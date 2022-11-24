@@ -156,7 +156,7 @@ export type PropValueTypes<K extends string = string> = Partial<{
 
 export type ComponentProps = Record<string, unknown>;
 
-export interface ArgTypeDefinition<V = unknown> {
+export interface ArgTypeDefinition<V = unknown, P = unknown> {
   /**
    * To be used instead of the property name for UI purposes in the editor.
    */
@@ -197,11 +197,11 @@ export interface ArgTypeDefinition<V = unknown> {
    * @param {string} props all the prop bindings of the component
    * @returns {boolean} a boolean value indicating whether the property should be visible or not
    */
-  visible?: ((props: ComponentProps) => boolean) | boolean;
+  visible?: ((props: P) => boolean) | boolean;
 }
 
 export type ArgTypeDefinitions<P = any> = {
-  [K in keyof P & string]?: ArgTypeDefinition<P[K]>;
+  [K in keyof P & string]?: ArgTypeDefinition<P[K], P>;
 };
 
 export interface ComponentDefinition<P> {

@@ -3,7 +3,6 @@ import {
   ArgControlSpec,
   PropValueType,
   ComponentProps,
-  TOOLPAD_COMPONENT_MODE_PROPERTY,
 } from '@mui/toolpad-core';
 import string from './string';
 import boolean from './boolean';
@@ -68,7 +67,7 @@ export function getDefaultControl(
 ): React.FC<EditorProps<any>> | null {
   if (argType.control) {
     if (argType.control.type === 'markdown') {
-      const { [TOOLPAD_COMPONENT_MODE_PROPERTY]: mode } = liveProps || {};
+      const { mode } = liveProps || {};
 
       if (mode && typeof mode === 'string') {
         const mappedControlFromMode = modePropTypeMap.get(mode);

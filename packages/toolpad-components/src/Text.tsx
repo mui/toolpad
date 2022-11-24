@@ -7,40 +7,36 @@ import {
   LinkProps as MuiLinkProps,
   styled,
 } from '@mui/material';
-import { createComponent, TOOLPAD_COMPONENT_MODE_PROPERTY } from '@mui/toolpad-core';
-import ReactMarkdown from 'react-markdown';
+import { createComponent } from '@mui/toolpad-core';
 import remarkGfm from 'remark-gfm';
+
+const ReactMarkdown = React.lazy(() => import('react-markdown'));
 
 type BaseProps = MuiLinkProps | MuiTypographyProps;
 interface TextProps extends Omit<BaseProps, 'children'> {
-  [TOOLPAD_COMPONENT_MODE_PROPERTY]: string;
+  mode: 'markdown' | 'link' | 'text';
   value: string;
   markdown: string;
   href?: string;
   loading?: boolean;
 }
 
-const MarkdownContainer = styled('div')({
+const MarkdownContainer = styled('div')(({ theme }) => ({
   display: 'block',
-  '&:empty::before': { content: '""', display: 'inline-block' },
-});
+  margin: theme.spacing(1),
+  [`&:empty::before`]: { content: '""', display: 'inline-block' },
+}));
 
-function Text({
-  value,
-  markdown,
-  href,
-  loading,
-  [TOOLPAD_COMPONENT_MODE_PROPERTY]: mode,
-  sx,
-  ...rest
-}: TextProps) {
+function Text({ value, markdown, href, loading, mode, sx, ...rest }: TextProps) {
   switch (mode) {
     case 'markdown':
       return loading ? (
-        <Skeleton width={150} />
+        <Skeleton width={'100%'} sx={{ mx: 1 }} />
       ) : (
         <MarkdownContainer>
-          <ReactMarkdown remarkPlugins={[remarkGfm]}>{value}</ReactMarkdown>
+          <React.Suspense>
+            <ReactMarkdown remarkPlugins={[remarkGfm]}>{value}</ReactMarkdown>
+          </React.Suspense>
         </MarkdownContainer>
       );
     case 'link':
@@ -85,7 +81,7 @@ export default createComponent(Text, {
   loadingPropSource: ['value'],
   loadingProp: 'loading',
   argTypes: {
-    [TOOLPAD_COMPONENT_MODE_PROPERTY]: {
+    mode: {
       typeDef: { type: 'string', enum: ['text', 'markdown', 'link'] },
       label: 'Mode',
       defaultValue: 'text',
@@ -99,7 +95,7 @@ export default createComponent(Text, {
     href: {
       typeDef: { type: 'string' },
       defaultValue: 'about:blank',
-      visible: ({ [TOOLPAD_COMPONENT_MODE_PROPERTY]: mode }) => mode === 'link',
+      visible: ({ mode }) => mode === 'link',
     },
     variant: {
       typeDef: {
@@ -107,14 +103,16 @@ export default createComponent(Text, {
         enum: ['h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'subtitle1', 'subtitle2', 'body1', 'body2'],
       },
       label: 'Variant',
-      visible: ({ [TOOLPAD_COMPONENT_MODE_PROPERTY]: mode }) => mode === 'text',
+      visible: ({ mode }) => mode === 'text',
     },
     loading: {
       typeDef: { type: 'boolean' },
       defaultValue: false,
+      visible: ({ mode }) => mode !== 'markdown',
     },
     sx: {
       typeDef: { type: 'object' },
+      visible: ({ mode }) => mode !== 'markdown',
     },
   },
 });

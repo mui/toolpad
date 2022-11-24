@@ -29,13 +29,8 @@ function MarkdownPropEditor({ value, onChange }: EditorProps<any>) {
       <Button variant="outlined" color="inherit" fullWidth onClick={() => setDialogOpen(true)}>
         Edit Markdown
       </Button>
-      <Dialog
-        fullWidth
-        open={dialogOpen}
-        onClose={() => setDialogOpen(false)}
-        aria-labelledby="draggable-dialog-title"
-      >
-        <DialogTitle id="draggable-dialog-title">Edit Markdown</DialogTitle>
+      <Dialog fullWidth open={dialogOpen} onClose={() => setDialogOpen(false)}>
+        <DialogTitle>Edit Markdown</DialogTitle>
         <DialogContent>
           <Box sx={{ height: 200 }}>
             <MarkdownEditor value={value} onChange={(newValue = '') => onChange(newValue)} />

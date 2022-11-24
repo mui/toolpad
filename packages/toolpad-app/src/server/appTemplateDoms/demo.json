@@ -1,6 +1,37 @@
 {
   "root": "320kq4a",
   "nodes": {
+    "1313wn3": {
+      "id": "1313wn3",
+      "name": "getUsers",
+      "type": "query",
+      "params": [],
+      "parentId": "331kqzd",
+      "attributes": {
+        "query": {
+          "type": "const",
+          "value": {
+            "url": {
+              "type": "const",
+              "value": "http://localhost:3000/static/employees.json"
+            },
+            "method": "GET",
+            "browser": true,
+            "headers": []
+          }
+        },
+        "dataSource": {
+          "type": "const",
+          "value": "rest"
+        },
+        "connectionId": {
+          "type": "const",
+          "value": null
+        }
+      },
+      "parentProp": "queries",
+      "parentIndex": "a1"
+    },
     "320kq4a": {
       "id": "320kq4a",
       "name": "Application",
@@ -22,64 +53,6 @@
         }
       },
       "parentProp": "pages",
-      "parentIndex": "a0"
-    },
-    "h903q4f": {
-      "id": "h903q4f",
-      "name": "mockApi",
-      "type": "connection",
-      "parentId": "320kq4a",
-      "attributes": {
-        "params": {
-          "type": "secret",
-          "value": {
-            "baseUrl": "http://localhost:3000/static/",
-            "headers": [],
-            "authentication": null
-          }
-        },
-        "status": {
-          "type": "const",
-          "value": null
-        },
-        "dataSource": {
-          "type": "const",
-          "value": "rest"
-        }
-      },
-      "parentProp": "connections",
-      "parentIndex": "a0"
-    },
-    "je13qh6": {
-      "id": "je13qh6",
-      "name": "getUsers",
-      "type": "query",
-      "params": [],
-      "parentId": "331kqzd",
-      "attributes": {
-        "query": {
-          "type": "const",
-          "value": {
-            "url": {
-              "type": "const",
-              "value": "employees.json"
-            },
-            "method": "GET",
-            "headers": []
-          }
-        },
-        "dataSource": {
-          "type": "const",
-          "value": "rest"
-        },
-        "connectionId": {
-          "type": "const",
-          "value": {
-            "$$ref": "h903q4f"
-          }
-        }
-      },
-      "parentProp": "queries",
       "parentIndex": "a0"
     },
     "k3c3qmt": {

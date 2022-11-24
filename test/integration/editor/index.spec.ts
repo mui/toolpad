@@ -9,7 +9,7 @@ test('can place new components from catalog', async ({ page, browserName }) => {
   const editorModel = new ToolpadEditor(page, browserName);
 
   await homeModel.goto();
-  const app = await homeModel.createApplication({});
+  const app = await homeModel.createApplication({ appTemplateId: 'blank' });
   await editorModel.goto(app.id);
 
   await editorModel.pageRoot.waitFor();

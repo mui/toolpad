@@ -40,7 +40,7 @@ export class ToolpadHome {
     });
     this.newAppNameInput = this.newAppDialog.locator('label:has-text("name")');
     this.newAppTemplateSelect = this.newAppDialog.locator(
-      '[aria-haspopup="listbox"]:has-text("blank")',
+      '[aria-haspopup="listbox"]:has-text("demo")',
     );
     this.newAppDomInput = this.newAppDialog.locator('label:has-text("dom")');
     this.newAppDomCreateBtn = this.newAppDialog.locator('button:has-text("create")');

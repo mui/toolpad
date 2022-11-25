@@ -1,5 +1,5 @@
 import * as path from 'path';
-import { test } from '@playwright/test';
+import { test, expect } from '@playwright/test';
 import { ToolpadHome } from '../../models/ToolpadHome';
 import { ToolpadRuntime } from '../../models/ToolpadRuntime';
 import { readJsonFile } from '../../utils/fs';
@@ -30,9 +30,10 @@ test('rest basics', async ({ page }) => {
   const runtimeModel = new ToolpadRuntime(page);
   await runtimeModel.gotoPage(app.id, 'page1');
 
-  await page.locator('text="query1: query1_value"').waitFor({ state: 'visible' });
-  await page.locator('text="query2: undefined"').waitFor({ state: 'visible' });
+  await expect(page.locator('text="query1: query1_value"')).toBeVisible();
+  await expect(page.locator('text="query2: undefined"')).toBeVisible();
   await page.locator('button:has-text("fetch query2")').click();
-  await page.locator('text="query2: query2_value"').waitFor({ state: 'visible' });
-  await page.locator('text="browserQuery: browserQuery_value"').waitFor({ state: 'visible' });
+  await expect(page.locator('text="query2: query2_value"')).toBeVisible();
+  await expect(page.locator('text="browserQuery: browserQuery_value"')).toBeVisible();
+  await expect(page.locator('text="browserQuery: browserQuery_value"')).toBeVisible();
 });

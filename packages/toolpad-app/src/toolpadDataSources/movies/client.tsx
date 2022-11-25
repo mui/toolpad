@@ -75,7 +75,7 @@ function getInitialQueryValue(): MoviesQuery {
 }
 
 const dataSource: ClientDataSource<MoviesConnectionParams, MoviesQuery> = {
-  displayName: 'Movies Mock API',
+  displayName: 'Movies',
   QueryEditor,
   getInitialQueryValue,
   hasDefault: true,

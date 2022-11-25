@@ -2,6 +2,7 @@ import * as React from 'react';
 import { Box, Container, Stack, Typography } from '@mui/material';
 import { useParams } from 'react-router-dom';
 import { NodeId } from '@mui/toolpad-core';
+import invariant from 'invariant';
 import { ConnectionEditorProps, ClientDataSource } from '../../../types';
 import { useDom, useDomApi } from '../../DomLoader';
 import * as appDom from '../../../appDom';
@@ -23,7 +24,10 @@ function ConnectionParamsEditor<P>({
   handlerBasePath,
 }: ConnectionParamsEditorProps<P>) {
   const { ConnectionParamsInput } = dataSource;
-  return ConnectionParamsInput ? (
+
+  invariant(ConnectionParamsInput, 'Datasource has no ConnectionParamsInput');
+
+  return (
     <ConnectionParamsInput
       handlerBasePath={handlerBasePath}
       connectionId={connectionId}
@@ -31,7 +35,7 @@ function ConnectionParamsEditor<P>({
       onChange={onChange}
       appId={appId}
     />
-  ) : null;
+  );
 }
 
 interface ConnectionEditorContentProps<P> {

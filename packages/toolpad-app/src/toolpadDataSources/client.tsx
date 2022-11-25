@@ -10,15 +10,16 @@ import { DEMO_DATASOURCES, PRODUCTION_DATASOURCES } from '../constants';
 
 type ClientDataSources = { [key: string]: ClientDataSource<any, any> | undefined };
 
-const clientDataSources: ClientDataSources = _.pick(
-  {
-    rest,
-    function: functionSrc,
-    postgres,
-    googleSheets,
-    movies,
-  },
-  [...PRODUCTION_DATASOURCES, ...(config.isDemo ? DEMO_DATASOURCES : [])],
-);
+export const allClientDataSources: ClientDataSources = {
+  rest,
+  function: functionSrc,
+  postgres,
+  googleSheets,
+  ...(config.isDemo ? { movies } : {}),
+};
+
+const clientDataSources = _.pick(allClientDataSources, [
+  ...(config.isDemo ? DEMO_DATASOURCES : PRODUCTION_DATASOURCES),
+]);
 
 export default clientDataSources;

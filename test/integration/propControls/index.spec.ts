@@ -1,18 +1,23 @@
 import { test, expect } from '@playwright/test';
-import { ToolpadHome } from '../../models/ToolpadHome';
+import invariant from 'invariant';
+import * as path from 'path';
 import { ToolpadEditor } from '../../models/ToolpadEditor';
 import clickCenter from '../../utils/clickCenter';
-import domInput from './domInput.json';
+import { createApplication } from '../../utils/toolpadApi';
+import { readJsonFile } from '../../utils/fs';
 
 test('can control component prop values in properties control panel', async ({
   page,
   browserName,
+  baseURL,
 }) => {
-  const homeModel = new ToolpadHome(page);
+  invariant(baseURL, 'playwright must be run with a a baseURL');
+
+  const dom = await readJsonFile(path.resolve(__dirname, './domInput.json'));
+  const app = await createApplication(baseURL, { dom });
+
   const editorModel = new ToolpadEditor(page, browserName);
 
-  await homeModel.goto();
-  const app = await homeModel.createApplication({ dom: domInput });
   await editorModel.goto(app.id);
 
   await editorModel.pageRoot.waitFor();

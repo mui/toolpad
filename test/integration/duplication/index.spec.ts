@@ -1,15 +1,16 @@
+import invariant from 'invariant';
 import * as path from 'path';
 import { ToolpadEditor } from '../../models/ToolpadEditor';
-import { ToolpadHome } from '../../models/ToolpadHome';
 import { test, expect } from '../../playwright/test';
 import { readJsonFile } from '../../utils/fs';
+import { createApplication } from '../../utils/toolpadApi';
 
-test('duplication', async ({ page, browserName }) => {
+test('duplication', async ({ page, browserName, baseURL }) => {
+  invariant(baseURL, 'playwright must be run with a a baseURL');
+
   const dom = await readJsonFile(path.resolve(__dirname, './dom.json'));
 
-  const homeModel = new ToolpadHome(page);
-  await homeModel.goto();
-  const app = await homeModel.createApplication({ dom });
+  const app = await createApplication(baseURL, { dom });
 
   const editorModel = new ToolpadEditor(page, browserName);
   await editorModel.goto(app.id);

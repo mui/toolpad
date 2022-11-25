@@ -1,15 +1,15 @@
 import * as path from 'path';
 import { test } from '@playwright/test';
-import { ToolpadHome } from '../../models/ToolpadHome';
+import invariant from 'invariant';
 import { ToolpadRuntime } from '../../models/ToolpadRuntime';
 import { readJsonFile } from '../../utils/fs';
+import { createApplication } from '../../utils/toolpadApi';
 
-test('functions basics', async ({ page }) => {
+test('functions basics', async ({ page, baseURL }) => {
+  invariant(baseURL, 'playwright must be run with a a baseURL');
+
   const dom = await readJsonFile(path.resolve(__dirname, './functionDom.json'));
-
-  const homeModel = new ToolpadHome(page);
-  await homeModel.goto();
-  const app = await homeModel.createApplication({ dom });
+  const app = await createApplication(baseURL, { dom });
 
   const runtimeModel = new ToolpadRuntime(page);
   await runtimeModel.gotoPage(app.id, 'page1');

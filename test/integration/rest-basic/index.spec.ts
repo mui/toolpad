@@ -15,7 +15,7 @@ if (customHttbinBaseUrl) {
 
 const HTTPBIN_BASEURL = customHttbinBaseUrl || 'https://httpbin.org/';
 
-test('functions basics', async ({ page }) => {
+test('rest basics', async ({ page }) => {
   const dom = await readJsonFile(path.resolve(__dirname, './restDom.json'));
 
   const httpbinConnection: any = Object.values(dom.nodes).find(
@@ -34,4 +34,5 @@ test('functions basics', async ({ page }) => {
   await page.locator('text="query2: undefined"').waitFor({ state: 'visible' });
   await page.locator('button:has-text("fetch query2")').click();
   await page.locator('text="query2: query2_value"').waitFor({ state: 'visible' });
+  await page.locator('text="browserQuery: browserQuery_value"').waitFor({ state: 'visible' });
 });

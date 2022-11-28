@@ -14,8 +14,6 @@ import {
 import type { Serializable } from '../../server/evalExpression';
 import applyTransform from '../../server/applyTransform';
 import { errorFrom } from '../../utils/errors';
-import config from '../../config';
-import DEMO_BASE_URLS from './demoBaseUrls';
 import { MOVIES_API_DEMO_URL } from '../demo';
 
 export const HTTP_NO_BODY = new Set(['GET', 'HEAD']);
@@ -168,6 +166,7 @@ async function readData(res: Response, fetchQuery: FetchQuery): Promise<any> {
 
 export function getDefaultUrl(connection?: RestConnectionParams | null): BindableAttrValue<string> {
   const baseUrl = connection?.baseUrl;
+
   return {
     type: 'const',
     value: baseUrl ? '' : MOVIES_API_DEMO_URL,
@@ -198,21 +197,6 @@ export async function execfetch(
     resolveBindableEntries(fetchQuery.searchParams || [], evalExpression, queryScope),
     resolveBindableEntries(fetchQuery.headers || [], evalExpression, queryScope),
   ]);
-
-  if (config.isDemo) {
-    const demoUrls = DEMO_BASE_URLS.map((baseUrl) => baseUrl.url);
-
-    const hasNonDemoConnectionParams =
-      !demoUrls.includes(connection?.baseUrl || '') ||
-      (!!connection?.headers && connection.headers.length > 0) ||
-      !!connection?.authentication;
-    const hasNonDemoQueryParams =
-      fetchQuery.method !== 'GET' || (!!fetchQuery.headers && fetchQuery.headers.length > 0);
-
-    if (hasNonDemoConnectionParams || hasNonDemoQueryParams) {
-      throw new Error(`Cannot use these features in demo version.`);
-    }
-  }
 
   const queryUrl = parseQueryUrl(resolvedUrl, connection?.baseUrl);
   resolvedSearchParams.forEach(([key, value]) => queryUrl.searchParams.append(key, value));

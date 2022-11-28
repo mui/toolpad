@@ -585,3 +585,57 @@ export async function getConnections() {
     select: SELECT_CONNECTION_META,
   });
 }
+
+type SecretsAction =
+  | {
+      kind: 'set';
+      value: any;
+    }
+  | {
+      kind: 'ignore';
+    }
+  | {
+      kind: 'delete';
+    };
+
+function updateSecrets(
+  existing: Record<string, any>,
+  updates: Record<string, SecretsAction>,
+): Record<string, any> {
+  const result = { ...existing };
+  for (const [key, update] of Object.entries(updates)) {
+    switch (update.kind) {
+      case 'set': {
+        result[key] = update.value;
+        break;
+      }
+      case 'delete': {
+        delete result[key];
+        break;
+      }
+      case 'ignore': {
+        break;
+      }
+      default:
+        throw new Error(`Unrecognized secrets update`);
+    }
+  }
+  return result;
+}
+
+interface CreateConnectionOptions {
+  datasource: string;
+  params: unknown;
+  secrets: Record<string, SecretsAction>;
+}
+
+export async function createConnection(name: string, options: CreateConnectionOptions) {
+  return prismaClient.connection.create({
+    data: {
+      name,
+      datasource: options.datasource,
+      params: options.params,
+      secrets: encryptSecret(JSON.stringify(updateSecrets({}, options.secrets))),
+    },
+  });
+}

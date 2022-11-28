@@ -120,6 +120,7 @@ function CreateConnectionDialog<P>({
   onStateChange,
   ...props
 }: CreateConnectionDialogProps<P>) {
+  const createConnectionMutation = client.useMutation('createConnection');
   const [dataSourceId, setDataSourceId] = React.useState('');
 
   const handleClose = React.useCallback(() => {
@@ -131,11 +132,19 @@ function CreateConnectionDialog<P>({
   }, [onStateChange, dataSourceId]);
 
   const handleSave = React.useCallback(
-    (newValue: P | null) => {
-      console.log(`saving`, newValue);
+    async (newValue: P | null) => {
+      await createConnectionMutation.mutateAsync([
+        'test',
+        {
+          datasource: dataSourceId,
+          params: newValue,
+          secrets: {},
+        },
+      ]);
+      client.invalidateQueries('getConnections');
       onStateChange((old) => ({ ...old, open: false }));
     },
-    [onStateChange],
+    [createConnectionMutation, dataSourceId, onStateChange],
   );
 
   const dataSource = getDataSource<P>(dataSourceId);

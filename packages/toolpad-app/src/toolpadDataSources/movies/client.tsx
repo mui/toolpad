@@ -23,7 +23,6 @@ import { MoviesQuery, MoviesConnectionParams } from './types';
 import { FetchResult } from '../rest/types';
 import useFetchPrivate from '../useFetchPrivate';
 import * as appDom from '../../appDom';
-import { isSaveDisabled } from '../../utils/forms';
 
 function withDefaults(value: Maybe<MoviesConnectionParams>): MoviesConnectionParams {
   return {
@@ -72,7 +71,7 @@ function ConnectionParamsInput2({
             Cancel
           </Button>
         ) : null}
-        <Button type="submit" onClick={doSubmit} disabled={isSaveDisabled(formState)}>
+        <Button type="submit" onClick={doSubmit} disabled={!formState.isValid}>
           Save
         </Button>
       </DialogActions>

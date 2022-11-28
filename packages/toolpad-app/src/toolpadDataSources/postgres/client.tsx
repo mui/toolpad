@@ -263,7 +263,7 @@ function ConnectionParamsInput2({
             Cancel
           </Button>
         ) : null}
-        <Button type="submit" onClick={doSubmit} disabled={isSaveDisabled(formState)}>
+        <Button type="submit" onClick={doSubmit} disabled={!formState.isValid}>
           Save
         </Button>
       </DialogActions>

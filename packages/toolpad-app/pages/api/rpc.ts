@@ -22,6 +22,7 @@ import {
   deploy,
   getDeployments,
   getConnections,
+  createConnection,
 } from '../../src/server/data';
 import { getLatestToolpadRelease } from '../../src/server/getLatestRelease';
 import { hasOwnProperty } from '../../src/utils/collections';
@@ -180,6 +181,9 @@ const rpcServer = {
     }),
     saveDom: createMethod<typeof saveDom>(({ params }) => {
       return saveDom(...params);
+    }),
+    createConnection: createMethod<typeof createConnection>(({ params }) => {
+      return createConnection(...params);
     }),
   },
 } as const;

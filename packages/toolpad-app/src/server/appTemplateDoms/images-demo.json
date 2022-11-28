@@ -97,9 +97,7 @@
         },
         "connectionId": {
           "type": "const",
-          "value": {
-            "$$ref": "cl27ajwae00003g69pc8n5eor"
-          }
+          "value": null
         }
       },
       "parentProp": "queries",
@@ -155,9 +153,7 @@
         },
         "connectionId": {
           "type": "const",
-          "value": {
-            "$$ref": "cl27ajwae00003g69pc8n5eor"
-          }
+          "value": null
         }
       },
       "parentProp": "queries",
@@ -224,9 +220,7 @@
         },
         "connectionId": {
           "type": "const",
-          "value": {
-            "$$ref": "cl27ajwae00003g69pc8n5eor"
-          }
+          "value": null
         }
       },
       "parentProp": "queries",
@@ -290,32 +284,6 @@
       "attributes": {},
       "parentProp": null,
       "parentIndex": null
-    },
-    "cl27ajwae00003g69pc8n5eor": {
-      "id": "cl27ajwae00003g69pc8n5eor",
-      "name": "dogsConnection",
-      "type": "connection",
-      "parentId": "cl27ajqk00000a0oz4xlqcy7n",
-      "attributes": {
-        "params": {
-          "type": "secret",
-          "value": {
-            "baseUrl": "",
-            "headers": [],
-            "authentication": null
-          }
-        },
-        "status": {
-          "type": "const",
-          "value": null
-        },
-        "dataSource": {
-          "type": "const",
-          "value": "rest"
-        }
-      },
-      "parentProp": "connections",
-      "parentIndex": "a0"
     },
     "cl27arb1i00043g693pzhex2r": {
       "id": "cl27arb1i00043g693pzhex2r",

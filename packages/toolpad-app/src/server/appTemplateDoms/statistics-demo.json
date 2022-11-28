@@ -26,9 +26,7 @@
         },
         "connectionId": {
           "type": "const",
-          "value": {
-            "$$ref": "jv03sl9"
-          }
+          "value": null
         }
       },
       "parentProp": "queries",
@@ -73,32 +71,6 @@
         }
       },
       "parentProp": "children",
-      "parentIndex": "a0"
-    },
-    "jv03sl9": {
-      "id": "jv03sl9",
-      "name": "covidStatsConnection",
-      "type": "connection",
-      "parentId": "l00ao64",
-      "attributes": {
-        "params": {
-          "type": "secret",
-          "value": {
-            "baseUrl": "",
-            "headers": [],
-            "authentication": null
-          }
-        },
-        "status": {
-          "type": "const",
-          "value": null
-        },
-        "dataSource": {
-          "type": "const",
-          "value": "rest"
-        }
-      },
-      "parentProp": "connections",
       "parentIndex": "a0"
     },
     "l00ao64": {

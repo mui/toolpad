@@ -15,7 +15,7 @@ export interface NodeAttributeEditorProps<P> {
   props?: P;
 }
 
-export default function NodeAttributeEditor<P>({
+export default function NodeAttributeEditor<P extends Record<string, unknown>>({
   node,
   namespace = 'attributes',
   name,

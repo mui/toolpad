@@ -17,6 +17,7 @@ import { BindableAttrEntries, BindableAttrValue } from '@mui/toolpad-core';
 import {
   ClientDataSource,
   ConnectionEditorProps,
+  ConnectionEditorProps2,
   ExecFetchFn,
   QueryEditorProps,
 } from '../../types';
@@ -107,15 +108,15 @@ function ConnectionParamsInput2({
   value,
   onChange,
   onClose,
-}: ConnectionEditorProps<FunctionConnectionParams>) {
+}: ConnectionEditorProps2<FunctionConnectionParams>) {
   const { handleSubmit, formState, reset, control } = useForm({
-    defaultValues: withDefaults(value),
+    defaultValues: value,
     reValidateMode: 'onChange',
     mode: 'all',
   });
-  React.useEffect(() => reset(withDefaults(value)), [reset, value]);
+  React.useEffect(() => reset(value), [reset, value]);
 
-  const doSubmit = handleSubmit((connectionParams) => onChange(connectionParams));
+  const doSubmit = handleSubmit((newValue) => onChange(newValue));
 
   return (
     <React.Fragment>
@@ -123,16 +124,15 @@ function ConnectionParamsInput2({
         <Stack direction="column" gap={3} sx={{ py: 3 }}>
           <Typography>Secrets:</Typography>
           <Controller
-            name="secrets"
+            name="params.secrets"
             control={control}
-            render={({
-              field: { value: fieldValue = [], onChange: onFieldChange, ref, ...field },
-            }) => {
+            render={({ field: { value: fieldValue, onChange: onFieldChange, ref, ...field } }) => {
+              console.log(fieldValue);
               return (
                 <MapEntriesEditor
                   {...field}
                   fieldLabel="key"
-                  value={fieldValue}
+                  value={fieldValue ?? []}
                   onChange={onFieldChange}
                 />
               );

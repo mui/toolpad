@@ -15,7 +15,12 @@ import { inferColumns, parseColumns } from '@mui/toolpad-components';
 import { DataGridPro, GridColDef } from '@mui/x-data-grid-pro';
 import { UseQueryResult } from '@tanstack/react-query';
 import { getObjectKey } from '@mui/toolpad-core/objectKey';
-import { ClientDataSource, ConnectionEditorProps, QueryEditorProps } from '../../types';
+import {
+  ClientDataSource,
+  ConnectionEditorProps,
+  ConnectionEditorProps2,
+  QueryEditorProps,
+} from '../../types';
 import {
   GoogleSheetsConnectionParams,
   GoogleSheetsApiQuery,
@@ -251,7 +256,7 @@ function ConnectionParamsInput2({
   connectionId,
   handlerBasePath,
   onClose,
-}: ConnectionEditorProps<GoogleSheetsConnectionParams>) {
+}: ConnectionEditorProps2<GoogleSheetsConnectionParams>) {
   const validatedUser: UseQueryResult<GoogleDriveUser> = usePrivateQuery(
     {
       type: 'CONNECTION_STATUS',

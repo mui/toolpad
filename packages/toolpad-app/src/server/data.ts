@@ -1,7 +1,13 @@
 import { NodeId, BindableAttrValue, ExecFetchResult } from '@mui/toolpad-core';
 import * as _ from 'lodash-es';
 import * as prisma from '../../prisma/generated/client';
-import { ServerDataSource, VersionOrPreview, AppTemplateId, RuntimeState } from '../types';
+import {
+  ServerDataSource,
+  VersionOrPreview,
+  AppTemplateId,
+  RuntimeState,
+  SecretsActions,
+} from '../types';
 import serverDataSources from '../toolpadDataSources/server';
 import * as appDom from '../appDom';
 import { omit } from '../utils/immutability';
@@ -586,21 +592,9 @@ export async function getConnections() {
   });
 }
 
-type SecretsAction =
-  | {
-      kind: 'set';
-      value: any;
-    }
-  | {
-      kind: 'ignore';
-    }
-  | {
-      kind: 'delete';
-    };
-
 function updateSecrets(
   existing: Record<string, any>,
-  updates: Record<string, SecretsAction>,
+  updates: SecretsActions,
 ): Record<string, any> {
   const result = { ...existing };
   for (const [key, update] of Object.entries(updates)) {
@@ -626,7 +620,7 @@ function updateSecrets(
 interface CreateConnectionOptions {
   datasource: string;
   params: unknown;
-  secrets: Record<string, SecretsAction>;
+  secrets: SecretsActions;
 }
 
 export async function createConnection(name: string, options: CreateConnectionOptions) {

@@ -23,7 +23,12 @@ import SplitPane from '../../components/SplitPane';
 import ErrorAlert from '../../toolpad/AppEditor/PageEditor/ErrorAlert';
 import ParametersEditor from '../../toolpad/AppEditor/PageEditor/ParametersEditor';
 import { useEvaluateLiveBindingEntries } from '../../toolpad/AppEditor/useEvaluateLiveBinding';
-import { ClientDataSource, ConnectionEditorProps, QueryEditorProps } from '../../types';
+import {
+  ClientDataSource,
+  ConnectionEditorProps,
+  ConnectionEditorProps2,
+  QueryEditorProps,
+} from '../../types';
 import { isSaveDisabled, validation } from '../../utils/forms';
 import lazyComponent from '../../utils/lazyComponent';
 import { Maybe } from '../../utils/types';
@@ -171,7 +176,7 @@ function ConnectionParamsInput2({
   value,
   onChange,
   onClose,
-}: ConnectionEditorProps<PostgresConnectionParams>) {
+}: ConnectionEditorProps2<PostgresConnectionParams>) {
   const { handleSubmit, register, formState, reset, watch } = useForm({
     defaultValues: withDefaults(value),
     reValidateMode: 'onChange',

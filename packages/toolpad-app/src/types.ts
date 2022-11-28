@@ -82,6 +82,31 @@ export interface ConnectionEditorProps<P> extends WithControlledProp<P | null> {
 }
 export type ConnectionParamsEditor<P = {}> = React.FC<ConnectionEditorProps<P>>;
 
+export type SecretsAction =
+  | {
+      kind: 'set';
+      value: any;
+    }
+  | {
+      kind: 'ignore';
+    }
+  | {
+      kind: 'delete';
+    };
+
+export type SecretsActions = Record<string, SecretsAction>;
+
+export interface ConnectionEditorModel<P> {
+  name: string;
+  params: P | null;
+  secrets: SecretsActions;
+}
+
+export interface ConnectionEditorProps2<P> extends WithControlledProp<ConnectionEditorModel<P>> {
+  onClose?: () => void;
+}
+export type ConnectionParamsEditor2<P = {}> = React.FC<ConnectionEditorProps2<P>>;
+
 export interface QueryEditorProps<C, Q> extends WithControlledProp<appDom.QueryNode<Q>> {
   connectionParams: Maybe<C>;
   globalScope: Record<string, any>;
@@ -109,7 +134,7 @@ export interface ClientDataSource<C = {}, Q = {}> {
   /** @deprecated Kept around for in-app connections until they're global */
   ConnectionParamsInput: ConnectionParamsEditor<C>;
   // Temporary until connections are made global
-  ConnectionParamsInput2: ConnectionParamsEditor<C>;
+  ConnectionParamsInput2: ConnectionParamsEditor2<C>;
   transformQueryBeforeCommit?: (query: Q) => Q;
   QueryEditor: QueryEditor<C, Q>;
   getInitialQueryValue: () => Q;

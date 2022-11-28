@@ -46,7 +46,12 @@ import useLocalStorageState from '../../utils/useLocalStorageState';
 import ErrorAlert from '../AppEditor/PageEditor/ErrorAlert';
 import { ConfirmDialog } from '../../components/SystemDialogs';
 import config from '../../config';
-import { AppTemplateId, ClientDataSource, ConnectionEditorProps } from '../../types';
+import {
+  AppTemplateId,
+  ClientDataSource,
+  ConnectionEditorModel,
+  ConnectionEditorProps2,
+} from '../../types';
 import { errorFrom } from '../../utils/errors';
 import FlexFill from '../../components/FlexFill';
 import dataSources from '../../toolpadDataSources/client';
@@ -99,7 +104,7 @@ interface DialogState<P> {
   params: P | null;
 }
 
-interface ConnectionParamsEditorProps<P> extends ConnectionEditorProps<P> {
+interface ConnectionParamsEditorProps<P> extends ConnectionEditorProps2<P> {
   dataSource: ClientDataSource<P, any>;
 }
 
@@ -132,13 +137,13 @@ function CreateConnectionDialog<P>({
   }, [onStateChange, dataSourceId]);
 
   const handleSave = React.useCallback(
-    async (newValue: P | null) => {
+    async ({ name, params, secrets }: ConnectionEditorModel<P>) => {
       await createConnectionMutation.mutateAsync([
-        'test',
+        name,
         {
           datasource: dataSourceId,
-          params: newValue,
-          secrets: {},
+          params,
+          secrets,
         },
       ]);
       client.invalidateQueries('getConnections');
@@ -154,6 +159,15 @@ function CreateConnectionDialog<P>({
     [dataSourceId],
   );
 
+  const model = React.useMemo(
+    () => ({
+      name: 'new connection',
+      params: state.params,
+      secrets: {},
+    }),
+    [state.params],
+  );
+
   return (
     <Dialog fullWidth open={state.open} onClose={handleClose} {...props}>
       {state.dataSourceId ? (
@@ -164,12 +178,9 @@ function CreateConnectionDialog<P>({
             <ConnectionContextProvider value={connectionEditorContext}>
               <ConnectionParamsEditor<P>
                 dataSource={dataSource}
-                value={state.params}
+                value={model}
                 onChange={handleSave}
-                handlerBasePath={`/api/dataSources/${dataSourceId}`}
                 onClose={handleClose}
-                appId={null}
-                connectionId={null}
               />
             </ConnectionContextProvider>
           ) : (

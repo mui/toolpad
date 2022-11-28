@@ -23,6 +23,7 @@ import { TabContext, TabList } from '@mui/lab';
 import {
   ClientDataSource,
   ConnectionEditorProps,
+  ConnectionEditorProps2,
   ExecFetchFn,
   QueryEditorProps,
 } from '../../types';
@@ -226,7 +227,7 @@ function ConnectionParamsInput2({
   value,
   onChange,
   onClose,
-}: ConnectionEditorProps<RestConnectionParams>) {
+}: ConnectionEditorProps2<RestConnectionParams>) {
   const { handleSubmit, register, formState, reset, control, watch } = useForm({
     defaultValues: withDefaults(value),
     reValidateMode: 'onChange',

@@ -16,7 +16,12 @@ import data from '../../../public/static/movies.json';
 import JsonView from '../../components/JsonView';
 import SplitPane from '../../components/SplitPane';
 import ErrorAlert from '../../toolpad/AppEditor/PageEditor/ErrorAlert';
-import { ClientDataSource, ConnectionEditorProps, QueryEditorProps } from '../../types';
+import {
+  ClientDataSource,
+  ConnectionEditorProps,
+  ConnectionEditorProps2,
+  QueryEditorProps,
+} from '../../types';
 import { Maybe } from '../../utils/types';
 import useQueryPreview from '../useQueryPreview';
 import { MoviesQuery, MoviesConnectionParams } from './types';
@@ -53,7 +58,7 @@ function ConnectionParamsInput2({
   value,
   onChange,
   onClose,
-}: ConnectionEditorProps<MoviesConnectionParams>) {
+}: ConnectionEditorProps2<MoviesConnectionParams>) {
   const { handleSubmit, reset, formState } = useForm({
     defaultValues: withDefaults(value),
   });

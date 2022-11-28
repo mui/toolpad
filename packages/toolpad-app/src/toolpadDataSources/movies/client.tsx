@@ -1,4 +1,13 @@
-import { Box, Button, MenuItem, Stack, TextField, Toolbar } from '@mui/material';
+import {
+  Box,
+  Button,
+  DialogActions,
+  DialogContent,
+  MenuItem,
+  Stack,
+  TextField,
+  Toolbar,
+} from '@mui/material';
 import * as React from 'react';
 import { useForm } from 'react-hook-form';
 import { LoadingButton } from '@mui/lab';
@@ -14,6 +23,7 @@ import { MoviesQuery, MoviesConnectionParams } from './types';
 import { FetchResult } from '../rest/types';
 import useFetchPrivate from '../useFetchPrivate';
 import * as appDom from '../../appDom';
+import { isSaveDisabled } from '../../utils/forms';
 
 function withDefaults(value: Maybe<MoviesConnectionParams>): MoviesConnectionParams {
   return {
@@ -37,6 +47,36 @@ function ConnectionParamsInput({ value, onChange }: ConnectionEditorProps<Movies
         </Button>
       </Toolbar>
     </Stack>
+  );
+}
+
+function ConnectionParamsInput2({
+  value,
+  onChange,
+  onClose,
+}: ConnectionEditorProps<MoviesConnectionParams>) {
+  const { handleSubmit, reset, formState } = useForm({
+    defaultValues: withDefaults(value),
+  });
+  React.useEffect(() => reset(withDefaults(value)), [reset, value]);
+
+  const doSubmit = handleSubmit((connectionParams) => onChange(connectionParams));
+
+  return (
+    <React.Fragment>
+      <DialogContent>Movies</DialogContent>
+
+      <DialogActions>
+        {onClose ? (
+          <Button color="inherit" variant="text" onClick={onClose}>
+            Cancel
+          </Button>
+        ) : null}
+        <Button type="submit" onClick={doSubmit} disabled={isSaveDisabled(formState)}>
+          Save
+        </Button>
+      </DialogActions>
+    </React.Fragment>
   );
 }
 
@@ -104,6 +144,7 @@ function getInitialQueryValue(): MoviesQuery {
 const dataSource: ClientDataSource<MoviesConnectionParams, MoviesQuery> = {
   displayName: 'Fake Movies API',
   ConnectionParamsInput,
+  ConnectionParamsInput2,
   QueryEditor,
   getInitialQueryValue,
 };

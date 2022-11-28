@@ -1,5 +1,15 @@
 import { LoadingButton } from '@mui/lab';
-import { Box, Button, Skeleton, Stack, TextField, Toolbar, Typography } from '@mui/material';
+import {
+  Box,
+  Button,
+  DialogActions,
+  DialogContent,
+  Skeleton,
+  Stack,
+  TextField,
+  Toolbar,
+  Typography,
+} from '@mui/material';
 import { inferColumns, parseColumns } from '@mui/toolpad-components';
 import { DataGridPro, GridColDef } from '@mui/x-data-grid-pro';
 import * as React from 'react';
@@ -157,6 +167,110 @@ function ConnectionParamsInput({
   );
 }
 
+function ConnectionParamsInput2({
+  value,
+  onChange,
+  onClose,
+}: ConnectionEditorProps<PostgresConnectionParams>) {
+  const { handleSubmit, register, formState, reset, watch } = useForm({
+    defaultValues: withDefaults(value),
+    reValidateMode: 'onChange',
+    mode: 'all',
+  });
+  React.useEffect(() => reset(withDefaults(value)), [reset, value]);
+
+  const doSubmit = handleSubmit((connectionParams) => onChange(connectionParams));
+
+  const fetchPrivate = useFetchPrivate<PostgresPrivateQuery, any>();
+
+  const [connectionStatus, setConnectionStatus] = React.useState<PostgresConnectionStatus | null>(
+    null,
+  );
+
+  const values = watch();
+
+  const handleTestConnection = React.useCallback(() => {
+    fetchPrivate({ kind: 'connectionStatus', params: values })
+      .then((status) => {
+        setConnectionStatus(status);
+      })
+      .catch(() => {
+        setConnectionStatus(null);
+      });
+  }, [fetchPrivate, values]);
+
+  const statusIcon = getConnectionStatusIcon(connectionStatus);
+
+  React.useEffect(() => {
+    const { unsubscribe } = watch((_values, params) => {
+      if (params.type === 'change') {
+        setConnectionStatus(null);
+      }
+    });
+    return unsubscribe;
+  }, [watch]);
+
+  return (
+    <React.Fragment>
+      <DialogContent>
+        <Stack direction="column" gap={1}>
+          <TextField
+            label="host"
+            {...register('host', { required: true })}
+            {...validation(formState, 'host')}
+          />
+          <TextField
+            label="port"
+            {...register('port', { required: true })}
+            {...validation(formState, 'port')}
+          />
+          <TextField
+            label="user"
+            {...register('user', { required: true })}
+            {...validation(formState, 'user')}
+          />
+          <TextField
+            label="password"
+            type="password"
+            {...register('password', { required: true })}
+            {...validation(formState, 'password')}
+          />
+          <TextField
+            label="database"
+            {...register('database', { required: true })}
+            {...validation(formState, 'database')}
+          />
+          <LoadingButton
+            variant="outlined"
+            onClick={handleTestConnection}
+            disabled={!formState.isValid}
+            loadingPosition="end"
+            endIcon={statusIcon}
+            color={getConnectionStatusColor(connectionStatus) || 'inherit'}
+          >
+            Test connection
+          </LoadingButton>
+          {connectionStatus ? (
+            <Typography variant="body2" color="error">
+              {connectionStatus.error}
+            </Typography>
+          ) : null}
+        </Stack>
+      </DialogContent>
+      <DialogActions>
+        {onClose ? (
+          <Button color="inherit" variant="text" onClick={onClose}>
+            Cancel
+          </Button>
+        ) : null}
+        <Button type="submit" onClick={doSubmit} disabled={isSaveDisabled(formState)}>
+          Save
+        </Button>
+      </DialogActions>
+    </React.Fragment>
+  );
+}
+
 const EMPTY_PARAMS: BindableAttrEntries = [];
 
 function QueryEditor({
@@ -245,6 +359,7 @@ function getInitialQueryValue(): PostgresQuery {
 const dataSource: ClientDataSource<PostgresConnectionParams, PostgresQuery> = {
   displayName: 'PostgreSQL',
   ConnectionParamsInput,
+  ConnectionParamsInput2,
   QueryEditor,
   getInitialQueryValue,
 };

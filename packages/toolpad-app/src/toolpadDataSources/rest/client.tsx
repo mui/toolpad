@@ -15,6 +15,8 @@ import {
   Checkbox,
   FormControlLabel,
   FormGroup,
+  DialogActions,
+  DialogContent,
 } from '@mui/material';
 import { Controller, useForm } from 'react-hook-form';
 import { TabContext, TabList } from '@mui/lab';
@@ -217,6 +219,118 @@ function ConnectionParamsInput({ value, onChange }: ConnectionEditorProps<RestCo
         </Button>
       </Toolbar>
     </Stack>
+  );
+}
+
+function ConnectionParamsInput2({
+  value,
+  onChange,
+  onClose,
+}: ConnectionEditorProps<RestConnectionParams>) {
+  const { handleSubmit, register, formState, reset, control, watch } = useForm({
+    defaultValues: withDefaults(value),
+    reValidateMode: 'onChange',
+    mode: 'all',
+  });
+  React.useEffect(() => reset(withDefaults(value)), [reset, value]);
+
+  const doSubmit = handleSubmit((connectionParams) =>
+    onChange({
+      ...connectionParams,
+      baseUrl: connectionParams.baseUrl && parseBaseUrl(connectionParams.baseUrl).href,
+    }),
+  );
+
+  const baseUrlValue = watch('baseUrl');
+  const headersValue = watch('headers');
+  const authenticationValue = watch('authentication');
+  const authenticationHeaders = getAuthenticationHeaders(authenticationValue);
+
+  const mustHaveBaseUrl: boolean =
+    (headersValue && headersValue.length > 0) || !!authenticationValue;
+
+  const headersAllowed = !!baseUrlValue;
+
+  const baseUrlInputProps = {
+    label: 'base url',
+    ...register('baseUrl', {
+      validate(input?: string) {
+        if (!input) {
+          if (mustHaveBaseUrl) {
+            return 'A base url is required when headers are used';
+          }
+          return true;
+        }
+        try {
+          return !!parseBaseUrl(input);
+        } catch (error) {
+          return 'Must be an absolute url';
+        }
+      },
+    }),
+    ...validation(formState, 'baseUrl'),
+  };
+
+  return (
+    <React.Fragment>
+      <DialogContent>
+        <Stack direction="column" gap={3} sx={{ py: 3 }}>
+          {config.isDemo ? (
+            <TextField select {...baseUrlInputProps} defaultValue="">
+              {DEMO_BASE_URLS.map(({ url, name }) => (
+                <MenuItem key={url} value={url}>
+                  {url} ({name})
+                </MenuItem>
+              ))}
+            </TextField>
+          ) : (
+            <TextField {...baseUrlInputProps} />
+          )}
+          <Typography>Headers:</Typography>
+          <Controller
+            name="headers"
+            control={control}
+            render={({
+              field: { value: fieldValue = [], onChange: onFieldChange, ref, ...field },
+            }) => {
+              const allHeaders = [...authenticationHeaders, ...fieldValue];
+              return (
+                <MapEntriesEditor
+                  {...field}
+                  disabled={!headersAllowed || config.isDemo}
+                  fieldLabel="header"
+                  value={allHeaders}
+                  onChange={(headers) => onFieldChange(headers.slice(authenticationHeaders.length))}
+                  isEntryDisabled={(entry, index) => index < authenticationHeaders.length}
+                />
+              );
+            }}
+          />
+          <Typography>Authentication:</Typography>
+          <Controller
+            name="authentication"
+            control={control}
+            render={({ field: { value: fieldValue, ref, ...field } }) => (
+              <AuthenticationEditor
+                {...field}
+                disabled={!headersAllowed || config.isDemo}
+                value={fieldValue ?? null}
+              />
+            )}
+          />
+        </Stack>
+      </DialogContent>
+      <DialogActions>
+        {onClose ? (
+          <Button color="inherit" variant="text" onClick={onClose}>
+            Cancel
+          </Button>
+        ) : null}
+        <Button type="submit" onClick={doSubmit} disabled={isSaveDisabled(formState)}>
+          Save
+        </Button>
+      </DialogActions>
+    </React.Fragment>
   );
 }
 
@@ -576,6 +690,7 @@ function getInitialQueryValue(): FetchQuery {
 const dataSource: ClientDataSource<RestConnectionParams, FetchQuery> = {
   displayName: 'Fetch',
   ConnectionParamsInput,
+  ConnectionParamsInput2,
   QueryEditor,
   getInitialQueryValue,
   hasDefault: true,

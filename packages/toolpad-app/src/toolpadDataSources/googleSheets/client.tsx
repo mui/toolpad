@@ -7,6 +7,8 @@ import {
   FormControlLabel,
   Typography,
   Skeleton,
+  DialogActions,
+  DialogContent,
 } from '@mui/material';
 import * as React from 'react';
 import { inferColumns, parseColumns } from '@mui/toolpad-components';
@@ -244,9 +246,56 @@ function ConnectionParamsInput({
   );
 }
 
+function ConnectionParamsInput2({
+  appId,
+  connectionId,
+  handlerBasePath,
+  onClose,
+}: ConnectionEditorProps<GoogleSheetsConnectionParams>) {
+  const validatedUser: UseQueryResult<GoogleDriveUser> = usePrivateQuery(
+    {
+      type: 'CONNECTION_STATUS',
+    },
+    { retry: false },
+  );
+  return (
+    <React.Fragment>
+      <DialogContent>
+        <Stack direction="column" gap={1}>
+          <Button
+            component="a"
+            disabled={Boolean(validatedUser.data)}
+            href={`${handlerBasePath}/auth/login?state=${encodeURIComponent(
+              JSON.stringify({ appId, connectionId }),
+            )}
+        `}
+            variant="outlined"
+          >
+            <Typography variant="button">
+              {validatedUser.isLoading ? (
+                <Skeleton width={100} />
+              ) : (
+                `Connect${validatedUser.data ? `ed: ${validatedUser.data.emailAddress}` : ''}`
+              )}
+            </Typography>
+          </Button>
+        </Stack>
+      </DialogContent>
+      <DialogActions>
+        {onClose ? (
+          <Button color="inherit" variant="text" onClick={onClose}>
+            Cancel
+          </Button>
+        ) : null}
+      </DialogActions>
+    </React.Fragment>
+  );
+}
+
 const dataSource: ClientDataSource<GoogleSheetsConnectionParams, GoogleSheetsApiQuery> = {
   displayName: 'Google Sheets',
   ConnectionParamsInput,
+  ConnectionParamsInput2,
   QueryEditor,
   getInitialQueryValue,
 };

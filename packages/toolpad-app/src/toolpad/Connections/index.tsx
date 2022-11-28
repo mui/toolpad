@@ -36,7 +36,6 @@ import GridViewIcon from '@mui/icons-material/GridView';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { Link } from 'react-router-dom';
 import client from '../../api';
-import DialogForm from '../../components/DialogForm';
 import useLatest from '../../utils/useLatest';
 import ToolpadHomeShell from '../ToolpadHomeShell';
 import getReadableDuration from '../../utils/readableDuration';
@@ -104,24 +103,9 @@ interface ConnectionParamsEditorProps<P> extends ConnectionEditorProps<P> {
   dataSource: ClientDataSource<P, any>;
 }
 
-function ConnectionParamsEditor<P>({
-  dataSource,
-  value,
-  onChange,
-  connectionId,
-  appId,
-  handlerBasePath,
-}: ConnectionParamsEditorProps<P>) {
-  const { ConnectionParamsInput } = dataSource;
-  return (
-    <ConnectionParamsInput
-      handlerBasePath={handlerBasePath}
-      connectionId={connectionId}
-      value={value}
-      onChange={onChange}
-      appId={appId}
-    />
-  );
+function ConnectionParamsEditor<P>({ dataSource, ...props }: ConnectionParamsEditorProps<P>) {
+  const { ConnectionParamsInput2 } = dataSource;
+  return <ConnectionParamsInput2 {...props} />;
 }
 
 export interface CreateConnectionDialogProps<P> {
@@ -146,9 +130,13 @@ function CreateConnectionDialog<P>({
     onStateChange((old) => ({ ...old, dataSourceId, params: null }));
   }, [onStateChange, dataSourceId]);
 
-  const handleSave = React.useCallback(() => {
-    onStateChange((old) => ({ ...old, open: false }));
-  }, [onStateChange, dataSourceId]);
+  const handleSave = React.useCallback(
+    (newValue: P | null) => {
+      console.log(`saving`, newValue);
+      onStateChange((old) => ({ ...old, open: false }));
+    },
+    [onStateChange],
+  );
 
   const dataSource = getDataSource<P>(dataSourceId);
 
@@ -158,36 +146,26 @@ function CreateConnectionDialog<P>({
   );
 
   return (
-    <Dialog open={state.open} onClose={handleClose} {...props}>
+    <Dialog fullWidth open={state.open} onClose={handleClose} {...props}>
       {state.dataSourceId ? (
         <React.Fragment>
           <DialogTitle>Create a new Connection</DialogTitle>
-          <DialogContent>
-            {dataSource ? (
-              <ConnectionContextProvider value={connectionEditorContext}>
-                <ConnectionParamsEditor<P>
-                  dataSource={dataSource}
-                  value={state.params}
-                  onChange={(newParams) =>
-                    onStateChange((old) => ({ ...old, params: newParams ?? null }))
-                  }
-                  handlerBasePath={`/api/dataSources/${dataSourceId}`}
-                  appId={null}
-                  connectionId={null}
-                />
-              </ConnectionContextProvider>
-            ) : (
-              `Unknown data source type "${state.dataSourceId}"`
-            )}
-          </DialogContent>
-          <DialogActions>
-            <Button color="inherit" variant="text" onClick={handleClose}>
-              Cancel
-            </Button>
-            <Button type="submit" onClick={handleSave}>
-              Save
-            </Button>
-          </DialogActions>
+
+          {dataSource ? (
+            <ConnectionContextProvider value={connectionEditorContext}>
+              <ConnectionParamsEditor<P>
+                dataSource={dataSource}
+                value={state.params}
+                onChange={handleSave}
+                handlerBasePath={`/api/dataSources/${dataSourceId}`}
+                onClose={handleClose}
+                appId={null}
+                connectionId={null}
+              />
+            </ConnectionContextProvider>
+          ) : (
+            <DialogContent>Unknown data source type &quot;{state.dataSourceId}&quot;</DialogContent>
+          )}
         </React.Fragment>
       ) : (
         <React.Fragment>
@@ -518,7 +496,7 @@ function ConnectionsGridView({
           return <AppCard />;
         }
         if (connections.length <= 0) {
-          return 'No apps yet';
+          return 'No connections yet';
         }
         return connections.map((app) => {
           return (
@@ -551,7 +529,7 @@ function ConnectionsListView({
           if (connections.length <= 0) {
             return (
               <TableRow>
-                <TableCell>No apps yet</TableCell>
+                <TableCell>No connections yet</TableCell>
               </TableRow>
             );
           }

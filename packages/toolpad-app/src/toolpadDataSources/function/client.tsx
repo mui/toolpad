@@ -3,6 +3,8 @@ import {
   Box,
   Button,
   Checkbox,
+  DialogActions,
+  DialogContent,
   FormControlLabel,
   FormGroup,
   Skeleton,
@@ -98,6 +100,57 @@ function ConnectionParamsInput({
         </Button>
       </Toolbar>
     </Stack>
+  );
+}
+
+function ConnectionParamsInput2({
+  value,
+  onChange,
+  onClose,
+}: ConnectionEditorProps<FunctionConnectionParams>) {
+  const { handleSubmit, formState, reset, control } = useForm({
+    defaultValues: withDefaults(value),
+    reValidateMode: 'onChange',
+    mode: 'all',
+  });
+  React.useEffect(() => reset(withDefaults(value)), [reset, value]);
+
+  const doSubmit = handleSubmit((connectionParams) => onChange(connectionParams));
+
+  return (
+    <React.Fragment>
+      <DialogContent>
+        <Stack direction="column" gap={3} sx={{ py: 3 }}>
+          <Typography>Secrets:</Typography>
+          <Controller
+            name="secrets"
+            control={control}
+            render={({
+              field: { value: fieldValue = [], onChange: onFieldChange, ref, ...field },
+            }) => {
+              return (
+                <MapEntriesEditor
+                  {...field}
+                  fieldLabel="key"
+                  value={fieldValue}
+                  onChange={onFieldChange}
+                />
+              );
+            }}
+          />
+        </Stack>
+      </DialogContent>
+      <DialogActions>
+        {onClose ? (
+          <Button color="inherit" variant="text" onClick={onClose}>
+            Cancel
+          </Button>
+        ) : null}
+        <Button type="submit" onClick={doSubmit} disabled={isSaveDisabled(formState)}>
+          Save
+        </Button>
+      </DialogActions>
+    </React.Fragment>
   );
 }
 
@@ -275,6 +328,7 @@ function getInitialQueryValue(): FunctionQuery {
 const dataSource: ClientDataSource<FunctionConnectionParams, FunctionQuery> = {
   displayName: 'Function',
   ConnectionParamsInput,
+  ConnectionParamsInput2,
   QueryEditor,
   getInitialQueryValue,
   hasDefault: true,

@@ -78,6 +78,7 @@ export interface ConnectionEditorProps<P> extends WithControlledProp<P | null> {
   handlerBasePath: string;
   appId: string;
   connectionId: NodeId;
+  onClose?: () => void;
 }
 export type ConnectionParamsEditor<P = {}> = React.FC<ConnectionEditorProps<P>>;
 
@@ -105,7 +106,10 @@ export interface ExecClientFetchFn<Q, R extends ExecFetchResult> {
 
 export interface ClientDataSource<C = {}, Q = {}> {
   displayName: string;
+  /** @deprecated Kept around for in-app connections until they're global */
   ConnectionParamsInput: ConnectionParamsEditor<C>;
+  // Temporary until connections are made global
+  ConnectionParamsInput2: ConnectionParamsEditor<C>;
   transformQueryBeforeCommit?: (query: Q) => Q;
   QueryEditor: QueryEditor<C, Q>;
   getInitialQueryValue: () => Q;

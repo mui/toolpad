@@ -153,7 +153,7 @@ export type PropValueType = PrimitiveValueType | ElementValueType | EventValueTy
 export type PropValueTypes<K extends string = string> = Partial<{
   [key in K]?: PropValueType;
 }>;
-export interface ArgTypeDefinition<V = unknown, P = any> {
+export interface ArgTypeDefinition<V = unknown, P = Record<string, unknown>> {
   /**
    * To be used instead of the property name for UI purposes in the editor.
    */
@@ -257,10 +257,10 @@ export interface ComponentConfig<P> {
    * Designates a property as "the resizable height property". If Toolpad detects any
    * vertical resizing of the component it will forward it to this property.
    */
-  resizableHeightProp?: keyof P & string /**       
+  resizableHeightProp?: keyof P & string;
   /**
    * Describes the individual properties for this component
-   */;
+   */
   argTypes?: ArgTypeDefinitions<P>;
 }
 

@@ -1,5 +1,74 @@
 # Changelog
 
+## 0.0.28
+
+<!-- generated comparing v0.0.27..master -->
+
+_Nov 23, 2022_
+
+A big thanks to the 4 contributors who made this release possible. Here are some highlights ✨:
+
+Client-side functions, migration fixes, add sidebar to overview page, support visual captcha as fallback, add "alpha" label to app and landing page, automatic app names in demo.
+
+- &#8203;<!-- 19 -->Fix landing page hydration issue (#1375) @bharatkashyap
+- &#8203;<!-- 18 -->Update demo bar copy (#1371) @apedroferreira
+- &#8203;<!-- 17 -->Fix overflow for explorer (#1372) @Janpot
+- &#8203;<!-- 16 -->Add "alpha" label to app and landing page hero (#1356) @bharatkashyap
+- &#8203;<!-- 15 -->Add missing sucrase helper (#1360) @Janpot
+- &#8203;<!-- 14 -->Remove demo docker (#1369) @apedroferreira
+- &#8203;<!-- 13 -->Remove demo configuration from render.yaml (#1368) @apedroferreira
+- &#8203;<!-- 12 -->Move typescript to devDependencies (#1366) @Janpot
+- &#8203;<!-- 11 -->Remove sentry debug option (#1361) @Janpot
+- &#8203;<!-- 10 -->Fix yarn.lock @Janpot
+- &#8203;<!-- 09 -->Upgrade eslint (#1287) @Janpot
+- &#8203;<!-- 08 -->Fallback to visible captcha if invisible captcha fails (#1272) @apedroferreira
+- &#8203;<!-- 07 -->Refactor overview page (#1357) @Janpot
+- &#8203;<!-- 06 -->Fix migration to v3 (#1359) @Janpot
+- &#8203;<!-- 05 -->Run functions client side (#1325) @Janpot
+- &#8203;<!-- 04 -->Show IP address in log messages (#1350) @apedroferreira
+- &#8203;<!-- 03 -->Fix prettier script in CI (#1355) @Janpot
+- &#8203;<!-- 02 -->Automatic app names in demo (#1351) @apedroferreira
+- &#8203;<!-- 01 -->[core] Group renovate GitHub Action dependency updates (#1341) @oliviertassinari
+
+All contributors of this release in alphabetical order: @apedroferreira, @bharatkashyap, @Janpot, @oliviertassinari
+
+## 0.0.27
+
+<!-- generated comparing v0.0.26..master -->
+
+_Nov 16, 2022_
+
+A big thanks to the 5 contributors who made this release possible. Here are some highlights ✨:
+
+Upgraded to Next.js 13, some fixes on undo/redo and also an improvement to the cloud demo which allows continuing work on the latest-used app.
+
+- &#8203;<!-- 24 -->Allow working on latest used app from demo home page (#1304) @apedroferreira
+- &#8203;<!-- 23 -->Make sure to show a 404 for non existing apps in the preview (#1344) @Janpot
+- &#8203;<!-- 22 -->Make sure code components can run against React in production mode (#1348) @Janpot
+- &#8203;<!-- 21 -->Disable baseUrl when ran in browser (#1346) @Janpot
+- &#8203;<!-- 20 -->Upgrade to next 13 (#1294) @Janpot
+- &#8203;<!-- 19 -->Show self-host bar in demo (#1309) @apedroferreira
+- &#8203;<!-- 18 -->Move component compilation serverside (#1332) @Janpot
+- &#8203;<!-- 17 -->Remove externalResolver for Sentry (#1343) @Janpot
+- &#8203;<!-- 16 -->Convert scripts to ESM (#1307) @Janpot
+- &#8203;<!-- 15 -->Add github repository link from landing page (#1342) @bharatkashyap
+- &#8203;<!-- 14 -->Fix windows and AZERTY shortcuts for undo redo (#1274) @bytasv
+- &#8203;<!-- 13 -->Simplify menu actions (#1281) @oliviertassinari
+- &#8203;<!-- 12 -->Fix undo/redo race condition (#1328) @bytasv
+- &#8203;<!-- 11 -->Fix hud overlay index (#1329) @bytasv
+- &#8203;<!-- 10 -->Reorganize QueryEditor into its own folder (#1322) @Janpot
+- &#8203;<!-- 09 -->Upgrade docs to Next.js 13 (#1297) @Janpot
+- &#8203;<!-- 08 -->Remove package.json resolutions field (#1316) @Janpot
+- &#8203;<!-- 07 -->Show creation dialog as loading while navigating to newly created app (#1317) @Janpot
+- &#8203;<!-- 06 -->Change dots to ellipsis (#1314) @Janpot
+- &#8203;<!-- 05 -->[core] Show the whole version to make blame easier @oliviertassinari
+- &#8203;<!-- 04 -->[core] Pin GitHub Action versions @oliviertassinari
+- &#8203;<!-- 03 -->[core] Feedback on branch protection @oliviertassinari
+- &#8203;<!-- 02 -->[core] Remove scorecard default permissions @oliviertassinari
+- &#8203;<!-- 01 -->[docs] Fix path typo in Fetch docs (#1331) @bharatkashyap
+
+All contributors of this release in alphabetical order: @apedroferreira, @bharatkashyap, @bytasv, @Janpot, @oliviertassinari
+
 ## 0.0.26
 
 <!-- generated comparing v0.0.25..master -->

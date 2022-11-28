@@ -129,7 +129,7 @@
     "@types/whatwg-url": "^11.0.0",
     "ajv": "^8.11.2",
     "eslint": "8.28.0",
-    "eslint-config-next": "^13.0.4",
+    "eslint-config-next": "^13.0.5",
     "eslint-config-prettier": "^8.5.0",
     "eslint-plugin-import": "^2.26.0",
     "formidable": "^2.0.1",

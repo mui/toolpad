@@ -33,7 +33,7 @@ const StyledTreeItem = styled(TreeItem)({
     visibility: 'hidden',
   },
   [`
-    & .${treeItemClasses.content}:hover .${classes.treeItemMenuButton}, 
+    & .${treeItemClasses.content}:hover .${classes.treeItemMenuButton},
     & .${classes.treeItemMenuOpen}
   `]: {
     visibility: 'visible',
@@ -75,9 +75,9 @@ function HierarchyTreeItem(props: StyledTreeItemProps) {
     onCreate,
     onDeleteNode,
     onDuplicateNode,
-    createLabelText = `Create ${labelText}`,
-    deleteLabelText = `Delete ${labelText}`,
-    duplicateLabelText = `Duplicate ${labelText}`,
+    createLabelText,
+    deleteLabelText = 'Delete',
+    duplicateLabelText = 'Duplicate',
     toolpadNodeId,
     ...other
   } = props;
@@ -87,7 +87,7 @@ function HierarchyTreeItem(props: StyledTreeItemProps) {
       label={
         <Box sx={{ display: 'flex', alignItems: 'center', p: 0.5, pr: 0 }}>
           {labelIcon}
-          <Typography variant="body2" sx={{ fontWeight: 'inherit', flexGrow: 1 }}>
+          <Typography variant="body2" sx={{ fontWeight: 'inherit', flexGrow: 1 }} noWrap>
             {labelText}
           </Typography>
           {onCreate ? (
@@ -282,7 +282,6 @@ export default function HierarchyExplorer({ appId, className }: HierarchyExplore
           aria-level={1}
           labelText="Connections"
           createLabelText="Create connection"
-          deleteLabelText="Delete connection"
           onCreate={handleCreateConnectionDialogOpen}
         >
           {connections.map((connectionNode) => (
@@ -302,7 +301,6 @@ export default function HierarchyExplorer({ appId, className }: HierarchyExplore
           aria-level={1}
           labelText="Components"
           createLabelText="Create component"
-          deleteLabelText="Delete component"
           onCreate={handleCreateCodeComponentDialogOpen}
         >
           {codeComponents.map((codeComponent) => (
@@ -322,7 +320,6 @@ export default function HierarchyExplorer({ appId, className }: HierarchyExplore
           aria-level={1}
           labelText="Pages"
           createLabelText="Create page"
-          deleteLabelText="Delete page"
           onCreate={handleCreatePageDialogOpen}
         >
           {pages.map((page) => (

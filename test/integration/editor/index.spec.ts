@@ -99,7 +99,7 @@ test('can delete elements from page', async ({ page, browserName }) => {
 
   const canvasInputLocator = editorModel.appCanvas.locator('input');
   const canvasRemoveElementButtonLocator = editorModel.appCanvas.locator(
-    'button[aria-label="Remove element"]',
+    'button[aria-label="Remove"]',
   );
 
   await expect(canvasInputLocator).toHaveCount(2);

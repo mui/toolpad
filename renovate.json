@@ -32,7 +32,7 @@
     },
     {
       "groupName": "playwright",
-      "matchPackageNames": ["playwright", "@playwright/*", "mcr.microsoft.com/playwright"]
+      "matchPackageNames": ["playwright", "^@playwright/", "mcr.microsoft.com/playwright"]
     },
     {
       "groupName": "node",
@@ -50,11 +50,6 @@
       "allowedVersions": "< 3.0.0"
     },
     {
-      "groupName": "eslint-config-airbnb-typescript",
-      "matchPackageNames": ["eslint-config-airbnb-typescript"],
-      "allowedVersions": "< 13.0.0"
-    },
-    {
       "groupName": "react-router",
       "matchPackageNames": ["react-router", "react-router-dom"],
       "allowedVersions": "< 6.4.0"
@@ -70,13 +65,12 @@
       "allowedVersions": "< 2.0.0"
     },
     {
-      "groupName": "next",
-      "matchPackageNames": ["next", "@next/eslint-plugin-next", "eslint-config-next"],
-      "allowedVersions": "1.2.2"
-    },
-    {
       "matchDepTypes": ["action"],
       "pinDigests": true
+    },
+    {
+      "groupName": "GitHub Actions",
+      "matchManagers": ["github-actions"]
     }
   ],
   "postUpdateOptions": ["yarnDedupeHighest"],

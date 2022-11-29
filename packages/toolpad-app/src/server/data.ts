@@ -1,7 +1,7 @@
 import { NodeId, BindableAttrValue, ExecFetchResult } from '@mui/toolpad-core';
 import * as _ from 'lodash-es';
 import * as prisma from '../../prisma/generated/client';
-import { ServerDataSource, VersionOrPreview, AppTemplateId } from '../types';
+import { ServerDataSource, VersionOrPreview, AppTemplateId, RuntimeState } from '../types';
 import serverDataSources from '../toolpadDataSources/server';
 import * as appDom from '../appDom';
 import { omit } from '../utils/immutability';
@@ -13,6 +13,9 @@ import { getAppTemplateDom } from './appTemplateDoms/doms';
 import { validateRecaptchaToken } from './validateRecaptchaToken';
 import config from './config';
 import { migrateUp } from '../appDom/migrations';
+import { errorFrom } from '../utils/errors';
+import { ERR_APP_EXISTS, ERR_VALIDATE_CAPTCHA_FAILED } from '../errorCodes';
+import createRuntimeState from '../createRuntimeState';
 
 const SELECT_RELEASE_META = excludeFields(prisma.Prisma.ReleaseScalarFieldEnum, ['snapshot']);
 const SELECT_APP_META = excludeFields(prisma.Prisma.AppScalarFieldEnum, ['dom']);
@@ -199,45 +202,52 @@ export type CreateAppOptions = {
         kind: 'template';
         id: AppTemplateId;
       };
-  recaptchaToken?: string;
+  captcha?: {
+    token: string;
+    version: 2 | 3;
+  };
 };
 
 export async function createApp(name: string, opts: CreateAppOptions = {}): Promise<prisma.App> {
   const { from } = opts;
 
-  const recaptchaSecretKey = config.recaptchaSecretKey;
-  if (recaptchaSecretKey) {
+  if (config.recaptchaV3SecretKey) {
+    const captchaVersion = opts.captcha?.version;
+
+    const secretKey =
+      captchaVersion === 2 ? config.recaptchaV2SecretKey || '' : config.recaptchaV3SecretKey;
     const isRecaptchaTokenValid = await validateRecaptchaToken(
-      recaptchaSecretKey,
-      opts.recaptchaToken || '',
+      secretKey,
+      opts.captcha?.token || '',
     );
 
     if (!isRecaptchaTokenValid) {
-      throw new Error('Unable to verify CAPTCHA.');
+      const toolpadError = new Error(
+        config.recaptchaV2SecretKey ? 'Please solve the CAPTCHA.' : 'Unable to verify CAPTCHA.',
+      );
+      toolpadError.code = ERR_VALIDATE_CAPTCHA_FAILED;
+      throw toolpadError;
     }
   }
 
-  let appName = name.trim();
-
-  if (config.isDemo) {
-    appName = appName.replace(/\(#[0-9]+\)/g, '').trim();
-
-    const sameNameAppCount = await prismaClient.app.count({
-      where: { OR: [{ name: appName }, { name: { startsWith: `${appName} (#`, endsWith: ')' } }] },
-    });
-    if (sameNameAppCount > 0) {
-      appName = `${appName} (#${sameNameAppCount + 1})`;
-    }
-  }
-
-  if (await prismaClient.app.findUnique({ where: { name: appName } })) {
-    throw new Error(`An app named "${name}" already exists.`);
-  }
+  const cleanAppName = name.trim();
 
   return prismaClient.$transaction(async () => {
-    const app = await prismaClient.app.create({
-      data: { name: appName },
-    });
+    let app;
+    try {
+      app = await prismaClient.app.create({
+        data: { name: cleanAppName },
+      });
+    } catch (error) {
+      // https://www.prisma.io/docs/reference/api-reference/error-reference#error-codes
+      // P2002: Unique constraint failed on the field
+      if (error instanceof prisma.Prisma.PrismaClientKnownRequestError && error.code === 'P2002') {
+        const toolpadError = new Error(`An app named "${name}" already exists.`, { cause: error });
+        toolpadError.code = ERR_APP_EXISTS;
+        throw toolpadError;
+      }
+      throw error;
+    }
 
     let dom: appDom.AppDom | null = null;
 
@@ -518,29 +528,45 @@ export function parseVersion(param?: string | string[]): VersionOrPreview | null
   return Number.isNaN(parsed) ? null : parsed;
 }
 
-export async function loadDom(appId: string, version: VersionOrPreview = 'preview') {
+export async function loadDom(
+  appId: string,
+  version: VersionOrPreview = 'preview',
+): Promise<appDom.AppDom> {
   return version === 'preview' ? loadPreviewDom(appId) : loadReleaseDom(appId, version);
 }
 
 /**
  * Version of loadDom that returns a subset of the dom that doesn't contain sensitive information
  */
-export async function loadRenderTree(appId: string, version: VersionOrPreview = 'preview') {
-  return appDom.createRenderTree(await loadDom(appId, version));
+export async function loadRuntimeState(
+  appId: string,
+  version: VersionOrPreview = 'preview',
+): Promise<RuntimeState> {
+  return createRuntimeState({ appId, dom: await loadDom(appId, version) });
 }
 
 export async function duplicateApp(id: string, name: string): Promise<AppMeta> {
   const dom = await loadPreviewDom(id);
-  const duplicateCount = await prismaClient.app.count({
-    where: { name: { startsWith: `${name} (copy`, endsWith: ')' } },
-  });
-  const duplicateName =
-    duplicateCount === 0 ? `${name} (copy)` : `${name} (copy ${duplicateCount + 1})`;
-  const newApp = await createApp(duplicateName, {
+  const appFromDom: CreateAppOptions = {
     from: {
       kind: 'dom',
       dom,
     },
-  });
-  return newApp;
+  };
+  try {
+    const newApp = await createApp(name, appFromDom);
+    return newApp;
+  } catch (rawError) {
+    const error = errorFrom(rawError);
+    if (error.code !== ERR_APP_EXISTS) {
+      throw error;
+    }
+    const duplicateCount = await prismaClient.app.count({
+      where: { name: { startsWith: `${name} (copy`, endsWith: ')' } },
+    });
+    const duplicateName =
+      duplicateCount === 0 ? `${name} (copy)` : `${name} (copy ${duplicateCount + 1})`;
+    const newApp = await createApp(duplicateName, appFromDom);
+    return newApp;
+  }
 }

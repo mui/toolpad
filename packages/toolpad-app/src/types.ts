@@ -10,9 +10,14 @@ import {
 } from '@mui/toolpad-core';
 import { PaletteMode } from '@mui/material';
 import type * as appDom from './appDom';
-
 import type { Maybe, WithControlledProp } from './utils/types';
 import type { Rectangle } from './utils/geometry';
+
+declare global {
+  interface Error {
+    code?: unknown;
+  }
+}
 
 export interface EditorProps<T> {
   /**
@@ -100,7 +105,7 @@ export interface ExecClientFetchFn<Q, R extends ExecFetchResult> {
 
 export interface ClientDataSource<C = {}, Q = {}> {
   displayName: string;
-  ConnectionParamsInput: ConnectionParamsEditor<C>;
+  ConnectionParamsInput?: ConnectionParamsEditor<C>;
   transformQueryBeforeCommit?: (query: Q) => Q;
   QueryEditor: QueryEditor<C, Q>;
   getInitialQueryValue: () => Q;
@@ -162,3 +167,29 @@ export type VersionOrPreview = 'preview' | number;
 export type AppTemplateId = 'blank' | 'stats' | 'images';
 
 export type NodeHashes = Record<NodeId, number | undefined>;
+
+export type CompiledModule =
+  | {
+      code: string;
+      urlImports: string[];
+      error?: undefined;
+    }
+  | {
+      error: Error;
+    };
+
+/**
+ * Defines all the data needed to render the runtime.
+ * While the dom is optimized for storage and editing. It isn't the ideal format used to render the application
+ * `RuntimeData` will hold all data to render a toolpad app and will contain things like:
+ * - precompile assets, like code component modules
+ * - precompiled expressions
+ * - datastructures optimized for rendering with less processing required
+ * - ...
+ */
+export interface RuntimeState {
+  // We start out with just the rendertree. The ultimate goal will be to move things out of this tree
+  dom: appDom.RenderTree;
+  appId: string;
+  modules: Record<string, CompiledModule>;
+}

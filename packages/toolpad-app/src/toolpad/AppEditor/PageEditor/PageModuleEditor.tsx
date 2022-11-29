@@ -46,7 +46,7 @@ function PageModuleEditorDialog({ pageNodeId, open, onClose }: PageModuleEditorD
     onClose();
   }, [handleSave, onClose]);
 
-  useShortcut({ code: 'KeyS', metaKey: true, disabled: !open }, handleSave);
+  useShortcut({ key: 's', metaKey: true, disabled: !open }, handleSave);
 
   return (
     <Dialog onClose={onClose} open={open} fullWidth maxWidth="lg">

@@ -14,6 +14,7 @@ import { LogEntry } from '../../../components/Console';
 import { Maybe } from '../../../utils/types';
 import { useDomApi } from '../../DomLoader';
 import { hasFieldFocus } from '../../../utils/fields';
+import createRuntimeState from '../../../createRuntimeState';
 
 type IframeContentWindow = Window & typeof globalThis;
 
@@ -86,9 +87,9 @@ export default React.forwardRef<EditorCanvasHostHandle, EditorCanvasHostProps>(
     const [bridge, setBridge] = React.useState<ToolpadBridge | null>(null);
 
     const updateOnBridge = React.useCallback(
-      (bridgeInstance: ToolpadBridge) => {
-        const renderDom = appDom.createRenderTree(dom);
-        bridgeInstance.update({ appId, dom: renderDom, savedNodes });
+      async (bridgeInstance: ToolpadBridge) => {
+        const data = createRuntimeState({ appId, dom });
+        bridgeInstance.update({ ...data, savedNodes });
       },
       [appId, dom, savedNodes],
     );
@@ -155,9 +156,10 @@ export default React.forwardRef<EditorCanvasHostHandle, EditorCanvasHostProps>(
             return;
           }
 
-          const { code, metaKey, shiftKey } = event;
-          const undoShortcut = code === 'KeyZ' && metaKey;
-          const redoShortcut = undoShortcut && shiftKey;
+          const isZ = event.key.toLowerCase() === 'z';
+
+          const undoShortcut = isZ && (event.metaKey || event.ctrlKey);
+          const redoShortcut = undoShortcut && event.shiftKey;
 
           if (redoShortcut) {
             domApi.redo();

@@ -113,7 +113,7 @@ export class ToolpadEditor {
   }
 
   waitForOverlay() {
-    const hudOverlay = this.appCanvas.getByTestId('hud-overlay');
+    const hudOverlay = this.appCanvas.getByTestId('page-overlay');
 
     return expect(hudOverlay).toBeVisible();
   }

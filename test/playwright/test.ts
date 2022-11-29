@@ -1,3 +1,4 @@
+import '../utils/fetchPolyfill';
 import { ConsoleMessage, test as base } from '@playwright/test';
 import { createRpcClient, RpcClient } from '../../packages/toolpad-app/src/rpcClient';
 import type { ServerDefinition } from '../../packages/toolpad-app/pages/api/rpc';
@@ -60,7 +61,8 @@ export const test = base.extend<Options & { api: RpcClient<ServerDefinition> }>(
   },
 
   api: async ({ baseURL }, use) => {
-    const api = createRpcClient<ServerDefinition>(new URL('/api/rpc', baseURL).href);
+    const endpoint = new URL('/api/rpc', baseURL).href;
+    const api = createRpcClient<ServerDefinition>(endpoint);
     await use(api);
   },
 });

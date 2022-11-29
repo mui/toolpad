@@ -1,14 +1,12 @@
-import invariant from 'invariant';
+import * as path from 'path';
 import { test, expect } from '../../playwright/test';
 import { ToolpadEditor } from '../../models/ToolpadEditor';
 import clickCenter from '../../utils/clickCenter';
-import domInput from './domInput.json';
-import { createApplication } from '../../utils/toolpadApi';
+import generateId from '../../utils/generateId';
+import { readJsonFile } from '../../utils/fs';
 
-test('can place new components from catalog', async ({ page, browserName, baseURL }) => {
-  invariant(baseURL, 'playwright must be run with a a baseURL');
-
-  const app = await createApplication(baseURL, {});
+test('can place new components from catalog', async ({ page, browserName, api }) => {
+  const app = await api.mutation.createApp(`App ${generateId()}`);
 
   const editorModel = new ToolpadEditor(page, browserName);
 
@@ -36,13 +34,15 @@ test('can place new components from catalog', async ({ page, browserName, baseUR
   await expect(canvasInputLocator).toHaveCount(2);
 });
 
-test('can move elements in page', async ({ page, browserName, baseURL }) => {
-  invariant(baseURL, 'playwright must be run with a a baseURL');
-
+test('can move elements in page', async ({ page, browserName, api }) => {
   const editorModel = new ToolpadEditor(page, browserName);
   const TEXT_FIELD_COMPONENT_DISPLAY_NAME = 'Text field';
 
-  const app = await createApplication(baseURL, { dom: domInput });
+  const dom = await readJsonFile(path.resolve(__dirname, './domInput.json'));
+
+  const app = await api.mutation.createApp(`App ${generateId()}`, {
+    from: { kind: 'dom', dom },
+  });
 
   await editorModel.goto(app.id);
 
@@ -90,12 +90,14 @@ test('can move elements in page', async ({ page, browserName, baseURL }) => {
   await expect(secondTextFieldLocator).toHaveAttribute('value', 'textField1');
 });
 
-test('can delete elements from page', async ({ page, browserName, baseURL }) => {
-  invariant(baseURL, 'playwright must be run with a a baseURL');
-
+test('can delete elements from page', async ({ page, browserName, api }) => {
   const editorModel = new ToolpadEditor(page, browserName);
 
-  const app = await createApplication(baseURL, { dom: domInput });
+  const dom = await readJsonFile(path.resolve(__dirname, './domInput.json'));
+
+  const app = await api.mutation.createApp(`App ${generateId()}`, {
+    from: { kind: 'dom', dom },
+  });
 
   await editorModel.goto(app.id);
 
@@ -127,10 +129,8 @@ test('can delete elements from page', async ({ page, browserName, baseURL }) => 
   await expect(canvasInputLocator).toHaveCount(0);
 });
 
-test('can create new component', async ({ page, browserName, baseURL }) => {
-  invariant(baseURL, 'playwright must be run with a a baseURL');
-
-  const app = await createApplication(baseURL, {});
+test('can create new component', async ({ page, browserName, api }) => {
+  const app = await api.mutation.createApp(`App ${generateId()}`);
 
   const editorModel = new ToolpadEditor(page, browserName);
 

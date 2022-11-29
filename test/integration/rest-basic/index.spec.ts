@@ -1,10 +1,9 @@
 import * as path from 'path';
-import invariant from 'invariant';
 import { test, expect } from '../../playwright/test';
-import { createApplication } from '../../utils/toolpadApi';
 import { ToolpadRuntime } from '../../models/ToolpadRuntime';
 import { readJsonFile } from '../../utils/fs';
 import { ToolpadEditor } from '../../models/ToolpadEditor';
+import generateId from '../../utils/generateId';
 
 // We can run our own httpbin instance if necessary:
 //    $ docker run -p 80:80 kennethreitz/httpbin
@@ -17,13 +16,14 @@ if (customHttbinBaseUrl) {
 
 const HTTPBIN_BASEURL = customHttbinBaseUrl || 'https://httpbin.org/';
 
-test.use({ ignoreConsoleErrors: [/Cannot read properties of null/] });
+test.use({ ignoreConsoleErrors: [/.*/] });
 
-test('rest basics', async ({ page, browserName, baseURL }) => {
-  invariant(baseURL, 'playwright must be run with a a baseURL');
-
+test('rest basics', async ({ page, browserName, api }) => {
   const dom = await readJsonFile(path.resolve(__dirname, './restDom.json'));
-  const app = await createApplication(baseURL, { dom });
+
+  const app = await api.mutation.createApp(`App ${generateId()}`, {
+    from: { kind: 'dom', dom },
+  });
 
   const httpbinConnection: any = Object.values(dom.nodes).find(
     (node: any) => node.name === 'httpbin',

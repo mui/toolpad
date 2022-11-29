@@ -1,11 +1,5 @@
 import { parse as superjsonParse } from 'superjson';
-import type {
-  Definition,
-  MethodsOf,
-  MethodsOfGroup,
-  RpcRequest,
-  RpcResponse,
-} from '../pages/api/rpc';
+import type { MethodsOf, MethodsOfGroup, RpcRequest, RpcResponse } from '../pages/api/rpc';
 
 function createFetcher(endpoint: string, type: 'query' | 'mutation'): MethodsOfGroup<any> {
   return new Proxy(
@@ -45,7 +39,7 @@ function createFetcher(endpoint: string, type: 'query' | 'mutation'): MethodsOfG
   );
 }
 
-export interface RpcClient<D extends Definition> {
+export interface RpcClient<D extends MethodsOf<any>> {
   query: D['query'];
   mutation: D['mutation'];
 }

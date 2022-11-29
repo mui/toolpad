@@ -266,6 +266,8 @@ export default function HierarchyExplorer({ appId, className }: HierarchyExplore
     [appId, dom, domApi, navigate],
   );
 
+  const hasConnectionsView = !config.isDemo;
+
   return (
     <HierarchyExplorerRoot data-testid="hierarchy-explorer" className={className}>
       <TreeView
@@ -278,7 +280,7 @@ export default function HierarchyExplorer({ appId, className }: HierarchyExplore
         defaultCollapseIcon={<ArrowDropDownIcon />}
         defaultExpandIcon={<ArrowRightIcon />}
       >
-        {!config.isDemo ? (
+        {hasConnectionsView ? (
           <HierarchyTreeItem
             nodeId=":connections"
             aria-level={1}

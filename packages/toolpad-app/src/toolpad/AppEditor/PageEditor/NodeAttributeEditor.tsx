@@ -2,7 +2,7 @@ import * as React from 'react';
 import { ArgTypeDefinition, BindableAttrValue } from '@mui/toolpad-core';
 import { Alert } from '@mui/material';
 import * as appDom from '../../../appDom';
-import { useDomApi } from '../../DomLoader';
+import { useDom, useDomApi } from '../../DomLoader';
 import BindableEditor from './BindableEditor';
 import { usePageEditorState } from './PageEditorProvider';
 import { getDefaultControl } from '../../propertyControls';
@@ -20,13 +20,15 @@ export default function NodeAttributeEditor({
   name,
   argType,
 }: NodeAttributeEditorProps) {
+  const dom = useDom();
   const domApi = useDomApi();
 
   const handlePropChange = React.useCallback(
     (newValue: BindableAttrValue<unknown> | null) => {
-      domApi.setNodeNamespacedProp(node, namespace as any, name, newValue);
+      const updatedDom = appDom.setNodeNamespacedProp(dom, node, namespace as any, name, newValue);
+      domApi.update(updatedDom);
     },
-    [domApi, node, namespace, name],
+    [dom, node, namespace, name, domApi],
   );
 
   const propValue: BindableAttrValue<unknown> | null = (node as any)[namespace]?.[name] ?? null;

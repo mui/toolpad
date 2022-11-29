@@ -236,7 +236,8 @@ export default function HierarchyExplorer({ appId, className }: HierarchyExplore
         }
       }
 
-      domApi.removeNode(nodeId);
+      const updatedDom = appDom.removeNode(dom, nodeId);
+      domApi.update(updatedDom);
 
       if (redirectAfterDelete) {
         navigate(redirectAfterDelete);
@@ -254,7 +255,9 @@ export default function HierarchyExplorer({ appId, className }: HierarchyExplore
       );
 
       const fragment = appDom.cloneFragment(dom, nodeId);
-      domApi.addFragment(fragment, node.parentId, node.parentProp);
+
+      const updatedDom = appDom.addFragment(dom, fragment, node.parentId, node.parentProp);
+      domApi.update(updatedDom);
 
       const newNode = appDom.getNode(fragment, fragment.root);
       const editorLink = getLinkToNodeEditor(appId, newNode);

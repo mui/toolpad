@@ -444,9 +444,10 @@ export default function RenderOverlay({ canvasHostRef }: RenderOverlayProps) {
     (node: appDom.ElementNode) => (event: React.MouseEvent) => {
       event.stopPropagation();
 
-      domApi.duplicateNode(node);
+      const updatedDom = appDom.duplicateNode(dom, node);
+      domApi.update(updatedDom);
     },
-    [domApi],
+    [dom, domApi],
   );
 
   const handleEdgeDragStart = React.useCallback(

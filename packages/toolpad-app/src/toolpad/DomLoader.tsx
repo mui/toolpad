@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { NodeId, BindableAttrValue, BindableAttrValues } from '@mui/toolpad-core';
+import { NodeId, BindableAttrValues } from '@mui/toolpad-core';
 import invariant from 'invariant';
 import { throttle, DebouncedFunc } from 'lodash-es';
 import * as appDom from '../appDom';
@@ -40,13 +40,6 @@ export type DomAction =
       name: string;
     }
   | {
-      type: 'DOM_SET_NODE_PROP';
-      node: appDom.AppDomNode;
-      prop: string;
-      namespace: string;
-      value: BindableAttrValue<unknown> | null;
-    }
-  | {
       type: 'DOM_SET_NODE_NAMESPACE';
       node: appDom.AppDomNode;
       namespace: string;
@@ -55,35 +48,6 @@ export type DomAction =
   | {
       type: 'DOM_UPDATE';
       updatedDom: appDom.AppDom;
-    }
-  | {
-      type: 'DOM_ADD_NODE';
-      node: appDom.AppDomNode;
-      parent: appDom.AppDomNode;
-      parentProp: string;
-      parentIndex?: string;
-    }
-  | {
-      type: 'DOM_ADD_FRAGMENT';
-      fragment: appDom.AppDom;
-      parentId: NodeId;
-      parentProp: string;
-      parentIndex?: string;
-    }
-  | {
-      type: 'DOM_MOVE_NODE';
-      node: appDom.AppDomNode;
-      parent: appDom.AppDomNode;
-      parentProp: string;
-      parentIndex?: string;
-    }
-  | {
-      type: 'DOM_DUPLICATE_NODE';
-      node: appDom.AppDomNode;
-    }
-  | {
-      type: 'DOM_REMOVE_NODE';
-      nodeId: NodeId;
     }
   | {
       type: 'DOM_SAVE_NODE';
@@ -97,56 +61,14 @@ export function domReducer(dom: appDom.AppDom, action: DomAction): appDom.AppDom
       const node = appDom.getNode(dom, action.nodeId);
       return appDom.setNodeName(dom, node, action.name);
     }
-    case 'DOM_SET_NODE_PROP': {
-      return appDom.setNodeNamespacedProp<any, any, any>(
-        dom,
-        action.node,
-        action.namespace,
-        action.prop,
-        action.value,
-      );
-    }
     case 'DOM_SET_NODE_NAMESPACE': {
       return appDom.setNodeNamespace<any, any>(dom, action.node, action.namespace, action.value);
     }
     case 'DOM_UPDATE': {
       return action.updatedDom;
     }
-    case 'DOM_ADD_NODE': {
-      return appDom.addNode<any, any>(
-        dom,
-        action.node,
-        action.parent,
-        action.parentProp,
-        action.parentIndex,
-      );
-    }
-    case 'DOM_ADD_FRAGMENT': {
-      return appDom.addFragment(
-        dom,
-        action.fragment,
-        action.parentId,
-        action.parentProp,
-        action.parentIndex,
-      );
-    }
-    case 'DOM_MOVE_NODE': {
-      return appDom.moveNode<any, any>(
-        dom,
-        action.node,
-        action.parent,
-        action.parentProp,
-        action.parentIndex,
-      );
-    }
-    case 'DOM_DUPLICATE_NODE': {
-      return appDom.duplicateNode(dom, action.node);
-    }
     case 'DOM_SAVE_NODE': {
       return appDom.saveNode(dom, action.node);
-    }
-    case 'DOM_REMOVE_NODE': {
-      return appDom.removeNode(dom, action.nodeId);
     }
     default:
       return dom;
@@ -268,82 +190,10 @@ function createDomApi(
         updatedDom: dom,
       });
     },
-    addNode<Parent extends appDom.AppDomNode, Child extends appDom.AppDomNode>(
-      node: Child,
-      parent: Parent,
-      parentProp: appDom.ParentPropOf<Child, Parent>,
-      parentIndex?: string,
-    ) {
-      dispatch({
-        type: 'DOM_ADD_NODE',
-        node,
-        parent,
-        parentProp,
-        parentIndex,
-      });
-    },
-    addFragment(
-      fragment: appDom.AppDom,
-      parentId: NodeId,
-      parentProp: string,
-      parentIndex?: string,
-    ) {
-      dispatch({
-        type: 'DOM_ADD_FRAGMENT',
-        fragment,
-        parentId,
-        parentProp,
-        parentIndex,
-      });
-    },
-    moveNode<Parent extends appDom.AppDomNode, Child extends appDom.AppDomNode>(
-      node: Child,
-      parent: Parent,
-      parentProp: appDom.ParentPropOf<Child, Parent>,
-      parentIndex?: string,
-    ) {
-      dispatch({
-        type: 'DOM_MOVE_NODE',
-        node,
-        parent,
-        parentProp,
-        parentIndex,
-      });
-    },
-    duplicateNode<Child extends appDom.AppDomNode>(node: Child) {
-      dispatch({
-        type: 'DOM_DUPLICATE_NODE',
-        node,
-      });
-    },
-    removeNode(nodeId: NodeId) {
-      dispatch({
-        type: 'DOM_REMOVE_NODE',
-        nodeId,
-      });
-    },
     saveNode(node: appDom.AppDomNode) {
       dispatch({
         type: 'DOM_SAVE_NODE',
         node,
-      });
-    },
-    setNodeNamespacedProp<
-      Node extends appDom.AppDomNode,
-      Namespace extends appDom.PropNamespaces<Node>,
-      Prop extends keyof NonNullable<Node[Namespace]> & string,
-    >(
-      node: Node,
-      namespace: Namespace,
-      prop: Prop,
-      value: NonNullable<Node[Namespace]>[Prop] | null,
-    ) {
-      dispatch({
-        type: 'DOM_SET_NODE_PROP',
-        namespace,
-        node,
-        prop,
-        value: value as BindableAttrValue<unknown> | null,
       });
     },
     setNodeNamespace<Node extends appDom.AppDomNode, Namespace extends appDom.PropNamespaces<Node>>(

@@ -57,10 +57,11 @@ export default function RenderPanel({ className }: RenderPanelProps) {
           const newValue: unknown =
             typeof event.value === 'function' ? event.value(actual?.value) : event.value;
 
-          domApi.setNodeNamespacedProp(node, 'props', event.prop, {
+          const updatedDom = appDom.setNodeNamespacedProp(dom, node, 'props', event.prop, {
             type: 'const',
             value: newValue,
           });
+          domApi.update(updatedDom);
           return;
         }
         case 'pageStateUpdated': {

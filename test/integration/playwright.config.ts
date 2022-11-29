@@ -15,12 +15,10 @@ const config: PlaywrightTestConfig = {
       name: 'chromium',
       use: { ...devices['Desktop Chrome'] },
     },
-    !process.env.SKIP_FF
-      ? {
-          name: 'firefox',
-          use: { ...devices['Desktop Firefox'] },
-        }
-      : {},
+    {
+      name: 'firefox',
+      use: { ...devices['Desktop Firefox'] },
+    },
   ],
 };
 

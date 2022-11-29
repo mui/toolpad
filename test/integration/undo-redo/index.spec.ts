@@ -28,26 +28,22 @@ test('test basic undo and redo', async ({ page, browserName }) => {
   // Ensure that we added 3rd text field
   await expect(canvasInputLocator).toHaveCount(3);
 
-  const undoButton = page.locator('[data-testid=undo-button]');
-
   // Wait for undo stack to be updated
   await page.waitForTimeout(600);
 
   // Undo adding text field
-  undoButton.click();
+  await page.keyboard.press('Meta+Z');
 
   // Check that we have only 2 text fields
   await expect(canvasInputLocator).toHaveCount(2);
 
-  const redoButton = page.locator('[data-testid=redo-button]');
-
-  redoButton.click();
+  await page.keyboard.press('Meta+Shift+Z');
 
   // Redo should bring back text field
   await expect(canvasInputLocator).toHaveCount(3);
 });
 
-test('test batching quick actions into single undo entry', async ({ page, browserName }) => {
+test.only('test batching quick actions into single undo entry', async ({ page, browserName }) => {
   const homeModel = new ToolpadHome(page);
   const editorModel = new ToolpadEditor(page, browserName);
 
@@ -63,8 +59,9 @@ test('test batching quick actions into single undo entry', async ({ page, browse
 
   clickCenter(page, input);
 
-  await page.getByLabel('defaultValue').fill('some value');
-  await page.getByLabel('label').fill('some label');
+  await editorModel.componentEditor.getByLabel('defaultValue').fill('some value');
+  await editorModel.componentEditor.getByLabel('label').fill('some label');
+  await editorModel.componentEditor.getByLabel('label').blur();
 
   await expect(input).toHaveValue('some value');
   await expect(editorModel.appCanvas.getByLabel('some label')).toBeVisible();
@@ -72,9 +69,8 @@ test('test batching quick actions into single undo entry', async ({ page, browse
   // Wait for undo stack to be updated
   await page.waitForTimeout(600);
 
-  const undoButton = page.locator('[data-testid=undo-button]');
   // Undo changes
-  undoButton.click();
+  await page.keyboard.press('Meta+Z');
 
   // Asssert that batched changes were reverted
   await expect(input).toHaveValue('');

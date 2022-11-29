@@ -381,11 +381,6 @@ function createDomApi(
   };
 }
 
-interface UndoRedoStackEntry {
-  dom: appDom.AppDom;
-  selectedNodeId: NodeId | null;
-}
-
 export interface DomLoader {
   dom: appDom.AppDom;
   savedDom: appDom.AppDom;
@@ -393,8 +388,8 @@ export interface DomLoader {
   unsavedChanges: number;
   saveError: string | null;
   selectedNodeId: NodeId | null;
-  undoStack: UndoRedoStackEntry[];
-  redoStack: UndoRedoStackEntry[];
+  undoStack: DomState[];
+  redoStack: DomState[];
 }
 
 export function getNodeHashes(dom: appDom.AppDom): NodeHashes {
@@ -409,7 +404,12 @@ export type DomApi = ReturnType<typeof createDomApi>;
 
 export { useDomLoader };
 
-export function useDom(): { dom: appDom.AppDom; selectedNodeId: NodeId | null } {
+export interface DomState {
+  dom: appDom.AppDom;
+  selectedNodeId: NodeId | null;
+}
+
+export function useDom(): DomState {
   const { dom, selectedNodeId } = useDomLoader();
   if (!dom) {
     throw new Error("Trying to access the DOM before it's loaded");

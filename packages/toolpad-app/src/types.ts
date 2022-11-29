@@ -132,7 +132,7 @@ export interface ExecClientFetchFn<Q, R extends ExecFetchResult> {
 export interface ClientDataSource<C = {}, Q = {}> {
   displayName: string;
   /** @deprecated Kept around for in-app connections until they're global */
-  ConnectionParamsInput: ConnectionParamsEditor<C>;
+  ConnectionParamsInput?: ConnectionParamsEditor<C>;
   // Temporary until connections are made global
   ConnectionParamsInput2: ConnectionParamsEditor2<C>;
   transformQueryBeforeCommit?: (query: Q) => Q;

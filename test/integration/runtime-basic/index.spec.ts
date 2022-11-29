@@ -1,15 +1,15 @@
 import * as path from 'path';
-import { ToolpadHome } from '../../models/ToolpadHome';
 import { ToolpadRuntime } from '../../models/ToolpadRuntime';
 import { test, expect } from '../../playwright/test';
 import { readJsonFile } from '../../utils/fs';
+import generateId from '../../utils/generateId';
 
-test('input basics', async ({ page }) => {
+test('input basics', async ({ page, api }) => {
   const dom = await readJsonFile(path.resolve(__dirname, './basicDom.json'));
 
-  const homeModel = new ToolpadHome(page);
-  await homeModel.goto();
-  const app = await homeModel.createApplication({ dom });
+  const app = await api.mutation.createApp(`App ${generateId()}`, {
+    from: { kind: 'dom', dom },
+  });
 
   const runtimeModel = new ToolpadRuntime(page);
   await runtimeModel.gotoPage(app.id, 'page1');

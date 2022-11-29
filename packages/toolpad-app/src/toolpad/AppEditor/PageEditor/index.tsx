@@ -71,7 +71,7 @@ interface PageEditorProps {
 }
 
 export default function PageEditor({ appId }: PageEditorProps) {
-  const dom = useDom();
+  const { dom } = useDom();
   const domApi = useDomApi();
   const { nodeId } = useParams();
   const pageNode = appDom.getMaybeNode(dom, nodeId as NodeId, 'page');

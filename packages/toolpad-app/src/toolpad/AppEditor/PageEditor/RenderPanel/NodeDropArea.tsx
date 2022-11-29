@@ -159,7 +159,7 @@ export default function NodeDropArea({
   dropAreaRect,
   availableDropZones,
 }: NodeDropAreaProps) {
-  const dom = useDom();
+  const { dom } = useDom();
   const { dragOverNodeId, dragOverSlotParentProp, dragOverZone, viewState } = usePageEditorState();
 
   const { nodes: nodesInfo } = viewState;

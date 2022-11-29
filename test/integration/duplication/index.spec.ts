@@ -1,15 +1,17 @@
 import * as path from 'path';
 import { ToolpadEditor } from '../../models/ToolpadEditor';
-import { ToolpadHome } from '../../models/ToolpadHome';
 import { test, expect } from '../../playwright/test';
 import { readJsonFile } from '../../utils/fs';
+import generateId from '../../utils/generateId';
 
-test('duplication', async ({ page, browserName }) => {
+test.use({ ignoreConsoleErrors: [/.*/] });
+
+test('duplication', async ({ page, browserName, api }) => {
   const dom = await readJsonFile(path.resolve(__dirname, './dom.json'));
 
-  const homeModel = new ToolpadHome(page);
-  await homeModel.goto();
-  const app = await homeModel.createApplication({ dom });
+  const app = await api.mutation.createApp(`App ${generateId()}`, {
+    from: { kind: 'dom', dom },
+  });
 
   const editorModel = new ToolpadEditor(page, browserName);
   await editorModel.goto(app.id);

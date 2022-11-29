@@ -168,7 +168,10 @@ export function domLoaderReducer(state: DomLoader, action: DomAction): DomLoader
 
   switch (action.type) {
     case 'DOM_UPDATE_HISTORY': {
-      const updatedUndoStack = [...state.undoStack, { dom: state.dom, selectedNodeId: null }];
+      const updatedUndoStack = [
+        ...state.undoStack,
+        { dom: state.dom, selectedNodeId: state.selectedNodeId },
+      ];
 
       if (updatedUndoStack.length > UNDO_HISTORY_LIMIT) {
         updatedUndoStack.shift();
@@ -199,6 +202,7 @@ export function domLoaderReducer(state: DomLoader, action: DomAction): DomLoader
 
       return update(state, {
         dom: previousStackEntry.dom,
+        selectedNodeId: previousStackEntry.selectedNodeId,
         undoStack,
         redoStack,
       });
@@ -217,6 +221,7 @@ export function domLoaderReducer(state: DomLoader, action: DomAction): DomLoader
 
       return update(state, {
         dom: nextStackEntry.dom,
+        selectedNodeId: nextStackEntry.selectedNodeId,
         undoStack,
         redoStack,
       });

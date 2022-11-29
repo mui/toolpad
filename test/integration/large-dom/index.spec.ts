@@ -1,5 +1,5 @@
 import * as path from 'path';
-import { test } from '@playwright/test';
+import { test } from '../../playwright/test';
 import { ToolpadHome } from '../../models/ToolpadHome';
 import { readJsonFile } from '../../utils/fs';
 

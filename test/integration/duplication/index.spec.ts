@@ -5,6 +5,8 @@ import { test, expect } from '../../playwright/test';
 import { readJsonFile } from '../../utils/fs';
 import { createApplication } from '../../utils/toolpadApi';
 
+test.use({ ignoreConsoleErrors: [/Cannot read properties of null/] });
+
 test('duplication', async ({ page, browserName, baseURL }) => {
   invariant(baseURL, 'playwright must be run with a a baseURL');
 

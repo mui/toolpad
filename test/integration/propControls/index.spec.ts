@@ -1,6 +1,6 @@
-import { test, expect } from '@playwright/test';
 import invariant from 'invariant';
 import * as path from 'path';
+import { test, expect } from '../../playwright/test';
 import { ToolpadEditor } from '../../models/ToolpadEditor';
 import clickCenter from '../../utils/clickCenter';
 import { createApplication } from '../../utils/toolpadApi';

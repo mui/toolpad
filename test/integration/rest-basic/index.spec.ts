@@ -1,6 +1,6 @@
 import * as path from 'path';
 import invariant from 'invariant';
-import { test, expect } from '@playwright/test';
+import { test, expect } from '../../playwright/test';
 import { createApplication } from '../../utils/toolpadApi';
 import { ToolpadRuntime } from '../../models/ToolpadRuntime';
 import { readJsonFile } from '../../utils/fs';
@@ -16,6 +16,8 @@ if (customHttbinBaseUrl) {
 }
 
 const HTTPBIN_BASEURL = customHttbinBaseUrl || 'https://httpbin.org/';
+
+test.use({ ignoreConsoleErrors: [/Cannot read properties of null/] });
 
 test('rest basics', async ({ page, browserName, baseURL }) => {
   invariant(baseURL, 'playwright must be run with a a baseURL');

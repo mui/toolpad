@@ -1,4 +1,6 @@
 import { ConsoleMessage, test as base } from '@playwright/test';
+import { createRpcClient, RpcClient } from '../../packages/toolpad-app/src/rpcClient';
+import type { ServerDefinition } from '../../packages/toolpad-app/pages/api/rpc';
 
 export * from '@playwright/test';
 
@@ -17,8 +19,12 @@ const IGNORED_ERRORS = [
   /JavaScript Error: "downloadable font: download failed \(font-family: "Roboto" style:normal/,
 ];
 
-export const test = base.extend({
-  page: async ({ page }, use) => {
+export type Options = { ignoreConsoleErrors: RegExp[] };
+
+export const test = base.extend<Options & { api: RpcClient<ServerDefinition> }>({
+  ignoreConsoleErrors: [],
+
+  page: async ({ page, ignoreConsoleErrors }, use) => {
     const entryPromises: Promise<ConsoleEntry>[] = [];
 
     const consoleHandler = (msg: ConsoleMessage) => {
@@ -43,12 +49,18 @@ export const test = base.extend({
     page.off('console', consoleHandler);
 
     const entries = await Promise.all(entryPromises);
+    const ignoredEntries = [...IGNORED_ERRORS, ...ignoreConsoleErrors];
     for (const entry of entries) {
-      if (entry.type === 'error' && !IGNORED_ERRORS.some((regex) => regex.test(entry.text))) {
+      if (entry.type === 'error' && !ignoredEntries.some((regex) => regex.test(entry.text))) {
         // Currently a catch-all for console error messages. Expecting us to add a way of blacklisting
         // expected error messages at some point here
         throw new Error(`Console error message detected\n${JSON.stringify(entry, null, 2)}`);
       }
     }
+  },
+
+  api: async ({ baseURL }, use) => {
+    const api = createRpcClient<ServerDefinition>(new URL('/api/rpc', baseURL).href);
+    await use(api);
   },
 });

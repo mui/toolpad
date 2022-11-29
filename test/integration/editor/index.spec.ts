@@ -1,5 +1,5 @@
-import { test, expect } from '@playwright/test';
 import invariant from 'invariant';
+import { test, expect } from '../../playwright/test';
 import { ToolpadEditor } from '../../models/ToolpadEditor';
 import clickCenter from '../../utils/clickCenter';
 import domInput from './domInput.json';

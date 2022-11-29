@@ -1,9 +1,11 @@
 import * as path from 'path';
-import { test } from '@playwright/test';
 import invariant from 'invariant';
+import { test } from '../../playwright/test';
 import { ToolpadRuntime } from '../../models/ToolpadRuntime';
 import { readJsonFile } from '../../utils/fs';
 import { createApplication } from '../../utils/toolpadApi';
+
+test.use({ ignoreConsoleErrors: [/Cannot read properties of null/] });
 
 test('functions basics', async ({ page, baseURL }) => {
   invariant(baseURL, 'playwright must be run with a a baseURL');

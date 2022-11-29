@@ -4,8 +4,6 @@ import { test, expect } from '../../playwright/test';
 import { readJsonFile } from '../../utils/fs';
 import generateId from '../../utils/generateId';
 
-test.use({ ignoreConsoleErrors: [/.*/] });
-
 test('duplication', async ({ page, browserName, api }) => {
   const dom = await readJsonFile(path.resolve(__dirname, './dom.json'));
 

@@ -6,7 +6,7 @@ import { readJsonFile } from '../utils/fs';
 
 test.use({ ignoreConsoleErrors: [/Cannot read properties of null/] });
 
-test.only('duplicate app from home flow', async ({ page }) => {
+test('duplicate app from home flow', async ({ page }) => {
   const dom = await readJsonFile(path.resolve(__dirname, './duplicateNavigationDom.json'));
 
   const homeModel = new ToolpadHome(page);

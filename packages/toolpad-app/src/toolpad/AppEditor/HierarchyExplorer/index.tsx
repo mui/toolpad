@@ -142,7 +142,7 @@ export interface HierarchyExplorerProps {
 }
 
 export default function HierarchyExplorer({ appId, className }: HierarchyExplorerProps) {
-  const dom = useDom();
+  const { dom } = useDom();
   const domApi = useDomApi();
 
   const app = appDom.getApp(dom);

@@ -423,32 +423,34 @@ const DataGridComponent = React.forwardRef(function DataGridComponent(
                 />,
               ];
             }
-            return [
-              onUpdateProp ? (
+            const actionElems = [];
+            if (onUpdateProp) {
+              actionElems.push(
                 <GridActionsCellItem
                   icon={<EditIcon />}
                   label="Edit"
                   key={'edit'}
+                  showInMenu
                   onClick={() => {
                     setRowModesModel({ ...rowModesModel, [id]: { mode: GridRowModes.Edit } });
                   }}
-                />
-              ) : (
-                <React.Fragment />
-              ),
-              onDeleteProp ? (
+                />,
+              );
+            }
+            if (onDeleteProp) {
+              actionElems.push(
                 <GridActionsCellItem
                   key={'delete'}
                   icon={<DeleteIcon />}
                   label="Delete"
+                  showInMenu
                   onClick={() => {
                     onDeleteProp({ event: { row } });
                   }}
-                />
-              ) : (
-                <React.Fragment />
-              ),
-            ];
+                />,
+              );
+            }
+            return actionElems;
           },
         }
       : null;

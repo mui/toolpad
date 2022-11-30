@@ -24,6 +24,11 @@
 
 1. Copy the generated changelog from the console, clean it up, add a short summary of the release highlights and use the new version number as the title.
 
+   Writing good highlights:
+
+   - Focus on new user facing features or changes
+   - Be concise, link to relevant documentation for extra clarity
+
 1. Prepend the changelog to [`CHANGELOG.md`](./CHANGELOG.md).
 
 1. Open a PR with the proposed changes.

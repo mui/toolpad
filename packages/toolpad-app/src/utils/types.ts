@@ -80,3 +80,5 @@ export interface MetaField {
   value?: any;
 }
 export type GlobalScopeMeta = Record<string, MetaField>;
+
+export type ValueOf<T> = T[keyof T];

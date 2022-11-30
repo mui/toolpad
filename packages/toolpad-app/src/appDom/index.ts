@@ -17,7 +17,7 @@ import { camelCase, removeDiacritics } from '../utils/strings';
 import { ExactEntriesOf, Maybe } from '../utils/types';
 import { mapProperties, mapValues } from '../utils/collections';
 
-export const CURRENT_APPDOM_VERSION = 2;
+export const CURRENT_APPDOM_VERSION = 3;
 
 export const RESERVED_NODE_PROPERTIES = [
   'id',
@@ -1063,8 +1063,10 @@ function createRenderTreeNode(node: AppDomNode): RenderTreeNode | null {
   }
 
   if (isQuery(node) || isMutation(node)) {
+    // This is hacky, should we delegate this check to the datasources?
     const isBrowserSideRestQuery: boolean =
-      node.attributes.dataSource?.value === 'rest' &&
+      (node.attributes.dataSource?.value === 'rest' ||
+        node.attributes.dataSource?.value === 'function') &&
       !!(node.attributes.query.value as any).browser;
 
     if (node.attributes.query.value && !isBrowserSideRestQuery) {

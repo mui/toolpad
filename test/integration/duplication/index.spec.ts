@@ -1,29 +1,31 @@
 import * as path from 'path';
 import { ToolpadEditor } from '../../models/ToolpadEditor';
-import { ToolpadHome } from '../../models/ToolpadHome';
 import { test, expect } from '../../playwright/test';
 import { readJsonFile } from '../../utils/fs';
+import generateId from '../../utils/generateId';
 
-test('duplication', async ({ page, browserName }) => {
+test.use({ ignoreConsoleErrors: [/.*/] });
+
+test('duplication', async ({ page, browserName, api }) => {
   const dom = await readJsonFile(path.resolve(__dirname, './dom.json'));
 
-  const homeModel = new ToolpadHome(page);
-  await homeModel.goto();
-  const app = await homeModel.createApplication({ dom });
+  const app = await api.mutation.createApp(`App ${generateId()}`, {
+    from: { kind: 'dom', dom },
+  });
 
   const editorModel = new ToolpadEditor(page, browserName);
   await editorModel.goto(app.id);
 
   {
     await editorModel.openHierarchyMenu('connections', 'connection');
-    const duplicateMenuItem = page.getByRole('menuitem', { name: 'Duplicate connection' });
+    const duplicateMenuItem = page.getByRole('menuitem', { name: 'Duplicate' });
     await Promise.all([duplicateMenuItem.click(), page.waitForNavigation()]);
 
     const input = page.getByLabel('base url');
     await expect(input).toHaveValue('https://example.com/');
 
     await editorModel.openHierarchyMenu('connections', 'connection1');
-    const deleteMenuItem = page.getByRole('menuitem', { name: 'Delete connection1' });
+    const deleteMenuItem = page.getByRole('menuitem', { name: 'Delete' });
     await deleteMenuItem.click();
     const deleteButton = editorModel.confirmationDialog.getByRole('button', { name: 'Delete' });
     await Promise.all([deleteButton.click(), page.waitForNavigation()]);
@@ -33,11 +35,11 @@ test('duplication', async ({ page, browserName }) => {
 
   {
     await editorModel.openHierarchyMenu('components', 'myComponent');
-    const duplicateMenuItem = page.getByRole('menuitem', { name: 'Duplicate myComponent' });
+    const duplicateMenuItem = page.getByRole('menuitem', { name: 'Duplicate' });
     await Promise.all([duplicateMenuItem.click(), page.waitForNavigation()]);
 
     await editorModel.openHierarchyMenu('components', 'myComponent1');
-    const deleteMenuItem = page.getByRole('menuitem', { name: 'Delete myComponent1' });
+    const deleteMenuItem = page.getByRole('menuitem', { name: 'Delete' });
     await deleteMenuItem.click();
     const deleteButton = editorModel.confirmationDialog.getByRole('button', { name: 'Delete' });
     await Promise.all([deleteButton.click(), page.waitForNavigation()]);
@@ -47,14 +49,14 @@ test('duplication', async ({ page, browserName }) => {
 
   {
     await editorModel.openHierarchyMenu('pages', 'page1');
-    const duplicateMenuItem = page.getByRole('menuitem', { name: 'Duplicate page1' });
+    const duplicateMenuItem = page.getByRole('menuitem', { name: 'Duplicate' });
     await Promise.all([duplicateMenuItem.click(), page.waitForNavigation()]);
 
     const button = editorModel.appCanvas.getByRole('button', { name: 'hello world' });
     await expect(button).toBeVisible();
 
     await editorModel.openHierarchyMenu('pages', 'page2');
-    const deleteMenuItem = page.getByRole('menuitem', { name: 'Delete page2' });
+    const deleteMenuItem = page.getByRole('menuitem', { name: 'Delete' });
     await deleteMenuItem.click();
     const deleteButton = editorModel.confirmationDialog.getByRole('button', { name: 'Delete' });
     await Promise.all([deleteButton.click(), page.waitForNavigation()]);

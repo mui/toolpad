@@ -19,11 +19,11 @@ export const reportWebVitalsToGA = ({ id, label, name, value }: NextWebVitalsMet
   }
 };
 
-export const sendAppCreatedEvent = (name: string, templateId?: AppTemplateId): void => {
+export const sendAppCreatedEvent = (appName: string, appTemplateId?: AppTemplateId): void => {
   if (config.gaId) {
     window.gtag('event', 'toolpad_app_created', {
-      app_name: name,
-      app_template_id: templateId,
+      app_name: appName,
+      app_template_id: appTemplateId,
     });
   }
 };

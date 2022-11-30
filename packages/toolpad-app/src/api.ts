@@ -8,52 +8,10 @@ import {
   UseQueryOptions,
   UseQueryResult,
 } from '@tanstack/react-query';
-import { parse as superjsonParse } from 'superjson';
-import type {
-  Definition,
-  MethodsGroup,
-  MethodsOf,
-  MethodsOfGroup,
-  RpcRequest,
-  RpcResponse,
-  ServerDefinition,
-} from '../pages/api/rpc';
+import type { Definition, MethodsGroup, MethodsOf, ServerDefinition } from '../pages/api/rpc';
+import { createRpcClient } from './rpcClient';
 
 export const queryClient = new QueryClient();
-
-function createFetcher(endpoint: string, type: 'query' | 'mutation'): MethodsOfGroup<any> {
-  return new Proxy(
-    {},
-    {
-      get(target, prop) {
-        return async (...params: any[]) => {
-          const body: RpcRequest = {
-            type,
-            name: prop as string,
-            params,
-          };
-          const res = await fetch(endpoint, {
-            method: 'POST',
-            headers: {
-              'content-type': 'application/json',
-            },
-            body: JSON.stringify(body),
-          });
-
-          if (res.ok) {
-            const response = (await res.json()) as RpcResponse;
-            if (response.error) {
-              throw new Error(response.error.message);
-            }
-            return superjsonParse(response.result);
-          }
-
-          throw new Error(`HTTP ${res.status}`);
-        };
-      },
-    },
-  );
-}
 
 export interface UseQueryFnOptions<F extends (...args: any[]) => any>
   extends Omit<
@@ -76,7 +34,12 @@ interface UseMutationFn<M extends MethodsGroup> {
   ): UseMutationResult<Awaited<ReturnType<M[K]>>, unknown, Parameters<M[K]>>;
 }
 
-interface ApiClient<D extends Definition> {
+interface RpcClient<D extends Definition> {
+  query: D['query'];
+  mutation: D['mutation'];
+}
+
+interface ApiClient<D extends Definition> extends RpcClient<D> {
   query: D['query'];
   mutation: D['mutation'];
   useQuery: UseQueryFn<D['query']>;
@@ -92,8 +55,7 @@ interface ApiClient<D extends Definition> {
 }
 
 function createClient<D extends MethodsOf<any>>(endpoint: string): ApiClient<D> {
-  const query = createFetcher(endpoint, 'query');
-  const mutation = createFetcher(endpoint, 'mutation');
+  const { query, mutation } = createRpcClient<D>(endpoint);
 
   return {
     query,

@@ -14,12 +14,12 @@ export async function clientExec(
     const har = createHarLog();
 
     const instrumentedFetch = async (...args: Parameters<typeof fetch>) => {
-      const startedDateTime = new Date().toISOString();
+      const startTime = Date.now();
       const req = new Request(...args);
       const url = new URL(req.url);
       const res = await window.fetch(req);
       const entry: Entry = {
-        startedDateTime,
+        startedDateTime: new Date(startTime).toISOString(),
         request: {
           bodySize: 0,
           cookies: [],
@@ -45,7 +45,7 @@ export async function clientExec(
           statusText: res.statusText,
         },
         cache: {},
-        time: Date.now(),
+        time: Date.now() - startTime,
         timings: {
           wait: 0,
           receive: 0,

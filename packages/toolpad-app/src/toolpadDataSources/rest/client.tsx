@@ -57,7 +57,6 @@ import Devtools from '../../components/Devtools';
 import { createHarLog, mergeHar } from '../../utils/har';
 import config from '../../config';
 import QueryInputPanel from '../QueryInputPanel';
-import DEMO_BASE_URLS from './demoBaseUrls';
 import useFetchPrivate from '../useFetchPrivate';
 import { clientExec } from './runtime';
 
@@ -83,7 +82,7 @@ const ButtonLink = styled('button')(({ theme }) => ({
 }));
 
 interface UrlControlProps extends RenderControlParams<string> {
-  baseUrl?: string;
+  baseUrl: string | null;
 }
 
 function UrlControl({ label, disabled, baseUrl, value, onChange }: UrlControlProps) {
@@ -168,17 +167,7 @@ function ConnectionParamsInput({ value, onChange }: ConnectionEditorProps<RestCo
 
   return (
     <Stack direction="column" gap={3} sx={{ py: 3 }}>
-      {config.isDemo ? (
-        <TextField select {...baseUrlInputProps} defaultValue="">
-          {DEMO_BASE_URLS.map(({ url, name }) => (
-            <MenuItem key={url} value={url}>
-              {url} ({name})
-            </MenuItem>
-          ))}
-        </TextField>
-      ) : (
-        <TextField {...baseUrlInputProps} />
-      )}
+      <TextField {...baseUrlInputProps} />
       <Typography>Headers:</Typography>
       <Controller
         name="headers"
@@ -188,7 +177,7 @@ function ConnectionParamsInput({ value, onChange }: ConnectionEditorProps<RestCo
           return (
             <MapEntriesEditor
               {...field}
-              disabled={!headersAllowed || config.isDemo}
+              disabled={!headersAllowed}
               fieldLabel="header"
               value={allHeaders}
               onChange={(headers) => onFieldChange(headers.slice(authenticationHeaders.length))}
@@ -202,11 +191,7 @@ function ConnectionParamsInput({ value, onChange }: ConnectionEditorProps<RestCo
         name="authentication"
         control={control}
         render={({ field: { value: fieldValue, ref, ...field } }) => (
-          <AuthenticationEditor
-            {...field}
-            disabled={!headersAllowed || config.isDemo}
-            value={fieldValue ?? null}
-          />
+          <AuthenticationEditor {...field} disabled={!headersAllowed} value={fieldValue ?? null} />
         )}
       />
 
@@ -271,11 +256,15 @@ const EMPTY_PARAMS: BindableAttrEntries = [];
 
 function QueryEditor({
   globalScope,
-  connectionParams,
+  connectionParams: rawConnectionParams,
   value: input,
   onChange: setInput,
 }: QueryEditorProps<RestConnectionParams, FetchQuery>) {
-  const baseUrl = connectionParams?.baseUrl;
+  const isBrowserSide = input.attributes.query.value.browser;
+
+  const connectionParams = isBrowserSide ? null : rawConnectionParams;
+  const baseUrl = isBrowserSide ? null : connectionParams?.baseUrl ?? null;
+
   const urlValue: BindableAttrValue<string> =
     input.attributes.query.value.url || getDefaultUrl(connectionParams);
 
@@ -425,15 +414,30 @@ function QueryEditor({
   return (
     <SplitPane split="vertical" size="50%" allowResize>
       <SplitPane split="horizontal" size={85} primary="second" allowResize>
-        <QueryInputPanel onRunPreview={handleRunPreview}>
+        <QueryInputPanel
+          onRunPreview={handleRunPreview}
+          actions={
+            <FormGroup>
+              <FormControlLabel
+                control={
+                  <Checkbox
+                    checked={isBrowserSide}
+                    onChange={handleRunInBrowserChange}
+                    disabled={config.isDemo}
+                  />
+                }
+                label="Run in the browser"
+              />
+            </FormGroup>
+          }
+        >
           <Stack gap={2} sx={{ px: 3, pt: 1 }}>
             <Typography>Query</Typography>
             <Box sx={{ display: 'flex', flexDirection: 'row', gap: 1 }}>
               <TextField
                 select
-                value={config.isDemo ? 'GET' : input.attributes.query.value.method || 'GET'}
+                value={input.attributes.query.value.method || 'GET'}
                 onChange={handleMethodChange}
-                disabled={config.isDemo}
               >
                 {HTTP_METHODS.map((method) => (
                   <MenuItem key={method} value={method}>
@@ -454,25 +458,14 @@ function QueryEditor({
                 onChange={handleUrlChange}
               />
             </Box>
-            <FormGroup>
-              <FormControlLabel
-                control={
-                  <Checkbox
-                    checked={input.attributes.query.value.browser}
-                    onChange={handleRunInBrowserChange}
-                  />
-                }
-                label="Run in the browser"
-              />
-            </FormGroup>
             <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
               <TabContext value={activeTab}>
                 <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
                   <TabList onChange={handleActiveTabChange} aria-label="Fetch options active tab">
                     <Tab label="URL query" value="urlQuery" />
-                    <Tab label="Body" value="body" disabled={config.isDemo} />
-                    <Tab label="Headers" value="headers" disabled={config.isDemo} />
-                    <Tab label="Response" value="response" disabled={config.isDemo} />
+                    <Tab label="Body" value="body" />
+                    <Tab label="Headers" value="headers" />
+                    <Tab label="Response" value="response" />
                     <Tab label="Transform" value="transform" />
                   </TabList>
                 </Box>
@@ -571,6 +564,7 @@ function getInitialQueryValue(): FetchQuery {
   return {
     method: 'GET',
     headers: [],
+    browser: config.isDemo,
   };
 }
 

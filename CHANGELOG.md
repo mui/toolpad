@@ -1,5 +1,25 @@
 # Changelog
 
+## 0.0.29
+
+<!-- generated comparing v0.0.28..master -->
+
+_Nov 30, 2022_
+
+A big thanks to the 4 contributors who made this release possible. Here are some highlights ✨:
+
+Improved query options in demo, fixed time property in HAR, unified app editor options menus
+
+- &#8203;<!-- 7 -->Undo redo tests (#1308) @bytasv
+- &#8203;<!-- 6 -->Hide connections tree in demo (#1393) @apedroferreira
+- &#8203;<!-- 5 -->Create apps programmatically in integration tests (#1384) @Janpot
+- &#8203;<!-- 4 -->Set connection/query available options in demo (#1323) @apedroferreira
+- &#8203;<!-- 3 -->Add some tips about writing highlights in release docs (#1352) @Janpot
+- &#8203;<!-- 2 -->Fix time property in HAR (#1383) @Janpot
+- &#8203;<!-- 1 -->Unify app editor options menus (#1286) @bharatkashyap
+
+All contributors of this release in alphabetical order: @apedroferreira, @bharatkashyap, @bytasv, @Janpot
+
 ## 0.0.28
 
 <!-- generated comparing v0.0.27..master -->

@@ -113,9 +113,7 @@ export class ToolpadEditor {
   }
 
   waitForOverlay() {
-    const hudOverlay = this.appCanvas.getByTestId('page-overlay');
-
-    return expect(hudOverlay).toBeVisible();
+    return expect(this.pageOverlay).toBeVisible();
   }
 
   async dragToAppCanvas(

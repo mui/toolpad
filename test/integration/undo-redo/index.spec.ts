@@ -15,7 +15,7 @@ test('test basic undo and redo', async ({ page, browserName }) => {
   const app = await homeModel.createApplication({ dom: domInput });
   await editorModel.goto(app.id);
 
-  await editorModel.pageRoot.waitFor();
+  await editorModel.waitForOverlay();
 
   const canvasInputLocator = editorModel.appCanvas.locator('input');
 

@@ -23,6 +23,9 @@ import {
   getDeployments,
   getConnections,
   createConnection,
+  getConnection,
+  updateConnection,
+  deleteConnection,
 } from '../../src/server/data';
 import { getLatestToolpadRelease } from '../../src/server/getLatestRelease';
 import { hasOwnProperty } from '../../src/utils/collections';
@@ -135,6 +138,9 @@ const rpcServer = {
     getConnections: createMethod<typeof getConnections>(({ params }) => {
       return getConnections(...params);
     }),
+    getConnection: createMethod<typeof getConnection>(({ params }) => {
+      return getConnection(...params);
+    }),
     execQuery: createMethod<typeof execQuery>(({ params }) => {
       return execQuery(...params);
     }),
@@ -184,6 +190,12 @@ const rpcServer = {
     }),
     createConnection: createMethod<typeof createConnection>(({ params }) => {
       return createConnection(...params);
+    }),
+    updateConnection: createMethod<typeof updateConnection>(({ params }) => {
+      return updateConnection(...params);
+    }),
+    deleteConnection: createMethod<typeof deleteConnection>(({ params }) => {
+      return deleteConnection(...params);
     }),
   },
 } as const;

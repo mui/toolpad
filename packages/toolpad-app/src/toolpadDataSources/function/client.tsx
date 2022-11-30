@@ -9,6 +9,7 @@ import {
   FormGroup,
   Skeleton,
   Stack,
+  TextField,
   Toolbar,
   Typography,
 } from '@mui/material';
@@ -36,7 +37,7 @@ import ErrorAlert from '../../toolpad/AppEditor/PageEditor/ErrorAlert';
 import { LogEntry } from '../../components/Console';
 import MapEntriesEditor from '../../components/MapEntriesEditor';
 import { Maybe } from '../../utils/types';
-import { isSaveDisabled } from '../../utils/forms';
+import { isSaveDisabled, validation } from '../../utils/forms';
 import Devtools from '../../components/Devtools';
 import { createHarLog, mergeHar } from '../../utils/har';
 import useQueryPreview from '../useQueryPreview';
@@ -110,7 +111,7 @@ function ConnectionParamsInput2({
   onChange,
   onClose,
 }: ConnectionEditorProps2<FunctionConnectionParams>) {
-  const { handleSubmit, formState, reset, control } = useForm({
+  const { handleSubmit, formState, reset, control, register } = useForm({
     defaultValues: value,
     reValidateMode: 'onChange',
     mode: 'all',
@@ -123,12 +124,12 @@ function ConnectionParamsInput2({
     <React.Fragment>
       <DialogContent>
         <Stack direction="column" gap={3} sx={{ py: 3 }}>
+          <TextField {...register('name', { required: true })} {...validation(formState, 'name')} />
           <Typography>Secrets:</Typography>
           <Controller
             name="params.secrets"
             control={control}
             render={({ field: { value: fieldValue, onChange: onFieldChange, ref, ...field } }) => {
-              console.log(fieldValue);
               return (
                 <MapEntriesEditor
                   {...field}

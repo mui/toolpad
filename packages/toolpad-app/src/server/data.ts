@@ -12,7 +12,7 @@ import serverDataSources from '../toolpadDataSources/server';
 import * as appDom from '../appDom';
 import { omit } from '../utils/immutability';
 import { asArray } from '../utils/collections';
-import { decryptSecret, encryptSecret } from './secrets';
+import { decryptSecret as decryptString, encryptSecret as encryptString } from './secrets';
 import applyTransform from './applyTransform';
 import { excludeFields } from '../utils/prisma';
 import { getAppTemplateDom } from './appTemplateDoms/doms';
@@ -25,7 +25,10 @@ import createRuntimeState from '../createRuntimeState';
 
 const SELECT_RELEASE_META = excludeFields(prisma.Prisma.ReleaseScalarFieldEnum, ['snapshot']);
 const SELECT_APP_META = excludeFields(prisma.Prisma.AppScalarFieldEnum, ['dom']);
-const SELECT_CONNECTION_META = excludeFields(prisma.Prisma.ConnectionScalarFieldEnum, ['params']);
+const SELECT_CONNECTION_META = excludeFields(prisma.Prisma.ConnectionScalarFieldEnum, [
+  'params',
+  'secrets',
+]);
 
 export type AppMeta = Pick<prisma.App, keyof typeof SELECT_APP_META>;
 export type ConnectionMeta = Pick<prisma.Connection, keyof typeof SELECT_CONNECTION_META>;
@@ -47,7 +50,7 @@ function getPrismaClient(): prisma.PrismaClient {
 const prismaClient = getPrismaClient();
 
 function deserializeValue(dbValue: string, type: prisma.DomNodeAttributeType): unknown {
-  const serialized = type === 'secret' ? decryptSecret(dbValue) : dbValue;
+  const serialized = type === 'secret' ? decryptString(dbValue) : dbValue;
   return serialized.length <= 0 ? undefined : JSON.parse(serialized);
 }
 
@@ -60,7 +63,7 @@ function encryptSecrets(dom: appDom.AppDom): appDom.AppDom {
       for (const value of Object.values(namespace)) {
         if (value.type === 'secret') {
           const serialized = value.value === undefined ? '' : JSON.stringify(value.value);
-          value.value = encryptSecret(serialized);
+          value.value = encryptString(serialized);
         }
       }
     }
@@ -76,7 +79,7 @@ function decryptSecrets(dom: appDom.AppDom): appDom.AppDom {
     for (const namespace of Object.values(namespaces)) {
       for (const value of Object.values(namespace)) {
         if (value.type === 'secret') {
-          const decrypted = decryptSecret(value.value);
+          const decrypted = decryptString(value.value);
           value.value = decrypted.length <= 0 ? undefined : JSON.parse(decrypted);
         }
       }
@@ -592,6 +595,35 @@ export async function getConnections() {
   });
 }
 
+function deserializeConnectionSerets(secrets: string): Record<string, string> {
+  return JSON.parse(decryptString(secrets));
+}
+
+function serializeConnectionSerets(secrets: Record<string, string>): string {
+  return encryptString(JSON.stringify(secrets));
+}
+
+export async function getConnection(id: string) {
+  if (config.isDemo) {
+    return null;
+  }
+
+  const connection = await prismaClient.connection.findUnique({ where: { id } });
+  if (!connection) {
+    return null;
+  }
+
+  const decryptedSecrets = deserializeConnectionSerets(connection.secrets);
+  const maskedSecrets = Object.fromEntries(
+    Object.keys(decryptedSecrets).map((key) => [key, '<redacted>']),
+  );
+
+  return {
+    ...connection,
+    secrets: maskedSecrets,
+  };
+}
+
 function updateSecrets(
   existing: Record<string, any>,
   updates: SecretsActions,
@@ -617,7 +649,7 @@ function updateSecrets(
   return result;
 }
 
-interface CreateConnectionOptions {
+export interface CreateConnectionOptions {
   datasource: string;
   params: unknown;
   secrets: SecretsActions;
@@ -629,7 +661,35 @@ export async function createConnection(name: string, options: CreateConnectionOp
       name,
       datasource: options.datasource,
       params: options.params,
-      secrets: encryptSecret(JSON.stringify(updateSecrets({}, options.secrets))),
+      secrets: encryptString(JSON.stringify(updateSecrets({}, options.secrets))),
     },
+    select: SELECT_CONNECTION_META,
   });
+}
+
+export interface UpdateConnectionOptions {
+  name: string;
+  params: unknown;
+  secrets: SecretsActions;
+}
+
+export async function updateConnection(
+  id: string,
+  { name, params, secrets }: UpdateConnectionOptions,
+) {
+  const existing = await prismaClient.connection.findUniqueOrThrow({ where: { id } });
+  const existingSecrets = deserializeConnectionSerets(existing.secrets);
+  return prismaClient.connection.update({
+    where: { id },
+    data: {
+      name,
+      params,
+      secrets: serializeConnectionSerets(updateSecrets(existingSecrets, secrets)),
+    },
+    select: SELECT_CONNECTION_META,
+  });
+}
+
+export async function deleteConnection(id: string) {
+  await prismaClient.connection.delete({ where: { id } });
 }

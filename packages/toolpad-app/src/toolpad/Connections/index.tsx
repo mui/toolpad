@@ -34,7 +34,6 @@ import ContentCopyOutlinedIcon from '@mui/icons-material/ContentCopyOutlined';
 import ViewListIcon from '@mui/icons-material/ViewList';
 import GridViewIcon from '@mui/icons-material/GridView';
 import DeleteIcon from '@mui/icons-material/Delete';
-import { Link } from 'react-router-dom';
 import client from '../../api';
 import useLatest from '../../utils/useLatest';
 import ToolpadHomeShell from '../ToolpadHomeShell';
@@ -51,6 +50,7 @@ import {
   ClientDataSource,
   ConnectionEditorModel,
   ConnectionEditorProps2,
+  SecretsAction,
 } from '../../types';
 import { errorFrom } from '../../utils/errors';
 import FlexFill from '../../components/FlexFill';
@@ -100,8 +100,64 @@ function getDataSource<P>(dataSourceId: string): ClientDataSource<P, any> | null
 
 interface DialogState<P> {
   open: boolean;
+  loading: boolean;
+  error: Error | null;
+  connectionId: string | null;
   dataSourceId: string | null;
   params: P | null;
+  secrets: Record<string, SecretsAction>;
+}
+
+type DialogAction<P> =
+  | { kind: 'DIALOG_OPEN'; connectionId?: string }
+  | { kind: 'DIALOG_CLOSE' }
+  | { kind: 'DATASOURCE_SELECTED'; dataSourceId: string }
+  | { kind: 'DATASOURCE_SELECTED'; dataSourceId: string }
+  | { kind: 'SAVE_STARTED' }
+  | { kind: 'SAVE_FAILED'; error: Error }
+  | {
+      kind: 'CONNECTION_LOAD_SUCCESS';
+      dataSourceId: string;
+      params: P;
+      secrets: Record<string, SecretsAction>;
+    }
+  | { kind: 'CONNECTION_LOAD_FAILED'; error: Error };
+
+function dialogStateREducer<P>(state: DialogState<P>, action: DialogAction<P>): DialogState<P> {
+  switch (action.kind) {
+    case 'DIALOG_OPEN': {
+      const loading = !!action.connectionId;
+      return {
+        open: true,
+        loading,
+        connectionId: action.connectionId ?? null,
+        dataSourceId: null,
+        error: null,
+        params: null,
+        secrets: {},
+      };
+    }
+    case 'DIALOG_CLOSE': {
+      return { ...state, open: false };
+    }
+    case 'DATASOURCE_SELECTED': {
+      return { ...state, dataSourceId: action.dataSourceId, params: null, secrets: {} };
+    }
+    case 'CONNECTION_LOAD_FAILED': {
+      return { ...state, loading: false, error: action.error };
+    }
+    case 'CONNECTION_LOAD_SUCCESS': {
+      return {
+        ...state,
+        loading: false,
+        dataSourceId: action.dataSourceId,
+        params: action.params,
+        secrets: action.secrets,
+      };
+    }
+    default:
+      throw new Error(`Unknown dialog action "${(action as DialogAction<P>).kind}"`);
+  }
 }
 
 interface ConnectionParamsEditorProps<P> extends ConnectionEditorProps2<P> {
@@ -115,48 +171,41 @@ function ConnectionParamsEditor<P>({ dataSource, ...props }: ConnectionParamsEdi
 
 export interface CreateConnectionDialogProps<P> {
   state: DialogState<P>;
-  onStateChange: (
-    newState: DialogState<P> | ((oldState: DialogState<P>) => DialogState<P>),
-  ) => void;
+  dispatch: React.Dispatch<DialogAction<P>>;
 }
 
-function CreateConnectionDialog<P>({
-  state,
-  onStateChange,
-  ...props
-}: CreateConnectionDialogProps<P>) {
-  const createConnectionMutation = client.useMutation('createConnection');
+function CreateConnectionDialog<P>({ state, dispatch, ...props }: CreateConnectionDialogProps<P>) {
   const [dataSourceId, setDataSourceId] = React.useState('');
 
   const handleClose = React.useCallback(() => {
-    onStateChange((old) => ({ ...old, open: false }));
-  }, [onStateChange]);
+    dispatch({ kind: 'DIALOG_CLOSE' });
+  }, [dispatch]);
 
   const handleDatasourceSelected = React.useCallback(() => {
-    onStateChange((old) => ({ ...old, dataSourceId, params: null }));
-  }, [onStateChange, dataSourceId]);
+    dispatch({ kind: 'DATASOURCE_SELECTED', dataSourceId });
+  }, [dispatch, dataSourceId]);
 
   const handleSave = React.useCallback(
     async ({ name, params, secrets }: ConnectionEditorModel<P>) => {
-      await createConnectionMutation.mutateAsync([
-        name,
-        {
-          datasource: dataSourceId,
-          params,
-          secrets,
-        },
-      ]);
-      client.invalidateQueries('getConnections');
-      onStateChange((old) => ({ ...old, open: false }));
+      dispatch({ kind: 'SAVE_STARTED' });
+      try {
+        if (state.connectionId) {
+          await client.mutation.updateConnection(state.connectionId, { name, params, secrets });
+        } else {
+          await client.mutation.createConnection(name, {
+            datasource: dataSourceId,
+            params,
+            secrets,
+          });
+        }
+      } catch (error: unknown) {
+        dispatch({ kind: 'SAVE_FAILED', error: errorFrom(error) });
+      } finally {
+        client.invalidateQueries('getConnections');
+        dispatch({ kind: 'DIALOG_CLOSE' });
+      }
     },
-    [createConnectionMutation, dataSourceId, onStateChange],
-  );
-
-  const dataSource = getDataSource<P>(dataSourceId);
-
-  const connectionEditorContext = React.useMemo(
-    () => ({ appId: null, dataSourceId, connectionId: null }),
-    [dataSourceId],
+    [dataSourceId, dispatch, state.connectionId],
   );
 
   const model = React.useMemo(
@@ -170,83 +219,103 @@ function CreateConnectionDialog<P>({
 
   return (
     <Dialog fullWidth open={state.open} onClose={handleClose} {...props}>
-      {state.dataSourceId ? (
-        <React.Fragment>
-          <DialogTitle>Create a new Connection</DialogTitle>
+      {(() => {
+        if (state.error) {
+          return (
+            <DialogContent>
+              <ErrorAlert error={state.error} />
+            </DialogContent>
+          );
+        }
 
-          {dataSource ? (
-            <ConnectionContextProvider value={connectionEditorContext}>
-              <ConnectionParamsEditor<P>
-                dataSource={dataSource}
-                value={model}
-                onChange={handleSave}
-                onClose={handleClose}
-              />
-            </ConnectionContextProvider>
-          ) : (
-            <DialogContent>Unknown data source type &quot;{state.dataSourceId}&quot;</DialogContent>
-          )}
-        </React.Fragment>
-      ) : (
-        <React.Fragment>
-          <DialogTitle>Create a new Connection</DialogTitle>
-          <DialogContent>
-            <TextField
-              select
-              required
-              sx={{ my: 1 }}
-              fullWidth
-              value={dataSourceId}
-              label="Type"
-              onChange={(event) => setDataSourceId(event.target.value)}
-            >
-              {(Object.entries(dataSources) as ExactEntriesOf<typeof dataSources>).map(
-                ([type, dataSourceDef]) =>
-                  dataSourceDef && (
-                    <MenuItem key={type} value={type}>
-                      {dataSourceDef.displayName}
-                    </MenuItem>
-                  ),
+        if (state.dataSourceId) {
+          const dataSource = state.dataSourceId ? getDataSource<P>(state.dataSourceId) : null;
+
+          const connectionEditorContext = { appId: null, dataSourceId, connectionId: null };
+
+          return (
+            <React.Fragment>
+              <DialogTitle>Create a new Connection</DialogTitle>
+
+              {dataSource ? (
+                <ConnectionContextProvider value={connectionEditorContext}>
+                  <ConnectionParamsEditor<P>
+                    dataSource={dataSource}
+                    value={model}
+                    onChange={handleSave}
+                    onClose={handleClose}
+                  />
+                </ConnectionContextProvider>
+              ) : (
+                <DialogContent>
+                  Unknown data source type &quot;{state.dataSourceId}&quot;
+                </DialogContent>
               )}
-            </TextField>
-          </DialogContent>
-          <DialogActions>
-            <Button color="inherit" variant="text" onClick={handleClose}>
-              Cancel
-            </Button>
-            <Button type="submit" onClick={handleDatasourceSelected}>
-              Continue
-            </Button>
-          </DialogActions>
-        </React.Fragment>
-      )}
+            </React.Fragment>
+          );
+        }
+
+        return (
+          <React.Fragment>
+            <DialogTitle>Create a new Connection</DialogTitle>
+            <DialogContent>
+              <TextField
+                select
+                required
+                sx={{ my: 1 }}
+                fullWidth
+                value={dataSourceId}
+                label="Type"
+                onChange={(event) => setDataSourceId(event.target.value)}
+              >
+                {(Object.entries(dataSources) as ExactEntriesOf<typeof dataSources>).map(
+                  ([type, dataSourceDef]) =>
+                    dataSourceDef && (
+                      <MenuItem key={type} value={type}>
+                        {dataSourceDef.displayName}
+                      </MenuItem>
+                    ),
+                )}
+              </TextField>
+            </DialogContent>
+            <DialogActions>
+              <Button color="inherit" variant="text" onClick={handleClose}>
+                Cancel
+              </Button>
+              <Button type="submit" onClick={handleDatasourceSelected}>
+                Continue
+              </Button>
+            </DialogActions>
+          </React.Fragment>
+        );
+      })()}
     </Dialog>
   );
 }
 
 export interface AppDeleteDialogProps {
-  app: ConnectionMeta | null;
+  connection: ConnectionMeta | null;
   onClose: () => void;
 }
 
-function AppDeleteDialog({ app, onClose }: AppDeleteDialogProps) {
-  const latestApp = useLatest(app);
-  const deleteAppMutation = client.useMutation('deleteApp');
+function AppDeleteDialog({ connection, onClose }: AppDeleteDialogProps) {
+  const latestApp = useLatest(connection);
+  const deleteAppMutation = client.useMutation('deleteConnection');
 
   const handleClose = React.useCallback(
     async (confirmed: boolean) => {
-      if (confirmed && app) {
-        await deleteAppMutation.mutateAsync([app.id]);
-        await client.invalidateQueries('getApps');
+      if (confirmed && connection) {
+        await deleteAppMutation.mutateAsync([connection.id]);
+        await client.invalidateQueries('getConnections');
       }
       onClose();
     },
-    [app, deleteAppMutation, onClose],
+    [connection, deleteAppMutation, onClose],
   );
 
   return (
     <ConfirmDialog
-      open={!!app}
+      open={!!connection}
       onClose={handleClose}
       severity="error"
       okButton="Delete"
@@ -318,26 +387,19 @@ function AppNameEditable({ app, editing, setEditing, loading }: AppNameEditableP
   );
 }
 
-interface AppEditButtonProps {
-  app?: ConnectionMeta;
-}
-
-function AppEditButton({ app }: AppEditButtonProps) {
-  return (
-    <Button size="small" component={Link} to={app ? `/app/${app.id}` : ''} disabled={!app}>
-      Edit
-    </Button>
-  );
-}
-
 interface ConnectionOptionsProps {
-  app?: ConnectionMeta;
+  connection?: ConnectionMeta;
   onRename: () => void;
   onDelete?: () => void;
   onDuplicate?: () => void;
 }
 
-function AppOptions({ app, onRename, onDelete, onDuplicate }: ConnectionOptionsProps) {
+function ConnectionOptions({
+  connection,
+  onRename,
+  onDelete,
+  onDuplicate,
+}: ConnectionOptionsProps) {
   const { buttonProps, menuProps, onMenuClose } = useMenu();
 
   const handleRenameClick = React.useCallback(() => {
@@ -357,7 +419,7 @@ function AppOptions({ app, onRename, onDelete, onDuplicate }: ConnectionOptionsP
 
   return (
     <React.Fragment>
-      <IconButton {...buttonProps} aria-label="Connection menu" disabled={!app}>
+      <IconButton {...buttonProps} aria-label="Connection menu" disabled={!connection}>
         <MoreVertIcon />
       </IconButton>
       <Menu {...menuProps}>
@@ -384,13 +446,14 @@ function AppOptions({ app, onRename, onDelete, onDuplicate }: ConnectionOptionsP
   );
 }
 
-interface AppCardProps {
-  app?: ConnectionMeta;
+interface ConnectionCardProps {
+  connection?: ConnectionMeta;
   onDelete?: () => void;
+  onEdit?: () => void;
   onDuplicate?: () => void;
 }
 
-function AppCard({ app, onDelete, onDuplicate }: AppCardProps) {
+function ConnectionCard({ connection, onDelete, onEdit, onDuplicate }: ConnectionCardProps) {
   const [editingName, setEditingName] = React.useState<boolean>(false);
 
   const handleRename = React.useCallback(() => {
@@ -409,8 +472,8 @@ function AppCard({ app, onDelete, onDuplicate }: AppCardProps) {
     >
       <CardHeader
         action={
-          <AppOptions
-            app={app}
+          <ConnectionOptions
+            connection={connection}
             onRename={handleRename}
             onDelete={onDelete}
             onDuplicate={onDuplicate}
@@ -419,9 +482,9 @@ function AppCard({ app, onDelete, onDuplicate }: AppCardProps) {
         disableTypography
         subheader={
           <Typography variant="body2" color="text.secondary">
-            {app ? (
-              <Tooltip title={app.editedAt.toLocaleString('short')}>
-                <span>Edited {getReadableDuration(app.editedAt)}</span>
+            {connection ? (
+              <Tooltip title={connection.editedAt.toLocaleString('short')}>
+                <span>Edited {getReadableDuration(connection.editedAt)}</span>
               </Tooltip>
             ) : (
               <Skeleton />
@@ -431,26 +494,27 @@ function AppCard({ app, onDelete, onDuplicate }: AppCardProps) {
       />
       <CardContent sx={{ flexGrow: 1 }}>
         <AppNameEditable
-          app={app}
+          app={connection}
           editing={editingName}
           setEditing={setEditingName}
-          loading={Boolean(!app)}
+          loading={Boolean(!connection)}
         />
       </CardContent>
       <CardActions>
-        <AppEditButton app={app} />
+        <Button onClick={onEdit}>Edit</Button>
       </CardActions>
     </Card>
   );
 }
 
-interface AppRowProps {
-  app?: ConnectionMeta;
+interface ConnectionRowProps {
+  connection?: ConnectionMeta;
   onDelete?: () => void;
   onDuplicate?: () => void;
+  onEdit?: () => void;
 }
 
-function AppRow({ app, onDelete, onDuplicate }: AppRowProps) {
+function ConnectionRow({ connection, onDelete, onDuplicate, onEdit }: ConnectionRowProps) {
   const [editingName, setEditingName] = React.useState<boolean>(false);
 
   const handleRename = React.useCallback(() => {
@@ -461,20 +525,20 @@ function AppRow({ app, onDelete, onDuplicate }: AppRowProps) {
     <TableRow hover role="row">
       <TableCell component="th" scope="row">
         <AppNameEditable
-          loading={Boolean(!app)}
-          app={app}
+          loading={Boolean(!connection)}
+          app={connection}
           editing={editingName}
           setEditing={setEditingName}
         />
         <Typography variant="caption">
-          {app ? `Edited ${getReadableDuration(app.editedAt)}` : <Skeleton />}
+          {connection ? `Edited ${getReadableDuration(connection.editedAt)}` : <Skeleton />}
         </Typography>
       </TableCell>
       <TableCell align="right">
         <Stack direction="row" spacing={1} justifyContent={'flex-end'}>
-          <AppEditButton app={app} />
-          <AppOptions
-            app={app}
+          <Button onClick={onEdit}>Edit</Button>
+          <ConnectionOptions
+            connection={connection}
             onRename={handleRename}
             onDelete={onDelete}
             onDuplicate={onDuplicate}
@@ -488,15 +552,17 @@ function AppRow({ app, onDelete, onDuplicate }: AppRowProps) {
 interface ConnectionsViewProps {
   connections: ConnectionMeta[];
   loading?: boolean;
-  setDeletedApp: (app: ConnectionMeta) => void;
-  duplicateApp: (app: ConnectionMeta) => void;
+  onDeleteConnection: (connection: ConnectionMeta) => void;
+  onEditConnection: (id: string) => void;
+  onDuplicateConnection: (connection: ConnectionMeta) => void;
 }
 
 function ConnectionsGridView({
   loading,
   connections,
-  setDeletedApp,
-  duplicateApp,
+  onDeleteConnection,
+  onEditConnection,
+  onDuplicateConnection,
 }: ConnectionsViewProps) {
   return (
     <Box
@@ -513,18 +579,19 @@ function ConnectionsGridView({
     >
       {(() => {
         if (loading) {
-          return <AppCard />;
+          return <ConnectionCard />;
         }
         if (connections.length <= 0) {
           return 'No connections yet';
         }
-        return connections.map((app) => {
+        return connections.map((connection) => {
           return (
-            <AppCard
-              key={app.id}
-              app={app}
-              onDelete={() => setDeletedApp(app)}
-              onDuplicate={() => duplicateApp(app)}
+            <ConnectionCard
+              key={connection.id}
+              connection={connection}
+              onDelete={() => onDeleteConnection(connection)}
+              onDuplicate={() => onDuplicateConnection(connection)}
+              onEdit={() => onEditConnection(connection)}
             />
           );
         });
@@ -536,15 +603,16 @@ function ConnectionsGridView({
 function ConnectionsListView({
   loading,
   connections,
-  setDeletedApp,
-  duplicateApp,
+  onDeleteConnection,
+  onEditConnection,
+  onDuplicateConnection,
 }: ConnectionsViewProps) {
   return (
     <Table aria-label="apps list" size="medium">
       <TableBody>
         {(() => {
           if (loading) {
-            return <AppRow />;
+            return <ConnectionRow />;
           }
           if (connections.length <= 0) {
             return (
@@ -553,13 +621,14 @@ function ConnectionsListView({
               </TableRow>
             );
           }
-          return connections.map((app) => {
+          return connections.map((connection) => {
             return (
-              <AppRow
-                key={app.id}
-                app={app}
-                onDelete={() => setDeletedApp(app)}
-                onDuplicate={() => duplicateApp(app)}
+              <ConnectionRow
+                key={connection.id}
+                connection={connection}
+                onDelete={() => onDeleteConnection(connection)}
+                onDuplicate={() => onDuplicateConnection(connection)}
+                onEdit={() => onEditConnection(connection.id)}
               />
             );
           });
@@ -573,7 +642,7 @@ export default function Connections() {
   const {
     data: connections = [],
     isLoading,
-    error,
+    error: queryError,
   } = client.useQuery('getConnections', [], {
     enabled: !config.isDemo,
   });
@@ -601,15 +670,36 @@ export default function Connections() {
     [duplicateAppMutation],
   );
 
-  // TODO: reducer
-  const [createDialogState, setCreateDialogState] = React.useState<DialogState<any>>({
+  const [dialogState, dispatch] = React.useReducer(dialogStateREducer, {
     open: false,
+    loading: false,
+    connectionId: null,
     dataSourceId: null,
     params: null,
+    secrets: {},
+    error: null,
   });
 
   const handleOpenDialog = React.useCallback(() => {
-    setCreateDialogState((old) => ({ ...old, dataSourceId: null, open: true }));
+    dispatch({ kind: 'DIALOG_OPEN' });
+  }, []);
+
+  const handleEditConnection = React.useCallback(async (connectionId: string) => {
+    dispatch({ kind: 'DIALOG_OPEN', connectionId });
+    try {
+      const connection = await client.query.getConnection(connectionId);
+      if (!connection) {
+        throw new Error(`Connection "${connectionId}" doesn't exist`);
+      }
+      dispatch({
+        kind: 'CONNECTION_LOAD_SUCCESS',
+        dataSourceId: connection.datasource,
+        params: connection.params,
+        secrets: connection.secrets,
+      });
+    } catch (error: unknown) {
+      dispatch({ kind: 'CONNECTION_LOAD_FAILED', error: errorFrom(error) });
+    }
   }, []);
 
   return (
@@ -643,22 +733,23 @@ export default function Connections() {
             </ToggleButton>
           </ToggleButtonGroup>
         </Toolbar>
-        {error ? (
-          <ErrorAlert error={error} />
+        {queryError ? (
+          <ErrorAlert error={queryError} />
         ) : (
           <Box sx={{ flex: 1, overflow: 'auto', px: 5 }}>
             <ConnectionsView
               connections={connections}
               loading={isLoading}
-              setDeletedApp={setDeletedApp}
-              duplicateApp={duplicateApp}
+              onDeleteConnection={setDeletedApp}
+              onDuplicateConnection={duplicateApp}
+              onEditConnection={handleEditConnection}
             />
           </Box>
         )}
-        <AppDeleteDialog app={deletedApp} onClose={() => setDeletedApp(null)} />
+        <AppDeleteDialog connection={deletedApp} onClose={() => setDeletedApp(null)} />
       </Box>
 
-      <CreateConnectionDialog state={createDialogState} onStateChange={setCreateDialogState} />
+      <CreateConnectionDialog state={dialogState} dispatch={dispatch} />
     </ToolpadHomeShell>
   );
 }

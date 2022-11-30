@@ -260,18 +260,8 @@ function ConnectionParamsInput2({
   return (
     <React.Fragment>
       <DialogContent>
-        <Stack direction="column" gap={3} sx={{ py: 3 }}>
-          {config.isDemo ? (
-            <TextField select {...baseUrlInputProps} defaultValue="">
-              {DEMO_BASE_URLS.map(({ url, name }) => (
-                <MenuItem key={url} value={url}>
-                  {url} ({name})
-                </MenuItem>
-              ))}
-            </TextField>
-          ) : (
-            <TextField {...baseUrlInputProps} />
-          )}
+        <Stack direction="column" sx={{ py: 3 }}>
+          <TextField {...baseUrlInputProps} />
           <Typography>Headers:</Typography>
           <Controller
             name="headers"

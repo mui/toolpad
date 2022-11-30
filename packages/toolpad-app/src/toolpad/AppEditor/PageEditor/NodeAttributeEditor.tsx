@@ -20,7 +20,7 @@ export default function NodeAttributeEditor({
   name,
   argType,
 }: NodeAttributeEditorProps) {
-  const dom = useDom();
+  const { dom } = useDom();
   const domApi = useDomApi();
 
   const handlePropChange = React.useCallback(

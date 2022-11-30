@@ -49,7 +49,7 @@ function ConnectionEditorContent<P>({
   className,
   connectionNode,
 }: ConnectionEditorContentProps<P>) {
-  const dom = useDom();
+  const { dom } = useDom();
   const domApi = useDomApi();
 
   const handleConnectionChange = React.useCallback(

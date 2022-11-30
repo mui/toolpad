@@ -422,7 +422,7 @@ function AppCard({ app, activeDeployment, existingAppNames }: AppCardProps) {
       }}
     >
       <CardHeader
-        action={<AppOptions app={app} onRename={handleRename} />}
+        action={app ? <AppOptions app={app} onRename={handleRename} /> : null}
         disableTypography
         subheader={
           <Typography variant="body2" color="text.secondary">
@@ -482,9 +482,13 @@ function AppRow({ app, activeDeployment, existingAppNames }: AppRowProps) {
       </TableCell>
       <TableCell align="right">
         <Stack direction="row" spacing={1} justifyContent={'flex-end'}>
-          <AppEditButton app={app} />
-          <AppOpenButton app={app} activeDeployment={activeDeployment} />
-          <AppOptions app={app} onRename={handleRename} />
+          {app ? (
+            <React.Fragment>
+              <AppEditButton app={app} />
+              <AppOpenButton app={app} activeDeployment={activeDeployment} />
+              <AppOptions app={app} onRename={handleRename} />
+            </React.Fragment>
+          ) : null}
         </Stack>
       </TableCell>
     </TableRow>

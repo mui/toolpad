@@ -18,15 +18,20 @@ import DialogForm from '../../components/DialogForm';
 import type { AppMeta } from '../../server/data';
 import { errorFrom } from '../../utils/errors';
 import useLatest from '../../utils/useLatest';
+import useRisingEdge from '../../utils/useRisingEdge';
 
 interface AppDuplicateDialogProps {
   open: boolean;
-  app?: AppMeta | null;
+  app: AppMeta;
   onClose: () => void;
 }
 
-function AppDuplicateDialog({ app, onClose, ...props }: AppDuplicateDialogProps) {
-  const [nameInput, setNameInput] = React.useState(app?.name ?? '');
+function AppDuplicateDialog({ app, onClose, open, ...props }: AppDuplicateDialogProps) {
+  const [nameInput, setNameInput] = React.useState(app.name);
+  useRisingEdge(open, () => {
+    setNameInput(app.name);
+  });
+
   const [duplicatedApp, setDuplicatedApp] = React.useState<{
     name: string;
     url: string;
@@ -43,10 +48,8 @@ function AppDuplicateDialog({ app, onClose, ...props }: AppDuplicateDialogProps)
   const duplicateAppMutation = client.useMutation('duplicateApp');
 
   const duplicateApp = React.useCallback(async () => {
-    if (app) {
-      const duplicated = await duplicateAppMutation.mutateAsync([app.id, nameInput]);
-      setDuplicatedApp({ name: duplicated.name, url: `/app/${duplicated.id}` });
-    }
+    const duplicated = await duplicateAppMutation.mutateAsync([app.id, nameInput]);
+    setDuplicatedApp({ name: duplicated.name, url: `/app/${duplicated.id}` });
     await client.invalidateQueries('getApps');
   }, [app, nameInput, duplicateAppMutation]);
 
@@ -65,7 +68,7 @@ function AppDuplicateDialog({ app, onClose, ...props }: AppDuplicateDialogProps)
 
   return (
     <React.Fragment>
-      <Dialog {...props} onClose={onClose} maxWidth="xs">
+      <Dialog open={open} onClose={onClose} maxWidth="xs" {...props}>
         <DialogForm
           onSubmit={(event) => {
             invariant(isFormValid, 'Form should not be submitted when invalid');

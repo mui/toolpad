@@ -16,7 +16,7 @@ import AppDeleteDialog from './AppDeleteDialog';
 import AppDuplicateDialog from './AppDuplicateDialog';
 
 interface AppOptionsProps {
-  app?: AppMeta;
+  app: AppMeta;
   onRename: () => void;
   dom?: any;
   redirectOnDelete?: boolean;
@@ -29,15 +29,11 @@ function AppOptions({ app, onRename, dom, redirectOnDelete }: AppOptionsProps) {
   const [duplicateApp, setDuplicateApp] = React.useState<AppMeta | null>(null);
 
   const onDuplicate = React.useCallback(() => {
-    if (app) {
-      setDuplicateApp(app);
-    }
+    setDuplicateApp(app);
   }, [app]);
 
   const onDelete = React.useCallback(() => {
-    if (app) {
-      setDeletedApp(app);
-    }
+    setDeletedApp(app);
   }, [app]);
 
   const handleRenameClick = React.useCallback(() => {
@@ -130,7 +126,7 @@ function AppOptions({ app, onRename, dom, redirectOnDelete }: AppOptionsProps) {
       />
       <AppDuplicateDialog
         open={Boolean(duplicateApp)}
-        app={duplicateApp}
+        app={app}
         onClose={() => setDuplicateApp(null)}
       />
     </React.Fragment>

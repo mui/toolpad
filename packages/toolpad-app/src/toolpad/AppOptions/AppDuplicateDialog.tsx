@@ -82,6 +82,7 @@ function AppDuplicateDialog({ app, onClose, open, ...props }: AppDuplicateDialog
             <TextField
               sx={{ my: 1 }}
               autoFocus
+              onFocus={(event) => event.target.select()}
               required
               fullWidth
               label="Name"

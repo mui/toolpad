@@ -1,0 +1,77 @@
+{
+  "root": "a7cz4jo",
+  "nodes": {
+    "3s030s3": {
+      "id": "3s030s3",
+      "name": "page",
+      "type": "page",
+      "parentId": "a7cz4jo",
+      "attributes": {
+        "title": {
+          "type": "const",
+          "value": "page"
+        }
+      },
+      "parentProp": "pages",
+      "parentIndex": "a0"
+    },
+    "5qd3zm4": {
+      "id": "5qd3zm4",
+      "name": "pageRow2",
+      "type": "element",
+      "props": {},
+      "layout": {},
+      "parentId": "3s030s3",
+      "attributes": {
+        "component": {
+          "type": "const",
+          "value": "PageRow"
+        }
+      },
+      "parentProp": "children",
+      "parentIndex": "a2"
+    },
+    "a7cz4jo": {
+      "id": "a7cz4jo",
+      "name": "Application",
+      "type": "app",
+      "parentId": null,
+      "attributes": {},
+      "parentProp": null,
+      "parentIndex": null
+    },
+    "xuc3zdd": {
+      "id": "xuc3zdd",
+      "name": "textField",
+      "type": "element",
+      "props": {},
+      "layout": {},
+      "parentId": "5qd3zm4",
+      "attributes": {
+        "component": {
+          "type": "const",
+          "value": "TextField"
+        }
+      },
+      "parentProp": "children",
+      "parentIndex": "a0"
+    },
+    "ni13zvp": {
+      "id": "ni13zvp",
+      "name": "textField1",
+      "type": "element",
+      "props": {},
+      "layout": {},
+      "parentId": "5qd3zm4",
+      "attributes": {
+        "component": {
+          "type": "const",
+          "value": "TextField"
+        }
+      },
+      "parentProp": "children",
+      "parentIndex": "a1"
+    }
+  },
+  "version": 2
+}

@@ -32,12 +32,12 @@ test('test basic undo and redo', async ({ page, browserName }) => {
   await page.waitForTimeout(600);
 
   // Undo adding text field
-  await page.keyboard.press('Meta+Z');
+  await page.keyboard.press('Control+Z');
 
   // Check that we have only 2 text fields
   await expect(canvasInputLocator).toHaveCount(2);
 
-  await page.keyboard.press('Meta+Shift+Z');
+  await page.keyboard.press('Control+Shift+Z');
 
   // Redo should bring back text field
   await expect(canvasInputLocator).toHaveCount(3);
@@ -70,7 +70,7 @@ test('test batching quick actions into single undo entry', async ({ page, browse
   await page.waitForTimeout(600);
 
   // Undo changes
-  await page.keyboard.press('Meta+Z');
+  await page.keyboard.press('Control+Z');
 
   // Asssert that batched changes were reverted
   await expect(input).toHaveValue('');

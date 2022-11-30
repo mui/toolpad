@@ -61,9 +61,9 @@ export const APP_TEMPLATE_OPTIONS: Map<
   }
 > = new Map([
   [
-    'demo',
+    'default',
     {
-      label: 'Demo',
+      label: 'Default',
       description: 'HR management tool',
     },
   ],
@@ -99,7 +99,7 @@ export interface CreateAppDialogProps {
 
 function CreateAppDialog({ onClose, open, ...props }: CreateAppDialogProps) {
   const [name, setName] = React.useState('');
-  const [appTemplateId, setAppTemplateId] = React.useState<AppTemplateId>('demo');
+  const [appTemplateId, setAppTemplateId] = React.useState<AppTemplateId>('default');
   const [dom, setDom] = React.useState('');
 
   const captchaTargetRef = React.useRef<HTMLDivElement | null>(null);

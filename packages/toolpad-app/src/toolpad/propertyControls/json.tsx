@@ -45,7 +45,7 @@ function JsonPropEditor({ label, propType, value, onChange, disabled }: EditorPr
   const schemaUri =
     propType.type === 'object' || propType.type === 'array' ? propType.schema : undefined;
 
-  useShortcut({ code: 'KeyS', metaKey: true, disabled: !dialogOpen }, handleSave);
+  useShortcut({ key: 's', metaKey: true, disabled: !dialogOpen }, handleSave);
 
   return (
     <React.Fragment>

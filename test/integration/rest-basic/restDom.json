@@ -90,12 +90,15 @@
       "id": "fw03uxo",
       "name": "query1",
       "type": "query",
-      "params": {
-        "param1": {
-          "type": "jsExpression",
-          "value": "\"query1_value\"\n"
-        }
-      },
+      "params": [
+        [
+          "param1",
+          {
+            "type": "jsExpression",
+            "value": "\"query1_value\"\n"
+          }
+        ]
+      ],
       "parentId": "cn1tds0",
       "attributes": {
         "query": {
@@ -199,12 +202,15 @@
       "id": "rwd3ud0",
       "name": "query2",
       "type": "query",
-      "params": {
-        "value": {
-          "type": "const",
-          "value": "incorrect"
-        }
-      },
+      "params": [
+        [
+          "value",
+          {
+            "type": "const",
+            "value": "incorrect"
+          }
+        ]
+      ],
       "parentId": "cn1tds0",
       "attributes": {
         "mode": {
@@ -262,7 +268,94 @@
       },
       "parentProp": "children",
       "parentIndex": "a2"
+    },
+    "2b03zy3": {
+      "id": "2b03zy3",
+      "name": "browserQuery",
+      "type": "query",
+      "params": [
+        [
+          "param1",
+          {
+            "type": "jsExpression",
+            "value": "\"browserQuery_value\"\n"
+          }
+        ]
+      ],
+      "parentId": "cn1tds0",
+      "attributes": {
+        "query": {
+          "type": "const",
+          "value": {
+            "url": {
+              "type": "const",
+              "value": "https://httpbin.org/get"
+            },
+            "method": "GET",
+            "headers": [],
+            "searchParams": [
+              [
+                "browserQuery_param1",
+                {
+                  "type": "jsExpression",
+                  "value": "parameters.param1\n"
+                }
+              ]
+            ],
+            "browser": true
+          }
+        },
+        "dataSource": {
+          "type": "const",
+          "value": "rest"
+        },
+        "connectionId": {
+          "type": "const",
+          "value": {
+            "$$ref": "oo13u6e"
+          }
+        }
+      },
+      "parentProp": "queries",
+      "parentIndex": "a2"
+    },
+    "e623znr": {
+      "id": "e623znr",
+      "name": "typography2",
+      "type": "element",
+      "props": {
+        "value": {
+          "type": "jsExpression",
+          "value": "`browserQuery: ${browserQuery.data.args.browserQuery_param1}`\n"
+        }
+      },
+      "layout": {},
+      "parentId": "qy33z22",
+      "attributes": {
+        "component": {
+          "type": "const",
+          "value": "Typography"
+        }
+      },
+      "parentProp": "children",
+      "parentIndex": "a0"
+    },
+    "qy33z22": {
+      "name": "pageRow3",
+      "props": {},
+      "attributes": {
+        "component": {
+          "type": "const",
+          "value": "PageRow"
+        }
+      },
+      "layout": {},
+      "id": "qy33z22",
+      "type": "element",
+      "parentId": "cn1tds0",
+      "parentProp": "children",
+      "parentIndex": "a3"
     }
   },
-  "version": 2
+  "version": 3
 }

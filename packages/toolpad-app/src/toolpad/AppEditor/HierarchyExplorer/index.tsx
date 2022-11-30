@@ -17,6 +17,7 @@ import CreateCodeComponentNodeDialog from './CreateCodeComponentNodeDialog';
 import CreateConnectionNodeDialog from './CreateConnectionNodeDialog';
 import useLocalStorageState from '../../../utils/useLocalStorageState';
 import NodeMenu from '../NodeMenu';
+import config from '../../../config';
 
 const HierarchyExplorerRoot = styled('div')({
   overflow: 'auto',
@@ -33,7 +34,7 @@ const StyledTreeItem = styled(TreeItem)({
     visibility: 'hidden',
   },
   [`
-    & .${treeItemClasses.content}:hover .${classes.treeItemMenuButton}, 
+    & .${treeItemClasses.content}:hover .${classes.treeItemMenuButton},
     & .${classes.treeItemMenuOpen}
   `]: {
     visibility: 'visible',
@@ -75,9 +76,9 @@ function HierarchyTreeItem(props: StyledTreeItemProps) {
     onCreate,
     onDeleteNode,
     onDuplicateNode,
-    createLabelText = `Create ${labelText}`,
-    deleteLabelText = `Delete ${labelText}`,
-    duplicateLabelText = `Duplicate ${labelText}`,
+    createLabelText,
+    deleteLabelText = 'Delete',
+    duplicateLabelText = 'Duplicate',
     toolpadNodeId,
     ...other
   } = props;
@@ -87,7 +88,7 @@ function HierarchyTreeItem(props: StyledTreeItemProps) {
       label={
         <Box sx={{ display: 'flex', alignItems: 'center', p: 0.5, pr: 0 }}>
           {labelIcon}
-          <Typography variant="body2" sx={{ fontWeight: 'inherit', flexGrow: 1 }}>
+          <Typography variant="body2" sx={{ fontWeight: 'inherit', flexGrow: 1 }} noWrap>
             {labelText}
           </Typography>
           {onCreate ? (
@@ -265,6 +266,8 @@ export default function HierarchyExplorer({ appId, className }: HierarchyExplore
     [appId, dom, domApi, navigate],
   );
 
+  const hasConnectionsView = !config.isDemo;
+
   return (
     <HierarchyExplorerRoot data-testid="hierarchy-explorer" className={className}>
       <TreeView
@@ -277,32 +280,32 @@ export default function HierarchyExplorer({ appId, className }: HierarchyExplore
         defaultCollapseIcon={<ArrowDropDownIcon />}
         defaultExpandIcon={<ArrowRightIcon />}
       >
-        <HierarchyTreeItem
-          nodeId=":connections"
-          aria-level={1}
-          labelText="Connections"
-          createLabelText="Create connection"
-          deleteLabelText="Delete connection"
-          onCreate={handleCreateConnectionDialogOpen}
-        >
-          {connections.map((connectionNode) => (
-            <HierarchyTreeItem
-              key={connectionNode.id}
-              nodeId={connectionNode.id}
-              toolpadNodeId={connectionNode.id}
-              aria-level={2}
-              labelText={connectionNode.name}
-              onDuplicateNode={handleDuplicateNode}
-              onDeleteNode={handleDeleteNode}
-            />
-          ))}
-        </HierarchyTreeItem>
+        {hasConnectionsView ? (
+          <HierarchyTreeItem
+            nodeId=":connections"
+            aria-level={1}
+            labelText="Connections"
+            createLabelText="Create connection"
+            onCreate={handleCreateConnectionDialogOpen}
+          >
+            {connections.map((connectionNode) => (
+              <HierarchyTreeItem
+                key={connectionNode.id}
+                nodeId={connectionNode.id}
+                toolpadNodeId={connectionNode.id}
+                aria-level={2}
+                labelText={connectionNode.name}
+                onDuplicateNode={handleDuplicateNode}
+                onDeleteNode={handleDeleteNode}
+              />
+            ))}
+          </HierarchyTreeItem>
+        ) : null}
         <HierarchyTreeItem
           nodeId=":codeComponents"
           aria-level={1}
           labelText="Components"
           createLabelText="Create component"
-          deleteLabelText="Delete component"
           onCreate={handleCreateCodeComponentDialogOpen}
         >
           {codeComponents.map((codeComponent) => (
@@ -322,7 +325,6 @@ export default function HierarchyExplorer({ appId, className }: HierarchyExplore
           aria-level={1}
           labelText="Pages"
           createLabelText="Create page"
-          deleteLabelText="Delete page"
           onCreate={handleCreatePageDialogOpen}
         >
           {pages.map((page) => (

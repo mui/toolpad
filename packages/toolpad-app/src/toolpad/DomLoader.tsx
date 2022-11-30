@@ -13,7 +13,7 @@ import insecureHash from '../utils/insecureHash';
 import useEvent from '../utils/useEvent';
 import { NodeHashes } from '../types';
 
-export type DomAction =
+export type DomAction = { skipHistory?: boolean } & (
   | {
       type: 'DOM_UPDATE_HISTORY';
     }
@@ -48,11 +48,20 @@ export type DomAction =
   | {
       type: 'DOM_UPDATE';
       updatedDom: appDom.AppDom;
+      selectedNodeId?: NodeId | null;
     }
   | {
       type: 'DOM_SAVE_NODE';
       node: appDom.AppDomNode;
-    };
+    }
+  | {
+      type: 'SELECT_NODE';
+      nodeId: NodeId;
+    }
+  | {
+      type: 'DESELECT_NODE';
+    }
+);
 
 export function domReducer(dom: appDom.AppDom, action: DomAction): appDom.AppDom {
   switch (action.type) {
@@ -90,7 +99,10 @@ export function domLoaderReducer(state: DomLoader, action: DomAction): DomLoader
 
   switch (action.type) {
     case 'DOM_UPDATE_HISTORY': {
-      const updatedUndoStack = [...state.undoStack, state.dom];
+      const updatedUndoStack = [
+        ...state.undoStack,
+        { dom: state.dom, selectedNodeId: state.selectedNodeId },
+      ];
 
       if (updatedUndoStack.length > UNDO_HISTORY_LIMIT) {
         updatedUndoStack.shift();
@@ -111,16 +123,17 @@ export function domLoaderReducer(state: DomLoader, action: DomAction): DomLoader
 
       const currentState = undoStack.pop();
 
-      const previousDom = undoStack[undoStack.length - 1];
+      const previousStackEntry = undoStack[undoStack.length - 1];
 
-      if (!previousDom || !currentState) {
+      if (!previousStackEntry || !currentState) {
         return state;
       }
 
       redoStack.push(currentState);
 
       return update(state, {
-        dom: previousDom,
+        dom: previousStackEntry.dom,
+        selectedNodeId: previousStackEntry.selectedNodeId,
         undoStack,
         redoStack,
       });
@@ -129,16 +142,17 @@ export function domLoaderReducer(state: DomLoader, action: DomAction): DomLoader
       const undoStack = [...state.undoStack];
       const redoStack = [...state.redoStack];
 
-      const nextDom = redoStack.pop();
+      const nextStackEntry = redoStack.pop();
 
-      if (!nextDom) {
+      if (!nextStackEntry) {
         return state;
       }
 
-      undoStack.push(nextDom);
+      undoStack.push(nextStackEntry);
 
       return update(state, {
-        dom: nextDom,
+        dom: nextStackEntry.dom,
+        selectedNodeId: nextStackEntry.selectedNodeId,
         undoStack,
         redoStack,
       });
@@ -163,6 +177,23 @@ export function domLoaderReducer(state: DomLoader, action: DomAction): DomLoader
         saveError: action.error,
       });
     }
+    case 'SELECT_NODE': {
+      return update(state, {
+        selectedNodeId: action.nodeId,
+      });
+    }
+    case 'DESELECT_NODE': {
+      return update(state, {
+        selectedNodeId: null,
+      });
+    }
+    case 'DOM_UPDATE': {
+      return action.selectedNodeId !== undefined
+        ? update(state, {
+            selectedNodeId: action.selectedNodeId,
+          })
+        : state;
+    }
     default:
       return state;
   }
@@ -184,10 +215,11 @@ function createDomApi(
     setNodeName(nodeId: NodeId, name: string) {
       dispatch({ type: 'DOM_SET_NODE_NAME', nodeId, name });
     },
-    update(dom: appDom.AppDom) {
+    update(dom: appDom.AppDom, selectedNodeId?: NodeId | null) {
       dispatch({
         type: 'DOM_UPDATE',
         updatedDom: dom,
+        selectedNodeId,
       });
     },
     saveNode(node: appDom.AppDomNode) {
@@ -208,6 +240,19 @@ function createDomApi(
         value: value as BindableAttrValues | null,
       });
     },
+    selectNode(nodeId: NodeId, skipHistory?: boolean) {
+      dispatch({
+        type: 'SELECT_NODE',
+        nodeId,
+        skipHistory,
+      });
+    },
+    deselectNode(skipHistory?: boolean) {
+      dispatch({
+        type: 'DESELECT_NODE',
+        skipHistory,
+      });
+    },
   };
 }
 
@@ -217,8 +262,9 @@ export interface DomLoader {
   saving: boolean;
   unsavedChanges: number;
   saveError: string | null;
-  undoStack: appDom.AppDom[];
-  redoStack: appDom.AppDom[];
+  selectedNodeId: NodeId | null;
+  undoStack: DomState[];
+  redoStack: DomState[];
 }
 
 export function getNodeHashes(dom: appDom.AppDom): NodeHashes {
@@ -233,12 +279,17 @@ export type DomApi = ReturnType<typeof createDomApi>;
 
 export { useDomLoader };
 
-export function useDom(): appDom.AppDom {
-  const { dom } = useDomLoader();
+export interface DomState {
+  dom: appDom.AppDom;
+  selectedNodeId: NodeId | null;
+}
+
+export function useDom(): DomState {
+  const { dom, selectedNodeId } = useDomLoader();
   if (!dom) {
     throw new Error("Trying to access the DOM before it's loaded");
   }
-  return dom;
+  return { dom, selectedNodeId };
 }
 
 export function useDomApi(): DomApi {
@@ -282,7 +333,8 @@ export default function DomProvider({ appId, children }: DomContextProps) {
     saveError: null,
     savedDom: dom,
     dom,
-    undoStack: [dom],
+    selectedNodeId: null,
+    undoStack: [{ dom, selectedNodeId: null }],
     redoStack: [],
   });
 
@@ -301,8 +353,8 @@ export default function DomProvider({ appId, children }: DomContextProps) {
   const dispatchWithHistory = useEvent((action: DomAction) => {
     dispatch(action);
 
-    if (!SKIP_UNDO_ACTIONS.has(action.type)) {
-      scheduleHistoryUpdate();
+    if (!SKIP_UNDO_ACTIONS.has(action.type) && !action.skipHistory) {
+      dispatch({ type: 'DOM_UPDATE_HISTORY' });
     }
   });
 

@@ -3,14 +3,25 @@ import * as appDom from '../../appDom';
 import { migrateUp } from '../../appDom/migrations';
 import { AppTemplateId } from '../../types';
 import { readJsonFile } from '../../utils/fs';
+import config from '../config';
 import projectRoot from '../projectRoot';
 
 const DOMS_DIR_PATH = './src/server/appTemplateDoms';
 
 const APP_TEMPLATE_DOM_PATHS: Record<AppTemplateId, string | null> = {
   blank: null,
-  stats: path.resolve(projectRoot, DOMS_DIR_PATH, './statistics.json'),
-  images: path.resolve(projectRoot, DOMS_DIR_PATH, './images.json'),
+  stats: path.resolve(
+    projectRoot,
+    DOMS_DIR_PATH,
+    // @TODO: Remove demo template once demo supports server-side queries
+    config.isDemo ? './statistics-demo.json' : './statistics.json',
+  ),
+  images: path.resolve(
+    projectRoot,
+    DOMS_DIR_PATH,
+    // @TODO: Remove demo template once demo supports server-side queries
+    config.isDemo ? './images-demo.json' : './images.json',
+  ),
 };
 
 export async function getAppTemplateDom(

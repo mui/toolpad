@@ -1,9 +1,9 @@
 import * as path from 'path';
 import { ToolpadEditor } from '../../models/ToolpadEditor';
-import { ToolpadHome } from '../../models/ToolpadHome';
 import { ToolpadRuntime } from '../../models/ToolpadRuntime';
 import { FrameLocator, Page, test } from '../../playwright/test';
 import { readJsonFile } from '../../utils/fs';
+import generateId from '../../utils/generateId';
 
 async function waitForComponents(page: Page | FrameLocator) {
   await page.locator('text="foo button"').waitFor({ state: 'visible' });
@@ -15,12 +15,12 @@ async function waitForComponents(page: Page | FrameLocator) {
   await page.locator('label:has-text("foo select")').waitFor({ state: 'visible' });
 }
 
-test('components', async ({ page, browserName }) => {
+test('components', async ({ page, browserName, api }) => {
   const dom = await readJsonFile(path.resolve(__dirname, './componentsDom.json'));
 
-  const homeModel = new ToolpadHome(page);
-  await homeModel.goto();
-  const app = await homeModel.createApplication({ dom });
+  const app = await api.mutation.createApp(`App ${generateId()}`, {
+    from: { kind: 'dom', dom },
+  });
 
   const runtimeModel = new ToolpadRuntime(page);
   await runtimeModel.gotoPage(app.id, 'components');

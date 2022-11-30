@@ -5,6 +5,7 @@ import { ServerDataSource } from '../../types';
 import { FetchPrivateQuery, FetchQuery, RestConnectionParams } from './types';
 import serverEvalExpression from '../../server/evalExpression';
 import { Maybe } from '../../utils/types';
+import config from '../../server/config';
 import { execfetch } from './shared';
 
 async function execBase(
@@ -12,6 +13,10 @@ async function execBase(
   fetchQuery: FetchQuery,
   params: Record<string, string>,
 ) {
+  if (config.isDemo) {
+    throw new Error('Cannot use these features in demo version.');
+  }
+
   const har = createHarLog();
   const instrumentedFetch = withHarInstrumentation(fetch, { har });
 

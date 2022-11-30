@@ -19,7 +19,7 @@ export interface UrlQueryEditorProps {
 }
 
 export default function UrlQueryEditor({ pageNodeId }: UrlQueryEditorProps) {
-  const dom = useDom();
+  const { dom } = useDom();
   const domApi = useDomApi();
 
   const page = appDom.getNode(dom, pageNodeId, 'page');

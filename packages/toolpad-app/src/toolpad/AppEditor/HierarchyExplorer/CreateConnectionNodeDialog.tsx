@@ -12,11 +12,13 @@ import { useNavigate } from 'react-router-dom';
 import invariant from 'invariant';
 import * as appDom from '../../../appDom';
 import { useDom, useDomApi } from '../../DomLoader';
-import dataSources from '../../../toolpadDataSources/client';
+import { allClientDataSources } from '../../../toolpadDataSources/client';
 import { ExactEntriesOf } from '../../../utils/types';
 import DialogForm from '../../../components/DialogForm';
 import { useNodeNameValidation } from './validation';
 import useEvent from '../../../utils/useEvent';
+import config from '../../../config';
+import { DEMO_DATASOURCES } from '../../../constants';
 
 const DEFAULT_NAME = 'connection';
 
@@ -32,7 +34,7 @@ export default function CreateConnectionDialog({
   onClose,
   ...props
 }: CreateConnectionDialogProps) {
-  const dom = useDom();
+  const { dom } = useDom();
   const domApi = useDomApi();
 
   const existingNames = React.useMemo(
@@ -66,7 +68,7 @@ export default function CreateConnectionDialog({
           invariant(isFormValid, 'Invalid form should not be submitted when submit is disabled');
 
           event.preventDefault();
-          const dataSource = dataSources[dataSourceType];
+          const dataSource = allClientDataSources[dataSourceType];
           if (!dataSource) {
             throw new Error(`Can't find a datasource for "${dataSourceType}"`);
           }
@@ -109,14 +111,26 @@ export default function CreateConnectionDialog({
             label="Type"
             onChange={(event) => setDataSourceType(event.target.value)}
           >
-            {(Object.entries(dataSources) as ExactEntriesOf<typeof dataSources>).map(
-              ([type, dataSourceDef]) =>
-                dataSourceDef && (
-                  <MenuItem key={type} value={type}>
+            {(
+              Object.entries(allClientDataSources) as ExactEntriesOf<typeof allClientDataSources>
+            ).map(([type, dataSourceDef]) => {
+              const isDisabledInDemo = config.isDemo && !DEMO_DATASOURCES.has(type);
+              const isSelectable = dataSourceDef && !!dataSourceDef.ConnectionParamsInput;
+
+              return (
+                isSelectable && (
+                  <MenuItem
+                    key={type}
+                    value={type}
+                    disabled={isDisabledInDemo}
+                    sx={{ justifyContent: 'space-between' }}
+                  >
                     {dataSourceDef.displayName}
+                    <span>{isDisabledInDemo ? '(Self-host only)' : null}</span>
                   </MenuItem>
-                ),
-            )}
+                )
+              );
+            })}
           </TextField>
         </DialogContent>
         <DialogActions>

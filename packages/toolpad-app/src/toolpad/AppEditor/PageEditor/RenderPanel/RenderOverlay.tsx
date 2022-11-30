@@ -272,11 +272,10 @@ interface RenderOverlayProps {
 }
 
 export default function RenderOverlay({ canvasHostRef }: RenderOverlayProps) {
-  const dom = useDom();
+  const { dom, selectedNodeId } = useDom();
   const domApi = useDomApi();
   const api = usePageEditorApi();
   const {
-    selection,
     viewState,
     nodeId: pageNodeId,
     newNode,
@@ -296,7 +295,7 @@ export default function RenderOverlay({ canvasHostRef }: RenderOverlayProps) {
     return [pageNode, ...appDom.getDescendants(dom, pageNode)];
   }, [dom, pageNode]);
 
-  const selectedNode = selection && appDom.getMaybeNode(dom, selection);
+  const selectedNode = selectedNodeId && appDom.getMaybeNode(dom, selectedNodeId);
 
   const overlayRef = React.useRef<HTMLDivElement | null>(null);
 
@@ -365,12 +364,31 @@ export default function RenderOverlay({ canvasHostRef }: RenderOverlayProps) {
   );
 
   const updateDom = React.useCallback(
-    (draftDom: appDom.AppDom) => {
+    (draftDom: appDom.AppDom, newSelectedNodeId?: NodeId | null) => {
       draftDom = normalizePageRowColumnSizes(draftDom);
-      domApi.update(draftDom);
+      domApi.update(draftDom, newSelectedNodeId);
     },
     [domApi, normalizePageRowColumnSizes],
   );
+
+  const selectNode = React.useCallback(
+    (nodeId: NodeId) => {
+      if (selectedNodeId !== nodeId) {
+        domApi.selectNode(nodeId);
+      }
+    },
+    [domApi, selectedNodeId],
+  );
+
+  const deselectNode = React.useCallback(() => {
+    if (selectedNodeId) {
+      domApi.deselectNode();
+    }
+  }, [domApi, selectedNodeId]);
+
+  const setSelectedComponentPanelTab = React.useCallback(() => {
+    api.setComponentPanelTab('component');
+  }, [api]);
 
   const handleNodeMouseUp = React.useCallback(
     (event: React.MouseEvent<HTMLDivElement>) => {
@@ -384,12 +402,21 @@ export default function RenderOverlay({ canvasHostRef }: RenderOverlayProps) {
       const newSelectedNode =
         newSelectedNodeId && appDom.getMaybeNode(dom, newSelectedNodeId as NodeId);
       if (newSelectedNode && appDom.isElement(newSelectedNode)) {
-        api.select(newSelectedNodeId as NodeId);
+        selectNode(newSelectedNodeId as NodeId);
       } else {
-        api.select(null);
+        deselectNode();
       }
+      setSelectedComponentPanelTab();
     },
-    [canvasHostRef, draggedNodeId, selectionRects, dom, api],
+    [
+      canvasHostRef,
+      draggedNodeId,
+      selectionRects,
+      dom,
+      setSelectedComponentPanelTab,
+      selectNode,
+      deselectNode,
+    ],
   );
 
   const handleNodeDelete = React.useCallback(
@@ -407,11 +434,9 @@ export default function RenderOverlay({ canvasHostRef }: RenderOverlayProps) {
         draftDom = deleteOrphanedLayoutNodes(dom, draftDom, toRemove);
       }
 
-      updateDom(draftDom);
-
-      api.deselect();
+      updateDom(draftDom, null);
     },
-    [dom, updateDom, api],
+    [dom, updateDom],
   );
 
   const selectedRect = selectedNode ? nodesInfo[selectedNode.id]?.rect : null;
@@ -433,11 +458,12 @@ export default function RenderOverlay({ canvasHostRef }: RenderOverlayProps) {
 
       if (appDom.isElement(node)) {
         event.dataTransfer.dropEffect = 'move';
-        api.select(node.id);
+        selectNode(node.id);
+        setSelectedComponentPanelTab();
         api.existingNodeDragStart(node);
       }
     },
-    [api],
+    [api, selectNode, setSelectedComponentPanelTab],
   );
 
   const handleNodeDuplicate = React.useCallback(
@@ -456,18 +482,19 @@ export default function RenderOverlay({ canvasHostRef }: RenderOverlayProps) {
 
       api.edgeDragStart({ nodeId: node.id, edge });
 
-      api.select(node.id);
+      selectNode(node.id);
+      setSelectedComponentPanelTab();
     },
-    [api],
+    [api, selectNode, setSelectedComponentPanelTab],
   );
 
   const handleKeyDown = React.useCallback(
     (event: React.KeyboardEvent<HTMLDivElement>) => {
-      if (selection && event.key === 'Backspace') {
-        handleNodeDelete(selection)();
+      if (selectedNodeId && event.key === 'Backspace') {
+        handleNodeDelete(selectedNodeId)();
       }
     },
-    [handleNodeDelete, selection],
+    [handleNodeDelete, selectedNodeId],
   );
 
   const isEmptyPage = pageNodes.length <= 1;
@@ -955,7 +982,7 @@ export default function RenderOverlay({ canvasHostRef }: RenderOverlayProps) {
         originalParent && appDom.isElement(originalParent) ? isPageColumn(originalParent) : false;
 
       let addOrMoveNode = appDom.addNode;
-      if (selection) {
+      if (selectedNodeId) {
         addOrMoveNode = appDom.moveNode;
       }
 
@@ -1170,7 +1197,7 @@ export default function RenderOverlay({ canvasHostRef }: RenderOverlayProps) {
           }
         }
 
-        const draggedNodeParent = selection ? appDom.getParent(dom, draggedNode) : null;
+        const draggedNodeParent = selectedNodeId ? appDom.getParent(dom, draggedNode) : null;
         if (
           draggedNode.layout?.columnSize &&
           draggedNodeParent &&
@@ -1186,16 +1213,17 @@ export default function RenderOverlay({ canvasHostRef }: RenderOverlayProps) {
         }
       }
 
-      if (selection) {
+      if (selectedNodeId) {
         draftDom = deleteOrphanedLayoutNodes(dom, draftDom, draggedNode, dragOverNodeId);
       }
 
-      updateDom(draftDom);
+      updateDom(draftDom, newNode?.id || undefined);
 
+      api.dragEnd();
       api.dragEnd();
 
       if (newNode) {
-        api.select(newNode.id);
+        setSelectedComponentPanelTab();
 
         // Refocus on overlay so that keyboard events can keep being caught by it
         const overlayElement = overlayRef.current;
@@ -1214,7 +1242,8 @@ export default function RenderOverlay({ canvasHostRef }: RenderOverlayProps) {
       draggedNode,
       newNode,
       nodesInfo,
-      selection,
+      selectedNodeId,
+      setSelectedComponentPanelTab,
       updateDom,
     ],
   );

@@ -29,7 +29,7 @@ export interface RenderPanelProps {
 
 export default function RenderPanel({ className }: RenderPanelProps) {
   const domLoader = useDomLoader();
-  const dom = useDom();
+  const { dom } = useDom();
   const domApi = useDomApi();
   const api = usePageEditorApi();
   const { appId, nodeId: pageNodeId } = usePageEditorState();

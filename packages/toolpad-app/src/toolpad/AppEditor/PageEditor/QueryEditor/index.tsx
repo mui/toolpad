@@ -33,7 +33,7 @@ interface DataSourceSelectorProps<Q> {
 }
 
 function ConnectionSelectorDialog<Q>({ open, onCreated, onClose }: DataSourceSelectorProps<Q>) {
-  const dom = useDom();
+  const { dom } = useDom();
 
   const [input, setInput] = React.useState<ConnectionOption | null>(null);
 
@@ -107,7 +107,7 @@ type DialogState =
     };
 
 export default function QueryEditor() {
-  const dom = useDom();
+  const { dom } = useDom();
   const state = usePageEditorState();
   const domApi = useDomApi();
 

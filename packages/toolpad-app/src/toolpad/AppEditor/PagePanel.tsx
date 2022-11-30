@@ -20,7 +20,7 @@ export interface ComponentPanelProps {
 export default function PagePanel({ appId, className, sx }: ComponentPanelProps) {
   const { data: app, isLoading } = client.useQuery('getApp', [appId]);
   const [editingName, setEditingName] = React.useState<boolean>(false);
-  const dom = useDom();
+  const { dom } = useDom();
 
   const handleRename = React.useCallback(() => {
     setEditingName(true);

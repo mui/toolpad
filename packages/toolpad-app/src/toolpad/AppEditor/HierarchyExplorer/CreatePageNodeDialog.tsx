@@ -29,7 +29,7 @@ export default function CreatePageDialog({
   onClose,
   ...props
 }: CreatePageDialogProps) {
-  const dom = useDom();
+  const { dom } = useDom();
   const domApi = useDomApi();
 
   const existingNames = React.useMemo(

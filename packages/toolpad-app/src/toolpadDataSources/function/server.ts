@@ -6,6 +6,7 @@ import {
   FunctionPrivateQuery,
 } from './types';
 import { Maybe } from '../../utils/types';
+import config from '../../server/config';
 import execFunction from './execFunction';
 
 async function execBase(
@@ -13,7 +14,12 @@ async function execBase(
   functionQuery: FunctionQuery,
   params: Record<string, string>,
 ): Promise<FunctionResult> {
+  if (config.isDemo) {
+    throw new Error('Cannot use these features in demo version.');
+  }
+
   const secrets = Object.fromEntries(connection?.secrets ?? []);
+
   return execFunction(functionQuery.module, { params, secrets });
 }
 

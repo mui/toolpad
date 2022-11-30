@@ -69,7 +69,7 @@ export interface ComponentEditorProps {
 }
 
 export default function ComponentEditor({ className }: ComponentEditorProps) {
-  const dom = useDom();
+  const { dom } = useDom();
   const domApi = useDomApi();
 
   const app = appDom.getApp(dom);

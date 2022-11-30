@@ -1,18 +1,23 @@
-import { test, expect } from '@playwright/test';
-import { ToolpadHome } from '../../models/ToolpadHome';
+import * as path from 'path';
+import { test, expect } from '../../playwright/test';
 import { ToolpadEditor } from '../../models/ToolpadEditor';
 import clickCenter from '../../utils/clickCenter';
-import domInput from './domInput.json';
+import { readJsonFile } from '../../utils/fs';
+import generateId from '../../utils/generateId';
 
 test('can control component prop values in properties control panel', async ({
   page,
   browserName,
+  api,
 }) => {
-  const homeModel = new ToolpadHome(page);
+  const dom = await readJsonFile(path.resolve(__dirname, './domInput.json'));
+
+  const app = await api.mutation.createApp(`App ${generateId()}`, {
+    from: { kind: 'dom', dom },
+  });
+
   const editorModel = new ToolpadEditor(page, browserName);
 
-  await homeModel.goto();
-  const app = await homeModel.createApplication({ dom: domInput });
   await editorModel.goto(app.id);
 
   await editorModel.pageRoot.waitFor();

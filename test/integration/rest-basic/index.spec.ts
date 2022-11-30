@@ -1,9 +1,9 @@
 import * as path from 'path';
-import { test, expect } from '@playwright/test';
-import { ToolpadHome } from '../../models/ToolpadHome';
+import { test, expect } from '../../playwright/test';
 import { ToolpadRuntime } from '../../models/ToolpadRuntime';
 import { readJsonFile } from '../../utils/fs';
 import { ToolpadEditor } from '../../models/ToolpadEditor';
+import generateId from '../../utils/generateId';
 
 // We can run our own httpbin instance if necessary:
 //    $ docker run -p 80:80 kennethreitz/httpbin
@@ -16,17 +16,19 @@ if (customHttbinBaseUrl) {
 
 const HTTPBIN_BASEURL = customHttbinBaseUrl || 'https://httpbin.org/';
 
-test('rest basics', async ({ page, browserName }) => {
+test.use({ ignoreConsoleErrors: [/.*/] });
+
+test('rest basics', async ({ page, browserName, api }) => {
   const dom = await readJsonFile(path.resolve(__dirname, './restDom.json'));
+
+  const app = await api.mutation.createApp(`App ${generateId()}`, {
+    from: { kind: 'dom', dom },
+  });
 
   const httpbinConnection: any = Object.values(dom.nodes).find(
     (node: any) => node.name === 'httpbin',
   );
   httpbinConnection.attributes.params.value.baseUrl = HTTPBIN_BASEURL;
-
-  const homeModel = new ToolpadHome(page);
-  await homeModel.goto();
-  const app = await homeModel.createApplication({ dom });
 
   const runtimeModel = new ToolpadRuntime(page);
   await runtimeModel.gotoPage(app.id, 'page1');

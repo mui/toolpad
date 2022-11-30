@@ -4,6 +4,8 @@ import { ToolpadHome } from '../models/ToolpadHome';
 import { ToolpadRuntime } from '../models/ToolpadRuntime';
 import { readJsonFile } from '../utils/fs';
 
+test.use({ ignoreConsoleErrors: [/.*/] });
+
 test('duplicate app from home flow', async ({ page }) => {
   const dom = await readJsonFile(path.resolve(__dirname, './duplicateNavigationDom.json'));
 

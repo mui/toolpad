@@ -45,6 +45,7 @@ import useFetchPrivate from '../useFetchPrivate';
 import { MOVIES_API_DEMO_URL } from '../demo';
 import * as appDom from '../../appDom';
 import { clientExec } from './runtime';
+import config from '../../config';
 
 const EVENT_INTERFACE_IDENTIFIER = 'ToolpadFunctionEvent';
 
@@ -208,6 +209,8 @@ function QueryEditor({
   const handleCommit = React.useCallback(() => onCommit?.(), [onCommit]);
   useShortcut({ key: 's', metaKey: true }, handleCommit);
 
+  const isBrowserSide = input.attributes.query.value.browser;
+
   return (
     <SplitPane split="vertical" size="50%" allowResize>
       <SplitPane split="horizontal" size={85} primary="second" allowResize>
@@ -218,8 +221,9 @@ function QueryEditor({
               <FormControlLabel
                 control={
                   <Checkbox
-                    checked={input.attributes.query.value.browser}
+                    checked={isBrowserSide}
                     onChange={handleRunInBrowserChange}
+                    disabled={config.isDemo}
                   />
                 }
                 label="Run in the browser"
@@ -269,7 +273,7 @@ function QueryEditor({
 }
 
 function getInitialQueryValue(): FunctionQuery {
-  return { module: DEFAULT_MODULE };
+  return { module: DEFAULT_MODULE, browser: config.isDemo };
 }
 
 const dataSource: ClientDataSource<FunctionConnectionParams, FunctionQuery> = {

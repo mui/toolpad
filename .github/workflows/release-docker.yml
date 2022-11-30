@@ -34,13 +34,13 @@ jobs:
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       - name: Publish version tag
-        uses: akhilerm/tag-push-action@f973043dc002b8e5a772c53e79441e6e1861e874 # v2.0.0
+        uses: akhilerm/tag-push-action@85bf542f43f5f2060ef76262a67ee3607cb6db37 # v2.1.0
         with:
           src: docker.io/muicom/toolpad:${{ github.event.inputs.commit }}
           dst: docker.io/muicom/toolpad:${{ github.event.inputs.version }}
 
       - name: Publish latest tag
-        uses: akhilerm/tag-push-action@f973043dc002b8e5a772c53e79441e6e1861e874 # v2.0.0
+        uses: akhilerm/tag-push-action@85bf542f43f5f2060ef76262a67ee3607cb6db37 # v2.1.0
         if: ${{ github.event.inputs.latest == 'true' }}
         with:
           src: docker.io/muicom/toolpad:${{ github.event.inputs.commit }}

@@ -29,19 +29,19 @@ import useBoolean from '../../../../utils/useBoolean';
 import { useNodeNameValidation } from '../../HierarchyExplorer/validation';
 import useEvent from '../../../../utils/useEvent';
 
-interface QueryeditorDialogActionsProps {
+interface QueryEditorDialogActionsProps {
   saveDisabled?: boolean;
   onSave?: () => void;
   onRemove?: () => void;
   onClose?: () => void;
 }
 
-function QueryeditorDialogActions({
+function QueryEditorDialogActions({
   saveDisabled,
   onSave,
   onRemove,
   onClose,
-}: QueryeditorDialogActionsProps) {
+}: QueryEditorDialogActionsProps) {
   const {
     value: removeConfirmOpen,
     setTrue: handleRemoveConfirmOpen,
@@ -118,6 +118,7 @@ export default function QueryNodeEditorDialog<Q>({
   const connectionId = input.attributes.connectionId.value
     ? appDom.deref(input.attributes.connectionId.value)
     : null;
+
   const connection = connectionId ? appDom.getMaybeNode(dom, connectionId, 'connection') : null;
   const dataSourceId = input.attributes.dataSource?.value || null;
   const dataSource = (dataSourceId && dataSources[dataSourceId]) || null;
@@ -338,7 +339,7 @@ export default function QueryNodeEditorDialog<Q>({
               />
             </Stack>
           </DialogContent>
-          <QueryeditorDialogActions
+          <QueryEditorDialogActions
             onSave={handleSave}
             onClose={handleClose}
             onRemove={handleRemove}

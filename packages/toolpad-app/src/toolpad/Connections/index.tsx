@@ -26,6 +26,7 @@ import {
   ToggleButtonGroup,
   Tooltip,
   Typography,
+  CircularProgress,
 } from '@mui/material';
 import IconButton from '@mui/material/IconButton';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
@@ -101,9 +102,12 @@ function getDataSource<P>(dataSourceId: string): ClientDataSource<P, any> | null
 interface DialogState<P> {
   open: boolean;
   loading: boolean;
-  error: Error | null;
+  saving: boolean;
+  loadError: Error | null;
+  saveError: Error | null;
   connectionId: string | null;
   dataSourceId: string | null;
+  name: string;
   params: P | null;
   secrets: Record<string, SecretsAction>;
 }
@@ -117,43 +121,54 @@ type DialogAction<P> =
   | { kind: 'SAVE_FAILED'; error: Error }
   | {
       kind: 'CONNECTION_LOAD_SUCCESS';
+      name: string;
       dataSourceId: string;
       params: P;
       secrets: Record<string, SecretsAction>;
     }
   | { kind: 'CONNECTION_LOAD_FAILED'; error: Error };
 
-function dialogStateREducer<P>(state: DialogState<P>, action: DialogAction<P>): DialogState<P> {
+function dialogStateReducer<P>(state: DialogState<P>, action: DialogAction<P>): DialogState<P> {
   switch (action.kind) {
     case 'DIALOG_OPEN': {
       const loading = !!action.connectionId;
       return {
         open: true,
         loading,
+        saving: false,
         connectionId: action.connectionId ?? null,
         dataSourceId: null,
-        error: null,
+        name: 'new connection',
+        loadError: null,
+        saveError: null,
         params: null,
         secrets: {},
       };
     }
     case 'DIALOG_CLOSE': {
-      return { ...state, open: false };
+      return { ...state, open: false, loading: false, saving: false };
     }
     case 'DATASOURCE_SELECTED': {
       return { ...state, dataSourceId: action.dataSourceId, params: null, secrets: {} };
     }
     case 'CONNECTION_LOAD_FAILED': {
-      return { ...state, loading: false, error: action.error };
+      return { ...state, loading: false, loadError: action.error };
     }
     case 'CONNECTION_LOAD_SUCCESS': {
       return {
         ...state,
         loading: false,
+        name: action.name,
         dataSourceId: action.dataSourceId,
         params: action.params,
         secrets: action.secrets,
       };
+    }
+    case 'SAVE_STARTED': {
+      return { ...state, saving: true, saveError: null };
+    }
+    case 'SAVE_FAILED': {
+      return { ...state, saving: false, saveError: action.error };
     }
     default:
       throw new Error(`Unknown dialog action "${(action as DialogAction<P>).kind}"`);
@@ -201,29 +216,27 @@ function CreateConnectionDialog<P>({ state, dispatch, ...props }: CreateConnecti
       } catch (error: unknown) {
         dispatch({ kind: 'SAVE_FAILED', error: errorFrom(error) });
       } finally {
-        client.invalidateQueries('getConnections');
+        await client.refetchQueries('getConnections');
         dispatch({ kind: 'DIALOG_CLOSE' });
       }
     },
     [dataSourceId, dispatch, state.connectionId],
   );
 
-  const model = React.useMemo(
-    () => ({
-      name: 'new connection',
-      params: state.params,
-      secrets: {},
-    }),
-    [state.params],
-  );
-
   return (
     <Dialog fullWidth open={state.open} onClose={handleClose} {...props}>
       {(() => {
-        if (state.error) {
+        if (state.loading) {
           return (
             <DialogContent>
-              <ErrorAlert error={state.error} />
+              <CircularProgress />
+            </DialogContent>
+          );
+        }
+        if (state.loadError) {
+          return (
+            <DialogContent>
+              <ErrorAlert error={state.loadError} />
             </DialogContent>
           );
         }
@@ -241,7 +254,7 @@ function CreateConnectionDialog<P>({ state, dispatch, ...props }: CreateConnecti
                 <ConnectionContextProvider value={connectionEditorContext}>
                   <ConnectionParamsEditor<P>
                     dataSource={dataSource}
-                    value={model}
+                    value={state}
                     onChange={handleSave}
                     onClose={handleClose}
                   />
@@ -591,7 +604,7 @@ function ConnectionsGridView({
               connection={connection}
               onDelete={() => onDeleteConnection(connection)}
               onDuplicate={() => onDuplicateConnection(connection)}
-              onEdit={() => onEditConnection(connection)}
+              onEdit={() => onEditConnection(connection.id)}
             />
           );
         });
@@ -670,14 +683,17 @@ export default function Connections() {
     [duplicateAppMutation],
   );
 
-  const [dialogState, dispatch] = React.useReducer(dialogStateREducer, {
+  const [dialogState, dispatch] = React.useReducer(dialogStateReducer, {
     open: false,
     loading: false,
+    saving: false,
     connectionId: null,
     dataSourceId: null,
+    name: 'new connection',
     params: null,
     secrets: {},
-    error: null,
+    loadError: null,
+    saveError: null,
   });
 
   const handleOpenDialog = React.useCallback(() => {
@@ -693,6 +709,7 @@ export default function Connections() {
       }
       dispatch({
         kind: 'CONNECTION_LOAD_SUCCESS',
+        name: connection.name,
         dataSourceId: connection.datasource,
         params: connection.params,
         secrets: connection.secrets,

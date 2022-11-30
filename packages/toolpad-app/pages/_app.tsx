@@ -7,6 +7,7 @@ import { CacheProvider, EmotionCache } from '@emotion/react';
 import { QueryClientProvider } from '@tanstack/react-query';
 import { LicenseInfo } from '@mui/x-data-grid-pro';
 import { useRouter } from 'next/router';
+import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import config from '../src/config';
 import { ThemeProvider } from '../src/ThemeContext';
 import createEmotionCache from '../src/createEmotionCache';
@@ -63,6 +64,7 @@ export default function MyApp(props: MyAppProps) {
             <CssBaseline />
             <Component {...pageProps} />
           </ThemeProvider>
+          <ReactQueryDevtools initialIsOpen={false} />
         </QueryClientProvider>
       </CacheProvider>
       {/* Google reCAPTCHA */}

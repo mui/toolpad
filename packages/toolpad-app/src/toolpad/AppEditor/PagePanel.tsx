@@ -49,16 +49,7 @@ export default function PagePanel({ appId, className, sx }: ComponentPanelProps)
             loading={Boolean(!app)}
           />
         )}
-        {app ? (
-          <AppOptions
-            app={app}
-            dom={dom}
-            allowDelete
-            redirectOnDelete
-            allowDuplicate
-            onRename={handleRename}
-          />
-        ) : null}
+        {app ? <AppOptions app={app} dom={dom} redirectOnDelete onRename={handleRename} /> : null}
       </Box>
       <Divider />
       <HierarchyExplorer appId={appId} />

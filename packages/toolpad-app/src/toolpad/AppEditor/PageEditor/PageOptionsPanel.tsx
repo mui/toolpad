@@ -12,7 +12,7 @@ import PageModuleEditor from './PageModuleEditor';
 export default function PageOptionsPanel() {
   const state = usePageEditorState();
   const pageNodeId = state.nodeId;
-  const dom = useDom();
+  const { dom } = useDom();
 
   const page = appDom.getNode(dom, pageNodeId, 'page');
 

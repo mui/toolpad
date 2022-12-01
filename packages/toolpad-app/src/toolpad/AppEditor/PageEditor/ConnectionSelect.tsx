@@ -7,6 +7,7 @@ import { useDom } from '../../DomLoader';
 import dataSources from '../../../toolpadDataSources/client';
 import { asArray } from '../../../utils/collections';
 import envConfig from '../../../config';
+import { DEMO_DATASOURCES } from '../../../constants';
 
 export type ConnectionOption = {
   connectionId: NodeId | null;
@@ -24,7 +25,7 @@ export default function ConnectionSelect({
   value,
   onChange,
 }: ConnectionSelectProps) {
-  const dom = useDom();
+  const { dom } = useDom();
 
   const app = appDom.getApp(dom);
   const { connections = [] } = appDom.getChildNodes(dom, app);
@@ -34,7 +35,7 @@ export default function ConnectionSelect({
     const result: ConnectionOption[] = [];
 
     for (const [dataSourceId, config] of Object.entries(dataSources)) {
-      if (config?.hasDefault && !envConfig.isDemo) {
+      if (config?.hasDefault || (envConfig.isDemo && DEMO_DATASOURCES.has(dataSourceId))) {
         if (!dataSource || filteredSources.has(dataSourceId)) {
           result.push({
             dataSourceId,
@@ -100,7 +101,8 @@ export default function ConnectionSelect({
           : '<default>';
         return (
           <MenuItem key={index} value={index}>
-            {dataSourceLabel} | {connectionLabel}
+            {dataSourceLabel}
+            {config?.ConnectionParamsInput ? ` | ${connectionLabel}` : ''}
           </MenuItem>
         );
       })}

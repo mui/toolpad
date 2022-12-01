@@ -23,7 +23,6 @@ export interface PageEditorState {
   readonly appId: string;
   readonly type: 'page';
   readonly nodeId: NodeId;
-  readonly selection: NodeId | null;
   readonly componentPanelTab: ComponentPanelTab;
   readonly newNode: appDom.ElementNode | null;
   readonly draggedNodeId: NodeId | null;
@@ -41,13 +40,6 @@ export type PageEditorAction =
   | {
       type: 'REPLACE';
       state: PageEditorState;
-    }
-  | {
-      type: 'SELECT_NODE';
-      nodeId: NodeId | null;
-    }
-  | {
-      type: 'DESELECT_NODE';
     }
   | {
       type: 'PAGE_SET_COMPONENT_PANEL_TAB';
@@ -97,7 +89,6 @@ export function createPageEditorState(appId: string, nodeId: NodeId): PageEditor
     appId,
     type: 'page',
     nodeId,
-    selection: null,
     componentPanelTab: 'component',
     newNode: null,
     draggedNodeId: null,
@@ -119,17 +110,6 @@ export function pageEditorReducer(
   switch (action.type) {
     case 'REPLACE': {
       return action.state;
-    }
-    case 'SELECT_NODE': {
-      return update(state, {
-        selection: action.nodeId,
-        componentPanelTab: 'component',
-      });
-    }
-    case 'DESELECT_NODE': {
-      return update(state, {
-        selection: null,
-      });
     }
     case 'PAGE_SET_COMPONENT_PANEL_TAB':
       return update(state, {
@@ -202,8 +182,6 @@ export function pageEditorReducer(
 function createPageEditorApi(dispatch: React.Dispatch<PageEditorAction>) {
   return {
     replace: (state: PageEditorState) => dispatch({ type: 'REPLACE', state }),
-    select: (nodeId: NodeId | null) => dispatch({ type: 'SELECT_NODE', nodeId }),
-    deselect: () => dispatch({ type: 'DESELECT_NODE' }),
     setComponentPanelTab(tab: ComponentPanelTab) {
       dispatch({ type: 'PAGE_SET_COMPONENT_PANEL_TAB', tab });
     },

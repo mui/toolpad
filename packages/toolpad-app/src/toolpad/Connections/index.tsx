@@ -625,21 +625,25 @@ function ConnectionsListView({
     () => [
       {
         field: 'name',
+        headerName: 'Name',
         flex: 1,
         hideable: false,
       },
       {
         field: 'createdAt',
+        headerName: 'Created',
         type: 'datetime',
         valueFormatter: (params) => getReadableDuration(params.value),
       },
       {
         field: 'editedAt',
+        headerName: 'Last edit',
         type: 'datetime',
         valueFormatter: (params) => getReadableDuration(params.value),
       },
       {
         field: 'actions',
+        headerName: '',
         type: 'actions',
         width: 120,
         align: 'center',

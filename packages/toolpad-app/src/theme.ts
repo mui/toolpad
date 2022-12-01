@@ -896,7 +896,7 @@ export function getThemedComponents(theme: Theme): { components: Theme['componen
             '& .MuiSvgIcon-root': {
               fontSize: defaultTheme.typography.pxToRem(18),
               color:
-                theme.palette.mode === 'dark' ? theme.palette.grey[300] : theme.palette.grey[500],
+                theme.palette.mode === 'dark' ? theme.palette.grey[400] : theme.palette.grey[500],
               marginRight: theme.spacing(0.2),
             },
           },

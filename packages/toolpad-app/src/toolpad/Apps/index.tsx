@@ -627,7 +627,7 @@ export default function Home() {
   ) : (
     <ToolpadHomeShell>
       <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
-        <Toolbar variant="regular" disableGutters sx={{ gap: 2, px: 5, mt: 3 }}>
+        <Toolbar variant="regular" disableGutters sx={{ gap: 2, px: 5, mt: 3, mb: 2 }}>
           <Typography sx={{ pl: 2 }} variant="h3">
             Apps
           </Typography>

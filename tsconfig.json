@@ -19,7 +19,8 @@
     "paths": {}
   },
   "ts-node": {
-    "swc": true
+    // https://github.com/TypeStrong/ts-node/issues/1915
+    //  "swc": true
   },
   "include": ["./test"]
 }

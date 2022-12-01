@@ -437,13 +437,16 @@ function AppCard({ app, activeDeployment, existingAppNames }: AppCardProps) {
         }
       />
       <CardContent sx={{ flexGrow: 1 }}>
-        <AppNameEditable
-          app={app}
-          editing={editingName}
-          setEditing={setEditingName}
-          loading={Boolean(!app)}
-          existingAppNames={existingAppNames}
-        />
+        {app ? (
+          <AppNameEditable
+            app={app}
+            editing={editingName}
+            setEditing={setEditingName}
+            existingAppNames={existingAppNames}
+          />
+        ) : (
+          <Skeleton />
+        )}
       </CardContent>
       <CardActions>
         <AppEditButton app={app} />
@@ -469,13 +472,16 @@ function AppRow({ app, activeDeployment, existingAppNames }: AppRowProps) {
   return (
     <TableRow hover role="row">
       <TableCell component="th" scope="row">
-        <AppNameEditable
-          loading={Boolean(!app)}
-          app={app}
-          editing={editingName}
-          setEditing={setEditingName}
-          existingAppNames={existingAppNames}
-        />
+        {app ? (
+          <AppNameEditable
+            app={app}
+            editing={editingName}
+            setEditing={setEditingName}
+            existingAppNames={existingAppNames}
+          />
+        ) : (
+          <Skeleton />
+        )}
         <Typography variant="caption">
           {app ? `Edited ${getReadableDuration(app.editedAt)}` : <Skeleton />}
         </Typography>

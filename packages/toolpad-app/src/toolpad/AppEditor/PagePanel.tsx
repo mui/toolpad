@@ -42,12 +42,7 @@ export default function PagePanel({ appId, className, sx }: ComponentPanelProps)
         {isLoading || !app ? (
           <Skeleton variant="text" width={70} />
         ) : (
-          <AppNameEditable
-            app={app}
-            editing={editingName}
-            setEditing={setEditingName}
-            loading={Boolean(!app)}
-          />
+          <AppNameEditable app={app} editing={editingName} setEditing={setEditingName} />
         )}
         {app ? (
           <AppOptions

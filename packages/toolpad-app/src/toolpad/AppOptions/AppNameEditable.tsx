@@ -1,26 +1,21 @@
 import * as React from 'react';
-import Skeleton from '@mui/material/Skeleton';
 import type { AppMeta } from '../../server/data';
 import EditableText from '../../components/EditableText';
 import client from '../../api';
 
 interface AppNameEditableProps {
-  app?: AppMeta;
+  app: AppMeta;
   editing?: boolean;
   setEditing: (editing: boolean) => void;
-  loading?: boolean;
   existingAppNames?: string[];
 }
 
-function AppNameEditable({
-  app,
-  editing,
-  setEditing,
-  loading,
-  existingAppNames,
-}: AppNameEditableProps) {
+function AppNameEditable({ app, editing, setEditing, existingAppNames }: AppNameEditableProps) {
   const appNameInput = React.useRef<HTMLInputElement | null>(null);
-  const [appName, setAppName] = React.useState<string>(app?.name || '');
+  const [appName, setAppName] = React.useState<string>(app.name || '');
+  React.useEffect(() => {
+    setAppName(app.name);
+  }, [app.name]);
 
   const handleAppNameChange = React.useCallback(
     (newValue: string) => {
@@ -32,11 +27,11 @@ function AppNameEditable({
   const existingNames = React.useMemo(() => new Set(existingAppNames), [existingAppNames]);
 
   const nameError = React.useMemo(() => {
-    if (editing && appName !== app?.name && existingNames.has(appName)) {
+    if (editing && appName !== app.name && existingNames.has(appName)) {
       return 'An app with that name already exists.';
     }
     return null;
-  }, [editing, existingNames, appName, app?.name]);
+  }, [editing, existingNames, appName, app.name]);
 
   const handleAppRenameClose = React.useCallback(() => {
     setEditing(false);
@@ -48,7 +43,7 @@ function AppNameEditable({
         setEditing(true);
         return;
       }
-      if (app?.id) {
+      if (app.id) {
         try {
           await client.mutation.updateApp(app.id, { name });
           await client.invalidateQueries('getApps');
@@ -58,14 +53,12 @@ function AppNameEditable({
         }
       }
     },
-    [app?.id, setEditing, nameError, existingNames],
+    [app.id, setEditing, nameError, existingNames],
   );
 
-  return loading ? (
-    <Skeleton />
-  ) : (
+  return (
     <EditableText
-      defaultValue={app?.name}
+      defaultValue={app.name}
       editable={editing}
       helperText={nameError}
       error={!!nameError}

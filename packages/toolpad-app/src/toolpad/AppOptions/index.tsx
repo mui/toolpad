@@ -16,37 +16,24 @@ import AppDeleteDialog from './AppDeleteDialog';
 import AppDuplicateDialog from './AppDuplicateDialog';
 
 interface AppOptionsProps {
-  app?: AppMeta;
+  app: AppMeta;
   onRename: () => void;
-  allowDuplicate?: boolean;
-  allowDelete?: boolean;
   dom?: any;
   redirectOnDelete?: boolean;
 }
 
-function AppOptions({
-  app,
-  onRename,
-  allowDelete,
-  allowDuplicate,
-  dom,
-  redirectOnDelete,
-}: AppOptionsProps) {
+function AppOptions({ app, onRename, dom, redirectOnDelete }: AppOptionsProps) {
   const { buttonProps, menuProps, onMenuClose } = useMenu();
 
   const [deletedApp, setDeletedApp] = React.useState<AppMeta | null>(null);
   const [duplicateApp, setDuplicateApp] = React.useState<AppMeta | null>(null);
 
   const onDuplicate = React.useCallback(() => {
-    if (app) {
-      setDuplicateApp(app);
-    }
+    setDuplicateApp(app);
   }, [app]);
 
   const onDelete = React.useCallback(() => {
-    if (app) {
-      setDeletedApp(app);
-    }
+    setDeletedApp(app);
   }, [app]);
 
   const handleRenameClick = React.useCallback(() => {
@@ -98,22 +85,18 @@ function AppOptions({
           </ListItemIcon>
           <ListItemText>Rename</ListItemText>
         </MenuItem>
-        {allowDuplicate ? (
-          <MenuItem onClick={handleDuplicateClick}>
-            <ListItemIcon>
-              <ContentCopyOutlinedIcon />
-            </ListItemIcon>
-            <ListItemText>Duplicate</ListItemText>
-          </MenuItem>
-        ) : null}
-        {allowDelete ? (
-          <MenuItem onClick={handleDeleteClick}>
-            <ListItemIcon>
-              <DeleteIcon />
-            </ListItemIcon>
-            <ListItemText>Delete</ListItemText>
-          </MenuItem>
-        ) : null}
+        <MenuItem onClick={handleDuplicateClick}>
+          <ListItemIcon>
+            <ContentCopyOutlinedIcon />
+          </ListItemIcon>
+          <ListItemText>Duplicate</ListItemText>
+        </MenuItem>
+        <MenuItem onClick={handleDeleteClick}>
+          <ListItemIcon>
+            <DeleteIcon />
+          </ListItemIcon>
+          <ListItemText>Delete</ListItemText>
+        </MenuItem>
         <Divider />
         {dom ? (
           <MenuItem onClick={handleAppExportClick}>
@@ -143,7 +126,7 @@ function AppOptions({
       />
       <AppDuplicateDialog
         open={Boolean(duplicateApp)}
-        app={duplicateApp}
+        app={app}
         onClose={() => setDuplicateApp(null)}
       />
     </React.Fragment>

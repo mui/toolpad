@@ -38,6 +38,7 @@ import DialogForm from '../../components/DialogForm';
 import type { Deployment } from '../../../prisma/generated/client';
 import ToolpadHomeShell from '../ToolpadHomeShell';
 import getReadableDuration from '../../utils/readableDuration';
+import useSearch from '../../utils/useSearch';
 import type { AppMeta } from '../../server/data';
 import useLocalStorageState from '../../utils/useLocalStorageState';
 import ErrorAlert from '../AppEditor/PageEditor/ErrorAlert';
@@ -619,17 +620,22 @@ export default function Home() {
 
   const AppsView = viewMode === 'list' ? AppsListView : AppsGridView;
 
+  const [AppsSearchField, filteredApps] = useSearch<AppMeta>(apps, 'Search apps');
+
   return config.isDemo ? (
     <DemoPage />
   ) : (
     <ToolpadHomeShell>
       <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
-        <Toolbar variant="regular" disableGutters sx={{ gap: 2, px: 5, mt: 3, mb: 2 }}>
+        <Toolbar variant="regular" disableGutters sx={{ gap: 2, px: 5, mt: 3 }}>
           <Typography sx={{ pl: 2 }} variant="h3">
             Apps
           </Typography>
           <FlexFill />
-          <Button onClick={() => setCreateDialogOpen(true)}>Create New</Button>
+          {AppsSearchField}
+          <Button variant="contained" onClick={() => setCreateDialogOpen(true)}>
+            Create New
+          </Button>
           <ToggleButtonGroup
             value={viewMode}
             exclusive
@@ -641,14 +647,14 @@ export default function Home() {
               aria-label="list view"
               color={viewMode === 'list' ? 'primary' : undefined}
             >
-              <ViewListIcon />
+              <ViewListIcon fontSize="small" />
             </ToggleButton>
             <ToggleButton
               value="grid"
               aria-label="grid view"
               color={viewMode === 'grid' ? 'primary' : undefined}
             >
-              <GridViewIcon />
+              <GridViewIcon fontSize="small" />
             </ToggleButton>
           </ToggleButtonGroup>
         </Toolbar>
@@ -657,7 +663,7 @@ export default function Home() {
         ) : (
           <Box sx={{ flex: 1, overflow: 'auto', px: 5 }}>
             <AppsView
-              apps={apps}
+              apps={filteredApps}
               loading={isLoading}
               activeDeploymentsByApp={activeDeploymentsByApp}
               existingAppNames={existingAppNames}

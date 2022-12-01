@@ -587,12 +587,14 @@ export async function getConnections() {
     return [];
   }
 
-  return prismaClient.connection.findMany({
+  const connections = await prismaClient.connection.findMany({
     orderBy: {
       editedAt: 'desc',
     },
     select: SELECT_CONNECTION_META,
   });
+
+  return connections;
 }
 
 function deserializeConnectionSerets(secrets: string): Record<string, string> {
@@ -679,7 +681,7 @@ export async function updateConnection(
 ) {
   const existing = await prismaClient.connection.findUniqueOrThrow({ where: { id } });
   const existingSecrets = deserializeConnectionSerets(existing.secrets);
-  return prismaClient.connection.update({
+  await prismaClient.connection.update({
     where: { id },
     data: {
       name,

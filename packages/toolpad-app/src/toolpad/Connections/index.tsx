@@ -340,16 +340,16 @@ function AppDeleteDialog({ connection, onClose }: AppDeleteDialogProps) {
 }
 
 interface AppNameEditableProps {
-  app?: ConnectionMeta;
+  connection?: ConnectionMeta;
   editing?: boolean;
   setEditing: (editing: boolean) => void;
   loading?: boolean;
 }
 
-function AppNameEditable({ app, editing, setEditing, loading }: AppNameEditableProps) {
+function AppNameEditable({ connection, editing, setEditing, loading }: AppNameEditableProps) {
   const [appRenameError, setAppRenameError] = React.useState<Error | null>(null);
   const appNameInput = React.useRef<HTMLInputElement | null>(null);
-  const [appName, setAppName] = React.useState<string>(app?.name || '');
+  const [appName, setAppName] = React.useState<string>(connection?.name || '');
 
   const handleAppNameChange = React.useCallback(
     (newValue: string) => {
@@ -366,9 +366,9 @@ function AppNameEditable({ app, editing, setEditing, loading }: AppNameEditableP
 
   const handleAppRenameSave = React.useCallback(
     async (name: string) => {
-      if (app?.id) {
+      if (connection?.id) {
         try {
-          await client.mutation.updateApp(app.id, { name });
+          await client.mutation.updateApp(connection.id, { name });
           await client.invalidateQueries('getApps');
         } catch (rawError) {
           setAppRenameError(errorFrom(rawError));
@@ -376,14 +376,14 @@ function AppNameEditable({ app, editing, setEditing, loading }: AppNameEditableP
         }
       }
     },
-    [app?.id, setEditing],
+    [connection?.id, setEditing],
   );
 
   return loading ? (
     <Skeleton />
   ) : (
     <EditableText
-      defaultValue={app?.name}
+      defaultValue={connection?.name}
       editable={editing}
       helperText={appRenameError ? `An app named "${appName}" already exists` : null}
       error={!!appRenameError}
@@ -394,7 +394,7 @@ function AppNameEditable({ app, editing, setEditing, loading }: AppNameEditableP
       sx={{
         width: '100%',
       }}
-      value={appName}
+      value={connection.name}
       variant="subtitle1"
     />
   );
@@ -507,7 +507,7 @@ function ConnectionCard({ connection, onDelete, onEdit, onDuplicate }: Connectio
       />
       <CardContent sx={{ flexGrow: 1 }}>
         <AppNameEditable
-          app={connection}
+          connection={connection}
           editing={editingName}
           setEditing={setEditingName}
           loading={Boolean(!connection)}
@@ -539,7 +539,7 @@ function ConnectionRow({ connection, onDelete, onDuplicate, onEdit }: Connection
       <TableCell component="th" scope="row">
         <AppNameEditable
           loading={Boolean(!connection)}
-          app={connection}
+          connection={connection}
           editing={editingName}
           setEditing={setEditingName}
         />

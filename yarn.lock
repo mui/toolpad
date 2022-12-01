@@ -2102,10 +2102,10 @@
     "@babel/runtime" "^7.18.9"
     "@mui/utils" "^5.10.3"
 
-"@next/bundle-analyzer@^13.0.4":
-  version "13.0.4"
-  resolved "https://registry.yarnpkg.com/@next/bundle-analyzer/-/bundle-analyzer-13.0.4.tgz#ce9acb11ae1019a956e278ecd05cac1c4242d3b6"
-  integrity sha512-GFbr0HX75Fv/S+R7NOXOUX7YBtg+snE3a/4ikEfouXVHzPakluIQL8ojYJTcR5Q6mBospGaldT19AdfuqRmPqQ==
+"@next/bundle-analyzer@^13.0.5":
+  version "13.0.5"
+  resolved "https://registry.yarnpkg.com/@next/bundle-analyzer/-/bundle-analyzer-13.0.5.tgz#d1ccd1b1c1f50bb19f606711e2fe2095a78fe432"
+  integrity sha512-45q05yO6ZqS5NHHaxnU/PsVdMw5XfT6d7CptFaIr/9O2nECDjhM56G5JQx+346fkI76l1embxkLBzoQByTYGKQ==
   dependencies:
     webpack-bundle-analyzer "4.7.0"
 
@@ -2712,10 +2712,10 @@
   dependencies:
     tslib "^2.4.0"
 
-"@swc/wasm@^1.3.18":
-  version "1.3.18"
-  resolved "https://registry.yarnpkg.com/@swc/wasm/-/wasm-1.3.18.tgz#64e58125a537a0d47a0a69f294d6f5d22a3fbf38"
-  integrity sha512-/nQNX5g0B7yEczrcdJhJQRY3FnFBzvDBVhPa+f9wXWrBV+YB5XWM10eF3oOpHB4l27r3E6tAAUZCTLBfpUT42w==
+"@swc/wasm@^1.3.21":
+  version "1.3.21"
+  resolved "https://registry.yarnpkg.com/@swc/wasm/-/wasm-1.3.21.tgz#56e064d08c1a191fad71b97b19b57b43c0d7aab8"
+  integrity sha512-dypb8fgPHDjzizYNRNMJKKOqH/7FdRGTK/zMEyICqRpEk6cgW2o4WKExbqxcg9xt2SNKafFjMX7basjGbJbOCw==
 
 "@tanstack/match-sorter-utils@^8.7.0":
   version "8.7.0"
@@ -4535,7 +4535,7 @@ chalk@^2.0.0:
     escape-string-regexp "^1.0.5"
     supports-color "^5.3.0"
 
-chalk@^4.0.0, chalk@^4.0.2, chalk@^4.1.0, chalk@^4.1.1, chalk@^4.1.2:
+chalk@^4.0.0, chalk@^4.0.2, chalk@^4.1.0, chalk@^4.1.1:
   version "4.1.2"
   resolved "https://registry.yarnpkg.com/chalk/-/chalk-4.1.2.tgz#aac4e2b7734a740867aeb16bf02aad556a1e7a01"
   integrity sha512-oKnbhFyRIXpUuez8iBMmyEa4nbj4IOQyuhc/wy9kY7/WVPcwIO9VA668Pu8RkO7+0G76SLROeyw9CpQ061i4mA==
@@ -10623,7 +10623,7 @@ react-lifecycles-compat@^3.0.4:
   resolved "https://registry.yarnpkg.com/react-lifecycles-compat/-/react-lifecycles-compat-3.0.4.tgz#4f1a273afdfc8f3488a8c516bfda78f872352362"
   integrity sha512-fBASbA6LnOU9dOU2eW7aQ8xmYBSXUIWr+UmF9b1efZBazGNO+rcXT/icdKnYm2pTwcRylVUYwW7H1PHfLekVzA==
 
-react-router-dom@^6.4.4:
+react-router-dom@^6.3.0, react-router-dom@^6.4.4:
   version "6.4.4"
   resolved "https://registry.yarnpkg.com/react-router-dom/-/react-router-dom-6.4.4.tgz#4271ec66333c440d1754477e4e6a3a5acb5487f8"
   integrity sha512-0Axverhw5d+4SBhLqLpzPhNkmv7gahUwlUVIOrRLGJ4/uwt30JVajVJXqv2Qr/LCwyvHhQc7YyK1Do8a9Jj7qA==

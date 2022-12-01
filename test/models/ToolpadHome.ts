@@ -39,7 +39,7 @@ export class ToolpadHome {
       hasText: 'Create a new App',
     });
     this.newAppNameInput = this.newAppDialog.locator('label:has-text("name")');
-    this.newAppTemplateSelect = this.newAppDialog.locator('role=button[name="Use template"]');
+    this.newAppTemplateSelect = page.getByRole('button', { name: /Use template/ });
     this.newAppDomInput = this.newAppDialog.locator('label:has-text("dom")');
     this.newAppDomCreateBtn = this.newAppDialog.locator('button:has-text("create")');
 

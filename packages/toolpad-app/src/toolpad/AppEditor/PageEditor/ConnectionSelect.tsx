@@ -25,7 +25,7 @@ export default function ConnectionSelect({
   value,
   onChange,
 }: ConnectionSelectProps) {
-  const dom = useDom();
+  const { dom } = useDom();
 
   const app = appDom.getApp(dom);
   const { connections = [] } = appDom.getChildNodes(dom, app);

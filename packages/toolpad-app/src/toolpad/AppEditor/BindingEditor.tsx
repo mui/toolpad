@@ -196,7 +196,7 @@ function JsExpressionActionEditor({ value, onChange }: JsExpressionActionEditorP
 export interface NavigationActionEditorProps extends WithControlledProp<NavigationAction | null> {}
 
 function NavigationActionEditor({ value, onChange }: NavigationActionEditorProps) {
-  const dom = useDom();
+  const { dom } = useDom();
   const root = appDom.getApp(dom);
   const { pages = [] } = appDom.getChildNodes(dom, root);
   const { nodeId: currentPageNodeId } = usePageEditorState();

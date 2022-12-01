@@ -110,7 +110,7 @@ interface SelectedNodeEditorProps {
 }
 
 function SelectedNodeEditor({ node }: SelectedNodeEditorProps) {
-  const dom = useDom();
+  const { dom } = useDom();
   const { viewState } = usePageEditorState();
   const nodeError = viewState.nodes[node.id]?.error;
   const componentConfig = viewState.nodes[node.id]?.componentConfig || { argTypes: {} };
@@ -140,12 +140,9 @@ export interface ComponentEditorProps {
 }
 
 export default function ComponentEditor({ className }: ComponentEditorProps) {
-  const dom = useDom();
-  const editor = usePageEditorState();
+  const { dom, selectedNodeId } = useDom();
 
-  const { selection } = editor;
-
-  const selectedNode = selection ? appDom.getMaybeNode(dom, selection) : null;
+  const selectedNode = selectedNodeId ? appDom.getMaybeNode(dom, selectedNodeId) : null;
 
   return (
     <ComponentEditorRoot className={className} data-testid="component-editor">

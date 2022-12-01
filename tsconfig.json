@@ -19,6 +19,7 @@
     "paths": {}
   },
   "ts-node": {
+    "transpileOnly": true
     // https://github.com/TypeStrong/ts-node/issues/1915
     //  "swc": true
   },

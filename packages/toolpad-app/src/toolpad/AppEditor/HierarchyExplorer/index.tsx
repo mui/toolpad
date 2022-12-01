@@ -17,6 +17,7 @@ import CreateCodeComponentNodeDialog from './CreateCodeComponentNodeDialog';
 import CreateConnectionNodeDialog from './CreateConnectionNodeDialog';
 import useLocalStorageState from '../../../utils/useLocalStorageState';
 import NodeMenu from '../NodeMenu';
+import config from '../../../config';
 
 const HierarchyExplorerRoot = styled('div')({
   overflow: 'auto',
@@ -141,7 +142,7 @@ export interface HierarchyExplorerProps {
 }
 
 export default function HierarchyExplorer({ appId, className }: HierarchyExplorerProps) {
-  const dom = useDom();
+  const { dom } = useDom();
   const domApi = useDomApi();
 
   const app = appDom.getApp(dom);
@@ -265,6 +266,8 @@ export default function HierarchyExplorer({ appId, className }: HierarchyExplore
     [appId, dom, domApi, navigate],
   );
 
+  const hasConnectionsView = !config.isDemo;
+
   return (
     <HierarchyExplorerRoot data-testid="hierarchy-explorer" className={className}>
       <TreeView
@@ -277,25 +280,27 @@ export default function HierarchyExplorer({ appId, className }: HierarchyExplore
         defaultCollapseIcon={<ArrowDropDownIcon />}
         defaultExpandIcon={<ArrowRightIcon />}
       >
-        <HierarchyTreeItem
-          nodeId=":connections"
-          aria-level={1}
-          labelText="Connections"
-          createLabelText="Create connection"
-          onCreate={handleCreateConnectionDialogOpen}
-        >
-          {connections.map((connectionNode) => (
-            <HierarchyTreeItem
-              key={connectionNode.id}
-              nodeId={connectionNode.id}
-              toolpadNodeId={connectionNode.id}
-              aria-level={2}
-              labelText={connectionNode.name}
-              onDuplicateNode={handleDuplicateNode}
-              onDeleteNode={handleDeleteNode}
-            />
-          ))}
-        </HierarchyTreeItem>
+        {hasConnectionsView ? (
+          <HierarchyTreeItem
+            nodeId=":connections"
+            aria-level={1}
+            labelText="Connections"
+            createLabelText="Create connection"
+            onCreate={handleCreateConnectionDialogOpen}
+          >
+            {connections.map((connectionNode) => (
+              <HierarchyTreeItem
+                key={connectionNode.id}
+                nodeId={connectionNode.id}
+                toolpadNodeId={connectionNode.id}
+                aria-level={2}
+                labelText={connectionNode.name}
+                onDuplicateNode={handleDuplicateNode}
+                onDeleteNode={handleDeleteNode}
+              />
+            ))}
+          </HierarchyTreeItem>
+        ) : null}
         <HierarchyTreeItem
           nodeId=":codeComponents"
           aria-level={1}

@@ -111,7 +111,7 @@ export default withBundleAnalyzer(
   withSentryConfig(
     /** @type {import('next').NextConfig & { sentry: import('@sentry/nextjs/types/config/types').UserSentryOptions }} */ ({
       experimental: {
-        transpilePackages: USE_EXPERIMENTAL_TRANSPILE_PACKAGES ? ['monaco-editor'] : [],
+        transpilePackages: USE_EXPERIMENTAL_TRANSPILE_PACKAGES ? ['monaco-editor'] : undefined,
       },
       reactStrictMode: true,
       poweredByHeader: false,

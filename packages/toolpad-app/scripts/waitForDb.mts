@@ -1,4 +1,8 @@
-import { PrismaClient } from '../prisma/generated/client';
+import { createRequire } from 'module';
+
+const require = createRequire(import.meta.url);
+
+const { PrismaClient } = require('../prisma/generated/client');
 
 const INTERVAL = 1000;
 const MAX_RETRIES = 30;

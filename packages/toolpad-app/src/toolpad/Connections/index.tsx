@@ -35,6 +35,7 @@ import ContentCopyOutlinedIcon from '@mui/icons-material/ContentCopyOutlined';
 import ViewListIcon from '@mui/icons-material/ViewList';
 import GridViewIcon from '@mui/icons-material/GridView';
 import DeleteIcon from '@mui/icons-material/Delete';
+import { DataGridPro, gridClasses, GridColumns } from '@mui/x-data-grid-pro';
 import client from '../../api';
 import useLatest from '../../utils/useLatest';
 import ToolpadHomeShell from '../ToolpadHomeShell';
@@ -620,34 +621,92 @@ function ConnectionsListView({
   onEditConnection,
   onDuplicateConnection,
 }: ConnectionsViewProps) {
-  return (
-    <Table aria-label="apps list" size="medium">
-      <TableBody>
-        {(() => {
-          if (loading) {
-            return <ConnectionRow />;
-          }
-          if (connections.length <= 0) {
-            return (
-              <TableRow>
-                <TableCell>No connections yet</TableCell>
-              </TableRow>
-            );
-          }
-          return connections.map((connection) => {
-            return (
-              <ConnectionRow
-                key={connection.id}
-                connection={connection}
-                onDelete={() => onDeleteConnection(connection)}
-                onDuplicate={() => onDuplicateConnection(connection)}
-                onEdit={() => onEditConnection(connection.id)}
+  const columns = React.useMemo<GridColumns<ConnectionMeta>>(
+    () => [
+      {
+        field: 'name',
+        flex: 1,
+        hideable: false,
+      },
+      {
+        field: 'createdAt',
+        type: 'datetime',
+        valueFormatter: (params) => getReadableDuration(params.value),
+      },
+      {
+        field: 'editedAt',
+        type: 'datetime',
+        valueFormatter: (params) => getReadableDuration(params.value),
+      },
+      {
+        field: 'actions',
+        type: 'actions',
+        width: 120,
+        align: 'center',
+        hideable: false,
+        renderCell(params) {
+          return (
+            <Box sx={{ display: 'flex', flexDirection: 'row', gap: 1 }}>
+              <Button onClick={() => onEditConnection(params.row.id)}>Edit</Button>
+              <ConnectionOptions
+                connection={params.row}
+                onDelete={() => onDeleteConnection(params.row)}
+                onDuplicate={() => onDuplicateConnection(params.row)}
+                onRename={() => undefined}
               />
-            );
-          });
-        })()}
-      </TableBody>
-    </Table>
+            </Box>
+          );
+        },
+      },
+    ],
+    [onDeleteConnection, onDuplicateConnection, onEditConnection],
+  );
+
+  return (
+    <React.Fragment>
+      <DataGridPro
+        columns={columns}
+        rows={connections}
+        hideFooter
+        density="standard"
+        sx={{
+          border: 'none',
+          [`& .${gridClasses.cell}:focus, & .${gridClasses.cell}:focus-within`]: {
+            outline: 'none',
+          },
+          [`& .${gridClasses.columnHeader}:focus, & .${gridClasses.columnHeader}:focus-within`]: {
+            outline: 'none',
+          },
+        }}
+      />
+      <Table aria-label="apps list" size="medium">
+        <TableBody>
+          {(() => {
+            if (loading) {
+              return <ConnectionRow />;
+            }
+            if (connections.length <= 0) {
+              return (
+                <TableRow>
+                  <TableCell>No connections yet</TableCell>
+                </TableRow>
+              );
+            }
+            return connections.map((connection) => {
+              return (
+                <ConnectionRow
+                  key={connection.id}
+                  connection={connection}
+                  onDelete={() => onDeleteConnection(connection)}
+                  onDuplicate={() => onDuplicateConnection(connection)}
+                  onEdit={() => onEditConnection(connection.id)}
+                />
+              );
+            });
+          })()}
+        </TableBody>
+      </Table>
+    </React.Fragment>
   );
 }
 

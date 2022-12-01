@@ -394,7 +394,7 @@ function AppNameEditable({ connection, editing, setEditing, loading }: AppNameEd
       sx={{
         width: '100%',
       }}
-      value={connection.name}
+      value={appName}
       variant="subtitle1"
     />
   );

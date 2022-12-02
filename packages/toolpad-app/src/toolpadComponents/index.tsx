@@ -23,6 +23,13 @@ const INTERNAL_COMPONENTS = new Map<string, ToolpadComponentDefinition>([
   [PAGE_COLUMN_COMPONENT_ID, { displayName: 'Column', builtIn: 'PageColumn', system: true }],
   [STACK_COMPONENT_ID, { displayName: 'Stack', builtIn: 'Stack', system: true }],
   [
+    'Autocomplete',
+    {
+      displayName: 'Autocomplete',
+      builtIn: 'Autocomplete',
+    },
+  ],
+  [
     'Button',
     {
       displayName: 'Button',

@@ -22,6 +22,7 @@ import LinkIcon from '@mui/icons-material/Link';
 import { SvgIconProps } from '@mui/material/SvgIcon';
 
 const iconMap = new Map<string, React.ComponentType<SvgIconProps>>([
+  ['Autocomplete', SmartButtonIcon],
   ['Button', SmartButtonIcon],
   ['Image', ImageIcon],
   ['DataGrid', GridOnIcon],

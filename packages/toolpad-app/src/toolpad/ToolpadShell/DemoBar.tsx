@@ -28,7 +28,7 @@ export default function DemoBar() {
       <Typography variant="subtitle1" sx={{ fontWeight: 700 }}>
         Demo version
       </Typography>
-      <Typography variant="body2">
+      <Typography variant="body2" textAlign="center">
         Check out our{' '}
         <Link href={ROADMAP_URL} target="_blank" underline="always" sx={linkStyles}>
           roadmap
@@ -37,7 +37,8 @@ export default function DemoBar() {
         <Link href={SCHEDULE_DEMO_URL} target="_blank" underline="always" sx={linkStyles}>
           schedule a demo
         </Link>
-        .
+        .<br />
+        Note: PostgreSQL, Google Sheets are supported in the self-hosted version.
       </Typography>
       <Link href={DOCUMENTATION_INSTALLATION_URL} target="_blank">
         <Button size="medium" variant="contained" endIcon={<KeyboardArrowRightRounded />}>

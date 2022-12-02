@@ -100,7 +100,7 @@ export default function QueryNodeEditorDialog<Q>({
   isDraft,
 }: QueryNodeEditorProps<Q>) {
   const { appId } = usePageEditorState();
-  const dom = useDom();
+  const { dom } = useDom();
 
   // To keep it around during closing animation
   const node = useLatest(nodeProp);

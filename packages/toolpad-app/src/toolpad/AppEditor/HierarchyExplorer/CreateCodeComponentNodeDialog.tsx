@@ -59,7 +59,7 @@ export default function CreateCodeComponentDialog({
   onClose,
   ...props
 }: CreateCodeComponentDialogProps) {
-  const dom = useDom();
+  const { dom } = useDom();
   const domApi = useDomApi();
 
   const existingNames = React.useMemo(

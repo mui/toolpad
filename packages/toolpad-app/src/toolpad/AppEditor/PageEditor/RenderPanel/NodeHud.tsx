@@ -153,7 +153,7 @@ export default function NodeHud({
   resizePreviewElementRef,
   onDuplicate,
 }: NodeHudProps) {
-  const dom = useDom();
+  const { dom } = useDom();
 
   const componentId = appDom.isElement(node) ? getElementNodeComponentId(node) : '';
   const component = useToolpadComponent(dom, componentId);

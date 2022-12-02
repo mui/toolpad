@@ -11,7 +11,7 @@ interface NodeNameEditorProps {
 
 export default function NodeNameEditor({ node, sx }: NodeNameEditorProps) {
   const domApi = useDomApi();
-  const dom = useDom();
+  const { dom } = useDom();
 
   const [nameInput, setNameInput] = React.useState(node.name);
   React.useEffect(() => setNameInput(node.name), [node.name]);

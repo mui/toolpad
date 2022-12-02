@@ -1,4 +1,8 @@
-import { PrismaClient } from '../prisma/generated/client';
+import { createRequire } from 'module';
+
+const require = createRequire(import.meta.url);
+
+const { PrismaClient } = require('../prisma/generated/client');
 
 const INTERVAL = 1000;
 const MAX_RETRIES = 30;
@@ -21,7 +25,7 @@ async function main() {
       // eslint-disable-next-line no-console
       console.log(`connected!`);
       return;
-    } catch (err) {
+    } catch (err: any) {
       if (err.errorCode === 'P1001') {
         // eslint-disable-next-line no-await-in-loop
         await new Promise((resolve) => {

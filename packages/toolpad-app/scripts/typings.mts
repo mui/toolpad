@@ -1,9 +1,15 @@
 import * as fs from 'fs/promises';
 import * as path from 'path';
+import * as url from 'url';
+import { createRequire } from 'module';
 import globCb from 'glob';
 import { promisify } from 'util';
 
+const require = createRequire(import.meta.url);
+
 const glob = promisify(globCb);
+
+const currentDirectory = url.fileURLToPath(new URL('.', import.meta.url));
 
 const LIBS = [
   { name: 'react' },
@@ -35,7 +41,7 @@ async function main() {
       LIBS.map(async ({ name }) => {
         const files: { filename: string; moduleId: string }[] = [];
         const resolvedPkg = require.resolve(`${name}/package.json`);
-        const pkgJson = await import(resolvedPkg);
+        const pkgJson = await import(resolvedPkg, { assert: { type: 'json' } });
         const pkgDir = path.dirname(resolvedPkg);
 
         const dtsFiles = await glob('**/*.d.ts', {
@@ -94,9 +100,13 @@ async function main() {
 
   const result: Record<string, string> = Object.assign({}, ...results);
 
-  await fs.writeFile(path.resolve(__dirname, '../public/typings.json'), JSON.stringify(result), {
-    encoding: 'utf-8',
-  });
+  await fs.writeFile(
+    path.resolve(currentDirectory, '../public/typings.json'),
+    JSON.stringify(result),
+    {
+      encoding: 'utf-8',
+    },
+  );
 }
 
 main().catch((err) => {

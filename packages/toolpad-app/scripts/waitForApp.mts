@@ -29,10 +29,12 @@ async function main() {
       // eslint-disable-next-line no-console
       console.log(`connected!`);
       return;
-    } catch (err) {
+    } catch (err: any) {
       console.error(` > ${err.message}`);
       // eslint-disable-next-line no-await-in-loop
-      await new Promise((resolve) => setTimeout(resolve, INTERVAL));
+      await new Promise((resolve) => {
+        setTimeout(resolve, INTERVAL);
+      });
     }
   }
   throw new Error(`Failed to connect`);

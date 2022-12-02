@@ -55,14 +55,13 @@
       "allowedVersions": "< 6.4.0"
     },
     {
-      "groupName": "chalk",
-      "matchPackageNames": ["chalk"],
-      "allowedVersions": "< 5.0.0"
-    },
-    {
       "groupName": "core-js",
       "matchPackageNames": ["core-js"],
       "allowedVersions": "< 2.0.0"
+    },
+    {
+      "groupName": "sentry",
+      "matchPackageNames": ["@sentry/nextjs"]
     },
     {
       "matchDepTypes": ["action"],

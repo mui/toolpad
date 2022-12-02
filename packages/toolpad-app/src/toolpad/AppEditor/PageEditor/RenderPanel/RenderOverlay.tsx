@@ -439,7 +439,7 @@ export default function RenderOverlay({ canvasHostRef }: RenderOverlayProps) {
     [dom, updateDom],
   );
 
-  const selectedRect = selectedNode ? nodesInfo[selectedNode.id]?.rect : null;
+  const selectedRect = selectedNode && !newNode ? nodesInfo[selectedNode.id]?.rect : null;
 
   const interactiveNodes = React.useMemo<Set<NodeId>>(() => {
     if (!selectedNode) {
@@ -509,12 +509,13 @@ export default function RenderOverlay({ canvasHostRef }: RenderOverlayProps) {
      * i.e. Exclude all descendants of the current selection since inserting in one of
      * them would create a cyclic structure.
      */
-    const excludedNodes = selectedNode
-      ? new Set<appDom.AppDomNode>([selectedNode, ...appDom.getDescendants(dom, selectedNode)])
-      : new Set();
+    const excludedNodes =
+      selectedNode && !newNode
+        ? new Set<appDom.AppDomNode>([selectedNode, ...appDom.getDescendants(dom, selectedNode)])
+        : new Set();
 
     return pageNodes.filter((n) => !excludedNodes.has(n));
-  }, [dom, draggedNode, pageNodes, selectedNode]);
+  }, [dom, draggedNode, newNode, pageNodes, selectedNode]);
 
   const availableDropTargetIds = React.useMemo(
     () => new Set(availableDropTargets.map((n) => n.id)),

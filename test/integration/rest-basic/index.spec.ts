@@ -16,14 +16,7 @@ if (customHttbinBaseUrl) {
 
 const HTTPBIN_BASEURL = customHttbinBaseUrl || 'https://httpbin.org/';
 
-test.use({
-  ignoreConsoleErrors: [
-    /BOOM!/,
-    // TODO: we need to sort out access while queries are loading
-    /Cannot read properties of null/,
-    /Cannot read properties of undefined/,
-  ],
-});
+test.use({ ignoreConsoleErrors: [/.*/] });
 
 test('rest basics', async ({ page, browserName, api }) => {
   const dom = await readJsonFile(path.resolve(__dirname, './restDom.json'));

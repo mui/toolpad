@@ -63,7 +63,8 @@ test('test batching quick actions into single undo entry', async ({ page, browse
 
   await editorModel.componentEditor.getByLabel('defaultValue').fill('some value');
   await editorModel.componentEditor.getByLabel('label').fill('some label');
-  await editorModel.componentEditor.getByLabel('label').blur();
+
+  clickCenter(page, input);
 
   await expect(input).toHaveValue('some value');
   await expect(editorModel.appCanvas.getByLabel('some label')).toBeVisible();
@@ -75,6 +76,6 @@ test('test batching quick actions into single undo entry', async ({ page, browse
   await page.keyboard.press('Control+Z');
 
   // Asssert that batched changes were reverted
-  await expect(input).toHaveValue('');
   await expect(editorModel.appCanvas.getByLabel('some label')).not.toBeVisible();
+  await expect(input).toHaveValue('');
 });

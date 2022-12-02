@@ -13,7 +13,7 @@ import insecureHash from '../utils/insecureHash';
 import useEvent from '../utils/useEvent';
 import { NodeHashes } from '../types';
 
-export type DomAction = { skipHistory?: boolean } & (
+export type DomAction =
   | {
       type: 'DOM_UPDATE_HISTORY';
     }
@@ -60,8 +60,7 @@ export type DomAction = { skipHistory?: boolean } & (
     }
   | {
       type: 'DESELECT_NODE';
-    }
-);
+    };
 
 export function domReducer(dom: appDom.AppDom, action: DomAction): appDom.AppDom {
   switch (action.type) {
@@ -240,17 +239,15 @@ function createDomApi(
         value: value as BindableAttrValues | null,
       });
     },
-    selectNode(nodeId: NodeId, skipHistory?: boolean) {
+    selectNode(nodeId: NodeId) {
       dispatch({
         type: 'SELECT_NODE',
         nodeId,
-        skipHistory,
       });
     },
-    deselectNode(skipHistory?: boolean) {
+    deselectNode() {
       dispatch({
         type: 'DESELECT_NODE',
-        skipHistory,
       });
     },
   };
@@ -353,7 +350,7 @@ export default function DomProvider({ appId, children }: DomContextProps) {
   const dispatchWithHistory = useEvent((action: DomAction) => {
     dispatch(action);
 
-    if (!SKIP_UNDO_ACTIONS.has(action.type) && !action.skipHistory) {
+    if (!SKIP_UNDO_ACTIONS.has(action.type)) {
       dispatch({ type: 'DOM_UPDATE_HISTORY' });
     }
   });

@@ -981,8 +981,10 @@ export default function RenderOverlay({ canvasHostRef }: RenderOverlayProps) {
       const isOriginalParentColumn =
         originalParent && appDom.isElement(originalParent) ? isPageColumn(originalParent) : false;
 
+      const isMovingNode = selectedNodeId && !newNode;
+
       let addOrMoveNode = appDom.addNode;
-      if (selectedNodeId) {
+      if (isMovingNode) {
         addOrMoveNode = appDom.moveNode;
       }
 
@@ -1197,7 +1199,7 @@ export default function RenderOverlay({ canvasHostRef }: RenderOverlayProps) {
           }
         }
 
-        const draggedNodeParent = selectedNodeId ? appDom.getParent(dom, draggedNode) : null;
+        const draggedNodeParent = isMovingNode ? appDom.getParent(dom, draggedNode) : null;
         if (
           draggedNode.layout?.columnSize &&
           draggedNodeParent &&
@@ -1213,13 +1215,12 @@ export default function RenderOverlay({ canvasHostRef }: RenderOverlayProps) {
         }
       }
 
-      if (selectedNodeId) {
+      if (isMovingNode) {
         draftDom = deleteOrphanedLayoutNodes(dom, draftDom, draggedNode, dragOverNodeId);
       }
 
       updateDom(draftDom, newNode?.id || undefined);
 
-      api.dragEnd();
       api.dragEnd();
 
       if (newNode) {
@@ -1531,7 +1532,7 @@ export default function RenderOverlay({ canvasHostRef }: RenderOverlayProps) {
 
         const isPageRowChild = parent ? appDom.isElement(parent) && isPageRow(parent) : false;
 
-        const isSelected = selectedNode ? selectedNode.id === node.id : false;
+        const isSelected = selectedNode && !newNode ? selectedNode.id === node.id : false;
         const isInteractive = interactiveNodes.has(node.id) && !draggedEdge;
 
         const isVerticallyResizable = Boolean(nodeInfo?.componentConfig?.resizableHeightProp);

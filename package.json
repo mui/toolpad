@@ -41,7 +41,7 @@
   },
   "devDependencies": {
     "@mui/monorepo": "https://github.com/mui/material-ui.git",
-    "@next/eslint-plugin-next": "13.0.5",
+    "@next/eslint-plugin-next": "13.0.6",
     "@playwright/test": "^1.28.1",
     "@swc/helpers": "^0.4.14",
     "@testing-library/jest-dom": "^5.16.5",
@@ -54,7 +54,7 @@
     "@typescript-eslint/parser": "^5.45.0",
     "babel-plugin-transform-rename-import": "^2.3.0",
     "chalk": "^5.1.2",
-    "eslint": "^8.28.0",
+    "eslint": "^8.29.0",
     "eslint-config-airbnb": "^19.0.4",
     "eslint-config-airbnb-typescript": "^17.0.0",
     "eslint-config-prettier": "^8.5.0",

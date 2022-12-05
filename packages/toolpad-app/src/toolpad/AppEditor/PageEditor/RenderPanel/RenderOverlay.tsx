@@ -366,7 +366,7 @@ export default function RenderOverlay({ canvasHostRef }: RenderOverlayProps) {
   const updateDom = React.useCallback(
     (draftDom: appDom.AppDom, newSelectedNodeId?: NodeId | null) => {
       draftDom = normalizePageRowColumnSizes(draftDom);
-      domApi.update(draftDom, { name: 'canvas' }, newSelectedNodeId);
+      domApi.update(draftDom, { name: 'main' }, newSelectedNodeId);
     },
     [domApi, normalizePageRowColumnSizes],
   );
@@ -471,7 +471,7 @@ export default function RenderOverlay({ canvasHostRef }: RenderOverlayProps) {
       event.stopPropagation();
 
       const updatedDom = appDom.duplicateNode(dom, node);
-      domApi.update(updatedDom, { name: 'canvas' });
+      domApi.update(updatedDom, { name: 'main' });
     },
     [dom, domApi],
   );

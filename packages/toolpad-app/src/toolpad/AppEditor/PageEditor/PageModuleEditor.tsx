@@ -46,8 +46,8 @@ function PageModuleEditorDialog({ pageNodeId, open, onClose }: PageModuleEditorD
       'module',
       appDom.createConst(pretty),
     );
-    domApi.update(updatedDom);
-  }, [dom, domApi, input, page]);
+    domApi.update(updatedDom, { name: 'pageModule', pageNodeId });
+  }, [dom, domApi, input, page, pageNodeId]);
 
   const handleSaveButton = React.useCallback(() => {
     handleSave();

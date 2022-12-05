@@ -12,16 +12,19 @@ import { mapValues } from '../utils/collections';
 import insecureHash from '../utils/insecureHash';
 import useEvent from '../utils/useEvent';
 import { NodeHashes } from '../types';
+import { ComponentPanelTab } from './AppEditor/PageEditor/PageEditorProvider';
 
-type LastEditedViewInfo =
-  | { name: 'explorer' }
-  | { name: 'canvas' }
-  | { name: 'query'; nodeId: NodeId };
+type ViewInfo =
+  | { name: 'main' }
+  | { name: 'query'; nodeId: NodeId }
+  | { name: 'properties'; tab: ComponentPanelTab; nodeId?: NodeId }
+  | { name: 'pageModule'; pageNodeId: NodeId }
+  | { name: 'pageParameters'; pageNodeId: NodeId };
 
-export type DomAction = { viewInfo?: LastEditedViewInfo } & (
+export type DomAction = { viewInfo?: ViewInfo } & (
   | {
       type: 'DOM_UPDATE_HISTORY';
-      lastEditedViewInfo?: LastEditedViewInfo;
+      lastEditedViewInfo?: ViewInfo;
     }
   | {
       type: 'DOM_UNDO';
@@ -44,7 +47,7 @@ export type DomAction = { viewInfo?: LastEditedViewInfo } & (
       type: 'DOM_SET_NODE_NAME';
       nodeId: NodeId;
       name: string;
-      viewInfo: LastEditedViewInfo;
+      viewInfo: ViewInfo;
     }
   | {
       type: 'DOM_SET_NODE_NAMESPACE';
@@ -56,12 +59,11 @@ export type DomAction = { viewInfo?: LastEditedViewInfo } & (
       type: 'DOM_UPDATE';
       updatedDom: appDom.AppDom;
       selectedNodeId?: NodeId | null;
-      viewInfo: LastEditedViewInfo;
     }
   | {
       type: 'DOM_SAVE_NODE';
       node: appDom.AppDomNode;
-      viewInfo: LastEditedViewInfo;
+      viewInfo: ViewInfo;
     }
   | {
       type: 'SELECT_NODE';
@@ -226,10 +228,10 @@ function createDomApi(
     redo() {
       dispatch({ type: 'DOM_REDO' });
     },
-    setNodeName(nodeId: NodeId, name: string, viewInfo: LastEditedViewInfo) {
+    setNodeName(nodeId: NodeId, name: string, viewInfo: ViewInfo) {
       dispatch({ type: 'DOM_SET_NODE_NAME', nodeId, name, viewInfo });
     },
-    update(dom: appDom.AppDom, viewInfo: LastEditedViewInfo, selectedNodeId?: NodeId | null) {
+    update(dom: appDom.AppDom, viewInfo?: ViewInfo, selectedNodeId?: NodeId | null) {
       dispatch({
         type: 'DOM_UPDATE',
         updatedDom: dom,
@@ -237,7 +239,7 @@ function createDomApi(
         viewInfo,
       });
     },
-    saveNode(node: appDom.AppDomNode, viewInfo: LastEditedViewInfo) {
+    saveNode(node: appDom.AppDomNode, viewInfo: ViewInfo) {
       dispatch({
         type: 'DOM_SAVE_NODE',
         node,
@@ -281,7 +283,7 @@ export interface DomLoader {
   unsavedChanges: number;
   saveError: string | null;
   selectedNodeId: NodeId | null;
-  lastEditedViewInfo: LastEditedViewInfo | null;
+  lastEditedViewInfo: ViewInfo | null;
   undoStack: UndoRedoStackEntry[];
   redoStack: UndoRedoStackEntry[];
 }
@@ -361,7 +363,7 @@ export default function DomProvider({ appId, children }: DomContextProps) {
   const scheduleHistoryUpdate = React.useMemo(
     () =>
       throttle(
-        (lastEditedViewInfo?: LastEditedViewInfo) => {
+        (lastEditedViewInfo?: ViewInfo) => {
           dispatch({ type: 'DOM_UPDATE_HISTORY', lastEditedViewInfo });
         },
         500,

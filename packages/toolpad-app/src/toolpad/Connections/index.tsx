@@ -60,6 +60,8 @@ import dataSources from '../../toolpadDataSources/client';
 import { ExactEntriesOf } from '../../utils/types';
 import { ConnectionContextProvider } from '../../toolpadDataSources/context';
 
+const USE_DATAGRID = true;
+
 export const APP_TEMPLATE_OPTIONS: Map<
   AppTemplateId,
   {
@@ -614,6 +616,22 @@ function ConnectionsGridView({
   );
 }
 
+function NoConnectionsOverlay() {
+  return (
+    <Box
+      sx={{
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+        height: '100%',
+      }}
+    >
+      No Connections
+    </Box>
+  );
+}
+
 function ConnectionsListView({
   loading,
   connections,
@@ -628,23 +646,20 @@ function ConnectionsListView({
         headerName: 'Name',
         flex: 1,
         hideable: false,
-      },
-      {
-        field: 'createdAt',
-        headerName: 'Created',
-        type: 'datetime',
-        valueFormatter: (params) => getReadableDuration(params.value),
-      },
-      {
-        field: 'editedAt',
-        headerName: 'Last edit',
-        type: 'datetime',
-        valueFormatter: (params) => getReadableDuration(params.value),
+        renderCell(params) {
+          return (
+            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+              <Typography>{params.value}</Typography>
+              <Typography variant="caption">
+                Edited {getReadableDuration(params.row.editedAt)}
+              </Typography>
+            </Box>
+          );
+        },
       },
       {
         field: 'actions',
         headerName: '',
-        type: 'actions',
         width: 120,
         align: 'center',
         hideable: false,
@@ -666,51 +681,55 @@ function ConnectionsListView({
     [onDeleteConnection, onDuplicateConnection, onEditConnection],
   );
 
-  return (
-    <React.Fragment>
-      <DataGridPro
-        columns={columns}
-        rows={connections}
-        hideFooter
-        density="standard"
-        sx={{
-          border: 'none',
-          [`& .${gridClasses.cell}:focus, & .${gridClasses.cell}:focus-within`]: {
-            outline: 'none',
-          },
-          [`& .${gridClasses.columnHeader}:focus, & .${gridClasses.columnHeader}:focus-within`]: {
-            outline: 'none',
-          },
-        }}
-      />
-      <Table aria-label="apps list" size="medium">
-        <TableBody>
-          {(() => {
-            if (loading) {
-              return <ConnectionRow />;
-            }
-            if (connections.length <= 0) {
-              return (
-                <TableRow>
-                  <TableCell>No connections yet</TableCell>
-                </TableRow>
-              );
-            }
-            return connections.map((connection) => {
-              return (
-                <ConnectionRow
-                  key={connection.id}
-                  connection={connection}
-                  onDelete={() => onDeleteConnection(connection)}
-                  onDuplicate={() => onDuplicateConnection(connection)}
-                  onEdit={() => onEditConnection(connection.id)}
-                />
-              );
-            });
-          })()}
-        </TableBody>
-      </Table>
-    </React.Fragment>
+  return USE_DATAGRID ? (
+    <DataGridPro
+      columns={columns}
+      rows={connections}
+      hideFooter
+      disableColumnSelector
+      rowHeight={80}
+      components={{
+        NoResultsOverlay: NoConnectionsOverlay,
+        NoRowsOverlay: NoConnectionsOverlay,
+      }}
+      sx={{
+        border: 'none',
+        [`& .${gridClasses.cell}:focus, & .${gridClasses.cell}:focus-within`]: {
+          outline: 'none',
+        },
+        [`& .${gridClasses.columnHeader}:focus, & .${gridClasses.columnHeader}:focus-within`]: {
+          outline: 'none',
+        },
+      }}
+    />
+  ) : (
+    <Table aria-label="apps list" size="medium">
+      <TableBody>
+        {(() => {
+          if (loading) {
+            return <ConnectionRow />;
+          }
+          if (connections.length <= 0) {
+            return (
+              <TableRow>
+                <TableCell>No connections yet</TableCell>
+              </TableRow>
+            );
+          }
+          return connections.map((connection) => {
+            return (
+              <ConnectionRow
+                key={connection.id}
+                connection={connection}
+                onDelete={() => onDeleteConnection(connection)}
+                onDuplicate={() => onDuplicateConnection(connection)}
+                onEdit={() => onEditConnection(connection.id)}
+              />
+            );
+          });
+        })()}
+      </TableBody>
+    </Table>
   );
 }
 

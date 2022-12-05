@@ -252,8 +252,8 @@ function ConnectionParamsInput({
 }
 
 function ConnectionParamsInput2({
-  appId,
-  connectionId,
+  value,
+  onChange,
   handlerBasePath,
   onClose,
 }: ConnectionEditorProps2<GoogleSheetsConnectionParams>) {

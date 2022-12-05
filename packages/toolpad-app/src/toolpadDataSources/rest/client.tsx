@@ -214,22 +214,25 @@ function ConnectionParamsInput2({
   onClose,
 }: ConnectionEditorProps2<RestConnectionParams>) {
   const { handleSubmit, register, formState, reset, control, watch } = useForm({
-    defaultValues: withDefaults(value),
+    defaultValues: { ...value, params: withDefaults(value.params) },
     reValidateMode: 'onChange',
     mode: 'all',
   });
-  React.useEffect(() => reset(withDefaults(value)), [reset, value]);
+  React.useEffect(() => reset({ ...value, params: withDefaults(value.params) }), [reset, value]);
 
-  const doSubmit = handleSubmit((connectionParams) =>
+  const doSubmit = handleSubmit((newValue) =>
     onChange({
-      ...connectionParams,
-      baseUrl: connectionParams.baseUrl && parseBaseUrl(connectionParams.baseUrl).href,
+      ...newValue,
+      params: {
+        ...newValue.params,
+        baseUrl: newValue.params?.baseUrl && parseBaseUrl(newValue.params.baseUrl).href,
+      },
     }),
   );
 
-  const baseUrlValue = watch('baseUrl');
-  const headersValue = watch('headers');
-  const authenticationValue = watch('authentication');
+  const baseUrlValue = watch('params.baseUrl');
+  const headersValue = watch('params.headers');
+  const authenticationValue = watch('params.authentication');
   const authenticationHeaders = getAuthenticationHeaders(authenticationValue);
 
   const mustHaveBaseUrl: boolean =
@@ -239,7 +242,7 @@ function ConnectionParamsInput2({
 
   const baseUrlInputProps = {
     label: 'base url',
-    ...register('baseUrl', {
+    ...register('params.baseUrl', {
       validate(input?: string) {
         if (!input) {
           if (mustHaveBaseUrl) {
@@ -254,7 +257,7 @@ function ConnectionParamsInput2({
         }
       },
     }),
-    ...validation(formState, 'baseUrl'),
+    ...validation(formState, 'params.baseUrl'),
   };
 
   return (
@@ -264,11 +267,9 @@ function ConnectionParamsInput2({
           <TextField {...baseUrlInputProps} />
           <Typography>Headers:</Typography>
           <Controller
-            name="headers"
+            name="params.headers"
             control={control}
-            render={({
-              field: { value: fieldValue = [], onChange: onFieldChange, ref, ...field },
-            }) => {
+            render={({ field: { value: fieldValue, onChange: onFieldChange, ref, ...field } }) => {
               const allHeaders = [...authenticationHeaders, ...fieldValue];
               return (
                 <MapEntriesEditor
@@ -284,7 +285,7 @@ function ConnectionParamsInput2({
           />
           <Typography>Authentication:</Typography>
           <Controller
-            name="authentication"
+            name="params.authentication"
             control={control}
             render={({ field: { value: fieldValue, ref, ...field } }) => (
               <AuthenticationEditor

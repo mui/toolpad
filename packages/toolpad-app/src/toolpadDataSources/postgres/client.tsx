@@ -178,11 +178,11 @@ function ConnectionParamsInput2({
   onClose,
 }: ConnectionEditorProps2<PostgresConnectionParams>) {
   const { handleSubmit, register, formState, reset, watch } = useForm({
-    defaultValues: withDefaults(value),
+    defaultValues: value,
     reValidateMode: 'onChange',
     mode: 'all',
   });
-  React.useEffect(() => reset(withDefaults(value)), [reset, value]);
+  React.useEffect(() => reset(value), [reset, value]);
 
   const doSubmit = handleSubmit((connectionParams) => onChange(connectionParams));
 
@@ -195,7 +195,7 @@ function ConnectionParamsInput2({
   const values = watch();
 
   const handleTestConnection = React.useCallback(() => {
-    fetchPrivate({ kind: 'connectionStatus', params: values })
+    fetchPrivate({ kind: 'connectionStatus', params: values.params, secrets: values.secrets })
       .then((status) => {
         setConnectionStatus(status);
       })
@@ -221,29 +221,29 @@ function ConnectionParamsInput2({
         <Stack direction="column" gap={1}>
           <TextField
             label="host"
-            {...register('host', { required: true })}
-            {...validation(formState, 'host')}
+            {...register('params.host', { required: true })}
+            {...validation(formState, 'params.host')}
           />
           <TextField
             label="port"
-            {...register('port', { required: true })}
-            {...validation(formState, 'port')}
+            {...register('params.port', { required: true })}
+            {...validation(formState, 'params.port')}
           />
           <TextField
             label="user"
-            {...register('user', { required: true })}
-            {...validation(formState, 'user')}
+            {...register('params.user', { required: true })}
+            {...validation(formState, 'params.user')}
           />
           <TextField
             label="password"
             type="password"
-            {...register('password', { required: true })}
-            {...validation(formState, 'password')}
+            {...register('params.password', { required: true })}
+            {...validation(formState, 'params.password')}
           />
           <TextField
             label="database"
-            {...register('database', { required: true })}
-            {...validation(formState, 'database')}
+            {...register('params.database', { required: true })}
+            {...validation(formState, 'params.database')}
           />
           <LoadingButton
             variant="outlined"

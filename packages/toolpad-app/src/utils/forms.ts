@@ -1,8 +1,21 @@
-import { FieldError, FieldValues, FormState } from 'react-hook-form';
+import {
+  DeepRequired,
+  FieldError,
+  FieldErrorsImpl,
+  FieldPath,
+  FieldValues,
+  FormState,
+  Merge,
+} from 'react-hook-form';
 
-function errorMessage(error: FieldError) {
+function errorMessage<
+  TFieldValues extends FieldValues,
+  TFieldName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>,
+>(
+  error: FieldError | Merge<FieldError, FieldErrorsImpl<DeepRequired<TFieldValues>[TFieldName]>>,
+): string {
   if (error.message) {
-    return error.message;
+    return String(error.message);
   }
   switch (error.type) {
     case 'required':
@@ -12,11 +25,11 @@ function errorMessage(error: FieldError) {
   }
 }
 
-export function validation<T extends FieldValues>(
-  formState: FormState<T>,
-  field: keyof T,
-): { error?: boolean; helperText?: string } {
-  const error: FieldError = (formState.errors as any)[field];
+export function validation<
+  TFieldValues extends FieldValues,
+  TFieldName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>,
+>(formState: FormState<TFieldValues>, field: TFieldName): { error?: boolean; helperText?: string } {
+  const error = formState.errors[field];
 
   return {
     error: !!error,
@@ -24,7 +37,9 @@ export function validation<T extends FieldValues>(
   };
 }
 
-export function isSaveDisabled<T extends FieldValues>(formState: FormState<T>): boolean {
+export function isSaveDisabled<TFieldValues extends FieldValues>(
+  formState: FormState<TFieldValues>,
+): boolean {
   // Always destructure formState to trigger underlying react-hook-form Proxy object
   const { isValid, isDirty } = formState;
   return !isValid || !isDirty;

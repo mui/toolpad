@@ -107,8 +107,8 @@ const sentryWebpackPluginOptions = {
 
 const NEVER = () => false;
 
-export default withBundleAnalyzer(
-  withSentryConfig(
+export default withSentryConfig(
+  withBundleAnalyzer(
     /** @type {import('next').NextConfig & { sentry: import('@sentry/nextjs/types/config/types').UserSentryOptions }} */ ({
       experimental: {
         transpilePackages: USE_EXPERIMENTAL_TRANSPILE_PACKAGES ? ['monaco-editor'] : undefined,
@@ -220,6 +220,6 @@ export default withBundleAnalyzer(
         ];
       },
     }),
-    sentryWebpackPluginOptions,
   ),
+  sentryWebpackPluginOptions,
 );

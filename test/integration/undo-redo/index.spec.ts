@@ -1,18 +1,18 @@
 import * as path from 'path';
 import { ToolpadEditor } from '../../models/ToolpadEditor';
-import { ToolpadHome } from '../../models/ToolpadHome';
 import { test, expect } from '../../playwright/test';
 import { readJsonFile } from '../../utils/fs';
 import clickCenter from '../../utils/clickCenter';
+import generateId from '../../utils/generateId';
 
-test('test basic undo and redo', async ({ page, browserName }) => {
-  const homeModel = new ToolpadHome(page);
+test('test basic undo and redo', async ({ page, browserName, api }) => {
+  const dom = await readJsonFile(path.resolve(__dirname, './dom.json'));
+
+  const app = await api.mutation.createApp(`App ${generateId()}`, {
+    from: { kind: 'dom', dom },
+  });
+
   const editorModel = new ToolpadEditor(page, browserName);
-
-  const domInput = await readJsonFile(path.resolve(__dirname, './dom.json'));
-
-  await homeModel.goto();
-  const app = await homeModel.createApplication({ dom: domInput });
   await editorModel.goto(app.id);
 
   await editorModel.waitForOverlay();
@@ -43,14 +43,14 @@ test('test basic undo and redo', async ({ page, browserName }) => {
   await expect(canvasInputLocator).toHaveCount(3);
 });
 
-test.only('test batching quick actions into single undo entry', async ({ page, browserName }) => {
-  const homeModel = new ToolpadHome(page);
+test('test batching quick actions into single undo entry', async ({ page, browserName, api }) => {
+  const dom = await readJsonFile(path.resolve(__dirname, './dom.json'));
+
+  const app = await api.mutation.createApp(`App ${generateId()}`, {
+    from: { kind: 'dom', dom },
+  });
+
   const editorModel = new ToolpadEditor(page, browserName);
-
-  const domInput = await readJsonFile(path.resolve(__dirname, './dom.json'));
-
-  await homeModel.goto();
-  const app = await homeModel.createApplication({ dom: domInput });
   await editorModel.goto(app.id);
 
   await editorModel.waitForOverlay();
@@ -59,12 +59,18 @@ test.only('test batching quick actions into single undo entry', async ({ page, b
 
   clickCenter(page, input);
 
-  await editorModel.componentEditor.getByLabel('defaultValue').fill('some value');
-  await editorModel.componentEditor.getByLabel('label').fill('some label');
-  await editorModel.componentEditor.getByLabel('label').blur();
+  await editorModel.componentEditor.getByLabel('defaultValue').click();
 
-  await expect(input).toHaveValue('some value');
-  await expect(editorModel.appCanvas.getByLabel('some label')).toBeVisible();
+  await page.keyboard.type('some value');
+
+  // Wait for undo stack to be updated
+  await page.waitForTimeout(600);
+
+  await page.keyboard.type(' hello');
+
+  await editorModel.componentEditor.getByLabel('defaultValue').blur();
+
+  await expect(input).toHaveValue('some value hello');
 
   // Wait for undo stack to be updated
   await page.waitForTimeout(600);
@@ -73,6 +79,5 @@ test.only('test batching quick actions into single undo entry', async ({ page, b
   await page.keyboard.press('Control+Z');
 
   // Asssert that batched changes were reverted
-  await expect(input).toHaveValue('');
-  await expect(editorModel.appCanvas.getByLabel('some label')).not.toBeVisible();
+  await expect(input).toHaveValue('some value');
 });

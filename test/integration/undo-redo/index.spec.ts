@@ -43,7 +43,7 @@ test('test basic undo and redo', async ({ page, browserName }) => {
   await expect(canvasInputLocator).toHaveCount(3);
 });
 
-test('test batching quick actions into single undo entry', async ({ page, browserName }) => {
+test.skip('test batching quick actions into single undo entry', async ({ page, browserName }) => {
   const homeModel = new ToolpadHome(page);
   const editorModel = new ToolpadEditor(page, browserName);
 

@@ -15,6 +15,8 @@ import { inferColumns, parseColumns } from '@mui/toolpad-components';
 import { DataGridPro, GridColDef } from '@mui/x-data-grid-pro';
 import { UseQueryResult } from '@tanstack/react-query';
 import { getObjectKey } from '@mui/toolpad-core/objectKey';
+import mitt from 'mitt';
+import invariant from 'invariant';
 import {
   ClientDataSource,
   ConnectionEditorProps,
@@ -40,6 +42,8 @@ import SplitPane from '../../components/SplitPane';
 import useQueryPreview from '../useQueryPreview';
 import useFetchPrivate from '../useFetchPrivate';
 import * as appDom from '../../appDom';
+import config from '../../config';
+import { errorFrom } from '../../utils/errors';
 
 const EMPTY_ROWS: any[] = [];
 
@@ -251,6 +255,34 @@ function ConnectionParamsInput({
   );
 }
 
+let script: HTMLScriptElement | null = null;
+const emitter = mitt();
+function useGsi() {
+  const client = React.useSyncExternalStore(
+    (handler) => {
+      emitter.on('load', handler);
+
+      if (!script) {
+        script = document.createElement('script');
+        script.src = 'https://accounts.google.com/gsi/client';
+        script.onload = () => {
+          emitter.emit('load');
+        };
+        script.async = true;
+        script.id = 'google-client-script';
+        document.body.appendChild(script);
+      }
+
+      return () => {
+        emitter.off('load', handler);
+      };
+    },
+    () => window.google ?? null,
+    () => null,
+  );
+  return client;
+}
+
 function ConnectionParamsInput2({
   value,
   onChange,
@@ -261,28 +293,63 @@ function ConnectionParamsInput2({
     {
       type: 'CONNECTION_STATUS',
     },
-    { retry: false },
+    { retry: false, enabled: false },
   );
+
+  const [error, setError] = React.useState<string | null>(null);
+  const [loading, setLoading] = React.useState(false);
+
+  const google = useGsi();
+
+  const fetchPrivate = useFetchPrivate<GoogleSheetsPrivateQuery, any>();
+
+  const handleAuthClick = React.useCallback(() => {
+    invariant(
+      google && config.googleSheetsClientId,
+      'Button should be blocked as long as client is not initialized',
+    );
+
+    const client = google.accounts.oauth2.initCodeClient({
+      client_id: config.googleSheetsClientId,
+      scope: [
+        'https://www.googleapis.com/auth/spreadsheets.readonly',
+        'https://www.googleapis.com/auth/drive.readonly',
+      ].join(' '),
+      ux_mode: 'popup',
+      callback: async (response) => {
+        if (response.error) {
+          setError(response.error_description);
+          return;
+        }
+        setLoading(true);
+        try {
+          await fetchPrivate({ type: 'RECEIVE_CODE', code: response.code });
+          validatedUser.refetch();
+        } catch (rawError: unknown) {
+          setError(errorFrom(rawError).message);
+        } finally {
+          setLoading(false);
+        }
+      },
+      error_callback: (err) => {
+        setError(err.message);
+      },
+    });
+    client.requestCode();
+  }, [fetchPrivate, google, validatedUser]);
+
+  console.log(validatedUser);
+
   return (
     <React.Fragment>
       <DialogContent>
-        <Stack direction="column" gap={1}>
+        <Stack direction="column" sx={{ gap: 1 }}>
           <Button
-            component="a"
-            disabled={Boolean(validatedUser.data)}
-            href={`${handlerBasePath}/auth/login?state=${encodeURIComponent(
-              JSON.stringify({ appId, connectionId }),
-            )}
-        `}
+            disabled={Boolean(validatedUser.data || !google || !config.googleSheetsClientId)}
             variant="outlined"
+            onClick={handleAuthClick}
           >
-            <Typography variant="button">
-              {validatedUser.isLoading ? (
-                <Skeleton width={100} />
-              ) : (
-                `Connect${validatedUser.data ? `ed: ${validatedUser.data.emailAddress}` : ''}`
-              )}
-            </Typography>
+            Connect
           </Button>
         </Stack>
       </DialogContent>

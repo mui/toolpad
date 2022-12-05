@@ -48,6 +48,8 @@ export interface RuntimeConfig {
   recaptchaV2SiteKey?: string;
   recaptchaV3SiteKey?: string;
   externalUrl: string;
+
+  googleSheetsClientId?: string;
 }
 
 declare global {
@@ -83,6 +85,7 @@ const runtimeConfig: RuntimeConfig =
         recaptchaV3SiteKey: process.env.TOOLPAD_RECAPTCHA_V3_SITE_KEY,
         externalUrl:
           process.env.TOOLPAD_EXTERNAL_URL || `http://localhost:${process.env.PORT || 3000}`,
+        googleSheetsClientId: process.env.TOOLPAD_DATASOURCE_GOOGLESHEETS_CLIENT_ID,
       }
     : getBrowsersideRuntimeConfig();
 

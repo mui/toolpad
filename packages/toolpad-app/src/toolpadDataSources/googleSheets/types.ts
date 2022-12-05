@@ -62,6 +62,10 @@ export type GoogleSheetsPrivateQuery =
   | {
       type: 'DEBUG_EXEC';
       query: GoogleSheetsApiQuery;
+    }
+  | {
+      type: 'RECEIVE_CODE';
+      code: string;
     };
 
 export interface GoogleSheetsResult extends ExecFetchResult {}

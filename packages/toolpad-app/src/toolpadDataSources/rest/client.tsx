@@ -263,7 +263,12 @@ function ConnectionParamsInput2({
   return (
     <React.Fragment>
       <DialogContent>
-        <Stack direction="column" sx={{ py: 3 }}>
+        <Stack direction="column" sx={{ gap: 1 }}>
+          <TextField
+            label="name"
+            {...register('name', { required: true })}
+            {...validation(formState, 'name')}
+          />
           <TextField {...baseUrlInputProps} />
           <Typography>Headers:</Typography>
           <Controller

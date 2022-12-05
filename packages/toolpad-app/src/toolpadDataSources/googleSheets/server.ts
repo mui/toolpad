@@ -194,6 +194,20 @@ async function execPrivate(
     }
     return null;
   }
+  if (query.type === 'RECEIVE_CODE') {
+    const { tokens, res: getTokenResponse } = await client.getToken({
+      code: query.code,
+      // See https://stackoverflow.com/a/55222567
+      redirect_uri: 'postmessage',
+    });
+    if (!tokens) {
+      throw new Error(`${getTokenResponse?.status}: ${getTokenResponse?.statusText}`);
+    }
+    if (tokens) {
+      client.setCredentials(tokens);
+      console.log('storing', client.credentials);
+    }
+  }
   if (query.type === 'DEBUG_EXEC') {
     return exec(connection, query.query);
   }

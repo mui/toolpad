@@ -218,7 +218,12 @@ function ConnectionParamsInput2({
   return (
     <React.Fragment>
       <DialogContent>
-        <Stack direction="column" gap={1}>
+        <Stack direction="column" sx={{ gap: 1 }}>
+          <TextField
+            label="name"
+            {...register('name', { required: true })}
+            {...validation(formState, 'name')}
+          />
           <TextField
             label="host"
             {...register('params.host', { required: true })}

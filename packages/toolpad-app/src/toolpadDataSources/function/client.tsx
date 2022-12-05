@@ -123,8 +123,12 @@ function ConnectionParamsInput2({
   return (
     <React.Fragment>
       <DialogContent>
-        <Stack direction="column" gap={3} sx={{ py: 3 }}>
-          <TextField {...register('name', { required: true })} {...validation(formState, 'name')} />
+        <Stack direction="column" sx={{ gap: 1 }}>
+          <TextField
+            label="name"
+            {...register('name', { required: true })}
+            {...validation(formState, 'name')}
+          />
           <Typography>Secrets:</Typography>
           <Controller
             name="params.secrets"

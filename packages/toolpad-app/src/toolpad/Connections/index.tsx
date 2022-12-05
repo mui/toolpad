@@ -60,7 +60,7 @@ import dataSources from '../../toolpadDataSources/client';
 import { ExactEntriesOf } from '../../utils/types';
 import { ConnectionContextProvider } from '../../toolpadDataSources/context';
 
-const USE_DATAGRID = true;
+const USE_DATAGRID = false;
 
 export const APP_TEMPLATE_OPTIONS: Map<
   AppTemplateId,

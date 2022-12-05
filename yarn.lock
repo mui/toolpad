@@ -2845,6 +2845,11 @@
     "@types/minimatch" "*"
     "@types/node" "*"
 
+"@types/google.accounts@^0.0.4":
+  version "0.0.4"
+  resolved "https://registry.yarnpkg.com/@types/google.accounts/-/google.accounts-0.0.4.tgz#e72e7922bb658057e391b1c460fa88dfb292f625"
+  integrity sha512-X42obEgMx+Ptt3RZShgfRNLxGfm9PTLB/zdQkVBYtjnQnbQvTdbU02kZuS6pahp7LA9a5tUxB5vGBnD81SUhjg==
+
 "@types/graceful-fs@^4.1.3":
   version "4.1.5"
   resolved "https://registry.yarnpkg.com/@types/graceful-fs/-/graceful-fs-4.1.5.tgz#21ffba0d98da4350db64891f92a9e5db3cdb4e15"

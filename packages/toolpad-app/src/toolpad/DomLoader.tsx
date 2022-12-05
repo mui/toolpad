@@ -13,9 +13,15 @@ import insecureHash from '../utils/insecureHash';
 import useEvent from '../utils/useEvent';
 import { NodeHashes } from '../types';
 
-export type DomAction =
+type LastEditedViewInfo =
+  | { name: 'explorer' }
+  | { name: 'canvas' }
+  | { name: 'query'; nodeId: NodeId };
+
+export type DomAction = { viewInfo?: LastEditedViewInfo } & (
   | {
       type: 'DOM_UPDATE_HISTORY';
+      lastEditedViewInfo?: LastEditedViewInfo;
     }
   | {
       type: 'DOM_UNDO';
@@ -38,6 +44,7 @@ export type DomAction =
       type: 'DOM_SET_NODE_NAME';
       nodeId: NodeId;
       name: string;
+      viewInfo: LastEditedViewInfo;
     }
   | {
       type: 'DOM_SET_NODE_NAMESPACE';
@@ -49,10 +56,12 @@ export type DomAction =
       type: 'DOM_UPDATE';
       updatedDom: appDom.AppDom;
       selectedNodeId?: NodeId | null;
+      viewInfo: LastEditedViewInfo;
     }
   | {
       type: 'DOM_SAVE_NODE';
       node: appDom.AppDomNode;
+      viewInfo: LastEditedViewInfo;
     }
   | {
       type: 'SELECT_NODE';
@@ -60,7 +69,8 @@ export type DomAction =
     }
   | {
       type: 'DESELECT_NODE';
-    };
+    }
+);
 
 export function domReducer(dom: appDom.AppDom, action: DomAction): appDom.AppDom {
   switch (action.type) {
@@ -100,7 +110,12 @@ export function domLoaderReducer(state: DomLoader, action: DomAction): DomLoader
     case 'DOM_UPDATE_HISTORY': {
       const updatedUndoStack = [
         ...state.undoStack,
-        { dom: state.dom, selectedNodeId: state.selectedNodeId },
+        {
+          dom: state.dom,
+          selectedNodeId: state.selectedNodeId,
+          lastEditedViewInfo: action.lastEditedViewInfo || state.lastEditedViewInfo,
+          timestamp: Date.now(),
+        },
       ];
 
       if (updatedUndoStack.length > UNDO_HISTORY_LIMIT) {
@@ -211,20 +226,22 @@ function createDomApi(
     redo() {
       dispatch({ type: 'DOM_REDO' });
     },
-    setNodeName(nodeId: NodeId, name: string) {
-      dispatch({ type: 'DOM_SET_NODE_NAME', nodeId, name });
+    setNodeName(nodeId: NodeId, name: string, viewInfo: LastEditedViewInfo) {
+      dispatch({ type: 'DOM_SET_NODE_NAME', nodeId, name, viewInfo });
     },
-    update(dom: appDom.AppDom, selectedNodeId?: NodeId | null) {
+    update(dom: appDom.AppDom, viewInfo: LastEditedViewInfo, selectedNodeId?: NodeId | null) {
       dispatch({
         type: 'DOM_UPDATE',
         updatedDom: dom,
         selectedNodeId,
+        viewInfo,
       });
     },
-    saveNode(node: appDom.AppDomNode) {
+    saveNode(node: appDom.AppDomNode, viewInfo: LastEditedViewInfo) {
       dispatch({
         type: 'DOM_SAVE_NODE',
         node,
+        viewInfo,
       });
     },
     setNodeNamespace<Node extends appDom.AppDomNode, Namespace extends appDom.PropNamespaces<Node>>(
@@ -253,6 +270,10 @@ function createDomApi(
   };
 }
 
+interface UndoRedoStackEntry extends DomState {
+  timestamp: number;
+}
+
 export interface DomLoader {
   dom: appDom.AppDom;
   savedDom: appDom.AppDom;
@@ -260,8 +281,9 @@ export interface DomLoader {
   unsavedChanges: number;
   saveError: string | null;
   selectedNodeId: NodeId | null;
-  undoStack: DomState[];
-  redoStack: DomState[];
+  lastEditedViewInfo: LastEditedViewInfo | null;
+  undoStack: UndoRedoStackEntry[];
+  redoStack: UndoRedoStackEntry[];
 }
 
 export function getNodeHashes(dom: appDom.AppDom): NodeHashes {
@@ -331,15 +353,16 @@ export default function DomProvider({ appId, children }: DomContextProps) {
     savedDom: dom,
     dom,
     selectedNodeId: null,
-    undoStack: [{ dom, selectedNodeId: null }],
+    lastEditedViewInfo: null,
+    undoStack: [{ dom, selectedNodeId: null, timestamp: Date.now() }],
     redoStack: [],
   });
 
   const scheduleHistoryUpdate = React.useMemo(
     () =>
       throttle(
-        () => {
-          dispatch({ type: 'DOM_UPDATE_HISTORY' });
+        (lastEditedViewInfo?: LastEditedViewInfo) => {
+          dispatch({ type: 'DOM_UPDATE_HISTORY', lastEditedViewInfo });
         },
         500,
         { leading: false, trailing: true },
@@ -351,7 +374,7 @@ export default function DomProvider({ appId, children }: DomContextProps) {
     dispatch(action);
 
     if (!SKIP_UNDO_ACTIONS.has(action.type)) {
-      dispatch({ type: 'DOM_UPDATE_HISTORY' });
+      scheduleHistoryUpdate(action?.viewInfo);
     }
   });
 

@@ -17,6 +17,7 @@ import { UseQueryResult } from '@tanstack/react-query';
 import { getObjectKey } from '@mui/toolpad-core/objectKey';
 import mitt from 'mitt';
 import invariant from 'invariant';
+import { useForm } from 'react-hook-form';
 import {
   ClientDataSource,
   ConnectionEditorProps,
@@ -44,6 +45,7 @@ import useFetchPrivate from '../useFetchPrivate';
 import * as appDom from '../../appDom';
 import config from '../../config';
 import { errorFrom } from '../../utils/errors';
+import { validation } from '../../utils/forms';
 
 const EMPTY_ROWS: any[] = [];
 
@@ -286,14 +288,23 @@ function useGsi() {
 function ConnectionParamsInput2({
   value,
   onChange,
-  handlerBasePath,
   onClose,
 }: ConnectionEditorProps2<GoogleSheetsConnectionParams>) {
-  const validatedUser: UseQueryResult<GoogleDriveUser> = usePrivateQuery(
+  const { handleSubmit, register, formState, reset, setValue } = useForm({
+    defaultValues: value,
+    reValidateMode: 'onChange',
+    mode: 'all',
+  });
+  React.useEffect(() => reset(value), [reset, value]);
+
+  const doSubmit = handleSubmit((connectionParams) => onChange(connectionParams));
+
+  const validatedUser: UseQueryResult<GoogleDriveUser> = usePrivateQuery2(
     {
-      type: 'CONNECTION_STATUS',
+      type: 'GLOBAL_CONNECTION_STATUS',
+      value,
     },
-    { retry: false, enabled: false },
+    { globalConnection: true, retry: false, enabled: false },
   );
 
   const [error, setError] = React.useState<string | null>(null);
@@ -323,8 +334,8 @@ function ConnectionParamsInput2({
         }
         setLoading(true);
         try {
-          await fetchPrivate({ type: 'RECEIVE_CODE', code: response.code });
-          validatedUser.refetch();
+          const { tokens } = await fetchPrivate({ type: 'RECEIVE_CODE', code: response.code });
+          setValue('secrets.tokens', { kind: 'set', value: JSON.stringify(tokens) });
         } catch (rawError: unknown) {
           setError(errorFrom(rawError).message);
         } finally {
@@ -336,16 +347,21 @@ function ConnectionParamsInput2({
       },
     });
     client.requestCode();
-  }, [fetchPrivate, google, validatedUser]);
+  }, [fetchPrivate, google, setValue]);
 
   console.log(validatedUser);
 
   return (
     <React.Fragment>
       <DialogContent>
+        <TextField
+          label="name"
+          {...register('name', { required: true })}
+          {...validation(formState, 'name')}
+        />
         <Stack direction="column" sx={{ gap: 1 }}>
           <Button
-            disabled={Boolean(validatedUser.data || !google || !config.googleSheetsClientId)}
+            disabled={!google || !config.googleSheetsClientId}
             variant="outlined"
             onClick={handleAuthClick}
           >
@@ -359,6 +375,9 @@ function ConnectionParamsInput2({
             Cancel
           </Button>
         ) : null}
+        <Button type="submit" onClick={doSubmit} disabled={!formState.isValid}>
+          Save
+        </Button>
       </DialogActions>
     </React.Fragment>
   );

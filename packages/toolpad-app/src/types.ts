@@ -96,6 +96,11 @@ export type SecretsAction =
 
 export type SecretsActions = Record<string, SecretsAction>;
 
+export interface GlobalConnectionContext {
+  dataSourceId: string;
+  connectionId: string | null;
+}
+
 export interface ConnectionEditorModel<P> {
   name: string;
   params: P | null;
@@ -148,6 +153,8 @@ export interface RuntimeDataSource<Q = {}, R extends ExecFetchResult = ExecFetch
 export interface ServerDataSource<P = {}, Q = {}, PQ = {}, D = {}> {
   // Execute a private query on this connection, intended for editors only
   execPrivate?: (connection: Maybe<P>, query: PQ) => Promise<any>;
+  // New version of execPrivate for global connections
+  execPrivate2?: (connection: Maybe<P>, query: PQ) => Promise<any>;
   // Execute a query on this connection, intended for viewers
   exec: (connection: Maybe<P>, query: Q, params: any) => Promise<ExecFetchResult<D>>;
   createHandler?: () => (

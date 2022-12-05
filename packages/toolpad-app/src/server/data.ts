@@ -7,6 +7,7 @@ import {
   AppTemplateId,
   RuntimeState,
   SecretsActions,
+  GlobalConnectionContext,
 } from '../types';
 import serverDataSources from '../toolpadDataSources/server';
 import * as appDom from '../appDom';
@@ -527,6 +528,28 @@ export async function dataSourceFetchPrivate<P, Q>(
   return dataSource.execPrivate(connectionParams, query);
 }
 
+export async function dataSourceFetchPrivate2<P, Q>(
+  context: GlobalConnectionContext,
+  query: Q,
+): Promise<any> {
+  const dataSource: ServerDataSource<P, Q, any> | undefined =
+    serverDataSources[context.dataSourceId];
+
+  if (!dataSource) {
+    throw new Error(`Unknown dataSource "${context.dataSourceId}"`);
+  }
+
+  if (!dataSource.execPrivate2) {
+    throw new Error(`No execPrivate2 available on datasource "${context.dataSourceId}"`);
+  }
+
+  const connectionParams: P | null = connectionId
+    ? await getConnectionParams<P>(appId, connectionId)
+    : null;
+
+  return dataSource.execPrivate(connectionParams, query);
+}
+
 export function parseVersion(param?: string | string[]): VersionOrPreview | null {
   if (!param) {
     return null;
@@ -677,17 +700,27 @@ export interface UpdateConnectionOptions {
 
 export async function updateConnection(
   id: string,
-  { name, params, secrets }: UpdateConnectionOptions,
+  { name, params, secrets }: Partial<UpdateConnectionOptions>,
 ) {
-  const existing = await prismaClient.connection.findUniqueOrThrow({ where: { id } });
-  const existingSecrets = deserializeConnectionSerets(existing.secrets);
+  const updates: Partial<prisma.Prisma.ConnectionUpdateArgs['data']> = {};
+
+  if (name) {
+    updates.name = name;
+  }
+
+  if (params) {
+    updates.params = params;
+  }
+
+  if (secrets) {
+    const existing = await prismaClient.connection.findUniqueOrThrow({ where: { id } });
+    const existingSecrets = deserializeConnectionSerets(existing.secrets);
+    updates.secrets = serializeConnectionSerets(updateSecrets(existingSecrets, secrets));
+  }
+
   await prismaClient.connection.update({
     where: { id },
-    data: {
-      name,
-      params,
-      secrets: serializeConnectionSerets(updateSecrets(existingSecrets, secrets)),
-    },
+    data: updates,
     select: SELECT_CONNECTION_META,
   });
 }

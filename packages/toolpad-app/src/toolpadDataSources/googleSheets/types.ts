@@ -1,6 +1,7 @@
 import { sheets_v4 } from '@googleapis/sheets';
 import { drive_v3 } from '@googleapis/drive';
 import { ExecFetchResult } from '@mui/toolpad-core';
+import { ConnectionEditorModel } from '../../types';
 
 export type GoogleSheetsConnectionParams = {
   refresh_token?: string | null;
@@ -66,6 +67,10 @@ export type GoogleSheetsPrivateQuery =
   | {
       type: 'RECEIVE_CODE';
       code: string;
+    }
+  | {
+      type: 'GLOBAL_CONNECTION_STATUS';
+      value: ConnectionEditorModel<GoogleSheetsApiQuery>;
     };
 
 export interface GoogleSheetsResult extends ExecFetchResult {}

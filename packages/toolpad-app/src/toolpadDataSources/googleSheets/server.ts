@@ -203,10 +203,10 @@ async function execPrivate(
     if (!tokens) {
       throw new Error(`${getTokenResponse?.status}: ${getTokenResponse?.statusText}`);
     }
-    if (tokens) {
-      client.setCredentials(tokens);
-      console.log('storing', client.credentials);
-    }
+    return { tokens };
+  }
+  if (query.type === 'GLOBAL_CONNECTION_STATUS') {
+    return { tokens };
   }
   if (query.type === 'DEBUG_EXEC') {
     return exec(connection, query.query);

@@ -247,21 +247,17 @@ function CreateConnectionDialog<P>({ state, dispatch, ...props }: CreateConnecti
         if (state.dataSourceId) {
           const dataSource = state.dataSourceId ? getDataSource<P>(state.dataSourceId) : null;
 
-          const connectionEditorContext = { appId: null, dataSourceId, connectionId: null };
-
           return (
             <React.Fragment>
               <DialogTitle>Create a new Connection</DialogTitle>
 
               {dataSource ? (
-                <ConnectionContextProvider value={connectionEditorContext}>
-                  <ConnectionParamsEditor<P>
-                    dataSource={dataSource}
-                    value={state}
-                    onChange={handleSave}
-                    onClose={handleClose}
-                  />
-                </ConnectionContextProvider>
+                <ConnectionParamsEditor<P>
+                  dataSource={dataSource}
+                  value={state}
+                  onChange={handleSave}
+                  onClose={handleClose}
+                />
               ) : (
                 <DialogContent>
                   Unknown data source type &quot;{state.dataSourceId}&quot;

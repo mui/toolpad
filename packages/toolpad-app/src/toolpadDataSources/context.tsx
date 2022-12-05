@@ -14,6 +14,11 @@ const [useConnectionContext, ConnectionContextProvider] =
 
 export { useConnectionContext, ConnectionContextProvider };
 
+const [useGlobalConnectionContext, GlobalConnectionContextProvider] =
+  createProvidedContext<GlobalConnectionContext>('GlobalConnectionContext');
+
+export { useGlobalConnectionContext, GlobalConnectionContextProvider };
+
 export function usePrivateQuery<Q = unknown, R = unknown>(
   query: Q | null,
   options?: UseQueryFnOptions<any>,
@@ -22,6 +27,18 @@ export function usePrivateQuery<Q = unknown, R = unknown>(
   return client.useQuery(
     'dataSourceFetchPrivate',
     query == null ? null : [appId, dataSourceId, connectionId, query],
+    options,
+  );
+}
+
+export function useGobalConnectionPrivateQuery<Q = unknown, R = unknown>(
+  query: Q | null,
+  options?: UseQueryFnOptions<any> & { connectionId: boolean },
+): UseQueryResult<R> {
+  const { dataSourceId, connectionId } = useConnectionContext();
+  return client.useQuery(
+    'dataSourceFetchPrivate',
+    query == null ? null : [dataSourceId, connectionId, query],
     options,
   );
 }

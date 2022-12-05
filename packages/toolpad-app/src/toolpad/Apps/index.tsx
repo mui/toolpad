@@ -68,13 +68,6 @@ export const APP_TEMPLATE_OPTIONS: Map<
     },
   ],
   [
-    'stats',
-    {
-      label: 'Statistics',
-      description: 'Table with statistics data',
-    },
-  ],
-  [
     'images',
     {
       label: 'Images',

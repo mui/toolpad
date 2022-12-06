@@ -39,12 +39,7 @@ export default createComponent(Autocomplete, {
     value: {
       typeDef: { type: 'string' },
       onChangeProp: 'onChange',
-      onChangeHandler: (event: React.SyntheticEvent, value: AutocompleteOption) => {
-        if (typeof value === 'string') {
-          return value;
-        }
-        return value?.label ?? JSON.stringify(typeof value);
-      },
+      defaultValue: '',
     },
     size: {
       typeDef: { type: 'string', enum: ['small', 'medium', 'large'] },

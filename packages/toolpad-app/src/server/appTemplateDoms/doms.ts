@@ -16,6 +16,7 @@ const APP_TEMPLATE_DOM_PATHS: Record<AppTemplateId, string | null> = {
     // @TODO: Remove demo template once demo supports server-side queries
     config.isDemo ? './images-demo.json' : './images.json',
   ),
+  default: path.resolve(projectRoot, DOMS_DIR_PATH, './default.json'),
 };
 
 export async function getAppTemplateDom(

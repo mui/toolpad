@@ -7,7 +7,7 @@
 To learn more about our plans for Toolpad, visit the [public roadmap](https://github.com/orgs/mui/projects/9).
 
 :::warning
-We operate in a dynamic environment,so things are subject to change.
+We operate in a dynamic environment, so things are subject to change.
 The information provided is intended to outline the general direction, but is for informational purposes only.
 
 We may decide to add or remove items at any time, depending on our capability to deliver, while meeting our quality standards.

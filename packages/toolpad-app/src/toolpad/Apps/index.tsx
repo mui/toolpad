@@ -31,6 +31,7 @@ import {
 import LoadingButton from '@mui/lab/LoadingButton';
 import ViewListIcon from '@mui/icons-material/ViewList';
 import GridViewIcon from '@mui/icons-material/GridView';
+import Search from '@mui/icons-material/SearchOutlined';
 import invariant from 'invariant';
 import { Link } from 'react-router-dom';
 import client from '../../api';
@@ -38,7 +39,6 @@ import DialogForm from '../../components/DialogForm';
 import type { Deployment } from '../../../prisma/generated/client';
 import ToolpadHomeShell from '../ToolpadHomeShell';
 import getReadableDuration from '../../utils/readableDuration';
-import useSearch from '../../utils/useSearch';
 import type { AppMeta } from '../../server/data';
 import useLocalStorageState from '../../utils/useLocalStorageState';
 import ErrorAlert from '../AppEditor/PageEditor/ErrorAlert';
@@ -620,7 +620,17 @@ export default function Home() {
 
   const AppsView = viewMode === 'list' ? AppsListView : AppsGridView;
 
-  const [AppsSearchField, filteredApps] = useSearch<AppMeta>(apps, 'Search apps');
+  const [searchText, setSearchText] = React.useState('');
+
+  const handleSearchInput = React.useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchText(event.target.value);
+  }, []);
+
+  const filteredApps = React.useMemo(() => {
+    return apps.filter((element: any) =>
+      element.name.toLowerCase().includes(searchText.toLowerCase()),
+    );
+  }, [apps, searchText]);
 
   return config.isDemo ? (
     <DemoPage />
@@ -632,7 +642,16 @@ export default function Home() {
             Apps
           </Typography>
           <FlexFill />
-          {AppsSearchField}
+          <TextField
+            sx={{ py: 0 }}
+            key={'search'}
+            InputProps={{
+              startAdornment: <Search />,
+            }}
+            placeholder={'Search apps'}
+            value={searchText}
+            onChange={handleSearchInput}
+          />
           <Button variant="contained" onClick={() => setCreateDialogOpen(true)}>
             Create New
           </Button>
@@ -661,7 +680,7 @@ export default function Home() {
         {error ? (
           <ErrorAlert error={error} />
         ) : (
-          <Box sx={{ flex: 1, overflow: 'auto', px: 5 }}>
+          <Box sx={{ flex: 1, overflow: 'auto', px: 5, scrollbarGutter: 'stable' }}>
             <AppsView
               apps={filteredApps}
               loading={isLoading}

@@ -10,12 +10,6 @@ const DOMS_DIR_PATH = './src/server/appTemplateDoms';
 
 const APP_TEMPLATE_DOM_PATHS: Record<AppTemplateId, string | null> = {
   blank: null,
-  stats: path.resolve(
-    projectRoot,
-    DOMS_DIR_PATH,
-    // @TODO: Remove demo template once demo supports server-side queries
-    config.isDemo ? './statistics-demo.json' : './statistics.json',
-  ),
   images: path.resolve(
     projectRoot,
     DOMS_DIR_PATH,

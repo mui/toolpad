@@ -164,7 +164,7 @@ export interface AppTheme {
 
 export type VersionOrPreview = 'preview' | number;
 
-export type AppTemplateId = 'default' | 'blank' | 'stats' | 'images';
+export type AppTemplateId = 'default' | 'blank' | 'images';
 
 export type NodeHashes = Record<NodeId, number | undefined>;
 

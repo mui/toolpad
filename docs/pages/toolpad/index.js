@@ -14,7 +14,7 @@ import Banner from '../../src/components/landing/Banner';
 import Pricing from '../../src/components/landing/PricingTable';
 import Marquee from '../../src/components/landing/Marquee';
 import features from '../../src/content/features';
-import upvote from '../../src/content/upvote';
+import { action, category, title, description, href, label } from '../../src/content/upvote';
 import useCases from '../../src/content/useCases';
 import marquee from '../../src/content/marquee';
 import {
@@ -44,7 +44,15 @@ export default function Home() {
         <ToolpadHero />
         <DemoVideo />
         <CardGrid content={features} />
-        <Banner content={upvote} />
+        <Banner
+          action={action}
+          category={category}
+          title={title}
+          description={description}
+          href={href}
+          label={label}
+          docs={false}
+        />
         <CardGrid content={useCases} darker />
         <Pricing
           Headline={Headline}

@@ -43,7 +43,7 @@ interface FileEditorProps {
 }
 
 function FileEditor({ appId }: FileEditorProps) {
-  const dom = useDom();
+  const { dom } = useDom();
   const app = appDom.getApp(dom);
   const { pages = [] } = appDom.getChildNodes(dom, app);
 

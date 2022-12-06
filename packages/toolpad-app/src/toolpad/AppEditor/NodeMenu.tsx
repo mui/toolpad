@@ -26,7 +26,7 @@ export default function NodeMenu({
   onDeleteNode,
   onDuplicateNode,
 }: NodeMenuProps) {
-  const dom = useDom();
+  const { dom } = useDom();
 
   const { menuProps, buttonProps, onMenuClose } = useMenu();
 

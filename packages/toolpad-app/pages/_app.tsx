@@ -14,6 +14,7 @@ import { MUI_X_PRO_LICENSE } from '../src/constants';
 import { queryClient } from '../src/api';
 import { reportWebVitalsToGA, setGAPage } from '../src/utils/ga';
 import '../src/appStyles.css';
+import 'perf-cascade/dist/perf-cascade.css';
 
 import appleTouchIcon from '../public/apple-touch-icon.png';
 import favicon32 from '../public/favicon-32x32.png';
@@ -66,11 +67,11 @@ export default function MyApp(props: MyAppProps) {
         </QueryClientProvider>
       </CacheProvider>
       {/* Google reCAPTCHA */}
-      {config.recaptchaSiteKey ? (
+      {config.recaptchaV3SiteKey ? (
         <Script
           async
           strategy="afterInteractive"
-          src={`https://www.google.com/recaptcha/api.js?render=${config.recaptchaSiteKey}`}
+          src={`https://www.google.com/recaptcha/api.js?render=${config.recaptchaV3SiteKey}`}
         />
       ) : null}
     </React.Fragment>

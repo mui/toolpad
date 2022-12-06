@@ -1,8 +1,23 @@
 import * as React from 'react';
-import { Box, Button, Skeleton, Stack, Toolbar, Typography } from '@mui/material';
+import {
+  Box,
+  Button,
+  Checkbox,
+  FormControlLabel,
+  FormGroup,
+  Skeleton,
+  Stack,
+  Toolbar,
+  Typography,
+} from '@mui/material';
 import { Controller, useForm } from 'react-hook-form';
 import { BindableAttrEntries, BindableAttrValue } from '@mui/toolpad-core';
-import { ClientDataSource, ConnectionEditorProps, QueryEditorProps } from '../../types';
+import {
+  ClientDataSource,
+  ConnectionEditorProps,
+  ExecFetchFn,
+  QueryEditorProps,
+} from '../../types';
 import {
   FunctionConnectionParams,
   FunctionPrivateQuery,
@@ -29,6 +44,8 @@ import { tryFormat } from '../../utils/prettier';
 import useFetchPrivate from '../useFetchPrivate';
 import { MOVIES_API_DEMO_URL } from '../demo';
 import * as appDom from '../../appDom';
+import { clientExec } from './runtime';
+import config from '../../config';
 
 const EVENT_INTERFACE_IDENTIFIER = 'ToolpadFunctionEvent';
 
@@ -117,6 +134,13 @@ function QueryEditor({
     [setInput],
   );
 
+  const handleRunInBrowserChange = React.useCallback(
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      setInput((existing) => appDom.setQueryProp(existing, 'browser', event.target.checked));
+    },
+    [setInput],
+  );
+
   const paramsEditorLiveValue = useEvaluateLiveBindingEntries({
     input: paramsEntries,
     globalScope,
@@ -134,10 +158,13 @@ function QueryEditor({
     [fetchPrivate],
   );
 
+  const fetchPreview: ExecFetchFn<FunctionQuery, FunctionResult> = (query, params) =>
+    clientExec(query, params, fetchServerPreview);
+
   const [previewLogs, setPreviewLogs] = React.useState<LogEntry[]>([]);
   const [previewHar, setPreviewHar] = React.useState(() => createHarLog());
   const { preview, runPreview: handleRunPreview } = useQueryPreview(
-    fetchServerPreview,
+    fetchPreview,
     input.attributes.query.value,
     previewParams,
     {
@@ -182,10 +209,28 @@ function QueryEditor({
   const handleCommit = React.useCallback(() => onCommit?.(), [onCommit]);
   useShortcut({ key: 's', metaKey: true }, handleCommit);
 
+  const isBrowserSide = input.attributes.query.value.browser;
+
   return (
     <SplitPane split="vertical" size="50%" allowResize>
       <SplitPane split="horizontal" size={85} primary="second" allowResize>
-        <QueryInputPanel onRunPreview={handleRunPreview}>
+        <QueryInputPanel
+          onRunPreview={handleRunPreview}
+          actions={
+            <FormGroup>
+              <FormControlLabel
+                control={
+                  <Checkbox
+                    checked={isBrowserSide}
+                    onChange={handleRunInBrowserChange}
+                    disabled={config.isDemo}
+                  />
+                }
+                label="Run in the browser"
+              />
+            </FormGroup>
+          }
+        >
           <Box sx={{ flex: 1, minHeight: 0 }}>
             <TypescriptEditor
               value={input.attributes.query.value.module}
@@ -228,7 +273,7 @@ function QueryEditor({
 }
 
 function getInitialQueryValue(): FunctionQuery {
-  return { module: DEFAULT_MODULE };
+  return { module: DEFAULT_MODULE, browser: config.isDemo };
 }
 
 const dataSource: ClientDataSource<FunctionConnectionParams, FunctionQuery> = {

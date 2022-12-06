@@ -1,5 +1,57 @@
 # Changelog
 
+## 0.0.29
+
+<!-- generated comparing v0.0.28..master -->
+
+_Nov 30, 2022_
+
+A big thanks to the 4 contributors who made this release possible. Here are some highlights ✨:
+
+Improved query options in demo, fixed time property in HAR, unified app editor options menus
+
+- &#8203;<!-- 7 -->Undo redo tests (#1308) @bytasv
+- &#8203;<!-- 6 -->Hide connections tree in demo (#1393) @apedroferreira
+- &#8203;<!-- 5 -->Create apps programmatically in integration tests (#1384) @Janpot
+- &#8203;<!-- 4 -->Set connection/query available options in demo (#1323) @apedroferreira
+- &#8203;<!-- 3 -->Add some tips about writing highlights in release docs (#1352) @Janpot
+- &#8203;<!-- 2 -->Fix time property in HAR (#1383) @Janpot
+- &#8203;<!-- 1 -->Unify app editor options menus (#1286) @bharatkashyap
+
+All contributors of this release in alphabetical order: @apedroferreira, @bharatkashyap, @bytasv, @Janpot
+
+## 0.0.28
+
+<!-- generated comparing v0.0.27..master -->
+
+_Nov 23, 2022_
+
+A big thanks to the 4 contributors who made this release possible. Here are some highlights ✨:
+
+Client-side functions, migration fixes, add sidebar to overview page, support visual captcha as fallback, add "alpha" label to app and landing page, automatic app names in demo.
+
+- &#8203;<!-- 19 -->Fix landing page hydration issue (#1375) @bharatkashyap
+- &#8203;<!-- 18 -->Update demo bar copy (#1371) @apedroferreira
+- &#8203;<!-- 17 -->Fix overflow for explorer (#1372) @Janpot
+- &#8203;<!-- 16 -->Add "alpha" label to app and landing page hero (#1356) @bharatkashyap
+- &#8203;<!-- 15 -->Add missing sucrase helper (#1360) @Janpot
+- &#8203;<!-- 14 -->Remove demo docker (#1369) @apedroferreira
+- &#8203;<!-- 13 -->Remove demo configuration from render.yaml (#1368) @apedroferreira
+- &#8203;<!-- 12 -->Move typescript to devDependencies (#1366) @Janpot
+- &#8203;<!-- 11 -->Remove sentry debug option (#1361) @Janpot
+- &#8203;<!-- 10 -->Fix yarn.lock @Janpot
+- &#8203;<!-- 09 -->Upgrade eslint (#1287) @Janpot
+- &#8203;<!-- 08 -->Fallback to visible captcha if invisible captcha fails (#1272) @apedroferreira
+- &#8203;<!-- 07 -->Refactor overview page (#1357) @Janpot
+- &#8203;<!-- 06 -->Fix migration to v3 (#1359) @Janpot
+- &#8203;<!-- 05 -->Run functions client side (#1325) @Janpot
+- &#8203;<!-- 04 -->Show IP address in log messages (#1350) @apedroferreira
+- &#8203;<!-- 03 -->Fix prettier script in CI (#1355) @Janpot
+- &#8203;<!-- 02 -->Automatic app names in demo (#1351) @apedroferreira
+- &#8203;<!-- 01 -->[core] Group renovate GitHub Action dependency updates (#1341) @oliviertassinari
+
+All contributors of this release in alphabetical order: @apedroferreira, @bharatkashyap, @Janpot, @oliviertassinari
+
 ## 0.0.27
 
 <!-- generated comparing v0.0.26..master -->

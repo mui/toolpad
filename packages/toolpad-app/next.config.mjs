@@ -3,6 +3,11 @@ import * as path from 'path';
 import { withSentryConfig } from '@sentry/nextjs';
 import createBundleAnalyzer from '@next/bundle-analyzer';
 
+// Flag to be used to experiment with using experimental.transpilePackages to
+// compile monaco-editor CSS
+// Current blocker: https://github.com/vercel/next.js/issues/43125
+const USE_EXPERIMENTAL_TRANSPILE_PACKAGES = false;
+
 const withBundleAnalyzer = createBundleAnalyzer({ enabled: !!process.env.ANALYZE });
 
 // TODO: remove when https://github.com/getsentry/sentry-javascript/issues/3852 gets resolved
@@ -85,6 +90,7 @@ const securityHeaders = [
   },
 ];
 
+/** @type {Partial<import('@sentry/nextjs').SentryWebpackPluginOptions>} */
 const sentryWebpackPluginOptions = {
   // Additional config options for the Sentry Webpack plugin. Keep in mind that
   // the following options are set automatically, and overriding them is not
@@ -101,9 +107,12 @@ const sentryWebpackPluginOptions = {
 
 const NEVER = () => false;
 
-export default withBundleAnalyzer(
-  withSentryConfig(
-    /** @type {import('next').NextConfig} */ ({
+export default withSentryConfig(
+  withBundleAnalyzer(
+    /** @type {import('next').NextConfig & { sentry: import('@sentry/nextjs/types/config/types').UserSentryOptions }} */ ({
+      experimental: {
+        transpilePackages: USE_EXPERIMENTAL_TRANSPILE_PACKAGES ? ['monaco-editor'] : undefined,
+      },
       reactStrictMode: true,
       poweredByHeader: false,
       productionBrowserSourceMaps: true,
@@ -129,7 +138,7 @@ export default withBundleAnalyzer(
           path: false,
         };
 
-        {
+        if (!USE_EXPERIMENTAL_TRANSPILE_PACKAGES) {
           // Support global CSS in monaco-editor
           // Adapted from next-transpile-modules.
           const extraCssIssuer = /(\/|\\)node_modules(\/|\\)monaco-editor(\/|\\).*\.js$/;
@@ -211,6 +220,6 @@ export default withBundleAnalyzer(
         ];
       },
     }),
-    sentryWebpackPluginOptions,
   ),
+  sentryWebpackPluginOptions,
 );

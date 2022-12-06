@@ -1,15 +1,15 @@
-import { test, expect } from '@playwright/test';
-import { ToolpadHome } from '../../models/ToolpadHome';
+import * as path from 'path';
+import { test, expect } from '../../playwright/test';
 import { ToolpadEditor } from '../../models/ToolpadEditor';
 import clickCenter from '../../utils/clickCenter';
-import domInput from './domInput.json';
+import generateId from '../../utils/generateId';
+import { readJsonFile } from '../../utils/fs';
 
-test('can place new components from catalog', async ({ page, browserName }) => {
-  const homeModel = new ToolpadHome(page);
+test('can place new components from catalog', async ({ page, browserName, api }) => {
+  const app = await api.mutation.createApp(`App ${generateId()}`);
+
   const editorModel = new ToolpadEditor(page, browserName);
 
-  await homeModel.goto();
-  const app = await homeModel.createApplication({});
   await editorModel.goto(app.id);
 
   await editorModel.pageRoot.waitFor();
@@ -34,16 +34,19 @@ test('can place new components from catalog', async ({ page, browserName }) => {
   await expect(canvasInputLocator).toHaveCount(2);
 });
 
-test('can move elements in page', async ({ page, browserName }) => {
-  const homeModel = new ToolpadHome(page);
+test('can move elements in page', async ({ page, browserName, api }) => {
   const editorModel = new ToolpadEditor(page, browserName);
   const TEXT_FIELD_COMPONENT_DISPLAY_NAME = 'Text field';
 
-  await homeModel.goto();
-  const app = await homeModel.createApplication({ dom: domInput });
+  const dom = await readJsonFile(path.resolve(__dirname, './domInput.json'));
+
+  const app = await api.mutation.createApp(`App ${generateId()}`, {
+    from: { kind: 'dom', dom },
+  });
+
   await editorModel.goto(app.id);
 
-  await editorModel.pageRoot.waitFor();
+  await editorModel.waitForOverlay();
 
   const canvasMoveElementHandleSelector = `:has-text("${TEXT_FIELD_COMPONENT_DISPLAY_NAME}")[draggable]`;
 
@@ -87,15 +90,18 @@ test('can move elements in page', async ({ page, browserName }) => {
   await expect(secondTextFieldLocator).toHaveAttribute('value', 'textField1');
 });
 
-test('can delete elements from page', async ({ page, browserName }) => {
-  const homeModel = new ToolpadHome(page);
+test('can delete elements from page', async ({ page, browserName, api }) => {
   const editorModel = new ToolpadEditor(page, browserName);
 
-  await homeModel.goto();
-  const app = await homeModel.createApplication({ dom: domInput });
+  const dom = await readJsonFile(path.resolve(__dirname, './domInput.json'));
+
+  const app = await api.mutation.createApp(`App ${generateId()}`, {
+    from: { kind: 'dom', dom },
+  });
+
   await editorModel.goto(app.id);
 
-  await editorModel.pageRoot.waitFor();
+  await editorModel.waitForOverlay();
 
   const canvasInputLocator = editorModel.appCanvas.locator('input');
   const canvasRemoveElementButtonLocator = editorModel.appCanvas.locator(
@@ -123,12 +129,10 @@ test('can delete elements from page', async ({ page, browserName }) => {
   await expect(canvasInputLocator).toHaveCount(0);
 });
 
-test('can create new component', async ({ page, browserName }) => {
-  const homeModel = new ToolpadHome(page);
-  const editorModel = new ToolpadEditor(page, browserName);
+test('can create new component', async ({ page, browserName, api }) => {
+  const app = await api.mutation.createApp(`App ${generateId()}`);
 
-  await homeModel.goto();
-  const app = await homeModel.createApplication({});
+  const editorModel = new ToolpadEditor(page, browserName);
 
   await editorModel.goto(app.id);
 

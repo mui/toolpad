@@ -136,7 +136,7 @@ function SignUp({ sx }) {
           disabled={form.status === 'loading'}
           type="submit"
           size="large"
-          variant="contained"
+          variant="outlined"
           endIcon={<KeyboardArrowRightRounded />}
           sx={{ width: { xs: '100%', sm: 'auto' } }}
         >

@@ -11,11 +11,11 @@ import { ConnectionContextProvider } from '../../../toolpadDataSources/context';
 import NodeNameEditor from '../NodeNameEditor';
 import NotFoundEditor from '../NotFoundEditor';
 
-interface ConnectionParamsEditorProps<P> extends ConnectionEditorProps<P> {
+interface ConnectionParamsEditorProps<P extends object> extends ConnectionEditorProps<P> {
   dataSource: ClientDataSource<P, any>;
 }
 
-function ConnectionParamsEditor<P>({
+function ConnectionParamsEditor<P extends object>({
   dataSource,
   value,
   onChange,
@@ -44,7 +44,7 @@ interface ConnectionEditorContentProps<P> {
   connectionNode: appDom.ConnectionNode<P>;
 }
 
-function ConnectionEditorContent<P>({
+function ConnectionEditorContent<P extends object>({
   appId,
   className,
   connectionNode,
@@ -106,7 +106,11 @@ export default function ConnectionEditor({ appId }: ConnectionProps) {
   const { nodeId } = useParams();
   const connectionNode = appDom.getMaybeNode(dom, nodeId as NodeId, 'connection');
   return connectionNode ? (
-    <ConnectionEditorContent appId={appId} key={nodeId} connectionNode={connectionNode} />
+    <ConnectionEditorContent
+      appId={appId}
+      key={nodeId}
+      connectionNode={connectionNode as appDom.ConnectionNode<object>}
+    />
   ) : (
     <NotFoundEditor message={`Non-existing Connection "${nodeId}"`} />
   );

@@ -3,6 +3,7 @@ import {
   Alert,
   Box,
   Button,
+  ButtonGroup,
   Dialog,
   DialogActions,
   DialogContent,
@@ -16,6 +17,7 @@ import CloudDoneIcon from '@mui/icons-material/CloudDone';
 import SyncIcon from '@mui/icons-material/Sync';
 import SyncProblemIcon from '@mui/icons-material/SyncProblem';
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
+import PreviewIcon from '@mui/icons-material/Preview';
 import RocketLaunchIcon from '@mui/icons-material/RocketLaunch';
 
 import * as React from 'react';
@@ -138,12 +140,15 @@ export interface ToolpadShellProps {
 
 export default function AppEditorShell({ appId, ...props }: ToolpadShellProps) {
   const domLoader = useDomLoader();
+  const releases = client.useQuery('findLastRelease', [appId]);
 
   const {
     value: createReleaseDialogOpen,
     setTrue: handleCreateReleaseDialogOpen,
     setFalse: handleCreateReleaseDialogClose,
   } = useBoolean(false);
+
+  const isDeployed = Boolean(releases?.data);
 
   return (
     <ToolpadShell
@@ -159,14 +164,48 @@ export default function AppEditorShell({ appId, ...props }: ToolpadShellProps) {
           >
             Preview
           </Button>
-          <Button
-            variant="outlined"
-            endIcon={<RocketLaunchIcon />}
-            color="primary"
-            onClick={handleCreateReleaseDialogOpen}
-          >
-            Deploy
-          </Button>
+          <ButtonGroup>
+            <Button
+              variant="outlined"
+              endIcon={!isDeployed ? <RocketLaunchIcon /> : null}
+              size="small"
+              color="primary"
+              onClick={handleCreateReleaseDialogOpen}
+              sx={
+                isDeployed
+                  ? {
+                      // Workaround for https://github.com/mui/material-ui/issues/31210
+                      borderTopRightRadius: 0,
+                      borderBottomRightRadius: 0,
+                    }
+                  : {}
+              }
+            >
+              Deploy
+            </Button>
+            {isDeployed ? (
+              <Button
+                size="small"
+                component="a"
+                href={`/deploy/${appId}`}
+                target="_blank"
+                sx={
+                  isDeployed
+                    ? {
+                        // Workaround for https://github.com/mui/material-ui/issues/31210
+                        borderTopLeftRadius: 0,
+                        borderBottomLeftRadius: 0,
+                        marginLeft: '-1px',
+                      }
+                    : {}
+                }
+              >
+                <Tooltip title="Preview latest deployed version">
+                  <PreviewIcon />
+                </Tooltip>
+              </Button>
+            ) : null}
+          </ButtonGroup>
         </Stack>
       }
       status={getSaveState(domLoader)}

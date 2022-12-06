@@ -26,7 +26,7 @@ import { useEvaluateLiveBindingEntries } from '../../toolpad/AppEditor/useEvalua
 import {
   ClientDataSource,
   ConnectionEditorProps,
-  ConnectionEditorProps2,
+  GlobalConnectionEditorProps,
   QueryEditorProps,
 } from '../../types';
 import { isSaveDisabled, validation } from '../../utils/forms';
@@ -172,11 +172,11 @@ function ConnectionParamsInput({
   );
 }
 
-function ConnectionParamsInput2({
+function GlobalConnectionParamsInput({
   value,
   onChange,
   onClose,
-}: ConnectionEditorProps2<PostgresConnectionParams>) {
+}: GlobalConnectionEditorProps<PostgresConnectionParams>) {
   const { handleSubmit, register, formState, reset, watch } = useForm({
     defaultValues: value,
     reValidateMode: 'onChange',
@@ -195,7 +195,7 @@ function ConnectionParamsInput2({
   const values = watch();
 
   const handleTestConnection = React.useCallback(() => {
-    fetchPrivate({ kind: 'connectionStatus', params: values.params, secrets: values.secrets })
+    fetchPrivate({ kind: 'connectionStatus', params: values.params })
       .then((status) => {
         setConnectionStatus(status);
       })
@@ -369,7 +369,7 @@ function getInitialQueryValue(): PostgresQuery {
 const dataSource: ClientDataSource<PostgresConnectionParams, PostgresQuery> = {
   displayName: 'PostgreSQL',
   ConnectionParamsInput,
-  ConnectionParamsInput2,
+  GlobalConnectionParamsInput,
   QueryEditor,
   getInitialQueryValue,
 };

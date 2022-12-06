@@ -51,14 +51,16 @@ import {
   AppTemplateId,
   ClientDataSource,
   ConnectionEditorModel,
-  ConnectionEditorProps2,
+  GlobalConnectionEditorProps,
   SecretsAction,
+  SecretsActions,
 } from '../../types';
 import { errorFrom } from '../../utils/errors';
 import FlexFill from '../../components/FlexFill';
 import dataSources from '../../toolpadDataSources/client';
 import { ExactEntriesOf } from '../../utils/types';
-import { ConnectionContextProvider } from '../../toolpadDataSources/context';
+import { GlobalConnectionContextProvider } from '../../toolpadDataSources/context';
+import { mapValues } from '../../utils/collections';
 
 const USE_DATAGRID = false;
 
@@ -97,7 +99,7 @@ export interface CreateAppDialogProps {
   onClose?: () => void;
 }
 
-function getDataSource<P>(dataSourceId: string): ClientDataSource<P, any> | null {
+function getDataSource<P extends object>(dataSourceId: string): ClientDataSource<P, any> | null {
   const dataSource = dataSources[dataSourceId];
   return dataSource ?? null;
 }
@@ -112,7 +114,7 @@ interface DialogState<P> {
   dataSourceId: string | null;
   name: string;
   params: P | null;
-  secrets: Record<string, SecretsAction>;
+  secrets: SecretsActions;
 }
 
 type DialogAction<P> =
@@ -126,12 +128,15 @@ type DialogAction<P> =
       kind: 'CONNECTION_LOAD_SUCCESS';
       name: string;
       dataSourceId: string;
-      params: P;
-      secrets: Record<string, SecretsAction>;
+      params: P | null;
+      secrets: SecretsActions;
     }
   | { kind: 'CONNECTION_LOAD_FAILED'; error: Error };
 
-function dialogStateReducer<P>(state: DialogState<P>, action: DialogAction<P>): DialogState<P> {
+function dialogStateReducer<P extends object>(
+  state: DialogState<P>,
+  action: DialogAction<P>,
+): DialogState<P> {
   switch (action.kind) {
     case 'DIALOG_OPEN': {
       const loading = !!action.connectionId;
@@ -178,12 +183,15 @@ function dialogStateReducer<P>(state: DialogState<P>, action: DialogAction<P>): 
   }
 }
 
-interface ConnectionParamsEditorProps<P> extends ConnectionEditorProps2<P> {
+interface ConnectionParamsEditorProps<P extends object> extends GlobalConnectionEditorProps<P> {
   dataSource: ClientDataSource<P, any>;
 }
 
-function ConnectionParamsEditor<P>({ dataSource, ...props }: ConnectionParamsEditorProps<P>) {
-  const { ConnectionParamsInput2 } = dataSource;
+function ConnectionParamsEditor<P extends object>({
+  dataSource,
+  ...props
+}: ConnectionParamsEditorProps<P>) {
+  const { GlobalConnectionParamsInput: ConnectionParamsInput2 } = dataSource;
   return <ConnectionParamsInput2 {...props} />;
 }
 
@@ -192,7 +200,11 @@ export interface CreateConnectionDialogProps<P> {
   dispatch: React.Dispatch<DialogAction<P>>;
 }
 
-function CreateConnectionDialog<P>({ state, dispatch, ...props }: CreateConnectionDialogProps<P>) {
+function CreateConnectionDialog<P extends object>({
+  state,
+  dispatch,
+  ...props
+}: CreateConnectionDialogProps<P>) {
   const [dataSourceId, setDataSourceId] = React.useState('');
 
   const handleClose = React.useCallback(() => {
@@ -247,17 +259,24 @@ function CreateConnectionDialog<P>({ state, dispatch, ...props }: CreateConnecti
         if (state.dataSourceId) {
           const dataSource = state.dataSourceId ? getDataSource<P>(state.dataSourceId) : null;
 
+          const contextValue = {
+            dataSourceId: state.dataSourceId,
+            connectionId: state.connectionId,
+          };
+
           return (
             <React.Fragment>
               <DialogTitle>Create a new Connection</DialogTitle>
 
               {dataSource ? (
-                <ConnectionParamsEditor<P>
-                  dataSource={dataSource}
-                  value={state}
-                  onChange={handleSave}
-                  onClose={handleClose}
-                />
+                <GlobalConnectionContextProvider value={contextValue}>
+                  <ConnectionParamsEditor<P>
+                    dataSource={dataSource}
+                    value={state}
+                    onChange={handleSave}
+                    onClose={handleClose}
+                  />
+                </GlobalConnectionContextProvider>
               ) : (
                 <DialogContent>
                   Unknown data source type &quot;{state.dataSourceId}&quot;
@@ -789,8 +808,8 @@ export default function Connections() {
         kind: 'CONNECTION_LOAD_SUCCESS',
         name: connection.name,
         dataSourceId: connection.datasource,
-        params: connection.params,
-        secrets: connection.secrets,
+        params: connection.params as object | null,
+        secrets: mapValues(connection.secrets, (): SecretsAction => ({ kind: 'ignore' })),
       });
     } catch (error: unknown) {
       dispatch({ kind: 'CONNECTION_LOAD_FAILED', error: errorFrom(error) });

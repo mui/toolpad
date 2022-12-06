@@ -26,7 +26,7 @@ export interface PostgresPrivateQueryDebugExec {
 
 export interface PostgresPrivateQueryConnectionStatus {
   kind: 'connectionStatus';
-  params: PostgresConnectionParams;
+  params: PostgresConnectionParams | null;
 }
 
 export type PostgresPrivateQuery =

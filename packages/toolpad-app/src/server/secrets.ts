@@ -1,6 +1,7 @@
 import UTF8 from 'crypto-js/enc-utf8';
 import AES from 'crypto-js/aes';
 import config from './config';
+import { SecretsActions } from '../types';
 
 /*
  * Proposed strategy:
@@ -55,4 +56,29 @@ export function decryptSecret(value: string): string {
   }
 
   throw new Error(`Failed to decrypt secret`);
+}
+
+export function updateSecrets(
+  existing: Record<string, any>,
+  updates: SecretsActions,
+): Record<string, any> {
+  const result = { ...existing };
+  for (const [key, update] of Object.entries(updates)) {
+    switch (update.kind) {
+      case 'set': {
+        result[key] = update.value;
+        break;
+      }
+      case 'delete': {
+        delete result[key];
+        break;
+      }
+      case 'ignore': {
+        break;
+      }
+      default:
+        throw new Error(`Unrecognized secrets update`);
+    }
+  }
+  return result;
 }

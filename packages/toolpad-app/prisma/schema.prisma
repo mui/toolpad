@@ -1,7 +1,6 @@
 generator client {
-  provider        = "prisma-client-js"
-  output          = "./generated/client"
-  previewFeatures = ["interactiveTransactions"]
+  provider = "prisma-client-js"
+  output   = "./generated/client"
 }
 
 datasource db {
@@ -103,6 +102,6 @@ model Connection {
   createdAt  DateTime @default(now())
   editedAt   DateTime @default(now())
   datasource String
-  params     Json
+  params     Json?
   secrets    String
 }

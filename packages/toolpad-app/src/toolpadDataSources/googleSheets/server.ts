@@ -3,7 +3,12 @@ import { drive_v3 } from '@googleapis/drive';
 import { sheets_v4 } from '@googleapis/sheets';
 import { OAuth2Client } from 'google-auth-library';
 import { match } from 'path-to-regexp';
-import { ServerDataSource, CreateHandlerApi } from '../../types';
+import type {
+  ServerDataSource,
+  CreateHandlerApi,
+  ConnectionEditorModel,
+  ConnectionData,
+} from '../../types';
 import config from '../../server/config';
 import { asArray } from '../../utils/collections';
 import {
@@ -13,6 +18,7 @@ import {
   GoogleSheetsResult,
 } from './types';
 import { Maybe } from '../../utils/types';
+import { updateSecrets } from '../../server/secrets';
 
 /**
  * Create an OAuth2 client based on the configuration
@@ -205,11 +211,56 @@ async function execPrivate(
     }
     return { tokens };
   }
-  if (query.type === 'GLOBAL_CONNECTION_STATUS') {
-    return { tokens };
-  }
   if (query.type === 'DEBUG_EXEC') {
     return exec(connection, query.query);
+  }
+  throw new Error(`Google Sheets: Unrecognized private query "${JSON.stringify(query)}"`);
+}
+
+function mergeConnectionModel<P extends object>(
+  connection: Maybe<ConnectionData<P>>,
+  model: ConnectionEditorModel<P>,
+): ConnectionData<P> {
+  const params = model.params || connection?.params || null;
+  const secrets = updateSecrets(connection?.secrets || {}, model.secrets);
+  return { params, secrets };
+}
+
+/**
+ * Private executor function for this connection
+ * @param connection  The connection object
+ * @param query  The query object
+ * @returns The private api response
+ */
+async function globalConnectionExecPrivate(
+  connection: Maybe<ConnectionData<GoogleSheetsConnectionParams>>,
+  query: GoogleSheetsPrivateQuery,
+): Promise<any> {
+  const oauthClient = createOAuthClient();
+  if (query.type === 'RECEIVE_CODE') {
+    const { tokens, res: getTokenResponse } = await oauthClient.getToken({
+      code: query.code,
+      // See https://stackoverflow.com/a/55222567
+      redirect_uri: 'postmessage',
+    });
+    if (!tokens) {
+      throw new Error(`${getTokenResponse?.status}: ${getTokenResponse?.statusText}`);
+    }
+    return { tokens };
+  }
+  if (query.type === 'GLOBAL_CONNECTION_STATUS') {
+    const { secrets } = mergeConnectionModel(connection, query.value);
+    if (!secrets.tokens) {
+      return null;
+    }
+    const tokens = JSON.parse(secrets.tokens);
+    oauthClient.setCredentials(tokens);
+    const driveClient = createDriveClient(oauthClient);
+    const response = await driveClient.about.get({ fields: 'user' });
+    if (response.status === 200) {
+      return response.data.user;
+    }
+    return null;
   }
   throw new Error(`Google Sheets: Unrecognized private query "${JSON.stringify(query)}"`);
 }
@@ -299,6 +350,7 @@ const dataSource: ServerDataSource<
 > = {
   exec,
   execPrivate,
+  globalConnectionExecPrivate,
   createHandler: () => handler,
 };
 

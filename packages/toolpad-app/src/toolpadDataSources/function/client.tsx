@@ -18,7 +18,7 @@ import { BindableAttrEntries, BindableAttrValue } from '@mui/toolpad-core';
 import {
   ClientDataSource,
   ConnectionEditorProps,
-  ConnectionEditorProps2,
+  GlobalConnectionEditorProps,
   ExecFetchFn,
   QueryEditorProps,
 } from '../../types';
@@ -106,11 +106,11 @@ function ConnectionParamsInput({
   );
 }
 
-function ConnectionParamsInput2({
+function GlobalConnectionParamsInput({
   value,
   onChange,
   onClose,
-}: ConnectionEditorProps2<FunctionConnectionParams>) {
+}: GlobalConnectionEditorProps<FunctionConnectionParams>) {
   const { handleSubmit, formState, reset, control, register } = useForm({
     defaultValues: value,
     reValidateMode: 'onChange',
@@ -337,7 +337,7 @@ function getInitialQueryValue(): FunctionQuery {
 const dataSource: ClientDataSource<FunctionConnectionParams, FunctionQuery> = {
   displayName: 'Function',
   ConnectionParamsInput,
-  ConnectionParamsInput2,
+  GlobalConnectionParamsInput,
   QueryEditor,
   getInitialQueryValue,
   hasDefault: true,

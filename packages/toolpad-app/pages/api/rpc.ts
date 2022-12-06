@@ -26,6 +26,7 @@ import {
   getConnection,
   updateConnection,
   deleteConnection,
+  globalConnectionFetchPrivate,
 } from '../../src/server/data';
 import { getLatestToolpadRelease } from '../../src/server/getLatestRelease';
 import { hasOwnProperty } from '../../src/utils/collections';
@@ -123,6 +124,11 @@ const rpcServer = {
     dataSourceFetchPrivate: createMethod<typeof dataSourceFetchPrivate>(({ params }) => {
       return dataSourceFetchPrivate(...params);
     }),
+    globalConnectionFetchPrivate: createMethod<typeof globalConnectionFetchPrivate>(
+      ({ params }) => {
+        return globalConnectionFetchPrivate(...params);
+      },
+    ),
     getApps: createMethod<typeof getApps>(({ params }) => {
       return getApps(...params);
     }),

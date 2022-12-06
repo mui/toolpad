@@ -23,7 +23,7 @@ import { TabContext, TabList } from '@mui/lab';
 import {
   ClientDataSource,
   ConnectionEditorProps,
-  ConnectionEditorProps2,
+  GlobalConnectionEditorProps,
   ExecFetchFn,
   QueryEditorProps,
 } from '../../types';
@@ -208,11 +208,11 @@ function ConnectionParamsInput({ value, onChange }: ConnectionEditorProps<RestCo
   );
 }
 
-function ConnectionParamsInput2({
+function GlobalConnectionParamsInput({
   value,
   onChange,
   onClose,
-}: ConnectionEditorProps2<RestConnectionParams>) {
+}: GlobalConnectionEditorProps<RestConnectionParams>) {
   const { handleSubmit, register, formState, reset, control, watch } = useForm({
     defaultValues: { ...value, params: withDefaults(value.params) },
     reValidateMode: 'onChange',
@@ -275,7 +275,7 @@ function ConnectionParamsInput2({
             name="params.headers"
             control={control}
             render={({ field: { value: fieldValue, onChange: onFieldChange, ref, ...field } }) => {
-              const allHeaders = [...authenticationHeaders, ...fieldValue];
+              const allHeaders = [...authenticationHeaders, ...(fieldValue || [])];
               return (
                 <MapEntriesEditor
                   {...field}
@@ -682,7 +682,7 @@ function getInitialQueryValue(): FetchQuery {
 const dataSource: ClientDataSource<RestConnectionParams, FetchQuery> = {
   displayName: 'Fetch',
   ConnectionParamsInput,
-  ConnectionParamsInput2,
+  GlobalConnectionParamsInput,
   QueryEditor,
   getInitialQueryValue,
   hasDefault: true,

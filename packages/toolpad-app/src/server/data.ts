@@ -8,12 +8,17 @@ import {
   RuntimeState,
   SecretsActions,
   GlobalConnectionContext,
+  ConnectionSecrets,
 } from '../types';
 import serverDataSources from '../toolpadDataSources/server';
 import * as appDom from '../appDom';
 import { omit } from '../utils/immutability';
 import { asArray } from '../utils/collections';
-import { decryptSecret as decryptString, encryptSecret as encryptString } from './secrets';
+import {
+  decryptSecret as decryptString,
+  encryptSecret as encryptString,
+  updateSecrets,
+} from './secrets';
 import applyTransform from './applyTransform';
 import { excludeFields } from '../utils/prisma';
 import { getAppTemplateDom } from './appTemplateDoms/doms';
@@ -528,28 +533,6 @@ export async function dataSourceFetchPrivate<P, Q>(
   return dataSource.execPrivate(connectionParams, query);
 }
 
-export async function dataSourceFetchPrivate2<P, Q>(
-  context: GlobalConnectionContext,
-  query: Q,
-): Promise<any> {
-  const dataSource: ServerDataSource<P, Q, any> | undefined =
-    serverDataSources[context.dataSourceId];
-
-  if (!dataSource) {
-    throw new Error(`Unknown dataSource "${context.dataSourceId}"`);
-  }
-
-  if (!dataSource.execPrivate2) {
-    throw new Error(`No execPrivate2 available on datasource "${context.dataSourceId}"`);
-  }
-
-  const connectionParams: P | null = connectionId
-    ? await getConnectionParams<P>(appId, connectionId)
-    : null;
-
-  return dataSource.execPrivate(connectionParams, query);
-}
-
 export function parseVersion(param?: string | string[]): VersionOrPreview | null {
   if (!param) {
     return null;
@@ -620,15 +603,17 @@ export async function getConnections() {
   return connections;
 }
 
-function deserializeConnectionSerets(secrets: string): Record<string, string> {
+function deserializeConnectionSerets(secrets: string): ConnectionSecrets {
   return JSON.parse(decryptString(secrets));
 }
 
-function serializeConnectionSerets(secrets: Record<string, string>): string {
+function serializeConnectionSerets(secrets: ConnectionSecrets): string {
   return encryptString(JSON.stringify(secrets));
 }
 
-export async function getConnection(id: string) {
+export type Connection = Omit<prisma.Connection, 'secrets'> & { secrets: ConnectionSecrets };
+
+async function getConnectionUnsafe(id: string): Promise<Connection | null> {
   if (config.isDemo) {
     return null;
   }
@@ -638,9 +623,20 @@ export async function getConnection(id: string) {
     return null;
   }
 
-  const decryptedSecrets = deserializeConnectionSerets(connection.secrets);
+  return {
+    ...connection,
+    secrets: deserializeConnectionSerets(connection.secrets),
+  };
+}
+
+export async function getConnection(id: string): Promise<Connection | null> {
+  const connection = await getConnectionUnsafe(id);
+  if (!connection) {
+    return null;
+  }
+
   const maskedSecrets = Object.fromEntries(
-    Object.keys(decryptedSecrets).map((key) => [key, '<redacted>']),
+    Object.keys(connection.secrets).map((key) => [key, '<redacted>']),
   );
 
   return {
@@ -649,34 +645,9 @@ export async function getConnection(id: string) {
   };
 }
 
-function updateSecrets(
-  existing: Record<string, any>,
-  updates: SecretsActions,
-): Record<string, any> {
-  const result = { ...existing };
-  for (const [key, update] of Object.entries(updates)) {
-    switch (update.kind) {
-      case 'set': {
-        result[key] = update.value;
-        break;
-      }
-      case 'delete': {
-        delete result[key];
-        break;
-      }
-      case 'ignore': {
-        break;
-      }
-      default:
-        throw new Error(`Unrecognized secrets update`);
-    }
-  }
-  return result;
-}
-
 export interface CreateConnectionOptions {
   datasource: string;
-  params: unknown;
+  params: object | null;
   secrets: SecretsActions;
 }
 
@@ -685,7 +656,7 @@ export async function createConnection(name: string, options: CreateConnectionOp
     data: {
       name,
       datasource: options.datasource,
-      params: options.params,
+      params: options.params || undefined,
       secrets: encryptString(JSON.stringify(updateSecrets({}, options.secrets))),
     },
     select: SELECT_CONNECTION_META,
@@ -727,4 +698,31 @@ export async function updateConnection(
 
 export async function deleteConnection(id: string) {
   await prismaClient.connection.delete({ where: { id } });
+}
+
+export async function globalConnectionFetchPrivate<P, Q>(
+  context: GlobalConnectionContext,
+  query: Q,
+): Promise<any> {
+  const dataSource: ServerDataSource<P, Q, any> | undefined =
+    serverDataSources[context.dataSourceId];
+
+  if (!dataSource) {
+    throw new Error(`Unknown dataSource "${context.dataSourceId}"`);
+  }
+
+  if (!dataSource.globalConnectionExecPrivate) {
+    throw new Error(`No execPrivate2 available on datasource "${context.dataSourceId}"`);
+  }
+
+  const connection = context.connectionId ? await getConnectionUnsafe(context.connectionId) : null;
+
+  const connectionData = connection
+    ? {
+        params: connection.params as P,
+        secrets: connection.secrets,
+      }
+    : null;
+
+  return dataSource.globalConnectionExecPrivate(connectionData, query);
 }

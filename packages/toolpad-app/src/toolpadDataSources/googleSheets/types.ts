@@ -70,7 +70,7 @@ export type GoogleSheetsPrivateQuery =
     }
   | {
       type: 'GLOBAL_CONNECTION_STATUS';
-      value: ConnectionEditorModel<GoogleSheetsApiQuery>;
+      value: ConnectionEditorModel<GoogleSheetsConnectionParams>;
     };
 
 export interface GoogleSheetsResult extends ExecFetchResult {}

@@ -101,16 +101,19 @@ export interface GlobalConnectionContext {
   connectionId: string | null;
 }
 
-export interface ConnectionEditorModel<P> {
+export interface ConnectionEditorModel<P extends object> {
   name: string;
   params: P | null;
   secrets: SecretsActions;
 }
 
-export interface ConnectionEditorProps2<P> extends WithControlledProp<ConnectionEditorModel<P>> {
+export interface GlobalConnectionEditorProps<P extends object>
+  extends WithControlledProp<ConnectionEditorModel<P>> {
   onClose?: () => void;
 }
-export type ConnectionParamsEditor2<P = {}> = React.FC<ConnectionEditorProps2<P>>;
+export type GlobalConnectionParamsEditor<P extends object> = React.FC<
+  GlobalConnectionEditorProps<P>
+>;
 
 export interface QueryEditorProps<C, Q> extends WithControlledProp<appDom.QueryNode<Q>> {
   connectionParams: Maybe<C>;
@@ -134,16 +137,23 @@ export interface ExecClientFetchFn<Q, R extends ExecFetchResult> {
   (fetchQuery: Q, params: Record<string, string>, serverFetch: ExecFetchFn<Q, R>): Promise<R>;
 }
 
-export interface ClientDataSource<C = {}, Q = {}> {
+export interface ClientDataSource<C extends object = {}, Q = {}> {
   displayName: string;
   /** @deprecated Kept around for in-app connections until they're global */
   ConnectionParamsInput?: ConnectionParamsEditor<C>;
   // Temporary until connections are made global
-  ConnectionParamsInput2: ConnectionParamsEditor2<C>;
+  GlobalConnectionParamsInput: GlobalConnectionParamsEditor<C>;
   transformQueryBeforeCommit?: (query: Q) => Q;
   QueryEditor: QueryEditor<C, Q>;
   getInitialQueryValue: () => Q;
   hasDefault?: boolean;
+}
+
+export type ConnectionSecrets = Partial<Record<string, string>>;
+
+export interface ConnectionData<P> {
+  params: P | null;
+  secrets: ConnectionSecrets;
 }
 
 export interface RuntimeDataSource<Q = {}, R extends ExecFetchResult = ExecFetchResult> {
@@ -153,8 +163,8 @@ export interface RuntimeDataSource<Q = {}, R extends ExecFetchResult = ExecFetch
 export interface ServerDataSource<P = {}, Q = {}, PQ = {}, D = {}> {
   // Execute a private query on this connection, intended for editors only
   execPrivate?: (connection: Maybe<P>, query: PQ) => Promise<any>;
-  // New version of execPrivate for global connections
-  execPrivate2?: (connection: Maybe<P>, query: PQ) => Promise<any>;
+  // New version of execPrivate, but for global connections
+  globalConnectionExecPrivate?: (connection: Maybe<ConnectionData<P>>, query: PQ) => Promise<any>;
   // Execute a query on this connection, intended for viewers
   exec: (connection: Maybe<P>, query: Q, params: any) => Promise<ExecFetchResult<D>>;
   createHandler?: () => (

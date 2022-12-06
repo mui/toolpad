@@ -12,7 +12,7 @@ function stackTraceOnly(stack: string, message: string): string {
 }
 
 export interface ErrorAlertProps {
-  error: unknown;
+  error: NonNullable<unknown>;
 }
 
 export default function ErrorAlert({ error }: ErrorAlertProps) {

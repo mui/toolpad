@@ -186,6 +186,7 @@ jobs:
               -v "$CIRCLE_WORKING_DIRECTORY:/tests" \
               -w /tests \
               -e PLAYWRIGHT_TEST_BASE_URL=http://172.17.0.1:3000/ \
+              -e TOOLPAD_EXTERNAL_URL=http://172.17.0.1:3000/ \
               -e HTTPBIN_BASEURL=http://httpbin/ \
               mcr.microsoft.com/playwright:v1.28.0-focal \
               yarn test:integration --forbid-only

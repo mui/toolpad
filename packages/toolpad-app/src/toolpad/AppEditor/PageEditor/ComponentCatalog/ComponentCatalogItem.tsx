@@ -17,13 +17,13 @@ import RadioButtonCheckedIcon from '@mui/icons-material/RadioButtonChecked';
 import DateRangeIcon from '@mui/icons-material/DateRange';
 import CheckBoxIcon from '@mui/icons-material/CheckBox';
 import DashboardCustomizeSharpIcon from '@mui/icons-material/DashboardCustomizeSharp';
-import ViewHeadlineIcon from '@mui/icons-material/ViewHeadline';
+import ManageSearchIcon from '@mui/icons-material/ManageSearch';
 import AddIcon from '@mui/icons-material/Add';
 import LinkIcon from '@mui/icons-material/Link';
 import { SvgIconProps } from '@mui/material/SvgIcon';
 
 const iconMap = new Map<string, React.ComponentType<SvgIconProps>>([
-  ['Autocomplete', ViewHeadlineIcon],
+  ['Autocomplete', ManageSearchIcon],
   ['Button', SmartButtonIcon],
   ['Image', ImageIcon],
   ['DataGrid', GridOnIcon],

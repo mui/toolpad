@@ -17,7 +17,7 @@ interface AutocompleteProps
 function Autocomplete({ options, label, ...rest }: AutocompleteProps) {
   return (
     <MuiAutocomplete
-      options={options}
+      options={options ?? []}
       renderInput={(params) => <TextField {...params} label={label} variant="outlined" />}
       {...rest}
     />

@@ -46,7 +46,7 @@ export default function UrlQueryEditor({ pageNodeId }: UrlQueryEditorProps) {
       'parameters',
       appDom.createConst(input || []),
     );
-    domApi.update(updatedDom, { name: 'pageParameters', pageNodeId });
+    domApi.update(updatedDom, { name: 'pageParameters', nodeId: pageNodeId });
 
     handleDialogClose();
   }, [dom, page, input, domApi, pageNodeId, handleDialogClose]);

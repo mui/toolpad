@@ -214,8 +214,8 @@ function CodeComponentEditorContent({ codeComponentNode }: CodeComponentEditorCo
       appDom.createConst(tryFormat(input.attributes.code.value)),
     );
     setInput(prettyfied);
-    domApi.saveNode(prettyfied);
-  }, [domApi, input, isSaveAllowed]);
+    domApi.saveNode(prettyfied, { name: 'component', nodeId: codeComponentNode.id });
+  }, [codeComponentNode.id, domApi, input, isSaveAllowed]);
 
   usePrompt(
     'Your code has unsaved changes. Are you sure you want to navigate away? All changes will be discarded.',

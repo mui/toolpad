@@ -2,6 +2,7 @@ import * as React from 'react';
 import { NodeId, BindableAttrValues } from '@mui/toolpad-core';
 import invariant from 'invariant';
 import { throttle, DebouncedFunc } from 'lodash-es';
+import { useNavigate } from 'react-router-dom';
 import * as appDom from '../appDom';
 import { update } from '../utils/immutability';
 import client from '../api';
@@ -18,13 +19,15 @@ type ViewInfo =
   | { name: 'main' }
   | { name: 'query'; nodeId: NodeId }
   | { name: 'properties'; tab: ComponentPanelTab; nodeId?: NodeId }
-  | { name: 'pageModule'; pageNodeId: NodeId }
-  | { name: 'pageParameters'; pageNodeId: NodeId };
+  | { name: 'pageModule'; nodeId: NodeId }
+  | { name: 'pageParameters'; nodeId: NodeId }
+  | { name: 'connection'; nodeId: NodeId }
+  | { name: 'component'; nodeId: NodeId };
 
 export type DomAction = { viewInfo?: ViewInfo } & (
   | {
       type: 'DOM_UPDATE_HISTORY';
-      lastEditedViewInfo?: ViewInfo;
+      viewInfo?: ViewInfo;
     }
   | {
       type: 'DOM_UNDO';
@@ -47,7 +50,6 @@ export type DomAction = { viewInfo?: ViewInfo } & (
       type: 'DOM_SET_NODE_NAME';
       nodeId: NodeId;
       name: string;
-      viewInfo: ViewInfo;
     }
   | {
       type: 'DOM_SET_NODE_NAMESPACE';
@@ -59,11 +61,12 @@ export type DomAction = { viewInfo?: ViewInfo } & (
       type: 'DOM_UPDATE';
       updatedDom: appDom.AppDom;
       selectedNodeId?: NodeId | null;
+      viewInfo?: ViewInfo;
     }
   | {
       type: 'DOM_SAVE_NODE';
       node: appDom.AppDomNode;
-      viewInfo: ViewInfo;
+      viewInfo?: ViewInfo;
     }
   | {
       type: 'SELECT_NODE';
@@ -115,7 +118,7 @@ export function domLoaderReducer(state: DomLoader, action: DomAction): DomLoader
         {
           dom: state.dom,
           selectedNodeId: state.selectedNodeId,
-          lastEditedViewInfo: action.lastEditedViewInfo || state.lastEditedViewInfo,
+          viewInfo: action.viewInfo || state.lastEditedViewInfo,
           timestamp: Date.now(),
         },
       ];
@@ -207,6 +210,14 @@ export function domLoaderReducer(state: DomLoader, action: DomAction): DomLoader
       return action.selectedNodeId !== undefined
         ? update(state, {
             selectedNodeId: action.selectedNodeId,
+            lastEditedViewInfo: action.viewInfo,
+          })
+        : state;
+    }
+    case 'DOM_SAVE_NODE': {
+      return action.viewInfo
+        ? update(state, {
+            lastEditedViewInfo: action.viewInfo,
           })
         : state;
     }
@@ -228,8 +239,8 @@ function createDomApi(
     redo() {
       dispatch({ type: 'DOM_REDO' });
     },
-    setNodeName(nodeId: NodeId, name: string, viewInfo: ViewInfo) {
-      dispatch({ type: 'DOM_SET_NODE_NAME', nodeId, name, viewInfo });
+    setNodeName(nodeId: NodeId, name: string) {
+      dispatch({ type: 'DOM_SET_NODE_NAME', nodeId, name });
     },
     update(dom: appDom.AppDom, viewInfo?: ViewInfo, selectedNodeId?: NodeId | null) {
       dispatch({
@@ -272,10 +283,6 @@ function createDomApi(
   };
 }
 
-interface UndoRedoStackEntry extends DomState {
-  timestamp: number;
-}
-
 export interface DomLoader {
   dom: appDom.AppDom;
   savedDom: appDom.AppDom;
@@ -283,7 +290,7 @@ export interface DomLoader {
   unsavedChanges: number;
   saveError: string | null;
   selectedNodeId: NodeId | null;
-  lastEditedViewInfo: ViewInfo | null;
+  lastEditedViewInfo: ViewInfo;
   undoStack: UndoRedoStackEntry[];
   redoStack: UndoRedoStackEntry[];
 }
@@ -303,6 +310,11 @@ export { useDomLoader };
 export interface DomState {
   dom: appDom.AppDom;
   selectedNodeId: NodeId | null;
+}
+
+interface UndoRedoStackEntry extends DomState {
+  viewInfo: ViewInfo;
+  timestamp: number;
 }
 
 export function useDom(): DomState {
@@ -355,16 +367,16 @@ export default function DomProvider({ appId, children }: DomContextProps) {
     savedDom: dom,
     dom,
     selectedNodeId: null,
-    lastEditedViewInfo: null,
-    undoStack: [{ dom, selectedNodeId: null, timestamp: Date.now() }],
+    lastEditedViewInfo: { name: 'main' },
+    undoStack: [{ dom, selectedNodeId: null, viewInfo: { name: 'main' }, timestamp: Date.now() }],
     redoStack: [],
   });
 
   const scheduleHistoryUpdate = React.useMemo(
     () =>
       throttle(
-        (lastEditedViewInfo?: ViewInfo) => {
-          dispatch({ type: 'DOM_UPDATE_HISTORY', lastEditedViewInfo });
+        (viewInfo?: ViewInfo) => {
+          dispatch({ type: 'DOM_UPDATE_HISTORY', viewInfo });
         },
         500,
         { leading: false, trailing: true },
@@ -425,6 +437,16 @@ export default function DomProvider({ appId, children }: DomContextProps) {
   }, [state.unsavedChanges]);
 
   useShortcut({ key: 's', metaKey: true }, handleSave);
+
+  const navigate = useNavigate();
+  React.useEffect(() => {
+    switch (state.lastEditedViewInfo.name) {
+      case 'query':
+        // @TODO: Change to the correct view. This might involve making every view its own route?
+        break;
+      default:
+    }
+  }, [navigate, state.lastEditedViewInfo]);
 
   return (
     <DomLoaderProvider value={state}>

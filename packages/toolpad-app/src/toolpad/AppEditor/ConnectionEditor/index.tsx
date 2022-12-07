@@ -61,7 +61,7 @@ function ConnectionEditorContent<P>({
         'params',
         appDom.createSecret(connectionParams),
       );
-      domApi.update(updatedDom);
+      domApi.update(updatedDom, { name: 'connection', nodeId: connectionNode.id });
     },
     [connectionNode, dom, domApi],
   );

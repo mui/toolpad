@@ -6,7 +6,12 @@ import config from '../../config';
 export const DEFAULT_TEMPLATE_DATA_URL = new URL('/static/employees.json', config.externalUrl).href;
 
 function replaceDefaultDataStaticPath(node: appDom.AppDomNode): appDom.AppDomNode {
-  if (node.type === 'query' && node.name === 'getUsers' && node.attributes.query) {
+  if (
+    node.type === 'query' &&
+    node.name === 'getUsers' &&
+    node.attributes.query &&
+    node.attributes.query.value?.url?.value?.includes('/static/employees.json')
+  ) {
     return {
       ...node,
       attributes: {

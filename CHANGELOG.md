@@ -8,7 +8,7 @@ _Dec 7, 2022_
 
 A big thanks to the 3 contributors who made this release possible. Here are some highlights ✨:
 
-TODO INSERT HIGHLIGHTS
+Release the demo version, update app duplication UX.
 
 - &#8203;<!-- 13 -->Revert accidental react-router-dom update (#1426) @Janpot
 - &#8203;<!-- 12 -->Add demo link to the docs (#1319) @bharatkashyap

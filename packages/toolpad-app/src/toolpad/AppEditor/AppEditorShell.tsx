@@ -200,7 +200,7 @@ export default function AppEditorShell({ appId, ...props }: ToolpadShellProps) {
                     : {}
                 }
               >
-                <Tooltip title="Preview latest deployed version">
+                <Tooltip title="Open last deployed version">
                   <PreviewIcon />
                 </Tooltip>
               </Button>

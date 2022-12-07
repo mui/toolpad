@@ -6,7 +6,7 @@ import {
 } from '@mui/material';
 import { createComponent } from '@mui/toolpad-core';
 
-type AutocompleteOption = string | { label: string };
+type AutocompleteOption = string | { label?: string };
 
 interface AutocompleteProps
   extends Omit<MuiAutocompleteProps<AutocompleteOption, false, false, false>, 'renderInput'> {
@@ -28,8 +28,7 @@ export default createComponent(Autocomplete, {
   layoutDirection: 'both',
   argTypes: {
     options: {
-      typeDef: { type: 'array', schema: '/schemas/AutocompleteOptions.json' },
-      control: { type: 'SelectOptions' },
+      typeDef: { type: 'array' },
       defaultValue: [],
     },
     label: {
@@ -39,6 +38,7 @@ export default createComponent(Autocomplete, {
     value: {
       typeDef: { type: 'string' },
       onChangeProp: 'onChange',
+      onChangeHandler: (event: React.ChangeEvent<HTMLInputElement>) => event.target.textContent,
       defaultValue: '',
     },
     size: {

@@ -28,6 +28,7 @@ import {
   ConnectionEditorProps,
   GlobalConnectionEditorProps,
   QueryEditorProps,
+  SecretsAction,
 } from '../../types';
 import { isSaveDisabled, validation } from '../../utils/forms';
 import lazyComponent from '../../utils/lazyComponent';
@@ -170,6 +171,15 @@ function ConnectionParamsInput({
       ) : null}
     </Stack>
   );
+}
+
+interface SecretTextFieldProps {
+  value: SecretsAction;
+  onChange: (newValue: SecretsAction) => void;
+}
+
+function SecretTextField({ value, onChange, ...props }: SecretTextFieldProps) {
+  return <TextField {...props} />;
 }
 
 function GlobalConnectionParamsInput({

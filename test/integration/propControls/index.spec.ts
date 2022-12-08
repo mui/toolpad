@@ -56,3 +56,38 @@ test('can control component prop values in properties control panel', async ({
 
   await inputByLabel.waitFor({ state: 'visible' });
 });
+
+test('changing defaultValue resets controlled value', async ({ page, browserName, api }) => {
+  const dom = await readJsonFile(path.resolve(__dirname, './defaultValueDom.json'));
+
+  const app = await api.mutation.createApp(`App ${generateId()}`, {
+    from: { kind: 'dom', dom },
+  });
+
+  const editorModel = new ToolpadEditor(page, browserName);
+  await editorModel.goto(app.id);
+
+  await editorModel.waitForOverlay();
+
+  const firstInput = editorModel.appCanvas.locator('input').nth(0);
+  const secondInput = editorModel.appCanvas.locator('input').nth(1);
+
+  await secondInput.focus();
+
+  await page.keyboard.type('Extra');
+
+  await expect(firstInput).toHaveValue('defaultTwoExtra');
+
+  await firstInput.focus();
+
+  await page.keyboard.type('Value');
+
+  await expect(firstInput).toHaveValue('defaultTwoExtraValue');
+
+  clickCenter(page, secondInput);
+
+  await editorModel.componentEditor.getByLabel('defaultValue').fill('New');
+
+  await expect(firstInput).toHaveValue('New');
+  await expect(secondInput).toHaveValue('New');
+});

@@ -2,6 +2,20 @@ import { ToolpadHome } from '../models/ToolpadHome';
 import { ToolpadRuntime } from '../models/ToolpadRuntime';
 import { test, expect } from '../playwright/test';
 
+test('can use default app template', async ({ page }) => {
+  const homeModel = new ToolpadHome(page);
+  await homeModel.goto();
+  const app = await homeModel.createApplication({ appTemplateId: 'default' });
+
+  page.waitForNavigation();
+
+  const runtimeModel = new ToolpadRuntime(page);
+  await runtimeModel.gotoPage(app.id, 'page1');
+
+  const dataGridRowLocator = page.getByText('Todd Breitenberg');
+  await expect(dataGridRowLocator).toBeVisible();
+});
+
 test('can use images app template', async ({ page }) => {
   const homeModel = new ToolpadHome(page);
   await homeModel.goto();

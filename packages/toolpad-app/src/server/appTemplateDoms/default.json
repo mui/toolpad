@@ -13,7 +13,7 @@
           "value": {
             "url": {
               "type": "const",
-              "value": "http://localhost:3000/static/employees.json"
+              "value": "https://demo.toolpad.io/static/employees.json"
             },
             "method": "GET",
             "browser": true,

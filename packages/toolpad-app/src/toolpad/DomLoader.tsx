@@ -387,7 +387,7 @@ export default function DomProvider({ appId, children }: DomContextProps) {
     dispatch(action);
 
     if (!SKIP_UNDO_ACTIONS.has(action.type)) {
-      scheduleHistoryUpdate(action?.viewInfo);
+      scheduleHistoryUpdate(action.viewInfo);
     }
   });
 

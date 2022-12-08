@@ -210,7 +210,7 @@ export interface AppTheme {
 
 export type VersionOrPreview = 'preview' | number;
 
-export type AppTemplateId = 'blank' | 'stats' | 'images';
+export type AppTemplateId = 'default' | 'blank' | 'images';
 
 export type NodeHashes = Record<NodeId, number | undefined>;
 

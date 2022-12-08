@@ -374,7 +374,7 @@ export default function RenderOverlay({ canvasHostRef }: RenderOverlayProps) {
   const selectNode = React.useCallback(
     (nodeId: NodeId) => {
       if (selectedNodeId !== nodeId) {
-        domApi.selectNode(nodeId);
+        domApi.selectNode(nodeId, { name: 'main' });
       }
     },
     [domApi, selectedNodeId],
@@ -382,7 +382,7 @@ export default function RenderOverlay({ canvasHostRef }: RenderOverlayProps) {
 
   const deselectNode = React.useCallback(() => {
     if (selectedNodeId) {
-      domApi.deselectNode();
+      domApi.deselectNode({ name: 'main' });
     }
   }, [domApi, selectedNodeId]);
 

@@ -2,7 +2,6 @@ import * as React from 'react';
 import { NodeId, BindableAttrValues } from '@mui/toolpad-core';
 import invariant from 'invariant';
 import { throttle, DebouncedFunc } from 'lodash-es';
-import { useNavigate } from 'react-router-dom';
 import * as appDom from '../appDom';
 import { update } from '../utils/immutability';
 import client from '../api';
@@ -61,12 +60,10 @@ export type DomAction = { viewInfo?: ViewInfo } & (
       type: 'DOM_UPDATE';
       updatedDom: appDom.AppDom;
       selectedNodeId?: NodeId | null;
-      viewInfo?: ViewInfo;
     }
   | {
       type: 'DOM_SAVE_NODE';
       node: appDom.AppDomNode;
-      viewInfo?: ViewInfo;
     }
   | {
       type: 'SELECT_NODE';
@@ -153,6 +150,7 @@ export function domLoaderReducer(state: DomLoader, action: DomAction): DomLoader
       return update(state, {
         dom: previousStackEntry.dom,
         selectedNodeId: previousStackEntry.selectedNodeId,
+        lastEditedViewInfo: previousStackEntry.viewInfo,
         undoStack,
         redoStack,
       });
@@ -172,6 +170,7 @@ export function domLoaderReducer(state: DomLoader, action: DomAction): DomLoader
       return update(state, {
         dom: nextStackEntry.dom,
         selectedNodeId: nextStackEntry.selectedNodeId,
+        lastEditedViewInfo: nextStackEntry.viewInfo,
         undoStack,
         redoStack,
       });
@@ -207,12 +206,10 @@ export function domLoaderReducer(state: DomLoader, action: DomAction): DomLoader
       });
     }
     case 'DOM_UPDATE': {
-      return action.selectedNodeId !== undefined
-        ? update(state, {
-            selectedNodeId: action.selectedNodeId,
-            lastEditedViewInfo: action.viewInfo,
-          })
-        : state;
+      return update(state, {
+        ...(action.selectedNodeId ? { selectedNodeId: action.selectedNodeId } : {}),
+        ...(action.viewInfo ? { lastEditedViewInfo: action.viewInfo } : {}),
+      });
     }
     case 'DOM_SAVE_NODE': {
       return action.viewInfo
@@ -269,15 +266,17 @@ function createDomApi(
         value: value as BindableAttrValues | null,
       });
     },
-    selectNode(nodeId: NodeId) {
+    selectNode(nodeId: NodeId, viewInfo: ViewInfo) {
       dispatch({
         type: 'SELECT_NODE',
         nodeId,
+        viewInfo,
       });
     },
-    deselectNode() {
+    deselectNode(viewInfo: ViewInfo) {
       dispatch({
         type: 'DESELECT_NODE',
+        viewInfo,
       });
     },
   };
@@ -310,19 +309,19 @@ export { useDomLoader };
 export interface DomState {
   dom: appDom.AppDom;
   selectedNodeId: NodeId | null;
+  viewInfo: ViewInfo;
 }
 
 interface UndoRedoStackEntry extends DomState {
-  viewInfo: ViewInfo;
   timestamp: number;
 }
 
 export function useDom(): DomState {
-  const { dom, selectedNodeId } = useDomLoader();
+  const { dom, selectedNodeId, lastEditedViewInfo } = useDomLoader();
   if (!dom) {
     throw new Error("Trying to access the DOM before it's loaded");
   }
-  return { dom, selectedNodeId };
+  return { dom, selectedNodeId, viewInfo: lastEditedViewInfo };
 }
 
 export function useDomApi(): DomApi {
@@ -437,16 +436,6 @@ export default function DomProvider({ appId, children }: DomContextProps) {
   }, [state.unsavedChanges]);
 
   useShortcut({ key: 's', metaKey: true }, handleSave);
-
-  const navigate = useNavigate();
-  React.useEffect(() => {
-    switch (state.lastEditedViewInfo.name) {
-      case 'query':
-        // @TODO: Change to the correct view. This might involve making every view its own route?
-        break;
-      default:
-    }
-  }, [navigate, state.lastEditedViewInfo]);
 
   return (
     <DomLoaderProvider value={state}>

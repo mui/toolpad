@@ -12,9 +12,10 @@ import { ToolpadBridge } from '../../../canvas';
 import useEvent from '../../../utils/useEvent';
 import { LogEntry } from '../../../components/Console';
 import { Maybe } from '../../../utils/types';
-import { useDomApi } from '../../DomLoader';
+import { useDom, useDomApi } from '../../DomLoader';
 import { hasFieldFocus } from '../../../utils/fields';
 import createRuntimeState from '../../../createRuntimeState';
+import { usePageEditorApi } from './PageEditorProvider';
 
 type IframeContentWindow = Window & typeof globalThis;
 
@@ -82,7 +83,9 @@ export default React.forwardRef<EditorCanvasHostHandle, EditorCanvasHostProps>(
     forwardedRef,
   ) {
     const frameRef = React.useRef<HTMLIFrameElement>(null);
+    const { viewInfo } = useDom();
     const domApi = useDomApi();
+    const pageEditorApi = usePageEditorApi();
 
     const [bridge, setBridge] = React.useState<ToolpadBridge | null>(null);
 
@@ -170,6 +173,18 @@ export default React.forwardRef<EditorCanvasHostHandle, EditorCanvasHostProps>(
       },
       [domApi],
     );
+
+    React.useEffect(() => {
+      switch (viewInfo.name) {
+        case 'query':
+          // @TODO: Change to the correct view. This might involve making every view its own route?
+          break;
+        case 'properties':
+          pageEditorApi.setComponentPanelTab(viewInfo.tab);
+          break;
+        default:
+      }
+    }, [viewInfo, pageEditorApi]);
 
     const handleFrameLoad = React.useCallback(() => {
       invariant(frameRef.current, 'Iframe ref not attached');

@@ -12,12 +12,14 @@ import {
   TextField,
   Tooltip,
   Typography,
+  Menu,
+  MenuItem,
 } from '@mui/material';
 import CloudDoneIcon from '@mui/icons-material/CloudDone';
 import SyncIcon from '@mui/icons-material/Sync';
 import SyncProblemIcon from '@mui/icons-material/SyncProblem';
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
-import PreviewIcon from '@mui/icons-material/Preview';
+import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import RocketLaunchIcon from '@mui/icons-material/RocketLaunch';
 
 import * as React from 'react';
@@ -150,6 +152,15 @@ export default function AppEditorShell({ appId, ...props }: ToolpadShellProps) {
 
   const isDeployed = Boolean(releases?.data);
 
+  const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
+  const open = Boolean(anchorEl);
+  const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+    setAnchorEl(event.currentTarget);
+  };
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
+
   return (
     <ToolpadShell
       actions={
@@ -167,43 +178,37 @@ export default function AppEditorShell({ appId, ...props }: ToolpadShellProps) {
           <ButtonGroup>
             <Button
               variant="outlined"
-              endIcon={!isDeployed ? <RocketLaunchIcon /> : null}
+              endIcon={<RocketLaunchIcon />}
               size="small"
               color="primary"
               onClick={handleCreateReleaseDialogOpen}
-              sx={
-                isDeployed
-                  ? {
-                      // Workaround for https://github.com/mui/material-ui/issues/31210
-                      borderTopRightRadius: 0,
-                      borderBottomRightRadius: 0,
-                    }
-                  : {}
-              }
             >
               Deploy
             </Button>
             {isDeployed ? (
-              <Button
-                size="small"
-                component="a"
-                href={`/deploy/${appId}`}
-                target="_blank"
-                sx={
-                  isDeployed
-                    ? {
-                        // Workaround for https://github.com/mui/material-ui/issues/31210
-                        borderTopLeftRadius: 0,
-                        borderBottomLeftRadius: 0,
-                        marginLeft: '-1px',
-                      }
-                    : {}
-                }
-              >
-                <Tooltip title="Open last deployed version">
-                  <PreviewIcon />
-                </Tooltip>
-              </Button>
+              <>
+                <Button
+                  size="small"
+                  aria-controls={open ? 'split-button-menu' : undefined}
+                  aria-expanded={open ? 'true' : undefined}
+                  aria-label="select merge strategy"
+                  aria-haspopup="menu"
+                  onClick={handleClick}
+                >
+                  <ArrowDropDownIcon />
+                </Button>
+                <Menu
+                  open={open}
+                  onClose={handleClose}
+                  anchorEl={anchorEl}
+                  anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
+                  transformOrigin={{ horizontal: 'right', vertical: 'top' }}
+                >
+                  <MenuItem component="a" href={`/deploy/${appId}`} target="_blank">
+                    Preview latest deployed version
+                  </MenuItem>
+                </Menu>
+              </>
             ) : null}
           </ButtonGroup>
         </Stack>

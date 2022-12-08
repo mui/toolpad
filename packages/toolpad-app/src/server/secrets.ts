@@ -1,7 +1,8 @@
 import UTF8 from 'crypto-js/enc-utf8';
 import AES from 'crypto-js/aes';
 import config from './config';
-import { SecretsActions } from '../types';
+import { ConnectionData, ConnectionEditorModel, SecretsActions } from '../types';
+import { Maybe } from '../utils/types';
 
 /*
  * Proposed strategy:
@@ -69,11 +70,11 @@ export function updateSecrets(
         result[key] = update.value;
         break;
       }
-      case 'delete': {
+      case 'unset': {
         delete result[key];
         break;
       }
-      case 'ignore': {
+      case 'keep': {
         break;
       }
       default:
@@ -81,4 +82,13 @@ export function updateSecrets(
     }
   }
   return result;
+}
+
+export function mergeConnectionModel<P extends object>(
+  connection: Maybe<ConnectionData<P>>,
+  model: ConnectionEditorModel<P>,
+): ConnectionData<P> {
+  const params = model.params || connection?.params || null;
+  const secrets = updateSecrets(connection?.secrets || {}, model.secrets);
+  return { params, secrets };
 }

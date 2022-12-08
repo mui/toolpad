@@ -7,13 +7,14 @@ import {
   Skeleton,
   Stack,
   TextField,
+  TextFieldProps,
   Toolbar,
   Typography,
 } from '@mui/material';
 import { inferColumns, parseColumns } from '@mui/toolpad-components';
 import { DataGridPro, GridColDef } from '@mui/x-data-grid-pro';
 import * as React from 'react';
-import { useForm } from 'react-hook-form';
+import { Controller, useForm } from 'react-hook-form';
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
 import SyncIcon from '@mui/icons-material/Sync';
@@ -44,6 +45,7 @@ import {
   PostgresResult,
 } from './types';
 import * as appDom from '../../appDom';
+import { useGlobalConnectionFetchPrivate } from '../context';
 
 const MonacoEditor = lazyComponent(() => import('../../components/MonacoEditor'), {
   noSsr: true,
@@ -173,13 +175,21 @@ function ConnectionParamsInput({
   );
 }
 
-interface SecretTextFieldProps {
-  value: SecretsAction;
-  onChange: (newValue: SecretsAction) => void;
+interface SecretTextFieldProps extends Omit<TextFieldProps, 'value' | 'onChange'> {
+  value?: SecretsAction;
+  onChange?: (newValue: SecretsAction) => void;
 }
 
 function SecretTextField({ value, onChange, ...props }: SecretTextFieldProps) {
-  return <TextField {...props} />;
+  return (
+    <TextField
+      InputLabelProps={value?.kind === 'keep' ? { shrink: true } : {}}
+      placeholder={value?.kind === 'keep' ? '*** encrypted server-side ***' : undefined}
+      value={value?.kind === 'set' ? value.value : null}
+      onChange={(event) => onChange?.({ kind: 'set', value: event.target.value })}
+      {...props}
+    />
+  );
 }
 
 function GlobalConnectionParamsInput({
@@ -187,7 +197,7 @@ function GlobalConnectionParamsInput({
   onChange,
   onClose,
 }: GlobalConnectionEditorProps<PostgresConnectionParams>) {
-  const { handleSubmit, register, formState, reset, watch } = useForm({
+  const { handleSubmit, register, formState, reset, watch, control } = useForm({
     defaultValues: value,
     reValidateMode: 'onChange',
     mode: 'all',
@@ -196,23 +206,23 @@ function GlobalConnectionParamsInput({
 
   const doSubmit = handleSubmit((connectionParams) => onChange(connectionParams));
 
-  const fetchPrivate = useFetchPrivate<PostgresPrivateQuery, any>();
+  const fetchPrivate = useGlobalConnectionFetchPrivate<PostgresPrivateQuery, any>();
 
   const [connectionStatus, setConnectionStatus] = React.useState<PostgresConnectionStatus | null>(
     null,
   );
 
-  const values = watch();
+  const input = watch();
 
   const handleTestConnection = React.useCallback(() => {
-    fetchPrivate({ kind: 'connectionStatus', params: values.params })
+    fetchPrivate({ kind: 'connectionStatus2', value: input })
       .then((status) => {
         setConnectionStatus(status);
       })
       .catch(() => {
         setConnectionStatus(null);
       });
-  }, [fetchPrivate, values]);
+  }, [fetchPrivate, input]);
 
   const statusIcon = getConnectionStatusIcon(connectionStatus);
 
@@ -241,6 +251,7 @@ function GlobalConnectionParamsInput({
           />
           <TextField
             label="port"
+            type="number"
             {...register('params.port', { required: true })}
             {...validation(formState, 'params.port')}
           />
@@ -249,11 +260,20 @@ function GlobalConnectionParamsInput({
             {...register('params.user', { required: true })}
             {...validation(formState, 'params.user')}
           />
-          <TextField
-            label="password"
-            type="password"
-            {...register('params.password', { required: true })}
-            {...validation(formState, 'params.password')}
+          <Controller
+            name="secrets.password"
+            control={control}
+            render={({ field: { value: fieldValue, onChange: onFieldChange, ref } }) => {
+              return (
+                <SecretTextField
+                  ref={ref}
+                  label="password"
+                  type="password"
+                  value={fieldValue}
+                  onChange={(newValue) => onFieldChange(newValue)}
+                />
+              );
+            }}
           />
           <TextField
             label="database"

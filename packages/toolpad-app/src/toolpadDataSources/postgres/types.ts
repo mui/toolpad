@@ -1,4 +1,5 @@
 import { ExecFetchResult } from '@mui/toolpad-core';
+import { ConnectionEditorModel } from '../../types';
 
 export interface PostgresConnectionParams {
   host: string;
@@ -29,6 +30,12 @@ export interface PostgresPrivateQueryConnectionStatus {
   params: PostgresConnectionParams | null;
 }
 
+export interface PostgresPrivateQueryConnectionStatus2 {
+  kind: 'connectionStatus2';
+  value: ConnectionEditorModel<PostgresConnectionParams>;
+}
+
 export type PostgresPrivateQuery =
   | PostgresPrivateQueryDebugExec
-  | PostgresPrivateQueryConnectionStatus;
+  | PostgresPrivateQueryConnectionStatus
+  | PostgresPrivateQueryConnectionStatus2;

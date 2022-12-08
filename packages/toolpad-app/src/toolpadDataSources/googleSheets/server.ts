@@ -3,12 +3,7 @@ import { drive_v3 } from '@googleapis/drive';
 import { sheets_v4 } from '@googleapis/sheets';
 import { OAuth2Client } from 'google-auth-library';
 import { match } from 'path-to-regexp';
-import type {
-  ServerDataSource,
-  CreateHandlerApi,
-  ConnectionEditorModel,
-  ConnectionData,
-} from '../../types';
+import type { ServerDataSource, CreateHandlerApi, ConnectionData } from '../../types';
 import config from '../../server/config';
 import { asArray } from '../../utils/collections';
 import {
@@ -18,7 +13,7 @@ import {
   GoogleSheetsResult,
 } from './types';
 import { Maybe } from '../../utils/types';
-import { updateSecrets } from '../../server/secrets';
+import { mergeConnectionModel } from '../../server/secrets';
 
 /**
  * Create an OAuth2 client based on the configuration
@@ -215,15 +210,6 @@ async function execPrivate(
     return exec(connection, query.query);
   }
   throw new Error(`Google Sheets: Unrecognized private query "${JSON.stringify(query)}"`);
-}
-
-function mergeConnectionModel<P extends object>(
-  connection: Maybe<ConnectionData<P>>,
-  model: ConnectionEditorModel<P>,
-): ConnectionData<P> {
-  const params = model.params || connection?.params || null;
-  const secrets = updateSecrets(connection?.secrets || {}, model.secrets);
-  return { params, secrets };
 }
 
 /**

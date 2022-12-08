@@ -48,7 +48,6 @@ import ErrorAlert from '../AppEditor/PageEditor/ErrorAlert';
 import { ConfirmDialog } from '../../components/SystemDialogs';
 import config from '../../config';
 import {
-  AppTemplateId,
   ClientDataSource,
   ConnectionEditorModel,
   GlobalConnectionEditorProps,
@@ -63,36 +62,6 @@ import { GlobalConnectionContextProvider } from '../../toolpadDataSources/contex
 import { mapValues } from '../../utils/collections';
 
 const USE_DATAGRID = false;
-
-export const APP_TEMPLATE_OPTIONS: Map<
-  AppTemplateId,
-  {
-    label: string;
-    description: string;
-  }
-> = new Map([
-  [
-    'blank',
-    {
-      label: 'Blank page',
-      description: 'Start with an empty canvas',
-    },
-  ],
-  [
-    'stats',
-    {
-      label: 'Statistics',
-      description: 'Table with statistics data',
-    },
-  ],
-  [
-    'images',
-    {
-      label: 'Images',
-      description: 'Fetch remote images',
-    },
-  ],
-]);
 
 export interface CreateAppDialogProps {
   open: boolean;
@@ -809,7 +778,7 @@ export default function Connections() {
         name: connection.name,
         dataSourceId: connection.datasource,
         params: connection.params as object | null,
-        secrets: mapValues(connection.secrets, (): SecretsAction => ({ kind: 'ignore' })),
+        secrets: mapValues(connection.secrets, (): SecretsAction => ({ kind: 'keep' })),
       });
     } catch (error: unknown) {
       dispatch({ kind: 'CONNECTION_LOAD_FAILED', error: errorFrom(error) });

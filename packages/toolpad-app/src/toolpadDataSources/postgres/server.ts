@@ -1,5 +1,6 @@
 import { Client, QueryConfig } from 'pg';
-import { ServerDataSource } from '../../types';
+import { mergeConnectionModel } from '../../server/secrets';
+import { ConnectionData, ServerDataSource } from '../../types';
 import { errorFrom } from '../../utils/errors';
 import { Maybe } from '../../utils/types';
 import {
@@ -88,10 +89,6 @@ async function exec(
 async function execPrivate(
   connection: Maybe<PostgresConnectionParams>,
   query: PostgresPrivateQuery,
-): Promise<any>;
-async function execPrivate(
-  connection: Maybe<PostgresConnectionParams>,
-  query: PostgresPrivateQuery,
 ): Promise<any> {
   switch (query.kind) {
     case 'debugExec':
@@ -112,7 +109,30 @@ async function execPrivate(
   }
 }
 
+async function globalConnectionExecPrivate(
+  connection: Maybe<ConnectionData<PostgresConnectionParams>>,
+  query: PostgresPrivateQuery,
+): Promise<any> {
+  switch (query.kind) {
+    case 'connectionStatus2': {
+      try {
+        const { params, secrets } = mergeConnectionModel(connection, query.value);
+        const client = new Client({ ...params, ...secrets });
+        await client.connect();
+        await client.query('SELECT * FROM version();');
+        return { error: null };
+      } catch (rawError) {
+        const err = errorFrom(rawError);
+        return { error: err.message };
+      }
+    }
+    default:
+      throw new Error(`Unknown query "${(query as PostgresPrivateQuery).kind}"`);
+  }
+}
+
 const dataSource: ServerDataSource<PostgresConnectionParams, PostgresQuery, any> = {
+  globalConnectionExecPrivate,
   execPrivate,
   exec,
 };

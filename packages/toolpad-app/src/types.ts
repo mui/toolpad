@@ -88,10 +88,10 @@ export type SecretsAction =
       value: any;
     }
   | {
-      kind: 'ignore';
+      kind: 'keep';
     }
   | {
-      kind: 'delete';
+      kind: 'unset';
     };
 
 export type SecretsActions = Record<string, SecretsAction>;

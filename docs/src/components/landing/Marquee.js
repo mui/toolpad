@@ -29,7 +29,7 @@ function Marquee({ content }) {
         {content.title}
       </Typography>
       <Typography
-        color="text.secondary"
+        color="grey.500"
         textAlign="center"
         sx={{
           my: 2,

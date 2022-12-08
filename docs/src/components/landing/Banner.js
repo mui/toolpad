@@ -12,19 +12,7 @@ import KeyboardArrowRightRounded from '@mui/icons-material/KeyboardArrowRightRou
 export default function Banner(props) {
   const { title, description, href, label, category, action, docs } = props;
   return (
-    <Box
-      sx={{
-        bgcolor: (theme) => {
-          if (theme.palette.mode === 'dark') {
-            return theme.palette.primaryDark[900];
-          }
-          if (docs) {
-            return 'default';
-          }
-          return theme.palette.grey[50];
-        },
-      }}
-    >
+    <Box>
       <Container
         sx={{
           pt: 0,
@@ -106,5 +94,5 @@ Banner.propTypes = {
   docs: PropTypes.bool,
   href: PropTypes.string.isRequired,
   label: PropTypes.string.isRequired,
-  title: PropTypes.string.isRequired,
+  title: PropTypes.string,
 };

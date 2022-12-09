@@ -56,3 +56,33 @@ export function filterValues<U>(
 ): Record<string, U> {
   return mapProperties(obj, ([key, value]) => (filter(value) ? [key, value] : null));
 }
+
+export function union<T>(...sources: Set<T>[]): Set<T> {
+  const result = new Set<T>();
+  for (const source of sources) {
+    for (const element of source) {
+      result.add(element);
+    }
+  }
+  return result;
+}
+
+export function intersection<T>(...sources: Set<T>[]): Set<T> {
+  const result = new Set<T>(sources.length > 0 ? sources[0] : []);
+  for (const source of sources.slice(1)) {
+    for (const element of result) {
+      if (!source.has(element)) {
+        result.delete(element);
+      }
+    }
+  }
+  return result;
+}
+
+export function difference<T>(target: Set<T>, ...sources: Set<T>[]): Set<T> {
+  const result = new Set<T>(target);
+  for (const source of sources) {
+    source.forEach((element) => result.delete(element));
+  }
+  return result;
+}

@@ -2,9 +2,13 @@ import * as React from 'react';
 import { Grid, MenuItem, Stack, TextField } from '@mui/material';
 import { ApiKeyAuth, Authentication, BasicAuth, BearerTokenAuth } from './types';
 import { Maybe, WithControlledProp } from '../../utils/types';
+import { SecretsActions } from '../../types';
+import SecretTextField from '../SecretTextField';
 
 interface AuthMethodEditorProps<T> extends WithControlledProp<T> {
   disabled?: boolean;
+  secrets?: SecretsActions;
+  onSecretsChange?: (newSecrets: SecretsActions) => void;
 }
 
 function ApiKeyAuthEditor({ disabled, value, onChange }: AuthMethodEditorProps<ApiKeyAuth>) {
@@ -29,20 +33,28 @@ function BearerTokenAuthEditor({
   disabled,
   value,
   onChange,
+  secrets,
+  onSecretsChange,
 }: AuthMethodEditorProps<BearerTokenAuth>) {
   return (
     <Stack gap={1}>
-      <TextField
+      <SecretTextField
         disabled={disabled}
         label="token"
-        value={value.token}
-        onChange={(event) => onChange({ ...value, token: event.target.value })}
+        value={secrets?.bearerToken || { kind: 'set', value: '' }}
+        onChange={(newValue) => onSecretsChange?.({ ...secrets, bearerToken: newValue })}
       />
     </Stack>
   );
 }
 
-function BasicAuthEditor({ disabled, value, onChange }: AuthMethodEditorProps<BasicAuth>) {
+function BasicAuthEditor({
+  disabled,
+  value,
+  onChange,
+  secrets,
+  onSecretsChange,
+}: AuthMethodEditorProps<BasicAuth>) {
   return (
     <Stack gap={1}>
       <TextField
@@ -51,12 +63,11 @@ function BasicAuthEditor({ disabled, value, onChange }: AuthMethodEditorProps<Ba
         value={value.user}
         onChange={(event) => onChange({ ...value, user: event.target.value })}
       />
-      <TextField
-        type="password"
+      <SecretTextField
         disabled={disabled}
         label="password"
-        value={value.password}
-        onChange={(event) => onChange({ ...value, password: event.target.value })}
+        value={secrets?.basicAuthPassword || { kind: 'set', value: '' }}
+        onChange={(newValue) => onSecretsChange?.({ ...secrets, basicAuthPassword: newValue })}
       />
     </Stack>
   );
@@ -93,12 +104,15 @@ function getInitialAuthenticationValue(type: string): Maybe<Authentication> {
 
 export interface AuthenticationEditorProps extends WithControlledProp<Maybe<Authentication>> {
   disabled?: boolean;
+  secrets?: SecretsActions;
+  onSecretsChange?: (newSecrets: SecretsActions) => void;
 }
 
 export default function AuthenticationEditor({
   disabled,
   value,
   onChange,
+  ...props
 }: AuthenticationEditorProps) {
   const handleTypeChange = React.useCallback(
     (event: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => {
@@ -124,9 +138,14 @@ export default function AuthenticationEditor({
           <MenuItem value="apiKey">API key</MenuItem>
         </TextField>
       </Grid>
-      <Grid item xs={4}>
+      <Grid item xs={8}>
         {value ? (
-          <AuthenticationDetailsEditor disabled={disabled} value={value} onChange={onChange} />
+          <AuthenticationDetailsEditor
+            disabled={disabled}
+            value={value}
+            onChange={onChange}
+            {...props}
+          />
         ) : null}
       </Grid>
     </Grid>

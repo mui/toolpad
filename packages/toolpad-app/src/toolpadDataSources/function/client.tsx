@@ -15,12 +15,15 @@ import {
 } from '@mui/material';
 import { Controller, useForm } from 'react-hook-form';
 import { BindableAttrEntries, BindableAttrValue } from '@mui/toolpad-core';
+import cuid from 'cuid';
 import {
   ClientDataSource,
   ConnectionEditorProps,
   GlobalConnectionEditorProps,
   ExecFetchFn,
   QueryEditorProps,
+  SecretsAction,
+  SecretsActions,
 } from '../../types';
 import {
   FunctionConnectionParams,
@@ -50,6 +53,9 @@ import { MOVIES_API_DEMO_URL } from '../demo';
 import * as appDom from '../../appDom';
 import { clientExec } from './runtime';
 import config from '../../config';
+import SecretTextField from '../SecretTextField';
+import { difference } from '../../utils/collections';
+import { omit } from '../../utils/immutability';
 
 const EVENT_INTERFACE_IDENTIFIER = 'ToolpadFunctionEvent';
 
@@ -106,12 +112,71 @@ function ConnectionParamsInput({
   );
 }
 
+interface SecretsMapEntriesEditorValue {
+  map: [string, string][];
+  secrets: SecretsActions;
+}
+
+interface SecretsMapEntriesEditorProps {
+  value: SecretsMapEntriesEditorValue;
+  onChange: (newValue: SecretsMapEntriesEditorValue) => void;
+}
+
+type KeyedSecretsAction = SecretsAction & { key: string };
+
+function SecretsMapEntriesEditor({ value, onChange }: SecretsMapEntriesEditorProps) {
+  const val: [string, KeyedSecretsAction][] = React.useMemo(() => {
+    return value.map.map(([key, secretKey]) => [
+      key,
+      {
+        key: secretKey,
+        ...(value.secrets[secretKey] ?? { kind: 'unset' }),
+      },
+    ]);
+  }, [value.map, value.secrets]);
+
+  const handleChange = React.useCallback(
+    (newValue: [string, KeyedSecretsAction][]) => {
+      const oldSecretKeys = new Set(value.map.map(([, secretKey]) => secretKey));
+      const newSecretKeys = new Set(newValue.map(([, { key }]) => key));
+      const deletedSecretKeys = difference(oldSecretKeys, newSecretKeys);
+      onChange({
+        map: newValue.map(([key, action]) => [key, action.key]),
+        secrets: {
+          ...omit(value.secrets, ...deletedSecretKeys),
+          ...Object.fromEntries(newValue.map(([, { key, ...secret }]) => [key, secret])),
+        },
+      });
+    },
+    [onChange, value.map, value.secrets],
+  );
+
+  return (
+    <MapEntriesEditor<KeyedSecretsAction>
+      fieldLabel="key"
+      defaultValue={() => ({ key: cuid.slug(), kind: 'set', value: '' })}
+      value={val}
+      onChange={handleChange}
+      renderValueEditor={({ value: entryValue, onChange: onEntryChange, ...props }) => {
+        const { key, ...secret } = entryValue;
+        return (
+          <SecretTextField
+            value={secret}
+            onChange={(newValue) => onEntryChange({ key, ...newValue })}
+            {...props}
+          />
+        );
+      }}
+    />
+  );
+}
+
 function GlobalConnectionParamsInput({
   value,
   onChange,
   onClose,
 }: GlobalConnectionEditorProps<FunctionConnectionParams>) {
-  const { handleSubmit, formState, reset, control, register } = useForm({
+  const { handleSubmit, formState, reset, register, watch, setValue } = useForm({
     defaultValues: value,
     reValidateMode: 'onChange',
     mode: 'all',
@@ -119,6 +184,9 @@ function GlobalConnectionParamsInput({
   React.useEffect(() => reset(value), [reset, value]);
 
   const doSubmit = handleSubmit((newValue) => onChange(newValue));
+
+  const secretsMap = watch('params.secrets');
+  const secrets = watch('secrets');
 
   return (
     <React.Fragment>
@@ -130,18 +198,11 @@ function GlobalConnectionParamsInput({
             {...validation(formState, 'name')}
           />
           <Typography>Secrets:</Typography>
-          <Controller
-            name="params.secrets"
-            control={control}
-            render={({ field: { value: fieldValue, onChange: onFieldChange, ref, ...field } }) => {
-              return (
-                <MapEntriesEditor
-                  {...field}
-                  fieldLabel="key"
-                  value={fieldValue ?? []}
-                  onChange={onFieldChange}
-                />
-              );
+          <SecretsMapEntriesEditor
+            value={{ map: secretsMap || [], secrets }}
+            onChange={(newValue) => {
+              setValue('params.secrets', newValue.map);
+              setValue('secrets', newValue.secrets);
             }}
           />
         </Stack>

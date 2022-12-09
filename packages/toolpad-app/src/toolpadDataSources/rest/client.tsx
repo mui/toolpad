@@ -142,6 +142,7 @@ function ConnectionParamsInput({ value, onChange }: ConnectionEditorProps<RestCo
   const headersValue = watch('headers');
   const authenticationValue = watch('authentication');
   const authenticationHeaders = getAuthenticationHeaders(authenticationValue);
+  console.log(authenticationValue);
 
   const mustHaveBaseUrl: boolean =
     (headersValue && headersValue.length > 0) || !!authenticationValue;
@@ -213,7 +214,7 @@ function GlobalConnectionParamsInput({
   onChange,
   onClose,
 }: GlobalConnectionEditorProps<RestConnectionParams>) {
-  const { handleSubmit, register, formState, reset, control, watch } = useForm({
+  const { handleSubmit, register, formState, reset, control, watch, setValue } = useForm({
     defaultValues: { ...value, params: withDefaults(value.params) },
     reValidateMode: 'onChange',
     mode: 'all',
@@ -260,6 +261,8 @@ function GlobalConnectionParamsInput({
     ...validation(formState, 'params.baseUrl'),
   };
 
+  const secrets = watch('secrets');
+
   return (
     <React.Fragment>
       <DialogContent>
@@ -297,6 +300,8 @@ function GlobalConnectionParamsInput({
                 {...field}
                 disabled={!headersAllowed || config.isDemo}
                 value={fieldValue ?? null}
+                secrets={secrets}
+                onSecretsChange={(newSecrets) => setValue('secrets', newSecrets)}
               />
             )}
           />

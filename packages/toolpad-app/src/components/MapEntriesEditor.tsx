@@ -29,7 +29,7 @@ interface RenderValueEditor<V> {
 }
 
 interface MapEntriesEditorExtraProps<V> {
-  defaultValue: V;
+  defaultValue: V extends Function ? never : V | (() => V);
   renderValueEditor: RenderValueEditor<V>;
 }
 
@@ -79,8 +79,6 @@ export default function MapEntriesEditor<V = string>({
 
   const renderValueEditor =
     renderValueEditorProp ?? (renderStringValueEditor as unknown as RenderValueEditor<V>);
-
-  const defaultValue = defaultValueProp ?? ('' as unknown as V);
 
   return (
     <Box sx={sx} display="grid" gridTemplateColumns="1fr 2fr auto" alignItems="center" gap={1}>
@@ -135,6 +133,12 @@ export default function MapEntriesEditor<V = string>({
           label={fieldLabel}
           value=""
           onChange={(event) => {
+            let defaultValue: V;
+            if (typeof defaultValueProp === 'function') {
+              defaultValue = defaultValueProp();
+            } else {
+              defaultValue = (defaultValueProp ?? '') as unknown as V;
+            }
             onChange([...value, [event.target.value, defaultValue]]);
           }}
           autoFocus={autoFocus}

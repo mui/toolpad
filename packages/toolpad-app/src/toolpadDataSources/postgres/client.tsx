@@ -7,7 +7,6 @@ import {
   Skeleton,
   Stack,
   TextField,
-  TextFieldProps,
   Toolbar,
   Typography,
 } from '@mui/material';
@@ -29,7 +28,6 @@ import {
   ConnectionEditorProps,
   GlobalConnectionEditorProps,
   QueryEditorProps,
-  SecretsAction,
 } from '../../types';
 import { isSaveDisabled, validation } from '../../utils/forms';
 import lazyComponent from '../../utils/lazyComponent';
@@ -46,6 +44,7 @@ import {
 } from './types';
 import * as appDom from '../../appDom';
 import { useGlobalConnectionFetchPrivate } from '../context';
+import SecretTextField from '../SecretTextField';
 
 const MonacoEditor = lazyComponent(() => import('../../components/MonacoEditor'), {
   noSsr: true,
@@ -172,23 +171,6 @@ function ConnectionParamsInput({
         </Typography>
       ) : null}
     </Stack>
-  );
-}
-
-interface SecretTextFieldProps extends Omit<TextFieldProps, 'value' | 'onChange'> {
-  value?: SecretsAction;
-  onChange?: (newValue: SecretsAction) => void;
-}
-
-function SecretTextField({ value, onChange, ...props }: SecretTextFieldProps) {
-  return (
-    <TextField
-      InputLabelProps={value?.kind === 'keep' ? { shrink: true } : {}}
-      placeholder={value?.kind === 'keep' ? '*** encrypted server-side ***' : undefined}
-      value={value?.kind === 'set' ? value.value : null}
-      onChange={(event) => onChange?.({ kind: 'set', value: event.target.value })}
-      {...props}
-    />
   );
 }
 

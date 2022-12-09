@@ -2,6 +2,8 @@
 
 <p class="description">Toolpad is a low-code UI builder for creating apps with MUI's suite of component libraries.</p>
 
+{{"component": "components/landing/Banner.js", "action": "tryDemo", "category": "ToolpadDocs", "description": "Check out Toolpad's interactive demo. No sign-up required!", "href": "https://demo.toolpad.io", "label": "Try Demo", "docs": true }}
+
 ## Introduction
 
 Toolpad is a self-hosted low-code internal tools builder designed to extend MUI's suite of React components.

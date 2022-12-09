@@ -27,6 +27,7 @@ import {
   Tooltip,
   Typography,
   CircularProgress,
+  Alert,
 } from '@mui/material';
 import IconButton from '@mui/material/IconButton';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
@@ -326,39 +327,44 @@ function AppDeleteDialog({ connection, onClose }: AppDeleteDialogProps) {
   );
 }
 
-interface AppNameEditableProps {
+interface ConnectionNameEditableProps {
   connection?: ConnectionMeta;
   editing?: boolean;
   setEditing: (editing: boolean) => void;
   loading?: boolean;
 }
 
-function AppNameEditable({ connection, editing, setEditing, loading }: AppNameEditableProps) {
-  const [appRenameError, setAppRenameError] = React.useState<Error | null>(null);
+function ConnectionNameEditable({
+  connection,
+  editing,
+  setEditing,
+  loading,
+}: ConnectionNameEditableProps) {
+  const [renameError, setRenameError] = React.useState<Error | null>(null);
   const appNameInput = React.useRef<HTMLInputElement | null>(null);
-  const [appName, setAppName] = React.useState<string>(connection?.name || '');
+  const [name, setName] = React.useState<string>(connection?.name || '');
 
-  const handleAppNameChange = React.useCallback(
+  const handleNameChange = React.useCallback(
     (newValue: string) => {
-      setAppRenameError(null);
-      setAppName(newValue);
+      setRenameError(null);
+      setName(newValue);
     },
-    [setAppName],
+    [setName],
   );
 
   const handleAppRenameClose = React.useCallback(() => {
     setEditing(false);
-    setAppRenameError(null);
+    setRenameError(null);
   }, [setEditing]);
 
-  const handleAppRenameSave = React.useCallback(
-    async (name: string) => {
+  const handleSave = React.useCallback(
+    async (newName: string) => {
       if (connection?.id) {
         try {
-          await client.mutation.updateApp(connection.id, { name });
-          await client.invalidateQueries('getApps');
+          await client.mutation.updateConnection(connection.id, { name: newName });
+          await client.invalidateQueries('getConnections');
         } catch (rawError) {
-          setAppRenameError(errorFrom(rawError));
+          setRenameError(errorFrom(rawError));
           setEditing(true);
         }
       }
@@ -372,16 +378,16 @@ function AppNameEditable({ connection, editing, setEditing, loading }: AppNameEd
     <EditableText
       defaultValue={connection?.name}
       editable={editing}
-      helperText={appRenameError ? `An app named "${appName}" already exists` : null}
-      error={!!appRenameError}
-      onChange={handleAppNameChange}
+      helperText={renameError ? `An app named "${name}" already exists` : null}
+      error={!!renameError}
+      onChange={handleNameChange}
       onClose={handleAppRenameClose}
-      onSave={handleAppRenameSave}
+      onSave={handleSave}
       ref={appNameInput}
       sx={{
         width: '100%',
       }}
-      value={appName}
+      value={name}
       variant="subtitle1"
     />
   );
@@ -389,7 +395,7 @@ function AppNameEditable({ connection, editing, setEditing, loading }: AppNameEd
 
 interface ConnectionOptionsProps {
   connection?: ConnectionMeta;
-  onRename: () => void;
+  onRename?: () => void;
   onDelete?: () => void;
   onDuplicate?: () => void;
 }
@@ -404,7 +410,7 @@ function ConnectionOptions({
 
   const handleRenameClick = React.useCallback(() => {
     onMenuClose();
-    onRename();
+    onRename?.();
   }, [onMenuClose, onRename]);
 
   const handleDeleteClick = React.useCallback(() => {
@@ -423,12 +429,14 @@ function ConnectionOptions({
         <MoreVertIcon />
       </IconButton>
       <Menu {...menuProps}>
-        <MenuItem onClick={handleRenameClick}>
-          <ListItemIcon>
-            <DriveFileRenameOutlineIcon />
-          </ListItemIcon>
-          <ListItemText>Rename</ListItemText>
-        </MenuItem>
+        {onRename ? (
+          <MenuItem onClick={handleRenameClick}>
+            <ListItemIcon>
+              <DriveFileRenameOutlineIcon />
+            </ListItemIcon>
+            <ListItemText>Rename</ListItemText>
+          </MenuItem>
+        ) : null}
         <MenuItem onClick={handleDuplicateClick}>
           <ListItemIcon>
             <ContentCopyOutlinedIcon />
@@ -474,7 +482,6 @@ function ConnectionCard({ connection, onDelete, onEdit, onDuplicate }: Connectio
         action={
           <ConnectionOptions
             connection={connection}
-            onRename={handleRename}
             onDelete={onDelete}
             onDuplicate={onDuplicate}
           />
@@ -493,7 +500,7 @@ function ConnectionCard({ connection, onDelete, onEdit, onDuplicate }: Connectio
         }
       />
       <CardContent sx={{ flexGrow: 1 }}>
-        <AppNameEditable
+        <ConnectionNameEditable
           connection={connection}
           editing={editingName}
           setEditing={setEditingName}
@@ -524,7 +531,7 @@ function ConnectionRow({ connection, onDelete, onDuplicate, onEdit }: Connection
   return (
     <TableRow hover role="row">
       <TableCell component="th" scope="row">
-        <AppNameEditable
+        <ConnectionNameEditable
           loading={Boolean(!connection)}
           connection={connection}
           editing={editingName}
@@ -726,7 +733,7 @@ export default function Connections() {
     enabled: !config.isDemo,
   });
 
-  const [deletedApp, setDeletedApp] = React.useState<null | ConnectionMeta>(null);
+  const [deletedApp, setDeletedConnection] = React.useState<null | ConnectionMeta>(null);
 
   const [viewMode, setViewMode] = useLocalStorageState<string>('home-app-view-mode', 'list');
 
@@ -739,7 +746,7 @@ export default function Connections() {
 
   const duplicateAppMutation = client.useMutation('duplicateApp');
 
-  const duplicateApp = React.useCallback(
+  const duplicateConnection = React.useCallback(
     async (app: ConnectionMeta) => {
       if (app) {
         await duplicateAppMutation.mutateAsync([app.id, app.name]);
@@ -788,6 +795,9 @@ export default function Connections() {
   return (
     <ToolpadHomeShell>
       <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
+        <Alert severity="warning">
+          🚧 Under construction. Assume that global connections are not functional yet.
+        </Alert>
         <Toolbar variant="regular" disableGutters sx={{ gap: 2, px: 5, mt: 3, mb: 2 }}>
           <Typography sx={{ pl: 2 }} variant="h3">
             Connections
@@ -823,13 +833,13 @@ export default function Connections() {
             <ConnectionsView
               connections={connections}
               loading={isLoading}
-              onDeleteConnection={setDeletedApp}
-              onDuplicateConnection={duplicateApp}
+              onDeleteConnection={setDeletedConnection}
+              onDuplicateConnection={duplicateConnection}
               onEditConnection={handleEditConnection}
             />
           </Box>
         )}
-        <AppDeleteDialog connection={deletedApp} onClose={() => setDeletedApp(null)} />
+        <AppDeleteDialog connection={deletedApp} onClose={() => setDeletedConnection(null)} />
       </Box>
 
       <CreateConnectionDialog state={dialogState} dispatch={dispatch} />

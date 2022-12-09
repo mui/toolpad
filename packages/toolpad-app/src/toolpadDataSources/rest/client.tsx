@@ -142,7 +142,6 @@ function ConnectionParamsInput({ value, onChange }: ConnectionEditorProps<RestCo
   const headersValue = watch('headers');
   const authenticationValue = watch('authentication');
   const authenticationHeaders = getAuthenticationHeaders(authenticationValue);
-  console.log(authenticationValue);
 
   const mustHaveBaseUrl: boolean =
     (headersValue && headersValue.length > 0) || !!authenticationValue;

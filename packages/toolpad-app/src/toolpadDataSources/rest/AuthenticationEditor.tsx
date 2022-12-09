@@ -7,7 +7,9 @@ import SecretTextField from '../SecretTextField';
 
 interface AuthMethodEditorProps<T> extends WithControlledProp<T> {
   disabled?: boolean;
+  // eslint-disable-next-line react/no-unused-prop-types
   secrets?: SecretsActions;
+  // eslint-disable-next-line react/no-unused-prop-types
   onSecretsChange?: (newSecrets: SecretsActions) => void;
 }
 
@@ -31,8 +33,6 @@ function ApiKeyAuthEditor({ disabled, value, onChange }: AuthMethodEditorProps<A
 }
 function BearerTokenAuthEditor({
   disabled,
-  value,
-  onChange,
   secrets,
   onSecretsChange,
 }: AuthMethodEditorProps<BearerTokenAuth>) {

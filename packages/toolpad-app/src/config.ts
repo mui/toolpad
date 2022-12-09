@@ -50,6 +50,7 @@ export interface RuntimeConfig {
   externalUrl: string;
 
   googleSheetsClientId?: string;
+  experimentalGlobalConnections?: boolean;
 }
 
 declare global {
@@ -86,6 +87,7 @@ const runtimeConfig: RuntimeConfig =
         externalUrl:
           process.env.TOOLPAD_EXTERNAL_URL || `http://localhost:${process.env.PORT || 3000}`,
         googleSheetsClientId: process.env.TOOLPAD_DATASOURCE_GOOGLESHEETS_CLIENT_ID,
+        experimentalGlobalConnections: !!process.env.TOOLPAD_EXPERIMENTAL_GLOBAL_CONNECTIONS,
       }
     : getBrowsersideRuntimeConfig();
 

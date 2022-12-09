@@ -186,7 +186,7 @@ export default function AppEditorShell({ appId, ...props }: ToolpadShellProps) {
               Deploy
             </Button>
             {isDeployed ? (
-              <>
+              <React.Fragment>
                 <Button
                   size="small"
                   aria-controls={open ? 'split-button-menu' : undefined}
@@ -208,7 +208,7 @@ export default function AppEditorShell({ appId, ...props }: ToolpadShellProps) {
                     Preview latest deployed version
                   </MenuItem>
                 </Menu>
-              </>
+              </React.Fragment>
             ) : null}
           </ButtonGroup>
         </Stack>

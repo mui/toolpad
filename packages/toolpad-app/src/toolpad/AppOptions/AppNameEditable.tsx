@@ -46,7 +46,7 @@ function AppNameEditable({ app, editing, setEditing, existingAppNames }: AppName
       if (app.id) {
         try {
           await client.mutation.updateApp(app.id, { name });
-          await client.invalidateQueries('getApps');
+          await client.invalidateQueries('getConnections');
         } catch (rawError) {
           existingNames.add(name);
           setEditing(true);

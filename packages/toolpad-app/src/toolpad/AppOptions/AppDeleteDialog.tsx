@@ -18,7 +18,7 @@ function AppDeleteDialog({ app, onClose, redirectOnDelete }: AppDeleteDialogProp
     async (confirmed: boolean) => {
       if (confirmed && app) {
         await deleteAppMutation.mutateAsync([app.id]);
-        await client.invalidateQueries('getApps');
+        await client.invalidateQueries('getConnections');
         if (redirectOnDelete) {
           window.location.href = `/`;
         }

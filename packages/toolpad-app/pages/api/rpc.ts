@@ -26,6 +26,7 @@ import {
   getConnection,
   updateConnection,
   deleteConnection,
+  duplicateConnection,
   globalConnectionFetchPrivate,
 } from '../../src/server/data';
 import { getLatestToolpadRelease } from '../../src/server/getLatestRelease';
@@ -202,6 +203,9 @@ const rpcServer = {
     }),
     deleteConnection: createMethod<typeof deleteConnection>(({ params }) => {
       return deleteConnection(...params);
+    }),
+    duplicateConnection: createMethod<typeof duplicateConnection>(({ params }) => {
+      return duplicateConnection(...params);
     }),
   },
 } as const;

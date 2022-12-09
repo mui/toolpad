@@ -341,10 +341,10 @@ function ConnectionNameEditable({
   loading,
 }: ConnectionNameEditableProps) {
   const [renameError, setRenameError] = React.useState<Error | null>(null);
-  const appNameInput = React.useRef<HTMLInputElement | null>(null);
+  const nameInput = React.useRef<HTMLInputElement | null>(null);
   const [name, setName] = React.useState<string>(connection?.name || '');
 
-  const handleNameChange = React.useCallback(
+  const handleChange = React.useCallback(
     (newValue: string) => {
       setRenameError(null);
       setName(newValue);
@@ -352,7 +352,7 @@ function ConnectionNameEditable({
     [setName],
   );
 
-  const handleAppRenameClose = React.useCallback(() => {
+  const handleClose = React.useCallback(() => {
     setEditing(false);
     setRenameError(null);
   }, [setEditing]);
@@ -378,12 +378,12 @@ function ConnectionNameEditable({
     <EditableText
       defaultValue={connection?.name}
       editable={editing}
-      helperText={renameError ? `An app named "${name}" already exists` : null}
+      helperText={renameError ? `A connection named "${name}" already exists` : null}
       error={!!renameError}
-      onChange={handleNameChange}
-      onClose={handleAppRenameClose}
+      onChange={handleChange}
+      onClose={handleClose}
       onSave={handleSave}
-      ref={appNameInput}
+      ref={nameInput}
       sx={{
         width: '100%',
       }}
@@ -482,6 +482,7 @@ function ConnectionCard({ connection, onDelete, onEdit, onDuplicate }: Connectio
         action={
           <ConnectionOptions
             connection={connection}
+            onRename={handleRename}
             onDelete={onDelete}
             onDuplicate={onDuplicate}
           />
@@ -694,7 +695,7 @@ function ConnectionsListView({
       }}
     />
   ) : (
-    <Table aria-label="apps list" size="medium">
+    <Table aria-label="connections list" size="medium">
       <TableBody>
         {(() => {
           if (loading) {
@@ -733,7 +734,7 @@ export default function Connections() {
     enabled: !config.isDemo,
   });
 
-  const [deletedApp, setDeletedConnection] = React.useState<null | ConnectionMeta>(null);
+  const [deletedConnection, setDeletedConnection] = React.useState<null | ConnectionMeta>(null);
 
   const [viewMode, setViewMode] = useLocalStorageState<string>('home-app-view-mode', 'list');
 
@@ -744,16 +745,16 @@ export default function Connections() {
 
   const ConnectionsView = viewMode === 'list' ? ConnectionsListView : ConnectionsGridView;
 
-  const duplicateAppMutation = client.useMutation('duplicateApp');
+  const duplicateConnectionMutation = client.useMutation('duplicateConnection');
 
   const duplicateConnection = React.useCallback(
-    async (app: ConnectionMeta) => {
-      if (app) {
-        await duplicateAppMutation.mutateAsync([app.id, app.name]);
+    async (connection: ConnectionMeta) => {
+      if (connection) {
+        await duplicateConnectionMutation.mutateAsync([connection.id, connection.name]);
       }
-      await client.invalidateQueries('getApps');
+      await client.invalidateQueries('getConnections');
     },
-    [duplicateAppMutation],
+    [duplicateConnectionMutation],
   );
 
   const [dialogState, dispatch] = React.useReducer(dialogStateReducer, {
@@ -839,7 +840,10 @@ export default function Connections() {
             />
           </Box>
         )}
-        <AppDeleteDialog connection={deletedApp} onClose={() => setDeletedConnection(null)} />
+        <AppDeleteDialog
+          connection={deletedConnection}
+          onClose={() => setDeletedConnection(null)}
+        />
       </Box>
 
       <CreateConnectionDialog state={dialogState} dispatch={dispatch} />

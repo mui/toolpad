@@ -9,11 +9,12 @@ import {
   SecretsActions,
   GlobalConnectionContext,
   ConnectionSecrets,
+  SecretsAction,
 } from '../types';
 import serverDataSources from '../toolpadDataSources/server';
 import * as appDom from '../appDom';
 import { omit } from '../utils/immutability';
-import { asArray } from '../utils/collections';
+import { asArray, mapValues } from '../utils/collections';
 import {
   decryptSecret as decryptString,
   encryptSecret as encryptString,
@@ -647,7 +648,7 @@ export async function getConnection(id: string): Promise<Connection | null> {
 
 export interface CreateConnectionOptions {
   datasource: string;
-  params: object | null;
+  params: prisma.Prisma.JsonValue;
   secrets: SecretsActions;
 }
 
@@ -698,6 +699,17 @@ export async function updateConnection(
 
 export async function deleteConnection(id: string) {
   await prismaClient.connection.delete({ where: { id } });
+}
+
+export async function duplicateConnection(id: string, name: string) {
+  const connection = await getConnectionUnsafe(id);
+  if (!connection) {
+    throw new Error(`Connection "${id}" doesn't exist`);
+  }
+  await createConnection(name, {
+    ...connection,
+    secrets: mapValues(connection.secrets, (value): SecretsAction => ({ kind: 'set', value })),
+  });
 }
 
 export async function globalConnectionFetchPrivate<P, Q>(

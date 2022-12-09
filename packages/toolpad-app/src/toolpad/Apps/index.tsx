@@ -590,7 +590,7 @@ export default function Home() {
     data: apps = [],
     isLoading,
     error,
-  } = client.useQuery('getApps', [], {
+  } = client.useQuery('getConnections', [], {
     enabled: !config.isDemo,
   });
   const { data: activeDeployments } = client.useQuery('getActiveDeployments', []);

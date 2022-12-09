@@ -50,7 +50,7 @@ function AppDuplicateDialog({ app, onClose, open, ...props }: AppDuplicateDialog
   const duplicateApp = React.useCallback(async () => {
     const duplicated = await duplicateAppMutation.mutateAsync([app.id, nameInput]);
     setDuplicatedApp({ name: duplicated.name, url: `/app/${duplicated.id}` });
-    await client.invalidateQueries('getApps');
+    await client.invalidateQueries('getConnections');
   }, [app, nameInput, duplicateAppMutation]);
 
   const isFormValid = !duplicateAppMutation.isError;

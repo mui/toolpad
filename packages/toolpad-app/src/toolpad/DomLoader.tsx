@@ -111,12 +111,12 @@ export function domLoaderReducer(state: DomLoader, action: DomAction): DomLoader
   switch (action.type) {
     case 'DOM_UPDATE_HISTORY': {
       const updatedViewInfo =
-        action.viewInfo && action.viewInfo.name === state.lastEditedViewInfo.name
+        action.viewInfo && action.viewInfo.name === state.currentViewInfo.name
           ? {
-              ...state.lastEditedViewInfo,
+              ...state.currentViewInfo,
               ...action.viewInfo,
             }
-          : action.viewInfo || state.lastEditedViewInfo;
+          : action.viewInfo || state.currentViewInfo;
 
       const updatedUndoStack = [
         ...state.undoStack,
@@ -158,7 +158,7 @@ export function domLoaderReducer(state: DomLoader, action: DomAction): DomLoader
       return update(state, {
         dom: previousStackEntry.dom,
         selectedNodeId: previousStackEntry.selectedNodeId,
-        lastEditedViewInfo: previousStackEntry.viewInfo,
+        currentViewInfo: previousStackEntry.viewInfo,
         undoStack,
         redoStack,
       });
@@ -178,7 +178,7 @@ export function domLoaderReducer(state: DomLoader, action: DomAction): DomLoader
       return update(state, {
         dom: nextStackEntry.dom,
         selectedNodeId: nextStackEntry.selectedNodeId,
-        lastEditedViewInfo: nextStackEntry.viewInfo,
+        currentViewInfo: nextStackEntry.viewInfo,
         undoStack,
         redoStack,
       });
@@ -216,13 +216,13 @@ export function domLoaderReducer(state: DomLoader, action: DomAction): DomLoader
     case 'DOM_UPDATE': {
       return update(state, {
         ...(action.selectedNodeId ? { selectedNodeId: action.selectedNodeId } : {}),
-        ...(action.viewInfo ? { lastEditedViewInfo: action.viewInfo } : {}),
+        ...(action.viewInfo ? { currentViewInfo: action.viewInfo } : {}),
       });
     }
     case 'DOM_SAVE_NODE': {
       return action.viewInfo
         ? update(state, {
-            lastEditedViewInfo: action.viewInfo,
+            currentViewInfo: action.viewInfo,
           })
         : state;
     }
@@ -297,7 +297,7 @@ export interface DomLoader {
   unsavedChanges: number;
   saveError: string | null;
   selectedNodeId: NodeId | null;
-  lastEditedViewInfo: ViewInfo;
+  currentViewInfo: ViewInfo;
   undoStack: UndoRedoStackEntry[];
   redoStack: UndoRedoStackEntry[];
 }
@@ -325,11 +325,11 @@ interface UndoRedoStackEntry extends DomState {
 }
 
 export function useDom(): DomState {
-  const { dom, selectedNodeId, lastEditedViewInfo } = useDomLoader();
+  const { dom, selectedNodeId, currentViewInfo } = useDomLoader();
   if (!dom) {
     throw new Error("Trying to access the DOM before it's loaded");
   }
-  return { dom, selectedNodeId, viewInfo: lastEditedViewInfo };
+  return { dom, selectedNodeId, viewInfo: currentViewInfo };
 }
 
 export function useDomApi(): DomApi {
@@ -374,7 +374,7 @@ export default function DomProvider({ appId, children }: DomContextProps) {
     savedDom: dom,
     dom,
     selectedNodeId: null,
-    lastEditedViewInfo: { name: 'page' },
+    currentViewInfo: { name: 'page' },
     undoStack: [{ dom, selectedNodeId: null, viewInfo: { name: 'page' }, timestamp: Date.now() }],
     redoStack: [],
   });

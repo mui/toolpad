@@ -60,10 +60,6 @@
       "allowedVersions": "< 2.0.0"
     },
     {
-      "groupName": "sentry",
-      "matchPackageNames": ["@sentry/nextjs"]
-    },
-    {
       "matchDepTypes": ["action"],
       "pinDigests": true
     },

@@ -1,3 +1,6 @@
+/**
+ * Converts a Date into a human readable duration relative to the current time.
+ */
 const getReadableDuration = (editedAt: Date) => {
   const duration = new Date().getTime() - editedAt.getTime();
   const delta = Math.floor(duration / 1000);

@@ -1,19 +1,7 @@
-type ArrayUpdate<T> = {
-  [index: number]: T;
-};
-
-export function updateArray<T>(dest: T[], src: ArrayUpdate<T>): T[] {
-  let result: T[] | undefined;
-  Object.entries(src).forEach(([strIdx, value]) => {
-    const idx = Number(strIdx);
-    if (!Number.isNaN(idx) && idx < dest.length && idx >= 0 && dest[idx] !== value) {
-      result = result || [...dest];
-      (result as any)[idx] = value;
-    }
-  });
-  return result || dest;
-}
-
+/**
+ * Applies changes to an object in an immutable way. The `dest` object will adopt the properties of
+ * the `src` object. Object identity is preserved if the operation results in a no-op.
+ */
 export function update<T>(dest: T, src: Partial<T>): T {
   let result: T | undefined;
   Object.entries(src).forEach(([key, value]) => {
@@ -24,15 +12,26 @@ export function update<T>(dest: T, src: Partial<T>): T {
   });
   return result || dest;
 }
-
+/**
+ * Applies changes to an object in an immutable way. The `dest` object will adopt the properties of
+ * the `src` object. If `dest` is undefined, `src` will be used. Object identity is preserved if
+ * the operation results in a no-op.
+ */
 export function updateOrCreate<T>(dest: T | null | undefined, src: NonNullable<T>): T {
   return dest ? update(dest, src) : src;
 }
 
+/**
+ * Inserts a value in an immutable array.
+ */
 export function insert<T>(array: readonly T[], value: T, index: number): T[] {
   return [...array.slice(0, index), value, ...array.slice(index)];
 }
 
+/**
+ * Removes a set of properties from an object in an immutable way. Object identity is preserved if
+ * the operation results in a no-op.
+ */
 export function omit<T, K extends keyof T>(obj: T, ...keys: readonly K[]): Omit<T, K> {
   let result: T | undefined;
 
@@ -48,6 +47,10 @@ export function omit<T, K extends keyof T>(obj: T, ...keys: readonly K[]): Omit<
   return result || obj;
 }
 
+/**
+ * Returns an object created from `obj` with only the specified `keys`. Object identity is preserved if
+ * the operation results in a no-op.
+ */
 export function take<K extends string, T extends Record<K, unknown>>(
   obj: T,
   ...keys: readonly K[]
@@ -66,7 +69,10 @@ export function take<K extends string, T extends Record<K, unknown>>(
 
   return result || obj;
 }
-
+/**
+ * Returns an array without any of its items equal to `value`. Object identity is preserved if
+ * the operation results in a no-op.
+ */
 export function without<T>(array: readonly T[], value: T): readonly T[] {
   const result: T[] = [];
 

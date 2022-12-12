@@ -13,13 +13,15 @@ import * as appDom from '../../../appDom';
 import { useDom, useDomApi } from '../../DomLoader';
 import MapEntriesEditor from '../../../components/MapEntriesEditor';
 import useBoolean from '../../../utils/useBoolean';
+import useUndoRedo from '../../hooks/useUndoRedo';
+import useEventListener from '../../hooks/useEventListener';
 
 export interface UrlQueryEditorProps {
   pageNodeId: NodeId;
 }
 
 export default function UrlQueryEditor({ pageNodeId }: UrlQueryEditorProps) {
-  const { dom } = useDom();
+  const { dom, viewInfo } = useDom();
   const domApi = useDomApi();
 
   const page = appDom.getNode(dom, pageNodeId, 'page');
@@ -50,6 +52,17 @@ export default function UrlQueryEditor({ pageNodeId }: UrlQueryEditorProps) {
 
     handleDialogClose();
   }, [dom, page, input, domApi, pageNodeId, handleDialogClose]);
+
+  const { handleUndoRedoKeyDown } = useUndoRedo();
+  useEventListener('keydown', handleUndoRedoKeyDown);
+
+  React.useEffect(() => {
+    if (viewInfo.name === 'pageParameters') {
+      handleDialogOpen();
+    } else {
+      handleDialogClose();
+    }
+  }, [handleDialogClose, handleDialogOpen, viewInfo.name]);
 
   return (
     <React.Fragment>

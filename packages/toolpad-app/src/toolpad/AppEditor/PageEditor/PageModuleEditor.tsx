@@ -7,6 +7,8 @@ import * as appDom from '../../../appDom';
 import { tryFormat } from '../../../utils/prettier';
 import useShortcut from '../../../utils/useShortcut';
 import lazyComponent from '../../../utils/lazyComponent';
+import useEventListener from '../../hooks/useEventListener';
+import useUndoRedo from '../../hooks/useUndoRedo';
 
 const TypescriptEditor = lazyComponent(() => import('../../../components/TypescriptEditor'), {
   noSsr: true,
@@ -56,6 +58,10 @@ function PageModuleEditorDialog({ pageNodeId, open, onClose }: PageModuleEditorD
 
   useShortcut({ key: 's', metaKey: true, disabled: !open }, handleSave);
 
+  React.useEffect(() => {
+    setInput(page.attributes.module?.value || DEFAULT_CONTENT);
+  }, [page]);
+
   return (
     <Dialog onClose={onClose} open={open} fullWidth maxWidth="lg">
       <DialogTitle>Edit page module</DialogTitle>
@@ -81,7 +87,16 @@ export interface PageModuleEditorProps {
 }
 
 export default function PageModuleEditor({ pageNodeId }: PageModuleEditorProps) {
+  const { viewInfo } = useDom();
+
   const [dialogOpen, setDialogOpen] = React.useState(false);
+
+  const { handleUndoRedoKeyDown } = useUndoRedo();
+  useEventListener('keydown', handleUndoRedoKeyDown);
+
+  React.useEffect(() => {
+    setDialogOpen(viewInfo.name === 'pageModule');
+  }, [viewInfo.name]);
 
   return (
     <React.Fragment>

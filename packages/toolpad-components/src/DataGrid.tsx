@@ -170,6 +170,17 @@ const COLUMN_TYPES: Record<string, Omit<ToolpadGridColDef, 'field'>> = {
       <Box component="img" src={value} alt={`${field}${id}`} sx={{ maxWidth: '100%', p: 2 }} />
     ),
   },
+  component: {
+    customType: 'custom-component',
+    renderCell: (args) => {
+      debugger;
+      return (
+        <Link href={args.value} target="_blank" rel="noopener noreferrer nofollow">
+          {args.value}
+        </Link>
+      );
+    },
+  },
 };
 
 export type SerializableGridColumns = { field: string; type: string }[];

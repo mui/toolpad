@@ -23,12 +23,23 @@ import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import RefreshIcon from '@mui/icons-material/Refresh';
 import { inferColumns } from '@mui/toolpad-components';
 import type { EditorProps } from '../../types';
+import { useToolpadComponents } from '../AppEditor/toolpadComponents';
+import { useDom } from '../DomLoader';
 
 // TODO: this import suggests leaky abstraction
 import { usePageEditorState } from '../AppEditor/PageEditor/PageEditorProvider';
 import { generateUniqueString } from '../../utils/strings';
 
-const COLUMN_TYPES: string[] = ['string', 'number', 'date', 'dateTime', 'boolean', 'link', 'image'];
+const COLUMN_TYPES: string[] = [
+  'string',
+  'number',
+  'date',
+  'dateTime',
+  'boolean',
+  'link',
+  'image',
+  'custom-component',
+];
 const ALIGNMENTS: GridAlignment[] = ['left', 'right', 'center'];
 
 function GridColumnsPropEditor({
@@ -41,6 +52,13 @@ function GridColumnsPropEditor({
   const { bindings } = usePageEditorState();
   const [editColumnsDialogOpen, setEditColumnsDialogOpen] = React.useState(false);
   const [editedIndex, setEditedIndex] = React.useState<number | null>(null);
+  const { dom } = useDom();
+  const toolpadComponents = useToolpadComponents(dom);
+  const customComponents = React.useMemo(() => {
+    const entries = Object.entries(toolpadComponents);
+
+    return entries.filter(([_, definition]) => !definition?.builtIn);
+  }, [toolpadComponents]);
 
   const editedColumn = typeof editedIndex === 'number' ? value[editedIndex] : null;
   React.useEffect(() => {
@@ -182,6 +200,27 @@ function GridColumnsPropEditor({
                     handleColumnChange({ ...editedColumn, width: Number(event.target.value) })
                   }
                 />
+                {editedColumn.type === 'custom-component' ? (
+                  <TextField
+                    select
+                    fullWidth
+                    label="Custom component"
+                    value={editedColumn.align ?? ''}
+                    disabled={disabled}
+                    onChange={(event) =>
+                      handleColumnChange({
+                        ...editedColumn,
+                        align: (event.target.value as GridAlignment) || undefined,
+                      })
+                    }
+                  >
+                    {customComponents.map(([_, { displayName }]) => (
+                      <MenuItem key={displayName} value={displayName}>
+                        {displayName}
+                      </MenuItem>
+                    ))}
+                  </TextField>
+                ) : null}
               </Stack>
             </DialogContent>
           </React.Fragment>

@@ -37,12 +37,16 @@ const cardContentRootStyle = (imageUrl) => ({
 });
 
 export default function CardGrid(props) {
-  const { content } = props;
+  const { content, darker } = props;
   return (
     <Box
-      sx={{
-        bgcolor: (theme) => (theme.palette.mode === 'dark' ? 'primaryDark.900' : 'grey.50'),
-      }}
+      sx={
+        darker
+          ? {
+              bgcolor: (theme) => (theme.palette.mode === 'dark' ? 'primaryDark.900' : 'grey.50'),
+            }
+          : null
+      }
     >
       <Container sx={{ py: { xs: 4, sm: 6, md: 8 } }}>
         <SectionHeadline overline={content.overline} title={content.Headline} />
@@ -94,4 +98,5 @@ CardGrid.propTypes = {
     Headline: PropTypes.node.isRequired,
     overline: PropTypes.string.isRequired,
   }).isRequired,
+  darker: PropTypes.bool,
 };

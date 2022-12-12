@@ -604,11 +604,11 @@ export async function getConnections() {
   return connections;
 }
 
-function deserializeConnectionSerets(secrets: string): ConnectionSecrets {
+function deserializeConnectionSecrets(secrets: string): ConnectionSecrets {
   return JSON.parse(decryptString(secrets));
 }
 
-function serializeConnectionSerets(secrets: ConnectionSecrets): string {
+function serializeConnectionSecrets(secrets: ConnectionSecrets): string {
   return encryptString(JSON.stringify(secrets));
 }
 
@@ -626,7 +626,7 @@ async function getConnectionUnsafe(id: string): Promise<Connection | null> {
 
   return {
     ...connection,
-    secrets: deserializeConnectionSerets(connection.secrets),
+    secrets: deserializeConnectionSecrets(connection.secrets),
   };
 }
 
@@ -686,8 +686,8 @@ export async function updateConnection(
 
   if (secrets) {
     const existing = await prismaClient.connection.findUniqueOrThrow({ where: { id } });
-    const existingSecrets = deserializeConnectionSerets(existing.secrets);
-    updates.secrets = serializeConnectionSerets(updateSecrets(existingSecrets, secrets));
+    const existingSecrets = deserializeConnectionSecrets(existing.secrets);
+    updates.secrets = serializeConnectionSecrets(updateSecrets(existingSecrets, secrets));
   }
 
   await prismaClient.connection.update({

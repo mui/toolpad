@@ -12,10 +12,11 @@ import { ToolpadBridge } from '../../../canvas';
 import useEvent from '../../../utils/useEvent';
 import { LogEntry } from '../../../components/Console';
 import { Maybe } from '../../../utils/types';
-import { useDom, useDomApi } from '../../DomLoader';
-import { hasFieldFocus } from '../../../utils/fields';
+import { useDom } from '../../DomLoader';
 import createRuntimeState from '../../../createRuntimeState';
 import { usePageEditorApi } from './PageEditorProvider';
+import useUndoRedo from '../../hooks/useUndoRedo';
+import { hasFieldFocus } from '../../../utils/fields';
 
 type IframeContentWindow = Window & typeof globalThis;
 
@@ -84,7 +85,6 @@ export default React.forwardRef<EditorCanvasHostHandle, EditorCanvasHostProps>(
   ) {
     const frameRef = React.useRef<HTMLIFrameElement>(null);
     const { viewInfo } = useDom();
-    const domApi = useDomApi();
     const pageEditorApi = usePageEditorApi();
 
     const [bridge, setBridge] = React.useState<ToolpadBridge | null>(null);
@@ -152,32 +152,10 @@ export default React.forwardRef<EditorCanvasHostHandle, EditorCanvasHostProps>(
 
     const handleRuntimeEvent = useEvent(onRuntimeEvent);
 
-    const iframeKeyDownHandler = React.useCallback(
-      (iframeDocument: Document) => {
-        return (event: KeyboardEvent) => {
-          if (hasFieldFocus(iframeDocument)) {
-            return;
-          }
-
-          const isZ = event.key.toLowerCase() === 'z';
-
-          const undoShortcut = isZ && (event.metaKey || event.ctrlKey);
-          const redoShortcut = undoShortcut && event.shiftKey;
-
-          if (redoShortcut) {
-            domApi.redo();
-          } else if (undoShortcut) {
-            domApi.undo();
-          }
-        };
-      },
-      [domApi],
-    );
-
     React.useEffect(() => {
       switch (viewInfo.name) {
-        case 'query':
-          // @TODO: Change to the correct view. This might involve making every view its own route?
+        case 'main':
+          pageEditorApi.setComponentPanelTab('component');
           break;
         case 'properties':
           pageEditorApi.setComponentPanelTab(viewInfo.tab);
@@ -186,13 +164,28 @@ export default React.forwardRef<EditorCanvasHostHandle, EditorCanvasHostProps>(
       }
     }, [viewInfo, pageEditorApi]);
 
+    const { handleUndoRedoKeyDown } = useUndoRedo();
+
+    const iframeKeyDownHandler = React.useCallback(
+      (iframeDocument: Document) => {
+        return (event: KeyboardEvent) => {
+          if (hasFieldFocus(iframeDocument)) {
+            return;
+          }
+
+          handleUndoRedoKeyDown(event);
+        };
+      },
+      [handleUndoRedoKeyDown],
+    );
+
     const handleFrameLoad = React.useCallback(() => {
       invariant(frameRef.current, 'Iframe ref not attached');
 
       const iframeWindow = frameRef.current.contentWindow;
       setContentWindow(iframeWindow);
 
-      if (!iframeWindow) {
+      if (!iframeWindow || (viewInfo.name !== 'main' && viewInfo.name !== 'properties')) {
         return;
       }
 
@@ -202,7 +195,7 @@ export default React.forwardRef<EditorCanvasHostHandle, EditorCanvasHostProps>(
       iframeWindow?.addEventListener('unload', () => {
         iframeWindow?.removeEventListener('keydown', keyDownHandler);
       });
-    }, [iframeKeyDownHandler]);
+    }, [iframeKeyDownHandler, viewInfo.name]);
 
     React.useEffect(() => {
       if (!contentWindow) {

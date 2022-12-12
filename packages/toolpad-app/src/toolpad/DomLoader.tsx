@@ -16,7 +16,7 @@ import { ComponentPanelTab } from './AppEditor/PageEditor/PageEditorProvider';
 
 type ViewInfo =
   | { name: 'main' }
-  | { name: 'query'; nodeId: NodeId }
+  | { name: 'query'; nodeId: NodeId; isDraft: boolean }
   | { name: 'properties'; tab: ComponentPanelTab; nodeId?: NodeId }
   | { name: 'pageModule'; nodeId: NodeId }
   | { name: 'pageParameters'; nodeId: NodeId }

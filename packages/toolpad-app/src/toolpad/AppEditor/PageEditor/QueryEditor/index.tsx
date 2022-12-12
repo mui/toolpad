@@ -25,6 +25,8 @@ import { useDom, useDomApi } from '../../../DomLoader';
 import ConnectionSelect, { ConnectionOption } from '../ConnectionSelect';
 import NodeMenu from '../../NodeMenu';
 import QueryNodeEditorDialog from './QueryEditorDialog';
+import useUndoRedo from '../../../hooks/useUndoRedo';
+import useEventListener from '../../../hooks/useEventListener';
 
 interface DataSourceSelectorProps<Q> {
   open: boolean;
@@ -107,7 +109,7 @@ type DialogState =
     };
 
 export default function QueryEditor() {
-  const { dom } = useDom();
+  const { dom, viewInfo } = useDom();
   const state = usePageEditorState();
   const domApi = useDomApi();
 
@@ -132,10 +134,10 @@ export default function QueryEditor() {
       const nodeId = node.id;
 
       if (appDom.nodeExists(dom, nodeId)) {
-        domApi.saveNode(node, { name: 'query', nodeId });
+        domApi.saveNode(node, { name: 'query', nodeId, isDraft: false });
       } else {
         const updatedDom = appDom.addNode(dom, node, page, 'queries');
-        domApi.update(updatedDom, { name: 'query', nodeId });
+        domApi.update(updatedDom, { name: 'query', nodeId, isDraft: false });
       }
       setDialogState({ node, isDraft: false });
     },
@@ -171,6 +173,19 @@ export default function QueryEditor() {
     },
     [dom, page],
   );
+
+  const { handleUndoRedoKeyDown } = useUndoRedo();
+  useEventListener('keydown', handleUndoRedoKeyDown);
+
+  React.useEffect(() => {
+    setDialogState(() => {
+      if (viewInfo.name === 'query') {
+        const node = appDom.getNode(dom, viewInfo.nodeId, 'query');
+        return { node, isDraft: viewInfo.isDraft };
+      }
+      return null;
+    });
+  }, [dom, viewInfo]);
 
   return (
     <Stack spacing={1} alignItems="start" sx={{ width: '100%' }}>

@@ -10,6 +10,8 @@ import dataSources from '../../../toolpadDataSources/client';
 import { ConnectionContextProvider } from '../../../toolpadDataSources/context';
 import NodeNameEditor from '../NodeNameEditor';
 import NotFoundEditor from '../NotFoundEditor';
+import useUndoRedo from '../../hooks/useUndoRedo';
+import useEventListener from '../../hooks/useEventListener';
 
 interface ConnectionParamsEditorProps<P> extends ConnectionEditorProps<P> {
   dataSource: ClientDataSource<P, any>;
@@ -108,6 +110,10 @@ export default function ConnectionEditor({ appId }: ConnectionProps) {
   const { dom } = useDom();
   const { nodeId } = useParams();
   const connectionNode = appDom.getMaybeNode(dom, nodeId as NodeId, 'connection');
+
+  const { handleUndoRedoKeyDown } = useUndoRedo();
+  useEventListener('keydown', handleUndoRedoKeyDown);
+
   return connectionNode ? (
     <ConnectionEditorContent appId={appId} key={nodeId} connectionNode={connectionNode} />
   ) : (

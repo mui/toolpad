@@ -15,7 +15,7 @@ import { NodeHashes } from '../types';
 import { ComponentPanelTab } from './AppEditor/PageEditor/PageEditorProvider';
 
 type ViewInfo =
-  | { name: 'main' }
+  | { name: 'page'; nodeId?: NodeId }
   | { name: 'query'; nodeId: NodeId; isDraft: boolean }
   | { name: 'properties'; tab: ComponentPanelTab; nodeId?: NodeId }
   | { name: 'pageModule'; nodeId: NodeId }
@@ -110,12 +110,20 @@ export function domLoaderReducer(state: DomLoader, action: DomAction): DomLoader
 
   switch (action.type) {
     case 'DOM_UPDATE_HISTORY': {
+      const updatedViewInfo =
+        action.viewInfo && action.viewInfo.name === state.lastEditedViewInfo.name
+          ? {
+              ...state.lastEditedViewInfo,
+              ...action.viewInfo,
+            }
+          : action.viewInfo || state.lastEditedViewInfo;
+
       const updatedUndoStack = [
         ...state.undoStack,
         {
           dom: state.dom,
           selectedNodeId: state.selectedNodeId,
-          viewInfo: action.viewInfo || state.lastEditedViewInfo,
+          viewInfo: updatedViewInfo,
           timestamp: Date.now(),
         },
       ];
@@ -366,8 +374,8 @@ export default function DomProvider({ appId, children }: DomContextProps) {
     savedDom: dom,
     dom,
     selectedNodeId: null,
-    lastEditedViewInfo: { name: 'main' },
-    undoStack: [{ dom, selectedNodeId: null, viewInfo: { name: 'main' }, timestamp: Date.now() }],
+    lastEditedViewInfo: { name: 'page' },
+    undoStack: [{ dom, selectedNodeId: null, viewInfo: { name: 'page' }, timestamp: Date.now() }],
     redoStack: [],
   });
 

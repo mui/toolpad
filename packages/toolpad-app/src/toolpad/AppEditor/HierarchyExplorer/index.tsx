@@ -179,20 +179,20 @@ export default function HierarchyExplorer({ appId, className }: HierarchyExplore
       // TODO: sort out in-page selection
       const page = appDom.getPageAncestor(dom, node);
       if (page) {
-        navigate(`/app/${appId}/pages/${page.id}`);
+        domApi.update(dom, { name: 'page', nodeId: page.id });
       }
     }
 
     if (appDom.isPage(node)) {
-      navigate(`/app/${appId}/pages/${node.id}`);
+      domApi.update(dom, { name: 'page', nodeId: node.id });
     }
 
     if (appDom.isCodeComponent(node)) {
-      navigate(`/app/${appId}/codeComponents/${node.id}`);
+      domApi.update(dom, { name: 'component', nodeId: node.id });
     }
 
     if (appDom.isConnection(node)) {
-      navigate(`/app/${appId}/connections/${node.id}`);
+      domApi.update(dom, { name: 'connection', nodeId: node.id });
     }
   };
 
@@ -238,7 +238,7 @@ export default function HierarchyExplorer({ appId, className }: HierarchyExplore
       }
 
       const updatedDom = appDom.removeNode(dom, nodeId);
-      domApi.update(updatedDom, { name: 'main' });
+      domApi.update(updatedDom, { name: 'page' });
 
       if (redirectAfterDelete) {
         navigate(redirectAfterDelete);
@@ -258,7 +258,7 @@ export default function HierarchyExplorer({ appId, className }: HierarchyExplore
       const fragment = appDom.cloneFragment(dom, nodeId);
 
       const updatedDom = appDom.addFragment(dom, fragment, node.parentId, node.parentProp);
-      domApi.update(updatedDom, { name: 'main' });
+      domApi.update(updatedDom, { name: 'page' });
 
       const newNode = appDom.getNode(fragment, fragment.root);
       const editorLink = getLinkToNodeEditor(appId, newNode);

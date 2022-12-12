@@ -366,7 +366,7 @@ export default function RenderOverlay({ canvasHostRef }: RenderOverlayProps) {
   const updateDom = React.useCallback(
     (draftDom: appDom.AppDom, newSelectedNodeId?: NodeId | null) => {
       draftDom = normalizePageRowColumnSizes(draftDom);
-      domApi.update(draftDom, { name: 'main' }, newSelectedNodeId);
+      domApi.update(draftDom, { name: 'page' }, newSelectedNodeId);
     },
     [domApi, normalizePageRowColumnSizes],
   );
@@ -374,7 +374,7 @@ export default function RenderOverlay({ canvasHostRef }: RenderOverlayProps) {
   const selectNode = React.useCallback(
     (nodeId: NodeId) => {
       if (selectedNodeId !== nodeId) {
-        domApi.selectNode(nodeId, { name: 'main' });
+        domApi.selectNode(nodeId, { name: 'page' });
       }
     },
     [domApi, selectedNodeId],
@@ -382,7 +382,7 @@ export default function RenderOverlay({ canvasHostRef }: RenderOverlayProps) {
 
   const deselectNode = React.useCallback(() => {
     if (selectedNodeId) {
-      domApi.deselectNode({ name: 'main' });
+      domApi.deselectNode({ name: 'page' });
     }
   }, [domApi, selectedNodeId]);
 
@@ -471,7 +471,7 @@ export default function RenderOverlay({ canvasHostRef }: RenderOverlayProps) {
       event.stopPropagation();
 
       const updatedDom = appDom.duplicateNode(dom, node);
-      domApi.update(updatedDom, { name: 'main' });
+      domApi.update(updatedDom, { name: 'page' });
     },
     [dom, domApi],
   );

@@ -14,7 +14,6 @@ import { LogEntry } from '../../../components/Console';
 import { Maybe } from '../../../utils/types';
 import { useDom } from '../../DomLoader';
 import createRuntimeState from '../../../createRuntimeState';
-import { usePageEditorApi } from './PageEditorProvider';
 import useUndoRedo from '../../hooks/useUndoRedo';
 import { hasFieldFocus } from '../../../utils/fields';
 
@@ -85,7 +84,6 @@ export default React.forwardRef<EditorCanvasHostHandle, EditorCanvasHostProps>(
   ) {
     const frameRef = React.useRef<HTMLIFrameElement>(null);
     const { viewInfo } = useDom();
-    const pageEditorApi = usePageEditorApi();
 
     const [bridge, setBridge] = React.useState<ToolpadBridge | null>(null);
 
@@ -152,18 +150,6 @@ export default React.forwardRef<EditorCanvasHostHandle, EditorCanvasHostProps>(
 
     const handleRuntimeEvent = useEvent(onRuntimeEvent);
 
-    React.useEffect(() => {
-      switch (viewInfo.name) {
-        case 'main':
-          pageEditorApi.setComponentPanelTab('component');
-          break;
-        case 'properties':
-          pageEditorApi.setComponentPanelTab(viewInfo.tab);
-          break;
-        default:
-      }
-    }, [viewInfo, pageEditorApi]);
-
     const { handleUndoRedoKeyDown } = useUndoRedo();
 
     const iframeKeyDownHandler = React.useCallback(
@@ -185,7 +171,7 @@ export default React.forwardRef<EditorCanvasHostHandle, EditorCanvasHostProps>(
       const iframeWindow = frameRef.current.contentWindow;
       setContentWindow(iframeWindow);
 
-      if (!iframeWindow || (viewInfo.name !== 'main' && viewInfo.name !== 'properties')) {
+      if (!iframeWindow || (viewInfo.name !== 'page' && viewInfo.name !== 'properties')) {
         return;
       }
 

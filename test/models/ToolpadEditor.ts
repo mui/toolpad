@@ -197,15 +197,11 @@ export class ToolpadEditor {
   }
 
   hierarchyItem(group: string, name: string): Locator {
-    return (
-      this.explorer
-        // @ts-expect-error https://github.com/microsoft/playwright/pull/17952
-        .getByRole('treeitem')
-        .filter({ hasText: group })
-        // @ts-expect-error https://github.com/microsoft/playwright/pull/17952
-        .getByRole('treeitem')
-        .filter({ hasText: name })
-    );
+    return this.explorer
+      .getByRole('treeitem')
+      .filter({ hasText: group })
+      .getByRole('treeitem')
+      .filter({ hasText: name });
   }
 
   async openHierarchyMenu(group: string, name: string) {

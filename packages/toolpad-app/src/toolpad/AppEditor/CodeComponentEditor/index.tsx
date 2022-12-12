@@ -246,6 +246,7 @@ function CodeComponentEditorContent({ codeComponentNode }: CodeComponentEditorCo
           <SplitPane split="vertical" allowResize size="50%">
             <TypescriptEditor
               value={input.attributes.code.value}
+              data-testid="codecomponent editor"
               onChange={(newValue) =>
                 setInput((existing) =>
                   appDom.setNamespacedProp(
@@ -260,7 +261,12 @@ function CodeComponentEditorContent({ codeComponentNode }: CodeComponentEditorCo
             />
 
             <SplitPane split="horizontal" allowResize size="20%" primary="second">
-              <CanvasFrame ref={frameRef} title="Code component sandbox" onLoad={onLoad} />
+              <CanvasFrame
+                data-testid="code component viewer"
+                ref={frameRef}
+                title="Code component sandbox"
+                onLoad={onLoad}
+              />
               <PropertiesEditor argTypes={argTypes} value={props} onChange={setProps} />
             </SplitPane>
           </SplitPane>

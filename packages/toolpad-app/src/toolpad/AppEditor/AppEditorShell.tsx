@@ -32,6 +32,7 @@ import ToolpadShell from '../ToolpadShell';
 import PagePanel from './PagePanel';
 import client from '../../api';
 import useBoolean from '../../utils/useBoolean';
+import useMenu from '../../utils/useMenu';
 
 interface CreateReleaseDialogProps {
   appId: string;
@@ -142,7 +143,7 @@ export interface ToolpadShellProps {
 
 export default function AppEditorShell({ appId, ...props }: ToolpadShellProps) {
   const domLoader = useDomLoader();
-  const releases = client.useQuery('findLastRelease', [appId]);
+  const release = client.useQuery('findLastRelease', [appId]);
 
   const {
     value: createReleaseDialogOpen,
@@ -150,16 +151,9 @@ export default function AppEditorShell({ appId, ...props }: ToolpadShellProps) {
     setFalse: handleCreateReleaseDialogClose,
   } = useBoolean(false);
 
-  const isDeployed = Boolean(releases?.data);
+  const isDeployed = Boolean(release?.data);
 
-  const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
-  const open = Boolean(anchorEl);
-  const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
-    setAnchorEl(event.currentTarget);
-  };
-  const handleClose = () => {
-    setAnchorEl(null);
-  };
+  const { buttonProps, menuProps } = useMenu();
 
   return (
     <ToolpadShell
@@ -187,26 +181,21 @@ export default function AppEditorShell({ appId, ...props }: ToolpadShellProps) {
             </Button>
             {isDeployed ? (
               <React.Fragment>
-                <Button
-                  size="small"
-                  aria-controls={open ? 'split-button-menu' : undefined}
-                  aria-expanded={open ? 'true' : undefined}
-                  aria-label="select merge strategy"
-                  aria-haspopup="menu"
-                  onClick={handleClick}
-                >
+                <Button size="small" {...buttonProps}>
                   <ArrowDropDownIcon />
                 </Button>
                 <Menu
-                  open={open}
-                  onClose={handleClose}
-                  anchorEl={anchorEl}
+                  {...menuProps}
                   anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
                   transformOrigin={{ horizontal: 'right', vertical: 'top' }}
                 >
-                  <MenuItem component="a" href={`/deploy/${appId}`} target="_blank">
-                    Open current deployed version
-                  </MenuItem>
+                  {!release.error ? (
+                    <MenuItem component="a" href={`/deploy/${appId}`} target="_blank">
+                      Open current deployed version
+                    </MenuItem>
+                  ) : (
+                    <MenuItem>{release.error as string}</MenuItem>
+                  )}
                 </Menu>
               </React.Fragment>
             ) : null}

@@ -4,7 +4,7 @@ import { test, expect } from '../../playwright/test';
 import { readJsonFile } from '../../utils/fs';
 import generateId from '../../utils/generateId';
 
-test.only('components', async ({ page, browserName, api }) => {
+test('components', async ({ page, browserName, api }) => {
   const dom = await readJsonFile(path.resolve(__dirname, './dom.json'));
 
   const app = await api.mutation.createApp(`App ${generateId()}`, {

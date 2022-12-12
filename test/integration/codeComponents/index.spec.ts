@@ -1,6 +1,6 @@
 import * as path from 'path';
 import { ToolpadEditor } from '../../models/ToolpadEditor';
-import { FrameLocator, Page, test, expect } from '../../playwright/test';
+import { test, expect } from '../../playwright/test';
 import { readJsonFile } from '../../utils/fs';
 import generateId from '../../utils/generateId';
 

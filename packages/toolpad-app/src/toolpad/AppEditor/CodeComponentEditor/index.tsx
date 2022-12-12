@@ -261,12 +261,7 @@ function CodeComponentEditorContent({ codeComponentNode }: CodeComponentEditorCo
             />
 
             <SplitPane split="horizontal" allowResize size="20%" primary="second">
-              <CanvasFrame
-                data-testid="code component viewer"
-                ref={frameRef}
-                title="Code component sandbox"
-                onLoad={onLoad}
-              />
+              <CanvasFrame ref={frameRef} title="Code component sandbox" onLoad={onLoad} />
               <PropertiesEditor argTypes={argTypes} value={props} onChange={setProps} />
             </SplitPane>
           </SplitPane>

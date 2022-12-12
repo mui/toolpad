@@ -205,7 +205,7 @@ export default function AppEditorShell({ appId, ...props }: ToolpadShellProps) {
                   transformOrigin={{ horizontal: 'right', vertical: 'top' }}
                 >
                   <MenuItem component="a" href={`/deploy/${appId}`} target="_blank">
-                    Preview latest deployed version
+                    Open current deployed version
                   </MenuItem>
                 </Menu>
               </React.Fragment>

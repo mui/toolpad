@@ -13,8 +13,6 @@ import * as appDom from '../../../appDom';
 import { useDom, useDomApi } from '../../DomLoader';
 import MapEntriesEditor from '../../../components/MapEntriesEditor';
 import useBoolean from '../../../utils/useBoolean';
-import useUndoRedo from '../../hooks/useUndoRedo';
-import useEventListener from '../../hooks/useEventListener';
 
 export interface UrlQueryEditorProps {
   pageNodeId: NodeId;
@@ -46,9 +44,6 @@ export default function UrlQueryEditor({ pageNodeId }: UrlQueryEditorProps) {
     );
     domApi.update(updatedDom);
   }, [dom, page, input, domApi]);
-
-  const { handleUndoRedoKeyDown } = useUndoRedo();
-  useEventListener('keydown', handleUndoRedoKeyDown);
 
   const handleButtonClick = React.useCallback(() => {
     domApi.updateView({ kind: 'pageParameters', nodeId: pageNodeId });

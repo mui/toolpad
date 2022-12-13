@@ -266,7 +266,7 @@ function createDomApi(
         viewInfo,
       });
     },
-    saveNode(node: appDom.AppDomNode, viewInfo: ViewInfo) {
+    saveNode(node: appDom.AppDomNode, viewInfo?: ViewInfo) {
       dispatch({
         type: 'DOM_SAVE_NODE',
         node,

@@ -7,8 +7,6 @@ import * as appDom from '../../../appDom';
 import { tryFormat } from '../../../utils/prettier';
 import useShortcut from '../../../utils/useShortcut';
 import lazyComponent from '../../../utils/lazyComponent';
-import useEventListener from '../../hooks/useEventListener';
-import useUndoRedo from '../../hooks/useUndoRedo';
 
 const TypescriptEditor = lazyComponent(() => import('../../../components/TypescriptEditor'), {
   noSsr: true,
@@ -91,9 +89,6 @@ export default function PageModuleEditor({ pageNodeId }: PageModuleEditorProps) 
   const { viewInfo } = useDom();
 
   const [dialogOpen, setDialogOpen] = React.useState(false);
-
-  const { handleUndoRedoKeyDown } = useUndoRedo();
-  useEventListener('keydown', handleUndoRedoKeyDown);
 
   const handleButtonClick = React.useCallback(() => {
     domApi.updateView({ kind: 'pageModule', nodeId: pageNodeId });

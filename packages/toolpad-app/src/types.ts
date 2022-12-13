@@ -239,3 +239,11 @@ export interface RuntimeState {
   appId: string;
   modules: Record<string, CompiledModule>;
 }
+
+export interface MetaField {
+  description?: string;
+  deprecated?: boolean | string;
+  tsType?: string;
+  value?: any;
+}
+export type GlobalScopeMeta = Record<string, MetaField>;

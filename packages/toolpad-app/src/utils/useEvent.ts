@@ -20,6 +20,8 @@ function isInRender() {
 }
 
 /**
+ * A Hook to define an event handler with an always-stable function identity.
+ * In anticipation of a react native solution
  * See https://github.com/reactjs/rfcs/pull/220
  */
 export default function useEvent<F extends (...args: any[]) => void>(handler: F): F {

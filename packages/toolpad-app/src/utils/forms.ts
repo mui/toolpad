@@ -25,6 +25,9 @@ function errorMessage<
   }
 }
 
+/**
+ * Translates `react-hook-form` `formState` into error/helpText properties for UI components.
+ */
 export function validation<
   TFieldValues extends FieldValues,
   TFieldName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>,
@@ -37,6 +40,9 @@ export function validation<
   };
 }
 
+/**
+ * Reads `react-hook-form` `formState` and checks whether the state can and needs to be saved.
+ */
 export function isSaveDisabled<TFieldValues extends FieldValues>(
   formState: FormState<TFieldValues>,
 ): boolean {

@@ -186,7 +186,7 @@ export default function QueryEditor() {
       if (viewInfo.kind === 'query') {
         if (viewInfo.nodeId) {
           const node = appDom.getNode(dom, viewInfo.nodeId, 'query');
-          return { node, isDraft: !!node };
+          return { node, isDraft: viewInfo.isDraft || false };
         }
         return {};
       }

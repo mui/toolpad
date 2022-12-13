@@ -44,8 +44,8 @@ export default function UrlQueryEditor({ pageNodeId }: UrlQueryEditorProps) {
       'parameters',
       appDom.createConst(input || []),
     );
-    domApi.update(updatedDom, { kind: 'pageParameters', nodeId: pageNodeId });
-  }, [dom, page, input, domApi, pageNodeId]);
+    domApi.update(updatedDom);
+  }, [dom, page, input, domApi]);
 
   const { handleUndoRedoKeyDown } = useUndoRedo();
   useEventListener('keydown', handleUndoRedoKeyDown);

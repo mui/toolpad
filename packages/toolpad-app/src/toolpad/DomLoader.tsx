@@ -1,7 +1,6 @@
 import * as React from 'react';
 import { NodeId, BindableAttrValues } from '@mui/toolpad-core';
 import invariant from 'invariant';
-import { throttle, DebouncedFunc } from 'lodash-es';
 import * as appDom from '../appDom';
 import { update } from '../utils/immutability';
 import client from '../api';
@@ -236,14 +235,9 @@ export function domLoaderReducer(state: DomLoader, action: DomAction): DomLoader
   }
 }
 
-function createDomApi(
-  dispatch: React.Dispatch<DomAction>,
-  scheduleHistoryUpdate?: DebouncedFunc<() => void>,
-) {
+function createDomApi(dispatch: React.Dispatch<DomAction>) {
   return {
     undo() {
-      scheduleHistoryUpdate?.flush();
-
       dispatch({ type: 'DOM_UNDO' });
     },
     redo() {
@@ -398,14 +392,9 @@ export default function DomProvider({ appId, children }: DomContextProps) {
   });
 
   const scheduleHistoryUpdate = React.useMemo(
-    () =>
-      throttle(
-        () => {
-          dispatch({ type: 'DOM_UPDATE_HISTORY' });
-        },
-        500,
-        { leading: false, trailing: true },
-      ),
+    () => () => {
+      dispatch({ type: 'DOM_UPDATE_HISTORY' });
+    },
     [],
   );
 
@@ -417,10 +406,7 @@ export default function DomProvider({ appId, children }: DomContextProps) {
     }
   });
 
-  const api = React.useMemo(
-    () => createDomApi(dispatchWithHistory, scheduleHistoryUpdate),
-    [dispatchWithHistory, scheduleHistoryUpdate],
-  );
+  const api = React.useMemo(() => createDomApi(dispatchWithHistory), [dispatchWithHistory]);
 
   const handleSave = React.useCallback(() => {
     if (!state.dom || state.saving || state.savedDom === state.dom) {

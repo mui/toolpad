@@ -12,7 +12,6 @@ import { ToolpadBridge } from '../../../canvas';
 import useEvent from '../../../utils/useEvent';
 import { LogEntry } from '../../../components/Console';
 import { Maybe } from '../../../utils/types';
-import { useDom } from '../../DomLoader';
 import createRuntimeState from '../../../createRuntimeState';
 import useUndoRedo from '../../hooks/useUndoRedo';
 import { hasFieldFocus } from '../../../utils/fields';
@@ -83,7 +82,6 @@ export default React.forwardRef<EditorCanvasHostHandle, EditorCanvasHostProps>(
     forwardedRef,
   ) {
     const frameRef = React.useRef<HTMLIFrameElement>(null);
-    const { viewInfo } = useDom();
 
     const [bridge, setBridge] = React.useState<ToolpadBridge | null>(null);
 
@@ -171,7 +169,7 @@ export default React.forwardRef<EditorCanvasHostHandle, EditorCanvasHostProps>(
       const iframeWindow = frameRef.current.contentWindow;
       setContentWindow(iframeWindow);
 
-      if (!iframeWindow || (viewInfo.kind !== 'page' && viewInfo.kind !== 'properties')) {
+      if (!iframeWindow) {
         return;
       }
 
@@ -181,7 +179,7 @@ export default React.forwardRef<EditorCanvasHostHandle, EditorCanvasHostProps>(
       iframeWindow?.addEventListener('unload', () => {
         iframeWindow?.removeEventListener('keydown', keyDownHandler);
       });
-    }, [iframeKeyDownHandler, viewInfo]);
+    }, [iframeKeyDownHandler]);
 
     React.useEffect(() => {
       if (!contentWindow) {

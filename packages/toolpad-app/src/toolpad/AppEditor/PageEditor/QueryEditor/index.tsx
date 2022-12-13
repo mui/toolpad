@@ -25,8 +25,6 @@ import { useDom, useDomApi } from '../../../DomLoader';
 import ConnectionSelect, { ConnectionOption } from '../ConnectionSelect';
 import NodeMenu from '../../NodeMenu';
 import QueryNodeEditorDialog from './QueryEditorDialog';
-import useUndoRedo from '../../../hooks/useUndoRedo';
-import useEventListener from '../../../hooks/useEventListener';
 
 interface DataSourceSelectorProps<Q> {
   open: boolean;
@@ -177,9 +175,6 @@ export default function QueryEditor() {
     },
     [dom, domApi, page],
   );
-
-  const { handleUndoRedoKeyDown } = useUndoRedo();
-  useEventListener('keydown', handleUndoRedoKeyDown);
 
   React.useEffect(() => {
     setDialogState(() => {

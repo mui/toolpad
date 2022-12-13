@@ -1,3 +1,8 @@
+<!-- markdownlint-disable-next-line -->
+<p align="center">
+  <a href="https://mui.com/" rel="noopener" target="_blank"><img width="150" src="https://mui.com/static/logo.svg" alt="MUI logo"></a>
+</p>
+
 <h1 align="center">MUI Toolpad</h1>
 
 <div align="center">

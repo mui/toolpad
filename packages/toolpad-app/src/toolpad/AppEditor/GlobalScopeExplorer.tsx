@@ -1,7 +1,7 @@
 import { Typography, Divider, Box, SxProps } from '@mui/material';
 import * as React from 'react';
 import ObjectInspector from '../../components/ObjectInspector';
-import { GlobalScopeMeta } from '../../utils/types';
+import { GlobalScopeMeta } from '../../types';
 
 export interface GlobalScopeExplorerProps {
   value?: Record<string, unknown>;

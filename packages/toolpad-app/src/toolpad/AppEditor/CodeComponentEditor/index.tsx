@@ -246,6 +246,7 @@ function CodeComponentEditorContent({ codeComponentNode }: CodeComponentEditorCo
           <SplitPane split="vertical" allowResize size="50%">
             <TypescriptEditor
               value={input.attributes.code.value}
+              data-testid="codecomponent editor"
               onChange={(newValue) =>
                 setInput((existing) =>
                   appDom.setNamespacedProp(

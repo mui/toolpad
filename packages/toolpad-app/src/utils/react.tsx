@@ -1,5 +1,8 @@
 import * as React from 'react';
 
+/**
+ * Context that throws when used outside of a provider.
+ */
 export function createProvidedContext<T>(
   name: string,
 ): [() => T, React.ComponentType<React.ProviderProps<T>>] {
@@ -16,34 +19,9 @@ export function createProvidedContext<T>(
   return [useContext, context.Provider as React.ComponentType<React.ProviderProps<T>>];
 }
 
-export function suspendPromise<T>(promise: Promise<T>): () => T {
-  let status = 'pending';
-  let error: Error;
-  let response: T;
-
-  const suspender = promise.then(
-    (res) => {
-      status = 'success';
-      response = res;
-    },
-    (err: Error) => {
-      status = 'error';
-      error = err;
-    },
-  );
-
-  return () => {
-    switch (status) {
-      case 'pending':
-        throw suspender;
-      case 'error':
-        throw error;
-      default:
-        return response;
-    }
-  };
-}
-
+/**
+ * Like `Array.prototype.join`, but for React nodes.
+ */
 export function interleave(items: React.ReactNode[], separator: React.ReactNode): React.ReactNode {
   const result: React.ReactNode[] = [];
 

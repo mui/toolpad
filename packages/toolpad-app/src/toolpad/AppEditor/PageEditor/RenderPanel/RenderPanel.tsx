@@ -1,7 +1,6 @@
 import * as React from 'react';
 import { styled } from '@mui/material';
 import { RuntimeEvent, NodeId } from '@mui/toolpad-core';
-import { useNavigate } from 'react-router-dom';
 import invariant from 'invariant';
 import * as appDom from '../../../../appDom';
 import EditorCanvasHost, { EditorCanvasHostHandle } from '../EditorCanvasHost';
@@ -35,8 +34,6 @@ export default function RenderPanel({ className }: RenderPanelProps) {
   const { appId, nodeId: pageNodeId } = usePageEditorState();
 
   const canvasHostRef = React.useRef<EditorCanvasHostHandle>(null);
-
-  const navigate = useNavigate();
 
   const savedNodes: NodeHashes = React.useMemo(
     () => getNodeHashes(domLoader.savedDom),
@@ -79,7 +76,7 @@ export default function RenderPanel({ className }: RenderPanelProps) {
           return;
         }
         case 'pageNavigationRequest': {
-          navigate(`../pages/${event.pageNodeId}`);
+          domApi.updateView({ kind: 'page', nodeId: event.pageNodeId });
           return;
         }
         default:
@@ -88,7 +85,7 @@ export default function RenderPanel({ className }: RenderPanelProps) {
           );
       }
     },
-    [dom, domApi, api, navigate],
+    [dom, domApi, api],
   );
 
   return (

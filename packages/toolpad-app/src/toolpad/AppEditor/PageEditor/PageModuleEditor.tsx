@@ -48,7 +48,7 @@ function PageModuleEditorDialog({ pageNodeId, open, onClose }: PageModuleEditorD
       'module',
       appDom.createConst(pretty),
     );
-    domApi.update(updatedDom, { name: 'pageModule', nodeId: pageNodeId });
+    domApi.update(updatedDom, { kind: 'pageModule', nodeId: pageNodeId });
   }, [dom, domApi, input, page, pageNodeId]);
 
   const handleSaveButton = React.useCallback(() => {
@@ -87,6 +87,7 @@ export interface PageModuleEditorProps {
 }
 
 export default function PageModuleEditor({ pageNodeId }: PageModuleEditorProps) {
+  const domApi = useDomApi();
   const { viewInfo } = useDom();
 
   const [dialogOpen, setDialogOpen] = React.useState(false);
@@ -94,19 +95,27 @@ export default function PageModuleEditor({ pageNodeId }: PageModuleEditorProps) 
   const { handleUndoRedoKeyDown } = useUndoRedo();
   useEventListener('keydown', handleUndoRedoKeyDown);
 
+  const handleButtonClick = React.useCallback(() => {
+    domApi.updateView({ kind: 'pageModule', nodeId: pageNodeId });
+  }, [domApi, pageNodeId]);
+
+  const handleDialogClose = React.useCallback(() => {
+    domApi.updateView({ kind: 'page' });
+  }, [domApi]);
+
   React.useEffect(() => {
-    setDialogOpen(viewInfo.name === 'pageModule');
-  }, [viewInfo.name]);
+    setDialogOpen(viewInfo.kind === 'pageModule');
+  }, [viewInfo]);
 
   return (
     <React.Fragment>
-      <Button color="inherit" onClick={() => setDialogOpen(true)} startIcon={<CodeIcon />}>
+      <Button color="inherit" onClick={handleButtonClick} startIcon={<CodeIcon />}>
         Edit page module
       </Button>
       <PageModuleEditorDialog
         pageNodeId={pageNodeId}
         open={dialogOpen}
-        onClose={() => setDialogOpen(false)}
+        onClose={handleDialogClose}
       />
     </React.Fragment>
   );

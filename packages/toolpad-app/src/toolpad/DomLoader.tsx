@@ -14,19 +14,18 @@ import useEvent from '../utils/useEvent';
 import { NodeHashes } from '../types';
 import { ComponentPanelTab } from './AppEditor/PageEditor/PageEditorProvider';
 
-type ViewInfo =
-  | { name: 'page'; nodeId?: NodeId }
-  | { name: 'query'; nodeId: NodeId; isDraft: boolean }
-  | { name: 'properties'; tab: ComponentPanelTab; nodeId?: NodeId }
-  | { name: 'pageModule'; nodeId: NodeId }
-  | { name: 'pageParameters'; nodeId: NodeId }
-  | { name: 'connection'; nodeId: NodeId }
-  | { name: 'component'; nodeId: NodeId };
+export type ViewInfo =
+  | { kind: 'page'; nodeId?: NodeId }
+  | { kind: 'query'; nodeId?: NodeId; isDraft?: boolean }
+  | { kind: 'properties'; tab: ComponentPanelTab; nodeId?: NodeId }
+  | { kind: 'pageModule'; nodeId: NodeId }
+  | { kind: 'pageParameters'; nodeId: NodeId }
+  | { kind: 'connection'; nodeId: NodeId }
+  | { kind: 'codeComponent'; nodeId: NodeId };
 
-export type DomAction = { viewInfo?: ViewInfo } & (
+export type DomAction =
   | {
       type: 'DOM_UPDATE_HISTORY';
-      viewInfo?: ViewInfo;
     }
   | {
       type: 'DOM_UNDO';
@@ -60,19 +59,26 @@ export type DomAction = { viewInfo?: ViewInfo } & (
       type: 'DOM_UPDATE';
       updatedDom: appDom.AppDom;
       selectedNodeId?: NodeId | null;
+      viewInfo?: ViewInfo;
+    }
+  | {
+      type: 'DOM_UPDATE_VIEW';
+      viewInfo?: ViewInfo;
     }
   | {
       type: 'DOM_SAVE_NODE';
       node: appDom.AppDomNode;
+      viewInfo?: ViewInfo;
     }
   | {
       type: 'SELECT_NODE';
       nodeId: NodeId;
+      viewInfo?: ViewInfo;
     }
   | {
       type: 'DESELECT_NODE';
-    }
-);
+      viewInfo?: ViewInfo;
+    };
 
 export function domReducer(dom: appDom.AppDom, action: DomAction): appDom.AppDom {
   switch (action.type) {
@@ -110,20 +116,12 @@ export function domLoaderReducer(state: DomLoader, action: DomAction): DomLoader
 
   switch (action.type) {
     case 'DOM_UPDATE_HISTORY': {
-      const updatedViewInfo =
-        action.viewInfo && action.viewInfo.name === state.currentViewInfo.name
-          ? {
-              ...state.currentViewInfo,
-              ...action.viewInfo,
-            }
-          : action.viewInfo || state.currentViewInfo;
-
       const updatedUndoStack = [
         ...state.undoStack,
         {
           dom: state.dom,
           selectedNodeId: state.selectedNodeId,
-          viewInfo: updatedViewInfo,
+          viewInfo: state.currentViewInfo,
           timestamp: Date.now(),
         },
       ];
@@ -206,17 +204,24 @@ export function domLoaderReducer(state: DomLoader, action: DomAction): DomLoader
     case 'SELECT_NODE': {
       return update(state, {
         selectedNodeId: action.nodeId,
+        ...(action.viewInfo ? { currentViewInfo: action.viewInfo } : {}),
       });
     }
     case 'DESELECT_NODE': {
       return update(state, {
         selectedNodeId: null,
+        ...(action.viewInfo ? { currentViewInfo: action.viewInfo } : {}),
       });
     }
     case 'DOM_UPDATE': {
       return update(state, {
         ...(action.selectedNodeId ? { selectedNodeId: action.selectedNodeId } : {}),
         ...(action.viewInfo ? { currentViewInfo: action.viewInfo } : {}),
+      });
+    }
+    case 'DOM_UPDATE_VIEW': {
+      return update(state, {
+        currentViewInfo: action.viewInfo,
       });
     }
     case 'DOM_SAVE_NODE': {
@@ -252,6 +257,12 @@ function createDomApi(
         type: 'DOM_UPDATE',
         updatedDom: dom,
         selectedNodeId,
+        viewInfo,
+      });
+    },
+    updateView(viewInfo: ViewInfo) {
+      dispatch({
+        type: 'DOM_UPDATE_VIEW',
         viewInfo,
       });
     },
@@ -374,16 +385,23 @@ export default function DomProvider({ appId, children }: DomContextProps) {
     savedDom: dom,
     dom,
     selectedNodeId: null,
-    currentViewInfo: { name: 'page' },
-    undoStack: [{ dom, selectedNodeId: null, viewInfo: { name: 'page' }, timestamp: Date.now() }],
+    currentViewInfo: { kind: 'page' },
+    undoStack: [
+      {
+        dom,
+        selectedNodeId: null,
+        viewInfo: { kind: 'page' },
+        timestamp: Date.now(),
+      },
+    ],
     redoStack: [],
   });
 
   const scheduleHistoryUpdate = React.useMemo(
     () =>
       throttle(
-        (viewInfo?: ViewInfo) => {
-          dispatch({ type: 'DOM_UPDATE_HISTORY', viewInfo });
+        () => {
+          dispatch({ type: 'DOM_UPDATE_HISTORY' });
         },
         500,
         { leading: false, trailing: true },
@@ -395,7 +413,7 @@ export default function DomProvider({ appId, children }: DomContextProps) {
     dispatch(action);
 
     if (!SKIP_UNDO_ACTIONS.has(action.type)) {
-      scheduleHistoryUpdate(action.viewInfo);
+      scheduleHistoryUpdate();
     }
   });
 

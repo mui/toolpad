@@ -8,7 +8,6 @@ import {
 } from '@mui/material';
 import * as React from 'react';
 import invariant from 'invariant';
-import { useNavigate } from 'react-router-dom';
 import * as appDom from '../../../appDom';
 import DialogForm from '../../../components/DialogForm';
 import useEvent from '../../../utils/useEvent';
@@ -38,8 +37,6 @@ export default function CreatePageDialog({
   );
 
   const [name, setName] = React.useState(appDom.proposeName(DEFAULT_NAME, existingNames));
-
-  const navigate = useNavigate();
 
   // Reset form
   const handleReset = useEvent(() => setName(appDom.proposeName(DEFAULT_NAME, existingNames)));
@@ -71,10 +68,9 @@ export default function CreatePageDialog({
           const appNode = appDom.getApp(dom);
 
           const updatedDom = appDom.addNode(dom, newNode, appNode, 'pages');
-          domApi.update(updatedDom);
+          domApi.update(updatedDom, { kind: 'page', nodeId: newNode.id });
 
           onClose();
-          navigate(`/app/${appId}/pages/${newNode.id}`);
         }}
       >
         <DialogTitle>Create a new Page</DialogTitle>

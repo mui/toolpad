@@ -26,19 +26,15 @@ export default function UrlQueryEditor({ pageNodeId }: UrlQueryEditorProps) {
 
   const page = appDom.getNode(dom, pageNodeId, 'page');
 
-  const {
-    value: dialogOpen,
-    setTrue: handleDialogOpen,
-    setFalse: handleDialogClose,
-  } = useBoolean(false);
+  const { value: isDialogOpen, setTrue: openDialog, setFalse: closeDialog } = useBoolean(false);
 
   const value = page.attributes.parameters?.value;
   const [input, setInput] = React.useState(value);
   React.useEffect(() => {
-    if (dialogOpen) {
+    if (isDialogOpen) {
       setInput(value);
     }
-  }, [dialogOpen, value]);
+  }, [isDialogOpen, value]);
 
   const handleSave = React.useCallback(() => {
     const updatedDom = appDom.setNodeNamespacedProp(
@@ -48,28 +44,34 @@ export default function UrlQueryEditor({ pageNodeId }: UrlQueryEditorProps) {
       'parameters',
       appDom.createConst(input || []),
     );
-    domApi.update(updatedDom, { name: 'pageParameters', nodeId: pageNodeId });
-
-    handleDialogClose();
-  }, [dom, page, input, domApi, pageNodeId, handleDialogClose]);
+    domApi.update(updatedDom, { kind: 'pageParameters', nodeId: pageNodeId });
+  }, [dom, page, input, domApi, pageNodeId]);
 
   const { handleUndoRedoKeyDown } = useUndoRedo();
   useEventListener('keydown', handleUndoRedoKeyDown);
 
+  const handleButtonClick = React.useCallback(() => {
+    domApi.updateView({ kind: 'pageParameters', nodeId: pageNodeId });
+  }, [domApi, pageNodeId]);
+
+  const handleDialogClose = React.useCallback(() => {
+    domApi.updateView({ kind: 'page' });
+  }, [domApi]);
+
   React.useEffect(() => {
-    if (viewInfo.name === 'pageParameters') {
-      handleDialogOpen();
+    if (viewInfo.kind === 'pageParameters') {
+      openDialog();
     } else {
-      handleDialogClose();
+      closeDialog();
     }
-  }, [handleDialogClose, handleDialogOpen, viewInfo.name]);
+  }, [closeDialog, handleDialogClose, openDialog, viewInfo]);
 
   return (
     <React.Fragment>
-      <Button color="inherit" startIcon={<AddIcon />} onClick={handleDialogOpen}>
+      <Button color="inherit" startIcon={<AddIcon />} onClick={handleButtonClick}>
         Add page parameters
       </Button>
-      <Dialog fullWidth open={dialogOpen} onClose={handleDialogClose}>
+      <Dialog fullWidth open={isDialogOpen} onClose={handleDialogClose}>
         <DialogTitle>Edit page parameters</DialogTitle>
         <DialogContent>
           <Typography>

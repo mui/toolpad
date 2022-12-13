@@ -115,18 +115,22 @@ export default function QueryEditor() {
 
   const [dialogState, setDialogState] = React.useState<DialogState | null>(null);
 
-  const handleEditStateDialogClose = React.useCallback(() => setDialogState(null), []);
+  const handleEditStateDialogClose = React.useCallback(() => {
+    domApi.updateView({ kind: 'page' });
+  }, [domApi]);
 
   const page = appDom.getNode(dom, state.nodeId, 'page');
   const { queries = [] } = appDom.getChildNodes(dom, page) ?? [];
 
   const handleCreate = React.useCallback(() => {
-    setDialogState({});
-  }, []);
+    domApi.updateView({ kind: 'query' });
+  }, [domApi]);
 
   const handleCreated = React.useCallback(
-    (node: appDom.QueryNode) => setDialogState({ node, isDraft: true }),
-    [],
+    (node: appDom.QueryNode) => {
+      domApi.updateView({ kind: 'query', nodeId: node.id, isDraft: true });
+    },
+    [domApi],
   );
 
   const handleSave = React.useCallback(
@@ -134,12 +138,11 @@ export default function QueryEditor() {
       const nodeId = node.id;
 
       if (appDom.nodeExists(dom, nodeId)) {
-        domApi.saveNode(node, { name: 'query', nodeId, isDraft: false });
+        domApi.saveNode(node, { kind: 'query', nodeId, isDraft: false });
       } else {
         const updatedDom = appDom.addNode(dom, node, page, 'queries');
-        domApi.update(updatedDom, { name: 'query', nodeId, isDraft: false });
+        domApi.update(updatedDom, { kind: 'query', nodeId, isDraft: false });
       }
-      setDialogState({ node, isDraft: false });
     },
     [dom, domApi, page],
   );
@@ -147,7 +150,7 @@ export default function QueryEditor() {
   const handleDeleteNode = React.useCallback(
     (nodeId: NodeId) => {
       const updatedDom = appDom.removeNode(dom, nodeId);
-      domApi.update(updatedDom);
+      domApi.update(updatedDom, { kind: 'page' });
 
       handleEditStateDialogClose();
     },
@@ -169,9 +172,10 @@ export default function QueryEditor() {
       const existingNames = appDom.getExistingNamesForChildren(dom, page);
       const newName = appDom.proposeName(node.name, existingNames);
       const copy = appDom.createNode(dom, 'query', { ...node, name: newName });
-      setDialogState({ node: copy, isDraft: true });
+
+      domApi.updateView({ kind: 'query', nodeId: copy.id, isDraft: true });
     },
-    [dom, page],
+    [dom, domApi, page],
   );
 
   const { handleUndoRedoKeyDown } = useUndoRedo();
@@ -179,9 +183,12 @@ export default function QueryEditor() {
 
   React.useEffect(() => {
     setDialogState(() => {
-      if (viewInfo.name === 'query') {
-        const node = appDom.getNode(dom, viewInfo.nodeId, 'query');
-        return { node, isDraft: viewInfo.isDraft };
+      if (viewInfo.kind === 'query') {
+        if (viewInfo.nodeId) {
+          const node = appDom.getNode(dom, viewInfo.nodeId, 'query');
+          return { node, isDraft: !!node };
+        }
+        return {};
       }
       return null;
     });
@@ -198,7 +205,9 @@ export default function QueryEditor() {
             <QueryListItem
               key={queryNode.id}
               disablePadding
-              onClick={() => setDialogState({ node: queryNode, isDraft: false })}
+              onClick={() => {
+                domApi.updateView({ kind: 'query', nodeId: queryNode.id, isDraft: false });
+              }}
               secondaryAction={
                 <NodeMenu
                   renderButton={({ buttonProps, menuProps }) => (

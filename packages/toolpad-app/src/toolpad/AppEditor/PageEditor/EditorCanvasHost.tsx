@@ -171,7 +171,7 @@ export default React.forwardRef<EditorCanvasHostHandle, EditorCanvasHostProps>(
       const iframeWindow = frameRef.current.contentWindow;
       setContentWindow(iframeWindow);
 
-      if (!iframeWindow || (viewInfo.name !== 'page' && viewInfo.name !== 'properties')) {
+      if (!iframeWindow || (viewInfo.kind !== 'page' && viewInfo.kind !== 'properties')) {
         return;
       }
 
@@ -181,7 +181,7 @@ export default React.forwardRef<EditorCanvasHostHandle, EditorCanvasHostProps>(
       iframeWindow?.addEventListener('unload', () => {
         iframeWindow?.removeEventListener('keydown', keyDownHandler);
       });
-    }, [iframeKeyDownHandler, viewInfo.name]);
+    }, [iframeKeyDownHandler, viewInfo]);
 
     React.useEffect(() => {
       if (!contentWindow) {

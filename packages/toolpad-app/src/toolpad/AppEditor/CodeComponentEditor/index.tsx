@@ -216,7 +216,7 @@ function CodeComponentEditorContent({ codeComponentNode }: CodeComponentEditorCo
       appDom.createConst(tryFormat(input.attributes.code.value)),
     );
     setInput(prettyfied);
-    domApi.saveNode(prettyfied, { name: 'component', nodeId: codeComponentNode.id });
+    domApi.saveNode(prettyfied, { kind: 'codeComponent', nodeId: codeComponentNode.id });
   }, [codeComponentNode.id, domApi, input, isSaveAllowed]);
 
   usePrompt(

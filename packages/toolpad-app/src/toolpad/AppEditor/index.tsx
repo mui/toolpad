@@ -54,9 +54,9 @@ function FileEditor({ appId }: FileEditorProps) {
   const firstPage = pages.length > 0 ? pages[0] : null;
 
   React.useEffect(() => {
-    switch (viewInfo.name) {
+    switch (viewInfo.kind) {
       case 'page':
-        navigate(`/app/${appId}/pages/${viewInfo.nodeId}`, { replace: true });
+        navigate(`/app/${appId}/pages/${viewInfo.nodeId || firstPage?.id}`, { replace: true });
         api.setComponentPanelTab('component');
         break;
       case 'properties':
@@ -66,12 +66,12 @@ function FileEditor({ appId }: FileEditorProps) {
       case 'connection':
         navigate(`/app/${appId}/connections/${viewInfo.nodeId}`, { replace: true });
         break;
-      case 'component':
+      case 'codeComponent':
         navigate(`/app/${appId}/codeComponents/${viewInfo.nodeId}`);
         break;
       default:
     }
-  }, [api, appId, navigate, viewInfo]);
+  }, [api, appId, firstPage?.id, navigate, viewInfo]);
 
   return (
     <Routes>

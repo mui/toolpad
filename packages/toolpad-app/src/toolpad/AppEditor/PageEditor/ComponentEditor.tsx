@@ -38,7 +38,7 @@ const ComponentEditorRoot = styled('div')(({ theme }) => ({
   },
 }));
 
-function shouldRenderControl(propTypeDef: ArgTypeDefinition, props: Record<string, any>) {
+function shouldRenderControl<P extends object>(propTypeDef: ArgTypeDefinition<P>, props: P) {
   if (propTypeDef.typeDef.type === 'element') {
     return propTypeDef.control?.type !== 'slot' && propTypeDef.control?.type !== 'slots';
   }
@@ -54,13 +54,13 @@ function shouldRenderControl(propTypeDef: ArgTypeDefinition, props: Record<strin
   return true;
 }
 
-interface ComponentPropsEditorProps<P> {
+interface ComponentPropsEditorProps<P extends object> {
   node: appDom.ElementNode<P>;
   bindings: Partial<Record<string, LiveBinding>>;
   componentConfig: ComponentConfig<P>;
 }
 
-function ComponentPropsEditor<P>({
+function ComponentPropsEditor<P extends object>({
   componentConfig,
   bindings,
   node,

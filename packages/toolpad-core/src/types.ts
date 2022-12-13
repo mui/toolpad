@@ -153,7 +153,8 @@ export type PropValueType = PrimitiveValueType | ElementValueType | EventValueTy
 export type PropValueTypes<K extends string = string> = Partial<{
   [key in K]?: PropValueType;
 }>;
-export interface ArgTypeDefinition<V = unknown, P = Record<string, unknown>> {
+
+export interface ArgTypeDefinition<P extends object = {}, V = P[keyof P]> {
   /**
    * To be used instead of the property name for UI purposes in the editor.
    */
@@ -197,11 +198,11 @@ export interface ArgTypeDefinition<V = unknown, P = Record<string, unknown>> {
   visible?: ((props: P) => boolean) | boolean;
 }
 
-export type ArgTypeDefinitions<P = any> = {
-  [K in keyof P & string]?: ArgTypeDefinition<P[K], P>;
+export type ArgTypeDefinitions<P extends object = {}> = {
+  [K in keyof P & string]?: ArgTypeDefinition<P, P[K]>;
 };
 
-export interface ComponentDefinition<P> {
+export interface ComponentDefinition<P extends object = {}> {
   // props: PropDefinitions<P>;
   argTypes: ArgTypeDefinitions<P>;
 }
@@ -234,7 +235,7 @@ export type RuntimeEvent =
   | { type: 'screenUpdate' }
   | { type: 'pageNavigationRequest'; pageNodeId: NodeId };
 
-export interface ComponentConfig<P> {
+export interface ComponentConfig<P extends object = {}> {
   /**
    * Designates a property as "the error property". If Toolpad detects an error
    * on any of the inputs, it will forward it to this property.
@@ -264,7 +265,7 @@ export interface ComponentConfig<P> {
   argTypes?: ArgTypeDefinitions<P>;
 }
 
-export type ToolpadComponent<P = {}> = React.ComponentType<P> & {
+export type ToolpadComponent<P extends object = {}> = React.ComponentType<P> & {
   [TOOLPAD_COMPONENT]: ComponentConfig<P>;
 };
 

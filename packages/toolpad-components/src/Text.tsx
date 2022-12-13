@@ -21,11 +21,10 @@ interface TextProps extends Omit<BaseProps, 'children'> {
   loading?: boolean;
 }
 
-const MarkdownContainer = styled('div')(({ theme }) => ({
+const MarkdownContainer = styled('div')({
   display: 'block',
-  margin: theme.spacing(1),
   [`&:empty::before`]: { content: '""', display: 'inline-block' },
-}));
+});
 
 function Text({ value, markdown, href, loading, mode, sx, ...rest }: TextProps) {
   switch (mode) {

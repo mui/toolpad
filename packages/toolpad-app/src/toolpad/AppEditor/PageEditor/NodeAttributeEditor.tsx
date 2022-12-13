@@ -7,15 +7,15 @@ import BindableEditor from './BindableEditor';
 import { usePageEditorState } from './PageEditorProvider';
 import { getDefaultControl } from '../../propertyControls';
 
-export interface NodeAttributeEditorProps<P> {
+export interface NodeAttributeEditorProps<P extends object> {
   node: appDom.AppDomNode;
   namespace?: string;
   name: string;
-  argType: ArgTypeDefinition;
+  argType: ArgTypeDefinition<P>;
   props?: P;
 }
 
-export default function NodeAttributeEditor<P extends Record<string, unknown>>({
+export default function NodeAttributeEditor<P extends object>({
   node,
   namespace = 'attributes',
   name,

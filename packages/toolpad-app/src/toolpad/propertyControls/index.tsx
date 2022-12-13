@@ -56,9 +56,9 @@ const modePropTypeMap = new Map<string, ArgControlSpec['type']>([
   ['link', 'string'],
 ]);
 
-export function getDefaultControl(
-  argType: ArgTypeDefinition,
-  liveProps?: Record<string, unknown>,
+export function getDefaultControl<P extends { [key in string]?: unknown }>(
+  argType: ArgTypeDefinition<P>,
+  liveProps?: P,
 ): React.FC<EditorProps<any>> | null {
   if (argType.control) {
     if (argType.control.type === 'markdown') {

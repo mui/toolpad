@@ -102,9 +102,10 @@ export default function CreateCodeComponentDialog({
           const appNode = appDom.getApp(dom);
 
           const updatedDom = appDom.addNode(dom, newNode, appNode, 'codeComponents');
-          domApi.update(updatedDom, { kind: 'codeComponent', nodeId: newNode.id });
+          domApi.update(updatedDom);
 
           onClose();
+          domApi.updateView({ kind: 'codeComponent', nodeId: newNode.id });
         }}
       >
         <DialogTitle>Create a new Code Component</DialogTitle>

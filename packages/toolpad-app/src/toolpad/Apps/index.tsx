@@ -643,7 +643,21 @@ export default function Home() {
           </Typography>
           <FlexFill />
           <TextField
-            sx={{ py: 0 }}
+            sx={(theme) => ({
+              '& .MuiInputBase-root': {
+                fontSize: theme.typography.pxToRem(14),
+              },
+              '& .MuiInputBase-input': {
+                paddingTop: theme.spacing(0.7),
+                paddingBottom: theme.spacing(0.7),
+              },
+              '& .MuiSvgIcon-root': {
+                fontSize: theme.typography.pxToRem(16),
+                color:
+                  theme.palette.mode === 'dark' ? theme.palette.grey[400] : theme.palette.grey[500],
+                marginRight: theme.spacing(0.6),
+              },
+            })}
             key={'search'}
             InputProps={{
               startAdornment: <Search />,

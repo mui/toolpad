@@ -828,24 +828,6 @@ export function getThemedComponents(theme: Theme): { components: Theme['componen
           size: 'small',
           margin: 'dense',
         },
-        styleOverrides: {
-          root: {
-            fontSize: defaultTheme.typography.pxToRem(13),
-            '& .MuiInputBase-input': {
-              paddingTop: theme.spacing(0.6),
-              paddingBottom: theme.spacing(0.6),
-            },
-            '& .MuiInputLabel-root': {
-              fontSize: defaultTheme.typography.pxToRem(13),
-            },
-            '& .MuiSvgIcon-root': {
-              fontSize: defaultTheme.typography.pxToRem(18),
-              color:
-                theme.palette.mode === 'dark' ? theme.palette.grey[400] : theme.palette.grey[500],
-              marginRight: theme.spacing(0.2),
-            },
-          },
-        },
       },
       MuiCheckbox: {
         defaultProps: {

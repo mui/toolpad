@@ -33,6 +33,7 @@ import PagePanel from './PagePanel';
 import client from '../../api';
 import useBoolean from '../../utils/useBoolean';
 import useMenu from '../../utils/useMenu';
+import { errorFrom } from '../../utils/errors';
 
 interface CreateReleaseDialogProps {
   appId: string;
@@ -189,12 +190,12 @@ export default function AppEditorShell({ appId, ...props }: ToolpadShellProps) {
                   anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
                   transformOrigin={{ horizontal: 'right', vertical: 'top' }}
                 >
-                  {!release.error ? (
+                  {release.error ? (
+                    <MenuItem>{errorFrom(release.error).message}</MenuItem>
+                  ) : (
                     <MenuItem component="a" href={`/deploy/${appId}`} target="_blank">
                       Open current deployed version
                     </MenuItem>
-                  ) : (
-                    <MenuItem>{release.error as string}</MenuItem>
                   )}
                 </Menu>
               </React.Fragment>

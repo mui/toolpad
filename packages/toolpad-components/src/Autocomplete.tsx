@@ -33,13 +33,17 @@ export default createComponent(Autocomplete, {
     },
     label: {
       typeDef: { type: 'string' },
-      defaultValue: 'Search...',
+      defaultValue: 'Search…',
     },
     value: {
       typeDef: { type: 'string' },
       onChangeProp: 'onChange',
       onChangeHandler: (event: React.ChangeEvent<HTMLInputElement>) => event.target.textContent,
       defaultValue: '',
+    },
+    fullWidth: {
+      typeDef: { type: 'boolean' },
+      defaultValue: true,
     },
     size: {
       typeDef: { type: 'string', enum: ['small', 'medium', 'large'] },
@@ -53,9 +57,6 @@ export default createComponent(Autocomplete, {
     },
     sx: {
       typeDef: { type: 'object' },
-      defaultValue: {
-        width: 300,
-      },
     },
   },
 });

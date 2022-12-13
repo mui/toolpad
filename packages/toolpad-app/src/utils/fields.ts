@@ -1,6 +1,6 @@
 const SINGLE_ACTION_INPUT_TYPES = ['checkbox', 'radio', 'range', 'color'];
 
-export const hasFieldFocus = (documentTarget = document) => {
+export function hasFieldFocus(documentTarget = document): boolean {
   const activeElement = documentTarget.activeElement as HTMLElement | HTMLInputElement;
 
   if (!activeElement) {
@@ -15,4 +15,4 @@ export const hasFieldFocus = (documentTarget = document) => {
   const focusedContentEditable = contentEditable === 'true';
 
   return focusedInput || focusedTextarea || focusedContentEditable;
-};
+}

@@ -59,6 +59,12 @@ function setValue<T = unknown>(key: string, value: T) {
  *
  * Since the local storage API isn't available in server-rendering environments, we
  * return initialValue during SSR and hydration.
+ *
+ * Things this hook does different from existing solutions:
+ * - SSR-capable: it shows initial value during SSR and hydration, but immediately
+ *   initiallizes when clientside mounted.
+ * - Sync state across tabs: When another tab changes the value in local storage, the
+ *   current tab follows suit.
  */
 export default function useLocalStorageState<V>(
   key: string,

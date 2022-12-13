@@ -6,6 +6,9 @@ interface LazyComponentOptions {
   fallback?: React.ReactNode;
 }
 
+/**
+ * Extends React.lazy with automatic fallback support and adds the ability to exclude SSR.
+ */
 export default function lazyComponent<T extends React.ComponentType<any>>(
   importComponent: () => Promise<{ default: T }>,
   { noSsr, fallback }: LazyComponentOptions = {},

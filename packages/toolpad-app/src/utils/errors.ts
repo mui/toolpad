@@ -7,6 +7,20 @@ export function serializeError(error: Error): SerializedError {
   return { message, name, stack };
 }
 
+/**
+ * Creates a javascript `Error` from an unkown value if it's not already an error.
+ * Does a best effort at inferring a message. Intended to be used typically in `catch`
+ * blocks, as there is no way to enforce only `Error` objects being thrown.
+ *
+ * ```
+ * try {
+ *   // ...
+ * } catch (rawError) {
+ *   const error = errorFrom(rawError);
+ *   console.assert(error instancof Error);
+ * }
+ * ```
+ */
 export function errorFrom(maybeError: unknown): Error {
   if (maybeError instanceof Error) {
     return maybeError;

@@ -164,7 +164,7 @@ export interface AppTheme {
 
 export type VersionOrPreview = 'preview' | number;
 
-export type AppTemplateId = 'blank' | 'stats' | 'images';
+export type AppTemplateId = 'default' | 'blank' | 'images';
 
 export type NodeHashes = Record<NodeId, number | undefined>;
 
@@ -193,3 +193,11 @@ export interface RuntimeState {
   appId: string;
   modules: Record<string, CompiledModule>;
 }
+
+export interface MetaField {
+  description?: string;
+  deprecated?: boolean | string;
+  tsType?: string;
+  value?: any;
+}
+export type GlobalScopeMeta = Record<string, MetaField>;

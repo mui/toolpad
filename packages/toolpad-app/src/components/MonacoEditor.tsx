@@ -232,6 +232,7 @@ interface MonacoEditorBaseProps {
   onBlur?: () => void;
   options?: EditorOptions;
   className?: string;
+  'data-testid'?: string;
 }
 
 export type MonacoEditorProps = MonacoEditorBaseProps &
@@ -277,6 +278,7 @@ export default React.forwardRef<MonacoEditorHandle, MonacoEditorProps>(function 
     disabled,
     options,
     autoFocus,
+    ...props
   },
   ref,
 ) {
@@ -331,7 +333,6 @@ export default React.forwardRef<MonacoEditorHandle, MonacoEditorProps>(function 
 
   React.useEffect(() => {
     invariant(rootRef.current, 'Ref not attached');
-
     const extraOptions: EditorOptions = {
       readOnly: disabled,
       theme: monacoTheme,
@@ -456,7 +457,7 @@ export default React.forwardRef<MonacoEditorHandle, MonacoEditorProps>(function 
   );
 
   return (
-    <EditorRoot className={clsx({ [classes.disabled]: disabled }, className)} sx={sx}>
+    <EditorRoot className={clsx({ [classes.disabled]: disabled }, className)} sx={sx} {...props}>
       <div className={classes.monacoHost} ref={rootRef} />
       <div className={classes.overlay} />
     </EditorRoot>

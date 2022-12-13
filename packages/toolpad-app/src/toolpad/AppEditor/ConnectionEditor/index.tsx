@@ -102,7 +102,7 @@ export interface ConnectionProps {
 }
 
 export default function ConnectionEditor({ appId }: ConnectionProps) {
-  const dom = useDom();
+  const { dom } = useDom();
   const { nodeId } = useParams();
   const connectionNode = appDom.getMaybeNode(dom, nodeId as NodeId, 'connection');
   return connectionNode ? (

@@ -1,5 +1,51 @@
 # Changelog
 
+## 0.0.30
+
+<!-- generated comparing v0.0.29..master -->
+
+_Dec 7, 2022_
+
+A big thanks to the 3 contributors who made this release possible. Here are some highlights ✨:
+
+Release the demo version, update app duplication UX.
+
+- &#8203;<!-- 13 -->Revert accidental react-router-dom update (#1426) @Janpot
+- &#8203;<!-- 12 -->Add demo link to the docs (#1319) @bharatkashyap
+- &#8203;<!-- 11 -->Add Demo link to landing page (#1228) @bharatkashyap
+- &#8203;<!-- 10 -->Add a Default app template (#1381) @bharatkashyap
+- &#8203;<!-- 09 -->Remove stats template (#1418) @apedroferreira
+- &#8203;<!-- 08 -->Propose solution for flaky undo test (#1415) @Janpot
+- &#8203;<!-- 07 -->Update dependencies (#1403) @Janpot
+- &#8203;<!-- 06 -->Move to next.config.mjs (#1404) @Janpot
+- &#8203;<!-- 05 -->Add note about missing connections to demo footer (#1406) @apedroferreira
+- &#8203;<!-- 04 -->Try out transpilePackages on latest next (#1362) @Janpot
+- &#8203;<!-- 03 -->Don't immediately open duplicated apps (#1397) @Janpot
+- &#8203;<!-- 02 -->Make sure EditableText updates when underlying string changes (#1400) @Janpot
+- &#8203;<!-- 01 -->Undoable/redoable node selection (#1394) @apedroferreira
+
+All contributors of this release in alphabetical order: @apedroferreira, @bharatkashyap, @Janpot
+
+## 0.0.29
+
+<!-- generated comparing v0.0.28..master -->
+
+_Nov 30, 2022_
+
+A big thanks to the 4 contributors who made this release possible. Here are some highlights ✨:
+
+Improved query options in demo, fixed time property in HAR, unified app editor options menus
+
+- &#8203;<!-- 7 -->Undo redo tests (#1308) @bytasv
+- &#8203;<!-- 6 -->Hide connections tree in demo (#1393) @apedroferreira
+- &#8203;<!-- 5 -->Create apps programmatically in integration tests (#1384) @Janpot
+- &#8203;<!-- 4 -->Set connection/query available options in demo (#1323) @apedroferreira
+- &#8203;<!-- 3 -->Add some tips about writing highlights in release docs (#1352) @Janpot
+- &#8203;<!-- 2 -->Fix time property in HAR (#1383) @Janpot
+- &#8203;<!-- 1 -->Unify app editor options menus (#1286) @bharatkashyap
+
+All contributors of this release in alphabetical order: @apedroferreira, @bharatkashyap, @bytasv, @Janpot
+
 ## 0.0.28
 
 <!-- generated comparing v0.0.27..master -->

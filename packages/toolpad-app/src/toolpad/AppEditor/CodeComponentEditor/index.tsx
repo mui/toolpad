@@ -130,7 +130,7 @@ interface CodeComponentEditorContentProps {
 
 function CodeComponentEditorContent({ codeComponentNode }: CodeComponentEditorContentProps) {
   const domApi = useDomApi();
-  const dom = useDom();
+  const { dom } = useDom();
 
   const { data: typings } = useQuery<Record<string, string>>(['/typings.json'], async () => {
     return fetch('/typings.json').then((res) => res.json());
@@ -246,6 +246,7 @@ function CodeComponentEditorContent({ codeComponentNode }: CodeComponentEditorCo
           <SplitPane split="vertical" allowResize size="50%">
             <TypescriptEditor
               value={input.attributes.code.value}
+              data-testid="codecomponent editor"
               onChange={(newValue) =>
                 setInput((existing) =>
                   appDom.setNamespacedProp(
@@ -307,7 +308,7 @@ interface CodeComponentEditorProps {
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 export default function CodeComponentEditor({ appId }: CodeComponentEditorProps) {
-  const dom = useDom();
+  const { dom } = useDom();
   const { nodeId } = useParams();
   const codeComponentNode = appDom.getMaybeNode(dom, nodeId as NodeId, 'codeComponent');
   return codeComponentNode ? (

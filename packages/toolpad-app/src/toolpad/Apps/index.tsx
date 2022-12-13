@@ -61,17 +61,17 @@ export const APP_TEMPLATE_OPTIONS: Map<
   }
 > = new Map([
   [
+    'default',
+    {
+      label: 'Default',
+      description: 'HR management tool',
+    },
+  ],
+  [
     'blank',
     {
       label: 'Blank page',
       description: 'Start with an empty canvas',
-    },
-  ],
-  [
-    'stats',
-    {
-      label: 'Statistics',
-      description: 'Table with statistics data',
     },
   ],
   [
@@ -92,7 +92,7 @@ export interface CreateAppDialogProps {
 
 function CreateAppDialog({ onClose, open, ...props }: CreateAppDialogProps) {
   const [name, setName] = React.useState('');
-  const [appTemplateId, setAppTemplateId] = React.useState<AppTemplateId>('blank');
+  const [appTemplateId, setAppTemplateId] = React.useState<AppTemplateId>('default');
   const [dom, setDom] = React.useState('');
 
   const captchaTargetRef = React.useRef<HTMLDivElement | null>(null);
@@ -422,7 +422,7 @@ function AppCard({ app, activeDeployment, existingAppNames }: AppCardProps) {
       }}
     >
       <CardHeader
-        action={<AppOptions app={app} allowDelete allowDuplicate onRename={handleRename} />}
+        action={app ? <AppOptions app={app} onRename={handleRename} /> : null}
         disableTypography
         subheader={
           <Typography variant="body2" color="text.secondary">
@@ -437,13 +437,16 @@ function AppCard({ app, activeDeployment, existingAppNames }: AppCardProps) {
         }
       />
       <CardContent sx={{ flexGrow: 1 }}>
-        <AppNameEditable
-          app={app}
-          editing={editingName}
-          setEditing={setEditingName}
-          loading={Boolean(!app)}
-          existingAppNames={existingAppNames}
-        />
+        {app ? (
+          <AppNameEditable
+            app={app}
+            editing={editingName}
+            setEditing={setEditingName}
+            existingAppNames={existingAppNames}
+          />
+        ) : (
+          <Skeleton />
+        )}
       </CardContent>
       <CardActions>
         <AppEditButton app={app} />
@@ -469,22 +472,29 @@ function AppRow({ app, activeDeployment, existingAppNames }: AppRowProps) {
   return (
     <TableRow hover role="row">
       <TableCell component="th" scope="row">
-        <AppNameEditable
-          loading={Boolean(!app)}
-          app={app}
-          editing={editingName}
-          setEditing={setEditingName}
-          existingAppNames={existingAppNames}
-        />
+        {app ? (
+          <AppNameEditable
+            app={app}
+            editing={editingName}
+            setEditing={setEditingName}
+            existingAppNames={existingAppNames}
+          />
+        ) : (
+          <Skeleton />
+        )}
         <Typography variant="caption">
           {app ? `Edited ${getReadableDuration(app.editedAt)}` : <Skeleton />}
         </Typography>
       </TableCell>
       <TableCell align="right">
         <Stack direction="row" spacing={1} justifyContent={'flex-end'}>
-          <AppEditButton app={app} />
-          <AppOpenButton app={app} activeDeployment={activeDeployment} />
-          <AppOptions app={app} allowDelete allowDuplicate onRename={handleRename} />
+          {app ? (
+            <React.Fragment>
+              <AppEditButton app={app} />
+              <AppOpenButton app={app} activeDeployment={activeDeployment} />
+              <AppOptions app={app} onRename={handleRename} />
+            </React.Fragment>
+          ) : null}
         </Stack>
       </TableCell>
     </TableRow>

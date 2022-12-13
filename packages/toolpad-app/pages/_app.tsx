@@ -14,6 +14,7 @@ import { MUI_X_PRO_LICENSE } from '../src/constants';
 import { queryClient } from '../src/api';
 import { reportWebVitalsToGA, setGAPage } from '../src/utils/ga';
 import '../src/appStyles.css';
+import 'perf-cascade/dist/perf-cascade.css';
 
 import appleTouchIcon from '../public/apple-touch-icon.png';
 import favicon32 from '../public/favicon-32x32.png';

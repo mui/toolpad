@@ -1,7 +1,8 @@
 import * as React from 'react';
 import jsonToTs from 'json-to-ts';
 import { Skeleton, styled, SxProps } from '@mui/material';
-import { WithControlledProp, GlobalScopeMeta } from '../../../utils/types';
+import { WithControlledProp } from '../../../utils/types';
+import { GlobalScopeMeta } from '../../../types';
 import lazyComponent from '../../../utils/lazyComponent';
 import { hasOwnProperty } from '../../../utils/collections';
 import ElementContext from '../ElementContext';

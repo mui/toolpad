@@ -12,6 +12,9 @@ function errorMessage(error: FieldError) {
   }
 }
 
+/**
+ * Translates `react-hook-form` `formState` into error/helpText properties for UI components.
+ */
 export function validation<T extends FieldValues>(
   formState: FormState<T>,
   field: keyof T,
@@ -24,6 +27,9 @@ export function validation<T extends FieldValues>(
   };
 }
 
+/**
+ * Reads `react-hook-form` `formState` and checks whether the state can and needs to be saved.
+ */
 export function isSaveDisabled<T extends FieldValues>(formState: FormState<T>): boolean {
   // Always destructure formState to trigger underlying react-hook-form Proxy object
   const { isValid, isDirty } = formState;

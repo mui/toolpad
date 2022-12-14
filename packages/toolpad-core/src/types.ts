@@ -132,6 +132,7 @@ export interface ArgControlSpec {
     | 'multiSelect' // multi select ({ type: 'array', items: { type: 'enum', values: ['1', '2', '3'] } })
     | 'date' // date picker
     | 'json' // JSON editor
+    | 'markdown' // Markdown editor
     | 'GridColumns' // GridColumns specialized editor
     | 'SelectOptions' // SelectOptions specialized editor
     | 'HorizontalAlign'
@@ -153,7 +154,7 @@ export type PropValueTypes<K extends string = string> = Partial<{
   [key in K]?: PropValueType;
 }>;
 
-export interface ArgTypeDefinition<V = unknown> {
+export interface ArgTypeDefinition<P extends object = {}, V = P[keyof P]> {
   /**
    * To be used instead of the property name for UI purposes in the editor.
    */
@@ -188,13 +189,20 @@ export interface ArgTypeDefinition<V = unknown> {
    * @returns {any} a value for the controlled prop
    */
   onChangeHandler?: (...params: any[]) => V;
+  /**
+   * For compound components, this property is used to control the visibility of this property based on the selected value of another property.
+   * If this property is not defined, the property will be visible at all times.
+   * @param {P} props all the prop bindings of the component
+   * @returns {boolean} a boolean value indicating whether the property should be visible or not
+   */
+  visible?: ((props: P) => boolean) | boolean;
 }
 
-export type ArgTypeDefinitions<P = any> = {
-  [K in keyof P & string]?: ArgTypeDefinition<P[K]>;
+export type ArgTypeDefinitions<P extends object = {}> = {
+  [K in keyof P & string]?: ArgTypeDefinition<P, P[K]>;
 };
 
-export interface ComponentDefinition<P> {
+export interface ComponentDefinition<P extends object = {}> {
   // props: PropDefinitions<P>;
   argTypes: ArgTypeDefinitions<P>;
 }
@@ -227,7 +235,7 @@ export type RuntimeEvent =
   | { type: 'screenUpdate' }
   | { type: 'pageNavigationRequest'; pageNodeId: NodeId };
 
-export interface ComponentConfig<P> {
+export interface ComponentConfig<P extends object = {}> {
   /**
    * Designates a property as "the error property". If Toolpad detects an error
    * on any of the inputs, it will forward it to this property.
@@ -257,7 +265,7 @@ export interface ComponentConfig<P> {
   argTypes?: ArgTypeDefinitions<P>;
 }
 
-export type ToolpadComponent<P = {}> = React.ComponentType<P> & {
+export type ToolpadComponent<P extends object = {}> = React.ComponentType<P> & {
   [TOOLPAD_COMPONENT]: ComponentConfig<P>;
 };
 

@@ -1,6 +1,9 @@
 import { ButtonProps, MenuProps } from '@mui/material';
 import * as React from 'react';
 
+/**
+ * Abstracts MUI menus opening logic and some of the a11y.
+ */
 export default function useMenu() {
   const buttonId = React.useId();
   const menuId = React.useId();

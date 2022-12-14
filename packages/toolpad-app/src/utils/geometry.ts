@@ -7,10 +7,16 @@ export interface Rectangle {
   height: number;
 }
 
+/**
+ * Calculates the Euclidian distance between two points
+ */
 export function distanceToPoint(x1: number, y1: number, x2: number, y2: number): number {
   return Math.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2);
 }
-
+/**
+ * Calculates the shortest Euclidian distance from a point to a rectangle. Returns `0` if the
+ * point falss within the rectangle.
+ */
 export function distanceToRect(rect: Rectangle, x: number, y: number) {
   const left = rect.x;
   const top = rect.y;
@@ -43,8 +49,11 @@ export function distanceToRect(rect: Rectangle, x: number, y: number) {
   return 0;
 }
 
-// All credit goes to https://stackoverflow.com/a/6853926/419436
-// I was too lazy to figure out the math
+/**
+ * Calculates the shortes Euclidian distance from a point to a line segment.
+ * All credit goes to https://stackoverflow.com/a/6853926/419436
+ * I was too lazy to figure out the math
+ */
 export function distanceToLine(
   x1: number,
   y1: number,
@@ -85,6 +94,9 @@ export function distanceToLine(
   return Math.sqrt(dx * dx + dy * dy);
 }
 
+/**
+ * Translates a `Rectangle` into CSS properties for absolutely positioned elements.
+ */
 export function absolutePositionCss({ x, y, width, height }: Rectangle): React.CSSProperties {
   return { left: x, top: y, width, height };
 }
@@ -101,7 +113,9 @@ export function isReverseFlow(flowDirection: FlowDirection): boolean {
   return flowDirection === 'row-reverse' || flowDirection === 'column-reverse';
 }
 
-// Returns the bounding client rect of an element against another element.
+/**
+ * Returns the bounding client rect of an element relative to its container.
+ */
 export function getRelativeBoundingRect(containerElm: Element, childElm: Element): Rectangle {
   const containerRect = containerElm.getBoundingClientRect();
   const childRect = childElm.getBoundingClientRect();
@@ -114,8 +128,10 @@ export function getRelativeBoundingRect(containerElm: Element, childElm: Element
   };
 }
 
-// Returns the bounding box of an element against another element.
-// Considers the box model to return the full dimensions, including padding/border/margin.
+/**
+ * Returns the bounding box of an element against another element.
+ * Considers the box model to return the full dimensions, including padding/border/margin.
+ */
 export function getRelativeOuterRect(containerElm: Element, childElm: Element): Rectangle {
   const { x, y, width, height } = getRelativeBoundingRect(containerElm, childElm);
   const styles = window.getComputedStyle(childElm);
@@ -140,6 +156,9 @@ export function getRelativeOuterRect(containerElm: Element, childElm: Element): 
   };
 }
 
+/**
+ * Checks whether a point falls within a reactangle
+ */
 export function rectContainsPoint(rect: Rectangle, x: number, y: number): boolean {
   return rect.x <= x && rect.x + rect.width >= x && rect.y <= y && rect.y + rect.height >= y;
 }

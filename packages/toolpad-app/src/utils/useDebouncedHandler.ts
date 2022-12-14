@@ -30,6 +30,9 @@ function defer<P extends any[]>(fn: React.MutableRefObject<Handler<P>>, params: 
 /**
  * Creates a debounced version of the handler that is passed. The invocation of [fn] is
  * delayed for [delay] milliseconds from the last invocation of the debounced function.
+ *
+ * This implementation adds on the lodash implementation in that it handles updates to the
+ * delay value.
  */
 export default function useDebouncedHandler<P extends any[]>(
   fn: Handler<P>,

@@ -21,3 +21,4 @@ export { default as Image } from './Image.js';
 export { default as Link } from './Link.js';
 
 export { inferColumns, parseColumns } from './DataGrid';
+export type { SerializableGridColumn, SerializableGridColumns } from './DataGrid';

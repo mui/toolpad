@@ -129,7 +129,7 @@ function inferColumnType(value: unknown): string {
   }
 }
 
-const DEFAULT_TYPES = new Set([
+const DEFAULT_TYPES = new Set<GridColDef['type']>([
   'string',
   'number',
   'date',
@@ -143,10 +143,7 @@ function dateValueGetter({ value }: GridValueGetterParams<any, any>) {
   return typeof value === 'number' ? new Date(value) : value;
 }
 
-type ToolpadColumnExtraProps = { customType?: string };
-type ToolpadGridColDef = GridColDef & ToolpadColumnExtraProps;
-
-const COLUMN_TYPES: Record<string, Omit<ToolpadGridColDef, 'field'>> = {
+const COLUMN_TYPES: Record<string, Omit<GridColDef, 'field'>> = {
   json: {
     valueFormatter: ({ value: cellValue }: GridValueFormatterParams) => JSON.stringify(cellValue),
   },
@@ -157,7 +154,7 @@ const COLUMN_TYPES: Record<string, Omit<ToolpadGridColDef, 'field'>> = {
     valueGetter: dateValueGetter,
   },
   link: {
-    customType: 'link',
+    type: 'link',
     renderCell: ({ value }) => (
       <Link href={value} target="_blank" rel="noopener noreferrer nofollow">
         {value}
@@ -165,14 +162,16 @@ const COLUMN_TYPES: Record<string, Omit<ToolpadGridColDef, 'field'>> = {
     ),
   },
   image: {
-    customType: 'image',
+    type: 'image',
     renderCell: ({ field, id, value }) => (
       <Box component="img" src={value} alt={`${field}${id}`} sx={{ maxWidth: '100%', p: 2 }} />
     ),
   },
 };
 
-export type SerializableGridColumns = { field: string; type: string }[];
+export interface SerializableGridColumn
+  extends Pick<GridColDef, 'field' | 'type' | 'align' | 'width' | 'headerName'> {}
+export type SerializableGridColumns = SerializableGridColumn[];
 
 export function inferColumns(rows: GridRowsProp): SerializableGridColumns {
   if (rows.length < 1) {
@@ -190,9 +189,9 @@ export function inferColumns(rows: GridRowsProp): SerializableGridColumns {
 
 export function parseColumns(columns: SerializableGridColumns): GridColumns {
   return columns.map(({ type, ...column }) => ({
-    type: DEFAULT_TYPES.has(type) ? type : undefined,
+    type: type && DEFAULT_TYPES.has(type) ? type : undefined,
     ...column,
-    ...COLUMN_TYPES[type],
+    ...(type ? COLUMN_TYPES[type] : {}),
   }));
 }
 
@@ -345,9 +344,7 @@ const DataGridComponent = React.forwardRef(function DataGridComponent(
   );
 
   const getRowHeight = React.useMemo(() => {
-    const hasImageColumns = columns.some(
-      ({ customType }: ToolpadGridColDef) => customType === 'image',
-    );
+    const hasImageColumns = columns.some(({ type }) => type === 'image');
     return hasImageColumns ? () => 'auto' : undefined;
   }, [columns]);
 

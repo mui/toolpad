@@ -15,13 +15,17 @@ import {
   TextField,
   Tooltip,
 } from '@mui/material';
-import { GridColumns, GridColDef, GridAlignment } from '@mui/x-data-grid-pro';
+import { GridAlignment } from '@mui/x-data-grid-pro';
 import * as React from 'react';
 import AddIcon from '@mui/icons-material/Add';
 import DeleteIcon from '@mui/icons-material/Delete';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import RefreshIcon from '@mui/icons-material/Refresh';
-import { inferColumns } from '@mui/toolpad-components';
+import {
+  inferColumns,
+  SerializableGridColumn,
+  SerializableGridColumns,
+} from '@mui/toolpad-components';
 import type { EditorProps } from '../../types';
 
 // TODO: this import suggests leaky abstraction
@@ -37,7 +41,7 @@ function GridColumnsPropEditor({
   value = [],
   onChange,
   disabled,
-}: EditorProps<GridColumns>) {
+}: EditorProps<SerializableGridColumns>) {
   const { bindings } = usePageEditorState();
   const [editColumnsDialogOpen, setEditColumnsDialogOpen] = React.useState(false);
   const [editedIndex, setEditedIndex] = React.useState<number | null>(null);
@@ -73,7 +77,7 @@ function GridColumnsPropEditor({
   const hasColumnSuggestions = columnSuggestions.length > 0;
 
   const handleCreateColumn = React.useCallback(
-    (suggestion: GridColDef) => () => {
+    (suggestion: SerializableGridColumn) => () => {
       const existingFields = new Set(value.map(({ field }) => field));
       const newFieldName = generateUniqueString(suggestion.field, existingFields);
       const newValue = [...value, { ...suggestion, field: newFieldName }];
@@ -92,7 +96,7 @@ function GridColumnsPropEditor({
   );
 
   const handleColumnChange = React.useCallback(
-    (newValue: GridColDef) => {
+    (newValue: SerializableGridColumn) => {
       onChange(value.map((column, i) => (i === editedIndex ? newValue : column)));
     },
     [editedIndex, onChange, value],
@@ -136,6 +140,14 @@ function GridColumnsPropEditor({
                   disabled={disabled}
                   onChange={(event) =>
                     handleColumnChange({ ...editedColumn, field: event.target.value })
+                  }
+                />
+                <TextField
+                  label="header"
+                  value={editedColumn.headerName}
+                  disabled={disabled}
+                  onChange={(event) =>
+                    handleColumnChange({ ...editedColumn, headerName: event.target.value })
                   }
                 />
                 <TextField

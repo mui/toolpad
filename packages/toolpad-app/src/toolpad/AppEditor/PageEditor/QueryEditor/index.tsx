@@ -134,8 +134,8 @@ export default function QueryEditor() {
 
   const handleSave = React.useCallback(
     (node: appDom.QueryNode) => {
-      if (appDom.nodeExists(dom, nodeId)) {
-        domApi.saveNode(node.id);
+      if (appDom.nodeExists(dom, node.id)) {
+        domApi.saveNode(node);
       } else {
         const updatedDom = appDom.addNode(dom, node, page, 'queries');
         domApi.update(updatedDom);

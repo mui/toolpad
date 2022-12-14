@@ -139,7 +139,7 @@ export default function QueryEditor() {
         domApi.saveNode(node, { kind: 'query', nodeId, isDraft: false });
       } else {
         const updatedDom = appDom.addNode(dom, node, page, 'queries');
-        domApi.update(updatedDom, { kind: 'query', nodeId, isDraft: false });
+        domApi.update(updatedDom);
       }
     },
     [dom, domApi, page],

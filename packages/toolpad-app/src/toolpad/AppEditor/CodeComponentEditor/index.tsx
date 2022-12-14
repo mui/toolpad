@@ -35,7 +35,6 @@ import useDebounced from '../../../utils/useDebounced';
 import { ExtraLib } from '../../../components/MonacoEditor';
 import { useNodeNameValidation } from '../HierarchyExplorer/validation';
 import useUndoRedo from '../../hooks/useUndoRedo';
-import useEventListener from '../../hooks/useEventListener';
 
 const TypescriptEditor = lazyComponent(() => import('../../../components/TypescriptEditor'), {
   noSsr: true,
@@ -313,8 +312,7 @@ export default function CodeComponentEditor({ appId }: CodeComponentEditorProps)
   const { nodeId } = useParams();
   const codeComponentNode = appDom.getMaybeNode(dom, nodeId as NodeId, 'codeComponent');
 
-  const { handleUndoRedoKeyDown } = useUndoRedo();
-  useEventListener('keydown', handleUndoRedoKeyDown);
+  useUndoRedo();
 
   return codeComponentNode ? (
     <CodeComponentEditorContent key={nodeId} codeComponentNode={codeComponentNode} />

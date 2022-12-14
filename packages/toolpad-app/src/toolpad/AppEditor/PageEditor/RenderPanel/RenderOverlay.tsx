@@ -386,10 +386,6 @@ export default function RenderOverlay({ canvasHostRef }: RenderOverlayProps) {
     }
   }, [domApi, selectedNodeId]);
 
-  const setSelectedComponentPanelTab = React.useCallback(() => {
-    api.setComponentPanelTab('component');
-  }, [api]);
-
   const handleNodeMouseUp = React.useCallback(
     (event: React.MouseEvent<HTMLDivElement>) => {
       const cursorPos = canvasHostRef.current?.getViewCoordinates(event.clientX, event.clientY);
@@ -406,17 +402,8 @@ export default function RenderOverlay({ canvasHostRef }: RenderOverlayProps) {
       } else {
         deselectNode();
       }
-      setSelectedComponentPanelTab();
     },
-    [
-      canvasHostRef,
-      draggedNodeId,
-      selectionRects,
-      dom,
-      setSelectedComponentPanelTab,
-      selectNode,
-      deselectNode,
-    ],
+    [canvasHostRef, draggedNodeId, selectionRects, dom, selectNode, deselectNode],
   );
 
   const handleNodeDelete = React.useCallback(
@@ -459,11 +446,10 @@ export default function RenderOverlay({ canvasHostRef }: RenderOverlayProps) {
       if (appDom.isElement(node)) {
         event.dataTransfer.dropEffect = 'move';
         selectNode(node.id);
-        setSelectedComponentPanelTab();
         api.existingNodeDragStart(node);
       }
     },
-    [api, selectNode, setSelectedComponentPanelTab],
+    [api, selectNode],
   );
 
   const handleNodeDuplicate = React.useCallback(
@@ -483,9 +469,8 @@ export default function RenderOverlay({ canvasHostRef }: RenderOverlayProps) {
       api.edgeDragStart({ nodeId: node.id, edge });
 
       selectNode(node.id);
-      setSelectedComponentPanelTab();
     },
-    [api, selectNode, setSelectedComponentPanelTab],
+    [api, selectNode],
   );
 
   const handleKeyDown = React.useCallback(
@@ -1220,13 +1205,11 @@ export default function RenderOverlay({ canvasHostRef }: RenderOverlayProps) {
         draftDom = deleteOrphanedLayoutNodes(dom, draftDom, draggedNode, dragOverNodeId);
       }
 
-      updateDom(draftDom, newNode?.id || undefined);
+      updateDom(draftDom, newNode?.id || draggedNodeId);
 
       api.dragEnd();
 
       if (newNode) {
-        setSelectedComponentPanelTab();
-
         // Refocus on overlay so that keyboard events can keep being caught by it
         const overlayElement = overlayRef.current;
         invariant(overlayElement, 'Overlay ref not bound');
@@ -1245,7 +1228,6 @@ export default function RenderOverlay({ canvasHostRef }: RenderOverlayProps) {
       newNode,
       nodesInfo,
       selectedNodeId,
-      setSelectedComponentPanelTab,
       updateDom,
     ],
   );

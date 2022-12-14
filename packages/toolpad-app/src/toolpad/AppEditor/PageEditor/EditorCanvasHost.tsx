@@ -13,8 +13,8 @@ import useEvent from '../../../utils/useEvent';
 import { LogEntry } from '../../../components/Console';
 import { Maybe } from '../../../utils/types';
 import createRuntimeState from '../../../createRuntimeState';
-import useUndoRedo from '../../hooks/useUndoRedo';
 import { hasFieldFocus } from '../../../utils/fields';
+import { useDomApi } from '../../DomLoader';
 
 type IframeContentWindow = Window & typeof globalThis;
 
@@ -82,6 +82,7 @@ export default React.forwardRef<EditorCanvasHostHandle, EditorCanvasHostProps>(
     forwardedRef,
   ) {
     const frameRef = React.useRef<HTMLIFrameElement>(null);
+    const domApi = useDomApi();
 
     const [bridge, setBridge] = React.useState<ToolpadBridge | null>(null);
 
@@ -148,8 +149,6 @@ export default React.forwardRef<EditorCanvasHostHandle, EditorCanvasHostProps>(
 
     const handleRuntimeEvent = useEvent(onRuntimeEvent);
 
-    const { handleUndoRedoKeyDown } = useUndoRedo();
-
     const iframeKeyDownHandler = React.useCallback(
       (iframeDocument: Document) => {
         return (event: KeyboardEvent) => {
@@ -157,10 +156,19 @@ export default React.forwardRef<EditorCanvasHostHandle, EditorCanvasHostProps>(
             return;
           }
 
-          handleUndoRedoKeyDown(event);
+          const isZ = event.key.toLowerCase() === 'z';
+
+          const undoShortcut = isZ && (event.metaKey || event.ctrlKey);
+          const redoShortcut = undoShortcut && event.shiftKey;
+
+          if (redoShortcut) {
+            domApi.redo();
+          } else if (undoShortcut) {
+            domApi.undo();
+          }
         };
       },
-      [handleUndoRedoKeyDown],
+      [domApi],
     );
 
     const handleFrameLoad = React.useCallback(() => {

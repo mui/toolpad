@@ -207,17 +207,19 @@ export function domLoaderReducer(state: DomLoader, action: DomAction): DomLoader
     case 'SELECT_NODE': {
       return update(state, {
         selectedNodeId: action.nodeId,
+        currentTab: 'component',
       });
     }
     case 'DESELECT_NODE': {
       return update(state, {
         selectedNodeId: null,
+        currentTab: 'component',
       });
     }
     case 'DOM_UPDATE': {
       return update(state, {
         ...(typeof action.selectedNodeId !== 'undefined'
-          ? { selectedNodeId: action.selectedNodeId }
+          ? { selectedNodeId: action.selectedNodeId, currentTab: 'component' }
           : {}),
         ...(action.view ? { currentView: action.view } : {}),
       });

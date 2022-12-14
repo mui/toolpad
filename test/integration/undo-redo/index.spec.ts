@@ -27,9 +27,6 @@ test('test basic undo and redo', async ({ page, browserName, api }) => {
   // Ensure that we added 3rd text field
   await expect(canvasInputLocator).toHaveCount(3);
 
-  // Wait for undo stack to be updated
-  await page.waitForTimeout(600);
-
   // Undo adding text field
   await page.keyboard.press('Control+Z');
 

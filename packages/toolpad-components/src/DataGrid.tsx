@@ -15,6 +15,7 @@ import {
   GridColDef,
   GridValueGetterParams,
   useGridApiRef,
+  GridColumnTypesRecord,
 } from '@mui/x-data-grid-pro';
 import * as React from 'react';
 import { useNode, createComponent } from '@mui/toolpad-core';
@@ -129,32 +130,23 @@ function inferColumnType(value: unknown): string {
   }
 }
 
-const DEFAULT_TYPES = new Set<GridColDef['type']>([
-  'string',
-  'number',
-  'date',
-  'dateTime',
-  'boolean',
-  'singleSelect',
-  'actions',
-]);
-
 function dateValueGetter({ value }: GridValueGetterParams<any, any>) {
   return typeof value === 'number' ? new Date(value) : value;
 }
 
-const COLUMN_TYPES: Record<string, Omit<GridColDef, 'field'>> = {
+export const CUSTOM_COLUMN_TYPES: GridColumnTypesRecord = {
   json: {
     valueFormatter: ({ value: cellValue }: GridValueFormatterParams) => JSON.stringify(cellValue),
   },
   date: {
+    extendType: 'date',
     valueGetter: dateValueGetter,
   },
   dateTime: {
+    extendType: 'date',
     valueGetter: dateValueGetter,
   },
   link: {
-    type: 'link',
     renderCell: ({ value }) => (
       <Link href={value} target="_blank" rel="noopener noreferrer nofollow">
         {value}
@@ -162,7 +154,6 @@ const COLUMN_TYPES: Record<string, Omit<GridColDef, 'field'>> = {
     ),
   },
   image: {
-    type: 'image',
     renderCell: ({ field, id, value }) => (
       <Box component="img" src={value} alt={`${field}${id}`} sx={{ maxWidth: '100%', p: 2 }} />
     ),
@@ -188,11 +179,7 @@ export function inferColumns(rows: GridRowsProp): SerializableGridColumns {
 }
 
 export function parseColumns(columns: SerializableGridColumns): GridColumns {
-  return columns.map(({ type, ...column }) => ({
-    type: type && DEFAULT_TYPES.has(type) ? type : undefined,
-    ...column,
-    ...(type ? COLUMN_TYPES[type] : {}),
-  }));
+  return columns;
 }
 
 const EMPTY_ROWS: GridRowsProp = [];
@@ -344,9 +331,9 @@ const DataGridComponent = React.forwardRef(function DataGridComponent(
   );
 
   const getRowHeight = React.useMemo(() => {
-    const hasImageColumns = columnsProp?.some(({ type }) => type === 'image');
+    const hasImageColumns = columns.some(({ type }) => type === 'image');
     return hasImageColumns ? () => 'auto' : undefined;
-  }, [columnsProp]);
+  }, [columns]);
 
   return (
     <div ref={ref} style={{ height: heightProp, minHeight: '100%', width: '100%' }}>
@@ -365,6 +352,7 @@ const DataGridComponent = React.forwardRef(function DataGridComponent(
         onSelectionModelChange={onSelectionModelChange}
         selectionModel={selectionModel}
         error={errorProp}
+        columnTypes={CUSTOM_COLUMN_TYPES}
         componentsProps={{
           errorOverlay: {
             message: typeof errorProp === 'string' ? errorProp : errorProp?.message,

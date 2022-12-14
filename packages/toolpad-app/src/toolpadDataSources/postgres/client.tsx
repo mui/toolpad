@@ -1,6 +1,6 @@
 import { LoadingButton } from '@mui/lab';
 import { Box, Button, Skeleton, Stack, TextField, Toolbar, Typography } from '@mui/material';
-import { inferColumns, parseColumns } from '@mui/toolpad-components';
+import { CUSTOM_COLUMN_TYPES, inferColumns, parseColumns } from '@mui/toolpad-components';
 import { DataGridPro, GridColDef } from '@mui/x-data-grid-pro';
 import * as React from 'react';
 import { useForm } from 'react-hook-form';
@@ -230,7 +230,13 @@ function QueryEditor({
       {preview?.error ? (
         <ErrorAlert error={preview?.error} />
       ) : (
-        <DataGridPro sx={{ border: 'none' }} columns={columns} key={previewGridKey} rows={rows} />
+        <DataGridPro
+          sx={{ border: 'none' }}
+          columns={columns}
+          key={previewGridKey}
+          rows={rows}
+          columnTypes={CUSTOM_COLUMN_TYPES}
+        />
       )}
     </SplitPane>
   );

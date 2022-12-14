@@ -15,7 +15,6 @@ import {
   TextField,
   Tooltip,
 } from '@mui/material';
-import { GridAlignment } from '@mui/x-data-grid-pro';
 import * as React from 'react';
 import AddIcon from '@mui/icons-material/Add';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -31,6 +30,8 @@ import type { EditorProps } from '../../types';
 // TODO: this import suggests leaky abstraction
 import { usePageEditorState } from '../AppEditor/PageEditor/PageEditorProvider';
 import { generateUniqueString } from '../../utils/strings';
+
+type GridAlignment = SerializableGridColumn['align'];
 
 const COLUMN_TYPES: string[] = ['string', 'number', 'date', 'dateTime', 'boolean', 'link', 'image'];
 const ALIGNMENTS: GridAlignment[] = ['left', 'right', 'center'];

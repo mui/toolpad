@@ -344,9 +344,9 @@ const DataGridComponent = React.forwardRef(function DataGridComponent(
   );
 
   const getRowHeight = React.useMemo(() => {
-    const hasImageColumns = columns.some(({ type }) => type === 'image');
+    const hasImageColumns = columnsProp?.some(({ type }) => type === 'image');
     return hasImageColumns ? () => 'auto' : undefined;
-  }, [columns]);
+  }, [columnsProp]);
 
   return (
     <div ref={ref} style={{ height: heightProp, minHeight: '100%', width: '100%' }}>

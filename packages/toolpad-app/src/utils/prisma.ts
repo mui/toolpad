@@ -1,4 +1,7 @@
-// See https://github.com/prisma/prisma/issues/5042#issuecomment-1104679760
+/**
+ * Excludes a set of keys from a javascript object
+ * See https://github.com/prisma/prisma/issues/5042#issuecomment-1104679760
+ */
 export function excludeFields<T extends {}, K extends (keyof T)[]>(
   fields: T,
   excluded: K,

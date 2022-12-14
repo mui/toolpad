@@ -1,6 +1,9 @@
 import crypto from './crypto';
 
-// credit: https://stackoverflow.com/a/2117523
+/**
+ * Isomorphic UUID generator, based on web crypto
+ * credit: https://stackoverflow.com/a/2117523
+ */
 export function uuidv4() {
   // @ts-ignore
   return ([1e7] + -1e3 + -4e3 + -8e3 + -1e11).replace(/[018]/g, (c) =>

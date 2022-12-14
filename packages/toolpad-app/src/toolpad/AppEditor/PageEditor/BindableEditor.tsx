@@ -2,7 +2,8 @@ import { Stack, SxProps } from '@mui/material';
 import * as React from 'react';
 import { BindableAttrValue, PropValueType, LiveBinding } from '@mui/toolpad-core';
 import { BindingEditor } from '../BindingEditor';
-import { WithControlledProp, GlobalScopeMeta } from '../../../utils/types';
+import { WithControlledProp } from '../../../utils/types';
+import { GlobalScopeMeta } from '../../../types';
 import { getDefaultControl } from '../../propertyControls';
 
 function renderDefaultControl(params: RenderControlParams<any>) {

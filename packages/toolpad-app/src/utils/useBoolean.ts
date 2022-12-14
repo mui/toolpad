@@ -1,5 +1,8 @@
 import * as React from 'react';
 
+/**
+ * A utility with shortcuts to manipulate boolean values.
+ */
 export default function useBoolean(initialValue: boolean) {
   const [value, setValue] = React.useState(initialValue);
   const toggle = React.useCallback(() => setValue((existing) => !existing), []);

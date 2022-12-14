@@ -107,26 +107,26 @@ type DialogState =
     };
 
 export default function QueryEditor() {
-  const { dom, viewInfo } = useDom();
+  const { dom, currentView } = useDom();
   const state = usePageEditorState();
   const domApi = useDomApi();
 
   const [dialogState, setDialogState] = React.useState<DialogState | null>(null);
 
   const handleEditStateDialogClose = React.useCallback(() => {
-    domApi.updateView({ kind: 'page' });
+    domApi.setView({ kind: 'page' });
   }, [domApi]);
 
   const page = appDom.getNode(dom, state.nodeId, 'page');
   const { queries = [] } = appDom.getChildNodes(dom, page) ?? [];
 
   const handleCreate = React.useCallback(() => {
-    domApi.updateView({ kind: 'query' });
+    domApi.setView({ kind: 'query' });
   }, [domApi]);
 
   const handleCreated = React.useCallback(
     (node: appDom.QueryNode) => {
-      domApi.updateView({ kind: 'query', nodeId: node.id, isDraft: true });
+      domApi.setView({ kind: 'query', nodeId: node.id, isDraft: true });
     },
     [domApi],
   );
@@ -148,7 +148,7 @@ export default function QueryEditor() {
   const handleDeleteNode = React.useCallback(
     (nodeId: NodeId) => {
       const updatedDom = appDom.removeNode(dom, nodeId);
-      domApi.update(updatedDom, { kind: 'page' });
+      domApi.update(updatedDom);
 
       handleEditStateDialogClose();
     },
@@ -171,23 +171,23 @@ export default function QueryEditor() {
       const newName = appDom.proposeName(node.name, existingNames);
       const copy = appDom.createNode(dom, 'query', { ...node, name: newName });
 
-      domApi.updateView({ kind: 'query', nodeId: copy.id, isDraft: true });
+      domApi.setView({ kind: 'query', nodeId: copy.id, isDraft: true });
     },
     [dom, domApi, page],
   );
 
   React.useEffect(() => {
     setDialogState(() => {
-      if (viewInfo.kind === 'query') {
-        if (viewInfo.nodeId) {
-          const node = appDom.getNode(dom, viewInfo.nodeId, 'query');
-          return { node, isDraft: viewInfo.isDraft || false };
+      if (currentView.kind === 'query') {
+        if (currentView.nodeId) {
+          const node = appDom.getNode(dom, currentView.nodeId, 'query');
+          return { node, isDraft: currentView.isDraft || false };
         }
         return {};
       }
       return null;
     });
-  }, [dom, viewInfo]);
+  }, [dom, currentView]);
 
   return (
     <Stack spacing={1} alignItems="start" sx={{ width: '100%' }}>
@@ -201,7 +201,7 @@ export default function QueryEditor() {
               key={queryNode.id}
               disablePadding
               onClick={() => {
-                domApi.updateView({ kind: 'query', nodeId: queryNode.id, isDraft: false });
+                domApi.setView({ kind: 'query', nodeId: queryNode.id, isDraft: false });
               }}
               secondaryAction={
                 <NodeMenu

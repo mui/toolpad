@@ -13,10 +13,9 @@ import useEvent from '../utils/useEvent';
 import { NodeHashes } from '../types';
 import { ComponentPanelTab } from './AppEditor/PageEditor/PageEditorProvider';
 
-export type ViewInfo =
+export type DomView =
   | { kind: 'page'; nodeId?: NodeId }
   | { kind: 'query'; nodeId?: NodeId; isDraft?: boolean }
-  | { kind: 'properties'; tab: ComponentPanelTab; nodeId?: NodeId }
   | { kind: 'pageModule'; nodeId: NodeId }
   | { kind: 'pageParameters'; nodeId: NodeId }
   | { kind: 'connection'; nodeId: NodeId }
@@ -58,25 +57,27 @@ export type DomAction =
       type: 'DOM_UPDATE';
       updatedDom: appDom.AppDom;
       selectedNodeId?: NodeId | null;
-      viewInfo?: ViewInfo;
+      view?: DomView;
     }
   | {
-      type: 'DOM_UPDATE_VIEW';
-      viewInfo?: ViewInfo;
+      type: 'DOM_SET_VIEW';
+      view: DomView;
+    }
+  | {
+      type: 'DOM_SET_TAB';
+      tab: ComponentPanelTab;
     }
   | {
       type: 'DOM_SAVE_NODE';
       node: appDom.AppDomNode;
-      viewInfo?: ViewInfo;
+      view?: DomView;
     }
   | {
       type: 'SELECT_NODE';
       nodeId: NodeId;
-      viewInfo?: ViewInfo;
     }
   | {
       type: 'DESELECT_NODE';
-      viewInfo?: ViewInfo;
     };
 
 export function domReducer(dom: appDom.AppDom, action: DomAction): appDom.AppDom {
@@ -120,7 +121,8 @@ export function domLoaderReducer(state: DomLoader, action: DomAction): DomLoader
         {
           dom: state.dom,
           selectedNodeId: state.selectedNodeId,
-          viewInfo: state.currentViewInfo,
+          view: state.currentView,
+          tab: state.currentTab,
           timestamp: Date.now(),
         },
       ];
@@ -155,7 +157,8 @@ export function domLoaderReducer(state: DomLoader, action: DomAction): DomLoader
       return update(state, {
         dom: previousStackEntry.dom,
         selectedNodeId: previousStackEntry.selectedNodeId,
-        currentViewInfo: previousStackEntry.viewInfo,
+        currentView: previousStackEntry.view,
+        currentTab: previousStackEntry.tab,
         undoStack,
         redoStack,
       });
@@ -175,7 +178,8 @@ export function domLoaderReducer(state: DomLoader, action: DomAction): DomLoader
       return update(state, {
         dom: nextStackEntry.dom,
         selectedNodeId: nextStackEntry.selectedNodeId,
-        currentViewInfo: nextStackEntry.viewInfo,
+        currentView: nextStackEntry.view,
+        currentTab: nextStackEntry.tab,
         undoStack,
         redoStack,
       });
@@ -203,32 +207,35 @@ export function domLoaderReducer(state: DomLoader, action: DomAction): DomLoader
     case 'SELECT_NODE': {
       return update(state, {
         selectedNodeId: action.nodeId,
-        ...(action.viewInfo ? { currentViewInfo: action.viewInfo } : {}),
       });
     }
     case 'DESELECT_NODE': {
       return update(state, {
         selectedNodeId: null,
-        ...(action.viewInfo ? { currentViewInfo: action.viewInfo } : {}),
       });
     }
     case 'DOM_UPDATE': {
       return update(state, {
-        ...(action.selectedNodeId ? { selectedNodeId: action.selectedNodeId } : {}),
-        ...(action.viewInfo ? { currentViewInfo: action.viewInfo } : {}),
-      });
-    }
-    case 'DOM_UPDATE_VIEW': {
-      return update(state, {
-        currentViewInfo: action.viewInfo,
+        ...(typeof action.selectedNodeId !== 'undefined'
+          ? { selectedNodeId: action.selectedNodeId }
+          : {}),
+        ...(action.view ? { currentView: action.view } : {}),
       });
     }
     case 'DOM_SAVE_NODE': {
-      return action.viewInfo
-        ? update(state, {
-            currentViewInfo: action.viewInfo,
-          })
-        : state;
+      return update(state, {
+        ...(action.view ? { currentView: action.view } : {}),
+      });
+    }
+    case 'DOM_SET_VIEW': {
+      return update(state, {
+        currentView: action.view,
+      });
+    }
+    case 'DOM_SET_TAB': {
+      return update(state, {
+        currentTab: action.tab,
+      });
     }
     default:
       return state;
@@ -246,25 +253,31 @@ function createDomApi(dispatch: React.Dispatch<DomAction>) {
     setNodeName(nodeId: NodeId, name: string) {
       dispatch({ type: 'DOM_SET_NODE_NAME', nodeId, name });
     },
-    update(dom: appDom.AppDom, viewInfo?: ViewInfo, selectedNodeId?: NodeId | null) {
+    update(dom: appDom.AppDom, view?: DomView, selectedNodeId?: NodeId | null) {
       dispatch({
         type: 'DOM_UPDATE',
         updatedDom: dom,
         selectedNodeId,
-        viewInfo,
+        view,
       });
     },
-    updateView(viewInfo: ViewInfo) {
+    setView(view: DomView) {
       dispatch({
-        type: 'DOM_UPDATE_VIEW',
-        viewInfo,
+        type: 'DOM_SET_VIEW',
+        view,
       });
     },
-    saveNode(node: appDom.AppDomNode, viewInfo?: ViewInfo) {
+    setTab(tab: ComponentPanelTab) {
+      dispatch({
+        type: 'DOM_SET_TAB',
+        tab,
+      });
+    },
+    saveNode(node: appDom.AppDomNode, view?: DomView) {
       dispatch({
         type: 'DOM_SAVE_NODE',
         node,
-        viewInfo,
+        view,
       });
     },
     setNodeNamespace<Node extends appDom.AppDomNode, Namespace extends appDom.PropNamespaces<Node>>(
@@ -279,17 +292,15 @@ function createDomApi(dispatch: React.Dispatch<DomAction>) {
         value: value as BindableAttrValues | null,
       });
     },
-    selectNode(nodeId: NodeId, viewInfo: ViewInfo) {
+    selectNode(nodeId: NodeId) {
       dispatch({
         type: 'SELECT_NODE',
         nodeId,
-        viewInfo,
       });
     },
-    deselectNode(viewInfo: ViewInfo) {
+    deselectNode() {
       dispatch({
         type: 'DESELECT_NODE',
-        viewInfo,
       });
     },
   };
@@ -302,7 +313,8 @@ export interface DomLoader {
   unsavedChanges: number;
   saveError: string | null;
   selectedNodeId: NodeId | null;
-  currentViewInfo: ViewInfo;
+  currentView: DomView;
+  currentTab: ComponentPanelTab;
   undoStack: UndoRedoStackEntry[];
   redoStack: UndoRedoStackEntry[];
 }
@@ -322,19 +334,22 @@ export { useDomLoader };
 export interface DomState {
   dom: appDom.AppDom;
   selectedNodeId: NodeId | null;
-  viewInfo: ViewInfo;
+  currentView: DomView;
+  currentTab: ComponentPanelTab;
 }
 
-interface UndoRedoStackEntry extends DomState {
+interface UndoRedoStackEntry extends Omit<DomState, 'currentView' | 'currentTab'> {
+  view: DomView;
+  tab: ComponentPanelTab;
   timestamp: number;
 }
 
 export function useDom(): DomState {
-  const { dom, selectedNodeId, currentViewInfo } = useDomLoader();
+  const { dom, selectedNodeId, currentView, currentTab } = useDomLoader();
   if (!dom) {
     throw new Error("Trying to access the DOM before it's loaded");
   }
-  return { dom, selectedNodeId, viewInfo: currentViewInfo };
+  return { dom, selectedNodeId, currentView, currentTab };
 }
 
 export function useDomApi(): DomApi {
@@ -379,12 +394,14 @@ export default function DomProvider({ appId, children }: DomContextProps) {
     savedDom: dom,
     dom,
     selectedNodeId: null,
-    currentViewInfo: { kind: 'page' },
+    currentView: { kind: 'page' },
+    currentTab: 'component',
     undoStack: [
       {
         dom,
         selectedNodeId: null,
-        viewInfo: { kind: 'page' },
+        view: { kind: 'page' },
+        tab: 'component',
         timestamp: Date.now(),
       },
     ],

@@ -4,6 +4,7 @@ import * as React from 'react';
 import ComponentEditor from './ComponentEditor';
 import ThemeEditor from './ThemeEditor';
 import { ComponentPanelTab, usePageEditorApi, usePageEditorState } from './PageEditorProvider';
+import { useDom, useDomApi } from '../../DomLoader';
 
 const classes = {
   panel: 'Toolpad_Panel',
@@ -25,11 +26,18 @@ export interface ComponentPanelProps {
 }
 
 export default function ComponentPanel({ className }: ComponentPanelProps) {
+  const { currentTab } = useDom();
+  const domApi = useDomApi();
+
   const state = usePageEditorState();
   const api = usePageEditorApi();
 
   const handleChange = (event: React.SyntheticEvent, newValue: ComponentPanelTab) =>
-    api.setComponentPanelTab(newValue);
+    domApi.setTab(newValue);
+
+  React.useEffect(() => {
+    api.setComponentPanelTab(currentTab);
+  }, [api, currentTab]);
 
   return (
     <ComponentPanelRoot className={className}>

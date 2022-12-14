@@ -366,25 +366,25 @@ export default function RenderOverlay({ canvasHostRef }: RenderOverlayProps) {
   const updateDom = React.useCallback(
     (draftDom: appDom.AppDom, newSelectedNodeId?: NodeId | null) => {
       draftDom = normalizePageRowColumnSizes(draftDom);
-      domApi.update(draftDom, { kind: 'page', nodeId: pageNodeId }, newSelectedNodeId);
+      domApi.update(draftDom, undefined, newSelectedNodeId);
     },
-    [domApi, normalizePageRowColumnSizes, pageNodeId],
+    [domApi, normalizePageRowColumnSizes],
   );
 
   const selectNode = React.useCallback(
     (nodeId: NodeId) => {
       if (selectedNodeId !== nodeId) {
-        domApi.selectNode(nodeId, { kind: 'page', nodeId: pageNodeId });
+        domApi.selectNode(nodeId);
       }
     },
-    [domApi, pageNodeId, selectedNodeId],
+    [domApi, selectedNodeId],
   );
 
   const deselectNode = React.useCallback(() => {
     if (selectedNodeId) {
-      domApi.deselectNode({ kind: 'page', nodeId: pageNodeId });
+      domApi.deselectNode();
     }
-  }, [domApi, pageNodeId, selectedNodeId]);
+  }, [domApi, selectedNodeId]);
 
   const setSelectedComponentPanelTab = React.useCallback(() => {
     api.setComponentPanelTab('component');
@@ -471,9 +471,9 @@ export default function RenderOverlay({ canvasHostRef }: RenderOverlayProps) {
       event.stopPropagation();
 
       const updatedDom = appDom.duplicateNode(dom, node);
-      domApi.update(updatedDom, { kind: 'page', nodeId: pageNodeId });
+      domApi.update(updatedDom);
     },
-    [dom, domApi, pageNodeId],
+    [dom, domApi],
   );
 
   const handleEdgeDragStart = React.useCallback(

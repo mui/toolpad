@@ -76,7 +76,7 @@ export default function RenderPanel({ className }: RenderPanelProps) {
           return;
         }
         case 'pageNavigationRequest': {
-          domApi.updateView({ kind: 'page', nodeId: event.pageNodeId });
+          domApi.setView({ kind: 'page', nodeId: event.pageNodeId });
           return;
         }
         default:

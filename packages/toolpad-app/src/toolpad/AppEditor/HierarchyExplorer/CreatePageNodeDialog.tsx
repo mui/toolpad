@@ -71,7 +71,7 @@ export default function CreatePageDialog({
           domApi.update(updatedDom);
 
           onClose();
-          domApi.updateView({ kind: 'page', nodeId: newNode.id });
+          domApi.setView({ kind: 'page', nodeId: newNode.id });
         }}
       >
         <DialogTitle>Create a new Page</DialogTitle>

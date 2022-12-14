@@ -3,7 +3,7 @@ import { styled } from '@mui/material';
 import { Route, Routes, useParams, Navigate, useNavigate } from 'react-router-dom';
 import { JsRuntimeProvider } from '@mui/toolpad-core/jsRuntime';
 import PageEditor from './PageEditor';
-import DomProvider, { useDom } from '../DomLoader';
+import DomProvider, { useDom, useDomApi } from '../DomLoader';
 import * as appDom from '../../appDom';
 import CodeComponentEditor from './CodeComponentEditor';
 import ConnectionEditor from './ConnectionEditor';
@@ -44,7 +44,9 @@ interface FileEditorProps {
 }
 
 function FileEditor({ appId }: FileEditorProps) {
-  const { dom, viewInfo } = useDom();
+  const { dom, currentView } = useDom();
+  const domApi = useDomApi();
+
   const app = appDom.getApp(dom);
   const { pages = [] } = appDom.getChildNodes(dom, app);
   const api = usePageEditorApi();
@@ -54,31 +56,25 @@ function FileEditor({ appId }: FileEditorProps) {
   const firstPage = pages.length > 0 ? pages[0] : null;
 
   React.useEffect(() => {
-    switch (viewInfo.kind) {
+    switch (currentView.kind) {
       case 'page':
-        navigate(`/app/${appId}/pages/${viewInfo.nodeId || firstPage?.id}`, { replace: true });
-        api.setComponentPanelTab('component');
-        break;
-      case 'properties':
-        navigate(`/app/${appId}/pages/${viewInfo.nodeId}`, { replace: true });
-        api.setComponentPanelTab(viewInfo.tab);
+        navigate(`/app/${appId}/pages/${currentView.nodeId || firstPage?.id}`, { replace: true });
         break;
       case 'connection':
-        navigate(`/app/${appId}/connections/${viewInfo.nodeId}`, { replace: true });
+        navigate(`/app/${appId}/connections/${currentView.nodeId}`, { replace: true });
         break;
       case 'codeComponent':
-        navigate(`/app/${appId}/codeComponents/${viewInfo.nodeId}`);
+        navigate(`/app/${appId}/codeComponents/${currentView.nodeId}`);
         break;
       default:
     }
-  }, [api, appId, firstPage?.id, navigate, viewInfo]);
+  }, [api, appId, firstPage?.id, navigate, currentView, domApi]);
 
   return (
     <Routes>
       <Route element={<AppEditorShell appId={appId} />}>
         <Route path="connections/:nodeId" element={<ConnectionEditor appId={appId} />} />
         <Route path="pages/:nodeId" element={<PageEditor appId={appId} />} />
-        <Route path="codeComponents/:nodeId" element={<CodeComponentEditor appId={appId} />} />
         <Route path="codeComponents/:nodeId" element={<CodeComponentEditor appId={appId} />} />
         <Route
           index

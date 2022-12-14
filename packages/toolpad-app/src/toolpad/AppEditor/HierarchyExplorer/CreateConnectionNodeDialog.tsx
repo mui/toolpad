@@ -84,7 +84,7 @@ export default function CreateConnectionDialog({
           domApi.update(updatedDom);
 
           onClose();
-          domApi.updateView({ kind: 'connection', nodeId: newNode.id });
+          domApi.setView({ kind: 'connection', nodeId: newNode.id });
         }}
       >
         <DialogTitle>Create a new Connection</DialogTitle>

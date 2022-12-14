@@ -19,7 +19,7 @@ export interface UrlQueryEditorProps {
 }
 
 export default function UrlQueryEditor({ pageNodeId }: UrlQueryEditorProps) {
-  const { dom, viewInfo } = useDom();
+  const { dom, currentView } = useDom();
   const domApi = useDomApi();
 
   const page = appDom.getNode(dom, pageNodeId, 'page');
@@ -46,20 +46,20 @@ export default function UrlQueryEditor({ pageNodeId }: UrlQueryEditorProps) {
   }, [dom, page, input, domApi]);
 
   const handleButtonClick = React.useCallback(() => {
-    domApi.updateView({ kind: 'pageParameters', nodeId: pageNodeId });
+    domApi.setView({ kind: 'pageParameters', nodeId: pageNodeId });
   }, [domApi, pageNodeId]);
 
   const handleDialogClose = React.useCallback(() => {
-    domApi.updateView({ kind: 'page' });
+    domApi.setView({ kind: 'page' });
   }, [domApi]);
 
   React.useEffect(() => {
-    if (viewInfo.kind === 'pageParameters') {
+    if (currentView.kind === 'pageParameters') {
       openDialog();
     } else {
       closeDialog();
     }
-  }, [closeDialog, handleDialogClose, openDialog, viewInfo]);
+  }, [closeDialog, handleDialogClose, openDialog, currentView]);
 
   return (
     <React.Fragment>

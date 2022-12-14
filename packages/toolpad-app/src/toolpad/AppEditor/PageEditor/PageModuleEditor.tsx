@@ -86,21 +86,21 @@ export interface PageModuleEditorProps {
 
 export default function PageModuleEditor({ pageNodeId }: PageModuleEditorProps) {
   const domApi = useDomApi();
-  const { viewInfo } = useDom();
+  const { currentView } = useDom();
 
   const [dialogOpen, setDialogOpen] = React.useState(false);
 
   const handleButtonClick = React.useCallback(() => {
-    domApi.updateView({ kind: 'pageModule', nodeId: pageNodeId });
+    domApi.setView({ kind: 'pageModule', nodeId: pageNodeId });
   }, [domApi, pageNodeId]);
 
   const handleDialogClose = React.useCallback(() => {
-    domApi.updateView({ kind: 'page' });
+    domApi.setView({ kind: 'page' });
   }, [domApi]);
 
   React.useEffect(() => {
-    setDialogOpen(viewInfo.kind === 'pageModule');
-  }, [viewInfo]);
+    setDialogOpen(currentView.kind === 'pageModule');
+  }, [currentView]);
 
   return (
     <React.Fragment>

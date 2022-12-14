@@ -83,7 +83,7 @@ export default function ComponentEditor({ className }: ComponentEditorProps) {
       attributes: {},
     });
     const updatedDom = appDom.addNode(dom, newTheme, app, 'themes');
-    domApi.update(updatedDom, { kind: 'properties', tab: 'theme' });
+    domApi.update(updatedDom);
   };
 
   return (
@@ -98,7 +98,7 @@ export default function ComponentEditor({ className }: ComponentEditorProps) {
                 type: 'const',
                 value: newValue,
               });
-              domApi.update(updatedDom, { kind: 'properties', tab: 'theme' });
+              domApi.update(updatedDom);
             }}
             aria-label="Mode"
           >
@@ -125,7 +125,7 @@ export default function ComponentEditor({ className }: ComponentEditorProps) {
                   value: newValue,
                 },
               );
-              domApi.update(updatedDom, { kind: 'properties', tab: 'theme' });
+              domApi.update(updatedDom);
             }}
           />
           <PaletteColorPicker
@@ -142,7 +142,7 @@ export default function ComponentEditor({ className }: ComponentEditorProps) {
                   value: newValue,
                 },
               );
-              domApi.update(updatedDom, { kind: 'properties', tab: 'theme' });
+              domApi.update(updatedDom);
             }}
           />
         </Stack>

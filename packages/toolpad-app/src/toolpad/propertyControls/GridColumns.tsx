@@ -22,6 +22,8 @@ import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import RefreshIcon from '@mui/icons-material/Refresh';
 import {
   inferColumns,
+  NumberFormat,
+  NUMBER_FORMAT_PRESETS,
   SerializableGridColumn,
   SerializableGridColumns,
 } from '@mui/toolpad-components';
@@ -35,6 +37,22 @@ type GridAlignment = SerializableGridColumn['align'];
 
 const COLUMN_TYPES: string[] = ['string', 'number', 'date', 'dateTime', 'boolean', 'link', 'image'];
 const ALIGNMENTS: GridAlignment[] = ['left', 'right', 'center'];
+
+function formatOptionValue(numberFormat: NumberFormat | undefined) {
+  if (!numberFormat) {
+    return undefined;
+  }
+  switch (numberFormat.kind) {
+    case 'preset':
+      return `preset:${numberFormat.preset}`;
+    case 'custom':
+      return 'custom';
+    case 'currency':
+      return 'currency';
+    default:
+      return undefined;
+  }
+}
 
 function GridColumnsPropEditor({
   label,
@@ -96,8 +114,8 @@ function GridColumnsPropEditor({
     [],
   );
 
-  const handleColumnChange = React.useCallback(
-    (newValue: SerializableGridColumn) => {
+  const handleColumnChange = React.useCallback<React.Dispatch<SerializableGridColumn>>(
+    (newValue) => {
       onChange(value.map((column, i) => (i === editedIndex ? newValue : column)));
     },
     [editedIndex, onChange, value],
@@ -167,6 +185,69 @@ function GridColumnsPropEditor({
                     </MenuItem>
                   ))}
                 </TextField>
+                {editedColumn.type === 'number' ? (
+                  <TextField
+                    select
+                    fullWidth
+                    label="number format"
+                    value={formatOptionValue(editedColumn.numberFormat)}
+                    disabled={disabled}
+                    onChange={(event) => {
+                      let numberFormat: NumberFormat | undefined;
+                      if (event.target.value === 'currency') {
+                        numberFormat = {
+                          kind: 'currency',
+                          currency: 'USD',
+                        };
+                      } else if (event.target.value === 'custom') {
+                        numberFormat = {
+                          kind: 'custom',
+                          custom: {},
+                        };
+                      } else {
+                        const [prefix, id] = event.target.value.split(':');
+
+                        if (prefix === 'preset') {
+                          numberFormat = {
+                            kind: 'preset',
+                            preset: id,
+                          };
+                        }
+                      }
+
+                      handleColumnChange({ ...editedColumn, numberFormat });
+                    }}
+                  >
+                    <MenuItem value="">plain</MenuItem>
+                    {Array.from(NUMBER_FORMAT_PRESETS.keys(), (type) => (
+                      <MenuItem key={type} value={`preset:${type}`}>
+                        {type}
+                      </MenuItem>
+                    ))}
+                    <MenuItem value="currency">currency</MenuItem>
+                    <MenuItem value="custom">custom</MenuItem>
+                  </TextField>
+                ) : null}
+
+                {editedColumn.numberFormat?.kind === 'currency' ? (
+                  <TextField
+                    fullWidth
+                    label="currency code"
+                    value={editedColumn.numberFormat.currency}
+                    disabled={disabled}
+                    onChange={(event) => {
+                      handleColumnChange({
+                        ...editedColumn,
+                        numberFormat: {
+                          ...editedColumn.numberFormat,
+                          kind: 'currency',
+                          currency: event.target.value,
+                        },
+                      });
+                    }}
+                  />
+                ) : null}
+
                 <TextField
                   select
                   fullWidth

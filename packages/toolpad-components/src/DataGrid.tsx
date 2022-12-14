@@ -160,8 +160,48 @@ export const CUSTOM_COLUMN_TYPES: GridColumnTypesRecord = {
   },
 };
 
+export const NUMBER_FORMAT_PRESETS = new Map<string, { options?: Intl.NumberFormatOptions }>([
+  [
+    'bytes',
+    {
+      options: {
+        style: 'unit',
+        maximumSignificantDigits: 3,
+        notation: 'compact',
+        unit: 'byte',
+        unitDisplay: 'narrow',
+      },
+    },
+  ],
+  [
+    'percent',
+    {
+      options: {
+        style: 'percent',
+      },
+    },
+  ],
+]);
+
+export type NumberFormat =
+  | {
+      kind: 'preset';
+      preset: string;
+    }
+  | {
+      kind: 'currency';
+      currency?: string;
+    }
+  | {
+      kind: 'custom';
+      custom: Intl.NumberFormatOptions;
+    };
+
 export interface SerializableGridColumn
-  extends Pick<GridColDef, 'field' | 'type' | 'align' | 'width' | 'headerName'> {}
+  extends Pick<GridColDef, 'field' | 'type' | 'align' | 'width' | 'headerName'> {
+  numberFormat?: NumberFormat;
+}
+
 export type SerializableGridColumns = SerializableGridColumn[];
 
 export function inferColumns(rows: GridRowsProp): SerializableGridColumns {
@@ -179,7 +219,38 @@ export function inferColumns(rows: GridRowsProp): SerializableGridColumns {
 }
 
 export function parseColumns(columns: SerializableGridColumns): GridColumns {
-  return columns;
+  return columns.map((column) => {
+    if (column.type === 'number' && column.numberFormat) {
+      switch (column.numberFormat.kind) {
+        case 'preset': {
+          const preset = NUMBER_FORMAT_PRESETS.get(column.numberFormat.preset);
+          const { format } = new Intl.NumberFormat(undefined, preset?.options);
+          return { ...column, valueFormatter: ({ value }) => format(value) };
+        }
+        case 'custom': {
+          const { format } = new Intl.NumberFormat(undefined, column.numberFormat.custom);
+          return { ...column, valueFormatter: ({ value }) => format(value) };
+        }
+        case 'currency': {
+          const userInput = column.numberFormat.currency || 'USD';
+          if (/[a-z]{3}/i.test(userInput)) {
+            const { format } = new Intl.NumberFormat(undefined, {
+              style: 'currency',
+              currency: userInput,
+            });
+            return { ...column, valueFormatter: ({ value }) => format(value) };
+          }
+          const { format } = new Intl.NumberFormat(undefined, {});
+          return { ...column, valueFormatter: ({ value }) => `${userInput} ${format(value)}` };
+        }
+        default: {
+          return column;
+        }
+      }
+    }
+
+    return column;
+  });
 }
 
 const EMPTY_ROWS: GridRowsProp = [];

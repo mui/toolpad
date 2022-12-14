@@ -1225,6 +1225,7 @@ export default function RenderOverlay({ canvasHostRef }: RenderOverlayProps) {
       dragOverSlotParentProp,
       dragOverZone,
       draggedNode,
+      draggedNodeId,
       newNode,
       nodesInfo,
       selectedNodeId,

@@ -3,8 +3,7 @@ import { Tab, Box, styled } from '@mui/material';
 import * as React from 'react';
 import ComponentEditor from './ComponentEditor';
 import ThemeEditor from './ThemeEditor';
-import { ComponentPanelTab, usePageEditorApi, usePageEditorState } from './PageEditorProvider';
-import { useDom, useDomApi } from '../../DomLoader';
+import { ComponentPanelTab, useDom, useDomApi } from '../../DomLoader';
 
 const classes = {
   panel: 'Toolpad_Panel',
@@ -29,19 +28,12 @@ export default function ComponentPanel({ className }: ComponentPanelProps) {
   const { currentTab } = useDom();
   const domApi = useDomApi();
 
-  const state = usePageEditorState();
-  const api = usePageEditorApi();
-
   const handleChange = (event: React.SyntheticEvent, newValue: ComponentPanelTab) =>
     domApi.setTab(newValue);
 
-  React.useEffect(() => {
-    api.setComponentPanelTab(currentTab);
-  }, [api, currentTab]);
-
   return (
     <ComponentPanelRoot className={className}>
-      <TabContext value={state.componentPanelTab}>
+      <TabContext value={currentTab}>
         <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
           <TabList onChange={handleChange} aria-label="Component options">
             <Tab label="Component" value="component" />

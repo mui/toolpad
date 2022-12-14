@@ -11,15 +11,16 @@ import { mapValues } from '../utils/collections';
 import insecureHash from '../utils/insecureHash';
 import useEvent from '../utils/useEvent';
 import { NodeHashes } from '../types';
-import { ComponentPanelTab } from './AppEditor/PageEditor/PageEditorProvider';
 
 export type DomView =
   | { kind: 'page'; nodeId?: NodeId }
-  | { kind: 'query'; nodeId?: NodeId; isDraft?: boolean }
+  | { kind: 'query'; nodeId: NodeId }
   | { kind: 'pageModule'; nodeId: NodeId }
   | { kind: 'pageParameters'; nodeId: NodeId }
   | { kind: 'connection'; nodeId: NodeId }
   | { kind: 'codeComponent'; nodeId: NodeId };
+
+export type ComponentPanelTab = 'component' | 'theme';
 
 export type DomAction =
   | {
@@ -70,7 +71,6 @@ export type DomAction =
   | {
       type: 'DOM_SAVE_NODE';
       node: appDom.AppDomNode;
-      view?: DomView;
     }
   | {
       type: 'SELECT_NODE';
@@ -224,11 +224,6 @@ export function domLoaderReducer(state: DomLoader, action: DomAction): DomLoader
         ...(action.view ? { currentView: action.view } : {}),
       });
     }
-    case 'DOM_SAVE_NODE': {
-      return update(state, {
-        ...(action.view ? { currentView: action.view } : {}),
-      });
-    }
     case 'DOM_SET_VIEW': {
       return update(state, {
         currentView: action.view,
@@ -275,11 +270,10 @@ function createDomApi(dispatch: React.Dispatch<DomAction>) {
         tab,
       });
     },
-    saveNode(node: appDom.AppDomNode, view?: DomView) {
+    saveNode(node: appDom.AppDomNode) {
       dispatch({
         type: 'DOM_SAVE_NODE',
         node,
-        view,
       });
     },
     setNodeNamespace<Node extends appDom.AppDomNode, Namespace extends appDom.PropNamespaces<Node>>(

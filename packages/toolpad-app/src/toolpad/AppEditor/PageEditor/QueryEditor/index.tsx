@@ -114,29 +114,30 @@ export default function QueryEditor() {
   const [dialogState, setDialogState] = React.useState<DialogState | null>(null);
 
   const handleEditStateDialogClose = React.useCallback(() => {
-    domApi.setView({ kind: 'page' });
-  }, [domApi]);
+    if (currentView.kind === 'query') {
+      domApi.setView({ kind: 'page' });
+    } else {
+      setDialogState(null);
+    }
+  }, [currentView, domApi]);
 
   const page = appDom.getNode(dom, state.nodeId, 'page');
   const { queries = [] } = appDom.getChildNodes(dom, page) ?? [];
 
   const handleCreate = React.useCallback(() => {
-    domApi.setView({ kind: 'query' });
-  }, [domApi]);
+    setDialogState({});
+  }, []);
 
-  const handleCreated = React.useCallback(
-    (node: appDom.QueryNode) => {
-      domApi.setView({ kind: 'query', nodeId: node.id, isDraft: true });
-    },
-    [domApi],
-  );
+  const handleCreated = React.useCallback((node: appDom.QueryNode) => {
+    setDialogState({ node, isDraft: true });
+  }, []);
 
   const handleSave = React.useCallback(
     (node: appDom.QueryNode) => {
       const nodeId = node.id;
 
       if (appDom.nodeExists(dom, nodeId)) {
-        domApi.saveNode(node, { kind: 'query', nodeId, isDraft: false });
+        domApi.saveNode(node);
       } else {
         const updatedDom = appDom.addNode(dom, node, page, 'queries');
         domApi.update(updatedDom);
@@ -171,19 +172,16 @@ export default function QueryEditor() {
       const newName = appDom.proposeName(node.name, existingNames);
       const copy = appDom.createNode(dom, 'query', { ...node, name: newName });
 
-      domApi.setView({ kind: 'query', nodeId: copy.id, isDraft: true });
+      setDialogState({ node: copy, isDraft: true });
     },
-    [dom, domApi, page],
+    [dom, page],
   );
 
   React.useEffect(() => {
     setDialogState(() => {
       if (currentView.kind === 'query') {
-        if (currentView.nodeId) {
-          const node = appDom.getNode(dom, currentView.nodeId, 'query');
-          return { node, isDraft: currentView.isDraft || false };
-        }
-        return {};
+        const node = appDom.getNode(dom, currentView.nodeId, 'query');
+        return { node, isDraft: false };
       }
       return null;
     });
@@ -201,7 +199,7 @@ export default function QueryEditor() {
               key={queryNode.id}
               disablePadding
               onClick={() => {
-                domApi.setView({ kind: 'query', nodeId: queryNode.id, isDraft: false });
+                domApi.setView({ kind: 'query', nodeId: queryNode.id });
               }}
               secondaryAction={
                 <NodeMenu

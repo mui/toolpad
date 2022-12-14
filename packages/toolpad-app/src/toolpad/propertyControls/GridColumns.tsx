@@ -252,7 +252,7 @@ function GridColumnsPropEditor({
                       }
                     >
                       <ListItemButton>
-                        <ListItemText primary={colDef.field} />
+                        <ListItemText primary={colDef.headerName || colDef.field} />
                       </ListItemButton>
                     </ListItem>
                   );

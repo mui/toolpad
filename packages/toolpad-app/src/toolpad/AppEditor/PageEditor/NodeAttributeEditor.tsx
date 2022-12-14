@@ -7,19 +7,21 @@ import BindableEditor from './BindableEditor';
 import { usePageEditorState } from './PageEditorProvider';
 import { getDefaultControl } from '../../propertyControls';
 
-export interface NodeAttributeEditorProps {
+export interface NodeAttributeEditorProps<P extends object> {
   node: appDom.AppDomNode;
   namespace?: string;
   name: string;
-  argType: ArgTypeDefinition;
+  argType: ArgTypeDefinition<P>;
+  props?: P;
 }
 
-export default function NodeAttributeEditor({
+export default function NodeAttributeEditor<P extends object>({
   node,
   namespace = 'attributes',
   name,
   argType,
-}: NodeAttributeEditorProps) {
+  props,
+}: NodeAttributeEditorProps<P>) {
   const { dom } = useDom();
   const domApi = useDomApi();
 
@@ -38,7 +40,7 @@ export default function NodeAttributeEditor({
   const liveBinding = bindings[bindingId];
   const globalScope = pageState;
   const propType = argType.typeDef;
-  const Control = getDefaultControl(argType);
+  const Control = getDefaultControl(argType, props);
 
   // NOTE: Doesn't make much sense to bind controlled props. In the future we might opt
   // to make them bindable to other controlled props only

@@ -30,7 +30,7 @@ import lazyComponent from '../../../utils/lazyComponent';
 import CenteredSpinner from '../../../components/CenteredSpinner';
 import SplitPane from '../../../components/SplitPane';
 import { getDefaultControl } from '../../propertyControls';
-import { WithControlledProp } from '../../../utils/types';
+import { ExactEntriesOf, WithControlledProp } from '../../../utils/types';
 import useDebounced from '../../../utils/useDebounced';
 import { ExtraLib } from '../../../components/MonacoEditor';
 import { useNodeNameValidation } from '../HierarchyExplorer/validation';
@@ -43,7 +43,7 @@ const TypescriptEditor = lazyComponent(() => import('../../../components/Typescr
 
 interface PropertyEditorProps extends WithControlledProp<any> {
   name: string;
-  argType: ArgTypeDefinition;
+  argType: ArgTypeDefinition<{ [key in string]?: unknown }>;
 }
 
 function PropertyEditor({ argType, name, value, onChange }: PropertyEditorProps) {
@@ -55,14 +55,18 @@ function PropertyEditor({ argType, name, value, onChange }: PropertyEditorProps)
 }
 
 interface PropertiesEditorProps extends WithControlledProp<Record<string, any>> {
-  argTypes: ArgTypeDefinitions;
+  argTypes: ArgTypeDefinitions<{ [key in string]?: unknown }>;
 }
 
 function PropertiesEditor({ argTypes, value, onChange }: PropertiesEditorProps) {
   return (
     <Stack sx={{ p: 2, gap: 2, overflow: 'auto', height: '100%' }}>
       <Typography>Properties:</Typography>
-      {Object.entries(argTypes).map(([name, argType]) => {
+      {(
+        Object.entries(argTypes) as ExactEntriesOf<
+          ArgTypeDefinitions<{ [key in string]?: unknown }>
+        >
+      ).map(([name, argType]) => {
         invariant(argType, 'argType not defined');
         return (
           <ErrorBoundary key={name} fallback={<div>{name}</div>} resetKeys={[argType]}>
@@ -247,6 +251,7 @@ function CodeComponentEditorContent({ codeComponentNode }: CodeComponentEditorCo
           <SplitPane split="vertical" allowResize size="50%">
             <TypescriptEditor
               value={input.attributes.code.value}
+              data-testid="codecomponent editor"
               onChange={(newValue) =>
                 setInput((existing) =>
                   appDom.setNamespacedProp(

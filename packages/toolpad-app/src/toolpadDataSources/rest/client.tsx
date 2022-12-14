@@ -23,6 +23,7 @@ import {
   ConnectionEditorProps,
   ExecFetchFn,
   QueryEditorProps,
+  GlobalScopeMeta,
 } from '../../types';
 import {
   FetchPrivateQuery,
@@ -41,7 +42,7 @@ import {
   useEvaluateLiveBindingEntries,
 } from '../../toolpad/AppEditor/useEvaluateLiveBinding';
 import MapEntriesEditor from '../../components/MapEntriesEditor';
-import { Maybe, GlobalScopeMeta } from '../../utils/types';
+import { Maybe } from '../../utils/types';
 import AuthenticationEditor from './AuthenticationEditor';
 import { isSaveDisabled, validation } from '../../utils/forms';
 import * as appDom from '../../appDom';

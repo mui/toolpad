@@ -1,5 +1,9 @@
 import * as React from 'react';
-
+/**
+ * This hook allows you to throttle any fast changing value. The throttle value will only
+ * update once in the defined time period. Multiple changes to the value within this time
+ * period are throttled until the delay has passed.
+ */
 export default function useThrottled<T>(value: T, throttle: number): T {
   const [throttledValue, setThrottledValue] = React.useState(value);
   const lastUpdate = React.useRef(-Infinity);

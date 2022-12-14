@@ -102,6 +102,7 @@
     "react-is": "^18.2.0",
     "react-router-dom": "^6.3.0",
     "react-split-pane": "^0.1.92",
+    "remark-gfm": "^3.0.1",
     "serialize-javascript": "^6.0.0",
     "ses": "^0.18.0",
     "sucrase": "^3.29.0",

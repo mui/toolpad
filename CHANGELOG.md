@@ -1,5 +1,31 @@
 # Changelog
 
+## 0.0.31
+
+<!-- generated comparing v0.0.30..master -->
+
+_Dec 14, 2022_
+
+A big thanks to the 5 contributors who made this release possible. Here are some highlights ✨:
+
+Add a new Text component that subsumes Typography and Link, and allows support for Markdown. Allow support for dynamic templates, and fix a bug around the default value of components.
+
+- &#8203;<!-- 11 -->Add Text component to merge Typography, Markdown, Link (#1298) @bharatkashyap
+- &#8203;<!-- 10 -->Document and cleanup of utility functions (#1442) @Janpot
+- &#8203;<!-- 09 -->Revert react-router-dom to 6.3 (#1444) @Janpot
+- &#8203;<!-- 08 -->Update README.md @prakhargupta1
+- &#8203;<!-- 07 -->Fix yarnlock (#1443) @bytasv
+- &#8203;<!-- 06 -->Add roadmap to the docs (#1424) @bytasv
+- &#8203;<!-- 05 -->Landing page tweaks (#1433) @bharatkashyap
+- &#8203;<!-- 04 -->Fix controlled value reset when default value changes (#1434) @bytasv
+- &#8203;<!-- 03 -->Add integration test for default template (#1429) @bharatkashyap
+- &#8203;<!-- 02 -->Support dynamic app templates (#1430) @apedroferreira
+- &#8203;<!-- 01 -->Fix changelog @Janpot
+
+All contributors of this release in alphabetical order: @apedroferreira, @bharatkashyap, @bytasv, @Janpot, @prakhargupta1
+
+✨ Done in 1.75s.
+
 ## 0.0.30
 
 <!-- generated comparing v0.0.29..master -->

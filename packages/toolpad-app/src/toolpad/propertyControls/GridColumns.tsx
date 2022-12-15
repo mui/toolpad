@@ -15,13 +15,18 @@ import {
   TextField,
   Tooltip,
 } from '@mui/material';
-import { GridColumns, GridColDef, GridAlignment } from '@mui/x-data-grid-pro';
 import * as React from 'react';
 import AddIcon from '@mui/icons-material/Add';
 import DeleteIcon from '@mui/icons-material/Delete';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import RefreshIcon from '@mui/icons-material/Refresh';
-import { inferColumns } from '@mui/toolpad-components';
+import {
+  inferColumns,
+  NumberFormat,
+  NUMBER_FORMAT_PRESETS,
+  SerializableGridColumn,
+  SerializableGridColumns,
+} from '@mui/toolpad-components';
 import type { EditorProps } from '../../types';
 import { useToolpadComponents } from '../AppEditor/toolpadComponents';
 import { useDom } from '../DomLoader';
@@ -29,6 +34,8 @@ import { useDom } from '../DomLoader';
 // TODO: this import suggests leaky abstraction
 import { usePageEditorState } from '../AppEditor/PageEditor/PageEditorProvider';
 import { generateUniqueString } from '../../utils/strings';
+
+type GridAlignment = SerializableGridColumn['align'];
 
 const COLUMN_TYPES: string[] = [
   'string',
@@ -42,13 +49,29 @@ const COLUMN_TYPES: string[] = [
 ];
 const ALIGNMENTS: GridAlignment[] = ['left', 'right', 'center'];
 
+function formatNumberOptionValue(numberFormat: NumberFormat | undefined) {
+  if (!numberFormat) {
+    return 'plain';
+  }
+  switch (numberFormat.kind) {
+    case 'preset':
+      return `preset:${numberFormat.preset}`;
+    case 'custom':
+      return 'custom';
+    case 'currency':
+      return 'currency';
+    default:
+      return 'plain';
+  }
+}
+
 function GridColumnsPropEditor({
   label,
   nodeId,
   value = [],
   onChange,
   disabled,
-}: EditorProps<GridColumns>) {
+}: EditorProps<SerializableGridColumns>) {
   const { bindings } = usePageEditorState();
   const [editColumnsDialogOpen, setEditColumnsDialogOpen] = React.useState(false);
   const [editedIndex, setEditedIndex] = React.useState<number | null>(null);
@@ -91,7 +114,7 @@ function GridColumnsPropEditor({
   const hasColumnSuggestions = columnSuggestions.length > 0;
 
   const handleCreateColumn = React.useCallback(
-    (suggestion: GridColDef) => () => {
+    (suggestion: SerializableGridColumn) => () => {
       const existingFields = new Set(value.map(({ field }) => field));
       const newFieldName = generateUniqueString(suggestion.field, existingFields);
       const newValue = [...value, { ...suggestion, field: newFieldName }];
@@ -109,8 +132,8 @@ function GridColumnsPropEditor({
     [],
   );
 
-  const handleColumnChange = React.useCallback(
-    (newValue: GridColDef) => {
+  const handleColumnChange = React.useCallback<React.Dispatch<SerializableGridColumn>>(
+    (newValue) => {
       onChange(value.map((column, i) => (i === editedIndex ? newValue : column)));
     },
     [editedIndex, onChange, value],
@@ -157,13 +180,25 @@ function GridColumnsPropEditor({
                   }
                 />
                 <TextField
+                  label="header"
+                  value={editedColumn.headerName}
+                  disabled={disabled}
+                  onChange={(event) =>
+                    handleColumnChange({ ...editedColumn, headerName: event.target.value })
+                  }
+                />
+                <TextField
                   select
                   fullWidth
                   label="type"
                   value={editedColumn.type ?? ''}
                   disabled={disabled}
                   onChange={(event) =>
-                    handleColumnChange({ ...editedColumn, type: event.target.value })
+                    handleColumnChange({
+                      ...editedColumn,
+                      type: event.target.value,
+                      numberFormat: undefined,
+                    })
                   }
                 >
                   {COLUMN_TYPES.map((type) => (
@@ -172,6 +207,72 @@ function GridColumnsPropEditor({
                     </MenuItem>
                   ))}
                 </TextField>
+                {editedColumn.type === 'number' ? (
+                  <React.Fragment>
+                    <TextField
+                      select
+                      fullWidth
+                      label="number format"
+                      value={formatNumberOptionValue(editedColumn.numberFormat)}
+                      disabled={disabled}
+                      onChange={(event) => {
+                        let numberFormat: NumberFormat | undefined;
+
+                        if (event.target.value === 'currency') {
+                          numberFormat = {
+                            kind: 'currency',
+                            currency: 'USD',
+                          };
+                        } else if (event.target.value === 'custom') {
+                          numberFormat = {
+                            kind: 'custom',
+                            custom: {},
+                          };
+                        } else if (event.target.value) {
+                          const [prefix, id] = event.target.value.split(':');
+
+                          if (prefix === 'preset') {
+                            numberFormat = {
+                              kind: 'preset',
+                              preset: id,
+                            };
+                          }
+                        }
+
+                        handleColumnChange({ ...editedColumn, numberFormat });
+                      }}
+                    >
+                      <MenuItem value="plain">plain</MenuItem>
+                      {Array.from(NUMBER_FORMAT_PRESETS.keys(), (type) => (
+                        <MenuItem key={type} value={`preset:${type}`}>
+                          {type}
+                        </MenuItem>
+                      ))}
+                      <MenuItem value="currency">currency</MenuItem>
+                      <MenuItem value="custom">custom</MenuItem>
+                    </TextField>
+
+                    {editedColumn.numberFormat?.kind === 'currency' ? (
+                      <TextField
+                        fullWidth
+                        label="currency code"
+                        value={editedColumn.numberFormat.currency}
+                        disabled={disabled}
+                        onChange={(event) => {
+                          handleColumnChange({
+                            ...editedColumn,
+                            numberFormat: {
+                              ...editedColumn.numberFormat,
+                              kind: 'currency',
+                              currency: event.target.value,
+                            },
+                          });
+                        }}
+                      />
+                    ) : null}
+                  </React.Fragment>
+                ) : null}
+
                 <TextField
                   select
                   fullWidth
@@ -278,7 +379,7 @@ function GridColumnsPropEditor({
                       }
                     >
                       <ListItemButton>
-                        <ListItemText primary={colDef.field} />
+                        <ListItemText primary={colDef.headerName || colDef.field} />
                       </ListItemButton>
                     </ListItem>
                   );

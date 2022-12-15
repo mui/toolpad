@@ -1,6 +1,11 @@
 import { Stack, styled, Typography, Divider } from '@mui/material';
 import * as React from 'react';
-import { ArgTypeDefinition, ArgTypeDefinitions, ComponentConfig } from '@mui/toolpad-core';
+import {
+  ArgTypeDefinition,
+  ArgTypeDefinitions,
+  ComponentConfig,
+  LiveBinding,
+} from '@mui/toolpad-core';
 import { ExactEntriesOf } from '../../../utils/types';
 import * as appDom from '../../../appDom';
 import NodeAttributeEditor from './NodeAttributeEditor';
@@ -33,19 +38,33 @@ const ComponentEditorRoot = styled('div')(({ theme }) => ({
   },
 }));
 
-function shouldRenderControl(propTypeDef: ArgTypeDefinition) {
+function shouldRenderControl<P extends object>(propTypeDef: ArgTypeDefinition<P>, props: P) {
   if (propTypeDef.typeDef.type === 'element') {
     return propTypeDef.control?.type !== 'slot' && propTypeDef.control?.type !== 'slots';
   }
+
+  if (typeof propTypeDef.visible === 'boolean') {
+    return propTypeDef.visible;
+  }
+
+  if (typeof propTypeDef.visible === 'function') {
+    return propTypeDef.visible(props);
+  }
+
   return true;
 }
 
-interface ComponentPropsEditorProps<P> {
+interface ComponentPropsEditorProps<P extends object> {
   node: appDom.ElementNode<P>;
+  bindings: Partial<Record<string, LiveBinding>>;
   componentConfig: ComponentConfig<P>;
 }
 
-function ComponentPropsEditor<P>({ componentConfig, node }: ComponentPropsEditorProps<P>) {
+function ComponentPropsEditor<P extends object>({
+  componentConfig,
+  bindings,
+  node,
+}: ComponentPropsEditorProps<P>) {
   const { layoutDirection } = componentConfig;
 
   const hasLayoutHorizontalControls =
@@ -53,6 +72,16 @@ function ComponentPropsEditor<P>({ componentConfig, node }: ComponentPropsEditor
   const hasLayoutVerticalControls =
     layoutDirection === LAYOUT_DIRECTION_VERTICAL || layoutDirection === LAYOUT_DIRECTION_BOTH;
   const hasLayoutControls = hasLayoutHorizontalControls || hasLayoutVerticalControls;
+
+  const props = React.useMemo(() => {
+    const propsPattern = new RegExp(`(?<=${node.id}.props.)(.*)`);
+    return Object.fromEntries(
+      Object.entries(bindings).map(([key, binding]) => [
+        key.match(propsPattern)?.[0],
+        binding?.value,
+      ]),
+    );
+  }, [bindings, node.id]);
 
   return (
     <React.Fragment>
@@ -90,11 +119,12 @@ function ComponentPropsEditor<P>({ componentConfig, node }: ComponentPropsEditor
       {(
         Object.entries(componentConfig.argTypes || {}) as ExactEntriesOf<ArgTypeDefinitions<P>>
       ).map(([propName, propTypeDef]) =>
-        propTypeDef && shouldRenderControl(propTypeDef) ? (
+        propTypeDef && shouldRenderControl(propTypeDef, props) ? (
           <div key={propName} className={classes.control}>
             <NodeAttributeEditor
               node={node}
               namespace="props"
+              props={props}
               name={propName}
               argType={propTypeDef}
             />
@@ -111,7 +141,8 @@ interface SelectedNodeEditorProps {
 
 function SelectedNodeEditor({ node }: SelectedNodeEditorProps) {
   const { dom } = useDom();
-  const { viewState } = usePageEditorState();
+  const { bindings, viewState } = usePageEditorState();
+
   const nodeError = viewState.nodes[node.id]?.error;
   const componentConfig = viewState.nodes[node.id]?.componentConfig || { argTypes: {} };
 
@@ -129,7 +160,9 @@ function SelectedNodeEditor({ node }: SelectedNodeEditorProps) {
         <NodeNameEditor node={node} />
         {nodeError ? <ErrorAlert error={nodeError} /> : null}
         <Divider sx={{ mt: 1 }} />
-        {node ? <ComponentPropsEditor componentConfig={componentConfig} node={node} /> : null}
+        {node ? (
+          <ComponentPropsEditor bindings={bindings} componentConfig={componentConfig} node={node} />
+        ) : null}
       </Stack>
     </ElementContext.Provider>
   );

@@ -13,6 +13,7 @@ export default function useQueryPreview<Q, P, R extends ExecFetchResult<any> & P
   { onPreview = () => {} }: UseQueryPreviewOptions<R> = {},
 ) {
   const [preview, setPreview] = React.useState<R | null>(null);
+  const [isLoading, setIsloading] = React.useState(false);
 
   const cancelRunPreview = React.useRef<(() => void) | null>(null);
   const runPreview = React.useCallback(() => {
@@ -23,6 +24,7 @@ export default function useQueryPreview<Q, P, R extends ExecFetchResult<any> & P
       canceled = true;
     };
 
+    setIsloading(true);
     dofetch(query, params)
       .then(
         (result) => {
@@ -36,9 +38,10 @@ export default function useQueryPreview<Q, P, R extends ExecFetchResult<any> & P
         },
       )
       .finally(() => {
+        setIsloading(false);
         cancelRunPreview.current = null;
       });
   }, [dofetch, query, params, onPreview]);
 
-  return { preview, runPreview };
+  return { preview, runPreview, isLoading };
 }

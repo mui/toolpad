@@ -50,7 +50,6 @@ import ParametersEditor from '../../toolpad/AppEditor/PageEditor/ParametersEdito
 import BodyEditor from './BodyEditor';
 import TabPanel from '../../components/TabPanel';
 import SplitPane from '../../components/SplitPane';
-import ErrorAlert from '../../toolpad/AppEditor/PageEditor/ErrorAlert';
 import JsonView from '../../components/JsonView';
 import useQueryPreview from '../useQueryPreview';
 import TransformInput from '../TranformInput';
@@ -60,6 +59,7 @@ import config from '../../config';
 import QueryInputPanel from '../QueryInputPanel';
 import useFetchPrivate from '../useFetchPrivate';
 import { clientExec } from './runtime';
+import QueryPreview from '../QueryPreview';
 
 const HTTP_METHODS = ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'HEAD'];
 
@@ -392,18 +392,17 @@ function QueryEditor({
     clientExec(query, params, fetchServerPreview);
 
   const [previewHar, setPreviewHar] = React.useState(() => createHarLog());
-  const { preview, runPreview: handleRunPreview } = useQueryPreview(
-    fetchPreview,
-    input.attributes.query.value,
-    previewParams,
-    {
-      onPreview(result) {
-        setPreviewHar((existing) =>
-          result.har ? mergeHar(createHarLog(), existing, result.har) : existing,
-        );
-      },
+  const {
+    preview,
+    runPreview: handleRunPreview,
+    isLoading: previewIsLoading,
+  } = useQueryPreview(fetchPreview, input.attributes.query.value, previewParams, {
+    onPreview(result) {
+      setPreviewHar((existing) =>
+        result.har ? mergeHar(createHarLog(), existing, result.har) : existing,
+      );
     },
-  );
+  });
 
   const handleHarClear = React.useCallback(() => setPreviewHar(createHarLog()), []);
 
@@ -546,11 +545,9 @@ function QueryEditor({
         allowResize
         pane1Style={{ overflow: 'auto' }}
       >
-        {preview?.error ? (
-          <ErrorAlert error={preview?.error} />
-        ) : (
+        <QueryPreview isLoading={previewIsLoading} error={preview?.error}>
           <ResolvedPreview preview={preview} onShowTransform={() => setActiveTab('transform')} />
-        )}
+        </QueryPreview>
         <Devtools
           sx={{ width: '100%', height: '100%' }}
           har={previewHar}

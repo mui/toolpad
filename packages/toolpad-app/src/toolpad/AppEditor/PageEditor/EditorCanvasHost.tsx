@@ -156,8 +156,10 @@ export default React.forwardRef<EditorCanvasHostHandle, EditorCanvasHostProps>(
         const redoShortcut = undoShortcut && event.shiftKey;
 
         if (redoShortcut) {
+          event.preventDefault();
           domApi.redo();
         } else if (undoShortcut) {
+          event.preventDefault();
           domApi.undo();
         }
       },

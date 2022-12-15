@@ -68,6 +68,7 @@ import { execDataSourceQuery, useDataQuery, UseDataQueryConfig, UseFetch } from 
 import { useAppContext, AppContextProvider } from './AppContext';
 import { CanvasHooksContext, NavigateToPage } from './CanvasHooksContext';
 import useBoolean from '../utils/useBoolean';
+import { errorFrom } from '../utils/errors';
 
 const ReactQueryDevtoolsProduction = React.lazy(() =>
   import('@tanstack/react-query-devtools/build/lib/index.prod.js').then((d) => ({
@@ -226,7 +227,7 @@ function RenderedNodeContent({ node, childNodeGroups, Component }: RenderedNodeC
       if (errorProp) {
         hookResult[errorProp] = error;
       } else {
-        console.error(error);
+        console.error(errorFrom(error));
       }
     }
 

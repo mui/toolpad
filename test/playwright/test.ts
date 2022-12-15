@@ -52,7 +52,12 @@ export const test = base.extend<Options & { api: RpcClient<ServerDefinition> }>(
     const entries = await Promise.all(entryPromises);
     const ignoredEntries = [...IGNORED_ERRORS, ...ignoreConsoleErrors];
     for (const entry of entries) {
-      if (entry.type === 'error' && !ignoredEntries.some((regex) => regex.test(entry.text))) {
+      if (
+        entry.type === 'error' &&
+        !ignoredEntries.some(
+          (regex) => regex.test(entry.text) || entry.args.some((arg) => regex.test(arg)),
+        )
+      ) {
         // Currently a catch-all for console error messages. Expecting us to add a way of blacklisting
         // expected error messages at some point here
         throw new Error(`Console error message detected\n${JSON.stringify(entry, null, 2)}`);

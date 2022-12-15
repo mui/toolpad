@@ -4,7 +4,16 @@ import { ToolpadRuntime } from '../../models/ToolpadRuntime';
 import { readJsonFile } from '../../utils/fs';
 import generateId from '../../utils/generateId';
 
-test.use({ ignoreConsoleErrors: [/Cannot read properties of null/, /BOOM!/] });
+test.use({
+  ignoreConsoleErrors: [
+    // Chrome:
+    /Cannot read properties of null/,
+    // firefox:
+    /throws\.error is null/,
+    // Intentionally thrown
+    /BOOM!/,
+  ],
+});
 
 test('functions basics', async ({ page, api }) => {
   const dom = await readJsonFile(path.resolve(__dirname, './functionDom.json'));

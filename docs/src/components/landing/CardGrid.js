@@ -1,10 +1,12 @@
 import * as React from 'react';
 import PropTypes from 'prop-types';
 import Box from '@mui/material/Box';
+import Button from '@mui/material/Button';
 import Container from '@mui/material/Container';
 import Paper from '@mui/material/Paper';
 import Typography from '@mui/material/Typography';
 import Grid from '@mui/material/Grid';
+import KeyboardArrowRightRounded from '@mui/icons-material/KeyboardArrowRightRounded';
 import SectionHeadline from 'docs/src/components/typography/SectionHeadline';
 import IconImage from 'docs/src/components/icon/IconImage';
 
@@ -14,6 +16,10 @@ const cardRootStyle = (imageUrl) => ({
   pt: imageUrl ? 0 : 3,
   height: '100%',
   maxWidth: 360,
+  display: 'flex',
+  flexDirection: 'column',
+  justifyContent: 'space-between',
+  rowGap: 2,
 });
 
 const cardMediaStyle = (imageUrl) => ({
@@ -51,30 +57,48 @@ export default function CardGrid(props) {
       <Container sx={{ py: { xs: 4, sm: 6, md: 8 } }}>
         <SectionHeadline overline={content.overline} title={content.Headline} />
         <Grid container spacing={2}>
-          {content.cards.map(({ icon, title, wip, imageUrl, description }) => (
+          {content.cards.map(({ icon, title, wip, imageUrl, description, action }) => (
             <Grid key={title} item xs={12} sm={6} md={4}>
               <Paper variant="outlined" sx={cardRootStyle(imageUrl)}>
-                {imageUrl ? <Box sx={cardMediaStyle(imageUrl)} /> : null}
-                <Box sx={cardContentRootStyle(imageUrl)}>
-                  <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
-                    {icon ?? null}
-                    <Typography
-                      fontWeight="bold"
-                      component="h3"
-                      color="text.primary"
-                      variant="body2"
-                      sx={{ ml: imageUrl ? 0 : 1 }}
-                    >
-                      {title}
+                <div>
+                  {imageUrl ? <Box sx={cardMediaStyle(imageUrl)} /> : null}
+                  <Box sx={cardContentRootStyle(imageUrl)}>
+                    <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
+                      {icon ?? null}
+                      <Typography
+                        fontWeight="bold"
+                        component="h3"
+                        color="text.primary"
+                        variant="body2"
+                        sx={{ ml: imageUrl ? 0 : 1 }}
+                      >
+                        {title}
+                      </Typography>
+                      {wip ? (
+                        <IconImage
+                          name="time"
+                          title="Work in progress"
+                          sx={{ ml: 'auto', mr: 2 }}
+                        />
+                      ) : null}
+                    </Box>
+                    <Typography variant="body2" color="text.secondary">
+                      {description}
                     </Typography>
-                    {wip ? (
-                      <IconImage name="time" title="Work in progress" sx={{ ml: 'auto', mr: 2 }} />
-                    ) : null}
                   </Box>
-                  <Typography variant="body2" color="text.secondary">
-                    {description}
-                  </Typography>
-                </Box>
+                </div>
+                {action ? (
+                  <Button
+                    sx={{ py: 1, mx: 2, width: 'fit-content' }}
+                    variant="contained"
+                    endIcon={<KeyboardArrowRightRounded />}
+                    target="_blank"
+                    rel="noopener"
+                    href={action.href}
+                  >
+                    {action.label}
+                  </Button>
+                ) : null}
               </Paper>
             </Grid>
           ))}

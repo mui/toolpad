@@ -59,7 +59,7 @@ export default function UrlQueryEditor({ pageNodeId }: UrlQueryEditorProps) {
     } else {
       closeDialog();
     }
-  }, [closeDialog, handleDialogClose, openDialog, currentView]);
+  }, [closeDialog, currentView, openDialog]);
 
   return (
     <React.Fragment>

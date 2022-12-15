@@ -1,4 +1,8 @@
 let iframe: HTMLIFrameElement;
+
+/**
+ * Evaluates a javascript expression with global scope in an iframe.
+ */
 export default function evalExpression(code: string, globalScope: Record<string, unknown>) {
   // TODO: investigate https://www.npmjs.com/package/ses
   if (!iframe) {

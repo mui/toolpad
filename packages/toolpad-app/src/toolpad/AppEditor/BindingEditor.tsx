@@ -30,7 +30,7 @@ import {
   JsExpressionAction,
 } from '@mui/toolpad-core';
 import { TabContext, TabList } from '@mui/lab';
-import { Maybe, WithControlledProp, GlobalScopeMeta } from '../../utils/types';
+import { Maybe, WithControlledProp } from '../../utils/types';
 import { JsExpressionEditor } from './PageEditor/JsExpressionEditor';
 import JsonView from '../../components/JsonView';
 import { tryFormatExpression } from '../../utils/prettier';
@@ -44,6 +44,7 @@ import * as appDom from '../../appDom';
 import { usePageEditorState } from './PageEditor/PageEditorProvider';
 import GlobalScopeExplorer from './GlobalScopeExplorer';
 import TabPanel from '../../components/TabPanel';
+import { GlobalScopeMeta } from '../../types';
 
 interface BindingEditorContext {
   label: string;

@@ -3,7 +3,7 @@ import * as ReactIs from 'react-is';
 import compileModule from '../compileModule';
 import loadModule from './loadModule';
 
-export function ensureToolpadComponent<P>(Component: unknown): ToolpadComponent<P> {
+export function ensureToolpadComponent<P extends object>(Component: unknown): ToolpadComponent<P> {
   if (!ReactIs.isValidElementType(Component) || typeof Component === 'string') {
     return createComponent(() => {
       throw new Error(`No React Component.`);

@@ -57,7 +57,7 @@ export interface NodeInfo {
   error?: RuntimeError | null;
   rect?: Rectangle;
   slots?: SlotsState;
-  componentConfig?: ComponentConfig<unknown>;
+  componentConfig?: ComponentConfig;
   props: { [key: string]: unknown };
 }
 

@@ -27,7 +27,6 @@ import {
 } from './types';
 import useDebounced from '../../utils/useDebounced';
 import { usePrivateQuery } from '../context';
-import ErrorAlert from '../../toolpad/AppEditor/PageEditor/ErrorAlert';
 import QueryInputPanel from '../QueryInputPanel';
 import SplitPane from '../../components/SplitPane';
 import useQueryPreview from '../useQueryPreview';
@@ -128,11 +127,11 @@ function QueryEditor({
     [fetchPrivate],
   );
 
-  const { preview, runPreview: handleRunPreview } = useQueryPreview(
-    fetchServerPreview,
-    input.attributes.query.value,
-    {},
-  );
+  const {
+    preview,
+    runPreview: handleRunPreview,
+    isLoading: isPreviewLoading,
+  } = useQueryPreview(fetchServerPreview, input.attributes.query.value, {});
 
   const rawRows: any[] = preview?.data || EMPTY_ROWS;
   const columns: GridColDef[] = React.useMemo(() => parseColumns(inferColumns(rawRows)), [rawRows]);
@@ -201,17 +200,15 @@ function QueryEditor({
         </Stack>
       </QueryInputPanel>
 
-      {preview?.error ? (
-        <ErrorAlert error={preview?.error} />
-      ) : (
-        <DataGridPro
-          sx={{ border: 'none' }}
-          columns={columns}
-          key={previewGridKey}
-          rows={rows}
-          columnTypes={CUSTOM_COLUMN_TYPES}
-        />
-      )}
+      <DataGridPro
+        sx={{ border: 'none' }}
+        columns={columns}
+        key={previewGridKey}
+        rows={rows}
+        columnTypes={CUSTOM_COLUMN_TYPES}
+        error={preview?.error}
+        loading={isPreviewLoading}
+      />
     </SplitPane>
   );
 }

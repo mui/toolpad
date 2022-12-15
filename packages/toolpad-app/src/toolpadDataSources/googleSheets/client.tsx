@@ -9,7 +9,7 @@ import {
   Skeleton,
 } from '@mui/material';
 import * as React from 'react';
-import { inferColumns, parseColumns } from '@mui/toolpad-components';
+import { inferColumns, parseColumns, CUSTOM_COLUMN_TYPES } from '@mui/toolpad-components';
 import { DataGridPro, GridColDef } from '@mui/x-data-grid-pro';
 import { UseQueryResult } from '@tanstack/react-query';
 import { getObjectKey } from '@mui/toolpad-core/objectKey';
@@ -205,6 +205,7 @@ function QueryEditor({
         columns={columns}
         key={previewGridKey}
         rows={rows}
+        columnTypes={CUSTOM_COLUMN_TYPES}
         error={preview?.error}
         loading={isPreviewLoading}
       />

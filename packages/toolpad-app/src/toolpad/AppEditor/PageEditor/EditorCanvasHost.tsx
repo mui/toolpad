@@ -148,8 +148,8 @@ export default React.forwardRef<EditorCanvasHostHandle, EditorCanvasHostProps>(
 
     const handleRuntimeEvent = useEvent(onRuntimeEvent);
 
-    const iframeKeyDownHandler = React.useCallback(() => {
-      return (event: KeyboardEvent) => {
+    const keyDownHandler = React.useCallback(
+      (event: KeyboardEvent) => {
         const isZ = event.key.toLowerCase() === 'z';
 
         const undoShortcut = isZ && (event.metaKey || event.ctrlKey);
@@ -160,8 +160,9 @@ export default React.forwardRef<EditorCanvasHostHandle, EditorCanvasHostProps>(
         } else if (undoShortcut) {
           domApi.undo();
         }
-      };
-    }, [domApi]);
+      },
+      [domApi],
+    );
 
     const handleFrameLoad = React.useCallback(() => {
       invariant(frameRef.current, 'Iframe ref not attached');
@@ -173,13 +174,11 @@ export default React.forwardRef<EditorCanvasHostHandle, EditorCanvasHostProps>(
         return;
       }
 
-      const keyDownHandler = iframeKeyDownHandler();
-
       iframeWindow?.addEventListener('keydown', keyDownHandler);
       iframeWindow?.addEventListener('unload', () => {
         iframeWindow?.removeEventListener('keydown', keyDownHandler);
       });
-    }, [iframeKeyDownHandler]);
+    }, [keyDownHandler]);
 
     React.useEffect(() => {
       if (!contentWindow) {

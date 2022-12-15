@@ -340,7 +340,7 @@ export default function DomProvider({ appId, children }: DomContextProps) {
     () =>
       debounce(() => {
         dispatch({ type: 'DOM_UPDATE_HISTORY' });
-      }, 1000),
+      }, 500),
     [],
   );
 

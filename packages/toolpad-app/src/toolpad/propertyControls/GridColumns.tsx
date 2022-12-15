@@ -186,66 +186,68 @@ function GridColumnsPropEditor({
                   ))}
                 </TextField>
                 {editedColumn.type === 'number' ? (
-                  <TextField
-                    select
-                    fullWidth
-                    label="number format"
-                    value={formatNumberOptionValue(editedColumn.numberFormat)}
-                    disabled={disabled}
-                    onChange={(event) => {
-                      let numberFormat: NumberFormat | undefined;
-                      if (event.target.value === 'currency') {
-                        numberFormat = {
-                          kind: 'currency',
-                          currency: 'USD',
-                        };
-                      } else if (event.target.value === 'custom') {
-                        numberFormat = {
-                          kind: 'custom',
-                          custom: {},
-                        };
-                      } else {
-                        const [prefix, id] = event.target.value.split(':');
-
-                        if (prefix === 'preset') {
+                  <React.Fragment>
+                    <TextField
+                      select
+                      fullWidth
+                      label="number format"
+                      value={formatNumberOptionValue(editedColumn.numberFormat)}
+                      disabled={disabled}
+                      onChange={(event) => {
+                        let numberFormat: NumberFormat | undefined;
+                        if (event.target.value === 'currency') {
                           numberFormat = {
-                            kind: 'preset',
-                            preset: id,
+                            kind: 'currency',
+                            currency: 'USD',
                           };
+                        } else if (event.target.value === 'custom') {
+                          numberFormat = {
+                            kind: 'custom',
+                            custom: {},
+                          };
+                        } else {
+                          const [prefix, id] = event.target.value.split(':');
+
+                          if (prefix === 'preset') {
+                            numberFormat = {
+                              kind: 'preset',
+                              preset: id,
+                            };
+                          }
                         }
-                      }
 
-                      handleColumnChange({ ...editedColumn, numberFormat });
-                    }}
-                  >
-                    <MenuItem value="">plain</MenuItem>
-                    {Array.from(NUMBER_FORMAT_PRESETS.keys(), (type) => (
-                      <MenuItem key={type} value={`preset:${type}`}>
-                        {type}
-                      </MenuItem>
-                    ))}
-                    <MenuItem value="currency">currency</MenuItem>
-                    <MenuItem value="custom">custom</MenuItem>
-                  </TextField>
-                ) : null}
+                        handleColumnChange({ ...editedColumn, numberFormat });
+                      }}
+                    >
+                      <MenuItem value="">plain</MenuItem>
+                      {Array.from(NUMBER_FORMAT_PRESETS.keys(), (type) => (
+                        <MenuItem key={type} value={`preset:${type}`}>
+                          {type}
+                        </MenuItem>
+                      ))}
+                      <MenuItem value="currency">currency</MenuItem>
+                      <MenuItem value="custom">custom</MenuItem>
+                    </TextField>
 
-                {editedColumn.numberFormat?.kind === 'currency' ? (
-                  <TextField
-                    fullWidth
-                    label="currency code"
-                    value={editedColumn.numberFormat.currency}
-                    disabled={disabled}
-                    onChange={(event) => {
-                      handleColumnChange({
-                        ...editedColumn,
-                        numberFormat: {
-                          ...editedColumn.numberFormat,
-                          kind: 'currency',
-                          currency: event.target.value,
-                        },
-                      });
-                    }}
-                  />
+                    {editedColumn.numberFormat?.kind === 'currency' ? (
+                      <TextField
+                        fullWidth
+                        label="currency code"
+                        value={editedColumn.numberFormat.currency}
+                        disabled={disabled}
+                        onChange={(event) => {
+                          handleColumnChange({
+                            ...editedColumn,
+                            numberFormat: {
+                              ...editedColumn.numberFormat,
+                              kind: 'currency',
+                              currency: event.target.value,
+                            },
+                          });
+                        }}
+                      />
+                    ) : null}
+                  </React.Fragment>
                 ) : null}
 
                 <TextField

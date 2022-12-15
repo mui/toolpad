@@ -2,11 +2,11 @@ import invariant from 'invariant';
 import * as appDom from '..';
 import { mapValues } from '../../utils/collections';
 
-function replaceTypographyWithText(node: appDom.AppDomNode): appDom.AppDomNode {
-  if (node.type === 'element' && node.attributes.component.value === 'Typography') {
+function replaceLinkWithText(node: appDom.AppDomNode): appDom.AppDomNode {
+  if (node.type === 'element' && node.attributes.component.value === 'Link') {
     return {
       ...node,
-      name: node.name.replace(/Typography|Link/gi, 'text'),
+      name: node.name.replace(/Link/gi, 'text'),
       attributes: {
         component: {
           ...node.attributes.component,
@@ -20,11 +20,11 @@ function replaceTypographyWithText(node: appDom.AppDomNode): appDom.AppDomNode {
 
 export default {
   up(dom: appDom.AppDom): appDom.AppDom {
-    invariant(dom.version === 3, 'Can only migrate dom of version 3');
+    invariant(dom.version === 4, 'Can only migrate dom of version 4');
     return {
       ...dom,
-      nodes: mapValues(dom.nodes, (node) => replaceTypographyWithText(node)),
-      version: 4,
+      nodes: mapValues(dom.nodes, (node) => replaceLinkWithText(node)),
+      version: 5,
     };
   },
 };

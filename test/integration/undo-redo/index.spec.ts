@@ -2,6 +2,7 @@ import * as path from 'path';
 import { ToolpadEditor } from '../../models/ToolpadEditor';
 import { test, expect } from '../../playwright/test';
 import { readJsonFile } from '../../utils/fs';
+import clickCenter from '../../utils/clickCenter';
 import generateId from '../../utils/generateId';
 
 test('test basic undo and redo', async ({ page, browserName, api }) => {
@@ -40,4 +41,47 @@ test('test basic undo and redo', async ({ page, browserName, api }) => {
 
   // Redo should bring back text field
   await expect(canvasInputLocator).toHaveCount(3);
+});
+
+test('test batching text input actions into single undo entry', async ({
+  page,
+  browserName,
+  api,
+}) => {
+  const dom = await readJsonFile(path.resolve(__dirname, './dom.json'));
+
+  const app = await api.mutation.createApp(`App ${generateId()}`, {
+    from: { kind: 'dom', dom },
+  });
+
+  const editorModel = new ToolpadEditor(page, browserName);
+  await editorModel.goto(app.id);
+
+  await editorModel.waitForOverlay();
+
+  const input = editorModel.appCanvas.locator('input').first();
+
+  clickCenter(page, input);
+
+  await editorModel.componentEditor.getByLabel('defaultValue').click();
+
+  await page.keyboard.type('some value');
+
+  // Wait for undo stack to be updated
+  await page.waitForTimeout(500);
+
+  await page.keyboard.type(' hello');
+
+  await editorModel.componentEditor.getByLabel('defaultValue').blur();
+
+  await expect(input).toHaveValue('some value hello');
+
+  // Wait for undo stack to be updated
+  await page.waitForTimeout(500);
+
+  // Undo changes
+  await page.keyboard.press('Control+Z');
+
+  // Asssert that batched changes were reverted
+  await expect(input).toHaveValue('some value');
 });

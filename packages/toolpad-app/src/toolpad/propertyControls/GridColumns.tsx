@@ -38,7 +38,7 @@ type GridAlignment = SerializableGridColumn['align'];
 const COLUMN_TYPES: string[] = ['string', 'number', 'date', 'dateTime', 'boolean', 'link', 'image'];
 const ALIGNMENTS: GridAlignment[] = ['left', 'right', 'center'];
 
-function formatOptionValue(numberFormat: NumberFormat | undefined) {
+function formatNumberOptionValue(numberFormat: NumberFormat | undefined) {
   if (!numberFormat) {
     return undefined;
   }
@@ -190,7 +190,7 @@ function GridColumnsPropEditor({
                     select
                     fullWidth
                     label="number format"
-                    value={formatOptionValue(editedColumn.numberFormat)}
+                    value={formatNumberOptionValue(editedColumn.numberFormat)}
                     disabled={disabled}
                     onChange={(event) => {
                       let numberFormat: NumberFormat | undefined;

@@ -40,7 +40,7 @@ const ALIGNMENTS: GridAlignment[] = ['left', 'right', 'center'];
 
 function formatNumberOptionValue(numberFormat: NumberFormat | undefined) {
   if (!numberFormat) {
-    return undefined;
+    return 'plain';
   }
   switch (numberFormat.kind) {
     case 'preset':
@@ -50,7 +50,7 @@ function formatNumberOptionValue(numberFormat: NumberFormat | undefined) {
     case 'currency':
       return 'currency';
     default:
-      return undefined;
+      return 'plain';
   }
 }
 
@@ -176,7 +176,11 @@ function GridColumnsPropEditor({
                   value={editedColumn.type ?? ''}
                   disabled={disabled}
                   onChange={(event) =>
-                    handleColumnChange({ ...editedColumn, type: event.target.value })
+                    handleColumnChange({
+                      ...editedColumn,
+                      type: event.target.value,
+                      numberFormat: undefined,
+                    })
                   }
                 >
                   {COLUMN_TYPES.map((type) => (
@@ -195,6 +199,7 @@ function GridColumnsPropEditor({
                       disabled={disabled}
                       onChange={(event) => {
                         let numberFormat: NumberFormat | undefined;
+
                         if (event.target.value === 'currency') {
                           numberFormat = {
                             kind: 'currency',
@@ -205,7 +210,7 @@ function GridColumnsPropEditor({
                             kind: 'custom',
                             custom: {},
                           };
-                        } else {
+                        } else if (event.target.value) {
                           const [prefix, id] = event.target.value.split(':');
 
                           if (prefix === 'preset') {
@@ -219,7 +224,7 @@ function GridColumnsPropEditor({
                         handleColumnChange({ ...editedColumn, numberFormat });
                       }}
                     >
-                      <MenuItem value="">plain</MenuItem>
+                      <MenuItem value="plain">plain</MenuItem>
                       {Array.from(NUMBER_FORMAT_PRESETS.keys(), (type) => (
                         <MenuItem key={type} value={`preset:${type}`}>
                           {type}

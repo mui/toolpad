@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { NodeId, BindableAttrValues } from '@mui/toolpad-core';
 import invariant from 'invariant';
-import { throttle, DebouncedFunc } from 'lodash-es';
+import { debounce, DebouncedFunc } from 'lodash-es';
 import * as appDom from '../appDom';
 import { update } from '../utils/immutability';
 import client from '../api';
@@ -12,6 +12,7 @@ import { mapValues } from '../utils/collections';
 import insecureHash from '../utils/insecureHash';
 import useEvent from '../utils/useEvent';
 import { NodeHashes } from '../types';
+import { hasFieldFocus } from '../utils/fields';
 
 export type DomAction =
   | {
@@ -200,11 +201,11 @@ export function domLoaderReducer(state: DomLoader, action: DomAction): DomLoader
 
 function createDomApi(
   dispatch: React.Dispatch<DomAction>,
-  scheduleHistoryUpdate?: DebouncedFunc<() => void>,
+  scheduleTextInputHistoryUpdate?: DebouncedFunc<() => void>,
 ) {
   return {
     undo() {
-      scheduleHistoryUpdate?.flush();
+      scheduleTextInputHistoryUpdate?.flush();
 
       dispatch({ type: 'DOM_UNDO' });
     },
@@ -335,29 +336,36 @@ export default function DomProvider({ appId, children }: DomContextProps) {
     redoStack: [],
   });
 
-  const scheduleHistoryUpdate = React.useMemo(
+  const scheduleTextInputHistoryUpdate = React.useMemo(
     () =>
-      throttle(
-        () => {
-          dispatch({ type: 'DOM_UPDATE_HISTORY' });
-        },
-        500,
-        { leading: false, trailing: true },
-      ),
+      debounce(() => {
+        dispatch({ type: 'DOM_UPDATE_HISTORY' });
+      }, 1000),
     [],
+  );
+
+  const scheduleHistoryUpdate = React.useMemo(
+    () => () => {
+      if (!hasFieldFocus()) {
+        dispatch({ type: 'DOM_UPDATE_HISTORY' });
+      } else {
+        scheduleTextInputHistoryUpdate();
+      }
+    },
+    [scheduleTextInputHistoryUpdate],
   );
 
   const dispatchWithHistory = useEvent((action: DomAction) => {
     dispatch(action);
 
     if (!SKIP_UNDO_ACTIONS.has(action.type)) {
-      dispatch({ type: 'DOM_UPDATE_HISTORY' });
+      scheduleHistoryUpdate();
     }
   });
 
   const api = React.useMemo(
-    () => createDomApi(dispatchWithHistory, scheduleHistoryUpdate),
-    [dispatchWithHistory, scheduleHistoryUpdate],
+    () => createDomApi(dispatchWithHistory, scheduleTextInputHistoryUpdate),
+    [dispatchWithHistory, scheduleTextInputHistoryUpdate],
   );
 
   const handleSave = React.useCallback(() => {
@@ -377,11 +385,11 @@ export default function DomProvider({ appId, children }: DomContextProps) {
       });
   }, [appId, state]);
 
-  const debouncedhandleSave = useDebouncedHandler(handleSave, 1000);
+  const debouncedHandleSave = useDebouncedHandler(handleSave, 1000);
 
   React.useEffect(() => {
-    debouncedhandleSave();
-  }, [state.dom, debouncedhandleSave]);
+    debouncedHandleSave();
+  }, [state.dom, debouncedHandleSave]);
 
   React.useEffect(() => {
     logUnsavedChanges(state.unsavedChanges);

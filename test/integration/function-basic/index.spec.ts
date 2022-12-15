@@ -4,7 +4,7 @@ import { ToolpadRuntime } from '../../models/ToolpadRuntime';
 import { readJsonFile } from '../../utils/fs';
 import generateId from '../../utils/generateId';
 
-test.use({ ignoreConsoleErrors: [/.*/] });
+test.use({ ignoreConsoleErrors: [/Cannot read properties of null/, /BOOM!/] });
 
 test('functions basics', async ({ page, api }) => {
   const dom = await readJsonFile(path.resolve(__dirname, './functionDom.json'));

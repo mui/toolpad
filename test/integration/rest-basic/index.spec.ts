@@ -16,8 +16,6 @@ if (customHttbinBaseUrl) {
 
 const HTTPBIN_BASEURL = customHttbinBaseUrl || 'https://httpbin.org/';
 
-test.use({ ignoreConsoleErrors: [/.*/] });
-
 test('rest basics', async ({ page, browserName, api }) => {
   const dom = await readJsonFile(path.resolve(__dirname, './restDom.json'));
 

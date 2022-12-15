@@ -209,10 +209,11 @@ function RenderedNodeContent({ node, childNodeGroups, Component }: RenderedNodeC
       const binding = liveBindings[bindingId];
       if (binding) {
         hookResult[propName] = binding.value;
-        error = error || binding.error;
 
         if (binding.loading && loadingPropSourceSet.has(propName)) {
           loading = true;
+        } else {
+          error = error || binding.error;
         }
       }
 

@@ -20,4 +20,5 @@ export { default as Paper } from './Paper.js';
 
 export { default as Image } from './Image.js';
 
-export { inferColumns, parseColumns } from './DataGrid';
+export { CUSTOM_COLUMN_TYPES, NUMBER_FORMAT_PRESETS, inferColumns, parseColumns } from './DataGrid';
+export type { SerializableGridColumn, SerializableGridColumns, NumberFormat } from './DataGrid';

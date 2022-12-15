@@ -3,13 +3,12 @@ import { styled } from '@mui/material';
 import { Route, Routes, useParams, Navigate, useNavigate } from 'react-router-dom';
 import { JsRuntimeProvider } from '@mui/toolpad-core/jsRuntime';
 import PageEditor from './PageEditor';
-import DomProvider, { useDom, useDomApi } from '../DomLoader';
+import DomProvider, { useDom } from '../DomLoader';
 import * as appDom from '../../appDom';
 import CodeComponentEditor from './CodeComponentEditor';
 import ConnectionEditor from './ConnectionEditor';
 import AppEditorShell from './AppEditorShell';
 import NoPageFound from './NoPageFound';
-import { usePageEditorApi } from './PageEditor/PageEditorProvider';
 
 const classes = {
   content: 'Toolpad_Content',
@@ -45,11 +44,9 @@ interface FileEditorProps {
 
 function FileEditor({ appId }: FileEditorProps) {
   const { dom, currentView } = useDom();
-  const domApi = useDomApi();
 
   const app = appDom.getApp(dom);
   const { pages = [] } = appDom.getChildNodes(dom, app);
-  const api = usePageEditorApi();
 
   const navigate = useNavigate();
 

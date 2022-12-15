@@ -13,7 +13,6 @@ import useEvent from '../../../utils/useEvent';
 import { LogEntry } from '../../../components/Console';
 import { Maybe } from '../../../utils/types';
 import { useDomApi } from '../../DomLoader';
-import { hasFieldFocus } from '../../../utils/fields';
 import createRuntimeState from '../../../createRuntimeState';
 
 type IframeContentWindow = Window & typeof globalThis;
@@ -149,27 +148,20 @@ export default React.forwardRef<EditorCanvasHostHandle, EditorCanvasHostProps>(
 
     const handleRuntimeEvent = useEvent(onRuntimeEvent);
 
-    const iframeKeyDownHandler = React.useCallback(
-      (iframeDocument: Document) => {
-        return (event: KeyboardEvent) => {
-          if (hasFieldFocus(iframeDocument)) {
-            return;
-          }
+    const iframeKeyDownHandler = React.useCallback(() => {
+      return (event: KeyboardEvent) => {
+        const isZ = event.key.toLowerCase() === 'z';
 
-          const isZ = event.key.toLowerCase() === 'z';
+        const undoShortcut = isZ && (event.metaKey || event.ctrlKey);
+        const redoShortcut = undoShortcut && event.shiftKey;
 
-          const undoShortcut = isZ && (event.metaKey || event.ctrlKey);
-          const redoShortcut = undoShortcut && event.shiftKey;
-
-          if (redoShortcut) {
-            domApi.redo();
-          } else if (undoShortcut) {
-            domApi.undo();
-          }
-        };
-      },
-      [domApi],
-    );
+        if (redoShortcut) {
+          domApi.redo();
+        } else if (undoShortcut) {
+          domApi.undo();
+        }
+      };
+    }, [domApi]);
 
     const handleFrameLoad = React.useCallback(() => {
       invariant(frameRef.current, 'Iframe ref not attached');
@@ -181,7 +173,7 @@ export default React.forwardRef<EditorCanvasHostHandle, EditorCanvasHostProps>(
         return;
       }
 
-      const keyDownHandler = iframeKeyDownHandler(iframeWindow.document);
+      const keyDownHandler = iframeKeyDownHandler();
 
       iframeWindow?.addEventListener('keydown', keyDownHandler);
       iframeWindow?.addEventListener('unload', () => {

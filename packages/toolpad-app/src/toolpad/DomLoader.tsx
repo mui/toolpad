@@ -385,7 +385,7 @@ export default function DomProvider({ appId, children }: DomContextProps) {
       });
   }, [appId, state]);
 
-  const debouncedHandleSave = useDebouncedHandler(handleSave, 1000);
+  const debouncedHandleSave = useDebouncedHandler(handleSave, 500);
 
   React.useEffect(() => {
     debouncedHandleSave();

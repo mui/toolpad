@@ -14,7 +14,6 @@ import usePageTitle from '../../../utils/usePageTitle';
 import useLocalStorageState from '../../../utils/useLocalStorageState';
 import useDebouncedHandler from '../../../utils/useDebouncedHandler';
 import useShortcut from '../../../utils/useShortcut';
-import { hasFieldFocus } from '../../../utils/fields';
 
 const classes = {
   renderPanel: 'Toolpad_RenderPanel',
@@ -77,15 +76,9 @@ export default function PageEditor({ appId }: PageEditorProps) {
   const pageNode = appDom.getMaybeNode(dom, nodeId as NodeId, 'page');
 
   useShortcut({ key: 'z', metaKey: true, preventDefault: false }, () => {
-    if (hasFieldFocus()) {
-      return;
-    }
     domApi.undo();
   });
   useShortcut({ key: 'z', metaKey: true, shiftKey: true, preventDefault: false }, () => {
-    if (hasFieldFocus()) {
-      return;
-    }
     domApi.redo();
   });
 

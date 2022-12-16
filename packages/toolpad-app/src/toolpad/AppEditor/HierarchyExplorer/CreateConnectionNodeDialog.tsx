@@ -80,8 +80,10 @@ export default function CreateConnectionDialog({
           });
           const appNode = appDom.getApp(dom);
 
-          const updatedDom = appDom.addNode(dom, newNode, appNode, 'connections');
-          domApi.update(updatedDom, { kind: 'connection', nodeId: newNode.id });
+          domApi.update((draft) => appDom.addNode(draft, newNode, appNode, 'connections'), {
+            kind: 'connection',
+            nodeId: newNode.id,
+          });
 
           onClose();
         }}

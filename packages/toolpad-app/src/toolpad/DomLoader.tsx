@@ -58,7 +58,7 @@ export type DomAction =
     }
   | {
       type: 'DOM_UPDATE';
-      updatedDom: appDom.AppDom;
+      updater: (dom: appDom.AppDom) => appDom.AppDom;
       selectedNodeId?: NodeId | null;
       view?: DomView;
     }
@@ -93,7 +93,7 @@ export function domReducer(dom: appDom.AppDom, action: DomAction): appDom.AppDom
       return appDom.setNodeNamespace<any, any>(dom, action.node, action.namespace, action.value);
     }
     case 'DOM_UPDATE': {
-      return action.updatedDom;
+      return action.updater(dom);
     }
     case 'DOM_SAVE_NODE': {
       return appDom.saveNode(dom, action.node);
@@ -257,10 +257,14 @@ function createDomApi(
     setNodeName(nodeId: NodeId, name: string) {
       dispatch({ type: 'DOM_SET_NODE_NAME', nodeId, name });
     },
-    update(dom: appDom.AppDom, view?: DomView, selectedNodeId?: NodeId | null) {
+    update(
+      updater: (dom: appDom.AppDom) => appDom.AppDom,
+      view?: DomView,
+      selectedNodeId?: NodeId | null,
+    ) {
       dispatch({
         type: 'DOM_UPDATE',
-        updatedDom: dom,
+        updater,
         selectedNodeId,
         view,
       });

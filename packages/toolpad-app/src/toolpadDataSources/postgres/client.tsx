@@ -1,6 +1,6 @@
 import { LoadingButton } from '@mui/lab';
 import { Box, Button, Skeleton, Stack, TextField, Toolbar, Typography } from '@mui/material';
-import { inferColumns, parseColumns } from '@mui/toolpad-components';
+import { CUSTOM_COLUMN_TYPES, inferColumns, parseColumns } from '@mui/toolpad-components';
 import { DataGridPro, GridColDef } from '@mui/x-data-grid-pro';
 import * as React from 'react';
 import { useForm } from 'react-hook-form';
@@ -10,7 +10,6 @@ import SyncIcon from '@mui/icons-material/Sync';
 import { getObjectKey } from '@mui/toolpad-core/objectKey';
 import { BindableAttrEntries, BindableAttrValue } from '@mui/toolpad-core';
 import SplitPane from '../../components/SplitPane';
-import ErrorAlert from '../../toolpad/AppEditor/PageEditor/ErrorAlert';
 import ParametersEditor from '../../toolpad/AppEditor/PageEditor/ParametersEditor';
 import { useEvaluateLiveBindingEntries } from '../../toolpad/AppEditor/useEvaluateLiveBinding';
 import { ClientDataSource, ConnectionEditorProps, QueryEditorProps } from '../../types';
@@ -190,11 +189,11 @@ function QueryEditor({
     [fetchPrivate],
   );
 
-  const { preview, runPreview: handleRunPreview } = useQueryPreview(
-    fetchServerPreview,
-    input.attributes.query.value,
-    previewParams,
-  );
+  const {
+    preview,
+    runPreview: handleRunPreview,
+    isLoading: previewIsLoading,
+  } = useQueryPreview(fetchServerPreview, input.attributes.query.value, previewParams);
 
   const rawRows: any[] = preview?.data || EMPTY_ROWS;
   const columns: GridColDef[] = React.useMemo(() => parseColumns(inferColumns(rawRows)), [rawRows]);
@@ -227,11 +226,15 @@ function QueryEditor({
         </Box>
       </SplitPane>
 
-      {preview?.error ? (
-        <ErrorAlert error={preview?.error} />
-      ) : (
-        <DataGridPro sx={{ border: 'none' }} columns={columns} key={previewGridKey} rows={rows} />
-      )}
+      <DataGridPro
+        sx={{ border: 'none' }}
+        columns={columns}
+        key={previewGridKey}
+        rows={rows}
+        columnTypes={CUSTOM_COLUMN_TYPES}
+        error={preview?.error}
+        loading={previewIsLoading}
+      />
     </SplitPane>
   );
 }

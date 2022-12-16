@@ -57,7 +57,7 @@ export interface NodeInfo {
   error?: RuntimeError | null;
   rect?: Rectangle;
   slots?: SlotsState;
-  componentConfig?: ComponentConfig<unknown>;
+  componentConfig?: ComponentConfig;
   props: { [key: string]: unknown };
 }
 
@@ -193,3 +193,11 @@ export interface RuntimeState {
   appId: string;
   modules: Record<string, CompiledModule>;
 }
+
+export interface MetaField {
+  description?: string;
+  deprecated?: boolean | string;
+  tsType?: string;
+  value?: any;
+}
+export type GlobalScopeMeta = Record<string, MetaField>;

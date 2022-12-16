@@ -3,9 +3,10 @@ import v1 from './v1';
 import v2 from './v2';
 import v3 from './v3';
 import v4 from './v4';
+import v5 from './v5';
 import * as appDom from '..';
 
-const versions = [v1, v2, v3, v4];
+const versions = [v1, v2, v3, v4, v5];
 
 invariant(versions.length === appDom.CURRENT_APPDOM_VERSION, 'Unable to find the latest version');
 

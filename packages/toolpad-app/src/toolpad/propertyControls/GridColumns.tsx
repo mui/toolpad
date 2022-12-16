@@ -29,6 +29,7 @@ import {
 } from '@mui/toolpad-components';
 import type { EditorProps } from '../../types';
 import { useToolpadComponents } from '../AppEditor/toolpadComponents';
+import { ToolpadComponentDefinition } from '../../toolpadComponents';
 import { useDom } from '../DomLoader';
 
 // TODO: this import suggests leaky abstraction
@@ -45,7 +46,7 @@ const COLUMN_TYPES: string[] = [
   'boolean',
   'link',
   'image',
-  'custom-component',
+  'customComponent',
 ];
 const ALIGNMENTS: GridAlignment[] = ['left', 'right', 'center'];
 
@@ -80,7 +81,9 @@ function GridColumnsPropEditor({
   const customComponents = React.useMemo(() => {
     const entries = Object.entries(toolpadComponents);
 
-    return entries.filter(([_, definition]) => !definition?.builtIn);
+    return entries
+      .map(([, definition]) => definition)
+      .filter((definition) => definition && !definition.builtIn) as ToolpadComponentDefinition[];
   }, [toolpadComponents]);
 
   const editedColumn = typeof editedIndex === 'number' ? value[editedIndex] : null;
@@ -301,22 +304,22 @@ function GridColumnsPropEditor({
                     handleColumnChange({ ...editedColumn, width: Number(event.target.value) })
                   }
                 />
-                {editedColumn.type === 'custom-component' ? (
+                {editedColumn.type === 'customComponent' ? (
                   <TextField
                     select
                     fullWidth
                     label="Custom component"
-                    value={editedColumn.align ?? ''}
+                    value={editedColumn.customComponent ?? ''}
                     disabled={disabled}
                     onChange={(event) =>
                       handleColumnChange({
                         ...editedColumn,
-                        align: (event.target.value as GridAlignment) || undefined,
+                        customComponent: event.target.value,
                       })
                     }
                   >
-                    {customComponents.map(([_, { displayName }]) => (
-                      <MenuItem key={displayName} value={displayName}>
+                    {customComponents.map(({ displayName, codeComponentId }) => (
+                      <MenuItem key={displayName} value={codeComponentId}>
                         {displayName}
                       </MenuItem>
                     ))}

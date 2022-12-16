@@ -29,8 +29,6 @@ export const test = base.extend<Options & { api: RpcClient<ServerDefinition> }>(
     const entryPromises: Promise<ConsoleEntry>[] = [];
 
     const consoleHandler = (msg: ConsoleMessage) => {
-      // eslint-disable-next-line no-console
-      console.log(`console: ${msg.text()}`);
       entryPromises.push(
         Promise.all(
           msg.args().map(async (argHandle) => argHandle.jsonValue().catch(() => '<circular>')),

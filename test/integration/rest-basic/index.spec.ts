@@ -14,6 +14,14 @@ if (customHttbinBaseUrl) {
   console.log(`Running tests with custom httpbin service: ${customHttbinBaseUrl}`);
 }
 
+test.use({
+  ignoreConsoleErrors: [
+    // For some reason this shows error in chrome in CI only
+    // Needs to be investigated
+    /Invariant Violation: canvas ref not attached/,
+  ],
+});
+
 const HTTPBIN_BASEURL = customHttbinBaseUrl || 'https://httpbin.org/';
 
 test('rest basics', async ({ page, browserName, api }) => {

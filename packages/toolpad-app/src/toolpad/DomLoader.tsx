@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { NodeId, BindableAttrValues } from '@mui/toolpad-core';
+import { NodeId } from '@mui/toolpad-core';
 import invariant from 'invariant';
 import { debounce, DebouncedFunc } from 'lodash-es';
 import * as appDom from '../appDom';
@@ -41,14 +41,8 @@ export type DomAction =
       name: string;
     }
   | {
-      type: 'DOM_SET_NODE_NAMESPACE';
-      node: appDom.AppDomNode;
-      namespace: string;
-      value: BindableAttrValues | null;
-    }
-  | {
       type: 'DOM_UPDATE';
-      updatedDom: appDom.AppDom;
+      updater: (dom: appDom.AppDom) => appDom.AppDom;
       selectedNodeId?: NodeId | null;
     }
   | {
@@ -70,11 +64,8 @@ export function domReducer(dom: appDom.AppDom, action: DomAction): appDom.AppDom
       const node = appDom.getNode(dom, action.nodeId);
       return appDom.setNodeName(dom, node, action.name);
     }
-    case 'DOM_SET_NODE_NAMESPACE': {
-      return appDom.setNodeNamespace<any, any>(dom, action.node, action.namespace, action.value);
-    }
     case 'DOM_UPDATE': {
-      return action.updatedDom;
+      return action.updater(dom);
     }
     case 'DOM_SAVE_NODE': {
       return appDom.saveNode(dom, action.node);
@@ -215,10 +206,10 @@ function createDomApi(
     setNodeName(nodeId: NodeId, name: string) {
       dispatch({ type: 'DOM_SET_NODE_NAME', nodeId, name });
     },
-    update(dom: appDom.AppDom, selectedNodeId?: NodeId | null) {
+    update(updater: (dom: appDom.AppDom) => appDom.AppDom, selectedNodeId?: NodeId | null) {
       dispatch({
         type: 'DOM_UPDATE',
-        updatedDom: dom,
+        updater,
         selectedNodeId,
       });
     },
@@ -226,18 +217,6 @@ function createDomApi(
       dispatch({
         type: 'DOM_SAVE_NODE',
         node,
-      });
-    },
-    setNodeNamespace<Node extends appDom.AppDomNode, Namespace extends appDom.PropNamespaces<Node>>(
-      node: Node,
-      namespace: Namespace,
-      value: Node[Namespace] | null,
-    ) {
-      dispatch({
-        type: 'DOM_SET_NODE_NAMESPACE',
-        namespace,
-        node,
-        value: value as BindableAttrValues | null,
       });
     },
     selectNode(nodeId: NodeId) {

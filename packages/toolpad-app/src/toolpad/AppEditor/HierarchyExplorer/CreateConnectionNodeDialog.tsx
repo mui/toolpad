@@ -82,8 +82,7 @@ export default function CreateConnectionDialog({
           });
           const appNode = appDom.getApp(dom);
 
-          const updatedDom = appDom.addNode(dom, newNode, appNode, 'connections');
-          domApi.update(updatedDom);
+          domApi.update((draft) => appDom.addNode(draft, newNode, appNode, 'connections'));
 
           onClose();
           navigate(`/app/${appId}/connections/${newNode.id}`);

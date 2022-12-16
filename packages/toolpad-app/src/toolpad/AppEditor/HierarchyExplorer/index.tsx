@@ -237,8 +237,7 @@ export default function HierarchyExplorer({ appId, className }: HierarchyExplore
         }
       }
 
-      const updatedDom = appDom.removeNode(dom, nodeId);
-      domApi.update(updatedDom);
+      domApi.update((draft) => appDom.removeNode(draft, nodeId));
 
       if (redirectAfterDelete) {
         navigate(redirectAfterDelete);
@@ -250,15 +249,17 @@ export default function HierarchyExplorer({ appId, className }: HierarchyExplore
   const handleDuplicateNode = React.useCallback(
     (nodeId: NodeId) => {
       const node = appDom.getNode(dom, nodeId);
-      invariant(
-        node.parentId && node.parentProp,
-        'Duplication should never be called on nodes that are not placed in the dom',
-      );
 
       const fragment = appDom.cloneFragment(dom, nodeId);
 
-      const updatedDom = appDom.addFragment(dom, fragment, node.parentId, node.parentProp);
-      domApi.update(updatedDom);
+      domApi.update((draft) => {
+        invariant(
+          node.parentId && node.parentProp,
+          'Duplication should never be called on nodes that are not placed in the dom',
+        );
+
+        return appDom.addFragment(draft, fragment, node.parentId, node.parentProp);
+      });
 
       const newNode = appDom.getNode(fragment, fragment.root);
       const editorLink = getLinkToNodeEditor(appId, newNode);

@@ -82,8 +82,7 @@ export default function ComponentEditor({ className }: ComponentEditorProps) {
       theme: {},
       attributes: {},
     });
-    const updatedDom = appDom.addNode(dom, newTheme, app, 'themes');
-    domApi.update(updatedDom);
+    domApi.update((draft) => appDom.addNode(draft, newTheme, app, 'themes'));
   };
 
   return (
@@ -94,11 +93,12 @@ export default function ComponentEditor({ className }: ComponentEditorProps) {
             exclusive
             value={appDom.fromConstPropValue(theme.theme?.['palette.mode']) || 'light'}
             onChange={(event, newValue) => {
-              const updatedDom = appDom.setNodeNamespacedProp(dom, theme, 'theme', 'palette.mode', {
-                type: 'const',
-                value: newValue,
-              });
-              domApi.update(updatedDom);
+              domApi.update((draft) =>
+                appDom.setNodeNamespacedProp(draft, theme, 'theme', 'palette.mode', {
+                  type: 'const',
+                  value: newValue,
+                }),
+              );
             }}
             aria-label="Mode"
           >
@@ -115,34 +115,24 @@ export default function ComponentEditor({ className }: ComponentEditorProps) {
             name="primary"
             value={appDom.fromConstPropValue(theme.theme?.['palette.primary.main']) || ''}
             onChange={(newValue) => {
-              const updatedDom = appDom.setNodeNamespacedProp(
-                dom,
-                theme,
-                'theme',
-                'palette.primary.main',
-                {
+              domApi.update((draft) =>
+                appDom.setNodeNamespacedProp(draft, theme, 'theme', 'palette.primary.main', {
                   type: 'const',
                   value: newValue,
-                },
+                }),
               );
-              domApi.update(updatedDom);
             }}
           />
           <PaletteColorPicker
             name="secondary"
             value={appDom.fromConstPropValue(theme.theme?.['palette.secondary.main']) || ''}
             onChange={(newValue) => {
-              const updatedDom = appDom.setNodeNamespacedProp(
-                dom,
-                theme,
-                'theme',
-                'palette.secondary.main',
-                {
+              domApi.update((draft) =>
+                appDom.setNodeNamespacedProp(draft, theme, 'theme', 'palette.secondary.main', {
                   type: 'const',
                   value: newValue,
-                },
+                }),
               );
-              domApi.update(updatedDom);
             }}
           />
         </Stack>

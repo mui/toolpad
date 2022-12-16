@@ -39,15 +39,10 @@ function PageModuleEditorDialog({ pageNodeId, open, onClose }: PageModuleEditorD
     const pretty = tryFormat(input);
     setInput(pretty);
 
-    const updatedDom = appDom.setNodeNamespacedProp(
-      dom,
-      page,
-      'attributes',
-      'module',
-      appDom.createConst(pretty),
+    domApi.update((draft) =>
+      appDom.setNodeNamespacedProp(draft, page, 'attributes', 'module', appDom.createConst(pretty)),
     );
-    domApi.update(updatedDom);
-  }, [dom, domApi, input, page]);
+  }, [domApi, input, page]);
 
   const handleSaveButton = React.useCallback(() => {
     handleSave();

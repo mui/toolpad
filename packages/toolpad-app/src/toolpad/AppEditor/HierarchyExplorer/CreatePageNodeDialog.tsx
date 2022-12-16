@@ -70,8 +70,7 @@ export default function CreatePageDialog({
           });
           const appNode = appDom.getApp(dom);
 
-          const updatedDom = appDom.addNode(dom, newNode, appNode, 'pages');
-          domApi.update(updatedDom);
+          domApi.update((draft) => appDom.addNode(draft, newNode, appNode, 'pages'));
 
           onClose();
           navigate(`/app/${appId}/pages/${newNode.id}`);

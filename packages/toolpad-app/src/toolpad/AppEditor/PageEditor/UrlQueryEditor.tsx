@@ -39,17 +39,18 @@ export default function UrlQueryEditor({ pageNodeId }: UrlQueryEditorProps) {
   }, [dialogOpen, value]);
 
   const handleSave = React.useCallback(() => {
-    const updatedDom = appDom.setNodeNamespacedProp(
-      dom,
-      page,
-      'attributes',
-      'parameters',
-      appDom.createConst(input || []),
+    domApi.update((draft) =>
+      appDom.setNodeNamespacedProp(
+        draft,
+        page,
+        'attributes',
+        'parameters',
+        appDom.createConst(input || []),
+      ),
     );
-    domApi.update(updatedDom);
 
     handleDialogClose();
-  }, [dom, page, input, domApi, handleDialogClose]);
+  }, [domApi, handleDialogClose, input, page]);
 
   return (
     <React.Fragment>

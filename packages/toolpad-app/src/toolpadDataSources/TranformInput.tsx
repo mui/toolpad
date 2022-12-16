@@ -4,6 +4,7 @@ import * as React from 'react';
 import AutorenewIcon from '@mui/icons-material/Autorenew';
 import JsonView from '../components/JsonView';
 import { JsExpressionEditor } from '../toolpad/AppEditor/PageEditor/JsExpressionEditor';
+import { metaFrom } from '../toolpad/AppEditor/BindingEditor';
 
 export interface TransformInputProps {
   value: string;
@@ -28,6 +29,8 @@ export default function TransformInput({
     (event: React.ChangeEvent<HTMLInputElement>) => onEnabledChange(event.target.checked),
     [onEnabledChange],
   );
+
+  const globalScopeMeta = metaFrom(globalScope);
 
   return (
     <Grid item xs={6} md={12}>
@@ -78,7 +81,7 @@ export default function TransformInput({
             </IconButton>
           ) : null}
           <JsExpressionEditor
-            globalScope={globalScope}
+            globalScopeMeta={globalScopeMeta}
             autoFocus
             value={value}
             sx={{

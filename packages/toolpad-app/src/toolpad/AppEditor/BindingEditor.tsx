@@ -28,6 +28,8 @@ import {
   NavigationAction,
   NodeId,
   JsExpressionAction,
+  GlobalScopeMeta,
+  GlobalScopeMetaField,
 } from '@mui/toolpad-core';
 import { TabContext, TabList } from '@mui/lab';
 import { Maybe, WithControlledProp } from '../../utils/types';
@@ -44,7 +46,6 @@ import * as appDom from '../../appDom';
 import { usePageEditorState } from './PageEditor/PageEditorProvider';
 import GlobalScopeExplorer from './GlobalScopeExplorer';
 import TabPanel from '../../components/TabPanel';
-import { GlobalScopeMeta } from '../../types';
 
 interface BindingEditorContext {
   label: string;
@@ -59,6 +60,27 @@ interface BindingEditorContext {
   liveBinding?: LiveBinding;
 }
 
+export function metaFrom(
+  globalScope: Record<string, unknown>,
+  meta: GlobalScopeMeta = {},
+): GlobalScopeMeta {
+  const keys = new Set([...Object.keys(globalScope), ...Object.keys(meta)]);
+  return Object.fromEntries<GlobalScopeMetaField>(
+    Array.from(keys, (key) => {
+      const value = globalScope[key];
+      const existingMeta = meta[key];
+
+      return [
+        key,
+        {
+          ...existingMeta,
+          value,
+        },
+      ];
+    }),
+  );
+}
+
 const [useBindingEditorContext, BindingEditorContextProvider] =
   createProvidedContext<BindingEditorContext>('BindingEditor');
 
@@ -71,12 +93,10 @@ const ErrorTooltip = styled(({ className, ...props }: TooltipProps) => (
 }));
 
 interface JsExpressionBindingEditorProps extends WithControlledProp<JsExpressionAttrValue | null> {
-  globalScope: Record<string, unknown>;
-  globalScopeMeta?: GlobalScopeMeta;
+  globalScopeMeta: GlobalScopeMeta;
 }
 
 function JsExpressionBindingEditor({
-  globalScope,
   globalScopeMeta = {},
   value,
   onChange,
@@ -88,7 +108,6 @@ function JsExpressionBindingEditor({
 
   return (
     <JsExpressionEditor
-      globalScope={globalScope}
       globalScopeMeta={globalScopeMeta}
       value={value?.type === 'jsExpression' ? value.value : ''}
       onChange={handleChange}
@@ -124,9 +143,15 @@ export interface JsBindingEditorProps extends WithControlledProp<JsExpressionAtt
 
 export function JsBindingEditor({ value, onChange }: JsBindingEditorProps) {
   const { label, globalScope, globalScopeMeta = {}, server, propType } = useBindingEditorContext();
+
+  const scopeMeta = React.useMemo(
+    () => metaFrom(globalScope, globalScopeMeta),
+    [globalScope, globalScopeMeta],
+  );
+
   return (
     <Stack direction="row" sx={{ height: 400, gap: 2 }}>
-      <GlobalScopeExplorer sx={{ width: 250 }} value={globalScope} meta={globalScopeMeta} />
+      <GlobalScopeExplorer sx={{ width: 250 }} meta={scopeMeta} />
 
       <Box
         sx={{
@@ -143,7 +168,6 @@ export function JsBindingEditor({ value, onChange }: JsBindingEditorProps) {
         </Typography>
 
         <JsExpressionBindingEditor
-          globalScope={globalScope}
           globalScopeMeta={globalScopeMeta}
           value={value}
           onChange={onChange}
@@ -165,6 +189,11 @@ function JsExpressionActionEditor({ value, onChange }: JsExpressionActionEditorP
     [onChange],
   );
 
+  const scopeMeta = React.useMemo(
+    () => metaFrom(globalScope, globalScopeMeta),
+    [globalScope, globalScopeMeta],
+  );
+
   return (
     <Box sx={{ my: 1 }}>
       <Typography>Run code when this event fires</Typography>
@@ -178,12 +207,11 @@ function JsExpressionActionEditor({ value, onChange }: JsExpressionActionEditorP
           gap: 2,
         }}
       >
-        <GlobalScopeExplorer sx={{ width: 250 }} value={globalScope} meta={globalScopeMeta} />
+        <GlobalScopeExplorer sx={{ width: 250 }} meta={scopeMeta} />
 
         <JsExpressionEditor
           sx={{ flex: 1 }}
-          globalScope={globalScope}
-          globalScopeMeta={globalScopeMeta}
+          globalScopeMeta={scopeMeta}
           value={value?.value || ''}
           onChange={handleCodeChange}
           functionBody

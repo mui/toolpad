@@ -1,21 +1,14 @@
 import { Typography, Divider, Box, SxProps } from '@mui/material';
+import { GlobalScopeMeta } from '@mui/toolpad-core';
 import * as React from 'react';
 import ObjectInspector from '../../components/ObjectInspector';
-import { GlobalScopeMeta } from '../../types';
 
 export interface GlobalScopeExplorerProps {
-  value?: Record<string, unknown>;
   meta?: GlobalScopeMeta;
   sx?: SxProps;
 }
 
-export default function GlobalScopeExplorer({
-  meta = {},
-  value = {},
-  sx,
-}: GlobalScopeExplorerProps) {
-  const valueKeys = new Set(Object.keys(value));
-  const extraGlobalKeys = Object.keys(meta).filter((key) => !valueKeys.has(key));
+export default function GlobalScopeExplorer({ meta = {}, sx }: GlobalScopeExplorerProps) {
   return (
     <Box sx={{ ...sx, display: 'flex', flexDirection: 'column' }}>
       <Typography sx={{ mb: 1 }} variant="subtitle2">
@@ -23,20 +16,20 @@ export default function GlobalScopeExplorer({
       </Typography>
       <Box sx={{ overflow: 'auto', whiteSpace: 'nowrap', border: 1, borderColor: 'divider' }}>
         <Box sx={{ display: 'flex', flexDirection: 'column', width: 'fit-content' }}>
-          {Object.entries(value).map(([key, content]) => {
+          {Object.entries(meta).map(([key, scopeField]) => {
+            if (!scopeField) {
+              return null;
+            }
             return (
               <React.Fragment key={key}>
                 <Box sx={{ p: 1 }}>
                   <Typography>{key}</Typography>
-                  <ObjectInspector expandLevel={0} data={content} />
+                  <ObjectInspector expandLevel={0} data={scopeField.value} />
                 </Box>
                 <Divider />
               </React.Fragment>
             );
           })}
-          {extraGlobalKeys.map((key) => (
-            <Box key={key}>{key}</Box>
-          ))}
         </Box>
       </Box>
     </Box>

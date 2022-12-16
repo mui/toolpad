@@ -25,6 +25,7 @@ import * as appDom from '../../appDom';
 import TabPanel from '../../components/TabPanel';
 import ParametersEditor from '../../toolpad/AppEditor/PageEditor/ParametersEditor';
 import { HTTP_NO_BODY } from './shared';
+import { metaFrom } from '../../toolpad/AppEditor/BindingEditor';
 
 interface ContentTypeSpec {
   alias: string;
@@ -111,6 +112,8 @@ function RawBodyEditor({
 
   const { language = 'plaintext' } = RAW_CONTENT_TYPES.get(value.contentType.value) ?? {};
 
+  const globalScopeMeta = React.useMemo(() => metaFrom(globalScope), [globalScope]);
+
   return (
     <React.Fragment>
       {renderToolbar({
@@ -135,6 +138,7 @@ function RawBodyEditor({
         sx={{ mt: 1 }}
         liveBinding={liveContent}
         globalScope={globalScope}
+        globalScopeMeta={globalScopeMeta}
         propType={{ type: 'string' }}
         renderControl={(props) => (
           <MonacoEditor

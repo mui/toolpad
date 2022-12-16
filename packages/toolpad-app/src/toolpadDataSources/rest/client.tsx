@@ -1,5 +1,10 @@
 import * as React from 'react';
-import { BindableAttrEntries, BindableAttrValue, LiveBinding } from '@mui/toolpad-core';
+import {
+  BindableAttrEntries,
+  BindableAttrValue,
+  GlobalScopeMeta,
+  LiveBinding,
+} from '@mui/toolpad-core';
 import {
   Box,
   Button,
@@ -23,7 +28,6 @@ import {
   ConnectionEditorProps,
   ExecFetchFn,
   QueryEditorProps,
-  GlobalScopeMeta,
 } from '../../types';
 import {
   FetchPrivateQuery,

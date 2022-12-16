@@ -141,7 +141,7 @@ export default function QueryNodeEditorDialog<Q>({
     onSave(toCommit);
   }, [dataSource, input, onSave]);
 
-  const { pageState } = usePageEditorState();
+  const { pageState, globalScopeMeta } = usePageEditorState();
 
   const handleConnectionChange = React.useCallback(
     (newConnectionOption: ConnectionOption | null) => {
@@ -319,6 +319,7 @@ export default function QueryNodeEditorDialog<Q>({
               <BindableEditor
                 liveBinding={liveEnabled}
                 globalScope={pageState}
+                globalScopeMeta={globalScopeMeta}
                 server
                 label="Enabled"
                 propType={{ type: 'boolean' }}

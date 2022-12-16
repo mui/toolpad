@@ -16,7 +16,13 @@ if (customHttbinBaseUrl) {
 
 const HTTPBIN_BASEURL = customHttbinBaseUrl || 'https://httpbin.org/';
 
-test.use({ ignoreConsoleErrors: [/.*/] });
+test.use({
+  ignoreConsoleErrors: [
+    // For some reason this shows error in chrome in CI only
+    // Needs to be investigated
+    /Invariant Violation: canvas ref not attached/,
+  ],
+});
 
 test('rest basics', async ({ page, browserName, api }) => {
   const dom = await readJsonFile(path.resolve(__dirname, './restDom.json'));
@@ -32,7 +38,6 @@ test('rest basics', async ({ page, browserName, api }) => {
 
   const runtimeModel = new ToolpadRuntime(page);
   await runtimeModel.gotoPage(app.id, 'page1');
-
   await expect(page.locator('text="query1: query1_value"')).toBeVisible();
   await expect(page.locator('text="query2: undefined"')).toBeVisible();
   await page.locator('button:has-text("fetch query2")').click();

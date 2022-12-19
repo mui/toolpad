@@ -33,6 +33,7 @@ import ViewListIcon from '@mui/icons-material/ViewList';
 import GridViewIcon from '@mui/icons-material/GridView';
 import invariant from 'invariant';
 import { Link } from 'react-router-dom';
+import Script from 'next/script';
 import client from '../../api';
 import DialogForm from '../../components/DialogForm';
 import type { Deployment } from '../../../prisma/generated/client';
@@ -94,13 +95,15 @@ function CreateAppDialog({ onClose, open, ...props }: CreateAppDialogProps) {
   const [name, setName] = React.useState('');
   const [appTemplateId, setAppTemplateId] = React.useState<AppTemplateId>('default');
   const [dom, setDom] = React.useState('');
+  const [recaptachaApiLoaded, setRecaptachaApiLoaded] = React.useState(false);
+  const [requestRecaptchaV2, setRequestRecaptchaV2] = React.useState(false);
+  const [recaptchaV2Token, setRecaptchaV2Token] = React.useState('');
 
   const captchaTargetRef = React.useRef<HTMLDivElement | null>(null);
 
-  const latestRecaptchaWidgetIdRef = React.useRef<number | null>(null);
   React.useEffect(() => {
     if (!open) {
-      latestRecaptchaWidgetIdRef.current = null;
+      setRequestRecaptchaV2(false);
     }
   }, [open]);
 
@@ -147,25 +150,22 @@ function CreateAppDialog({ onClose, open, ...props }: CreateAppDialogProps) {
   const isSubmitting =
     createAppMutation.isLoading || isNavigatingToNewApp || isNavigatingToExistingApp;
 
+  const recaptchaSubmitEnabled =
+    config.recaptchaV2SiteKey || config.recaptchaV3SiteKey
+      ? recaptachaApiLoaded && ((requestRecaptchaV2 && recaptchaV2Token) || !requestRecaptchaV2)
+      : true;
+
   const handleSubmit = React.useCallback(
     async (event: React.FormEvent<HTMLFormElement>) => {
       invariant(isFormValid, 'Invalid form should not be submitted when submit is disabled');
 
       event.preventDefault();
 
-      const latestRecaptchaWidgetId = latestRecaptchaWidgetIdRef.current;
-      const hasShownRecaptchaCheckbox = latestRecaptchaWidgetId !== null;
-
       // Check if captcha checkbox was solved
-      let recaptchaToken = hasShownRecaptchaCheckbox
-        ? grecaptcha.getResponse(latestRecaptchaWidgetId)
-        : '';
+      let recaptchaToken = requestRecaptchaV2 ? recaptchaV2Token : '';
 
-      if (config.recaptchaV3SiteKey && !hasShownRecaptchaCheckbox) {
+      if (config.recaptchaV3SiteKey && !requestRecaptchaV2) {
         // Invisible captcha validation
-        await new Promise<void>((resolve) => {
-          grecaptcha.ready(resolve);
-        });
         recaptchaToken = await grecaptcha.execute(config.recaptchaV3SiteKey, {
           action: 'submit',
         });
@@ -185,7 +185,7 @@ function CreateAppDialog({ onClose, open, ...props }: CreateAppDialogProps) {
               ? {
                   captcha: {
                     token: recaptchaToken,
-                    version: hasShownRecaptchaCheckbox ? 2 : 3,
+                    version: requestRecaptchaV2 ? 2 : 3,
                   },
                 }
               : {}),
@@ -199,23 +199,55 @@ function CreateAppDialog({ onClose, open, ...props }: CreateAppDialogProps) {
 
         sendAppCreatedEvent(createdApp.name, appTemplateId);
       } catch (rawError) {
-        if (config.recaptchaV2SiteKey && !hasShownRecaptchaCheckbox && captchaTargetRef.current) {
-          const error = errorFrom(rawError);
-          if (error.code === ERR_VALIDATE_CAPTCHA_FAILED) {
-            // Show captcha checkbox
-            const widgetId = grecaptcha.render(captchaTargetRef.current.id, {
-              sitekey: config.recaptchaV2SiteKey,
-            });
-            latestRecaptchaWidgetIdRef.current = widgetId;
-          }
+        const error = errorFrom(rawError);
+        if (config.recaptchaV2SiteKey && error.code === ERR_VALIDATE_CAPTCHA_FAILED) {
+          // Show captcha checkbox
+          setRequestRecaptchaV2(true);
+        } else {
+          throw error;
         }
       }
     },
-    [appTemplateId, createAppMutation, dom, isFormValid, name, setLatestCreatedApp],
+    [
+      appTemplateId,
+      createAppMutation,
+      dom,
+      isFormValid,
+      name,
+      recaptchaV2Token,
+      requestRecaptchaV2,
+      setLatestCreatedApp,
+    ],
   );
 
   return (
     <Dialog {...props} open={open} onClose={config.isDemo ? NO_OP : onClose} maxWidth="xs">
+      {config.recaptchaV3SiteKey ? (
+        <Script
+          strategy="afterInteractive"
+          src={`https://www.google.com/recaptcha/api.js?render=${encodeURIComponent(
+            config.recaptchaV3SiteKey,
+          )}`}
+          onLoad={async () => {
+            await new Promise<void>((resolve) => {
+              grecaptcha.ready(resolve);
+            });
+            if (config.recaptchaV2SiteKey) {
+              invariant(captchaTargetRef.current, 'Recaptcha v2 widget ref not attached');
+              grecaptcha.render(captchaTargetRef.current, {
+                sitekey: config.recaptchaV2SiteKey,
+                callback: (token) => {
+                  setRecaptchaV2Token(token);
+                },
+                'expired-callback': () => {
+                  setRecaptchaV2Token('');
+                },
+              });
+            }
+            setRecaptachaApiLoaded(true);
+          }}
+        />
+      ) : null}
       <DialogForm onSubmit={handleSubmit}>
         <DialogTitle>Create a new App</DialogTitle>
         <DialogContent>
@@ -295,16 +327,18 @@ function CreateAppDialog({ onClose, open, ...props }: CreateAppDialogProps) {
             </Box>
           ) : null}
           {config.recaptchaV2SiteKey ? (
-            <Box
-              id="captcha-target"
-              ref={captchaTargetRef}
-              mt={1}
-              mb={1}
-              sx={{
-                display: 'flex',
-                justifyContent: 'center',
-              }}
-            />
+            <Box sx={{ visibility: requestRecaptchaV2 ? undefined : 'hidden' }}>
+              <Box
+                id="captcha-target"
+                ref={captchaTargetRef}
+                mt={1}
+                mb={1}
+                sx={{
+                  display: 'flex',
+                  justifyContent: 'center',
+                }}
+              />
+            </Box>
           ) : null}
           {config.recaptchaV3SiteKey ? (
             <Box mt={2}>
@@ -349,7 +383,7 @@ function CreateAppDialog({ onClose, open, ...props }: CreateAppDialogProps) {
           <LoadingButton
             type="submit"
             loading={createAppMutation.isLoading || isNavigatingToNewApp}
-            disabled={!isFormValid || isSubmitting}
+            disabled={!isFormValid || isSubmitting || !recaptchaSubmitEnabled}
           >
             Create
           </LoadingButton>

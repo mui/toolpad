@@ -447,12 +447,27 @@ const SKIP_UNDO_ACTIONS = new Set([
   'DOM_SAVING_ERROR',
 ]);
 
+interface DispatchMessage {
+  kind: 'dispatch';
+  args: [DomAction];
+}
+
+const channels = new Map<string, BroadcastChannel>();
+function getBroadcastChannel(appId: string) {
+  let channel = channels.get(appId);
+  if (!channel) {
+    channel = new BroadcastChannel(`toolpad_app_${appId}`);
+    channels.set(appId, channel);
+  }
+  return channel;
+}
+
 export default function DomProvider({ appId, children }: DomContextProps) {
   const { data: dom } = client.useQuery('loadDom', [appId], { suspense: true });
 
   invariant(dom, `Suspense should load the dom`);
 
-  const [state, dispatch] = React.useReducer(domLoaderReducer, {
+  const [state, rawDispatch] = React.useReducer(domLoaderReducer, {
     saving: false,
     unsavedChanges: 0,
     saveError: null,
@@ -463,16 +478,36 @@ export default function DomProvider({ appId, children }: DomContextProps) {
     redoStack: [],
   });
 
+  React.useEffect(() => {
+    const channel = getBroadcastChannel(appId);
+    channel.addEventListener('message', (event: MessageEvent<DispatchMessage>) => {
+      if (event.data.kind === 'dispatch') {
+        rawDispatch(...event.data.args);
+      }
+    });
+  }, [appId]);
+
+  const dispatch = React.useCallback<typeof rawDispatch>(
+    (...args) => {
+      const channel = getBroadcastChannel(appId);
+      const msg: DispatchMessage = { kind: 'dispatch', args };
+      channel.postMessage(msg);
+      rawDispatch(...args);
+    },
+    [appId],
+  );
+
+  const stableDispatch = useEvent(dispatch);
   const scheduleHistoryUpdate = React.useMemo(
     () =>
       throttle(
         () => {
-          dispatch({ type: 'DOM_UPDATE_HISTORY' });
+          stableDispatch({ type: 'DOM_UPDATE_HISTORY' });
         },
         500,
         { leading: false, trailing: true },
       ),
-    [],
+    [stableDispatch],
   );
 
   const dispatchWithHistory = useEvent((action: DomAction) => {

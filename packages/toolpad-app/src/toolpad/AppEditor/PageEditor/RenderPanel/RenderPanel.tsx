@@ -3,7 +3,7 @@ import { styled } from '@mui/material';
 import { RuntimeEvent, NodeId } from '@mui/toolpad-core';
 import { useNavigate } from 'react-router-dom';
 import * as appDom from '../../../../appDom';
-import EditorCanvasHost, { EditorCanvasHostHandle } from '../EditorCanvasHost';
+import EditorCanvasHost from '../EditorCanvasHost';
 import { getNodeHashes, useDom, useDomApi, useDomLoader } from '../../../DomLoader';
 import { usePageEditorApi, usePageEditorState } from '../PageEditorProvider';
 import RenderOverlay from './RenderOverlay';
@@ -35,7 +35,7 @@ export default function RenderPanel({ className }: RenderPanelProps) {
   const api = usePageEditorApi();
   const { appId, nodeId: pageNodeId } = usePageEditorState();
 
-  const canvasHostRef = React.useRef<EditorCanvasHostHandle>(null);
+  const [bridge, setBridge] = React.useState<ToolpadBridge | null>(null);
 
   const navigate = useNavigate();
 
@@ -44,8 +44,8 @@ export default function RenderPanel({ className }: RenderPanelProps) {
     [domLoader.savedDom],
   );
 
-  const handleInit = useEvent((bridge: ToolpadBridge) => {
-    bridge.onRuntimeEvent((event: RuntimeEvent) => {
+  const handleInit = useEvent((initializedBridge: ToolpadBridge) => {
+    initializedBridge.onRuntimeEvent((event: RuntimeEvent) => {
       switch (event.type) {
         case 'propUpdated': {
           const node = appDom.getNode(dom, event.nodeId as NodeId, 'element');
@@ -75,7 +75,7 @@ export default function RenderPanel({ className }: RenderPanelProps) {
           return;
         }
         case 'screenUpdate': {
-          const pageViewState = bridge.getPageViewState();
+          const pageViewState = initializedBridge.getPageViewState();
           api.pageViewStateUpdate(pageViewState);
           return;
         }
@@ -89,6 +89,7 @@ export default function RenderPanel({ className }: RenderPanelProps) {
           );
       }
     });
+    setBridge(initializedBridge);
   });
 
   return (
@@ -99,7 +100,7 @@ export default function RenderPanel({ className }: RenderPanelProps) {
         dom={dom}
         savedNodes={savedNodes}
         pageNodeId={pageNodeId}
-        overlay={<RenderOverlay canvasHostRef={canvasHostRef} />}
+        overlay={<RenderOverlay bridge={bridge} />}
         onInit={handleInit}
       />
     </RenderPanelRoot>

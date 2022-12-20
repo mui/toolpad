@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { Box, CircularProgress, styled } from '@mui/material';
-import { NodeId, RuntimeEvent } from '@mui/toolpad-core';
+import { NodeId } from '@mui/toolpad-core';
 import createCache from '@emotion/cache';
 import { CacheProvider } from '@emotion/react';
 import ReactDOM from 'react-dom';
@@ -50,9 +50,9 @@ export interface EditorCanvasHostProps {
   pageNodeId: NodeId;
   dom: appDom.AppDom;
   savedNodes: NodeHashes;
-  onRuntimeEvent?: (event: RuntimeEvent) => void;
   onConsoleEntry?: (entry: LogEntry) => void;
   overlay?: React.ReactNode;
+  onInit?: (bridge: ToolpadBridge) => void;
 }
 
 const CanvasRoot = styled('div')({
@@ -69,16 +69,7 @@ const CanvasFrame = styled('iframe')({
 
 export default React.forwardRef<EditorCanvasHostHandle, EditorCanvasHostProps>(
   function EditorCanvasHost(
-    {
-      appId,
-      className,
-      pageNodeId,
-      dom,
-      savedNodes,
-      overlay,
-      onRuntimeEvent = () => {},
-      onConsoleEntry,
-    },
+    { appId, className, pageNodeId, dom, savedNodes, overlay, onConsoleEntry, onInit },
     forwardedRef,
   ) {
     const frameRef = React.useRef<HTMLIFrameElement>(null);
@@ -103,6 +94,7 @@ export default React.forwardRef<EditorCanvasHostHandle, EditorCanvasHostProps>(
 
     const handleInit = useEvent((newBridge: ToolpadBridge) => {
       setBridge(newBridge);
+      onInit?.(newBridge);
       updateOnBridge(newBridge);
     });
 
@@ -119,6 +111,8 @@ export default React.forwardRef<EditorCanvasHostHandle, EditorCanvasHostProps>(
       if (typeof frameWindow.__TOOLPAD_BRIDGE__ === 'object') {
         // eslint-disable-next-line no-underscore-dangle
         handleInit(frameWindow.__TOOLPAD_BRIDGE__);
+        // eslint-disable-next-line no-underscore-dangle
+        frameWindow.__TOOLPAD_BRIDGE__ = 'consumed';
         // eslint-disable-next-line no-underscore-dangle
       } else if (typeof frameWindow.__TOOLPAD_BRIDGE__ === 'undefined') {
         // eslint-disable-next-line no-underscore-dangle
@@ -146,8 +140,6 @@ export default React.forwardRef<EditorCanvasHostHandle, EditorCanvasHostProps>(
       },
       [bridge],
     );
-
-    const handleRuntimeEvent = useEvent(onRuntimeEvent);
 
     const iframeKeyDownHandler = React.useCallback(
       (iframeDocument: Document) => {
@@ -209,8 +201,6 @@ export default React.forwardRef<EditorCanvasHostHandle, EditorCanvasHostProps>(
         observer.disconnect();
       };
     }, [contentWindow]);
-
-    React.useEffect(() => bridge?.onRuntimeEvent(handleRuntimeEvent), [handleRuntimeEvent, bridge]);
 
     return (
       <CanvasRoot className={className}>

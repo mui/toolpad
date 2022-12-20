@@ -2,13 +2,14 @@ import * as React from 'react';
 import { styled } from '@mui/material';
 import { RuntimeEvent, NodeId } from '@mui/toolpad-core';
 import { useNavigate } from 'react-router-dom';
-import invariant from 'invariant';
 import * as appDom from '../../../../appDom';
 import EditorCanvasHost, { EditorCanvasHostHandle } from '../EditorCanvasHost';
 import { getNodeHashes, useDom, useDomApi, useDomLoader } from '../../../DomLoader';
 import { usePageEditorApi, usePageEditorState } from '../PageEditorProvider';
 import RenderOverlay from './RenderOverlay';
 import { NodeHashes } from '../../../../types';
+import { ToolpadBridge } from '../../../../canvas';
+import useEvent from '../../../../utils/useEvent';
 
 const classes = {
   view: 'Toolpad_View',
@@ -43,8 +44,8 @@ export default function RenderPanel({ className }: RenderPanelProps) {
     [domLoader.savedDom],
   );
 
-  const handleRuntimeEvent = React.useCallback(
-    (event: RuntimeEvent) => {
+  const handleInit = useEvent((bridge: ToolpadBridge) => {
+    bridge.onRuntimeEvent((event: RuntimeEvent) => {
       switch (event.type) {
         case 'propUpdated': {
           const node = appDom.getNode(dom, event.nodeId as NodeId, 'element');
@@ -72,8 +73,7 @@ export default function RenderPanel({ className }: RenderPanelProps) {
           return;
         }
         case 'screenUpdate': {
-          invariant(canvasHostRef.current, 'canvas ref not attached');
-          const pageViewState = canvasHostRef.current?.getPageViewState();
+          const pageViewState = bridge.getPageViewState();
           api.pageViewStateUpdate(pageViewState);
           return;
         }
@@ -86,21 +86,19 @@ export default function RenderPanel({ className }: RenderPanelProps) {
             `received unrecognized event "${(event as RuntimeEvent).type}" from editor runtime`,
           );
       }
-    },
-    [dom, domApi, api, navigate],
-  );
+    });
+  });
 
   return (
     <RenderPanelRoot className={className}>
       <EditorCanvasHost
-        ref={canvasHostRef}
         appId={appId}
         className={classes.view}
         dom={dom}
         savedNodes={savedNodes}
         pageNodeId={pageNodeId}
-        onRuntimeEvent={handleRuntimeEvent}
         overlay={<RenderOverlay canvasHostRef={canvasHostRef} />}
+        onInit={handleInit}
       />
     </RenderPanelRoot>
   );

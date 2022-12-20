@@ -86,6 +86,11 @@ export const APP_TEMPLATE_OPTIONS: Map<
 
 const NO_OP = () => {};
 
+function RecaptchaV2({ onToken }) {
+  const captchaTargetRef = React.useRef<HTMLDivElement | null>(null);
+  return <div ref={captchaTargetRef} />;
+}
+
 export interface CreateAppDialogProps {
   open: boolean;
   onClose?: () => void;
@@ -100,12 +105,6 @@ function CreateAppDialog({ onClose, open, ...props }: CreateAppDialogProps) {
   const [recaptchaV2Token, setRecaptchaV2Token] = React.useState('');
 
   const captchaTargetRef = React.useRef<HTMLDivElement | null>(null);
-
-  React.useEffect(() => {
-    if (!open) {
-      setRequestRecaptchaV2(false);
-    }
-  }, [open]);
 
   const [isNavigatingToNewApp, setIsNavigatingToNewApp] = React.useState(false);
   const [isNavigatingToExistingApp, setIsNavigatingToExistingApp] = React.useState(false);
@@ -228,23 +227,22 @@ function CreateAppDialog({ onClose, open, ...props }: CreateAppDialogProps) {
           src={`https://www.google.com/recaptcha/api.js?render=${encodeURIComponent(
             config.recaptchaV3SiteKey,
           )}`}
-          onLoad={async () => {
-            await new Promise<void>((resolve) => {
-              grecaptcha.ready(resolve);
+          onReady={() => {
+            grecaptcha.ready(() => {
+              if (config.recaptchaV2SiteKey) {
+                invariant(captchaTargetRef.current, 'Recaptcha v2 widget ref not attached');
+                grecaptcha.render(captchaTargetRef.current, {
+                  sitekey: config.recaptchaV2SiteKey,
+                  callback: (token) => {
+                    setRecaptchaV2Token(token);
+                  },
+                  'expired-callback': () => {
+                    setRecaptchaV2Token('');
+                  },
+                });
+              }
+              setRecaptachaApiLoaded(true);
             });
-            if (config.recaptchaV2SiteKey) {
-              invariant(captchaTargetRef.current, 'Recaptcha v2 widget ref not attached');
-              grecaptcha.render(captchaTargetRef.current, {
-                sitekey: config.recaptchaV2SiteKey,
-                callback: (token) => {
-                  setRecaptchaV2Token(token);
-                },
-                'expired-callback': () => {
-                  setRecaptchaV2Token('');
-                },
-              });
-            }
-            setRecaptachaApiLoaded(true);
           }}
         />
       ) : null}

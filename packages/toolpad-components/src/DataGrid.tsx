@@ -20,7 +20,7 @@ import {
 } from '@mui/x-data-grid-pro';
 import * as React from 'react';
 import { useNode, createComponent, ToolpadComponent } from '@mui/toolpad-core';
-import { Box, debounce, LinearProgress, Skeleton, Link, styled } from '@mui/material';
+import { Box, debounce, LinearProgress, Skeleton, Link, styled, Typography } from '@mui/material';
 import { getObjectKey } from '@mui/toolpad-core/objectKey';
 import { hasImageExtension } from '@mui/toolpad-core/path';
 
@@ -306,7 +306,11 @@ const DataGridComponent = React.forwardRef(function DataGridComponent(
           const Component = __toolpadComponents[`codeComponent.${column.customComponent}`];
 
           if (!Component) {
-            return 'No component selected';
+            return (
+              <Typography variant="overline" sx={{ color: 'error.main', fontSize: '10px' }}>
+                No component selected
+              </Typography>
+            );
           }
 
           return <Component {...value} />;

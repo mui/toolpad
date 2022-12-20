@@ -305,6 +305,10 @@ const DataGridComponent = React.forwardRef(function DataGridComponent(
 
           const Component = __toolpadComponents[`codeComponent.${column.customComponent}`];
 
+          if (!Component) {
+            return 'No component selected';
+          }
+
           return <Component {...value} />;
         },
       },

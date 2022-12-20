@@ -137,10 +137,11 @@ export default function QueryEditor() {
       if (appDom.nodeExists(dom, node.id)) {
         domApi.saveNode(node);
       } else {
-        domApi.update((draft) => appDom.addNode(draft, node, page, 'queries'));
-        domApi.setView({
-          kind: 'page',
-          nodeId: page.id,
+        domApi.update((draft) => appDom.addNode(draft, node, page, 'queries'), {
+          view: {
+            kind: 'page',
+            nodeId: page.id,
+          },
         });
       }
     },

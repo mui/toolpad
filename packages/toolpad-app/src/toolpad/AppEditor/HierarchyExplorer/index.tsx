@@ -241,6 +241,7 @@ export default function HierarchyExplorer({ appId, className }: HierarchyExplore
   const handleDuplicateNode = React.useCallback(
     (nodeId: NodeId) => {
       const node = appDom.getNode(dom, nodeId);
+
       invariant(
         node.parentId && node.parentProp,
         'Duplication should never be called on nodes that are not placed in the dom',

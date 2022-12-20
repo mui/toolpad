@@ -238,6 +238,13 @@ export function domLoaderReducer(state: DomLoader, action: DomAction): DomLoader
         currentTab: action.tab,
       });
     }
+    case 'DOM_UPDATE': {
+      return action.selectedNodeId !== undefined
+        ? update(state, {
+            selectedNodeId: action.selectedNodeId,
+          })
+        : state;
+    }
     default:
       return state;
   }

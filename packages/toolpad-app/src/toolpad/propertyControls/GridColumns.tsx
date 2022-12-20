@@ -1,9 +1,6 @@
 import {
+  Box,
   Button,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogTitle,
   IconButton,
   List,
   ListItem,
@@ -11,6 +8,7 @@ import {
   ListItemText,
   Menu,
   MenuItem,
+  Popover,
   Stack,
   TextField,
   Tooltip,
@@ -74,7 +72,6 @@ function GridColumnsPropEditor({
   disabled,
 }: EditorProps<SerializableGridColumns>) {
   const { bindings } = usePageEditorState();
-  const [editColumnsDialogOpen, setEditColumnsDialogOpen] = React.useState(false);
   const [editedIndex, setEditedIndex] = React.useState<number | null>(null);
   const { dom } = useDom();
   const toolpadComponents = useToolpadComponents(dom);
@@ -87,11 +84,6 @@ function GridColumnsPropEditor({
   }, [toolpadComponents]);
 
   const editedColumn = typeof editedIndex === 'number' ? value[editedIndex] : null;
-  React.useEffect(() => {
-    if (editColumnsDialogOpen) {
-      setEditedIndex(null);
-    }
-  }, [editColumnsDialogOpen]);
 
   const [menuAnchorEl, setMenuAnchorEl] = React.useState<null | HTMLElement>(null);
   const menuOpen = Boolean(menuAnchorEl);
@@ -156,23 +148,50 @@ function GridColumnsPropEditor({
     }
   }, [hasColumnSuggestions, inferredColumns, onChange]);
 
+  const [anchorEl, setAnchorEl] = React.useState<HTMLButtonElement | null>(null);
+
+  const handlePopoverClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handlePopoverClose = () => {
+    setAnchorEl(null);
+  };
+  const open = Boolean(anchorEl);
+  const popoverIdValue = React.useId();
+  const popoverId = open ? popoverIdValue : undefined;
+
+  React.useEffect(() => {
+    if (open) {
+      setEditedIndex(null);
+    }
+  }, [open]);
+
   return (
     <React.Fragment>
-      <Button onClick={() => setEditColumnsDialogOpen(true)}>{label}</Button>
-      <Dialog
-        fullWidth
-        open={editColumnsDialogOpen}
-        onClose={() => setEditColumnsDialogOpen(false)}
+      <Button aria-describedby={popoverId} onClick={handlePopoverClick}>
+        {label}
+      </Button>
+      <Popover
+        id={popoverId}
+        open={open}
+        anchorEl={anchorEl}
+        onClose={handlePopoverClose}
+        anchorOrigin={{
+          vertical: 'center',
+          horizontal: 'left',
+        }}
+        transformOrigin={{
+          vertical: 'center',
+          horizontal: 'left',
+        }}
       >
-        {editedColumn ? (
-          <React.Fragment>
-            <DialogTitle>
+        <Box sx={{ minWidth: 300, p: 2 }}>
+          {editedColumn ? (
+            <React.Fragment>
               <IconButton aria-label="Back" onClick={() => setEditedIndex(null)}>
                 <ArrowBackIcon />
               </IconButton>
-              Edit column {editedColumn.field}
-            </DialogTitle>
-            <DialogContent>
               <Stack gap={1} py={1}>
                 <TextField
                   label="field"
@@ -326,12 +345,9 @@ function GridColumnsPropEditor({
                   </TextField>
                 ) : null}
               </Stack>
-            </DialogContent>
-          </React.Fragment>
-        ) : (
-          <React.Fragment>
-            <DialogTitle>Edit columns</DialogTitle>
-            <DialogContent>
+            </React.Fragment>
+          ) : (
+            <React.Fragment>
               <Tooltip describeChild title="Recreate columns">
                 <span>
                   <IconButton
@@ -388,15 +404,10 @@ function GridColumnsPropEditor({
                   );
                 })}
               </List>
-            </DialogContent>
-          </React.Fragment>
-        )}
-        <DialogActions>
-          <Button color="inherit" variant="text" onClick={() => setEditColumnsDialogOpen(false)}>
-            Close
-          </Button>
-        </DialogActions>
-      </Dialog>
+            </React.Fragment>
+          )}
+        </Box>
+      </Popover>
     </React.Fragment>
   );
 }

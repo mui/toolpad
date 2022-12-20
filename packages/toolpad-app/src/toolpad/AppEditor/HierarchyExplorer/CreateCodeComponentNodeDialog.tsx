@@ -103,7 +103,9 @@ export default function CreateCodeComponentDialog({
             },
           });
           const appNode = appDom.getApp(dom);
-          domApi.addNode(newNode, appNode, 'codeComponents');
+
+          domApi.update((draft) => appDom.addNode(draft, newNode, appNode, 'codeComponents'));
+
           onClose();
           navigate(`/app/${appId}/codeComponents/${newNode.id}`);
         }}

@@ -8,9 +8,8 @@ import {
   styled,
 } from '@mui/material';
 import { createComponent } from '@mui/toolpad-core';
-import remarkGfm from 'remark-gfm';
 
-const ReactMarkdown = React.lazy(() => import('react-markdown'));
+const ReactMarkdown = React.lazy(() => import('markdown-to-jsx'));
 
 type BaseProps = MuiLinkProps | MuiTypographyProps;
 interface TextProps extends Omit<BaseProps, 'children'> {
@@ -34,7 +33,21 @@ function Text({ value, markdown, href, loading, mode, sx, ...rest }: TextProps) 
       ) : (
         <MarkdownContainer>
           <React.Suspense>
-            <ReactMarkdown remarkPlugins={[remarkGfm]}>{value}</ReactMarkdown>
+            <ReactMarkdown
+              options={{
+                overrides: {
+                  a: {
+                    component: MuiLink,
+                    props: {
+                      target: '_blank',
+                      rel: 'noopener noreferrer nofollow',
+                    },
+                  },
+                },
+              }}
+            >
+              {value}
+            </ReactMarkdown>
           </React.Suspense>
         </MarkdownContainer>
       );

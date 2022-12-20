@@ -32,7 +32,7 @@
     "@mui/material": "^5.11.0",
     "@mui/toolpad-core": "^0.0.31",
     "@mui/x-data-grid-pro": "^5.17.16",
-    "react-markdown": "^8.0.4"
+    "markdown-to-jsx": "^7.1.8"
   },
   "devDependencies": {
     "react": "^18.2.0"

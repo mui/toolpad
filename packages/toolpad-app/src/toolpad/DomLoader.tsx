@@ -219,11 +219,13 @@ export function domLoaderReducer(state: DomLoader, action: DomAction): DomLoader
       });
     }
     case 'DOM_UPDATE': {
+      const { selectedNodeId, view } = action;
+
       return update(state, {
-        ...(typeof action.selectedNodeId !== 'undefined'
-          ? { selectedNodeId: action.selectedNodeId, currentTab: 'component' }
+        ...(typeof selectedNodeId !== 'undefined'
+          ? { selectedNodeId, currentTab: 'component' }
           : {}),
-        ...(action.view ? { currentView: action.view } : {}),
+        ...(view ? { currentView: view } : {}),
       });
     }
     case 'DOM_SET_VIEW': {
@@ -259,14 +261,15 @@ function createDomApi(
     },
     update(
       updater: (dom: appDom.AppDom) => appDom.AppDom,
-      view?: DomView,
-      selectedNodeId?: NodeId | null,
+      extraUpdates: {
+        view?: DomView;
+        selectedNodeId?: NodeId | null;
+      } = {},
     ) {
       dispatch({
         type: 'DOM_UPDATE',
         updater,
-        selectedNodeId,
-        view,
+        ...extraUpdates,
       });
     },
     setView(view: DomView) {

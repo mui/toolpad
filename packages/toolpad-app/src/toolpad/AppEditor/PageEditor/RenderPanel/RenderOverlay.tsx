@@ -415,8 +415,9 @@ export default function RenderOverlay({ canvasHostRef }: RenderOverlayProps) {
 
           return normalizePageRowColumnSizes(draft);
         },
-        undefined,
-        null,
+        {
+          selectedNodeId: null,
+        },
       );
     },
     [dom, domApi, normalizePageRowColumnSizes],
@@ -1211,8 +1212,7 @@ export default function RenderOverlay({ canvasHostRef }: RenderOverlayProps) {
 
           return normalizePageRowColumnSizes(draft);
         },
-        undefined,
-        newNode?.id || draggedNodeId,
+        { selectedNodeId: newNode?.id || draggedNodeId },
       );
 
       api.dragEnd();

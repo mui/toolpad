@@ -228,12 +228,12 @@ export default function HierarchyExplorer({ appId, className }: HierarchyExplore
         const deletedNode = appDom.getNode(dom, nodeId);
         const siblings = appDom.getSiblings(dom, deletedNode);
         const firstSiblingOfType = siblings.find((sibling) => sibling.type === deletedNode.type);
-        domViewAfterDelete = firstSiblingOfType
-          ? getNodeEditorDomView(firstSiblingOfType)
-          : { kind: 'page' };
+        domViewAfterDelete = firstSiblingOfType && getNodeEditorDomView(firstSiblingOfType);
       }
 
-      domApi.update((draft) => appDom.removeNode(draft, nodeId), domViewAfterDelete);
+      domApi.update((draft) => appDom.removeNode(draft, nodeId), {
+        view: domViewAfterDelete || { kind: 'page' },
+      });
     },
     [activeNode, dom, domApi],
   );
@@ -241,20 +241,22 @@ export default function HierarchyExplorer({ appId, className }: HierarchyExplore
   const handleDuplicateNode = React.useCallback(
     (nodeId: NodeId) => {
       const node = appDom.getNode(dom, nodeId);
+      invariant(
+        node.parentId && node.parentProp,
+        'Duplication should never be called on nodes that are not placed in the dom',
+      );
 
       const fragment = appDom.cloneFragment(dom, nodeId);
 
       const newNode = appDom.getNode(fragment, fragment.root);
       const editorDomView = getNodeEditorDomView(newNode);
 
-      domApi.update((draft) => {
-        invariant(
-          node.parentId && node.parentProp,
-          'Duplication should never be called on nodes that are not placed in the dom',
-        );
-
-        return appDom.addFragment(draft, fragment, node.parentId, node.parentProp);
-      }, editorDomView || { kind: 'page' });
+      domApi.update(
+        (draft) => appDom.addFragment(draft, fragment, node.parentId!, node.parentProp!),
+        {
+          view: editorDomView || { kind: 'page' },
+        },
+      );
     },
     [dom, domApi],
   );

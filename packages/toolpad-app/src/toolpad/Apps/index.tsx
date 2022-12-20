@@ -86,11 +86,6 @@ export const APP_TEMPLATE_OPTIONS: Map<
 
 const NO_OP = () => {};
 
-function RecaptchaV2({ onToken }) {
-  const captchaTargetRef = React.useRef<HTMLDivElement | null>(null);
-  return <div ref={captchaTargetRef} />;
-}
-
 export interface CreateAppDialogProps {
   open: boolean;
   onClose?: () => void;

@@ -327,17 +327,14 @@ function CreateAppDialog({ onClose, open, ...props }: CreateAppDialogProps) {
             </Box>
           ) : null}
           {config.recaptchaV2SiteKey ? (
-            <Box sx={{ visibility: requestRecaptchaV2 ? undefined : 'hidden' }}>
-              <Box
-                id="captcha-target"
-                ref={captchaTargetRef}
-                mt={1}
-                mb={1}
-                sx={{
-                  display: 'flex',
-                  justifyContent: 'center',
-                }}
-              />
+            <Box
+              sx={{
+                display: requestRecaptchaV2 ? 'flex' : 'none',
+                justifyContent: 'center',
+                my: 1,
+              }}
+            >
+              <div ref={captchaTargetRef} />
             </Box>
           ) : null}
           {config.recaptchaV3SiteKey ? (

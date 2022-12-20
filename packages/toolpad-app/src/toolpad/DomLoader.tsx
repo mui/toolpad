@@ -215,7 +215,6 @@ export function domLoaderReducer(state: DomLoader, action: DomAction): DomLoader
     case 'DESELECT_NODE': {
       return update(state, {
         selectedNodeId: null,
-        currentTab: 'component',
       });
     }
     case 'DOM_UPDATE': {
@@ -237,13 +236,6 @@ export function domLoaderReducer(state: DomLoader, action: DomAction): DomLoader
       return update(state, {
         currentTab: action.tab,
       });
-    }
-    case 'DOM_UPDATE': {
-      return action.selectedNodeId !== undefined
-        ? update(state, {
-            selectedNodeId: action.selectedNodeId,
-          })
-        : state;
     }
     default:
       return state;

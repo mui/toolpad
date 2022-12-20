@@ -16,7 +16,7 @@ import { hasFieldFocus } from '../utils/fields';
 
 export type DomView =
   | { kind: 'page'; nodeId?: NodeId }
-  | { kind: 'query'; node: appDom.QueryNode; isDraft: boolean }
+  | { kind: 'query'; nodeId: NodeId }
   | { kind: 'pageModule'; nodeId: NodeId }
   | { kind: 'pageParameters'; nodeId: NodeId }
   | { kind: 'connection'; nodeId: NodeId }

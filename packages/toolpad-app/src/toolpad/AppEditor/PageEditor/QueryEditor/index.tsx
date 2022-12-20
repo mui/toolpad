@@ -119,8 +119,6 @@ export default function QueryEditor() {
   const handleEditStateDialogClose = React.useCallback(() => {
     if (currentView.kind === 'query') {
       domApi.setView({ kind: 'page', nodeId: page.id });
-    } else {
-      setDialogState(null);
     }
   }, [currentView.kind, domApi, page.id]);
 
@@ -128,21 +126,19 @@ export default function QueryEditor() {
     setDialogState({});
   }, []);
 
-  const handleCreated = React.useCallback((node: appDom.QueryNode) => {
-    setDialogState({ node, isDraft: true });
-  }, []);
+  const handleCreated = React.useCallback(
+    (node: appDom.QueryNode) => {
+      domApi.setView({ kind: 'query', node, isDraft: true });
+    },
+    [domApi],
+  );
 
   const handleSave = React.useCallback(
     (node: appDom.QueryNode) => {
       if (appDom.nodeExists(dom, node.id)) {
         domApi.saveNode(node);
       } else {
-        domApi.update((draft) => appDom.addNode(draft, node, page, 'queries'), {
-          view: {
-            kind: 'page',
-            nodeId: page.id,
-          },
-        });
+        domApi.update((draft) => appDom.addNode(draft, node, page, 'queries'));
       }
     },
     [dom, domApi, page],
@@ -150,11 +146,14 @@ export default function QueryEditor() {
 
   const handleDeleteNode = React.useCallback(
     (nodeId: NodeId) => {
-      domApi.update((draft) => appDom.removeNode(draft, nodeId));
-
-      handleEditStateDialogClose();
+      domApi.update((draft) => appDom.removeNode(draft, nodeId), {
+        view: {
+          kind: 'page',
+          nodeId: page.id,
+        },
+      });
     },
-    [domApi, handleEditStateDialogClose],
+    [domApi, page.id],
   );
 
   const handleRemove = React.useCallback(
@@ -181,12 +180,11 @@ export default function QueryEditor() {
   React.useEffect(() => {
     setDialogState(() => {
       if (currentView.kind === 'query') {
-        const node = appDom.getNode(dom, currentView.nodeId, 'query');
-        return { node, isDraft: false };
+        return { node: currentView.node, isDraft: currentView.isDraft };
       }
       return null;
     });
-  }, [dom, currentView]);
+  }, [currentView, dom]);
 
   return (
     <Stack spacing={1} alignItems="start" sx={{ width: '100%' }}>
@@ -200,7 +198,7 @@ export default function QueryEditor() {
               key={queryNode.id}
               disablePadding
               onClick={() => {
-                domApi.setView({ kind: 'query', nodeId: queryNode.id });
+                domApi.setView({ kind: 'query', node: queryNode, isDraft: false });
               }}
               secondaryAction={
                 <NodeMenu

@@ -34,6 +34,14 @@ export default function UrlQueryEditor({ pageNodeId }: UrlQueryEditorProps) {
     }
   }, [isDialogOpen, value]);
 
+  const handleButtonClick = React.useCallback(() => {
+    domApi.setView({ kind: 'pageParameters', nodeId: pageNodeId });
+  }, [domApi, pageNodeId]);
+
+  const handleDialogClose = React.useCallback(() => {
+    domApi.setView({ kind: 'page', nodeId: pageNodeId });
+  }, [domApi, pageNodeId]);
+
   const handleSave = React.useCallback(() => {
     domApi.update((draft) =>
       appDom.setNodeNamespacedProp(
@@ -44,15 +52,8 @@ export default function UrlQueryEditor({ pageNodeId }: UrlQueryEditorProps) {
         appDom.createConst(input || []),
       ),
     );
-  }, [domApi, input, page]);
-
-  const handleButtonClick = React.useCallback(() => {
-    domApi.setView({ kind: 'pageParameters', nodeId: pageNodeId });
-  }, [domApi, pageNodeId]);
-
-  const handleDialogClose = React.useCallback(() => {
-    domApi.setView({ kind: 'page', nodeId: pageNodeId });
-  }, [domApi, pageNodeId]);
+    handleDialogClose();
+  }, [domApi, handleDialogClose, input, page]);
 
   React.useEffect(() => {
     if (currentView.kind === 'pageParameters') {

@@ -113,16 +113,16 @@ export default function QueryEditor() {
 
   const [dialogState, setDialogState] = React.useState<DialogState | null>(null);
 
+  const page = appDom.getNode(dom, state.nodeId, 'page');
+  const { queries = [] } = appDom.getChildNodes(dom, page) ?? [];
+
   const handleEditStateDialogClose = React.useCallback(() => {
     if (currentView.kind === 'query') {
-      domApi.setView({ kind: 'page' });
+      domApi.setView({ kind: 'page', nodeId: page.id });
     } else {
       setDialogState(null);
     }
-  }, [currentView, domApi]);
-
-  const page = appDom.getNode(dom, state.nodeId, 'page');
-  const { queries = [] } = appDom.getChildNodes(dom, page) ?? [];
+  }, [currentView.kind, domApi, page.id]);
 
   const handleCreate = React.useCallback(() => {
     setDialogState({});

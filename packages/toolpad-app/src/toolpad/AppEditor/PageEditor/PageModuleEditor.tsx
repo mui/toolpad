@@ -90,8 +90,8 @@ export default function PageModuleEditor({ pageNodeId }: PageModuleEditorProps) 
   }, [domApi, pageNodeId]);
 
   const handleDialogClose = React.useCallback(() => {
-    domApi.setView({ kind: 'page' });
-  }, [domApi]);
+    domApi.setView({ kind: 'page', nodeId: pageNodeId });
+  }, [domApi, pageNodeId]);
 
   React.useEffect(() => {
     setDialogOpen(currentView.kind === 'pageModule');

@@ -51,8 +51,8 @@ export default function UrlQueryEditor({ pageNodeId }: UrlQueryEditorProps) {
   }, [domApi, pageNodeId]);
 
   const handleDialogClose = React.useCallback(() => {
-    domApi.setView({ kind: 'page' });
-  }, [domApi]);
+    domApi.setView({ kind: 'page', nodeId: pageNodeId });
+  }, [domApi, pageNodeId]);
 
   React.useEffect(() => {
     if (currentView.kind === 'pageParameters') {

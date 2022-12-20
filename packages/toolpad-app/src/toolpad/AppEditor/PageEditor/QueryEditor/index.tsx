@@ -132,7 +132,7 @@ export default function QueryEditor() {
       if (appDom.nodeExists(dom, node.id)) {
         domApi.saveNode(node);
       } else {
-        domApi.addNode(node, page, 'queries');
+        domApi.update((draft) => appDom.addNode(draft, node, page, 'queries'));
       }
       setDialogState({ node, isDraft: false });
     },
@@ -141,7 +141,8 @@ export default function QueryEditor() {
 
   const handleDeleteNode = React.useCallback(
     (nodeId: NodeId) => {
-      domApi.removeNode(nodeId);
+      domApi.update((draft) => appDom.removeNode(draft, nodeId));
+
       handleEditStateDialogClose();
     },
     [domApi, handleEditStateDialogClose],

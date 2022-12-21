@@ -23,11 +23,14 @@ function getType(value: unknown) {
 
 type PropValueType = ReturnType<typeof getType>;
 
-function getLabel(value: unknown, type: PropValueType): string {
+function getLabel(value: unknown, type: PropValueType, open: boolean): string {
   switch (type) {
     case 'array': {
       const length: number = (value as unknown[]).length;
-      return `Array (${length} ${length === 1 ? 'item' : 'items'})`;
+      if (open) {
+        return `Array (${length} ${length === 1 ? 'item' : 'items'})`;
+      }
+      return length > 0 ? '[…]' : '[]';
     }
     case 'null':
       return 'null';
@@ -36,8 +39,11 @@ function getLabel(value: unknown, type: PropValueType): string {
     case 'function':
       return `f ${(value as Function).name}()`;
     case 'object': {
-      const keys = Object.keys(value as object).length;
-      return `Object (${keys} ${keys === 1 ? 'key' : 'keys'})`;
+      const keyCount = Object.keys(value as object).length;
+      if (open) {
+        return `Object (${keyCount} ${keyCount === 1 ? 'key' : 'keys'})`;
+      }
+      return keyCount > 0 ? '{…}' : '{}';
     }
     case 'string':
       return `"${value}"`;
@@ -135,14 +141,10 @@ interface PropertyValueProps {
   value: unknown;
 }
 
-function PropertyValue({ open, type, value }: PropertyValueProps) {
-  if (!open && type === 'object') {
-    return <span className={clsx(classes.token, 'comment')}>{'{…}'}</span>;
-  }
-  if (!open && type === 'array') {
-    return <span className={clsx(classes.token, 'comment')}>{'[…]'}</span>;
-  }
-  return <span className={clsx(classes.token, getTokenType(type))}>{getLabel(value, type)}</span>;
+function PropertyValue({ open = false, type, value }: PropertyValueProps) {
+  return (
+    <span className={clsx(classes.token, getTokenType(type))}>{getLabel(value, type, open)}</span>
+  );
 }
 
 interface TreeItemIconProps {
@@ -212,32 +214,32 @@ function useDimensions<E extends HTMLElement>(): [
 }
 
 export interface MuiObjectInspectorProps {
+  name?: string;
   data?: unknown;
   expandPaths?: string[];
 }
 
-export default function MuiObjectInspector(props: MuiObjectInspectorProps) {
-  const { data = {}, expandPaths } = props;
-
+export default function MuiObjectInspector({
+  name = '',
+  data = {},
+  expandPaths,
+}: MuiObjectInspectorProps) {
   const initialOpenState = React.useMemo(
     () => (expandPaths ? Object.fromEntries(expandPaths.map((path) => [path, true])) : undefined),
     [expandPaths],
   );
 
   const treeData: ObjectTreePropertyNode[] = React.useMemo(
-    () =>
-      data && typeof data === 'object'
-        ? [
-            {
-              name: '',
-              id: '$ROOT',
-              type: getType(data),
-              value: data,
-              children: createTreeData(data),
-            },
-          ]
-        : [{ name: '', id: '$ROOT', type: getType(data), value: data }],
-    [data],
+    () => [
+      {
+        name,
+        id: '$ROOT',
+        type: getType(data),
+        value: data,
+        children: data && typeof data === 'object' ? createTreeData(data) : undefined,
+      },
+    ],
+    [data, name],
   );
 
   const [rootRef, dimensions] = useDimensions<HTMLDivElement>();

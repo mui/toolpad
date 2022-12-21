@@ -32,7 +32,7 @@ import LoadingButton from '@mui/lab/LoadingButton';
 import ViewListIcon from '@mui/icons-material/ViewList';
 import GridViewIcon from '@mui/icons-material/GridView';
 import invariant from 'invariant';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import client from '../../api';
 import DialogForm from '../../components/DialogForm';
 import type { Deployment } from '../../../prisma/generated/client';
@@ -83,14 +83,70 @@ export const APP_TEMPLATE_OPTIONS: Map<
   ],
 ]);
 
+export interface SurveyDialogProps {
+  open: boolean;
+  onClose?: () => void;
+  loading: boolean;
+}
+
+function SurveyDialog({ onClose, open, loading, ...props }: SurveyDialogProps) {
+  return (
+    <Dialog
+      {...props}
+      open={open}
+      onClose={onClose}
+      sx={{ maxWidth: '700px', margin: '0 auto' }}
+      maxWidth={false}
+    >
+      <DialogForm onSubmit={() => {}}>
+        <DialogTitle>You feedback is really valuable!</DialogTitle>
+        <DialogContent>
+          <Typography variant="body2" sx={{ mb: 5 }}>
+            We are really happy to see you exploring Toolpad! You can help us improve it by taking 2
+            minutes to fill out the questionnaire below. Feel free to skip it by the clicking the
+            button at the bottom.
+          </Typography>
+
+          <iframe
+            title="Survey"
+            src="https://docs.google.com/forms/d/e/1FAIpQLSfM2NSUkBcMoAZgQnpl5l1Whv1RSw_OXFrxEeSmNpi9Tnh7YQ/viewform?embedded=true"
+            width="600"
+            height="500"
+            frameBorder="0"
+          >
+            Loading…
+          </iframe>
+        </DialogContent>
+        <DialogActions>
+          <LoadingButton
+            fullWidth
+            variant="contained"
+            type="submit"
+            onClick={onClose}
+            loading={loading}
+          >
+            Continue to the app
+          </LoadingButton>
+        </DialogActions>
+      </DialogForm>
+    </Dialog>
+  );
+}
+
 const NO_OP = () => {};
 
 export interface CreateAppDialogProps {
   open: boolean;
   onClose?: () => void;
+  onContinueToExistingApp: (appId: string) => void;
 }
 
-function CreateAppDialog({ onClose, open, ...props }: CreateAppDialogProps) {
+function CreateAppDialog({
+  onClose,
+  open,
+  onContinueToExistingApp,
+  ...props
+}: CreateAppDialogProps) {
   const [name, setName] = React.useState('');
   const [appTemplateId, setAppTemplateId] = React.useState<AppTemplateId>('default');
   const [dom, setDom] = React.useState('');
@@ -105,7 +161,6 @@ function CreateAppDialog({ onClose, open, ...props }: CreateAppDialogProps) {
   }, [open]);
 
   const [isNavigatingToNewApp, setIsNavigatingToNewApp] = React.useState(false);
-  const [isNavigatingToExistingApp, setIsNavigatingToExistingApp] = React.useState(false);
 
   const handleAppTemplateChange = React.useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -126,9 +181,8 @@ function CreateAppDialog({ onClose, open, ...props }: CreateAppDialogProps) {
     },
   });
 
-  const handleContinueButtonClick = React.useCallback(() => {
-    setIsNavigatingToExistingApp(true);
-  }, []);
+  const navigate = useNavigate();
+  const [surveySeen, setSurveySeen] = useLocalStorageState<boolean>('toolpad-survey-seen', false);
 
   const [latestCreatedApp, setLatestCreatedApp] = useLocalStorageState<StoredLatestCreatedApp>(
     TOOLPAD_LATEST_CREATED_APP_KEY,
@@ -144,8 +198,23 @@ function CreateAppDialog({ onClose, open, ...props }: CreateAppDialogProps) {
 
   const isFormValid = config.isDemo ? true : !!name;
 
-  const isSubmitting =
-    createAppMutation.isLoading || isNavigatingToNewApp || isNavigatingToExistingApp;
+  const isSubmitting = createAppMutation.isLoading || isNavigatingToNewApp;
+
+  const handleContinueButtonClick = React.useCallback(() => {
+    // setIsNavigatingToExistingApp(true);
+    if (!firstLatestCreatedApp) {
+      return;
+    }
+
+    if (!surveySeen) {
+      onContinueToExistingApp(firstLatestCreatedApp.appId);
+      setSurveySeen(true);
+
+      return;
+    }
+
+    navigate(`/app/${firstLatestCreatedApp.appId}`);
+  }, [firstLatestCreatedApp, onContinueToExistingApp, surveySeen, navigate]);
 
   const handleSubmit = React.useCallback(
     async (event: React.FormEvent<HTMLFormElement>) => {
@@ -283,10 +352,7 @@ function CreateAppDialog({ onClose, open, ...props }: CreateAppDialogProps) {
               <LoadingButton
                 variant="outlined"
                 size="medium"
-                component={Link}
-                to={`/app/${firstLatestCreatedApp.appId}`}
                 sx={{ mt: 0.5, mb: 1 }}
-                loading={isNavigatingToExistingApp}
                 onClick={handleContinueButtonClick}
                 disabled={isSubmitting}
               >
@@ -578,9 +644,27 @@ function AppsListView({ loading, apps, activeDeploymentsByApp, existingAppNames 
 }
 
 function DemoPage() {
+  const navigate = useNavigate();
+  const [appToContinue, setAppToContinue] = React.useState<null | string>(null);
+  const [navigating, setNavigating] = React.useState(false);
+  const handleSurveyClose = () => {
+    invariant(appToContinue, 'App to continue must be defined');
+
+    setNavigating(true);
+
+    navigate(`/app/${appToContinue}`);
+  };
+
   return (
     <ToolpadShell>
-      <CreateAppDialog open />
+      <CreateAppDialog open onContinueToExistingApp={(appId) => setAppToContinue(appId)} />
+      {config.isDemo ? (
+        <SurveyDialog
+          open={Boolean(appToContinue)}
+          loading={navigating}
+          onClose={handleSurveyClose}
+        />
+      ) : null}
     </ToolpadShell>
   );
 }

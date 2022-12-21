@@ -221,7 +221,6 @@ export type GlobalScopeMetaField = {
   description?: string;
   deprecated?: boolean | string;
   tsType?: string;
-  value?: any;
 } & (
   | {
       kind?: undefined;

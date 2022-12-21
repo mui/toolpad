@@ -307,6 +307,7 @@ export default function QueryNodeEditorDialog<Q>({
                 onChange={setInput}
                 onCommit={handleCommit}
                 globalScope={pageState}
+                globalScopeMeta={globalScopeMeta}
               />
             </Box>
             <Stack direction="row" alignItems="center" sx={{ pt: 2, px: 3, gap: 2 }}>

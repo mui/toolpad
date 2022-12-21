@@ -13,6 +13,7 @@ import {
 } from '@mui/material';
 import { TabContext } from '@mui/lab';
 import { BindableAttrValue, LiveBinding } from '@mui/toolpad-core';
+import { GlobalScopeMeta } from '@mui/toolpad-core/dist/types';
 import { Body, RawBody, UrlEncodedBody } from './types';
 import { Maybe, WithControlledProp } from '../../utils/types';
 import {
@@ -25,7 +26,6 @@ import * as appDom from '../../appDom';
 import TabPanel from '../../components/TabPanel';
 import ParametersEditor from '../../toolpad/AppEditor/PageEditor/ParametersEditor';
 import { HTTP_NO_BODY } from './shared';
-import { metaFrom } from '../../toolpad/AppEditor/BindingEditor';
 
 interface ContentTypeSpec {
   alias: string;
@@ -66,6 +66,7 @@ const MonacoEditor = lazyComponent(() => import('../../components/MonacoEditor')
 });
 
 interface BodyTypeEditorProps<B = Body> extends WithControlledProp<Maybe<B>> {
+  globalScopeMeta: GlobalScopeMeta;
   globalScope: Record<string, any>;
   renderToolbar: RenderBodyToolbar;
   disabled?: boolean;
@@ -76,6 +77,7 @@ function RawBodyEditor({
   value: valueProp,
   onChange,
   globalScope,
+  globalScopeMeta,
   disabled,
 }: BodyTypeEditorProps<RawBody>) {
   const value: RawBody = React.useMemo(
@@ -111,8 +113,6 @@ function RawBodyEditor({
   });
 
   const { language = 'plaintext' } = RAW_CONTENT_TYPES.get(value.contentType.value) ?? {};
-
-  const globalScopeMeta = React.useMemo(() => metaFrom(globalScope), [globalScope]);
 
   return (
     <React.Fragment>
@@ -163,6 +163,7 @@ function UrlEncodedBodyEditor({
   value: valueProp,
   onChange,
   globalScope,
+  globalScopeMeta,
   disabled,
 }: BodyTypeEditorProps<UrlEncodedBody>) {
   const value: UrlEncodedBody = React.useMemo(
@@ -196,6 +197,7 @@ function UrlEncodedBodyEditor({
         value={value.content}
         onChange={handleParamsChange}
         globalScope={globalScope}
+        globalScopeMeta={globalScopeMeta}
         liveValue={liveContent}
         disabled={disabled}
       />
@@ -206,6 +208,7 @@ function UrlEncodedBodyEditor({
 type BodyKind = Body['kind'];
 
 export interface BodyEditorProps extends WithControlledProp<Maybe<Body>> {
+  globalScopeMeta: GlobalScopeMeta;
   globalScope: Record<string, any>;
   sx?: SxProps;
   method?: string;
@@ -213,6 +216,7 @@ export interface BodyEditorProps extends WithControlledProp<Maybe<Body>> {
 
 export default function BodyEditor({
   globalScope,
+  globalScopeMeta,
   value,
   onChange,
   sx,
@@ -255,6 +259,7 @@ export default function BodyEditor({
           <RawBodyEditor
             renderToolbar={renderToolbar}
             globalScope={globalScope}
+            globalScopeMeta={globalScopeMeta}
             value={value?.kind === 'raw' ? (value as RawBody) : null}
             onChange={onChange}
             disabled={disabled}
@@ -264,6 +269,7 @@ export default function BodyEditor({
           <UrlEncodedBodyEditor
             renderToolbar={renderToolbar}
             globalScope={globalScope}
+            globalScopeMeta={globalScopeMeta}
             value={value?.kind === 'urlEncoded' ? (value as UrlEncodedBody) : null}
             onChange={onChange}
             disabled={disabled}

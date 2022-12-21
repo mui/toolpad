@@ -50,7 +50,7 @@ import TabPanel from '../../components/TabPanel';
 interface BindingEditorContext {
   label: string;
   globalScope: Record<string, unknown>;
-  globalScopeMeta?: GlobalScopeMeta;
+  globalScopeMeta: GlobalScopeMeta;
   /**
    * Serverside binding, use the QuickJs runtime to evaluate bindings
    */
@@ -58,27 +58,6 @@ interface BindingEditorContext {
   disabled?: boolean;
   propType?: PropValueType;
   liveBinding?: LiveBinding;
-}
-
-export function metaFrom(
-  globalScope: Record<string, unknown>,
-  meta: GlobalScopeMeta = {},
-): GlobalScopeMeta {
-  const keys = new Set([...Object.keys(globalScope), ...Object.keys(meta)]);
-  return Object.fromEntries<GlobalScopeMetaField>(
-    Array.from(keys, (key) => {
-      const value = globalScope[key];
-      const existingMeta = meta[key];
-
-      return [
-        key,
-        {
-          ...existingMeta,
-          value,
-        },
-      ];
-    }),
-  );
 }
 
 const [useBindingEditorContext, BindingEditorContextProvider] =
@@ -93,11 +72,13 @@ const ErrorTooltip = styled(({ className, ...props }: TooltipProps) => (
 }));
 
 interface JsExpressionBindingEditorProps extends WithControlledProp<JsExpressionAttrValue | null> {
+  globalScope: Record<string, unknown>;
   globalScopeMeta: GlobalScopeMeta;
 }
 
 function JsExpressionBindingEditor({
-  globalScopeMeta = {},
+  globalScope,
+  globalScopeMeta,
   value,
   onChange,
 }: JsExpressionBindingEditorProps) {
@@ -108,6 +89,7 @@ function JsExpressionBindingEditor({
 
   return (
     <JsExpressionEditor
+      globalScope={globalScope}
       globalScopeMeta={globalScopeMeta}
       value={value?.type === 'jsExpression' ? value.value : ''}
       onChange={handleChange}
@@ -144,14 +126,9 @@ export interface JsBindingEditorProps extends WithControlledProp<JsExpressionAtt
 export function JsBindingEditor({ value, onChange }: JsBindingEditorProps) {
   const { label, globalScope, globalScopeMeta = {}, server, propType } = useBindingEditorContext();
 
-  const scopeMeta = React.useMemo(
-    () => metaFrom(globalScope, globalScopeMeta),
-    [globalScope, globalScopeMeta],
-  );
-
   return (
     <Stack direction="row" sx={{ height: 400, gap: 2 }}>
-      <GlobalScopeExplorer sx={{ width: 250 }} meta={scopeMeta} />
+      <GlobalScopeExplorer sx={{ width: 250 }} value={globalScope} meta={globalScopeMeta} />
 
       <Box
         sx={{
@@ -168,6 +145,7 @@ export function JsBindingEditor({ value, onChange }: JsBindingEditorProps) {
         </Typography>
 
         <JsExpressionBindingEditor
+          globalScope={globalScope}
           globalScopeMeta={globalScopeMeta}
           value={value}
           onChange={onChange}
@@ -189,11 +167,6 @@ function JsExpressionActionEditor({ value, onChange }: JsExpressionActionEditorP
     [onChange],
   );
 
-  const scopeMeta = React.useMemo(
-    () => metaFrom(globalScope, globalScopeMeta),
-    [globalScope, globalScopeMeta],
-  );
-
   return (
     <Box sx={{ my: 1 }}>
       <Typography>Run code when this event fires</Typography>
@@ -207,11 +180,12 @@ function JsExpressionActionEditor({ value, onChange }: JsExpressionActionEditorP
           gap: 2,
         }}
       >
-        <GlobalScopeExplorer sx={{ width: 250 }} meta={scopeMeta} />
+        <GlobalScopeExplorer sx={{ width: 250 }} value={globalScope} meta={globalScopeMeta} />
 
         <JsExpressionEditor
           sx={{ flex: 1 }}
-          globalScopeMeta={scopeMeta}
+          globalScope={globalScope}
+          globalScopeMeta={globalScopeMeta}
           value={value?.value || ''}
           onChange={handleCodeChange}
           functionBody
@@ -454,18 +428,14 @@ export function BindingEditor<V>({
     const meta: GlobalScopeMeta = { ...globalScopeMeta };
     if (propType?.type === 'event' && propType.arguments) {
       for (const { name, tsType } of propType.arguments) {
-        meta[name] ??= {};
-        meta[name].tsType = tsType;
+        const metaField: GlobalScopeMetaField = meta[name] ?? {};
+        metaField.tsType = tsType;
+        meta[name] = metaField;
       }
     }
 
-    for (const [name, globalValue] of Object.entries(globalScope)) {
-      meta[name] ??= {};
-      meta[name].value = globalValue;
-    }
-
     return meta;
-  }, [propType, globalScopeMeta, globalScope]);
+  }, [propType, globalScopeMeta]);
 
   const bindingEditorContext: BindingEditorContext = React.useMemo(
     () => ({

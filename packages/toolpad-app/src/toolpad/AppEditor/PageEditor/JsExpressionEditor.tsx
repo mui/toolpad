@@ -17,6 +17,7 @@ const JsExpressionEditorRoot = styled('div')(({ theme }) => ({
 }));
 
 export interface JsExpressionEditorProps extends WithControlledProp<string> {
+  globalScope: Record<string, unknown>;
   globalScopeMeta: GlobalScopeMeta;
   disabled?: boolean;
   autoFocus?: boolean;
@@ -30,6 +31,7 @@ export interface JsExpressionEditorProps extends WithControlledProp<string> {
 export function JsExpressionEditor({
   value,
   onChange,
+  globalScope,
   globalScopeMeta,
   disabled,
   autoFocus,
@@ -44,9 +46,6 @@ export function JsExpressionEditor({
   const nodeName = element?.name;
 
   const extraLibs = React.useMemo(() => {
-    const globalScope = Object.fromEntries(
-      Object.entries(globalScopeMeta).map(([key, field]) => [key, field?.value]),
-    );
     const generatedTypes = jsonToTs(globalScope);
 
     const globalDeclarations = Object.entries(globalScopeMeta).map(([key, metaData = {}]) => {
@@ -82,7 +81,7 @@ export function JsExpressionEditor({
     `;
 
     return [{ content, filePath: 'global.d.ts' }];
-  }, [globalScopeMeta, nodeName]);
+  }, [globalScope, globalScopeMeta, nodeName]);
 
   return (
     <JsExpressionEditorRoot sx={sx}>

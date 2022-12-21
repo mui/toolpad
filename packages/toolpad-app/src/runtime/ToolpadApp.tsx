@@ -739,10 +739,6 @@ function parseBindings(
   const urlParams = new URLSearchParams(location.search);
   const pageParameters = page.attributes.parameters?.value || [];
 
-  globalScopeMeta.page = {
-    kind: 'page',
-  };
-
   for (const [paramName, paramDefault] of pageParameters) {
     const bindingId = `${page.id}.parameters.${paramName}`;
     const scopePath = `page.parameters.${paramName}`;

@@ -230,10 +230,7 @@ export type GlobalScopeMetaField = {
       componentId: string;
     }
   | {
-      kind: 'query';
-    }
-  | {
-      kind: 'page';
+      kind: 'query' | 'local';
     }
 );
 

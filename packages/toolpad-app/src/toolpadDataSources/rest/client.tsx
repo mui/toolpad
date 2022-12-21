@@ -360,11 +360,14 @@ function QueryEditor({
     [paramsEditorLiveValue],
   );
 
-  const queryScope = {
-    // TODO mark query as @deprecated remove after v1
-    query: previewParams,
-    parameters: previewParams,
-  };
+  const queryScope = React.useMemo(
+    () => ({
+      // TODO mark query as @deprecated remove after v1
+      query: previewParams,
+      parameters: previewParams,
+    }),
+    [previewParams],
+  );
 
   const liveUrl: LiveBinding = useEvaluateLiveBinding({
     server: true,

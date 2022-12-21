@@ -203,7 +203,7 @@ export type NumberFormat =
 export interface SerializableGridColumn
   extends Pick<GridColDef, 'field' | 'type' | 'align' | 'width' | 'headerName'> {
   numberFormat?: NumberFormat;
-  customComponent?: string;
+  codeComponent?: string;
 }
 
 export type SerializableGridColumns = SerializableGridColumn[];
@@ -299,11 +299,11 @@ const DataGridComponent = React.forwardRef(function DataGridComponent(
   const columnTypes = React.useMemo(
     () => ({
       ...CUSTOM_COLUMN_TYPES,
-      customComponent: {
+      codeComponent: {
         renderCell: ({ value, colDef }: GridRenderCellParams) => {
           const column = colDef as SerializableGridColumn;
 
-          const Component = __toolpadComponents[`codeComponent.${column.customComponent}`];
+          const Component = __toolpadComponents[`codeComponent.${column.codeComponent}`];
 
           if (!Component) {
             return (

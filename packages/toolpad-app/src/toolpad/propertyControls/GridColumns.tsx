@@ -44,7 +44,7 @@ const COLUMN_TYPES: string[] = [
   'boolean',
   'link',
   'image',
-  'customComponent',
+  'codeComponent',
 ];
 const ALIGNMENTS: GridAlignment[] = ['left', 'right', 'center'];
 
@@ -75,7 +75,7 @@ function GridColumnsPropEditor({
   const [editedIndex, setEditedIndex] = React.useState<number | null>(null);
   const { dom } = useDom();
   const toolpadComponents = useToolpadComponents(dom);
-  const customComponents = React.useMemo(() => {
+  const codeComponents = React.useMemo(() => {
     const entries = Object.entries(toolpadComponents);
 
     return entries
@@ -323,21 +323,21 @@ function GridColumnsPropEditor({
                     handleColumnChange({ ...editedColumn, width: Number(event.target.value) })
                   }
                 />
-                {editedColumn.type === 'customComponent' ? (
+                {editedColumn.type === 'codeComponent' ? (
                   <TextField
                     select
                     fullWidth
                     label="Custom component"
-                    value={editedColumn.customComponent ?? ''}
+                    value={editedColumn.codeComponent ?? ''}
                     disabled={disabled}
                     onChange={(event) =>
                       handleColumnChange({
                         ...editedColumn,
-                        customComponent: event.target.value,
+                        codeComponent: event.target.value,
                       })
                     }
                   >
-                    {customComponents.map(({ displayName, codeComponentId }) => (
+                    {codeComponents.map(({ displayName, codeComponentId }) => (
                       <MenuItem key={displayName} value={codeComponentId}>
                         {displayName}
                       </MenuItem>

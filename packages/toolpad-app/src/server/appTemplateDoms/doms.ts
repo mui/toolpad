@@ -17,9 +17,8 @@ const appTemplates: Record<AppTemplateId, () => Promise<appDom.AppDom | null>> =
     getAppTemplateDomFromPath(config.isDemo ? './images-demo.json' : './images.json'),
   default: async () => {
     const template = await getAppTemplateDomFromPath('./default.json');
-    (
-      template.nodes['1313wn3' as NodeId] as appDom.QueryNode
-    ).attributes.query.value.url.value = `${config.externalUrl}/static/employees.json`;
+    (template.nodes['1313wn3' as NodeId] as appDom.QueryNode).attributes.query.value.url.value =
+      new URL('/static/employees.json', config.externalUrl).href;
     return template;
   },
 };

@@ -211,7 +211,7 @@ function CreateAppDialog({
     }
 
     navigate(`/app/${firstLatestCreatedApp.appId}`);
-  }, [firstLatestCreatedApp, onContinueToExistingApp, surveySeen, navigate]);
+  }, [firstLatestCreatedApp, onContinueToExistingApp, surveySeen, setSurveySeen, navigate]);
 
   const recaptchaSubmitEnabled =
     config.recaptchaV2SiteKey || config.recaptchaV3SiteKey

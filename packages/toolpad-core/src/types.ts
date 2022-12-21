@@ -217,23 +217,25 @@ export interface LiveBinding {
   error?: LiveBindingError;
 }
 
-export type RuntimeEvent =
-  | {
-      type: 'propUpdated';
-      nodeId: string;
-      prop: string;
-      value: React.SetStateAction<unknown>;
-    }
-  | {
-      type: 'pageStateUpdated';
-      pageState: Record<string, unknown>;
-    }
-  | {
-      type: 'pageBindingsUpdated';
-      bindings: LiveBindings;
-    }
-  | { type: 'screenUpdate' }
-  | { type: 'pageNavigationRequest'; pageNodeId: NodeId };
+export type RuntimeEvents = {
+  propUpdated: {
+    nodeId: string;
+    prop: string;
+    value: React.SetStateAction<unknown>;
+  };
+  pageStateUpdated: {
+    pageState: Record<string, unknown>;
+  };
+  pageBindingsUpdated: {
+    bindings: LiveBindings;
+  };
+  screenUpdate: {};
+  pageNavigationRequest: { pageNodeId: NodeId };
+};
+
+export type RuntimeEvent = {
+  [K in keyof RuntimeEvents]: { type: K } & RuntimeEvents[K];
+}[keyof RuntimeEvents];
 
 export interface ComponentConfig<P extends object = {}> {
   /**

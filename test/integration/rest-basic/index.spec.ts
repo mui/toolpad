@@ -17,14 +17,6 @@ if (customHttbinBaseUrl) {
 const HTTPBIN_SOURCE_URL = 'https://httpbin.org/';
 const HTTPBIN_TARGET_URL = customHttbinBaseUrl || HTTPBIN_SOURCE_URL;
 
-test.use({
-  ignoreConsoleErrors: [
-    // For some reason this shows error in chrome in CI only
-    // Needs to be investigated
-    /Invariant Violation: canvas ref not attached/,
-  ],
-});
-
 test('rest basics', async ({ page, browserName, api }) => {
   const dom = await readJsonFile(path.resolve(__dirname, './restDom.json'), (key, value) => {
     if (typeof value === 'string') {

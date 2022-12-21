@@ -25,16 +25,20 @@ type PropValueType = ReturnType<typeof getType>;
 
 function getLabel(value: unknown, type: PropValueType): string {
   switch (type) {
-    case 'array':
-      return `Array(${(value as unknown[]).length})`;
+    case 'array': {
+      const length: number = (value as unknown[]).length;
+      return `Array (${length} ${length === 1 ? 'item' : 'items'})`;
+    }
     case 'null':
       return 'null';
     case 'undefined':
       return 'undefined';
     case 'function':
       return `f ${(value as Function).name}()`;
-    case 'object':
-      return 'Object';
+    case 'object': {
+      const keys = Object.keys(value as object).length;
+      return `Object (${keys} ${keys === 1 ? 'key' : 'keys'})`;
+    }
     case 'string':
       return `"${value}"`;
     case 'symbol':
@@ -220,11 +224,19 @@ export default function MuiObjectInspector(props: MuiObjectInspectorProps) {
     [expandPaths],
   );
 
-  const initalData: ObjectTreePropertyNode[] = React.useMemo(
+  const treeData: ObjectTreePropertyNode[] = React.useMemo(
     () =>
       data && typeof data === 'object'
-        ? createTreeData(data)
-        : [{ name: '', id: '$ROOT', value: data, type: getType(data) }],
+        ? [
+            {
+              name: '',
+              id: '$ROOT',
+              type: getType(data),
+              value: data,
+              children: createTreeData(data),
+            },
+          ]
+        : [{ name: '', id: '$ROOT', type: getType(data), value: data }],
     [data],
   );
 
@@ -236,7 +248,7 @@ export default function MuiObjectInspector(props: MuiObjectInspectorProps) {
         indent={8}
         disableDrag
         disableDrop
-        initialData={initalData}
+        data={treeData}
         initialOpenState={initialOpenState}
         width={dimensions.width}
         height={dimensions.height}

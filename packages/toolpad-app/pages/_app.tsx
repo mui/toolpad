@@ -1,19 +1,18 @@
 import * as React from 'react';
 import Head from 'next/head';
-import Script from 'next/script';
 import App, { AppContext, AppProps, NextWebVitalsMetric } from 'next/app';
 import CssBaseline from '@mui/material/CssBaseline';
 import { CacheProvider, EmotionCache } from '@emotion/react';
 import { QueryClientProvider } from '@tanstack/react-query';
 import { LicenseInfo } from '@mui/x-data-grid-pro';
 import { useRouter } from 'next/router';
-import config from '../src/config';
 import { ThemeProvider } from '../src/ThemeContext';
 import createEmotionCache from '../src/createEmotionCache';
 import { MUI_X_PRO_LICENSE } from '../src/constants';
 import { queryClient } from '../src/api';
 import { reportWebVitalsToGA, setGAPage } from '../src/utils/ga';
 import '../src/appStyles.css';
+import 'perf-cascade/dist/perf-cascade.css';
 
 import appleTouchIcon from '../public/apple-touch-icon.png';
 import favicon32 from '../public/favicon-32x32.png';
@@ -48,32 +47,22 @@ export default function MyApp(props: MyAppProps) {
   }, [router.events]);
 
   return (
-    <React.Fragment>
-      <CacheProvider value={emotionCache}>
-        <Head>
-          <title>My page</title>
-          <meta name="viewport" content="initial-scale=1, width=device-width" />
-          <link rel="apple-touch-icon" sizes="180x180" href={appleTouchIcon.src} />
-          <link rel="icon" type="image/png" sizes="32x32" href={favicon32.src} />
-          <link rel="icon" type="image/png" sizes="16x16" href={favicon16.src} />
-        </Head>
-        <QueryClientProvider client={queryClient}>
-          <ThemeProvider>
-            {/* CssBaseline kickstart an elegant, consistent, and simple baseline to build upon. */}
-            <CssBaseline />
-            <Component {...pageProps} />
-          </ThemeProvider>
-        </QueryClientProvider>
-      </CacheProvider>
-      {/* Google reCAPTCHA */}
-      {config.recaptchaSiteKey ? (
-        <Script
-          async
-          strategy="afterInteractive"
-          src={`https://www.google.com/recaptcha/api.js?render=${config.recaptchaSiteKey}`}
-        />
-      ) : null}
-    </React.Fragment>
+    <CacheProvider value={emotionCache}>
+      <Head>
+        <title>My page</title>
+        <meta name="viewport" content="initial-scale=1, width=device-width" />
+        <link rel="apple-touch-icon" sizes="180x180" href={appleTouchIcon.src} />
+        <link rel="icon" type="image/png" sizes="32x32" href={favicon32.src} />
+        <link rel="icon" type="image/png" sizes="16x16" href={favicon16.src} />
+      </Head>
+      <QueryClientProvider client={queryClient}>
+        <ThemeProvider>
+          {/* CssBaseline kickstart an elegant, consistent, and simple baseline to build upon. */}
+          <CssBaseline />
+          <Component {...pageProps} />
+        </ThemeProvider>
+      </QueryClientProvider>
+    </CacheProvider>
   );
 }
 

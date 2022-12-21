@@ -1,5 +1,109 @@
 # Changelog
 
+## 0.0.31
+
+<!-- generated comparing v0.0.30..master -->
+
+_Dec 14, 2022_
+
+A big thanks to the 5 contributors who made this release possible. Here are some highlights ✨:
+
+Add a new Text component that subsumes Typography and Link, and allows support for Markdown. Allow support for dynamic templates, and fix a bug around the default value of components.
+
+- &#8203;<!-- 11 -->Add Text component to merge Typography, Markdown, Link (#1298) @bharatkashyap
+- &#8203;<!-- 10 -->Document and cleanup of utility functions (#1442) @Janpot
+- &#8203;<!-- 09 -->Revert react-router-dom to 6.3 (#1444) @Janpot
+- &#8203;<!-- 08 -->Update README.md @prakhargupta1
+- &#8203;<!-- 07 -->Fix yarnlock (#1443) @bytasv
+- &#8203;<!-- 06 -->Add roadmap to the docs (#1424) @bytasv
+- &#8203;<!-- 05 -->Landing page tweaks (#1433) @bharatkashyap
+- &#8203;<!-- 04 -->Fix controlled value reset when default value changes (#1434) @bytasv
+- &#8203;<!-- 03 -->Add integration test for default template (#1429) @bharatkashyap
+- &#8203;<!-- 02 -->Support dynamic app templates (#1430) @apedroferreira
+- &#8203;<!-- 01 -->Fix changelog @Janpot
+
+All contributors of this release in alphabetical order: @apedroferreira, @bharatkashyap, @bytasv, @Janpot, @prakhargupta1
+
+✨ Done in 1.75s.
+
+## 0.0.30
+
+<!-- generated comparing v0.0.29..master -->
+
+_Dec 7, 2022_
+
+A big thanks to the 3 contributors who made this release possible. Here are some highlights ✨:
+
+Release the demo version, update app duplication UX.
+
+- &#8203;<!-- 13 -->Revert accidental react-router-dom update (#1426) @Janpot
+- &#8203;<!-- 12 -->Add demo link to the docs (#1319) @bharatkashyap
+- &#8203;<!-- 11 -->Add Demo link to landing page (#1228) @bharatkashyap
+- &#8203;<!-- 10 -->Add a Default app template (#1381) @bharatkashyap
+- &#8203;<!-- 09 -->Remove stats template (#1418) @apedroferreira
+- &#8203;<!-- 08 -->Propose solution for flaky undo test (#1415) @Janpot
+- &#8203;<!-- 07 -->Update dependencies (#1403) @Janpot
+- &#8203;<!-- 06 -->Move to next.config.mjs (#1404) @Janpot
+- &#8203;<!-- 05 -->Add note about missing connections to demo footer (#1406) @apedroferreira
+- &#8203;<!-- 04 -->Try out transpilePackages on latest next (#1362) @Janpot
+- &#8203;<!-- 03 -->Don't immediately open duplicated apps (#1397) @Janpot
+- &#8203;<!-- 02 -->Make sure EditableText updates when underlying string changes (#1400) @Janpot
+- &#8203;<!-- 01 -->Undoable/redoable node selection (#1394) @apedroferreira
+
+All contributors of this release in alphabetical order: @apedroferreira, @bharatkashyap, @Janpot
+
+## 0.0.29
+
+<!-- generated comparing v0.0.28..master -->
+
+_Nov 30, 2022_
+
+A big thanks to the 4 contributors who made this release possible. Here are some highlights ✨:
+
+Improved query options in demo, fixed time property in HAR, unified app editor options menus
+
+- &#8203;<!-- 7 -->Undo redo tests (#1308) @bytasv
+- &#8203;<!-- 6 -->Hide connections tree in demo (#1393) @apedroferreira
+- &#8203;<!-- 5 -->Create apps programmatically in integration tests (#1384) @Janpot
+- &#8203;<!-- 4 -->Set connection/query available options in demo (#1323) @apedroferreira
+- &#8203;<!-- 3 -->Add some tips about writing highlights in release docs (#1352) @Janpot
+- &#8203;<!-- 2 -->Fix time property in HAR (#1383) @Janpot
+- &#8203;<!-- 1 -->Unify app editor options menus (#1286) @bharatkashyap
+
+All contributors of this release in alphabetical order: @apedroferreira, @bharatkashyap, @bytasv, @Janpot
+
+## 0.0.28
+
+<!-- generated comparing v0.0.27..master -->
+
+_Nov 23, 2022_
+
+A big thanks to the 4 contributors who made this release possible. Here are some highlights ✨:
+
+Client-side functions, migration fixes, add sidebar to overview page, support visual captcha as fallback, add "alpha" label to app and landing page, automatic app names in demo.
+
+- &#8203;<!-- 19 -->Fix landing page hydration issue (#1375) @bharatkashyap
+- &#8203;<!-- 18 -->Update demo bar copy (#1371) @apedroferreira
+- &#8203;<!-- 17 -->Fix overflow for explorer (#1372) @Janpot
+- &#8203;<!-- 16 -->Add "alpha" label to app and landing page hero (#1356) @bharatkashyap
+- &#8203;<!-- 15 -->Add missing sucrase helper (#1360) @Janpot
+- &#8203;<!-- 14 -->Remove demo docker (#1369) @apedroferreira
+- &#8203;<!-- 13 -->Remove demo configuration from render.yaml (#1368) @apedroferreira
+- &#8203;<!-- 12 -->Move typescript to devDependencies (#1366) @Janpot
+- &#8203;<!-- 11 -->Remove sentry debug option (#1361) @Janpot
+- &#8203;<!-- 10 -->Fix yarn.lock @Janpot
+- &#8203;<!-- 09 -->Upgrade eslint (#1287) @Janpot
+- &#8203;<!-- 08 -->Fallback to visible captcha if invisible captcha fails (#1272) @apedroferreira
+- &#8203;<!-- 07 -->Refactor overview page (#1357) @Janpot
+- &#8203;<!-- 06 -->Fix migration to v3 (#1359) @Janpot
+- &#8203;<!-- 05 -->Run functions client side (#1325) @Janpot
+- &#8203;<!-- 04 -->Show IP address in log messages (#1350) @apedroferreira
+- &#8203;<!-- 03 -->Fix prettier script in CI (#1355) @Janpot
+- &#8203;<!-- 02 -->Automatic app names in demo (#1351) @apedroferreira
+- &#8203;<!-- 01 -->[core] Group renovate GitHub Action dependency updates (#1341) @oliviertassinari
+
+All contributors of this release in alphabetical order: @apedroferreira, @bharatkashyap, @Janpot, @oliviertassinari
+
 ## 0.0.27
 
 <!-- generated comparing v0.0.26..master -->

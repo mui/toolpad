@@ -1,5 +1,5 @@
 import { NextApiRequest, NextApiResponse } from 'next';
-import type { RecaptchaResJson } from '../validateRecaptchaToken';
+import { errorFrom } from '../../utils/errors';
 
 function getReqLoggableIPAddress(req: NextApiRequest): string | null {
   const forwardedHeader = req.headers['x-forwarded-for'];
@@ -39,11 +39,12 @@ export function resSerializer(res: NextApiResponse) {
   };
 }
 
-export function recaptchaResSerializer(res: RecaptchaResJson) {
+export function errSerializer(rawError: unknown) {
+  const error = errorFrom(rawError);
   return {
-    success: res.success,
-    score: res.score,
-    action: res.action,
-    errorCodes: res['error-codes'],
+    message: error.message,
+    name: error.name,
+    stack: error.stack,
+    code: error.code,
   };
 }

@@ -1,11 +1,13 @@
 import * as React from 'react';
 import Box from '@mui/material/Box';
+import Button from '@mui/material/Button';
+import KeyboardArrowRightRounded from '@mui/icons-material/KeyboardArrowRightRounded';
+import Chip from '@mui/material/Chip';
 import Typography from '@mui/material/Typography';
 import IconImage from 'docs/src/components/icon/IconImage';
 import GradientText from 'docs/src/components/typography/GradientText';
 import SignUp from './SignUp';
 import ToolpadHeroContainer from '../../layouts/ToolpadHeroContainer';
-import DemoVideo from './DemoVideo';
 
 export default function Hero() {
   return (
@@ -27,9 +29,10 @@ export default function Hero() {
           }}
         >
           <IconImage name="product-toolpad" width="28" height="28" sx={{ mr: 1 }} />
-          <Box component="span" sx={{ mr: 2 }}>
+          <Box component="span" sx={{ mr: 1 }}>
             MUI Toolpad
           </Box>
+          <Chip label="Alpha" component="span" color="grey" size="small" />
         </Typography>
         <Typography variant="h1" sx={{ my: 2 }}>
           Low-code
@@ -40,10 +43,20 @@ export default function Hero() {
           Drag and drop pre-built components, connect to data sources and APIs, and build your
           internal tools 10x faster. Open-source and powered by MUI.
         </Typography>
+        <Button
+          size="large"
+          variant="contained"
+          href="https://demo.toolpad.io/"
+          target="_blank"
+          endIcon={<KeyboardArrowRightRounded />}
+          sx={{ width: { xs: '100%', sm: 'auto' }, mb: 3 }}
+        >
+          Try demo
+        </Button>
         <Typography
           component="label"
           color={(theme) => (theme.palette.mode === 'dark' ? '#fff' : `text.secondary`)}
-          sx={{ fontWeight: 'bold', display: 'block', mb: 2, mx: 'auto' }}
+          sx={{ fontWeight: 'bold', display: 'block', mb: 1, mx: 'auto' }}
           htmlFor="email-landing"
         >
           Sign up for early access to the beta release.
@@ -58,16 +71,6 @@ export default function Hero() {
             },
           }}
         />
-      </Box>
-      <Box
-        sx={{
-          display: 'flex',
-          flexDirection: 'row',
-          justifyContent: 'center',
-          mt: { xs: '20px', sm: '100px' },
-        }}
-      >
-        <DemoVideo />
       </Box>
     </ToolpadHeroContainer>
   );

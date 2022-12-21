@@ -10,18 +10,14 @@ import Link from 'docs/src/modules/components/Link';
 import KeyboardArrowRightRounded from '@mui/icons-material/KeyboardArrowRightRounded';
 
 export default function Banner(props) {
-  const { content } = props;
+  const { title, description, href, label, category, action, docs } = props;
   return (
-    <Box
-      sx={{
-        bgcolor: (theme) =>
-          theme.palette.mode === 'dark' ? theme.palette.primaryDark[900] : theme.palette.grey[50],
-      }}
-    >
+    <Box>
       <Container
         sx={{
           pt: 0,
-          pb: { xs: 2, sm: 8, md: 16 },
+          pb: { xs: 2, sm: 8, md: docs ? 1 : 16 },
+          px: docs ? { xs: 0, sm: 0, md: 0 } : 'default',
           display: 'flex',
           flexDirection: 'row',
           justifyContent: 'center',
@@ -30,7 +26,8 @@ export default function Banner(props) {
         <Stack
           sx={{
             borderRadius: 1,
-            p: 2,
+            px: 2,
+            py: docs ? 2.5 : 2,
             bgcolor: (theme) =>
               theme.palette.mode === 'dark'
                 ? alpha(theme.palette.primaryDark[900], 0.5)
@@ -50,32 +47,39 @@ export default function Banner(props) {
         >
           <div>
             <Typography fontWeight="bold" sx={{ mb: 0.5 }}>
-              {content.title}
+              {title}
             </Typography>
-            <Typography variant="body2" color="text.secondary" sx={{ maxWidth: 700 }}>
-              {content.description}
+            <Typography
+              variant={docs ? 'body1' : 'body2'}
+              color="text.secondary"
+              sx={{ maxWidth: 700 }}
+            >
+              {description}
             </Typography>
           </div>
           <Button
             component={Link}
             noLinkStyle
-            data-ga-event-category="ToolpadLanding"
-            data-ga-event-label={content.action.label}
-            data-ga-event-action="Upvote"
+            data-ga-event-category={category}
+            data-ga-event-label={label}
+            data-ga-event-action={action}
             target="_blank"
             rel="noopener"
-            href={content.action.href}
+            href={href}
             variant="contained"
             fullWidth
             endIcon={<KeyboardArrowRightRounded />}
             sx={{
               py: 1,
+              px: {
+                md: 2,
+              },
               ml: { xs: 0, sm: 2 },
               mt: { xs: 3, sm: 0 },
-              width: { xs: '100%', sm: '50%', md: '15%' },
+              width: { xs: '100%', sm: '50%', md: 'auto' },
             }}
           >
-            {content.action.label}
+            {label}
           </Button>
         </Stack>
       </Container>
@@ -84,12 +88,11 @@ export default function Banner(props) {
 }
 
 Banner.propTypes = {
-  content: PropTypes.shape({
-    action: PropTypes.shape({
-      href: PropTypes.string.isRequired,
-      label: PropTypes.string.isRequired,
-    }).isRequired,
-    description: PropTypes.string.isRequired,
-    title: PropTypes.string.isRequired,
-  }).isRequired,
+  action: PropTypes.string.isRequired,
+  category: PropTypes.string.isRequired,
+  description: PropTypes.string.isRequired,
+  docs: PropTypes.bool,
+  href: PropTypes.string.isRequired,
+  label: PropTypes.string.isRequired,
+  title: PropTypes.string,
 };

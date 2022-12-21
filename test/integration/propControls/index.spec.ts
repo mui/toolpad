@@ -1,18 +1,23 @@
-import { test, expect } from '@playwright/test';
-import { ToolpadHome } from '../../models/ToolpadHome';
+import * as path from 'path';
+import { test, expect } from '../../playwright/test';
 import { ToolpadEditor } from '../../models/ToolpadEditor';
 import clickCenter from '../../utils/clickCenter';
-import domInput from './domInput.json';
+import { readJsonFile } from '../../utils/fs';
+import generateId from '../../utils/generateId';
 
 test('can control component prop values in properties control panel', async ({
   page,
   browserName,
+  api,
 }) => {
-  const homeModel = new ToolpadHome(page);
+  const dom = await readJsonFile(path.resolve(__dirname, './domInput.json'));
+
+  const app = await api.mutation.createApp(`App ${generateId()}`, {
+    from: { kind: 'dom', dom },
+  });
+
   const editorModel = new ToolpadEditor(page, browserName);
 
-  await homeModel.goto();
-  const app = await homeModel.createApplication({ dom: domInput });
   await editorModel.goto(app.id);
 
   await editorModel.pageRoot.waitFor();
@@ -50,4 +55,39 @@ test('can control component prop values in properties control panel', async ({
   await labelControlInput.fill(TEST_VALUE_2);
 
   await inputByLabel.waitFor({ state: 'visible' });
+});
+
+test('changing defaultValue resets controlled value', async ({ page, browserName, api }) => {
+  const dom = await readJsonFile(path.resolve(__dirname, './defaultValueDom.json'));
+
+  const app = await api.mutation.createApp(`App ${generateId()}`, {
+    from: { kind: 'dom', dom },
+  });
+
+  const editorModel = new ToolpadEditor(page, browserName);
+  await editorModel.goto(app.id);
+
+  await editorModel.waitForOverlay();
+
+  const firstInput = editorModel.appCanvas.locator('input').nth(0);
+  const secondInput = editorModel.appCanvas.locator('input').nth(1);
+
+  await secondInput.focus();
+
+  await page.keyboard.type('Extra');
+
+  await expect(firstInput).toHaveValue('defaultTwoExtra');
+
+  await firstInput.focus();
+
+  await page.keyboard.type('Value');
+
+  await expect(firstInput).toHaveValue('defaultTwoExtraValue');
+
+  clickCenter(page, secondInput);
+
+  await editorModel.componentEditor.getByLabel('defaultValue').fill('New');
+
+  await expect(firstInput).toHaveValue('New');
+  await expect(secondInput).toHaveValue('New');
 });

@@ -29,7 +29,7 @@ export default function CreatePageDialog({
   onClose,
   ...props
 }: CreatePageDialogProps) {
-  const dom = useDom();
+  const { dom } = useDom();
   const domApi = useDomApi();
 
   const existingNames = React.useMemo(
@@ -69,7 +69,8 @@ export default function CreatePageDialog({
             },
           });
           const appNode = appDom.getApp(dom);
-          domApi.addNode(newNode, appNode, 'pages');
+
+          domApi.update((draft) => appDom.addNode(draft, newNode, appNode, 'pages'));
 
           onClose();
           navigate(`/app/${appId}/pages/${newNode.id}`);

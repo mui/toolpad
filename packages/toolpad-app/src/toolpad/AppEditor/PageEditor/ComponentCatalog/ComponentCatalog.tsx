@@ -48,7 +48,7 @@ export interface ComponentCatalogProps {
 export default function ComponentCatalog({ className }: ComponentCatalogProps) {
   const api = usePageEditorApi();
   const pageState = usePageEditorState();
-  const dom = useDom();
+  const { dom } = useDom();
 
   const [openStart, setOpenStart] = React.useState(0);
   const [openCustomComponents, setOpenCustomComponents] = useLocalStorageState(
@@ -89,7 +89,6 @@ export default function ComponentCatalog({ className }: ComponentCatalogProps) {
   const handleDragStart = (componentType: string) => (event: React.DragEvent<HTMLElement>) => {
     event.dataTransfer.dropEffect = 'copy';
     const newNode = appDom.createElement(dom, componentType, {});
-    api.deselect();
     api.newNodeDragStart(newNode);
     closeDrawer(0);
   };

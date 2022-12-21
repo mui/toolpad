@@ -1,15 +1,26 @@
 import * as path from 'path';
-import { test } from '@playwright/test';
-import { ToolpadHome } from '../../models/ToolpadHome';
+import { test } from '../../playwright/test';
 import { ToolpadRuntime } from '../../models/ToolpadRuntime';
 import { readJsonFile } from '../../utils/fs';
+import generateId from '../../utils/generateId';
 
-test('functions basics', async ({ page }) => {
+test.use({
+  ignoreConsoleErrors: [
+    // Chrome:
+    /Cannot read properties of null/,
+    // firefox:
+    /throws\.error is null/,
+    // Intentionally thrown
+    /BOOM!/,
+  ],
+});
+
+test('functions basics', async ({ page, api }) => {
   const dom = await readJsonFile(path.resolve(__dirname, './functionDom.json'));
 
-  const homeModel = new ToolpadHome(page);
-  await homeModel.goto();
-  const app = await homeModel.createApplication({ dom });
+  const app = await api.mutation.createApp(`App ${generateId()}`, {
+    from: { kind: 'dom', dom },
+  });
 
   const runtimeModel = new ToolpadRuntime(page);
   await runtimeModel.gotoPage(app.id, 'page1');

@@ -68,9 +68,9 @@ import { execDataSourceQuery, useDataQuery, UseDataQueryConfig, UseFetch } from 
 import { useAppContext, AppContextProvider } from './AppContext';
 import { CanvasHooksContext, NavigateToPage } from './CanvasHooksContext';
 import useBoolean from '../utils/useBoolean';
+import { errorFrom } from '../utils/errors';
 
 const ReactQueryDevtoolsProduction = React.lazy(() =>
-  // eslint-disable-next-line import/extensions
   import('@tanstack/react-query-devtools/build/lib/index.prod.js').then((d) => ({
     default: d.ReactQueryDevtools,
   })),
@@ -210,10 +210,11 @@ function RenderedNodeContent({ node, childNodeGroups, Component }: RenderedNodeC
       const binding = liveBindings[bindingId];
       if (binding) {
         hookResult[propName] = binding.value;
-        error = error || binding.error;
 
         if (binding.loading && loadingPropSourceSet.has(propName)) {
           loading = true;
+        } else {
+          error = error || binding.error;
         }
       }
 
@@ -226,7 +227,7 @@ function RenderedNodeContent({ node, childNodeGroups, Component }: RenderedNodeC
       if (errorProp) {
         hookResult[errorProp] = error;
       } else {
-        console.error(error);
+        console.error(errorFrom(error));
       }
     }
 
@@ -330,6 +331,24 @@ function RenderedNodeContent({ node, childNodeGroups, Component }: RenderedNodeC
       ...reactChildren,
     };
   }, [boundProps, eventHandlers, layoutElementProps, onChangeHandlers, reactChildren]);
+
+  const previousProps = React.useRef<Record<string, any>>(props);
+  React.useEffect(() => {
+    Object.entries(argTypes).forEach(([key, argType]) => {
+      if (!argType?.defaultValueProp) {
+        return;
+      }
+
+      if (previousProps.current[argType.defaultValueProp] === props[argType.defaultValueProp]) {
+        return;
+      }
+
+      const bindingIdToUpdate = `${nodeId}.props.${key}`;
+      setControlledBinding(bindingIdToUpdate, { value: props[argType.defaultValueProp] });
+    });
+
+    previousProps.current = props;
+  }, [props, argTypes, nodeId, setControlledBinding]);
 
   // Wrap with slots
   for (const [propName, argType] of Object.entries(argTypes)) {
@@ -437,7 +456,7 @@ function resolveBindables(
   bindingId: string,
   params?: NestedBindableAttrs,
 ): Record<string, unknown> {
-  const result: any = _.cloneDeep(params) || {};
+  const result: any = {};
   const resultKey = 'value';
   const flattened = flattenNestedBindables(params);
   for (const [path] of flattened) {
@@ -456,7 +475,11 @@ function QueryNode({ node }: QueryNodeProps) {
   const bindings = useBindingsContext();
   const setControlledBinding = useSetControlledBindingContext();
 
-  const params = resolveBindables(bindings, `${node.id}.params`, node.params);
+  const params = resolveBindables(
+    bindings,
+    `${node.id}.params`,
+    Object.fromEntries(node.params ?? []),
+  );
 
   const configBindings = _.pick(node.attributes, USE_DATA_QUERY_CONFIG_KEYS);
   const options = resolveBindables(bindings, `${node.id}.config`, configBindings);
@@ -582,21 +605,6 @@ function parseBinding(bindable: BindableAttrValue<any>, { scopePath }: ParseBind
   };
 }
 
-function parsedBindingEqual(
-  binding1: ParsedBinding | undefined,
-  binding2: ParsedBinding | undefined,
-): boolean {
-  if (
-    (!binding1 && !binding2) ||
-    (binding1?.expression === binding2?.expression &&
-      binding1?.result?.value === binding2?.result?.value &&
-      binding1?.initializer === binding2?.initializer)
-  ) {
-    return true;
-  }
-  return false;
-}
-
 function parseBindings(
   dom: appDom.AppDom,
   page: appDom.PageNode,
@@ -652,7 +660,7 @@ function parseBindings(
 
     if (appDom.isQuery(elm)) {
       if (elm.params) {
-        const nestedBindablePaths = flattenNestedBindables(elm.params);
+        const nestedBindablePaths = flattenNestedBindables(Object.fromEntries(elm.params ?? []));
 
         for (const [nestedPath, paramValue] of nestedBindablePaths) {
           const bindingId = `${elm.id}.params${nestedPath}`;
@@ -762,23 +770,7 @@ function RenderedPage({ nodeId }: RenderedNodeProps) {
       // Make sure to patch page bindings after dom nodes have been added or removed
       const updated: Record<string, ParsedBinding> = {};
       for (const [key, binding] of Object.entries(parsedBindings)) {
-        let shouldUpdateBinding = false;
-
-        if (controlled.has(key)) {
-          // controlled bindings don't get updated, unless their initialValue has changed
-          if (binding.initializer) {
-            const initializer: ParsedBinding | undefined = parsedBindings[binding.initializer];
-            const existingInitializer: ParsedBinding | undefined =
-              existingBindings[binding.initializer];
-            if (!parsedBindingEqual(initializer, existingInitializer)) {
-              shouldUpdateBinding = true;
-            }
-          }
-        } else {
-          shouldUpdateBinding = true;
-        }
-
-        updated[key] = shouldUpdateBinding ? binding : existingBindings[key] || binding;
+        updated[key] = controlled.has(key) ? existingBindings[key] || binding : binding;
       }
       return updated;
     });

@@ -14,14 +14,14 @@ export interface ToolpadShellProps {
 
 const ToolpadShellRoot = styled('div')({
   width: '100vw',
-  maxWidth: '100%',
-  minHeight: '100vh',
+  height: '100vh',
   display: 'flex',
   flexDirection: 'column',
 });
 
 const ViewPort = styled('div')({
   flex: 1,
+  width: '100%',
   overflow: 'auto',
   position: 'relative',
 });

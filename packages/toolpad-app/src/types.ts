@@ -13,6 +13,12 @@ import type * as appDom from './appDom';
 import type { Maybe, WithControlledProp } from './utils/types';
 import type { Rectangle } from './utils/geometry';
 
+declare global {
+  interface Error {
+    code?: unknown;
+  }
+}
+
 export interface EditorProps<T> {
   /**
    * @deprecated
@@ -51,7 +57,7 @@ export interface NodeInfo {
   error?: RuntimeError | null;
   rect?: Rectangle;
   slots?: SlotsState;
-  componentConfig?: ComponentConfig<unknown>;
+  componentConfig?: ComponentConfig;
   props: { [key: string]: unknown };
 }
 
@@ -99,7 +105,7 @@ export interface ExecClientFetchFn<Q, R extends ExecFetchResult> {
 
 export interface ClientDataSource<C = {}, Q = {}> {
   displayName: string;
-  ConnectionParamsInput: ConnectionParamsEditor<C>;
+  ConnectionParamsInput?: ConnectionParamsEditor<C>;
   transformQueryBeforeCommit?: (query: Q) => Q;
   QueryEditor: QueryEditor<C, Q>;
   getInitialQueryValue: () => Q;
@@ -158,7 +164,7 @@ export interface AppTheme {
 
 export type VersionOrPreview = 'preview' | number;
 
-export type AppTemplateId = 'blank' | 'stats' | 'images';
+export type AppTemplateId = 'default' | 'blank' | 'images';
 
 export type NodeHashes = Record<NodeId, number | undefined>;
 
@@ -187,3 +193,11 @@ export interface RuntimeState {
   appId: string;
   modules: Record<string, CompiledModule>;
 }
+
+export interface MetaField {
+  description?: string;
+  deprecated?: boolean | string;
+  tsType?: string;
+  value?: any;
+}
+export type GlobalScopeMeta = Record<string, MetaField>;

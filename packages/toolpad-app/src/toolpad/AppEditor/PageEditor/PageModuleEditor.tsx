@@ -30,7 +30,7 @@ interface PageModuleEditorDialogProps {
 }
 
 function PageModuleEditorDialog({ pageNodeId, open, onClose }: PageModuleEditorDialogProps) {
-  const dom = useDom();
+  const { dom } = useDom();
   const domApi = useDomApi();
   const page = appDom.getNode(dom, pageNodeId, 'page');
   const [input, setInput] = React.useState(page.attributes.module?.value || DEFAULT_CONTENT);
@@ -38,7 +38,10 @@ function PageModuleEditorDialog({ pageNodeId, open, onClose }: PageModuleEditorD
   const handleSave = React.useCallback(() => {
     const pretty = tryFormat(input);
     setInput(pretty);
-    domApi.setNodeNamespacedProp(page, 'attributes', 'module', appDom.createConst(pretty));
+
+    domApi.update((draft) =>
+      appDom.setNodeNamespacedProp(draft, page, 'attributes', 'module', appDom.createConst(pretty)),
+    );
   }, [domApi, input, page]);
 
   const handleSaveButton = React.useCallback(() => {

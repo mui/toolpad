@@ -1,8 +1,8 @@
 import pino from 'pino';
 import ecsFormat from '@elastic/ecs-pino-format';
-
+import type { NextApiRequest, NextApiResponse } from 'next';
 import config from '../config';
-import { recaptchaResSerializer, reqSerializer, resSerializer } from './logSerializers';
+import { errSerializer, reqSerializer, resSerializer } from './logSerializers';
 
 let transport;
 if (config.ecsNodeUrl) {
@@ -21,18 +21,42 @@ if (config.ecsNodeUrl) {
 
 const logger = pino(
   {
-    enabled: config.serverLogsEnabled,
     level: process.env.LOG_LEVEL || 'info',
     redact: { paths: [] },
     serializers: {
-      err: pino.stdSerializers.err,
+      err: errSerializer,
+      error: errSerializer,
       req: reqSerializer,
       res: resSerializer,
-      recaptchaRes: recaptchaResSerializer,
     },
     ...(config.ecsNodeUrl ? ecsFormat() : {}),
   },
   transport,
 );
 
-export default logger;
+interface ReqResLogPayload {
+  key: 'apiReqRes';
+  req: NextApiRequest;
+  res: NextApiResponse;
+}
+
+interface RpcReqResLogPayload {
+  key: 'rpc';
+  type: 'query' | 'mutation';
+  name: string;
+  error: Error | null;
+}
+
+type LogPayload = ReqResLogPayload | RpcReqResLogPayload;
+
+function logMethod(method: 'info' | 'trace' | 'error' | 'warn' | 'fatal') {
+  return (obj: LogPayload, msg: string) => logger[method](obj, msg);
+}
+
+export default {
+  info: logMethod('info'),
+  trace: logMethod('trace'),
+  error: logMethod('error'),
+  warn: logMethod('warn'),
+  fatal: logMethod('fatal'),
+};

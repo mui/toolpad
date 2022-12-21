@@ -1,7 +1,7 @@
 import * as React from 'react';
-import { NodeId, BindableAttrValue, BindableAttrValues } from '@mui/toolpad-core';
+import { NodeId, BindableAttrValues } from '@mui/toolpad-core';
 import invariant from 'invariant';
-import { throttle, DebouncedFunc } from 'lodash-es';
+import { debounce, DebouncedFunc } from 'lodash-es';
 import * as appDom from '../appDom';
 import { update } from '../utils/immutability';
 import client from '../api';
@@ -12,6 +12,7 @@ import { mapValues } from '../utils/collections';
 import insecureHash from '../utils/insecureHash';
 import useEvent from '../utils/useEvent';
 import { NodeHashes } from '../types';
+import { hasFieldFocus } from '../utils/fields';
 
 export type DomAction =
   | {
@@ -40,50 +41,26 @@ export type DomAction =
       name: string;
     }
   | {
-      type: 'DOM_SET_NODE_PROP';
-      node: appDom.AppDomNode;
-      prop: string;
-      namespace: string;
-      value: BindableAttrValue<unknown> | null;
-    }
-  | {
       type: 'DOM_SET_NODE_NAMESPACE';
       node: appDom.AppDomNode;
       namespace: string;
       value: BindableAttrValues | null;
     }
   | {
-      type: 'DOM_ADD_NODE';
-      node: appDom.AppDomNode;
-      parent: appDom.AppDomNode;
-      parentProp: string;
-      parentIndex?: string;
-    }
-  | {
-      type: 'DOM_ADD_FRAGMENT';
-      fragment: appDom.AppDom;
-      parentId: NodeId;
-      parentProp: string;
-      parentIndex?: string;
-    }
-  | {
-      type: 'DOM_MOVE_NODE';
-      node: appDom.AppDomNode;
-      parent: appDom.AppDomNode;
-      parentProp: string;
-      parentIndex?: string;
-    }
-  | {
-      type: 'DOM_DUPLICATE_NODE';
-      node: appDom.AppDomNode;
-    }
-  | {
-      type: 'DOM_REMOVE_NODE';
-      nodeId: NodeId;
+      type: 'DOM_UPDATE';
+      updater: (dom: appDom.AppDom) => appDom.AppDom;
+      selectedNodeId?: NodeId | null;
     }
   | {
       type: 'DOM_SAVE_NODE';
       node: appDom.AppDomNode;
+    }
+  | {
+      type: 'SELECT_NODE';
+      nodeId: NodeId;
+    }
+  | {
+      type: 'DESELECT_NODE';
     };
 
 export function domReducer(dom: appDom.AppDom, action: DomAction): appDom.AppDom {
@@ -93,53 +70,14 @@ export function domReducer(dom: appDom.AppDom, action: DomAction): appDom.AppDom
       const node = appDom.getNode(dom, action.nodeId);
       return appDom.setNodeName(dom, node, action.name);
     }
-    case 'DOM_SET_NODE_PROP': {
-      return appDom.setNodeNamespacedProp<any, any, any>(
-        dom,
-        action.node,
-        action.namespace,
-        action.prop,
-        action.value,
-      );
-    }
     case 'DOM_SET_NODE_NAMESPACE': {
       return appDom.setNodeNamespace<any, any>(dom, action.node, action.namespace, action.value);
     }
-    case 'DOM_ADD_NODE': {
-      return appDom.addNode<any, any>(
-        dom,
-        action.node,
-        action.parent,
-        action.parentProp,
-        action.parentIndex,
-      );
-    }
-    case 'DOM_ADD_FRAGMENT': {
-      return appDom.addFragment(
-        dom,
-        action.fragment,
-        action.parentId,
-        action.parentProp,
-        action.parentIndex,
-      );
-    }
-    case 'DOM_MOVE_NODE': {
-      return appDom.moveNode<any, any>(
-        dom,
-        action.node,
-        action.parent,
-        action.parentProp,
-        action.parentIndex,
-      );
-    }
-    case 'DOM_DUPLICATE_NODE': {
-      return appDom.duplicateNode(dom, action.node);
+    case 'DOM_UPDATE': {
+      return action.updater(dom);
     }
     case 'DOM_SAVE_NODE': {
       return appDom.saveNode(dom, action.node);
-    }
-    case 'DOM_REMOVE_NODE': {
-      return appDom.removeNode(dom, action.nodeId);
     }
     default:
       return dom;
@@ -161,7 +99,10 @@ export function domLoaderReducer(state: DomLoader, action: DomAction): DomLoader
 
   switch (action.type) {
     case 'DOM_UPDATE_HISTORY': {
-      const updatedUndoStack = [...state.undoStack, state.dom];
+      const updatedUndoStack = [
+        ...state.undoStack,
+        { dom: state.dom, selectedNodeId: state.selectedNodeId },
+      ];
 
       if (updatedUndoStack.length > UNDO_HISTORY_LIMIT) {
         updatedUndoStack.shift();
@@ -182,16 +123,17 @@ export function domLoaderReducer(state: DomLoader, action: DomAction): DomLoader
 
       const currentState = undoStack.pop();
 
-      const previousDom = undoStack[undoStack.length - 1];
+      const previousStackEntry = undoStack[undoStack.length - 1];
 
-      if (!previousDom || !currentState) {
+      if (!previousStackEntry || !currentState) {
         return state;
       }
 
       redoStack.push(currentState);
 
       return update(state, {
-        dom: previousDom,
+        dom: previousStackEntry.dom,
+        selectedNodeId: previousStackEntry.selectedNodeId,
         undoStack,
         redoStack,
       });
@@ -200,16 +142,17 @@ export function domLoaderReducer(state: DomLoader, action: DomAction): DomLoader
       const undoStack = [...state.undoStack];
       const redoStack = [...state.redoStack];
 
-      const nextDom = redoStack.pop();
+      const nextStackEntry = redoStack.pop();
 
-      if (!nextDom) {
+      if (!nextStackEntry) {
         return state;
       }
 
-      undoStack.push(nextDom);
+      undoStack.push(nextStackEntry);
 
       return update(state, {
-        dom: nextDom,
+        dom: nextStackEntry.dom,
+        selectedNodeId: nextStackEntry.selectedNodeId,
         undoStack,
         redoStack,
       });
@@ -234,6 +177,23 @@ export function domLoaderReducer(state: DomLoader, action: DomAction): DomLoader
         saveError: action.error,
       });
     }
+    case 'SELECT_NODE': {
+      return update(state, {
+        selectedNodeId: action.nodeId,
+      });
+    }
+    case 'DESELECT_NODE': {
+      return update(state, {
+        selectedNodeId: null,
+      });
+    }
+    case 'DOM_UPDATE': {
+      return action.selectedNodeId !== undefined
+        ? update(state, {
+            selectedNodeId: action.selectedNodeId,
+          })
+        : state;
+    }
     default:
       return state;
   }
@@ -241,11 +201,11 @@ export function domLoaderReducer(state: DomLoader, action: DomAction): DomLoader
 
 function createDomApi(
   dispatch: React.Dispatch<DomAction>,
-  scheduleHistoryUpdate?: DebouncedFunc<() => void>,
+  scheduleTextInputHistoryUpdate?: DebouncedFunc<() => void>,
 ) {
   return {
     undo() {
-      scheduleHistoryUpdate?.flush();
+      scheduleTextInputHistoryUpdate?.flush();
 
       dispatch({ type: 'DOM_UNDO' });
     },
@@ -255,82 +215,17 @@ function createDomApi(
     setNodeName(nodeId: NodeId, name: string) {
       dispatch({ type: 'DOM_SET_NODE_NAME', nodeId, name });
     },
-    addNode<Parent extends appDom.AppDomNode, Child extends appDom.AppDomNode>(
-      node: Child,
-      parent: Parent,
-      parentProp: appDom.ParentPropOf<Child, Parent>,
-      parentIndex?: string,
-    ) {
+    update(updater: (dom: appDom.AppDom) => appDom.AppDom, selectedNodeId?: NodeId | null) {
       dispatch({
-        type: 'DOM_ADD_NODE',
-        node,
-        parent,
-        parentProp,
-        parentIndex,
-      });
-    },
-    addFragment(
-      fragment: appDom.AppDom,
-      parentId: NodeId,
-      parentProp: string,
-      parentIndex?: string,
-    ) {
-      dispatch({
-        type: 'DOM_ADD_FRAGMENT',
-        fragment,
-        parentId,
-        parentProp,
-        parentIndex,
-      });
-    },
-    moveNode<Parent extends appDom.AppDomNode, Child extends appDom.AppDomNode>(
-      node: Child,
-      parent: Parent,
-      parentProp: appDom.ParentPropOf<Child, Parent>,
-      parentIndex?: string,
-    ) {
-      dispatch({
-        type: 'DOM_MOVE_NODE',
-        node,
-        parent,
-        parentProp,
-        parentIndex,
-      });
-    },
-    duplicateNode<Child extends appDom.AppDomNode>(node: Child) {
-      dispatch({
-        type: 'DOM_DUPLICATE_NODE',
-        node,
-      });
-    },
-    removeNode(nodeId: NodeId) {
-      dispatch({
-        type: 'DOM_REMOVE_NODE',
-        nodeId,
+        type: 'DOM_UPDATE',
+        updater,
+        selectedNodeId,
       });
     },
     saveNode(node: appDom.AppDomNode) {
       dispatch({
         type: 'DOM_SAVE_NODE',
         node,
-      });
-    },
-    setNodeNamespacedProp<
-      Node extends appDom.AppDomNode,
-      Namespace extends appDom.PropNamespaces<Node>,
-      Prop extends keyof NonNullable<Node[Namespace]> & string,
-    >(
-      node: Node,
-      namespace: Namespace,
-      prop: Prop,
-      value: NonNullable<Node[Namespace]>[Prop] | null,
-    ) {
-      dispatch({
-        type: 'DOM_SET_NODE_PROP',
-        namespace,
-        node,
-        prop,
-        value: value as BindableAttrValue<unknown> | null,
       });
     },
     setNodeNamespace<Node extends appDom.AppDomNode, Namespace extends appDom.PropNamespaces<Node>>(
@@ -345,6 +240,17 @@ function createDomApi(
         value: value as BindableAttrValues | null,
       });
     },
+    selectNode(nodeId: NodeId) {
+      dispatch({
+        type: 'SELECT_NODE',
+        nodeId,
+      });
+    },
+    deselectNode() {
+      dispatch({
+        type: 'DESELECT_NODE',
+      });
+    },
   };
 }
 
@@ -354,8 +260,9 @@ export interface DomLoader {
   saving: boolean;
   unsavedChanges: number;
   saveError: string | null;
-  undoStack: appDom.AppDom[];
-  redoStack: appDom.AppDom[];
+  selectedNodeId: NodeId | null;
+  undoStack: DomState[];
+  redoStack: DomState[];
 }
 
 export function getNodeHashes(dom: appDom.AppDom): NodeHashes {
@@ -370,12 +277,17 @@ export type DomApi = ReturnType<typeof createDomApi>;
 
 export { useDomLoader };
 
-export function useDom(): appDom.AppDom {
-  const { dom } = useDomLoader();
+export interface DomState {
+  dom: appDom.AppDom;
+  selectedNodeId: NodeId | null;
+}
+
+export function useDom(): DomState {
+  const { dom, selectedNodeId } = useDomLoader();
   if (!dom) {
     throw new Error("Trying to access the DOM before it's loaded");
   }
-  return dom;
+  return { dom, selectedNodeId };
 }
 
 export function useDomApi(): DomApi {
@@ -419,20 +331,28 @@ export default function DomProvider({ appId, children }: DomContextProps) {
     saveError: null,
     savedDom: dom,
     dom,
-    undoStack: [dom],
+    selectedNodeId: null,
+    undoStack: [{ dom, selectedNodeId: null }],
     redoStack: [],
   });
 
-  const scheduleHistoryUpdate = React.useMemo(
+  const scheduleTextInputHistoryUpdate = React.useMemo(
     () =>
-      throttle(
-        () => {
-          dispatch({ type: 'DOM_UPDATE_HISTORY' });
-        },
-        500,
-        { leading: false, trailing: true },
-      ),
+      debounce(() => {
+        dispatch({ type: 'DOM_UPDATE_HISTORY' });
+      }, 500),
     [],
+  );
+
+  const scheduleHistoryUpdate = React.useMemo(
+    () => () => {
+      if (!hasFieldFocus()) {
+        dispatch({ type: 'DOM_UPDATE_HISTORY' });
+      } else {
+        scheduleTextInputHistoryUpdate();
+      }
+    },
+    [scheduleTextInputHistoryUpdate],
   );
 
   const dispatchWithHistory = useEvent((action: DomAction) => {
@@ -444,8 +364,8 @@ export default function DomProvider({ appId, children }: DomContextProps) {
   });
 
   const api = React.useMemo(
-    () => createDomApi(dispatchWithHistory, scheduleHistoryUpdate),
-    [dispatchWithHistory, scheduleHistoryUpdate],
+    () => createDomApi(dispatchWithHistory, scheduleTextInputHistoryUpdate),
+    [dispatchWithHistory, scheduleTextInputHistoryUpdate],
   );
 
   const handleSave = React.useCallback(() => {
@@ -465,11 +385,11 @@ export default function DomProvider({ appId, children }: DomContextProps) {
       });
   }, [appId, state]);
 
-  const debouncedhandleSave = useDebouncedHandler(handleSave, 1000);
+  const debouncedHandleSave = useDebouncedHandler(handleSave, 1000);
 
   React.useEffect(() => {
-    debouncedhandleSave();
-  }, [state.dom, debouncedhandleSave]);
+    debouncedHandleSave();
+  }, [state.dom, debouncedHandleSave]);
 
   React.useEffect(() => {
     logUnsavedChanges(state.unsavedChanges);

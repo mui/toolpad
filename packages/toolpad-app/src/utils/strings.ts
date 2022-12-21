@@ -25,6 +25,9 @@ export function camelCase(...parts: string[]): string {
   return '';
 }
 
+/**
+ * Generates a string for `base` by add a number until it's unique amongst a set of predefined names.
+ */
 export function generateUniqueString(base: string, existingNames: Set<string>) {
   let i = 1;
   if (!existingNames.has(base)) {
@@ -39,6 +42,9 @@ export function generateUniqueString(base: string, existingNames: Set<string>) {
   return suggestion;
 }
 
+/**
+ * Escape string for use in HTML.
+ */
 export function escapeHtml(unsafe: string): string {
   return unsafe
     .replace(/&/g, '&amp;')
@@ -48,8 +54,12 @@ export function escapeHtml(unsafe: string): string {
     .replace(/'/g, '&#039;');
 }
 
+/**
+ * Normalizes and removes all diacritics from a javascript string.
+ *
+ * See https://stackoverflow.com/a/37511463
+ */
 export function removeDiacritics(input: string): string {
-  // See https://stackoverflow.com/a/37511463
   return input.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
 }
 
@@ -61,18 +71,30 @@ export function isAbsoluteUrl(maybeUrl: string) {
   }
 }
 
+/**
+ * Removes a prefix from a string if it starts with it.
+ */
 export function removePrefix(input: string, prefix: string): string {
   return input.startsWith(prefix) ? input.slice(prefix.length) : input;
 }
 
+/**
+ * Removes a suffix from a string if it ends with it.
+ */
 export function removeSuffix(input: string, suffix: string): string {
   return input.endsWith(suffix) ? input.slice(0, input.length - suffix.length) : input;
 }
 
+/**
+ * Adds a prefix to a string if it doesn't start with it.
+ */
 export function ensurePrefix(input: string, prefix: string): string {
   return input.startsWith(prefix) ? input : prefix + input;
 }
 
+/**
+ * Adds a suffix to a string if it doesn't end with it.
+ */
 export function ensureSuffix(input: string, suffix: string): string {
   return input.endsWith(suffix) ? input : input + suffix;
 }
@@ -99,10 +121,19 @@ export function ensureSuffix(input: string, suffix: string): string {
 const IMPORT_STATEMENT_REGEX =
   /^\s*import(?:["'\s]*([\w*{}\n, ]+)from\s*)?["'\s]*([^"']+)["'\s].*/gm;
 
+/**
+ * Statically analyses a javascript source code for import statements and return the specifiers.
+ *
+ * NOTE: This function does a best effort without parsing the code. The result may contain false
+ *       positives
+ */
 export function findImports(src: string): string[] {
   return Array.from(src.matchAll(IMPORT_STATEMENT_REGEX), (match) => match[2]);
 }
 
+/**
+ * Limits the length of a string and adds ellipsis if necessary.
+ */
 export function truncate(str: string, maxLength: number, dots: string = '…') {
   if (str.length <= maxLength) {
     return str;

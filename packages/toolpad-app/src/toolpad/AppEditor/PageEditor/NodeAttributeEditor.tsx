@@ -26,9 +26,11 @@ export default function NodeAttributeEditor<P extends object>({
 
   const handlePropChange = React.useCallback(
     (newValue: BindableAttrValue<unknown> | null) => {
-      domApi.setNodeNamespacedProp(node, namespace as any, name, newValue);
+      domApi.update((draft) =>
+        appDom.setNodeNamespacedProp(draft, node, namespace as any, name, newValue),
+      );
     },
-    [domApi, node, namespace, name],
+    [node, namespace, name, domApi],
   );
 
   const propValue: BindableAttrValue<unknown> | null = (node as any)[namespace]?.[name] ?? null;

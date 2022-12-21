@@ -2,7 +2,7 @@ import type { GetServerSideProps } from 'next';
 
 export const getServerSideProps: GetServerSideProps<{}> = async () => {
   return {
-    redirect: { destination: '/_toolpad', permanent: true },
+    redirect: { destination: '/_toolpad', permanent: false },
   };
 };
 

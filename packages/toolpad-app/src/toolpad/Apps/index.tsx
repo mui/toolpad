@@ -139,13 +139,13 @@ const NO_OP = () => {};
 export interface CreateAppDialogProps {
   open: boolean;
   onClose?: () => void;
-  onContinueToExistingApp: (appId: string) => void;
+  onContinueToExistingApp?: (appId: string) => void;
 }
 
 function CreateAppDialog({
   onClose,
   open,
-  onContinueToExistingApp,
+  onContinueToExistingApp = NO_OP,
   ...props
 }: CreateAppDialogProps) {
   const [name, setName] = React.useState('');
@@ -198,7 +198,6 @@ function CreateAppDialog({
   const isSubmitting = createAppMutation.isLoading || isNavigatingToNewApp;
 
   const handleContinueButtonClick = React.useCallback(() => {
-    // setIsNavigatingToExistingApp(true);
     if (!firstLatestCreatedApp) {
       return;
     }

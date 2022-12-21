@@ -1,4 +1,5 @@
 import { NextApiRequest, NextApiResponse } from 'next';
+import { errorFrom } from '../../utils/errors';
 
 function getReqLoggableIPAddress(req: NextApiRequest): string | null {
   const forwardedHeader = req.headers['x-forwarded-for'];
@@ -38,9 +39,12 @@ export function resSerializer(res: NextApiResponse) {
   };
 }
 
-export function resErrSerializer(error: Error) {
+export function errSerializer(rawError: unknown) {
+  const error = errorFrom(rawError);
   return {
     message: error.message,
+    name: error.name,
+    stack: error.stack,
     code: error.code,
   };
 }

@@ -429,6 +429,7 @@ export function BindingEditor<V>({
     if (propType?.type === 'event' && propType.arguments) {
       for (const { name, tsType } of propType.arguments) {
         const metaField: GlobalScopeMetaField = meta[name] ?? {};
+        metaField.kind = 'local';
         metaField.tsType = tsType;
         meta[name] = metaField;
       }

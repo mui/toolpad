@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { ErrorBoundary, FallbackProps } from 'react-error-boundary';
-import { ToolpadComponent } from '@mui/toolpad-core';
+import { ToolpadComponents } from './types';
 import { RUNTIME_PROP_NODE_ID, RUNTIME_PROP_SLOTS } from './constants.js';
 import type { SlotType, ComponentConfig, RuntimeEvent, RuntimeError } from './types';
 
@@ -8,9 +8,9 @@ const ResetNodeErrorsKeyContext = React.createContext(0);
 
 export const ResetNodeErrorsKeyProvider = ResetNodeErrorsKeyContext.Provider;
 
-export type Components = Partial<Record<string, ToolpadComponent<any>>>;
+export type Components = ToolpadComponents;
 
-export const ComponentsContext = React.createContext<Components | null>(null);
+export const ComponentsContext = React.createContext<ToolpadComponents | null>(null);
 
 const ComponentsProvider = ComponentsContext.Provider;
 

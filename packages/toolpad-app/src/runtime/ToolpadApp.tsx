@@ -331,9 +331,8 @@ function RenderedNodeContent({ node, childNodeGroups, Component }: RenderedNodeC
       ...eventHandlers,
       ...layoutElementProps,
       ...reactChildren,
-      __toolpadComponents: components,
     };
-  }, [boundProps, eventHandlers, layoutElementProps, onChangeHandlers, reactChildren, components]);
+  }, [boundProps, eventHandlers, layoutElementProps, onChangeHandlers, reactChildren]);
 
   const previousProps = React.useRef<Record<string, any>>(props);
   React.useEffect(() => {
@@ -373,6 +372,7 @@ function RenderedNodeContent({ node, childNodeGroups, Component }: RenderedNodeC
   return (
     <NodeRuntimeWrapper
       nodeId={nodeId}
+      components={components}
       componentConfig={Component[TOOLPAD_COMPONENT]}
       NodeError={NodeError}
     >

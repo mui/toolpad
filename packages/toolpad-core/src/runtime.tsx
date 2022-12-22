@@ -1,11 +1,18 @@
 import * as React from 'react';
 import { ErrorBoundary, FallbackProps } from 'react-error-boundary';
+import { ToolpadComponent } from '@mui/toolpad-core';
 import { RUNTIME_PROP_NODE_ID, RUNTIME_PROP_SLOTS } from './constants.js';
 import type { SlotType, ComponentConfig, RuntimeEvent, RuntimeError } from './types';
 
 const ResetNodeErrorsKeyContext = React.createContext(0);
 
 export const ResetNodeErrorsKeyProvider = ResetNodeErrorsKeyContext.Provider;
+
+export type Components = Partial<Record<string, ToolpadComponent<any>>>;
+
+export const ComponentsContext = React.createContext<Components | null>(null);
+
+const ComponentsProvider = ComponentsContext.Provider;
 
 declare global {
   interface Window {
@@ -77,6 +84,7 @@ export interface NodeRuntimeWrapperProps {
   nodeId: string;
   componentConfig: ComponentConfig<any>;
   NodeError: React.ComponentType<NodeErrorProps>;
+  components: Components;
 }
 
 export function NodeRuntimeWrapper({
@@ -84,6 +92,7 @@ export function NodeRuntimeWrapper({
   componentConfig,
   children,
   NodeError,
+  components,
 }: NodeRuntimeWrapperProps) {
   const resetNodeErrorsKey = React.useContext(ResetNodeErrorsKeyContext);
 
@@ -111,7 +120,7 @@ export function NodeRuntimeWrapper({
             componentConfig,
           }}
         >
-          {children}
+          <ComponentsProvider value={components}>{children}</ComponentsProvider>
         </NodeFiberHost>
       </NodeRuntimeContext.Provider>
     </ErrorBoundary>

@@ -19,12 +19,10 @@ import {
   GridRenderCellParams,
 } from '@mui/x-data-grid-pro';
 import * as React from 'react';
-import { useNode, createComponent, ToolpadComponent } from '@mui/toolpad-core';
+import { useNode, createComponent, ComponentsContext } from '@mui/toolpad-core';
 import { Box, debounce, LinearProgress, Skeleton, Link, styled, Typography } from '@mui/material';
 import { getObjectKey } from '@mui/toolpad-core/objectKey';
 import { hasImageExtension } from '@mui/toolpad-core/path';
-
-type ToolpadComponents = Record<string, ToolpadComponent<any>>;
 
 // Pseudo random number. See https://stackoverflow.com/a/47593316
 function mulberry32(a: number): () => number {
@@ -277,7 +275,6 @@ interface ToolpadDataGridProps extends Omit<DataGridProProps, 'columns' | 'rows'
   onSelectionChange?: (newSelection?: Selection | null) => void;
   onDelete?: (event: OnDeleteEvent) => void;
   hideToolbar?: boolean;
-  __toolpadComponents: ToolpadComponents;
 }
 
 const DataGridComponent = React.forwardRef(function DataGridComponent(
@@ -290,11 +287,12 @@ const DataGridComponent = React.forwardRef(function DataGridComponent(
     selection,
     onSelectionChange,
     hideToolbar,
-    __toolpadComponents,
     ...props
   }: ToolpadDataGridProps,
   ref: React.ForwardedRef<HTMLDivElement>,
 ) {
+  const components = React.useContext(ComponentsContext);
+
   const nodeRuntime = useNode<ToolpadDataGridProps>();
   const columnTypes = React.useMemo(
     () => ({
@@ -303,7 +301,7 @@ const DataGridComponent = React.forwardRef(function DataGridComponent(
         renderCell: ({ value, colDef }: GridRenderCellParams) => {
           const column = colDef as SerializableGridColumn;
 
-          const Component = __toolpadComponents[`codeComponent.${column.codeComponent}`];
+          const Component = components[`codeComponent.${column.codeComponent}`];
 
           if (!Component) {
             return (
@@ -317,7 +315,7 @@ const DataGridComponent = React.forwardRef(function DataGridComponent(
         },
       },
     }),
-    [__toolpadComponents],
+    [components],
   );
 
   const handleResize = React.useMemo(

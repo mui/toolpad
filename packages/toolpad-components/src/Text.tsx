@@ -22,8 +22,17 @@ interface TextProps extends Omit<BaseProps, 'children'> {
 
 const MarkdownContainer = styled('div')({
   display: 'block',
-  [`&:empty::before`]: { content: '""', display: 'inline-block' },
+  minHeight: '25px',
 });
+
+const CodeContainer = styled('pre')(({ theme }) => ({
+  whiteSpace: 'pre-wrap',
+  backgroundColor: theme.palette.grey[200],
+  marginLeft: theme.spacing(1),
+  marginRight: theme.spacing(1),
+  borderRadius: theme.shape.borderRadius,
+  padding: theme.spacing(1),
+}));
 
 function Text({ value, markdown, href, loading, mode, sx, ...rest }: TextProps) {
   switch (mode) {
@@ -40,8 +49,11 @@ function Text({ value, markdown, href, loading, mode, sx, ...rest }: TextProps) 
                     component: MuiLink,
                     props: {
                       target: '_blank',
-                      rel: 'noopener noreferrer nofollow',
+                      rel: 'noopener noreferrer',
                     },
+                  },
+                  pre: {
+                    component: CodeContainer,
                   },
                 },
               }}
@@ -58,7 +70,7 @@ function Text({ value, markdown, href, loading, mode, sx, ...rest }: TextProps) 
         <MuiLink
           href={href}
           target="_blank"
-          rel="noopener noreferrer nofollow"
+          rel="noopener noreferrer"
           sx={{
             minWidth: loading || !value ? 150 : undefined,
             // Same as Typography

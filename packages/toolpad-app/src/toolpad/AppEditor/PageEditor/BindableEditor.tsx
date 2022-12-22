@@ -1,9 +1,8 @@
 import { Stack, SxProps } from '@mui/material';
 import * as React from 'react';
-import { BindableAttrValue, PropValueType, LiveBinding } from '@mui/toolpad-core';
+import { BindableAttrValue, PropValueType, LiveBinding, GlobalScopeMeta } from '@mui/toolpad-core';
 import { BindingEditor } from '../BindingEditor';
 import { WithControlledProp } from '../../../utils/types';
-import { GlobalScopeMeta } from '../../../types';
 import { getDefaultControl } from '../../propertyControls';
 
 function renderDefaultControl(params: RenderControlParams<any>) {
@@ -26,7 +25,7 @@ export interface BindableEditorProps<V> extends WithControlledProp<BindableAttrV
   renderControl?: (params: RenderControlParams<any>) => React.ReactNode;
   liveBinding?: LiveBinding;
   globalScope?: Record<string, unknown>;
-  globalScopeMeta?: GlobalScopeMeta;
+  globalScopeMeta: GlobalScopeMeta;
   sx?: SxProps;
 }
 

@@ -23,6 +23,7 @@ import { useNode, createComponent, ComponentsContext } from '@mui/toolpad-core';
 import { Box, debounce, LinearProgress, Skeleton, Link, styled, Typography } from '@mui/material';
 import { getObjectKey } from '@mui/toolpad-core/objectKey';
 import { hasImageExtension } from '@mui/toolpad-core/path';
+import invariant from 'invariant';
 
 // Pseudo random number. See https://stackoverflow.com/a/47593316
 function mulberry32(a: number): () => number {
@@ -300,6 +301,8 @@ const DataGridComponent = React.forwardRef(function DataGridComponent(
       codeComponent: {
         renderCell: ({ value, colDef }: GridRenderCellParams) => {
           const column = colDef as SerializableGridColumn;
+
+          invariant(components, 'Components must be defined');
 
           const Component = components[`codeComponent.${column.codeComponent}`];
 

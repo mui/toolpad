@@ -174,6 +174,7 @@ const EMPTY_PARAMS: BindableAttrEntries = [];
 
 export function QueryEditor({
   globalScope,
+  globalScopeMeta,
   value: input,
   onChange: setInput,
 }: QueryEditorProps<SqlConnectionParams, SqlQuery>) {
@@ -238,6 +239,7 @@ export function QueryEditor({
             value={paramsEntries}
             onChange={handleParamsChange}
             globalScope={globalScope}
+            globalScopeMeta={globalScopeMeta}
             liveValue={paramsEditorLiveValue}
           />
         </Box>

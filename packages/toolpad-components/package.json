@@ -31,7 +31,7 @@
   "dependencies": {
     "@mui/material": "^5.11.1",
     "@mui/toolpad-core": "^0.0.32",
-    "@mui/x-data-grid-pro": "^5.17.16",
+    "@mui/x-data-grid-pro": "^5.17.17",
     "react-markdown": "^8.0.4"
   },
   "devDependencies": {

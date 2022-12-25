@@ -1,0 +1,87 @@
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: toolpad
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgres
+  namespace: toolpad
+  labels:
+    app: postgres
+spec:
+  ports:
+    - port: 5432
+      name: postgres
+  selector:
+    app: postgres
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: postgres
+  namespace: toolpad
+spec:
+  serviceName: postgres
+  replicas: 1
+  selector:
+    matchLabels:
+      app: postgres
+  template:
+    metadata:
+      labels:
+        app: postgres
+    spec:
+      containers:
+        - name: postgres
+          image: postgres:14.5
+          env:
+            - name: POSTGRES_USER
+              value: toolpad-app
+            - name: POSTGRES_PASSWORD
+              value: secretpw
+          ports:
+            - containerPort: 5432
+              name: postgres
+          volumeMounts:
+            - name: postgres-persistent-storage
+              mountPath: /var/lib/postgresql/data
+  volumeClaimTemplates:
+    - metadata:
+        name: postgres-persistent-storage
+      spec:
+        accessModes: ['ReadWriteOnce']
+        resources:
+          requests:
+            storage: 1Gi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: toolpad
+  namespace: toolpad
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: toolpad
+  template:
+    metadata:
+      labels:
+        app: toolpad
+    spec:
+      containers:
+        - name: toolpad
+          image: muicom/toolpad:latest
+          env:
+            - name: TOOLPAD_DATABASE_URL
+              value: postgresql://toolpad-app:secretpw@postgres:5432/postgres?connect_timeout=10
+            - name: PORT
+              value: '3000'
+            - name: TOOLPAD_EXTERNAL_URL
+              value: http://localhost:3000/
+          ports:
+            - containerPort: 3000
+              name: toolpad

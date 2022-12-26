@@ -29,7 +29,7 @@
     "url": "https://github.com/mui/mui-toolpad/issues"
   },
   "dependencies": {
-    "@mui/material": "^5.11.1",
+    "@mui/material": "^5.11.2",
     "@mui/toolpad-core": "^0.0.32",
     "@mui/x-data-grid-pro": "^5.17.17",
     "react-markdown": "^8.0.4"

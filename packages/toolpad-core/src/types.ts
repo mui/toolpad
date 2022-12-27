@@ -306,6 +306,7 @@ export interface SerializedError {
   message: string;
   name: string;
   stack?: string;
+  code?: unknown;
 }
 
 export type ExecFetchResult<T = any> = {

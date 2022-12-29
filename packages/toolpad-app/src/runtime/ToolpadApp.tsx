@@ -266,12 +266,20 @@ function RenderedNodeContent({ node, childNodeGroups, Component }: RenderedNodeC
 
         const handler = (param: any) => {
           const bindingId = `${nodeId}.props.${key}`;
-          const value = argType.onChangeHandler ? argType.onChangeHandler(param) : param;
+
+          const defaultValues = _.mapValues(argTypes, ({ defaultValue }) => defaultValue);
+          const propsValues = _.mapValues(node.props, ({ value }) => value);
+          const props = {
+            ...defaultValues,
+            ...propsValues,
+          };
+
+          const value = argType.onChangeHandler ? argType.onChangeHandler(param, props) : param;
           setControlledBinding(bindingId, { value });
         };
         return [argType.onChangeProp, handler];
       }),
-    [argTypes, nodeId, setControlledBinding],
+    [argTypes, nodeId, setControlledBinding, node.props],
   );
 
   const navigateToPage = usePageNavigator();

@@ -267,7 +267,7 @@ function RenderedNodeContent({ node, childNodeGroups, Component }: RenderedNodeC
         const handler = (param: any) => {
           const bindingId = `${nodeId}.props.${key}`;
 
-          const defaultValues = _.mapValues(argTypes, ({ defaultValue }) => defaultValue);
+          const defaultValues = _.mapValues(argTypes, ({ defaultValue }: any) => defaultValue);
           const propsValues = _.mapValues(node.props, ({ value }) => value);
           const props = {
             ...defaultValues,

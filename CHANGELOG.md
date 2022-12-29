@@ -1,5 +1,22 @@
 # Changelog
 
+## 0.0.33
+
+<!-- generated comparing v0.0.32..master -->
+
+_Dec 28, 2022_
+
+A big thanks to the 2 contributors who made this release possible. Here are some highlights ✨:
+
+Improvements to the scope explorer, and some other bug fixes an improvements.
+
+- &#8203;<!-- 4 -->Fix: Demo reCaptcha v2 fallback does not work (#1485) @bharatkashyap
+- &#8203;<!-- 3 -->Group scope variables by function in global scope explorer (#1464) @Janpot
+- &#8203;<!-- 2 -->Fix canvas ref timing issues (#1476) @Janpot
+- &#8203;<!-- 1 -->Fix flaky rest-basics test (#1481) @Janpot
+
+All contributors of this release in alphabetical order: @bharatkashyap, @Janpot
+
 ## 0.0.32
 
 <!-- generated comparing v0.0.31..master -->

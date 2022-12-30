@@ -268,7 +268,10 @@ function RenderedNodeContent({ node, childNodeGroups, Component }: RenderedNodeC
           const bindingId = `${nodeId}.props.${key}`;
 
           const defaultValues = _.mapValues(argTypes, ({ defaultValue }: any) => defaultValue);
-          const propsValues = _.mapValues(node.props, ({ value }) => value);
+          const propsValues = _.mapValues(
+            (node as appDom.ElementNode).props,
+            (prop) => prop?.value || undefined,
+          );
           const props = {
             ...defaultValues,
             ...propsValues,
@@ -279,7 +282,7 @@ function RenderedNodeContent({ node, childNodeGroups, Component }: RenderedNodeC
         };
         return [argType.onChangeProp, handler];
       }),
-    [argTypes, nodeId, setControlledBinding, node.props],
+    [argTypes, nodeId, setControlledBinding, node],
   );
 
   const navigateToPage = usePageNavigator();

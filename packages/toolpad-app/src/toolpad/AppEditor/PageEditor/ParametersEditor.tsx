@@ -1,7 +1,7 @@
 import { Box, TextField, IconButton, SxProps } from '@mui/material';
 import * as React from 'react';
 import DeleteIcon from '@mui/icons-material/Delete';
-import { BindableAttrValue, LiveBinding } from '@mui/toolpad-core';
+import { BindableAttrValue, GlobalScopeMeta, LiveBinding } from '@mui/toolpad-core';
 import { WithControlledProp } from '../../../utils/types';
 import BindableEditor from './BindableEditor';
 
@@ -10,6 +10,7 @@ export interface StringRecordEntriesEditorProps
   label?: string;
   liveValue: [string, LiveBinding][];
   globalScope: Record<string, unknown>;
+  globalScopeMeta: GlobalScopeMeta;
   fieldLabel?: string;
   valueLabel?: string;
   autoFocus?: boolean;
@@ -30,6 +31,7 @@ export default function ParametersEditor({
   sx,
   server,
   disabled,
+  globalScopeMeta,
 }: StringRecordEntriesEditorProps) {
   const fieldInputRef = React.useRef<HTMLInputElement>(null);
 
@@ -72,6 +74,7 @@ export default function ParametersEditor({
               liveBinding={liveBinding}
               server={server}
               globalScope={globalScope}
+              globalScopeMeta={globalScopeMeta}
               label={field}
               propType={{ type: 'string' }}
               value={fieldValue}

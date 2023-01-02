@@ -1,4 +1,4 @@
-import { NodeId, LiveBindings } from '@mui/toolpad-core';
+import { NodeId, LiveBindings, GlobalScopeMeta } from '@mui/toolpad-core';
 import * as React from 'react';
 import * as appDom from '../../../appDom';
 import { PageViewState } from '../../../types';
@@ -30,6 +30,7 @@ export interface PageEditorState {
   readonly draggedEdge: RectangleEdge | null;
   readonly viewState: PageViewState;
   readonly pageState: Record<string, unknown>;
+  readonly globalScopeMeta: GlobalScopeMeta;
   readonly bindings: LiveBindings;
 }
 
@@ -67,6 +68,7 @@ export type PageEditorAction =
   | {
       type: 'PAGE_STATE_UPDATE';
       pageState: Record<string, unknown>;
+      globalScopeMeta: GlobalScopeMeta;
     }
   | {
       type: 'PAGE_VIEW_STATE_UPDATE';
@@ -91,6 +93,7 @@ export function createPageEditorState(appId: string, nodeId: NodeId): PageEditor
     draggedEdge: null,
     viewState: { nodes: {} },
     pageState: {},
+    globalScopeMeta: {},
     bindings: {},
   };
 }
@@ -151,9 +154,10 @@ export function pageEditorReducer(
       });
     }
     case 'PAGE_STATE_UPDATE': {
-      const { pageState } = action;
+      const { pageState, globalScopeMeta } = action;
       return update(state, {
         pageState,
+        globalScopeMeta,
       });
     }
     case 'PAGE_BINDINGS_UPDATE': {
@@ -205,10 +209,11 @@ function createPageEditorApi(dispatch: React.Dispatch<PageEditorAction>) {
         viewState,
       });
     },
-    pageStateUpdate(pageState: Record<string, unknown>) {
+    pageStateUpdate(pageState: Record<string, unknown>, globalScopeMeta: GlobalScopeMeta) {
       dispatch({
         type: 'PAGE_STATE_UPDATE',
         pageState,
+        globalScopeMeta,
       });
     },
     pageBindingsUpdate(bindings: LiveBindings) {

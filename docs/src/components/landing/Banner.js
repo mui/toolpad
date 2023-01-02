@@ -17,7 +17,7 @@ export default function Banner(props) {
         sx={{
           pt: 0,
           pb: { xs: 2, sm: 8, md: docs ? 1 : 16 },
-          px: docs ? { xs: 0, sm: 0, md: 3 } : 'default',
+          px: docs ? { xs: 0, sm: 0, md: 0 } : 'default',
           display: 'flex',
           flexDirection: 'row',
           justifyContent: 'center',
@@ -27,7 +27,7 @@ export default function Banner(props) {
           sx={{
             borderRadius: 1,
             px: 2,
-            py: docs ? 3 : 2,
+            py: docs ? 2.5 : 2,
             bgcolor: (theme) =>
               theme.palette.mode === 'dark'
                 ? alpha(theme.palette.primaryDark[900], 0.5)

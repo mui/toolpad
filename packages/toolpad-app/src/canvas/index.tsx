@@ -22,7 +22,7 @@ export interface ToolpadBridge {
 
 declare global {
   interface Window {
-    __TOOLPAD_BRIDGE__?: ToolpadBridge | ((bridge: ToolpadBridge) => void);
+    __TOOLPAD_BRIDGE__?: ToolpadBridge | ((bridge: ToolpadBridge) => void) | 'consumed';
   }
 }
 
@@ -110,7 +110,10 @@ export default function AppCanvas({ basename }: AppCanvasProps) {
     if (typeof window.__TOOLPAD_BRIDGE__ === 'function') {
       // eslint-disable-next-line no-underscore-dangle
       window.__TOOLPAD_BRIDGE__(bridge);
-    } else {
+      // eslint-disable-next-line no-underscore-dangle
+      window.__TOOLPAD_BRIDGE__ = 'consumed';
+      // eslint-disable-next-line no-underscore-dangle
+    } else if (typeof window.__TOOLPAD_BRIDGE__ === 'undefined') {
       // eslint-disable-next-line no-underscore-dangle
       window.__TOOLPAD_BRIDGE__ = bridge;
     }

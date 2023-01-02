@@ -37,11 +37,11 @@ import {
   RECTANGLE_EDGE_TOP,
   rectContainsPoint,
 } from '../../../../utils/geometry';
-import { EditorCanvasHostHandle } from '../EditorCanvasHost';
 import NodeHud from './NodeHud';
 import { OverlayGrid, OverlayGridHandle } from './OverlayGrid';
 import { NodeInfo } from '../../../../types';
 import NodeDropArea from './NodeDropArea';
+import { ToolpadBridge } from '../../../../canvas';
 
 const HORIZONTAL_RESIZE_SNAP_UNITS = 4; // px
 const SNAP_TO_GRID_COLUMN_MARGIN = 10; // px
@@ -268,10 +268,10 @@ function deleteOrphanedLayoutNodes(
 }
 
 interface RenderOverlayProps {
-  canvasHostRef: React.RefObject<EditorCanvasHostHandle>;
+  bridge: ToolpadBridge | null;
 }
 
-export default function RenderOverlay({ canvasHostRef }: RenderOverlayProps) {
+export default function RenderOverlay({ bridge }: RenderOverlayProps) {
   const { dom, selectedNodeId } = useDom();
   const domApi = useDomApi();
   const api = usePageEditorApi();
@@ -380,7 +380,7 @@ export default function RenderOverlay({ canvasHostRef }: RenderOverlayProps) {
 
   const handleNodeMouseUp = React.useCallback(
     (event: React.MouseEvent<HTMLDivElement>) => {
-      const cursorPos = canvasHostRef.current?.getViewCoordinates(event.clientX, event.clientY);
+      const cursorPos = bridge?.getViewCoordinates(event.clientX, event.clientY);
 
       if (!cursorPos || draggedNodeId) {
         return;
@@ -395,7 +395,7 @@ export default function RenderOverlay({ canvasHostRef }: RenderOverlayProps) {
         deselectNode();
       }
     },
-    [canvasHostRef, draggedNodeId, selectionRects, dom, selectNode, deselectNode],
+    [bridge, deselectNode, dom, draggedNodeId, selectNode, selectionRects],
   );
 
   const handleNodeDelete = React.useCallback(
@@ -748,7 +748,7 @@ export default function RenderOverlay({ canvasHostRef }: RenderOverlayProps) {
     (event: React.DragEvent<Element>) => {
       event.preventDefault();
 
-      const cursorPos = canvasHostRef.current?.getViewCoordinates(event.clientX, event.clientY);
+      const cursorPos = bridge?.getViewCoordinates(event.clientX, event.clientY);
 
       if (!cursorPos || !draggedNode) {
         return;
@@ -896,7 +896,7 @@ export default function RenderOverlay({ canvasHostRef }: RenderOverlayProps) {
       }
     },
     [
-      canvasHostRef,
+      bridge,
       draggedNode,
       dropAreaRects,
       pageNode.id,
@@ -914,7 +914,7 @@ export default function RenderOverlay({ canvasHostRef }: RenderOverlayProps) {
 
   const handleNodeDrop = React.useCallback(
     (event: React.DragEvent<Element>) => {
-      const cursorPos = canvasHostRef.current?.getViewCoordinates(event.clientX, event.clientY);
+      const cursorPos = bridge?.getViewCoordinates(event.clientX, event.clientY);
 
       if (
         !draggedNode ||
@@ -1227,7 +1227,7 @@ export default function RenderOverlay({ canvasHostRef }: RenderOverlayProps) {
     [
       api,
       availableDropZones,
-      canvasHostRef,
+      bridge,
       dom,
       domApi,
       dragOverNodeId,
@@ -1287,7 +1287,7 @@ export default function RenderOverlay({ canvasHostRef }: RenderOverlayProps) {
       const parentInfo = parent ? nodesInfo[parent.id] : null;
       const parentRect = parentInfo?.rect;
 
-      const cursorPos = canvasHostRef.current?.getViewCoordinates(event.clientX, event.clientY);
+      const cursorPos = bridge?.getViewCoordinates(event.clientX, event.clientY);
 
       if (draggedNodeRect && parentRect && resizePreviewElement && cursorPos) {
         if (draggedEdge === RECTANGLE_EDGE_LEFT || draggedEdge === RECTANGLE_EDGE_RIGHT) {
@@ -1361,7 +1361,7 @@ export default function RenderOverlay({ canvasHostRef }: RenderOverlayProps) {
         }
       }
     },
-    [canvasHostRef, dom, draggedEdge, draggedNode, nodesInfo, resizePreviewElement],
+    [bridge, dom, draggedEdge, draggedNode, nodesInfo, resizePreviewElement],
   );
 
   const handleEdgeDragEnd = React.useCallback(

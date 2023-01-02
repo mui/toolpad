@@ -18,6 +18,8 @@ const useInspectorTheme = (): InspectorTheme => {
       TREENODE_FONT_SIZE: 'inherit',
       ARROW_FONT_SIZE: 'inherit',
       TREENODE_LINE_HEIGHT: 'inherit',
+      OBJECT_PREVIEW_ARRAY_MAX_PROPERTIES: 1,
+      OBJECT_PREVIEW_OBJECT_MAX_PROPERTIES: 1,
     };
   }, [theme]);
 };

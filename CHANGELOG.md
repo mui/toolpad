@@ -1,5 +1,47 @@
 # Changelog
 
+## 0.0.33
+
+<!-- generated comparing v0.0.32..master -->
+
+_Dec 28, 2022_
+
+A big thanks to the 2 contributors who made this release possible. Here are some highlights ✨:
+
+Improvements to the scope explorer, and some other bug fixes an improvements.
+
+- &#8203;<!-- 4 -->Fix: Demo reCaptcha v2 fallback does not work (#1485) @bharatkashyap
+- &#8203;<!-- 3 -->Group scope variables by function in global scope explorer (#1464) @Janpot
+- &#8203;<!-- 2 -->Fix canvas ref timing issues (#1476) @Janpot
+- &#8203;<!-- 1 -->Fix flaky rest-basics test (#1481) @Janpot
+
+All contributors of this release in alphabetical order: @bharatkashyap, @Janpot
+
+## 0.0.32
+
+<!-- generated comparing v0.0.31..master -->
+
+_Dec 21, 2022_
+
+A big thanks to the 5 contributors who made this release possible. Here are some highlights ✨:
+
+Added survey for the Toolpad usage, simplified RPC logs, added latest deployment preview in the editor, undo/redo improvements, improved grid columns editor, added visual feedback when query runs, as well as various fixes.
+
+- &#8203;<!-- 12 -->Add survey dialog (#1480) @bytasv
+- &#8203;<!-- 11 -->Simplify RPC logs (#1473) @Janpot
+- &#8203;<!-- 10 -->Move recaptcha script away from \_app (#1472) @Janpot
+- &#8203;<!-- 09 -->Add latest deployment preview in editor (#1423) @bytasv
+- &#8203;<!-- 08 -->Single-update undo/redo (#1374) @apedroferreira
+- &#8203;<!-- 07 -->Non permanent root redirection (#1468) @oliviertassinari
+- &#8203;<!-- 06 -->Fix display of errors during loading of data (#1457) @Janpot
+- &#8203;<!-- 05 -->Replace gridcolumns editor dialog with popover (#1455) @Janpot
+- &#8203;<!-- 04 -->Fix: Incorrect migration for Text component (#1451) @bharatkashyap
+- &#8203;<!-- 03 -->Add formatting options to DataGrid columns (#1449) @Janpot
+- &#8203;<!-- 02 -->Add visual feedback when query is running (#1454) @Janpot
+- &#8203;<!-- 01 -->[docs] Banner tweaks (#1475) @bharatkashyap
+
+All contributors of this release in alphabetical order: @apedroferreira, @bharatkashyap, @bytasv, @Janpot, @oliviertassinari
+
 ## 0.0.31
 
 <!-- generated comparing v0.0.30..master -->

@@ -28,6 +28,8 @@ import {
   NavigationAction,
   NodeId,
   JsExpressionAction,
+  GlobalScopeMeta,
+  GlobalScopeMetaField,
 } from '@mui/toolpad-core';
 import { TabContext, TabList } from '@mui/lab';
 import { Maybe, WithControlledProp } from '../../utils/types';
@@ -44,12 +46,11 @@ import * as appDom from '../../appDom';
 import { usePageEditorState } from './PageEditor/PageEditorProvider';
 import GlobalScopeExplorer from './GlobalScopeExplorer';
 import TabPanel from '../../components/TabPanel';
-import { GlobalScopeMeta } from '../../types';
 
 interface BindingEditorContext {
   label: string;
   globalScope: Record<string, unknown>;
-  globalScopeMeta?: GlobalScopeMeta;
+  globalScopeMeta: GlobalScopeMeta;
   /**
    * Serverside binding, use the QuickJs runtime to evaluate bindings
    */
@@ -72,12 +73,12 @@ const ErrorTooltip = styled(({ className, ...props }: TooltipProps) => (
 
 interface JsExpressionBindingEditorProps extends WithControlledProp<JsExpressionAttrValue | null> {
   globalScope: Record<string, unknown>;
-  globalScopeMeta?: GlobalScopeMeta;
+  globalScopeMeta: GlobalScopeMeta;
 }
 
 function JsExpressionBindingEditor({
   globalScope,
-  globalScopeMeta = {},
+  globalScopeMeta,
   value,
   onChange,
 }: JsExpressionBindingEditorProps) {
@@ -124,6 +125,7 @@ export interface JsBindingEditorProps extends WithControlledProp<JsExpressionAtt
 
 export function JsBindingEditor({ value, onChange }: JsBindingEditorProps) {
   const { label, globalScope, globalScopeMeta = {}, server, propType } = useBindingEditorContext();
+
   return (
     <Stack direction="row" sx={{ height: 400, gap: 2 }}>
       <GlobalScopeExplorer sx={{ width: 250 }} value={globalScope} meta={globalScopeMeta} />
@@ -426,18 +428,15 @@ export function BindingEditor<V>({
     const meta: GlobalScopeMeta = { ...globalScopeMeta };
     if (propType?.type === 'event' && propType.arguments) {
       for (const { name, tsType } of propType.arguments) {
-        meta[name] ??= {};
-        meta[name].tsType = tsType;
+        const metaField: GlobalScopeMetaField = meta[name] ?? {};
+        metaField.kind = 'local';
+        metaField.tsType = tsType;
+        meta[name] = metaField;
       }
     }
 
-    for (const [name, globalValue] of Object.entries(globalScope)) {
-      meta[name] ??= {};
-      meta[name].value = globalValue;
-    }
-
     return meta;
-  }, [propType, globalScopeMeta, globalScope]);
+  }, [propType, globalScopeMeta]);
 
   const bindingEditorContext: BindingEditorContext = React.useMemo(
     () => ({

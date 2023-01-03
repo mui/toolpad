@@ -49,6 +49,7 @@ export default createComponent(DatePicker, {
       typeDef: { type: 'string' },
       onChangeProp: 'onChange',
       onChangeHandler: (newValue: Dayjs) => {
+        // date-only form of ISO8601. See https://tc39.es/ecma262/#sec-date-time-string-format
         return newValue.format('YYYY-MM-DD');
       },
       defaultValue: '',

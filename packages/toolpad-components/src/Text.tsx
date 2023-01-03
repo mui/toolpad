@@ -56,6 +56,7 @@ function Text({ value, markdown, href, loading, mode, sx, ...rest }: TextProps) 
                     component: CodeContainer,
                   },
                 },
+                slugify: (text) => `toolpad-markdown-${text}`,
               }}
             >
               {value}

@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { styled } from '@mui/material';
-import { Route, Routes, useParams, Navigate } from 'react-router-dom';
+import { Route, Routes, useParams, Navigate, useNavigate } from 'react-router-dom';
 import { JsRuntimeProvider } from '@mui/toolpad-core/jsRuntime';
 import PageEditor from './PageEditor';
 import DomProvider, { useDom } from '../DomLoader';
@@ -43,18 +43,35 @@ interface FileEditorProps {
 }
 
 function FileEditor({ appId }: FileEditorProps) {
-  const { dom } = useDom();
+  const { dom, currentView } = useDom();
+
   const app = appDom.getApp(dom);
   const { pages = [] } = appDom.getChildNodes(dom, app);
 
+  const navigate = useNavigate();
+
   const firstPage = pages.length > 0 ? pages[0] : null;
+
+  React.useEffect(() => {
+    switch (currentView.kind) {
+      case 'page':
+        navigate(`/app/${appId}/pages/${currentView.nodeId || firstPage?.id}`, { replace: true });
+        break;
+      case 'connection':
+        navigate(`/app/${appId}/connections/${currentView.nodeId}`, { replace: true });
+        break;
+      case 'codeComponent':
+        navigate(`/app/${appId}/codeComponents/${currentView.nodeId}`);
+        break;
+      default:
+    }
+  }, [appId, currentView.kind, currentView.nodeId, firstPage?.id, navigate]);
 
   return (
     <Routes>
       <Route element={<AppEditorShell appId={appId} />}>
         <Route path="connections/:nodeId" element={<ConnectionEditor appId={appId} />} />
         <Route path="pages/:nodeId" element={<PageEditor appId={appId} />} />
-        <Route path="codeComponents/:nodeId" element={<CodeComponentEditor appId={appId} />} />
         <Route path="codeComponents/:nodeId" element={<CodeComponentEditor appId={appId} />} />
         <Route
           index

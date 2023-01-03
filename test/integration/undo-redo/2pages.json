@@ -1,0 +1,117 @@
+{
+  "root": "vn009hx",
+  "nodes": {
+    "vn009hx": {
+      "id": "vn009hx",
+      "name": "Application",
+      "type": "app",
+      "parentId": null,
+      "attributes": {},
+      "parentProp": null,
+      "parentIndex": null
+    },
+    "vo1091s": {
+      "id": "vo1091s",
+      "name": "page1",
+      "type": "page",
+      "parentId": "vn009hx",
+      "attributes": {
+        "title": {
+          "type": "const",
+          "value": "Page 1"
+        }
+      },
+      "parentProp": "pages",
+      "parentIndex": "a0"
+    },
+    "8823y0s": {
+      "name": "pageRow",
+      "props": {},
+      "attributes": {
+        "component": {
+          "type": "const",
+          "value": "PageRow"
+        }
+      },
+      "layout": {},
+      "id": "8823y0s",
+      "type": "element",
+      "parentId": "vo1091s",
+      "parentProp": "children",
+      "parentIndex": "a0"
+    },
+    "fg03ynw": {
+      "name": "button",
+      "props": {
+        "content": {
+          "type": "const",
+          "value": "page1Button"
+        }
+      },
+      "attributes": {
+        "component": {
+          "type": "const",
+          "value": "Button"
+        }
+      },
+      "layout": {},
+      "id": "fg03ynw",
+      "type": "element",
+      "parentId": "8823y0s",
+      "parentProp": "children",
+      "parentIndex": "a0"
+    },
+    "g433ywb": {
+      "name": "page2",
+      "attributes": {
+        "title": {
+          "type": "const",
+          "value": "page2"
+        }
+      },
+      "id": "g433ywb",
+      "type": "page",
+      "parentId": "vn009hx",
+      "parentProp": "pages",
+      "parentIndex": "a1"
+    },
+    "it63yzs": {
+      "name": "pageRow",
+      "props": {},
+      "attributes": {
+        "component": {
+          "type": "const",
+          "value": "PageRow"
+        }
+      },
+      "layout": {},
+      "id": "it63yzs",
+      "type": "element",
+      "parentId": "g433ywb",
+      "parentProp": "children",
+      "parentIndex": "a0"
+    },
+    "5m43y1o": {
+      "name": "button",
+      "props": {
+        "content": {
+          "type": "const",
+          "value": "page2Button"
+        }
+      },
+      "attributes": {
+        "component": {
+          "type": "const",
+          "value": "Button"
+        }
+      },
+      "layout": {},
+      "id": "5m43y1o",
+      "type": "element",
+      "parentId": "it63yzs",
+      "parentProp": "children",
+      "parentIndex": "a0"
+    }
+  },
+  "version": 5
+}

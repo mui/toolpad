@@ -231,6 +231,10 @@ export default function QueryNodeEditorDialog<Q>({
     onClose();
   }, [handleCommit, onClose]);
 
+  React.useEffect(() => {
+    setInput(node);
+  }, [node]);
+
   const queryEditorContext = React.useMemo(
     () => (dataSourceId ? { appId, dataSourceId, connectionId } : null),
     [appId, dataSourceId, connectionId],

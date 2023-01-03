@@ -234,7 +234,6 @@ function QueryEditor({
           <Box sx={{ flex: 1, minHeight: 0 }}>
             <TypescriptEditor
               value={input.attributes.query.value.module}
-              data-testid="function editor"
               onChange={(newValue) => {
                 setInput((existing) => appDom.setQueryProp(existing, 'module', newValue));
               }}

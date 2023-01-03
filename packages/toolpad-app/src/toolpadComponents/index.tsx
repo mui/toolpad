@@ -39,6 +39,7 @@ const INTERNAL_COMPONENTS = new Map<string, ToolpadComponentDefinition>([
   ['Image', { displayName: 'Image', builtIn: 'Image' }],
   ['DataGrid', { displayName: 'Data grid', builtIn: 'DataGrid' }],
   ['TextField', { displayName: 'Text field', builtIn: 'TextField' }],
+  ['DatePicker', { displayName: 'Date picker', builtIn: 'DatePicker' }],
   ['Text', { displayName: 'Text', builtIn: 'Text' }],
   ['Select', { displayName: 'Select', builtIn: 'Select' }],
   ['Paper', { displayName: 'Paper', builtIn: 'Paper' }],

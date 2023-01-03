@@ -26,15 +26,17 @@ export default function NodeAttributeEditor<P extends object>({
 
   const handlePropChange = React.useCallback(
     (newValue: BindableAttrValue<unknown> | null) => {
-      domApi.setNodeNamespacedProp(node, namespace as any, name, newValue);
+      domApi.update((draft) =>
+        appDom.setNodeNamespacedProp(draft, node, namespace as any, name, newValue),
+      );
     },
-    [domApi, node, namespace, name],
+    [node, namespace, name, domApi],
   );
 
   const propValue: BindableAttrValue<unknown> | null = (node as any)[namespace]?.[name] ?? null;
 
   const bindingId = `${node.id}${namespace ? `.${namespace}` : ''}.${name}`;
-  const { bindings, pageState } = usePageEditorState();
+  const { bindings, pageState, globalScopeMeta } = usePageEditorState();
   const liveBinding = bindings[bindingId];
   const globalScope = pageState;
   const propType = argType.typeDef;
@@ -50,6 +52,7 @@ export default function NodeAttributeEditor<P extends object>({
     <BindableEditor
       liveBinding={liveBinding}
       globalScope={globalScope}
+      globalScopeMeta={globalScopeMeta}
       label={argType.label || name}
       bindable={isBindable}
       disabled={isDisabled}

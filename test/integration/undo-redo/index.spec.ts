@@ -28,9 +28,6 @@ test('test basic undo and redo', async ({ page, browserName, api }) => {
   // Ensure that we added 3rd text field
   await expect(canvasInputLocator).toHaveCount(3);
 
-  // Wait for undo stack to be updated
-  await page.waitForTimeout(600);
-
   // Undo adding text field
   await page.keyboard.press('Control+Z');
 
@@ -84,4 +81,35 @@ test('test batching text input actions into single undo entry', async ({
 
   // Asssert that batched changes were reverted
   await expect(input).toHaveValue('some value');
+});
+
+test('test undo and redo through different pages', async ({ page, browserName, api }) => {
+  const dom = await readJsonFile(path.resolve(__dirname, './2pages.json'));
+
+  const app = await api.mutation.createApp(`App ${generateId()}`, {
+    from: { kind: 'dom', dom },
+  });
+
+  const editorModel = new ToolpadEditor(page, browserName);
+  await editorModel.goto(app.id);
+
+  await editorModel.waitForOverlay();
+
+  const pageButton1 = editorModel.appCanvas.getByRole('button', {
+    name: 'page1Button',
+  });
+  await expect(pageButton1).toBeVisible();
+
+  await editorModel.goToPage('page2');
+
+  const pageButton2 = editorModel.appCanvas.getByRole('button', {
+    name: 'page2Button',
+  });
+  await expect(pageButton2).toBeVisible();
+
+  // Undo changes
+  await page.keyboard.press('Control+Z');
+  page.waitForNavigation();
+
+  await expect(pageButton1).toBeVisible();
 });

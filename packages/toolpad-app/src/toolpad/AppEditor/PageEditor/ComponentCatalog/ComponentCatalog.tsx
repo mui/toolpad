@@ -24,10 +24,6 @@ const FUTURE_COMPONENTS = new Map<string, FutureComponentSpec>([
   ['Slider', { url: 'https://github.com/mui/mui-toolpad/issues/746', displayName: 'Slider' }],
   ['Switch', { url: 'https://github.com/mui/mui-toolpad/issues/745', displayName: 'Switch' }],
   ['Radio', { url: 'https://github.com/mui/mui-toolpad/issues/744', displayName: 'Radio' }],
-  [
-    'DatePicker',
-    { url: 'https://github.com/mui/mui-toolpad/issues/743', displayName: 'Date picker' },
-  ],
   ['Checkbox', { url: 'https://github.com/mui/mui-toolpad/issues/742', displayName: 'Checkbox' }],
 ]);
 

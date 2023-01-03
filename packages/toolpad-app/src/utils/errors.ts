@@ -3,8 +3,8 @@ import { hasOwnProperty } from './collections';
 import { truncate } from './strings';
 
 export function serializeError(error: Error): SerializedError {
-  const { message, name, stack } = error;
-  return { message, name, stack };
+  const { message, name, stack, code } = error;
+  return { message, name, stack, code };
 }
 
 /**

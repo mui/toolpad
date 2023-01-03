@@ -90,26 +90,20 @@ function ComponentPropsEditor<P extends object>({
           <Typography variant="overline" className={classes.sectionHeading}>
             Layout:
           </Typography>
-          {hasLayoutHorizontalControls ? (
-            <div className={classes.control}>
-              <NodeAttributeEditor
-                node={node}
-                namespace="layout"
-                name="horizontalAlign"
-                argType={layoutBoxArgTypes.horizontalAlign}
-              />
-            </div>
-          ) : null}
-          {hasLayoutVerticalControls ? (
-            <div className={classes.control}>
-              <NodeAttributeEditor
-                node={node}
-                namespace="layout"
-                name="verticalAlign"
-                argType={layoutBoxArgTypes.verticalAlign}
-              />
-            </div>
-          ) : null}
+
+          <div className={classes.control}>
+            <NodeAttributeEditor
+              node={node}
+              namespace="layout"
+              name={hasLayoutHorizontalControls ? 'horizontalAlign' : 'verticalAlign'}
+              argType={
+                hasLayoutHorizontalControls
+                  ? layoutBoxArgTypes.horizontalAlign
+                  : layoutBoxArgTypes.verticalAlign
+              }
+            />
+          </div>
+
           <Divider sx={{ mt: 1 }} />
         </React.Fragment>
       ) : null}

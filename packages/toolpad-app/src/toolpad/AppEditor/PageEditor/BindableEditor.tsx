@@ -49,11 +49,13 @@ export default function BindableEditor<V>({
   );
 
   const initConstValue = React.useCallback(() => {
+    let constValue = liveBinding?.value;
+
     if (value?.type === 'const') {
-      return value.value;
+      constValue = value.value;
     }
 
-    return liveBinding?.value;
+    return constValue;
   }, [liveBinding, value]);
 
   const constValue = React.useMemo(initConstValue, [value, initConstValue]);

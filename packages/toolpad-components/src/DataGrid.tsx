@@ -299,7 +299,8 @@ const DataGridComponent = React.forwardRef(function DataGridComponent(
     () => ({
       ...CUSTOM_COLUMN_TYPES,
       codeComponent: {
-        renderCell: ({ value, colDef }: GridRenderCellParams) => {
+        renderCell: (params: GridRenderCellParams) => {
+          const { value, colDef, row, field } = params;
           const column = colDef as SerializableGridColumn;
 
           invariant(components, 'Components must be defined');
@@ -314,7 +315,7 @@ const DataGridComponent = React.forwardRef(function DataGridComponent(
             );
           }
 
-          return <Component {...value} />;
+          return <Component value={value} row={row} field={field} />;
         },
       },
     }),

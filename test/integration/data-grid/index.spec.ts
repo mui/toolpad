@@ -16,5 +16,11 @@ test('Code component cell', async ({ page, browserName, api }) => {
 
   await editorModel.waitForOverlay();
 
-  await expect(editorModel.pageRoot.getByText('Testing passed')).toBeVisible();
+  await expect(editorModel.pageRoot.getByText('value: {"test":"value"}')).toBeVisible();
+  await expect(
+    editorModel.pageRoot.getByText(
+      'row: {"hiddenField":true,"customField":{"test":"value"},"id":0}',
+    ),
+  ).toBeVisible();
+  await expect(editorModel.pageRoot.getByText('field: "customField"')).toBeVisible();
 });

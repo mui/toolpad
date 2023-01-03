@@ -40,7 +40,7 @@
     "@googleapis/sheets": "^4.0.1",
     "@mui/icons-material": "^5.11.0",
     "@mui/lab": "^5.0.0-alpha.114",
-    "@mui/material": "^5.11.2",
+    "@mui/material": "^5.11.3",
     "@mui/system": "^5.11.2",
     "@mui/toolpad-components": "^0.0.33",
     "@mui/toolpad-core": "^0.0.33",

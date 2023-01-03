@@ -67,7 +67,7 @@ export default function RenderPanel({ className }: RenderPanelProps) {
           return;
         }
         case 'pageStateUpdated': {
-          api.pageStateUpdate(event.pageState);
+          api.pageStateUpdate(event.pageState, event.globalScopeMeta);
           return;
         }
         case 'pageBindingsUpdated': {

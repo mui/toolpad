@@ -34,7 +34,7 @@ services:
   playwright:
     profiles:
       - test
-    image: mcr.microsoft.com/playwright:v1.29.0-focal
+    image: mcr.microsoft.com/playwright:v1.29.1-focal
     environment:
       - PLAYWRIGHT_TEST_BASE_URL=http://toolpad:3000/
       - HTTPBIN_BASEURL=http://httpbin/

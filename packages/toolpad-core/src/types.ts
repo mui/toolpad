@@ -217,6 +217,25 @@ export interface LiveBinding {
   error?: LiveBindingError;
 }
 
+export type GlobalScopeMetaField = {
+  description?: string;
+  deprecated?: boolean | string;
+  tsType?: string;
+} & (
+  | {
+      kind?: undefined;
+    }
+  | {
+      kind: 'element';
+      componentId: string;
+    }
+  | {
+      kind: 'query' | 'local';
+    }
+);
+
+export type GlobalScopeMeta = Partial<Record<string, GlobalScopeMetaField>>;
+
 export type RuntimeEvents = {
   propUpdated: {
     nodeId: string;
@@ -225,6 +244,7 @@ export type RuntimeEvents = {
   };
   pageStateUpdated: {
     pageState: Record<string, unknown>;
+    globalScopeMeta: GlobalScopeMeta;
   };
   pageBindingsUpdated: {
     bindings: LiveBindings;
@@ -286,6 +306,7 @@ export interface SerializedError {
   message: string;
   name: string;
   stack?: string;
+  code?: unknown;
 }
 
 export type ExecFetchResult<T = any> = {

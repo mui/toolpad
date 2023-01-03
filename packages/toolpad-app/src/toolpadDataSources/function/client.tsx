@@ -121,6 +121,7 @@ const EMPTY_PARAMS: BindableAttrEntries = [];
 
 function QueryEditor({
   globalScope,
+  globalScopeMeta,
   value: input,
   onChange: setInput,
   onCommit,
@@ -247,6 +248,7 @@ function QueryEditor({
             value={paramsEntries}
             onChange={handleParamsChange}
             globalScope={globalScope}
+            globalScopeMeta={globalScopeMeta}
             liveValue={paramsEditorLiveValue}
           />
         </Box>

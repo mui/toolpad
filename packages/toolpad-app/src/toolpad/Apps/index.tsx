@@ -151,7 +151,7 @@ function CreateAppDialog({
   const [name, setName] = React.useState('');
   const [appTemplateId, setAppTemplateId] = React.useState<AppTemplateId>('default');
   const [dom, setDom] = React.useState('');
-  const [recaptachaApiLoaded, setRecaptachaApiLoaded] = React.useState(false);
+  const [recaptchaApiLoaded, setRecaptchaApiLoaded] = React.useState(false);
   const [requestRecaptchaV2, setRequestRecaptchaV2] = React.useState(false);
   const [recaptchaV2Token, setRecaptchaV2Token] = React.useState('');
 
@@ -214,7 +214,7 @@ function CreateAppDialog({
 
   const recaptchaSubmitEnabled =
     config.recaptchaV2SiteKey || config.recaptchaV3SiteKey
-      ? recaptachaApiLoaded && ((requestRecaptchaV2 && recaptchaV2Token) || !requestRecaptchaV2)
+      ? recaptchaApiLoaded && ((requestRecaptchaV2 && recaptchaV2Token) || !requestRecaptchaV2)
       : true;
 
   const handleSubmit = React.useCallback(
@@ -223,7 +223,9 @@ function CreateAppDialog({
 
       event.preventDefault();
 
-      // Check if captcha checkbox was solved
+      // Fallback: request validation with RecaptchaV2 instead, so requestRecaptchaV2 will be true
+
+      // Check if this is the fallback scenario
       let recaptchaToken = requestRecaptchaV2 ? recaptchaV2Token : '';
 
       if (config.recaptchaV3SiteKey && !requestRecaptchaV2) {
@@ -263,7 +265,7 @@ function CreateAppDialog({
       } catch (rawError) {
         const error = errorFrom(rawError);
         if (config.recaptchaV2SiteKey && error.code === ERR_VALIDATE_CAPTCHA_FAILED) {
-          // Show captcha checkbox
+          // Show recaptcha v2 checkbox as a fallback
           setRequestRecaptchaV2(true);
         } else {
           throw error;
@@ -304,7 +306,7 @@ function CreateAppDialog({
                   },
                 });
               }
-              setRecaptachaApiLoaded(true);
+              setRecaptchaApiLoaded(true);
             });
           }}
         />

@@ -1,7 +1,6 @@
 import * as React from 'react';
 import { styled } from '@mui/material';
 import { RuntimeEvent, NodeId } from '@mui/toolpad-core';
-import { useNavigate } from 'react-router-dom';
 import * as appDom from '../../../../appDom';
 import EditorCanvasHost from '../EditorCanvasHost';
 import { getNodeHashes, useDom, useDomApi, useDomLoader } from '../../../DomLoader';
@@ -36,8 +35,6 @@ export default function RenderPanel({ className }: RenderPanelProps) {
   const { appId, nodeId: pageNodeId } = usePageEditorState();
 
   const [bridge, setBridge] = React.useState<ToolpadBridge | null>(null);
-
-  const navigate = useNavigate();
 
   const savedNodes: NodeHashes = React.useMemo(
     () => getNodeHashes(domLoader.savedDom),
@@ -80,7 +77,7 @@ export default function RenderPanel({ className }: RenderPanelProps) {
           return;
         }
         case 'pageNavigationRequest': {
-          navigate(`../pages/${event.pageNodeId}`);
+          domApi.setView({ kind: 'page', nodeId: event.pageNodeId });
           return;
         }
         default:

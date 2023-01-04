@@ -16,3 +16,7 @@ export * from './constants.js';
 export { default as createComponent } from './createComponent.js';
 
 export * from './types';
+
+export * from './componentsContext';
+
+export * from './utils';

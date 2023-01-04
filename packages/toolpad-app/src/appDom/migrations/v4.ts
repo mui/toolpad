@@ -6,7 +6,6 @@ function replaceTypographyWithText(node: appDom.AppDomNode): appDom.AppDomNode {
   if (node.type === 'element' && node.attributes.component.value === 'Typography') {
     return {
       ...node,
-      name: node.name.replace(/Typography|Link/gi, 'text'),
       attributes: {
         component: {
           ...node.attributes.component,

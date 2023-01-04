@@ -82,7 +82,6 @@ export interface NodeRuntimeWrapperProps {
   nodeId: string;
   componentConfig: ComponentConfig<any>;
   NodeError: React.ComponentType<NodeErrorProps>;
-  components: Components;
 }
 
 export function NodeRuntimeWrapper({

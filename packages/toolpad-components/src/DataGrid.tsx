@@ -19,11 +19,12 @@ import {
   GridRenderCellParams,
 } from '@mui/x-data-grid-pro';
 import * as React from 'react';
-import { useNode, createComponent, ComponentsContext } from '@mui/toolpad-core';
+import { useNode, createComponent } from '@mui/toolpad-core';
 import { Box, debounce, LinearProgress, Skeleton, Link, styled, Typography } from '@mui/material';
 import { getObjectKey } from '@mui/toolpad-core/objectKey';
 import { hasImageExtension } from '@mui/toolpad-core/path';
 import invariant from 'invariant';
+import { useComponents } from '@mui/toolpad-app/src/runtime/ComponentsContext';
 
 // Pseudo random number. See https://stackoverflow.com/a/47593316
 function mulberry32(a: number): () => number {
@@ -292,7 +293,7 @@ const DataGridComponent = React.forwardRef(function DataGridComponent(
   }: ToolpadDataGridProps,
   ref: React.ForwardedRef<HTMLDivElement>,
 ) {
-  const components = React.useContext(ComponentsContext);
+  const components = useComponents();
 
   const nodeRuntime = useNode<ToolpadDataGridProps>();
   const columnTypes = React.useMemo(

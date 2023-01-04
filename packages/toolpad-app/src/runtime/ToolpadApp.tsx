@@ -334,8 +334,6 @@ function RenderedNodeContent({ node, childNodeGroups, Component }: RenderedNodeC
     return {};
   }, [childNodeGroups.children, node]);
 
-  const components = useComponents();
-
   const props: Record<string, any> = React.useMemo(() => {
     return {
       ...boundProps,
@@ -384,7 +382,6 @@ function RenderedNodeContent({ node, childNodeGroups, Component }: RenderedNodeC
   return (
     <NodeRuntimeWrapper
       nodeId={nodeId}
-      components={components}
       componentConfig={Component[TOOLPAD_COMPONENT]}
       NodeError={NodeError}
     >

@@ -12,8 +12,6 @@ export type Components = ToolpadComponents;
 
 export const ComponentsContext = React.createContext<ToolpadComponents | null>(null);
 
-const ComponentsProvider = ComponentsContext.Provider;
-
 declare global {
   interface Window {
     __TOOLPAD_RUNTIME_EVENT__?: RuntimeEvent[] | ((event: RuntimeEvent) => void);
@@ -92,7 +90,6 @@ export function NodeRuntimeWrapper({
   componentConfig,
   children,
   NodeError,
-  components,
 }: NodeRuntimeWrapperProps) {
   const resetNodeErrorsKey = React.useContext(ResetNodeErrorsKeyContext);
 
@@ -120,7 +117,7 @@ export function NodeRuntimeWrapper({
             componentConfig,
           }}
         >
-          <ComponentsProvider value={components}>{children}</ComponentsProvider>
+          {children}
         </NodeFiberHost>
       </NodeRuntimeContext.Provider>
     </ErrorBoundary>

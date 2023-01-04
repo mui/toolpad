@@ -38,7 +38,7 @@
     "test:build": "lerna run build --scope @mui/toolpad-core --scope @mui/toolpad-components --stream",
     "test:integration": "playwright test --config ./test/integration/playwright.config.ts",
     "test": "yarn test:build && jest",
-    "check-types": "lerna run check-types --parallel"
+    "check-types": "lerna run check-types"
   },
   "devDependencies": {
     "@mui/monorepo": "https://github.com/mui/material-ui.git",

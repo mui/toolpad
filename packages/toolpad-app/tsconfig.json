@@ -34,5 +34,6 @@
     "typings/**/*.d.ts",
     "scripts/*.mts"
   ],
-  "exclude": ["node_modules", "./scripts", "./public"]
+  "exclude": ["node_modules", "./scripts", "./public"],
+  "composite": true
 }

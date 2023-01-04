@@ -18,10 +18,10 @@
 
    This file contains a basic configuration, setting up a database and the Toolpad application server. You can use it as a starting point or for local development.
 
-2. Run the docker compose services with:
+1. Run the docker compose services with:
 
    ```sh
    docker-compose -f docker-compose.yml up -d
    ```
 
-3. Build and deploy applications on http://localhost:3000/.
+1. Build and deploy applications on http://localhost:3000/.

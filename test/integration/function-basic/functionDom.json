@@ -43,7 +43,7 @@
     },
     "3bv3ppv": {
       "id": "3bv3ppv",
-      "name": "text2",
+      "name": "typography2",
       "type": "element",
       "props": {
         "value": {
@@ -185,7 +185,7 @@
     },
     "oe93prg": {
       "id": "oe93prg",
-      "name": "text4",
+      "name": "typography4",
       "type": "element",
       "props": {
         "value": {
@@ -206,7 +206,7 @@
     },
     "v9o3p9k": {
       "id": "v9o3p9k",
-      "name": "text1",
+      "name": "typography1",
       "type": "element",
       "props": {
         "value": {
@@ -278,7 +278,7 @@
     },
     "yik3pld": {
       "id": "yik3pld",
-      "name": "text",
+      "name": "typography",
       "type": "element",
       "props": {
         "value": {
@@ -299,7 +299,7 @@
     },
     "ym23prd": {
       "id": "ym23prd",
-      "name": "text3",
+      "name": "typography3",
       "type": "element",
       "props": {
         "value": {

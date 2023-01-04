@@ -1,4 +1,4 @@
-import { Stack, styled, Typography, Divider } from '@mui/material';
+import { Stack, styled, Typography, Divider, Tooltip, Link as MuiLink } from '@mui/material';
 import * as React from 'react';
 import {
   ArgTypeDefinition,
@@ -6,6 +6,7 @@ import {
   ComponentConfig,
   LiveBinding,
 } from '@mui/toolpad-core';
+import Markdown from 'markdown-to-jsx';
 import { ExactEntriesOf } from '../../../utils/types';
 import * as appDom from '../../../appDom';
 import NodeAttributeEditor from './NodeAttributeEditor';
@@ -129,6 +130,39 @@ function ComponentPropsEditor<P extends object>({
   );
 }
 
+interface MarkdownTooltipProps {
+  title: string;
+  children: React.ReactElement<any, any>;
+}
+
+function MarkdownTooltip({ title, children }: MarkdownTooltipProps) {
+  // Only render markdown once
+  const renderedTitle = React.useMemo(
+    () => (
+      <Markdown
+        options={{
+          overrides: {
+            a: {
+              component: MuiLink,
+              props: {
+                target: '_blank',
+                rel: 'noopener noreferrer',
+              },
+            },
+            /*       pre: {
+              component: CodeContainer,
+            }, */
+          },
+        }}
+      >
+        {title}
+      </Markdown>
+    ),
+    [title],
+  );
+  return <Tooltip title={renderedTitle}>{children}</Tooltip>;
+}
+
 interface SelectedNodeEditorProps {
   node: appDom.ElementNode;
 }
@@ -142,12 +176,14 @@ function SelectedNodeEditor({ node }: SelectedNodeEditorProps) {
 
   const component = useToolpadComponent(dom, getElementNodeComponentId(node));
 
+  const displayName = component?.displayName || '<unknown>';
+
   return (
     <ElementContext.Provider value={node}>
       <Stack direction="column" gap={1}>
-        <Typography variant="subtitle1">
-          Component: {component?.displayName || '<unknown>'}
-        </Typography>
+        <MarkdownTooltip title={componentConfig.helperText ?? displayName}>
+          <Typography variant="subtitle1">Component: {displayName}</Typography>
+        </MarkdownTooltip>
         <Typography variant="subtitle2" sx={{ mb: 1 }}>
           ID: {node.id}
         </Typography>

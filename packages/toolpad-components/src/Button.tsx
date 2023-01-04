@@ -11,7 +11,8 @@ function Button({ content, ...rest }: ButtonProps) {
 }
 
 export default createComponent(Button, {
-  helperText: 'The standard MUI [Button component](https://mui.com/material-ui/react-button/)',
+  helperText:
+    'The standard MUI [Button](https://mui.com/material-ui/react-button/) component. `hellooooo`',
 
   layoutDirection: 'both',
   argTypes: {
@@ -25,7 +26,7 @@ export default createComponent(Button, {
     },
     variant: {
       helperText:
-        'One of the available [MUI variants](https://mui.com/material-ui/react-button/#basic-button).',
+        'One of the available MUI Button [variants](https://mui.com/material-ui/react-button/#basic-button). Possible values are `contained`, `outlined` or `text`',
       typeDef: { type: 'string', enum: ['contained', 'outlined', 'text'] },
       defaultValue: 'contained',
     },

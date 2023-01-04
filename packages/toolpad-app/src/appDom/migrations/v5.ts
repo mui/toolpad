@@ -6,7 +6,6 @@ function replaceLinkWithText(node: appDom.AppDomNode): appDom.AppDomNode {
   if (node.type === 'element' && node.attributes.component.value === 'Link') {
     return {
       ...node,
-      name: node.name.replace(/Link/gi, 'text'),
       attributes: {
         component: {
           ...node.attributes.component,

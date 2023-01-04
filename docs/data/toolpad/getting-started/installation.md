@@ -2,26 +2,26 @@
 
 <p class="description">Setup Toolpad to run on your own machine.</p>
 
-## Installing Docker
+## With Docker
 
-In order to run Toolpad you will need to have Docker set up on your machine. Follow [official instructions](https://www.docker.com/get-started/) to get started.
+### Prerequisites
 
-## Downloading Toolpad
+- A Docker and Docker Compose installation. Follow [official instructions](https://www.docker.com/get-started/) to get started.
 
-Toolpad runs inside a docker container so you first need to download the docker compose file. Run following command in your terminal:
+### Steps
 
-```sh
-curl -LO https://raw.githubusercontent.com/mui/mui-toolpad/master/docker/compose/docker-compose.yml
-```
+1. Download our basic Docker Compose configuration:
 
-## Running Toolpad
+   ```sh
+   curl -LO https://raw.githubusercontent.com/mui/mui-toolpad/master/docker/compose/docker-compose.yml
+   ```
 
-Now you need to run the docker container by running the following command:
+   This file contains a basic configuration, setting up a database and the Toolpad application server. You can use it as a starting point or for local development.
 
-```sh
-docker-compose -f docker-compose.yml up -d
-```
+2. Run the docker compose services with:
 
-## Opening Toolpad
+   ```sh
+   docker-compose -f docker-compose.yml up -d
+   ```
 
-You should now be able to open Toolpad on http://localhost:3000/.
+3. Build and deploy applications on http://localhost:3000/.

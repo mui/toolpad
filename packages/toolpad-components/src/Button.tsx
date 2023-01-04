@@ -11,16 +11,21 @@ function Button({ content, ...rest }: ButtonProps) {
 }
 
 export default createComponent(Button, {
+  helperText: 'The standard MUI [Button component](https://mui.com/material-ui/react-button/)',
+
   layoutDirection: 'both',
   argTypes: {
     onClick: {
       typeDef: { type: 'event' },
     },
     content: {
+      helperText: 'Will appear as the text content of the button.',
       typeDef: { type: 'string' },
       defaultValue: 'Button Text',
     },
     variant: {
+      helperText:
+        'One of the available [MUI variants](https://mui.com/material-ui/react-button/#basic-button).',
       typeDef: { type: 'string', enum: ['contained', 'outlined', 'text'] },
       defaultValue: 'contained',
     },

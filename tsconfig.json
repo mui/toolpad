@@ -23,10 +23,5 @@
     // https://github.com/TypeStrong/ts-node/issues/1915
     //  "swc": true
   },
-  "include": ["./test"],
-  "references": [
-    { "path": "./packages/toolpad-app/src" },
-    { "path": "./packages/toolpad-components/src" },
-    { "path": "./packages/toolpad-core/src" }
-  ]
+  "include": ["./test"]
 }

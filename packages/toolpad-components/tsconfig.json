@@ -14,6 +14,5 @@
     "target": "ES2020",
     "skipLibCheck": true
   },
-  "include": ["**/*.ts", "**/*.tsx"],
-  "composite": true
+  "include": ["**/*.ts", "**/*.tsx"]
 }

@@ -1,5 +1,5 @@
+import { createProvidedContext } from '@mui/toolpad-core';
 import { VersionOrPreview } from '../types';
-import { createProvidedContext } from '../utils/react';
 
 export interface AppContext {
   appId: string;

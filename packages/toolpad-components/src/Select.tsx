@@ -40,11 +40,13 @@ export default createComponent(Select, {
   loadingProp: 'disabled',
   argTypes: {
     options: {
+      helperText: 'The available options to select from.',
       typeDef: { type: 'array', schema: '/schemas/SelectOptions.json' },
       control: { type: 'SelectOptions' },
       defaultValue: [],
     },
     value: {
+      helperText: 'The currently selected value.',
       typeDef: { type: 'string' },
       onChangeProp: 'onChange',
       onChangeHandler: (event: React.ChangeEvent<HTMLSelectElement>) => event.target.value,
@@ -52,27 +54,32 @@ export default createComponent(Select, {
       defaultValueProp: 'defaultValue',
     },
     defaultValue: {
+      helperText: 'A default value.',
       typeDef: { type: 'string' },
       defaultValue: '',
     },
     label: {
+      helperText: 'A label that describes the option that can be selected. e.g. "Country".',
       typeDef: { type: 'string' },
       defaultValue: '',
     },
     variant: {
+      helperText:
+        'One of the available MUI TextField [variants](https://mui.com/material-ui/react-button/#basic-button). Possible values are `outlined`, `filled` or `standard`',
       typeDef: { type: 'string', enum: ['outlined', 'filled', 'standard'] },
       defaultValue: 'outlined',
     },
     size: {
-      helperText: 'The size of the component. One of `small`, `medium`, or `large`.',
+      helperText: 'The size of the select. One of `small`, or `medium`.',
       typeDef: { type: 'string', enum: ['small', 'medium'] },
       defaultValue: 'small',
     },
     fullWidth: {
-      helperText: 'Whether the button should occupy all available horizontal space.',
+      helperText: 'Whether the select should occupy all available horizontal space.',
       typeDef: { type: 'boolean' },
     },
     disabled: {
+      helperText: 'Whether the select is disabled.',
       typeDef: { type: 'boolean' },
     },
     sx: {

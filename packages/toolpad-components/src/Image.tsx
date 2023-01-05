@@ -59,17 +59,23 @@ export default createComponent(Image, {
   loadingProp: 'loading',
   argTypes: {
     src: {
+      helperText: 'The url of the image. Must resolve to an image file.',
       typeDef: { type: 'string' },
     },
     alt: {
+      helperText:
+        "The `alt` attribute holds a text description of the image. screen readers read this description out to their users so they know what the image means. Alt text is also displayed on the page if the image can't be loaded for some reason: for example, network errors, content blocking, or linkrot.",
       typeDef: { type: 'string' },
       defaultValue: '',
     },
     fit: {
+      helperText:
+        'Defines how the image should [resize](https://developer.mozilla.org/en-US/docs/Web/CSS/object-fit) to its container.',
       typeDef: { type: 'string', enum: ['contain', 'cover', 'fill', 'none', 'scale-down'] },
       defaultValue: 'contain',
     },
     width: {
+      helperText: 'The image width in pixels',
       typeDef: { type: 'number' },
       defaultValue: 400,
     },
@@ -78,6 +84,7 @@ export default createComponent(Image, {
       defaultValue: 300,
     },
     loading: {
+      helperText: 'Displays a loading animation indicating the image is still loading',
       typeDef: { type: 'boolean' },
       defaultValue: false,
     },

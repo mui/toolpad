@@ -49,7 +49,7 @@ export default createComponent(Button, {
       typeDef: { type: 'boolean' },
     },
     disabled: {
-      helperText: 'The button is disabled.',
+      helperText: 'Whether the button is disabled.',
       typeDef: { type: 'boolean' },
     },
     sx: {

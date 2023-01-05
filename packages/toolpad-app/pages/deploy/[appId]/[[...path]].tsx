@@ -8,7 +8,7 @@ export const getServerSideProps: GetServerSideProps<ToolpadAppProps> = async (co
     { loadRuntimeState, findActiveDeployment, getApp },
     { checkBasicAuth, basicAuthUnauthorized },
   ] = await Promise.all([
-    import('../../../src/server/data'),
+    import('../../../src/server/prismaDataApi'),
     import('../../../src/server/basicAuth'),
   ]);
 

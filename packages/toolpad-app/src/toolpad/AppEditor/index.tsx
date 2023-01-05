@@ -92,13 +92,18 @@ export interface EditorContentProps {
   appId: string;
 }
 
-function EditorContent({ appId }: EditorContentProps) {
+export function EditorContent({ appId }: EditorContentProps) {
   return (
-    <EditorRoot>
-      <FileEditor appId={appId} />
-    </EditorRoot>
+    <JsRuntimeProvider>
+      <DomProvider appId={appId}>
+        <EditorRoot>
+          <FileEditor appId={appId} />
+        </EditorRoot>
+      </DomProvider>
+    </JsRuntimeProvider>
   );
 }
+
 export default function Editor() {
   const { appId } = useParams();
 
@@ -106,11 +111,5 @@ export default function Editor() {
     throw new Error(`Missing queryParam "appId"`);
   }
 
-  return (
-    <JsRuntimeProvider>
-      <DomProvider appId={appId}>
-        <EditorContent appId={appId} />
-      </DomProvider>
-    </JsRuntimeProvider>
-  );
+  return <EditorContent appId={appId} />;
 }

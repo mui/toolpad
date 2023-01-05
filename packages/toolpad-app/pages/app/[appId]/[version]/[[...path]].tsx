@@ -4,7 +4,9 @@ import { asArray } from '../../../../src/utils/collections';
 import ToolpadApp, { ToolpadAppProps } from '../../../../src/runtime/ToolpadApp';
 
 export const getServerSideProps: GetServerSideProps<ToolpadAppProps> = async (context) => {
-  const { loadRuntimeState, parseVersion, getApp } = await import('../../../../src/server/data');
+  const { loadRuntimeState, parseVersion, getApp } = await import(
+    '../../../../src/server/prismaDataApi'
+  );
 
   const [appId] = asArray(context.query.appId);
   const version = parseVersion(context.query.version);

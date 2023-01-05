@@ -6,6 +6,8 @@
     "build": "yarn prisma generate && concurrently \"yarn:build:*\" && rimraf ./.next/cache",
     "start": "yarn waitForDb && yarn prisma migrate deploy && next start",
     "dev": "yarn prisma generate && yarn waitForDb && yarn prisma db push --skip-generate && concurrently \"yarn:dev:*\"",
+    "local:start": "TOOLPAD_LOCAL_MODE=1 next start",
+    "local:dev": "TOOLPAD_LOCAL_MODE=1 concurrently \"yarn:dev:*\"",
     "lint": "next lint && prettier --check .",
     "fix": "next lint --fix && prettier --write .",
     "prisma": "prisma",

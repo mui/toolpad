@@ -11,7 +11,7 @@ type BasicAuthConfig =
     };
 
 export type ServerConfig = {
-  databaseUrl: string;
+  databaseUrl?: string;
   googleSheetsClientId?: string;
   googleSheetsClientSecret?: string;
   encryptionKeys: string[];
@@ -26,10 +26,6 @@ export type ServerConfig = {
 function readConfig(): ServerConfig & typeof sharedConfig {
   if (typeof window !== 'undefined') {
     throw new Error(`Serverside config can't be loaded on the client side`);
-  }
-
-  if (!process.env.TOOLPAD_DATABASE_URL) {
-    throw new Error(`App started without config env variable TOOLPAD_DATABASE_URL`);
   }
 
   // Whitespace separated, do not use spaces in your keys

@@ -20,10 +20,19 @@ import {
 } from '@mui/x-data-grid-pro';
 import * as React from 'react';
 import { useNode, createComponent, useComponents } from '@mui/toolpad-core';
-import { Box, debounce, LinearProgress, Skeleton, Link, styled, Typography } from '@mui/material';
+import {
+  Box,
+  debounce,
+  LinearProgress,
+  Skeleton,
+  Link,
+  styled,
+  Typography,
+  Tooltip,
+} from '@mui/material';
 import { getObjectKey } from '@mui/toolpad-core/objectKey';
 import { hasImageExtension } from '@mui/toolpad-core/path';
-import invariant from 'invariant';
+import { ErrorBoundary, FallbackProps } from 'react-error-boundary';
 
 // Pseudo random number. See https://stackoverflow.com/a/47593316
 function mulberry32(a: number): () => number {
@@ -278,6 +287,25 @@ interface ToolpadDataGridProps extends Omit<DataGridProProps, 'columns' | 'rows'
   hideToolbar?: boolean;
 }
 
+function ComponentErrorFallback({ error }: FallbackProps) {
+  return (
+    <Typography variant="overline" sx={{ color: 'error.main', fontSize: '10px' }}>
+      Code component error{' '}
+      <Tooltip title={error.message}>
+        <span>ℹ️</span>
+      </Tooltip>
+    </Typography>
+  );
+}
+
+function NoComponentSelected() {
+  return (
+    <Typography variant="overline" sx={{ color: 'error.main', fontSize: '10px' }}>
+      No component selected
+    </Typography>
+  );
+}
+
 const DataGridComponent = React.forwardRef(function DataGridComponent(
   {
     columns: columnsProp,
@@ -303,19 +331,17 @@ const DataGridComponent = React.forwardRef(function DataGridComponent(
           const { value, colDef, row, field } = params;
           const column = colDef as SerializableGridColumn;
 
-          invariant(components, 'Components must be defined');
-
           const Component = components[`codeComponent.${column.codeComponent}`];
 
           if (!Component) {
-            return (
-              <Typography variant="overline" sx={{ color: 'error.main', fontSize: '10px' }}>
-                No component selected
-              </Typography>
-            );
+            return <NoComponentSelected />;
           }
 
-          return <Component value={value} row={row} field={field} />;
+          return (
+            <ErrorBoundary FallbackComponent={ComponentErrorFallback}>
+              <Component value={value} row={row} field={field} />
+            </ErrorBoundary>
+          );
         },
       },
     }),

@@ -1,0 +1,21 @@
+{
+  "name": "@mui/toolpad",
+  "version": "0.0.33",
+  "license": "MIT",
+  "scripts": {
+    "build": "tsc",
+    "start": "./index.js",
+    "dev": "tsc --pretty --watch --preserveWatchOutput"
+  },
+  "files": [
+    "index.js",
+    "dist"
+  ],
+  "bin": {
+    "toolpad": "./index.js"
+  },
+  "dependencies": {
+    "@mui/toolpad-app": "^0.0.34"
+  },
+  "devDependencies": {}
+}

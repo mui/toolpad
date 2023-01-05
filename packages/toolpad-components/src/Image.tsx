@@ -1,6 +1,7 @@
 import { Box, Skeleton, SxProps } from '@mui/material';
 import * as React from 'react';
 import { createComponent } from '@mui/toolpad-core';
+import { SX_PROP_HELPER_TEXT } from './constants';
 
 export interface ImageProps {
   src: string;
@@ -32,7 +33,7 @@ function Image({ sx: sxProp, src, width, height, alt, loading: loadingProp, fit 
   const loading = loadingProp || imgLoading;
 
   return (
-    <Box sx={sx}>
+    <Box sx={{ maxWidth: '100%', ...sx }}>
       {loading ? <Skeleton variant="rectangular" width={width} height={height} /> : null}
       <Box
         component="img"
@@ -52,6 +53,7 @@ function Image({ sx: sxProp, src, width, height, alt, loading: loadingProp, fit 
 }
 
 export default createComponent(Image, {
+  helperText: 'The Image component lets you display images.',
   layoutDirection: 'both',
   loadingPropSource: ['src'],
   loadingProp: 'loading',
@@ -80,8 +82,8 @@ export default createComponent(Image, {
       defaultValue: false,
     },
     sx: {
+      helperText: SX_PROP_HELPER_TEXT,
       typeDef: { type: 'object' },
-      defaultValue: { maxWidth: '100%' },
     },
   },
 });

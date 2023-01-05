@@ -9,6 +9,7 @@ import {
 } from '@mui/material';
 import { createComponent } from '@mui/toolpad-core';
 import remarkGfm from 'remark-gfm';
+import { SX_PROP_HELPER_TEXT } from './constants';
 
 const ReactMarkdown = React.lazy(() => import('react-markdown'));
 
@@ -76,6 +77,8 @@ function Text({ value, markdown, href, loading, mode, sx, ...rest }: TextProps) 
 }
 
 export default createComponent(Text, {
+  helperText:
+    'The Text component lets you display text. Text can be rendered in multiple forms: plain, as a link, or as markdown.',
   layoutDirection: 'both',
   loadingPropSource: ['value'],
   loadingProp: 'loading',
@@ -109,6 +112,7 @@ export default createComponent(Text, {
       defaultValue: false,
     },
     sx: {
+      helperText: SX_PROP_HELPER_TEXT,
       typeDef: { type: 'object' },
       visible: ({ mode }) => mode !== 'markdown',
     },

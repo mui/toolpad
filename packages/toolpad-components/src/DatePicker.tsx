@@ -7,6 +7,7 @@ import { DesktopDatePicker, DesktopDatePickerProps } from '@mui/x-date-pickers/D
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { createComponent } from '@mui/toolpad-core';
 import { Dayjs } from 'dayjs';
+import { SX_PROP_HELPER_TEXT } from './constants';
 
 export interface Props extends DesktopDatePickerProps<string, Dayjs> {
   format: string;
@@ -44,6 +45,8 @@ function DatePicker(props: Props) {
 }
 
 export default createComponent(DatePicker, {
+  helperText:
+    'The MUI X [Date picker](https://mui.com/x/react-data-grid/) component.\n\nThe date picker lets the user select a date.',
   argTypes: {
     value: {
       typeDef: { type: 'string' },
@@ -78,12 +81,14 @@ export default createComponent(DatePicker, {
       defaultValue: 'small',
     },
     fullWidth: {
+      helperText: 'Whether the button should occupy all available horizontal space.',
       typeDef: { type: 'boolean' },
     },
     disabled: {
       typeDef: { type: 'boolean' },
     },
     sx: {
+      helperText: SX_PROP_HELPER_TEXT,
       typeDef: { type: 'object' },
     },
   },

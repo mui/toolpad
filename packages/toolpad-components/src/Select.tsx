@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { TextFieldProps, MenuItem, TextField } from '@mui/material';
 import { createComponent } from '@mui/toolpad-core';
+import { SX_PROP_HELPER_TEXT } from './constants';
 
 export interface SelectOption {
   value: string;
@@ -33,6 +34,7 @@ function Select({ options, value, defaultValue, fullWidth, sx, ...rest }: Select
 }
 
 export default createComponent(Select, {
+  helperText: 'The Select component lets you select a value from a set of options.',
   layoutDirection: 'both',
   loadingPropSource: ['value', 'options'],
   loadingProp: 'disabled',
@@ -62,16 +64,19 @@ export default createComponent(Select, {
       defaultValue: 'outlined',
     },
     size: {
+      helperText: 'The size of the component. One of `small`, `medium`, or `large`.',
       typeDef: { type: 'string', enum: ['small', 'medium'] },
       defaultValue: 'small',
     },
     fullWidth: {
+      helperText: 'Whether the button should occupy all available horizontal space.',
       typeDef: { type: 'boolean' },
     },
     disabled: {
       typeDef: { type: 'boolean' },
     },
     sx: {
+      helperText: SX_PROP_HELPER_TEXT,
       typeDef: { type: 'object' },
     },
   },

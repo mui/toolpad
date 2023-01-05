@@ -1,4 +1,4 @@
-import { Stack, styled, Typography, Divider, Tooltip, Link as MuiLink } from '@mui/material';
+import { Stack, styled, Typography, Divider } from '@mui/material';
 import * as React from 'react';
 import {
   ArgTypeDefinition,
@@ -6,7 +6,6 @@ import {
   ComponentConfig,
   LiveBinding,
 } from '@mui/toolpad-core';
-import Markdown from 'markdown-to-jsx';
 import { ExactEntriesOf } from '../../../utils/types';
 import * as appDom from '../../../appDom';
 import NodeAttributeEditor from './NodeAttributeEditor';
@@ -24,6 +23,7 @@ import {
   LAYOUT_DIRECTION_VERTICAL,
 } from '../../../toolpadComponents/layoutBox';
 import ElementContext from '../ElementContext';
+import MarkdownTooltip from '../../../components/MarkdownTooltip';
 
 const classes = {
   control: 'Toolpad_Control',
@@ -128,39 +128,6 @@ function ComponentPropsEditor<P extends object>({
       )}
     </React.Fragment>
   );
-}
-
-interface MarkdownTooltipProps {
-  title: string;
-  children: React.ReactElement<any, any>;
-}
-
-function MarkdownTooltip({ title, children }: MarkdownTooltipProps) {
-  // Only render markdown once
-  const renderedTitle = React.useMemo(
-    () => (
-      <Markdown
-        options={{
-          overrides: {
-            a: {
-              component: MuiLink,
-              props: {
-                target: '_blank',
-                rel: 'noopener noreferrer',
-              },
-            },
-            /*       pre: {
-              component: CodeContainer,
-            }, */
-          },
-        }}
-      >
-        {title}
-      </Markdown>
-    ),
-    [title],
-  );
-  return <Tooltip title={renderedTitle}>{children}</Tooltip>;
 }
 
 interface SelectedNodeEditorProps {

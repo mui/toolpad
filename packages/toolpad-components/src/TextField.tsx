@@ -5,6 +5,7 @@ import {
   BoxProps,
 } from '@mui/material';
 import { createComponent } from '@mui/toolpad-core';
+import { SX_PROP_HELPER_TEXT } from './constants';
 
 export type TextFieldProps = MuiTextFieldProps & {
   alignItems?: BoxProps['alignItems'];
@@ -16,6 +17,7 @@ function TextField({ defaultValue, ...props }: TextFieldProps) {
 }
 
 export default createComponent(TextField, {
+  helperText: 'The TextField component lets you input a text value.',
   layoutDirection: 'both',
   argTypes: {
     value: {
@@ -37,16 +39,19 @@ export default createComponent(TextField, {
       defaultValue: 'outlined',
     },
     size: {
+      helperText: 'The size of the component. One of `small`, `medium`, or `large`.',
       typeDef: { type: 'string', enum: ['small', 'normal'] },
       defaultValue: 'small',
     },
     fullWidth: {
+      helperText: 'Whether the button should occupy all available horizontal space.',
       typeDef: { type: 'boolean' },
     },
     disabled: {
       typeDef: { type: 'boolean' },
     },
     sx: {
+      helperText: SX_PROP_HELPER_TEXT,
       typeDef: { type: 'object' },
     },
   },

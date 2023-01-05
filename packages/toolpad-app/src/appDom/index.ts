@@ -1108,3 +1108,20 @@ export function deref(nodeRef: Maybe<NodeReference>): NodeId | null {
   }
   return null;
 }
+
+export function createDefaultDom(): AppDom {
+  let dom = createDom();
+  const appNode = getApp(dom);
+
+  // Create default page
+  const newPageNode = createNode(dom, 'page', {
+    name: 'Page 1',
+    attributes: {
+      title: createConst('Page 1'),
+    },
+  });
+
+  dom = addNode(dom, newPageNode, appNode, 'pages');
+
+  return dom;
+}

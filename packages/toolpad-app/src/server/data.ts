@@ -16,6 +16,8 @@ import { migrateUp } from '../appDom/migrations';
 import { errorFrom } from '../utils/errors';
 import { ERR_APP_EXISTS, ERR_VALIDATE_CAPTCHA_FAILED } from '../errorCodes';
 import createRuntimeState from '../createRuntimeState';
+import { APP_ID_LOCAL_MARKER } from '../constants';
+import { saveLocalDom, loadLocalDom } from './localMode';
 
 const SELECT_RELEASE_META = excludeFields(prisma.Prisma.ReleaseScalarFieldEnum, ['snapshot']);
 const SELECT_APP_META = excludeFields(prisma.Prisma.AppScalarFieldEnum, ['dom']);
@@ -88,6 +90,10 @@ function decryptSecrets(dom: appDom.AppDom): appDom.AppDom {
 }
 
 export async function saveDom(appId: string, app: appDom.AppDom): Promise<void> {
+  if (appId === APP_ID_LOCAL_MARKER) {
+    return saveLocalDom(app);
+  }
+
   const prismaClient = getPrismaClient();
   await prismaClient.app.update({
     where: {
@@ -191,23 +197,6 @@ export async function getApp(id: string): Promise<AppMeta | null> {
   return prismaClient.app.findUnique({ where: { id }, select: SELECT_APP_META });
 }
 
-function createDefaultDom(): appDom.AppDom {
-  let dom = appDom.createDom();
-  const appNode = appDom.getApp(dom);
-
-  // Create default page
-  const newPageNode = appDom.createNode(dom, 'page', {
-    name: 'Page 1',
-    attributes: {
-      title: appDom.createConst('Page 1'),
-    },
-  });
-
-  dom = appDom.addNode(dom, newPageNode, appNode, 'pages');
-
-  return dom;
-}
-
 export type CreateAppOptions = {
   from?:
     | {
@@ -275,7 +264,7 @@ export async function createApp(name: string, opts: CreateAppOptions = {}): Prom
     }
 
     if (!dom) {
-      dom = createDefaultDom();
+      dom = appDom.createDefaultDom();
     }
 
     await saveDom(app.id, dom);
@@ -560,6 +549,10 @@ export async function loadDom(
   appId: string,
   version: VersionOrPreview = 'preview',
 ): Promise<appDom.AppDom> {
+  if (appId === APP_ID_LOCAL_MARKER) {
+    return loadLocalDom();
+  }
+
   return version === 'preview' ? loadPreviewDom(appId) : loadReleaseDom(appId, version);
 }
 

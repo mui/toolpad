@@ -40,9 +40,10 @@ const EditorRoot = styled('div')(({ theme }) => ({
 
 interface FileEditorProps {
   appId: string;
+  prefix: string;
 }
 
-function FileEditor({ appId }: FileEditorProps) {
+function FileEditor({ appId, prefix }: FileEditorProps) {
   const { dom, currentView } = useDom();
 
   const app = appDom.getApp(dom);
@@ -55,13 +56,13 @@ function FileEditor({ appId }: FileEditorProps) {
   React.useEffect(() => {
     switch (currentView.kind) {
       case 'page':
-        navigate(`/app/${appId}/pages/${currentView.nodeId || firstPage?.id}`, { replace: true });
+        navigate(`${prefix}/pages/${currentView.nodeId || firstPage?.id}`, { replace: true });
         break;
       case 'connection':
-        navigate(`/app/${appId}/connections/${currentView.nodeId}`, { replace: true });
+        navigate(`${prefix}/connections/${currentView.nodeId}`, { replace: true });
         break;
       case 'codeComponent':
-        navigate(`/app/${appId}/codeComponents/${currentView.nodeId}`);
+        navigate(`${prefix}/codeComponents/${currentView.nodeId}`);
         break;
       default:
     }
@@ -90,14 +91,15 @@ function FileEditor({ appId }: FileEditorProps) {
 
 export interface EditorContentProps {
   appId: string;
+  prefix: string;
 }
 
-export function EditorContent({ appId }: EditorContentProps) {
+export function EditorContent({ appId, prefix }: EditorContentProps) {
   return (
     <JsRuntimeProvider>
       <DomProvider appId={appId}>
         <EditorRoot>
-          <FileEditor appId={appId} />
+          <FileEditor appId={appId} prefix={prefix} />
         </EditorRoot>
       </DomProvider>
     </JsRuntimeProvider>
@@ -111,5 +113,5 @@ export default function Editor() {
     throw new Error(`Missing queryParam "appId"`);
   }
 
-  return <EditorContent appId={appId} />;
+  return <EditorContent appId={appId} prefix={`/app/${appId}`} />;
 }

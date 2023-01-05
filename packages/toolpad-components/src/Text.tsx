@@ -9,7 +9,7 @@ import {
 } from '@mui/material';
 import { createComponent } from '@mui/toolpad-core';
 
-const ReactMarkdown = React.lazy(() => import('markdown-to-jsx'));
+const Markdown = React.lazy(() => import('markdown-to-jsx'));
 
 type BaseProps = MuiLinkProps | MuiTypographyProps;
 interface TextProps extends Omit<BaseProps, 'children'> {
@@ -22,7 +22,10 @@ interface TextProps extends Omit<BaseProps, 'children'> {
 
 const MarkdownContainer = styled('div')({
   display: 'block',
-  minHeight: '25px',
+  '& span:empty::before': {
+    content: '""',
+    display: 'inline-block',
+  },
 });
 
 const CodeContainer = styled('pre')(({ theme }) => ({
@@ -42,7 +45,7 @@ function Text({ value, markdown, href, loading, mode, sx, ...rest }: TextProps) 
       ) : (
         <MarkdownContainer>
           <React.Suspense>
-            <ReactMarkdown
+            <Markdown
               options={{
                 overrides: {
                   a: {
@@ -56,11 +59,11 @@ function Text({ value, markdown, href, loading, mode, sx, ...rest }: TextProps) 
                     component: CodeContainer,
                   },
                 },
-                slugify: (text) => `toolpad-markdown-${text}`,
+                slugify: () => '',
               }}
             >
               {value}
-            </ReactMarkdown>
+            </Markdown>
           </React.Suspense>
         </MarkdownContainer>
       );

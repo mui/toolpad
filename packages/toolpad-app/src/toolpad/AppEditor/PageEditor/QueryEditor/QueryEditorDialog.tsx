@@ -106,6 +106,9 @@ export default function QueryNodeEditorDialog<Q>({
   const node = useLatest(nodeProp);
 
   const [input, setInput] = React.useState<appDom.QueryNode<Q>>(node);
+  React.useEffect(() => {
+    setInput(node);
+  }, [node]);
 
   const reset = useEvent(() => setInput(node));
 
@@ -230,10 +233,6 @@ export default function QueryNodeEditorDialog<Q>({
     handleCommit();
     onClose();
   }, [handleCommit, onClose]);
-
-  React.useEffect(() => {
-    setInput(node);
-  }, [node]);
 
   const queryEditorContext = React.useMemo(
     () => (dataSourceId ? { appId, dataSourceId, connectionId } : null),

@@ -20,6 +20,7 @@ import {
   BindableAttrValue,
   NestedBindableAttrs,
   GlobalScopeMeta,
+  createProvidedContext,
 } from '@mui/toolpad-core';
 import { QueryClient, QueryClientProvider, useMutation } from '@tanstack/react-query';
 import {
@@ -42,7 +43,6 @@ import * as _ from 'lodash-es';
 import ErrorIcon from '@mui/icons-material/Error';
 import * as appDom from '../appDom';
 import { RuntimeState, VersionOrPreview } from '../types';
-import { createProvidedContext } from '../utils/react';
 import {
   getElementNodeComponentId,
   isPageLayoutComponent,

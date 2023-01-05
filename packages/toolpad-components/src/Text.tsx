@@ -22,6 +22,7 @@ interface TextProps extends Omit<BaseProps, 'children'> {
 
 const MarkdownContainer = styled('div')({
   display: 'block',
+  maxWidth: 'fill-available',
   '& span:empty::before': {
     content: '""',
     display: 'inline-block',
@@ -29,12 +30,12 @@ const MarkdownContainer = styled('div')({
 });
 
 const CodeContainer = styled('pre')(({ theme }) => ({
-  whiteSpace: 'pre-wrap',
   backgroundColor: theme.palette.grey[200],
   marginLeft: theme.spacing(1),
   marginRight: theme.spacing(1),
   borderRadius: theme.shape.borderRadius,
   padding: theme.spacing(1),
+  overflowX: 'scroll',
 }));
 
 function Text({ value, markdown, href, loading, mode, sx, ...rest }: TextProps) {

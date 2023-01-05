@@ -14,6 +14,7 @@ export interface Props extends DesktopDatePickerProps<string, Dayjs> {
   variant: 'outlined' | 'filled' | 'standard';
   size: 'small' | 'medium';
   sx: any;
+  defaultValue: string;
 }
 
 function DatePicker(props: Props) {
@@ -61,7 +62,6 @@ export default createComponent(DatePicker, {
       },
       defaultValue: '',
     },
-    // @ts-ignore no idea why it complains even though it's done exactly same as TextField
     defaultValue: {
       typeDef: { type: 'string' },
       defaultValue: '',

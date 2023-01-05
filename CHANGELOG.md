@@ -1,5 +1,29 @@
 # Changelog
 
+## 0.0.34
+
+<!-- generated comparing v0.0.33..master -->
+
+_Jan 4, 2023_
+
+A big thanks to the 4 contributors who made this release possible. Here are some highlights ✨:
+
+New date picker component, Make switching views part of undo/redo cycle.
+
+- &#8203;<!-- 13 -->Fix dependabot vulnerabilities (#1512) @Janpot
+- &#8203;<!-- 12 -->Don't import from dist folders (#1513) @Janpot
+- &#8203;<!-- 11 -->Root type check (#1510) @bytasv
+- &#8203;<!-- 10 -->Fix function editor save (#1507) @Janpot
+- &#8203;<!-- 09 -->Do not rename nodes when migrating Typography components (#1509) @Janpot
+- &#8203;<!-- 08 -->Just re-export the prettier config (#1508) @Janpot
+- &#8203;<!-- 07 -->Datepicker format handling changes (#1504) @bytasv
+- &#8203;<!-- 04 -->Undo/redo through different views (#1417) @apedroferreira
+- &#8203;<!-- 03 -->Make sure npm package is splitted out correctly (#1502) @Janpot
+- &#8203;<!-- 02 -->Date picker component (#1499) @bytasv
+- &#8203;<!-- 01 -->[core] Remove dead prettier config @oliviertassinari
+
+All contributors of this release in alphabetical order: @apedroferreira, @bytasv, @Janpot, @oliviertassinari
+
 ## 0.0.33
 
 <!-- generated comparing v0.0.32..master -->

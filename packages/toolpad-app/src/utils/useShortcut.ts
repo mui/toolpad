@@ -10,7 +10,7 @@ export interface ShortCut {
 
 export default function useShortcut(
   { key, metaKey = false, disabled = false, shiftKey = false, preventDefault = true }: ShortCut,
-  handler: () => void,
+  handler: (event: KeyboardEvent) => void,
 ) {
   React.useEffect(() => {
     if (disabled) {
@@ -23,7 +23,7 @@ export default function useShortcut(
         (event.metaKey === metaKey || event.ctrlKey === metaKey) &&
         event.shiftKey === shiftKey
       ) {
-        handler();
+        handler(event);
         if (preventDefault) {
           event.preventDefault();
         }

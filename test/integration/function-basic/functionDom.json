@@ -56,7 +56,7 @@
       "attributes": {
         "component": {
           "type": "const",
-          "value": "Typography"
+          "value": "Text"
         }
       },
       "parentProp": "children",
@@ -105,7 +105,7 @@
       "id": "avf3p1y",
       "name": "throws",
       "type": "query",
-      "params": {},
+      "params": [],
       "parentId": "5q1xd0t",
       "attributes": {
         "query": {
@@ -162,7 +162,7 @@
       "id": "od03pa3",
       "name": "hello",
       "type": "query",
-      "params": {},
+      "params": [],
       "parentId": "5q1xd0t",
       "attributes": {
         "query": {
@@ -198,7 +198,7 @@
       "attributes": {
         "component": {
           "type": "const",
-          "value": "Typography"
+          "value": "Text"
         }
       },
       "parentProp": "children",
@@ -219,7 +219,7 @@
       "attributes": {
         "component": {
           "type": "const",
-          "value": "Typography"
+          "value": "Text"
         }
       },
       "parentProp": "children",
@@ -245,12 +245,15 @@
       "id": "xh03p50",
       "name": "echo",
       "type": "query",
-      "params": {
-        "foo": {
-          "type": "jsExpression",
-          "value": "\"bound foo parameter\"\n"
-        }
-      },
+      "params": [
+        [
+          "foo",
+          {
+            "type": "jsExpression",
+            "value": "\"bound foo parameter\"\n"
+          }
+        ]
+      ],
       "parentId": "5q1xd0t",
       "attributes": {
         "query": {
@@ -288,7 +291,7 @@
       "attributes": {
         "component": {
           "type": "const",
-          "value": "Typography"
+          "value": "Text"
         }
       },
       "parentProp": "children",
@@ -309,7 +312,7 @@
       "attributes": {
         "component": {
           "type": "const",
-          "value": "Typography"
+          "value": "Text"
         }
       },
       "parentProp": "children",
@@ -351,6 +354,69 @@
       },
       "parentProp": "children",
       "parentIndex": "a0"
+    },
+    "rd030ch": {
+      "attributes": {
+        "query": {
+          "type": "const",
+          "value": {
+            "module": "export default async function ({ parameters }: ToolpadFunctionEvent) {\n  return \"edited hello\";\n}\n",
+            "browser": false
+          }
+        },
+        "connectionId": {
+          "type": "const",
+          "value": null
+        },
+        "dataSource": {
+          "type": "const",
+          "value": "function"
+        }
+      },
+      "name": "edited",
+      "id": "rd030ch",
+      "type": "query",
+      "parentId": "5q1xd0t",
+      "parentProp": "queries",
+      "parentIndex": "a3"
+    },
+    "ib830c5": {
+      "name": "pageRow5",
+      "props": {},
+      "attributes": {
+        "component": {
+          "type": "const",
+          "value": "PageRow"
+        }
+      },
+      "layout": {},
+      "id": "ib830c5",
+      "type": "element",
+      "parentId": "5q1xd0t",
+      "parentProp": "children",
+      "parentIndex": "a6"
+    },
+    "yv630a2": {
+      "name": "text5",
+      "props": {
+        "value": {
+          "type": "jsExpression",
+          "value": "edited.data\n"
+        }
+      },
+      "attributes": {
+        "component": {
+          "type": "const",
+          "value": "Text"
+        }
+      },
+      "layout": {},
+      "id": "yv630a2",
+      "type": "element",
+      "parentId": "ib830c5",
+      "parentProp": "children",
+      "parentIndex": "a0"
     }
-  }
+  },
+  "version": 5
 }

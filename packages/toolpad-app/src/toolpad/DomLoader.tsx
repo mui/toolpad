@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { NodeId, BindableAttrValues } from '@mui/toolpad-core';
+import { NodeId, BindableAttrValues, createProvidedContext } from '@mui/toolpad-core';
 import invariant from 'invariant';
 import { debounce, DebouncedFunc } from 'lodash-es';
 import * as appDom from '../appDom';
@@ -7,7 +7,6 @@ import { update } from '../utils/immutability';
 import client from '../api';
 import useShortcut from '../utils/useShortcut';
 import useDebouncedHandler from '../utils/useDebouncedHandler';
-import { createProvidedContext } from '../utils/react';
 import { mapValues } from '../utils/collections';
 import insecureHash from '../utils/insecureHash';
 import useEvent from '../utils/useEvent';

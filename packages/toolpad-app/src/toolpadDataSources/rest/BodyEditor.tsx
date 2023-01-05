@@ -12,8 +12,7 @@ import {
   Typography,
 } from '@mui/material';
 import { TabContext } from '@mui/lab';
-import { BindableAttrValue, LiveBinding } from '@mui/toolpad-core';
-import { GlobalScopeMeta } from '@mui/toolpad-core/dist/types';
+import { BindableAttrValue, LiveBinding, GlobalScopeMeta } from '@mui/toolpad-core';
 import { Body, RawBody, UrlEncodedBody } from './types';
 import { Maybe, WithControlledProp } from '../../utils/types';
 import {

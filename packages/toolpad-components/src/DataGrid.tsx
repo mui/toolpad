@@ -16,13 +16,24 @@ import {
   GridValueGetterParams,
   useGridApiRef,
   GridColumnTypesRecord,
+  GridRenderCellParams,
 } from '@mui/x-data-grid-pro';
 import * as React from 'react';
-import { useNode, createComponent } from '@mui/toolpad-core';
-import { Box, debounce, LinearProgress, Skeleton, Link, styled } from '@mui/material';
+import { useNode, createComponent, useComponents } from '@mui/toolpad-core';
+import {
+  Box,
+  debounce,
+  LinearProgress,
+  Skeleton,
+  Link,
+  styled,
+  Typography,
+  Tooltip,
+} from '@mui/material';
 import { getObjectKey } from '@mui/toolpad-core/objectKey';
 import { hasImageExtension } from '@mui/toolpad-core/path';
 import { SX_PROP_HELPER_TEXT } from './constants';
+import { ErrorBoundary, FallbackProps } from 'react-error-boundary';
 
 // Pseudo random number. See https://stackoverflow.com/a/47593316
 function mulberry32(a: number): () => number {
@@ -201,6 +212,7 @@ export type NumberFormat =
 export interface SerializableGridColumn
   extends Pick<GridColDef, 'field' | 'type' | 'align' | 'width' | 'headerName'> {
   numberFormat?: NumberFormat;
+  codeComponent?: string;
 }
 
 export type SerializableGridColumns = SerializableGridColumn[];
@@ -276,6 +288,25 @@ interface ToolpadDataGridProps extends Omit<DataGridProProps, 'columns' | 'rows'
   hideToolbar?: boolean;
 }
 
+function ComponentErrorFallback({ error }: FallbackProps) {
+  return (
+    <Typography variant="overline" sx={{ color: 'error.main', fontSize: '10px' }}>
+      Code component error{' '}
+      <Tooltip title={error.message}>
+        <span>ℹ️</span>
+      </Tooltip>
+    </Typography>
+  );
+}
+
+function NoComponentSelected() {
+  return (
+    <Typography variant="overline" sx={{ color: 'error.main', fontSize: '10px' }}>
+      No component selected
+    </Typography>
+  );
+}
+
 const DataGridComponent = React.forwardRef(function DataGridComponent(
   {
     columns: columnsProp,
@@ -290,7 +321,33 @@ const DataGridComponent = React.forwardRef(function DataGridComponent(
   }: ToolpadDataGridProps,
   ref: React.ForwardedRef<HTMLDivElement>,
 ) {
+  const components = useComponents();
+
   const nodeRuntime = useNode<ToolpadDataGridProps>();
+  const columnTypes = React.useMemo(
+    () => ({
+      ...CUSTOM_COLUMN_TYPES,
+      codeComponent: {
+        renderCell: (params: GridRenderCellParams) => {
+          const { value, colDef, row, field } = params;
+          const column = colDef as SerializableGridColumn;
+
+          const Component = components[`codeComponent.${column.codeComponent}`];
+
+          if (!Component) {
+            return <NoComponentSelected />;
+          }
+
+          return (
+            <ErrorBoundary FallbackComponent={ComponentErrorFallback}>
+              <Component value={value} row={row} field={field} />
+            </ErrorBoundary>
+          );
+        },
+      },
+    }),
+    [components],
+  );
 
   const handleResize = React.useMemo(
     () =>
@@ -424,7 +481,7 @@ const DataGridComponent = React.forwardRef(function DataGridComponent(
         onSelectionModelChange={onSelectionModelChange}
         selectionModel={selectionModel}
         error={errorProp}
-        columnTypes={CUSTOM_COLUMN_TYPES}
+        columnTypes={columnTypes}
         componentsProps={{
           errorOverlay: {
             message: typeof errorProp === 'string' ? errorProp : errorProp?.message,

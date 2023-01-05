@@ -30,6 +30,7 @@ import {
   JsExpressionAction,
   GlobalScopeMeta,
   GlobalScopeMetaField,
+  createProvidedContext,
 } from '@mui/toolpad-core';
 import { TabContext, TabList } from '@mui/lab';
 import { Maybe, WithControlledProp } from '../../utils/types';
@@ -40,7 +41,6 @@ import useLatest from '../../utils/useLatest';
 import useDebounced from '../../utils/useDebounced';
 import { useEvaluateLiveBinding } from './useEvaluateLiveBinding';
 import useShortcut from '../../utils/useShortcut';
-import { createProvidedContext } from '../../utils/react';
 import { useDom } from '../DomLoader';
 import * as appDom from '../../appDom';
 import { usePageEditorState } from './PageEditor/PageEditorProvider';

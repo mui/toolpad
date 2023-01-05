@@ -27,6 +27,7 @@ import {
   Typography,
   Alert,
   AlertTitle,
+  Theme,
 } from '@mui/material';
 import LoadingButton from '@mui/lab/LoadingButton';
 import ViewListIcon from '@mui/icons-material/ViewList';
@@ -695,6 +696,22 @@ function DemoPage() {
   );
 }
 
+const searchFieldStyleOverrides = (theme: Theme) => ({
+  '& .MuiInputBase-root': {
+    fontSize: theme.typography.pxToRem(14),
+  },
+  '& .MuiInputBase-input': {
+    paddingTop: theme.spacing(0.7),
+    paddingBottom: theme.spacing(0.7),
+  },
+  '& .MuiSvgIcon-root': {
+    fontSize: theme.typography.pxToRem(16),
+    color: theme.palette.mode === 'dark' ? theme.palette.grey[400] : theme.palette.grey[500],
+    marginRight: theme.spacing(0.6),
+    marginTop: theme.spacing(0.2),
+  },
+});
+
 export default function Home() {
   const {
     data: apps = [],
@@ -752,21 +769,7 @@ export default function Home() {
           </Typography>
           <FlexFill />
           <TextField
-            sx={(theme) => ({
-              '& .MuiInputBase-root': {
-                fontSize: theme.typography.pxToRem(14),
-              },
-              '& .MuiInputBase-input': {
-                paddingTop: theme.spacing(0.7),
-                paddingBottom: theme.spacing(0.7),
-              },
-              '& .MuiSvgIcon-root': {
-                fontSize: theme.typography.pxToRem(16),
-                color:
-                  theme.palette.mode === 'dark' ? theme.palette.grey[400] : theme.palette.grey[500],
-                marginRight: theme.spacing(0.6),
-              },
-            })}
+            sx={searchFieldStyleOverrides}
             key={'search'}
             InputProps={{
               startAdornment: <Search />,

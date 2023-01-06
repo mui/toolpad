@@ -506,7 +506,11 @@ export function getThemedComponents(theme: Theme): { components: Theme['componen
               marginLeft: 2,
             },
             [`.${tooltipClasses.tooltip} &`]: {
+              // Tooltip has a dark background in light mode
               color: theme.palette.primary[300],
+              '&:hover': {
+                color: theme.palette.primary[200],
+              },
             },
           },
         },

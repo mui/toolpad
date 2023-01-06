@@ -110,4 +110,10 @@ export class ToolpadHome {
 
     return { id: idMatch[1] };
   }
+
+  async searchFor(name: string) {
+    const textField = this.page.getByPlaceholder('Search apps');
+    await textField.focus();
+    await textField.fill(name);
+  }
 }

@@ -32,8 +32,8 @@ import {
 } from '@mui/material';
 import { getObjectKey } from '@mui/toolpad-core/objectKey';
 import { hasImageExtension } from '@mui/toolpad-core/path';
-import { SX_PROP_HELPER_TEXT } from './constants';
 import { ErrorBoundary, FallbackProps } from 'react-error-boundary';
+import { SX_PROP_HELPER_TEXT } from './constants';
 
 // Pseudo random number. See https://stackoverflow.com/a/47593316
 function mulberry32(a: number): () => number {

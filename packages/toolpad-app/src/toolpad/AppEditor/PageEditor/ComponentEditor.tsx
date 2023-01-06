@@ -148,7 +148,7 @@ function SelectedNodeEditor({ node }: SelectedNodeEditorProps) {
   return (
     <ElementContext.Provider value={node}>
       <Stack direction="column" gap={1}>
-        <MarkdownTooltip title={componentConfig.helperText ?? displayName}>
+        <MarkdownTooltip placement="left" title={componentConfig.helperText ?? displayName}>
           <Typography variant="subtitle1">Component: {displayName}</Typography>
         </MarkdownTooltip>
         <Typography variant="subtitle2" sx={{ mb: 1 }}>

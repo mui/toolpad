@@ -94,6 +94,11 @@ export function getNodesViewInfo(rootElm: HTMLElement): {
           const parentId: NodeId = fiber.memoizedProps.parentId as NodeId;
           const nodeSlots = nodes[parentId]?.slots;
 
+          // If there are 2 slots for the same prop name, consider only the first one
+          if (nodeSlots && nodeSlots[slotNamePropValue]) {
+            return;
+          }
+
           const firstChildElm = devtoolsHook.renderers
             .get(rendererId)
             ?.findHostInstanceByFiber(fiber);

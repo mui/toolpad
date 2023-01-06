@@ -35,6 +35,7 @@ const INTERNAL_COMPONENTS = new Map<string, ToolpadComponentDefinition>([
   ['DatePicker', { displayName: 'Date picker', builtIn: 'DatePicker' }],
   ['Text', { displayName: 'Text', builtIn: 'Text' }],
   ['Select', { displayName: 'Select', builtIn: 'Select' }],
+  ['List', { displayName: 'List', builtIn: 'List' }],
   ['Paper', { displayName: 'Paper', builtIn: 'Paper' }],
 ]);
 

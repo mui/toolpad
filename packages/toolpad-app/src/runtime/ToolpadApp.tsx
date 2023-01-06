@@ -126,13 +126,21 @@ type ToolpadComponents = Partial<Record<string, ToolpadComponent<any>>>;
 
 const [useDomContext, DomContextProvider] = createProvidedContext<appDom.AppDom>('Dom');
 const [useEvaluatePageExpression, EvaluatePageExpressionProvider] =
-  createProvidedContext<(expr: string) => any>('EvaluatePageExpression');
+  createProvidedContext<(expr: string, params: Record<string, any>) => any>(
+    'EvaluatePageExpression',
+  );
 const [useBindingsContext, BindingsContextProvider] =
-  createProvidedContext<Record<string, BindingEvaluationResult>>('LiveBindings');
+  createProvidedContext<(params?: Record<string, any>) => Record<string, BindingEvaluationResult>>(
+    'GetBindings',
+  );
 const [useSetControlledBindingContext, SetControlledBindingContextProvider] =
   createProvidedContext<(id: string, result: BindingEvaluationResult) => void>(
     'SetControlledBinding',
   );
+const [usePageNodeCountsContext, PageNodeCountsContextProvider] = createProvidedContext<{
+  getNodeCount: (nodeId: NodeId) => number;
+  incrementNodeCount: (nodeId: NodeId) => void;
+}>('PageNodeCounts');
 
 function getComponentId(elm: appDom.ElementNode): string {
   const componentId = getElementNodeComponentId(elm);
@@ -144,9 +152,9 @@ function useElmToolpadComponent(elm: appDom.ElementNode): ToolpadComponent {
   return useComponent(componentId);
 }
 
-interface RenderedNodeProps {
+type RenderedNodeProps = {
   nodeId: NodeId;
-}
+};
 
 function RenderedNode({ nodeId }: RenderedNodeProps) {
   const dom = useDomContext();
@@ -187,8 +195,23 @@ interface RenderedNodeContentProps {
 
 function RenderedNodeContent({ node, childNodeGroups, Component }: RenderedNodeContentProps) {
   const setControlledBinding = useSetControlledBindingContext();
+  const { getNodeCount, incrementNodeCount } = usePageNodeCountsContext();
 
   const nodeId = node.id;
+
+  const hasMountedRef = React.useRef(false);
+  const [nodeIndex, setNodeIndex] = React.useState<number | null>(0);
+
+  React.useEffect(() => {
+    if (!hasMountedRef.current) {
+      incrementNodeCount(nodeId);
+      setNodeIndex(getNodeCount(nodeId));
+    }
+
+    hasMountedRef.current = true;
+  }, [getNodeCount, incrementNodeCount, nodeId]);
+
+  const globalScopeNodeParams = React.useMemo(() => ({ i: nodeIndex }), [nodeIndex]);
 
   const componentConfig = Component[TOOLPAD_COMPONENT];
   const { argTypes = {}, errorProp, loadingProp, loadingPropSource } = componentConfig;
@@ -196,7 +219,11 @@ function RenderedNodeContent({ node, childNodeGroups, Component }: RenderedNodeC
   const isLayoutNode =
     appDom.isPage(node) || (appDom.isElement(node) && isPageLayoutComponent(node));
 
-  const liveBindings = useBindingsContext();
+  const getBindings = useBindingsContext();
+  const liveBindings = React.useMemo(
+    () => getBindings(globalScopeNodeParams),
+    [getBindings, globalScopeNodeParams],
+  );
   const boundProps: Record<string, any> = React.useMemo(() => {
     const loadingPropSourceSet = new Set(loadingPropSource);
     const hookResult: Record<string, any> = {};
@@ -301,7 +328,7 @@ function RenderedNodeContent({ node, childNodeGroups, Component }: RenderedNodeC
         const handler = () => {
           const code = action.value;
           const exprToEvaluate = `(async () => {${code}})()`;
-          evaluatePageExpression(exprToEvaluate);
+          evaluatePageExpression(exprToEvaluate, globalScopeNodeParams);
         };
 
         return [key, handler];
@@ -309,11 +336,19 @@ function RenderedNodeContent({ node, childNodeGroups, Component }: RenderedNodeC
 
       return null;
     });
-  }, [argTypes, node, navigateToPage, evaluatePageExpression]);
+  }, [argTypes, node, navigateToPage, evaluatePageExpression, globalScopeNodeParams]);
 
-  const reactChildren = mapValues(childNodeGroups, (childNodes) =>
-    childNodes.map((child) => <RenderedNode key={child.id} nodeId={child.id} />),
-  );
+  const hasRenderedChildrenRef = React.useRef(false);
+
+  const reactChildren = mapValues(childNodeGroups, (childNodes) => {
+    const renderedChildNodes = childNodes.map((child) => (
+      <RenderedNode key={child.id} nodeId={child.id} />
+    ));
+
+    hasRenderedChildrenRef.current = true;
+
+    return renderedChildNodes;
+  });
 
   const layoutElementProps = React.useMemo(() => {
     if (appDom.isElement(node) && isPageRow(node)) {
@@ -474,8 +509,10 @@ interface QueryNodeProps {
 }
 
 function QueryNode({ node }: QueryNodeProps) {
-  const bindings = useBindingsContext();
+  const getBindings = useBindingsContext();
   const setControlledBinding = useSetControlledBindingContext();
+
+  const bindings = React.useMemo(() => getBindings(), [getBindings]);
 
   const params = resolveBindables(
     bindings,
@@ -513,8 +550,10 @@ interface MutationNodeProps {
 
 function MutationNode({ node }: MutationNodeProps) {
   const { appId, version } = useAppContext();
-  const bindings = useBindingsContext();
+  const getBindings = useBindingsContext();
   const setControlledBinding = useSetControlledBindingContext();
+
+  const bindings = React.useMemo(() => getBindings(), [getBindings]);
 
   const queryId = node.id;
   const params = resolveBindables(bindings, `${node.id}.params`, node.params);
@@ -754,6 +793,8 @@ function parseBindings(
   return { parsedBindings, controlled, globalScopeMeta };
 }
 
+const DEFAULT_GLOBAL_SCOPE_NODE_PARAMS = { i: 0 };
+
 function RenderedPage({ nodeId }: RenderedNodeProps) {
   const dom = useDomContext();
   const page = appDom.getNode(dom, nodeId, 'page');
@@ -812,47 +853,92 @@ function RenderedPage({ nodeId }: RenderedNodeProps) {
   const moduleEntry = modules[`pages/${nodeId}`];
   const globalScope = (moduleEntry?.module as any)?.globalScope || EMPTY_OBJECT;
 
-  const evaluatedBindings = React.useMemo(
-    () => evalJsBindings(pageBindings, globalScope),
+  const getEvaluatedBindings = React.useCallback(
+    (params?: Record<string, any>) =>
+      evalJsBindings(pageBindings, {
+        ...globalScope,
+        ...(params || DEFAULT_GLOBAL_SCOPE_NODE_PARAMS),
+      }),
     [globalScope, pageBindings],
   );
 
-  const pageState = React.useMemo(
-    () => buildGlobalScope(globalScope, evaluatedBindings),
-    [evaluatedBindings, globalScope],
+  const getPageState = React.useCallback(
+    (params?: Record<string, any>) => {
+      const evaluatedBindings = getEvaluatedBindings(params);
+      return buildGlobalScope(globalScope, evaluatedBindings);
+    },
+    [getEvaluatedBindings, globalScope],
   );
 
-  const liveBindings: Record<string, BindingEvaluationResult> = React.useMemo(
-    () => mapValues(evaluatedBindings, (binding) => binding.result || { value: undefined }),
-    [evaluatedBindings],
+  const getBindings = React.useCallback(
+    (params?: Record<string, any>) => {
+      const evaluatedBindings = getEvaluatedBindings(params);
+      return mapValues(evaluatedBindings, (binding) => binding.result || { value: undefined });
+    },
+    [getEvaluatedBindings],
   );
 
   const evaluatePageExpression = React.useCallback(
-    (expression: string) => evaluateExpression(expression, pageState),
-    [pageState],
+    (expression: string, params?: Record<string, any>) => {
+      const pageState = getPageState(params);
+      return evaluateExpression(expression, {
+        ...pageState,
+        ...(params || DEFAULT_GLOBAL_SCOPE_NODE_PARAMS),
+      });
+    },
+    [getPageState],
+  );
+
+  const nodeCountsRef = React.useRef<Record<NodeId, number>>({});
+
+  const getNodeCount = React.useCallback(
+    (countedNodeId: NodeId) => nodeCountsRef.current[countedNodeId] || 0,
+    [nodeCountsRef],
+  );
+
+  const incrementNodeCount = React.useCallback((countedNodeId: NodeId) => {
+    nodeCountsRef.current = {
+      ...nodeCountsRef.current,
+      [countedNodeId]:
+        typeof nodeCountsRef.current[countedNodeId] === 'undefined'
+          ? 0
+          : nodeCountsRef.current[countedNodeId] + 1,
+    };
+  }, []);
+
+  const pageNodeCountsProviderValue = React.useMemo(
+    () => ({
+      getNodeCount,
+      incrementNodeCount,
+    }),
+    [getNodeCount, incrementNodeCount],
   );
 
   React.useEffect(() => {
+    const pageState = getPageState();
     fireEvent({ type: 'pageStateUpdated', pageState, globalScopeMeta });
-  }, [pageState, globalScopeMeta]);
+  }, [globalScopeMeta, getBindings, getPageState]);
 
   React.useEffect(() => {
+    const liveBindings = getBindings();
     fireEvent({ type: 'pageBindingsUpdated', bindings: liveBindings });
-  }, [liveBindings]);
+  }, [getBindings]);
 
   return (
-    <BindingsContextProvider value={liveBindings}>
+    <BindingsContextProvider value={getBindings}>
       <SetControlledBindingContextProvider value={setControlledBinding}>
         <EvaluatePageExpressionProvider value={evaluatePageExpression}>
-          <RenderedNodeContent
-            node={page}
-            childNodeGroups={{ children }}
-            Component={PageRootComponent}
-          />
+          <PageNodeCountsContextProvider value={pageNodeCountsProviderValue}>
+            <RenderedNodeContent
+              node={page}
+              childNodeGroups={{ children }}
+              Component={PageRootComponent}
+            />
 
-          {queries.map((node) => (
-            <FetchNode key={node.id} node={node} />
-          ))}
+            {queries.map((node) => (
+              <FetchNode key={node.id} node={node} />
+            ))}
+          </PageNodeCountsContextProvider>
         </EvaluatePageExpressionProvider>
       </SetControlledBindingContextProvider>
     </BindingsContextProvider>

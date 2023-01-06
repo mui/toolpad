@@ -152,9 +152,9 @@ function useElmToolpadComponent(elm: appDom.ElementNode): ToolpadComponent {
   return useComponent(componentId);
 }
 
-type RenderedNodeProps = {
+interface RenderedNodeProps {
   nodeId: NodeId;
-};
+}
 
 function RenderedNode({ nodeId }: RenderedNodeProps) {
   const dom = useDomContext();
@@ -338,17 +338,9 @@ function RenderedNodeContent({ node, childNodeGroups, Component }: RenderedNodeC
     });
   }, [argTypes, node, navigateToPage, evaluatePageExpression, globalScopeNodeParams]);
 
-  const hasRenderedChildrenRef = React.useRef(false);
-
-  const reactChildren = mapValues(childNodeGroups, (childNodes) => {
-    const renderedChildNodes = childNodes.map((child) => (
-      <RenderedNode key={child.id} nodeId={child.id} />
-    ));
-
-    hasRenderedChildrenRef.current = true;
-
-    return renderedChildNodes;
-  });
+  const reactChildren = mapValues(childNodeGroups, (childNodes) =>
+    childNodes.map((child) => <RenderedNode key={child.id} nodeId={child.id} />),
+  );
 
   const layoutElementProps = React.useMemo(() => {
     if (appDom.isElement(node) && isPageRow(node)) {

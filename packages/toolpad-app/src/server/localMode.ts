@@ -1,9 +1,9 @@
-import * as appDom from '../appDom';
 import * as yaml from 'yaml';
 import * as path from 'path';
 import * as fs from 'fs/promises';
-import config from '../config';
 import invariant from 'invariant';
+import config from '../config';
+import * as appDom from '../appDom';
 import { errorFrom } from '../utils/errors';
 
 function getConfigFilePath() {

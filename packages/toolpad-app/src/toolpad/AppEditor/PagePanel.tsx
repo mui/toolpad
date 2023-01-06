@@ -44,10 +44,14 @@ export default function PagePanel({ appId, className, sx }: ComponentPanelProps)
       >
         {config.localMode ? (
           <Typography noWrap>{config.projectDir?.split(/[/\\]/).pop()}</Typography>
-        ) : isLoading || !app ? (
-          <Skeleton variant="text" width={70} />
         ) : (
-          <AppNameEditable app={app} editing={editingName} setEditing={setEditingName} />
+          <React.Fragment>
+            {isLoading || !app ? (
+              <Skeleton variant="text" width={70} />
+            ) : (
+              <AppNameEditable app={app} editing={editingName} setEditing={setEditingName} />
+            )}
+          </React.Fragment>
         )}
         <AppOptions app={app} dom={dom} redirectOnDelete onRenameRequest={handleRename} />
       </Box>

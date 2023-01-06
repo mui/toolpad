@@ -66,7 +66,7 @@ function FileEditor({ appId, prefix }: FileEditorProps) {
         break;
       default:
     }
-  }, [appId, currentView.kind, currentView.nodeId, firstPage?.id, navigate]);
+  }, [currentView.kind, currentView.nodeId, firstPage?.id, navigate, prefix]);
 
   return (
     <Routes>

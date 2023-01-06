@@ -91,7 +91,8 @@ function decryptSecrets(dom: appDom.AppDom): appDom.AppDom {
 
 export async function saveDom(appId: string, app: appDom.AppDom): Promise<void> {
   if (appId === APP_ID_LOCAL_MARKER) {
-    return saveLocalDom(app);
+    await saveLocalDom(app);
+    return;
   }
 
   const prismaClient = getPrismaClient();

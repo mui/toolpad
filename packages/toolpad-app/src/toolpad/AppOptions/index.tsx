@@ -7,6 +7,7 @@ import ContentCopyOutlinedIcon from '@mui/icons-material/ContentCopyOutlined';
 import SettingsIcon from '@mui/icons-material/Settings';
 import DeleteIcon from '@mui/icons-material/Delete';
 import CodeIcon from '@mui/icons-material/Code';
+import invariant from 'invariant';
 import useMenu from '../../utils/useMenu';
 import type { AppMeta } from '../../server/data';
 import useBoolean from '../../utils/useBoolean';
@@ -14,7 +15,6 @@ import AppSettingsDialog from './AppSettingsDialog';
 import AppExportDialog from './AppExportDialog';
 import AppDeleteDialog from './AppDeleteDialog';
 import AppDuplicateDialog from './AppDuplicateDialog';
-import invariant from 'invariant';
 import config from '../../config';
 
 interface AppOptionsProps {
@@ -84,7 +84,7 @@ function AppOptions({ app, onRenameRequest: onRename, dom, redirectOnDelete }: A
       </IconButton>
       <Menu {...menuProps}>
         {config.localMode ? null : (
-          <>
+          <React.Fragment>
             <MenuItem onClick={handleRenameClick}>
               <ListItemIcon>
                 <DriveFileRenameOutlineIcon />
@@ -103,7 +103,7 @@ function AppOptions({ app, onRenameRequest: onRename, dom, redirectOnDelete }: A
               </ListItemIcon>
               <ListItemText>Delete</ListItemText>
             </MenuItem>
-          </>
+          </React.Fragment>
         )}
         <Divider />
         {dom ? (

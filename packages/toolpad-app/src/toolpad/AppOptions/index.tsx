@@ -14,25 +14,29 @@ import AppSettingsDialog from './AppSettingsDialog';
 import AppExportDialog from './AppExportDialog';
 import AppDeleteDialog from './AppDeleteDialog';
 import AppDuplicateDialog from './AppDuplicateDialog';
+import invariant from 'invariant';
+import config from '../../config';
 
 interface AppOptionsProps {
-  app: AppMeta;
-  onRename: () => void;
+  app?: AppMeta | null;
+  onRenameRequest: () => void;
   dom?: any;
   redirectOnDelete?: boolean;
 }
 
-function AppOptions({ app, onRename, dom, redirectOnDelete }: AppOptionsProps) {
+function AppOptions({ app, onRenameRequest: onRename, dom, redirectOnDelete }: AppOptionsProps) {
   const { buttonProps, menuProps, onMenuClose } = useMenu();
 
   const [deletedApp, setDeletedApp] = React.useState<AppMeta | null>(null);
   const [duplicateApp, setDuplicateApp] = React.useState<AppMeta | null>(null);
 
   const onDuplicate = React.useCallback(() => {
+    invariant(app, "This action shouln't be enabled when no app is available");
     setDuplicateApp(app);
   }, [app]);
 
   const onDelete = React.useCallback(() => {
+    invariant(app, "This action shouln't be enabled when no app is available");
     setDeletedApp(app);
   }, [app]);
 
@@ -75,28 +79,32 @@ function AppOptions({ app, onRename, dom, redirectOnDelete }: AppOptionsProps) {
 
   return (
     <React.Fragment>
-      <IconButton {...buttonProps} aria-label="Application menu" disabled={!app}>
+      <IconButton {...buttonProps} aria-label="Application menu">
         <MoreVertIcon />
       </IconButton>
       <Menu {...menuProps}>
-        <MenuItem onClick={handleRenameClick}>
-          <ListItemIcon>
-            <DriveFileRenameOutlineIcon />
-          </ListItemIcon>
-          <ListItemText>Rename</ListItemText>
-        </MenuItem>
-        <MenuItem onClick={handleDuplicateClick}>
-          <ListItemIcon>
-            <ContentCopyOutlinedIcon />
-          </ListItemIcon>
-          <ListItemText>Duplicate</ListItemText>
-        </MenuItem>
-        <MenuItem onClick={handleDeleteClick}>
-          <ListItemIcon>
-            <DeleteIcon />
-          </ListItemIcon>
-          <ListItemText>Delete</ListItemText>
-        </MenuItem>
+        {config.localMode ? null : (
+          <>
+            <MenuItem onClick={handleRenameClick}>
+              <ListItemIcon>
+                <DriveFileRenameOutlineIcon />
+              </ListItemIcon>
+              <ListItemText>Rename</ListItemText>
+            </MenuItem>
+            <MenuItem onClick={handleDuplicateClick} disabled={!app}>
+              <ListItemIcon>
+                <ContentCopyOutlinedIcon />
+              </ListItemIcon>
+              <ListItemText>Duplicate</ListItemText>
+            </MenuItem>
+            <MenuItem onClick={handleDeleteClick} disabled={!app}>
+              <ListItemIcon>
+                <DeleteIcon />
+              </ListItemIcon>
+              <ListItemText>Delete</ListItemText>
+            </MenuItem>
+          </>
+        )}
         <Divider />
         {dom ? (
           <MenuItem onClick={handleAppExportClick}>
@@ -106,12 +114,14 @@ function AppOptions({ app, onRename, dom, redirectOnDelete }: AppOptionsProps) {
             <ListItemText>View DOM</ListItemText>
           </MenuItem>
         ) : null}
-        <MenuItem onClick={handleopenSettingsClick}>
-          <ListItemIcon>
-            <SettingsIcon />
-          </ListItemIcon>
-          <ListItemText>Settings</ListItemText>
-        </MenuItem>
+        {config.localMode ? null : (
+          <MenuItem onClick={handleopenSettingsClick} disabled={!app}>
+            <ListItemIcon>
+              <SettingsIcon />
+            </ListItemIcon>
+            <ListItemText>Settings</ListItemText>
+          </MenuItem>
+        )}
       </Menu>
       {app && dom ? (
         <AppExportDialog open={appExportOpen} onClose={handleCloseAppExport} dom={dom} />
@@ -124,11 +134,13 @@ function AppOptions({ app, onRename, dom, redirectOnDelete }: AppOptionsProps) {
         onClose={() => setDeletedApp(null)}
         redirectOnDelete={redirectOnDelete}
       />
-      <AppDuplicateDialog
-        open={Boolean(duplicateApp)}
-        app={app}
-        onClose={() => setDuplicateApp(null)}
-      />
+      {app ? (
+        <AppDuplicateDialog
+          open={Boolean(duplicateApp)}
+          app={app}
+          onClose={() => setDuplicateApp(null)}
+        />
+      ) : null}
     </React.Fragment>
   );
 }

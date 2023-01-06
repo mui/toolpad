@@ -712,18 +712,13 @@ export function getThemedComponents(theme: Theme): { components: Theme['componen
         defaultProps: {
           size: 'small',
         },
-        styleOverrides: {
-          root: {
-            backgroundColor:
-              theme.palette.mode === 'dark' ? theme.palette.primaryDark[900] : '#fff',
-          },
-        },
       },
       MuiToggleButton: {
         styleOverrides: {
           root: {
             textTransform: 'none',
             fontWeight: 500,
+            padding: theme.spacing(0.5),
             color:
               theme.palette.mode === 'dark' ? theme.palette.grey[300] : theme.palette.grey[700],
             borderColor:

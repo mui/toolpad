@@ -111,7 +111,8 @@
     "superjson": "^1.12.1",
     "ts-node": "^10.9.1",
     "web-streams-polyfill": "^3.2.1",
-    "whatwg-url": "^11.0.0"
+    "whatwg-url": "^11.0.0",
+    "yaml": "^2.2.1"
   },
   "devDependencies": {
     "@types/babel__code-frame": "^7.0.3",

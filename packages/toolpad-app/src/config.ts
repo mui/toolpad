@@ -49,6 +49,7 @@ export interface RuntimeConfig {
   recaptchaV3SiteKey?: string;
   externalUrl: string;
   localMode: boolean;
+  projectDir?: string;
 }
 
 declare global {
@@ -85,6 +86,7 @@ const runtimeConfig: RuntimeConfig =
         externalUrl:
           process.env.TOOLPAD_EXTERNAL_URL || `http://localhost:${process.env.PORT || 3000}`,
         localMode: !!process.env.TOOLPAD_LOCAL_MODE,
+        projectDir: process.env.TOOLPAD_PROJECT_DIR,
       }
     : getBrowsersideRuntimeConfig();
 

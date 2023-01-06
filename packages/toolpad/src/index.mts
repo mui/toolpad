@@ -27,7 +27,7 @@ const cp = execa('yarn', [NEXT_CMD, '--', '--port', String(port)], {
   preferLocal: true,
   stdio: 'pipe',
   env: {
-    TOOLPAD_WORKING_DIR: process.cwd(),
+    TOOLPAD_PROJECT_DIR: process.cwd(),
     FORCE_COLOR: '1',
   },
 });

@@ -159,18 +159,18 @@ export default function AppEditorShell({ appId, ...props }: ToolpadShellProps) {
   return (
     <ToolpadShell
       actions={
-        config.localMode ? null : (
-          <Stack direction="row" gap={1} alignItems="center">
-            <Button
-              variant="outlined"
-              endIcon={<OpenInNewIcon />}
-              color="primary"
-              component="a"
-              href={`/app/${appId}/preview`}
-              target="_blank"
-            >
-              Preview
-            </Button>
+        <Stack direction="row" gap={1} alignItems="center">
+          <Button
+            variant="outlined"
+            endIcon={<OpenInNewIcon />}
+            color="primary"
+            component="a"
+            href={`/app/${appId}/preview`}
+            target="_blank"
+          >
+            Preview
+          </Button>
+          {config.localMode ? null : (
             <ButtonGroup>
               <Button
                 variant="outlined"
@@ -202,8 +202,8 @@ export default function AppEditorShell({ appId, ...props }: ToolpadShellProps) {
                 </React.Fragment>
               ) : null}
             </ButtonGroup>
-          </Stack>
-        )
+          )}
+        </Stack>
       }
       status={getSaveState(domLoader)}
       {...props}

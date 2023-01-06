@@ -8,7 +8,7 @@ import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { createComponent } from '@mui/toolpad-core';
 import { Dayjs } from 'dayjs';
 
-export interface Props extends DesktopDatePickerProps<string, Dayjs> {
+export interface DatePickerProps extends DesktopDatePickerProps<string, Dayjs> {
   format: string;
   fullWidth: boolean;
   variant: 'outlined' | 'filled' | 'standard';
@@ -17,7 +17,7 @@ export interface Props extends DesktopDatePickerProps<string, Dayjs> {
   defaultValue: string;
 }
 
-function DatePicker(props: Props) {
+function DatePicker(props: DatePickerProps) {
   const customProps: any = {};
 
   if (props.format) {

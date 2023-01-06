@@ -21,11 +21,11 @@ import SyncProblemIcon from '@mui/icons-material/SyncProblem';
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import RocketLaunchIcon from '@mui/icons-material/RocketLaunch';
-
 import * as React from 'react';
 import { useForm } from 'react-hook-form';
 import { Outlet } from 'react-router-dom';
 import invariant from 'invariant';
+import config from '../../config';
 import DialogForm from '../../components/DialogForm';
 import { DomLoader, useDomLoader } from '../DomLoader';
 import ToolpadShell from '../ToolpadShell';
@@ -159,49 +159,51 @@ export default function AppEditorShell({ appId, ...props }: ToolpadShellProps) {
   return (
     <ToolpadShell
       actions={
-        <Stack direction="row" gap={1} alignItems="center">
-          <Button
-            variant="outlined"
-            endIcon={<OpenInNewIcon />}
-            color="primary"
-            component="a"
-            href={`/app/${appId}/preview`}
-            target="_blank"
-          >
-            Preview
-          </Button>
-          <ButtonGroup>
+        config.localMode ? null : (
+          <Stack direction="row" gap={1} alignItems="center">
             <Button
               variant="outlined"
-              endIcon={<RocketLaunchIcon />}
-              size="small"
+              endIcon={<OpenInNewIcon />}
               color="primary"
-              onClick={handleCreateReleaseDialogOpen}
+              component="a"
+              href={`/app/${appId}/preview`}
+              target="_blank"
             >
-              Deploy
+              Preview
             </Button>
-            {isDeployed ? (
-              <React.Fragment>
-                <Button size="small" {...buttonProps}>
-                  <ArrowDropDownIcon />
-                </Button>
-                <Menu
-                  {...menuProps}
-                  anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
-                  transformOrigin={{ horizontal: 'right', vertical: 'top' }}
-                >
-                  {release.error ? (
-                    <MenuItem>{errorFrom(release.error).message}</MenuItem>
-                  ) : (
-                    <MenuItem component="a" href={`/deploy/${appId}`} target="_blank">
-                      Open current deployed version
-                    </MenuItem>
-                  )}
-                </Menu>
-              </React.Fragment>
-            ) : null}
-          </ButtonGroup>
-        </Stack>
+            <ButtonGroup>
+              <Button
+                variant="outlined"
+                endIcon={<RocketLaunchIcon />}
+                size="small"
+                color="primary"
+                onClick={handleCreateReleaseDialogOpen}
+              >
+                Deploy
+              </Button>
+              {isDeployed ? (
+                <React.Fragment>
+                  <Button size="small" {...buttonProps}>
+                    <ArrowDropDownIcon />
+                  </Button>
+                  <Menu
+                    {...menuProps}
+                    anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
+                    transformOrigin={{ horizontal: 'right', vertical: 'top' }}
+                  >
+                    {release.error ? (
+                      <MenuItem>{errorFrom(release.error).message}</MenuItem>
+                    ) : (
+                      <MenuItem component="a" href={`/deploy/${appId}`} target="_blank">
+                        Open current deployed version
+                      </MenuItem>
+                    )}
+                  </Menu>
+                </React.Fragment>
+              ) : null}
+            </ButtonGroup>
+          </Stack>
+        )
       }
       status={getSaveState(domLoader)}
       {...props}
@@ -232,11 +234,13 @@ export default function AppEditorShell({ appId, ...props }: ToolpadShellProps) {
           <Outlet />
         </Box>
 
-        <CreateReleaseDialog
-          appId={appId}
-          open={createReleaseDialogOpen}
-          onClose={handleCreateReleaseDialogClose}
-        />
+        {config.localMode ? null : (
+          <CreateReleaseDialog
+            appId={appId}
+            open={createReleaseDialogOpen}
+            onClose={handleCreateReleaseDialogClose}
+          />
+        )}
       </Box>
     </ToolpadShell>
   );

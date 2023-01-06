@@ -46,12 +46,6 @@ export default function ComponentCatalog({ className }: ComponentCatalogProps) {
   const pageState = usePageEditorState();
   const { dom } = useDom();
 
-  // Show the component partially collapsed until it has been interacted with for the first time
-  const [collapsedSize, setCollapsedSize] = useLocalStorageState(
-    'discoverable-component-drawer-size',
-    95,
-  );
-
   const [openStart, setOpenStart] = React.useState(0);
   const [openCustomComponents, setOpenCustomComponents] = useLocalStorageState(
     'catalog-custom-expanded',
@@ -81,12 +75,11 @@ export default function ComponentCatalog({ className }: ComponentCatalogProps) {
 
   const closeDrawer = React.useCallback(
     (delay?: number) => {
-      setCollapsedSize(0);
       const timeOpen = Date.now() - openStart;
       const defaultDelay = timeOpen > 750 ? 500 : 0;
       closeTimeoutRef.current = setTimeout(() => setOpenStart(0), delay ?? defaultDelay);
     },
-    [setCollapsedSize, openStart],
+    [openStart],
   );
 
   const handleDragStart = (componentType: string) => (event: React.DragEvent<HTMLElement>) => {
@@ -125,7 +118,6 @@ export default function ComponentCatalog({ className }: ComponentCatalogProps) {
           orientation="horizontal"
           timeout={200}
           sx={{ height: '100%', justifyContent: 'flex-end', display: 'flex' }}
-          collapsedSize={collapsedSize}
         >
           <Box
             sx={{

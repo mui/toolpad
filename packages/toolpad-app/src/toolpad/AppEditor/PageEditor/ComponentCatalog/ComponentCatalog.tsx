@@ -37,6 +37,47 @@ const ComponentCatalogRoot = styled('div')({
   overflow: 'visible',
 });
 
+interface UseDebouncedBooleanValueParams {
+  waitTrue?: number;
+  waitFalse?: number;
+}
+
+// Two-way debounce function for boolean values
+function useDebouncedBooleanValue(
+  value: boolean,
+  { waitTrue = 0, waitFalse = 0 }: UseDebouncedBooleanValueParams,
+) {
+  const [debouncedValue, setDebouncedValue] = React.useState(value);
+  const timeoutIdRef = React.useRef<NodeJS.Timeout | null>(null);
+
+  React.useEffect(() => {
+    if (value) {
+      timeoutIdRef.current = setTimeout(() => setDebouncedValue(true), waitTrue);
+    } else {
+      timeoutIdRef.current = setTimeout(() => setDebouncedValue(false), waitFalse);
+    }
+
+    return () => {
+      if (timeoutIdRef.current) {
+        clearTimeout(timeoutIdRef.current);
+        timeoutIdRef.current = null;
+      }
+    };
+  }, [value, waitTrue, waitFalse]);
+
+  if (!waitTrue && value) {
+    // Return in this render, we don't need to wait for the effect to run
+    return true;
+  }
+
+  if (!waitFalse && !value) {
+    // Return in this render, we don't need to wait for the effect to run
+    return false;
+  }
+
+  return debouncedValue;
+}
+
 export interface ComponentCatalogProps {
   className?: string;
 }
@@ -46,7 +87,35 @@ export default function ComponentCatalog({ className }: ComponentCatalogProps) {
   const pageState = usePageEditorState();
   const { dom } = useDom();
 
-  const [openStart, setOpenStart] = React.useState(0);
+  const [mouseOver, setMouseOver] = React.useState(false);
+  const [isOpenCommitted, setIsOpenCommitted] = React.useState(false);
+
+  const open = useDebouncedBooleanValue(mouseOver, {
+    // Wait 100ms before opening drawer
+    waitTrue: 100,
+    // Wait 500ms before closing, unless it was a drag over
+    waitFalse: isOpenCommitted ? 500 : 0,
+  });
+
+  React.useEffect(() => {
+    let timeout: NodeJS.Timeout;
+    if (open) {
+      // After 750ms we consider the user interaction committed, they're not merely dragging
+      // over the drawer, they want it to be open
+      timeout = setTimeout(() => {
+        setIsOpenCommitted(true);
+      }, 750);
+    } else {
+      setIsOpenCommitted(false);
+    }
+
+    return () => {
+      if (timeout) {
+        clearTimeout(timeout);
+      }
+    };
+  }, [open]);
+
   const [openCustomComponents, setOpenCustomComponents] = useLocalStorageState(
     'catalog-custom-expanded',
     true,
@@ -65,34 +134,25 @@ export default function ComponentCatalog({ className }: ComponentCatalogProps) {
     [],
   );
 
-  const closeTimeoutRef = React.useRef<NodeJS.Timeout>();
-  const openDrawer = React.useCallback(() => {
-    if (closeTimeoutRef.current) {
-      clearTimeout(closeTimeoutRef.current);
-    }
-    setOpenStart(Date.now());
-  }, []);
-
-  const closeDrawer = React.useCallback(
-    (delay?: number) => {
-      const timeOpen = Date.now() - openStart;
-      const defaultDelay = timeOpen > 750 ? 500 : 0;
-      closeTimeoutRef.current = setTimeout(() => setOpenStart(0), delay ?? defaultDelay);
-    },
-    [openStart],
-  );
-
   const handleDragStart = (componentType: string) => (event: React.DragEvent<HTMLElement>) => {
     event.dataTransfer.dropEffect = 'copy';
     const newNode = appDom.createElement(dom, componentType, {});
     api.newNodeDragStart(newNode);
-    closeDrawer(0);
+
+    // Close immediately
+    setMouseOver(false);
+    setIsOpenCommitted(false);
   };
 
   const toolpadComponents = useToolpadComponents(dom);
 
-  const handleMouseEnter = React.useCallback(() => openDrawer(), [openDrawer]);
-  const handleMouseLeave = React.useCallback(() => closeDrawer(), [closeDrawer]);
+  const handleMouseEnter = React.useCallback(() => {
+    setMouseOver(true);
+  }, []);
+
+  const handleMouseLeave = React.useCallback(() => {
+    setMouseOver(false);
+  }, []);
 
   return (
     <ComponentCatalogRoot
@@ -113,7 +173,7 @@ export default function ComponentCatalog({ className }: ComponentCatalogProps) {
           borderColor: 'divider',
         }}
       >
-        <Collapse in={!!openStart} orientation="horizontal" timeout={200} sx={{ height: '100%' }}>
+        <Collapse in={open} orientation="horizontal" timeout={200} sx={{ height: '100%' }}>
           <Box sx={{ width: 250, height: '100%', overflow: 'auto', scrollbarGutter: 'stable' }}>
             <Box display="grid" gridTemplateColumns="1fr 1fr 1fr" gap={1} padding={1}>
               {Object.entries(toolpadComponents).map(([componentId, componentType]) => {
@@ -247,7 +307,7 @@ export default function ComponentCatalog({ className }: ComponentCatalogProps) {
             width: WIDTH_COLLAPSED,
           }}
         >
-          <Box sx={{ mt: 2 }}>{openStart ? <ArrowLeftIcon /> : <ArrowRightIcon />}</Box>
+          <Box sx={{ mt: 2 }}>{open ? <ArrowLeftIcon /> : <ArrowRightIcon />}</Box>
           <Box position="relative">
             <Typography
               sx={{

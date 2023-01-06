@@ -7,6 +7,7 @@ import { DesktopDatePicker, DesktopDatePickerProps } from '@mui/x-date-pickers/D
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { createComponent } from '@mui/toolpad-core';
 import { Dayjs } from 'dayjs';
+import { SX_PROP_HELPER_TEXT } from './constants';
 
 export interface DatePickerProps extends DesktopDatePickerProps<string, Dayjs> {
   format: string;
@@ -45,8 +46,11 @@ function DatePicker(props: DatePickerProps) {
 }
 
 export default createComponent(DatePicker, {
+  helperText:
+    'The MUI X [Date picker](https://mui.com/x/react-date-pickers/date-picker/) component.\n\nThe date picker lets the user select a date.',
   argTypes: {
     value: {
+      helperText: '',
       typeDef: { type: 'string' },
       onChangeProp: 'onChange',
       onChangeHandler: (newValue: Dayjs) => {
@@ -57,33 +61,43 @@ export default createComponent(DatePicker, {
       defaultValueProp: 'defaultValue',
     },
     format: {
+      helperText:
+        'The [format](https://day.js.org/docs/en/display/format) of the date in the UI. The value for the bindings will always be in the `YYYY-MM-DD` format. Leave empty to let the end-user locale define the format.',
       typeDef: {
         type: 'string',
       },
       defaultValue: '',
     },
     defaultValue: {
+      helperText: 'A default value for the date picker.',
       typeDef: { type: 'string' },
       defaultValue: '',
     },
     label: {
+      helperText: 'A label that describes the content of the date picker. e.g. "Arrival date".',
       typeDef: { type: 'string' },
     },
     variant: {
+      helperText:
+        'One of the available MUI TextField [variants](https://mui.com/material-ui/react-button/#basic-button). Possible values are `outlined`, `filled` or `standard`',
       typeDef: { type: 'string', enum: ['outlined', 'filled', 'standard'] },
       defaultValue: 'outlined',
     },
     size: {
+      helperText: 'The size of the component. One of `small`, or `medium`.',
       typeDef: { type: 'string', enum: ['small', 'medium'] },
       defaultValue: 'small',
     },
     fullWidth: {
+      helperText: 'Whether the button should occupy all available horizontal space.',
       typeDef: { type: 'boolean' },
     },
     disabled: {
+      helperText: 'The date picker is disabled.',
       typeDef: { type: 'boolean' },
     },
     sx: {
+      helperText: SX_PROP_HELPER_TEXT,
       typeDef: { type: 'object' },
     },
   },

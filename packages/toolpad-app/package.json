@@ -79,6 +79,7 @@
     "json-to-ts": "^1.7.0",
     "json5": "^2.2.3",
     "lodash-es": "^4.17.21",
+    "markdown-to-jsx": "^7.1.8",
     "mitt": "^3.0.0",
     "monaco-editor": "0.34.1",
     "next": "^13.1.1",

@@ -9,15 +9,16 @@ import { createComponent } from '@mui/toolpad-core';
 import { Dayjs } from 'dayjs';
 import { SX_PROP_HELPER_TEXT } from './constants';
 
-export interface Props extends DesktopDatePickerProps<string, Dayjs> {
+export interface DatePickerProps extends DesktopDatePickerProps<string, Dayjs> {
   format: string;
   fullWidth: boolean;
   variant: 'outlined' | 'filled' | 'standard';
   size: 'small' | 'medium';
   sx: any;
+  defaultValue: string;
 }
 
-function DatePicker(props: Props) {
+function DatePicker(props: DatePickerProps) {
   const customProps: any = {};
 
   if (props.format) {
@@ -67,7 +68,6 @@ export default createComponent(DatePicker, {
       },
       defaultValue: '',
     },
-    // @ts-ignore no idea why it complains even though it's done exactly same as TextField
     defaultValue: {
       helperText: 'A default value for the date picker.',
       typeDef: { type: 'string' },

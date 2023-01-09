@@ -131,9 +131,7 @@ interface GlobalScopeNodeState {
 
 const [useDomContext, DomContextProvider] = createProvidedContext<appDom.AppDom>('Dom');
 const [useEvaluatePageExpression, EvaluatePageExpressionProvider] =
-  createProvidedContext<(expr: string, nodeState: GlobalScopeNodeState) => any>(
-    'EvaluatePageExpression',
-  );
+  createProvidedContext<(expr: string) => any>('EvaluatePageExpression');
 const [useBindingsContext, BindingsContextProvider] =
   createProvidedContext<
     (nodeState?: GlobalScopeNodeState) => Record<string, BindingEvaluationResult>
@@ -336,7 +334,7 @@ function RenderedNodeContent({ node, childNodeGroups, Component }: RenderedNodeC
         const handler = () => {
           const code = action.value;
           const exprToEvaluate = `(async () => {${code}})()`;
-          evaluatePageExpression(exprToEvaluate, globalScopeNodeState);
+          evaluatePageExpression(exprToEvaluate);
         };
 
         return [key, handler];
@@ -344,7 +342,7 @@ function RenderedNodeContent({ node, childNodeGroups, Component }: RenderedNodeC
 
       return null;
     });
-  }, [argTypes, node, navigateToPage, evaluatePageExpression, globalScopeNodeState]);
+  }, [argTypes, node, navigateToPage, evaluatePageExpression]);
 
   const reactChildren = mapValues(childNodeGroups, (childNodes) =>
     childNodes.map((child) => <RenderedNode key={child.id} nodeId={child.id} />),

@@ -165,7 +165,7 @@ export default function AppEditorShell({ appId, ...props }: ToolpadShellProps) {
             endIcon={<OpenInNewIcon />}
             color="primary"
             component="a"
-            href={`/app/${appId}/preview`}
+            href={config.localMode ? '/preview' : `/app/${appId}/preview`}
             target="_blank"
           >
             Preview

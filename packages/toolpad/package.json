@@ -4,7 +4,8 @@
   "license": "MIT",
   "scripts": {
     "build": "tsc",
-    "start": "./index.mjs",
+    "start": "yarn cli",
+    "cli": "./index.mjs",
     "dev": "tsc --pretty --watch --preserveWatchOutput"
   },
   "files": [

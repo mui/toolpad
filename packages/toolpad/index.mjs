@@ -1,3 +1,5 @@
 #!/usr/bin/env node
 // eslint-disable-next-line import/extensions
-import './dist/index.mjs';
+import cli from './dist/index.mjs';
+
+cli(process.argv);

@@ -35,7 +35,7 @@ const CodeContainer = styled('pre')(({ theme }) => ({
   marginRight: theme.spacing(1),
   borderRadius: theme.shape.borderRadius,
   padding: theme.spacing(1),
-  overflowX: 'scroll',
+  overflow: 'auto',
 }));
 
 function Text({ value, markdown, href, loading, mode, sx, ...rest }: TextProps) {

@@ -101,7 +101,7 @@
     "react-hook-form": "^7.41.5",
     "react-inspector": "^5.1.1",
     "react-is": "^18.2.0",
-    "react-router-dom": "^6.3.0",
+    "react-router-dom": "~6.3.0",
     "react-split-pane": "^0.1.92",
     "remark-gfm": "^3.0.1",
     "serialize-javascript": "^6.0.0",

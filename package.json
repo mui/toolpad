@@ -92,8 +92,5 @@
   "engines": {
     "npm": "please-use-yarn",
     "node": ">=16.17"
-  },
-  "resolutions": {
-    "react-router-dom": "~6.3.0"
   }
 }

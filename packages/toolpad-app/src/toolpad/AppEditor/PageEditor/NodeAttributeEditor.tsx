@@ -3,10 +3,11 @@ import {
   ArgTypeDefinition,
   BindableAttrValue,
   DEFAULT_GLOBAL_SCOPE_NODE_STATE,
+  GlobalScopeMeta,
 } from '@mui/toolpad-core';
 import { Alert, Box } from '@mui/material';
 import * as appDom from '../../../appDom';
-import { useDomApi } from '../../DomLoader';
+import { useDom, useDomApi } from '../../DomLoader';
 import BindableEditor from './BindableEditor';
 import { usePageEditorState } from './PageEditorProvider';
 import { getDefaultControl } from '../../propertyControls';
@@ -27,6 +28,7 @@ export default function NodeAttributeEditor<P extends object>({
   argType,
   props,
 }: NodeAttributeEditorProps<P>) {
+  const { dom } = useDom();
   const domApi = useDomApi();
 
   const handlePropChange = React.useCallback(
@@ -43,7 +45,22 @@ export default function NodeAttributeEditor<P extends object>({
   const bindingId = `${node.id}${namespace ? `.${namespace}` : ''}.${name}`;
   const { bindings, pageState, globalScopeMeta } = usePageEditorState();
   const liveBinding = bindings[bindingId];
-  const globalScope = { ...pageState, ...DEFAULT_GLOBAL_SCOPE_NODE_STATE };
+
+  const ancestorComponentNames = React.useMemo(
+    () => appDom.getAncestors(dom, node).map((element) => element.name),
+    [dom, node],
+  );
+  const isListComponentDescendant = ancestorComponentNames.includes('list');
+
+  const nodeAwareGlobalScope = {
+    ...pageState,
+    ...(isListComponentDescendant ? { i: DEFAULT_GLOBAL_SCOPE_NODE_STATE.i } : {}),
+  };
+  const nodeAwareGlobalScopeMeta: GlobalScopeMeta = {
+    ...globalScopeMeta,
+    ...(isListComponentDescendant ? { i: { kind: 'local' } } : {}),
+  };
+
   const propType = argType.typeDef;
   const Control = getDefaultControl(argType, props);
 
@@ -56,8 +73,8 @@ export default function NodeAttributeEditor<P extends object>({
   return Control ? (
     <BindableEditor
       liveBinding={liveBinding}
-      globalScope={globalScope}
-      globalScopeMeta={globalScopeMeta}
+      globalScope={nodeAwareGlobalScope}
+      globalScopeMeta={nodeAwareGlobalScopeMeta}
       label={argType.label || name}
       bindable={isBindable}
       disabled={isDisabled}

@@ -203,15 +203,15 @@ function RenderedNodeContent({ node, childNodeGroups, Component }: RenderedNodeC
   const nodeId = node.id;
 
   const hasMountedRef = React.useRef(false);
-  const [nodeIndex, setNodeIndex] = React.useState<number>(0);
+  const [nodeIndex, setNodeIndex] = React.useState<number>(DEFAULT_GLOBAL_SCOPE_NODE_STATE.i);
 
   React.useEffect(() => {
     if (!hasMountedRef.current) {
       incrementNodeCount(nodeId);
       setNodeIndex(getNodeCount(nodeId));
-    }
 
-    hasMountedRef.current = true;
+      hasMountedRef.current = true;
+    }
   }, [getNodeCount, incrementNodeCount, nodeId]);
 
   const globalScopeNodeState = React.useMemo<GlobalScopeNodeState>(

@@ -1,5 +1,9 @@
 import * as React from 'react';
-import { ArgTypeDefinition, BindableAttrValue } from '@mui/toolpad-core';
+import {
+  ArgTypeDefinition,
+  BindableAttrValue,
+  DEFAULT_GLOBAL_SCOPE_NODE_STATE,
+} from '@mui/toolpad-core';
 import { Alert, Box } from '@mui/material';
 import * as appDom from '../../../appDom';
 import { useDomApi } from '../../DomLoader';
@@ -39,7 +43,7 @@ export default function NodeAttributeEditor<P extends object>({
   const bindingId = `${node.id}${namespace ? `.${namespace}` : ''}.${name}`;
   const { bindings, pageState, globalScopeMeta } = usePageEditorState();
   const liveBinding = bindings[bindingId];
-  const globalScope = pageState;
+  const globalScope = { ...pageState, ...DEFAULT_GLOBAL_SCOPE_NODE_STATE };
   const propType = argType.typeDef;
   const Control = getDefaultControl(argType, props);
 

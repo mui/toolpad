@@ -11,6 +11,7 @@ import SelectOptions from './SelectOptions';
 import HorizontalAlign from './HorizontalAlign';
 import VerticalAlign from './VerticalAlign';
 import RowIdFieldSelect from './RowIdFieldSelect';
+import file from './file';
 import { EditorProps } from '../../types';
 
 const propTypeControls: {
@@ -28,6 +29,7 @@ const propTypeControls: {
   RowIdFieldSelect,
   HorizontalAlign,
   VerticalAlign,
+  file,
 };
 
 function getDefaultControlForType(propType: PropValueType): React.FC<EditorProps<any>> | null {
@@ -44,6 +46,8 @@ function getDefaultControlForType(propType: PropValueType): React.FC<EditorProps
       return json;
     case 'event':
       return event;
+    case 'file':
+      return file;
     default:
       return null;
   }

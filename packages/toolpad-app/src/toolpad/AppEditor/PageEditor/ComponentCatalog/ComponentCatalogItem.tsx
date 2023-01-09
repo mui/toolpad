@@ -17,6 +17,7 @@ import DateRangeIcon from '@mui/icons-material/DateRange';
 import CheckBoxIcon from '@mui/icons-material/CheckBox';
 import DashboardCustomizeSharpIcon from '@mui/icons-material/DashboardCustomizeSharp';
 import AddIcon from '@mui/icons-material/Add';
+import UploadFileIcon from '@mui/icons-material/UploadFile';
 import NotesIcon from '@mui/icons-material/Notes';
 import { SvgIconProps } from '@mui/material/SvgIcon';
 
@@ -35,6 +36,7 @@ const iconMap = new Map<string, React.ComponentType<SvgIconProps>>([
   ['Switch', ToggleOnIcon],
   ['Radio', RadioButtonCheckedIcon],
   ['DatePicker', DateRangeIcon],
+  ['FilePicker', UploadFileIcon],
   ['Checkbox', CheckBoxIcon],
   ['CodeComponent', DashboardCustomizeSharpIcon],
   ['CreateNew', AddIcon],

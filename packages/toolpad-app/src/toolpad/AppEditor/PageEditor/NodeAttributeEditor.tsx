@@ -46,11 +46,16 @@ export default function NodeAttributeEditor<P extends object>({
   const { bindings, pageState, globalScopeMeta } = usePageEditorState();
   const liveBinding = bindings[bindingId];
 
-  const ancestorComponentNames = React.useMemo(
-    () => appDom.getAncestors(dom, node).map((element) => element.name),
+  const ancestorComponentTypes = React.useMemo(
+    () =>
+      appDom
+        .getAncestors(dom, node)
+        .map((ancestor) =>
+          appDom.isElement(ancestor) ? ancestor.attributes.component.value : null,
+        ),
     [dom, node],
   );
-  const isListComponentDescendant = ancestorComponentNames.includes('list');
+  const isListComponentDescendant = ancestorComponentTypes.includes('List');
 
   const nodeAwareGlobalScope = {
     ...pageState,

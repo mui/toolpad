@@ -7,6 +7,7 @@ import {
   NodeId,
   PropValueType,
   ExecFetchResult,
+  GlobalScopeMeta,
 } from '@mui/toolpad-core';
 import { PaletteMode } from '@mui/material';
 import type * as appDom from './appDom';
@@ -84,6 +85,7 @@ export type ConnectionParamsEditor<P = {}> = React.FC<ConnectionEditorProps<P>>;
 export interface QueryEditorProps<C, Q> extends WithControlledProp<appDom.QueryNode<Q>> {
   connectionParams: Maybe<C>;
   globalScope: Record<string, any>;
+  globalScopeMeta: GlobalScopeMeta;
   onChange: React.Dispatch<React.SetStateAction<appDom.QueryNode<Q>>>;
   onCommit?: () => void;
 }
@@ -193,11 +195,3 @@ export interface RuntimeState {
   appId: string;
   modules: Record<string, CompiledModule>;
 }
-
-export interface MetaField {
-  description?: string;
-  deprecated?: boolean | string;
-  tsType?: string;
-  value?: any;
-}
-export type GlobalScopeMeta = Record<string, MetaField>;

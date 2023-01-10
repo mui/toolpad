@@ -1,6 +1,6 @@
 import * as React from 'react';
+import { createProvidedContext } from '@mui/toolpad-core';
 import { CompiledModule } from '../types';
-import { createProvidedContext } from '../utils/react';
 import loadModule from './loadModule';
 
 type SuspenseCacheEntry =

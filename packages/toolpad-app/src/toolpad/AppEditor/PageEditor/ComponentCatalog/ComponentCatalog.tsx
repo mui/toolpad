@@ -7,7 +7,7 @@ import invariant from 'invariant';
 import ComponentCatalogItem from './ComponentCatalogItem';
 import CreateCodeComponentNodeDialog from '../../HierarchyExplorer/CreateCodeComponentNodeDialog';
 import * as appDom from '../../../../appDom';
-import { useDom, useDomApi } from '../../../DomLoader';
+import { useDom } from '../../../DomLoader';
 import { usePageEditorApi, usePageEditorState } from '../PageEditorProvider';
 import { useToolpadComponents } from '../../toolpadComponents';
 import useLocalStorageState from '../../../../utils/useLocalStorageState';
@@ -24,10 +24,6 @@ const FUTURE_COMPONENTS = new Map<string, FutureComponentSpec>([
   ['Slider', { url: 'https://github.com/mui/mui-toolpad/issues/746', displayName: 'Slider' }],
   ['Switch', { url: 'https://github.com/mui/mui-toolpad/issues/745', displayName: 'Switch' }],
   ['Radio', { url: 'https://github.com/mui/mui-toolpad/issues/744', displayName: 'Radio' }],
-  [
-    'DatePicker',
-    { url: 'https://github.com/mui/mui-toolpad/issues/743', displayName: 'Date picker' },
-  ],
   ['Checkbox', { url: 'https://github.com/mui/mui-toolpad/issues/742', displayName: 'Checkbox' }],
 ]);
 
@@ -49,7 +45,6 @@ export default function ComponentCatalog({ className }: ComponentCatalogProps) {
   const api = usePageEditorApi();
   const pageState = usePageEditorState();
   const { dom } = useDom();
-  const domApi = useDomApi();
 
   const [openStart, setOpenStart] = React.useState(0);
   const [openCustomComponents, setOpenCustomComponents] = useLocalStorageState(
@@ -90,7 +85,6 @@ export default function ComponentCatalog({ className }: ComponentCatalogProps) {
   const handleDragStart = (componentType: string) => (event: React.DragEvent<HTMLElement>) => {
     event.dataTransfer.dropEffect = 'copy';
     const newNode = appDom.createElement(dom, componentType, {});
-    domApi.deselectNode();
     api.newNodeDragStart(newNode);
     closeDrawer(0);
   };
@@ -119,8 +113,20 @@ export default function ComponentCatalog({ className }: ComponentCatalogProps) {
           borderColor: 'divider',
         }}
       >
-        <Collapse in={!!openStart} orientation="horizontal" timeout={200} sx={{ height: '100%' }}>
-          <Box sx={{ width: 250, height: '100%', overflow: 'auto', scrollbarGutter: 'stable' }}>
+        <Collapse
+          in={!!openStart}
+          orientation="horizontal"
+          timeout={200}
+          sx={{ height: '100%', justifyContent: 'flex-end', display: 'flex' }}
+        >
+          <Box
+            sx={{
+              width: 250,
+              height: '100%',
+              overflow: 'auto',
+              scrollbarGutter: 'stable',
+            }}
+          >
             <Box display="grid" gridTemplateColumns="1fr 1fr 1fr" gap={1} padding={1}>
               {Object.entries(toolpadComponents).map(([componentId, componentType]) => {
                 invariant(componentType, `No component definition found for "${componentId}"`);
@@ -218,10 +224,10 @@ export default function ComponentCatalog({ className }: ComponentCatalogProps) {
                     <ArrowDropDownSharpIcon />
                   </IconButton>
                 </Box>
-                <Typography variant="caption" color="text.secondary">
-                  👍 Upvote on GitHub to get it prioritized.
-                </Typography>
                 <Collapse in={openFutureComponents} orientation={'vertical'}>
+                  <Typography variant="caption" color="text.secondary">
+                    👍 Upvote on GitHub to get it prioritized.
+                  </Typography>
                   <Box display="grid" gridTemplateColumns="1fr 1fr 1fr" gap={1} pt={1} pb={0}>
                     {Array.from(FUTURE_COMPONENTS, ([key, { displayName, url }]) => {
                       return (

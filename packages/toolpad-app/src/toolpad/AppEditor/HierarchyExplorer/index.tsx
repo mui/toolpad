@@ -6,12 +6,12 @@ import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import ArrowRightIcon from '@mui/icons-material/ArrowRight';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import AddIcon from '@mui/icons-material/Add';
-import { useNavigate, useLocation, matchRoutes, Location } from 'react-router-dom';
+import { useLocation, matchRoutes, Location } from 'react-router-dom';
 import { NodeId } from '@mui/toolpad-core';
 import clsx from 'clsx';
 import invariant from 'invariant';
 import * as appDom from '../../../appDom';
-import { useDom, useDomApi } from '../../DomLoader';
+import { useDom, useDomApi, DomView } from '../../DomLoader';
 import CreatePageNodeDialog from './CreatePageNodeDialog';
 import CreateCodeComponentNodeDialog from './CreateCodeComponentNodeDialog';
 import CreateConnectionNodeDialog from './CreateConnectionNodeDialog';
@@ -123,14 +123,14 @@ function HierarchyTreeItem(props: StyledTreeItemProps) {
   );
 }
 
-function getLinkToNodeEditor(appId: string, node: appDom.AppDomNode): string | undefined {
+function getNodeEditorDomView(node: appDom.AppDomNode): DomView | undefined {
   switch (node.type) {
     case 'page':
-      return `/app/${appId}/pages/${node.id}`;
+      return { kind: 'page', nodeId: node.id };
     case 'connection':
-      return `/app/${appId}/connections/${node.id}`;
+      return { kind: 'connection', nodeId: node.id };
     case 'codeComponent':
-      return `/app/${appId}/codeComponents/${node.id}`;
+      return { kind: 'codeComponent', nodeId: node.id };
     default:
       return undefined;
   }
@@ -161,8 +161,6 @@ export default function HierarchyExplorer({ appId, className }: HierarchyExplore
     setExpanded(nodeIds as NodeId[]);
   };
 
-  const navigate = useNavigate();
-
   const handleSelect = (event: React.SyntheticEvent, nodeIds: string[]) => {
     if (nodeIds.length <= 0) {
       return;
@@ -179,20 +177,20 @@ export default function HierarchyExplorer({ appId, className }: HierarchyExplore
       // TODO: sort out in-page selection
       const page = appDom.getPageAncestor(dom, node);
       if (page) {
-        navigate(`/app/${appId}/pages/${page.id}`);
+        domApi.setView({ kind: 'page', nodeId: page.id });
       }
     }
 
     if (appDom.isPage(node)) {
-      navigate(`/app/${appId}/pages/${node.id}`);
+      domApi.setView({ kind: 'page', nodeId: node.id });
     }
 
     if (appDom.isCodeComponent(node)) {
-      navigate(`/app/${appId}/codeComponents/${node.id}`);
+      domApi.setView({ kind: 'codeComponent', nodeId: node.id });
     }
 
     if (appDom.isConnection(node)) {
-      navigate(`/app/${appId}/connections/${node.id}`);
+      domApi.setView({ kind: 'connection', nodeId: node.id });
     }
   };
 
@@ -225,45 +223,43 @@ export default function HierarchyExplorer({ appId, className }: HierarchyExplore
 
   const handleDeleteNode = React.useCallback(
     (nodeId: NodeId) => {
-      let redirectAfterDelete: string | undefined;
+      let domViewAfterDelete: DomView | undefined;
       if (nodeId === activeNode) {
         const deletedNode = appDom.getNode(dom, nodeId);
         const siblings = appDom.getSiblings(dom, deletedNode);
         const firstSiblingOfType = siblings.find((sibling) => sibling.type === deletedNode.type);
-        if (firstSiblingOfType) {
-          redirectAfterDelete = getLinkToNodeEditor(appId, firstSiblingOfType);
-        } else {
-          redirectAfterDelete = `/app/${appId}`;
-        }
+        domViewAfterDelete = firstSiblingOfType && getNodeEditorDomView(firstSiblingOfType);
       }
 
-      domApi.removeNode(nodeId);
-
-      if (redirectAfterDelete) {
-        navigate(redirectAfterDelete);
-      }
+      domApi.update((draft) => appDom.removeNode(draft, nodeId), {
+        view: domViewAfterDelete || { kind: 'page' },
+      });
     },
-    [activeNode, appId, dom, domApi, navigate],
+    [activeNode, dom, domApi],
   );
 
   const handleDuplicateNode = React.useCallback(
     (nodeId: NodeId) => {
       const node = appDom.getNode(dom, nodeId);
+
       invariant(
         node.parentId && node.parentProp,
         'Duplication should never be called on nodes that are not placed in the dom',
       );
 
       const fragment = appDom.cloneFragment(dom, nodeId);
-      domApi.addFragment(fragment, node.parentId, node.parentProp);
 
       const newNode = appDom.getNode(fragment, fragment.root);
-      const editorLink = getLinkToNodeEditor(appId, newNode);
-      if (editorLink) {
-        navigate(editorLink);
-      }
+      const editorDomView = getNodeEditorDomView(newNode);
+
+      domApi.update(
+        (draft) => appDom.addFragment(draft, fragment, node.parentId!, node.parentProp!),
+        {
+          view: editorDomView || { kind: 'page' },
+        },
+      );
     },
-    [appId, dom, domApi, navigate],
+    [dom, domApi],
   );
 
   const hasConnectionsView = !config.isDemo;

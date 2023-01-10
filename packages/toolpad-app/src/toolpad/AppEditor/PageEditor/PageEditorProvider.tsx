@@ -1,11 +1,9 @@
-import { NodeId, LiveBindings } from '@mui/toolpad-core';
+import { NodeId, LiveBindings, GlobalScopeMeta } from '@mui/toolpad-core';
 import * as React from 'react';
 import * as appDom from '../../../appDom';
 import { PageViewState } from '../../../types';
 import { RectangleEdge } from '../../../utils/geometry';
 import { update } from '../../../utils/immutability';
-
-export type ComponentPanelTab = 'component' | 'theme';
 
 export const DROP_ZONE_TOP = 'top';
 export const DROP_ZONE_BOTTOM = 'bottom';
@@ -23,7 +21,6 @@ export interface PageEditorState {
   readonly appId: string;
   readonly type: 'page';
   readonly nodeId: NodeId;
-  readonly componentPanelTab: ComponentPanelTab;
   readonly newNode: appDom.ElementNode | null;
   readonly draggedNodeId: NodeId | null;
   readonly isDraggingOver: boolean;
@@ -33,6 +30,7 @@ export interface PageEditorState {
   readonly draggedEdge: RectangleEdge | null;
   readonly viewState: PageViewState;
   readonly pageState: Record<string, unknown>;
+  readonly globalScopeMeta: GlobalScopeMeta;
   readonly bindings: LiveBindings;
 }
 
@@ -40,10 +38,6 @@ export type PageEditorAction =
   | {
       type: 'REPLACE';
       state: PageEditorState;
-    }
-  | {
-      type: 'PAGE_SET_COMPONENT_PANEL_TAB';
-      tab: ComponentPanelTab;
     }
   | {
       type: 'PAGE_NEW_NODE_DRAG_START';
@@ -74,6 +68,7 @@ export type PageEditorAction =
   | {
       type: 'PAGE_STATE_UPDATE';
       pageState: Record<string, unknown>;
+      globalScopeMeta: GlobalScopeMeta;
     }
   | {
       type: 'PAGE_VIEW_STATE_UPDATE';
@@ -89,7 +84,6 @@ export function createPageEditorState(appId: string, nodeId: NodeId): PageEditor
     appId,
     type: 'page',
     nodeId,
-    componentPanelTab: 'component',
     newNode: null,
     draggedNodeId: null,
     isDraggingOver: false,
@@ -99,6 +93,7 @@ export function createPageEditorState(appId: string, nodeId: NodeId): PageEditor
     draggedEdge: null,
     viewState: { nodes: {} },
     pageState: {},
+    globalScopeMeta: {},
     bindings: {},
   };
 }
@@ -111,10 +106,6 @@ export function pageEditorReducer(
     case 'REPLACE': {
       return action.state;
     }
-    case 'PAGE_SET_COMPONENT_PANEL_TAB':
-      return update(state, {
-        componentPanelTab: action.tab,
-      });
     case 'PAGE_NEW_NODE_DRAG_START': {
       if (state.newNode) {
         return state;
@@ -163,9 +154,10 @@ export function pageEditorReducer(
       });
     }
     case 'PAGE_STATE_UPDATE': {
-      const { pageState } = action;
+      const { pageState, globalScopeMeta } = action;
       return update(state, {
         pageState,
+        globalScopeMeta,
       });
     }
     case 'PAGE_BINDINGS_UPDATE': {
@@ -182,9 +174,6 @@ export function pageEditorReducer(
 function createPageEditorApi(dispatch: React.Dispatch<PageEditorAction>) {
   return {
     replace: (state: PageEditorState) => dispatch({ type: 'REPLACE', state }),
-    setComponentPanelTab(tab: ComponentPanelTab) {
-      dispatch({ type: 'PAGE_SET_COMPONENT_PANEL_TAB', tab });
-    },
     newNodeDragStart(newNode: appDom.ElementNode) {
       dispatch({ type: 'PAGE_NEW_NODE_DRAG_START', newNode });
     },
@@ -220,10 +209,11 @@ function createPageEditorApi(dispatch: React.Dispatch<PageEditorAction>) {
         viewState,
       });
     },
-    pageStateUpdate(pageState: Record<string, unknown>) {
+    pageStateUpdate(pageState: Record<string, unknown>, globalScopeMeta: GlobalScopeMeta) {
       dispatch({
         type: 'PAGE_STATE_UPDATE',
         pageState,
+        globalScopeMeta,
       });
     },
     pageBindingsUpdate(bindings: LiveBindings) {

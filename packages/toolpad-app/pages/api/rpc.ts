@@ -24,7 +24,8 @@ import {
 } from '../../src/server/data';
 import { getLatestToolpadRelease } from '../../src/server/getLatestRelease';
 import { hasOwnProperty } from '../../src/utils/collections';
-import { withRpcReqResLogs } from '../../src/server/logs/withLogs';
+import { errorFrom, serializeError } from '../../src/utils/errors';
+import logger from '../../src/server/logs/logger';
 
 export interface Method<P extends any[] = any[], R = any> {
   (...params: P): Promise<R>;
@@ -72,6 +73,7 @@ function createRpcHandler(definition: Definition): NextApiHandler<RpcResponse> {
       res.status(405).end();
       return;
     }
+
     const { type, name, params } = req.body as RpcRequest;
 
     if (!hasOwnProperty(definition, type) || !hasOwnProperty(definition[type], name)) {
@@ -82,20 +84,29 @@ function createRpcHandler(definition: Definition): NextApiHandler<RpcResponse> {
     const method: MethodResolver<any> = definition[type][name];
 
     let rawResult;
+    let error: Error | null = null;
     try {
       rawResult = await method({ params, req, res });
-    } catch (error) {
-      console.error(error);
-      if (error instanceof Error) {
-        res.json({ error: { message: error.message, code: error.code, stack: error.stack } });
-      } else {
-        res.status(500).end();
-      }
-
-      return;
+    } catch (rawError) {
+      error = errorFrom(rawError);
     }
-    const responseData: RpcResponse = { result: superjson.stringify(rawResult) };
+
+    const responseData: RpcResponse = error
+      ? { error: serializeError(error) }
+      : { result: superjson.stringify(rawResult) };
+
     res.json(responseData);
+
+    const logLevel = error ? 'warn' : 'trace';
+    logger[logLevel](
+      {
+        key: 'rpc',
+        type,
+        name,
+        error,
+      },
+      'Handled RPC request',
+    );
   };
 }
 
@@ -182,4 +193,4 @@ const rpcServer = {
 
 export type ServerDefinition = MethodsOf<typeof rpcServer>;
 
-export default withRpcReqResLogs(createRpcHandler(rpcServer));
+export default createRpcHandler(rpcServer);

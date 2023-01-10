@@ -1,11 +1,12 @@
 import * as React from 'react';
 import { ArgTypeDefinition, BindableAttrValue } from '@mui/toolpad-core';
-import { Alert } from '@mui/material';
+import { Alert, Box } from '@mui/material';
 import * as appDom from '../../../appDom';
 import { useDomApi } from '../../DomLoader';
 import BindableEditor from './BindableEditor';
 import { usePageEditorState } from './PageEditorProvider';
 import { getDefaultControl } from '../../propertyControls';
+import MarkdownTooltip from '../../../components/MarkdownTooltip';
 
 export interface NodeAttributeEditorProps<P extends object> {
   node: appDom.AppDomNode;
@@ -26,15 +27,17 @@ export default function NodeAttributeEditor<P extends object>({
 
   const handlePropChange = React.useCallback(
     (newValue: BindableAttrValue<unknown> | null) => {
-      domApi.setNodeNamespacedProp(node, namespace as any, name, newValue);
+      domApi.update((draft) =>
+        appDom.setNodeNamespacedProp(draft, node, namespace as any, name, newValue),
+      );
     },
-    [domApi, node, namespace, name],
+    [node, namespace, name, domApi],
   );
 
   const propValue: BindableAttrValue<unknown> | null = (node as any)[namespace]?.[name] ?? null;
 
   const bindingId = `${node.id}${namespace ? `.${namespace}` : ''}.${name}`;
-  const { bindings, pageState } = usePageEditorState();
+  const { bindings, pageState, globalScopeMeta } = usePageEditorState();
   const liveBinding = bindings[bindingId];
   const globalScope = pageState;
   const propType = argType.typeDef;
@@ -50,11 +53,18 @@ export default function NodeAttributeEditor<P extends object>({
     <BindableEditor
       liveBinding={liveBinding}
       globalScope={globalScope}
+      globalScopeMeta={globalScopeMeta}
       label={argType.label || name}
       bindable={isBindable}
       disabled={isDisabled}
       propType={propType}
-      renderControl={(params) => <Control nodeId={node.id} {...params} propType={propType} />}
+      renderControl={(params) => (
+        <MarkdownTooltip placement="left" title={argType.helperText ?? ''}>
+          <Box sx={{ flex: 1 }}>
+            <Control nodeId={node.id} {...params} propType={propType} />
+          </Box>
+        </MarkdownTooltip>
+      )}
       value={propValue}
       onChange={handlePropChange}
     />

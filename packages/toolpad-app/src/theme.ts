@@ -1,4 +1,5 @@
 import ArrowDropDownRounded from '@mui/icons-material/ArrowDropDownRounded';
+import { tooltipClasses } from '@mui/material';
 import { createTheme, ThemeOptions, Theme, alpha } from '@mui/material/styles';
 
 declare module '@mui/material/styles/createPalette' {
@@ -504,6 +505,13 @@ export function getThemedComponents(theme: Theme): { components: Theme['componen
             '& svg:last-child': {
               marginLeft: 2,
             },
+            [`.${tooltipClasses.tooltip} &`]: {
+              // Tooltip has a dark background in light mode
+              color: theme.palette.primary[300],
+              '&:hover': {
+                color: theme.palette.primary[200],
+              },
+            },
           },
         },
       },
@@ -712,18 +720,13 @@ export function getThemedComponents(theme: Theme): { components: Theme['componen
         defaultProps: {
           size: 'small',
         },
-        styleOverrides: {
-          root: {
-            backgroundColor:
-              theme.palette.mode === 'dark' ? theme.palette.primaryDark[900] : '#fff',
-          },
-        },
       },
       MuiToggleButton: {
         styleOverrides: {
           root: {
             textTransform: 'none',
             fontWeight: 500,
+            padding: theme.spacing(0.5),
             color:
               theme.palette.mode === 'dark' ? theme.palette.grey[300] : theme.palette.grey[700],
             borderColor:

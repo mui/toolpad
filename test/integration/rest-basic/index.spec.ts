@@ -14,27 +14,20 @@ if (customHttbinBaseUrl) {
   console.log(`Running tests with custom httpbin service: ${customHttbinBaseUrl}`);
 }
 
-const HTTPBIN_BASEURL = customHttbinBaseUrl || 'https://httpbin.org/';
-
-test.use({
-  ignoreConsoleErrors: [
-    // For some reason this shows error in chrome in CI only
-    // Needs to be investigated
-    /Invariant Violation: canvas ref not attached/,
-  ],
-});
+const HTTPBIN_SOURCE_URL = 'https://httpbin.org/';
+const HTTPBIN_TARGET_URL = customHttbinBaseUrl || HTTPBIN_SOURCE_URL;
 
 test('rest basics', async ({ page, browserName, api }) => {
-  const dom = await readJsonFile(path.resolve(__dirname, './restDom.json'));
+  const dom = await readJsonFile(path.resolve(__dirname, './restDom.json'), (key, value) => {
+    if (typeof value === 'string') {
+      return value.replaceAll(HTTPBIN_SOURCE_URL, HTTPBIN_TARGET_URL);
+    }
+    return value;
+  });
 
   const app = await api.mutation.createApp(`App ${generateId()}`, {
     from: { kind: 'dom', dom },
   });
-
-  const httpbinConnection: any = Object.values(dom.nodes).find(
-    (node: any) => node.name === 'httpbin',
-  );
-  httpbinConnection.attributes.params.value.baseUrl = HTTPBIN_BASEURL;
 
   const runtimeModel = new ToolpadRuntime(page);
   await runtimeModel.gotoPage(app.id, 'page1');

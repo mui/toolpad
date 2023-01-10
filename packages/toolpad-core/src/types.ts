@@ -75,7 +75,15 @@ export type BindableAttrEntries = [string, BindableAttrValue<any>][];
 export type SlotType = 'single' | 'multiple' | 'layout';
 
 export interface ValueTypeBase {
-  type: 'string' | 'boolean' | 'number' | 'object' | 'array' | 'element' | 'event';
+  type:
+    | 'string'
+    | 'boolean'
+    | 'number'
+    | 'object'
+    | 'array'
+    | 'element'
+    | 'iteratorElement'
+    | 'event';
 }
 
 export interface StringValueType extends ValueTypeBase {
@@ -105,6 +113,10 @@ export interface ArrayValueType extends ValueTypeBase {
 
 export interface ElementValueType extends ValueTypeBase {
   type: 'element';
+}
+
+export interface IteratorElementType extends ValueTypeBase {
+  type: 'iteratorElement';
 }
 
 export interface EventValueType extends ValueTypeBase {
@@ -148,7 +160,11 @@ type PrimitiveValueType =
   | ObjectValueType
   | ArrayValueType;
 
-export type PropValueType = PrimitiveValueType | ElementValueType | EventValueType;
+export type PropValueType =
+  | PrimitiveValueType
+  | ElementValueType
+  | IteratorElementType
+  | EventValueType;
 
 export type PropValueTypes<K extends string = string> = Partial<{
   [key in K]?: PropValueType;
@@ -323,3 +339,20 @@ export type ExecFetchResult<T = any> = {
   data?: T;
   error?: SerializedError;
 };
+
+export interface GlobalScopeNodeState {
+  item: IteratorItem;
+}
+
+export type IteratorItem = Record<string, unknown>;
+
+export type IteratorItemRenderer = (
+  children: React.ReactNode,
+  item: IteratorItem,
+  index: number,
+) => React.ReactNode;
+
+export type IteratorRenderer = (
+  items: IteratorItem[],
+  itemRenderer: IteratorItemRenderer,
+) => React.ReactNode;

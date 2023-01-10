@@ -1,27 +1,33 @@
 import * as React from 'react';
-import { createComponent } from '@mui/toolpad-core';
-import { Box, List as MuiList, ListItem, ListSubheader, SxProps } from '@mui/material';
+import { createComponent, IteratorItem, IteratorRenderer } from '@mui/toolpad-core';
+import {
+  Box,
+  List as MuiList,
+  ListItem as MuiListItem,
+  ListSubheader,
+  SxProps,
+} from '@mui/material';
 import { SX_PROP_HELPER_TEXT } from './constants';
 
 export type ListProps = {
-  items: { key?: string; [prop: string]: any }[];
+  items: IteratorItem[];
   subheader?: string;
   disablePadding?: boolean;
-  children: React.ReactNode;
+  listItemChildren: IteratorRenderer;
   sx?: SxProps;
 };
 
-function List({ items, subheader, children, disablePadding = false, sx }: ListProps) {
+function List({ items, subheader, listItemChildren, disablePadding = false, sx }: ListProps) {
   return (
     <MuiList
       subheader={subheader ? <ListSubheader>{subheader}</ListSubheader> : null}
       disablePadding={disablePadding}
       sx={{ width: '100%', ...sx }}
     >
-      {items.map((item, index) => (
-        <ListItem key={item?.key || index} disablePadding={disablePadding}>
+      {listItemChildren(items, (children, item, index) => (
+        <MuiListItem key={index} disablePadding={disablePadding}>
           <Box sx={{ width: '100%', p: 0, m: 0 }}>{children}</Box>
-        </ListItem>
+        </MuiListItem>
       ))}
     </MuiList>
   );
@@ -44,8 +50,8 @@ export default createComponent(List, {
       helperText: 'If true, vertical padding is removed from the list.',
       typeDef: { type: 'boolean' },
     },
-    children: {
-      typeDef: { type: 'element' },
+    listItemChildren: {
+      typeDef: { type: 'iteratorElement' },
       control: { type: 'layoutSlot' },
     },
     sx: {

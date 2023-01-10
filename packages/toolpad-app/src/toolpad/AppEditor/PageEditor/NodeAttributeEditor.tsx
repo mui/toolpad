@@ -55,15 +55,15 @@ export default function NodeAttributeEditor<P extends object>({
         ),
     [dom, node],
   );
-  const isListComponentDescendant = ancestorComponentTypes.includes('List');
+  const isIteratorComponentDescendant = ancestorComponentTypes.includes('List');
 
   const nodeAwareGlobalScope = {
     ...pageState,
-    ...(isListComponentDescendant ? { i: DEFAULT_GLOBAL_SCOPE_NODE_STATE.i } : {}),
+    ...(isIteratorComponentDescendant ? { item: DEFAULT_GLOBAL_SCOPE_NODE_STATE.item } : {}),
   };
   const nodeAwareGlobalScopeMeta: GlobalScopeMeta = {
     ...globalScopeMeta,
-    ...(isListComponentDescendant ? { i: { kind: 'local' } } : {}),
+    ...(isIteratorComponentDescendant ? { item: { kind: 'local' } } : {}),
   };
 
   const propType = argType.typeDef;

@@ -22,6 +22,9 @@ import {
   GlobalScopeMeta,
   createProvidedContext,
   DEFAULT_GLOBAL_SCOPE_NODE_STATE,
+  IteratorItem,
+  IteratorItemRenderer,
+  GlobalScopeNodeState,
 } from '@mui/toolpad-core';
 import { QueryClient, QueryClientProvider, useMutation } from '@tanstack/react-query';
 import {
@@ -125,10 +128,6 @@ const EditorOverlay = styled('div')({
 
 type ToolpadComponents = Partial<Record<string, ToolpadComponent<any>>>;
 
-interface GlobalScopeNodeState {
-  i: number;
-}
-
 const [useDomContext, DomContextProvider] = createProvidedContext<appDom.AppDom>('Dom');
 const [useEvaluatePageExpression, EvaluatePageExpressionProvider] =
   createProvidedContext<(expr: string) => any>('EvaluatePageExpression');
@@ -140,10 +139,9 @@ const [useSetControlledBindingContext, SetControlledBindingContextProvider] =
   createProvidedContext<(id: string, result: BindingEvaluationResult) => void>(
     'SetControlledBinding',
   );
-const [usePageNodeCountsContext, PageNodeCountsContextProvider] = createProvidedContext<{
-  getNodeCount: (nodeId: NodeId) => number;
-  incrementNodeCount: (nodeId: NodeId) => void;
-}>('PageNodeCounts');
+
+const [useIteratorItemContext, IteratorItemContextProvider] =
+  createProvidedContext<IteratorItem>('IteratorItem');
 
 function getComponentId(elm: appDom.ElementNode): string {
   const componentId = getElementNodeComponentId(elm);
@@ -198,25 +196,14 @@ interface RenderedNodeContentProps {
 
 function RenderedNodeContent({ node, childNodeGroups, Component }: RenderedNodeContentProps) {
   const setControlledBinding = useSetControlledBindingContext();
-  const { getNodeCount, incrementNodeCount } = usePageNodeCountsContext();
 
   const nodeId = node.id;
 
-  const hasMountedRef = React.useRef(false);
-  const [nodeIndex, setNodeIndex] = React.useState<number>(DEFAULT_GLOBAL_SCOPE_NODE_STATE.i);
-
-  React.useEffect(() => {
-    if (!hasMountedRef.current) {
-      incrementNodeCount(nodeId);
-      setNodeIndex(getNodeCount(nodeId));
-
-      hasMountedRef.current = true;
-    }
-  }, [getNodeCount, incrementNodeCount, nodeId]);
+  const iteratorItem = useIteratorItemContext();
 
   const globalScopeNodeState = React.useMemo<GlobalScopeNodeState>(
-    () => ({ i: nodeIndex }),
-    [nodeIndex],
+    () => ({ item: iteratorItem }),
+    [iteratorItem],
   );
 
   const componentConfig = Component[TOOLPAD_COMPONENT];
@@ -387,18 +374,31 @@ function RenderedNodeContent({ node, childNodeGroups, Component }: RenderedNodeC
 
   // Wrap with slots
   for (const [propName, argType] of Object.entries(argTypes)) {
-    if (argType?.typeDef.type === 'element') {
+    const isElement = argType?.typeDef.type === 'element';
+    const isIteratorElement = argType?.typeDef.type === 'iteratorElement';
+
+    if (isElement || isIteratorElement) {
+      const value = props[propName];
+
+      let wrappedValue = value;
       if (argType.control?.type === 'slots') {
-        const value = props[propName];
-        props[propName] = <Slots prop={propName}>{value}</Slots>;
+        wrappedValue = <Slots prop={propName}>{value}</Slots>;
       } else if (argType.control?.type === 'slot' || argType.control?.type === 'layoutSlot') {
-        const value = props[propName];
-        props[propName] = (
+        wrappedValue = (
           <Placeholder prop={propName} hasLayout={argType.control?.type === 'layoutSlot'}>
             {value}
           </Placeholder>
         );
       }
+
+      props[propName] = isIteratorElement
+        ? (items: IteratorItem[], itemRenderer: IteratorItemRenderer) =>
+            items.map((item, index) => (
+              <IteratorItemContextProvider key={index} value={item}>
+                {itemRenderer(wrappedValue, item, index)}
+              </IteratorItemContextProvider>
+            ))
+        : wrappedValue;
     }
   }
 
@@ -876,31 +876,6 @@ function RenderedPage({ nodeId }: RenderedNodeProps) {
     [pageState],
   );
 
-  const nodeCountsRef = React.useRef<Record<NodeId, number>>({});
-
-  const getNodeCount = React.useCallback(
-    (countedNodeId: NodeId) => nodeCountsRef.current[countedNodeId] || 0,
-    [nodeCountsRef],
-  );
-
-  const incrementNodeCount = React.useCallback((countedNodeId: NodeId) => {
-    nodeCountsRef.current = {
-      ...nodeCountsRef.current,
-      [countedNodeId]:
-        typeof nodeCountsRef.current[countedNodeId] === 'undefined'
-          ? 0
-          : nodeCountsRef.current[countedNodeId] + 1,
-    };
-  }, []);
-
-  const pageNodeCountsProviderValue = React.useMemo(
-    () => ({
-      getNodeCount,
-      incrementNodeCount,
-    }),
-    [getNodeCount, incrementNodeCount],
-  );
-
   React.useEffect(() => {
     fireEvent({ type: 'pageStateUpdated', pageState, globalScopeMeta });
   }, [globalScopeMeta, getBindings, pageState]);
@@ -914,7 +889,7 @@ function RenderedPage({ nodeId }: RenderedNodeProps) {
     <BindingsContextProvider value={getBindings}>
       <SetControlledBindingContextProvider value={setControlledBinding}>
         <EvaluatePageExpressionProvider value={evaluatePageExpression}>
-          <PageNodeCountsContextProvider value={pageNodeCountsProviderValue}>
+          <IteratorItemContextProvider value={{}}>
             <RenderedNodeContent
               node={page}
               childNodeGroups={{ children }}
@@ -924,7 +899,7 @@ function RenderedPage({ nodeId }: RenderedNodeProps) {
             {queries.map((node) => (
               <FetchNode key={node.id} node={node} />
             ))}
-          </PageNodeCountsContextProvider>
+          </IteratorItemContextProvider>
         </EvaluatePageExpressionProvider>
       </SetControlledBindingContextProvider>
     </BindingsContextProvider>

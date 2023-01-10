@@ -25,7 +25,7 @@ export interface PageEditorState {
   readonly draggedNodeId: NodeId | null;
   readonly isDraggingOver: boolean;
   readonly dragOverNodeId: NodeId | null;
-  readonly dragOverSlotParentProp: string | null;
+  readonly dragOverSlotParentProp: appDom.ParentProp<appDom.ElementNode | appDom.PageNode> | null;
   readonly dragOverZone: DropZone | null;
   readonly draggedEdge: RectangleEdge | null;
   readonly viewState: PageViewState;
@@ -58,7 +58,7 @@ export type PageEditorAction =
       type: 'PAGE_NODE_DRAG_OVER';
       dragOverState: {
         nodeId: NodeId | null;
-        parentProp: string | null;
+        parentProp: appDom.ParentProp<appDom.ElementNode | appDom.PageNode> | null;
         zone: DropZone | null;
       };
     }
@@ -195,7 +195,7 @@ function createPageEditorApi(dispatch: React.Dispatch<PageEditorAction>) {
       zone,
     }: {
       nodeId: NodeId | null;
-      parentProp: string | null;
+      parentProp: appDom.ParentProp<appDom.ElementNode | appDom.PageNode> | null;
       zone: DropZone | null;
     }) {
       dispatch({

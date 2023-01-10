@@ -890,7 +890,9 @@ export default function RenderOverlay({ bridge }: RenderOverlayProps) {
 
         api.nodeDragOver({
           nodeId: hasDragOverParentRowOverride ? activeDropNodeParent.id : activeDropNodeId,
-          parentProp: activeDropSlotParentProp,
+          parentProp: activeDropSlotParentProp as appDom.ParentProp<
+            appDom.ElementNode | appDom.PageNode
+          >,
           zone: activeDropZone as DropZone,
         });
       }
@@ -978,20 +980,32 @@ export default function RenderOverlay({ bridge }: RenderOverlayProps) {
           }
 
           // Drop on page or layout slot
-          if (isDraggingOverPage || isDraggingOverLayoutSlot) {
+          if ((isDraggingOverPage || isDraggingOverLayoutSlot) && dragOverSlotParentProp) {
             const newParentIndex =
               dragOverZone === DROP_ZONE_TOP
-                ? appDom.getNewFirstParentIndexInNode(draft, dragOverNode, 'children')
-                : appDom.getNewLastParentIndexInNode(draft, dragOverNode, 'children');
+                ? appDom.getNewFirstParentIndexInNode(draft, dragOverNode, dragOverSlotParentProp)
+                : appDom.getNewLastParentIndexInNode(draft, dragOverNode, dragOverSlotParentProp);
 
             if (!isPageRow(draggedNode)) {
               const rowContainer = appDom.createElement(draft, PAGE_ROW_COMPONENT_ID, {});
-              draft = appDom.addNode(draft, rowContainer, dragOverNode, 'children', newParentIndex);
+              draft = appDom.addNode(
+                draft,
+                rowContainer,
+                dragOverNode,
+                dragOverSlotParentProp,
+                newParentIndex,
+              );
               parent = rowContainer;
 
               draft = addOrMoveNode(draft, draggedNode, rowContainer, 'children');
             } else {
-              draft = addOrMoveNode(draft, draggedNode, dragOverNode, 'children', newParentIndex);
+              draft = addOrMoveNode(
+                draft,
+                draggedNode,
+                dragOverNode,
+                dragOverSlotParentProp,
+                newParentIndex,
+              );
             }
           }
 

@@ -4,7 +4,8 @@
       // TODO: remove when we move to typescript 4.7 (supports package exports)
       "@mui/toolpad-core/runtime": ["../toolpad-core/dist/runtime"],
       "@mui/toolpad-core/jsRuntime": ["../toolpad-core/dist/jsRuntime"],
-      "@mui/toolpad-core/objectKey": ["../toolpad-core/dist/objectKey"]
+      "@mui/toolpad-core/objectKey": ["../toolpad-core/dist/objectKey"],
+      "@mui/toolpad-core/utils/*": ["../toolpad-core/dist/utils/*"]
     },
     "target": "es5",
     "lib": ["dom", "dom.iterable", "esnext"],

@@ -1,5 +1,6 @@
 import * as React from 'react';
-import { NodeId, createProvidedContext } from '@mui/toolpad-core';
+import { NodeId } from '@mui/toolpad-core';
+import { createProvidedContext } from '@mui/toolpad-core/utils/react';
 import invariant from 'invariant';
 import { debounce, DebouncedFunc } from 'lodash-es';
 import * as appDom from '../appDom';

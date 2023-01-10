@@ -1,5 +1,6 @@
 import * as React from 'react';
-import { NodeId, BindableAttrValues, createProvidedContext } from '@mui/toolpad-core';
+import { NodeId } from '@mui/toolpad-core';
+import { createProvidedContext } from '@mui/toolpad-core/utils/react';
 import invariant from 'invariant';
 import { debounce, DebouncedFunc } from 'lodash-es';
 import * as appDom from '../appDom';
@@ -45,17 +46,6 @@ export type DomAction =
       error: string;
     }
   | {
-      type: 'DOM_SET_NODE_NAME';
-      nodeId: NodeId;
-      name: string;
-    }
-  | {
-      type: 'DOM_SET_NODE_NAMESPACE';
-      node: appDom.AppDomNode;
-      namespace: string;
-      value: BindableAttrValues | null;
-    }
-  | {
       type: 'DOM_UPDATE';
       updater: (dom: appDom.AppDom) => appDom.AppDom;
       selectedNodeId?: NodeId | null;
@@ -70,10 +60,6 @@ export type DomAction =
       tab: ComponentPanelTab;
     }
   | {
-      type: 'DOM_SAVE_NODE';
-      node: appDom.AppDomNode;
-    }
-  | {
       type: 'SELECT_NODE';
       nodeId: NodeId;
     }
@@ -83,19 +69,8 @@ export type DomAction =
 
 export function domReducer(dom: appDom.AppDom, action: DomAction): appDom.AppDom {
   switch (action.type) {
-    case 'DOM_SET_NODE_NAME': {
-      // TODO: Also update all bindings on the page that use this name
-      const node = appDom.getNode(dom, action.nodeId);
-      return appDom.setNodeName(dom, node, action.name);
-    }
-    case 'DOM_SET_NODE_NAMESPACE': {
-      return appDom.setNodeNamespace<any, any>(dom, action.node, action.namespace, action.value);
-    }
     case 'DOM_UPDATE': {
       return action.updater(dom);
-    }
-    case 'DOM_SAVE_NODE': {
-      return appDom.saveNode(dom, action.node);
     }
     default:
       return dom;
@@ -255,7 +230,13 @@ function createDomApi(
       dispatch({ type: 'DOM_REDO' });
     },
     setNodeName(nodeId: NodeId, name: string) {
-      dispatch({ type: 'DOM_SET_NODE_NAME', nodeId, name });
+      dispatch({
+        type: 'DOM_UPDATE',
+        updater(dom) {
+          const node = appDom.getNode(dom, nodeId);
+          return appDom.setNodeName(dom, node, name);
+        },
+      });
     },
     update(
       updater: (dom: appDom.AppDom) => appDom.AppDom,
@@ -284,20 +265,10 @@ function createDomApi(
     },
     saveNode(node: appDom.AppDomNode) {
       dispatch({
-        type: 'DOM_SAVE_NODE',
-        node,
-      });
-    },
-    setNodeNamespace<Node extends appDom.AppDomNode, Namespace extends appDom.PropNamespaces<Node>>(
-      node: Node,
-      namespace: Namespace,
-      value: Node[Namespace] | null,
-    ) {
-      dispatch({
-        type: 'DOM_SET_NODE_NAMESPACE',
-        namespace,
-        node,
-        value: value as BindableAttrValues | null,
+        type: 'DOM_UPDATE',
+        updater(dom) {
+          return appDom.saveNode(dom, node);
+        },
       });
     },
     selectNode(nodeId: NodeId) {
@@ -381,13 +352,14 @@ export interface DomContextProps {
   children?: React.ReactNode;
 }
 
-const SKIP_UNDO_ACTIONS = new Set([
-  'DOM_UPDATE_HISTORY',
-  'DOM_UNDO',
-  'DOM_REDO',
-  'DOM_SAVED',
-  'DOM_SAVING',
-  'DOM_SAVING_ERROR',
+type DomActionType = DomAction['type'];
+
+const UNDOABLE_ACTIONS = new Set<DomActionType>([
+  'DOM_UPDATE',
+  'DOM_SET_VIEW',
+  'DOM_SET_TAB',
+  'SELECT_NODE',
+  'DESELECT_NODE',
 ]);
 
 export default function DomProvider({ appId, children }: DomContextProps) {
@@ -424,22 +396,15 @@ export default function DomProvider({ appId, children }: DomContextProps) {
     [],
   );
 
-  const scheduleHistoryUpdate = React.useMemo(
-    () => () => {
-      if (!hasFieldFocus()) {
-        dispatch({ type: 'DOM_UPDATE_HISTORY' });
-      } else {
-        scheduleTextInputHistoryUpdate();
-      }
-    },
-    [scheduleTextInputHistoryUpdate],
-  );
-
   const dispatchWithHistory = useEvent((action: DomAction) => {
     dispatch(action);
 
-    if (!SKIP_UNDO_ACTIONS.has(action.type)) {
-      scheduleHistoryUpdate();
+    if (UNDOABLE_ACTIONS.has(action.type)) {
+      if (hasFieldFocus()) {
+        scheduleTextInputHistoryUpdate();
+      } else {
+        dispatch({ type: 'DOM_UPDATE_HISTORY' });
+      }
     }
   });
 

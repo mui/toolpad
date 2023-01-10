@@ -20,8 +20,8 @@ import {
   BindableAttrValue,
   NestedBindableAttrs,
   GlobalScopeMeta,
-  createProvidedContext,
 } from '@mui/toolpad-core';
+import { createProvidedContext } from '@mui/toolpad-core/utils/react';
 import { QueryClient, QueryClientProvider, useMutation } from '@tanstack/react-query';
 import {
   BrowserRouter,

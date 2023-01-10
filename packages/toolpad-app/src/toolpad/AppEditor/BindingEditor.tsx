@@ -30,8 +30,8 @@ import {
   JsExpressionAction,
   GlobalScopeMeta,
   GlobalScopeMetaField,
-  createProvidedContext,
 } from '@mui/toolpad-core';
+import { createProvidedContext } from '@mui/toolpad-core/utils/react';
 import { TabContext, TabList } from '@mui/lab';
 import { Maybe, WithControlledProp } from '../../utils/types';
 import { JsExpressionEditor } from './PageEditor/JsExpressionEditor';

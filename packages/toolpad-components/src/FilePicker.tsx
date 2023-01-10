@@ -63,7 +63,8 @@ function FilePicker({ multiple, onChange, ...props }: Props) {
 export default createComponent(FilePicker, {
   argTypes: {
     value: {
-      typeDef: { type: 'file' },
+      typeDef: { type: 'object' },
+      visible: false
       onChangeProp: 'onChange',
     },
     label: {

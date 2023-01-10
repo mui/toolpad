@@ -1,4 +1,5 @@
 import ArrowDropDownRounded from '@mui/icons-material/ArrowDropDownRounded';
+import { tooltipClasses } from '@mui/material';
 import { createTheme, ThemeOptions, Theme, alpha } from '@mui/material/styles';
 
 declare module '@mui/material/styles/createPalette' {
@@ -503,6 +504,13 @@ export function getThemedComponents(theme: Theme): { components: Theme['componen
             },
             '& svg:last-child': {
               marginLeft: 2,
+            },
+            [`.${tooltipClasses.tooltip} &`]: {
+              // Tooltip has a dark background in light mode
+              color: theme.palette.primary[300],
+              '&:hover': {
+                color: theme.palette.primary[200],
+              },
             },
           },
         },

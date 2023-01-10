@@ -64,7 +64,7 @@ export default createComponent(FilePicker, {
   argTypes: {
     value: {
       typeDef: { type: 'object' },
-      visible: false
+      visible: false,
       onChangeProp: 'onChange',
     },
     label: {

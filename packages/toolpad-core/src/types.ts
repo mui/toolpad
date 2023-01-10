@@ -75,7 +75,7 @@ export type BindableAttrEntries = [string, BindableAttrValue<any>][];
 export type SlotType = 'single' | 'multiple' | 'layout';
 
 export interface ValueTypeBase {
-  type: 'string' | 'boolean' | 'number' | 'object' | 'array' | 'element' | 'event' | 'file';
+  type: 'string' | 'boolean' | 'number' | 'object' | 'array' | 'element' | 'event';
 }
 
 export interface StringValueType extends ValueTypeBase {
@@ -101,10 +101,6 @@ export interface ObjectValueType extends ValueTypeBase {
 export interface ArrayValueType extends ValueTypeBase {
   type: 'array';
   schema?: string;
-}
-
-export interface FileValueType extends ValueTypeBase {
-  type: 'file';
 }
 
 export interface ElementValueType extends ValueTypeBase {
@@ -142,8 +138,7 @@ export interface ArgControlSpec {
     | 'HorizontalAlign'
     | 'VerticalAlign'
     | 'event'
-    | 'RowIdFieldSelect' // Row id field specialized select
-    | 'file';
+    | 'RowIdFieldSelect'; // Row id field specialized select
 }
 
 type PrimitiveValueType =
@@ -151,8 +146,7 @@ type PrimitiveValueType =
   | NumberValueType
   | BooleanValueType
   | ObjectValueType
-  | ArrayValueType
-  | FileValueType;
+  | ArrayValueType;
 
 export type PropValueType = PrimitiveValueType | ElementValueType | EventValueType;
 

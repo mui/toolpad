@@ -127,6 +127,14 @@ jobs:
       - run:
           name: Lint Markdown
           command: yarn markdownlint
+  test_types:
+    <<: *defaults
+    steps:
+      - checkout
+      - install_js
+      - run:
+          name: Check Typescript types
+          command: yarn check-types
   test_static:
     <<: *defaults
     resource_class: medium+
@@ -181,14 +189,7 @@ jobs:
             # See https://circleci.com/docs/2.0/env-vars/#setting-an-environment-variable-in-a-shell-command
             TAG=$CIRCLE_SHA1 docker-compose -f ./docker-compose.test.yml up -d
             yarn workspace @mui/toolpad-app waitForApp --url=http://172.17.0.1:3000/
-            docker run -it --rm \
-              --ipc=host \
-              -v "$CIRCLE_WORKING_DIRECTORY:/tests" \
-              -w /tests \
-              -e PLAYWRIGHT_TEST_BASE_URL=http://172.17.0.1:3000/ \
-              -e HTTPBIN_BASEURL=http://httpbin/ \
-              mcr.microsoft.com/playwright:v1.29.0-focal \
-              yarn test:integration --forbid-only
+            docker-compose -f ./docker-compose.test.yml run -it --rm playwright yarn test:integration --forbid-only
             docker-compose -f ./docker-compose.test.yml logs toolpad
             docker-compose -f ./docker-compose.test.yml down
 
@@ -212,6 +213,9 @@ workflows:
     jobs:
       - checkout
       - test_lint:
+          requires:
+            - checkout
+      - test_types:
           requires:
             - checkout
       - test_static:

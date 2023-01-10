@@ -27,12 +27,14 @@ import {
   Typography,
   Alert,
   AlertTitle,
+  Theme,
 } from '@mui/material';
 import LoadingButton from '@mui/lab/LoadingButton';
 import ViewListIcon from '@mui/icons-material/ViewList';
 import GridViewIcon from '@mui/icons-material/GridView';
+import Search from '@mui/icons-material/SearchOutlined';
 import invariant from 'invariant';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import Script from 'next/script';
 import client from '../../api';
 import DialogForm from '../../components/DialogForm';
@@ -84,25 +86,80 @@ export const APP_TEMPLATE_OPTIONS: Map<
   ],
 ]);
 
+export interface SurveyDialogProps {
+  open: boolean;
+  onClose?: () => void;
+  loading: boolean;
+}
+
+function SurveyDialog({ onClose, open, loading, ...props }: SurveyDialogProps) {
+  return (
+    <Dialog
+      {...props}
+      open={open}
+      onClose={onClose}
+      sx={{ maxWidth: '700px', margin: '0 auto' }}
+      maxWidth={false}
+    >
+      <DialogForm onSubmit={() => {}}>
+        <DialogTitle>You feedback is really valuable!</DialogTitle>
+        <DialogContent>
+          <Typography variant="body2" sx={{ mb: 5 }}>
+            We are really happy to see you exploring Toolpad! You can help us improve it by taking 2
+            minutes to fill out the questionnaire below. Feel free to skip it by the clicking the
+            button at the bottom.
+          </Typography>
+
+          <iframe
+            title="Survey"
+            src="https://docs.google.com/forms/d/e/1FAIpQLSfM2NSUkBcMoAZgQnpl5l1Whv1RSw_OXFrxEeSmNpi9Tnh7YQ/viewform?embedded=true"
+            width="600"
+            height="500"
+            frameBorder="0"
+          >
+            Loading…
+          </iframe>
+        </DialogContent>
+        <DialogActions>
+          <LoadingButton
+            fullWidth
+            variant="contained"
+            type="submit"
+            onClick={onClose}
+            loading={loading}
+          >
+            Continue to the app
+          </LoadingButton>
+        </DialogActions>
+      </DialogForm>
+    </Dialog>
+  );
+}
+
 const NO_OP = () => {};
 
 export interface CreateAppDialogProps {
   open: boolean;
   onClose?: () => void;
+  onContinueToExistingApp?: (appId: string) => void;
 }
 
-function CreateAppDialog({ onClose, open, ...props }: CreateAppDialogProps) {
+function CreateAppDialog({
+  onClose,
+  open,
+  onContinueToExistingApp = NO_OP,
+  ...props
+}: CreateAppDialogProps) {
   const [name, setName] = React.useState('');
   const [appTemplateId, setAppTemplateId] = React.useState<AppTemplateId>('default');
   const [dom, setDom] = React.useState('');
-  const [recaptachaApiLoaded, setRecaptachaApiLoaded] = React.useState(false);
+  const [recaptchaApiLoaded, setRecaptchaApiLoaded] = React.useState(false);
   const [requestRecaptchaV2, setRequestRecaptchaV2] = React.useState(false);
   const [recaptchaV2Token, setRecaptchaV2Token] = React.useState('');
 
   const captchaTargetRef = React.useRef<HTMLDivElement | null>(null);
 
   const [isNavigatingToNewApp, setIsNavigatingToNewApp] = React.useState(false);
-  const [isNavigatingToExistingApp, setIsNavigatingToExistingApp] = React.useState(false);
 
   const handleAppTemplateChange = React.useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -123,9 +180,8 @@ function CreateAppDialog({ onClose, open, ...props }: CreateAppDialogProps) {
     },
   });
 
-  const handleContinueButtonClick = React.useCallback(() => {
-    setIsNavigatingToExistingApp(true);
-  }, []);
+  const navigate = useNavigate();
+  const [surveySeen, setSurveySeen] = useLocalStorageState<boolean>('toolpad-survey-seen', false);
 
   const [latestCreatedApp, setLatestCreatedApp] = useLocalStorageState<StoredLatestCreatedApp>(
     TOOLPAD_LATEST_CREATED_APP_KEY,
@@ -141,12 +197,26 @@ function CreateAppDialog({ onClose, open, ...props }: CreateAppDialogProps) {
 
   const isFormValid = config.isDemo ? true : !!name;
 
-  const isSubmitting =
-    createAppMutation.isLoading || isNavigatingToNewApp || isNavigatingToExistingApp;
+  const isSubmitting = createAppMutation.isLoading || isNavigatingToNewApp;
+
+  const handleContinueButtonClick = React.useCallback(() => {
+    if (!firstLatestCreatedApp) {
+      return;
+    }
+
+    if (!surveySeen) {
+      onContinueToExistingApp(firstLatestCreatedApp.appId);
+      setSurveySeen(true);
+
+      return;
+    }
+
+    navigate(`/app/${firstLatestCreatedApp.appId}`);
+  }, [firstLatestCreatedApp, onContinueToExistingApp, surveySeen, setSurveySeen, navigate]);
 
   const recaptchaSubmitEnabled =
     config.recaptchaV2SiteKey || config.recaptchaV3SiteKey
-      ? recaptachaApiLoaded && ((requestRecaptchaV2 && recaptchaV2Token) || !requestRecaptchaV2)
+      ? recaptchaApiLoaded && ((requestRecaptchaV2 && recaptchaV2Token) || !requestRecaptchaV2)
       : true;
 
   const handleSubmit = React.useCallback(
@@ -155,7 +225,9 @@ function CreateAppDialog({ onClose, open, ...props }: CreateAppDialogProps) {
 
       event.preventDefault();
 
-      // Check if captcha checkbox was solved
+      // Fallback: request validation with RecaptchaV2 instead, so requestRecaptchaV2 will be true
+
+      // Check if this is the fallback scenario
       let recaptchaToken = requestRecaptchaV2 ? recaptchaV2Token : '';
 
       if (config.recaptchaV3SiteKey && !requestRecaptchaV2) {
@@ -195,7 +267,7 @@ function CreateAppDialog({ onClose, open, ...props }: CreateAppDialogProps) {
       } catch (rawError) {
         const error = errorFrom(rawError);
         if (config.recaptchaV2SiteKey && error.code === ERR_VALIDATE_CAPTCHA_FAILED) {
-          // Show captcha checkbox
+          // Show recaptcha v2 checkbox as a fallback
           setRequestRecaptchaV2(true);
         } else {
           throw error;
@@ -236,7 +308,7 @@ function CreateAppDialog({ onClose, open, ...props }: CreateAppDialogProps) {
                   },
                 });
               }
-              setRecaptachaApiLoaded(true);
+              setRecaptchaApiLoaded(true);
             });
           }}
         />
@@ -308,10 +380,7 @@ function CreateAppDialog({ onClose, open, ...props }: CreateAppDialogProps) {
               <LoadingButton
                 variant="outlined"
                 size="medium"
-                component={Link}
-                to={`/app/${firstLatestCreatedApp.appId}`}
                 sx={{ mt: 0.5, mb: 1 }}
-                loading={isNavigatingToExistingApp}
                 onClick={handleContinueButtonClick}
                 disabled={isSubmitting}
               >
@@ -602,12 +671,46 @@ function AppsListView({ loading, apps, activeDeploymentsByApp, existingAppNames 
 }
 
 function DemoPage() {
+  const navigate = useNavigate();
+  const [appToContinue, setAppToContinue] = React.useState<null | string>(null);
+  const [navigating, setNavigating] = React.useState(false);
+  const handleSurveyClose = () => {
+    invariant(appToContinue, 'App to continue must be defined');
+
+    setNavigating(true);
+
+    navigate(`/app/${appToContinue}`);
+  };
+
   return (
     <ToolpadShell>
-      <CreateAppDialog open />
+      <CreateAppDialog open onContinueToExistingApp={(appId) => setAppToContinue(appId)} />
+      {config.isDemo ? (
+        <SurveyDialog
+          open={Boolean(appToContinue)}
+          loading={navigating}
+          onClose={handleSurveyClose}
+        />
+      ) : null}
     </ToolpadShell>
   );
 }
+
+const searchFieldStyleOverrides = (theme: Theme) => ({
+  '& .MuiInputBase-root': {
+    fontSize: theme.typography.pxToRem(14),
+  },
+  '& .MuiInputBase-input': {
+    paddingTop: theme.spacing(0.7),
+    paddingBottom: theme.spacing(0.7),
+  },
+  '& .MuiSvgIcon-root': {
+    fontSize: theme.typography.pxToRem(16),
+    color: theme.palette.mode === 'dark' ? theme.palette.grey[400] : theme.palette.grey[500],
+    marginRight: theme.spacing(0.6),
+    marginTop: theme.spacing(0.2),
+  },
+});
 
 export default function Home() {
   const {
@@ -643,6 +746,18 @@ export default function Home() {
 
   const AppsView = viewMode === 'list' ? AppsListView : AppsGridView;
 
+  const [searchText, setSearchText] = React.useState('');
+
+  const handleSearchInput = React.useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchText(event.target.value);
+  }, []);
+
+  const filteredApps = React.useMemo(() => {
+    return apps.filter((element: any) =>
+      element.name.toLowerCase().includes(searchText.toLowerCase()),
+    );
+  }, [apps, searchText]);
+
   return config.isDemo ? (
     <DemoPage />
   ) : (
@@ -653,7 +768,19 @@ export default function Home() {
             Apps
           </Typography>
           <FlexFill />
-          <Button onClick={() => setCreateDialogOpen(true)}>Create New</Button>
+          <TextField
+            sx={searchFieldStyleOverrides}
+            key={'search'}
+            InputProps={{
+              startAdornment: <Search />,
+            }}
+            placeholder={'Search apps'}
+            value={searchText}
+            onChange={handleSearchInput}
+          />
+          <Button variant="contained" onClick={() => setCreateDialogOpen(true)}>
+            Create New
+          </Button>
           <ToggleButtonGroup
             value={viewMode}
             exclusive
@@ -665,23 +792,23 @@ export default function Home() {
               aria-label="list view"
               color={viewMode === 'list' ? 'primary' : undefined}
             >
-              <ViewListIcon />
+              <ViewListIcon fontSize="small" />
             </ToggleButton>
             <ToggleButton
               value="grid"
               aria-label="grid view"
               color={viewMode === 'grid' ? 'primary' : undefined}
             >
-              <GridViewIcon />
+              <GridViewIcon fontSize="small" />
             </ToggleButton>
           </ToggleButtonGroup>
         </Toolbar>
         {error ? (
           <ErrorAlert error={error} />
         ) : (
-          <Box sx={{ flex: 1, overflow: 'auto', px: 5 }}>
+          <Box sx={{ flex: 1, overflow: 'auto', px: 5, scrollbarGutter: 'stable' }}>
             <AppsView
-              apps={apps}
+              apps={filteredApps}
               loading={isLoading}
               activeDeploymentsByApp={activeDeploymentsByApp}
               existingAppNames={existingAppNames}

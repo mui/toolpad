@@ -19,6 +19,8 @@ import {
   NodeId,
   BindableAttrValue,
   NestedBindableAttrs,
+  GlobalScopeMeta,
+  createProvidedContext,
 } from '@mui/toolpad-core';
 import { QueryClient, QueryClientProvider, useMutation } from '@tanstack/react-query';
 import {
@@ -41,7 +43,6 @@ import * as _ from 'lodash-es';
 import ErrorIcon from '@mui/icons-material/Error';
 import * as appDom from '../appDom';
 import { RuntimeState, VersionOrPreview } from '../types';
-import { createProvidedContext } from '../utils/react';
 import {
   getElementNodeComponentId,
   isPageLayoutComponent,
@@ -265,6 +266,7 @@ function RenderedNodeContent({ node, childNodeGroups, Component }: RenderedNodeC
 
         const handler = (param: any) => {
           const bindingId = `${nodeId}.props.${key}`;
+
           const value = argType.onChangeHandler ? argType.onChangeHandler(param) : param;
           setControlledBinding(bindingId, { value });
         };
@@ -615,6 +617,7 @@ function parseBindings(
 
   const parsedBindingsMap = new Map<string, ParsedBinding>();
   const controlled = new Set<string>();
+  const globalScopeMeta: GlobalScopeMeta = {};
 
   for (const elm of elements) {
     if (appDom.isElement<any>(elm)) {
@@ -632,8 +635,16 @@ function parseBindings(
           elm.props?.[propName] || appDom.createConst(argType?.defaultValue ?? undefined);
 
         const bindingId = `${elm.id}.props.${propName}`;
-        const scopePath =
-          componentId === PAGE_ROW_COMPONENT_ID ? undefined : `${elm.name}.${propName}`;
+
+        let scopePath: string | undefined;
+        if (componentId !== PAGE_ROW_COMPONENT_ID) {
+          scopePath = `${elm.name}.${propName}`;
+          globalScopeMeta[elm.name] = {
+            kind: 'element',
+            componentId,
+          };
+        }
+
         if (argType) {
           if (argType.onChangeProp) {
             controlled.add(bindingId);
@@ -659,6 +670,10 @@ function parseBindings(
     }
 
     if (appDom.isQuery(elm)) {
+      globalScopeMeta[elm.name] = {
+        kind: 'query',
+      };
+
       if (elm.params) {
         const nestedBindablePaths = flattenNestedBindables(Object.fromEntries(elm.params ?? []));
 
@@ -724,6 +739,7 @@ function parseBindings(
 
   const urlParams = new URLSearchParams(location.search);
   const pageParameters = page.attributes.parameters?.value || [];
+
   for (const [paramName, paramDefault] of pageParameters) {
     const bindingId = `${page.id}.parameters.${paramName}`;
     const scopePath = `page.parameters.${paramName}`;
@@ -735,7 +751,7 @@ function parseBindings(
 
   const parsedBindings: Record<string, ParsedBinding> = Object.fromEntries(parsedBindingsMap);
 
-  return { parsedBindings, controlled };
+  return { parsedBindings, controlled, globalScopeMeta };
 }
 
 function RenderedPage({ nodeId }: RenderedNodeProps) {
@@ -748,7 +764,7 @@ function RenderedPage({ nodeId }: RenderedNodeProps) {
   const location = useLocation();
   const components = useComponents();
 
-  const { parsedBindings, controlled } = React.useMemo(
+  const { parsedBindings, controlled, globalScopeMeta } = React.useMemo(
     () => parseBindings(dom, page, components, location),
     [components, dom, location, page],
   );
@@ -805,6 +821,7 @@ function RenderedPage({ nodeId }: RenderedNodeProps) {
     () => buildGlobalScope(globalScope, evaluatedBindings),
     [evaluatedBindings, globalScope],
   );
+
   const liveBindings: Record<string, BindingEvaluationResult> = React.useMemo(
     () => mapValues(evaluatedBindings, (binding) => binding.result || { value: undefined }),
     [evaluatedBindings],
@@ -816,8 +833,8 @@ function RenderedPage({ nodeId }: RenderedNodeProps) {
   );
 
   React.useEffect(() => {
-    fireEvent({ type: 'pageStateUpdated', pageState });
-  }, [pageState]);
+    fireEvent({ type: 'pageStateUpdated', pageState, globalScopeMeta });
+  }, [pageState, globalScopeMeta]);
 
   React.useEffect(() => {
     fireEvent({ type: 'pageBindingsUpdated', bindings: liveBindings });

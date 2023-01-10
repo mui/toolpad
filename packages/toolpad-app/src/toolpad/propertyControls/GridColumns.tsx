@@ -26,6 +26,9 @@ import {
   SerializableGridColumns,
 } from '@mui/toolpad-components';
 import type { EditorProps } from '../../types';
+import { useToolpadComponents } from '../AppEditor/toolpadComponents';
+import { ToolpadComponentDefinition } from '../../toolpadComponents';
+import { useDom } from '../DomLoader';
 
 // TODO: this import suggests leaky abstraction
 import { usePageEditorState } from '../AppEditor/PageEditor/PageEditorProvider';
@@ -33,7 +36,16 @@ import { generateUniqueString } from '../../utils/strings';
 
 type GridAlignment = SerializableGridColumn['align'];
 
-const COLUMN_TYPES: string[] = ['string', 'number', 'date', 'dateTime', 'boolean', 'link', 'image'];
+const COLUMN_TYPES: string[] = [
+  'string',
+  'number',
+  'date',
+  'dateTime',
+  'boolean',
+  'link',
+  'image',
+  'codeComponent',
+];
 const ALIGNMENTS: GridAlignment[] = ['left', 'right', 'center'];
 
 function formatNumberOptionValue(numberFormat: NumberFormat | undefined) {
@@ -61,6 +73,15 @@ function GridColumnsPropEditor({
 }: EditorProps<SerializableGridColumns>) {
   const { bindings } = usePageEditorState();
   const [editedIndex, setEditedIndex] = React.useState<number | null>(null);
+  const { dom } = useDom();
+  const toolpadComponents = useToolpadComponents(dom);
+  const codeComponents = React.useMemo(() => {
+    const entries = Object.entries(toolpadComponents);
+
+    return entries
+      .map(([, definition]) => definition)
+      .filter((definition) => definition && !definition.builtIn) as ToolpadComponentDefinition[];
+  }, [toolpadComponents]);
 
   const editedColumn = typeof editedIndex === 'number' ? value[editedIndex] : null;
 
@@ -302,6 +323,27 @@ function GridColumnsPropEditor({
                     handleColumnChange({ ...editedColumn, width: Number(event.target.value) })
                   }
                 />
+                {editedColumn.type === 'codeComponent' ? (
+                  <TextField
+                    select
+                    fullWidth
+                    label="Custom component"
+                    value={editedColumn.codeComponent ?? ''}
+                    disabled={disabled}
+                    onChange={(event) =>
+                      handleColumnChange({
+                        ...editedColumn,
+                        codeComponent: event.target.value,
+                      })
+                    }
+                  >
+                    {codeComponents.map(({ displayName, codeComponentId }) => (
+                      <MenuItem key={displayName} value={codeComponentId}>
+                        {displayName}
+                      </MenuItem>
+                    ))}
+                  </TextField>
+                ) : null}
               </Stack>
             </React.Fragment>
           ) : (

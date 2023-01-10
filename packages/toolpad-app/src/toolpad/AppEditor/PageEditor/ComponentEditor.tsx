@@ -23,6 +23,7 @@ import {
   LAYOUT_DIRECTION_VERTICAL,
 } from '../../../toolpadComponents/layoutBox';
 import ElementContext from '../ElementContext';
+import MarkdownTooltip from '../../../components/MarkdownTooltip';
 
 const classes = {
   control: 'Toolpad_Control',
@@ -90,26 +91,20 @@ function ComponentPropsEditor<P extends object>({
           <Typography variant="overline" className={classes.sectionHeading}>
             Layout:
           </Typography>
-          {hasLayoutHorizontalControls ? (
-            <div className={classes.control}>
-              <NodeAttributeEditor
-                node={node}
-                namespace="layout"
-                name="horizontalAlign"
-                argType={layoutBoxArgTypes.horizontalAlign}
-              />
-            </div>
-          ) : null}
-          {hasLayoutVerticalControls ? (
-            <div className={classes.control}>
-              <NodeAttributeEditor
-                node={node}
-                namespace="layout"
-                name="verticalAlign"
-                argType={layoutBoxArgTypes.verticalAlign}
-              />
-            </div>
-          ) : null}
+
+          <div className={classes.control}>
+            <NodeAttributeEditor
+              node={node}
+              namespace="layout"
+              name={hasLayoutHorizontalControls ? 'horizontalAlign' : 'verticalAlign'}
+              argType={
+                hasLayoutHorizontalControls
+                  ? layoutBoxArgTypes.horizontalAlign
+                  : layoutBoxArgTypes.verticalAlign
+              }
+            />
+          </div>
+
           <Divider sx={{ mt: 1 }} />
         </React.Fragment>
       ) : null}
@@ -148,12 +143,14 @@ function SelectedNodeEditor({ node }: SelectedNodeEditorProps) {
 
   const component = useToolpadComponent(dom, getElementNodeComponentId(node));
 
+  const displayName = component?.displayName || '<unknown>';
+
   return (
     <ElementContext.Provider value={node}>
       <Stack direction="column" gap={1}>
-        <Typography variant="subtitle1">
-          Component: {component?.displayName || '<unknown>'}
-        </Typography>
+        <MarkdownTooltip placement="left" title={componentConfig.helperText ?? displayName}>
+          <Typography variant="subtitle1">Component: {displayName}</Typography>
+        </MarkdownTooltip>
         <Typography variant="subtitle2" sx={{ mb: 1 }}>
           ID: {node.id}
         </Typography>

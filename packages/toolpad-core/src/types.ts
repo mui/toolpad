@@ -156,6 +156,11 @@ export type PropValueTypes<K extends string = string> = Partial<{
 
 export interface ArgTypeDefinition<P extends object = {}, V = P[keyof P]> {
   /**
+   * A short explanatory text that'll be shown in the editor UI when this property is referenced.
+   * May contain Markdown.
+   */
+  helperText?: string;
+  /**
    * To be used instead of the property name for UI purposes in the editor.
    */
   label?: string;
@@ -217,25 +222,52 @@ export interface LiveBinding {
   error?: LiveBindingError;
 }
 
-export type RuntimeEvent =
+export type GlobalScopeMetaField = {
+  description?: string;
+  deprecated?: boolean | string;
+  tsType?: string;
+} & (
   | {
-      type: 'propUpdated';
-      nodeId: string;
-      prop: string;
-      value: React.SetStateAction<unknown>;
+      kind?: undefined;
     }
   | {
-      type: 'pageStateUpdated';
-      pageState: Record<string, unknown>;
+      kind: 'element';
+      componentId: string;
     }
   | {
-      type: 'pageBindingsUpdated';
-      bindings: LiveBindings;
+      kind: 'query' | 'local';
     }
-  | { type: 'screenUpdate' }
-  | { type: 'pageNavigationRequest'; pageNodeId: NodeId };
+);
+
+export type GlobalScopeMeta = Partial<Record<string, GlobalScopeMetaField>>;
+
+export type RuntimeEvents = {
+  propUpdated: {
+    nodeId: string;
+    prop: string;
+    value: React.SetStateAction<unknown>;
+  };
+  pageStateUpdated: {
+    pageState: Record<string, unknown>;
+    globalScopeMeta: GlobalScopeMeta;
+  };
+  pageBindingsUpdated: {
+    bindings: LiveBindings;
+  };
+  screenUpdate: {};
+  pageNavigationRequest: { pageNodeId: NodeId };
+};
+
+export type RuntimeEvent = {
+  [K in keyof RuntimeEvents]: { type: K } & RuntimeEvents[K];
+}[keyof RuntimeEvents];
 
 export interface ComponentConfig<P extends object = {}> {
+  /**
+   * A short explanatory text that'll be shown in the editor UI when this component is referenced.
+   * May contain Markdown
+   */
+  helperText?: string;
   /**
    * Designates a property as "the error property". If Toolpad detects an error
    * on any of the inputs, it will forward it to this property.
@@ -284,6 +316,7 @@ export interface SerializedError {
   message: string;
   name: string;
   stack?: string;
+  code?: unknown;
 }
 
 export type ExecFetchResult<T = any> = {

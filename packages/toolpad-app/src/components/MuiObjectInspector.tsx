@@ -1,7 +1,7 @@
 import * as React from 'react';
 import clsx from 'clsx';
 import { styled, SvgIcon } from '@mui/material';
-import { NodeApi, NodeRendererProps, Tree } from 'react-arborist';
+import { NodeApi, NodeRendererProps, Tree as ArboristTree } from 'react-arborist';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import ArrowRightIcon from '@mui/icons-material/ArrowRight';
 
@@ -69,28 +69,49 @@ function getTokenType(type: string): string {
   }
 }
 
-interface ObjectTreePropertyNode {
+export interface ObjectTreePropertyNode {
   id: string;
-  name?: string;
+  label?: string;
   value: unknown;
   type: PropValueType;
   children?: ObjectTreePropertyNode[];
 }
 
-function createTreeData(data: object, id = '$ROOT'): ObjectTreePropertyNode[] {
+function createPropertiesData(data: object, id: string): ObjectTreePropertyNode[] {
   const result: ObjectTreePropertyNode[] = [];
-  for (const [name, value] of Object.entries(data)) {
-    const itemId = `${id}.${name}`;
+  for (const [label, value] of Object.entries(data)) {
+    const itemId = `${id}.${label}`;
     const type = getType(value);
     result.push({
       id: itemId,
-      name,
+      label,
       value,
       type,
-      children: value && typeof value === 'object' ? createTreeData(value, itemId) : undefined,
+      children:
+        value && typeof value === 'object' ? createPropertiesData(value, itemId) : undefined,
     });
   }
   return result;
+}
+
+export interface CreateObjectTreeDataParams {
+  label?: string;
+  id?: string;
+}
+
+export function createObjectTreeData(
+  data: unknown,
+  { id = '$ROOT', label }: CreateObjectTreeDataParams,
+): ObjectTreePropertyNode[] {
+  return [
+    {
+      label,
+      id,
+      type: getType(data),
+      value: data,
+      children: data && typeof data === 'object' ? createPropertiesData(data, id) : undefined,
+    },
+  ];
 }
 
 const classes = {
@@ -98,7 +119,7 @@ const classes = {
   token: 'Toolpad__ObjectExplorerToken',
 };
 
-const StyledTree = styled(Tree<ObjectTreePropertyNode>)(({ theme }) => ({
+export const Tree = styled(ArboristTree<ObjectTreePropertyNode>)(({ theme }) => ({
   color: theme.palette.mode === 'dark' ? '#d4d4d4' : '#000000',
   background: theme.palette.mode === 'dark' ? '#0c2945' : '#ffffff',
   fontSize: 12,
@@ -158,7 +179,7 @@ function TreeItemIcon({ node }: TreeItemIconProps) {
   return node.isOpen ? <ArrowDropDownIcon /> : <ArrowRightIcon />;
 }
 
-function ObjectPropertyEntry({
+export function ObjectPropertyEntry({
   node,
   style,
   dragHandle,
@@ -174,7 +195,7 @@ function ObjectPropertyEntry({
     >
       <TreeItemIcon node={node} />
       <span>
-        {node.data.name ? <span>{node.data.name}: </span> : null}
+        {node.data.label ? <span>{node.data.label}: </span> : null}
         <PropertyValue open={node.isOpen} value={node.data.value} type={node.data.type} />
       </span>
     </div>
@@ -214,13 +235,13 @@ function useDimensions<E extends HTMLElement>(): [
 }
 
 export interface MuiObjectInspectorProps {
-  name?: string;
+  label?: string;
   data?: unknown;
   expandPaths?: string[];
 }
 
 export default function MuiObjectInspector({
-  name = '',
+  label,
   data = {},
   expandPaths,
 }: MuiObjectInspectorProps) {
@@ -230,23 +251,15 @@ export default function MuiObjectInspector({
   );
 
   const treeData: ObjectTreePropertyNode[] = React.useMemo(
-    () => [
-      {
-        name,
-        id: '$ROOT',
-        type: getType(data),
-        value: data,
-        children: data && typeof data === 'object' ? createTreeData(data) : undefined,
-      },
-    ],
-    [data, name],
+    () => createObjectTreeData(data, { label }),
+    [data, label],
   );
 
   const [rootRef, dimensions] = useDimensions<HTMLDivElement>();
 
   return (
     <div ref={rootRef} style={{ width: '100%', height: '100%', overflow: 'hidden' }}>
-      <StyledTree
+      <Tree
         indent={8}
         disableDrag
         disableDrop
@@ -256,7 +269,7 @@ export default function MuiObjectInspector({
         height={dimensions.height}
       >
         {ObjectPropertyEntry}
-      </StyledTree>
+      </Tree>
     </div>
   );
 }

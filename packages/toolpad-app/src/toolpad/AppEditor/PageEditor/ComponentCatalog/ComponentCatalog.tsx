@@ -113,8 +113,20 @@ export default function ComponentCatalog({ className }: ComponentCatalogProps) {
           borderColor: 'divider',
         }}
       >
-        <Collapse in={!!openStart} orientation="horizontal" timeout={200} sx={{ height: '100%' }}>
-          <Box sx={{ width: 250, height: '100%', overflow: 'auto', scrollbarGutter: 'stable' }}>
+        <Collapse
+          in={!!openStart}
+          orientation="horizontal"
+          timeout={200}
+          sx={{ height: '100%', justifyContent: 'flex-end', display: 'flex' }}
+        >
+          <Box
+            sx={{
+              width: 250,
+              height: '100%',
+              overflow: 'auto',
+              scrollbarGutter: 'stable',
+            }}
+          >
             <Box display="grid" gridTemplateColumns="1fr 1fr 1fr" gap={1} padding={1}>
               {Object.entries(toolpadComponents).map(([componentId, componentType]) => {
                 invariant(componentType, `No component definition found for "${componentId}"`);
@@ -212,10 +224,10 @@ export default function ComponentCatalog({ className }: ComponentCatalogProps) {
                     <ArrowDropDownSharpIcon />
                   </IconButton>
                 </Box>
-                <Typography variant="caption" color="text.secondary">
-                  👍 Upvote on GitHub to get it prioritized.
-                </Typography>
                 <Collapse in={openFutureComponents} orientation={'vertical'}>
+                  <Typography variant="caption" color="text.secondary">
+                    👍 Upvote on GitHub to get it prioritized.
+                  </Typography>
                   <Box display="grid" gridTemplateColumns="1fr 1fr 1fr" gap={1} pt={1} pb={0}>
                     {Array.from(FUTURE_COMPONENTS, ([key, { displayName, url }]) => {
                       return (

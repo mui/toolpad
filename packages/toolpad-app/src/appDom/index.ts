@@ -742,21 +742,6 @@ export function setNodeNamespacedProp<
   });
 }
 
-export function setNodeNamespace<Node extends AppDomNode, Namespace extends PropNamespaces<Node>>(
-  dom: AppDom,
-  node: Node,
-  namespace: Namespace,
-  value: Node[Namespace] | null,
-): AppDom {
-  return update(dom, {
-    nodes: update(dom.nodes, {
-      [node.id]: update(node, {
-        [namespace]: value ? (value as Partial<Node[Namespace]>) : {},
-      } as Partial<Node>),
-    }),
-  });
-}
-
 function setNodeParent<N extends AppDomNode>(
   dom: AppDom,
   node: N,

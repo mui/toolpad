@@ -270,18 +270,6 @@ function createDomApi(
         },
       });
     },
-    setNodeNamespace<Node extends appDom.AppDomNode, Namespace extends appDom.PropNamespaces<Node>>(
-      node: Node,
-      namespace: Namespace,
-      value: Node[Namespace] | null,
-    ) {
-      dispatch({
-        type: 'DOM_UPDATE',
-        updater(dom) {
-          return appDom.setNodeNamespace(dom, node, namespace, value);
-        },
-      });
-    },
     selectNode(nodeId: NodeId) {
       dispatch({
         type: 'SELECT_NODE',

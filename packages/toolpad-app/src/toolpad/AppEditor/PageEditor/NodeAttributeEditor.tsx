@@ -1,10 +1,5 @@
 import * as React from 'react';
-import {
-  ArgTypeDefinition,
-  BindableAttrValue,
-  DEFAULT_GLOBAL_SCOPE_NODE_STATE,
-  GlobalScopeMeta,
-} from '@mui/toolpad-core';
+import { ArgTypeDefinition, BindableAttrValue, GlobalScopeMeta } from '@mui/toolpad-core';
 import { Alert, Box } from '@mui/material';
 import * as appDom from '../../../appDom';
 import { useDom, useDomApi } from '../../DomLoader';
@@ -12,6 +7,7 @@ import BindableEditor from './BindableEditor';
 import { usePageEditorState } from './PageEditorProvider';
 import { getDefaultControl } from '../../propertyControls';
 import MarkdownTooltip from '../../../components/MarkdownTooltip';
+import { getFirstElementIteratorAncestorItems } from '../../../toolpadComponents/elementIterator';
 
 export interface NodeAttributeEditorProps<P extends object> {
   node: appDom.AppDomNode;
@@ -30,6 +26,7 @@ export default function NodeAttributeEditor<P extends object>({
 }: NodeAttributeEditorProps<P>) {
   const { dom } = useDom();
   const domApi = useDomApi();
+  const { viewState } = usePageEditorState();
 
   const handlePropChange = React.useCallback(
     (newValue: BindableAttrValue<unknown> | null) => {
@@ -46,24 +43,18 @@ export default function NodeAttributeEditor<P extends object>({
   const { bindings, pageState, globalScopeMeta } = usePageEditorState();
   const liveBinding = bindings[bindingId];
 
-  const ancestorComponentTypes = React.useMemo(
-    () =>
-      appDom
-        .getAncestors(dom, node)
-        .map((ancestor) =>
-          appDom.isElement(ancestor) ? ancestor.attributes.component.value : null,
-        ),
-    [dom, node],
+  const firstIteratorAncestorItems = React.useMemo(
+    () => appDom.isElement(node) && getFirstElementIteratorAncestorItems(dom, node, viewState),
+    [dom, node, viewState],
   );
-  const isIteratorComponentDescendant = ancestorComponentTypes.includes('List');
 
   const nodeAwareGlobalScope = {
     ...pageState,
-    ...(isIteratorComponentDescendant ? { item: DEFAULT_GLOBAL_SCOPE_NODE_STATE.item } : {}),
+    ...(firstIteratorAncestorItems ? { item: firstIteratorAncestorItems[0] } : {}),
   };
   const nodeAwareGlobalScopeMeta: GlobalScopeMeta = {
     ...globalScopeMeta,
-    ...(isIteratorComponentDescendant ? { item: { kind: 'local' } } : {}),
+    ...(firstIteratorAncestorItems ? { item: { kind: 'local' } } : {}),
   };
 
   const propType = argType.typeDef;

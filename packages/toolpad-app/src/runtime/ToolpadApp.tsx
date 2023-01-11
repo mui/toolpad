@@ -25,6 +25,7 @@ import {
   IteratorItem,
   IteratorItemRenderer,
   GlobalScopeNodeState,
+  ElementIteratorValueType,
 } from '@mui/toolpad-core';
 import { QueryClient, QueryClientProvider, useMutation } from '@tanstack/react-query';
 import {
@@ -375,9 +376,9 @@ function RenderedNodeContent({ node, childNodeGroups, Component }: RenderedNodeC
   // Wrap with slots
   for (const [propName, argType] of Object.entries(argTypes)) {
     const isElement = argType?.typeDef.type === 'element';
-    const isIteratorElement = argType?.typeDef.type === 'iteratorElement';
+    const isElementIterator = argType?.typeDef.type === 'elementIterator';
 
-    if (isElement || isIteratorElement) {
+    if (isElement || isElementIterator) {
       const value = props[propName];
 
       let wrappedValue = value;
@@ -391,13 +392,15 @@ function RenderedNodeContent({ node, childNodeGroups, Component }: RenderedNodeC
         );
       }
 
-      props[propName] = isIteratorElement
-        ? (items: IteratorItem[], itemRenderer: IteratorItemRenderer) =>
-            items.map((item, index) => (
-              <IteratorItemContextProvider key={index} value={item}>
-                {itemRenderer(wrappedValue, item, index)}
-              </IteratorItemContextProvider>
-            ))
+      props[propName] = isElementIterator
+        ? (itemRenderer: IteratorItemRenderer) =>
+            (props[(argType.typeDef as ElementIteratorValueType).itemsProp] as IteratorItem[]).map(
+              (item, index) => (
+                <IteratorItemContextProvider key={index} value={item}>
+                  {itemRenderer(wrappedValue, item, index)}
+                </IteratorItemContextProvider>
+              ),
+            )
         : wrappedValue;
     }
   }
@@ -889,7 +892,7 @@ function RenderedPage({ nodeId }: RenderedNodeProps) {
     <BindingsContextProvider value={getBindings}>
       <SetControlledBindingContextProvider value={setControlledBinding}>
         <EvaluatePageExpressionProvider value={evaluatePageExpression}>
-          <IteratorItemContextProvider value={{}}>
+          <IteratorItemContextProvider value={DEFAULT_GLOBAL_SCOPE_NODE_STATE.item}>
             <RenderedNodeContent
               node={page}
               childNodeGroups={{ children }}

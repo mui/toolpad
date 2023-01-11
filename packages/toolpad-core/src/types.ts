@@ -82,7 +82,7 @@ export interface ValueTypeBase {
     | 'object'
     | 'array'
     | 'element'
-    | 'iteratorElement'
+    | 'elementIterator'
     | 'event';
 }
 
@@ -115,8 +115,12 @@ export interface ElementValueType extends ValueTypeBase {
   type: 'element';
 }
 
-export interface IteratorElementType extends ValueTypeBase {
-  type: 'iteratorElement';
+export interface ElementIteratorValueType extends ValueTypeBase {
+  type: 'elementIterator';
+  /**
+   * The property that is used to provide items to an element iterator.
+   */
+  itemsProp: string;
 }
 
 export interface EventValueType extends ValueTypeBase {
@@ -163,7 +167,7 @@ type PrimitiveValueType =
 export type PropValueType =
   | PrimitiveValueType
   | ElementValueType
-  | IteratorElementType
+  | ElementIteratorValueType
   | EventValueType;
 
 export type PropValueTypes<K extends string = string> = Partial<{
@@ -352,7 +356,4 @@ export type IteratorItemRenderer = (
   index: number,
 ) => React.ReactNode;
 
-export type IteratorRenderer = (
-  items: IteratorItem[],
-  itemRenderer: IteratorItemRenderer,
-) => React.ReactNode;
+export type IteratorRenderer = (itemRenderer: IteratorItemRenderer) => React.ReactNode;

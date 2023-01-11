@@ -1,6 +1,7 @@
 import { getQuickJS, RuntimeOptions, QuickJSRuntime } from 'quickjs-emscripten';
 import * as React from 'react';
-import { ArgTypeDefinition, BindableAttrValue, LiveBinding } from './types';
+import { BindableAttrValue, BindingEvaluationResult } from './types';
+import { errorFrom } from './utils/errors';
 
 const JsRuntimeContext = React.createContext<QuickJSRuntime | null>(null);
 
@@ -55,28 +56,35 @@ function evalCode(code: string, globalScope: Record<string, unknown>) {
   return (iframe.contentWindow as any).eval(`with (window.__SCOPE) { ${code} }`);
 }
 
+export const TOOLPAD_LOADING_MARKER = '__TOOLPAD_LOADING_MARKER__';
+
+export function evaluateExpression(
+  code: string,
+  globalScope: Record<string, unknown>,
+): BindingEvaluationResult {
+  try {
+    const value = evalCode(code, globalScope);
+    return { value };
+  } catch (rawError) {
+    const error = errorFrom(rawError);
+    if (error?.message === TOOLPAD_LOADING_MARKER) {
+      return { loading: true };
+    }
+    return { error: error as Error };
+  }
+}
+
 export function evaluateBindable<V>(
   bindable: BindableAttrValue<V> | null,
   globalScope: Record<string, unknown>,
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  argType?: ArgTypeDefinition,
-): LiveBinding {
-  const execExpression = () => {
-    if (bindable?.type === 'jsExpression') {
-      return evalCode(bindable?.value, globalScope);
-    }
-
-    if (bindable?.type === 'const') {
-      return bindable?.value;
-    }
-
-    return undefined;
-  };
-
-  try {
-    const value = execExpression();
-    return { value };
-  } catch (err) {
-    return { error: err as Error };
+): BindingEvaluationResult {
+  if (bindable?.type === 'jsExpression') {
+    return evaluateExpression(bindable?.value, globalScope);
   }
+
+  if (bindable?.type === 'const') {
+    return { value: bindable?.value };
+  }
+
+  return { value: undefined };
 }

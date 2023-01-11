@@ -20,6 +20,7 @@ import {
   BindableAttrValue,
   NestedBindableAttrs,
   GlobalScopeMeta,
+  BindingEvaluationResult,
 } from '@mui/toolpad-core';
 import { createProvidedContext } from '@mui/toolpad-core/utils/react';
 import { QueryClient, QueryClientProvider, useMutation } from '@tanstack/react-query';
@@ -41,6 +42,7 @@ import {
 } from '@mui/toolpad-core/runtime';
 import * as _ from 'lodash-es';
 import ErrorIcon from '@mui/icons-material/Error';
+import { evaluateExpression } from '@mui/toolpad-core/jsRuntime';
 import * as appDom from '../appDom';
 import { RuntimeState, VersionOrPreview } from '../types';
 import {
@@ -51,12 +53,7 @@ import {
 } from '../toolpadComponents';
 import AppOverview from './AppOverview';
 import AppThemeProvider from './AppThemeProvider';
-import evalJsBindings, {
-  BindingEvaluationResult,
-  buildGlobalScope,
-  evaluateExpression,
-  ParsedBinding,
-} from './evalJsBindings';
+import evalJsBindings, { buildGlobalScope, ParsedBinding } from './evalJsBindings';
 import { HTML_ID_EDITOR_OVERLAY } from '../constants';
 import { mapProperties, mapValues } from '../utils/collections';
 import usePageTitle from '../utils/usePageTitle';

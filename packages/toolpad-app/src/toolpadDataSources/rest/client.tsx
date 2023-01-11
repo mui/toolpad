@@ -404,13 +404,18 @@ function QueryEditor({
     preview,
     runPreview: handleRunPreview,
     isLoading: previewIsLoading,
-  } = useQueryPreview(fetchPreview, input.attributes.query.value, previewParams, {
-    onPreview(result) {
-      setPreviewHar((existing) =>
-        result.har ? mergeHar(createHarLog(), existing, result.har) : existing,
-      );
+  } = useQueryPreview(
+    fetchPreview,
+    input.attributes.query.value,
+    previewParams as Record<string, string>,
+    {
+      onPreview(result) {
+        setPreviewHar((existing) =>
+          result.har ? mergeHar(createHarLog(), existing, result.har) : existing,
+        );
+      },
     },
-  });
+  );
 
   const handleHarClear = React.useCallback(() => setPreviewHar(createHarLog()), []);
 

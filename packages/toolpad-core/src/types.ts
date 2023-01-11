@@ -217,10 +217,25 @@ export interface LiveBindingError {
   stack?: string;
 }
 
-export interface LiveBinding {
-  value?: any;
-  error?: LiveBindingError;
-}
+/**
+ * Represents the actual state of an evaluated binding.
+ */
+export type BindingEvaluationResult<T = unknown> = {
+  /**
+   * The actual value.
+   */
+  value?: T;
+  /**
+   * The evaluation of the value resulted in error.
+   */
+  error?: Error;
+  /**
+   * The parts that this value depends on are still loading.
+   */
+  loading?: boolean;
+};
+
+export type LiveBinding = BindingEvaluationResult;
 
 export type GlobalScopeMetaField = {
   description?: string;

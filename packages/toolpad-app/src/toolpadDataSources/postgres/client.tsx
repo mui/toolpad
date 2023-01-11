@@ -194,7 +194,11 @@ function QueryEditor({
     preview,
     runPreview: handleRunPreview,
     isLoading: previewIsLoading,
-  } = useQueryPreview(fetchServerPreview, input.attributes.query.value, previewParams);
+  } = useQueryPreview(
+    fetchServerPreview,
+    input.attributes.query.value,
+    previewParams as Record<string, string>,
+  );
 
   const rawRows: any[] = preview?.data || EMPTY_ROWS;
   const columns: GridColDef[] = React.useMemo(() => parseColumns(inferColumns(rawRows)), [rawRows]);

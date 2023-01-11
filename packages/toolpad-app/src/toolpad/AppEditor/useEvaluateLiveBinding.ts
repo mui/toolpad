@@ -10,7 +10,7 @@ import {
   useJsRuntime,
 } from '@mui/toolpad-core/jsRuntime';
 import { QuickJSRuntime } from 'quickjs-emscripten';
-import { Serializable } from '../../server/evalExpression';
+import type { Serializable } from '../../server/evalExpression';
 import evaluateBindableServer from '../../server/evaluateBindable';
 import { mapValues } from '../../utils/collections';
 

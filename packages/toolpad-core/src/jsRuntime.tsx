@@ -52,7 +52,13 @@ function evalCode(code: string, globalScope: Record<string, unknown>) {
 
   // eslint-disable-next-line no-underscore-dangle
   (iframe.contentWindow as any).__SCOPE = globalScope;
-  return (iframe.contentWindow as any).eval(`with (window.__SCOPE) { ${code} }`);
+  return (iframe.contentWindow as any).eval(`
+    (() => {
+      with (window.__SCOPE) { 
+        return (${code})
+      }
+    })()
+  `);
 }
 
 export function evaluateBindable<V>(

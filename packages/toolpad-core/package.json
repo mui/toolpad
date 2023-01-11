@@ -16,7 +16,7 @@
     "./runtime": "./dist/runtime.js",
     "./jsRuntime": "./dist/jsRuntime.js",
     "./objectKey": "./dist/objectKey.js",
-    "./utils": "./dist/utils.js"
+    "./utils/*": "./dist/utils/*.js"
   },
   "files": [
     "dist"

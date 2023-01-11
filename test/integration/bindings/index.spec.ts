@@ -5,7 +5,12 @@ import { readJsonFile } from '../../utils/fs';
 import generateId from '../../utils/generateId';
 
 test.use({
-  ignoreConsoleErrors: [/Unexpected token '\)'/],
+  ignoreConsoleErrors: [
+    // Chrome
+    /Unexpected token '\)'/,
+    // Firefox
+    /expected property name, got '\)'/,
+  ],
 });
 
 test('bindings', async ({ page, api }) => {

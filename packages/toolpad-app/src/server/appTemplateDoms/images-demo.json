@@ -87,8 +87,8 @@
               "value": "`https://dog.ceo/api/breed/${query.breed}/list`\n"
             },
             "method": "GET",
-            "headers": [],
-            "browser": true
+            "browser": true,
+            "headers": []
           }
         },
         "dataSource": {
@@ -122,7 +122,7 @@
       "attributes": {
         "component": {
           "type": "const",
-          "value": "Typography"
+          "value": "Text"
         }
       },
       "parentProp": "children",
@@ -143,8 +143,8 @@
               "value": "https://dog.ceo/api/breeds/list/all"
             },
             "method": "GET",
-            "headers": [],
-            "browser": true
+            "browser": true,
+            "headers": []
           }
         },
         "dataSource": {
@@ -210,8 +210,8 @@
               "value": "`https://dog.ceo/api/breed/${\n  query.subBreed\n    ? `${query.breed}/${query.subBreed}/images/random`\n    : `${query.breed}/images/random`\n}`\n"
             },
             "method": "GET",
-            "headers": [],
-            "browser": true
+            "browser": true,
+            "headers": []
           }
         },
         "dataSource": {
@@ -270,7 +270,7 @@
       "attributes": {
         "component": {
           "type": "const",
-          "value": "Typography"
+          "value": "Text"
         }
       },
       "parentProp": "children",
@@ -395,7 +395,7 @@
       "attributes": {
         "component": {
           "type": "const",
-          "value": "Typography"
+          "value": "Text"
         }
       },
       "parentProp": "children",
@@ -500,7 +500,7 @@
         },
         "options": {
           "type": "jsExpression",
-          "value": "allDogSubBreeds.error ? [] : allDogSubBreeds.data?.message\n"
+          "value": "allDogSubBreeds.error ? [] : allDogSubBreeds.data?.message[selectBreed.value]\n"
         },
         "disabled": {
           "type": "jsExpression",
@@ -541,5 +541,5 @@
       "parentIndex": "a0"
     }
   },
-  "version": 3
+  "version": 5
 }

@@ -56,11 +56,13 @@ function FilePicker({ multiple, onChange, ...props }: Props) {
       value={undefined}
       inputProps={{ multiple }}
       onChange={handleChange}
+      InputLabelProps={{ shrink: true }}
     />
   );
 }
 
 export default createComponent(FilePicker, {
+  helperText: 'File picker component.\nIt allows users to take select and read files.',
   argTypes: {
     value: {
       typeDef: { type: 'object' },
@@ -68,24 +70,31 @@ export default createComponent(FilePicker, {
       onChangeProp: 'onChange',
     },
     label: {
+      helperText: 'A label that describes the content of the FilePicker. e.g. "Profile Image".',
       typeDef: { type: 'string' },
     },
     variant: {
+      helperText:
+        'One of the available MUI TextField [variants](https://mui.com/material-ui/react-text-field/#basic-textfield). Possible values are `outlined`, `filled` or `standard`.',
       typeDef: { type: 'string', enum: ['outlined', 'filled', 'standard'] },
       defaultValue: 'outlined',
     },
     size: {
+      helperText: 'The size of the component. One of `small` or `normal`.',
       typeDef: { type: 'string', enum: ['small', 'normal'] },
       defaultValue: 'small',
     },
     multiple: {
+      helperText: 'Whether the FilePicker should accept multiple files.',
       typeDef: { type: 'boolean' },
       defaultValue: true,
     },
     fullWidth: {
+      helperText: 'Whether the FilePicker should occupy all available horizontal space.',
       typeDef: { type: 'boolean' },
     },
     disabled: {
+      helperText: 'Whether the FilePicker is disabled.',
       typeDef: { type: 'boolean' },
     },
     sx: {

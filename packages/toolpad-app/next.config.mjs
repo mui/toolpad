@@ -3,7 +3,7 @@ import * as path from 'path';
 import { withSentryConfig } from '@sentry/nextjs';
 import createBundleAnalyzer from '@next/bundle-analyzer';
 
-// Flag to be used to experiment with using experimental.transpilePackages to
+// Flag to be used to experiment with using transpilePackages to
 // compile monaco-editor CSS
 // Current blocker: https://github.com/vercel/next.js/issues/43125
 const USE_EXPERIMENTAL_TRANSPILE_PACKAGES = false;
@@ -110,9 +110,7 @@ const NEVER = () => false;
 export default withSentryConfig(
   withBundleAnalyzer(
     /** @type {import('next').NextConfig & { sentry: import('@sentry/nextjs/types/config/types').UserSentryOptions }} */ ({
-      experimental: {
-        transpilePackages: USE_EXPERIMENTAL_TRANSPILE_PACKAGES ? ['monaco-editor'] : undefined,
-      },
+      transpilePackages: USE_EXPERIMENTAL_TRANSPILE_PACKAGES ? ['monaco-editor'] : undefined,
       reactStrictMode: true,
       poweredByHeader: false,
       productionBrowserSourceMaps: true,

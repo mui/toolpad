@@ -6,15 +6,14 @@ import SplitPane from '../../../components/SplitPane';
 import RenderPanel from './RenderPanel';
 import ComponentPanel from './ComponentPanel';
 import { PageEditorProvider } from './PageEditorProvider';
-import { useDom, useDomApi } from '../../DomLoader';
+import { useDom } from '../../DomLoader';
 import * as appDom from '../../../appDom';
 import ComponentCatalog from './ComponentCatalog';
 import NotFoundEditor from '../NotFoundEditor';
 import usePageTitle from '../../../utils/usePageTitle';
 import useLocalStorageState from '../../../utils/useLocalStorageState';
 import useDebouncedHandler from '../../../utils/useDebouncedHandler';
-import useShortcut from '../../../utils/useShortcut';
-import { hasFieldFocus } from '../../../utils/fields';
+import useUndoRedo from '../../hooks/useUndoRedo';
 
 const classes = {
   renderPanel: 'Toolpad_RenderPanel',
@@ -72,22 +71,10 @@ interface PageEditorProps {
 
 export default function PageEditor({ appId }: PageEditorProps) {
   const { dom } = useDom();
-  const domApi = useDomApi();
   const { nodeId } = useParams();
   const pageNode = appDom.getMaybeNode(dom, nodeId as NodeId, 'page');
 
-  useShortcut({ key: 'z', metaKey: true, preventDefault: false }, () => {
-    if (hasFieldFocus()) {
-      return;
-    }
-    domApi.undo();
-  });
-  useShortcut({ key: 'z', metaKey: true, shiftKey: true, preventDefault: false }, () => {
-    if (hasFieldFocus()) {
-      return;
-    }
-    domApi.redo();
-  });
+  useUndoRedo();
 
   return pageNode ? (
     <PageEditorContent appId={appId} node={pageNode} />

@@ -59,7 +59,7 @@ The [changelog](https://github.com/mui/mui-toolpad/releases) is regularly update
 
 ## Roadmap
 
-<!-- TODO -->
+Future plans and high-priority features and enhancements can be found in our [roadmap](https://mui.com/toolpad/getting-started/roadmap/).
 
 ## License
 

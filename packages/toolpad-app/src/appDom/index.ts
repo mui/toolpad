@@ -26,7 +26,7 @@ export const RESERVED_NODE_PROPERTIES = [
   'parentProp',
   'parentIndex',
 ] as const;
-export type ReservedNodeProperty = typeof RESERVED_NODE_PROPERTIES[number];
+export type ReservedNodeProperty = (typeof RESERVED_NODE_PROPERTIES)[number];
 
 export function createFractionalIndex(index1: string | null, index2: string | null) {
   return generateKeyBetween(index1, index2);
@@ -714,13 +714,13 @@ export function setQueryProp<Q, K extends keyof Q>(
 export function setNodeNamespacedProp<
   Node extends AppDomNode,
   Namespace extends PropNamespaces<Node>,
-  Prop extends keyof Node[Namespace] & string,
+  Prop extends keyof NonNullable<Node[Namespace]> & string,
 >(
   dom: AppDom,
   node: Node,
   namespace: Namespace,
   prop: Prop,
-  value: Node[Namespace][Prop] | null,
+  value: NonNullable<Node[Namespace]>[Prop] | null,
 ): AppDom {
   if (value) {
     return update(dom, {
@@ -736,22 +736,7 @@ export function setNodeNamespacedProp<
   return update(dom, {
     nodes: update(dom.nodes, {
       [node.id]: update(node, {
-        [namespace]: omit(node[namespace], prop) as Partial<Node[Namespace]>,
-      } as Partial<Node>),
-    }),
-  });
-}
-
-export function setNodeNamespace<Node extends AppDomNode, Namespace extends PropNamespaces<Node>>(
-  dom: AppDom,
-  node: Node,
-  namespace: Namespace,
-  value: Node[Namespace] | null,
-): AppDom {
-  return update(dom, {
-    nodes: update(dom.nodes, {
-      [node.id]: update(node, {
-        [namespace]: value ? (value as Partial<Node[Namespace]>) : {},
+        [namespace]: omit(node[namespace]!, prop) as Partial<Node[Namespace]>,
       } as Partial<Node>),
     }),
   });
@@ -1046,7 +1031,7 @@ const RENDERTREE_NODES = [
   'codeComponent',
 ] as const;
 
-export type RenderTreeNodeType = typeof RENDERTREE_NODES[number];
+export type RenderTreeNodeType = (typeof RENDERTREE_NODES)[number];
 export type RenderTreeNode = { [K in RenderTreeNodeType]: AppDomNodeOfType<K> }[RenderTreeNodeType];
 export type RenderTreeNodes = Record<NodeId, RenderTreeNode>;
 

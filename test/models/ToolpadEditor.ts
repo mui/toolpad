@@ -103,6 +103,11 @@ export class ToolpadEditor {
     await Promise.all([this.createPageDialog.createButton.click(), this.page.waitForNavigation()]);
   }
 
+  async goToPage(name: string) {
+    await this.explorer.getByText(name).click();
+    this.page.waitForNavigation();
+  }
+
   async createComponent(name: string) {
     await this.createComponentBtn.click();
     await this.createComponentDialog.nameInput.fill(name);
@@ -184,6 +189,9 @@ export class ToolpadEditor {
 
   async dragNewComponentToAppCanvas(componentName: string) {
     await this.componentCatalog.hover();
+
+    // Account for opening transition
+    await this.page.waitForTimeout(200);
 
     const sourceSelector = `data-testid=component-catalog >> div:has-text("${componentName}")[draggable]`;
 

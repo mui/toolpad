@@ -160,6 +160,7 @@ const EMPTY_PARAMS: BindableAttrEntries = [];
 
 function QueryEditor({
   globalScope,
+  globalScopeMeta,
   value: input,
   onChange: setInput,
 }: QueryEditorProps<PostgresConnectionParams, PostgresQuery>) {
@@ -221,6 +222,7 @@ function QueryEditor({
             value={paramsEntries}
             onChange={handleParamsChange}
             globalScope={globalScope}
+            globalScopeMeta={globalScopeMeta}
             liveValue={paramsEditorLiveValue}
           />
         </Box>

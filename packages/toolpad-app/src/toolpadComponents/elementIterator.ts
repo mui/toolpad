@@ -24,12 +24,12 @@ export const getFirstElementIteratorAncestorItems = (
       | ArgTypeDefinitions<{ [parentProp: string]: PropValueType }>
       | undefined = parentComponentConfig?.argTypes;
 
-    const argTypeDef =
+    const parentArgTypeDef =
       (parentComponentArgTypes && parentProp && parentComponentArgTypes[parentProp]?.typeDef) ||
       null;
 
-    if (parent && argTypeDef?.type === 'elementIterator') {
-      const { itemsProp } = argTypeDef;
+    if (parent && parentArgTypeDef?.type === 'elementIterator') {
+      const { itemsProp } = parentArgTypeDef;
       const parentProps = (parent as appDom.ElementNode).props;
 
       firstIteratorAncestorItems = (parentProps && parentProps[itemsProp]?.value) || null;

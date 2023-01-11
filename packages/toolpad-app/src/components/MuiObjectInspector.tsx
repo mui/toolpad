@@ -1,7 +1,7 @@
 import * as React from 'react';
 import clsx from 'clsx';
 import { styled, SvgIcon } from '@mui/material';
-import { NodeApi, NodeRendererProps, Tree as ArboristTree } from 'react-arborist';
+import { NodeRendererProps, Tree as ArboristTree } from 'react-arborist';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import ArrowRightIcon from '@mui/icons-material/ArrowRight';
 
@@ -103,13 +103,14 @@ export function createObjectTreeData(
   data: unknown,
   { id = '$ROOT', label }: CreateObjectTreeDataParams,
 ): ObjectTreePropertyNode[] {
+  const children = data && typeof data === 'object' ? createPropertiesData(data, id) : [];
   return [
     {
       label,
       id,
       type: getType(data),
       value: data,
-      children: data && typeof data === 'object' ? createPropertiesData(data, id) : undefined,
+      children: children.length > 0 ? children : undefined,
     },
   ];
 }
@@ -169,23 +170,24 @@ function PropertyValue({ open = false, type, value }: PropertyValueProps) {
 }
 
 interface TreeItemIconProps {
-  node: NodeApi<ObjectTreePropertyNode>;
+  leaf: boolean;
+  open: boolean;
 }
 
-function TreeItemIcon({ node }: TreeItemIconProps) {
-  if (node.isLeaf) {
+function TreeItemIcon({ leaf, open }: TreeItemIconProps) {
+  if (leaf) {
     return <SvgIcon />;
   }
-  return node.isOpen ? <ArrowDropDownIcon /> : <ArrowRightIcon />;
+  return open ? <ArrowDropDownIcon /> : <ArrowRightIcon />;
 }
 
-export function ObjectPropertyEntry({
+export function ObjectPropertyEntry<T extends ObjectTreePropertyNode = ObjectTreePropertyNode>({
   node,
   style,
   dragHandle,
-}: NodeRendererProps<ObjectTreePropertyNode>) {
+}: NodeRendererProps<T>) {
   return (
-    // TODO: react-arborist sets role treeitem to its parent but suggests onClcik on this node
+    // TODO: react-arborist sets role treeitem to its parent but suggests onClick on this node
     // eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions
     <div
       className={classes.node}
@@ -193,7 +195,7 @@ export function ObjectPropertyEntry({
       ref={dragHandle}
       onClick={() => node.toggle()}
     >
-      <TreeItemIcon node={node} />
+      <TreeItemIcon leaf={node.isLeaf} open={node.isOpen} />
       <span>
         {node.data.label ? <span>{node.data.label}: </span> : null}
         <PropertyValue open={node.isOpen} value={node.data.value} type={node.data.type} />
@@ -246,7 +248,7 @@ export default function MuiObjectInspector({
   expandPaths,
 }: MuiObjectInspectorProps) {
   const initialOpenState = React.useMemo(
-    () => (expandPaths ? Object.fromEntries(expandPaths.map((path) => [path, true])) : undefined),
+    () => (expandPaths ? Object.fromEntries(expandPaths.map((path) => [path, true])) : {}),
     [expandPaths],
   );
 

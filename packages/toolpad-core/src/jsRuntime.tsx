@@ -42,7 +42,7 @@ export function useJsRuntime(): QuickJSRuntime {
 }
 
 let iframe: HTMLIFrameElement;
-function evalCode(code: string, globalScope: Record<string, unknown>) {
+export function evalExpression(code: string, globalScope: Record<string, unknown>) {
   if (!iframe) {
     iframe = document.createElement('iframe');
     iframe.setAttribute('sandbox', 'allow-same-origin allow-scripts');
@@ -52,6 +52,7 @@ function evalCode(code: string, globalScope: Record<string, unknown>) {
 
   // eslint-disable-next-line no-underscore-dangle
   (iframe.contentWindow as any).__SCOPE = globalScope;
+  (iframe.contentWindow as any).console = window.console;
   return (iframe.contentWindow as any).eval(`
     (() => {
       with (window.__SCOPE) { 
@@ -59,6 +60,8 @@ function evalCode(code: string, globalScope: Record<string, unknown>) {
       }
     })()
   `);
+
+  return (iframe.contentWindow as any).eval(`with (window.__SCOPE) { ${code} }`);
 }
 
 export function evaluateBindable<V>(
@@ -69,7 +72,7 @@ export function evaluateBindable<V>(
 ): LiveBinding {
   const execExpression = () => {
     if (bindable?.type === 'jsExpression') {
-      return evalCode(bindable?.value, globalScope);
+      return evalExpression(bindable?.value, globalScope);
     }
 
     if (bindable?.type === 'const') {

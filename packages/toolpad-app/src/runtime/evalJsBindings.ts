@@ -1,5 +1,5 @@
+import { evalExpression } from '@mui/toolpad-core/jsRuntime';
 import { set } from 'lodash-es';
-import evalExpression from '../utils/evalExpression';
 import { mapValues } from '../utils/collections';
 import { errorFrom } from '../utils/errors';
 

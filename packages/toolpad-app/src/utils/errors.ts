@@ -3,10 +3,24 @@ import { hasOwnProperty } from './collections';
 import { truncate } from './strings';
 
 export function serializeError(error: Error): SerializedError {
-  const { message, name, stack } = error;
-  return { message, name, stack };
+  const { message, name, stack, code } = error;
+  return { message, name, stack, code };
 }
 
+/**
+ * Creates a javascript `Error` from an unkown value if it's not already an error.
+ * Does a best effort at inferring a message. Intended to be used typically in `catch`
+ * blocks, as there is no way to enforce only `Error` objects being thrown.
+ *
+ * ```
+ * try {
+ *   // ...
+ * } catch (rawError) {
+ *   const error = errorFrom(rawError);
+ *   console.assert(error instancof Error);
+ * }
+ * ```
+ */
 export function errorFrom(maybeError: unknown): Error {
   if (maybeError instanceof Error) {
     return maybeError;

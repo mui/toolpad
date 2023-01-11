@@ -8,7 +8,6 @@ import {
   TextField,
 } from '@mui/material';
 import * as React from 'react';
-import { useNavigate } from 'react-router-dom';
 import invariant from 'invariant';
 import * as appDom from '../../../appDom';
 import { useDom, useDomApi } from '../../DomLoader';
@@ -45,7 +44,6 @@ export default function CreateConnectionDialog({
   const [name, setName] = React.useState(appDom.proposeName(DEFAULT_NAME, existingNames));
 
   const [dataSourceType, setDataSourceType] = React.useState('');
-  const navigate = useNavigate();
 
   // Reset form
   const handleReset = useEvent(() => setName(appDom.proposeName(DEFAULT_NAME, existingNames)));
@@ -81,9 +79,15 @@ export default function CreateConnectionDialog({
             },
           });
           const appNode = appDom.getApp(dom);
-          domApi.addNode(newNode, appNode, 'connections');
+
+          domApi.update((draft) => appDom.addNode(draft, newNode, appNode, 'connections'), {
+            view: {
+              kind: 'connection',
+              nodeId: newNode.id,
+            },
+          });
+
           onClose();
-          navigate(`/app/${appId}/connections/${newNode.id}`);
         }}
       >
         <DialogTitle>Create a new Connection</DialogTitle>

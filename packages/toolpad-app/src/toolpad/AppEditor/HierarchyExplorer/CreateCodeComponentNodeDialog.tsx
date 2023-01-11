@@ -7,7 +7,6 @@ import {
   TextField,
 } from '@mui/material';
 import * as React from 'react';
-import { useNavigate } from 'react-router-dom';
 import invariant from 'invariant';
 import * as appDom from '../../../appDom';
 import { useDom, useDomApi } from '../../DomLoader';
@@ -69,8 +68,6 @@ export default function CreateCodeComponentDialog({
 
   const [name, setName] = React.useState(appDom.proposeName(DEFAULT_NAME, existingNames));
 
-  const navigate = useNavigate();
-
   // Reset form
   const handleReset = useEvent(() => setName(appDom.proposeName(DEFAULT_NAME, existingNames)));
 
@@ -103,9 +100,15 @@ export default function CreateCodeComponentDialog({
             },
           });
           const appNode = appDom.getApp(dom);
-          domApi.addNode(newNode, appNode, 'codeComponents');
+
+          domApi.update((draft) => appDom.addNode(draft, newNode, appNode, 'codeComponents'), {
+            view: {
+              kind: 'codeComponent',
+              nodeId: newNode.id,
+            },
+          });
+
           onClose();
-          navigate(`/app/${appId}/codeComponents/${newNode.id}`);
         }}
       >
         <DialogTitle>Create a new Code Component</DialogTitle>

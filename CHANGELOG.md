@@ -1,5 +1,123 @@
 # Changelog
 
+## 0.0.34
+
+<!-- generated comparing v0.0.33..master -->
+
+_Jan 4, 2023_
+
+A big thanks to the 4 contributors who made this release possible. Here are some highlights ✨:
+
+New date picker component, Make switching views part of undo/redo cycle.
+
+- &#8203;<!-- 13 -->Fix dependabot vulnerabilities (#1512) @Janpot
+- &#8203;<!-- 12 -->Don't import from dist folders (#1513) @Janpot
+- &#8203;<!-- 11 -->Root type check (#1510) @bytasv
+- &#8203;<!-- 10 -->Fix function editor save (#1507) @Janpot
+- &#8203;<!-- 09 -->Do not rename nodes when migrating Typography components (#1509) @Janpot
+- &#8203;<!-- 08 -->Just re-export the prettier config (#1508) @Janpot
+- &#8203;<!-- 07 -->Datepicker format handling changes (#1504) @bytasv
+- &#8203;<!-- 04 -->Undo/redo through different views (#1417) @apedroferreira
+- &#8203;<!-- 03 -->Make sure npm package is splitted out correctly (#1502) @Janpot
+- &#8203;<!-- 02 -->Date picker component (#1499) @bytasv
+- &#8203;<!-- 01 -->[core] Remove dead prettier config @oliviertassinari
+
+All contributors of this release in alphabetical order: @apedroferreira, @bytasv, @Janpot, @oliviertassinari
+
+## 0.0.33
+
+<!-- generated comparing v0.0.32..master -->
+
+_Dec 28, 2022_
+
+A big thanks to the 2 contributors who made this release possible. Here are some highlights ✨:
+
+Improvements to the scope explorer, and some other bug fixes an improvements.
+
+- &#8203;<!-- 4 -->Fix: Demo reCaptcha v2 fallback does not work (#1485) @bharatkashyap
+- &#8203;<!-- 3 -->Group scope variables by function in global scope explorer (#1464) @Janpot
+- &#8203;<!-- 2 -->Fix canvas ref timing issues (#1476) @Janpot
+- &#8203;<!-- 1 -->Fix flaky rest-basics test (#1481) @Janpot
+
+All contributors of this release in alphabetical order: @bharatkashyap, @Janpot
+
+## 0.0.32
+
+<!-- generated comparing v0.0.31..master -->
+
+_Dec 21, 2022_
+
+A big thanks to the 5 contributors who made this release possible. Here are some highlights ✨:
+
+Added survey for the Toolpad usage, simplified RPC logs, added latest deployment preview in the editor, undo/redo improvements, improved grid columns editor, added visual feedback when query runs, as well as various fixes.
+
+- &#8203;<!-- 12 -->Add survey dialog (#1480) @bytasv
+- &#8203;<!-- 11 -->Simplify RPC logs (#1473) @Janpot
+- &#8203;<!-- 10 -->Move recaptcha script away from \_app (#1472) @Janpot
+- &#8203;<!-- 09 -->Add latest deployment preview in editor (#1423) @bytasv
+- &#8203;<!-- 08 -->Single-update undo/redo (#1374) @apedroferreira
+- &#8203;<!-- 07 -->Non permanent root redirection (#1468) @oliviertassinari
+- &#8203;<!-- 06 -->Fix display of errors during loading of data (#1457) @Janpot
+- &#8203;<!-- 05 -->Replace gridcolumns editor dialog with popover (#1455) @Janpot
+- &#8203;<!-- 04 -->Fix: Incorrect migration for Text component (#1451) @bharatkashyap
+- &#8203;<!-- 03 -->Add formatting options to DataGrid columns (#1449) @Janpot
+- &#8203;<!-- 02 -->Add visual feedback when query is running (#1454) @Janpot
+- &#8203;<!-- 01 -->[docs] Banner tweaks (#1475) @bharatkashyap
+
+All contributors of this release in alphabetical order: @apedroferreira, @bharatkashyap, @bytasv, @Janpot, @oliviertassinari
+
+## 0.0.31
+
+<!-- generated comparing v0.0.30..master -->
+
+_Dec 14, 2022_
+
+A big thanks to the 5 contributors who made this release possible. Here are some highlights ✨:
+
+Add a new Text component that subsumes Typography and Link, and allows support for Markdown. Allow support for dynamic templates, and fix a bug around the default value of components.
+
+- &#8203;<!-- 11 -->Add Text component to merge Typography, Markdown, Link (#1298) @bharatkashyap
+- &#8203;<!-- 10 -->Document and cleanup of utility functions (#1442) @Janpot
+- &#8203;<!-- 09 -->Revert react-router-dom to 6.3 (#1444) @Janpot
+- &#8203;<!-- 08 -->Update README.md @prakhargupta1
+- &#8203;<!-- 07 -->Fix yarnlock (#1443) @bytasv
+- &#8203;<!-- 06 -->Add roadmap to the docs (#1424) @bytasv
+- &#8203;<!-- 05 -->Landing page tweaks (#1433) @bharatkashyap
+- &#8203;<!-- 04 -->Fix controlled value reset when default value changes (#1434) @bytasv
+- &#8203;<!-- 03 -->Add integration test for default template (#1429) @bharatkashyap
+- &#8203;<!-- 02 -->Support dynamic app templates (#1430) @apedroferreira
+- &#8203;<!-- 01 -->Fix changelog @Janpot
+
+All contributors of this release in alphabetical order: @apedroferreira, @bharatkashyap, @bytasv, @Janpot, @prakhargupta1
+
+✨ Done in 1.75s.
+
+## 0.0.30
+
+<!-- generated comparing v0.0.29..master -->
+
+_Dec 7, 2022_
+
+A big thanks to the 3 contributors who made this release possible. Here are some highlights ✨:
+
+Release the demo version, update app duplication UX.
+
+- &#8203;<!-- 13 -->Revert accidental react-router-dom update (#1426) @Janpot
+- &#8203;<!-- 12 -->Add demo link to the docs (#1319) @bharatkashyap
+- &#8203;<!-- 11 -->Add Demo link to landing page (#1228) @bharatkashyap
+- &#8203;<!-- 10 -->Add a Default app template (#1381) @bharatkashyap
+- &#8203;<!-- 09 -->Remove stats template (#1418) @apedroferreira
+- &#8203;<!-- 08 -->Propose solution for flaky undo test (#1415) @Janpot
+- &#8203;<!-- 07 -->Update dependencies (#1403) @Janpot
+- &#8203;<!-- 06 -->Move to next.config.mjs (#1404) @Janpot
+- &#8203;<!-- 05 -->Add note about missing connections to demo footer (#1406) @apedroferreira
+- &#8203;<!-- 04 -->Try out transpilePackages on latest next (#1362) @Janpot
+- &#8203;<!-- 03 -->Don't immediately open duplicated apps (#1397) @Janpot
+- &#8203;<!-- 02 -->Make sure EditableText updates when underlying string changes (#1400) @Janpot
+- &#8203;<!-- 01 -->Undoable/redoable node selection (#1394) @apedroferreira
+
+All contributors of this release in alphabetical order: @apedroferreira, @bharatkashyap, @Janpot
+
 ## 0.0.29
 
 <!-- generated comparing v0.0.28..master -->

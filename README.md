@@ -1,3 +1,8 @@
+<!-- markdownlint-disable-next-line -->
+<p align="center">
+  <a href="https://mui.com/" rel="noopener" target="_blank"><img width="150" src="https://mui.com/static/logo.svg" alt="MUI logo"></a>
+</p>
+
 <h1 align="center">MUI Toolpad</h1>
 
 <div align="center">
@@ -20,7 +25,7 @@ Quickly build internal tools. MUI Toolpad is a self-hosted low-code internal too
 
 </div>
 
-![Editor screenshot](./docs/public/static/toolpad/marketing/index-hero-video-poster.jpg)
+[![Editor screenshot](./docs/public/static/toolpad/marketing/readme-hero-poster.jpeg)](https://demo.toolpad.io)
 
 ## Notice
 
@@ -54,7 +59,7 @@ The [changelog](https://github.com/mui/mui-toolpad/releases) is regularly update
 
 ## Roadmap
 
-<!-- TODO -->
+Future plans and high-priority features and enhancements can be found in our [roadmap](https://mui.com/toolpad/getting-started/roadmap/).
 
 ## License
 

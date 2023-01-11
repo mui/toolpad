@@ -15,12 +15,25 @@ import {
   GridColDef,
   GridValueGetterParams,
   useGridApiRef,
+  GridColumnTypesRecord,
+  GridRenderCellParams,
 } from '@mui/x-data-grid-pro';
 import * as React from 'react';
-import { useNode, createComponent } from '@mui/toolpad-core';
-import { Box, debounce, LinearProgress, Skeleton, Link, styled } from '@mui/material';
+import { useNode, createComponent, useComponents } from '@mui/toolpad-core';
+import {
+  Box,
+  debounce,
+  LinearProgress,
+  Skeleton,
+  Link,
+  styled,
+  Typography,
+  Tooltip,
+} from '@mui/material';
 import { getObjectKey } from '@mui/toolpad-core/objectKey';
 import { hasImageExtension } from '@mui/toolpad-core/path';
+import { ErrorBoundary, FallbackProps } from 'react-error-boundary';
+import { SX_PROP_HELPER_TEXT } from './constants';
 
 // Pseudo random number. See https://stackoverflow.com/a/47593316
 function mulberry32(a: number): () => number {
@@ -129,35 +142,23 @@ function inferColumnType(value: unknown): string {
   }
 }
 
-const DEFAULT_TYPES = new Set([
-  'string',
-  'number',
-  'date',
-  'dateTime',
-  'boolean',
-  'singleSelect',
-  'actions',
-]);
-
 function dateValueGetter({ value }: GridValueGetterParams<any, any>) {
   return typeof value === 'number' ? new Date(value) : value;
 }
 
-type ToolpadColumnExtraProps = { customType?: string };
-type ToolpadGridColDef = GridColDef & ToolpadColumnExtraProps;
-
-const COLUMN_TYPES: Record<string, Omit<ToolpadGridColDef, 'field'>> = {
+export const CUSTOM_COLUMN_TYPES: GridColumnTypesRecord = {
   json: {
     valueFormatter: ({ value: cellValue }: GridValueFormatterParams) => JSON.stringify(cellValue),
   },
   date: {
+    extendType: 'date',
     valueGetter: dateValueGetter,
   },
   dateTime: {
+    extendType: 'date',
     valueGetter: dateValueGetter,
   },
   link: {
-    customType: 'link',
     renderCell: ({ value }) => (
       <Link href={value} target="_blank" rel="noopener noreferrer nofollow">
         {value}
@@ -165,14 +166,56 @@ const COLUMN_TYPES: Record<string, Omit<ToolpadGridColDef, 'field'>> = {
     ),
   },
   image: {
-    customType: 'image',
     renderCell: ({ field, id, value }) => (
       <Box component="img" src={value} alt={`${field}${id}`} sx={{ maxWidth: '100%', p: 2 }} />
     ),
   },
 };
 
-export type SerializableGridColumns = { field: string; type: string }[];
+export const NUMBER_FORMAT_PRESETS = new Map<string, { options?: Intl.NumberFormatOptions }>([
+  [
+    'bytes',
+    {
+      options: {
+        style: 'unit',
+        maximumSignificantDigits: 3,
+        notation: 'compact',
+        unit: 'byte',
+        unitDisplay: 'narrow',
+      },
+    },
+  ],
+  [
+    'percent',
+    {
+      options: {
+        style: 'percent',
+      },
+    },
+  ],
+]);
+
+export type NumberFormat =
+  | {
+      kind: 'preset';
+      preset: string;
+    }
+  | {
+      kind: 'currency';
+      currency?: string;
+    }
+  | {
+      kind: 'custom';
+      custom: Intl.NumberFormatOptions;
+    };
+
+export interface SerializableGridColumn
+  extends Pick<GridColDef, 'field' | 'type' | 'align' | 'width' | 'headerName'> {
+  numberFormat?: NumberFormat;
+  codeComponent?: string;
+}
+
+export type SerializableGridColumns = SerializableGridColumn[];
 
 export function inferColumns(rows: GridRowsProp): SerializableGridColumns {
   if (rows.length < 1) {
@@ -189,11 +232,38 @@ export function inferColumns(rows: GridRowsProp): SerializableGridColumns {
 }
 
 export function parseColumns(columns: SerializableGridColumns): GridColumns {
-  return columns.map(({ type, ...column }) => ({
-    type: DEFAULT_TYPES.has(type) ? type : undefined,
-    ...column,
-    ...COLUMN_TYPES[type],
-  }));
+  return columns.map((column) => {
+    if (column.type === 'number' && column.numberFormat) {
+      switch (column.numberFormat.kind) {
+        case 'preset': {
+          const preset = NUMBER_FORMAT_PRESETS.get(column.numberFormat.preset);
+          const { format } = new Intl.NumberFormat(undefined, preset?.options);
+          return { ...column, valueFormatter: ({ value }) => format(value) };
+        }
+        case 'custom': {
+          const { format } = new Intl.NumberFormat(undefined, column.numberFormat.custom);
+          return { ...column, valueFormatter: ({ value }) => format(value) };
+        }
+        case 'currency': {
+          const userInput = column.numberFormat.currency || 'USD';
+          if (/[a-z]{3}/i.test(userInput)) {
+            const { format } = new Intl.NumberFormat(undefined, {
+              style: 'currency',
+              currency: userInput,
+            });
+            return { ...column, valueFormatter: ({ value }) => format(value) };
+          }
+          const { format } = new Intl.NumberFormat(undefined, {});
+          return { ...column, valueFormatter: ({ value }) => `${userInput} ${format(value)}` };
+        }
+        default: {
+          return column;
+        }
+      }
+    }
+
+    return column;
+  });
 }
 
 const EMPTY_ROWS: GridRowsProp = [];
@@ -218,6 +288,25 @@ interface ToolpadDataGridProps extends Omit<DataGridProProps, 'columns' | 'rows'
   hideToolbar?: boolean;
 }
 
+function ComponentErrorFallback({ error }: FallbackProps) {
+  return (
+    <Typography variant="overline" sx={{ color: 'error.main', fontSize: '10px' }}>
+      Code component error{' '}
+      <Tooltip title={error.message}>
+        <span>ℹ️</span>
+      </Tooltip>
+    </Typography>
+  );
+}
+
+function NoComponentSelected() {
+  return (
+    <Typography variant="overline" sx={{ color: 'error.main', fontSize: '10px' }}>
+      No component selected
+    </Typography>
+  );
+}
+
 const DataGridComponent = React.forwardRef(function DataGridComponent(
   {
     columns: columnsProp,
@@ -232,7 +321,33 @@ const DataGridComponent = React.forwardRef(function DataGridComponent(
   }: ToolpadDataGridProps,
   ref: React.ForwardedRef<HTMLDivElement>,
 ) {
+  const components = useComponents();
+
   const nodeRuntime = useNode<ToolpadDataGridProps>();
+  const columnTypes = React.useMemo(
+    () => ({
+      ...CUSTOM_COLUMN_TYPES,
+      codeComponent: {
+        renderCell: (params: GridRenderCellParams) => {
+          const { value, colDef, row, field } = params;
+          const column = colDef as SerializableGridColumn;
+
+          const Component = components[`codeComponent.${column.codeComponent}`];
+
+          if (!Component) {
+            return <NoComponentSelected />;
+          }
+
+          return (
+            <ErrorBoundary FallbackComponent={ComponentErrorFallback}>
+              <Component value={value} row={row} field={field} />
+            </ErrorBoundary>
+          );
+        },
+      },
+    }),
+    [components],
+  );
 
   const handleResize = React.useMemo(
     () =>
@@ -345,9 +460,7 @@ const DataGridComponent = React.forwardRef(function DataGridComponent(
   );
 
   const getRowHeight = React.useMemo(() => {
-    const hasImageColumns = columns.some(
-      ({ customType }: ToolpadGridColDef) => customType === 'image',
-    );
+    const hasImageColumns = columns.some(({ type }) => type === 'image');
     return hasImageColumns ? () => 'auto' : undefined;
   }, [columns]);
 
@@ -368,6 +481,7 @@ const DataGridComponent = React.forwardRef(function DataGridComponent(
         onSelectionModelChange={onSelectionModelChange}
         selectionModel={selectionModel}
         error={errorProp}
+        columnTypes={columnTypes}
         componentsProps={{
           errorOverlay: {
             message: typeof errorProp === 'string' ? errorProp : errorProp?.message,
@@ -381,29 +495,38 @@ const DataGridComponent = React.forwardRef(function DataGridComponent(
 });
 
 export default createComponent(DataGridComponent, {
+  helperText:
+    'The MUI X [Data grid](https://mui.com/x/react-data-grid/) component.\n\nThe datagrid lets users display tabular data in a flexible grid.',
   errorProp: 'error',
   loadingPropSource: ['rows', 'columns'],
   loadingProp: 'loading',
   resizableHeightProp: 'height',
   argTypes: {
     rows: {
+      helperText: 'The data to be displayed as rows. Must be an array of objects.',
       typeDef: { type: 'array', schema: '/schemas/DataGridRows.json' },
     },
     columns: {
+      helperText: '',
       typeDef: { type: 'array', schema: '/schemas/DataGridColumns.json' },
       control: { type: 'GridColumns' },
     },
     rowIdField: {
+      helperText:
+        'Defines which column contains the [id](https://mui.com/x/react-data-grid/row-definition/#row-identifier) that uniquely identifies each row.',
       typeDef: { type: 'string' },
       control: { type: 'RowIdFieldSelect' },
       label: 'Id field',
     },
     selection: {
+      helperText: 'The currently selected row. Or `null` in case no row has been selected.',
       typeDef: { type: 'object' },
       onChangeProp: 'onSelectionChange',
       defaultValue: null,
     },
     density: {
+      helperText:
+        'The [density](https://mui.com/x/react-data-grid/accessibility/#density-prop) of the rows. Possible values are `compact`, `standard`, or `comfortable`.',
       typeDef: { type: 'string', enum: ['compact', 'standard', 'comfortable'] },
       defaultValue: 'compact',
     },
@@ -412,12 +535,16 @@ export default createComponent(DataGridComponent, {
       defaultValue: 350,
     },
     loading: {
+      helperText:
+        "Displays a loading animation indicating the datagrid isn't ready to present data yet.",
       typeDef: { type: 'boolean' },
     },
     hideToolbar: {
+      helperText: 'Hide the toolbar area that contains the data grid user controls.',
       typeDef: { type: 'boolean' },
     },
     sx: {
+      helperText: SX_PROP_HELPER_TEXT,
       typeDef: { type: 'object' },
     },
     onDelete: {

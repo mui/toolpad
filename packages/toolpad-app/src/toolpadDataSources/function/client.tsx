@@ -28,8 +28,6 @@ import lazyComponent from '../../utils/lazyComponent';
 import ParametersEditor from '../../toolpad/AppEditor/PageEditor/ParametersEditor';
 import SplitPane from '../../components/SplitPane';
 import { usePrivateQuery } from '../context';
-import JsonView from '../../components/JsonView';
-import ErrorAlert from '../../toolpad/AppEditor/PageEditor/ErrorAlert';
 import { LogEntry } from '../../components/Console';
 import MapEntriesEditor from '../../components/MapEntriesEditor';
 import { Maybe } from '../../utils/types';
@@ -46,6 +44,8 @@ import { MOVIES_API_DEMO_URL } from '../demo';
 import * as appDom from '../../appDom';
 import { clientExec } from './runtime';
 import config from '../../config';
+import QueryPreview from '../QueryPreview';
+import JsonView from '../../components/JsonView';
 
 const EVENT_INTERFACE_IDENTIFIER = 'ToolpadFunctionEvent';
 
@@ -121,6 +121,7 @@ const EMPTY_PARAMS: BindableAttrEntries = [];
 
 function QueryEditor({
   globalScope,
+  globalScopeMeta,
   value: input,
   onChange: setInput,
   onCommit,
@@ -163,17 +164,16 @@ function QueryEditor({
 
   const [previewLogs, setPreviewLogs] = React.useState<LogEntry[]>([]);
   const [previewHar, setPreviewHar] = React.useState(() => createHarLog());
-  const { preview, runPreview: handleRunPreview } = useQueryPreview(
-    fetchPreview,
-    input.attributes.query.value,
-    previewParams,
-    {
-      onPreview(result) {
-        setPreviewLogs((existing) => [...existing, ...result.logs]);
-        setPreviewHar((existing) => mergeHar(createHarLog(), existing, result.har));
-      },
+  const {
+    preview,
+    runPreview: handleRunPreview,
+    isLoading: previewIsLoading,
+  } = useQueryPreview(fetchPreview, input.attributes.query.value, previewParams, {
+    onPreview(result) {
+      setPreviewLogs((existing) => [...existing, ...result.logs]);
+      setPreviewHar((existing) => mergeHar(createHarLog(), existing, result.har));
     },
-  );
+  });
 
   const { data: secretsKeys = [] } = usePrivateQuery<FunctionPrivateQuery, string[]>({
     kind: 'secretsKeys',
@@ -234,6 +234,7 @@ function QueryEditor({
           <Box sx={{ flex: 1, minHeight: 0 }}>
             <TypescriptEditor
               value={input.attributes.query.value.module}
+              data-testid="function editor"
               onChange={(newValue) => {
                 setInput((existing) => appDom.setQueryProp(existing, 'module', newValue));
               }}
@@ -248,18 +249,16 @@ function QueryEditor({
             value={paramsEntries}
             onChange={handleParamsChange}
             globalScope={globalScope}
+            globalScopeMeta={globalScopeMeta}
             liveValue={paramsEditorLiveValue}
           />
         </Box>
       </SplitPane>
 
       <SplitPane split="horizontal" size="30%" minSize={30} primary="second" allowResize>
-        {preview?.error ? (
-          <ErrorAlert error={preview?.error} />
-        ) : (
+        <QueryPreview isLoading={previewIsLoading} error={preview?.error}>
           <JsonView sx={{ height: '100%' }} copyToClipboard src={preview?.data} />
-        )}
-
+        </QueryPreview>
         <Devtools
           sx={{ width: '100%', height: '100%' }}
           log={previewLogs}

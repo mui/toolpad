@@ -1,5 +1,10 @@
 import * as React from 'react';
-import { BindableAttrEntries, BindableAttrValue, LiveBinding } from '@mui/toolpad-core';
+import {
+  BindableAttrEntries,
+  BindableAttrValue,
+  GlobalScopeMeta,
+  LiveBinding,
+} from '@mui/toolpad-core';
 import {
   Box,
   Button,
@@ -41,7 +46,7 @@ import {
   useEvaluateLiveBindingEntries,
 } from '../../toolpad/AppEditor/useEvaluateLiveBinding';
 import MapEntriesEditor from '../../components/MapEntriesEditor';
-import { Maybe, GlobalScopeMeta } from '../../utils/types';
+import { Maybe } from '../../utils/types';
 import AuthenticationEditor from './AuthenticationEditor';
 import { isSaveDisabled, validation } from '../../utils/forms';
 import * as appDom from '../../appDom';
@@ -49,7 +54,6 @@ import ParametersEditor from '../../toolpad/AppEditor/PageEditor/ParametersEdito
 import BodyEditor from './BodyEditor';
 import TabPanel from '../../components/TabPanel';
 import SplitPane from '../../components/SplitPane';
-import ErrorAlert from '../../toolpad/AppEditor/PageEditor/ErrorAlert';
 import JsonView from '../../components/JsonView';
 import useQueryPreview from '../useQueryPreview';
 import TransformInput from '../TranformInput';
@@ -59,10 +63,11 @@ import config from '../../config';
 import QueryInputPanel from '../QueryInputPanel';
 import useFetchPrivate from '../useFetchPrivate';
 import { clientExec } from './runtime';
+import QueryPreview from '../QueryPreview';
 
 const HTTP_METHODS = ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'HEAD'];
 
-const GLOBAL_SCOPE_META: GlobalScopeMeta = {
+const QUERY_SCOPE_META: GlobalScopeMeta = {
   query: {
     deprecated: 'Use parameters variable instead',
     description: 'Parameters that can be bound to app scope variables',
@@ -256,6 +261,7 @@ const EMPTY_PARAMS: BindableAttrEntries = [];
 
 function QueryEditor({
   globalScope,
+  globalScopeMeta,
   connectionParams: rawConnectionParams,
   value: input,
   onChange: setInput,
@@ -354,11 +360,14 @@ function QueryEditor({
     [paramsEditorLiveValue],
   );
 
-  const queryScope = {
-    // TODO mark query as @deprecated remove after v1
-    query: previewParams,
-    parameters: previewParams,
-  };
+  const queryScope = React.useMemo(
+    () => ({
+      // TODO mark query as @deprecated remove after v1
+      query: previewParams,
+      parameters: previewParams,
+    }),
+    [previewParams],
+  );
 
   const liveUrl: LiveBinding = useEvaluateLiveBinding({
     server: true,
@@ -391,18 +400,17 @@ function QueryEditor({
     clientExec(query, params, fetchServerPreview);
 
   const [previewHar, setPreviewHar] = React.useState(() => createHarLog());
-  const { preview, runPreview: handleRunPreview } = useQueryPreview(
-    fetchPreview,
-    input.attributes.query.value,
-    previewParams,
-    {
-      onPreview(result) {
-        setPreviewHar((existing) =>
-          result.har ? mergeHar(createHarLog(), existing, result.har) : existing,
-        );
-      },
+  const {
+    preview,
+    runPreview: handleRunPreview,
+    isLoading: previewIsLoading,
+  } = useQueryPreview(fetchPreview, input.attributes.query.value, previewParams, {
+    onPreview(result) {
+      setPreviewHar((existing) =>
+        result.har ? mergeHar(createHarLog(), existing, result.har) : existing,
+      );
     },
-  );
+  });
 
   const handleHarClear = React.useCallback(() => setPreviewHar(createHarLog()), []);
 
@@ -448,7 +456,7 @@ function QueryEditor({
               <BindableEditor
                 liveBinding={liveUrl}
                 globalScope={queryScope}
-                globalScopeMeta={GLOBAL_SCOPE_META}
+                globalScopeMeta={QUERY_SCOPE_META}
                 sx={{ flex: 1 }}
                 server
                 label="url"
@@ -474,14 +482,16 @@ function QueryEditor({
                     value={input.attributes.query.value.searchParams ?? []}
                     onChange={handleSearchParamsChange}
                     globalScope={queryScope}
+                    globalScopeMeta={QUERY_SCOPE_META}
                     liveValue={liveSearchParams}
                   />
                 </TabPanel>
                 <TabPanel disableGutters value="body">
                   <BodyEditor
-                    globalScope={queryScope}
                     value={input.attributes.query.value.body}
                     onChange={handleBodyChange}
+                    globalScope={queryScope}
+                    globalScopeMeta={QUERY_SCOPE_META}
                     method={input.attributes.query.value.method || 'GET'}
                   />
                 </TabPanel>
@@ -490,6 +500,7 @@ function QueryEditor({
                     value={input.attributes.query.value.headers ?? []}
                     onChange={handleHeadersChange}
                     globalScope={queryScope}
+                    globalScopeMeta={QUERY_SCOPE_META}
                     liveValue={liveHeaders}
                   />
                 </TabPanel>
@@ -532,6 +543,7 @@ function QueryEditor({
             value={paramsEntries}
             onChange={handleParamsChange}
             globalScope={globalScope}
+            globalScopeMeta={globalScopeMeta}
             liveValue={paramsEditorLiveValue}
           />
         </Box>
@@ -545,11 +557,9 @@ function QueryEditor({
         allowResize
         pane1Style={{ overflow: 'auto' }}
       >
-        {preview?.error ? (
-          <ErrorAlert error={preview?.error} />
-        ) : (
+        <QueryPreview isLoading={previewIsLoading} error={preview?.error}>
           <ResolvedPreview preview={preview} onShowTransform={() => setActiveTab('transform')} />
-        )}
+        </QueryPreview>
         <Devtools
           sx={{ width: '100%', height: '100%' }}
           har={previewHar}

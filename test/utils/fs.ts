@@ -1,6 +1,8 @@
 import * as fs from 'fs/promises';
 
-export async function readJsonFile(path: string): Promise<any> {
+export type Reviver = NonNullable<Parameters<typeof JSON.parse>[1]>;
+
+export async function readJsonFile(path: string, reviver?: Reviver): Promise<any> {
   const content = await fs.readFile(path, { encoding: 'utf-8' });
-  return JSON.parse(content);
+  return JSON.parse(content, reviver);
 }

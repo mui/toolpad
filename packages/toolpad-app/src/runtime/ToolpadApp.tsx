@@ -19,7 +19,9 @@ import {
   NodeId,
   BindableAttrValue,
   NestedBindableAttrs,
+  GlobalScopeMeta,
 } from '@mui/toolpad-core';
+import { createProvidedContext } from '@mui/toolpad-core/utils/react';
 import { QueryClient, QueryClientProvider, useMutation } from '@tanstack/react-query';
 import {
   BrowserRouter,
@@ -41,7 +43,6 @@ import * as _ from 'lodash-es';
 import ErrorIcon from '@mui/icons-material/Error';
 import * as appDom from '../appDom';
 import { RuntimeState, VersionOrPreview } from '../types';
-import { createProvidedContext } from '../utils/react';
 import {
   getElementNodeComponentId,
   isPageLayoutComponent,
@@ -68,6 +69,7 @@ import { execDataSourceQuery, useDataQuery, UseDataQueryConfig, UseFetch } from 
 import { useAppContext, AppContextProvider } from './AppContext';
 import { CanvasHooksContext, NavigateToPage } from './CanvasHooksContext';
 import useBoolean from '../utils/useBoolean';
+import { errorFrom } from '../utils/errors';
 
 const ReactQueryDevtoolsProduction = React.lazy(() =>
   import('@tanstack/react-query-devtools/build/lib/index.prod.js').then((d) => ({
@@ -209,10 +211,11 @@ function RenderedNodeContent({ node, childNodeGroups, Component }: RenderedNodeC
       const binding = liveBindings[bindingId];
       if (binding) {
         hookResult[propName] = binding.value;
-        error = error || binding.error;
 
         if (binding.loading && loadingPropSourceSet.has(propName)) {
           loading = true;
+        } else {
+          error = error || binding.error;
         }
       }
 
@@ -225,7 +228,7 @@ function RenderedNodeContent({ node, childNodeGroups, Component }: RenderedNodeC
       if (errorProp) {
         hookResult[errorProp] = error;
       } else {
-        console.error(error);
+        console.error(errorFrom(error));
       }
     }
 
@@ -263,6 +266,7 @@ function RenderedNodeContent({ node, childNodeGroups, Component }: RenderedNodeC
 
         const handler = (param: any) => {
           const bindingId = `${nodeId}.props.${key}`;
+
           const value = argType.onChangeHandler ? argType.onChangeHandler(param) : param;
           setControlledBinding(bindingId, { value });
         };
@@ -329,6 +333,24 @@ function RenderedNodeContent({ node, childNodeGroups, Component }: RenderedNodeC
       ...reactChildren,
     };
   }, [boundProps, eventHandlers, layoutElementProps, onChangeHandlers, reactChildren]);
+
+  const previousProps = React.useRef<Record<string, any>>(props);
+  React.useEffect(() => {
+    Object.entries(argTypes).forEach(([key, argType]) => {
+      if (!argType?.defaultValueProp) {
+        return;
+      }
+
+      if (previousProps.current[argType.defaultValueProp] === props[argType.defaultValueProp]) {
+        return;
+      }
+
+      const bindingIdToUpdate = `${nodeId}.props.${key}`;
+      setControlledBinding(bindingIdToUpdate, { value: props[argType.defaultValueProp] });
+    });
+
+    previousProps.current = props;
+  }, [props, argTypes, nodeId, setControlledBinding]);
 
   // Wrap with slots
   for (const [propName, argType] of Object.entries(argTypes)) {
@@ -585,21 +607,6 @@ function parseBinding(bindable: BindableAttrValue<any>, { scopePath }: ParseBind
   };
 }
 
-function parsedBindingEqual(
-  binding1: ParsedBinding | undefined,
-  binding2: ParsedBinding | undefined,
-): boolean {
-  if (
-    (!binding1 && !binding2) ||
-    (binding1?.expression === binding2?.expression &&
-      binding1?.result?.value === binding2?.result?.value &&
-      binding1?.initializer === binding2?.initializer)
-  ) {
-    return true;
-  }
-  return false;
-}
-
 function parseBindings(
   dom: appDom.AppDom,
   page: appDom.PageNode,
@@ -610,6 +617,7 @@ function parseBindings(
 
   const parsedBindingsMap = new Map<string, ParsedBinding>();
   const controlled = new Set<string>();
+  const globalScopeMeta: GlobalScopeMeta = {};
 
   for (const elm of elements) {
     if (appDom.isElement<any>(elm)) {
@@ -627,8 +635,16 @@ function parseBindings(
           elm.props?.[propName] || appDom.createConst(argType?.defaultValue ?? undefined);
 
         const bindingId = `${elm.id}.props.${propName}`;
-        const scopePath =
-          componentId === PAGE_ROW_COMPONENT_ID ? undefined : `${elm.name}.${propName}`;
+
+        let scopePath: string | undefined;
+        if (componentId !== PAGE_ROW_COMPONENT_ID) {
+          scopePath = `${elm.name}.${propName}`;
+          globalScopeMeta[elm.name] = {
+            kind: 'element',
+            componentId,
+          };
+        }
+
         if (argType) {
           if (argType.onChangeProp) {
             controlled.add(bindingId);
@@ -654,6 +670,10 @@ function parseBindings(
     }
 
     if (appDom.isQuery(elm)) {
+      globalScopeMeta[elm.name] = {
+        kind: 'query',
+      };
+
       if (elm.params) {
         const nestedBindablePaths = flattenNestedBindables(Object.fromEntries(elm.params ?? []));
 
@@ -719,6 +739,7 @@ function parseBindings(
 
   const urlParams = new URLSearchParams(location.search);
   const pageParameters = page.attributes.parameters?.value || [];
+
   for (const [paramName, paramDefault] of pageParameters) {
     const bindingId = `${page.id}.parameters.${paramName}`;
     const scopePath = `page.parameters.${paramName}`;
@@ -730,7 +751,7 @@ function parseBindings(
 
   const parsedBindings: Record<string, ParsedBinding> = Object.fromEntries(parsedBindingsMap);
 
-  return { parsedBindings, controlled };
+  return { parsedBindings, controlled, globalScopeMeta };
 }
 
 function RenderedPage({ nodeId }: RenderedNodeProps) {
@@ -743,7 +764,7 @@ function RenderedPage({ nodeId }: RenderedNodeProps) {
   const location = useLocation();
   const components = useComponents();
 
-  const { parsedBindings, controlled } = React.useMemo(
+  const { parsedBindings, controlled, globalScopeMeta } = React.useMemo(
     () => parseBindings(dom, page, components, location),
     [components, dom, location, page],
   );
@@ -765,23 +786,7 @@ function RenderedPage({ nodeId }: RenderedNodeProps) {
       // Make sure to patch page bindings after dom nodes have been added or removed
       const updated: Record<string, ParsedBinding> = {};
       for (const [key, binding] of Object.entries(parsedBindings)) {
-        let shouldUpdateBinding = false;
-
-        if (controlled.has(key)) {
-          // controlled bindings don't get updated, unless their initialValue has changed
-          if (binding.initializer) {
-            const initializer: ParsedBinding | undefined = parsedBindings[binding.initializer];
-            const existingInitializer: ParsedBinding | undefined =
-              existingBindings[binding.initializer];
-            if (!parsedBindingEqual(initializer, existingInitializer)) {
-              shouldUpdateBinding = true;
-            }
-          }
-        } else {
-          shouldUpdateBinding = true;
-        }
-
-        updated[key] = shouldUpdateBinding ? binding : existingBindings[key] || binding;
+        updated[key] = controlled.has(key) ? existingBindings[key] || binding : binding;
       }
       return updated;
     });
@@ -816,6 +821,7 @@ function RenderedPage({ nodeId }: RenderedNodeProps) {
     () => buildGlobalScope(globalScope, evaluatedBindings),
     [evaluatedBindings, globalScope],
   );
+
   const liveBindings: Record<string, BindingEvaluationResult> = React.useMemo(
     () => mapValues(evaluatedBindings, (binding) => binding.result || { value: undefined }),
     [evaluatedBindings],
@@ -827,8 +833,8 @@ function RenderedPage({ nodeId }: RenderedNodeProps) {
   );
 
   React.useEffect(() => {
-    fireEvent({ type: 'pageStateUpdated', pageState });
-  }, [pageState]);
+    fireEvent({ type: 'pageStateUpdated', pageState, globalScopeMeta });
+  }, [pageState, globalScopeMeta]);
 
   React.useEffect(() => {
     fireEvent({ type: 'pageBindingsUpdated', bindings: liveBindings });

@@ -2,20 +2,17 @@ import * as React from 'react';
 import * as builtIns from '@mui/toolpad-components';
 import {
   ToolpadComponent,
-  ToolpadComponents,
   TOOLPAD_COMPONENT,
   createComponent,
+  ComponentsContextProvider,
+  useComponents,
 } from '@mui/toolpad-core';
 import * as ReactIs from 'react-is';
 import * as appDom from '../appDom';
 import { getToolpadComponents } from '../toolpadComponents';
 import { ensureToolpadComponent } from './loadCodeComponent';
-import { createProvidedContext } from '../utils/react';
 import { hasOwnProperty } from '../utils/collections';
 import { useAppModules } from './AppModulesProvider';
-
-const [useComponents, ComponentsContextProvider] =
-  createProvidedContext<ToolpadComponents>('Components');
 
 function createToolpadComponentThatThrows(error: Error) {
   return createComponent(() => {

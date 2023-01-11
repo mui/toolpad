@@ -103,6 +103,11 @@ export class ToolpadEditor {
     await Promise.all([this.createPageDialog.createButton.click(), this.page.waitForNavigation()]);
   }
 
+  async goToPage(name: string) {
+    await this.explorer.getByText(name).click();
+    this.page.waitForNavigation();
+  }
+
   async createComponent(name: string) {
     await this.createComponentBtn.click();
     await this.createComponentDialog.nameInput.fill(name);
@@ -185,6 +190,9 @@ export class ToolpadEditor {
   async dragNewComponentToAppCanvas(componentName: string) {
     await this.componentCatalog.hover();
 
+    // Account for opening transition
+    await this.page.waitForTimeout(200);
+
     const sourceSelector = `data-testid=component-catalog >> div:has-text("${componentName}")[draggable]`;
 
     const targetBoundingBox = await this.pageRoot.boundingBox();
@@ -197,15 +205,11 @@ export class ToolpadEditor {
   }
 
   hierarchyItem(group: string, name: string): Locator {
-    return (
-      this.explorer
-        // @ts-expect-error https://github.com/microsoft/playwright/pull/17952
-        .getByRole('treeitem')
-        .filter({ hasText: group })
-        // @ts-expect-error https://github.com/microsoft/playwright/pull/17952
-        .getByRole('treeitem')
-        .filter({ hasText: name })
-    );
+    return this.explorer
+      .getByRole('treeitem')
+      .filter({ hasText: group })
+      .getByRole('treeitem')
+      .filter({ hasText: name });
   }
 
   async openHierarchyMenu(group: string, name: string) {

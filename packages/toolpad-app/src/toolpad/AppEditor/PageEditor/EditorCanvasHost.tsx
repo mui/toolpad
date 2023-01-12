@@ -8,14 +8,11 @@ import invariant from 'invariant';
 import * as appDom from '../../../appDom';
 import { HTML_ID_EDITOR_OVERLAY } from '../../../constants';
 import { NodeHashes } from '../../../types';
-import { ToolpadBridge } from '../../../canvas';
 import useEvent from '../../../utils/useEvent';
 import { LogEntry } from '../../../components/Console';
-import { Maybe } from '../../../utils/types';
 import { useDomApi } from '../../DomLoader';
 import createRuntimeState from '../../../createRuntimeState';
-
-type IframeContentWindow = Window & typeof globalThis;
+import { ToolpadBridge, TOOLPAD_BRIDGE_GLOBAL } from '../../../canvas/ToolpadBridge';
 
 interface OverlayProps {
   children?: React.ReactNode;
@@ -76,50 +73,21 @@ export default function EditorCanvasHost({
 
   const [bridge, setBridge] = React.useState<ToolpadBridge | null>(null);
 
-  const updateOnBridge = React.useCallback(
-    async (bridgeInstance: ToolpadBridge) => {
+  const updateOnBridge = React.useCallback(() => {
+    if (bridge) {
       const data = createRuntimeState({ appId, dom });
-      bridgeInstance.update({ ...data, savedNodes });
-    },
-    [appId, dom, savedNodes],
-  );
+      bridge.canvasCommands.update({ ...data, savedNodes });
+    }
+  }, [appId, bridge, dom, savedNodes]);
 
   React.useEffect(() => {
-    if (bridge) {
-      // Update every time dom prop updates
-      updateOnBridge(bridge);
-    }
-  }, [updateOnBridge, bridge]);
-
-  const handleInit = useEvent((newBridge: ToolpadBridge) => {
-    setBridge(newBridge);
-    onInit?.(newBridge);
-    updateOnBridge(newBridge);
-  });
+    updateOnBridge();
+  }, [updateOnBridge]);
 
   const onConsoleEntryRef = React.useRef(onConsoleEntry);
   React.useLayoutEffect(() => {
     onConsoleEntryRef.current = onConsoleEntry;
   });
-
-  React.useEffect(() => {
-    const frameWindow = frameRef.current?.contentWindow as Maybe<IframeContentWindow>;
-    invariant(frameWindow, 'Iframe ref not attached');
-
-    // eslint-disable-next-line no-underscore-dangle
-    if (typeof frameWindow.__TOOLPAD_BRIDGE__ === 'object') {
-      // eslint-disable-next-line no-underscore-dangle
-      handleInit(frameWindow.__TOOLPAD_BRIDGE__);
-      // eslint-disable-next-line no-underscore-dangle
-      frameWindow.__TOOLPAD_BRIDGE__ = 'consumed';
-      // eslint-disable-next-line no-underscore-dangle
-    } else if (typeof frameWindow.__TOOLPAD_BRIDGE__ === 'undefined') {
-      // eslint-disable-next-line no-underscore-dangle
-      frameWindow.__TOOLPAD_BRIDGE__ = (newBridge: ToolpadBridge) => {
-        handleInit(newBridge);
-      };
-    }
-  }, [handleInit]);
 
   const [contentWindow, setContentWindow] = React.useState<Window | null>(null);
   const [editorOverlayRoot, setEditorOverlayRoot] = React.useState<HTMLElement | null>(null);
@@ -142,10 +110,19 @@ export default function EditorCanvasHost({
     [domApi],
   );
 
-  const handleFrameLoad = React.useCallback(() => {
-    invariant(frameRef.current, 'Iframe ref not attached');
+  const handleInit = useEvent(onInit ?? (() => {}));
 
-    const iframeWindow = frameRef.current.contentWindow;
+  const handleFrameLoad = React.useCallback(() => {
+    const iframeWindow = frameRef.current?.contentWindow;
+    invariant(iframeWindow, 'Iframe ref not attached');
+
+    const bridgeInstance = iframeWindow?.[TOOLPAD_BRIDGE_GLOBAL];
+    invariant(bridgeInstance, 'Bridge not set');
+    bridgeInstance?.canvasEvents.on('ready', () => {
+      setBridge(bridgeInstance);
+      handleInit(bridgeInstance);
+    });
+
     setContentWindow(iframeWindow);
 
     if (!iframeWindow) {
@@ -156,7 +133,7 @@ export default function EditorCanvasHost({
     iframeWindow?.addEventListener('unload', () => {
       iframeWindow?.removeEventListener('keydown', keyDownHandler);
     });
-  }, [keyDownHandler]);
+  }, [handleInit, keyDownHandler]);
 
   React.useEffect(() => {
     if (!contentWindow) {

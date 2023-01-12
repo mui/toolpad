@@ -255,6 +255,7 @@ export type RuntimeEvents = {
     bindings: LiveBindings;
   };
   screenUpdate: {};
+  ready: {};
   pageNavigationRequest: { pageNodeId: NodeId };
 };
 

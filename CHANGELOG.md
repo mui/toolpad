@@ -1,5 +1,30 @@
 # Changelog
 
+## 0.0.35
+
+<!-- generated comparing v0.0.34..master -->
+
+_Jan 11, 2023_
+
+A big thanks to the 4 contributors who made this release possible. Here are some highlights ✨:
+
+Custom column types, add search to apps overview, add inline tooltips to components and properties, component library tweaks.
+
+- &#8203;<!-- 12 -->Fix templates after dog API changed (#1544) @Janpot
+- &#8203;<!-- 11 -->Reorganize shared utils (#1539) @Janpot
+- &#8203;<!-- 10 -->Remove obsolete dom reducer actions (#1541) @Janpot
+- &#8203;<!-- 09 -->Some component library tweaks (#1526) @Janpot
+- &#8203;<!-- 08 -->Pin react-router-dom instead of resolutions (#1519) @Janpot
+- &#8203;<!-- 07 -->Update README.md @prakhargupta1
+- &#8203;<!-- 06 -->Add inline documentation to components and properties (#1518) @Janpot
+- &#8203;<!-- 05 -->Correct types in Datepicker (#1517) @Janpot
+- &#8203;<!-- 04 -->Promote previously experimental config (#1515) @Janpot
+- &#8203;<!-- 03 -->Add search to the apps overview (#1402) @bharatkashyap
+- &#8203;<!-- 02 -->Custom column types (#1462) @bytasv
+- &#8203;<!-- 01 -->Restructure installation docs (#1511) @Janpot
+
+All contributors of this release in alphabetical order: @bharatkashyap, @bytasv, @Janpot, @prakhargupta1
+
 ## 0.0.34
 
 <!-- generated comparing v0.0.33..master -->

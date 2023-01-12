@@ -39,7 +39,7 @@ export const JsRuntimeProvider = React.lazy(async () => {
   return { default: Context };
 });
 
-function useJsRuntime(): QuickJSRuntime {
+function useQuickJsRuntime(): QuickJSRuntime {
   const runtime = React.useContext(JsRuntimeContext);
 
   if (!runtime) {
@@ -173,7 +173,7 @@ export async function createServerJsRuntime(): Promise<JsRuntime> {
 }
 
 export function useServerJsRuntime(): JsRuntime {
-  const quickJs = useJsRuntime();
+  const quickJs = useQuickJsRuntime();
   const ctx = quickJs.newContext();
   return React.useMemo(
     () => ({

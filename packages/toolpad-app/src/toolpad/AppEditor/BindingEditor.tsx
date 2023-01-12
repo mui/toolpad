@@ -108,8 +108,6 @@ interface JsExpressionPreviewProps {
 function JsExpressionPreview({ jsRuntime, input, globalScope }: JsExpressionPreviewProps) {
   const previewValue: LiveBinding = useEvaluateLiveBinding({ jsRuntime, input, globalScope });
 
-  console.log(previewValue);
-
   const lastGoodPreview = useLatest(previewValue?.error ? undefined : previewValue);
   const previewErrorDebounced = useDebounced(previewValue?.error, 500);
   const previewError = previewValue?.error && previewErrorDebounced;

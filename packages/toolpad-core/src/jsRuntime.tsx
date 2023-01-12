@@ -106,7 +106,7 @@ export function useBrowserJsRuntime(): JsRuntime {
   );
 }
 
-export function newSerializable(ctx: QuickJSContext, json: unknown): QuickJSHandle {
+function newSerializable(ctx: QuickJSContext, json: unknown): QuickJSHandle {
   switch (typeof json) {
     case 'string':
       return ctx.newString(json);
@@ -150,7 +150,7 @@ export function newSerializable(ctx: QuickJSContext, json: unknown): QuickJSHand
   }
 }
 
-export function evalExpressionInContext(
+function evalExpressionInContext(
   ctx: QuickJSContext,
   expression: string,
   globalScope: Record<string, unknown> = {},

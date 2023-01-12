@@ -345,7 +345,7 @@ export type ExecFetchResult<T = any> = {
 };
 
 export interface GlobalScopeNodeState {
-  item: IteratorItem;
+  item?: IteratorItem;
 }
 
 export type IteratorItem = Record<string, unknown>;

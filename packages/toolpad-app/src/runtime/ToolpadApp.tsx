@@ -20,11 +20,10 @@ import {
   BindableAttrValue,
   NestedBindableAttrs,
   GlobalScopeMeta,
-  DEFAULT_GLOBAL_SCOPE_NODE_STATE,
   IteratorItem,
   IteratorItemRenderer,
-  GlobalScopeNodeState,
   ElementIteratorValueType,
+  GlobalScopeNodeState,
 } from '@mui/toolpad-core';
 import { createProvidedContext } from '@mui/toolpad-core/utils/react';
 import { QueryClient, QueryClientProvider, useMutation } from '@tanstack/react-query';
@@ -63,7 +62,7 @@ import evalJsBindings, {
   ParsedBinding,
 } from './evalJsBindings';
 import { HTML_ID_EDITOR_OVERLAY } from '../constants';
-import { mapProperties, mapValues } from '../utils/collections';
+import { filterValues, mapProperties, mapValues } from '../utils/collections';
 import usePageTitle from '../utils/usePageTitle';
 import ComponentsContext, { useComponents, useComponent } from './ComponentsContext';
 import { AppModulesProvider, useAppModules } from './AppModulesProvider';
@@ -75,6 +74,11 @@ import { useAppContext, AppContextProvider } from './AppContext';
 import { CanvasHooksContext, NavigateToPage } from './CanvasHooksContext';
 import useBoolean from '../utils/useBoolean';
 import { errorFrom } from '../utils/errors';
+import {
+  getElementIteratorBindingId,
+  getElementIteratorScopePath,
+  getFirstElementIteratorAncestorItems,
+} from '../toolpadComponents/elementIterator';
 
 const ReactQueryDevtoolsProduction = React.lazy(() =>
   import('@tanstack/react-query-devtools/build/lib/index.prod.js').then((d) => ({
@@ -141,8 +145,9 @@ const [useSetControlledBindingContext, SetControlledBindingContextProvider] =
     'SetControlledBinding',
   );
 
-const [useIteratorItemContext, IteratorItemContextProvider] =
-  createProvidedContext<IteratorItem>('IteratorItem');
+const [useIteratorItemContext, IteratorItemContextProvider] = createProvidedContext<{
+  item: IteratorItem | null;
+}>('IteratorItem');
 
 function getComponentId(elm: appDom.ElementNode): string {
   const componentId = getElementNodeComponentId(elm);
@@ -200,11 +205,11 @@ function RenderedNodeContent({ node, childNodeGroups, Component }: RenderedNodeC
 
   const nodeId = node.id;
 
-  const iteratorItem = useIteratorItemContext();
+  const { item: iteratorItem } = useIteratorItemContext();
 
   const globalScopeNodeState = React.useMemo<GlobalScopeNodeState>(
-    () => ({ item: iteratorItem }),
-    [iteratorItem],
+    () => (iteratorItem ? { [getElementIteratorScopePath(node)]: iteratorItem } : {}),
+    [iteratorItem, node],
   );
 
   const componentConfig = Component[TOOLPAD_COMPONENT];
@@ -218,6 +223,7 @@ function RenderedNodeContent({ node, childNodeGroups, Component }: RenderedNodeC
     () => getBindings(globalScopeNodeState),
     [getBindings, globalScopeNodeState],
   );
+
   const boundProps: Record<string, any> = React.useMemo(() => {
     const loadingPropSourceSet = new Set(loadingPropSource);
     const hookResult: Record<string, any> = {};
@@ -373,7 +379,7 @@ function RenderedNodeContent({ node, childNodeGroups, Component }: RenderedNodeC
     previousProps.current = props;
   }, [props, argTypes, nodeId, setControlledBinding]);
 
-  // Wrap with slots
+  // Wrap element props
   for (const [propName, argType] of Object.entries(argTypes)) {
     const isElement = argType?.typeDef.type === 'element';
     const isElementIterator = argType?.typeDef.type === 'elementIterator';
@@ -396,7 +402,7 @@ function RenderedNodeContent({ node, childNodeGroups, Component }: RenderedNodeC
         ? (itemRenderer: IteratorItemRenderer) =>
             (props[(argType.typeDef as ElementIteratorValueType).itemsProp] as IteratorItem[]).map(
               (item, index) => (
-                <IteratorItemContextProvider key={index} value={item}>
+                <IteratorItemContextProvider key={index} value={{ item }}>
                   {itemRenderer(wrappedValue, item, index)}
                 </IteratorItemContextProvider>
               ),
@@ -707,6 +713,17 @@ function parseBindings(
           parsedBindingsMap.set(bindingId, parseBinding(binding, {}));
         }
       }
+
+      const firstIteratorAncestorItems = getFirstElementIteratorAncestorItems(dom, elm, components);
+      if (firstIteratorAncestorItems) {
+        const bindingId = getElementIteratorBindingId(elm);
+        parsedBindingsMap.set(
+          bindingId,
+          parseBinding(appDom.createConst(firstIteratorAncestorItems[0]), {
+            scopePath: getElementIteratorScopePath(elm),
+          }),
+        );
+      }
     }
 
     if (appDom.isQuery(elm)) {
@@ -853,11 +870,16 @@ function RenderedPage({ nodeId }: RenderedNodeProps) {
   const globalScope = (moduleEntry?.module as any)?.globalScope || EMPTY_OBJECT;
 
   const getEvaluatedBindings = React.useCallback(
-    (nodeState?: GlobalScopeNodeState) =>
-      evalJsBindings(pageBindings, {
+    (nodeState: GlobalScopeNodeState = {}) => {
+      const filteredPageBindings = filterValues(
+        pageBindings,
+        (binding) => !binding.scopePath || !Object.keys(nodeState).includes(binding.scopePath),
+      ) as Record<string, ParsedBinding>;
+      return evalJsBindings(filteredPageBindings, {
         ...globalScope,
-        ...(nodeState || DEFAULT_GLOBAL_SCOPE_NODE_STATE),
-      }),
+        ...nodeState,
+      });
+    },
     [globalScope, pageBindings],
   );
 
@@ -892,7 +914,7 @@ function RenderedPage({ nodeId }: RenderedNodeProps) {
     <BindingsContextProvider value={getBindings}>
       <SetControlledBindingContextProvider value={setControlledBinding}>
         <EvaluatePageExpressionProvider value={evaluatePageExpression}>
-          <IteratorItemContextProvider value={DEFAULT_GLOBAL_SCOPE_NODE_STATE.item}>
+          <IteratorItemContextProvider value={{ item: null }}>
             <RenderedNodeContent
               node={page}
               childNodeGroups={{ children }}

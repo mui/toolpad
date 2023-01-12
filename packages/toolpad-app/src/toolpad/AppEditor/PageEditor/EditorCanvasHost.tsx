@@ -92,23 +92,20 @@ export default function EditorCanvasHost({
   const [contentWindow, setContentWindow] = React.useState<Window | null>(null);
   const [editorOverlayRoot, setEditorOverlayRoot] = React.useState<HTMLElement | null>(null);
 
-  const keyDownHandler = React.useCallback(
-    (event: KeyboardEvent) => {
-      const isZ = event.key.toLowerCase() === 'z';
+  const handleKeyDown = useEvent((event: KeyboardEvent) => {
+    const isZ = event.key.toLowerCase() === 'z';
 
-      const undoShortcut = isZ && (event.metaKey || event.ctrlKey);
-      const redoShortcut = undoShortcut && event.shiftKey;
+    const undoShortcut = isZ && (event.metaKey || event.ctrlKey);
+    const redoShortcut = undoShortcut && event.shiftKey;
 
-      if (redoShortcut) {
-        event.preventDefault();
-        domApi.redo();
-      } else if (undoShortcut) {
-        event.preventDefault();
-        domApi.undo();
-      }
-    },
-    [domApi],
-  );
+    if (redoShortcut) {
+      event.preventDefault();
+      domApi.redo();
+    } else if (undoShortcut) {
+      event.preventDefault();
+      domApi.undo();
+    }
+  });
 
   const handleInit = useEvent(onInit ?? (() => {}));
 
@@ -129,11 +126,11 @@ export default function EditorCanvasHost({
       return;
     }
 
-    iframeWindow?.addEventListener('keydown', keyDownHandler);
+    iframeWindow?.addEventListener('keydown', handleKeyDown);
     iframeWindow?.addEventListener('unload', () => {
-      iframeWindow?.removeEventListener('keydown', keyDownHandler);
+      iframeWindow?.removeEventListener('keydown', handleKeyDown);
     });
-  }, [handleInit, keyDownHandler]);
+  }, [handleInit, handleKeyDown]);
 
   React.useEffect(() => {
     if (!contentWindow) {

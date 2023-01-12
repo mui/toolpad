@@ -1,6 +1,13 @@
-import { getQuickJS, RuntimeOptions, QuickJSRuntime } from 'quickjs-emscripten';
+import invariant from 'invariant';
+import {
+  getQuickJS,
+  QuickJSHandle,
+  QuickJSContext,
+  RuntimeOptions,
+  QuickJSRuntime,
+} from 'quickjs-emscripten';
 import * as React from 'react';
-import { BindableAttrValue, BindingEvaluationResult } from './types';
+import { BindableAttrValue, BindingEvaluationResult, JsRuntime, Serializable } from './types';
 import { errorFrom } from './utils/errors';
 
 const JsRuntimeContext = React.createContext<QuickJSRuntime | null>(null);
@@ -32,11 +39,11 @@ export const JsRuntimeProvider = React.lazy(async () => {
   return { default: Context };
 });
 
-export function useJsRuntime(): QuickJSRuntime {
+function useJsRuntime(): QuickJSRuntime {
   const runtime = React.useContext(JsRuntimeContext);
 
   if (!runtime) {
-    throw new Error(`No JsRuntime contetx found`);
+    throw new Error(`No JsRuntime context found`);
   }
 
   return runtime;
@@ -58,7 +65,7 @@ function evalCode(code: string, globalScope: Record<string, unknown>) {
 
 export const TOOLPAD_LOADING_MARKER = '__TOOLPAD_LOADING_MARKER__';
 
-export function evaluateExpression(
+function evaluateExpression(
   code: string,
   globalScope: Record<string, unknown>,
 ): BindingEvaluationResult {
@@ -75,11 +82,12 @@ export function evaluateExpression(
 }
 
 export function evaluateBindable<V>(
+  ctx: JsRuntime,
   bindable: BindableAttrValue<V> | null,
   globalScope: Record<string, unknown>,
 ): BindingEvaluationResult {
   if (bindable?.type === 'jsExpression') {
-    return evaluateExpression(bindable?.value, globalScope);
+    return ctx.evaluateExpression(bindable?.value, globalScope);
   }
 
   if (bindable?.type === 'const') {
@@ -87,4 +95,97 @@ export function evaluateBindable<V>(
   }
 
   return { value: undefined };
+}
+
+export function useBrowserJsRuntime(): JsRuntime {
+  return React.useMemo(
+    () => ({
+      evaluateExpression,
+    }),
+    [],
+  );
+}
+
+export function newSerializable(ctx: QuickJSContext, json: unknown): QuickJSHandle {
+  switch (typeof json) {
+    case 'string':
+      return ctx.newString(json);
+    case 'number':
+      return ctx.newNumber(json);
+    case 'boolean':
+      return json ? ctx.true : ctx.false;
+    case 'object': {
+      if (!json) {
+        return ctx.null;
+      }
+      if (Array.isArray(json)) {
+        const result = ctx.newArray();
+        Object.values(json).forEach((value, i) => {
+          const valueHandle = newSerializable(ctx, value);
+          ctx.setProp(result, i, valueHandle);
+          valueHandle.dispose();
+        });
+        return result;
+      }
+      const result = ctx.newObject();
+      Object.entries(json).forEach(([key, value]) => {
+        const valueHandle = newSerializable(ctx, value);
+        ctx.setProp(result, key, valueHandle);
+        valueHandle.dispose();
+      });
+      return result;
+    }
+    case 'function': {
+      const result = ctx.newFunction('anonymous', (...args) => {
+        const dumpedArgs: Serializable[] = args.map((arg) => ctx.dump(arg));
+        const fnResult = json(...dumpedArgs);
+        return newSerializable(ctx, fnResult);
+      });
+      return result;
+    }
+    case 'undefined':
+      return ctx.undefined;
+    default:
+      return invariant(false, `invalid value: ${json}`);
+  }
+}
+
+export function evalExpressionInContext(
+  ctx: QuickJSContext,
+  expression: string,
+  globalScope: Record<string, unknown> = {},
+): BindingEvaluationResult {
+  try {
+    Object.entries(globalScope).forEach(([key, value]) => {
+      const valueHandle = newSerializable(ctx, value);
+      ctx.setProp(ctx.global, key, valueHandle);
+      valueHandle.dispose();
+    });
+
+    const result = ctx.unwrapResult(ctx.evalCode(expression));
+    const resultValue = ctx.dump(result);
+    result.dispose();
+    return { value: resultValue };
+  } catch (rawError) {
+    return { error: errorFrom(rawError) };
+  }
+}
+
+export async function createServerJsRuntime(): Promise<JsRuntime> {
+  const quickJs = await getQuickJS();
+  const ctx = quickJs.newContext();
+  return {
+    evaluateExpression: (code, globalScope) => evalExpressionInContext(ctx, code, globalScope),
+  };
+}
+
+export function useServerJsRuntime(): JsRuntime {
+  const quickJs = useJsRuntime();
+  const ctx = quickJs.newContext();
+  return React.useMemo(
+    () => ({
+      evaluateExpression: (code, globalScope) => evalExpressionInContext(ctx, code, globalScope),
+    }),
+    [ctx],
+  );
 }

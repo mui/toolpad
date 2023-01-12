@@ -9,6 +9,7 @@ import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
 import SyncIcon from '@mui/icons-material/Sync';
 import { getObjectKey } from '@mui/toolpad-core/objectKey';
 import { BindableAttrEntries, BindableAttrValue } from '@mui/toolpad-core';
+import { useBrowserJsRuntime } from '@mui/toolpad-core/jsRuntime';
 import SplitPane from '../../components/SplitPane';
 import ParametersEditor from '../../toolpad/AppEditor/PageEditor/ParametersEditor';
 import { useEvaluateLiveBindingEntries } from '../../toolpad/AppEditor/useEvaluateLiveBinding';
@@ -166,7 +167,9 @@ function QueryEditor({
 }: QueryEditorProps<PostgresConnectionParams, PostgresQuery>) {
   const paramsEntries = input.params || EMPTY_PARAMS;
 
+  const jsBrowserRuntime = useBrowserJsRuntime();
   const paramsEditorLiveValue = useEvaluateLiveBindingEntries({
+    jsRuntime: jsBrowserRuntime,
     input: paramsEntries,
     globalScope,
   });
@@ -228,6 +231,7 @@ function QueryEditor({
             globalScope={globalScope}
             globalScopeMeta={globalScopeMeta}
             liveValue={paramsEditorLiveValue}
+            jsRuntime={jsBrowserRuntime}
           />
         </Box>
       </SplitPane>

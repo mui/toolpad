@@ -338,3 +338,17 @@ export type ExecFetchResult<T = any> = {
   data?: T;
   error?: SerializedError;
 };
+
+export type Serializable =
+  | string
+  | number
+  | boolean
+  | null
+  | undefined
+  | Serializable[]
+  | { [key: string]: Serializable }
+  | ((...args: Serializable[]) => Serializable);
+
+export interface JsRuntime {
+  evaluateExpression(code: string, globalScope: Record<string, unknown>): BindingEvaluationResult;
+}

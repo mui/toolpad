@@ -1,4 +1,9 @@
-import { BindableAttrEntries, BindableAttrValue, BindableAttrValues } from '@mui/toolpad-core';
+import {
+  BindableAttrEntries,
+  BindableAttrValue,
+  BindableAttrValues,
+  Serializable,
+} from '@mui/toolpad-core';
 import { ensureSuffix, removePrefix } from '../../utils/strings';
 import { Maybe } from '../../utils/types';
 import {
@@ -10,8 +15,6 @@ import {
   RestConnectionParams,
   UrlEncodedBody,
 } from './types';
-// TODO: move to ../../types
-import type { Serializable } from '../../server/evalExpression';
 import applyTransform from '../../server/applyTransform';
 import { errorFrom } from '../../utils/errors';
 import { MOVIES_API_DEMO_URL } from '../demo';
@@ -61,7 +64,8 @@ async function resolveBindable(
     return bindable.value;
   }
   if (bindable.type === 'jsExpression') {
-    return evalExpression(bindable.value, scope);
+    const result = await evalExpression(bindable.value, scope);
+    return result;
   }
   throw new Error(
     `Can't resolve bindable of type "${(bindable as BindableAttrValue<unknown>).type}"`,

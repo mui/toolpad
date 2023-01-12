@@ -1,5 +1,4 @@
-import { BindingEvaluationResult } from '@mui/toolpad-core';
-import { evaluateExpression } from '@mui/toolpad-core/jsRuntime';
+import { BindingEvaluationResult, JsRuntime } from '@mui/toolpad-core';
 import { set } from 'lodash-es';
 import { mapValues } from '../utils/collections';
 
@@ -116,6 +115,7 @@ export function buildGlobalScope(
  * Evaluates the expressions and replace with their result
  */
 export default function evalJsBindings(
+  jsRuntime: JsRuntime,
   bindings: Record<string, ParsedBinding>,
   globalScope: Record<string, unknown>,
 ): Record<string, EvaluatedBinding> {
@@ -170,7 +170,7 @@ export default function evalJsBindings(
       computationStatuses.set(expression, { result: null });
       const prevContext = currentParentBinding;
       currentParentBinding = bindingId;
-      const result = evaluateExpression(expression, proxiedScope);
+      const result = jsRuntime.evaluateExpression(expression, proxiedScope);
       currentParentBinding = prevContext;
       computationStatuses.set(expression, { result });
       // From freshly computed

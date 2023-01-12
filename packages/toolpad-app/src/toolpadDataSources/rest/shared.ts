@@ -2,8 +2,10 @@ import {
   BindableAttrEntries,
   BindableAttrValue,
   BindableAttrValues,
+  JsRuntime,
   Serializable,
 } from '@mui/toolpad-core';
+import { evaluateBindable } from '@mui/toolpad-core/jsRuntime';
 import { ensureSuffix, removePrefix } from '../../utils/strings';
 import { Maybe } from '../../utils/types';
 import {
@@ -51,44 +53,33 @@ export function parseBaseUrl(baseUrl: string): URL {
   return parsedBase;
 }
 
-interface EvalExpression {
-  (expression: string, scope: Record<string, Serializable>): Promise<any>;
-}
-
-async function resolveBindable(
+function resolveBindable(
+  jsRuntime: JsRuntime,
   bindable: BindableAttrValue<string>,
-  evalExpression: EvalExpression,
   scope: Record<string, Serializable>,
-): Promise<any> {
-  if (bindable.type === 'const') {
-    return bindable.value;
+): any {
+  const { value, error } = evaluateBindable(jsRuntime, bindable, scope);
+  if (error) {
+    throw error;
   }
-  if (bindable.type === 'jsExpression') {
-    const result = await evalExpression(bindable.value, scope);
-    return result;
-  }
-  throw new Error(
-    `Can't resolve bindable of type "${(bindable as BindableAttrValue<unknown>).type}"`,
-  );
+  return value;
 }
 
-async function resolveBindableEntries(
+function resolveBindableEntries(
+  jsRuntime: JsRuntime,
   entries: BindableAttrEntries,
-  evalExpression: EvalExpression,
   scope: Record<string, Serializable>,
-): Promise<[string, any][]> {
-  return Promise.all(
-    entries.map(async ([key, value]) => [key, await resolveBindable(value, evalExpression, scope)]),
-  );
+): [string, any][] {
+  return entries.map(([key, value]) => [key, resolveBindable(jsRuntime, value, scope)]);
 }
 
-async function resolveBindables<P>(
+function resolveBindables<P>(
+  jsRuntime: JsRuntime,
   obj: BindableAttrValues<P>,
-  evalExpression: EvalExpression,
   scope: Record<string, Serializable>,
-): Promise<P> {
+): P {
   return Object.fromEntries(
-    await resolveBindableEntries(Object.entries(obj) as BindableAttrEntries, evalExpression, scope),
+    resolveBindableEntries(jsRuntime, Object.entries(obj) as BindableAttrEntries, scope),
   ) as P;
 }
 
@@ -107,17 +98,17 @@ interface ResolvedRawBody {
   content: string;
 }
 
-async function resolveRawBody(
+function resolveRawBody(
+  jsRuntime: JsRuntime,
   body: RawBody,
-  evalExpression: EvalExpression,
   scope: Record<string, Serializable>,
-): Promise<ResolvedRawBody> {
-  const { content, contentType } = await resolveBindables(
+): ResolvedRawBody {
+  const { content, contentType } = resolveBindables(
+    jsRuntime,
     {
       contentType: body.contentType,
       content: body.content,
     },
-    evalExpression,
     scope,
   );
   return {
@@ -132,27 +123,23 @@ interface ResolveUrlEncodedBodyBody {
   content: [string, string][];
 }
 
-async function resolveUrlEncodedBody(
+function resolveUrlEncodedBody(
+  jsRuntime: JsRuntime,
   body: UrlEncodedBody,
-  evalExpression: EvalExpression,
   scope: Record<string, Serializable>,
-): Promise<ResolveUrlEncodedBodyBody> {
+): ResolveUrlEncodedBodyBody {
   return {
     kind: 'urlEncoded',
-    content: await resolveBindableEntries(body.content, evalExpression, scope),
+    content: resolveBindableEntries(jsRuntime, body.content, scope),
   };
 }
 
-async function resolveBody(
-  body: Body,
-  evalExpression: EvalExpression,
-  scope: Record<string, Serializable>,
-) {
+function resolveBody(jsRuntime: JsRuntime, body: Body, scope: Record<string, Serializable>) {
   switch (body.kind) {
     case 'raw':
-      return resolveRawBody(body, evalExpression, scope);
+      return resolveRawBody(jsRuntime, body, scope);
     case 'urlEncoded':
-      return resolveUrlEncodedBody(body, evalExpression, scope);
+      return resolveUrlEncodedBody(jsRuntime, body, scope);
     default:
       throw new Error(`Missing case for "${(body as Body).kind}"`);
   }
@@ -179,14 +166,14 @@ export function getDefaultUrl(connection?: RestConnectionParams | null): Bindabl
 
 interface ExecBaseOptions {
   connection?: Maybe<RestConnectionParams>;
-  evalExpression: EvalExpression;
+  jsRuntime: JsRuntime;
   fetchImpl: typeof fetch;
 }
 
 export async function execfetch(
   fetchQuery: FetchQuery,
   params: Record<string, string>,
-  { connection, evalExpression, fetchImpl }: ExecBaseOptions,
+  { connection, jsRuntime, fetchImpl }: ExecBaseOptions,
 ): Promise<FetchResult> {
   const queryScope = {
     // TODO: remove deprecated query after v1
@@ -196,11 +183,13 @@ export async function execfetch(
 
   const urlvalue = fetchQuery.url || getDefaultUrl(connection);
 
-  const [resolvedUrl, resolvedSearchParams, resolvedHeaders] = await Promise.all([
-    resolveBindable(urlvalue, evalExpression, queryScope),
-    resolveBindableEntries(fetchQuery.searchParams || [], evalExpression, queryScope),
-    resolveBindableEntries(fetchQuery.headers || [], evalExpression, queryScope),
-  ]);
+  const resolvedUrl = resolveBindable(jsRuntime, urlvalue, queryScope);
+  const resolvedSearchParams = resolveBindableEntries(
+    jsRuntime,
+    fetchQuery.searchParams || [],
+    queryScope,
+  );
+  const resolvedHeaders = resolveBindableEntries(jsRuntime, fetchQuery.headers || [], queryScope);
 
   const queryUrl = parseQueryUrl(resolvedUrl, connection?.baseUrl);
   resolvedSearchParams.forEach(([key, value]) => queryUrl.searchParams.append(key, value));
@@ -216,7 +205,7 @@ export async function execfetch(
   const requestInit: RequestInit = { method, headers };
 
   if (!HTTP_NO_BODY.has(method) && fetchQuery.body) {
-    const resolvedBody = await resolveBody(fetchQuery.body, evalExpression, queryScope);
+    const resolvedBody = resolveBody(jsRuntime, fetchQuery.body, queryScope);
 
     switch (resolvedBody.kind) {
       case 'raw': {

@@ -63,7 +63,15 @@ function createBrowserRuntime(): JsRuntime {
 
     // eslint-disable-next-line no-underscore-dangle
     (iframe.contentWindow as any).__SCOPE = globalScope;
-    return (iframe.contentWindow as any).eval(`with (window.__SCOPE) { ${code} }`);
+    (iframe.contentWindow as any).console = window.console;
+
+    return (iframe.contentWindow as any).eval(`
+      (() => {
+        with (window.__SCOPE) { 
+          return (${code})
+        }
+      })()
+    `);
   }
 
   function evaluateExpression(

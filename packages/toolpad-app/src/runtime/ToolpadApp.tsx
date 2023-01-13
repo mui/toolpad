@@ -885,6 +885,7 @@ function RenderedPage({ nodeId }: RenderedNodeProps) {
 
   const getEvaluatedBindings = React.useCallback(
     (nodeState: GlobalScopeNodeState = {}) => {
+      // Prevent global state from overriding local state
       const filteredPageBindings = filterValues(
         pageBindings,
         (binding) => !binding.scopePath || !Object.keys(nodeState).includes(binding.scopePath),

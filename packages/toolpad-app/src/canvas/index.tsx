@@ -137,7 +137,5 @@ export default function AppCanvas({ basename }: AppCanvasProps) {
         />
       </CanvasEventsContext.Provider>
     </CanvasHooksContext.Provider>
-  ) : (
-    <div>loading...</div>
-  );
+  ) : null;
 }

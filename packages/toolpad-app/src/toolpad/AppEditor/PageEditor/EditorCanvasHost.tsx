@@ -13,6 +13,7 @@ import { LogEntry } from '../../../components/Console';
 import { useDomApi } from '../../DomLoader';
 import createRuntimeState from '../../../createRuntimeState';
 import { ToolpadBridge, TOOLPAD_BRIDGE_GLOBAL } from '../../../canvas/ToolpadBridge';
+import CenteredSpinner from '../../../components/CenteredSpinner';
 
 interface OverlayProps {
   children?: React.ReactNode;
@@ -51,12 +52,30 @@ const CanvasRoot = styled('div')({
   position: 'relative',
 });
 
+const CanvasOverlay = styled('div')(({ theme }) => ({
+  backgroundColor: theme.palette.background.default,
+  position: 'absolute',
+  width: '100%',
+  height: '100%',
+}));
+
 const CanvasFrame = styled('iframe')({
   border: 'none',
   position: 'absolute',
   width: '100%',
   height: '100%',
 });
+
+function useOnChange<T = unknown>(value: T, handler: (newValue: T, oldValue: T) => void) {
+  const stableHandler = useEvent(handler);
+  const prevValue = React.useRef(value);
+  React.useEffect(() => {
+    if (prevValue.current !== value) {
+      stableHandler(value, prevValue.current);
+      prevValue.current = value;
+    }
+  }, [value, stableHandler]);
+}
 
 export default function EditorCanvasHost({
   appId,
@@ -107,7 +126,13 @@ export default function EditorCanvasHost({
     }
   });
 
+  const src = `/app-canvas/${appId}/pages/${pageNodeId}`;
+
+  const [loading, setLoading] = React.useState(true);
+  useOnChange(src, () => setLoading(true));
+
   const handleReady = useEvent((bridgeInstance) => {
+    setLoading(false);
     setBridge(bridgeInstance);
     onInit?.(bridgeInstance);
   });
@@ -175,7 +200,7 @@ export default function EditorCanvasHost({
         ref={frameRef}
         name="data-toolpad-canvas"
         onLoad={handleFrameLoad}
-        src={`/app-canvas/${appId}/pages/${pageNodeId}`}
+        src={src}
         // Used by the runtime to know when to load react devtools
         data-toolpad-canvas
       />
@@ -185,6 +210,12 @@ export default function EditorCanvasHost({
             editorOverlayRoot,
           )
         : null}
+
+      {loading ? (
+        <CanvasOverlay>
+          <CenteredSpinner />
+        </CanvasOverlay>
+      ) : null}
     </CanvasRoot>
   );
 }

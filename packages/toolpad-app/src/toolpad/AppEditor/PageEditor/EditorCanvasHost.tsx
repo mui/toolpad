@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Box, CircularProgress, styled } from '@mui/material';
+import { styled } from '@mui/material';
 import { NodeId } from '@mui/toolpad-core';
 import createCache from '@emotion/cache';
 import { CacheProvider } from '@emotion/react';

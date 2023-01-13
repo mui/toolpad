@@ -16,7 +16,7 @@ describe('evalExpression', () => {
 
   test('With functions', async () => {
     const result = await evalExpression(`x('Jack', 'Joe') + y()`, {
-      x: (a, b) => `hello ${a} and ${b}`,
+      x: (a: string, b: string) => `hello ${a} and ${b}`,
       y: () => `!`,
     });
     expect(result).toBe('hello Jack and Joe!');

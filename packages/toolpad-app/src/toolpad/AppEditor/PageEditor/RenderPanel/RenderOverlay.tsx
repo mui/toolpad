@@ -41,7 +41,7 @@ import NodeHud from './NodeHud';
 import { OverlayGrid, OverlayGridHandle } from './OverlayGrid';
 import { NodeInfo } from '../../../../types';
 import NodeDropArea from './NodeDropArea';
-import { ToolpadBridge } from '../../../../canvas';
+import { ToolpadBridge } from '../../../../canvas/ToolpadBridge';
 
 const HORIZONTAL_RESIZE_SNAP_UNITS = 4; // px
 const SNAP_TO_GRID_COLUMN_MARGIN = 10; // px
@@ -380,7 +380,7 @@ export default function RenderOverlay({ bridge }: RenderOverlayProps) {
 
   const handleNodeMouseUp = React.useCallback(
     (event: React.MouseEvent<HTMLDivElement>) => {
-      const cursorPos = bridge?.getViewCoordinates(event.clientX, event.clientY);
+      const cursorPos = bridge?.canvasCommands.getViewCoordinates(event.clientX, event.clientY);
 
       if (!cursorPos || draggedNodeId) {
         return;
@@ -748,7 +748,7 @@ export default function RenderOverlay({ bridge }: RenderOverlayProps) {
     (event: React.DragEvent<Element>) => {
       event.preventDefault();
 
-      const cursorPos = bridge?.getViewCoordinates(event.clientX, event.clientY);
+      const cursorPos = bridge?.canvasCommands.getViewCoordinates(event.clientX, event.clientY);
 
       if (!cursorPos || !draggedNode) {
         return;
@@ -921,7 +921,7 @@ export default function RenderOverlay({ bridge }: RenderOverlayProps) {
 
   const handleNodeDrop = React.useCallback(
     (event: React.DragEvent<Element>) => {
-      const cursorPos = bridge?.getViewCoordinates(event.clientX, event.clientY);
+      const cursorPos = bridge?.canvasCommands.getViewCoordinates(event.clientX, event.clientY);
 
       if (
         !draggedNode ||
@@ -1306,7 +1306,7 @@ export default function RenderOverlay({ bridge }: RenderOverlayProps) {
       const parentInfo = parent ? nodesInfo[parent.id] : null;
       const parentRect = parentInfo?.rect;
 
-      const cursorPos = bridge?.getViewCoordinates(event.clientX, event.clientY);
+      const cursorPos = bridge?.canvasCommands.getViewCoordinates(event.clientX, event.clientY);
 
       if (draggedNodeRect && parentRect && resizePreviewElement && cursorPos) {
         if (draggedEdge === RECTANGLE_EDGE_LEFT || draggedEdge === RECTANGLE_EDGE_RIGHT) {

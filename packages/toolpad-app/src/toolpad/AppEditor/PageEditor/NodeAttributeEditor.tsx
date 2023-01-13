@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { ArgTypeDefinition, BindableAttrValue, GlobalScopeMeta } from '@mui/toolpad-core';
 import { Alert, Box } from '@mui/material';
+import { useBrowserJsRuntime } from '@mui/toolpad-core/jsRuntime';
 import * as appDom from '../../../appDom';
 import { useDomApi } from '../../DomLoader';
 import BindableEditor from './BindableEditor';
@@ -63,6 +64,8 @@ export default function NodeAttributeEditor<P extends object>({
 
   const isBindable = !isDisabled && namespace !== 'layout';
 
+  const jsBrowserRuntime = useBrowserJsRuntime();
+
   return Control ? (
     <BindableEditor
       liveBinding={liveBinding}
@@ -72,6 +75,7 @@ export default function NodeAttributeEditor<P extends object>({
       bindable={isBindable}
       disabled={isDisabled}
       propType={propType}
+      jsRuntime={jsBrowserRuntime}
       renderControl={(params) => (
         <MarkdownTooltip placement="left" title={argType.helperText ?? ''}>
           <Box sx={{ flex: 1 }}>

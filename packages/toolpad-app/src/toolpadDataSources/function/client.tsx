@@ -12,6 +12,7 @@ import {
 } from '@mui/material';
 import { Controller, useForm } from 'react-hook-form';
 import { BindableAttrEntries, BindableAttrValue } from '@mui/toolpad-core';
+import { useBrowserJsRuntime } from '@mui/toolpad-core/jsRuntime';
 import {
   ClientDataSource,
   ConnectionEditorProps,
@@ -142,7 +143,9 @@ function QueryEditor({
     [setInput],
   );
 
+  const jsBrowserRuntime = useBrowserJsRuntime();
   const paramsEditorLiveValue = useEvaluateLiveBindingEntries({
+    jsRuntime: jsBrowserRuntime,
     input: paramsEntries,
     globalScope,
   });
@@ -168,12 +171,17 @@ function QueryEditor({
     preview,
     runPreview: handleRunPreview,
     isLoading: previewIsLoading,
-  } = useQueryPreview(fetchPreview, input.attributes.query.value, previewParams, {
-    onPreview(result) {
-      setPreviewLogs((existing) => [...existing, ...result.logs]);
-      setPreviewHar((existing) => mergeHar(createHarLog(), existing, result.har));
+  } = useQueryPreview(
+    fetchPreview,
+    input.attributes.query.value,
+    previewParams as Record<string, string>,
+    {
+      onPreview(result) {
+        setPreviewLogs((existing) => [...existing, ...result.logs]);
+        setPreviewHar((existing) => mergeHar(createHarLog(), existing, result.har));
+      },
     },
-  });
+  );
 
   const { data: secretsKeys = [] } = usePrivateQuery<FunctionPrivateQuery, string[]>({
     kind: 'secretsKeys',
@@ -251,6 +259,7 @@ function QueryEditor({
             globalScope={globalScope}
             globalScopeMeta={globalScopeMeta}
             liveValue={paramsEditorLiveValue}
+            jsRuntime={jsBrowserRuntime}
           />
         </Box>
       </SplitPane>

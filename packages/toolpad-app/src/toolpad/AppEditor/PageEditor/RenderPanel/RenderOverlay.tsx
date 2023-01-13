@@ -824,7 +824,12 @@ export default function RenderOverlay({ bridge }: RenderOverlayProps) {
         const edgeDetectionMargin = 10; // px
 
         // Detect center in layout containers
-        if (isDraggingOverElement && activeDropNodeInfo && activeDropSlot) {
+        if (
+          isDraggingOverElement &&
+          !isDraggingOverEmptyContainer &&
+          activeDropNodeInfo &&
+          activeDropSlot
+        ) {
           const isDraggingOverPageChild = activeDropNodeParent
             ? appDom.isPage(activeDropNodeParent)
             : false;

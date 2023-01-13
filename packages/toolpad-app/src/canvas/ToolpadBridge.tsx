@@ -17,10 +17,10 @@ type Commands<T extends Record<string, Function>> = T & {
   [COMMAND_HANDLERS]: Partial<T>;
 };
 
-function createCommands<T extends Record<string, Function>>(): Commands<T> {
+function createCommands<T extends Record<string, Function>>(initial: Partial<T> = {}): Commands<T> {
   return new Proxy(
     {
-      [COMMAND_HANDLERS]: {} as Partial<T>,
+      [COMMAND_HANDLERS]: initial,
     },
     {
       get(target, prop, receiver) {
@@ -66,16 +66,24 @@ export interface ToolpadBridge {
   canvasCommands: Commands<{
     update(updates: AppCanvasState): void;
     getViewCoordinates(clientX: number, clientY: number): { x: number; y: number } | null;
-    getPageViewState: () => PageViewState;
+    getPageViewState(): PageViewState;
+    isReady(): boolean;
   }>;
 }
 
+let canvasIsReady = false;
 export const bridge: ToolpadBridge = {
   editorEvents: mitt(),
   editorCommands: createCommands(),
   canvasEvents: mitt(),
-  canvasCommands: createCommands(),
-};
+  canvasCommands: createCommands({
+    isReady: () => canvasIsReady,
+  }),
+} as ToolpadBridge;
+
+bridge.canvasEvents.on('ready', () => {
+  canvasIsReady = true;
+});
 
 if (typeof window !== 'undefined') {
   window[TOOLPAD_BRIDGE_GLOBAL] = bridge;

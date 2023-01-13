@@ -107,30 +107,34 @@ export default function EditorCanvasHost({
     }
   });
 
-  const handleInit = useEvent(onInit ?? (() => {}));
+  const handleReady = useEvent((bridgeInstance) => {
+    setBridge(bridgeInstance);
+    onInit?.(bridgeInstance);
+  });
 
   const handleFrameLoad = React.useCallback(() => {
     const iframeWindow = frameRef.current?.contentWindow;
     invariant(iframeWindow, 'Iframe ref not attached');
-
-    const bridgeInstance = iframeWindow?.[TOOLPAD_BRIDGE_GLOBAL];
-    invariant(bridgeInstance, 'Bridge not set');
-    bridgeInstance?.canvasEvents.on('ready', () => {
-      setBridge(bridgeInstance);
-      handleInit(bridgeInstance);
-    });
-
     setContentWindow(iframeWindow);
 
-    if (!iframeWindow) {
-      return;
+    const bridgeInstance = iframeWindow?.[TOOLPAD_BRIDGE_GLOBAL];
+    invariant(bridgeInstance, 'Bridge not set up');
+
+    if (bridgeInstance.canvasCommands.isReady()) {
+      handleReady(bridgeInstance);
+    } else {
+      const readyHandler = () => {
+        handleReady(bridgeInstance);
+        bridgeInstance.canvasEvents.off('ready', readyHandler);
+      };
+      bridgeInstance.canvasEvents.on('ready', readyHandler);
     }
 
-    iframeWindow?.addEventListener('keydown', handleKeyDown);
-    iframeWindow?.addEventListener('unload', () => {
-      iframeWindow?.removeEventListener('keydown', handleKeyDown);
+    iframeWindow.addEventListener('keydown', handleKeyDown);
+    iframeWindow.addEventListener('unload', () => {
+      iframeWindow.removeEventListener('keydown', handleKeyDown);
     });
-  }, [handleInit, handleKeyDown]);
+  }, [handleReady, handleKeyDown]);
 
   React.useEffect(() => {
     if (!contentWindow) {

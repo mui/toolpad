@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { styled } from '@mui/material';
+import { Fade, styled } from '@mui/material';
 import { NodeId } from '@mui/toolpad-core';
 import createCache from '@emotion/cache';
 import { CacheProvider } from '@emotion/react';
@@ -199,11 +199,11 @@ export default function EditorCanvasHost({
           )
         : null}
 
-      {loading ? (
+      <Fade in={loading} appear={false} timeout={{ enter: 0, exit: 100 }}>
         <CanvasOverlay>
           <CenteredSpinner />
         </CanvasOverlay>
-      ) : null}
+      </Fade>
     </CanvasRoot>
   );
 }

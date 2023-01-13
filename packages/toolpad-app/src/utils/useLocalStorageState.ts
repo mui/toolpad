@@ -70,8 +70,9 @@ export default function useLocalStorageState<V>(
   key: string,
   initialValue: V,
 ): [V, React.Dispatch<React.SetStateAction<V>>] {
+  const subscribeKey = React.useCallback((cb: () => void) => subscribe(key, cb), [key]);
   const storedValue: V = React.useSyncExternalStore(
-    (cb) => subscribe(key, cb),
+    subscribeKey,
     () => getSnapshot(key) ?? initialValue,
     () => initialValue,
   );

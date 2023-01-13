@@ -35,7 +35,7 @@ export const getFirstElementIteratorAncestorItems = (
       const { itemsProp } = parentArgTypeDef;
       const parentProps = (parent as appDom.ElementNode).props;
 
-      firstIteratorAncestorItems = (parentProps && parentProps[itemsProp]?.value) || null;
+      firstIteratorAncestorItems = (parentProps && parentProps[itemsProp]?.value) || [{}];
     }
   });
 

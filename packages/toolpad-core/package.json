@@ -37,6 +37,7 @@
   },
   "dependencies": {
     "@tanstack/react-query": "^4.20.9",
+    "mitt": "^3.0.0",
     "quickjs-emscripten": "^0.21.1",
     "react-error-boundary": "^3.1.4"
   },

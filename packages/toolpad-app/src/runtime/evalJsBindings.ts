@@ -6,7 +6,7 @@ import { mapValues } from '../utils/collections';
  * Represents the state of a binding. It both describes which place it takes in the gobal scope
  * and how to obtain the result
  */
-export interface ParsedBinding<T = unknown> {
+export interface ParsedBinding {
   /**
    * How this binding presents itself to expressions in the global scope.
    * Path in the form that is accepted by lodash.set
@@ -16,14 +16,23 @@ export interface ParsedBinding<T = unknown> {
    * javascript expression that evaluates to the value of this binding
    */
   expression?: string;
-  /**
-   * actual evaluated result of the binding
-   */
-  result?: BindingEvaluationResult<T>;
+  dependencies?: undefined;
+  result?: undefined;
   /**
    * javascript expression that evaluates to the initial value of this binding if it doesn't have one
    */
   initializer?: string;
+}
+
+export interface EvaluatedBinding<T = unknown> {
+  scopePath?: string;
+  expression?: undefined;
+  dependencies?: string[];
+  /**
+   * actual evaluated result of the binding
+   */
+  result?: BindingEvaluationResult<T>;
+  initializer?: undefined;
 }
 
 type Dependencies = Map<string, Set<string>>;
@@ -92,11 +101,6 @@ function bubbleLoading(
   return false;
 }
 
-export interface EvaluatedBinding<T = unknown> {
-  scopePath?: string;
-  result?: BindingEvaluationResult<T>;
-}
-
 export function buildGlobalScope(
   base: Record<string, unknown>,
   bindings: Record<string, { result?: BindingEvaluationResult; scopePath?: string }>,
@@ -116,7 +120,7 @@ export function buildGlobalScope(
  */
 export default function evalJsBindings(
   jsRuntime: JsRuntime,
-  bindings: Record<string, ParsedBinding>,
+  bindings: Record<string, ParsedBinding | EvaluatedBinding>,
   globalScope: Record<string, unknown>,
 ): Record<string, EvaluatedBinding> {
   const bindingsMap = new Map(Object.entries(bindings));
@@ -178,6 +182,9 @@ export default function evalJsBindings(
     }
 
     if (binding.result) {
+      if (binding.dependencies) {
+        dependencies.set(bindingId, new Set(binding.dependencies));
+      }
       // From input value on the page
       return binding.result;
     }
@@ -234,6 +241,7 @@ export default function evalJsBindings(
 
     return {
       scopePath,
+      dependencies: Array.from(flatDependencies.get(bindingId) ?? []),
       result: {
         ...results[bindingId],
         error: bubbleError(flatDependencies, results, bindingId),

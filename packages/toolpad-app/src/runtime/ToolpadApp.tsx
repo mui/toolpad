@@ -20,6 +20,7 @@ import {
   BindableAttrValue,
   NestedBindableAttrs,
   GlobalScopeMeta,
+  BindingEvaluationResult,
 } from '@mui/toolpad-core';
 import { createProvidedContext } from '@mui/toolpad-core/utils/react';
 import { QueryClient, QueryClientProvider, useMutation } from '@tanstack/react-query';
@@ -40,6 +41,7 @@ import {
 } from '@mui/toolpad-core/runtime';
 import * as _ from 'lodash-es';
 import ErrorIcon from '@mui/icons-material/Error';
+import { useBrowserJsRuntime } from '@mui/toolpad-core/jsRuntime';
 import * as appDom from '../appDom';
 import { RuntimeState, VersionOrPreview } from '../types';
 import {
@@ -51,10 +53,8 @@ import {
 import AppOverview from './AppOverview';
 import AppThemeProvider from './AppThemeProvider';
 import evalJsBindings, {
-  BindingEvaluationResult,
   buildGlobalScope,
   EvaluatedBinding,
-  evaluateExpression,
   ParsedBinding,
 } from './evalJsBindings';
 import { HTML_ID_EDITOR_OVERLAY } from '../constants';
@@ -817,9 +817,11 @@ function RenderedPage({ nodeId }: RenderedNodeProps) {
   const moduleEntry = modules[`pages/${nodeId}`];
   const globalScope = (moduleEntry?.module as any)?.globalScope || EMPTY_OBJECT;
 
+  const browserJsRuntime = useBrowserJsRuntime();
+
   const evaluatedBindings = React.useMemo(
-    () => evalJsBindings(pageBindings, globalScope),
-    [globalScope, pageBindings],
+    () => evalJsBindings(browserJsRuntime, pageBindings, globalScope),
+    [browserJsRuntime, globalScope, pageBindings],
   );
 
   const pageState = React.useMemo(
@@ -833,8 +835,8 @@ function RenderedPage({ nodeId }: RenderedNodeProps) {
   );
 
   const evaluatePageExpression = React.useCallback(
-    (expression: string) => evaluateExpression(expression, pageState),
-    [pageState],
+    (expression: string) => browserJsRuntime.evaluateExpression(expression, pageState),
+    [browserJsRuntime, pageState],
   );
 
   React.useEffect(() => {

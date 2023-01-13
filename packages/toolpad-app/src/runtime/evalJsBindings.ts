@@ -1,43 +1,6 @@
-import { evalExpression } from '@mui/toolpad-core/jsRuntime';
+import { BindingEvaluationResult, JsRuntime } from '@mui/toolpad-core';
 import { set } from 'lodash-es';
 import { mapValues } from '../utils/collections';
-import { errorFrom } from '../utils/errors';
-
-const TOOLPAD_LOADING_MARKER = '__TOOLPAD_LOADING_MARKER__';
-
-export function evaluateExpression(
-  code: string,
-  globalScope: Record<string, unknown>,
-): BindingEvaluationResult {
-  try {
-    const value = evalExpression(code, globalScope);
-    return { value };
-  } catch (rawError) {
-    const error = errorFrom(rawError);
-    if (error?.message === TOOLPAD_LOADING_MARKER) {
-      return { loading: true };
-    }
-    return { error: error as Error };
-  }
-}
-
-/**
- * Represents the actual state of an evaluated binding.
- */
-export type BindingEvaluationResult<T = unknown> = {
-  /**
-   * The actual value.
-   */
-  value?: T;
-  /**
-   * The evaluation of the value resulted in error.
-   */
-  error?: Error;
-  /**
-   * The parts that this value depends on are still loading.
-   */
-  loading?: boolean;
-};
 
 /**
  * Represents the state of a binding. It both describes which place it takes in the gobal scope
@@ -156,6 +119,7 @@ export function buildGlobalScope(
  * Evaluates the expressions and replace with their result
  */
 export default function evalJsBindings(
+  jsRuntime: JsRuntime,
   bindings: Record<string, ParsedBinding | EvaluatedBinding>,
   globalScope: Record<string, unknown>,
 ): Record<string, EvaluatedBinding> {
@@ -210,7 +174,7 @@ export default function evalJsBindings(
       computationStatuses.set(expression, { result: null });
       const prevContext = currentParentBinding;
       currentParentBinding = bindingId;
-      const result = evaluateExpression(expression, proxiedScope);
+      const result = jsRuntime.evaluateExpression(expression, proxiedScope);
       currentParentBinding = prevContext;
       computationStatuses.set(expression, { result });
       // From freshly computed

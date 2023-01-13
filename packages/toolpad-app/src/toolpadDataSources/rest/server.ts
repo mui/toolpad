@@ -1,9 +1,9 @@
 import { ExecFetchResult } from '@mui/toolpad-core';
 import fetch from 'node-fetch';
+import { createServerJsRuntime } from '@mui/toolpad-core/jsRuntime';
 import { withHarInstrumentation, createHarLog } from '../../server/har';
 import { ServerDataSource } from '../../types';
 import { FetchPrivateQuery, FetchQuery, RestConnectionParams } from './types';
-import serverEvalExpression from '../../server/evalExpression';
 import { Maybe } from '../../utils/types';
 import config from '../../server/config';
 import { execfetch } from './shared';
@@ -20,9 +20,10 @@ async function execBase(
   const har = createHarLog();
   const instrumentedFetch = withHarInstrumentation(fetch, { har });
 
+  const jsServerRuntime = await createServerJsRuntime();
   const result = await execfetch(fetchQuery, params, {
     connection,
-    evalExpression: serverEvalExpression,
+    jsRuntime: jsServerRuntime,
     fetchImpl: instrumentedFetch as any,
   });
 

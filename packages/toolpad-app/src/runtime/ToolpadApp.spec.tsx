@@ -1,11 +1,11 @@
 import * as React from 'react';
 import { render, waitFor as waitForOrig, screen, fireEvent, act } from '@testing-library/react';
 import '@testing-library/jest-dom';
-import { LiveBindings } from '@mui/toolpad-core';
-import { setEventHandler } from '@mui/toolpad-core/runtime';
+import { LiveBindings, RuntimeEvents } from '@mui/toolpad-core';
 import ToolpadApp from './ToolpadApp';
 import * as appDom from '../appDom';
 import createRuntimeState from '../createRuntimeState';
+import { bridge } from '../canvas/ToolpadBridge';
 
 // More sensible default for these tests
 const waitFor: typeof waitForOrig = (waiter, options) =>
@@ -33,12 +33,6 @@ function renderPage(initPage: (dom: appDom.AppDom, page: appDom.PageNode) => app
 
   return render(<ToolpadApp state={state} version={version} basename="toolpad" />);
 }
-
-afterEach(() => {
-  // Make sure to clean up events after each test
-  const cleanup = setEventHandler(window, () => {});
-  cleanup();
-});
 
 test(`Static Text`, async () => {
   renderPage((dom, page) => {
@@ -131,11 +125,10 @@ test(`Databinding errors`, async () => {
   const consoleErrorMock = jest.spyOn(console, 'error').mockImplementation();
   let bindings: LiveBindings | undefined;
 
-  const cleanup = setEventHandler(window, (event) => {
-    if (event.type === 'pageBindingsUpdated') {
-      bindings = event.bindings;
-    }
-  });
+  const bindingsUpdateHandler = (event: RuntimeEvents['pageBindingsUpdated']) => {
+    bindings = event.bindings;
+  };
+  bridge.canvasEvents.on('pageBindingsUpdated', bindingsUpdateHandler);
 
   try {
     let nonExisting: appDom.ElementNode;
@@ -203,7 +196,7 @@ test(`Databinding errors`, async () => {
 
     expect(consoleErrorMock).toHaveBeenCalled();
   } finally {
-    cleanup();
+    bridge.canvasEvents.off('pageBindingsUpdated', bindingsUpdateHandler);
     consoleErrorMock.mockRestore();
   }
 });

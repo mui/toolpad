@@ -184,18 +184,6 @@ export default function EditorCanvasHost({
 
   return (
     <CanvasRoot className={className}>
-      <Box
-        sx={{
-          position: 'absolute',
-          width: '100%',
-          height: '100%',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-        }}
-      >
-        <CircularProgress />
-      </Box>
       <CanvasFrame
         ref={frameRef}
         name="data-toolpad-canvas"

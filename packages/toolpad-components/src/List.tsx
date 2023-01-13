@@ -1,13 +1,13 @@
 import * as React from 'react';
-import { createComponent, IteratorItem, IteratorRenderer } from '@mui/toolpad-core';
+import { createComponent, ElementIteratorItem, ElementIteratorRenderer } from '@mui/toolpad-core';
 import { Box, List as MuiList, ListItem, SxProps } from '@mui/material';
 import { SX_PROP_HELPER_TEXT } from './constants';
 
 export type ListProps = {
   // eslint-disable-next-line react/no-unused-prop-types
-  items: IteratorItem[];
+  items: ElementIteratorItem[];
   disablePadding?: boolean;
-  renderItems: IteratorRenderer;
+  renderItems: ElementIteratorRenderer;
   sx?: SxProps;
 };
 

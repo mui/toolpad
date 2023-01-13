@@ -344,16 +344,18 @@ export type ExecFetchResult<T = any> = {
   error?: SerializedError;
 };
 
-export interface GlobalScopeNodeState {
-  item?: IteratorItem;
-}
+export type ElementIteratorItem = Record<string, unknown>;
 
-export type IteratorItem = Record<string, unknown>;
-
-export type IteratorItemRenderer = (
+export type ElementIteratorItemRenderer = (
   children: React.ReactNode,
-  item: IteratorItem,
+  item: ElementIteratorItem,
   index: number,
 ) => React.ReactNode;
 
-export type IteratorRenderer = (itemRenderer: IteratorItemRenderer) => React.ReactNode;
+export type ElementIteratorRenderer = (
+  itemRenderer: ElementIteratorItemRenderer,
+) => React.ReactNode;
+
+export interface GlobalScopeNodeState {
+  item?: ElementIteratorItem;
+}

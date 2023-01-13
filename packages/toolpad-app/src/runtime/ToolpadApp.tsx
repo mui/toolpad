@@ -20,8 +20,8 @@ import {
   BindableAttrValue,
   NestedBindableAttrs,
   GlobalScopeMeta,
-  IteratorItem,
-  IteratorItemRenderer,
+  ElementIteratorItem,
+  ElementIteratorItemRenderer,
   ElementIteratorValueType,
   GlobalScopeNodeState,
 } from '@mui/toolpad-core';
@@ -146,7 +146,7 @@ const [useSetControlledBindingContext, SetControlledBindingContextProvider] =
   );
 
 const [useIteratorItemContext, IteratorItemContextProvider] = createProvidedContext<{
-  item: IteratorItem | null;
+  item: ElementIteratorItem | null;
 }>('IteratorItem');
 
 function getComponentId(elm: appDom.ElementNode): string {
@@ -399,14 +399,16 @@ function RenderedNodeContent({ node, childNodeGroups, Component }: RenderedNodeC
       }
 
       props[propName] = isElementIterator
-        ? (itemRenderer: IteratorItemRenderer) =>
-            (props[(argType.typeDef as ElementIteratorValueType).itemsProp] as IteratorItem[]).map(
-              (item, index) => (
-                <IteratorItemContextProvider key={index} value={{ item }}>
-                  {itemRenderer(wrappedValue, item, index)}
-                </IteratorItemContextProvider>
-              ),
-            )
+        ? (itemRenderer: ElementIteratorItemRenderer) =>
+            (
+              props[
+                (argType.typeDef as ElementIteratorValueType).itemsProp
+              ] as ElementIteratorItem[]
+            ).map((item, index) => (
+              <IteratorItemContextProvider key={index} value={{ item }}>
+                {itemRenderer(wrappedValue, item, index)}
+              </IteratorItemContextProvider>
+            ))
         : wrappedValue;
     }
   }
@@ -903,7 +905,7 @@ function RenderedPage({ nodeId }: RenderedNodeProps) {
 
   React.useEffect(() => {
     fireEvent({ type: 'pageStateUpdated', pageState, globalScopeMeta });
-  }, [globalScopeMeta, getBindings, pageState]);
+  }, [globalScopeMeta, pageState]);
 
   React.useEffect(() => {
     const liveBindings = getBindings();

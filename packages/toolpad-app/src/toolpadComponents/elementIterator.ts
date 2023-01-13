@@ -1,4 +1,4 @@
-import { IteratorItem, ToolpadComponents, TOOLPAD_COMPONENT } from '@mui/toolpad-core';
+import { ElementIteratorItem, ToolpadComponents, TOOLPAD_COMPONENT } from '@mui/toolpad-core';
 import { getElementNodeComponentId } from '.';
 import * as appDom from '../appDom';
 
@@ -10,10 +10,10 @@ export const getFirstElementIteratorAncestorItems = (
   dom: appDom.AppDom,
   elementNode: appDom.ElementNode,
   components: ToolpadComponents,
-): IteratorItem[] | null => {
+): ElementIteratorItem[] | null => {
   const ancestorComponents = [...appDom.getAncestors(dom, elementNode), elementNode];
 
-  let firstIteratorAncestorItems: IteratorItem[] | null = null;
+  let firstIteratorAncestorItems: ElementIteratorItem[] | null = null;
   ancestorComponents.reverse().forEach((ancestor, index) => {
     if (firstIteratorAncestorItems) {
       return;

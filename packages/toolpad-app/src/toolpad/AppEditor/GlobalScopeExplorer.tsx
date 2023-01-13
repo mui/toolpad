@@ -39,6 +39,10 @@ function groupScopeMeta(value: Record<string, unknown>, meta: GlobalScopeMeta): 
       displayName: 'Queries',
       items: [],
     },
+    hidden: {
+      displayName: 'Hidden',
+      items: [],
+    },
     other: {
       displayName: 'Other',
       items: [],
@@ -50,11 +54,14 @@ function groupScopeMeta(value: Record<string, unknown>, meta: GlobalScopeMeta): 
   for (const key of scopeKeys) {
     const metaField = meta[key];
     const group = metaField?.kind || 'other';
-    structure[group].items.push({
-      ...metaField,
-      key,
-      value: value[key],
-    });
+
+    if (group !== 'hidden') {
+      structure[group].items.push({
+        ...metaField,
+        key,
+        value: value[key],
+      });
+    }
   }
 
   return structure;

@@ -719,12 +719,17 @@ function parseBindings(
       const firstIteratorAncestorItems = getFirstElementIteratorAncestorItems(dom, elm, components);
       if (firstIteratorAncestorItems) {
         const bindingId = getElementIteratorBindingId(elm);
+        const bindingScopePath = getElementIteratorScopePath(elm);
+
         parsedBindingsMap.set(
           bindingId,
           parseBinding(appDom.createConst(firstIteratorAncestorItems[0]), {
-            scopePath: getElementIteratorScopePath(elm),
+            scopePath: bindingScopePath,
           }),
         );
+        globalScopeMeta[bindingScopePath] = {
+          kind: 'hidden',
+        };
       }
     }
 
@@ -877,6 +882,7 @@ function RenderedPage({ nodeId }: RenderedNodeProps) {
         pageBindings,
         (binding) => !binding.scopePath || !Object.keys(nodeState).includes(binding.scopePath),
       ) as Record<string, ParsedBinding>;
+
       return evalJsBindings(filteredPageBindings, {
         ...globalScope,
         ...nodeState,

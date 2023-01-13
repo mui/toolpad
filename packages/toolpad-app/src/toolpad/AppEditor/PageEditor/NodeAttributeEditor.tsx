@@ -49,10 +49,6 @@ export default function NodeAttributeEditor<P extends object>({
   const iteratorItemBinding = bindings[iteratorItemBindingId];
   const iteratorItemScopePath = getElementIteratorScopePath(node);
 
-  const nodeAwareGlobalScope = {
-    ...pageState,
-    ...(iteratorItemBinding ? { [iteratorItemScopePath]: iteratorItemBinding.value } : {}),
-  };
   const nodeAwareGlobalScopeMeta: GlobalScopeMeta = {
     ...globalScopeMeta,
     ...(iteratorItemBinding ? { [iteratorItemScopePath]: { kind: 'local' } } : {}),
@@ -70,7 +66,7 @@ export default function NodeAttributeEditor<P extends object>({
   return Control ? (
     <BindableEditor
       liveBinding={liveBinding}
-      globalScope={nodeAwareGlobalScope}
+      globalScope={pageState}
       globalScopeMeta={nodeAwareGlobalScopeMeta}
       label={argType.label || name}
       bindable={isBindable}

@@ -255,7 +255,7 @@ export type GlobalScopeMetaField = {
       componentId: string;
     }
   | {
-      kind: 'query' | 'local';
+      kind: 'query' | 'local' | 'hidden';
     }
 );
 

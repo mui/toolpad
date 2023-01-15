@@ -83,7 +83,7 @@
     "mitt": "^3.0.0",
     "monaco-editor": "0.34.1",
     "next": "^13.1.1",
-    "node-fetch": "^2.6.7",
+    "node-fetch": "^2.6.8",
     "node-fetch-har": "^1.0.1",
     "path-to-regexp": "^6.2.1",
     "perf-cascade": "^3.0.3",

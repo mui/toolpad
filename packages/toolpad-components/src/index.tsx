@@ -20,5 +20,9 @@ export { default as Image } from './Image.js';
 
 export { default as DatePicker } from './DatePicker.js';
 
+export { default as Tabs } from './Tabs.js';
+
+export { default as Container } from './Container.js';
+
 export { CUSTOM_COLUMN_TYPES, NUMBER_FORMAT_PRESETS, inferColumns, parseColumns } from './DataGrid';
 export type { SerializableGridColumn, SerializableGridColumns, NumberFormat } from './DataGrid';

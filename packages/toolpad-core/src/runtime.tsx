@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { ErrorBoundary, FallbackProps } from 'react-error-boundary';
-import { ToolpadComponents } from './types';
+import mitt, { Emitter } from 'mitt';
+import { RuntimeEvents, ToolpadComponents } from './types';
 import { RUNTIME_PROP_NODE_ID, RUNTIME_PROP_SLOTS } from './constants.js';
 import type { SlotType, ComponentConfig, RuntimeEvent, RuntimeError } from './types';
 
@@ -19,6 +20,7 @@ declare global {
 }
 
 export const NodeRuntimeContext = React.createContext<string | null>(null);
+export const CanvasEventsContext = React.createContext<Emitter<RuntimeEvents>>(mitt());
 
 // NOTE: These props aren't used, they are only there to transfer information from the
 // React elements to the fibers.
@@ -130,47 +132,9 @@ export interface NodeRuntime<P> {
   ) => void;
 }
 
-export function fireEvent(event: RuntimeEvent) {
-  // eslint-disable-next-line no-underscore-dangle
-  if (!window.__TOOLPAD_RUNTIME_EVENT__) {
-    // eslint-disable-next-line no-underscore-dangle
-    window.__TOOLPAD_RUNTIME_EVENT__ = [] as RuntimeEvent[];
-  }
-  // eslint-disable-next-line no-underscore-dangle
-  if (typeof window.__TOOLPAD_RUNTIME_EVENT__ === 'function') {
-    // eslint-disable-next-line no-underscore-dangle
-    window.__TOOLPAD_RUNTIME_EVENT__(event);
-  } else {
-    // eslint-disable-next-line no-underscore-dangle
-    window.__TOOLPAD_RUNTIME_EVENT__.push(event);
-  }
-}
-
-export function setEventHandler(window: Window, handleEvent: (event: RuntimeEvent) => void) {
-  // eslint-disable-next-line no-underscore-dangle
-  if (typeof window.__TOOLPAD_RUNTIME_EVENT__ === 'function') {
-    throw new Error(`Event handler already attached.`);
-  }
-
-  // eslint-disable-next-line no-underscore-dangle
-  const queuedEvents = Array.isArray(window.__TOOLPAD_RUNTIME_EVENT__)
-    ? // eslint-disable-next-line no-underscore-dangle
-      window.__TOOLPAD_RUNTIME_EVENT__
-    : [];
-
-  queuedEvents.forEach((event) => handleEvent(event));
-
-  // eslint-disable-next-line no-underscore-dangle
-  window.__TOOLPAD_RUNTIME_EVENT__ = (event) => handleEvent(event);
-
-  return () => {
-    // eslint-disable-next-line no-underscore-dangle
-    delete window.__TOOLPAD_RUNTIME_EVENT__;
-  };
-}
-
 export function useNode<P = {}>(): NodeRuntime<P> | null {
   const nodeId = React.useContext(NodeRuntimeContext);
+  const canvasEvents = React.useContext(CanvasEventsContext);
 
   return React.useMemo(() => {
     if (!nodeId) {
@@ -178,15 +142,14 @@ export function useNode<P = {}>(): NodeRuntime<P> | null {
     }
     return {
       updateAppDomConstProp: (prop, value) => {
-        fireEvent({
-          type: 'propUpdated',
+        canvasEvents.emit('propUpdated', {
           nodeId,
           prop,
           value,
         });
       },
     };
-  }, [nodeId]);
+  }, [canvasEvents, nodeId]);
 }
 
 export interface PlaceholderProps {

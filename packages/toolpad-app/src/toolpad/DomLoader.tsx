@@ -3,6 +3,7 @@ import { NodeId } from '@mui/toolpad-core';
 import { createProvidedContext } from '@mui/toolpad-core/utils/react';
 import invariant from 'invariant';
 import { debounce, DebouncedFunc } from 'lodash-es';
+import { Location, matchPath, useLocation } from 'react-router-dom';
 import * as appDom from '../appDom';
 import { update } from '../utils/immutability';
 import client from '../api';
@@ -13,6 +14,7 @@ import insecureHash from '../utils/insecureHash';
 import useEvent from '../utils/useEvent';
 import { NodeHashes } from '../types';
 import { hasFieldFocus } from '../utils/fields';
+import { APP_CODE_COMPONENT_ROUTE, APP_CONNECTION_ROUTE, APP_PAGE_ROUTE } from '../routes';
 
 export type DomView =
   | { kind: 'page'; nodeId?: NodeId }
@@ -362,10 +364,34 @@ const UNDOABLE_ACTIONS = new Set<DomActionType>([
   'DESELECT_NODE',
 ]);
 
+export const getCurrentPageDomView = (location: Location): DomView => {
+  const { pathname } = location;
+
+  const pageRouteMatch = matchPath(APP_PAGE_ROUTE, pathname);
+  if (pageRouteMatch?.params.nodeId) {
+    return { kind: 'page', nodeId: pageRouteMatch.params.nodeId as NodeId };
+  }
+
+  const connectionsRouteMatch = matchPath(APP_CONNECTION_ROUTE, pathname);
+  if (connectionsRouteMatch?.params.nodeId) {
+    return { kind: 'connection', nodeId: connectionsRouteMatch.params.nodeId as NodeId };
+  }
+
+  const codeComponentRouteMatch = matchPath(APP_CODE_COMPONENT_ROUTE, pathname);
+  if (codeComponentRouteMatch?.params.nodeId) {
+    return { kind: 'codeComponent', nodeId: codeComponentRouteMatch.params.nodeId as NodeId };
+  }
+
+  return { kind: 'page' };
+};
+
 export default function DomProvider({ appId, children }: DomContextProps) {
   const { data: dom } = client.useQuery('loadDom', [appId], { suspense: true });
 
   invariant(dom, `Suspense should load the dom`);
+
+  const location = useLocation();
+  const initialView = getCurrentPageDomView(location);
 
   const [state, dispatch] = React.useReducer(domLoaderReducer, {
     saving: false,
@@ -374,13 +400,13 @@ export default function DomProvider({ appId, children }: DomContextProps) {
     savedDom: dom,
     dom,
     selectedNodeId: null,
-    currentView: { kind: 'page' },
+    currentView: initialView,
     currentTab: 'component',
     undoStack: [
       {
         dom,
         selectedNodeId: null,
-        view: { kind: 'page' },
+        view: initialView,
         tab: 'component',
         timestamp: Date.now(),
       },

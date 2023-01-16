@@ -18,6 +18,12 @@ import CreateConnectionNodeDialog from './CreateConnectionNodeDialog';
 import useLocalStorageState from '../../../utils/useLocalStorageState';
 import NodeMenu from '../NodeMenu';
 import config from '../../../config';
+import {
+  APP_API_ROUTE,
+  APP_CODE_COMPONENT_ROUTE,
+  APP_CONNECTION_ROUTE,
+  APP_PAGE_ROUTE,
+} from '../../../routes';
 
 const HierarchyExplorerRoot = styled('div')({
   overflow: 'auto',
@@ -45,15 +51,15 @@ function getActiveNodeId(location: Location): NodeId | null {
   const match =
     matchRoutes(
       [
-        { path: `/app/:appId/pages/:activeNodeId` },
-        { path: `/app/:appId/apis/:activeNodeId` },
-        { path: `/app/:appId/codeComponents/:activeNodeId` },
-        { path: `/app/:appId/connections/:activeNodeId` },
+        { path: APP_PAGE_ROUTE },
+        { path: APP_API_ROUTE },
+        { path: APP_CODE_COMPONENT_ROUTE },
+        { path: APP_CONNECTION_ROUTE },
       ],
       location,
     ) || [];
 
-  const selected: NodeId[] = match.map((route) => route.params.activeNodeId as NodeId);
+  const selected: NodeId[] = match.map((route) => route.params.nodeId as NodeId);
   return selected.length > 0 ? selected[0] : null;
 }
 

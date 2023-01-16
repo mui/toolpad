@@ -1,9 +1,9 @@
 import * as React from 'react';
 import { styled } from '@mui/material';
-import { Route, Routes, useParams, Navigate, useNavigate } from 'react-router-dom';
+import { Route, Routes, useParams, Navigate, useNavigate, useLocation } from 'react-router-dom';
 import { JsRuntimeProvider } from '@mui/toolpad-core/jsRuntime';
 import PageEditor from './PageEditor';
-import DomProvider, { useDom } from '../DomLoader';
+import DomProvider, { getCurrentPageDomView, useDom, useDomApi } from '../DomLoader';
 import * as appDom from '../../appDom';
 import CodeComponentEditor from './CodeComponentEditor';
 import ConnectionEditor from './ConnectionEditor';
@@ -44,28 +44,83 @@ interface FileEditorProps {
 
 function FileEditor({ appId }: FileEditorProps) {
   const { dom, currentView } = useDom();
+  const domApi = useDomApi();
 
   const app = appDom.getApp(dom);
   const { pages = [] } = appDom.getChildNodes(dom, app);
 
-  const navigate = useNavigate();
-
   const firstPage = pages.length > 0 ? pages[0] : null;
 
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  const blockNextNavigationViewUpdateRef = React.useRef(false);
+
+  const previousLocationPathnameRef = React.useRef(location.pathname);
   React.useEffect(() => {
-    switch (currentView.kind) {
-      case 'page':
-        navigate(`/app/${appId}/pages/${currentView.nodeId || firstPage?.id}`, { replace: true });
-        break;
-      case 'connection':
-        navigate(`/app/${appId}/connections/${currentView.nodeId}`, { replace: true });
-        break;
-      case 'codeComponent':
-        navigate(`/app/${appId}/codeComponents/${currentView.nodeId}`);
-        break;
-      default:
+    const { pathname } = location;
+
+    if (blockNextNavigationViewUpdateRef.current) {
+      blockNextNavigationViewUpdateRef.current = false;
+      return;
     }
-  }, [appId, currentView.kind, currentView.nodeId, firstPage?.id, navigate]);
+
+    if (pathname === previousLocationPathnameRef.current) {
+      return;
+    }
+
+    domApi.setView(getCurrentPageDomView(location));
+    previousLocationPathnameRef.current = pathname;
+  }, [domApi, location]);
+
+  const previousViewRef = React.useRef(currentView);
+  React.useEffect(() => {
+    const { pathname } = location;
+    const previousView = previousViewRef.current;
+
+    if (
+      currentView.kind === 'page' &&
+      (currentView.kind !== previousView.kind || currentView.nodeId !== previousView.nodeId)
+    ) {
+      blockNextNavigationViewUpdateRef.current = true;
+      const newPathname = `/app/${appId}/pages/${currentView.nodeId || firstPage?.id}`;
+
+      if (pathname !== newPathname) {
+        navigate({
+          pathname: newPathname,
+        });
+      }
+    }
+    if (
+      currentView.kind === 'connection' &&
+      (currentView.kind !== previousView.kind || currentView.nodeId !== previousView.nodeId)
+    ) {
+      blockNextNavigationViewUpdateRef.current = true;
+      const newPathname = `/app/${appId}/connections/${currentView.nodeId}`;
+
+      if (pathname !== newPathname) {
+        navigate({
+          pathname: newPathname,
+        });
+      }
+    }
+
+    if (
+      currentView.kind === 'codeComponent' &&
+      (currentView.kind !== previousView.kind || currentView.nodeId !== previousView.nodeId)
+    ) {
+      blockNextNavigationViewUpdateRef.current = true;
+      const newPathname = `/app/${appId}/codeComponents/${currentView.nodeId}`;
+
+      if (pathname !== newPathname) {
+        navigate({
+          pathname: newPathname,
+        });
+      }
+    }
+
+    previousViewRef.current = currentView;
+  }, [appId, currentView, currentView.kind, currentView.nodeId, firstPage?.id, location, navigate]);
 
   return (
     <Routes>

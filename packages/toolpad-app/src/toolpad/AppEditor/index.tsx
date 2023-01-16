@@ -49,10 +49,10 @@ function FileEditor({ appId }: FileEditorProps) {
   const app = appDom.getApp(dom);
   const { pages = [] } = appDom.getChildNodes(dom, app);
 
-  const firstPage = pages.length > 0 ? pages[0] : null;
-
   const location = useLocation();
   const navigate = useNavigate();
+
+  const firstPage = pages.length > 0 ? pages[0] : null;
 
   const blockNextNavigationViewUpdateRef = React.useRef(false);
 

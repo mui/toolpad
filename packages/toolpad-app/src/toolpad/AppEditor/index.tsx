@@ -66,7 +66,6 @@ function FileEditor({ appId }: FileEditorProps) {
     }
 
     if (pathname !== previousLocationPathnameRef.current) {
-      console.log('set route view');
       domApi.setView(getCurrentPageDomView(location));
 
       previousLocationPathnameRef.current = pathname;
@@ -86,7 +85,6 @@ function FileEditor({ appId }: FileEditorProps) {
 
       if (pathname !== newPathname) {
         blockNextNavigationViewUpdateRef.current = true;
-        console.log('undo/redo nav');
         navigate({
           pathname: newPathname,
         });
@@ -101,7 +99,6 @@ function FileEditor({ appId }: FileEditorProps) {
 
       if (pathname !== newPathname) {
         blockNextNavigationViewUpdateRef.current = true;
-        console.log('undo/redo nav');
         navigate({
           pathname: newPathname,
         });
@@ -116,7 +113,6 @@ function FileEditor({ appId }: FileEditorProps) {
 
       if (pathname !== newPathname) {
         blockNextNavigationViewUpdateRef.current = true;
-        console.log('undo/redo nav');
         navigate({
           pathname: newPathname,
         });

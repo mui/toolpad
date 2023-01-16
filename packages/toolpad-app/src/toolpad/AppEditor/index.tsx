@@ -65,12 +65,12 @@ function FileEditor({ appId }: FileEditorProps) {
       return;
     }
 
-    if (pathname === previousLocationPathnameRef.current) {
-      return;
-    }
+    if (pathname !== previousLocationPathnameRef.current) {
+      console.log('set route view');
+      domApi.setView(getCurrentPageDomView(location));
 
-    domApi.setView(getCurrentPageDomView(location));
-    previousLocationPathnameRef.current = pathname;
+      previousLocationPathnameRef.current = pathname;
+    }
   }, [domApi, location]);
 
   const previousViewRef = React.useRef(currentView);
@@ -82,23 +82,26 @@ function FileEditor({ appId }: FileEditorProps) {
       currentView.kind === 'page' &&
       (currentView.kind !== previousView.kind || currentView.nodeId !== previousView.nodeId)
     ) {
-      blockNextNavigationViewUpdateRef.current = true;
       const newPathname = `/app/${appId}/pages/${currentView.nodeId || firstPage?.id}`;
 
       if (pathname !== newPathname) {
+        blockNextNavigationViewUpdateRef.current = true;
+        console.log('undo/redo nav');
         navigate({
           pathname: newPathname,
         });
       }
     }
+
     if (
       currentView.kind === 'connection' &&
       (currentView.kind !== previousView.kind || currentView.nodeId !== previousView.nodeId)
     ) {
-      blockNextNavigationViewUpdateRef.current = true;
       const newPathname = `/app/${appId}/connections/${currentView.nodeId}`;
 
       if (pathname !== newPathname) {
+        blockNextNavigationViewUpdateRef.current = true;
+        console.log('undo/redo nav');
         navigate({
           pathname: newPathname,
         });
@@ -109,10 +112,11 @@ function FileEditor({ appId }: FileEditorProps) {
       currentView.kind === 'codeComponent' &&
       (currentView.kind !== previousView.kind || currentView.nodeId !== previousView.nodeId)
     ) {
-      blockNextNavigationViewUpdateRef.current = true;
       const newPathname = `/app/${appId}/codeComponents/${currentView.nodeId}`;
 
       if (pathname !== newPathname) {
+        blockNextNavigationViewUpdateRef.current = true;
+        console.log('undo/redo nav');
         navigate({
           pathname: newPathname,
         });

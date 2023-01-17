@@ -8,18 +8,18 @@ interface TabProps {
 }
 
 interface Props {
-  active: string;
+  value: string;
   onChange: (value: number) => void;
   tabs: TabProps[];
   defaultValue: string;
 }
 
-function Tabs({ active, onChange, tabs, defaultValue }: Props) {
+function Tabs({ value, onChange, tabs, defaultValue }: Props) {
   return (
     <MUITabs
-      value={active || defaultValue}
-      onChange={(event, value) => {
-        onChange(value);
+      value={value || defaultValue}
+      onChange={(event, newValue) => {
+        onChange(newValue);
       }}
     >
       {tabs.map(({ title, name }) => (
@@ -32,7 +32,7 @@ function Tabs({ active, onChange, tabs, defaultValue }: Props) {
 export default createComponent(Tabs, {
   layoutDirection: 'horizontal',
   argTypes: {
-    active: {
+    value: {
       typeDef: { type: 'string' },
       onChangeProp: 'onChange',
       defaultValueProp: 'defaultValue',

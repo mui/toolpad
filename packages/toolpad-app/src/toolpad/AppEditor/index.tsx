@@ -1,14 +1,13 @@
 import * as React from 'react';
 import { styled } from '@mui/material';
-import { Route, Routes, useParams, Navigate, useNavigate, useLocation } from 'react-router-dom';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { JsRuntimeProvider } from '@mui/toolpad-core/jsRuntime';
-import PageEditor from './PageEditor';
-import DomProvider, { getCurrentPageDomView, useDom, useDomApi } from '../DomLoader';
+import DomProvider, { useDom } from '../DomLoader';
 import * as appDom from '../../appDom';
-import CodeComponentEditor from './CodeComponentEditor';
 import ConnectionEditor from './ConnectionEditor';
 import AppEditorShell from './AppEditorShell';
-import NoPageFound from './NoPageFound';
+import PageEditor from './PageEditor';
+import CodeComponentEditor from './CodeComponentEditor';
 
 const classes = {
   content: 'Toolpad_Content',
@@ -44,7 +43,6 @@ interface FileEditorProps {
 
 function FileEditor({ appId }: FileEditorProps) {
   const { dom, currentView } = useDom();
-  const domApi = useDomApi();
 
   const app = appDom.getApp(dom);
   const { pages = [] } = appDom.getChildNodes(dom, app);
@@ -54,92 +52,65 @@ function FileEditor({ appId }: FileEditorProps) {
 
   const firstPage = pages.length > 0 ? pages[0] : null;
 
-  const blockNextNavigationViewUpdateRef = React.useRef(false);
-
-  const previousLocationPathnameRef = React.useRef(location.pathname);
   React.useEffect(() => {
-    const { pathname } = location;
-
-    if (blockNextNavigationViewUpdateRef.current) {
-      blockNextNavigationViewUpdateRef.current = false;
-      return;
-    }
-
-    if (pathname !== previousLocationPathnameRef.current) {
-      domApi.setView(getCurrentPageDomView(location));
-
-      previousLocationPathnameRef.current = pathname;
-    }
-  }, [domApi, location]);
-
-  const previousViewRef = React.useRef(currentView);
-  React.useEffect(() => {
-    const { pathname } = location;
-    const previousView = previousViewRef.current;
-
-    if (
-      currentView.kind === 'page' &&
-      (currentView.kind !== previousView.kind || currentView.nodeId !== previousView.nodeId)
-    ) {
+    if (currentView.kind === 'page') {
       const newPathname = `/app/${appId}/pages/${currentView.nodeId || firstPage?.id}`;
 
-      if (pathname !== newPathname) {
-        blockNextNavigationViewUpdateRef.current = true;
-        navigate({
-          pathname: newPathname,
-        });
+      if (newPathname !== location.pathname) {
+        navigate(
+          {
+            pathname: newPathname,
+          },
+          {
+            replace: true,
+          },
+        );
       }
     }
 
-    if (
-      currentView.kind === 'connection' &&
-      (currentView.kind !== previousView.kind || currentView.nodeId !== previousView.nodeId)
-    ) {
+    if (currentView.kind === 'connection') {
       const newPathname = `/app/${appId}/connections/${currentView.nodeId}`;
 
-      if (pathname !== newPathname) {
-        blockNextNavigationViewUpdateRef.current = true;
-        navigate({
-          pathname: newPathname,
-        });
+      if (newPathname !== location.pathname) {
+        navigate(
+          {
+            pathname: newPathname,
+          },
+          {
+            replace: true,
+          },
+        );
       }
     }
 
-    if (
-      currentView.kind === 'codeComponent' &&
-      (currentView.kind !== previousView.kind || currentView.nodeId !== previousView.nodeId)
-    ) {
+    if (currentView.kind === 'codeComponent') {
       const newPathname = `/app/${appId}/codeComponents/${currentView.nodeId}`;
 
-      if (pathname !== newPathname) {
-        blockNextNavigationViewUpdateRef.current = true;
-        navigate({
-          pathname: newPathname,
-        });
+      if (newPathname !== location.pathname) {
+        navigate(
+          {
+            pathname: newPathname,
+          },
+          {
+            replace: true,
+          },
+        );
       }
     }
-
-    previousViewRef.current = currentView;
-  }, [appId, currentView, currentView.kind, currentView.nodeId, firstPage?.id, location, navigate]);
+  }, [appId, currentView.kind, currentView.nodeId, firstPage?.id, location.pathname, navigate]);
 
   return (
-    <Routes>
-      <Route element={<AppEditorShell appId={appId} />}>
-        <Route path="connections/:nodeId" element={<ConnectionEditor appId={appId} />} />
-        <Route path="pages/:nodeId" element={<PageEditor appId={appId} />} />
-        <Route path="codeComponents/:nodeId" element={<CodeComponentEditor appId={appId} />} />
-        <Route
-          index
-          element={
-            firstPage ? (
-              <Navigate to={`pages/${firstPage.id}`} replace />
-            ) : (
-              <NoPageFound appId={appId} />
-            )
-          }
-        />
-      </Route>
-    </Routes>
+    <AppEditorShell appId={appId}>
+      {currentView.kind === 'page' ? (
+        <PageEditor appId={appId} nodeId={currentView.nodeId || firstPage?.id} />
+      ) : null}
+      {currentView.kind === 'connection' ? (
+        <ConnectionEditor appId={appId} nodeId={currentView.nodeId} />
+      ) : null}
+      {currentView.kind === 'codeComponent' ? (
+        <CodeComponentEditor appId={appId} nodeId={currentView.nodeId} />
+      ) : null}
+    </AppEditorShell>
   );
 }
 

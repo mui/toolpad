@@ -1,8 +1,8 @@
 import type { Entry } from 'har-format';
+import { getBrowserRuntime } from '@mui/toolpad-core/jsRuntime';
 import { ExecFetchFn, RuntimeDataSource } from '../../types';
 import { FetchQuery, FetchResult } from './types';
 import { execfetch } from './shared';
-import evalExpression from '../../utils/evalExpression';
 import { createHarLog } from '../../utils/har';
 
 export async function clientExec(
@@ -58,7 +58,7 @@ export async function clientExec(
     const result = await execfetch(fetchQuery, params, {
       connection: null,
       fetchImpl: instrumentedFetch,
-      evalExpression,
+      jsRuntime: getBrowserRuntime(),
     });
 
     return { ...result, har };

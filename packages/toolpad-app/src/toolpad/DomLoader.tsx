@@ -16,11 +16,13 @@ import { NodeHashes } from '../types';
 import { hasFieldFocus } from '../utils/fields';
 import { APP_CODE_COMPONENT_ROUTE, APP_CONNECTION_ROUTE, APP_PAGE_ROUTE } from '../routes';
 
-export type DomView =
-  | { kind: 'page'; nodeId?: NodeId }
+export type PageView =
   | { kind: 'query'; nodeId: NodeId }
   | { kind: 'pageModule'; nodeId: NodeId }
-  | { kind: 'pageParameters'; nodeId: NodeId }
+  | { kind: 'pageParameters'; nodeId: NodeId };
+
+export type DomView =
+  | { kind: 'page'; nodeId?: NodeId; view?: PageView }
   | { kind: 'connection'; nodeId: NodeId }
   | { kind: 'codeComponent'; nodeId: NodeId };
 

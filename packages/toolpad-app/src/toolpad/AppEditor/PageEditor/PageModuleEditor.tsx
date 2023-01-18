@@ -86,7 +86,11 @@ export default function PageModuleEditor({ pageNodeId }: PageModuleEditorProps) 
   const [dialogOpen, setDialogOpen] = React.useState(false);
 
   const handleButtonClick = React.useCallback(() => {
-    domApi.setView({ kind: 'pageModule', nodeId: pageNodeId });
+    domApi.setView({
+      kind: 'page',
+      nodeId: pageNodeId,
+      view: { kind: 'pageModule', nodeId: pageNodeId },
+    });
   }, [domApi, pageNodeId]);
 
   const handleDialogClose = React.useCallback(() => {
@@ -94,7 +98,7 @@ export default function PageModuleEditor({ pageNodeId }: PageModuleEditorProps) 
   }, [domApi, pageNodeId]);
 
   React.useEffect(() => {
-    setDialogOpen(currentView.kind === 'pageModule');
+    setDialogOpen(currentView.kind === 'page' && currentView.view?.kind === 'pageModule');
   }, [currentView]);
 
   return (

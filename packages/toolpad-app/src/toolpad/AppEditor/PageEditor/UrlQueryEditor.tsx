@@ -35,7 +35,11 @@ export default function UrlQueryEditor({ pageNodeId }: UrlQueryEditorProps) {
   }, [isDialogOpen, value]);
 
   const handleButtonClick = React.useCallback(() => {
-    domApi.setView({ kind: 'pageParameters', nodeId: pageNodeId });
+    domApi.setView({
+      kind: 'page',
+      nodeId: pageNodeId,
+      view: { kind: 'pageParameters', nodeId: pageNodeId },
+    });
   }, [domApi, pageNodeId]);
 
   const handleDialogClose = React.useCallback(() => {
@@ -56,7 +60,7 @@ export default function UrlQueryEditor({ pageNodeId }: UrlQueryEditorProps) {
   }, [domApi, handleDialogClose, input, page]);
 
   React.useEffect(() => {
-    if (currentView.kind === 'pageParameters') {
+    if (currentView.kind === 'page' && currentView.view?.kind === 'pageParameters') {
       openDialog();
     } else {
       closeDialog();

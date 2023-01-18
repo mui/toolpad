@@ -8,6 +8,7 @@ import ConnectionEditor from './ConnectionEditor';
 import AppEditorShell from './AppEditorShell';
 import PageEditor from './PageEditor';
 import CodeComponentEditor from './CodeComponentEditor';
+import NoPageFound from './NoPageFound';
 
 const classes = {
   content: 'Toolpad_Content',
@@ -109,6 +110,9 @@ function FileEditor({ appId }: FileEditorProps) {
       ) : null}
       {currentView.kind === 'codeComponent' ? (
         <CodeComponentEditor appId={appId} nodeId={currentView.nodeId} />
+      ) : null}
+      {!['page', 'connection', 'codeComponent'].includes(currentView.kind) ? (
+        <NoPageFound appId={appId} />
       ) : null}
     </AppEditorShell>
   );

@@ -23,7 +23,9 @@ export function interleave(items: React.ReactNode[], separator: React.ReactNode)
  */
 export function createGlobalState<T = undefined>(initialValue: T) {
   const emitter = mitt();
+
   let result: [T, React.Dispatch<React.SetStateAction<T>>];
+
   const setState: React.Dispatch<React.SetStateAction<T>> = (newValue) => {
     const updateValue =
       typeof newValue === 'function' ? (newValue as (newValue: T) => T)(result[0]) : newValue;
@@ -33,17 +35,23 @@ export function createGlobalState<T = undefined>(initialValue: T) {
       emitter.emit('change');
     }
   };
+
   result = [initialValue, setState];
+
+  const subscribe = (cb: () => void) => {
+    emitter.on('change', cb);
+    return () => {
+      emitter.off('change', cb);
+    };
+  };
+
+  const getSnapshot = () => result;
+
   return function useGlobalState() {
     return React.useSyncExternalStore<[T, React.Dispatch<React.SetStateAction<T>>]>(
-      (cb) => {
-        emitter.on('change', cb);
-        return () => {
-          emitter.off('change', cb);
-        };
-      },
-      () => result,
-      () => result,
+      subscribe,
+      getSnapshot,
+      getSnapshot,
     );
   };
 }

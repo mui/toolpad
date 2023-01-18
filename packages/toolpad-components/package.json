@@ -30,9 +30,11 @@
     "url": "https://github.com/mui/mui-toolpad/issues"
   },
   "dependencies": {
-    "@mui/material": "^5.11.4",
+    "@mui/material": "^5.11.5",
     "@mui/toolpad-core": "^0.0.35",
-    "@mui/x-data-grid-pro": "^5.17.18",
+    "@mui/x-data-grid-pro": "^5.17.19",
+    "@mui/x-date-pickers": "^5.0.14",
+    "dayjs": "^1.11.7",
     "react-markdown": "^8.0.4"
   },
   "devDependencies": {

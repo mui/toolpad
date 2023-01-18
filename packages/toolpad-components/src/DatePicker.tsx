@@ -8,10 +8,59 @@ import { Dayjs } from 'dayjs';
 import { SX_PROP_HELPER_TEXT } from './constants';
 
 const LOCALE_LOADERS = new Map([
+  ['en', () => import('dayjs/locale/en')],
   ['nl', () => import('dayjs/locale/nl')],
   ['fr', () => import('dayjs/locale/fr')],
   // TODO...
 ]);
+
+interface LoadableLocale {
+  locale: string;
+  load: () => Promise<unknown>;
+}
+
+const handlers = new Set<() => void>();
+let loadedLocale: undefined | string;
+
+function trygetLoadableLocale(locale: string): LoadableLocale | null {
+  const load = LOCALE_LOADERS.get(locale);
+  if (load) {
+    return { locale, load };
+  }
+  return null;
+}
+
+function getLoadableLocale(): LoadableLocale | null {
+  if (typeof window === 'undefined') {
+    return null;
+  }
+  const languages = window.navigator.languages;
+  for (const locale of languages) {
+    const { language } = new Intl.Locale(locale);
+    const result = trygetLoadableLocale(locale) || trygetLoadableLocale(language);
+    if (result) {
+      return result;
+    }
+  }
+  return null;
+}
+
+const loadableLocale = getLoadableLocale();
+if (loadableLocale) {
+  loadableLocale.load().then(() => {
+    loadedLocale = loadableLocale.locale;
+    handlers.forEach((handler) => handler());
+  });
+}
+
+function subscribeLocaleLoader(cb: () => void) {
+  handlers.add(cb);
+  return () => handlers.delete(cb);
+}
+
+function getSnapshot() {
+  return loadedLocale;
+}
 
 export interface DatePickerProps
   extends Omit<DesktopDatePickerProps<string, Dayjs>, 'value' | 'onChange'> {
@@ -35,25 +84,7 @@ function DatePicker({ format, onChange, ...props }: DatePickerProps) {
     [onChange],
   );
 
-  const [adapterLocale, setAdapterLocale] = React.useState<string | undefined>();
-
-  React.useEffect(() => {
-    const languages = navigator.languages;
-    for (const language of languages) {
-      const loader = LOCALE_LOADERS.get(language);
-      if (loader) {
-        loader().then(
-          () => {
-            setAdapterLocale(language);
-          },
-          () => {
-            console.error(`Failed to load locale "${language}", proceeding without localization`);
-          },
-        );
-        return;
-      }
-    }
-  }, []);
+  const adapterLocale = React.useSyncExternalStore(subscribeLocaleLoader, getSnapshot);
 
   return (
     // @ts-expect-error This seems to be a dependencies issue. Recreating the yarn.lock file solves this.

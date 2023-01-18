@@ -400,16 +400,17 @@ function RenderedNodeContent({ node, childNodeGroups, Component }: RenderedNodeC
       }
 
       props[propName] = isElementIterator
-        ? (itemRenderer: ElementIteratorItemRenderer) =>
-            (
-              props[
-                (argType.typeDef as ElementIteratorValueType).itemsProp
-              ] as ElementIteratorItem[]
-            ).map((item, index) => (
+        ? (itemRenderer: ElementIteratorItemRenderer) => {
+            const elementInteratorArgTypeDef = argType.typeDef as ElementIteratorValueType;
+            const elementInteratorArgItems: ElementIteratorItem[] =
+              props[elementInteratorArgTypeDef.itemsProp];
+
+            return elementInteratorArgItems.map((item, index) => (
               <IteratorItemContextProvider key={index} value={{ item }}>
                 {itemRenderer(wrappedValue, item, index)}
               </IteratorItemContextProvider>
-            ))
+            ));
+          }
         : wrappedValue;
     }
   }

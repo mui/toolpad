@@ -4,7 +4,7 @@ import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DesktopDatePicker, DesktopDatePickerProps } from '@mui/x-date-pickers/DesktopDatePicker';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { createComponent } from '@mui/toolpad-core';
-import * as dayjs from 'dayjs';
+import { Dayjs } from 'dayjs';
 import { SX_PROP_HELPER_TEXT } from './constants';
 
 const LOCALE_LOADERS = new Map([
@@ -14,7 +14,7 @@ const LOCALE_LOADERS = new Map([
 ]);
 
 export interface DatePickerProps
-  extends Omit<DesktopDatePickerProps<string, dayjs.Dayjs>, 'value' | 'onChange'> {
+  extends Omit<DesktopDatePickerProps<string, Dayjs>, 'value' | 'onChange'> {
   value: string;
   onChange: (newValue: string) => void;
   format: string;
@@ -27,7 +27,7 @@ export interface DatePickerProps
 
 function DatePicker({ format, onChange, ...props }: DatePickerProps) {
   const handleChange = React.useCallback(
-    (value: dayjs.Dayjs | null) => {
+    (value: Dayjs | null) => {
       // date-only form of ISO8601. See https://tc39.es/ecma262/#sec-date-time-string-format
       const stringValue = value?.format('YYYY-MM-DD') || '';
       onChange(stringValue);

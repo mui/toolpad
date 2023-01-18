@@ -19,6 +19,7 @@ import CheckBoxIcon from '@mui/icons-material/CheckBox';
 import DashboardCustomizeSharpIcon from '@mui/icons-material/DashboardCustomizeSharp';
 import AddIcon from '@mui/icons-material/Add';
 import NotesIcon from '@mui/icons-material/Notes';
+import AutoAwesomeMosaicIcon from '@mui/icons-material/AutoAwesomeMosaic';
 import { SvgIconProps } from '@mui/material/SvgIcon';
 
 const iconMap = new Map<string, React.ComponentType<SvgIconProps>>([
@@ -40,6 +41,8 @@ const iconMap = new Map<string, React.ComponentType<SvgIconProps>>([
   ['Checkbox', CheckBoxIcon],
   ['CodeComponent', DashboardCustomizeSharpIcon],
   ['CreateNew', AddIcon],
+  ['Tabs', TabIcon],
+  ['Container', AutoAwesomeMosaicIcon],
 ]);
 
 type ComponentItemKind = 'future' | 'builtIn' | 'create' | 'custom';

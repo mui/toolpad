@@ -7,13 +7,22 @@ import {
 import { createComponent } from '@mui/toolpad-core';
 import { SX_PROP_HELPER_TEXT } from './constants';
 
-export type TextFieldProps = MuiTextFieldProps & {
+export type TextFieldProps = Omit<MuiTextFieldProps, 'value' | 'onChange'> & {
+  value: string;
+  onChange: (newValue: string) => void;
   alignItems?: BoxProps['alignItems'];
   justifyContent?: BoxProps['justifyContent'];
 };
 
-function TextField({ defaultValue, ...props }: TextFieldProps) {
-  return <MuiTextField {...props} />;
+function TextField({ defaultValue, onChange, ...props }: TextFieldProps) {
+  const handleChange = React.useCallback(
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      onChange(event.target.value);
+    },
+    [onChange],
+  );
+
+  return <MuiTextField {...props} onChange={handleChange} />;
 }
 
 export default createComponent(TextField, {
@@ -24,7 +33,6 @@ export default createComponent(TextField, {
       helperText: 'The value that is controlled by this text input.',
       typeDef: { type: 'string' },
       onChangeProp: 'onChange',
-      onChangeHandler: (event: React.ChangeEvent<HTMLInputElement>) => event.target.value,
       defaultValue: '',
       defaultValueProp: 'defaultValue',
     },

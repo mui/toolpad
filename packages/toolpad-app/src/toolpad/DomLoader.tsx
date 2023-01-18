@@ -366,7 +366,7 @@ const UNDOABLE_ACTIONS = new Set<DomActionType>([
   'DESELECT_NODE',
 ]);
 
-export const getInitialPageDomView = (location: Location): DomView => {
+export const getInitialPageDomView = (location: Location, defaultPageNodeId?: NodeId): DomView => {
   const { pathname } = location;
 
   const pageRouteMatch = matchPath(APP_PAGE_ROUTE, pathname);
@@ -384,7 +384,7 @@ export const getInitialPageDomView = (location: Location): DomView => {
     return { kind: 'codeComponent', nodeId: codeComponentRouteMatch.params.nodeId as NodeId };
   }
 
-  return { kind: 'page' };
+  return { kind: 'page', nodeId: defaultPageNodeId };
 };
 
 export default function DomProvider({ appId, children }: DomContextProps) {
@@ -393,7 +393,12 @@ export default function DomProvider({ appId, children }: DomContextProps) {
   invariant(dom, `Suspense should load the dom`);
 
   const location = useLocation();
-  const initialView = getInitialPageDomView(location);
+
+  const app = appDom.getApp(dom);
+  const { pages = [] } = appDom.getChildNodes(dom, app);
+  const firstPage = pages.length > 0 ? pages[0] : null;
+
+  const initialView = getInitialPageDomView(location, firstPage?.id);
 
   const [state, dispatch] = React.useReducer(domLoaderReducer, {
     saving: false,

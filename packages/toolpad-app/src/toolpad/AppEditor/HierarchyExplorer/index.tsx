@@ -6,7 +6,6 @@ import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import ArrowRightIcon from '@mui/icons-material/ArrowRight';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import AddIcon from '@mui/icons-material/Add';
-import { useLocation, matchRoutes, Location } from 'react-router-dom';
 import { NodeId } from '@mui/toolpad-core';
 import clsx from 'clsx';
 import invariant from 'invariant';
@@ -18,12 +17,6 @@ import CreateConnectionNodeDialog from './CreateConnectionNodeDialog';
 import useLocalStorageState from '../../../utils/useLocalStorageState';
 import NodeMenu from '../NodeMenu';
 import config from '../../../config';
-import {
-  APP_API_ROUTE,
-  APP_CODE_COMPONENT_ROUTE,
-  APP_CONNECTION_ROUTE,
-  APP_PAGE_ROUTE,
-} from '../../../routes';
 
 const HierarchyExplorerRoot = styled('div')({
   overflow: 'auto',
@@ -46,22 +39,6 @@ const StyledTreeItem = styled(TreeItem)({
     visibility: 'visible',
   },
 });
-
-function getActiveNodeId(location: Location): NodeId | null {
-  const match =
-    matchRoutes(
-      [
-        { path: APP_PAGE_ROUTE },
-        { path: APP_API_ROUTE },
-        { path: APP_CODE_COMPONENT_ROUTE },
-        { path: APP_CONNECTION_ROUTE },
-      ],
-      location,
-    ) || [];
-
-  const selected: NodeId[] = match.map((route) => route.params.nodeId as NodeId);
-  return selected.length > 0 ? selected[0] : null;
-}
 
 type StyledTreeItemProps = TreeItemProps & {
   onDeleteNode?: (nodeId: NodeId) => void;
@@ -148,7 +125,7 @@ export interface HierarchyExplorerProps {
 }
 
 export default function HierarchyExplorer({ appId, className }: HierarchyExplorerProps) {
-  const { dom } = useDom();
+  const { dom, currentView } = useDom();
   const domApi = useDomApi();
 
   const app = appDom.getApp(dom);
@@ -159,9 +136,7 @@ export default function HierarchyExplorer({ appId, className }: HierarchyExplore
     [':connections', ':pages', ':codeComponents'],
   );
 
-  const location = useLocation();
-
-  const activeNode = getActiveNodeId(location);
+  const activeNode = currentView.nodeId || null;
 
   const handleToggle = (event: React.SyntheticEvent, nodeIds: string[]) => {
     setExpanded(nodeIds as NodeId[]);

@@ -3,7 +3,6 @@ import { styled } from '@mui/material';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { JsRuntimeProvider } from '@mui/toolpad-core/jsRuntime';
 import DomProvider, { useDom } from '../DomLoader';
-import * as appDom from '../../appDom';
 import ConnectionEditor from './ConnectionEditor';
 import AppEditorShell from './AppEditorShell';
 import PageEditor from './PageEditor';
@@ -43,19 +42,14 @@ interface FileEditorProps {
 }
 
 function FileEditor({ appId }: FileEditorProps) {
-  const { dom, currentView } = useDom();
-
-  const app = appDom.getApp(dom);
-  const { pages = [] } = appDom.getChildNodes(dom, app);
+  const { currentView } = useDom();
 
   const location = useLocation();
   const navigate = useNavigate();
 
-  const firstPage = pages.length > 0 ? pages[0] : null;
-
   React.useEffect(() => {
     if (currentView.kind === 'page') {
-      const newPathname = `/app/${appId}/pages/${currentView.nodeId || firstPage?.id}`;
+      const newPathname = `/app/${appId}/pages/${currentView.nodeId}`;
 
       if (newPathname !== location.pathname) {
         navigate(
@@ -98,12 +92,12 @@ function FileEditor({ appId }: FileEditorProps) {
         );
       }
     }
-  }, [appId, currentView.kind, currentView.nodeId, firstPage?.id, location.pathname, navigate]);
+  }, [appId, currentView.kind, currentView.nodeId, location.pathname, navigate]);
 
   return (
     <AppEditorShell appId={appId}>
       {currentView.kind === 'page' ? (
-        <PageEditor appId={appId} nodeId={currentView.nodeId || firstPage?.id} />
+        <PageEditor appId={appId} nodeId={currentView.nodeId} />
       ) : null}
       {currentView.kind === 'connection' ? (
         <ConnectionEditor appId={appId} nodeId={currentView.nodeId} />

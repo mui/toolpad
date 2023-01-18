@@ -1,0 +1,61 @@
+import * as esbuild from 'esbuild';
+import * as appDom from '../appDom';
+import createRuntimeState from '../createRuntimeState';
+import projectRoot from './projectRoot';
+
+async function generate(dom: appDom.AppDom): Promise<string> {
+  return `
+    import * as React from 'react';
+    import AppCanvas from './src/canvas';
+
+    const rootNode = document.createElement('div');
+    document.body.append(rootNode);
+    const root = React.createRoot(rootNode);
+
+    const initialState = ${JSON.stringify(createRuntimeState({ appId: '', dom }))}
+
+    root.render(<AppCanvas initialState={initialState} />)
+  `;
+}
+
+export async function createBuilder(initialDom: appDom.AppDom) {
+  let dom = initialDom;
+
+  const toolpadPLugin: esbuild.Plugin = {
+    name: 'toolpad',
+    setup(build) {
+      build.onResolve({ filter: /^toolpad:/ }, (args) => ({
+        path: args.path.slice('toolpad:'.length),
+        namespace: 'toolpad',
+      }));
+
+      build.onLoad({ filter: /fs|path/ }, async (args) => {
+        return { loader: 'tsx', contents: 'export {}' };
+      });
+
+      build.onLoad({ filter: /.*/, namespace: 'toolpad' }, async (args) => {
+        console.log(`building ${args.path}`);
+        return { loader: 'tsx', contents: await generate(dom), resolveDir: projectRoot };
+      });
+    },
+  };
+
+  const ctx = await esbuild.context({
+    absWorkingDir: projectRoot,
+    entryPoints: ['toolpad:main.tsx'],
+    plugins: [toolpadPLugin],
+    write: false,
+    bundle: true,
+    outfile: 'main.js',
+    target: 'es2022',
+  });
+
+  return {
+    rebuild() {
+      return ctx.rebuild();
+    },
+    updateDom(newDom: appDom.AppDom) {
+      dom = newDom;
+    },
+  };
+}

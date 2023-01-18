@@ -1,15 +1,22 @@
 import * as React from 'react';
-
 import { TextField } from '@mui/material';
-
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DesktopDatePicker, DesktopDatePickerProps } from '@mui/x-date-pickers/DesktopDatePicker';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { createComponent } from '@mui/toolpad-core';
-import { Dayjs } from 'dayjs';
+import * as dayjs from 'dayjs';
 import { SX_PROP_HELPER_TEXT } from './constants';
 
-export interface DatePickerProps extends DesktopDatePickerProps<string, Dayjs> {
+const LOCALE_LOADERS = new Map([
+  ['nl', () => import('dayjs/locale/nl')],
+  ['fr', () => import('dayjs/locale/fr')],
+  // TODO...
+]);
+
+export interface DatePickerProps
+  extends Omit<DesktopDatePickerProps<string, dayjs.Dayjs>, 'value' | 'onChange'> {
+  value: string;
+  onChange: (newValue: string) => void;
   format: string;
   fullWidth: boolean;
   variant: 'outlined' | 'filled' | 'standard';
@@ -18,19 +25,43 @@ export interface DatePickerProps extends DesktopDatePickerProps<string, Dayjs> {
   defaultValue: string;
 }
 
-function DatePicker(props: DatePickerProps) {
-  const customProps: any = {};
+function DatePicker({ format, onChange, ...props }: DatePickerProps) {
+  const handleChange = React.useCallback(
+    (value: dayjs.Dayjs | null) => {
+      const stringValue = value?.format('YYYY-MM-DD') || '';
+      onChange(stringValue);
+    },
+    [onChange],
+  );
 
-  if (props.format) {
-    // If inputFormat receives undefined prop, datepicker throws error
-    customProps.inputFormat = props.format;
-  }
+  const [adapterLocale, setAdapterLocale] = React.useState<string | undefined>();
+
+  React.useEffect(() => {
+    const languages = navigator.languages;
+    for (const language of languages) {
+      const loader = LOCALE_LOADERS.get(language);
+      if (loader) {
+        loader().then(
+          () => {
+            setAdapterLocale(language);
+          },
+          () => {
+            console.error(`Failed to load locale "${language}", proceeding without localization`);
+          },
+        );
+        return;
+      }
+    }
+  }, []);
 
   return (
-    <LocalizationProvider dateAdapter={AdapterDayjs as any}>
+    // @ts-expect-error This seems to be a dependencies issue. Recreating the yarn.lock file solves this.
+    //                  TODO: recreate yarn.lock, or find less drastic solution
+    <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale={adapterLocale}>
       <DesktopDatePicker
-        {...customProps}
         {...props}
+        inputFormat={format || 'L'}
+        onChange={handleChange}
         renderInput={(params) => (
           <TextField
             {...params}
@@ -50,13 +81,9 @@ export default createComponent(DatePicker, {
     'The MUI X [Date picker](https://mui.com/x/react-date-pickers/date-picker/) component.\n\nThe date picker lets the user select a date.',
   argTypes: {
     value: {
-      helperText: '',
+      helperText: 'The currently selected date.',
       typeDef: { type: 'string' },
       onChangeProp: 'onChange',
-      onChangeHandler: (newValue: Dayjs) => {
-        // date-only form of ISO8601. See https://tc39.es/ecma262/#sec-date-time-string-format
-        return newValue.format('YYYY-MM-DD');
-      },
       defaultValue: '',
       defaultValueProp: 'defaultValue',
     },

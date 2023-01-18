@@ -28,6 +28,7 @@ export interface DatePickerProps
 function DatePicker({ format, onChange, ...props }: DatePickerProps) {
   const handleChange = React.useCallback(
     (value: dayjs.Dayjs | null) => {
+      // date-only form of ISO8601. See https://tc39.es/ecma262/#sec-date-time-string-format
       const stringValue = value?.format('YYYY-MM-DD') || '';
       onChange(stringValue);
     },

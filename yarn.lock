@@ -2121,6 +2121,24 @@
     react-transition-group "^4.4.5"
     rifm "^0.12.1"
 
+"@mui/x-date-pickers@^5.0.14":
+  version "5.0.14"
+  resolved "https://registry.yarnpkg.com/@mui/x-date-pickers/-/x-date-pickers-5.0.14.tgz#acfc3ef9be914e2f0127484442063f7300deeebf"
+  integrity sha512-+k+YOL++wEwuF6XRhF3uMLOXlHkUjMHmbXOXWWZ9wJppaGFolj9fNmUvydCp3Z0E9dPRt8J5Vv0z+upZ9KyQZg==
+  dependencies:
+    "@babel/runtime" "^7.18.9"
+    "@date-io/core" "^2.15.0"
+    "@date-io/date-fns" "^2.15.0"
+    "@date-io/dayjs" "^2.15.0"
+    "@date-io/luxon" "^2.15.0"
+    "@date-io/moment" "^2.15.0"
+    "@mui/utils" "^5.10.3"
+    "@types/react-transition-group" "^4.4.5"
+    clsx "^1.2.1"
+    prop-types "^15.7.2"
+    react-transition-group "^4.4.5"
+    rifm "^0.12.1"
+
 "@mui/x-license-pro@5.17.12":
   version "5.17.12"
   resolved "https://registry.yarnpkg.com/@mui/x-license-pro/-/x-license-pro-5.17.12.tgz#d069416b7191f9f5b77b2bf7375d2c51aead497c"

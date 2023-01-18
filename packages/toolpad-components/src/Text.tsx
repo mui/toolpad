@@ -24,6 +24,9 @@ interface TextProps extends Omit<BaseProps, 'children'> {
 const MarkdownContainer = styled('div')({
   display: 'block',
   maxWidth: 'fill-available',
+  '&  p': {
+    margin: '0',
+  },
   '&:empty::before, & > span:empty::before': {
     content: '""',
     display: 'inline-block',

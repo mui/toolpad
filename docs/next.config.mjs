@@ -34,7 +34,7 @@ const MONOREPO_PACKAGES = {
   '@mui/styles': path.resolve(MONORPO_PATH, './packages/mui-styles'),
   '@mui/system': path.resolve(MONORPO_PATH, './packages/mui-system/src'),
   '@mui/types': path.resolve(MONORPO_PATH, './packages/mui-types'),
-  '@mui/markdown': path.resolve(MONORPO_PATH, './docs/packages/markdown'),
+  '@mui/markdown': path.resolve(MONORPO_PATH, './packages/markdown'),
   '@mui/utils': path.resolve(MONORPO_PATH, './packages/mui-utils'),
 };
 
@@ -70,7 +70,7 @@ export default withTM(
                 oneOf: [
                   {
                     resourceQuery: /@mui\/markdown/,
-                    use: require.resolve('@mui/monorepo/docs/packages/markdown/loader'),
+                    use: require.resolve('@mui/monorepo/packages/markdown/loader'),
                   },
                 ],
               },

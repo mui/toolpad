@@ -190,6 +190,9 @@ export class ToolpadEditor {
   async dragNewComponentToAppCanvas(componentName: string) {
     await this.componentCatalog.hover();
 
+    // Account for opening transition
+    await this.page.waitForTimeout(200);
+
     const sourceSelector = `data-testid=component-catalog >> div:has-text("${componentName}")[draggable]`;
 
     const targetBoundingBox = await this.pageRoot.boundingBox();

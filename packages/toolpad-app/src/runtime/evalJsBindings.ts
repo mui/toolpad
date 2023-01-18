@@ -1,49 +1,12 @@
+import { BindingEvaluationResult, JsRuntime } from '@mui/toolpad-core';
 import { set } from 'lodash-es';
-import evalExpression from '../utils/evalExpression';
 import { mapValues } from '../utils/collections';
-import { errorFrom } from '../utils/errors';
-
-const TOOLPAD_LOADING_MARKER = '__TOOLPAD_LOADING_MARKER__';
-
-export function evaluateExpression(
-  code: string,
-  globalScope: Record<string, unknown>,
-): BindingEvaluationResult {
-  try {
-    const value = evalExpression(code, globalScope);
-    return { value };
-  } catch (rawError) {
-    const error = errorFrom(rawError);
-    if (error?.message === TOOLPAD_LOADING_MARKER) {
-      return { loading: true };
-    }
-    return { error: error as Error };
-  }
-}
-
-/**
- * Represents the actual state of an evaluated binding.
- */
-export type BindingEvaluationResult<T = unknown> = {
-  /**
-   * The actual value.
-   */
-  value?: T;
-  /**
-   * The evaluation of the value resulted in error.
-   */
-  error?: Error;
-  /**
-   * The parts that this value depends on are still loading.
-   */
-  loading?: boolean;
-};
 
 /**
  * Represents the state of a binding. It both describes which place it takes in the gobal scope
  * and how to obtain the result
  */
-export interface ParsedBinding<T = unknown> {
+export interface ParsedBinding {
   /**
    * How this binding presents itself to expressions in the global scope.
    * Path in the form that is accepted by lodash.set
@@ -53,14 +16,23 @@ export interface ParsedBinding<T = unknown> {
    * javascript expression that evaluates to the value of this binding
    */
   expression?: string;
-  /**
-   * actual evaluated result of the binding
-   */
-  result?: BindingEvaluationResult<T>;
+  dependencies?: undefined;
+  result?: undefined;
   /**
    * javascript expression that evaluates to the initial value of this binding if it doesn't have one
    */
   initializer?: string;
+}
+
+export interface EvaluatedBinding<T = unknown> {
+  scopePath?: string;
+  expression?: undefined;
+  dependencies?: string[];
+  /**
+   * actual evaluated result of the binding
+   */
+  result?: BindingEvaluationResult<T>;
+  initializer?: undefined;
 }
 
 type Dependencies = Map<string, Set<string>>;
@@ -129,11 +101,6 @@ function bubbleLoading(
   return false;
 }
 
-export interface EvaluatedBinding<T = unknown> {
-  scopePath?: string;
-  result?: BindingEvaluationResult<T>;
-}
-
 export function buildGlobalScope(
   base: Record<string, unknown>,
   bindings: Record<string, { result?: BindingEvaluationResult; scopePath?: string }>,
@@ -152,7 +119,8 @@ export function buildGlobalScope(
  * Evaluates the expressions and replace with their result
  */
 export default function evalJsBindings(
-  bindings: Record<string, ParsedBinding>,
+  jsRuntime: JsRuntime,
+  bindings: Record<string, ParsedBinding | EvaluatedBinding>,
   globalScope: Record<string, unknown>,
 ): Record<string, EvaluatedBinding> {
   const bindingsMap = new Map(Object.entries(bindings));
@@ -206,7 +174,7 @@ export default function evalJsBindings(
       computationStatuses.set(expression, { result: null });
       const prevContext = currentParentBinding;
       currentParentBinding = bindingId;
-      const result = evaluateExpression(expression, proxiedScope);
+      const result = jsRuntime.evaluateExpression(expression, proxiedScope);
       currentParentBinding = prevContext;
       computationStatuses.set(expression, { result });
       // From freshly computed
@@ -214,6 +182,9 @@ export default function evalJsBindings(
     }
 
     if (binding.result) {
+      if (binding.dependencies) {
+        dependencies.set(bindingId, new Set(binding.dependencies));
+      }
       // From input value on the page
       return binding.result;
     }
@@ -270,6 +241,7 @@ export default function evalJsBindings(
 
     return {
       scopePath,
+      dependencies: Array.from(flatDependencies.get(bindingId) ?? []),
       result: {
         ...results[bindingId],
         error: bubbleError(flatDependencies, results, bindingId),

@@ -8,17 +8,27 @@ export interface SelectOption {
   label?: string;
 }
 
-export type SelectProps = TextFieldProps & {
+export type SelectProps = Omit<TextFieldProps, 'value' | 'onChange'> & {
+  value: string;
+  onChange: (newValue: string) => void;
   options: (string | SelectOption)[];
 };
 
-function Select({ options, value, defaultValue, fullWidth, sx, ...rest }: SelectProps) {
+function Select({ options, value, onChange, defaultValue, fullWidth, sx, ...rest }: SelectProps) {
+  const handleChange = React.useCallback(
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      onChange(event.target.value);
+    },
+    [onChange],
+  );
+
   return (
     <TextField
       select
       sx={{ ...(!fullWidth && !value ? { width: 120 } : {}), ...sx }}
       fullWidth={fullWidth}
       value={value}
+      onChange={handleChange}
       {...rest}
     >
       {options.map((option) => {
@@ -49,7 +59,6 @@ export default createComponent(Select, {
       helperText: 'The currently selected value.',
       typeDef: { type: 'string' },
       onChangeProp: 'onChange',
-      onChangeHandler: (event: React.ChangeEvent<HTMLSelectElement>) => event.target.value,
       defaultValue: '',
       defaultValueProp: 'defaultValue',
     },

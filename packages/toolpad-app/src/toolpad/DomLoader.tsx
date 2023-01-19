@@ -18,8 +18,8 @@ import { APP_CODE_COMPONENT_ROUTE, APP_CONNECTION_ROUTE, APP_PAGE_ROUTE } from '
 
 export type PageView =
   | { kind: 'query'; nodeId: NodeId }
-  | { kind: 'pageModule'; nodeId: NodeId }
-  | { kind: 'pageParameters'; nodeId: NodeId };
+  | { kind: 'pageModule' }
+  | { kind: 'pageParameters' };
 
 export type DomView =
   | { kind: 'page'; nodeId?: NodeId; view?: PageView }

@@ -38,7 +38,7 @@ export default function UrlQueryEditor({ pageNodeId }: UrlQueryEditorProps) {
     domApi.setView({
       kind: 'page',
       nodeId: pageNodeId,
-      view: { kind: 'pageParameters', nodeId: pageNodeId },
+      view: { kind: 'pageParameters' },
     });
   }, [domApi, pageNodeId]);
 

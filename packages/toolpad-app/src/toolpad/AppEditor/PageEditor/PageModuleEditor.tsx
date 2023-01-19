@@ -89,7 +89,7 @@ export default function PageModuleEditor({ pageNodeId }: PageModuleEditorProps) 
     domApi.setView({
       kind: 'page',
       nodeId: pageNodeId,
-      view: { kind: 'pageModule', nodeId: pageNodeId },
+      view: { kind: 'pageModule' },
     });
   }, [domApi, pageNodeId]);
 

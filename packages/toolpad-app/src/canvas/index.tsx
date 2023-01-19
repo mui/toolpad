@@ -22,11 +22,12 @@ const handleScreenUpdate = throttle(
 );
 
 export interface AppCanvasProps {
+  initialState?: AppCanvasState | null;
   basename: string;
 }
 
-export default function AppCanvas({ basename }: AppCanvasProps) {
-  const [state, setState] = React.useState<AppCanvasState | null>(null);
+export default function AppCanvas({ basename, initialState = null }: AppCanvasProps) {
+  const [state, setState] = React.useState<AppCanvasState | null>(initialState);
 
   const appRootRef = React.useRef<HTMLDivElement>();
   const appRootCleanupRef = React.useRef<() => void>();

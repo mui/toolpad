@@ -1,4 +1,4 @@
-import { createServerJsRuntime } from '@mui/toolpad-core/jsRuntime';
+import { createServerJsRuntime } from '@mui/toolpad-core/jsServerRuntime';
 
 export default async function evalExpression(
   expression: string,

@@ -8,18 +8,18 @@ async function resolveValues(input: Map<string, Promise<unknown>>): Promise<Map<
 }
 
 async function createRequire(urlImports: string[]) {
-  const [{ default: muiMaterialExports }, urlModules] = await Promise.all([
-    import('./muiExports'),
-    resolveValues(
-      new Map(urlImports.map((url) => [url, import(/* webpackIgnore: true */ url)] as const)),
-    ),
-  ]);
+  // const [{ default: muiMaterialExports }, urlModules] = await Promise.all([
+  //   import('./muiExports'),
+  //   resolveValues(
+  //     new Map(urlImports.map((url) => [url, import(/* webpackIgnore: true */ url)] as const)),
+  //   ),
+  // ]);
 
   const modules: Map<string, any> = new Map([
-    ['react', React],
-    ['react-dom', ReactDom],
-    ...muiMaterialExports,
-    ...urlModules,
+    // ['react', React],
+    // ['react-dom', ReactDom],
+    // ...muiMaterialExports,
+    // ...urlModules,
   ]);
 
   const require = (moduleId: string): unknown => {

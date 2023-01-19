@@ -1,6 +1,6 @@
 import { ExecFetchResult } from '@mui/toolpad-core';
 import fetch from 'node-fetch';
-import { createServerJsRuntime } from '@mui/toolpad-core/jsRuntime';
+import { createServerJsRuntime } from '@mui/toolpad-core/jsServerRuntime';
 import { withHarInstrumentation, createHarLog } from '../../server/har';
 import { ServerDataSource } from '../../types';
 import { FetchPrivateQuery, FetchQuery, RestConnectionParams } from './types';

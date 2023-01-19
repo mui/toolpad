@@ -14,6 +14,7 @@ import { useDomApi } from '../../DomLoader';
 import createRuntimeState from '../../../createRuntimeState';
 import { ToolpadBridge, TOOLPAD_BRIDGE_GLOBAL } from '../../../canvas/ToolpadBridge';
 import CenteredSpinner from '../../../components/CenteredSpinner';
+import config from '../../../config';
 
 interface OverlayProps {
   children?: React.ReactNode;
@@ -126,7 +127,9 @@ export default function EditorCanvasHost({
     }
   });
 
-  const src = `/app-canvas/${appId}/pages/${pageNodeId}`;
+  const src = config.localMode
+    ? `/api/runtime/app/pages/${pageNodeId}`
+    : `/app-canvas/${appId}/pages/${pageNodeId}`;
 
   const [loading, setLoading] = React.useState(true);
   useOnChange(src, () => setLoading(true));

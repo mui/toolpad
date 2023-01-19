@@ -133,7 +133,7 @@ export default function AppCanvas({ basename, initialState = null }: AppCanvasPr
           rootRef={onAppRoot}
           hidePreviewBanner
           version="preview"
-          basename={`${basename}/${state.appId}`}
+          basename={basename}
           state={state}
         />
       </CanvasEventsContext.Provider>

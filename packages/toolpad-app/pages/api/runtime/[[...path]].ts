@@ -25,10 +25,20 @@ const routes = new Map<RegExp, NextApiHandler<string>>([
       const serializedConfig = serializeJavascript(config, { ignoreFunction: true });
 
       res.setHeader('content-type', 'text/html');
+      res.setHeader('x-frame-options', 'SAMEORIGIN');
+
       res.send(`
         <html>
           <body>
             <script>
+              // Add the data-toolpad-canvas attribute to the canvas iframe element
+              if (window.frameElement?.dataset.toolpadCanvas){
+                var script = document.createElement('script');
+                script.type = 'module';
+                script.src = '/reactDevtools/bootstrap.js';
+                document.write(script.outerHTML);
+              }
+              
               window[${JSON.stringify(RUNTIME_CONFIG_WINDOW_PROPERTY)}] = ${serializedConfig}
             </script>
             <script src="${BASE}/index.js"></script>

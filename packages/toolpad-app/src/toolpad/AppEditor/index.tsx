@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { styled } from '@mui/material';
 import { Route, Routes, useParams, Navigate, useNavigate } from 'react-router-dom';
-import { JsRuntimeProvider } from '@mui/toolpad-core/jsRuntime';
+import { JsRuntimeProvider } from '@mui/toolpad-core/jsServerRuntime';
 import PageEditor from './PageEditor';
 import DomProvider, { useDom } from '../DomLoader';
 import * as appDom from '../../appDom';
@@ -9,6 +9,7 @@ import CodeComponentEditor from './CodeComponentEditor';
 import ConnectionEditor from './ConnectionEditor';
 import AppEditorShell from './AppEditorShell';
 import NoPageFound from './NoPageFound';
+import config from '../../config';
 
 const classes = {
   content: 'Toolpad_Content',
@@ -113,5 +114,5 @@ export default function Editor() {
     throw new Error(`Missing queryParam "appId"`);
   }
 
-  return <EditorContent appId={appId} prefix={`/app/${appId}`} />;
+  return <EditorContent appId={appId} prefix={config.localMode ? '/app' : `/app/${appId}`} />;
 }

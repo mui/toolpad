@@ -17,7 +17,7 @@ import {
   RestConnectionParams,
   UrlEncodedBody,
 } from './types';
-import applyTransform from '../../server/applyTransform';
+import applyTransform from '../applyTransform';
 import { errorFrom } from '../../utils/errors';
 import { MOVIES_API_DEMO_URL } from '../demo';
 
@@ -238,7 +238,7 @@ export async function execfetch(
     data = untransformedData;
 
     if (fetchQuery.transformEnabled && fetchQuery.transform) {
-      data = await applyTransform(fetchQuery.transform, untransformedData);
+      data = await applyTransform(jsRuntime, fetchQuery.transform, untransformedData);
     }
   } catch (rawError) {
     error = errorFrom(rawError);

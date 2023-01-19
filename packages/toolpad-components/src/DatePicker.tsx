@@ -1,7 +1,5 @@
 import * as React from 'react';
-
 import { TextField } from '@mui/material';
-
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DesktopDatePicker, DesktopDatePickerProps } from '@mui/x-date-pickers/DesktopDatePicker';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
@@ -9,7 +7,65 @@ import { createComponent } from '@mui/toolpad-core';
 import { Dayjs } from 'dayjs';
 import { SX_PROP_HELPER_TEXT } from './constants';
 
-export interface DatePickerProps extends DesktopDatePickerProps<string, Dayjs> {
+const LOCALE_LOADERS = new Map([
+  ['en', () => import('dayjs/locale/en')],
+  ['nl', () => import('dayjs/locale/nl')],
+  ['fr', () => import('dayjs/locale/fr')],
+  // TODO...
+]);
+
+interface LoadableLocale {
+  locale: string;
+  load: () => Promise<unknown>;
+}
+
+const handlers = new Set<() => void>();
+let loadedLocale: undefined | string;
+
+function trygetLoadableLocale(locale: string): LoadableLocale | null {
+  const load = LOCALE_LOADERS.get(locale);
+  if (load) {
+    return { locale, load };
+  }
+  return null;
+}
+
+function getLoadableLocale(): LoadableLocale | null {
+  if (typeof window === 'undefined') {
+    return null;
+  }
+  const languages = window.navigator.languages;
+  for (const locale of languages) {
+    const { language } = new Intl.Locale(locale);
+    const result = trygetLoadableLocale(locale) || trygetLoadableLocale(language);
+    if (result) {
+      return result;
+    }
+  }
+  return null;
+}
+
+const loadableLocale = getLoadableLocale();
+if (loadableLocale) {
+  loadableLocale.load().then(() => {
+    loadedLocale = loadableLocale.locale;
+    handlers.forEach((handler) => handler());
+  });
+}
+
+function subscribeLocaleLoader(cb: () => void) {
+  handlers.add(cb);
+  return () => handlers.delete(cb);
+}
+
+function getSnapshot() {
+  return loadedLocale;
+}
+
+export interface DatePickerProps
+  extends Omit<DesktopDatePickerProps<string, Dayjs>, 'value' | 'onChange'> {
+  value: string;
+  onChange: (newValue: string) => void;
   format: string;
   fullWidth: boolean;
   variant: 'outlined' | 'filled' | 'standard';
@@ -18,19 +74,24 @@ export interface DatePickerProps extends DesktopDatePickerProps<string, Dayjs> {
   defaultValue: string;
 }
 
-function DatePicker(props: DatePickerProps) {
-  const customProps: any = {};
+function DatePicker({ format, onChange, ...props }: DatePickerProps) {
+  const handleChange = React.useCallback(
+    (value: Dayjs | null) => {
+      // date-only form of ISO8601. See https://tc39.es/ecma262/#sec-date-time-string-format
+      const stringValue = value?.format('YYYY-MM-DD') || '';
+      onChange(stringValue);
+    },
+    [onChange],
+  );
 
-  if (props.format) {
-    // If inputFormat receives undefined prop, datepicker throws error
-    customProps.inputFormat = props.format;
-  }
+  const adapterLocale = React.useSyncExternalStore(subscribeLocaleLoader, getSnapshot);
 
   return (
-    <LocalizationProvider dateAdapter={AdapterDayjs as any}>
+    <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale={adapterLocale}>
       <DesktopDatePicker
-        {...customProps}
         {...props}
+        inputFormat={format || 'L'}
+        onChange={handleChange}
         renderInput={(params) => (
           <TextField
             {...params}
@@ -50,13 +111,9 @@ export default createComponent(DatePicker, {
     'The MUI X [Date picker](https://mui.com/x/react-date-pickers/date-picker/) component.\n\nThe date picker lets the user select a date.',
   argTypes: {
     value: {
-      helperText: '',
+      helperText: 'The currently selected date.',
       typeDef: { type: 'string' },
       onChangeProp: 'onChange',
-      onChangeHandler: (newValue: Dayjs) => {
-        // date-only form of ISO8601. See https://tc39.es/ecma262/#sec-date-time-string-format
-        return newValue.format('YYYY-MM-DD');
-      },
       defaultValue: '',
       defaultValueProp: 'defaultValue',
     },

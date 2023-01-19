@@ -3,7 +3,7 @@ import /* muiToolpadCoreDefault, */ * as muiToolpadCore from '@mui/toolpad-core'
 // eslint-disable-next-line no-restricted-imports
 import /* muiIconsMaterialDefault, */ * as muiIconsMaterial from '@mui/icons-material';
 
-import muiMaterialDefault, * as muiMaterial from '@mui/material';
+import /* muiMaterialDefault, */ * as muiMaterial from '@mui/material';
 import muiMaterialAccordionDefault, * as muiMaterialAccordion from '@mui/material/Accordion';
 import muiMaterialCssBaselineDefault, * as muiMaterialCssBaseline from '@mui/material/CssBaseline';
 import muiMaterialListDefault, * as muiMaterialList from '@mui/material/List';
@@ -135,7 +135,7 @@ import muiMaterialCircularProgressDefault, * as muiMaterialCircularProgress from
 import muiMaterialInputLabelDefault, * as muiMaterialInputLabel from '@mui/material/InputLabel';
 import muiMaterialSelectDefault, * as muiMaterialSelect from '@mui/material/Select';
 import muiMaterialTabsDefault, * as muiMaterialTabs from '@mui/material/Tabs';
-import muiMaterialutilsDefault, * as muiMaterialutils from '@mui/material/utils';
+import /* muiMaterialutilsDefault, */ * as muiMaterialutils from '@mui/material/utils';
 import muiMaterialClickAwayListenerDefault, * as muiMaterialClickAwayListener from '@mui/material/ClickAwayListener';
 import muiMaterialSkeletonDefault, * as muiMaterialSkeleton from '@mui/material/Skeleton';
 import muiMaterialTextFieldDefault, * as muiMaterialTextField from '@mui/material/TextField';
@@ -195,7 +195,7 @@ function esm(namedExports: any, defaultExport?: any) {
 }
 
 const muiMaterialExports = new Map([
-  ['@mui/material', esm(muiMaterial, muiMaterialDefault)],
+  ['@mui/material', esm(muiMaterial /* , muiMaterialDefault */)],
   ['@mui/material/Accordion', esm(muiMaterialAccordion, muiMaterialAccordionDefault)],
   ['@mui/material/CssBaseline', esm(muiMaterialCssBaseline, muiMaterialCssBaselineDefault)],
   ['@mui/material/List', esm(muiMaterialList, muiMaterialListDefault)],
@@ -420,7 +420,7 @@ const muiMaterialExports = new Map([
   ['@mui/material/InputLabel', esm(muiMaterialInputLabel, muiMaterialInputLabelDefault)],
   ['@mui/material/Select', esm(muiMaterialSelect, muiMaterialSelectDefault)],
   ['@mui/material/Tabs', esm(muiMaterialTabs, muiMaterialTabsDefault)],
-  ['@mui/material/utils', esm(muiMaterialutils, muiMaterialutilsDefault)],
+  ['@mui/material/utils', esm(muiMaterialutils /* , muiMaterialutilsDefault */)],
   [
     '@mui/material/ClickAwayListener',
     esm(muiMaterialClickAwayListener, muiMaterialClickAwayListenerDefault),

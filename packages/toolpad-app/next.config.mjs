@@ -136,6 +136,9 @@ export default withSentryConfig(
           path: false,
         };
 
+        config.module = config.module ?? {};
+        config.module.strictExportPresence = true;
+
         if (!USE_EXPERIMENTAL_TRANSPILE_PACKAGES) {
           // Support global CSS in monaco-editor
           // Adapted from next-transpile-modules.
@@ -144,7 +147,6 @@ export default withSentryConfig(
             path.resolve(path.dirname(require.resolve('monaco-editor/package.json')), './esm'),
           ];
 
-          config.module = config.module ?? {};
           config.module.rules = config.module.rules ?? [];
           const nextCssLoaders = /** @type {import('webpack').RuleSetRule} */ (
             config.module.rules.find(

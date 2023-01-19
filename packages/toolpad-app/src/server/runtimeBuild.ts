@@ -1,19 +1,28 @@
 import * as esbuild from 'esbuild';
+import serializeJavascript from 'serialize-javascript';
 import * as appDom from '../appDom';
 import createRuntimeState from '../createRuntimeState';
 import projectRoot from './projectRoot';
 
-const MAIN_TSX = `
-  import * as React from 'react';
-  import * as ReactDOM from 'react-dom/client';
-  import AppCanvas from './src/canvas';
-  import initialState from 'toolpad:dom.json' assert { type: "json" };
+async function createMain(dom: appDom.AppDom) {
+  const initialState = createRuntimeState({ appId: '', dom });
+  const serializedInitialState = serializeJavascript(initialState, {
+    ignoreFunction: true,
+  });
 
-  const rootNode = document.createElement('div');
-  document.body.append(rootNode);
-  const root = ReactDOM.createRoot(rootNode);
-  root.render(<AppCanvas initialState={initialState} />)
-`;
+  return `
+    import * as React from 'react';
+    import * as ReactDOM from 'react-dom/client';
+    import AppCanvas from './src/canvas';
+    
+    const initialState = ${serializedInitialState}
+
+    const rootNode = document.createElement('div');
+    document.body.append(rootNode);
+    const root = ReactDOM.createRoot(rootNode);
+    root.render(<AppCanvas basename='/api/runtime/app' initialState={initialState} />)
+  `;
+}
 
 export async function createBuilder(initialDom: appDom.AppDom) {
   let dom = initialDom;
@@ -31,14 +40,8 @@ export async function createBuilder(initialDom: appDom.AppDom) {
           case 'main.tsx': {
             return {
               loader: 'tsx',
-              contents: MAIN_TSX,
+              contents: await createMain(dom),
               resolveDir: projectRoot,
-            };
-          }
-          case 'dom.json': {
-            return {
-              loader: 'json',
-              contents: JSON.stringify(createRuntimeState({ appId: '', dom })),
             };
           }
           default: {
@@ -63,12 +66,15 @@ export async function createBuilder(initialDom: appDom.AppDom) {
     external: ['quickjs-emscripten'],
   });
 
+  const result = await ctx.rebuild();
+
   return {
-    rebuild() {
-      return ctx.rebuild();
-    },
-    updateDom(newDom: appDom.AppDom) {
+    async rebuild(newDom: appDom.AppDom) {
       dom = newDom;
+      await ctx.rebuild();
+    },
+    getResult() {
+      return result;
     },
   };
 }

@@ -84,26 +84,28 @@ function AppOptions({ app, onRenameRequest: onRename, dom, redirectOnDelete }: A
       </IconButton>
       <Menu {...menuProps}>
         {config.localMode ? null : (
-          <React.Fragment>
-            <MenuItem onClick={handleRenameClick}>
-              <ListItemIcon>
-                <DriveFileRenameOutlineIcon />
-              </ListItemIcon>
-              <ListItemText>Rename</ListItemText>
-            </MenuItem>
-            <MenuItem onClick={handleDuplicateClick} disabled={!app}>
-              <ListItemIcon>
-                <ContentCopyOutlinedIcon />
-              </ListItemIcon>
-              <ListItemText>Duplicate</ListItemText>
-            </MenuItem>
-            <MenuItem onClick={handleDeleteClick} disabled={!app}>
-              <ListItemIcon>
-                <DeleteIcon />
-              </ListItemIcon>
-              <ListItemText>Delete</ListItemText>
-            </MenuItem>
-          </React.Fragment>
+          <MenuItem onClick={handleRenameClick}>
+            <ListItemIcon>
+              <DriveFileRenameOutlineIcon />
+            </ListItemIcon>
+            <ListItemText>Rename</ListItemText>
+          </MenuItem>
+        )}
+        {config.localMode ? null : (
+          <MenuItem onClick={handleDuplicateClick} disabled={!app}>
+            <ListItemIcon>
+              <ContentCopyOutlinedIcon />
+            </ListItemIcon>
+            <ListItemText>Duplicate</ListItemText>
+          </MenuItem>
+        )}
+        {config.localMode ? null : (
+          <MenuItem onClick={handleDeleteClick} disabled={!app}>
+            <ListItemIcon>
+              <DeleteIcon />
+            </ListItemIcon>
+            <ListItemText>Delete</ListItemText>
+          </MenuItem>
         )}
         <Divider />
         {dom ? (

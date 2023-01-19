@@ -1,6 +1,7 @@
 import * as esbuild from 'esbuild';
 import serializeJavascript from 'serialize-javascript';
 import * as appDom from '../appDom';
+import { MUI_X_PRO_LICENSE } from '../constants';
 import createRuntimeState from '../createRuntimeState';
 import projectRoot from './projectRoot';
 
@@ -13,7 +14,10 @@ async function createMain(dom: appDom.AppDom) {
   return `
     import * as React from 'react';
     import * as ReactDOM from 'react-dom/client';
+    import { LicenseInfo } from '@mui/x-data-grid-pro';
     import AppCanvas from './src/canvas';
+
+    LicenseInfo.setLicenseKey(${JSON.stringify(MUI_X_PRO_LICENSE)});
     
     const initialState = ${serializedInitialState}
 

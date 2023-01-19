@@ -28,6 +28,14 @@ export const sendAppCreatedEvent = (appName: string, appTemplateId?: AppTemplate
   }
 };
 
+export const sendAppContinueLatestEvent = (appId: string): void => {
+  if (config.gaId) {
+    window.gtag('event', 'toolpad_app_continue_latest', {
+      app_id: appId,
+    });
+  }
+};
+
 export const sendSelfHostClickEvent = (appId?: string, source?: string): void => {
   if (config.gaId) {
     window.gtag('event', 'toolpad_self_host_click', {

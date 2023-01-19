@@ -1,6 +1,6 @@
 import { NodeId, BindableAttrValue, ExecFetchResult } from '@mui/toolpad-core';
 import * as _ from 'lodash-es';
-import { createServerJsRuntime } from '@mui/toolpad-core/jsServerRuntime';
+import { createServerJsRuntime } from '@mui/toolpad-core/jsRuntime';
 import * as prisma from '../../prisma/generated/client';
 import { ServerDataSource, VersionOrPreview, AppTemplateId, RuntimeState } from '../types';
 import serverDataSources from '../toolpadDataSources/server';

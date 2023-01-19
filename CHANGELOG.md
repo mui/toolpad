@@ -1,5 +1,27 @@
 # Changelog
 
+## 0.0.36
+
+<!-- generated comparing v0.0.35..master -->
+
+_Jan 18, 2023_
+
+A big thanks to the 3 contributors who made this release possible. Here are some highlights ✨:
+
+Added Tabs component and new canvas bridge implementation, fixed DatePicker localization, binding to objects, link redirection. Improved code around js evaluation.
+
+- &#8203;<!-- 9 -->Fix DatePicker localization issues (#1575) @Janpot
+- &#8203;<!-- 8 -->Avoid resubscribing in useSyncExternalStore on every render (#1554) @Janpot
+- &#8203;<!-- 7 -->Rename Tabs main prop (#1568) @bytasv
+- &#8203;<!-- 6 -->Add tabs and container components (#1549) @bytasv
+- &#8203;<!-- 5 -->Reorganize js evaluation across project (#1548) @Janpot
+- &#8203;<!-- 4 -->New canvas bridge implementation (#1550) @Janpot
+- &#8203;<!-- 3 -->Fix binding to objects with more than one property (#1542) @Janpot
+- &#8203;<!-- 2 -->[core] Add missing need triage label on RFC @oliviertassinari
+- &#8203;<!-- 1 -->[docs] Fix link redirection @oliviertassinari
+
+All contributors of this release in alphabetical order: @bytasv, @Janpot, @oliviertassinari
+
 ## 0.0.35
 
 <!-- generated comparing v0.0.34..master -->

@@ -6,7 +6,7 @@ import config from '../config';
 import * as appDom from '../appDom';
 import { errorFrom } from '../utils/errors';
 
-function getConfigFilePath() {
+export function getConfigFilePath() {
   const { projectDir } = config;
   invariant(projectDir, 'Toolpad in local mode must have a project directory defined');
   const filePath = path.resolve(projectDir, './toolpad.yaml');
@@ -18,8 +18,7 @@ export async function saveLocalDom(app: appDom.AppDom): Promise<void> {
   await fs.writeFile(filePath, yaml.stringify(app), { encoding: 'utf-8' });
 }
 
-export async function loadLocalDom(): Promise<appDom.AppDom> {
-  const filePath = getConfigFilePath();
+export async function loadLocalDomFromFile(filePath: string): Promise<appDom.AppDom> {
   try {
     const content = await fs.readFile(filePath, { encoding: 'utf-8' });
     return yaml.parse(content);
@@ -32,4 +31,8 @@ export async function loadLocalDom(): Promise<appDom.AppDom> {
     }
     throw error;
   }
+}
+
+export async function loadLocalDom(): Promise<appDom.AppDom> {
+  return loadLocalDomFromFile(getConfigFilePath());
 }

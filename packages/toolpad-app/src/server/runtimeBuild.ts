@@ -3,6 +3,7 @@ import serializeJavascript from 'serialize-javascript';
 import * as appDom from '../appDom';
 import { MUI_X_PRO_LICENSE } from '../constants';
 import createRuntimeState from '../createRuntimeState';
+import { loadLocalDomFromFile } from './localMode';
 import projectRoot from './projectRoot';
 
 async function createMain(dom: appDom.AppDom) {
@@ -28,8 +29,8 @@ async function createMain(dom: appDom.AppDom) {
   `;
 }
 
-export async function createBuilder(initialDom: appDom.AppDom) {
-  let dom = initialDom;
+export async function createBuilder(filePath: string) {
+  const dom = await loadLocalDomFromFile(filePath);
 
   const toolpadPLugin: esbuild.Plugin = {
     name: 'toolpad',
@@ -46,12 +47,19 @@ export async function createBuilder(initialDom: appDom.AppDom) {
               loader: 'tsx',
               contents: await createMain(dom),
               resolveDir: projectRoot,
+              watchFiles: [filePath],
             };
           }
           default: {
             throw new Error(`Can't resolve "${args.path}" for toolpad namespace`);
           }
         }
+      });
+
+      build.onEnd((args) => {
+        // TODO: use for hot reloading
+        // eslint-disable-next-line no-console
+        console.log(`Rebuild: ${args.errors.length} error(s), ${args.warnings.length} warning(s)`);
       });
     },
   };
@@ -73,9 +81,8 @@ export async function createBuilder(initialDom: appDom.AppDom) {
   const result = await ctx.rebuild();
 
   return {
-    async rebuild(newDom: appDom.AppDom) {
-      dom = newDom;
-      await ctx.rebuild();
+    async watch() {
+      await ctx.watch();
     },
     getResult() {
       return result;

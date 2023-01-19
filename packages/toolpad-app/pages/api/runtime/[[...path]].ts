@@ -3,7 +3,7 @@ import { NextApiHandler } from 'next';
 import serializeJavascript from 'serialize-javascript';
 import config from '../../../src/config';
 import { RUNTIME_CONFIG_WINDOW_PROPERTY } from '../../../src/constants';
-import { loadLocalDom } from '../../../src/server/localMode';
+import { getConfigFilePath } from '../../../src/server/localMode';
 import { createBuilder } from '../../../src/server/runtimeBuild';
 
 const BASE = '/api/runtime';
@@ -12,9 +12,12 @@ let builderPromise: ReturnType<typeof createBuilder> | undefined;
 
 async function getBuilder() {
   if (!builderPromise) {
-    const initialDom = await loadLocalDom();
-    builderPromise = createBuilder(initialDom);
+    builderPromise = createBuilder(getConfigFilePath()).then(async (builder) => {
+      await builder.watch();
+      return builder;
+    });
   }
+
   return builderPromise;
 }
 
@@ -29,19 +32,25 @@ const routes = new Map<RegExp, NextApiHandler<string>>([
 
       res.send(`
         <html>
-          <body>
+          <head>
+            <link
+              rel="stylesheet"
+              href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap"
+            />
+
             <script>
               // Add the data-toolpad-canvas attribute to the canvas iframe element
               if (window.frameElement?.dataset.toolpadCanvas){
                 var script = document.createElement('script');
-                script.type = 'module';
                 script.src = '/reactDevtools/bootstrap.js';
                 document.write(script.outerHTML);
               }
               
               window[${JSON.stringify(RUNTIME_CONFIG_WINDOW_PROPERTY)}] = ${serializedConfig}
             </script>
-            <script src="${BASE}/index.js"></script>
+          </head>
+          <body>
+            <script async src="${BASE}/index.js"></script>
           </body>
         </html>
       `);

@@ -27,3 +27,28 @@ export const sendAppCreatedEvent = (appName: string, appTemplateId?: AppTemplate
     });
   }
 };
+
+export const sendSelfHostClickEvent = (appId?: string, source?: string): void => {
+  if (config.gaId) {
+    window.gtag('event', 'toolpad_self_host_click', {
+      app_id: appId,
+      source,
+    });
+  }
+};
+
+export const sendRoadmapClickEvent = (appId?: string): void => {
+  if (config.gaId) {
+    window.gtag('event', 'toolpad_roadmap_click', {
+      app_id: appId,
+    });
+  }
+};
+
+export const sendScheduleDemoClickEvent = (appId?: string): void => {
+  if (config.gaId) {
+    window.gtag('event', 'toolpad_schedule_demo_click', {
+      app_id: appId,
+    });
+  }
+};

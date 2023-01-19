@@ -238,7 +238,7 @@ export async function execfetch(
     data = untransformedData;
 
     if (fetchQuery.transformEnabled && fetchQuery.transform) {
-      data = await applyTransform(fetchQuery.transform, untransformedData);
+      data = await applyTransform(jsRuntime, fetchQuery.transform, untransformedData);
     }
   } catch (rawError) {
     error = errorFrom(rawError);

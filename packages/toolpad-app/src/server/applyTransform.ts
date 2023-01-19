@@ -1,6 +1,17 @@
-import evalExpression from './evalExpression';
+import { JsRuntime } from '@mui/toolpad-core';
 
-export default async function applyTransform(transform: string, data: any): Promise<any> {
+export default async function applyTransform(
+  jsRuntime: JsRuntime,
+  transform: string,
+  data: any,
+): Promise<any> {
   const transformFn = `(data) => {${transform}}`;
-  return evalExpression(`${transformFn}(${JSON.stringify(data)})`);
+  const { error, value } = jsRuntime.evaluateExpression(
+    `${transformFn}(${JSON.stringify(data)})`,
+    {},
+  );
+  if (error) {
+    throw error;
+  }
+  return value;
 }

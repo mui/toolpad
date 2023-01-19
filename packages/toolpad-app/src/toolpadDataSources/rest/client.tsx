@@ -23,7 +23,8 @@ import {
 } from '@mui/material';
 import { Controller, useForm } from 'react-hook-form';
 import { TabContext, TabList } from '@mui/lab';
-import { useBrowserJsRuntime, useServerJsRuntime } from '@mui/toolpad-core/jsRuntime';
+import { useBrowserJsRuntime } from '@mui/toolpad-core/jsRuntime';
+import { useServerJsRuntime } from '@mui/toolpad-core/jsServerRuntime';
 import {
   ClientDataSource,
   ConnectionEditorProps,

@@ -1,5 +1,6 @@
 import { NodeId, BindableAttrValue, ExecFetchResult } from '@mui/toolpad-core';
 import * as _ from 'lodash-es';
+import { createServerJsRuntime } from '@mui/toolpad-core/jsRuntime';
 import * as prisma from '../../prisma/generated/client';
 import { ServerDataSource, VersionOrPreview, AppTemplateId, RuntimeState } from '../types';
 import serverDataSources from '../toolpadDataSources/server';
@@ -7,7 +8,7 @@ import * as appDom from '../appDom';
 import { omit } from '../utils/immutability';
 import { asArray } from '../utils/collections';
 import { decryptSecret, encryptSecret } from './secrets';
-import applyTransform from './applyTransform';
+import applyTransform from '../toolpadDataSources/applyTransform';
 import { excludeFields } from '../utils/prisma';
 import { getAppTemplateDom } from './appTemplateDoms/doms';
 import { validateRecaptchaToken } from './validateRecaptchaToken';
@@ -484,8 +485,9 @@ export async function execQuery<P, Q>(
     const transformEnabled = dataNode.attributes.transformEnabled?.value;
     const transform = dataNode.attributes.transform?.value;
     if (transformEnabled && transform) {
+      const jsServerRuntime = await createServerJsRuntime();
       result = {
-        data: await applyTransform(transform, result.data),
+        data: await applyTransform(jsServerRuntime, transform, result.data),
       };
     }
   }

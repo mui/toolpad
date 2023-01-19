@@ -1,4 +1,4 @@
-import { createServerJsRuntime } from '@mui/toolpad-core/jsRuntime';
+import { createServerJsRuntime } from '@mui/toolpad-core/jsServerRuntime';
 
 async function evalExpression(expression: string, globalScope: Record<string, unknown> = {}) {
   const jsServerRuntime = await createServerJsRuntime();

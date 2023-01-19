@@ -17,7 +17,7 @@ import {
   RestConnectionParams,
   UrlEncodedBody,
 } from './types';
-import applyTransform from '../../server/applyTransform';
+import applyTransform from '../applyTransform';
 import { errorFrom } from '../../utils/errors';
 import { MOVIES_API_DEMO_URL } from '../demo';
 

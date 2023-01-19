@@ -31,7 +31,7 @@ function isValidTarget(input) {
   );
 }
 
-/** @type {(env: Partial<Record<string, string>>) => import('./src/config').BuildEnvVars} */
+/** @type {(env: Partial<Record<string, string>>) => import('./src/config.js').BuildEnvVars} */
 function parseBuidEnvVars(env) {
   let target = 'CE';
   if (env.TOOLPAD_TARGET && !isValidTarget(env.TOOLPAD_TARGET)) {
@@ -109,7 +109,7 @@ const NEVER = () => false;
 
 export default withSentryConfig(
   withBundleAnalyzer(
-    /** @type {import('next').NextConfig & { sentry: import('@sentry/nextjs/types/config/types').UserSentryOptions }} */ ({
+    /** @type {import('next').NextConfig & { sentry: import('@sentry/nextjs/types/config/types.js').UserSentryOptions }} */ ({
       transpilePackages: USE_EXPERIMENTAL_TRANSPILE_PACKAGES ? ['monaco-editor'] : undefined,
       reactStrictMode: true,
       poweredByHeader: false,

@@ -24,7 +24,7 @@
       "props": {
         "value": {
           "type": "jsExpression",
-          "value": "filePicker.value && filePicker.value[0].base64 ? \"Uploaded: base64\" : \"Empty\"\n"
+          "value": "filePicker.value && filePicker.value[0].base64 ? \"Uploaded\" : \"Empty\"\n"
         }
       },
       "layout": {},
@@ -113,7 +113,7 @@
       "props": {
         "value": {
           "type": "jsExpression",
-          "value": "\"name: \" + (filePicker.value && filePicker.value[0].name)\n"
+          "value": "filePicker.value && filePicker.value[0].name\n"
         }
       },
       "layout": {},

@@ -62,6 +62,7 @@ export default async (
       }
     }
   }
+
   const dom = await loadDom(appId, version);
   const dataNode = appDom.getMaybeNode(dom, queryNodeId);
 

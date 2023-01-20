@@ -127,7 +127,7 @@ export default withSentryConfig(
       // Ignoring type mismatch because types from Sentry are incompatible
       // https://github.com/getsentry/sentry-javascript/issues/4560
       webpack: (config, options) => {
-        config.resolve = config.resolve ?? {};
+        config.resolve ??= {};
         config.resolve.fallback = {
           ...config.resolve.fallback,
           // We need these because quickjs-emscripten doesn't export pure browser compatible modules yet
@@ -135,6 +135,9 @@ export default withSentryConfig(
           fs: false,
           path: false,
         };
+
+        config.module ??= {};
+        config.module.strictExportPresence = true;
 
         if (!USE_EXPERIMENTAL_TRANSPILE_PACKAGES) {
           // Support global CSS in monaco-editor
@@ -144,8 +147,7 @@ export default withSentryConfig(
             path.resolve(path.dirname(require.resolve('monaco-editor/package.json')), './esm'),
           ];
 
-          config.module = config.module ?? {};
-          config.module.rules = config.module.rules ?? [];
+          config.module.rules ??= [];
           const nextCssLoaders = /** @type {import('webpack').RuleSetRule} */ (
             config.module.rules.find(
               (rule) => typeof rule === 'object' && typeof rule.oneOf === 'object',

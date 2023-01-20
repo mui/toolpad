@@ -36,6 +36,7 @@ const addDemoBarUTMParamsToURL = (url: string): string =>
     medium: 'organic_toolpad',
     campaign: DEMO_CAMPAIGN_NAME,
   });
+
 export default function DemoBar() {
   const { appId } = useParams();
 

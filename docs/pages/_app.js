@@ -133,8 +133,6 @@ function AppWrapper(props) {
     }
   }, []);
 
-  const activePage = findActivePage(pages, router.pathname);
-
   let fonts = [];
   if (router.pathname.match(/onepirate/)) {
     fonts = [
@@ -142,7 +140,11 @@ function AppWrapper(props) {
     ];
   }
 
-  const pageContextValue = React.useMemo(() => ({ activePage, pages }), [activePage]);
+  const pageContextValue = React.useMemo(() => {
+    const { activePage, activePageParents } = findActivePage(pages, router.pathname);
+
+    return { activePage, activePageParents, pages };
+  }, [router.pathname]);
 
   return (
     <React.Fragment>

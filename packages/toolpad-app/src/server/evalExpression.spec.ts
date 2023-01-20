@@ -1,4 +1,15 @@
-import evalExpression from './evalExpression';
+import { createServerJsRuntime } from '@mui/toolpad-core/jsRuntime';
+
+async function evalExpression(expression: string, globalScope: Record<string, unknown> = {}) {
+  const jsServerRuntime = await createServerJsRuntime();
+  const { value, error } = jsServerRuntime.evaluateExpression(expression, globalScope);
+
+  if (error) {
+    throw error;
+  }
+
+  return value;
+}
 
 describe('evalExpression', () => {
   test('Basic expression', async () => {

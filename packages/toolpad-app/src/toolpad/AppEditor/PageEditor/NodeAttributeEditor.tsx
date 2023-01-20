@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { ArgTypeDefinition, BindableAttrValue } from '@mui/toolpad-core';
 import { Alert, Box } from '@mui/material';
-import { useBrowserJsRuntime } from '@mui/toolpad-core/jsRuntime';
+import { useBrowserJsRuntime } from '@mui/toolpad-core/jsBrowserRuntime';
 import * as appDom from '../../../appDom';
 import { useDomApi } from '../../DomLoader';
 import BindableEditor from './BindableEditor';

@@ -17,7 +17,13 @@ export type SelectProps = Omit<TextFieldProps, 'value' | 'onChange'> & {
 function Select({ options, value, onChange, defaultValue, fullWidth, sx, ...rest }: SelectProps) {
   const handleChange = React.useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
+      console.log('kickced');
+
+      debugger;
       onChange(event.target.value);
+
+      const changeEvent = new Event('change', { bubbles: true });
+      event.target.dispatchEvent(changeEvent);
     },
     [onChange],
   );

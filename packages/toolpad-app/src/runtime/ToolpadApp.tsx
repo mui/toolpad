@@ -327,6 +327,7 @@ function RenderedNodeContent({ node, childNodeGroups, Component }: RenderedNodeC
 
   const props: Record<string, any> = React.useMemo(() => {
     return {
+      name: node.name,
       ...boundProps,
       ...onChangeHandlers,
       ...eventHandlers,

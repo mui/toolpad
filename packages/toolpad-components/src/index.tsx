@@ -24,5 +24,7 @@ export { default as Tabs } from './Tabs.js';
 
 export { default as Container } from './Container.js';
 
+export { default as Form } from './Form.js';
+
 export { CUSTOM_COLUMN_TYPES, NUMBER_FORMAT_PRESETS, inferColumns, parseColumns } from './DataGrid';
 export type { SerializableGridColumn, SerializableGridColumns, NumberFormat } from './DataGrid';

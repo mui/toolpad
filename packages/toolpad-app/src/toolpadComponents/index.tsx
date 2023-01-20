@@ -38,6 +38,7 @@ const INTERNAL_COMPONENTS = new Map<string, ToolpadComponentDefinition>([
   ['Paper', { displayName: 'Paper', builtIn: 'Paper' }],
   ['Tabs', { displayName: 'Tabs', builtIn: 'Tabs' }],
   ['Container', { displayName: 'Container', builtIn: 'Container' }],
+  ['Form', { displayName: 'Form', builtIn: 'Form' }],
 ]);
 
 function createCodeComponent(domNode: appDom.CodeComponentNode): ToolpadComponentDefinition {

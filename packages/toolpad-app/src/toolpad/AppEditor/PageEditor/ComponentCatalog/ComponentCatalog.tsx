@@ -18,7 +18,6 @@ interface FutureComponentSpec {
 }
 
 const FUTURE_COMPONENTS = new Map<string, FutureComponentSpec>([
-  ['Form', { url: 'https://github.com/mui/mui-toolpad/issues/749', displayName: 'Form' }],
   ['Card', { url: 'https://github.com/mui/mui-toolpad/issues/748', displayName: 'Card' }],
   ['Slider', { url: 'https://github.com/mui/mui-toolpad/issues/746', displayName: 'Slider' }],
   ['Switch', { url: 'https://github.com/mui/mui-toolpad/issues/745', displayName: 'Switch' }],

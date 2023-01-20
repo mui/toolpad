@@ -109,7 +109,6 @@ test('test undo and redo through different pages', async ({ page, browserName, a
 
   // Undo changes
   await page.keyboard.press('Control+Z');
-  page.waitForNavigation();
 
   await expect(pageButton1).toBeVisible();
 });

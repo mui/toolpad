@@ -12,7 +12,10 @@ let builderPromise: ReturnType<typeof createBuilder> | undefined;
 
 async function getBuilder() {
   if (!builderPromise) {
-    builderPromise = createBuilder(getConfigFilePath()).then(async (builder) => {
+    builderPromise = createBuilder({
+      filePath: getConfigFilePath(),
+      dev: true,
+    }).then(async (builder) => {
       await builder.watch();
       return builder;
     });
@@ -58,13 +61,21 @@ const routes = new Map<RegExp, NextApiHandler<string>>([
   ],
 
   [
-    /^\/index\.js/,
+    /^\/index\.js$/,
     async (req, res) => {
       const builder = await getBuilder();
       const output = builder.getResult();
-      const content = output.outputFiles[0].contents;
-      res.setHeader('content-type', 'application/javascript; charset=utf-8');
-      res.write(content);
+
+      const indexFile = output.outputFiles.find((file) => file.path === '/index.js');
+
+      if (indexFile) {
+        res.setHeader('content-type', 'application/javascript; charset=utf-8');
+        res.write(indexFile.contents);
+        res.end();
+        return;
+      }
+
+      res.status(404);
       res.end();
     },
   ],

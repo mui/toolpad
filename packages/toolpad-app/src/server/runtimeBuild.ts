@@ -29,7 +29,12 @@ async function createMain(dom: appDom.AppDom) {
   `;
 }
 
-export async function createBuilder(filePath: string) {
+interface BuilderOptions {
+  filePath: string;
+  dev?: boolean;
+}
+
+export async function createBuilder({ filePath, dev }: BuilderOptions) {
   const dom = await loadLocalDomFromFile(filePath);
 
   const toolpadPLugin: esbuild.Plugin = {
@@ -70,12 +75,12 @@ export async function createBuilder(filePath: string) {
     plugins: [toolpadPLugin],
     write: false,
     bundle: true,
-    outfile: 'main.js',
+    outfile: '/index.js',
     target: 'es2022',
     jsx: 'transform',
-    jsxDev: true,
+    jsxDev: dev,
+    minify: !dev,
     tsconfig: './tsconfig.esbuild.json',
-    external: ['quickjs-emscripten'],
   });
 
   const result = await ctx.rebuild();

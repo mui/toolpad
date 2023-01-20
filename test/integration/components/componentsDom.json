@@ -22,6 +22,22 @@
       "parentProp": "children",
       "parentIndex": "a0"
     },
+    "1m13ljr": {
+      "id": "1m13ljr",
+      "name": "codeComponent_eb03t9a",
+      "type": "element",
+      "props": {},
+      "layout": {},
+      "parentId": "rx23l68",
+      "attributes": {
+        "component": {
+          "type": "const",
+          "value": "codeComponent.eb03t9a"
+        }
+      },
+      "parentProp": "children",
+      "parentIndex": "a0"
+    },
     "2m53pfl": {
       "id": "2m53pfl",
       "name": "pageRow5",
@@ -173,7 +189,7 @@
       "attributes": {
         "component": {
           "type": "const",
-          "value": "Typography"
+          "value": "Text"
         }
       },
       "parentProp": "children",
@@ -240,6 +256,22 @@
       "parentProp": "children",
       "parentIndex": "a0"
     },
+    "rx23l68": {
+      "id": "rx23l68",
+      "name": "pageRow",
+      "type": "element",
+      "props": {},
+      "layout": {},
+      "parentId": "f703ps3",
+      "attributes": {
+        "component": {
+          "type": "const",
+          "value": "PageRow"
+        }
+      },
+      "parentProp": "children",
+      "parentIndex": "a1V"
+    },
     "vkowdut": {
       "id": "vkowdut",
       "name": "Application",
@@ -281,8 +313,8 @@
       "parentProp": "children",
       "parentIndex": "a0"
     },
-    "rx23l68": {
-      "name": "pageRow",
+    "cq23zi2": {
+      "name": "pageRow1",
       "props": {},
       "attributes": {
         "component": {
@@ -291,28 +323,80 @@
         }
       },
       "layout": {},
-      "id": "rx23l68",
+      "id": "cq23zi2",
       "type": "element",
       "parentId": "f703ps3",
       "parentProp": "children",
-      "parentIndex": "a1V"
+      "parentIndex": "a6"
     },
-    "1m13ljr": {
-      "name": "codeComponent_eb03t9a",
+    "dw03zsb": {
+      "name": "list",
+      "props": {
+        "items": {
+          "type": "const",
+          "value": [
+            {
+              "buttonText": "List Button 1"
+            },
+            {
+              "buttonText": "List Button 2"
+            },
+            {
+              "buttonText": "List Button 3"
+            }
+          ]
+        }
+      },
+      "attributes": {
+        "component": {
+          "type": "const",
+          "value": "List"
+        }
+      },
+      "layout": {},
+      "id": "dw03zsb",
+      "type": "element",
+      "parentId": "cq23zi2",
+      "parentProp": "children",
+      "parentIndex": "a0"
+    },
+    "a053zk5": {
+      "name": "pageRow2",
       "props": {},
       "attributes": {
         "component": {
           "type": "const",
-          "value": "codeComponent.eb03t9a"
+          "value": "PageRow"
         }
       },
       "layout": {},
-      "id": "1m13ljr",
+      "id": "a053zk5",
       "type": "element",
-      "parentId": "rx23l68",
+      "parentId": "dw03zsb",
+      "parentProp": "renderItems",
+      "parentIndex": "a0"
+    },
+    "j333zmp": {
+      "name": "button1",
+      "props": {
+        "content": {
+          "type": "jsExpression",
+          "value": "button1Item.buttonText\n"
+        }
+      },
+      "attributes": {
+        "component": {
+          "type": "const",
+          "value": "Button"
+        }
+      },
+      "layout": {},
+      "id": "j333zmp",
+      "type": "element",
+      "parentId": "a053zk5",
       "parentProp": "children",
       "parentIndex": "a0"
     }
   },
-  "version": 2
+  "version": 5
 }

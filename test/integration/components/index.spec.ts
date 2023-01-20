@@ -13,6 +13,7 @@ async function waitForComponents(page: Page | FrameLocator) {
   await page.locator('label:has-text("foo textfield")').waitFor({ state: 'visible' });
   await page.locator('text="foo typography"').waitFor({ state: 'visible' });
   await page.locator('label:has-text("foo select")').waitFor({ state: 'visible' });
+  await page.locator('text="List Button 3"').waitFor({ state: 'visible' });
 }
 
 test('components', async ({ page, browserName, api }) => {

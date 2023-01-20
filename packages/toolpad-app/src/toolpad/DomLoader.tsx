@@ -3,7 +3,7 @@ import { NodeId } from '@mui/toolpad-core';
 import { createProvidedContext } from '@mui/toolpad-core/utils/react';
 import invariant from 'invariant';
 import { debounce, DebouncedFunc } from 'lodash-es';
-import { Location, matchPath, useLocation } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 import * as appDom from '../appDom';
 import { update } from '../utils/immutability';
 import client from '../api';
@@ -14,17 +14,7 @@ import insecureHash from '../utils/insecureHash';
 import useEvent from '../utils/useEvent';
 import { NodeHashes } from '../types';
 import { hasFieldFocus } from '../utils/fields';
-import { APP_CODE_COMPONENT_ROUTE, APP_CONNECTION_ROUTE, APP_PAGE_ROUTE } from '../routes';
-
-export type PageView =
-  | { kind: 'query'; nodeId: NodeId }
-  | { kind: 'pageModule' }
-  | { kind: 'pageParameters' };
-
-export type DomView =
-  | { kind: 'page'; nodeId?: NodeId; view?: PageView }
-  | { kind: 'connection'; nodeId: NodeId }
-  | { kind: 'codeComponent'; nodeId: NodeId };
+import { DomView, getViewFromPathname } from '../utils/domView';
 
 export type ComponentPanelTab = 'component' | 'theme';
 
@@ -366,27 +356,6 @@ const UNDOABLE_ACTIONS = new Set<DomActionType>([
   'DESELECT_NODE',
 ]);
 
-export const getInitialPageDomView = (location: Location, defaultPageNodeId?: NodeId): DomView => {
-  const { pathname } = location;
-
-  const pageRouteMatch = matchPath(APP_PAGE_ROUTE, pathname);
-  if (pageRouteMatch?.params.nodeId) {
-    return { kind: 'page', nodeId: pageRouteMatch.params.nodeId as NodeId };
-  }
-
-  const connectionsRouteMatch = matchPath(APP_CONNECTION_ROUTE, pathname);
-  if (connectionsRouteMatch?.params.nodeId) {
-    return { kind: 'connection', nodeId: connectionsRouteMatch.params.nodeId as NodeId };
-  }
-
-  const codeComponentRouteMatch = matchPath(APP_CODE_COMPONENT_ROUTE, pathname);
-  if (codeComponentRouteMatch?.params.nodeId) {
-    return { kind: 'codeComponent', nodeId: codeComponentRouteMatch.params.nodeId as NodeId };
-  }
-
-  return { kind: 'page', nodeId: defaultPageNodeId };
-};
-
 export default function DomProvider({ appId, children }: DomContextProps) {
   const { data: dom } = client.useQuery('loadDom', [appId], { suspense: true });
 
@@ -398,7 +367,10 @@ export default function DomProvider({ appId, children }: DomContextProps) {
   const { pages = [] } = appDom.getChildNodes(dom, app);
   const firstPage = pages.length > 0 ? pages[0] : null;
 
-  const initialView = getInitialPageDomView(location, firstPage?.id);
+  const initialView = getViewFromPathname(location.pathname) || {
+    kind: 'page',
+    nodeId: firstPage?.id,
+  };
 
   const [state, dispatch] = React.useReducer(domLoaderReducer, {
     saving: false,

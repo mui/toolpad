@@ -10,13 +10,14 @@ import { NodeId } from '@mui/toolpad-core';
 import clsx from 'clsx';
 import invariant from 'invariant';
 import * as appDom from '../../../appDom';
-import { useDom, useDomApi, DomView } from '../../DomLoader';
+import { useDom, useDomApi } from '../../DomLoader';
 import CreatePageNodeDialog from './CreatePageNodeDialog';
 import CreateCodeComponentNodeDialog from './CreateCodeComponentNodeDialog';
 import CreateConnectionNodeDialog from './CreateConnectionNodeDialog';
 import useLocalStorageState from '../../../utils/useLocalStorageState';
 import NodeMenu from '../NodeMenu';
 import config from '../../../config';
+import { DomView } from '../../../utils/domView';
 
 const HierarchyExplorerRoot = styled('div')({
   overflow: 'auto',

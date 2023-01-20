@@ -8,6 +8,7 @@ import AppEditorShell from './AppEditorShell';
 import PageEditor from './PageEditor';
 import CodeComponentEditor from './CodeComponentEditor';
 import NoPageFound from './NoPageFound';
+import { getPathnameFromView } from '../../utils/domView';
 
 const classes = {
   content: 'Toolpad_Content',
@@ -48,68 +49,26 @@ function FileEditor({ appId }: FileEditorProps) {
   const navigate = useNavigate();
 
   React.useEffect(() => {
-    if (currentView.kind === 'page') {
-      const newPathname = `/app/${appId}/pages/${currentView.nodeId}`;
-
-      if (newPathname !== location.pathname) {
-        navigate(
-          {
-            pathname: newPathname,
-          },
-          {
-            replace: true,
-          },
-        );
-      }
+    const newPathname = getPathnameFromView(appId, currentView);
+    if (newPathname && newPathname !== location.pathname) {
+      navigate({ pathname: newPathname }, { replace: true });
     }
+  }, [appId, currentView, location.pathname, navigate]);
 
-    if (currentView.kind === 'connection') {
-      const newPathname = `/app/${appId}/connections/${currentView.nodeId}`;
-
-      if (newPathname !== location.pathname) {
-        navigate(
-          {
-            pathname: newPathname,
-          },
-          {
-            replace: true,
-          },
-        );
-      }
+  const currentViewContent = React.useMemo(() => {
+    switch (currentView.kind) {
+      case 'page':
+        return <PageEditor appId={appId} nodeId={currentView.nodeId} />;
+      case 'connection':
+        return <ConnectionEditor appId={appId} nodeId={currentView.nodeId} />;
+      case 'codeComponent':
+        return <CodeComponentEditor appId={appId} nodeId={currentView.nodeId} />;
+      default:
+        return <NoPageFound appId={appId} />;
     }
+  }, [appId, currentView.kind, currentView.nodeId]);
 
-    if (currentView.kind === 'codeComponent') {
-      const newPathname = `/app/${appId}/codeComponents/${currentView.nodeId}`;
-
-      if (newPathname !== location.pathname) {
-        navigate(
-          {
-            pathname: newPathname,
-          },
-          {
-            replace: true,
-          },
-        );
-      }
-    }
-  }, [appId, currentView.kind, currentView.nodeId, location.pathname, navigate]);
-
-  return (
-    <AppEditorShell appId={appId}>
-      {currentView.kind === 'page' ? (
-        <PageEditor appId={appId} nodeId={currentView.nodeId} />
-      ) : null}
-      {currentView.kind === 'connection' ? (
-        <ConnectionEditor appId={appId} nodeId={currentView.nodeId} />
-      ) : null}
-      {currentView.kind === 'codeComponent' ? (
-        <CodeComponentEditor appId={appId} nodeId={currentView.nodeId} />
-      ) : null}
-      {!['page', 'connection', 'codeComponent'].includes(currentView.kind) ? (
-        <NoPageFound appId={appId} />
-      ) : null}
-    </AppEditorShell>
-  );
+  return <AppEditorShell appId={appId}>{currentViewContent}</AppEditorShell>;
 }
 
 export interface EditorContentProps {

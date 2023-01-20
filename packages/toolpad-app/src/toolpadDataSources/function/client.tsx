@@ -12,7 +12,7 @@ import {
 } from '@mui/material';
 import { Controller, useForm } from 'react-hook-form';
 import { BindableAttrEntries, BindableAttrValue } from '@mui/toolpad-core';
-import { useBrowserJsRuntime } from '@mui/toolpad-core/jsRuntime';
+import { useBrowserJsRuntime } from '@mui/toolpad-core/jsBrowserRuntime';
 import {
   ClientDataSource,
   ConnectionEditorProps,

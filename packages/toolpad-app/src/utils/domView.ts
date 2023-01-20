@@ -12,7 +12,7 @@ export type DomView =
   | { kind: 'connection'; nodeId: NodeId }
   | { kind: 'codeComponent'; nodeId: NodeId };
 
-export function getPathnameFromView(appId: string, view: DomView): string | null {
+export function getPathnameFromView(appId: string, view: DomView): string {
   switch (view.kind) {
     case 'page':
       return `/app/${appId}/pages/${view.nodeId}`;
@@ -21,7 +21,7 @@ export function getPathnameFromView(appId: string, view: DomView): string | null
     case 'codeComponent':
       return `/app/${appId}/codeComponents/${view.nodeId}`;
     default:
-      return null;
+      throw new Error(`Unknown view "${(view as DomView).kind}".`);
   }
 }
 

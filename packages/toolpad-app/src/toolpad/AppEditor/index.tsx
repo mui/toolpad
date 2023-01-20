@@ -50,7 +50,7 @@ function FileEditor({ appId }: FileEditorProps) {
 
   React.useEffect(() => {
     const newPathname = getPathnameFromView(appId, currentView);
-    if (newPathname && newPathname !== location.pathname) {
+    if (newPathname !== location.pathname) {
       navigate({ pathname: newPathname }, { replace: true });
     }
   }, [appId, currentView, location.pathname, navigate]);

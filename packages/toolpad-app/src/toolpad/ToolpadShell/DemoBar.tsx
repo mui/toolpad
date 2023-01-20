@@ -5,6 +5,8 @@ import { useParams } from 'react-router-dom';
 import { blueDark, grey } from '../../theme';
 import { DOCUMENTATION_INSTALLATION_URL, ROADMAP_URL, SCHEDULE_DEMO_URL } from '../../constants';
 import {
+  addUTMParamsToUrl,
+  DEMO_CAMPAIGN_NAME,
   sendRoadmapClickEvent,
   sendScheduleDemoClickEvent,
   sendSelfHostClickEvent,
@@ -28,6 +30,12 @@ const linkStyles: SxProps = {
   '&:hover': { color: grey[700] },
 };
 
+const addDemoBarUTMParamsToURL = (url: string): string =>
+  addUTMParamsToUrl(url, {
+    source: 'demo_bar',
+    medium: 'organic_toolpad',
+    campaign: DEMO_CAMPAIGN_NAME,
+  });
 export default function DemoBar() {
   const { appId } = useParams();
 
@@ -51,7 +59,7 @@ export default function DemoBar() {
       <Typography variant="body2" textAlign="center">
         Check out our{' '}
         <Link
-          href={ROADMAP_URL}
+          href={addDemoBarUTMParamsToURL(ROADMAP_URL)}
           target="_blank"
           underline="always"
           sx={linkStyles}
@@ -61,7 +69,7 @@ export default function DemoBar() {
         </Link>{' '}
         to stay up to date, or{' '}
         <Link
-          href={SCHEDULE_DEMO_URL}
+          href={addDemoBarUTMParamsToURL(SCHEDULE_DEMO_URL)}
           target="_blank"
           underline="always"
           sx={linkStyles}
@@ -72,7 +80,11 @@ export default function DemoBar() {
         .<br />
         Note: PostgreSQL, Google Sheets are supported in the self-hosted version.
       </Typography>
-      <Link href={DOCUMENTATION_INSTALLATION_URL} target="_blank" onClick={handleSelfHostLinkClick}>
+      <Link
+        href={addDemoBarUTMParamsToURL(DOCUMENTATION_INSTALLATION_URL)}
+        target="_blank"
+        onClick={handleSelfHostLinkClick}
+      >
         <Button size="medium" variant="contained" endIcon={<KeyboardArrowRightRounded />}>
           Self-host
         </Button>

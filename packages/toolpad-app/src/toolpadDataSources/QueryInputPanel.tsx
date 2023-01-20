@@ -6,7 +6,7 @@ import { useParams } from 'react-router-dom';
 import FlexFill from '../components/FlexFill';
 import { DOCUMENTATION_INSTALLATION_URL } from '../constants';
 import config from '../config';
-import { sendSelfHostClickEvent } from '../utils/ga';
+import { addUTMParamsToUrl, DEMO_CAMPAIGN_NAME, sendSelfHostClickEvent } from '../utils/ga';
 
 export interface QueryInputPanelProps {
   children: React.ReactNode;
@@ -28,7 +28,11 @@ export default function QueryInputPanel({ children, onRunPreview, actions }: Que
           Can only run queries in browser in demo mode.
           <br />
           <Link
-            href={DOCUMENTATION_INSTALLATION_URL}
+            href={addUTMParamsToUrl(DOCUMENTATION_INSTALLATION_URL, {
+              source: 'query_panel',
+              medium: 'organic_toolpad',
+              campaign: DEMO_CAMPAIGN_NAME,
+            })}
             target="_blank"
             onClick={handleSelfHostLinkClick}
           >

@@ -19,6 +19,23 @@ export const reportWebVitalsToGA = ({ id, label, name, value }: NextWebVitalsMet
   }
 };
 
+export const DEMO_CAMPAIGN_NAME = 'toolpad_demo';
+
+export const addUTMParamsToUrl = (
+  url: string,
+  params: { source: string; medium: string; campaign: string },
+): string => {
+  const { source, medium, campaign } = params;
+
+  const urlWithParams = new URL(url);
+
+  urlWithParams.searchParams.set('utm_source', source);
+  urlWithParams.searchParams.set('utm_medium', medium);
+  urlWithParams.searchParams.set('utm_campaign', campaign);
+
+  return urlWithParams.toString();
+};
+
 export const sendAppCreatedEvent = (appName: string, appTemplateId?: AppTemplateId): void => {
   if (config.gaId) {
     window.gtag('event', 'toolpad_app_created', {

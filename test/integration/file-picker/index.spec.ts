@@ -4,7 +4,7 @@ import { test, expect } from '../../playwright/test';
 import { readJsonFile } from '../../utils/fs';
 import generateId from '../../utils/generateId';
 
-test.only('File picker component', async ({ page, browserName, api }) => {
+test('File picker component', async ({ page, browserName, api }) => {
   const dom = await readJsonFile(path.resolve(__dirname, './dom.json'));
   const testFilePath = path.resolve(__dirname, './test.txt');
 

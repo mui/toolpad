@@ -1,13 +1,13 @@
 import * as esbuild from 'esbuild';
 import serializeJavascript from 'serialize-javascript';
 import * as appDom from '../appDom';
-import { MUI_X_PRO_LICENSE } from '../constants';
+import { APP_ID_LOCAL_MARKER, MUI_X_PRO_LICENSE } from '../constants';
 import createRuntimeState from '../createRuntimeState';
 import { loadLocalDomFromFile } from './localMode';
 import projectRoot from './projectRoot';
 
 async function createMain(dom: appDom.AppDom) {
-  const initialState = createRuntimeState({ appId: '', dom });
+  const initialState = createRuntimeState({ appId: APP_ID_LOCAL_MARKER, dom });
   const serializedInitialState = serializeJavascript(initialState, {
     ignoreFunction: true,
   });

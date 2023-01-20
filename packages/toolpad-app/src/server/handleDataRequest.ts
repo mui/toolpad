@@ -8,6 +8,7 @@ import * as appDom from '../appDom';
 import { errorFrom, serializeError } from '../utils/errors';
 import { basicAuthUnauthorized, checkBasicAuth } from './basicAuth';
 import { reportSentryError } from '../utils/sentry';
+import config from '../config';
 
 // Initialize the cors middleware
 const cors = initMiddleware<any>(
@@ -47,19 +48,20 @@ export default async (
   await cors(req, res);
   const queryNodeId = req.query.queryId as NodeId;
 
-  const app = await getApp(appId);
-  if (!app) {
-    res.status(404).end();
-    return;
-  }
-
-  if (!app.public) {
-    if (!checkBasicAuth(req)) {
-      basicAuthUnauthorized(res);
+  if (!config.localMode) {
+    const app = await getApp(appId);
+    if (!app) {
+      res.status(404).end();
       return;
     }
-  }
 
+    if (!app.public) {
+      if (!checkBasicAuth(req)) {
+        basicAuthUnauthorized(res);
+        return;
+      }
+    }
+  }
   const dom = await loadDom(appId, version);
   const dataNode = appDom.getMaybeNode(dom, queryNodeId);
 

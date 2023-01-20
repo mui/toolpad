@@ -62,9 +62,10 @@ const routes = new Map<RegExp, NextApiHandler<string>>([
     async (req, res) => {
       const builder = await getBuilder();
       const output = builder.getResult();
-      const content = output.outputFiles[0].text;
-      res.setHeader('content-type', 'application/javascript');
-      res.send(content);
+      const content = output.outputFiles[0].contents;
+      res.setHeader('content-type', 'application/javascript; charset=utf-8');
+      res.write(content);
+      res.end();
     },
   ],
 ]);

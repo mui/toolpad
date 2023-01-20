@@ -24,7 +24,6 @@ import RocketLaunchIcon from '@mui/icons-material/RocketLaunch';
 
 import * as React from 'react';
 import { useForm } from 'react-hook-form';
-import { Outlet } from 'react-router-dom';
 import invariant from 'invariant';
 import DialogForm from '../../components/DialogForm';
 import { DomLoader, useDomLoader } from '../DomLoader';
@@ -140,9 +139,10 @@ function getSaveState(domLoader: DomLoader): React.ReactNode {
 export interface ToolpadShellProps {
   appId: string;
   actions?: React.ReactNode;
+  children: React.ReactNode;
 }
 
-export default function AppEditorShell({ appId, ...props }: ToolpadShellProps) {
+export default function AppEditorShell({ appId, children, ...props }: ToolpadShellProps) {
   const domLoader = useDomLoader();
   const release = client.useQuery('findLastRelease', [appId]);
 
@@ -229,7 +229,7 @@ export default function AppEditorShell({ appId, ...props }: ToolpadShellProps) {
             position: 'relative',
           }}
         >
-          <Outlet />
+          {children}
         </Box>
 
         <CreateReleaseDialog

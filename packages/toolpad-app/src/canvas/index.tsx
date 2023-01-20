@@ -2,6 +2,7 @@ import * as React from 'react';
 import invariant from 'invariant';
 import { throttle } from 'lodash-es';
 import { CanvasEventsContext } from '@mui/toolpad-core/runtime';
+import { ToolpadComponent } from '@mui/toolpad-core';
 import ToolpadApp from '../runtime';
 import { NodeHashes, RuntimeState } from '../types';
 import getPageViewState from './getPageViewState';
@@ -24,9 +25,10 @@ const handleScreenUpdate = throttle(
 export interface AppCanvasProps {
   initialState?: AppCanvasState | null;
   basename: string;
+  catalog?: Record<string, ToolpadComponent>;
 }
 
-export default function AppCanvas({ basename, initialState = null }: AppCanvasProps) {
+export default function AppCanvas({ catalog, basename, initialState = null }: AppCanvasProps) {
   const [state, setState] = React.useState<AppCanvasState | null>(initialState);
 
   const appRootRef = React.useRef<HTMLDivElement>();
@@ -131,6 +133,7 @@ export default function AppCanvas({ basename, initialState = null }: AppCanvasPr
       <CanvasEventsContext.Provider value={bridge.canvasEvents}>
         <ToolpadApp
           rootRef={onAppRoot}
+          catalog={catalog}
           hidePreviewBanner
           version="preview"
           basename={basename}

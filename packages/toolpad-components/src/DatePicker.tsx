@@ -87,8 +87,6 @@ function DatePicker({ format, onChange, ...props }: DatePickerProps) {
   const adapterLocale = React.useSyncExternalStore(subscribeLocaleLoader, getSnapshot);
 
   return (
-    // @ts-expect-error This seems to be a dependencies issue. Recreating the yarn.lock file solves this.
-    //                  TODO: recreate yarn.lock, or find less drastic solution
     <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale={adapterLocale}>
       <DesktopDatePicker
         {...props}

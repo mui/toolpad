@@ -13,7 +13,7 @@ import {
 } from '@mui/material';
 import { TabContext } from '@mui/lab';
 import { BindableAttrValue, LiveBinding, GlobalScopeMeta } from '@mui/toolpad-core';
-import { useServerJsRuntime } from '@mui/toolpad-core/jsRuntime';
+import { useServerJsRuntime } from '@mui/toolpad-core/jsServerRuntime';
 import { Body, RawBody, UrlEncodedBody } from './types';
 import { Maybe, WithControlledProp } from '../../utils/types';
 import {

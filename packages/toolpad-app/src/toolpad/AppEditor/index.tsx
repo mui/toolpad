@@ -1,11 +1,11 @@
 import * as React from 'react';
 import { styled } from '@mui/material';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
-import { JsRuntimeProvider } from '@mui/toolpad-core/jsRuntime';
+import { JsRuntimeProvider } from '@mui/toolpad-core/jsServerRuntime';
+import PageEditor from './PageEditor';
 import DomProvider, { useDom } from '../DomLoader';
 import ConnectionEditor from './ConnectionEditor';
 import AppEditorShell from './AppEditorShell';
-import PageEditor from './PageEditor';
 import CodeComponentEditor from './CodeComponentEditor';
 import NoPageFound from './NoPageFound';
 import { getPathnameFromView } from '../../utils/domView';

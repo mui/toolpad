@@ -9,7 +9,7 @@ import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
 import SyncIcon from '@mui/icons-material/Sync';
 import { getObjectKey } from '@mui/toolpad-core/objectKey';
 import { BindableAttrEntries, BindableAttrValue } from '@mui/toolpad-core';
-import { useBrowserJsRuntime } from '@mui/toolpad-core/jsRuntime';
+import { useBrowserJsRuntime } from '@mui/toolpad-core/jsBrowserRuntime';
 import SplitPane from '../../components/SplitPane';
 import ParametersEditor from '../../toolpad/AppEditor/PageEditor/ParametersEditor';
 import { useEvaluateLiveBindingEntries } from '../../toolpad/AppEditor/useEvaluateLiveBinding';

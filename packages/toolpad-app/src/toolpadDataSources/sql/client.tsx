@@ -9,14 +9,15 @@ import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
 import SyncIcon from '@mui/icons-material/Sync';
 import { getObjectKey } from '@mui/toolpad-core/objectKey';
 import { BindableAttrEntries, BindableAttrValue, ExecFetchResult } from '@mui/toolpad-core';
+import { useBrowserJsRuntime } from '@mui/toolpad-core/jsBrowserRuntime';
 import SplitPane from '../../components/SplitPane';
 import ParametersEditor from '../../toolpad/AppEditor/PageEditor/ParametersEditor';
 import { useEvaluateLiveBindingEntries } from '../../toolpad/AppEditor/useEvaluateLiveBinding';
 import { QueryEditorProps } from '../../types';
 import { isSaveDisabled, validation } from '../../utils/forms';
 import lazyComponent from '../../utils/lazyComponent';
-import { serializeError, errorFrom } from '../../utils/errors';
 import { Maybe } from '../../utils/types';
+import { serializeError, errorFrom } from '../../utils/errors';
 import QueryInputPanel from '../QueryInputPanel';
 import useFetchPrivate from '../useFetchPrivate';
 import useQueryPreview from '../useQueryPreview';
@@ -180,7 +181,9 @@ export function QueryEditor({
 }: QueryEditorProps<SqlConnectionParams, SqlQuery>) {
   const paramsEntries = input.params || EMPTY_PARAMS;
 
+  const jsBrowserRuntime = useBrowserJsRuntime();
   const paramsEditorLiveValue = useEvaluateLiveBindingEntries({
+    jsRuntime: jsBrowserRuntime,
     input: paramsEntries,
     globalScope,
   });
@@ -211,7 +214,11 @@ export function QueryEditor({
     preview,
     runPreview: handleRunPreview,
     isLoading: previewIsLoading,
-  } = useQueryPreview(fetchServerPreview, input.attributes.query.value, previewParams);
+  } = useQueryPreview(
+    fetchServerPreview,
+    input.attributes.query.value,
+    previewParams as Record<string, string>,
+  );
 
   const rawRows: any[] = preview?.data || EMPTY_ROWS;
   const columns: GridColDef[] = React.useMemo(() => parseColumns(inferColumns(rawRows)), [rawRows]);
@@ -241,6 +248,7 @@ export function QueryEditor({
             globalScope={globalScope}
             globalScopeMeta={globalScopeMeta}
             liveValue={paramsEditorLiveValue}
+            jsRuntime={jsBrowserRuntime}
           />
         </Box>
       </SplitPane>

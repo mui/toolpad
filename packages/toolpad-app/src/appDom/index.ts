@@ -26,7 +26,7 @@ export const RESERVED_NODE_PROPERTIES = [
   'parentProp',
   'parentIndex',
 ] as const;
-export type ReservedNodeProperty = typeof RESERVED_NODE_PROPERTIES[number];
+export type ReservedNodeProperty = (typeof RESERVED_NODE_PROPERTIES)[number];
 
 export function createFractionalIndex(index1: string | null, index2: string | null) {
   return generateKeyBetween(index1, index2);
@@ -1031,7 +1031,7 @@ const RENDERTREE_NODES = [
   'codeComponent',
 ] as const;
 
-export type RenderTreeNodeType = typeof RENDERTREE_NODES[number];
+export type RenderTreeNodeType = (typeof RENDERTREE_NODES)[number];
 export type RenderTreeNode = { [K in RenderTreeNodeType]: AppDomNodeOfType<K> }[RenderTreeNodeType];
 export type RenderTreeNodes = Record<NodeId, RenderTreeNode>;
 

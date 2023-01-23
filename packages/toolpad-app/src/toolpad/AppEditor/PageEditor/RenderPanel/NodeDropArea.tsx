@@ -129,7 +129,7 @@ function getChildNodeHighlightedZone(parentFlowDirection: FlowDirection): DropZo
 
 function getHighlightedZoneOverlayClass(
   highlightedZone: DropZone,
-): (typeof dropAreaHighlightClasses)[keyof typeof dropAreaHighlightClasses] | null {
+): typeof dropAreaHighlightClasses[keyof typeof dropAreaHighlightClasses] | null {
   switch (highlightedZone) {
     case DROP_ZONE_TOP:
       return dropAreaHighlightClasses.highlightedTop;

@@ -14,7 +14,7 @@ import {
 } from '@mui/material';
 import * as React from 'react';
 import { BindableAttrValue } from '@mui/toolpad-core';
-import { useBrowserJsRuntime } from '@mui/toolpad-core/jsRuntime';
+import { useBrowserJsRuntime } from '@mui/toolpad-core/jsBrowserRuntime';
 import useLatest from '../../../../utils/useLatest';
 import { usePageEditorState } from '../PageEditorProvider';
 import * as appDom from '../../../../appDom';

@@ -41,7 +41,7 @@ import {
 } from '@mui/toolpad-core/runtime';
 import * as _ from 'lodash-es';
 import ErrorIcon from '@mui/icons-material/Error';
-import { useBrowserJsRuntime } from '@mui/toolpad-core/jsRuntime';
+import { useBrowserJsRuntime } from '@mui/toolpad-core/jsBrowserRuntime';
 import * as appDom from '../appDom';
 import { RuntimeState, VersionOrPreview } from '../types';
 import {

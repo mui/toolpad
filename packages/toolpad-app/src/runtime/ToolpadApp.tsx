@@ -20,7 +20,9 @@ import {
   BindableAttrValue,
   NestedBindableAttrs,
   GlobalScopeMeta,
+  BindingEvaluationResult,
 } from '@mui/toolpad-core';
+import { createProvidedContext } from '@mui/toolpad-core/utils/react';
 import { QueryClient, QueryClientProvider, useMutation } from '@tanstack/react-query';
 import {
   BrowserRouter,
@@ -33,16 +35,15 @@ import {
 } from 'react-router-dom';
 import { ErrorBoundary, FallbackProps } from 'react-error-boundary';
 import {
-  fireEvent,
   NodeErrorProps,
   NodeRuntimeWrapper,
   ResetNodeErrorsKeyProvider,
 } from '@mui/toolpad-core/runtime';
 import * as _ from 'lodash-es';
 import ErrorIcon from '@mui/icons-material/Error';
+import { useBrowserJsRuntime } from '@mui/toolpad-core/jsBrowserRuntime';
 import * as appDom from '../appDom';
 import { RuntimeState, VersionOrPreview } from '../types';
-import { createProvidedContext } from '../utils/react';
 import {
   getElementNodeComponentId,
   isPageLayoutComponent,
@@ -52,9 +53,8 @@ import {
 import AppOverview from './AppOverview';
 import AppThemeProvider from './AppThemeProvider';
 import evalJsBindings, {
-  BindingEvaluationResult,
   buildGlobalScope,
-  evaluateExpression,
+  EvaluatedBinding,
   ParsedBinding,
 } from './evalJsBindings';
 import { HTML_ID_EDITOR_OVERLAY } from '../constants';
@@ -70,6 +70,7 @@ import { useAppContext, AppContextProvider } from './AppContext';
 import { CanvasHooksContext, NavigateToPage } from './CanvasHooksContext';
 import useBoolean from '../utils/useBoolean';
 import { errorFrom } from '../utils/errors';
+import { bridge } from '../canvas/ToolpadBridge';
 
 const ReactQueryDevtoolsProduction = React.lazy(() =>
   import('@tanstack/react-query-devtools/build/lib/index.prod.js').then((d) => ({
@@ -267,22 +268,12 @@ function RenderedNodeContent({ node, childNodeGroups, Component }: RenderedNodeC
         const handler = (param: any) => {
           const bindingId = `${nodeId}.props.${key}`;
 
-          const defaultValues = _.mapValues(argTypes, ({ defaultValue }: any) => defaultValue);
-          const propsValues = _.mapValues(
-            (node as appDom.ElementNode).props,
-            (prop) => prop?.value || undefined,
-          );
-          const props = {
-            ...defaultValues,
-            ...propsValues,
-          };
-
-          const value = argType.onChangeHandler ? argType.onChangeHandler(param, props) : param;
+          const value = argType.onChangeHandler ? argType.onChangeHandler(param) : param;
           setControlledBinding(bindingId, { value });
         };
         return [argType.onChangeProp, handler];
       }),
-    [argTypes, nodeId, setControlledBinding, node],
+    [argTypes, nodeId, setControlledBinding],
   );
 
   const navigateToPage = usePageNavigator();
@@ -598,7 +589,10 @@ interface ParseBindingOptions {
   scopePath?: string;
 }
 
-function parseBinding(bindable: BindableAttrValue<any>, { scopePath }: ParseBindingOptions = {}) {
+function parseBinding(
+  bindable: BindableAttrValue<any>,
+  { scopePath }: ParseBindingOptions = {},
+): ParsedBinding | EvaluatedBinding {
   if (bindable?.type === 'const') {
     return {
       scopePath,
@@ -625,7 +619,7 @@ function parseBindings(
 ) {
   const elements = appDom.getDescendants(dom, page);
 
-  const parsedBindingsMap = new Map<string, ParsedBinding>();
+  const parsedBindingsMap = new Map<string, ParsedBinding | EvaluatedBinding>();
   const controlled = new Set<string>();
   const globalScopeMeta: GlobalScopeMeta = {};
 
@@ -759,7 +753,8 @@ function parseBindings(
     });
   }
 
-  const parsedBindings: Record<string, ParsedBinding> = Object.fromEntries(parsedBindingsMap);
+  const parsedBindings: Record<string, ParsedBinding | EvaluatedBinding> =
+    Object.fromEntries(parsedBindingsMap);
 
   return { parsedBindings, controlled, globalScopeMeta };
 }
@@ -780,7 +775,7 @@ function RenderedPage({ nodeId }: RenderedNodeProps) {
   );
 
   const [pageBindings, setPageBindings] =
-    React.useState<Record<string, ParsedBinding>>(parsedBindings);
+    React.useState<Record<string, ParsedBinding | EvaluatedBinding>>(parsedBindings);
 
   const prevDom = React.useRef(dom);
   React.useEffect(() => {
@@ -794,7 +789,7 @@ function RenderedPage({ nodeId }: RenderedNodeProps) {
 
     setPageBindings((existingBindings) => {
       // Make sure to patch page bindings after dom nodes have been added or removed
-      const updated: Record<string, ParsedBinding> = {};
+      const updated: Record<string, ParsedBinding | EvaluatedBinding> = {};
       for (const [key, binding] of Object.entries(parsedBindings)) {
         updated[key] = controlled.has(key) ? existingBindings[key] || binding : binding;
       }
@@ -804,8 +799,8 @@ function RenderedPage({ nodeId }: RenderedNodeProps) {
 
   const setControlledBinding = React.useCallback(
     (id: string, result: BindingEvaluationResult) => {
-      const parsedBinding = parsedBindings[id];
-      setPageBindings((existing) => {
+      const { expression, initializer, ...parsedBinding } = parsedBindings[id];
+      setPageBindings((existing): Record<string, ParsedBinding | EvaluatedBinding> => {
         if (!controlled.has(id)) {
           throw new Error(`Not a controlled binding "${id}"`);
         }
@@ -822,9 +817,11 @@ function RenderedPage({ nodeId }: RenderedNodeProps) {
   const moduleEntry = modules[`pages/${nodeId}`];
   const globalScope = (moduleEntry?.module as any)?.globalScope || EMPTY_OBJECT;
 
+  const browserJsRuntime = useBrowserJsRuntime();
+
   const evaluatedBindings = React.useMemo(
-    () => evalJsBindings(pageBindings, globalScope),
-    [globalScope, pageBindings],
+    () => evalJsBindings(browserJsRuntime, pageBindings, globalScope),
+    [browserJsRuntime, globalScope, pageBindings],
   );
 
   const pageState = React.useMemo(
@@ -838,16 +835,16 @@ function RenderedPage({ nodeId }: RenderedNodeProps) {
   );
 
   const evaluatePageExpression = React.useCallback(
-    (expression: string) => evaluateExpression(expression, pageState),
-    [pageState],
+    (expression: string) => browserJsRuntime.evaluateExpression(expression, pageState),
+    [browserJsRuntime, pageState],
   );
 
   React.useEffect(() => {
-    fireEvent({ type: 'pageStateUpdated', pageState, globalScopeMeta });
+    bridge.canvasEvents.emit('pageStateUpdated', { pageState, globalScopeMeta });
   }, [pageState, globalScopeMeta]);
 
   React.useEffect(() => {
-    fireEvent({ type: 'pageBindingsUpdated', bindings: liveBindings });
+    bridge.canvasEvents.emit('pageBindingsUpdated', { bindings: liveBindings });
   }, [liveBindings]);
 
   return (

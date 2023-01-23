@@ -27,10 +27,12 @@ import {
   Typography,
   Alert,
   AlertTitle,
+  Theme,
 } from '@mui/material';
 import LoadingButton from '@mui/lab/LoadingButton';
 import ViewListIcon from '@mui/icons-material/ViewList';
 import GridViewIcon from '@mui/icons-material/GridView';
+import Search from '@mui/icons-material/SearchOutlined';
 import invariant from 'invariant';
 import { Link, useNavigate } from 'react-router-dom';
 import Script from 'next/script';
@@ -694,6 +696,22 @@ function DemoPage() {
   );
 }
 
+const searchFieldStyleOverrides = (theme: Theme) => ({
+  '& .MuiInputBase-root': {
+    fontSize: theme.typography.pxToRem(14),
+  },
+  '& .MuiInputBase-input': {
+    paddingTop: theme.spacing(0.7),
+    paddingBottom: theme.spacing(0.7),
+  },
+  '& .MuiSvgIcon-root': {
+    fontSize: theme.typography.pxToRem(16),
+    color: theme.palette.mode === 'dark' ? theme.palette.grey[400] : theme.palette.grey[500],
+    marginRight: theme.spacing(0.6),
+    marginTop: theme.spacing(0.2),
+  },
+});
+
 export default function Home() {
   const {
     data: apps = [],
@@ -728,6 +746,18 @@ export default function Home() {
 
   const AppsView = viewMode === 'list' ? AppsListView : AppsGridView;
 
+  const [searchText, setSearchText] = React.useState('');
+
+  const handleSearchInput = React.useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchText(event.target.value);
+  }, []);
+
+  const filteredApps = React.useMemo(() => {
+    return apps.filter((element: any) =>
+      element.name.toLowerCase().includes(searchText.toLowerCase()),
+    );
+  }, [apps, searchText]);
+
   return config.isDemo ? (
     <DemoPage />
   ) : (
@@ -738,7 +768,19 @@ export default function Home() {
             Apps
           </Typography>
           <FlexFill />
-          <Button onClick={() => setCreateDialogOpen(true)}>Create New</Button>
+          <TextField
+            sx={searchFieldStyleOverrides}
+            key={'search'}
+            InputProps={{
+              startAdornment: <Search />,
+            }}
+            placeholder={'Search apps'}
+            value={searchText}
+            onChange={handleSearchInput}
+          />
+          <Button variant="contained" onClick={() => setCreateDialogOpen(true)}>
+            Create New
+          </Button>
           <ToggleButtonGroup
             value={viewMode}
             exclusive
@@ -750,23 +792,23 @@ export default function Home() {
               aria-label="list view"
               color={viewMode === 'list' ? 'primary' : undefined}
             >
-              <ViewListIcon />
+              <ViewListIcon fontSize="small" />
             </ToggleButton>
             <ToggleButton
               value="grid"
               aria-label="grid view"
               color={viewMode === 'grid' ? 'primary' : undefined}
             >
-              <GridViewIcon />
+              <GridViewIcon fontSize="small" />
             </ToggleButton>
           </ToggleButtonGroup>
         </Toolbar>
         {error ? (
           <ErrorAlert error={error} />
         ) : (
-          <Box sx={{ flex: 1, overflow: 'auto', px: 5 }}>
+          <Box sx={{ flex: 1, overflow: 'auto', px: 5, scrollbarGutter: 'stable' }}>
             <AppsView
-              apps={apps}
+              apps={filteredApps}
               loading={isLoading}
               activeDeploymentsByApp={activeDeploymentsByApp}
               existingAppNames={existingAppNames}

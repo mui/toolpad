@@ -1,19 +1,18 @@
 import * as React from 'react';
 import { styled } from '@mui/material';
-import { useParams } from 'react-router-dom';
 import { NodeId } from '@mui/toolpad-core';
 import SplitPane from '../../../components/SplitPane';
 import RenderPanel from './RenderPanel';
 import ComponentPanel from './ComponentPanel';
 import { PageEditorProvider } from './PageEditorProvider';
-import { useDom, useDomApi } from '../../DomLoader';
+import { useDom } from '../../DomLoader';
 import * as appDom from '../../../appDom';
 import ComponentCatalog from './ComponentCatalog';
 import NotFoundEditor from '../NotFoundEditor';
 import usePageTitle from '../../../utils/usePageTitle';
 import useLocalStorageState from '../../../utils/useLocalStorageState';
 import useDebouncedHandler from '../../../utils/useDebouncedHandler';
-import useShortcut from '../../../utils/useShortcut';
+import useUndoRedo from '../../hooks/useUndoRedo';
 
 const classes = {
   renderPanel: 'Toolpad_RenderPanel',
@@ -67,20 +66,14 @@ function PageEditorContent({ appId, node }: PageEditorContentProps) {
 
 interface PageEditorProps {
   appId: string;
+  nodeId?: NodeId;
 }
 
-export default function PageEditor({ appId }: PageEditorProps) {
+export default function PageEditor({ appId, nodeId }: PageEditorProps) {
   const { dom } = useDom();
-  const domApi = useDomApi();
-  const { nodeId } = useParams();
   const pageNode = appDom.getMaybeNode(dom, nodeId as NodeId, 'page');
 
-  useShortcut({ key: 'z', metaKey: true, preventDefault: true }, () => {
-    domApi.undo();
-  });
-  useShortcut({ key: 'z', metaKey: true, shiftKey: true, preventDefault: true }, () => {
-    domApi.redo();
-  });
+  useUndoRedo();
 
   return pageNode ? (
     <PageEditorContent appId={appId} node={pageNode} />

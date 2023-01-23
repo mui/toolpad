@@ -3,7 +3,7 @@ import * as path from 'path';
 import { withSentryConfig } from '@sentry/nextjs';
 import createBundleAnalyzer from '@next/bundle-analyzer';
 
-// Flag to be used to experiment with using experimental.transpilePackages to
+// Flag to be used to experiment with using transpilePackages to
 // compile monaco-editor CSS
 // Current blocker: https://github.com/vercel/next.js/issues/43125
 const USE_EXPERIMENTAL_TRANSPILE_PACKAGES = false;
@@ -31,7 +31,7 @@ function isValidTarget(input) {
   );
 }
 
-/** @type {(env: Partial<Record<string, string>>) => import('./src/config').BuildEnvVars} */
+/** @type {(env: Partial<Record<string, string>>) => import('./src/config.js').BuildEnvVars} */
 function parseBuidEnvVars(env) {
   let target = 'CE';
   if (env.TOOLPAD_TARGET && !isValidTarget(env.TOOLPAD_TARGET)) {
@@ -109,10 +109,8 @@ const NEVER = () => false;
 
 export default withSentryConfig(
   withBundleAnalyzer(
-    /** @type {import('next').NextConfig & { sentry: import('@sentry/nextjs/types/config/types').UserSentryOptions }} */ ({
-      experimental: {
-        transpilePackages: USE_EXPERIMENTAL_TRANSPILE_PACKAGES ? ['monaco-editor'] : undefined,
-      },
+    /** @type {import('next').NextConfig & { sentry: import('@sentry/nextjs/types/config/types.js').UserSentryOptions }} */ ({
+      transpilePackages: USE_EXPERIMENTAL_TRANSPILE_PACKAGES ? ['monaco-editor'] : undefined,
       reactStrictMode: true,
       poweredByHeader: false,
       productionBrowserSourceMaps: true,
@@ -129,7 +127,7 @@ export default withSentryConfig(
       // Ignoring type mismatch because types from Sentry are incompatible
       // https://github.com/getsentry/sentry-javascript/issues/4560
       webpack: (config, options) => {
-        config.resolve = config.resolve ?? {};
+        config.resolve ??= {};
         config.resolve.fallback = {
           ...config.resolve.fallback,
           // We need these because quickjs-emscripten doesn't export pure browser compatible modules yet
@@ -137,6 +135,9 @@ export default withSentryConfig(
           fs: false,
           path: false,
         };
+
+        config.module ??= {};
+        config.module.strictExportPresence = true;
 
         if (!USE_EXPERIMENTAL_TRANSPILE_PACKAGES) {
           // Support global CSS in monaco-editor
@@ -146,8 +147,7 @@ export default withSentryConfig(
             path.resolve(path.dirname(require.resolve('monaco-editor/package.json')), './esm'),
           ];
 
-          config.module = config.module ?? {};
-          config.module.rules = config.module.rules ?? [];
+          config.module.rules ??= [];
           const nextCssLoaders = /** @type {import('webpack').RuleSetRule} */ (
             config.module.rules.find(
               (rule) => typeof rule === 'object' && typeof rule.oneOf === 'object',

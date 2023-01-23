@@ -1,11 +1,13 @@
 import * as React from 'react';
 import { ArgTypeDefinition, BindableAttrValue } from '@mui/toolpad-core';
-import { Alert } from '@mui/material';
+import { Alert, Box } from '@mui/material';
+import { useBrowserJsRuntime } from '@mui/toolpad-core/jsBrowserRuntime';
 import * as appDom from '../../../appDom';
 import { useDomApi } from '../../DomLoader';
 import BindableEditor from './BindableEditor';
 import { usePageEditorState } from './PageEditorProvider';
 import { getDefaultControl } from '../../propertyControls';
+import MarkdownTooltip from '../../../components/MarkdownTooltip';
 
 export interface NodeAttributeEditorProps<P extends object> {
   node: appDom.AppDomNode;
@@ -48,6 +50,8 @@ export default function NodeAttributeEditor<P extends object>({
 
   const isBindable = !isDisabled && namespace !== 'layout';
 
+  const jsBrowserRuntime = useBrowserJsRuntime();
+
   return Control ? (
     <BindableEditor
       liveBinding={liveBinding}
@@ -57,7 +61,14 @@ export default function NodeAttributeEditor<P extends object>({
       bindable={isBindable}
       disabled={isDisabled}
       propType={propType}
-      renderControl={(params) => <Control nodeId={node.id} {...params} propType={propType} />}
+      jsRuntime={jsBrowserRuntime}
+      renderControl={(params) => (
+        <MarkdownTooltip placement="left" title={argType.helperText ?? ''}>
+          <Box sx={{ flex: 1 }}>
+            <Control nodeId={node.id} {...params} propType={propType} />
+          </Box>
+        </MarkdownTooltip>
+      )}
       value={propValue}
       onChange={handlePropChange}
     />

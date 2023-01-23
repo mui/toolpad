@@ -1,6 +1,12 @@
 import { Stack, SxProps } from '@mui/material';
 import * as React from 'react';
-import { BindableAttrValue, PropValueType, LiveBinding, GlobalScopeMeta } from '@mui/toolpad-core';
+import {
+  BindableAttrValue,
+  PropValueType,
+  LiveBinding,
+  GlobalScopeMeta,
+  JsRuntime,
+} from '@mui/toolpad-core';
 import { BindingEditor } from '../BindingEditor';
 import { WithControlledProp } from '../../../utils/types';
 import { getDefaultControl } from '../../propertyControls';
@@ -20,7 +26,7 @@ export interface BindableEditorProps<V> extends WithControlledProp<BindableAttrV
   label: string;
   bindable?: boolean;
   disabled?: boolean;
-  server?: boolean;
+  jsRuntime: JsRuntime;
   propType: PropValueType;
   renderControl?: (params: RenderControlParams<any>) => React.ReactNode;
   liveBinding?: LiveBinding;
@@ -36,7 +42,7 @@ export default function BindableEditor<V>({
   propType,
   renderControl = renderDefaultControl,
   value,
-  server,
+  jsRuntime,
   onChange,
   liveBinding,
   globalScope = {},
@@ -49,13 +55,11 @@ export default function BindableEditor<V>({
   );
 
   const initConstValue = React.useCallback(() => {
-    let constValue = liveBinding?.value;
-
     if (value?.type === 'const') {
-      constValue = value.value;
+      return value.value;
     }
 
-    return constValue;
+    return liveBinding?.value;
   }, [liveBinding, value]);
 
   const constValue = React.useMemo(initConstValue, [value, initConstValue]);
@@ -76,7 +80,7 @@ export default function BindableEditor<V>({
           globalScope={globalScope}
           globalScopeMeta={globalScopeMeta}
           label={label}
-          server={server}
+          jsRuntime={jsRuntime}
           propType={propType}
           value={value}
           onChange={onChange}

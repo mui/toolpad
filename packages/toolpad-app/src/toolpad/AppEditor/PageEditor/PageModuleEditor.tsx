@@ -51,6 +51,10 @@ function PageModuleEditorDialog({ pageNodeId, open, onClose }: PageModuleEditorD
 
   useShortcut({ key: 's', metaKey: true, disabled: !open }, handleSave);
 
+  React.useEffect(() => {
+    setInput(page.attributes.module?.value || DEFAULT_CONTENT);
+  }, [page]);
+
   return (
     <Dialog onClose={onClose} open={open} fullWidth maxWidth="lg">
       <DialogTitle>Edit page module</DialogTitle>
@@ -76,17 +80,36 @@ export interface PageModuleEditorProps {
 }
 
 export default function PageModuleEditor({ pageNodeId }: PageModuleEditorProps) {
+  const domApi = useDomApi();
+  const { currentView } = useDom();
+
   const [dialogOpen, setDialogOpen] = React.useState(false);
+
+  const handleButtonClick = React.useCallback(() => {
+    domApi.setView({
+      kind: 'page',
+      nodeId: pageNodeId,
+      view: { kind: 'pageModule' },
+    });
+  }, [domApi, pageNodeId]);
+
+  const handleDialogClose = React.useCallback(() => {
+    domApi.setView({ kind: 'page', nodeId: pageNodeId });
+  }, [domApi, pageNodeId]);
+
+  React.useEffect(() => {
+    setDialogOpen(currentView.kind === 'page' && currentView.view?.kind === 'pageModule');
+  }, [currentView]);
 
   return (
     <React.Fragment>
-      <Button color="inherit" onClick={() => setDialogOpen(true)} startIcon={<CodeIcon />}>
+      <Button color="inherit" onClick={handleButtonClick} startIcon={<CodeIcon />}>
         Edit page module
       </Button>
       <PageModuleEditorDialog
         pageNodeId={pageNodeId}
         open={dialogOpen}
-        onClose={() => setDialogOpen(false)}
+        onClose={handleDialogClose}
       />
     </React.Fragment>
   );

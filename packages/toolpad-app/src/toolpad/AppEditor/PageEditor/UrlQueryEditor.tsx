@@ -19,24 +19,32 @@ export interface UrlQueryEditorProps {
 }
 
 export default function UrlQueryEditor({ pageNodeId }: UrlQueryEditorProps) {
-  const { dom } = useDom();
+  const { dom, currentView } = useDom();
   const domApi = useDomApi();
 
   const page = appDom.getNode(dom, pageNodeId, 'page');
 
-  const {
-    value: dialogOpen,
-    setTrue: handleDialogOpen,
-    setFalse: handleDialogClose,
-  } = useBoolean(false);
+  const { value: isDialogOpen, setTrue: openDialog, setFalse: closeDialog } = useBoolean(false);
 
   const value = page.attributes.parameters?.value;
   const [input, setInput] = React.useState(value);
   React.useEffect(() => {
-    if (dialogOpen) {
+    if (isDialogOpen) {
       setInput(value);
     }
-  }, [dialogOpen, value]);
+  }, [isDialogOpen, value]);
+
+  const handleButtonClick = React.useCallback(() => {
+    domApi.setView({
+      kind: 'page',
+      nodeId: pageNodeId,
+      view: { kind: 'pageParameters' },
+    });
+  }, [domApi, pageNodeId]);
+
+  const handleDialogClose = React.useCallback(() => {
+    domApi.setView({ kind: 'page', nodeId: pageNodeId });
+  }, [domApi, pageNodeId]);
 
   const handleSave = React.useCallback(() => {
     domApi.update((draft) =>
@@ -48,16 +56,23 @@ export default function UrlQueryEditor({ pageNodeId }: UrlQueryEditorProps) {
         appDom.createConst(input || []),
       ),
     );
-
     handleDialogClose();
   }, [domApi, handleDialogClose, input, page]);
 
+  React.useEffect(() => {
+    if (currentView.kind === 'page' && currentView.view?.kind === 'pageParameters') {
+      openDialog();
+    } else {
+      closeDialog();
+    }
+  }, [closeDialog, currentView, openDialog]);
+
   return (
     <React.Fragment>
-      <Button color="inherit" startIcon={<AddIcon />} onClick={handleDialogOpen}>
+      <Button color="inherit" startIcon={<AddIcon />} onClick={handleButtonClick}>
         Add page parameters
       </Button>
-      <Dialog fullWidth open={dialogOpen} onClose={handleDialogClose}>
+      <Dialog fullWidth open={isDialogOpen} onClose={handleDialogClose}>
         <DialogTitle>Edit page parameters</DialogTitle>
         <DialogContent>
           <Typography>

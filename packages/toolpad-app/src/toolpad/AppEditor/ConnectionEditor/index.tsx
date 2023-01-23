@@ -1,6 +1,5 @@
 import * as React from 'react';
 import { Box, Container, Stack, Typography } from '@mui/material';
-import { useParams } from 'react-router-dom';
 import { NodeId } from '@mui/toolpad-core';
 import invariant from 'invariant';
 import { ConnectionEditorProps, ClientDataSource } from '../../../types';
@@ -10,6 +9,7 @@ import dataSources from '../../../toolpadDataSources/client';
 import { ConnectionContextProvider } from '../../../toolpadDataSources/context';
 import NodeNameEditor from '../NodeNameEditor';
 import NotFoundEditor from '../NotFoundEditor';
+import useUndoRedo from '../../hooks/useUndoRedo';
 
 interface ConnectionParamsEditorProps<P> extends ConnectionEditorProps<P> {
   dataSource: ClientDataSource<P, any>;
@@ -102,12 +102,15 @@ function ConnectionEditorContent<P>({
 
 export interface ConnectionProps {
   appId: string;
+  nodeId?: NodeId;
 }
 
-export default function ConnectionEditor({ appId }: ConnectionProps) {
+export default function ConnectionEditor({ appId, nodeId }: ConnectionProps) {
   const { dom } = useDom();
-  const { nodeId } = useParams();
   const connectionNode = appDom.getMaybeNode(dom, nodeId as NodeId, 'connection');
+
+  useUndoRedo();
+
   return connectionNode ? (
     <ConnectionEditorContent appId={appId} key={nodeId} connectionNode={connectionNode} />
   ) : (

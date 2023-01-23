@@ -30,7 +30,9 @@ import {
   JsExpressionAction,
   GlobalScopeMeta,
   GlobalScopeMetaField,
+  JsRuntime,
 } from '@mui/toolpad-core';
+import { createProvidedContext } from '@mui/toolpad-core/utils/react';
 import { TabContext, TabList } from '@mui/lab';
 import { Maybe, WithControlledProp } from '../../utils/types';
 import { JsExpressionEditor } from './PageEditor/JsExpressionEditor';
@@ -40,7 +42,6 @@ import useLatest from '../../utils/useLatest';
 import useDebounced from '../../utils/useDebounced';
 import { useEvaluateLiveBinding } from './useEvaluateLiveBinding';
 import useShortcut from '../../utils/useShortcut';
-import { createProvidedContext } from '../../utils/react';
 import { useDom } from '../DomLoader';
 import * as appDom from '../../appDom';
 import { usePageEditorState } from './PageEditor/PageEditorProvider';
@@ -54,7 +55,7 @@ interface BindingEditorContext {
   /**
    * Serverside binding, use the QuickJs runtime to evaluate bindings
    */
-  server?: boolean;
+  jsRuntime: JsRuntime;
   disabled?: boolean;
   propType?: PropValueType;
   liveBinding?: LiveBinding;
@@ -99,13 +100,13 @@ function JsExpressionBindingEditor({
 }
 
 interface JsExpressionPreviewProps {
-  server?: boolean;
+  jsRuntime: JsRuntime;
   input: BindableAttrValue<any> | null;
   globalScope: Record<string, unknown>;
 }
 
-function JsExpressionPreview({ server, input, globalScope }: JsExpressionPreviewProps) {
-  const previewValue: LiveBinding = useEvaluateLiveBinding({ server, input, globalScope });
+function JsExpressionPreview({ jsRuntime, input, globalScope }: JsExpressionPreviewProps) {
+  const previewValue: LiveBinding = useEvaluateLiveBinding({ jsRuntime, input, globalScope });
 
   const lastGoodPreview = useLatest(previewValue?.error ? undefined : previewValue);
   const previewErrorDebounced = useDebounced(previewValue?.error, 500);
@@ -124,7 +125,13 @@ function JsExpressionPreview({ server, input, globalScope }: JsExpressionPreview
 export interface JsBindingEditorProps extends WithControlledProp<JsExpressionAttrValue | null> {}
 
 export function JsBindingEditor({ value, onChange }: JsBindingEditorProps) {
-  const { label, globalScope, globalScopeMeta = {}, server, propType } = useBindingEditorContext();
+  const {
+    label,
+    globalScope,
+    globalScopeMeta = {},
+    jsRuntime,
+    propType,
+  } = useBindingEditorContext();
 
   return (
     <Stack direction="row" sx={{ height: 400, gap: 2 }}>
@@ -151,7 +158,7 @@ export function JsBindingEditor({ value, onChange }: JsBindingEditorProps) {
           onChange={onChange}
         />
 
-        <JsExpressionPreview server={server} input={value} globalScope={globalScope} />
+        <JsExpressionPreview jsRuntime={jsRuntime} input={value} globalScope={globalScope} />
       </Box>
     </Stack>
   );
@@ -372,7 +379,7 @@ export interface BindingEditorProps<V> extends WithControlledProp<BindableAttrVa
   /**
    * Uses the QuickJs runtime to evaluate bindings, just like on the server
    */
-  server?: boolean;
+  jsRuntime: JsRuntime;
   disabled?: boolean;
   hidden?: boolean;
   propType?: PropValueType;
@@ -383,7 +390,7 @@ export function BindingEditor<V>({
   label,
   globalScope,
   globalScopeMeta,
-  server,
+  jsRuntime,
   disabled,
   hidden = false,
   propType,
@@ -443,12 +450,12 @@ export function BindingEditor<V>({
       label,
       globalScope,
       globalScopeMeta: resolvedMeta,
-      server,
+      jsRuntime,
       disabled,
       propType,
       liveBinding,
     }),
-    [disabled, globalScope, label, liveBinding, propType, resolvedMeta, server],
+    [disabled, globalScope, jsRuntime, label, liveBinding, propType, resolvedMeta],
   );
 
   return (

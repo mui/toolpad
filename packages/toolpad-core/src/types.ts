@@ -1,6 +1,6 @@
 import type * as React from 'react';
 import type { TOOLPAD_COMPONENT } from './constants';
-import type { Branded } from './utils';
+import type { Branded } from './utils/types';
 
 export type NodeId = Branded<string, 'NodeId'>;
 
@@ -156,6 +156,11 @@ export type PropValueTypes<K extends string = string> = Partial<{
 
 export interface ArgTypeDefinition<P extends object = {}, V = P[keyof P]> {
   /**
+   * A short explanatory text that'll be shown in the editor UI when this property is referenced.
+   * May contain Markdown.
+   */
+  helperText?: string;
+  /**
    * To be used instead of the property name for UI purposes in the editor.
    */
   label?: string;
@@ -212,10 +217,25 @@ export interface LiveBindingError {
   stack?: string;
 }
 
-export interface LiveBinding {
-  value?: any;
-  error?: LiveBindingError;
-}
+/**
+ * Represents the actual state of an evaluated binding.
+ */
+export type BindingEvaluationResult<T = unknown> = {
+  /**
+   * The actual value.
+   */
+  value?: T;
+  /**
+   * The evaluation of the value resulted in error.
+   */
+  error?: Error;
+  /**
+   * The parts that this value depends on are still loading.
+   */
+  loading?: boolean;
+};
+
+export type LiveBinding = BindingEvaluationResult;
 
 export type GlobalScopeMetaField = {
   description?: string;
@@ -250,6 +270,7 @@ export type RuntimeEvents = {
     bindings: LiveBindings;
   };
   screenUpdate: {};
+  ready: {};
   pageNavigationRequest: { pageNodeId: NodeId };
 };
 
@@ -258,6 +279,11 @@ export type RuntimeEvent = {
 }[keyof RuntimeEvents];
 
 export interface ComponentConfig<P extends object = {}> {
+  /**
+   * A short explanatory text that'll be shown in the editor UI when this component is referenced.
+   * May contain Markdown
+   */
+  helperText?: string;
   /**
    * Designates a property as "the error property". If Toolpad detects an error
    * on any of the inputs, it will forward it to this property.
@@ -313,3 +339,17 @@ export type ExecFetchResult<T = any> = {
   data?: T;
   error?: SerializedError;
 };
+
+export type Serializable =
+  | string
+  | number
+  | boolean
+  | null
+  | undefined
+  | Serializable[]
+  | { [key: string]: Serializable }
+  | ((...args: Serializable[]) => Serializable);
+
+export interface JsRuntime {
+  evaluateExpression(code: string, globalScope: Record<string, unknown>): BindingEvaluationResult;
+}

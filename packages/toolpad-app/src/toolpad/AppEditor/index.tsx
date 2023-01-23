@@ -1,14 +1,14 @@
 import * as React from 'react';
 import { styled } from '@mui/material';
-import { Route, Routes, useParams, Navigate } from 'react-router-dom';
-import { JsRuntimeProvider } from '@mui/toolpad-core/jsRuntime';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
+import { JsRuntimeProvider } from '@mui/toolpad-core/jsServerRuntime';
 import PageEditor from './PageEditor';
 import DomProvider, { useDom } from '../DomLoader';
-import * as appDom from '../../appDom';
-import CodeComponentEditor from './CodeComponentEditor';
 import ConnectionEditor from './ConnectionEditor';
 import AppEditorShell from './AppEditorShell';
+import CodeComponentEditor from './CodeComponentEditor';
 import NoPageFound from './NoPageFound';
+import { getPathnameFromView } from '../../utils/domView';
 
 const classes = {
   content: 'Toolpad_Content',
@@ -43,32 +43,32 @@ interface FileEditorProps {
 }
 
 function FileEditor({ appId }: FileEditorProps) {
-  const { dom } = useDom();
-  const app = appDom.getApp(dom);
-  const { pages = [] } = appDom.getChildNodes(dom, app);
+  const { currentView } = useDom();
 
-  const firstPage = pages.length > 0 ? pages[0] : null;
+  const location = useLocation();
+  const navigate = useNavigate();
 
-  return (
-    <Routes>
-      <Route element={<AppEditorShell appId={appId} />}>
-        <Route path="connections/:nodeId" element={<ConnectionEditor appId={appId} />} />
-        <Route path="pages/:nodeId" element={<PageEditor appId={appId} />} />
-        <Route path="codeComponents/:nodeId" element={<CodeComponentEditor appId={appId} />} />
-        <Route path="codeComponents/:nodeId" element={<CodeComponentEditor appId={appId} />} />
-        <Route
-          index
-          element={
-            firstPage ? (
-              <Navigate to={`pages/${firstPage.id}`} replace />
-            ) : (
-              <NoPageFound appId={appId} />
-            )
-          }
-        />
-      </Route>
-    </Routes>
-  );
+  React.useEffect(() => {
+    const newPathname = getPathnameFromView(appId, currentView);
+    if (newPathname !== location.pathname) {
+      navigate({ pathname: newPathname }, { replace: true });
+    }
+  }, [appId, currentView, location.pathname, navigate]);
+
+  const currentViewContent = React.useMemo(() => {
+    switch (currentView.kind) {
+      case 'page':
+        return <PageEditor appId={appId} nodeId={currentView.nodeId} />;
+      case 'connection':
+        return <ConnectionEditor appId={appId} nodeId={currentView.nodeId} />;
+      case 'codeComponent':
+        return <CodeComponentEditor appId={appId} nodeId={currentView.nodeId} />;
+      default:
+        return <NoPageFound appId={appId} />;
+    }
+  }, [appId, currentView.kind, currentView.nodeId]);
+
+  return <AppEditorShell appId={appId}>{currentViewContent}</AppEditorShell>;
 }
 
 export interface EditorContentProps {

@@ -14,6 +14,7 @@ import {
 } from '@mui/material';
 import * as React from 'react';
 import { BindableAttrValue } from '@mui/toolpad-core';
+import { useBrowserJsRuntime } from '@mui/toolpad-core/jsBrowserRuntime';
 import useLatest from '../../../../utils/useLatest';
 import { usePageEditorState } from '../PageEditorProvider';
 import * as appDom from '../../../../appDom';
@@ -106,6 +107,9 @@ export default function QueryNodeEditorDialog<Q>({
   const node = useLatest(nodeProp);
 
   const [input, setInput] = React.useState<appDom.QueryNode<Q>>(node);
+  React.useEffect(() => {
+    setInput(node);
+  }, [node]);
 
   const reset = useEvent(() => setInput(node));
 
@@ -236,7 +240,10 @@ export default function QueryNodeEditorDialog<Q>({
     [appId, dataSourceId, connectionId],
   );
 
+  const jsBrowserRuntime = useBrowserJsRuntime();
+
   const liveEnabled = useEvaluateLiveBinding({
+    jsRuntime: jsBrowserRuntime,
     input: input.attributes.enabled || null,
     globalScope: pageState,
   });
@@ -321,7 +328,7 @@ export default function QueryNodeEditorDialog<Q>({
                 liveBinding={liveEnabled}
                 globalScope={pageState}
                 globalScopeMeta={globalScopeMeta}
-                server
+                jsRuntime={jsBrowserRuntime}
                 label="Enabled"
                 propType={{ type: 'boolean' }}
                 value={input.attributes.enabled ?? appDom.createConst(true)}

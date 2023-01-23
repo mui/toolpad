@@ -1,6 +1,5 @@
 import * as React from 'react';
 import { Box, Button, Stack, styled, TextField, Toolbar, Typography } from '@mui/material';
-import { useParams } from 'react-router-dom';
 import createCache from '@emotion/cache';
 import { CacheProvider } from '@emotion/react';
 import * as ReactDOM from 'react-dom';
@@ -34,6 +33,7 @@ import { ExactEntriesOf, WithControlledProp } from '../../../utils/types';
 import useDebounced from '../../../utils/useDebounced';
 import { ExtraLib } from '../../../components/MonacoEditor';
 import { useNodeNameValidation } from '../HierarchyExplorer/validation';
+import useUndoRedo from '../../hooks/useUndoRedo';
 
 const TypescriptEditor = lazyComponent(() => import('../../../components/TypescriptEditor'), {
   noSsr: true,
@@ -308,13 +308,16 @@ function CodeComponentEditorContent({ codeComponentNode }: CodeComponentEditorCo
 
 interface CodeComponentEditorProps {
   appId: string;
+  nodeId?: NodeId;
 }
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-export default function CodeComponentEditor({ appId }: CodeComponentEditorProps) {
+export default function CodeComponentEditor({ appId, nodeId }: CodeComponentEditorProps) {
   const { dom } = useDom();
-  const { nodeId } = useParams();
   const codeComponentNode = appDom.getMaybeNode(dom, nodeId as NodeId, 'codeComponent');
+
+  useUndoRedo();
+
   return codeComponentNode ? (
     <CodeComponentEditorContent key={nodeId} codeComponentNode={codeComponentNode} />
   ) : (

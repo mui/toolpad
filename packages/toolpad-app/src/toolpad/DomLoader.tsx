@@ -1,18 +1,22 @@
 import * as React from 'react';
-import { NodeId, BindableAttrValues } from '@mui/toolpad-core';
+import { NodeId } from '@mui/toolpad-core';
+import { createProvidedContext } from '@mui/toolpad-core/utils/react';
 import invariant from 'invariant';
 import { debounce, DebouncedFunc } from 'lodash-es';
+import { useLocation } from 'react-router-dom';
 import * as appDom from '../appDom';
 import { update } from '../utils/immutability';
 import client from '../api';
 import useShortcut from '../utils/useShortcut';
 import useDebouncedHandler from '../utils/useDebouncedHandler';
-import { createProvidedContext } from '../utils/react';
 import { mapValues } from '../utils/collections';
 import insecureHash from '../utils/insecureHash';
 import useEvent from '../utils/useEvent';
 import { NodeHashes } from '../types';
 import { hasFieldFocus } from '../utils/fields';
+import { DomView, getViewFromPathname } from '../utils/domView';
+
+export type ComponentPanelTab = 'component' | 'theme';
 
 export type DomAction =
   | {
@@ -36,24 +40,18 @@ export type DomAction =
       error: string;
     }
   | {
-      type: 'DOM_SET_NODE_NAME';
-      nodeId: NodeId;
-      name: string;
-    }
-  | {
-      type: 'DOM_SET_NODE_NAMESPACE';
-      node: appDom.AppDomNode;
-      namespace: string;
-      value: BindableAttrValues | null;
-    }
-  | {
       type: 'DOM_UPDATE';
       updater: (dom: appDom.AppDom) => appDom.AppDom;
       selectedNodeId?: NodeId | null;
+      view?: DomView;
     }
   | {
-      type: 'DOM_SAVE_NODE';
-      node: appDom.AppDomNode;
+      type: 'DOM_SET_VIEW';
+      view: DomView;
+    }
+  | {
+      type: 'DOM_SET_TAB';
+      tab: ComponentPanelTab;
     }
   | {
       type: 'SELECT_NODE';
@@ -65,19 +63,8 @@ export type DomAction =
 
 export function domReducer(dom: appDom.AppDom, action: DomAction): appDom.AppDom {
   switch (action.type) {
-    case 'DOM_SET_NODE_NAME': {
-      // TODO: Also update all bindings on the page that use this name
-      const node = appDom.getNode(dom, action.nodeId);
-      return appDom.setNodeName(dom, node, action.name);
-    }
-    case 'DOM_SET_NODE_NAMESPACE': {
-      return appDom.setNodeNamespace<any, any>(dom, action.node, action.namespace, action.value);
-    }
     case 'DOM_UPDATE': {
       return action.updater(dom);
-    }
-    case 'DOM_SAVE_NODE': {
-      return appDom.saveNode(dom, action.node);
     }
     default:
       return dom;
@@ -101,7 +88,13 @@ export function domLoaderReducer(state: DomLoader, action: DomAction): DomLoader
     case 'DOM_UPDATE_HISTORY': {
       const updatedUndoStack = [
         ...state.undoStack,
-        { dom: state.dom, selectedNodeId: state.selectedNodeId },
+        {
+          dom: state.dom,
+          selectedNodeId: state.selectedNodeId,
+          view: state.currentView,
+          tab: state.currentTab,
+          timestamp: Date.now(),
+        },
       ];
 
       if (updatedUndoStack.length > UNDO_HISTORY_LIMIT) {
@@ -134,6 +127,8 @@ export function domLoaderReducer(state: DomLoader, action: DomAction): DomLoader
       return update(state, {
         dom: previousStackEntry.dom,
         selectedNodeId: previousStackEntry.selectedNodeId,
+        currentView: previousStackEntry.view,
+        currentTab: previousStackEntry.tab,
         undoStack,
         redoStack,
       });
@@ -153,6 +148,8 @@ export function domLoaderReducer(state: DomLoader, action: DomAction): DomLoader
       return update(state, {
         dom: nextStackEntry.dom,
         selectedNodeId: nextStackEntry.selectedNodeId,
+        currentView: nextStackEntry.view,
+        currentTab: nextStackEntry.tab,
         undoStack,
         redoStack,
       });
@@ -180,6 +177,7 @@ export function domLoaderReducer(state: DomLoader, action: DomAction): DomLoader
     case 'SELECT_NODE': {
       return update(state, {
         selectedNodeId: action.nodeId,
+        currentTab: 'component',
       });
     }
     case 'DESELECT_NODE': {
@@ -188,11 +186,24 @@ export function domLoaderReducer(state: DomLoader, action: DomAction): DomLoader
       });
     }
     case 'DOM_UPDATE': {
-      return action.selectedNodeId !== undefined
-        ? update(state, {
-            selectedNodeId: action.selectedNodeId,
-          })
-        : state;
+      const { selectedNodeId, view } = action;
+
+      return update(state, {
+        ...(typeof selectedNodeId !== 'undefined'
+          ? { selectedNodeId, currentTab: 'component' }
+          : {}),
+        ...(view ? { currentView: view } : {}),
+      });
+    }
+    case 'DOM_SET_VIEW': {
+      return update(state, {
+        currentView: action.view,
+      });
+    }
+    case 'DOM_SET_TAB': {
+      return update(state, {
+        currentTab: action.tab,
+      });
     }
     default:
       return state;
@@ -213,31 +224,45 @@ function createDomApi(
       dispatch({ type: 'DOM_REDO' });
     },
     setNodeName(nodeId: NodeId, name: string) {
-      dispatch({ type: 'DOM_SET_NODE_NAME', nodeId, name });
+      dispatch({
+        type: 'DOM_UPDATE',
+        updater(dom) {
+          const node = appDom.getNode(dom, nodeId);
+          return appDom.setNodeName(dom, node, name);
+        },
+      });
     },
-    update(updater: (dom: appDom.AppDom) => appDom.AppDom, selectedNodeId?: NodeId | null) {
+    update(
+      updater: (dom: appDom.AppDom) => appDom.AppDom,
+      extraUpdates: {
+        view?: DomView;
+        selectedNodeId?: NodeId | null;
+      } = {},
+    ) {
       dispatch({
         type: 'DOM_UPDATE',
         updater,
-        selectedNodeId,
+        ...extraUpdates,
+      });
+    },
+    setView(view: DomView) {
+      dispatch({
+        type: 'DOM_SET_VIEW',
+        view,
+      });
+    },
+    setTab(tab: ComponentPanelTab) {
+      dispatch({
+        type: 'DOM_SET_TAB',
+        tab,
       });
     },
     saveNode(node: appDom.AppDomNode) {
       dispatch({
-        type: 'DOM_SAVE_NODE',
-        node,
-      });
-    },
-    setNodeNamespace<Node extends appDom.AppDomNode, Namespace extends appDom.PropNamespaces<Node>>(
-      node: Node,
-      namespace: Namespace,
-      value: Node[Namespace] | null,
-    ) {
-      dispatch({
-        type: 'DOM_SET_NODE_NAMESPACE',
-        namespace,
-        node,
-        value: value as BindableAttrValues | null,
+        type: 'DOM_UPDATE',
+        updater(dom) {
+          return appDom.saveNode(dom, node);
+        },
       });
     },
     selectNode(nodeId: NodeId) {
@@ -261,8 +286,10 @@ export interface DomLoader {
   unsavedChanges: number;
   saveError: string | null;
   selectedNodeId: NodeId | null;
-  undoStack: DomState[];
-  redoStack: DomState[];
+  currentView: DomView;
+  currentTab: ComponentPanelTab;
+  undoStack: UndoRedoStackEntry[];
+  redoStack: UndoRedoStackEntry[];
 }
 
 export function getNodeHashes(dom: appDom.AppDom): NodeHashes {
@@ -280,14 +307,22 @@ export { useDomLoader };
 export interface DomState {
   dom: appDom.AppDom;
   selectedNodeId: NodeId | null;
+  currentView: DomView;
+  currentTab: ComponentPanelTab;
+}
+
+interface UndoRedoStackEntry extends Omit<DomState, 'currentView' | 'currentTab'> {
+  view: DomView;
+  tab: ComponentPanelTab;
+  timestamp: number;
 }
 
 export function useDom(): DomState {
-  const { dom, selectedNodeId } = useDomLoader();
+  const { dom, selectedNodeId, currentView, currentTab } = useDomLoader();
   if (!dom) {
     throw new Error("Trying to access the DOM before it's loaded");
   }
-  return { dom, selectedNodeId };
+  return { dom, selectedNodeId, currentView, currentTab };
 }
 
 export function useDomApi(): DomApi {
@@ -311,19 +346,31 @@ export interface DomContextProps {
   children?: React.ReactNode;
 }
 
-const SKIP_UNDO_ACTIONS = new Set([
-  'DOM_UPDATE_HISTORY',
-  'DOM_UNDO',
-  'DOM_REDO',
-  'DOM_SAVED',
-  'DOM_SAVING',
-  'DOM_SAVING_ERROR',
+type DomActionType = DomAction['type'];
+
+const UNDOABLE_ACTIONS = new Set<DomActionType>([
+  'DOM_UPDATE',
+  'DOM_SET_VIEW',
+  'DOM_SET_TAB',
+  'SELECT_NODE',
+  'DESELECT_NODE',
 ]);
 
 export default function DomProvider({ appId, children }: DomContextProps) {
   const { data: dom } = client.useQuery('loadDom', [appId], { suspense: true });
 
   invariant(dom, `Suspense should load the dom`);
+
+  const location = useLocation();
+
+  const app = appDom.getApp(dom);
+  const { pages = [] } = appDom.getChildNodes(dom, app);
+  const firstPage = pages.length > 0 ? pages[0] : null;
+
+  const initialView = getViewFromPathname(location.pathname) || {
+    kind: 'page',
+    nodeId: firstPage?.id,
+  };
 
   const [state, dispatch] = React.useReducer(domLoaderReducer, {
     saving: false,
@@ -332,7 +379,17 @@ export default function DomProvider({ appId, children }: DomContextProps) {
     savedDom: dom,
     dom,
     selectedNodeId: null,
-    undoStack: [{ dom, selectedNodeId: null }],
+    currentView: initialView,
+    currentTab: 'component',
+    undoStack: [
+      {
+        dom,
+        selectedNodeId: null,
+        view: initialView,
+        tab: 'component',
+        timestamp: Date.now(),
+      },
+    ],
     redoStack: [],
   });
 
@@ -344,22 +401,15 @@ export default function DomProvider({ appId, children }: DomContextProps) {
     [],
   );
 
-  const scheduleHistoryUpdate = React.useMemo(
-    () => () => {
-      if (!hasFieldFocus()) {
-        dispatch({ type: 'DOM_UPDATE_HISTORY' });
-      } else {
-        scheduleTextInputHistoryUpdate();
-      }
-    },
-    [scheduleTextInputHistoryUpdate],
-  );
-
   const dispatchWithHistory = useEvent((action: DomAction) => {
     dispatch(action);
 
-    if (!SKIP_UNDO_ACTIONS.has(action.type)) {
-      scheduleHistoryUpdate();
+    if (UNDOABLE_ACTIONS.has(action.type)) {
+      if (hasFieldFocus()) {
+        scheduleTextInputHistoryUpdate();
+      } else {
+        dispatch({ type: 'DOM_UPDATE_HISTORY' });
+      }
     }
   });
 

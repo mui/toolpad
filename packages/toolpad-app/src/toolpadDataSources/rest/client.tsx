@@ -23,6 +23,8 @@ import {
 } from '@mui/material';
 import { Controller, useForm } from 'react-hook-form';
 import { TabContext, TabList } from '@mui/lab';
+import { useBrowserJsRuntime } from '@mui/toolpad-core/jsBrowserRuntime';
+import { useServerJsRuntime } from '@mui/toolpad-core/jsServerRuntime';
 import {
   ClientDataSource,
   ConnectionEditorProps,
@@ -350,7 +352,11 @@ function QueryEditor({
 
   const paramsEntries = input.params || EMPTY_PARAMS;
 
+  const jsBrowserRuntime = useBrowserJsRuntime();
+  const jsServerRuntime = useServerJsRuntime();
+
   const paramsEditorLiveValue = useEvaluateLiveBindingEntries({
+    jsRuntime: jsBrowserRuntime,
     input: paramsEntries,
     globalScope,
   });
@@ -370,19 +376,19 @@ function QueryEditor({
   );
 
   const liveUrl: LiveBinding = useEvaluateLiveBinding({
-    server: true,
+    jsRuntime: jsServerRuntime,
     input: urlValue,
     globalScope: queryScope,
   });
 
   const liveSearchParams = useEvaluateLiveBindingEntries({
-    server: true,
+    jsRuntime: jsServerRuntime,
     input: input.attributes.query.value.searchParams || [],
     globalScope: queryScope,
   });
 
   const liveHeaders = useEvaluateLiveBindingEntries({
-    server: true,
+    jsRuntime: jsServerRuntime,
     input: input.attributes.query.value.headers || [],
     globalScope: queryScope,
   });
@@ -404,13 +410,18 @@ function QueryEditor({
     preview,
     runPreview: handleRunPreview,
     isLoading: previewIsLoading,
-  } = useQueryPreview(fetchPreview, input.attributes.query.value, previewParams, {
-    onPreview(result) {
-      setPreviewHar((existing) =>
-        result.har ? mergeHar(createHarLog(), existing, result.har) : existing,
-      );
+  } = useQueryPreview(
+    fetchPreview,
+    input.attributes.query.value,
+    previewParams as Record<string, string>,
+    {
+      onPreview(result) {
+        setPreviewHar((existing) =>
+          result.har ? mergeHar(createHarLog(), existing, result.har) : existing,
+        );
+      },
     },
-  });
+  );
 
   const handleHarClear = React.useCallback(() => setPreviewHar(createHarLog()), []);
 
@@ -458,7 +469,7 @@ function QueryEditor({
                 globalScope={queryScope}
                 globalScopeMeta={QUERY_SCOPE_META}
                 sx={{ flex: 1 }}
-                server
+                jsRuntime={jsServerRuntime}
                 label="url"
                 propType={{ type: 'string' }}
                 renderControl={(props) => <UrlControl baseUrl={baseUrl} {...props} />}
@@ -484,6 +495,7 @@ function QueryEditor({
                     globalScope={queryScope}
                     globalScopeMeta={QUERY_SCOPE_META}
                     liveValue={liveSearchParams}
+                    jsRuntime={jsServerRuntime}
                   />
                 </TabPanel>
                 <TabPanel disableGutters value="body">
@@ -502,6 +514,7 @@ function QueryEditor({
                     globalScope={queryScope}
                     globalScopeMeta={QUERY_SCOPE_META}
                     liveValue={liveHeaders}
+                    jsRuntime={jsServerRuntime}
                   />
                 </TabPanel>
                 <TabPanel disableGutters value="response">
@@ -545,6 +558,7 @@ function QueryEditor({
             globalScope={globalScope}
             globalScopeMeta={globalScopeMeta}
             liveValue={paramsEditorLiveValue}
+            jsRuntime={jsBrowserRuntime}
           />
         </Box>
       </SplitPane>

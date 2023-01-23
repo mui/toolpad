@@ -1,5 +1,76 @@
 # Changelog
 
+## 0.0.36
+
+<!-- generated comparing v0.0.35..master -->
+
+_Jan 18, 2023_
+
+A big thanks to the 3 contributors who made this release possible. Here are some highlights ✨:
+
+Added Tabs component and new canvas bridge implementation, fixed DatePicker localization, binding to objects, link redirection. Improved code around js evaluation.
+
+- &#8203;<!-- 9 -->Fix DatePicker localization issues (#1575) @Janpot
+- &#8203;<!-- 8 -->Avoid resubscribing in useSyncExternalStore on every render (#1554) @Janpot
+- &#8203;<!-- 7 -->Rename Tabs main prop (#1568) @bytasv
+- &#8203;<!-- 6 -->Add tabs and container components (#1549) @bytasv
+- &#8203;<!-- 5 -->Reorganize js evaluation across project (#1548) @Janpot
+- &#8203;<!-- 4 -->New canvas bridge implementation (#1550) @Janpot
+- &#8203;<!-- 3 -->Fix binding to objects with more than one property (#1542) @Janpot
+- &#8203;<!-- 2 -->[core] Add missing need triage label on RFC @oliviertassinari
+- &#8203;<!-- 1 -->[docs] Fix link redirection @oliviertassinari
+
+All contributors of this release in alphabetical order: @bytasv, @Janpot, @oliviertassinari
+
+## 0.0.35
+
+<!-- generated comparing v0.0.34..master -->
+
+_Jan 11, 2023_
+
+A big thanks to the 4 contributors who made this release possible. Here are some highlights ✨:
+
+Custom column types, add search to apps overview, add inline tooltips to components and properties, component library tweaks.
+
+- &#8203;<!-- 12 -->Fix templates after dog API changed (#1544) @Janpot
+- &#8203;<!-- 11 -->Reorganize shared utils (#1539) @Janpot
+- &#8203;<!-- 10 -->Remove obsolete dom reducer actions (#1541) @Janpot
+- &#8203;<!-- 09 -->Some component library tweaks (#1526) @Janpot
+- &#8203;<!-- 08 -->Pin react-router-dom instead of resolutions (#1519) @Janpot
+- &#8203;<!-- 07 -->Update README.md @prakhargupta1
+- &#8203;<!-- 06 -->Add inline documentation to components and properties (#1518) @Janpot
+- &#8203;<!-- 05 -->Correct types in Datepicker (#1517) @Janpot
+- &#8203;<!-- 04 -->Promote previously experimental config (#1515) @Janpot
+- &#8203;<!-- 03 -->Add search to the apps overview (#1402) @bharatkashyap
+- &#8203;<!-- 02 -->Custom column types (#1462) @bytasv
+- &#8203;<!-- 01 -->Restructure installation docs (#1511) @Janpot
+
+All contributors of this release in alphabetical order: @bharatkashyap, @bytasv, @Janpot, @prakhargupta1
+
+## 0.0.34
+
+<!-- generated comparing v0.0.33..master -->
+
+_Jan 4, 2023_
+
+A big thanks to the 4 contributors who made this release possible. Here are some highlights ✨:
+
+New date picker component, Make switching views part of undo/redo cycle.
+
+- &#8203;<!-- 13 -->Fix dependabot vulnerabilities (#1512) @Janpot
+- &#8203;<!-- 12 -->Don't import from dist folders (#1513) @Janpot
+- &#8203;<!-- 11 -->Root type check (#1510) @bytasv
+- &#8203;<!-- 10 -->Fix function editor save (#1507) @Janpot
+- &#8203;<!-- 09 -->Do not rename nodes when migrating Typography components (#1509) @Janpot
+- &#8203;<!-- 08 -->Just re-export the prettier config (#1508) @Janpot
+- &#8203;<!-- 07 -->Datepicker format handling changes (#1504) @bytasv
+- &#8203;<!-- 04 -->Undo/redo through different views (#1417) @apedroferreira
+- &#8203;<!-- 03 -->Make sure npm package is splitted out correctly (#1502) @Janpot
+- &#8203;<!-- 02 -->Date picker component (#1499) @bytasv
+- &#8203;<!-- 01 -->[core] Remove dead prettier config @oliviertassinari
+
+All contributors of this release in alphabetical order: @apedroferreira, @bytasv, @Janpot, @oliviertassinari
+
 ## 0.0.33
 
 <!-- generated comparing v0.0.32..master -->

@@ -15,7 +15,7 @@ function List({ items, renderItem, disablePadding = false, sx }: ListProps) {
     <MuiList disablePadding={disablePadding} sx={{ width: '100%', ...sx }}>
       {items.map((item, index) => (
         <ListItem key={index} disablePadding={disablePadding}>
-          <Box sx={{ width: '100%', p: 0, m: 0 }}>{renderItem({ index, item })}</Box>
+          <Box sx={{ width: '100%', p: 0, m: 0 }}>{renderItem({ item, i: index })}</Box>
         </ListItem>
       ))}
     </MuiList>

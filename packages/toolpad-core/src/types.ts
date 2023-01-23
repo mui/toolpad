@@ -366,7 +366,7 @@ export type LocalScope = Record<string, unknown>;
 
 export interface TemplateScope extends LocalScope {
   item: unknown;
-  index: number;
+  i: number;
 }
 
 export type TemplateRenderer = ({ item, index }: TemplateScope) => React.ReactNode;

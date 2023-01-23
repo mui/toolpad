@@ -384,8 +384,8 @@ function RenderedNodeContent({ node, childNodeGroups, Component }: RenderedNodeC
       }
 
       props[propName] = isTemplate
-        ? ({ index, item }: TemplateScope) => (
-            <LocalScopeContextProvider key={index} value={{ index, item }}>
+        ? ({ item, i }: TemplateScope) => (
+            <LocalScopeContextProvider key={i} value={{ item, i }}>
               {wrappedValue}
             </LocalScopeContextProvider>
           )

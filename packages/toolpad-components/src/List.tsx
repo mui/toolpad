@@ -1,22 +1,21 @@
 import * as React from 'react';
-import { createComponent, ElementIteratorItem, ElementIteratorRenderer } from '@mui/toolpad-core';
+import { createComponent, TemplateRenderer } from '@mui/toolpad-core';
 import { Box, List as MuiList, ListItem, SxProps } from '@mui/material';
 import { SX_PROP_HELPER_TEXT } from './constants';
 
 export type ListProps = {
-  // eslint-disable-next-line react/no-unused-prop-types
-  items: ElementIteratorItem[];
+  items: Record<string, unknown>[];
   disablePadding?: boolean;
-  renderItems: ElementIteratorRenderer;
+  renderItem: TemplateRenderer;
   sx?: SxProps;
 };
 
-function List({ renderItems, disablePadding = false, sx }: ListProps) {
+function List({ items, renderItem, disablePadding = false, sx }: ListProps) {
   return (
     <MuiList disablePadding={disablePadding} sx={{ width: '100%', ...sx }}>
-      {renderItems((children, item, index) => (
+      {items.map((item, index) => (
         <ListItem key={index} disablePadding={disablePadding}>
-          <Box sx={{ width: '100%', p: 0, m: 0 }}>{children}</Box>
+          <Box sx={{ width: '100%', p: 0, m: 0 }}>{renderItem({ index, item })}</Box>
         </ListItem>
       ))}
     </MuiList>
@@ -31,8 +30,8 @@ export default createComponent(List, {
       typeDef: { type: 'object' },
       defaultValue: [...Array(3).fill({})],
     },
-    renderItems: {
-      typeDef: { type: 'elementIterator', itemsProp: 'items' },
+    renderItem: {
+      typeDef: { type: 'template' },
       control: { type: 'layoutSlot' },
     },
     disablePadding: {

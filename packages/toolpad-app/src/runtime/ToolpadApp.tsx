@@ -20,11 +20,9 @@ import {
   BindableAttrValue,
   NestedBindableAttrs,
   GlobalScopeMeta,
-  ElementIteratorItem,
-  ElementIteratorItemRenderer,
-  ElementIteratorValueType,
-  GlobalScopeNodeState,
   BindingEvaluationResult,
+  LocalScope,
+  TemplateScope,
 } from '@mui/toolpad-core';
 import { createProvidedContext } from '@mui/toolpad-core/utils/react';
 import { QueryClient, QueryClientProvider, useMutation } from '@tanstack/react-query';
@@ -62,7 +60,7 @@ import evalJsBindings, {
   ParsedBinding,
 } from './evalJsBindings';
 import { HTML_ID_EDITOR_OVERLAY } from '../constants';
-import { filterValues, mapProperties, mapValues } from '../utils/collections';
+import { mapProperties, mapValues } from '../utils/collections';
 import usePageTitle from '../utils/usePageTitle';
 import ComponentsContext, { useComponents, useComponent } from './ComponentsContext';
 import { AppModulesProvider, useAppModules } from './AppModulesProvider';
@@ -74,11 +72,6 @@ import { useAppContext, AppContextProvider } from './AppContext';
 import { CanvasHooksContext, NavigateToPage } from './CanvasHooksContext';
 import useBoolean from '../utils/useBoolean';
 import { errorFrom } from '../utils/errors';
-import {
-  getElementIteratorBindingId,
-  getElementIteratorScopePath,
-  getFirstElementIteratorAncestorItems,
-} from '../toolpadComponents/elementIterator';
 import { bridge } from '../canvas/ToolpadBridge';
 
 const ReactQueryDevtoolsProduction = React.lazy(() =>
@@ -138,17 +131,16 @@ const [useDomContext, DomContextProvider] = createProvidedContext<appDom.AppDom>
 const [useEvaluatePageExpression, EvaluatePageExpressionProvider] =
   createProvidedContext<(expr: string) => any>('EvaluatePageExpression');
 const [useBindingsContext, BindingsContextProvider] =
-  createProvidedContext<
-    (nodeState?: GlobalScopeNodeState) => Record<string, BindingEvaluationResult>
-  >('GetBindings');
+  createProvidedContext<(localScope?: LocalScope) => Record<string, BindingEvaluationResult>>(
+    'GetBindings',
+  );
 const [useSetControlledBindingContext, SetControlledBindingContextProvider] =
   createProvidedContext<(id: string, result: BindingEvaluationResult) => void>(
     'SetControlledBinding',
   );
 
-const [useIteratorItemContext, IteratorItemContextProvider] = createProvidedContext<{
-  item: ElementIteratorItem | null;
-}>('IteratorItem');
+const [useLocalScopeContext, LocalScopeContextProvider] =
+  createProvidedContext<LocalScope>('IteratorItem');
 
 function getComponentId(elm: appDom.ElementNode): string {
   const componentId = getElementNodeComponentId(elm);
@@ -206,12 +198,7 @@ function RenderedNodeContent({ node, childNodeGroups, Component }: RenderedNodeC
 
   const nodeId = node.id;
 
-  const { item: iteratorItem } = useIteratorItemContext();
-
-  const globalScopeNodeState = React.useMemo<GlobalScopeNodeState>(
-    () => (iteratorItem ? { [getElementIteratorScopePath(node)]: iteratorItem } : {}),
-    [iteratorItem, node],
-  );
+  const localScope = useLocalScopeContext();
 
   const componentConfig = Component[TOOLPAD_COMPONENT];
   const { argTypes = {}, errorProp, loadingProp, loadingPropSource } = componentConfig;
@@ -220,10 +207,7 @@ function RenderedNodeContent({ node, childNodeGroups, Component }: RenderedNodeC
     appDom.isPage(node) || (appDom.isElement(node) && isPageLayoutComponent(node));
 
   const getBindings = useBindingsContext();
-  const liveBindings = React.useMemo(
-    () => getBindings(globalScopeNodeState),
-    [getBindings, globalScopeNodeState],
-  );
+  const liveBindings = React.useMemo(() => getBindings(localScope), [getBindings, localScope]);
 
   const boundProps: Record<string, any> = React.useMemo(() => {
     const loadingPropSourceSet = new Set(loadingPropSource);
@@ -383,9 +367,9 @@ function RenderedNodeContent({ node, childNodeGroups, Component }: RenderedNodeC
   // Wrap element props
   for (const [propName, argType] of Object.entries(argTypes)) {
     const isElement = argType?.typeDef.type === 'element';
-    const isElementIterator = argType?.typeDef.type === 'elementIterator';
+    const isTemplate = argType?.typeDef.type === 'template';
 
-    if (isElement || isElementIterator) {
+    if (isElement || isTemplate) {
       const value = props[propName];
 
       let wrappedValue = value;
@@ -399,18 +383,12 @@ function RenderedNodeContent({ node, childNodeGroups, Component }: RenderedNodeC
         );
       }
 
-      props[propName] = isElementIterator
-        ? (itemRenderer: ElementIteratorItemRenderer) => {
-            const elementInteratorArgTypeDef = argType.typeDef as ElementIteratorValueType;
-            const elementInteratorArgItems: ElementIteratorItem[] =
-              props[elementInteratorArgTypeDef.itemsProp];
-
-            return elementInteratorArgItems.map((item, index) => (
-              <IteratorItemContextProvider key={index} value={{ item }}>
-                {itemRenderer(wrappedValue, item, index)}
-              </IteratorItemContextProvider>
-            ));
-          }
+      props[propName] = isTemplate
+        ? ({ index, item }: TemplateScope) => (
+            <LocalScopeContextProvider key={index} value={{ index, item }}>
+              {wrappedValue}
+            </LocalScopeContextProvider>
+          )
         : wrappedValue;
     }
   }
@@ -720,22 +698,6 @@ function parseBindings(
           parsedBindingsMap.set(bindingId, parseBinding(binding, {}));
         }
       }
-
-      const firstIteratorAncestorItems = getFirstElementIteratorAncestorItems(dom, elm, components);
-      if (firstIteratorAncestorItems) {
-        const bindingId = getElementIteratorBindingId(elm);
-        const bindingScopePath = getElementIteratorScopePath(elm);
-
-        parsedBindingsMap.set(
-          bindingId,
-          parseBinding(appDom.createConst(firstIteratorAncestorItems[0]), {
-            scopePath: bindingScopePath,
-          }),
-        );
-        globalScopeMeta[bindingScopePath] = {
-          kind: 'hidden',
-        };
-      }
     }
 
     if (appDom.isQuery(elm)) {
@@ -885,16 +847,10 @@ function RenderedPage({ nodeId }: RenderedNodeProps) {
   const browserJsRuntime = useBrowserJsRuntime();
 
   const getEvaluatedBindings = React.useCallback(
-    (nodeState: GlobalScopeNodeState = {}) => {
-      // Prevent global state from overriding local state
-      const filteredPageBindings = filterValues(
-        pageBindings,
-        (binding) => !binding.scopePath || !Object.keys(nodeState).includes(binding.scopePath),
-      ) as Record<string, ParsedBinding>;
-
-      return evalJsBindings(browserJsRuntime, filteredPageBindings, {
+    (localScope: LocalScope = {}) => {
+      return evalJsBindings(browserJsRuntime, pageBindings, {
         ...globalScope,
-        ...nodeState,
+        ...localScope,
       });
     },
     [browserJsRuntime, globalScope, pageBindings],
@@ -906,8 +862,8 @@ function RenderedPage({ nodeId }: RenderedNodeProps) {
   );
 
   const getBindings = React.useCallback(
-    (nodeState?: GlobalScopeNodeState) => {
-      const evaluatedBindings = getEvaluatedBindings(nodeState);
+    (localScope?: LocalScope) => {
+      const evaluatedBindings = getEvaluatedBindings(localScope);
       return mapValues(evaluatedBindings, (binding) => binding.result || { value: undefined });
     },
     [getEvaluatedBindings],
@@ -931,7 +887,7 @@ function RenderedPage({ nodeId }: RenderedNodeProps) {
     <BindingsContextProvider value={getBindings}>
       <SetControlledBindingContextProvider value={setControlledBinding}>
         <EvaluatePageExpressionProvider value={evaluatePageExpression}>
-          <IteratorItemContextProvider value={{ item: null }}>
+          <LocalScopeContextProvider value={{}}>
             <RenderedNodeContent
               node={page}
               childNodeGroups={{ children }}
@@ -941,7 +897,7 @@ function RenderedPage({ nodeId }: RenderedNodeProps) {
             {queries.map((node) => (
               <FetchNode key={node.id} node={node} />
             ))}
-          </IteratorItemContextProvider>
+          </LocalScopeContextProvider>
         </EvaluatePageExpressionProvider>
       </SetControlledBindingContextProvider>
     </BindingsContextProvider>

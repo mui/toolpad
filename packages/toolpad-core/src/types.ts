@@ -75,15 +75,7 @@ export type BindableAttrEntries = [string, BindableAttrValue<any>][];
 export type SlotType = 'single' | 'multiple' | 'layout';
 
 export interface ValueTypeBase {
-  type:
-    | 'string'
-    | 'boolean'
-    | 'number'
-    | 'object'
-    | 'array'
-    | 'element'
-    | 'elementIterator'
-    | 'event';
+  type: 'string' | 'boolean' | 'number' | 'object' | 'array' | 'element' | 'template' | 'event';
 }
 
 export interface StringValueType extends ValueTypeBase {
@@ -115,12 +107,8 @@ export interface ElementValueType extends ValueTypeBase {
   type: 'element';
 }
 
-export interface ElementIteratorValueType extends ValueTypeBase {
-  type: 'elementIterator';
-  /**
-   * The property that is used to provide items to an element iterator.
-   */
-  itemsProp: string;
+export interface TemplateValueType extends ValueTypeBase {
+  type: 'template';
 }
 
 export interface EventValueType extends ValueTypeBase {
@@ -167,7 +155,7 @@ type PrimitiveValueType =
 export type PropValueType =
   | PrimitiveValueType
   | ElementValueType
-  | ElementIteratorValueType
+  | TemplateValueType
   | EventValueType;
 
 export type PropValueTypes<K extends string = string> = Partial<{
@@ -270,7 +258,7 @@ export type GlobalScopeMetaField = {
       componentId: string;
     }
   | {
-      kind: 'query' | 'local' | 'hidden';
+      kind: 'query' | 'local';
     }
 );
 
@@ -374,18 +362,11 @@ export interface JsRuntime {
   evaluateExpression(code: string, globalScope: Record<string, unknown>): BindingEvaluationResult;
 }
 
-export type ElementIteratorItem = Record<string, unknown>;
+export type LocalScope = Record<string, unknown>;
 
-export type ElementIteratorItemRenderer = (
-  children: React.ReactNode,
-  item: ElementIteratorItem,
-  index: number,
-) => React.ReactNode;
-
-export type ElementIteratorRenderer = (
-  itemRenderer: ElementIteratorItemRenderer,
-) => React.ReactNode;
-
-export interface GlobalScopeNodeState {
-  item?: ElementIteratorItem;
+export interface TemplateScope extends LocalScope {
+  item: unknown;
+  index: number;
 }
+
+export type TemplateRenderer = ({ item, index }: TemplateScope) => React.ReactNode;

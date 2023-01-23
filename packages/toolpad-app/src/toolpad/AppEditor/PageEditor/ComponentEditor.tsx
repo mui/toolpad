@@ -40,7 +40,7 @@ const ComponentEditorRoot = styled('div')(({ theme }) => ({
 }));
 
 function shouldRenderControl<P extends object>(propTypeDef: ArgTypeDefinition<P>, props: P) {
-  if (propTypeDef.typeDef.type === 'element' || propTypeDef.typeDef.type === 'elementIterator') {
+  if (propTypeDef.typeDef.type === 'element' || propTypeDef.typeDef.type === 'template') {
     return (
       propTypeDef.control?.type !== 'slot' &&
       propTypeDef.control?.type !== 'slots' &&

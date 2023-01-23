@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { ArgTypeDefinition, BindableAttrValue, GlobalScopeMeta } from '@mui/toolpad-core';
+import { ArgTypeDefinition, BindableAttrValue } from '@mui/toolpad-core';
 import { Alert, Box } from '@mui/material';
 import { useBrowserJsRuntime } from '@mui/toolpad-core/jsRuntime';
 import * as appDom from '../../../appDom';
@@ -8,10 +8,6 @@ import BindableEditor from './BindableEditor';
 import { usePageEditorState } from './PageEditorProvider';
 import { getDefaultControl } from '../../propertyControls';
 import MarkdownTooltip from '../../../components/MarkdownTooltip';
-import {
-  getElementIteratorBindingId,
-  getElementIteratorScopePath,
-} from '../../../toolpadComponents/elementIterator';
 
 export interface NodeAttributeEditorProps<P extends object> {
   node: appDom.AppDomNode;
@@ -46,15 +42,6 @@ export default function NodeAttributeEditor<P extends object>({
 
   const liveBinding = bindings[bindingId];
 
-  const iteratorItemBindingId = getElementIteratorBindingId(node);
-  const iteratorItemBinding = bindings[iteratorItemBindingId];
-  const iteratorItemScopePath = getElementIteratorScopePath(node);
-
-  const nodeAwareGlobalScopeMeta: GlobalScopeMeta = {
-    ...globalScopeMeta,
-    ...(iteratorItemBinding ? { [iteratorItemScopePath]: { kind: 'local' } } : {}),
-  };
-
   const propType = argType.typeDef;
   const Control = getDefaultControl(argType, props);
 
@@ -70,7 +57,7 @@ export default function NodeAttributeEditor<P extends object>({
     <BindableEditor
       liveBinding={liveBinding}
       globalScope={pageState}
-      globalScopeMeta={nodeAwareGlobalScopeMeta}
+      globalScopeMeta={globalScopeMeta}
       label={argType.label || name}
       bindable={isBindable}
       disabled={isDisabled}

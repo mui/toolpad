@@ -1,15 +1,18 @@
 import * as appDom from './appDom';
 import compileModule from './compileModule';
+import config from './config';
 import { CompiledModule, RuntimeState } from './types';
 
 function compileModules(dom: appDom.AppDom): Record<string, CompiledModule> {
   const result: Record<string, CompiledModule> = {};
   const root = appDom.getApp(dom);
   const { codeComponents = [], pages = [] } = appDom.getChildNodes(dom, root);
-  for (const node of codeComponents) {
-    const src = node.attributes.code.value;
-    const name = `codeComponents/${node.id}`;
-    result[name] = compileModule(src, name);
+  if (!config.localMode) {
+    for (const node of codeComponents) {
+      const src = node.attributes.code.value;
+      const name = `codeComponents/${node.id}`;
+      result[name] = compileModule(src, name);
+    }
   }
   for (const node of pages) {
     const src = node.attributes.module?.value;

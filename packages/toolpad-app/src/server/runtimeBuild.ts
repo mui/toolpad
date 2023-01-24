@@ -148,6 +148,9 @@ export async function createBuilder({ filePath, dev }: BuilderOptions) {
     async watch() {
       await ctx.watch();
     },
+    async dispose() {
+      return ctx.dispose();
+    },
     getResult() {
       return result;
     },

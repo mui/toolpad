@@ -59,6 +59,7 @@ export default function cli(argv: string[]) {
   const command = args._[0];
 
   switch (command) {
+    case undefined:
     case 'dev':
       devCommand({
         devMode: args['--dev'],

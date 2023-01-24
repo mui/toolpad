@@ -10,15 +10,32 @@ const BASE = '/api/runtime';
 
 let builderPromise: ReturnType<typeof createBuilder> | undefined;
 
+declare module globalThis {
+  // Used to detect old builders to be cleaned up after HMR
+  let internalBuilderPromise: ReturnType<typeof createBuilder> | undefined;
+}
+
 async function getBuilder() {
   if (!builderPromise) {
-    builderPromise = createBuilder({
-      filePath: getConfigFilePath(),
-      dev: true,
-    }).then(async (builder) => {
+    // Not initialized yet, either first run, or after HMR
+
+    const oldBuilderPromise = globalThis.internalBuilderPromise;
+    builderPromise = (async () => {
+      if (oldBuilderPromise) {
+        // This module was loaded as part of HMR, cleaning up the previous bulder first
+        const oldBuilder = await oldBuilderPromise;
+        await oldBuilder.dispose();
+      }
+
+      const builder = await createBuilder({
+        filePath: getConfigFilePath(),
+        dev: true,
+      });
+
       await builder.watch();
       return builder;
-    });
+    })();
+    globalThis.internalBuilderPromise = builderPromise;
   }
 
   return builderPromise;

@@ -23,7 +23,6 @@ import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import RocketLaunchIcon from '@mui/icons-material/RocketLaunch';
 import * as React from 'react';
 import { useForm } from 'react-hook-form';
-import { Outlet } from 'react-router-dom';
 import invariant from 'invariant';
 import config from '../../config';
 import DialogForm from '../../components/DialogForm';
@@ -200,9 +199,10 @@ export function DeployMenu({ appId }: DeployMenuProps) {
 export interface ToolpadShellProps {
   appId: string;
   actions?: React.ReactNode;
+  children: React.ReactNode;
 }
 
-export default function AppEditorShell({ appId, ...props }: ToolpadShellProps) {
+export default function AppEditorShell({ appId, children, ...props }: ToolpadShellProps) {
   const domLoader = useDomLoader();
 
   return (
@@ -248,7 +248,7 @@ export default function AppEditorShell({ appId, ...props }: ToolpadShellProps) {
             position: 'relative',
           }}
         >
-          <Outlet />
+          {children}
         </Box>
       </Box>
     </ToolpadShell>

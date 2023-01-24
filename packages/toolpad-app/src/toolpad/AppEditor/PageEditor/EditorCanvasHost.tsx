@@ -127,9 +127,11 @@ export default function EditorCanvasHost({
     }
   });
 
-  const src = config.localMode
-    ? `/api/runtime/app/pages/${pageNodeId}`
-    : `/app-canvas/${appId}/pages/${pageNodeId}`;
+  const src = `/app-canvas/${appId}/pages/${pageNodeId}`;
+
+  // const src = config.localMode
+  //  ? `/api/runtime/app/pages/${pageNodeId}`
+  //  : `/app-canvas/${appId}/pages/${pageNodeId}`;
 
   const [loading, setLoading] = React.useState(true);
   useOnChange(src, () => setLoading(true));

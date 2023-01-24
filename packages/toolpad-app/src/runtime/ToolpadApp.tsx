@@ -334,7 +334,7 @@ function RenderedNodeContent({ node, childNodeGroups, Component }: RenderedNodeC
       ...layoutElementProps,
       ...reactChildren,
     };
-  }, [boundProps, eventHandlers, layoutElementProps, onChangeHandlers, reactChildren]);
+  }, [boundProps, eventHandlers, layoutElementProps, onChangeHandlers, reactChildren, node.name]);
 
   const previousProps = React.useRef<Record<string, any>>(props);
   React.useEffect(() => {

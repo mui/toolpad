@@ -19,10 +19,10 @@ import {
   NodeId,
   BindableAttrValue,
   NestedBindableAttrs,
-  GlobalScopeMeta,
   BindingEvaluationResult,
   LocalScope,
   TemplateScope,
+  ScopeMeta,
 } from '@mui/toolpad-core';
 import { createProvidedContext } from '@mui/toolpad-core/utils/react';
 import { QueryClient, QueryClientProvider, useMutation } from '@tanstack/react-query';
@@ -150,6 +150,213 @@ function getComponentId(elm: appDom.ElementNode): string {
 function useElmToolpadComponent(elm: appDom.ElementNode): ToolpadComponent {
   const componentId = getElementNodeComponentId(elm);
   return useComponent(componentId);
+}
+
+interface ParseBindingOptions {
+  scopePath?: string;
+}
+
+/**
+ * Turns an object consisting of a nested structure of BindableAttrValues
+ * into a flat array of relative paths associated with their value.
+ * Example:
+ *   { foo: { bar: { type: 'const', value:1 } }, baz: [{ type: 'jsExpression', value: 'quux' }] }
+ *   =>
+ *   [['.foo.bar', { type: 'const', value:1 }],
+ *    ['.baz[0]', { type: 'jsExpression', value: 'quux' }]]
+ */
+function flattenNestedBindables(
+  params?: NestedBindableAttrs,
+  prefix = '',
+): [string, BindableAttrValue<any>][] {
+  if (!params) {
+    return [];
+  }
+  if (Array.isArray(params)) {
+    return params.flatMap((param, i) => {
+      return flattenNestedBindables(param[1], `${prefix}[${i}][1]`);
+    });
+  }
+  // TODO: create a marker in bindables (similar to $$ref) to recognize them automatically
+  // in a nested structure. This would allow us to build deeply nested structures
+  if (typeof params.type === 'string') {
+    return [[prefix, params as BindableAttrValue<any>]];
+  }
+  return Object.entries(params).flatMap(([key, param]) =>
+    flattenNestedBindables(param, `${prefix}.${key}`),
+  );
+}
+
+function parseBinding(
+  bindable: BindableAttrValue<any>,
+  { scopePath }: ParseBindingOptions = {},
+): ParsedBinding | EvaluatedBinding {
+  if (bindable?.type === 'const') {
+    return {
+      scopePath,
+      result: { value: bindable.value },
+    };
+  }
+  if (bindable?.type === 'jsExpression') {
+    return {
+      scopePath,
+      expression: bindable.value,
+    };
+  }
+  return {
+    scopePath,
+    result: { value: undefined },
+  };
+}
+
+function parseBindings(
+  dom: appDom.AppDom,
+  rootNode: appDom.ElementNode | appDom.PageNode,
+  components: ToolpadComponents,
+  location: RouterLocation,
+) {
+  const elements = appDom.getDescendants(dom, rootNode);
+
+  const parsedBindingsMap = new Map<string, ParsedBinding | EvaluatedBinding>();
+  const controlled = new Set<string>();
+  const scopeMeta: ScopeMeta = {};
+
+  for (const elm of elements) {
+    if (appDom.isElement<any>(elm)) {
+      const componentId = getComponentId(elm);
+      const Component = components[componentId];
+
+      const { argTypes = {} } = Component?.[TOOLPAD_COMPONENT] ?? {};
+
+      for (const [propName, argType] of Object.entries(argTypes)) {
+        const initializerId = argType?.defaultValueProp
+          ? `${elm.id}.props.${argType.defaultValueProp}`
+          : undefined;
+
+        const binding: BindableAttrValue<any> =
+          elm.props?.[propName] || appDom.createConst(argType?.defaultValue ?? undefined);
+
+        const bindingId = `${elm.id}.props.${propName}`;
+
+        let scopePath: string | undefined;
+        if (componentId !== PAGE_ROW_COMPONENT_ID) {
+          scopePath = `${elm.name}.${propName}`;
+          scopeMeta[elm.name] = {
+            kind: 'element',
+            componentId,
+          };
+        }
+
+        if (argType) {
+          if (argType.onChangeProp) {
+            controlled.add(bindingId);
+            parsedBindingsMap.set(bindingId, {
+              scopePath,
+              initializer: initializerId,
+            });
+          } else {
+            parsedBindingsMap.set(bindingId, parseBinding(binding, { scopePath }));
+          }
+        }
+      }
+
+      if (!isPageLayoutComponent(elm)) {
+        for (const [propName, argType] of Object.entries(layoutBoxArgTypes)) {
+          const binding =
+            elm.layout?.[propName as keyof typeof layoutBoxArgTypes] ||
+            appDom.createConst(argType?.defaultValue ?? undefined);
+          const bindingId = `${elm.id}.layout.${propName}`;
+          parsedBindingsMap.set(bindingId, parseBinding(binding, {}));
+        }
+      }
+    }
+
+    if (appDom.isQuery(elm)) {
+      scopeMeta[elm.name] = {
+        kind: 'query',
+      };
+
+      if (elm.params) {
+        const nestedBindablePaths = flattenNestedBindables(Object.fromEntries(elm.params ?? []));
+
+        for (const [nestedPath, paramValue] of nestedBindablePaths) {
+          const bindingId = `${elm.id}.params${nestedPath}`;
+          const scopePath = `${elm.name}.params${nestedPath}`;
+          const bindable = paramValue || appDom.createConst(undefined);
+          parsedBindingsMap.set(bindingId, parseBinding(bindable, { scopePath }));
+        }
+      }
+
+      for (const [key, value] of Object.entries(INITIAL_FETCH)) {
+        const bindingId = `${elm.id}.${key}`;
+        const scopePath = `${elm.name}.${key}`;
+        controlled.add(bindingId);
+        parsedBindingsMap.set(bindingId, {
+          scopePath,
+          result: { value, loading: true },
+        });
+      }
+
+      const configBindings = _.pick(elm.attributes, USE_DATA_QUERY_CONFIG_KEYS);
+      const nestedBindablePaths = flattenNestedBindables(configBindings);
+
+      for (const [nestedPath, paramValue] of nestedBindablePaths) {
+        const bindingId = `${elm.id}.config${nestedPath}`;
+        const scopePath = `${elm.name}.config${nestedPath}`;
+        const bindable = paramValue || appDom.createConst(undefined);
+        parsedBindingsMap.set(bindingId, parseBinding(bindable, { scopePath }));
+      }
+    }
+
+    if (appDom.isMutation(elm)) {
+      if (elm.params) {
+        for (const [paramName, bindable] of Object.entries(elm.params)) {
+          const bindingId = `${elm.id}.params.${paramName}`;
+          const scopePath = `${elm.name}.params.${paramName}`;
+          if (bindable?.type === 'const') {
+            parsedBindingsMap.set(bindingId, {
+              scopePath,
+              result: { value: bindable.value },
+            });
+          } else if (bindable?.type === 'jsExpression') {
+            parsedBindingsMap.set(bindingId, {
+              scopePath,
+              expression: bindable.value,
+            });
+          }
+        }
+      }
+
+      for (const [key, value] of Object.entries(INITIAL_FETCH)) {
+        const bindingId = `${elm.id}.${key}`;
+        const scopePath = `${elm.name}.${key}`;
+        controlled.add(bindingId);
+        parsedBindingsMap.set(bindingId, {
+          scopePath,
+          result: { value, loading: true },
+        });
+      }
+    }
+  }
+
+  if (appDom.isPage(rootNode)) {
+    const urlParams = new URLSearchParams(location.search);
+    const pageParameters = rootNode.attributes.parameters?.value || [];
+
+    for (const [paramName, paramDefault] of pageParameters) {
+      const bindingId = `${rootNode.id}.parameters.${paramName}`;
+      const scopePath = `page.parameters.${paramName}`;
+      parsedBindingsMap.set(bindingId, {
+        scopePath,
+        result: { value: urlParams.get(paramName) || paramDefault },
+      });
+    }
+  }
+
+  const parsedBindings: Record<string, ParsedBinding | EvaluatedBinding> =
+    Object.fromEntries(parsedBindingsMap);
+
+  return { parsedBindings, controlled, scopeMeta };
 }
 
 interface RenderedNodeProps {
@@ -364,6 +571,10 @@ function RenderedNodeContent({ node, childNodeGroups, Component }: RenderedNodeC
     previousProps.current = props;
   }, [props, argTypes, nodeId, setControlledBinding]);
 
+  const dom = useDomContext();
+  const location = useLocation();
+  const components = useComponents();
+
   // Wrap element props
   for (const [propName, argType] of Object.entries(argTypes)) {
     const isElement = argType?.typeDef.type === 'element';
@@ -383,13 +594,17 @@ function RenderedNodeContent({ node, childNodeGroups, Component }: RenderedNodeC
         );
       }
 
-      props[propName] = isTemplate
-        ? ({ item, i }: TemplateScope) => (
-            <LocalScopeContextProvider key={i} value={{ item, i }}>
-              {wrappedValue}
-            </LocalScopeContextProvider>
-          )
-        : wrappedValue;
+      if (isTemplate) {
+        const { parsedBindings } = parseBindings(dom, node, components, location);
+
+        props[propName] = ({ item, i }: TemplateScope) => (
+          <LocalScopeContextProvider key={i} value={{ ...parsedBindings, item, i }}>
+            {wrappedValue}
+          </LocalScopeContextProvider>
+        );
+      } else {
+        props[propName] = wrappedValue;
+      }
     }
   }
 
@@ -445,37 +660,6 @@ const PageRootComponent = createComponent(PageRoot, {
     },
   },
 });
-
-/**
- * Turns an object consisting of a nested structure of BindableAttrValues
- * into a flat array of relative paths associated with their value.
- * Example:
- *   { foo: { bar: { type: 'const', value:1 } }, baz: [{ type: 'jsExpression', value: 'quux' }] }
- *   =>
- *   [['.foo.bar', { type: 'const', value:1 }],
- *    ['.baz[0]', { type: 'jsExpression', value: 'quux' }]]
- */
-function flattenNestedBindables(
-  params?: NestedBindableAttrs,
-  prefix = '',
-): [string, BindableAttrValue<any>][] {
-  if (!params) {
-    return [];
-  }
-  if (Array.isArray(params)) {
-    return params.flatMap((param, i) => {
-      return flattenNestedBindables(param[1], `${prefix}[${i}][1]`);
-    });
-  }
-  // TODO: create a marker in bindables (similar to $$ref) to recognize them automatically
-  // in a nested structure. This would allow us to build deeply nested structures
-  if (typeof params.type === 'string') {
-    return [[prefix, params as BindableAttrValue<any>]];
-  }
-  return Object.entries(params).flatMap(([key, param]) =>
-    flattenNestedBindables(param, `${prefix}.${key}`),
-  );
-}
 
 function resolveBindables(
   bindings: Partial<Record<string, BindingEvaluationResult>>,
@@ -612,180 +796,6 @@ function FetchNode({ node }: FetchNodeProps) {
   }
 }
 
-interface ParseBindingOptions {
-  scopePath?: string;
-}
-
-function parseBinding(
-  bindable: BindableAttrValue<any>,
-  { scopePath }: ParseBindingOptions = {},
-): ParsedBinding | EvaluatedBinding {
-  if (bindable?.type === 'const') {
-    return {
-      scopePath,
-      result: { value: bindable.value },
-    };
-  }
-  if (bindable?.type === 'jsExpression') {
-    return {
-      scopePath,
-      expression: bindable.value,
-    };
-  }
-  return {
-    scopePath,
-    result: { value: undefined },
-  };
-}
-
-function parseBindings(
-  dom: appDom.AppDom,
-  page: appDom.PageNode,
-  components: ToolpadComponents,
-  location: RouterLocation,
-) {
-  const elements = appDom.getDescendants(dom, page);
-
-  const parsedBindingsMap = new Map<string, ParsedBinding | EvaluatedBinding>();
-  const controlled = new Set<string>();
-  const globalScopeMeta: GlobalScopeMeta = {};
-
-  for (const elm of elements) {
-    if (appDom.isElement<any>(elm)) {
-      const componentId = getComponentId(elm);
-      const Component = components[componentId];
-
-      const { argTypes = {} } = Component?.[TOOLPAD_COMPONENT] ?? {};
-
-      for (const [propName, argType] of Object.entries(argTypes)) {
-        const initializerId = argType?.defaultValueProp
-          ? `${elm.id}.props.${argType.defaultValueProp}`
-          : undefined;
-
-        const binding: BindableAttrValue<any> =
-          elm.props?.[propName] || appDom.createConst(argType?.defaultValue ?? undefined);
-
-        const bindingId = `${elm.id}.props.${propName}`;
-
-        let scopePath: string | undefined;
-        if (componentId !== PAGE_ROW_COMPONENT_ID) {
-          scopePath = `${elm.name}.${propName}`;
-          globalScopeMeta[elm.name] = {
-            kind: 'element',
-            componentId,
-          };
-        }
-
-        if (argType) {
-          if (argType.onChangeProp) {
-            controlled.add(bindingId);
-            parsedBindingsMap.set(bindingId, {
-              scopePath,
-              initializer: initializerId,
-            });
-          } else {
-            parsedBindingsMap.set(bindingId, parseBinding(binding, { scopePath }));
-          }
-        }
-      }
-
-      if (!isPageLayoutComponent(elm)) {
-        for (const [propName, argType] of Object.entries(layoutBoxArgTypes)) {
-          const binding =
-            elm.layout?.[propName as keyof typeof layoutBoxArgTypes] ||
-            appDom.createConst(argType?.defaultValue ?? undefined);
-          const bindingId = `${elm.id}.layout.${propName}`;
-          parsedBindingsMap.set(bindingId, parseBinding(binding, {}));
-        }
-      }
-    }
-
-    if (appDom.isQuery(elm)) {
-      globalScopeMeta[elm.name] = {
-        kind: 'query',
-      };
-
-      if (elm.params) {
-        const nestedBindablePaths = flattenNestedBindables(Object.fromEntries(elm.params ?? []));
-
-        for (const [nestedPath, paramValue] of nestedBindablePaths) {
-          const bindingId = `${elm.id}.params${nestedPath}`;
-          const scopePath = `${elm.name}.params${nestedPath}`;
-          const bindable = paramValue || appDom.createConst(undefined);
-          parsedBindingsMap.set(bindingId, parseBinding(bindable, { scopePath }));
-        }
-      }
-
-      for (const [key, value] of Object.entries(INITIAL_FETCH)) {
-        const bindingId = `${elm.id}.${key}`;
-        const scopePath = `${elm.name}.${key}`;
-        controlled.add(bindingId);
-        parsedBindingsMap.set(bindingId, {
-          scopePath,
-          result: { value, loading: true },
-        });
-      }
-
-      const configBindings = _.pick(elm.attributes, USE_DATA_QUERY_CONFIG_KEYS);
-      const nestedBindablePaths = flattenNestedBindables(configBindings);
-
-      for (const [nestedPath, paramValue] of nestedBindablePaths) {
-        const bindingId = `${elm.id}.config${nestedPath}`;
-        const scopePath = `${elm.name}.config${nestedPath}`;
-        const bindable = paramValue || appDom.createConst(undefined);
-        parsedBindingsMap.set(bindingId, parseBinding(bindable, { scopePath }));
-      }
-    }
-
-    if (appDom.isMutation(elm)) {
-      if (elm.params) {
-        for (const [paramName, bindable] of Object.entries(elm.params)) {
-          const bindingId = `${elm.id}.params.${paramName}`;
-          const scopePath = `${elm.name}.params.${paramName}`;
-          if (bindable?.type === 'const') {
-            parsedBindingsMap.set(bindingId, {
-              scopePath,
-              result: { value: bindable.value },
-            });
-          } else if (bindable?.type === 'jsExpression') {
-            parsedBindingsMap.set(bindingId, {
-              scopePath,
-              expression: bindable.value,
-            });
-          }
-        }
-      }
-
-      for (const [key, value] of Object.entries(INITIAL_FETCH)) {
-        const bindingId = `${elm.id}.${key}`;
-        const scopePath = `${elm.name}.${key}`;
-        controlled.add(bindingId);
-        parsedBindingsMap.set(bindingId, {
-          scopePath,
-          result: { value, loading: true },
-        });
-      }
-    }
-  }
-
-  const urlParams = new URLSearchParams(location.search);
-  const pageParameters = page.attributes.parameters?.value || [];
-
-  for (const [paramName, paramDefault] of pageParameters) {
-    const bindingId = `${page.id}.parameters.${paramName}`;
-    const scopePath = `page.parameters.${paramName}`;
-    parsedBindingsMap.set(bindingId, {
-      scopePath,
-      result: { value: urlParams.get(paramName) || paramDefault },
-    });
-  }
-
-  const parsedBindings: Record<string, ParsedBinding | EvaluatedBinding> =
-    Object.fromEntries(parsedBindingsMap);
-
-  return { parsedBindings, controlled, globalScopeMeta };
-}
-
 function RenderedPage({ nodeId }: RenderedNodeProps) {
   const dom = useDomContext();
   const page = appDom.getNode(dom, nodeId, 'page');
@@ -796,7 +806,11 @@ function RenderedPage({ nodeId }: RenderedNodeProps) {
   const location = useLocation();
   const components = useComponents();
 
-  const { parsedBindings, controlled, globalScopeMeta } = React.useMemo(
+  const {
+    parsedBindings,
+    controlled,
+    scopeMeta: globalScopeMeta,
+  } = React.useMemo(
     () => parseBindings(dom, page, components, location),
     [components, dom, location, page],
   );

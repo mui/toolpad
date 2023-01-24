@@ -245,7 +245,7 @@ export type BindingEvaluationResult<T = unknown> = {
 
 export type LiveBinding = BindingEvaluationResult;
 
-export type GlobalScopeMetaField = {
+export type ScopeMetaField = {
   description?: string;
   deprecated?: boolean | string;
   tsType?: string;
@@ -262,7 +262,7 @@ export type GlobalScopeMetaField = {
     }
 );
 
-export type GlobalScopeMeta = Partial<Record<string, GlobalScopeMetaField>>;
+export type ScopeMeta = Partial<Record<string, ScopeMetaField>>;
 
 export type RuntimeEvents = {
   propUpdated: {
@@ -272,7 +272,7 @@ export type RuntimeEvents = {
   };
   pageStateUpdated: {
     pageState: Record<string, unknown>;
-    globalScopeMeta: GlobalScopeMeta;
+    globalScopeMeta: ScopeMeta;
   };
   pageBindingsUpdated: {
     bindings: LiveBindings;

@@ -38,6 +38,10 @@ async function loadCodeComponentsFromFiles(componentsFolder: string): Promise<Co
   return Object.fromEntries(resultEntries.filter(Boolean));
 }
 
+async function writeConfigFile(filePath: string, dom: appDom.AppDom): Promise<void> {
+  await fs.writeFile(filePath, yaml.stringify(dom), { encoding: 'utf-8' });
+}
+
 async function writeCodeComponentsToFiles(
   componentsFolder: string,
   components: ComponentsContent,
@@ -80,12 +84,28 @@ function extractComponentsContentFromDom(dom: appDom.AppDom): ComponentsContent 
   );
 }
 
+export async function loadConfigFile(filePath: string): Promise<appDom.AppDom> {
+  try {
+    const configContent = await fs.readFile(filePath, { encoding: 'utf-8' });
+    const parsedConfig = yaml.parse(configContent);
+    return parsedConfig;
+  } catch (rawError) {
+    const error = errorFrom(rawError);
+    if (error.code === 'ENOENT') {
+      const dom = appDom.createDefaultDom();
+      await writeConfigFile(filePath, dom);
+      return dom;
+    }
+    throw error;
+  }
+}
+
 export async function saveLocalDom(dom: appDom.AppDom): Promise<void> {
   const filePath = getConfigFilePath();
   const componentsFolder = getComponentFolder(filePath);
   const componentsContent = extractComponentsContentFromDom(dom);
   await Promise.all([
-    fs.writeFile(filePath, yaml.stringify(dom), { encoding: 'utf-8' }),
+    writeConfigFile(filePath, dom),
     writeCodeComponentsToFiles(componentsFolder, componentsContent),
   ]);
 }
@@ -102,7 +122,6 @@ export async function loadLocalDomFromFile(filePath: string): Promise<appDom.App
     return dom;
   } catch (rawError) {
     const error = errorFrom(rawError);
-    console.log(error);
     if (error.code === 'ENOENT') {
       const dom = appDom.createDefaultDom();
       await saveLocalDom(dom);

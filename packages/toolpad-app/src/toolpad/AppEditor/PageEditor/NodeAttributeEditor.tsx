@@ -1,5 +1,10 @@
 import * as React from 'react';
-import { ArgTypeDefinition, BindableAttrValue, DEFAULT_LOCAL_SCOPE } from '@mui/toolpad-core';
+import {
+  ArgTypeDefinition,
+  BindableAttrValue,
+  DEFAULT_LOCAL_SCOPE,
+  ScopeMeta,
+} from '@mui/toolpad-core';
 import { Alert, Box } from '@mui/material';
 import { useBrowserJsRuntime } from '@mui/toolpad-core/jsBrowserRuntime';
 import { mapValues } from '../../../utils/collections';
@@ -54,8 +59,8 @@ export default function NodeAttributeEditor<P extends object>({
 
   const jsBrowserRuntime = useBrowserJsRuntime();
 
-  const localScopeMeta = React.useMemo(
-    () => mapValues(DEFAULT_LOCAL_SCOPE, () => ({ kind: 'local' })),
+  const localScopeMeta: ScopeMeta = React.useMemo(
+    () => mapValues(DEFAULT_LOCAL_SCOPE, () => ({ kind: 'local' })) as ScopeMeta,
     [],
   );
 

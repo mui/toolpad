@@ -1,15 +1,15 @@
 import { Typography, Divider, Box, SxProps } from '@mui/material';
-import { GlobalScopeMeta, GlobalScopeMetaField } from '@mui/toolpad-core';
+import { ScopeMeta, ScopeMetaField } from '@mui/toolpad-core';
 import * as React from 'react';
 import ObjectInspector from '../../components/ObjectInspector';
 
 export interface GlobalScopeExplorerProps {
   value: Record<string, unknown>;
-  meta: GlobalScopeMeta;
+  meta: ScopeMeta;
   sx?: SxProps;
 }
 
-type ExplorerItem = GlobalScopeMetaField & {
+type ExplorerItem = ScopeMetaField & {
   key: string;
   value: unknown;
 };
@@ -19,13 +19,13 @@ type ExplorerGroup = {
   items: ExplorerItem[];
 };
 
-type GroupKind = NonNullable<GlobalScopeMetaField['kind']> | 'other';
+type GroupKind = NonNullable<ScopeMetaField['kind']> | 'other';
 
 type ExplorerStructure = {
   [K in GroupKind]: ExplorerGroup;
 };
 
-function groupScopeMeta(value: Record<string, unknown>, meta: GlobalScopeMeta): ExplorerStructure {
+function groupScopeMeta(value: Record<string, unknown>, meta: ScopeMeta): ExplorerStructure {
   const structure: ExplorerStructure = {
     local: {
       displayName: 'Locals',

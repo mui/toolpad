@@ -1,4 +1,4 @@
-import { NodeId, LiveBindings, GlobalScopeMeta } from '@mui/toolpad-core';
+import { NodeId, LiveBindings, ScopeMeta } from '@mui/toolpad-core';
 import * as React from 'react';
 import * as appDom from '../../../appDom';
 import { PageViewState } from '../../../types';
@@ -30,7 +30,7 @@ export interface PageEditorState {
   readonly draggedEdge: RectangleEdge | null;
   readonly viewState: PageViewState;
   readonly pageState: Record<string, unknown>;
-  readonly globalScopeMeta: GlobalScopeMeta;
+  readonly globalScopeMeta: ScopeMeta;
   readonly bindings: LiveBindings;
 }
 
@@ -68,7 +68,7 @@ export type PageEditorAction =
   | {
       type: 'PAGE_STATE_UPDATE';
       pageState: Record<string, unknown>;
-      globalScopeMeta: GlobalScopeMeta;
+      globalScopeMeta: ScopeMeta;
     }
   | {
       type: 'PAGE_VIEW_STATE_UPDATE';
@@ -209,7 +209,7 @@ function createPageEditorApi(dispatch: React.Dispatch<PageEditorAction>) {
         viewState,
       });
     },
-    pageStateUpdate(pageState: Record<string, unknown>, globalScopeMeta: GlobalScopeMeta) {
+    pageStateUpdate(pageState: Record<string, unknown>, globalScopeMeta: ScopeMeta) {
       dispatch({
         type: 'PAGE_STATE_UPDATE',
         pageState,

@@ -4,7 +4,7 @@ import {
   BindableAttrValue,
   PropValueType,
   LiveBinding,
-  GlobalScopeMeta,
+  ScopeMeta,
   JsRuntime,
 } from '@mui/toolpad-core';
 import { BindingEditor } from '../BindingEditor';
@@ -31,7 +31,7 @@ export interface BindableEditorProps<V> extends WithControlledProp<BindableAttrV
   renderControl?: (params: RenderControlParams<any>) => React.ReactNode;
   liveBinding?: LiveBinding;
   globalScope?: Record<string, unknown>;
-  globalScopeMeta: GlobalScopeMeta;
+  globalScopeMeta: ScopeMeta;
   sx?: SxProps;
 }
 

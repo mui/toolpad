@@ -26,6 +26,7 @@ import { getLatestToolpadRelease } from '../../src/server/getLatestRelease';
 import { hasOwnProperty } from '../../src/utils/collections';
 import { errorFrom, serializeError } from '../../src/utils/errors';
 import logger from '../../src/server/logs/logger';
+import { openCodeComponentEditor } from '../../src/server/localMode';
 
 export interface Method<P extends any[] = any[], R = any> {
   (...params: P): Promise<R>;
@@ -187,6 +188,9 @@ const rpcServer = {
     }),
     saveDom: createMethod<typeof saveDom>(({ params }) => {
       return saveDom(...params);
+    }),
+    openCodeComponentEditor: createMethod<typeof openCodeComponentEditor>(({ params }) => {
+      return openCodeComponentEditor(...params);
     }),
   },
 } as const;

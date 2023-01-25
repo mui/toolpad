@@ -1,7 +1,8 @@
 import * as React from 'react';
-import { ArgTypeDefinition, BindableAttrValue } from '@mui/toolpad-core';
+import { ArgTypeDefinition, BindableAttrValue, DEFAULT_LOCAL_SCOPE } from '@mui/toolpad-core';
 import { Alert, Box } from '@mui/material';
 import { useBrowserJsRuntime } from '@mui/toolpad-core/jsRuntime';
+import { mapValues } from '../../../utils/collections';
 import * as appDom from '../../../appDom';
 import { useDomApi } from '../../DomLoader';
 import BindableEditor from './BindableEditor';
@@ -53,11 +54,19 @@ export default function NodeAttributeEditor<P extends object>({
 
   const jsBrowserRuntime = useBrowserJsRuntime();
 
+  const localScopeMeta = React.useMemo(
+    () => mapValues(DEFAULT_LOCAL_SCOPE, () => ({ kind: 'local' })),
+    [],
+  );
+
   return Control ? (
     <BindableEditor
       liveBinding={liveBinding}
-      globalScope={pageState}
-      globalScopeMeta={globalScopeMeta}
+      globalScope={{ ...pageState, ...DEFAULT_LOCAL_SCOPE }}
+      globalScopeMeta={{
+        ...globalScopeMeta,
+        ...localScopeMeta,
+      }}
       label={argType.label || name}
       bindable={isBindable}
       disabled={isDisabled}

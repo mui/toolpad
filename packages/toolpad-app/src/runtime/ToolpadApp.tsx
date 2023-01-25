@@ -23,6 +23,7 @@ import {
   LocalScope,
   TemplateScope,
   ScopeMeta,
+  DEFAULT_LOCAL_SCOPE,
 } from '@mui/toolpad-core';
 import { createProvidedContext } from '@mui/toolpad-core/utils/react';
 import { QueryClient, QueryClientProvider, useMutation } from '@tanstack/react-query';
@@ -571,10 +572,6 @@ function RenderedNodeContent({ node, childNodeGroups, Component }: RenderedNodeC
     previousProps.current = props;
   }, [props, argTypes, nodeId, setControlledBinding]);
 
-  const dom = useDomContext();
-  const location = useLocation();
-  const components = useComponents();
-
   // Wrap element props
   for (const [propName, argType] of Object.entries(argTypes)) {
     const isElement = argType?.typeDef.type === 'element';
@@ -595,10 +592,8 @@ function RenderedNodeContent({ node, childNodeGroups, Component }: RenderedNodeC
       }
 
       if (isTemplate) {
-        const { parsedBindings } = parseBindings(dom, node, components, location);
-
-        props[propName] = ({ item, i }: TemplateScope) => (
-          <LocalScopeContextProvider key={i} value={{ ...parsedBindings, item, i }}>
+        props[propName] = ({ i }: TemplateScope) => (
+          <LocalScopeContextProvider key={i} value={{ i }}>
             {wrappedValue}
           </LocalScopeContextProvider>
         );
@@ -861,7 +856,7 @@ function RenderedPage({ nodeId }: RenderedNodeProps) {
   const browserJsRuntime = useBrowserJsRuntime();
 
   const getEvaluatedBindings = React.useCallback(
-    (localScope: LocalScope = {}) => {
+    (localScope: LocalScope = DEFAULT_LOCAL_SCOPE) => {
       return evalJsBindings(browserJsRuntime, pageBindings, {
         ...globalScope,
         ...localScope,
@@ -901,7 +896,7 @@ function RenderedPage({ nodeId }: RenderedNodeProps) {
     <BindingsContextProvider value={getBindings}>
       <SetControlledBindingContextProvider value={setControlledBinding}>
         <EvaluatePageExpressionProvider value={evaluatePageExpression}>
-          <LocalScopeContextProvider value={{}}>
+          <LocalScopeContextProvider value={{ ...DEFAULT_LOCAL_SCOPE }}>
             <RenderedNodeContent
               node={page}
               childNodeGroups={{ children }}

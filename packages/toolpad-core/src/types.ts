@@ -365,8 +365,7 @@ export interface JsRuntime {
 export type LocalScope = Record<string, unknown>;
 
 export interface TemplateScope extends LocalScope {
-  item: unknown;
   i: number;
 }
 
-export type TemplateRenderer = ({ item, index }: TemplateScope) => React.ReactNode;
+export type TemplateRenderer = ({ i }: TemplateScope) => React.ReactNode;

@@ -4,18 +4,18 @@ import { Box, List as MuiList, ListItem, SxProps } from '@mui/material';
 import { SX_PROP_HELPER_TEXT } from './constants';
 
 export type ListProps = {
-  items: Record<string, unknown>[];
+  itemCount: number;
   disablePadding?: boolean;
   renderItem: TemplateRenderer;
   sx?: SxProps;
 };
 
-function List({ items, renderItem, disablePadding = false, sx }: ListProps) {
+function List({ itemCount, renderItem, disablePadding = false, sx }: ListProps) {
   return (
     <MuiList disablePadding={disablePadding} sx={{ width: '100%', ...sx }}>
-      {items.map((item, index) => (
+      {[...Array(itemCount).keys()].map((index) => (
         <ListItem key={index} disablePadding={disablePadding}>
-          <Box sx={{ width: '100%', p: 0, m: 0 }}>{renderItem({ item, i: index })}</Box>
+          <Box sx={{ width: '100%', p: 0, m: 0 }}>{renderItem({ i: index })}</Box>
         </ListItem>
       ))}
     </MuiList>
@@ -25,10 +25,10 @@ function List({ items, renderItem, disablePadding = false, sx }: ListProps) {
 export default createComponent(List, {
   layoutDirection: 'both',
   argTypes: {
-    items: {
-      helperText: 'List items to render.',
-      typeDef: { type: 'object' },
-      defaultValue: [...Array(3).fill({})],
+    itemCount: {
+      helperText: 'Number of items to render.',
+      typeDef: { type: 'number' },
+      defaultValue: 3,
     },
     renderItem: {
       typeDef: { type: 'template' },

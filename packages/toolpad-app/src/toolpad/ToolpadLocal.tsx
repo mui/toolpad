@@ -51,10 +51,7 @@ export default function ToolpadLocal({ basename }: ToolpadLocalProps) {
           <React.Suspense fallback={<FullPageLoader />}>
             <BrowserRouter basename={basename}>
               <Routes>
-                <Route
-                  path="/*"
-                  element={<EditorContent appId={APP_ID_LOCAL_MARKER} prefix="" />}
-                />
+                <Route path="/*" element={<EditorContent appId={APP_ID_LOCAL_MARKER} />} />
               </Routes>
             </BrowserRouter>
           </React.Suspense>

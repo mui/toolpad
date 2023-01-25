@@ -1,5 +1,28 @@
 # Changelog
 
+## 0.0.37
+
+<!-- generated comparing v0.0.36..master -->
+
+_Jan 25, 2023_
+
+A big thanks to the 3 contributors who made this release possible. Here are some highlights ✨:
+
+Added a new FilePicker component, some changes to page navigation and improvements to JavaScript runtime code.
+
+- &#8203;<!-- 8 -->Fix navigation through DOM views with pages (#1565) @apedroferreira
+- &#8203;<!-- 7 -->Add FilePicker component (#1537) @bytasv
+- &#8203;<!-- 6 -->Split browser and server js runtimes (#1584) @Janpot
+- &#8203;<!-- 5 -->Fix webpack missing exports warnings (#1582) @Janpot
+- &#8203;<!-- 4 -->Make applyTransform runtime agnostic (#1585) @Janpot
+- &#8203;<!-- 3 -->Recreate yarn.lock (#1577) @Janpot
+- &#8203;<!-- 2 -->Upgrade monorepo dependency (#1580) @Janpot
+- &#8203;<!-- 1 -->Remove onChangeHandler from Select and TextField (#1576) @Janpot
+
+All contributors of this release in alphabetical order: @apedroferreira, @bytasv, @Janpot
+
+✨ Done in 1.69s.
+
 ## 0.0.36
 
 <!-- generated comparing v0.0.35..master -->

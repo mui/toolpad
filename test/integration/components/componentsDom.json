@@ -313,7 +313,7 @@
       "parentProp": "children",
       "parentIndex": "a0"
     },
-    "cq23zi2": {
+    "qt23z07": {
       "name": "pageRow1",
       "props": {},
       "attributes": {
@@ -323,30 +323,15 @@
         }
       },
       "layout": {},
-      "id": "cq23zi2",
+      "id": "qt23z07",
       "type": "element",
       "parentId": "f703ps3",
       "parentProp": "children",
       "parentIndex": "a6"
     },
-    "dw03zsb": {
+    "gg03zca": {
       "name": "list",
-      "props": {
-        "items": {
-          "type": "const",
-          "value": [
-            {
-              "buttonText": "List Button 1"
-            },
-            {
-              "buttonText": "List Button 2"
-            },
-            {
-              "buttonText": "List Button 3"
-            }
-          ]
-        }
-      },
+      "props": {},
       "attributes": {
         "component": {
           "type": "const",
@@ -354,13 +339,13 @@
         }
       },
       "layout": {},
-      "id": "dw03zsb",
+      "id": "gg03zca",
       "type": "element",
-      "parentId": "cq23zi2",
+      "parentId": "qt23z07",
       "parentProp": "children",
       "parentIndex": "a0"
     },
-    "a053zk5": {
+    "ex53zfn": {
       "name": "pageRow2",
       "props": {},
       "attributes": {
@@ -370,18 +355,18 @@
         }
       },
       "layout": {},
-      "id": "a053zk5",
+      "id": "ex53zfn",
       "type": "element",
-      "parentId": "dw03zsb",
-      "parentProp": "renderItems",
+      "parentId": "gg03zca",
+      "parentProp": "renderItem",
       "parentIndex": "a0"
     },
-    "j333zmp": {
+    "p333z1y": {
       "name": "button1",
       "props": {
         "content": {
           "type": "jsExpression",
-          "value": "button1Item.buttonText\n"
+          "value": "`List Button ${i + 1}`\n"
         }
       },
       "attributes": {
@@ -391,9 +376,9 @@
         }
       },
       "layout": {},
-      "id": "j333zmp",
+      "id": "p333z1y",
       "type": "element",
-      "parentId": "a053zk5",
+      "parentId": "ex53zfn",
       "parentProp": "children",
       "parentIndex": "a0"
     }

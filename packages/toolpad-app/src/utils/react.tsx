@@ -55,3 +55,11 @@ export function createGlobalState<T = undefined>(initialValue: T) {
     );
   };
 }
+
+export function useNonNullableContext<T>(context: React.Context<T>): NonNullable<T> {
+  const maybeContext = React.useContext(context);
+  if (!maybeContext) {
+    throw new Error(`Context was used without a Provider`);
+  }
+  return maybeContext;
+}

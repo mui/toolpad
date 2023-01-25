@@ -44,7 +44,8 @@ export default function PagePanel({ appId, className, sx }: ComponentPanelProps)
         ) : (
           <AppNameEditable app={app} editing={editingName} setEditing={setEditingName} />
         )}
-        {app ? <AppOptions app={app} dom={dom} redirectOnDelete onRename={handleRename} /> : null}
+
+        <AppOptions app={app} dom={dom} redirectOnDelete onRenameRequest={handleRename} />
       </Box>
       <Divider />
       <HierarchyExplorer appId={appId} />

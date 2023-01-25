@@ -10,7 +10,7 @@
     "fix": "next lint --fix && prettier --write .",
     "prisma": "prisma",
     "build:next": "NODE_OPTIONS=--max-old-space-size=8192 next build",
-    "build:react-devtools": "rimraf ./public/reactDevtools && esbuild ./reactDevtools/bootstrap.ts --target=es6 --bundle --outdir=./public/reactDevtools",
+    "build:react-devtools": "rimraf ./public/reactDevtools && esbuild ./reactDevtools/bootstrap.ts --target=es6 --bundle --format=iife --outdir=./public/reactDevtools",
     "build:typings": "ts-node --esm ./scripts/typings.mts",
     "build:function-runtime": "rimraf ./src/toolpadDataSources/function/dist && esbuild ./src/toolpadDataSources/function/runtime/index.ts --target=es2020 --bundle --outdir=./src/toolpadDataSources/function/dist",
     "dev:next": "next dev | pino-pretty",

@@ -30,7 +30,7 @@ services:
     image: mysql:8.0.27
     restart: always
     environment:
-      - MYSQL_ROOT_PASSWORD=root
+      - MYSQL_ROOT_PASSWORD=mysql
       - MYSQL_DATABASE=mysql
     expose:
       - '3306'

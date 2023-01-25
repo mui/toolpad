@@ -130,7 +130,7 @@ type ToolpadComponents = Partial<Record<string, ToolpadComponent<any>>>;
 
 const [useDomContext, DomContextProvider] = createProvidedContext<appDom.AppDom>('Dom');
 const [useEvaluatePageExpression, EvaluatePageExpressionProvider] =
-  createProvidedContext<(expr: string) => any>('EvaluatePageExpression');
+  createProvidedContext<(expr: string, localScope?: LocalScope) => any>('EvaluatePageExpression');
 const [useBindingsContext, BindingsContextProvider] =
   createProvidedContext<(localScope?: LocalScope) => Record<string, BindingEvaluationResult>>(
     'GetBindings',
@@ -521,7 +521,7 @@ function RenderedNodeContent({ node, childNodeGroups, Component }: RenderedNodeC
         const handler = () => {
           const code = action.value;
           const exprToEvaluate = `(async () => {${code}})()`;
-          evaluatePageExpression(exprToEvaluate);
+          evaluatePageExpression(exprToEvaluate, localScope);
         };
 
         return [key, handler];
@@ -529,7 +529,7 @@ function RenderedNodeContent({ node, childNodeGroups, Component }: RenderedNodeC
 
       return null;
     });
-  }, [argTypes, node, navigateToPage, evaluatePageExpression]);
+  }, [argTypes, node, navigateToPage, evaluatePageExpression, localScope]);
 
   const reactChildren = mapValues(childNodeGroups, (childNodes) =>
     childNodes.map((child) => <RenderedNode key={child.id} nodeId={child.id} />),
@@ -879,7 +879,8 @@ function RenderedPage({ nodeId }: RenderedNodeProps) {
   );
 
   const evaluatePageExpression = React.useCallback(
-    (expression: string) => browserJsRuntime.evaluateExpression(expression, pageState),
+    (expression: string, localScope?: LocalScope) =>
+      browserJsRuntime.evaluateExpression(expression, { ...pageState, ...localScope }),
     [browserJsRuntime, pageState],
   );
 

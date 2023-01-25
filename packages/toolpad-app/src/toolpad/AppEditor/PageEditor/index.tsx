@@ -1,6 +1,5 @@
 import * as React from 'react';
 import { styled } from '@mui/material';
-import { useParams } from 'react-router-dom';
 import { NodeId } from '@mui/toolpad-core';
 import SplitPane from '../../../components/SplitPane';
 import RenderPanel from './RenderPanel';
@@ -67,11 +66,11 @@ function PageEditorContent({ appId, node }: PageEditorContentProps) {
 
 interface PageEditorProps {
   appId: string;
+  nodeId?: NodeId;
 }
 
-export default function PageEditor({ appId }: PageEditorProps) {
+export default function PageEditor({ appId, nodeId }: PageEditorProps) {
   const { dom } = useDom();
-  const { nodeId } = useParams();
   const pageNode = appDom.getMaybeNode(dom, nodeId as NodeId, 'page');
 
   useUndoRedo();

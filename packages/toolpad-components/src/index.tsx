@@ -22,6 +22,8 @@ export { default as Image } from './Image.js';
 
 export { default as DatePicker } from './DatePicker.js';
 
+export { default as FilePicker } from './FilePicker.js';
+
 export { default as Tabs } from './Tabs.js';
 
 export { default as Container } from './Container.js';

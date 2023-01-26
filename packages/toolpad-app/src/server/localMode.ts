@@ -7,6 +7,7 @@ import { promisify } from 'util';
 import config from '../config';
 import * as appDom from '../appDom';
 import { errorFrom } from '../utils/errors';
+import insecureHash from '../utils/insecureHash';
 
 const execFile = promisify(child_process.execFile);
 
@@ -132,7 +133,7 @@ export async function loadConfigFile(filePath: string): Promise<appDom.AppDom> {
   }
 }
 
-export async function saveLocalDom(dom: appDom.AppDom): Promise<void> {
+export async function writeDomToDisk(dom: appDom.AppDom): Promise<void> {
   const configFilePath = getConfigFilePath();
   const componentsFolder = getComponentFolder();
   const componentsContent = extractComponentsContentFromDom(dom);
@@ -142,8 +143,13 @@ export async function saveLocalDom(dom: appDom.AppDom): Promise<void> {
   ]);
 }
 
-export async function loadLocalDomFromFile(configFilePath: string): Promise<appDom.AppDom> {
+export async function saveLocalDom(dom: appDom.AppDom): Promise<void> {
+  await writeDomToDisk(dom);
+}
+
+export async function loadDomFromDisk(): Promise<appDom.AppDom> {
   try {
+    const configFilePath = getConfigFilePath();
     const [configContent, componentsContent] = await Promise.all([
       fs.readFile(configFilePath, { encoding: 'utf-8' }),
       loadCodeComponentsFromFiles(),
@@ -163,7 +169,7 @@ export async function loadLocalDomFromFile(configFilePath: string): Promise<appD
 }
 
 export async function loadLocalDom(): Promise<appDom.AppDom> {
-  return loadLocalDomFromFile(getConfigFilePath());
+  return loadDomFromDisk();
 }
 
 export async function openCodeComponentEditor(componentName: string): Promise<void> {
@@ -171,4 +177,9 @@ export async function openCodeComponentEditor(componentName: string): Promise<vo
   const filePath = getComponentFilePath(componentsFolder, componentName);
   const userProjectRoot = getUserProjectRoot();
   await execFile('code', [userProjectRoot, '--goto', path.relative(userProjectRoot, filePath)]);
+}
+
+export async function getDomFingerprint() {
+  const dom = await loadLocalDom();
+  return insecureHash(JSON.stringify(dom));
 }

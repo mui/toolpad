@@ -26,7 +26,7 @@ import { getLatestToolpadRelease } from '../../src/server/getLatestRelease';
 import { hasOwnProperty } from '../../src/utils/collections';
 import { errorFrom, serializeError } from '../../src/utils/errors';
 import logger from '../../src/server/logs/logger';
-import { openCodeComponentEditor } from '../../src/server/localMode';
+import { getDomFingerprint, openCodeComponentEditor } from '../../src/server/localMode';
 
 export interface Method<P extends any[] = any[], R = any> {
   (...params: P): Promise<R>;
@@ -162,6 +162,9 @@ const rpcServer = {
     }),
     getLatestToolpadRelease: createMethod<typeof getLatestToolpadRelease>(({ params }) => {
       return getLatestToolpadRelease(...params);
+    }),
+    getDomFingerprint: createMethod<typeof getDomFingerprint>(({ params }) => {
+      return getDomFingerprint(...params);
     }),
   },
   mutation: {

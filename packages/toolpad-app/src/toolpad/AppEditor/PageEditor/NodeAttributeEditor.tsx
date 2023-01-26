@@ -14,7 +14,7 @@ import BindableEditor from './BindableEditor';
 import { usePageEditorState } from './PageEditorProvider';
 import { getDefaultControl } from '../../propertyControls';
 import MarkdownTooltip from '../../../components/MarkdownTooltip';
-import { isTemplateChild } from '../../../toolpadComponents/template';
+import { isTemplateDescendant } from '../../../toolpadComponents/template';
 
 export interface NodeAttributeEditorProps<P extends object> {
   node: appDom.AppDomNode;
@@ -61,8 +61,8 @@ export default function NodeAttributeEditor<P extends object>({
 
   const jsBrowserRuntime = useBrowserJsRuntime();
 
-  const isNodeTemplateChild = React.useMemo(
-    () => appDom.isElement(node) && isTemplateChild(dom, node, viewState),
+  const isNodeTemplateDescendant = React.useMemo(
+    () => appDom.isElement(node) && isTemplateDescendant(dom, node, viewState),
     [dom, node, viewState],
   );
 
@@ -70,11 +70,11 @@ export default function NodeAttributeEditor<P extends object>({
     () =>
       mapValues(
         {
-          ...(isNodeTemplateChild ? { i: DEFAULT_LOCAL_SCOPE_PARAMS.i } : {}),
+          ...(isNodeTemplateDescendant ? { i: DEFAULT_LOCAL_SCOPE_PARAMS.i } : {}),
         },
         () => ({ kind: 'local' }),
       ) as ScopeMeta,
-    [isNodeTemplateChild],
+    [isNodeTemplateDescendant],
   );
 
   return Control ? (

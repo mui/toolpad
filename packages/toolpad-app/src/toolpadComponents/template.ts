@@ -3,7 +3,7 @@ import { ArgTypeDefinitions, PropValueType } from '@mui/toolpad-core';
 import * as appDom from '../appDom';
 import { PageViewState } from '../types';
 
-export const isTemplateChild = (
+export const isTemplateDescendant = (
   dom: appDom.AppDom,
   elementNode: appDom.ElementNode,
   viewState: PageViewState,

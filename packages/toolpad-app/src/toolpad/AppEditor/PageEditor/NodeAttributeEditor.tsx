@@ -9,11 +9,12 @@ import { Alert, Box } from '@mui/material';
 import { useBrowserJsRuntime } from '@mui/toolpad-core/jsBrowserRuntime';
 import { mapValues } from '../../../utils/collections';
 import * as appDom from '../../../appDom';
-import { useDomApi } from '../../DomLoader';
+import { useDom, useDomApi } from '../../DomLoader';
 import BindableEditor from './BindableEditor';
 import { usePageEditorState } from './PageEditorProvider';
 import { getDefaultControl } from '../../propertyControls';
 import MarkdownTooltip from '../../../components/MarkdownTooltip';
+import { isTemplateChild } from '../../../toolpadComponents/template';
 
 export interface NodeAttributeEditorProps<P extends object> {
   node: appDom.AppDomNode;
@@ -30,6 +31,7 @@ export default function NodeAttributeEditor<P extends object>({
   argType,
   props,
 }: NodeAttributeEditorProps<P>) {
+  const { dom } = useDom();
   const domApi = useDomApi();
 
   const handlePropChange = React.useCallback(
@@ -44,7 +46,7 @@ export default function NodeAttributeEditor<P extends object>({
   const propValue: BindableAttrValue<unknown> | null = (node as any)[namespace]?.[name] ?? null;
 
   const bindingId = `${node.id}${namespace ? `.${namespace}` : ''}.${name}`;
-  const { bindings, pageState, globalScopeMeta } = usePageEditorState();
+  const { bindings, pageState, globalScopeMeta, viewState } = usePageEditorState();
 
   const liveBinding = bindings[bindingId];
 
@@ -59,9 +61,20 @@ export default function NodeAttributeEditor<P extends object>({
 
   const jsBrowserRuntime = useBrowserJsRuntime();
 
+  const isNodeTemplateChild = React.useMemo(
+    () => appDom.isElement(node) && isTemplateChild(dom, node, viewState),
+    [dom, node, viewState],
+  );
+
   const localScopeMeta: ScopeMeta = React.useMemo(
-    () => mapValues(DEFAULT_LOCAL_SCOPE_PARAMS, () => ({ kind: 'local' })) as ScopeMeta,
-    [],
+    () =>
+      mapValues(
+        {
+          ...(isNodeTemplateChild ? { i: DEFAULT_LOCAL_SCOPE_PARAMS.i } : {}),
+        },
+        () => ({ kind: 'local' }),
+      ) as ScopeMeta,
+    [isNodeTemplateChild],
   );
 
   return Control ? (

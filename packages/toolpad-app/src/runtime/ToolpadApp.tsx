@@ -414,14 +414,14 @@ function RenderedNodeContent({ node, childNodeGroups, Component }: RenderedNodeC
 
       if (isTemplate) {
         props[propName] = ({ i }: TemplateScopeParams) => {
-          const templateScopeId = `${node.id}.${propName}[${i}]`;
+          const templateScopeId = `${node.id}.props.${propName}[${i}]`;
 
           return (
             <LocalScopeContextProvider
               key={i}
               value={{
                 id: templateScopeId,
-                isDefaultScope: i === 0,
+                isDefaultScope: i === DEFAULT_LOCAL_SCOPE_PARAMS.i,
                 params: { i },
               }}
             >

@@ -42,13 +42,13 @@ const NodeHudWrapper = styled('div', {
   // capture mouse events
   pointerEvents: 'initial',
   position: 'absolute',
-  outline: `2px dashed rgba(0, 127, 255, 0.2)`,
+  outline: `1px dashed rgba(0, 127, 255, 0.2)`,
   userSelect: 'none',
   [`.${nodeHudClasses.selected}`]: {
     position: 'absolute',
     height: '100%',
     width: '100%',
-    outline: '2px solid red',
+    outline: '1px solid red',
     left: 0,
     top: 0,
     zIndex: 1,

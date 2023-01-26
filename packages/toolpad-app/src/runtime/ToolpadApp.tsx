@@ -21,7 +21,7 @@ import {
   NestedBindableAttrs,
   BindingEvaluationResult,
   LocalScopeParams,
-  TemplateScope,
+  TemplateScopeParams,
   ScopeMeta,
   DEFAULT_LOCAL_SCOPE_PARAMS,
 } from '@mui/toolpad-core';
@@ -131,13 +131,13 @@ type ToolpadComponents = Partial<Record<string, ToolpadComponent<any>>>;
 const [useDomContext, DomContextProvider] = createProvidedContext<appDom.AppDom>('Dom');
 const [useEvaluatePageExpression, EvaluatePageExpressionProvider] =
   createProvidedContext<
-    (expr: string, localScopeParams?: LocalScopeParams, scopeId?: string) => any
+    (expr: string, scopeId?: string, localScopeParams?: LocalScopeParams) => any
   >('EvaluatePageExpression');
 const [useBindingsContext, BindingsContextProvider] =
   createProvidedContext<
     (
-      localScopeParams?: LocalScopeParams,
       scopeId?: string,
+      localScopeParams?: LocalScopeParams,
     ) => Record<string, BindingEvaluationResult>
   >('GetBindings');
 const [useSetControlledBindingContext, SetControlledBindingContextProvider] =
@@ -160,6 +160,333 @@ function useElmToolpadComponent(elm: appDom.ElementNode): ToolpadComponent {
   const componentId = getElementNodeComponentId(elm);
   return useComponent(componentId);
 }
+
+interface RenderedNodeProps {
+  nodeId: NodeId;
+}
+
+function RenderedNode({ nodeId }: RenderedNodeProps) {
+  const dom = useDomContext();
+  const node = appDom.getNode(dom, nodeId, 'element');
+  const Component: ToolpadComponent<any> = useElmToolpadComponent(node);
+  const childNodeGroups = appDom.getChildNodes(dom, node);
+
+  return (
+    /* eslint-disable-next-line @typescript-eslint/no-use-before-define */
+    <RenderedNodeContent node={node} childNodeGroups={childNodeGroups} Component={Component} />
+  );
+}
+
+function NodeError({ error }: NodeErrorProps) {
+  return (
+    <Tooltip title={error.message}>
+      <span
+        style={{
+          display: 'inline-flex',
+          flexDirection: 'row',
+          alignItems: 'center',
+          padding: 8,
+          background: 'red',
+          color: 'white',
+        }}
+      >
+        <ErrorIcon color="inherit" style={{ marginRight: 8 }} /> Error
+      </span>
+    </Tooltip>
+  );
+}
+
+interface RenderedNodeContentProps {
+  node: appDom.PageNode | appDom.ElementNode;
+  childNodeGroups: appDom.NodeChildren<appDom.ElementNode>;
+  Component: ToolpadComponent<any>;
+}
+
+function RenderedNodeContent({ node, childNodeGroups, Component }: RenderedNodeContentProps) {
+  const setControlledBinding = useSetControlledBindingContext();
+
+  const nodeId = node.id;
+
+  const { id: scopeId, params: localScopeParams, isDefaultScope } = useLocalScopeContext();
+
+  const componentConfig = Component[TOOLPAD_COMPONENT];
+  const { argTypes = {}, errorProp, loadingProp, loadingPropSource } = componentConfig;
+
+  const isLayoutNode =
+    appDom.isPage(node) || (appDom.isElement(node) && isPageLayoutComponent(node));
+
+  const getBindings = useBindingsContext();
+  const liveBindings = React.useMemo(
+    () => getBindings(scopeId, localScopeParams),
+    [getBindings, localScopeParams, scopeId],
+  );
+
+  const boundProps: Record<string, any> = React.useMemo(() => {
+    const loadingPropSourceSet = new Set(loadingPropSource);
+    const hookResult: Record<string, any> = {};
+
+    // error state we will propagate to the component
+    let error: Error | undefined;
+    // loading state we will propagate to the component
+    let loading: boolean = false;
+
+    for (const [propName, argType] of Object.entries(argTypes)) {
+      const bindingId = `${nodeId}.props.${propName}`;
+      const binding = liveBindings[bindingId];
+
+      if (binding) {
+        hookResult[propName] = binding.value;
+
+        if (binding.loading && loadingPropSourceSet.has(propName)) {
+          loading = true;
+        } else {
+          error = error || binding.error;
+        }
+      }
+
+      if (typeof hookResult[propName] === 'undefined' && argType) {
+        hookResult[propName] = argType.defaultValue;
+      }
+    }
+
+    if (error) {
+      if (errorProp) {
+        hookResult[errorProp] = error;
+      } else {
+        console.error(errorFrom(error));
+      }
+    }
+
+    if (loadingProp && loading) {
+      hookResult[loadingProp] = true;
+    }
+
+    return hookResult;
+  }, [argTypes, errorProp, liveBindings, loadingProp, loadingPropSource, nodeId]);
+
+  const boundLayoutProps: Record<string, any> = React.useMemo(() => {
+    const hookResult: Record<string, any> = {};
+
+    for (const [propName, argType] of isLayoutNode ? [] : Object.entries(layoutBoxArgTypes)) {
+      const bindingId = `${nodeId}.layout.${propName}`;
+      const binding = liveBindings[bindingId];
+      if (binding) {
+        hookResult[propName] = binding.value;
+      }
+
+      if (typeof hookResult[propName] === 'undefined' && argType) {
+        hookResult[propName] = argType.defaultValue;
+      }
+    }
+
+    return hookResult;
+  }, [isLayoutNode, liveBindings, nodeId]);
+
+  const onChangeHandlers: Record<string, (param: any) => void> = React.useMemo(
+    () =>
+      mapProperties(argTypes, ([key, argType]) => {
+        if (!argType || !argType.onChangeProp) {
+          return null;
+        }
+
+        const handler = (param: any) => {
+          const bindingId = `${nodeId}.props.${key}`;
+
+          const value = argType.onChangeHandler ? argType.onChangeHandler(param) : param;
+          setControlledBinding(bindingId, { value }, argType.isScoped ? scopeId : undefined);
+
+          if (scopeId && isDefaultScope) {
+            setControlledBinding(bindingId, { value });
+          }
+        };
+        return [argType.onChangeProp, handler];
+      }),
+    [argTypes, isDefaultScope, nodeId, scopeId, setControlledBinding],
+  );
+
+  const navigateToPage = usePageNavigator();
+  const evaluatePageExpression = useEvaluatePageExpression();
+
+  const eventHandlers: Record<string, (param: any) => void> = React.useMemo(() => {
+    return mapProperties(argTypes, ([key, argType]) => {
+      if (!argType || argType.typeDef.type !== 'event' || !appDom.isElement(node)) {
+        return null;
+      }
+
+      const action = (node as appDom.ElementNode).props?.[key];
+
+      if (action?.type === 'navigationAction') {
+        const handler = () => {
+          const { page } = action.value;
+          if (page) {
+            navigateToPage(appDom.deref(page));
+          }
+        };
+
+        return [key, handler];
+      }
+
+      if (action?.type === 'jsExpressionAction') {
+        const handler = () => {
+          const code = action.value;
+          const exprToEvaluate = `(async () => {${code}})()`;
+          evaluatePageExpression(exprToEvaluate, scopeId, localScopeParams);
+        };
+
+        return [key, handler];
+      }
+
+      return null;
+    });
+  }, [argTypes, node, navigateToPage, evaluatePageExpression, localScopeParams, scopeId]);
+
+  const reactChildren = mapValues(childNodeGroups, (childNodes) =>
+    childNodes.map((child) => <RenderedNode key={child.id} nodeId={child.id} />),
+  );
+
+  const layoutElementProps = React.useMemo(() => {
+    if (appDom.isElement(node) && isPageRow(node)) {
+      return {
+        layoutColumnSizes: childNodeGroups.children.map((child) => child.layout?.columnSize?.value),
+      };
+    }
+    return {};
+  }, [childNodeGroups.children, node]);
+
+  const props: Record<string, any> = React.useMemo(() => {
+    return {
+      ...boundProps,
+      ...onChangeHandlers,
+      ...eventHandlers,
+      ...layoutElementProps,
+      ...reactChildren,
+    };
+  }, [boundProps, eventHandlers, layoutElementProps, onChangeHandlers, reactChildren]);
+
+  const hasSetInitialScopedBindingsRef = React.useRef(false);
+  React.useEffect(() => {
+    Object.entries(argTypes).forEach(([key, argType]) => {
+      if (scopeId && argType?.isScoped && !hasSetInitialScopedBindingsRef.current) {
+        const bindingId = `${nodeId}.props.${key}`;
+        setControlledBinding(bindingId, { value: props[key] }, scopeId);
+      }
+    });
+
+    hasSetInitialScopedBindingsRef.current = true;
+  }, [argTypes, nodeId, props, scopeId, setControlledBinding]);
+
+  const previousProps = React.useRef<Record<string, any>>(props);
+  React.useEffect(() => {
+    Object.entries(argTypes).forEach(([key, argType]) => {
+      if (!argType?.defaultValueProp) {
+        return;
+      }
+
+      if (previousProps.current[argType.defaultValueProp] === props[argType.defaultValueProp]) {
+        return;
+      }
+
+      const bindingIdToUpdate = `${nodeId}.props.${key}`;
+      setControlledBinding(bindingIdToUpdate, { value: props[argType.defaultValueProp] }, scopeId);
+    });
+
+    previousProps.current = props;
+  }, [props, argTypes, nodeId, setControlledBinding, scopeId]);
+
+  // Wrap element props
+  for (const [propName, argType] of Object.entries(argTypes)) {
+    const isElement = argType?.typeDef.type === 'element';
+    const isTemplate = argType?.typeDef.type === 'template';
+
+    if (isElement || isTemplate) {
+      const value = props[propName];
+
+      let wrappedValue = value;
+      if (argType.control?.type === 'slots') {
+        wrappedValue = <Slots prop={propName}>{value}</Slots>;
+      } else if (argType.control?.type === 'slot' || argType.control?.type === 'layoutSlot') {
+        wrappedValue = (
+          <Placeholder prop={propName} hasLayout={argType.control?.type === 'layoutSlot'}>
+            {value}
+          </Placeholder>
+        );
+      }
+
+      if (isTemplate) {
+        props[propName] = ({ i }: TemplateScopeParams) => {
+          const templateScopeId = `${node.id}.${propName}[${i}]`;
+
+          return (
+            <LocalScopeContextProvider
+              key={i}
+              value={{
+                id: templateScopeId,
+                isDefaultScope: i === 0,
+                params: { i },
+              }}
+            >
+              {wrappedValue}
+            </LocalScopeContextProvider>
+          );
+        };
+      } else {
+        props[propName] = wrappedValue;
+      }
+    }
+  }
+
+  return (
+    <NodeRuntimeWrapper
+      nodeId={nodeId}
+      componentConfig={Component[TOOLPAD_COMPONENT]}
+      NodeError={NodeError}
+    >
+      {isLayoutNode ? (
+        <Component {...props} />
+      ) : (
+        <Box
+          sx={{
+            display: 'flex',
+            alignItems: boundLayoutProps.verticalAlign,
+            justifyContent: boundLayoutProps.horizontalAlign,
+          }}
+        >
+          <Component {...props} />
+        </Box>
+      )}
+    </NodeRuntimeWrapper>
+  );
+}
+
+interface PageRootProps {
+  children?: React.ReactNode;
+}
+
+function PageRoot({ children }: PageRootProps) {
+  return (
+    <Container>
+      <Stack
+        data-testid="page-root"
+        direction="column"
+        sx={{
+          my: 2,
+          gap: 1,
+        }}
+      >
+        {children}
+      </Stack>
+    </Container>
+  );
+}
+
+const PageRootComponent = createComponent(PageRoot, {
+  argTypes: {
+    children: {
+      typeDef: { type: 'element' },
+      control: { type: 'slots' },
+    },
+  },
+});
 
 interface ParseBindingOptions {
   scopePath?: string;
@@ -367,333 +694,6 @@ function parseBindings(
 
   return { parsedBindings, controlled, scopeMeta };
 }
-
-interface RenderedNodeProps {
-  nodeId: NodeId;
-}
-
-function RenderedNode({ nodeId }: RenderedNodeProps) {
-  const dom = useDomContext();
-  const node = appDom.getNode(dom, nodeId, 'element');
-  const Component: ToolpadComponent<any> = useElmToolpadComponent(node);
-  const childNodeGroups = appDom.getChildNodes(dom, node);
-
-  return (
-    /* eslint-disable-next-line @typescript-eslint/no-use-before-define */
-    <RenderedNodeContent node={node} childNodeGroups={childNodeGroups} Component={Component} />
-  );
-}
-
-function NodeError({ error }: NodeErrorProps) {
-  return (
-    <Tooltip title={error.message}>
-      <span
-        style={{
-          display: 'inline-flex',
-          flexDirection: 'row',
-          alignItems: 'center',
-          padding: 8,
-          background: 'red',
-          color: 'white',
-        }}
-      >
-        <ErrorIcon color="inherit" style={{ marginRight: 8 }} /> Error
-      </span>
-    </Tooltip>
-  );
-}
-
-interface RenderedNodeContentProps {
-  node: appDom.PageNode | appDom.ElementNode;
-  childNodeGroups: appDom.NodeChildren<appDom.ElementNode>;
-  Component: ToolpadComponent<any>;
-}
-
-function RenderedNodeContent({ node, childNodeGroups, Component }: RenderedNodeContentProps) {
-  const setControlledBinding = useSetControlledBindingContext();
-
-  const nodeId = node.id;
-
-  const { id: scopeId, params: localScopeParams, isDefaultScope } = useLocalScopeContext();
-
-  const componentConfig = Component[TOOLPAD_COMPONENT];
-  const { argTypes = {}, errorProp, loadingProp, loadingPropSource } = componentConfig;
-
-  const isLayoutNode =
-    appDom.isPage(node) || (appDom.isElement(node) && isPageLayoutComponent(node));
-
-  const getBindings = useBindingsContext();
-  const liveBindings = React.useMemo(
-    () => getBindings(localScopeParams, scopeId),
-    [getBindings, localScopeParams, scopeId],
-  );
-
-  const boundProps: Record<string, any> = React.useMemo(() => {
-    const loadingPropSourceSet = new Set(loadingPropSource);
-    const hookResult: Record<string, any> = {};
-
-    // error state we will propagate to the component
-    let error: Error | undefined;
-    // loading state we will propagate to the component
-    let loading: boolean = false;
-
-    for (const [propName, argType] of Object.entries(argTypes)) {
-      const bindingId = `${nodeId}.props.${propName}`;
-      const binding = liveBindings[bindingId];
-
-      if (binding) {
-        hookResult[propName] = binding.value;
-
-        if (binding.loading && loadingPropSourceSet.has(propName)) {
-          loading = true;
-        } else {
-          error = error || binding.error;
-        }
-      }
-
-      if (typeof hookResult[propName] === 'undefined' && argType) {
-        hookResult[propName] = argType.defaultValue;
-      }
-    }
-
-    if (error) {
-      if (errorProp) {
-        hookResult[errorProp] = error;
-      } else {
-        console.error(errorFrom(error));
-      }
-    }
-
-    if (loadingProp && loading) {
-      hookResult[loadingProp] = true;
-    }
-
-    return hookResult;
-  }, [argTypes, errorProp, liveBindings, loadingProp, loadingPropSource, nodeId]);
-
-  const boundLayoutProps: Record<string, any> = React.useMemo(() => {
-    const hookResult: Record<string, any> = {};
-
-    for (const [propName, argType] of isLayoutNode ? [] : Object.entries(layoutBoxArgTypes)) {
-      const bindingId = `${nodeId}.layout.${propName}`;
-      const binding = liveBindings[bindingId];
-      if (binding) {
-        hookResult[propName] = binding.value;
-      }
-
-      if (typeof hookResult[propName] === 'undefined' && argType) {
-        hookResult[propName] = argType.defaultValue;
-      }
-    }
-
-    return hookResult;
-  }, [isLayoutNode, liveBindings, nodeId]);
-
-  const onChangeHandlers: Record<string, (param: any) => void> = React.useMemo(
-    () =>
-      mapProperties(argTypes, ([key, argType]) => {
-        if (!argType || !argType.onChangeProp) {
-          return null;
-        }
-
-        const handler = (param: any) => {
-          const bindingId = `${nodeId}.props.${key}`;
-
-          const value = argType.onChangeHandler ? argType.onChangeHandler(param) : param;
-          setControlledBinding(bindingId, { value }, argType.isScoped ? scopeId : undefined);
-
-          if (scopeId && isDefaultScope) {
-            setControlledBinding(bindingId, { value });
-          }
-        };
-        return [argType.onChangeProp, handler];
-      }),
-    [argTypes, isDefaultScope, nodeId, scopeId, setControlledBinding],
-  );
-
-  const navigateToPage = usePageNavigator();
-  const evaluatePageExpression = useEvaluatePageExpression();
-
-  const eventHandlers: Record<string, (param: any) => void> = React.useMemo(() => {
-    return mapProperties(argTypes, ([key, argType]) => {
-      if (!argType || argType.typeDef.type !== 'event' || !appDom.isElement(node)) {
-        return null;
-      }
-
-      const action = (node as appDom.ElementNode).props?.[key];
-
-      if (action?.type === 'navigationAction') {
-        const handler = () => {
-          const { page } = action.value;
-          if (page) {
-            navigateToPage(appDom.deref(page));
-          }
-        };
-
-        return [key, handler];
-      }
-
-      if (action?.type === 'jsExpressionAction') {
-        const handler = () => {
-          const code = action.value;
-          const exprToEvaluate = `(async () => {${code}})()`;
-          evaluatePageExpression(exprToEvaluate, localScopeParams, scopeId);
-        };
-
-        return [key, handler];
-      }
-
-      return null;
-    });
-  }, [argTypes, node, navigateToPage, evaluatePageExpression, localScopeParams, scopeId]);
-
-  const reactChildren = mapValues(childNodeGroups, (childNodes) =>
-    childNodes.map((child) => <RenderedNode key={child.id} nodeId={child.id} />),
-  );
-
-  const layoutElementProps = React.useMemo(() => {
-    if (appDom.isElement(node) && isPageRow(node)) {
-      return {
-        layoutColumnSizes: childNodeGroups.children.map((child) => child.layout?.columnSize?.value),
-      };
-    }
-    return {};
-  }, [childNodeGroups.children, node]);
-
-  const props: Record<string, any> = React.useMemo(() => {
-    return {
-      ...boundProps,
-      ...onChangeHandlers,
-      ...eventHandlers,
-      ...layoutElementProps,
-      ...reactChildren,
-    };
-  }, [boundProps, eventHandlers, layoutElementProps, onChangeHandlers, reactChildren]);
-
-  const hasSetInitialScopedBindingsRef = React.useRef(false);
-  React.useEffect(() => {
-    Object.entries(argTypes).forEach(([key, argType]) => {
-      if (scopeId && argType?.isScoped && !hasSetInitialScopedBindingsRef.current) {
-        const bindingId = `${nodeId}.props.${key}`;
-        setControlledBinding(bindingId, { value: props[key] }, scopeId);
-      }
-    });
-
-    hasSetInitialScopedBindingsRef.current = true;
-  }, [argTypes, nodeId, props, scopeId, setControlledBinding]);
-
-  const previousProps = React.useRef<Record<string, any>>(props);
-  React.useEffect(() => {
-    Object.entries(argTypes).forEach(([key, argType]) => {
-      if (!argType?.defaultValueProp) {
-        return;
-      }
-
-      if (previousProps.current[argType.defaultValueProp] === props[argType.defaultValueProp]) {
-        return;
-      }
-
-      const bindingIdToUpdate = `${nodeId}.props.${key}`;
-      setControlledBinding(bindingIdToUpdate, { value: props[argType.defaultValueProp] }, scopeId);
-    });
-
-    previousProps.current = props;
-  }, [props, argTypes, nodeId, setControlledBinding, scopeId]);
-
-  // Wrap element props
-  for (const [propName, argType] of Object.entries(argTypes)) {
-    const isElement = argType?.typeDef.type === 'element';
-    const isTemplate = argType?.typeDef.type === 'template';
-
-    if (isElement || isTemplate) {
-      const value = props[propName];
-
-      let wrappedValue = value;
-      if (argType.control?.type === 'slots') {
-        wrappedValue = <Slots prop={propName}>{value}</Slots>;
-      } else if (argType.control?.type === 'slot' || argType.control?.type === 'layoutSlot') {
-        wrappedValue = (
-          <Placeholder prop={propName} hasLayout={argType.control?.type === 'layoutSlot'}>
-            {value}
-          </Placeholder>
-        );
-      }
-
-      if (isTemplate) {
-        props[propName] = ({ i }: TemplateScope) => {
-          const templateScopeId = `${node.id}[${i}]`;
-
-          return (
-            <LocalScopeContextProvider
-              key={i}
-              value={{
-                id: templateScopeId,
-                isDefaultScope: i === 0,
-                params: { i },
-              }}
-            >
-              {wrappedValue}
-            </LocalScopeContextProvider>
-          );
-        };
-      } else {
-        props[propName] = wrappedValue;
-      }
-    }
-  }
-
-  return (
-    <NodeRuntimeWrapper
-      nodeId={nodeId}
-      componentConfig={Component[TOOLPAD_COMPONENT]}
-      NodeError={NodeError}
-    >
-      {isLayoutNode ? (
-        <Component {...props} />
-      ) : (
-        <Box
-          sx={{
-            display: 'flex',
-            alignItems: boundLayoutProps.verticalAlign,
-            justifyContent: boundLayoutProps.horizontalAlign,
-          }}
-        >
-          <Component {...props} />
-        </Box>
-      )}
-    </NodeRuntimeWrapper>
-  );
-}
-
-interface PageRootProps {
-  children?: React.ReactNode;
-}
-
-function PageRoot({ children }: PageRootProps) {
-  return (
-    <Container>
-      <Stack
-        data-testid="page-root"
-        direction="column"
-        sx={{
-          my: 2,
-          gap: 1,
-        }}
-      >
-        {children}
-      </Stack>
-    </Container>
-  );
-}
-
-const PageRootComponent = createComponent(PageRoot, {
-  argTypes: {
-    children: {
-      typeDef: { type: 'element' },
-      control: { type: 'slots' },
-    },
-  },
-});
 
 function resolveBindables(
   bindings: Partial<Record<string, BindingEvaluationResult>>,
@@ -939,7 +939,7 @@ function RenderedPage({ nodeId }: RenderedNodeProps) {
   );
 
   const getBindings = React.useCallback(
-    (localScopeParams?: LocalScopeParams, scopeId?: string) => {
+    (scopeId?: string, localScopeParams?: LocalScopeParams) => {
       const evaluatedBindings = getEvaluatedBindings(scopeId, localScopeParams);
       return mapValues(evaluatedBindings, (binding) => binding.result || { value: undefined });
     },
@@ -947,7 +947,7 @@ function RenderedPage({ nodeId }: RenderedNodeProps) {
   );
 
   const evaluatePageExpression = React.useCallback(
-    (expression: string, localScopeParams?: LocalScopeParams, scopeId?: string) => {
+    (expression: string, scopeId?: string, localScopeParams?: LocalScopeParams) => {
       const scopeState = getScopeState(scopeId);
       return browserJsRuntime.evaluateExpression(expression, {
         ...scopeState,

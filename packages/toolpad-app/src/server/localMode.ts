@@ -176,7 +176,7 @@ export async function openCodeComponentEditor(componentName: string): Promise<vo
   const componentsFolder = getComponentFolder();
   const filePath = getComponentFilePath(componentsFolder, componentName);
   const userProjectRoot = getUserProjectRoot();
-  await execFile('code', [userProjectRoot, '--goto', path.relative(userProjectRoot, filePath)]);
+  await execFile('code', [userProjectRoot, '--goto', filePath]);
 }
 
 export async function getDomFingerprint() {

@@ -7,6 +7,7 @@ import ContentCopyOutlinedIcon from '@mui/icons-material/ContentCopyOutlined';
 import SettingsIcon from '@mui/icons-material/Settings';
 import DeleteIcon from '@mui/icons-material/Delete';
 import CodeIcon from '@mui/icons-material/Code';
+import invariant from 'invariant';
 import useMenu from '../../utils/useMenu';
 import type { AppMeta } from '../../server/data';
 import useBoolean from '../../utils/useBoolean';
@@ -16,23 +17,25 @@ import AppDeleteDialog from './AppDeleteDialog';
 import AppDuplicateDialog from './AppDuplicateDialog';
 
 interface AppOptionsProps {
-  app: AppMeta;
-  onRename: () => void;
+  app?: AppMeta | null;
+  onRenameRequest: () => void;
   dom?: any;
   redirectOnDelete?: boolean;
 }
 
-function AppOptions({ app, onRename, dom, redirectOnDelete }: AppOptionsProps) {
+function AppOptions({ app, onRenameRequest: onRename, dom, redirectOnDelete }: AppOptionsProps) {
   const { buttonProps, menuProps, onMenuClose } = useMenu();
 
   const [deletedApp, setDeletedApp] = React.useState<AppMeta | null>(null);
   const [duplicateApp, setDuplicateApp] = React.useState<AppMeta | null>(null);
 
   const onDuplicate = React.useCallback(() => {
+    invariant(app, "This action shouln't be enabled when no app is available");
     setDuplicateApp(app);
   }, [app]);
 
   const onDelete = React.useCallback(() => {
+    invariant(app, "This action shouln't be enabled when no app is available");
     setDeletedApp(app);
   }, [app]);
 
@@ -75,7 +78,7 @@ function AppOptions({ app, onRename, dom, redirectOnDelete }: AppOptionsProps) {
 
   return (
     <React.Fragment>
-      <IconButton {...buttonProps} aria-label="Application menu" disabled={!app}>
+      <IconButton {...buttonProps} aria-label="Application menu">
         <MoreVertIcon />
       </IconButton>
       <Menu {...menuProps}>
@@ -85,13 +88,13 @@ function AppOptions({ app, onRename, dom, redirectOnDelete }: AppOptionsProps) {
           </ListItemIcon>
           <ListItemText>Rename</ListItemText>
         </MenuItem>
-        <MenuItem onClick={handleDuplicateClick}>
+        <MenuItem onClick={handleDuplicateClick} disabled={!app}>
           <ListItemIcon>
             <ContentCopyOutlinedIcon />
           </ListItemIcon>
           <ListItemText>Duplicate</ListItemText>
         </MenuItem>
-        <MenuItem onClick={handleDeleteClick}>
+        <MenuItem onClick={handleDeleteClick} disabled={!app}>
           <ListItemIcon>
             <DeleteIcon />
           </ListItemIcon>
@@ -106,7 +109,7 @@ function AppOptions({ app, onRename, dom, redirectOnDelete }: AppOptionsProps) {
             <ListItemText>View DOM</ListItemText>
           </MenuItem>
         ) : null}
-        <MenuItem onClick={handleopenSettingsClick}>
+        <MenuItem onClick={handleopenSettingsClick} disabled={!app}>
           <ListItemIcon>
             <SettingsIcon />
           </ListItemIcon>
@@ -124,11 +127,13 @@ function AppOptions({ app, onRename, dom, redirectOnDelete }: AppOptionsProps) {
         onClose={() => setDeletedApp(null)}
         redirectOnDelete={redirectOnDelete}
       />
-      <AppDuplicateDialog
-        open={Boolean(duplicateApp)}
-        app={app}
-        onClose={() => setDuplicateApp(null)}
-      />
+      {app ? (
+        <AppDuplicateDialog
+          open={Boolean(duplicateApp)}
+          app={app}
+          onClose={() => setDuplicateApp(null)}
+        />
+      ) : null}
     </React.Fragment>
   );
 }

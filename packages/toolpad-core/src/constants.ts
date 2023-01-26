@@ -5,4 +5,4 @@ export const TOOLPAD_COMPONENT_MODE_PROPERTY = 'ToolpadComponentMode';
 
 export const IMAGE_EXTENSIONS = ['jpg', 'jpeg', 'png', 'gif', 'svg', 'webp'];
 
-export const DEFAULT_LOCAL_SCOPE = { i: 0 };
+export const DEFAULT_LOCAL_SCOPE_PARAMS = { i: 0 };

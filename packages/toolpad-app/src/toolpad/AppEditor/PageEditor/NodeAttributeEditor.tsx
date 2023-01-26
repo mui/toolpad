@@ -2,7 +2,7 @@ import * as React from 'react';
 import {
   ArgTypeDefinition,
   BindableAttrValue,
-  DEFAULT_LOCAL_SCOPE,
+  DEFAULT_LOCAL_SCOPE_PARAMS,
   ScopeMeta,
 } from '@mui/toolpad-core';
 import { Alert, Box } from '@mui/material';
@@ -60,14 +60,14 @@ export default function NodeAttributeEditor<P extends object>({
   const jsBrowserRuntime = useBrowserJsRuntime();
 
   const localScopeMeta: ScopeMeta = React.useMemo(
-    () => mapValues(DEFAULT_LOCAL_SCOPE, () => ({ kind: 'local' })) as ScopeMeta,
+    () => mapValues(DEFAULT_LOCAL_SCOPE_PARAMS, () => ({ kind: 'local' })) as ScopeMeta,
     [],
   );
 
   return Control ? (
     <BindableEditor
       liveBinding={liveBinding}
-      globalScope={{ ...pageState, ...DEFAULT_LOCAL_SCOPE }}
+      globalScope={{ ...pageState, ...DEFAULT_LOCAL_SCOPE_PARAMS }}
       globalScopeMeta={{
         ...globalScopeMeta,
         ...localScopeMeta,

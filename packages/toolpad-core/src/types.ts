@@ -209,6 +209,10 @@ export interface ArgTypeDefinition<P extends object = {}, V = P[keyof P]> {
    * @returns {boolean} a boolean value indicating whether the property should be visible or not
    */
   visible?: ((props: P) => boolean) | boolean;
+  /**
+   * Whether this property should have a unique value per scope.
+   */
+  isScoped?: boolean;
 }
 
 export type ArgTypeDefinitions<P extends object = {}> = {
@@ -362,10 +366,10 @@ export interface JsRuntime {
   evaluateExpression(code: string, globalScope: Record<string, unknown>): BindingEvaluationResult;
 }
 
-export type LocalScope = Record<string, unknown>;
+export type LocalScopeParams = Record<string, unknown>;
 
-export interface TemplateScope extends LocalScope {
+export interface TemplateScopeParams extends LocalScopeParams {
   i: number;
 }
 
-export type TemplateRenderer = ({ i }: TemplateScope) => React.ReactNode;
+export type TemplateRenderer = ({ i }: TemplateScopeParams) => React.ReactNode;

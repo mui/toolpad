@@ -488,10 +488,6 @@ const PageRootComponent = createComponent(PageRoot, {
   },
 });
 
-interface ParseBindingOptions {
-  scopePath?: string;
-}
-
 /**
  * Turns an object consisting of a nested structure of BindableAttrValues
  * into a flat array of relative paths associated with their value.
@@ -521,6 +517,145 @@ function flattenNestedBindables(
   return Object.entries(params).flatMap(([key, param]) =>
     flattenNestedBindables(param, `${prefix}.${key}`),
   );
+}
+
+function resolveBindables(
+  bindings: Partial<Record<string, BindingEvaluationResult>>,
+  bindingId: string,
+  params?: NestedBindableAttrs,
+): Record<string, unknown> {
+  const result: any = {};
+  const resultKey = 'value';
+  const flattened = flattenNestedBindables(params);
+  for (const [path] of flattened) {
+    const resolvedValue = bindings[`${bindingId}${path}`]?.value;
+    _.set(result, `${resultKey}${path}`, resolvedValue);
+  }
+
+  return result[resultKey] || {};
+}
+
+interface QueryNodeProps {
+  node: appDom.QueryNode;
+}
+
+function QueryNode({ node }: QueryNodeProps) {
+  const getBindings = useBindingsContext();
+  const setControlledBinding = useSetControlledBindingContext();
+
+  const bindings = React.useMemo(() => getBindings(), [getBindings]);
+
+  const params = resolveBindables(
+    bindings,
+    `${node.id}.params`,
+    Object.fromEntries(node.params ?? []),
+  );
+
+  const configBindings = _.pick(node.attributes, USE_DATA_QUERY_CONFIG_KEYS);
+  const options = resolveBindables(bindings, `${node.id}.config`, configBindings);
+  const queryResult = useDataQuery(node, params, options);
+
+  React.useEffect(() => {
+    const { isLoading, error, data, rows, ...result } = queryResult;
+
+    for (const [key, value] of Object.entries(result)) {
+      const bindingId = `${node.id}.${key}`;
+      setControlledBinding(bindingId, { value });
+    }
+
+    // Here we propagate the error and loading state to the data and rows prop prop
+    // TODO: is there a straightforward way for us to generalize this behavior?
+    setControlledBinding(`${node.id}.isLoading`, { value: isLoading });
+    setControlledBinding(`${node.id}.error`, { value: error });
+    const deferredStatus = { loading: isLoading, error };
+    setControlledBinding(`${node.id}.data`, { ...deferredStatus, value: data });
+    setControlledBinding(`${node.id}.rows`, { ...deferredStatus, value: rows });
+  }, [node.id, queryResult, setControlledBinding]);
+
+  return null;
+}
+
+interface MutationNodeProps {
+  node: appDom.QueryNode;
+}
+
+function MutationNode({ node }: MutationNodeProps) {
+  const { appId, version } = useAppContext();
+  const getBindings = useBindingsContext();
+  const setControlledBinding = useSetControlledBindingContext();
+
+  const bindings = React.useMemo(() => getBindings(), [getBindings]);
+
+  const queryId = node.id;
+  const params = resolveBindables(bindings, `${node.id}.params`, node.params);
+
+  const {
+    isLoading,
+    data: responseData = EMPTY_OBJECT,
+    error: fetchError,
+    mutateAsync,
+  } = useMutation(
+    async (overrides: any = {}) =>
+      execDataSourceQuery({
+        appId,
+        version,
+        queryId,
+        params: { ...params, ...overrides },
+      }),
+    {
+      mutationKey: [appId, version, queryId, params],
+    },
+  );
+
+  const { data, error: apiError } = responseData;
+
+  const error = apiError || fetchError;
+
+  // Stabilize the mutation and prepare for inclusion in global scope
+  const mutationResult: UseFetch = React.useMemo(
+    () => ({
+      isLoading,
+      isFetching: isLoading,
+      error,
+      data,
+      rows: Array.isArray(data) ? data : EMPTY_ARRAY,
+      call: mutateAsync,
+      fetch: mutateAsync,
+      refetch: () => {
+        throw new Error(`refetch is not supported in manual queries`);
+      },
+    }),
+    [isLoading, error, mutateAsync, data],
+  );
+
+  React.useEffect(() => {
+    for (const [key, value] of Object.entries(mutationResult)) {
+      const bindingId = `${node.id}.${key}`;
+      setControlledBinding(bindingId, { value });
+    }
+  }, [node.id, mutationResult, setControlledBinding]);
+
+  return null;
+}
+
+interface FetchNodeProps {
+  node: appDom.QueryNode;
+}
+
+function FetchNode({ node }: FetchNodeProps) {
+  const mode: appDom.FetchMode = node.attributes.mode?.value || 'query';
+  switch (mode) {
+    case 'query':
+      return <QueryNode node={node} />;
+    case 'mutation':
+      return <MutationNode node={node} />;
+    default:
+      throw new Error(`Unrecognized fetch mdoe "${mode}"`);
+  }
+}
+
+interface ParseBindingOptions {
+  scopePath?: string;
 }
 
 function parseBinding(
@@ -693,141 +828,6 @@ function parseBindings(
     Object.fromEntries(parsedBindingsMap);
 
   return { parsedBindings, controlled, scopeMeta };
-}
-
-function resolveBindables(
-  bindings: Partial<Record<string, BindingEvaluationResult>>,
-  bindingId: string,
-  params?: NestedBindableAttrs,
-): Record<string, unknown> {
-  const result: any = {};
-  const resultKey = 'value';
-  const flattened = flattenNestedBindables(params);
-  for (const [path] of flattened) {
-    const resolvedValue = bindings[`${bindingId}${path}`]?.value;
-    _.set(result, `${resultKey}${path}`, resolvedValue);
-  }
-
-  return result[resultKey] || {};
-}
-
-interface QueryNodeProps {
-  node: appDom.QueryNode;
-}
-
-function QueryNode({ node }: QueryNodeProps) {
-  const getBindings = useBindingsContext();
-  const setControlledBinding = useSetControlledBindingContext();
-
-  const bindings = React.useMemo(() => getBindings(), [getBindings]);
-
-  const params = resolveBindables(
-    bindings,
-    `${node.id}.params`,
-    Object.fromEntries(node.params ?? []),
-  );
-
-  const configBindings = _.pick(node.attributes, USE_DATA_QUERY_CONFIG_KEYS);
-  const options = resolveBindables(bindings, `${node.id}.config`, configBindings);
-  const queryResult = useDataQuery(node, params, options);
-
-  React.useEffect(() => {
-    const { isLoading, error, data, rows, ...result } = queryResult;
-
-    for (const [key, value] of Object.entries(result)) {
-      const bindingId = `${node.id}.${key}`;
-      setControlledBinding(bindingId, { value });
-    }
-
-    // Here we propagate the error and loading state to the data and rows prop prop
-    // TODO: is there a straightforward way for us to generalize this behavior?
-    setControlledBinding(`${node.id}.isLoading`, { value: isLoading });
-    setControlledBinding(`${node.id}.error`, { value: error });
-    const deferredStatus = { loading: isLoading, error };
-    setControlledBinding(`${node.id}.data`, { ...deferredStatus, value: data });
-    setControlledBinding(`${node.id}.rows`, { ...deferredStatus, value: rows });
-  }, [node.id, queryResult, setControlledBinding]);
-
-  return null;
-}
-
-interface MutationNodeProps {
-  node: appDom.QueryNode;
-}
-
-function MutationNode({ node }: MutationNodeProps) {
-  const { appId, version } = useAppContext();
-  const getBindings = useBindingsContext();
-  const setControlledBinding = useSetControlledBindingContext();
-
-  const bindings = React.useMemo(() => getBindings(), [getBindings]);
-
-  const queryId = node.id;
-  const params = resolveBindables(bindings, `${node.id}.params`, node.params);
-
-  const {
-    isLoading,
-    data: responseData = EMPTY_OBJECT,
-    error: fetchError,
-    mutateAsync,
-  } = useMutation(
-    async (overrides: any = {}) =>
-      execDataSourceQuery({
-        appId,
-        version,
-        queryId,
-        params: { ...params, ...overrides },
-      }),
-    {
-      mutationKey: [appId, version, queryId, params],
-    },
-  );
-
-  const { data, error: apiError } = responseData;
-
-  const error = apiError || fetchError;
-
-  // Stabilize the mutation and prepare for inclusion in global scope
-  const mutationResult: UseFetch = React.useMemo(
-    () => ({
-      isLoading,
-      isFetching: isLoading,
-      error,
-      data,
-      rows: Array.isArray(data) ? data : EMPTY_ARRAY,
-      call: mutateAsync,
-      fetch: mutateAsync,
-      refetch: () => {
-        throw new Error(`refetch is not supported in manual queries`);
-      },
-    }),
-    [isLoading, error, mutateAsync, data],
-  );
-
-  React.useEffect(() => {
-    for (const [key, value] of Object.entries(mutationResult)) {
-      const bindingId = `${node.id}.${key}`;
-      setControlledBinding(bindingId, { value });
-    }
-  }, [node.id, mutationResult, setControlledBinding]);
-
-  return null;
-}
-
-interface FetchNodeProps {
-  node: appDom.QueryNode;
-}
-
-function FetchNode({ node }: FetchNodeProps) {
-  const mode: appDom.FetchMode = node.attributes.mode?.value || 'query';
-  switch (mode) {
-    case 'query':
-      return <QueryNode node={node} />;
-    case 'mutation':
-      return <MutationNode node={node} />;
-    default:
-      throw new Error(`Unrecognized fetch mdoe "${mode}"`);
-  }
 }
 
 function RenderedPage({ nodeId }: RenderedNodeProps) {

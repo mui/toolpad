@@ -77,7 +77,7 @@ interface BuilderOptions {
 }
 
 export async function createBuilder({ filePath, dev }: BuilderOptions) {
-  const dom = await loadDomFromDisk(filePath);
+  const dom = await loadDomFromDisk();
 
   const userProjectRoot = path.dirname(filePath);
 

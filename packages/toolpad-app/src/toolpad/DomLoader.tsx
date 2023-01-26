@@ -370,14 +370,14 @@ const UNDOABLE_ACTIONS = new Set<DomActionType>([
 ]);
 
 export default function DomProvider({ appId, children }: DomContextProps) {
-  const { data: initialDom } = client.useQuery('loadDom', [appId], { suspense: true });
+  const { data: dom } = client.useQuery('loadDom', [appId], { suspense: true });
 
-  invariant(initialDom, `Suspense should load the dom`);
+  invariant(dom, `Suspense should load the dom`);
 
   const location = useLocation();
 
-  const app = appDom.getApp(initialDom);
-  const { pages = [] } = appDom.getChildNodes(initialDom, app);
+  const app = appDom.getApp(dom);
+  const { pages = [] } = appDom.getChildNodes(dom, app);
   const firstPage = pages.length > 0 ? pages[0] : null;
 
   const initialView = getViewFromPathname(location.pathname) || {
@@ -389,14 +389,14 @@ export default function DomProvider({ appId, children }: DomContextProps) {
     saving: false,
     unsavedChanges: 0,
     saveError: null,
-    savedDom: initialDom,
-    dom: initialDom,
+    savedDom: dom,
+    dom,
     selectedNodeId: null,
     currentView: initialView,
     currentTab: 'component',
     undoStack: [
       {
-        dom: initialDom,
+        dom,
         selectedNodeId: null,
         view: initialView,
         tab: 'component',
@@ -409,9 +409,9 @@ export default function DomProvider({ appId, children }: DomContextProps) {
   React.useEffect(() => {
     dispatch({
       type: 'DOM_SERVER_UPDATE',
-      dom: initialDom,
+      dom,
     });
-  }, [initialDom]);
+  }, [dom]);
 
   const scheduleTextInputHistoryUpdate = React.useMemo(
     () =>

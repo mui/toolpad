@@ -54,8 +54,7 @@ const pendingExecutions = new Map<number, Execution>();
 let cp: child_process.ChildProcess | undefined;
 let buildErrors: Error[] = [];
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-let setInitialized: () => void | undefined;
+let setInitialized: () => void;
 const initPromise = new Promise<void>((resolve) => {
   setInitialized = resolve;
 });

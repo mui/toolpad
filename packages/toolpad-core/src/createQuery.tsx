@@ -24,7 +24,7 @@ export interface ToolpadQuery<P> extends QueryResolver<P> {
   [TOOLPAD_QUERY]: CreateQueryConfig<P>;
 }
 
-export default function createQuery<P>(resolver: QueryResolver<P>, config: CreateQueryConfig<P>) {
+export default function createQuery<P>(resolver: QueryResolver<P>, config?: CreateQueryConfig<P>) {
   return Object.assign(resolver, {
     [TOOLPAD_QUERY]: config || { parameters: {} },
   });

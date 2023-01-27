@@ -2,12 +2,11 @@ import { ExecFetchResult, SerializedError } from '@mui/toolpad-core';
 import * as child_process from 'child_process';
 import * as esbuild from 'esbuild';
 import * as path from 'path';
-import * as fs from 'fs/promises';
 import invariant from 'invariant';
 import { ServerDataSource } from '../../types';
 import { LocalPrivateQuery, LocalQuery, LocalConnectionParams } from './types';
 import { Maybe } from '../../utils/types';
-import { getUserProjectRoot } from '../../server/localMode';
+import { getUserProjectRoot, QUERIES_FILES } from '../../server/localMode';
 import { errorFrom, serializeError } from '../../utils/errors';
 
 type MessageToChildProcess =
@@ -36,8 +35,6 @@ declare module globalThis {
   let localFunctionsChildProcessController: AbortController | undefined;
 }
 
-const QUERIES_FOLDER = 'toolpad-queries';
-
 let nextMsgId = 1;
 
 function getNextId() {
@@ -57,7 +54,18 @@ const pendingExecutions = new Map<number, Execution>();
 let cp: child_process.ChildProcess | undefined;
 let buildErrors: Error[] = [];
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+let setInitialized: () => void | undefined;
+const initPromise = new Promise<void>((resolve) => {
+  setInitialized = resolve;
+});
+
+function revalidate() {
+  setInitialized();
+}
+
 async function sendRequest(msg: MessageToChildProcess) {
+  await initPromise;
   return new Promise((resolve, reject) => {
     if (buildErrors.length > 0) {
       const firstError = buildErrors[0];
@@ -96,45 +104,32 @@ async function introspect() {
   });
 }
 
-async function createMain(userProjectRoot: string): Promise<string> {
-  const functionsFolder = path.resolve(userProjectRoot, `./${QUERIES_FOLDER}`);
-  const entries = await fs.readdir(functionsFolder, {
-    withFileTypes: true,
-  });
-  const imports = entries
-    .map((entry) => {
-      if (entry.isFile()) {
-        const name = entry.name.replace(/\..+$/, '');
-        const filePath = `./${path.join(`./${QUERIES_FOLDER}`, entry.name)}`;
-        return `[
-        ${JSON.stringify(name)},
-        () =>  import(${JSON.stringify(filePath)})
-      ]`;
-      }
-
-      return null;
-    })
-    .filter(Boolean);
-
+async function createMain(): Promise<string> {
   return `
     import { TOOLPAD_QUERY } from '@mui/toolpad-core';
     import { errorFrom, serializeError } from '@mui/toolpad-core/utils/errors';
 
-    const resolvers = new Map([
-      ${imports.join(',\n')}
-    ])
+    let resolversPromise
+    async function getResolvers() {
+      if (!resolversPromise) {
+        resolversPromise = (async () => {
+          const queries = await import(${JSON.stringify(QUERIES_FILES)})
+
+          return new Map(Object.entries(queries).flatMap(([name, resolver]) => {
+            return typeof resolver === 'function' ? [[name, resolver]] : []
+          }))
+        })()
+      }
+      return resolversPromise
+    }
 
     async function loadResolver (name) {
-      const importModule = resolvers.get(name)
+      const resolvers = await getResolvers()
 
-      if (!importModule) {
-        throw new Error(\`Can't resolve "\${name}"\`);
-      }
-
-      const { default: resolver } = await importModule();
+      const resolver = resolvers.get(name);
 
       if (!resolver) {
-        throw new Error(\`Can't resolve "\${name}"\`);
+        throw new Error(\`Can't find "\${name}"\`);
       }
 
       return resolver
@@ -165,10 +160,11 @@ async function createMain(userProjectRoot: string): Promise<string> {
         case 'introspect': {
           let data, error
           try {
-            const resolvedResolvers = await Promise.all(Array.from(resolvers.keys(), async (name) => {
-              const resolver = await loadResolver(name)
-              return [name, resolver[TOOLPAD_QUERY]];
-            }));
+            const resolvers = await getResolvers()
+            const resolvedResolvers =  Array.from(resolvers, ([name, resolver]) => [
+              name,
+              resolver[TOOLPAD_QUERY] || {}
+            ]);
             data = { 
               functions: Object.fromEntries(resolvedResolvers.filter(Boolean))
             };
@@ -202,7 +198,7 @@ async function createEsbuildContext() {
 
       build.onLoad({ filter: /.*/, namespace: 'toolpad' }, async (args) => {
         if (args.path === 'main.tsx') {
-          const contents = await createMain(userProjectRoot);
+          const contents = await createMain();
           return {
             loader: 'tsx',
             contents,
@@ -278,6 +274,8 @@ async function createEsbuildContext() {
         });
 
         globalThis.localFunctionsChildProcessController = controller;
+
+        revalidate();
       });
     },
   };
@@ -342,6 +340,7 @@ export default dataSource;
 async function startDev() {
   if (globalThis.localFunctionsEsbuildContext) {
     await globalThis.localFunctionsEsbuildContext.dispose();
+    globalThis.localFunctionsEsbuildContext = undefined;
   }
   const ctx = await createEsbuildContext();
   await ctx.watch();

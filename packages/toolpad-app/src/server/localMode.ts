@@ -179,7 +179,12 @@ export async function openCodeComponentEditor(componentName: string): Promise<vo
   await execFile('code', [userProjectRoot, '--goto', filePath]);
 }
 
+export const QUERIES_FILES = `./toolpad/queries.ts`;
+
 export async function getDomFingerprint() {
-  const dom = await loadLocalDom();
-  return insecureHash(JSON.stringify(dom));
+  const [dom, queriesFile] = await Promise.all([
+    loadLocalDom(),
+    fs.readFile(path.resolve(getUserProjectRoot(), QUERIES_FILES), { encoding: 'utf-8' }),
+  ]);
+  return insecureHash(JSON.stringify(dom)) + insecureHash(queriesFile);
 }

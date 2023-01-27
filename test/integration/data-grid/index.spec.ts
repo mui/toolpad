@@ -31,8 +31,10 @@ test('Column prop updates are not lost on drag interactions', async ({
   browserName,
   api,
 }) => {
+  const dom = await readJsonFile(path.resolve(__dirname, './columnPropUpdate.json'));
+
   const app = await api.mutation.createApp(`App ${generateId()}`, {
-    from: { kind: 'template', id: 'default' },
+    from: { kind: 'dom', dom },
   });
 
   const editorModel = new ToolpadEditor(page, browserName);
@@ -42,7 +44,7 @@ test('Column prop updates are not lost on drag interactions', async ({
 
   const canvasGridLocator = editorModel.appCanvas.getByRole('grid');
 
-  // Change the "Avatar" column type from "image" to "string"
+  // Change the "Avatar" column type from "link" to "boolean"
 
   const firstGridLocator = canvasGridLocator.first();
   await clickCenter(page, firstGridLocator);
@@ -51,9 +53,9 @@ test('Column prop updates are not lost on drag interactions', async ({
 
   await editorModel.page.getByRole('button', { name: 'Avatar' }).click();
 
-  await editorModel.page.getByRole('button', { name: 'image' }).click();
+  await editorModel.page.getByRole('button', { name: 'link' }).click();
 
-  await editorModel.page.getByRole('option', { name: 'string' }).click();
+  await editorModel.page.getByRole('option', { name: 'boolean' }).click();
 
   await clickCenter(page, firstGridLocator);
 
@@ -64,11 +66,13 @@ test('Column prop updates are not lost on drag interactions', async ({
 
   await avatarColumn.dragTo(profileColumn);
 
-  // Expect the "Avatar" column to continue to be of type "string" instead of "image"
+  // Expect the "Avatar" column to continue to be of type "boolean" instead of "link"
 
   await expect(
-    editorModel.pageRoot.getByRole('cell', {
-      name: 'https://cloudflare-ipfs.com/ipfs/Qmd3W5DuhgHirLHGVixi6V76LhCkZUz6pnFt5AJBiyvHye/avatar/793.jpg',
-    }),
+    editorModel.pageRoot
+      .getByRole('row', {
+        name: '1 Todd Breitenberg International http://spotless-octopus.name yes',
+      })
+      .getByTestId('CheckIcon'),
   ).toBeVisible();
 });

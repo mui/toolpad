@@ -4,6 +4,7 @@ import postgres from './postgres/client';
 import rest from './rest/client';
 import { ClientDataSource } from '../types';
 import googleSheets from './googleSheets/client';
+import local from './local/client';
 import config from '../config';
 import { DEMO_DATASOURCES, PRODUCTION_DATASOURCES } from '../constants';
 
@@ -14,6 +15,7 @@ export const allClientDataSources: ClientDataSources = {
   function: functionSrc,
   postgres,
   googleSheets,
+  ...(config.localMode ? { local } : {}),
 };
 
 const clientDataSources = _.pick(allClientDataSources, [

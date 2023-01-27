@@ -11,7 +11,7 @@ import insecureHash from '../utils/insecureHash';
 
 const execFile = promisify(child_process.execFile);
 
-function getUserProjectRoot(): string {
+export function getUserProjectRoot(): string {
   const { projectDir } = config;
   invariant(projectDir, 'Toolpad in local mode must have a project directory defined');
   return projectDir;

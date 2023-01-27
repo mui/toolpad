@@ -9,6 +9,7 @@ import {
   LinearProgress,
   Container,
   Tooltip,
+  Button,
 } from '@mui/material';
 import {
   ToolpadComponent,
@@ -965,7 +966,17 @@ export default function ToolpadApp({
           <AppThemeProvider dom={dom}>
             <CssBaseline enableColorScheme />
             {version === 'preview' && !hidePreviewBanner ? (
-              <Alert severity="info">This is a preview version of the application.</Alert>
+              <Alert severity="info">
+                This is a preview version of the application.
+                <Button
+                  variant="contained"
+                  size="small"
+                  href={`/_toolpad/app/${appId}`}
+                  sx={{ m: '-14px 16px -8px', fontSize: '10px' }}
+                >
+                  Edit application
+                </Button>
+              </Alert>
             ) : null}
             <ErrorBoundary FallbackComponent={AppError}>
               <ResetNodeErrorsKeyProvider value={resetNodeErrorsKey}>

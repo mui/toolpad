@@ -41,7 +41,7 @@ import {
 } from '@mui/toolpad-core/runtime';
 import * as _ from 'lodash-es';
 import ErrorIcon from '@mui/icons-material/Error';
-import { useBrowserJsRuntime } from '@mui/toolpad-core/jsRuntime';
+import { useBrowserJsRuntime } from '@mui/toolpad-core/jsBrowserRuntime';
 import * as appDom from '../appDom';
 import { RuntimeState, VersionOrPreview } from '../types';
 import {
@@ -930,6 +930,7 @@ const queryClient = new QueryClient({
 
 export interface ToolpadAppProps {
   rootRef?: React.Ref<HTMLDivElement>;
+  catalog?: Record<string, ToolpadComponent>;
   hidePreviewBanner?: boolean;
   basename: string;
   version: VersionOrPreview;
@@ -938,6 +939,7 @@ export interface ToolpadAppProps {
 
 export default function ToolpadApp({
   rootRef,
+  catalog,
   basename,
   version,
   hidePreviewBanner,
@@ -969,7 +971,7 @@ export default function ToolpadApp({
               <ResetNodeErrorsKeyProvider value={resetNodeErrorsKey}>
                 <React.Suspense fallback={<AppLoading />}>
                   <AppModulesProvider modules={state.modules}>
-                    <ComponentsContext dom={dom}>
+                    <ComponentsContext catalog={catalog} dom={dom}>
                       <AppContextProvider value={appContext}>
                         <QueryClientProvider client={queryClient}>
                           <BrowserRouter basename={basename}>

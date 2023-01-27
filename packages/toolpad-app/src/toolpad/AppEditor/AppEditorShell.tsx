@@ -21,10 +21,8 @@ import SyncProblemIcon from '@mui/icons-material/SyncProblem';
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import RocketLaunchIcon from '@mui/icons-material/RocketLaunch';
-
 import * as React from 'react';
 import { useForm } from 'react-hook-form';
-import { Outlet } from 'react-router-dom';
 import invariant from 'invariant';
 import DialogForm from '../../components/DialogForm';
 import { DomLoader, useDomLoader } from '../DomLoader';
@@ -137,14 +135,14 @@ function getSaveState(domLoader: DomLoader): React.ReactNode {
   );
 }
 
-export interface ToolpadShellProps {
+interface DeployMenuProps {
   appId: string;
-  actions?: React.ReactNode;
 }
 
-export default function AppEditorShell({ appId, ...props }: ToolpadShellProps) {
-  const domLoader = useDomLoader();
+export function DeployMenu({ appId }: DeployMenuProps) {
   const release = client.useQuery('findLastRelease', [appId]);
+
+  const { buttonProps, menuProps } = useMenu();
 
   const {
     value: createReleaseDialogOpen,
@@ -154,7 +152,57 @@ export default function AppEditorShell({ appId, ...props }: ToolpadShellProps) {
 
   const isDeployed = Boolean(release?.data);
 
-  const { buttonProps, menuProps } = useMenu();
+  return (
+    <React.Fragment>
+      <ButtonGroup>
+        <Button
+          variant="outlined"
+          endIcon={<RocketLaunchIcon />}
+          size="small"
+          color="primary"
+          onClick={handleCreateReleaseDialogOpen}
+        >
+          Deploy
+        </Button>
+        {isDeployed ? (
+          <React.Fragment>
+            <Button size="small" {...buttonProps}>
+              <ArrowDropDownIcon />
+            </Button>
+            <Menu
+              {...menuProps}
+              anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
+              transformOrigin={{ horizontal: 'right', vertical: 'top' }}
+            >
+              {release.error ? (
+                <MenuItem>{errorFrom(release.error).message}</MenuItem>
+              ) : (
+                <MenuItem component="a" href={`/deploy/${appId}`} target="_blank">
+                  Open current deployed version
+                </MenuItem>
+              )}
+            </Menu>
+          </React.Fragment>
+        ) : null}
+      </ButtonGroup>
+
+      <CreateReleaseDialog
+        appId={appId}
+        open={createReleaseDialogOpen}
+        onClose={handleCreateReleaseDialogClose}
+      />
+    </React.Fragment>
+  );
+}
+
+export interface ToolpadShellProps {
+  appId: string;
+  actions?: React.ReactNode;
+  children: React.ReactNode;
+}
+
+export default function AppEditorShell({ appId, children, ...props }: ToolpadShellProps) {
+  const domLoader = useDomLoader();
 
   return (
     <ToolpadShell
@@ -170,37 +218,7 @@ export default function AppEditorShell({ appId, ...props }: ToolpadShellProps) {
           >
             Preview
           </Button>
-          <ButtonGroup>
-            <Button
-              variant="outlined"
-              endIcon={<RocketLaunchIcon />}
-              size="small"
-              color="primary"
-              onClick={handleCreateReleaseDialogOpen}
-            >
-              Deploy
-            </Button>
-            {isDeployed ? (
-              <React.Fragment>
-                <Button size="small" {...buttonProps}>
-                  <ArrowDropDownIcon />
-                </Button>
-                <Menu
-                  {...menuProps}
-                  anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
-                  transformOrigin={{ horizontal: 'right', vertical: 'top' }}
-                >
-                  {release.error ? (
-                    <MenuItem>{errorFrom(release.error).message}</MenuItem>
-                  ) : (
-                    <MenuItem component="a" href={`/deploy/${appId}`} target="_blank">
-                      Open current deployed version
-                    </MenuItem>
-                  )}
-                </Menu>
-              </React.Fragment>
-            ) : null}
-          </ButtonGroup>
+          <DeployMenu appId={appId} />
         </Stack>
       }
       status={getSaveState(domLoader)}
@@ -229,14 +247,8 @@ export default function AppEditorShell({ appId, ...props }: ToolpadShellProps) {
             position: 'relative',
           }}
         >
-          <Outlet />
+          {children}
         </Box>
-
-        <CreateReleaseDialog
-          appId={appId}
-          open={createReleaseDialogOpen}
-          onClose={handleCreateReleaseDialogClose}
-        />
       </Box>
     </ToolpadShell>
   );

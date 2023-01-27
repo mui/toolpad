@@ -2,6 +2,7 @@ import * as _ from 'lodash-es';
 import { ServerDataSource } from '../types';
 import functionSrc from './function/server';
 import postgres from './postgres/server';
+import mysql from './mysql/server';
 import rest from './rest/server';
 import googleSheets from './googleSheets/server';
 
@@ -16,6 +17,7 @@ const serverDataSources: ServerDataSources = _.pick(
     function: functionSrc,
     postgres,
     googleSheets,
+    mysql,
   },
   [...(config.isDemo ? DEMO_DATASOURCES : PRODUCTION_DATASOURCES)],
 );

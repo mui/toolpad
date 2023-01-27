@@ -53,6 +53,7 @@ export default function PagePanel({ appId, className, sx }: ComponentPanelProps)
             )}
           </React.Fragment>
         )}
+
         <AppOptions app={app} dom={dom} redirectOnDelete onRenameRequest={handleRename} />
       </Box>
       <Divider />

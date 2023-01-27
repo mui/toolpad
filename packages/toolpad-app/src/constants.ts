@@ -21,6 +21,7 @@ export const PRODUCTION_DATASOURCES = new Set([
   'function',
   'googleSheets',
   'postgres',
+  'mysql',
   'local',
 ]);
 

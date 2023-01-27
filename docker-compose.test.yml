@@ -26,6 +26,15 @@ services:
     expose:
       - '5432'
 
+  mysql:
+    image: mysql:8.0.27
+    restart: always
+    environment:
+      - MYSQL_ROOT_PASSWORD=mysql
+      - MYSQL_DATABASE=mysql
+    expose:
+      - '3306'
+
   httpbin:
     image: kennethreitz/httpbin
     ports:
@@ -38,6 +47,7 @@ services:
     environment:
       - PLAYWRIGHT_TEST_BASE_URL=http://toolpad:3000/
       - HTTPBIN_BASEURL=http://httpbin/
+      - MYSQL_HOST=mysql
     working_dir: /tests
     volumes:
       - .:/tests

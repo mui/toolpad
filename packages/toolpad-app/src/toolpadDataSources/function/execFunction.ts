@@ -4,12 +4,13 @@ import type * as harFormat from 'har-format';
 import * as fs from 'fs/promises';
 import fetch from 'node-fetch';
 import * as path from 'path';
+import { SerializedError } from '@mui/toolpad-core';
 import { FunctionResult } from './types';
 import { LogEntry } from '../../components/Console';
 import { FetchOptions } from './runtime/types';
 import projectRoot from '../../server/projectRoot';
 import { withHarInstrumentation, createHarLog } from '../../server/har';
-import { errorFrom } from '../../utils/errors';
+import { errorFrom, serializeError } from '../../utils/errors';
 
 async function fetchRuntimeModule() {
   const filePath = path.resolve(projectRoot, './src/toolpadDataSources/function/dist/index.js');
@@ -118,7 +119,7 @@ export default async function execFunction(
   await jail.delete('TOOLPAD_BRIDGE');
 
   let data;
-  let error: Error | undefined;
+  let error: SerializedError | undefined;
 
   try {
     const { code: userModuleJs } = await esbuild.transform(code, {
@@ -151,7 +152,7 @@ export default async function execFunction(
       },
     );
   } catch (userError) {
-    error = errorFrom(userError);
+    error = serializeError(errorFrom(userError));
   }
 
   return { data, logs, error, har };

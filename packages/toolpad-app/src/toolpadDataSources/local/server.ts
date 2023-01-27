@@ -148,13 +148,13 @@ async function createMain(userProjectRoot: string): Promise<string> {
           try {
             data = await execResolver(msg.name, msg.parameters);
           } catch (err) {
-            error = errorFrom(err)
+            error =  serializeError(errorFrom(err))
           }
           process.send({
             kind: 'result',
             id: msg.id,
             data,
-            error: serializeError(error)
+            error
           });
           break;
         }
@@ -169,13 +169,13 @@ async function createMain(userProjectRoot: string): Promise<string> {
               functions: Object.fromEntries(resolvedResolvers.filter(Boolean))
             };
           } catch (err) {
-            error = errorFrom(err)
+            error =  serializeError(errorFrom(err))
           }
           process.send({
             kind: 'result',
             id: msg.id,
             data,
-            error: serializeError(error)
+            error
           });
           break;
         }

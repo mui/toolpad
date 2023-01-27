@@ -1,9 +1,4 @@
-import {
-  BindableAttrValue,
-  CreateQueryConfig,
-  ExecFetchResult,
-  ToolpadQuery,
-} from '@mui/toolpad-core';
+import { BindableAttrValue, CreateQueryConfig, ExecFetchResult } from '@mui/toolpad-core';
 
 export interface LocalConnectionParams {}
 

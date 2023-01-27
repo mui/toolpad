@@ -32,10 +32,11 @@ function Select({ options, value, onChange, defaultValue, fullWidth, sx, ...rest
       {...rest}
     >
       {options.map((option) => {
-        const parsedOption: SelectOption = typeof option === 'string' ? { value: option } : option;
+        const parsedOption: SelectOption =
+          option && typeof option === 'object' ? option : { value: String(option) };
         return (
           <MenuItem key={parsedOption.value} value={parsedOption.value}>
-            {parsedOption.label ?? parsedOption.value}
+            {String(parsedOption.label ?? parsedOption.value)}
           </MenuItem>
         );
       })}

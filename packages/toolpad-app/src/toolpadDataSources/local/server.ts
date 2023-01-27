@@ -55,10 +55,14 @@ interface Execution {
 
 const pendingExecutions = new Map<number, Execution>();
 let cp: child_process.ChildProcess | undefined;
+let buildErrors: Error[] = [];
 
 async function sendRequest(msg: MessageToChildProcess) {
   return new Promise((resolve, reject) => {
-    if (cp) {
+    if (buildErrors.length > 0) {
+      const firstError = buildErrors[0];
+      reject(firstError);
+    } else if (cp) {
       const timeout = setTimeout(() => {
         pendingExecutions.delete(msg.id);
         reject(new Error(`Timeout`));
@@ -160,7 +164,7 @@ async function createMain(userProjectRoot: string): Promise<string> {
         }
         case 'introspect': {
           let data, error
-          tr {
+          try {
             const resolvedResolvers = await Promise.all(Array.from(resolvers.keys(), async (name) => {
               const resolver = await loadResolver(name)
               return [name, resolver[TOOLPAD_QUERY]];
@@ -213,6 +217,14 @@ async function createEsbuildContext() {
         // TODO: use for hot reloading
         // eslint-disable-next-line no-console
         console.log(`Rebuild: ${args.errors.length} error(s), ${args.warnings.length} warning(s)`);
+
+        buildErrors = args.errors.map((message) => {
+          return new Error(message.text);
+        });
+
+        if (buildErrors.length > 0) {
+          return;
+        }
 
         if (globalThis.localFunctionsChildProcessController) {
           globalThis.localFunctionsChildProcessController.abort();

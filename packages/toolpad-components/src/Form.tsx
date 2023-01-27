@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { Container as MUIContainer, ContainerProps, Button } from '@mui/material';
 import { createComponent } from '@mui/toolpad-core';
-import { Formik, useFormikContext } from 'formik';
+import { useForm, FormProvider } from 'react-hook-form';
 import { SX_PROP_HELPER_TEXT } from './constants';
 
 type FormValue = Record<string, string>;
@@ -11,52 +11,59 @@ interface Props extends ContainerProps {
   submitLabel: string;
   value: FormValue;
   onChange: (value: FormValue) => void;
+  defaultValue: Record<string, any>;
 }
 
-// Because: https://github.com/jaredpalmer/formik/issues/271
-function ChangeHandler({ onChange }: any) {
-  const { values } = useFormikContext();
+function Form({
+  children,
+  onSubmit = () => {},
+  onChange,
+  submitLabel,
+  sx,
+  value,
+  defaultValue,
+  ...rest
+}: Props) {
+  const methods = useForm({
+    defaultValues: defaultValue,
+    resolver: (values) => {
+      onChange(values);
 
-  React.useEffect(() => {
-    onChange(values);
-  }, [values, onChange]);
+      return {};
+    },
+    mode: 'onChange',
+  });
 
-  return null;
-}
+  // const values = methods.getValues();
 
-function Form({ children, onSubmit, onChange, submitLabel, sx, defaultValue, ...rest }: Props) {
+  // React.useEffect(() => {
+  //   onChange(values);
+  //   console.log('new', values);
+  // }, [values]);
+
   return (
     <MUIContainer disableGutters sx={sx} {...rest}>
-      <Formik
-        initialValues={defaultValue}
-        onSubmit={(values) => {
-          onSubmit(values);
-        }}
-      >
-        {(props) => (
-          <form onSubmit={props.handleSubmit}>
-            <MUIContainer />
-            <ChangeHandler onChange={onChange} />
-            {children}
+      <FormProvider {...methods}>
+        <form onSubmit={methods.handleSubmit(onSubmit)}>
+          {children}
 
-            <MUIContainer
-              disableGutters
-              sx={{
-                borderTop: 'solid 1px',
-                display: 'flex',
-                justifyContent: 'end',
-                width: '100%',
-                mt: 1,
-                pt: 1,
-              }}
-            >
-              <Button type="submit" variant="contained">
-                {submitLabel}
-              </Button>
-            </MUIContainer>
-          </form>
-        )}
-      </Formik>
+          <MUIContainer
+            disableGutters
+            sx={{
+              borderTop: 'solid 1px',
+              display: 'flex',
+              justifyContent: 'end',
+              width: '100%',
+              mt: 1,
+              pt: 1,
+            }}
+          >
+            <Button type="submit" variant="contained">
+              {submitLabel}
+            </Button>
+          </MUIContainer>
+        </form>
+      </FormProvider>
     </MUIContainer>
   );
 }
@@ -86,7 +93,7 @@ export default createComponent(Form, {
       defaultValue: 'Submit',
     },
     onSubmit: {
-      helperText: 'Add logic to be executed when the user submit the form.',
+      helperText: 'Add logic to be executed when the user submits the form.',
       typeDef: { type: 'event' },
     },
     sx: {

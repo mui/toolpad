@@ -42,6 +42,7 @@ import {
 import * as _ from 'lodash-es';
 import ErrorIcon from '@mui/icons-material/Error';
 import { useBrowserJsRuntime } from '@mui/toolpad-core/jsBrowserRuntime';
+import { FormProvider, useForm } from 'react-hook-form';
 import * as appDom from '../appDom';
 import { RuntimeState, VersionOrPreview } from '../types';
 import {
@@ -761,6 +762,7 @@ function parseBindings(
 }
 
 function RenderedPage({ nodeId }: RenderedNodeProps) {
+  const formMethods = useForm();
   const dom = useDomContext();
   const page = appDom.getNode(dom, nodeId, 'page');
   const { children = [], queries = [] } = appDom.getChildNodes(dom, page);

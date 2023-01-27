@@ -5,7 +5,7 @@ import { DesktopDatePicker, DesktopDatePickerProps } from '@mui/x-date-pickers/D
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { createComponent } from '@mui/toolpad-core';
 import { Dayjs } from 'dayjs';
-import { useField } from 'formik';
+// import { useField } from 'formik';
 import { SX_PROP_HELPER_TEXT } from './constants';
 
 const LOCALE_LOADERS = new Map([
@@ -77,15 +77,15 @@ export interface DatePickerProps
 }
 
 function DatePicker({ format, onChange, value, ...props }: DatePickerProps) {
-  const [field, , helpers] = useField(props.name);
+  // const [field, , helpers] = useField(props.name);
   const handleChange = React.useCallback(
     (newValue: Dayjs | null) => {
       // date-only form of ISO8601. See https://tc39.es/ecma262/#sec-date-time-string-format
       const stringValue = newValue?.format('YYYY-MM-DD') || '';
       onChange(stringValue);
-      helpers.setValue(stringValue);
+      // helpers.setValue(stringValue);
     },
-    [onChange, helpers],
+    [onChange],
   );
 
   const adapterLocale = React.useSyncExternalStore(subscribeLocaleLoader, getSnapshot);
@@ -96,7 +96,7 @@ function DatePicker({ format, onChange, value, ...props }: DatePickerProps) {
         {...props}
         inputFormat={format || 'L'}
         onChange={handleChange}
-        value={value || field.value}
+        value={value}
         renderInput={(params) => (
           <TextField
             {...params}

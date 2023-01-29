@@ -288,6 +288,7 @@ async function createEsbuildContext() {
     metafile: true,
     outdir: path.resolve(userProjectRoot, './.toolpad-generated/functions'),
     target: 'es2022',
+    external: ['pg'],
   });
 
   return ctx;

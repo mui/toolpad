@@ -30,10 +30,9 @@ type MessageFromChildProcess = {
 };
 
 declare module globalThis {
-  // Used to detect old esbuild context to be cleaned up after HMR
-  let localFunctionsEsbuildContext: esbuild.BuildContext | undefined;
-  // Used to detect old childprocess to be cleaned up after HMR
-  let localFunctionsChildProcessController: AbortController | undefined;
+  let builder: Promise<{
+    sendRequest(msg: MessageToChildProcess): Promise<any>;
+  }>;
 }
 
 let nextMsgId = 1;
@@ -52,8 +51,6 @@ interface Execution {
 }
 
 const pendingExecutions = new Map<number, Execution>();
-let cp: child_process.ChildProcess | undefined;
-let buildErrors: Error[] = [];
 
 let setInitialized: () => void;
 const initPromise = new Promise<void>((resolve) => {
@@ -64,32 +61,9 @@ function revalidate() {
   setInitialized();
 }
 
-async function sendRequest(msg: MessageToChildProcess) {
-  await initPromise;
-  return new Promise((resolve, reject) => {
-    if (buildErrors.length > 0) {
-      const firstError = buildErrors[0];
-      reject(firstError);
-    } else if (cp) {
-      const timeout = setTimeout(() => {
-        pendingExecutions.delete(msg.id);
-        reject(new Error(`Timeout`));
-      }, 60000);
-      pendingExecutions.set(msg.id, {
-        id: msg.id,
-        resolve,
-        reject,
-        timeout,
-      });
-      cp.send(msg);
-    } else {
-      reject(new Error(`Not initialized`));
-    }
-  });
-}
-
 async function execFunction(name: string, parameters: Record<string, unknown>) {
-  return sendRequest({
+  const builder = await globalThis.builder;
+  return builder.sendRequest({
     kind: 'exec',
     id: getNextId(),
     name,
@@ -107,7 +81,8 @@ function formatCodeFrame(location: esbuild.Location): string {
 }
 
 async function introspect() {
-  return sendRequest({
+  const builder = await globalThis.builder;
+  return builder.sendRequest({
     kind: 'introspect',
     id: getNextId(),
   });
@@ -194,8 +169,11 @@ async function createMain(): Promise<string> {
   `;
 }
 
-async function createEsbuildContext() {
+async function createBuilder() {
   const userProjectRoot = getUserProjectRoot();
+  let currentRuntimeProcess: child_process.ChildProcess | undefined;
+  let controller: AbortController | undefined;
+  let buildErrors: Error[] = [];
 
   const toolpadPlugin: esbuild.Plugin = {
     name: 'toolpad',
@@ -233,9 +211,9 @@ async function createEsbuildContext() {
         });
 
         if (buildErrors.length <= 0) {
-          if (globalThis.localFunctionsChildProcessController) {
-            globalThis.localFunctionsChildProcessController.abort();
-            globalThis.localFunctionsChildProcessController = undefined;
+          if (controller) {
+            controller.abort();
+            controller = undefined;
 
             // clean up handlers
             for (const [id, execution] of pendingExecutions) {
@@ -245,26 +223,26 @@ async function createEsbuildContext() {
             }
           }
 
-          const controller = new AbortController();
+          controller = new AbortController();
           const metafile = args.metafile;
           invariant(metafile, 'esbuild settings should enable metafile');
           const outputFileNames = Object.keys(metafile.outputs);
           invariant(outputFileNames.length === 1, 'esbuild should build only one output file');
           const outputFile = outputFileNames[0];
-          cp = child_process.fork(`./${outputFile}`, {
+          const runtimeProcess = child_process.fork(`./${outputFile}`, {
             cwd: userProjectRoot,
             signal: controller.signal,
             stdio: 'inherit',
           });
 
-          cp.on('error', (error) => {
+          runtimeProcess.on('error', (error) => {
             if (error.name === 'AbortError') {
               return;
             }
-            console.error(error);
+            console.error(`cp ${runtimeProcess.pid} error`, error);
           });
 
-          cp.on('message', (msg: MessageFromChildProcess) => {
+          runtimeProcess.on('message', (msg: MessageFromChildProcess) => {
             switch (msg.kind) {
               case 'result': {
                 const execution = pendingExecutions.get(msg.id);
@@ -284,7 +262,7 @@ async function createEsbuildContext() {
             }
           });
 
-          globalThis.localFunctionsChildProcessController = controller;
+          currentRuntimeProcess = runtimeProcess;
         }
 
         revalidate();
@@ -292,7 +270,7 @@ async function createEsbuildContext() {
     },
   };
 
-  const ctx = esbuild.context({
+  const ctx = await esbuild.context({
     absWorkingDir: userProjectRoot,
     entryPoints: ['toolpad:main.tsx'],
     plugins: [toolpadPlugin],
@@ -304,7 +282,34 @@ async function createEsbuildContext() {
     external: ['pg'],
   });
 
-  return ctx;
+  async function sendRequest(msg: MessageToChildProcess) {
+    await initPromise;
+    return new Promise((resolve, reject) => {
+      if (buildErrors.length > 0) {
+        const firstError = buildErrors[0];
+        reject(firstError);
+      } else if (currentRuntimeProcess) {
+        const timeout = setTimeout(() => {
+          pendingExecutions.delete(msg.id);
+          reject(new Error(`Timeout`));
+        }, 60000);
+        pendingExecutions.set(msg.id, {
+          id: msg.id,
+          resolve,
+          reject,
+          timeout,
+        });
+        currentRuntimeProcess.send(msg);
+      } else {
+        reject(new Error(`Not initialized`));
+      }
+    });
+  }
+
+  return {
+    ctx,
+    sendRequest,
+  };
 }
 
 async function execBase(
@@ -351,13 +356,9 @@ const dataSource: ServerDataSource<{}, LocalQuery, any> = {
 export default dataSource;
 
 async function startDev() {
-  if (globalThis.localFunctionsEsbuildContext) {
-    await globalThis.localFunctionsEsbuildContext.dispose();
-    globalThis.localFunctionsEsbuildContext = undefined;
-  }
-  const ctx = await createEsbuildContext();
-  await ctx.watch();
-  globalThis.localFunctionsEsbuildContext = ctx;
+  const builder = await createBuilder();
+  await builder.ctx.watch();
+  return builder;
 }
 
-startDev();
+globalThis.builder = globalThis.builder || startDev();

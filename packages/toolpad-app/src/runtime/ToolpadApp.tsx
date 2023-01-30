@@ -221,8 +221,6 @@ function RenderedNodeContent({ node, childNodeGroups, Component }: RenderedNodeC
     [getBindings, localScopeParams, scopeId],
   );
 
-  const hasSetInitialBindingsRef = React.useRef(false);
-
   const boundProps: Record<string, any> = React.useMemo(() => {
     const loadingPropSourceSet = new Set(loadingPropSource);
     const hookResult: Record<string, any> = {};
@@ -233,11 +231,6 @@ function RenderedNodeContent({ node, childNodeGroups, Component }: RenderedNodeC
     let loading: boolean = false;
 
     for (const [propName, argType] of Object.entries(argTypes)) {
-      // Wait for initial bindings to be set if inside local scope
-      if (scopeId && !hasSetInitialBindingsRef.current) {
-        return hookResult;
-      }
-
       const bindingId = `${nodeId}.props.${propName}`;
       const binding = liveBindings[bindingId];
 
@@ -269,7 +262,7 @@ function RenderedNodeContent({ node, childNodeGroups, Component }: RenderedNodeC
     }
 
     return hookResult;
-  }, [argTypes, errorProp, liveBindings, loadingProp, loadingPropSource, nodeId, scopeId]);
+  }, [argTypes, errorProp, liveBindings, loadingProp, loadingPropSource, nodeId]);
 
   const boundLayoutProps: Record<string, any> = React.useMemo(() => {
     const hookResult: Record<string, any> = {};
@@ -372,6 +365,7 @@ function RenderedNodeContent({ node, childNodeGroups, Component }: RenderedNodeC
   }, [boundProps, eventHandlers, layoutElementProps, onChangeHandlers, reactChildren]);
 
   const previousProps = React.useRef<Record<string, any>>(props);
+  const hasSetInitialBindingsRef = React.useRef(false);
   React.useEffect(() => {
     Object.entries(argTypes).forEach(([key, argType]) => {
       if (!argType?.defaultValueProp) {
@@ -435,6 +429,8 @@ function RenderedNodeContent({ node, childNodeGroups, Component }: RenderedNodeC
     }
   }
 
+  const hasUnsetScopedBindings = scopeId && !hasSetInitialBindingsRef.current;
+
   return (
     <NodeRuntimeWrapper
       nodeId={nodeId}
@@ -449,6 +445,7 @@ function RenderedNodeContent({ node, childNodeGroups, Component }: RenderedNodeC
             display: 'flex',
             alignItems: boundLayoutProps.verticalAlign,
             justifyContent: boundLayoutProps.horizontalAlign,
+            visibility: hasUnsetScopedBindings ? 'hidden' : 'visible',
           }}
         >
           <Component {...props} />

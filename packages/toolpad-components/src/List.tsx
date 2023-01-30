@@ -23,7 +23,6 @@ function List({ itemCount, renderItem, disablePadding = false, sx }: ListProps) 
 }
 
 export default createComponent(List, {
-  layoutDirection: 'both',
   argTypes: {
     itemCount: {
       helperText: 'Number of items to render.',

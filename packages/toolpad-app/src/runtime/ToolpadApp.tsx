@@ -363,26 +363,18 @@ function RenderedNodeContent({ node, childNodeGroups, Component }: RenderedNodeC
     };
   }, [boundProps, eventHandlers, layoutElementProps, onChangeHandlers, reactChildren]);
 
-  const hasSetInitialScopedBindingsRef = React.useRef(false);
-  React.useEffect(() => {
-    Object.entries(argTypes).forEach(([key, argType]) => {
-      if (scopeId && argType?.isScoped && !hasSetInitialScopedBindingsRef.current) {
-        const bindingId = `${nodeId}.props.${key}`;
-        setControlledBinding(bindingId, { value: props[key] }, scopeId);
-      }
-    });
-
-    hasSetInitialScopedBindingsRef.current = true;
-  }, [argTypes, nodeId, props, scopeId, setControlledBinding]);
-
   const previousProps = React.useRef<Record<string, any>>(props);
+  const hasSetInitialBindingsRef = React.useRef(false);
   React.useEffect(() => {
     Object.entries(argTypes).forEach(([key, argType]) => {
       if (!argType?.defaultValueProp) {
         return;
       }
 
-      if (previousProps.current[argType.defaultValueProp] === props[argType.defaultValueProp]) {
+      if (
+        hasSetInitialBindingsRef.current &&
+        previousProps.current[argType.defaultValueProp] === props[argType.defaultValueProp]
+      ) {
         return;
       }
 
@@ -391,6 +383,7 @@ function RenderedNodeContent({ node, childNodeGroups, Component }: RenderedNodeC
     });
 
     previousProps.current = props;
+    hasSetInitialBindingsRef.current = true;
   }, [props, argTypes, nodeId, setControlledBinding, scopeId]);
 
   // Wrap element props
@@ -918,11 +911,13 @@ function RenderedPage({ nodeId }: RenderedNodeProps) {
 
   const getEvaluatedBindings = React.useCallback(
     (scopeId?: string, localScopeParams: LocalScopeParams = DEFAULT_LOCAL_SCOPE_PARAMS) => {
+      const localBindings = scopeId ? scopedBindings[scopeId] : null;
+
       return evalJsBindings(
         browserJsRuntime,
         {
           ...pageBindings,
-          ...(scopeId ? scopedBindings[scopeId] || {} : {}),
+          ...(localBindings || {}),
         },
         {
           ...globalScope,

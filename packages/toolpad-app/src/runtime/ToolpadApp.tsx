@@ -233,12 +233,15 @@ function RenderedNodeContent({ node, childNodeGroups, Component }: RenderedNodeC
     let loading: boolean = false;
 
     for (const [propName, argType] of Object.entries(argTypes)) {
+      // Wait for initial bindings to be set if inside local scope
+      if (scopeId && !hasSetInitialBindingsRef.current) {
+        return hookResult;
+      }
+
       const bindingId = `${nodeId}.props.${propName}`;
       const binding = liveBindings[bindingId];
 
-      const isNewScopedBinding = argType?.isScoped && !hasSetInitialBindingsRef.current;
-
-      if (binding && !isNewScopedBinding) {
+      if (binding) {
         hookResult[propName] = binding.value;
 
         if (binding.loading && loadingPropSourceSet.has(propName)) {
@@ -266,7 +269,7 @@ function RenderedNodeContent({ node, childNodeGroups, Component }: RenderedNodeC
     }
 
     return hookResult;
-  }, [argTypes, errorProp, liveBindings, loadingProp, loadingPropSource, nodeId]);
+  }, [argTypes, errorProp, liveBindings, loadingProp, loadingPropSource, nodeId, scopeId]);
 
   const boundLayoutProps: Record<string, any> = React.useMemo(() => {
     const hookResult: Record<string, any> = {};

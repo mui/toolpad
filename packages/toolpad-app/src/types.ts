@@ -120,7 +120,7 @@ export interface RuntimeDataSource<Q = {}, R extends ExecFetchResult = ExecFetch
 
 export interface ServerDataSource<P = {}, Q = {}, PQ = {}, D = {}> {
   // Execute a private query on this connection, intended for editors only
-  execPrivate?: (connection: Maybe<P>, query: PQ) => Promise<any>;
+  execPrivate?: (connection: Maybe<P>, query: PQ) => Promise<unknown>;
   // Execute a query on this connection, intended for viewers
   exec: (connection: Maybe<P>, query: Q, params: any) => Promise<ExecFetchResult<D>>;
   createHandler?: () => (
@@ -166,7 +166,7 @@ export interface AppTheme {
 
 export type VersionOrPreview = 'preview' | number;
 
-export type AppTemplateId = 'default' | 'blank' | 'images';
+export type AppTemplateId = 'default' | 'hr' | 'images';
 
 export type NodeHashes = Record<NodeId, number | undefined>;
 

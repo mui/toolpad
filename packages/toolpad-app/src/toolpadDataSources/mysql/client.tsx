@@ -3,16 +3,16 @@ import { ClientDataSource, ConnectionEditorProps } from '../../types';
 import { SqlConnectionParams, SqlQuery } from '../sql/types';
 import { QueryEditor, ConnectionParamsInput, getInitialQueryValue } from '../sql/client';
 
-function PostgreSQLConnectionParamsInput({
+function MySQLConnectionParamsInput({
   value,
   onChange,
 }: ConnectionEditorProps<SqlConnectionParams>) {
-  return <ConnectionParamsInput value={value} onChange={onChange} defaultPort={5432} />;
+  return <ConnectionParamsInput value={value} onChange={onChange} defaultPort={3306} />;
 }
 
 const dataSource: ClientDataSource<SqlConnectionParams, SqlQuery> = {
-  displayName: 'PostgreSQL',
-  ConnectionParamsInput: PostgreSQLConnectionParamsInput,
+  displayName: 'MySQL',
+  ConnectionParamsInput: MySQLConnectionParamsInput,
   QueryEditor,
   getInitialQueryValue,
 };

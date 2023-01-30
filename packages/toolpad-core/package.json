@@ -38,7 +38,7 @@
     "url": "https://github.com/mui/mui-toolpad/issues"
   },
   "dependencies": {
-    "@tanstack/react-query": "^4.22.3",
+    "@tanstack/react-query": "^4.23.0",
     "mitt": "^3.0.0",
     "quickjs-emscripten": "^0.21.1",
     "react-error-boundary": "^3.1.4"

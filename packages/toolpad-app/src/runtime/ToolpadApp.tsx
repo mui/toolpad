@@ -221,6 +221,8 @@ function RenderedNodeContent({ node, childNodeGroups, Component }: RenderedNodeC
     [getBindings, localScopeParams, scopeId],
   );
 
+  const hasSetInitialBindingsRef = React.useRef(false);
+
   const boundProps: Record<string, any> = React.useMemo(() => {
     const loadingPropSourceSet = new Set(loadingPropSource);
     const hookResult: Record<string, any> = {};
@@ -234,7 +236,7 @@ function RenderedNodeContent({ node, childNodeGroups, Component }: RenderedNodeC
       const bindingId = `${nodeId}.props.${propName}`;
       const binding = liveBindings[bindingId];
 
-      if (binding) {
+      if (binding && (!argType?.isScoped || hasSetInitialBindingsRef.current)) {
         hookResult[propName] = binding.value;
 
         if (binding.loading && loadingPropSourceSet.has(propName)) {
@@ -299,6 +301,7 @@ function RenderedNodeContent({ node, childNodeGroups, Component }: RenderedNodeC
             setControlledBinding(bindingId, { value });
           }
         };
+
         return [argType.onChangeProp, handler];
       }),
     [argTypes, isDefaultScope, nodeId, scopeId, setControlledBinding],
@@ -364,7 +367,6 @@ function RenderedNodeContent({ node, childNodeGroups, Component }: RenderedNodeC
   }, [boundProps, eventHandlers, layoutElementProps, onChangeHandlers, reactChildren]);
 
   const previousProps = React.useRef<Record<string, any>>(props);
-  const hasSetInitialBindingsRef = React.useRef(false);
   React.useEffect(() => {
     Object.entries(argTypes).forEach(([key, argType]) => {
       if (!argType?.defaultValueProp) {

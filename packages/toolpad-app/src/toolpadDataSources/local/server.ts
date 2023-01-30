@@ -3,6 +3,7 @@ import * as child_process from 'child_process';
 import * as esbuild from 'esbuild';
 import * as path from 'path';
 import invariant from 'invariant';
+import { indent } from '@mui/toolpad-core/utils/strings';
 import { ServerDataSource } from '../../types';
 import { LocalPrivateQuery, LocalQuery, LocalConnectionParams } from './types';
 import { Maybe } from '../../utils/types';
@@ -94,6 +95,15 @@ async function execFunction(name: string, parameters: Record<string, unknown>) {
     name,
     parameters,
   });
+}
+
+function formatCodeFrame(location: esbuild.Location): string {
+  const lineNumberCharacters = Math.ceil(Math.log10(location.line));
+  return [
+    `${location.file}:${location.line}:${location.column}:`,
+    `  ${location.line} │ ${location.lineText}`,
+    `  ${' '.repeat(lineNumberCharacters)} ╵ ${' '.repeat(location.lineText.length - 1)}^`,
+  ].join('\n');
 }
 
 async function introspect() {
@@ -214,65 +224,68 @@ async function createEsbuildContext() {
         console.log(`Rebuild: ${args.errors.length} error(s), ${args.warnings.length} warning(s)`);
 
         buildErrors = args.errors.map((message) => {
-          return new Error(message.text);
-        });
-
-        if (buildErrors.length > 0) {
-          return;
-        }
-
-        if (globalThis.localFunctionsChildProcessController) {
-          globalThis.localFunctionsChildProcessController.abort();
-          globalThis.localFunctionsChildProcessController = undefined;
-
-          // clean up handlers
-          for (const [id, execution] of pendingExecutions) {
-            execution.reject(new Error(`Aborted`));
-            clearTimeout(execution.timeout);
-            pendingExecutions.delete(id);
+          let messageText = message.text;
+          if (message.location) {
+            const formattedLocation = indent(formatCodeFrame(message.location), 2);
+            messageText = [messageText, formattedLocation].join('\n');
           }
-        }
-
-        const controller = new AbortController();
-        const metafile = args.metafile;
-        invariant(metafile, 'esbuild settings should enable metafile');
-        const outputFileNames = Object.keys(metafile.outputs);
-        invariant(outputFileNames.length === 1, 'esbuild should build only one output file');
-        const outputFile = outputFileNames[0];
-        cp = child_process.fork(`./${outputFile}`, {
-          cwd: userProjectRoot,
-          signal: controller.signal,
-          stdio: 'inherit',
+          return new Error(messageText);
         });
 
-        cp.on('error', (error) => {
-          if (error.name === 'AbortError') {
-            return;
-          }
-          console.error(error);
-        });
+        if (buildErrors.length <= 0) {
+          if (globalThis.localFunctionsChildProcessController) {
+            globalThis.localFunctionsChildProcessController.abort();
+            globalThis.localFunctionsChildProcessController = undefined;
 
-        cp.on('message', (msg: MessageFromChildProcess) => {
-          switch (msg.kind) {
-            case 'result': {
-              const execution = pendingExecutions.get(msg.id);
-              if (execution) {
-                pendingExecutions.delete(msg.id);
-                clearTimeout(execution.timeout);
-                if (msg.error) {
-                  execution.reject(new Error(msg.error.message || 'Unknown error'));
-                } else {
-                  execution.resolve(msg.data);
-                }
-              }
-              break;
+            // clean up handlers
+            for (const [id, execution] of pendingExecutions) {
+              execution.reject(new Error(`Aborted`));
+              clearTimeout(execution.timeout);
+              pendingExecutions.delete(id);
             }
-            default:
-              console.error(`Unknowm message received "${msg.kind}"`);
           }
-        });
 
-        globalThis.localFunctionsChildProcessController = controller;
+          const controller = new AbortController();
+          const metafile = args.metafile;
+          invariant(metafile, 'esbuild settings should enable metafile');
+          const outputFileNames = Object.keys(metafile.outputs);
+          invariant(outputFileNames.length === 1, 'esbuild should build only one output file');
+          const outputFile = outputFileNames[0];
+          cp = child_process.fork(`./${outputFile}`, {
+            cwd: userProjectRoot,
+            signal: controller.signal,
+            stdio: 'inherit',
+          });
+
+          cp.on('error', (error) => {
+            if (error.name === 'AbortError') {
+              return;
+            }
+            console.error(error);
+          });
+
+          cp.on('message', (msg: MessageFromChildProcess) => {
+            switch (msg.kind) {
+              case 'result': {
+                const execution = pendingExecutions.get(msg.id);
+                if (execution) {
+                  pendingExecutions.delete(msg.id);
+                  clearTimeout(execution.timeout);
+                  if (msg.error) {
+                    execution.reject(new Error(msg.error.message || 'Unknown error'));
+                  } else {
+                    execution.resolve(msg.data);
+                  }
+                }
+                break;
+              }
+              default:
+                console.error(`Unknowm message received "${msg.kind}"`);
+            }
+          });
+
+          globalThis.localFunctionsChildProcessController = controller;
+        }
 
         revalidate();
       });

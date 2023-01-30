@@ -500,7 +500,7 @@ export default function DomProvider({ appId, children }: DomContextProps) {
           fingerprint.current = newFingerPrint;
           // eslint-disable-next-line no-await-in-loop
           await new Promise((resolve) => {
-            setTimeout(resolve, 500);
+            setTimeout(resolve, 1000);
           });
         } catch (err) {
           console.error(err);

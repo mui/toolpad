@@ -368,7 +368,7 @@ export interface JsRuntime {
 
 export type LocalScopeParams = Record<string, unknown>;
 
-export interface TemplateScopeParams extends LocalScopeParams {
+export interface TemplateScopeParams {
   i: number;
 }
 

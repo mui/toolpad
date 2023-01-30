@@ -3,7 +3,9 @@ import {
   ArgTypeDefinition,
   BindableAttrValue,
   DEFAULT_LOCAL_SCOPE_PARAMS,
+  LocalScopeParams,
   ScopeMeta,
+  ScopeMetaField,
 } from '@mui/toolpad-core';
 import { Alert, Box } from '@mui/material';
 import { useBrowserJsRuntime } from '@mui/toolpad-core/jsBrowserRuntime';
@@ -66,21 +68,18 @@ export default function NodeAttributeEditor<P extends object>({
     [dom, node, viewState],
   );
 
-  const localScopeMeta: ScopeMeta = React.useMemo(
-    () =>
-      mapValues(
-        {
-          ...(isNodeTemplateDescendant ? { i: DEFAULT_LOCAL_SCOPE_PARAMS.i } : {}),
-        },
-        () => ({ kind: 'local' }),
-      ) as ScopeMeta,
-    [isNodeTemplateDescendant],
+  const localState: LocalScopeParams = isNodeTemplateDescendant
+    ? { i: DEFAULT_LOCAL_SCOPE_PARAMS.i }
+    : {};
+  const localScopeMeta: ScopeMeta = mapValues(
+    localState,
+    () => ({ kind: 'local' } as ScopeMetaField),
   );
 
   return Control ? (
     <BindableEditor
       liveBinding={liveBinding}
-      globalScope={{ ...pageState, ...DEFAULT_LOCAL_SCOPE_PARAMS }}
+      globalScope={{ ...pageState, ...localState }}
       globalScopeMeta={{
         ...globalScopeMeta,
         ...localScopeMeta,

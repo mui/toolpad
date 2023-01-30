@@ -86,7 +86,7 @@ test('changing defaultValue resets controlled value', async ({ page, browserName
 
   clickCenter(page, secondInput);
 
-  await editorModel.componentEditor.getByLabel('defaultValue').fill('New');
+  await editorModel.componentEditor.getByLabel('defaultValue', { exact: true }).fill('New');
 
   await expect(firstInput).toHaveValue('New');
   await expect(secondInput).toHaveValue('New');

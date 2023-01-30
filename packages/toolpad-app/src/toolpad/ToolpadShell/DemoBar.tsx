@@ -60,7 +60,7 @@ export default function DemoBar() {
       <Typography variant="body2" textAlign="center">
         Check out our{' '}
         <Link
-          href={addDemoBarUTMParamsToURL(ROADMAP_URL)}
+          href={ROADMAP_URL}
           target="_blank"
           underline="always"
           sx={linkStyles}
@@ -70,7 +70,7 @@ export default function DemoBar() {
         </Link>{' '}
         to stay up to date, or{' '}
         <Link
-          href={addDemoBarUTMParamsToURL(SCHEDULE_DEMO_URL)}
+          href={SCHEDULE_DEMO_URL}
           target="_blank"
           underline="always"
           sx={linkStyles}

@@ -24,8 +24,14 @@ export function getConfigFilePath() {
 
 type ComponentsContent = Record<string, string>;
 
+export const QUERIES_FILES = `./toolpad/queries.ts`;
+
+function getQueriesFilePath(): string {
+  return path.resolve(getUserProjectRoot(), QUERIES_FILES);
+}
+
 function getComponentFolder(): string {
-  return path.resolve(getUserProjectRoot(), './toolpad-components');
+  return path.resolve(getUserProjectRoot(), './toolpad/components');
 }
 
 function getComponentFilePath(componentsFolder: string, componentName: string): string {
@@ -133,6 +139,36 @@ export async function loadConfigFile(filePath: string): Promise<appDom.AppDom> {
   }
 }
 
+export async function fileExists(filepath: string): Promise<boolean> {
+  try {
+    const stat = await fs.stat(filepath);
+    return stat.isFile();
+  } catch (err) {
+    if (errorFrom(err).code === 'ENOENT') {
+      return false;
+    }
+    throw err;
+  }
+}
+
+const DEFAULT_QUERIES_FILE_CONTENT = `// Toolpad queries:
+
+export async function example() {
+  return [
+    { firstname: 'Nell', lastName: 'Lester' },
+    { firstname: 'Keanu', lastName: 'Walter' },
+    { firstname: 'Daniella', lastName: 'Sweeney' },
+  ];
+}
+`;
+
+export async function writeQueriesFile(): Promise<void> {
+  const queriesFilePath = getQueriesFilePath();
+  if (!(await fileExists(queriesFilePath))) {
+    await fs.writeFile(queriesFilePath, DEFAULT_QUERIES_FILE_CONTENT, { encoding: 'utf-8' });
+  }
+}
+
 export async function writeDomToDisk(dom: appDom.AppDom): Promise<void> {
   const configFilePath = getConfigFilePath();
   const componentsFolder = getComponentFolder();
@@ -140,6 +176,7 @@ export async function writeDomToDisk(dom: appDom.AppDom): Promise<void> {
   await Promise.all([
     writeConfigFile(configFilePath, dom),
     writeCodeComponentsToFiles(componentsFolder, componentsContent),
+    writeQueriesFile(),
   ]);
 }
 
@@ -179,12 +216,20 @@ export async function openCodeComponentEditor(componentName: string): Promise<vo
   await execFile('code', [userProjectRoot, '--goto', filePath]);
 }
 
-export const QUERIES_FILES = `./toolpad/queries.ts`;
+async function getQueriesFileContent(): Promise<string | null> {
+  try {
+    return await fs.readFile(getQueriesFilePath(), { encoding: 'utf-8' });
+  } catch (err) {
+    if (errorFrom(err).code === 'ENOENT') {
+      return null;
+    }
+    throw err;
+  }
+}
 
 export async function getDomFingerprint() {
-  const [dom, queriesFile] = await Promise.all([
-    loadLocalDom(),
-    fs.readFile(path.resolve(getUserProjectRoot(), QUERIES_FILES), { encoding: 'utf-8' }),
-  ]);
-  return insecureHash(JSON.stringify(dom)) + insecureHash(queriesFile);
+  const [dom, queriesFile] = await Promise.all([loadLocalDom(), getQueriesFileContent()]);
+  return (
+    insecureHash(JSON.stringify(dom)) + insecureHash(queriesFile || DEFAULT_QUERIES_FILE_CONTENT)
+  );
 }

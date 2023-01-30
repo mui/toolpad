@@ -236,7 +236,9 @@ function RenderedNodeContent({ node, childNodeGroups, Component }: RenderedNodeC
       const bindingId = `${nodeId}.props.${propName}`;
       const binding = liveBindings[bindingId];
 
-      if (binding && (!argType?.isScoped || hasSetInitialBindingsRef.current)) {
+      const isNewScopedBinding = argType?.isScoped && !hasSetInitialBindingsRef.current;
+
+      if (binding && !isNewScopedBinding) {
         hookResult[propName] = binding.value;
 
         if (binding.loading && loadingPropSourceSet.has(propName)) {

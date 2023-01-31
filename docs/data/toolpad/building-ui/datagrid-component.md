@@ -6,15 +6,15 @@
 
 ## Customizing cell rendering
 
-By default you can render data json using DataGrid component and it will automatically recognize most of the data types. However sometimes it might not be enough and for that reason we provide option to use custom components to render the data.
+By default you can render json data using DataGrid component and it will automatically recognize most of the data types. However sometimes it might not be enough and for that reason we provide the option to render custom components inside a datagrid.
 
 ### Creating custom component
 
-First you will have to create custom component which is able to process `DataGrid` data:
+Firstly, you will have to create a custom component which should be able to process `DataGrid` data:
 
-- `value` prop will recieve the value of the specific column
-- `row` prop will recieve the date for the entire row
-- `field` prop will recieve field confifuration data
+- `value` prop will receive the value of the specific column
+- `row` prop will receive the data for the entire row
+- `field` prop will receive field configuration data
 
 <img src="/static/toolpad/docs/building-ui/cell-component.png" width="621px" alt="Custom component" />
 

@@ -18,4 +18,3 @@ export { default as createComponent } from './createComponent.js';
 export * from './types.js';
 
 export * from './componentsContext.js';
-export { default as createQuery } from './createQuery.js';

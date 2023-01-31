@@ -56,6 +56,10 @@ const pages: MuiPage[] = [
         pathname: '/toolpad/building-ui/custom-components',
         title: 'Custom components',
       },
+      {
+        pathname: '/toolpad/building-ui/datagrid-component',
+        title: 'DataGrid component',
+      },
     ],
   },
   {

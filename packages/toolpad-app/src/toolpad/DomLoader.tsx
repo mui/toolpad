@@ -3,6 +3,7 @@ import { NodeId } from '@mui/toolpad-core';
 import { createProvidedContext } from '@mui/toolpad-core/utils/react';
 import invariant from 'invariant';
 import { debounce, DebouncedFunc } from 'lodash-es';
+import { useLocation } from 'react-router-dom';
 import * as appDom from '../appDom';
 import { update } from '../utils/immutability';
 import client from '../api';
@@ -13,14 +14,7 @@ import insecureHash from '../utils/insecureHash';
 import useEvent from '../utils/useEvent';
 import { NodeHashes } from '../types';
 import { hasFieldFocus } from '../utils/fields';
-
-export type DomView =
-  | { kind: 'page'; nodeId?: NodeId }
-  | { kind: 'query'; nodeId: NodeId }
-  | { kind: 'pageModule'; nodeId: NodeId }
-  | { kind: 'pageParameters'; nodeId: NodeId }
-  | { kind: 'connection'; nodeId: NodeId }
-  | { kind: 'codeComponent'; nodeId: NodeId };
+import { DomView, getViewFromPathname } from '../utils/domView';
 
 export type ComponentPanelTab = 'component' | 'theme';
 
@@ -367,6 +361,17 @@ export default function DomProvider({ appId, children }: DomContextProps) {
 
   invariant(dom, `Suspense should load the dom`);
 
+  const location = useLocation();
+
+  const app = appDom.getApp(dom);
+  const { pages = [] } = appDom.getChildNodes(dom, app);
+  const firstPage = pages.length > 0 ? pages[0] : null;
+
+  const initialView = getViewFromPathname(location.pathname) || {
+    kind: 'page',
+    nodeId: firstPage?.id,
+  };
+
   const [state, dispatch] = React.useReducer(domLoaderReducer, {
     saving: false,
     unsavedChanges: 0,
@@ -374,13 +379,13 @@ export default function DomProvider({ appId, children }: DomContextProps) {
     savedDom: dom,
     dom,
     selectedNodeId: null,
-    currentView: { kind: 'page' },
+    currentView: initialView,
     currentTab: 'component',
     undoStack: [
       {
         dom,
         selectedNodeId: null,
-        view: { kind: 'page' },
+        view: initialView,
         tab: 'component',
         timestamp: Date.now(),
       },

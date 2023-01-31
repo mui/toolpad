@@ -134,7 +134,7 @@ export default function QueryEditor() {
         domApi.saveNode(node);
       } else {
         domApi.update((draft) => appDom.addNode(draft, node, page, 'queries'), {
-          view: { kind: 'query', nodeId: node.id },
+          view: { kind: 'page', nodeId: page.id, view: { kind: 'query', nodeId: node.id } },
         });
       }
     },
@@ -176,8 +176,8 @@ export default function QueryEditor() {
 
   React.useEffect(() => {
     setDialogState(() => {
-      if (currentView.kind === 'query') {
-        const node = appDom.getNode(dom, currentView.nodeId, 'query');
+      if (currentView.kind === 'page' && currentView.view?.kind === 'query') {
+        const node = appDom.getNode(dom, currentView.view?.nodeId, 'query');
         return { node, isDraft: false };
       }
 
@@ -197,7 +197,11 @@ export default function QueryEditor() {
               key={queryNode.id}
               disablePadding
               onClick={() => {
-                domApi.setView({ kind: 'query', nodeId: queryNode.id });
+                domApi.setView({
+                  kind: 'page',
+                  nodeId: page.id,
+                  view: { kind: 'query', nodeId: queryNode.id },
+                });
               }}
               secondaryAction={
                 <NodeMenu

@@ -60,7 +60,7 @@ test('test batching text input actions into single undo entry', async ({
 
   clickCenter(page, input);
 
-  await editorModel.componentEditor.getByLabel('defaultValue').click();
+  await editorModel.componentEditor.getByLabel('defaultValue', { exact: true }).click();
 
   await page.keyboard.type('some value');
 
@@ -69,7 +69,7 @@ test('test batching text input actions into single undo entry', async ({
 
   await page.keyboard.type(' hello');
 
-  await editorModel.componentEditor.getByLabel('defaultValue').blur();
+  await editorModel.componentEditor.getByLabel('defaultValue', { exact: true }).blur();
 
   await expect(input).toHaveValue('some value hello');
 

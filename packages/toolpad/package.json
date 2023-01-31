@@ -7,7 +7,7 @@
     "start": "yarn cli",
     "cli": "./index.mjs",
     "dev": "tsc --pretty --watch --preserveWatchOutput",
-    "dev:13": "tsc --pretty --watch --preserveWatchOutput"
+    "dev13": "tsc --pretty --watch --preserveWatchOutput"
   },
   "files": [
     "index.mjs",

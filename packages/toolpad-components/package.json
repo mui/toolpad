@@ -23,7 +23,7 @@
     "prebuild": "rimraf dist",
     "build": "tsc",
     "dev": "tsc --pretty --watch --preserveWatchOutput",
-    "dev:13": "tsc --pretty --watch --preserveWatchOutput",
+    "dev13": "tsc --pretty --watch --preserveWatchOutput",
     "test": "echo \"Error: run tests from root\" && exit 1",
     "check-types": "tsc"
   },

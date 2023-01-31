@@ -25,7 +25,7 @@
     "deduplicate": "node scripts/deduplicate.mjs",
     "start": "dotenv cross-env FORCE_COLOR=1 yarn workspace @mui/toolpad-app start",
     "dev": "dotenv cross-env FORCE_COLOR=1 lerna -- run dev --stream --parallel --scope @mui/toolpad-core --scope @mui/toolpad-components --scope @mui/toolpad-app",
-    "dev:13": "dotenv cross-env FORCE_COLOR=1 lerna -- run dev:13 --stream --parallel",
+    "dev13": "dotenv cross-env FORCE_COLOR=1 lerna -- run dev13 --stream --parallel",
     "docs:dev": "yarn workspace docs dev",
     "docs:build": "yarn workspace docs build",
     "docs:export": "yarn workspace docs export",

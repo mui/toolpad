@@ -290,11 +290,10 @@ async function createBuilder() {
     write: true,
     bundle: true,
     metafile: true,
-    outdir: path.resolve(userProjectRoot, './.toolpad-generated/functions'),
-    // platform: 'node',
-    // packages: 'external',
+    outfile: path.resolve(userProjectRoot, './.toolpad-generated/queries.js'),
+    platform: 'node',
+    packages: 'external',
     target: 'es2022',
-    external: ['pg'],
   });
 
   async function sendRequest(msg: MessageToChildProcess) {

@@ -1,37 +1,6 @@
 {
   "root": "320kq4a",
   "nodes": {
-    "1313wn3": {
-      "id": "1313wn3",
-      "name": "getUsers",
-      "type": "query",
-      "params": [],
-      "parentId": "331kqzd",
-      "attributes": {
-        "query": {
-          "type": "const",
-          "value": {
-            "url": {
-              "type": "const",
-              "value": "http://localhost:3000/static/employees.json"
-            },
-            "method": "GET",
-            "browser": true,
-            "headers": []
-          }
-        },
-        "dataSource": {
-          "type": "const",
-          "value": "rest"
-        },
-        "connectionId": {
-          "type": "const",
-          "value": null
-        }
-      },
-      "parentProp": "queries",
-      "parentIndex": "a1"
-    },
     "320kq4a": {
       "id": "320kq4a",
       "name": "Application",
@@ -225,6 +194,31 @@
       },
       "parentProp": "children",
       "parentIndex": "a1"
+    },
+    "os03yf3": {
+      "attributes": {
+        "query": {
+          "type": "const",
+          "value": {
+            "module": "export default async function ({ parameters }: ToolpadFunctionEvent) {\n  return [\n    {\n      Name: \"Todd Breitenberg\",\n      Avatar:\n        \"https://cloudflare-ipfs.com/ipfs/Qmd3W5DuhgHirLHGVixi6V76LhCkZUz6pnFt5AJBiyvHye/avatar/793.jpg\",\n      Designation: \"International\",\n      Profile: \"http://spotless-octopus.name\",\n      ID: \"1\",\n    },\n    {\n      Name: \"Cheryl Feest\",\n      Avatar:\n        \"https://cloudflare-ipfs.com/ipfs/Qmd3W5DuhgHirLHGVixi6V76LhCkZUz6pnFt5AJBiyvHye/avatar/668.jpg\",\n      Designation: \"Product\",\n      Profile: \"http://zealous-psychoanalyst.info\",\n      ID: \"2\",\n    },\n    {\n      Name: \"Rudy Bradtke\",\n      Avatar:\n        \"https://cloudflare-ipfs.com/ipfs/Qmd3W5DuhgHirLHGVixi6V76LhCkZUz6pnFt5AJBiyvHye/avatar/1049.jpg\",\n      Designation: \"Investor\",\n      Profile: \"http://thankful-revelation.com\",\n      ID: \"3\",\n    },\n    {\n      Name: \"Desiree Osinski\",\n      Avatar:\n        \"https://cloudflare-ipfs.com/ipfs/Qmd3W5DuhgHirLHGVixi6V76LhCkZUz6pnFt5AJBiyvHye/avatar/606.jpg\",\n      Designation: \"Future\",\n      Profile: \"https://valuable-newspaper.org\",\n      ID: \"4\",\n    },\n  ];\n}\n",
+            "browser": false
+          }
+        },
+        "connectionId": {
+          "type": "const",
+          "value": null
+        },
+        "dataSource": {
+          "type": "const",
+          "value": "function"
+        }
+      },
+      "name": "getUsers",
+      "id": "os03yf3",
+      "type": "query",
+      "parentId": "331kqzd",
+      "parentProp": "queries",
+      "parentIndex": "a0"
     }
   },
   "version": 5

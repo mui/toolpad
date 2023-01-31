@@ -174,6 +174,7 @@ async function createBuilder() {
   let currentRuntimeProcess: child_process.ChildProcess | undefined;
   let controller: AbortController | undefined;
   let buildErrors: Error[] = [];
+  let runtimeError: Error | undefined;
 
   const toolpadPlugin: esbuild.Plugin = {
     name: 'toolpad',
@@ -184,7 +185,7 @@ async function createBuilder() {
       }));
 
       build.onLoad({ filter: /.*/, namespace: 'toolpad' }, async (args) => {
-        if (args.path === 'main.tsx') {
+        if (args.path === 'main.ts') {
           const contents = await createMain();
           return {
             loader: 'tsx',
@@ -231,15 +232,27 @@ async function createBuilder() {
           const outputFile = outputFileNames[0];
           const runtimeProcess = child_process.fork(`./${outputFile}`, {
             cwd: userProjectRoot,
+            silent: true,
             signal: controller.signal,
             stdio: 'inherit',
           });
+          runtimeError = undefined;
 
           runtimeProcess.on('error', (error) => {
             if (error.name === 'AbortError') {
               return;
             }
+            runtimeError = error;
             console.error(`cp ${runtimeProcess.pid} error`, error);
+          });
+
+          runtimeProcess.on('exit', (code) => {
+            if (currentRuntimeProcess === runtimeProcess) {
+              currentRuntimeProcess = undefined;
+              if (code !== 0) {
+                runtimeError = new Error(`The runtime process exited with code ${code}`);
+              }
+            }
           });
 
           runtimeProcess.on('message', (msg: MessageFromChildProcess) => {
@@ -272,12 +285,14 @@ async function createBuilder() {
 
   const ctx = await esbuild.context({
     absWorkingDir: userProjectRoot,
-    entryPoints: ['toolpad:main.tsx'],
+    entryPoints: ['toolpad:main.ts'],
     plugins: [toolpadPlugin],
     write: true,
     bundle: true,
     metafile: true,
     outdir: path.resolve(userProjectRoot, './.toolpad-generated/functions'),
+    // platform: 'node',
+    // packages: 'external',
     target: 'es2022',
     external: ['pg'],
   });
@@ -288,6 +303,8 @@ async function createBuilder() {
       if (buildErrors.length > 0) {
         const firstError = buildErrors[0];
         reject(firstError);
+      } else if (runtimeError) {
+        reject(runtimeError);
       } else if (currentRuntimeProcess) {
         const timeout = setTimeout(() => {
           pendingExecutions.delete(msg.id);
@@ -301,7 +318,7 @@ async function createBuilder() {
         });
         currentRuntimeProcess.send(msg);
       } else {
-        reject(new Error(`Not initialized`));
+        reject(new Error(`Toolpad local runtime is not running`));
       }
     });
   }

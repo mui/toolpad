@@ -74,7 +74,7 @@
     "dev:cjs": "yarn build:cjs --pretty --watch --preserveWatchOutput",
     "dev13": "yarn dev",
     "test": "echo \"Error: run tests from root\" && exit 1",
-    "check-types": "tsc"
+    "check-types": "yarn build"
   },
   "bugs": {
     "url": "https://github.com/mui/mui-toolpad/issues"

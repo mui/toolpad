@@ -4,14 +4,14 @@ import * as path from 'path';
 import { execa } from 'execa';
 import { createRequire } from 'module';
 
-interface DevCommandArgs {
+interface RunCommandArgs {
   // Toolpad port
   port?: number;
   // Whether Toolpad editor is running in dev mode (for debugging purposes only)
   devMode?: boolean;
 }
 
-function devCommand({ devMode = false, port = 3000 }: DevCommandArgs) {
+async function runApp(cmd: 'dev' | 'start', { devMode = false, port = 3000 }: RunCommandArgs) {
   const NEXT_CMD = devMode ? 'local:dev' : 'local:start';
 
   const toolpadDir = path.dirname(
@@ -24,6 +24,7 @@ function devCommand({ devMode = false, port = 3000 }: DevCommandArgs) {
     stdio: 'pipe',
     env: {
       TOOLPAD_PROJECT_DIR: process.cwd(),
+      TOOLPAD_CMD: cmd,
       FORCE_COLOR: '1',
     },
   });
@@ -33,15 +34,29 @@ function devCommand({ devMode = false, port = 3000 }: DevCommandArgs) {
   cp.stderr?.pipe(process.stdout);
 }
 
-function buildCommand() {
-  throw new Error('Not implemented');
+async function devCommand(args: RunCommandArgs) {
+  // eslint-disable-next-line no-console
+  console.log('starting toolpad application in dev mode...');
+  await runApp('dev', args);
 }
 
-function startCommand() {
-  throw new Error('Not implemented');
+async function buildCommand() {
+  // eslint-disable-next-line no-console
+  console.log('building toolpad application...');
+  await new Promise((resolve) => {
+    setTimeout(resolve, 1000);
+  });
+  // eslint-disable-next-line no-console
+  console.log('done.');
 }
 
-export default function cli(argv: string[]) {
+async function startCommand(args: RunCommandArgs) {
+  // eslint-disable-next-line no-console
+  console.log('starting toolpad application...');
+  await runApp('start', args);
+}
+
+export default async function cli(argv: string[]) {
   const args = arg(
     {
       // Types
@@ -58,19 +73,21 @@ export default function cli(argv: string[]) {
 
   const command = args._[0];
 
+  const runArgs = {
+    devMode: args['--dev'],
+    port: args['--port'],
+  };
+
   switch (command) {
     case undefined:
     case 'dev':
-      devCommand({
-        devMode: args['--dev'],
-        port: args['--port'],
-      });
+      await devCommand(runArgs);
       break;
     case 'build':
-      buildCommand();
+      await buildCommand();
       break;
     case 'start':
-      startCommand();
+      await startCommand(runArgs);
       break;
     default:
       throw new Error(`Unknown command "${command}"`);

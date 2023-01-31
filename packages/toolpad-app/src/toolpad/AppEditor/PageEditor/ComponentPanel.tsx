@@ -3,7 +3,7 @@ import { Tab, Box, styled } from '@mui/material';
 import * as React from 'react';
 import ComponentEditor from './ComponentEditor';
 import ThemeEditor from './ThemeEditor';
-import { ComponentPanelTab, useDom, useDomApi } from '../../DomLoader';
+import { ComponentPanelTab, useDom, useDomApi } from '../../AppState';
 
 const classes = {
   panel: 'Toolpad_Panel',

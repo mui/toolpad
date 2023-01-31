@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { useDom, useDomApi } from '../DomLoader';
+import { useDom, useDomApi } from '../AppState';
 import useShortcut from '../../utils/useShortcut';
 import { hasFieldFocus } from '../../utils/fields';
 

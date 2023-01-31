@@ -3,7 +3,7 @@ import { ArgTypeDefinition, BindableAttrValue } from '@mui/toolpad-core';
 import { Alert, Box } from '@mui/material';
 import { useBrowserJsRuntime } from '@mui/toolpad-core/jsBrowserRuntime';
 import * as appDom from '../../../appDom';
-import { useDomApi } from '../../DomLoader';
+import { useDomApi } from '../../AppState';
 import BindableEditor from './BindableEditor';
 import { usePageEditorState } from './PageEditorProvider';
 import { getDefaultControl } from '../../propertyControls';

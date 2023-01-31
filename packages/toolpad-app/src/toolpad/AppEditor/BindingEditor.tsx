@@ -42,7 +42,7 @@ import useLatest from '../../utils/useLatest';
 import useDebounced from '../../utils/useDebounced';
 import { useEvaluateLiveBinding } from './useEvaluateLiveBinding';
 import useShortcut from '../../utils/useShortcut';
-import { useDom } from '../DomLoader';
+import { useDom } from '../AppState';
 import * as appDom from '../../appDom';
 import { usePageEditorState } from './PageEditor/PageEditorProvider';
 import GlobalScopeExplorer from './GlobalScopeExplorer';

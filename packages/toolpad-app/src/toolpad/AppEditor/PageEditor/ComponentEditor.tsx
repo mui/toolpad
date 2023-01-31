@@ -9,7 +9,7 @@ import {
 import { ExactEntriesOf } from '../../../utils/types';
 import * as appDom from '../../../appDom';
 import NodeAttributeEditor from './NodeAttributeEditor';
-import { useDom } from '../../DomLoader';
+import { useDom } from '../../AppState';
 import { usePageEditorState } from './PageEditorProvider';
 import PageOptionsPanel from './PageOptionsPanel';
 import ErrorAlert from './ErrorAlert';

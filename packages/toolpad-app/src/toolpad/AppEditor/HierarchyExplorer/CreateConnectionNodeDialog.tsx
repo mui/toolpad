@@ -10,7 +10,7 @@ import {
 import * as React from 'react';
 import invariant from 'invariant';
 import * as appDom from '../../../appDom';
-import { useDom, useDomApi } from '../../DomLoader';
+import { useDom, useDomApi } from '../../AppState';
 import { allClientDataSources } from '../../../toolpadDataSources/client';
 import { ExactEntriesOf } from '../../../utils/types';
 import DialogForm from '../../../components/DialogForm';

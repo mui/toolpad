@@ -13,7 +13,7 @@ import {
   Rectangle,
 } from '../../../../utils/geometry';
 
-import { useDom } from '../../../DomLoader';
+import { useDom } from '../../../AppState';
 
 import {
   DROP_ZONE_CENTER,

@@ -25,7 +25,7 @@ import * as React from 'react';
 import { useForm } from 'react-hook-form';
 import invariant from 'invariant';
 import DialogForm from '../../components/DialogForm';
-import { DomLoader, useDomLoader } from '../DomLoader';
+import { DomLoader, useDomLoader } from '../AppState';
 import ToolpadShell from '../ToolpadShell';
 import PagePanel from './PagePanel';
 import client from '../../api';

@@ -21,7 +21,7 @@ import clsx from 'clsx';
 import { usePageEditorState } from '../PageEditorProvider';
 import * as appDom from '../../../../appDom';
 import dataSources from '../../../../toolpadDataSources/client';
-import { useDom, useDomApi } from '../../../DomLoader';
+import { useDom, useDomApi } from '../../../AppState';
 import ConnectionSelect, { ConnectionOption } from '../ConnectionSelect';
 import NodeMenu from '../../NodeMenu';
 import QueryNodeEditorDialog from './QueryEditorDialog';

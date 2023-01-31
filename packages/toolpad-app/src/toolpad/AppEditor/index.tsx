@@ -3,7 +3,7 @@ import { styled } from '@mui/material';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { JsRuntimeProvider } from '@mui/toolpad-core/jsServerRuntime';
 import PageEditor from './PageEditor';
-import DomProvider, { useDom } from '../DomLoader';
+import DomProvider, { useDom } from '../AppState';
 import ConnectionEditor from './ConnectionEditor';
 import AppEditorShell from './AppEditorShell';
 import CodeComponentEditor from './CodeComponentEditor';

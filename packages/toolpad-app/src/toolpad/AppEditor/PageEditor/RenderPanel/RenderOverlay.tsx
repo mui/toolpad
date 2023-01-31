@@ -5,7 +5,7 @@ import clsx from 'clsx';
 import invariant from 'invariant';
 
 import * as appDom from '../../../../appDom';
-import { useDom, useDomApi } from '../../../DomLoader';
+import { useDom, useDomApi } from '../../../AppState';
 import {
   DropZone,
   DROP_ZONE_BOTTOM,

@@ -15,7 +15,7 @@ import {
 import { useQuery } from '@tanstack/react-query';
 import invariant from 'invariant';
 import * as appDom from '../../../appDom';
-import { useDom, useDomApi } from '../../DomLoader';
+import { useDom, useDomApi } from '../../AppState';
 import { tryFormat } from '../../../utils/prettier';
 import useShortcut from '../../../utils/useShortcut';
 import usePageTitle from '../../../utils/usePageTitle';

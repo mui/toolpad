@@ -19,16 +19,15 @@ import { ConfirmDialog } from '../components/SystemDialogs';
 
 export type ComponentPanelTab = 'component' | 'theme';
 
-export type DomAction =
-  | {
-      type: 'DOM_UPDATE_HISTORY';
-    }
-  | {
-      type: 'DOM_UNDO';
-    }
-  | {
-      type: 'DOM_REDO';
-    }
+export type DomAction = {
+  type: 'DOM_UPDATE';
+  updater: (dom: appDom.AppDom) => appDom.AppDom;
+  selectedNodeId?: NodeId | null;
+  view?: DomView;
+};
+
+export type DomLoaderAction =
+  | DomAction
   | {
       type: 'DOM_SAVING';
     }
@@ -39,12 +38,18 @@ export type DomAction =
   | {
       type: 'DOM_SAVING_ERROR';
       error: string;
+    };
+
+export type AppStateAction =
+  | DomLoaderAction
+  | {
+      type: 'DOM_UPDATE_HISTORY';
     }
   | {
-      type: 'DOM_UPDATE';
-      updater: (dom: appDom.AppDom) => appDom.AppDom;
-      selectedNodeId?: NodeId | null;
-      view?: DomView;
+      type: 'DOM_UNDO';
+    }
+  | {
+      type: 'DOM_REDO';
     }
   | {
       type: 'DOM_SET_VIEW';
@@ -66,7 +71,7 @@ export type DomAction =
       hasUnsavedChanges: boolean;
     };
 
-export function domReducer(dom: appDom.AppDom, action: DomAction): appDom.AppDom {
+export function domReducer(dom: appDom.AppDom, action: AppStateAction): appDom.AppDom {
   switch (action.type) {
     case 'DOM_UPDATE': {
       return action.updater(dom);
@@ -76,18 +81,80 @@ export function domReducer(dom: appDom.AppDom, action: DomAction): appDom.AppDom
   }
 }
 
-const UNDO_HISTORY_LIMIT = 100;
+export interface DomLoader {
+  dom: appDom.AppDom;
+  savedDom: appDom.AppDom;
+  savingDom: boolean;
+  unsavedDomChanges: number;
+  saveDomError: string | null;
+}
 
-export function domLoaderReducer(state: DomLoader, action: DomAction): DomLoader {
+export interface AppState extends DomLoader {
+  selectedNodeId: NodeId | null;
+  currentView: DomView;
+  currentTab: ComponentPanelTab;
+  undoStack: UndoRedoStackEntry[];
+  redoStack: UndoRedoStackEntry[];
+  hasUnsavedChanges: boolean;
+}
+
+export type PublicAppState = Pick<
+  AppState,
+  'dom' | 'selectedNodeId' | 'currentView' | 'currentTab' | 'hasUnsavedChanges'
+>;
+
+interface UndoRedoStackEntry
+  extends Omit<PublicAppState, 'currentView' | 'currentTab' | 'hasUnsavedChanges'> {
+  view: DomView;
+  tab: ComponentPanelTab;
+  timestamp: number;
+}
+
+export function domLoaderReducer(state: DomLoader, action: AppStateAction): DomLoader {
   if (state.dom) {
     const newDom = domReducer(state.dom, action);
-    const hasUnsavedChanges = newDom !== state.dom;
+    const hasUnsavedDomChanges = newDom !== state.dom;
 
     state = update(state, {
       dom: newDom,
-      unsavedChanges: hasUnsavedChanges ? state.unsavedChanges + 1 : state.unsavedChanges,
+      unsavedDomChanges: hasUnsavedDomChanges
+        ? state.unsavedDomChanges + 1
+        : state.unsavedDomChanges,
     });
   }
+
+  switch (action.type) {
+    case 'DOM_SAVING': {
+      return update(state, {
+        savingDom: true,
+        saveDomError: null,
+      });
+    }
+    case 'DOM_SAVED': {
+      return update(state, {
+        savedDom: action.savedDom,
+        savingDom: false,
+        saveDomError: null,
+        unsavedDomChanges: 0,
+      });
+    }
+    case 'DOM_SAVING_ERROR': {
+      return update(state, {
+        savingDom: false,
+        saveDomError: action.error,
+      });
+    }
+    default:
+      return state;
+  }
+}
+
+const UNDO_HISTORY_LIMIT = 100;
+
+export function appStateReducer(state: AppState, action: AppStateAction): AppState {
+  const domLoaderState = domLoaderReducer(state, action);
+
+  state = { ...state, ...domLoaderState };
 
   switch (action.type) {
     case 'DOM_UPDATE_HISTORY': {
@@ -159,26 +226,6 @@ export function domLoaderReducer(state: DomLoader, action: DomAction): DomLoader
         redoStack,
       });
     }
-    case 'DOM_SAVING': {
-      return update(state, {
-        saving: true,
-        saveError: null,
-      });
-    }
-    case 'DOM_SAVED': {
-      return update(state, {
-        savedDom: action.savedDom,
-        saving: false,
-        saveError: null,
-        unsavedChanges: 0,
-      });
-    }
-    case 'DOM_SAVING_ERROR': {
-      return update(state, {
-        saving: false,
-        saveError: action.error,
-      });
-    }
     case 'SELECT_NODE': {
       return update(state, {
         selectedNodeId: action.nodeId,
@@ -220,8 +267,8 @@ export function domLoaderReducer(state: DomLoader, action: DomAction): DomLoader
   }
 }
 
-function createDomApi(
-  dispatch: React.Dispatch<DomAction>,
+function createAppStateApi(
+  dispatch: React.Dispatch<AppStateAction>,
   scheduleTextInputHistoryUpdate?: DebouncedFunc<() => void>,
 ) {
   return {
@@ -295,57 +342,29 @@ function createDomApi(
   };
 }
 
-export interface DomLoader {
-  dom: appDom.AppDom;
-  savedDom: appDom.AppDom;
-  saving: boolean;
-  unsavedChanges: number;
-  saveError: string | null;
-  selectedNodeId: NodeId | null;
-  currentView: DomView;
-  currentTab: ComponentPanelTab;
-  undoStack: UndoRedoStackEntry[];
-  redoStack: UndoRedoStackEntry[];
-  hasUnsavedChanges: boolean;
-}
-
 export function getNodeHashes(dom: appDom.AppDom): NodeHashes {
   return mapValues(dom.nodes, (node) => insecureHash(JSON.stringify(node)));
 }
 
-const [useDomLoader, DomLoaderProvider] = createProvidedContext<DomLoader>('DomLoader');
+const [useAppStateContext, AppStateProvider] = createProvidedContext<AppState>('AppState');
 
-const DomApiContext = React.createContext<DomApi>(createDomApi(() => undefined));
+export type AppStateApi = ReturnType<typeof createAppStateApi>;
 
-export type DomApi = ReturnType<typeof createDomApi>;
+const AppStateApiContext = React.createContext<AppStateApi>(createAppStateApi(() => undefined));
 
-export { useDomLoader };
+export { useAppStateContext };
 
-export interface DomState {
-  dom: appDom.AppDom;
-  selectedNodeId: NodeId | null;
-  currentView: DomView;
-  currentTab: ComponentPanelTab;
-  hasUnsavedChanges: boolean;
-}
+export function useAppState(): PublicAppState {
+  const { dom, selectedNodeId, currentView, currentTab, hasUnsavedChanges } = useAppStateContext();
 
-interface UndoRedoStackEntry
-  extends Omit<DomState, 'currentView' | 'currentTab' | 'hasUnsavedChanges'> {
-  view: DomView;
-  tab: ComponentPanelTab;
-  timestamp: number;
-}
-
-export function useDom(): DomState {
-  const { dom, selectedNodeId, currentView, currentTab, hasUnsavedChanges } = useDomLoader();
   if (!dom) {
     throw new Error("Trying to access the DOM before it's loaded");
   }
   return { dom, selectedNodeId, currentView, currentTab, hasUnsavedChanges };
 }
 
-export function useDomApi(): DomApi {
-  return React.useContext(DomApiContext);
+export function useAppStateApi(): AppStateApi {
+  return React.useContext(AppStateApiContext);
 }
 
 let previousUnsavedChanges = 0;
@@ -365,9 +384,9 @@ export interface DomContextProps {
   children?: React.ReactNode;
 }
 
-type DomActionType = DomAction['type'];
+type AppStateActionType = AppStateAction['type'];
 
-const UNDOABLE_ACTIONS = new Set<DomActionType>([
+const UNDOABLE_ACTIONS = new Set<AppStateActionType>([
   'DOM_UPDATE',
   'DOM_SET_VIEW',
   'DOM_SET_TAB',
@@ -375,7 +394,7 @@ const UNDOABLE_ACTIONS = new Set<DomActionType>([
   'DESELECT_NODE',
 ]);
 
-function isCancellableAction(action: DomAction): boolean {
+function isCancellableAction(action: AppStateAction): boolean {
   return Boolean(action.type === 'DOM_SET_VIEW' || (action.type === 'DOM_UPDATE' && action.view));
 }
 
@@ -395,10 +414,10 @@ export default function DomProvider({ appId, children }: DomContextProps) {
     nodeId: firstPage?.id,
   };
 
-  const [state, dispatch] = React.useReducer(domLoaderReducer, {
-    saving: false,
-    unsavedChanges: 0,
-    saveError: null,
+  const [state, dispatch] = React.useReducer(appStateReducer, {
+    savingDom: false,
+    unsavedDomChanges: 0,
+    saveDomError: null,
     savedDom: dom,
     dom,
     selectedNodeId: null,
@@ -427,9 +446,9 @@ export default function DomProvider({ appId, children }: DomContextProps) {
 
   const [isUnsavedChangesDialogVisible, setIsUnsavedChangesDialogVisible] = React.useState(false);
   const [unsavedChangesBlockedAction, setUnsavedChangesBlockedAction] =
-    React.useState<DomAction | null>(null);
+    React.useState<AppStateAction | null>(null);
 
-  const dispatchWithHistory = useEvent((action: DomAction, hasUnsavedChangesCheck = true) => {
+  const dispatchWithHistory = useEvent((action: AppStateAction, hasUnsavedChangesCheck = true) => {
     if (hasUnsavedChangesCheck && state.hasUnsavedChanges && isCancellableAction(action)) {
       setUnsavedChangesBlockedAction(action);
       setIsUnsavedChangesDialogVisible(true);
@@ -448,12 +467,12 @@ export default function DomProvider({ appId, children }: DomContextProps) {
   });
 
   const api = React.useMemo(
-    () => createDomApi(dispatchWithHistory, scheduleTextInputHistoryUpdate),
+    () => createAppStateApi(dispatchWithHistory, scheduleTextInputHistoryUpdate),
     [dispatchWithHistory, scheduleTextInputHistoryUpdate],
   );
 
   const handleSave = React.useCallback(() => {
-    if (!state.dom || state.saving || state.savedDom === state.dom) {
+    if (!state.dom || state.savingDom || state.savedDom === state.dom) {
       return;
     }
 
@@ -476,9 +495,9 @@ export default function DomProvider({ appId, children }: DomContextProps) {
   }, [state.dom, debouncedHandleSave]);
 
   React.useEffect(() => {
-    logUnsavedChanges(state.unsavedChanges);
+    logUnsavedChanges(state.unsavedDomChanges);
 
-    if (state.unsavedChanges <= 0) {
+    if (state.unsavedDomChanges <= 0) {
       return () => {};
     }
 
@@ -489,7 +508,7 @@ export default function DomProvider({ appId, children }: DomContextProps) {
 
     window.addEventListener('beforeunload', onBeforeUnload);
     return () => window.removeEventListener('beforeunload', onBeforeUnload);
-  }, [state.unsavedChanges]);
+  }, [state.unsavedDomChanges]);
 
   useShortcut({ key: 's', metaKey: true }, handleSave);
 
@@ -506,9 +525,9 @@ export default function DomProvider({ appId, children }: DomContextProps) {
 
   return (
     <React.Fragment>
-      <DomLoaderProvider value={state}>
-        <DomApiContext.Provider value={api}>{children}</DomApiContext.Provider>
-      </DomLoaderProvider>
+      <AppStateProvider value={state}>
+        <AppStateApiContext.Provider value={api}>{children}</AppStateApiContext.Provider>
+      </AppStateProvider>
       <ConfirmDialog
         title="Discard unsaved changes?"
         open={isUnsavedChangesDialogVisible}

@@ -3,7 +3,7 @@ import { styled } from '@mui/material';
 import { NodeId } from '@mui/toolpad-core';
 import * as appDom from '../../../../appDom';
 import EditorCanvasHost from '../EditorCanvasHost';
-import { getNodeHashes, useDom, useDomApi, useDomLoader } from '../../../DomLoader';
+import { getNodeHashes, useDom, useDomApi, useDomLoader } from '../../../AppState';
 import { usePageEditorApi, usePageEditorState } from '../PageEditorProvider';
 import RenderOverlay from './RenderOverlay';
 import { NodeHashes } from '../../../../types';

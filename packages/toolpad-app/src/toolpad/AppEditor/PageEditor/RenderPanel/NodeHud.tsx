@@ -13,7 +13,7 @@ import {
   RECTANGLE_EDGE_LEFT,
   RECTANGLE_EDGE_RIGHT,
 } from '../../../../utils/geometry';
-import { useDom } from '../../../DomLoader';
+import { useDom } from '../../../AppState';
 import { useToolpadComponent } from '../../toolpadComponents';
 import { getElementNodeComponentId } from '../../../../toolpadComponents';
 

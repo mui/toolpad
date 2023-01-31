@@ -2,7 +2,7 @@ import CodeIcon from '@mui/icons-material/Code';
 import { Box, Button, Dialog, DialogActions, DialogTitle, Skeleton } from '@mui/material';
 import { NodeId } from '@mui/toolpad-core';
 import * as React from 'react';
-import { useDom, useDomApi } from '../../DomLoader';
+import { useDom, useDomApi } from '../../AppState';
 import * as appDom from '../../../appDom';
 import { tryFormat } from '../../../utils/prettier';
 import useShortcut from '../../../utils/useShortcut';

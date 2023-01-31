@@ -11,7 +11,7 @@ import invariant from 'invariant';
 import * as appDom from '../../../appDom';
 import DialogForm from '../../../components/DialogForm';
 import useEvent from '../../../utils/useEvent';
-import { useDom, useDomApi } from '../../DomLoader';
+import { useDom, useDomApi } from '../../AppState';
 import { useNodeNameValidation } from './validation';
 
 const DEFAULT_NAME = 'page';

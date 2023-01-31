@@ -10,7 +10,7 @@ import { HTML_ID_EDITOR_OVERLAY } from '../../../constants';
 import { NodeHashes } from '../../../types';
 import useEvent from '../../../utils/useEvent';
 import { LogEntry } from '../../../components/Console';
-import { useDomApi } from '../../DomLoader';
+import { useDomApi } from '../../AppState';
 import createRuntimeState from '../../../createRuntimeState';
 import { ToolpadBridge, TOOLPAD_BRIDGE_GLOBAL } from '../../../canvas/ToolpadBridge';
 import CenteredSpinner from '../../../components/CenteredSpinner';

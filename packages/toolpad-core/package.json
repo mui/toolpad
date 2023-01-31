@@ -10,15 +10,51 @@
   "type": "module",
   "exports": {
     "./package.json": "./package.json",
-    ".": "./dist/index.js",
-    "./constants": "./dist/constants.js",
-    "./path": "./dist/path.js",
-    "./runtime": "./dist/runtime.js",
-    "./jsRuntime": "./dist/jsRuntime.js",
-    "./jsServerRuntime": "./dist/jsServerRuntime.js",
-    "./jsBrowserRuntime": "./dist/jsBrowserRuntime.js",
-    "./objectKey": "./dist/objectKey.js",
-    "./utils/*": "./dist/utils/*.js"
+    ".": {
+      "types": "./dist/esm/index.d.ts",
+      "import": "./dist/esm/index.js",
+      "require": "./dist/cjs/index.js"
+    },
+    "./constants": {
+      "types": "./dist/esm/constants.d.ts",
+      "import": "./dist/esm/constants.js",
+      "require": "./dist/cjs/constants.js"
+    },
+    "./path": {
+      "types": "./dist/esm/path.d.ts",
+      "import": "./dist/esm/path.js",
+      "require": "./dist/cjs/path.js"
+    },
+    "./runtime": {
+      "types": "./dist/esm/runtime.d.ts",
+      "import": "./dist/esm/runtime.js",
+      "require": "./dist/cjs/runtime.js"
+    },
+    "./jsRuntime": {
+      "types": "./dist/esm/jsRuntime.d.ts",
+      "import": "./dist/esm/jsRuntime.js",
+      "require": "./dist/cjs/jsRuntime.js"
+    },
+    "./jsServerRuntime": {
+      "types": "./dist/esm/jsServerRuntime.d.ts",
+      "import": "./dist/esm/jsServerRuntime.js",
+      "require": "./dist/cjs/jsServerRuntime.js"
+    },
+    "./jsBrowserRuntime": {
+      "types": "./dist/esm/jsBrowserRuntime.d.ts",
+      "import": "./dist/esm/jsBrowserRuntime.js",
+      "require": "./dist/cjs/jsBrowserRuntime.js"
+    },
+    "./objectKey": {
+      "types": "./dist/esm/objectKey.d.ts",
+      "import": "./dist/esm/objectKey.js",
+      "require": "./dist/cjs/objectKey.js"
+    },
+    "./utils/*": {
+      "types": "./dist/esm/utils/*.d.ts",
+      "import": "./dist/esm/utils/*.js",
+      "require": "./dist/cjs/utils/*.js"
+    }
   },
   "files": [
     "dist"
@@ -29,10 +65,15 @@
   },
   "scripts": {
     "prebuild": "rimraf dist",
-    "build": "tsc",
-    "dev": "tsc --pretty --watch --preserveWatchOutput",
+    "cjsify": "mkdir -p ./dist/cjs && echo \"{ \\\"type\\\":\\\"commonjs\\\" }\" > ./dist/cjs/package.json",
+    "build": "concurrently \"yarn:build:*\" && yarn cjsify",
+    "build:esm": "tsc --outDir dist/esm --module esnext",
+    "build:cjs": "tsc --outDir dist/cjs --module commonjs",
+    "dev": "concurrently \"yarn:dev:*\" yarn:cjsify",
+    "dev:esm": "yarn build:esm --pretty --watch --preserveWatchOutput",
+    "dev:cjs": "yarn build:cjs --pretty --watch --preserveWatchOutput",
     "test": "echo \"Error: run tests from root\" && exit 1",
-    "check-types": "tsc"
+    "check-types": "yarn build"
   },
   "bugs": {
     "url": "https://github.com/mui/mui-toolpad/issues"
@@ -44,6 +85,7 @@
     "react-error-boundary": "^3.1.4"
   },
   "devDependencies": {
+    "concurrently": "^7.6.0",
     "react": "^18.2.0"
   },
   "peerDependencies": {

@@ -18,7 +18,6 @@ import * as appDom from '../../../appDom';
 import { useDom, useDomApi } from '../../DomLoader';
 import { tryFormat } from '../../../utils/prettier';
 import useShortcut from '../../../utils/useShortcut';
-import { usePrompt } from '../../../utils/router';
 import usePageTitle from '../../../utils/usePageTitle';
 import useLatest from '../../../utils/useLatest';
 import AppThemeProvider from '../../../runtime/AppThemeProvider';
@@ -134,7 +133,7 @@ interface CodeComponentEditorContentProps {
 
 function CodeComponentEditorContent({ codeComponentNode }: CodeComponentEditorContentProps) {
   const domApi = useDomApi();
-  const { dom } = useDom();
+  const { dom, hasUnsavedChanges } = useDom();
 
   const { data: typings } = useQuery<Record<string, string>>(['/typings.json'], async () => {
     return fetch('/typings.json').then((res) => res.json());
@@ -221,10 +220,15 @@ function CodeComponentEditorContent({ codeComponentNode }: CodeComponentEditorCo
     domApi.saveNode(prettyfied);
   }, [domApi, input, isSaveAllowed]);
 
-  usePrompt(
-    'Your code has unsaved changes. Are you sure you want to navigate away? All changes will be discarded.',
-    !allChangesAreCommitted,
-  );
+  React.useEffect(() => {
+    if (!allChangesAreCommitted && !hasUnsavedChanges) {
+      domApi.setHasUnsavedChanges(true);
+    }
+
+    return () => {
+      domApi.setHasUnsavedChanges(false);
+    };
+  }, [allChangesAreCommitted, domApi, hasUnsavedChanges]);
 
   useShortcut({ key: 's', metaKey: true }, handleSave);
 

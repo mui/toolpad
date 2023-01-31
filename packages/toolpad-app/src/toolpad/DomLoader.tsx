@@ -15,6 +15,7 @@ import useEvent from '../utils/useEvent';
 import { NodeHashes } from '../types';
 import { hasFieldFocus } from '../utils/fields';
 import { DomView, getViewFromPathname } from '../utils/domView';
+import { ConfirmDialog } from '../components/SystemDialogs';
 
 export type ComponentPanelTab = 'component' | 'theme';
 
@@ -59,6 +60,10 @@ export type DomAction =
     }
   | {
       type: 'DESELECT_NODE';
+    }
+  | {
+      type: 'DOM_SET_HAS_UNSAVED_CHANGES';
+      hasUnsavedChanges: boolean;
     };
 
 export function domReducer(dom: appDom.AppDom, action: DomAction): appDom.AppDom {
@@ -205,6 +210,11 @@ export function domLoaderReducer(state: DomLoader, action: DomAction): DomLoader
         currentTab: action.tab,
       });
     }
+    case 'DOM_SET_HAS_UNSAVED_CHANGES': {
+      return update(state, {
+        hasUnsavedChanges: action.hasUnsavedChanges,
+      });
+    }
     default:
       return state;
   }
@@ -276,6 +286,12 @@ function createDomApi(
         type: 'DESELECT_NODE',
       });
     },
+    setHasUnsavedChanges(hasUnsavedChanges: boolean) {
+      dispatch({
+        type: 'DOM_SET_HAS_UNSAVED_CHANGES',
+        hasUnsavedChanges,
+      });
+    },
   };
 }
 
@@ -290,6 +306,7 @@ export interface DomLoader {
   currentTab: ComponentPanelTab;
   undoStack: UndoRedoStackEntry[];
   redoStack: UndoRedoStackEntry[];
+  hasUnsavedChanges: boolean;
 }
 
 export function getNodeHashes(dom: appDom.AppDom): NodeHashes {
@@ -309,20 +326,22 @@ export interface DomState {
   selectedNodeId: NodeId | null;
   currentView: DomView;
   currentTab: ComponentPanelTab;
+  hasUnsavedChanges: boolean;
 }
 
-interface UndoRedoStackEntry extends Omit<DomState, 'currentView' | 'currentTab'> {
+interface UndoRedoStackEntry
+  extends Omit<DomState, 'currentView' | 'currentTab' | 'hasUnsavedChanges'> {
   view: DomView;
   tab: ComponentPanelTab;
   timestamp: number;
 }
 
 export function useDom(): DomState {
-  const { dom, selectedNodeId, currentView, currentTab } = useDomLoader();
+  const { dom, selectedNodeId, currentView, currentTab, hasUnsavedChanges } = useDomLoader();
   if (!dom) {
     throw new Error("Trying to access the DOM before it's loaded");
   }
-  return { dom, selectedNodeId, currentView, currentTab };
+  return { dom, selectedNodeId, currentView, currentTab, hasUnsavedChanges };
 }
 
 export function useDomApi(): DomApi {
@@ -355,6 +374,10 @@ const UNDOABLE_ACTIONS = new Set<DomActionType>([
   'SELECT_NODE',
   'DESELECT_NODE',
 ]);
+
+function isCancellableAction(action: DomAction): boolean {
+  return Boolean(action.type === 'DOM_SET_VIEW' || (action.type === 'DOM_UPDATE' && action.view));
+}
 
 export default function DomProvider({ appId, children }: DomContextProps) {
   const { data: dom } = client.useQuery('loadDom', [appId], { suspense: true });
@@ -391,6 +414,7 @@ export default function DomProvider({ appId, children }: DomContextProps) {
       },
     ],
     redoStack: [],
+    hasUnsavedChanges: false,
   });
 
   const scheduleTextInputHistoryUpdate = React.useMemo(
@@ -401,7 +425,17 @@ export default function DomProvider({ appId, children }: DomContextProps) {
     [],
   );
 
-  const dispatchWithHistory = useEvent((action: DomAction) => {
+  const [isUnsavedChangesDialogVisible, setIsUnsavedChangesDialogVisible] = React.useState(false);
+  const [unsavedChangesBlockedAction, setUnsavedChangesBlockedAction] =
+    React.useState<DomAction | null>(null);
+
+  const dispatchWithHistory = useEvent((action: DomAction, hasUnsavedChangesCheck = true) => {
+    if (hasUnsavedChangesCheck && state.hasUnsavedChanges && isCancellableAction(action)) {
+      setUnsavedChangesBlockedAction(action);
+      setIsUnsavedChangesDialogVisible(true);
+      return;
+    }
+
     dispatch(action);
 
     if (UNDOABLE_ACTIONS.has(action.type)) {
@@ -459,9 +493,32 @@ export default function DomProvider({ appId, children }: DomContextProps) {
 
   useShortcut({ key: 's', metaKey: true }, handleSave);
 
+  const handleUpdateBlockDialogClose = React.useCallback(
+    (hasConfirmed: boolean) => {
+      if (hasConfirmed && unsavedChangesBlockedAction) {
+        dispatchWithHistory(unsavedChangesBlockedAction, false);
+        setUnsavedChangesBlockedAction(null);
+      }
+      setIsUnsavedChangesDialogVisible(false);
+    },
+    [dispatchWithHistory, unsavedChangesBlockedAction],
+  );
+
   return (
-    <DomLoaderProvider value={state}>
-      <DomApiContext.Provider value={api}>{children}</DomApiContext.Provider>
-    </DomLoaderProvider>
+    <React.Fragment>
+      <DomLoaderProvider value={state}>
+        <DomApiContext.Provider value={api}>{children}</DomApiContext.Provider>
+      </DomLoaderProvider>
+      <ConfirmDialog
+        title="Discard unsaved changes?"
+        open={isUnsavedChangesDialogVisible}
+        onClose={handleUpdateBlockDialogClose}
+        okButton="OK"
+      >
+        You have unsaved changes. Are you sure you want to navigate away?
+        <br />
+        All changes will be discarded.
+      </ConfirmDialog>
+    </React.Fragment>
   );
 }

@@ -33,7 +33,7 @@ test('can render in an iframe', async ({ api, page, baseURL }) => {
   await expect(frame.getByText('Hello World!')).toBeVisible();
 });
 
-test('can render non-existing app in an iframe', async ({ api, page, baseURL }) => {
+test('can render non-existing app in an iframe', async ({ page, baseURL }) => {
   await page.evaluate(
     ([src]) => {
       const iframe = document.createElement('iframe');

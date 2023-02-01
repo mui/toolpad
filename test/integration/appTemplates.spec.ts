@@ -12,6 +12,20 @@ test('can use default app template', async ({ page }) => {
   const runtimeModel = new ToolpadRuntime(page);
   await runtimeModel.gotoPage(app.id, 'page1');
 
+  const emptyCanvasLocator = page.getByText('Drop component here');
+  await expect(emptyCanvasLocator).not.toBeVisible();
+});
+
+test('can use hr template', async ({ page }) => {
+  const homeModel = new ToolpadHome(page);
+  await homeModel.goto();
+  const app = await homeModel.createApplication({ appTemplateId: 'hr' });
+
+  page.waitForNavigation();
+
+  const runtimeModel = new ToolpadRuntime(page);
+  await runtimeModel.gotoPage(app.id, 'page1');
+
   const dataGridRowLocator = page.getByText('Todd Breitenberg');
   await expect(dataGridRowLocator).toBeVisible();
 });

@@ -1,4 +1,4 @@
-import { BindableAttrValue, BindingEvaluationResult, JsRuntime } from './types';
+import { BindableAttrValue, BindingEvaluationResult, JsRuntime } from './types.js';
 
 export const TOOLPAD_LOADING_MARKER = '__TOOLPAD_LOADING_MARKER__';
 

@@ -1,5 +1,5 @@
-import { TOOLPAD_COMPONENT } from './constants';
-import { ComponentConfig, ToolpadComponent } from './types';
+import { TOOLPAD_COMPONENT } from './constants.js';
+import { ComponentConfig, ToolpadComponent } from './types.js';
 
 export default function createComponent<P extends object>(
   Component: React.ComponentType<P>,

@@ -42,7 +42,7 @@ export default withTM(
   withDocsInfra(
     /** @type {import('next').NextConfig  }} */ ({
       // Avoid conflicts with the other Next.js apps hosted under https://mui.com/
-      assetPrefix: process.env.DEPLOY_ENV === 'development' ? '' : '/toolpad',
+      assetPrefix: process.env.DEPLOY_ENV === 'development' ? undefined : '/toolpad',
       env: {
         LIB_VERSION: pkg.version,
         // #default-branch-switch

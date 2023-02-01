@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { BindableAttrEntries, CreateQueryConfig } from '@mui/toolpad-core';
-import { MenuItem, Stack, TextField, Typography } from '@mui/material';
+import { Button, MenuItem, Stack, TextField, Typography } from '@mui/material';
 import { useBrowserJsRuntime } from '@mui/toolpad-core/jsBrowserRuntime';
 import { ClientDataSource, QueryEditorProps } from '../../types';
 import {
@@ -72,6 +72,10 @@ function QueryEditor({
     [fetchPrivate],
   );
 
+  const openEditor = React.useCallback(() => {
+    fetchPrivate({ kind: 'openEditor' });
+  }, [fetchPrivate]);
+
   const {
     preview,
     runPreview: handleRunPreview,
@@ -92,13 +96,16 @@ function QueryEditor({
     <SplitPane split="vertical" size="50%" allowResize>
       <QueryInputPanel onRunPreview={handleRunPreview}>
         <Stack gap={2} sx={{ px: 3, pt: 1 }}>
-          <TextField select value={functionName ?? ''} onChange={handleQueryFunctionNameChange}>
-            {Object.keys(introspection.data?.functions ?? {}).map((method) => (
-              <MenuItem key={method} value={method}>
-                {method}
-              </MenuItem>
-            ))}
-          </TextField>
+          <Stack gap={2} direction="row">
+            <TextField select value={functionName ?? ''} onChange={handleQueryFunctionNameChange}>
+              {Object.keys(introspection.data?.functions ?? {}).map((method) => (
+                <MenuItem key={method} value={method}>
+                  {method}
+                </MenuItem>
+              ))}
+            </TextField>
+            <Button onClick={openEditor}>Open editor</Button>
+          </Stack>
           <Typography>Parameters:</Typography>
           <Stack gap={1}>
             {Object.entries(parameterDefs).map(([name, definiton]) => {

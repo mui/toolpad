@@ -19,6 +19,9 @@ export type LocalPrivateQuery =
     }
   | {
       kind: 'introspection';
+    }
+  | {
+      kind: 'openEditor';
     };
 
 export interface FetchResult extends ExecFetchResult<any> {

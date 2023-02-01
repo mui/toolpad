@@ -24,10 +24,10 @@ export function getConfigFilePath() {
 
 type ComponentsContent = Record<string, string>;
 
-export const QUERIES_FILES = `./toolpad/queries.ts`;
+export const QUERIES_FILE = `./toolpad/queries.ts`;
 
 function getQueriesFilePath(): string {
-  return path.resolve(getUserProjectRoot(), QUERIES_FILES);
+  return path.resolve(getUserProjectRoot(), QUERIES_FILE);
 }
 
 function getComponentFolder(): string {
@@ -207,6 +207,12 @@ export async function loadDomFromDisk(): Promise<appDom.AppDom> {
 
 export async function loadLocalDom(): Promise<appDom.AppDom> {
   return loadDomFromDisk();
+}
+
+export async function openCodeEditor(file: string): Promise<void> {
+  const userProjectRoot = getUserProjectRoot();
+  const fullPath = path.resolve(userProjectRoot, file);
+  await execFile('code', [userProjectRoot, '--goto', fullPath]);
 }
 
 export async function openCodeComponentEditor(componentName: string): Promise<void> {

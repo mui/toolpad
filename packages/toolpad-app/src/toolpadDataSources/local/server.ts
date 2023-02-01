@@ -7,7 +7,7 @@ import { indent } from '@mui/toolpad-core/utils/strings';
 import { ServerDataSource } from '../../types';
 import { LocalPrivateQuery, LocalQuery, LocalConnectionParams } from './types';
 import { Maybe } from '../../utils/types';
-import { getUserProjectRoot, QUERIES_FILES } from '../../server/localMode';
+import { getUserProjectRoot, openCodeEditor, QUERIES_FILE } from '../../server/localMode';
 import { errorFrom, serializeError } from '../../utils/errors';
 
 type MessageToChildProcess =
@@ -97,7 +97,7 @@ async function createMain(): Promise<string> {
     async function getResolvers() {
       if (!resolversPromise) {
         resolversPromise = (async () => {
-          const queries = await import(${JSON.stringify(QUERIES_FILES)})
+          const queries = await import(${JSON.stringify(QUERIES_FILE)})
 
           return new Map(Object.entries(queries).flatMap(([name, resolver]) => {
             return typeof resolver === 'function' ? [[name, resolver]] : []
@@ -350,6 +350,8 @@ async function execPrivate(connection: Maybe<LocalConnectionParams>, query: Loca
       return introspect();
     case 'debugExec':
       return execBase(connection, query.query, query.params);
+    case 'openEditor':
+      return openCodeEditor(QUERIES_FILE);
     default:
       throw new Error(`Unknown private query "${(query as LocalPrivateQuery).kind}"`);
   }

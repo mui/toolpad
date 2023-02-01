@@ -972,6 +972,7 @@ export default function ToolpadApp({
             {version === 'preview' && !hidePreviewBanner ? (
               <ThemeProvider>
                 <Header
+                  enableUserFeedback={false}
                   actions={
                     <Stack direction="row" spacing={1} alignItems="center">
                       <Typography variant="body2" sx={{ color: 'primary.main' }}>

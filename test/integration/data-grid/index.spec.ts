@@ -47,6 +47,7 @@ test('Column prop updates are not lost on drag interactions', async ({
   // Change the "Avatar" column type from "link" to "boolean"
 
   const firstGridLocator = canvasGridLocator.first();
+
   await clickCenter(page, firstGridLocator);
 
   await editorModel.componentEditor.locator('button:has-text("columns")').click();
@@ -57,7 +58,7 @@ test('Column prop updates are not lost on drag interactions', async ({
 
   await editorModel.page.getByRole('option', { name: 'boolean' }).click();
 
-  await clickCenter(page, firstGridLocator);
+  await page.keyboard.press('Escape');
 
   // Drag the "Avatar" column to the end of the grid
 

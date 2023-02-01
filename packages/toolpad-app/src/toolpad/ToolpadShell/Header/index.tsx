@@ -60,6 +60,8 @@ function Header({ actions, status }: HeaderProps) {
                   lineHeight: '21px',
                   fontSize: '16px',
                   fontWeight: 700,
+                  letterSpacing: 0,
+                  fontFamily: theme.typography.fontFamily,
                 }}
               >
                 MUI Toolpad

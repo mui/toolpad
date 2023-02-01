@@ -73,6 +73,7 @@
 For now using this to publish
 
 ```sh
+yarn release:build
 yarn lerna publish --force-publish --no-git-tag-version --no-push
 ```
 

@@ -9,7 +9,7 @@ test.use({
   ],
 });
 
-test.only('can render in an iframe', async ({ api, page, baseURL }) => {
+test('can render in an iframe', async ({ api, page, baseURL }) => {
   const dom = await readJsonFile(path.resolve(__dirname, './dom.json'));
 
   const app = await api.mutation.createApp(`App ${generateId()}`, {
@@ -33,7 +33,7 @@ test.only('can render in an iframe', async ({ api, page, baseURL }) => {
   await expect(frame.getByText('Hello World!')).toBeVisible();
 });
 
-test.only('can render non-existing app in an iframe', async ({ api, page, baseURL }) => {
+test('can render non-existing app in an iframe', async ({ api, page, baseURL }) => {
   await page.evaluate(
     ([src]) => {
       const iframe = document.createElement('iframe');

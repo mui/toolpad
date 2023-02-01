@@ -3,7 +3,7 @@ import { test, expect } from '../playwright/test';
 
 const userAgent = 'Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)';
 
-test('can render in an iframe', async ({ baseURL }) => {
+test('can render in an iframe', async ({ baseURL, browserName }) => {
   if (browserName !== 'chromium') {
     test.skip(true, 'No use, test HTTP statuses');
   }

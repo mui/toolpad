@@ -40,11 +40,7 @@ test('test basic undo and redo', async ({ page, api }) => {
   await expect(canvasInputLocator).toHaveCount(3);
 });
 
-test('test batching text input actions into single undo entry', async ({
-  page,
-  browserName,
-  api,
-}) => {
+test('test batching text input actions into single undo entry', async ({ page, api }) => {
   const dom = await readJsonFile(path.resolve(__dirname, './dom.json'));
 
   const app = await api.mutation.createApp(`App ${generateId()}`, {

@@ -9,7 +9,7 @@ import {
 import { ExactEntriesOf } from '../../../utils/types';
 import * as appDom from '../../../appDom';
 import NodeAttributeEditor from './NodeAttributeEditor';
-import { useDom } from '../../AppState';
+import { useDom, useEditorState } from '../../AppState';
 import { usePageEditorState } from './PageEditorProvider';
 import PageOptionsPanel from './PageOptionsPanel';
 import ErrorAlert from './ErrorAlert';
@@ -170,7 +170,8 @@ export interface ComponentEditorProps {
 }
 
 export default function ComponentEditor({ className }: ComponentEditorProps) {
-  const { dom, selectedNodeId } = useDom();
+  const { dom } = useDom();
+  const { selectedNodeId } = useEditorState();
 
   const selectedNode = selectedNodeId ? appDom.getMaybeNode(dom, selectedNodeId) : null;
 

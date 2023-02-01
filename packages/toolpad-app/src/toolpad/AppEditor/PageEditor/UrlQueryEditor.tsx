@@ -10,7 +10,7 @@ import * as React from 'react';
 import AddIcon from '@mui/icons-material/Add';
 import { NodeId } from '@mui/toolpad-core';
 import * as appDom from '../../../appDom';
-import { useDom, useDomApi } from '../../AppState';
+import { useDom, useDomApi, useEditorState, useEditorStateApi } from '../../AppState';
 import MapEntriesEditor from '../../../components/MapEntriesEditor';
 import useBoolean from '../../../utils/useBoolean';
 
@@ -19,8 +19,11 @@ export interface UrlQueryEditorProps {
 }
 
 export default function UrlQueryEditor({ pageNodeId }: UrlQueryEditorProps) {
-  const { dom, currentView } = useDom();
+  const { dom } = useDom();
+  const { currentView } = useEditorState();
+
   const domApi = useDomApi();
+  const editorStateApi = useEditorStateApi();
 
   const page = appDom.getNode(dom, pageNodeId, 'page');
 
@@ -35,16 +38,16 @@ export default function UrlQueryEditor({ pageNodeId }: UrlQueryEditorProps) {
   }, [isDialogOpen, value]);
 
   const handleButtonClick = React.useCallback(() => {
-    domApi.setView({
+    editorStateApi.setView({
       kind: 'page',
       nodeId: pageNodeId,
       view: { kind: 'pageParameters' },
     });
-  }, [domApi, pageNodeId]);
+  }, [editorStateApi, pageNodeId]);
 
   const handleDialogClose = React.useCallback(() => {
-    domApi.setView({ kind: 'page', nodeId: pageNodeId });
-  }, [domApi, pageNodeId]);
+    editorStateApi.setView({ kind: 'page', nodeId: pageNodeId });
+  }, [editorStateApi, pageNodeId]);
 
   const handleSave = React.useCallback(() => {
     domApi.update((draft) =>

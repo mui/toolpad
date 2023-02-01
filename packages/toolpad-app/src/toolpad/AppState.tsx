@@ -17,17 +17,20 @@ import { hasFieldFocus } from '../utils/fields';
 import { DomView, getViewFromPathname } from '../utils/domView';
 import { ConfirmDialog } from '../components/SystemDialogs';
 
+export function getNodeHashes(dom: appDom.AppDom): NodeHashes {
+  return mapValues(dom.nodes, (node) => insecureHash(JSON.stringify(node)));
+}
+
 export type ComponentPanelTab = 'component' | 'theme';
 
 export type DomAction = {
-  type: 'DOM_UPDATE';
-  updater: (dom: appDom.AppDom) => appDom.AppDom;
+  type: 'UPDATE';
+  updater?: (dom: appDom.AppDom) => appDom.AppDom;
   selectedNodeId?: NodeId | null;
   view?: DomView;
 };
 
 export type DomLoaderAction =
-  | DomAction
   | {
       type: 'DOM_SAVING';
     }
@@ -40,23 +43,22 @@ export type DomLoaderAction =
       error: string;
     };
 
-export type AppStateAction =
-  | DomLoaderAction
+export type EditorStateAction =
   | {
-      type: 'DOM_UPDATE_HISTORY';
+      type: 'UPDATE_HISTORY';
     }
   | {
-      type: 'DOM_UNDO';
+      type: 'UNDO';
     }
   | {
-      type: 'DOM_REDO';
+      type: 'REDO';
     }
   | {
-      type: 'DOM_SET_VIEW';
+      type: 'SET_VIEW';
       view: DomView;
     }
   | {
-      type: 'DOM_SET_TAB';
+      type: 'SET_TAB';
       tab: ComponentPanelTab;
     }
   | {
@@ -67,14 +69,16 @@ export type AppStateAction =
       type: 'DESELECT_NODE';
     }
   | {
-      type: 'DOM_SET_HAS_UNSAVED_CHANGES';
+      type: 'SET_HAS_UNSAVED_CHANGES';
       hasUnsavedChanges: boolean;
     };
 
+type AppStateAction = DomAction | DomLoaderAction | EditorStateAction;
+
 export function domReducer(dom: appDom.AppDom, action: AppStateAction): appDom.AppDom {
   switch (action.type) {
-    case 'DOM_UPDATE': {
-      return action.updater(dom);
+    case 'UPDATE': {
+      return action.updater ? action.updater(dom) : dom;
     }
     default:
       return dom;
@@ -87,27 +91,6 @@ export interface DomLoader {
   savingDom: boolean;
   unsavedDomChanges: number;
   saveDomError: string | null;
-}
-
-export interface AppState extends DomLoader {
-  selectedNodeId: NodeId | null;
-  currentView: DomView;
-  currentTab: ComponentPanelTab;
-  undoStack: UndoRedoStackEntry[];
-  redoStack: UndoRedoStackEntry[];
-  hasUnsavedChanges: boolean;
-}
-
-export type PublicAppState = Pick<
-  AppState,
-  'dom' | 'selectedNodeId' | 'currentView' | 'currentTab' | 'hasUnsavedChanges'
->;
-
-interface UndoRedoStackEntry
-  extends Omit<PublicAppState, 'currentView' | 'currentTab' | 'hasUnsavedChanges'> {
-  view: DomView;
-  tab: ComponentPanelTab;
-  timestamp: number;
 }
 
 export function domLoaderReducer(state: DomLoader, action: AppStateAction): DomLoader {
@@ -149,6 +132,27 @@ export function domLoaderReducer(state: DomLoader, action: AppStateAction): DomL
   }
 }
 
+export interface AppState extends DomLoader {
+  selectedNodeId: NodeId | null;
+  currentView: DomView;
+  currentTab: ComponentPanelTab;
+  undoStack: UndoRedoStackEntry[];
+  redoStack: UndoRedoStackEntry[];
+  hasUnsavedChanges: boolean;
+}
+
+export type EditorState = Pick<
+  AppState,
+  'dom' | 'selectedNodeId' | 'currentView' | 'currentTab' | 'hasUnsavedChanges'
+>;
+
+interface UndoRedoStackEntry
+  extends Omit<EditorState, 'currentView' | 'currentTab' | 'hasUnsavedChanges'> {
+  view: DomView;
+  tab: ComponentPanelTab;
+  timestamp: number;
+}
+
 const UNDO_HISTORY_LIMIT = 100;
 
 export function appStateReducer(state: AppState, action: AppStateAction): AppState {
@@ -157,7 +161,7 @@ export function appStateReducer(state: AppState, action: AppStateAction): AppSta
   state = { ...state, ...domLoaderState };
 
   switch (action.type) {
-    case 'DOM_UPDATE_HISTORY': {
+    case 'UPDATE_HISTORY': {
       const updatedUndoStack = [
         ...state.undoStack,
         {
@@ -178,7 +182,7 @@ export function appStateReducer(state: AppState, action: AppStateAction): AppSta
         redoStack: [],
       });
     }
-    case 'DOM_UNDO': {
+    case 'UNDO': {
       const undoStack = [...state.undoStack];
       const redoStack = [...state.redoStack];
 
@@ -205,7 +209,7 @@ export function appStateReducer(state: AppState, action: AppStateAction): AppSta
         redoStack,
       });
     }
-    case 'DOM_REDO': {
+    case 'REDO': {
       const undoStack = [...state.undoStack];
       const redoStack = [...state.redoStack];
 
@@ -237,7 +241,7 @@ export function appStateReducer(state: AppState, action: AppStateAction): AppSta
         selectedNodeId: null,
       });
     }
-    case 'DOM_UPDATE': {
+    case 'UPDATE': {
       const { selectedNodeId, view } = action;
 
       return update(state, {
@@ -247,17 +251,17 @@ export function appStateReducer(state: AppState, action: AppStateAction): AppSta
         ...(view ? { currentView: view } : {}),
       });
     }
-    case 'DOM_SET_VIEW': {
+    case 'SET_VIEW': {
       return update(state, {
         currentView: action.view,
       });
     }
-    case 'DOM_SET_TAB': {
+    case 'SET_TAB': {
       return update(state, {
         currentTab: action.tab,
       });
     }
-    case 'DOM_SET_HAS_UNSAVED_CHANGES': {
+    case 'SET_HAS_UNSAVED_CHANGES': {
       return update(state, {
         hasUnsavedChanges: action.hasUnsavedChanges,
       });
@@ -267,28 +271,8 @@ export function appStateReducer(state: AppState, action: AppStateAction): AppSta
   }
 }
 
-function createAppStateApi(
-  dispatch: React.Dispatch<AppStateAction>,
-  scheduleTextInputHistoryUpdate?: DebouncedFunc<() => void>,
-) {
+function createAppStateApi(dispatch: React.Dispatch<AppStateAction>) {
   return {
-    undo() {
-      scheduleTextInputHistoryUpdate?.flush();
-
-      dispatch({ type: 'DOM_UNDO' });
-    },
-    redo() {
-      dispatch({ type: 'DOM_REDO' });
-    },
-    setNodeName(nodeId: NodeId, name: string) {
-      dispatch({
-        type: 'DOM_UPDATE',
-        updater(dom) {
-          const node = appDom.getNode(dom, nodeId);
-          return appDom.setNodeName(dom, node, name);
-        },
-      });
-    },
     update(
       updater: (dom: appDom.AppDom) => appDom.AppDom,
       extraUpdates: {
@@ -297,29 +281,72 @@ function createAppStateApi(
       } = {},
     ) {
       dispatch({
-        type: 'DOM_UPDATE',
+        type: 'UPDATE',
         updater,
         ...extraUpdates,
       });
     },
+  };
+}
+
+function createDomApi(dispatch: React.Dispatch<AppStateAction>) {
+  return {
+    update(updater: (dom: appDom.AppDom) => appDom.AppDom) {
+      dispatch({
+        type: 'UPDATE',
+        updater,
+      });
+    },
+    setNodeName(nodeId: NodeId, name: string) {
+      dispatch({
+        type: 'UPDATE',
+        updater(dom) {
+          const node = appDom.getNode(dom, nodeId);
+          return appDom.setNodeName(dom, node, name);
+        },
+      });
+    },
+    saveNode(node: appDom.AppDomNode) {
+      dispatch({
+        type: 'UPDATE',
+        updater(dom) {
+          return appDom.saveNode(dom, node);
+        },
+      });
+    },
+  };
+}
+
+function createEditorApi(
+  dispatch: React.Dispatch<AppStateAction>,
+  scheduleTextInputHistoryUpdate?: DebouncedFunc<() => void>,
+) {
+  return {
+    update(view?: DomView, selectedNodeId?: NodeId | null) {
+      dispatch({
+        type: 'UPDATE',
+        view,
+        selectedNodeId,
+      });
+    },
+    undo() {
+      scheduleTextInputHistoryUpdate?.flush();
+
+      dispatch({ type: 'UNDO' });
+    },
+    redo() {
+      dispatch({ type: 'REDO' });
+    },
     setView(view: DomView) {
       dispatch({
-        type: 'DOM_SET_VIEW',
+        type: 'SET_VIEW',
         view,
       });
     },
     setTab(tab: ComponentPanelTab) {
       dispatch({
-        type: 'DOM_SET_TAB',
+        type: 'SET_TAB',
         tab,
-      });
-    },
-    saveNode(node: appDom.AppDomNode) {
-      dispatch({
-        type: 'DOM_UPDATE',
-        updater(dom) {
-          return appDom.saveNode(dom, node);
-        },
       });
     },
     selectNode(nodeId: NodeId) {
@@ -335,36 +362,67 @@ function createAppStateApi(
     },
     setHasUnsavedChanges(hasUnsavedChanges: boolean) {
       dispatch({
-        type: 'DOM_SET_HAS_UNSAVED_CHANGES',
+        type: 'SET_HAS_UNSAVED_CHANGES',
         hasUnsavedChanges,
       });
     },
   };
 }
 
-export function getNodeHashes(dom: appDom.AppDom): NodeHashes {
-  return mapValues(dom.nodes, (node) => insecureHash(JSON.stringify(node)));
-}
-
 const [useAppStateContext, AppStateProvider] = createProvidedContext<AppState>('AppState');
 
-export type AppStateApi = ReturnType<typeof createAppStateApi>;
+export function useDom(): Pick<AppState, 'dom'> {
+  const { dom } = useAppStateContext();
 
-const AppStateApiContext = React.createContext<AppStateApi>(createAppStateApi(() => undefined));
+  if (!dom) {
+    throw new Error("Trying to access the DOM before it's loaded");
+  }
 
-export { useAppStateContext };
+  return { dom };
+}
 
-export function useAppState(): PublicAppState {
+export function useDomLoader(): DomLoader {
+  const { dom, savedDom, savingDom, unsavedDomChanges, saveDomError } = useAppStateContext();
+
+  if (!dom) {
+    throw new Error("Trying to access the DOM before it's loaded");
+  }
+
+  return { dom, savedDom, savingDom, unsavedDomChanges, saveDomError };
+}
+
+export function useEditorState(): EditorState {
   const { dom, selectedNodeId, currentView, currentTab, hasUnsavedChanges } = useAppStateContext();
 
   if (!dom) {
     throw new Error("Trying to access the DOM before it's loaded");
   }
+
   return { dom, selectedNodeId, currentView, currentTab, hasUnsavedChanges };
 }
 
+const AppStateApiContext = React.createContext<AppStateApi>(createAppStateApi(() => undefined));
+
+export type AppStateApi = ReturnType<typeof createAppStateApi>;
+
 export function useAppStateApi(): AppStateApi {
   return React.useContext(AppStateApiContext);
+}
+
+const DomApiContext = React.createContext<DomApi>(createDomApi(() => undefined));
+
+export type DomApi = ReturnType<typeof createDomApi>;
+
+export function useDomApi(): DomApi {
+  return React.useContext(DomApiContext);
+}
+
+const EditorStateApiContext = React.createContext<EditorStateApi>(createEditorApi(() => undefined));
+
+export type EditorStateApi = ReturnType<typeof createEditorApi>;
+
+export function useEditorStateApi(): EditorStateApi {
+  return React.useContext(EditorStateApiContext);
 }
 
 let previousUnsavedChanges = 0;
@@ -379,29 +437,29 @@ function logUnsavedChanges(unsavedChanges: number) {
   previousUnsavedChanges = unsavedChanges;
 }
 
-export interface DomContextProps {
-  appId: string;
-  children?: React.ReactNode;
-}
-
 type AppStateActionType = AppStateAction['type'];
 
 const UNDOABLE_ACTIONS = new Set<AppStateActionType>([
-  'DOM_UPDATE',
-  'DOM_SET_VIEW',
-  'DOM_SET_TAB',
+  'UPDATE',
+  'SET_VIEW',
+  'SET_TAB',
   'SELECT_NODE',
   'DESELECT_NODE',
 ]);
 
 function isCancellableAction(action: AppStateAction): boolean {
-  return Boolean(action.type === 'DOM_SET_VIEW' || (action.type === 'DOM_UPDATE' && action.view));
+  return Boolean(action.type === 'SET_VIEW' || (action.type === 'UPDATE' && action.view));
 }
 
-export default function DomProvider({ appId, children }: DomContextProps) {
+export interface DomContextProps {
+  appId: string;
+  children?: React.ReactNode;
+}
+
+export default function AppProvider({ appId, children }: DomContextProps) {
   const { data: dom } = client.useQuery('loadDom', [appId], { suspense: true });
 
-  invariant(dom, `Suspense should load the dom`);
+  invariant(dom, 'Suspense should load the dom');
 
   const location = useLocation();
 
@@ -415,11 +473,14 @@ export default function DomProvider({ appId, children }: DomContextProps) {
   };
 
   const [state, dispatch] = React.useReducer(appStateReducer, {
+    // DOM state
+    dom,
+    // DOM loader state
     savingDom: false,
     unsavedDomChanges: 0,
     saveDomError: null,
     savedDom: dom,
-    dom,
+    // Editor state
     selectedNodeId: null,
     currentView: initialView,
     currentTab: 'component',
@@ -439,7 +500,7 @@ export default function DomProvider({ appId, children }: DomContextProps) {
   const scheduleTextInputHistoryUpdate = React.useMemo(
     () =>
       debounce(() => {
-        dispatch({ type: 'DOM_UPDATE_HISTORY' });
+        dispatch({ type: 'UPDATE_HISTORY' });
       }, 500),
     [],
   );
@@ -461,13 +522,18 @@ export default function DomProvider({ appId, children }: DomContextProps) {
       if (hasFieldFocus()) {
         scheduleTextInputHistoryUpdate();
       } else {
-        dispatch({ type: 'DOM_UPDATE_HISTORY' });
+        dispatch({ type: 'UPDATE_HISTORY' });
       }
     }
   });
 
-  const api = React.useMemo(
-    () => createAppStateApi(dispatchWithHistory, scheduleTextInputHistoryUpdate),
+  const appStateApi = React.useMemo(
+    () => createAppStateApi(dispatchWithHistory),
+    [dispatchWithHistory],
+  );
+  const domApi = React.useMemo(() => createDomApi(dispatchWithHistory), [dispatchWithHistory]);
+  const editorApi = React.useMemo(
+    () => createEditorApi(dispatchWithHistory, scheduleTextInputHistoryUpdate),
     [dispatchWithHistory, scheduleTextInputHistoryUpdate],
   );
 
@@ -526,8 +592,15 @@ export default function DomProvider({ appId, children }: DomContextProps) {
   return (
     <React.Fragment>
       <AppStateProvider value={state}>
-        <AppStateApiContext.Provider value={api}>{children}</AppStateApiContext.Provider>
+        <AppStateApiContext.Provider value={appStateApi}>
+          <DomApiContext.Provider value={domApi}>
+            <EditorStateApiContext.Provider value={editorApi}>
+              {children}
+            </EditorStateApiContext.Provider>
+          </DomApiContext.Provider>
+        </AppStateApiContext.Provider>
       </AppStateProvider>
+
       <ConfirmDialog
         title="Discard unsaved changes?"
         open={isUnsavedChangesDialogVisible}

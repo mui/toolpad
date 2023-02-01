@@ -11,7 +11,7 @@ import invariant from 'invariant';
 import * as appDom from '../../../appDom';
 import DialogForm from '../../../components/DialogForm';
 import useEvent from '../../../utils/useEvent';
-import { useDom, useDomApi } from '../../AppState';
+import { useAppStateApi, useDom } from '../../AppState';
 import { useNodeNameValidation } from './validation';
 
 const DEFAULT_NAME = 'page';
@@ -29,7 +29,7 @@ export default function CreatePageDialog({
   ...props
 }: CreatePageDialogProps) {
   const { dom } = useDom();
-  const domApi = useDomApi();
+  const appStateApi = useAppStateApi();
 
   const existingNames = React.useMemo(
     () => appDom.getExistingNamesForChildren(dom, appDom.getApp(dom), 'pages'),
@@ -67,7 +67,7 @@ export default function CreatePageDialog({
           });
           const appNode = appDom.getApp(dom);
 
-          domApi.update((draft) => appDom.addNode(draft, newNode, appNode, 'pages'), {
+          appStateApi.update((draft) => appDom.addNode(draft, newNode, appNode, 'pages'), {
             view: {
               kind: 'page',
               nodeId: newNode.id,

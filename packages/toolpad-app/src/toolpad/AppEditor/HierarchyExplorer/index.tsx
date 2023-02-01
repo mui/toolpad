@@ -10,7 +10,7 @@ import { NodeId } from '@mui/toolpad-core';
 import clsx from 'clsx';
 import invariant from 'invariant';
 import * as appDom from '../../../appDom';
-import { useDom, useDomApi } from '../../AppState';
+import { useAppStateApi, useDom, useEditorState, useEditorStateApi } from '../../AppState';
 import CreatePageNodeDialog from './CreatePageNodeDialog';
 import CreateCodeComponentNodeDialog from './CreateCodeComponentNodeDialog';
 import CreateConnectionNodeDialog from './CreateConnectionNodeDialog';
@@ -126,8 +126,11 @@ export interface HierarchyExplorerProps {
 }
 
 export default function HierarchyExplorer({ appId, className }: HierarchyExplorerProps) {
-  const { dom, currentView } = useDom();
-  const domApi = useDomApi();
+  const { dom } = useDom();
+  const { currentView } = useEditorState();
+
+  const appStateApi = useAppStateApi();
+  const editorStateApi = useEditorStateApi();
 
   const app = appDom.getApp(dom);
   const { codeComponents = [], pages = [], connections = [] } = appDom.getChildNodes(dom, app);
@@ -159,20 +162,20 @@ export default function HierarchyExplorer({ appId, className }: HierarchyExplore
       // TODO: sort out in-page selection
       const page = appDom.getPageAncestor(dom, node);
       if (page) {
-        domApi.setView({ kind: 'page', nodeId: page.id });
+        editorStateApi.setView({ kind: 'page', nodeId: page.id });
       }
     }
 
     if (appDom.isPage(node)) {
-      domApi.setView({ kind: 'page', nodeId: node.id });
+      editorStateApi.setView({ kind: 'page', nodeId: node.id });
     }
 
     if (appDom.isCodeComponent(node)) {
-      domApi.setView({ kind: 'codeComponent', nodeId: node.id });
+      editorStateApi.setView({ kind: 'codeComponent', nodeId: node.id });
     }
 
     if (appDom.isConnection(node)) {
-      domApi.setView({ kind: 'connection', nodeId: node.id });
+      editorStateApi.setView({ kind: 'connection', nodeId: node.id });
     }
   };
 
@@ -213,11 +216,11 @@ export default function HierarchyExplorer({ appId, className }: HierarchyExplore
         domViewAfterDelete = firstSiblingOfType && getNodeEditorDomView(firstSiblingOfType);
       }
 
-      domApi.update((draft) => appDom.removeNode(draft, nodeId), {
+      appStateApi.update((draft) => appDom.removeNode(draft, nodeId), {
         view: domViewAfterDelete || { kind: 'page' },
       });
     },
-    [activeNode, dom, domApi],
+    [activeNode, appStateApi, dom],
   );
 
   const handleDuplicateNode = React.useCallback(
@@ -234,14 +237,14 @@ export default function HierarchyExplorer({ appId, className }: HierarchyExplore
       const newNode = appDom.getNode(fragment, fragment.root);
       const editorDomView = getNodeEditorDomView(newNode);
 
-      domApi.update(
+      appStateApi.update(
         (draft) => appDom.addFragment(draft, fragment, node.parentId!, node.parentProp!),
         {
           view: editorDomView || { kind: 'page' },
         },
       );
     },
-    [dom, domApi],
+    [appStateApi, dom],
   );
 
   const hasConnectionsView = !config.isDemo;

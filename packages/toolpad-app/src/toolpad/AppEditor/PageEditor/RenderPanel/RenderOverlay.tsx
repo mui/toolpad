@@ -5,7 +5,13 @@ import clsx from 'clsx';
 import invariant from 'invariant';
 
 import * as appDom from '../../../../appDom';
-import { useDom, useDomApi } from '../../../AppState';
+import {
+  useAppStateApi,
+  useDom,
+  useDomApi,
+  useEditorState,
+  useEditorStateApi,
+} from '../../../AppState';
 import {
   DropZone,
   DROP_ZONE_BOTTOM,
@@ -272,8 +278,12 @@ interface RenderOverlayProps {
 }
 
 export default function RenderOverlay({ bridge }: RenderOverlayProps) {
-  const { dom, selectedNodeId } = useDom();
+  const { dom } = useDom();
+  const { selectedNodeId } = useEditorState();
+
   const domApi = useDomApi();
+  const appStateApi = useAppStateApi();
+  const editorStateApi = useEditorStateApi();
   const api = usePageEditorApi();
   const {
     viewState,
@@ -366,17 +376,17 @@ export default function RenderOverlay({ bridge }: RenderOverlayProps) {
   const selectNode = React.useCallback(
     (nodeId: NodeId) => {
       if (selectedNodeId !== nodeId) {
-        domApi.selectNode(nodeId);
+        editorStateApi.selectNode(nodeId);
       }
     },
-    [domApi, selectedNodeId],
+    [editorStateApi, selectedNodeId],
   );
 
   const deselectNode = React.useCallback(() => {
     if (selectedNodeId) {
-      domApi.deselectNode();
+      editorStateApi.deselectNode();
     }
-  }, [domApi, selectedNodeId]);
+  }, [editorStateApi, selectedNodeId]);
 
   const handleNodeMouseUp = React.useCallback(
     (event: React.MouseEvent<HTMLDivElement>) => {
@@ -404,7 +414,7 @@ export default function RenderOverlay({ bridge }: RenderOverlayProps) {
         event.stopPropagation();
       }
 
-      domApi.update(
+      appStateApi.update(
         (draft) => {
           const toRemove = appDom.getNode(draft, nodeId);
 
@@ -420,7 +430,7 @@ export default function RenderOverlay({ bridge }: RenderOverlayProps) {
         },
       );
     },
-    [dom, domApi, normalizePageRowColumnSizes],
+    [appStateApi, dom, normalizePageRowColumnSizes],
   );
 
   const selectedRect = selectedNode && !newNode ? nodesInfo[selectedNode.id]?.rect : null;
@@ -955,7 +965,7 @@ export default function RenderOverlay({ bridge }: RenderOverlayProps) {
       const isDraggingOverLayoutSlot = dragOverSlot?.type === 'layout';
       const isDraggingOverElement = appDom.isElement(dragOverNode);
 
-      domApi.update(
+      appStateApi.update(
         (draft) => {
           let parent = appDom.getParent(draft, dragOverNode);
 
@@ -1226,10 +1236,10 @@ export default function RenderOverlay({ bridge }: RenderOverlayProps) {
     },
     [
       api,
+      appStateApi,
       availableDropZones,
-      bridge,
+      bridge?.canvasCommands,
       dom,
-      domApi,
       dragOverNodeId,
       dragOverSlotParentProp,
       dragOverZone,

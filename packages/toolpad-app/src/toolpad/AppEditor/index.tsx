@@ -3,7 +3,7 @@ import { styled } from '@mui/material';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { JsRuntimeProvider } from '@mui/toolpad-core/jsServerRuntime';
 import PageEditor from './PageEditor';
-import DomProvider, { useDom } from '../AppState';
+import DomProvider, { useEditorState } from '../AppState';
 import ConnectionEditor from './ConnectionEditor';
 import AppEditorShell from './AppEditorShell';
 import CodeComponentEditor from './CodeComponentEditor';
@@ -43,7 +43,7 @@ interface FileEditorProps {
 }
 
 function FileEditor({ appId }: FileEditorProps) {
-  const { currentView } = useDom();
+  const { currentView } = useEditorState();
 
   const location = useLocation();
   const navigate = useNavigate();

@@ -10,7 +10,7 @@ import {
 import * as React from 'react';
 import invariant from 'invariant';
 import * as appDom from '../../../appDom';
-import { useDom, useDomApi } from '../../AppState';
+import { useAppStateApi, useDom } from '../../AppState';
 import { allClientDataSources } from '../../../toolpadDataSources/client';
 import { ExactEntriesOf } from '../../../utils/types';
 import DialogForm from '../../../components/DialogForm';
@@ -34,7 +34,7 @@ export default function CreateConnectionDialog({
   ...props
 }: CreateConnectionDialogProps) {
   const { dom } = useDom();
-  const domApi = useDomApi();
+  const appStateApi = useAppStateApi();
 
   const existingNames = React.useMemo(
     () => appDom.getExistingNamesForChildren(dom, appDom.getApp(dom), 'connections'),
@@ -80,7 +80,7 @@ export default function CreateConnectionDialog({
           });
           const appNode = appDom.getApp(dom);
 
-          domApi.update((draft) => appDom.addNode(draft, newNode, appNode, 'connections'), {
+          appStateApi.update((draft) => appDom.addNode(draft, newNode, appNode, 'connections'), {
             view: {
               kind: 'connection',
               nodeId: newNode.id,

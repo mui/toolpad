@@ -110,7 +110,7 @@ function CreateReleaseDialog({ appId, open, onClose }: CreateReleaseDialogProps)
 }
 
 function getSaveState(domLoader: DomLoader): React.ReactNode {
-  if (domLoader.saveError) {
+  if (domLoader.saveDomError) {
     return (
       <Tooltip title="Error while saving">
         <SyncProblemIcon color="primary" />
@@ -118,7 +118,7 @@ function getSaveState(domLoader: DomLoader): React.ReactNode {
     );
   }
 
-  const isSaving = domLoader.unsavedChanges > 0;
+  const isSaving = domLoader.unsavedDomChanges > 0;
 
   if (isSaving) {
     return (

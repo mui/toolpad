@@ -33,7 +33,7 @@ export default function UrlQueryEditor({ pageNodeId }: UrlQueryEditorProps) {
 
   const [input, setInput] = React.useState(value);
 
-  const hasSavedAllChanges = input === value;
+  const hasUnsavedChanges = input !== value;
 
   React.useEffect(() => {
     if (isDialogOpen) {
@@ -49,9 +49,32 @@ export default function UrlQueryEditor({ pageNodeId }: UrlQueryEditorProps) {
     });
   }, [editorStateApi, pageNodeId]);
 
-  const handleDialogClose = React.useCallback(() => {
-    editorStateApi.setView({ kind: 'page', nodeId: pageNodeId });
-  }, [editorStateApi, pageNodeId]);
+  const handleDialogClose = React.useCallback(
+    (skipUnsavedChangesCheck: boolean) => () => {
+      if (hasUnsavedChanges && !skipUnsavedChangesCheck) {
+        // eslint-disable-next-line no-alert
+        const ok = window.confirm(
+          'You have unsaved changes. Are you sure you want to navigate away?\nAll changes will be discarded.',
+        );
+
+        if (!ok) {
+          return;
+        }
+      }
+
+      editorStateApi.setView({ kind: 'page', nodeId: pageNodeId });
+    },
+    [editorStateApi, hasUnsavedChanges, pageNodeId],
+  );
+
+  const handleDialogCloseWithoutCheck = React.useMemo(
+    () => handleDialogClose(true),
+    [handleDialogClose],
+  );
+  const handleDialogCloseWithCheck = React.useMemo(
+    () => handleDialogClose(false),
+    [handleDialogClose],
+  );
 
   const handleSave = React.useCallback(() => {
     domApi.update((draft) =>
@@ -63,8 +86,8 @@ export default function UrlQueryEditor({ pageNodeId }: UrlQueryEditorProps) {
         appDom.createConst(input || []),
       ),
     );
-    handleDialogClose();
-  }, [domApi, handleDialogClose, input, page]);
+    handleDialogCloseWithoutCheck();
+  }, [domApi, handleDialogCloseWithoutCheck, input, page]);
 
   React.useEffect(() => {
     if (currentView.kind === 'page' && currentView.view?.kind === 'pageParameters') {
@@ -74,24 +97,12 @@ export default function UrlQueryEditor({ pageNodeId }: UrlQueryEditorProps) {
     }
   }, [closeDialog, currentView, openDialog]);
 
-  React.useEffect(() => {
-    if (!hasSavedAllChanges) {
-      editorStateApi.setHasUnsavedChanges(true);
-    }
-  }, [editorStateApi, hasSavedAllChanges]);
-
-  React.useEffect(() => {
-    if (!isDialogOpen) {
-      editorStateApi.setHasUnsavedChanges(false);
-    }
-  }, [editorStateApi, isDialogOpen]);
-
   return (
     <React.Fragment>
       <Button color="inherit" startIcon={<AddIcon />} onClick={handleButtonClick}>
         Add page parameters
       </Button>
-      <Dialog fullWidth open={isDialogOpen} onClose={handleDialogClose}>
+      <Dialog fullWidth open={isDialogOpen} onClose={handleDialogCloseWithCheck}>
         <DialogTitle>Edit page parameters</DialogTitle>
         <DialogContent>
           <Typography>
@@ -108,7 +119,7 @@ export default function UrlQueryEditor({ pageNodeId }: UrlQueryEditorProps) {
           />
         </DialogContent>
         <DialogActions>
-          <Button color="inherit" variant="text" onClick={handleDialogClose}>
+          <Button color="inherit" variant="text" onClick={handleDialogCloseWithCheck}>
             Close
           </Button>
           <Button disabled={value === input} onClick={handleSave}>

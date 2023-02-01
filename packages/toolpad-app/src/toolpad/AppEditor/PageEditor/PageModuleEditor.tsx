@@ -31,9 +31,7 @@ interface PageModuleEditorDialogProps {
 
 function PageModuleEditorDialog({ pageNodeId, open, onClose }: PageModuleEditorDialogProps) {
   const { dom } = useDom();
-
   const domApi = useDomApi();
-  const editorStateApi = useEditorStateApi();
 
   const page = appDom.getNode(dom, pageNodeId, 'page');
 
@@ -41,7 +39,7 @@ function PageModuleEditorDialog({ pageNodeId, open, onClose }: PageModuleEditorD
 
   const [input, setInput] = React.useState(value);
 
-  const hasSavedAllChanges = input === value;
+  const hasUnsavedChanges = input !== value;
 
   const handleSave = React.useCallback(() => {
     const pretty = tryFormat(input);
@@ -52,10 +50,37 @@ function PageModuleEditorDialog({ pageNodeId, open, onClose }: PageModuleEditorD
     );
   }, [domApi, input, page]);
 
+  const handleDialogClose = React.useCallback(
+    (skipUnsavedChangesCheck: boolean) => () => {
+      if (hasUnsavedChanges && !skipUnsavedChangesCheck) {
+        // eslint-disable-next-line no-alert
+        const ok = window.confirm(
+          'You have unsaved changes. Are you sure you want to navigate away?\nAll changes will be discarded.',
+        );
+
+        if (!ok) {
+          return;
+        }
+      }
+
+      onClose();
+    },
+    [hasUnsavedChanges, onClose],
+  );
+
+  const handleDialogCloseWithoutCheck = React.useMemo(
+    () => handleDialogClose(true),
+    [handleDialogClose],
+  );
+  const handleDialogCloseWithCheck = React.useMemo(
+    () => handleDialogClose(false),
+    [handleDialogClose],
+  );
+
   const handleSaveButton = React.useCallback(() => {
     handleSave();
-    onClose();
-  }, [handleSave, onClose]);
+    handleDialogCloseWithoutCheck();
+  }, [handleDialogCloseWithoutCheck, handleSave]);
 
   useShortcut({ key: 's', metaKey: true, disabled: !open }, handleSave);
 
@@ -63,20 +88,8 @@ function PageModuleEditorDialog({ pageNodeId, open, onClose }: PageModuleEditorD
     setInput(value);
   }, [value]);
 
-  React.useEffect(() => {
-    if (!hasSavedAllChanges) {
-      editorStateApi.setHasUnsavedChanges(true);
-    }
-  }, [editorStateApi, hasSavedAllChanges]);
-
-  React.useEffect(() => {
-    if (!open) {
-      editorStateApi.setHasUnsavedChanges(false);
-    }
-  }, [editorStateApi, open]);
-
   return (
-    <Dialog onClose={onClose} open={open} fullWidth maxWidth="lg">
+    <Dialog onClose={handleDialogCloseWithCheck} open={open} fullWidth maxWidth="lg">
       <DialogTitle>Edit page module</DialogTitle>
       <Box sx={{ height: 500 }}>
         <TypescriptEditor
@@ -86,7 +99,7 @@ function PageModuleEditorDialog({ pageNodeId, open, onClose }: PageModuleEditorD
         />
       </Box>
       <DialogActions>
-        <Button color="inherit" variant="text" onClick={onClose}>
+        <Button color="inherit" variant="text" onClick={handleDialogCloseWithCheck}>
           Cancel
         </Button>
         <Button onClick={handleSaveButton}>Save</Button>

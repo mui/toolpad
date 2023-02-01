@@ -504,8 +504,8 @@ export default function AppProvider({ appId, children }: DomContextProps) {
     [],
   );
 
-  const dispatchWithHistory = useEvent((action: AppStateAction, hasUnsavedChangesCheck = true) => {
-    if (hasUnsavedChangesCheck && state.hasUnsavedChanges && isCancellableAction(action)) {
+  const dispatchWithHistory = useEvent((action: AppStateAction) => {
+    if (state.hasUnsavedChanges && isCancellableAction(action)) {
       // eslint-disable-next-line no-alert
       const ok = window.confirm(
         'You have unsaved changes. Are you sure you want to navigate away?\nAll changes will be discarded.',
@@ -563,7 +563,7 @@ export default function AppProvider({ appId, children }: DomContextProps) {
   React.useEffect(() => {
     logUnsavedChanges(state.unsavedDomChanges);
 
-    if (state.unsavedDomChanges <= 0) {
+    if (state.unsavedDomChanges <= 0 && !state.hasUnsavedChanges) {
       return () => {};
     }
 
@@ -574,7 +574,7 @@ export default function AppProvider({ appId, children }: DomContextProps) {
 
     window.addEventListener('beforeunload', onBeforeUnload);
     return () => window.removeEventListener('beforeunload', onBeforeUnload);
-  }, [state.unsavedDomChanges]);
+  }, [state.hasUnsavedChanges, state.unsavedDomChanges]);
 
   useShortcut({ key: 's', metaKey: true }, handleSave);
 

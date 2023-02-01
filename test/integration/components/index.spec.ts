@@ -6,7 +6,7 @@ import clickCenter from '../../utils/clickCenter';
 import { readJsonFile } from '../../utils/fs';
 import generateId from '../../utils/generateId';
 
-async function waitForComponents(page: Page, frame: Page | FrameLocator = page, isEditor = false) {
+async function waitForComponents(page: Page, frame: Page | FrameLocator = page) {
   const button = frame.locator('text="foo button"');
   await button.waitFor({ state: 'visible' });
 

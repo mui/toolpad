@@ -1,6 +1,6 @@
 {
   "name": "@mui/toolpad",
-  "version": "0.0.38",
+  "version": "0.0.39-alpha.0",
   "license": "MIT",
   "scripts": {
     "build": "tsc",
@@ -17,10 +17,9 @@
     "toolpad": "./index.mjs"
   },
   "dependencies": {
-    "@mui/toolpad-app": "^0.0.38",
+    "@mui/toolpad-app": "^0.0.39-alpha.0",
     "arg": "^5.0.2",
     "dotenv": "^16.0.3",
     "execa": "^6.1.0"
-  },
-  "devDependencies": {}
+  }
 }

@@ -313,8 +313,22 @@
       "parentProp": "children",
       "parentIndex": "a0"
     },
-    "5c43usr": {
-      "name": "pageRow1",
+    "ly03uc8": {
+      "name": "select",
+      "attributes": {
+        "title": {
+          "type": "const",
+          "value": "select"
+        }
+      },
+      "id": "ly03uc8",
+      "type": "page",
+      "parentId": "vkowdut",
+      "parentProp": "pages",
+      "parentIndex": "a2"
+    },
+    "vy33um7": {
+      "name": "pageRow",
       "props": {},
       "attributes": {
         "component": {
@@ -323,14 +337,14 @@
         }
       },
       "layout": {},
-      "id": "5c43usr",
+      "id": "vy33um7",
       "type": "element",
-      "parentId": "f703ps3",
+      "parentId": "ly03uc8",
       "parentProp": "children",
-      "parentIndex": "a6"
+      "parentIndex": "a0"
     },
-    "6n23u2h": {
-      "name": "selectWithOptions",
+    "q813u5k": {
+      "name": "selectOptions",
       "props": {
         "options": {
           "type": "jsExpression",
@@ -352,9 +366,9 @@
         }
       },
       "layout": {},
-      "id": "6n23u2h",
+      "id": "q813u5k",
       "type": "element",
-      "parentId": "5c43usr",
+      "parentId": "vy33um7",
       "parentProp": "children",
       "parentIndex": "a0"
     }

@@ -30,7 +30,11 @@ export default function UrlQueryEditor({ pageNodeId }: UrlQueryEditorProps) {
   const { value: isDialogOpen, setTrue: openDialog, setFalse: closeDialog } = useBoolean(false);
 
   const value = page.attributes.parameters?.value;
+
   const [input, setInput] = React.useState(value);
+
+  const hasSavedAllChanges = input === value;
+
   React.useEffect(() => {
     if (isDialogOpen) {
       setInput(value);
@@ -69,6 +73,18 @@ export default function UrlQueryEditor({ pageNodeId }: UrlQueryEditorProps) {
       closeDialog();
     }
   }, [closeDialog, currentView, openDialog]);
+
+  React.useEffect(() => {
+    if (!hasSavedAllChanges) {
+      editorStateApi.setHasUnsavedChanges(true);
+    }
+  }, [editorStateApi, hasSavedAllChanges]);
+
+  React.useEffect(() => {
+    if (!isDialogOpen) {
+      editorStateApi.setHasUnsavedChanges(false);
+    }
+  }, [editorStateApi, isDialogOpen]);
 
   return (
     <React.Fragment>

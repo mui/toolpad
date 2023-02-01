@@ -15,7 +15,6 @@ import useEvent from '../utils/useEvent';
 import { NodeHashes } from '../types';
 import { hasFieldFocus } from '../utils/fields';
 import { DomView, getViewFromPathname } from '../utils/domView';
-import { ConfirmDialog } from '../components/SystemDialogs';
 
 export function getNodeHashes(dom: appDom.AppDom): NodeHashes {
   return mapValues(dom.nodes, (node) => insecureHash(JSON.stringify(node)));
@@ -505,15 +504,16 @@ export default function AppProvider({ appId, children }: DomContextProps) {
     [],
   );
 
-  const [isUnsavedChangesDialogVisible, setIsUnsavedChangesDialogVisible] = React.useState(false);
-  const [unsavedChangesBlockedAction, setUnsavedChangesBlockedAction] =
-    React.useState<AppStateAction | null>(null);
-
   const dispatchWithHistory = useEvent((action: AppStateAction, hasUnsavedChangesCheck = true) => {
     if (hasUnsavedChangesCheck && state.hasUnsavedChanges && isCancellableAction(action)) {
-      setUnsavedChangesBlockedAction(action);
-      setIsUnsavedChangesDialogVisible(true);
-      return;
+      // eslint-disable-next-line no-alert
+      const ok = window.confirm(
+        'You have unsaved changes. Are you sure you want to navigate away?\nAll changes will be discarded.',
+      );
+
+      if (!ok) {
+        return;
+      }
     }
 
     dispatch(action);
@@ -578,39 +578,15 @@ export default function AppProvider({ appId, children }: DomContextProps) {
 
   useShortcut({ key: 's', metaKey: true }, handleSave);
 
-  const handleUpdateBlockDialogClose = React.useCallback(
-    (hasConfirmed: boolean) => {
-      if (hasConfirmed && unsavedChangesBlockedAction) {
-        dispatchWithHistory(unsavedChangesBlockedAction, false);
-        setUnsavedChangesBlockedAction(null);
-      }
-      setIsUnsavedChangesDialogVisible(false);
-    },
-    [dispatchWithHistory, unsavedChangesBlockedAction],
-  );
-
   return (
-    <React.Fragment>
-      <AppStateProvider value={state}>
-        <AppStateApiContext.Provider value={appStateApi}>
-          <DomApiContext.Provider value={domApi}>
-            <EditorStateApiContext.Provider value={editorApi}>
-              {children}
-            </EditorStateApiContext.Provider>
-          </DomApiContext.Provider>
-        </AppStateApiContext.Provider>
-      </AppStateProvider>
-
-      <ConfirmDialog
-        title="Discard unsaved changes?"
-        open={isUnsavedChangesDialogVisible}
-        onClose={handleUpdateBlockDialogClose}
-        okButton="OK"
-      >
-        You have unsaved changes. Are you sure you want to navigate away?
-        <br />
-        All changes will be discarded.
-      </ConfirmDialog>
-    </React.Fragment>
+    <AppStateProvider value={state}>
+      <AppStateApiContext.Provider value={appStateApi}>
+        <DomApiContext.Provider value={domApi}>
+          <EditorStateApiContext.Provider value={editorApi}>
+            {children}
+          </EditorStateApiContext.Provider>
+        </DomApiContext.Provider>
+      </AppStateApiContext.Provider>
+    </AppStateProvider>
   );
 }

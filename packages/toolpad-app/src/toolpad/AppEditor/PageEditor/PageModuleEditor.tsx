@@ -31,9 +31,17 @@ interface PageModuleEditorDialogProps {
 
 function PageModuleEditorDialog({ pageNodeId, open, onClose }: PageModuleEditorDialogProps) {
   const { dom } = useDom();
+
   const domApi = useDomApi();
+  const editorStateApi = useEditorStateApi();
+
   const page = appDom.getNode(dom, pageNodeId, 'page');
-  const [input, setInput] = React.useState(page.attributes.module?.value || DEFAULT_CONTENT);
+
+  const value = page.attributes.module?.value || DEFAULT_CONTENT;
+
+  const [input, setInput] = React.useState(value);
+
+  const hasSavedAllChanges = input === value;
 
   const handleSave = React.useCallback(() => {
     const pretty = tryFormat(input);
@@ -52,8 +60,20 @@ function PageModuleEditorDialog({ pageNodeId, open, onClose }: PageModuleEditorD
   useShortcut({ key: 's', metaKey: true, disabled: !open }, handleSave);
 
   React.useEffect(() => {
-    setInput(page.attributes.module?.value || DEFAULT_CONTENT);
-  }, [page]);
+    setInput(value);
+  }, [value]);
+
+  React.useEffect(() => {
+    if (!hasSavedAllChanges) {
+      editorStateApi.setHasUnsavedChanges(true);
+    }
+  }, [editorStateApi, hasSavedAllChanges]);
+
+  React.useEffect(() => {
+    if (!open) {
+      editorStateApi.setHasUnsavedChanges(false);
+    }
+  }, [editorStateApi, open]);
 
   return (
     <Dialog onClose={onClose} open={open} fullWidth maxWidth="lg">

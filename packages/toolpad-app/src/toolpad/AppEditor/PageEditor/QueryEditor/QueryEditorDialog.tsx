@@ -211,9 +211,11 @@ export default function QueryNodeEditorDialog<Q>({
   );
 
   const handleRemove = React.useCallback(() => {
-    onRemove(node);
+    if (!isDraft) {
+      onRemove(node);
+    }
     onClose();
-  }, [onRemove, node, onClose]);
+  }, [isDraft, onClose, onRemove, node]);
 
   const isInputSaved = !isDraft && node === input;
 
@@ -222,7 +224,7 @@ export default function QueryNodeEditorDialog<Q>({
       ? true
       : // eslint-disable-next-line no-alert
         window.confirm(
-          'Are you sure you want to close the editor. All unsaved progress will be lost.',
+          'Are you sure you want to close the editor? All unsaved progress will be lost.',
         );
 
     if (ok) {

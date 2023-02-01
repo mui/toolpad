@@ -12,7 +12,11 @@ export default class CustomJsdomEnvironment extends JsdomEnvironment {
   async setup() {
     await super.setup();
 
-    setRuntimeConfig(this.global, { externalUrl: 'http://localhost:3000', isDemo: false });
+    setRuntimeConfig(this.global, {
+      externalUrl: 'http://localhost:3000',
+      isDemo: false,
+      localMode: false,
+    });
 
     if (!this.global.TextDecoder) {
       // @ts-expect-error The polyfill is not 100% spec-compliant

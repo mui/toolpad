@@ -74,7 +74,6 @@ export default class MyDocument extends Document<ToolpadDocumentProps> {
                 // Add the data-toolpad-canvas attribute to the canvas iframe element
                 if (window.frameElement?.dataset.toolpadCanvas){
                   var script = document.createElement('script');
-                  script.type = 'module';
                   script.src = '/reactDevtools/bootstrap.js';
                   document.write(script.outerHTML);
                 }

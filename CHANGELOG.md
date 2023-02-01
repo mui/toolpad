@@ -1,5 +1,25 @@
 # Changelog
 
+## 0.0.38
+
+<!-- generated comparing v0.0.37..master -->
+
+_Feb 1, 2023_
+
+A big thanks to the 5 contributors who made this release possible. Here are some highlights ✨:
+
+Improved default template.
+
+- &#8203;<!-- 7 -->Dual build toolpad-core for esm and cjs (#1617) @Janpot
+- &#8203;<!-- 6 -->Add new custom GA events to demo (#1588) @apedroferreira
+- &#8203;<!-- 5 -->Change default template (#1601) @bytasv
+- &#8203;<!-- 4 -->Add MySQL datasource (#1313) @bharatkashyap
+- &#8203;<!-- 3 -->Cherrypick some changes from direction 13 branch (#1599) @Janpot
+- &#8203;<!-- 2 -->[core] Remove dead code @oliviertassinari
+- &#8203;<!-- 1 -->[core] Fix Next.js warning @oliviertassinari
+
+All contributors of this release in alphabetical order: @apedroferreira, @bharatkashyap, @bytasv, @Janpot, @oliviertassinari
+
 ## 0.0.37
 
 <!-- generated comparing v0.0.36..master -->

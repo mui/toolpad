@@ -7,8 +7,8 @@ import {
   QuickJSRuntime,
 } from 'quickjs-emscripten';
 import * as React from 'react';
-import { BindingEvaluationResult, JsRuntime, Serializable } from './types';
-import { errorFrom } from './utils/errors';
+import { BindingEvaluationResult, JsRuntime, Serializable } from './types.js';
+import { errorFrom } from './utils/errors.js';
 
 const JsRuntimeContext = React.createContext<QuickJSRuntime | null>(null);
 

@@ -67,3 +67,13 @@
    1. Use `<version number>` as the **Release title**
    1. Mark as prerelease if necessary.
    1. **Publish release**
+
+## npm
+
+For now using this to publish
+
+```sh
+yarn lerna publish --force-publish --no-git-tag-version --no-push
+```
+
+** TODO: work out full flow **

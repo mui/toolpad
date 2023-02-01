@@ -18,7 +18,7 @@ export const getServerSideProps: GetServerSideProps<ToolpadAppProps> = async () 
   return {
     props: {
       state,
-      version: 0,
+      version: 'preview',
       basename: `/prod`,
     },
   };

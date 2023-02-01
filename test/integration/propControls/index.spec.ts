@@ -16,7 +16,7 @@ test('can control component prop values in properties control panel', async ({
     from: { kind: 'dom', dom },
   });
 
-  const editorModel = new ToolpadEditor(page, browserName);
+  const editorModel = new ToolpadEditor(page);
 
   await editorModel.goto(app.id);
 
@@ -57,14 +57,14 @@ test('can control component prop values in properties control panel', async ({
   await inputByLabel.waitFor({ state: 'visible' });
 });
 
-test('changing defaultValue resets controlled value', async ({ page, browserName, api }) => {
+test('changing defaultValue resets controlled value', async ({ page, api }) => {
   const dom = await readJsonFile(path.resolve(__dirname, './defaultValueDom.json'));
 
   const app = await api.mutation.createApp(`App ${generateId()}`, {
     from: { kind: 'dom', dom },
   });
 
-  const editorModel = new ToolpadEditor(page, browserName);
+  const editorModel = new ToolpadEditor(page);
   await editorModel.goto(app.id);
 
   await editorModel.waitForOverlay();

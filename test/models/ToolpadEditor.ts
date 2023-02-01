@@ -43,13 +43,6 @@ class CreateComponentDialog {
 export class ToolpadEditor {
   readonly page: Page;
 
-  /**
-   * @deprecated Do not use, this is a temporary workaround for firefox issues
-   * See https://github.com/microsoft/playwright/issues/17441
-   * TODO: remove this property
-   */
-  readonly browserName: string;
-
   readonly createPageBtn: Locator;
 
   readonly createPageDialog: CreatePageDialog;
@@ -72,9 +65,8 @@ export class ToolpadEditor {
 
   readonly confirmationDialog: Locator;
 
-  constructor(page: Page, browserName: string) {
+  constructor(page: Page) {
     this.page = page;
-    this.browserName = browserName;
 
     this.createPageBtn = page.locator('[aria-label="Create page"]');
     this.createPageDialog = new CreatePageDialog(page);

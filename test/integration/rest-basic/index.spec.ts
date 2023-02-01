@@ -17,7 +17,7 @@ if (customHttbinBaseUrl) {
 const HTTPBIN_SOURCE_URL = 'https://httpbin.org/';
 const HTTPBIN_TARGET_URL = customHttbinBaseUrl || HTTPBIN_SOURCE_URL;
 
-test('rest basics', async ({ page, browserName, api }) => {
+test('rest basics', async ({ page, api }) => {
   const dom = await readJsonFile(path.resolve(__dirname, './restDom.json'), (key, value) => {
     if (typeof value === 'string') {
       return value.replaceAll(HTTPBIN_SOURCE_URL, HTTPBIN_TARGET_URL);
@@ -38,7 +38,7 @@ test('rest basics', async ({ page, browserName, api }) => {
   await expect(page.locator('text="browserQuery: browserQuery_value"')).toBeVisible();
   await expect(page.locator('text="browserQuery: browserQuery_value"')).toBeVisible();
 
-  const editorModel = new ToolpadEditor(page, browserName);
+  const editorModel = new ToolpadEditor(page);
   await editorModel.goto(app.id);
 
   await editorModel.componentEditor.getByRole('button', { name: 'browserQuery' }).click();

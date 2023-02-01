@@ -15,7 +15,7 @@ async function waitForComponents(page: Page | FrameLocator) {
   await page.locator('label:has-text("foo select")').waitFor({ state: 'visible' });
 }
 
-test('components', async ({ page, browserName, api }) => {
+test('components', async ({ page, api }) => {
   const dom = await readJsonFile(path.resolve(__dirname, './componentsDom.json'));
 
   const app = await api.mutation.createApp(`App ${generateId()}`, {
@@ -27,7 +27,7 @@ test('components', async ({ page, browserName, api }) => {
 
   await waitForComponents(page);
 
-  const editorModel = new ToolpadEditor(page, browserName);
+  const editorModel = new ToolpadEditor(page);
   editorModel.goto(app.id);
 
   await waitForComponents(editorModel.appCanvas);

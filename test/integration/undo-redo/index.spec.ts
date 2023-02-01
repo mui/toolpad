@@ -5,14 +5,14 @@ import { readJsonFile } from '../../utils/fs';
 import clickCenter from '../../utils/clickCenter';
 import generateId from '../../utils/generateId';
 
-test('test basic undo and redo', async ({ page, browserName, api }) => {
+test('test basic undo and redo', async ({ page, api }) => {
   const dom = await readJsonFile(path.resolve(__dirname, './dom.json'));
 
   const app = await api.mutation.createApp(`App ${generateId()}`, {
     from: { kind: 'dom', dom },
   });
 
-  const editorModel = new ToolpadEditor(page, browserName);
+  const editorModel = new ToolpadEditor(page);
   await editorModel.goto(app.id);
 
   await editorModel.waitForOverlay();
@@ -51,7 +51,7 @@ test('test batching text input actions into single undo entry', async ({
     from: { kind: 'dom', dom },
   });
 
-  const editorModel = new ToolpadEditor(page, browserName);
+  const editorModel = new ToolpadEditor(page);
   await editorModel.goto(app.id);
 
   await editorModel.waitForOverlay();
@@ -83,14 +83,14 @@ test('test batching text input actions into single undo entry', async ({
   await expect(input).toHaveValue('some value');
 });
 
-test('test undo and redo through different pages', async ({ page, browserName, api }) => {
+test('test undo and redo through different pages', async ({ page, api }) => {
   const dom = await readJsonFile(path.resolve(__dirname, './2pages.json'));
 
   const app = await api.mutation.createApp(`App ${generateId()}`, {
     from: { kind: 'dom', dom },
   });
 
-  const editorModel = new ToolpadEditor(page, browserName);
+  const editorModel = new ToolpadEditor(page);
   await editorModel.goto(app.id);
 
   await editorModel.waitForOverlay();

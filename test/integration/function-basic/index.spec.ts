@@ -33,14 +33,14 @@ test('functions basics', async ({ page, api }) => {
   await page.locator('text="echo, secret: Some bar secret"').waitFor({ state: 'visible' });
 });
 
-test('function editor save shortcut', async ({ page, api, browserName }) => {
+test('function editor save shortcut', async ({ page, api }) => {
   const dom = await readJsonFile(path.resolve(__dirname, './functionDom.json'));
 
   const app = await api.mutation.createApp(`App ${generateId()}`, {
     from: { kind: 'dom', dom },
   });
 
-  const editorModel = new ToolpadEditor(page, browserName);
+  const editorModel = new ToolpadEditor(page);
   await editorModel.goto(app.id);
 
   await expect(editorModel.appCanvas.getByText('edited hello')).toBeVisible();

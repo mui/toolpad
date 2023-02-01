@@ -22,4 +22,7 @@ export const PRODUCTION_DATASOURCES = new Set([
   'googleSheets',
   'postgres',
   'mysql',
+  'local',
 ]);
+
+export const APP_ID_LOCAL_MARKER = '__LOCAL_MODE_APP_';

@@ -15,6 +15,7 @@ import useEvent from '../utils/useEvent';
 import { NodeHashes } from '../types';
 import { hasFieldFocus } from '../utils/fields';
 import { DomView, getViewFromPathname } from '../utils/domView';
+import config from '../config';
 
 export type ComponentPanelTab = 'component' | 'theme';
 
@@ -44,6 +45,10 @@ export type DomAction =
       updater: (dom: appDom.AppDom) => appDom.AppDom;
       selectedNodeId?: NodeId | null;
       view?: DomView;
+    }
+  | {
+      type: 'DOM_SERVER_UPDATE';
+      dom: appDom.AppDom;
     }
   | {
       type: 'DOM_SET_VIEW';
@@ -194,6 +199,14 @@ export function domLoaderReducer(state: DomLoader, action: DomAction): DomLoader
           : {}),
         ...(view ? { currentView: view } : {}),
       });
+    }
+    case 'DOM_SERVER_UPDATE': {
+      if (state.unsavedChanges > 0) {
+        // Ignore this server update
+        return state;
+      }
+
+      return update(state, { dom: action.dom });
     }
     case 'DOM_SET_VIEW': {
       return update(state, {
@@ -393,6 +406,13 @@ export default function DomProvider({ appId, children }: DomContextProps) {
     redoStack: [],
   });
 
+  React.useEffect(() => {
+    dispatch({
+      type: 'DOM_SERVER_UPDATE',
+      dom,
+    });
+  }, [dom]);
+
   const scheduleTextInputHistoryUpdate = React.useMemo(
     () =>
       debounce(() => {
@@ -458,6 +478,40 @@ export default function DomProvider({ appId, children }: DomContextProps) {
   }, [state.unsavedChanges]);
 
   useShortcut({ key: 's', metaKey: true }, handleSave);
+
+  // Quick and dirty polling for dom updates
+  const fingerprint = React.useRef<number | undefined>();
+  React.useEffect(() => {
+    if (!config.localMode) {
+      return () => {};
+    }
+
+    let active = true;
+
+    (async () => {
+      while (active) {
+        try {
+          const currentFingerprint = fingerprint.current;
+          // eslint-disable-next-line no-await-in-loop
+          const newFingerPrint = await client.query.getDomFingerprint();
+          if (currentFingerprint && currentFingerprint !== newFingerPrint) {
+            client.invalidateQueries('loadDom', [appId]);
+          }
+          fingerprint.current = newFingerPrint;
+          // eslint-disable-next-line no-await-in-loop
+          await new Promise((resolve) => {
+            setTimeout(resolve, 1000);
+          });
+        } catch (err) {
+          console.error(err);
+        }
+      }
+    })();
+
+    return () => {
+      active = false;
+    };
+  }, [appId]);
 
   return (
     <DomLoaderProvider value={state}>

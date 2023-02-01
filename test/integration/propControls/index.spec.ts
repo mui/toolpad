@@ -5,11 +5,7 @@ import clickCenter from '../../utils/clickCenter';
 import { readJsonFile } from '../../utils/fs';
 import generateId from '../../utils/generateId';
 
-test('can control component prop values in properties control panel', async ({
-  page,
-  browserName,
-  api,
-}) => {
+test('can control component prop values in properties control panel', async ({ page, api }) => {
   const dom = await readJsonFile(path.resolve(__dirname, './domInput.json'));
 
   const app = await api.mutation.createApp(`App ${generateId()}`, {

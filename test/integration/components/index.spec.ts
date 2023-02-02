@@ -42,17 +42,17 @@ test('rendering components in the app runtime', async ({ page, api }) => {
   await waitForComponents(page);
 });
 
-test('rendering components in the app editor', async ({ page, browserName, api }) => {
+test('rendering components in the app editor', async ({ page, api }) => {
   const dom = await readJsonFile(path.resolve(__dirname, './componentsDom.json'));
 
   const app = await api.mutation.createApp(`App ${generateId()}`, {
     from: { kind: 'dom', dom },
   });
 
-  const editorModel = new ToolpadEditor(page, browserName);
+  const editorModel = new ToolpadEditor(page);
   editorModel.goto(app.id);
 
-  await waitForComponents(page, editorModel.appCanvas, true);
+  await waitForComponents(page, editorModel.appCanvas);
 });
 
 test('select component behavior', async ({ page, api }) => {

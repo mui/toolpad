@@ -69,7 +69,10 @@ export default function AppThemeProvider({ dom, children }: ThemeProviderProps) 
     const root = appDom.getApp(dom);
     const { themes = [] } = appDom.getChildNodes(dom, root);
     const themeNode = themes.length > 0 ? themes[0] : null;
-    return createToolpadTheme(themeNode?.theme || {});
+    const toolpadTheme: AppTheme = themeNode?.theme
+      ? appDom.fromConstPropValues(themeNode.theme)
+      : {};
+    return createToolpadTheme(toolpadTheme);
   }, [dom]);
 
   return <ThemeProvider theme={theme}>{children}</ThemeProvider>;

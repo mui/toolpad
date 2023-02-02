@@ -30,6 +30,7 @@ export type DomAction = {
 };
 
 export type DomLoaderAction =
+  | DomAction
   | {
       type: 'DOM_SAVING';
     }
@@ -42,7 +43,8 @@ export type DomLoaderAction =
       error: string;
     };
 
-export type EditorStateAction =
+export type AppStateAction =
+  | DomLoaderAction
   | {
       type: 'UPDATE_HISTORY';
     }
@@ -71,8 +73,6 @@ export type EditorStateAction =
       type: 'SET_HAS_UNSAVED_CHANGES';
       hasUnsavedChanges: boolean;
     };
-
-type AppStateAction = DomAction | DomLoaderAction | EditorStateAction;
 
 export function domReducer(dom: appDom.AppDom, action: AppStateAction): appDom.AppDom {
   switch (action.type) {
@@ -140,13 +140,13 @@ export interface AppState extends DomLoader {
   hasUnsavedChanges: boolean;
 }
 
-export type EditorState = Pick<
+export type PublicAppState = Pick<
   AppState,
   'dom' | 'selectedNodeId' | 'currentView' | 'currentTab' | 'hasUnsavedChanges'
 >;
 
 interface UndoRedoStackEntry
-  extends Omit<EditorState, 'currentView' | 'currentTab' | 'hasUnsavedChanges'> {
+  extends Omit<PublicAppState, 'currentView' | 'currentTab' | 'hasUnsavedChanges'> {
   view: DomView;
   tab: ComponentPanelTab;
   timestamp: number;
@@ -270,24 +270,6 @@ export function appStateReducer(state: AppState, action: AppStateAction): AppSta
   }
 }
 
-function createAppStateApi(dispatch: React.Dispatch<AppStateAction>) {
-  return {
-    update(
-      updater: (dom: appDom.AppDom) => appDom.AppDom,
-      extraUpdates: {
-        view?: DomView;
-        selectedNodeId?: NodeId | null;
-      } = {},
-    ) {
-      dispatch({
-        type: 'UPDATE',
-        updater,
-        ...extraUpdates,
-      });
-    },
-  };
-}
-
 function createDomApi(dispatch: React.Dispatch<AppStateAction>) {
   return {
     update(updater: (dom: appDom.AppDom) => appDom.AppDom) {
@@ -316,16 +298,22 @@ function createDomApi(dispatch: React.Dispatch<AppStateAction>) {
   };
 }
 
-function createEditorApi(
+function createAppStateApi(
   dispatch: React.Dispatch<AppStateAction>,
   scheduleTextInputHistoryUpdate?: DebouncedFunc<() => void>,
 ) {
   return {
-    update(view?: DomView, selectedNodeId?: NodeId | null) {
+    update(
+      updater: (dom: appDom.AppDom) => appDom.AppDom,
+      extraUpdates: {
+        view?: DomView;
+        selectedNodeId?: NodeId | null;
+      } = {},
+    ) {
       dispatch({
         type: 'UPDATE',
-        view,
-        selectedNodeId,
+        updater,
+        ...extraUpdates,
       });
     },
     undo() {
@@ -390,7 +378,7 @@ export function useDomLoader(): DomLoader {
   return { dom, savedDom, savingDom, unsavedDomChanges, saveDomError };
 }
 
-export function useEditorState(): EditorState {
+export function useAppState(): PublicAppState {
   const { dom, selectedNodeId, currentView, currentTab, hasUnsavedChanges } = useAppStateContext();
 
   if (!dom) {
@@ -398,14 +386,6 @@ export function useEditorState(): EditorState {
   }
 
   return { dom, selectedNodeId, currentView, currentTab, hasUnsavedChanges };
-}
-
-const AppStateApiContext = React.createContext<AppStateApi>(createAppStateApi(() => undefined));
-
-export type AppStateApi = ReturnType<typeof createAppStateApi>;
-
-export function useAppStateApi(): AppStateApi {
-  return React.useContext(AppStateApiContext);
 }
 
 const DomApiContext = React.createContext<DomApi>(createDomApi(() => undefined));
@@ -416,12 +396,12 @@ export function useDomApi(): DomApi {
   return React.useContext(DomApiContext);
 }
 
-const EditorStateApiContext = React.createContext<EditorStateApi>(createEditorApi(() => undefined));
+const AppStateApiContext = React.createContext<AppStateApi>(createAppStateApi(() => undefined));
 
-export type EditorStateApi = ReturnType<typeof createEditorApi>;
+export type AppStateApi = ReturnType<typeof createAppStateApi>;
 
-export function useEditorStateApi(): EditorStateApi {
-  return React.useContext(EditorStateApiContext);
+export function useAppStateApi(): AppStateApi {
+  return React.useContext(AppStateApiContext);
 }
 
 let previousUnsavedChanges = 0;
@@ -479,7 +459,7 @@ export default function AppProvider({ appId, children }: DomContextProps) {
     unsavedDomChanges: 0,
     saveDomError: null,
     savedDom: dom,
-    // Editor state
+    // App state
     selectedNodeId: null,
     currentView: initialView,
     currentTab: 'component',
@@ -527,13 +507,9 @@ export default function AppProvider({ appId, children }: DomContextProps) {
     }
   });
 
-  const appStateApi = React.useMemo(
-    () => createAppStateApi(dispatchWithHistory),
-    [dispatchWithHistory],
-  );
   const domApi = React.useMemo(() => createDomApi(dispatchWithHistory), [dispatchWithHistory]);
-  const editorApi = React.useMemo(
-    () => createEditorApi(dispatchWithHistory, scheduleTextInputHistoryUpdate),
+  const appStateApi = React.useMemo(
+    () => createAppStateApi(dispatchWithHistory, scheduleTextInputHistoryUpdate),
     [dispatchWithHistory, scheduleTextInputHistoryUpdate],
   );
 
@@ -581,11 +557,7 @@ export default function AppProvider({ appId, children }: DomContextProps) {
   return (
     <AppStateProvider value={state}>
       <AppStateApiContext.Provider value={appStateApi}>
-        <DomApiContext.Provider value={domApi}>
-          <EditorStateApiContext.Provider value={editorApi}>
-            {children}
-          </EditorStateApiContext.Provider>
-        </DomApiContext.Provider>
+        <DomApiContext.Provider value={domApi}>{children}</DomApiContext.Provider>
       </AppStateApiContext.Provider>
     </AppStateProvider>
   );

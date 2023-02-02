@@ -15,7 +15,7 @@ import {
 import { useQuery } from '@tanstack/react-query';
 import invariant from 'invariant';
 import * as appDom from '../../../appDom';
-import { useDom, useDomApi, useEditorStateApi } from '../../AppState';
+import { useDom, useDomApi, useAppStateApi } from '../../AppState';
 import { tryFormat } from '../../../utils/prettier';
 import useShortcut from '../../../utils/useShortcut';
 import usePageTitle from '../../../utils/usePageTitle';
@@ -135,7 +135,7 @@ function CodeComponentEditorContent({ codeComponentNode }: CodeComponentEditorCo
   const { dom } = useDom();
 
   const domApi = useDomApi();
-  const editorStateApi = useEditorStateApi();
+  const appStateApi = useAppStateApi();
 
   const { data: typings } = useQuery<Record<string, string>>(['/typings.json'], async () => {
     return fetch('/typings.json').then((res) => res.json());
@@ -221,18 +221,18 @@ function CodeComponentEditorContent({ codeComponentNode }: CodeComponentEditorCo
     setInput(prettyfied);
     domApi.saveNode(prettyfied);
 
-    editorStateApi.setHasUnsavedChanges(false);
-  }, [domApi, editorStateApi, input, isSaveAllowed]);
+    appStateApi.setHasUnsavedChanges(false);
+  }, [domApi, appStateApi, input, isSaveAllowed]);
 
   React.useEffect(() => {
     if (!allChangesAreCommitted) {
-      editorStateApi.setHasUnsavedChanges(true);
+      appStateApi.setHasUnsavedChanges(true);
     }
 
     return () => {
-      editorStateApi.setHasUnsavedChanges(false);
+      appStateApi.setHasUnsavedChanges(false);
     };
-  }, [allChangesAreCommitted, editorStateApi]);
+  }, [allChangesAreCommitted, appStateApi]);
 
   useShortcut({ key: 's', metaKey: true }, handleSave);
 

@@ -21,13 +21,7 @@ import clsx from 'clsx';
 import { usePageEditorState } from '../PageEditorProvider';
 import * as appDom from '../../../../appDom';
 import dataSources from '../../../../toolpadDataSources/client';
-import {
-  useAppStateApi,
-  useDom,
-  useDomApi,
-  useEditorState,
-  useEditorStateApi,
-} from '../../../AppState';
+import { useAppStateApi, useDom, useDomApi, useAppState } from '../../../AppState';
 import ConnectionSelect, { ConnectionOption } from '../ConnectionSelect';
 import NodeMenu from '../../NodeMenu';
 import QueryNodeEditorDialog from './QueryEditorDialog';
@@ -114,12 +108,11 @@ type DialogState =
 
 export default function QueryEditor() {
   const { dom } = useDom();
-  const { currentView } = useEditorState();
+  const { currentView } = useAppState();
   const state = usePageEditorState();
 
   const appStateApi = useAppStateApi();
   const domApi = useDomApi();
-  const editorStateApi = useEditorStateApi();
 
   const [dialogState, setDialogState] = React.useState<DialogState | null>(null);
 
@@ -127,8 +120,8 @@ export default function QueryEditor() {
   const { queries = [] } = appDom.getChildNodes(dom, page) ?? [];
 
   const handleEditStateDialogClose = React.useCallback(() => {
-    editorStateApi.setView({ kind: 'page', nodeId: page.id });
-  }, [editorStateApi, page.id]);
+    appStateApi.setView({ kind: 'page', nodeId: page.id });
+  }, [appStateApi, page.id]);
 
   const handleCreate = React.useCallback(() => {
     setDialogState({});
@@ -207,7 +200,7 @@ export default function QueryEditor() {
               key={queryNode.id}
               disablePadding
               onClick={() => {
-                editorStateApi.setView({
+                appStateApi.setView({
                   kind: 'page',
                   nodeId: page.id,
                   view: { kind: 'query', nodeId: queryNode.id },

@@ -3,13 +3,7 @@ import { styled } from '@mui/material';
 import { NodeId } from '@mui/toolpad-core';
 import * as appDom from '../../../../appDom';
 import EditorCanvasHost from '../EditorCanvasHost';
-import {
-  getNodeHashes,
-  useDom,
-  useEditorStateApi,
-  useDomLoader,
-  useDomApi,
-} from '../../../AppState';
+import { getNodeHashes, useDom, useAppStateApi, useDomLoader, useDomApi } from '../../../AppState';
 import { usePageEditorApi, usePageEditorState } from '../PageEditorProvider';
 import RenderOverlay from './RenderOverlay';
 import { NodeHashes } from '../../../../types';
@@ -37,7 +31,7 @@ export default function RenderPanel({ className }: RenderPanelProps) {
   const domLoader = useDomLoader();
   const { dom } = useDom();
   const domApi = useDomApi();
-  const editorStateApi = useEditorStateApi();
+  const appStateApi = useAppStateApi();
   const pageEditorApi = usePageEditorApi();
   const { appId, nodeId: pageNodeId } = usePageEditorState();
 
@@ -82,7 +76,7 @@ export default function RenderPanel({ className }: RenderPanelProps) {
     });
 
     initializedBridge.canvasEvents.on('pageNavigationRequest', (event) => {
-      editorStateApi.setView({ kind: 'page', nodeId: event.pageNodeId });
+      appStateApi.setView({ kind: 'page', nodeId: event.pageNodeId });
     });
 
     setBridge(initializedBridge);

@@ -2,7 +2,7 @@ import CodeIcon from '@mui/icons-material/Code';
 import { Box, Button, Dialog, DialogActions, DialogTitle, Skeleton } from '@mui/material';
 import { NodeId } from '@mui/toolpad-core';
 import * as React from 'react';
-import { useDom, useDomApi, useEditorState, useEditorStateApi } from '../../AppState';
+import { useDom, useDomApi, useAppState, useAppStateApi } from '../../AppState';
 import * as appDom from '../../../appDom';
 import { tryFormat } from '../../../utils/prettier';
 import useShortcut from '../../../utils/useShortcut';
@@ -113,22 +113,22 @@ export interface PageModuleEditorProps {
 }
 
 export default function PageModuleEditor({ pageNodeId }: PageModuleEditorProps) {
-  const { currentView } = useEditorState();
-  const editorStateApi = useEditorStateApi();
+  const { currentView } = useAppState();
+  const appStateApi = useAppStateApi();
 
   const [dialogOpen, setDialogOpen] = React.useState(false);
 
   const handleButtonClick = React.useCallback(() => {
-    editorStateApi.setView({
+    appStateApi.setView({
       kind: 'page',
       nodeId: pageNodeId,
       view: { kind: 'pageModule' },
     });
-  }, [editorStateApi, pageNodeId]);
+  }, [appStateApi, pageNodeId]);
 
   const handleDialogClose = React.useCallback(() => {
-    editorStateApi.setView({ kind: 'page', nodeId: pageNodeId });
-  }, [editorStateApi, pageNodeId]);
+    appStateApi.setView({ kind: 'page', nodeId: pageNodeId });
+  }, [appStateApi, pageNodeId]);
 
   React.useEffect(() => {
     setDialogOpen(currentView.kind === 'page' && currentView.view?.kind === 'pageModule');

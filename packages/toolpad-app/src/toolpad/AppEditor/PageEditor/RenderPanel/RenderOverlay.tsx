@@ -5,13 +5,7 @@ import clsx from 'clsx';
 import invariant from 'invariant';
 
 import * as appDom from '../../../../appDom';
-import {
-  useAppStateApi,
-  useDom,
-  useDomApi,
-  useEditorState,
-  useEditorStateApi,
-} from '../../../AppState';
+import { useAppStateApi, useDom, useDomApi, useAppState } from '../../../AppState';
 import {
   DropZone,
   DROP_ZONE_BOTTOM,
@@ -279,11 +273,10 @@ interface RenderOverlayProps {
 
 export default function RenderOverlay({ bridge }: RenderOverlayProps) {
   const { dom } = useDom();
-  const { selectedNodeId } = useEditorState();
+  const { selectedNodeId } = useAppState();
 
   const domApi = useDomApi();
   const appStateApi = useAppStateApi();
-  const editorStateApi = useEditorStateApi();
   const api = usePageEditorApi();
   const {
     viewState,
@@ -376,17 +369,17 @@ export default function RenderOverlay({ bridge }: RenderOverlayProps) {
   const selectNode = React.useCallback(
     (nodeId: NodeId) => {
       if (selectedNodeId !== nodeId) {
-        editorStateApi.selectNode(nodeId);
+        appStateApi.selectNode(nodeId);
       }
     },
-    [editorStateApi, selectedNodeId],
+    [appStateApi, selectedNodeId],
   );
 
   const deselectNode = React.useCallback(() => {
     if (selectedNodeId) {
-      editorStateApi.deselectNode();
+      appStateApi.deselectNode();
     }
-  }, [editorStateApi, selectedNodeId]);
+  }, [appStateApi, selectedNodeId]);
 
   const handleNodeMouseUp = React.useCallback(
     (event: React.MouseEvent<HTMLDivElement>) => {

@@ -10,7 +10,7 @@ import { NodeId } from '@mui/toolpad-core';
 import clsx from 'clsx';
 import invariant from 'invariant';
 import * as appDom from '../../../appDom';
-import { useAppStateApi, useDom, useEditorState, useEditorStateApi } from '../../AppState';
+import { useAppStateApi, useDom, useAppState, useAppStateApi } from '../../AppState';
 import CreatePageNodeDialog from './CreatePageNodeDialog';
 import CreateCodeComponentNodeDialog from './CreateCodeComponentNodeDialog';
 import CreateConnectionNodeDialog from './CreateConnectionNodeDialog';
@@ -127,10 +127,10 @@ export interface HierarchyExplorerProps {
 
 export default function HierarchyExplorer({ appId, className }: HierarchyExplorerProps) {
   const { dom } = useDom();
-  const { currentView } = useEditorState();
+  const { currentView } = useAppState();
 
   const appStateApi = useAppStateApi();
-  const editorStateApi = useEditorStateApi();
+  const appStateApi = useAppStateApi();
 
   const app = appDom.getApp(dom);
   const { codeComponents = [], pages = [], connections = [] } = appDom.getChildNodes(dom, app);
@@ -162,20 +162,20 @@ export default function HierarchyExplorer({ appId, className }: HierarchyExplore
       // TODO: sort out in-page selection
       const page = appDom.getPageAncestor(dom, node);
       if (page) {
-        editorStateApi.setView({ kind: 'page', nodeId: page.id });
+        appStateApi.setView({ kind: 'page', nodeId: page.id });
       }
     }
 
     if (appDom.isPage(node)) {
-      editorStateApi.setView({ kind: 'page', nodeId: node.id });
+      appStateApi.setView({ kind: 'page', nodeId: node.id });
     }
 
     if (appDom.isCodeComponent(node)) {
-      editorStateApi.setView({ kind: 'codeComponent', nodeId: node.id });
+      appStateApi.setView({ kind: 'codeComponent', nodeId: node.id });
     }
 
     if (appDom.isConnection(node)) {
-      editorStateApi.setView({ kind: 'connection', nodeId: node.id });
+      appStateApi.setView({ kind: 'connection', nodeId: node.id });
     }
   };
 

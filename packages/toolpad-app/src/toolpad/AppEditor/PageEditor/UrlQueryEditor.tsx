@@ -10,7 +10,7 @@ import * as React from 'react';
 import AddIcon from '@mui/icons-material/Add';
 import { NodeId } from '@mui/toolpad-core';
 import * as appDom from '../../../appDom';
-import { useDom, useDomApi, useEditorState, useEditorStateApi } from '../../AppState';
+import { useDom, useDomApi, useAppState, useAppStateApi } from '../../AppState';
 import MapEntriesEditor from '../../../components/MapEntriesEditor';
 import useBoolean from '../../../utils/useBoolean';
 
@@ -20,10 +20,10 @@ export interface UrlQueryEditorProps {
 
 export default function UrlQueryEditor({ pageNodeId }: UrlQueryEditorProps) {
   const { dom } = useDom();
-  const { currentView } = useEditorState();
+  const { currentView } = useAppState();
 
   const domApi = useDomApi();
-  const editorStateApi = useEditorStateApi();
+  const appStateApi = useAppStateApi();
 
   const page = appDom.getNode(dom, pageNodeId, 'page');
 
@@ -42,12 +42,12 @@ export default function UrlQueryEditor({ pageNodeId }: UrlQueryEditorProps) {
   }, [isDialogOpen, value]);
 
   const handleButtonClick = React.useCallback(() => {
-    editorStateApi.setView({
+    appStateApi.setView({
       kind: 'page',
       nodeId: pageNodeId,
       view: { kind: 'pageParameters' },
     });
-  }, [editorStateApi, pageNodeId]);
+  }, [appStateApi, pageNodeId]);
 
   const handleDialogClose = React.useCallback(
     (skipUnsavedChangesCheck: boolean) => () => {
@@ -62,9 +62,9 @@ export default function UrlQueryEditor({ pageNodeId }: UrlQueryEditorProps) {
         }
       }
 
-      editorStateApi.setView({ kind: 'page', nodeId: pageNodeId });
+      appStateApi.setView({ kind: 'page', nodeId: pageNodeId });
     },
-    [editorStateApi, hasUnsavedChanges, pageNodeId],
+    [appStateApi, hasUnsavedChanges, pageNodeId],
   );
 
   const handleDialogCloseWithoutCheck = React.useMemo(

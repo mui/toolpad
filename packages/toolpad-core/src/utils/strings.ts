@@ -140,3 +140,20 @@ export function truncate(str: string, maxLength: number, dots: string = '...') {
   }
   return str.slice(0, maxLength) + dots;
 }
+
+/**
+ * Prepend a prefix to each line in the text
+ */
+export function prependLines(text: string, prefix: string): string {
+  return text
+    .split('\n')
+    .map((line) => prefix + line)
+    .join('\n');
+}
+
+/**
+ * Indent the text with [length] number of spaces
+ */
+export function indent(text: string, length: 2): string {
+  return prependLines(text, ' '.repeat(length));
+}

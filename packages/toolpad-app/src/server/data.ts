@@ -17,13 +17,19 @@ import { migrateUp } from '../appDom/migrations';
 import { errorFrom } from '../utils/errors';
 import { ERR_APP_EXISTS, ERR_VALIDATE_CAPTCHA_FAILED } from '../errorCodes';
 import createRuntimeState from '../createRuntimeState';
+import { APP_ID_LOCAL_MARKER } from '../constants';
+import { saveLocalDom, loadLocalDom } from './localMode';
 
 const SELECT_RELEASE_META = excludeFields(prisma.Prisma.ReleaseScalarFieldEnum, ['snapshot']);
 const SELECT_APP_META = excludeFields(prisma.Prisma.AppScalarFieldEnum, ['dom']);
 
 export type AppMeta = Omit<prisma.App, 'dom'>;
 
-function getPrismaClient(): prisma.PrismaClient {
+function createPrismaClient(): prisma.PrismaClient {
+  if (!process.env.TOOLPAD_DATABASE_URL) {
+    throw new Error(`App started without config env variable TOOLPAD_DATABASE_URL`);
+  }
+
   if (process.env.NODE_ENV === 'production') {
     return new prisma.PrismaClient();
   }
@@ -37,7 +43,13 @@ function getPrismaClient(): prisma.PrismaClient {
   return (globalThis as any).prisma;
 }
 
-const prismaClient = getPrismaClient();
+let clientInstance: prisma.PrismaClient | undefined;
+function getPrismaClient(): prisma.PrismaClient {
+  if (!clientInstance) {
+    clientInstance = createPrismaClient();
+  }
+  return clientInstance;
+}
 
 function deserializeValue(dbValue: string, type: prisma.DomNodeAttributeType): unknown {
   const serialized = type === 'secret' ? decryptSecret(dbValue) : dbValue;
@@ -79,6 +91,12 @@ function decryptSecrets(dom: appDom.AppDom): appDom.AppDom {
 }
 
 export async function saveDom(appId: string, app: appDom.AppDom): Promise<void> {
+  if (appId === APP_ID_LOCAL_MARKER) {
+    await saveLocalDom(app);
+    return;
+  }
+
+  const prismaClient = getPrismaClient();
   await prismaClient.app.update({
     where: {
       id: appId,
@@ -89,6 +107,7 @@ export async function saveDom(appId: string, app: appDom.AppDom): Promise<void> 
 }
 
 async function loadPreviewDomLegacy(appId: string): Promise<appDom.AppDom> {
+  const prismaClient = getPrismaClient();
   const dbNodes = await prismaClient.domNode.findMany({
     where: { appId },
     include: { attributes: true },
@@ -137,6 +156,7 @@ async function loadPreviewDomLegacy(appId: string): Promise<appDom.AppDom> {
 }
 
 async function loadPreviewDom(appId: string): Promise<appDom.AppDom> {
+  const prismaClient = getPrismaClient();
   const { dom } = await prismaClient.app.findUniqueOrThrow({
     where: { id: appId },
   });
@@ -153,6 +173,7 @@ async function loadPreviewDom(appId: string): Promise<appDom.AppDom> {
 }
 
 export async function getApps(): Promise<AppMeta[]> {
+  const prismaClient = getPrismaClient();
   if (config.isDemo) {
     return [];
   }
@@ -166,6 +187,7 @@ export async function getApps(): Promise<AppMeta[]> {
 }
 
 export async function getActiveDeployments() {
+  const prismaClient = getPrismaClient();
   return prismaClient.deployment.findMany({
     distinct: ['appId'],
     orderBy: { createdAt: 'desc' },
@@ -173,24 +195,8 @@ export async function getActiveDeployments() {
 }
 
 export async function getApp(id: string): Promise<AppMeta | null> {
+  const prismaClient = getPrismaClient();
   return prismaClient.app.findUnique({ where: { id }, select: SELECT_APP_META });
-}
-
-function createDefaultDom(): appDom.AppDom {
-  let dom = appDom.createDom();
-  const appNode = appDom.getApp(dom);
-
-  // Create default page
-  const newPageNode = appDom.createNode(dom, 'page', {
-    name: 'Page 1',
-    attributes: {
-      title: appDom.createConst('Page 1'),
-    },
-  });
-
-  dom = appDom.addNode(dom, newPageNode, appNode, 'pages');
-
-  return dom;
 }
 
 export type CreateAppOptions = {
@@ -210,6 +216,7 @@ export type CreateAppOptions = {
 };
 
 export async function createApp(name: string, opts: CreateAppOptions = {}): Promise<prisma.App> {
+  const prismaClient = getPrismaClient();
   const { from } = opts;
 
   if (config.recaptchaV3SecretKey) {
@@ -259,7 +266,7 @@ export async function createApp(name: string, opts: CreateAppOptions = {}): Prom
     }
 
     if (!dom) {
-      dom = createDefaultDom();
+      dom = appDom.createDefaultDom();
     }
 
     await saveDom(app.id, dom);
@@ -274,6 +281,7 @@ interface AppUpdates {
 }
 
 export async function updateApp(appId: string, updates: AppUpdates): Promise<void> {
+  const prismaClient = getPrismaClient();
   await prismaClient.app.update({
     where: {
       id: appId,
@@ -287,6 +295,7 @@ export async function updateApp(appId: string, updates: AppUpdates): Promise<voi
 }
 
 export async function deleteApp(id: string): Promise<void> {
+  const prismaClient = getPrismaClient();
   await prismaClient.app.delete({
     where: { id },
     select: {
@@ -303,6 +312,7 @@ export interface CreateReleaseParams {
 export type ReleaseMeta = Pick<prisma.Release, keyof typeof SELECT_RELEASE_META>;
 
 async function findLastReleaseInternal(appId: string) {
+  const prismaClient = getPrismaClient();
   return prismaClient.release.findFirst({
     where: { appId },
     orderBy: { version: 'desc' },
@@ -310,6 +320,7 @@ async function findLastReleaseInternal(appId: string) {
 }
 
 export async function findLastRelease(appId: string): Promise<ReleaseMeta | null> {
+  const prismaClient = getPrismaClient();
   return prismaClient.release.findFirst({
     where: { appId },
     orderBy: { version: 'desc' },
@@ -321,6 +332,7 @@ export async function createRelease(
   appId: string,
   { description }: CreateReleaseParams,
 ): Promise<ReleaseMeta> {
+  const prismaClient = getPrismaClient();
   const currentDom = await loadPreviewDom(appId);
   const snapshot = Buffer.from(JSON.stringify(currentDom), 'utf-8');
 
@@ -341,6 +353,7 @@ export async function createRelease(
 }
 
 export async function getReleases(appId: string): Promise<ReleaseMeta[]> {
+  const prismaClient = getPrismaClient();
   return prismaClient.release.findMany({
     where: { appId },
     select: SELECT_RELEASE_META,
@@ -351,6 +364,7 @@ export async function getReleases(appId: string): Promise<ReleaseMeta[]> {
 }
 
 export async function getRelease(appId: string, version: number): Promise<ReleaseMeta | null> {
+  const prismaClient = getPrismaClient();
   return prismaClient.release.findUnique({
     where: { release_app_constraint: { appId, version } },
     select: SELECT_RELEASE_META,
@@ -362,6 +376,7 @@ export type Deployment = prisma.Deployment & {
 };
 
 export function getDeployments(appId: string): Promise<Deployment[]> {
+  const prismaClient = getPrismaClient();
   return prismaClient.deployment.findMany({
     where: { appId },
     orderBy: { createdAt: 'desc' },
@@ -374,6 +389,7 @@ export function getDeployments(appId: string): Promise<Deployment[]> {
 }
 
 export async function createDeployment(appId: string, version: number): Promise<Deployment> {
+  const prismaClient = getPrismaClient();
   return prismaClient.deployment.create({
     data: {
       app: {
@@ -401,6 +417,7 @@ export async function deploy(
 }
 
 export async function findActiveDeployment(appId: string): Promise<Deployment | null> {
+  const prismaClient = getPrismaClient();
   return prismaClient.deployment.findFirst({
     where: { appId },
     orderBy: { createdAt: 'desc' },
@@ -417,6 +434,7 @@ function parseSnapshot(snapshot: Buffer): appDom.AppDom {
 }
 
 async function loadReleaseDom(appId: string, version: number): Promise<appDom.AppDom> {
+  const prismaClient = getPrismaClient();
   const release = await prismaClient.release.findUnique({
     where: { release_app_constraint: { appId, version } },
   });
@@ -534,6 +552,10 @@ export async function loadDom(
   appId: string,
   version: VersionOrPreview = 'preview',
 ): Promise<appDom.AppDom> {
+  if (appId === APP_ID_LOCAL_MARKER) {
+    return loadLocalDom();
+  }
+
   return version === 'preview' ? loadPreviewDom(appId) : loadReleaseDom(appId, version);
 }
 
@@ -548,6 +570,7 @@ export async function loadRuntimeState(
 }
 
 export async function duplicateApp(id: string, name: string): Promise<AppMeta> {
+  const prismaClient = getPrismaClient();
   const dom = await loadPreviewDom(id);
   const appFromDom: CreateAppOptions = {
     from: {

@@ -28,6 +28,8 @@ function Select({ options, value, onChange, defaultValue, fullWidth, sx, ...rest
     [onChange],
   );
 
+  const id = React.useId();
+
   return (
     <TextField
       select
@@ -37,11 +39,12 @@ function Select({ options, value, onChange, defaultValue, fullWidth, sx, ...rest
       onChange={handleChange}
       {...rest}
     >
-      {options.map((option) => {
-        const parsedOption: SelectOption = typeof option === 'string' ? { value: option } : option;
+      {options.map((option, i) => {
+        const parsedOption: SelectOption =
+          option && typeof option === 'object' ? option : { value: String(option) };
         return (
-          <MenuItem key={parsedOption.value} value={parsedOption.value}>
-            {parsedOption.label ?? parsedOption.value}
+          <MenuItem key={parsedOption.value ?? `${id}::${i}`} value={parsedOption.value}>
+            {String(parsedOption.label ?? parsedOption.value)}
           </MenuItem>
         );
       })}

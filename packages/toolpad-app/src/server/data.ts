@@ -17,6 +17,8 @@ import { migrateUp } from '../appDom/migrations';
 import { errorFrom } from '../utils/errors';
 import { ERR_APP_EXISTS, ERR_VALIDATE_CAPTCHA_FAILED } from '../errorCodes';
 import createRuntimeState from '../createRuntimeState';
+import { APP_ID_LOCAL_MARKER } from '../constants';
+import { saveLocalDom, loadLocalDom } from './localMode';
 
 const SELECT_RELEASE_META = excludeFields(prisma.Prisma.ReleaseScalarFieldEnum, ['snapshot']);
 const SELECT_APP_META = excludeFields(prisma.Prisma.AppScalarFieldEnum, ['dom']);
@@ -89,6 +91,11 @@ function decryptSecrets(dom: appDom.AppDom): appDom.AppDom {
 }
 
 export async function saveDom(appId: string, app: appDom.AppDom): Promise<void> {
+  if (appId === APP_ID_LOCAL_MARKER) {
+    await saveLocalDom(app);
+    return;
+  }
+
   const prismaClient = getPrismaClient();
   await prismaClient.app.update({
     where: {
@@ -545,6 +552,10 @@ export async function loadDom(
   appId: string,
   version: VersionOrPreview = 'preview',
 ): Promise<appDom.AppDom> {
+  if (appId === APP_ID_LOCAL_MARKER) {
+    return loadLocalDom();
+  }
+
   return version === 'preview' ? loadPreviewDom(appId) : loadReleaseDom(appId, version);
 }
 

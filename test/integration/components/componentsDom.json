@@ -313,8 +313,22 @@
       "parentProp": "children",
       "parentIndex": "a0"
     },
-    "qt23z07": {
-      "name": "pageRow1",
+    "ly03uc8": {
+      "name": "select",
+      "attributes": {
+        "title": {
+          "type": "const",
+          "value": "select"
+        }
+      },
+      "id": "ly03uc8",
+      "type": "page",
+      "parentId": "vkowdut",
+      "parentProp": "pages",
+      "parentIndex": "a2"
+    },
+    "vy33um7": {
+      "name": "pageRow",
       "props": {},
       "attributes": {
         "component": {
@@ -323,62 +337,38 @@
         }
       },
       "layout": {},
-      "id": "qt23z07",
+      "id": "vy33um7",
       "type": "element",
-      "parentId": "f703ps3",
-      "parentProp": "children",
-      "parentIndex": "a6"
-    },
-    "gg03zca": {
-      "name": "list",
-      "props": {},
-      "attributes": {
-        "component": {
-          "type": "const",
-          "value": "List"
-        }
-      },
-      "layout": {},
-      "id": "gg03zca",
-      "type": "element",
-      "parentId": "qt23z07",
+      "parentId": "ly03uc8",
       "parentProp": "children",
       "parentIndex": "a0"
     },
-    "ex53zfn": {
-      "name": "pageRow2",
-      "props": {},
-      "attributes": {
-        "component": {
-          "type": "const",
-          "value": "PageRow"
-        }
-      },
-      "layout": {},
-      "id": "ex53zfn",
-      "type": "element",
-      "parentId": "gg03zca",
-      "parentProp": "renderItem",
-      "parentIndex": "a0"
-    },
-    "p333z1y": {
-      "name": "button1",
+    "q813u5k": {
+      "name": "selectOptions",
       "props": {
-        "content": {
+        "options": {
           "type": "jsExpression",
-          "value": "`List Button ${i + 1}`\n"
+          "value": "[\"one\", 2, { value: 3, label: \"three\" }, { value: 4 }, { noValue: \"foo\" }]\n"
+        },
+        "label": {
+          "type": "const",
+          "value": "select with options"
+        },
+        "fullWidth": {
+          "type": "const",
+          "value": true
         }
       },
       "attributes": {
         "component": {
           "type": "const",
-          "value": "Button"
+          "value": "Select"
         }
       },
       "layout": {},
-      "id": "p333z1y",
+      "id": "q813u5k",
       "type": "element",
-      "parentId": "ex53zfn",
+      "parentId": "vy33um7",
       "parentProp": "children",
       "parentIndex": "a0"
     }

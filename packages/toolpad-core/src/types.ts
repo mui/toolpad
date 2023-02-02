@@ -1,6 +1,6 @@
 import type * as React from 'react';
-import type { TOOLPAD_COMPONENT } from './constants';
-import type { Branded } from './utils/types';
+import type { TOOLPAD_COMPONENT } from './constants.js';
+import type { Branded } from './utils/types.js';
 
 export type NodeId = Branded<string, 'NodeId'>;
 
@@ -340,7 +340,9 @@ export interface RuntimeError {
 
 export type FlowDirection = 'row' | 'column' | 'row-reverse' | 'column-reverse';
 
-export interface SerializedError {
+export type PlainObject = Record<string, unknown>;
+
+export interface SerializedError extends PlainObject {
   message: string;
   name: string;
   stack?: string;

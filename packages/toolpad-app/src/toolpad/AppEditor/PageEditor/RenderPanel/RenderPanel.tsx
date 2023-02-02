@@ -43,22 +43,28 @@ export default function RenderPanel({ className }: RenderPanelProps) {
 
   const handleInit = useEvent((initializedBridge: ToolpadBridge) => {
     initializedBridge.canvasEvents.on('propUpdated', (event) => {
-      const node = appDom.getNode(dom, event.nodeId as NodeId, 'element');
-      const actual = node.props?.[event.prop];
-      if (actual && actual.type !== 'const') {
-        console.warn(`Can't update a non-const prop "${event.prop}" on node "${node.id}"`);
-        return;
-      }
+      domApi.update((draft) => {
+        const node = appDom.getMaybeNode(draft, event.nodeId as NodeId, 'element');
+        if (!node) {
+          return draft;
+        }
 
-      const newValue: unknown =
-        typeof event.value === 'function' ? event.value(actual?.value) : event.value;
+        const actual = node.props?.[event.prop];
+        if (actual && actual.type !== 'const') {
+          console.warn(`Can't update a non-const prop "${event.prop}" on node "${node.id}"`);
+          return draft;
+        }
 
-      domApi.update((draft) =>
-        appDom.setNodeNamespacedProp(draft, node, 'props', event.prop, {
+        const newValue: unknown =
+          typeof event.value === 'function' ? event.value(actual?.value) : event.value;
+
+        draft = appDom.setNodeNamespacedProp(draft, node, 'props', event.prop, {
           type: 'const',
           value: newValue,
-        }),
-      );
+        });
+
+        return draft;
+      });
     });
 
     initializedBridge.canvasEvents.on('pageStateUpdated', (event) => {

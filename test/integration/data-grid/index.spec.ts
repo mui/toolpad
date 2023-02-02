@@ -26,18 +26,14 @@ test('Code component cell', async ({ page, api }) => {
   await expect(editorModel.pageRoot.getByText('field: "customField"')).toBeVisible();
 });
 
-test('Column prop updates are not lost on drag interactions', async ({
-  page,
-  browserName,
-  api,
-}) => {
+test('Column prop updates are not lost on drag interactions', async ({ page, api }) => {
   const dom = await readJsonFile(path.resolve(__dirname, './columnPropUpdate.json'));
 
   const app = await api.mutation.createApp(`App ${generateId()}`, {
     from: { kind: 'dom', dom },
   });
 
-  const editorModel = new ToolpadEditor(page, browserName);
+  const editorModel = new ToolpadEditor(page);
   editorModel.goto(app.id);
 
   await editorModel.pageRoot.waitFor({ state: 'visible' });

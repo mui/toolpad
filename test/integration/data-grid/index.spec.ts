@@ -72,7 +72,7 @@ test('Column prop updates are not lost on drag interactions', async ({
   await expect(
     editorModel.pageRoot
       .getByRole('row', {
-        name: '1 Todd Breitenberg International http://spotless-octopus.name yes',
+        name: '1 Todd Breitenberg International http://spotless-octopus.name',
       })
       .getByTestId('CheckIcon'),
   ).toBeVisible();

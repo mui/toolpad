@@ -10,7 +10,7 @@ import { ExactEntriesOf } from '../../../utils/types';
 import * as appDom from '../../../appDom';
 import NodeAttributeEditor from './NodeAttributeEditor';
 import { useDom, useAppState } from '../../AppState';
-import { usePageAppState } from './PageEditorProvider';
+import { usePageEditorState } from './PageEditorProvider';
 import PageOptionsPanel from './PageOptionsPanel';
 import ErrorAlert from './ErrorAlert';
 import NodeNameEditor from '../NodeNameEditor';
@@ -136,7 +136,7 @@ interface SelectedNodeEditorProps {
 
 function SelectedNodeEditor({ node }: SelectedNodeEditorProps) {
   const { dom } = useDom();
-  const { bindings, viewState } = usePageAppState();
+  const { bindings, viewState } = usePageEditorState();
 
   const nodeError = viewState.nodes[node.id]?.error;
   const componentConfig = viewState.nodes[node.id]?.componentConfig || { argTypes: {} };

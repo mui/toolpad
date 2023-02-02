@@ -10,7 +10,7 @@ import { NodeId } from '@mui/toolpad-core';
 import clsx from 'clsx';
 import invariant from 'invariant';
 import * as appDom from '../../../appDom';
-import { useAppStateApi, useDom, useAppState, useAppStateApi } from '../../AppState';
+import { useAppStateApi, useDom, useAppState } from '../../AppState';
 import CreatePageNodeDialog from './CreatePageNodeDialog';
 import CreateCodeComponentNodeDialog from './CreateCodeComponentNodeDialog';
 import CreateConnectionNodeDialog from './CreateConnectionNodeDialog';
@@ -129,7 +129,6 @@ export default function HierarchyExplorer({ appId, className }: HierarchyExplore
   const { dom } = useDom();
   const { currentView } = useAppState();
 
-  const appStateApi = useAppStateApi();
   const appStateApi = useAppStateApi();
 
   const app = appDom.getApp(dom);

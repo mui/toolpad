@@ -33,6 +33,8 @@ import useDebounced from '../../../utils/useDebounced';
 import { ExtraLib } from '../../../components/MonacoEditor';
 import { useNodeNameValidation } from '../HierarchyExplorer/validation';
 import useUndoRedo from '../../hooks/useUndoRedo';
+import config from '../../../config';
+import client from '../../../api';
 
 const TypescriptEditor = lazyComponent(() => import('../../../components/TypescriptEditor'), {
   noSsr: true,
@@ -239,7 +241,7 @@ function CodeComponentEditorContent({ codeComponentNode }: CodeComponentEditorCo
   return (
     <React.Fragment>
       <Stack sx={{ height: '100%' }}>
-        <Toolbar sx={{ mt: 2, mb: 2 }}>
+        <Toolbar sx={{ mt: 2, mb: 2, gap: 2 }}>
           <TextField
             sx={{ maxWidth: 300 }}
             required
@@ -252,7 +254,17 @@ function CodeComponentEditorContent({ codeComponentNode }: CodeComponentEditorCo
             }
             error={!isNameValid}
             helperText={nodeNameError}
+            disabled={config.localMode}
           />
+          {config.localMode ? (
+            <Button
+              onClick={() => {
+                client.mutation.openCodeComponentEditor(codeComponentNode.name);
+              }}
+            >
+              Open in vscode
+            </Button>
+          ) : null}
         </Toolbar>
         <Box flex={1}>
           <SplitPane split="vertical" allowResize size="50%">

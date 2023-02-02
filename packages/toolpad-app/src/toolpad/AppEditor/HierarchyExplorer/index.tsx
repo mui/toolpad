@@ -246,7 +246,8 @@ export default function HierarchyExplorer({ appId, className }: HierarchyExplore
     [appStateApi, dom],
   );
 
-  const hasConnectionsView = !config.isDemo;
+  const hasConnectionsView = !config.localMode && !config.isDemo;
+  const hasComponentsView = !config.localMode;
 
   return (
     <HierarchyExplorerRoot data-testid="hierarchy-explorer" className={className}>
@@ -281,25 +282,27 @@ export default function HierarchyExplorer({ appId, className }: HierarchyExplore
             ))}
           </HierarchyTreeItem>
         ) : null}
-        <HierarchyTreeItem
-          nodeId=":codeComponents"
-          aria-level={1}
-          labelText="Components"
-          createLabelText="Create component"
-          onCreate={handleCreateCodeComponentDialogOpen}
-        >
-          {codeComponents.map((codeComponent) => (
-            <HierarchyTreeItem
-              key={codeComponent.id}
-              nodeId={codeComponent.id}
-              toolpadNodeId={codeComponent.id}
-              aria-level={2}
-              labelText={codeComponent.name}
-              onDuplicateNode={handleDuplicateNode}
-              onDeleteNode={handleDeleteNode}
-            />
-          ))}
-        </HierarchyTreeItem>
+        {hasComponentsView ? (
+          <HierarchyTreeItem
+            nodeId=":codeComponents"
+            aria-level={1}
+            labelText="Components"
+            createLabelText="Create component"
+            onCreate={handleCreateCodeComponentDialogOpen}
+          >
+            {codeComponents.map((codeComponent) => (
+              <HierarchyTreeItem
+                key={codeComponent.id}
+                nodeId={codeComponent.id}
+                toolpadNodeId={codeComponent.id}
+                aria-level={2}
+                labelText={codeComponent.name}
+                onDuplicateNode={handleDuplicateNode}
+                onDeleteNode={handleDeleteNode}
+              />
+            ))}
+          </HierarchyTreeItem>
+        ) : null}
         <HierarchyTreeItem
           nodeId=":pages"
           aria-level={1}

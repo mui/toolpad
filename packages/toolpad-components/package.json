@@ -1,6 +1,6 @@
 {
   "name": "@mui/toolpad-components",
-  "version": "0.0.37",
+  "version": "0.0.39-alpha.0",
   "description": "Build MUI apps quickly",
   "author": "MUI Toolpad team",
   "homepage": "https://github.com/mui/mui-toolpad#readme",
@@ -23,6 +23,7 @@
     "prebuild": "rimraf dist",
     "build": "tsc",
     "dev": "tsc --pretty --watch --preserveWatchOutput",
+    "dev13": "tsc --pretty --watch --preserveWatchOutput",
     "test": "echo \"Error: run tests from root\" && exit 1",
     "check-types": "tsc"
   },
@@ -31,7 +32,7 @@
   },
   "dependencies": {
     "@mui/material": "^5.11.7",
-    "@mui/toolpad-core": "^0.0.37",
+    "@mui/toolpad-core": "^0.0.39-alpha.0",
     "@mui/x-data-grid-pro": "^5.17.21",
     "@mui/x-date-pickers": "^5.0.16",
     "dayjs": "^1.11.7",

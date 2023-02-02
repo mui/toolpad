@@ -24,6 +24,7 @@ import RocketLaunchIcon from '@mui/icons-material/RocketLaunch';
 import * as React from 'react';
 import { useForm } from 'react-hook-form';
 import invariant from 'invariant';
+import config from '../../config';
 import DialogForm from '../../components/DialogForm';
 import { DomLoader, useDomLoader } from '../AppState';
 import ToolpadShell from '../ToolpadShell';
@@ -213,12 +214,12 @@ export default function AppEditorShell({ appId, children, ...props }: ToolpadShe
             endIcon={<OpenInNewIcon />}
             color="primary"
             component="a"
-            href={`/app/${appId}/preview`}
+            href={config.localMode ? '/preview' : `/app/${appId}/preview`}
             target="_blank"
           >
             Preview
           </Button>
-          <DeployMenu appId={appId} />
+          {config.localMode ? null : <DeployMenu appId={appId} />}
         </Stack>
       }
       status={getSaveState(domLoader)}

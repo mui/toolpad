@@ -15,6 +15,7 @@ import AppSettingsDialog from './AppSettingsDialog';
 import AppExportDialog from './AppExportDialog';
 import AppDeleteDialog from './AppDeleteDialog';
 import AppDuplicateDialog from './AppDuplicateDialog';
+import config from '../../config';
 
 interface AppOptionsProps {
   app?: AppMeta | null;
@@ -82,24 +83,30 @@ function AppOptions({ app, onRenameRequest: onRename, dom, redirectOnDelete }: A
         <MoreVertIcon />
       </IconButton>
       <Menu {...menuProps}>
-        <MenuItem onClick={handleRenameClick}>
-          <ListItemIcon>
-            <DriveFileRenameOutlineIcon />
-          </ListItemIcon>
-          <ListItemText>Rename</ListItemText>
-        </MenuItem>
-        <MenuItem onClick={handleDuplicateClick} disabled={!app}>
-          <ListItemIcon>
-            <ContentCopyOutlinedIcon />
-          </ListItemIcon>
-          <ListItemText>Duplicate</ListItemText>
-        </MenuItem>
-        <MenuItem onClick={handleDeleteClick} disabled={!app}>
-          <ListItemIcon>
-            <DeleteIcon />
-          </ListItemIcon>
-          <ListItemText>Delete</ListItemText>
-        </MenuItem>
+        {config.localMode ? null : (
+          <MenuItem onClick={handleRenameClick}>
+            <ListItemIcon>
+              <DriveFileRenameOutlineIcon />
+            </ListItemIcon>
+            <ListItemText>Rename</ListItemText>
+          </MenuItem>
+        )}
+        {config.localMode ? null : (
+          <MenuItem onClick={handleDuplicateClick} disabled={!app}>
+            <ListItemIcon>
+              <ContentCopyOutlinedIcon />
+            </ListItemIcon>
+            <ListItemText>Duplicate</ListItemText>
+          </MenuItem>
+        )}
+        {config.localMode ? null : (
+          <MenuItem onClick={handleDeleteClick} disabled={!app}>
+            <ListItemIcon>
+              <DeleteIcon />
+            </ListItemIcon>
+            <ListItemText>Delete</ListItemText>
+          </MenuItem>
+        )}
         <Divider />
         {dom ? (
           <MenuItem onClick={handleAppExportClick}>
@@ -109,12 +116,14 @@ function AppOptions({ app, onRenameRequest: onRename, dom, redirectOnDelete }: A
             <ListItemText>View DOM</ListItemText>
           </MenuItem>
         ) : null}
-        <MenuItem onClick={handleopenSettingsClick} disabled={!app}>
-          <ListItemIcon>
-            <SettingsIcon />
-          </ListItemIcon>
-          <ListItemText>Settings</ListItemText>
-        </MenuItem>
+        {config.localMode ? null : (
+          <MenuItem onClick={handleopenSettingsClick} disabled={!app}>
+            <ListItemIcon>
+              <SettingsIcon />
+            </ListItemIcon>
+            <ListItemText>Settings</ListItemText>
+          </MenuItem>
+        )}
       </Menu>
       {app && dom ? (
         <AppExportDialog open={appExportOpen} onClose={handleCloseAppExport} dom={dom} />

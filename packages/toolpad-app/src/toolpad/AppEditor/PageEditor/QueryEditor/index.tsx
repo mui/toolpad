@@ -25,6 +25,7 @@ import { useDom, useDomApi } from '../../../DomLoader';
 import ConnectionSelect, { ConnectionOption } from '../ConnectionSelect';
 import NodeMenu from '../../NodeMenu';
 import QueryNodeEditorDialog from './QueryEditorDialog';
+import config from '../../../../config';
 
 interface DataSourceSelectorProps<Q> {
   open: boolean;
@@ -121,8 +122,23 @@ export default function QueryEditor() {
   }, [domApi, page.id]);
 
   const handleCreate = React.useCallback(() => {
-    setDialogState({});
-  }, []);
+    if (config.localMode) {
+      const node = appDom.createNode(dom, 'query', {
+        attributes: {
+          query: appDom.createConst({}),
+          connectionId: appDom.createConst(null),
+          dataSource: appDom.createConst('local'),
+        },
+      });
+
+      setDialogState({
+        node,
+        isDraft: true,
+      });
+    } else {
+      setDialogState({});
+    }
+  }, [dom]);
 
   const handleCreated = React.useCallback((node: appDom.QueryNode) => {
     setDialogState({ node, isDraft: true });
@@ -134,7 +150,7 @@ export default function QueryEditor() {
         domApi.saveNode(node);
       } else {
         domApi.update((draft) => appDom.addNode(draft, node, page, 'queries'), {
-          view: { kind: 'query', nodeId: node.id },
+          view: { kind: 'page', nodeId: page.id, view: { kind: 'query', nodeId: node.id } },
         });
       }
     },
@@ -176,8 +192,8 @@ export default function QueryEditor() {
 
   React.useEffect(() => {
     setDialogState(() => {
-      if (currentView.kind === 'query') {
-        const node = appDom.getNode(dom, currentView.nodeId, 'query');
+      if (currentView.kind === 'page' && currentView.view?.kind === 'query') {
+        const node = appDom.getNode(dom, currentView.view?.nodeId, 'query');
         return { node, isDraft: false };
       }
 
@@ -197,7 +213,11 @@ export default function QueryEditor() {
               key={queryNode.id}
               disablePadding
               onClick={() => {
-                domApi.setView({ kind: 'query', nodeId: queryNode.id });
+                domApi.setView({
+                  kind: 'page',
+                  nodeId: page.id,
+                  view: { kind: 'query', nodeId: queryNode.id },
+                });
               }}
               secondaryAction={
                 <NodeMenu

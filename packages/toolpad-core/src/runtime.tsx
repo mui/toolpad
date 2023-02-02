@@ -1,9 +1,9 @@
 import * as React from 'react';
 import { ErrorBoundary, FallbackProps } from 'react-error-boundary';
 import mitt, { Emitter } from 'mitt';
-import { RuntimeEvents, ToolpadComponents } from './types';
+import { RuntimeEvents, ToolpadComponents } from './types.js';
 import { RUNTIME_PROP_NODE_ID, RUNTIME_PROP_SLOTS } from './constants.js';
-import type { SlotType, ComponentConfig, RuntimeEvent, RuntimeError } from './types';
+import type { SlotType, ComponentConfig, RuntimeEvent, RuntimeError } from './types.js';
 
 const ResetNodeErrorsKeyContext = React.createContext(0);
 

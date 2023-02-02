@@ -8,24 +8,37 @@ export interface SelectOption {
   label?: string;
 }
 
-export type SelectProps = TextFieldProps & {
+export type SelectProps = Omit<TextFieldProps, 'value' | 'onChange'> & {
+  value: string;
+  onChange: (newValue: string) => void;
   options: (string | SelectOption)[];
 };
 
-function Select({ options, value, defaultValue, fullWidth, sx, ...rest }: SelectProps) {
+function Select({ options, value, onChange, defaultValue, fullWidth, sx, ...rest }: SelectProps) {
+  const handleChange = React.useCallback(
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      onChange(event.target.value);
+    },
+    [onChange],
+  );
+
+  const id = React.useId();
+
   return (
     <TextField
       select
       sx={{ ...(!fullWidth && !value ? { width: 120 } : {}), ...sx }}
       fullWidth={fullWidth}
       value={value}
+      onChange={handleChange}
       {...rest}
     >
-      {options.map((option) => {
-        const parsedOption: SelectOption = typeof option === 'string' ? { value: option } : option;
+      {options.map((option, i) => {
+        const parsedOption: SelectOption =
+          option && typeof option === 'object' ? option : { value: String(option) };
         return (
-          <MenuItem key={parsedOption.value} value={parsedOption.value}>
-            {parsedOption.label ?? parsedOption.value}
+          <MenuItem key={parsedOption.value ?? `${id}::${i}`} value={parsedOption.value}>
+            {String(parsedOption.label ?? parsedOption.value)}
           </MenuItem>
         );
       })}
@@ -49,7 +62,6 @@ export default createComponent(Select, {
       helperText: 'The currently selected value.',
       typeDef: { type: 'string' },
       onChangeProp: 'onChange',
-      onChangeHandler: (event: React.ChangeEvent<HTMLSelectElement>) => event.target.value,
       defaultValue: '',
       defaultValueProp: 'defaultValue',
     },

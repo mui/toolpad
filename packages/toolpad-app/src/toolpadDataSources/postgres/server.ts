@@ -1,13 +1,9 @@
 import { Client, QueryConfig } from 'pg';
-import { ServerDataSource } from '../../types';
 import { errorFrom } from '../../utils/errors';
 import { Maybe } from '../../utils/types';
-import {
-  PostgresConnectionParams,
-  PostgresPrivateQuery,
-  PostgresQuery,
-  PostgresResult,
-} from './types';
+import { SqlConnectionParams, SqlQuery } from '../sql/types';
+import { PostgresResult } from './types';
+import { createSqlServerDatasource } from '../sql/server';
 
 /**
  * Substitute named parameters ($varName) in a postgres query with their positional parameter ($1)
@@ -27,7 +23,6 @@ function parseQuery(sql: string, params: [string, any][]): QueryConfig {
     values: params.map(([, value]) => value),
   };
 }
-
 /**
  * Augment variables ($1, $2,...) in an error message with their name "$varName($1)"
  */
@@ -44,9 +39,9 @@ function parseErrorMessage(msg: string, params: [string, any][]): string {
   return msgWithNamedVars;
 }
 
-async function execBase(
-  connection: Maybe<PostgresConnectionParams>,
-  postgresQuery: PostgresQuery,
+async function execSql(
+  connection: Maybe<SqlConnectionParams>,
+  postgresQuery: SqlQuery,
   params: Record<string, string>,
 ): Promise<PostgresResult> {
   if (!connection?.password) {
@@ -76,45 +71,13 @@ async function execBase(
   }
 }
 
-async function exec(
-  connection: Maybe<PostgresConnectionParams>,
-  postgresQuery: PostgresQuery,
-  params: Record<string, string>,
-): Promise<PostgresResult> {
-  const { data, error } = await execBase(connection, postgresQuery, params);
-  return { data, error };
-}
-
-async function execPrivate(
-  connection: Maybe<PostgresConnectionParams>,
-  query: PostgresPrivateQuery,
-): Promise<any>;
-async function execPrivate(
-  connection: Maybe<PostgresConnectionParams>,
-  query: PostgresPrivateQuery,
-): Promise<any> {
-  switch (query.kind) {
-    case 'debugExec':
-      return execBase(connection, query.query, query.params);
-    case 'connectionStatus': {
-      try {
-        const client = new Client({ ...query.params });
-        await client.connect();
-        await client.query('SELECT * FROM version();');
-        return { error: null };
-      } catch (rawError) {
-        const err = errorFrom(rawError);
-        return { error: err.message };
-      }
-    }
-    default:
-      throw new Error(`Unknown query "${(query as PostgresPrivateQuery).kind}"`);
-  }
-}
-
-const dataSource: ServerDataSource<PostgresConnectionParams, PostgresQuery, any> = {
-  execPrivate,
-  exec,
+const testConnection = async (connection: Maybe<SqlConnectionParams>) => {
+  const client = new Client({ ...connection });
+  await client.connect();
+  await client.query('SELECT * FROM version();');
 };
 
-export default dataSource;
+export default createSqlServerDatasource<SqlConnectionParams, SqlQuery>({
+  execSql,
+  testConnection,
+});

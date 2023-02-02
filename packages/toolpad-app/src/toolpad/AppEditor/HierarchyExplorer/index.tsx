@@ -6,18 +6,18 @@ import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import ArrowRightIcon from '@mui/icons-material/ArrowRight';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import AddIcon from '@mui/icons-material/Add';
-import { useLocation, matchRoutes, Location } from 'react-router-dom';
 import { NodeId } from '@mui/toolpad-core';
 import clsx from 'clsx';
 import invariant from 'invariant';
 import * as appDom from '../../../appDom';
-import { useDom, useDomApi, DomView } from '../../DomLoader';
+import { useDom, useDomApi } from '../../DomLoader';
 import CreatePageNodeDialog from './CreatePageNodeDialog';
 import CreateCodeComponentNodeDialog from './CreateCodeComponentNodeDialog';
 import CreateConnectionNodeDialog from './CreateConnectionNodeDialog';
 import useLocalStorageState from '../../../utils/useLocalStorageState';
 import NodeMenu from '../NodeMenu';
 import config from '../../../config';
+import { DomView } from '../../../utils/domView';
 
 const HierarchyExplorerRoot = styled('div')({
   overflow: 'auto',
@@ -40,22 +40,6 @@ const StyledTreeItem = styled(TreeItem)({
     visibility: 'visible',
   },
 });
-
-function getActiveNodeId(location: Location): NodeId | null {
-  const match =
-    matchRoutes(
-      [
-        { path: `/app/:appId/pages/:activeNodeId` },
-        { path: `/app/:appId/apis/:activeNodeId` },
-        { path: `/app/:appId/codeComponents/:activeNodeId` },
-        { path: `/app/:appId/connections/:activeNodeId` },
-      ],
-      location,
-    ) || [];
-
-  const selected: NodeId[] = match.map((route) => route.params.activeNodeId as NodeId);
-  return selected.length > 0 ? selected[0] : null;
-}
 
 type StyledTreeItemProps = TreeItemProps & {
   onDeleteNode?: (nodeId: NodeId) => void;
@@ -142,7 +126,7 @@ export interface HierarchyExplorerProps {
 }
 
 export default function HierarchyExplorer({ appId, className }: HierarchyExplorerProps) {
-  const { dom } = useDom();
+  const { dom, currentView } = useDom();
   const domApi = useDomApi();
 
   const app = appDom.getApp(dom);
@@ -153,9 +137,7 @@ export default function HierarchyExplorer({ appId, className }: HierarchyExplore
     [':connections', ':pages', ':codeComponents'],
   );
 
-  const location = useLocation();
-
-  const activeNode = getActiveNodeId(location);
+  const activeNode = currentView.nodeId || null;
 
   const handleToggle = (event: React.SyntheticEvent, nodeIds: string[]) => {
     setExpanded(nodeIds as NodeId[]);
@@ -262,7 +244,8 @@ export default function HierarchyExplorer({ appId, className }: HierarchyExplore
     [dom, domApi],
   );
 
-  const hasConnectionsView = !config.isDemo;
+  const hasConnectionsView = !config.localMode && !config.isDemo;
+  const hasComponentsView = !config.localMode;
 
   return (
     <HierarchyExplorerRoot data-testid="hierarchy-explorer" className={className}>
@@ -297,25 +280,27 @@ export default function HierarchyExplorer({ appId, className }: HierarchyExplore
             ))}
           </HierarchyTreeItem>
         ) : null}
-        <HierarchyTreeItem
-          nodeId=":codeComponents"
-          aria-level={1}
-          labelText="Components"
-          createLabelText="Create component"
-          onCreate={handleCreateCodeComponentDialogOpen}
-        >
-          {codeComponents.map((codeComponent) => (
-            <HierarchyTreeItem
-              key={codeComponent.id}
-              nodeId={codeComponent.id}
-              toolpadNodeId={codeComponent.id}
-              aria-level={2}
-              labelText={codeComponent.name}
-              onDuplicateNode={handleDuplicateNode}
-              onDeleteNode={handleDeleteNode}
-            />
-          ))}
-        </HierarchyTreeItem>
+        {hasComponentsView ? (
+          <HierarchyTreeItem
+            nodeId=":codeComponents"
+            aria-level={1}
+            labelText="Components"
+            createLabelText="Create component"
+            onCreate={handleCreateCodeComponentDialogOpen}
+          >
+            {codeComponents.map((codeComponent) => (
+              <HierarchyTreeItem
+                key={codeComponent.id}
+                nodeId={codeComponent.id}
+                toolpadNodeId={codeComponent.id}
+                aria-level={2}
+                labelText={codeComponent.name}
+                onDuplicateNode={handleDuplicateNode}
+                onDeleteNode={handleDeleteNode}
+              />
+            ))}
+          </HierarchyTreeItem>
+        ) : null}
         <HierarchyTreeItem
           nodeId=":pages"
           aria-level={1}

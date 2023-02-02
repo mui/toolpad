@@ -1,6 +1,5 @@
 import * as React from 'react';
 import { Box, Button, Stack, styled, TextField, Toolbar, Typography } from '@mui/material';
-import { useParams } from 'react-router-dom';
 import createCache from '@emotion/cache';
 import { CacheProvider } from '@emotion/react';
 import * as ReactDOM from 'react-dom';
@@ -35,6 +34,8 @@ import useDebounced from '../../../utils/useDebounced';
 import { ExtraLib } from '../../../components/MonacoEditor';
 import { useNodeNameValidation } from '../HierarchyExplorer/validation';
 import useUndoRedo from '../../hooks/useUndoRedo';
+import config from '../../../config';
+import client from '../../../api';
 
 const TypescriptEditor = lazyComponent(() => import('../../../components/TypescriptEditor'), {
   noSsr: true,
@@ -232,7 +233,7 @@ function CodeComponentEditorContent({ codeComponentNode }: CodeComponentEditorCo
   return (
     <React.Fragment>
       <Stack sx={{ height: '100%' }}>
-        <Toolbar sx={{ mt: 2, mb: 2 }}>
+        <Toolbar sx={{ mt: 2, mb: 2, gap: 2 }}>
           <TextField
             sx={{ maxWidth: 300 }}
             required
@@ -245,7 +246,17 @@ function CodeComponentEditorContent({ codeComponentNode }: CodeComponentEditorCo
             }
             error={!isNameValid}
             helperText={nodeNameError}
+            disabled={config.localMode}
           />
+          {config.localMode ? (
+            <Button
+              onClick={() => {
+                client.mutation.openCodeComponentEditor(codeComponentNode.name);
+              }}
+            >
+              Open in vscode
+            </Button>
+          ) : null}
         </Toolbar>
         <Box flex={1}>
           <SplitPane split="vertical" allowResize size="50%">
@@ -309,12 +320,12 @@ function CodeComponentEditorContent({ codeComponentNode }: CodeComponentEditorCo
 
 interface CodeComponentEditorProps {
   appId: string;
+  nodeId?: NodeId;
 }
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-export default function CodeComponentEditor({ appId }: CodeComponentEditorProps) {
+export default function CodeComponentEditor({ appId, nodeId }: CodeComponentEditorProps) {
   const { dom } = useDom();
-  const { nodeId } = useParams();
   const codeComponentNode = appDom.getMaybeNode(dom, nodeId as NodeId, 'codeComponent');
 
   useUndoRedo();

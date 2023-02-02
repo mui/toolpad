@@ -1,5 +1,70 @@
 # Changelog
 
+## 0.0.38
+
+<!-- generated comparing v0.0.37..master -->
+
+_Feb 1, 2023_
+
+A big thanks to the 5 contributors who made this release possible. Here are some highlights ✨:
+
+Improved default template.
+
+- &#8203;<!-- 7 -->Dual build toolpad-core for esm and cjs (#1617) @Janpot
+- &#8203;<!-- 6 -->Add new custom GA events to demo (#1588) @apedroferreira
+- &#8203;<!-- 5 -->Change default template (#1601) @bytasv
+- &#8203;<!-- 4 -->Add MySQL datasource (#1313) @bharatkashyap
+- &#8203;<!-- 3 -->Cherrypick some changes from direction 13 branch (#1599) @Janpot
+- &#8203;<!-- 2 -->[core] Remove dead code @oliviertassinari
+- &#8203;<!-- 1 -->[core] Fix Next.js warning @oliviertassinari
+
+All contributors of this release in alphabetical order: @apedroferreira, @bharatkashyap, @bytasv, @Janpot, @oliviertassinari
+
+## 0.0.37
+
+<!-- generated comparing v0.0.36..master -->
+
+_Jan 25, 2023_
+
+A big thanks to the 3 contributors who made this release possible. Here are some highlights ✨:
+
+Added a new FilePicker component, some changes to page navigation and improvements to JavaScript runtime code.
+
+- &#8203;<!-- 8 -->Fix navigation through DOM views with pages (#1565) @apedroferreira
+- &#8203;<!-- 7 -->Add FilePicker component (#1537) @bytasv
+- &#8203;<!-- 6 -->Split browser and server js runtimes (#1584) @Janpot
+- &#8203;<!-- 5 -->Fix webpack missing exports warnings (#1582) @Janpot
+- &#8203;<!-- 4 -->Make applyTransform runtime agnostic (#1585) @Janpot
+- &#8203;<!-- 3 -->Recreate yarn.lock (#1577) @Janpot
+- &#8203;<!-- 2 -->Upgrade monorepo dependency (#1580) @Janpot
+- &#8203;<!-- 1 -->Remove onChangeHandler from Select and TextField (#1576) @Janpot
+
+All contributors of this release in alphabetical order: @apedroferreira, @bytasv, @Janpot
+
+✨ Done in 1.69s.
+
+## 0.0.36
+
+<!-- generated comparing v0.0.35..master -->
+
+_Jan 18, 2023_
+
+A big thanks to the 3 contributors who made this release possible. Here are some highlights ✨:
+
+Added Tabs component and new canvas bridge implementation, fixed DatePicker localization, binding to objects, link redirection. Improved code around js evaluation.
+
+- &#8203;<!-- 9 -->Fix DatePicker localization issues (#1575) @Janpot
+- &#8203;<!-- 8 -->Avoid resubscribing in useSyncExternalStore on every render (#1554) @Janpot
+- &#8203;<!-- 7 -->Rename Tabs main prop (#1568) @bytasv
+- &#8203;<!-- 6 -->Add tabs and container components (#1549) @bytasv
+- &#8203;<!-- 5 -->Reorganize js evaluation across project (#1548) @Janpot
+- &#8203;<!-- 4 -->New canvas bridge implementation (#1550) @Janpot
+- &#8203;<!-- 3 -->Fix binding to objects with more than one property (#1542) @Janpot
+- &#8203;<!-- 2 -->[core] Add missing need triage label on RFC @oliviertassinari
+- &#8203;<!-- 1 -->[docs] Fix link redirection @oliviertassinari
+
+All contributors of this release in alphabetical order: @bytasv, @Janpot, @oliviertassinari
+
 ## 0.0.35
 
 <!-- generated comparing v0.0.34..master -->

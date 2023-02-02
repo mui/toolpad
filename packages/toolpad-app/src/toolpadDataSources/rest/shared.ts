@@ -4,6 +4,7 @@ import {
   BindableAttrValues,
   JsRuntime,
   Serializable,
+  SerializedError,
 } from '@mui/toolpad-core';
 import { evaluateBindable } from '@mui/toolpad-core/jsRuntime';
 import { ensureSuffix, removePrefix } from '../../utils/strings';
@@ -17,8 +18,8 @@ import {
   RestConnectionParams,
   UrlEncodedBody,
 } from './types';
-import applyTransform from '../../server/applyTransform';
-import { errorFrom } from '../../utils/errors';
+import applyTransform from '../applyTransform';
+import { errorFrom, serializeError } from '../../utils/errors';
 import { MOVIES_API_DEMO_URL } from '../demo';
 
 export const HTTP_NO_BODY = new Set(['GET', 'HEAD']);
@@ -223,7 +224,7 @@ export async function execfetch(
     }
   }
 
-  let error: Error | undefined;
+  let error: SerializedError | undefined;
   let untransformedData;
   let data;
 
@@ -238,10 +239,10 @@ export async function execfetch(
     data = untransformedData;
 
     if (fetchQuery.transformEnabled && fetchQuery.transform) {
-      data = await applyTransform(fetchQuery.transform, untransformedData);
+      data = await applyTransform(jsRuntime, fetchQuery.transform, untransformedData);
     }
   } catch (rawError) {
-    error = errorFrom(rawError);
+    error = serializeError(errorFrom(rawError));
   }
 
   return { data, untransformedData, error };

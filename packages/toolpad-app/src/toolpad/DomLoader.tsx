@@ -3,6 +3,7 @@ import { NodeId } from '@mui/toolpad-core';
 import { createProvidedContext } from '@mui/toolpad-core/utils/react';
 import invariant from 'invariant';
 import { debounce, DebouncedFunc } from 'lodash-es';
+import { useLocation } from 'react-router-dom';
 import * as appDom from '../appDom';
 import { update } from '../utils/immutability';
 import client from '../api';
@@ -13,14 +14,8 @@ import insecureHash from '../utils/insecureHash';
 import useEvent from '../utils/useEvent';
 import { NodeHashes } from '../types';
 import { hasFieldFocus } from '../utils/fields';
-
-export type DomView =
-  | { kind: 'page'; nodeId?: NodeId }
-  | { kind: 'query'; nodeId: NodeId }
-  | { kind: 'pageModule'; nodeId: NodeId }
-  | { kind: 'pageParameters'; nodeId: NodeId }
-  | { kind: 'connection'; nodeId: NodeId }
-  | { kind: 'codeComponent'; nodeId: NodeId };
+import { DomView, getViewFromPathname } from '../utils/domView';
+import config from '../config';
 
 export type ComponentPanelTab = 'component' | 'theme';
 
@@ -50,6 +45,10 @@ export type DomAction =
       updater: (dom: appDom.AppDom) => appDom.AppDom;
       selectedNodeId?: NodeId | null;
       view?: DomView;
+    }
+  | {
+      type: 'DOM_SERVER_UPDATE';
+      dom: appDom.AppDom;
     }
   | {
       type: 'DOM_SET_VIEW';
@@ -200,6 +199,14 @@ export function domLoaderReducer(state: DomLoader, action: DomAction): DomLoader
           : {}),
         ...(view ? { currentView: view } : {}),
       });
+    }
+    case 'DOM_SERVER_UPDATE': {
+      if (state.unsavedChanges > 0) {
+        // Ignore this server update
+        return state;
+      }
+
+      return update(state, { dom: action.dom });
     }
     case 'DOM_SET_VIEW': {
       return update(state, {
@@ -367,6 +374,17 @@ export default function DomProvider({ appId, children }: DomContextProps) {
 
   invariant(dom, `Suspense should load the dom`);
 
+  const location = useLocation();
+
+  const app = appDom.getApp(dom);
+  const { pages = [] } = appDom.getChildNodes(dom, app);
+  const firstPage = pages.length > 0 ? pages[0] : null;
+
+  const initialView = getViewFromPathname(location.pathname) || {
+    kind: 'page',
+    nodeId: firstPage?.id,
+  };
+
   const [state, dispatch] = React.useReducer(domLoaderReducer, {
     saving: false,
     unsavedChanges: 0,
@@ -374,19 +392,26 @@ export default function DomProvider({ appId, children }: DomContextProps) {
     savedDom: dom,
     dom,
     selectedNodeId: null,
-    currentView: { kind: 'page' },
+    currentView: initialView,
     currentTab: 'component',
     undoStack: [
       {
         dom,
         selectedNodeId: null,
-        view: { kind: 'page' },
+        view: initialView,
         tab: 'component',
         timestamp: Date.now(),
       },
     ],
     redoStack: [],
   });
+
+  React.useEffect(() => {
+    dispatch({
+      type: 'DOM_SERVER_UPDATE',
+      dom,
+    });
+  }, [dom]);
 
   const scheduleTextInputHistoryUpdate = React.useMemo(
     () =>
@@ -453,6 +478,40 @@ export default function DomProvider({ appId, children }: DomContextProps) {
   }, [state.unsavedChanges]);
 
   useShortcut({ key: 's', metaKey: true }, handleSave);
+
+  // Quick and dirty polling for dom updates
+  const fingerprint = React.useRef<number | undefined>();
+  React.useEffect(() => {
+    if (!config.localMode) {
+      return () => {};
+    }
+
+    let active = true;
+
+    (async () => {
+      while (active) {
+        try {
+          const currentFingerprint = fingerprint.current;
+          // eslint-disable-next-line no-await-in-loop
+          const newFingerPrint = await client.query.getDomFingerprint();
+          if (currentFingerprint && currentFingerprint !== newFingerPrint) {
+            client.invalidateQueries('loadDom', [appId]);
+          }
+          fingerprint.current = newFingerPrint;
+          // eslint-disable-next-line no-await-in-loop
+          await new Promise((resolve) => {
+            setTimeout(resolve, 1000);
+          });
+        } catch (err) {
+          console.error(err);
+        }
+      }
+    })();
+
+    return () => {
+      active = false;
+    };
+  }, [appId]);
 
   return (
     <DomLoaderProvider value={state}>

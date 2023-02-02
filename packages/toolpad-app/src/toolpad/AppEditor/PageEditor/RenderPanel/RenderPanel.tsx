@@ -44,7 +44,11 @@ export default function RenderPanel({ className }: RenderPanelProps) {
   const handleInit = useEvent((initializedBridge: ToolpadBridge) => {
     initializedBridge.canvasEvents.on('propUpdated', (event) => {
       domApi.update((draft) => {
-        const node = appDom.getNode(draft, event.nodeId as NodeId, 'element');
+        const node = appDom.getMaybeNode(draft, event.nodeId as NodeId, 'element');
+        if (!node) {
+          return draft;
+        }
+
         const actual = node.props?.[event.prop];
         if (actual && actual.type !== 'const') {
           console.warn(`Can't update a non-const prop "${event.prop}" on node "${node.id}"`);

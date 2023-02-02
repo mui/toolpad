@@ -5,14 +5,14 @@ import { readJsonFile } from '../../utils/fs';
 import clickCenter from '../../utils/clickCenter';
 import generateId from '../../utils/generateId';
 
-test('Code component cell', async ({ page, browserName, api }) => {
+test('Code component cell', async ({ page, api }) => {
   const dom = await readJsonFile(path.resolve(__dirname, './codeComponentCell.json'));
 
   const app = await api.mutation.createApp(`App ${generateId()}`, {
     from: { kind: 'dom', dom },
   });
 
-  const editorModel = new ToolpadEditor(page, browserName);
+  const editorModel = new ToolpadEditor(page);
   editorModel.goto(app.id);
 
   await editorModel.waitForOverlay();

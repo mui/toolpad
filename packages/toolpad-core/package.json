@@ -1,6 +1,6 @@
 {
   "name": "@mui/toolpad-core",
-  "version": "0.0.38",
+  "version": "0.0.39-alpha.0",
   "description": "Build MUI apps quickly",
   "author": "MUI Toolpad team",
   "homepage": "https://github.com/mui/mui-toolpad#readme",
@@ -73,6 +73,7 @@
     "dev": "concurrently \"yarn:dev:*\" yarn:cjsify",
     "dev:esm": "yarn build:esm --pretty --watch --preserveWatchOutput",
     "dev:cjs": "yarn build:cjs --pretty --watch --preserveWatchOutput",
+    "dev13": "yarn dev",
     "test": "echo \"Error: run tests from root\" && exit 1",
     "check-types": "yarn build"
   },

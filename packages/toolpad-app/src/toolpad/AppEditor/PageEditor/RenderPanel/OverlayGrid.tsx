@@ -16,18 +16,18 @@ const StyledGrid = styled(Grid)({
   height: '100vh',
   pointerEvents: 'none',
   position: 'absolute',
-  width: 'calc(100vw - 6px)',
+  width: 'calc(100vw - 12px)',
   zIndex: 1,
   margin: '0 auto',
-  left: -1,
+  left: -6,
 });
 
-const StyledGridColumn = styled('div')({
-  backgroundColor: 'pink',
+const StyledGridColumn = styled('div')(({ theme }) => ({
+  backgroundColor: theme.palette.grey[400],
   height: '100%',
   opacity: 0.2,
   width: '100%',
-});
+}));
 
 export const OverlayGrid = React.forwardRef<OverlayGridHandle>(function OverlayGrid(
   props,

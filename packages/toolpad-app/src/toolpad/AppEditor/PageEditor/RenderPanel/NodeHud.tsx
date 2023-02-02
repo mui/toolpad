@@ -16,6 +16,7 @@ import {
 import { useDom } from '../../../DomLoader';
 import { useToolpadComponent } from '../../toolpadComponents';
 import { getElementNodeComponentId } from '../../../../toolpadComponents';
+import { blue } from '../../../../theme';
 
 const HUD_POSITION_TOP = 'top';
 const HUD_POSITION_BOTTOM = 'bottom';
@@ -42,16 +43,16 @@ const NodeHudWrapper = styled('div', {
   // capture mouse events
   pointerEvents: 'initial',
   position: 'absolute',
-  outline: `2px dashed rgba(0, 127, 255, 0.4)`,
+  outline: `2px dashed ${blue[500]}`,
   userSelect: 'none',
   [`.${nodeHudClasses.selected}`]: {
     position: 'absolute',
     height: '100%',
     width: '100%',
-    outline: '2px solid red',
+    outline: `2px solid ${blue[500]}`,
     left: 0,
     top: 0,
-    zIndex: 1,
+    zIndex: 2,
   },
   [`.${nodeHudClasses.selectionHint}`]: {
     // capture mouse events
@@ -61,7 +62,7 @@ const NodeHudWrapper = styled('div', {
     position: 'absolute',
     alignItems: 'center',
     right: -1,
-    background: 'red',
+    background: blue[500],
     color: 'white',
     fontSize: 11,
     padding: `0 0 0 8px`,
@@ -120,8 +121,9 @@ const DraggableEdge = styled('div', {
 });
 
 const ResizePreview = styled('div')({
-  backgroundColor: '#44EB2D',
-  opacity: 0.5,
+  backgroundColor: blue[500],
+  opacity: 0.2,
+  zIndex: 3,
 });
 
 interface NodeHudProps {

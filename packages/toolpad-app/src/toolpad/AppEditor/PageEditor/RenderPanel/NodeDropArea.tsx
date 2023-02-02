@@ -25,6 +25,7 @@ import {
   usePageEditorState,
 } from '../PageEditorProvider';
 import { isPageRow } from '../../../../toolpadComponents';
+import { blue } from '../../../../theme';
 
 const dropAreaHighlightClasses = {
   highlightedTop: 'DropArea_HighlightedTop',
@@ -51,50 +52,50 @@ const StyledNodeDropArea = styled('div', {
     position: 'absolute',
     [`&.${dropAreaHighlightClasses.highlightedTop}`]: {
       '&:after': {
-        backgroundColor: '#44EB2D',
+        backgroundColor: blue[500],
         content: "''",
         position: 'absolute',
-        height: 4,
+        height: 2,
         width: highlightWidth,
-        top: -2,
+        top: -1,
         left: highlightRelativeX,
       },
     },
     [`&.${dropAreaHighlightClasses.highlightedRight}`]: {
       '&:after': {
-        backgroundColor: '#44EB2D',
+        backgroundColor: blue[500],
         content: "''",
         position: 'absolute',
         height: highlightHeight,
-        width: 4,
+        width: 2,
         top: highlightRelativeY,
-        right: -2,
+        right: -1,
       },
     },
     [`&.${dropAreaHighlightClasses.highlightedBottom}`]: {
       '&:after': {
-        backgroundColor: '#44EB2D',
+        backgroundColor: blue[500],
         content: "''",
         position: 'absolute',
-        height: 4,
+        height: 2,
         width: highlightWidth,
-        bottom: -2,
+        bottom: -1,
         left: highlightRelativeX,
       },
     },
     [`&.${dropAreaHighlightClasses.highlightedLeft}`]: {
       '&:after': {
-        backgroundColor: '#44EB2D',
+        backgroundColor: blue[500],
         content: "''",
         position: 'absolute',
         height: highlightHeight,
-        width: 4,
-        left: -2,
+        width: 2,
+        left: -1,
         top: highlightRelativeY,
       },
     },
     [`&.${dropAreaHighlightClasses.highlightedCenter}`]: {
-      border: '4px solid #44EB2D',
+      border: `4px solid ${blue[500]}`,
     },
   };
 });

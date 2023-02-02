@@ -7,7 +7,6 @@ import * as appDom from '../../../appDom';
 import { tryFormat } from '../../../utils/prettier';
 import useShortcut from '../../../utils/useShortcut';
 import lazyComponent from '../../../utils/lazyComponent';
-import useEditorUnsavedChangesConfirm from '../../hooks/useEditorUnsavedChangesConfirm';
 
 const TypescriptEditor = lazyComponent(() => import('../../../components/TypescriptEditor'), {
   noSsr: true,
@@ -40,8 +39,6 @@ function PageModuleEditorDialog({ pageNodeId, open, onClose }: PageModuleEditorD
 
   const [input, setInput] = React.useState(value);
 
-  const hasUnsavedChanges = input !== value;
-
   const handleSave = React.useCallback(() => {
     const pretty = tryFormat(input);
     setInput(pretty);
@@ -51,18 +48,10 @@ function PageModuleEditorDialog({ pageNodeId, open, onClose }: PageModuleEditorD
     );
   }, [domApi, input, page]);
 
-  const {
-    handleCloseWithoutCheck: handleDialogCloseWithoutCheck,
-    handleCloseWithCheck: handleDialogCloseWithCheck,
-  } = useEditorUnsavedChangesConfirm({
-    hasUnsavedChanges,
-    onClose,
-  });
-
   const handleSaveButton = React.useCallback(() => {
     handleSave();
-    handleDialogCloseWithoutCheck();
-  }, [handleDialogCloseWithoutCheck, handleSave]);
+    onClose();
+  }, [onClose, handleSave]);
 
   useShortcut({ key: 's', metaKey: true, disabled: !open }, handleSave);
 
@@ -71,7 +60,7 @@ function PageModuleEditorDialog({ pageNodeId, open, onClose }: PageModuleEditorD
   }, [value]);
 
   return (
-    <Dialog onClose={handleDialogCloseWithCheck} open={open} fullWidth maxWidth="lg">
+    <Dialog onClose={onClose} open={open} fullWidth maxWidth="lg">
       <DialogTitle>Edit page module</DialogTitle>
       <Box sx={{ height: 500 }}>
         <TypescriptEditor
@@ -81,7 +70,7 @@ function PageModuleEditorDialog({ pageNodeId, open, onClose }: PageModuleEditorD
         />
       </Box>
       <DialogActions>
-        <Button color="inherit" variant="text" onClick={handleDialogCloseWithoutCheck}>
+        <Button color="inherit" variant="text" onClick={onClose}>
           Cancel
         </Button>
         <Button onClick={handleSaveButton}>Save</Button>

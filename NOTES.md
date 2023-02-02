@@ -39,3 +39,4 @@ tentative dir 13 to do list:
 - which node versions to support?
 - remove function datasource
 - remove all datasources?
+- deploys take too long

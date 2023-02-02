@@ -1231,7 +1231,7 @@ export default function RenderOverlay({ bridge }: RenderOverlayProps) {
       api,
       appStateApi,
       availableDropZones,
-      bridge?.canvasCommands,
+      bridge,
       dom,
       dragOverNodeId,
       dragOverSlotParentProp,

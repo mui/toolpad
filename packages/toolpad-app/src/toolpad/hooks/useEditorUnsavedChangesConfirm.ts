@@ -1,13 +1,15 @@
 import React from 'react';
 
+type OnCloseType = (...args: unknown[]) => void | Promise<void>;
+
 interface UseEditorUnsavedChangesConfirmInput {
   hasUnsavedChanges: boolean;
-  onClose: (...args: unknown[]) => void | Promise<void>;
+  onClose: OnCloseType;
 }
 
 interface UseEditorUnsavedChangesConfirmPayload {
-  handleCloseWithoutCheck: (...args: unknown[]) => void | Promise<void>;
-  handleCloseWithCheck: (...args: unknown[]) => void | Promise<void>;
+  handleCloseWithoutCheck: OnCloseType;
+  handleCloseWithCheck: OnCloseType;
 }
 
 export default function useEditorUnsavedChangesConfirm({

@@ -14,7 +14,7 @@ const DEV_COMPOSE_FILE = path.resolve(__dirname, '../../docker-compose.dev.yml')
 export async function isRunning(): Promise<boolean> {
   try {
     const { stdout } = await exec(
-      `docker-compose -f ${DEV_COMPOSE_FILE} ps --format=json postgres`,
+      `docker compose -f=${DEV_COMPOSE_FILE} ps --format=json postgres`,
     );
     const [service] = JSON.parse(stdout);
     return service?.State === 'running';
@@ -28,7 +28,7 @@ export async function isRunning(): Promise<boolean> {
  */
 export async function dump(): Promise<Buffer> {
   const proc = exec(
-    `docker-compose -f ${DEV_COMPOSE_FILE} exec postgres pg_dump -U postgres --format t`,
+    `docker compose -f=${DEV_COMPOSE_FILE} exec postgres pg_dump -U postgres --format t`,
     { encoding: 'buffer' },
   );
 
@@ -51,7 +51,7 @@ export async function dump(): Promise<Buffer> {
  */
 export async function restore(pgDump: string): Promise<void> {
   const proc = exec(
-    `docker-compose -f ${DEV_COMPOSE_FILE} exec postgres pg_restore -U postgres -d postgres --clean`,
+    `docker compose -f=${DEV_COMPOSE_FILE} exec postgres pg_restore -U postgres -d postgres --clean`,
   );
 
   if (!proc.child.stdin) {

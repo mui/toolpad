@@ -29,6 +29,7 @@ import { ConfirmDialog } from '../../../../components/SystemDialogs';
 import useBoolean from '../../../../utils/useBoolean';
 import { useNodeNameValidation } from '../../HierarchyExplorer/validation';
 import useEvent from '../../../../utils/useEvent';
+import useEditorUnsavedChangesConfirm from '../../../hooks/useEditorUnsavedChangesConfirm';
 
 interface QueryEditorDialogActionsProps {
   saveDisabled?: boolean;
@@ -219,18 +220,10 @@ export default function QueryNodeEditorDialog<Q>({
 
   const isInputSaved = !isDraft && node === input;
 
-  const handleClose = React.useCallback(() => {
-    const ok = isInputSaved
-      ? true
-      : // eslint-disable-next-line no-alert
-        window.confirm(
-          'Are you sure you want to close the editor? All unsaved progress will be lost.',
-        );
-
-    if (ok) {
-      onClose();
-    }
-  }, [onClose, isInputSaved]);
+  const { handleCloseWithoutCheck, handleCloseWithCheck } = useEditorUnsavedChangesConfirm({
+    hasUnsavedChanges: !isInputSaved,
+    onClose,
+  });
 
   const handleSave = React.useCallback(() => {
     handleCommit();
@@ -261,7 +254,7 @@ export default function QueryNodeEditorDialog<Q>({
   const isNameValid = !nodeNameError;
 
   return (
-    <Dialog fullWidth maxWidth="xl" open={open} onClose={handleClose}>
+    <Dialog fullWidth maxWidth="xl" open={open} onClose={handleCloseWithCheck}>
       {dataSourceId && dataSource && queryEditorContext ? (
         <ConnectionContextProvider value={queryEditorContext}>
           <DialogTitle>
@@ -352,7 +345,7 @@ export default function QueryNodeEditorDialog<Q>({
           </DialogContent>
           <QueryEditorDialogActions
             onSave={handleSave}
-            onClose={handleClose}
+            onClose={handleCloseWithoutCheck}
             onRemove={handleRemove}
             saveDisabled={isInputSaved || !isNameValid}
           />

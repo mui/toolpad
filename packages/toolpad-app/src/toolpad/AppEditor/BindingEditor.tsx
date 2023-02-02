@@ -47,6 +47,7 @@ import * as appDom from '../../appDom';
 import { usePageEditorState } from './PageEditor/PageEditorProvider';
 import GlobalScopeExplorer from './GlobalScopeExplorer';
 import TabPanel from '../../components/TabPanel';
+import useEditorUnsavedChangesConfirm from '../hooks/useEditorUnsavedChangesConfirm';
 
 interface BindingEditorContext {
   label: string;
@@ -330,22 +331,27 @@ export function BindingEditorDialog<V>({
     onChange(newValue);
   }, [onChange, input]);
 
+  const hasUnsavedChanges = input ? input !== committedInput.current : false;
+
+  const { handleCloseWithoutCheck, handleCloseWithCheck } = useEditorUnsavedChangesConfirm({
+    hasUnsavedChanges,
+    onClose,
+  });
+
   const handleCommit = React.useCallback(() => {
     handleSave();
-    onClose();
-  }, [handleSave, onClose]);
+    handleCloseWithoutCheck();
+  }, [handleCloseWithoutCheck, handleSave]);
 
   const handleRemove = React.useCallback(() => {
     onChange(null);
-    onClose();
-  }, [onChange, onClose]);
+    handleCloseWithoutCheck();
+  }, [handleCloseWithoutCheck, onChange]);
 
   useShortcut({ key: 's', metaKey: true, disabled: !open }, handleSave);
 
-  const hasUnsavedChanges = input && input !== committedInput.current;
-
   return (
-    <Dialog onClose={onClose} open={open} fullWidth scroll="body" maxWidth="lg">
+    <Dialog onClose={handleCloseWithCheck} open={open} fullWidth scroll="body" maxWidth="lg">
       <DialogTitle>Bind a property</DialogTitle>
       <DialogContent>
         {propType?.type === 'event' ? (
@@ -358,7 +364,7 @@ export function BindingEditorDialog<V>({
         )}
       </DialogContent>
       <DialogActions>
-        <Button color="inherit" variant="text" onClick={onClose}>
+        <Button color="inherit" variant="text" onClick={handleCloseWithoutCheck}>
           {hasUnsavedChanges ? 'Cancel' : 'Close'}
         </Button>
         <Button color="inherit" disabled={!value} onClick={handleRemove}>

@@ -13,6 +13,7 @@ import * as appDom from '../../../appDom';
 import { useDom, useDomApi, useAppState, useAppStateApi } from '../../AppState';
 import MapEntriesEditor from '../../../components/MapEntriesEditor';
 import useBoolean from '../../../utils/useBoolean';
+import useEditorUnsavedChangesConfirm from '../../hooks/useEditorUnsavedChangesConfirm';
 
 export interface UrlQueryEditorProps {
   pageNodeId: NodeId;
@@ -49,32 +50,17 @@ export default function UrlQueryEditor({ pageNodeId }: UrlQueryEditorProps) {
     });
   }, [appStateApi, pageNodeId]);
 
-  const handleDialogClose = React.useCallback(
-    (skipUnsavedChangesCheck: boolean) => () => {
-      if (hasUnsavedChanges && !skipUnsavedChangesCheck) {
-        // eslint-disable-next-line no-alert
-        const ok = window.confirm(
-          'You have unsaved changes. Are you sure you want to navigate away?\nAll changes will be discarded.',
-        );
+  const handleDialogClose = React.useCallback(() => {
+    appStateApi.setView({ kind: 'page', nodeId: pageNodeId });
+  }, [appStateApi, pageNodeId]);
 
-        if (!ok) {
-          return;
-        }
-      }
-
-      appStateApi.setView({ kind: 'page', nodeId: pageNodeId });
-    },
-    [appStateApi, hasUnsavedChanges, pageNodeId],
-  );
-
-  const handleDialogCloseWithoutCheck = React.useMemo(
-    () => handleDialogClose(true),
-    [handleDialogClose],
-  );
-  const handleDialogCloseWithCheck = React.useMemo(
-    () => handleDialogClose(false),
-    [handleDialogClose],
-  );
+  const {
+    handleCloseWithoutCheck: handleDialogCloseWithoutCheck,
+    handleCloseWithCheck: handleDialogCloseWithCheck,
+  } = useEditorUnsavedChangesConfirm({
+    hasUnsavedChanges,
+    onClose: handleDialogClose,
+  });
 
   const handleSave = React.useCallback(() => {
     domApi.update((draft) =>
@@ -119,7 +105,7 @@ export default function UrlQueryEditor({ pageNodeId }: UrlQueryEditorProps) {
           />
         </DialogContent>
         <DialogActions>
-          <Button color="inherit" variant="text" onClick={handleDialogCloseWithCheck}>
+          <Button color="inherit" variant="text" onClick={handleDialogCloseWithoutCheck}>
             Close
           </Button>
           <Button disabled={value === input} onClick={handleSave}>

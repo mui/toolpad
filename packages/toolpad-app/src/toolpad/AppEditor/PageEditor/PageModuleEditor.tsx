@@ -7,6 +7,7 @@ import * as appDom from '../../../appDom';
 import { tryFormat } from '../../../utils/prettier';
 import useShortcut from '../../../utils/useShortcut';
 import lazyComponent from '../../../utils/lazyComponent';
+import useEditorUnsavedChangesConfirm from '../../hooks/useEditorUnsavedChangesConfirm';
 
 const TypescriptEditor = lazyComponent(() => import('../../../components/TypescriptEditor'), {
   noSsr: true,
@@ -50,32 +51,13 @@ function PageModuleEditorDialog({ pageNodeId, open, onClose }: PageModuleEditorD
     );
   }, [domApi, input, page]);
 
-  const handleDialogClose = React.useCallback(
-    (skipUnsavedChangesCheck: boolean) => () => {
-      if (hasUnsavedChanges && !skipUnsavedChangesCheck) {
-        // eslint-disable-next-line no-alert
-        const ok = window.confirm(
-          'You have unsaved changes. Are you sure you want to navigate away?\nAll changes will be discarded.',
-        );
-
-        if (!ok) {
-          return;
-        }
-      }
-
-      onClose();
-    },
-    [hasUnsavedChanges, onClose],
-  );
-
-  const handleDialogCloseWithoutCheck = React.useMemo(
-    () => handleDialogClose(true),
-    [handleDialogClose],
-  );
-  const handleDialogCloseWithCheck = React.useMemo(
-    () => handleDialogClose(false),
-    [handleDialogClose],
-  );
+  const {
+    handleCloseWithoutCheck: handleDialogCloseWithoutCheck,
+    handleCloseWithCheck: handleDialogCloseWithCheck,
+  } = useEditorUnsavedChangesConfirm({
+    hasUnsavedChanges,
+    onClose,
+  });
 
   const handleSaveButton = React.useCallback(() => {
     handleSave();
@@ -99,7 +81,7 @@ function PageModuleEditorDialog({ pageNodeId, open, onClose }: PageModuleEditorD
         />
       </Box>
       <DialogActions>
-        <Button color="inherit" variant="text" onClick={handleDialogCloseWithCheck}>
+        <Button color="inherit" variant="text" onClick={handleDialogCloseWithoutCheck}>
           Cancel
         </Button>
         <Button onClick={handleSaveButton}>Save</Button>

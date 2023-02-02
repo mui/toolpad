@@ -60,7 +60,7 @@
       "type": "element",
       "props": {},
       "layout": {},
-      "parentId": "x533yj6",
+      "parentId": "vv33pd0",
       "attributes": {
         "component": {
           "type": "const",
@@ -68,7 +68,7 @@
         }
       },
       "parentProp": "children",
-      "parentIndex": "a0"
+      "parentIndex": "a1"
     },
     "7i93pcv": {
       "id": "7i93pcv",
@@ -408,22 +408,6 @@
       },
       "parentProp": "children",
       "parentIndex": "a0"
-    },
-    "x533yj6": {
-      "id": "x533yj6",
-      "name": "pageRow1",
-      "type": "element",
-      "props": {},
-      "layout": {},
-      "parentId": "f703ps3",
-      "attributes": {
-        "component": {
-          "type": "const",
-          "value": "PageRow"
-        }
-      },
-      "parentProp": "children",
-      "parentIndex": "a6"
     },
     "zc13pha": {
       "id": "zc13pha",

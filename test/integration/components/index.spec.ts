@@ -29,6 +29,7 @@ async function waitForComponents(page: Page, frame: Page | FrameLocator = page) 
   await select.waitFor({ state: 'visible' });
 
   const list = await page.locator('text="List Button 3"');
+  await list.scrollIntoViewIfNeeded();
   await list.waitFor({ state: 'visible' });
 }
 

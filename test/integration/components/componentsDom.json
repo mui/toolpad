@@ -60,7 +60,7 @@
       "type": "element",
       "props": {},
       "layout": {},
-      "parentId": "vv33pd0",
+      "parentId": "9n33yll",
       "attributes": {
         "component": {
           "type": "const",
@@ -68,7 +68,7 @@
         }
       },
       "parentProp": "children",
-      "parentIndex": "a1"
+      "parentIndex": "a0"
     },
     "7i93pcv": {
       "id": "7i93pcv",
@@ -106,6 +106,22 @@
       },
       "parentProp": "children",
       "parentIndex": "a0"
+    },
+    "9n33yll": {
+      "id": "9n33yll",
+      "name": "pageRow9",
+      "type": "element",
+      "props": {},
+      "layout": {},
+      "parentId": "f703ps3",
+      "attributes": {
+        "component": {
+          "type": "const",
+          "value": "PageRow"
+        }
+      },
+      "parentProp": "children",
+      "parentIndex": "a6"
     },
     "9qc3pjm": {
       "id": "9qc3pjm",

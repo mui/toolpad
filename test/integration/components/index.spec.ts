@@ -28,8 +28,7 @@ async function waitForComponents(page: Page, frame: Page | FrameLocator = page) 
   const select = frame.locator('label:has-text("foo select")');
   await select.waitFor({ state: 'visible' });
 
-  const list = await page.locator('text="List Button 3"');
-  await list.scrollIntoViewIfNeeded();
+  const list = frame.locator('text="List Button 3"');
   await list.waitFor({ state: 'visible' });
 }
 

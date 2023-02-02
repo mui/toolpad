@@ -219,6 +219,19 @@ export default function QueryNodeEditorDialog<Q>({
 
   const isInputSaved = !isDraft && node === input;
 
+  const handleClose = React.useCallback(() => {
+    const ok = isInputSaved
+      ? true
+      : // eslint-disable-next-line no-alert
+        window.confirm(
+          'Are you sure you want to close the editor. All unsaved progress will be lost.',
+        );
+
+    if (ok) {
+      onClose();
+    }
+  }, [onClose, isInputSaved]);
+
   const handleSave = React.useCallback(() => {
     handleCommit();
     onClose();
@@ -248,7 +261,7 @@ export default function QueryNodeEditorDialog<Q>({
   const isNameValid = !nodeNameError;
 
   return (
-    <Dialog fullWidth maxWidth="xl" open={open} onClose={onClose}>
+    <Dialog fullWidth maxWidth="xl" open={open} onClose={handleClose}>
       {dataSourceId && dataSource && queryEditorContext ? (
         <ConnectionContextProvider value={queryEditorContext}>
           <DialogTitle>
@@ -339,7 +352,7 @@ export default function QueryNodeEditorDialog<Q>({
           </DialogContent>
           <QueryEditorDialogActions
             onSave={handleSave}
-            onClose={onClose}
+            onClose={handleClose}
             onRemove={handleRemove}
             saveDisabled={isInputSaved || !isNameValid}
           />

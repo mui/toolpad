@@ -50,7 +50,8 @@ test('can use images app template', async ({ page }) => {
   await subBreedInputLocator.click();
   await page.getByRole('option', { name: 'shepherd' }).click();
 
-  const imageLocator = page.locator('img');
+  const imageLocator = page.getByTestId('page-root').locator('img');
+
   await expect(imageLocator).toHaveAttribute(
     'src',
     /^https:\/\/images.dog.ceo\/breeds\/australian-shepherd\/[^/]+$/,

@@ -2,6 +2,7 @@ import type { GetServerSideProps, NextPage } from 'next';
 import * as React from 'react';
 import { asArray } from '../../../src/utils/collections';
 import ToolpadApp, { ToolpadAppProps } from '../../../src/runtime/ToolpadApp';
+import config from '../../../src/config';
 
 export const getServerSideProps: GetServerSideProps<ToolpadAppProps> = async (context) => {
   const [
@@ -11,6 +12,12 @@ export const getServerSideProps: GetServerSideProps<ToolpadAppProps> = async (co
     import('../../../src/server/data'),
     import('../../../src/server/basicAuth'),
   ]);
+
+  if (config.localMode) {
+    return {
+      notFound: true,
+    };
+  }
 
   const [appId] = asArray(context.query.appId);
   const app = appId ? await getApp(appId) : null;

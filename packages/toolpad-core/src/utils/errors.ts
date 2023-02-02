@@ -1,6 +1,6 @@
-import { SerializedError } from '../types';
-import { hasOwnProperty } from './collections';
-import { truncate } from './strings';
+import { SerializedError } from '../types.js';
+import { hasOwnProperty } from './collections.js';
+import { truncate } from './strings.js';
 
 export function serializeError(error: Error & { code?: unknown }): SerializedError {
   const { message, name, stack, code } = error;

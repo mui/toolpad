@@ -10,9 +10,10 @@ import productIconLight from '../../../../public/product-icon-light.svg';
 export interface HeaderProps {
   actions?: React.ReactNode;
   status?: React.ReactNode;
+  enableUserFeedback?: boolean;
 }
 
-function Header({ actions, status }: HeaderProps) {
+function Header({ actions, status, enableUserFeedback = true }: HeaderProps) {
   const theme = useTheme();
   const { themeMode, setThemeMode } = useThemeMode();
 
@@ -60,6 +61,8 @@ function Header({ actions, status }: HeaderProps) {
                   lineHeight: '21px',
                   fontSize: '16px',
                   fontWeight: 700,
+                  letterSpacing: 0,
+                  fontFamily: theme.typography.fontFamily,
                 }}
               >
                 MUI Toolpad
@@ -91,7 +94,7 @@ function Header({ actions, status }: HeaderProps) {
         >
           {status}
           <ThemeModeMenu mode={themeMode} onChange={handleThemeModeChange} />
-          <UserFeedback />
+          {enableUserFeedback ? <UserFeedback /> : null}
         </Box>
       </Toolbar>
     </AppBar>

@@ -20,7 +20,12 @@ import AddIcon from '@mui/icons-material/Add';
 import UploadFileIcon from '@mui/icons-material/UploadFile';
 import NotesIcon from '@mui/icons-material/Notes';
 import AutoAwesomeMosaicIcon from '@mui/icons-material/AutoAwesomeMosaic';
+import InsightsIcon from '@mui/icons-material/Insights';
 import { SvgIconProps } from '@mui/material/SvgIcon';
+import PlaceIcon from '@mui/icons-material/Place';
+import ViewSidebarIcon from '@mui/icons-material/ViewSidebar';
+import MoodIcon from '@mui/icons-material/Mood';
+import HtmlIcon from '@mui/icons-material/Html';
 
 const iconMap = new Map<string, React.ComponentType<SvgIconProps>>([
   ['Text', NotesIcon],
@@ -43,6 +48,11 @@ const iconMap = new Map<string, React.ComponentType<SvgIconProps>>([
   ['CreateNew', AddIcon],
   ['Tabs', TabIcon],
   ['Container', AutoAwesomeMosaicIcon],
+  ['Chart', InsightsIcon],
+  ['Map', PlaceIcon],
+  ['Drawer', ViewSidebarIcon],
+  ['Icon', MoodIcon],
+  ['Html', HtmlIcon],
 ]);
 
 type ComponentItemKind = 'future' | 'builtIn' | 'create' | 'custom';

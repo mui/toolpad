@@ -35,7 +35,7 @@ export default createComponent(Button, {
     },
     size: {
       helperText: 'The size of the component. One of `small`, `medium`, or `large`.',
-      typeDef: { type: 'string', enum: ['small', 'medium', 'large'] },
+      typeDef: { type: 'string', enum: ['small', 'medium', 'large'], default: 'small' },
     },
     color: {
       helperText: 'The theme color of the component.',

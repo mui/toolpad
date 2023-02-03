@@ -4,6 +4,7 @@ import * as esbuild from 'esbuild';
 import * as path from 'path';
 import invariant from 'invariant';
 import { indent } from '@mui/toolpad-core/utils/strings';
+import config from '../../config';
 import { ServerDataSource } from '../../types';
 import { LocalPrivateQuery, LocalQuery, LocalConnectionParams } from './types';
 import { Maybe } from '../../utils/types';
@@ -379,4 +380,6 @@ async function startDev() {
   return builder;
 }
 
-globalThis.builder = globalThis.builder || startDev();
+if (config.localMode) {
+  globalThis.builder = globalThis.builder || startDev();
+}

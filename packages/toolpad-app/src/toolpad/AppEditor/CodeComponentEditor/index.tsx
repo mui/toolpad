@@ -190,7 +190,7 @@ function CodeComponentEditorContent({ codeComponentNode }: CodeComponentEditorCo
   const { argTypes = {} } = CodeComponent[TOOLPAD_COMPONENT];
 
   const defaultProps = React.useMemo(
-    () => mapValues(argTypes, (argType) => argType?.defaultValue),
+    () => mapValues(argTypes, (argType) => argType?.typeDef.default),
     [argTypes],
   );
 

@@ -86,21 +86,18 @@ export default createComponent(Text, {
     mode: {
       helperText:
         'Defines how the content is rendered. Either as plain text, markdown, or as a link.',
-      typeDef: { type: 'string', enum: ['text', 'markdown', 'link'] },
+      typeDef: { type: 'string', enum: ['text', 'markdown', 'link'], default: 'text' },
       label: 'Mode',
-      defaultValue: 'text',
     },
     value: {
       helperText: 'The text content.',
-      typeDef: { type: 'string' },
+      typeDef: { type: 'string', default: '' },
       label: 'Value',
-      defaultValue: '',
       control: { type: 'markdown' },
     },
     href: {
       helperText: 'The url that is being linked.',
-      typeDef: { type: 'string' },
-      defaultValue: 'about:blank',
+      typeDef: { type: 'string', default: 'about:blank' },
       visible: ({ mode }) => mode === 'link',
     },
     variant: {
@@ -116,8 +113,7 @@ export default createComponent(Text, {
     loading: {
       helperText:
         'Displays a loading animation instead of the text. Can be used when the content is not available yet.',
-      typeDef: { type: 'boolean' },
-      defaultValue: false,
+      typeDef: { type: 'boolean', default: false },
     },
     sx: {
       helperText: SX_PROP_HELPER_TEXT,

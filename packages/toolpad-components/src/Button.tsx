@@ -22,14 +22,16 @@ export default createComponent(Button, {
     },
     content: {
       helperText: 'Will appear as the text content of the button.',
-      typeDef: { type: 'string' },
-      defaultValue: 'Button Text',
+      typeDef: { type: 'string', default: 'Button Text' },
     },
     variant: {
       helperText:
         'One of the available MUI Button [variants](https://mui.com/material-ui/react-button/#basic-button). Possible values are `contained`, `outlined` or `text`',
-      typeDef: { type: 'string', enum: ['contained', 'outlined', 'text'] },
-      defaultValue: 'contained',
+      typeDef: {
+        type: 'string',
+        enum: ['contained', 'outlined', 'text'],
+        default: 'contained',
+      },
     },
     size: {
       helperText: 'The size of the component. One of `small`, `medium`, or `large`.',
@@ -37,8 +39,7 @@ export default createComponent(Button, {
     },
     color: {
       helperText: 'The theme color of the component.',
-      typeDef: { type: 'string', enum: ['primary', 'secondary'] },
-      defaultValue: 'primary',
+      typeDef: { type: 'string', enum: ['primary', 'secondary'], default: 'primary' },
     },
     fullWidth: {
       helperText: 'Whether the button should occupy all available horizontal space.',

@@ -36,6 +36,7 @@ import { useNodeNameValidation } from '../HierarchyExplorer/validation';
 import useUndoRedo from '../../hooks/useUndoRedo';
 import config from '../../../config';
 import client from '../../../api';
+import { getArgTypeDefaultValue } from '../../../runtime';
 
 const TypescriptEditor = lazyComponent(() => import('../../../components/TypescriptEditor'), {
   noSsr: true,
@@ -190,7 +191,7 @@ function CodeComponentEditorContent({ codeComponentNode }: CodeComponentEditorCo
   const { argTypes = {} } = CodeComponent[TOOLPAD_COMPONENT];
 
   const defaultProps = React.useMemo(
-    () => mapValues(argTypes, (argType) => argType?.typeDef.default),
+    () => mapValues(argTypes, (argType) => (argType ? getArgTypeDefaultValue(argType) : undefined)),
     [argTypes],
   );
 

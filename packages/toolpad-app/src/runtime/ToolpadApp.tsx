@@ -78,7 +78,7 @@ import { bridge } from '../canvas/ToolpadBridge';
 import Header from '../toolpad/ToolpadShell/Header';
 import { ThemeProvider } from '../ThemeContext';
 
-function getArgTypeDefaultValue<V>(argType: ArgTypeDefinition<{}, V>): V | undefined {
+export function getArgTypeDefaultValue<V>(argType: ArgTypeDefinition<{}, V>): V | undefined {
   return argType.typeDef.default ?? argType.defaultValue ?? undefined;
 }
 

@@ -43,8 +43,11 @@ const NodeHudWrapper = styled('div', {
   // capture mouse events
   pointerEvents: 'initial',
   position: 'absolute',
-  outline: `2px dashed ${blue[500]}`,
   userSelect: 'none',
+  zIndex: 2,
+  '&:hover': {
+    outline: `2px dashed ${blue[500]}`,
+  },
   [`.${nodeHudClasses.selected}`]: {
     position: 'absolute',
     height: '100%',

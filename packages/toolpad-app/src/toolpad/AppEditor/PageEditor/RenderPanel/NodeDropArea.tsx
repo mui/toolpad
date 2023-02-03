@@ -2,7 +2,6 @@ import * as React from 'react';
 import clsx from 'clsx';
 import { styled } from '@mui/material';
 import Typography from '@mui/material/Typography';
-import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 
 import { FlowDirection } from '../../../../types';
 import * as appDom from '../../../../appDom';
@@ -95,22 +94,20 @@ const StyledNodeDropArea = styled('div', {
       },
     },
     [`&.${dropAreaHighlightClasses.highlightedCenter}`]: {
-      border: `4px solid ${blue[500]}`,
+      border: `2px solid ${blue[500]}`,
     },
   };
 });
 
 const EmptySlot = styled('div')({
   alignItems: 'center',
-  border: '1px dashed green',
-  color: 'green',
+  border: `2px dotted ${blue[500]}`,
+  color: blue[500],
   display: 'flex',
   flexDirection: 'column',
   justifyContent: 'center',
   position: 'absolute',
-  opacity: 0.75,
   textAlign: 'center',
-  fontSize: 30,
 });
 
 function getChildNodeHighlightedZone(parentFlowDirection: FlowDirection): DropZone | null {
@@ -362,8 +359,7 @@ export default function NodeDropArea({
       />
       {isEmptySlot && slotRect ? (
         <EmptySlot style={absolutePositionCss(slotRect)}>
-          <AddCircleOutlineIcon fontSize="inherit" sx={{ mb: 0.2 }} />
-          <Typography variant="caption">Drop component here</Typography>
+          <Typography variant="subtitle2">Drop component here</Typography>
         </EmptySlot>
       ) : null}
     </React.Fragment>

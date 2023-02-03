@@ -47,7 +47,7 @@ import * as appDom from '../../appDom';
 import { usePageEditorState } from './PageEditor/PageEditorProvider';
 import GlobalScopeExplorer from './GlobalScopeExplorer';
 import TabPanel from '../../components/TabPanel';
-import useEditorUnsavedChangesConfirm from '../hooks/useEditorUnsavedChangesConfirm';
+import useUnsavedChangesConfirm from '../hooks/useUnsavedChangesConfirm';
 
 interface BindingEditorContext {
   label: string;
@@ -333,25 +333,31 @@ export function BindingEditorDialog<V>({
 
   const hasUnsavedChanges = input ? input !== committedInput.current : false;
 
-  const { handleCloseWithoutCheck, handleCloseWithCheck } = useEditorUnsavedChangesConfirm({
+  const { handleCloseWithUnsavedChanges } = useUnsavedChangesConfirm({
     hasUnsavedChanges,
     onClose,
   });
 
   const handleCommit = React.useCallback(() => {
     handleSave();
-    handleCloseWithoutCheck();
-  }, [handleCloseWithoutCheck, handleSave]);
+    onClose();
+  }, [handleSave, onClose]);
 
   const handleRemove = React.useCallback(() => {
     onChange(null);
-    handleCloseWithoutCheck();
-  }, [handleCloseWithoutCheck, onChange]);
+    onClose();
+  }, [onChange, onClose]);
 
   useShortcut({ key: 's', metaKey: true, disabled: !open }, handleSave);
 
   return (
-    <Dialog onClose={handleCloseWithCheck} open={open} fullWidth scroll="body" maxWidth="lg">
+    <Dialog
+      onClose={handleCloseWithUnsavedChanges}
+      open={open}
+      fullWidth
+      scroll="body"
+      maxWidth="lg"
+    >
       <DialogTitle>Bind a property</DialogTitle>
       <DialogContent>
         {propType?.type === 'event' ? (
@@ -364,7 +370,7 @@ export function BindingEditorDialog<V>({
         )}
       </DialogContent>
       <DialogActions>
-        <Button color="inherit" variant="text" onClick={handleCloseWithoutCheck}>
+        <Button color="inherit" variant="text" onClick={onClose}>
           {hasUnsavedChanges ? 'Cancel' : 'Close'}
         </Button>
         <Button color="inherit" disabled={!value} onClick={handleRemove}>

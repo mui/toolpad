@@ -13,7 +13,7 @@ import * as appDom from '../../../appDom';
 import { useDom, useDomApi, useAppState, useAppStateApi } from '../../AppState';
 import MapEntriesEditor from '../../../components/MapEntriesEditor';
 import useBoolean from '../../../utils/useBoolean';
-import useEditorUnsavedChangesConfirm from '../../hooks/useEditorUnsavedChangesConfirm';
+import useUnsavedChangesConfirm from '../../hooks/useUnsavedChangesConfirm';
 
 export interface UrlQueryEditorProps {
   pageNodeId: NodeId;
@@ -54,10 +54,7 @@ export default function UrlQueryEditor({ pageNodeId }: UrlQueryEditorProps) {
     appStateApi.setView({ kind: 'page', nodeId: pageNodeId });
   }, [appStateApi, pageNodeId]);
 
-  const {
-    handleCloseWithoutCheck: handleDialogCloseWithoutCheck,
-    handleCloseWithCheck: handleDialogCloseWithCheck,
-  } = useEditorUnsavedChangesConfirm({
+  const { handleCloseWithUnsavedChanges } = useUnsavedChangesConfirm({
     hasUnsavedChanges,
     onClose: handleDialogClose,
   });
@@ -72,8 +69,8 @@ export default function UrlQueryEditor({ pageNodeId }: UrlQueryEditorProps) {
         appDom.createConst(input || []),
       ),
     );
-    handleDialogCloseWithoutCheck();
-  }, [domApi, handleDialogCloseWithoutCheck, input, page]);
+    handleDialogClose();
+  }, [domApi, handleDialogClose, input, page]);
 
   React.useEffect(() => {
     if (currentView.kind === 'page' && currentView.view?.kind === 'pageParameters') {
@@ -88,7 +85,7 @@ export default function UrlQueryEditor({ pageNodeId }: UrlQueryEditorProps) {
       <Button color="inherit" startIcon={<AddIcon />} onClick={handleButtonClick}>
         Add page parameters
       </Button>
-      <Dialog fullWidth open={isDialogOpen} onClose={handleDialogCloseWithCheck}>
+      <Dialog fullWidth open={isDialogOpen} onClose={handleCloseWithUnsavedChanges}>
         <DialogTitle>Edit page parameters</DialogTitle>
         <DialogContent>
           <Typography>
@@ -105,7 +102,7 @@ export default function UrlQueryEditor({ pageNodeId }: UrlQueryEditorProps) {
           />
         </DialogContent>
         <DialogActions>
-          <Button color="inherit" variant="text" onClick={handleDialogCloseWithoutCheck}>
+          <Button color="inherit" variant="text" onClick={handleDialogClose}>
             Close
           </Button>
           <Button disabled={value === input} onClick={handleSave}>

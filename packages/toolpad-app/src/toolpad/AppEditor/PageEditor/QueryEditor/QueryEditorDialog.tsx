@@ -29,7 +29,7 @@ import { ConfirmDialog } from '../../../../components/SystemDialogs';
 import useBoolean from '../../../../utils/useBoolean';
 import { useNodeNameValidation } from '../../HierarchyExplorer/validation';
 import useEvent from '../../../../utils/useEvent';
-import useEditorUnsavedChangesConfirm from '../../../hooks/useEditorUnsavedChangesConfirm';
+import useUnsavedChangesConfirm from '../../../hooks/useUnsavedChangesConfirm';
 
 interface QueryEditorDialogActionsProps {
   saveDisabled?: boolean;
@@ -220,7 +220,7 @@ export default function QueryNodeEditorDialog<Q>({
 
   const isInputSaved = !isDraft && node === input;
 
-  const { handleCloseWithoutCheck, handleCloseWithCheck } = useEditorUnsavedChangesConfirm({
+  const { handleCloseWithUnsavedChanges } = useUnsavedChangesConfirm({
     hasUnsavedChanges: !isInputSaved,
     onClose,
   });
@@ -254,7 +254,7 @@ export default function QueryNodeEditorDialog<Q>({
   const isNameValid = !nodeNameError;
 
   return (
-    <Dialog fullWidth maxWidth="xl" open={open} onClose={handleCloseWithCheck}>
+    <Dialog fullWidth maxWidth="xl" open={open} onClose={handleCloseWithUnsavedChanges}>
       {dataSourceId && dataSource && queryEditorContext ? (
         <ConnectionContextProvider value={queryEditorContext}>
           <DialogTitle>
@@ -345,7 +345,7 @@ export default function QueryNodeEditorDialog<Q>({
           </DialogContent>
           <QueryEditorDialogActions
             onSave={handleSave}
-            onClose={handleCloseWithoutCheck}
+            onClose={onClose}
             onRemove={handleRemove}
             saveDisabled={isInputSaved || !isNameValid}
           />

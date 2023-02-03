@@ -7,7 +7,7 @@ import * as appDom from '../../../appDom';
 import { tryFormat } from '../../../utils/prettier';
 import useShortcut from '../../../utils/useShortcut';
 import lazyComponent from '../../../utils/lazyComponent';
-import useEditorUnsavedChangesConfirm from '../../hooks/useEditorUnsavedChangesConfirm';
+import useUnsavedChangesConfirm from '../../hooks/useUnsavedChangesConfirm';
 
 const TypescriptEditor = lazyComponent(() => import('../../../components/TypescriptEditor'), {
   noSsr: true,
@@ -51,18 +51,15 @@ function PageModuleEditorDialog({ pageNodeId, open, onClose }: PageModuleEditorD
     );
   }, [domApi, input, page]);
 
-  const {
-    handleCloseWithoutCheck: handleDialogCloseWithoutCheck,
-    handleCloseWithCheck: handleDialogCloseWithCheck,
-  } = useEditorUnsavedChangesConfirm({
+  const { handleCloseWithUnsavedChanges } = useUnsavedChangesConfirm({
     hasUnsavedChanges,
     onClose,
   });
 
   const handleSaveButton = React.useCallback(() => {
     handleSave();
-    handleDialogCloseWithoutCheck();
-  }, [handleDialogCloseWithoutCheck, handleSave]);
+    onClose();
+  }, [handleSave, onClose]);
 
   useShortcut({ key: 's', metaKey: true, disabled: !open }, handleSave);
 
@@ -71,7 +68,7 @@ function PageModuleEditorDialog({ pageNodeId, open, onClose }: PageModuleEditorD
   }, [value]);
 
   return (
-    <Dialog onClose={handleDialogCloseWithCheck} open={open} fullWidth maxWidth="lg">
+    <Dialog onClose={handleCloseWithUnsavedChanges} open={open} fullWidth maxWidth="lg">
       <DialogTitle>Edit page module</DialogTitle>
       <Box sx={{ height: 500 }}>
         <TypescriptEditor
@@ -81,7 +78,7 @@ function PageModuleEditorDialog({ pageNodeId, open, onClose }: PageModuleEditorD
         />
       </Box>
       <DialogActions>
-        <Button color="inherit" variant="text" onClick={handleDialogCloseWithoutCheck}>
+        <Button color="inherit" variant="text" onClick={onClose}>
           Cancel
         </Button>
         <Button onClick={handleSaveButton}>Save</Button>

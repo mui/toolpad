@@ -1565,6 +1565,7 @@ export default function RenderOverlay({ bridge }: RenderOverlayProps) {
                 onDelete={handleNodeDelete(node.id)}
                 isResizing={isResizing}
                 resizePreviewElementRef={resizePreviewElementRef}
+                isDropOutlineVisible={isDraggingOver}
               />
             ) : null}
           </React.Fragment>

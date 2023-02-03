@@ -170,6 +170,8 @@ export default function NodeHud({
 
   const hudPosition = rect.y > HUD_HEIGHT ? HUD_POSITION_TOP : HUD_POSITION_BOTTOM;
 
+  const iconSx = { opacity: 0.7 };
+
   return (
     <NodeHudWrapper
       data-node-id={node.id}
@@ -193,13 +195,13 @@ export default function NodeHud({
             onMouseUp={stopPropagationHandler}
           >
             {component?.displayName || '<unknown>'}
-            <DragIndicatorIcon color="inherit" />
-            <IconButton aria-label="Duplicate" color="inherit" onMouseUp={onDuplicate}>
+            <DragIndicatorIcon color="inherit" sx={iconSx} />
+            <IconButton aria-label="Duplicate" color="inherit" onMouseUp={onDuplicate} sx={iconSx}>
               <Tooltip title="Duplicate" enterDelay={400}>
                 <ContentCopy color="inherit" />
               </Tooltip>
             </IconButton>
-            <IconButton aria-label="Remove" color="inherit" onMouseUp={onDelete}>
+            <IconButton aria-label="Remove" color="inherit" onMouseUp={onDelete} sx={iconSx}>
               <Tooltip title="Remove" enterDelay={400}>
                 <DeleteIcon color="inherit" />
               </Tooltip>

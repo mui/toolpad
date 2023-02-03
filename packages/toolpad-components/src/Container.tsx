@@ -22,14 +22,12 @@ export default createComponent(Container, {
       control: { type: 'layoutSlot' },
     },
     visible: {
-      typeDef: { type: 'boolean' },
-      defaultValue: true,
+      typeDef: { type: 'boolean', default: true },
       helperText: 'Control whether container element is visible.',
     },
     sx: {
       helperText: SX_PROP_HELPER_TEXT,
-      typeDef: { type: 'object' },
-      defaultValue: { padding: 1, border: 'solid 1px' },
+      typeDef: { type: 'object', default: { padding: 1, border: 'solid 1px' } },
     },
   },
 });

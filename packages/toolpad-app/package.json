@@ -89,7 +89,7 @@
     "monaco-editor": "0.34.1",
     "mysql2": "^3.0.1",
     "next": "^13.1.6",
-    "node-fetch": "^2.6.8",
+    "node-fetch": "^2.6.9",
     "node-fetch-har": "^1.0.1",
     "path-to-regexp": "^6.2.1",
     "perf-cascade": "^3.0.3",

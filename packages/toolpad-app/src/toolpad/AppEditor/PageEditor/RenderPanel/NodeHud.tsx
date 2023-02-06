@@ -17,13 +17,6 @@ import { useDom } from '../../../DomLoader';
 import { useToolpadComponent } from '../../toolpadComponents';
 import { getElementNodeComponentId } from '../../../../toolpadComponents';
 import { blue } from '../../../../theme';
-import {
-  DropZone,
-  DROP_ZONE_BOTTOM,
-  DROP_ZONE_LEFT,
-  DROP_ZONE_RIGHT,
-  DROP_ZONE_TOP,
-} from '../PageEditorProvider';
 
 const HUD_POSITION_TOP = 'top';
 const HUD_POSITION_BOTTOM = 'bottom';
@@ -40,25 +33,20 @@ const nodeHudClasses = {
   allowNodeInteraction: 'NodeHud_AllowNodeInteraction',
   selected: 'NodeHud_Selected',
   selectionHint: 'NodeHud_SelectionHint',
-  dropTriangleUp: 'NodeHud_DropTriangleUp',
-  dropTriangleLeft: 'NodeHud_DropTriangleLeft',
-  dropTriangleBottom: 'NodeHud_DropTriangleBottom',
-  dropTriangleRight: 'NodeHud_DropTriangleRight',
 };
 
 const NodeHudWrapper = styled('div', {
-  shouldForwardProp: (prop) => prop !== 'hudPosition' && prop !== 'isOutlineVisible',
+  shouldForwardProp: (prop) => prop !== 'hudPosition' && prop !== 'isDropOutlineVisible',
 })<{
   hudPosition: HudPosition;
-  isOutlineVisible: boolean;
-}>(({ isOutlineVisible, hudPosition }) => ({
+  isDropOutlineVisible: boolean;
+}>(({ isDropOutlineVisible, hudPosition }) => ({
   // capture mouse events
   pointerEvents: 'initial',
   position: 'absolute',
   userSelect: 'none',
   zIndex: 2,
-  outline: isOutlineVisible ? `1px dotted ${blue[500]}` : 'none',
-  transition: 'outline 0.05s ease, opacity 0.5s ease',
+  outline: isDropOutlineVisible ? `1px dotted ${blue[500]}` : 'none',
   '&:hover': {
     outline: `2px dashed ${blue[500]}`,
   },
@@ -88,50 +76,6 @@ const NodeHudWrapper = styled('div', {
     ...(hudPosition === HUD_POSITION_TOP
       ? { top: 0, transform: 'translate(0, -100%)' }
       : { bottom: 0, transform: 'translate(0, 100%)' }),
-  },
-  [`.${nodeHudClasses.dropTriangleLeft}`]: {
-    position: 'absolute',
-    height: '100%',
-    width: '100%',
-    left: 0,
-    top: 0,
-    zIndex: 2,
-    clipPath: 'polygon(50% 50%, 0 0, 0 100%)',
-    background: blue[500],
-    opacity: 0.1,
-  },
-  [`.${nodeHudClasses.dropTriangleRight}`]: {
-    position: 'absolute',
-    height: '100%',
-    width: '100%',
-    left: 0,
-    top: 0,
-    zIndex: 2,
-    clipPath: 'polygon(50% 50%, 100% 0, 100% 100%)',
-    background: blue[500],
-    opacity: 0.1,
-  },
-  [`.${nodeHudClasses.dropTriangleBottom}`]: {
-    position: 'absolute',
-    height: '100%',
-    width: '100%',
-    left: 0,
-    top: 0,
-    zIndex: 2,
-    clipPath: 'polygon(50% 50%, 100% 100%, 0 100%)',
-    background: blue[500],
-    opacity: 0.1,
-  },
-  [`.${nodeHudClasses.dropTriangleUp}`]: {
-    position: 'absolute',
-    height: '100%',
-    width: '100%',
-    left: 0,
-    top: 0,
-    zIndex: 2,
-    clipPath: 'polygon(50% 50%, 0 0, 100% 0)',
-    background: blue[500],
-    opacity: 0.1,
   },
   [`&.${nodeHudClasses.allowNodeInteraction}`]: {
     // block pointer-events so we can interact with the selection
@@ -202,8 +146,7 @@ interface NodeHudProps {
   isResizing?: boolean;
   resizePreviewElementRef: React.MutableRefObject<HTMLDivElement | null>;
   onDuplicate?: (event: React.MouseEvent) => void;
-  isOutlineVisible?: boolean;
-  highlightedZone?: DropZone | null;
+  isDropOutlineVisible?: boolean;
 }
 
 export default function NodeHud({
@@ -218,8 +161,7 @@ export default function NodeHud({
   isResizing = false,
   resizePreviewElementRef,
   onDuplicate,
-  isOutlineVisible = false,
-  highlightedZone,
+  isDropOutlineVisible = false,
 }: NodeHudProps) {
   const { dom } = useDom();
 
@@ -238,7 +180,7 @@ export default function NodeHud({
         [nodeHudClasses.allowNodeInteraction]: isInteractive,
       })}
       hudPosition={hudPosition}
-      isOutlineVisible={isOutlineVisible}
+      isDropOutlineVisible={isDropOutlineVisible}
     >
       {isSelected ? (
         <React.Fragment>
@@ -267,20 +209,6 @@ export default function NodeHud({
           </div>
         </React.Fragment>
       ) : null}
-      <React.Fragment>
-        {highlightedZone === DROP_ZONE_TOP ? (
-          <span className={nodeHudClasses.dropTriangleUp} />
-        ) : null}
-        {highlightedZone === DROP_ZONE_LEFT ? (
-          <span className={nodeHudClasses.dropTriangleLeft} />
-        ) : null}
-        {highlightedZone === DROP_ZONE_BOTTOM ? (
-          <span className={nodeHudClasses.dropTriangleBottom} />
-        ) : null}
-        {highlightedZone === DROP_ZONE_RIGHT ? (
-          <span className={nodeHudClasses.dropTriangleRight} />
-        ) : null}
-      </React.Fragment>
       {onEdgeDragStart
         ? draggableEdges.map((edge) => (
             <DraggableEdge

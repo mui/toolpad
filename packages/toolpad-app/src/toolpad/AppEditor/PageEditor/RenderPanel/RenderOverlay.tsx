@@ -1540,6 +1540,11 @@ export default function RenderOverlay({ bridge }: RenderOverlayProps) {
           return null;
         }
 
+        const nodeChildren = (
+          appDom.getChildNodes(dom, node) as appDom.NodeChildren<appDom.ElementNode>
+        ).children;
+        const hasChildren = nodeChildren?.length > 0;
+
         return (
           <React.Fragment key={node.id}>
             {!isPageNode ? (
@@ -1565,7 +1570,8 @@ export default function RenderOverlay({ bridge }: RenderOverlayProps) {
                 onDelete={handleNodeDelete(node.id)}
                 isResizing={isResizing}
                 resizePreviewElementRef={resizePreviewElementRef}
-                isDropOutlineVisible={isDraggingOver}
+                isOutlineVisible={isDraggingOver}
+                highlightedZone={dragOverNodeId === node.id && !hasChildren ? dragOverZone : null}
               />
             ) : null}
           </React.Fragment>

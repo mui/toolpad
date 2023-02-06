@@ -36,17 +36,18 @@ const nodeHudClasses = {
 };
 
 const NodeHudWrapper = styled('div', {
-  shouldForwardProp: (prop) => prop !== 'hudPosition' && prop !== 'isDropOutlineVisible',
+  shouldForwardProp: (prop) => prop !== 'hudPosition' && prop !== 'isOutlineVisible',
 })<{
   hudPosition: HudPosition;
-  isDropOutlineVisible: boolean;
-}>(({ isDropOutlineVisible, hudPosition }) => ({
+  isOutlineVisible: boolean;
+}>(({ isOutlineVisible, hudPosition }) => ({
   // capture mouse events
   pointerEvents: 'initial',
   position: 'absolute',
   userSelect: 'none',
   zIndex: 2,
-  outline: isDropOutlineVisible ? `1px dotted ${blue[500]}` : 'none',
+  outline: isOutlineVisible ? `1px dotted ${blue[500]}` : 'none',
+  transition: 'outline 0.05s ease',
   '&:hover': {
     outline: `2px dashed ${blue[500]}`,
   },
@@ -146,7 +147,7 @@ interface NodeHudProps {
   isResizing?: boolean;
   resizePreviewElementRef: React.MutableRefObject<HTMLDivElement | null>;
   onDuplicate?: (event: React.MouseEvent) => void;
-  isDropOutlineVisible?: boolean;
+  isOutlineVisible?: boolean;
 }
 
 export default function NodeHud({
@@ -161,7 +162,7 @@ export default function NodeHud({
   isResizing = false,
   resizePreviewElementRef,
   onDuplicate,
-  isDropOutlineVisible = false,
+  isOutlineVisible = false,
 }: NodeHudProps) {
   const { dom } = useDom();
 
@@ -180,7 +181,7 @@ export default function NodeHud({
         [nodeHudClasses.allowNodeInteraction]: isInteractive,
       })}
       hudPosition={hudPosition}
-      isDropOutlineVisible={isDropOutlineVisible}
+      isOutlineVisible={isOutlineVisible}
     >
       {isSelected ? (
         <React.Fragment>

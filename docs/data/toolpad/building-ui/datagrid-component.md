@@ -6,7 +6,8 @@
 
 ## Customizing cell rendering
 
-By default you can render json data using DataGrid component and it will automatically recognize most of the data types. However sometimes it might not be enough and for that reason we provide the option to render custom components inside a datagrid.
+By default, you can render JSON data using the Data Grid component and it will automatically recognize most of the data types. 
+If this isn't sufficient, you can also render custom components inside the Data Grid.
 
 ### Creating custom component
 

@@ -13,18 +13,18 @@ export const layoutBoxArgTypes: {
     typeDef: {
       type: 'string',
       enum: ['start', 'center', 'end', 'space-between', 'space-around', 'space-evenly'],
+      default: 'start',
     },
     label: 'Horizontal alignment',
     control: { type: 'HorizontalAlign' },
-    defaultValue: 'start',
   },
   verticalAlign: {
     typeDef: {
       type: 'string',
       enum: ['start', 'center', 'end', 'space-between', 'space-around', 'space-evenly'],
+      default: 'center',
     },
     label: 'Vertical alignment',
     control: { type: 'VerticalAlign' },
-    defaultValue: 'center',
   },
 };

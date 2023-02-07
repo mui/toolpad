@@ -16,6 +16,7 @@ export default class CustomJsdomEnvironment extends JsdomEnvironment {
       externalUrl: 'http://localhost:3000',
       isDemo: false,
       localMode: false,
+      cmd: 'dev',
     });
 
     if (!this.global.TextDecoder) {

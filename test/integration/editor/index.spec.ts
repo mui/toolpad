@@ -5,10 +5,10 @@ import clickCenter from '../../utils/clickCenter';
 import generateId from '../../utils/generateId';
 import { readJsonFile } from '../../utils/fs';
 
-test('can place new components from catalog', async ({ page, browserName, api }) => {
+test('can place new components from catalog', async ({ page, api }) => {
   const app = await api.mutation.createApp(`App ${generateId()}`);
 
-  const editorModel = new ToolpadEditor(page, browserName);
+  const editorModel = new ToolpadEditor(page);
 
   await editorModel.goto(app.id);
 
@@ -34,8 +34,8 @@ test('can place new components from catalog', async ({ page, browserName, api })
   await expect(canvasInputLocator).toHaveCount(2);
 });
 
-test('can move elements in page', async ({ page, browserName, api }) => {
-  const editorModel = new ToolpadEditor(page, browserName);
+test('can move elements in page', async ({ page, api }) => {
+  const editorModel = new ToolpadEditor(page);
   const TEXT_FIELD_COMPONENT_DISPLAY_NAME = 'Text field';
 
   const dom = await readJsonFile(path.resolve(__dirname, './domInput.json'));
@@ -90,8 +90,8 @@ test('can move elements in page', async ({ page, browserName, api }) => {
   await expect(secondTextFieldLocator).toHaveAttribute('value', 'textField1');
 });
 
-test('can delete elements from page', async ({ page, browserName, api }) => {
-  const editorModel = new ToolpadEditor(page, browserName);
+test('can delete elements from page', async ({ page, api }) => {
+  const editorModel = new ToolpadEditor(page);
 
   const dom = await readJsonFile(path.resolve(__dirname, './domInput.json'));
 
@@ -129,10 +129,10 @@ test('can delete elements from page', async ({ page, browserName, api }) => {
   await expect(canvasInputLocator).toHaveCount(0);
 });
 
-test('can create new component', async ({ page, browserName, api }) => {
+test('can create new component', async ({ page, api }) => {
   const app = await api.mutation.createApp(`App ${generateId()}`);
 
-  const editorModel = new ToolpadEditor(page, browserName);
+  const editorModel = new ToolpadEditor(page);
 
   await editorModel.goto(app.id);
 

@@ -538,19 +538,16 @@ export default createComponent(DataGridComponent, {
     },
     selection: {
       helperText: 'The currently selected row. Or `null` in case no row has been selected.',
-      typeDef: { type: 'object' },
+      typeDef: { type: 'object', default: null },
       onChangeProp: 'onSelectionChange',
-      defaultValue: null,
     },
     density: {
       helperText:
         'The [density](https://mui.com/x/react-data-grid/accessibility/#density-prop) of the rows. Possible values are `compact`, `standard`, or `comfortable`.',
-      typeDef: { type: 'string', enum: ['compact', 'standard', 'comfortable'] },
-      defaultValue: 'compact',
+      typeDef: { type: 'string', enum: ['compact', 'standard', 'comfortable'], default: 'compact' },
     },
     height: {
-      typeDef: { type: 'number' },
-      defaultValue: 350,
+      typeDef: { type: 'number', default: 350 },
     },
     loading: {
       helperText:

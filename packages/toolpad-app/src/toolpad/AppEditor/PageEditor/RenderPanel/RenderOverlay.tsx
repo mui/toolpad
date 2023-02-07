@@ -68,10 +68,10 @@ const OverlayRoot = styled('div')({
     cursor: 'copy',
   },
   [`&.${overlayClasses.resizeHorizontal}`]: {
-    cursor: 'ew-resize',
+    cursor: 'col-resize',
   },
   [`&.${overlayClasses.resizeVertical}`]: {
-    cursor: 'ns-resize',
+    cursor: 'row-resize',
   },
   [`.${overlayClasses.hudOverlay}`]: {
     position: 'absolute',
@@ -1534,7 +1534,8 @@ export default function RenderOverlay({ bridge }: RenderOverlayProps) {
 
         const isVerticallyResizable = Boolean(nodeInfo?.componentConfig?.resizableHeightProp);
 
-        const isResizing = Boolean(draggedEdge) && node.id === draggedNodeId;
+        const isResizing = Boolean(draggedEdge);
+        const isResizingNode = isResizing && node.id === draggedNodeId;
 
         if (!nodeRect) {
           return null;
@@ -1563,8 +1564,9 @@ export default function RenderOverlay({ bridge }: RenderOverlayProps) {
                   isPageRowChild || isVerticallyResizable ? handleEdgeDragStart : undefined
                 }
                 onDelete={handleNodeDelete(node.id)}
-                isResizing={isResizing}
+                isResizing={isResizingNode}
                 resizePreviewElementRef={resizePreviewElementRef}
+                isHoverable={isResizing}
                 isOutlineVisible={isDraggingOver}
               />
             ) : null}

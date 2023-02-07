@@ -35,10 +35,11 @@ const nodeHudClasses = {
 };
 
 const NodeHudWrapper = styled('div', {
-  shouldForwardProp: (prop) => prop !== 'isOutlineVisible',
+  shouldForwardProp: (prop) => prop !== 'isOutlineVisible' && prop !== 'isHoverable',
 })<{
   isOutlineVisible: boolean;
-}>(({ isOutlineVisible, theme }) => ({
+  isHoverable: boolean;
+}>(({ isOutlineVisible, isHoverable, theme }) => ({
   // capture mouse events
   pointerEvents: 'initial',
   position: 'absolute',
@@ -46,7 +47,7 @@ const NodeHudWrapper = styled('div', {
   outline: `1px dotted ${isOutlineVisible ? theme.palette.primary[500] : 'transparent'}`,
   zIndex: 2,
   '&:hover': {
-    outline: `2px dashed ${theme.palette.primary[500]}`,
+    outline: `2px dashed ${isHoverable ? 'transparent' : theme.palette.primary[500]}`,
   },
   [`.${nodeHudClasses.selected}`]: {
     position: 'absolute',
@@ -89,6 +90,11 @@ const SelectionHintWrapper = styled('div', {
   },
 }));
 
+const DraggableEdgeWrapper = styled('div')({
+  position: 'absolute',
+  zIndex: 3,
+});
+
 const DraggableEdge = styled('div', {
   shouldForwardProp: (prop) => prop !== 'edge',
 })<{
@@ -97,7 +103,7 @@ const DraggableEdge = styled('div', {
   let dynamicStyles = {};
   if (edge === RECTANGLE_EDGE_RIGHT) {
     dynamicStyles = {
-      cursor: 'ew-resize',
+      cursor: 'col-resize',
       top: 0,
       right: -2,
       height: '100%',
@@ -106,7 +112,7 @@ const DraggableEdge = styled('div', {
   }
   if (edge === RECTANGLE_EDGE_LEFT) {
     dynamicStyles = {
-      cursor: 'ew-resize',
+      cursor: 'col-resize',
       top: 0,
       left: -2,
       height: '100%',
@@ -115,7 +121,7 @@ const DraggableEdge = styled('div', {
   }
   if (edge === RECTANGLE_EDGE_BOTTOM) {
     dynamicStyles = {
-      cursor: 'ns-resize',
+      cursor: 'row-resize',
       bottom: -2,
       height: 12,
       left: 0,
@@ -127,7 +133,7 @@ const DraggableEdge = styled('div', {
     ...dynamicStyles,
     position: 'absolute',
     pointerEvents: 'initial',
-    zIndex: 1,
+    zIndex: 3,
   };
 });
 
@@ -153,6 +159,7 @@ interface NodeHudProps {
   resizePreviewElementRef: React.MutableRefObject<HTMLDivElement | null>;
   onDuplicate?: (event: React.MouseEvent) => void;
   isOutlineVisible?: boolean;
+  isHoverable?: boolean;
 }
 
 export default function NodeHud({
@@ -168,6 +175,7 @@ export default function NodeHud({
   resizePreviewElementRef,
   onDuplicate,
   isOutlineVisible = false,
+  isHoverable = true,
 }: NodeHudProps) {
   const { dom } = useDom();
 
@@ -186,17 +194,9 @@ export default function NodeHud({
           [nodeHudClasses.allowNodeInteraction]: isInteractive,
         })}
         isOutlineVisible={isOutlineVisible}
+        isHoverable={isHoverable}
       >
         {isSelected ? <span className={nodeHudClasses.selected} /> : null}
-        {onEdgeDragStart
-          ? draggableEdges.map((edge) => (
-              <DraggableEdge
-                key={`${node.id}-edge-${edge}`}
-                edge={edge}
-                onMouseDown={onEdgeDragStart(node as appDom.ElementNode, edge)}
-              />
-            ))
-          : null}
         {isResizing ? (
           <ResizePreview ref={resizePreviewElementRef} style={absolutePositionCss(rect)} />
         ) : null}
@@ -227,6 +227,17 @@ export default function NodeHud({
           </div>
         </SelectionHintWrapper>
       ) : null}
+      <DraggableEdgeWrapper style={absolutePositionCss(rect)}>
+        {onEdgeDragStart
+          ? draggableEdges.map((edge) => (
+              <DraggableEdge
+                key={`${node.id}-edge-${edge}`}
+                edge={edge}
+                onMouseDown={onEdgeDragStart(node as appDom.ElementNode, edge)}
+              />
+            ))
+          : null}
+      </DraggableEdgeWrapper>
     </React.Fragment>
   );
 }

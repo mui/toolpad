@@ -31,16 +31,14 @@ export default createComponent(TextField, {
   argTypes: {
     value: {
       helperText: 'The value that is controlled by this text input.',
-      typeDef: { type: 'string' },
+      typeDef: { type: 'string', default: '' },
       onChangeProp: 'onChange',
-      defaultValue: '',
       defaultValueProp: 'defaultValue',
       isScoped: true,
     },
     defaultValue: {
       helperText: 'A default value for when the inoput is still empty.',
-      typeDef: { type: 'string' },
-      defaultValue: '',
+      typeDef: { type: 'string', default: '' },
     },
     label: {
       helperText: 'A label that describes the content of the text field. e.g. "First name".',
@@ -49,13 +47,11 @@ export default createComponent(TextField, {
     variant: {
       helperText:
         'One of the available MUI TextField [variants](https://mui.com/material-ui/react-button/#basic-button). Possible values are `outlined`, `filled` or `standard`',
-      typeDef: { type: 'string', enum: ['outlined', 'filled', 'standard'] },
-      defaultValue: 'outlined',
+      typeDef: { type: 'string', enum: ['outlined', 'filled', 'standard'], default: 'outlined' },
     },
     size: {
       helperText: 'The size of the input. One of `small`, or `medium`.',
-      typeDef: { type: 'string', enum: ['small', 'medium'] },
-      defaultValue: 'small',
+      typeDef: { type: 'string', enum: ['small', 'medium'], default: 'small' },
     },
     fullWidth: {
       helperText: 'Whether the input should occupy all available horizontal space.',

@@ -26,6 +26,7 @@ import {
   TemplateScopeParams,
   ScopeMeta,
   DEFAULT_LOCAL_SCOPE_PARAMS,
+  ArgTypeDefinition,
 } from '@mui/toolpad-core';
 import { createProvidedContext } from '@mui/toolpad-core/utils/react';
 import { QueryClient, QueryClientProvider, useMutation } from '@tanstack/react-query';
@@ -79,6 +80,10 @@ import { errorFrom } from '../utils/errors';
 import { bridge } from '../canvas/ToolpadBridge';
 import Header from '../toolpad/ToolpadShell/Header';
 import { ThemeProvider } from '../ThemeContext';
+
+export function getArgTypeDefaultValue<V>(argType: ArgTypeDefinition<{}, V>): V | undefined {
+  return argType.typeDef.default ?? argType.defaultValue ?? undefined;
+}
 
 const ReactQueryDevtoolsProduction = React.lazy(() =>
   import('@tanstack/react-query-devtools/build/lib/index.prod.js').then((d) => ({
@@ -250,7 +255,7 @@ function RenderedNodeContent({ node, childNodeGroups, Component }: RenderedNodeC
       }
 
       if (typeof hookResult[propName] === 'undefined' && argType) {
-        hookResult[propName] = argType.defaultValue;
+        hookResult[propName] = getArgTypeDefaultValue(argType);
       }
     }
 
@@ -280,7 +285,7 @@ function RenderedNodeContent({ node, childNodeGroups, Component }: RenderedNodeC
       }
 
       if (typeof hookResult[propName] === 'undefined' && argType) {
-        hookResult[propName] = argType.defaultValue;
+        hookResult[propName] = getArgTypeDefaultValue(argType);
       }
     }
 
@@ -707,7 +712,8 @@ function parseBindings(
           : undefined;
 
         const binding: BindableAttrValue<any> =
-          elm.props?.[propName] || appDom.createConst(argType?.defaultValue ?? undefined);
+          elm.props?.[propName] ||
+          appDom.createConst(argType ? getArgTypeDefaultValue(argType) : undefined);
 
         const bindingId = `${elm.id}.props.${propName}`;
 
@@ -737,7 +743,7 @@ function parseBindings(
         for (const [propName, argType] of Object.entries(layoutBoxArgTypes)) {
           const binding =
             elm.layout?.[propName as keyof typeof layoutBoxArgTypes] ||
-            appDom.createConst(argType?.defaultValue ?? undefined);
+            appDom.createConst(argType ? getArgTypeDefaultValue(argType) : undefined);
           const bindingId = `${elm.id}.layout.${propName}`;
           parsedBindingsMap.set(bindingId, parseBinding(binding, {}));
         }

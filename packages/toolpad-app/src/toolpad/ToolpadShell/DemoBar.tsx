@@ -1,8 +1,8 @@
 import * as React from 'react';
 import { Box, Button, Link, styled, SxProps, Typography } from '@mui/material';
+import { useTheme } from '@mui/material/styles';
 import KeyboardArrowRightRounded from '@mui/icons-material/KeyboardArrowRightRounded';
 import { useParams } from 'react-router-dom';
-import { blueDark, grey } from '../../theme';
 import { DOCUMENTATION_INSTALLATION_URL, ROADMAP_URL, SCHEDULE_DEMO_URL } from '../../constants';
 import {
   addUTMParamsToUrl,
@@ -12,23 +12,16 @@ import {
   sendSelfHostClickEvent,
 } from '../../utils/ga';
 
-const DemoBarContainer = styled(Box)({
+const DemoBarContainer = styled(Box)(({ theme }) => ({
   alignItems: 'center',
-  backgroundColor: blueDark[50],
-  color: grey[700],
+  backgroundColor: theme.palette.primaryDark[50],
+  color: theme.palette.grey[700],
   display: 'flex',
   height: 60,
   justifyContent: 'space-between',
   paddingLeft: 20,
   paddingRight: 20,
-});
-
-const linkStyles: SxProps = {
-  color: grey[700],
-  fontWeight: 'normal',
-  textDecorationColor: grey[700],
-  '&:hover': { color: grey[700] },
-};
+}));
 
 const addDemoBarUTMParamsToURL = (url: string): string =>
   addUTMParamsToUrl(url, {
@@ -39,6 +32,8 @@ const addDemoBarUTMParamsToURL = (url: string): string =>
 
 export default function DemoBar() {
   const { appId } = useParams();
+
+  const theme = useTheme();
 
   const handleSelfHostLinkClick = React.useCallback(() => {
     sendSelfHostClickEvent(appId, 'demoBar');
@@ -51,6 +46,13 @@ export default function DemoBar() {
   const handleScheduleDemoClick = React.useCallback(() => {
     sendScheduleDemoClickEvent(appId);
   }, [appId]);
+
+  const linkStyles: SxProps = {
+    color: theme.palette.grey[700],
+    fontWeight: 'normal',
+    textDecorationColor: theme.palette.grey[700],
+    '&:hover': { color: theme.palette.grey[700] },
+  };
 
   return (
     <DemoBarContainer>

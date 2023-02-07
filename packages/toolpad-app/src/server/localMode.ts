@@ -201,6 +201,10 @@ export async function loadDomFromDisk(): Promise<appDom.AppDom> {
   } catch (rawError) {
     const error = errorFrom(rawError);
     if (error.code === 'ENOENT') {
+      if (config.cmd !== 'dev') {
+        throw new Error(`No application found.`);
+      }
+
       const dom = appDom.createDefaultDom();
       await saveLocalDom(dom);
       return dom;

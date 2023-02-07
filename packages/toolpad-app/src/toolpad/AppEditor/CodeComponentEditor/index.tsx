@@ -3,6 +3,7 @@ import { Box, Button, Stack, styled, TextField, Toolbar, Typography } from '@mui
 import createCache from '@emotion/cache';
 import { CacheProvider } from '@emotion/react';
 import * as ReactDOM from 'react-dom';
+import * as _ from 'lodash-es';
 import { ErrorBoundary, FallbackProps } from 'react-error-boundary';
 import {
   NodeId,
@@ -206,7 +207,7 @@ function CodeComponentEditorContent({ codeComponentNode }: CodeComponentEditorCo
   const nodeNameError = useNodeNameValidation(input.name, existingNames, 'query');
   const isNameValid = !nodeNameError;
 
-  const allChangesAreCommitted = codeComponentNode === input;
+  const allChangesAreCommitted = _.isEqual(codeComponentNode, input);
 
   const isSaveAllowed = isNameValid;
 
@@ -223,14 +224,10 @@ function CodeComponentEditorContent({ codeComponentNode }: CodeComponentEditorCo
     );
     setInput(prettyfied);
     domApi.saveNode(prettyfied);
-
-    appStateApi.setHasUnsavedChanges(false);
-  }, [domApi, appStateApi, input, isSaveAllowed]);
+  }, [domApi, input, isSaveAllowed]);
 
   React.useEffect(() => {
-    if (!allChangesAreCommitted) {
-      appStateApi.setHasUnsavedChanges(true);
-    }
+    appStateApi.setHasUnsavedChanges(!allChangesAreCommitted);
 
     return () => {
       appStateApi.setHasUnsavedChanges(false);

@@ -181,6 +181,10 @@ export async function writeDomToDisk(dom: appDom.AppDom): Promise<void> {
 }
 
 export async function saveLocalDom(dom: appDom.AppDom): Promise<void> {
+  if (config.cmd !== 'dev') {
+    throw new Error(`Writing to disk is only possible in toolpad dev mode.`);
+  }
+
   await writeDomToDisk(dom);
 }
 

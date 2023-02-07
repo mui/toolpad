@@ -187,8 +187,9 @@ export default function NodeHud({
   const iconSx = { opacity: 0.7 };
 
   return (
-    <React.Fragment data-node-id={node.id}>
+    <React.Fragment>
       <NodeHudWrapper
+        data-node-id={node.id}
         style={absolutePositionCss(rect)}
         className={clsx({
           [nodeHudClasses.allowNodeInteraction]: isInteractive,

@@ -43,8 +43,8 @@ const NodeHudWrapper = styled('div', {
   pointerEvents: 'initial',
   position: 'absolute',
   userSelect: 'none',
-  outline: isOutlineVisible ? `1px dotted ${theme.palette.primary[500]}` : 'none',
-  transition: 'outline 0.05s ease',
+  outline: `1px dotted ${isOutlineVisible ? theme.palette.primary[500] : 'transparent'}`,
+  zIndex: 2,
   '&:hover': {
     outline: `2px dashed ${theme.palette.primary[500]}`,
   },
@@ -55,6 +55,7 @@ const NodeHudWrapper = styled('div', {
     outline: `2px solid ${theme.palette.primary[500]}`,
     left: 0,
     top: 0,
+    zIndex: 2,
   },
   [`&.${nodeHudClasses.allowNodeInteraction}`]: {
     // block pointer-events so we can interact with the selection

@@ -40,20 +40,21 @@ export default createComponent(Tabs, {
     },
     defaultValue: {
       label: 'Default active tab',
-      typeDef: { type: 'string' },
-      defaultValue: 'tab-one',
+      typeDef: { type: 'string', default: 'tab-one' },
       helperText: 'The tab which will be active by default.',
     },
     tabs: {
-      typeDef: { type: 'array' },
-      defaultValue: [
-        {
-          title: 'Tab one',
-          name: 'tab-one',
-        },
-        { title: 'Tab two', name: 'tab-two' },
-        { title: 'Tab three', name: 'tab-three' },
-      ],
+      typeDef: {
+        type: 'array',
+        default: [
+          {
+            title: 'Tab one',
+            name: 'tab-one',
+          },
+          { title: 'Tab two', name: 'tab-two' },
+          { title: 'Tab three', name: 'tab-three' },
+        ],
+      },
       helperText: 'Tabs configuration object.',
     },
   },

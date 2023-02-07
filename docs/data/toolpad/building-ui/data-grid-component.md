@@ -1,12 +1,13 @@
-# DataGrid component
+# Data Grid component
 
-<p class="description">Build powerful and feature rich data tables</p>
+<p class="description">Build powerful and feature rich data tables using <a href='https://mui.com/x/react-data-grid' target='_blank' rel="noopener noreferrer">MUI Data Grid</a> component</p>
 
 <img src="/static/toolpad/docs/building-ui/datagrid.png" width="884px" alt="Custom component" />
 
+By default, you can render JSON data using the Data Grid component and it will automatically recognize most of the data types.
+
 ## Customizing cell rendering
 
-By default, you can render JSON data using the Data Grid component and it will automatically recognize most of the data types. 
 If this isn't sufficient, you can also render custom components inside the Data Grid.
 
 ### Creating custom component
@@ -22,7 +23,7 @@ Firstly, you will have to create a custom component which should be able to proc
 ### Configuring columns
 
 1. Select `DataGrid` component
-2. Click on columns edit button
+2. Click on "columns" button
 
 <img src="/static/toolpad/docs/building-ui/edit-columns.png" width="286px" alt="Edit columns" />
 
@@ -34,6 +35,6 @@ Firstly, you will have to create a custom component which should be able to proc
 
 <img src="/static/toolpad/docs/building-ui/choose-column-type.png" width="318px" alt="Choose column type" />
 
-5. Choose custom component that you created
+5. Choose the custom component that you created
 
 <img src="/static/toolpad/docs/building-ui/choose-cell-component.png" width="306px" alt="Choose component" />

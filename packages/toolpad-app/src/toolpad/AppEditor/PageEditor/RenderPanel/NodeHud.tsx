@@ -16,7 +16,6 @@ import {
 import { useDom } from '../../../DomLoader';
 import { useToolpadComponent } from '../../toolpadComponents';
 import { getElementNodeComponentId } from '../../../../toolpadComponents';
-import { blue } from '../../../../theme';
 
 const HINT_POSITION_TOP = 'top';
 const HINT_POSITION_BOTTOM = 'bottom';
@@ -39,21 +38,21 @@ const NodeHudWrapper = styled('div', {
   shouldForwardProp: (prop) => prop !== 'isOutlineVisible',
 })<{
   isOutlineVisible: boolean;
-}>(({ isOutlineVisible }) => ({
+}>(({ isOutlineVisible, theme }) => ({
   // capture mouse events
   pointerEvents: 'initial',
   position: 'absolute',
   userSelect: 'none',
-  outline: isOutlineVisible ? `1px dotted ${blue[500]}` : 'none',
+  outline: isOutlineVisible ? `1px dotted ${theme.palette.primary[500]}` : 'none',
   transition: 'outline 0.05s ease',
   '&:hover': {
-    outline: `2px dashed ${blue[500]}`,
+    outline: `2px dashed ${theme.palette.primary[500]}`,
   },
   [`.${nodeHudClasses.selected}`]: {
     position: 'absolute',
     height: '100%',
     width: '100%',
-    outline: `2px solid ${blue[500]}`,
+    outline: `2px solid ${theme.palette.primary[500]}`,
     left: 0,
     top: 0,
   },
@@ -67,7 +66,7 @@ const SelectionHintWrapper = styled('div', {
   shouldForwardProp: (prop) => prop !== 'hintPosition',
 })<{
   hintPosition: HintPosition;
-}>(({ hintPosition }) => ({
+}>(({ hintPosition, theme }) => ({
   position: 'absolute',
   [`.${nodeHudClasses.selectionHint}`]: {
     // capture mouse events
@@ -77,7 +76,7 @@ const SelectionHintWrapper = styled('div', {
     position: 'absolute',
     alignItems: 'center',
     right: -1,
-    background: blue[500],
+    background: theme.palette.primary[500],
     color: 'white',
     fontSize: 11,
     padding: `0 0 0 8px`,
@@ -131,11 +130,11 @@ const DraggableEdge = styled('div', {
   };
 });
 
-const ResizePreview = styled('div')({
-  backgroundColor: blue[500],
+const ResizePreview = styled('div')(({ theme }) => ({
+  backgroundColor: theme.palette.primary[500],
   opacity: 0.2,
   zIndex: 3,
-});
+}));
 
 interface NodeHudProps {
   node: appDom.AppDomNode;

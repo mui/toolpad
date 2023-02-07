@@ -24,7 +24,6 @@ import {
   usePageEditorState,
 } from '../PageEditorProvider';
 import { isPageRow } from '../../../../toolpadComponents';
-import { blue } from '../../../../theme';
 
 const dropAreaHighlightClasses = {
   highlightedTop: 'DropArea_HighlightedTop',
@@ -38,7 +37,7 @@ const StyledNodeDropArea = styled('div', {
   shouldForwardProp: (prop) => prop !== 'highlightRelativeRect',
 })<{
   highlightRelativeRect?: Partial<Rectangle>;
-}>(({ highlightRelativeRect = {} }) => {
+}>(({ highlightRelativeRect = {}, theme }) => {
   const {
     x: highlightRelativeX = 0,
     y: highlightRelativeY = 0,
@@ -51,7 +50,7 @@ const StyledNodeDropArea = styled('div', {
     position: 'absolute',
     [`&.${dropAreaHighlightClasses.highlightedTop}`]: {
       '&:after': {
-        backgroundColor: blue[500],
+        backgroundColor: theme.palette.primary[500],
         content: "''",
         position: 'absolute',
         height: 2,
@@ -62,7 +61,7 @@ const StyledNodeDropArea = styled('div', {
     },
     [`&.${dropAreaHighlightClasses.highlightedRight}`]: {
       '&:after': {
-        backgroundColor: blue[500],
+        backgroundColor: theme.palette.primary[500],
         content: "''",
         position: 'absolute',
         height: highlightHeight,
@@ -73,7 +72,7 @@ const StyledNodeDropArea = styled('div', {
     },
     [`&.${dropAreaHighlightClasses.highlightedBottom}`]: {
       '&:after': {
-        backgroundColor: blue[500],
+        backgroundColor: theme.palette.primary[500],
         content: "''",
         position: 'absolute',
         height: 2,
@@ -84,7 +83,7 @@ const StyledNodeDropArea = styled('div', {
     },
     [`&.${dropAreaHighlightClasses.highlightedLeft}`]: {
       '&:after': {
-        backgroundColor: blue[500],
+        backgroundColor: theme.palette.primary[500],
         content: "''",
         position: 'absolute',
         height: highlightHeight,
@@ -94,21 +93,21 @@ const StyledNodeDropArea = styled('div', {
       },
     },
     [`&.${dropAreaHighlightClasses.highlightedCenter}`]: {
-      border: `2px solid ${blue[500]}`,
+      border: `2px solid ${theme.palette.primary[500]}`,
     },
   };
 });
 
-const EmptySlot = styled('div')({
+const EmptySlot = styled('div')(({ theme }) => ({
   alignItems: 'center',
-  border: `2px dotted ${blue[500]}`,
-  color: blue[500],
+  border: `2px dotted ${theme.palette.primary[500]}`,
+  color: theme.palette.primary[500],
   display: 'flex',
   flexDirection: 'column',
   justifyContent: 'center',
   position: 'absolute',
   textAlign: 'center',
-});
+}));
 
 function getChildNodeHighlightedZone(parentFlowDirection: FlowDirection): DropZone | null {
   switch (parentFlowDirection) {

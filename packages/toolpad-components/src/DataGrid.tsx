@@ -170,7 +170,7 @@ function ImageCell({ field, id, value: src }: GridRenderCellParams<any, any, any
         component="img"
         src={src}
         alt={alt}
-        sx={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain', p: 1 }}
+        sx={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain', py: 1 }}
       />
       <Popover
         id={popoverId}
@@ -186,7 +186,7 @@ function ImageCell({ field, id, value: src }: GridRenderCellParams<any, any, any
           component="img"
           src={src}
           alt={alt}
-          sx={{ maxWidth: '60vw', maxHeight: '60vh', objectFit: 'contain', m: 2 }}
+          sx={{ maxWidth: '60vw', maxHeight: '60vh', objectFit: 'contain', m: 1 }}
         />
       </Popover>
     </React.Fragment>

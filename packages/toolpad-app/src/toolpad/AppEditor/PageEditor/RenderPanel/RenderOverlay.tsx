@@ -1574,7 +1574,7 @@ export default function RenderOverlay({ bridge }: RenderOverlayProps) {
                 onDelete={handleNodeDelete(node.id)}
                 isResizing={isResizingNode}
                 resizePreviewElementRef={resizePreviewElementRef}
-                isHoverable={isResizing}
+                isHoverable={isResizing && !isDraggingOver}
                 isOutlineVisible={isDraggingOver}
               />
             ) : null}

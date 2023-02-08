@@ -193,7 +193,7 @@ export default function NodeHud({
           [nodeHudClasses.allowNodeInteraction]: isInteractive,
         })}
         isOutlineVisible={isOutlineVisible}
-        isHoverable={isHoverable && !isOutlineVisible}
+        isHoverable={isHoverable}
       >
         {isSelected ? <span className={nodeHudClasses.selected} /> : null}
         {isResizing ? (

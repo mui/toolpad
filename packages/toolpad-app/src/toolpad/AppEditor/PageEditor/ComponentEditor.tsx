@@ -39,7 +39,12 @@ const ComponentEditorRoot = styled('div')(({ theme }) => ({
   },
 }));
 
-function shouldRenderControl<P extends object>(propTypeDef: ArgTypeDefinition<P>, props: P) {
+function shouldRenderControl<P extends object>(
+  propTypeDef: ArgTypeDefinition<P>,
+  propName: keyof P,
+  props: P,
+  componentConfig: ComponentConfig<P>,
+) {
   if (propTypeDef.typeDef.type === 'element') {
     return propTypeDef.control?.type !== 'slot' && propTypeDef.control?.type !== 'slots';
   }
@@ -50,6 +55,10 @@ function shouldRenderControl<P extends object>(propTypeDef: ArgTypeDefinition<P>
 
   if (typeof propTypeDef.visible === 'function') {
     return propTypeDef.visible(props);
+  }
+
+  if (componentConfig.resizableHeightProp && propName === componentConfig.resizableHeightProp) {
+    return false;
   }
 
   return true;
@@ -114,7 +123,7 @@ function ComponentPropsEditor<P extends object>({
       {(
         Object.entries(componentConfig.argTypes || {}) as ExactEntriesOf<ArgTypeDefinitions<P>>
       ).map(([propName, propTypeDef]) =>
-        propTypeDef && shouldRenderControl(propTypeDef, props) ? (
+        propTypeDef && shouldRenderControl(propTypeDef, propName, props, componentConfig) ? (
           <div key={propName} className={classes.control}>
             <NodeAttributeEditor
               node={node}

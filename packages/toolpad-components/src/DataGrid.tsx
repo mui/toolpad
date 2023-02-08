@@ -529,7 +529,7 @@ export default createComponent(DataGridComponent, {
       typeDef: { type: 'string', enum: ['compact', 'standard', 'comfortable'], default: 'compact' },
     },
     height: {
-      typeDef: { type: 'number', default: 350 },
+      typeDef: { type: 'number', default: 350, minimum: 100 },
     },
     loading: {
       helperText:

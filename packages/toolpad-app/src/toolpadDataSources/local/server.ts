@@ -179,8 +179,15 @@ async function createBuilder() {
   let buildErrors: Error[] = [];
   let runtimeError: Error | undefined;
 
-  const envFileContent = await fs.readFile(path.resolve(userProjectRoot, '.env'));
-  const env = dotenv.parse(envFileContent) as any;
+  let env: any = {};
+  try {
+    const envFileContent = await fs.readFile(path.resolve(userProjectRoot, '.env'));
+    env = dotenv.parse(envFileContent) as any;
+  } catch (err) {
+    if (errorFrom(err).code !== 'ENOENT') {
+      throw err;
+    }
+  }
 
   const toolpadPlugin: esbuild.Plugin = {
     name: 'toolpad',

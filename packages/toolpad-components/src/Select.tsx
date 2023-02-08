@@ -60,37 +60,35 @@ export default createComponent(Select, {
   argTypes: {
     options: {
       helperText: 'The available options to select from.',
-      typeDef: { type: 'array', schema: '/schemas/SelectOptions.json' },
+      typeDef: { type: 'array', schema: '/schemas/SelectOptions.json', default: [] },
       control: { type: 'SelectOptions' },
-      defaultValue: [],
     },
     value: {
       helperText: 'The currently selected value.',
-      typeDef: { type: 'string' },
+      typeDef: { type: 'string', default: '' },
       onChangeProp: 'onChange',
-      defaultValue: '',
       defaultValueProp: 'defaultValue',
     },
     defaultValue: {
       helperText: 'A default value.',
-      typeDef: { type: 'string' },
-      defaultValue: '',
+      typeDef: { type: 'string', default: '' },
     },
     label: {
       helperText: 'A label that describes the option that can be selected. e.g. "Country".',
-      typeDef: { type: 'string' },
-      defaultValue: '',
+      typeDef: { type: 'string', default: '' },
     },
     variant: {
       helperText:
         'One of the available MUI TextField [variants](https://mui.com/material-ui/react-button/#basic-button). Possible values are `outlined`, `filled` or `standard`',
-      typeDef: { type: 'string', enum: ['outlined', 'filled', 'standard'] },
-      defaultValue: 'outlined',
+      typeDef: {
+        type: 'string',
+        enum: ['outlined', 'filled', 'standard'],
+        default: 'outlined',
+      },
     },
     size: {
       helperText: 'The size of the select. One of `small`, or `medium`.',
-      typeDef: { type: 'string', enum: ['small', 'medium'] },
-      defaultValue: 'small',
+      typeDef: { type: 'string', enum: ['small', 'medium'], default: 'small' },
     },
     fullWidth: {
       helperText: 'Whether the select should occupy all available horizontal space.',

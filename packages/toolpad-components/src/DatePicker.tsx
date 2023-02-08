@@ -117,9 +117,8 @@ export default createComponent(DatePicker, {
   argTypes: {
     value: {
       helperText: 'The currently selected date.',
-      typeDef: { type: 'string' },
+      typeDef: { type: 'string', default: '' },
       onChangeProp: 'onChange',
-      defaultValue: '',
       defaultValueProp: 'defaultValue',
     },
     format: {
@@ -127,13 +126,12 @@ export default createComponent(DatePicker, {
         'The [format](https://day.js.org/docs/en/display/format) of the date in the UI. The value for the bindings will always be in the `YYYY-MM-DD` format. Leave empty to let the end-user locale define the format.',
       typeDef: {
         type: 'string',
+        default: '',
       },
-      defaultValue: '',
     },
     defaultValue: {
       helperText: 'A default value for the date picker.',
-      typeDef: { type: 'string' },
-      defaultValue: '',
+      typeDef: { type: 'string', default: '' },
     },
     label: {
       helperText: 'A label that describes the content of the date picker. e.g. "Arrival date".',
@@ -142,13 +140,11 @@ export default createComponent(DatePicker, {
     variant: {
       helperText:
         'One of the available MUI TextField [variants](https://mui.com/material-ui/react-button/#basic-button). Possible values are `outlined`, `filled` or `standard`',
-      typeDef: { type: 'string', enum: ['outlined', 'filled', 'standard'] },
-      defaultValue: 'outlined',
+      typeDef: { type: 'string', enum: ['outlined', 'filled', 'standard'], default: 'outlined' },
     },
     size: {
       helperText: 'The size of the component. One of `small`, or `medium`.',
-      typeDef: { type: 'string', enum: ['small', 'medium'] },
-      defaultValue: 'small',
+      typeDef: { type: 'string', enum: ['small', 'medium'], default: 'small' },
     },
     fullWidth: {
       helperText: 'Whether the button should occupy all available horizontal space.',

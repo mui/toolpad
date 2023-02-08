@@ -76,31 +76,37 @@ export type SlotType = 'single' | 'multiple' | 'layout';
 
 export interface ValueTypeBase {
   type: 'string' | 'boolean' | 'number' | 'object' | 'array' | 'element' | 'event';
+  default?: unknown;
 }
 
 export interface StringValueType extends ValueTypeBase {
   type: 'string';
   enum?: string[];
+  default?: string;
 }
 
 export interface NumberValueType extends ValueTypeBase {
   type: 'number';
   minimum?: number;
   maximum?: number;
+  default?: number;
 }
 
 export interface BooleanValueType extends ValueTypeBase {
   type: 'boolean';
+  default?: boolean;
 }
 
 export interface ObjectValueType extends ValueTypeBase {
   type: 'object';
   schema?: string;
+  default?: any;
 }
 
 export interface ArrayValueType extends ValueTypeBase {
   type: 'array';
   schema?: string;
+  default?: any[];
 }
 
 export interface ElementValueType extends ValueTypeBase {
@@ -178,6 +184,7 @@ export interface ArgTypeDefinition<P extends object = {}, V = P[keyof P]> {
   description?: string;
   /**
    * A default value for the property.
+   * @deprecated Use `typeDef.default` instead.
    */
   defaultValue?: V;
   /**

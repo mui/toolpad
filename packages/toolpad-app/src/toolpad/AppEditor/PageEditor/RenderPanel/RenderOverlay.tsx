@@ -1536,7 +1536,8 @@ export default function RenderOverlay({ bridge }: RenderOverlayProps) {
         const isInteractive = interactiveNodes.has(node.id) && !draggedEdge;
 
         const isHorizontallyResizable = isSelected && (isPageRowChild || isPageColumnChild);
-        const isVerticallyResizable = Boolean(nodeInfo?.componentConfig?.resizableHeightProp);
+        const isVerticallyResizable =
+          isSelected && Boolean(nodeInfo?.componentConfig?.resizableHeightProp);
 
         const isResizing = Boolean(draggedEdge);
         const isResizingNode = isResizing && node.id === draggedNodeId;

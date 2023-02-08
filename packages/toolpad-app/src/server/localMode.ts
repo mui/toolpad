@@ -189,8 +189,8 @@ export async function saveLocalDom(dom: appDom.AppDom): Promise<void> {
 }
 
 export async function loadDomFromDisk(): Promise<appDom.AppDom> {
+  const configFilePath = getConfigFilePath();
   try {
-    const configFilePath = getConfigFilePath();
     const [configContent, componentsContent] = await Promise.all([
       fs.readFile(configFilePath, { encoding: 'utf-8' }),
       loadCodeComponentsFromFiles(),
@@ -202,7 +202,7 @@ export async function loadDomFromDisk(): Promise<appDom.AppDom> {
     const error = errorFrom(rawError);
     if (error.code === 'ENOENT') {
       if (config.cmd !== 'dev') {
-        throw new Error(`No application found.`);
+        throw new Error(`No application found at "${configFilePath}".`);
       }
 
       const dom = appDom.createDefaultDom();

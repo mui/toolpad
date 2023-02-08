@@ -1,9 +1,8 @@
 import type { RuntimeEvents } from '@mui/toolpad-core';
 import mitt, { Emitter } from 'mitt';
 import type { AppCanvasState } from '.';
+import { TOOLPAD_BRIDGE_GLOBAL } from '../constants';
 import type { PageViewState } from '../types';
-
-export const TOOLPAD_BRIDGE_GLOBAL = '__TOOLPAD_BRIDGE__';
 
 declare global {
   interface Window {
@@ -69,6 +68,15 @@ export interface ToolpadBridge {
     getPageViewState(): PageViewState;
     isReady(): boolean;
   }>;
+}
+
+if (
+  typeof window !== 'undefined' &&
+  !(window.frameElement as HTMLIFrameElement | null)?.dataset.toolpadCanvas
+) {
+  throw new Error(
+    'An attempt was made at setting up the canvas bridge outside of the canvas. Was this file imported unintentionally?',
+  );
 }
 
 let canvasIsReady = false;

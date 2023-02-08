@@ -6,13 +6,13 @@ import { CacheProvider } from '@emotion/react';
 import ReactDOM from 'react-dom';
 import invariant from 'invariant';
 import * as appDom from '../../../appDom';
-import { HTML_ID_EDITOR_OVERLAY } from '../../../constants';
+import { HTML_ID_EDITOR_OVERLAY, TOOLPAD_BRIDGE_GLOBAL } from '../../../constants';
 import { NodeHashes } from '../../../types';
 import useEvent from '../../../utils/useEvent';
 import { LogEntry } from '../../../components/Console';
 import { useDomApi } from '../../DomLoader';
 import createRuntimeState from '../../../createRuntimeState';
-import { ToolpadBridge, TOOLPAD_BRIDGE_GLOBAL } from '../../../canvas/ToolpadBridge';
+import type { ToolpadBridge } from '../../../canvas/ToolpadBridge';
 import CenteredSpinner from '../../../components/CenteredSpinner';
 
 interface OverlayProps {

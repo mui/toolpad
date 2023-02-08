@@ -8,7 +8,7 @@ import { usePageEditorApi, usePageEditorState } from '../PageEditorProvider';
 import RenderOverlay from './RenderOverlay';
 import { NodeHashes } from '../../../../types';
 import useEvent from '../../../../utils/useEvent';
-import { ToolpadBridge } from '../../../../canvas/ToolpadBridge';
+import type { ToolpadBridge } from '../../../../canvas/ToolpadBridge';
 
 const classes = {
   view: 'Toolpad_View',

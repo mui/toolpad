@@ -68,10 +68,10 @@ const OverlayRoot = styled('div')({
     cursor: 'copy',
   },
   [`&.${overlayClasses.resizeHorizontal}`]: {
-    cursor: 'col-resize',
+    cursor: 'ew-resize',
   },
   [`&.${overlayClasses.resizeVertical}`]: {
-    cursor: 'row-resize',
+    cursor: 'ns-resize',
   },
   [`.${overlayClasses.hudOverlay}`]: {
     position: 'absolute',
@@ -459,13 +459,15 @@ export default function RenderOverlay({ bridge }: RenderOverlayProps) {
   );
 
   const handleEdgeDragStart = React.useCallback(
-    (node: appDom.ElementNode, edge: RectangleEdge) => (event: React.MouseEvent<HTMLElement>) => {
-      event.stopPropagation();
+    (node: appDom.AppDomNode) =>
+      (edge: RectangleEdge) =>
+      (event: React.MouseEvent<HTMLElement>) => {
+        event.stopPropagation();
 
-      api.edgeDragStart({ nodeId: node.id, edge });
+        api.edgeDragStart({ nodeId: node.id, edge });
 
-      selectNode(node.id);
-    },
+        selectNode(node.id);
+      },
     [api, selectNode],
   );
 
@@ -1528,10 +1530,12 @@ export default function RenderOverlay({ bridge }: RenderOverlayProps) {
             : false;
 
         const isPageRowChild = parent ? appDom.isElement(parent) && isPageRow(parent) : false;
+        const isPageColumnChild = parent ? appDom.isElement(parent) && isPageColumn(parent) : false;
 
         const isSelected = selectedNode && !newNode ? selectedNode.id === node.id : false;
         const isInteractive = interactiveNodes.has(node.id) && !draggedEdge;
 
+        const isHorizontallyResizable = isSelected && (isPageRowChild || isPageColumnChild);
         const isVerticallyResizable = Boolean(nodeInfo?.componentConfig?.resizableHeightProp);
 
         const isResizing = Boolean(draggedEdge);
@@ -1552,7 +1556,7 @@ export default function RenderOverlay({ bridge }: RenderOverlayProps) {
                 onNodeDragStart={handleNodeDragStart(node as appDom.ElementNode)}
                 onDuplicate={handleNodeDuplicate(node as appDom.ElementNode)}
                 draggableEdges={[
-                  ...(isPageRowChild
+                  ...(isHorizontallyResizable
                     ? [
                         ...(isFirstChild ? [] : [RECTANGLE_EDGE_LEFT as RectangleEdge]),
                         ...(isLastChild ? [] : [RECTANGLE_EDGE_RIGHT as RectangleEdge]),
@@ -1561,7 +1565,11 @@ export default function RenderOverlay({ bridge }: RenderOverlayProps) {
                   ...(isVerticallyResizable ? [RECTANGLE_EDGE_BOTTOM as RectangleEdge] : []),
                 ]}
                 onEdgeDragStart={
-                  isPageRowChild || isVerticallyResizable ? handleEdgeDragStart : undefined
+                  isHorizontallyResizable || isVerticallyResizable
+                    ? handleEdgeDragStart(
+                        parent && isPageColumnChild && !isVerticallyResizable ? parent : node,
+                      )
+                    : undefined
                 }
                 onDelete={handleNodeDelete(node.id)}
                 isResizing={isResizingNode}

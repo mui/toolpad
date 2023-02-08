@@ -91,6 +91,7 @@ const SelectionHintWrapper = styled('div', {
 }));
 
 const DraggableEdgeWrapper = styled('div')({
+  userSelect: 'none',
   position: 'absolute',
   zIndex: 3,
 });
@@ -103,27 +104,27 @@ const DraggableEdge = styled('div', {
   let dynamicStyles = {};
   if (edge === RECTANGLE_EDGE_RIGHT) {
     dynamicStyles = {
-      cursor: 'col-resize',
+      cursor: 'ew-resize',
       top: 0,
-      right: -2,
+      right: -12,
       height: '100%',
-      width: 12,
+      width: 24,
     };
   }
   if (edge === RECTANGLE_EDGE_LEFT) {
     dynamicStyles = {
-      cursor: 'col-resize',
+      cursor: 'ew-resize',
       top: 0,
-      left: -2,
+      left: -12,
       height: '100%',
-      width: 12,
+      width: 24,
     };
   }
   if (edge === RECTANGLE_EDGE_BOTTOM) {
     dynamicStyles = {
-      cursor: 'row-resize',
-      bottom: -2,
-      height: 12,
+      cursor: 'ns-resize',
+      bottom: -12,
+      height: 24,
       left: 0,
       width: '100%',
     };
@@ -150,10 +151,7 @@ interface NodeHudProps {
   isInteractive?: boolean;
   onNodeDragStart?: React.DragEventHandler<HTMLElement>;
   draggableEdges?: RectangleEdge[];
-  onEdgeDragStart?: (
-    node: appDom.ElementNode,
-    edge: RectangleEdge,
-  ) => React.MouseEventHandler<HTMLElement>;
+  onEdgeDragStart?: (edge: RectangleEdge) => React.MouseEventHandler<HTMLElement>;
   onDelete?: React.MouseEventHandler<HTMLElement>;
   isResizing?: boolean;
   resizePreviewElementRef: React.MutableRefObject<HTMLDivElement | null>;
@@ -195,7 +193,7 @@ export default function NodeHud({
           [nodeHudClasses.allowNodeInteraction]: isInteractive,
         })}
         isOutlineVisible={isOutlineVisible}
-        isHoverable={isHoverable}
+        isHoverable={isHoverable && !isOutlineVisible}
       >
         {isSelected ? <span className={nodeHudClasses.selected} /> : null}
         {isResizing ? (
@@ -228,17 +226,17 @@ export default function NodeHud({
           </div>
         </SelectionHintWrapper>
       ) : null}
-      <DraggableEdgeWrapper style={absolutePositionCss(rect)}>
-        {onEdgeDragStart
-          ? draggableEdges.map((edge) => (
-              <DraggableEdge
-                key={`${node.id}-edge-${edge}`}
-                edge={edge}
-                onMouseDown={onEdgeDragStart(node as appDom.ElementNode, edge)}
-              />
-            ))
-          : null}
-      </DraggableEdgeWrapper>
+      {onEdgeDragStart ? (
+        <DraggableEdgeWrapper style={absolutePositionCss(rect)}>
+          {draggableEdges.map((edge) => (
+            <DraggableEdge
+              key={`${node.id}-edge-${edge}`}
+              edge={edge}
+              onMouseDown={onEdgeDragStart(edge)}
+            />
+          ))}
+        </DraggableEdgeWrapper>
+      ) : null}
     </React.Fragment>
   );
 }

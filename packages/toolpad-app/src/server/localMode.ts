@@ -4,6 +4,7 @@ import * as fs from 'fs/promises';
 import invariant from 'invariant';
 import * as child_process from 'child_process';
 import { promisify } from 'util';
+import { Dirent } from 'fs';
 import config from '../config';
 import * as appDom from '../appDom';
 import { errorFrom } from '../utils/errors';
@@ -40,7 +41,14 @@ function getComponentFilePath(componentsFolder: string, componentName: string): 
 
 async function loadCodeComponentsFromFiles(): Promise<ComponentsContent> {
   const componentsFolder = getComponentFolder();
-  const entries = await fs.readdir(componentsFolder, { withFileTypes: true });
+  let entries: Dirent[] = [];
+  try {
+    entries = await fs.readdir(componentsFolder, { withFileTypes: true });
+  } catch (err: unknown) {
+    if (errorFrom(err).code !== 'ENOENT') {
+      throw err;
+    }
+  }
   const resultEntries = await Promise.all(
     entries.map(async (entry): Promise<[string, string] | null> => {
       if (entry.isFile()) {
@@ -123,22 +131,6 @@ function extractComponentsContentFromDom(dom: appDom.AppDom): ComponentsContent 
   );
 }
 
-export async function loadConfigFile(filePath: string): Promise<appDom.AppDom> {
-  try {
-    const configContent = await fs.readFile(filePath, { encoding: 'utf-8' });
-    const parsedConfig = yaml.parse(configContent);
-    return parsedConfig;
-  } catch (rawError) {
-    const error = errorFrom(rawError);
-    if (error.code === 'ENOENT') {
-      const dom = appDom.createDefaultDom();
-      await writeConfigFile(filePath, dom);
-      return dom;
-    }
-    throw error;
-  }
-}
-
 export async function fileExists(filepath: string): Promise<boolean> {
   try {
     const stat = await fs.stat(filepath);
@@ -188,16 +180,12 @@ export async function saveLocalDom(dom: appDom.AppDom): Promise<void> {
   await writeDomToDisk(dom);
 }
 
-export async function loadDomFromDisk(): Promise<appDom.AppDom> {
+async function loadConfigFile() {
   const configFilePath = getConfigFilePath();
   try {
-    const [configContent, componentsContent] = await Promise.all([
-      fs.readFile(configFilePath, { encoding: 'utf-8' }),
-      loadCodeComponentsFromFiles(),
-    ]);
+    const configContent = await fs.readFile(configFilePath, { encoding: 'utf-8' });
     const parsedConfig = yaml.parse(configContent);
-    const dom = mergeComponentsContentIntoDom(parsedConfig, componentsContent);
-    return dom;
+    return parsedConfig;
   } catch (rawError) {
     const error = errorFrom(rawError);
     if (error.code === 'ENOENT') {
@@ -211,6 +199,15 @@ export async function loadDomFromDisk(): Promise<appDom.AppDom> {
     }
     throw error;
   }
+}
+
+export async function loadDomFromDisk(): Promise<appDom.AppDom> {
+  const [configContent, componentsContent] = await Promise.all([
+    loadConfigFile(),
+    loadCodeComponentsFromFiles(),
+  ]);
+  const dom = mergeComponentsContentIntoDom(configContent, componentsContent);
+  return dom;
 }
 
 export async function loadLocalDom(): Promise<appDom.AppDom> {

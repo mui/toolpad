@@ -70,6 +70,16 @@ export interface ToolpadBridge {
   }>;
 }
 
+if (
+  typeof window !== 'undefined' &&
+  process.env.NODE_ENV !== 'test' &&
+  !(window.frameElement as HTMLIFrameElement | null)?.dataset.toolpadCanvas
+) {
+  throw new Error(
+    'An attempt was made at setting up the canvas bridge outside of the canvas. Was this file imported unintentionally?',
+  );
+}
+
 let canvasIsReady = false;
 export const bridge: ToolpadBridge = {
   editorEvents: mitt(),
@@ -84,9 +94,6 @@ bridge.canvasEvents.on('ready', () => {
   canvasIsReady = true;
 });
 
-if (
-  typeof window !== 'undefined' &&
-  (window.frameElement as HTMLIFrameElement | null)?.dataset.toolpadCanvas
-) {
+if (typeof window !== 'undefined') {
   window[TOOLPAD_BRIDGE_GLOBAL] = bridge;
 }

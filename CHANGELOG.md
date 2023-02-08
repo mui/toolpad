@@ -1,5 +1,31 @@
 # Changelog
 
+## 0.0.39
+
+<!-- generated comparing v0.0.39-alpha.0..master -->
+
+_Feb 8, 2023_
+
+A big thanks to the 3 contributors who made this release possible. Here are some highlights ✨:
+
+Edit option from preview, improved Select component behavior, updated drag & drop UI/UX, improved image columns in Data Grid, add Data Grid documentation.
+
+- &#8203;<!-- 13 -->Improve behavior of image columns (#1637) @Janpot
+- &#8203;<!-- 12 -->Add DataGrid docs (#1616) @bytasv
+- &#8203;<!-- 11 -->Fix console errors @apedroferreira
+- &#8203;<!-- 10 -->Improve drag & drop / canvas UI (#1553) @apedroferreira
+- &#8203;<!-- 09 -->Add some new future components (#1631) @Janpot
+- &#8203;<!-- 08 -->Fix design issue template (#1636) @bytasv
+- &#8203;<!-- 07 -->Add design GH template (#1632) @bytasv
+- &#8203;<!-- 06 -->Remove - from select options (#1630) @Janpot
+- &#8203;<!-- 05 -->Improve deploy in iframe tests (#1622) @Janpot
+- &#8203;<!-- 04 -->disable server code build when not in local mode @Janpot
+- &#8203;<!-- 03 -->Remove firefox specific branch in tests (#1620) @Janpot
+- &#8203;<!-- 02 -->Add fast edit option from preview (#1603) @bytasv
+- &#8203;<!-- 01 -->Be more accepting of select options (#1604) @Janpot
+
+All contributors of this release in alphabetical order: @apedroferreira, @bytasv, @Janpot
+
 ## 0.0.38
 
 <!-- generated comparing v0.0.37..master -->

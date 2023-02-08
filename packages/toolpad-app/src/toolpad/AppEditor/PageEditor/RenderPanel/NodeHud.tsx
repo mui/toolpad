@@ -106,25 +106,25 @@ const DraggableEdge = styled('div', {
     dynamicStyles = {
       cursor: 'ew-resize',
       top: 0,
-      right: -12,
+      right: -2,
       height: '100%',
-      width: 24,
+      width: 16,
     };
   }
   if (edge === RECTANGLE_EDGE_LEFT) {
     dynamicStyles = {
       cursor: 'ew-resize',
       top: 0,
-      left: -12,
+      left: -2,
       height: '100%',
-      width: 24,
+      width: 16,
     };
   }
   if (edge === RECTANGLE_EDGE_BOTTOM) {
     dynamicStyles = {
       cursor: 'ns-resize',
-      bottom: -12,
-      height: 24,
+      bottom: -2,
+      height: 16,
       left: 0,
       width: '100%',
     };

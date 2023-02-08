@@ -458,6 +458,34 @@ export default function RenderOverlay({ bridge }: RenderOverlayProps) {
     [domApi, normalizePageRowColumnSizes],
   );
 
+  const getNodeDraggableHorizontalEdges = React.useCallback(
+    (node: appDom.AppDomNode): RectangleEdge[] => {
+      const nodeParentProp = node.parentProp;
+
+      const parent = appDom.getParent(dom, node);
+
+      const isFirstChild =
+        parent && appDom.isElement(parent) && nodeParentProp
+          ? appDom.getNodeFirstChild(dom, parent, node.parentProp)?.id === node.id
+          : false;
+      const isLastChild =
+        parent && appDom.isElement(parent) && nodeParentProp
+          ? appDom.getNodeLastChild(dom, parent, nodeParentProp)?.id === node.id
+          : false;
+
+      const isPageRowChild = parent ? appDom.isElement(parent) && isPageRow(parent) : false;
+
+      const isDraggableLeft = isPageRowChild ? !isFirstChild : false;
+      const isDraggableRight = isPageRowChild ? !isLastChild : false;
+
+      return [
+        ...(isDraggableLeft ? [RECTANGLE_EDGE_LEFT] : []),
+        ...(isDraggableRight ? [RECTANGLE_EDGE_RIGHT] : []),
+      ] as RectangleEdge[];
+    },
+    [dom],
+  );
+
   const handleEdgeDragStart = React.useCallback(
     (node: appDom.AppDomNode) =>
       (edge: RectangleEdge) =>
@@ -1511,23 +1539,12 @@ export default function RenderOverlay({ bridge }: RenderOverlayProps) {
           })}
     >
       {pageNodes.map((node) => {
-        const nodeParentProp = node.parentProp;
-
         const nodeInfo = nodesInfo[node.id];
         const nodeRect = nodeInfo?.rect || null;
 
         const parent = appDom.getParent(dom, node);
 
         const isPageNode = appDom.isPage(node);
-
-        const isFirstChild =
-          parent && appDom.isElement(parent) && nodeParentProp
-            ? appDom.getNodeFirstChild(dom, parent, node.parentProp)?.id === node.id
-            : false;
-        const isLastChild =
-          parent && appDom.isElement(parent) && nodeParentProp
-            ? appDom.getNodeLastChild(dom, parent, nodeParentProp)?.id === node.id
-            : false;
 
         const isPageRowChild = parent ? appDom.isElement(parent) && isPageRow(parent) : false;
         const isPageColumnChild = parent ? appDom.isElement(parent) && isPageColumn(parent) : false;
@@ -1557,12 +1574,7 @@ export default function RenderOverlay({ bridge }: RenderOverlayProps) {
                 onNodeDragStart={handleNodeDragStart(node as appDom.ElementNode)}
                 onDuplicate={handleNodeDuplicate(node as appDom.ElementNode)}
                 draggableEdges={[
-                  ...(isHorizontallyResizable
-                    ? [
-                        ...(isFirstChild ? [] : [RECTANGLE_EDGE_LEFT as RectangleEdge]),
-                        ...(isLastChild ? [] : [RECTANGLE_EDGE_RIGHT as RectangleEdge]),
-                      ]
-                    : []),
+                  ...getNodeDraggableHorizontalEdges(parent && isPageColumnChild ? parent : node),
                   ...(isVerticallyResizable ? [RECTANGLE_EDGE_BOTTOM as RectangleEdge] : []),
                 ]}
                 onEdgeDragStart={

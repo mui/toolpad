@@ -38,8 +38,7 @@ function createDefaultCodeComponent(name: string): string {
     export default createComponent(${componentId}, {
       argTypes: {
         msg: {
-          typeDef: { type: "string" },
-          defaultValue: "Hello world!",
+          typeDef: { type: "string", default: "Hello world!" },
         },
       },
     });    

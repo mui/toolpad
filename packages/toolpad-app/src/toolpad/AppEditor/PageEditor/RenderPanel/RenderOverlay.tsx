@@ -43,9 +43,6 @@ import { NodeInfo } from '../../../../types';
 import NodeDropArea from './NodeDropArea';
 import { ToolpadBridge } from '../../../../canvas/ToolpadBridge';
 
-const HORIZONTAL_RESIZE_SNAP_UNITS = 4; // px
-const SNAP_TO_GRID_COLUMN_MARGIN = 10; // px
-
 const VERTICAL_RESIZE_SNAP_UNITS = 2; // px
 
 const MIN_RESIZABLE_ELEMENT_HEIGHT = 100; // px
@@ -1294,22 +1291,20 @@ export default function RenderOverlay({ bridge }: RenderOverlayProps) {
 
       if (draggedNodeRect && parentRect && resizePreviewElement && cursorPos) {
         if (draggedEdge === RECTANGLE_EDGE_LEFT || draggedEdge === RECTANGLE_EDGE_RIGHT) {
-          let snappedToGridCursorRelativePosX =
-            Math.ceil((cursorPos.x - draggedNodeRect.x) / HORIZONTAL_RESIZE_SNAP_UNITS) *
-            HORIZONTAL_RESIZE_SNAP_UNITS;
+          let snappedToGridCursorRelativePosX = cursorPos.x - draggedNodeRect.x;
 
           const activeSnapGridColumnEdges =
             draggedEdge === RECTANGLE_EDGE_LEFT
               ? overlayGridRef.current.getLeftColumnEdges()
               : overlayGridRef.current.getRightColumnEdges();
 
+          const minGridColumnWidth = overlayGridRef.current.getMinColumnWidth();
+
           for (const gridColumnEdge of activeSnapGridColumnEdges) {
-            if (Math.abs(gridColumnEdge - cursorPos.x) <= SNAP_TO_GRID_COLUMN_MARGIN) {
+            if (Math.abs(gridColumnEdge - cursorPos.x) <= minGridColumnWidth) {
               snappedToGridCursorRelativePosX = gridColumnEdge - draggedNodeRect.x;
             }
           }
-
-          const minGridColumnWidth = overlayGridRef.current.getMinColumnWidth();
 
           const previousSibling = appDom.getSiblingBeforeNode(dom, draggedNode, 'children');
           const previousSiblingInfo = previousSibling && nodesInfo[previousSibling.id];
@@ -1573,6 +1568,7 @@ export default function RenderOverlay({ bridge }: RenderOverlayProps) {
                 onDelete={handleNodeDelete(node.id)}
                 isResizing={isResizing}
                 resizePreviewElementRef={resizePreviewElementRef}
+                isOutlineVisible={isDraggingOver}
               />
             ) : null}
           </React.Fragment>

@@ -74,9 +74,9 @@ import { useAppContext, AppContextProvider } from './AppContext';
 import { CanvasHooksContext, NavigateToPage } from './CanvasHooksContext';
 import useBoolean from '../utils/useBoolean';
 import { errorFrom } from '../utils/errors';
-import { bridge } from '../canvas/ToolpadBridge';
 import Header from '../toolpad/ToolpadShell/Header';
 import { ThemeProvider } from '../ThemeContext';
+import { BridgeContext } from '../canvas/BridgeContext';
 
 const ReactQueryDevtoolsProduction = React.lazy(() =>
   import('@tanstack/react-query-devtools/build/lib/index.prod.js').then((d) => ({
@@ -846,13 +846,15 @@ function RenderedPage({ nodeId }: RenderedNodeProps) {
     [browserJsRuntime, pageState],
   );
 
-  React.useEffect(() => {
-    bridge.canvasEvents.emit('pageStateUpdated', { pageState, globalScopeMeta });
-  }, [pageState, globalScopeMeta]);
+  const bridge = React.useContext(BridgeContext);
 
   React.useEffect(() => {
-    bridge.canvasEvents.emit('pageBindingsUpdated', { bindings: liveBindings });
-  }, [liveBindings]);
+    bridge?.canvasEvents.emit('pageStateUpdated', { pageState, globalScopeMeta });
+  }, [pageState, globalScopeMeta, bridge]);
+
+  React.useEffect(() => {
+    bridge?.canvasEvents.emit('pageBindingsUpdated', { bindings: liveBindings });
+  }, [bridge, liveBindings]);
 
   return (
     <BindingsContextProvider value={liveBindings}>

@@ -1,9 +1,11 @@
 import { ExecFetchResult, SerializedError } from '@mui/toolpad-core';
 import * as child_process from 'child_process';
 import * as esbuild from 'esbuild';
+import * as fs from 'fs/promises';
 import * as path from 'path';
 import invariant from 'invariant';
 import { indent } from '@mui/toolpad-core/utils/strings';
+import * as dotenv from 'dotenv';
 import config from '../../config';
 import { ServerDataSource } from '../../types';
 import { LocalPrivateQuery, LocalQuery, LocalConnectionParams } from './types';
@@ -177,6 +179,9 @@ async function createBuilder() {
   let buildErrors: Error[] = [];
   let runtimeError: Error | undefined;
 
+  const envFileContent = await fs.readFile(path.resolve(userProjectRoot, '.env'));
+  const env = dotenv.parse(envFileContent) as any;
+
   const toolpadPlugin: esbuild.Plugin = {
     name: 'toolpad',
     setup(build) {
@@ -231,12 +236,18 @@ async function createBuilder() {
           const outputFileNames = Object.keys(metafile.outputs);
           invariant(outputFileNames.length === 1, 'esbuild should build only one output file');
           const outputFile = outputFileNames[0];
+
           const runtimeProcess = child_process.fork(`./${outputFile}`, {
             cwd: userProjectRoot,
             silent: true,
             signal: controller.signal,
             stdio: 'inherit',
+            env: {
+              NODE_ENV: config.cmd === 'start' ? 'production' : 'development',
+              ...env,
+            },
           });
+
           runtimeError = undefined;
 
           runtimeProcess.on('error', (error) => {

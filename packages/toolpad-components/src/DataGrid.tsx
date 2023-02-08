@@ -161,7 +161,7 @@ function ImageCell({ field, id, value: src }: GridRenderCellParams<any, any, any
   const alt = `${field} ${id}`;
 
   return (
-    <Box sx={{ width: '100%', height: '100%' }}>
+    <React.Fragment>
       <Box
         aria-owns={open ? popoverId : undefined}
         aria-haspopup="true"
@@ -170,7 +170,7 @@ function ImageCell({ field, id, value: src }: GridRenderCellParams<any, any, any
         component="img"
         src={src}
         alt={alt}
-        sx={{ width: '100%', height: '100%', objectFit: 'contain', p: 1 }}
+        sx={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain', p: 1 }}
       />
       <Popover
         id={popoverId}
@@ -179,20 +179,17 @@ function ImageCell({ field, id, value: src }: GridRenderCellParams<any, any, any
         }}
         open={open}
         anchorEl={anchorEl}
-        anchorOrigin={{
-          vertical: 'bottom',
-          horizontal: 'left',
-        }}
-        transformOrigin={{
-          vertical: 'top',
-          horizontal: 'left',
-        }}
         onClose={handlePopoverClose}
         disableRestoreFocus
       >
-        <Box component="img" src={src} alt={alt} sx={{ m: 2 }} />
+        <Box
+          component="img"
+          src={src}
+          alt={alt}
+          sx={{ maxWidth: '60vw', maxHeight: '60vh', objectFit: 'contain', m: 2 }}
+        />
       </Popover>
-    </Box>
+    </React.Fragment>
   );
 }
 

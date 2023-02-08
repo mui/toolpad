@@ -46,7 +46,6 @@ import * as _ from 'lodash-es';
 import ErrorIcon from '@mui/icons-material/Error';
 import EditIcon from '@mui/icons-material/Edit';
 import { useBrowserJsRuntime } from '@mui/toolpad-core/jsBrowserRuntime';
-import { FormProvider, useForm } from 'react-hook-form';
 import * as appDom from '../appDom';
 import { RuntimeState, VersionOrPreview } from '../types';
 import {
@@ -200,6 +199,8 @@ interface RenderedNodeContentProps {
 function RenderedNodeContent({ node, childNodeGroups, Component }: RenderedNodeContentProps) {
   const setControlledBinding = useSetControlledBindingContext();
 
+  const dom = useDomContext();
+
   const nodeId = node.id;
 
   const componentConfig = Component[TOOLPAD_COMPONENT];
@@ -281,10 +282,27 @@ function RenderedNodeContent({ node, childNodeGroups, Component }: RenderedNodeC
 
           const value = argType.onChangeHandler ? argType.onChangeHandler(param) : param;
           setControlledBinding(bindingId, { value });
+
+          const closestForm = appDom.getClosestForm(dom, node);
+
+          if (closestForm) {
+            const formBindingId = `${closestForm.id}.props.value`;
+
+            const currentValue = closestForm.props.value?.value || {};
+
+            const formValue = {
+              ...currentValue,
+              [node.name]: value,
+            };
+
+            setControlledBinding(formBindingId, {
+              value: formValue,
+            });
+          }
         };
         return [argType.onChangeProp, handler];
       }),
-    [argTypes, nodeId, setControlledBinding],
+    [argTypes, nodeId, setControlledBinding, dom, node],
   );
 
   const navigateToPage = usePageNavigator();
@@ -773,7 +791,6 @@ function parseBindings(
 }
 
 function RenderedPage({ nodeId }: RenderedNodeProps) {
-  const formMethods = useForm();
   const dom = useDomContext();
   const page = appDom.getNode(dom, nodeId, 'page');
   const { children = [], queries = [] } = appDom.getChildNodes(dom, page);

@@ -5,7 +5,6 @@ import {
   BoxProps,
 } from '@mui/material';
 import { createComponent } from '@mui/toolpad-core';
-import { useFormContext } from 'react-hook-form';
 import { SX_PROP_HELPER_TEXT } from './constants';
 
 export type TextFieldProps = Omit<MuiTextFieldProps, 'value' | 'onChange'> & {
@@ -16,16 +15,7 @@ export type TextFieldProps = Omit<MuiTextFieldProps, 'value' | 'onChange'> & {
   name: string;
 };
 
-function TextField({
-  defaultValue,
-  onChange,
-  value,
-  onBlur = () => {},
-  ref,
-  ...props
-}: TextFieldProps) {
-  const { register } = useFormContext();
-
+function TextField({ defaultValue, onChange, value, ref, ...props }: TextFieldProps) {
   const handleChange = React.useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
       console.log('here', event.target.value);
@@ -33,15 +23,7 @@ function TextField({
     },
     [onChange],
   );
-
-  const formProps = register(props.name, {
-    onBlur,
-    onChange: handleChange,
-    value,
-    ref,
-  });
-
-  return <MuiTextField {...props} {...formProps} name={props.name} value={value} />;
+  return <MuiTextField {...props} onChange={handleChange} name={props.name} value={value} />;
 }
 
 export default createComponent(TextField, {

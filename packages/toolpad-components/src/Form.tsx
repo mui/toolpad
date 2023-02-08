@@ -24,46 +24,15 @@ function Form({
   defaultValue,
   ...rest
 }: Props) {
-  const methods = useForm({
-    defaultValues: defaultValue,
-    resolver: (values) => {
-      onChange(values);
+  const handleSubmit = (event) => {
+    event.preventDefault();
 
-      return {};
-    },
-    mode: 'onChange',
-  });
-
-  // const values = methods.getValues();
-
-  // React.useEffect(() => {
-  //   onChange(values);
-  //   console.log('new', values);
-  // }, [values]);
+    onSubmit(value);
+  };
 
   return (
     <MUIContainer disableGutters sx={sx} {...rest}>
-      <FormProvider {...methods}>
-        <form onSubmit={methods.handleSubmit(onSubmit)}>
-          {children}
-
-          <MUIContainer
-            disableGutters
-            sx={{
-              borderTop: 'solid 1px',
-              display: 'flex',
-              justifyContent: 'end',
-              width: '100%',
-              mt: 1,
-              pt: 1,
-            }}
-          >
-            <Button type="submit" variant="contained">
-              {submitLabel}
-            </Button>
-          </MUIContainer>
-        </form>
-      </FormProvider>
+      <form onSubmit={handleSubmit}>{children}</form>
     </MUIContainer>
   );
 }
@@ -76,21 +45,9 @@ export default createComponent(Form, {
       control: { type: 'layoutSlot' },
     },
     value: {
-      helperText: 'The value that is controlled by this text input.',
-      typeDef: { type: 'object' },
+      visible: false,
+      typeDef: { type: 'object', default: {} },
       onChangeProp: 'onChange',
-      defaultValue: {},
-    },
-    defaultValue: {
-      helperText: 'Set initial valus of form fields.',
-      typeDef: { type: 'object' },
-      defaultValue: {},
-    },
-    submitLabel: {
-      label: 'Submit label',
-      helperText: 'Submit button label.',
-      typeDef: { type: 'string' },
-      defaultValue: 'Submit',
     },
     onSubmit: {
       helperText: 'Add logic to be executed when the user submits the form.',
@@ -98,8 +55,13 @@ export default createComponent(Form, {
     },
     sx: {
       helperText: SX_PROP_HELPER_TEXT,
-      typeDef: { type: 'object' },
-      defaultValue: { padding: 1 },
+      typeDef: {
+        type: 'object',
+        default: {
+          padding: 1,
+          border: 'solid 1px #007FFF',
+        },
+      },
     },
   },
 });

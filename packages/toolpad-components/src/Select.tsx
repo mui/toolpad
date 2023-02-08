@@ -1,7 +1,6 @@
 import * as React from 'react';
 import { TextFieldProps, MenuItem, TextField } from '@mui/material';
 import { createComponent } from '@mui/toolpad-core';
-// import { useField } from 'formik';
 import { SX_PROP_HELPER_TEXT } from './constants';
 
 export interface SelectOption {
@@ -17,13 +16,9 @@ export type SelectProps = Omit<TextFieldProps, 'value' | 'onChange'> & {
 };
 
 function Select({ options, value, onChange, defaultValue, fullWidth, sx, ...rest }: SelectProps) {
-  // const [field] = useField(rest.name);
-
   const handleChange = React.useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
       onChange(event.target.value);
-
-      // field.onChange(event);
     },
     [onChange],
   );

@@ -5,10 +5,15 @@ import { SX_PROP_HELPER_TEXT } from './constants';
 
 interface ButtonProps extends Omit<MuiButtonProps, 'children'> {
   content: string;
+  submit: boolean;
 }
 
-function Button({ content, ...rest }: ButtonProps) {
-  return <MuiButton {...rest}>{content}</MuiButton>;
+function Button({ content, submit, ...rest }: ButtonProps) {
+  return (
+    <MuiButton type={submit ? 'submit' : 'button'} {...rest}>
+      {content}
+    </MuiButton>
+  );
 }
 
 export default createComponent(Button, {
@@ -51,6 +56,10 @@ export default createComponent(Button, {
     },
     disabled: {
       helperText: 'Whether the button is disabled.',
+      typeDef: { type: 'boolean' },
+    },
+    submit: {
+      helperText: 'Whether the button should submit forms.',
       typeDef: { type: 'boolean' },
     },
     sx: {

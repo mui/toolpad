@@ -1,7 +1,6 @@
 import * as React from 'react';
 import { TextField as MuiTextField, TextFieldProps as MuiTextFieldProps } from '@mui/material';
 import { createComponent } from '@mui/toolpad-core';
-import { useField } from 'formik';
 
 interface FullFile {
   name: string;
@@ -34,8 +33,6 @@ const readFile = async (file: Blob): Promise<string> => {
 };
 
 function FilePicker({ multiple, onChange, ...props }: Props) {
-  const [, , helpers] = useField(props.name);
-
   const handleChange = async (changeEvent: React.ChangeEvent<HTMLInputElement>) => {
     const filesPromises = Array.from(changeEvent.target.files || []).map(async (file) => {
       const fullFile: FullFile = {
@@ -51,7 +48,6 @@ function FilePicker({ multiple, onChange, ...props }: Props) {
     const files = await Promise.all(filesPromises);
 
     onChange(files);
-    helpers.setValue(files);
   };
 
   return (

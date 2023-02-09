@@ -14,6 +14,7 @@ export { default as useUrlQueryState } from './useUrlQueryState.js';
 export * from './constants.js';
 
 export { default as createComponent } from './createComponent.js';
+export * from './createComponent.js';
 
 export * from './types.js';
 

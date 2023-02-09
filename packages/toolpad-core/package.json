@@ -1,6 +1,6 @@
 {
   "name": "@mui/toolpad-core",
-  "version": "0.0.39-alpha.11",
+  "version": "0.0.40-alpha.0",
   "description": "Build MUI apps quickly",
   "author": "MUI Toolpad team",
   "homepage": "https://github.com/mui/mui-toolpad#readme",
@@ -96,5 +96,5 @@
   "publishConfig": {
     "access": "public"
   },
-  "gitHead": "59afbe28bbc308c8a284fc98c1cfdb46b0c70776"
+  "gitHead": "e241ccd5671fba4a4050cfaecc1e94d22dbf8066"
 }

@@ -1,6 +1,6 @@
 {
   "name": "@mui/toolpad-app",
-  "version": "0.0.39-alpha.10",
+  "version": "0.0.39-alpha.11",
   "license": "MIT",
   "scripts": {
     "build": "yarn prisma generate && concurrently \"yarn:build:*\" && rimraf ./.next/cache",
@@ -47,8 +47,8 @@
     "@mui/lab": "^5.0.0-alpha.119",
     "@mui/material": "^5.11.8",
     "@mui/system": "^5.11.8",
-    "@mui/toolpad-components": "^0.0.39-alpha.10",
-    "@mui/toolpad-core": "^0.0.39-alpha.10",
+    "@mui/toolpad-components": "^0.0.39-alpha.11",
+    "@mui/toolpad-core": "^0.0.39-alpha.11",
     "@mui/types": "^7.2.3",
     "@mui/utils": "^5.11.7",
     "@mui/x-data-grid-generator": "^5.17.20",
@@ -154,5 +154,5 @@
   "publishConfig": {
     "access": "public"
   },
-  "gitHead": "e850d2006b42c6844ce64bca95188cafda7252ca"
+  "gitHead": "59afbe28bbc308c8a284fc98c1cfdb46b0c70776"
 }

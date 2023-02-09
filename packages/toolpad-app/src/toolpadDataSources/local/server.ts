@@ -4,7 +4,7 @@ import * as esbuild from 'esbuild';
 import * as fs from 'fs/promises';
 import * as path from 'path';
 import invariant from 'invariant';
-import { indent } from '@mui/toolpad-core/utils/strings';
+import { indent, truncate } from '@mui/toolpad-core/utils/strings';
 import * as dotenv from 'dotenv';
 import config from '../../config';
 import { ServerDataSource } from '../../types';
@@ -181,8 +181,13 @@ async function createBuilder() {
 
   let env: any = {};
   try {
-    const envFileContent = await fs.readFile(path.resolve(userProjectRoot, '.env'));
+    const envFilePath = path.resolve(userProjectRoot, '.env');
+    const envFileContent = await fs.readFile(envFilePath);
     env = dotenv.parse(envFileContent) as any;
+    // eslint-disable-next-line no-console
+    console.log(
+      `Loaded env file "${envFilePath}" with keys ${truncate(Object.keys(env).join(', '), 1000)}`,
+    );
   } catch (err) {
     if (errorFrom(err).code !== 'ENOENT') {
       throw err;
@@ -250,6 +255,7 @@ async function createBuilder() {
             signal: controller.signal,
             stdio: 'inherit',
             env: {
+              ...process.env,
               NODE_ENV: config.cmd === 'start' ? 'production' : 'development',
               ...env,
             },

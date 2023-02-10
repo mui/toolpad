@@ -123,12 +123,23 @@ function mergeComponentsContentIntoDom(
   return dom;
 }
 
-function extractComponentsContentFromDom(dom: appDom.AppDom): ComponentsContent {
+interface ExtractedComponents {
+  components: ComponentsContent;
+  dom: appDom.AppDom;
+}
+
+function extractComponentsContentFromDom(dom: appDom.AppDom): ExtractedComponents {
   const rootNode = appDom.getApp(dom);
   const { codeComponents: codeComponentNodes = [] } = appDom.getChildNodes(dom, rootNode);
-  return Object.fromEntries(
-    codeComponentNodes.map((node) => [node.name, node.attributes.code.value]),
-  );
+
+  const components: ComponentsContent = {};
+
+  for (const codeComponent of codeComponentNodes) {
+    components[codeComponent.name] = codeComponent.attributes.code.value;
+    dom = appDom.setNodeNamespacedProp(dom, codeComponent, 'attributes', 'code', null);
+  }
+
+  return { components, dom };
 }
 
 export async function fileExists(filepath: string): Promise<boolean> {
@@ -164,9 +175,10 @@ export async function writeQueriesFile(): Promise<void> {
 export async function writeDomToDisk(dom: appDom.AppDom): Promise<void> {
   const configFilePath = getConfigFilePath();
   const componentsFolder = getComponentFolder();
-  const componentsContent = extractComponentsContentFromDom(dom);
+  const { components: componentsContent, dom: domWithoutComponentContent } =
+    extractComponentsContentFromDom(dom);
   await Promise.all([
-    writeConfigFile(configFilePath, dom),
+    writeConfigFile(configFilePath, domWithoutComponentContent),
     writeCodeComponentsToFiles(componentsFolder, componentsContent),
     writeQueriesFile(),
   ]);

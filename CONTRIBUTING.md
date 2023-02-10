@@ -8,22 +8,8 @@ If you would like to hack on MUI Toolpad or want to run the latest version, you 
 
 - git
 - node.js
-- Docker
-- docker-compose
 
 ### Steps
-
-1. Start a local database:
-
-   ```sh
-   docker-compose -f ./docker-compose.dev.yml up -d
-   ```
-
-   You can skip this step if you already have a development database available by other means. Use the following command to stop the running container:
-
-   ```sh
-   docker-compose -f ./docker-compose.dev.yml down
-   ```
 
 1. Install dependencies:
 
@@ -31,22 +17,40 @@ If you would like to hack on MUI Toolpad or want to run the latest version, you 
    yarn install
    ```
 
-1. Create a `.env` file in the root of the project
+1. Run the build in watch mode
 
    ```sh
-   TOOLPAD_DATABASE_URL=postgres://postgres:postgres@localhost:5432/postgres
-   # For a custom port:
-   # PORT=3004
-   # TOOLPAD_EXTERNAL_URL=http://localhost:3004/
+   yarn dev13
    ```
 
-1. Now you can run the MUI Toolpad dev command to start the application
+1. Run
 
    ```sh
-   yarn dev
+   cd packages/toolpad
+   npm link
    ```
 
-1. Open [`http://localhost:3000/`](http://localhost:3000/) in your browser.
+1. In another folder, start a toolpad project using:
+
+   ```json
+   {
+     "name": "toolpad-local",
+     "version": "1.0.0",
+     "license": "MIT",
+     "scripts": {
+       "dev": "toolpad dev --dev",
+       "build": "toolpad build --dev",
+       "start": "toolpad start --dev"
+     },
+     "dependencies": {
+       "@mui/toolpad-core": "file:/path/to/toolpad/monorepo/toolpad/packages/toolpad-core"
+     }
+   }
+   ```
+
+   replace `/path/to/toolpad/monorepo` with the path to the monorepo on your file system, then run `yarn install --force`.
+
+1. Run `yarn dev`.
 
 ### Notes for contributors
 

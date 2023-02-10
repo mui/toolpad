@@ -8,7 +8,7 @@
     "dev": "yarn prisma generate && yarn waitForDb && yarn prisma db push --skip-generate && concurrently \"yarn:dev:*\"",
     "dev13": "concurrently \"yarn:dev13:*\"",
     "local:start": "TOOLPAD_LOCAL_MODE=1 next start",
-    "local:dev": "TOOLPAD_LOCAL_MODE=1 concurrently \"yarn:dev:*\"",
+    "local:dev": "TOOLPAD_LOCAL_MODE=1 next dev",
     "lint": "next lint && prettier --check .",
     "fix": "next lint --fix && prettier --write .",
     "prisma": "prisma",

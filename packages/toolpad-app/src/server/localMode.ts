@@ -9,6 +9,7 @@ import config from '../config';
 import * as appDom from '../appDom';
 import { errorFrom } from '../utils/errors';
 import insecureHash from '../utils/insecureHash';
+import { migrateUp } from '../appDom/migrations';
 
 const execFile = promisify(child_process.execFile);
 
@@ -123,12 +124,23 @@ function mergeComponentsContentIntoDom(
   return dom;
 }
 
-function extractComponentsContentFromDom(dom: appDom.AppDom): ComponentsContent {
+interface ExtractedComponents {
+  components: ComponentsContent;
+  dom: appDom.AppDom;
+}
+
+function extractComponentsContentFromDom(dom: appDom.AppDom): ExtractedComponents {
   const rootNode = appDom.getApp(dom);
   const { codeComponents: codeComponentNodes = [] } = appDom.getChildNodes(dom, rootNode);
-  return Object.fromEntries(
-    codeComponentNodes.map((node) => [node.name, node.attributes.code.value]),
-  );
+
+  const components: ComponentsContent = {};
+
+  for (const codeComponent of codeComponentNodes) {
+    components[codeComponent.name] = codeComponent.attributes.code.value;
+    dom = appDom.removeNode(dom, codeComponent.id);
+  }
+
+  return { components, dom };
 }
 
 export async function fileExists(filepath: string): Promise<boolean> {
@@ -164,9 +176,10 @@ export async function writeQueriesFile(): Promise<void> {
 export async function writeDomToDisk(dom: appDom.AppDom): Promise<void> {
   const configFilePath = getConfigFilePath();
   const componentsFolder = getComponentFolder();
-  const componentsContent = extractComponentsContentFromDom(dom);
+  const { components: componentsContent, dom: domWithoutComponents } =
+    extractComponentsContentFromDom(dom);
   await Promise.all([
-    writeConfigFile(configFilePath, dom),
+    writeConfigFile(configFilePath, domWithoutComponents),
     writeCodeComponentsToFiles(componentsFolder, componentsContent),
     writeQueriesFile(),
   ]);
@@ -211,7 +224,8 @@ export async function loadDomFromDisk(): Promise<appDom.AppDom> {
 }
 
 export async function loadLocalDom(): Promise<appDom.AppDom> {
-  return loadDomFromDisk();
+  const dom = await loadDomFromDisk();
+  return migrateUp(dom);
 }
 
 export async function openCodeEditor(file: string): Promise<void> {

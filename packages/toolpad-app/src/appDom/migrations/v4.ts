@@ -7,6 +7,7 @@ function replaceTypographyWithText(node: appDom.AppDomNode): appDom.AppDomNode {
     return {
       ...node,
       attributes: {
+        ...node.attributes,
         component: {
           ...node.attributes.component,
           value: 'Text',

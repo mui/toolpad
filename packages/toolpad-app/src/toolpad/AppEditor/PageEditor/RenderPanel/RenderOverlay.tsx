@@ -41,7 +41,7 @@ import NodeHud from './NodeHud';
 import { OverlayGrid, OverlayGridHandle } from './OverlayGrid';
 import { NodeInfo } from '../../../../types';
 import NodeDropArea from './NodeDropArea';
-import { ToolpadBridge } from '../../../../canvas/ToolpadBridge';
+import type { ToolpadBridge } from '../../../../canvas/ToolpadBridge';
 
 const VERTICAL_RESIZE_SNAP_UNITS = 2; // px
 

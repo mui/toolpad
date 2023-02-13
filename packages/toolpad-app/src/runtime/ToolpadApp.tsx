@@ -26,7 +26,6 @@ import {
   TemplateScopeParams,
   ScopeMeta,
   DEFAULT_LOCAL_SCOPE_PARAMS,
-  ArgTypeDefinition,
   getArgTypeDefaultValue,
 } from '@mui/toolpad-core';
 import { createProvidedContext } from '@mui/toolpad-core/utils/react';

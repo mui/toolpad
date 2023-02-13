@@ -27,6 +27,7 @@ import {
   ScopeMeta,
   DEFAULT_LOCAL_SCOPE_PARAMS,
   ArgTypeDefinition,
+  getArgTypeDefaultValue,
 } from '@mui/toolpad-core';
 import { createProvidedContext } from '@mui/toolpad-core/utils/react';
 import { QueryClient, QueryClientProvider, useMutation } from '@tanstack/react-query';
@@ -77,13 +78,9 @@ import { useAppContext, AppContextProvider } from './AppContext';
 import { CanvasHooksContext, NavigateToPage } from './CanvasHooksContext';
 import useBoolean from '../utils/useBoolean';
 import { errorFrom } from '../utils/errors';
-import { bridge } from '../canvas/ToolpadBridge';
 import Header from '../toolpad/ToolpadShell/Header';
 import { ThemeProvider } from '../ThemeContext';
-
-export function getArgTypeDefaultValue<V>(argType: ArgTypeDefinition<{}, V>): V | undefined {
-  return argType.typeDef.default ?? argType.defaultValue ?? undefined;
-}
+import { BridgeContext } from '../canvas/BridgeContext';
 
 const ReactQueryDevtoolsProduction = React.lazy(() =>
   import('@tanstack/react-query-devtools/build/lib/index.prod.js').then((d) => ({
@@ -967,15 +964,17 @@ function RenderedPage({ nodeId }: RenderedNodeProps) {
     [browserJsRuntime, getScopeState],
   );
 
+  const bridge = React.useContext(BridgeContext);
+
   React.useEffect(() => {
     const pageState = getScopeState();
-    bridge.canvasEvents.emit('pageStateUpdated', { pageState, globalScopeMeta });
-  }, [globalScopeMeta, getScopeState]);
+    bridge?.canvasEvents.emit('pageStateUpdated', { pageState, globalScopeMeta });
+  }, [bridge, globalScopeMeta, getScopeState]);
 
   React.useEffect(() => {
     const liveBindings = getBindings();
-    bridge.canvasEvents.emit('pageBindingsUpdated', { bindings: liveBindings });
-  }, [getBindings]);
+    bridge?.canvasEvents.emit('pageBindingsUpdated', { bindings: liveBindings });
+  }, [bridge, getBindings]);
 
   return (
     <BindingsContextProvider value={getBindings}>

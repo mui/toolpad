@@ -860,8 +860,6 @@ function RenderedPage({ nodeId }: RenderedNodeProps) {
     Record<string, Record<string, ParsedBinding | EvaluatedBinding>>
   >({});
 
-  console.log(scopedBindings);
-
   const prevDom = React.useRef(dom);
   React.useEffect(() => {
     if (dom === prevDom.current) {

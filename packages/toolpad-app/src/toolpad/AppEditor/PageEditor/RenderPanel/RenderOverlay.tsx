@@ -277,7 +277,8 @@ export default function RenderOverlay({ bridge }: RenderOverlayProps) {
     nodeId: pageNodeId,
     newNode,
     draggedNodeId,
-    draggedEdge,
+    resizeDraggedEdge,
+    marginDraggedEdge,
     dragOverNodeId,
     dragOverSlotParentProp,
     dragOverZone,
@@ -486,13 +487,26 @@ export default function RenderOverlay({ bridge }: RenderOverlayProps) {
     [dom],
   );
 
-  const handleEdgeDragStart = React.useCallback(
+  const handleResizeDragStart = React.useCallback(
     (node: appDom.AppDomNode) =>
       (edge: RectangleEdge) =>
       (event: React.MouseEvent<HTMLElement>) => {
         event.stopPropagation();
 
-        api.edgeDragStart({ nodeId: node.id, edge });
+        api.resizeDragStart({ nodeId: node.id, edge });
+
+        selectNode(node.id);
+      },
+    [api, selectNode],
+  );
+
+  const handleMarginDragStart = React.useCallback(
+    (node: appDom.AppDomNode) =>
+      (edge: RectangleEdge) =>
+      (event: React.MouseEvent<HTMLElement>) => {
+        event.stopPropagation();
+
+        api.marginDragStart({ nodeId: node.id, edge });
 
         selectNode(node.id);
       },
@@ -1293,6 +1307,9 @@ export default function RenderOverlay({ bridge }: RenderOverlayProps) {
   const resizePreviewElementRef = React.useRef<HTMLDivElement | null>(null);
   const resizePreviewElement = resizePreviewElementRef.current;
 
+  const marginPreviewElementRef = React.useRef<HTMLDivElement | null>(null);
+  const marginPreviewElement = marginPreviewElementRef.current;
+
   const overlayGridRef = React.useRef<OverlayGridHandle>({
     gridElement: null,
     getMinColumnWidth: () => 0,
@@ -1317,11 +1334,14 @@ export default function RenderOverlay({ bridge }: RenderOverlayProps) {
       const cursorPos = bridge?.canvasCommands.getViewCoordinates(event.clientX, event.clientY);
 
       if (draggedNodeRect && parentRect && resizePreviewElement && cursorPos) {
-        if (draggedEdge === RECTANGLE_EDGE_LEFT || draggedEdge === RECTANGLE_EDGE_RIGHT) {
+        if (
+          resizeDraggedEdge === RECTANGLE_EDGE_LEFT ||
+          resizeDraggedEdge === RECTANGLE_EDGE_RIGHT
+        ) {
           let snappedToGridCursorRelativePosX = cursorPos.x - draggedNodeRect.x;
 
           const activeSnapGridColumnEdges =
-            draggedEdge === RECTANGLE_EDGE_LEFT
+            resizeDraggedEdge === RECTANGLE_EDGE_LEFT
               ? overlayGridRef.current.getLeftColumnEdges()
               : overlayGridRef.current.getRightColumnEdges();
 
@@ -1338,7 +1358,7 @@ export default function RenderOverlay({ bridge }: RenderOverlayProps) {
           const previousSiblingRect = previousSiblingInfo?.rect;
 
           if (
-            draggedEdge === RECTANGLE_EDGE_LEFT &&
+            resizeDraggedEdge === RECTANGLE_EDGE_LEFT &&
             cursorPos.x >
               Math.max(parentRect.x, previousSiblingRect?.x || 0) + minGridColumnWidth &&
             cursorPos.x < draggedNodeRect.x + draggedNodeRect.width - minGridColumnWidth
@@ -1355,7 +1375,7 @@ export default function RenderOverlay({ bridge }: RenderOverlayProps) {
           const nextSiblingRect = nextSiblingInfo?.rect;
 
           if (
-            draggedEdge === RECTANGLE_EDGE_RIGHT &&
+            resizeDraggedEdge === RECTANGLE_EDGE_RIGHT &&
             cursorPos.x > draggedNodeRect.x + minGridColumnWidth &&
             cursorPos.x <
               Math.min(
@@ -1372,7 +1392,7 @@ export default function RenderOverlay({ bridge }: RenderOverlayProps) {
         }
 
         if (
-          draggedEdge === RECTANGLE_EDGE_BOTTOM &&
+          resizeDraggedEdge === RECTANGLE_EDGE_BOTTOM &&
           cursorPos.y > draggedNodeRect.y + MIN_RESIZABLE_ELEMENT_HEIGHT
         ) {
           const snappedToGridCursorRelativePosY =
@@ -1385,8 +1405,41 @@ export default function RenderOverlay({ bridge }: RenderOverlayProps) {
           resizePreviewElement.style.transform = `scaleY(${updatedTransformScale})`;
         }
       }
+
+      if (draggedNodeRect && marginPreviewElement && cursorPos) {
+        if (
+          marginDraggedEdge === RECTANGLE_EDGE_TOP ||
+          marginDraggedEdge === RECTANGLE_EDGE_BOTTOM
+        ) {
+          const cursorRelativePosY = cursorPos.y - draggedNodeRect.y;
+          marginPreviewElement.style.height = `${Math.max(
+            cursorRelativePosY,
+            draggedNodeRect.height,
+          )}px`;
+        }
+        if (
+          marginDraggedEdge === RECTANGLE_EDGE_LEFT ||
+          marginDraggedEdge === RECTANGLE_EDGE_RIGHT
+        ) {
+          const cursorRelativePosX = Math.abs(cursorPos.x - draggedNodeRect.x);
+          marginPreviewElement.style.width = `${
+            marginDraggedEdge === RECTANGLE_EDGE_LEFT
+              ? draggedNodeRect.width - cursorRelativePosX
+              : cursorRelativePosX
+          }px`;
+        }
+      }
     },
-    [draggedNode, nodesInfo, dom, bridge?.canvasCommands, resizePreviewElement, draggedEdge],
+    [
+      draggedNode,
+      nodesInfo,
+      dom,
+      bridge?.canvasCommands,
+      resizePreviewElement,
+      marginPreviewElement,
+      resizeDraggedEdge,
+      marginDraggedEdge,
+    ],
   );
 
   const handleEdgeDragEnd = React.useCallback(
@@ -1406,7 +1459,10 @@ export default function RenderOverlay({ bridge }: RenderOverlayProps) {
 
       if (draggedNodeRect && resizePreviewRect) {
         domApi.update((draft) => {
-          if (draggedEdge === RECTANGLE_EDGE_LEFT || draggedEdge === RECTANGLE_EDGE_RIGHT) {
+          if (
+            resizeDraggedEdge === RECTANGLE_EDGE_LEFT ||
+            resizeDraggedEdge === RECTANGLE_EDGE_RIGHT
+          ) {
             const parentChildren = parent ? appDom.getChildNodes(draft, parent).children : [];
             const totalLayoutColumnSizes = parentChildren.reduce(
               (acc, child) => acc + (nodesInfo[child.id]?.rect?.width || 0),
@@ -1416,7 +1472,7 @@ export default function RenderOverlay({ bridge }: RenderOverlayProps) {
             const normalizeColumnSize = (size: number) =>
               Math.max(0, size * parentChildren.length) / totalLayoutColumnSizes;
 
-            if (draggedEdge === RECTANGLE_EDGE_LEFT) {
+            if (resizeDraggedEdge === RECTANGLE_EDGE_LEFT) {
               const previousSibling = appDom.getSiblingBeforeNode(draft, draggedNode, 'children');
 
               if (previousSibling) {
@@ -1446,7 +1502,7 @@ export default function RenderOverlay({ bridge }: RenderOverlayProps) {
                 }
               }
             }
-            if (draggedEdge === RECTANGLE_EDGE_RIGHT) {
+            if (resizeDraggedEdge === RECTANGLE_EDGE_RIGHT) {
               const nextSibling = appDom.getSiblingAfterNode(draft, draggedNode, 'children');
 
               if (nextSibling) {
@@ -1478,7 +1534,7 @@ export default function RenderOverlay({ bridge }: RenderOverlayProps) {
             }
           }
 
-          if (draggedEdge === RECTANGLE_EDGE_BOTTOM) {
+          if (resizeDraggedEdge === RECTANGLE_EDGE_BOTTOM) {
             const resizableHeightProp = draggedNodeInfo?.componentConfig?.resizableHeightProp;
 
             if (resizableHeightProp) {
@@ -1499,14 +1555,14 @@ export default function RenderOverlay({ bridge }: RenderOverlayProps) {
       api.dragEnd();
     },
     [
-      api,
-      dom,
-      domApi,
-      draggedEdge,
       draggedNode,
       nodesInfo,
-      normalizePageRowColumnSizes,
+      dom,
       resizePreviewElement,
+      api,
+      domApi,
+      resizeDraggedEdge,
+      normalizePageRowColumnSizes,
     ],
   );
 
@@ -1517,14 +1573,14 @@ export default function RenderOverlay({ bridge }: RenderOverlayProps) {
       className={clsx({
         [overlayClasses.nodeDrag]: isDraggingOver,
         [overlayClasses.resizeHorizontal]:
-          draggedEdge === RECTANGLE_EDGE_LEFT || draggedEdge === RECTANGLE_EDGE_RIGHT,
+          resizeDraggedEdge === RECTANGLE_EDGE_LEFT || resizeDraggedEdge === RECTANGLE_EDGE_RIGHT,
         [overlayClasses.resizeVertical]:
-          draggedEdge === RECTANGLE_EDGE_TOP || draggedEdge === RECTANGLE_EDGE_BOTTOM,
+          resizeDraggedEdge === RECTANGLE_EDGE_TOP || resizeDraggedEdge === RECTANGLE_EDGE_BOTTOM,
       })}
       // Need this to be able to capture key events
       tabIndex={0}
       onKeyDown={handleKeyDown}
-      {...(draggedEdge
+      {...(resizeDraggedEdge || marginDraggedEdge
         ? {
             onMouseMove: handleEdgeDragOver,
             onMouseUp: handleEdgeDragEnd,
@@ -1550,13 +1606,14 @@ export default function RenderOverlay({ bridge }: RenderOverlayProps) {
         const isPageColumnChild = parent ? appDom.isElement(parent) && isPageColumn(parent) : false;
 
         const isSelected = selectedNode && !newNode ? selectedNode.id === node.id : false;
-        const isInteractive = interactiveNodes.has(node.id) && !draggedEdge;
+        const isInteractive =
+          interactiveNodes.has(node.id) && !resizeDraggedEdge && !marginDraggedEdge;
 
         const isHorizontallyResizable = isSelected && (isPageRowChild || isPageColumnChild);
         const isVerticallyResizable =
           isSelected && Boolean(nodeInfo?.componentConfig?.resizableHeightProp);
 
-        const isResizing = Boolean(draggedEdge);
+        const isResizing = Boolean(resizeDraggedEdge);
         const isResizingNode = isResizing && node.id === draggedNodeId;
 
         if (!nodeRect) {
@@ -1577,16 +1634,19 @@ export default function RenderOverlay({ bridge }: RenderOverlayProps) {
                   ...getNodeDraggableHorizontalEdges(parent && isPageColumnChild ? parent : node),
                   ...(isVerticallyResizable ? [RECTANGLE_EDGE_BOTTOM as RectangleEdge] : []),
                 ]}
-                onEdgeDragStart={
+                onResizeDragStart={
                   isHorizontallyResizable || isVerticallyResizable
-                    ? handleEdgeDragStart(
+                    ? handleResizeDragStart(
                         parent && isPageColumnChild && !isVerticallyResizable ? parent : node,
                       )
                     : undefined
                 }
+                onMarginDragStart={handleMarginDragStart(node)}
                 onDelete={handleNodeDelete(node.id)}
                 isResizing={isResizingNode}
+                marginDraggedEdge={node.id === draggedNodeId ? marginDraggedEdge : null}
                 resizePreviewElementRef={resizePreviewElementRef}
+                marginPreviewElementRef={marginPreviewElementRef}
                 isHoverable={isResizing && !isDraggingOver}
                 isOutlineVisible={isDraggingOver}
               />
@@ -1616,7 +1676,7 @@ export default function RenderOverlay({ bridge }: RenderOverlayProps) {
             a reliable click target for the rest of the page 
       */}
       <PinholeOverlay className={overlayClasses.hudOverlay} pinhole={selectedRect} />
-      {draggedEdge ? <OverlayGrid ref={overlayGridRef} /> : null}
+      {resizeDraggedEdge || marginDraggedEdge ? <OverlayGrid ref={overlayGridRef} /> : null}
     </OverlayRoot>
   );
 }

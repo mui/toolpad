@@ -14,7 +14,7 @@ import {
   RECTANGLE_EDGE_RIGHT,
   RECTANGLE_EDGE_TOP,
 } from '../../../../utils/geometry';
-import { useDom, useDomApi } from '../../../DomLoader';
+import { useDom } from '../../../DomLoader';
 import { useToolpadComponent } from '../../toolpadComponents';
 import { getElementNodeComponentId } from '../../../../toolpadComponents';
 
@@ -152,7 +152,7 @@ const MARGIN_CONTROL_EDGES: RectangleEdge[] = [
   RECTANGLE_EDGE_LEFT,
 ];
 
-const DRAGGABLE_SQUARE_SIZE = 16; // px
+const DRAGGABLE_SQUARE_SIZE = 10; // px
 
 const DraggableSquare = styled('div', {
   shouldForwardProp: (prop) => prop !== 'edge',
@@ -203,57 +203,57 @@ const DraggableSquare = styled('div', {
   };
 });
 
-const MarginPreview = styled('div', {
-  shouldForwardProp: (prop) => prop !== 'edge' && prop !== 'isActive',
+const MarginPreview = styled('div')({
+  backgroundColor: 'pink',
+  opacity: 0.8,
+  willChange: 'height, width',
+  zIndex: 3,
+});
+
+const MarginPreviewContent = styled('div')({
+  position: 'relative',
+  height: '100%',
+  width: '100%',
+  zIndex: 4,
+});
+
+const MarginPreviewNode = styled('div', {
+  shouldForwardProp: (prop) => prop !== 'edge',
 })<{
   edge: RectangleEdge;
-  isActive: boolean;
-}>(({ edge, isActive, theme }) => {
+}>(({ edge }) => {
   let dynamicStyles = {};
 
   if (edge === RECTANGLE_EDGE_TOP) {
     dynamicStyles = {
-      top: '50%',
-      transform: 'translateY(-50% + 1px)',
-      right: '-100%',
-      width: 400,
-      zIndex: 4,
+      left: 0,
+      bottom: 0,
     };
   }
   if (edge === RECTANGLE_EDGE_RIGHT) {
     dynamicStyles = {
-      top: '50%',
-      transform: 'translateY(-50% + 1px)',
-      right: '-100%',
-      width: 400,
-      zIndex: 4,
+      left: 0,
+      top: 0,
     };
   }
   if (edge === RECTANGLE_EDGE_BOTTOM) {
     dynamicStyles = {
-      top: '50%',
-      transform: 'translateY(-50% + 1px)',
-      right: '-100%',
-      width: 400,
-      zIndex: 4,
+      left: 0,
+      top: 0,
     };
   }
   if (edge === RECTANGLE_EDGE_LEFT) {
     dynamicStyles = {
-      top: '50%',
-      transform: 'translateY(-50% + 1px)',
-      right: '-100%',
-      width: 400,
-      height: 2,
-      zIndex: 4,
+      right: 0,
+      top: 0,
     };
   }
 
   return {
     ...dynamicStyles,
-    display: isActive ? 'inline' : 'none',
-    borderTop: '2px dashed pink',
+    backgroundColor: 'red',
     position: 'absolute',
+    willChange: 'height, width',
   };
 });
 
@@ -264,10 +264,13 @@ interface NodeHudProps {
   isInteractive?: boolean;
   onNodeDragStart?: React.DragEventHandler<HTMLElement>;
   draggableEdges?: RectangleEdge[];
-  onEdgeDragStart?: (edge: RectangleEdge) => React.MouseEventHandler<HTMLElement>;
+  onResizeDragStart?: (edge: RectangleEdge) => React.MouseEventHandler<HTMLElement>;
+  onMarginDragStart: (edge: RectangleEdge) => React.MouseEventHandler<HTMLElement>;
   onDelete?: React.MouseEventHandler<HTMLElement>;
   isResizing?: boolean;
+  marginDraggedEdge: RectangleEdge | null;
   resizePreviewElementRef: React.MutableRefObject<HTMLDivElement | null>;
+  marginPreviewElementRef: React.MutableRefObject<HTMLDivElement | null>;
   onDuplicate?: (event: React.MouseEvent) => void;
   isOutlineVisible?: boolean;
   isHoverable?: boolean;
@@ -280,38 +283,28 @@ export default function NodeHud({
   isInteractive,
   onNodeDragStart,
   draggableEdges = [],
-  onEdgeDragStart,
+  onResizeDragStart,
+  onMarginDragStart,
   onDelete,
   isResizing = false,
+  marginDraggedEdge,
   resizePreviewElementRef,
+  marginPreviewElementRef,
   onDuplicate,
   isOutlineVisible = false,
   isHoverable = true,
 }: NodeHudProps) {
   const { dom } = useDom();
-  const domApi = useDomApi();
-
-  const [controlledMarginEdge, setControlledMarginEdge] = React.useState<RectangleEdge | null>(
-    null,
-  );
 
   const componentId = appDom.isElement(node) ? getElementNodeComponentId(node) : '';
   const component = useToolpadComponent(dom, componentId);
 
-  const handleSquareDragStart = React.useCallback(
-    (edge) => (event) => {
-      event.stopPropagation();
-
-      setControlledMarginEdge(edge);
-
-      domApi.selectNode(node.id);
-    },
-    [domApi, node.id],
-  );
-
   const hintPosition = rect.y > HUD_HEIGHT ? HINT_POSITION_TOP : HINT_POSITION_BOTTOM;
 
   const iconSx = { opacity: 0.7 };
+
+  const isControllingVerticalMargin =
+    marginDraggedEdge === RECTANGLE_EDGE_TOP || marginDraggedEdge === RECTANGLE_EDGE_BOTTOM;
 
   return (
     <React.Fragment>
@@ -328,18 +321,26 @@ export default function NodeHud({
         {isResizing ? (
           <ResizePreview ref={resizePreviewElementRef} style={absolutePositionCss(rect)} />
         ) : null}
-        {controlledMarginEdge
-          ? MARGIN_CONTROL_EDGES.map((edge) => (
-              <MarginPreview
-                key={`${node.id}-margin-preview-${edge}`}
-                edge={edge}
-                isActive={controlledMarginEdge === edge}
+        {marginDraggedEdge ? (
+          <MarginPreview
+            ref={isControllingVerticalMargin ? marginPreviewElementRef : null}
+            style={absolutePositionCss(rect)}
+          >
+            <MarginPreviewContent>
+              <MarginPreviewNode
+                ref={isControllingVerticalMargin ? null : marginPreviewElementRef}
+                style={{ height: rect.height, width: rect.width }}
+                edge={marginDraggedEdge}
               />
-            ))
-          : null}
+            </MarginPreviewContent>
+          </MarginPreview>
+        ) : null}
       </NodeHudWrapper>
       {isSelected ? (
-        <SelectionHintWrapper style={absolutePositionCss(rect)} hintPosition={hintPosition}>
+        <SelectionHintWrapper
+          style={{ ...absolutePositionCss(rect), bottom: 0 }}
+          hintPosition={hintPosition}
+        >
           <div
             draggable
             className={nodeHudClasses.selectionHint}
@@ -364,20 +365,20 @@ export default function NodeHud({
           </div>
         </SelectionHintWrapper>
       ) : null}
-      {onEdgeDragStart ? (
+      {onResizeDragStart ? (
         <ResizeControlsWrapper style={absolutePositionCss(rect)}>
           {draggableEdges.map((edge) => (
             <DraggableEdge
               key={`${node.id}-edge-${edge}`}
               edge={edge}
-              onMouseDown={onEdgeDragStart(edge)}
+              onMouseDown={onResizeDragStart(edge)}
             />
           ))}
           {MARGIN_CONTROL_EDGES.map((edge) => (
             <DraggableSquare
               key={`${node.id}-drag-square-${edge}`}
               edge={edge}
-              onMouseDown={handleSquareDragStart(edge)}
+              onMouseDown={onMarginDragStart(edge)}
             />
           ))}
         </ResizeControlsWrapper>

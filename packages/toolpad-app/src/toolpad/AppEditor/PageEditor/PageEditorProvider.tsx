@@ -27,7 +27,8 @@ export interface PageEditorState {
   readonly dragOverNodeId: NodeId | null;
   readonly dragOverSlotParentProp: string | null;
   readonly dragOverZone: DropZone | null;
-  readonly draggedEdge: RectangleEdge | null;
+  readonly resizeDraggedEdge: RectangleEdge | null;
+  readonly marginDraggedEdge: RectangleEdge | null;
   readonly viewState: PageViewState;
   readonly pageState: Record<string, unknown>;
   readonly globalScopeMeta: GlobalScopeMeta;
@@ -48,7 +49,14 @@ export type PageEditorAction =
       node: appDom.ElementNode;
     }
   | {
-      type: 'PAGE_EDGE_DRAG_START';
+      type: 'PAGE_RESIZE_DRAG_START';
+      edgeDragState: {
+        nodeId: NodeId | null;
+        edge: RectangleEdge;
+      };
+    }
+  | {
+      type: 'PAGE_MARGIN_DRAG_START';
       edgeDragState: {
         nodeId: NodeId | null;
         edge: RectangleEdge;
@@ -90,7 +98,8 @@ export function createPageEditorState(appId: string, nodeId: NodeId): PageEditor
     dragOverNodeId: null,
     dragOverSlotParentProp: null,
     dragOverZone: null,
-    draggedEdge: null,
+    resizeDraggedEdge: null,
+    marginDraggedEdge: null,
     viewState: { nodes: {} },
     pageState: {},
     globalScopeMeta: {},
@@ -119,12 +128,20 @@ export function pageEditorReducer(
         draggedNodeId: action.node.id,
       });
     }
-    case 'PAGE_EDGE_DRAG_START': {
+    case 'PAGE_RESIZE_DRAG_START': {
       const { nodeId, edge } = action.edgeDragState;
 
       return update(state, {
         draggedNodeId: nodeId,
-        draggedEdge: edge,
+        resizeDraggedEdge: edge,
+      });
+    }
+    case 'PAGE_MARGIN_DRAG_START': {
+      const { nodeId, edge } = action.edgeDragState;
+
+      return update(state, {
+        draggedNodeId: nodeId,
+        marginDraggedEdge: edge,
       });
     }
     case 'PAGE_DRAG_END':
@@ -135,7 +152,8 @@ export function pageEditorReducer(
         dragOverNodeId: null,
         dragOverSlotParentProp: null,
         dragOverZone: null,
-        draggedEdge: null,
+        resizeDraggedEdge: null,
+        marginDraggedEdge: null,
       });
     case 'PAGE_NODE_DRAG_OVER': {
       const { nodeId, parentProp, zone } = action.dragOverState;
@@ -180,9 +198,15 @@ function createPageEditorApi(dispatch: React.Dispatch<PageEditorAction>) {
     existingNodeDragStart(node: appDom.ElementNode) {
       dispatch({ type: 'PAGE_EXISTING_NODE_DRAG_START', node });
     },
-    edgeDragStart({ nodeId, edge }: { nodeId: NodeId | null; edge: RectangleEdge }) {
+    resizeDragStart({ nodeId, edge }: { nodeId: NodeId | null; edge: RectangleEdge }) {
       dispatch({
-        type: 'PAGE_EDGE_DRAG_START',
+        type: 'PAGE_RESIZE_DRAG_START',
+        edgeDragState: { nodeId, edge },
+      });
+    },
+    marginDragStart({ nodeId, edge }: { nodeId: NodeId | null; edge: RectangleEdge }) {
+      dispatch({
+        type: 'PAGE_MARGIN_DRAG_START',
         edgeDragState: { nodeId, edge },
       });
     },

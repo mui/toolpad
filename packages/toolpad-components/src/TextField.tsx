@@ -34,7 +34,6 @@ export default createComponent(TextField, {
       typeDef: { type: 'string', default: '' },
       onChangeProp: 'onChange',
       defaultValueProp: 'defaultValue',
-      isScoped: true,
     },
     defaultValue: {
       helperText: 'A default value for when the inoput is still empty.',

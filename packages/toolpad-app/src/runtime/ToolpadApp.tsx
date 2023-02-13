@@ -299,7 +299,7 @@ function RenderedNodeContent({ node, childNodeGroups, Component }: RenderedNodeC
           const bindingId = `${nodeId}.props.${key}`;
 
           const value = argType.onChangeHandler ? argType.onChangeHandler(param) : param;
-          setControlledBinding(bindingId, { value }, argType.isScoped ? scopeId : undefined);
+          setControlledBinding(bindingId, { value }, scopeId);
 
           if (scopeId && isDefaultScope) {
             setControlledBinding(bindingId, { value });
@@ -859,6 +859,8 @@ function RenderedPage({ nodeId }: RenderedNodeProps) {
   const [scopedBindings, setScopedBindings] = React.useState<
     Record<string, Record<string, ParsedBinding | EvaluatedBinding>>
   >({});
+
+  console.log(scopedBindings);
 
   const prevDom = React.useRef(dom);
   React.useEffect(() => {

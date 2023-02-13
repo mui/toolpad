@@ -216,10 +216,6 @@ export interface ArgTypeDefinition<P extends object = {}, V = P[keyof P]> {
    * @returns {boolean} a boolean value indicating whether the property should be visible or not
    */
   visible?: ((props: P) => boolean) | boolean;
-  /**
-   * Whether this property should have a unique value per scope.
-   */
-  isScoped?: boolean;
 }
 
 export type ArgTypeDefinitions<P extends object = {}> = {

@@ -9,6 +9,7 @@ import config from '../config';
 import * as appDom from '../appDom';
 import { errorFrom } from '../utils/errors';
 import insecureHash from '../utils/insecureHash';
+import { migrateUp } from '../appDom/migrations';
 
 const execFile = promisify(child_process.execFile);
 
@@ -136,7 +137,7 @@ function extractComponentsContentFromDom(dom: appDom.AppDom): ExtractedComponent
 
   for (const codeComponent of codeComponentNodes) {
     components[codeComponent.name] = codeComponent.attributes.code.value;
-    dom = appDom.setNodeNamespacedProp(dom, codeComponent, 'attributes', 'code', null);
+    dom = appDom.removeNode(dom, codeComponent.id);
   }
 
   return { components, dom };
@@ -175,10 +176,11 @@ export async function writeQueriesFile(): Promise<void> {
 export async function writeDomToDisk(dom: appDom.AppDom): Promise<void> {
   const configFilePath = getConfigFilePath();
   const componentsFolder = getComponentFolder();
-  const { components: componentsContent, dom: domWithoutComponentContent } =
+
+  const { components: componentsContent, dom: domWithoutComponents } =
     extractComponentsContentFromDom(dom);
   await Promise.all([
-    writeConfigFile(configFilePath, domWithoutComponentContent),
+    writeConfigFile(configFilePath, domWithoutComponents),
     writeCodeComponentsToFiles(componentsFolder, componentsContent),
     writeQueriesFile(),
   ]);
@@ -223,7 +225,8 @@ export async function loadDomFromDisk(): Promise<appDom.AppDom> {
 }
 
 export async function loadLocalDom(): Promise<appDom.AppDom> {
-  return loadDomFromDisk();
+  const dom = await loadDomFromDisk();
+  return migrateUp(dom);
 }
 
 export async function openCodeEditor(file: string): Promise<void> {

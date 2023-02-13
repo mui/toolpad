@@ -54,7 +54,7 @@ export function getToolpadComponents(dom: appDom.AppDom): ToolpadComponentDefini
   return Object.fromEntries([
     ...INTERNAL_COMPONENTS.entries(),
     ...codeComponents.map((codeComponent) => [
-      `codeComponent.${codeComponent.id}`,
+      `codeComponent.${codeComponent.name}`,
       createCodeComponent(codeComponent),
     ]),
   ]);

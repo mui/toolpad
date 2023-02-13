@@ -1386,7 +1386,7 @@ export default function RenderOverlay({ bridge }: RenderOverlayProps) {
         }
       }
     },
-    [bridge, dom, draggedEdge, draggedNode, nodesInfo, resizePreviewElement],
+    [draggedNode, nodesInfo, dom, bridge?.canvasCommands, resizePreviewElement, draggedEdge],
   );
 
   const handleEdgeDragEnd = React.useCallback(

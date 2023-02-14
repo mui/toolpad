@@ -500,7 +500,7 @@
         },
         "options": {
           "type": "jsExpression",
-          "value": "allDogSubBreeds.error ? [] : allDogSubBreeds.data?.message[selectBreed.value]\n"
+          "value": "allDogSubBreeds.error ? [] : allDogSubBreeds.data?.message\n"
         },
         "disabled": {
           "type": "jsExpression",

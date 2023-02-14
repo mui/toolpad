@@ -493,7 +493,7 @@
         },
         "disabled": {
           "type": "jsExpression",
-          "value": "allDogBreeds.data?.message.length <= 0\n"
+          "value": "allDogBreeds.data?.message[selectBreed.value].length <= 0\n"
         },
         "fullWidth": {
           "type": "const",

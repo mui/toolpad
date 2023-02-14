@@ -21,7 +21,7 @@ export default {
                 ...node.attributes,
                 component: {
                   ...node.attributes.component,
-                  value: `${prefix}${codeComponent}`,
+                  value: `${prefix}${codeComponent.name}`,
                 },
               },
             };

@@ -170,6 +170,7 @@ export default function HierarchyExplorer({ appId, className }: HierarchyExplore
     }
 
     if (appDom.isPage(node)) {
+      domApi.deselectNode();
       domApi.setView({ kind: 'page', nodeId: node.id });
     }
 

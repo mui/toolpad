@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { TextFieldProps, MenuItem, TextField } from '@mui/material';
-import { createComponent } from '@mui/toolpad-core';
+import { createComponent, SetFormField, FormValues } from '@mui/toolpad-core';
 import { SX_PROP_HELPER_TEXT } from './constants';
 
 export interface SelectOption {
@@ -16,21 +16,29 @@ export type SelectProps = Omit<TextFieldProps, 'value' | 'onChange'> & {
 };
 
 function Select({ options, value, onChange, defaultValue, fullWidth, sx, ...rest }: SelectProps) {
+  const formValues = React.useContext(FormValues);
+  const setFormField = React.useContext(SetFormField);
   const handleChange = React.useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
+      if (setFormField) {
+        setFormField(rest.name, event.target.value);
+        return;
+      }
+
       onChange(event.target.value);
     },
-    [onChange],
+    [onChange, setFormField],
   );
 
   const id = React.useId();
+  const resolvedValue = (formValues ? formValues[rest.name] : value) || '';
 
   return (
     <TextField
       select
       sx={{ ...(!fullWidth && !value ? { width: 120 } : {}), ...sx }}
       fullWidth={fullWidth}
-      value={value}
+      value={resolvedValue}
       onChange={handleChange}
       {...rest}
     >

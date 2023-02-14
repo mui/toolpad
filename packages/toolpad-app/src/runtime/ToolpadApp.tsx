@@ -266,30 +266,6 @@ function RenderedNodeContent({ node, childNodeGroups, Component }: RenderedNodeC
     return hookResult;
   }, [isLayoutNode, liveBindings, nodeId]);
 
-  const changeClosestFormValue = React.useCallback(
-    (value: any) => {
-      const closestForm = appDom.getClosestForm(dom, node);
-
-      if (closestForm) {
-        const formBindingId = `${closestForm.id}.props.value`;
-
-        const formBinding = liveBindings[formBindingId];
-
-        const currentFormValue = formBinding?.value || {};
-
-        const formValue = {
-          ...currentFormValue,
-          [node.name]: value,
-        };
-
-        setControlledBinding(formBindingId, {
-          value: formValue,
-        });
-      }
-    },
-    [setControlledBinding, liveBindings, node, dom],
-  );
-
   const onChangeHandlers: Record<string, (param: any) => void> = React.useMemo(
     () =>
       mapProperties(argTypes, ([key, argType]) => {
@@ -303,11 +279,11 @@ function RenderedNodeContent({ node, childNodeGroups, Component }: RenderedNodeC
           const value = argType.onChangeHandler ? argType.onChangeHandler(param) : param;
           setControlledBinding(bindingId, { value });
 
-          changeClosestFormValue(value);
+          console.log(node.name, value);
         };
         return [argType.onChangeProp, handler];
       }),
-    [argTypes, nodeId, setControlledBinding, changeClosestFormValue],
+    [argTypes, nodeId, setControlledBinding],
   );
 
   const navigateToPage = usePageNavigator();

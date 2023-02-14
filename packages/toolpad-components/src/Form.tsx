@@ -1,38 +1,41 @@
 import * as React from 'react';
 import { Container as MUIContainer, ContainerProps, Button } from '@mui/material';
-import { createComponent } from '@mui/toolpad-core';
-import { useForm, FormProvider } from 'react-hook-form';
+import { createComponent, FormValues, FormValuesType, SetFormField } from '@mui/toolpad-core';
 import { SX_PROP_HELPER_TEXT } from './constants';
-
-type FormValue = Record<string, string>;
 
 interface Props extends ContainerProps {
   onSubmit: (values: any) => void;
   submitLabel: string;
-  value: FormValue;
-  onChange: (value: FormValue) => void;
-  defaultValue: Record<string, any>;
+  value: FormValuesType;
+  onChange: (value: FormValuesType) => void;
 }
 
-function Form({
-  children,
-  onSubmit = () => {},
-  onChange,
-  submitLabel,
-  sx,
-  value,
-  defaultValue,
-  ...rest
-}: Props) {
+function Form({ children, onSubmit = () => {}, onChange, submitLabel, sx, value, ...rest }: Props) {
   const handleSubmit = (event) => {
     event.preventDefault();
 
     onSubmit(value);
   };
 
+  const formSetter = React.useCallback(
+    (formValue: FormValuesType) => {
+      return (fieldName: string, fieldValue: string) => {
+        onChange({
+          ...formValue,
+          [fieldName]: fieldValue,
+        });
+      };
+    },
+    [onChange],
+  );
+
   return (
     <MUIContainer disableGutters sx={sx} {...rest}>
-      <form onSubmit={handleSubmit}>{children}</form>
+      <FormValues.Provider value={value}>
+        <SetFormField.Provider value={formSetter(value)}>
+          <form onSubmit={handleSubmit}>{children}</form>
+        </SetFormField.Provider>
+      </FormValues.Provider>
     </MUIContainer>
   );
 }
@@ -45,9 +48,14 @@ export default createComponent(Form, {
       control: { type: 'layoutSlot' },
     },
     value: {
-      visible: false,
-      typeDef: { type: 'object', default: {} },
+      typeDef: { type: 'object' },
       onChangeProp: 'onChange',
+      // TODO: why - Type 'string' is not assignable to type 'FormValuesType'.
+      defaultValueProp: 'defaultValue',
+    },
+    defaultValue: {
+      helperText: 'A default value for when the inoput is still empty.',
+      typeDef: { type: 'object', default: {} },
     },
     onSubmit: {
       helperText: 'Add logic to be executed when the user submits the form.',

@@ -44,12 +44,14 @@ const StyledTreeItem = styled(TreeItem)({
 type StyledTreeItemProps = TreeItemProps & {
   onDeleteNode?: (nodeId: NodeId) => void;
   onDuplicateNode?: (nodeId: NodeId) => void;
+  onSettingsNode?: (nodeId: NodeId) => void;
   onCreate?: React.MouseEventHandler;
   labelIcon?: React.ReactNode;
   labelText: string;
   createLabelText?: string;
   deleteLabelText?: string;
   duplicateLabelText?: string;
+  settingsLabelText?: string;
   toolpadNodeId?: NodeId;
 };
 
@@ -60,9 +62,11 @@ function HierarchyTreeItem(props: StyledTreeItemProps) {
     onCreate,
     onDeleteNode,
     onDuplicateNode,
+    onSettingsNode,
     createLabelText,
     deleteLabelText = 'Delete',
     duplicateLabelText = 'Duplicate',
+    settingsLabelText = 'Settings',
     toolpadNodeId,
     ...other
   } = props;
@@ -98,6 +102,8 @@ function HierarchyTreeItem(props: StyledTreeItemProps) {
               duplicateLabelText={duplicateLabelText}
               onDeleteNode={onDeleteNode}
               onDuplicateNode={onDuplicateNode}
+              onSettingsNode={onSettingsNode}
+              settingsLabelText={settingsLabelText}
             />
           ) : null}
         </Box>
@@ -244,6 +250,19 @@ export default function HierarchyExplorer({ appId, className }: HierarchyExplore
     [dom, domApi],
   );
 
+  const handlePageSettingsNode = React.useCallback(
+    (nodeId: NodeId) => {
+      if (nodeId) {
+        const node = appDom.getNode(dom, nodeId);
+        if (appDom.isPage(node)) {
+          domApi.setView({ kind: 'page', nodeId: node.id });
+          domApi.deselectNode();
+        }
+      }
+    },
+    [dom, domApi],
+  );
+
   const hasConnectionsView = !config.localMode && !config.isDemo;
   const hasComponentsView = !config.localMode;
 
@@ -317,6 +336,7 @@ export default function HierarchyExplorer({ appId, className }: HierarchyExplore
               labelText={page.name}
               onDuplicateNode={handleDuplicateNode}
               onDeleteNode={handleDeleteNode}
+              onSettingsNode={handlePageSettingsNode}
             />
           ))}
         </HierarchyTreeItem>

@@ -211,6 +211,10 @@ export function domLoaderReducer(state: DomLoader, action: DomAction): DomLoader
     case 'DOM_SET_VIEW': {
       return update(state, {
         currentView: action.view,
+        selectedNodeId:
+          action.view.kind !== 'page' || action.view.nodeId === state.currentView.nodeId
+            ? state.selectedNodeId
+            : null,
       });
     }
     case 'DOM_SET_TAB': {

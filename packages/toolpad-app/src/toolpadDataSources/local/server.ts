@@ -93,7 +93,7 @@ async function introspect() {
 
 async function createMain(): Promise<string> {
   return `
-    import { TOOLPAD_QUERY } from '@mui/toolpad-core';
+    import { TOOLPAD_QUERY } from '@mui/toolpad-core/server';
     import { errorFrom, serializeError } from '@mui/toolpad-core/utils/errors';
 
     let resolversPromise
@@ -174,25 +174,128 @@ async function createMain(): Promise<string> {
 
 async function createBuilder() {
   const userProjectRoot = getUserProjectRoot();
+  const envFilePath = path.resolve(userProjectRoot, '.env');
+
   let currentRuntimeProcess: child_process.ChildProcess | undefined;
   let controller: AbortController | undefined;
   let buildErrors: Error[] = [];
   let runtimeError: Error | undefined;
 
-  let env: any = {};
-  try {
-    const envFilePath = path.resolve(userProjectRoot, '.env');
-    const envFileContent = await fs.readFile(envFilePath);
-    env = dotenv.parse(envFileContent) as any;
-    // eslint-disable-next-line no-console
-    console.log(
-      `Loaded env file "${envFilePath}" with keys ${truncate(Object.keys(env).join(', '), 1000)}`,
-    );
-  } catch (err) {
-    if (errorFrom(err).code !== 'ENOENT') {
+  const loadEnvFile = async () => {
+    try {
+      const envFileContent = await fs.readFile(envFilePath);
+      const parsed = dotenv.parse(envFileContent) as any;
+      // eslint-disable-next-line no-console
+      console.log(
+        `Loaded env file "${envFilePath}" with keys ${truncate(
+          Object.keys(parsed).join(', '),
+          1000,
+        )}`,
+      );
+
+      return parsed;
+    } catch (err) {
+      if (errorFrom(err).code !== 'ENOENT') {
+        throw err;
+      }
+    }
+
+    return {};
+  };
+
+  let outputFile: string | undefined;
+  let env: any = loadEnvFile();
+
+  const restartRuntimeProcess = () => {
+    if (controller) {
+      controller.abort();
+      controller = undefined;
+
+      // clean up handlers
+      for (const [id, execution] of pendingExecutions) {
+        execution.reject(new Error(`Aborted`));
+        clearTimeout(execution.timeout);
+        pendingExecutions.delete(id);
+      }
+    }
+
+    if (!outputFile) {
+      return;
+    }
+
+    controller = new AbortController();
+
+    const runtimeProcess = child_process.fork(`./${outputFile}`, {
+      cwd: userProjectRoot,
+      silent: true,
+      signal: controller.signal,
+      stdio: 'inherit',
+      env: {
+        ...process.env,
+        NODE_ENV: config.cmd === 'start' ? 'production' : 'development',
+        ...env,
+      },
+    });
+
+    runtimeError = undefined;
+
+    runtimeProcess.on('error', (error) => {
+      if (error.name === 'AbortError') {
+        return;
+      }
+      runtimeError = error;
+      console.error(`cp ${runtimeProcess.pid} error`, error);
+    });
+
+    runtimeProcess.on('exit', (code) => {
+      if (currentRuntimeProcess === runtimeProcess) {
+        currentRuntimeProcess = undefined;
+        if (code !== 0) {
+          runtimeError = new Error(`The runtime process exited with code ${code}`);
+        }
+      }
+    });
+
+    runtimeProcess.on('message', (msg: MessageFromChildProcess) => {
+      switch (msg.kind) {
+        case 'result': {
+          const execution = pendingExecutions.get(msg.id);
+          if (execution) {
+            pendingExecutions.delete(msg.id);
+            clearTimeout(execution.timeout);
+            if (msg.error) {
+              execution.reject(new Error(msg.error.message || 'Unknown error'));
+            } else {
+              execution.resolve(msg.data);
+            }
+          }
+          break;
+        }
+        default:
+          console.error(`Unknowm message received "${msg.kind}"`);
+      }
+    });
+
+    currentRuntimeProcess = runtimeProcess;
+  };
+
+  const envFileWatcherController = new AbortController();
+
+  (async () => {
+    try {
+      const watcher = fs.watch(envFilePath, { signal: envFileWatcherController.signal });
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars, @typescript-eslint/naming-convention, no-underscore-dangle
+      for await (const _event of watcher) {
+        env = await loadEnvFile();
+        restartRuntimeProcess();
+      }
+    } catch (err: unknown) {
+      if (errorFrom(err).name === 'AbortError') {
+        return;
+      }
       throw err;
     }
-  }
+  })();
 
   const toolpadPlugin: esbuild.Plugin = {
     name: 'toolpad',
@@ -230,77 +333,13 @@ async function createBuilder() {
         });
 
         if (buildErrors.length <= 0) {
-          if (controller) {
-            controller.abort();
-            controller = undefined;
-
-            // clean up handlers
-            for (const [id, execution] of pendingExecutions) {
-              execution.reject(new Error(`Aborted`));
-              clearTimeout(execution.timeout);
-              pendingExecutions.delete(id);
-            }
-          }
-
-          controller = new AbortController();
           const metafile = args.metafile;
           invariant(metafile, 'esbuild settings should enable metafile');
           const outputFileNames = Object.keys(metafile.outputs);
           invariant(outputFileNames.length === 1, 'esbuild should build only one output file');
-          const outputFile = outputFileNames[0];
+          outputFile = outputFileNames[0];
 
-          const runtimeProcess = child_process.fork(`./${outputFile}`, {
-            cwd: userProjectRoot,
-            silent: true,
-            signal: controller.signal,
-            stdio: 'inherit',
-            env: {
-              ...process.env,
-              NODE_ENV: config.cmd === 'start' ? 'production' : 'development',
-              ...env,
-            },
-          });
-
-          runtimeError = undefined;
-
-          runtimeProcess.on('error', (error) => {
-            if (error.name === 'AbortError') {
-              return;
-            }
-            runtimeError = error;
-            console.error(`cp ${runtimeProcess.pid} error`, error);
-          });
-
-          runtimeProcess.on('exit', (code) => {
-            if (currentRuntimeProcess === runtimeProcess) {
-              currentRuntimeProcess = undefined;
-              if (code !== 0) {
-                runtimeError = new Error(`The runtime process exited with code ${code}`);
-              }
-            }
-          });
-
-          runtimeProcess.on('message', (msg: MessageFromChildProcess) => {
-            switch (msg.kind) {
-              case 'result': {
-                const execution = pendingExecutions.get(msg.id);
-                if (execution) {
-                  pendingExecutions.delete(msg.id);
-                  clearTimeout(execution.timeout);
-                  if (msg.error) {
-                    execution.reject(new Error(msg.error.message || 'Unknown error'));
-                  } else {
-                    execution.resolve(msg.data);
-                  }
-                }
-                break;
-              }
-              default:
-                console.error(`Unknowm message received "${msg.kind}"`);
-            }
-          });
-
-          currentRuntimeProcess = runtimeProcess;
+          restartRuntimeProcess();
         }
 
         revalidate();
@@ -350,6 +389,11 @@ async function createBuilder() {
   return {
     ctx,
     sendRequest,
+    dispose() {
+      ctx.dispose();
+      envFileWatcherController.abort();
+      controller?.abort();
+    },
   };
 }
 

@@ -158,7 +158,7 @@
           "subBreed",
           {
             "type": "jsExpression",
-            "value": "selectSubBreed.value\n"
+            "value": "selectSubBreed.options.includes(selectSubBreed.value)\n  ? selectSubBreed.value\n  : null\n"
           }
         ]
       ],
@@ -493,7 +493,7 @@
         },
         "disabled": {
           "type": "jsExpression",
-          "value": "allDogBreeds.data?.message[selectBreed.value].length <= 0\n"
+          "value": "selectSubBreed.options?.length <= 0\n"
         },
         "fullWidth": {
           "type": "const",

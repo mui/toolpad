@@ -26,8 +26,7 @@ function PageColumn({ gap, children }: PageColumnProps) {
 export default createComponent(PageColumn, {
   argTypes: {
     gap: {
-      typeDef: { type: 'number' },
-      defaultValue: 1,
+      typeDef: { type: 'number', default: 1 },
     },
     children: {
       typeDef: { type: 'element' },

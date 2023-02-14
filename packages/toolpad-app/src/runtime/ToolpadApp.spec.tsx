@@ -6,6 +6,7 @@ import ToolpadApp from './ToolpadApp';
 import * as appDom from '../appDom';
 import createRuntimeState from '../createRuntimeState';
 import { bridge } from '../canvas/ToolpadBridge';
+import { BridgeContext } from '../canvas/BridgeContext';
 
 // More sensible default for these tests
 const waitFor: typeof waitForOrig = (waiter, options) =>
@@ -31,7 +32,12 @@ function renderPage(initPage: (dom: appDom.AppDom, page: appDom.PageNode) => app
 
   const state = createRuntimeState({ appId, dom });
 
-  return render(<ToolpadApp state={state} version={version} basename="toolpad" />);
+  return render(
+    <BridgeContext.Provider value={bridge}>
+      {' '}
+      <ToolpadApp state={state} version={version} basename="toolpad" />
+    </BridgeContext.Provider>,
+  );
 }
 
 test(`Static Text`, async () => {

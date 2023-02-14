@@ -23,6 +23,7 @@ import {
   NestedBindableAttrs,
   GlobalScopeMeta,
   BindingEvaluationResult,
+  getArgTypeDefaultValue,
 } from '@mui/toolpad-core';
 import { createProvidedContext } from '@mui/toolpad-core/utils/react';
 import { QueryClient, QueryClientProvider, useMutation } from '@tanstack/react-query';
@@ -73,9 +74,9 @@ import { useAppContext, AppContextProvider } from './AppContext';
 import { CanvasHooksContext, NavigateToPage } from './CanvasHooksContext';
 import useBoolean from '../utils/useBoolean';
 import { errorFrom } from '../utils/errors';
-import { bridge } from '../canvas/ToolpadBridge';
 import Header from '../toolpad/ToolpadShell/Header';
 import { ThemeProvider } from '../ThemeContext';
+import { BridgeContext } from '../canvas/BridgeContext';
 
 const ReactQueryDevtoolsProduction = React.lazy(() =>
   import('@tanstack/react-query-devtools/build/lib/index.prod.js').then((d) => ({
@@ -226,7 +227,7 @@ function RenderedNodeContent({ node, childNodeGroups, Component }: RenderedNodeC
       }
 
       if (typeof hookResult[propName] === 'undefined' && argType) {
-        hookResult[propName] = argType.defaultValue;
+        hookResult[propName] = getArgTypeDefaultValue(argType);
       }
     }
 
@@ -256,7 +257,7 @@ function RenderedNodeContent({ node, childNodeGroups, Component }: RenderedNodeC
       }
 
       if (typeof hookResult[propName] === 'undefined' && argType) {
-        hookResult[propName] = argType.defaultValue;
+        hookResult[propName] = getArgTypeDefaultValue(argType);
       }
     }
 
@@ -641,7 +642,8 @@ function parseBindings(
           : undefined;
 
         const binding: BindableAttrValue<any> =
-          elm.props?.[propName] || appDom.createConst(argType?.defaultValue ?? undefined);
+          elm.props?.[propName] ||
+          appDom.createConst(argType ? getArgTypeDefaultValue(argType) : undefined);
 
         const bindingId = `${elm.id}.props.${propName}`;
 
@@ -671,7 +673,7 @@ function parseBindings(
         for (const [propName, argType] of Object.entries(layoutBoxArgTypes)) {
           const binding =
             elm.layout?.[propName as keyof typeof layoutBoxArgTypes] ||
-            appDom.createConst(argType?.defaultValue ?? undefined);
+            appDom.createConst(argType ? getArgTypeDefaultValue(argType) : undefined);
           const bindingId = `${elm.id}.layout.${propName}`;
           parsedBindingsMap.set(bindingId, parseBinding(binding, {}));
         }
@@ -844,13 +846,15 @@ function RenderedPage({ nodeId }: RenderedNodeProps) {
     [browserJsRuntime, pageState],
   );
 
-  React.useEffect(() => {
-    bridge.canvasEvents.emit('pageStateUpdated', { pageState, globalScopeMeta });
-  }, [pageState, globalScopeMeta]);
+  const bridge = React.useContext(BridgeContext);
 
   React.useEffect(() => {
-    bridge.canvasEvents.emit('pageBindingsUpdated', { bindings: liveBindings });
-  }, [liveBindings]);
+    bridge?.canvasEvents.emit('pageStateUpdated', { pageState, globalScopeMeta });
+  }, [pageState, globalScopeMeta, bridge]);
+
+  React.useEffect(() => {
+    bridge?.canvasEvents.emit('pageBindingsUpdated', { bindings: liveBindings });
+  }, [bridge, liveBindings]);
 
   return (
     <BindingsContextProvider value={liveBindings}>

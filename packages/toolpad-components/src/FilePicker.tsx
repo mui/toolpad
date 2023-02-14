@@ -75,8 +75,7 @@ export default createComponent(FilePicker, {
     },
     multiple: {
       helperText: 'Whether the FilePicker should accept multiple files.',
-      typeDef: { type: 'boolean' },
-      defaultValue: true,
+      typeDef: { type: 'boolean', default: true },
     },
     disabled: {
       helperText: 'Whether the FilePicker is disabled.',

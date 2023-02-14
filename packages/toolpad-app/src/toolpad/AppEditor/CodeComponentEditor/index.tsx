@@ -11,6 +11,7 @@ import {
   TOOLPAD_COMPONENT,
   ArgTypeDefinitions,
   ArgTypeDefinition,
+  getArgTypeDefaultValue,
 } from '@mui/toolpad-core';
 import { useQuery } from '@tanstack/react-query';
 import invariant from 'invariant';
@@ -190,7 +191,7 @@ function CodeComponentEditorContent({ codeComponentNode }: CodeComponentEditorCo
   const { argTypes = {} } = CodeComponent[TOOLPAD_COMPONENT];
 
   const defaultProps = React.useMemo(
-    () => mapValues(argTypes, (argType) => argType?.defaultValue),
+    () => mapValues(argTypes, (argType) => (argType ? getArgTypeDefaultValue(argType) : undefined)),
     [argTypes],
   );
 

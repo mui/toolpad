@@ -193,11 +193,17 @@ export function domLoaderReducer(state: DomLoader, action: DomAction): DomLoader
     case 'DOM_UPDATE': {
       const { selectedNodeId, view } = action;
 
+      const isSamePage =
+        !view || (view.kind === 'page' && view.nodeId === state.currentView.nodeId);
+
       return update(state, {
-        ...(typeof selectedNodeId !== 'undefined'
-          ? { selectedNodeId, currentTab: 'component' }
-          : {}),
-        ...(view ? { currentView: view } : {}),
+        currentView: view || state.currentView,
+        ...(isSamePage
+          ? {
+              selectedNodeId: selectedNodeId || state.selectedNodeId,
+              currentTab: selectedNodeId ? 'component' : state.currentTab,
+            }
+          : { selectedNodeId: null }),
       });
     }
     case 'DOM_SERVER_UPDATE': {
@@ -209,12 +215,12 @@ export function domLoaderReducer(state: DomLoader, action: DomAction): DomLoader
       return update(state, { dom: action.dom });
     }
     case 'DOM_SET_VIEW': {
+      const isSamePage =
+        action.view.kind === 'page' && action.view.nodeId === state.currentView.nodeId;
+
       return update(state, {
         currentView: action.view,
-        selectedNodeId:
-          action.view.kind !== 'page' || action.view.nodeId === state.currentView.nodeId
-            ? state.selectedNodeId
-            : null,
+        selectedNodeId: isSamePage ? state.selectedNodeId : null,
       });
     }
     case 'DOM_SET_TAB': {

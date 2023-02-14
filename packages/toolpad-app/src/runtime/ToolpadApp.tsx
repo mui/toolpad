@@ -9,6 +9,8 @@ import {
   LinearProgress,
   Container,
   Tooltip,
+  Button,
+  Typography,
 } from '@mui/material';
 import {
   ToolpadComponent,
@@ -21,6 +23,7 @@ import {
   NestedBindableAttrs,
   GlobalScopeMeta,
   BindingEvaluationResult,
+  getArgTypeDefaultValue,
 } from '@mui/toolpad-core';
 import { createProvidedContext } from '@mui/toolpad-core/utils/react';
 import { QueryClient, QueryClientProvider, useMutation } from '@tanstack/react-query';
@@ -41,6 +44,7 @@ import {
 } from '@mui/toolpad-core/runtime';
 import * as _ from 'lodash-es';
 import ErrorIcon from '@mui/icons-material/Error';
+import EditIcon from '@mui/icons-material/Edit';
 import { useBrowserJsRuntime } from '@mui/toolpad-core/jsBrowserRuntime';
 import * as appDom from '../appDom';
 import { RuntimeState, VersionOrPreview } from '../types';
@@ -70,7 +74,9 @@ import { useAppContext, AppContextProvider } from './AppContext';
 import { CanvasHooksContext, NavigateToPage } from './CanvasHooksContext';
 import useBoolean from '../utils/useBoolean';
 import { errorFrom } from '../utils/errors';
-import { bridge } from '../canvas/ToolpadBridge';
+import Header from '../toolpad/ToolpadShell/Header';
+import { ThemeProvider } from '../ThemeContext';
+import { BridgeContext } from '../canvas/BridgeContext';
 
 const ReactQueryDevtoolsProduction = React.lazy(() =>
   import('@tanstack/react-query-devtools/build/lib/index.prod.js').then((d) => ({
@@ -221,7 +227,7 @@ function RenderedNodeContent({ node, childNodeGroups, Component }: RenderedNodeC
       }
 
       if (typeof hookResult[propName] === 'undefined' && argType) {
-        hookResult[propName] = argType.defaultValue;
+        hookResult[propName] = getArgTypeDefaultValue(argType);
       }
     }
 
@@ -251,7 +257,7 @@ function RenderedNodeContent({ node, childNodeGroups, Component }: RenderedNodeC
       }
 
       if (typeof hookResult[propName] === 'undefined' && argType) {
-        hookResult[propName] = argType.defaultValue;
+        hookResult[propName] = getArgTypeDefaultValue(argType);
       }
     }
 
@@ -636,7 +642,8 @@ function parseBindings(
           : undefined;
 
         const binding: BindableAttrValue<any> =
-          elm.props?.[propName] || appDom.createConst(argType?.defaultValue ?? undefined);
+          elm.props?.[propName] ||
+          appDom.createConst(argType ? getArgTypeDefaultValue(argType) : undefined);
 
         const bindingId = `${elm.id}.props.${propName}`;
 
@@ -666,7 +673,7 @@ function parseBindings(
         for (const [propName, argType] of Object.entries(layoutBoxArgTypes)) {
           const binding =
             elm.layout?.[propName as keyof typeof layoutBoxArgTypes] ||
-            appDom.createConst(argType?.defaultValue ?? undefined);
+            appDom.createConst(argType ? getArgTypeDefaultValue(argType) : undefined);
           const bindingId = `${elm.id}.layout.${propName}`;
           parsedBindingsMap.set(bindingId, parseBinding(binding, {}));
         }
@@ -839,13 +846,15 @@ function RenderedPage({ nodeId }: RenderedNodeProps) {
     [browserJsRuntime, pageState],
   );
 
-  React.useEffect(() => {
-    bridge.canvasEvents.emit('pageStateUpdated', { pageState, globalScopeMeta });
-  }, [pageState, globalScopeMeta]);
+  const bridge = React.useContext(BridgeContext);
 
   React.useEffect(() => {
-    bridge.canvasEvents.emit('pageBindingsUpdated', { bindings: liveBindings });
-  }, [liveBindings]);
+    bridge?.canvasEvents.emit('pageStateUpdated', { pageState, globalScopeMeta });
+  }, [pageState, globalScopeMeta, bridge]);
+
+  React.useEffect(() => {
+    bridge?.canvasEvents.emit('pageBindingsUpdated', { bindings: liveBindings });
+  }, [bridge, liveBindings]);
 
   return (
     <BindingsContextProvider value={liveBindings}>
@@ -930,6 +939,7 @@ const queryClient = new QueryClient({
 
 export interface ToolpadAppProps {
   rootRef?: React.Ref<HTMLDivElement>;
+  catalog?: Record<string, ToolpadComponent>;
   hidePreviewBanner?: boolean;
   basename: string;
   version: VersionOrPreview;
@@ -938,6 +948,7 @@ export interface ToolpadAppProps {
 
 export default function ToolpadApp({
   rootRef,
+  catalog,
   basename,
   version,
   hidePreviewBanner,
@@ -963,13 +974,33 @@ export default function ToolpadApp({
           <AppThemeProvider dom={dom}>
             <CssBaseline enableColorScheme />
             {version === 'preview' && !hidePreviewBanner ? (
-              <Alert severity="info">This is a preview version of the application.</Alert>
+              <ThemeProvider>
+                <Header
+                  enableUserFeedback={false}
+                  actions={
+                    <Stack direction="row" spacing={1} alignItems="center">
+                      <Typography variant="body2" sx={{ color: 'primary.main' }}>
+                        This is a preview version of the application.
+                      </Typography>
+                      <Button
+                        variant="outlined"
+                        endIcon={<EditIcon />}
+                        color="primary"
+                        component="a"
+                        href={`/_toolpad/app/${appId}`}
+                      >
+                        Edit
+                      </Button>
+                    </Stack>
+                  }
+                />
+              </ThemeProvider>
             ) : null}
             <ErrorBoundary FallbackComponent={AppError}>
               <ResetNodeErrorsKeyProvider value={resetNodeErrorsKey}>
                 <React.Suspense fallback={<AppLoading />}>
                   <AppModulesProvider modules={state.modules}>
-                    <ComponentsContext dom={dom}>
+                    <ComponentsContext catalog={catalog} dom={dom}>
                       <AppContextProvider value={appContext}>
                         <QueryClientProvider client={queryClient}>
                           <BrowserRouter basename={basename}>

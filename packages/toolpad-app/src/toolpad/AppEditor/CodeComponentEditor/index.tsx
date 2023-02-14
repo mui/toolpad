@@ -11,6 +11,7 @@ import {
   TOOLPAD_COMPONENT,
   ArgTypeDefinitions,
   ArgTypeDefinition,
+  getArgTypeDefaultValue,
 } from '@mui/toolpad-core';
 import { useQuery } from '@tanstack/react-query';
 import invariant from 'invariant';
@@ -34,6 +35,8 @@ import useDebounced from '../../../utils/useDebounced';
 import { ExtraLib } from '../../../components/MonacoEditor';
 import { useNodeNameValidation } from '../HierarchyExplorer/validation';
 import useUndoRedo from '../../hooks/useUndoRedo';
+import config from '../../../config';
+import client from '../../../api';
 
 const TypescriptEditor = lazyComponent(() => import('../../../components/TypescriptEditor'), {
   noSsr: true,
@@ -188,7 +191,7 @@ function CodeComponentEditorContent({ codeComponentNode }: CodeComponentEditorCo
   const { argTypes = {} } = CodeComponent[TOOLPAD_COMPONENT];
 
   const defaultProps = React.useMemo(
-    () => mapValues(argTypes, (argType) => argType?.defaultValue),
+    () => mapValues(argTypes, (argType) => (argType ? getArgTypeDefaultValue(argType) : undefined)),
     [argTypes],
   );
 
@@ -231,7 +234,7 @@ function CodeComponentEditorContent({ codeComponentNode }: CodeComponentEditorCo
   return (
     <React.Fragment>
       <Stack sx={{ height: '100%' }}>
-        <Toolbar sx={{ mt: 2, mb: 2 }}>
+        <Toolbar sx={{ mt: 2, mb: 2, gap: 2 }}>
           <TextField
             sx={{ maxWidth: 300 }}
             required
@@ -244,7 +247,17 @@ function CodeComponentEditorContent({ codeComponentNode }: CodeComponentEditorCo
             }
             error={!isNameValid}
             helperText={nodeNameError}
+            disabled={config.localMode}
           />
+          {config.localMode ? (
+            <Button
+              onClick={() => {
+                client.mutation.openCodeComponentEditor(codeComponentNode.name);
+              }}
+            >
+              Open in vscode
+            </Button>
+          ) : null}
         </Toolbar>
         <Box flex={1}>
           <SplitPane split="vertical" allowResize size="50%">

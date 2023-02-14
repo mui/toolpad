@@ -16,4 +16,15 @@ export const ROADMAP_URL = 'https://github.com/orgs/mui/projects/9';
 export const SCHEDULE_DEMO_URL = 'https://calendly.com/prakhar-mui/toolpad';
 
 export const DEMO_DATASOURCES = new Set(['rest', 'function']);
-export const PRODUCTION_DATASOURCES = new Set(['rest', 'function', 'googleSheets', 'postgres']);
+export const PRODUCTION_DATASOURCES = new Set([
+  'rest',
+  'function',
+  'googleSheets',
+  'postgres',
+  'mysql',
+  'local',
+]);
+
+export const APP_ID_LOCAL_MARKER = '__LOCAL_MODE_APP_';
+
+export const TOOLPAD_BRIDGE_GLOBAL = '__TOOLPAD_BRIDGE__';

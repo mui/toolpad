@@ -1,6 +1,6 @@
 import type * as React from 'react';
-import type { TOOLPAD_COMPONENT } from './constants';
-import type { Branded } from './utils/types';
+import type { TOOLPAD_COMPONENT } from './constants.js';
+import type { Branded } from './utils/types.js';
 
 export type NodeId = Branded<string, 'NodeId'>;
 
@@ -76,31 +76,37 @@ export type SlotType = 'single' | 'multiple' | 'layout';
 
 export interface ValueTypeBase {
   type: 'string' | 'boolean' | 'number' | 'object' | 'array' | 'element' | 'event';
+  default?: unknown;
 }
 
 export interface StringValueType extends ValueTypeBase {
   type: 'string';
   enum?: string[];
+  default?: string;
 }
 
 export interface NumberValueType extends ValueTypeBase {
   type: 'number';
   minimum?: number;
   maximum?: number;
+  default?: number;
 }
 
 export interface BooleanValueType extends ValueTypeBase {
   type: 'boolean';
+  default?: boolean;
 }
 
 export interface ObjectValueType extends ValueTypeBase {
   type: 'object';
   schema?: string;
+  default?: any;
 }
 
 export interface ArrayValueType extends ValueTypeBase {
   type: 'array';
   schema?: string;
+  default?: any[];
 }
 
 export interface ElementValueType extends ValueTypeBase {
@@ -178,6 +184,7 @@ export interface ArgTypeDefinition<P extends object = {}, V = P[keyof P]> {
   description?: string;
   /**
    * A default value for the property.
+   * @deprecated Use `typeDef.default` instead.
    */
   defaultValue?: V;
   /**
@@ -328,7 +335,9 @@ export interface RuntimeError {
 
 export type FlowDirection = 'row' | 'column' | 'row-reverse' | 'column-reverse';
 
-export interface SerializedError {
+export type PlainObject = Record<string, unknown>;
+
+export interface SerializedError extends PlainObject {
   message: string;
   name: string;
   stack?: string;

@@ -33,14 +33,23 @@ function isToolpadComponent(maybeComponent: unknown): maybeComponent is ToolpadC
 }
 
 interface ComponentsContextProps {
+  catalog?: Record<string, ToolpadComponent>;
   dom: appDom.AppDom;
   children?: React.ReactNode;
 }
 
-export default function ComponentsContext({ dom, children }: ComponentsContextProps) {
+export default function ComponentsContext({
+  catalog: componentsCatalog,
+  dom,
+  children,
+}: ComponentsContextProps) {
   const modules = useAppModules();
 
   const components = React.useMemo(() => {
+    if (componentsCatalog) {
+      return componentsCatalog;
+    }
+
     const catalog = getToolpadComponents(dom);
     const result: Record<string, ToolpadComponent<any>> = {};
 
@@ -77,7 +86,7 @@ export default function ComponentsContext({ dom, children }: ComponentsContextPr
     }
 
     return result;
-  }, [dom, modules]);
+  }, [componentsCatalog, dom, modules]);
 
   return <ComponentsContextProvider value={components}>{children}</ComponentsContextProvider>;
 }

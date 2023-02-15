@@ -26,8 +26,7 @@ export default createComponent(List, {
   argTypes: {
     itemCount: {
       helperText: 'Number of items to render.',
-      typeDef: { type: 'number' },
-      defaultValue: 3,
+      typeDef: { type: 'number', default: 3 },
     },
     renderItem: {
       typeDef: { type: 'template' },

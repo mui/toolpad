@@ -77,3 +77,25 @@ test('select component behavior', async ({ page, api }) => {
   await expect(page.getByRole('option', { name: '4' })).toBeVisible();
   await expect(page.getByRole('option', { name: 'undefined' })).toBeVisible();
 });
+
+test.only('list component behavior', async ({ page, api }) => {
+  const dom = await readJsonFile(path.resolve(__dirname, './listDom.json'));
+
+  const app = await api.mutation.createApp(`App ${generateId()}`, {
+    from: { kind: 'dom', dom },
+  });
+
+  const runtimeModel = new ToolpadRuntime(page);
+  await runtimeModel.gotoPage(app.id, 'list');
+
+  const firstInput = page.getByLabel('textField0');
+  const secondInput = page.getByLabel('textField1');
+
+  await firstInput.type('one');
+  await secondInput.type('two');
+
+  await expect(page.locator('p:text("one")')).toBeVisible();
+  await expect(page.locator('p:text("two")')).toBeVisible();
+
+  await expect(page.locator('button:text("one")')).toBeVisible();
+});

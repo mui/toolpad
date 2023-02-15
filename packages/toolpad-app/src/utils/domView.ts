@@ -8,7 +8,7 @@ export type PageView =
   | { kind: 'pageParameters' };
 
 export type DomView =
-  | { kind: 'page'; nodeId?: NodeId; view?: PageView }
+  | { kind: 'page'; nodeId?: NodeId; view?: PageView; selectedNodeId: NodeId | null }
   | { kind: 'connection'; nodeId: NodeId }
   | { kind: 'codeComponent'; nodeId: NodeId };
 
@@ -28,7 +28,7 @@ export function getPathnameFromView(appId: string, view: DomView): string {
 export function getViewFromPathname(pathname: string): DomView | null {
   const pageRouteMatch = matchPath(APP_PAGE_ROUTE, pathname);
   if (pageRouteMatch?.params.nodeId) {
-    return { kind: 'page', nodeId: pageRouteMatch.params.nodeId as NodeId };
+    return { kind: 'page', nodeId: pageRouteMatch.params.nodeId as NodeId, selectedNodeId: null };
   }
 
   const connectionsRouteMatch = matchPath(APP_CONNECTION_ROUTE, pathname);

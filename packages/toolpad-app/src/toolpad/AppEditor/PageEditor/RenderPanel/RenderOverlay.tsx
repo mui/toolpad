@@ -269,7 +269,8 @@ interface RenderOverlayProps {
 }
 
 export default function RenderOverlay({ bridge }: RenderOverlayProps) {
-  const { dom, selectedNodeId } = useDom();
+  const { dom, currentView } = useDom();
+  const selectedNodeId = currentView.kind === 'page' ? currentView.selectedNodeId : null;
   const domApi = useDomApi();
   const api = usePageEditorApi();
   const {

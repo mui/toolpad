@@ -52,7 +52,7 @@ export type DomAction =
     }
   | {
       type: 'DOM_SET_VIEW';
-      view: DomView;
+      view: Partial<DomView> & Omit<DomView, 'selectedNodeId'>;
     }
   | {
       type: 'DOM_SET_TAB';
@@ -95,7 +95,6 @@ export function domLoaderReducer(state: DomLoader, action: DomAction): DomLoader
         ...state.undoStack,
         {
           dom: state.dom,
-          selectedNodeId: state.selectedNodeId,
           view: state.currentView,
           tab: state.currentTab,
           timestamp: Date.now(),
@@ -131,7 +130,6 @@ export function domLoaderReducer(state: DomLoader, action: DomAction): DomLoader
 
       return update(state, {
         dom: previousStackEntry.dom,
-        selectedNodeId: previousStackEntry.selectedNodeId,
         currentView: previousStackEntry.view,
         currentTab: previousStackEntry.tab,
         undoStack,
@@ -152,7 +150,6 @@ export function domLoaderReducer(state: DomLoader, action: DomAction): DomLoader
 
       return update(state, {
         dom: nextStackEntry.dom,
-        selectedNodeId: nextStackEntry.selectedNodeId,
         currentView: nextStackEntry.view,
         currentTab: nextStackEntry.tab,
         undoStack,
@@ -180,15 +177,21 @@ export function domLoaderReducer(state: DomLoader, action: DomAction): DomLoader
       });
     }
     case 'SELECT_NODE': {
-      return update(state, {
-        selectedNodeId: action.nodeId,
-        currentTab: 'component',
-      });
+      if (state.currentView.kind === 'page') {
+        return update(state, {
+          currentView: { ...state.currentView, selectedNodeId: action.nodeId },
+          currentTab: 'component',
+        });
+      }
+      return state;
     }
     case 'DESELECT_NODE': {
-      return update(state, {
-        selectedNodeId: null,
-      });
+      if (state.currentView.kind === 'page') {
+        return update(state, {
+          currentView: { ...state.currentView, selectedNodeId: null },
+        });
+      }
+      return state;
     }
     case 'DOM_UPDATE': {
       const { selectedNodeId, view } = action;
@@ -209,8 +212,17 @@ export function domLoaderReducer(state: DomLoader, action: DomAction): DomLoader
       return update(state, { dom: action.dom });
     }
     case 'DOM_SET_VIEW': {
+      let newView = action.view;
+      if (action.view.kind === 'page' && typeof action.view.selectedNodeId === 'undefined') {
+        newView = {
+          ...action.view,
+          selectedNodeId:
+            state.currentView.kind === 'page' ? state.currentView.selectedNodeId : null,
+        };
+      }
+
       return update(state, {
-        currentView: action.view,
+        currentView: newView as DomView,
       });
     }
     case 'DOM_SET_TAB': {
@@ -258,7 +270,7 @@ function createDomApi(
         ...extraUpdates,
       });
     },
-    setView(view: DomView) {
+    setView(view: Partial<DomView> & Omit<DomView, 'selectedNodeId'>) {
       dispatch({
         type: 'DOM_SET_VIEW',
         view,
@@ -298,7 +310,6 @@ export interface DomLoader {
   saving: boolean;
   unsavedChanges: number;
   saveError: string | null;
-  selectedNodeId: NodeId | null;
   currentView: DomView;
   currentTab: ComponentPanelTab;
   undoStack: UndoRedoStackEntry[];
@@ -319,7 +330,6 @@ export { useDomLoader };
 
 export interface DomState {
   dom: appDom.AppDom;
-  selectedNodeId: NodeId | null;
   currentView: DomView;
   currentTab: ComponentPanelTab;
 }
@@ -331,11 +341,11 @@ interface UndoRedoStackEntry extends Omit<DomState, 'currentView' | 'currentTab'
 }
 
 export function useDom(): DomState {
-  const { dom, selectedNodeId, currentView, currentTab } = useDomLoader();
+  const { dom, currentView, currentTab } = useDomLoader();
   if (!dom) {
     throw new Error("Trying to access the DOM before it's loaded");
   }
-  return { dom, selectedNodeId, currentView, currentTab };
+  return { dom, currentView, currentTab };
 }
 
 export function useDomApi(): DomApi {
@@ -383,6 +393,7 @@ export default function DomProvider({ appId, children }: DomContextProps) {
   const initialView = getViewFromPathname(location.pathname) || {
     kind: 'page',
     nodeId: firstPage?.id,
+    selectedNodeId: null,
   };
 
   const [state, dispatch] = React.useReducer(domLoaderReducer, {
@@ -391,13 +402,11 @@ export default function DomProvider({ appId, children }: DomContextProps) {
     saveError: null,
     savedDom: dom,
     dom,
-    selectedNodeId: null,
     currentView: initialView,
     currentTab: 'component',
     undoStack: [
       {
         dom,
-        selectedNodeId: null,
         view: initialView,
         tab: 'component',
         timestamp: Date.now(),

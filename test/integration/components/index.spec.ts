@@ -78,7 +78,7 @@ test('select component behavior', async ({ page, api }) => {
   await expect(page.getByRole('option', { name: 'undefined' })).toBeVisible();
 });
 
-test.only('list component behavior', async ({ page, api }) => {
+test('list component behavior', async ({ page, api }) => {
   const dom = await readJsonFile(path.resolve(__dirname, './listDom.json'));
 
   const app = await api.mutation.createApp(`App ${generateId()}`, {

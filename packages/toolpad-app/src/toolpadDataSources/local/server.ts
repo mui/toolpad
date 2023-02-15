@@ -75,7 +75,15 @@ function formatCodeFrame(location: esbuild.Location): string {
   ].join('\n');
 }
 
-async function createMain(): Promise<string> {
+interface MainManifest {
+  queryFiles: { name: string; filepath: string }[];
+}
+
+async function createMain(manifest: MainManifest): Promise<string> {
+  const loadLines = manifest.queryFiles.map(
+    ({ name, filepath }) =>
+      `loadQuery(${JSON.stringify(name)}, () => import(${JSON.stringify(filepath)}))`,
+  );
   return `
     import { TOOLPAD_QUERY } from '@mui/toolpad-core/server';
     import { errorFrom, serializeError } from '@mui/toolpad-core/utils/errors';
@@ -89,16 +97,27 @@ async function createMain(): Promise<string> {
       global.Response = Response
     }
 
+    async function loadQuery (name, importFn) {
+      const { default: resolver } = await importFn()
+      return [name, resolver]
+    }
+
     let resolversPromise
     async function getResolvers() {
       if (!resolversPromise) {
         resolversPromise = (async () => {
+          const fileQueryResolvers = await Promise.all([
+            ${loadLines.join(',')}
+          ]);
+
           const queries = await import(${JSON.stringify(QUERIES_FILE)})
 
-          return new Map(Object.entries(queries).flatMap(([name, resolver]) => {
+          const queriesFileResolvers = Object.entries(queries).flatMap(([name, resolver]) => {
             return typeof resolver === 'function' ? [[name, resolver]] : []
-          }))
-        })()
+          })
+
+          return new Map([...fileQueryResolvers, ...queriesFileResolvers]);
+        })();
       }
       return resolversPromise
     }
@@ -290,7 +309,9 @@ async function createBuilder() {
 
       build.onLoad({ filter: /.*/, namespace: 'toolpad' }, async (args) => {
         if (args.path === 'main.ts') {
-          const contents = await createMain();
+          const contents = await createMain({
+            queryFiles: projectEntries.filter((entry) => entry.kind === 'query'),
+          });
           return {
             loader: 'tsx',
             contents,
@@ -442,7 +463,8 @@ async function execPrivate(connection: Maybe<LocalConnectionParams>, query: Loca
   switch (query.kind) {
     case 'introspection': {
       const builder = await globalThis.builder;
-      return builder.introspect();
+      const introspectionResult = await builder.introspect();
+      return introspectionResult;
     }
     case 'debugExec':
       return execBase(connection, query.query, query.params);

@@ -63,15 +63,14 @@ const initPromise = new Promise<void>((resolve) => {
   setInitialized = resolve;
 });
 
-function revalidate() {
-  setInitialized();
-}
 function formatCodeFrame(location: esbuild.Location): string {
   const lineNumberCharacters = Math.ceil(Math.log10(location.line));
   return [
     `${location.file}:${location.line}:${location.column}:`,
     `  ${location.line} │ ${location.lineText}`,
-    `  ${' '.repeat(lineNumberCharacters)} ╵ ${' '.repeat(location.lineText.length - 1)}^`,
+    `  ${' '.repeat(lineNumberCharacters)} ╵ ${' '.repeat(
+      Math.max(location.lineText.length - 1, 0),
+    )}^`,
   ].join('\n');
 }
 
@@ -348,7 +347,7 @@ async function createBuilder() {
           restartRuntimeProcess();
         }
 
-        revalidate();
+        setInitialized();
       });
     },
   };

@@ -8,8 +8,8 @@ import { Dirent } from 'fs';
 import config from '../config';
 import * as appDom from '../appDom';
 import { errorFrom } from '../utils/errors';
-import insecureHash from '../utils/insecureHash';
 import { migrateUp } from '../appDom/migrations';
+import insecureHash from '../utils/insecureHash';
 
 const execFile = promisify(child_process.execFile);
 
@@ -254,10 +254,13 @@ async function getQueriesFileContent(): Promise<string | null> {
 }
 
 export async function getDomFingerprint() {
-  const [dom, queriesFile] = await Promise.all([loadLocalDom(), getQueriesFileContent()]);
-  return (
-    insecureHash(JSON.stringify(dom)) + insecureHash(queriesFile || DEFAULT_QUERIES_FILE_CONTENT)
-  );
+  const [configContent, componentsContent, queriesFile] = await Promise.all([
+    loadConfigFile(),
+    loadCodeComponentsFromFiles(),
+    getQueriesFileContent(),
+  ]);
+
+  return insecureHash(JSON.stringify([configContent, componentsContent, queriesFile]));
 }
 
 export type ProjectFolderEntry = {

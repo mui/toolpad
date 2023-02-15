@@ -49,9 +49,12 @@ function QueryEditor({
     [setInput],
   );
 
-  const introspection = usePrivateQuery<LocalPrivateQuery, IntrospectionResult>({
-    kind: 'introspection',
-  });
+  const introspection = usePrivateQuery<LocalPrivateQuery, IntrospectionResult>(
+    {
+      kind: 'introspection',
+    },
+    { retry: false },
+  );
 
   const functionName: string | undefined = input.attributes.query.value.function;
   const functionDefs: Record<string, CreateQueryConfig<any>> = introspection.data?.functions ?? {};

@@ -110,7 +110,7 @@ function HierarchyTreeItem(props: StyledTreeItemProps) {
 function getNodeEditorDomView(node: appDom.AppDomNode): DomView | undefined {
   switch (node.type) {
     case 'page':
-      return { kind: 'page', nodeId: node.id, selectedNodeId: null };
+      return { kind: 'page', nodeId: node.id };
     case 'connection':
       return { kind: 'connection', nodeId: node.id };
     case 'codeComponent':
@@ -159,12 +159,12 @@ export default function HierarchyExplorer({ appId, className }: HierarchyExplore
       // TODO: sort out in-page selection
       const page = appDom.getPageAncestor(dom, node);
       if (page) {
-        domApi.setView({ kind: 'page', nodeId: page.id, selectedNodeId: null });
+        domApi.setView({ kind: 'page', nodeId: page.id });
       }
     }
 
     if (appDom.isPage(node)) {
-      domApi.setView({ kind: 'page', nodeId: node.id, selectedNodeId: null });
+      domApi.setView({ kind: 'page', nodeId: node.id });
     }
 
     if (appDom.isCodeComponent(node)) {
@@ -215,7 +215,7 @@ export default function HierarchyExplorer({ appId, className }: HierarchyExplore
 
       domApi.update(
         (draft) => appDom.removeNode(draft, nodeId),
-        domViewAfterDelete || { kind: 'page', selectedNodeId: null },
+        domViewAfterDelete || { kind: 'page' },
       );
     },
     [activeNode, dom, domApi],
@@ -237,7 +237,7 @@ export default function HierarchyExplorer({ appId, className }: HierarchyExplore
 
       domApi.update(
         (draft) => appDom.addFragment(draft, fragment, node.parentId!, node.parentProp!),
-        editorDomView || { kind: 'page', selectedNodeId: null },
+        editorDomView || { kind: 'page' },
       );
     },
     [dom, domApi],

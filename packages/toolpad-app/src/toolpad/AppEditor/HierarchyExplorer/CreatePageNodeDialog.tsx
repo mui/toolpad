@@ -70,7 +70,6 @@ export default function CreatePageDialog({
           domApi.update((draft) => appDom.addNode(draft, newNode, appNode, 'pages'), {
             kind: 'page',
             nodeId: newNode.id,
-            selectedNodeId: null,
           });
 
           onClose();

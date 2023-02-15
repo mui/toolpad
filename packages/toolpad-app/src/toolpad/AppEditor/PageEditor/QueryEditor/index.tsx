@@ -25,7 +25,6 @@ import { useDom, useDomApi } from '../../../DomLoader';
 import ConnectionSelect, { ConnectionOption } from '../ConnectionSelect';
 import NodeMenu from '../../NodeMenu';
 import QueryNodeEditorDialog from './QueryEditorDialog';
-import config from '../../../../config';
 
 interface DataSourceSelectorProps<Q> {
   open: boolean;
@@ -122,22 +121,18 @@ export default function QueryEditor() {
   }, [domApi, page.id]);
 
   const handleCreate = React.useCallback(() => {
-    if (config.localMode) {
-      const node = appDom.createNode(dom, 'query', {
-        attributes: {
-          query: appDom.createConst({}),
-          connectionId: appDom.createConst(null),
-          dataSource: appDom.createConst('local'),
-        },
-      });
+    const node = appDom.createNode(dom, 'query', {
+      attributes: {
+        query: appDom.createConst({}),
+        connectionId: appDom.createConst(null),
+        dataSource: appDom.createConst('local'),
+      },
+    });
 
-      setDialogState({
-        node,
-        isDraft: true,
-      });
-    } else {
-      setDialogState({});
-    }
+    setDialogState({
+      node,
+      isDraft: true,
+    });
   }, [dom]);
 
   const handleCreated = React.useCallback((node: appDom.QueryNode) => {

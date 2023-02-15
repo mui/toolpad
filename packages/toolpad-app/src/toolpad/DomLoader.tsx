@@ -15,7 +15,6 @@ import useEvent from '../utils/useEvent';
 import { NodeHashes } from '../types';
 import { hasFieldFocus } from '../utils/fields';
 import { DomView, getViewFromPathname } from '../utils/domView';
-import config from '../config';
 
 export type ComponentPanelTab = 'component' | 'theme';
 
@@ -482,10 +481,6 @@ export default function DomProvider({ appId, children }: DomContextProps) {
   // Quick and dirty polling for dom updates
   const fingerprint = React.useRef<number | undefined>();
   React.useEffect(() => {
-    if (!config.localMode) {
-      return () => {};
-    }
-
     let active = true;
 
     (async () => {

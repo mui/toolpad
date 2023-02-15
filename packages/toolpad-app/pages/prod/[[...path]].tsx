@@ -7,7 +7,7 @@ import config from '../../src/config';
 export const getServerSideProps: GetServerSideProps<ToolpadAppProps> = async () => {
   const { loadRuntimeState } = await import('../../src/server/data');
 
-  if (!config.localMode || config.cmd !== 'start') {
+  if (config.cmd !== 'start') {
     return {
       notFound: true,
     };

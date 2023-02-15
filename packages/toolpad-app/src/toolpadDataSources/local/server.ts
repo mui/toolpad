@@ -95,6 +95,15 @@ async function createMain(): Promise<string> {
   return `
     import { TOOLPAD_QUERY } from '@mui/toolpad-core/server';
     import { errorFrom, serializeError } from '@mui/toolpad-core/utils/errors';
+    import fetch, { Headers, Request, Response } from 'node-fetch'
+
+    // Polyfill fetch() in the Node.js environment
+    if (!global.fetch) {
+      global.fetch = fetch
+      global.Headers = Headers
+      global.Request = Request
+      global.Response = Response
+    }
 
     let resolversPromise
     async function getResolvers() {

@@ -46,7 +46,7 @@ If you would like to hack on MUI Toolpad or want to run the latest version, you 
    }
    ```
 
-   1. Replace `<your-local-toolpad-monorepo>` with the path to the toolpad monorepo on your file system
+   1. Replace `<your-local-toolpad-monorepo>` with the path to the toolpad monorepo on your file system.
 
    1. In order to use `portal:` dependencies, we will need to use yarn 2. So start by running
 

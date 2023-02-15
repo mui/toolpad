@@ -10,7 +10,12 @@ import config from '../../config';
 import { ServerDataSource } from '../../types';
 import { LocalPrivateQuery, LocalQuery, LocalConnectionParams } from './types';
 import { Maybe } from '../../utils/types';
-import { getUserProjectRoot, openCodeEditor, QUERIES_FILE } from '../../server/localMode';
+import {
+  getUserProjectRoot,
+  openCodeEditor,
+  QUERIES_FILE,
+  readProjectFolder,
+} from '../../server/localMode';
 import { errorFrom, serializeError } from '../../utils/errors';
 
 type MessageToChildProcess =
@@ -33,9 +38,7 @@ type MessageFromChildProcess = {
 };
 
 declare module globalThis {
-  let builder: Promise<{
-    sendRequest(msg: MessageToChildProcess): Promise<any>;
-  }>;
+  let builder: Promise<ReturnType<typeof createBuilder>>;
 }
 
 let nextMsgId = 1;
@@ -63,17 +66,6 @@ const initPromise = new Promise<void>((resolve) => {
 function revalidate() {
   setInitialized();
 }
-
-async function execFunction(name: string, parameters: Record<string, unknown>) {
-  const builder = await globalThis.builder;
-  return builder.sendRequest({
-    kind: 'exec',
-    id: getNextId(),
-    name,
-    parameters,
-  });
-}
-
 function formatCodeFrame(location: esbuild.Location): string {
   const lineNumberCharacters = Math.ceil(Math.log10(location.line));
   return [
@@ -81,14 +73,6 @@ function formatCodeFrame(location: esbuild.Location): string {
     `  ${location.line} │ ${location.lineText}`,
     `  ${' '.repeat(lineNumberCharacters)} ╵ ${' '.repeat(location.lineText.length - 1)}^`,
   ].join('\n');
-}
-
-async function introspect() {
-  const builder = await globalThis.builder;
-  return builder.sendRequest({
-    kind: 'introspect',
-    id: getNextId(),
-  });
 }
 
 async function createMain(): Promise<string> {
@@ -190,6 +174,11 @@ async function createBuilder() {
   let buildErrors: Error[] = [];
   let runtimeError: Error | undefined;
 
+  const projectEntries = await readProjectFolder();
+  const entryPoints = projectEntries
+    .filter((entry) => entry.kind === 'query')
+    .map((entry) => entry.filepath);
+
   const loadEnvFile = async () => {
     try {
       const envFileContent = await fs.readFile(envFilePath);
@@ -213,6 +202,7 @@ async function createBuilder() {
   };
 
   let outputFile: string | undefined;
+  let metafile: esbuild.Metafile | undefined;
   let env: any = loadEnvFile();
 
   const restartRuntimeProcess = () => {
@@ -288,23 +278,7 @@ async function createBuilder() {
     currentRuntimeProcess = runtimeProcess;
   };
 
-  const envFileWatcherController = new AbortController();
-
-  (async () => {
-    try {
-      const watcher = fs.watch(envFilePath, { signal: envFileWatcherController.signal });
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars, @typescript-eslint/naming-convention, no-underscore-dangle
-      for await (const _event of watcher) {
-        env = await loadEnvFile();
-        restartRuntimeProcess();
-      }
-    } catch (err: unknown) {
-      if (errorFrom(err).name === 'AbortError') {
-        return;
-      }
-      throw err;
-    }
-  })();
+  let envFileWatcherController: AbortController | undefined;
 
   const toolpadPlugin: esbuild.Plugin = {
     name: 'toolpad',
@@ -342,11 +316,13 @@ async function createBuilder() {
         });
 
         if (buildErrors.length <= 0) {
-          const metafile = args.metafile;
+          metafile = args.metafile;
           invariant(metafile, 'esbuild settings should enable metafile');
-          const outputFileNames = Object.keys(metafile.outputs);
-          invariant(outputFileNames.length === 1, 'esbuild should build only one output file');
-          outputFile = outputFileNames[0];
+          const mainEntry = Object.entries(metafile.outputs).find(
+            ([, entry]) => entry.entryPoint === 'toolpad:main.ts',
+          );
+          invariant(mainEntry, 'No output found for main entry point');
+          outputFile = mainEntry[0];
 
           restartRuntimeProcess();
         }
@@ -358,12 +334,12 @@ async function createBuilder() {
 
   const ctx = await esbuild.context({
     absWorkingDir: userProjectRoot,
-    entryPoints: ['toolpad:main.ts'],
+    entryPoints: ['toolpad:main.ts', ...entryPoints],
     plugins: [toolpadPlugin],
     write: true,
     bundle: true,
     metafile: true,
-    outfile: path.resolve(userProjectRoot, './.toolpad-generated/queries.js'),
+    outdir: path.resolve(userProjectRoot, './.toolpad-generated/'),
     platform: 'node',
     packages: 'external',
     target: 'es2022',
@@ -395,12 +371,51 @@ async function createBuilder() {
     });
   }
 
+  async function execute(name: string, parameters: Record<string, unknown>) {
+    return sendRequest({
+      kind: 'exec',
+      id: getNextId(),
+      name,
+      parameters,
+    });
+  }
+
+  async function introspect() {
+    return sendRequest({
+      kind: 'introspect',
+      id: getNextId(),
+    });
+  }
+
   return {
-    ctx,
-    sendRequest,
+    watch() {
+      ctx.watch();
+
+      (async () => {
+        try {
+          if (envFileWatcherController) {
+            envFileWatcherController.abort();
+          }
+          envFileWatcherController = new AbortController();
+          const watcher = fs.watch(envFilePath, { signal: envFileWatcherController.signal });
+          // eslint-disable-next-line @typescript-eslint/no-unused-vars, @typescript-eslint/naming-convention, no-underscore-dangle
+          for await (const _event of watcher) {
+            env = await loadEnvFile();
+            restartRuntimeProcess();
+          }
+        } catch (err: unknown) {
+          if (errorFrom(err).name === 'AbortError') {
+            return;
+          }
+          throw err;
+        }
+      })();
+    },
+    introspect,
+    execute,
     dispose() {
       ctx.dispose();
-      envFileWatcherController.abort();
+      envFileWatcherController?.abort();
       controller?.abort();
     },
   };
@@ -415,7 +430,8 @@ async function execBase(
     throw new Error(`No function name chosen`);
   }
   try {
-    const data = await execFunction(localQuery.function, params);
+    const builder = await globalThis.builder;
+    const data = await builder.execute(localQuery.function, params);
     return { data };
   } catch (rawError) {
     return { error: serializeError(errorFrom(rawError)) };
@@ -424,8 +440,10 @@ async function execBase(
 
 async function execPrivate(connection: Maybe<LocalConnectionParams>, query: LocalPrivateQuery) {
   switch (query.kind) {
-    case 'introspection':
-      return introspect();
+    case 'introspection': {
+      const builder = await globalThis.builder;
+      return builder.introspect();
+    }
     case 'debugExec':
       return execBase(connection, query.query, query.params);
     case 'openEditor':
@@ -453,7 +471,7 @@ export default dataSource;
 
 async function startDev() {
   const builder = await createBuilder();
-  await builder.ctx.watch();
+  await builder.watch();
   return builder;
 }
 

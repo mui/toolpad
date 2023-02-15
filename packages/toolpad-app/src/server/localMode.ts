@@ -259,3 +259,29 @@ export async function getDomFingerprint() {
     insecureHash(JSON.stringify(dom)) + insecureHash(queriesFile || DEFAULT_QUERIES_FILE_CONTENT)
   );
 }
+
+export type ProjectFolderEntry = {
+  name: string;
+  kind: 'query';
+  filepath: string;
+};
+
+export async function readProjectFolder(): Promise<ProjectFolderEntry[]> {
+  const userProjectRoot = getUserProjectRoot();
+  const toolpadFolder = path.resolve(userProjectRoot, 'toolpad');
+  const entries = await fs.readdir(toolpadFolder, { withFileTypes: true });
+  return entries.flatMap((entry) => {
+    const match = /^(.*)\.query\.[jt]sx?$/.exec(entry.name);
+    if (entry.isFile() && match) {
+      const name = match[1];
+      return [
+        {
+          name,
+          kind: 'query',
+          filepath: path.resolve(toolpadFolder, entry.name),
+        },
+      ];
+    }
+    return [];
+  });
+}

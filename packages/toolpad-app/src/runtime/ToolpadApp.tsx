@@ -371,7 +371,7 @@ function RenderedNodeContent({ node, childNodeGroups, Component }: RenderedNodeC
   }, [boundProps, eventHandlers, layoutElementProps, onChangeHandlers, reactChildren]);
 
   const previousProps = React.useRef<Record<string, any>>(props);
-  const hasSetInitialBindingsRef = React.useRef(false);
+  const [hasSetInitialBindings, setHasSetInitialBindings] = React.useState(false);
   React.useEffect(() => {
     Object.entries(argTypes).forEach(([key, argType]) => {
       if (!argType?.defaultValueProp) {
@@ -379,7 +379,7 @@ function RenderedNodeContent({ node, childNodeGroups, Component }: RenderedNodeC
       }
 
       if (
-        hasSetInitialBindingsRef.current &&
+        hasSetInitialBindings &&
         previousProps.current[argType.defaultValueProp] === props[argType.defaultValueProp]
       ) {
         return;
@@ -390,8 +390,8 @@ function RenderedNodeContent({ node, childNodeGroups, Component }: RenderedNodeC
     });
 
     previousProps.current = props;
-    hasSetInitialBindingsRef.current = true;
-  }, [props, argTypes, nodeId, setControlledBinding, scopeId]);
+    setHasSetInitialBindings(true);
+  }, [props, argTypes, nodeId, setControlledBinding, scopeId, hasSetInitialBindings]);
 
   // Wrap element props
   for (const [propName, argType] of Object.entries(argTypes)) {
@@ -435,7 +435,7 @@ function RenderedNodeContent({ node, childNodeGroups, Component }: RenderedNodeC
     }
   }
 
-  const hasUnsetScopedBindings = scopeId && !hasSetInitialBindingsRef.current;
+  const hasUnsetScopedBindings = scopeId && !hasSetInitialBindings;
 
   return (
     <NodeRuntimeWrapper

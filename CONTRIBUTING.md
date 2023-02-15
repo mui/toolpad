@@ -23,13 +23,6 @@ If you would like to hack on MUI Toolpad or want to run the latest version, you 
    yarn dev13
    ```
 
-1. Run
-
-   ```sh
-   cd packages/toolpad
-   npm link
-   ```
-
 1. In another folder, start a toolpad project using:
 
    ```json
@@ -43,12 +36,21 @@ If you would like to hack on MUI Toolpad or want to run the latest version, you 
        "start": "toolpad start --dev"
      },
      "dependencies": {
-       "@mui/toolpad-core": "file:/path/to/toolpad/monorepo/toolpad/packages/toolpad-core"
+       "@mui/toolpad": "portal:<your-local-toolpad-monorepo>/packages/toolpad"
+     },
+     "resolutions": {
+       "@mui/toolpad-app": "portal:<your-local-toolpad-monorepo>/packages/toolpad-app",
+       "@mui/toolpad-core": "portal:<your-local-toolpad-monorepo>/packages/toolpad-core",
+       "@mui/toolpad-components": "portal:<your-local-toolpad-monorepo>/packages/toolpad-components"
      }
    }
    ```
 
-   replace `/path/to/toolpad/monorepo` with the path to the monorepo on your file system, then run `yarn install --force`.
+   1. Replace `<your-local-toolpad-monorepo>` with the path to the toolpad monorepo on your file system
+
+   1. In order to use `portal:` dependencies, we will need to use yarn 2. So start by running `yarn set version berry`.
+
+   1. then run `yarn install`.
 
 1. Run `yarn dev`.
 

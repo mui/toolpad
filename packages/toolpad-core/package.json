@@ -89,11 +89,11 @@
     "@tanstack/react-query": "^4.24.4",
     "mitt": "^3.0.0",
     "quickjs-emscripten": "^0.21.1",
-    "react-error-boundary": "^3.1.4"
+    "react-error-boundary": "^3.1.4",
+    "react": "^18.2.0"
   },
   "devDependencies": {
-    "concurrently": "^7.6.0",
-    "react": "^18.2.0"
+    "concurrently": "^7.6.0"
   },
   "peerDependencies": {
     "react": "^18.0.0"

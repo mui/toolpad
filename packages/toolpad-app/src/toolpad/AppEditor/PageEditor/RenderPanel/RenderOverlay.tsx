@@ -413,12 +413,15 @@ export default function RenderOverlay({ bridge }: RenderOverlayProps) {
 
           return normalizePageRowColumnSizes(draft);
         },
-        {
-          selectedNodeId: null,
-        },
+        currentView.kind === 'page'
+          ? {
+              ...currentView,
+              selectedNodeId: null,
+            }
+          : currentView,
       );
     },
-    [dom, domApi, normalizePageRowColumnSizes],
+    [currentView, dom, domApi, normalizePageRowColumnSizes],
   );
 
   const selectedRect = selectedNode && !newNode ? nodesInfo[selectedNode.id]?.rect : null;
@@ -1210,7 +1213,9 @@ export default function RenderOverlay({ bridge }: RenderOverlayProps) {
 
           return normalizePageRowColumnSizes(draft);
         },
-        { selectedNodeId: newNode?.id || draggedNodeId },
+        currentView.kind === 'page'
+          ? { ...currentView, selectedNodeId: newNode?.id || draggedNodeId }
+          : currentView,
       );
 
       api.dragEnd();
@@ -1225,7 +1230,8 @@ export default function RenderOverlay({ bridge }: RenderOverlayProps) {
     [
       api,
       availableDropZones,
-      bridge,
+      bridge?.canvasCommands,
+      currentView,
       dom,
       domApi,
       dragOverNodeId,

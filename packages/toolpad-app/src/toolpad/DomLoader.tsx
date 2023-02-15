@@ -43,7 +43,6 @@ export type DomAction =
   | {
       type: 'DOM_UPDATE';
       updater: (dom: appDom.AppDom) => appDom.AppDom;
-      selectedNodeId?: NodeId | null;
       view?: DomView;
     }
   | {
@@ -52,7 +51,7 @@ export type DomAction =
     }
   | {
       type: 'DOM_SET_VIEW';
-      view: Partial<DomView> & Omit<DomView, 'selectedNodeId'>;
+      view: DomView;
     }
   | {
       type: 'DOM_SET_TAB';
@@ -193,16 +192,6 @@ export function domLoaderReducer(state: DomLoader, action: DomAction): DomLoader
       }
       return state;
     }
-    case 'DOM_UPDATE': {
-      const { selectedNodeId, view } = action;
-
-      return update(state, {
-        ...(typeof selectedNodeId !== 'undefined'
-          ? { selectedNodeId, currentTab: 'component' }
-          : {}),
-        ...(view ? { currentView: view } : {}),
-      });
-    }
     case 'DOM_SERVER_UPDATE': {
       if (state.unsavedChanges > 0) {
         // Ignore this server update
@@ -211,7 +200,12 @@ export function domLoaderReducer(state: DomLoader, action: DomAction): DomLoader
 
       return update(state, { dom: action.dom });
     }
-    case 'DOM_SET_VIEW': {
+    case 'DOM_SET_VIEW':
+    case 'DOM_UPDATE': {
+      if (!action.view) {
+        return state;
+      }
+
       let newView = action.view;
       if (action.view.kind === 'page' && typeof action.view.selectedNodeId === 'undefined') {
         newView = {
@@ -223,6 +217,10 @@ export function domLoaderReducer(state: DomLoader, action: DomAction): DomLoader
 
       return update(state, {
         currentView: newView as DomView,
+        currentTab:
+          action.view.kind === 'page' && action.view.selectedNodeId
+            ? 'component'
+            : state.currentTab,
       });
     }
     case 'DOM_SET_TAB': {
@@ -257,20 +255,14 @@ function createDomApi(
         },
       });
     },
-    update(
-      updater: (dom: appDom.AppDom) => appDom.AppDom,
-      extraUpdates: {
-        view?: DomView;
-        selectedNodeId?: NodeId | null;
-      } = {},
-    ) {
+    update(updater: (dom: appDom.AppDom) => appDom.AppDom, view?: DomView) {
       dispatch({
         type: 'DOM_UPDATE',
         updater,
-        ...extraUpdates,
+        view,
       });
     },
-    setView(view: Partial<DomView> & Omit<DomView, 'selectedNodeId'>) {
+    setView(view: DomView) {
       dispatch({
         type: 'DOM_SET_VIEW',
         view,

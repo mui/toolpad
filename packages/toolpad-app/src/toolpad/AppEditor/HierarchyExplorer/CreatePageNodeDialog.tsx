@@ -68,10 +68,9 @@ export default function CreatePageDialog({
           const appNode = appDom.getApp(dom);
 
           domApi.update((draft) => appDom.addNode(draft, newNode, appNode, 'pages'), {
-            view: {
-              kind: 'page',
-              nodeId: newNode.id,
-            },
+            kind: 'page',
+            nodeId: newNode.id,
+            selectedNodeId: null,
           });
 
           onClose();

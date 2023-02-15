@@ -8,7 +8,7 @@ export type PageView =
   | { kind: 'pageParameters' };
 
 export type DomView =
-  | { kind: 'page'; nodeId?: NodeId; view?: PageView; selectedNodeId: NodeId | null }
+  | { kind: 'page'; nodeId?: NodeId; view?: PageView; selectedNodeId?: NodeId | null }
   | { kind: 'connection'; nodeId: NodeId }
   | { kind: 'codeComponent'; nodeId: NodeId };
 

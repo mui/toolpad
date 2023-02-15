@@ -2,7 +2,6 @@ import { NextApiHandler } from 'next';
 import invariant from 'invariant';
 import { asArray } from '../../../../src/utils/collections';
 import serverDataSources from '../../../../src/toolpadDataSources/server';
-import { getConnectionParams, setConnectionParams } from '../../../../src/server/data';
 import { withReqResLogs } from '../../../../src/server/logs/withLogs';
 
 const handlerMap = new Map<String, Function | null | undefined>();
@@ -27,8 +26,8 @@ const apiHandler = (async (req, res) => {
     if (typeof handler === 'function') {
       return handler(
         {
-          getConnectionParams,
-          setConnectionParams,
+          getConnectionParams: async () => null,
+          setConnectionParams: async () => null,
         },
         req,
         res,

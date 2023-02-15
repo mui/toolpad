@@ -34,7 +34,7 @@ export interface HandleDataRequestParams {
 export default async (
   req: NextApiRequest,
   res: NextApiResponse<ExecFetchResult<any>>,
-  { appId, version }: HandleDataRequestParams,
+  { appId }: HandleDataRequestParams,
 ) => {
   if (req.method !== 'POST') {
     // This endpoint is used both by queries and mutations
@@ -45,7 +45,7 @@ export default async (
   await cors(req, res);
   const queryNodeId = req.query.queryId as NodeId;
 
-  const dom = await loadDom(appId, version);
+  const dom = await loadDom();
   const dataNode = appDom.getMaybeNode(dom, queryNodeId);
 
   if (!dataNode) {

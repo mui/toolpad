@@ -369,7 +369,7 @@ const UNDOABLE_ACTIONS = new Set<DomActionType>([
 ]);
 
 export default function DomProvider({ appId, children }: DomContextProps) {
-  const { data: dom } = client.useQuery('loadDom', [appId], { suspense: true });
+  const { data: dom } = client.useQuery('loadDom', [], { suspense: true });
 
   invariant(dom, `Suspense should load the dom`);
 
@@ -490,7 +490,7 @@ export default function DomProvider({ appId, children }: DomContextProps) {
           // eslint-disable-next-line no-await-in-loop
           const newFingerPrint = await client.query.getDomFingerprint();
           if (currentFingerprint && currentFingerprint !== newFingerPrint) {
-            client.invalidateQueries('loadDom', [appId]);
+            client.invalidateQueries('loadDom', []);
           }
           fingerprint.current = newFingerPrint;
           // eslint-disable-next-line no-await-in-loop

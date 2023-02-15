@@ -9,6 +9,7 @@ import getPageViewState from './getPageViewState';
 import { rectContainsPoint } from '../utils/geometry';
 import { CanvasHooks, CanvasHooksContext } from '../runtime/CanvasHooksContext';
 import { bridge, setCommandHandler } from './ToolpadBridge';
+import { BridgeContext } from './BridgeContext';
 
 export interface AppCanvasState extends RuntimeState {
   savedNodes: NodeHashes;
@@ -129,17 +130,19 @@ export default function AppCanvas({ catalog, basename, initialState = null }: Ap
   }, [savedNodes]);
 
   return state ? (
-    <CanvasHooksContext.Provider value={editorHooks}>
-      <CanvasEventsContext.Provider value={bridge.canvasEvents}>
-        <ToolpadApp
-          rootRef={onAppRoot}
-          catalog={catalog}
-          hidePreviewBanner
-          version="preview"
-          basename={basename}
-          state={state}
-        />
-      </CanvasEventsContext.Provider>
-    </CanvasHooksContext.Provider>
+    <BridgeContext.Provider value={bridge}>
+      <CanvasHooksContext.Provider value={editorHooks}>
+        <CanvasEventsContext.Provider value={bridge.canvasEvents}>
+          <ToolpadApp
+            rootRef={onAppRoot}
+            catalog={catalog}
+            hidePreviewBanner
+            version="preview"
+            basename={basename}
+            state={state}
+          />
+        </CanvasEventsContext.Provider>
+      </CanvasHooksContext.Provider>
+    </BridgeContext.Provider>
   ) : null;
 }

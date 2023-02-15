@@ -195,8 +195,6 @@ interface RenderedNodeContentProps {
 function RenderedNodeContent({ node, childNodeGroups, Component }: RenderedNodeContentProps) {
   const setControlledBinding = useSetControlledBindingContext();
 
-  const dom = useDomContext();
-
   const nodeId = node.id;
 
   const componentConfig = Component[TOOLPAD_COMPONENT];
@@ -278,8 +276,6 @@ function RenderedNodeContent({ node, childNodeGroups, Component }: RenderedNodeC
 
           const value = argType.onChangeHandler ? argType.onChangeHandler(param) : param;
           setControlledBinding(bindingId, { value });
-
-          console.log(node.name, value);
         };
         return [argType.onChangeProp, handler];
       }),

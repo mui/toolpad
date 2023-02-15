@@ -5,7 +5,6 @@ import type { EditorProps } from '../../types';
 function StringPropEditor({ label, value, onChange, disabled }: EditorProps<string>) {
   const handleChange = React.useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
-      debugger;
       onChange(event.target.value || undefined);
     },
     [onChange],

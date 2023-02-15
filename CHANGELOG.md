@@ -1,5 +1,17 @@
 # Changelog
 
+## 0.0.40
+
+<!-- generated comparing v0.0.39..master -->
+
+_Feb 15, 2023_
+
+A big thanks to the 1 contributors who made this release possible. Here are some highlights ✨:
+
+- &#8203;<!-- 1 -->Fix HMR issues with the canvas bridge (#1640) @Janpot
+
+All contributors of this release in alphabetical order: @Janpot
+
 ## 0.0.39
 
 <!-- generated comparing v0.0.39-alpha.0..master -->

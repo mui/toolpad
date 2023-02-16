@@ -21,17 +21,33 @@ interface TextProps extends Omit<BaseProps, 'children'> {
   loading?: boolean;
 }
 
-const MarkdownContainer = styled('div')({
+const gutters = (marginTop: number, marginBottom: number) => ({
+  marginTop,
+  marginBottom,
+  '&:first-child': {
+    marginTop: 0,
+  },
+  '&:last-child': {
+    marginBottom: 0,
+  },
+});
+
+const MarkdownContainer = styled('div')(({ theme }) => ({
   display: 'block',
   maxWidth: 'fill-available',
-  '&  p': {
-    margin: '0',
-  },
+
   '&:empty::before, & > span:empty::before': {
     content: '""',
     display: 'inline-block',
   },
-});
+  '& h1': { ...theme.typography.h1, ...gutters(16, 16) },
+  '& h2': { ...theme.typography.h2, ...gutters(12, 12) },
+  '& h3': { ...theme.typography.h3, ...gutters(12, 12) },
+  '& h4': { ...theme.typography.h4, ...gutters(12, 12) },
+  '& h5': { ...theme.typography.h5, ...gutters(4, 4) },
+  '& h6': { ...theme.typography.h6, ...gutters(4, 4) },
+  '& p': { margin: 0, marginBottom: 6 },
+}));
 
 const CodeContainer = styled('pre')(({ theme }) => ({
   backgroundColor: theme.palette.grey[200],

@@ -48,7 +48,8 @@ export default createComponent(Form, {
       control: { type: 'layoutSlot' },
     },
     value: {
-      typeDef: { type: 'object' },
+      visible: false,
+      typeDef: { type: 'object', default: {} },
       onChangeProp: 'onChange',
       // TODO: why - Type 'string' is not assignable to type 'FormValuesType'.
       defaultValueProp: 'defaultValue',

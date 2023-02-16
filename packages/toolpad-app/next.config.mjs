@@ -9,9 +9,6 @@ const USE_EXPERIMENTAL_TRANSPILE_PACKAGES = false;
 
 const withBundleAnalyzer = createBundleAnalyzer({ enabled: !!process.env.ANALYZE });
 
-// TODO: remove when https://github.com/getsentry/sentry-javascript/issues/3852 gets resolved
-process.env.SENTRY_IGNORE_API_RESOLUTION_ERROR = 'true';
-
 const require = createRequire(import.meta.url);
 const pkgJson = require('./package.json');
 
@@ -104,9 +101,6 @@ export default withBundleAnalyzer({
   /**
    * @param {import('webpack').Configuration} config
    */
-  // @ts-ignore
-  // Ignoring type mismatch because types from Sentry are incompatible
-  // https://github.com/getsentry/sentry-javascript/issues/4560
   webpack: (config, options) => {
     config.resolve ??= {};
     config.resolve.fallback = {
@@ -161,10 +155,6 @@ export default withBundleAnalyzer({
     }
 
     return config;
-  },
-  sentry: {
-    autoInstrumentServerFunctions: true,
-    hideSourceMaps: false,
   },
   async redirects() {
     return [

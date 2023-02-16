@@ -253,12 +253,10 @@ export default function HierarchyExplorer({ appId, className }: HierarchyExplore
 
   const handlePageSettingsNode = React.useCallback(
     (nodeId: NodeId) => {
-      if (nodeId) {
-        const node = appDom.getNode(dom, nodeId);
-        if (appDom.isPage(node)) {
-          domApi.setView({ kind: 'page', nodeId: node.id });
-          domApi.deselectNode();
-        }
+      const node = appDom.getNode(dom, nodeId);
+
+      if (appDom.isPage(node)) {
+        domApi.update(dom => dom, { view: { kind: 'page', nodeId: node.id }, selectedNodeId: null });
       }
     },
     [dom, domApi],

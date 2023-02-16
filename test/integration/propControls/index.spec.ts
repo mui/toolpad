@@ -87,3 +87,34 @@ test('changing defaultValue resets controlled value', async ({ page, api }) => {
   await expect(firstInput).toHaveValue('New');
   await expect(secondInput).toHaveValue('New');
 });
+
+test('can not change controlled component prop values', async ({ page, api }) => {
+  const dom = await readJsonFile(path.resolve(__dirname, './domInput.json'));
+
+  const app = await api.mutation.createApp(`App ${generateId()}`, {
+    from: { kind: 'dom', dom },
+  });
+
+  const editorModel = new ToolpadEditor(page);
+
+  await editorModel.goto(app.id);
+
+  await editorModel.waitForOverlay();
+
+  const input = editorModel.appCanvas.locator('input').first();
+
+  await expect(input).toBeVisible();
+
+  const targetBoundingBox = await input.boundingBox();
+
+  expect(targetBoundingBox).toBeDefined();
+
+  await page.mouse.click(
+    targetBoundingBox!.x + targetBoundingBox!.width / 2,
+    targetBoundingBox!.y + targetBoundingBox!.height / 2,
+  );
+
+  const valueControl = editorModel.componentEditor.getByLabel('value', { exact: true });
+
+  await expect(valueControl).toBeDisabled();
+});

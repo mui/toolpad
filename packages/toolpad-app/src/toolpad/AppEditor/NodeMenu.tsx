@@ -88,14 +88,14 @@ export default function NodeMenu({
           menuProps.onClick?.(event);
         }}
       >
-        {onSettingsNode && (
+        {onSettingsNode ? (
           <MenuItem onClick={handleSettingsClick}>
             <ListItemIcon>
               <SettingsIcon />
             </ListItemIcon>
             <ListItemText>{settingsLabelText}</ListItemText>
           </MenuItem>
-        )}
+        ) : null}
         <MenuItem onClick={handleDuplicateClick}>
           <ListItemIcon>
             <ContentCopyIcon />

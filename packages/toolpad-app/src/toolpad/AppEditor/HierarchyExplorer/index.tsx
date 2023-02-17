@@ -256,7 +256,10 @@ export default function HierarchyExplorer({ appId, className }: HierarchyExplore
       const node = appDom.getNode(dom, nodeId);
 
       if (appDom.isPage(node)) {
-        domApi.update(dom => dom, { view: { kind: 'page', nodeId: node.id }, selectedNodeId: null });
+        domApi.update((dom) => dom, {
+          view: { kind: 'page', nodeId: node.id },
+          selectedNodeId: null,
+        });
       }
     },
     [dom, domApi],

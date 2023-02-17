@@ -5,24 +5,22 @@ import { execa } from 'execa';
 import { createRequire } from 'module';
 
 interface RunCommandArgs {
-  // Toolpad port
-  port?: number;
   // Whether Toolpad editor is running in dev mode (for debugging purposes only)
   devMode?: boolean;
 }
 
-async function runApp(cmd: 'dev' | 'start', { devMode = false, port = 3000 }: RunCommandArgs) {
-  const NEXT_CMD = devMode ? 'local:dev' : 'local:start';
-
+async function runApp(cmd: 'dev' | 'start', { devMode = false }: RunCommandArgs) {
   const toolpadDir = path.dirname(
     createRequire(import.meta.url).resolve('@mui/toolpad-app/package.json'),
   );
 
-  const cp = execa('yarn', [NEXT_CMD, '--', '--port', String(port)], {
+  const cp = execa('yarn', ['cli'], {
     cwd: toolpadDir,
     preferLocal: true,
     stdio: 'pipe',
     env: {
+      NODE_ENV: devMode ? 'development' : 'production',
+      TOOLPAD_LOCAL_MODE: '1',
       TOOLPAD_PROJECT_DIR: process.cwd(),
       TOOLPAD_CMD: cmd,
       FORCE_COLOR: '1',
@@ -62,9 +60,6 @@ export default async function cli(argv: string[]) {
       // Types
       '--help': Boolean,
       '--dev': Boolean,
-      '--port': Number,
-      // Aliases
-      '-p': '--port',
     },
     {
       argv,
@@ -75,7 +70,6 @@ export default async function cli(argv: string[]) {
 
   const runArgs = {
     devMode: args['--dev'],
-    port: args['--port'],
   };
 
   switch (command) {

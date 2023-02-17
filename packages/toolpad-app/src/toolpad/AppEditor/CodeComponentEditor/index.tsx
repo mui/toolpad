@@ -12,6 +12,7 @@ import {
   TOOLPAD_COMPONENT,
   ArgTypeDefinitions,
   ArgTypeDefinition,
+  getArgTypeDefaultValue,
 } from '@mui/toolpad-core';
 import { useQuery } from '@tanstack/react-query';
 import invariant from 'invariant';
@@ -36,7 +37,6 @@ import { useNodeNameValidation } from '../HierarchyExplorer/validation';
 import useUndoRedo from '../../hooks/useUndoRedo';
 import config from '../../../config';
 import client from '../../../api';
-import { getArgTypeDefaultValue } from '../../../runtime';
 
 const TypescriptEditor = lazyComponent(() => import('../../../components/TypescriptEditor'), {
   noSsr: true,
@@ -224,7 +224,6 @@ function CodeComponentEditorContent({ codeComponentNode }: CodeComponentEditorCo
     );
     setInput(prettyfied);
     domApi.saveNode(prettyfied);
-  }, [domApi, input, isSaveAllowed]);
 
   React.useEffect(() => {
     appStateApi.setHasUnsavedChanges(!allChangesAreCommitted);

@@ -59,7 +59,7 @@ function PageModuleEditorDialog({ pageNodeId, open, onClose }: PageModuleEditorD
   const handleSaveButton = React.useCallback(() => {
     handleSave();
     onClose();
-  }, [handleSave, onClose]);
+  }, [onClose, handleSave]);
 
   useShortcut({ key: 's', metaKey: true, disabled: !open }, handleSave);
 

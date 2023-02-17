@@ -35,9 +35,6 @@ const gutters = (marginTop: number, marginBottom: number) => ({
 const MarkdownContainer = styled('div')(({ theme }) => ({
   display: 'block',
   maxWidth: '100%',
-  '&  p': {
-    margin: '0',
-  },
   '&:empty::before, & > span:empty::before': {
     content: '""',
     display: 'inline-block',

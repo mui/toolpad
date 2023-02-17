@@ -23,7 +23,7 @@ interface TextProps extends Omit<BaseProps, 'children'> {
 
 const MarkdownContainer = styled('div')({
   display: 'block',
-  maxWidth: 'fill-available',
+  maxWidth: '100%',
   '&  p': {
     margin: '0',
   },

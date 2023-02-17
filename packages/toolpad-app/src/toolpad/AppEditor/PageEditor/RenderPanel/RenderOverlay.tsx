@@ -41,7 +41,7 @@ import NodeHud from './NodeHud';
 import { OverlayGrid, OverlayGridHandle } from './OverlayGrid';
 import { NodeInfo } from '../../../../types';
 import NodeDropArea from './NodeDropArea';
-import { ToolpadBridge } from '../../../../canvas/ToolpadBridge';
+import type { ToolpadBridge } from '../../../../canvas/ToolpadBridge';
 
 const VERTICAL_RESIZE_SNAP_UNITS = 2; // px
 
@@ -195,6 +195,7 @@ function deleteOrphanedLayoutNodes(
           parentParent.parentIndex &&
           parentParentParent &&
           appDom.isElement(parentParentParent) &&
+          isPageLayoutComponent(parentParentParent) &&
           isParentOnlyLayoutContainerChild &&
           moveTargetNodeId !== parentParent.id &&
           moveTargetNodeId !== lastContainerChild.id
@@ -824,7 +825,12 @@ export default function RenderOverlay({ bridge }: RenderOverlayProps) {
         const edgeDetectionMargin = 10; // px
 
         // Detect center in layout containers
-        if (isDraggingOverElement && activeDropNodeInfo && activeDropSlot) {
+        if (
+          isDraggingOverElement &&
+          !isDraggingOverEmptyContainer &&
+          activeDropNodeInfo &&
+          activeDropSlot
+        ) {
           const isDraggingOverPageChild = activeDropNodeParent
             ? appDom.isPage(activeDropNodeParent)
             : false;
@@ -890,7 +896,9 @@ export default function RenderOverlay({ bridge }: RenderOverlayProps) {
 
         api.nodeDragOver({
           nodeId: hasDragOverParentRowOverride ? activeDropNodeParent.id : activeDropNodeId,
-          parentProp: activeDropSlotParentProp,
+          parentProp: activeDropSlotParentProp as appDom.ParentProp<
+            appDom.ElementNode | appDom.PageNode
+          >,
           zone: activeDropZone as DropZone,
         });
       }
@@ -978,20 +986,32 @@ export default function RenderOverlay({ bridge }: RenderOverlayProps) {
           }
 
           // Drop on page or layout slot
-          if (isDraggingOverPage || isDraggingOverLayoutSlot) {
+          if ((isDraggingOverPage || isDraggingOverLayoutSlot) && dragOverSlotParentProp) {
             const newParentIndex =
               dragOverZone === DROP_ZONE_TOP
-                ? appDom.getNewFirstParentIndexInNode(draft, dragOverNode, 'children')
-                : appDom.getNewLastParentIndexInNode(draft, dragOverNode, 'children');
+                ? appDom.getNewFirstParentIndexInNode(draft, dragOverNode, dragOverSlotParentProp)
+                : appDom.getNewLastParentIndexInNode(draft, dragOverNode, dragOverSlotParentProp);
 
             if (!isPageRow(draggedNode)) {
               const rowContainer = appDom.createElement(draft, PAGE_ROW_COMPONENT_ID, {});
-              draft = appDom.addNode(draft, rowContainer, dragOverNode, 'children', newParentIndex);
+              draft = appDom.addNode(
+                draft,
+                rowContainer,
+                dragOverNode,
+                dragOverSlotParentProp,
+                newParentIndex,
+              );
               parent = rowContainer;
 
               draft = addOrMoveNode(draft, draggedNode, rowContainer, 'children');
             } else {
-              draft = addOrMoveNode(draft, draggedNode, dragOverNode, 'children', newParentIndex);
+              draft = addOrMoveNode(
+                draft,
+                draggedNode,
+                dragOverNode,
+                dragOverSlotParentProp,
+                newParentIndex,
+              );
             }
           }
 

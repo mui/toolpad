@@ -34,6 +34,7 @@ interface QueryEditorDialogActionsProps {
   saveDisabled?: boolean;
   onSave?: () => void;
   onRemove?: () => void;
+  isDraft?: boolean;
   onClose?: () => void;
 }
 
@@ -42,6 +43,7 @@ function QueryEditorDialogActions({
   onSave,
   onRemove,
   onClose,
+  isDraft,
 }: QueryEditorDialogActionsProps) {
   const {
     value: removeConfirmOpen,
@@ -64,7 +66,9 @@ function QueryEditorDialogActions({
       <Button color="inherit" variant="text" onClick={onClose}>
         Cancel
       </Button>
-      <Button onClick={handleRemoveConfirmOpen}>Remove</Button>
+      <Button onClick={handleRemoveConfirmOpen} disabled={isDraft}>
+        Remove
+      </Button>
       <ConfirmDialog open={removeConfirmOpen} onClose={handleRemoveConfirm} severity="error">
         Are you sure your want to remove this query?
       </ConfirmDialog>
@@ -354,6 +358,7 @@ export default function QueryNodeEditorDialog<Q>({
             onSave={handleSave}
             onClose={handleClose}
             onRemove={handleRemove}
+            isDraft={isDraft}
             saveDisabled={isInputSaved || !isNameValid}
           />
         </ConnectionContextProvider>

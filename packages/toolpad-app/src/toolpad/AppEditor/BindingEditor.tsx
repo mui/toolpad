@@ -28,8 +28,8 @@ import {
   NavigationAction,
   NodeId,
   JsExpressionAction,
-  GlobalScopeMeta,
-  GlobalScopeMetaField,
+  ScopeMeta,
+  ScopeMetaField,
   JsRuntime,
 } from '@mui/toolpad-core';
 import { createProvidedContext } from '@mui/toolpad-core/utils/react';
@@ -51,7 +51,7 @@ import TabPanel from '../../components/TabPanel';
 interface BindingEditorContext {
   label: string;
   globalScope: Record<string, unknown>;
-  globalScopeMeta: GlobalScopeMeta;
+  globalScopeMeta: ScopeMeta;
   /**
    * Serverside binding, use the QuickJs runtime to evaluate bindings
    */
@@ -74,7 +74,7 @@ const ErrorTooltip = styled(({ className, ...props }: TooltipProps) => (
 
 interface JsExpressionBindingEditorProps extends WithControlledProp<JsExpressionAttrValue | null> {
   globalScope: Record<string, unknown>;
-  globalScopeMeta: GlobalScopeMeta;
+  globalScopeMeta: ScopeMeta;
 }
 
 function JsExpressionBindingEditor({
@@ -375,7 +375,7 @@ export function BindingEditorDialog<V>({
 export interface BindingEditorProps<V> extends WithControlledProp<BindableAttrValue<V> | null> {
   label: string;
   globalScope: Record<string, unknown>;
-  globalScopeMeta?: GlobalScopeMeta;
+  globalScopeMeta?: ScopeMeta;
   /**
    * Uses the QuickJs runtime to evaluate bindings, just like on the server
    */
@@ -432,10 +432,10 @@ export function BindingEditor<V>({
   );
 
   const resolvedMeta = React.useMemo(() => {
-    const meta: GlobalScopeMeta = { ...globalScopeMeta };
+    const meta: ScopeMeta = { ...globalScopeMeta };
     if (propType?.type === 'event' && propType.arguments) {
       for (const { name, tsType } of propType.arguments) {
-        const metaField: GlobalScopeMetaField = meta[name] ?? {};
+        const metaField: ScopeMetaField = meta[name] ?? {};
         metaField.kind = 'local';
         metaField.tsType = tsType;
         meta[name] = metaField;

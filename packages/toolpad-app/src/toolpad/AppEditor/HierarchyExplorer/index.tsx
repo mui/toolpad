@@ -260,13 +260,13 @@ export default function HierarchyExplorer({ appId, className }: HierarchyExplore
       const node = appDom.getNode(dom, nodeId);
 
       if (appDom.isPage(node)) {
-        domApi.update((draft) => draft, {
+        appStateApi.update((draft) => draft, {
           view: { kind: 'page', nodeId: node.id },
           selectedNodeId: null,
         });
       }
     },
-    [dom, domApi],
+    [appStateApi, dom],
   );
 
   const hasConnectionsView = !config.localMode && !config.isDemo;

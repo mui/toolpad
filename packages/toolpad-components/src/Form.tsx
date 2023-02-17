@@ -52,6 +52,7 @@ export default createComponent(Form, {
       typeDef: { type: 'object', default: {} },
       onChangeProp: 'onChange',
       // TODO: why - Type 'string' is not assignable to type 'FormValuesType'.
+      // @ts-ignore
       defaultValueProp: 'defaultValue',
     },
     defaultValue: {

@@ -5,7 +5,7 @@ import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import SettingsIcon from '@mui/icons-material/Settings';
 import { NodeId } from '@mui/toolpad-core';
 import * as appDom from '../../appDom';
-import { useDom } from '../DomLoader';
+import { useDom } from '../AppState';
 import useLatest from '../../utils/useLatest';
 import { ConfirmDialog } from '../../components/SystemDialogs';
 import useMenu from '../../utils/useMenu';

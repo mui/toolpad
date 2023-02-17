@@ -42,7 +42,7 @@ import useLatest from '../../utils/useLatest';
 import useDebounced from '../../utils/useDebounced';
 import { useEvaluateLiveBinding } from './useEvaluateLiveBinding';
 import useShortcut from '../../utils/useShortcut';
-import { useDom } from '../DomLoader';
+import { useDom } from '../AppState';
 import * as appDom from '../../appDom';
 import { usePageEditorState } from './PageEditor/PageEditorProvider';
 import GlobalScopeExplorer from './GlobalScopeExplorer';
@@ -330,19 +330,19 @@ export function BindingEditorDialog<V>({
     onChange(newValue);
   }, [onChange, input]);
 
+  const hasUnsavedChanges = input ? input !== committedInput.current : false;
+
   const handleCommit = React.useCallback(() => {
     handleSave();
     onClose();
-  }, [handleSave, onClose]);
+  }, [onClose, handleSave]);
 
   const handleRemove = React.useCallback(() => {
     onChange(null);
     onClose();
-  }, [onChange, onClose]);
+  }, [onClose, onChange]);
 
   useShortcut({ key: 's', metaKey: true, disabled: !open }, handleSave);
-
-  const hasUnsavedChanges = input && input !== committedInput.current;
 
   return (
     <Dialog onClose={onClose} open={open} fullWidth scroll="body" maxWidth="lg">

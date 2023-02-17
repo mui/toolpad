@@ -11,7 +11,7 @@ import { Alert, Box } from '@mui/material';
 import { useBrowserJsRuntime } from '@mui/toolpad-core/jsBrowserRuntime';
 import { mapValues } from '../../../utils/collections';
 import * as appDom from '../../../appDom';
-import { useDom, useDomApi } from '../../DomLoader';
+import { useDom, useDomApi } from '../../AppState';
 import BindableEditor from './BindableEditor';
 import { usePageEditorState } from './PageEditorProvider';
 import { getDefaultControl } from '../../propertyControls';

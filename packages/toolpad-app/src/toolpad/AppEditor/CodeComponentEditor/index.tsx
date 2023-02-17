@@ -224,9 +224,7 @@ function CodeComponentEditorContent({ codeComponentNode }: CodeComponentEditorCo
     );
     setInput(prettyfied);
     domApi.saveNode(prettyfied);
-
-    appStateApi.setHasUnsavedChanges(false);
-  }, [appStateApi, domApi, input, isSaveAllowed]);
+  }, [domApi, input, isSaveAllowed]);
 
   React.useEffect(() => {
     appStateApi.setHasUnsavedChanges(!allChangesAreCommitted);

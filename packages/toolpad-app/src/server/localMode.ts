@@ -342,8 +342,24 @@ export interface ToolpadProjectFiles {
   files: ToolpadFile[];
 }
 
+function getToolpadFolder(root: string): string {
+  return path.resolve(root, './toolpad');
+}
+
+function getComponentsFolder(root: string): string {
+  return path.resolve(getToolpadFolder(root), './components');
+}
+
+function getQueriesFile(root: string): string {
+  return path.resolve(getToolpadFolder(root), './queries.ts');
+}
+
+function getDomFile(root: string): string {
+  return path.resolve(getToolpadFolder(root), './toolpad.yml');
+}
+
 async function readDomFile(root: string): Promise<DomFile | null> {
-  const filepath = path.resolve(root, './toolpad.yaml');
+  const filepath = getDomFile(root);
   try {
     const configContent = await fs.readFile(filepath, { encoding: 'utf-8' });
     const parsedConfig = yaml.parse(configContent);
@@ -364,7 +380,7 @@ async function readDomFile(root: string): Promise<DomFile | null> {
 }
 
 async function readQueriesFile(root: string): Promise<QueriesFile | null> {
-  const filepath = path.resolve(root, 'toolpad/queries.ts');
+  const filepath = getQueriesFile(root);
   try {
     const content = await fs.readFile(filepath, { encoding: 'utf-8' });
     return {
@@ -383,8 +399,34 @@ async function readQueriesFile(root: string): Promise<QueriesFile | null> {
   }
 }
 
-export async function readProjectFiles(root: string): Promise<ToolpadFile[]> {
-  const toolpadFolder = path.resolve(root, 'toolpad');
+async function readComponentsFolder(root: string) {
+  const componentsFolder = getComponentsFolder(root);
+  const entries = await fs.readdir(componentsFolder, { withFileTypes: true });
+  const filePromises: Promise<ComponentFile | null>[] = entries.map(async (entry) => {
+    if (entry.isFile()) {
+      const filepath = path.resolve(componentsFolder, entry.name);
+
+      const content = await fs.readFile(filepath, { encoding: 'utf-8' });
+
+      return {
+        name: entry.name.replace(/\.[^.]+$/, ''),
+        kind: 'component',
+        filepath,
+        hash: String(insecureHash(content)),
+        content,
+      } satisfies ToolpadFile;
+    }
+
+    return null;
+  });
+
+  const maybeFiles = await Promise.all(filePromises);
+
+  return maybeFiles.filter(Boolean);
+}
+
+async function readProjectFiles(root: string): Promise<ToolpadFile[]> {
+  const toolpadFolder = getToolpadFolder(root);
   const entries = await fs.readdir(toolpadFolder, { withFileTypes: true });
   const filePromises: Promise<ToolpadFile | null>[] = entries.map(async (entry) => {
     const match =
@@ -421,13 +463,14 @@ export async function readProjectFiles(root: string): Promise<ToolpadFile[]> {
 }
 
 export async function readToolpadProjectFiles(root: string): Promise<ToolpadProjectFiles> {
-  const [dom, queries, files] = await Promise.all([
+  const [dom, queries, files, components] = await Promise.all([
     readDomFile(root),
     readQueriesFile(root),
     readProjectFiles(root),
+    readComponentsFolder(root),
   ]);
 
-  return { dom, queries, files };
+  return { dom, queries, files: [...files, ...components] };
 }
 
 type ToolpadProjectEvents = {
@@ -457,15 +500,15 @@ export class ToolpadProject {
 
   watch() {
     if (!this.watcher) {
-      const toolpadFolder = path.resolve(this.root, './toolpad');
-
       const handleProjectFileChanged = debounce(async () => {
         this.files = readToolpadProjectFiles(this.root);
         await this.files;
         this.emitter.emit('change', {});
       }, 200);
 
-      this.watcher = chokidar.watch([toolpadFolder]).on('all', handleProjectFileChanged);
+      this.watcher = chokidar
+        .watch([getToolpadFolder(this.root), getDomFile(this.root)])
+        .on('all', handleProjectFileChanged);
     }
   }
 

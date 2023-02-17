@@ -5,6 +5,9 @@ import invariant from 'invariant';
 import * as child_process from 'child_process';
 import { promisify } from 'util';
 import { Dirent } from 'fs';
+import * as chokidar from 'chokidar';
+import { debounce } from 'lodash';
+import mitt from 'mitt';
 import config from '../config';
 import * as appDom from '../appDom';
 import { errorFrom } from '../utils/errors';
@@ -287,4 +290,189 @@ export async function readProjectFolder(): Promise<ProjectFolderEntry[]> {
     }
     return [];
   });
+}
+
+export interface QueryFile {
+  name: string;
+  kind: 'query';
+  filepath: string;
+  hash: string;
+  content: string;
+}
+
+export interface QueriesFile {
+  name: string;
+  kind: 'queries';
+  filepath: string;
+  hash: string;
+  content: string;
+}
+
+export interface DomFile {
+  name: string;
+  kind: 'dom';
+  filepath: string;
+  hash: string;
+  content: appDom.AppDom;
+}
+
+export interface PageFile {
+  name: string;
+  kind: 'page';
+  filepath: string;
+  hash: string;
+  content: string;
+}
+
+export interface ComponentFile {
+  name: string;
+  kind: 'component';
+  filepath: string;
+  hash: string;
+  content: string;
+}
+
+export type ToolpadFile = QueryFile | QueriesFile | PageFile | ComponentFile;
+
+export interface ToolpadProjectFiles {
+  /** @depcrecated We will phase out a single dom file for multiple individual files in the toolpad folder */
+  dom: DomFile | null;
+  /** @depcrecated We will phase out a single queries file for multiple individual query files in the toolpad folder */
+  queries: QueriesFile | null;
+  files: ToolpadFile[];
+}
+
+async function readDomFile(root: string): Promise<DomFile | null> {
+  const filepath = path.resolve(root, './toolpad.yaml');
+  try {
+    const configContent = await fs.readFile(filepath, { encoding: 'utf-8' });
+    const parsedConfig = yaml.parse(configContent);
+    return {
+      name: 'dom',
+      kind: 'dom',
+      filepath,
+      hash: String(insecureHash(configContent)),
+      content: parsedConfig,
+    };
+  } catch (rawError) {
+    const error = errorFrom(rawError);
+    if (error.code === 'ENOENT') {
+      return null;
+    }
+    throw error;
+  }
+}
+
+async function readQueriesFile(root: string): Promise<QueriesFile | null> {
+  const filepath = path.resolve(root, 'toolpad/queries.ts');
+  try {
+    const content = await fs.readFile(filepath, { encoding: 'utf-8' });
+    return {
+      name: 'queries',
+      kind: 'queries',
+      filepath,
+      hash: String(insecureHash(content)),
+      content,
+    };
+  } catch (rawError) {
+    const error = errorFrom(rawError);
+    if (error.code === 'ENOENT') {
+      return null;
+    }
+    throw error;
+  }
+}
+
+export async function readProjectFiles(root: string): Promise<ToolpadFile[]> {
+  const toolpadFolder = path.resolve(root, 'toolpad');
+  const entries = await fs.readdir(toolpadFolder, { withFileTypes: true });
+  const filePromises: Promise<ToolpadFile | null>[] = entries.map(async (entry) => {
+    const match =
+      /^(?<name>.*)\.(?<kind>query|page|component)\.(?<extension>js|jsx|ts|tsx|yml)$/.exec(
+        entry.name,
+      );
+
+    const filepath = path.resolve(toolpadFolder, entry.name);
+    if (entry.isFile() && match?.groups) {
+      const { name, kind } = match.groups;
+
+      const content = await fs.readFile(filepath, { encoding: 'utf-8' });
+
+      invariant(
+        kind === 'query' || kind === 'page' || kind === 'component',
+        `Invalid file kind detected "${kind}"`,
+      );
+
+      return {
+        name,
+        kind,
+        filepath,
+        hash: String(insecureHash(content)),
+        content,
+      } satisfies ToolpadFile;
+    }
+
+    return null;
+  });
+
+  const maybeFiles = await Promise.all(filePromises);
+
+  return maybeFiles.filter(Boolean);
+}
+
+export async function readToolpadProjectFiles(root: string): Promise<ToolpadProjectFiles> {
+  const [dom, queries, files] = await Promise.all([
+    readDomFile(root),
+    readQueriesFile(root),
+    readProjectFiles(root),
+  ]);
+
+  return { dom, queries, files };
+}
+
+type ToolpadProjectEvents = {
+  change: {};
+};
+
+export class ToolpadProject {
+  private root: string;
+
+  private watcher: chokidar.FSWatcher | undefined;
+
+  private files: Promise<ToolpadProjectFiles> | undefined;
+
+  private emitter = mitt<ToolpadProjectEvents>();
+
+  constructor(root: string) {
+    this.root = root;
+  }
+
+  on(...args: Parameters<typeof this.emitter.on>) {
+    return this.emitter.on(...args);
+  }
+
+  off(...args: Parameters<typeof this.emitter.off>) {
+    return this.emitter.off(...args);
+  }
+
+  watch() {
+    if (!this.watcher) {
+      const toolpadFolder = path.resolve(this.root, './toolpad');
+
+      const handleProjectFileChanged = debounce(async () => {
+        this.files = readToolpadProjectFiles(this.root);
+        await this.files;
+        this.emitter.emit('change', {});
+      }, 200);
+
+      this.watcher = chokidar.watch([toolpadFolder]).on('all', handleProjectFileChanged);
+    }
+  }
+
+  async getFiles(): Promise<ToolpadProjectFiles> {
+    if (!this.files) {
+      this.files = readToolpadProjectFiles(this.root);
+    }
+    return this.files;
+  }
 }

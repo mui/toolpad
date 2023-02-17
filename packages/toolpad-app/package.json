@@ -64,6 +64,7 @@
     "abort-controller": "^3.0.0",
     "arg": "^5.0.2",
     "basic-auth": "^2.0.1",
+    "chokidar": "^3.5.3",
     "clsx": "^1.2.1",
     "concurrently": "^7.6.0",
     "cors": "^2.8.5",

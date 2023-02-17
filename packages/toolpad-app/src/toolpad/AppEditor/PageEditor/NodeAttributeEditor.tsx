@@ -3,7 +3,7 @@ import { ArgTypeDefinition, BindableAttrValue } from '@mui/toolpad-core';
 import { Alert, Box } from '@mui/material';
 import { useBrowserJsRuntime } from '@mui/toolpad-core/jsBrowserRuntime';
 import * as appDom from '../../../appDom';
-import { useDomApi, useDom } from '../../DomLoader';
+import { useDomApi } from '../../DomLoader';
 import BindableEditor from './BindableEditor';
 import { usePageEditorState } from './PageEditorProvider';
 import { getDefaultControl } from '../../propertyControls';
@@ -24,20 +24,15 @@ export default function NodeAttributeEditor<P extends object>({
   argType,
   props,
 }: NodeAttributeEditorProps<P>) {
-  const { dom } = useDom();
   const domApi = useDomApi();
 
   const handlePropChange = React.useCallback(
     (newValue: BindableAttrValue<unknown> | null) => {
-      const closestForm = appDom.getClosestForm(dom, node);
-
-      console.log('what is form', closestForm);
-
       domApi.update((draft) =>
         appDom.setNodeNamespacedProp(draft, node, namespace as any, name, newValue),
       );
     },
-    [node, namespace, name, domApi, dom],
+    [node, namespace, name, domApi],
   );
 
   const propValue: BindableAttrValue<unknown> | null = (node as any)[namespace]?.[name] ?? null;

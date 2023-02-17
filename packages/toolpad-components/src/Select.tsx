@@ -27,7 +27,7 @@ function Select({ options, value, onChange, defaultValue, fullWidth, sx, ...rest
 
       onChange(event.target.value);
     },
-    [onChange, setFormField],
+    [onChange, setFormField, rest.name],
   );
 
   const id = React.useId();

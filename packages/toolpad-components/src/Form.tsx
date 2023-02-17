@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Container as MUIContainer, ContainerProps, Button } from '@mui/material';
+import { Container as MUIContainer, ContainerProps } from '@mui/material';
 import { createComponent, FormValues, FormValuesType, SetFormField } from '@mui/toolpad-core';
 import { SX_PROP_HELPER_TEXT } from './constants';
 
@@ -11,7 +11,7 @@ interface Props extends ContainerProps {
 }
 
 function Form({ children, onSubmit = () => {}, onChange, submitLabel, sx, value, ...rest }: Props) {
-  const handleSubmit = (event) => {
+  const handleSubmit = (event: React.SyntheticEvent) => {
     event.preventDefault();
 
     onSubmit(value);

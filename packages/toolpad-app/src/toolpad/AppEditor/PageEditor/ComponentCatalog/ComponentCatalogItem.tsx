@@ -107,6 +107,7 @@ function ComponentCatalogItem({
         borderColor: 'divider',
         borderStyle: kind === 'create' ? 'dashed' : 'solid',
         color: 'text.secondary',
+        backgroundColor: 'paper',
         '&:hover': {
           backgroundColor: 'action.hover',
         },

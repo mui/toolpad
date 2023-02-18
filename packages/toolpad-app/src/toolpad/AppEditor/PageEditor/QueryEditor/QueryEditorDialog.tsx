@@ -21,7 +21,7 @@ import * as appDom from '../../../../appDom';
 import dataSources from '../../../../toolpadDataSources/client';
 import { omit, update } from '../../../../utils/immutability';
 import { useEvaluateLiveBinding } from '../../useEvaluateLiveBinding';
-import { useDom } from '../../../DomLoader';
+import { useDom } from '../../../AppState';
 import { ConnectionContextProvider } from '../../../../toolpadDataSources/context';
 import ConnectionSelect, { ConnectionOption } from '../ConnectionSelect';
 import BindableEditor from '../BindableEditor';
@@ -215,9 +215,11 @@ export default function QueryNodeEditorDialog<Q>({
   );
 
   const handleRemove = React.useCallback(() => {
-    onRemove(node);
+    if (!isDraft) {
+      onRemove(node);
+    }
     onClose();
-  }, [onRemove, node, onClose]);
+  }, [isDraft, onClose, onRemove, node]);
 
   const isInputSaved = !isDraft && node === input;
 

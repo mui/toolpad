@@ -1,0 +1,161 @@
+{
+  "root": "qp0d9jg",
+  "nodes": {
+    "2j33xs2": {
+      "id": "2j33xs2",
+      "name": "pageRow",
+      "type": "element",
+      "props": {},
+      "layout": {},
+      "parentId": "5w03xpv",
+      "attributes": {
+        "component": {
+          "type": "const",
+          "value": "PageRow"
+        }
+      },
+      "parentProp": "children",
+      "parentIndex": "a0"
+    },
+    "4973xor": {
+      "id": "4973xor",
+      "name": "textField",
+      "type": "element",
+      "props": {
+        "label": {
+          "type": "jsExpression",
+          "value": "`textField${i}`\n"
+        }
+      },
+      "layout": {},
+      "parentId": "uu63x2q",
+      "attributes": {
+        "component": {
+          "type": "const",
+          "value": "TextField"
+        }
+      },
+      "parentProp": "children",
+      "parentIndex": "a1"
+    },
+    "5w03xpv": {
+      "id": "5w03xpv",
+      "name": "list",
+      "type": "page",
+      "parentId": "qp0d9jg",
+      "attributes": {
+        "title": {
+          "type": "const",
+          "value": "list"
+        }
+      },
+      "parentProp": "pages",
+      "parentIndex": "a1"
+    },
+    "d3d3xxo": {
+      "id": "d3d3xxo",
+      "name": "pageRow2",
+      "type": "element",
+      "props": {},
+      "layout": {},
+      "parentId": "5w03xpv",
+      "attributes": {
+        "component": {
+          "type": "const",
+          "value": "PageRow"
+        }
+      },
+      "parentProp": "children",
+      "parentIndex": "a1"
+    },
+    "fs83xku": {
+      "id": "fs83xku",
+      "name": "text",
+      "type": "element",
+      "props": {
+        "value": {
+          "type": "jsExpression",
+          "value": "textField.value\n"
+        }
+      },
+      "layout": {},
+      "parentId": "uu63x2q",
+      "attributes": {
+        "component": {
+          "type": "const",
+          "value": "Text"
+        }
+      },
+      "parentProp": "children",
+      "parentIndex": "a2"
+    },
+    "qp0d9jg": {
+      "id": "qp0d9jg",
+      "name": "Application",
+      "type": "app",
+      "parentId": null,
+      "attributes": {},
+      "parentProp": null,
+      "parentIndex": null
+    },
+    "s013x2f": {
+      "id": "s013x2f",
+      "name": "list",
+      "type": "element",
+      "props": {
+        "itemCount": {
+          "type": "const",
+          "value": 2
+        }
+      },
+      "layout": {},
+      "parentId": "2j33xs2",
+      "attributes": {
+        "component": {
+          "type": "const",
+          "value": "List"
+        }
+      },
+      "parentProp": "children",
+      "parentIndex": "a0"
+    },
+    "uu63x2q": {
+      "id": "uu63x2q",
+      "name": "pageRow1",
+      "type": "element",
+      "props": {},
+      "layout": {},
+      "parentId": "s013x2f",
+      "attributes": {
+        "component": {
+          "type": "const",
+          "value": "PageRow"
+        }
+      },
+      "parentProp": "renderItem",
+      "parentIndex": "a0"
+    },
+    "vjb3xw3": {
+      "id": "vjb3xw3",
+      "name": "button",
+      "type": "element",
+      "props": {
+        "content": {
+          "type": "jsExpression",
+          "value": "textField.value\n"
+        }
+      },
+      "layout": {},
+      "parentId": "d3d3xxo",
+      "attributes": {
+        "component": {
+          "type": "const",
+          "value": "Button"
+        }
+      },
+      "parentProp": "children",
+      "parentIndex": "a0"
+    }
+  },
+  "version": 5
+}

@@ -14,6 +14,7 @@ import {
   ButtonBase,
   Popover,
   Paper,
+  Typography,
 } from '@mui/material';
 import * as React from 'react';
 import AddIcon from '@mui/icons-material/Add';
@@ -36,6 +37,7 @@ const DataSourceButton = styled(ButtonBase)(({ theme }) => ({
   borderColor: 'divider',
   borderStyle: 'solid',
   color: 'text.secondary',
+  padding: theme.spacing(1),
   borderRadius: 8,
   '&:hover': {
     backgroundColor: theme.palette.action.hover,
@@ -238,9 +240,14 @@ export default function QueryEditor() {
         }}
       >
         <Paper sx={{ p: 2 }}>
+          <Typography sx={{ mb: 2 }}>Make backend data available as state on the page.</Typography>
           <Stack direction="row" gap={1}>
-            <DataSourceButton onClick={handleCreateClick('local')}>Local function</DataSourceButton>
-            <DataSourceButton onClick={handleCreateClick('rest')}>Fetch</DataSourceButton>
+            <DataSourceButton onClick={handleCreateClick('local')}>
+              serverside javascript
+            </DataSourceButton>
+            <DataSourceButton onClick={handleCreateClick('rest')}>
+              serverside HTTP request
+            </DataSourceButton>
           </Stack>
         </Paper>
       </Popover>

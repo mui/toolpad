@@ -47,7 +47,7 @@
     "@playwright/test": "^1.30.0",
     "@swc/helpers": "^0.4.14",
     "@testing-library/jest-dom": "^5.16.5",
-    "@testing-library/react": "^13.4.0",
+    "@testing-library/react": "^14.0.0",
     "@types/gtag.js": "^0.0.12",
     "@types/jest": "^29.4.0",
     "@types/node": "^18.13.0",

@@ -493,7 +493,7 @@
         },
         "disabled": {
           "type": "jsExpression",
-          "value": "selectSubBreed.options.length <= 0\n"
+          "value": "selectSubBreed.options?.length <= 0\n"
         },
         "fullWidth": {
           "type": "const",

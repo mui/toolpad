@@ -96,6 +96,7 @@
     "next": "^13.1.6",
     "node-fetch": "^2.6.9",
     "node-fetch-har": "^1.0.1",
+    "open-editor": "^4.0.0",
     "path-to-regexp": "^6.2.1",
     "perf-cascade": "^3.0.3",
     "pg": "^8.9.0",

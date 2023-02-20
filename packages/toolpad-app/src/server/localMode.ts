@@ -2,19 +2,16 @@ import * as yaml from 'yaml';
 import * as path from 'path';
 import * as fs from 'fs/promises';
 import invariant from 'invariant';
-import * as child_process from 'child_process';
-import { promisify } from 'util';
 import { Dirent } from 'fs';
 import * as chokidar from 'chokidar';
 import { debounce } from 'lodash';
 import mitt from 'mitt';
+import openEditor from 'open-editor';
 import config from '../config';
 import * as appDom from '../appDom';
 import { errorFrom } from '../utils/errors';
 import { migrateUp } from '../appDom/migrations';
 import insecureHash from '../utils/insecureHash';
-
-const execFile = promisify(child_process.execFile);
 
 export function getUserProjectRoot(): string {
   const { projectDir } = config;
@@ -235,14 +232,18 @@ export async function loadLocalDom(): Promise<appDom.AppDom> {
 export async function openCodeEditor(file: string): Promise<void> {
   const userProjectRoot = getUserProjectRoot();
   const fullPath = path.resolve(userProjectRoot, file);
-  await execFile('code', [userProjectRoot, '--goto', fullPath]);
+  openEditor([fullPath, userProjectRoot], {
+    editor: process.env.EDITOR ? undefined : 'vscode',
+  });
 }
 
 export async function openCodeComponentEditor(componentName: string): Promise<void> {
   const componentsFolder = getComponentFolder();
-  const filePath = getComponentFilePath(componentsFolder, componentName);
+  const fullPath = getComponentFilePath(componentsFolder, componentName);
   const userProjectRoot = getUserProjectRoot();
-  await execFile('code', [userProjectRoot, '--goto', filePath]);
+  openEditor([fullPath, userProjectRoot], {
+    editor: process.env.EDITOR ? undefined : 'vscode',
+  });
 }
 
 async function getQueriesFileContent(): Promise<string | null> {

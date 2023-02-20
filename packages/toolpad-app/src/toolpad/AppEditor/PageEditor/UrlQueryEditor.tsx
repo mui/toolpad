@@ -13,6 +13,7 @@ import * as appDom from '../../../appDom';
 import { useDom, useDomApi, useAppState, useAppStateApi } from '../../AppState';
 import MapEntriesEditor from '../../../components/MapEntriesEditor';
 import useBoolean from '../../../utils/useBoolean';
+import useUnsavedChangesConfirm from '../../hooks/useUnsavedChangesConfirm';
 
 export interface UrlQueryEditorProps {
   pageNodeId: NodeId;
@@ -33,6 +34,8 @@ export default function UrlQueryEditor({ pageNodeId }: UrlQueryEditorProps) {
 
   const [input, setInput] = React.useState(value);
 
+  const hasUnsavedChanges = input !== value;
+
   React.useEffect(() => {
     if (isDialogOpen) {
       setInput(value);
@@ -50,6 +53,11 @@ export default function UrlQueryEditor({ pageNodeId }: UrlQueryEditorProps) {
   const handleDialogClose = React.useCallback(() => {
     appStateApi.setView({ kind: 'page', nodeId: pageNodeId });
   }, [appStateApi, pageNodeId]);
+
+  const { handleCloseWithUnsavedChanges } = useUnsavedChangesConfirm({
+    hasUnsavedChanges,
+    onClose: handleDialogClose,
+  });
 
   const handleSave = React.useCallback(() => {
     domApi.update((draft) =>
@@ -77,7 +85,7 @@ export default function UrlQueryEditor({ pageNodeId }: UrlQueryEditorProps) {
       <Button color="inherit" startIcon={<AddIcon />} onClick={handleButtonClick}>
         Add page parameters
       </Button>
-      <Dialog fullWidth open={isDialogOpen} onClose={handleDialogClose}>
+      <Dialog fullWidth open={isDialogOpen} onClose={handleCloseWithUnsavedChanges}>
         <DialogTitle>Edit page parameters</DialogTitle>
         <DialogContent>
           <Typography>

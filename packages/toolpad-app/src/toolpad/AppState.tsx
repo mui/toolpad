@@ -14,14 +14,12 @@ import insecureHash from '../utils/insecureHash';
 import useEvent from '../utils/useEvent';
 import { NodeHashes } from '../types';
 import { hasFieldFocus } from '../utils/fields';
-import { DomView, getViewFromPathname } from '../utils/domView';
+import { DomView, getViewFromPathname, PageViewTab } from '../utils/domView';
 import config from '../config';
 
 export function getNodeHashes(dom: appDom.AppDom): NodeHashes {
   return mapValues(dom.nodes, (node) => insecureHash(JSON.stringify(node)));
 }
-
-export type ComponentPanelTab = 'component' | 'theme';
 
 export type DomAction = {
   type: 'UPDATE';
@@ -64,7 +62,7 @@ export type AppStateAction =
     }
   | {
       type: 'SET_TAB';
-      tab: ComponentPanelTab;
+      tab: PageViewTab;
     }
   | {
       type: 'SELECT_NODE';
@@ -145,21 +143,15 @@ export function domLoaderReducer(state: DomLoader, action: AppStateAction): DomL
 
 export interface AppState extends DomLoader {
   currentView: DomView;
-  currentTab: ComponentPanelTab;
   undoStack: UndoRedoStackEntry[];
   redoStack: UndoRedoStackEntry[];
   hasUnsavedChanges: boolean;
 }
 
-export type PublicAppState = Pick<
-  AppState,
-  'dom' | 'currentView' | 'currentTab' | 'hasUnsavedChanges'
->;
+export type PublicAppState = Pick<AppState, 'dom' | 'currentView' | 'hasUnsavedChanges'>;
 
-interface UndoRedoStackEntry
-  extends Omit<PublicAppState, 'currentView' | 'currentTab' | 'hasUnsavedChanges'> {
+interface UndoRedoStackEntry extends Omit<PublicAppState, 'currentView' | 'hasUnsavedChanges'> {
   view: DomView;
-  tab: ComponentPanelTab;
   timestamp: number;
 }
 
@@ -177,7 +169,6 @@ export function appStateReducer(state: AppState, action: AppStateAction): AppSta
         {
           dom: state.dom,
           view: state.currentView,
-          tab: state.currentTab,
           timestamp: Date.now(),
         },
       ];
@@ -212,7 +203,6 @@ export function appStateReducer(state: AppState, action: AppStateAction): AppSta
       return update(state, {
         dom: previousStackEntry.dom,
         currentView: previousStackEntry.view,
-        currentTab: previousStackEntry.tab,
         undoStack,
         redoStack,
       });
@@ -232,7 +222,6 @@ export function appStateReducer(state: AppState, action: AppStateAction): AppSta
       return update(state, {
         dom: nextStackEntry.dom,
         currentView: nextStackEntry.view,
-        currentTab: nextStackEntry.tab,
         undoStack,
         redoStack,
       });
@@ -240,8 +229,7 @@ export function appStateReducer(state: AppState, action: AppStateAction): AppSta
     case 'SELECT_NODE': {
       if (state.currentView.kind === 'page') {
         return update(state, {
-          currentView: { ...state.currentView, selectedNodeId: action.nodeId },
-          currentTab: 'component',
+          currentView: { ...state.currentView, selectedNodeId: action.nodeId, tab: 'component' },
         });
       }
       return state;
@@ -267,20 +255,24 @@ export function appStateReducer(state: AppState, action: AppStateAction): AppSta
           selectedNodeId:
             state.currentView.kind === 'page' ? state.currentView.selectedNodeId : null,
         };
+      } else if (action.view.kind === 'page' && action.view.selectedNodeId) {
+        newView = {
+          ...action.view,
+          tab: 'component',
+        };
       }
 
       return update(state, {
-        currentView: newView as DomView,
-        currentTab:
-          action.view.kind === 'page' && action.view.selectedNodeId
-            ? 'component'
-            : state.currentTab,
+        currentView: newView,
       });
     }
     case 'SET_TAB': {
-      return update(state, {
-        currentTab: action.tab,
-      });
+      if (state.currentView.kind === 'page') {
+        return update(state, {
+          currentView: { ...state.currentView, tab: action.tab },
+        });
+      }
+      return state;
     }
     case 'SET_HAS_UNSAVED_CHANGES': {
       return update(state, {
@@ -346,7 +338,7 @@ function createAppStateApi(
         view,
       });
     },
-    setTab(tab: ComponentPanelTab) {
+    setTab(tab: PageViewTab) {
       dispatch({
         type: 'SET_TAB',
         tab,
@@ -395,13 +387,13 @@ export function useDomLoader(): DomLoader {
 }
 
 export function useAppState(): PublicAppState {
-  const { dom, currentView, currentTab, hasUnsavedChanges } = useAppStateContext();
+  const { dom, currentView, hasUnsavedChanges } = useAppStateContext();
 
   if (!dom) {
     throw new Error("Trying to access the DOM before it's loaded");
   }
 
-  return { dom, currentView, currentTab, hasUnsavedChanges };
+  return { dom, currentView, hasUnsavedChanges };
 }
 
 const DomApiContext = React.createContext<DomApi>(createDomApi(() => undefined));
@@ -466,6 +458,7 @@ export default function AppProvider({ appId, children }: DomContextProps) {
     kind: 'page',
     nodeId: firstPage?.id,
     selectedNodeId: null,
+    tab: 'component',
   };
 
   const [state, dispatch] = React.useReducer(appStateReducer, {
@@ -478,12 +471,10 @@ export default function AppProvider({ appId, children }: DomContextProps) {
     savedDom: dom,
     // App state
     currentView: initialView,
-    currentTab: 'component',
     undoStack: [
       {
         dom,
         view: initialView,
-        tab: 'component',
         timestamp: Date.now(),
       },
     ],

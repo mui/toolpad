@@ -7,8 +7,16 @@ export type PageView =
   | { kind: 'pageModule' }
   | { kind: 'pageParameters' };
 
+export type PageViewTab = 'component' | 'theme';
+
 export type DomView =
-  | { kind: 'page'; nodeId?: NodeId; view?: PageView; selectedNodeId?: NodeId | null }
+  | {
+      kind: 'page';
+      nodeId?: NodeId;
+      view?: PageView;
+      selectedNodeId?: NodeId | null;
+      tab: PageViewTab;
+    }
   | { kind: 'connection'; nodeId: NodeId }
   | { kind: 'codeComponent'; nodeId: NodeId };
 

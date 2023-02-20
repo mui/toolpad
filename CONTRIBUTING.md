@@ -17,7 +17,7 @@ If you would like to hack on MUI Toolpad or want to run the latest version, you 
    yarn install
    ```
 
-1. Run the build in watch mode
+1. Run the dev in watch mode (Note it's `dev13`, not `dev`)
 
    ```sh
    yarn dev13

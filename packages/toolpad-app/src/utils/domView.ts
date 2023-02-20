@@ -36,7 +36,12 @@ export function getPathnameFromView(appId: string, view: DomView): string {
 export function getViewFromPathname(pathname: string): DomView | null {
   const pageRouteMatch = matchPath(APP_PAGE_ROUTE, pathname);
   if (pageRouteMatch?.params.nodeId) {
-    return { kind: 'page', nodeId: pageRouteMatch.params.nodeId as NodeId, selectedNodeId: null };
+    return {
+      kind: 'page',
+      nodeId: pageRouteMatch.params.nodeId as NodeId,
+      selectedNodeId: null,
+      tab: 'component',
+    };
   }
 
   const connectionsRouteMatch = matchPath(APP_CONNECTION_ROUTE, pathname);

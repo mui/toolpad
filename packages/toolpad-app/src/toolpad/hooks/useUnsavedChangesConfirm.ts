@@ -19,7 +19,7 @@ export default function useUnsavedChangesConfirm({
     if (hasUnsavedChanges) {
       // eslint-disable-next-line no-alert
       const hasConfirmed = window.confirm(
-        'You have unsaved changes. Are you sure you want to navigate away? All changes will be discarded when you press "Ok".',
+        'You have unsaved changes. Are you sure you want to navigate away? All changes will be discarded when you press "OK".',
       );
 
       if (!hasConfirmed) {

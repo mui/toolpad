@@ -27,6 +27,9 @@ async function waitForComponents(page: Page, frame: Page | FrameLocator = page) 
 
   const select = frame.locator('label:has-text("foo select")');
   await select.waitFor({ state: 'visible' });
+
+  const list = frame.locator('text="List Button 3"');
+  await list.waitFor({ state: 'visible' });
 }
 
 test('rendering components in the app runtime', async ({ page, api }) => {
@@ -73,4 +76,26 @@ test('select component behavior', async ({ page, api }) => {
   await expect(page.getByRole('option', { name: 'three' })).toBeVisible();
   await expect(page.getByRole('option', { name: '4' })).toBeVisible();
   await expect(page.getByRole('option', { name: 'undefined' })).toBeVisible();
+});
+
+test('list component behavior', async ({ page, api }) => {
+  const dom = await readJsonFile(path.resolve(__dirname, './listDom.json'));
+
+  const app = await api.mutation.createApp(`App ${generateId()}`, {
+    from: { kind: 'dom', dom },
+  });
+
+  const runtimeModel = new ToolpadRuntime(page);
+  await runtimeModel.gotoPage(app.id, 'list');
+
+  const firstInput = page.getByLabel('textField0');
+  const secondInput = page.getByLabel('textField1');
+
+  await firstInput.type('one');
+  await secondInput.type('two');
+
+  await expect(page.locator('p:text("one")')).toBeVisible();
+  await expect(page.locator('p:text("two")')).toBeVisible();
+
+  await expect(page.locator('button:text("one")')).toBeVisible();
 });

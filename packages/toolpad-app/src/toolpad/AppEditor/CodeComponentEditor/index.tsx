@@ -11,14 +11,14 @@ import {
   TOOLPAD_COMPONENT,
   ArgTypeDefinitions,
   ArgTypeDefinition,
+  getArgTypeDefaultValue,
 } from '@mui/toolpad-core';
 import { useQuery } from '@tanstack/react-query';
 import invariant from 'invariant';
 import * as appDom from '../../../appDom';
-import { useDom, useDomApi } from '../../DomLoader';
+import { useDom, useDomApi, useAppStateApi } from '../../AppState';
 import { tryFormat } from '../../../utils/prettier';
 import useShortcut from '../../../utils/useShortcut';
-import { usePrompt } from '../../../utils/router';
 import usePageTitle from '../../../utils/usePageTitle';
 import useLatest from '../../../utils/useLatest';
 import AppThemeProvider from '../../../runtime/AppThemeProvider';
@@ -36,7 +36,6 @@ import { useNodeNameValidation } from '../HierarchyExplorer/validation';
 import useUndoRedo from '../../hooks/useUndoRedo';
 import config from '../../../config';
 import client from '../../../api';
-import { getArgTypeDefaultValue } from '../../../runtime';
 
 const TypescriptEditor = lazyComponent(() => import('../../../components/TypescriptEditor'), {
   noSsr: true,
@@ -136,8 +135,10 @@ interface CodeComponentEditorContentProps {
 }
 
 function CodeComponentEditorContent({ codeComponentNode }: CodeComponentEditorContentProps) {
-  const domApi = useDomApi();
   const { dom } = useDom();
+
+  const domApi = useDomApi();
+  const appStateApi = useAppStateApi();
 
   const { data: typings } = useQuery<Record<string, string>>(['/typings.json'], async () => {
     return fetch('/typings.json').then((res) => res.json());
@@ -222,12 +223,19 @@ function CodeComponentEditorContent({ codeComponentNode }: CodeComponentEditorCo
     );
     setInput(prettyfied);
     domApi.saveNode(prettyfied);
-  }, [domApi, input, isSaveAllowed]);
 
-  usePrompt(
-    'Your code has unsaved changes. Are you sure you want to navigate away? All changes will be discarded.',
-    !allChangesAreCommitted,
-  );
+    appStateApi.setHasUnsavedChanges(false);
+  }, [domApi, appStateApi, input, isSaveAllowed]);
+
+  React.useEffect(() => {
+    if (!allChangesAreCommitted) {
+      appStateApi.setHasUnsavedChanges(true);
+    }
+
+    return () => {
+      appStateApi.setHasUnsavedChanges(false);
+    };
+  }, [allChangesAreCommitted, appStateApi]);
 
   useShortcut({ key: 's', metaKey: true }, handleSave);
 

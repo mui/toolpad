@@ -28,7 +28,7 @@ import {
 import type { EditorProps } from '../../types';
 import { useToolpadComponents } from '../AppEditor/toolpadComponents';
 import { ToolpadComponentDefinition } from '../../toolpadComponents';
-import { useDom } from '../DomLoader';
+import { useDom } from '../AppState';
 
 // TODO: this import suggests leaky abstraction
 import { usePageEditorState } from '../AppEditor/PageEditor/PageEditorProvider';

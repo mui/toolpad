@@ -1,10 +1,5 @@
 import * as React from 'react';
-import {
-  BindableAttrEntries,
-  BindableAttrValue,
-  GlobalScopeMeta,
-  LiveBinding,
-} from '@mui/toolpad-core';
+import { BindableAttrEntries, BindableAttrValue, ScopeMeta, LiveBinding } from '@mui/toolpad-core';
 import {
   Box,
   Button,
@@ -69,7 +64,7 @@ import QueryPreview from '../QueryPreview';
 
 const HTTP_METHODS = ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'HEAD'];
 
-const QUERY_SCOPE_META: GlobalScopeMeta = {
+const QUERY_SCOPE_META: ScopeMeta = {
   query: {
     deprecated: 'Use parameters variable instead',
     description: 'Parameters that can be bound to app scope variables',

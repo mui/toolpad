@@ -73,3 +73,19 @@ export function filterValues<U>(
 ): Record<string, U> {
   return mapProperties(obj, ([key, value]) => (filter(value) ? [key, value] : null));
 }
+
+/**
+ * Filters an objects' property keys. Similar to `array.filter` but for objects. The result is a new
+ * object with all the properties removed for which `filter` returned `false`.
+ */
+export function filterKeys<P>(obj: P, filter: (old: keyof P) => boolean): Partial<P>;
+export function filterKeys<U>(
+  obj: Record<string, U>,
+  filter: (old: string) => boolean,
+): Record<string, U>;
+export function filterKeys<U>(
+  obj: Record<string, U>,
+  filter: (old: string) => boolean,
+): Record<string, U> {
+  return mapProperties(obj, ([key, value]) => (filter(key) ? [key, value] : null));
+}

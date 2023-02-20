@@ -64,46 +64,6 @@
       "parentProp": "children",
       "parentIndex": "a0V"
     },
-    "3m13snf": {
-      "id": "3m13snf",
-      "name": "allDogSubBreeds",
-      "type": "query",
-      "params": [
-        [
-          "breed",
-          {
-            "type": "jsExpression",
-            "value": "selectBreed.value\n"
-          }
-        ]
-      ],
-      "parentId": "cl27arb1i00043g693pzhex2r",
-      "attributes": {
-        "query": {
-          "type": "const",
-          "value": {
-            "url": {
-              "type": "jsExpression",
-              "value": "`breed/${query.breed}/list`\n"
-            },
-            "method": "GET",
-            "headers": []
-          }
-        },
-        "dataSource": {
-          "type": "const",
-          "value": "rest"
-        },
-        "connectionId": {
-          "type": "const",
-          "value": {
-            "$$ref": "cl27ajwae00003g69pc8n5eor"
-          }
-        }
-      },
-      "parentProp": "queries",
-      "parentIndex": "a4"
-    },
     "9h83s7x": {
       "id": "9h83s7x",
       "name": "dogImagesTitle",
@@ -198,7 +158,7 @@
           "subBreed",
           {
             "type": "jsExpression",
-            "value": "selectSubBreed.value\n"
+            "value": "selectSubBreed.options.includes(selectSubBreed.value)\n  ? selectSubBreed.value\n  : null\n"
           }
         ]
       ],
@@ -529,11 +489,11 @@
         },
         "options": {
           "type": "jsExpression",
-          "value": "allDogSubBreeds.error ? [] : allDogSubBreeds.data?.message[selectBreed.value]\n"
+          "value": "allDogBreeds.data?.message[selectBreed.value]\n"
         },
         "disabled": {
           "type": "jsExpression",
-          "value": "allDogSubBreeds.error ? true : allDogSubBreeds.data?.message.length <= 0\n"
+          "value": "selectSubBreed.options?.length <= 0\n"
         },
         "fullWidth": {
           "type": "const",

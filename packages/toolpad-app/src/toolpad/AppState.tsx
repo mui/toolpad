@@ -250,12 +250,21 @@ export function appStateReducer(state: AppState, action: AppStateAction): AppSta
 
       let newView = action.view;
       if (action.view.kind === 'page' && typeof action.view.selectedNodeId === 'undefined') {
+        const isSamePage =
+          action.view.kind === 'page' && action.view.nodeId === state.currentView.nodeId;
+
         newView = {
           ...action.view,
           selectedNodeId:
-            state.currentView.kind === 'page' ? state.currentView.selectedNodeId : null,
+            state.currentView.kind === 'page' && isSamePage
+              ? state.currentView.selectedNodeId
+              : null,
         };
-      } else if (action.view.kind === 'page' && action.view.selectedNodeId) {
+      } else if (
+        action.view.kind === 'page' &&
+        action.view.selectedNodeId &&
+        typeof action.view.tab === 'undefined'
+      ) {
         newView = {
           ...action.view,
           tab: 'component',

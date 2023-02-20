@@ -15,7 +15,7 @@ export type DomView =
       nodeId?: NodeId;
       view?: PageView;
       selectedNodeId?: NodeId | null;
-      tab: PageViewTab;
+      tab?: PageViewTab;
     }
   | { kind: 'connection'; nodeId: NodeId }
   | { kind: 'codeComponent'; nodeId: NodeId };

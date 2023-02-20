@@ -8,10 +8,9 @@ import {
   styled,
 } from '@mui/material';
 import { createComponent } from '@mui/toolpad-core';
-import remarkGfm from 'remark-gfm';
 import { SX_PROP_HELPER_TEXT } from './constants';
 
-const ReactMarkdown = React.lazy(() => import('react-markdown'));
+const Markdown = React.lazy(() => import('markdown-to-jsx'));
 
 type BaseProps = MuiLinkProps | MuiTypographyProps;
 interface TextProps extends Omit<BaseProps, 'children'> {
@@ -22,10 +21,41 @@ interface TextProps extends Omit<BaseProps, 'children'> {
   loading?: boolean;
 }
 
-const MarkdownContainer = styled('div')({
-  display: 'block',
-  [`&:empty::before`]: { content: '""', display: 'inline-block' },
+const gutters = (marginTop: number, marginBottom: number) => ({
+  marginTop,
+  marginBottom,
+  '&:first-child': {
+    marginTop: 0,
+  },
+  '&:last-child': {
+    marginBottom: 0,
+  },
 });
+
+const MarkdownContainer = styled('div')(({ theme }) => ({
+  display: 'block',
+  maxWidth: '100%',
+  '&:empty::before, & > span:empty::before': {
+    content: '""',
+    display: 'inline-block',
+  },
+  '& h1': { ...theme.typography.h1, ...gutters(16, 16) },
+  '& h2': { ...theme.typography.h2, ...gutters(12, 12) },
+  '& h3': { ...theme.typography.h3, ...gutters(12, 12) },
+  '& h4': { ...theme.typography.h4, ...gutters(12, 12) },
+  '& h5': { ...theme.typography.h5, ...gutters(4, 4) },
+  '& h6': { ...theme.typography.h6, ...gutters(4, 4) },
+  '& p': { margin: 0, marginBottom: 6 },
+}));
+
+const CodeContainer = styled('pre')(({ theme }) => ({
+  backgroundColor: theme.palette.grey[200],
+  marginLeft: theme.spacing(1),
+  marginRight: theme.spacing(1),
+  borderRadius: theme.shape.borderRadius,
+  padding: theme.spacing(1),
+  overflow: 'auto',
+}));
 
 function Text({ value, markdown, href, loading, mode, sx, ...rest }: TextProps) {
   switch (mode) {
@@ -35,7 +65,25 @@ function Text({ value, markdown, href, loading, mode, sx, ...rest }: TextProps) 
       ) : (
         <MarkdownContainer>
           <React.Suspense>
-            <ReactMarkdown remarkPlugins={[remarkGfm]}>{value}</ReactMarkdown>
+            <Markdown
+              options={{
+                overrides: {
+                  a: {
+                    component: MuiLink,
+                    props: {
+                      target: '_blank',
+                      rel: 'noopener noreferrer',
+                    },
+                  },
+                  pre: {
+                    component: CodeContainer,
+                  },
+                },
+                slugify: () => '',
+              }}
+            >
+              {value}
+            </Markdown>
           </React.Suspense>
         </MarkdownContainer>
       );
@@ -46,7 +94,7 @@ function Text({ value, markdown, href, loading, mode, sx, ...rest }: TextProps) 
         <MuiLink
           href={href}
           target="_blank"
-          rel="noopener noreferrer nofollow"
+          rel="noopener noreferrer"
           sx={{
             minWidth: loading || !value ? 150 : undefined,
             // Same as Typography

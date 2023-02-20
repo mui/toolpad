@@ -9,7 +9,7 @@ import {
 import { ExactEntriesOf } from '../../../utils/types';
 import * as appDom from '../../../appDom';
 import NodeAttributeEditor from './NodeAttributeEditor';
-import { useDom } from '../../DomLoader';
+import { useDom, useAppState } from '../../AppState';
 import { usePageEditorState } from './PageEditorProvider';
 import PageOptionsPanel from './PageOptionsPanel';
 import ErrorAlert from './ErrorAlert';
@@ -40,8 +40,12 @@ const ComponentEditorRoot = styled('div')(({ theme }) => ({
 }));
 
 function shouldRenderControl<P extends object>(propTypeDef: ArgTypeDefinition<P>, props: P) {
-  if (propTypeDef.typeDef.type === 'element') {
-    return propTypeDef.control?.type !== 'slot' && propTypeDef.control?.type !== 'slots';
+  if (propTypeDef.typeDef.type === 'element' || propTypeDef.typeDef.type === 'template') {
+    return (
+      propTypeDef.control?.type !== 'slot' &&
+      propTypeDef.control?.type !== 'slots' &&
+      propTypeDef.control?.type !== 'layoutSlot'
+    );
   }
 
   if (typeof propTypeDef.visible === 'boolean') {
@@ -170,7 +174,8 @@ export interface ComponentEditorProps {
 }
 
 export default function ComponentEditor({ className }: ComponentEditorProps) {
-  const { dom, currentView } = useDom();
+  const { dom } = useDom();
+  const { currentView } = useAppState();
   const selectedNodeId = currentView.kind === 'page' ? currentView.selectedNodeId : null;
 
   const selectedNode = selectedNodeId ? appDom.getMaybeNode(dom, selectedNodeId) : null;

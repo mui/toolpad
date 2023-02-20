@@ -10,7 +10,7 @@ import { HTML_ID_EDITOR_OVERLAY, TOOLPAD_BRIDGE_GLOBAL } from '../../../constant
 import { NodeHashes } from '../../../types';
 import useEvent from '../../../utils/useEvent';
 import { LogEntry } from '../../../components/Console';
-import { useDomApi } from '../../DomLoader';
+import { useAppStateApi } from '../../AppState';
 import createRuntimeState from '../../../createRuntimeState';
 import type { ToolpadBridge } from '../../../canvas/ToolpadBridge';
 import CenteredSpinner from '../../../components/CenteredSpinner';
@@ -88,7 +88,7 @@ export default function EditorCanvasHost({
   onInit,
 }: EditorCanvasHostProps) {
   const frameRef = React.useRef<HTMLIFrameElement>(null);
-  const domApi = useDomApi();
+  const appStateApi = useAppStateApi();
 
   const [bridge, setBridge] = React.useState<ToolpadBridge | null>(null);
 
@@ -119,10 +119,10 @@ export default function EditorCanvasHost({
 
     if (redoShortcut) {
       event.preventDefault();
-      domApi.redo();
+      appStateApi.redo();
     } else if (undoShortcut) {
       event.preventDefault();
-      domApi.undo();
+      appStateApi.undo();
     }
   });
 

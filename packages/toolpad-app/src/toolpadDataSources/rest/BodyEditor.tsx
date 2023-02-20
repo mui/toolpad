@@ -12,7 +12,7 @@ import {
   Typography,
 } from '@mui/material';
 import { TabContext } from '@mui/lab';
-import { BindableAttrValue, LiveBinding, GlobalScopeMeta } from '@mui/toolpad-core';
+import { BindableAttrValue, LiveBinding, ScopeMeta } from '@mui/toolpad-core';
 import { useServerJsRuntime } from '@mui/toolpad-core/jsServerRuntime';
 import { Body, RawBody, UrlEncodedBody } from './types';
 import { Maybe, WithControlledProp } from '../../utils/types';
@@ -66,7 +66,7 @@ const MonacoEditor = lazyComponent(() => import('../../components/MonacoEditor')
 });
 
 interface BodyTypeEditorProps<B = Body> extends WithControlledProp<Maybe<B>> {
-  globalScopeMeta: GlobalScopeMeta;
+  globalScopeMeta: ScopeMeta;
   globalScope: Record<string, any>;
   renderToolbar: RenderBodyToolbar;
   disabled?: boolean;
@@ -213,7 +213,7 @@ function UrlEncodedBodyEditor({
 type BodyKind = Body['kind'];
 
 export interface BodyEditorProps extends WithControlledProp<Maybe<Body>> {
-  globalScopeMeta: GlobalScopeMeta;
+  globalScopeMeta: ScopeMeta;
   globalScope: Record<string, any>;
   sx?: SxProps;
   method?: string;

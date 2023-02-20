@@ -3,7 +3,7 @@ import { styled } from '@mui/material';
 import { NodeId } from '@mui/toolpad-core';
 import * as appDom from '../../../../appDom';
 import EditorCanvasHost from '../EditorCanvasHost';
-import { getNodeHashes, useDom, useDomApi, useDomLoader } from '../../../DomLoader';
+import { getNodeHashes, useDom, useAppStateApi, useDomLoader, useDomApi } from '../../../AppState';
 import { usePageEditorApi, usePageEditorState } from '../PageEditorProvider';
 import RenderOverlay from './RenderOverlay';
 import { NodeHashes } from '../../../../types';
@@ -31,7 +31,8 @@ export default function RenderPanel({ className }: RenderPanelProps) {
   const domLoader = useDomLoader();
   const { dom } = useDom();
   const domApi = useDomApi();
-  const api = usePageEditorApi();
+  const appStateApi = useAppStateApi();
+  const pageEditorApi = usePageEditorApi();
   const { appId, nodeId: pageNodeId } = usePageEditorState();
 
   const [bridge, setBridge] = React.useState<ToolpadBridge | null>(null);
@@ -68,20 +69,20 @@ export default function RenderPanel({ className }: RenderPanelProps) {
     });
 
     initializedBridge.canvasEvents.on('pageStateUpdated', (event) => {
-      api.pageStateUpdate(event.pageState, event.globalScopeMeta);
+      pageEditorApi.pageStateUpdate(event.pageState, event.globalScopeMeta);
     });
 
     initializedBridge.canvasEvents.on('pageBindingsUpdated', (event) => {
-      api.pageBindingsUpdate(event.bindings);
+      pageEditorApi.pageBindingsUpdate(event.bindings);
     });
 
     initializedBridge.canvasEvents.on('screenUpdate', () => {
       const pageViewState = initializedBridge.canvasCommands.getPageViewState();
-      api.pageViewStateUpdate(pageViewState);
+      pageEditorApi.pageViewStateUpdate(pageViewState);
     });
 
     initializedBridge.canvasEvents.on('pageNavigationRequest', (event) => {
-      domApi.setView({ kind: 'page', nodeId: event.pageNodeId });
+      appStateApi.setView({ kind: 'page', nodeId: event.pageNodeId });
     });
 
     setBridge(initializedBridge);

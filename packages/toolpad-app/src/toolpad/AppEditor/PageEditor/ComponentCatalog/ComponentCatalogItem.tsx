@@ -12,6 +12,7 @@ import ContactPageIcon from '@mui/icons-material/ContactPage';
 import TabIcon from '@mui/icons-material/Tab';
 import TuneIcon from '@mui/icons-material/Tune';
 import ToggleOnIcon from '@mui/icons-material/ToggleOn';
+import ListIcon from '@mui/icons-material/List';
 import RadioButtonCheckedIcon from '@mui/icons-material/RadioButtonChecked';
 import DateRangeIcon from '@mui/icons-material/DateRange';
 import CheckBoxIcon from '@mui/icons-material/CheckBox';
@@ -34,6 +35,7 @@ const iconMap = new Map<string, React.ComponentType<SvgIconProps>>([
   ['DataGrid', GridOnIcon],
   ['TextField', Crop75Icon],
   ['Select', ArrowDropDownCircleIcon],
+  ['List', ListIcon],
   ['Paper', LayersIcon],
   ['Form', DnsIcon],
   ['Card', ContactPageIcon],

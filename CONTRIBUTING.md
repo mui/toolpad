@@ -54,6 +54,12 @@ If you would like to hack on MUI Toolpad or want to run the latest version, you 
       yarn set version berry
       ```
 
+      and add to the `.yarnrc.yml`:
+
+      ```yaml
+      nodeLinker: node-modules
+      ```
+
    1. then run
 
       ```sh

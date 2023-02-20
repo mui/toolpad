@@ -5,7 +5,7 @@ import SplitPane from '../../../components/SplitPane';
 import RenderPanel from './RenderPanel';
 import ComponentPanel from './ComponentPanel';
 import { PageEditorProvider } from './PageEditorProvider';
-import { useDom } from '../../DomLoader';
+import { useDom } from '../../AppState';
 import * as appDom from '../../../appDom';
 import ComponentCatalog from './ComponentCatalog';
 import NotFoundEditor from '../NotFoundEditor';

@@ -21,7 +21,7 @@ import clsx from 'clsx';
 import { usePageEditorState } from '../PageEditorProvider';
 import * as appDom from '../../../../appDom';
 import dataSources from '../../../../toolpadDataSources/client';
-import { useDom, useDomApi } from '../../../DomLoader';
+import { useAppStateApi, useDom, useDomApi, useAppState } from '../../../AppState';
 import ConnectionSelect, { ConnectionOption } from '../ConnectionSelect';
 import NodeMenu from '../../NodeMenu';
 import QueryNodeEditorDialog from './QueryEditorDialog';
@@ -108,8 +108,11 @@ type DialogState =
     };
 
 export default function QueryEditor() {
-  const { dom, currentView } = useDom();
+  const { dom } = useDom();
+  const { currentView } = useAppState();
   const state = usePageEditorState();
+
+  const appStateApi = useAppStateApi();
   const domApi = useDomApi();
 
   const [dialogState, setDialogState] = React.useState<DialogState | null>(null);
@@ -118,8 +121,8 @@ export default function QueryEditor() {
   const { queries = [] } = appDom.getChildNodes(dom, page) ?? [];
 
   const handleEditStateDialogClose = React.useCallback(() => {
-    domApi.setView({ kind: 'page', nodeId: page.id });
-  }, [domApi, page.id]);
+    appStateApi.setView({ kind: 'page', nodeId: page.id });
+  }, [appStateApi, page.id]);
 
   const handleCreate = React.useCallback(() => {
     if (config.localMode) {
@@ -149,24 +152,24 @@ export default function QueryEditor() {
       if (appDom.nodeExists(dom, node.id)) {
         domApi.saveNode(node);
       } else {
-        domApi.update((draft) => appDom.addNode(draft, node, page, 'queries'), {
+        appStateApi.update((draft) => appDom.addNode(draft, node, page, 'queries'), {
           view: { kind: 'page', nodeId: page.id, view: { kind: 'query', nodeId: node.id } },
         });
       }
     },
-    [dom, domApi, page],
+    [dom, domApi, appStateApi, page],
   );
 
   const handleDeleteNode = React.useCallback(
     (nodeId: NodeId) => {
-      domApi.update((draft) => appDom.removeNode(draft, nodeId), {
+      appStateApi.update((draft) => appDom.removeNode(draft, nodeId), {
         view: {
           kind: 'page',
           nodeId: page.id,
         },
       });
     },
-    [domApi, page.id],
+    [appStateApi, page.id],
   );
 
   const handleRemove = React.useCallback(
@@ -213,7 +216,7 @@ export default function QueryEditor() {
               key={queryNode.id}
               disablePadding
               onClick={() => {
-                domApi.setView({
+                appStateApi.setView({
                   kind: 'page',
                   nodeId: page.id,
                   view: { kind: 'query', nodeId: queryNode.id },

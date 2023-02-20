@@ -1,43 +1,106 @@
-import { createServer } from 'http';
-import { parse } from 'url';
-import next from 'next';
-import invariant from 'invariant';
+import 'dotenv/config';
+import arg from 'arg';
+import path from 'path';
 
-const dev = process.env.NODE_ENV !== 'production';
-const hostname = 'localhost';
-const port = 3000;
-// when using middleware `hostname` and `port` must be provided below
-const app = next({ dev, hostname, port });
-const handle = app.getRequestHandler();
+const DEFAULT_PORT = 3000;
 
-(async () => {
-  await app.prepare();
+function* getNextPort(port: number = DEFAULT_PORT) {
+  while (true) {
+    yield port;
+    port += 1;
+  }
+}
 
-  const server = createServer(async (req, res) => {
-    invariant(req.url, 'missing request url');
+interface RunCommandArgs {
+  // Whether Toolpad editor is running in dev mode (for debugging purposes only)
+  devMode?: boolean;
+  port?: number;
+}
 
-    try {
-      // Be sure to pass `true` as the second argument to `url.parse`.
-      // This tells it to parse the query portion of the URL.
-      const parsedUrl = parse(req.url, true);
+async function runApp(cmd: 'dev' | 'start', { devMode = false, port }: RunCommandArgs) {
+  const { execa } = await import('execa');
+  const { default: getPort } = await import('get-port');
+  const toolpadDir = path.resolve(__dirname, '../..'); // from ./dist/server
+  const nextCommand = devMode ? 'dev' : 'start';
 
-      await handle(req, res, parsedUrl);
-    } catch (err) {
-      console.error('Error occurred handling', req.url, err);
-      res.statusCode = 500;
-      res.end('internal server error');
-    }
+  if (!port) {
+    port = cmd === 'dev' ? await getPort({ port: getNextPort(DEFAULT_PORT) }) : DEFAULT_PORT;
+  }
+
+  const cp = execa('next', [nextCommand, `--port=${port}`], {
+    cwd: toolpadDir,
+    preferLocal: true,
+    stdio: 'pipe',
+    env: {
+      TOOLPAD_LOCAL_MODE: '1',
+      TOOLPAD_PROJECT_DIR: process.cwd(),
+      TOOLPAD_CMD: cmd,
+      FORCE_COLOR: '1',
+    } as any,
   });
 
-  await new Promise<void>((resolve, reject) => {
-    server.once('error', (err) => {
-      reject(err);
-    });
-    server.listen(port, () => {
-      resolve();
-    });
-  });
+  process.stdin.pipe(cp.stdin!);
+  cp.stdout?.pipe(process.stdout);
+  cp.stderr?.pipe(process.stdout);
+}
 
+async function devCommand(args: RunCommandArgs) {
   // eslint-disable-next-line no-console
-  console.log(`> Ready on http://${hostname}:${port}`);
-})();
+  console.log('starting toolpad application in dev mode...');
+  await runApp('dev', args);
+}
+
+async function buildCommand() {
+  // eslint-disable-next-line no-console
+  console.log('building toolpad application...');
+  await new Promise((resolve) => {
+    setTimeout(resolve, 1000);
+  });
+  // eslint-disable-next-line no-console
+  console.log('done.');
+}
+
+async function startCommand(args: RunCommandArgs) {
+  // eslint-disable-next-line no-console
+  console.log('starting toolpad application...');
+  await runApp('start', args);
+}
+
+export default async function cli(argv: string[]) {
+  const args = arg(
+    {
+      // Types
+      '--help': Boolean,
+      '--dev': Boolean,
+      '--port': Number,
+
+      // Aliases
+      '-p': '--port',
+    },
+    {
+      argv,
+    },
+  );
+
+  const command = args._[0];
+
+  const runArgs = {
+    devMode: args['--dev'],
+    port: args['--port'],
+  };
+
+  switch (command) {
+    case undefined:
+    case 'dev':
+      await devCommand(runArgs);
+      break;
+    case 'build':
+      await buildCommand();
+      break;
+    case 'start':
+      await startCommand(runArgs);
+      break;
+    default:
+      throw new Error(`Unknown command "${command}"`);
+  }
+}

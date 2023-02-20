@@ -3,8 +3,6 @@
   "version": "0.0.41-alpha.2",
   "license": "MIT",
   "scripts": {
-    "start": "yarn cli",
-    "cli": "./index.mjs",
     "cjsify": "mkdir -p ./dist/cjs && echo \"{ \\\"type\\\":\\\"commonjs\\\" }\" > ./dist/cjs/package.json",
     "build": "concurrently \"yarn:build:*\" && yarn cjsify",
     "build:esm": "tsc",
@@ -32,7 +30,7 @@
     "dist"
   ],
   "bin": {
-    "toolpad": "./index.mjs"
+    "toolpad": "./index.js"
   },
   "dependencies": {
     "@mui/toolpad-app": "^0.0.41-alpha.2",

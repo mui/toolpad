@@ -4,7 +4,8 @@
     "noEmit": false,
     "rootDir": ".",
     "outDir": "./dist",
-    "module": "commonjs"
+    "module": "commonjs",
+    "moduleResolution": "node16"
   },
   "include": ["./cli/**/*"]
 }

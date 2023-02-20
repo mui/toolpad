@@ -510,7 +510,7 @@ export default function AppProvider({ appId, children }: DomContextProps) {
     if (state.hasUnsavedChanges && isCancellableAction(action)) {
       // eslint-disable-next-line no-alert
       const ok = window.confirm(
-        'You have unsaved changes. Are you sure you want to navigate away?\nAll changes will be discarded.',
+        'You have unsaved changes. Are you sure you want to navigate away? All changes will be discarded.',
       );
 
       if (!ok) {

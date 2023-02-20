@@ -520,3 +520,17 @@ export class ToolpadProject {
     return this.files;
   }
 }
+
+/*
+// WIP
+
+(globalThis as any).toolpadProject = (globalThis as any).toolpadProject || (() => {
+  const project = new ToolpadProject(getUserProjectRoot())
+
+  if (config.cmd === 'dev') {
+    project.watch()
+  }
+
+  return project
+})()
+*/

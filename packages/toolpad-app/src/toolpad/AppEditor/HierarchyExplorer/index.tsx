@@ -10,7 +10,7 @@ import { NodeId } from '@mui/toolpad-core';
 import clsx from 'clsx';
 import invariant from 'invariant';
 import * as appDom from '../../../appDom';
-import { useDom, useDomApi } from '../../DomLoader';
+import { useAppStateApi, useDom, useAppState } from '../../AppState';
 import CreatePageNodeDialog from './CreatePageNodeDialog';
 import CreateCodeComponentNodeDialog from './CreateCodeComponentNodeDialog';
 import CreateConnectionNodeDialog from './CreateConnectionNodeDialog';
@@ -44,12 +44,14 @@ const StyledTreeItem = styled(TreeItem)({
 type StyledTreeItemProps = TreeItemProps & {
   onDeleteNode?: (nodeId: NodeId) => void;
   onDuplicateNode?: (nodeId: NodeId) => void;
+  onSettingsNode?: (nodeId: NodeId) => void;
   onCreate?: React.MouseEventHandler;
   labelIcon?: React.ReactNode;
   labelText: string;
   createLabelText?: string;
   deleteLabelText?: string;
   duplicateLabelText?: string;
+  settingsLabelText?: string;
   toolpadNodeId?: NodeId;
 };
 
@@ -60,9 +62,11 @@ function HierarchyTreeItem(props: StyledTreeItemProps) {
     onCreate,
     onDeleteNode,
     onDuplicateNode,
+    onSettingsNode,
     createLabelText,
     deleteLabelText = 'Delete',
     duplicateLabelText = 'Duplicate',
+    settingsLabelText = 'Settings',
     toolpadNodeId,
     ...other
   } = props;
@@ -98,6 +102,8 @@ function HierarchyTreeItem(props: StyledTreeItemProps) {
               duplicateLabelText={duplicateLabelText}
               onDeleteNode={onDeleteNode}
               onDuplicateNode={onDuplicateNode}
+              onSettingsNode={onSettingsNode}
+              settingsLabelText={settingsLabelText}
             />
           ) : null}
         </Box>
@@ -126,8 +132,10 @@ export interface HierarchyExplorerProps {
 }
 
 export default function HierarchyExplorer({ appId, className }: HierarchyExplorerProps) {
-  const { dom, currentView } = useDom();
-  const domApi = useDomApi();
+  const { dom } = useDom();
+  const { currentView } = useAppState();
+
+  const appStateApi = useAppStateApi();
 
   const app = appDom.getApp(dom);
   const { codeComponents = [], pages = [], connections = [] } = appDom.getChildNodes(dom, app);
@@ -159,20 +167,23 @@ export default function HierarchyExplorer({ appId, className }: HierarchyExplore
       // TODO: sort out in-page selection
       const page = appDom.getPageAncestor(dom, node);
       if (page) {
-        domApi.setView({ kind: 'page', nodeId: page.id });
+        appStateApi.setView({ kind: 'page', nodeId: page.id });
       }
     }
 
     if (appDom.isPage(node)) {
-      domApi.setView({ kind: 'page', nodeId: node.id });
+      appStateApi.update((draft) => draft, {
+        view: { kind: 'page', nodeId: node.id },
+        selectedNodeId: null,
+      });
     }
 
     if (appDom.isCodeComponent(node)) {
-      domApi.setView({ kind: 'codeComponent', nodeId: node.id });
+      appStateApi.setView({ kind: 'codeComponent', nodeId: node.id });
     }
 
     if (appDom.isConnection(node)) {
-      domApi.setView({ kind: 'connection', nodeId: node.id });
+      appStateApi.setView({ kind: 'connection', nodeId: node.id });
     }
   };
 
@@ -213,11 +224,11 @@ export default function HierarchyExplorer({ appId, className }: HierarchyExplore
         domViewAfterDelete = firstSiblingOfType && getNodeEditorDomView(firstSiblingOfType);
       }
 
-      domApi.update((draft) => appDom.removeNode(draft, nodeId), {
+      appStateApi.update((draft) => appDom.removeNode(draft, nodeId), {
         view: domViewAfterDelete || { kind: 'page' },
       });
     },
-    [activeNode, dom, domApi],
+    [activeNode, appStateApi, dom],
   );
 
   const handleDuplicateNode = React.useCallback(
@@ -234,14 +245,28 @@ export default function HierarchyExplorer({ appId, className }: HierarchyExplore
       const newNode = appDom.getNode(fragment, fragment.root);
       const editorDomView = getNodeEditorDomView(newNode);
 
-      domApi.update(
+      appStateApi.update(
         (draft) => appDom.addFragment(draft, fragment, node.parentId!, node.parentProp!),
         {
           view: editorDomView || { kind: 'page' },
         },
       );
     },
-    [dom, domApi],
+    [appStateApi, dom],
+  );
+
+  const handlePageSettingsNode = React.useCallback(
+    (nodeId: NodeId) => {
+      const node = appDom.getNode(dom, nodeId);
+
+      if (appDom.isPage(node)) {
+        appStateApi.update((draft) => draft, {
+          view: { kind: 'page', nodeId: node.id },
+          selectedNodeId: null,
+        });
+      }
+    },
+    [appStateApi, dom],
   );
 
   const hasConnectionsView = !config.localMode && !config.isDemo;
@@ -317,6 +342,7 @@ export default function HierarchyExplorer({ appId, className }: HierarchyExplore
               labelText={page.name}
               onDuplicateNode={handleDuplicateNode}
               onDeleteNode={handleDeleteNode}
+              onSettingsNode={handlePageSettingsNode}
             />
           ))}
         </HierarchyTreeItem>

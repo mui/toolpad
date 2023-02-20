@@ -3,6 +3,7 @@ import { Box, Button, Stack, styled, TextField, Toolbar, Typography } from '@mui
 import createCache from '@emotion/cache';
 import { CacheProvider } from '@emotion/react';
 import * as ReactDOM from 'react-dom';
+import * as _ from 'lodash-es';
 import { ErrorBoundary, FallbackProps } from 'react-error-boundary';
 import {
   NodeId,
@@ -11,14 +12,14 @@ import {
   TOOLPAD_COMPONENT,
   ArgTypeDefinitions,
   ArgTypeDefinition,
+  getArgTypeDefaultValue,
 } from '@mui/toolpad-core';
 import { useQuery } from '@tanstack/react-query';
 import invariant from 'invariant';
 import * as appDom from '../../../appDom';
-import { useDom, useDomApi } from '../../DomLoader';
+import { useDom, useDomApi, useAppStateApi } from '../../AppState';
 import { tryFormat } from '../../../utils/prettier';
 import useShortcut from '../../../utils/useShortcut';
-import { usePrompt } from '../../../utils/router';
 import usePageTitle from '../../../utils/usePageTitle';
 import useLatest from '../../../utils/useLatest';
 import AppThemeProvider from '../../../runtime/AppThemeProvider';
@@ -36,7 +37,6 @@ import { useNodeNameValidation } from '../HierarchyExplorer/validation';
 import useUndoRedo from '../../hooks/useUndoRedo';
 import config from '../../../config';
 import client from '../../../api';
-import { getArgTypeDefaultValue } from '../../../runtime';
 
 const TypescriptEditor = lazyComponent(() => import('../../../components/TypescriptEditor'), {
   noSsr: true,
@@ -136,8 +136,10 @@ interface CodeComponentEditorContentProps {
 }
 
 function CodeComponentEditorContent({ codeComponentNode }: CodeComponentEditorContentProps) {
-  const domApi = useDomApi();
   const { dom } = useDom();
+
+  const domApi = useDomApi();
+  const appStateApi = useAppStateApi();
 
   const { data: typings } = useQuery<Record<string, string>>(['/typings.json'], async () => {
     return fetch('/typings.json').then((res) => res.json());
@@ -205,7 +207,7 @@ function CodeComponentEditorContent({ codeComponentNode }: CodeComponentEditorCo
   const nodeNameError = useNodeNameValidation(input.name, existingNames, 'query');
   const isNameValid = !nodeNameError;
 
-  const allChangesAreCommitted = codeComponentNode === input;
+  const allChangesAreCommitted = _.isEqual(codeComponentNode, input);
 
   const isSaveAllowed = isNameValid;
 
@@ -224,10 +226,13 @@ function CodeComponentEditorContent({ codeComponentNode }: CodeComponentEditorCo
     domApi.saveNode(prettyfied);
   }, [domApi, input, isSaveAllowed]);
 
-  usePrompt(
-    'Your code has unsaved changes. Are you sure you want to navigate away? All changes will be discarded.',
-    !allChangesAreCommitted,
-  );
+  React.useEffect(() => {
+    appStateApi.setHasUnsavedChanges(!allChangesAreCommitted);
+
+    return () => {
+      appStateApi.setHasUnsavedChanges(false);
+    };
+  }, [allChangesAreCommitted, appStateApi]);
 
   useShortcut({ key: 's', metaKey: true }, handleSave);
 

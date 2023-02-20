@@ -1,10 +1,10 @@
 import * as React from 'react';
-import { createTheme, ThemeOptions, PaletteOptions, Theme, ThemeProvider } from '@mui/material';
+import { createTheme, ThemeOptions, PaletteOptions, ThemeProvider } from '@mui/material';
 import * as colors from '@mui/material/colors';
 import * as appDom from '../appDom';
 import { AppTheme } from '../types';
 
-export function createThemeOptions(toolpadTheme: AppTheme): ThemeOptions {
+export function createToolpadTheme(toolpadTheme: AppTheme = {}): ThemeOptions {
   const palette: PaletteOptions = {};
   const primary = toolpadTheme['palette.primary.main'];
   if (primary) {
@@ -21,14 +21,42 @@ export function createThemeOptions(toolpadTheme: AppTheme): ThemeOptions {
     palette.mode = mode;
   }
 
-  return { palette };
-}
+  const theme = createTheme();
 
-export function createToolpadTheme(themeNode?: appDom.ThemeNode | null): Theme {
-  const options = themeNode?.theme
-    ? createThemeOptions(appDom.fromConstPropValues(themeNode.theme))
-    : {};
-  return createTheme(options);
+  return createTheme(theme, {
+    typography: {
+      h1: {
+        fontSize: `3.25rem`,
+        fontWeight: 800,
+      },
+
+      h2: {
+        fontSize: `2.25rem`,
+        fontWeight: 700,
+      },
+
+      h3: {
+        fontSize: `1.75rem`,
+        fontWeight: 700,
+      },
+
+      h4: {
+        fontSize: `1.5rem`,
+        fontWeight: 700,
+      },
+
+      h5: {
+        fontSize: `1.25rem`,
+        fontWeight: 700,
+      },
+
+      h6: {
+        fontSize: `1.15rem`,
+        fontWeight: 700,
+      },
+    },
+    palette,
+  });
 }
 
 export interface ThemeProviderProps {
@@ -41,7 +69,10 @@ export default function AppThemeProvider({ dom, children }: ThemeProviderProps) 
     const root = appDom.getApp(dom);
     const { themes = [] } = appDom.getChildNodes(dom, root);
     const themeNode = themes.length > 0 ? themes[0] : null;
-    return createToolpadTheme(themeNode);
+    const toolpadTheme: AppTheme = themeNode?.theme
+      ? appDom.fromConstPropValues(themeNode.theme)
+      : {};
+    return createToolpadTheme(toolpadTheme);
   }, [dom]);
 
   return <ThemeProvider theme={theme}>{children}</ThemeProvider>;

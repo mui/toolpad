@@ -29,6 +29,7 @@ import {
   styled,
   Typography,
   Tooltip,
+  Popover,
 } from '@mui/material';
 import { getObjectKey } from '@mui/toolpad-core/objectKey';
 import { hasImageExtension } from '@mui/toolpad-core/path';
@@ -142,6 +143,56 @@ function inferColumnType(value: unknown): string {
   }
 }
 
+function ImageCell({ field, id, value: src }: GridRenderCellParams<any, any, any>) {
+  const [anchorEl, setAnchorEl] = React.useState<HTMLElement | null>(null);
+
+  const handlePopoverOpen = (event: React.MouseEvent<HTMLElement>) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handlePopoverClose = () => {
+    setAnchorEl(null);
+  };
+
+  const open = Boolean(anchorEl);
+
+  const popoverId = React.useId();
+
+  const alt = `${field} ${id}`;
+
+  return (
+    <React.Fragment>
+      <Box
+        aria-owns={open ? popoverId : undefined}
+        aria-haspopup="true"
+        onMouseEnter={handlePopoverOpen}
+        onMouseLeave={handlePopoverClose}
+        component="img"
+        src={src}
+        alt={alt}
+        sx={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain', py: 1 }}
+      />
+      <Popover
+        id={popoverId}
+        sx={{
+          pointerEvents: 'none',
+        }}
+        open={open}
+        anchorEl={anchorEl}
+        onClose={handlePopoverClose}
+        disableRestoreFocus
+      >
+        <Box
+          component="img"
+          src={src}
+          alt={alt}
+          sx={{ maxWidth: '60vw', maxHeight: '60vh', objectFit: 'contain', m: 1 }}
+        />
+      </Popover>
+    </React.Fragment>
+  );
+}
+
 function dateValueGetter({ value }: GridValueGetterParams<any, any>) {
   return typeof value === 'number' ? new Date(value) : value;
 }
@@ -166,9 +217,7 @@ export const CUSTOM_COLUMN_TYPES: GridColumnTypesRecord = {
     ),
   },
   image: {
-    renderCell: ({ field, id, value }) => (
-      <Box component="img" src={value} alt={`${field}${id}`} sx={{ maxWidth: '100%', p: 2 }} />
-    ),
+    renderCell: ({ value, ...params }) => (value ? <ImageCell value={value} {...params} /> : ''),
   },
 };
 
@@ -459,11 +508,6 @@ const DataGridComponent = React.forwardRef(function DataGridComponent(
     [getRowId, columns],
   );
 
-  const getRowHeight = React.useMemo(() => {
-    const hasImageColumns = columns.some(({ type }) => type === 'image');
-    return hasImageColumns ? () => 'auto' : undefined;
-  }, [columns]);
-
   return (
     <div ref={ref} style={{ height: heightProp, minHeight: '100%', width: '100%' }}>
       <DataGridPro
@@ -487,7 +531,6 @@ const DataGridComponent = React.forwardRef(function DataGridComponent(
             message: typeof errorProp === 'string' ? errorProp : errorProp?.message,
           },
         }}
-        getRowHeight={getRowHeight}
         {...props}
       />
     </div>

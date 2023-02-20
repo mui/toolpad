@@ -28,8 +28,8 @@ import {
   NavigationAction,
   NodeId,
   JsExpressionAction,
-  GlobalScopeMeta,
-  GlobalScopeMetaField,
+  ScopeMeta,
+  ScopeMetaField,
   JsRuntime,
 } from '@mui/toolpad-core';
 import { createProvidedContext } from '@mui/toolpad-core/utils/react';
@@ -42,16 +42,17 @@ import useLatest from '../../utils/useLatest';
 import useDebounced from '../../utils/useDebounced';
 import { useEvaluateLiveBinding } from './useEvaluateLiveBinding';
 import useShortcut from '../../utils/useShortcut';
-import { useDom } from '../DomLoader';
+import { useDom } from '../AppState';
 import * as appDom from '../../appDom';
 import { usePageEditorState } from './PageEditor/PageEditorProvider';
 import GlobalScopeExplorer from './GlobalScopeExplorer';
 import TabPanel from '../../components/TabPanel';
+import useUnsavedChangesConfirm from '../hooks/useUnsavedChangesConfirm';
 
 interface BindingEditorContext {
   label: string;
   globalScope: Record<string, unknown>;
-  globalScopeMeta: GlobalScopeMeta;
+  globalScopeMeta: ScopeMeta;
   /**
    * Serverside binding, use the QuickJs runtime to evaluate bindings
    */
@@ -74,7 +75,7 @@ const ErrorTooltip = styled(({ className, ...props }: TooltipProps) => (
 
 interface JsExpressionBindingEditorProps extends WithControlledProp<JsExpressionAttrValue | null> {
   globalScope: Record<string, unknown>;
-  globalScopeMeta: GlobalScopeMeta;
+  globalScopeMeta: ScopeMeta;
 }
 
 function JsExpressionBindingEditor({
@@ -330,22 +331,33 @@ export function BindingEditorDialog<V>({
     onChange(newValue);
   }, [onChange, input]);
 
+  const hasUnsavedChanges = input ? input !== committedInput.current : false;
+
+  const { handleCloseWithUnsavedChanges } = useUnsavedChangesConfirm({
+    hasUnsavedChanges,
+    onClose,
+  });
+
   const handleCommit = React.useCallback(() => {
     handleSave();
     onClose();
-  }, [handleSave, onClose]);
+  }, [onClose, handleSave]);
 
   const handleRemove = React.useCallback(() => {
     onChange(null);
     onClose();
-  }, [onChange, onClose]);
+  }, [onClose, onChange]);
 
   useShortcut({ key: 's', metaKey: true, disabled: !open }, handleSave);
 
-  const hasUnsavedChanges = input && input !== committedInput.current;
-
   return (
-    <Dialog onClose={onClose} open={open} fullWidth scroll="body" maxWidth="lg">
+    <Dialog
+      onClose={handleCloseWithUnsavedChanges}
+      open={open}
+      fullWidth
+      scroll="body"
+      maxWidth="lg"
+    >
       <DialogTitle>Bind a property</DialogTitle>
       <DialogContent>
         {propType?.type === 'event' ? (
@@ -375,7 +387,7 @@ export function BindingEditorDialog<V>({
 export interface BindingEditorProps<V> extends WithControlledProp<BindableAttrValue<V> | null> {
   label: string;
   globalScope: Record<string, unknown>;
-  globalScopeMeta?: GlobalScopeMeta;
+  globalScopeMeta?: ScopeMeta;
   /**
    * Uses the QuickJs runtime to evaluate bindings, just like on the server
    */
@@ -432,10 +444,10 @@ export function BindingEditor<V>({
   );
 
   const resolvedMeta = React.useMemo(() => {
-    const meta: GlobalScopeMeta = { ...globalScopeMeta };
+    const meta: ScopeMeta = { ...globalScopeMeta };
     if (propType?.type === 'event' && propType.arguments) {
       for (const { name, tsType } of propType.arguments) {
-        const metaField: GlobalScopeMetaField = meta[name] ?? {};
+        const metaField: ScopeMetaField = meta[name] ?? {};
         metaField.kind = 'local';
         metaField.tsType = tsType;
         meta[name] = metaField;

@@ -1,4 +1,4 @@
-import { NodeId, LiveBindings, GlobalScopeMeta } from '@mui/toolpad-core';
+import { NodeId, LiveBindings, ScopeMeta } from '@mui/toolpad-core';
 import * as React from 'react';
 import * as appDom from '../../../appDom';
 import { PageViewState } from '../../../types';
@@ -25,12 +25,12 @@ export interface PageEditorState {
   readonly draggedNodeId: NodeId | null;
   readonly isDraggingOver: boolean;
   readonly dragOverNodeId: NodeId | null;
-  readonly dragOverSlotParentProp: string | null;
+  readonly dragOverSlotParentProp: appDom.ParentProp<appDom.ElementNode | appDom.PageNode> | null;
   readonly dragOverZone: DropZone | null;
   readonly draggedEdge: RectangleEdge | null;
   readonly viewState: PageViewState;
   readonly pageState: Record<string, unknown>;
-  readonly globalScopeMeta: GlobalScopeMeta;
+  readonly globalScopeMeta: ScopeMeta;
   readonly bindings: LiveBindings;
 }
 
@@ -58,7 +58,7 @@ export type PageEditorAction =
       type: 'PAGE_NODE_DRAG_OVER';
       dragOverState: {
         nodeId: NodeId | null;
-        parentProp: string | null;
+        parentProp: appDom.ParentProp<appDom.ElementNode | appDom.PageNode> | null;
         zone: DropZone | null;
       };
     }
@@ -68,7 +68,7 @@ export type PageEditorAction =
   | {
       type: 'PAGE_STATE_UPDATE';
       pageState: Record<string, unknown>;
-      globalScopeMeta: GlobalScopeMeta;
+      globalScopeMeta: ScopeMeta;
     }
   | {
       type: 'PAGE_VIEW_STATE_UPDATE';
@@ -195,7 +195,7 @@ function createPageEditorApi(dispatch: React.Dispatch<PageEditorAction>) {
       zone,
     }: {
       nodeId: NodeId | null;
-      parentProp: string | null;
+      parentProp: appDom.ParentProp<appDom.ElementNode | appDom.PageNode> | null;
       zone: DropZone | null;
     }) {
       dispatch({
@@ -209,7 +209,7 @@ function createPageEditorApi(dispatch: React.Dispatch<PageEditorAction>) {
         viewState,
       });
     },
-    pageStateUpdate(pageState: Record<string, unknown>, globalScopeMeta: GlobalScopeMeta) {
+    pageStateUpdate(pageState: Record<string, unknown>, globalScopeMeta: ScopeMeta) {
       dispatch({
         type: 'PAGE_STATE_UPDATE',
         pageState,

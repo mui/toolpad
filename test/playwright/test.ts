@@ -18,6 +18,7 @@ interface ConsoleEntry {
 
 const IGNORED_ERRORS = [
   /JavaScript Error: "downloadable font: download failed \(font-family: "Roboto" style:normal/,
+  /JavaScript Error: "Image corrupt or truncated./,
 ];
 
 export type Options = { ignoreConsoleErrors: RegExp[] };

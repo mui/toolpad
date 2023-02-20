@@ -47,6 +47,7 @@ import * as appDom from '../../appDom';
 import { usePageEditorState } from './PageEditor/PageEditorProvider';
 import GlobalScopeExplorer from './GlobalScopeExplorer';
 import TabPanel from '../../components/TabPanel';
+import useUnsavedChangesConfirm from '../hooks/useUnsavedChangesConfirm';
 
 interface BindingEditorContext {
   label: string;
@@ -332,6 +333,11 @@ export function BindingEditorDialog<V>({
 
   const hasUnsavedChanges = input ? input !== committedInput.current : false;
 
+  const { handleCloseWithUnsavedChanges } = useUnsavedChangesConfirm({
+    hasUnsavedChanges,
+    onClose,
+  });
+
   const handleCommit = React.useCallback(() => {
     handleSave();
     onClose();
@@ -345,7 +351,13 @@ export function BindingEditorDialog<V>({
   useShortcut({ key: 's', metaKey: true, disabled: !open }, handleSave);
 
   return (
-    <Dialog onClose={onClose} open={open} fullWidth scroll="body" maxWidth="lg">
+    <Dialog
+      onClose={handleCloseWithUnsavedChanges}
+      open={open}
+      fullWidth
+      scroll="body"
+      maxWidth="lg"
+    >
       <DialogTitle>Bind a property</DialogTitle>
       <DialogContent>
         {propType?.type === 'event' ? (

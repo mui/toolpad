@@ -269,6 +269,10 @@ async function createBuilder() {
         currentRuntimeProcess = undefined;
         if (code !== 0) {
           runtimeError = new Error(`The runtime process exited with code ${code}`);
+          if (config.cmd === 'start') {
+            console.error(`The runtime process exited with code ${code}`);
+            process.exit(1);
+          }
         }
       }
     });

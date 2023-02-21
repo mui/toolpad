@@ -13,7 +13,7 @@ import invariant from 'invariant';
 import { BoxProps } from '@mui/material';
 import { ConnectionStatus, AppTheme } from '../types';
 import { omit, update, updateOrCreate } from '../utils/immutability';
-import { camelCase, removeDiacritics } from '../utils/strings';
+import { camelCase, pascalCase, removeDiacritics } from '../utils/strings';
 import { ExactEntriesOf, Maybe } from '../utils/types';
 import { mapProperties, mapValues } from '../utils/collections';
 
@@ -440,6 +440,8 @@ function slugifyNodeName(nameCandidate: string, fallback: string): string {
   // try to replace accents with relevant ascii
   slug = removeDiacritics(slug);
   // replace spaces with camelcase
+  // const [first, ...rest] = slug.split(/\s+/);
+  // slug = first + pascalCase(...rest);
   slug = camelCase(...slug.split(/\s+/));
   // replace disallowed characters for js identifiers
   slug = slug.replace(/[^a-zA-Z0-9]+/g, '_');

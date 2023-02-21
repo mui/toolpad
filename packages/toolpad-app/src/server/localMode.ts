@@ -19,8 +19,13 @@ export function getUserProjectRoot(): string {
   return projectDir;
 }
 
-export function getConfigFilePath() {
+function getLegacyConfigFilePath() {
   const filePath = path.resolve(getUserProjectRoot(), './toolpad.yaml');
+  return filePath;
+}
+
+export function getConfigFilePath() {
+  const filePath = path.resolve(getUserProjectRoot(), './toolpad.yml');
   return filePath;
 }
 
@@ -136,9 +141,9 @@ function extractNewComponentsContentFromDom(dom: appDom.AppDom): ExtractedCompon
   const components: ComponentsContent = {};
 
   for (const codeComponent of codeComponentNodes) {
-    if (codeComponent.attributes.isNew?.value) {
-      components[codeComponent.name] = codeComponent.attributes.code.value;
-    }
+    // if (codeComponent.attributes.isNew?.value) {
+    components[codeComponent.name] = codeComponent.attributes.code.value;
+    // }
     dom = appDom.removeNode(dom, codeComponent.id);
   }
 
@@ -196,8 +201,7 @@ export async function saveLocalDom(dom: appDom.AppDom): Promise<void> {
   await writeDomToDisk(dom);
 }
 
-async function loadConfigFile() {
-  const configFilePath = getConfigFilePath();
+async function loadConfigFileFrom(configFilePath: string): Promise<appDom.AppDom | null> {
   try {
     const configContent = await fs.readFile(configFilePath, { encoding: 'utf-8' });
     const parsedConfig = yaml.parse(configContent);
@@ -205,16 +209,32 @@ async function loadConfigFile() {
   } catch (rawError) {
     const error = errorFrom(rawError);
     if (error.code === 'ENOENT') {
-      if (config.cmd !== 'dev') {
-        throw new Error(`No application found at "${configFilePath}".`);
-      }
-
-      const dom = appDom.createDefaultDom();
-      await saveLocalDom(dom);
-      return dom;
+      return null;
     }
     throw error;
   }
+}
+
+async function loadConfigFile() {
+  const configFilePath = getConfigFilePath();
+  const dom = await loadConfigFileFrom(configFilePath);
+
+  if (dom) {
+    return dom;
+  }
+
+  const legacyPath = getLegacyConfigFilePath();
+  const legacyFileDom = await loadConfigFileFrom(getLegacyConfigFilePath());
+
+  if (legacyFileDom) {
+    await saveLocalDom(legacyFileDom);
+    await fs.unlink(legacyPath);
+    return legacyFileDom;
+  }
+
+  const defaultDom = appDom.createDefaultDom();
+  await saveLocalDom(defaultDom);
+  return defaultDom;
 }
 
 export async function loadDomFromDisk(): Promise<appDom.AppDom> {

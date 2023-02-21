@@ -64,7 +64,7 @@ import evalJsBindings, {
   EvaluatedBinding,
   ParsedBinding,
 } from './evalJsBindings';
-import { HTML_ID_EDITOR_OVERLAY } from '../constants';
+import { HTML_ID_EDITOR_OVERLAY, NON_BINDABLE_CONTROL_TYPES } from '../constants';
 import { mapProperties, mapValues } from '../utils/collections';
 import usePageTitle from '../utils/usePageTitle';
 import ComponentsContext, { useComponents, useComponent } from './ComponentsContext';
@@ -700,9 +700,20 @@ function parseBindings(
       const componentId = getComponentId(elm);
       const Component = components[componentId];
 
-      const { argTypes = {} } = Component?.[TOOLPAD_COMPONENT] ?? {};
+      const componentConfig = Component?.[TOOLPAD_COMPONENT];
 
-      for (const [propName, argType] of Object.entries(argTypes)) {
+      const { argTypes = {} } = componentConfig ?? {};
+
+      const bindableArgTypeEntries = Object.entries(argTypes).filter(([propName, argType]) => {
+        const isResizableHeightProp =
+          componentConfig?.resizableHeightProp && propName === componentConfig?.resizableHeightProp;
+        return (
+          !isResizableHeightProp &&
+          !NON_BINDABLE_CONTROL_TYPES.includes(argType?.control?.type as string)
+        );
+      });
+
+      for (const [propName, argType] of bindableArgTypeEntries) {
         const initializerId = argType?.defaultValueProp
           ? `${elm.id}.props.${argType.defaultValueProp}`
           : undefined;

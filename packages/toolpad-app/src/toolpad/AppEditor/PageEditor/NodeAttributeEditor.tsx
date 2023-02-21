@@ -17,8 +17,7 @@ import { usePageEditorState } from './PageEditorProvider';
 import { getDefaultControl } from '../../propertyControls';
 import MarkdownTooltip from '../../../components/MarkdownTooltip';
 import { isTemplateDescendant } from '../../../toolpadComponents/template';
-
-const NON_BINDABLE_CONTROL_TYPES = ['GridColumns'];
+import { NON_BINDABLE_CONTROL_TYPES } from '../../../constants';
 
 export interface NodeAttributeEditorProps<P extends object> {
   node: appDom.AppDomNode;

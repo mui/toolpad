@@ -131,7 +131,7 @@ function Text({ value, markdown, href, loading, mode, sx, ...rest }: TextProps) 
           }}
           onInput={(event) => {
             if (nodeRuntime) {
-              setInput(event.target.innerText);
+              setInput(event.currentTarget.innerText);
             }
           }}
           contentEditable={contentEditable}

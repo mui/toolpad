@@ -28,6 +28,7 @@ import {
   SqlConnectionEditorProps,
   SqlQuery,
   SqlPrivateQuery,
+  SqlResult,
 } from './types';
 
 const MonacoEditor = lazyComponent(() => import('../../components/MonacoEditor'), {
@@ -200,12 +201,9 @@ export function QueryEditor({
     [paramsEditorLiveValue],
   );
 
-  const fetchPrivate = useFetchPrivate<
-    SqlPrivateQuery<SqlConnectionParams, SqlQuery>,
-    ExecFetchResult
-  >();
+  const fetchPrivate = useFetchPrivate<SqlPrivateQuery<SqlConnectionParams, SqlQuery>, SqlResult>();
   const fetchServerPreview = React.useCallback(
-    (query: SqlQuery, params: Record<string, string>) =>
+    async (query: SqlQuery, params: Record<string, string>) =>
       fetchPrivate({ kind: 'debugExec', query, params }),
     [fetchPrivate],
   );
@@ -253,15 +251,22 @@ export function QueryEditor({
         </Box>
       </SplitPane>
 
-      <DataGridPro
-        sx={{ border: 'none' }}
-        columns={columns}
-        key={previewGridKey}
-        rows={rows}
-        columnTypes={CUSTOM_COLUMN_TYPES}
-        error={preview?.error}
-        loading={previewIsLoading}
-      />
+      <Box sx={{ height: '100%', overflow: 'auto', display: 'flex', flexDirection: 'column' }}>
+        <DataGridPro
+          sx={{ border: 'none', flex: 1 }}
+          columns={columns}
+          key={previewGridKey}
+          rows={rows}
+          columnTypes={CUSTOM_COLUMN_TYPES}
+          error={preview?.error}
+          loading={previewIsLoading}
+        />
+        {preview?.info ? (
+          <Typography variant="body2" sx={{ m: 1 }}>
+            {preview.info}
+          </Typography>
+        ) : null}
+      </Box>
     </SplitPane>
   );
 }

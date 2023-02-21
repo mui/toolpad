@@ -12,6 +12,11 @@ export interface SqlConnectionParams {
 export interface SqlQuery {
   sql: string;
 }
+
+export interface SqlResult extends ExecFetchResult {
+  info?: string;
+}
+
 export interface SqlConnectionEditorProps<P> extends WithControlledProp<P | null> {
   defaultPort: number;
 }

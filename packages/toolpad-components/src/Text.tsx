@@ -7,7 +7,7 @@ import {
   LinkProps as MuiLinkProps,
   styled,
 } from '@mui/material';
-import { createComponent } from '@mui/toolpad-core';
+import { createComponent, useNode } from '@mui/toolpad-core';
 import { SX_PROP_HELPER_TEXT } from './constants';
 
 const Markdown = React.lazy(() => import('markdown-to-jsx'));
@@ -58,6 +58,11 @@ const CodeContainer = styled('pre')(({ theme }) => ({
 }));
 
 function Text({ value, markdown, href, loading, mode, sx, ...rest }: TextProps) {
+  const [contentEditable, setContentEditable] = React.useState(false);
+  const [input, setInput] = React.useState<string | null>(null);
+
+  const nodeRuntime = useNode<TextProps>();
+
   switch (mode) {
     case 'markdown':
       return loading ? (
@@ -114,7 +119,26 @@ function Text({ value, markdown, href, loading, mode, sx, ...rest }: TextProps) 
             // This will give it height, even when empty.
             // REMARK: Does it make sense to put it in core?
             [`&:empty::before`]: { content: '""', display: 'inline-block' },
+            outline: 'none',
             ...sx,
+          }}
+          onBlur={() => {
+            setContentEditable(false);
+            if (nodeRuntime && typeof input === 'string') {
+              setInput(null);
+              nodeRuntime.updateAppDomConstProp('value', input);
+            }
+          }}
+          onInput={(event) => {
+            if (nodeRuntime) {
+              setInput(event.target.innerText);
+            }
+          }}
+          contentEditable={contentEditable}
+          onDoubleClick={() => {
+            if (nodeRuntime) {
+              setContentEditable(true);
+            }
           }}
           {...rest}
         >

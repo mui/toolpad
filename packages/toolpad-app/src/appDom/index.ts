@@ -105,6 +105,7 @@ export interface CodeComponentNode extends AppDomNodeBase {
   readonly type: 'codeComponent';
   readonly attributes: {
     readonly code: ConstantAttrValue<string>;
+    readonly isNew?: ConstantAttrValue<boolean>;
   };
 }
 

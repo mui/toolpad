@@ -129,14 +129,16 @@ interface ExtractedComponents {
   dom: appDom.AppDom;
 }
 
-function extractComponentsContentFromDom(dom: appDom.AppDom): ExtractedComponents {
+function extractNewComponentsContentFromDom(dom: appDom.AppDom): ExtractedComponents {
   const rootNode = appDom.getApp(dom);
   const { codeComponents: codeComponentNodes = [] } = appDom.getChildNodes(dom, rootNode);
 
   const components: ComponentsContent = {};
 
   for (const codeComponent of codeComponentNodes) {
-    components[codeComponent.name] = codeComponent.attributes.code.value;
+    if (codeComponent.attributes.isNew?.value) {
+      components[codeComponent.name] = codeComponent.attributes.code.value;
+    }
     dom = appDom.removeNode(dom, codeComponent.id);
   }
 
@@ -178,7 +180,7 @@ export async function writeDomToDisk(dom: appDom.AppDom): Promise<void> {
   const componentsFolder = getComponentFolder();
 
   const { components: componentsContent, dom: domWithoutComponents } =
-    extractComponentsContentFromDom(dom);
+    extractNewComponentsContentFromDom(dom);
   await Promise.all([
     writeConfigFile(configFilePath, domWithoutComponents),
     writeCodeComponentsToFiles(componentsFolder, componentsContent),

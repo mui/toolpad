@@ -96,6 +96,7 @@ export default function CreateCodeComponentDialog({
             name,
             attributes: {
               code: appDom.createConst(createDefaultCodeComponent(name)),
+              isNew: appDom.createConst(true),
             },
           });
           const appNode = appDom.getApp(dom);

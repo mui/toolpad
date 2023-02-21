@@ -18,6 +18,8 @@ import { getDefaultControl } from '../../propertyControls';
 import MarkdownTooltip from '../../../components/MarkdownTooltip';
 import { isTemplateDescendant } from '../../../toolpadComponents/template';
 
+const NON_BINDABLE_CONTROL_TYPES = ['GridColumns'];
+
 export interface NodeAttributeEditorProps<P extends object> {
   node: appDom.AppDomNode;
   namespace?: string;
@@ -59,7 +61,10 @@ export default function NodeAttributeEditor<P extends object>({
   // to make them bindable to other controlled props only
   const isDisabled = !!argType.onChangeHandler;
 
-  const isBindable = !isDisabled && namespace !== 'layout';
+  const isBindable =
+    !isDisabled &&
+    namespace !== 'layout' &&
+    !NON_BINDABLE_CONTROL_TYPES.includes(argType.control?.type as string);
 
   const jsBrowserRuntime = useBrowserJsRuntime();
 

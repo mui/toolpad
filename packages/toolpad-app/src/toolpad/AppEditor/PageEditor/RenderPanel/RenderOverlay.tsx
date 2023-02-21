@@ -271,7 +271,8 @@ interface RenderOverlayProps {
 
 export default function RenderOverlay({ bridge }: RenderOverlayProps) {
   const { dom } = useDom();
-  const { selectedNodeId } = useAppState();
+  const { currentView } = useAppState();
+  const selectedNodeId = currentView.kind === 'page' ? currentView.selectedNodeId : null;
 
   const domApi = useDomApi();
   const appStateApi = useAppStateApi();
@@ -416,12 +417,15 @@ export default function RenderOverlay({ bridge }: RenderOverlayProps) {
 
           return normalizePageRowColumnSizes(draft);
         },
-        {
-          selectedNodeId: null,
-        },
+        currentView.kind === 'page'
+          ? {
+              ...currentView,
+              selectedNodeId: null,
+            }
+          : currentView,
       );
     },
-    [appStateApi, dom, normalizePageRowColumnSizes],
+    [appStateApi, currentView, dom, normalizePageRowColumnSizes],
   );
 
   const selectedRect = selectedNode && !newNode ? nodesInfo[selectedNode.id]?.rect : null;
@@ -1262,7 +1266,9 @@ export default function RenderOverlay({ bridge }: RenderOverlayProps) {
 
           return normalizePageRowColumnSizes(draft);
         },
-        { selectedNodeId: newNode?.id || draggedNodeId },
+        currentView.kind === 'page'
+          ? { ...currentView, selectedNodeId: newNode?.id || draggedNodeId }
+          : currentView,
       );
 
       api.dragEnd();
@@ -1278,7 +1284,8 @@ export default function RenderOverlay({ bridge }: RenderOverlayProps) {
       api,
       appStateApi,
       availableDropZones,
-      bridge,
+      bridge?.canvasCommands,
+      currentView,
       dom,
       dragOverNodeId,
       dragOverSlotParentProp,

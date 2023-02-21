@@ -175,7 +175,8 @@ export interface ComponentEditorProps {
 
 export default function ComponentEditor({ className }: ComponentEditorProps) {
   const { dom } = useDom();
-  const { selectedNodeId } = useAppState();
+  const { currentView } = useAppState();
+  const selectedNodeId = currentView.kind === 'page' ? currentView.selectedNodeId : null;
 
   const selectedNode = selectedNodeId ? appDom.getMaybeNode(dom, selectedNodeId) : null;
 

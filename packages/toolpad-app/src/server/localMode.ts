@@ -141,9 +141,9 @@ function extractNewComponentsContentFromDom(dom: appDom.AppDom): ExtractedCompon
   const components: ComponentsContent = {};
 
   for (const codeComponent of codeComponentNodes) {
-    // if (codeComponent.attributes.isNew?.value) {
-    components[codeComponent.name] = codeComponent.attributes.code.value;
-    // }
+    if (codeComponent.attributes.isNew?.value) {
+      components[codeComponent.name] = codeComponent.attributes.code.value;
+    }
     dom = appDom.removeNode(dom, codeComponent.id);
   }
 

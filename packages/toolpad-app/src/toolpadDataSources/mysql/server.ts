@@ -1,9 +1,7 @@
-import { createConnection } from 'mysql2/promise';
+import { createConnection, OkPacket, ResultSetHeader } from 'mysql2/promise';
 import { errorFrom } from '../../utils/errors';
 import { Maybe } from '../../utils/types';
-import { asArray } from '../../utils/collections';
-import { SqlConnectionParams } from '../sql/types';
-import { MySQLQuery, MySQLResult } from './types';
+import { SqlConnectionParams, SqlQuery, SqlResult } from '../sql/types';
 import { createSqlServerDatasource } from '../sql/server';
 
 /**
@@ -11,7 +9,7 @@ import { createSqlServerDatasource } from '../sql/server';
  * and return an array containing the values to replace the placeholders with
  */
 
-function prepareQuery(sql: string, params: Record<string, string>): MySQLQuery {
+function prepareQuery(sql: string, params: Record<string, string>) {
   const substitutions: any[] = [];
   const sqlWithVarsReplaced = sql.replaceAll(
     // eslint-disable-next-line no-useless-escape
@@ -40,18 +38,28 @@ function prepareQuery(sql: string, params: Record<string, string>): MySQLQuery {
 
 async function execSql(
   connection: Maybe<SqlConnectionParams>,
-  query: MySQLQuery,
+  query: SqlQuery,
   params: Record<string, string>,
-): Promise<MySQLResult> {
+): Promise<SqlResult> {
   const mysqlConnection = await createConnection({ ...connection });
 
   try {
     const { sql, substitutions } = prepareQuery(query.sql, params);
 
-    const [rows] = await mysqlConnection.execute(sql, substitutions);
+    const [result] = await mysqlConnection.execute(sql, substitutions);
+
+    let rows: any[] = [];
+    let info: string | undefined;
+
+    if (Array.isArray(result)) {
+      rows = result;
+    } else {
+      info = (result as ResultSetHeader).info || (result as OkPacket).message;
+    }
+
     return {
-      // @ts-expect-error - TODO: Fix this asArray type error
-      data: asArray(rows),
+      data: rows,
+      info,
     };
   } catch (rawError) {
     const error = errorFrom(rawError);
@@ -66,7 +74,7 @@ async function testConnection(connection: Maybe<SqlConnectionParams>): Promise<v
   mysqlConnection.execute('SELECT 1');
 }
 
-export default createSqlServerDatasource<SqlConnectionParams, MySQLQuery>({
+export default createSqlServerDatasource<SqlConnectionParams, SqlQuery>({
   execSql,
   testConnection,
 });

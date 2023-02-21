@@ -14,6 +14,8 @@ import { format } from '../../../utils/prettier';
 import DialogForm from '../../../components/DialogForm';
 import useEvent from '../../../utils/useEvent';
 import { useNodeNameValidation } from './validation';
+import client from '../../../api';
+import config from '../../../config';
 
 const DEFAULT_NAME = 'MyComponent';
 
@@ -101,12 +103,23 @@ export default function CreateCodeComponentDialog({
           });
           const appNode = appDom.getApp(dom);
 
-          appStateApi.update((draft) => appDom.addNode(draft, newNode, appNode, 'codeComponents'), {
-            view: {
-              kind: 'codeComponent',
-              nodeId: newNode.id,
-            },
-          });
+          if (config.localMode) {
+            appStateApi.update((draft) =>
+              appDom.addNode(draft, newNode, appNode, 'codeComponents'),
+            );
+
+            client.mutation.openCodeComponentEditor(name);
+          } else {
+            appStateApi.update(
+              (draft) => appDom.addNode(draft, newNode, appNode, 'codeComponents'),
+              {
+                view: {
+                  kind: 'codeComponent',
+                  nodeId: newNode.id,
+                },
+              },
+            );
+          }
 
           onClose();
         }}

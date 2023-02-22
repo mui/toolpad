@@ -15,6 +15,7 @@ import {
   openCodeEditor,
   QUERIES_FILE,
   readProjectFolder,
+  writeProjectFiles,
 } from '../../server/localMode';
 import { errorFrom, serializeError } from '../../utils/errors';
 
@@ -496,7 +497,7 @@ export default dataSource;
 
 async function startDev() {
   const builder = await createBuilder();
-  await builder.watch();
+  builder.watch();
   return builder;
 }
 

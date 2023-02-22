@@ -1,6 +1,7 @@
 import 'dotenv/config';
 import arg from 'arg';
 import path from 'path';
+import * as fs from 'fs/promises';
 
 const DEFAULT_PORT = 3000;
 
@@ -11,6 +12,8 @@ function* getNextPort(port: number = DEFAULT_PORT) {
   }
 }
 
+const TOOLPAD_DIR_PATH = path.resolve(__dirname, '../..'); // from ./dist/server
+
 interface RunCommandArgs {
   // Whether Toolpad editor is running in dev mode (for debugging purposes only)
   devMode?: boolean;
@@ -20,7 +23,7 @@ interface RunCommandArgs {
 async function runApp(cmd: 'dev' | 'start', { devMode = false, port }: RunCommandArgs) {
   const { execa } = await import('execa');
   const { default: getPort } = await import('get-port');
-  const toolpadDir = path.resolve(__dirname, '../..'); // from ./dist/server
+
   const nextCommand = devMode ? 'dev' : 'start';
 
   if (!port) {
@@ -28,7 +31,7 @@ async function runApp(cmd: 'dev' | 'start', { devMode = false, port }: RunComman
   }
 
   const cp = execa('next', [nextCommand, `--port=${port}`], {
-    cwd: toolpadDir,
+    cwd: TOOLPAD_DIR_PATH,
     preferLocal: true,
     stdio: 'pipe',
     env: {
@@ -50,9 +53,27 @@ async function runApp(cmd: 'dev' | 'start', { devMode = false, port }: RunComman
   });
 }
 
+const PROJECT_FILES_PATH = path.resolve(TOOLPAD_DIR_PATH, './cli/projectFiles');
+
+async function writeProjectFiles(): Promise<void> {
+  const projectFilePaths = await fs.readdir(PROJECT_FILES_PATH);
+  await Promise.all(
+    projectFilePaths.map(async (fileName) => {
+      const filePath = path.resolve(PROJECT_FILES_PATH, fileName);
+      const fileContent = await fs.readFile(filePath);
+
+      fs.writeFile(`${process.cwd()}/${fileName}`, fileContent, { encoding: 'utf-8' });
+    }),
+  );
+}
+
 async function devCommand(args: RunCommandArgs) {
   // eslint-disable-next-line no-console
-  console.log('starting toolpad application in dev mode...');
+  console.log('generating project files…');
+  await writeProjectFiles();
+
+  // eslint-disable-next-line no-console
+  console.log('starting toolpad application in dev mode…');
   await runApp('dev', args);
 }
 

@@ -35,7 +35,10 @@ const MONOREPO_PACKAGES = {
   '@mui/system': path.resolve(MONOREPO_PATH, './packages/mui-system/src'),
   '@mui/types': path.resolve(MONOREPO_PATH, './packages/mui-types'),
   '@mui/markdown': path.resolve(MONOREPO_PATH, './packages/markdown'),
-  '@mui/utils': path.resolve(MONOREPO_PATH, './packages/mui-utils'),
+  '@mui/utils/macros/MuiError.macro': path.resolve(
+    MONOREPO_PATH,
+    './packages/mui-utils/macros/MuiError.macro.js',
+  ),
 };
 
 export default withTM(
@@ -57,7 +60,6 @@ export default withTM(
             alias: {
               ...config.resolve.alias,
               docs: path.resolve(MONOREPO_PATH, './docs'),
-              [path.resolve(MONOREPO_PATH, './packages/mui-utils/macros/MuiError.macro')]: 'react',
               ...MONOREPO_PACKAGES,
             },
           },

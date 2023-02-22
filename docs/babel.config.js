@@ -1,8 +1,15 @@
 const fse = require('fs-extra');
+const path = require('path');
 
 const { version: transformRuntimeVersion } = fse.readJSONSync(
   require.resolve('@babel/runtime-corejs2/package.json'),
 );
+
+const errorCodesPath = path.resolve(
+  __dirname,
+  './node_modules/@mui/monorepo/docs/public/static/error-codes.json',
+);
+const missingError = process.env.MUI_EXTRACT_ERROR_CODES === 'true' ? 'write' : 'annotate';
 
 module.exports = {
   presets: [
@@ -10,6 +17,15 @@ module.exports = {
     ['next/babel', { 'transform-runtime': { corejs: 2, version: transformRuntimeVersion } }],
   ],
   plugins: [
+    [
+      'babel-plugin-macros',
+      {
+        muiError: {
+          errorCodesPath,
+          missingError,
+        },
+      },
+    ],
     [
       'babel-plugin-transform-rename-import',
       {

@@ -5,20 +5,11 @@
   "description": "Build MUI apps quickly",
   "repository": "https://github.com/mui/mui-toolpad.git",
   "private": true,
-  "workspaces": {
-    "packages": [
-      "packages/*",
-      "docs"
-    ],
-    "nohoist": [
-      "docs",
-      "docs/**"
-    ]
-  },
   "bin": {
     "toolpad": "./dist/index.js"
   },
   "scripts": {
+    "preinstall": "npx only-allow pnpm", 
     "markdownlint": "markdownlint-cli2 \"**/*.md\"",
     "prettier": "pretty-quick --ignore-path .eslintignore",
     "prettier:all": "prettier --write . --ignore-path .eslintignore",
@@ -26,7 +17,7 @@
     "start": "dotenv cross-env FORCE_COLOR=1 yarn workspace @mui/toolpad-app start",
     "dev": "dotenv cross-env FORCE_COLOR=1 lerna -- run dev --stream --parallel --scope @mui/toolpad-core --scope @mui/toolpad-components --scope @mui/toolpad-app",
     "dev13": "dotenv cross-env FORCE_COLOR=1 lerna -- run dev13 --stream --parallel",
-    "docs:dev": "yarn workspace docs dev",
+    "docs:dev": "pnpm --dir ./docs dev",
     "docs:build": "yarn workspace docs build",
     "docs:export": "yarn workspace docs export",
     "eslint": "eslint . --report-unused-disable-directives --ext .js,.ts,.tsx",
@@ -42,7 +33,7 @@
     "check-types": "lerna run check-types"
   },
   "devDependencies": {
-    "@mui/monorepo": "https://github.com/mui/material-ui.git",
+    "@mui/monorepo": "https://github.com/mui/material-ui.git#f8fe2bfe36d11cf9f1cb8d4cb437a09caadee6ad",
     "@next/eslint-plugin-next": "13.1.6",
     "@playwright/test": "^1.30.0",
     "@swc/helpers": "^0.4.14",

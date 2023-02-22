@@ -113,10 +113,8 @@ export default function CreateCodeComponentDialog({
             appStateApi.update(
               (draft) => appDom.addNode(draft, newNode, appNode, 'codeComponents'),
               {
-                view: {
-                  kind: 'codeComponent',
-                  nodeId: newNode.id,
-                },
+                kind: 'codeComponent',
+                nodeId: newNode.id,
               },
             );
           }

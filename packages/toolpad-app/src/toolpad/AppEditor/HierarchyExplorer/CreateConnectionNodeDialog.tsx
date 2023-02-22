@@ -81,10 +81,8 @@ export default function CreateConnectionDialog({
           const appNode = appDom.getApp(dom);
 
           appStateApi.update((draft) => appDom.addNode(draft, newNode, appNode, 'connections'), {
-            view: {
-              kind: 'connection',
-              nodeId: newNode.id,
-            },
+            kind: 'connection',
+            nodeId: newNode.id,
           });
 
           onClose();

@@ -143,7 +143,9 @@ export default function QueryEditor() {
         domApi.saveNode(node);
       } else {
         appStateApi.update((draft) => appDom.addNode(draft, node, page, 'queries'), {
-          view: { kind: 'page', nodeId: page.id, view: { kind: 'query', nodeId: node.id } },
+          kind: 'page',
+          nodeId: page.id,
+          view: { kind: 'query', nodeId: node.id },
         });
       }
     },
@@ -153,10 +155,8 @@ export default function QueryEditor() {
   const handleDeleteNode = React.useCallback(
     (nodeId: NodeId) => {
       appStateApi.update((draft) => appDom.removeNode(draft, nodeId), {
-        view: {
-          kind: 'page',
-          nodeId: page.id,
-        },
+        kind: 'page',
+        nodeId: page.id,
       });
     },
     [appStateApi, page.id],

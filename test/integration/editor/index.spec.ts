@@ -1,9 +1,9 @@
 import * as path from 'path';
-import { test, expect } from '../../playwright/test.js';
-import { ToolpadEditor } from '../../models/ToolpadEditor.js';
-import clickCenter from '../../utils/clickCenter.js';
-import generateId from '../../utils/generateId.js';
-import { readJsonFile } from '../../utils/fs.js';
+import { test, expect } from '../../playwright/test';
+import { ToolpadEditor } from '../../models/ToolpadEditor';
+import clickCenter from '../../utils/clickCenter';
+import generateId from '../../utils/generateId';
+import { readJsonFile } from '../../utils/fs';
 
 test('can place new components from catalog', async ({ page, api }) => {
   const app = await api.mutation.createApp(`App ${generateId()}`);

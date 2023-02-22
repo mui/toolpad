@@ -1,11 +1,24 @@
 import * as path from 'path';
-import { test, expect } from '../../playwright/test';
-import { ToolpadEditor } from '../../models/ToolpadEditor';
-import clickCenter from '../../utils/clickCenter';
-import generateId from '../../utils/generateId';
-import { readJsonFile } from '../../utils/fs';
+import * as url from 'url';
+import { test, expect } from '../../playwright/test.js';
+import { ToolpadEditor } from '../../models/ToolpadEditor.js';
+import clickCenter from '../../utils/clickCenter.js';
+import generateId from '../../utils/generateId.js';
+import { readJsonFile } from '../../utils/fs.js';
 
-test('can place new components from catalog', async ({ page, api }) => {
+const currentDirectory = url.fileURLToPath(new URL('.', import.meta.url));
+
+async function runApp() {
+  const { execa } = await import('execa');
+  const x = await execa('toolpad', ['start'], {
+    cwd: currentDirectory,
+  });
+  console.log(x.stdout);
+}
+
+test.only('can place new components from catalog', async ({ page, api }) => {
+  await runApp();
+
   const app = await api.mutation.createApp(`App ${generateId()}`);
 
   const editorModel = new ToolpadEditor(page);

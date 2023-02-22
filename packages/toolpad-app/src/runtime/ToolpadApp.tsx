@@ -703,6 +703,7 @@ function parseBindings(
       const componentConfig = Component?.[TOOLPAD_COMPONENT];
 
       const { argTypes = {} } = componentConfig ?? {};
+
       for (const [propName, argType] of Object.entries(argTypes)) {
         const initializerId = argType?.defaultValueProp
           ? `${elm.id}.props.${argType.defaultValueProp}`

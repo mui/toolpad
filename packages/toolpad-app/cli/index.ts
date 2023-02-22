@@ -62,7 +62,7 @@ async function writeProjectFiles(): Promise<void> {
       const filePath = path.resolve(PROJECT_FILES_PATH, fileName);
       const fileContent = await fs.readFile(filePath);
 
-      fs.writeFile(`${process.cwd()}/${fileName}`, fileContent, { encoding: 'utf-8' });
+      fs.writeFile(path.join(process.cwd(), fileName), fileContent, { encoding: 'utf-8' });
     }),
   );
 }

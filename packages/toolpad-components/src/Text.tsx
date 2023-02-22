@@ -38,17 +38,6 @@ interface TextProps extends Omit<BaseProps, 'children'> {
   loading?: boolean;
 }
 
-const gutters = (marginTop: number, marginBottom: number) => ({
-  marginTop,
-  marginBottom,
-  '&:first-child': {
-    marginTop: 0,
-  },
-  '&:last-child': {
-    marginBottom: 0,
-  },
-});
-
 const MarkdownContainer = styled('div')(({ theme }) => ({
   display: 'block',
   maxWidth: '100%',
@@ -56,13 +45,46 @@ const MarkdownContainer = styled('div')(({ theme }) => ({
     content: '""',
     display: 'inline-block',
   },
-  '& h1': { ...theme.typography.h1, ...gutters(16, 16) },
-  '& h2': { ...theme.typography.h2, ...gutters(12, 12) },
-  '& h3': { ...theme.typography.h3, ...gutters(12, 12) },
-  '& h4': { ...theme.typography.h4, ...gutters(12, 12) },
-  '& h5': { ...theme.typography.h5, ...gutters(4, 4) },
-  '& h6': { ...theme.typography.h6, ...gutters(4, 4) },
-  '& p': { margin: 0, marginBottom: 6 },
+  '& h1': {
+    ...theme.typography.h1,
+    marginTop: 16,
+    marginBottom: 16,
+  },
+  '& h2': {
+    ...theme.typography.h2,
+    marginTop: 12,
+    marginBottom: 12,
+  },
+  '& h3': {
+    ...theme.typography.h3,
+    marginTop: 12,
+    marginBottom: 12,
+  },
+  '& h4': {
+    ...theme.typography.h4,
+    marginTop: 12,
+    marginBottom: 12,
+  },
+  '& h5': {
+    ...theme.typography.h5,
+    marginTop: 4,
+    marginBottom: 4,
+  },
+  '& h6': {
+    ...theme.typography.h6,
+    marginTop: 4,
+    marginBottom: 4,
+  },
+  '& p': {
+    marginTop: 12,
+    marginBottom: 12,
+  },
+  '& *:first-child': {
+    marginTop: 0,
+  },
+  '& *:last-child': {
+    marginBottom: 0,
+  },
 }));
 
 const CodeContainer = styled('pre')(({ theme }) => ({

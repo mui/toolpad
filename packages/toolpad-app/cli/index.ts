@@ -56,9 +56,9 @@ async function runApp(cmd: 'dev' | 'start', { devMode = false, port }: RunComman
 const PROJECT_FILES_PATH = path.resolve(TOOLPAD_DIR_PATH, './cli/projectFiles');
 
 async function writeProjectFiles(): Promise<void> {
-  const projectFilePaths = await fs.readdir(PROJECT_FILES_PATH);
+  const projectFileNames = await fs.readdir(PROJECT_FILES_PATH);
   await Promise.all(
-    projectFilePaths.map(async (fileName) => {
+    projectFileNames.map(async (fileName) => {
       const filePath = path.resolve(PROJECT_FILES_PATH, fileName);
       const fileContent = await fs.readFile(filePath);
 

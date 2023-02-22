@@ -1,0 +1,36 @@
+{
+  "name": "create-toolpad-app-test",
+  "version": "0.0.2",
+  "keywords": [
+    "react",
+    "toolpad",
+    "mui"
+  ],
+  "description": "Create Toolpad apps with one command",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/mui/mui-toolpad",
+    "directory": "packages/create-toolpad-app"
+  },
+  "author": "Toolpad Team",
+  "license": "MIT",
+  "bin": {
+    "create-toolpad-app-test": "./dist/index.js"
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "dev": "ncc build ./index.ts -w -o dist/",
+    "prerelease": "rimraf ./dist/",
+    "release": "ncc build ./index.ts -o ./dist/ --minify --no-cache --no-source-map-register",
+    "build": "yarn release"
+  },
+  "devDependencies": {
+    "@vercel/ncc": "0.34.0",
+    "chalk": "2.4.2"
+  },
+  "engines": {
+    "node": ">=14.6.0"
+  }
+}

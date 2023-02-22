@@ -6,11 +6,28 @@ import {
   Link as MuiLink,
   LinkProps as MuiLinkProps,
   styled,
+  TextareaAutosize,
 } from '@mui/material';
-import { createComponent } from '@mui/toolpad-core';
+import { createComponent, useNode } from '@mui/toolpad-core';
+import { Typography } from '@mui/material/styles/createTypography';
 import { SX_PROP_HELPER_TEXT } from './constants';
 
 const Markdown = React.lazy(() => import('markdown-to-jsx'));
+
+const StyledTextareaAutosize = styled(TextareaAutosize)(({ theme }) => ({
+  width: '100%',
+  resize: 'none',
+  border: 'none',
+  outline: 'none',
+  padding: 0,
+
+  ...Object.fromEntries(
+    Object.keys(theme.typography).map((variant) => [
+      [`&.variant-${variant}`],
+      theme.typography[variant as keyof Typography],
+    ]),
+  ),
+}));
 
 type BaseProps = MuiLinkProps | MuiTypographyProps;
 interface TextProps extends Omit<BaseProps, 'children'> {
@@ -78,7 +95,22 @@ const CodeContainer = styled('pre')(({ theme }) => ({
   overflow: 'auto',
 }));
 
+function parseInput(text: unknown): string {
+  return String(text).replaceAll('\n', '');
+}
+
 function Text({ value, markdown, href, loading, mode, sx, ...rest }: TextProps) {
+  const [contentEditable, setContentEditable] = React.useState<null | {
+    selectionStart: number;
+    selectionEnd: number;
+  }>(null);
+  const [input, setInput] = React.useState<string>(parseInput(value));
+  React.useEffect(() => {
+    setInput(parseInput(value));
+  }, [value]);
+
+  const nodeRuntime = useNode<TextProps>();
+
   switch (mode) {
     case 'markdown':
       return loading ? (
@@ -128,18 +160,56 @@ function Text({ value, markdown, href, loading, mode, sx, ...rest }: TextProps) 
       );
     case 'text':
     default:
-      return (
+      return contentEditable ? (
+        <StyledTextareaAutosize
+          value={input}
+          onChange={(event) => {
+            setInput(parseInput(event.target.value));
+          }}
+          onKeyDown={(event) => {
+            if (event.key === 'Enter') {
+              event.preventDefault();
+            }
+          }}
+          autoFocus
+          onFocus={(event) => {
+            event.currentTarget.selectionStart = contentEditable.selectionStart;
+            event.currentTarget.selectionEnd = Math.max(
+              contentEditable.selectionStart,
+              contentEditable.selectionEnd,
+            );
+          }}
+          onBlur={() => {
+            setContentEditable(null);
+            if (nodeRuntime) {
+              nodeRuntime.updateAppDomConstProp('value', input);
+            }
+          }}
+          className={`variant-${rest.variant}`}
+        />
+      ) : (
         <MuiTypography
           sx={{
-            minWidth: loading || !value ? 150 : undefined,
-            // This will give it height, even when empty.
-            // REMARK: Does it make sense to put it in core?
-            [`&:empty::before`]: { content: '""', display: 'inline-block' },
             ...sx,
+            width: '100%',
+            // This will give it height, even when empty.
+            // REMARK: Does it make sense to put it in MUI core?
+            [`&:empty::before`]: { content: '""', display: 'inline-block' },
+            outline: 'none',
+            whiteSpace: 'pre-wrap',
+          }}
+          onDoubleClick={() => {
+            if (nodeRuntime) {
+              const selection = window.getSelection();
+              setContentEditable({
+                selectionStart: selection?.anchorOffset || 0,
+                selectionEnd: selection?.focusOffset || 0,
+              });
+            }
           }}
           {...rest}
         >
-          {loading ? <Skeleton /> : String(value)}
+          {loading ? <Skeleton /> : input}
         </MuiTypography>
       );
   }
@@ -160,7 +230,7 @@ export default createComponent(Text, {
     },
     value: {
       helperText: 'The text content.',
-      typeDef: { type: 'string', default: '' },
+      typeDef: { type: 'string', default: 'text' },
       label: 'Value',
       control: { type: 'markdown' },
     },

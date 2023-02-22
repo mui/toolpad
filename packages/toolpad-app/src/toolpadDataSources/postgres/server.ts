@@ -1,8 +1,7 @@
 import { Client, QueryConfig } from 'pg';
 import { errorFrom } from '../../utils/errors';
 import { Maybe } from '../../utils/types';
-import { SqlConnectionParams, SqlQuery } from '../sql/types';
-import { PostgresResult } from './types';
+import { SqlConnectionParams, SqlQuery, SqlResult } from '../sql/types';
 import { createSqlServerDatasource } from '../sql/server';
 
 /**
@@ -43,7 +42,7 @@ async function execSql(
   connection: Maybe<SqlConnectionParams>,
   postgresQuery: SqlQuery,
   params: Record<string, string>,
-): Promise<PostgresResult> {
+): Promise<SqlResult> {
   if (!connection?.password) {
     // pg client doesn't support passwordless authentication atm
     // See https://github.com/brianc/node-postgres/issues/1927
@@ -61,6 +60,10 @@ async function execSql(
 
     return {
       data: res.rows,
+      info:
+        res.command !== 'SELECT'
+          ? `OK ${res.command}, ${res.rowCount} ${res.rowCount === 1 ? 'row' : 'rows'} affected`
+          : undefined,
     };
   } catch (rawError) {
     const error = errorFrom(rawError);

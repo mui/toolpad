@@ -70,7 +70,7 @@ test(`Default Text`, async () => {
 
   await waitFor(() => screen.getByTestId('page-root'));
 
-  const text = screen.getByText('', { selector: 'p' });
+  const text = screen.getByText('text', { selector: 'p' });
   expect(text).toHaveClass('MuiTypography-root');
 });
 

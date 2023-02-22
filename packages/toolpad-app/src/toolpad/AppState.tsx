@@ -14,19 +14,16 @@ import insecureHash from '../utils/insecureHash';
 import useEvent from '../utils/useEvent';
 import { NodeHashes } from '../types';
 import { hasFieldFocus } from '../utils/fields';
-import { DomView, getViewFromPathname } from '../utils/domView';
+import { DomView, getViewFromPathname, PageViewTab } from '../utils/domView';
 import config from '../config';
 
 export function getNodeHashes(dom: appDom.AppDom): NodeHashes {
   return mapValues(dom.nodes, (node) => insecureHash(JSON.stringify(node)));
 }
 
-export type ComponentPanelTab = 'component' | 'theme';
-
 export type DomAction = {
   type: 'UPDATE';
   updater?: (dom: appDom.AppDom) => appDom.AppDom;
-  selectedNodeId?: NodeId | null;
   view?: DomView;
 };
 
@@ -65,7 +62,7 @@ export type AppStateAction =
     }
   | {
       type: 'SET_TAB';
-      tab: ComponentPanelTab;
+      tab: PageViewTab;
     }
   | {
       type: 'SELECT_NODE';
@@ -145,23 +142,16 @@ export function domLoaderReducer(state: DomLoader, action: AppStateAction): DomL
 }
 
 export interface AppState extends DomLoader {
-  selectedNodeId: NodeId | null;
   currentView: DomView;
-  currentTab: ComponentPanelTab;
   undoStack: UndoRedoStackEntry[];
   redoStack: UndoRedoStackEntry[];
   hasUnsavedChanges: boolean;
 }
 
-export type PublicAppState = Pick<
-  AppState,
-  'dom' | 'selectedNodeId' | 'currentView' | 'currentTab' | 'hasUnsavedChanges'
->;
+export type PublicAppState = Pick<AppState, 'dom' | 'currentView' | 'hasUnsavedChanges'>;
 
-interface UndoRedoStackEntry
-  extends Omit<PublicAppState, 'currentView' | 'currentTab' | 'hasUnsavedChanges'> {
+interface UndoRedoStackEntry extends Omit<PublicAppState, 'currentView' | 'hasUnsavedChanges'> {
   view: DomView;
-  tab: ComponentPanelTab;
   timestamp: number;
 }
 
@@ -178,9 +168,7 @@ export function appStateReducer(state: AppState, action: AppStateAction): AppSta
         ...state.undoStack,
         {
           dom: state.dom,
-          selectedNodeId: state.selectedNodeId,
           view: state.currentView,
-          tab: state.currentTab,
           timestamp: Date.now(),
         },
       ];
@@ -214,9 +202,7 @@ export function appStateReducer(state: AppState, action: AppStateAction): AppSta
 
       return update(state, {
         dom: previousStackEntry.dom,
-        selectedNodeId: previousStackEntry.selectedNodeId,
         currentView: previousStackEntry.view,
-        currentTab: previousStackEntry.tab,
         undoStack,
         redoStack,
       });
@@ -235,43 +221,65 @@ export function appStateReducer(state: AppState, action: AppStateAction): AppSta
 
       return update(state, {
         dom: nextStackEntry.dom,
-        selectedNodeId: nextStackEntry.selectedNodeId,
         currentView: nextStackEntry.view,
-        currentTab: nextStackEntry.tab,
         undoStack,
         redoStack,
       });
     }
     case 'SELECT_NODE': {
-      return update(state, {
-        selectedNodeId: action.nodeId,
-        currentTab: 'component',
-      });
+      if (state.currentView.kind === 'page') {
+        return update(state, {
+          currentView: { ...state.currentView, selectedNodeId: action.nodeId, tab: 'component' },
+        });
+      }
+      return state;
     }
     case 'DESELECT_NODE': {
-      return update(state, {
-        selectedNodeId: null,
-      });
+      if (state.currentView.kind === 'page') {
+        return update(state, {
+          currentView: { ...state.currentView, selectedNodeId: null },
+        });
+      }
+      return state;
     }
+    case 'SET_VIEW':
     case 'UPDATE': {
-      const { selectedNodeId, view } = action;
+      if (!action.view) {
+        return state;
+      }
+
+      let newView = action.view;
+      if (action.view.kind === 'page') {
+        if (typeof action.view.selectedNodeId === 'undefined') {
+          const isSameNode = action.view.nodeId === state.currentView.nodeId;
+
+          newView = {
+            ...action.view,
+            selectedNodeId:
+              state.currentView.kind === 'page' && isSameNode
+                ? state.currentView.selectedNodeId
+                : null,
+          };
+        }
+        if (action.view.selectedNodeId && typeof action.view.tab === 'undefined') {
+          newView = {
+            ...action.view,
+            tab: 'component',
+          };
+        }
+      }
 
       return update(state, {
-        ...(typeof selectedNodeId !== 'undefined'
-          ? { selectedNodeId, currentTab: 'component' }
-          : {}),
-        ...(view ? { currentView: view } : {}),
-      });
-    }
-    case 'SET_VIEW': {
-      return update(state, {
-        currentView: action.view,
+        currentView: newView,
       });
     }
     case 'SET_TAB': {
-      return update(state, {
-        currentTab: action.tab,
-      });
+      if (state.currentView.kind === 'page') {
+        return update(state, {
+          currentView: { ...state.currentView, tab: action.tab },
+        });
+      }
+      return state;
     }
     case 'SET_HAS_UNSAVED_CHANGES': {
       return update(state, {
@@ -316,17 +324,11 @@ function createAppStateApi(
   scheduleTextInputHistoryUpdate?: DebouncedFunc<() => void>,
 ) {
   return {
-    update(
-      updater: (dom: appDom.AppDom) => appDom.AppDom,
-      extraUpdates: {
-        view?: DomView;
-        selectedNodeId?: NodeId | null;
-      } = {},
-    ) {
+    update(updater: (dom: appDom.AppDom) => appDom.AppDom, view?: DomView) {
       dispatch({
         type: 'UPDATE',
         updater,
-        ...extraUpdates,
+        view,
       });
     },
     undo() {
@@ -343,7 +345,7 @@ function createAppStateApi(
         view,
       });
     },
-    setTab(tab: ComponentPanelTab) {
+    setTab(tab: PageViewTab) {
       dispatch({
         type: 'SET_TAB',
         tab,
@@ -392,13 +394,13 @@ export function useDomLoader(): DomLoader {
 }
 
 export function useAppState(): PublicAppState {
-  const { dom, selectedNodeId, currentView, currentTab, hasUnsavedChanges } = useAppStateContext();
+  const { dom, currentView, hasUnsavedChanges } = useAppStateContext();
 
   if (!dom) {
     throw new Error("Trying to access the DOM before it's loaded");
   }
 
-  return { dom, selectedNodeId, currentView, currentTab, hasUnsavedChanges };
+  return { dom, currentView, hasUnsavedChanges };
 }
 
 const DomApiContext = React.createContext<DomApi>(createDomApi(() => undefined));
@@ -462,6 +464,8 @@ export default function AppProvider({ appId, children }: DomContextProps) {
   const initialView = getViewFromPathname(location.pathname) || {
     kind: 'page',
     nodeId: firstPage?.id,
+    selectedNodeId: null,
+    tab: 'component',
   };
 
   const [state, dispatch] = React.useReducer(appStateReducer, {
@@ -473,15 +477,11 @@ export default function AppProvider({ appId, children }: DomContextProps) {
     saveDomError: null,
     savedDom: dom,
     // App state
-    selectedNodeId: null,
     currentView: initialView,
-    currentTab: 'component',
     undoStack: [
       {
         dom,
-        selectedNodeId: null,
         view: initialView,
-        tab: 'component',
         timestamp: Date.now(),
       },
     ],
@@ -508,7 +508,7 @@ export default function AppProvider({ appId, children }: DomContextProps) {
     if (state.hasUnsavedChanges && isCancellableAction(action)) {
       // eslint-disable-next-line no-alert
       const ok = window.confirm(
-        'You have unsaved changes. Are you sure you want to navigate away?\nAll changes will be discarded.',
+        'You have unsaved changes. Are you sure you want to navigate away? All changes will be discarded.',
       );
 
       if (!ok) {

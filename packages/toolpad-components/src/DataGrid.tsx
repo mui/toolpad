@@ -280,6 +280,12 @@ export function inferColumns(rows: GridRowsProp): SerializableGridColumns {
   });
 }
 
+function createNumericFormatter(
+  format: (value: number) => string,
+): (params: GridValueFormatterParams<unknown>) => string {
+  return ({ value }) => (typeof value === 'number' ? format(value) : String(value || ''));
+}
+
 export function parseColumns(columns: SerializableGridColumns): GridColumns {
   return columns.map((column) => {
     if (column.type === 'number' && column.numberFormat) {
@@ -287,11 +293,17 @@ export function parseColumns(columns: SerializableGridColumns): GridColumns {
         case 'preset': {
           const preset = NUMBER_FORMAT_PRESETS.get(column.numberFormat.preset);
           const { format } = new Intl.NumberFormat(undefined, preset?.options);
-          return { ...column, valueFormatter: ({ value }) => format(value) };
+          return {
+            ...column,
+            valueFormatter: createNumericFormatter((value) => format(value)),
+          };
         }
         case 'custom': {
           const { format } = new Intl.NumberFormat(undefined, column.numberFormat.custom);
-          return { ...column, valueFormatter: ({ value }) => format(value) };
+          return {
+            ...column,
+            valueFormatter: createNumericFormatter((value) => format(value)),
+          };
         }
         case 'currency': {
           const userInput = column.numberFormat.currency || 'USD';
@@ -300,10 +312,16 @@ export function parseColumns(columns: SerializableGridColumns): GridColumns {
               style: 'currency',
               currency: userInput,
             });
-            return { ...column, valueFormatter: ({ value }) => format(value) };
+            return {
+              ...column,
+              valueFormatter: createNumericFormatter((value) => format(value)),
+            };
           }
           const { format } = new Intl.NumberFormat(undefined, {});
-          return { ...column, valueFormatter: ({ value }) => `${userInput} ${format(value)}` };
+          return {
+            ...column,
+            valueFormatter: createNumericFormatter((value) => `${userInput} ${format(value)}`),
+          };
         }
         default: {
           return column;
@@ -572,7 +590,7 @@ export default createComponent(DataGridComponent, {
       typeDef: { type: 'string', enum: ['compact', 'standard', 'comfortable'], default: 'compact' },
     },
     height: {
-      typeDef: { type: 'number', default: 350 },
+      typeDef: { type: 'number', default: 350, minimum: 100 },
     },
     loading: {
       helperText:

@@ -153,7 +153,10 @@ function Text({ value, markdown, href, loading, mode, sx, ...rest }: TextProps) 
           autoFocus
           onFocus={(event) => {
             event.currentTarget.selectionStart = contentEditable.selectionStart;
-            event.currentTarget.selectionEnd = contentEditable.selectionEnd;
+            event.currentTarget.selectionEnd = Math.max(
+              contentEditable.selectionStart,
+              contentEditable.selectionEnd,
+            );
           }}
           onBlur={() => {
             setContentEditable(null);
@@ -167,7 +170,7 @@ function Text({ value, markdown, href, loading, mode, sx, ...rest }: TextProps) 
         <MuiTypography
           sx={{
             ...sx,
-            minWidth: loading || !value ? 150 : undefined,
+            width: '100%',
             // This will give it height, even when empty.
             // REMARK: Does it make sense to put it in MUI core?
             [`&:empty::before`]: { content: '""', display: 'inline-block' },

@@ -209,7 +209,7 @@ export default createComponent(Text, {
     },
     value: {
       helperText: 'The text content.',
-      typeDef: { type: 'string', default: '' },
+      typeDef: { type: 'string', default: 'text' },
       label: 'Value',
       control: { type: 'markdown' },
     },

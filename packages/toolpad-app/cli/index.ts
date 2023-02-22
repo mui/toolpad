@@ -42,6 +42,12 @@ async function runApp(cmd: 'dev' | 'start', { devMode = false, port }: RunComman
   process.stdin.pipe(cp.stdin!);
   cp.stdout?.pipe(process.stdout);
   cp.stderr?.pipe(process.stdout);
+
+  cp.on('exit', (code) => {
+    if (code) {
+      process.exit(code);
+    }
+  });
 }
 
 async function devCommand(args: RunCommandArgs) {

@@ -7,8 +7,6 @@ test('can use default app template', async ({ page }) => {
   await homeModel.goto();
   const app = await homeModel.createApplication({ appTemplateId: 'default' });
 
-  page.waitForNavigation();
-
   const runtimeModel = new ToolpadRuntime(page);
   await runtimeModel.gotoPage(app.id, 'page1');
 
@@ -21,8 +19,6 @@ test('can use hr template', async ({ page }) => {
   await homeModel.goto();
   const app = await homeModel.createApplication({ appTemplateId: 'hr' });
 
-  page.waitForNavigation();
-
   const runtimeModel = new ToolpadRuntime(page);
   await runtimeModel.gotoPage(app.id, 'page1');
 
@@ -34,8 +30,6 @@ test('can use images app template', async ({ page }) => {
   const homeModel = new ToolpadHome(page);
   await homeModel.goto();
   const app = await homeModel.createApplication({ appTemplateId: 'images' });
-
-  page.waitForNavigation();
 
   const runtimeModel = new ToolpadRuntime(page);
   await runtimeModel.gotoPage(app.id, 'dogBreedsPage');

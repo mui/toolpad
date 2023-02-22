@@ -1,5 +1,35 @@
 # Changelog
 
+## 0.0.41
+
+<!-- generated comparing v0.0.40..master -->
+
+_Feb 22, 2023_
+
+A big thanks to the 4 contributors who made this release possible. Here are some highlights ✨:
+
+Add a List component, polish Markdown component, easier access to Page module settings, feedback for mutation queries, and a new option to edit Text component directly in canvas!
+
+- &#8203;<!-- 17 -->Fix binding editor confirm on unsaved changes (#1695) @apedroferreira
+- &#8203;<!-- 16 -->Adjust margins for Markdown component (#1690) @Janpot
+- &#8203;<!-- 15 -->Remove deprecated waitForNavigation playwright API (#1699) @Janpot
+- &#8203;<!-- 14 -->Make text component editable in the canvas (#1694) @Janpot
+- &#8203;<!-- 13 -->Hide resizable height prop controls (#1641) @apedroferreira
+- &#8203;<!-- 12 -->Move selected node state to page view only (#1679) @apedroferreira
+- &#8203;<!-- 11 -->Fix DataGrid number formats for non-numerical values (#1626) @Janpot
+- &#8203;<!-- 10 -->Add feedback for mutating queries (#1691) @Janpot
+- &#8203;<!-- 09 -->Show confirmation dialog when there are unsaved changes (#1618) @apedroferreira
+- &#8203;<!-- 08 -->Fix resizing after drag & drop UI changes (#1639) @apedroferreira
+- &#8203;<!-- 07 -->Polish Markdown component (#1477) @bharatkashyap
+- &#8203;<!-- 06 -->Confirm unsaved code component changes (#1628) @apedroferreira
+- &#8203;<!-- 05 -->Add in page settings option to sidebar to allow for easier access to page module settings (#1672) @scouttyg
+- &#8203;<!-- 04 -->Add List component (#1527) @apedroferreira
+- &#8203;<!-- 03 -->Fix: Column changes dropped on prop update (#1583) @bharatkashyap
+- &#8203;<!-- 02 -->Fix: Disable "Remove" on draft nodes (#1681) @bharatkashyap
+- &#8203;<!-- 01 -->Align headers and typography in the theme (#1627) @Janpot
+
+All contributors of this release in alphabetical order: @apedroferreira, @bharatkashyap, @Janpot, @scouttyg
+
 ## 0.0.40
 
 <!-- generated comparing v0.0.39..master -->

@@ -15,7 +15,6 @@ import {
   openCodeEditor,
   QUERIES_FILE,
   readProjectFolder,
-  writeProjectFiles,
 } from '../../server/localMode';
 import { errorFrom, serializeError } from '../../utils/errors';
 

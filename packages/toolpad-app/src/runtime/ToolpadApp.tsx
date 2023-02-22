@@ -703,17 +703,7 @@ function parseBindings(
       const componentConfig = Component?.[TOOLPAD_COMPONENT];
 
       const { argTypes = {} } = componentConfig ?? {};
-
-      const bindableArgTypeEntries = Object.entries(argTypes).filter(([propName, argType]) => {
-        const isResizableHeightProp =
-          componentConfig?.resizableHeightProp && propName === componentConfig?.resizableHeightProp;
-        return (
-          !isResizableHeightProp &&
-          !NON_BINDABLE_CONTROL_TYPES.includes(argType?.control?.type as string)
-        );
-      });
-
-      for (const [propName, argType] of bindableArgTypeEntries) {
+      for (const [propName, argType] of Object.entries(argTypes)) {
         const initializerId = argType?.defaultValueProp
           ? `${elm.id}.props.${argType.defaultValueProp}`
           : undefined;
@@ -725,7 +715,15 @@ function parseBindings(
         const bindingId = `${elm.id}.props.${propName}`;
 
         let scopePath: string | undefined;
-        if (componentId !== PAGE_ROW_COMPONENT_ID) {
+
+        const isResizableHeightProp =
+          componentConfig?.resizableHeightProp && propName === componentConfig?.resizableHeightProp;
+
+        if (
+          componentId !== PAGE_ROW_COMPONENT_ID &&
+          !isResizableHeightProp &&
+          !NON_BINDABLE_CONTROL_TYPES.includes(argType?.control?.type as string)
+        ) {
           scopePath = `${elm.name}.${propName}`;
           scopeMeta[elm.name] = {
             kind: 'element',

@@ -76,7 +76,8 @@ const MarkdownContainer = styled('div')(({ theme }) => ({
     marginBottom: 4,
   },
   '& p': {
-    marginBottom: 16,
+    marginTop: 12,
+    marginBottom: 12,
   },
   '& *:first-child': {
     marginTop: 0,

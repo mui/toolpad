@@ -6,8 +6,6 @@ import { Readable } from 'stream';
 import { test, expect } from '../../playwright/test';
 import { ToolpadEditor } from '../../models/ToolpadEditor';
 import clickCenter from '../../utils/clickCenter';
-import generateId from '../../utils/generateId';
-import { readJsonFile } from '../../utils/fs';
 import { APP_ID_LOCAL_MARKER } from '../../../packages/toolpad-app/src/constants';
 
 async function waitForMatch(input: Readable, regex: RegExp): Promise<RegExpExecArray | null> {
@@ -34,7 +32,7 @@ interface WithAppOptions {
   template?: string;
 }
 
-async function withApp(options: WithAppOptions, doWork: (opts: { port: number }) => Promise<void>) {
+async function withApp(options: WithAppOptions, doWork: (url: string) => Promise<void>) {
   const { dir = __dirname, cmd = 'start', dev = false, verbose = false, template } = options;
 
   const projectDir = await fs.mkdtemp(path.resolve(dir, './tmp-'));
@@ -44,7 +42,7 @@ async function withApp(options: WithAppOptions, doWork: (opts: { port: number })
       await fs.cp(template, projectDir, { recursive: true });
     }
 
-    const child = childProcess.exec(`toolpad ${cmd} ${dev ? '--dev' : ''}`, {
+    const child = childProcess.exec(`toolpad ${cmd} --port 3000 ${dev ? '--dev' : ''}`, {
       cwd: projectDir,
     });
 
@@ -70,7 +68,8 @@ async function withApp(options: WithAppOptions, doWork: (opts: { port: number })
             throw new Error('Failed to start');
           }
 
-          await doWork({ port: Number(match[1]) });
+          const port = Number(match[1]);
+          await doWork(`http://localhost:${port}`);
         })(),
       ]);
     } finally {
@@ -81,37 +80,18 @@ async function withApp(options: WithAppOptions, doWork: (opts: { port: number })
   }
 }
 
-const test2 = test.extend({
-  server: async (x, use) => {
-    await withApp(
-      {
-        dir: __dirname,
-        cmd: 'dev',
-        dev: true,
-        verbose: true,
-      },
-      async ({ port }) => {
-        const baseURL = `http://localhost:${port}`;
-        use(baseURL);
-      },
-    );
-  },
-  baseURL: async ({ server }, use) => {
-    use(server);
-  },
-});
+const DEV_MODE = true;
+const VERBOSE = true;
 
-test.only('can place new components from catalog', async ({ page }) => {
+test('can place new components from catalog', async ({ page }) => {
   await withApp(
     {
       dir: __dirname,
       cmd: 'dev',
-      dev: true,
-      verbose: true,
+      dev: DEV_MODE,
+      verbose: VERBOSE,
     },
-    async ({ port }) => {
-      console.log('port: ', port);
-
+    async () => {
       const editorModel = new ToolpadEditor(page);
 
       await editorModel.goto(APP_ID_LOCAL_MARKER);
@@ -140,108 +120,127 @@ test.only('can place new components from catalog', async ({ page }) => {
   );
 });
 
-test('can move elements in page', async ({ page, api }) => {
-  const editorModel = new ToolpadEditor(page);
-  const TEXT_FIELD_COMPONENT_DISPLAY_NAME = 'Text field';
+test('can move elements in page', async ({ page }) => {
+  test.setTimeout(15000);
+  await withApp(
+    {
+      dir: __dirname,
+      template: path.resolve(__dirname, './fixture'),
+      cmd: 'dev',
+      dev: DEV_MODE,
+      verbose: VERBOSE,
+    },
+    async () => {
+      const editorModel = new ToolpadEditor(page);
+      const TEXT_FIELD_COMPONENT_DISPLAY_NAME = 'Text field';
 
-  const dom = await readJsonFile(path.resolve(__dirname, './domInput.json'));
+      await editorModel.goto(APP_ID_LOCAL_MARKER);
 
-  const app = await api.mutation.createApp(`App ${generateId()}`, {
-    from: { kind: 'dom', dom },
-  });
+      await editorModel.waitForOverlay();
 
-  await editorModel.goto(app.id);
+      const canvasMoveElementHandleSelector = `:has-text("${TEXT_FIELD_COMPONENT_DISPLAY_NAME}")[draggable]`;
 
-  await editorModel.waitForOverlay();
+      const canvasInputLocator = editorModel.appCanvas.locator('input');
+      const canvasMoveElementHandleLocator = editorModel.appCanvas.locator(
+        canvasMoveElementHandleSelector,
+      );
 
-  const canvasMoveElementHandleSelector = `:has-text("${TEXT_FIELD_COMPONENT_DISPLAY_NAME}")[draggable]`;
+      const firstTextFieldLocator = canvasInputLocator.first();
+      const secondTextFieldLocator = canvasInputLocator.nth(1);
 
-  const canvasInputLocator = editorModel.appCanvas.locator('input');
-  const canvasMoveElementHandleLocator = editorModel.appCanvas.locator(
-    canvasMoveElementHandleSelector,
+      await firstTextFieldLocator.focus();
+      await firstTextFieldLocator.fill('textField1');
+
+      await secondTextFieldLocator.focus();
+      await secondTextFieldLocator.fill('textField2');
+
+      await expect(firstTextFieldLocator).toHaveAttribute('value', 'textField1');
+      await expect(secondTextFieldLocator).toHaveAttribute('value', 'textField2');
+
+      await expect(canvasMoveElementHandleLocator).not.toBeVisible();
+
+      // Move first element by dragging it to the right side of second element
+
+      await clickCenter(page, firstTextFieldLocator);
+
+      const secondTextFieldBoundingBox = await secondTextFieldLocator.boundingBox();
+      expect(secondTextFieldBoundingBox).toBeDefined();
+
+      const moveTargetX = secondTextFieldBoundingBox!.x + secondTextFieldBoundingBox!.width;
+      const moveTargetY = secondTextFieldBoundingBox!.y + secondTextFieldBoundingBox!.height / 2;
+
+      await editorModel.dragToAppCanvas(
+        canvasMoveElementHandleSelector,
+        true,
+        moveTargetX,
+        moveTargetY,
+      );
+
+      await expect(firstTextFieldLocator).toHaveAttribute('value', 'textField2');
+      await expect(secondTextFieldLocator).toHaveAttribute('value', 'textField1');
+    },
   );
-
-  const firstTextFieldLocator = canvasInputLocator.first();
-  const secondTextFieldLocator = canvasInputLocator.nth(1);
-
-  await firstTextFieldLocator.focus();
-  await firstTextFieldLocator.fill('textField1');
-
-  await secondTextFieldLocator.focus();
-  await secondTextFieldLocator.fill('textField2');
-
-  await expect(firstTextFieldLocator).toHaveAttribute('value', 'textField1');
-  await expect(secondTextFieldLocator).toHaveAttribute('value', 'textField2');
-
-  await expect(canvasMoveElementHandleLocator).not.toBeVisible();
-
-  // Move first element by dragging it to the right side of second element
-
-  await clickCenter(page, firstTextFieldLocator);
-
-  const secondTextFieldBoundingBox = await secondTextFieldLocator.boundingBox();
-  expect(secondTextFieldBoundingBox).toBeDefined();
-
-  const moveTargetX = secondTextFieldBoundingBox!.x + secondTextFieldBoundingBox!.width;
-  const moveTargetY = secondTextFieldBoundingBox!.y + secondTextFieldBoundingBox!.height / 2;
-
-  await editorModel.dragToAppCanvas(
-    canvasMoveElementHandleSelector,
-    true,
-    moveTargetX,
-    moveTargetY,
-  );
-
-  await expect(firstTextFieldLocator).toHaveAttribute('value', 'textField2');
-  await expect(secondTextFieldLocator).toHaveAttribute('value', 'textField1');
 });
 
-test('can delete elements from page', async ({ page, api }) => {
-  const editorModel = new ToolpadEditor(page);
+test('can delete elements from page', async ({ page }) => {
+  await withApp(
+    {
+      dir: __dirname,
+      template: path.resolve(__dirname, './fixture'),
+      cmd: 'dev',
+      dev: DEV_MODE,
+      verbose: VERBOSE,
+    },
+    async () => {
+      const editorModel = new ToolpadEditor(page);
 
-  const dom = await readJsonFile(path.resolve(__dirname, './domInput.json'));
+      await editorModel.goto(APP_ID_LOCAL_MARKER);
 
-  const app = await api.mutation.createApp(`App ${generateId()}`, {
-    from: { kind: 'dom', dom },
-  });
+      await editorModel.waitForOverlay();
 
-  await editorModel.goto(app.id);
+      const canvasInputLocator = editorModel.appCanvas.locator('input');
+      const canvasRemoveElementButtonLocator = editorModel.appCanvas.locator(
+        'button[aria-label="Remove"]',
+      );
 
-  await editorModel.waitForOverlay();
+      await expect(canvasInputLocator).toHaveCount(2);
 
-  const canvasInputLocator = editorModel.appCanvas.locator('input');
-  const canvasRemoveElementButtonLocator = editorModel.appCanvas.locator(
-    'button[aria-label="Remove"]',
+      // Delete element by clicking
+
+      await expect(canvasRemoveElementButtonLocator).not.toBeVisible();
+
+      const firstTextFieldLocator = canvasInputLocator.first();
+
+      await clickCenter(page, firstTextFieldLocator);
+      await canvasRemoveElementButtonLocator.click();
+
+      await expect(canvasInputLocator).toHaveCount(1);
+
+      // Delete element by pressing key
+
+      await clickCenter(page, firstTextFieldLocator);
+      await page.keyboard.press('Backspace');
+
+      await expect(canvasInputLocator).toHaveCount(0);
+    },
   );
-
-  await expect(canvasInputLocator).toHaveCount(2);
-
-  // Delete element by clicking
-
-  await expect(canvasRemoveElementButtonLocator).not.toBeVisible();
-
-  const firstTextFieldLocator = canvasInputLocator.first();
-
-  await clickCenter(page, firstTextFieldLocator);
-  await canvasRemoveElementButtonLocator.click();
-
-  await expect(canvasInputLocator).toHaveCount(1);
-
-  // Delete element by pressing key
-
-  await clickCenter(page, firstTextFieldLocator);
-  await page.keyboard.press('Backspace');
-
-  await expect(canvasInputLocator).toHaveCount(0);
 });
 
-test('can create new component', async ({ page, api }) => {
-  const app = await api.mutation.createApp(`App ${generateId()}`);
+test.only('can create new component', async ({ page }) => {
+  await withApp(
+    {
+      dir: __dirname,
+      cmd: 'dev',
+      dev: DEV_MODE,
+      verbose: VERBOSE,
+    },
+    async () => {
+      const editorModel = new ToolpadEditor(page);
 
-  const editorModel = new ToolpadEditor(page);
+      await editorModel.goto(APP_ID_LOCAL_MARKER);
 
-  await editorModel.goto(app.id);
-
-  await editorModel.createPage('somePage');
-  await editorModel.createComponent('someComponent');
+      await editorModel.createPage('somePage');
+      await editorModel.createComponent('someComponent');
+    },
+  );
 });

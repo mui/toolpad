@@ -71,11 +71,11 @@ export class ToolpadEditor {
     this.createPageBtn = page.locator('[aria-label="Create page"]');
     this.createPageDialog = new CreatePageDialog(page);
 
-    this.createComponentBtn = page.locator('[aria-label="Create component"]');
-    this.createComponentDialog = new CreateComponentDialog(page);
-
     this.componentCatalog = page.getByTestId('component-catalog');
     this.componentEditor = page.getByTestId('component-editor');
+
+    this.createComponentBtn = this.componentCatalog.getByRole('button', { name: 'Create' });
+    this.createComponentDialog = new CreateComponentDialog(page);
 
     this.appCanvas = page.frameLocator('[name=data-toolpad-canvas]');
     this.pageRoot = this.appCanvas.getByTestId('page-root');
@@ -101,6 +101,7 @@ export class ToolpadEditor {
   }
 
   async createComponent(name: string) {
+    await this.componentCatalog.hover();
     await this.createComponentBtn.click();
     await this.createComponentDialog.nameInput.fill(name);
     await Promise.all([

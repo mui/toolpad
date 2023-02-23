@@ -43,6 +43,12 @@ async function runApp(cmd: 'dev' | 'start', { devMode = false, port }: RunComman
   cp.stdout?.pipe(process.stdout);
   cp.stderr?.pipe(process.stdout);
 
+  setTimeout(() => {
+    // eslint-disable-next-line no-console
+    console.log("Navigating to the app's page in the browser...");
+    execa('open', [`http://localhost:${port}`], { stdio: 'inherit' });
+  }, 10000);
+
   cp.on('exit', (code) => {
     if (code) {
       process.exit(code);

@@ -1,38 +1,52 @@
 #!/usr/bin/env node
 
 import chalk from 'chalk';
-import { execaCommand, execaCommandSync } from 'execa';
+import { execaCommand } from 'execa';
 import inquirer from 'inquirer';
 import fs from 'fs';
-import open from 'open';
 import { getPackageManager } from './utils/getPackageManager';
 
 // Detect the package manager
 const packageManager = getPackageManager();
 
 // Create a new directory and initialize a new project
-const scaffoldProject = async (projectName: string) => {
-  try {
-    fs.mkdirSync(projectName);
-  } catch (error) {
-    console.error(chalk.red(`Error: Directory ${projectName} already exists`));
-    process.exit(1);
-  }
-
-  process.chdir(projectName);
-
-  const packageJson = {
-    name: projectName,
-    version: '0.1.0',
-    private: true,
-    scripts: {
-      dev: 'toolpad dev',
-      build: 'toolpad build',
-      start: 'toolpad start',
+const scaffoldProject = async () => {
+  const name = await inquirer.prompt([
+    {
+      type: 'input',
+      name: 'projectName',
+      message: 'Enter the name of your project:',
+      default: 'my-app',
     },
-  };
+  ]);
 
-  fs.writeFileSync('package.json', JSON.stringify(packageJson, null, 2));
+  // eslint-disable-next-line no-console
+  console.log(`Creating a new MUI Toolpad project in ${chalk.blue(name.projectName)}`);
+  try {
+    fs.mkdirSync(name.projectName);
+    process.chdir(name.projectName);
+
+    const packageJson = {
+      name: name.projectName,
+      version: '0.1.0',
+      private: true,
+      scripts: {
+        dev: 'toolpad dev',
+        build: 'toolpad build',
+        start: 'toolpad start',
+      },
+    };
+
+    fs.writeFileSync('package.json', JSON.stringify(packageJson, null, 2));
+    return name.projectName;
+  } catch (error) {
+    if (fs.existsSync(name.projectName)) {
+      console.error(
+        `Directory ${chalk.red(name.projectName)} already exists. Please provide a different name.`,
+      );
+    }
+    return null;
+  }
 };
 
 // Install the dependencies
@@ -45,34 +59,21 @@ const installDeps = async () => {
   console.log(chalk.green('Dependencies installed successfully!'));
 };
 
-const runDevProcess = () => {
-  const runVerb = packageManager === 'yarn' ? '' : 'run';
-  const command = `${packageManager} ${runVerb} dev`;
-  execaCommandSync(command, { stdio: 'inherit', detached: true });
-  process.exit(0);
-};
-
 // Run the CLI interaction with Inquirer.js
 const run = async () => {
-  const name = await inquirer.prompt([
-    {
-      type: 'input',
-      name: 'projectName',
-      message: 'Enter the name of your project:',
-      default: 'my-app',
-    },
-  ]);
+  let projectName;
+  do {
+    // eslint-disable-next-line no-await-in-loop
+    projectName = await scaffoldProject();
+  } while (!projectName);
 
-  // eslint-disable-next-line no-console
-  console.log(`Creating a new MUI Toolpad project in ${chalk.blue(name.projectName)}`);
-
-  await scaffoldProject(name.projectName);
   const installDependenciesConsent = await inquirer.prompt([
     {
       type: 'confirm',
       name: 'installDependencies',
-      message:
-        'The following dependencies will be installed: @mui/toolpad @mui/toolpad-core. Do you want to continue?',
+      message: `The following dependencies will be installed: ${chalk.magentaBright(
+        '@mui/toolpad',
+      )}, ${chalk.magenta('@mui/toolpad-core')}. Do you want to continue?`,
       default: false,
     },
   ]);
@@ -81,20 +82,16 @@ const run = async () => {
     // eslint-disable-next-line no-console
     console.log(`${chalk.blue('Installing dependencies...')}`);
   } else {
-    console.error(chalk.red('Error: Dependencies are required for the project'));
+    console.error(chalk.red('Dependencies are required for the project. Exiting.'));
     process.exit(1);
   }
   await installDeps();
 
-  const { stdout } = await runDevProcess();
-
-  const url = 'http://localhost:3000';
-  // eslint-disable-next-line no-console
-  console.log(stdout);
-  const message = `Your MUI Toolpad project is ready on ${chalk.green(url)}`;
+  const message = `\nRun the following to get started: \n\n ${chalk.magentaBright(
+    `cd ${projectName}`,
+  )}\n ${chalk.magentaBright(`${packageManager} ${packageManager === 'yarn' ? '' : 'run'} dev`)}`;
   // eslint-disable-next-line no-console
   console.log(message);
-  open(url);
 };
 
 run().catch((error) => {

@@ -6,6 +6,7 @@ import * as path from 'path';
 import invariant from 'invariant';
 import { indent, truncate } from '@mui/toolpad-core/utils/strings';
 import * as dotenv from 'dotenv';
+import * as chokidar from 'chokidar';
 import config from '../../config';
 import { ServerDataSource } from '../../types';
 import { LocalPrivateQuery, LocalQuery, LocalConnectionParams } from './types';
@@ -300,8 +301,6 @@ async function createBuilder() {
     currentRuntimeProcess = runtimeProcess;
   };
 
-  let envFileWatcherController: AbortController | undefined;
-
   const toolpadPlugin: esbuild.Plugin = {
     name: 'toolpad',
     setup(build) {
@@ -411,22 +410,23 @@ async function createBuilder() {
     });
   }
 
+  let envFileWatcher: chokidar.FSWatcher | undefined;
+
   return {
     watch() {
       ctx.watch();
 
       (async () => {
         try {
-          if (envFileWatcherController) {
-            envFileWatcherController.abort();
+          if (envFileWatcher) {
+            await envFileWatcher.close();
           }
-          envFileWatcherController = new AbortController();
-          const watcher = fs.watch(envFilePath, { signal: envFileWatcherController.signal });
-          // eslint-disable-next-line @typescript-eslint/no-unused-vars, @typescript-eslint/naming-convention, no-underscore-dangle
-          for await (const _event of watcher) {
+
+          envFileWatcher = chokidar.watch([envFilePath]);
+          envFileWatcher.on('all', async () => {
             env = await loadEnvFile();
             restartRuntimeProcess();
-          }
+          });
         } catch (err: unknown) {
           if (errorFrom(err).name === 'AbortError') {
             return;
@@ -437,10 +437,8 @@ async function createBuilder() {
     },
     introspect,
     execute,
-    dispose() {
-      ctx.dispose();
-      envFileWatcherController?.abort();
-      controller?.abort();
+    async dispose() {
+      await Promise.all([ctx.dispose(), envFileWatcher?.close(), controller?.abort()]);
     },
   };
 }

@@ -47,6 +47,7 @@ function getComponentFilePath(componentsFolder: string, componentName: string): 
 
 async function loadCodeComponentsFromFiles(): Promise<ComponentsContent> {
   const componentsFolder = getComponentFolder();
+  await fs.mkdir(componentsFolder, { recursive: true });
   let entries: Dirent[] = [];
   try {
     entries = await fs.readdir(componentsFolder, { withFileTypes: true });
@@ -450,6 +451,7 @@ async function readComponentsFolder(root: string) {
 
 async function readProjectFiles(root: string): Promise<ToolpadFile[]> {
   const toolpadFolder = getToolpadFolder(root);
+  await fs.mkdir(toolpadFolder, { recursive: true });
   const entries = await fs.readdir(toolpadFolder, { withFileTypes: true });
   const filePromises: Promise<ToolpadFile | null>[] = entries.map(async (entry) => {
     const match =

@@ -47,7 +47,7 @@ async function runApp(cmd: 'dev' | 'start', { devMode = false, port }: RunComman
     // eslint-disable-next-line no-console
     console.log("Navigating to the app's page in the browser...");
     execa('open', [`http://localhost:${port}`], { stdio: 'inherit' });
-  }, 10000);
+  }, 3000);
 
   cp.on('exit', (code) => {
     if (code) {

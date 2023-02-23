@@ -1,37 +1,143 @@
 import * as path from 'path';
+import * as readline from 'readline';
+import * as fs from 'fs/promises';
+import childProcess from 'child_process';
+import { Readable } from 'stream';
 import { test, expect } from '../../playwright/test';
 import { ToolpadEditor } from '../../models/ToolpadEditor';
 import clickCenter from '../../utils/clickCenter';
 import generateId from '../../utils/generateId';
 import { readJsonFile } from '../../utils/fs';
+import { APP_ID_LOCAL_MARKER } from '../../../packages/toolpad-app/src/constants';
 
-test('can place new components from catalog', async ({ page, api }) => {
-  const app = await api.mutation.createApp(`App ${generateId()}`);
+async function waitForMatch(input: Readable, regex: RegExp): Promise<RegExpExecArray | null> {
+  return new Promise((resolve, reject) => {
+    const rl = readline.createInterface({ input });
 
-  const editorModel = new ToolpadEditor(page);
+    rl.on('line', (line) => {
+      const match = regex.exec(line);
+      if (match) {
+        rl.close();
+        resolve(match);
+      }
+    });
+    rl.on('error', (err) => reject(err));
+    rl.on('end', () => resolve(null));
+  });
+}
 
-  await editorModel.goto(app.id);
+interface WithAppOptions {
+  dir: string;
+  cmd?: 'start' | 'dev';
+  dev?: boolean;
+  verbose?: boolean;
+  template?: string;
+}
 
-  await editorModel.pageRoot.waitFor();
+async function withApp(options: WithAppOptions, doWork: (opts: { port: number }) => Promise<void>) {
+  const { dir = __dirname, cmd = 'start', dev = false, verbose = false, template } = options;
 
-  const canvasInputLocator = editorModel.appCanvas.locator('input');
+  const projectDir = await fs.mkdtemp(path.resolve(dir, './tmp-'));
 
-  await expect(canvasInputLocator).toHaveCount(0);
+  try {
+    if (template) {
+      await fs.cp(template, projectDir, { recursive: true });
+    }
 
-  const TEXT_FIELD_COMPONENT_DISPLAY_NAME = 'Text field';
+    const child = childProcess.exec(`toolpad ${cmd} ${dev ? '--dev' : ''}`, {
+      cwd: projectDir,
+    });
 
-  // Drag in a first component
+    try {
+      await Promise.race([
+        new Promise((resolve, reject) => {
+          child.on('exit', (code) => {
+            reject(new Error(`App process exited unexpectedly${code ? ` with code ${code}` : ''}`));
+          });
+        }),
+        (async () => {
+          if (!child.stdout) {
+            throw new Error('No stdout');
+          }
 
-  await editorModel.dragNewComponentToAppCanvas(TEXT_FIELD_COMPONENT_DISPLAY_NAME);
+          if (verbose) {
+            child.stdout?.pipe(process.stdout);
+          }
 
-  await expect(canvasInputLocator).toHaveCount(1);
-  await expect(canvasInputLocator).toBeVisible();
+          const match = await waitForMatch(child.stdout, /localhost:(\d+)/);
 
-  // Drag in a second component
+          if (!match) {
+            throw new Error('Failed to start');
+          }
 
-  await editorModel.dragNewComponentToAppCanvas(TEXT_FIELD_COMPONENT_DISPLAY_NAME);
+          await doWork({ port: Number(match[1]) });
+        })(),
+      ]);
+    } finally {
+      child.kill();
+    }
+  } finally {
+    await fs.rm(projectDir, { recursive: true });
+  }
+}
 
-  await expect(canvasInputLocator).toHaveCount(2);
+const test2 = test.extend({
+  server: async (x, use) => {
+    await withApp(
+      {
+        dir: __dirname,
+        cmd: 'dev',
+        dev: true,
+        verbose: true,
+      },
+      async ({ port }) => {
+        const baseURL = `http://localhost:${port}`;
+        use(baseURL);
+      },
+    );
+  },
+  baseURL: async ({ server }, use) => {
+    use(server);
+  },
+});
+
+test.only('can place new components from catalog', async ({ page }) => {
+  await withApp(
+    {
+      dir: __dirname,
+      cmd: 'dev',
+      dev: true,
+      verbose: true,
+    },
+    async ({ port }) => {
+      console.log('port: ', port);
+
+      const editorModel = new ToolpadEditor(page);
+
+      await editorModel.goto(APP_ID_LOCAL_MARKER);
+
+      await editorModel.pageRoot.waitFor();
+
+      const canvasInputLocator = editorModel.appCanvas.locator('input');
+
+      await expect(canvasInputLocator).toHaveCount(0);
+
+      const TEXT_FIELD_COMPONENT_DISPLAY_NAME = 'Text field';
+
+      // Drag in a first component
+
+      await editorModel.dragNewComponentToAppCanvas(TEXT_FIELD_COMPONENT_DISPLAY_NAME);
+
+      await expect(canvasInputLocator).toHaveCount(1);
+      await expect(canvasInputLocator).toBeVisible();
+
+      // Drag in a second component
+
+      await editorModel.dragNewComponentToAppCanvas(TEXT_FIELD_COMPONENT_DISPLAY_NAME);
+
+      await expect(canvasInputLocator).toHaveCount(2);
+    },
+  );
 });
 
 test('can move elements in page', async ({ page, api }) => {

@@ -33,7 +33,7 @@ add the following scripts to package.json:
 
 run
 
-```
+```sh
 yarn dev
 ```
 

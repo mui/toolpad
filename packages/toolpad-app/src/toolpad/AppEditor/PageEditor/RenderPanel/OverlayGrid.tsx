@@ -17,7 +17,7 @@ const StyledGrid = styled(Grid)({
   pointerEvents: 'none',
   position: 'absolute',
   zIndex: 1,
-  border: '2px solid transparent',
+  border: '4px solid transparent',
 });
 
 const StyledGridColumn = styled('div')(({ theme }) => ({

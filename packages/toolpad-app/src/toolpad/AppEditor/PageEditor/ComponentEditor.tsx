@@ -39,7 +39,12 @@ const ComponentEditorRoot = styled('div')(({ theme }) => ({
   },
 }));
 
-function shouldRenderControl<P extends object>(propTypeDef: ArgTypeDefinition<P>, props: P) {
+function shouldRenderControl<P extends object>(
+  propTypeDef: ArgTypeDefinition<P>,
+  propName: keyof P,
+  props: P,
+  componentConfig: ComponentConfig<P>,
+) {
   if (propTypeDef.typeDef.type === 'element' || propTypeDef.typeDef.type === 'template') {
     return (
       propTypeDef.control?.type !== 'slot' &&
@@ -54,6 +59,10 @@ function shouldRenderControl<P extends object>(propTypeDef: ArgTypeDefinition<P>
 
   if (typeof propTypeDef.visible === 'function') {
     return propTypeDef.visible(props);
+  }
+
+  if (componentConfig.resizableHeightProp && propName === componentConfig.resizableHeightProp) {
+    return false;
   }
 
   return true;
@@ -118,7 +127,7 @@ function ComponentPropsEditor<P extends object>({
       {(
         Object.entries(componentConfig.argTypes || {}) as ExactEntriesOf<ArgTypeDefinitions<P>>
       ).map(([propName, propTypeDef]) =>
-        propTypeDef && shouldRenderControl(propTypeDef, props) ? (
+        propTypeDef && shouldRenderControl(propTypeDef, propName, props, componentConfig) ? (
           <div key={propName} className={classes.control}>
             <NodeAttributeEditor
               node={node}
@@ -175,7 +184,8 @@ export interface ComponentEditorProps {
 
 export default function ComponentEditor({ className }: ComponentEditorProps) {
   const { dom } = useDom();
-  const { selectedNodeId } = useAppState();
+  const { currentView } = useAppState();
+  const selectedNodeId = currentView.kind === 'page' ? currentView.selectedNodeId : null;
 
   const selectedNode = selectedNodeId ? appDom.getMaybeNode(dom, selectedNodeId) : null;
 

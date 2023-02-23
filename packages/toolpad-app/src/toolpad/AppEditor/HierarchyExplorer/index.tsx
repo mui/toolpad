@@ -172,10 +172,7 @@ export default function HierarchyExplorer({ appId, className }: HierarchyExplore
     }
 
     if (appDom.isPage(node)) {
-      appStateApi.update((draft) => draft, {
-        view: { kind: 'page', nodeId: node.id },
-        selectedNodeId: null,
-      });
+      appStateApi.setView({ kind: 'page', nodeId: node.id });
     }
 
     if (appDom.isCodeComponent(node)) {
@@ -224,9 +221,10 @@ export default function HierarchyExplorer({ appId, className }: HierarchyExplore
         domViewAfterDelete = firstSiblingOfType && getNodeEditorDomView(firstSiblingOfType);
       }
 
-      appStateApi.update((draft) => appDom.removeNode(draft, nodeId), {
-        view: domViewAfterDelete || { kind: 'page' },
-      });
+      appStateApi.update(
+        (draft) => appDom.removeNode(draft, nodeId),
+        domViewAfterDelete || { kind: 'page' },
+      );
     },
     [activeNode, appStateApi, dom],
   );
@@ -247,9 +245,7 @@ export default function HierarchyExplorer({ appId, className }: HierarchyExplore
 
       appStateApi.update(
         (draft) => appDom.addFragment(draft, fragment, node.parentId!, node.parentProp!),
-        {
-          view: editorDomView || { kind: 'page' },
-        },
+        editorDomView || { kind: 'page' },
       );
     },
     [appStateApi, dom],
@@ -260,10 +256,7 @@ export default function HierarchyExplorer({ appId, className }: HierarchyExplore
       const node = appDom.getNode(dom, nodeId);
 
       if (appDom.isPage(node)) {
-        appStateApi.update((draft) => draft, {
-          view: { kind: 'page', nodeId: node.id },
-          selectedNodeId: null,
-        });
+        appStateApi.setView({ kind: 'page', nodeId: node.id, selectedNodeId: null });
       }
     },
     [appStateApi, dom],

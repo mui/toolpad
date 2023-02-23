@@ -35,10 +35,11 @@ const nodeHudClasses = {
 };
 
 const NodeHudWrapper = styled('div', {
-  shouldForwardProp: (prop) => prop !== 'isOutlineVisible',
+  shouldForwardProp: (prop) => prop !== 'isOutlineVisible' && prop !== 'isHoverable',
 })<{
   isOutlineVisible: boolean;
-}>(({ isOutlineVisible, theme }) => ({
+  isHoverable: boolean;
+}>(({ isOutlineVisible, isHoverable, theme }) => ({
   // capture mouse events
   pointerEvents: 'initial',
   position: 'absolute',
@@ -46,7 +47,7 @@ const NodeHudWrapper = styled('div', {
   outline: `1px dotted ${isOutlineVisible ? theme.palette.primary[500] : 'transparent'}`,
   zIndex: 2,
   '&:hover': {
-    outline: `2px dashed ${theme.palette.primary[500]}`,
+    outline: `2px dashed ${isHoverable ? 'transparent' : theme.palette.primary[500]}`,
   },
   [`.${nodeHudClasses.selected}`]: {
     position: 'absolute',
@@ -89,6 +90,12 @@ const SelectionHintWrapper = styled('div', {
   },
 }));
 
+const DraggableEdgeWrapper = styled('div')({
+  userSelect: 'none',
+  position: 'absolute',
+  zIndex: 3,
+});
+
 const DraggableEdge = styled('div', {
   shouldForwardProp: (prop) => prop !== 'edge',
 })<{
@@ -99,25 +106,25 @@ const DraggableEdge = styled('div', {
     dynamicStyles = {
       cursor: 'ew-resize',
       top: 0,
-      right: -2,
+      right: -10,
       height: '100%',
-      width: 12,
+      width: 22,
     };
   }
   if (edge === RECTANGLE_EDGE_LEFT) {
     dynamicStyles = {
       cursor: 'ew-resize',
       top: 0,
-      left: -2,
+      left: -10,
       height: '100%',
-      width: 12,
+      width: 22,
     };
   }
   if (edge === RECTANGLE_EDGE_BOTTOM) {
     dynamicStyles = {
       cursor: 'ns-resize',
-      bottom: -2,
-      height: 12,
+      bottom: -10,
+      height: 22,
       left: 0,
       width: '100%',
     };
@@ -127,7 +134,7 @@ const DraggableEdge = styled('div', {
     ...dynamicStyles,
     position: 'absolute',
     pointerEvents: 'initial',
-    zIndex: 1,
+    zIndex: 3,
   };
 });
 
@@ -144,15 +151,13 @@ interface NodeHudProps {
   isInteractive?: boolean;
   onNodeDragStart?: React.DragEventHandler<HTMLElement>;
   draggableEdges?: RectangleEdge[];
-  onEdgeDragStart?: (
-    node: appDom.ElementNode,
-    edge: RectangleEdge,
-  ) => React.MouseEventHandler<HTMLElement>;
+  onEdgeDragStart?: (edge: RectangleEdge) => React.MouseEventHandler<HTMLElement>;
   onDelete?: React.MouseEventHandler<HTMLElement>;
   isResizing?: boolean;
   resizePreviewElementRef: React.MutableRefObject<HTMLDivElement | null>;
   onDuplicate?: (event: React.MouseEvent) => void;
   isOutlineVisible?: boolean;
+  isHoverable?: boolean;
 }
 
 export default function NodeHud({
@@ -168,6 +173,7 @@ export default function NodeHud({
   resizePreviewElementRef,
   onDuplicate,
   isOutlineVisible = false,
+  isHoverable = true,
 }: NodeHudProps) {
   const { dom } = useDom();
 
@@ -175,8 +181,6 @@ export default function NodeHud({
   const component = useToolpadComponent(dom, componentId);
 
   const hintPosition = rect.y > HUD_HEIGHT ? HINT_POSITION_TOP : HINT_POSITION_BOTTOM;
-
-  const iconSx = { opacity: 0.7 };
 
   return (
     <React.Fragment>
@@ -187,17 +191,9 @@ export default function NodeHud({
           [nodeHudClasses.allowNodeInteraction]: isInteractive,
         })}
         isOutlineVisible={isOutlineVisible}
+        isHoverable={isHoverable}
       >
         {isSelected ? <span className={nodeHudClasses.selected} /> : null}
-        {onEdgeDragStart
-          ? draggableEdges.map((edge) => (
-              <DraggableEdge
-                key={`${node.id}-edge-${edge}`}
-                edge={edge}
-                onMouseDown={onEdgeDragStart(node as appDom.ElementNode, edge)}
-              />
-            ))
-          : null}
         {isResizing ? (
           <ResizePreview ref={resizePreviewElementRef} style={absolutePositionCss(rect)} />
         ) : null}
@@ -214,19 +210,30 @@ export default function NodeHud({
             onMouseUp={stopPropagationHandler}
           >
             {component?.displayName || '<unknown>'}
-            <DragIndicatorIcon color="inherit" sx={iconSx} />
-            <IconButton aria-label="Duplicate" color="inherit" onMouseUp={onDuplicate} sx={iconSx}>
+            <DragIndicatorIcon color="inherit" />
+            <IconButton aria-label="Duplicate" color="inherit" onMouseUp={onDuplicate}>
               <Tooltip title="Duplicate" enterDelay={400}>
                 <ContentCopy color="inherit" />
               </Tooltip>
             </IconButton>
-            <IconButton aria-label="Remove" color="inherit" onMouseUp={onDelete} sx={iconSx}>
+            <IconButton aria-label="Remove" color="inherit" onMouseUp={onDelete}>
               <Tooltip title="Remove" enterDelay={400}>
                 <DeleteIcon color="inherit" />
               </Tooltip>
             </IconButton>
           </div>
         </SelectionHintWrapper>
+      ) : null}
+      {onEdgeDragStart ? (
+        <DraggableEdgeWrapper style={absolutePositionCss(rect)}>
+          {draggableEdges.map((edge) => (
+            <DraggableEdge
+              key={`${node.id}-edge-${edge}`}
+              edge={edge}
+              onMouseDown={onEdgeDragStart(edge)}
+            />
+          ))}
+        </DraggableEdgeWrapper>
       ) : null}
     </React.Fragment>
   );

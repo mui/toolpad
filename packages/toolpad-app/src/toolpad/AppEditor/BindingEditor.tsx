@@ -315,7 +315,7 @@ export function BindingEditorDialog<V>({
     }
   }, [open, value]);
 
-  const committedInput = React.useRef<BindableAttrValue<V> | null>(null);
+  const committedInput = React.useRef<BindableAttrValue<V> | null>(input);
 
   const handleSave = React.useCallback(() => {
     let newValue = input;
@@ -331,7 +331,9 @@ export function BindingEditorDialog<V>({
     onChange(newValue);
   }, [onChange, input]);
 
-  const hasUnsavedChanges = input ? input !== committedInput.current : false;
+  const hasUnsavedChanges = input
+    ? input.type !== committedInput.current?.type || input.value !== committedInput.current?.value
+    : false;
 
   const { handleCloseWithUnsavedChanges } = useUnsavedChangesConfirm({
     hasUnsavedChanges,

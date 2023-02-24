@@ -3,6 +3,8 @@ import arg from 'arg';
 import path from 'path';
 
 const DEFAULT_PORT = 3000;
+const MAX_RETRIES = 30;
+const INTERVAL = 1000;
 
 function* getNextPort(port: number = DEFAULT_PORT) {
   while (true) {
@@ -12,16 +14,21 @@ function* getNextPort(port: number = DEFAULT_PORT) {
 }
 
 interface RunCommandArgs {
-  // Whether Toolpad editor is running in dev mode (for debugging purposes only)
-  devMode?: boolean;
+  // Whether Toolpad editor is running in debug mode
+  debugMode?: boolean;
   port?: number;
+  // Whether to disable the browser automatically opening up on startup
+  browser?: boolean;
 }
 
-async function runApp(cmd: 'dev' | 'start', { devMode = false, port }: RunCommandArgs) {
+async function runApp(
+  cmd: 'dev' | 'start',
+  { debugMode = false, port, noBrowser = false }: RunCommandArgs,
+) {
   const { execa } = await import('execa');
   const { default: getPort } = await import('get-port');
   const toolpadDir = path.resolve(__dirname, '../..'); // from ./dist/server
-  const nextCommand = devMode ? 'dev' : 'start';
+  const nextCommand = debugMode ? 'dev' : 'start';
 
   if (!port) {
     port = cmd === 'dev' ? await getPort({ port: getNextPort(DEFAULT_PORT) }) : DEFAULT_PORT;
@@ -43,11 +50,34 @@ async function runApp(cmd: 'dev' | 'start', { devMode = false, port }: RunComman
   cp.stdout?.pipe(process.stdout);
   cp.stderr?.pipe(process.stdout);
 
-  setTimeout(() => {
-    // eslint-disable-next-line no-console
-    console.log("Navigating to the app's page in the browser...");
-    execa('open', [`http://localhost:${port}`], { stdio: 'inherit' });
-  }, 3000);
+  if (cp.stdout && cmd === 'dev' && !noBrowser) {
+    const { default: fetch } = await import('node-fetch');
+
+    const checkedUrl = new URL(`https://localhost:${port || DEFAULT_PORT}`);
+    for (let i = 1; i <= MAX_RETRIES; i += 1) {
+      try {
+        // eslint-disable-next-line no-console
+        console.log(`(${i}/${MAX_RETRIES}) trying reach "${checkedUrl.href}"...`);
+        // eslint-disable-next-line no-await-in-loop
+        const res = await fetch(checkedUrl.href);
+
+        if (!res.ok) {
+          throw new Error(`HTTP ${res.status}`);
+        }
+
+        // eslint-disable-next-line no-console
+        console.log(`connected!`);
+        execa('open', [`http://localhost:${port || DEFAULT_PORT}`], { stdio: 'inherit' });
+        return;
+      } catch (err: any) {
+        console.error(` > ${err.message}`);
+        // eslint-disable-next-line no-await-in-loop
+        await new Promise((resolve) => {
+          setTimeout(resolve, INTERVAL);
+        });
+      }
+    }
+  }
 
   cp.on('exit', (code) => {
     if (code) {
@@ -58,13 +88,13 @@ async function runApp(cmd: 'dev' | 'start', { devMode = false, port }: RunComman
 
 async function devCommand(args: RunCommandArgs) {
   // eslint-disable-next-line no-console
-  console.log('starting toolpad application in dev mode...');
+  console.log('Starting Toolpad application in dev mode...');
   await runApp('dev', args);
 }
 
 async function buildCommand() {
   // eslint-disable-next-line no-console
-  console.log('building toolpad application...');
+  console.log('Building Toolpad application...');
   await new Promise((resolve) => {
     setTimeout(resolve, 1000);
   });
@@ -74,7 +104,7 @@ async function buildCommand() {
 
 async function startCommand(args: RunCommandArgs) {
   // eslint-disable-next-line no-console
-  console.log('starting toolpad application...');
+  console.log('Starting Toolpad application...');
   await runApp('start', args);
 }
 
@@ -83,8 +113,9 @@ export default async function cli(argv: string[]) {
     {
       // Types
       '--help': Boolean,
-      '--dev': Boolean,
+      '--debug': Boolean,
       '--port': Number,
+      '--noBrowser': Boolean,
 
       // Aliases
       '-p': '--port',
@@ -97,14 +128,17 @@ export default async function cli(argv: string[]) {
   const command = args._[0];
 
   const runArgs = {
-    devMode: args['--dev'],
+    debugMode: args['--debug'],
     port: args['--port'],
   };
+
+  const devArgs = { ...runArgs, noBrowser: args['--noBrowser'] };
 
   switch (command) {
     case undefined:
     case 'dev':
-      await devCommand(runArgs);
+      console.log(devArgs);
+      await devCommand(devArgs);
       break;
     case 'build':
       await buildCommand();

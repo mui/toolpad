@@ -8,6 +8,9 @@ import { ToolpadEditor } from '../../models/ToolpadEditor';
 import clickCenter from '../../utils/clickCenter';
 import { APP_ID_LOCAL_MARKER } from '../../../packages/toolpad-app/src/constants';
 
+const DEV_MODE = false;
+const VERBOSE = true;
+
 async function waitForMatch(input: Readable, regex: RegExp): Promise<RegExpExecArray | null> {
   return new Promise((resolve, reject) => {
     const rl = readline.createInterface({ input });
@@ -25,24 +28,21 @@ async function waitForMatch(input: Readable, regex: RegExp): Promise<RegExpExecA
 }
 
 interface WithAppOptions {
-  dir: string;
   cmd?: 'start' | 'dev';
-  dev?: boolean;
-  verbose?: boolean;
   template?: string;
 }
 
 async function withApp(options: WithAppOptions, doWork: (url: string) => Promise<void>) {
-  const { dir = __dirname, cmd = 'start', dev = false, verbose = false, template } = options;
+  const { cmd = 'start', template } = options;
 
-  const projectDir = await fs.mkdtemp(path.resolve(dir, './tmp-'));
+  const projectDir = await fs.mkdtemp(path.resolve(__dirname, './tmp-'));
 
   try {
     if (template) {
       await fs.cp(template, projectDir, { recursive: true });
     }
 
-    const child = childProcess.exec(`toolpad ${cmd} --port 3000 ${dev ? '--dev' : ''}`, {
+    const child = childProcess.exec(`toolpad ${cmd} --port 3000 ${DEV_MODE ? '--dev' : ''}`, {
       cwd: projectDir,
     });
 
@@ -58,7 +58,7 @@ async function withApp(options: WithAppOptions, doWork: (url: string) => Promise
             throw new Error('No stdout');
           }
 
-          if (verbose) {
+          if (VERBOSE) {
             child.stdout?.pipe(process.stdout);
           }
 
@@ -80,16 +80,10 @@ async function withApp(options: WithAppOptions, doWork: (url: string) => Promise
   }
 }
 
-const DEV_MODE = true;
-const VERBOSE = true;
-
 test('can place new components from catalog', async ({ page }) => {
   await withApp(
     {
-      dir: __dirname,
       cmd: 'dev',
-      dev: DEV_MODE,
-      verbose: VERBOSE,
     },
     async () => {
       const editorModel = new ToolpadEditor(page);
@@ -124,11 +118,8 @@ test('can move elements in page', async ({ page }) => {
   test.setTimeout(15000);
   await withApp(
     {
-      dir: __dirname,
       template: path.resolve(__dirname, './fixture'),
       cmd: 'dev',
-      dev: DEV_MODE,
-      verbose: VERBOSE,
     },
     async () => {
       const editorModel = new ToolpadEditor(page);
@@ -182,14 +173,11 @@ test('can move elements in page', async ({ page }) => {
   );
 });
 
-test('can delete elements from page', async ({ page }) => {
+test.only('can delete elements from page', async ({ page }) => {
   await withApp(
     {
-      dir: __dirname,
       template: path.resolve(__dirname, './fixture'),
       cmd: 'dev',
-      dev: DEV_MODE,
-      verbose: VERBOSE,
     },
     async () => {
       const editorModel = new ToolpadEditor(page);
@@ -199,9 +187,13 @@ test('can delete elements from page', async ({ page }) => {
       await editorModel.waitForOverlay();
 
       const canvasInputLocator = editorModel.appCanvas.locator('input');
+
       const canvasRemoveElementButtonLocator = editorModel.appCanvas.locator(
         'button[aria-label="Remove"]',
       );
+      // const canvasRemoveElementButtonLocator = editorModel.appCanvas.getByRole('button', {
+      //  name: 'Remove',
+      // });
 
       await expect(canvasInputLocator).toHaveCount(2);
 
@@ -226,13 +218,10 @@ test('can delete elements from page', async ({ page }) => {
   );
 });
 
-test.only('can create new component', async ({ page }) => {
+test('can create new component', async ({ page }) => {
   await withApp(
     {
-      dir: __dirname,
       cmd: 'dev',
-      dev: DEV_MODE,
-      verbose: VERBOSE,
     },
     async () => {
       const editorModel = new ToolpadEditor(page);

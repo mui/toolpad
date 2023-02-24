@@ -104,10 +104,7 @@ export class ToolpadEditor {
     await this.componentCatalog.hover();
     await this.createComponentBtn.click();
     await this.createComponentDialog.nameInput.fill(name);
-    await Promise.all([
-      this.createComponentDialog.createButton.click(),
-      this.page.waitForNavigation(),
-    ]);
+    await this.createComponentDialog.createButton.click();
   }
 
   waitForOverlay() {

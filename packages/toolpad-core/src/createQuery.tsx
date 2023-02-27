@@ -20,12 +20,12 @@ type QueryParameterValue<V extends PrimitiveValueType> = V extends NumberValueTy
   ? Record<string, unknown>
   : never;
 
-export interface QueryParameterConfig<P extends Record<string, unknown>, K extends keyof P> {
+export interface QueryParameterConfig<P, K extends keyof P> {
   typeDef: PrimitiveValueType;
   defaultValue?: P[K];
 }
 
-export interface CreateQueryConfig<P extends Record<string, unknown>> {
+export interface CreateQueryConfig<P> {
   parameters: {
     [K in keyof P]: QueryParameterConfig<P, K>;
   };

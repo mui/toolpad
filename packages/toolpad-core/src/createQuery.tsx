@@ -8,7 +8,7 @@ import {
   StringValueType,
 } from './types.js';
 
-export type QueryParameterValue<V extends PrimitiveValueType> = V extends NumberValueType
+type QueryParameterValue<V extends PrimitiveValueType> = V extends NumberValueType
   ? number
   : V extends StringValueType
   ? string

@@ -1,24 +1,13 @@
 import { TOOLPAD_QUERY } from './constants.js';
-import {
-  PrimitiveValueType,
-  NumberValueType,
-  BooleanValueType,
-  ArrayValueType,
-  ObjectValueType,
-  StringValueType,
-} from './types.js';
+import { PrimitiveValueType } from './types.js';
 
-type QueryParameterValue<V extends PrimitiveValueType> = V extends NumberValueType
-  ? number
-  : V extends StringValueType
-  ? string
-  : V extends BooleanValueType
-  ? boolean
-  : V extends ArrayValueType
-  ? unknown[]
-  : V extends ObjectValueType
-  ? Record<string, unknown>
-  : never;
+interface QueryParameterTypeLookup {
+  number: number;
+  string: string;
+  boolean: boolean;
+  array: unknown[];
+  object: Record<string, unknown>;
+}
 
 export interface QueryParameterConfig<P, K extends keyof P> {
   typeDef: PrimitiveValueType;
@@ -36,7 +25,7 @@ type CreateQueryConfigParameters<C extends CreateQueryConfig<CreateQueryConfigPa
 
 export interface QueryResolverParams<C extends CreateQueryConfig<CreateQueryConfigParameters<C>>> {
   parameters: {
-    [K in keyof C['parameters']]: QueryParameterValue<C['parameters'][K]['typeDef']>;
+    [K in keyof C['parameters']]: QueryParameterTypeLookup[C['parameters'][K]['typeDef']['type']];
   };
 }
 

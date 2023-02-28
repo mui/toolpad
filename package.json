@@ -38,7 +38,7 @@
     "release:changelog": "dotenv -- node ./scripts/releaseChangelog.mjs --repo mui-toolpad",
     "test:build": "lerna run build --scope @mui/toolpad-core --scope @mui/toolpad-components --stream",
     "test:integration": "playwright test --config ./test/integration/playwright.config.ts",
-    "test": "yarn test:build && jest",
+    "test": "jest",
     "check-types": "lerna run check-types"
   },
   "devDependencies": {

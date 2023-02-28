@@ -55,7 +55,6 @@ async function runApp(
   cp.stderr?.pipe(process.stdout);
 
   if (cp.stdout && cmd === 'dev' && !noBrowser) {
-    const { default: fetch } = await import('node-fetch');
     const checkedUrl = new URL(HEALTH_CHECK_URL, DEFAULT_URL);
     for (let i = 1; i <= MAX_RETRIES; i += 1) {
       try {

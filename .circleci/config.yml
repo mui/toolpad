@@ -147,6 +147,11 @@ jobs:
 
   test_unit:
     <<: *defaults
+    resource_class: 'medium+'
+    docker:
+      - image: mcr.microsoft.com/playwright:v1.31.1-focal
+        environment:
+          NODE_ENV: development # Needed if playwright is in `devDependencies`
     steps:
       - checkout
       - install_js

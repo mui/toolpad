@@ -2,11 +2,12 @@ import CodeIcon from '@mui/icons-material/Code';
 import { Box, Button, Dialog, DialogActions, DialogTitle, Skeleton } from '@mui/material';
 import { NodeId } from '@mui/toolpad-core';
 import * as React from 'react';
-import { useDom, useDomApi } from '../../DomLoader';
+import { useDom, useDomApi, useAppState, useAppStateApi } from '../../AppState';
 import * as appDom from '../../../appDom';
 import { tryFormat } from '../../../utils/prettier';
 import useShortcut from '../../../utils/useShortcut';
 import lazyComponent from '../../../utils/lazyComponent';
+import useUnsavedChangesConfirm from '../../hooks/useUnsavedChangesConfirm';
 
 const TypescriptEditor = lazyComponent(() => import('../../../components/TypescriptEditor'), {
   noSsr: true,
@@ -32,8 +33,14 @@ interface PageModuleEditorDialogProps {
 function PageModuleEditorDialog({ pageNodeId, open, onClose }: PageModuleEditorDialogProps) {
   const { dom } = useDom();
   const domApi = useDomApi();
+
   const page = appDom.getNode(dom, pageNodeId, 'page');
-  const [input, setInput] = React.useState(page.attributes.module?.value || DEFAULT_CONTENT);
+
+  const value = page.attributes.module?.value || DEFAULT_CONTENT;
+
+  const [input, setInput] = React.useState(value);
+
+  const hasUnsavedChanges = input !== value;
 
   const handleSave = React.useCallback(() => {
     const pretty = tryFormat(input);
@@ -44,19 +51,24 @@ function PageModuleEditorDialog({ pageNodeId, open, onClose }: PageModuleEditorD
     );
   }, [domApi, input, page]);
 
+  const { handleCloseWithUnsavedChanges } = useUnsavedChangesConfirm({
+    hasUnsavedChanges,
+    onClose,
+  });
+
   const handleSaveButton = React.useCallback(() => {
     handleSave();
     onClose();
-  }, [handleSave, onClose]);
+  }, [onClose, handleSave]);
 
   useShortcut({ key: 's', metaKey: true, disabled: !open }, handleSave);
 
   React.useEffect(() => {
-    setInput(page.attributes.module?.value || DEFAULT_CONTENT);
-  }, [page]);
+    setInput(value);
+  }, [value]);
 
   return (
-    <Dialog onClose={onClose} open={open} fullWidth maxWidth="lg">
+    <Dialog onClose={handleCloseWithUnsavedChanges} open={open} fullWidth maxWidth="lg">
       <DialogTitle>Edit page module</DialogTitle>
       <Box sx={{ height: 500 }}>
         <TypescriptEditor
@@ -80,22 +92,22 @@ export interface PageModuleEditorProps {
 }
 
 export default function PageModuleEditor({ pageNodeId }: PageModuleEditorProps) {
-  const domApi = useDomApi();
-  const { currentView } = useDom();
+  const { currentView } = useAppState();
+  const appStateApi = useAppStateApi();
 
   const [dialogOpen, setDialogOpen] = React.useState(false);
 
   const handleButtonClick = React.useCallback(() => {
-    domApi.setView({
+    appStateApi.setView({
       kind: 'page',
       nodeId: pageNodeId,
       view: { kind: 'pageModule' },
     });
-  }, [domApi, pageNodeId]);
+  }, [appStateApi, pageNodeId]);
 
   const handleDialogClose = React.useCallback(() => {
-    domApi.setView({ kind: 'page', nodeId: pageNodeId });
-  }, [domApi, pageNodeId]);
+    appStateApi.setView({ kind: 'page', nodeId: pageNodeId });
+  }, [appStateApi, pageNodeId]);
 
   React.useEffect(() => {
     setDialogOpen(currentView.kind === 'page' && currentView.view?.kind === 'pageModule');

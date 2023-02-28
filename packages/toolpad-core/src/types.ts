@@ -75,7 +75,7 @@ export type BindableAttrEntries = [string, BindableAttrValue<any>][];
 export type SlotType = 'single' | 'multiple' | 'layout';
 
 export interface ValueTypeBase {
-  type: 'string' | 'boolean' | 'number' | 'object' | 'array' | 'element' | 'event';
+  type: 'string' | 'boolean' | 'number' | 'object' | 'array' | 'element' | 'template' | 'event';
   default?: unknown;
 }
 
@@ -111,6 +111,10 @@ export interface ArrayValueType extends ValueTypeBase {
 
 export interface ElementValueType extends ValueTypeBase {
   type: 'element';
+}
+
+export interface TemplateValueType extends ValueTypeBase {
+  type: 'template';
 }
 
 export interface EventValueType extends ValueTypeBase {
@@ -154,7 +158,11 @@ type PrimitiveValueType =
   | ObjectValueType
   | ArrayValueType;
 
-export type PropValueType = PrimitiveValueType | ElementValueType | EventValueType;
+export type PropValueType =
+  | PrimitiveValueType
+  | ElementValueType
+  | TemplateValueType
+  | EventValueType;
 
 export type PropValueTypes<K extends string = string> = Partial<{
   [key in K]?: PropValueType;
@@ -244,7 +252,7 @@ export type BindingEvaluationResult<T = unknown> = {
 
 export type LiveBinding = BindingEvaluationResult;
 
-export type GlobalScopeMetaField = {
+export type ScopeMetaField = {
   description?: string;
   deprecated?: boolean | string;
   tsType?: string;
@@ -261,7 +269,7 @@ export type GlobalScopeMetaField = {
     }
 );
 
-export type GlobalScopeMeta = Partial<Record<string, GlobalScopeMetaField>>;
+export type ScopeMeta = Partial<Record<string, ScopeMetaField>>;
 
 export type RuntimeEvents = {
   propUpdated: {
@@ -271,7 +279,7 @@ export type RuntimeEvents = {
   };
   pageStateUpdated: {
     pageState: Record<string, unknown>;
-    globalScopeMeta: GlobalScopeMeta;
+    globalScopeMeta: ScopeMeta;
   };
   pageBindingsUpdated: {
     bindings: LiveBindings;
@@ -362,3 +370,11 @@ export type Serializable =
 export interface JsRuntime {
   evaluateExpression(code: string, globalScope: Record<string, unknown>): BindingEvaluationResult;
 }
+
+export type LocalScopeParams = Record<string, unknown>;
+
+export interface TemplateScopeParams {
+  i: number;
+}
+
+export type TemplateRenderer = ({ i }: TemplateScopeParams) => React.ReactNode;

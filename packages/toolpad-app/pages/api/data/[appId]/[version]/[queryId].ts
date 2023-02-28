@@ -12,7 +12,7 @@ const apiHandler = (async (req, res) => {
   }
 
   const version = parseVersion(req.query.version);
-  if (!version) {
+  if (typeof version !== 'number' && version !== 'preview') {
     res.status(404).end();
     return;
   }

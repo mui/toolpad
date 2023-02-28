@@ -12,7 +12,7 @@ import LightModeIcon from '@mui/icons-material/LightMode';
 import DarkModeIcon from '@mui/icons-material/DarkMode';
 import * as appDom from '../../../appDom';
 import { WithControlledProp } from '../../../utils/types';
-import { useDom, useDomApi } from '../../DomLoader';
+import { useDom, useDomApi } from '../../AppState';
 
 const IconToggleButton = styled(ToggleButton)({
   display: 'flex',

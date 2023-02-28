@@ -1,7 +1,7 @@
 import { Stack, Button, Typography, Divider } from '@mui/material';
 import * as React from 'react';
 import PageIcon from '@mui/icons-material/Web';
-import { useDom } from '../../DomLoader';
+import { useDom } from '../../AppState';
 import { usePageEditorState } from './PageEditorProvider';
 import QueryEditor from './QueryEditor';
 import UrlQueryEditor from './UrlQueryEditor';

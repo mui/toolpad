@@ -9,7 +9,7 @@ import {
 import * as React from 'react';
 import invariant from 'invariant';
 import * as appDom from '../../../appDom';
-import { useDom, useDomApi } from '../../DomLoader';
+import { useAppStateApi, useDom } from '../../AppState';
 import { format } from '../../../utils/prettier';
 import DialogForm from '../../../components/DialogForm';
 import useEvent from '../../../utils/useEvent';
@@ -58,7 +58,7 @@ export default function CreateCodeComponentDialog({
   ...props
 }: CreateCodeComponentDialogProps) {
   const { dom } = useDom();
-  const domApi = useDomApi();
+  const appStateApi = useAppStateApi();
 
   const existingNames = React.useMemo(
     () => appDom.getExistingNamesForChildren(dom, appDom.getApp(dom), 'codeComponents'),
@@ -100,11 +100,9 @@ export default function CreateCodeComponentDialog({
           });
           const appNode = appDom.getApp(dom);
 
-          domApi.update((draft) => appDom.addNode(draft, newNode, appNode, 'codeComponents'), {
-            view: {
-              kind: 'codeComponent',
-              nodeId: newNode.id,
-            },
+          appStateApi.update((draft) => appDom.addNode(draft, newNode, appNode, 'codeComponents'), {
+            kind: 'codeComponent',
+            nodeId: newNode.id,
           });
 
           onClose();

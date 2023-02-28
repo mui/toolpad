@@ -1,7 +1,7 @@
 import * as React from 'react';
 import jsonToTs from 'json-to-ts';
 import { Skeleton, styled, SxProps } from '@mui/material';
-import { GlobalScopeMeta } from '@mui/toolpad-core';
+import { ScopeMeta } from '@mui/toolpad-core';
 import { WithControlledProp } from '../../../utils/types';
 import lazyComponent from '../../../utils/lazyComponent';
 import ElementContext from '../ElementContext';
@@ -18,7 +18,7 @@ const JsExpressionEditorRoot = styled('div')(({ theme }) => ({
 
 export interface JsExpressionEditorProps extends WithControlledProp<string> {
   globalScope: Record<string, unknown>;
-  globalScopeMeta: GlobalScopeMeta;
+  globalScopeMeta: ScopeMeta;
   disabled?: boolean;
   autoFocus?: boolean;
   functionBody?: boolean;

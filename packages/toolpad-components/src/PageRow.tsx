@@ -31,7 +31,7 @@ function PageRow({ layoutColumnSizes = [], gap, children }: PageRowProps) {
 export default createComponent(PageRow, {
   argTypes: {
     gap: {
-      typeDef: { type: 'number', default: 1 },
+      typeDef: { type: 'number', default: 1, minimum: 1 },
     },
     children: {
       typeDef: { type: 'element' },

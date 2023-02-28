@@ -1,13 +1,23 @@
 import * as React from 'react';
-import { ArgTypeDefinition, BindableAttrValue } from '@mui/toolpad-core';
+import {
+  ArgTypeDefinition,
+  BindableAttrValue,
+  DEFAULT_LOCAL_SCOPE_PARAMS,
+  LocalScopeParams,
+  ScopeMeta,
+  ScopeMetaField,
+} from '@mui/toolpad-core';
 import { Alert, Box } from '@mui/material';
 import { useBrowserJsRuntime } from '@mui/toolpad-core/jsBrowserRuntime';
+import { mapValues } from '../../../utils/collections';
 import * as appDom from '../../../appDom';
-import { useDomApi } from '../../DomLoader';
+import { useDom, useDomApi } from '../../AppState';
 import BindableEditor from './BindableEditor';
 import { usePageEditorState } from './PageEditorProvider';
 import { getDefaultControl } from '../../propertyControls';
 import MarkdownTooltip from '../../../components/MarkdownTooltip';
+import { isTemplateDescendant } from '../../../toolpadComponents/template';
+import { NON_BINDABLE_CONTROL_TYPES } from '../../../constants';
 
 export interface NodeAttributeEditorProps<P extends object> {
   node: appDom.AppDomNode;
@@ -24,6 +34,7 @@ export default function NodeAttributeEditor<P extends object>({
   argType,
   props,
 }: NodeAttributeEditorProps<P>) {
+  const { dom } = useDom();
   const domApi = useDomApi();
 
   const handlePropChange = React.useCallback(
@@ -38,9 +49,10 @@ export default function NodeAttributeEditor<P extends object>({
   const propValue: BindableAttrValue<unknown> | null = (node as any)[namespace]?.[name] ?? null;
 
   const bindingId = `${node.id}${namespace ? `.${namespace}` : ''}.${name}`;
-  const { bindings, pageState, globalScopeMeta } = usePageEditorState();
+  const { bindings, pageState, globalScopeMeta, viewState } = usePageEditorState();
+
   const liveBinding = bindings[bindingId];
-  const globalScope = pageState;
+
   const propType = argType.typeDef;
   const Control = getDefaultControl(argType, props);
 
@@ -48,15 +60,34 @@ export default function NodeAttributeEditor<P extends object>({
   // to make them bindable to other controlled props only
   const isDisabled = !!argType.onChangeProp;
 
-  const isBindable = !isDisabled && namespace !== 'layout';
+  const isBindable =
+    !isDisabled &&
+    namespace !== 'layout' &&
+    !NON_BINDABLE_CONTROL_TYPES.includes(argType.control?.type as string);
 
   const jsBrowserRuntime = useBrowserJsRuntime();
+
+  const isNodeTemplateDescendant = React.useMemo(
+    () => appDom.isElement(node) && isTemplateDescendant(dom, node, viewState),
+    [dom, node, viewState],
+  );
+
+  const localState: LocalScopeParams = isNodeTemplateDescendant
+    ? { i: DEFAULT_LOCAL_SCOPE_PARAMS.i }
+    : {};
+  const localScopeMeta: ScopeMeta = mapValues(
+    localState,
+    () => ({ kind: 'local' } as ScopeMetaField),
+  );
 
   return Control ? (
     <BindableEditor
       liveBinding={liveBinding}
-      globalScope={globalScope}
-      globalScopeMeta={globalScopeMeta}
+      globalScope={{ ...pageState, ...localState }}
+      globalScopeMeta={{
+        ...globalScopeMeta,
+        ...localScopeMeta,
+      }}
       label={argType.label || name}
       bindable={isBindable}
       disabled={isDisabled}

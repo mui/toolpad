@@ -2,7 +2,7 @@ import * as React from 'react';
 import { styled, SxProps, Skeleton, Box, Divider, Typography } from '@mui/material';
 import HierarchyExplorer from './HierarchyExplorer';
 import client from '../../api';
-import { useDom } from '../DomLoader';
+import { useDom } from '../AppState';
 import AppOptions from '../AppOptions';
 import AppNameEditable from '../AppOptions/AppNameEditable';
 import config from '../../config';

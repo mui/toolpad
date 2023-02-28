@@ -21,8 +21,11 @@ import {
   NodeId,
   BindableAttrValue,
   NestedBindableAttrs,
-  GlobalScopeMeta,
   BindingEvaluationResult,
+  LocalScopeParams,
+  TemplateScopeParams,
+  ScopeMeta,
+  DEFAULT_LOCAL_SCOPE_PARAMS,
   getArgTypeDefaultValue,
 } from '@mui/toolpad-core';
 import { createProvidedContext } from '@mui/toolpad-core/utils/react';
@@ -61,7 +64,7 @@ import evalJsBindings, {
   EvaluatedBinding,
   ParsedBinding,
 } from './evalJsBindings';
-import { HTML_ID_EDITOR_OVERLAY } from '../constants';
+import { HTML_ID_EDITOR_OVERLAY, NON_BINDABLE_CONTROL_TYPES } from '../constants';
 import { mapProperties, mapValues } from '../utils/collections';
 import usePageTitle from '../utils/usePageTitle';
 import ComponentsContext, { useComponents, useComponent } from './ComponentsContext';
@@ -133,13 +136,26 @@ type ToolpadComponents = Partial<Record<string, ToolpadComponent<any>>>;
 
 const [useDomContext, DomContextProvider] = createProvidedContext<appDom.AppDom>('Dom');
 const [useEvaluatePageExpression, EvaluatePageExpressionProvider] =
-  createProvidedContext<(expr: string) => any>('EvaluatePageExpression');
+  createProvidedContext<
+    (expr: string, scopeId?: string, localScopeParams?: LocalScopeParams) => any
+  >('EvaluatePageExpression');
 const [useBindingsContext, BindingsContextProvider] =
-  createProvidedContext<Record<string, BindingEvaluationResult>>('LiveBindings');
+  createProvidedContext<
+    (
+      scopeId?: string,
+      localScopeParams?: LocalScopeParams,
+    ) => Record<string, BindingEvaluationResult>
+  >('GetBindings');
 const [useSetControlledBindingContext, SetControlledBindingContextProvider] =
-  createProvidedContext<(id: string, result: BindingEvaluationResult) => void>(
+  createProvidedContext<(id: string, result: BindingEvaluationResult, scopeId?: string) => void>(
     'SetControlledBinding',
   );
+
+const [useLocalScopeContext, LocalScopeContextProvider] = createProvidedContext<{
+  id?: string;
+  isDefaultScope: boolean;
+  params: LocalScopeParams;
+}>('IteratorItem');
 
 function getComponentId(elm: appDom.ElementNode): string {
   const componentId = getElementNodeComponentId(elm);
@@ -197,13 +213,20 @@ function RenderedNodeContent({ node, childNodeGroups, Component }: RenderedNodeC
 
   const nodeId = node.id;
 
+  const { id: scopeId, params: localScopeParams, isDefaultScope } = useLocalScopeContext();
+
   const componentConfig = Component[TOOLPAD_COMPONENT];
   const { argTypes = {}, errorProp, loadingProp, loadingPropSource } = componentConfig;
 
   const isLayoutNode =
     appDom.isPage(node) || (appDom.isElement(node) && isPageLayoutComponent(node));
 
-  const liveBindings = useBindingsContext();
+  const getBindings = useBindingsContext();
+  const liveBindings = React.useMemo(
+    () => getBindings(scopeId, localScopeParams),
+    [getBindings, localScopeParams, scopeId],
+  );
+
   const boundProps: Record<string, any> = React.useMemo(() => {
     const loadingPropSourceSet = new Set(loadingPropSource);
     const hookResult: Record<string, any> = {};
@@ -216,6 +239,7 @@ function RenderedNodeContent({ node, childNodeGroups, Component }: RenderedNodeC
     for (const [propName, argType] of Object.entries(argTypes)) {
       const bindingId = `${nodeId}.props.${propName}`;
       const binding = liveBindings[bindingId];
+
       if (binding) {
         hookResult[propName] = binding.value;
 
@@ -275,11 +299,16 @@ function RenderedNodeContent({ node, childNodeGroups, Component }: RenderedNodeC
           const bindingId = `${nodeId}.props.${key}`;
 
           const value = argType.onChangeHandler ? argType.onChangeHandler(param) : param;
-          setControlledBinding(bindingId, { value });
+          setControlledBinding(bindingId, { value }, scopeId);
+
+          if (scopeId && isDefaultScope) {
+            setControlledBinding(bindingId, { value });
+          }
         };
+
         return [argType.onChangeProp, handler];
       }),
-    [argTypes, nodeId, setControlledBinding],
+    [argTypes, isDefaultScope, nodeId, scopeId, setControlledBinding],
   );
 
   const navigateToPage = usePageNavigator();
@@ -308,7 +337,7 @@ function RenderedNodeContent({ node, childNodeGroups, Component }: RenderedNodeC
         const handler = () => {
           const code = action.value;
           const exprToEvaluate = `(async () => {${code}})()`;
-          evaluatePageExpression(exprToEvaluate);
+          evaluatePageExpression(exprToEvaluate, scopeId, localScopeParams);
         };
 
         return [key, handler];
@@ -316,7 +345,7 @@ function RenderedNodeContent({ node, childNodeGroups, Component }: RenderedNodeC
 
       return null;
     });
-  }, [argTypes, node, navigateToPage, evaluatePageExpression]);
+  }, [argTypes, node, navigateToPage, evaluatePageExpression, localScopeParams, scopeId]);
 
   const reactChildren = mapValues(childNodeGroups, (childNodes) =>
     childNodes.map((child) => <RenderedNode key={child.id} nodeId={child.id} />),
@@ -343,39 +372,71 @@ function RenderedNodeContent({ node, childNodeGroups, Component }: RenderedNodeC
   }, [boundProps, eventHandlers, layoutElementProps, onChangeHandlers, reactChildren, node.name]);
 
   const previousProps = React.useRef<Record<string, any>>(props);
+  const [hasSetInitialBindings, setHasSetInitialBindings] = React.useState(false);
   React.useEffect(() => {
     Object.entries(argTypes).forEach(([key, argType]) => {
       if (!argType?.defaultValueProp) {
         return;
       }
 
-      if (previousProps.current[argType.defaultValueProp] === props[argType.defaultValueProp]) {
+      if (
+        hasSetInitialBindings &&
+        previousProps.current[argType.defaultValueProp] === props[argType.defaultValueProp]
+      ) {
         return;
       }
 
       const bindingIdToUpdate = `${nodeId}.props.${key}`;
-      setControlledBinding(bindingIdToUpdate, { value: props[argType.defaultValueProp] });
+      setControlledBinding(bindingIdToUpdate, { value: props[argType.defaultValueProp] }, scopeId);
     });
 
     previousProps.current = props;
-  }, [props, argTypes, nodeId, setControlledBinding]);
+    setHasSetInitialBindings(true);
+  }, [props, argTypes, nodeId, setControlledBinding, scopeId, hasSetInitialBindings]);
 
-  // Wrap with slots
+  // Wrap element props
   for (const [propName, argType] of Object.entries(argTypes)) {
-    if (argType?.typeDef.type === 'element') {
+    const isElement = argType?.typeDef.type === 'element';
+    const isTemplate = argType?.typeDef.type === 'template';
+
+    if (isElement || isTemplate) {
+      const value = props[propName];
+
+      let wrappedValue = value;
       if (argType.control?.type === 'slots') {
-        const value = props[propName];
-        props[propName] = <Slots prop={propName}>{value}</Slots>;
+        wrappedValue = <Slots prop={propName}>{value}</Slots>;
       } else if (argType.control?.type === 'slot' || argType.control?.type === 'layoutSlot') {
-        const value = props[propName];
-        props[propName] = (
+        wrappedValue = (
           <Placeholder prop={propName} hasLayout={argType.control?.type === 'layoutSlot'}>
             {value}
           </Placeholder>
         );
       }
+
+      if (isTemplate) {
+        props[propName] = ({ i }: TemplateScopeParams) => {
+          const templateScopeId = `${node.id}.props.${propName}[${i}]`;
+
+          return (
+            <LocalScopeContextProvider
+              key={i}
+              value={{
+                id: templateScopeId,
+                isDefaultScope: i === DEFAULT_LOCAL_SCOPE_PARAMS.i,
+                params: { i },
+              }}
+            >
+              {wrappedValue}
+            </LocalScopeContextProvider>
+          );
+        };
+      } else {
+        props[propName] = wrappedValue;
+      }
     }
   }
+
+  const hasUnsetScopedBindings = scopeId && !hasSetInitialBindings;
 
   return (
     <NodeRuntimeWrapper
@@ -391,6 +452,7 @@ function RenderedNodeContent({ node, childNodeGroups, Component }: RenderedNodeC
             display: 'flex',
             alignItems: boundLayoutProps.verticalAlign,
             justifyContent: boundLayoutProps.horizontalAlign,
+            visibility: hasUnsetScopedBindings ? 'hidden' : 'visible',
           }}
         >
           <Component {...props} />
@@ -482,8 +544,10 @@ interface QueryNodeProps {
 }
 
 function QueryNode({ node }: QueryNodeProps) {
-  const bindings = useBindingsContext();
+  const getBindings = useBindingsContext();
   const setControlledBinding = useSetControlledBindingContext();
+
+  const bindings = React.useMemo(() => getBindings(), [getBindings]);
 
   const params = resolveBindables(
     bindings,
@@ -521,8 +585,10 @@ interface MutationNodeProps {
 
 function MutationNode({ node }: MutationNodeProps) {
   const { appId, version } = useAppContext();
-  const bindings = useBindingsContext();
+  const getBindings = useBindingsContext();
   const setControlledBinding = useSetControlledBindingContext();
+
+  const bindings = React.useMemo(() => getBindings(), [getBindings]);
 
   const queryId = node.id;
   const params = resolveBindables(bindings, `${node.id}.params`, node.params);
@@ -620,22 +686,24 @@ function parseBinding(
 
 function parseBindings(
   dom: appDom.AppDom,
-  page: appDom.PageNode,
+  rootNode: appDom.ElementNode | appDom.PageNode,
   components: ToolpadComponents,
   location: RouterLocation,
 ) {
-  const elements = appDom.getDescendants(dom, page);
+  const elements = appDom.getDescendants(dom, rootNode);
 
   const parsedBindingsMap = new Map<string, ParsedBinding | EvaluatedBinding>();
   const controlled = new Set<string>();
-  const globalScopeMeta: GlobalScopeMeta = {};
+  const scopeMeta: ScopeMeta = {};
 
   for (const elm of elements) {
     if (appDom.isElement<any>(elm)) {
       const componentId = getComponentId(elm);
       const Component = components[componentId];
 
-      const { argTypes = {} } = Component?.[TOOLPAD_COMPONENT] ?? {};
+      const componentConfig = Component?.[TOOLPAD_COMPONENT];
+
+      const { argTypes = {} } = componentConfig ?? {};
 
       for (const [propName, argType] of Object.entries(argTypes)) {
         const initializerId = argType?.defaultValueProp
@@ -649,9 +717,17 @@ function parseBindings(
         const bindingId = `${elm.id}.props.${propName}`;
 
         let scopePath: string | undefined;
-        if (componentId !== PAGE_ROW_COMPONENT_ID) {
+
+        const isResizableHeightProp =
+          componentConfig?.resizableHeightProp && propName === componentConfig?.resizableHeightProp;
+
+        if (
+          componentId !== PAGE_ROW_COMPONENT_ID &&
+          !isResizableHeightProp &&
+          !NON_BINDABLE_CONTROL_TYPES.includes(argType?.control?.type as string)
+        ) {
           scopePath = `${elm.name}.${propName}`;
-          globalScopeMeta[elm.name] = {
+          scopeMeta[elm.name] = {
             kind: 'element',
             componentId,
           };
@@ -682,7 +758,7 @@ function parseBindings(
     }
 
     if (appDom.isQuery(elm)) {
-      globalScopeMeta[elm.name] = {
+      scopeMeta[elm.name] = {
         kind: 'query',
       };
 
@@ -749,22 +825,24 @@ function parseBindings(
     }
   }
 
-  const urlParams = new URLSearchParams(location.search);
-  const pageParameters = page.attributes.parameters?.value || [];
+  if (appDom.isPage(rootNode)) {
+    const urlParams = new URLSearchParams(location.search);
+    const pageParameters = rootNode.attributes.parameters?.value || [];
 
-  for (const [paramName, paramDefault] of pageParameters) {
-    const bindingId = `${page.id}.parameters.${paramName}`;
-    const scopePath = `page.parameters.${paramName}`;
-    parsedBindingsMap.set(bindingId, {
-      scopePath,
-      result: { value: urlParams.get(paramName) || paramDefault },
-    });
+    for (const [paramName, paramDefault] of pageParameters) {
+      const bindingId = `${rootNode.id}.parameters.${paramName}`;
+      const scopePath = `page.parameters.${paramName}`;
+      parsedBindingsMap.set(bindingId, {
+        scopePath,
+        result: { value: urlParams.get(paramName) || paramDefault },
+      });
+    }
   }
 
   const parsedBindings: Record<string, ParsedBinding | EvaluatedBinding> =
     Object.fromEntries(parsedBindingsMap);
 
-  return { parsedBindings, controlled, globalScopeMeta };
+  return { parsedBindings, controlled, scopeMeta };
 }
 
 function RenderedPage({ nodeId }: RenderedNodeProps) {
@@ -777,13 +855,21 @@ function RenderedPage({ nodeId }: RenderedNodeProps) {
   const location = useLocation();
   const components = useComponents();
 
-  const { parsedBindings, controlled, globalScopeMeta } = React.useMemo(
+  const {
+    parsedBindings,
+    controlled,
+    scopeMeta: globalScopeMeta,
+  } = React.useMemo(
     () => parseBindings(dom, page, components, location),
     [components, dom, location, page],
   );
 
   const [pageBindings, setPageBindings] =
     React.useState<Record<string, ParsedBinding | EvaluatedBinding>>(parsedBindings);
+
+  const [scopedBindings, setScopedBindings] = React.useState<
+    Record<string, Record<string, ParsedBinding | EvaluatedBinding>>
+  >({});
 
   const prevDom = React.useRef(dom);
   React.useEffect(() => {
@@ -806,17 +892,35 @@ function RenderedPage({ nodeId }: RenderedNodeProps) {
   }, [parsedBindings, controlled, dom]);
 
   const setControlledBinding = React.useCallback(
-    (id: string, result: BindingEvaluationResult) => {
+    (id: string, result: BindingEvaluationResult, scopeId?: string) => {
       const { expression, initializer, ...parsedBinding } = parsedBindings[id];
-      setPageBindings((existing): Record<string, ParsedBinding | EvaluatedBinding> => {
-        if (!controlled.has(id)) {
-          throw new Error(`Not a controlled binding "${id}"`);
-        }
-        return {
-          ...existing,
-          [id]: { ...parsedBinding, result },
-        };
-      });
+
+      if (!controlled.has(id)) {
+        throw new Error(`Not a controlled binding "${id}"`);
+      }
+
+      if (scopeId) {
+        setScopedBindings(
+          (existing): Record<string, Record<string, ParsedBinding | EvaluatedBinding>> => ({
+            ...existing,
+            ...{
+              [scopeId]: {
+                ...(existing[scopeId] || {}),
+                [id]: { ...parsedBinding, result },
+              },
+            },
+          }),
+        );
+      } else {
+        setPageBindings(
+          (existing): Record<string, ParsedBinding | EvaluatedBinding> => ({
+            ...existing,
+            ...{
+              [id]: { ...parsedBinding, result },
+            },
+          }),
+        );
+      }
     },
     [parsedBindings, controlled],
   );
@@ -827,49 +931,78 @@ function RenderedPage({ nodeId }: RenderedNodeProps) {
 
   const browserJsRuntime = useBrowserJsRuntime();
 
-  const evaluatedBindings = React.useMemo(
-    () => evalJsBindings(browserJsRuntime, pageBindings, globalScope),
-    [browserJsRuntime, globalScope, pageBindings],
+  const getEvaluatedBindings = React.useCallback(
+    (scopeId?: string, localScopeParams: LocalScopeParams = DEFAULT_LOCAL_SCOPE_PARAMS) => {
+      const localBindings = scopeId ? scopedBindings[scopeId] : null;
+
+      return evalJsBindings(
+        browserJsRuntime,
+        {
+          ...pageBindings,
+          ...(localBindings || {}),
+        },
+        {
+          ...globalScope,
+          ...localScopeParams,
+        },
+      );
+    },
+    [browserJsRuntime, globalScope, pageBindings, scopedBindings],
   );
 
-  const pageState = React.useMemo(
-    () => buildGlobalScope(globalScope, evaluatedBindings),
-    [evaluatedBindings, globalScope],
+  const getScopeState = React.useCallback(
+    (scopeId?: string) => buildGlobalScope(globalScope, getEvaluatedBindings(scopeId)),
+    [getEvaluatedBindings, globalScope],
   );
 
-  const liveBindings: Record<string, BindingEvaluationResult> = React.useMemo(
-    () => mapValues(evaluatedBindings, (binding) => binding.result || { value: undefined }),
-    [evaluatedBindings],
+  const getBindings = React.useCallback(
+    (scopeId?: string, localScopeParams?: LocalScopeParams) => {
+      const evaluatedBindings = getEvaluatedBindings(scopeId, localScopeParams);
+      return mapValues(evaluatedBindings, (binding) => binding.result || { value: undefined });
+    },
+    [getEvaluatedBindings],
   );
 
   const evaluatePageExpression = React.useCallback(
-    (expression: string) => browserJsRuntime.evaluateExpression(expression, pageState),
-    [browserJsRuntime, pageState],
+    (expression: string, scopeId?: string, localScopeParams?: LocalScopeParams) => {
+      const scopeState = getScopeState(scopeId);
+      return browserJsRuntime.evaluateExpression(expression, {
+        ...scopeState,
+        ...localScopeParams,
+      });
+    },
+    [browserJsRuntime, getScopeState],
   );
 
   const bridge = React.useContext(BridgeContext);
 
   React.useEffect(() => {
+    const pageState = getScopeState();
     bridge?.canvasEvents.emit('pageStateUpdated', { pageState, globalScopeMeta });
-  }, [pageState, globalScopeMeta, bridge]);
+  }, [bridge, globalScopeMeta, getScopeState]);
 
   React.useEffect(() => {
+    const liveBindings = getBindings();
     bridge?.canvasEvents.emit('pageBindingsUpdated', { bindings: liveBindings });
-  }, [bridge, liveBindings]);
+  }, [bridge, getBindings]);
 
   return (
-    <BindingsContextProvider value={liveBindings}>
+    <BindingsContextProvider value={getBindings}>
       <SetControlledBindingContextProvider value={setControlledBinding}>
         <EvaluatePageExpressionProvider value={evaluatePageExpression}>
-          <RenderedNodeContent
-            node={page}
-            childNodeGroups={{ children }}
-            Component={PageRootComponent}
-          />
+          <LocalScopeContextProvider
+            value={{ params: DEFAULT_LOCAL_SCOPE_PARAMS, isDefaultScope: true }}
+          >
+            <RenderedNodeContent
+              node={page}
+              childNodeGroups={{ children }}
+              Component={PageRootComponent}
+            />
 
-          {queries.map((node) => (
-            <FetchNode key={node.id} node={node} />
-          ))}
+            {queries.map((node) => (
+              <FetchNode key={node.id} node={node} />
+            ))}
+          </LocalScopeContextProvider>
         </EvaluatePageExpressionProvider>
       </SetControlledBindingContextProvider>
     </BindingsContextProvider>

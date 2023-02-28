@@ -14,6 +14,8 @@ export { default as TextField } from './TextField.js';
 
 export { default as Select } from './Select.js';
 
+export { default as List } from './List.js';
+
 export { default as Paper } from './Paper.js';
 
 export { default as Image } from './Image.js';

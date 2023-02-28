@@ -31,6 +31,8 @@ interface WithAppOptions {
   // Template to be used as the starting point of the project folder toolpad is running in
   // This will copied to the temporary folder
   template?: string;
+  // Run toolpad next.js app in local dev mode
+  toolpadDev?: boolean;
 }
 
 /**
@@ -69,6 +71,7 @@ export async function withApp(options: WithAppOptions, doWork: (url: string) => 
 
           if (VERBOSE) {
             child.stdout?.pipe(process.stdout);
+            child.stderr?.pipe(process.stderr);
           }
 
           const match = await waitForMatch(child.stdout, /localhost:(\d+)/);
@@ -89,13 +92,18 @@ export async function withApp(options: WithAppOptions, doWork: (url: string) => 
   }
 }
 
-const test = base.extend<{ localAppConfig?: WithAppOptions; localApp: { url: string } }>({
+const test = base.extend<{
+  toolpadDev: boolean;
+  localAppConfig?: WithAppOptions;
+  localApp: { url: string };
+}>({
+  toolpadDev: false,
   localAppConfig: undefined,
-  localApp: async ({ localAppConfig }, use) => {
+  localApp: async ({ localAppConfig, toolpadDev }, use) => {
     if (!localAppConfig) {
       throw new Error('localAppConfig missing');
     }
-    await withApp(localAppConfig, async (url) => {
+    await withApp({ toolpadDev, ...localAppConfig }, async (url) => {
       await use({ url });
     });
   },

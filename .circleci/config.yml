@@ -151,7 +151,7 @@ jobs:
     docker:
       - image: mcr.microsoft.com/playwright:v1.31.1-focal
         environment:
-          NODE_ENV: development # Needed if playwright is in `devDependencies`
+          NODE_ENV: test
     steps:
       - checkout
       - install_js

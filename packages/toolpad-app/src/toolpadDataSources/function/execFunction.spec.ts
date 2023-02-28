@@ -7,7 +7,7 @@ import execFunction from './execFunction';
 import { streamToString } from '../../utils/streams';
 import { startServer } from '../../utils/tests';
 
-describe.skip('execFunction', () => {
+describe('execFunction', () => {
   test('basic', async () => {
     const { data, error } = await execFunction(`
       export default async function () {

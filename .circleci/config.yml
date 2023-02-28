@@ -149,7 +149,7 @@ jobs:
     <<: *defaults
     resource_class: 'medium+'
     docker:
-      - image: mcr.microsoft.com/playwright:v1.31.1-focal
+      - image: mcr.microsoft.com/playwright:v1.30.0-focal
         environment:
           NODE_ENV: test
     steps:

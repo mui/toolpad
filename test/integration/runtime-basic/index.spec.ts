@@ -4,6 +4,8 @@ import { test, expect } from '../../playwright/test';
 import { readJsonFile } from '../../utils/fs';
 import generateId from '../../utils/generateId';
 
+test.skip(!!process.env.LOCAL_MODE_TESTS, 'These are hosted mode tests');
+
 test('input basics', async ({ page, api }) => {
   const dom = await readJsonFile(path.resolve(__dirname, './basicDom.json'));
 

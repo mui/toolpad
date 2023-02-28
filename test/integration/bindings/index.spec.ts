@@ -4,6 +4,8 @@ import { expect, test } from '../../playwright/test';
 import { readJsonFile } from '../../utils/fs';
 import generateId from '../../utils/generateId';
 
+test.skip(!!process.env.LOCAL_MODE_TESTS, 'These are hosted mode tests');
+
 test.use({
   ignoreConsoleErrors: [
     // Chrome

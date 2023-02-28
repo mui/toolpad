@@ -6,6 +6,8 @@ import clickCenter from '../../utils/clickCenter';
 import { readJsonFile } from '../../utils/fs';
 import generateId from '../../utils/generateId';
 
+test.skip(!!process.env.LOCAL_MODE_TESTS, 'These are hosted mode tests');
+
 async function waitForComponents(page: Page, frame: Page | FrameLocator = page) {
   const button = frame.locator('text="foo button"');
   await button.waitFor({ state: 'visible' });

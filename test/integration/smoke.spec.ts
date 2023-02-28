@@ -2,6 +2,8 @@ import { ToolpadHome } from '../models/ToolpadHome';
 import { test, expect, Request } from '../playwright/test';
 import generateId from '../utils/generateId';
 
+test.skip(!!process.env.LOCAL_MODE_TESTS, 'These are hosted mode tests');
+
 test('basic app creation flow', async ({ page }) => {
   const homeModel = new ToolpadHome(page);
 

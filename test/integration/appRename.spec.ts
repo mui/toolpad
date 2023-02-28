@@ -2,6 +2,8 @@ import { ToolpadHome } from '../models/ToolpadHome';
 import { test, expect } from '../playwright/test';
 import generateId from '../utils/generateId';
 
+test.skip(!!process.env.LOCAL_MODE_TESTS, 'These are hosted mode tests');
+
 test('app create/rename flow', async ({ page }) => {
   const appName1 = `App ${generateId()}`;
   const appName2 = `App ${generateId()}`;

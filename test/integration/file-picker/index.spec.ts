@@ -4,6 +4,8 @@ import { test, expect } from '../../playwright/test';
 import { readJsonFile } from '../../utils/fs';
 import generateId from '../../utils/generateId';
 
+test.skip(!!process.env.LOCAL_MODE_TESTS, 'These are hosted mode tests');
+
 test('File picker component', async ({ page, api }) => {
   const dom = await readJsonFile(path.resolve(__dirname, './dom.json'));
   const testFilePath = path.resolve(__dirname, './test.txt');

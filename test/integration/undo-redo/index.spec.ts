@@ -5,6 +5,8 @@ import { readJsonFile } from '../../utils/fs';
 import clickCenter from '../../utils/clickCenter';
 import generateId from '../../utils/generateId';
 
+test.skip(!!process.env.LOCAL_MODE_TESTS, 'These are hosted mode tests');
+
 test('test basic undo and redo', async ({ page, api }) => {
   const dom = await readJsonFile(path.resolve(__dirname, './dom.json'));
 

@@ -5,6 +5,8 @@ import { readJsonFile } from '../../utils/fs';
 import { ToolpadEditor } from '../../models/ToolpadEditor';
 import generateId from '../../utils/generateId';
 
+test.skip(!!process.env.LOCAL_MODE_TESTS, 'These are hosted mode tests');
+
 // We can run our own httpbin instance if necessary:
 //    $ docker run -p 80:80 kennethreitz/httpbin
 const customHttbinBaseUrl = process.env.HTTPBIN_BASEURL;

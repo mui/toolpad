@@ -144,6 +144,12 @@ jobs:
       - run:
           name: '`yarn prettier` changes committed?'
           command: yarn prettier --check
+
+  test_unit:
+    <<: *defaults
+    steps:
+      - checkout
+      - install_js
       - run:
           name: 'Build packages'
           command: yarn release:build
@@ -152,15 +158,14 @@ jobs:
           key: v0-next-{{ checksum "yarn.lock" }}
           paths:
             - packages/toolpad-app/.next/cache
-
-  test_unit:
-    <<: *defaults
-    steps:
-      - checkout
-      - install_js
       - run:
           name: Tests fake browser
           command: yarn test
+      - run:
+          name: Tests real browser
+          environment:
+            - LOCAL_MODE_TESTS: '1'
+          command: yarn test:integration
 
   docker:
     working_directory: /tmp/mui-toolpad

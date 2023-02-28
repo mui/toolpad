@@ -4,6 +4,8 @@ import { ToolpadHome } from '../models/ToolpadHome';
 import { ToolpadRuntime } from '../models/ToolpadRuntime';
 import { readJsonFile } from '../utils/fs';
 
+test.skip(!!process.env.LOCAL_MODE_TESTS, 'These are hosted mode tests');
+
 test('duplicate app from home flow', async ({ page }) => {
   const dom = await readJsonFile(path.resolve(__dirname, './duplicateNavigationDom.json'));
 

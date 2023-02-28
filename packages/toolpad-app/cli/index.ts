@@ -3,8 +3,12 @@ import arg from 'arg';
 import path from 'path';
 
 const DEFAULT_PORT = 3000;
-const MAX_RETRIES = 30;
+
 const INTERVAL = 1000;
+const MAX_RETRIES = 30;
+
+const DEFAULT_URL = 'http://localhost:3000/';
+const HEALTH_CHECK_URL = `/health-check`;
 
 function* getNextPort(port: number = DEFAULT_PORT) {
   while (true) {
@@ -18,12 +22,12 @@ interface RunCommandArgs {
   debugMode?: boolean;
   port?: number;
   // Whether to disable the browser automatically opening up on startup
-  browser?: boolean;
+  noBrowser?: boolean;
 }
 
 async function runApp(
   cmd: 'dev' | 'start',
-  { debugMode = false, port, noBrowser = false }: RunCommandArgs,
+  { debugMode = false, port, noBrowser }: RunCommandArgs,
 ) {
   const { execa } = await import('execa');
   const { default: getPort } = await import('get-port');
@@ -52,8 +56,7 @@ async function runApp(
 
   if (cp.stdout && cmd === 'dev' && !noBrowser) {
     const { default: fetch } = await import('node-fetch');
-
-    const checkedUrl = new URL(`https://localhost:${port || DEFAULT_PORT}`);
+    const checkedUrl = new URL(HEALTH_CHECK_URL, DEFAULT_URL);
     for (let i = 1; i <= MAX_RETRIES; i += 1) {
       try {
         // eslint-disable-next-line no-console
@@ -66,17 +69,18 @@ async function runApp(
         }
 
         // eslint-disable-next-line no-console
-        console.log(`connected!`);
-        execa('open', [`http://localhost:${port || DEFAULT_PORT}`], { stdio: 'inherit' });
+        console.log(`Connected! Opening browser to Toolpad app...`);
+        // eslint-disable-next-line no-await-in-loop
+        await execa('open', [DEFAULT_URL], { stdio: 'inherit' });
         return;
       } catch (err: any) {
-        console.error(` > ${err.message}`);
         // eslint-disable-next-line no-await-in-loop
         await new Promise((resolve) => {
           setTimeout(resolve, INTERVAL);
         });
       }
     }
+    throw new Error(`Failed to connect`);
   }
 
   cp.on('exit', (code) => {
@@ -113,9 +117,9 @@ export default async function cli(argv: string[]) {
     {
       // Types
       '--help': Boolean,
-      '--debug': Boolean,
+      '--next-dev': Boolean,
       '--port': Number,
-      '--noBrowser': Boolean,
+      '--no-browser': Boolean,
 
       // Aliases
       '-p': '--port',
@@ -128,16 +132,18 @@ export default async function cli(argv: string[]) {
   const command = args._[0];
 
   const runArgs = {
-    debugMode: args['--debug'],
+    debugMode: args['--next-dev'],
     port: args['--port'],
   };
 
-  const devArgs = { ...runArgs, noBrowser: args['--noBrowser'] };
+  const devArgs = {
+    ...runArgs,
+    noBrowser: args['--no-browser'],
+  };
 
   switch (command) {
     case undefined:
     case 'dev':
-      console.log(devArgs);
       await devCommand(devArgs);
       break;
     case 'build':

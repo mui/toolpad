@@ -6,7 +6,6 @@ import { Readable } from 'stream';
 import { test as base } from './test';
 
 // You'll need to have `yarn dev13` running for this
-const DEV_MODE = !process.env.CI;
 const VERBOSE = true;
 
 async function waitForMatch(input: Readable, regex: RegExp): Promise<RegExpExecArray | null> {
@@ -49,7 +48,7 @@ export async function withApp(options: WithAppOptions, doWork: (url: string) => 
     }
 
     const args: string[] = [cmd];
-    if (DEV_MODE) {
+    if (options.toolpadDev) {
       args.push('--dev');
     }
     const child = childProcess.spawn('toolpad', args, {

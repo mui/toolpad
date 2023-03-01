@@ -3,6 +3,7 @@ import * as readline from 'readline';
 import * as fs from 'fs/promises';
 import childProcess from 'child_process';
 import { Readable } from 'stream';
+import { once } from 'events';
 import { test as base } from './test';
 
 // You'll need to have `yarn dev13` running for this
@@ -51,6 +52,7 @@ export async function withApp(options: WithAppOptions, doWork: (url: string) => 
     if (options.toolpadDev) {
       args.push('--dev');
     }
+
     const child = childProcess.spawn('toolpad', args, {
       cwd: projectDir,
       stdio: 'pipe',
@@ -85,17 +87,23 @@ export async function withApp(options: WithAppOptions, doWork: (url: string) => 
       ]);
     } finally {
       child.kill();
+      if (!child.exitCode) {
+        await once(child, 'exit');
+      }
     }
   } finally {
     await fs.rm(projectDir, { recursive: true });
   }
 }
 
-const test = base.extend<{
-  toolpadDev: boolean;
-  localAppConfig?: WithAppOptions;
-  localApp: { url: string };
-}>({
+const test = base.extend<
+  {
+    toolpadDev: boolean;
+    localAppConfig?: WithAppOptions;
+    localApp: { url: string };
+  },
+  { browserCloser: null }
+>({
   toolpadDev: false,
   localAppConfig: undefined,
   localApp: async ({ localAppConfig, toolpadDev }, use) => {
@@ -109,6 +117,17 @@ const test = base.extend<{
   baseURL: async ({ localApp }, use) => {
     await use(localApp.url);
   },
+  browserCloser: [
+    async ({ browser }, use) => {
+      // For some reason the browser doesn't close automatically when running a child process
+      await use(null);
+      await browser.close();
+    },
+    {
+      scope: 'worker',
+      auto: true,
+    },
+  ],
 });
 
 // eslint-disable-next-line import/export

@@ -1,18 +1,17 @@
 import 'dotenv/config';
 import arg from 'arg';
 import path from 'path';
-import open, { App } from 'open';
+import open from 'open';
 import invariant from 'invariant';
 import { Readable } from 'stream';
 import * as readline from 'readline';
 
 const DEFAULT_PORT = 3000;
 // https://github.com/sindresorhus/open#app
-const DEFAULT_BROWSER = open.apps.chrome;
 const INTERVAL = 1000;
 const MAX_RETRIES = 30;
 
-const HEALTH_CHECK_URL = `/health-check`;
+const HEALTH_CHECK_PATHNAME = `/health-check`;
 
 async function waitForMatch(input: Readable, regex: RegExp): Promise<RegExpExecArray | null> {
   return new Promise((resolve, reject) => {
@@ -39,18 +38,14 @@ function* getNextPort(port: number = DEFAULT_PORT) {
 
 interface RunCommandArgs {
   // Whether Toolpad editor is running in debug mode
-  debugMode?: boolean;
+  devMode?: boolean;
   port?: number;
 }
 
-const waitForHealthCheck = async (port: number): Promise<void> => {
-  const TOOLPAD_BASE_URL = `http://localhost:${port}/`;
-  const checkedUrl = new URL(HEALTH_CHECK_URL, TOOLPAD_BASE_URL);
+const waitForHealthCheck = async (baseUrl: string): Promise<void> => {
+  const checkedUrl = new URL(HEALTH_CHECK_PATHNAME, baseUrl);
   for (let i = 1; i <= MAX_RETRIES; i += 1) {
     try {
-      // eslint-disable-next-line no-console
-      console.log(`(${i}/${MAX_RETRIES}) trying to reach "${HEALTH_CHECK_URL}"...`);
-
       // eslint-disable-next-line no-await-in-loop
       const res = await fetch(checkedUrl.href);
 
@@ -81,7 +76,9 @@ function getBrowserEnv() {
   // See https://github.com/sindresorhus/open#app for documentation.
   const value = process.env.TOOLPAD_CLI_BROWSER;
 
-  const args = process.env.BROWSER_ARGS ? process.env.BROWSER_ARGS.split(' ') : [];
+  const args = process.env.TOOLPAD_CLI_BROWSER_ARGS
+    ? process.env.TOOLPAD_CLI_BROWSER_ARGS.split(' ')
+    : [];
 
   let action;
   if (!value) {
@@ -98,15 +95,11 @@ function getBrowserEnv() {
 async function startBrowserProcess(url: string, browserName?: string, args?: string[]) {
   // (Use open to open a new tab)
   try {
-    const browser: App = {
-      name: browserName || DEFAULT_BROWSER,
-      arguments: args,
-    };
-
-    const options = { app: browser, wait: false, url: true };
-
-    open(url, options);
-
+    // Omit the `app` property if the TOOLPAD_CLI_BROWSER variable is not specified
+    // to let `open` use the default browser.
+    // This means that TOOLPAD_CLI_BROWSER_ARGS will be ignored if TOOLPAD_CLI_BROWSER is not set.
+    const options: open.Options = { wait: false };
+    open(url, browserName ? { ...options, app: { name: browserName, arguments: args } } : options);
     return true;
   } catch (err) {
     return false;
@@ -135,12 +128,12 @@ async function openBrowser(url: string) {
   }
 }
 
-async function runApp(cmd: 'dev' | 'start', { debugMode = false, port }: RunCommandArgs) {
+async function runApp(cmd: 'dev' | 'start', { devMode = false, port }: RunCommandArgs) {
   const { execa } = await import('execa');
   const { default: chalk } = await import('chalk');
   const { default: getPort } = await import('get-port');
   const toolpadDir = path.resolve(__dirname, '../..'); // from ./dist/server
-  const nextCommand = debugMode ? 'dev' : 'start';
+  const nextCommand = devMode ? 'dev' : 'start';
 
   if (!port) {
     port = cmd === 'dev' ? await getPort({ port: getNextPort(DEFAULT_PORT) }) : DEFAULT_PORT;
@@ -173,12 +166,13 @@ async function runApp(cmd: 'dev' | 'start', { debugMode = false, port }: RunComm
     const detectedPort = match ? Number(match[1]) : null;
     invariant(detectedPort, 'Could not find port in stdout');
 
-    // Then wait for health check to pass on the detected port
-    await waitForHealthCheck(port);
+    const toolpadBaseUrl = `http://localhost:${detectedPort}/`;
 
-    const TOOLPAD_BASE_URL = `http://localhost:${detectedPort}/`;
+    // Then wait for health check to pass on the detected port
+    await waitForHealthCheck(toolpadBaseUrl);
+
     try {
-      await openBrowser(TOOLPAD_BASE_URL);
+      await openBrowser(toolpadBaseUrl);
     } catch (err: any) {
       console.error(`${chalk.red('error')} - Failed to open browser: ${err.message}`);
     }
@@ -196,14 +190,16 @@ async function runApp(cmd: 'dev' | 'start', { debugMode = false, port }: RunComm
 }
 
 async function devCommand(args: RunCommandArgs) {
+  const { default: chalk } = await import('chalk');
   // eslint-disable-next-line no-console
-  console.log('Starting Toolpad application in dev mode...');
+  console.log(`${chalk.blue('info')} - starting Toolpad application in dev mode...`);
   await runApp('dev', args);
 }
 
 async function buildCommand() {
+  const { default: chalk } = await import('chalk');
   // eslint-disable-next-line no-console
-  console.log('Building Toolpad application...');
+  console.log(`${chalk.blue('info')} - building Toolpad application...`);
   await new Promise((resolve) => {
     setTimeout(resolve, 1000);
   });
@@ -212,8 +208,9 @@ async function buildCommand() {
 }
 
 async function startCommand(args: RunCommandArgs) {
+  const { default: chalk } = await import('chalk');
   // eslint-disable-next-line no-console
-  console.log('Starting Toolpad application...');
+  console.log(`${chalk.blue('info')} - Starting Toolpad application...`);
   await runApp('start', args);
 }
 
@@ -236,7 +233,7 @@ export default async function cli(argv: string[]) {
   const command = args._[0];
 
   const runArgs = {
-    debugMode: args['--dev'],
+    devMode: args['--dev'],
     port: args['--port'],
   };
 

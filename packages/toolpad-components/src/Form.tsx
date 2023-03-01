@@ -1,28 +1,41 @@
 import * as React from 'react';
-import { Container, ContainerProps, Box, Button } from '@mui/material';
+import { Container, ContainerProps, Box } from '@mui/material';
+import { LoadingButton } from '@mui/lab';
 import { createComponent } from '@mui/toolpad-core';
-import { useForm, FieldValues } from 'react-hook-form';
-import { yupResolver } from '@hookform/resolvers/yup';
-import * as Yup from 'yup';
+import { useForm, FieldValues, RegisterOptions } from 'react-hook-form';
 import { SX_PROP_HELPER_TEXT } from './constants';
 
-export const FormContext = React.createContext<ReturnType<typeof useForm> | null>(null);
+type FormValidationRules = Record<
+  string,
+  Pick<RegisterOptions<FieldValues>, 'required' | 'min' | 'max' | 'maxLength' | 'minLength'>
+>;
+
+export const FormContext = React.createContext<{
+  form: ReturnType<typeof useForm> | null;
+  validationRules: FormValidationRules;
+}>({
+  form: null,
+  validationRules: {},
+});
 
 interface FormProps extends ContainerProps {
   value: FieldValues;
   onChange: (newValue: FieldValues) => void;
-  validationSchema: Yup.AnyObjectSchema;
+  validationRules: FormValidationRules;
   onSubmit: (data?: FieldValues) => unknown | Promise<unknown>;
 }
 
-function Form({ children, onChange, onSubmit, validationSchema, sx, ...rest }: FormProps) {
-  const form = useForm({
-    resolver: yupResolver(validationSchema),
-  });
+function Form({ children, onChange, onSubmit, validationRules, sx, ...rest }: FormProps) {
+  const form = useForm();
 
-  const handleSubmit = React.useCallback(() => {
-    onSubmit();
+  const handleSubmit = React.useCallback(async () => {
+    await onSubmit();
   }, [onSubmit]);
+
+  // Set initial form values
+  React.useEffect(() => {
+    onChange(form.getValues());
+  }, [form, onChange]);
 
   React.useEffect(() => {
     const formSubscription = form.watch((value) => {
@@ -31,15 +44,20 @@ function Form({ children, onChange, onSubmit, validationSchema, sx, ...rest }: F
     return () => formSubscription.unsubscribe();
   }, [form, onChange]);
 
+  const formContextValue = React.useMemo(
+    () => ({ form, validationRules }),
+    [form, validationRules],
+  );
+
   return (
     <Container disableGutters sx={sx} {...rest}>
-      <FormContext.Provider value={form}>
+      <FormContext.Provider value={formContextValue}>
         <form onSubmit={form.handleSubmit(handleSubmit)}>
           {children}
           <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'flex-end', pt: 1 }}>
-            <Button type="submit" variant="contained">
+            <LoadingButton type="submit" variant="contained">
               Submit
-            </Button>
+            </LoadingButton>
           </Box>
         </form>
       </FormContext.Provider>
@@ -58,15 +76,13 @@ export default createComponent(Form, {
       typeDef: { type: 'object', default: {} },
       onChangeProp: 'onChange',
     },
-    validationSchema: {
-      helperText: 'Form [Yup](https://www.npmjs.com/package/yup) validation schema.',
-      typeDef: { type: 'object', default: Yup.object() },
+    validationRules: {
+      helperText: 'Validation rules for form fields.',
+      typeDef: { type: 'object', default: {} },
     },
     onSubmit: {
       helperText: 'Add logic to be executed when the user submits the form.',
-      typeDef: {
-        type: 'event',
-      },
+      typeDef: { type: 'event' },
     },
     sx: {
       helperText: SX_PROP_HELPER_TEXT,

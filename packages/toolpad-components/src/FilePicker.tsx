@@ -36,7 +36,7 @@ const readFile = async (file: Blob): Promise<string> => {
 function FilePicker({ multiple, onChange, ...rest }: FilePickerProps) {
   const nodeRuntime = useNode();
 
-  const formContext = React.useContext(FormContext);
+  const { form, validationRules } = React.useContext(FormContext);
 
   const handleChange = async (changeEvent: React.ChangeEvent<HTMLInputElement>) => {
     const filesPromises = Array.from(changeEvent.target.files || []).map(async (file) => {
@@ -62,7 +62,10 @@ function FilePicker({ multiple, onChange, ...rest }: FilePickerProps) {
       {...rest}
       type="file"
       value={undefined}
-      inputProps={{ multiple, ...(formContext && nodeName && formContext.register(nodeName)) }}
+      inputProps={{
+        multiple,
+        ...(form && nodeName && form.register(nodeName, validationRules[nodeName])),
+      }}
       onChange={handleChange}
       InputLabelProps={{ shrink: true }}
     />

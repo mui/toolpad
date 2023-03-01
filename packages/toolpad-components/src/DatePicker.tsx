@@ -79,7 +79,7 @@ export interface DatePickerProps
 function DatePicker({ format, onChange, value, ...rest }: DatePickerProps) {
   const nodeRuntime = useNode();
 
-  const formContext = React.useContext(FormContext);
+  const { form, validationRules } = React.useContext(FormContext);
 
   const handleChange = React.useCallback(
     (newValue: Dayjs | null) => {
@@ -108,7 +108,7 @@ function DatePicker({ format, onChange, value, ...rest }: DatePickerProps) {
             variant={rest.variant}
             size={rest.size}
             sx={rest.sx}
-            {...(formContext && nodeName && formContext.register(nodeName))}
+            {...(form && nodeName && form.register(nodeName, validationRules[nodeName]))}
           />
         )}
       />

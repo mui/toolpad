@@ -16,10 +16,10 @@ export type SelectProps = Omit<TextFieldProps, 'value' | 'onChange'> & {
   name: string;
 };
 
-function Select({ options, value, onChange, defaultValue, fullWidth, sx, ...rest }: SelectProps) {
+function Select({ options, value, onChange, fullWidth, sx, ...rest }: SelectProps) {
   const nodeRuntime = useNode();
 
-  const formContext = React.useContext(FormContext);
+  const { form, validationRules } = React.useContext(FormContext);
 
   const handleChange = React.useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -38,8 +38,8 @@ function Select({ options, value, onChange, defaultValue, fullWidth, sx, ...rest
       select
       sx={{ ...(!fullWidth && !value ? { width: 120 } : {}), ...sx }}
       fullWidth={fullWidth}
-      {...(formContext && nodeName
-        ? formContext.register(nodeName)
+      {...(form && nodeName
+        ? { ...form.register(nodeName, validationRules[nodeName]) }
         : { value, onChange: handleChange })}
     >
       {options.map((option, i) => {

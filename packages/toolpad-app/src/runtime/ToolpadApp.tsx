@@ -64,7 +64,7 @@ import evalJsBindings, {
   EvaluatedBinding,
   ParsedBinding,
 } from './evalJsBindings';
-import { HTML_ID_EDITOR_OVERLAY } from '../constants';
+import { HTML_ID_EDITOR_OVERLAY, NON_BINDABLE_CONTROL_TYPES } from '../constants';
 import { mapProperties, mapValues } from '../utils/collections';
 import usePageTitle from '../utils/usePageTitle';
 import ComponentsContext, { useComponents, useComponent } from './ComponentsContext';
@@ -700,7 +700,9 @@ function parseBindings(
       const componentId = getComponentId(elm);
       const Component = components[componentId];
 
-      const { argTypes = {} } = Component?.[TOOLPAD_COMPONENT] ?? {};
+      const componentConfig = Component?.[TOOLPAD_COMPONENT];
+
+      const { argTypes = {} } = componentConfig ?? {};
 
       for (const [propName, argType] of Object.entries(argTypes)) {
         const initializerId = argType?.defaultValueProp
@@ -714,7 +716,15 @@ function parseBindings(
         const bindingId = `${elm.id}.props.${propName}`;
 
         let scopePath: string | undefined;
-        if (componentId !== PAGE_ROW_COMPONENT_ID) {
+
+        const isResizableHeightProp =
+          componentConfig?.resizableHeightProp && propName === componentConfig?.resizableHeightProp;
+
+        if (
+          componentId !== PAGE_ROW_COMPONENT_ID &&
+          !isResizableHeightProp &&
+          !NON_BINDABLE_CONTROL_TYPES.includes(argType?.control?.type as string)
+        ) {
           scopePath = `${elm.name}.${propName}`;
           scopeMeta[elm.name] = {
             kind: 'element',

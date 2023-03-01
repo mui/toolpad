@@ -130,7 +130,6 @@ async function runApp(cmd: 'dev' | 'start', { debugMode = false, port }: RunComm
     // if port is specified but is not available, exit
     const availablePort = await getPort({ port });
     if (availablePort !== port) {
-      // eslint-disable-next-line no-console
       console.error(`${chalk.red('error')} - Port ${port} is not available. Aborted.`);
       process.exit(1);
     }
@@ -156,7 +155,6 @@ async function runApp(cmd: 'dev' | 'start', { debugMode = false, port }: RunComm
     try {
       await openBrowser(TOOLPAD_BASE_URL);
     } catch (err: any) {
-      // eslint-disable-next-line no-console
       console.error(`${chalk.red('error')} - Failed to open browser: ${err.message}`);
     }
   }

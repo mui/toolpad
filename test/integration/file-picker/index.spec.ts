@@ -14,8 +14,6 @@ test('File picker component', async ({ page, api }) => {
     from: { kind: 'dom', dom },
   });
 
-  await page.pause();
-
   const editorModel = new ToolpadEditor(page);
   editorModel.goto(app.id);
 

@@ -30,13 +30,11 @@ services:
 
 databases:
   - name: toolpad-db
-    branch: legacy-master
     ipAllowList: []
     plan: starter
 
 envVarGroups:
   - name: toolpad-settings
-    branch: legacy-master
     envVars:
       - key: TOOLPAD_BASIC_AUTH_USER
         sync: false

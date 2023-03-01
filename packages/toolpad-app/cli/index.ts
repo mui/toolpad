@@ -1,10 +1,12 @@
 import 'dotenv/config';
 import arg from 'arg';
 import path from 'path';
+import open, { App } from 'open';
 import invariant from 'invariant';
 
 const DEFAULT_PORT = 3000;
-
+// https://github.com/sindresorhus/open#app
+const DEFAULT_BROWSER = open.apps.chrome;
 const INTERVAL = 1000;
 const MAX_RETRIES = 30;
 
@@ -21,8 +23,6 @@ interface RunCommandArgs {
   // Whether Toolpad editor is running in debug mode
   debugMode?: boolean;
   port?: number;
-  // Whether to disable the browser automatically opening up on startup
-  noBrowser?: boolean;
 }
 
 const waitForHealthCheck = async (port: number): Promise<void> => {
@@ -32,7 +32,7 @@ const waitForHealthCheck = async (port: number): Promise<void> => {
   for (let i = 1; i <= MAX_RETRIES; i += 1) {
     try {
       // eslint-disable-next-line no-console
-      console.log(`(${i}/${MAX_RETRIES}) trying reach "${checkedUrl.href}"...`);
+      console.log(`(${i}/${MAX_RETRIES}) trying to reach "${checkedUrl.href}"...`);
       // eslint-disable-next-line no-await-in-loop
       const res = await fetch(checkedUrl.href);
 
@@ -41,7 +41,7 @@ const waitForHealthCheck = async (port: number): Promise<void> => {
       }
 
       // eslint-disable-next-line no-console
-      console.log(`${chalk.green('Connected! Opening browser to Toolpad app...')}`);
+      console.log(`${chalk.green('success')} - Toolpad connected! Opening browser...`);
       return;
     } catch (err: any) {
       // eslint-disable-next-line no-await-in-loop
@@ -53,10 +53,71 @@ const waitForHealthCheck = async (port: number): Promise<void> => {
   throw new Error(`Failed to connect`);
 };
 
-async function runApp(
-  cmd: 'dev' | 'start',
-  { debugMode = false, port, noBrowser }: RunCommandArgs,
-) {
+// From https://github.com/facebook/create-react-app/blob/main/packages/react-dev-utils/openBrowser.js
+
+const Actions = Object.freeze({
+  NONE: 0,
+  BROWSER: 1,
+});
+
+function getBrowserEnv() {
+  // Attempt to honor this environment variable.
+  // It is specific to the operating system.
+  // See https://github.com/sindresorhus/open#app for documentation.
+  const value = process.env.TOOLPAD_CLI_BROWSER;
+
+  const args = process.env.BROWSER_ARGS ? process.env.BROWSER_ARGS.split(' ') : [];
+
+  let action;
+  if (!value) {
+    // Default.
+    action = Actions.BROWSER;
+  } else if (value.toLowerCase() === 'none') {
+    action = Actions.NONE;
+  } else {
+    action = Actions.BROWSER;
+  }
+  return { action, value, args };
+}
+
+async function startBrowserProcess(url: string, browserName?: string, args?: string[]) {
+  // (Use open to open a new tab)
+  try {
+    const browser: App = {
+      name: browserName || DEFAULT_BROWSER,
+      arguments: args,
+    };
+
+    const options = { app: browser, wait: false, url: true };
+
+    open(url, options);
+
+    return true;
+  } catch (err) {
+    return false;
+  }
+}
+
+/**
+ * Reads the TOOLPAD_CLI_BROWSER environment variable and decides what to do with it. Returns
+ * true if it opened a browser, otherwise false.
+ */
+async function openBrowser(url: string) {
+  const { action, value, args } = getBrowserEnv();
+  switch (action) {
+    case Actions.NONE:
+      // Special case: BROWSER="none" will prevent opening completely.
+      return false;
+
+    case Actions.BROWSER:
+      return startBrowserProcess(url, value, args);
+
+    default:
+      throw new Error('Not implemented.');
+  }
+}
+
+async function runApp(cmd: 'dev' | 'start', { debugMode = false, port }: RunCommandArgs) {
   const { execa } = await import('execa');
   const { default: chalk } = await import('chalk');
   const { default: getPort } = await import('get-port');
@@ -65,14 +126,12 @@ async function runApp(
 
   if (!port) {
     port = cmd === 'dev' ? await getPort({ port: getNextPort(DEFAULT_PORT) }) : DEFAULT_PORT;
-  }
-
-  // if port is specified but is not available, exit
-  else if (cmd === 'dev') {
+  } else {
+    // if port is specified but is not available, exit
     const availablePort = await getPort({ port });
     if (availablePort !== port) {
       // eslint-disable-next-line no-console
-      console.error(`${chalk.red(`Port ${port} is not available. Exiting...`)}`);
+      console.error(`${chalk.red('error')} - Port ${port} is not available. Aborted.`);
       process.exit(1);
     }
   }
@@ -91,15 +150,20 @@ async function runApp(
 
   invariant(cp.stdout, 'child process must be started with "stdio: \'pipe\'"');
 
+  if (cmd === 'dev') {
+    const TOOLPAD_BASE_URL = `http://localhost:${port}/`;
+    await waitForHealthCheck(port);
+    try {
+      await openBrowser(TOOLPAD_BASE_URL);
+    } catch (err: any) {
+      // eslint-disable-next-line no-console
+      console.error(`${chalk.red('error')} - Failed to open browser: ${err.message}`);
+    }
+  }
+
   process.stdin.pipe(cp.stdin!);
   cp.stdout?.pipe(process.stdout);
   cp.stderr?.pipe(process.stdout);
-
-  if (cmd === 'dev' && !noBrowser) {
-    const TOOLPAD_BASE_URL = `http://localhost:${port}/`;
-    await waitForHealthCheck(port);
-    await execa('open', [TOOLPAD_BASE_URL], { stdio: 'inherit' });
-  }
 
   cp.on('exit', (code) => {
     if (code) {
@@ -137,7 +201,6 @@ export default async function cli(argv: string[]) {
       '--help': Boolean,
       '--dev': Boolean,
       '--port': Number,
-      '--no-browser': Boolean,
 
       // Aliases
       '-p': '--port',
@@ -154,15 +217,10 @@ export default async function cli(argv: string[]) {
     port: args['--port'],
   };
 
-  const devArgs = {
-    ...runArgs,
-    noBrowser: args['--no-browser'],
-  };
-
   switch (command) {
     case undefined:
     case 'dev':
-      await devCommand(devArgs);
+      await devCommand(runArgs);
       break;
     case 'build':
       await buildCommand();

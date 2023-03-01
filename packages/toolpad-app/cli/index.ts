@@ -3,6 +3,8 @@ import arg from 'arg';
 import path from 'path';
 import open, { App } from 'open';
 import invariant from 'invariant';
+import { Readable } from 'stream';
+import * as readline from 'readline';
 
 const DEFAULT_PORT = 3000;
 // https://github.com/sindresorhus/open#app
@@ -11,6 +13,22 @@ const INTERVAL = 1000;
 const MAX_RETRIES = 30;
 
 const HEALTH_CHECK_URL = `/health-check`;
+
+async function waitForMatch(input: Readable, regex: RegExp): Promise<RegExpExecArray | null> {
+  return new Promise((resolve, reject) => {
+    const rl = readline.createInterface({ input });
+
+    rl.on('line', (line) => {
+      const match = regex.exec(line);
+      if (match) {
+        rl.close();
+        resolve(match);
+      }
+    });
+    rl.on('error', (err) => reject(err));
+    rl.on('end', () => resolve(null));
+  });
+}
 
 function* getNextPort(port: number = DEFAULT_PORT) {
   while (true) {
@@ -26,22 +44,19 @@ interface RunCommandArgs {
 }
 
 const waitForHealthCheck = async (port: number): Promise<void> => {
-  const { default: chalk } = await import('chalk');
   const TOOLPAD_BASE_URL = `http://localhost:${port}/`;
   const checkedUrl = new URL(HEALTH_CHECK_URL, TOOLPAD_BASE_URL);
   for (let i = 1; i <= MAX_RETRIES; i += 1) {
     try {
       // eslint-disable-next-line no-console
-      console.log(`(${i}/${MAX_RETRIES}) trying to reach "${checkedUrl.href}"...`);
+      console.log(`(${i}/${MAX_RETRIES}) trying to reach "${HEALTH_CHECK_URL}"...`);
+
       // eslint-disable-next-line no-await-in-loop
       const res = await fetch(checkedUrl.href);
 
       if (!res.ok) {
         throw new Error(`HTTP ${res.status}`);
       }
-
-      // eslint-disable-next-line no-console
-      console.log(`${chalk.green('success')} - Toolpad connected! Opening browser...`);
       return;
     } catch (err: any) {
       // eslint-disable-next-line no-await-in-loop
@@ -103,6 +118,7 @@ async function startBrowserProcess(url: string, browserName?: string, args?: str
  * true if it opened a browser, otherwise false.
  */
 async function openBrowser(url: string) {
+  const { default: chalk } = await import('chalk');
   const { action, value, args } = getBrowserEnv();
   switch (action) {
     case Actions.NONE:
@@ -110,6 +126,8 @@ async function openBrowser(url: string) {
       return false;
 
     case Actions.BROWSER:
+      // eslint-disable-next-line no-console
+      console.log(`${chalk.green('success')} - Toolpad connected! Opening browser...`);
       return startBrowserProcess(url, value, args);
 
     default:
@@ -150,8 +168,15 @@ async function runApp(cmd: 'dev' | 'start', { debugMode = false, port }: RunComm
   invariant(cp.stdout, 'child process must be started with "stdio: \'pipe\'"');
 
   if (cmd === 'dev') {
-    const TOOLPAD_BASE_URL = `http://localhost:${port}/`;
+    // Poll stdout for "http://localhost:3000" first
+    const match = await waitForMatch(cp.stdout, /http:\/\/localhost:(\d+)/);
+    const detectedPort = match ? Number(match[1]) : null;
+    invariant(detectedPort, 'Could not find port in stdout');
+
+    // Then wait for health check to pass on the detected port
     await waitForHealthCheck(port);
+
+    const TOOLPAD_BASE_URL = `http://localhost:${detectedPort}/`;
     try {
       await openBrowser(TOOLPAD_BASE_URL);
     } catch (err: any) {

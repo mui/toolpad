@@ -56,7 +56,7 @@ const installDeps = async () => {
   await execaCommand(command, { stdio: 'inherit' });
 
   // eslint-disable-next-line no-console
-  console.log(chalk.green('Dependencies installed successfully!'));
+  console.log(`${chalk.green('success')} - Dependencies installed successfully!`);
 };
 
 // Run the CLI interaction with Inquirer.js
@@ -80,10 +80,12 @@ const run = async () => {
 
   if (installDependenciesConsent.installDependencies) {
     // eslint-disable-next-line no-console
-    console.log(`${chalk.blue('Installing dependencies...')}`);
+    console.log(`${chalk.blue('info')} - Installing dependencies`);
   } else {
     console.error(
-      `Dependencies are required. Deleting directory ${chalk.red(projectName)} and exiting.`,
+      `${chalk.red('error')} - Dependencies are required. Deleting directory ${chalk.red(
+        projectName,
+      )} and exiting.`,
     );
     process.chdir('..');
     try {
@@ -97,14 +99,14 @@ const run = async () => {
   await installDeps();
 
   const message = `\nRun the following to get started: \n\n ${chalk.magentaBright(
-    `cd ${projectName}`,
-  )}\n ${chalk.magentaBright(`${packageManager}${packageManager === 'yarn' ? '' : ' run'} dev`)}`;
+    `cd ${projectName} && ${packageManager}${packageManager === 'yarn' ? '' : ' run'} dev`,
+  )}\n`;
   // eslint-disable-next-line no-console
   console.log(message);
 };
 
 run().catch((error) => {
-  console.error(chalk.red(error.message));
+  console.error(`${chalk.red('error')} - ${error.message}`);
   process.exit(1);
 });
 

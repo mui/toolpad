@@ -82,14 +82,23 @@ const run = async () => {
     // eslint-disable-next-line no-console
     console.log(`${chalk.blue('Installing dependencies...')}`);
   } else {
-    console.error(chalk.red('Dependencies are required for the project. Exiting.'));
+    console.error(
+      `Dependencies are required. Deleting directory ${chalk.red(projectName)} and exiting.`,
+    );
+    process.chdir('..');
+    try {
+      await execaCommand(`rm -rf ${projectName}`, { stdio: 'inherit' });
+    } catch (error) {
+      console.error(`${chalk.red('error')} - Unable to delete directory ${projectName}: ${error}`);
+    }
+
     process.exit(1);
   }
   await installDeps();
 
   const message = `\nRun the following to get started: \n\n ${chalk.magentaBright(
     `cd ${projectName}`,
-  )}\n ${chalk.magentaBright(`${packageManager} ${packageManager === 'yarn' ? '' : 'run'} dev`)}`;
+  )}\n ${chalk.magentaBright(`${packageManager}${packageManager === 'yarn' ? '' : ' run'} dev`)}`;
   // eslint-disable-next-line no-console
   console.log(message);
 };

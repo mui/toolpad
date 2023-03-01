@@ -1,63 +1,55 @@
 import * as React from 'react';
-import { Container as MUIContainer, ContainerProps } from '@mui/material';
-import { createComponent, FormValues, FormValuesType, SetFormField } from '@mui/toolpad-core';
+import { Container, ContainerProps, Box, Button } from '@mui/material';
+import { createComponent } from '@mui/toolpad-core';
+import { useForm, FieldValues } from 'react-hook-form';
+import { yupResolver } from '@hookform/resolvers/yup';
+import * as Yup from 'yup';
 import { SX_PROP_HELPER_TEXT } from './constants';
 
-interface Props extends ContainerProps {
-  onSubmit: (values: any) => void;
-  submitLabel: string;
-  value: FormValuesType;
-  onChange: (value: FormValuesType) => void;
+export const FormContext = React.createContext<ReturnType<typeof useForm> | null>(null);
+
+interface FormProps extends ContainerProps {
+  validationSchema: Yup.AnyObjectSchema;
+  onSubmit: (data: FieldValues) => unknown | Promise<unknown>;
 }
 
-function Form({ children, onSubmit = () => {}, onChange, submitLabel, sx, value, ...rest }: Props) {
-  const handleSubmit = (event: React.SyntheticEvent) => {
-    event.preventDefault();
+function Form({ children, onSubmit, validationSchema, sx, ...rest }: FormProps) {
+  const form = useForm({
+    resolver: yupResolver(validationSchema),
+  });
 
-    onSubmit(value);
-  };
-
-  const formSetter = React.useCallback(
-    (formValue: FormValuesType) => {
-      return (fieldName: string, fieldValue: string) => {
-        onChange({
-          ...formValue,
-          [fieldName]: fieldValue,
-        });
-      };
+  const handleSubmit = React.useCallback(
+    (data: Record<string, unknown>) => {
+      onSubmit(data);
     },
-    [onChange],
+    [onSubmit],
   );
 
   return (
-    <MUIContainer disableGutters sx={sx} {...rest}>
-      <FormValues.Provider value={value}>
-        <SetFormField.Provider value={formSetter(value)}>
-          <form onSubmit={handleSubmit}>{children}</form>
-        </SetFormField.Provider>
-      </FormValues.Provider>
-    </MUIContainer>
+    <Container disableGutters sx={sx} {...rest}>
+      <FormContext.Provider value={form}>
+        <form onSubmit={form.handleSubmit(handleSubmit)}>
+          {children}
+          <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'flex-end', pt: 1 }}>
+            <Button type="submit" variant="contained">
+              Submit
+            </Button>
+          </Box>
+        </form>
+      </FormContext.Provider>
+    </Container>
   );
 }
 
 export default createComponent(Form, {
   argTypes: {
     children: {
-      visible: false,
       typeDef: { type: 'element' },
       control: { type: 'layoutSlot' },
     },
-    value: {
-      visible: false,
-      typeDef: { type: 'object', default: {} },
-      onChangeProp: 'onChange',
-      // TODO: why - Type 'string' is not assignable to type 'FormValuesType'.
-      // @ts-ignore
-      defaultValueProp: 'defaultValue',
-    },
-    defaultValue: {
-      helperText: 'A default value for when the inoput is still empty.',
-      typeDef: { type: 'object', default: {} },
+    validationSchema: {
+      helperText: 'Form [Yup](https://www.npmjs.com/package/yup) validation schema.',
+      typeDef: { type: 'object', default: Yup.object({}) },
     },
     onSubmit: {
       helperText: 'Add logic to be executed when the user submits the form.',
@@ -65,13 +57,7 @@ export default createComponent(Form, {
     },
     sx: {
       helperText: SX_PROP_HELPER_TEXT,
-      typeDef: {
-        type: 'object',
-        default: {
-          padding: 1,
-          border: 'solid 1px #007FFF',
-        },
-      },
+      typeDef: { type: 'object' },
     },
   },
 });

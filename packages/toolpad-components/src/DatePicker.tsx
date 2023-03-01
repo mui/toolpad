@@ -3,9 +3,10 @@ import { TextField } from '@mui/material';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DesktopDatePicker, DesktopDatePickerProps } from '@mui/x-date-pickers/DesktopDatePicker';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
-import { createComponent } from '@mui/toolpad-core';
+import { createComponent, useNode } from '@mui/toolpad-core';
 import { Dayjs } from 'dayjs';
 import { SX_PROP_HELPER_TEXT } from './constants';
+import { FormContext } from './Form';
 
 const LOCALE_LOADERS = new Map([
   ['en', () => import('dayjs/locale/en')],
@@ -75,8 +76,11 @@ export interface DatePickerProps
   name: string;
 }
 
-function DatePicker({ format, onChange, value, ...props }: DatePickerProps) {
-  // const [field, , helpers] = useField(props.name);
+function DatePicker({ format, onChange, value, ...rest }: DatePickerProps) {
+  const nodeRuntime = useNode();
+
+  const formContext = React.useContext(FormContext);
+
   const handleChange = React.useCallback(
     (newValue: Dayjs | null) => {
       // date-only form of ISO8601. See https://tc39.es/ecma262/#sec-date-time-string-format
@@ -88,20 +92,23 @@ function DatePicker({ format, onChange, value, ...props }: DatePickerProps) {
 
   const adapterLocale = React.useSyncExternalStore(subscribeLocaleLoader, getSnapshot);
 
+  const nodeName = rest.name || nodeRuntime?.nodeName;
+
   return (
     <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale={adapterLocale}>
       <DesktopDatePicker
-        {...props}
+        {...rest}
         inputFormat={format || 'L'}
         onChange={handleChange}
         value={value}
         renderInput={(params) => (
           <TextField
             {...params}
-            fullWidth={props.fullWidth}
-            variant={props.variant}
-            size={props.size}
-            sx={props.sx}
+            fullWidth={rest.fullWidth}
+            variant={rest.variant}
+            size={rest.size}
+            sx={rest.sx}
+            {...(formContext && nodeName && formContext.register(nodeName))}
           />
         )}
       />
@@ -133,6 +140,10 @@ export default createComponent(DatePicker, {
     },
     label: {
       helperText: 'A label that describes the content of the date picker. e.g. "Arrival date".',
+      typeDef: { type: 'string' },
+    },
+    name: {
+      helperText: 'Name of this element. Used as a reference in form data.',
       typeDef: { type: 'string' },
     },
     variant: {

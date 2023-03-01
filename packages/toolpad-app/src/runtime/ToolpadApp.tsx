@@ -362,14 +362,13 @@ function RenderedNodeContent({ node, childNodeGroups, Component }: RenderedNodeC
 
   const props: Record<string, any> = React.useMemo(() => {
     return {
-      name: node.name,
       ...boundProps,
       ...onChangeHandlers,
       ...eventHandlers,
       ...layoutElementProps,
       ...reactChildren,
     };
-  }, [boundProps, eventHandlers, layoutElementProps, onChangeHandlers, reactChildren, node.name]);
+  }, [boundProps, eventHandlers, layoutElementProps, onChangeHandlers, reactChildren]);
 
   const previousProps = React.useRef<Record<string, any>>(props);
   const [hasSetInitialBindings, setHasSetInitialBindings] = React.useState(false);
@@ -441,6 +440,7 @@ function RenderedNodeContent({ node, childNodeGroups, Component }: RenderedNodeC
   return (
     <NodeRuntimeWrapper
       nodeId={nodeId}
+      nodeName={node.name}
       componentConfig={Component[TOOLPAD_COMPONENT]}
       NodeError={NodeError}
     >

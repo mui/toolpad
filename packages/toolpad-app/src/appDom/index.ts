@@ -413,24 +413,6 @@ export function getParent<N extends AppDomNode>(dom: AppDom, child: N): ParentOf
   return null;
 }
 
-export function isComponent(node: AppDomNode, component: string): boolean {
-  return node.type === 'element' && node.attributes.component.value === component;
-}
-
-export function getClosestForm(dom: AppDom, node: AppDomNode): AppDomNode | null {
-  const parent = getParent(dom, node);
-
-  if (!parent) {
-    return null;
-  }
-
-  if (isComponent(parent, 'Form')) {
-    return parent;
-  }
-
-  return getClosestForm(dom, parent);
-}
-
 type AppDomNodeInitOfType<T extends AppDomNodeType> = Omit<
   AppDomNodeOfType<T>,
   ReservedNodeProperty | 'name'

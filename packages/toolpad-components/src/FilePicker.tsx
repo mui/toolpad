@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { TextField as MuiTextField, TextFieldProps as MuiTextFieldProps } from '@mui/material';
-import { createComponent } from '@mui/toolpad-core';
+import { createComponent, useNode } from '@mui/toolpad-core';
+import { FormContext } from './Form';
 
 interface FullFile {
   name: string;
@@ -9,7 +10,7 @@ interface FullFile {
   base64: null | string;
 }
 
-export type Props = MuiTextFieldProps & {
+export type FilePickerProps = MuiTextFieldProps & {
   multiple: boolean;
   onChange: (files: FullFile[]) => void;
   name: string;
@@ -32,7 +33,11 @@ const readFile = async (file: Blob): Promise<string> => {
   });
 };
 
-function FilePicker({ multiple, onChange, ...props }: Props) {
+function FilePicker({ multiple, onChange, ...rest }: FilePickerProps) {
+  const nodeRuntime = useNode();
+
+  const formContext = React.useContext(FormContext);
+
   const handleChange = async (changeEvent: React.ChangeEvent<HTMLInputElement>) => {
     const filesPromises = Array.from(changeEvent.target.files || []).map(async (file) => {
       const fullFile: FullFile = {
@@ -50,12 +55,14 @@ function FilePicker({ multiple, onChange, ...props }: Props) {
     onChange(files);
   };
 
+  const nodeName = rest.name || nodeRuntime?.nodeName;
+
   return (
     <MuiTextField
-      {...props}
+      {...rest}
       type="file"
       value={undefined}
-      inputProps={{ multiple }}
+      inputProps={{ multiple, ...(formContext && nodeName && formContext.register(nodeName)) }}
       onChange={handleChange}
       InputLabelProps={{ shrink: true }}
     />
@@ -72,6 +79,10 @@ export default createComponent(FilePicker, {
     },
     label: {
       helperText: 'A label that describes the content of the FilePicker. e.g. "Profile Image".',
+      typeDef: { type: 'string' },
+    },
+    name: {
+      helperText: 'Name of this element. Used as a reference in form data.',
       typeDef: { type: 'string' },
     },
     multiple: {

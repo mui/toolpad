@@ -4,8 +4,9 @@ import {
   TextFieldProps as MuiTextFieldProps,
   BoxProps,
 } from '@mui/material';
-import { createComponent, SetFormField, FormValues } from '@mui/toolpad-core';
+import { createComponent, useNode } from '@mui/toolpad-core';
 import { SX_PROP_HELPER_TEXT } from './constants';
+import { FormContext } from './Form';
 
 export type TextFieldProps = Omit<MuiTextFieldProps, 'value' | 'onChange'> & {
   value: string;
@@ -15,25 +16,27 @@ export type TextFieldProps = Omit<MuiTextFieldProps, 'value' | 'onChange'> & {
   name: string;
 };
 
-function TextField({ defaultValue, onChange, value, ref, ...props }: TextFieldProps) {
-  const formValues = React.useContext(FormValues);
-  const setFormField = React.useContext(SetFormField);
+function TextField({ defaultValue, onChange, value, ref, ...rest }: TextFieldProps) {
+  const nodeRuntime = useNode();
+
+  const formContext = React.useContext(FormContext);
+
   const handleChange = React.useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
-      if (setFormField) {
-        setFormField(props.name, event.target.value);
-        return;
-      }
-
       onChange(event.target.value);
     },
-    [onChange, setFormField, props.name],
+    [onChange],
   );
 
-  const resolvedValue = (formValues ? formValues[props.name] : value) || '';
+  const nodeName = rest.name || nodeRuntime?.nodeName;
 
   return (
-    <MuiTextField {...props} onChange={handleChange} name={props.name} value={resolvedValue} />
+    <MuiTextField
+      {...rest}
+      {...(formContext && nodeName
+        ? formContext.register(nodeName)
+        : { value, onChange: handleChange })}
+    />
   );
 }
 
@@ -53,6 +56,10 @@ export default createComponent(TextField, {
     },
     label: {
       helperText: 'A label that describes the content of the text field. e.g. "First name".',
+      typeDef: { type: 'string' },
+    },
+    name: {
+      helperText: 'Name of this element. Used as a reference in form data.',
       typeDef: { type: 'string' },
     },
     variant: {

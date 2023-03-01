@@ -3,9 +3,9 @@ import { Paper as MuiPaper, PaperProps as MuiPaperProps } from '@mui/material';
 import { createComponent } from '@mui/toolpad-core';
 import { SX_PROP_HELPER_TEXT } from './constants';
 
-function Paper({ children, sx, ...props }: MuiPaperProps) {
+function Paper({ children, sx, ...rest }: MuiPaperProps) {
   return (
-    <MuiPaper sx={{ padding: 1, width: '100%', ...sx }} {...props}>
+    <MuiPaper sx={{ padding: 1, width: '100%', ...sx }} {...rest}>
       {children}
     </MuiPaper>
   );

@@ -1,7 +1,8 @@
 import * as React from 'react';
 import { TextFieldProps, MenuItem, TextField } from '@mui/material';
-import { createComponent, SetFormField, FormValues } from '@mui/toolpad-core';
+import { createComponent, useNode } from '@mui/toolpad-core';
 import { SX_PROP_HELPER_TEXT } from './constants';
+import { FormContext } from './Form';
 
 export interface SelectOption {
   value: string;
@@ -16,31 +17,30 @@ export type SelectProps = Omit<TextFieldProps, 'value' | 'onChange'> & {
 };
 
 function Select({ options, value, onChange, defaultValue, fullWidth, sx, ...rest }: SelectProps) {
-  const formValues = React.useContext(FormValues);
-  const setFormField = React.useContext(SetFormField);
+  const nodeRuntime = useNode();
+
+  const formContext = React.useContext(FormContext);
+
   const handleChange = React.useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
-      if (setFormField) {
-        setFormField(rest.name, event.target.value);
-        return;
-      }
-
       onChange(event.target.value);
     },
-    [onChange, setFormField, rest.name],
+    [onChange],
   );
 
   const id = React.useId();
-  const resolvedValue = (formValues ? formValues[rest.name] : value) || '';
+
+  const nodeName = rest.name || nodeRuntime?.nodeName;
 
   return (
     <TextField
+      {...rest}
       select
       sx={{ ...(!fullWidth && !value ? { width: 120 } : {}), ...sx }}
       fullWidth={fullWidth}
-      value={resolvedValue}
-      onChange={handleChange}
-      {...rest}
+      {...(formContext && nodeName
+        ? formContext.register(nodeName)
+        : { value, onChange: handleChange })}
     >
       {options.map((option, i) => {
         const parsedOption: SelectOption =
@@ -79,6 +79,10 @@ export default createComponent(Select, {
     label: {
       helperText: 'A label that describes the option that can be selected. e.g. "Country".',
       typeDef: { type: 'string', default: '' },
+    },
+    name: {
+      helperText: 'Name of this element. Used as a reference in form data.',
+      typeDef: { type: 'string' },
     },
     variant: {
       helperText:

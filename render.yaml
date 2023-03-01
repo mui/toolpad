@@ -5,6 +5,7 @@ previewsExpireAfterDays: 3
 services:
   - type: web
     name: toolpad
+    branch: legacy-master
     env: node
     buildCommand: yarn --frozen-lockfile --prod=false && yarn release:build
     startCommand: yarn start
@@ -29,11 +30,13 @@ services:
 
 databases:
   - name: toolpad-db
+    branch: legacy-master
     ipAllowList: []
     plan: starter
 
 envVarGroups:
   - name: toolpad-settings
+    branch: legacy-master
     envVars:
       - key: TOOLPAD_BASIC_AUTH_USER
         sync: false

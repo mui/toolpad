@@ -26,15 +26,14 @@
     "release": "ncc build ./index.ts -o ./dist/ --minify --no-cache --no-source-map-register",
     "build": "yarn release"
   },
-  "devDependencies": {
-    "@types/execa": "^2.0.0",
-    "@types/inquirer": "9.0.3",
-    "@vercel/ncc": "0.34.0",
-    "chalk": "2.4.2",
-    "execa": "^7.0.0"
-  },
   "engines": {
     "node": ">=14.6.0"
   },
-  "dependencies": {}
+  "dependencies": {},
+  "devDependencies": {
+    "@types/inquirer": "^9.0.3",
+    "@vercel/ncc": "^0.36.1",
+    "chalk": "^5.2.0",
+    "execa": "^7.0.0"
+  }
 }

@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { TextField as MuiTextField, TextFieldProps as MuiTextFieldProps } from '@mui/material';
 import { createComponent, useNode } from '@mui/toolpad-core';
+import { FieldError } from 'react-hook-form';
 import { FormContext } from './Form';
 
 interface FullFile {
@@ -36,7 +37,10 @@ const readFile = async (file: Blob): Promise<string> => {
 function FilePicker({ multiple, onChange, ...rest }: FilePickerProps) {
   const nodeRuntime = useNode();
 
+  const nodeName = rest.name || nodeRuntime?.nodeName;
+
   const { form, validationRules } = React.useContext(FormContext);
+  const fieldError = nodeName && form?.formState.errors[nodeName];
 
   const handleChange = async (changeEvent: React.ChangeEvent<HTMLInputElement>) => {
     const filesPromises = Array.from(changeEvent.target.files || []).map(async (file) => {
@@ -55,8 +59,6 @@ function FilePicker({ multiple, onChange, ...rest }: FilePickerProps) {
     onChange(files);
   };
 
-  const nodeName = rest.name || nodeRuntime?.nodeName;
-
   return (
     <MuiTextField
       {...rest}
@@ -68,6 +70,10 @@ function FilePicker({ multiple, onChange, ...rest }: FilePickerProps) {
       }}
       onChange={handleChange}
       InputLabelProps={{ shrink: true }}
+      {...(form && {
+        error: Boolean(fieldError),
+        helperText: (fieldError as FieldError)?.message || '',
+      })}
     />
   );
 }

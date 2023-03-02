@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { TextFieldProps, MenuItem, TextField } from '@mui/material';
 import { createComponent, useNode } from '@mui/toolpad-core';
+import { Controller, FieldError } from 'react-hook-form';
 import { SX_PROP_HELPER_TEXT } from './constants';
 import { FormContext } from './Form';
 
@@ -19,7 +20,10 @@ export type SelectProps = Omit<TextFieldProps, 'value' | 'onChange'> & {
 function Select({ options, value, onChange, fullWidth, sx, ...rest }: SelectProps) {
   const nodeRuntime = useNode();
 
+  const nodeName = rest.name || nodeRuntime?.nodeName;
+
   const { form, validationRules } = React.useContext(FormContext);
+  const fieldError = nodeName && form?.formState.errors[nodeName];
 
   const handleChange = React.useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -30,19 +34,22 @@ function Select({ options, value, onChange, fullWidth, sx, ...rest }: SelectProp
 
   const id = React.useId();
 
-  const nodeName = rest.name || nodeRuntime?.nodeName;
+  const selectProps: TextFieldProps = {
+    ...rest,
+    value,
+    onChange: handleChange,
+    select: true,
+    sx: { ...(!fullWidth && !value ? { width: 120 } : {}), ...sx },
+    fullWidth,
+    ...(form && {
+      error: Boolean(fieldError),
+      helperText: (fieldError as FieldError)?.message || '',
+    }),
+  };
 
-  return (
-    <TextField
-      {...rest}
-      select
-      sx={{ ...(!fullWidth && !value ? { width: 120 } : {}), ...sx }}
-      fullWidth={fullWidth}
-      {...(form && nodeName
-        ? { ...form.register(nodeName, validationRules[nodeName]) }
-        : { value, onChange: handleChange })}
-    >
-      {options.map((option, i) => {
+  const renderedOptions = React.useMemo(
+    () =>
+      options.map((option, i) => {
         const parsedOption: SelectOption =
           option && typeof option === 'object' ? option : { value: String(option) };
         return (
@@ -50,8 +57,23 @@ function Select({ options, value, onChange, fullWidth, sx, ...rest }: SelectProp
             {String(parsedOption.label ?? parsedOption.value)}
           </MenuItem>
         );
-      })}
-    </TextField>
+      }),
+    [id, options],
+  );
+
+  return form && nodeName ? (
+    <Controller
+      name={nodeName}
+      control={form.control}
+      rules={validationRules[nodeName]}
+      render={({ field }) => (
+        <TextField {...selectProps} {...field}>
+          {renderedOptions}
+        </TextField>
+      )}
+    />
+  ) : (
+    <TextField {...selectProps}>{renderedOptions}</TextField>
   );
 }
 

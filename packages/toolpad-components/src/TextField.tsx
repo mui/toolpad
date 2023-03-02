@@ -5,6 +5,7 @@ import {
   BoxProps,
 } from '@mui/material';
 import { createComponent, useNode } from '@mui/toolpad-core';
+import { FieldError } from 'react-hook-form';
 import { SX_PROP_HELPER_TEXT } from './constants';
 import { FormContext } from './Form';
 
@@ -19,7 +20,10 @@ export type TextFieldProps = Omit<MuiTextFieldProps, 'value' | 'onChange'> & {
 function TextField({ defaultValue, onChange, value, ref, ...rest }: TextFieldProps) {
   const nodeRuntime = useNode();
 
+  const nodeName = rest.name || nodeRuntime?.nodeName;
+
   const { form, validationRules } = React.useContext(FormContext);
+  const fieldError = nodeName && form?.formState.errors[nodeName];
 
   const handleChange = React.useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -28,13 +32,15 @@ function TextField({ defaultValue, onChange, value, ref, ...rest }: TextFieldPro
     [onChange],
   );
 
-  const nodeName = rest.name || nodeRuntime?.nodeName;
-
   return (
     <MuiTextField
       {...rest}
       {...(form && nodeName
-        ? form.register(nodeName, validationRules[nodeName])
+        ? {
+            ...form.register(nodeName, validationRules[nodeName]),
+            error: Boolean(fieldError),
+            helperText: (fieldError as FieldError)?.message || '',
+          }
         : { value, onChange: handleChange })}
     />
   );

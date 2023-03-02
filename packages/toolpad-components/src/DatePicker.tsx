@@ -5,6 +5,7 @@ import { DesktopDatePicker, DesktopDatePickerProps } from '@mui/x-date-pickers/D
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { createComponent, useNode } from '@mui/toolpad-core';
 import { Dayjs } from 'dayjs';
+import { Controller, FieldError } from 'react-hook-form';
 import { SX_PROP_HELPER_TEXT } from './constants';
 import { FormContext } from './Form';
 
@@ -79,7 +80,10 @@ export interface DatePickerProps
 function DatePicker({ format, onChange, value, ...rest }: DatePickerProps) {
   const nodeRuntime = useNode();
 
+  const nodeName = rest.name || nodeRuntime?.nodeName;
+
   const { form, validationRules } = React.useContext(FormContext);
+  const fieldError = nodeName && form?.formState.errors[nodeName];
 
   const handleChange = React.useCallback(
     (newValue: Dayjs | null) => {
@@ -92,26 +96,38 @@ function DatePicker({ format, onChange, value, ...rest }: DatePickerProps) {
 
   const adapterLocale = React.useSyncExternalStore(subscribeLocaleLoader, getSnapshot);
 
-  const nodeName = rest.name || nodeRuntime?.nodeName;
+  const datePickerProps: DesktopDatePickerProps<any, any> = {
+    ...rest,
+    inputFormat: format || 'L',
+    value,
+    onChange: handleChange,
+    renderInput: (params) => (
+      <TextField
+        {...params}
+        fullWidth={rest.fullWidth}
+        variant={rest.variant}
+        size={rest.size}
+        sx={rest.sx}
+        {...(form && {
+          error: Boolean(fieldError),
+          helperText: (fieldError as FieldError)?.message || '',
+        })}
+      />
+    ),
+  };
 
   return (
     <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale={adapterLocale}>
-      <DesktopDatePicker
-        {...rest}
-        inputFormat={format || 'L'}
-        onChange={handleChange}
-        value={value}
-        renderInput={(params) => (
-          <TextField
-            {...params}
-            fullWidth={rest.fullWidth}
-            variant={rest.variant}
-            size={rest.size}
-            sx={rest.sx}
-            {...(form && nodeName && form.register(nodeName, validationRules[nodeName]))}
-          />
-        )}
-      />
+      {form && nodeName ? (
+        <Controller
+          name={nodeName}
+          control={form.control}
+          rules={validationRules[nodeName]}
+          render={({ field }) => <DesktopDatePicker {...datePickerProps} {...field} />}
+        />
+      ) : (
+        <DesktopDatePicker {...datePickerProps} />
+      )}
     </LocalizationProvider>
   );
 }

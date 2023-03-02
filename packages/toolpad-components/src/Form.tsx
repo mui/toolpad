@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Container, ContainerProps, Box } from '@mui/material';
+import { Container, ContainerProps, Box, Stack } from '@mui/material';
 import { LoadingButton } from '@mui/lab';
 import { createComponent } from '@mui/toolpad-core';
 import { useForm, FieldValues, RegisterOptions } from 'react-hook-form';
@@ -7,7 +7,10 @@ import { SX_PROP_HELPER_TEXT } from './constants';
 
 type FormValidationRules = Record<
   string,
-  Pick<RegisterOptions<FieldValues>, 'required' | 'min' | 'max' | 'maxLength' | 'minLength'>
+  Pick<
+    RegisterOptions<FieldValues>,
+    'required' | 'min' | 'max' | 'maxLength' | 'minLength' | 'pattern'
+  >
 >;
 
 export const FormContext = React.createContext<{
@@ -23,14 +26,24 @@ interface FormProps extends ContainerProps {
   onChange: (newValue: FieldValues) => void;
   validationRules: FormValidationRules;
   onSubmit: (data?: FieldValues) => unknown | Promise<unknown>;
+  hasResetButton: boolean;
 }
 
-function Form({ children, onChange, onSubmit, validationRules, sx, ...rest }: FormProps) {
+function Form({
+  children,
+  onChange,
+  onSubmit,
+  validationRules,
+  hasResetButton,
+  sx,
+  ...rest
+}: FormProps) {
   const form = useForm();
 
   const handleSubmit = React.useCallback(async () => {
     await onSubmit();
-  }, [onSubmit]);
+    form.reset();
+  }, [form, onSubmit]);
 
   // Set initial form values
   React.useEffect(() => {
@@ -44,9 +57,15 @@ function Form({ children, onChange, onSubmit, validationRules, sx, ...rest }: Fo
     return () => formSubscription.unsubscribe();
   }, [form, onChange]);
 
+  const handleReset = React.useCallback(() => {
+    form.reset();
+  }, [form]);
+
   const formContextValue = React.useMemo(
     () => ({ form, validationRules }),
-    [form, validationRules],
+    // form never changes so use formState as dependency to update context when form state changes
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [form, form.formState, validationRules],
   );
 
   return (
@@ -55,9 +74,20 @@ function Form({ children, onChange, onSubmit, validationRules, sx, ...rest }: Fo
         <form onSubmit={form.handleSubmit(handleSubmit)}>
           {children}
           <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'flex-end', pt: 1 }}>
-            <LoadingButton type="submit" variant="contained">
-              Submit
-            </LoadingButton>
+            <Stack direction="row" spacing={1}>
+              {hasResetButton ? (
+                <LoadingButton variant="contained" onClick={handleReset}>
+                  Reset
+                </LoadingButton>
+              ) : null}
+              <LoadingButton
+                type="submit"
+                variant="contained"
+                loading={form.formState.isSubmitting}
+              >
+                {form.formState.isSubmitting ? 'Submitting…' : 'Submit'}
+              </LoadingButton>
+            </Stack>
           </Box>
         </form>
       </FormContext.Provider>
@@ -83,6 +113,10 @@ export default createComponent(Form, {
     onSubmit: {
       helperText: 'Add logic to be executed when the user submits the form.',
       typeDef: { type: 'event' },
+    },
+    hasResetButton: {
+      helperText: 'Show button to reset form values.',
+      typeDef: { type: 'boolean', default: false },
     },
     sx: {
       helperText: SX_PROP_HELPER_TEXT,

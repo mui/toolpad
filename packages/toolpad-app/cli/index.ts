@@ -18,20 +18,23 @@ interface RunCommandArgs {
 }
 
 async function runApp(cmd: 'dev' | 'start', { devMode = false, port }: RunCommandArgs) {
-  const { execa } = await import('execa');
+  const { execaNode } = await import('execa');
   const { default: getPort } = await import('get-port');
   const toolpadDir = path.resolve(__dirname, '../..'); // from ./dist/server
-  const nextCommand = devMode ? 'dev' : 'start';
 
   if (!port) {
     port = cmd === 'dev' ? await getPort({ port: getNextPort(DEFAULT_PORT) }) : DEFAULT_PORT;
   }
 
-  const cp = execa('next', [nextCommand, `--port=${port}`], {
-    cwd: toolpadDir,
-    preferLocal: true,
+  const serverPath = path.resolve(__dirname, './server.js');
+
+  const cp = execaNode(serverPath, [], {
+    cwd: process.cwd(),
     stdio: 'pipe',
     env: {
+      TOOLPAD_DIR: toolpadDir,
+      TOOLPAD_PORT: port,
+      TOOLPAD_DEV: devMode ? 'true' : 'false',
       TOOLPAD_LOCAL_MODE: '1',
       TOOLPAD_PROJECT_DIR: process.cwd(),
       TOOLPAD_CMD: cmd,

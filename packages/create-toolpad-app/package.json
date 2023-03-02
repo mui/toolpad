@@ -21,7 +21,7 @@
     "dist"
   ],
   "scripts": {
-    "dev": "ncc build ./index.ts -w -o dist/",
+    "dev13": "ncc build ./index.ts -w -o dist/",
     "prerelease": "rimraf ./dist/",
     "release": "ncc build ./index.ts -o ./dist/ --minify --no-cache --no-source-map-register",
     "build": "yarn release"

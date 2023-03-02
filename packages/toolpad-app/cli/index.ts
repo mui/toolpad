@@ -4,6 +4,7 @@ import path from 'path';
 import invariant from 'invariant';
 import { Readable } from 'stream';
 import * as readline from 'readline';
+import fetch from 'node-fetch';
 import openBrowser from './openBrowser';
 
 const DEFAULT_PORT = 3000;
@@ -53,7 +54,7 @@ const waitForHealthCheck = async (baseUrl: string): Promise<void> => {
         throw new Error(`HTTP ${res.status}`);
       }
       return;
-    } catch (err: any) {
+    } catch (err) {
       // eslint-disable-next-line no-await-in-loop
       await new Promise((resolve) => {
         setTimeout(resolve, INTERVAL);
@@ -95,6 +96,10 @@ async function runApp(cmd: 'dev' | 'start', { devMode = false, port }: RunComman
 
   invariant(cp.stdout, 'child process must be started with "stdio: \'pipe\'"');
 
+  process.stdin.pipe(cp.stdin!);
+  cp.stdout?.pipe(process.stdout);
+  cp.stderr?.pipe(process.stdout);
+
   if (cmd === 'dev') {
     // Poll stdout for "http://localhost:3000" first
     const match = await waitForMatch(cp.stdout, /http:\/\/localhost:(\d+)/);
@@ -112,10 +117,6 @@ async function runApp(cmd: 'dev' | 'start', { devMode = false, port }: RunComman
       console.error(`${chalk.red('error')} - Failed to open browser: ${err.message}`);
     }
   }
-
-  process.stdin.pipe(cp.stdin!);
-  cp.stdout?.pipe(process.stdout);
-  cp.stderr?.pipe(process.stdout);
 
   cp.on('exit', (code) => {
     if (code) {

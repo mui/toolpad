@@ -96,7 +96,7 @@ async function runApp(cmd: 'dev' | 'start', { devMode = false, port }: RunComman
 async function devCommand(args: RunCommandArgs) {
   const { default: chalk } = await import('chalk');
   // eslint-disable-next-line no-console
-  console.log(`${chalk.blue('info')} - starting Toolpad application in dev kumar mode...`);
+  console.log(`${chalk.blue('info')} - starting Toolpad application in dev mode...`);
   await runApp('dev', args);
 }
 

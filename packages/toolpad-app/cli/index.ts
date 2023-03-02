@@ -1,8 +1,33 @@
 import 'dotenv/config';
 import arg from 'arg';
 import path from 'path';
+import invariant from 'invariant';
+import { Readable } from 'stream';
+import * as readline from 'readline';
+import openBrowser from './openBrowser';
 
 const DEFAULT_PORT = 3000;
+// https://github.com/sindresorhus/open#app
+const INTERVAL = 1000;
+const MAX_RETRIES = 30;
+
+const HEALTH_CHECK_PATHNAME = `/health-check`;
+
+async function waitForMatch(input: Readable, regex: RegExp): Promise<RegExpExecArray | null> {
+  return new Promise((resolve, reject) => {
+    const rl = readline.createInterface({ input });
+
+    rl.on('line', (line) => {
+      const match = regex.exec(line);
+      if (match) {
+        rl.close();
+        resolve(match);
+      }
+    });
+    rl.on('error', (err) => reject(err));
+    rl.on('end', () => resolve(null));
+  });
+}
 
 function* getNextPort(port: number = DEFAULT_PORT) {
   while (true) {
@@ -12,19 +37,48 @@ function* getNextPort(port: number = DEFAULT_PORT) {
 }
 
 interface RunCommandArgs {
-  // Whether Toolpad editor is running in dev mode (for debugging purposes only)
+  // Whether Toolpad editor is running in debug mode
   devMode?: boolean;
   port?: number;
 }
 
+const waitForHealthCheck = async (baseUrl: string): Promise<void> => {
+  const checkedUrl = new URL(HEALTH_CHECK_PATHNAME, baseUrl);
+  for (let i = 1; i <= MAX_RETRIES; i += 1) {
+    try {
+      // eslint-disable-next-line no-await-in-loop
+      const res = await fetch(checkedUrl.href);
+
+      if (!res.ok) {
+        throw new Error(`HTTP ${res.status}`);
+      }
+      return;
+    } catch (err: any) {
+      // eslint-disable-next-line no-await-in-loop
+      await new Promise((resolve) => {
+        setTimeout(resolve, INTERVAL);
+      });
+    }
+  }
+  throw new Error(`Failed to connect`);
+};
+
 async function runApp(cmd: 'dev' | 'start', { devMode = false, port }: RunCommandArgs) {
   const { execa } = await import('execa');
+  const { default: chalk } = await import('chalk');
   const { default: getPort } = await import('get-port');
   const toolpadDir = path.resolve(__dirname, '../..'); // from ./dist/server
   const nextCommand = devMode ? 'dev' : 'start';
 
   if (!port) {
     port = cmd === 'dev' ? await getPort({ port: getNextPort(DEFAULT_PORT) }) : DEFAULT_PORT;
+  } else {
+    // if port is specified but is not available, exit
+    const availablePort = await getPort({ port });
+    if (availablePort !== port) {
+      console.error(`${chalk.red('error')} - Port ${port} is not available. Aborted.`);
+      process.exit(1);
+    }
   }
 
   const cp = execa('next', [nextCommand, `--port=${port}`], {
@@ -39,6 +93,26 @@ async function runApp(cmd: 'dev' | 'start', { devMode = false, port }: RunComman
     } as any,
   });
 
+  invariant(cp.stdout, 'child process must be started with "stdio: \'pipe\'"');
+
+  if (cmd === 'dev') {
+    // Poll stdout for "http://localhost:3000" first
+    const match = await waitForMatch(cp.stdout, /http:\/\/localhost:(\d+)/);
+    const detectedPort = match ? Number(match[1]) : null;
+    invariant(detectedPort, 'Could not find port in stdout');
+
+    const toolpadBaseUrl = `http://localhost:${detectedPort}/`;
+
+    // Then wait for health check to pass on the detected port
+    await waitForHealthCheck(toolpadBaseUrl);
+
+    try {
+      await openBrowser(toolpadBaseUrl);
+    } catch (err: any) {
+      console.error(`${chalk.red('error')} - Failed to open browser: ${err.message}`);
+    }
+  }
+
   process.stdin.pipe(cp.stdin!);
   cp.stdout?.pipe(process.stdout);
   cp.stderr?.pipe(process.stdout);
@@ -51,14 +125,16 @@ async function runApp(cmd: 'dev' | 'start', { devMode = false, port }: RunComman
 }
 
 async function devCommand(args: RunCommandArgs) {
+  const { default: chalk } = await import('chalk');
   // eslint-disable-next-line no-console
-  console.log('starting toolpad application in dev mode...');
+  console.log(`${chalk.blue('info')} - starting Toolpad application in dev mode...`);
   await runApp('dev', args);
 }
 
 async function buildCommand() {
+  const { default: chalk } = await import('chalk');
   // eslint-disable-next-line no-console
-  console.log('building toolpad application...');
+  console.log(`${chalk.blue('info')} - building Toolpad application...`);
   await new Promise((resolve) => {
     setTimeout(resolve, 1000);
   });
@@ -67,8 +143,9 @@ async function buildCommand() {
 }
 
 async function startCommand(args: RunCommandArgs) {
+  const { default: chalk } = await import('chalk');
   // eslint-disable-next-line no-console
-  console.log('starting toolpad application...');
+  console.log(`${chalk.blue('info')} - Starting Toolpad application...`);
   await runApp('start', args);
 }
 

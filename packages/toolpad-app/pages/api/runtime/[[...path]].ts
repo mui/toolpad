@@ -28,7 +28,7 @@ async function getBuilder() {
       }
 
       const builder = await createBuilder({
-        filePath: getConfigFilePath(),
+        filePath: await getConfigFilePath(),
         dev: true,
       });
 

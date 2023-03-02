@@ -19,14 +19,31 @@ export function getUserProjectRoot(): string {
   return projectDir;
 }
 
-function getLegacyConfigFilePath() {
-  const filePath = path.resolve(getUserProjectRoot(), './toolpad.yaml');
-  return filePath;
+export async function fileExists(filepath: string): Promise<boolean> {
+  try {
+    const stat = await fs.stat(filepath);
+    return stat.isFile();
+  } catch (err) {
+    if (errorFrom(err).code === 'ENOENT') {
+      return false;
+    }
+    throw err;
+  }
 }
 
-export function getConfigFilePath() {
-  const filePath = path.resolve(getUserProjectRoot(), './toolpad.yml');
-  return filePath;
+export async function getConfigFilePath() {
+  const yamlFilePath = path.resolve(getUserProjectRoot(), './toolpad.yaml');
+  const ymlFilePath = path.resolve(getUserProjectRoot(), './toolpad.yml');
+
+  if (await fileExists(yamlFilePath)) {
+    return yamlFilePath;
+  }
+
+  if (await fileExists(ymlFilePath)) {
+    return ymlFilePath;
+  }
+
+  return yamlFilePath;
 }
 
 type ComponentsContent = Record<string, string>;
@@ -151,18 +168,6 @@ function extractNewComponentsContentFromDom(dom: appDom.AppDom): ExtractedCompon
   return { components, dom };
 }
 
-export async function fileExists(filepath: string): Promise<boolean> {
-  try {
-    const stat = await fs.stat(filepath);
-    return stat.isFile();
-  } catch (err) {
-    if (errorFrom(err).code === 'ENOENT') {
-      return false;
-    }
-    throw err;
-  }
-}
-
 const DEFAULT_QUERIES_FILE_CONTENT = `// Toolpad queries:
 
 export async function example() {
@@ -182,7 +187,7 @@ export async function writeQueriesFile(): Promise<void> {
 }
 
 export async function writeDomToDisk(dom: appDom.AppDom): Promise<void> {
-  const configFilePath = getConfigFilePath();
+  const configFilePath = await getConfigFilePath();
   const componentsFolder = getComponentFolder();
 
   const { components: componentsContent, dom: domWithoutComponents } =
@@ -217,20 +222,11 @@ async function loadConfigFileFrom(configFilePath: string): Promise<appDom.AppDom
 }
 
 async function loadConfigFile() {
-  const configFilePath = getConfigFilePath();
+  const configFilePath = await getConfigFilePath();
   const dom = await loadConfigFileFrom(configFilePath);
 
   if (dom) {
     return dom;
-  }
-
-  const legacyPath = getLegacyConfigFilePath();
-  const legacyFileDom = await loadConfigFileFrom(getLegacyConfigFilePath());
-
-  if (legacyFileDom) {
-    await saveLocalDom(legacyFileDom);
-    await fs.unlink(legacyPath);
-    return legacyFileDom;
   }
 
   const defaultDom = appDom.createDefaultDom();

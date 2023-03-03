@@ -115,7 +115,7 @@ function DatePicker({ format, onChange, value, ...rest }: DatePickerProps) {
   const datePickerProps: DesktopDatePickerProps<any, any> = {
     ...rest,
     inputFormat: format || 'L',
-    value,
+    value: value || null,
     onChange: handleChange,
     renderInput: (params) => (
       <TextField

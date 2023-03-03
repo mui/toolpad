@@ -101,9 +101,14 @@ function DatePicker({ format, onChange, value, ...rest }: DatePickerProps) {
 
   React.useEffect(() => {
     if (form && nodeName) {
-      onChange(fieldValues[nodeName] || null);
+      let newValue = fieldValues[nodeName] || rest.defaultValue || null;
+      if (!newValue && rest.defaultValue) {
+        newValue = rest.defaultValue;
+        form.setValue(nodeName, rest.defaultValue);
+      }
+      onChange(newValue);
     }
-  }, [fieldValues, form, nodeName, onChange]);
+  }, [fieldValues, form, nodeName, onChange, rest.defaultValue]);
 
   const adapterLocale = React.useSyncExternalStore(subscribeLocaleLoader, getSnapshot);
 
@@ -133,7 +138,6 @@ function DatePicker({ format, onChange, value, ...rest }: DatePickerProps) {
         <Controller
           name={nodeName}
           control={form.control}
-          defaultValue={rest.defaultValue}
           rules={validationRules[nodeName]}
           render={() => <DesktopDatePicker {...datePickerProps} />}
         />

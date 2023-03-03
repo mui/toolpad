@@ -82,17 +82,28 @@ function DatePicker({ format, onChange, value, ...rest }: DatePickerProps) {
 
   const nodeName = rest.name || nodeRuntime?.nodeName;
 
-  const { form, validationRules } = React.useContext(FormContext);
+  const { form, fieldValues, validationRules } = React.useContext(FormContext);
   const fieldError = nodeName && form?.formState.errors[nodeName];
 
   const handleChange = React.useCallback(
     (newValue: Dayjs | null) => {
       // date-only form of ISO8601. See https://tc39.es/ecma262/#sec-date-time-string-format
       const stringValue = newValue?.format('YYYY-MM-DD') || '';
-      onChange(stringValue);
+
+      if (form && nodeName) {
+        form.setValue(nodeName, stringValue, { shouldValidate: true, shouldDirty: true });
+      } else {
+        onChange(stringValue);
+      }
     },
-    [onChange],
+    [form, nodeName, onChange],
   );
+
+  React.useEffect(() => {
+    if (form && nodeName) {
+      onChange(fieldValues[nodeName] || null);
+    }
+  }, [fieldValues, form, nodeName, onChange]);
 
   const adapterLocale = React.useSyncExternalStore(subscribeLocaleLoader, getSnapshot);
 
@@ -122,8 +133,9 @@ function DatePicker({ format, onChange, value, ...rest }: DatePickerProps) {
         <Controller
           name={nodeName}
           control={form.control}
+          defaultValue={rest.defaultValue}
           rules={validationRules[nodeName]}
-          render={({ field }) => <DesktopDatePicker {...datePickerProps} {...field} />}
+          render={() => <DesktopDatePicker {...datePickerProps} />}
         />
       ) : (
         <DesktopDatePicker {...datePickerProps} />

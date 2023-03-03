@@ -22,15 +22,27 @@ function TextField({ defaultValue, onChange, value, ref, ...rest }: TextFieldPro
 
   const nodeName = rest.name || nodeRuntime?.nodeName;
 
-  const { form, validationRules } = React.useContext(FormContext);
+  const { form, fieldValues, validationRules } = React.useContext(FormContext);
   const fieldError = nodeName && form?.formState.errors[nodeName];
 
   const handleChange = React.useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
-      onChange(event.target.value);
+      const newValue = event.target.value;
+      onChange(newValue);
     },
     [onChange],
   );
+
+  React.useEffect(() => {
+    if (form && nodeName) {
+      let newValue = fieldValues[nodeName] || defaultValue;
+      if (!newValue && defaultValue) {
+        newValue = defaultValue;
+        form.setValue(nodeName, defaultValue);
+      }
+      onChange(newValue);
+    }
+  }, [defaultValue, fieldValues, form, nodeName, onChange]);
 
   return (
     <MuiTextField

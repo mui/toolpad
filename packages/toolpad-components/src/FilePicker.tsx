@@ -34,12 +34,12 @@ const readFile = async (file: Blob): Promise<string> => {
   });
 };
 
-function FilePicker({ multiple, onChange, ...rest }: FilePickerProps) {
+function FilePicker({ multiple, value, onChange, ...rest }: FilePickerProps) {
   const nodeRuntime = useNode();
 
   const nodeName = rest.name || nodeRuntime?.nodeName;
 
-  const { form, validationRules } = React.useContext(FormContext);
+  const { form, fieldValues, validationRules } = React.useContext(FormContext);
   const fieldError = nodeName && form?.formState.errors[nodeName];
 
   const handleChange = async (changeEvent: React.ChangeEvent<HTMLInputElement>) => {
@@ -59,16 +59,22 @@ function FilePicker({ multiple, onChange, ...rest }: FilePickerProps) {
     onChange(files);
   };
 
+  React.useEffect(() => {
+    if (fieldValues && nodeName) {
+      onChange(fieldValues[nodeName]);
+    }
+  }, [fieldValues, nodeName, onChange]);
+
   return (
     <MuiTextField
       {...rest}
       type="file"
       value={undefined}
+      onChange={handleChange}
       inputProps={{
         multiple,
         ...(form && nodeName && form.register(nodeName, validationRules[nodeName])),
       }}
-      onChange={handleChange}
       InputLabelProps={{ shrink: true }}
       {...(form && {
         error: Boolean(fieldError),

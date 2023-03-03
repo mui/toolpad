@@ -15,9 +15,11 @@ type FormValidationRules = Record<
 
 export const FormContext = React.createContext<{
   form: ReturnType<typeof useForm> | null;
+  fieldValues: FieldValues;
   validationRules: FormValidationRules;
 }>({
   form: null,
+  fieldValues: {},
   validationRules: {},
 });
 
@@ -31,6 +33,7 @@ interface FormProps extends ContainerProps {
 
 function Form({
   children,
+  value,
   onChange,
   onSubmit,
   validationRules,
@@ -51,8 +54,8 @@ function Form({
   }, [form, onChange]);
 
   React.useEffect(() => {
-    const formSubscription = form.watch((value) => {
-      onChange(value);
+    const formSubscription = form.watch((newValue) => {
+      onChange(newValue);
     });
     return () => formSubscription.unsubscribe();
   }, [form, onChange]);
@@ -62,10 +65,10 @@ function Form({
   }, [form]);
 
   const formContextValue = React.useMemo(
-    () => ({ form, validationRules }),
-    // form never changes so use formState as dependency to update context when form state changes
+    () => ({ form, fieldValues: value, validationRules }),
+    // form never changes so also use formState as dependency to update context when form state changes
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [form, form.formState, validationRules],
+    [form, form.formState, validationRules, value],
   );
 
   return (

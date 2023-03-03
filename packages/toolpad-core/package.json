@@ -12,54 +12,19 @@
   "exports": {
     "./package.json": "./package.json",
     ".": {
-      "types": "./dist/esm/index.d.ts",
-      "import": "./dist/esm/index.js",
-      "require": "./dist/cjs/index.js"
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
     },
-    "./constants": {
-      "types": "./dist/esm/constants.d.ts",
-      "import": "./dist/esm/constants.js",
-      "require": "./dist/cjs/constants.js"
-    },
-    "./path": {
-      "types": "./dist/esm/path.d.ts",
-      "import": "./dist/esm/path.js",
-      "require": "./dist/cjs/path.js"
-    },
-    "./runtime": {
-      "types": "./dist/esm/runtime.d.ts",
-      "import": "./dist/esm/runtime.js",
-      "require": "./dist/cjs/runtime.js"
-    },
-    "./jsRuntime": {
-      "types": "./dist/esm/jsRuntime.d.ts",
-      "import": "./dist/esm/jsRuntime.js",
-      "require": "./dist/cjs/jsRuntime.js"
-    },
-    "./jsServerRuntime": {
-      "types": "./dist/esm/jsServerRuntime.d.ts",
-      "import": "./dist/esm/jsServerRuntime.js",
-      "require": "./dist/cjs/jsServerRuntime.js"
-    },
-    "./jsBrowserRuntime": {
-      "types": "./dist/esm/jsBrowserRuntime.d.ts",
-      "import": "./dist/esm/jsBrowserRuntime.js",
-      "require": "./dist/cjs/jsBrowserRuntime.js"
-    },
-    "./objectKey": {
-      "types": "./dist/esm/objectKey.d.ts",
-      "import": "./dist/esm/objectKey.js",
-      "require": "./dist/cjs/objectKey.js"
-    },
-    "./server": {
-      "types": "./dist/esm/server.d.ts",
-      "import": "./dist/esm/server.js",
-      "require": "./dist/cjs/server.js"
+    "./*": {
+      "types": "./dist/*.d.ts",
+      "import": "./dist/*.js",
+      "require": "./dist/*.cjs"
     },
     "./utils/*": {
-      "types": "./dist/esm/utils/*.d.ts",
-      "import": "./dist/esm/utils/*.js",
-      "require": "./dist/cjs/utils/*.js"
+      "types": "./dist/utils/*.d.ts",
+      "import": "./dist/utils/*.js",
+      "require": "./dist/utils/*.cjs"
     }
   },
   "files": [
@@ -71,13 +36,8 @@
   },
   "scripts": {
     "prebuild": "rimraf dist",
-    "cjsify": "mkdir -p ./dist/cjs && echo \"{ \\\"type\\\":\\\"commonjs\\\" }\" > ./dist/cjs/package.json",
-    "build": "concurrently \"yarn:build:*\" && yarn cjsify",
-    "build:esm": "tsc --outDir dist/esm --module esnext",
-    "build:cjs": "tsc --outDir dist/cjs --module commonjs",
-    "dev": "concurrently \"yarn:dev:*\" yarn:cjsify",
-    "dev:esm": "yarn build:esm --pretty --watch --preserveWatchOutput",
-    "dev:cjs": "yarn build:cjs --pretty --watch --preserveWatchOutput",
+    "build": "tsup",
+    "dev": "tsup --watch",
     "dev13": "yarn dev",
     "test": "echo \"Error: run tests from root\" && exit 1",
     "check-types": "yarn build"

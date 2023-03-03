@@ -3,8 +3,8 @@
   "compilerOptions": {
     "paths": {
       // TODO: remove when typescript module resolution supports package exports. (v5.0 with moduleResolution: 'bundler')
-      "@mui/toolpad-core/createQuery": ["../toolpad-core/dist/esm/createQuery"],
-      "@mui/toolpad-core/createComponent": ["../toolpad-core/dist/esm/createComponent"]
+      "@mui/toolpad-core/createQuery": ["../toolpad-core/dist/createQuery"],
+      "@mui/toolpad-core/createComponent": ["../toolpad-core/dist/createComponent"]
     },
     "module": "esnext",
     "alwaysStrict": true,

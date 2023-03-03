@@ -9,8 +9,17 @@
   "types": "dist/index.d.ts",
   "type": "module",
   "exports": {
-    ".": "./dist/index.js",
-    "./package.json": "./package.json"
+    "./package.json": "./package.json",
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    },
+    "./*": {
+      "types": "./dist/*.d.ts",
+      "import": "./dist/*.js",
+      "require": "./dist/*.cjs"
+    }
   },
   "files": [
     "dist"
@@ -21,9 +30,9 @@
   },
   "scripts": {
     "prebuild": "rimraf dist",
-    "build": "tsc",
-    "dev": "tsc --pretty --watch --preserveWatchOutput",
-    "dev13": "tsc --pretty --watch --preserveWatchOutput",
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "dev13": "tsup --watch",
     "test": "echo \"Error: run tests from root\" && exit 1",
     "check-types": "tsc"
   },
@@ -31,12 +40,14 @@
     "url": "https://github.com/mui/mui-toolpad/issues"
   },
   "dependencies": {
+    "@mui/lab": "^5.0.0-alpha.121",
     "@mui/material": "^5.11.11",
     "@mui/toolpad-core": "^0.0.42-alpha.2",
     "@mui/x-data-grid-pro": "^5.17.25",
     "@mui/x-date-pickers": "^5.0.20",
     "dayjs": "^1.11.7",
-    "markdown-to-jsx": "^7.1.9"
+    "markdown-to-jsx": "^7.1.9",
+    "react-error-boundary": "^3.1.4"
   },
   "devDependencies": {
     "react": "^18.2.0"

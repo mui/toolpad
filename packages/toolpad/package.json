@@ -3,26 +3,22 @@
   "version": "0.0.42-alpha.2",
   "license": "MIT",
   "scripts": {
-    "cjsify": "mkdir -p ./dist/cjs && echo \"{ \\\"type\\\":\\\"commonjs\\\" }\" > ./dist/cjs/package.json",
-    "build": "concurrently \"yarn:build:*\" && yarn cjsify",
-    "build:esm": "tsc",
-    "build:cjs": "tsc -p tsconfig.cjs.json",
-    "dev": "concurrently \"yarn:dev:*\" yarn:cjsify",
-    "dev:esm": "yarn build:esm --pretty --watch --preserveWatchOutput",
-    "dev:cjs": "yarn build:cjs --pretty --watch --preserveWatchOutput",
+    "prebuild": "rimraf dist",
+    "build": "tsup",
+    "dev": "tsup --watch",
     "dev13": "yarn dev"
   },
   "exports": {
     "./package.json": "./package.json",
     "./server": {
-      "types": "./dist/esm/server.d.ts",
-      "import": "./dist/esm/server.js",
-      "require": "./dist/cjs/server.js"
+      "types": "./dist/server.d.ts",
+      "import": "./dist/server.mjs",
+      "require": "./dist/server.js"
     },
     "./browser": {
-      "types": "./dist/esm/browser.d.ts",
-      "import": "./dist/esm/browser.js",
-      "require": "./dist/cjs/browser.js"
+      "types": "./dist/browser.d.ts",
+      "import": "./dist/browser.mjs",
+      "require": "./dist/browser.js"
     }
   },
   "files": [

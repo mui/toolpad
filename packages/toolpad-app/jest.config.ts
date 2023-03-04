@@ -3,6 +3,10 @@ import nextJest from 'next/jest';
 
 const createJestConfig = nextJest();
 
+const createJestConfig = nextJest({
+  dir: __dirname,
+});
+
 async function jestConfig(): Promise<Config.InitialOptions> {
   const baseConfig: Config.InitialOptions = {
     testEnvironment: '<rootDir>/jest-environment-jsdom.ts',

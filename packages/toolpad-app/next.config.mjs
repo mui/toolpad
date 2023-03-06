@@ -176,7 +176,7 @@ export default withBundleAnalyzer({
   headers: async () => {
     return [
       {
-        source: '/((?!(deploy|prod))/.*)',
+        source: '/((?!(?:deploy|prod))/.*)',
         headers: securityHeaders,
       },
       {

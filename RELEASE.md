@@ -77,4 +77,11 @@ yarn release:build
 yarn lerna publish --force-publish --no-git-tag-version --no-push --no-git-reset
 ```
 
+For canary releases:
+
+```sh
+yarn release:build
+yarn lerna publish --force-publish --no-git-tag-version --no-push --no-git-reset --canary
+```
+
 <!-- TODO: work out full flow -->

@@ -13,6 +13,11 @@ export const getServerSideProps: GetServerSideProps<ToolpadAppProps> = async () 
     };
   }
 
+  // TODO: iframes should be disallowed by default.
+  // if (!allowIframes) {
+  //   context.res.setHeader('X-Frame-Options', 'DENY');
+  // }
+
   const state = await loadRuntimeState(APP_ID_LOCAL_MARKER, 0);
 
   return {

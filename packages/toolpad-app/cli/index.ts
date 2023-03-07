@@ -4,15 +4,9 @@ import path from 'path';
 import invariant from 'invariant';
 import { Readable } from 'stream';
 import * as readline from 'readline';
-import fetch from 'node-fetch';
-import openBrowser from './openBrowser';
+import openBrowser from 'react-dev-utils/openBrowser';
 
 const DEFAULT_PORT = 3000;
-// https://github.com/sindresorhus/open#app
-const INTERVAL = 1000;
-const MAX_RETRIES = 30;
-
-const HEALTH_CHECK_PATHNAME = `/health-check`;
 
 async function waitForMatch(input: Readable, regex: RegExp): Promise<RegExpExecArray | null> {
   return new Promise((resolve, reject) => {
@@ -42,27 +36,6 @@ interface RunCommandArgs {
   devMode?: boolean;
   port?: number;
 }
-
-const waitForHealthCheck = async (baseUrl: string): Promise<void> => {
-  const checkedUrl = new URL(HEALTH_CHECK_PATHNAME, baseUrl);
-  for (let i = 1; i <= MAX_RETRIES; i += 1) {
-    try {
-      // eslint-disable-next-line no-await-in-loop
-      const res = await fetch(checkedUrl.href);
-
-      if (!res.ok) {
-        throw new Error(`HTTP ${res.status}`);
-      }
-      return;
-    } catch (err) {
-      // eslint-disable-next-line no-await-in-loop
-      await new Promise((resolve) => {
-        setTimeout(resolve, INTERVAL);
-      });
-    }
-  }
-  throw new Error(`Failed to connect`);
-};
 
 async function runApp(cmd: 'dev' | 'start', { devMode = false, port }: RunCommandArgs) {
   const { execaNode } = await import('execa');
@@ -108,12 +81,7 @@ async function runApp(cmd: 'dev' | 'start', { devMode = false, port }: RunComman
     const match = await waitForMatch(cp.stdout, /http:\/\/localhost:(\d+)/);
     const detectedPort = match ? Number(match[1]) : null;
     invariant(detectedPort, 'Could not find port in stdout');
-
     const toolpadBaseUrl = `http://localhost:${detectedPort}/`;
-
-    // Then wait for health check to pass on the detected port
-    await waitForHealthCheck(toolpadBaseUrl);
-
     try {
       await openBrowser(toolpadBaseUrl);
     } catch (err: any) {

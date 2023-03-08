@@ -3,7 +3,7 @@
 import chalk from 'chalk';
 import { execaCommand } from 'execa';
 import inquirer from 'inquirer';
-import fs from 'fs';
+import * as fs from 'fs/promises';
 import { getPackageManager } from './utils/getPackageManager';
 
 // Detect the package manager
@@ -16,14 +16,14 @@ const scaffoldProject = async () => {
       type: 'input',
       name: 'projectName',
       message: 'Enter the name of your project:',
-      default: 'my-app',
+      default: 'my-toolpad-app',
     },
   ]);
 
   // eslint-disable-next-line no-console
   console.log(`Creating a new MUI Toolpad project in ${chalk.blue(name.projectName)}`);
   try {
-    fs.mkdirSync(name.projectName);
+    await fs.mkdir(name.projectName);
     process.chdir(name.projectName);
 
     const packageJson = {
@@ -37,12 +37,19 @@ const scaffoldProject = async () => {
       },
     };
 
-    fs.writeFileSync('package.json', JSON.stringify(packageJson, null, 2));
+    await fs.writeFile('package.json', JSON.stringify(packageJson, null, 2));
     return name.projectName;
   } catch (error) {
-    if (fs.existsSync(name.projectName)) {
+    try {
+      await fs.access(name.projectName);
       console.error(
         `Directory ${chalk.red(name.projectName)} already exists. Please provide a different name.`,
+      );
+    } catch (err) {
+      console.error(
+        `Unable to create directory ${chalk.red(
+          name.projectName,
+        )}. Please provide a different name.`,
       );
     }
     return null;

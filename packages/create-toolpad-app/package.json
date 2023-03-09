@@ -1,6 +1,6 @@
 {
   "name": "create-toolpad-app-test",
-  "version": "0.0.14",
+  "version": "0.0.15",
   "keywords": [
     "react",
     "toolpad",
@@ -24,8 +24,7 @@
     "dev13": "ncc build ./index.ts -w -o dist/",
     "prerelease": "rimraf ./dist/",
     "release": "ncc build ./index.ts -o ./dist/ --minify --no-cache --no-source-map-register",
-    "build": "yarn release",
-    "releaseWithPublish": "yarn release && yarn publish"
+    "build": "yarn release"
   },
   "engines": {
     "node": ">=14.6.0"

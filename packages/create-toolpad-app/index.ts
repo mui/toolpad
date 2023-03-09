@@ -4,10 +4,24 @@ import chalk from 'chalk';
 import { execaCommand } from 'execa';
 import inquirer from 'inquirer';
 import * as fs from 'fs/promises';
+import path from 'path';
 import { getPackageManager } from './utils/getPackageManager';
-
+import { isFolderEmpty } from './utils/isFolderEmpty';
 // Detect the package manager
 const packageManager = getPackageManager();
+
+// Install the dependencies
+const installDeps = async () => {
+  // eslint-disable-next-line no-console
+  console.log(`${chalk.blue('info')} - Installing dependencies`);
+
+  const installVerb = packageManager === 'yarn' ? 'add' : 'install';
+  const command = `${packageManager} ${installVerb} @mui/toolpad @mui/toolpad-core`;
+  await execaCommand(command, { stdio: 'inherit' });
+
+  // eslint-disable-next-line no-console
+  console.log(`${chalk.green('success')} - Dependencies installed successfully!`);
+};
 
 // Create a new directory and initialize a new project
 const scaffoldProject = async () => {
@@ -40,11 +54,28 @@ const scaffoldProject = async () => {
     await fs.writeFile('package.json', JSON.stringify(packageJson, null, 2));
     return name.projectName;
   } catch (error) {
+    // Directory exists, verify if it is empty to continue
+    if (!isFolderEmpty(path.join(process.cwd(), name.projectName), name.projectName)) {
+      return null;
+    }
     try {
       await fs.access(name.projectName);
-      console.error(
-        `Directory ${chalk.red(name.projectName)} already exists. Please provide a different name.`,
-      );
+      const installDependenciesConsent = await inquirer.prompt([
+        {
+          type: 'confirm',
+          name: 'installInExisting',
+          message: `The following dependencies will be installed: ${chalk.magentaBright(
+            '@mui/toolpad',
+          )}, ${chalk.magenta('@mui/toolpad-core')}. Do you want to continue?`,
+          default: false,
+        },
+      ]);
+
+      if (installDependenciesConsent.installInExisting) {
+        return name.projectName;
+      }
+      console.error(`${chalk.red('error')} - Dependencies are required to be installed.`);
+      process.exit(1);
     } catch (err) {
       console.error(
         `Unable to create directory ${chalk.red(
@@ -56,16 +87,6 @@ const scaffoldProject = async () => {
   }
 };
 
-// Install the dependencies
-const installDeps = async () => {
-  const installVerb = packageManager === 'yarn' ? 'add' : 'install';
-  const command = `${packageManager} ${installVerb} @mui/toolpad @mui/toolpad-core`;
-  await execaCommand(command, { stdio: 'inherit' });
-
-  // eslint-disable-next-line no-console
-  console.log(`${chalk.green('success')} - Dependencies installed successfully!`);
-};
-
 // Run the CLI interaction with Inquirer.js
 const run = async () => {
   let projectName;
@@ -74,35 +95,6 @@ const run = async () => {
     projectName = await scaffoldProject();
   } while (!projectName);
 
-  const installDependenciesConsent = await inquirer.prompt([
-    {
-      type: 'confirm',
-      name: 'installDependencies',
-      message: `The following dependencies will be installed: ${chalk.magentaBright(
-        '@mui/toolpad',
-      )}, ${chalk.magenta('@mui/toolpad-core')}. Do you want to continue?`,
-      default: false,
-    },
-  ]);
-
-  if (installDependenciesConsent.installDependencies) {
-    // eslint-disable-next-line no-console
-    console.log(`${chalk.blue('info')} - Installing dependencies`);
-  } else {
-    console.error(
-      `${chalk.red('error')} - Dependencies are required. Deleting directory ${chalk.red(
-        projectName,
-      )} and exiting.`,
-    );
-    process.chdir('..');
-    try {
-      await execaCommand(`rm -rf ${projectName}`, { stdio: 'inherit' });
-    } catch (error) {
-      console.error(`${chalk.red('error')} - Unable to delete directory ${projectName}: ${error}`);
-    }
-
-    process.exit(1);
-  }
   await installDeps();
 
   const message = `\nRun the following to get started: \n\n ${chalk.magentaBright(

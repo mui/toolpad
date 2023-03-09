@@ -1,6 +1,6 @@
 {
   "name": "@mui/toolpad-app",
-  "version": "0.0.42-alpha.0",
+  "version": "0.0.42-alpha.5",
   "license": "MIT",
   "scripts": {
     "build": "yarn prisma generate && concurrently \"yarn:build:*\" && rimraf ./.next/cache",
@@ -50,8 +50,8 @@
     "@mui/lab": "^5.0.0-alpha.121",
     "@mui/material": "^5.11.11",
     "@mui/system": "^5.11.11",
-    "@mui/toolpad-components": "^0.0.42-alpha.0",
-    "@mui/toolpad-core": "^0.0.42-alpha.0",
+    "@mui/toolpad-components": "^0.0.42-alpha.5",
+    "@mui/toolpad-core": "^0.0.42-alpha.5",
     "@mui/types": "^7.2.3",
     "@mui/utils": "^5.11.11",
     "@mui/x-data-grid-generator": "^5.17.25",
@@ -64,6 +64,7 @@
     "@tanstack/react-query": "^4.24.10",
     "@tanstack/react-query-devtools": "^4.24.10",
     "@types/cors": "^2.8.13",
+    "@types/react-dev-utils": "^9.0.11",
     "abort-controller": "^3.0.0",
     "arg": "^5.0.2",
     "args": "^5.0.3",
@@ -109,6 +110,7 @@
     "prisma": "^4.10.1",
     "quickjs-emscripten": "^0.22.0",
     "react": "^18.2.0",
+    "react-dev-utils": "^12.0.1",
     "react-devtools-inline": "^4.27.2",
     "react-dom": "^18.2.0",
     "react-error-boundary": "^3.1.4",
@@ -160,5 +162,5 @@
   "publishConfig": {
     "access": "public"
   },
-  "gitHead": "ed9e42178b49c20885774064b0e023b8360d7777"
+  "gitHead": "62dd71783962945cbaf6214f8eeecb9e604321c2"
 }

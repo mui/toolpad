@@ -18,7 +18,7 @@ function prepareQuery(sql: string, params: Record<string, string>) {
       const trimmedMatch = match.trim().replaceAll(/[']+/g, '');
       if (trimmedMatch[0] === '$') {
         const varName = trimmedMatch.slice(1);
-        if (params[varName]) {
+        if (typeof params[varName] !== 'undefined') {
           substitutions.push(params[varName]);
         }
         return '?';

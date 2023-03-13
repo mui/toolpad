@@ -12,7 +12,7 @@ Toolpad won't be a hosted solution anymore. You will install the Toolpad editor 
 
 Toolpad applications are stored in configuration files within your project folder, Toolpad won't require access to a database anymore to store its applications. You will be able to hand-edit these configuration files if necessary and the change will immediately reflect in the visual editor.
 
-Toolpad integrates more closely with Node.js backends, you can expose your data to Toolpad by writing regular javascript functions, these functions will be able to use any npm package and have access to environment variable available in your project. Basically, Toolpad now is a more code friendly way of building applications. 
+Toolpad integrates more closely with Node.js backends, you can expose your data to Toolpad by writing regular javascript functions, these functions will be able to use any npm package and have access to environment variables available in your project. Now, Toolpad is a more code-friendly way of building applications.
 
 ### Why we are changing it
 

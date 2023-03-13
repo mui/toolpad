@@ -69,6 +69,10 @@ function Form({
     form.reset();
   }, [form]);
 
+  React.useEffect(() => {
+    form.trigger();
+  }, [form, validationRules]);
+
   const formContextValue = React.useMemo(
     () => ({ form, fieldValues: value, validationRules }),
     // form never changes so also use formState as dependency to update context when form state changes

@@ -4,21 +4,21 @@
 
 ## a change in direction
 
-For the past year that we've been developing on Toolpad, we've also kept talking to potential users. Now it's time to align Toolpad with the insights we've gained over the past months.
+For the past year that we've been building Toolpad, we've also kept talking to potential users. Having understood the needs better, now it's time to align Toolpad with the insights we've gained over the past months.
 
 ### What will change
 
 Toolpad won't be a hosted solution anymore. You will install the Toolpad editor as a regular npm dependency and fully run it locally from within your project folder.
 
-Toolpad application are stored in configuration files within your project folder, Toolpad won't require access to a database anymore to store its applications. You will be able to hand-edit these configuration files if necessary and the change will immediately reflect in the visual editor.
+Toolpad applications are stored in configuration files within your project folder, Toolpad won't require access to a database anymore to store its applications. You will be able to hand-edit these configuration files if necessary and the change will immediately reflect in the visual editor.
 
-Toolpad integrates more closely with Node.js backends, you can expose your data to Toolpad by writing regular javascript functions, these functions will be able to use any npm package and have access to environment variable avaliable in your project.
+Toolpad integrates more closely with Node.js backends, you can expose your data to Toolpad by writing regular javascript functions, these functions will be able to use any npm package and have access to environment variable available in your project. Basically, Toolpad now is a more code friendly way of building applications. 
 
 ### Why we are changing it
 
-Contrary to traditional low-code tools, We want to provide more degrees of freedom in the areas we dont consider our core functionality. This means you'll be able to use your code editor, version control system, and deployment infrastructure of choice, all the while while getting access to simpler workflows to build admin dashboards trough visual editors to configure UI and data fetching.
+Contrary to traditional low-code tools, we want to provide more degrees of freedom in the areas we don't consider our core functionality. This means you'll be able to use your code editor, version control system, and deployment infrastructure of choice, all the while getting access to simpler workflows to build admin dashboards through visual editors to configure UI and data fetching.
 
-We strongly dislike the lock-in other tools offer and so we want to build in powerful customization options. We want to enable a granular transition to real code whenever to low-code approach falls short.
+We strongly dislike the lock-in other tools offer and so we want to build in powerful customization options. We want to enable a granular transition to real code whenever low-code approach falls short.
 
 ## Toolpad roadmap
 

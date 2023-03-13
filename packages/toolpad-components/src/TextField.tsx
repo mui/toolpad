@@ -33,16 +33,17 @@ function TextField({ defaultValue, onChange, value, ref, ...rest }: TextFieldPro
     [onChange],
   );
 
+  const isInitialForm = Object.keys(fieldValues).length === 0;
+
   React.useEffect(() => {
     if (form && nodeName) {
-      let newValue = fieldValues[nodeName] || defaultValue;
-      if (!newValue && defaultValue) {
-        newValue = defaultValue;
+      if (!fieldValues[nodeName] && defaultValue && isInitialForm) {
         form.setValue(nodeName, defaultValue);
+      } else {
+        onChange(fieldValues[nodeName]);
       }
-      onChange(newValue);
     }
-  }, [defaultValue, fieldValues, form, nodeName, onChange]);
+  }, [defaultValue, fieldValues, form, isInitialForm, nodeName, onChange]);
 
   return (
     <MuiTextField

@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { TextField as MuiTextField, TextFieldProps as MuiTextFieldProps } from '@mui/material';
 import { createComponent, useNode } from '@mui/toolpad-core';
-import { FieldError } from 'react-hook-form';
+import { Controller, FieldError } from 'react-hook-form';
 import { FormContext } from './Form';
 
 interface FullFile {
@@ -56,7 +56,11 @@ function FilePicker({ multiple, value, onChange, ...rest }: FilePickerProps) {
 
     const files = await Promise.all(filesPromises);
 
-    onChange(files);
+    if (form && nodeName) {
+      form.setValue(nodeName, files, { shouldValidate: true, shouldDirty: true });
+    } else {
+      onChange(files);
+    }
   };
 
   React.useEffect(() => {
@@ -65,22 +69,30 @@ function FilePicker({ multiple, value, onChange, ...rest }: FilePickerProps) {
     }
   }, [fieldValues, nodeName, onChange]);
 
-  return (
-    <MuiTextField
-      {...rest}
-      type="file"
-      value={undefined}
-      onChange={handleChange}
-      inputProps={{
-        multiple,
-        ...(form && nodeName && form.register(nodeName, validationRules[nodeName])),
-      }}
-      InputLabelProps={{ shrink: true }}
-      {...(form && {
-        error: Boolean(fieldError),
-        helperText: (fieldError as FieldError)?.message || '',
-      })}
+  const filePickerProps = {
+    ...rest,
+    type: 'file',
+    value: undefined,
+    onChange: handleChange,
+    inputProps: {
+      multiple,
+    },
+    InputLabelProps: { shrink: true },
+    ...(form && {
+      error: Boolean(fieldError),
+      helperText: (fieldError as FieldError)?.message || '',
+    }),
+  };
+
+  return form && nodeName ? (
+    <Controller
+      name={nodeName}
+      control={form.control}
+      rules={validationRules[nodeName]}
+      render={() => <MuiTextField {...filePickerProps} />}
     />
+  ) : (
+    <MuiTextField {...filePickerProps} />
   );
 }
 

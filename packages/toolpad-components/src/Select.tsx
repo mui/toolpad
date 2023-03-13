@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { TextFieldProps, MenuItem, TextField } from '@mui/material';
 import { createComponent, useNode } from '@mui/toolpad-core';
-import { Controller, FieldError } from 'react-hook-form';
+import { FieldError } from 'react-hook-form';
 import { SX_PROP_HELPER_TEXT } from './constants';
 import { FormContext } from './Form';
 
@@ -17,12 +17,12 @@ export type SelectProps = Omit<TextFieldProps, 'value' | 'onChange'> & {
   name: string;
 };
 
-function Select({ options, value, onChange, fullWidth, sx, ...rest }: SelectProps) {
+function Select({ options, value, onChange, fullWidth, sx, defaultValue, ...rest }: SelectProps) {
   const nodeRuntime = useNode();
 
   const nodeName = rest.name || nodeRuntime?.nodeName;
 
-  const { form, validationRules } = React.useContext(FormContext);
+  const { form, fieldValues, validationRules } = React.useContext(FormContext);
   const fieldError = nodeName && form?.formState.errors[nodeName];
 
   const handleChange = React.useCallback(
@@ -34,18 +34,17 @@ function Select({ options, value, onChange, fullWidth, sx, ...rest }: SelectProp
 
   const id = React.useId();
 
-  const selectProps: TextFieldProps = {
-    ...rest,
-    value,
-    onChange: handleChange,
-    select: true,
-    sx: { ...(!fullWidth && !value ? { width: 120 } : {}), ...sx },
-    fullWidth,
-    ...(form && {
-      error: Boolean(fieldError),
-      helperText: (fieldError as FieldError)?.message || '',
-    }),
-  };
+  const isInitialForm = Object.keys(fieldValues).length === 0;
+
+  React.useEffect(() => {
+    if (form && nodeName) {
+      if (!fieldValues[nodeName] && defaultValue && isInitialForm) {
+        form.setValue(nodeName, defaultValue);
+      } else {
+        onChange(fieldValues[nodeName]);
+      }
+    }
+  }, [defaultValue, fieldValues, form, isInitialForm, nodeName, onChange]);
 
   const renderedOptions = React.useMemo(
     () =>
@@ -61,19 +60,24 @@ function Select({ options, value, onChange, fullWidth, sx, ...rest }: SelectProp
     [id, options],
   );
 
-  return form && nodeName ? (
-    <Controller
-      name={nodeName}
-      control={form.control}
-      rules={validationRules[nodeName]}
-      render={({ field }) => (
-        <TextField {...selectProps} {...field}>
-          {renderedOptions}
-        </TextField>
-      )}
-    />
-  ) : (
-    <TextField {...selectProps}>{renderedOptions}</TextField>
+  return (
+    <TextField
+      {...rest}
+      value={value}
+      onChange={handleChange}
+      defaultValue={defaultValue}
+      select
+      sx={{ ...(!fullWidth && !value ? { width: 120 } : {}), ...sx }}
+      fullWidth
+      {...(form &&
+        nodeName && {
+          ...form.register(nodeName, validationRules[nodeName]),
+          error: Boolean(fieldError),
+          helperText: (fieldError as FieldError)?.message || '',
+        })}
+    >
+      {renderedOptions}
+    </TextField>
   );
 }
 

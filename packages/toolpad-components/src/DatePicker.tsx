@@ -99,16 +99,20 @@ function DatePicker({ format, onChange, value, ...rest }: DatePickerProps) {
     [form, nodeName, onChange],
   );
 
+  const isInitialForm = Object.keys(fieldValues).length === 0;
+
   React.useEffect(() => {
     if (form && nodeName) {
-      let newValue = fieldValues[nodeName] || rest.defaultValue || null;
-      if (!newValue && rest.defaultValue) {
-        newValue = rest.defaultValue;
-        form.setValue(nodeName, rest.defaultValue);
+      if (rest.defaultValue && isInitialForm) {
+        const defaultValue = rest.defaultValue || null;
+
+        onChange(defaultValue as string);
+        form.setValue(nodeName, defaultValue);
+      } else {
+        onChange(fieldValues[nodeName]);
       }
-      onChange(newValue);
     }
-  }, [fieldValues, form, nodeName, onChange, rest.defaultValue]);
+  }, [fieldValues, form, isInitialForm, nodeName, onChange, rest.defaultValue]);
 
   const adapterLocale = React.useSyncExternalStore(subscribeLocaleLoader, getSnapshot);
 

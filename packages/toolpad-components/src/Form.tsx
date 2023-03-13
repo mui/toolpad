@@ -35,18 +35,23 @@ function Form({
   children,
   value,
   onChange,
-  onSubmit,
+  onSubmit = () => {},
   validationRules,
   hasResetButton,
   sx,
   ...rest
 }: FormProps) {
   const form = useForm();
+  const { isSubmitSuccessful } = form.formState;
 
   const handleSubmit = React.useCallback(async () => {
     await onSubmit();
+  }, [onSubmit]);
+
+  // Reset form in effect as suggested in https://react-hook-form.com/api/useform/reset/
+  React.useEffect(() => {
     form.reset();
-  }, [form, onSubmit]);
+  }, [form, isSubmitSuccessful]);
 
   // Set initial form values
   React.useEffect(() => {

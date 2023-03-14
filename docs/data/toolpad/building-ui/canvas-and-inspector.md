@@ -4,9 +4,19 @@
 
 ## Working with canvas
 
-To build your application's UI, drag the mouse over the component library to open the drawer.
+### Adding components
+
+Drag the mouse over the component library to open the drawer.
+
+<img src="/static/toolpad/docs/building-ui/ui-0a.png?v-0" alt="Open component drawer" />
+
 Click on a component and drag it over the canvas.
+
+<img src="/static/toolpad/docs/building-ui/ui-0b.png?v-0" alt="Drag a component" />
+
 The canvas will highlight the location where a component can be dropped. Release the mouse to place the component on the canvas.
+
+<img src="/static/toolpad/docs/building-ui/ui-0c.png?v-0" alt="Drop a component" />
 
 ### Selecting components
 

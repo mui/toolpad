@@ -1,10 +1,10 @@
 # Quickstart
 
-<p class="description">Learn the fundamentals of building with Toolpad by creating and deploying a simple application.</p>
+<p class="description">Learn the fundamentals of building with Toolpad by creating a small application.</p>
 
-This guide will walk you through the process of creating a basic Toolpad application.
+This guide will walk you through the process of creating a small Toolpad application.
 You'll use the MUI X DataGrid component to display a list of dog breeds from the [Dog API](https://dog.ceo/dog-api).
-When you click on the name of a breed, its photo will be displayed using the Material UI Image component.
+When you click on the name of a breed, a random photo of the breed will be displayed using the Material UI Image component.
 
 ## Purpose
 
@@ -13,9 +13,7 @@ By the end, you should be able to:
 
 - set up a new Toolpad app
 - navigate through your workspace
-- add components, data sources, and queries to an app
-- bind data sources and components
-- deploy a Toolpad app
+- design a page and connect its data
 
 ## Prerequisites
 
@@ -38,7 +36,7 @@ Make sure to [install Node.js](https://nodejs.org/en/) on your system.
    npm run dev
    ```
 
-   The Toolpad application editor opens in your browser.
+   The Toolpad application editor opens automatically in your browser.
 
 ### Assemble the UI
 
@@ -58,15 +56,11 @@ Make sure to [install Node.js](https://nodejs.org/en/) on your system.
 
    <img src="/static/toolpad/docs/quickstart/step-3b.png" alt="Choose serverside HTTP request" width="464px" />
 
-1. We'll be using `https://dog.ceo/dog-api` as the API of our example:
-
-   Give a unique name to this query, e.g. "dogQuery" and supply `https://dog.ceo/api/breeds/list/all` as the **URL**. The HTTP method can be left at GET.
+1. We'll be using the [open source dog API](https://dog.ceo/dog-api) for our example. First give the query a name "dogQuery". The name must be unique in the page. Then set `https://dog.ceo/api/breeds/list/all` as the **URL**. The HTTP method can be left at GET. Click the preview button to inspect the result of this request. If all went well it should like like this:
 
    <img src="/static/toolpad/docs/quickstart/step-5.png?v=0" alt="Fetch URL"/>
 
-   Click the preview button to see the result of this request.
-
-1. APIs expose data comes in different shapes and forms. As you can see, this API returns an object containing a `message` property. This is not ideal for displaying in a list. Luckily we can freely transform this data serverside. To do so choose **Transform** tab and enable the **Transform response** option. Add the expression `return Object.entries(data.message)` in the editor. Click **Preview** again to verify the result.
+1. APIs expose data in different shapes and forms. As you can see, this API returns an object containing a `message` property. This is not ideal for displaying in a datagrid. Luckily we can freely transform this data serverside. To do so choose the **Transform** tab and enable the **Transform response** option. Add the expression `return Object.entries(data.message)` in the editor. Click **Preview** again to verify the result.
 
    <img src="/static/toolpad/docs/quickstart/step-6.png?v=0" alt="Transform response" width="698px" />
 

@@ -96,7 +96,7 @@
     "mitt": "^3.0.0",
     "monaco-editor": "0.36.0",
     "mysql2": "^3.1.2",
-    "next": "^13.2.1",
+    "next": "13.2.1",
     "node-fetch": "^2.6.9",
     "node-fetch-har": "^1.0.1",
     "open-editor": "^4.0.0",

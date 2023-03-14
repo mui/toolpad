@@ -59,7 +59,7 @@ Drag two of them on the canvas and select the first one. In the **Inspector** yo
 
 <img src="/static/toolpad/docs/building-ui/ui-14.png?v=0" width="370px" alt="Custom create" />
 
-## Supported features:
+## Supported features
 
 - Expose props API through `argTypes` definition when using `createComponent` method.
 - Import anything from `@mui/*` packages:

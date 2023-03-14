@@ -64,15 +64,15 @@ Make sure to [install Node.js](https://nodejs.org/en/) on your system.
 
    <img src="/static/toolpad/docs/quickstart/step-6.png?v=0" alt="Transform response" width="698px" />
 
-1. **Save** your changes and you will return to **Canvas**. The content of this query will now be available on the page. You'll learn how to bind the user interface to this state next.
+1. **Save** the query and close the editor to get back to the **Canvas**. The result of this HTTP request will now be available as state on the page. You'll learn how to bind the user interface to this state next.
 
-1. Select the DataGrid component by clicking on it
+1. Click the DataGrid component to select it.
 
-1. Find the "rows" property button in the **Inspector**. notice there's a small link icon to the right of it. All bindable properties in Toolpad can be bound to state ont he page. You can identify bindable properties by this link icon.
+1. Find the "rows" property in the **Inspector**. notice there's a small link icon to the right of it. All bindable properties in Toolpad can be bound to state ont he page. You can identify bindable properties by this link icon.
 
    <img src="/static/toolpad/docs/quickstart/step-7.png" alt="Bind data" width="295px" />
 
-   Now click the icon to open the binding editor. This will open the binding editor. On the left you'll see a list of all bindable state in the page, on the right there's a code editor that accepts any JavaScript expression. All bindable state is available in the scope of this expression.
+   Click the icon to open the binding editor.On the left you'll see a list of all bindable state in the page, on the right there's a code editor that accepts any JavaScript expression. All bindable state is available in the scope of this expression.
 
 1. Use a `dogQuery` variable available in the scope as a binding expression.
 
@@ -80,15 +80,15 @@ Make sure to [install Node.js](https://nodejs.org/en/) on your system.
    dogQuery.data;
    ```
 
-   and click **Update binding**
+   then click **Update binding**
 
-   <img src="/static/toolpad/docs/quickstart/step-8.png" alt="dogQuery.data" width="1192px" />
+   <img src="/static/toolpad/docs/quickstart/step-8.png?v=0" alt="dogQuery.data" width="1192px" />
 
-1. You have connected backend data to your UI component!
+   If all went well, the DataGrid should now display the data from the HTTP request
 
    <img src="/static/toolpad/docs/quickstart/step-9.png" alt="Connected data" width="1512px" />
 
-1. Now let's make our app interactive by displaying an image of the selected breed. We'll create a dynamic query which reacts to the selection inside DataGrid component. Click **Add query** and select "serverside HTTP request" again. Name it "imageQuery" and add a parameter "breed"
+1. Now let's make our app interactive by displaying a random image of the selected breed. We'll create a dynamic query which reacts to the selection inside DataGrid component. Click **Add query** and select "serverside HTTP request" again. Name it "imageQuery" and add a parameter "breed"
 
    <img src="/static/toolpad/docs/quickstart/step-10.png" alt="Breed parameter" width="707px" />
 
@@ -102,12 +102,10 @@ Make sure to [install Node.js](https://nodejs.org/en/) on your system.
    `https://dog.ceo/api/breed/${parameters.breed}/images/random`;
    ```
 
-   <img src="/static/toolpad/docs/quickstart/step-12.png" alt="url binding" width="1191px" />
+   <img src="/static/toolpad/docs/quickstart/step-12.png?v=0" alt="url binding" width="1191px" />
 
    CLick **Save** to exit the query editor.
 
-1. In the **canvas** select the Image component and bind **src** prop to `imageQuery.data.message`.
+1. In the **canvas** select the Image component and bind **src** prop to `imageQuery.data.message`. Try selecting different rows in the datagrid to see the image update to a random image of the selected breed.
 
    <img src="/static/toolpad/docs/quickstart/step-13.png" alt="Preview image" width="1511px" />
-
-   Try selecting different rows in the datagrid to see the image update to a random image of the selected breed.

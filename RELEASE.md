@@ -81,6 +81,7 @@ yarn release:publish
 For canary releases:
 
 ```sh
+yarn
 yarn release:build
 yarn release:publish-canary
 ```

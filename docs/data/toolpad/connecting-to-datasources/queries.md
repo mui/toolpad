@@ -10,7 +10,7 @@ Be it a database table or an external API, most data we want to display ijn Tool
 
 1. At the moment there are two remote data sources we support:
 
-   <img src="/static/toolpad/docs/queries/query-2.png?v=0" alt="Datasources" width="464px" />
+   <img src="/static/toolpad/docs/queries/query-2.png?v=0" alt="Select query type" width="464px" />
 
    - [serverside javascript](/toolpad/connecting-to-datasources/function/) - Write serverside javascript functions and their result will be automatically made available on the page. These have full access to the Node.js environment they run under.
    - [serverside HTTP request](/toolpad/connecting-to-datasources/fetch/) - Basic, but very powerful. Just pass URL of an API endpoint and you are ready to query your data.

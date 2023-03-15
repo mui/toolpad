@@ -15,6 +15,8 @@ export type FilePickerProps = MuiTextFieldProps & {
   multiple: boolean;
   onChange: (files: FullFile[]) => void;
   name: string;
+  isRequired: boolean;
+  isInvalid: boolean;
 };
 
 const readFile = async (file: Blob): Promise<string> => {
@@ -34,12 +36,19 @@ const readFile = async (file: Blob): Promise<string> => {
   });
 };
 
-function FilePicker({ multiple, value, onChange, ...rest }: FilePickerProps) {
+function FilePicker({
+  multiple,
+  value,
+  onChange,
+  isRequired,
+  isInvalid,
+  ...rest
+}: FilePickerProps) {
   const nodeRuntime = useNode();
 
   const nodeName = rest.name || nodeRuntime?.nodeName;
 
-  const { form, fieldValues, validationRules } = React.useContext(FormContext);
+  const { form, fieldValues } = React.useContext(FormContext);
   const fieldError = nodeName && form?.formState.errors[nodeName];
 
   const handleChange = async (changeEvent: React.ChangeEvent<HTMLInputElement>) => {
@@ -88,7 +97,10 @@ function FilePicker({ multiple, value, onChange, ...rest }: FilePickerProps) {
     <Controller
       name={nodeName}
       control={form.control}
-      rules={validationRules[nodeName]}
+      rules={{
+        required: isRequired ? `${nodeName} is required.` : false,
+        validate: () => !isInvalid || `${nodeName} is invalid.`,
+      }}
       render={() => <MuiTextField {...filePickerProps} />}
     />
   ) : (
@@ -119,6 +131,14 @@ export default createComponent(FilePicker, {
     disabled: {
       helperText: 'Whether the FilePicker is disabled.',
       typeDef: { type: 'boolean' },
+    },
+    isRequired: {
+      helperText: 'Whether the FilePicker is required to have a value.',
+      typeDef: { type: 'boolean', default: false },
+    },
+    isInvalid: {
+      helperText: 'Whether the FilePicker value is invalid.',
+      typeDef: { type: 'boolean', default: false },
     },
     sx: {
       typeDef: { type: 'object' },

@@ -75,14 +75,16 @@ export interface DatePickerProps
   sx: any;
   defaultValue: string;
   name: string;
+  isRequired: boolean;
+  isInvalid: boolean;
 }
 
-function DatePicker({ format, onChange, value, ...rest }: DatePickerProps) {
+function DatePicker({ format, onChange, value, isRequired, isInvalid, ...rest }: DatePickerProps) {
   const nodeRuntime = useNode();
 
   const nodeName = rest.name || nodeRuntime?.nodeName;
 
-  const { form, fieldValues, validationRules } = React.useContext(FormContext);
+  const { form, fieldValues } = React.useContext(FormContext);
   const fieldError = nodeName && form?.formState.errors[nodeName];
 
   const handleChange = React.useCallback(
@@ -142,7 +144,10 @@ function DatePicker({ format, onChange, value, ...rest }: DatePickerProps) {
         <Controller
           name={nodeName}
           control={form.control}
-          rules={validationRules[nodeName]}
+          rules={{
+            required: isRequired ? `${nodeName} is required.` : false,
+            validate: () => !isInvalid || `${nodeName} is invalid.`,
+          }}
           render={() => <DesktopDatePicker {...datePickerProps} />}
         />
       ) : (
@@ -198,6 +203,14 @@ export default createComponent(DatePicker, {
     disabled: {
       helperText: 'The date picker is disabled.',
       typeDef: { type: 'boolean' },
+    },
+    isRequired: {
+      helperText: 'Whether the date picker is required to have a value.',
+      typeDef: { type: 'boolean', default: false },
+    },
+    isInvalid: {
+      helperText: 'Whether the date picker value is invalid.',
+      typeDef: { type: 'boolean', default: false },
     },
     sx: {
       helperText: SX_PROP_HELPER_TEXT,

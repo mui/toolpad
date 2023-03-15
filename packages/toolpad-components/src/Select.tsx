@@ -15,14 +15,26 @@ export type SelectProps = Omit<TextFieldProps, 'value' | 'onChange'> & {
   onChange: (newValue: string) => void;
   options: (string | SelectOption)[];
   name: string;
+  isRequired: boolean;
+  isInvalid: boolean;
 };
 
-function Select({ options, value, onChange, fullWidth, sx, defaultValue, ...rest }: SelectProps) {
+function Select({
+  options,
+  value,
+  onChange,
+  fullWidth,
+  sx,
+  defaultValue,
+  isRequired,
+  isInvalid,
+  ...rest
+}: SelectProps) {
   const nodeRuntime = useNode();
 
   const nodeName = rest.name || nodeRuntime?.nodeName;
 
-  const { form, fieldValues, validationRules } = React.useContext(FormContext);
+  const { form, fieldValues } = React.useContext(FormContext);
   const fieldError = nodeName && form?.formState.errors[nodeName];
 
   const handleChange = React.useCallback(
@@ -39,6 +51,7 @@ function Select({ options, value, onChange, fullWidth, sx, defaultValue, ...rest
   React.useEffect(() => {
     if (form && nodeName) {
       if (!fieldValues[nodeName] && defaultValue && isInitialForm) {
+        onChange(defaultValue);
         form.setValue(nodeName, defaultValue);
       } else {
         onChange(fieldValues[nodeName]);
@@ -71,7 +84,10 @@ function Select({ options, value, onChange, fullWidth, sx, defaultValue, ...rest
       fullWidth
       {...(form &&
         nodeName && {
-          ...form.register(nodeName, validationRules[nodeName]),
+          ...form.register(nodeName, {
+            required: isRequired ? `${nodeName} is required.` : false,
+            validate: () => !isInvalid || `${nodeName} is invalid.`,
+          }),
           error: Boolean(fieldError),
           helperText: (fieldError as FieldError)?.message || '',
         })}
@@ -130,6 +146,14 @@ export default createComponent(Select, {
     disabled: {
       helperText: 'Whether the select is disabled.',
       typeDef: { type: 'boolean' },
+    },
+    isRequired: {
+      helperText: 'Whether the select is required to have a value.',
+      typeDef: { type: 'boolean', default: false },
+    },
+    isInvalid: {
+      helperText: 'Whether the select value is invalid.',
+      typeDef: { type: 'boolean', default: false },
     },
     sx: {
       helperText: SX_PROP_HELPER_TEXT,

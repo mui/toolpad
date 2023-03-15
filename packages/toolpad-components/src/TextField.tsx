@@ -15,14 +15,28 @@ export type TextFieldProps = Omit<MuiTextFieldProps, 'value' | 'onChange'> & {
   alignItems?: BoxProps['alignItems'];
   justifyContent?: BoxProps['justifyContent'];
   name: string;
+  isRequired: boolean;
+  minLength: number;
+  maxLength: number;
+  isInvalid: boolean;
 };
 
-function TextField({ defaultValue, onChange, value, ref, ...rest }: TextFieldProps) {
+function TextField({
+  defaultValue,
+  onChange,
+  value,
+  ref,
+  isRequired,
+  minLength,
+  maxLength,
+  isInvalid,
+  ...rest
+}: TextFieldProps) {
   const nodeRuntime = useNode();
 
   const nodeName = rest.name || nodeRuntime?.nodeName;
 
-  const { form, fieldValues, validationRules } = React.useContext(FormContext);
+  const { form, fieldValues } = React.useContext(FormContext);
   const fieldError = nodeName && form?.formState.errors[nodeName];
 
   const handleChange = React.useCallback(
@@ -38,6 +52,7 @@ function TextField({ defaultValue, onChange, value, ref, ...rest }: TextFieldPro
   React.useEffect(() => {
     if (form && nodeName) {
       if (!fieldValues[nodeName] && defaultValue && isInitialForm) {
+        onChange(defaultValue as string);
         form.setValue(nodeName, defaultValue);
       } else {
         onChange(fieldValues[nodeName]);
@@ -48,13 +63,29 @@ function TextField({ defaultValue, onChange, value, ref, ...rest }: TextFieldPro
   return (
     <MuiTextField
       {...rest}
-      {...(form && nodeName
-        ? {
-            ...form.register(nodeName, validationRules[nodeName]),
-            error: Boolean(fieldError),
-            helperText: (fieldError as FieldError)?.message || '',
-          }
-        : { value, onChange: handleChange })}
+      value={value}
+      onChange={handleChange}
+      {...(form &&
+        nodeName && {
+          ...form.register(nodeName, {
+            required: isRequired ? `${nodeName} is required.` : false,
+            minLength: minLength
+              ? {
+                  value: minLength,
+                  message: `${nodeName} must have at least ${minLength} characters.`,
+                }
+              : undefined,
+            maxLength: maxLength
+              ? {
+                  value: maxLength,
+                  message: `${nodeName} must have no more than ${maxLength} characters.`,
+                }
+              : undefined,
+            validate: () => !isInvalid || `${nodeName} is invalid.`,
+          }),
+          error: Boolean(fieldError),
+          helperText: (fieldError as FieldError)?.message || '',
+        })}
     />
   );
 }
@@ -97,6 +128,22 @@ export default createComponent(TextField, {
     disabled: {
       helperText: 'Whether the input is disabled.',
       typeDef: { type: 'boolean' },
+    },
+    isRequired: {
+      helperText: 'Whether the input is required to have a value.',
+      typeDef: { type: 'boolean', default: false },
+    },
+    minLength: {
+      helperText: 'Minimum value length.',
+      typeDef: { type: 'number', minimum: 0, maximum: 512, default: 0 },
+    },
+    maxLength: {
+      helperText: 'Maximum value length.',
+      typeDef: { type: 'number', minimum: 0, maximum: 512, default: 0 },
+    },
+    isInvalid: {
+      helperText: 'Whether the input value is invalid.',
+      typeDef: { type: 'boolean', default: false },
     },
     sx: {
       helperText: SX_PROP_HELPER_TEXT,

@@ -2,31 +2,20 @@ import * as React from 'react';
 import { Container, ContainerProps, Box, Stack } from '@mui/material';
 import { LoadingButton } from '@mui/lab';
 import { createComponent } from '@mui/toolpad-core';
-import { useForm, FieldValues, RegisterOptions } from 'react-hook-form';
+import { useForm, FieldValues } from 'react-hook-form';
 import { SX_PROP_HELPER_TEXT } from './constants';
-
-type FormValidationRules = Record<
-  string,
-  Pick<
-    RegisterOptions<FieldValues>,
-    'required' | 'min' | 'max' | 'maxLength' | 'minLength' | 'pattern'
-  >
->;
 
 export const FormContext = React.createContext<{
   form: ReturnType<typeof useForm> | null;
   fieldValues: FieldValues;
-  validationRules: FormValidationRules;
 }>({
   form: null,
   fieldValues: {},
-  validationRules: {},
 });
 
 interface FormProps extends ContainerProps {
   value: FieldValues;
   onChange: (newValue: FieldValues) => void;
-  validationRules: FormValidationRules;
   onSubmit: (data?: FieldValues) => unknown | Promise<unknown>;
   hasResetButton: boolean;
 }
@@ -36,7 +25,6 @@ function Form({
   value,
   onChange,
   onSubmit = () => {},
-  validationRules,
   hasResetButton,
   sx,
   ...rest
@@ -69,15 +57,11 @@ function Form({
     form.reset();
   }, [form]);
 
-  React.useEffect(() => {
-    form.trigger();
-  }, [form, validationRules]);
-
   const formContextValue = React.useMemo(
-    () => ({ form, fieldValues: value, validationRules }),
+    () => ({ form, fieldValues: value }),
     // form never changes so also use formState as dependency to update context when form state changes
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [form, form.formState, validationRules, value],
+    [form, form.formState, value],
   );
 
   return (
@@ -117,10 +101,6 @@ export default createComponent(Form, {
       helperText: 'The value that is controlled by this text input.',
       typeDef: { type: 'object', default: {} },
       onChangeProp: 'onChange',
-    },
-    validationRules: {
-      helperText: 'Validation rules for form fields.',
-      typeDef: { type: 'object', default: {} },
     },
     onSubmit: {
       helperText: 'Add logic to be executed when the user submits the form.',

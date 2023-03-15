@@ -107,6 +107,8 @@ function ComponentCatalogItem({
         borderColor: 'divider',
         borderStyle: kind === 'create' ? 'dashed' : 'solid',
         color: 'text.secondary',
+        // https://stackoverflow.com/q/22922761
+        transform: 'translate(0, 0)',
         '&:hover': {
           backgroundColor: 'action.hover',
         },

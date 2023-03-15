@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { LoadingButton as MuiButton, LoadingButtonProps as MuiButtonProps } from '@mui/lab';
 import { createComponent } from '@mui/toolpad-core';
-import { SX_PROP_HELPER_TEXT } from './constants';
+import { SX_PROP } from './constants';
 
 interface ButtonProps extends Omit<MuiButtonProps, 'children'> {
   content: string;
@@ -53,9 +53,6 @@ export default createComponent(Button, {
       helperText: 'Whether the button is disabled.',
       typeDef: { type: 'boolean' },
     },
-    sx: {
-      helperText: SX_PROP_HELPER_TEXT,
-      typeDef: { type: 'object' },
-    },
+    sx: SX_PROP,
   },
 });

@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { createComponent, TemplateRenderer } from '@mui/toolpad-core';
 import { Box, List as MuiList, ListItem, SxProps } from '@mui/material';
-import { SX_PROP_HELPER_TEXT } from './constants';
+import { SX_PROP } from './constants';
 
 export type ListProps = {
   itemCount: number;
@@ -36,9 +36,6 @@ export default createComponent(List, {
       helperText: 'If true, vertical padding is removed from the list.',
       typeDef: { type: 'boolean' },
     },
-    sx: {
-      helperText: SX_PROP_HELPER_TEXT,
-      typeDef: { type: 'object' },
-    },
+    sx: SX_PROP,
   },
 });

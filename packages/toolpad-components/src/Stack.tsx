@@ -1,6 +1,6 @@
 import { Stack } from '@mui/material';
 import { createComponent } from '@mui/toolpad-core';
-import { SX_PROP_HELPER_TEXT } from './constants';
+import { SX_PROP } from './constants';
 
 export default createComponent(Stack, {
   argTypes: {
@@ -35,9 +35,6 @@ export default createComponent(Stack, {
       typeDef: { type: 'element' },
       control: { type: 'slots' },
     },
-    sx: {
-      helperText: SX_PROP_HELPER_TEXT,
-      typeDef: { type: 'object' },
-    },
+    sx: SX_PROP,
   },
 });

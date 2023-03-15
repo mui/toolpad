@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { TextField as MuiTextField, TextFieldProps as MuiTextFieldProps } from '@mui/material';
 import { createComponent } from '@mui/toolpad-core';
+import { SX_PROP } from './constants';
 
 interface FullFile {
   name: string;
@@ -81,8 +82,6 @@ export default createComponent(FilePicker, {
       helperText: 'Whether the FilePicker is disabled.',
       typeDef: { type: 'boolean' },
     },
-    sx: {
-      typeDef: { type: 'object' },
-    },
+    sx: SX_PROP,
   },
 });

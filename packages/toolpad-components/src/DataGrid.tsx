@@ -34,7 +34,7 @@ import {
 import { getObjectKey } from '@mui/toolpad-core/objectKey';
 import { hasImageExtension } from '@mui/toolpad-core/path';
 import { ErrorBoundary, FallbackProps } from 'react-error-boundary';
-import { SX_PROP_HELPER_TEXT } from './constants';
+import { SX_PROP } from './constants';
 
 // Pseudo random number. See https://stackoverflow.com/a/47593316
 function mulberry32(a: number): () => number {
@@ -601,10 +601,7 @@ export default createComponent(DataGridComponent, {
       helperText: 'Hide the toolbar area that contains the data grid user controls.',
       typeDef: { type: 'boolean' },
     },
-    sx: {
-      helperText: SX_PROP_HELPER_TEXT,
-      typeDef: { type: 'object' },
-    },
+    sx: SX_PROP,
     onDelete: {
       typeDef: {
         type: 'event',

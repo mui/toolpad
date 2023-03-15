@@ -1,7 +1,7 @@
 import { Box, Skeleton, SxProps } from '@mui/material';
 import * as React from 'react';
 import { createComponent } from '@mui/toolpad-core';
-import { SX_PROP_HELPER_TEXT } from './constants';
+import { SX_PROP } from './constants';
 
 export interface ImageProps {
   src: string;
@@ -87,9 +87,6 @@ export default createComponent(Image, {
       helperText: 'Displays a loading animation indicating the image is still loading',
       typeDef: { type: 'boolean', default: false },
     },
-    sx: {
-      helperText: SX_PROP_HELPER_TEXT,
-      typeDef: { type: 'object' },
-    },
+    sx: SX_PROP,
   },
 });

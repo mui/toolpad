@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { TextFieldProps, MenuItem, TextField } from '@mui/material';
 import { createComponent } from '@mui/toolpad-core';
-import { SX_PROP_HELPER_TEXT } from './constants';
+import { SX_PROP } from './constants';
 
 export interface SelectOption {
   value: string;
@@ -92,9 +92,6 @@ export default createComponent(Select, {
       helperText: 'Whether the select is disabled.',
       typeDef: { type: 'boolean' },
     },
-    sx: {
-      helperText: SX_PROP_HELPER_TEXT,
-      typeDef: { type: 'object' },
-    },
+    sx: SX_PROP,
   },
 });

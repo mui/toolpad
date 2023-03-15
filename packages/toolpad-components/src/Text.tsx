@@ -10,7 +10,7 @@ import {
 } from '@mui/material';
 import { createComponent, useNode } from '@mui/toolpad-core';
 import { Typography } from '@mui/material/styles/createTypography';
-import { SX_PROP_HELPER_TEXT } from './constants';
+import { SX_PROP } from './constants';
 
 const Markdown = React.lazy(() => import('markdown-to-jsx'));
 
@@ -256,10 +256,6 @@ export default createComponent(Text, {
         'Displays a loading animation instead of the text. Can be used when the content is not available yet.',
       typeDef: { type: 'boolean', default: false },
     },
-    sx: {
-      helperText: SX_PROP_HELPER_TEXT,
-      typeDef: { type: 'object' },
-      visible: ({ mode }) => mode !== 'markdown',
-    },
+    sx: SX_PROP,
   },
 });

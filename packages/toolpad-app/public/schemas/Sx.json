@@ -1,0 +1,15 @@
+{
+  "type": "object",
+  "additionalProperties": true,
+  "properties": {
+    "fontSize": {
+      "type": "number",
+      "default": 14
+    },
+    "color": {
+      "type": "string",
+      "enum": ["primary", "secondary"]
+    }
+  },
+  "required": []
+}

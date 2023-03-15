@@ -1,27 +1,23 @@
 # Queries
 
-<p class="description">Toolpad allows you to connect to external datasources and render dynamic data.</p>
+<p class="description">Toolpad allows you to bring remote data as state to the page and allows your UI to bind itself to this state.</p>
 
-The easiest way to do so is to create a new query which can be used to fetch data:
+Be it a database table or an external API, most data we want to display ijn Toolpad pages originates serverside. Toolpad offers mechanisms to bring this serverside data to the page. The most common way are **queries**. To configure a query we need to follow these steps:
 
-1. Locate **ADD QUERY** button in the **Inspector** on the right:
+1. Click **Add query** button in the **Inspector** on the right:
 
    <img src="/static/toolpad/docs/queries/query-1.png" alt="Query" width="287px" />
 
-2. There are currently 4 different datasources\* that can be used to fetch data:
+1. At the moment there are two remote data sources we support:
 
    <img src="/static/toolpad/docs/queries/query-2.png" alt="Datasources" width="591px" />
 
-   - [Function](/toolpad/connecting-to-datasources/function/) - advanced fetching methods which gives a lot of freedom by allowing to write custom fetching code.
-   - [Fetch](/toolpad/connecting-to-datasources/fetch/) - basic, but very powerful. Just pass URL of an API endpoint and you are ready to query your data.
-   - [Google Sheets](/toolpad/connecting-to-datasources/google-sheets/) - allows accessing data from your Google sheet document.
-   - [PostgreSQL](/toolpad/connecting-to-datasources/postgre-sql/) - ability to hook directly into your own DB without the need to use API.
+   - [serverside javascript](/toolpad/connecting-to-datasources/function/) - Write serverside javascript functions and their result will be automatically made available on the page. These have full access to the Node.js environment they run under.
+   - [serverside HTTP request](/toolpad/connecting-to-datasources/fetch/) - Basic, but very powerful. Just pass URL of an API endpoint and you are ready to query your data.
 
-   \* - by default you will see only **Function** and **Fetch** datasources, for **Google Sheets** and **PostgreSQL** you will first need to create a [CONNECTION instance](/toolpad/connecting-to-datasources/connections/).
+   CLick any of these to start configuration.
 
-3. After choosing the **QUERY** datasource and clicking **CREATE QUERY** you will be presented with a query configuration dialog (configuration settings for each individual type are documented on their respective pages).
-
-   There are a few configuration options that are applicable to every query type:
+1. There are a few configuration options that are applicable to every query type:
 
    <img src="/static/toolpad/docs/queries/query-3.png" alt="Query configuration" width="855px" />
 

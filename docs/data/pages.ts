@@ -22,8 +22,12 @@ const pages: MuiPage[] = [
       //   pathname: '/toolpad/connecting-to-datasources/connections',
       // },
       {
-        pathname: '/toolpad/connecting-to-datasources/fetch',
-        title: 'Fetch datasource',
+        pathname: '/toolpad/connecting-to-datasources/serverside-http-request',
+        title: 'serverside HTTP request',
+      },
+      {
+        pathname: '/toolpad/connecting-to-datasources/serverside-javascript',
+        title: 'serverside javascript',
       },
       // {
       //   pathname: '/toolpad/connecting-to-datasources/function',
@@ -34,7 +38,7 @@ const pages: MuiPage[] = [
       //   title: 'Google Sheets datasource',
       // },
       // {
-      //   pathname: '/toolpad/connecting-to-datasources/postgre-sql',
+      //   pathname: '/toolpad/connecting-to-datasources/postgresql',
       //   title: 'PostgreSQL datasource',
       // },
     ],

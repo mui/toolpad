@@ -2,6 +2,7 @@ import * as React from 'react';
 import { TextFieldProps, MenuItem, TextField } from '@mui/material';
 import { createComponent, useNode } from '@mui/toolpad-core';
 import { FieldError, Controller } from 'react-hook-form';
+import * as _ from 'lodash-es';
 import { SX_PROP_HELPER_TEXT } from './constants';
 import Form, { FormContext } from './Form';
 
@@ -64,6 +65,15 @@ function Select({
       }
     }
   }, [defaultValue, fieldValues, form, isInitialForm, nodeName, onChange, value]);
+
+  const validationProps = React.useMemo(() => ({ isRequired, isInvalid }), [isInvalid, isRequired]);
+  const previousManualValidationPropsRef = React.useRef(validationProps);
+  React.useEffect(() => {
+    if (form && !_.isEqual(validationProps, previousManualValidationPropsRef.current)) {
+      form.trigger();
+      previousManualValidationPropsRef.current = validationProps;
+    }
+  }, [form, validationProps]);
 
   const renderedOptions = React.useMemo(
     () =>

@@ -2,6 +2,7 @@ import * as React from 'react';
 import { TextField as MuiTextField, TextFieldProps as MuiTextFieldProps } from '@mui/material';
 import { createComponent, useNode } from '@mui/toolpad-core';
 import { Controller, FieldError } from 'react-hook-form';
+import * as _ from 'lodash-es';
 import Form, { FormContext } from './Form';
 
 interface FullFile {
@@ -77,6 +78,15 @@ function FilePicker({
       onChange(fieldValues[nodeName]);
     }
   }, [fieldValues, nodeName, onChange]);
+
+  const validationProps = React.useMemo(() => ({ isRequired, isInvalid }), [isInvalid, isRequired]);
+  const previousManualValidationPropsRef = React.useRef(validationProps);
+  React.useEffect(() => {
+    if (form && !_.isEqual(validationProps, previousManualValidationPropsRef.current)) {
+      form.trigger();
+      previousManualValidationPropsRef.current = validationProps;
+    }
+  }, [form, validationProps]);
 
   const filePickerProps = {
     ...rest,

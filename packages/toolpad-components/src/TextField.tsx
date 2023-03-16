@@ -6,6 +6,7 @@ import {
 } from '@mui/material';
 import { createComponent, useNode } from '@mui/toolpad-core';
 import { FieldError } from 'react-hook-form';
+import * as _ from 'lodash-es';
 import { SX_PROP_HELPER_TEXT } from './constants';
 import Form, { FormContext } from './Form';
 
@@ -59,6 +60,18 @@ function TextField({
       }
     }
   }, [defaultValue, fieldValues, form, isInitialForm, nodeName, onChange, value]);
+
+  const validationProps = React.useMemo(
+    () => ({ isRequired, minLength, maxLength, isInvalid }),
+    [isInvalid, isRequired, maxLength, minLength],
+  );
+  const previousManualValidationPropsRef = React.useRef(validationProps);
+  React.useEffect(() => {
+    if (form && !_.isEqual(validationProps, previousManualValidationPropsRef.current)) {
+      form.trigger();
+      previousManualValidationPropsRef.current = validationProps;
+    }
+  }, [form, validationProps]);
 
   return (
     <MuiTextField

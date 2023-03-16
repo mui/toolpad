@@ -6,6 +6,7 @@ import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { createComponent, useNode } from '@mui/toolpad-core';
 import { Dayjs } from 'dayjs';
 import { Controller, FieldError } from 'react-hook-form';
+import * as _ from 'lodash-es';
 import { SX_PROP_HELPER_TEXT } from './constants';
 import Form, { FormContext } from './Form';
 
@@ -115,6 +116,15 @@ function DatePicker({ format, onChange, value, isRequired, isInvalid, ...rest }:
       }
     }
   }, [fieldValues, form, isInitialForm, nodeName, onChange, rest.defaultValue, value]);
+
+  const validationProps = React.useMemo(() => ({ isRequired, isInvalid }), [isInvalid, isRequired]);
+  const previousManualValidationPropsRef = React.useRef(validationProps);
+  React.useEffect(() => {
+    if (form && !_.isEqual(validationProps, previousManualValidationPropsRef.current)) {
+      form.trigger();
+      previousManualValidationPropsRef.current = validationProps;
+    }
+  }, [form, validationProps]);
 
   const adapterLocale = React.useSyncExternalStore(subscribeLocaleLoader, getSnapshot);
 

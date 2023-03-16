@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Container, ContainerProps, Box, Stack } from '@mui/material';
+import { Container, ContainerProps, Box, Stack, BoxProps } from '@mui/material';
 import { LoadingButton } from '@mui/lab';
 import { createComponent } from '@mui/toolpad-core';
 import { useForm, FieldValues, ValidationMode } from 'react-hook-form';
@@ -17,9 +17,13 @@ interface FormProps extends ContainerProps {
   value: FieldValues;
   onChange: (newValue: FieldValues) => void;
   onSubmit?: (data?: FieldValues) => unknown | Promise<unknown>;
-  hasChrome?: boolean;
-  mode?: keyof ValidationMode | undefined;
+  formControlsAlign?: BoxProps['justifyContent'];
+  formControlsFullWidth: boolean;
+  submitButtonText?: string;
+  submitButtonLoadingText?: string;
   hasResetButton?: boolean;
+  mode?: keyof ValidationMode | undefined;
+  hasChrome?: boolean;
 }
 
 function Form({
@@ -27,9 +31,13 @@ function Form({
   value,
   onChange,
   onSubmit = () => {},
-  hasChrome = true,
   hasResetButton = false,
+  formControlsAlign = 'end',
+  formControlsFullWidth,
+  submitButtonText = 'Submit',
+  submitButtonLoadingText = 'Submitting…',
   mode = 'onSubmit',
+  hasChrome = true,
   sx,
   ...rest
 }: FormProps) {
@@ -74,10 +82,25 @@ function Form({
         <Container disableGutters sx={sx} {...rest}>
           <form onSubmit={form.handleSubmit(handleSubmit)}>
             {children}
-            <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'flex-end', pt: 1 }}>
-              <Stack direction="row" spacing={1}>
+            <Box
+              sx={{
+                display: 'flex',
+                flexDirection: 'row',
+                justifyContent: formControlsAlign,
+                pt: 1,
+              }}
+            >
+              <Stack
+                direction="row"
+                spacing={1}
+                sx={{ flex: formControlsFullWidth ? 1 : '0 1 auto' }}
+              >
                 {hasResetButton ? (
-                  <LoadingButton variant="contained" onClick={handleReset}>
+                  <LoadingButton
+                    variant="contained"
+                    onClick={handleReset}
+                    sx={{ flex: formControlsFullWidth ? 1 : '0 1 auto' }}
+                  >
                     Reset
                   </LoadingButton>
                 ) : null}
@@ -85,8 +108,9 @@ function Form({
                   type="submit"
                   variant="contained"
                   loading={form.formState.isSubmitting}
+                  sx={{ flex: formControlsFullWidth ? 1 : '0 1 auto' }}
                 >
-                  {form.formState.isSubmitting ? 'Submitting…' : 'Submit'}
+                  {form.formState.isSubmitting ? submitButtonLoadingText : submitButtonText}
                 </LoadingButton>
               </Stack>
             </Box>
@@ -138,6 +162,27 @@ export default createComponent(Form, {
     onSubmit: {
       helperText: 'Add logic to be executed when the user submits the form.',
       typeDef: { type: 'event' },
+    },
+    formControlsAlign: {
+      typeDef: {
+        type: 'string',
+        enum: ['start', 'center', 'end'],
+        default: 'end',
+      },
+      label: 'Form controls alignment',
+      control: { type: 'HorizontalAlign' },
+    },
+    formControlsFullWidth: {
+      helperText: 'Whether the form controls should occupy all available horizontal space.',
+      typeDef: { type: 'boolean', default: false },
+    },
+    submitButtonText: {
+      helperText: 'Submit button text.',
+      typeDef: { type: 'string', default: 'Submit' },
+    },
+    submitButtonLoadingText: {
+      helperText: 'Submit button text while submitting form.',
+      typeDef: { type: 'string', default: 'Submitting…' },
     },
     hasResetButton: {
       helperText: 'Show button to reset form values.',

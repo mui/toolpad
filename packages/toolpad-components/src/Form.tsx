@@ -18,7 +18,7 @@ interface FormProps extends ContainerProps {
   onChange: (newValue: FieldValues) => void;
   onSubmit?: (data?: FieldValues) => unknown | Promise<unknown>;
   formControlsAlign?: BoxProps['justifyContent'];
-  formControlsFullWidth: boolean;
+  formControlsFullWidth?: boolean;
   submitButtonText?: string;
   submitButtonLoadingText?: string;
   hasResetButton?: boolean;

@@ -7,7 +7,7 @@ import {
 import { createComponent, useNode } from '@mui/toolpad-core';
 import { FieldError } from 'react-hook-form';
 import { SX_PROP_HELPER_TEXT } from './constants';
-import { FormContext } from './Form';
+import Form, { FormContext } from './Form';
 
 export type TextFieldProps = Omit<MuiTextFieldProps, 'value' | 'onChange'> & {
   value: string;
@@ -90,7 +90,26 @@ function TextField({
   );
 }
 
-export default createComponent(TextField, {
+function FormWrappedTextField(props: TextFieldProps) {
+  const { form } = React.useContext(FormContext);
+
+  const [componentFormValue, setComponentFormValue] = React.useState({});
+
+  return form ? (
+    <TextField {...props} />
+  ) : (
+    <Form
+      value={componentFormValue}
+      onChange={setComponentFormValue}
+      mode="onBlur"
+      hasChrome={false}
+    >
+      <TextField {...props} />
+    </Form>
+  );
+}
+
+export default createComponent(FormWrappedTextField, {
   helperText: 'The TextField component lets you input a text value.',
   layoutDirection: 'both',
   argTypes: {

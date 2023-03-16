@@ -2,7 +2,7 @@ import * as React from 'react';
 import { Container, ContainerProps, Box, Stack } from '@mui/material';
 import { LoadingButton } from '@mui/lab';
 import { createComponent } from '@mui/toolpad-core';
-import { useForm, FieldValues } from 'react-hook-form';
+import { useForm, FieldValues, ValidationMode } from 'react-hook-form';
 import { SX_PROP_HELPER_TEXT } from './constants';
 
 export const FormContext = React.createContext<{
@@ -16,8 +16,10 @@ export const FormContext = React.createContext<{
 interface FormProps extends ContainerProps {
   value: FieldValues;
   onChange: (newValue: FieldValues) => void;
-  onSubmit: (data?: FieldValues) => unknown | Promise<unknown>;
-  hasResetButton: boolean;
+  onSubmit?: (data?: FieldValues) => unknown | Promise<unknown>;
+  hasChrome?: boolean;
+  mode?: keyof ValidationMode | undefined;
+  hasResetButton?: boolean;
 }
 
 function Form({
@@ -25,11 +27,13 @@ function Form({
   value,
   onChange,
   onSubmit = () => {},
-  hasResetButton,
+  hasChrome = true,
+  hasResetButton = false,
+  mode = 'onSubmit',
   sx,
   ...rest
 }: FormProps) {
-  const form = useForm();
+  const form = useForm({ mode });
   const { isSubmitSuccessful } = form.formState;
 
   const handleSubmit = React.useCallback(async () => {
@@ -65,29 +69,33 @@ function Form({
   );
 
   return (
-    <Container disableGutters sx={sx} {...rest}>
-      <FormContext.Provider value={formContextValue}>
-        <form onSubmit={form.handleSubmit(handleSubmit)}>
-          {children}
-          <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'flex-end', pt: 1 }}>
-            <Stack direction="row" spacing={1}>
-              {hasResetButton ? (
-                <LoadingButton variant="contained" onClick={handleReset}>
-                  Reset
+    <FormContext.Provider value={formContextValue}>
+      {hasChrome ? (
+        <Container disableGutters sx={sx} {...rest}>
+          <form onSubmit={form.handleSubmit(handleSubmit)}>
+            {children}
+            <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'flex-end', pt: 1 }}>
+              <Stack direction="row" spacing={1}>
+                {hasResetButton ? (
+                  <LoadingButton variant="contained" onClick={handleReset}>
+                    Reset
+                  </LoadingButton>
+                ) : null}
+                <LoadingButton
+                  type="submit"
+                  variant="contained"
+                  loading={form.formState.isSubmitting}
+                >
+                  {form.formState.isSubmitting ? 'Submitting…' : 'Submit'}
                 </LoadingButton>
-              ) : null}
-              <LoadingButton
-                type="submit"
-                variant="contained"
-                loading={form.formState.isSubmitting}
-              >
-                {form.formState.isSubmitting ? 'Submitting…' : 'Submit'}
-              </LoadingButton>
-            </Stack>
-          </Box>
-        </form>
-      </FormContext.Provider>
-    </Container>
+              </Stack>
+            </Box>
+          </form>
+        </Container>
+      ) : (
+        children
+      )}
+    </FormContext.Provider>
   );
 }
 

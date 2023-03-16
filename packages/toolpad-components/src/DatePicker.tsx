@@ -7,7 +7,7 @@ import { createComponent, useNode } from '@mui/toolpad-core';
 import { Dayjs } from 'dayjs';
 import { Controller, FieldError } from 'react-hook-form';
 import { SX_PROP_HELPER_TEXT } from './constants';
-import { FormContext } from './Form';
+import Form, { FormContext } from './Form';
 
 const LOCALE_LOADERS = new Map([
   ['en', () => import('dayjs/locale/en')],
@@ -157,7 +157,26 @@ function DatePicker({ format, onChange, value, isRequired, isInvalid, ...rest }:
   );
 }
 
-export default createComponent(DatePicker, {
+function FormWrappedDatePicker(props: DatePickerProps) {
+  const { form } = React.useContext(FormContext);
+
+  const [componentFormValue, setComponentFormValue] = React.useState({});
+
+  return form ? (
+    <DatePicker {...props} />
+  ) : (
+    <Form
+      value={componentFormValue}
+      onChange={setComponentFormValue}
+      mode="onBlur"
+      hasChrome={false}
+    >
+      <DatePicker {...props} />
+    </Form>
+  );
+}
+
+export default createComponent(FormWrappedDatePicker, {
   helperText:
     'The MUI X [Date picker](https://mui.com/x/react-date-pickers/date-picker/) component.\n\nThe date picker lets the user select a date.',
   argTypes: {

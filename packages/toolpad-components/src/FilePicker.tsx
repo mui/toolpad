@@ -2,7 +2,7 @@ import * as React from 'react';
 import { TextField as MuiTextField, TextFieldProps as MuiTextFieldProps } from '@mui/material';
 import { createComponent, useNode } from '@mui/toolpad-core';
 import { Controller, FieldError } from 'react-hook-form';
-import { FormContext } from './Form';
+import Form, { FormContext } from './Form';
 
 interface FullFile {
   name: string;
@@ -108,7 +108,26 @@ function FilePicker({
   );
 }
 
-export default createComponent(FilePicker, {
+function FormWrappedFilePicker(props: FilePickerProps) {
+  const { form } = React.useContext(FormContext);
+
+  const [componentFormValue, setComponentFormValue] = React.useState({});
+
+  return form ? (
+    <FilePicker {...props} />
+  ) : (
+    <Form
+      value={componentFormValue}
+      onChange={setComponentFormValue}
+      mode="onBlur"
+      hasChrome={false}
+    >
+      <FilePicker {...props} />
+    </Form>
+  );
+}
+
+export default createComponent(FormWrappedFilePicker, {
   helperText: 'File picker component.\nIt allows users to take select and read files.',
   argTypes: {
     value: {

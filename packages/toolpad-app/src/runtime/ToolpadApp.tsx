@@ -998,7 +998,6 @@ function RenderedPage({ nodeId }: RenderedNodeProps) {
               childNodeGroups={{ children }}
               Component={PageRootComponent}
             />
-
             {queries.map((node) => (
               <FetchNode key={node.id} node={node} />
             ))}

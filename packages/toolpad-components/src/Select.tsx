@@ -3,7 +3,7 @@ import { TextFieldProps, MenuItem, TextField } from '@mui/material';
 import { createComponent, useNode } from '@mui/toolpad-core';
 import { FieldError } from 'react-hook-form';
 import { SX_PROP_HELPER_TEXT } from './constants';
-import { FormContext } from './Form';
+import Form, { FormContext } from './Form';
 
 export interface SelectOption {
   value: string;
@@ -51,7 +51,7 @@ function Select({
   React.useEffect(() => {
     if (form && nodeName) {
       if (!fieldValues[nodeName] && defaultValue && isInitialForm) {
-        onChange(defaultValue);
+        onChange(defaultValue as string);
         form.setValue(nodeName, defaultValue);
       } else {
         onChange(fieldValues[nodeName]);
@@ -97,7 +97,26 @@ function Select({
   );
 }
 
-export default createComponent(Select, {
+function FormWrappedSelect(props: SelectProps) {
+  const { form } = React.useContext(FormContext);
+
+  const [componentFormValue, setComponentFormValue] = React.useState({});
+
+  return form ? (
+    <Select {...props} />
+  ) : (
+    <Form
+      value={componentFormValue}
+      onChange={setComponentFormValue}
+      mode="onBlur"
+      hasChrome={false}
+    >
+      <Select {...props} />
+    </Form>
+  );
+}
+
+export default createComponent(FormWrappedSelect, {
   helperText: 'The Select component lets you select a value from a set of options.',
   layoutDirection: 'both',
   loadingPropSource: ['value', 'options'],

@@ -41,6 +41,10 @@ Run:
 
 ```sh
 npx create-toolpad-app
+# or
+yarn create toolpad-app
+# or
+pnpm create toolpad-app
 ```
 
 ## Documentation

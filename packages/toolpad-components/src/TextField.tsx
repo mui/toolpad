@@ -54,38 +54,37 @@ function TextField({
       if (!fieldValues[nodeName] && defaultValue && isInitialForm) {
         onChange(defaultValue as string);
         form.setValue(nodeName, defaultValue);
-      } else {
+      } else if (value !== fieldValues[nodeName]) {
         onChange(fieldValues[nodeName]);
       }
     }
-  }, [defaultValue, fieldValues, form, isInitialForm, nodeName, onChange]);
+  }, [defaultValue, fieldValues, form, isInitialForm, nodeName, onChange, value]);
 
   return (
     <MuiTextField
       {...rest}
-      value={value}
-      onChange={handleChange}
-      {...(form &&
-        nodeName && {
-          ...form.register(nodeName, {
-            required: isRequired ? `${nodeName} is required.` : false,
-            minLength: minLength
-              ? {
-                  value: minLength,
-                  message: `${nodeName} must have at least ${minLength} characters.`,
-                }
-              : undefined,
-            maxLength: maxLength
-              ? {
-                  value: maxLength,
-                  message: `${nodeName} must have no more than ${maxLength} characters.`,
-                }
-              : undefined,
-            validate: () => !isInvalid || `${nodeName} is invalid.`,
-          }),
-          error: Boolean(fieldError),
-          helperText: (fieldError as FieldError)?.message || '',
-        })}
+      {...(form && nodeName
+        ? {
+            ...form.register(nodeName, {
+              required: isRequired ? `${nodeName} is required.` : false,
+              minLength: minLength
+                ? {
+                    value: minLength,
+                    message: `${nodeName} must have at least ${minLength} characters.`,
+                  }
+                : undefined,
+              maxLength: maxLength
+                ? {
+                    value: maxLength,
+                    message: `${nodeName} must have no more than ${maxLength} characters.`,
+                  }
+                : undefined,
+              validate: () => !isInvalid || `${nodeName} is invalid.`,
+            }),
+            error: Boolean(fieldError),
+            helperText: (fieldError as FieldError)?.message || '',
+          }
+        : { value, onChange: handleChange })}
     />
   );
 }

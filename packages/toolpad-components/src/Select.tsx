@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { TextFieldProps, MenuItem, TextField } from '@mui/material';
 import { createComponent, useNode } from '@mui/toolpad-core';
-import { FieldError } from 'react-hook-form';
+import { FieldError, Controller } from 'react-hook-form';
 import { SX_PROP_HELPER_TEXT } from './constants';
 import Form, { FormContext } from './Form';
 
@@ -39,9 +39,15 @@ function Select({
 
   const handleChange = React.useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
-      onChange(event.target.value);
+      const newValue = event.target.value;
+
+      if (form && nodeName) {
+        form.setValue(nodeName, newValue, { shouldValidate: true, shouldDirty: true });
+      } else {
+        onChange(newValue);
+      }
     },
-    [onChange],
+    [form, nodeName, onChange],
   );
 
   const id = React.useId();
@@ -53,11 +59,11 @@ function Select({
       if (!fieldValues[nodeName] && defaultValue && isInitialForm) {
         onChange(defaultValue as string);
         form.setValue(nodeName, defaultValue);
-      } else {
+      } else if (value !== fieldValues[nodeName]) {
         onChange(fieldValues[nodeName]);
       }
     }
-  }, [defaultValue, fieldValues, form, isInitialForm, nodeName, onChange]);
+  }, [defaultValue, fieldValues, form, isInitialForm, nodeName, onChange, value]);
 
   const renderedOptions = React.useMemo(
     () =>
@@ -73,27 +79,34 @@ function Select({
     [id, options],
   );
 
-  return (
-    <TextField
-      {...rest}
-      value={value}
-      onChange={handleChange}
-      defaultValue={defaultValue}
-      select
-      sx={{ ...(!fullWidth && !value ? { width: 120 } : {}), ...sx }}
-      fullWidth
-      {...(form &&
-        nodeName && {
-          ...form.register(nodeName, {
-            required: isRequired ? `${nodeName} is required.` : false,
-            validate: () => !isInvalid || `${nodeName} is invalid.`,
-          }),
-          error: Boolean(fieldError),
-          helperText: (fieldError as FieldError)?.message || '',
-        })}
-    >
-      {renderedOptions}
-    </TextField>
+  const selectProps = {
+    ...rest,
+    value,
+    onChange: handleChange,
+    defaultValue,
+    select: true,
+    sx: { ...(!fullWidth && !value ? { width: 120 } : {}), ...sx },
+    fullWidth: true,
+    ...(form && {
+      error: Boolean(fieldError),
+      helperText: (fieldError as FieldError)?.message || '',
+    }),
+  };
+
+  const selectElement = <TextField {...selectProps}>{renderedOptions}</TextField>;
+
+  return form && nodeName ? (
+    <Controller
+      name={nodeName}
+      control={form.control}
+      rules={{
+        required: isRequired ? `${nodeName} is required.` : false,
+        validate: () => !isInvalid || `${nodeName} is invalid.`,
+      }}
+      render={() => selectElement}
+    />
+  ) : (
+    selectElement
   );
 }
 

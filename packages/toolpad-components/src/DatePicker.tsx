@@ -110,11 +110,11 @@ function DatePicker({ format, onChange, value, isRequired, isInvalid, ...rest }:
 
         onChange(defaultValue as string);
         form.setValue(nodeName, defaultValue);
-      } else {
+      } else if (value !== fieldValues[nodeName]) {
         onChange(fieldValues[nodeName]);
       }
     }
-  }, [fieldValues, form, isInitialForm, nodeName, onChange, rest.defaultValue]);
+  }, [fieldValues, form, isInitialForm, nodeName, onChange, rest.defaultValue, value]);
 
   const adapterLocale = React.useSyncExternalStore(subscribeLocaleLoader, getSnapshot);
 
@@ -138,6 +138,8 @@ function DatePicker({ format, onChange, value, isRequired, isInvalid, ...rest }:
     ),
   };
 
+  const datePickerElement = <DesktopDatePicker {...datePickerProps} />;
+
   return (
     <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale={adapterLocale}>
       {form && nodeName ? (
@@ -148,10 +150,10 @@ function DatePicker({ format, onChange, value, isRequired, isInvalid, ...rest }:
             required: isRequired ? `${nodeName} is required.` : false,
             validate: () => !isInvalid || `${nodeName} is invalid.`,
           }}
-          render={() => <DesktopDatePicker {...datePickerProps} />}
+          render={() => datePickerElement}
         />
       ) : (
-        <DesktopDatePicker {...datePickerProps} />
+        datePickerElement
       )}
     </LocalizationProvider>
   );

@@ -113,8 +113,10 @@ function FormWrappedFilePicker(props: FilePickerProps) {
 
   const [componentFormValue, setComponentFormValue] = React.useState({});
 
+  const filePickerElement = <FilePicker {...props} />;
+
   return form ? (
-    <FilePicker {...props} />
+    filePickerElement
   ) : (
     <Form
       value={componentFormValue}
@@ -122,7 +124,7 @@ function FormWrappedFilePicker(props: FilePickerProps) {
       mode="onBlur"
       hasChrome={false}
     >
-      <FilePicker {...props} />
+      {filePickerElement}
     </Form>
   );
 }

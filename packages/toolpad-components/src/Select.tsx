@@ -4,7 +4,7 @@ import { createComponent, useNode } from '@mui/toolpad-core';
 import { FieldError, Controller } from 'react-hook-form';
 import * as _ from 'lodash-es';
 import { SX_PROP_HELPER_TEXT } from './constants';
-import Form, { FormContext } from './Form';
+import { FormContext, withComponentForm } from './Form';
 
 export interface SelectOption {
   value: string;
@@ -120,24 +120,7 @@ function Select({
   );
 }
 
-function FormWrappedSelect(props: SelectProps) {
-  const { form } = React.useContext(FormContext);
-
-  const [componentFormValue, setComponentFormValue] = React.useState({});
-
-  return form ? (
-    <Select {...props} />
-  ) : (
-    <Form
-      value={componentFormValue}
-      onChange={setComponentFormValue}
-      mode="onBlur"
-      hasChrome={false}
-    >
-      <Select {...props} />
-    </Form>
-  );
-}
+const FormWrappedSelect = withComponentForm(Select);
 
 export default createComponent(FormWrappedSelect, {
   helperText: 'The Select component lets you select a value from a set of options.',

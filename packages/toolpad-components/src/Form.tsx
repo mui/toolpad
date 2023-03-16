@@ -99,6 +99,31 @@ function Form({
   );
 }
 
+export function withComponentForm<P extends Record<string, any>>(
+  InputComponent: React.ComponentType<P>,
+) {
+  return function ComponentWithForm(props: P) {
+    const { form } = React.useContext(FormContext);
+
+    const [componentFormValue, setComponentFormValue] = React.useState({});
+
+    const inputElement = <InputComponent {...props} />;
+
+    return form ? (
+      inputElement
+    ) : (
+      <Form
+        value={componentFormValue}
+        onChange={setComponentFormValue}
+        mode="onBlur"
+        hasChrome={false}
+      >
+        {inputElement}
+      </Form>
+    );
+  };
+}
+
 export default createComponent(Form, {
   argTypes: {
     children: {

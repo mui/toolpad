@@ -216,6 +216,10 @@ export interface ArgTypeDefinition<P extends object = {}, V = P[keyof P]> {
    * @returns {boolean} a boolean value indicating whether the property should be visible or not
    */
   visible?: ((props: P) => boolean) | boolean;
+  /**
+   * Name of category that this property belongs to.
+   */
+  category?: string;
 }
 
 export type ArgTypeDefinitions<P extends object = {}> = {

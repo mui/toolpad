@@ -3,7 +3,7 @@ import { TextField as MuiTextField, TextFieldProps as MuiTextFieldProps } from '
 import { createComponent, useNode } from '@mui/toolpad-core';
 import { Controller, FieldError } from 'react-hook-form';
 import * as _ from 'lodash-es';
-import Form, { FormContext } from './Form';
+import { FormContext, withComponentForm } from './Form';
 
 interface FullFile {
   name: string;
@@ -118,26 +118,7 @@ function FilePicker({
   );
 }
 
-function FormWrappedFilePicker(props: FilePickerProps) {
-  const { form } = React.useContext(FormContext);
-
-  const [componentFormValue, setComponentFormValue] = React.useState({});
-
-  const filePickerElement = <FilePicker {...props} />;
-
-  return form ? (
-    filePickerElement
-  ) : (
-    <Form
-      value={componentFormValue}
-      onChange={setComponentFormValue}
-      mode="onBlur"
-      hasChrome={false}
-    >
-      {filePickerElement}
-    </Form>
-  );
-}
+const FormWrappedFilePicker = withComponentForm(FilePicker);
 
 export default createComponent(FormWrappedFilePicker, {
   helperText: 'File picker component.\nIt allows users to take select and read files.',

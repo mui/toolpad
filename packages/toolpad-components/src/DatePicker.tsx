@@ -8,7 +8,7 @@ import { Dayjs } from 'dayjs';
 import { Controller, FieldError } from 'react-hook-form';
 import * as _ from 'lodash-es';
 import { SX_PROP_HELPER_TEXT } from './constants';
-import Form, { FormContext } from './Form';
+import { FormContext, withComponentForm } from './Form';
 
 const LOCALE_LOADERS = new Map([
   ['en', () => import('dayjs/locale/en')],
@@ -169,24 +169,7 @@ function DatePicker({ format, onChange, value, isRequired, isInvalid, ...rest }:
   );
 }
 
-function FormWrappedDatePicker(props: DatePickerProps) {
-  const { form } = React.useContext(FormContext);
-
-  const [componentFormValue, setComponentFormValue] = React.useState({});
-
-  return form ? (
-    <DatePicker {...props} />
-  ) : (
-    <Form
-      value={componentFormValue}
-      onChange={setComponentFormValue}
-      mode="onBlur"
-      hasChrome={false}
-    >
-      <DatePicker {...props} />
-    </Form>
-  );
-}
+const FormWrappedDatePicker = withComponentForm(DatePicker);
 
 export default createComponent(FormWrappedDatePicker, {
   helperText:

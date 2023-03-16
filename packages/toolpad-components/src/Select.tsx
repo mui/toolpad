@@ -169,10 +169,12 @@ export default createComponent(FormWrappedSelect, {
     isRequired: {
       helperText: 'Whether the select is required to have a value.',
       typeDef: { type: 'boolean', default: false },
+      category: 'validation',
     },
     isInvalid: {
       helperText: 'Whether the select value is invalid.',
       typeDef: { type: 'boolean', default: false },
+      category: 'validation',
     },
     sx: {
       helperText: SX_PROP_HELPER_TEXT,

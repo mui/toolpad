@@ -154,10 +154,12 @@ export default createComponent(FormWrappedFilePicker, {
     isRequired: {
       helperText: 'Whether the FilePicker is required to have a value.',
       typeDef: { type: 'boolean', default: false },
+      category: 'validation',
     },
     isInvalid: {
       helperText: 'Whether the FilePicker value is invalid.',
       typeDef: { type: 'boolean', default: false },
+      category: 'validation',
     },
     sx: {
       typeDef: { type: 'object' },

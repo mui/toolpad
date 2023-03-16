@@ -226,10 +226,12 @@ export default createComponent(FormWrappedDatePicker, {
     isRequired: {
       helperText: 'Whether the date picker is required to have a value.',
       typeDef: { type: 'boolean', default: false },
+      category: 'validation',
     },
     isInvalid: {
       helperText: 'Whether the date picker value is invalid.',
       typeDef: { type: 'boolean', default: false },
+      category: 'validation',
     },
     sx: {
       helperText: SX_PROP_HELPER_TEXT,

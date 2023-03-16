@@ -151,18 +151,22 @@ export default createComponent(FormWrappedTextField, {
     isRequired: {
       helperText: 'Whether the input is required to have a value.',
       typeDef: { type: 'boolean', default: false },
+      category: 'validation',
     },
     minLength: {
       helperText: 'Minimum value length.',
       typeDef: { type: 'number', minimum: 0, maximum: 512, default: 0 },
+      category: 'validation',
     },
     maxLength: {
       helperText: 'Maximum value length.',
       typeDef: { type: 'number', minimum: 0, maximum: 512, default: 0 },
+      category: 'validation',
     },
     isInvalid: {
       helperText: 'Whether the input value is invalid.',
       typeDef: { type: 'boolean', default: false },
+      category: 'validation',
     },
     sx: {
       helperText: SX_PROP_HELPER_TEXT,

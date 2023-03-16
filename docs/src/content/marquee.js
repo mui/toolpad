@@ -1,11 +1,11 @@
 import ROUTES from '../route';
 
 const marquee = {
-  title: 'Install Toolpad locally',
-  subtitle: 'Using Docker, you can host Toolpad on your own secure infrastructure.',
+  title: 'Import in your exisitng codebase',
+  subtitle: 'Using a simple command, build your first app in a few minutes.',
   action: {
-    href: ROUTES.toolpadDocs,
-    label: 'Self-host',
+    href: ROUTES.toolpadQuickstart,
+    label: 'Get Started',
   },
 };
 

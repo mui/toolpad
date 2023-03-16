@@ -67,7 +67,7 @@ function FilePicker({
     const files = await Promise.all(filesPromises);
 
     if (form && nodeName) {
-      form.setValue(nodeName, files, { shouldValidate: true, shouldDirty: true });
+      form.setValue(nodeName, files);
     } else {
       onChange(files);
     }

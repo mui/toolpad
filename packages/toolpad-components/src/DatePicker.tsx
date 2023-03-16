@@ -94,7 +94,7 @@ function DatePicker({ format, onChange, value, isRequired, isInvalid, ...rest }:
       const stringValue = newValue?.format('YYYY-MM-DD') || '';
 
       if (form && nodeName) {
-        form.setValue(nodeName, stringValue, { shouldValidate: true, shouldDirty: true });
+        form.setValue(nodeName, stringValue);
       } else {
         onChange(stringValue);
       }

@@ -43,7 +43,7 @@ function Select({
       const newValue = event.target.value;
 
       if (form && nodeName) {
-        form.setValue(nodeName, newValue, { shouldValidate: true, shouldDirty: true });
+        form.setValue(nodeName, newValue);
       } else {
         onChange(newValue);
       }

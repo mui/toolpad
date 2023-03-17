@@ -20,10 +20,11 @@
   "files": [
     "dist"
   ],
+  "type": "module",
   "scripts": {
-    "dev13": "ncc build ./index.ts -w -o dist/",
+    "dev13": "tsc -w -p ./tsconfig.json --outDir ./dist/",
     "prerelease": "rimraf ./dist/",
-    "release": "ncc build ./index.ts -o ./dist/ --minify --no-cache --no-source-map-register",
+    "release": "tsc -p ./tsconfig.json -outDir ./dist/",
     "build": "yarn release"
   },
   "engines": {
@@ -32,7 +33,6 @@
   "dependencies": {},
   "devDependencies": {
     "@types/inquirer": "^9.0.3",
-    "@vercel/ncc": "^0.36.1",
     "chalk": "^5.2.0",
     "execa": "^7.0.0"
   }

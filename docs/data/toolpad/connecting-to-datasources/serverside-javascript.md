@@ -79,7 +79,7 @@ This will make the `value` property available in the query editor to be bound to
 
 ## Secrets
 
-As these functions are running fully serverside they have access to the available environmnet variables through `process.env.DB_PASS`. Toolpad reads the `.env` file at the root of the project and will load its values in the environment.
+As these functions are running fully serverside they have access to the available environment variables through `process.env.DB_PASS`. Toolpad reads the `.env` file at the root of the project and will load its values in the environment.
 
 An example `.env` file:
 

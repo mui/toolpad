@@ -32,7 +32,7 @@ Make sure to [install Node.js](https://nodejs.org/en/) on your system.
 1. Start the development server
 
    ```sh
-   cd my-app
+   cd dog-app
    npm run dev
    ```
 
@@ -40,7 +40,7 @@ Make sure to [install Node.js](https://nodejs.org/en/) on your system.
 
 ### Assemble the UI
 
-1. Hover over **Component library** and drag DataGrid component into **Canvas**. Now repeat the process and drag an Image component on the **Canvas** as well. When you're done, the canvas should like like follows:
+1. Hover over **Component library** and drag DataGrid component into **Canvas**. Now repeat the process and drag an Image component on the **Canvas** as well. When you're done, the canvas should look like:
 
    <img src="/static/toolpad/docs/quickstart/step-2.png" alt="Drag components" width="1512px" />
 
@@ -68,11 +68,11 @@ Make sure to [install Node.js](https://nodejs.org/en/) on your system.
 
 1. Click the DataGrid component to select it.
 
-1. Find the "rows" property in the **Inspector**. notice there's a small link icon to the right of it. All bindable properties in Toolpad can be bound to state ont he page. You can identify bindable properties by this link icon.
+1. Find the "rows" property in the **Inspector**. Notice there's a small link icon to the right of it. All bindable properties in Toolpad can be bound to state on the page. You can identify bindable properties by this link icon.
 
    <img src="/static/toolpad/docs/quickstart/step-7.png" alt="Bind data" width="295px" />
 
-   Click the icon to open the binding editor.On the left you'll see a list of all bindable state in the page, on the right there's a code editor that accepts any JavaScript expression. All bindable state is available in the scope of this expression.
+   Click the icon to open the binding editor. On the left you'll see a list of all bindable state in the page, on the right there's a code editor that accepts any JavaScript expression. All bindable state is available in the scope of this expression.
 
 1. Use a `dogQuery` variable available in the scope as a binding expression.
 
@@ -104,7 +104,7 @@ Make sure to [install Node.js](https://nodejs.org/en/) on your system.
 
    <img src="/static/toolpad/docs/quickstart/step-12.png?v=0" alt="url binding" width="1191px" />
 
-   CLick **Save** to exit the query editor.
+   Click **Update binding** to exit the query editor.
 
 1. In the **canvas** select the Image component and bind **src** prop to `imageQuery.data.message`. Try selecting different rows in the datagrid to see the image update to a random image of the selected breed.
 

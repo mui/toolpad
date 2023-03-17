@@ -17,7 +17,7 @@ test('File picker component', async ({ page, api }) => {
   const editorModel = new ToolpadEditor(page);
   editorModel.goto(app.id);
 
-  await editorModel.waitForOverlay();
+  await editorModel.pageRoot.waitFor();
 
   const filePicker = editorModel.pageRoot.locator('label');
 

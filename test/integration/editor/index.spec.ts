@@ -46,7 +46,7 @@ test('can move elements in page', async ({ page, api }) => {
 
   await editorModel.goto(app.id);
 
-  await editorModel.waitForOverlay();
+  await editorModel.pageRoot.waitFor();
 
   const canvasMoveElementHandleSelector = `:has-text("${TEXT_FIELD_COMPONENT_DISPLAY_NAME}")[draggable]`;
 
@@ -64,8 +64,8 @@ test('can move elements in page', async ({ page, api }) => {
   await secondTextFieldLocator.focus();
   await secondTextFieldLocator.fill('textField2');
 
-  await expect(firstTextFieldLocator).toHaveAttribute('value', 'textField1');
-  await expect(secondTextFieldLocator).toHaveAttribute('value', 'textField2');
+  await expect(firstTextFieldLocator).toHaveValue('textField1');
+  await expect(secondTextFieldLocator).toHaveValue('textField2');
 
   await expect(canvasMoveElementHandleLocator).not.toBeVisible();
 
@@ -86,8 +86,8 @@ test('can move elements in page', async ({ page, api }) => {
     moveTargetY,
   );
 
-  await expect(firstTextFieldLocator).toHaveAttribute('value', 'textField2');
-  await expect(secondTextFieldLocator).toHaveAttribute('value', 'textField1');
+  await expect(firstTextFieldLocator).toHaveValue('textField2');
+  await expect(secondTextFieldLocator).toHaveValue('textField1');
 });
 
 test('can delete elements from page', async ({ page, api }) => {
@@ -101,7 +101,7 @@ test('can delete elements from page', async ({ page, api }) => {
 
   await editorModel.goto(app.id);
 
-  await editorModel.waitForOverlay();
+  await editorModel.pageRoot.waitFor();
 
   const canvasInputLocator = editorModel.appCanvas.locator('input');
   const canvasRemoveElementButtonLocator = editorModel.appCanvas.locator(

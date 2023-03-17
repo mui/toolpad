@@ -13,9 +13,7 @@ test('can control component prop values in properties control panel', async ({ p
   });
 
   const editorModel = new ToolpadEditor(page);
-
   await editorModel.goto(app.id);
-
   await editorModel.pageRoot.waitFor();
 
   const canvasInputLocator = editorModel.appCanvas.locator('input');
@@ -40,7 +38,7 @@ test('can control component prop values in properties control panel', async ({ p
   const valueControl = editorModel.componentEditor.getByLabel('value', { exact: true });
   expect(await valueControl.inputValue()).not.toBe(TEST_VALUE_1);
   await firstInputLocator.fill(TEST_VALUE_1);
-  expect(await valueControl.inputValue()).toBe(TEST_VALUE_1);
+  await expect(valueControl).toHaveValue(TEST_VALUE_1);
 
   // Change component prop values through controls
   const TEST_VALUE_2 = 'value2';
@@ -63,7 +61,7 @@ test('changing defaultValue resets controlled value', async ({ page, api }) => {
   const editorModel = new ToolpadEditor(page);
   await editorModel.goto(app.id);
 
-  await editorModel.waitForOverlay();
+  await editorModel.pageRoot.waitFor();
 
   const firstInput = editorModel.appCanvas.locator('input').nth(0);
   const secondInput = editorModel.appCanvas.locator('input').nth(1);
@@ -96,12 +94,15 @@ test('cannot change controlled component prop values', async ({ page, api }) => 
   });
 
   const editorModel = new ToolpadEditor(page);
-
   await editorModel.goto(app.id);
-  await editorModel.waitForOverlay();
+  await editorModel.pageRoot.waitFor();
 
   const input = editorModel.appCanvas.locator('input').first();
   await clickCenter(page, input);
+
+  await editorModel.componentEditor
+    .locator('h6:has-text("Text field")')
+    .waitFor({ state: 'visible' });
 
   const valueControl = editorModel.componentEditor.getByLabel('value', { exact: true });
   await expect(valueControl).toBeDisabled();

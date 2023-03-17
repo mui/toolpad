@@ -68,7 +68,7 @@ function getSnapshot() {
 export interface DatePickerProps
   extends Omit<DesktopDatePickerProps<string, Dayjs>, 'value' | 'onChange'> {
   value: string;
-  onChange: (newValue: string) => void;
+  onChange: (newValue: string | null) => void;
   format: string;
   fullWidth: boolean;
   variant: 'outlined' | 'filled' | 'standard';
@@ -80,7 +80,15 @@ export interface DatePickerProps
   isInvalid: boolean;
 }
 
-function DatePicker({ format, onChange, value, isRequired, isInvalid, ...rest }: DatePickerProps) {
+function DatePicker({
+  format,
+  onChange,
+  value,
+  defaultValue,
+  isRequired,
+  isInvalid,
+  ...rest
+}: DatePickerProps) {
   const nodeRuntime = useNode();
 
   const nodeName = rest.name || nodeRuntime?.nodeName;
@@ -102,20 +110,28 @@ function DatePicker({ format, onChange, value, isRequired, isInvalid, ...rest }:
     [form, nodeName, onChange],
   );
 
+  const previousDefaultValueRef = React.useRef(defaultValue);
+  React.useEffect(() => {
+    if (form && nodeName && defaultValue !== previousDefaultValueRef.current) {
+      if (form && nodeName) {
+        form.setValue(nodeName, defaultValue);
+      }
+      previousDefaultValueRef.current = defaultValue;
+    }
+  }, [defaultValue, form, nodeName, onChange]);
+
   const isInitialForm = Object.keys(fieldValues).length === 0;
 
   React.useEffect(() => {
     if (form && nodeName) {
-      if (rest.defaultValue && isInitialForm) {
-        const defaultValue = rest.defaultValue || null;
-
-        onChange(defaultValue as string);
-        form.setValue(nodeName, defaultValue);
+      if (defaultValue && isInitialForm) {
+        onChange(defaultValue || null);
+        form.setValue(nodeName, defaultValue || null);
       } else if (value !== fieldValues[nodeName]) {
-        onChange(fieldValues[nodeName]);
+        onChange(fieldValues[nodeName] || null);
       }
     }
-  }, [fieldValues, form, isInitialForm, nodeName, onChange, rest.defaultValue, value]);
+  }, [fieldValues, form, isInitialForm, nodeName, onChange, defaultValue, value]);
 
   const validationProps = React.useMemo(() => ({ isRequired, isInvalid }), [isInvalid, isRequired]);
   const previousManualValidationPropsRef = React.useRef(validationProps);

@@ -15,7 +15,7 @@ test('Code component cell', async ({ page, api }) => {
   const editorModel = new ToolpadEditor(page);
   editorModel.goto(app.id);
 
-  await editorModel.waitForOverlay();
+  await editorModel.pageRoot.waitFor();
 
   await expect(editorModel.pageRoot.getByText('value: {"test":"value"}')).toBeVisible();
   await expect(

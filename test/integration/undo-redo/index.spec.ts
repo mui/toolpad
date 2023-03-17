@@ -14,8 +14,7 @@ test('test basic undo and redo', async ({ page, api }) => {
 
   const editorModel = new ToolpadEditor(page);
   await editorModel.goto(app.id);
-
-  await editorModel.waitForOverlay();
+  await editorModel.pageRoot.waitFor();
 
   const canvasInputLocator = editorModel.appCanvas.locator('input');
 
@@ -50,7 +49,7 @@ test('test batching text input actions into single undo entry', async ({ page, a
   const editorModel = new ToolpadEditor(page);
   await editorModel.goto(app.id);
 
-  await editorModel.waitForOverlay();
+  await editorModel.pageRoot.waitFor();
 
   const input = editorModel.appCanvas.locator('input').first();
 
@@ -89,7 +88,7 @@ test('test undo and redo through different pages', async ({ page, api }) => {
   const editorModel = new ToolpadEditor(page);
   await editorModel.goto(app.id);
 
-  await editorModel.waitForOverlay();
+  await editorModel.pageRoot.waitFor();
 
   const pageButton1 = editorModel.appCanvas.getByRole('button', {
     name: 'page1Button',

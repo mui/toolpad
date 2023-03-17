@@ -14,6 +14,7 @@ export interface SelectOption {
 export type SelectProps = Omit<TextFieldProps, 'value' | 'onChange'> & {
   value: string;
   onChange: (newValue: string) => void;
+  defaultValue: string;
   options: (string | SelectOption)[];
   name: string;
   isRequired: boolean;
@@ -38,6 +39,8 @@ function Select({
   const { form, fieldValues } = React.useContext(FormContext);
   const fieldError = nodeName && form?.formState.errors[nodeName];
 
+  const id = React.useId();
+
   const handleChange = React.useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
       const newValue = event.target.value;
@@ -51,14 +54,22 @@ function Select({
     [form, nodeName, onChange],
   );
 
-  const id = React.useId();
+  const previousDefaultValueRef = React.useRef(defaultValue);
+  React.useEffect(() => {
+    if (form && nodeName && defaultValue !== previousDefaultValueRef.current) {
+      if (form && nodeName) {
+        form.setValue(nodeName, defaultValue);
+      }
+      previousDefaultValueRef.current = defaultValue;
+    }
+  }, [form, nodeName, onChange, defaultValue]);
 
   const isInitialForm = Object.keys(fieldValues).length === 0;
 
   React.useEffect(() => {
     if (form && nodeName) {
       if (!fieldValues[nodeName] && defaultValue && isInitialForm) {
-        onChange(defaultValue as string);
+        onChange(defaultValue);
         form.setValue(nodeName, defaultValue);
       } else if (value !== fieldValues[nodeName]) {
         onChange(fieldValues[nodeName]);

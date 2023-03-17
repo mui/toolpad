@@ -109,10 +109,6 @@ export class ToolpadEditor {
     ]);
   }
 
-  waitForOverlay() {
-    return expect(this.pageOverlay).toBeVisible();
-  }
-
   async dragToAppCanvas(
     sourceSelector: string,
     isSourceInCanvas: boolean,

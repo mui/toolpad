@@ -13,6 +13,7 @@ import { FormContext, withComponentForm } from './Form';
 export type TextFieldProps = Omit<MuiTextFieldProps, 'value' | 'onChange'> & {
   value: string;
   onChange: (newValue: string) => void;
+  defaultValue: string;
   alignItems?: BoxProps['alignItems'];
   justifyContent?: BoxProps['justifyContent'];
   name: string;
@@ -26,7 +27,6 @@ function TextField({
   defaultValue,
   onChange,
   value,
-  ref,
   isRequired,
   minLength,
   maxLength,
@@ -43,20 +43,35 @@ function TextField({
   const handleChange = React.useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
       const newValue = event.target.value;
-      onChange(newValue);
+
+      if (form && nodeName) {
+        form.setValue(nodeName, newValue);
+      } else {
+        onChange(newValue);
+      }
     },
-    [onChange],
+    [form, nodeName, onChange],
   );
+
+  const previousDefaultValueRef = React.useRef(defaultValue);
+  React.useEffect(() => {
+    if (form && nodeName && defaultValue !== previousDefaultValueRef.current) {
+      if (form && nodeName) {
+        form.setValue(nodeName, defaultValue);
+      }
+      previousDefaultValueRef.current = defaultValue;
+    }
+  }, [form, nodeName, onChange, defaultValue]);
 
   const isInitialForm = Object.keys(fieldValues).length === 0;
 
   React.useEffect(() => {
     if (form && nodeName) {
       if (!fieldValues[nodeName] && defaultValue && isInitialForm) {
-        onChange(defaultValue as string);
-        form.setValue(nodeName, defaultValue);
+        onChange(defaultValue || '');
+        form.setValue(nodeName, defaultValue || '');
       } else if (value !== fieldValues[nodeName]) {
-        onChange(fieldValues[nodeName]);
+        onChange(fieldValues[nodeName] || '');
       }
     }
   }, [defaultValue, fieldValues, form, isInitialForm, nodeName, onChange, value]);

@@ -90,8 +90,25 @@ async function loadCodeComponentsFromFiles(): Promise<ComponentsContent> {
   return Object.fromEntries(resultEntries.filter(Boolean));
 }
 
+class Lock {
+  pending: Promise<any> | null = null;
+
+  async use<T = void>(doWork: () => Promise<T>): Promise<T> {
+    try {
+      this.pending = Promise.resolve(this.pending).then(() => doWork());
+      return await this.pending;
+    } finally {
+      this.pending = null;
+    }
+  }
+}
+
+const configFileLock = new Lock();
+
 async function writeConfigFile(filePath: string, dom: appDom.AppDom): Promise<void> {
-  await fs.writeFile(filePath, yaml.stringify(dom), { encoding: 'utf-8' });
+  await configFileLock.use(() =>
+    fs.writeFile(filePath, yaml.stringify(dom), { encoding: 'utf-8' }),
+  );
 }
 
 async function writeCodeComponentsToFiles(
@@ -209,8 +226,12 @@ export async function saveLocalDom(dom: appDom.AppDom): Promise<void> {
 
 async function loadConfigFileFrom(configFilePath: string): Promise<appDom.AppDom | null> {
   try {
-    const configContent = await fs.readFile(configFilePath, { encoding: 'utf-8' });
+    // Using a lock to avoid read during write which may result in reading truncated file content
+    const configContent = await configFileLock.use(() =>
+      fs.readFile(configFilePath, { encoding: 'utf-8' }),
+    );
     const parsedConfig = yaml.parse(configContent);
+    invariant(parsedConfig, 'Invalid Toolpad config');
     return parsedConfig;
   } catch (rawError) {
     const error = errorFrom(rawError);

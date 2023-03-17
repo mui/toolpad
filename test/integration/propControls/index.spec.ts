@@ -14,6 +14,7 @@ test('can control component prop values in properties control panel', async ({ p
 
   const editorModel = new ToolpadEditor(page);
   await editorModel.goto(app.id);
+
   await editorModel.pageRoot.waitFor();
 
   const canvasInputLocator = editorModel.appCanvas.locator('input');
@@ -95,6 +96,7 @@ test('cannot change controlled component prop values', async ({ page, api }) => 
 
   const editorModel = new ToolpadEditor(page);
   await editorModel.goto(app.id);
+
   await editorModel.pageRoot.waitFor();
 
   const input = editorModel.appCanvas.locator('input').first();

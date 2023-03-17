@@ -14,6 +14,7 @@ test('test basic undo and redo', async ({ page, api }) => {
 
   const editorModel = new ToolpadEditor(page);
   await editorModel.goto(app.id);
+
   await editorModel.pageRoot.waitFor();
 
   const canvasInputLocator = editorModel.appCanvas.locator('input');

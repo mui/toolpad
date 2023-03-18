@@ -85,8 +85,8 @@
   },
   "dependencies": {
     "cross-env": "^7.0.3",
-    "dotenv-cli": "^7.0.0",
-    "inquirer": "^9.1.4",
+    "dotenv-cli": "^7.1.0",
+    "inquirer": "^9.1.5",
     "semver": "^7.3.8",
     "yargs": "^17.7.1"
   },

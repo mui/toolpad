@@ -15,25 +15,22 @@
   "author": "Toolpad Team",
   "license": "MIT",
   "bin": {
-    "create-toolpad-app-test": "./dist/index.js"
+    "create-toolpad-app": "./dist/index.js"
   },
   "files": [
     "dist"
   ],
-  "type": "module",
   "scripts": {
-    "dev13": "tsc -w -p ./tsconfig.json --outDir ./dist/",
-    "prerelease": "rimraf ./dist/",
-    "release": "tsc -p ./tsconfig.json -outDir ./dist/",
-    "build": "yarn release"
+    "prebuild": "rimraf ./dist",
+    "build": "tsc -p ./tsconfig.json -outDir ./dist/",
+    "dev13": "tsc -w -p ./tsconfig.json --outDir ./dist/"
   },
   "engines": {
     "node": ">=14.6.0"
   },
-  "dependencies": {},
-  "devDependencies": {
+  "dependencies": {
     "@types/inquirer": "^9.0.3",
     "chalk": "^5.2.0",
-    "execa": "^7.0.0"
+    "execa": "^7.1.1"
   }
 }

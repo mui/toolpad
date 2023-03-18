@@ -1,8 +1,5 @@
 #!/usr/bin/env node
 
-import chalk from 'chalk';
-import { execaCommand } from 'execa';
-import inquirer from 'inquirer';
 import * as fs from 'fs/promises';
 import path from 'path';
 
@@ -28,20 +25,62 @@ function getPackageManager(): PackageManager {
 // From https://github.com/vercel/next.js/blob/canary/packages/create-next-app/helpers/is-folder-empty.ts
 
 async function isFolderEmpty(root: string, name: string): Promise<boolean> {
-  const files = await fs.readdir(root);
+  const { default: chalk } = await import('chalk');
+  const validFiles = [
+    '.DS_Store',
+    '.git',
+    '.gitattributes',
+    '.gitignore',
+    '.gitlab-ci.yml',
+    '.hg',
+    '.hgcheck',
+    '.hgignore',
+    '.idea',
+    '.npmignore',
+    '.travis.yml',
+    'LICENSE',
+    'Thumbs.db',
+    'docs',
+    'mkdocs.yml',
+    'npm-debug.log',
+    'yarn-debug.log',
+    'yarn-error.log',
+    'yarnrc.yml',
+    '.yarn',
+  ];
 
-  if (files.length > 0) {
+  const conflicts = await fs.readdir(root);
+
+  conflicts
+    .filter((file) => !validFiles.includes(file))
+    // Support IntelliJ IDEA-based editors
+    .filter((file) => !/\.iml$/.test(file));
+
+  if (conflicts.length > 0) {
     // eslint-disable-next-line no-console
-    console.log(`The directory ${chalk.green(name)} is non-empty.`);
+    console.log(`The directory ${chalk.green(name)} contains files that could conflict:`);
     // eslint-disable-next-line no-console
     console.log();
-    // eslint-disable-next-line no-console
-    console.log('Either try using a new directory name, or remove the files listed above.');
+    for (const file of conflicts) {
+      try {
+        // eslint-disable-next-line no-await-in-loop
+        const stats = await fs.lstat(path.join(root, file));
+        if (stats.isDirectory()) {
+          // eslint-disable-next-line no-console
+          console.log(`  ${chalk.blue(file)}/`);
+        } else {
+          // eslint-disable-next-line no-console
+          console.log(`  ${file}`);
+        }
+      } catch {
+        // eslint-disable-next-line no-console
+        console.log(`  ${file}`);
+      }
+    }
     // eslint-disable-next-line no-console
     console.log();
     return false;
   }
-
   return true;
 }
 
@@ -50,8 +89,12 @@ const packageManager = getPackageManager();
 
 // Install the dependencies
 const installDeps = async (projectName: string, cwd: string) => {
+  const { execaCommand } = await import('execa');
+  const { default: chalk } = await import('chalk');
   // eslint-disable-next-line no-console
   console.log(`${chalk.blue('info')} - Installing dependencies`);
+  // eslint-disable-next-line no-console
+  console.log();
 
   const installVerb = packageManager === 'yarn' ? 'add' : 'install';
   const command = `${packageManager} ${installVerb} @mui/toolpad @mui/toolpad-core`;
@@ -59,15 +102,20 @@ const installDeps = async (projectName: string, cwd: string) => {
 
   // eslint-disable-next-line no-console
   console.log(`${chalk.green('success')} - Dependencies installed successfully!`);
+  // eslint-disable-next-line no-console
+  console.log();
 };
 
 // Create a new directory and initialize a new project
 const scaffoldProject = async (projectName: string, cwd: string): Promise<string | null> => {
+  const { default: chalk } = await import('chalk');
+  const { default: inquirer } = await import('inquirer');
   // eslint-disable-next-line no-console
   console.log(`Creating a new MUI Toolpad project in ${chalk.blue(projectName)}`);
+  // eslint-disable-next-line no-console
+  console.log();
   try {
     await fs.mkdir(projectName);
-    // process.chdir(projectName);
 
     const packageJson = {
       name: projectName,
@@ -84,11 +132,16 @@ const scaffoldProject = async (projectName: string, cwd: string): Promise<string
     return projectName;
   } catch (error) {
     // Directory exists, verify if it is empty to continue
-    if (!isFolderEmpty(path.join(cwd, projectName), projectName)) {
+    if (!(await isFolderEmpty(path.join(cwd, projectName), projectName))) {
+      // eslint-disable-next-line no-console
+      console.log('Either try using a new directory name, or remove the files listed above.');
+      // eslint-disable-next-line no-console
+      console.log();
       return null;
     }
     try {
       await fs.access(projectName);
+
       const installDependenciesConsent = await inquirer.prompt([
         {
           type: 'confirm',
@@ -104,11 +157,15 @@ const scaffoldProject = async (projectName: string, cwd: string): Promise<string
         return projectName;
       }
       console.error(`${chalk.red('error')} - Dependencies are required to be installed.`);
+      // eslint-disable-next-line no-console
+      console.log();
       process.exit(1);
     } catch (err) {
       console.error(
         `Unable to create directory ${chalk.red(projectName)}. Please provide a different name.`,
       );
+      // eslint-disable-next-line no-console
+      console.log();
     }
     return null;
   }
@@ -116,6 +173,8 @@ const scaffoldProject = async (projectName: string, cwd: string): Promise<string
 
 // Run the CLI interaction with Inquirer.js
 const run = async () => {
+  const { default: chalk } = await import('chalk');
+  const { default: inquirer } = await import('inquirer');
   let projectName;
   const cwd = process.cwd();
   do {
@@ -140,10 +199,12 @@ const run = async () => {
   )}\n`;
   // eslint-disable-next-line no-console
   console.log(message);
+  // eslint-disable-next-line no-console
+  console.log();
 };
 
 run().catch((error) => {
-  console.error(`${chalk.red('error')} - ${error.message}`);
+  console.error(error.message);
   process.exit(1);
 });
 

@@ -1,11 +1,15 @@
 {
   "compilerOptions": {
-    "target": "es2019",
-    "moduleResolution": "node",
+    "target": "es5",
+    "module": "commonjs",
+    "moduleResolution": "node16",
+    "isolatedModules": true,
     "strict": true,
     "resolveJsonModule": true,
     "esModuleInterop": true,
-    "skipLibCheck": true
+    "skipLibCheck": true,
+    "noEmit": false,
+    "outDir": "./dist"
   },
   "exclude": ["templates", "dist"]
 }

@@ -928,10 +928,10 @@
   resolved "https://registry.yarnpkg.com/@gar/promisify/-/promisify-1.1.3.tgz#555193ab2e3bb3b6adc3d551c9c030d9e860daf6"
   integrity sha512-k2Ty1JcVojjJFwrg/ThKi2ujJ7XNLYaFGNB/bWT9wGR+oSMJHMa5w+CUq6p/pVrKeNNgA7pCqEcjSnHVoqJQFw==
 
-"@googleapis/drive@^4.0.2":
-  version "4.0.2"
-  resolved "https://registry.yarnpkg.com/@googleapis/drive/-/drive-4.0.2.tgz#3fb15944d8d04c2d1a8689297b49f099d9330a0b"
-  integrity sha512-NBD2wwkK0iVm5le1YqqDPCgUWl4aeEFIZPciiIIKYBz6kpNtdObj5uHDrtGRUxNzqsUUtYbV9FD1743B8jRZUQ==
+"@googleapis/drive@^5.0.1":
+  version "5.0.1"
+  resolved "https://registry.yarnpkg.com/@googleapis/drive/-/drive-5.0.1.tgz#3aa9b00232d47b443e4c3b20223dad66cf3dba6e"
+  integrity sha512-TDwG6FuPxmJACMS468QiThZFnaOUQxDDqHjr159rV+RhXkkTx9CvDSryo2LIOitqt2G7YCm/CkRoIg/BAkBAFw==
   dependencies:
     googleapis-common "^6.0.3"
 

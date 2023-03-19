@@ -36,7 +36,7 @@
     "@mui/x-data-grid-pro": "^6.0.1",
     "@mui/x-date-pickers": "^6.0.1",
     "dayjs": "^1.11.7",
-    "markdown-to-jsx": "^7.1.9"
+    "markdown-to-jsx": "^7.2.0"
   },
   "devDependencies": {
     "react": "^18.2.0"

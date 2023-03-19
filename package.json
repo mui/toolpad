@@ -46,7 +46,7 @@
   "devDependencies": {
     "@mui/monorepo": "https://github.com/mui/material-ui.git",
     "@next/eslint-plugin-next": "13.2.1",
-    "@playwright/test": "^1.31.1",
+    "@playwright/test": "^1.31.2",
     "@swc/helpers": "^0.4.14",
     "@testing-library/jest-dom": "^5.16.5",
     "@testing-library/react": "^14.0.0",
@@ -87,8 +87,8 @@
   },
   "dependencies": {
     "cross-env": "^7.0.3",
-    "dotenv-cli": "^7.0.0",
-    "inquirer": "^9.1.4",
+    "dotenv-cli": "^7.1.0",
+    "inquirer": "^9.1.5",
     "semver": "^7.3.8",
     "yargs": "^17.7.1"
   },

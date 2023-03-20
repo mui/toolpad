@@ -115,21 +115,11 @@ export default function CreateCodeComponentDialog({
             });
             const appNode = appDom.getApp(dom);
 
-            if (config.localMode) {
-              appStateApi.update((draft) =>
-                appDom.addNode(draft, newNode, appNode, 'codeComponents'),
-              );
+            appStateApi.update((draft) =>
+              appDom.addNode(draft, newNode, appNode, 'codeComponents'),
+            );
 
-              setSnackbarState({ name });
-            } else {
-              appStateApi.update(
-                (draft) => appDom.addNode(draft, newNode, appNode, 'codeComponents'),
-                {
-                  kind: 'codeComponent',
-                  nodeId: newNode.id,
-                },
-              );
-            }
+            setSnackbarState({ name });
 
             onClose();
           }}

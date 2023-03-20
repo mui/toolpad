@@ -1,0 +1,173 @@
+nodes:
+  h60gd9e:
+    name: Application
+    attributes: {}
+    id: h60gd9e
+    type: app
+    parentId: null
+    parentProp: null
+    parentIndex: null
+  h71gdad:
+    name: page1
+    attributes:
+      title:
+        type: const
+        value: Page 1
+      parameters:
+        type: const
+        value:
+          - - baseRef
+            - master
+          - - baseCommit
+            - 467a3af67ee21b4a0949d0053b2113b89e1cd6ca
+          - - circleCIBuildNumber
+            - "478251"
+    id: h71gdad
+    type: page
+    parentId: h60gd9e
+    parentProp: pages
+    parentIndex: a0
+  dk03lv4:
+    attributes:
+      query:
+        type: const
+        value:
+          function: getBundleSizes
+      connectionId:
+        type: const
+        value: null
+      dataSource:
+        type: const
+        value: local
+    name: bundleSizes
+    id: dk03lv4
+    type: query
+    parentId: h71gdad
+    parentProp: queries
+    parentIndex: a0
+    params:
+      - - baseRef
+        - type: jsExpression
+          value: |
+            page.parameters.baseRef
+      - - baseCommit
+        - type: jsExpression
+          value: |
+            page.parameters.baseCommit
+      - - circleCIBuildNumber
+        - type: jsExpression
+          value: |
+            page.parameters.circleCIBuildNumber
+  3d43lvk:
+    name: pageRow
+    props: {}
+    attributes:
+      component:
+        type: const
+        value: PageRow
+    layout: {}
+    id: 3d43lvk
+    type: element
+    parentId: h71gdad
+    parentProp: children
+    parentIndex: a0
+  sl33lb6:
+    name: dataGrid
+    props:
+      rows:
+        type: jsExpression
+        value: |
+          bundleSizes.data
+      columns:
+        type: const
+        value:
+          - field: id
+            type: string
+            headerName: Bundle
+            width: 334
+          - field: absoluteDiff.parsed
+            type: codeComponent
+            codeComponent: diff
+            headerName: Size change
+            align: right
+          - field: relativeDiff.parsed
+            type: codeComponent
+            codeComponent: percent
+            width: 111
+            headerName: Size %
+            align: right
+          - field: current.parsed
+            type: number
+            headerName: Size
+            numberFormat:
+              kind: preset
+              preset: bytes
+          - field: absoluteDiff.gzip
+            type: codeComponent
+            headerName: Gzip change
+            codeComponent: diff
+            align: right
+          - field: relativeDiff.gzip
+            type: codeComponent
+            codeComponent: percent
+            headerName: Gzip %
+            align: right
+          - field: current.gzip
+            type: number
+            numberFormat:
+              kind: preset
+              preset: bytes
+            headerName: Gzip
+      height:
+        type: const
+        value: 534
+      density:
+        type: const
+        value: standard
+    attributes:
+      component:
+        type: const
+        value: DataGrid
+    layout: {}
+    id: sl33lb6
+    type: element
+    parentId: 3d43lvk
+    parentProp: children
+    parentIndex: a0
+  r413myq:
+    name: pageRow1
+    props: {}
+    attributes:
+      component:
+        type: const
+        value: PageRow
+    layout: {}
+    id: r413myq
+    type: element
+    parentId: h71gdad
+    parentProp: children
+    parentIndex: Zz
+  aq03mi8:
+    name: text
+    props:
+      value:
+        type: const
+        value: "# Size comparison"
+      variant:
+        type: const
+        value: h2
+      mode:
+        type: const
+        value: markdown
+    attributes:
+      component:
+        type: const
+        value: Text
+    layout: {}
+    id: aq03mi8
+    type: element
+    parentId: r413myq
+    parentProp: children
+    parentIndex: a0
+root: h60gd9e
+version: 6

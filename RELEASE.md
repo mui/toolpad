@@ -67,3 +67,23 @@
    1. Use `<version number>` as the **Release title**
    1. Mark as prerelease if necessary.
    1. **Publish release**
+
+## npm
+
+For now using this to publish
+
+```sh
+yarn
+yarn release:build
+yarn release:publish
+```
+
+For canary releases:
+
+```sh
+yarn
+yarn release:build
+yarn release:publish-canary
+```
+
+<!-- TODO: work out full flow -->

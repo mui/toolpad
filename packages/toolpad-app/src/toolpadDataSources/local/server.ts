@@ -1,14 +1,22 @@
 import { ExecFetchResult, SerializedError } from '@mui/toolpad-core';
 import * as child_process from 'child_process';
 import * as esbuild from 'esbuild';
+import * as fs from 'fs/promises';
 import * as path from 'path';
 import invariant from 'invariant';
-import { indent } from '@mui/toolpad-core/utils/strings';
+import { indent, truncate } from '@mui/toolpad-core/utils/strings';
+import * as dotenv from 'dotenv';
+import * as chokidar from 'chokidar';
 import config from '../../config';
 import { ServerDataSource } from '../../types';
 import { LocalPrivateQuery, LocalQuery, LocalConnectionParams } from './types';
 import { Maybe } from '../../utils/types';
-import { getUserProjectRoot, openCodeEditor, QUERIES_FILE } from '../../server/localMode';
+import {
+  getUserProjectRoot,
+  openCodeEditor,
+  QUERIES_FILE,
+  readProjectFolder,
+} from '../../server/localMode';
 import { errorFrom, serializeError } from '../../utils/errors';
 
 type MessageToChildProcess =
@@ -31,9 +39,7 @@ type MessageFromChildProcess = {
 };
 
 declare module globalThis {
-  let builder: Promise<{
-    sendRequest(msg: MessageToChildProcess): Promise<any>;
-  }>;
+  let builder: Promise<ReturnType<typeof createBuilder>>;
 }
 
 let nextMsgId = 1;
@@ -58,52 +64,60 @@ const initPromise = new Promise<void>((resolve) => {
   setInitialized = resolve;
 });
 
-function revalidate() {
-  setInitialized();
-}
-
-async function execFunction(name: string, parameters: Record<string, unknown>) {
-  const builder = await globalThis.builder;
-  return builder.sendRequest({
-    kind: 'exec',
-    id: getNextId(),
-    name,
-    parameters,
-  });
-}
-
 function formatCodeFrame(location: esbuild.Location): string {
   const lineNumberCharacters = Math.ceil(Math.log10(location.line));
   return [
     `${location.file}:${location.line}:${location.column}:`,
     `  ${location.line} │ ${location.lineText}`,
-    `  ${' '.repeat(lineNumberCharacters)} ╵ ${' '.repeat(location.lineText.length - 1)}^`,
+    `  ${' '.repeat(lineNumberCharacters)} ╵ ${' '.repeat(
+      Math.max(location.lineText.length - 1, 0),
+    )}^`,
   ].join('\n');
 }
 
-async function introspect() {
-  const builder = await globalThis.builder;
-  return builder.sendRequest({
-    kind: 'introspect',
-    id: getNextId(),
-  });
+interface MainManifest {
+  queryFiles: { name: string; filepath: string }[];
 }
 
-async function createMain(): Promise<string> {
+async function createMain(manifest: MainManifest): Promise<string> {
+  const loadLines = manifest.queryFiles.map(
+    ({ name, filepath }) =>
+      `loadQuery(${JSON.stringify(name)}, () => import(${JSON.stringify(filepath)}))`,
+  );
   return `
-    import { TOOLPAD_QUERY } from '@mui/toolpad-core';
+    import { TOOLPAD_QUERY } from '@mui/toolpad-core/server';
     import { errorFrom, serializeError } from '@mui/toolpad-core/utils/errors';
+    import fetch, { Headers, Request, Response } from 'node-fetch'
+
+    // Polyfill fetch() in the Node.js environment
+    if (!global.fetch) {
+      global.fetch = fetch
+      global.Headers = Headers
+      global.Request = Request
+      global.Response = Response
+    }
+
+    async function loadQuery (name, importFn) {
+      const { default: resolver } = await importFn()
+      return [name, resolver]
+    }
 
     let resolversPromise
     async function getResolvers() {
       if (!resolversPromise) {
         resolversPromise = (async () => {
+          const fileQueryResolvers = await Promise.all([
+            ${loadLines.join(',')}
+          ]);
+
           const queries = await import(${JSON.stringify(QUERIES_FILE)})
 
-          return new Map(Object.entries(queries).flatMap(([name, resolver]) => {
+          const queriesFileResolvers = Object.entries(queries).flatMap(([name, resolver]) => {
             return typeof resolver === 'function' ? [[name, resolver]] : []
-          }))
-        })()
+          })
+
+          return new Map([...fileQueryResolvers, ...queriesFileResolvers]);
+        })();
       }
       return resolversPromise
     }
@@ -172,10 +186,120 @@ async function createMain(): Promise<string> {
 
 async function createBuilder() {
   const userProjectRoot = getUserProjectRoot();
+  const envFilePath = path.resolve(userProjectRoot, '.env');
+
   let currentRuntimeProcess: child_process.ChildProcess | undefined;
   let controller: AbortController | undefined;
   let buildErrors: Error[] = [];
   let runtimeError: Error | undefined;
+
+  const projectEntries = await readProjectFolder();
+  const entryPoints = projectEntries
+    .filter((entry) => entry.kind === 'query')
+    .map((entry) => entry.filepath);
+
+  const loadEnvFile = async () => {
+    try {
+      const envFileContent = await fs.readFile(envFilePath);
+      const parsed = dotenv.parse(envFileContent) as any;
+      // eslint-disable-next-line no-console
+      console.log(
+        `Loaded env file "${envFilePath}" with keys ${truncate(
+          Object.keys(parsed).join(', '),
+          1000,
+        )}`,
+      );
+
+      return parsed;
+    } catch (err) {
+      if (errorFrom(err).code !== 'ENOENT') {
+        throw err;
+      }
+    }
+
+    return {};
+  };
+
+  let outputFile: string | undefined;
+  let metafile: esbuild.Metafile | undefined;
+  let env: any = loadEnvFile();
+
+  const restartRuntimeProcess = () => {
+    if (controller) {
+      controller.abort();
+      controller = undefined;
+
+      // clean up handlers
+      for (const [id, execution] of pendingExecutions) {
+        execution.reject(new Error(`Aborted`));
+        clearTimeout(execution.timeout);
+        pendingExecutions.delete(id);
+      }
+    }
+
+    if (!outputFile) {
+      return;
+    }
+
+    controller = new AbortController();
+
+    const runtimeProcess = child_process.fork(`./${outputFile}`, {
+      cwd: userProjectRoot,
+      silent: true,
+      signal: controller.signal,
+      stdio: 'inherit',
+      env: {
+        ...process.env,
+        NODE_ENV: config.cmd === 'start' ? 'production' : 'development',
+        ...env,
+      },
+    });
+
+    runtimeError = undefined;
+
+    runtimeProcess.on('error', (error) => {
+      if (error.name === 'AbortError') {
+        return;
+      }
+      runtimeError = error;
+      console.error(`cp ${runtimeProcess.pid} error`, error);
+    });
+
+    runtimeProcess.on('exit', (code) => {
+      if (currentRuntimeProcess === runtimeProcess) {
+        currentRuntimeProcess = undefined;
+        if (code !== 0) {
+          runtimeError = new Error(`The runtime process exited with code ${code}`);
+          if (config.cmd === 'start') {
+            console.error(`The runtime process exited with code ${code}`);
+            process.exit(1);
+          }
+        }
+      }
+    });
+
+    runtimeProcess.on('message', (msg: MessageFromChildProcess) => {
+      switch (msg.kind) {
+        case 'result': {
+          const execution = pendingExecutions.get(msg.id);
+          if (execution) {
+            pendingExecutions.delete(msg.id);
+            clearTimeout(execution.timeout);
+            if (msg.error) {
+              execution.reject(new Error(msg.error.message || 'Unknown error'));
+            } else {
+              execution.resolve(msg.data);
+            }
+          }
+          break;
+        }
+        default:
+          console.error(`Unknowm message received "${msg.kind}"`);
+      }
+    });
+
+    currentRuntimeProcess = runtimeProcess;
+  };
 
   const toolpadPlugin: esbuild.Plugin = {
     name: 'toolpad',
@@ -187,7 +311,9 @@ async function createBuilder() {
 
       build.onLoad({ filter: /.*/, namespace: 'toolpad' }, async (args) => {
         if (args.path === 'main.ts') {
-          const contents = await createMain();
+          const contents = await createMain({
+            queryFiles: projectEntries.filter((entry) => entry.kind === 'query'),
+          });
           return {
             loader: 'tsx',
             contents,
@@ -213,85 +339,30 @@ async function createBuilder() {
         });
 
         if (buildErrors.length <= 0) {
-          if (controller) {
-            controller.abort();
-            controller = undefined;
-
-            // clean up handlers
-            for (const [id, execution] of pendingExecutions) {
-              execution.reject(new Error(`Aborted`));
-              clearTimeout(execution.timeout);
-              pendingExecutions.delete(id);
-            }
-          }
-
-          controller = new AbortController();
-          const metafile = args.metafile;
+          metafile = args.metafile;
           invariant(metafile, 'esbuild settings should enable metafile');
-          const outputFileNames = Object.keys(metafile.outputs);
-          invariant(outputFileNames.length === 1, 'esbuild should build only one output file');
-          const outputFile = outputFileNames[0];
-          const runtimeProcess = child_process.fork(`./${outputFile}`, {
-            cwd: userProjectRoot,
-            silent: true,
-            signal: controller.signal,
-            stdio: 'inherit',
-          });
-          runtimeError = undefined;
+          const mainEntry = Object.entries(metafile.outputs).find(
+            ([, entry]) => entry.entryPoint === 'toolpad:main.ts',
+          );
+          invariant(mainEntry, 'No output found for main entry point');
+          outputFile = mainEntry[0];
 
-          runtimeProcess.on('error', (error) => {
-            if (error.name === 'AbortError') {
-              return;
-            }
-            runtimeError = error;
-            console.error(`cp ${runtimeProcess.pid} error`, error);
-          });
-
-          runtimeProcess.on('exit', (code) => {
-            if (currentRuntimeProcess === runtimeProcess) {
-              currentRuntimeProcess = undefined;
-              if (code !== 0) {
-                runtimeError = new Error(`The runtime process exited with code ${code}`);
-              }
-            }
-          });
-
-          runtimeProcess.on('message', (msg: MessageFromChildProcess) => {
-            switch (msg.kind) {
-              case 'result': {
-                const execution = pendingExecutions.get(msg.id);
-                if (execution) {
-                  pendingExecutions.delete(msg.id);
-                  clearTimeout(execution.timeout);
-                  if (msg.error) {
-                    execution.reject(new Error(msg.error.message || 'Unknown error'));
-                  } else {
-                    execution.resolve(msg.data);
-                  }
-                }
-                break;
-              }
-              default:
-                console.error(`Unknowm message received "${msg.kind}"`);
-            }
-          });
-
-          currentRuntimeProcess = runtimeProcess;
+          restartRuntimeProcess();
         }
 
-        revalidate();
+        setInitialized();
       });
     },
   };
 
   const ctx = await esbuild.context({
     absWorkingDir: userProjectRoot,
-    entryPoints: ['toolpad:main.ts'],
+    entryPoints: ['toolpad:main.ts', ...entryPoints],
     plugins: [toolpadPlugin],
     write: true,
     bundle: true,
     metafile: true,
-    outfile: path.resolve(userProjectRoot, './.toolpad-generated/queries.js'),
+    outdir: path.resolve(userProjectRoot, './.toolpad-generated/'),
     platform: 'node',
     packages: 'external',
     target: 'es2022',
@@ -323,9 +394,52 @@ async function createBuilder() {
     });
   }
 
+  async function execute(name: string, parameters: Record<string, unknown>) {
+    return sendRequest({
+      kind: 'exec',
+      id: getNextId(),
+      name,
+      parameters,
+    });
+  }
+
+  async function introspect() {
+    return sendRequest({
+      kind: 'introspect',
+      id: getNextId(),
+    });
+  }
+
+  let envFileWatcher: chokidar.FSWatcher | undefined;
+
   return {
-    ctx,
-    sendRequest,
+    watch() {
+      ctx.watch();
+
+      (async () => {
+        try {
+          if (envFileWatcher) {
+            await envFileWatcher.close();
+          }
+
+          envFileWatcher = chokidar.watch([envFilePath]);
+          envFileWatcher.on('all', async () => {
+            env = await loadEnvFile();
+            restartRuntimeProcess();
+          });
+        } catch (err: unknown) {
+          if (errorFrom(err).name === 'AbortError') {
+            return;
+          }
+          throw err;
+        }
+      })();
+    },
+    introspect,
+    execute,
+    async dispose() {
+      await Promise.all([ctx.dispose(), envFileWatcher?.close(), controller?.abort()]);
+    },
   };
 }
 
@@ -338,7 +452,8 @@ async function execBase(
     throw new Error(`No function name chosen`);
   }
   try {
-    const data = await execFunction(localQuery.function, params);
+    const builder = await globalThis.builder;
+    const data = await builder.execute(localQuery.function, params);
     return { data };
   } catch (rawError) {
     return { error: serializeError(errorFrom(rawError)) };
@@ -347,8 +462,11 @@ async function execBase(
 
 async function execPrivate(connection: Maybe<LocalConnectionParams>, query: LocalPrivateQuery) {
   switch (query.kind) {
-    case 'introspection':
-      return introspect();
+    case 'introspection': {
+      const builder = await globalThis.builder;
+      const introspectionResult = await builder.introspect();
+      return introspectionResult;
+    }
     case 'debugExec':
       return execBase(connection, query.query, query.params);
     case 'openEditor':
@@ -376,7 +494,7 @@ export default dataSource;
 
 async function startDev() {
   const builder = await createBuilder();
-  await builder.ctx.watch();
+  await builder.watch();
   return builder;
 }
 

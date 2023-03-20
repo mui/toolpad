@@ -5,10 +5,9 @@ import {
   BoxProps,
 } from '@mui/material';
 import { createComponent, useNode } from '@mui/toolpad-core';
-import { FieldError } from 'react-hook-form';
-import * as _ from 'lodash-es';
+import { FieldError, Controller } from 'react-hook-form';
 import { SX_PROP_HELPER_TEXT } from './constants';
-import { FormContext, withComponentForm } from './Form';
+import { FormContext, useFormInput, withComponentForm } from './Form';
 
 export type TextFieldProps = Omit<MuiTextFieldProps, 'value' | 'onChange'> & {
   value: string;
@@ -37,83 +36,74 @@ function TextField({
 
   const nodeName = rest.name || nodeRuntime?.nodeName;
 
-  const { form, fieldValues } = React.useContext(FormContext);
+  const { form } = React.useContext(FormContext);
   const fieldError = nodeName && form?.formState.errors[nodeName];
-
-  const handleChange = React.useCallback(
-    (event: React.ChangeEvent<HTMLInputElement>) => {
-      const newValue = event.target.value;
-
-      if (form && nodeName) {
-        form.setValue(nodeName, newValue);
-      } else {
-        onChange(newValue);
-      }
-    },
-    [form, nodeName, onChange],
-  );
-
-  const previousDefaultValueRef = React.useRef(defaultValue);
-  React.useEffect(() => {
-    if (form && nodeName && defaultValue !== previousDefaultValueRef.current) {
-      if (form && nodeName) {
-        form.setValue(nodeName, defaultValue);
-      }
-      previousDefaultValueRef.current = defaultValue;
-    }
-  }, [form, nodeName, onChange, defaultValue]);
-
-  const isInitialForm = Object.keys(fieldValues).length === 0;
-
-  React.useEffect(() => {
-    if (form && nodeName) {
-      if (!fieldValues[nodeName] && defaultValue && isInitialForm) {
-        onChange(defaultValue || '');
-        form.setValue(nodeName, defaultValue || '');
-      } else if (value !== fieldValues[nodeName]) {
-        onChange(fieldValues[nodeName] || '');
-      }
-    }
-  }, [defaultValue, fieldValues, form, isInitialForm, nodeName, onChange, value]);
 
   const validationProps = React.useMemo(
     () => ({ isRequired, minLength, maxLength, isInvalid }),
     [isInvalid, isRequired, maxLength, minLength],
   );
-  const previousManualValidationPropsRef = React.useRef(validationProps);
-  React.useEffect(() => {
-    if (form && !_.isEqual(validationProps, previousManualValidationPropsRef.current)) {
-      form.trigger();
-      previousManualValidationPropsRef.current = validationProps;
-    }
-  }, [form, validationProps]);
 
-  return (
-    <MuiTextField
-      {...rest}
-      {...(form && nodeName
-        ? {
-            ...form.register(nodeName, {
-              required: isRequired ? `${nodeName} is required.` : false,
-              minLength: minLength
-                ? {
-                    value: minLength,
-                    message: `${nodeName} must have at least ${minLength} characters.`,
-                  }
-                : undefined,
-              maxLength: maxLength
-                ? {
-                    value: maxLength,
-                    message: `${nodeName} must have no more than ${maxLength} characters.`,
-                  }
-                : undefined,
-              validate: () => !isInvalid || `${nodeName} is invalid.`,
-            }),
-            error: Boolean(fieldError),
-            helperText: (fieldError as FieldError)?.message || '',
-          }
-        : { value, onChange: handleChange })}
+  const { onFormInputChange } = useFormInput<string>({
+    name: nodeName,
+    value,
+    onChange,
+    emptyValue: '',
+    defaultValue,
+    validationProps,
+  });
+
+  const handleChange = React.useCallback(
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      const newValue = event.target.value;
+
+      if (form) {
+        onFormInputChange(newValue);
+      } else {
+        onChange(newValue);
+      }
+    },
+    [form, onChange, onFormInputChange],
+  );
+
+  const textFieldProps = {
+    ...rest,
+    value,
+    onChange: handleChange,
+    ...(form && {
+      error: Boolean(fieldError),
+      helperText: (fieldError as FieldError)?.message || '',
+    }),
+  };
+
+  const textFieldElement = <MuiTextField {...textFieldProps} />;
+
+  const fieldDisplayName = rest.label || nodeName;
+
+  return form && nodeName ? (
+    <Controller
+      name={nodeName}
+      control={form.control}
+      rules={{
+        required: isRequired ? `${fieldDisplayName} is required.` : false,
+        minLength: minLength
+          ? {
+              value: minLength,
+              message: `${fieldDisplayName} must have at least ${minLength} characters.`,
+            }
+          : undefined,
+        maxLength: maxLength
+          ? {
+              value: maxLength,
+              message: `${fieldDisplayName} must have no more than ${maxLength} characters.`,
+            }
+          : undefined,
+        validate: () => !isInvalid || `${fieldDisplayName} is invalid.`,
+      }}
+      render={() => textFieldElement}
     />
+  ) : (
+    textFieldElement
   );
 }
 

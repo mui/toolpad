@@ -2,9 +2,8 @@ import * as React from 'react';
 import { TextFieldProps, MenuItem, TextField } from '@mui/material';
 import { createComponent, useNode } from '@mui/toolpad-core';
 import { FieldError, Controller } from 'react-hook-form';
-import * as _ from 'lodash-es';
 import { SX_PROP_HELPER_TEXT } from './constants';
-import { FormContext, withComponentForm } from './Form';
+import { FormContext, useFormInput, withComponentForm } from './Form';
 
 export interface SelectOption {
   value: string;
@@ -36,8 +35,18 @@ function Select({
 
   const nodeName = rest.name || nodeRuntime?.nodeName;
 
-  const { form, fieldValues } = React.useContext(FormContext);
+  const { form } = React.useContext(FormContext);
   const fieldError = nodeName && form?.formState.errors[nodeName];
+
+  const validationProps = React.useMemo(() => ({ isRequired, isInvalid }), [isInvalid, isRequired]);
+
+  const { onFormInputChange } = useFormInput<string>({
+    name: nodeName,
+    value,
+    onChange,
+    defaultValue,
+    validationProps,
+  });
 
   const id = React.useId();
 
@@ -45,46 +54,14 @@ function Select({
     (event: React.ChangeEvent<HTMLInputElement>) => {
       const newValue = event.target.value;
 
-      if (form && nodeName) {
-        form.setValue(nodeName, newValue);
+      if (form) {
+        onFormInputChange(newValue);
       } else {
         onChange(newValue);
       }
     },
-    [form, nodeName, onChange],
+    [form, onChange, onFormInputChange],
   );
-
-  const previousDefaultValueRef = React.useRef(defaultValue);
-  React.useEffect(() => {
-    if (form && nodeName && defaultValue !== previousDefaultValueRef.current) {
-      if (form && nodeName) {
-        form.setValue(nodeName, defaultValue);
-      }
-      previousDefaultValueRef.current = defaultValue;
-    }
-  }, [form, nodeName, onChange, defaultValue]);
-
-  const isInitialForm = Object.keys(fieldValues).length === 0;
-
-  React.useEffect(() => {
-    if (form && nodeName) {
-      if (!fieldValues[nodeName] && defaultValue && isInitialForm) {
-        onChange(defaultValue);
-        form.setValue(nodeName, defaultValue);
-      } else if (value !== fieldValues[nodeName]) {
-        onChange(fieldValues[nodeName]);
-      }
-    }
-  }, [defaultValue, fieldValues, form, isInitialForm, nodeName, onChange, value]);
-
-  const validationProps = React.useMemo(() => ({ isRequired, isInvalid }), [isInvalid, isRequired]);
-  const previousManualValidationPropsRef = React.useRef(validationProps);
-  React.useEffect(() => {
-    if (form && !_.isEqual(validationProps, previousManualValidationPropsRef.current)) {
-      form.trigger();
-      previousManualValidationPropsRef.current = validationProps;
-    }
-  }, [form, validationProps]);
 
   const renderedOptions = React.useMemo(
     () =>
@@ -104,7 +81,6 @@ function Select({
     ...rest,
     value,
     onChange: handleChange,
-    defaultValue,
     select: true,
     sx: { ...(!fullWidth && !value ? { width: 120 } : {}), ...sx },
     fullWidth: true,
@@ -116,13 +92,15 @@ function Select({
 
   const selectElement = <TextField {...selectProps}>{renderedOptions}</TextField>;
 
+  const fieldDisplayName = rest.label || nodeName;
+
   return form && nodeName ? (
     <Controller
       name={nodeName}
       control={form.control}
       rules={{
-        required: isRequired ? `${nodeName} is required.` : false,
-        validate: () => !isInvalid || `${nodeName} is invalid.`,
+        required: isRequired ? `${fieldDisplayName} is required.` : false,
+        validate: () => !isInvalid || `${fieldDisplayName} is invalid.`,
       }}
       render={() => selectElement}
     />

@@ -2,8 +2,7 @@ import * as React from 'react';
 import { TextField as MuiTextField, TextFieldProps as MuiTextFieldProps } from '@mui/material';
 import { createComponent, useNode } from '@mui/toolpad-core';
 import { Controller, FieldError } from 'react-hook-form';
-import * as _ from 'lodash-es';
-import { FormContext, withComponentForm } from './Form';
+import { FormContext, useFormInput, withComponentForm } from './Form';
 
 interface FullFile {
   name: string;
@@ -14,6 +13,7 @@ interface FullFile {
 
 export type FilePickerProps = MuiTextFieldProps & {
   multiple: boolean;
+  value: FullFile[];
   onChange: (files: FullFile[]) => void;
   name: string;
   isRequired: boolean;
@@ -49,8 +49,17 @@ function FilePicker({
 
   const nodeName = rest.name || nodeRuntime?.nodeName;
 
-  const { form, fieldValues } = React.useContext(FormContext);
+  const { form } = React.useContext(FormContext);
   const fieldError = nodeName && form?.formState.errors[nodeName];
+
+  const validationProps = React.useMemo(() => ({ isRequired, isInvalid }), [isInvalid, isRequired]);
+
+  const { onFormInputChange } = useFormInput<FullFile[]>({
+    name: nodeName,
+    value,
+    onChange,
+    validationProps,
+  });
 
   const handleChange = async (changeEvent: React.ChangeEvent<HTMLInputElement>) => {
     const filesPromises = Array.from(changeEvent.target.files || []).map(async (file) => {
@@ -66,27 +75,12 @@ function FilePicker({
 
     const files = await Promise.all(filesPromises);
 
-    if (form && nodeName) {
-      form.setValue(nodeName, files);
+    if (form) {
+      onFormInputChange(files);
     } else {
       onChange(files);
     }
   };
-
-  React.useEffect(() => {
-    if (fieldValues && nodeName) {
-      onChange(fieldValues[nodeName]);
-    }
-  }, [fieldValues, nodeName, onChange]);
-
-  const validationProps = React.useMemo(() => ({ isRequired, isInvalid }), [isInvalid, isRequired]);
-  const previousManualValidationPropsRef = React.useRef(validationProps);
-  React.useEffect(() => {
-    if (form && !_.isEqual(validationProps, previousManualValidationPropsRef.current)) {
-      form.trigger();
-      previousManualValidationPropsRef.current = validationProps;
-    }
-  }, [form, validationProps]);
 
   const filePickerProps = {
     ...rest,
@@ -103,13 +97,15 @@ function FilePicker({
     }),
   };
 
+  const fieldDisplayName = rest.label || nodeName;
+
   return form && nodeName ? (
     <Controller
       name={nodeName}
       control={form.control}
       rules={{
-        required: isRequired ? `${nodeName} is required.` : false,
-        validate: () => !isInvalid || `${nodeName} is invalid.`,
+        required: isRequired ? `${fieldDisplayName} is required.` : false,
+        validate: () => !isInvalid || `${fieldDisplayName} is invalid.`,
       }}
       render={() => <MuiTextField {...filePickerProps} />}
     />

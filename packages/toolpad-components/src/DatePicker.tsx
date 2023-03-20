@@ -6,9 +6,8 @@ import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { createComponent, useNode } from '@mui/toolpad-core';
 import { Dayjs } from 'dayjs';
 import { Controller, FieldError } from 'react-hook-form';
-import * as _ from 'lodash-es';
 import { SX_PROP_HELPER_TEXT } from './constants';
-import { FormContext, withComponentForm } from './Form';
+import { FormContext, useFormInput, withComponentForm } from './Form';
 
 const LOCALE_LOADERS = new Map([
   ['en', () => import('dayjs/locale/en')],
@@ -93,54 +92,33 @@ function DatePicker({
 
   const nodeName = rest.name || nodeRuntime?.nodeName;
 
-  const { form, fieldValues } = React.useContext(FormContext);
+  const { form } = React.useContext(FormContext);
   const fieldError = nodeName && form?.formState.errors[nodeName];
+
+  const validationProps = React.useMemo(() => ({ isRequired, isInvalid }), [isInvalid, isRequired]);
+
+  const { onFormInputChange } = useFormInput<string | null>({
+    name: nodeName,
+    value,
+    onChange,
+    defaultValue,
+    emptyValue: null,
+    validationProps,
+  });
 
   const handleChange = React.useCallback(
     (newValue: Dayjs | null) => {
       // date-only form of ISO8601. See https://tc39.es/ecma262/#sec-date-time-string-format
       const stringValue = newValue?.format('YYYY-MM-DD') || '';
 
-      if (form && nodeName) {
-        form.setValue(nodeName, stringValue);
+      if (form) {
+        onFormInputChange(stringValue);
       } else {
         onChange(stringValue);
       }
     },
-    [form, nodeName, onChange],
+    [form, onChange, onFormInputChange],
   );
-
-  const previousDefaultValueRef = React.useRef(defaultValue);
-  React.useEffect(() => {
-    if (form && nodeName && defaultValue !== previousDefaultValueRef.current) {
-      if (form && nodeName) {
-        form.setValue(nodeName, defaultValue);
-      }
-      previousDefaultValueRef.current = defaultValue;
-    }
-  }, [defaultValue, form, nodeName, onChange]);
-
-  const isInitialForm = Object.keys(fieldValues).length === 0;
-
-  React.useEffect(() => {
-    if (form && nodeName) {
-      if (defaultValue && isInitialForm) {
-        onChange(defaultValue || null);
-        form.setValue(nodeName, defaultValue || null);
-      } else if (value !== fieldValues[nodeName]) {
-        onChange(fieldValues[nodeName] || null);
-      }
-    }
-  }, [fieldValues, form, isInitialForm, nodeName, onChange, defaultValue, value]);
-
-  const validationProps = React.useMemo(() => ({ isRequired, isInvalid }), [isInvalid, isRequired]);
-  const previousManualValidationPropsRef = React.useRef(validationProps);
-  React.useEffect(() => {
-    if (form && !_.isEqual(validationProps, previousManualValidationPropsRef.current)) {
-      form.trigger();
-      previousManualValidationPropsRef.current = validationProps;
-    }
-  }, [form, validationProps]);
 
   const adapterLocale = React.useSyncExternalStore(subscribeLocaleLoader, getSnapshot);
 
@@ -166,6 +144,8 @@ function DatePicker({
 
   const datePickerElement = <DesktopDatePicker {...datePickerProps} />;
 
+  const fieldDisplayName = rest.label || nodeName;
+
   return (
     <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale={adapterLocale}>
       {form && nodeName ? (
@@ -173,8 +153,8 @@ function DatePicker({
           name={nodeName}
           control={form.control}
           rules={{
-            required: isRequired ? `${nodeName} is required.` : false,
-            validate: () => !isInvalid || `${nodeName} is invalid.`,
+            required: isRequired ? `${fieldDisplayName} is required.` : false,
+            validate: () => !isInvalid || `${fieldDisplayName} is invalid.`,
           }}
           render={() => datePickerElement}
         />

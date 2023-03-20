@@ -3,6 +3,7 @@ import { Container, ContainerProps, Box, Stack, BoxProps } from '@mui/material';
 import { LoadingButton } from '@mui/lab';
 import { createComponent } from '@mui/toolpad-core';
 import { useForm, FieldValues, ValidationMode } from 'react-hook-form';
+import * as _ from 'lodash-es';
 import { SX_PROP_HELPER_TEXT } from './constants';
 
 export const FormContext = React.createContext<{
@@ -20,10 +21,10 @@ interface FormProps extends ContainerProps {
   formControlsAlign?: BoxProps['justifyContent'];
   formControlsFullWidth?: boolean;
   submitButtonText?: string;
-  submitButtonLoadingText?: string;
   hasResetButton?: boolean;
   mode?: keyof ValidationMode | undefined;
   hasChrome?: boolean;
+  hideControls?: boolean;
 }
 
 function Form({
@@ -35,9 +36,9 @@ function Form({
   formControlsAlign = 'end',
   formControlsFullWidth,
   submitButtonText = 'Submit',
-  submitButtonLoadingText = 'Submitting…',
   mode = 'onSubmit',
   hasChrome = true,
+  hideControls = false,
   sx,
   ...rest
 }: FormProps) {
@@ -80,40 +81,44 @@ function Form({
     <FormContext.Provider value={formContextValue}>
       {hasChrome ? (
         <Container disableGutters sx={sx} {...rest}>
-          <form onSubmit={form.handleSubmit(handleSubmit)}>
+          <form onSubmit={form.handleSubmit(handleSubmit)} onReset={handleReset}>
             {children}
-            <Box
-              sx={{
-                display: 'flex',
-                flexDirection: 'row',
-                justifyContent: formControlsAlign,
-                pt: 1,
-              }}
-            >
-              <Stack
-                direction="row"
-                spacing={1}
-                sx={{ flex: formControlsFullWidth ? 1 : '0 1 auto' }}
+            {!hideControls ? (
+              <Box
+                sx={{
+                  display: 'flex',
+                  flexDirection: 'row',
+                  justifyContent: formControlsAlign,
+                  pt: 1,
+                }}
               >
-                {hasResetButton ? (
-                  <LoadingButton
-                    variant="contained"
-                    onClick={handleReset}
-                    sx={{ flex: formControlsFullWidth ? 1 : '0 1 auto' }}
-                  >
-                    Reset
-                  </LoadingButton>
-                ) : null}
-                <LoadingButton
-                  type="submit"
-                  variant="contained"
-                  loading={form.formState.isSubmitting}
+                <Stack
+                  direction="row"
+                  spacing={1}
                   sx={{ flex: formControlsFullWidth ? 1 : '0 1 auto' }}
                 >
-                  {form.formState.isSubmitting ? submitButtonLoadingText : submitButtonText}
-                </LoadingButton>
-              </Stack>
-            </Box>
+                  {hasResetButton ? (
+                    <LoadingButton
+                      type="reset"
+                      color="secondary"
+                      variant="contained"
+                      sx={{ flex: formControlsFullWidth ? 1 : '0 1 auto' }}
+                    >
+                      Reset
+                    </LoadingButton>
+                  ) : null}
+                  <LoadingButton
+                    type="submit"
+                    color="primary"
+                    variant="contained"
+                    loading={form.formState.isSubmitting}
+                    sx={{ flex: formControlsFullWidth ? 1 : '0 1 auto' }}
+                  >
+                    {submitButtonText}
+                  </LoadingButton>
+                </Stack>
+              </Box>
+            ) : null}
           </form>
         </Container>
       ) : (
@@ -121,6 +126,84 @@ function Form({
       )}
     </FormContext.Provider>
   );
+}
+
+interface UseFormInputInput<V> {
+  name?: string | null;
+  value: V;
+  onChange: (newValue: V) => void;
+  emptyValue?: V;
+  defaultValue?: V;
+  validationProps: Record<string, unknown>;
+}
+
+interface UseFormInputPayload<V> {
+  onFormInputChange: (newValue: V) => void;
+}
+
+export function useFormInput<V>({
+  name,
+  value,
+  onChange,
+  emptyValue,
+  defaultValue,
+  validationProps,
+}: UseFormInputInput<V>): UseFormInputPayload<V> {
+  const { form, fieldValues } = React.useContext(FormContext);
+
+  const handleFormInputChange = React.useCallback(
+    (newValue: V) => {
+      if (form && name) {
+        form.setValue(name, newValue, {
+          shouldValidate: true,
+          shouldDirty: true,
+          shouldTouch: true,
+        });
+        onChange(newValue);
+      }
+    },
+    [form, name, onChange],
+  );
+
+  const previousDefaultValueRef = React.useRef(defaultValue);
+  React.useEffect(() => {
+    if (form && name && defaultValue !== previousDefaultValueRef.current) {
+      if (form && name) {
+        form.setValue(name, defaultValue);
+      }
+      previousDefaultValueRef.current = defaultValue;
+    }
+  }, [form, name, onChange, defaultValue]);
+
+  const isInitialForm = Object.keys(fieldValues).length === 0;
+
+  React.useEffect(() => {
+    if (form && name) {
+      if (!fieldValues[name] && defaultValue && isInitialForm) {
+        onChange((defaultValue || emptyValue) as V);
+        form.setValue(name, defaultValue || emptyValue);
+      } else if (value !== fieldValues[name]) {
+        onChange(fieldValues[name] || emptyValue);
+      }
+    }
+  }, [defaultValue, emptyValue, fieldValues, form, isInitialForm, name, onChange, value]);
+
+  const previousManualValidationPropsRef = React.useRef(validationProps);
+  React.useEffect(() => {
+    if (
+      form &&
+      name &&
+      !_.isEqual(validationProps, previousManualValidationPropsRef.current) &&
+      form.formState.dirtyFields[name]
+    ) {
+      form.trigger(name);
+      previousManualValidationPropsRef.current = validationProps;
+    }
+  }, [form, name, validationProps]);
+
+  return {
+    onFormInputChange: handleFormInputChange,
+  };
 }
 
 export function withComponentForm<P extends Record<string, any>>(
@@ -180,12 +263,12 @@ export default createComponent(Form, {
       helperText: 'Submit button text.',
       typeDef: { type: 'string', default: 'Submit' },
     },
-    submitButtonLoadingText: {
-      helperText: 'Submit button text while submitting form.',
-      typeDef: { type: 'string', default: 'Submitting…' },
-    },
     hasResetButton: {
       helperText: 'Show button to reset form values.',
+      typeDef: { type: 'boolean', default: false },
+    },
+    hideControls: {
+      helperText: 'Hide form controls.',
       typeDef: { type: 'boolean', default: false },
     },
     sx: {

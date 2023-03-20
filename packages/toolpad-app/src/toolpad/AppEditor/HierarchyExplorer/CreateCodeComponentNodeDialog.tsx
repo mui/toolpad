@@ -19,7 +19,6 @@ import DialogForm from '../../../components/DialogForm';
 import useEvent from '../../../utils/useEvent';
 import { useNodeNameValidation } from './validation';
 import client from '../../../api';
-import config from '../../../config';
 import useLatest from '../../../utils/useLatest';
 
 const DEFAULT_NAME = 'MyComponent';

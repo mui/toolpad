@@ -19,14 +19,31 @@ export function getUserProjectRoot(): string {
   return projectDir;
 }
 
-function getLegacyConfigFilePath() {
-  const filePath = path.resolve(getUserProjectRoot(), './toolpad.yaml');
-  return filePath;
+export async function fileExists(filepath: string): Promise<boolean> {
+  try {
+    const stat = await fs.stat(filepath);
+    return stat.isFile();
+  } catch (err) {
+    if (errorFrom(err).code === 'ENOENT') {
+      return false;
+    }
+    throw err;
+  }
 }
 
-export function getConfigFilePath() {
-  const filePath = path.resolve(getUserProjectRoot(), './toolpad.yml');
-  return filePath;
+export async function getConfigFilePath() {
+  const yamlFilePath = path.resolve(getUserProjectRoot(), './toolpad.yaml');
+  const ymlFilePath = path.resolve(getUserProjectRoot(), './toolpad.yml');
+
+  if (await fileExists(yamlFilePath)) {
+    return yamlFilePath;
+  }
+
+  if (await fileExists(ymlFilePath)) {
+    return ymlFilePath;
+  }
+
+  return yamlFilePath;
 }
 
 type ComponentsContent = Record<string, string>;
@@ -47,6 +64,7 @@ function getComponentFilePath(componentsFolder: string, componentName: string): 
 
 async function loadCodeComponentsFromFiles(): Promise<ComponentsContent> {
   const componentsFolder = getComponentFolder();
+  await fs.mkdir(componentsFolder, { recursive: true });
   let entries: Dirent[] = [];
   try {
     entries = await fs.readdir(componentsFolder, { withFileTypes: true });
@@ -72,8 +90,25 @@ async function loadCodeComponentsFromFiles(): Promise<ComponentsContent> {
   return Object.fromEntries(resultEntries.filter(Boolean));
 }
 
+class Lock {
+  pending: Promise<any> | null = null;
+
+  async use<T = void>(doWork: () => Promise<T>): Promise<T> {
+    try {
+      this.pending = Promise.resolve(this.pending).then(() => doWork());
+      return await this.pending;
+    } finally {
+      this.pending = null;
+    }
+  }
+}
+
+const configFileLock = new Lock();
+
 async function writeConfigFile(filePath: string, dom: appDom.AppDom): Promise<void> {
-  await fs.writeFile(filePath, yaml.stringify(dom), { encoding: 'utf-8' });
+  await configFileLock.use(() =>
+    fs.writeFile(filePath, yaml.stringify(dom), { encoding: 'utf-8' }),
+  );
 }
 
 async function writeCodeComponentsToFiles(
@@ -150,18 +185,6 @@ function extractNewComponentsContentFromDom(dom: appDom.AppDom): ExtractedCompon
   return { components, dom };
 }
 
-export async function fileExists(filepath: string): Promise<boolean> {
-  try {
-    const stat = await fs.stat(filepath);
-    return stat.isFile();
-  } catch (err) {
-    if (errorFrom(err).code === 'ENOENT') {
-      return false;
-    }
-    throw err;
-  }
-}
-
 const DEFAULT_QUERIES_FILE_CONTENT = `// Toolpad queries:
 
 export async function example() {
@@ -181,7 +204,7 @@ export async function writeQueriesFile(): Promise<void> {
 }
 
 export async function writeDomToDisk(dom: appDom.AppDom): Promise<void> {
-  const configFilePath = getConfigFilePath();
+  const configFilePath = await getConfigFilePath();
   const componentsFolder = getComponentFolder();
 
   const { components: componentsContent, dom: domWithoutComponents } =
@@ -203,8 +226,12 @@ export async function saveLocalDom(dom: appDom.AppDom): Promise<void> {
 
 async function loadConfigFileFrom(configFilePath: string): Promise<appDom.AppDom | null> {
   try {
-    const configContent = await fs.readFile(configFilePath, { encoding: 'utf-8' });
+    // Using a lock to avoid read during write which may result in reading truncated file content
+    const configContent = await configFileLock.use(() =>
+      fs.readFile(configFilePath, { encoding: 'utf-8' }),
+    );
     const parsedConfig = yaml.parse(configContent);
+    invariant(parsedConfig, 'Invalid Toolpad config');
     return parsedConfig;
   } catch (rawError) {
     const error = errorFrom(rawError);
@@ -216,20 +243,11 @@ async function loadConfigFileFrom(configFilePath: string): Promise<appDom.AppDom
 }
 
 async function loadConfigFile() {
-  const configFilePath = getConfigFilePath();
+  const configFilePath = await getConfigFilePath();
   const dom = await loadConfigFileFrom(configFilePath);
 
   if (dom) {
     return dom;
-  }
-
-  const legacyPath = getLegacyConfigFilePath();
-  const legacyFileDom = await loadConfigFileFrom(getLegacyConfigFilePath());
-
-  if (legacyFileDom) {
-    await saveLocalDom(legacyFileDom);
-    await fs.unlink(legacyPath);
-    return legacyFileDom;
   }
 
   const defaultDom = appDom.createDefaultDom();
@@ -450,6 +468,7 @@ async function readComponentsFolder(root: string) {
 
 async function readProjectFiles(root: string): Promise<ToolpadFile[]> {
   const toolpadFolder = getToolpadFolder(root);
+  await fs.mkdir(toolpadFolder, { recursive: true });
   const entries = await fs.readdir(toolpadFolder, { withFileTypes: true });
   const filePromises: Promise<ToolpadFile | null>[] = entries.map(async (entry) => {
     const match =

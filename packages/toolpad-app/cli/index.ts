@@ -16,6 +16,7 @@ async function waitForMatch(input: Readable, regex: RegExp): Promise<RegExpExecA
       const match = regex.exec(line);
       if (match) {
         rl.close();
+        input.resume();
         resolve(match);
       }
     });
@@ -24,7 +25,7 @@ async function waitForMatch(input: Readable, regex: RegExp): Promise<RegExpExecA
   });
 }
 
-function* getNextPort(port: number = DEFAULT_PORT) {
+function* getPreferredPorts(port: number = DEFAULT_PORT): Iterable<number> {
   while (true) {
     yield port;
     port += 1;
@@ -44,7 +45,7 @@ async function runApp(cmd: 'dev' | 'start', { devMode = false, port }: RunComman
   const toolpadDir = path.resolve(__dirname, '../..'); // from ./dist/server
 
   if (!port) {
-    port = cmd === 'dev' ? await getPort({ port: getNextPort(DEFAULT_PORT) }) : DEFAULT_PORT;
+    port = cmd === 'dev' ? await getPort({ port: getPreferredPorts(DEFAULT_PORT) }) : DEFAULT_PORT;
   } else {
     // if port is specified but is not available, exit
     const availablePort = await getPort({ port });
@@ -74,7 +75,7 @@ async function runApp(cmd: 'dev' | 'start', { devMode = false, port }: RunComman
 
   process.stdin.pipe(cp.stdin!);
   cp.stdout?.pipe(process.stdout);
-  cp.stderr?.pipe(process.stdout);
+  cp.stderr?.pipe(process.stderr);
 
   if (cmd === 'dev') {
     // Poll stdout for "http://localhost:3000" first

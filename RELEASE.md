@@ -73,15 +73,17 @@
 For now using this to publish
 
 ```sh
+yarn
 yarn release:build
-yarn lerna publish --force-publish --no-git-tag-version --no-push --no-git-reset
+yarn release:publish
 ```
 
 For canary releases:
 
 ```sh
+yarn
 yarn release:build
-yarn lerna publish --force-publish --no-git-tag-version --no-push --no-git-reset --dist-tag canary
+yarn release:publish-canary
 ```
 
 <!-- TODO: work out full flow -->

@@ -4,9 +4,7 @@ import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { JsRuntimeProvider } from '@mui/toolpad-core/jsServerRuntime';
 import PageEditor from './PageEditor';
 import DomProvider, { useAppState } from '../AppState';
-import ConnectionEditor from './ConnectionEditor';
 import AppEditorShell from './AppEditorShell';
-import CodeComponentEditor from './CodeComponentEditor';
 import NoPageFound from './NoPageFound';
 import { getPathnameFromView } from '../../utils/domView';
 
@@ -59,10 +57,6 @@ function FileEditor({ appId }: FileEditorProps) {
     switch (currentView.kind) {
       case 'page':
         return <PageEditor appId={appId} nodeId={currentView.nodeId} />;
-      case 'connection':
-        return <ConnectionEditor appId={appId} nodeId={currentView.nodeId} />;
-      case 'codeComponent':
-        return <CodeComponentEditor appId={appId} nodeId={currentView.nodeId} />;
       default:
         return <NoPageFound appId={appId} />;
     }

@@ -1,11 +1,11 @@
+import { CircularProgress, Box, styled } from '@mui/material';
 import * as React from 'react';
-import { BrowserRouter, Routes, Route, Navigate, useParams } from 'react-router-dom';
-import { Box, CircularProgress, styled } from '@mui/material';
 import { ErrorBoundary, FallbackProps } from 'react-error-boundary';
-import AppEditor from './AppEditor';
-import Apps from './Apps';
-import ErrorAlert from './AppEditor/PageEditor/ErrorAlert';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import NoSsr from '../components/NoSsr';
+import { APP_ID_LOCAL_MARKER } from '../constants';
+import { EditorContent } from './AppEditor';
+import ErrorAlert from './AppEditor/PageEditor/ErrorAlert';
 
 const Centered = styled('div')({
   height: '100%',
@@ -34,31 +34,15 @@ function FullPageError({ error }: FullPageErrorProps) {
   );
 }
 
-function LegacyEditorUrlRedirect() {
-  const { '*': editorRoute } = useParams();
-  return <Navigate to={`../${editorRoute}`} />;
-}
-
-function AppWorkspace() {
-  return (
-    <Routes>
-      <Route>
-        <Route path="editor/*" element={<LegacyEditorUrlRedirect />} />
-        <Route path="*" element={<AppEditor />} />
-      </Route>
-    </Routes>
-  );
-}
-
 function ErrorFallback({ error }: FallbackProps) {
   return <FullPageError error={error} />;
 }
 
-export interface EditorProps {
+export interface ToolpadProps {
   basename: string;
 }
 
-export default function Toolpad({ basename }: EditorProps) {
+export default function Toolpad({ basename }: ToolpadProps) {
   return (
     <NoSsr>
       {/* Container that allows children to size to it with height: 100% */}
@@ -67,9 +51,7 @@ export default function Toolpad({ basename }: EditorProps) {
           <React.Suspense fallback={<FullPageLoader />}>
             <BrowserRouter basename={basename}>
               <Routes>
-                <Route path="/" element={<Navigate to="apps" replace />} />
-                <Route path="/apps" element={<Apps />} />
-                <Route path="/app/:appId/*" element={<AppWorkspace />} />
+                <Route path="/*" element={<EditorContent appId={APP_ID_LOCAL_MARKER} />} />
               </Routes>
             </BrowserRouter>
           </React.Suspense>

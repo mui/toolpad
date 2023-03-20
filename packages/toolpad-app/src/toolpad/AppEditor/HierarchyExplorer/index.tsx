@@ -12,11 +12,8 @@ import invariant from 'invariant';
 import * as appDom from '../../../appDom';
 import { useAppStateApi, useDom, useAppState } from '../../AppState';
 import CreatePageNodeDialog from './CreatePageNodeDialog';
-import CreateCodeComponentNodeDialog from './CreateCodeComponentNodeDialog';
-import CreateConnectionNodeDialog from './CreateConnectionNodeDialog';
 import useLocalStorageState from '../../../utils/useLocalStorageState';
 import NodeMenu from '../NodeMenu';
-import config from '../../../config';
 import { DomView } from '../../../utils/domView';
 
 const HierarchyExplorerRoot = styled('div')({
@@ -138,7 +135,7 @@ export default function HierarchyExplorer({ appId, className }: HierarchyExplore
   const appStateApi = useAppStateApi();
 
   const app = appDom.getApp(dom);
-  const { codeComponents = [], pages = [], connections = [] } = appDom.getChildNodes(dom, app);
+  const { pages = [] } = appDom.getChildNodes(dom, app);
 
   const [expanded, setExpanded] = useLocalStorageState<string[]>(
     `editor/${app.id}/hierarchy-expansion`,
@@ -184,32 +181,12 @@ export default function HierarchyExplorer({ appId, className }: HierarchyExplore
     }
   };
 
-  const [createConnectionDialogOpen, setCreateConnectionDialogOpen] = React.useState(0);
-  const handleCreateConnectionDialogOpen = React.useCallback((event: React.MouseEvent) => {
-    event.stopPropagation();
-    setCreateConnectionDialogOpen(Math.random());
-  }, []);
-  const handleCreateConnectionDialogClose = React.useCallback(
-    () => setCreateConnectionDialogOpen(0),
-    [],
-  );
-
   const [createPageDialogOpen, setCreatePageDialogOpen] = React.useState(0);
   const handleCreatePageDialogOpen = React.useCallback((event: React.MouseEvent) => {
     event.stopPropagation();
     setCreatePageDialogOpen(Math.random());
   }, []);
   const handleCreatepageDialogClose = React.useCallback(() => setCreatePageDialogOpen(0), []);
-
-  const [createCodeComponentDialogOpen, setCreateCodeComponentDialogOpen] = React.useState(0);
-  const handleCreateCodeComponentDialogOpen = React.useCallback((event: React.MouseEvent) => {
-    event.stopPropagation();
-    setCreateCodeComponentDialogOpen(Math.random());
-  }, []);
-  const handleCreateCodeComponentDialogClose = React.useCallback(
-    () => setCreateCodeComponentDialogOpen(0),
-    [],
-  );
 
   const handleDeleteNode = React.useCallback(
     (nodeId: NodeId) => {
@@ -262,9 +239,6 @@ export default function HierarchyExplorer({ appId, className }: HierarchyExplore
     [appStateApi, dom],
   );
 
-  const hasConnectionsView = !config.localMode && !config.isDemo;
-  const hasComponentsView = !config.localMode;
-
   return (
     <HierarchyExplorerRoot data-testid="hierarchy-explorer" className={className}>
       <TreeView
@@ -277,48 +251,6 @@ export default function HierarchyExplorer({ appId, className }: HierarchyExplore
         defaultCollapseIcon={<ArrowDropDownIcon />}
         defaultExpandIcon={<ArrowRightIcon />}
       >
-        {hasConnectionsView ? (
-          <HierarchyTreeItem
-            nodeId=":connections"
-            aria-level={1}
-            labelText="Connections"
-            createLabelText="Create connection"
-            onCreate={handleCreateConnectionDialogOpen}
-          >
-            {connections.map((connectionNode) => (
-              <HierarchyTreeItem
-                key={connectionNode.id}
-                nodeId={connectionNode.id}
-                toolpadNodeId={connectionNode.id}
-                aria-level={2}
-                labelText={connectionNode.name}
-                onDuplicateNode={handleDuplicateNode}
-                onDeleteNode={handleDeleteNode}
-              />
-            ))}
-          </HierarchyTreeItem>
-        ) : null}
-        {hasComponentsView ? (
-          <HierarchyTreeItem
-            nodeId=":codeComponents"
-            aria-level={1}
-            labelText="Components"
-            createLabelText="Create component"
-            onCreate={handleCreateCodeComponentDialogOpen}
-          >
-            {codeComponents.map((codeComponent) => (
-              <HierarchyTreeItem
-                key={codeComponent.id}
-                nodeId={codeComponent.id}
-                toolpadNodeId={codeComponent.id}
-                aria-level={2}
-                labelText={codeComponent.name}
-                onDuplicateNode={handleDuplicateNode}
-                onDeleteNode={handleDeleteNode}
-              />
-            ))}
-          </HierarchyTreeItem>
-        ) : null}
         <HierarchyTreeItem
           nodeId=":pages"
           aria-level={1}
@@ -341,23 +273,11 @@ export default function HierarchyExplorer({ appId, className }: HierarchyExplore
         </HierarchyTreeItem>
       </TreeView>
 
-      <CreateConnectionNodeDialog
-        key={createConnectionDialogOpen || undefined}
-        appId={appId}
-        open={!!createConnectionDialogOpen}
-        onClose={handleCreateConnectionDialogClose}
-      />
       <CreatePageNodeDialog
         key={createPageDialogOpen || undefined}
         appId={appId}
         open={!!createPageDialogOpen}
         onClose={handleCreatepageDialogClose}
-      />
-      <CreateCodeComponentNodeDialog
-        key={createCodeComponentDialogOpen || undefined}
-        appId={appId}
-        open={!!createCodeComponentDialogOpen}
-        onClose={handleCreateCodeComponentDialogClose}
       />
     </HierarchyExplorerRoot>
   );

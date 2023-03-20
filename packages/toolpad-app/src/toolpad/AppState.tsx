@@ -15,7 +15,6 @@ import useEvent from '../utils/useEvent';
 import { NodeHashes } from '../types';
 import { hasFieldFocus } from '../utils/fields';
 import { DomView, getViewFromPathname, PageViewTab } from '../utils/domView';
-import config from '../config';
 
 export function getNodeHashes(dom: appDom.AppDom): NodeHashes {
   return mapValues(dom.nodes, (node) => insecureHash(JSON.stringify(node)));
@@ -577,10 +576,6 @@ export default function AppProvider({ appId, children }: DomContextProps) {
   // Quick and dirty polling for dom updates
   const fingerprint = React.useRef<number | undefined>();
   React.useEffect(() => {
-    if (!config.localMode) {
-      return () => {};
-    }
-
     let active = true;
 
     (async () => {

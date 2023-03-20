@@ -27,7 +27,6 @@ import PlaceIcon from '@mui/icons-material/Place';
 import ViewSidebarIcon from '@mui/icons-material/ViewSidebar';
 import MoodIcon from '@mui/icons-material/Mood';
 import HtmlIcon from '@mui/icons-material/Html';
-import { ButtonBase } from '@mui/material';
 
 const iconMap = new Map<string, React.ComponentType<SvgIconProps>>([
   ['Text', NotesIcon],
@@ -95,7 +94,6 @@ function ComponentCatalogItem({
       onClick={onClick}
       draggable={draggable}
       onDragStart={onDragStart}
-      component={kind === 'create' ? ButtonBase : undefined}
       sx={{
         display: 'flex',
         flexDirection: 'column',
@@ -110,6 +108,8 @@ function ComponentCatalogItem({
         borderStyle: kind === 'create' ? 'dashed' : 'solid',
         color: 'text.secondary',
         backgroundColor: 'paper',
+        // https://stackoverflow.com/q/22922761
+        transform: 'translate(0, 0)',
         '&:hover': {
           backgroundColor: 'action.hover',
         },

@@ -1,10 +1,31 @@
 import 'dotenv/config';
 import arg from 'arg';
 import path from 'path';
+import invariant from 'invariant';
+import { Readable } from 'stream';
+import * as readline from 'readline';
+import openBrowser from 'react-dev-utils/openBrowser';
 
 const DEFAULT_PORT = 3000;
 
-function* getNextPort(port: number = DEFAULT_PORT) {
+async function waitForMatch(input: Readable, regex: RegExp): Promise<RegExpExecArray | null> {
+  return new Promise((resolve, reject) => {
+    const rl = readline.createInterface({ input });
+
+    rl.on('line', (line) => {
+      const match = regex.exec(line);
+      if (match) {
+        rl.close();
+        input.resume();
+        resolve(match);
+      }
+    });
+    rl.on('error', (err) => reject(err));
+    rl.on('end', () => resolve(null));
+  });
+}
+
+function* getPreferredPorts(port: number = DEFAULT_PORT): Iterable<number> {
   while (true) {
     yield port;
     port += 1;
@@ -12,19 +33,27 @@ function* getNextPort(port: number = DEFAULT_PORT) {
 }
 
 interface RunCommandArgs {
-  // Whether Toolpad editor is running in dev mode (for debugging purposes only)
+  // Whether Toolpad editor is running in debug mode
   devMode?: boolean;
   port?: number;
 }
 
 async function runApp(cmd: 'dev' | 'start', { devMode = false, port }: RunCommandArgs) {
   const { execa } = await import('execa');
+  const { default: chalk } = await import('chalk');
   const { default: getPort } = await import('get-port');
   const toolpadDir = path.resolve(__dirname, '../..'); // from ./dist/server
   const nextCommand = devMode ? 'dev' : 'start';
 
   if (!port) {
-    port = cmd === 'dev' ? await getPort({ port: getNextPort(DEFAULT_PORT) }) : DEFAULT_PORT;
+    port = cmd === 'dev' ? await getPort({ port: getPreferredPorts(DEFAULT_PORT) }) : DEFAULT_PORT;
+  } else {
+    // if port is specified but is not available, exit
+    const availablePort = await getPort({ port });
+    if (availablePort !== port) {
+      console.error(`${chalk.red('error')} - Port ${port} is not available. Aborted.`);
+      process.exit(1);
+    }
   }
 
   const cp = execa('next', [nextCommand, `--port=${port}`], {
@@ -39,9 +68,24 @@ async function runApp(cmd: 'dev' | 'start', { devMode = false, port }: RunComman
     } as any,
   });
 
+  invariant(cp.stdout, 'child process must be started with "stdio: \'pipe\'"');
+
   process.stdin.pipe(cp.stdin!);
   cp.stdout?.pipe(process.stdout);
-  cp.stderr?.pipe(process.stdout);
+  cp.stderr?.pipe(process.stderr);
+
+  if (cmd === 'dev') {
+    // Poll stdout for "http://localhost:3000" first
+    const match = await waitForMatch(cp.stdout, /http:\/\/localhost:(\d+)/);
+    const detectedPort = match ? Number(match[1]) : null;
+    invariant(detectedPort, 'Could not find port in stdout');
+    const toolpadBaseUrl = `http://localhost:${detectedPort}/`;
+    try {
+      await openBrowser(toolpadBaseUrl);
+    } catch (err: any) {
+      console.error(`${chalk.red('error')} - Failed to open browser: ${err.message}`);
+    }
+  }
 
   cp.on('exit', (code) => {
     if (code) {
@@ -51,14 +95,16 @@ async function runApp(cmd: 'dev' | 'start', { devMode = false, port }: RunComman
 }
 
 async function devCommand(args: RunCommandArgs) {
+  const { default: chalk } = await import('chalk');
   // eslint-disable-next-line no-console
-  console.log('starting toolpad application in dev mode...');
+  console.log(`${chalk.blue('info')} - starting Toolpad application in dev mode...`);
   await runApp('dev', args);
 }
 
 async function buildCommand() {
+  const { default: chalk } = await import('chalk');
   // eslint-disable-next-line no-console
-  console.log('building toolpad application...');
+  console.log(`${chalk.blue('info')} - building Toolpad application...`);
   await new Promise((resolve) => {
     setTimeout(resolve, 1000);
   });
@@ -67,8 +113,9 @@ async function buildCommand() {
 }
 
 async function startCommand(args: RunCommandArgs) {
+  const { default: chalk } = await import('chalk');
   // eslint-disable-next-line no-console
-  console.log('starting toolpad application...');
+  console.log(`${chalk.blue('info')} - Starting Toolpad application...`);
   await runApp('start', args);
 }
 

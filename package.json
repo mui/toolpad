@@ -36,7 +36,7 @@
     "release:version": "lerna version --no-changelog --no-push --no-git-tag-version",
     "release:docker": "dotenv -- node ./scripts/releaseDocker.mjs",
     "release:publish": "lerna publish from-package --force-publish --no-git-tag-version --no-push --no-git-reset",
-    "release:publish-canary": "lerna publish --force-publish --no-git-tag-version --no-push --no-git-reset --pre-dist-tag canary",
+    "release:publish-canary": "lerna publish from-package  --force-publish --no-git-tag-version --no-push --no-git-reset --pre-dist-tag canary",
     "release:changelog": "dotenv -- node ./scripts/releaseChangelog.mjs --repo mui-toolpad",
     "test:build": "lerna run build --scope @mui/toolpad-core --scope @mui/toolpad-components --stream",
     "test:integration": "playwright test --config ./test/integration/playwright.config.ts",

@@ -10,8 +10,8 @@
     "start": "toolpad start"
   },
   "dependencies": {
-    "@mui/toolpad": "^0.0.41-alpha.1",
-    "@mui/toolpad-core": "^0.0.41-alpha.1",
+    "@mui/toolpad": "^0.1.0",
+    "@mui/toolpad-core": "^0.1.0",
     "axios": "^1.3.3"
   },
   "engines": {

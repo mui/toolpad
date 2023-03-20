@@ -26,7 +26,7 @@
     "dev": "tsc -w -p ./tsconfig.json --outDir ./dist/"
   },
   "engines": {
-    "node": ">=14.6.0"
+    "node": ">=v14.21.3"
   },
   "dependencies": {
     "chalk": "^5.2.0",

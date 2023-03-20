@@ -7,7 +7,6 @@ import { VersionOrPreview } from '../types';
 import * as appDom from '../appDom';
 import { errorFrom, serializeError } from '../utils/errors';
 import { basicAuthUnauthorized, checkBasicAuth } from './basicAuth';
-import { reportSentryError } from '../utils/sentry';
 import config from '../config';
 
 // Initialize the cors middleware
@@ -79,7 +78,6 @@ export default async (
     const result = await execQuery(appId, dataNode, req.body);
     res.json(withSerializedError(result));
   } catch (error) {
-    reportSentryError(error as Error);
     res.json(withSerializedError({ error }));
   }
 };

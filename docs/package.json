@@ -1,6 +1,6 @@
 {
   "name": "docs",
-  "version": "0.0.41",
+  "version": "0.0.42-alpha.6",
   "private": true,
   "author": "MUI Toolpad",
   "license": "MIT",
@@ -86,7 +86,7 @@
     "webpack-bundle-analyzer": "^4.8.0"
   },
   "devDependencies": {
-    "@babel/plugin-transform-react-constant-elements": "^7.20.2",
+    "@babel/plugin-transform-react-constant-elements": "^7.21.3",
     "@babel/preset-typescript": "^7.21.0",
     "@types/doctrine": "^0.0.5",
     "cpy-cli": "^4.2.0",

@@ -11,7 +11,16 @@ import {
 import type { Definition, MethodsGroup, MethodsOf, ServerDefinition } from '../pages/api/rpc';
 import { createRpcClient } from './rpcClient';
 
-export const queryClient = new QueryClient();
+export const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      networkMode: 'always',
+    },
+    mutations: {
+      networkMode: 'always',
+    },
+  },
+});
 
 export interface UseQueryFnOptions<F extends (...args: any[]) => any>
   extends Omit<

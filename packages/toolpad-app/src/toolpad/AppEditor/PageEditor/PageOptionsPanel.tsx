@@ -9,6 +9,9 @@ import NodeNameEditor from '../NodeNameEditor';
 import * as appDom from '../../../appDom';
 import PageModuleEditor from './PageModuleEditor';
 
+// Page modules are deprecated
+const ENABLE_PAGE_MODULE_EDITOR = false;
+
 export default function PageOptionsPanel() {
   const state = usePageEditorState();
   const pageNodeId = state.nodeId;
@@ -30,7 +33,7 @@ export default function PageOptionsPanel() {
         >
           Preview
         </Button>
-        <PageModuleEditor pageNodeId={pageNodeId} />
+        {ENABLE_PAGE_MODULE_EDITOR ? <PageModuleEditor pageNodeId={pageNodeId} /> : null}
         <Divider variant="middle" sx={{ alignSelf: 'stretch' }} />
         <Typography variant="overline">Page State:</Typography>
         <UrlQueryEditor pageNodeId={pageNodeId} />

@@ -1,6 +1,6 @@
 {
   "name": "@mui/toolpad",
-  "version": "0.0.42-alpha.5",
+  "version": "0.0.42-alpha.6",
   "license": "MIT",
   "scripts": {
     "cjsify": "mkdir -p ./dist/cjs && echo \"{ \\\"type\\\":\\\"commonjs\\\" }\" > ./dist/cjs/package.json",
@@ -33,12 +33,12 @@
     "toolpad": "./index.js"
   },
   "dependencies": {
-    "@mui/toolpad-app": "^0.0.42-alpha.5",
-    "@mui/toolpad-core": "^0.0.42-alpha.5",
+    "@mui/toolpad-app": "^0.0.42-alpha.6",
+    "@mui/toolpad-core": "^0.0.42-alpha.6",
     "arg": "^5.0.2",
     "concurrently": "^7.6.0",
     "dotenv": "^16.0.3",
     "execa": "^7.1.1"
   },
-  "gitHead": "62dd71783962945cbaf6214f8eeecb9e604321c2"
+  "gitHead": "035964a9ef748b365e130b428c2cbba9663902cf"
 }

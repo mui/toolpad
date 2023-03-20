@@ -494,7 +494,7 @@ export default dataSource;
 
 async function startDev() {
   const builder = await createBuilder();
-  builder.watch();
+  await builder.watch();
   return builder;
 }
 

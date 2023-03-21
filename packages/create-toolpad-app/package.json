@@ -1,6 +1,6 @@
 {
   "name": "create-toolpad-app",
-  "version": "0.0.42-alpha.5",
+  "version": "0.1.0",
   "keywords": [
     "react",
     "toolpad",
@@ -23,16 +23,18 @@
   "scripts": {
     "prebuild": "rimraf ./dist",
     "build": "tsc -p ./tsconfig.json -outDir ./dist/",
-    "dev13": "tsc -w -p ./tsconfig.json --outDir ./dist/"
+    "dev": "tsc -w -p ./tsconfig.json --outDir ./dist/"
   },
   "engines": {
     "node": ">=14.6.0"
   },
   "dependencies": {
     "chalk": "^5.2.0",
-    "execa": "^7.1.1"
+    "execa": "^7.1.1",
+    "inquirer": "^9.1.5"
   },
   "devDependencies": {
     "@types/inquirer": "^9.0.3"
-  }
+  },
+  "gitHead": "de68953329881ccd3aa40e82a7302c0baa38c3c5"
 }

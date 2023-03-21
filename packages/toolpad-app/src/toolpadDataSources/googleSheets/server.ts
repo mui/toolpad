@@ -110,9 +110,7 @@ async function exec(
       `${response.status}: ${response.statusText} Failed to fetch "${JSON.stringify(query)}"`,
     );
   }
-  return {
-    data: {},
-  };
+  throw new Error(`No sheet selected`);
 }
 
 /**

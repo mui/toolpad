@@ -1,103 +1,96 @@
 import * as path from 'path';
 import { ToolpadEditor } from '../../models/ToolpadEditor';
 import { ToolpadRuntime } from '../../models/ToolpadRuntime';
-import { FrameLocator, Page, test, expect } from '../../playwright/test';
+import { FrameLocator, Page, test, expect } from '../../playwright/localTest';
 import clickCenter from '../../utils/clickCenter';
-import { readJsonFile } from '../../utils/fs';
-import generateId from '../../utils/generateId';
+import { APP_ID_LOCAL_MARKER } from '../../../packages/toolpad-app/src/constants';
 
-test.skip(!!process.env.LOCAL_MODE_TESTS, 'These are hosted mode tests');
+test.skip(!process.env.LOCAL_MODE_TESTS, 'These are local mode tests');
 
-async function waitForComponents(page: Page, frame: Page | FrameLocator = page) {
-  const button = frame.locator('text="foo button"');
-  await button.waitFor({ state: 'visible' });
+test.describe.only('components basics', () => {
+  async function waitForComponents(page: Page, frame: Page | FrameLocator = page) {
+    const button = frame.locator('text="foo button"');
+    await button.waitFor({ state: 'visible' });
 
-  const image = frame.locator('img[alt="foo image"]');
-  await image.waitFor({ state: 'attached' });
+    const image = frame.locator('img[alt="foo image"]');
+    await image.waitFor({ state: 'attached' });
 
-  const datagrid = frame.locator('text="foo datagrid column"');
-  await datagrid.waitFor({ state: 'visible' });
+    const datagrid = frame.locator('text="foo datagrid column"');
+    await datagrid.waitFor({ state: 'visible' });
 
-  const customComponent = frame.locator('text="custom component 1"');
-  await customComponent.waitFor({ state: 'visible' });
+    const customComponent = frame.locator('text="custom component 1"');
+    await customComponent.waitFor({ state: 'visible' });
 
-  const textField = frame.locator('label:has-text("foo textfield")');
-  await textField.waitFor({ state: 'visible' });
+    const textField = frame.locator('label:has-text("foo textfield")');
+    await textField.waitFor({ state: 'visible' });
 
-  const text = frame.locator('text="foo typography"');
-  await text.waitFor({ state: 'visible' });
+    const text = frame.locator('text="foo typography"');
+    await text.waitFor({ state: 'visible' });
 
-  const select = frame.locator('label:has-text("foo select")');
-  await select.waitFor({ state: 'visible' });
+    const select = frame.locator('label:has-text("foo select")');
+    await select.waitFor({ state: 'visible' });
 
-  const list = frame.locator('text="List Button 3"');
-  await list.waitFor({ state: 'visible' });
-}
+    const list = frame.locator('text="List Button 3"');
+    await list.waitFor({ state: 'visible' });
+  }
 
-test('rendering components in the app runtime', async ({ page, api }) => {
-  const dom = await readJsonFile(path.resolve(__dirname, './componentsDom.json'));
-
-  const app = await api.mutation.createApp(`App ${generateId()}`, {
-    from: { kind: 'dom', dom },
+  test.use({
+    localAppConfig: {
+      template: path.resolve(__dirname, './fixture-basic'),
+      cmd: 'dev',
+    },
   });
 
-  const runtimeModel = new ToolpadRuntime(page);
-  await runtimeModel.gotoPage(app.id, 'components');
+  test('rendering components in the app runtime', async ({ page }) => {
+    const runtimeModel = new ToolpadRuntime(page);
+    await runtimeModel.gotoPage(APP_ID_LOCAL_MARKER, 'components');
 
-  await waitForComponents(page);
+    await waitForComponents(page);
+  });
+
+  test('rendering components in the app editor', async ({ page }) => {
+    const editorModel = new ToolpadEditor(page);
+    editorModel.goto(APP_ID_LOCAL_MARKER);
+
+    await waitForComponents(page, editorModel.appCanvas);
+  });
+
+  test('select component behavior', async ({ page }) => {
+    const runtimeModel = new ToolpadRuntime(page);
+    await runtimeModel.gotoPage(APP_ID_LOCAL_MARKER, 'select');
+
+    const optionsSelect = page.getByRole('button', { name: /select with options/ });
+    await optionsSelect.scrollIntoViewIfNeeded();
+    await clickCenter(page, optionsSelect);
+    await expect(page.getByRole('option', { name: 'one' })).toBeVisible();
+    await expect(page.getByRole('option', { name: '2' })).toBeVisible();
+    await expect(page.getByRole('option', { name: 'three' })).toBeVisible();
+    await expect(page.getByRole('option', { name: '4' })).toBeVisible();
+    await expect(page.getByRole('option', { name: 'undefined' })).toBeVisible();
+  });
 });
 
-test('rendering components in the app editor', async ({ page, api }) => {
-  const dom = await readJsonFile(path.resolve(__dirname, './componentsDom.json'));
-
-  const app = await api.mutation.createApp(`App ${generateId()}`, {
-    from: { kind: 'dom', dom },
+test.describe('list component', () => {
+  test.use({
+    localAppConfig: {
+      template: path.resolve(__dirname, './fixture-list'),
+      cmd: 'dev',
+    },
   });
 
-  const editorModel = new ToolpadEditor(page);
-  editorModel.goto(app.id);
+  test('list component behavior', async ({ page }) => {
+    const runtimeModel = new ToolpadRuntime(page);
+    await runtimeModel.gotoPage(APP_ID_LOCAL_MARKER, 'list');
 
-  await waitForComponents(page, editorModel.appCanvas);
-});
+    const firstInput = page.getByLabel('textField0');
+    const secondInput = page.getByLabel('textField1');
 
-test('select component behavior', async ({ page, api }) => {
-  const dom = await readJsonFile(path.resolve(__dirname, './componentsDom.json'));
+    await firstInput.type('one');
+    await secondInput.type('two');
 
-  const app = await api.mutation.createApp(`App ${generateId()}`, {
-    from: { kind: 'dom', dom },
+    await expect(page.locator('p:text("one")')).toBeVisible();
+    await expect(page.locator('p:text("two")')).toBeVisible();
+
+    await expect(page.locator('button:text("one")')).toBeVisible();
   });
-
-  const runtimeModel = new ToolpadRuntime(page);
-  await runtimeModel.gotoPage(app.id, 'select');
-
-  const optionsSelect = page.getByRole('button', { name: /select with options/ });
-  await optionsSelect.scrollIntoViewIfNeeded();
-  await clickCenter(page, optionsSelect);
-  await expect(page.getByRole('option', { name: 'one' })).toBeVisible();
-  await expect(page.getByRole('option', { name: '2' })).toBeVisible();
-  await expect(page.getByRole('option', { name: 'three' })).toBeVisible();
-  await expect(page.getByRole('option', { name: '4' })).toBeVisible();
-  await expect(page.getByRole('option', { name: 'undefined' })).toBeVisible();
-});
-
-test('list component behavior', async ({ page, api }) => {
-  const dom = await readJsonFile(path.resolve(__dirname, './listDom.json'));
-
-  const app = await api.mutation.createApp(`App ${generateId()}`, {
-    from: { kind: 'dom', dom },
-  });
-
-  const runtimeModel = new ToolpadRuntime(page);
-  await runtimeModel.gotoPage(app.id, 'list');
-
-  const firstInput = page.getByLabel('textField0');
-  const secondInput = page.getByLabel('textField1');
-
-  await firstInput.type('one');
-  await secondInput.type('two');
-
-  await expect(page.locator('p:text("one")')).toBeVisible();
-  await expect(page.locator('p:text("two")')).toBeVisible();
-
-  await expect(page.locator('button:text("one")')).toBeVisible();
 });

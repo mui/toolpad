@@ -1,10 +1,9 @@
 import * as React from 'react';
-import { TextField } from '@mui/material';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DesktopDatePicker, DesktopDatePickerProps } from '@mui/x-date-pickers/DesktopDatePicker';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { createComponent } from '@mui/toolpad-core';
-import { Dayjs } from 'dayjs';
+import dayjs from 'dayjs';
 import { SX_PROP_HELPER_TEXT } from './constants.js';
 
 const LOCALE_LOADERS = new Map([
@@ -63,44 +62,64 @@ function getSnapshot() {
 }
 
 export interface DatePickerProps
-  extends Omit<DesktopDatePickerProps<string, Dayjs>, 'value' | 'onChange'> {
-  value: string;
-  onChange: (newValue: string) => void;
+  extends Omit<DesktopDatePickerProps<dayjs.Dayjs>, 'value' | 'onChange' | 'defaultValue'> {
+  value?: string;
+  onChange?: (newValue: string) => void;
   format: string;
   fullWidth: boolean;
   variant: 'outlined' | 'filled' | 'standard';
   size: 'small' | 'medium';
   sx: any;
-  defaultValue: string;
+  defaultValue?: string;
 }
 
-function DatePicker({ format, onChange, ...props }: DatePickerProps) {
-  const handleChange = React.useCallback(
-    (value: Dayjs | null) => {
-      // date-only form of ISO8601. See https://tc39.es/ecma262/#sec-date-time-string-format
-      const stringValue = value?.format('YYYY-MM-DD') || '';
-      onChange(stringValue);
-    },
+function DatePicker({
+  format,
+  onChange,
+  value: valueProp,
+  defaultValue: defaultValueProp,
+  ...props
+}: DatePickerProps) {
+  const handleChange = React.useMemo(
+    () =>
+      onChange
+        ? (value: dayjs.Dayjs | null) => {
+            // date-only form of ISO8601. See https://tc39.es/ecma262/#sec-date-time-string-format
+            const stringValue = value?.format('YYYY-MM-DD') || '';
+            onChange(stringValue);
+          }
+        : undefined,
     [onChange],
   );
 
   const adapterLocale = React.useSyncExternalStore(subscribeLocaleLoader, getSnapshot);
 
+  const value = React.useMemo(
+    () => (typeof valueProp === 'string' ? dayjs(valueProp) : valueProp),
+    [valueProp],
+  );
+
+  const defaultValue = React.useMemo(
+    () => (typeof defaultValueProp === 'string' ? dayjs(defaultValueProp) : defaultValueProp),
+    [defaultValueProp],
+  );
+
   return (
     <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale={adapterLocale}>
-      <DesktopDatePicker
+      <DesktopDatePicker<dayjs.Dayjs>
         {...props}
-        inputFormat={format || 'L'}
+        format={format || 'L'}
+        value={value}
         onChange={handleChange}
-        renderInput={(params) => (
-          <TextField
-            {...params}
-            fullWidth={props.fullWidth}
-            variant={props.variant}
-            size={props.size}
-            sx={props.sx}
-          />
-        )}
+        defaultValue={defaultValue}
+        slotProps={{
+          textField: {
+            fullWidth: props.fullWidth,
+            variant: props.variant,
+            size: props.size,
+            sx: props.sx,
+          },
+        }}
       />
     </LocalizationProvider>
   );

@@ -1,10 +1,9 @@
 import * as React from 'react';
-import { TextField } from '@mui/material';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DesktopDatePicker, DesktopDatePickerProps } from '@mui/x-date-pickers/DesktopDatePicker';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { createComponent, useNode } from '@mui/toolpad-core';
-import { Dayjs } from 'dayjs';
+import dayjs from 'dayjs';
 import { Controller, FieldError } from 'react-hook-form';
 import { SX_PROP_HELPER_TEXT } from './constants';
 import { FormContext, useFormInput, withComponentForm } from './Form';
@@ -65,15 +64,15 @@ function getSnapshot() {
 }
 
 export interface DatePickerProps
-  extends Omit<DesktopDatePickerProps<string, Dayjs>, 'value' | 'onChange'> {
-  value: string;
+  extends Omit<DesktopDatePickerProps<dayjs.Dayjs>, 'value' | 'onChange' | 'defaultValue'> {
+  value?: string;
   onChange: (newValue: string | null) => void;
   format: string;
   fullWidth: boolean;
   variant: 'outlined' | 'filled' | 'standard';
   size: 'small' | 'medium';
   sx: any;
-  defaultValue: string;
+  defaultValue?: string;
   name: string;
   isRequired: boolean;
   isInvalid: boolean;
@@ -82,8 +81,8 @@ export interface DatePickerProps
 function DatePicker({
   format,
   onChange,
-  value,
-  defaultValue,
+  value: valueProp,
+  defaultValue: defaultValueProp,
   isRequired,
   isInvalid,
   ...rest
@@ -99,50 +98,57 @@ function DatePicker({
 
   const { onFormInputChange } = useFormInput<string | null>({
     name: nodeName,
-    value,
+    value: valueProp,
     onChange,
-    defaultValue,
+    defaultValue: defaultValueProp,
     emptyValue: null,
     validationProps,
   });
 
-  const handleChange = React.useCallback(
-    (newValue: Dayjs | null) => {
-      // date-only form of ISO8601. See https://tc39.es/ecma262/#sec-date-time-string-format
-      const stringValue = newValue?.format('YYYY-MM-DD') || '';
+  const handleChange = React.useMemo(
+    () =>
+      onChange
+        ? (newValue: dayjs.Dayjs | null) => {
+            // date-only form of ISO8601. See https://tc39.es/ecma262/#sec-date-time-string-format
+            const stringValue = newValue?.format('YYYY-MM-DD') || '';
 
-      if (form) {
-        onFormInputChange(stringValue);
-      } else {
-        onChange(stringValue);
-      }
-    },
+            if (form) {
+              onFormInputChange(stringValue);
+            } else {
+              onChange(stringValue);
+            }
+          }
+        : undefined,
     [form, onChange, onFormInputChange],
   );
 
   const adapterLocale = React.useSyncExternalStore(subscribeLocaleLoader, getSnapshot);
 
-  const datePickerProps: DesktopDatePickerProps<any, any> = {
+  const value = React.useMemo(
+    () => (typeof valueProp === 'string' ? dayjs(valueProp) : valueProp),
+    [valueProp],
+  );
+
+  const datePickerProps: DesktopDatePickerProps = {
     ...rest,
-    inputFormat: format || 'L',
+    format: format || 'L',
     value: value || null,
     onChange: handleChange,
-    renderInput: (params) => (
-      <TextField
-        {...params}
-        fullWidth={rest.fullWidth}
-        variant={rest.variant}
-        size={rest.size}
-        sx={rest.sx}
-        {...(form && {
+    slotProps: {
+      textField: {
+        fullWidth: rest.fullWidth,
+        variant: rest.variant,
+        size: rest.size,
+        sx: rest.sx,
+        ...(form && {
           error: Boolean(fieldError),
           helperText: (fieldError as FieldError)?.message || '',
-        })}
-      />
-    ),
+        }),
+      },
+    },
   };
 
-  const datePickerElement = <DesktopDatePicker {...datePickerProps} />;
+  const datePickerElement = <DesktopDatePicker<dayjs.Dayjs> {...datePickerProps} />;
 
   const fieldDisplayName = rest.label || nodeName;
 

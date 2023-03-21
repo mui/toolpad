@@ -50,7 +50,7 @@ export interface RuntimeConfig {
   externalUrl: string;
   localMode: boolean;
   projectDir?: string;
-  cmd?: 'dev' | 'start';
+  cmd: 'dev' | 'start';
 }
 
 declare global {
@@ -91,7 +91,7 @@ const runtimeConfig: RuntimeConfig =
         cmd:
           process.env.TOOLPAD_CMD === 'dev' || process.env.TOOLPAD_CMD === 'start'
             ? process.env.TOOLPAD_CMD
-            : undefined,
+            : 'dev',
       }
     : getBrowsersideRuntimeConfig();
 

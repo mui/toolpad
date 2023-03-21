@@ -33,16 +33,6 @@
 
 1. Open a PR with the proposed changes.
 
-1. Review/merge the PR — once the PR is merged to `master` a Docker image is built for the commit, tagged with the commit SHA and then pushed to Docker Hub, just like for any other commit in `master`.
-
-1. Wait for the Docker build to finish. (You can find the job in the [CircleCI pipelines](https://app.circleci.com/pipelines/github/mui/mui-toolpad?branch=master)). Note that you can always verify the built docker image by running it as
-
-   ```sh
-   TAG=<git-sha> docker-compose -f docker/compose/docker-compose.yml up
-   ```
-
-   Where `<git-sha>` is the commit on master that you want to test.
-
 1. Release the Docker image using (requires GitHub authentication token):
 
    ```sh
@@ -67,3 +57,23 @@
    1. Use `<version number>` as the **Release title**
    1. Mark as prerelease if necessary.
    1. **Publish release**
+
+## npm
+
+For now using this to publish
+
+```sh
+yarn
+yarn release:build
+yarn release:publish
+```
+
+For canary releases:
+
+```sh
+yarn
+yarn release:build
+yarn release:publish-canary
+```
+
+<!-- TODO: work out full flow -->

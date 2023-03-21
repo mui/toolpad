@@ -431,18 +431,20 @@ function QueryEditor({
         <QueryInputPanel
           onRunPreview={handleRunPreview}
           actions={
-            <FormGroup>
-              <FormControlLabel
-                control={
-                  <Checkbox
-                    checked={isBrowserSide}
-                    onChange={handleRunInBrowserChange}
-                    disabled={config.isDemo}
-                  />
-                }
-                label="Run in the browser"
-              />
-            </FormGroup>
+            config.localMode ? undefined : (
+              <FormGroup>
+                <FormControlLabel
+                  control={
+                    <Checkbox
+                      checked={isBrowserSide}
+                      onChange={handleRunInBrowserChange}
+                      disabled={config.isDemo}
+                    />
+                  }
+                  label="Run in the browser"
+                />
+              </FormGroup>
+            )
           }
         >
           <Stack gap={2} sx={{ px: 3, pt: 1 }}>

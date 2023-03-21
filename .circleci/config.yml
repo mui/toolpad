@@ -79,6 +79,7 @@ commands:
             - packages/toolpad-app/node_modules
             - packages/toolpad-components/node_modules
             - packages/toolpad-core/node_modules
+            - packages/create-toolpad-app/node_modules
       - when:
           condition: << parameters.browsers >>
           steps:

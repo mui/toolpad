@@ -58,15 +58,6 @@ export default function ComponentCatalog({ className }: ComponentCatalogProps) {
     'catalog-future-expanded',
     true,
   );
-  const [createCodeComponentDialogOpen, setCreateCodeComponentDialogOpen] = React.useState(0);
-
-  const handleCreateCodeComponentDialogOpen = React.useCallback(() => {
-    setCreateCodeComponentDialogOpen(Math.random());
-  }, []);
-  const handleCreateCodeComponentDialogClose = React.useCallback(
-    () => setCreateCodeComponentDialogOpen(0),
-    [],
-  );
 
   const closeTimeoutRef = React.useRef<NodeJS.Timeout>();
   const openDrawer = React.useCallback(() => {
@@ -96,6 +87,17 @@ export default function ComponentCatalog({ className }: ComponentCatalogProps) {
 
   const handleMouseEnter = React.useCallback(() => openDrawer(), [openDrawer]);
   const handleMouseLeave = React.useCallback(() => closeDrawer(), [closeDrawer]);
+
+  const [createCodeComponentDialogOpen, setCreateCodeComponentDialogOpen] = React.useState(false);
+
+  const handleCreateCodeComponentDialogOpen = React.useCallback(() => {
+    setCreateCodeComponentDialogOpen(true);
+    closeDrawer(0);
+  }, [closeDrawer]);
+  const handleCreateCodeComponentDialogClose = React.useCallback(
+    () => setCreateCodeComponentDialogOpen(false),
+    [],
+  );
 
   return (
     <ComponentCatalogRoot
@@ -282,7 +284,6 @@ export default function ComponentCatalog({ className }: ComponentCatalogProps) {
         </Box>
       </Box>
       <CreateCodeComponentNodeDialog
-        key={createCodeComponentDialogOpen || undefined}
         appId={pageState.appId}
         open={!!createCodeComponentDialogOpen}
         onClose={handleCreateCodeComponentDialogClose}

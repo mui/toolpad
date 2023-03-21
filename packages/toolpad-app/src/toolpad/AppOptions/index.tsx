@@ -125,7 +125,7 @@ function AppOptions({ app, onRenameRequest: onRename, dom, redirectOnDelete }: A
           </MenuItem>
         )}
       </Menu>
-      {app && dom ? (
+      {dom ? (
         <AppExportDialog open={appExportOpen} onClose={handleCloseAppExport} dom={dom} />
       ) : null}
       {app ? (

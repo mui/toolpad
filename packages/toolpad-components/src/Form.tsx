@@ -130,7 +130,7 @@ function Form({
 
 interface UseFormInputInput<V> {
   name?: string | null;
-  value: V;
+  value?: V;
   onChange: (newValue: V) => void;
   emptyValue?: V;
   defaultValue?: V;

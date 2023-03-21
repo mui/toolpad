@@ -1,6 +1,14 @@
 import * as React from 'react';
 import { BindableAttrEntries, CreateQueryConfig } from '@mui/toolpad-core';
-import { Button, MenuItem, Stack, TextField, Typography } from '@mui/material';
+import {
+  Button,
+  CircularProgress,
+  InputAdornment,
+  MenuItem,
+  Stack,
+  TextField,
+  Typography,
+} from '@mui/material';
 import { useBrowserJsRuntime } from '@mui/toolpad-core/jsBrowserRuntime';
 import { ClientDataSource, QueryEditorProps } from '../../types';
 import {
@@ -24,6 +32,7 @@ import QueryPreview from '../QueryPreview';
 import { usePrivateQuery } from '../context';
 import BindableEditor from '../../toolpad/AppEditor/PageEditor/BindableEditor';
 import { getDefaultControl } from '../../toolpad/propertyControls';
+import { errorFrom } from '../../utils/errors';
 
 const EMPTY_PARAMS: BindableAttrEntries = [];
 
@@ -40,9 +49,12 @@ function QueryEditor({
     [setInput],
   );
 
-  const introspection = usePrivateQuery<LocalPrivateQuery, IntrospectionResult>({
-    kind: 'introspection',
-  });
+  const introspection = usePrivateQuery<LocalPrivateQuery, IntrospectionResult>(
+    {
+      kind: 'introspection',
+    },
+    { retry: false },
+  );
 
   const functionName: string | undefined = input.attributes.query.value.function;
   const functionDefs: Record<string, CreateQueryConfig<any>> = introspection.data?.functions ?? {};
@@ -92,12 +104,34 @@ function QueryEditor({
     globalScope,
   });
 
+  const introspectionError: string = introspection.error
+    ? errorFrom(introspection.error).message
+    : '';
+
   return (
     <SplitPane split="vertical" size="50%" allowResize>
       <QueryInputPanel onRunPreview={handleRunPreview}>
         <Stack gap={2} sx={{ px: 3, pt: 1 }}>
           <Stack gap={2} direction="row">
-            <TextField select value={functionName ?? ''} onChange={handleQueryFunctionNameChange}>
+            <TextField
+              fullWidth
+              select
+              InputProps={
+                introspection.isLoading
+                  ? {
+                      startAdornment: (
+                        <InputAdornment position="start">
+                          <CircularProgress size={16} />
+                        </InputAdornment>
+                      ),
+                    }
+                  : {}
+              }
+              value={functionName ?? ''}
+              onChange={handleQueryFunctionNameChange}
+              error={!!introspectionError}
+              helperText={introspectionError}
+            >
               {Object.keys(introspection.data?.functions ?? {}).map((method) => (
                 <MenuItem key={method} value={method}>
                   {method}

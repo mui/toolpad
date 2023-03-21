@@ -8,22 +8,8 @@ If you would like to hack on MUI Toolpad or want to run the latest version, you 
 
 - git
 - node.js
-- Docker
-- docker-compose
 
 ### Steps
-
-1. Start a local database:
-
-   ```sh
-   docker-compose -f ./docker-compose.dev.yml up -d
-   ```
-
-   You can skip this step if you already have a development database available by other means. Use the following command to stop the running container:
-
-   ```sh
-   docker-compose -f ./docker-compose.dev.yml down
-   ```
 
 1. Install dependencies:
 
@@ -31,22 +17,60 @@ If you would like to hack on MUI Toolpad or want to run the latest version, you 
    yarn install
    ```
 
-1. Create a `.env` file in the root of the project
-
-   ```sh
-   TOOLPAD_DATABASE_URL=postgres://postgres:postgres@localhost:5432/postgres
-   # For a custom port:
-   # PORT=3004
-   # TOOLPAD_EXTERNAL_URL=http://localhost:3004/
-   ```
-
-1. Now you can run the MUI Toolpad dev command to start the application
+1. Run the build in watch mode
 
    ```sh
    yarn dev
    ```
 
-1. Open [`http://localhost:3000/`](http://localhost:3000/) in your browser.
+1. In another folder, start a toolpad project using:
+
+   ```json
+   {
+     "name": "toolpad-local",
+     "version": "1.0.0",
+     "license": "MIT",
+     "scripts": {
+       "dev": "toolpad dev --dev",
+       "build": "toolpad build --dev",
+       "start": "toolpad start --dev"
+     },
+     "dependencies": {
+       "@mui/toolpad": "portal:<your-local-toolpad-monorepo>/packages/toolpad"
+     },
+     "resolutions": {
+       "@mui/toolpad-app": "portal:<your-local-toolpad-monorepo>/packages/toolpad-app",
+       "@mui/toolpad-core": "portal:<your-local-toolpad-monorepo>/packages/toolpad-core",
+       "@mui/toolpad-components": "portal:<your-local-toolpad-monorepo>/packages/toolpad-components"
+     }
+   }
+   ```
+
+   1. Replace `<your-local-toolpad-monorepo>` with the path to the toolpad monorepo on your file system. Make sure to keep `portal:`.
+
+   1. In order to use `portal:` dependencies, we will need to use yarn 2. So start by running
+
+      ```sh
+      yarn set version berry
+      ```
+
+      and add to the `.yarnrc.yml`:
+
+      ```yaml
+      nodeLinker: node-modules
+      ```
+
+   1. then run
+
+      ```sh
+      yarn install
+      ```
+
+1. Run start toolpad in dev mode:
+
+   ```sh
+   yarn dev
+   ```
 
 ### Notes for contributors
 
@@ -62,7 +86,7 @@ If you would like to hack on MUI Toolpad or want to run the latest version, you 
   ⚠️  There might be data loss when applying the changes:
   ```
 
-  This means your database is out of sync with the prisma schema and can't be synchronized without data loss. You can synchronise the database manually using:
+  This means your database is out of sync with the prisma schema and can't be synchronized without data loss. You can synchronize the database manually using:
 
   ```sh
   yarn prisma db push --accept-data-loss

@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { TextFieldProps, MenuItem, TextField } from '@mui/material';
 import { createComponent } from '@mui/toolpad-core';
-import { SX_PROP_HELPER_TEXT } from './constants';
+import { SX_PROP_HELPER_TEXT } from './constants.js';
 
 export interface SelectOption {
   value: string;

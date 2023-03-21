@@ -84,7 +84,7 @@ async function runApp(cmd: 'dev' | 'start', { devMode = false, port }: RunComman
     invariant(detectedPort, 'Could not find port in stdout');
     const toolpadBaseUrl = `http://localhost:${detectedPort}/`;
     try {
-      await openBrowser(toolpadBaseUrl);
+      openBrowser(toolpadBaseUrl);
     } catch (err: any) {
       console.error(`${chalk.red('error')} - Failed to open browser: ${err.message}`);
     }
@@ -101,19 +101,18 @@ const PROJECT_FILES_PATH = path.resolve(TOOLPAD_DIR_PATH, './cli/projectFiles');
 
 const projectFiles = [
   {
-    name: '.gitignore',
     source: 'toolpad-generated-gitignore',
-    destination: './.toolpad-generated',
+    destination: './.toolpad-generated/.gitignore',
   },
 ];
 
 async function writeProjectFiles(): Promise<void> {
   await Promise.all(
-    projectFiles.map(async ({ name, source, destination }) => {
+    projectFiles.map(async ({ source, destination }) => {
       const filePath = path.resolve(PROJECT_FILES_PATH, source);
       const fileContent = await fs.readFile(filePath);
 
-      await fs.writeFile(path.join(process.cwd(), destination, name), fileContent, {
+      await fs.writeFile(path.join(process.cwd(), destination), fileContent, {
         encoding: 'utf-8',
       });
     }),

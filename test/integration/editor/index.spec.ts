@@ -114,16 +114,15 @@ test.describe('with fixture', () => {
 
     await editorModel.waitForOverlay();
 
+    await expect(editorModel.appCanvas.getByTestId('page-overlay')).toBeVisible();
+
     const canvasInputLocator = editorModel.appCanvas.locator('input');
 
-    const canvasRemoveElementButtonLocator = editorModel.appCanvas.locator(
-      'button[aria-label="Remove"]',
-    );
-    // const canvasRemoveElementButtonLocator = editorModel.appCanvas.getByRole('button', {
-    //  name: 'Remove',
-    // });
-
     await expect(canvasInputLocator).toHaveCount(2);
+
+    const canvasRemoveElementButtonLocator = editorModel.appCanvas.getByRole('button', {
+      name: 'Remove',
+    });
 
     // Delete element by clicking
 
@@ -132,6 +131,9 @@ test.describe('with fixture', () => {
     const firstTextFieldLocator = canvasInputLocator.first();
 
     await clickCenter(page, firstTextFieldLocator);
+
+    await expect(canvasRemoveElementButtonLocator).toBeVisible();
+
     await canvasRemoveElementButtonLocator.click();
 
     await expect(canvasInputLocator).toHaveCount(1);

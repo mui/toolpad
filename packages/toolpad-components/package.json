@@ -32,8 +32,8 @@
   "dependencies": {
     "@mui/material": "^5.11.13",
     "@mui/toolpad-core": "^0.1.0",
-    "@mui/x-data-grid-pro": "^5.17.25",
-    "@mui/x-date-pickers": "^5.0.20",
+    "@mui/x-data-grid-pro": "^6.0.1",
+    "@mui/x-date-pickers": "^6.0.1",
     "dayjs": "^1.11.7",
     "markdown-to-jsx": "^7.2.0"
   },

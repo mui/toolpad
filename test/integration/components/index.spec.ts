@@ -7,7 +7,7 @@ import { APP_ID_LOCAL_MARKER } from '../../../packages/toolpad-app/src/constants
 
 test.skip(!process.env.LOCAL_MODE_TESTS, 'These are local mode tests');
 
-test.describe.only('components basics', () => {
+test.describe('components basics', () => {
   async function waitForComponents(page: Page, frame: Page | FrameLocator = page) {
     const button = frame.locator('text="foo button"');
     await button.waitFor({ state: 'visible' });

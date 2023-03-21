@@ -1,5 +1,26 @@
 # Changelog
 
+## 0.1.0
+
+<!-- generated comparing v0.0.41..master -->
+
+_Mar 20, 2023_
+
+A big thanks to the 3 contributors who made this release possible. Here are some highlights ✨:
+
+Today we're taking a big step. We're making Toolpad focus much more on integrating with your IDE, while providing the ease of building UI fast with a drag and drop. Read more [here](https://github.com/mui/mui-toolpad/discussions/1748).
+
+- &#8203;<!-- 8 -->Add create-toolpad-app CLI (#1700) @bharatkashyap
+- &#8203;<!-- 7 -->Direction 13 (#1651) @Janpot
+- &#8203;<!-- 6 -->Fix dragged element corners (#1750) @Janpot
+- &#8203;<!-- 5 -->Turn off preview environments (#1697) @Janpot
+- &#8203;<!-- 4 -->this don't work @Janpot
+- &#8203;<!-- 3 -->build to legacy master @Janpot
+- &#8203;<!-- 2 -->add ignore console to test @Janpot
+- &#8203;<!-- 1 -->Disable bindings for properties that can be controlled in canvas (#1696) @apedroferreira
+
+All contributors of this release in alphabetical order: @apedroferreira, @bharatkashyap, @Janpot
+
 ## 0.0.41
 
 <!-- generated comparing v0.0.40..master -->

@@ -1,6 +1,6 @@
 {
   "name": "docs",
-  "version": "0.0.42-alpha.6",
+  "version": "0.1.0",
   "private": true,
   "author": "MUI Toolpad",
   "license": "MIT",
@@ -92,7 +92,7 @@
     "cpy-cli": "^4.2.0",
     "cross-fetch": "^3.1.5",
     "gm": "^1.25.0",
-    "typescript": "^4.9.5",
+    "typescript": "^5.0.2",
     "typescript-to-proptypes": "^2.2.1"
   }
 }

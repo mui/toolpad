@@ -1,6 +1,6 @@
 {
   "name": "@mui/toolpad",
-  "version": "0.0.42-alpha.6",
+  "version": "0.1.0",
   "license": "MIT",
   "scripts": {
     "cjsify": "mkdir -p ./dist/cjs && echo \"{ \\\"type\\\":\\\"commonjs\\\" }\" > ./dist/cjs/package.json",
@@ -9,8 +9,7 @@
     "build:cjs": "tsc -p tsconfig.cjs.json",
     "dev": "concurrently \"yarn:dev:*\" yarn:cjsify",
     "dev:esm": "yarn build:esm --pretty --watch --preserveWatchOutput",
-    "dev:cjs": "yarn build:cjs --pretty --watch --preserveWatchOutput",
-    "dev13": "yarn dev"
+    "dev:cjs": "yarn build:cjs --pretty --watch --preserveWatchOutput"
   },
   "exports": {
     "./package.json": "./package.json",
@@ -33,12 +32,12 @@
     "toolpad": "./index.js"
   },
   "dependencies": {
-    "@mui/toolpad-app": "^0.0.42-alpha.6",
-    "@mui/toolpad-core": "^0.0.42-alpha.6",
+    "@mui/toolpad-app": "^0.1.0",
+    "@mui/toolpad-core": "^0.1.0",
     "arg": "^5.0.2",
     "concurrently": "^7.6.0",
     "dotenv": "^16.0.3",
     "execa": "^7.1.1"
   },
-  "gitHead": "035964a9ef748b365e130b428c2cbba9663902cf"
+  "gitHead": "de68953329881ccd3aa40e82a7302c0baa38c3c5"
 }

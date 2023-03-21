@@ -2,12 +2,9 @@ import * as fs from 'fs/promises';
 import * as path from 'path';
 import * as url from 'url';
 import { createRequire } from 'module';
-import globCb from 'glob';
-import { promisify } from 'util';
+import glob from 'glob';
 
 const require = createRequire(import.meta.url);
-
-const glob = promisify(globCb);
 
 const currentDirectory = url.fileURLToPath(new URL('.', import.meta.url));
 

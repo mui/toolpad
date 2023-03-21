@@ -86,7 +86,7 @@ If you would like to hack on MUI Toolpad or want to run the latest version, you 
   ⚠️  There might be data loss when applying the changes:
   ```
 
-  This means your database is out of sync with the prisma schema and can't be synchronized without data loss. You can synchronise the database manually using:
+  This means your database is out of sync with the prisma schema and can't be synchronized without data loss. You can synchronize the database manually using:
 
   ```sh
   yarn prisma db push --accept-data-loss

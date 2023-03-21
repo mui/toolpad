@@ -18,6 +18,7 @@ import {
   useGridRootProps,
   gridDensityFactorSelector,
   useGridSelector,
+  getGridDefaultColumnTypes,
 } from '@mui/x-data-grid-pro';
 import * as React from 'react';
 import { useNode, createComponent, useComponents } from '@mui/toolpad-core';
@@ -37,6 +38,8 @@ import { errorFrom } from '@mui/toolpad-core/utils/errors';
 import { hasImageExtension } from '@mui/toolpad-core/path';
 import { ErrorBoundary, FallbackProps } from 'react-error-boundary';
 import { SX_PROP_HELPER_TEXT } from './constants';
+
+const DEFAULT_COLUMN_TYPES = getGridDefaultColumnTypes();
 
 // Pseudo random number. See https://stackoverflow.com/a/47593316
 function mulberry32(a: number): () => number {
@@ -378,7 +381,9 @@ export function parseColumns(columns: SerializableGridColumns): GridColDef[] {
 
     const customType = column.type ? CUSTOM_COLUMN_TYPES[column.type] : {};
 
-    return { customType, ...column };
+    const type = column.type && column.type in DEFAULT_COLUMN_TYPES ? column.type : undefined;
+
+    return { ...customType, ...column, type };
   });
 }
 

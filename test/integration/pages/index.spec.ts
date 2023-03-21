@@ -1,21 +1,21 @@
 import * as path from 'path';
 import { ToolpadEditor } from '../../models/ToolpadEditor';
-import { test, expect } from '../../playwright/test';
-import { readJsonFile } from '../../utils/fs';
-import generateId from '../../utils/generateId';
+import { test, expect } from '../../playwright/localTest';
+import { APP_ID_LOCAL_MARKER } from '../../../packages/toolpad-app/src/constants';
 
-test.skip(!!process.env.LOCAL_MODE_TESTS, 'These are hosted mode tests');
+test.skip(!process.env.LOCAL_MODE_TESTS, 'These are local mode tests');
 
-test('must load page in initial URL without altering URL', async ({ page, api }) => {
-  const dom = await readJsonFile(path.resolve(__dirname, './2pages.json'));
+test.use({
+  localAppConfig: {
+    template: path.resolve(__dirname, './fixture'),
+    cmd: 'dev',
+  },
+});
 
-  const app = await api.mutation.createApp(`App ${generateId()}`, {
-    from: { kind: 'dom', dom },
-  });
-
+test('must load page in initial URL without altering URL', async ({ page }) => {
   const editorModel = new ToolpadEditor(page);
 
-  await page.goto(`/_toolpad/app/${app.id}/pages/g433ywb?abcd=123`);
+  await page.goto(`/_toolpad/app/${APP_ID_LOCAL_MARKER}/pages/g433ywb?abcd=123`);
 
   await editorModel.pageRoot.waitFor();
 

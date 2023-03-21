@@ -168,9 +168,8 @@ export function useFormInput<V>({
   const previousDefaultValueRef = React.useRef(defaultValue);
   React.useEffect(() => {
     if (form && name && defaultValue !== previousDefaultValueRef.current) {
-      if (form && name) {
-        form.setValue(name, defaultValue);
-      }
+      onChange(defaultValue as V);
+      form.setValue(name, defaultValue);
       previousDefaultValueRef.current = defaultValue;
     }
   }, [form, name, onChange, defaultValue]);

@@ -98,8 +98,7 @@ test.describe('with fixture', () => {
     const moveTargetY = secondTextFieldBoundingBox!.y + secondTextFieldBoundingBox!.height / 2;
 
     await editorModel.dragToAppCanvas(
-      canvasMoveElementHandleSelector,
-      true,
+      editorModel.appCanvas.locator(canvasMoveElementHandleSelector),
       moveTargetX,
       moveTargetY,
     );

@@ -95,7 +95,7 @@ function ComponentCatalogItem({
       onClick={onClick}
       draggable={draggable}
       onDragStart={onDragStart}
-      component={kind === 'create' ? ButtonBase : undefined}
+      component={ButtonBase}
       sx={{
         display: 'flex',
         flexDirection: 'column',

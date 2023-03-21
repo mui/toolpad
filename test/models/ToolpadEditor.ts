@@ -111,16 +111,7 @@ export class ToolpadEditor {
     return expect(this.pageOverlay).toBeVisible();
   }
 
-  async dragToAppCanvas(
-    sourceSelector: string,
-    isSourceInCanvas: boolean,
-    moveTargetX: number,
-    moveTargetY: number,
-  ) {
-    const sourceLocator = isSourceInCanvas
-      ? this.appCanvas.locator(sourceSelector)
-      : this.page.locator(sourceSelector);
-
+  async dragToAppCanvas(sourceLocator: Locator, moveTargetX: number, moveTargetY: number) {
     const sourceBoundingBox = await sourceLocator.boundingBox();
     const targetBoundingBox = await this.pageRoot.boundingBox();
 
@@ -151,15 +142,17 @@ export class ToolpadEditor {
     // Account for opening transition
     await this.page.waitForTimeout(200);
 
-    const sourceSelector = `data-testid=component-catalog >> div:has-text("${componentName}")[draggable]`;
-
     const targetBoundingBox = await this.pageRoot.boundingBox();
     expect(targetBoundingBox).toBeDefined();
 
     const moveTargetX = targetBoundingBox!.x + targetBoundingBox!.width / 2;
     const moveTargetY = targetBoundingBox!.y + targetBoundingBox!.height / 2;
 
-    this.dragToAppCanvas(sourceSelector, false, moveTargetX, moveTargetY);
+    const sourceLocator = this.page.getByTestId('component-catalog').getByRole('button', {
+      name: componentName,
+    });
+
+    this.dragToAppCanvas(sourceLocator, moveTargetX, moveTargetY);
   }
 
   hierarchyItem(group: string, name: string): Locator {

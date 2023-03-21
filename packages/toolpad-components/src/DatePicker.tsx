@@ -1,6 +1,10 @@
 import * as React from 'react';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
-import { DesktopDatePicker, DesktopDatePickerProps } from '@mui/x-date-pickers/DesktopDatePicker';
+import {
+  DesktopDatePicker,
+  DesktopDatePickerProps,
+  DesktopDatePickerSlotsComponentsProps,
+} from '@mui/x-date-pickers/DesktopDatePicker';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { createComponent, useNode } from '@mui/toolpad-core';
 import dayjs from 'dayjs';
@@ -129,11 +133,17 @@ function DatePicker({
     [valueProp],
   );
 
-  const datePickerProps: DesktopDatePickerProps = {
+  const defaultValue = React.useMemo(
+    () => (typeof defaultValueProp === 'string' ? dayjs(defaultValueProp) : defaultValueProp),
+    [defaultValueProp],
+  );
+
+  const datePickerProps: DesktopDatePickerProps<dayjs.Dayjs> = {
     ...rest,
     format: format || 'L',
     value: value || null,
     onChange: handleChange,
+    defaultValue,
     slotProps: {
       textField: {
         fullWidth: rest.fullWidth,
@@ -145,7 +155,7 @@ function DatePicker({
           helperText: (fieldError as FieldError)?.message || '',
         }),
       },
-    },
+    } as DesktopDatePickerSlotsComponentsProps<dayjs.Dayjs>,
   };
 
   const datePickerElement = <DesktopDatePicker<dayjs.Dayjs> {...datePickerProps} />;

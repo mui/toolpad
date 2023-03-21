@@ -101,18 +101,19 @@ const PROJECT_FILES_PATH = path.resolve(TOOLPAD_DIR_PATH, './cli/projectFiles');
 
 const projectFiles = [
   {
-    source: '.gitignore',
+    name: '.gitignore',
+    source: 'toolpad-generated-gitignore',
     destination: './.toolpad-generated',
   },
 ];
 
 async function writeProjectFiles(): Promise<void> {
   await Promise.all(
-    projectFiles.map(async ({ source, destination }) => {
+    projectFiles.map(async ({ name, source, destination }) => {
       const filePath = path.resolve(PROJECT_FILES_PATH, source);
       const fileContent = await fs.readFile(filePath);
 
-      await fs.writeFile(path.join(process.cwd(), destination, source), fileContent, {
+      await fs.writeFile(path.join(process.cwd(), destination, name), fileContent, {
         encoding: 'utf-8',
       });
     }),

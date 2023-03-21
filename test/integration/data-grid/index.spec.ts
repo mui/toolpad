@@ -6,7 +6,7 @@ import { APP_ID_LOCAL_MARKER } from '../../../packages/toolpad-app/src/constants
 
 test.skip(!process.env.LOCAL_MODE_TESTS, 'These are local mode tests');
 
-test.describe.only('custom component columns', () => {
+test.describe('custom component columns', () => {
   test.use({
     localAppConfig: {
       template: path.resolve(__dirname, './fixture-custom'),

@@ -105,7 +105,7 @@ const test = base.extend<
   { browserCloser: null }
 >({
   toolpadDev: !!process.env.TOOLPAD_DEV,
-  localAppConfig: undefined,
+  localAppConfig: [undefined, { option: true }],
   localApp: async ({ localAppConfig, toolpadDev }, use) => {
     if (!localAppConfig) {
       throw new Error('localAppConfig missing');

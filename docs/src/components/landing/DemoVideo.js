@@ -12,7 +12,7 @@ const Video = styled('video')(({ theme }) => ({
   border: '1px solid',
   borderColor:
     theme.palette.mode === 'dark'
-      ? 'linear-gradient(90deg, #202020 0%, #FFFFFF 100%)'
+      ? `${theme.palette.primaryDark[700]}`
       : `${theme.palette.primary[100]}`,
 }));
 
@@ -32,7 +32,10 @@ const VideoContainer = styled(Box)(({ theme }) => ({
   padding: 16,
   background:
     theme.palette.mode === 'dark'
-      ? 'linear-gradient(90deg, #202020 0%, #FFFFFF 100%)'
+      ? `linear-gradient(230deg, ${theme.palette.primaryDark[600]} 0%, ${alpha(
+          theme.palette.primaryDark[700],
+          0.4,
+        )} 150%)`
       : `linear-gradient(230deg, ${theme.palette.primary[50]} 0%, ${alpha(
           theme.palette.primary[100],
           0.4,
@@ -40,11 +43,11 @@ const VideoContainer = styled(Box)(({ theme }) => ({
   border: '1px solid',
   borderColor:
     theme.palette.mode === 'dark'
-      ? 'linear-gradient(90deg, #202020 0%, #FFFFFF 100%)'
+      ? `${alpha(theme.palette.primaryDark[300], 0.5)}`
       : `${alpha(theme.palette.primary[200], 0.5)}`,
   boxShadow:
     theme.palette.mode === 'dark'
-      ? 'linear-gradient(90deg, #202020 0%, #FFFFFF 100%)'
+      ? `4px 0 60px ${alpha(theme.palette.primary[300], 0.5)}`
       : `4px 0 60px ${alpha(theme.palette.primary[100], 0.8)}`,
 }));
 

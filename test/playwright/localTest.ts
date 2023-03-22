@@ -4,6 +4,7 @@ import * as fs from 'fs/promises';
 import childProcess from 'child_process';
 import { Readable } from 'stream';
 import { once } from 'events';
+import invariant from 'invariant';
 import { test as base } from './test';
 
 interface RunningLocalApp {
@@ -68,15 +69,11 @@ export async function withApp(
 
     try {
       await Promise.race([
-        new Promise((resolve, reject) => {
-          child.on('exit', (code) => {
-            reject(new Error(`App process exited unexpectedly${code ? ` with code ${code}` : ''}`));
-          });
+        once(child, 'exit').then(([code]) => {
+          throw new Error(`App process exited unexpectedly${code ? ` with code ${code}` : ''}`);
         }),
         (async () => {
-          if (!child.stdout) {
-            throw new Error('No stdout');
-          }
+          invariant(child.stdout, "Childprocess must be started with stdio: 'pipe'");
 
           if (VERBOSE) {
             child.stdout?.pipe(process.stdout);

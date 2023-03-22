@@ -4,6 +4,8 @@
 
 If you would like to hack on MUI Toolpad or want to run the latest version, you can follow these steps:
 
+_If you're looking into contributing to the docs, follow the instructions down below_
+
 ### Prerequisites
 
 - git
@@ -91,6 +93,28 @@ If you would like to hack on MUI Toolpad or want to run the latest version, you 
   ```sh
   yarn prisma db push --accept-data-loss
   ```
+
+## Building and running the documentation
+
+1.  If you haven't already, install the project dependencies using
+
+    ```sh
+    yarn
+    ```
+
+1.  To start the documentation application in dev mode run
+
+    ```sh
+    yarn docs:dev
+    ```
+
+    If all goes well it should print
+
+    ```sh
+    ready - started server on 0.0.0.0:3003, url: http://localhost:3003
+    ```
+
+1.  Open the docs application in the browser [http://localhost:3003/toolpad](http://localhost:3003/toolpad)
 
 ## Sending a pull request
 

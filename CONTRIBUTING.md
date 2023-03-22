@@ -4,7 +4,7 @@
 
 If you would like to hack on MUI Toolpad or want to run the latest version, you can follow these steps:
 
-_If you're looking into contributing to the docs, follow the instructions down below_
+_If you're looking into contributing to the docs, follow the [instructions](#building-and-running-the-documentation) down below_
 
 ### Prerequisites
 

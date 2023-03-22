@@ -16,7 +16,7 @@ export default function Banner(props) {
       <Container
         sx={{
           pt: 0,
-          pb: { xs: 2, sm: 8, md: docs ? 1 : 16 },
+          pb: { xs: 2, sm: 8, md: docs ? 1 : 12 },
           px: docs ? { xs: 0, sm: 0, md: 0 } : 'default',
           display: 'flex',
           flexDirection: 'row',
@@ -28,13 +28,18 @@ export default function Banner(props) {
             borderRadius: 1,
             px: 2,
             py: docs ? 2.5 : 2,
-            bgcolor: (theme) =>
+            background: (theme) =>
               theme.palette.mode === 'dark'
-                ? alpha(theme.palette.primaryDark[900], 0.5)
-                : 'primary.50',
+                ? `linear-gradient(230deg, ${alpha(
+                    theme.palette.primaryDark[400],
+                    0.4,
+                  )} 0%, ${alpha(theme.palette.primaryDark[300], 0.4)} 150%)`
+                : `linear-gradient(45deg, ${theme.palette.primary[50]} 0%, ${alpha(
+                    theme.palette.primary[200],
+                    0.4,
+                  )} 150%)`,
             border: '1px solid',
-            borderColor: (theme) =>
-              theme.palette.mode === 'dark' ? 'primaryDark.500' : 'primary.100',
+            borderColor: (theme) => `${alpha(theme.palette.primaryDark[300], 0.5)}`,
             display: 'flex',
             flexDirection: {
               xs: 'column',
@@ -52,7 +57,7 @@ export default function Banner(props) {
             <Typography
               variant={docs ? 'body1' : 'body2'}
               color="text.secondary"
-              sx={{ maxWidth: 700 }}
+              sx={{ maxWidth: 500 }}
             >
               {description}
             </Typography>

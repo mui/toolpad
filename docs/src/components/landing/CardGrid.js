@@ -4,7 +4,7 @@ import Box from '@mui/material/Box';
 import Container from '@mui/material/Container';
 import Paper from '@mui/material/Paper';
 import Typography from '@mui/material/Typography';
-import Grid from '@mui/material/Grid';
+import Grid from '@mui/material/Unstable_Grid2';
 import SectionHeadline from 'docs/src/components/typography/SectionHeadline';
 import IconImage from 'docs/src/components/icon/IconImage';
 
@@ -31,9 +31,7 @@ const cardMediaStyle = (imageUrl) => ({
 });
 
 const cardContentRootStyle = (imageUrl) => ({
-  px: imageUrl ? 2 : 0,
-  pt: imageUrl ? 2 : 0,
-  pb: 0,
+  p: imageUrl ? 2 : 0,
 });
 
 export default function CardGrid(props) {
@@ -48,11 +46,11 @@ export default function CardGrid(props) {
           : null
       }
     >
-      <Container sx={{ py: { xs: 4, sm: 6, md: 8 } }}>
+      <Container sx={{ py: { xs: 4, sm: 6 } }}>
         <SectionHeadline overline={content.overline} title={content.Headline} />
-        <Grid container spacing={2}>
+        <Grid container spacing={{ xs: 1, sm: 2, md: 3 }}>
           {content.cards.map(({ icon, title, wip, imageUrl, description }) => (
-            <Grid key={title} item xs={12} sm={6} md={4}>
+            <Grid key={title}>
               <Paper variant="outlined" sx={cardRootStyle(imageUrl)}>
                 {imageUrl ? <Box sx={cardMediaStyle(imageUrl)} /> : null}
                 <Box sx={cardContentRootStyle(imageUrl)}>

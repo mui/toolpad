@@ -4,10 +4,12 @@ import Button from '@mui/material/Button';
 import KeyboardArrowRightRounded from '@mui/icons-material/KeyboardArrowRightRounded';
 import Chip from '@mui/material/Chip';
 import Typography from '@mui/material/Typography';
+import SvgMuiLogo from 'docs/src/icons/SvgMuiLogo';
 import IconImage from 'docs/src/components/icon/IconImage';
 import GradientText from 'docs/src/components/typography/GradientText';
 import SignUp from './SignUp';
 import ToolpadHeroContainer from '../../layouts/ToolpadHeroContainer';
+import DataObjectRoundedIcon from '@mui/icons-material/DataObjectRounded';
 import ROUTES from '../../route';
 
 export default function Hero() {
@@ -44,6 +46,12 @@ export default function Hero() {
           Build scalable and secure internal tools locally. Use your own IDE, drag and drop
           pre-built components or create yours.
         </Typography>
+        <Box sx={{ mx: 'auto', display: 'flex', justifyContent: 'center' }}>
+          <SvgMuiLogo width={20} />
+          <Typography color="text.secondary">Open source</Typography>
+          <DataObjectRoundedIcon />
+          <Typography color="text.secondary">Open source</Typography>
+        </Box>
         {/* <Button
           size="large"
           variant="contained"

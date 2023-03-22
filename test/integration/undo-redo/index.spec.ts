@@ -2,7 +2,6 @@ import * as path from 'path';
 import { ToolpadEditor } from '../../models/ToolpadEditor';
 import { test, expect } from '../../playwright/localTest';
 import clickCenter from '../../utils/clickCenter';
-import { APP_ID_LOCAL_MARKER } from '../../../packages/toolpad-app/src/constants';
 
 test.describe('basic tests', () => {
   test.use({
@@ -14,7 +13,7 @@ test.describe('basic tests', () => {
 
   test('test basic undo and redo', async ({ page }) => {
     const editorModel = new ToolpadEditor(page);
-    await editorModel.goto(APP_ID_LOCAL_MARKER);
+    await editorModel.goto();
 
     await editorModel.waitForOverlay();
 
@@ -43,7 +42,7 @@ test.describe('basic tests', () => {
 
   test('test batching text input actions into single undo entry', async ({ page }) => {
     const editorModel = new ToolpadEditor(page);
-    await editorModel.goto(APP_ID_LOCAL_MARKER);
+    await editorModel.goto();
 
     await editorModel.waitForOverlay();
 
@@ -85,7 +84,7 @@ test.describe('multiple pages', () => {
 
   test('test undo and redo through different pages', async ({ page }) => {
     const editorModel = new ToolpadEditor(page);
-    await editorModel.goto(APP_ID_LOCAL_MARKER);
+    await editorModel.goto();
 
     await editorModel.waitForOverlay();
 

@@ -2,7 +2,6 @@ import * as path from 'path';
 import { test, expect } from '../../playwright/localTest';
 import { ToolpadRuntime } from '../../models/ToolpadRuntime';
 import { ToolpadEditor } from '../../models/ToolpadEditor';
-import { APP_ID_LOCAL_MARKER } from '../../../packages/toolpad-app/src/constants';
 import { fileReplace } from '../../utils/fs';
 
 test.use({
@@ -25,7 +24,7 @@ test.use({
 
 test('functions basics', async ({ page }) => {
   const runtimeModel = new ToolpadRuntime(page);
-  await runtimeModel.gotoPage(APP_ID_LOCAL_MARKER, 'page1');
+  await runtimeModel.gotoPage('page1');
 
   await page.locator('text="hello, message: hello world"').waitFor({ state: 'visible' });
   await page.locator('text="throws, error.message: BOOM!"').waitFor({ state: 'visible' });
@@ -36,7 +35,7 @@ test('functions basics', async ({ page }) => {
 
 test('function editor reload', async ({ page, localApp }) => {
   const editorModel = new ToolpadEditor(page);
-  await editorModel.goto(APP_ID_LOCAL_MARKER);
+  await editorModel.goto();
 
   await expect(editorModel.appCanvas.getByText('edited hello')).toBeVisible();
 

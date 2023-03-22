@@ -3,7 +3,6 @@ import { test, expect } from '../../playwright/localTest';
 import { ToolpadRuntime } from '../../models/ToolpadRuntime';
 import { fileReplaceAll } from '../../utils/fs';
 import { ToolpadEditor } from '../../models/ToolpadEditor';
-import { APP_ID_LOCAL_MARKER } from '../../../packages/toolpad-app/src/constants';
 
 // We can run our own httpbin instance if necessary:
 //    $ docker run -p 80:80 kennethreitz/httpbin
@@ -29,14 +28,14 @@ test('rest basics', async ({ page, localApp }) => {
   await fileReplaceAll(queriesFilePath, HTTPBIN_SOURCE_URL, HTTPBIN_TARGET_URL);
 
   const runtimeModel = new ToolpadRuntime(page);
-  await runtimeModel.gotoPage(APP_ID_LOCAL_MARKER, 'page1');
+  await runtimeModel.gotoPage('page1');
   await expect(page.locator('text="query1: query1_value"')).toBeVisible();
   await expect(page.locator('text="query2: undefined"')).toBeVisible();
   await page.locator('button:has-text("fetch query2")').click();
   await expect(page.locator('text="query2: query2_value"')).toBeVisible();
 
   const editorModel = new ToolpadEditor(page);
-  await editorModel.goto(APP_ID_LOCAL_MARKER);
+  await editorModel.goto();
 
   await editorModel.componentEditor.getByRole('button', { name: 'query1' }).click();
   const queryEditor = page.getByRole('dialog', { name: 'query1' });

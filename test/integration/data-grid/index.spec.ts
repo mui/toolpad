@@ -1,75 +1,80 @@
 import * as path from 'path';
 import { ToolpadEditor } from '../../models/ToolpadEditor';
-import { test, expect } from '../../playwright/test';
-import { readJsonFile } from '../../utils/fs';
+import { test, expect } from '../../playwright/localTest';
 import clickCenter from '../../utils/clickCenter';
-import generateId from '../../utils/generateId';
+import { APP_ID_LOCAL_MARKER } from '../../../packages/toolpad-app/src/constants';
 
-test('Code component cell', async ({ page, api }) => {
-  const dom = await readJsonFile(path.resolve(__dirname, './codeComponentCell.json'));
-
-  const app = await api.mutation.createApp(`App ${generateId()}`, {
-    from: { kind: 'dom', dom },
+test.describe('custom component columns', () => {
+  test.use({
+    localAppConfig: {
+      template: path.resolve(__dirname, './fixture-custom'),
+      cmd: 'dev',
+    },
   });
 
-  const editorModel = new ToolpadEditor(page);
-  editorModel.goto(app.id);
+  test('Code component cell', async ({ page }) => {
+    const editorModel = new ToolpadEditor(page);
+    editorModel.goto(APP_ID_LOCAL_MARKER);
 
-  await editorModel.waitForOverlay();
+    await editorModel.waitForOverlay();
 
-  await expect(editorModel.pageRoot.getByText('value: {"test":"value"}')).toBeVisible();
-  await expect(
-    editorModel.pageRoot.getByText(
-      'row: {"hiddenField":true,"customField":{"test":"value"},"id":0}',
-    ),
-  ).toBeVisible();
-  await expect(editorModel.pageRoot.getByText('field: "customField"')).toBeVisible();
+    await expect(editorModel.pageRoot.getByText('value: {"test":"value"}')).toBeVisible();
+    await expect(
+      editorModel.pageRoot.getByText(
+        'row: {"hiddenField":true,"customField":{"test":"value"},"id":0}',
+      ),
+    ).toBeVisible();
+    await expect(editorModel.pageRoot.getByText('field: "customField"')).toBeVisible();
+  });
 });
 
-test('Column prop updates are not lost on drag interactions', async ({ page, api }) => {
-  const dom = await readJsonFile(path.resolve(__dirname, './columnPropUpdate.json'));
-
-  const app = await api.mutation.createApp(`App ${generateId()}`, {
-    from: { kind: 'dom', dom },
+test.describe('basic tests', () => {
+  test.use({
+    localAppConfig: {
+      template: path.resolve(__dirname, './fixture-basic'),
+      cmd: 'dev',
+    },
   });
 
-  const editorModel = new ToolpadEditor(page);
-  editorModel.goto(app.id);
+  test('Column prop updates are not lost on drag interactions', async ({ page }) => {
+    const editorModel = new ToolpadEditor(page);
+    editorModel.goto(APP_ID_LOCAL_MARKER);
 
-  await editorModel.pageRoot.waitFor({ state: 'visible' });
+    await editorModel.pageRoot.waitFor({ state: 'visible' });
 
-  const canvasGridLocator = editorModel.appCanvas.getByRole('grid');
+    const canvasGridLocator = editorModel.appCanvas.getByRole('grid');
 
-  // Change the "Avatar" column type from "link" to "boolean"
+    // Change the "Avatar" column type from "link" to "boolean"
 
-  const firstGridLocator = canvasGridLocator.first();
+    const firstGridLocator = canvasGridLocator.first();
 
-  await clickCenter(page, firstGridLocator);
+    await clickCenter(page, firstGridLocator);
 
-  await editorModel.componentEditor.locator('button:has-text("columns")').click();
+    await editorModel.componentEditor.locator('button:has-text("columns")').click();
 
-  await editorModel.page.getByRole('button', { name: 'Avatar' }).click();
+    await editorModel.page.getByRole('button', { name: 'Avatar' }).click();
 
-  await editorModel.page.getByRole('button', { name: 'link' }).click();
+    await editorModel.page.getByRole('button', { name: 'link' }).click();
 
-  await editorModel.page.getByRole('option', { name: 'boolean' }).click();
+    await editorModel.page.getByRole('option', { name: 'boolean' }).click();
 
-  await page.keyboard.press('Escape');
+    await page.keyboard.press('Escape');
 
-  // Drag the "Avatar" column to the end of the grid
+    // Drag the "Avatar" column to the end of the grid
 
-  const avatarColumn = editorModel.pageRoot.getByText('Avatar', { exact: true });
-  const profileColumn = editorModel.pageRoot.getByText('Profile', { exact: true });
+    const avatarColumn = editorModel.pageRoot.getByText('Avatar', { exact: true });
+    const profileColumn = editorModel.pageRoot.getByText('Profile', { exact: true });
 
-  await avatarColumn.dragTo(profileColumn);
+    await avatarColumn.dragTo(profileColumn);
 
-  // Expect the "Avatar" column to continue to be of type "boolean" instead of "link"
+    // Expect the "Avatar" column to continue to be of type "boolean" instead of "link"
 
-  await expect(
-    editorModel.pageRoot
-      .getByRole('row', {
-        name: '1 Todd Breitenberg International http://spotless-octopus.name',
-      })
-      .getByTestId('CheckIcon'),
-  ).toBeVisible();
+    await expect(
+      editorModel.pageRoot
+        .getByRole('row', {
+          name: '1 Todd Breitenberg International http://spotless-octopus.name',
+        })
+        .getByTestId('CheckIcon'),
+    ).toBeVisible();
+  });
 });

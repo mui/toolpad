@@ -19,8 +19,6 @@ function getNodeViewInfo(
 ): NodeInfo | null {
   if (nodeId) {
     const rect = getRelativeOuterRect(viewElm, elm);
-    console.log(rect);
-    console.log('-----');
     const props = fiber.child?.memoizedProps ?? {};
 
     return {

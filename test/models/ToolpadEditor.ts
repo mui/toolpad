@@ -107,8 +107,8 @@ export class ToolpadEditor {
     await this.createComponentDialog.createButton.click();
   }
 
-  waitForOverlay() {
-    return expect(this.pageOverlay).toBeVisible();
+  async waitForOverlay() {
+    await this.pageOverlay.waitFor({ state: 'visible' });
   }
 
   async dragToAppCanvas(sourceLocator: Locator, moveTargetX: number, moveTargetY: number) {

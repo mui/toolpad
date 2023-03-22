@@ -112,8 +112,6 @@ test.describe('with fixture', () => {
 
     await editorModel.waitForOverlay();
 
-    await expect(editorModel.appCanvas.getByTestId('page-overlay')).toBeVisible();
-
     const canvasInputLocator = editorModel.appCanvas.locator('input');
 
     await expect(canvasInputLocator).toHaveCount(2);

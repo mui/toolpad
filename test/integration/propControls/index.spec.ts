@@ -19,9 +19,10 @@ test.describe('basic', () => {
 
     await editorModel.pageRoot.waitFor();
 
+    await editorModel.waitForOverlay();
+
     const canvasInputLocator = editorModel.appCanvas.locator('input');
 
-    await expect(editorModel.appCanvas.getByTestId('page-overlay')).toBeVisible();
     // Verify that initial prop control values are correct
 
     const firstInputLocator = canvasInputLocator.first();

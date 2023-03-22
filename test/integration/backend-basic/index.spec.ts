@@ -4,6 +4,7 @@ import { test, expect } from '../../playwright/localTest';
 import { ToolpadRuntime } from '../../models/ToolpadRuntime';
 import { ToolpadEditor } from '../../models/ToolpadEditor';
 import { APP_ID_LOCAL_MARKER } from '../../../packages/toolpad-app/src/constants';
+import { fileReplace } from '../../utils/fs';
 
 test.skip(!process.env.LOCAL_MODE_TESTS, 'These are local mode tests');
 
@@ -43,9 +44,7 @@ test('function editor reload', async ({ page, localApp }) => {
   await expect(editorModel.appCanvas.getByText('edited hello')).toBeVisible();
 
   const queriesFilePath = path.resolve(localApp.dir, './toolpad/queries.ts');
-  const queriesFileContent = await fs.readFile(queriesFilePath, { encoding: 'utf-8' });
-  const updatedFileContent = queriesFileContent.replace("'edited hello'", "'edited goodbye!!!'");
-  await fs.writeFile(queriesFilePath, updatedFileContent);
+  await fileReplace(queriesFilePath, "'edited hello'", "'edited goodbye!!!'");
 
   // TODO: make this unnecessary:
   await page.reload();

@@ -8,7 +8,6 @@ import UrlQueryEditor from './UrlQueryEditor';
 import NodeNameEditor from '../NodeNameEditor';
 import * as appDom from '../../../appDom';
 import PageModuleEditor from './PageModuleEditor';
-import { APP_ID_LOCAL_MARKER } from '../../../constants';
 
 // Page modules are deprecated
 const ENABLE_PAGE_MODULE_EDITOR = false;
@@ -28,7 +27,7 @@ export default function PageOptionsPanel() {
           startIcon={<PageIcon />}
           color="inherit"
           component="a"
-          href={`/app/${APP_ID_LOCAL_MARKER}/preview/pages/${pageNodeId}`}
+          href={`/app/preview/pages/${pageNodeId}`}
           aria-label={'Preview'}
         >
           Preview

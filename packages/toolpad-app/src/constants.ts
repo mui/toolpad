@@ -25,8 +25,6 @@ export const PRODUCTION_DATASOURCES = new Set([
   'local',
 ]);
 
-export const APP_ID_LOCAL_MARKER = '__LOCAL_MODE_APP_';
-
 export const TOOLPAD_BRIDGE_GLOBAL = '__TOOLPAD_BRIDGE__';
 
 export const NON_BINDABLE_CONTROL_TYPES = ['GridColumns'];

@@ -13,7 +13,6 @@ import {
   GoogleSheetsResult,
 } from './types';
 import { Maybe } from '../../utils/types';
-import { APP_ID_LOCAL_MARKER } from '../../constants';
 
 /**
  * Create an OAuth2 client based on the configuration
@@ -263,9 +262,7 @@ async function handler(
         client.setCredentials(tokens);
         await api.setConnectionParams(connectionId, client.credentials);
       }
-      return res.redirect(
-        `/_toolpad/app/${APP_ID_LOCAL_MARKER}/connections/${encodeURIComponent(connectionId)}`,
-      );
+      return res.redirect(`/_toolpad/app/connections/${encodeURIComponent(connectionId)}`);
     }
     return res.status(404).send('No handler exists for given path');
   } catch (e) {

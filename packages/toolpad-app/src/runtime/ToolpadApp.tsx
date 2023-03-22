@@ -64,11 +64,7 @@ import evalJsBindings, {
   EvaluatedBinding,
   ParsedBinding,
 } from './evalJsBindings';
-import {
-  APP_ID_LOCAL_MARKER,
-  HTML_ID_EDITOR_OVERLAY,
-  NON_BINDABLE_CONTROL_TYPES,
-} from '../constants';
+import { HTML_ID_EDITOR_OVERLAY, NON_BINDABLE_CONTROL_TYPES } from '../constants';
 import { mapProperties, mapValues } from '../utils/collections';
 import usePageTitle from '../utils/usePageTitle';
 import ComponentsContext, { useComponents, useComponent } from './ComponentsContext';
@@ -1122,7 +1118,7 @@ export default function ToolpadApp({
                         endIcon={<EditIcon />}
                         color="primary"
                         component="a"
-                        href={`/_toolpad/app/${APP_ID_LOCAL_MARKER}`}
+                        href={`/_toolpad/app`}
                       >
                         Edit
                       </Button>

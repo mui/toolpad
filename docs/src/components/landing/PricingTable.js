@@ -9,6 +9,12 @@ import Tabs from '@mui/material/Tabs';
 import Tab from '@mui/material/Tab';
 import Divider from '@mui/material/Divider';
 import Typography from '@mui/material/Typography';
+import GiteRoundedIcon from '@mui/icons-material/GiteRounded';
+import AppShortcutRoundedIcon from '@mui/icons-material/AppShortcutRounded';
+import ToggleOnIcon from '@mui/icons-material/ToggleOn';
+import SecurityRoundedIcon from '@mui/icons-material/SecurityRounded';
+import SupportAgentRoundedIcon from '@mui/icons-material/SupportAgentRounded';
+
 // import IconImage from 'docs/src/components/icon/IconImage';
 import SectionHeadline from 'docs/src/components/typography/SectionHeadline';
 
@@ -66,7 +72,7 @@ function Cell({ highlighted = false, ...props }) {
         ...(highlighted && {
           // Remove borders since there are only two plans
           // https://github.com/mui/mui-toolpad/pull/809#issuecomment-1221026428
-          borderWidth: '0 0 0 0',
+          borderWidth: '0 1px 0 1px',
           borderStyle: 'solid',
           borderColor: (theme) => (theme.palette.mode === 'dark' ? 'primaryDark.700' : 'grey.100'),
           bgcolor: (theme) =>
@@ -91,8 +97,10 @@ function RowHead({ children, startIcon, ...props }) {
       {...props}
       sx={{
         justifyContent: 'flex-start',
-        borderRadius: 1,
+        borderRadius: '8px 0 0 8px',
         bgcolor: (theme) => (theme.palette.mode === 'dark' ? 'primaryDark.900' : 'grey.50'),
+        border: '1px solid',
+        borderColor: (theme) => (theme.palette.mode === 'dark' ? 'primaryDark.700' : 'grey.100'),
         p: 1,
         transition: 'none',
         typography: 'body2',
@@ -239,6 +247,7 @@ function PricingTable({
       columnHeaderHidden ? '0px' : '240px'
     }, 1fr))`,
   };
+
   function renderRow(key) {
     return (
       <Box
@@ -286,17 +295,37 @@ function PricingTable({
         <Box sx={gridSx}>
           <Typography />
           {plans.map((plan) => (
-            <Box key={plan} sx={{ display: 'flex', flexDirection: 'column', p: 2 }}>
+            <Box
+              key={plan}
+              sx={{
+                display: 'flex',
+                flexDirection: 'column',
+                p: 2,
+                borderRadius: '12px 12px 0 0',
+                ...(planInfo.commercial && {
+                  borderWidth: '1px 1px 0 1px',
+                  borderStyle: 'solid',
+                  borderColor: (theme) =>
+                    theme.palette.mode === 'dark' ? 'primaryDark.700' : 'grey.100',
+                  bgcolor: (theme) =>
+                    theme.palette.mode === 'dark'
+                      ? alpha(theme.palette.primaryDark[900], 0.5)
+                      : alpha(theme.palette.grey[50], 0.5),
+                }),
+              }}
+            >
               <PlanName planInfo={planInfo[plan]} />
             </Box>
           ))}
         </Box>
       ) : null}
-      <RowHead>Hosting</RowHead>
+      <RowHead startIcon={<GiteRoundedIcon fontSize="small" color="primary" />}>Hosting</RowHead>
       {renderRow('Self-hosting')}
       {divider}
       {renderRow('Cloud hosting')}
-      <RowHead>Apps</RowHead>
+      <RowHead startIcon={<AppShortcutRoundedIcon fontSize="small" color="primary" />}>
+        Apps
+      </RowHead>
       {renderRow('Apps')}
       {divider}
       {renderRow('Data sources')}
@@ -310,13 +339,15 @@ function PricingTable({
       {renderRow('White label')}
       {divider}
       {renderRow('Custom themes')}
-      <RowHead>Components</RowHead>
+      <RowHead startIcon={<ToggleOnIcon fontSize="small" color="primary" />}>Components</RowHead>
       {renderRow('Components')}
       {divider}
       {renderRow('Custom components')}
       {divider}
       {renderRow('Premium components')}
-      <RowHead>Security</RowHead>
+      <RowHead startIcon={<SecurityRoundedIcon fontSize="small" color="primary" />}>
+        Security
+      </RowHead>
       {renderRow('OAuth2/OpenID SSO')}
       {divider}
       {renderRow('SSO enforcement')}
@@ -326,7 +357,9 @@ function PricingTable({
       {renderRow('Granular permissions')}
       {divider}
       {renderRow('Audit logs')}
-      <RowHead>Support</RowHead>
+      <RowHead startIcon={<SupportAgentRoundedIcon fontSize="small" color="primary" />}>
+        Support
+      </RowHead>
       {renderRow('Support level')}
       {divider}
     </Box>
@@ -438,9 +471,20 @@ export default function Pricing({
 }) {
   return (
     <React.Fragment>
-      <Container sx={{ py: { xs: 4, sm: 6, md: 8 } }}>
+      <Container
+        sx={{
+          mt: 4,
+          pt: { xs: 4, sm: 6, md: 8 },
+          borderTop: '1px solid',
+          borderColor: (theme) => (theme.palette.mode === 'dark' ? 'primaryDark.600' : 'grey.200'),
+        }}
+      >
         <SectionHeadline overline="Plans" title={Headline} />
-        <Typography variant="body2" sx={{ marginTop: { md: -2 }, marginBottom: { xs: 2, md: 0 } }}>
+        <Typography
+          variant="body2"
+          color="text.secondary"
+          sx={{ marginTop: { md: -2 }, marginBottom: { xs: 2, md: 0 }, maxWidth: 450 }}
+        >
           With the intention to have affordable plans for all kind of business needs, we will
           announce our exact pricing later this year.
         </Typography>

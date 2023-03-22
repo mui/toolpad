@@ -41,7 +41,10 @@ export default function CardGrid(props) {
       sx={
         darker
           ? {
-              bgcolor: (theme) => (theme.palette.mode === 'dark' ? 'primaryDark.900' : 'grey.50'),
+              background: (theme) =>
+                theme.palette.mode === 'dark'
+                  ? `linear-gradient(180deg, ${theme.palette.primaryDark[900]} 0%, transparent 100%)`
+                  : `linear-gradient(180deg, ${theme.palette.grey[50]} 0%, transparent 100%)`,
             }
           : null
       }

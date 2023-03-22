@@ -1,5 +1,7 @@
 import { PlaywrightTestConfig, devices } from '@playwright/test';
 
+process.env.BROWSER = 'none';
+
 const config: PlaywrightTestConfig<{ toolpadDev: boolean }> = {
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 2 : 0,
@@ -9,8 +11,6 @@ const config: PlaywrightTestConfig<{ toolpadDev: boolean }> = {
     trace: 'on-first-retry',
     baseURL: process.env.PLAYWRIGHT_TEST_BASE_URL || 'http://localhost:3000/',
   },
-  globalSetup: '../playwright/global-setup',
-  globalTeardown: '../playwright/global-teardown',
   projects: [
     {
       name: 'chromium',

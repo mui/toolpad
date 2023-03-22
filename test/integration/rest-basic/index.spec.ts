@@ -26,7 +26,7 @@ test.use({
   },
 });
 
-test.only('rest basics', async ({ page, localApp }) => {
+test('rest basics', async ({ page, localApp }) => {
   const queriesFilePath = path.resolve(localApp.dir, './toolpad.yml');
   await fileReplaceAll(queriesFilePath, HTTPBIN_SOURCE_URL, HTTPBIN_TARGET_URL);
 

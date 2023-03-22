@@ -3,8 +3,6 @@ import { ToolpadRuntime } from '../../models/ToolpadRuntime';
 import { expect, test } from '../../playwright/localTest';
 import { APP_ID_LOCAL_MARKER } from '../../../packages/toolpad-app/src/constants';
 
-test.skip(!process.env.LOCAL_MODE_TESTS, 'These are local mode tests');
-
 test.use({
   ignoreConsoleErrors: [
     // Chrome

@@ -4,8 +4,6 @@ import { test, expect } from '../../playwright/localTest';
 import clickCenter from '../../utils/clickCenter';
 import { APP_ID_LOCAL_MARKER } from '../../../packages/toolpad-app/src/constants';
 
-test.skip(!process.env.LOCAL_MODE_TESTS, 'These are local mode tests');
-
 test.describe('basic tests', () => {
   test.use({
     localAppConfig: {

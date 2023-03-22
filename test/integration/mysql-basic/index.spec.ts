@@ -4,7 +4,7 @@ import { ToolpadRuntime } from '../../models/ToolpadRuntime';
 import { readJsonFile } from '../../utils/fs';
 import generateId from '../../utils/generateId';
 
-test.skip(!!process.env.LOCAL_MODE_TESTS, 'These are hosted mode tests');
+test.skip(true, 'Legacy database tests');
 
 const mysqlHost = process.env.MYSQL_HOST;
 

@@ -153,6 +153,8 @@ jobs:
       - image: mcr.microsoft.com/playwright:v1.31.1-focal
         environment:
           NODE_ENV: test
+      - image: kennethreitz/httpbin:latest
+
     steps:
       - checkout
       - install_js
@@ -171,55 +173,11 @@ jobs:
           name: Tests real browser
           environment:
             - LOCAL_MODE_TESTS: '1'
+            - HTTPBIN_BASEURL: 'http://localhost/'
           command: |
             docker-compose -f ./docker-compose.test.yml up -d --quiet-pull
             yarn test:integration
             docker-compose -f ./docker-compose.test.yml down
-
-  docker:
-    working_directory: /tmp/mui-toolpad
-    resource_class: medium
-    machine: true
-    environment:
-      - DOCKER_BUILDKIT: '1'
-    steps:
-      - checkout
-
-      # build the application image
-      - run: |
-          docker build \
-            --progress plain \
-            -t muicom/toolpad:$CIRCLE_SHA1 \
-            --build-arg GIT_SHA1=$CIRCLE_SHA1 \
-            --build-arg CIRCLE_BUILD_NUM=$CIRCLE_BUILD_NUM \
-            -f ./docker/images/toolpad/Dockerfile \
-            .
-
-      - install_js
-
-      # test the image
-      - run:
-          command: |
-            # See https://circleci.com/docs/2.0/env-vars/#setting-an-environment-variable-in-a-shell-command
-            TAG=$CIRCLE_SHA1 docker-compose -f ./docker-compose.legacy-test.yml up -d --quiet-pull
-            yarn workspace @mui/toolpad-app waitForApp --url=http://172.17.0.1:3000/
-            docker-compose -f ./docker-compose.legacy-test.yml run -it --rm playwright yarn test:integration --forbid-only
-            docker-compose -f ./docker-compose.legacy-test.yml logs toolpad
-            docker-compose -f ./docker-compose.legacy-test.yml down
-
-      # push the image
-      - when:
-          condition:
-            equal: [master, << pipeline.git.branch >>]
-          steps:
-            # login docker hub
-            - run: |
-                echo "$DOCKER_PASS" | docker login --username $DOCKER_USER --password-stdin
-
-            - run: |
-                docker push muicom/toolpad:$CIRCLE_SHA1
-                docker tag muicom/toolpad:$CIRCLE_SHA1 muicom/toolpad:alpha
-                docker push muicom/toolpad:alpha
 
 workflows:
   version: 2
@@ -238,4 +196,3 @@ workflows:
       - test_unit:
           requires:
             - checkout
-      - docker

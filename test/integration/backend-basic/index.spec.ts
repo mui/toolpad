@@ -5,8 +5,6 @@ import { ToolpadEditor } from '../../models/ToolpadEditor';
 import { APP_ID_LOCAL_MARKER } from '../../../packages/toolpad-app/src/constants';
 import { fileReplace } from '../../utils/fs';
 
-test.skip(!process.env.LOCAL_MODE_TESTS, 'These are local mode tests');
-
 test.use({
   ignoreConsoleErrors: [
     // Chrome:

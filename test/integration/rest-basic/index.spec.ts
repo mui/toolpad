@@ -5,8 +5,6 @@ import { fileReplaceAll } from '../../utils/fs';
 import { ToolpadEditor } from '../../models/ToolpadEditor';
 import { APP_ID_LOCAL_MARKER } from '../../../packages/toolpad-app/src/constants';
 
-test.skip(!process.env.LOCAL_MODE_TESTS, 'These are local mode tests');
-
 // We can run our own httpbin instance if necessary:
 //    $ docker run -p 80:80 kennethreitz/httpbin
 const customHttbinBaseUrl = process.env.HTTPBIN_BASEURL;

@@ -3,8 +3,6 @@ import { ToolpadRuntime } from '../../models/ToolpadRuntime';
 import { test, expect } from '../../playwright/localTest';
 import { APP_ID_LOCAL_MARKER } from '../../../packages/toolpad-app/src/constants';
 
-test.skip(!process.env.LOCAL_MODE_TESTS, 'These are local mode tests');
-
 test.use({
   localAppConfig: {
     template: path.resolve(__dirname, './fixture'),

@@ -1,8 +1,6 @@
 import * as path from 'path';
 import { test, expect } from '../../playwright/localTest';
 
-test.skip(!process.env.LOCAL_MODE_TESTS, 'These are local mode tests');
-
 test.use({
   ignoreConsoleErrors: [
     /Failed to load resource: the server responded with a status of 404 \(Not Found\)/,

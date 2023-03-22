@@ -130,8 +130,12 @@ export default function QueryEditor() {
   const { queries = [] } = appDom.getChildNodes(dom, page) ?? [];
 
   const handleEditStateDialogClose = React.useCallback(() => {
-    appStateApi.setView({ kind: 'page', nodeId: page.id });
-  }, [appStateApi, page.id]);
+    if (!dialogState?.isDraft) {
+      appStateApi.setView({ kind: 'page', nodeId: page.id });
+    } else {
+      setDialogState(null);
+    }
+  }, [appStateApi, dialogState?.isDraft, page.id]);
 
   const handleCreated = React.useCallback((node: appDom.QueryNode) => {
     setDialogState({ node, isDraft: true });
@@ -184,15 +188,19 @@ export default function QueryEditor() {
   );
 
   React.useEffect(() => {
-    setDialogState(() => {
+    setDialogState((previousState) => {
       if (currentView.kind === 'page' && currentView.view?.kind === 'query') {
         const node = appDom.getNode(dom, currentView.view?.nodeId, 'query');
         return { node, isDraft: false };
       }
 
-      return null;
+      if (!dialogState?.isDraft) {
+        return null;
+      }
+
+      return previousState;
     });
-  }, [dom, currentView]);
+  }, [dom, currentView, dialogState?.isDraft]);
 
   const [anchorEl, setAnchorEl] = React.useState<Element | null>(null);
 

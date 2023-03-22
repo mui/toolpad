@@ -11,7 +11,7 @@ interface RunningLocalApp {
   dir: string;
 }
 
-// You'll need to have `yarn dev13` running for this
+// You'll need to have `yarn dev` running for this
 const VERBOSE = true;
 
 async function waitForMatch(input: Readable, regex: RegExp): Promise<RegExpExecArray | null> {

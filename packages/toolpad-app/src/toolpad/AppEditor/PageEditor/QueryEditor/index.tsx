@@ -125,17 +125,18 @@ export default function QueryEditor() {
   const domApi = useDomApi();
 
   const [dialogState, setDialogState] = React.useState<DialogState | null>(null);
+  const isDraft = dialogState?.isDraft || false;
 
   const page = appDom.getNode(dom, state.nodeId, 'page');
   const { queries = [] } = appDom.getChildNodes(dom, page) ?? [];
 
   const handleEditStateDialogClose = React.useCallback(() => {
-    if (!dialogState?.isDraft) {
-      appStateApi.setView({ kind: 'page', nodeId: page.id });
-    } else {
+    if (isDraft) {
       setDialogState(null);
+    } else {
+      appStateApi.setView({ kind: 'page', nodeId: page.id });
     }
-  }, [appStateApi, dialogState?.isDraft, page.id]);
+  }, [appStateApi, isDraft, page.id]);
 
   const handleCreated = React.useCallback((node: appDom.QueryNode) => {
     setDialogState({ node, isDraft: true });
@@ -194,13 +195,13 @@ export default function QueryEditor() {
         return { node, isDraft: false };
       }
 
-      if (!dialogState?.isDraft) {
-        return null;
+      if (isDraft) {
+        return previousState;
       }
 
-      return previousState;
+      return null;
     });
-  }, [dom, currentView, dialogState?.isDraft]);
+  }, [dom, currentView, isDraft]);
 
   const [anchorEl, setAnchorEl] = React.useState<Element | null>(null);
 
@@ -305,7 +306,7 @@ export default function QueryEditor() {
         <QueryNodeEditorDialog
           open={!!dialogState}
           node={dialogState.node}
-          isDraft={dialogState.isDraft}
+          isDraft={isDraft}
           onSave={handleSave}
           onRemove={handleRemove}
           onClose={handleEditStateDialogClose}

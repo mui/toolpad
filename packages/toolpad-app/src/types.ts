@@ -192,6 +192,5 @@ export type CompiledModule =
 export interface RuntimeState {
   // We start out with just the rendertree. The ultimate goal will be to move things out of this tree
   dom: appDom.RenderTree;
-  appId: string;
   modules: Record<string, CompiledModule>;
 }

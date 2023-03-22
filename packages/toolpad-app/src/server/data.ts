@@ -7,7 +7,7 @@ import serverDataSources from '../toolpadDataSources/server';
 import * as appDom from '../appDom';
 import { omit } from '../utils/immutability';
 import { asArray } from '../utils/collections';
-import { decryptSecret, encryptSecret } from './secrets';
+import { decryptSecret } from './secrets';
 import applyTransform from '../toolpadDataSources/applyTransform';
 import { excludeFields } from '../utils/prisma';
 import { getAppTemplateDom } from './appTemplateDoms/doms';
@@ -17,7 +17,6 @@ import { migrateUp } from '../appDom/migrations';
 import { errorFrom } from '../utils/errors';
 import { ERR_APP_EXISTS, ERR_VALIDATE_CAPTCHA_FAILED } from '../errorCodes';
 import createRuntimeState from '../createRuntimeState';
-import { APP_ID_LOCAL_MARKER } from '../constants';
 import { saveLocalDom, loadLocalDom } from './localMode';
 
 const SELECT_RELEASE_META = excludeFields(prisma.Prisma.ReleaseScalarFieldEnum, ['snapshot']);
@@ -56,23 +55,6 @@ function deserializeValue(dbValue: string, type: prisma.DomNodeAttributeType): u
   return serialized.length <= 0 ? undefined : JSON.parse(serialized);
 }
 
-function encryptSecrets(dom: appDom.AppDom): appDom.AppDom {
-  // TODO: use better method than clone + update (immer would work well here)
-  const result = _.cloneDeep(dom);
-  for (const node of Object.values(result.nodes)) {
-    const namespaces = omit(node, ...appDom.RESERVED_NODE_PROPERTIES);
-    for (const namespace of Object.values(namespaces)) {
-      for (const value of Object.values(namespace)) {
-        if (value.type === 'secret') {
-          const serialized = value.value === undefined ? '' : JSON.stringify(value.value);
-          value.value = encryptSecret(serialized);
-        }
-      }
-    }
-  }
-  return result;
-}
-
 function decryptSecrets(dom: appDom.AppDom): appDom.AppDom {
   // TODO: use better method than clone + update (immer would work well here)
   const result = _.cloneDeep(dom);
@@ -90,20 +72,8 @@ function decryptSecrets(dom: appDom.AppDom): appDom.AppDom {
   return result;
 }
 
-export async function saveDom(appId: string, app: appDom.AppDom): Promise<void> {
-  if (appId === APP_ID_LOCAL_MARKER) {
-    await saveLocalDom(app);
-    return;
-  }
-
-  const prismaClient = getPrismaClient();
-  await prismaClient.app.update({
-    where: {
-      id: appId,
-    },
-    data: { editedAt: new Date(), dom: encryptSecrets(app) as any },
-    select: SELECT_APP_META,
-  });
+export async function saveDom(app: appDom.AppDom): Promise<void> {
+  await saveLocalDom(app);
 }
 
 async function loadPreviewDomLegacy(appId: string): Promise<appDom.AppDom> {
@@ -269,7 +239,7 @@ export async function createApp(name: string, opts: CreateAppOptions = {}): Prom
       dom = appDom.createDefaultDom();
     }
 
-    await saveDom(app.id, dom);
+    await saveDom(dom);
 
     return app;
   });
@@ -429,25 +399,6 @@ export async function findActiveDeployment(appId: string): Promise<Deployment | 
   });
 }
 
-function parseSnapshot(snapshot: Buffer): appDom.AppDom {
-  return JSON.parse(snapshot.toString('utf-8')) as appDom.AppDom;
-}
-
-async function loadReleaseDom(appId: string, version: number): Promise<appDom.AppDom> {
-  const prismaClient = getPrismaClient();
-  const release = await prismaClient.release.findUnique({
-    where: { release_app_constraint: { appId, version } },
-  });
-
-  if (!release) {
-    throw new Error(`release doesn't exist`);
-  }
-
-  const domSnapshot = parseSnapshot(release.snapshot);
-
-  return migrateUp(domSnapshot);
-}
-
 export async function getConnectionParams<P = unknown>(
   appId: string,
   connectionId: string | null,
@@ -477,11 +428,10 @@ export async function setConnectionParams<P>(
     appDom.createSecret(params),
   );
 
-  await saveDom(appId, dom);
+  await saveDom(dom);
 }
 
 export async function execQuery<P, Q>(
-  appId: string,
   dataNode: appDom.QueryNode<Q>,
   params: Q,
 ): Promise<ExecFetchResult<any>> {
@@ -493,11 +443,7 @@ export async function execQuery<P, Q>(
     );
   }
 
-  const connectionParams = dataNode.attributes.connectionId.value
-    ? await getConnectionParams<P>(appId, appDom.deref(dataNode.attributes.connectionId.value))
-    : null;
-
-  let result = await dataSource.exec(connectionParams, dataNode.attributes.query.value, params);
+  let result = await dataSource.exec(null, dataNode.attributes.query.value, params);
 
   if (appDom.isQuery(dataNode)) {
     const transformEnabled = dataNode.attributes.transformEnabled?.value;
@@ -548,25 +494,15 @@ export function parseVersion(param?: string | string[]): VersionOrPreview | null
   return Number.isNaN(parsed) ? null : parsed;
 }
 
-export async function loadDom(
-  appId: string,
-  version: VersionOrPreview = 'preview',
-): Promise<appDom.AppDom> {
-  if (appId === APP_ID_LOCAL_MARKER) {
-    return loadLocalDom();
-  }
-
-  return version === 'preview' ? loadPreviewDom(appId) : loadReleaseDom(appId, version);
+export async function loadDom(): Promise<appDom.AppDom> {
+  return loadLocalDom();
 }
 
 /**
  * Version of loadDom that returns a subset of the dom that doesn't contain sensitive information
  */
-export async function loadRuntimeState(
-  appId: string,
-  version: VersionOrPreview = 'preview',
-): Promise<RuntimeState> {
-  return createRuntimeState({ appId, dom: await loadDom(appId, version) });
+export async function loadRuntimeState(): Promise<RuntimeState> {
+  return createRuntimeState({ dom: await loadDom() });
 }
 
 export async function duplicateApp(id: string, name: string): Promise<AppMeta> {

@@ -1,6 +1,5 @@
 import type { GetServerSideProps, NextPage } from 'next';
 import * as React from 'react';
-import { APP_ID_LOCAL_MARKER } from '../../src/constants';
 import ToolpadApp, { ToolpadAppProps } from '../../src/runtime/ToolpadApp';
 import config from '../../src/config';
 
@@ -18,7 +17,7 @@ export const getServerSideProps: GetServerSideProps<ToolpadAppProps> = async () 
   //   context.res.setHeader('X-Frame-Options', 'DENY');
   // }
 
-  const state = await loadRuntimeState(APP_ID_LOCAL_MARKER, 0);
+  const state = await loadRuntimeState();
 
   return {
     props: {

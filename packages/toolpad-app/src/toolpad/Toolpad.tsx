@@ -3,8 +3,7 @@ import * as React from 'react';
 import { ErrorBoundary, FallbackProps } from 'react-error-boundary';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import NoSsr from '../components/NoSsr';
-import { APP_ID_LOCAL_MARKER } from '../constants';
-import { EditorContent } from './AppEditor';
+import AppEditor from './AppEditor';
 import ErrorAlert from './AppEditor/PageEditor/ErrorAlert';
 
 const Centered = styled('div')({
@@ -51,7 +50,7 @@ export default function Toolpad({ basename }: ToolpadProps) {
           <React.Suspense fallback={<FullPageLoader />}>
             <BrowserRouter basename={basename}>
               <Routes>
-                <Route path="/*" element={<EditorContent appId={APP_ID_LOCAL_MARKER} />} />
+                <Route path="/*" element={<AppEditor />} />
               </Routes>
             </BrowserRouter>
           </React.Suspense>

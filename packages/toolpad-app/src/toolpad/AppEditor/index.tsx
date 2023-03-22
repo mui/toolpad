@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { styled } from '@mui/material';
-import { useParams, useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { JsRuntimeProvider } from '@mui/toolpad-core/jsServerRuntime';
 import PageEditor from './PageEditor';
 import DomProvider, { useAppState } from '../AppState';
@@ -36,57 +36,39 @@ const EditorRoot = styled('div')(({ theme }) => ({
   },
 }));
 
-interface FileEditorProps {
-  appId: string;
-}
-
-function FileEditor({ appId }: FileEditorProps) {
+function FileEditor() {
   const { currentView } = useAppState();
 
   const location = useLocation();
   const navigate = useNavigate();
 
   React.useEffect(() => {
-    const newPathname = getPathnameFromView(appId, currentView);
+    const newPathname = getPathnameFromView(currentView);
     if (newPathname !== location.pathname) {
       navigate({ pathname: newPathname }, { replace: true });
     }
-  }, [appId, currentView, location.pathname, navigate]);
+  }, [currentView, location.pathname, navigate]);
 
   const currentViewContent = React.useMemo(() => {
     switch (currentView.kind) {
       case 'page':
-        return <PageEditor appId={appId} nodeId={currentView.nodeId} />;
+        return <PageEditor nodeId={currentView.nodeId} />;
       default:
-        return <NoPageFound appId={appId} />;
+        return <NoPageFound />;
     }
-  }, [appId, currentView.kind, currentView.nodeId]);
+  }, [currentView.kind, currentView.nodeId]);
 
-  return <AppEditorShell appId={appId}>{currentViewContent}</AppEditorShell>;
+  return <AppEditorShell>{currentViewContent}</AppEditorShell>;
 }
 
-export interface EditorContentProps {
-  appId: string;
-}
-
-export function EditorContent({ appId }: EditorContentProps) {
+export default function Editor() {
   return (
     <JsRuntimeProvider>
-      <DomProvider appId={appId}>
+      <DomProvider>
         <EditorRoot>
-          <FileEditor appId={appId} />
+          <FileEditor />
         </EditorRoot>
       </DomProvider>
     </JsRuntimeProvider>
   );
-}
-
-export default function Editor() {
-  const { appId } = useParams();
-
-  if (!appId) {
-    throw new Error(`Missing queryParam "appId"`);
-  }
-
-  return <EditorContent appId={appId} />;
 }

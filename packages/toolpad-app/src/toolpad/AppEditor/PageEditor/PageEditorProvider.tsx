@@ -1,6 +1,7 @@
 import { NodeId, LiveBindings, ScopeMeta } from '@mui/toolpad-core';
 import * as React from 'react';
 import * as appDom from '../../../appDom';
+import { APP_ID_LOCAL_MARKER } from '../../../constants';
 import { PageViewState } from '../../../types';
 import { RectangleEdge } from '../../../utils/geometry';
 import { update } from '../../../utils/immutability';
@@ -79,9 +80,9 @@ export type PageEditorAction =
       bindings: LiveBindings;
     };
 
-export function createPageEditorState(appId: string, nodeId: NodeId): PageEditorState {
+export function createPageEditorState(nodeId: NodeId): PageEditorState {
   return {
-    appId,
+    appId: APP_ID_LOCAL_MARKER,
     type: 'page',
     nodeId,
     newNode: null,
@@ -238,7 +239,6 @@ export function usePageEditorState() {
 }
 
 export interface PageEditorProviderProps {
-  appId: string;
   children?: React.ReactNode;
   nodeId: NodeId;
 }
@@ -249,14 +249,14 @@ const PageEditorApiContext = React.createContext<PageEditorApi>(
   createPageEditorApi(() => undefined),
 );
 
-export function PageEditorProvider({ appId, children, nodeId }: PageEditorProviderProps) {
-  const initialState = createPageEditorState(appId, nodeId);
+export function PageEditorProvider({ children, nodeId }: PageEditorProviderProps) {
+  const initialState = createPageEditorState(nodeId);
   const [state, dispatch] = React.useReducer(pageEditorReducer, initialState);
   const api = React.useMemo(() => createPageEditorApi(dispatch), []);
 
   React.useEffect(() => {
-    api.replace(createPageEditorState(appId, nodeId));
-  }, [appId, api, nodeId]);
+    api.replace(createPageEditorState(nodeId));
+  }, [api, nodeId]);
 
   return (
     <PageEditorContext.Provider value={state}>

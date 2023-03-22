@@ -3,14 +3,14 @@ import * as esbuild from 'esbuild';
 import * as path from 'path';
 import serializeJavascript from 'serialize-javascript';
 import * as appDom from '../appDom';
-import { APP_ID_LOCAL_MARKER, MUI_X_PRO_LICENSE } from '../constants';
+import { MUI_X_PRO_LICENSE } from '../constants';
 import createRuntimeState from '../createRuntimeState';
 import { getToolpadComponents } from '../toolpadComponents';
 import { loadDomFromDisk } from './localMode';
 import projectRoot from './projectRoot';
 
 async function createMain(dom: appDom.AppDom) {
-  const initialState = createRuntimeState({ appId: APP_ID_LOCAL_MARKER, dom });
+  const initialState = createRuntimeState({ dom });
   const serializedInitialState = serializeJavascript(initialState, {
     ignoreFunction: true,
   });

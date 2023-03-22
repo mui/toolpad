@@ -1,5 +1,6 @@
 import { NodeId } from '@mui/toolpad-core';
 import { matchPath } from 'react-router-dom';
+import { APP_ID_LOCAL_MARKER } from '../constants';
 import { APP_PAGE_ROUTE, APP_CONNECTION_ROUTE, APP_CODE_COMPONENT_ROUTE } from '../routes';
 
 export type PageView =
@@ -20,14 +21,14 @@ export type DomView =
   | { kind: 'connection'; nodeId: NodeId }
   | { kind: 'codeComponent'; nodeId: NodeId };
 
-export function getPathnameFromView(appId: string, view: DomView): string {
+export function getPathnameFromView(view: DomView): string {
   switch (view.kind) {
     case 'page':
-      return `/app/${appId}/pages/${view.nodeId}`;
+      return `/app/${APP_ID_LOCAL_MARKER}/pages/${view.nodeId}`;
     case 'connection':
-      return `/app/${appId}/connections/${view.nodeId}`;
+      return `/app/${APP_ID_LOCAL_MARKER}/connections/${view.nodeId}`;
     case 'codeComponent':
-      return `/app/${appId}/codeComponents/${view.nodeId}`;
+      return `/app/${APP_ID_LOCAL_MARKER}/codeComponents/${view.nodeId}`;
     default:
       throw new Error(`Unknown view "${(view as DomView).kind}".`);
   }

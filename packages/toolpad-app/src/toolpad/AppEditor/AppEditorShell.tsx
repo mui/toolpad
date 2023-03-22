@@ -35,12 +35,11 @@ function getSaveState(domLoader: DomLoader): React.ReactNode {
 }
 
 export interface ToolpadShellProps {
-  appId: string;
   actions?: React.ReactNode;
   children: React.ReactNode;
 }
 
-export default function AppEditorShell({ appId, children, ...props }: ToolpadShellProps) {
+export default function AppEditorShell({ children, ...props }: ToolpadShellProps) {
   const domLoader = useDomLoader();
 
   return (
@@ -71,7 +70,6 @@ export default function AppEditorShell({ appId, children, ...props }: ToolpadShe
         }}
       >
         <PagePanel
-          appId={appId}
           sx={{
             width: 250,
             borderRight: 1,

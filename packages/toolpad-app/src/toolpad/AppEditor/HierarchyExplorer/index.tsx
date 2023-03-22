@@ -124,11 +124,10 @@ function getNodeEditorDomView(node: appDom.AppDomNode): DomView | undefined {
 }
 
 export interface HierarchyExplorerProps {
-  appId: string;
   className?: string;
 }
 
-export default function HierarchyExplorer({ appId, className }: HierarchyExplorerProps) {
+export default function HierarchyExplorer({ className }: HierarchyExplorerProps) {
   const { dom } = useDom();
   const { currentView } = useAppState();
 
@@ -275,7 +274,6 @@ export default function HierarchyExplorer({ appId, className }: HierarchyExplore
 
       <CreatePageNodeDialog
         key={createPageDialogOpen || undefined}
-        appId={appId}
         open={!!createPageDialogOpen}
         onClose={handleCreatepageDialogClose}
       />

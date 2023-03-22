@@ -11,12 +11,11 @@ const PagePanelRoot = styled('div')({
 });
 
 export interface ComponentPanelProps {
-  appId: string;
   className?: string;
   sx?: SxProps;
 }
 
-export default function PagePanel({ appId, className, sx }: ComponentPanelProps) {
+export default function PagePanel({ className, sx }: ComponentPanelProps) {
   const { dom } = useDom();
 
   return (
@@ -37,7 +36,7 @@ export default function PagePanel({ appId, className, sx }: ComponentPanelProps)
         <AppOptions dom={dom} />
       </Box>
       <Divider />
-      <HierarchyExplorer appId={appId} />
+      <HierarchyExplorer />
     </PagePanelRoot>
   );
 }

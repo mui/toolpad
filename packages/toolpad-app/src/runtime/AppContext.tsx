@@ -3,7 +3,6 @@ import { useNonNullableContext } from '@mui/toolpad-core/utils/react';
 import { VersionOrPreview } from '../types';
 
 export interface AppContext {
-  appId: string;
   version: VersionOrPreview;
 }
 

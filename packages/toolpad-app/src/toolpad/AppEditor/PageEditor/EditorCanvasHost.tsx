@@ -94,10 +94,10 @@ export default function EditorCanvasHost({
 
   const updateOnBridge = React.useCallback(() => {
     if (bridge) {
-      const data = createRuntimeState({ appId, dom });
+      const data = createRuntimeState({ dom });
       bridge.canvasCommands.update({ ...data, savedNodes });
     }
-  }, [appId, bridge, dom, savedNodes]);
+  }, [bridge, dom, savedNodes]);
 
   React.useEffect(() => {
     updateOnBridge();

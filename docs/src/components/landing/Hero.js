@@ -40,11 +40,11 @@ export default function Hero() {
           <br />
           <GradientText>admin builder</GradientText>
         </Typography>
-        <Typography color="text.secondary" sx={{ mb: 3, maxWidth: 540, mx: 'auto' }}>
+        <Typography color="text.secondary" sx={{ mb: 3, maxWidth: 520, mx: 'auto' }}>
           Build scalable and secure internal tools locally. Use your own IDE, drag and drop
-          pre-built components or create yours. Open source and powered by MUI
+          pre-built components or create yours.
         </Typography>
-        <Button
+        {/* <Button
           size="large"
           variant="contained"
           href={ROUTES.toolpadQuickstart}
@@ -52,11 +52,12 @@ export default function Hero() {
           sx={{ width: { xs: '100%', sm: 'auto' }, mb: 3 }}
         >
           Get started
-        </Button>
+        </Button> */}
         <Typography
           component="label"
+          variant="body2"
           color={(theme) => (theme.palette.mode === 'dark' ? '#fff' : `text.secondary`)}
-          sx={{ fontWeight: 'bold', display: 'block', mb: 1, mx: 'auto' }}
+          sx={{ fontWeight: 'medium', display: 'block', mb: 1, mx: 'auto' }}
           htmlFor="email-landing"
         >
           Sign up for early access to the beta release.

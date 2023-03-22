@@ -198,7 +198,7 @@ jobs:
       - run:
           command: |
             # See https://circleci.com/docs/2.0/env-vars/#setting-an-environment-variable-in-a-shell-command
-            TAG=$CIRCLE_SHA1 docker-compose -f ./docker-compose.test.yml up -d
+            TAG=$CIRCLE_SHA1 docker-compose -f ./docker-compose.test.yml up -d --quiet-pull
             yarn workspace @mui/toolpad-app waitForApp --url=http://172.17.0.1:3000/
             docker-compose -f ./docker-compose.test.yml run -it --rm playwright yarn test:integration --forbid-only
             docker-compose -f ./docker-compose.test.yml logs toolpad

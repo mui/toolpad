@@ -5,6 +5,8 @@ import { readJsonFile } from '../../utils/fs';
 import generateId from '../../utils/generateId';
 import { ToolpadEditor } from '../../models/ToolpadEditor';
 
+test.skip(!!process.env.LOCAL_MODE_TESTS, 'These are hosted mode tests');
+
 test.use({
   ignoreConsoleErrors: [
     // Chrome:

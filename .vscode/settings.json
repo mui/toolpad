@@ -7,6 +7,6 @@
     "source.fixAll.eslint": true
   },
   "editor.formatOnSave": true,
-  "typescript.tsdk": "node_modules/typescript/lib"
+  "typescript.tsdk": "node_modules/typescript/lib",
   "cSpell.words": ["Toolpad"]
 }

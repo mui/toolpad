@@ -4,6 +4,8 @@
 
 If you would like to hack on MUI Toolpad or want to run the latest version, you can follow these steps:
 
+_If you're looking into contributing to the docs, follow the [instructions](#building-and-running-the-documentation) down below_
+
 ### Prerequisites
 
 - git
@@ -86,11 +88,33 @@ If you would like to hack on MUI Toolpad or want to run the latest version, you 
   ⚠️  There might be data loss when applying the changes:
   ```
 
-  This means your database is out of sync with the prisma schema and can't be synchronized without data loss. You can synchronise the database manually using:
+  This means your database is out of sync with the prisma schema and can't be synchronized without data loss. You can synchronize the database manually using:
 
   ```sh
   yarn prisma db push --accept-data-loss
   ```
+
+## Building and running the documentation
+
+1. If you haven't already, install the project dependencies using
+
+   ```sh
+   yarn
+   ```
+
+1. To start the documentation application in dev mode run
+
+   ```sh
+   yarn docs:dev
+   ```
+
+   If all goes well it should print
+
+   ```sh
+   ready - started server on 0.0.0.0:3003, url: http://localhost:3003
+   ```
+
+1. Open the docs application in the browser [http://localhost:3003/toolpad](http://localhost:3003/toolpad)
 
 ## Sending a pull request
 

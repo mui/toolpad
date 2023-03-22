@@ -1,5 +1,6 @@
 import { Page } from '@playwright/test';
 import { gotoIfNotCurrent } from './shared';
+import { APP_ID_LOCAL_MARKER } from '../../packages/toolpad-app/src/constants';
 
 export class ToolpadRuntime {
   readonly page: Page;
@@ -9,7 +10,10 @@ export class ToolpadRuntime {
   }
 
   async goto(appId: string) {
-    await gotoIfNotCurrent(this.page, `/app/${appId}/preview/pages`);
+    await gotoIfNotCurrent(
+      this.page,
+      `${appId === APP_ID_LOCAL_MARKER ? '' : `/app/${appId}`}/preview/pages`,
+    );
   }
 
   async gotoPage(appId: string, pageName: string) {
@@ -18,6 +22,8 @@ export class ToolpadRuntime {
   }
 
   async gotoPageById(appId: string, pageId: string) {
-    await this.page.goto(`/app/${appId}/preview/pages/${pageId}`);
+    await this.page.goto(
+      `${appId === APP_ID_LOCAL_MARKER ? '' : `/app/${appId}`}/preview/pages/${pageId}`,
+    );
   }
 }

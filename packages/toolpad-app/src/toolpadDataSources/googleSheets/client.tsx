@@ -7,9 +7,10 @@ import {
   FormControlLabel,
   Typography,
   Skeleton,
+  Box,
 } from '@mui/material';
 import * as React from 'react';
-import { inferColumns, parseColumns, CUSTOM_COLUMN_TYPES } from '@mui/toolpad-components';
+import { inferColumns, parseColumns } from '@mui/toolpad-components';
 import { DataGridPro, GridColDef } from '@mui/x-data-grid-pro';
 import { UseQueryResult } from '@tanstack/react-query';
 import { getObjectKey } from '@mui/toolpad-core/objectKey';
@@ -130,7 +131,7 @@ function QueryEditor({
   const {
     preview,
     runPreview: handleRunPreview,
-    isLoading: isPreviewLoading,
+    isLoading: previewIsLoading,
   } = useQueryPreview(fetchServerPreview, input.attributes.query.value, {});
 
   const rawRows: any[] = preview?.data || EMPTY_ROWS;
@@ -200,15 +201,34 @@ function QueryEditor({
         </Stack>
       </QueryInputPanel>
 
-      <DataGridPro
-        sx={{ border: 'none' }}
-        columns={columns}
-        key={previewGridKey}
-        rows={rows}
-        columnTypes={CUSTOM_COLUMN_TYPES}
-        error={preview?.error}
-        loading={isPreviewLoading}
-      />
+      <Box
+        sx={{
+          height: '100%',
+          display: 'flex',
+          flexDirection: 'column',
+        }}
+      >
+        {preview?.error ? (
+          <Box
+            sx={{
+              display: 'flex',
+              flex: 1,
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}
+          >
+            <Typography color="error">{preview?.error?.message}</Typography>
+          </Box>
+        ) : (
+          <DataGridPro
+            sx={{ border: 'none', flex: 1 }}
+            columns={columns}
+            key={previewGridKey}
+            rows={rows}
+            loading={previewIsLoading}
+          />
+        )}
+      </Box>
     </SplitPane>
   );
 }

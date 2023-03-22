@@ -177,7 +177,6 @@ jobs:
           command: yarn test:integration
 
 workflows:
-  version: 2
   pipeline:
     jobs:
       - checkout

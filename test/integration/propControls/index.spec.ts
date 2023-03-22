@@ -29,7 +29,6 @@ test.describe('basic', () => {
     const firstInputLocator = canvasInputLocator.first();
     await clickCenter(page, firstInputLocator);
 
-    await page.screenshot({ path: 'screenshot.png' });
     await editorModel.componentEditor
       .locator('h6:has-text("Text field")')
       .waitFor({ state: 'visible' });

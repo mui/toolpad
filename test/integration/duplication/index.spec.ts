@@ -1,53 +1,18 @@
 import * as path from 'path';
 import { ToolpadEditor } from '../../models/ToolpadEditor';
-import { test, expect } from '../../playwright/test';
-import { readJsonFile } from '../../utils/fs';
-import generateId from '../../utils/generateId';
+import { test, expect } from '../../playwright/localTest';
+import { APP_ID_LOCAL_MARKER } from '../../../packages/toolpad-app/src/constants';
 
-test('duplication', async ({ page, api }) => {
-  const dom = await readJsonFile(path.resolve(__dirname, './dom.json'));
+test.use({
+  localAppConfig: {
+    template: path.resolve(__dirname, './fixture'),
+    cmd: 'dev',
+  },
+});
 
-  const app = await api.mutation.createApp(`App ${generateId()}`, {
-    from: { kind: 'dom', dom },
-  });
-
+test('duplication', async ({ page }) => {
   const editorModel = new ToolpadEditor(page);
-  await editorModel.goto(app.id);
-
-  {
-    await editorModel.openHierarchyMenu('connections', 'connection');
-    const duplicateMenuItem = page.getByRole('menuitem', { name: 'Duplicate' });
-    await duplicateMenuItem.click();
-
-    await page.waitForURL(/\/_toolpad\/app\/[^/]+\/connections\/[^/]+$/);
-
-    const input = page.getByLabel('base url');
-    await expect(input).toHaveValue('https://example.com/');
-
-    await editorModel.openHierarchyMenu('connections', 'connection1');
-    const deleteMenuItem = page.getByRole('menuitem', { name: 'Delete' });
-    await deleteMenuItem.click();
-    const deleteButton = editorModel.confirmationDialog.getByRole('button', { name: 'Delete' });
-    await deleteButton.click();
-
-    await expect(editorModel.hierarchyItem('connections', 'connection1')).toBeHidden();
-  }
-
-  {
-    await editorModel.openHierarchyMenu('components', 'myComponent');
-    const duplicateMenuItem = page.getByRole('menuitem', { name: 'Duplicate' });
-    await duplicateMenuItem.click();
-
-    await page.waitForURL(/\/_toolpad\/app\/[^/]+\/codeComponents\/[^/]+$/);
-
-    await editorModel.openHierarchyMenu('components', 'myComponent1');
-    const deleteMenuItem = page.getByRole('menuitem', { name: 'Delete' });
-    await deleteMenuItem.click();
-    const deleteButton = editorModel.confirmationDialog.getByRole('button', { name: 'Delete' });
-    await deleteButton.click();
-
-    await expect(editorModel.hierarchyItem('components', 'myComponent1')).toBeHidden();
-  }
+  await editorModel.goto(APP_ID_LOCAL_MARKER);
 
   {
     await editorModel.openHierarchyMenu('pages', 'page1');

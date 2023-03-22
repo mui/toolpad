@@ -1,8 +1,9 @@
 import { PlaywrightTestConfig, devices } from '@playwright/test';
 
-const config: PlaywrightTestConfig = {
+const config: PlaywrightTestConfig<{ toolpadDev: boolean }> = {
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 2 : 0,
+  testMatch: /.*.spec.[jt]sx?$/,
   workers: 1,
   use: {
     trace: 'on-first-retry',

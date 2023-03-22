@@ -52,13 +52,11 @@ function createDefaultCodeComponent(name: string): string {
 }
 
 export interface CreateCodeComponentDialogProps {
-  appId: string;
   open: boolean;
   onClose: () => void;
 }
 
 export default function CreateCodeComponentDialog({
-  appId,
   open,
   onClose,
   ...props

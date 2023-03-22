@@ -8,7 +8,7 @@ import ComponentCatalogItem from './ComponentCatalogItem';
 import CreateCodeComponentNodeDialog from '../../HierarchyExplorer/CreateCodeComponentNodeDialog';
 import * as appDom from '../../../../appDom';
 import { useDom } from '../../../AppState';
-import { usePageEditorApi, usePageEditorState } from '../PageEditorProvider';
+import { usePageEditorApi } from '../PageEditorProvider';
 import { useToolpadComponents } from '../../toolpadComponents';
 import useLocalStorageState from '../../../../utils/useLocalStorageState';
 
@@ -47,7 +47,6 @@ export interface ComponentCatalogProps {
 
 export default function ComponentCatalog({ className }: ComponentCatalogProps) {
   const api = usePageEditorApi();
-  const pageState = usePageEditorState();
   const { dom } = useDom();
 
   const [openStart, setOpenStart] = React.useState(0);
@@ -285,7 +284,6 @@ export default function ComponentCatalog({ className }: ComponentCatalogProps) {
         </Box>
       </Box>
       <CreateCodeComponentNodeDialog
-        appId={pageState.appId}
         open={!!createCodeComponentDialogOpen}
         onClose={handleCreateCodeComponentDialogClose}
       />

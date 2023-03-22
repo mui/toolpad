@@ -1,7 +1,6 @@
 import { NodeId, LiveBindings, ScopeMeta } from '@mui/toolpad-core';
 import * as React from 'react';
 import * as appDom from '../../../appDom';
-import { APP_ID_LOCAL_MARKER } from '../../../constants';
 import { PageViewState } from '../../../types';
 import { RectangleEdge } from '../../../utils/geometry';
 import { update } from '../../../utils/immutability';
@@ -19,7 +18,6 @@ export type DropZone =
   | typeof DROP_ZONE_CENTER;
 
 export interface PageEditorState {
-  readonly appId: string;
   readonly type: 'page';
   readonly nodeId: NodeId;
   readonly newNode: appDom.ElementNode | null;
@@ -82,7 +80,6 @@ export type PageEditorAction =
 
 export function createPageEditorState(nodeId: NodeId): PageEditorState {
   return {
-    appId: APP_ID_LOCAL_MARKER,
     type: 'page',
     nodeId,
     newNode: null,

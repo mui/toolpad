@@ -13,6 +13,7 @@ import {
   GoogleSheetsResult,
 } from './types';
 import { Maybe } from '../../utils/types';
+import { APP_ID_LOCAL_MARKER } from '../../constants';
 
 /**
  * Create an OAuth2 client based on the configuration
@@ -224,10 +225,10 @@ async function handler(
     if (!state) {
       return res.status(400).send(`Missing query parameter "state"`);
     }
-    const { connectionId, appId } = JSON.parse(decodeURIComponent(state));
+    const { connectionId } = JSON.parse(decodeURIComponent(state));
 
     // Check if connection with connectionId exists, if so: merge
-    const savedConnection = await api.getConnectionParams(appId, connectionId);
+    const savedConnection = await api.getConnectionParams(connectionId);
     if (savedConnection) {
       client.setCredentials(savedConnection);
     }
@@ -260,12 +261,10 @@ async function handler(
       }
       if (tokens) {
         client.setCredentials(tokens);
-        await api.setConnectionParams(appId, connectionId, client.credentials);
+        await api.setConnectionParams(connectionId, client.credentials);
       }
       return res.redirect(
-        `/_toolpad/app/${encodeURIComponent(appId)}/connections/${encodeURIComponent(
-          connectionId,
-        )}`,
+        `/_toolpad/app/${APP_ID_LOCAL_MARKER}/connections/${encodeURIComponent(connectionId)}`,
       );
     }
     return res.status(404).send('No handler exists for given path');

@@ -399,11 +399,14 @@ export async function findActiveDeployment(appId: string): Promise<Deployment | 
   });
 }
 
+export async function loadDom(): Promise<appDom.AppDom> {
+  return loadLocalDom();
+}
+
 export async function getConnectionParams<P = unknown>(
-  appId: string,
   connectionId: string | null,
 ): Promise<P | null> {
-  const dom = await loadPreviewDom(appId);
+  const dom = await loadDom();
   const node = appDom.getNode(
     dom,
     connectionId as NodeId,
@@ -412,12 +415,8 @@ export async function getConnectionParams<P = unknown>(
   return node.attributes.params.value;
 }
 
-export async function setConnectionParams<P>(
-  appId: string,
-  connectionId: NodeId,
-  params: P,
-): Promise<void> {
-  let dom = await loadPreviewDom(appId);
+export async function setConnectionParams<P>(connectionId: NodeId, params: P): Promise<void> {
+  let dom = await loadDom();
   const existing = appDom.getNode(dom, connectionId, 'connection');
 
   dom = appDom.setNodeNamespacedProp(
@@ -460,7 +459,6 @@ export async function execQuery<P, Q>(
 }
 
 export async function dataSourceFetchPrivate<P, Q>(
-  appId: string,
   dataSourceId: string,
   connectionId: NodeId | null,
   query: Q,
@@ -475,11 +473,7 @@ export async function dataSourceFetchPrivate<P, Q>(
     throw new Error(`No execPrivate available on datasource "${dataSourceId}"`);
   }
 
-  const connectionParams: P | null = connectionId
-    ? await getConnectionParams<P>(appId, connectionId)
-    : null;
-
-  return dataSource.execPrivate(connectionParams, query);
+  return dataSource.execPrivate(null, query);
 }
 
 export function parseVersion(param?: string | string[]): VersionOrPreview | null {
@@ -492,10 +486,6 @@ export function parseVersion(param?: string | string[]): VersionOrPreview | null
   }
   const parsed = Number(maybeVersion);
   return Number.isNaN(parsed) ? null : parsed;
-}
-
-export async function loadDom(): Promise<appDom.AppDom> {
-  return loadLocalDom();
 }
 
 /**

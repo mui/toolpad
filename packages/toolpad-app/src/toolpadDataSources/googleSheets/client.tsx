@@ -214,7 +214,6 @@ function QueryEditor({
 }
 
 function ConnectionParamsInput({
-  appId,
   connectionId,
   handlerBasePath,
 }: ConnectionEditorProps<GoogleSheetsConnectionParams>) {
@@ -230,7 +229,7 @@ function ConnectionParamsInput({
         component="a"
         disabled={Boolean(validatedUser.data)}
         href={`${handlerBasePath}/auth/login?state=${encodeURIComponent(
-          JSON.stringify({ appId, connectionId }),
+          JSON.stringify({ connectionId }),
         )}
         `}
         variant="outlined"

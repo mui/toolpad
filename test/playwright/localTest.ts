@@ -6,6 +6,11 @@ import { Readable } from 'stream';
 import { once } from 'events';
 import { test as base } from './test';
 
+interface RunningLocalApp {
+  url: string;
+  dir: string;
+}
+
 // You'll need to have `yarn dev13` running for this
 const VERBOSE = true;
 
@@ -38,7 +43,10 @@ interface WithAppOptions {
 /**
  * Spins up a Toolpad app in a local temporary folder. The folder is deleted after `doWork` is done
  */
-export async function withApp(options: WithAppOptions, doWork: (url: string) => Promise<void>) {
+export async function withApp(
+  options: WithAppOptions,
+  doWork: (app: RunningLocalApp) => Promise<void>,
+) {
   const { cmd = 'start', template } = options;
 
   const projectDir = await fs.mkdtemp(path.resolve(__dirname, './tmp-'));
@@ -82,7 +90,7 @@ export async function withApp(options: WithAppOptions, doWork: (url: string) => 
           }
 
           const port = Number(match[1]);
-          await doWork(`http://localhost:${port}`);
+          await doWork({ url: `http://localhost:${port}`, dir: projectDir });
         })(),
       ]);
     } finally {
@@ -100,7 +108,7 @@ const test = base.extend<
   {
     toolpadDev: boolean;
     localAppConfig?: WithAppOptions;
-    localApp: { url: string };
+    localApp: RunningLocalApp;
   },
   { browserCloser: null }
 >({
@@ -110,8 +118,8 @@ const test = base.extend<
     if (!localAppConfig) {
       throw new Error('localAppConfig missing');
     }
-    await withApp({ toolpadDev, ...localAppConfig }, async (url) => {
-      await use({ url });
+    await withApp({ toolpadDev, ...localAppConfig }, async (app) => {
+      await use(app);
     });
   },
   baseURL: async ({ localApp }, use) => {

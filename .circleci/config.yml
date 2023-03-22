@@ -171,7 +171,10 @@ jobs:
           name: Tests real browser
           environment:
             - LOCAL_MODE_TESTS: '1'
-          command: yarn test:integration
+          command: |
+            docker-compose -f ./docker-compose.test.yml up -d --quiet-pull
+            yarn test:integration
+            docker-compose -f ./docker-compose.test.yml down
 
   docker:
     working_directory: /tmp/mui-toolpad
@@ -198,11 +201,11 @@ jobs:
       - run:
           command: |
             # See https://circleci.com/docs/2.0/env-vars/#setting-an-environment-variable-in-a-shell-command
-            TAG=$CIRCLE_SHA1 docker-compose -f ./docker-compose.test.yml up -d --quiet-pull
+            TAG=$CIRCLE_SHA1 docker-compose -f ./docker-compose.legacy-test.yml up -d --quiet-pull
             yarn workspace @mui/toolpad-app waitForApp --url=http://172.17.0.1:3000/
-            docker-compose -f ./docker-compose.test.yml run -it --rm playwright yarn test:integration --forbid-only
-            docker-compose -f ./docker-compose.test.yml logs toolpad
-            docker-compose -f ./docker-compose.test.yml down
+            docker-compose -f ./docker-compose.legacy-test.yml run -it --rm playwright yarn test:integration --forbid-only
+            docker-compose -f ./docker-compose.legacy-test.yml logs toolpad
+            docker-compose -f ./docker-compose.legacy-test.yml down
 
       # push the image
       - when:

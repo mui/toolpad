@@ -1,18 +1,18 @@
 import * as path from 'path';
 import { ToolpadRuntime } from '../../models/ToolpadRuntime';
-import { test, expect } from '../../playwright/test';
-import { readJsonFile } from '../../utils/fs';
-import generateId from '../../utils/generateId';
+import { test, expect } from '../../playwright/localTest';
+import { APP_ID_LOCAL_MARKER } from '../../../packages/toolpad-app/src/constants';
 
-test('input basics', async ({ page, api }) => {
-  const dom = await readJsonFile(path.resolve(__dirname, './basicDom.json'));
+test.use({
+  localAppConfig: {
+    template: path.resolve(__dirname, './fixture'),
+    cmd: 'dev',
+  },
+});
 
-  const app = await api.mutation.createApp(`App ${generateId()}`, {
-    from: { kind: 'dom', dom },
-  });
-
+test('input basics', async ({ page }) => {
   const runtimeModel = new ToolpadRuntime(page);
-  await runtimeModel.gotoPage(app.id, 'page1');
+  await runtimeModel.gotoPage(APP_ID_LOCAL_MARKER, 'page1');
 
   const textField1 = page.locator('label:has-text("textField1")');
   const textField2 = page.locator('label:has-text("textField2")');

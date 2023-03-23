@@ -19,7 +19,7 @@ const serverDataSources: ServerDataSources = _.pick(
     postgres,
     googleSheets,
     mysql,
-    ...(config.localMode ? { local } : {}),
+    local,
   },
   [...(config.isDemo ? DEMO_DATASOURCES : PRODUCTION_DATASOURCES)],
 );

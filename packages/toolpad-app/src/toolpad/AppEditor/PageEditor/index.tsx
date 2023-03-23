@@ -30,22 +30,21 @@ const PageEditorRoot = styled('div')({
 });
 
 interface PageEditorContentProps {
-  appId: string;
   node: appDom.PageNode;
 }
 
-function PageEditorContent({ appId, node }: PageEditorContentProps) {
+function PageEditorContent({ node }: PageEditorContentProps) {
   usePageTitle(`${node.attributes.title.value} | Toolpad editor`);
 
   const [splitDefaultSize, setSplitDefaultSize] = useLocalStorageState<number>(
-    `editor/${appId}/component-panel-split`,
+    `editor/component-panel-split`,
     300,
   );
 
   const handleSplitChange = useDebouncedHandler((newSize) => setSplitDefaultSize(newSize), 100);
 
   return (
-    <PageEditorProvider key={node.id} appId={appId} nodeId={node.id}>
+    <PageEditorProvider key={node.id} nodeId={node.id}>
       <SplitPane
         allowResize
         split="vertical"
@@ -65,18 +64,17 @@ function PageEditorContent({ appId, node }: PageEditorContentProps) {
 }
 
 interface PageEditorProps {
-  appId: string;
   nodeId?: NodeId;
 }
 
-export default function PageEditor({ appId, nodeId }: PageEditorProps) {
+export default function PageEditor({ nodeId }: PageEditorProps) {
   const { dom } = useDom();
   const pageNode = appDom.getMaybeNode(dom, nodeId as NodeId, 'page');
 
   useUndoRedo();
 
   return pageNode ? (
-    <PageEditorContent appId={appId} node={pageNode} />
+    <PageEditorContent node={pageNode} />
   ) : (
     <NotFoundEditor message={`Non-existing Page "${nodeId}"`} />
   );

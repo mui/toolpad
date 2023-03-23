@@ -27,6 +27,7 @@ import PlaceIcon from '@mui/icons-material/Place';
 import ViewSidebarIcon from '@mui/icons-material/ViewSidebar';
 import MoodIcon from '@mui/icons-material/Mood';
 import HtmlIcon from '@mui/icons-material/Html';
+import { ButtonBase } from '@mui/material';
 
 const iconMap = new Map<string, React.ComponentType<SvgIconProps>>([
   ['Text', NotesIcon],
@@ -94,6 +95,7 @@ function ComponentCatalogItem({
       onClick={onClick}
       draggable={draggable}
       onDragStart={onDragStart}
+      component={ButtonBase}
       sx={{
         display: 'flex',
         flexDirection: 'column',

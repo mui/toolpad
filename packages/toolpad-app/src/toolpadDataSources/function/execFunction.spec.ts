@@ -3,39 +3,11 @@
  */
 
 import formidable from 'formidable';
-import { execa, ExecaChildProcess } from 'execa';
-import path from 'path';
 import execFunction from './execFunction';
 import { streamToString } from '../../utils/streams';
 import { startServer } from '../../utils/tests';
 
-function redirectOutput(cp: ExecaChildProcess): ExecaChildProcess {
-  if (cp.stdin) {
-    process.stdin.pipe(cp.stdin);
-  }
-  if (cp.stdout) {
-    cp.stdout.pipe(process.stdout);
-  }
-  if (cp.stderr) {
-    cp.stderr.pipe(process.stderr);
-  }
-  return cp;
-}
-
-async function buildRuntime() {
-  await redirectOutput(
-    execa('yarn', ['run', 'build:function-runtime'], {
-      cwd: path.resolve(__dirname, '../../..'),
-      stdio: 'pipe',
-    }),
-  );
-}
-
 describe('execFunction', () => {
-  beforeAll(async () => {
-    await buildRuntime();
-  });
-
   test('basic', async () => {
     const { data, error } = await execFunction(`
       export default async function () {

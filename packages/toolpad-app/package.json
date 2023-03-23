@@ -66,7 +66,7 @@
     "dayjs": "^1.11.7",
     "dotenv": "^16.0.3",
     "esbuild": "0.17.12",
-    "execa": "^7.0.0",
+    "execa": "^7.1.1",
     "find-up": "^6.3.0",
     "fractional-indexing": "^3.2.0",
     "get-port": "^6.1.2",

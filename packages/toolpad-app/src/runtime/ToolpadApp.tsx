@@ -27,6 +27,7 @@ import {
   ScopeMeta,
   DEFAULT_LOCAL_SCOPE_PARAMS,
   getArgTypeDefaultValue,
+  ScopeMetaPropField,
 } from '@mui/toolpad-core';
 import { createProvidedContext } from '@mui/toolpad-core/utils/react';
 import { QueryClient, QueryClientProvider, useMutation } from '@tanstack/react-query';
@@ -702,6 +703,8 @@ function parseBindings(
 
       const { argTypes = {} } = componentConfig ?? {};
 
+      const propsMeta: Record<string, ScopeMetaPropField> = {};
+
       for (const [propName, argType] of Object.entries(argTypes)) {
         const initializerId = argType?.defaultValueProp
           ? `${elm.id}.props.${argType.defaultValueProp}`
@@ -724,11 +727,11 @@ function parseBindings(
           !NON_BINDABLE_CONTROL_TYPES.includes(argType?.control?.type as string)
         ) {
           scopePath = `${elm.name}.${propName}`;
-          scopeMeta[elm.name] = {
-            kind: 'element',
-            componentId,
-          };
         }
+
+        propsMeta[propName] = {
+          tsType: argType?.tsType,
+        };
 
         if (argType) {
           if (argType.onChangeProp) {
@@ -741,6 +744,14 @@ function parseBindings(
             parsedBindingsMap.set(bindingId, parseBinding(binding, { scopePath }));
           }
         }
+      }
+
+      if (componentId !== PAGE_ROW_COMPONENT_ID) {
+        scopeMeta[elm.name] = {
+          kind: 'element',
+          componentId,
+          props: propsMeta,
+        };
       }
 
       if (!isPageLayoutComponent(elm)) {

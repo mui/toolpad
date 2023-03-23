@@ -188,20 +188,23 @@ export default function QueryEditor() {
     [dom, page],
   );
 
+  const previousViewChangeEffectDomRef = React.useRef(dom);
   React.useEffect(() => {
-    setDialogState((previousState) => {
+    if (dom !== previousViewChangeEffectDomRef.current) {
+      return;
+    }
+
+    setDialogState(() => {
       if (currentView.kind === 'page' && currentView.view?.kind === 'query') {
         const node = appDom.getNode(dom, currentView.view?.nodeId, 'query');
         return { node, isDraft: false };
       }
 
-      if (isDraft) {
-        return previousState;
-      }
-
       return null;
     });
-  }, [dom, currentView, isDraft]);
+
+    previousViewChangeEffectDomRef.current = dom;
+  }, [currentView, dom]);
 
   const [anchorEl, setAnchorEl] = React.useState<Element | null>(null);
 

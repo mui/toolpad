@@ -23,7 +23,7 @@ test.use({
   },
 });
 
-test('rest basics', async ({ page, localApp }) => {
+test('rest basics', async ({ page, context, localApp }) => {
   const queriesFilePath = path.resolve(localApp.dir, './toolpad.yml');
   await fileReplaceAll(queriesFilePath, HTTPBIN_SOURCE_URL, HTTPBIN_TARGET_URL);
 
@@ -41,6 +41,12 @@ test('rest basics', async ({ page, localApp }) => {
   await page.getByRole('button', { name: 'serverside HTTP request' }).click();
 
   const newQueryEditor = page.getByRole('dialog', { name: 'query' });
+
+  // Make sure switching tabs does not close query editor
+  const newTab = await context.newPage();
+  await newTab.bringToFront();
+  await page.bringToFront();
+  await expect(newQueryEditor).toBeVisible();
 
   await newQueryEditor.getByRole('button', { name: 'Save' }).click();
   await expect(newQueryEditor).not.toBeVisible();

@@ -64,7 +64,6 @@ async function runApp(cmd: 'dev' | 'start', { devMode = false, port }: RunComman
       TOOLPAD_DIR: toolpadDir,
       TOOLPAD_PORT: port,
       TOOLPAD_DEV: devMode ? 'true' : 'false',
-      TOOLPAD_LOCAL_MODE: '1',
       TOOLPAD_PROJECT_DIR: process.cwd(),
       TOOLPAD_CMD: cmd,
       FORCE_COLOR: '1',

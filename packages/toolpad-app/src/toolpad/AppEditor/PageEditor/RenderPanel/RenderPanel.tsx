@@ -33,7 +33,7 @@ export default function RenderPanel({ className }: RenderPanelProps) {
   const domApi = useDomApi();
   const appStateApi = useAppStateApi();
   const pageEditorApi = usePageEditorApi();
-  const { appId, nodeId: pageNodeId } = usePageEditorState();
+  const { nodeId: pageNodeId } = usePageEditorState();
 
   const [bridge, setBridge] = React.useState<ToolpadBridge | null>(null);
 
@@ -91,7 +91,6 @@ export default function RenderPanel({ className }: RenderPanelProps) {
   return (
     <RenderPanelRoot className={className}>
       <EditorCanvasHost
-        appId={appId}
         className={classes.view}
         dom={dom}
         savedNodes={savedNodes}

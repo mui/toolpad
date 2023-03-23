@@ -303,11 +303,7 @@ function PricingTable({
       {divider}
       {renderRow('Export to code')}
       {divider}
-      {renderRow('Plugging API')}
-      {divider}
-      {renderRow('Built-in version control')}
-      {divider}
-      {renderRow('Git version control')}
+      {renderRow('Plugin API')}
       {divider}
       {renderRow('Staging environments')}
       {divider}
@@ -320,10 +316,6 @@ function PricingTable({
       {renderRow('Custom components')}
       {divider}
       {renderRow('Premium components')}
-      <RowHead>Users</RowHead>
-      {renderRow('Real-time commenting')}
-      {divider}
-      {renderRow('Multiple organizations')}
       <RowHead>Security</RowHead>
       {renderRow('OAuth2/OpenID SSO')}
       {divider}

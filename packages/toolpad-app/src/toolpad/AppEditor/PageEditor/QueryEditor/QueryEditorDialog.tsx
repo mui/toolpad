@@ -105,7 +105,6 @@ export default function QueryNodeEditorDialog<Q>({
   onSave,
   isDraft,
 }: QueryNodeEditorProps<Q>) {
-  const { appId } = usePageEditorState();
   const { dom } = useDom();
 
   // To keep it around during closing animation
@@ -235,8 +234,8 @@ export default function QueryNodeEditorDialog<Q>({
   }, [handleCommit, onClose]);
 
   const queryEditorContext = React.useMemo(
-    () => (dataSourceId ? { appId, dataSourceId, connectionId } : null),
-    [appId, dataSourceId, connectionId],
+    () => (dataSourceId ? { dataSourceId, connectionId } : null),
+    [dataSourceId, connectionId],
   );
 
   const jsBrowserRuntime = useBrowserJsRuntime();

@@ -33,7 +33,7 @@ commands:
       - restore_cache:
           name: Restore yarn cache
           keys:
-            - v9-yarn-{{ checksum "yarn.lock" }}
+            - v10-yarn-{{ checksum "yarn.lock" }}
             - v0-next-{{ checksum "yarn.lock" }}
       - run:
           name: Set yarn cache folder
@@ -67,7 +67,7 @@ commands:
           command: yarn prisma generate
       - save_cache:
           name: Save yarn cache
-          key: v9-yarn-{{ checksum "yarn.lock" }}
+          key: v10-yarn-{{ checksum "yarn.lock" }}
           paths:
             # Keep path in sync with "Set yarn cache folder"
             # Can't use environment variables for `save_cache` paths (tested in https://app.circleci.com/pipelines/github/mui/material-ui/37813/workflows/5b1e207f-ac8b-44e7-9ba4-d0f9a01f5c55/jobs/223370)
@@ -79,6 +79,7 @@ commands:
             - packages/toolpad-app/node_modules
             - packages/toolpad-components/node_modules
             - packages/toolpad-core/node_modules
+            - packages/create-toolpad-app/node_modules
       - when:
           condition: << parameters.browsers >>
           steps:
@@ -137,13 +138,25 @@ jobs:
           command: yarn check-types
   test_static:
     <<: *defaults
-    resource_class: medium+
     steps:
       - checkout
       - install_js
       - run:
           name: '`yarn prettier` changes committed?'
           command: yarn prettier --check
+
+  test_unit:
+    <<: *defaults
+    resource_class: 'large'
+    docker:
+      - image: mcr.microsoft.com/playwright:v1.31.1-focal
+        environment:
+          NODE_ENV: test
+      - image: kennethreitz/httpbin:latest
+
+    steps:
+      - checkout
+      - install_js
       - run:
           name: 'Build packages'
           command: yarn release:build
@@ -152,63 +165,17 @@ jobs:
           key: v0-next-{{ checksum "yarn.lock" }}
           paths:
             - packages/toolpad-app/.next/cache
-
-  test_unit:
-    <<: *defaults
-    steps:
-      - checkout
-      - install_js
       - run:
           name: Tests fake browser
           command: yarn test
-
-  docker:
-    working_directory: /tmp/mui-toolpad
-    resource_class: medium
-    machine: true
-    environment:
-      - DOCKER_BUILDKIT: '1'
-    steps:
-      - checkout
-
-      # build the application image
-      - run: |
-          docker build \
-            --progress plain \
-            -t muicom/toolpad:$CIRCLE_SHA1 \
-            --build-arg GIT_SHA1=$CIRCLE_SHA1 \
-            --build-arg CIRCLE_BUILD_NUM=$CIRCLE_BUILD_NUM \
-            -f ./docker/images/toolpad/Dockerfile \
-            .
-
-      - install_js
-
-      # test the image
       - run:
-          command: |
-            # See https://circleci.com/docs/2.0/env-vars/#setting-an-environment-variable-in-a-shell-command
-            TAG=$CIRCLE_SHA1 docker-compose -f ./docker-compose.test.yml up -d
-            yarn workspace @mui/toolpad-app waitForApp --url=http://172.17.0.1:3000/
-            docker-compose -f ./docker-compose.test.yml run -it --rm playwright yarn test:integration --forbid-only
-            docker-compose -f ./docker-compose.test.yml logs toolpad
-            docker-compose -f ./docker-compose.test.yml down
-
-      # push the image
-      - when:
-          condition:
-            equal: [master, << pipeline.git.branch >>]
-          steps:
-            # login docker hub
-            - run: |
-                echo "$DOCKER_PASS" | docker login --username $DOCKER_USER --password-stdin
-
-            - run: |
-                docker push muicom/toolpad:$CIRCLE_SHA1
-                docker tag muicom/toolpad:$CIRCLE_SHA1 muicom/toolpad:alpha
-                docker push muicom/toolpad:alpha
+          name: Tests real browser
+          environment:
+            - LOCAL_MODE_TESTS: '1'
+            - HTTPBIN_BASEURL: 'http://localhost/'
+          command: yarn test:integration
 
 workflows:
-  version: 2
   pipeline:
     jobs:
       - checkout
@@ -224,4 +191,3 @@ workflows:
       - test_unit:
           requires:
             - checkout
-      - docker

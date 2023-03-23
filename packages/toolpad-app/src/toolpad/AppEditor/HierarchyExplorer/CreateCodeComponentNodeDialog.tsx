@@ -19,7 +19,6 @@ import DialogForm from '../../../components/DialogForm';
 import useEvent from '../../../utils/useEvent';
 import { useNodeNameValidation } from './validation';
 import client from '../../../api';
-import config from '../../../config';
 import useLatest from '../../../utils/useLatest';
 
 const DEFAULT_NAME = 'MyComponent';
@@ -53,13 +52,11 @@ function createDefaultCodeComponent(name: string): string {
 }
 
 export interface CreateCodeComponentDialogProps {
-  appId: string;
   open: boolean;
   onClose: () => void;
 }
 
 export default function CreateCodeComponentDialog({
-  appId,
   open,
   onClose,
   ...props
@@ -115,21 +112,11 @@ export default function CreateCodeComponentDialog({
             });
             const appNode = appDom.getApp(dom);
 
-            if (config.localMode) {
-              appStateApi.update((draft) =>
-                appDom.addNode(draft, newNode, appNode, 'codeComponents'),
-              );
+            appStateApi.update((draft) =>
+              appDom.addNode(draft, newNode, appNode, 'codeComponents'),
+            );
 
-              setSnackbarState({ name });
-            } else {
-              appStateApi.update(
-                (draft) => appDom.addNode(draft, newNode, appNode, 'codeComponents'),
-                {
-                  kind: 'codeComponent',
-                  nodeId: newNode.id,
-                },
-              );
-            }
+            setSnackbarState({ name });
 
             onClose();
           }}

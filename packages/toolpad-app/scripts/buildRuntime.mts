@@ -13,7 +13,7 @@ async function generate(dom: appDom.AppDom): Promise<string> {
     document.body.append(rootNode);
     const root = React.createRoot(rootNode);
 
-    const initialState = ${JSON.stringify(createRuntimeState({ appId: '', dom }))}
+    const initialState = ${JSON.stringify(createRuntimeState({ dom }))}
 
     root.render(<AppCanvas initialState={initialState} />)
   `;

@@ -175,21 +175,28 @@ const scaffoldProject = async (projectName: string, cwd: string): Promise<string
 const run = async () => {
   const { default: chalk } = await import('chalk');
   const { default: inquirer } = await import('inquirer');
-  let projectName;
+  const args = process.argv.slice(2);
+  let projectName = args.length ? args[0] : null;
+
   const cwd = process.cwd();
   do {
-    // eslint-disable-next-line no-await-in-loop
-    const name = await inquirer.prompt([
-      {
-        type: 'input',
-        name: 'projectName',
-        message: 'Enter the name of your project:',
-        default: 'my-toolpad-app',
-      },
-    ]);
+    if (!projectName) {
+      // eslint-disable-next-line no-await-in-loop
+      const name = await inquirer.prompt([
+        {
+          type: 'input',
+          name: 'projectName',
+          message: 'Enter the name of your project:',
+          default: 'my-toolpad-app',
+        },
+      ]);
 
-    // eslint-disable-next-line no-await-in-loop
-    projectName = await scaffoldProject(name.projectName, cwd);
+      // eslint-disable-next-line no-await-in-loop
+      projectName = await scaffoldProject(name.projectName, cwd);
+    } else {
+      // eslint-disable-next-line no-await-in-loop
+      projectName = await scaffoldProject(projectName, cwd);
+    }
   } while (!projectName);
 
   await installDeps(projectName, cwd);
@@ -207,5 +214,3 @@ run().catch((error) => {
   console.error(error.message);
   process.exit(1);
 });
-
-// Define the questions to be asked during the CLI interaction

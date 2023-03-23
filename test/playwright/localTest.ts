@@ -23,6 +23,7 @@ async function waitForMatch(input: Readable, regex: RegExp): Promise<RegExpExecA
       const match = regex.exec(line);
       if (match) {
         rl.close();
+        input.resume();
         resolve(match);
       }
     });
@@ -92,9 +93,6 @@ export async function withApp(
       ]);
     } finally {
       child.kill();
-      if (!child.exitCode) {
-        await once(child, 'exit');
-      }
     }
   } finally {
     await fs.rm(projectDir, { recursive: true });

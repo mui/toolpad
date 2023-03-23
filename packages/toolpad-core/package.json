@@ -16,45 +16,10 @@
       "import": "./dist/esm/index.js",
       "require": "./dist/cjs/index.js"
     },
-    "./constants": {
-      "types": "./dist/esm/constants.d.ts",
-      "import": "./dist/esm/constants.js",
-      "require": "./dist/cjs/constants.js"
-    },
-    "./path": {
-      "types": "./dist/esm/path.d.ts",
-      "import": "./dist/esm/path.js",
-      "require": "./dist/cjs/path.js"
-    },
-    "./runtime": {
-      "types": "./dist/esm/runtime.d.ts",
-      "import": "./dist/esm/runtime.js",
-      "require": "./dist/cjs/runtime.js"
-    },
-    "./jsRuntime": {
-      "types": "./dist/esm/jsRuntime.d.ts",
-      "import": "./dist/esm/jsRuntime.js",
-      "require": "./dist/cjs/jsRuntime.js"
-    },
-    "./jsServerRuntime": {
-      "types": "./dist/esm/jsServerRuntime.d.ts",
-      "import": "./dist/esm/jsServerRuntime.js",
-      "require": "./dist/cjs/jsServerRuntime.js"
-    },
-    "./jsBrowserRuntime": {
-      "types": "./dist/esm/jsBrowserRuntime.d.ts",
-      "import": "./dist/esm/jsBrowserRuntime.js",
-      "require": "./dist/cjs/jsBrowserRuntime.js"
-    },
-    "./objectKey": {
-      "types": "./dist/esm/objectKey.d.ts",
-      "import": "./dist/esm/objectKey.js",
-      "require": "./dist/cjs/objectKey.js"
-    },
-    "./server": {
-      "types": "./dist/esm/server.d.ts",
-      "import": "./dist/esm/server.js",
-      "require": "./dist/cjs/server.js"
+    "./*": {
+      "types": "./dist/esm/*.d.ts",
+      "import": "./dist/esm/*.js",
+      "require": "./dist/cjs/*.js"
     },
     "./utils/*": {
       "types": "./dist/esm/utils/*.d.ts",

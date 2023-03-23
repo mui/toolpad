@@ -11,6 +11,7 @@
     "dev:esm": "yarn build:esm --watch",
     "dev:cjs": "yarn build:cjs --watch"
   },
+  "type": "module",
   "exports": {
     "./package.json": "./package.json",
     "./server": {
@@ -25,11 +26,13 @@
     }
   },
   "files": [
-    "index.js",
-    "dist"
+    "index.cjs",
+    "dist",
+    "server",
+    "browser"
   ],
   "bin": {
-    "toolpad": "./index.js"
+    "toolpad": "./index.cjs"
   },
   "dependencies": {
     "@mui/toolpad-app": "^0.1.0",

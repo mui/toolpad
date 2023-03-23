@@ -25,7 +25,9 @@ Quickly build internal tools. MUI Toolpad is a self-hosted low-code internal too
 
 </div>
 
-[![Editor screenshot](./docs/public/static/toolpad/marketing/readme-hero-poster.jpeg)](https://demo.toolpad.io)
+## We are making some changes
+
+A [big change](https://github.com/mui/mui-toolpad/discussions/1748) is coming: we're making Toolpad focus much more on integrating with your IDE, while providing the ease of building UI fast with a drag and drop.
 
 ## Notice
 
@@ -35,11 +37,14 @@ MUI Toolpad is in its alpha stages of development. Feel free to run this applica
 
 **NOTE: MUI Toolpad is in preview, do not run this in production.**
 
-Download the docker-compose file and run:
+Run:
 
 ```sh
-curl -LO https://raw.githubusercontent.com/mui/mui-toolpad/master/docker/compose/docker-compose.yml
-docker-compose up -d
+npx create-toolpad-app
+# or
+yarn create toolpad-app
+# or
+pnpm create toolpad-app
 ```
 
 ## Documentation

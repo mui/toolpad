@@ -22,8 +22,8 @@
   ],
   "scripts": {
     "prebuild": "rimraf ./dist",
-    "build": "tsc -p ./tsconfig.json -outDir ./dist/",
-    "dev": "tsc -w --preserveWatchOutput -p ./tsconfig.json --outDir ./dist/"
+    "build": "tsc -p ./tsconfig.json",
+    "dev": "tsc -p ./tsconfig.json --watch"
   },
   "engines": {
     "node": ">=14.6.0"

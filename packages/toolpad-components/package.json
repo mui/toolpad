@@ -22,7 +22,7 @@
   "scripts": {
     "prebuild": "rimraf dist",
     "build": "tsc",
-    "dev": "tsc --pretty --watch --preserveWatchOutput",
+    "dev": "tsc --watch",
     "test": "echo \"Error: run tests from root\" && exit 1",
     "check-types": "tsc"
   },

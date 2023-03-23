@@ -9,7 +9,9 @@
     "esModuleInterop": true,
     "skipLibCheck": true,
     "noEmit": false,
-    "outDir": "./dist"
+    "outDir": "./dist",
+    "pretty": true,
+    "preserveWatchOutput": true
   },
   "include": ["src/**/*.ts", "src/**/*.tsx"]
 }

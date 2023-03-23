@@ -13,7 +13,7 @@
     "build:next": "NODE_OPTIONS=--max-old-space-size=8192 next build",
     "build:react-devtools": "rimraf ./public/reactDevtools && esbuild ./reactDevtools/bootstrap.ts --target=es6 --bundle --format=iife --outdir=./public/reactDevtools",
     "build:typings": "ts-node --esm ./scripts/typings.mts",
-    "dev:cli": "yarn build:cli --watch --preserveWatchOutput",
+    "dev:cli": "yarn build:cli --watch",
     "dev:react-devtools": "yarn build:react-devtools --watch",
     "dev:typings": "yarn build:typings",
     "waitForApp": "ts-node --esm ./scripts/waitForApp.mts",

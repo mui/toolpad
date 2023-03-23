@@ -74,26 +74,6 @@ _If you're looking into contributing to the docs, follow the [instructions](#bui
    yarn dev
    ```
 
-### Notes for contributors
-
-- Changes that you make to the prisma model will be automatically compiled, but you'll have to push them to the db manually, either by restarting the `yarn dev` command, or by running
-
-  ```sh
-  yarn prisma db push
-  ```
-
-- In some cases, after the schema changes, the app may not start up and you may see the message:
-
-  ```sh
-  ⚠️  There might be data loss when applying the changes:
-  ```
-
-  This means your database is out of sync with the prisma schema and can't be synchronized without data loss. You can synchronize the database manually using:
-
-  ```sh
-  yarn prisma db push --accept-data-loss
-  ```
-
 ## Building and running the documentation
 
 1. If you haven't already, install the project dependencies using

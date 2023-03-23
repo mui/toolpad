@@ -3,7 +3,6 @@ import { ToolpadEditor } from '../../models/ToolpadEditor';
 import { ToolpadRuntime } from '../../models/ToolpadRuntime';
 import { FrameLocator, Page, test, expect } from '../../playwright/localTest';
 import clickCenter from '../../utils/clickCenter';
-import { APP_ID_LOCAL_MARKER } from '../../../packages/toolpad-app/src/constants';
 
 test.describe('components basics', () => {
   async function waitForComponents(page: Page, frame: Page | FrameLocator = page) {
@@ -41,21 +40,21 @@ test.describe('components basics', () => {
 
   test('rendering components in the app runtime', async ({ page }) => {
     const runtimeModel = new ToolpadRuntime(page);
-    await runtimeModel.gotoPage(APP_ID_LOCAL_MARKER, 'components');
+    await runtimeModel.gotoPage('components');
 
     await waitForComponents(page);
   });
 
   test('rendering components in the app editor', async ({ page }) => {
     const editorModel = new ToolpadEditor(page);
-    editorModel.goto(APP_ID_LOCAL_MARKER);
+    editorModel.goto();
 
     await waitForComponents(page, editorModel.appCanvas);
   });
 
   test('select component behavior', async ({ page }) => {
     const runtimeModel = new ToolpadRuntime(page);
-    await runtimeModel.gotoPage(APP_ID_LOCAL_MARKER, 'select');
+    await runtimeModel.gotoPage('select');
 
     const optionsSelect = page.getByRole('button', { name: /select with options/ });
     await optionsSelect.scrollIntoViewIfNeeded();
@@ -78,7 +77,7 @@ test.describe('list component', () => {
 
   test('list component behavior', async ({ page }) => {
     const runtimeModel = new ToolpadRuntime(page);
-    await runtimeModel.gotoPage(APP_ID_LOCAL_MARKER, 'list');
+    await runtimeModel.gotoPage('list');
 
     const firstInput = page.getByLabel('textField0');
     const secondInput = page.getByLabel('textField1');

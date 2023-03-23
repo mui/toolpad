@@ -5,7 +5,7 @@ import invariant from 'invariant';
 import { Dirent } from 'fs';
 import * as chokidar from 'chokidar';
 import { debounce } from 'lodash';
-import mitt from 'mitt';
+import Emitter from '@mui/toolpad-core/utils/Emitter';
 import openEditor from 'open-editor';
 import config from '../config';
 import * as appDom from '../appDom';
@@ -526,7 +526,7 @@ export class ToolpadProject {
 
   private files: Promise<ToolpadProjectFiles> | undefined;
 
-  private emitter = mitt<ToolpadProjectEvents>();
+  private emitter = new Emitter<ToolpadProjectEvents>();
 
   constructor(root: string) {
     this.root = root;

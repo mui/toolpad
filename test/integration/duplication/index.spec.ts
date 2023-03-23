@@ -1,7 +1,6 @@
 import * as path from 'path';
 import { ToolpadEditor } from '../../models/ToolpadEditor';
 import { test, expect } from '../../playwright/localTest';
-import { APP_ID_LOCAL_MARKER } from '../../../packages/toolpad-app/src/constants';
 
 test.use({
   localAppConfig: {
@@ -12,14 +11,14 @@ test.use({
 
 test('duplication', async ({ page }) => {
   const editorModel = new ToolpadEditor(page);
-  await editorModel.goto(APP_ID_LOCAL_MARKER);
+  await editorModel.goto();
 
   {
     await editorModel.openHierarchyMenu('pages', 'page1');
     const duplicateMenuItem = page.getByRole('menuitem', { name: 'Duplicate' });
     await duplicateMenuItem.click();
 
-    await page.waitForURL(/\/_toolpad\/app\/[^/]+\/pages\/[^/]+$/);
+    await page.waitForURL(/\/_toolpad\/app\/pages\/[^/]+$/);
 
     const button = editorModel.appCanvas.getByRole('button', { name: 'hello world' });
     await expect(button).toBeVisible();

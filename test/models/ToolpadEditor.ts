@@ -85,8 +85,8 @@ export class ToolpadEditor {
     this.confirmationDialog = page.getByRole('dialog').filter({ hasText: 'Confirm' });
   }
 
-  async goto(appId: string) {
-    await gotoIfNotCurrent(this.page, `/_toolpad/app/${appId}`);
+  async goto() {
+    await gotoIfNotCurrent(this.page, `/_toolpad/app`);
   }
 
   async createPage(name: string) {

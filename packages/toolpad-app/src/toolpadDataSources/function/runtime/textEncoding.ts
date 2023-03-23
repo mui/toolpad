@@ -1,3 +1,0 @@
-import 'fastestsmallesttextencoderdecoder';
-
-export {};

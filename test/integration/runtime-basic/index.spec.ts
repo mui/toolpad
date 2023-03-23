@@ -1,7 +1,6 @@
 import * as path from 'path';
 import { ToolpadRuntime } from '../../models/ToolpadRuntime';
 import { test, expect } from '../../playwright/localTest';
-import { APP_ID_LOCAL_MARKER } from '../../../packages/toolpad-app/src/constants';
 
 test.use({
   localAppConfig: {
@@ -12,7 +11,7 @@ test.use({
 
 test('input basics', async ({ page }) => {
   const runtimeModel = new ToolpadRuntime(page);
-  await runtimeModel.gotoPage(APP_ID_LOCAL_MARKER, 'page1');
+  await runtimeModel.gotoPage('page1');
 
   const textField1 = page.locator('label:has-text("textField1")');
   const textField2 = page.locator('label:has-text("textField2")');

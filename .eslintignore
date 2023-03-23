@@ -3,7 +3,6 @@
 /docs/export
 /packages/**/dist
 /packages/toolpad-app/.next
-/packages/toolpad-app/prisma/generated/*
 /packages/toolpad-app/public
 
 /examples/*/toolpad.yml

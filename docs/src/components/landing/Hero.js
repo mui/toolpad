@@ -42,16 +42,10 @@ export default function Hero() {
           <br />
           <GradientText>admin builder</GradientText>
         </Typography>
-        <Typography color="text.secondary" sx={{ mb: 3, maxWidth: 520, mx: 'auto' }}>
+        <Typography color="text.secondary" sx={{ maxWidth: 520, mx: 'auto', mb: 4 }}>
           Build scalable and secure internal tools locally. Use your own IDE, drag and drop
           pre-built components or create yours.
         </Typography>
-        <Box sx={{ mx: 'auto', display: 'flex', justifyContent: 'center' }}>
-          <SvgMuiLogo width={20} />
-          <Typography color="text.secondary">Open source</Typography>
-          <DataObjectRoundedIcon />
-          <Typography color="text.secondary">Open source</Typography>
-        </Box>
         {/* <Button
           size="large"
           variant="contained"
@@ -80,6 +74,29 @@ export default function Hero() {
             },
           }}
         />
+        <Box
+          sx={{
+            mx: 'auto',
+            mt: 6,
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            gap: 4,
+          }}
+        >
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+            <SvgMuiLogo width={20} />
+            <Typography color="text.primary" fontWeight="medium" variant="body2">
+              Powered by MUI
+            </Typography>
+          </Box>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+            <DataObjectRoundedIcon color="primary" />
+            <Typography color="text.primary" fontWeight="medium" variant="body2">
+              Open source
+            </Typography>
+          </Box>
+        </Box>
       </Box>
     </ToolpadHeroContainer>
   );

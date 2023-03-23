@@ -5,7 +5,7 @@
   "scripts": {
     "prebuild": "rimraf dist",
     "build": "tsup",
-    "dev": "tsup --watch",
+    "dev": "tsup --watch"
   },
   "exports": {
     "./package.json": "./package.json",

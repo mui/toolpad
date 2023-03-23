@@ -147,11 +147,7 @@ export default function QueryEditor() {
       if (appDom.nodeExists(dom, node.id)) {
         domApi.saveNode(node);
       } else {
-        appStateApi.update((draft) => appDom.addNode(draft, node, page, 'queries'), {
-          kind: 'page',
-          nodeId: page.id,
-          view: { kind: 'query', nodeId: node.id },
-        });
+        appStateApi.update((draft) => appDom.addNode(draft, node, page, 'queries'));
       }
     },
     [dom, domApi, appStateApi, page],
@@ -188,23 +184,20 @@ export default function QueryEditor() {
     [dom, page],
   );
 
-  const previousViewChangeEffectDomRef = React.useRef(dom);
   React.useEffect(() => {
-    if (dom !== previousViewChangeEffectDomRef.current) {
-      return;
-    }
-
-    setDialogState(() => {
+    setDialogState((previousState) => {
       if (currentView.kind === 'page' && currentView.view?.kind === 'query') {
         const node = appDom.getNode(dom, currentView.view?.nodeId, 'query');
         return { node, isDraft: false };
       }
 
+      if (isDraft) {
+        return previousState;
+      }
+
       return null;
     });
-
-    previousViewChangeEffectDomRef.current = dom;
-  }, [currentView, dom]);
+  }, [currentView, dom, isDraft]);
 
   const [anchorEl, setAnchorEl] = React.useState<Element | null>(null);
 

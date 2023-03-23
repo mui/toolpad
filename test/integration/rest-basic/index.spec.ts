@@ -54,7 +54,13 @@ test('rest basics', async ({ page, context, localApp }) => {
   await editorModel.componentEditor.getByRole('button', { name: 'query1' }).click();
 
   const existingQueryEditor = page.getByRole('dialog', { name: 'query1' });
+
+  await expect(existingQueryEditor).toBeVisible();
+
   await existingQueryEditor.getByRole('button', { name: 'Preview' }).click();
   const networkTab = existingQueryEditor.getByRole('tabpanel', { name: 'Network' });
   await expect(networkTab.getByText('/get?query1_param1=query1_value')).not.toBeEmpty();
+
+  await newQueryEditor.getByRole('button', { name: 'Save' }).click();
+  await expect(existingQueryEditor).not.toBeVisible();
 });

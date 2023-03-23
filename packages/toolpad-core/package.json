@@ -28,7 +28,9 @@
     }
   },
   "files": [
-    "dist"
+    "dist",
+    "server",
+    "browser"
   ],
   "repository": {
     "type": "git",

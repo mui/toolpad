@@ -13,7 +13,7 @@ import invariant from 'invariant';
 import { BoxProps } from '@mui/material';
 import { ConnectionStatus, AppTheme } from '../types';
 import { omit, update, updateOrCreate } from '../utils/immutability';
-import { pascalCase, removeDiacritics } from '../utils/strings';
+import { pascalCase, removeDiacritics, uncapitalize } from '../utils/strings';
 import { ExactEntriesOf, Maybe } from '../utils/types';
 import { mapProperties, mapValues } from '../utils/collections';
 
@@ -522,7 +522,7 @@ export function createElement<P>(
   name?: string,
 ): ElementNode {
   return createNode(dom, 'element', {
-    name: name || component,
+    name: name || uncapitalize(component),
     props,
     attributes: {
       component: createConst(component),

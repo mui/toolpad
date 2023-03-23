@@ -17,17 +17,11 @@ import { useNodeNameValidation } from './validation';
 const DEFAULT_NAME = 'page';
 
 export interface CreatePageDialogProps {
-  appId: string;
   open: boolean;
   onClose: () => void;
 }
 
-export default function CreatePageDialog({
-  appId,
-  open,
-  onClose,
-  ...props
-}: CreatePageDialogProps) {
+export default function CreatePageDialog({ open, onClose, ...props }: CreatePageDialogProps) {
   const { dom } = useDom();
   const appStateApi = useAppStateApi();
 

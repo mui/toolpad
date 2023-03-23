@@ -2,7 +2,6 @@ import * as path from 'path';
 import { test, expect } from '../../playwright/localTest';
 import { ToolpadEditor } from '../../models/ToolpadEditor';
 import clickCenter from '../../utils/clickCenter';
-import { APP_ID_LOCAL_MARKER } from '../../../packages/toolpad-app/src/constants';
 
 test.describe('basic', () => {
   test.use({
@@ -15,7 +14,7 @@ test.describe('basic', () => {
   test('can control component prop values in properties control panel', async ({ page }) => {
     const editorModel = new ToolpadEditor(page);
 
-    await editorModel.goto(APP_ID_LOCAL_MARKER);
+    await editorModel.goto();
 
     await editorModel.pageRoot.waitFor();
 
@@ -67,7 +66,7 @@ test.describe('default values', () => {
 
   test('changing defaultValue resets controlled value', async ({ page }) => {
     const editorModel = new ToolpadEditor(page);
-    await editorModel.goto(APP_ID_LOCAL_MARKER);
+    await editorModel.goto();
 
     await editorModel.waitForOverlay();
 

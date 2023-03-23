@@ -2,27 +2,18 @@ import { GridRowsProp } from '@mui/x-data-grid-pro';
 import * as React from 'react';
 import { useQuery, UseQueryOptions } from '@tanstack/react-query';
 import { useAppContext } from './AppContext';
-import { VersionOrPreview } from '../types';
 import { CanvasHooksContext } from './CanvasHooksContext';
 import dataSources from '../toolpadDataSources/runtime';
 import * as appDom from '../appDom';
 
 interface ExecDataSourceQueryParams {
   signal?: AbortSignal;
-  appId: string;
-  version: VersionOrPreview;
   queryId: string;
   params: any;
 }
 
-export async function execDataSourceQuery({
-  signal,
-  appId,
-  version,
-  queryId,
-  params,
-}: ExecDataSourceQueryParams) {
-  const dataUrl = new URL(`/api/data/${appId}/${version}/`, window.location.href);
+export async function execDataSourceQuery({ signal, queryId, params }: ExecDataSourceQueryParams) {
+  const dataUrl = new URL(`/api/data/`, window.location.href);
   const url = new URL(`./${encodeURIComponent(queryId)}`, dataUrl);
 
   const res = await fetch(String(url), {
@@ -67,7 +58,7 @@ export function useDataQuery(
     ...options
   }: Pick<UseQueryOptions<any, unknown, unknown, any[]>, 'enabled' | 'refetchInterval'>,
 ): UseFetch {
-  const { appId, version } = useAppContext();
+  const { version } = useAppContext();
   const { savedNodes } = React.useContext(CanvasHooksContext);
   const queryId = node.id;
   const query = node.attributes.query?.value;
@@ -86,14 +77,13 @@ export function useDataQuery(
     data: responseData = EMPTY_OBJECT,
     refetch,
   } = useQuery(
-    [appId, version, nodeHash, queryId, params],
+    [version, nodeHash, queryId, params],
     ({ signal }) => {
       if (!queryId) {
         return null;
       }
 
-      const fetchFromServer = () =>
-        execDataSourceQuery({ signal, appId, version, queryId, params });
+      const fetchFromServer = () => execDataSourceQuery({ signal, queryId, params });
 
       if (query && dataSource?.exec) {
         return dataSource?.exec(query, params, fetchFromServer);

@@ -583,7 +583,7 @@ interface MutationNodeProps {
 }
 
 function MutationNode({ node }: MutationNodeProps) {
-  const { appId, version } = useAppContext();
+  const { version } = useAppContext();
   const getBindings = useBindingsContext();
   const setControlledBinding = useSetControlledBindingContext();
 
@@ -600,13 +600,11 @@ function MutationNode({ node }: MutationNodeProps) {
   } = useMutation(
     async (overrides: any = {}) =>
       execDataSourceQuery({
-        appId,
-        version,
         queryId,
         params: { ...params, ...overrides },
       }),
     {
-      mutationKey: [appId, version, queryId, params],
+      mutationKey: [version, queryId, params],
     },
   );
 
@@ -1087,8 +1085,8 @@ export default function ToolpadApp({
   hidePreviewBanner,
   state,
 }: ToolpadAppProps) {
-  const { appId, dom } = state;
-  const appContext = React.useMemo(() => ({ appId, version }), [appId, version]);
+  const { dom } = state;
+  const appContext = React.useMemo(() => ({ version }), [version]);
 
   const [resetNodeErrorsKey, setResetNodeErrorsKey] = React.useState(0);
 
@@ -1120,7 +1118,7 @@ export default function ToolpadApp({
                         endIcon={<EditIcon />}
                         color="primary"
                         component="a"
-                        href={`/_toolpad/app/${appId}`}
+                        href={`/_toolpad/app`}
                       >
                         Edit
                       </Button>

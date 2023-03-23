@@ -11,5 +11,5 @@
     "noEmit": false,
     "outDir": "./dist"
   },
-  "exclude": ["templates", "dist"]
+  "include": ["src/**/*.ts", "src/**/*.tsx"]
 }

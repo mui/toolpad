@@ -7,6 +7,7 @@ import Typography from '@mui/material/Typography';
 import Grid from '@mui/material/Unstable_Grid2';
 import SectionHeadline from 'docs/src/components/typography/SectionHeadline';
 import IconImage from 'docs/src/components/icon/IconImage';
+import { alpha } from '@mui/material/styles';
 
 const cardRootStyle = (imageUrl) => ({
   px: imageUrl ? 0 : 2,
@@ -43,13 +44,16 @@ export default function CardGrid(props) {
           ? {
               background: (theme) =>
                 theme.palette.mode === 'dark'
-                  ? `linear-gradient(180deg, ${theme.palette.primaryDark[900]} 0%, transparent 100%)`
-                  : `linear-gradient(180deg, ${theme.palette.grey[50]} 0%, transparent 100%)`,
+                  ? `linear-gradient(180deg, ${theme.palette.primaryDark[900]} 0%, ${theme.palette.primaryDark[700]} 100%)`
+                  : `linear-gradient(180deg, ${theme.palette.grey[50]} 0%, ${alpha(
+                      theme.palette.grey[100],
+                      0.4,
+                    )} 100%)`,
             }
           : null
       }
     >
-      <Container sx={{ py: { xs: 4, sm: 6 } }}>
+      <Container sx={{ py: { xs: 4, sm: 12 } }}>
         <SectionHeadline overline={content.overline} title={content.Headline} />
         <Grid container spacing={{ xs: 1, sm: 2, md: 3 }}>
           {content.cards.map(({ icon, title, wip, imageUrl, description }) => (

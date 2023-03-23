@@ -475,8 +475,6 @@ export default function Pricing({
         sx={{
           mt: 4,
           pt: { xs: 4, sm: 6, md: 8 },
-          borderTop: '1px solid',
-          borderColor: (theme) => (theme.palette.mode === 'dark' ? 'primaryDark.600' : 'grey.200'),
         }}
       >
         <SectionHeadline overline="Plans" title={Headline} />

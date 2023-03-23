@@ -10,15 +10,20 @@ function Marquee({ content }) {
   return (
     <Container
       sx={(theme) => ({
-        py: { xs: 4, sm: 6, md: 8 },
+        mt: 8,
+        mx: 0,
+        minWidth: '100%',
+        py: { xs: 4, sm: 6, md: 12 },
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
-        borderImage: `conic-gradient(${theme.palette.primaryDark[700]} 0deg 360deg) fill 1/ /0 50vw`,
+        background: `linear-gradient(180deg, ${theme.palette.primaryDark[900]} 0%, transparent)`,
+        borderBottom: '1px solid',
+        borderColor: (theme) => (theme.palette.mode === 'dark' ? 'primaryDark.600' : 'grey.200'),
       })}
     >
       <Typography
-        color="grey.50"
+        color="white"
         textAlign="center"
         variant="h2"
         sx={{
@@ -32,7 +37,8 @@ function Marquee({ content }) {
         color="grey.500"
         textAlign="center"
         sx={{
-          my: 2,
+          mt: 1,
+          mb: 4,
           mx: 'auto',
         }}
       >

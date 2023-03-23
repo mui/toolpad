@@ -51,7 +51,7 @@ export function JsExpressionEditor({
     const globalDeclarations = Object.entries(globalScopeMeta).map(([key, metaData = {}]) => {
       const { deprecated, description, tsType } = metaData;
 
-      const commentLines = [];
+      const commentLines: string[] = [];
 
       if (description) {
         commentLines.push(description);

@@ -1,5 +1,0 @@
-{
-  "main": "../dist/cjs/createComponent.js",
-  "types": "../dist/cjs/createComponent.d.ts",
-  "type": "commonjs"
-}

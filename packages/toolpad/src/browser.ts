@@ -1,2 +1,2 @@
-export { default as createComponent } from '@mui/toolpad-core/createComponent';
-export * from '@mui/toolpad-core/createComponent';
+export { default } from '@mui/toolpad-core/browser';
+export * from '@mui/toolpad-core/browser';

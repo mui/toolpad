@@ -13,11 +13,11 @@ import invariant from 'invariant';
 import { BoxProps } from '@mui/material';
 import { ConnectionStatus, AppTheme } from '../types';
 import { omit, update, updateOrCreate } from '../utils/immutability';
-import { camelCase, removeDiacritics } from '../utils/strings';
+import { pascalCase, removeDiacritics, uncapitalize } from '../utils/strings';
 import { ExactEntriesOf, Maybe } from '../utils/types';
 import { mapProperties, mapValues } from '../utils/collections';
 
-export const CURRENT_APPDOM_VERSION = 5;
+export const CURRENT_APPDOM_VERSION = 6;
 
 export const RESERVED_NODE_PROPERTIES = [
   'id',
@@ -105,6 +105,7 @@ export interface CodeComponentNode extends AppDomNodeBase {
   readonly type: 'codeComponent';
   readonly attributes: {
     readonly code: ConstantAttrValue<string>;
+    readonly isNew?: ConstantAttrValue<boolean>;
   };
 }
 
@@ -439,7 +440,8 @@ function slugifyNodeName(nameCandidate: string, fallback: string): string {
   // try to replace accents with relevant ascii
   slug = removeDiacritics(slug);
   // replace spaces with camelcase
-  slug = camelCase(...slug.split(/\s+/));
+  const [first, ...rest] = slug.split(/\s+/);
+  slug = first + pascalCase(...rest);
   // replace disallowed characters for js identifiers
   slug = slug.replace(/[^a-zA-Z0-9]+/g, '_');
   // remove leading digits
@@ -520,7 +522,7 @@ export function createElement<P>(
   name?: string,
 ): ElementNode {
   return createNode(dom, 'element', {
-    name: name || component,
+    name: name || uncapitalize(component),
     props,
     attributes: {
       component: createConst(component),

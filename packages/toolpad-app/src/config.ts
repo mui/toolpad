@@ -48,9 +48,8 @@ export interface RuntimeConfig {
   recaptchaV2SiteKey?: string;
   recaptchaV3SiteKey?: string;
   externalUrl: string;
-  localMode: boolean;
   projectDir?: string;
-  cmd?: 'dev' | 'start';
+  cmd: 'dev' | 'start';
 }
 
 declare global {
@@ -86,12 +85,11 @@ const runtimeConfig: RuntimeConfig =
         recaptchaV3SiteKey: process.env.TOOLPAD_RECAPTCHA_V3_SITE_KEY,
         externalUrl:
           process.env.TOOLPAD_EXTERNAL_URL || `http://localhost:${process.env.PORT || 3000}`,
-        localMode: !!process.env.TOOLPAD_LOCAL_MODE,
         projectDir: process.env.TOOLPAD_PROJECT_DIR,
         cmd:
           process.env.TOOLPAD_CMD === 'dev' || process.env.TOOLPAD_CMD === 'start'
             ? process.env.TOOLPAD_CMD
-            : undefined,
+            : 'dev',
       }
     : getBrowsersideRuntimeConfig();
 

@@ -8,6 +8,7 @@ import IconImage from 'docs/src/components/icon/IconImage';
 import GradientText from 'docs/src/components/typography/GradientText';
 import SignUp from './SignUp';
 import ToolpadHeroContainer from '../../layouts/ToolpadHeroContainer';
+import ROUTES from '../../route';
 
 export default function Hero() {
   return (
@@ -40,18 +41,17 @@ export default function Hero() {
           <GradientText>admin builder</GradientText>
         </Typography>
         <Typography color="text.secondary" sx={{ mb: 3, maxWidth: 540, mx: 'auto' }}>
-          Drag and drop pre-built components, connect to data sources and APIs, and build your
-          internal tools 10x faster. Open-source and powered by MUI.
+          Build scalable and secure internal tools locally. Use your own IDE, drag and drop
+          pre-built components or create yours. Open source and powered by MUI
         </Typography>
         <Button
           size="large"
           variant="contained"
-          href="https://demo.toolpad.io/"
-          target="_blank"
+          href={ROUTES.toolpadQuickstart}
           endIcon={<KeyboardArrowRightRounded />}
           sx={{ width: { xs: '100%', sm: 'auto' }, mb: 3 }}
         >
-          Try demo
+          Get started
         </Button>
         <Typography
           component="label"

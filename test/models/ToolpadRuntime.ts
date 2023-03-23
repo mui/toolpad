@@ -8,16 +8,16 @@ export class ToolpadRuntime {
     this.page = page;
   }
 
-  async goto(appId: string) {
-    await gotoIfNotCurrent(this.page, `/app/${appId}/preview/pages`);
+  async goto() {
+    await gotoIfNotCurrent(this.page, `/preview/pages`);
   }
 
-  async gotoPage(appId: string, pageName: string) {
-    await this.goto(appId);
+  async gotoPage(pageName: string) {
+    await this.goto();
     await this.page.getByRole('link', { name: pageName }).click();
   }
 
   async gotoPageById(appId: string, pageId: string) {
-    await this.page.goto(`/app/${appId}/preview/pages/${pageId}`);
+    await this.page.goto(`/preview/pages/${pageId}`);
   }
 }

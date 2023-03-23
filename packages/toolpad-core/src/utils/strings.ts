@@ -15,12 +15,19 @@ export function capitalize(str: string): string {
 }
 
 /**
+ * Capitalizes and joins all [parts].
+ */
+export function pascalCase(...parts: string[]): string {
+  return parts.map((part) => capitalize(part)).join('');
+}
+
+/**
  * Joins all [parts] and camelcases the result
  */
 export function camelCase(...parts: string[]): string {
   if (parts.length > 0) {
     const [first, ...rest] = parts;
-    return uncapitalize(first) + rest.map((part) => capitalize(part)).join('');
+    return uncapitalize(first) + pascalCase(...rest);
   }
   return '';
 }

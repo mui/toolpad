@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { Paper as MuiPaper, PaperProps as MuiPaperProps } from '@mui/material';
 import { createComponent } from '@mui/toolpad-core';
-import { SX_PROP } from './constants';
+import { SX_PROP } from './constants.js';
 
 function Paper({ children, sx, ...props }: MuiPaperProps) {
   return (

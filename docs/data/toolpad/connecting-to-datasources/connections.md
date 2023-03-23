@@ -83,4 +83,4 @@ Provide the database credentials and click **TEST CONNECTION** to verify that yo
 
 If everything is correct, click **SAVE** to complete the connection.
 
-Learn more in the [PostgreSQL documentation](/toolpad/connecting-to-datasources/postgre-sql/).
+Learn more in the [PostgreSQL documentation](/toolpad/connecting-to-datasources/postgresql/).

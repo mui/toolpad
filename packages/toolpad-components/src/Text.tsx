@@ -9,10 +9,11 @@ import {
   TextareaAutosize,
 } from '@mui/material';
 import { createComponent, useNode } from '@mui/toolpad-core';
-import { Typography } from '@mui/material/styles/createTypography';
-import { SX_PROP } from './constants';
+import { SX_PROP } from './constants.js';
 
-const Markdown = React.lazy(() => import('markdown-to-jsx'));
+// @ts-expect-error Missing "type": "module" in markdown-to-jsx package.json
+// See https://github.com/probablyup/markdown-to-jsx/pull/414
+const Markdown = React.lazy(async () => import('markdown-to-jsx'));
 
 const StyledTextareaAutosize = styled(TextareaAutosize)(({ theme }) => ({
   width: '100%',
@@ -24,7 +25,7 @@ const StyledTextareaAutosize = styled(TextareaAutosize)(({ theme }) => ({
   ...Object.fromEntries(
     Object.keys(theme.typography).map((variant) => [
       [`&.variant-${variant}`],
-      theme.typography[variant as keyof Typography],
+      theme.typography[variant as keyof typeof theme.typography],
     ]),
   ),
 }));

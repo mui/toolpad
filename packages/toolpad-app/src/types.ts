@@ -71,13 +71,12 @@ export interface PageViewState {
 }
 
 export interface CreateHandlerApi<P = unknown> {
-  setConnectionParams: (appId: string, connectionId: string, props: P) => Promise<void>;
-  getConnectionParams: (appId: string, connectionId: string) => Promise<P>;
+  setConnectionParams: (connectionId: string, props: P) => Promise<void>;
+  getConnectionParams: (connectionId: string) => Promise<P>;
 }
 
 export interface ConnectionEditorProps<P> extends WithControlledProp<P | null> {
   handlerBasePath: string;
-  appId: string;
   connectionId: NodeId;
 }
 export type ConnectionParamsEditor<P = {}> = React.FC<ConnectionEditorProps<P>>;
@@ -192,6 +191,5 @@ export type CompiledModule =
 export interface RuntimeState {
   // We start out with just the rendertree. The ultimate goal will be to move things out of this tree
   dom: appDom.RenderTree;
-  appId: string;
   modules: Record<string, CompiledModule>;
 }

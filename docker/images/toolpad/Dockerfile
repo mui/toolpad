@@ -1,4 +1,4 @@
-FROM node:18.10.0 as base
+FROM node:18.9.0 as base
 
 ARG GIT_SHA1
 ENV GIT_SHA1=$GIT_SHA1
@@ -25,6 +25,7 @@ COPY ./packages/eslint-plugin-material-ui/package.json ./packages/eslint-plugin-
 COPY ./packages/toolpad-app/package.json ./packages/toolpad-app/
 COPY ./packages/toolpad-components/package.json ./packages/toolpad-components/
 COPY ./packages/toolpad-core/package.json ./packages/toolpad-core/
+COPY ./packages/create-toolpad-app/package.json ./packages/create-toolpad-app/
 RUN --mount=type=cache,target=/root/caches \
   yarn install --frozen-lockfile
 

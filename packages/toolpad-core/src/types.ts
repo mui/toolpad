@@ -151,7 +151,7 @@ export interface ArgControlSpec {
     | 'RowIdFieldSelect'; // Row id field specialized select
 }
 
-type PrimitiveValueType =
+export type PrimitiveValueType =
   | StringValueType
   | NumberValueType
   | BooleanValueType

@@ -9,9 +9,11 @@ import NodeNameEditor from '../NodeNameEditor';
 import * as appDom from '../../../appDom';
 import PageModuleEditor from './PageModuleEditor';
 
+// Page modules are deprecated
+const ENABLE_PAGE_MODULE_EDITOR = false;
+
 export default function PageOptionsPanel() {
-  const state = usePageEditorState();
-  const pageNodeId = state.nodeId;
+  const { nodeId: pageNodeId } = usePageEditorState();
   const { dom } = useDom();
 
   const page = appDom.getNode(dom, pageNodeId, 'page');
@@ -25,12 +27,12 @@ export default function PageOptionsPanel() {
           startIcon={<PageIcon />}
           color="inherit"
           component="a"
-          href={`/app/${state.appId}/preview/pages/${pageNodeId}`}
+          href={`/app/preview/pages/${pageNodeId}`}
           aria-label={'Preview'}
         >
           Preview
         </Button>
-        <PageModuleEditor pageNodeId={pageNodeId} />
+        {ENABLE_PAGE_MODULE_EDITOR ? <PageModuleEditor pageNodeId={pageNodeId} /> : null}
         <Divider variant="middle" sx={{ alignSelf: 'stretch' }} />
         <Typography variant="overline">Page State:</Typography>
         <UrlQueryEditor pageNodeId={pageNodeId} />

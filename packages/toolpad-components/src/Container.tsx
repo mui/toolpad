@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { Container as MUIContainer, ContainerProps } from '@mui/material';
 import { createComponent } from '@mui/toolpad-core';
-import { SX_PROP } from './constants';
+import { SX_PROP } from './constants.js';
 
 interface Props extends ContainerProps {
   visible: boolean;

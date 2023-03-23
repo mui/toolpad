@@ -13,7 +13,6 @@ const waitFor: typeof waitForOrig = (waiter, options) =>
   waitForOrig(waiter, { timeout: 10000, ...options });
 
 function renderPage(initPage: (dom: appDom.AppDom, page: appDom.PageNode) => appDom.AppDom) {
-  const appId = '12345';
   const version = 'preview';
 
   let dom = appDom.createDom();
@@ -30,11 +29,10 @@ function renderPage(initPage: (dom: appDom.AppDom, page: appDom.PageNode) => app
 
   window.history.replaceState({}, 'Test page', `/toolpad/pages/${page.id}`);
 
-  const state = createRuntimeState({ appId, dom });
+  const state = createRuntimeState({ dom });
 
   return render(
     <BridgeContext.Provider value={bridge}>
-      {' '}
       <ToolpadApp state={state} version={version} basename="toolpad" />
     </BridgeContext.Provider>,
   );

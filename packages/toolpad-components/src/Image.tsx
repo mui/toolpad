@@ -1,7 +1,7 @@
 import { Box, Skeleton, SxProps } from '@mui/material';
 import * as React from 'react';
 import { createComponent } from '@mui/toolpad-core';
-import { SX_PROP } from './constants';
+import { SX_PROP } from './constants.js';
 
 export interface ImageProps {
   src: string;

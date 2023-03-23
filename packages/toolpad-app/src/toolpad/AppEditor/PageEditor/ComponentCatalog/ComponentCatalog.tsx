@@ -8,7 +8,7 @@ import ComponentCatalogItem from './ComponentCatalogItem';
 import CreateCodeComponentNodeDialog from '../../HierarchyExplorer/CreateCodeComponentNodeDialog';
 import * as appDom from '../../../../appDom';
 import { useDom } from '../../../AppState';
-import { usePageEditorApi, usePageEditorState } from '../PageEditorProvider';
+import { usePageEditorApi } from '../PageEditorProvider';
 import { useToolpadComponents } from '../../toolpadComponents';
 import useLocalStorageState from '../../../../utils/useLocalStorageState';
 
@@ -47,7 +47,6 @@ export interface ComponentCatalogProps {
 
 export default function ComponentCatalog({ className }: ComponentCatalogProps) {
   const api = usePageEditorApi();
-  const pageState = usePageEditorState();
   const { dom } = useDom();
 
   const [openStart, setOpenStart] = React.useState(0);
@@ -58,15 +57,6 @@ export default function ComponentCatalog({ className }: ComponentCatalogProps) {
   const [openFutureComponents, setOpenFutureComponents] = useLocalStorageState(
     'catalog-future-expanded',
     true,
-  );
-  const [createCodeComponentDialogOpen, setCreateCodeComponentDialogOpen] = React.useState(0);
-
-  const handleCreateCodeComponentDialogOpen = React.useCallback(() => {
-    setCreateCodeComponentDialogOpen(Math.random());
-  }, []);
-  const handleCreateCodeComponentDialogClose = React.useCallback(
-    () => setCreateCodeComponentDialogOpen(0),
-    [],
   );
 
   const closeTimeoutRef = React.useRef<NodeJS.Timeout>();
@@ -97,6 +87,17 @@ export default function ComponentCatalog({ className }: ComponentCatalogProps) {
 
   const handleMouseEnter = React.useCallback(() => openDrawer(), [openDrawer]);
   const handleMouseLeave = React.useCallback(() => closeDrawer(), [closeDrawer]);
+
+  const [createCodeComponentDialogOpen, setCreateCodeComponentDialogOpen] = React.useState(false);
+
+  const handleCreateCodeComponentDialogOpen = React.useCallback(() => {
+    setCreateCodeComponentDialogOpen(true);
+    closeDrawer(0);
+  }, [closeDrawer]);
+  const handleCreateCodeComponentDialogClose = React.useCallback(
+    () => setCreateCodeComponentDialogOpen(false),
+    [],
+  );
 
   return (
     <ComponentCatalogRoot
@@ -188,9 +189,9 @@ export default function ComponentCatalog({ className }: ComponentCatalogProps) {
                   ) : null;
                 })}
                 <ComponentCatalogItem
-                  id={'CreateNew'}
-                  displayName={'Create'}
-                  kind={'create'}
+                  id="CreateNew"
+                  displayName="Create"
+                  kind="create"
                   onClick={handleCreateCodeComponentDialogOpen}
                 />
               </Box>
@@ -283,8 +284,6 @@ export default function ComponentCatalog({ className }: ComponentCatalogProps) {
         </Box>
       </Box>
       <CreateCodeComponentNodeDialog
-        key={createCodeComponentDialogOpen || undefined}
-        appId={pageState.appId}
         open={!!createCodeComponentDialogOpen}
         onClose={handleCreateCodeComponentDialogClose}
       />

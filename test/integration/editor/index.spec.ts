@@ -2,7 +2,6 @@ import * as path from 'path';
 import { test, expect } from '../../playwright/localTest';
 import { ToolpadEditor } from '../../models/ToolpadEditor';
 import clickCenter from '../../utils/clickCenter';
-import { APP_ID_LOCAL_MARKER } from '../../../packages/toolpad-app/src/constants';
 
 test.describe('from new application', () => {
   test.use({
@@ -14,7 +13,7 @@ test.describe('from new application', () => {
   test('can place new components from catalog', async ({ page }) => {
     const editorModel = new ToolpadEditor(page);
 
-    await editorModel.goto(APP_ID_LOCAL_MARKER);
+    await editorModel.goto();
 
     await editorModel.pageRoot.waitFor();
 
@@ -41,7 +40,7 @@ test.describe('from new application', () => {
   test('can create new component', async ({ page }) => {
     const editorModel = new ToolpadEditor(page);
 
-    await editorModel.goto(APP_ID_LOCAL_MARKER);
+    await editorModel.goto();
 
     await editorModel.createPage('somePage');
     await editorModel.createComponent('someComponent');
@@ -60,7 +59,7 @@ test.describe('with fixture', () => {
     const editorModel = new ToolpadEditor(page);
     const TEXT_FIELD_COMPONENT_DISPLAY_NAME = 'Text field';
 
-    await editorModel.goto(APP_ID_LOCAL_MARKER);
+    await editorModel.goto();
 
     await editorModel.waitForOverlay();
 
@@ -108,7 +107,7 @@ test.describe('with fixture', () => {
   test('can delete elements from page', async ({ page }) => {
     const editorModel = new ToolpadEditor(page);
 
-    await editorModel.goto(APP_ID_LOCAL_MARKER);
+    await editorModel.goto();
 
     await editorModel.waitForOverlay();
 

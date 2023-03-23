@@ -1,7 +1,6 @@
 import * as path from 'path';
 import { ToolpadRuntime } from '../../models/ToolpadRuntime';
 import { expect, test } from '../../playwright/localTest';
-import { APP_ID_LOCAL_MARKER } from '../../../packages/toolpad-app/src/constants';
 
 test.use({
   ignoreConsoleErrors: [
@@ -21,7 +20,7 @@ test.use({
 
 test('bindings', async ({ page }) => {
   const runtimeModel = new ToolpadRuntime(page);
-  await runtimeModel.gotoPage(APP_ID_LOCAL_MARKER, 'bindings');
+  await runtimeModel.gotoPage('bindings');
 
   const test1 = page.getByText('-test1-');
   await expect(test1).toBeVisible();

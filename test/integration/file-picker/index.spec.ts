@@ -1,7 +1,6 @@
 import * as path from 'path';
 import { ToolpadEditor } from '../../models/ToolpadEditor';
 import { test, expect } from '../../playwright/localTest';
-import { APP_ID_LOCAL_MARKER } from '../../../packages/toolpad-app/src/constants';
 
 test.use({
   localAppConfig: {
@@ -14,7 +13,7 @@ test('File picker component', async ({ page }) => {
   const testFilePath = path.resolve(__dirname, './test.txt');
 
   const editorModel = new ToolpadEditor(page);
-  editorModel.goto(APP_ID_LOCAL_MARKER);
+  editorModel.goto();
 
   await editorModel.waitForOverlay();
 

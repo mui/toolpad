@@ -2,7 +2,6 @@ import * as path from 'path';
 import { ToolpadEditor } from '../../models/ToolpadEditor';
 import { test, expect } from '../../playwright/localTest';
 import clickCenter from '../../utils/clickCenter';
-import { APP_ID_LOCAL_MARKER } from '../../../packages/toolpad-app/src/constants';
 
 test.describe('custom component columns', () => {
   test.use({
@@ -14,7 +13,7 @@ test.describe('custom component columns', () => {
 
   test('Code component cell', async ({ page }) => {
     const editorModel = new ToolpadEditor(page);
-    editorModel.goto(APP_ID_LOCAL_MARKER);
+    editorModel.goto();
 
     await editorModel.waitForOverlay();
 
@@ -38,7 +37,7 @@ test.describe('basic tests', () => {
 
   test('Column prop updates are not lost on drag interactions', async ({ page }) => {
     const editorModel = new ToolpadEditor(page);
-    editorModel.goto(APP_ID_LOCAL_MARKER);
+    editorModel.goto();
 
     await editorModel.pageRoot.waitFor({ state: 'visible' });
 

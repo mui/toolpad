@@ -1,6 +1,6 @@
 import { LoadingButton } from '@mui/lab';
 import { Box, Button, Skeleton, Stack, TextField, Toolbar, Typography } from '@mui/material';
-import { CUSTOM_COLUMN_TYPES, inferColumns, parseColumns } from '@mui/toolpad-components';
+import { inferColumns, parseColumns } from '@mui/toolpad-components';
 import { DataGridPro, GridColDef } from '@mui/x-data-grid-pro';
 import * as React from 'react';
 import { useForm } from 'react-hook-form';
@@ -251,21 +251,41 @@ export function QueryEditor({
         </Box>
       </SplitPane>
 
-      <Box sx={{ height: '100%', overflow: 'auto', display: 'flex', flexDirection: 'column' }}>
-        <DataGridPro
-          sx={{ border: 'none', flex: 1 }}
-          columns={columns}
-          key={previewGridKey}
-          rows={rows}
-          columnTypes={CUSTOM_COLUMN_TYPES}
-          error={preview?.error}
-          loading={previewIsLoading}
-        />
-        {preview?.info ? (
-          <Typography variant="body2" sx={{ m: 1 }}>
-            {preview.info}
-          </Typography>
-        ) : null}
+      <Box
+        sx={{
+          height: '100%',
+          overflow: 'auto',
+          display: 'flex',
+          flexDirection: 'column',
+        }}
+      >
+        {preview?.error ? (
+          <Box
+            sx={{
+              display: 'flex',
+              flex: 1,
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}
+          >
+            <Typography color="error">{preview?.error?.message}</Typography>
+          </Box>
+        ) : (
+          <React.Fragment>
+            <DataGridPro
+              sx={{ border: 'none', flex: 1 }}
+              columns={columns}
+              key={previewGridKey}
+              rows={rows}
+              loading={previewIsLoading}
+            />
+            {preview?.info ? (
+              <Typography variant="body2" sx={{ m: 1 }}>
+                {preview.info}
+              </Typography>
+            ) : null}
+          </React.Fragment>
+        )}
       </Box>
     </SplitPane>
   );

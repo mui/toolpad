@@ -1,14 +1,8 @@
 {
   "extends": "../../tsconfig.json",
   "compilerOptions": {
-    "paths": {
-      // TODO: remove when typescript module resolution supports package exports. (v5.0 with moduleResolution: 'bundler')
-      "@mui/toolpad-core": ["../toolpad-core/dist"],
-      "@mui/toolpad-core/path": ["../toolpad-core/dist/path"],
-      "@mui/toolpad-core/objectKey": ["../toolpad-core/dist/objectKey"],
-      "@mui/toolpad-core/types": ["../toolpad-core/dist/types"]
-    },
     "module": "esnext",
+    "moduleResolution": "nodenext",
     "alwaysStrict": true,
     "rootDir": "src",
     "outDir": "dist",
@@ -16,5 +10,5 @@
     "target": "ES2020",
     "skipLibCheck": true
   },
-  "include": ["src/**/*.ts", "src/**/*.tsx"]
+  "include": ["**/*.ts", "**/*.tsx"]
 }

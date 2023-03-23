@@ -25,6 +25,7 @@ COPY ./packages/eslint-plugin-material-ui/package.json ./packages/eslint-plugin-
 COPY ./packages/toolpad-app/package.json ./packages/toolpad-app/
 COPY ./packages/toolpad-components/package.json ./packages/toolpad-components/
 COPY ./packages/toolpad-core/package.json ./packages/toolpad-core/
+COPY ./packages/create-toolpad-app/package.json ./packages/create-toolpad-app/
 RUN --mount=type=cache,target=/root/caches \
   yarn install --frozen-lockfile
 

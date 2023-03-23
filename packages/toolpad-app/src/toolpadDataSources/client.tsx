@@ -17,7 +17,7 @@ export const allClientDataSources: ClientDataSources = {
   postgres,
   googleSheets,
   mysql,
-  ...(config.localMode ? { local } : {}),
+  local,
 };
 
 const clientDataSources = _.pick(allClientDataSources, [

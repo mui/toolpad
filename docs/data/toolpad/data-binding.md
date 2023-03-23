@@ -26,7 +26,7 @@ You can either simply pass a path to a property of the object or you can also us
 
 <img src="/static/toolpad/docs/data-binding/bind-4.png" alt="Binding custom expression" width="1190px" />
 
-All that's left is to click **UPDATE BINDING** and you can observe how application behaves.
+All that's left is to click **Update binding** and you can observe how application behaves.
 
 (In this example you can see TextField value bound to the value of Typography component).
 
@@ -37,17 +37,3 @@ Empty field:
 Field with value:
 
 <img src="/static/toolpad/docs/data-binding/bind-6.png" alt="Binding result 2" width="902px" />
-
-## Global scope variables
-
-Sometimes you might want to define custom variables that could be used for data binding in order to do that you can use **EDIT PAGE MODULE** functionality that can be found in the **Inspector** on the right:
-
-<img src="/static/toolpad/docs/data-binding/bind-7.png" alt="Edit page module" width="285px" />
-
-You will be presented with an editor where you can define any number of variables:
-
-<img src="/static/toolpad/docs/data-binding/bind-8.png" alt="Global scope" width="1190px" />
-
-Once you **SAVE** the changes you can use those variables to bind value of any property:
-
-<img src="/static/toolpad/docs/data-binding/bind-9.png" alt="Global variable in the editor" width="1189px" />

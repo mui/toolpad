@@ -498,6 +498,4 @@ async function startDev() {
   return builder;
 }
 
-if (config.localMode) {
-  globalThis.builder = globalThis.builder || startDev();
-}
+globalThis.builder = globalThis.builder || startDev();

@@ -37,9 +37,18 @@ test('rest basics', async ({ page, localApp }) => {
   const editorModel = new ToolpadEditor(page);
   await editorModel.goto();
 
+  await editorModel.componentEditor.getByRole('button', { name: 'Add query' }).click();
+  await page.getByRole('button', { name: 'serverside HTTP request' }).click();
+
+  const newQueryEditor = page.getByRole('dialog', { name: 'query' });
+
+  await newQueryEditor.getByRole('button', { name: 'Save' }).click();
+  await expect(newQueryEditor).not.toBeVisible();
+
   await editorModel.componentEditor.getByRole('button', { name: 'query1' }).click();
-  const queryEditor = page.getByRole('dialog', { name: 'query1' });
-  await queryEditor.getByRole('button', { name: 'Preview' }).click();
-  const networkTab = queryEditor.getByRole('tabpanel', { name: 'Network' });
+
+  const existingQueryEditor = page.getByRole('dialog', { name: 'query1' });
+  await existingQueryEditor.getByRole('button', { name: 'Preview' }).click();
+  const networkTab = existingQueryEditor.getByRole('tabpanel', { name: 'Network' });
   await expect(networkTab.getByText('/get?query1_param1=query1_value')).not.toBeEmpty();
 });

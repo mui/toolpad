@@ -109,7 +109,7 @@ jobs:
           name: Eslint
           command: yarn eslint
       - run:
-          name: Lint JSONhttps://www.mayoclinic.org/diseases-conditions/raynauds-disease/symptoms-causes/syc-20363571
+          name: Lint JSON
           command: yarn jsonlint
       - run:
           name: Lint Markdown

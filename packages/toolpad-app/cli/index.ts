@@ -1,5 +1,5 @@
 import 'dotenv/config';
-import arg from 'arg';
+import yargs from 'yargs';
 import path from 'path';
 import invariant from 'invariant';
 import { Readable } from 'stream';
@@ -32,18 +32,18 @@ function* getPreferredPorts(port: number = DEFAULT_PORT): Iterable<number> {
   }
 }
 
-interface RunCommandArgs {
-  // Whether Toolpad editor is running in debug mode
-  devMode?: boolean;
+type Command = 'dev' | 'start' | 'build';
+interface Options {
   port?: number;
+  nextProd?: boolean;
 }
 
-async function runApp(cmd: 'dev' | 'start', { devMode = false, port }: RunCommandArgs) {
+async function runApp(cmd: Command, { port, nextProd = false }: Options) {
   const { execa } = await import('execa');
   const { default: chalk } = await import('chalk');
   const { default: getPort } = await import('get-port');
   const toolpadDir = path.resolve(__dirname, '../..'); // from ./dist/server
-  const nextCommand = devMode ? 'dev' : 'start';
+  const nextCommand = nextProd ? 'start' : 'dev';
 
   if (!port) {
     port = cmd === 'dev' ? await getPort({ port: getPreferredPorts(DEFAULT_PORT) }) : DEFAULT_PORT;
@@ -93,7 +93,7 @@ async function runApp(cmd: 'dev' | 'start', { devMode = false, port }: RunComman
   });
 }
 
-async function devCommand(args: RunCommandArgs) {
+async function devCommand(args: yargs.ArgumentsCamelCase<Options>) {
   const { default: chalk } = await import('chalk');
   // eslint-disable-next-line no-console
   console.log(`${chalk.blue('info')} - starting Toolpad application in dev mode...`);
@@ -108,51 +108,68 @@ async function buildCommand() {
     setTimeout(resolve, 1000);
   });
   // eslint-disable-next-line no-console
-  console.log('done.');
+  console.log(`${chalk.green('success')} - done.`);
 }
 
-async function startCommand(args: RunCommandArgs) {
+async function startCommand(args: yargs.ArgumentsCamelCase<Options>) {
   const { default: chalk } = await import('chalk');
   // eslint-disable-next-line no-console
-  console.log(`${chalk.blue('info')} - Starting Toolpad application...`);
+  console.log(`${chalk.blue('info')} - starting Toolpad application...`);
   await runApp('start', args);
 }
 
 export default async function cli(argv: string[]) {
-  const args = arg(
-    {
-      // Types
-      '--help': Boolean,
-      '--dev': Boolean,
-      '--port': Number,
-
-      // Aliases
-      '-p': '--port',
-    },
-    {
-      argv,
-    },
-  );
-
-  const command = args._[0];
-
-  const runArgs = {
-    devMode: args['--dev'],
-    port: args['--port'],
-  };
-
-  switch (command) {
-    case undefined:
-    case 'dev':
-      await devCommand(runArgs);
-      break;
-    case 'build':
-      await buildCommand();
-      break;
-    case 'start':
-      await startCommand(runArgs);
-      break;
-    default:
-      throw new Error(`Unknown command "${command}"`);
-  }
+  await yargs(argv)
+    // See https://github.com/yargs/yargs/issues/538
+    .scriptName('toolpad')
+    .command({
+      command: 'dev',
+      describe: 'Run Toolpad in development mode',
+      builder: {
+        port: {
+          type: 'number',
+          describe: 'Port to run the application on',
+          demandOption: false,
+        },
+        'next-prod': {
+          type: 'boolean',
+          describe: 'Run the Toolpad editor Next.js app in production mode',
+          demandOption: false,
+          default: false,
+        },
+      },
+      handler: (args) => devCommand(args),
+    })
+    .command({
+      command: 'start',
+      describe: 'Run built Toolpad application in production mode',
+      builder: {
+        port: {
+          type: 'number',
+          describe: 'Port to run the application on',
+          demandOption: false,
+        },
+        'next-prod': {
+          type: 'boolean',
+          describe: 'Run the Toolpad editor Next.js app in production mode',
+          demandOption: false,
+          default: false,
+        },
+      },
+      handler: (args) => startCommand(args),
+    })
+    .command({
+      command: 'build',
+      describe: 'Build Toolpad app for production',
+      handler: () => buildCommand(),
+    })
+    .command({
+      command: 'help',
+      describe: 'Show help',
+      handler: async () => {
+        // eslint-disable-next-line no-console
+        console.log(await yargs.getHelp());
+      },
+    })
+    .help().argv;
 }

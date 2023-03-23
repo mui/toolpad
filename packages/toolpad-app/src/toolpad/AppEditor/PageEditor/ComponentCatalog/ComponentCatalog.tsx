@@ -190,9 +190,9 @@ export default function ComponentCatalog({ className }: ComponentCatalogProps) {
                   ) : null;
                 })}
                 <ComponentCatalogItem
-                  id={'CreateNew'}
-                  displayName={'Create'}
-                  kind={'create'}
+                  id="CreateNew"
+                  displayName="Create"
+                  kind="create"
                   onClick={handleCreateCodeComponentDialogOpen}
                 />
               </Box>

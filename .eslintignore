@@ -7,3 +7,5 @@
 /packages/toolpad-app/public
 
 /examples/*/toolpad.yml
+
+/test/integration/**/toolpad.yml

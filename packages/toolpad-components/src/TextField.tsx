@@ -5,7 +5,7 @@ import {
   BoxProps,
 } from '@mui/material';
 import { createComponent } from '@mui/toolpad-core';
-import { SX_PROP_HELPER_TEXT } from './constants';
+import { SX_PROP_HELPER_TEXT } from './constants.js';
 
 export type TextFieldProps = Omit<MuiTextFieldProps, 'value' | 'onChange'> & {
   value: string;

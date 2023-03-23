@@ -9,6 +9,7 @@
     "esModuleInterop": true,
     "skipLibCheck": true,
     "noEmit": false,
+    "rootDir": "src",
     "outDir": "./dist",
     "pretty": true,
     "preserveWatchOutput": true

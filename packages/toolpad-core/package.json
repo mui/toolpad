@@ -76,8 +76,8 @@
     "build:esm": "tsc --outDir dist/esm --module esnext",
     "build:cjs": "tsc --outDir dist/cjs --module commonjs",
     "dev": "concurrently \"yarn:dev:*\" yarn:cjsify",
-    "dev:esm": "yarn build:esm --pretty --watch --preserveWatchOutput",
-    "dev:cjs": "yarn build:cjs --pretty --watch --preserveWatchOutput",
+    "dev:esm": "yarn build:esm --watch",
+    "dev:cjs": "yarn build:cjs --watch",
     "test": "echo \"Error: run tests from root\" && exit 1",
     "check-types": "yarn build"
   },

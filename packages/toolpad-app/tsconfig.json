@@ -26,7 +26,9 @@
     "isolatedModules": true,
     "jsx": "preserve",
     "incremental": true,
-    "noUnusedLocals": true
+    "noUnusedLocals": true,
+    "pretty": true,
+    "preserveWatchOutput": true
   },
   "include": [
     "next.config.mjs",

@@ -1,0 +1,5 @@
+{
+  "main": "../dist/cjs/createQuery.js",
+  "types": "../dist/cjs/createQuery.d.ts",
+  "type": "commonjs"
+}

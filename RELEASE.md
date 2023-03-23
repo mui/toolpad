@@ -33,14 +33,37 @@
 
 1. Open a PR with the proposed changes.
 
-1. Release the Docker image using (requires GitHub authentication token):
+1. Publish the package to `npm`
 
-   ```sh
-   # add --prerelease if necessary
-   yarn release:docker
-   ```
+   1. Make sure dependencies are up to date
 
-   This command runs a GitHub action that retags the Docker image of the release commit in `master` to the version being released and also to "latest", and pushes those new tags. During the release, no new Docker images are created.
+      ```sh
+      yarn
+      ```
+
+   1. Build the release version, make sure you don't have the project running in dev mode somewhere.
+
+      ```sh
+      yarn release:build
+      ```
+
+   1. Create a new version
+
+      ```sh
+      yarn release:version
+      ```
+
+   1. Publish to `npm`
+
+      ```sh
+      yarn release:publish
+      ```
+
+      If you've created a prerelease, then instead use
+
+      ```sh
+      yarn release:publish-canary
+      ```
 
 1. Publish the documentation. The documentation must be updated on the `docs-latest` branch.
 
@@ -57,23 +80,3 @@
    1. Use `<version number>` as the **Release title**
    1. Mark as prerelease if necessary.
    1. **Publish release**
-
-## npm
-
-For now using this to publish
-
-```sh
-yarn
-yarn release:build
-yarn release:publish
-```
-
-For canary releases:
-
-```sh
-yarn
-yarn release:build
-yarn release:publish-canary
-```
-
-<!-- TODO: work out full flow -->

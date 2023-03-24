@@ -16,7 +16,6 @@ import { omit, update, updateOrCreate } from '../utils/immutability';
 import { pascalCase, removeDiacritics, uncapitalize } from '../utils/strings';
 import { ExactEntriesOf, Maybe } from '../utils/types';
 import { mapProperties, mapValues } from '../utils/collections';
-import { getElementNodeComponentId } from '../toolpadComponents';
 
 export const CURRENT_APPDOM_VERSION = 6;
 
@@ -591,7 +590,7 @@ export function getPageAncestor(dom: AppDom, node: AppDomNode): PageNode | null 
  */
 export function getComponentTypeNodes(dom: AppDom, componentId: string): readonly AppDomNode[] {
   return Object.values(dom.nodes).filter(
-    (node) => isElement(node) && getElementNodeComponentId(node) === componentId,
+    (node) => isElement(node) && node.attributes.component.value === componentId,
   );
 }
 

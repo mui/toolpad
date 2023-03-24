@@ -29,7 +29,9 @@ test.describe('from new application', () => {
 
     await expect(canvasInputLocator).toHaveCount(1);
     await expect(canvasInputLocator).toBeVisible();
-    expect(await editorModel.componentEditor.getByLabel('name').inputValue()).toBe('textField');
+    await expect(editorModel.componentEditor.getByLabel('Node name', { exact: true })).toHaveValue(
+      'textField',
+    );
 
     // Drag in a second component
 

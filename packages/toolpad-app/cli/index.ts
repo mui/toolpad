@@ -96,14 +96,14 @@ async function runApp(cmd: 'dev' | 'start', { devMode = false, port }: RunComman
 async function devCommand(args: RunCommandArgs) {
   const { default: chalk } = await import('chalk');
   // eslint-disable-next-line no-console
-  console.log(`${chalk.blue('info')} - starting Toolpad application in dev mode...`);
+  console.log(`${chalk.blue('info')}  - starting Toolpad application in dev mode...`);
   await runApp('dev', args);
 }
 
 async function buildCommand() {
   const { default: chalk } = await import('chalk');
   // eslint-disable-next-line no-console
-  console.log(`${chalk.blue('info')} - building Toolpad application...`);
+  console.log(`${chalk.blue('info')}  - building Toolpad application...`);
   await new Promise((resolve) => {
     setTimeout(resolve, 1000);
   });
@@ -114,7 +114,7 @@ async function buildCommand() {
 async function startCommand(args: RunCommandArgs) {
   const { default: chalk } = await import('chalk');
   // eslint-disable-next-line no-console
-  console.log(`${chalk.blue('info')} - Starting Toolpad application...`);
+  console.log(`${chalk.blue('info')}  - Starting Toolpad application...`);
   await runApp('start', args);
 }
 

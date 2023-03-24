@@ -14,6 +14,7 @@ import { LocalPrivateQuery, LocalQuery, LocalConnectionParams } from './types';
 import { Maybe } from '../../utils/types';
 import {
   getUserProjectRoot,
+  isInitialized,
   openCodeEditor,
   QUERIES_FILE,
   readProjectFolder,
@@ -186,6 +187,8 @@ async function createMain(manifest: MainManifest): Promise<string> {
 }
 
 async function createBuilder() {
+  await isInitialized;
+
   const userProjectRoot = getUserProjectRoot();
   const envFilePath = path.resolve(userProjectRoot, '.env');
 

@@ -32,9 +32,25 @@ export async function fileExists(filepath: string): Promise<boolean> {
   }
 }
 
-export async function getConfigFilePath() {
-  const yamlFilePath = path.resolve(getUserProjectRoot(), './toolpad.yaml');
-  const ymlFilePath = path.resolve(getUserProjectRoot(), './toolpad.yml');
+function getToolpadFolder(root: string): string {
+  return path.resolve(root, './toolpad');
+}
+
+function getComponentsFolder(root: string): string {
+  return path.resolve(getToolpadFolder(root), './components');
+}
+
+function getQueriesFile(root: string): string {
+  return path.resolve(getToolpadFolder(root), './queries.ts');
+}
+
+function getDomFile(root: string): string {
+  return path.resolve(getToolpadFolder(root), './toolpad.yml');
+}
+
+export async function getConfigFilePathAtRoot(root: string) {
+  const yamlFilePath = path.resolve(root, './toolpad.yaml');
+  const ymlFilePath = path.resolve(root, './toolpad.yml');
 
   if (await fileExists(yamlFilePath)) {
     return yamlFilePath;
@@ -47,12 +63,16 @@ export async function getConfigFilePath() {
   return yamlFilePath;
 }
 
+export async function getConfigFilePath() {
+  return getConfigFilePathAtRoot(getUserProjectRoot());
+}
+
 type ComponentsContent = Record<string, string>;
 
 export const QUERIES_FILE = `./toolpad/queries.ts`;
 
 function getQueriesFilePath(): string {
-  return path.resolve(getUserProjectRoot(), QUERIES_FILE);
+  return getQueriesFile(getUserProjectRoot());
 }
 
 function getComponentFolder(): string {
@@ -123,37 +143,50 @@ export async function example() {
 }
 `;
 
-async function initQueriesFile(): Promise<void> {
-  const queriesFilePath = getQueriesFilePath();
+async function initToolpadFolder(root: string) {
+  const toolpadFolder = getToolpadFolder(root);
+  await fs.mkdir(toolpadFolder, { recursive: true });
+}
+
+async function initQueriesFile(root: string): Promise<void> {
+  const queriesFilePath = getQueriesFile(root);
   if (!(await fileExists(queriesFilePath))) {
     // eslint-disable-next-line no-console
-    console.log(`${chalk.blue('info')} - Initializing Toolpad queries file`);
+    console.log(`${chalk.blue('info')}  - Initializing Toolpad queries file`);
     await fs.writeFile(queriesFilePath, DEFAULT_QUERIES_FILE_CONTENT, { encoding: 'utf-8' });
   }
 }
 
-async function initToolpadFile(): Promise<void> {
-  const configFilePath = await getConfigFilePath();
+async function initToolpadFile(root: string): Promise<void> {
+  const configFilePath = await getConfigFilePathAtRoot(root);
   if (!(await fileExists(configFilePath))) {
     // eslint-disable-next-line no-console
-    console.log(`${chalk.blue('info')} - Initializing Toolpad config file`);
+    console.log(`${chalk.blue('info')}  - Initializing Toolpad config file`);
     const defaultDom = appDom.createDefaultDom();
     await writeConfigFile(configFilePath, defaultDom);
   }
 }
 
 async function initProjectFolder(): Promise<void> {
-  if (config.cmd === 'dev') {
-    await Promise.all([initToolpadFile(), initQueriesFile()]);
-  } else {
-    // TODO: verify files exist?
+  try {
+    const root = getUserProjectRoot();
+    if (config.cmd === 'dev') {
+      await initToolpadFolder(root);
+      await Promise.all([initToolpadFile(root), initQueriesFile(root)]);
+    } else {
+      // TODO: verify files exist?
+    }
+  } catch (err) {
+    console.error(`${chalk.red('error')} - Failed to intialize Toolpad`);
+    console.error(err);
+    process.exit(1);
   }
 }
 
 // eslint-disable-next-line no-underscore-dangle
 (globalThis as any).__init_project__ ??= initProjectFolder();
 // eslint-disable-next-line no-underscore-dangle
-const initPromise = (globalThis as any).__init_project__;
+export const isInitialized = (globalThis as any).__init_project__;
 
 async function writeCodeComponentsToFiles(
   componentsFolder: string,
@@ -250,7 +283,7 @@ export async function saveLocalDom(dom: appDom.AppDom): Promise<void> {
 }
 
 async function loadConfigFileFrom(configFilePath: string): Promise<appDom.AppDom | null> {
-  await initPromise;
+  await isInitialized;
   try {
     // Using a lock to avoid read during write which may result in reading truncated file content
     const configContent = await configFileLock.use(() =>
@@ -280,7 +313,7 @@ async function loadConfigFile() {
 }
 
 export async function loadDomFromDisk(): Promise<appDom.AppDom> {
-  await initPromise;
+  await isInitialized;
   const [configContent, componentsContent] = await Promise.all([
     loadConfigFile(),
     loadCodeComponentsFromFiles(),
@@ -312,7 +345,7 @@ export async function openCodeComponentEditor(componentName: string): Promise<vo
 }
 
 async function getQueriesFileContent(): Promise<string | null> {
-  await initPromise;
+  await isInitialized;
   try {
     return await fs.readFile(getQueriesFilePath(), { encoding: 'utf-8' });
   } catch (err) {
@@ -408,23 +441,6 @@ export interface ToolpadProjectFiles {
   queries: QueriesFile | null;
   files: ToolpadFile[];
 }
-
-function getToolpadFolder(root: string): string {
-  return path.resolve(root, './toolpad');
-}
-
-function getComponentsFolder(root: string): string {
-  return path.resolve(getToolpadFolder(root), './components');
-}
-
-function getQueriesFile(root: string): string {
-  return path.resolve(getToolpadFolder(root), './queries.ts');
-}
-
-function getDomFile(root: string): string {
-  return path.resolve(getToolpadFolder(root), './toolpad.yml');
-}
-
 async function readDomFile(root: string): Promise<DomFile | null> {
   const filepath = getDomFile(root);
   try {

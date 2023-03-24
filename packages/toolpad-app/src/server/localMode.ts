@@ -7,6 +7,7 @@ import * as chokidar from 'chokidar';
 import { debounce } from 'lodash';
 import Emitter from '@mui/toolpad-core/utils/Emitter';
 import openEditor from 'open-editor';
+import chalk from 'chalk';
 import config from '../config';
 import * as appDom from '../appDom';
 import { errorFrom } from '../utils/errors';
@@ -111,6 +112,45 @@ async function writeConfigFile(filePath: string, dom: appDom.AppDom): Promise<vo
   );
 }
 
+const DEFAULT_QUERIES_FILE_CONTENT = `// Toolpad queries:
+
+export async function example() {
+  return [
+    { firstname: 'Nell', lastName: 'Lester' },
+    { firstname: 'Keanu', lastName: 'Walter' },
+    { firstname: 'Daniella', lastName: 'Sweeney' },
+  ];
+}
+`;
+
+async function initQueriesFile(): Promise<void> {
+  const queriesFilePath = getQueriesFilePath();
+  if (!(await fileExists(queriesFilePath))) {
+    // eslint-disable-next-line no-console
+    console.log(`${chalk.blue('info')} - Initializing Toolpad queries file`);
+    await fs.writeFile(queriesFilePath, DEFAULT_QUERIES_FILE_CONTENT, { encoding: 'utf-8' });
+  }
+}
+
+async function initToolpadFile(): Promise<void> {
+  const configFilePath = await getConfigFilePath();
+  if (!(await fileExists(configFilePath))) {
+    // eslint-disable-next-line no-console
+    console.log(`${chalk.blue('info')} - Initializing Toolpad config file`);
+    const defaultDom = appDom.createDefaultDom();
+    await writeConfigFile(configFilePath, defaultDom);
+  }
+}
+
+async function initProjectFolder(): Promise<void> {
+  await Promise.all([initToolpadFile(), initQueriesFile()]);
+}
+
+// eslint-disable-next-line no-underscore-dangle
+(globalThis as any).__init_project__ ??= initProjectFolder();
+// eslint-disable-next-line no-underscore-dangle
+const initPromise = (globalThis as any).__init_project__;
+
 async function writeCodeComponentsToFiles(
   componentsFolder: string,
   components: ComponentsContent,
@@ -185,24 +225,6 @@ function extractNewComponentsContentFromDom(dom: appDom.AppDom): ExtractedCompon
   return { components, dom };
 }
 
-const DEFAULT_QUERIES_FILE_CONTENT = `// Toolpad queries:
-
-export async function example() {
-  return [
-    { firstname: 'Nell', lastName: 'Lester' },
-    { firstname: 'Keanu', lastName: 'Walter' },
-    { firstname: 'Daniella', lastName: 'Sweeney' },
-  ];
-}
-`;
-
-export async function writeQueriesFile(): Promise<void> {
-  const queriesFilePath = getQueriesFilePath();
-  if (!(await fileExists(queriesFilePath))) {
-    await fs.writeFile(queriesFilePath, DEFAULT_QUERIES_FILE_CONTENT, { encoding: 'utf-8' });
-  }
-}
-
 export async function writeDomToDisk(dom: appDom.AppDom): Promise<void> {
   const configFilePath = await getConfigFilePath();
   const componentsFolder = getComponentFolder();
@@ -212,7 +234,6 @@ export async function writeDomToDisk(dom: appDom.AppDom): Promise<void> {
   await Promise.all([
     writeConfigFile(configFilePath, domWithoutComponents),
     writeCodeComponentsToFiles(componentsFolder, componentsContent),
-    writeQueriesFile(),
   ]);
 }
 
@@ -225,6 +246,7 @@ export async function saveLocalDom(dom: appDom.AppDom): Promise<void> {
 }
 
 async function loadConfigFileFrom(configFilePath: string): Promise<appDom.AppDom | null> {
+  await initPromise;
   try {
     // Using a lock to avoid read during write which may result in reading truncated file content
     const configContent = await configFileLock.use(() =>
@@ -250,12 +272,11 @@ async function loadConfigFile() {
     return dom;
   }
 
-  const defaultDom = appDom.createDefaultDom();
-  await saveLocalDom(defaultDom);
-  return defaultDom;
+  throw new Error(`No toolpad dom found`);
 }
 
 export async function loadDomFromDisk(): Promise<appDom.AppDom> {
+  await initPromise;
   const [configContent, componentsContent] = await Promise.all([
     loadConfigFile(),
     loadCodeComponentsFromFiles(),
@@ -287,6 +308,7 @@ export async function openCodeComponentEditor(componentName: string): Promise<vo
 }
 
 async function getQueriesFileContent(): Promise<string | null> {
+  await initPromise;
   try {
     return await fs.readFile(getQueriesFilePath(), { encoding: 'utf-8' });
   } catch (err) {

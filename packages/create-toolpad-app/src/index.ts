@@ -97,7 +97,7 @@ const installDeps = async (projectName: string, cwd: string) => {
   console.log();
 
   const installVerb = packageManager === 'yarn' ? 'add' : 'install';
-  const command = `${packageManager} ${installVerb} @mui/toolpad @mui/toolpad-core`;
+  const command = `${packageManager} ${installVerb} @mui/toolpad`;
   await execaCommand(command, { stdio: 'inherit', cwd: path.join(cwd, projectName) });
 
   // eslint-disable-next-line no-console
@@ -148,7 +148,7 @@ const scaffoldProject = async (projectName: string, cwd: string): Promise<string
           name: 'installInExisting',
           message: `The following dependencies will be installed: ${chalk.magentaBright(
             '@mui/toolpad',
-          )}, ${chalk.magenta('@mui/toolpad-core')}. Do you want to continue?`,
+          )}. Do you want to continue?`,
           default: false,
         },
       ]);

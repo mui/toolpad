@@ -1,7 +1,7 @@
 // Toolpad queries:
 
 import axios from 'axios';
-import { createQuery } from '@mui/toolpad-core';
+import { createQuery } from '@mui/toolpad/server';
 
 async function getBaseSnapshot(baseRef: string, baseCommit: string) {
   const baseSnapshotUrl = new URL(

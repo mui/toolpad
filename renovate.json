@@ -41,6 +41,13 @@
       "allowedVersions": "<=16"
     },
     {
+      "description": "Ignore nodejs in engines",
+      "matchPackageNames": ["node"],
+      "matchManagers": ["npm"],
+      "matchDepTypes": ["engines"],
+      "enabled": false
+    },
+    {
       "groupName": "react-inspector",
       "matchPackageNames": ["react-inspector"],
       "allowedVersions": "< 6.0.0"

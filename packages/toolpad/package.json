@@ -41,5 +41,8 @@
     "dotenv": "^16.0.3",
     "execa": "^7.1.1"
   },
+  "engines": {
+    "node": ">=16.17"
+  },
   "gitHead": "de68953329881ccd3aa40e82a7302c0baa38c3c5"
 }

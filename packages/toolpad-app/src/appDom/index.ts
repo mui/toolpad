@@ -16,6 +16,7 @@ import { omit, update, updateOrCreate } from '../utils/immutability';
 import { pascalCase, removeDiacritics, uncapitalize } from '../utils/strings';
 import { ExactEntriesOf, Maybe } from '../utils/types';
 import { mapProperties, mapValues } from '../utils/collections';
+import { getElementNodeComponentId } from '../toolpadComponents';
 
 export const CURRENT_APPDOM_VERSION = 6;
 
@@ -583,6 +584,15 @@ export function getPageAncestor(dom: AppDom, node: AppDomNode): PageNode | null 
     return getPageAncestor(dom, parent);
   }
   return null;
+}
+
+/**
+ * Returns all nodes with a given component type
+ */
+export function getComponentTypeNodes(dom: AppDom, componentId: string): readonly AppDomNode[] {
+  return Object.values(dom.nodes).filter(
+    (node) => isElement(node) && getElementNodeComponentId(node) === componentId,
+  );
 }
 
 /**

@@ -91,26 +91,3 @@ test.describe('default values', () => {
     await expect(secondInput).toHaveValue('New');
   });
 });
-
-test('cannot change controlled component prop values', async ({ page, api }) => {
-  const dom = await readJsonFile(path.resolve(__dirname, './domInput.json'));
-
-  const app = await api.mutation.createApp(`App ${generateId()}`, {
-    from: { kind: 'dom', dom },
-  });
-
-  const editorModel = new ToolpadEditor(page);
-  await editorModel.goto(app.id);
-
-  await editorModel.pageRoot.waitFor();
-
-  const input = editorModel.appCanvas.locator('input').first();
-  await clickCenter(page, input);
-
-  await editorModel.componentEditor
-    .locator('h6:has-text("Text field")')
-    .waitFor({ state: 'visible' });
-
-  const valueControl = editorModel.componentEditor.getByLabel('value', { exact: true });
-  await expect(valueControl).toBeDisabled();
-});

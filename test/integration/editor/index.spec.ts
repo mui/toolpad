@@ -13,6 +13,8 @@ test.describe('from new application', () => {
   test('can place new components from catalog', async ({ page }) => {
     const editorModel = new ToolpadEditor(page);
 
+    await editorModel.goto();
+
     await editorModel.pageRoot.waitFor();
 
     const canvasInputLocator = editorModel.appCanvas.locator('input');

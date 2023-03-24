@@ -2,7 +2,7 @@ import * as React from 'react';
 import { TextField as MuiTextField, TextFieldProps as MuiTextFieldProps } from '@mui/material';
 import { createComponent, useNode } from '@mui/toolpad-core';
 import { Controller, FieldError } from 'react-hook-form';
-import { FormContext, useFormInput, withComponentForm } from './Form';
+import { FormContext, useFormInput, withComponentForm } from './Form.js';
 
 interface FullFile {
   name: string;

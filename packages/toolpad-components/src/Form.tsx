@@ -4,7 +4,7 @@ import { LoadingButton } from '@mui/lab';
 import { createComponent } from '@mui/toolpad-core';
 import { useForm, FieldValues, ValidationMode } from 'react-hook-form';
 import * as _ from 'lodash-es';
-import { SX_PROP_HELPER_TEXT } from './constants';
+import { SX_PROP_HELPER_TEXT } from './constants.js';
 
 export const FormContext = React.createContext<{
   form: ReturnType<typeof useForm> | null;

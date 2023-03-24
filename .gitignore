@@ -54,6 +54,5 @@ packages/toolpad-app/public/runtime
 packages/toolpad-app/public/reactDevtools
 packages/toolpad-app/public/runtime
 packages/toolpad-app/public/typings.json
-packages/toolpad-app/prisma/generated
 
 examples/*/yarn.lock

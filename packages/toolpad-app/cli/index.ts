@@ -1,7 +1,6 @@
 import 'dotenv/config';
 import arg from 'arg';
 import path from 'path';
-import * as fs from 'fs/promises';
 import invariant from 'invariant';
 import { Readable } from 'stream';
 import * as readline from 'readline';
@@ -99,43 +98,18 @@ async function runApp(cmd: 'dev' | 'start', { devMode = false, port }: RunComman
   });
 }
 
-const PROJECT_FILES_PATH = path.resolve(TOOLPAD_DIR_PATH, './cli/projectFiles');
-
-const projectFiles = [
-  {
-    source: 'toolpad-generated-gitignore',
-    destination: './.toolpad-generated/.gitignore',
-  },
-];
-
-async function writeProjectFiles(): Promise<void> {
-  await Promise.all(
-    projectFiles.map(async ({ source, destination }) => {
-      const filePath = path.resolve(PROJECT_FILES_PATH, source);
-      const fileContent = await fs.readFile(filePath);
-
-      await fs.writeFile(path.join(process.cwd(), destination), fileContent, {
-        encoding: 'utf-8',
-      });
-    }),
-  );
-}
-
 async function devCommand(args: RunCommandArgs) {
   const { default: chalk } = await import('chalk');
-  // eslint-disable-next-line no-console
-  console.log(`${chalk.blue('info')} - generating project files…`);
-  await writeProjectFiles();
 
   // eslint-disable-next-line no-console
-  console.log(`${chalk.blue('info')} - starting Toolpad application in dev mode…`);
+  console.log(`${chalk.blue('info')}  - starting Toolpad application in dev mode...`);
   await runApp('dev', args);
 }
 
 async function buildCommand() {
   const { default: chalk } = await import('chalk');
   // eslint-disable-next-line no-console
-  console.log(`${chalk.blue('info')} - building Toolpad application…`);
+  console.log(`${chalk.blue('info')}  - building Toolpad application...`);
   await new Promise((resolve) => {
     setTimeout(resolve, 1000);
   });
@@ -146,7 +120,7 @@ async function buildCommand() {
 async function startCommand(args: RunCommandArgs) {
   const { default: chalk } = await import('chalk');
   // eslint-disable-next-line no-console
-  console.log(`${chalk.blue('info')} - Starting Toolpad application…`);
+  console.log(`${chalk.blue('info')}  - Starting Toolpad application...`);
   await runApp('start', args);
 }
 

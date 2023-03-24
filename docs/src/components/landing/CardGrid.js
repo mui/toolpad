@@ -11,10 +11,9 @@ import { alpha } from '@mui/material/styles';
 
 const cardRootStyle = (imageUrl) => ({
   px: imageUrl ? 0 : 2,
-  pb: 3,
-  pt: imageUrl ? 0 : 3,
+  pt: imageUrl ? 0 : 2,
+  pb: 2,
   height: '100%',
-  maxWidth: 360,
 });
 
 const cardMediaStyle = (imageUrl) => ({
@@ -44,10 +43,7 @@ export default function CardGrid(props) {
           ? {
               background: (theme) =>
                 theme.palette.mode === 'dark'
-                  ? `linear-gradient(180deg, ${theme.palette.primaryDark[900]} 0%, ${alpha(
-                      theme.palette.primary[900],
-                      0.4,
-                    )} 100%)`
+                  ? `radial-gradient(200% 150% at 50% 20%, transparent 30%, ${theme.palette.primaryDark[300]} 100%, ${theme.palette.primaryDark[100]} 0)`
                   : `linear-gradient(180deg, ${theme.palette.grey[50]} 0%, ${alpha(
                       theme.palette.grey[100],
                       0.4,
@@ -60,24 +56,31 @@ export default function CardGrid(props) {
         <SectionHeadline overline={content.overline} title={content.Headline} />
         <Grid container spacing={{ xs: 1, sm: 2, md: 3 }}>
           {content.cards.map(({ icon, title, wip, imageUrl, description }) => (
-            <Grid key={title}>
+            <Grid xs={6} key={title}>
               <Paper variant="outlined" sx={cardRootStyle(imageUrl)}>
                 {imageUrl ? <Box sx={cardMediaStyle(imageUrl)} /> : null}
                 <Box sx={cardContentRootStyle(imageUrl)}>
-                  <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
-                    {icon ?? null}
-                    <Typography
-                      fontWeight="bold"
-                      component="h3"
-                      color="text.primary"
-                      variant="body2"
-                      sx={{ ml: imageUrl ? 0 : 1 }}
-                    >
-                      {title}
-                    </Typography>
-                    {wip ? (
-                      <IconImage name="time" title="Work in progress" sx={{ ml: 'auto', mr: 2 }} />
-                    ) : null}
+                  <Box
+                    sx={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                      mb: 1,
+                    }}
+                  >
+                    <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                      {icon ?? null}
+                      <Typography
+                        fontWeight="bold"
+                        component="h3"
+                        color="text.primary"
+                        variant="body2"
+                        sx={{ ml: imageUrl ? 0 : 1 }}
+                      >
+                        {title}
+                      </Typography>
+                    </Box>
+                    {wip ? <IconImage name="time" title="Work in progress" /> : null}
                   </Box>
                   <Typography variant="body2" color="text.secondary">
                     {description}

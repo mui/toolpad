@@ -2,6 +2,7 @@ import * as React from 'react';
 import NoSsr from '@mui/material/NoSsr';
 import Head from 'docs/src/modules/components/Head';
 import CssBaseline from '@mui/material/CssBaseline';
+import Divider from '@mui/material/Divider';
 import BrandingProvider from 'docs/src/BrandingProvider';
 import AppHeader from 'docs/src/layouts/AppHeader';
 import AppFooter from 'docs/src/layouts/AppFooter';
@@ -9,6 +10,7 @@ import AppHeaderBanner from 'docs/src/components/banner/AppHeaderBanner';
 import ToolpadHero from '../../src/components/landing/Hero';
 import DemoVideo from '../../src/components/landing/DemoVideo';
 import SignUpToast from '../../src/components/landing/SignUpToast';
+import UseCases from '../../src/components/landing/UseCases';
 import CardGrid from '../../src/components/landing/CardGrid';
 import Banner from '../../src/components/landing/Banner';
 import Pricing from '../../src/components/landing/PricingTable';
@@ -53,7 +55,9 @@ export default function Home() {
           label={label}
           docs={false}
         />
-        <CardGrid content={useCases} darker />
+        {/* <CardGrid content={useCases} darker /> */}
+        <UseCases content={useCases} />
+        <Divider sx={{ maxWidth: '1200px', m: 'auto' }} />
         <Pricing
           Headline={Headline}
           plans={plans}

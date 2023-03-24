@@ -17,7 +17,7 @@ function Marquee({ content }) {
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
-        background: `linear-gradient(180deg, ${theme.palette.primaryDark[900]} 0%, transparent)`,
+        background: `linear-gradient(180deg, ${theme.palette.primaryDark[900]} 0%, ${theme.palette.primaryDark[800]})`,
         borderBottom: '1px solid',
         borderColor: (theme) => (theme.palette.mode === 'dark' ? 'primaryDark.600' : 'grey.200'),
       })}

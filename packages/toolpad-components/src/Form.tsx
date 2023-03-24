@@ -187,6 +187,16 @@ export function useFormInput<V>({
     }
   }, [defaultValue, emptyValue, fieldValues, form, isInitialForm, name, onChange, value]);
 
+  const previousNodeNameRef = React.useRef<typeof name>(name);
+  React.useEffect(() => {
+    const previousNodeName = previousNodeNameRef.current;
+
+    if (form && previousNodeName && previousNodeName !== name) {
+      form.unregister(previousNodeName);
+      previousNodeNameRef.current = name;
+    }
+  }, [form, name]);
+
   const previousManualValidationPropsRef = React.useRef(validationProps);
   React.useEffect(() => {
     if (

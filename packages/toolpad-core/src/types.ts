@@ -216,6 +216,8 @@ export interface ArgTypeDefinition<P extends object = {}, V = P[keyof P]> {
    * @returns {boolean} a boolean value indicating whether the property should be visible or not
    */
   visible?: ((props: P) => boolean) | boolean;
+
+  tsType?: string;
 }
 
 export type ArgTypeDefinitions<P extends object = {}> = {
@@ -252,6 +254,10 @@ export type BindingEvaluationResult<T = unknown> = {
 
 export type LiveBinding = BindingEvaluationResult;
 
+export interface ScopeMetaPropField {
+  tsType?: string;
+}
+
 export type ScopeMetaField = {
   description?: string;
   deprecated?: boolean | string;
@@ -263,6 +269,7 @@ export type ScopeMetaField = {
   | {
       kind: 'element';
       componentId: string;
+      props?: Record<string, ScopeMetaPropField>;
     }
   | {
       kind: 'query' | 'local';

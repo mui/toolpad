@@ -17,7 +17,7 @@ export type InstantiatedComponents = Record<string, InstantiatedComponent | unde
 export const PAGE_ROW_COMPONENT_ID = 'PageRow';
 export const PAGE_COLUMN_COMPONENT_ID = 'PageColumn';
 export const STACK_COMPONENT_ID = 'Stack';
-export const FORM_COMPONENT_ID = 'Form'
+export const FORM_COMPONENT_ID = 'Form';
 
 const INTERNAL_COMPONENTS = new Map<string, ToolpadComponentDefinition>([
   [PAGE_ROW_COMPONENT_ID, { displayName: 'Row', builtIn: 'PageRow', system: true }],

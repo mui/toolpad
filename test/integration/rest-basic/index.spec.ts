@@ -42,6 +42,8 @@ test('rest basics', async ({ page, context, localApp }) => {
 
   const newQueryEditor = page.getByRole('dialog', { name: 'query' });
 
+  await expect(newQueryEditor).toBeVisible();
+
   // Make sure switching tabs does not close query editor
   const newTab = await context.newPage();
   await newTab.bringToFront();

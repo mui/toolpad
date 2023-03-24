@@ -143,6 +143,18 @@ export async function example() {
 }
 `;
 
+async function readMaybeFile(filePath: string): Promise<string | null> {
+  try {
+    return await fs.readFile(filePath, { encoding: 'utf-8' });
+  } catch (rawError) {
+    const error = errorFrom(rawError);
+    if (error.code === 'ENOENT') {
+      return null;
+    }
+    throw error;
+  }
+}
+
 async function initToolpadFolder(root: string) {
   const toolpadFolder = getToolpadFolder(root);
   await fs.mkdir(toolpadFolder, { recursive: true });
@@ -305,21 +317,16 @@ export async function saveLocalDom(dom: appDom.AppDom): Promise<void> {
 
 async function loadConfigFileFrom(configFilePath: string): Promise<appDom.AppDom | null> {
   await isInitialized;
-  try {
-    // Using a lock to avoid read during write which may result in reading truncated file content
-    const configContent = await configFileLock.use(() =>
-      fs.readFile(configFilePath, { encoding: 'utf-8' }),
-    );
-    const parsedConfig = yaml.parse(configContent);
-    invariant(parsedConfig, 'Invalid Toolpad config');
-    return parsedConfig;
-  } catch (rawError) {
-    const error = errorFrom(rawError);
-    if (error.code === 'ENOENT') {
-      return null;
-    }
-    throw error;
+  // Using a lock to avoid read during write which may result in reading truncated file content
+  const configContent = await configFileLock.use(() => readMaybeFile(configFilePath));
+
+  if (!configContent) {
+    return null;
   }
+
+  const parsedConfig = yaml.parse(configContent);
+  invariant(parsedConfig, 'Invalid Toolpad config');
+  return parsedConfig;
 }
 
 async function loadConfigFile() {
@@ -367,14 +374,7 @@ export async function openCodeComponentEditor(componentName: string): Promise<vo
 
 async function getQueriesFileContent(): Promise<string | null> {
   await isInitialized;
-  try {
-    return await fs.readFile(getQueriesFilePath(), { encoding: 'utf-8' });
-  } catch (err) {
-    if (errorFrom(err).code === 'ENOENT') {
-      return null;
-    }
-    throw err;
-  }
+  return readMaybeFile(getQueriesFilePath());
 }
 
 export async function getDomFingerprint() {
@@ -464,43 +464,37 @@ export interface ToolpadProjectFiles {
 }
 async function readDomFile(root: string): Promise<DomFile | null> {
   const filepath = getDomFile(root);
-  try {
-    const configContent = await fs.readFile(filepath, { encoding: 'utf-8' });
-    const parsedConfig = yaml.parse(configContent);
-    return {
-      name: 'dom',
-      kind: 'dom',
-      filepath,
-      hash: String(insecureHash(configContent)),
-      content: parsedConfig,
-    };
-  } catch (rawError) {
-    const error = errorFrom(rawError);
-    if (error.code === 'ENOENT') {
-      return null;
-    }
-    throw error;
+  const configContent = await readMaybeFile(filepath);
+
+  if (!configContent) {
+    return null;
   }
+
+  const parsedConfig = yaml.parse(configContent);
+  return {
+    name: 'dom',
+    kind: 'dom',
+    filepath,
+    hash: String(insecureHash(configContent)),
+    content: parsedConfig,
+  };
 }
 
 async function readQueriesFile(root: string): Promise<QueriesFile | null> {
   const filepath = getQueriesFile(root);
-  try {
-    const content = await fs.readFile(filepath, { encoding: 'utf-8' });
-    return {
-      name: 'queries',
-      kind: 'queries',
-      filepath,
-      hash: String(insecureHash(content)),
-      content,
-    };
-  } catch (rawError) {
-    const error = errorFrom(rawError);
-    if (error.code === 'ENOENT') {
-      return null;
-    }
-    throw error;
+  const content = await readMaybeFile(filepath);
+
+  if (!content) {
+    return null;
   }
+
+  return {
+    name: 'queries',
+    kind: 'queries',
+    filepath,
+    hash: String(insecureHash(content)),
+    content,
+  };
 }
 
 async function readComponentsFolder(root: string) {

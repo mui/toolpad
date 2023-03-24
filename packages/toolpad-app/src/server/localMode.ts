@@ -143,7 +143,11 @@ async function initToolpadFile(): Promise<void> {
 }
 
 async function initProjectFolder(): Promise<void> {
-  await Promise.all([initToolpadFile(), initQueriesFile()]);
+  if (config.cmd === 'dev') {
+    await Promise.all([initToolpadFile(), initQueriesFile()]);
+  } else {
+    // TODO: verify files exist?
+  }
 }
 
 // eslint-disable-next-line no-underscore-dangle

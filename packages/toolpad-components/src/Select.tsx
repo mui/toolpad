@@ -2,8 +2,8 @@ import * as React from 'react';
 import { TextFieldProps, MenuItem, TextField } from '@mui/material';
 import { createComponent, useNode } from '@mui/toolpad-core';
 import { FieldError, Controller } from 'react-hook-form';
-import { SX_PROP_HELPER_TEXT } from './constants';
 import { FormContext, useFormInput, withComponentForm } from './Form';
+import { SX_PROP_HELPER_TEXT } from './constants.js';
 
 export interface SelectOption {
   value: string;

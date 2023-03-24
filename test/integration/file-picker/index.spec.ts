@@ -1,21 +1,19 @@
 import * as path from 'path';
 import { ToolpadEditor } from '../../models/ToolpadEditor';
-import { test, expect } from '../../playwright/test';
-import { readJsonFile } from '../../utils/fs';
-import generateId from '../../utils/generateId';
+import { test, expect } from '../../playwright/localTest';
 
-test('File picker component', async ({ page, api }) => {
-  const dom = await readJsonFile(path.resolve(__dirname, './dom.json'));
+test.use({
+  localAppConfig: {
+    template: path.resolve(__dirname, './fixture'),
+    cmd: 'dev',
+  },
+});
+
+test('File picker component', async ({ page }) => {
   const testFilePath = path.resolve(__dirname, './test.txt');
 
-  const app = await api.mutation.createApp(`App ${generateId()}`, {
-    from: { kind: 'dom', dom },
-  });
-
-  await page.pause();
-
   const editorModel = new ToolpadEditor(page);
-  editorModel.goto(app.id);
+  editorModel.goto();
 
   await editorModel.pageRoot.waitFor();
 

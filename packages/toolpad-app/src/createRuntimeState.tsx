@@ -24,13 +24,11 @@ function compileModules(dom: appDom.AppDom): Record<string, CompiledModule> {
 }
 
 export interface CreateRuntimeStateParams {
-  appId: string;
   dom: appDom.AppDom;
 }
 
-export default function createRuntimeState({ appId, dom }: CreateRuntimeStateParams): RuntimeState {
+export default function createRuntimeState({ dom }: CreateRuntimeStateParams): RuntimeState {
   return {
-    appId,
     dom: appDom.createRenderTree(dom),
     modules: compileModules(dom),
   };

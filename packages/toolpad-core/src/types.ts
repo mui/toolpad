@@ -220,6 +220,7 @@ export interface ArgTypeDefinition<P extends object = {}, V = P[keyof P]> {
    * Name of category that this property belongs to.
    */
   category?: string;
+  tsType?: string;
 }
 
 export type ArgTypeDefinitions<P extends object = {}> = {
@@ -256,6 +257,10 @@ export type BindingEvaluationResult<T = unknown> = {
 
 export type LiveBinding = BindingEvaluationResult;
 
+export interface ScopeMetaPropField {
+  tsType?: string;
+}
+
 export type ScopeMetaField = {
   description?: string;
   deprecated?: boolean | string;
@@ -267,6 +272,7 @@ export type ScopeMetaField = {
   | {
       kind: 'element';
       componentId: string;
+      props?: Record<string, ScopeMetaPropField>;
     }
   | {
       kind: 'query' | 'local';

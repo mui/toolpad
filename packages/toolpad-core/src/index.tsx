@@ -4,7 +4,7 @@ export type {
   NodeRuntime,
   NodeErrorProps,
   Components,
-} from './runtime';
+} from './runtime.js';
 export { Placeholder, Slots, useNode, ComponentsContext } from './runtime.js';
 
 export type FlowDirection = 'row' | 'column' | 'row-reverse' | 'column-reverse';

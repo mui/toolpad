@@ -1,110 +1,108 @@
 import * as path from 'path';
 import { ToolpadEditor } from '../../models/ToolpadEditor';
-import { test, expect } from '../../playwright/test';
-import { readJsonFile } from '../../utils/fs';
+import { test, expect } from '../../playwright/localTest';
 import clickCenter from '../../utils/clickCenter';
-import generateId from '../../utils/generateId';
 
-test('test basic undo and redo', async ({ page, api }) => {
-  const dom = await readJsonFile(path.resolve(__dirname, './dom.json'));
-
-  const app = await api.mutation.createApp(`App ${generateId()}`, {
-    from: { kind: 'dom', dom },
+test.describe('basic tests', () => {
+  test.use({
+    localAppConfig: {
+      template: path.resolve(__dirname, './fixture-basic'),
+      cmd: 'dev',
+    },
   });
 
-  const editorModel = new ToolpadEditor(page);
-  await editorModel.goto(app.id);
+  test('test basic undo and redo', async ({ page }) => {
+    const editorModel = new ToolpadEditor(page);
+    await editorModel.goto();
 
-  await editorModel.pageRoot.waitFor();
+    await editorModel.pageRoot.waitFor();
 
-  const canvasInputLocator = editorModel.appCanvas.locator('input');
+    const canvasInputLocator = editorModel.appCanvas.locator('input');
 
-  // Initially we should have 2 text fields
-  await expect(canvasInputLocator).toHaveCount(2);
+    // Initially we should have 2 text fields
+    await expect(canvasInputLocator).toHaveCount(2);
 
-  // Add 3rd text field
-  await editorModel.dragNewComponentToAppCanvas('Text field');
+    // Add 3rd text field
+    await editorModel.dragNewComponentToAppCanvas('Text field');
 
-  // Ensure that we added 3rd text field
-  await expect(canvasInputLocator).toHaveCount(3);
+    // Ensure that we added 3rd text field
+    await expect(canvasInputLocator).toHaveCount(3);
 
-  // Undo adding text field
-  await page.keyboard.press('Control+Z');
+    // Undo adding text field
+    await page.keyboard.press('Control+Z');
 
-  // Check that we have only 2 text fields
-  await expect(canvasInputLocator).toHaveCount(2);
+    // Check that we have only 2 text fields
+    await expect(canvasInputLocator).toHaveCount(2);
 
-  await page.keyboard.press('Control+Shift+Z');
+    await page.keyboard.press('Control+Shift+Z');
 
-  // Redo should bring back text field
-  await expect(canvasInputLocator).toHaveCount(3);
+    // Redo should bring back text field
+    await expect(canvasInputLocator).toHaveCount(3);
+  });
+
+  test('test batching text input actions into single undo entry', async ({ page }) => {
+    const editorModel = new ToolpadEditor(page);
+    await editorModel.goto();
+
+    await editorModel.pageRoot.waitFor();
+
+    const input = editorModel.appCanvas.locator('input').first();
+
+    clickCenter(page, input);
+
+    await editorModel.componentEditor.getByLabel('defaultValue', { exact: true }).click();
+
+    await page.keyboard.type('some value');
+
+    // Wait for undo stack to be updated
+    await page.waitForTimeout(500);
+
+    await page.keyboard.type(' hello');
+
+    await editorModel.componentEditor.getByLabel('defaultValue', { exact: true }).blur();
+
+    await expect(input).toHaveValue('some value hello');
+
+    // Wait for undo stack to be updated
+    await page.waitForTimeout(500);
+
+    // Undo changes
+    await page.keyboard.press('Control+Z');
+
+    // Asssert that batched changes were reverted
+    await expect(input).toHaveValue('some value');
+  });
 });
 
-test('test batching text input actions into single undo entry', async ({ page, api }) => {
-  const dom = await readJsonFile(path.resolve(__dirname, './dom.json'));
-
-  const app = await api.mutation.createApp(`App ${generateId()}`, {
-    from: { kind: 'dom', dom },
+test.describe('multiple pages', () => {
+  test.use({
+    localAppConfig: {
+      template: path.resolve(__dirname, './fixture-multiple-pages'),
+      cmd: 'dev',
+    },
   });
 
-  const editorModel = new ToolpadEditor(page);
-  await editorModel.goto(app.id);
+  test('test undo and redo through different pages', async ({ page }) => {
+    const editorModel = new ToolpadEditor(page);
+    await editorModel.goto();
 
-  await editorModel.pageRoot.waitFor();
+    await editorModel.pageRoot.waitFor();
 
-  const input = editorModel.appCanvas.locator('input').first();
+    const pageButton1 = editorModel.appCanvas.getByRole('button', {
+      name: 'page1Button',
+    });
+    await expect(pageButton1).toBeVisible();
 
-  clickCenter(page, input);
+    await editorModel.goToPage('page2');
 
-  await editorModel.componentEditor.getByLabel('defaultValue', { exact: true }).click();
+    const pageButton2 = editorModel.appCanvas.getByRole('button', {
+      name: 'page2Button',
+    });
+    await expect(pageButton2).toBeVisible();
 
-  await page.keyboard.type('some value');
+    // Undo changes
+    await page.keyboard.press('Control+Z');
 
-  // Wait for undo stack to be updated
-  await page.waitForTimeout(500);
-
-  await page.keyboard.type(' hello');
-
-  await editorModel.componentEditor.getByLabel('defaultValue', { exact: true }).blur();
-
-  await expect(input).toHaveValue('some value hello');
-
-  // Wait for undo stack to be updated
-  await page.waitForTimeout(500);
-
-  // Undo changes
-  await page.keyboard.press('Control+Z');
-
-  // Asssert that batched changes were reverted
-  await expect(input).toHaveValue('some value');
-});
-
-test('test undo and redo through different pages', async ({ page, api }) => {
-  const dom = await readJsonFile(path.resolve(__dirname, './2pages.json'));
-
-  const app = await api.mutation.createApp(`App ${generateId()}`, {
-    from: { kind: 'dom', dom },
+    await expect(pageButton1).toBeVisible();
   });
-
-  const editorModel = new ToolpadEditor(page);
-  await editorModel.goto(app.id);
-
-  await editorModel.pageRoot.waitFor();
-
-  const pageButton1 = editorModel.appCanvas.getByRole('button', {
-    name: 'page1Button',
-  });
-  await expect(pageButton1).toBeVisible();
-
-  await editorModel.goToPage('page2');
-
-  const pageButton2 = editorModel.appCanvas.getByRole('button', {
-    name: 'page2Button',
-  });
-  await expect(pageButton2).toBeVisible();
-
-  // Undo changes
-  await page.keyboard.press('Control+Z');
-
-  await expect(pageButton1).toBeVisible();
 });

@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { ErrorBoundary, FallbackProps } from 'react-error-boundary';
-import mitt, { Emitter } from 'mitt';
+import Emitter from './utils/Emitter.js';
 import { RuntimeEvents, ToolpadComponents } from './types.js';
 import { RUNTIME_PROP_NODE_ID, RUNTIME_PROP_SLOTS } from './constants.js';
 import type { SlotType, ComponentConfig, RuntimeEvent, RuntimeError } from './types.js';
@@ -26,7 +26,7 @@ export const NodeRuntimeContext = React.createContext<{
   nodeId: null,
   nodeName: null,
 });
-export const CanvasEventsContext = React.createContext<Emitter<RuntimeEvents>>(mitt());
+export const CanvasEventsContext = React.createContext<Emitter<RuntimeEvents>>(new Emitter());
 
 // NOTE: These props aren't used, they are only there to transfer information from the
 // React elements to the fibers.

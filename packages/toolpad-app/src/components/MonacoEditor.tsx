@@ -164,6 +164,7 @@ const TYPESCRIPT_DEFAULT_COMPILER_OPTIONS: monaco.languages.typescript.CompilerO
   allowJs: true,
   lib: ['es2020'],
   typeRoots: ['node_modules/@types'],
+  strictNullChecks: true,
 };
 
 monaco.languages.typescript.typescriptDefaults.setCompilerOptions(

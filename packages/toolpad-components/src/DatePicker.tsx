@@ -9,8 +9,8 @@ import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { createComponent, useNode } from '@mui/toolpad-core';
 import dayjs from 'dayjs';
 import { Controller, FieldError } from 'react-hook-form';
-import { SX_PROP_HELPER_TEXT } from './constants';
 import { FormContext, useFormInput, withComponentForm } from './Form';
+import { SX_PROP_HELPER_TEXT } from './constants.js';
 
 const LOCALE_LOADERS = new Map([
   ['en', () => import('dayjs/locale/en')],

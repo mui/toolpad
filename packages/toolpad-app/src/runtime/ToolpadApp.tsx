@@ -27,6 +27,7 @@ import {
   ScopeMeta,
   DEFAULT_LOCAL_SCOPE_PARAMS,
   getArgTypeDefaultValue,
+  ScopeMetaPropField,
 } from '@mui/toolpad-core';
 import { createProvidedContext } from '@mui/toolpad-core/utils/react';
 import { QueryClient, QueryClientProvider, useMutation } from '@tanstack/react-query';
@@ -584,7 +585,7 @@ interface MutationNodeProps {
 }
 
 function MutationNode({ node }: MutationNodeProps) {
-  const { appId, version } = useAppContext();
+  const { version } = useAppContext();
   const getBindings = useBindingsContext();
   const setControlledBinding = useSetControlledBindingContext();
 
@@ -601,13 +602,11 @@ function MutationNode({ node }: MutationNodeProps) {
   } = useMutation(
     async (overrides: any = {}) =>
       execDataSourceQuery({
-        appId,
-        version,
         queryId,
         params: { ...params, ...overrides },
       }),
     {
-      mutationKey: [appId, version, queryId, params],
+      mutationKey: [version, queryId, params],
     },
   );
 
@@ -705,6 +704,8 @@ function parseBindings(
 
       const { argTypes = {} } = componentConfig ?? {};
 
+      const propsMeta: Record<string, ScopeMetaPropField> = {};
+
       for (const [propName, argType] of Object.entries(argTypes)) {
         const initializerId = argType?.defaultValueProp
           ? `${elm.id}.props.${argType.defaultValueProp}`
@@ -727,11 +728,11 @@ function parseBindings(
           !NON_BINDABLE_CONTROL_TYPES.includes(argType?.control?.type as string)
         ) {
           scopePath = `${elm.name}.${propName}`;
-          scopeMeta[elm.name] = {
-            kind: 'element',
-            componentId,
-          };
         }
+
+        propsMeta[propName] = {
+          tsType: argType?.tsType,
+        };
 
         if (argType) {
           if (argType.onChangeProp) {
@@ -744,6 +745,14 @@ function parseBindings(
             parsedBindingsMap.set(bindingId, parseBinding(binding, { scopePath }));
           }
         }
+      }
+
+      if (componentId !== PAGE_ROW_COMPONENT_ID) {
+        scopeMeta[elm.name] = {
+          kind: 'element',
+          componentId,
+          props: propsMeta,
+        };
       }
 
       if (!isPageLayoutComponent(elm)) {
@@ -1087,8 +1096,8 @@ export default function ToolpadApp({
   hidePreviewBanner,
   state,
 }: ToolpadAppProps) {
-  const { appId, dom } = state;
-  const appContext = React.useMemo(() => ({ appId, version }), [appId, version]);
+  const { dom } = state;
+  const appContext = React.useMemo(() => ({ version }), [version]);
 
   const [resetNodeErrorsKey, setResetNodeErrorsKey] = React.useState(0);
 
@@ -1120,7 +1129,7 @@ export default function ToolpadApp({
                         endIcon={<EditIcon />}
                         color="primary"
                         component="a"
-                        href={`/_toolpad/app/${appId}`}
+                        href={`/_toolpad/app`}
                       >
                         Edit
                       </Button>

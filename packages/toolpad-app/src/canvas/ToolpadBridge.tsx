@@ -1,5 +1,5 @@
+import Emitter from '@mui/toolpad-core/utils/Emitter';
 import type { RuntimeEvents } from '@mui/toolpad-core';
-import mitt, { Emitter } from 'mitt';
 import type { AppCanvasState } from '.';
 import { TOOLPAD_BRIDGE_GLOBAL } from '../constants';
 import type { PageViewState } from '../types';
@@ -82,9 +82,9 @@ if (
 
 let canvasIsReady = false;
 export const bridge: ToolpadBridge = {
-  editorEvents: mitt(),
+  editorEvents: new Emitter(),
   editorCommands: createCommands(),
-  canvasEvents: mitt(),
+  canvasEvents: new Emitter(),
   canvasCommands: createCommands({
     isReady: () => canvasIsReady,
   }),

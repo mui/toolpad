@@ -18,7 +18,6 @@ export type DropZone =
   | typeof DROP_ZONE_CENTER;
 
 export interface PageEditorState {
-  readonly appId: string;
   readonly type: 'page';
   readonly nodeId: NodeId;
   readonly newNode: appDom.ElementNode | null;
@@ -79,9 +78,8 @@ export type PageEditorAction =
       bindings: LiveBindings;
     };
 
-export function createPageEditorState(appId: string, nodeId: NodeId): PageEditorState {
+export function createPageEditorState(nodeId: NodeId): PageEditorState {
   return {
-    appId,
     type: 'page',
     nodeId,
     newNode: null,
@@ -238,7 +236,6 @@ export function usePageEditorState() {
 }
 
 export interface PageEditorProviderProps {
-  appId: string;
   children?: React.ReactNode;
   nodeId: NodeId;
 }
@@ -249,14 +246,14 @@ const PageEditorApiContext = React.createContext<PageEditorApi>(
   createPageEditorApi(() => undefined),
 );
 
-export function PageEditorProvider({ appId, children, nodeId }: PageEditorProviderProps) {
-  const initialState = createPageEditorState(appId, nodeId);
+export function PageEditorProvider({ children, nodeId }: PageEditorProviderProps) {
+  const initialState = createPageEditorState(nodeId);
   const [state, dispatch] = React.useReducer(pageEditorReducer, initialState);
   const api = React.useMemo(() => createPageEditorApi(dispatch), []);
 
   React.useEffect(() => {
-    api.replace(createPageEditorState(appId, nodeId));
-  }, [appId, api, nodeId]);
+    api.replace(createPageEditorState(nodeId));
+  }, [api, nodeId]);
 
   return (
     <PageEditorContext.Provider value={state}>

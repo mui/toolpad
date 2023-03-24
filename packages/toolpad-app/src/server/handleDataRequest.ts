@@ -1,13 +1,10 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import Cors from 'cors';
 import { ExecFetchResult, NodeId, SerializedError } from '@mui/toolpad-core';
-import { execQuery, getApp, loadDom } from './data';
+import { execQuery, loadDom } from './data';
 import initMiddleware from './initMiddleware';
-import { VersionOrPreview } from '../types';
 import * as appDom from '../appDom';
 import { errorFrom, serializeError } from '../utils/errors';
-import { basicAuthUnauthorized, checkBasicAuth } from './basicAuth';
-import config from '../config';
 
 // Initialize the cors middleware
 const cors = initMiddleware<any>(
@@ -28,16 +25,7 @@ function withSerializedError<T extends { error?: unknown }>(
     : withoutError;
 }
 
-export interface HandleDataRequestParams {
-  appId: string;
-  version: VersionOrPreview;
-}
-
-export default async (
-  req: NextApiRequest,
-  res: NextApiResponse<ExecFetchResult<any>>,
-  { appId, version }: HandleDataRequestParams,
-) => {
+export default async (req: NextApiRequest, res: NextApiResponse<ExecFetchResult<any>>) => {
   if (req.method !== 'POST') {
     // This endpoint is used both by queries and mutations
     res.status(405).end();
@@ -47,22 +35,7 @@ export default async (
   await cors(req, res);
   const queryNodeId = req.query.queryId as NodeId;
 
-  if (!config.localMode) {
-    const app = await getApp(appId);
-    if (!app) {
-      res.status(404).end();
-      return;
-    }
-
-    if (!app.public) {
-      if (!checkBasicAuth(req)) {
-        basicAuthUnauthorized(res);
-        return;
-      }
-    }
-  }
-
-  const dom = await loadDom(appId, version);
+  const dom = await loadDom();
   const dataNode = appDom.getMaybeNode(dom, queryNodeId);
 
   if (!dataNode) {
@@ -75,7 +48,7 @@ export default async (
   }
 
   try {
-    const result = await execQuery(appId, dataNode, req.body);
+    const result = await execQuery(dataNode, req.body);
     res.json(withSerializedError(result));
   } catch (error) {
     res.json(withSerializedError({ error }));

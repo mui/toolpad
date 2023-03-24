@@ -51,6 +51,19 @@ export function JsExpressionEditor({
     const globalDeclarations = Object.entries(globalScopeMeta).map(([key, metaData = {}]) => {
       const { deprecated, description, tsType } = metaData;
 
+      const overrides: Record<string, string> = {};
+
+      if (metaData.kind === 'element') {
+        const { props } = metaData;
+        if (props) {
+          for (const [prop, meta] of Object.entries(props)) {
+            if (meta.tsType) {
+              overrides[prop] = meta.tsType;
+            }
+          }
+        }
+      }
+
       const commentLines = [];
 
       if (description) {
@@ -66,13 +79,35 @@ export function JsExpressionEditor({
       const comment =
         commentLines.length > 0 ? ['/**', ...commentLines.map((line) => ` * ${line}`), ' */'] : [];
 
-      const declaration = tsType
-        ? `declare const ${key}: ${tsType}`
-        : `declare const ${key}: RootObject[${JSON.stringify(key)}];`;
+      const overridesType = `{ 
+        ${Object.entries(overrides)
+          .map(([propKey, propValue]) => {
+            return `${propKey}: ${propValue.replaceAll(
+              /\bThisComponent\b/g,
+              `RootObject[${JSON.stringify(key)}]`,
+            )}`;
+          })
+          .join('\n')} 
+      }`;
+
+      const globalType =
+        typeof tsType === 'string'
+          ? tsType
+          : `OverrideProps<RootObject[${JSON.stringify(key)}], ${overridesType}>;`;
+
+      const declaration = `declare const ${key}: Expand<${globalType}>`;
       return [...comment, declaration].join('\n');
     });
 
     const content = `
+      type OverrideProps<T, S extends Partial<Record<keyof T, unknown>>> = {
+        [K in keyof T]:  S extends { [M in K]: any } ? S[K] : T[K]
+      }
+
+      // Pretty-print types on hover:
+      // See https://github.com/microsoft/vscode/issues/94679#issuecomment-755194161
+      type Expand<T> = T extends infer O ? { [K in keyof O]: Expand<O[K]> } : never;
+      
       ${generatedTypes.join('\n')}
 
       ${globalDeclarations.join('\n')}

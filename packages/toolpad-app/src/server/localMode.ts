@@ -167,12 +167,33 @@ async function initToolpadFile(root: string): Promise<void> {
   }
 }
 
+const DEFAULT_GENERATED_GITIGNORE_FILE_CONTENT = `*
+!.gitignore
+`;
+
+async function initGeneratedGitignore(root: string) {
+  const generatedFolder = path.resolve(root, '.toolpad-generated');
+  const generatedGitignorePath = path.resolve(generatedFolder, '.gitignore');
+  if (!(await fileExists(generatedGitignorePath))) {
+    await fs.mkdir(generatedFolder, { recursive: true });
+    // eslint-disable-next-line no-console
+    console.log(`${chalk.blue('info')}  - Initializing Toolpad queries file`);
+    await fs.writeFile(generatedGitignorePath, DEFAULT_GENERATED_GITIGNORE_FILE_CONTENT, {
+      encoding: 'utf-8',
+    });
+  }
+}
+
 async function initProjectFolder(): Promise<void> {
   try {
     const root = getUserProjectRoot();
     if (config.cmd === 'dev') {
       await initToolpadFolder(root);
-      await Promise.all([initToolpadFile(root), initQueriesFile(root)]);
+      await Promise.all([
+        initGeneratedGitignore(root),
+        initToolpadFile(root),
+        initQueriesFile(root),
+      ]);
     } else {
       // TODO: verify files exist?
     }

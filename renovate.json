@@ -78,21 +78,5 @@
   "vulnerabilityAlerts": {
     "schedule": ["at any time"],
     "addLabels": ["priority: important"]
-  },
-  "regexManagers": [
-    {
-      "fileMatch": ["^render.yml$"],
-      "matchStringsStrategy": "combination",
-      "matchStrings": ["- key: NODE_VERSION", "value: '(?<currentValue>.*)"],
-      "depNameTemplate": "node",
-      "datasourceTemplate": "docker"
-    },
-    {
-      "fileMatch": ["^.circleci/config.yml$"],
-      "matchStrings": ["mcr.microsoft.com/playwright:(?<currentValue>.*)"],
-      "packageNameTemplate": "mcr.microsoft.com/playwright",
-      "depNameTemplate": "playwright",
-      "datasourceTemplate": "docker"
-    }
-  ]
+  }
 }

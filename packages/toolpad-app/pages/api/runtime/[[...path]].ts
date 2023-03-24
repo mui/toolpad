@@ -3,7 +3,7 @@ import { NextApiHandler } from 'next';
 import serializeJavascript from 'serialize-javascript';
 import config from '../../../src/config';
 import { RUNTIME_CONFIG_WINDOW_PROPERTY } from '../../../src/constants';
-import { getConfigFilePath } from '../../../src/server/localMode';
+import { getConfigFilePath, getUserProjectRoot } from '../../../src/server/localMode';
 import { createBuilder } from '../../../src/server/runtimeBuild';
 
 const BASE = '/api/runtime';
@@ -16,6 +16,7 @@ declare module globalThis {
 }
 
 async function getBuilder() {
+  const root = getUserProjectRoot();
   if (!builderPromise) {
     // Not initialized yet, either first run, or after HMR
 
@@ -28,7 +29,7 @@ async function getBuilder() {
       }
 
       const builder = await createBuilder({
-        filePath: await getConfigFilePath(),
+        filePath: await getConfigFilePath(root),
         dev: true,
       });
 

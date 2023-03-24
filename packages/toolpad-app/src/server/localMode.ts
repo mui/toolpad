@@ -13,6 +13,7 @@ import * as appDom from '../appDom';
 import { errorFrom } from '../utils/errors';
 import { migrateUp } from '../appDom/migrations';
 import insecureHash from '../utils/insecureHash';
+import { writeFileRecursive, readMaybeFile } from '../utils/fs';
 
 export function getUserProjectRoot(): string {
   const { projectDir } = config;
@@ -48,7 +49,16 @@ function getDomFile(root: string): string {
   return path.resolve(getToolpadFolder(root), './toolpad.yml');
 }
 
-export async function getConfigFilePathAtRoot(root: string) {
+function getComponentFolder(root: string): string {
+  const toolpadFolder = getToolpadFolder(root);
+  return path.resolve(toolpadFolder, './components');
+}
+
+function getComponentFilePath(componentsFolder: string, componentName: string): string {
+  return path.resolve(componentsFolder, `${componentName}.tsx`);
+}
+
+export async function getConfigFilePath(root: string) {
   const yamlFilePath = path.resolve(root, './toolpad.yaml');
   const ymlFilePath = path.resolve(root, './toolpad.yml');
 
@@ -63,28 +73,12 @@ export async function getConfigFilePathAtRoot(root: string) {
   return yamlFilePath;
 }
 
-export async function getConfigFilePath() {
-  return getConfigFilePathAtRoot(getUserProjectRoot());
-}
-
 type ComponentsContent = Record<string, string>;
 
 export const QUERIES_FILE = `./toolpad/queries.ts`;
 
-function getQueriesFilePath(): string {
-  return getQueriesFile(getUserProjectRoot());
-}
-
-function getComponentFolder(): string {
-  return path.resolve(getUserProjectRoot(), './toolpad/components');
-}
-
-function getComponentFilePath(componentsFolder: string, componentName: string): string {
-  return path.resolve(componentsFolder, `${componentName}.tsx`);
-}
-
-async function loadCodeComponentsFromFiles(): Promise<ComponentsContent> {
-  const componentsFolder = getComponentFolder();
+async function loadCodeComponentsFromFiles(root: string): Promise<ComponentsContent> {
+  const componentsFolder = getComponentFolder(root);
   await fs.mkdir(componentsFolder, { recursive: true });
   let entries: Dirent[] = [];
   try {
@@ -128,7 +122,7 @@ const configFileLock = new Lock();
 
 async function writeConfigFile(filePath: string, dom: appDom.AppDom): Promise<void> {
   await configFileLock.use(() =>
-    fs.writeFile(filePath, yaml.stringify(dom), { encoding: 'utf-8' }),
+    writeFileRecursive(filePath, yaml.stringify(dom), { encoding: 'utf-8' }),
   );
 }
 
@@ -143,18 +137,6 @@ export async function example() {
 }
 `;
 
-async function readMaybeFile(filePath: string): Promise<string | null> {
-  try {
-    return await fs.readFile(filePath, { encoding: 'utf-8' });
-  } catch (rawError) {
-    const error = errorFrom(rawError);
-    if (error.code === 'ENOENT') {
-      return null;
-    }
-    throw error;
-  }
-}
-
 async function initToolpadFolder(root: string) {
   const toolpadFolder = getToolpadFolder(root);
   await fs.mkdir(toolpadFolder, { recursive: true });
@@ -165,12 +147,12 @@ async function initQueriesFile(root: string): Promise<void> {
   if (!(await fileExists(queriesFilePath))) {
     // eslint-disable-next-line no-console
     console.log(`${chalk.blue('info')}  - Initializing Toolpad queries file`);
-    await fs.writeFile(queriesFilePath, DEFAULT_QUERIES_FILE_CONTENT, { encoding: 'utf-8' });
+    await writeFileRecursive(queriesFilePath, DEFAULT_QUERIES_FILE_CONTENT, { encoding: 'utf-8' });
   }
 }
 
 async function initToolpadFile(root: string): Promise<void> {
-  const configFilePath = await getConfigFilePathAtRoot(root);
+  const configFilePath = await getConfigFilePath(root);
   if (!(await fileExists(configFilePath))) {
     // eslint-disable-next-line no-console
     console.log(`${chalk.blue('info')}  - Initializing Toolpad config file`);
@@ -187,10 +169,9 @@ async function initGeneratedGitignore(root: string) {
   const generatedFolder = path.resolve(root, '.toolpad-generated');
   const generatedGitignorePath = path.resolve(generatedFolder, '.gitignore');
   if (!(await fileExists(generatedGitignorePath))) {
-    await fs.mkdir(generatedFolder, { recursive: true });
     // eslint-disable-next-line no-console
     console.log(`${chalk.blue('info')}  - Initializing Toolpad queries file`);
-    await fs.writeFile(generatedGitignorePath, DEFAULT_GENERATED_GITIGNORE_FILE_CONTENT, {
+    await writeFileRecursive(generatedGitignorePath, DEFAULT_GENERATED_GITIGNORE_FILE_CONTENT, {
       encoding: 'utf-8',
     });
   }
@@ -225,11 +206,10 @@ async function writeCodeComponentsToFiles(
   componentsFolder: string,
   components: ComponentsContent,
 ): Promise<void> {
-  await fs.mkdir(componentsFolder, { recursive: true });
   await Promise.all(
     Object.entries(components).map(async ([componentName, content]) => {
       const filePath = getComponentFilePath(componentsFolder, componentName);
-      await fs.writeFile(filePath, content, { encoding: 'utf-8' });
+      await writeFileRecursive(filePath, content, { encoding: 'utf-8' });
     }),
   );
 }
@@ -296,8 +276,9 @@ function extractNewComponentsContentFromDom(dom: appDom.AppDom): ExtractedCompon
 }
 
 export async function writeDomToDisk(dom: appDom.AppDom): Promise<void> {
-  const configFilePath = await getConfigFilePath();
-  const componentsFolder = getComponentFolder();
+  const root = getUserProjectRoot();
+  const configFilePath = await getConfigFilePath(root);
+  const componentsFolder = getComponentFolder(root);
 
   const { components: componentsContent, dom: domWithoutComponents } =
     extractNewComponentsContentFromDom(dom);
@@ -330,7 +311,8 @@ async function loadConfigFileFrom(configFilePath: string): Promise<appDom.AppDom
 }
 
 async function loadConfigFile() {
-  const configFilePath = await getConfigFilePath();
+  const root = getUserProjectRoot();
+  const configFilePath = await getConfigFilePath(root);
   const dom = await loadConfigFileFrom(configFilePath);
 
   if (dom) {
@@ -341,10 +323,11 @@ async function loadConfigFile() {
 }
 
 export async function loadDomFromDisk(): Promise<appDom.AppDom> {
+  const root = getUserProjectRoot();
   await isInitialized;
   const [configContent, componentsContent] = await Promise.all([
     loadConfigFile(),
-    loadCodeComponentsFromFiles(),
+    loadCodeComponentsFromFiles(root),
   ]);
   const dom = mergeComponentsContentIntoDom(configContent, componentsContent);
   return dom;
@@ -364,7 +347,8 @@ export async function openCodeEditor(file: string): Promise<void> {
 }
 
 export async function openCodeComponentEditor(componentName: string): Promise<void> {
-  const componentsFolder = getComponentFolder();
+  const root = getUserProjectRoot();
+  const componentsFolder = getComponentFolder(root);
   const fullPath = getComponentFilePath(componentsFolder, componentName);
   const userProjectRoot = getUserProjectRoot();
   openEditor([fullPath, userProjectRoot], {
@@ -372,16 +356,17 @@ export async function openCodeComponentEditor(componentName: string): Promise<vo
   });
 }
 
-async function getQueriesFileContent(): Promise<string | null> {
+async function getQueriesFileContent(root: string): Promise<string | null> {
   await isInitialized;
-  return readMaybeFile(getQueriesFilePath());
+  return readMaybeFile(getQueriesFile(root));
 }
 
 export async function getDomFingerprint() {
+  const root = getUserProjectRoot();
   const [configContent, componentsContent, queriesFile] = await Promise.all([
     loadConfigFile(),
-    loadCodeComponentsFromFiles(),
-    getQueriesFileContent(),
+    loadCodeComponentsFromFiles(root),
+    getQueriesFileContent(root),
   ]);
 
   return insecureHash(JSON.stringify([configContent, componentsContent, queriesFile]));

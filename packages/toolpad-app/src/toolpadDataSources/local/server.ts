@@ -7,12 +7,14 @@ import invariant from 'invariant';
 import { indent, truncate } from '@mui/toolpad-core/utils/strings';
 import * as dotenv from 'dotenv';
 import * as chokidar from 'chokidar';
+import chalk from 'chalk';
 import config from '../../config';
 import { ServerDataSource } from '../../types';
 import { LocalPrivateQuery, LocalQuery, LocalConnectionParams } from './types';
 import { Maybe } from '../../utils/types';
 import {
   getUserProjectRoot,
+  isInitialized,
   openCodeEditor,
   QUERIES_FILE,
   readProjectFolder,
@@ -110,7 +112,7 @@ async function createMain(manifest: MainManifest): Promise<string> {
             ${loadLines.join(',')}
           ]);
 
-          const queries = await import(${JSON.stringify(QUERIES_FILE)})
+          const queries = await import(${JSON.stringify(QUERIES_FILE)}).catch(() => ({}));
 
           const queriesFileResolvers = Object.entries(queries).flatMap(([name, resolver]) => {
             return typeof resolver === 'function' ? [[name, resolver]] : []
@@ -185,6 +187,8 @@ async function createMain(manifest: MainManifest): Promise<string> {
 }
 
 async function createBuilder() {
+  await isInitialized;
+
   const userProjectRoot = getUserProjectRoot();
   const envFilePath = path.resolve(userProjectRoot, '.env');
 
@@ -327,7 +331,11 @@ async function createBuilder() {
       build.onEnd((args) => {
         // TODO: use for hot reloading
         // eslint-disable-next-line no-console
-        console.log(`Rebuild: ${args.errors.length} error(s), ${args.warnings.length} warning(s)`);
+        console.log(
+          `${chalk.green('ready')} - built queries.ts: ${args.errors.length} error(s), ${
+            args.warnings.length
+          } warning(s)`,
+        );
 
         buildErrors = args.errors.map((message) => {
           let messageText = message.text;

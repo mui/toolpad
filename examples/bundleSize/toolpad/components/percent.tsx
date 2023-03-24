@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { createComponent } from '@mui/toolpad-core';
+import { createComponent } from '@mui/toolpad/browser';
 
 const percentFormat = new Intl.NumberFormat(undefined, {
   style: 'percent',

@@ -32,6 +32,8 @@ function* getPreferredPorts(port: number = DEFAULT_PORT): Iterable<number> {
   }
 }
 
+const TOOLPAD_DIR_PATH = path.resolve(__dirname, '../..'); // from ./dist/server
+
 interface RunCommandArgs {
   // Whether Toolpad editor is running in debug mode
   devMode?: boolean;
@@ -42,7 +44,7 @@ async function runApp(cmd: 'dev' | 'start', { devMode = false, port }: RunComman
   const { execa } = await import('execa');
   const { default: chalk } = await import('chalk');
   const { default: getPort } = await import('get-port');
-  const toolpadDir = path.resolve(__dirname, '../..'); // from ./dist/server
+
   const nextCommand = devMode ? 'dev' : 'start';
 
   if (!port) {
@@ -57,7 +59,7 @@ async function runApp(cmd: 'dev' | 'start', { devMode = false, port }: RunComman
   }
 
   const cp = execa('next', [nextCommand, `--port=${port}`], {
-    cwd: toolpadDir,
+    cwd: TOOLPAD_DIR_PATH,
     preferLocal: true,
     stdio: 'pipe',
     env: {
@@ -80,7 +82,7 @@ async function runApp(cmd: 'dev' | 'start', { devMode = false, port }: RunComman
     invariant(detectedPort, 'Could not find port in stdout');
     const toolpadBaseUrl = `http://localhost:${detectedPort}/`;
     try {
-      await openBrowser(toolpadBaseUrl);
+      openBrowser(toolpadBaseUrl);
     } catch (err: any) {
       console.error(`${chalk.red('error')} - Failed to open browser: ${err.message}`);
     }
@@ -95,15 +97,16 @@ async function runApp(cmd: 'dev' | 'start', { devMode = false, port }: RunComman
 
 async function devCommand(args: RunCommandArgs) {
   const { default: chalk } = await import('chalk');
+
   // eslint-disable-next-line no-console
-  console.log(`${chalk.blue('info')} - starting Toolpad application in dev mode...`);
+  console.log(`${chalk.blue('info')}  - starting Toolpad application in dev mode...`);
   await runApp('dev', args);
 }
 
 async function buildCommand() {
   const { default: chalk } = await import('chalk');
   // eslint-disable-next-line no-console
-  console.log(`${chalk.blue('info')} - building Toolpad application...`);
+  console.log(`${chalk.blue('info')}  - building Toolpad application...`);
   await new Promise((resolve) => {
     setTimeout(resolve, 1000);
   });
@@ -114,7 +117,7 @@ async function buildCommand() {
 async function startCommand(args: RunCommandArgs) {
   const { default: chalk } = await import('chalk');
   // eslint-disable-next-line no-console
-  console.log(`${chalk.blue('info')} - Starting Toolpad application...`);
+  console.log(`${chalk.blue('info')}  - Starting Toolpad application...`);
   await runApp('start', args);
 }
 

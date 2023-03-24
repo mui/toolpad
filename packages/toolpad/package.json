@@ -25,11 +25,13 @@
     }
   },
   "files": [
-    "index.js",
-    "dist"
+    "index.cjs",
+    "dist",
+    "server",
+    "browser"
   ],
   "bin": {
-    "toolpad": "./index.js"
+    "toolpad": "./index.cjs"
   },
   "dependencies": {
     "@mui/toolpad-app": "^0.1.0",

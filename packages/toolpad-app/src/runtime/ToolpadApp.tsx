@@ -972,12 +972,64 @@ function RenderedPage({ nodeId }: RenderedNodeProps) {
   );
 
   const evaluatePageExpression = React.useCallback(
-    (expression: string, scopeId?: string, localScopeParams?: LocalScopeParams) => {
+    async (expression: string, scopeId?: string, localScopeParams?: LocalScopeParams) => {
       const scopeState = getScopeState(scopeId);
-      return browserJsRuntime.evaluateExpression(expression, {
+
+      const scope = {
         ...scopeState,
         ...localScopeParams,
+      };
+
+      const updates: Record<string, unknown> = {};
+
+      const proxify = <T extends object>(obj: T, scopePathSegments: string[]): T => {
+        return new Proxy(obj, {
+          get(target, prop, receiver) {
+            if (typeof prop === 'symbol') {
+              return Reflect.get(target, prop, receiver);
+            }
+
+            const result = target[prop as keyof T];
+
+            if (result && typeof result === 'object') {
+              return proxify(result, [...scopePathSegments, prop]);
+            }
+
+            return Reflect.get(target, prop, receiver);
+          },
+          set(target, prop, newValue, receiver) {
+            if (typeof prop === 'symbol') {
+              return Reflect.set(target, prop, newValue, receiver);
+            }
+
+            const scopePath = [...scopePathSegments, prop].join('.');
+            updates[scopePath] = newValue;
+            return Reflect.set(target, prop, newValue, receiver);
+          },
+        });
+      };
+
+      const result = browserJsRuntime.evaluateExpression(expression, proxify(scope, []));
+
+      await result.value;
+
+      setPageBindings((existingBindings) => {
+        return Object.fromEntries(
+          Object.entries(existingBindings).map(([key, binding]) => {
+            for (const [scopePath, newValue] of Object.entries(updates)) {
+              if (binding.scopePath === scopePath) {
+                if (binding.expression) {
+                  console.warn(`Can't update "${scopePath}", it already has a binding`);
+                }
+                return [key, { ...binding, result: { value: newValue } }];
+              }
+            }
+            return [key, binding];
+          }),
+        );
       });
+
+      return result;
     },
     [browserJsRuntime, getScopeState],
   );

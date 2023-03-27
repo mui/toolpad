@@ -64,7 +64,7 @@ export function JsExpressionEditor({
         }
       }
 
-      const commentLines = [];
+      const commentLines: string[] = [];
 
       if (description) {
         commentLines.push(description);

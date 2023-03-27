@@ -36,9 +36,13 @@ interface RunCommandArgs {
   // Whether Toolpad editor is running in debug mode
   devMode?: boolean;
   port?: number;
+  dir?: string;
 }
 
-async function runApp(cmd: 'dev' | 'start', { devMode = false, port }: RunCommandArgs) {
+async function runApp(
+  cmd: 'dev' | 'start',
+  { devMode = false, port, dir = process.cwd() }: RunCommandArgs,
+) {
   const { execaNode } = await import('execa');
   const { default: chalk } = await import('chalk');
   const { default: getPort } = await import('get-port');
@@ -58,14 +62,13 @@ async function runApp(cmd: 'dev' | 'start', { devMode = false, port }: RunComman
   const serverPath = path.resolve(__dirname, './server.js');
 
   const cp = execaNode(serverPath, [], {
-    cwd: process.cwd(),
+    cwd: dir,
     stdio: 'pipe',
     env: {
       NODE_ENV: devMode ? 'development' : 'production',
       TOOLPAD_DIR: toolpadDir,
+      TOOLPAD_PROJECT_DIR: dir,
       TOOLPAD_PORT: String(port),
-      TOOLPAD_DEV: devMode ? 'true' : 'false',
-      TOOLPAD_PROJECT_DIR: process.cwd(),
       TOOLPAD_CMD: cmd,
       FORCE_COLOR: '1',
     },
@@ -139,11 +142,13 @@ export default async function cli(argv: string[]) {
     },
   );
 
-  const command = args._[0];
+  const command: string | undefined = args._[0];
+  const dir: string = args._[1];
 
   const runArgs = {
     devMode: args['--dev'],
     port: args['--port'],
+    dir,
   };
 
   switch (command) {

@@ -143,7 +143,7 @@ export default async function cli(argv: string[]) {
   );
 
   const command: string | undefined = args._[0];
-  const dir: string = args._[1];
+  const dir: string = path.resolve(process.cwd(), args._[1] || '.');
 
   const runArgs = {
     devMode: args['--dev'],

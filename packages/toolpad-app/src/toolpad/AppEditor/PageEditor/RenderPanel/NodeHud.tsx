@@ -194,6 +194,7 @@ export default function NodeHud({
         <SelectionHintWrapper style={absolutePositionCss(rect)} hintPosition={hintPosition}>
           <div
             draggable
+            data-testid="node-hud-tag"
             className={nodeHudClasses.selectionHint}
             onDragStart={onNodeDragStart}
             role="presentation"

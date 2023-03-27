@@ -31,3 +31,20 @@ test('input basics', async ({ page }) => {
 
   expect(await textField3.inputValue()).toBe('hello3');
 });
+
+test('event mutations', async ({ page }) => {
+  const runtimeModel = new ToolpadRuntime(page);
+  await runtimeModel.gotoPage('page2');
+
+  await page.getByText('Mutation tests').waitFor({ state: 'visible' });
+
+  await expect(page.getByText('result 1')).not.toBeVisible();
+  await expect(page.getByText('result 2')).not.toBeVisible();
+  await page.getByRole('button', { name: 'button 1' }).click();
+  await expect(page.getByText('result 1')).toBeVisible();
+  await expect(page.getByText('result 2')).toBeVisible();
+
+  await expect(page.getByText('result 3')).not.toBeVisible();
+  await page.getByRole('button', { name: 'button 2' }).click();
+  await expect(page.getByText('result 3')).toBeVisible();
+});

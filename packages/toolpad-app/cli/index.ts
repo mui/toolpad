@@ -32,8 +32,6 @@ function* getPreferredPorts(port: number = DEFAULT_PORT): Iterable<number> {
   }
 }
 
-const TOOLPAD_DIR_PATH = path.resolve(__dirname, '../..'); // from ./dist/server
-
 interface RunCommandArgs {
   // Whether Toolpad editor is running in debug mode
   devMode?: boolean;
@@ -114,7 +112,7 @@ async function buildCommand() {
     setTimeout(resolve, 1000);
   });
   // eslint-disable-next-line no-console
-  console.log('done.');
+  console.log(`${chalk.green('success')} - build done.`);
 }
 
 async function startCommand(args: RunCommandArgs) {

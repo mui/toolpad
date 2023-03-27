@@ -107,6 +107,21 @@ const installDeps = async (absolutePath: string) => {
   console.log();
 };
 
+const initPackageJson = async (absolutePath: string) => {
+  const packageJson = {
+    name: path.basename(absolutePath),
+    version: '0.1.0',
+    private: true,
+    scripts: {
+      dev: 'toolpad dev',
+      build: 'toolpad build',
+      start: 'toolpad start',
+    },
+  };
+
+  await fs.writeFile(path.join(absolutePath, 'package.json'), JSON.stringify(packageJson, null, 2));
+};
+
 // Create a new directory and initialize a new project
 const scaffoldProject = async (absolutePath: string): Promise<string | undefined> => {
   const { default: chalk } = await import('chalk');
@@ -117,22 +132,7 @@ const scaffoldProject = async (absolutePath: string): Promise<string | undefined
   console.log();
   try {
     await fs.mkdir(absolutePath);
-
-    const packageJson = {
-      name: path.basename(absolutePath),
-      version: '0.1.0',
-      private: true,
-      scripts: {
-        dev: 'toolpad dev',
-        build: 'toolpad build',
-        start: 'toolpad start',
-      },
-    };
-
-    await fs.writeFile(
-      path.join(absolutePath, 'package.json'),
-      JSON.stringify(packageJson, null, 2),
-    );
+    await initPackageJson(absolutePath);
     return absolutePath;
   } catch (error) {
     // Directory exists, verify if it is empty to continue
@@ -145,6 +145,8 @@ const scaffoldProject = async (absolutePath: string): Promise<string | undefined
     }
     try {
       await fs.access(absolutePath, fs.constants.W_OK);
+
+      await initPackageJson(absolutePath);
 
       const installDependenciesConsent = await inquirer.prompt([
         {
@@ -166,7 +168,7 @@ const scaffoldProject = async (absolutePath: string): Promise<string | undefined
       process.exit(1);
     } catch (err) {
       console.error(
-        `Unable to create directory at ${chalk.red(
+        `Unable to access directory at ${chalk.red(
           absolutePath,
         )}. Please provide a different path.`,
       );
@@ -191,6 +193,7 @@ const run = async () => {
     .help().argv;
   let absolutePath;
   const pathArg = args._?.[0] as string;
+  let count = 0;
   do {
     if (!pathArg) {
       // eslint-disable-next-line no-await-in-loop
@@ -202,19 +205,31 @@ const run = async () => {
           default: '.',
         },
       ]);
-      // eslint-disable-next-line no-await-in-loop
-      absolutePath = await scaffoldProject(pathPrompt.path);
+      absolutePath = pathPrompt.path;
     } else {
-      // eslint-disable-next-line no-await-in-loop
-      absolutePath = await scaffoldProject(path.join(process.cwd(), pathArg));
-    }
-  } while (!absolutePath);
-  await installDeps(absolutePath);
+      /* If a path is provided as argument (pathArg)
+       * but returns an error when trying to be initialised
+       * i.e. causes the loop to be executed again
+       * then exit the process
+       */
+      if (count > 0) {
+        process.exit(1);
+      }
 
-  const message = `\nRun the following to get started: \n\n ${chalk.magentaBright(
-    `cd ${path.relative(process.cwd(), absolutePath) || '.'} && ${packageManager}${
-      packageManager === 'yarn' ? '' : ' run'
-    } dev`,
+      absolutePath = path.join(process.cwd(), pathArg);
+    }
+    // eslint-disable-next-line no-await-in-loop
+    absolutePath = await scaffoldProject(absolutePath);
+    count += 1;
+  } while (!absolutePath);
+
+  await installDeps(absolutePath);
+  const changeDirectory = path.relative(process.cwd(), absolutePath)
+    ? `cd ${path.relative(process.cwd(), absolutePath)} && `
+    : '';
+
+  const message = `\nRun the following to get started: \n\n${chalk.magentaBright(
+    `${changeDirectory}${packageManager}${packageManager === 'yarn' ? '' : ' run'} dev`,
   )}\n`;
   // eslint-disable-next-line no-console
   console.log(message);

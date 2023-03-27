@@ -136,7 +136,7 @@ export default function AppCanvas({ catalog, basename, initialState = null }: Ap
           <ToolpadApp
             rootRef={onAppRoot}
             catalog={catalog}
-            hidePreviewBanner
+            hasShell={false}
             version="preview"
             basename={basename}
             state={state}

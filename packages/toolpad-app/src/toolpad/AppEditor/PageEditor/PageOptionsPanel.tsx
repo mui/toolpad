@@ -27,7 +27,7 @@ export default function PageOptionsPanel() {
           startIcon={<PageIcon />}
           color="inherit"
           component="a"
-          href={`/app/preview/pages/${pageNodeId}`}
+          href={`/preview/pages/${pageNodeId}`}
           aria-label={'Preview'}
         >
           Preview

@@ -58,7 +58,6 @@ import {
   isPageRow,
   PAGE_ROW_COMPONENT_ID,
 } from '../toolpadComponents';
-import AppOverview from './AppOverview';
 import AppThemeProvider from './AppThemeProvider';
 import evalJsBindings, {
   buildGlobalScope,
@@ -81,6 +80,7 @@ import { errorFrom } from '../utils/errors';
 import Header from '../toolpad/ToolpadShell/Header';
 import { ThemeProvider } from '../ThemeContext';
 import { BridgeContext } from '../canvas/BridgeContext';
+import AppNavigation from './AppNavigation';
 
 const ReactQueryDevtoolsProduction = React.lazy(() =>
   import('@tanstack/react-query-devtools/build/lib/index.prod.js').then((d) => ({
@@ -1018,17 +1018,14 @@ function RenderedPage({ nodeId }: RenderedNodeProps) {
 }
 
 interface RenderedPagesProps {
-  dom: appDom.AppDom;
+  pages: appDom.PageNode[];
 }
 
-function RenderedPages({ dom }: RenderedPagesProps) {
-  const root = appDom.getApp(dom);
-  const { pages = [] } = appDom.getChildNodes(dom, root);
+function RenderedPages({ pages }: RenderedPagesProps) {
+  const defaultPage = pages[0];
 
   return (
     <Routes>
-      <Route path="/" element={<Navigate replace to="/pages" />} />
-      <Route path="/pages" element={<AppOverview dom={dom} />} />
       {pages.map((page) => (
         <Route
           key={page.id}
@@ -1043,6 +1040,7 @@ function RenderedPages({ dom }: RenderedPagesProps) {
           }
         />
       ))}
+      <Route path="/" element={<Navigate to={`pages/${defaultPage.id}`} replace />} />
     </Routes>
   );
 }
@@ -1079,10 +1077,58 @@ const queryClient = new QueryClient({
   },
 });
 
+export interface ToolpadAppLayoutProps {
+  dom: appDom.RenderTree;
+  hasShell?: boolean;
+  version: VersionOrPreview;
+}
+
+function ToolpadAppLayout({ dom, version, hasShell: hasShellProp = true }: ToolpadAppLayoutProps) {
+  const root = appDom.getApp(dom);
+  const { pages = [] } = appDom.getChildNodes(dom, root);
+
+  const { search } = useLocation();
+  const urlParams = React.useMemo(() => new URLSearchParams(search), [search]);
+
+  const hasShell = hasShellProp && urlParams.get('toolpad-display') !== 'standalone';
+
+  const isPreview = version === 'preview';
+
+  return (
+    <React.Fragment>
+      {isPreview && hasShell ? (
+        <ThemeProvider>
+          <Header
+            enableUserFeedback={false}
+            actions={
+              <Stack direction="row" spacing={1} alignItems="center">
+                <Typography variant="body2" sx={{ color: 'primary.main' }}>
+                  This is a preview version of the application.
+                </Typography>
+                <Button
+                  variant="outlined"
+                  endIcon={<EditIcon />}
+                  color="primary"
+                  component="a"
+                  href={`/_toolpad/app`}
+                >
+                  Edit
+                </Button>
+              </Stack>
+            }
+          />
+        </ThemeProvider>
+      ) : null}
+      {hasShell && pages.length > 0 ? <AppNavigation pages={pages} isPreview={isPreview} /> : null}
+      <RenderedPages pages={pages} />
+    </React.Fragment>
+  );
+}
+
 export interface ToolpadAppProps {
   rootRef?: React.Ref<HTMLDivElement>;
   catalog?: Record<string, ToolpadComponent>;
-  hidePreviewBanner?: boolean;
+  hasShell?: boolean;
   basename: string;
   version: VersionOrPreview;
   state: RuntimeState;
@@ -1093,7 +1139,7 @@ export default function ToolpadApp({
   catalog,
   basename,
   version,
-  hidePreviewBanner,
+  hasShell = true,
   state,
 }: ToolpadAppProps) {
   const { dom } = state;
@@ -1115,29 +1161,6 @@ export default function ToolpadApp({
         <DomContextProvider value={dom}>
           <AppThemeProvider dom={dom}>
             <CssBaseline enableColorScheme />
-            {version === 'preview' && !hidePreviewBanner ? (
-              <ThemeProvider>
-                <Header
-                  enableUserFeedback={false}
-                  actions={
-                    <Stack direction="row" spacing={1} alignItems="center">
-                      <Typography variant="body2" sx={{ color: 'primary.main' }}>
-                        This is a preview version of the application.
-                      </Typography>
-                      <Button
-                        variant="outlined"
-                        endIcon={<EditIcon />}
-                        color="primary"
-                        component="a"
-                        href={`/_toolpad/app`}
-                      >
-                        Edit
-                      </Button>
-                    </Stack>
-                  }
-                />
-              </ThemeProvider>
-            ) : null}
             <ErrorBoundary FallbackComponent={AppError}>
               <ResetNodeErrorsKeyProvider value={resetNodeErrorsKey}>
                 <React.Suspense fallback={<AppLoading />}>
@@ -1146,7 +1169,7 @@ export default function ToolpadApp({
                       <AppContextProvider value={appContext}>
                         <QueryClientProvider client={queryClient}>
                           <BrowserRouter basename={basename}>
-                            <RenderedPages dom={dom} />
+                            <ToolpadAppLayout dom={dom} version={version} hasShell={hasShell} />
                           </BrowserRouter>
                           {showDevtools ? (
                             <ReactQueryDevtoolsProduction initialIsOpen={false} />

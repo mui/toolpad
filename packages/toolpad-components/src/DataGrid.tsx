@@ -591,6 +591,7 @@ export default createComponent(DataGridComponent, {
       helperText: 'The currently selected row. Or `null` in case no row has been selected.',
       typeDef: { type: 'object', default: null },
       onChangeProp: 'onSelectionChange',
+      tsType: `ThisComponent['rows'][number] | undefined`,
     },
     density: {
       helperText:

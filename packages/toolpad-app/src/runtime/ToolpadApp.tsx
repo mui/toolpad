@@ -27,6 +27,7 @@ import {
   ScopeMeta,
   DEFAULT_LOCAL_SCOPE_PARAMS,
   getArgTypeDefaultValue,
+  ScopeMetaPropField,
 } from '@mui/toolpad-core';
 import { createProvidedContext } from '@mui/toolpad-core/utils/react';
 import { QueryClient, QueryClientProvider, useMutation } from '@tanstack/react-query';
@@ -702,6 +703,8 @@ function parseBindings(
 
       const { argTypes = {} } = componentConfig ?? {};
 
+      const propsMeta: Record<string, ScopeMetaPropField> = {};
+
       for (const [propName, argType] of Object.entries(argTypes)) {
         const initializerId = argType?.defaultValueProp
           ? `${elm.id}.props.${argType.defaultValueProp}`
@@ -724,11 +727,11 @@ function parseBindings(
           !NON_BINDABLE_CONTROL_TYPES.includes(argType?.control?.type as string)
         ) {
           scopePath = `${elm.name}.${propName}`;
-          scopeMeta[elm.name] = {
-            kind: 'element',
-            componentId,
-          };
         }
+
+        propsMeta[propName] = {
+          tsType: argType?.tsType,
+        };
 
         if (argType) {
           if (argType.onChangeProp) {
@@ -741,6 +744,14 @@ function parseBindings(
             parsedBindingsMap.set(bindingId, parseBinding(binding, { scopePath }));
           }
         }
+      }
+
+      if (componentId !== PAGE_ROW_COMPONENT_ID) {
+        scopeMeta[elm.name] = {
+          kind: 'element',
+          componentId,
+          props: propsMeta,
+        };
       }
 
       if (!isPageLayoutComponent(elm)) {
@@ -961,12 +972,68 @@ function RenderedPage({ nodeId }: RenderedNodeProps) {
   );
 
   const evaluatePageExpression = React.useCallback(
-    (expression: string, scopeId?: string, localScopeParams?: LocalScopeParams) => {
+    async (expression: string, scopeId?: string, localScopeParams?: LocalScopeParams) => {
       const scopeState = getScopeState(scopeId);
-      return browserJsRuntime.evaluateExpression(expression, {
+
+      const scope = {
         ...scopeState,
         ...localScopeParams,
+      };
+
+      const updates: Record<string, unknown> = {};
+
+      const proxify = <T extends object>(obj: T, scopePathSegments: string[]): T => {
+        return new Proxy(obj, {
+          get(target, prop, receiver) {
+            if (typeof prop === 'symbol') {
+              return Reflect.get(target, prop, receiver);
+            }
+
+            const result = target[prop as keyof T];
+
+            if (result && typeof result === 'object') {
+              return proxify(result, [...scopePathSegments, prop]);
+            }
+
+            return Reflect.get(target, prop, receiver);
+          },
+          set(target, prop, newValue, receiver) {
+            if (typeof prop === 'symbol') {
+              return Reflect.set(target, prop, newValue, receiver);
+            }
+
+            const scopePath = [...scopePathSegments, prop].join('.');
+            updates[scopePath] = newValue;
+            return Reflect.set(target, prop, newValue, receiver);
+          },
+        });
+      };
+
+      const result = browserJsRuntime.evaluateExpression(expression, proxify(scope, []));
+
+      await result.value;
+
+      setPageBindings((existingBindings) => {
+        return mapValues(existingBindings, (binding) => {
+          for (const [scopePath, newValue] of Object.entries(updates)) {
+            if (binding.scopePath === scopePath) {
+              if (typeof binding.expression === 'string') {
+                console.warn(`Can't update "${scopePath}", it already has a binding`);
+              } else {
+                return {
+                  ...binding,
+                  expression: undefined,
+                  initializer: undefined,
+                  result: { value: newValue },
+                } satisfies EvaluatedBinding;
+              }
+            }
+          }
+          return binding;
+        });
       });
+
+      return result;
     },
     [browserJsRuntime, getScopeState],
   );

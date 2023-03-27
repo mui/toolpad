@@ -1,5 +1,6 @@
 import DayJsDefault, * as DayJs from 'dayjs';
 import /* muiToolpadCoreDefault, */ * as muiToolpadCore from '@mui/toolpad-core';
+import /* muiToolpadBrowserDefault, */ * as muiToolpadBrowser from '@mui/toolpad-core/browser';
 // eslint-disable-next-line no-restricted-imports
 import /* muiIconsMaterialDefault, */ * as muiIconsMaterial from '@mui/icons-material';
 
@@ -605,6 +606,7 @@ const muiDataGridProExports = new Map([
 export default new Map([
   ['dayjs', esm(DayJs, DayJsDefault)],
   ['@mui/toolpad-core', esm(muiToolpadCore /* , muiToolpadCoreDefault */)],
+  ['@mui/toolpad/browser', esm(muiToolpadBrowser /* , muiToolpadBrowserDefault */)],
   ['@mui/icons-material', esm(muiIconsMaterial /* , muiIconsMaterialDefault */)],
 
   ...muiMaterialExports,

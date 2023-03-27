@@ -35,15 +35,15 @@ function* getPreferredPorts(port: number = DEFAULT_PORT): Iterable<number> {
 type Command = 'dev' | 'start' | 'build';
 interface Options {
   port?: number;
-  devMode?: boolean;
+  dev?: boolean;
+  dir?: string;
 }
 
-async function runApp(cmd: Command, { port, devMode = false }: Options) {
-  const { execa } = await import('execa');
+async function runApp(cmd: Command, { port, dev = false, dir = process.cwd() }: Options) {
+  const { execaNode } = await import('execa');
   const { default: chalk } = await import('chalk');
   const { default: getPort } = await import('get-port');
   const toolpadDir = path.resolve(__dirname, '../..'); // from ./dist/server
-  const nextCommand = devMode ? 'dev' : 'start';
 
   if (!port) {
     port = cmd === 'dev' ? await getPort({ port: getPreferredPorts(DEFAULT_PORT) }) : DEFAULT_PORT;
@@ -56,15 +56,19 @@ async function runApp(cmd: Command, { port, devMode = false }: Options) {
     }
   }
 
-  const cp = execa('next', [nextCommand, `--port=${port}`], {
-    cwd: toolpadDir,
-    preferLocal: true,
+  const serverPath = path.resolve(__dirname, './server.js');
+
+  const cp = execaNode(serverPath, [], {
+    cwd: dir,
     stdio: 'pipe',
     env: {
-      TOOLPAD_PROJECT_DIR: process.cwd(),
+      NODE_ENV: dev ? 'development' : 'production',
+      TOOLPAD_DIR: toolpadDir,
+      TOOLPAD_PROJECT_DIR: dir,
+      TOOLPAD_PORT: String(port),
       TOOLPAD_CMD: cmd,
       FORCE_COLOR: '1',
-    } as any,
+    },
   });
 
   invariant(cp.stdout, 'child process must be started with "stdio: \'pipe\'"');
@@ -80,7 +84,7 @@ async function runApp(cmd: Command, { port, devMode = false }: Options) {
     invariant(detectedPort, 'Could not find port in stdout');
     const toolpadBaseUrl = `http://localhost:${detectedPort}/`;
     try {
-      await openBrowser(toolpadBaseUrl);
+      openBrowser(toolpadBaseUrl);
     } catch (err: any) {
       console.error(`${chalk.red('error')} - Failed to open browser: ${err.message}`);
     }
@@ -95,26 +99,27 @@ async function runApp(cmd: Command, { port, devMode = false }: Options) {
 
 async function devCommand(args: yargs.ArgumentsCamelCase<Options>) {
   const { default: chalk } = await import('chalk');
+
   // eslint-disable-next-line no-console
-  console.log(`${chalk.blue('info')} - starting Toolpad application in dev mode...`);
+  console.log(`${chalk.blue('info')}  - starting Toolpad application in dev mode...`);
   await runApp('dev', args);
 }
 
 async function buildCommand() {
   const { default: chalk } = await import('chalk');
   // eslint-disable-next-line no-console
-  console.log(`${chalk.blue('info')} - building Toolpad application...`);
+  console.log(`${chalk.blue('info')}  - building Toolpad application...`);
   await new Promise((resolve) => {
     setTimeout(resolve, 1000);
   });
   // eslint-disable-next-line no-console
-  console.log(`${chalk.green('success')} - done.`);
+  console.log(`${chalk.green('success')} - build done.`);
 }
 
 async function startCommand(args: yargs.ArgumentsCamelCase<Options>) {
   const { default: chalk } = await import('chalk');
   // eslint-disable-next-line no-console
-  console.log(`${chalk.blue('info')} - starting Toolpad application...`);
+  console.log(`${chalk.blue('info')}  - Starting Toolpad application...`);
   await runApp('start', args);
 }
 
@@ -123,7 +128,7 @@ export default async function cli(argv: string[]) {
     // See https://github.com/yargs/yargs/issues/538
     .scriptName('toolpad')
     .command({
-      command: 'dev',
+      command: 'dev [dir]',
       describe: 'Run Toolpad in development mode',
       builder: {
         port: {
@@ -142,7 +147,7 @@ export default async function cli(argv: string[]) {
       handler: (args) => devCommand(args),
     })
     .command({
-      command: 'start',
+      command: 'start [dir]',
       describe: 'Run built Toolpad application in production mode',
       builder: {
         port: {

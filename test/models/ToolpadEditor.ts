@@ -1,4 +1,5 @@
 import { expect, FrameLocator, Locator, Page } from '@playwright/test';
+import { setTimeout } from 'timers/promises';
 import { gotoIfNotCurrent } from './shared';
 
 class CreatePageDialog {
@@ -109,6 +110,9 @@ export class ToolpadEditor {
 
   async waitForOverlay() {
     await this.pageOverlay.waitFor({ state: 'visible' });
+    // Some tests seem to be flaky around this waitFor and perform better with a short timeout
+    // Not sure yet where the race condition is happening
+    await setTimeout(100);
   }
 
   async dragToAppCanvas(sourceLocator: Locator, moveTargetX: number, moveTargetY: number) {

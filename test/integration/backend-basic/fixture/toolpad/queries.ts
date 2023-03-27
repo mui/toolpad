@@ -1,4 +1,4 @@
-import { createQuery } from '@mui/toolpad-core';
+import { createQuery } from '@mui/toolpad/server';
 
 export async function hello() {
   return { message: 'hello world' };

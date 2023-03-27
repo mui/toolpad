@@ -25,11 +25,13 @@
     }
   },
   "files": [
-    "index.js",
-    "dist"
+    "index.cjs",
+    "dist",
+    "server",
+    "browser"
   ],
   "bin": {
-    "toolpad": "./index.js"
+    "toolpad": "./index.cjs"
   },
   "dependencies": {
     "@mui/toolpad-app": "^0.1.0",
@@ -38,6 +40,9 @@
     "concurrently": "^7.6.0",
     "dotenv": "^16.0.3",
     "execa": "^7.1.1"
+  },
+  "engines": {
+    "node": ">=16.17"
   },
   "gitHead": "de68953329881ccd3aa40e82a7302c0baa38c3c5"
 }

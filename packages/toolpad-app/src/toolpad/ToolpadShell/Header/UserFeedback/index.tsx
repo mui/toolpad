@@ -2,6 +2,7 @@ import * as React from 'react';
 import { Chip, Divider, ListItemText, IconButton, Menu, MenuItem, Tooltip } from '@mui/material';
 import HelpOutlinedIcon from '@mui/icons-material/HelpOutlined';
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
+import invariant from 'invariant';
 import useMenu from '../../../../utils/useMenu';
 import {
   TOOLPAD_TARGET_CLOUD,
@@ -15,7 +16,6 @@ import client from '../../../../api';
 const REPORT_BUG_URL =
   'https://github.com/mui/mui-toolpad/issues/new?assignees=&labels=status%3A+needs+triage&template=1.bug.yml';
 const FEATURE_REQUEST_URL = 'https://github.com/mui/mui-toolpad/issues';
-const CURRENT_RELEASE_VERSION = `v${process.env.TOOLPAD_VERSION}`;
 
 interface FeedbackMenuItemLinkProps {
   href: string;
@@ -47,6 +47,11 @@ function getReadableTarget(): string {
 function UserFeedback() {
   const { buttonProps, menuProps } = useMenu();
 
+  invariant(process.env.TOOLPAD_VERSION, 'Missing process.env.TOOLPAD_VERSION');
+  invariant(process.env.TOOLPAD_BUILD, 'Missing process.env.TOOLPAD_BUILD');
+
+  const currentReleaseVersion = `v${process.env.TOOLPAD_VERSION}`;
+
   const { data: latestRelease } = client.useQuery('getLatestToolpadRelease', [], {
     staleTime: 1000 * 60 * 10,
     enabled: process.env.TOOLPAD_TARGET !== TOOLPAD_TARGET_CLOUD,
@@ -67,7 +72,7 @@ function UserFeedback() {
         </FeedbackMenuItemLink>
         <Divider />
         <MenuItem disabled>{getReadableTarget()}</MenuItem>
-        {latestRelease && latestRelease.tag !== CURRENT_RELEASE_VERSION ? (
+        {latestRelease && latestRelease.tag !== currentReleaseVersion ? (
           <MenuItem
             component="a"
             target="_blank"

@@ -13,9 +13,6 @@ import {
   RECTANGLE_EDGE_LEFT,
   RECTANGLE_EDGE_RIGHT,
 } from '../../../../utils/geometry';
-import { useDom } from '../../../AppState';
-import { useToolpadComponent } from '../../toolpadComponents';
-import { getElementNodeComponentId } from '../../../../toolpadComponents';
 
 const HINT_POSITION_TOP = 'top';
 const HINT_POSITION_BOTTOM = 'bottom';
@@ -175,11 +172,6 @@ export default function NodeHud({
   isOutlineVisible = false,
   isHoverable = true,
 }: NodeHudProps) {
-  const { dom } = useDom();
-
-  const componentId = appDom.isElement(node) ? getElementNodeComponentId(node) : '';
-  const component = useToolpadComponent(dom, componentId);
-
   const hintPosition = rect.y > HUD_HEIGHT ? HINT_POSITION_TOP : HINT_POSITION_BOTTOM;
 
   return (
@@ -202,6 +194,7 @@ export default function NodeHud({
         <SelectionHintWrapper style={absolutePositionCss(rect)} hintPosition={hintPosition}>
           <div
             draggable
+            data-testid="node-hud-tag"
             className={nodeHudClasses.selectionHint}
             onDragStart={onNodeDragStart}
             role="presentation"
@@ -209,7 +202,7 @@ export default function NodeHud({
             onMouseDown={stopPropagationHandler}
             onMouseUp={stopPropagationHandler}
           >
-            {component?.displayName || '<unknown>'}
+            {node.name}
             <DragIndicatorIcon color="inherit" />
             <IconButton aria-label="Duplicate" color="inherit" onMouseUp={onDuplicate}>
               <Tooltip title="Duplicate" enterDelay={400}>

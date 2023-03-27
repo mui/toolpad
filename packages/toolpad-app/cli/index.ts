@@ -35,15 +35,15 @@ function* getPreferredPorts(port: number = DEFAULT_PORT): Iterable<number> {
 type Command = 'dev' | 'start' | 'build';
 interface Options {
   port?: number;
-  nextProd?: boolean;
+  devMode?: boolean;
 }
 
-async function runApp(cmd: Command, { port, nextProd = false }: Options) {
+async function runApp(cmd: Command, { port, devMode = false }: Options) {
   const { execa } = await import('execa');
   const { default: chalk } = await import('chalk');
   const { default: getPort } = await import('get-port');
   const toolpadDir = path.resolve(__dirname, '../..'); // from ./dist/server
-  const nextCommand = nextProd ? 'start' : 'dev';
+  const nextCommand = devMode ? 'dev' : 'start';
 
   if (!port) {
     port = cmd === 'dev' ? await getPort({ port: getPreferredPorts(DEFAULT_PORT) }) : DEFAULT_PORT;
@@ -131,11 +131,12 @@ export default async function cli(argv: string[]) {
           describe: 'Port to run the application on',
           demandOption: false,
         },
-        'next-prod': {
+        dev: {
           type: 'boolean',
           describe: 'Run the Toolpad editor Next.js app in production mode',
           demandOption: false,
           default: false,
+          hidden: true,
         },
       },
       handler: (args) => devCommand(args),
@@ -149,11 +150,12 @@ export default async function cli(argv: string[]) {
           describe: 'Port to run the application on',
           demandOption: false,
         },
-        'next-prod': {
+        dev: {
           type: 'boolean',
           describe: 'Run the Toolpad editor Next.js app in production mode',
           demandOption: false,
           default: false,
+          hidden: true,
         },
       },
       handler: (args) => startCommand(args),

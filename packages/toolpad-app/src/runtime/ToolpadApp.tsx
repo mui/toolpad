@@ -1014,19 +1014,23 @@ function RenderedPage({ nodeId }: RenderedNodeProps) {
       await result.value;
 
       setPageBindings((existingBindings) => {
-        return Object.fromEntries(
-          Object.entries(existingBindings).map(([key, binding]) => {
-            for (const [scopePath, newValue] of Object.entries(updates)) {
-              if (binding.scopePath === scopePath) {
-                if (binding.expression) {
-                  console.warn(`Can't update "${scopePath}", it already has a binding`);
-                }
-                return [key, { ...binding, result: { value: newValue } }];
+        return mapValues(existingBindings, (binding) => {
+          for (const [scopePath, newValue] of Object.entries(updates)) {
+            if (binding.scopePath === scopePath) {
+              if (typeof binding.expression === 'string') {
+                console.warn(`Can't update "${scopePath}", it already has a binding`);
+              } else {
+                return {
+                  ...binding,
+                  expression: undefined,
+                  initializer: undefined,
+                  result: { value: newValue },
+                } satisfies EvaluatedBinding;
               }
             }
-            return [key, binding];
-          }),
-        );
+          }
+          return binding;
+        });
       });
 
       return result;

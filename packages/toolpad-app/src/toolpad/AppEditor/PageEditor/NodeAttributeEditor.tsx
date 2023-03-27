@@ -58,7 +58,7 @@ export default function NodeAttributeEditor<P extends object>({
 
   // NOTE: Doesn't make much sense to bind controlled props. In the future we might opt
   // to make them bindable to other controlled props only
-  const isDisabled = !!argType.onChangeHandler;
+  const isDisabled = !!argType.onChangeProp;
 
   const isBindable =
     !isDisabled &&

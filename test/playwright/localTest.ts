@@ -108,7 +108,7 @@ const test = base.extend<
     localAppConfig?: WithAppOptions;
   }
 >({
-  toolpadDev: [!!process.env.TOOLPAD_DEV, { option: true, scope: 'worker' }],
+  toolpadDev: [!!process.env.TOOLPAD_NEXT_DEV, { option: true, scope: 'worker' }],
   localAppConfig: [undefined, { option: true, scope: 'worker' }],
   localApp: [
     async ({ localAppConfig, toolpadDev }, use) => {

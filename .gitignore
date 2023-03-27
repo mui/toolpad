@@ -58,3 +58,4 @@ packages/toolpad-app/public/typings.json
 examples/*/yarn.lock
 
 test-results
+.toolpad-generated

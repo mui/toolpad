@@ -6,16 +6,16 @@ import invariant from 'invariant';
 async function main() {
   const { default: chalk } = await import('chalk');
 
+  const projectDir = process.env.TOOLPAD_PROJECT_DIR;
+
   const dir = process.env.TOOLPAD_DIR;
-  const dev = process.env.TOOLPAD_DEV === 'true';
+  const dev = process.env.NODE_ENV !== 'production';
   const hostname = 'localhost';
   const port = Number(process.env.TOOLPAD_PORT);
 
   // when using middleware `hostname` and `port` must be provided below
   const app = next({ dir, dev, hostname, port });
   const handle = app.getRequestHandler();
-
-  await app.prepare();
 
   const server = createServer(async (req, res) => {
     try {
@@ -42,7 +42,13 @@ async function main() {
   });
 
   // eslint-disable-next-line no-console
-  console.log(`> Toolpad ready on ${chalk.green(`http://${hostname}:${port}`)}`);
+  console.log(
+    `${chalk.green('ready')} - toolpad project ${chalk.cyan(projectDir)} ready on ${chalk.cyan(
+      `http://${hostname}:${port}`,
+    )}`,
+  );
+
+  await app.prepare();
 }
 
 main().catch((err) => {

@@ -6,6 +6,8 @@ import invariant from 'invariant';
 async function main() {
   const { default: chalk } = await import('chalk');
 
+  const projectDir = process.env.TOOLPAD_PROJECT_DIR;
+
   const dir = process.env.TOOLPAD_DIR;
   const dev = process.env.NODE_ENV !== 'production';
   const hostname = 'localhost';
@@ -41,7 +43,7 @@ async function main() {
 
   // eslint-disable-next-line no-console
   console.log(
-    `${chalk.green('ready')} - toolpad project ${chalk.cyan(dir)} ready on ${chalk.cyan(
+    `${chalk.green('ready')} - toolpad project ${chalk.cyan(projectDir)} ready on ${chalk.cyan(
       `http://${hostname}:${port}`,
     )}`,
   );

@@ -56,3 +56,5 @@ packages/toolpad-app/public/runtime
 packages/toolpad-app/public/typings.json
 
 examples/*/yarn.lock
+
+.toolpad-generated

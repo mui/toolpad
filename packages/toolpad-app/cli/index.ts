@@ -61,13 +61,14 @@ async function runApp(cmd: 'dev' | 'start', { devMode = false, port }: RunComman
     cwd: process.cwd(),
     stdio: 'pipe',
     env: {
+      NODE_ENV: devMode ? 'development' : 'production',
       TOOLPAD_DIR: toolpadDir,
-      TOOLPAD_PORT: port,
+      TOOLPAD_PORT: String(port),
       TOOLPAD_DEV: devMode ? 'true' : 'false',
       TOOLPAD_PROJECT_DIR: process.cwd(),
       TOOLPAD_CMD: cmd,
       FORCE_COLOR: '1',
-    } as any,
+    },
   });
 
   invariant(cp.stdout, 'child process must be started with "stdio: \'pipe\'"');

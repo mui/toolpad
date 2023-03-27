@@ -57,15 +57,16 @@ async function runApp(cmd: 'dev' | 'start', { devMode = false, port }: RunComman
 
   const serverPath = path.resolve(__dirname, './server.js');
 
+  const projectDir = process.cwd();
+
   const cp = execaNode(serverPath, [], {
-    cwd: process.cwd(),
+    cwd: projectDir,
     stdio: 'pipe',
     env: {
       NODE_ENV: devMode ? 'development' : 'production',
       TOOLPAD_DIR: toolpadDir,
+      TOOLPAD_PROJECT_DIR: projectDir,
       TOOLPAD_PORT: String(port),
-      TOOLPAD_DEV: devMode ? 'true' : 'false',
-      TOOLPAD_PROJECT_DIR: process.cwd(),
       TOOLPAD_CMD: cmd,
       FORCE_COLOR: '1',
     },

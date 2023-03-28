@@ -24,44 +24,39 @@ export default function Banner(props) {
         }}
       >
         <Stack
+          flexDirection="column"
           sx={{
             borderRadius: 1,
             px: 2,
-            py: docs ? 2.5 : 2,
+            py: docs ? 2.5 : 4,
             background: (theme) =>
               theme.palette.mode === 'dark'
-                ? `linear-gradient(230deg, ${alpha(
+                ? `radial-gradient(150% 100% at 50% 80%, ${alpha(
                     theme.palette.primaryDark[400],
-                    0.4,
-                  )} 0%, ${alpha(theme.palette.primaryDark[300], 0.4)} 150%)`
-                : `linear-gradient(45deg, ${theme.palette.primary[50]} 0%, ${alpha(
-                    theme.palette.primary[200],
-                    0.4,
-                  )} 150%)`,
+                    0.2,
+                  )} 10%, ${theme.palette.primaryDark[900]} 100%, ${
+                    theme.palette.primaryDark[900]
+                  } 0)`
+                : `radial-gradient(150% 100% at 50% 80%, ${theme.palette.primary[50]} 10%, #fff 100%, ${theme.palette.primary[50]} 0)`,
             border: '1px solid',
-            borderColor: (theme) => `${alpha(theme.palette.primaryDark[300], 0.5)}`,
-            display: 'flex',
-            flexDirection: {
-              xs: 'column',
-              sm: 'row',
-            },
+            borderColor: (theme) => `${alpha(theme.palette.primaryDark[300], 0.3)}`,
             width: '100%',
             justifyContent: 'space-between',
-            alignItems: { xs: 'flex-start', sm: 'center' },
+            alignItems: 'center',
           }}
         >
-          <div>
-            <Typography fontWeight="bold" sx={{ mb: 0.5 }}>
+          <Stack flexDirection="column" spacing={1} sx={{ mb: 2 }}>
+            <Typography fontWeight="bold" variant="h6" sx={{ textAlign: 'center' }}>
               {title}
             </Typography>
             <Typography
-              variant={docs ? 'body1' : 'body2'}
+              variant="body1"
               color="text.secondary"
-              sx={{ maxWidth: 500 }}
+              sx={{ maxWidth: 500, textAlign: 'center' }}
             >
               {description}
             </Typography>
-          </div>
+          </Stack>
           <Button
             component={Link}
             noLinkStyle
@@ -80,7 +75,6 @@ export default function Banner(props) {
                 md: 2,
               },
               ml: { xs: 0, sm: 2 },
-              mt: { xs: 3, sm: 0 },
               width: { xs: '100%', sm: '50%', md: 'auto' },
             }}
           >

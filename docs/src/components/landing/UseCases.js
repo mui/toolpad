@@ -2,7 +2,6 @@ import * as React from 'react';
 import PropTypes from 'prop-types';
 import Box from '@mui/material/Box';
 import Container from '@mui/material/Container';
-// import Card from '@mui/material/Card';
 import Typography from '@mui/material/Typography';
 import Grid from '@mui/material/Unstable_Grid2';
 import SectionHeadline from 'docs/src/components/typography/SectionHeadline';
@@ -45,9 +44,9 @@ export default function CardGrid(props) {
     >
       <Container sx={{ py: { xs: 4, sm: 12 } }}>
         <SectionHeadline overline={content.overline} title={content.Headline} />
-        <Grid container spacing={6}>
+        <Grid container spacing={6} columns={{ xs: 1, sm: 2 }}>
           {content.cards.map(({ title, imageUrl, description }) => (
-            <Grid xs>
+            <Grid xs={2} sm={4} md={4}>
               <Box key={title}>
                 <Box sx={cardMediaStyle(imageUrl)} />
                 <Box mt={2}>

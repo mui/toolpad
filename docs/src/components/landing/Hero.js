@@ -1,7 +1,5 @@
 import * as React from 'react';
 import Box from '@mui/material/Box';
-import Button from '@mui/material/Button';
-import KeyboardArrowRightRounded from '@mui/icons-material/KeyboardArrowRightRounded';
 import Chip from '@mui/material/Chip';
 import Typography from '@mui/material/Typography';
 import SvgMuiLogo from 'docs/src/icons/SvgMuiLogo';
@@ -35,7 +33,7 @@ export default function Hero() {
           <Box component="span" sx={{ mr: 1 }}>
             MUI Toolpad
           </Box>
-          <Chip label="Alpha" component="span" color="grey" size="small" />
+          <Chip label="Alpha" component="span" color="primary" size="small" variant="outlined" />
         </Typography>
         <Typography variant="h1" sx={{ my: 2 }}>
           Low-code
@@ -46,15 +44,6 @@ export default function Hero() {
           Build scalable and secure internal tools locally. Use your own IDE, drag and drop
           pre-built components or create yours.
         </Typography>
-        {/* <Button
-          size="large"
-          variant="contained"
-          href={ROUTES.toolpadQuickstart}
-          endIcon={<KeyboardArrowRightRounded />}
-          sx={{ width: { xs: '100%', sm: 'auto' }, mb: 3 }}
-        >
-          Get started
-        </Button> */}
         <Typography
           component="label"
           variant="body2"

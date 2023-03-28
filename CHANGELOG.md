@@ -1,5 +1,46 @@
 # Changelog
 
+## 0.1.1
+
+<!-- generated comparing v0.1.0..master -->
+
+_Mar 28, 2023_
+
+A big thanks to the 4 contributors who made this release possible. Here are some highlights ✨:
+
+Mutate state in event handlers by assigning to properties of page elements. Make binding to DataGrid selection easier with improved typings. Big cleanup of dead code.
+
+- &#8203;<!-- 28 -->Use node name in the canvas HUD (#1818) @Janpot
+- &#8203;<!-- 27 -->Allow mutating page state in event handlers (#1807) @Janpot
+- &#8203;<!-- 26 -->Improve UX around integration testing (#1808) @Janpot
+- &#8203;<!-- 25 -->Disable property control for controlled properties (#1809) @Janpot
+- &#8203;<!-- 24 -->Use next.js custom server (#1723) @Janpot
+- &#8203;<!-- 23 -->Remove postgres (#1799) @Janpot
+- &#8203;<!-- 22 -->Remove example and docker files (#1798) @Janpot
+- &#8203;<!-- 21 -->Clean up more obsolete things in the repo (#1797) @Janpot
+- &#8203;<!-- 20 -->Fix errors when running the project the first time (#1796) @Janpot
+- &#8203;<!-- 19 -->Fix imports from toolpad (#1793) @Janpot
+- &#8203;<!-- 18 -->Fix changing tabs closing query editor (#1784) @apedroferreira
+- &#8203;<!-- 17 -->Generate .gitignore on dev command (#1705) @apedroferreira
+- &#8203;<!-- 16 -->Improve dataGrid.selection types (#1790) @Janpot
+- &#8203;<!-- 15 -->Dependency cleanup (#1791) @Janpot
+- &#8203;<!-- 14 -->Fixes on the dev pipeline (#1789) @Janpot
+- &#8203;<!-- 13 -->Remove Prisma, isolated-vm and dead code (#1787) @Janpot
+- &#8203;<!-- 12 -->Update release instructions (#1788) @Janpot
+- &#8203;<!-- 11 -->Fix capitalization of elements (#1782) @Janpot
+- &#8203;<!-- 10 -->Update moduleresolution for core and components (#1780) @Janpot
+- &#8203;<!-- 09 -->Remove the localMode flag (#1768) @Janpot
+- &#8203;<!-- 08 -->Convert tests to local mode (#1718) @Janpot
+- &#8203;<!-- 07 -->Add docs contributing instructions (#1779) @Janpot
+- &#8203;<!-- 06 -->Allow falsy MySQL variable values (#1738) @evankennedy
+- &#8203;<!-- 05 -->Add Toolpad to cspell config for the workspace (#1767) @Janpot
+- &#8203;<!-- 04 -->Use latest version for examples (#1764) @Janpot
+- &#8203;<!-- 03 -->Rename dev13 script to dev (#1766) @Janpot
+- &#8203;<!-- 02 -->Small typo fix @prakhargupta1
+- &#8203;<!-- 01 -->Docs updates for the new direction (#1743) @Janpot
+
+All contributors of this release in alphabetical order: @apedroferreira, @evankennedy, @Janpot, @prakhargupta1
+
 ## 0.1.0
 
 <!-- generated comparing v0.0.41..master -->

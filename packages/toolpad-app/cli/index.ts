@@ -32,20 +32,21 @@ function* getPreferredPorts(port: number = DEFAULT_PORT): Iterable<number> {
   }
 }
 
-const TOOLPAD_DIR_PATH = path.resolve(__dirname, '../..'); // from ./dist/server
-
 interface RunCommandArgs {
   // Whether Toolpad editor is running in debug mode
   devMode?: boolean;
   port?: number;
+  dir?: string;
 }
 
-async function runApp(cmd: 'dev' | 'start', { devMode = false, port }: RunCommandArgs) {
-  const { execa } = await import('execa');
+async function runApp(
+  cmd: 'dev' | 'start',
+  { devMode = false, port, dir = process.cwd() }: RunCommandArgs,
+) {
+  const { execaNode } = await import('execa');
   const { default: chalk } = await import('chalk');
   const { default: getPort } = await import('get-port');
-
-  const nextCommand = devMode ? 'dev' : 'start';
+  const toolpadDir = path.resolve(__dirname, '../..'); // from ./dist/server
 
   if (!port) {
     port = cmd === 'dev' ? await getPort({ port: getPreferredPorts(DEFAULT_PORT) }) : DEFAULT_PORT;
@@ -58,15 +59,19 @@ async function runApp(cmd: 'dev' | 'start', { devMode = false, port }: RunComman
     }
   }
 
-  const cp = execa('next', [nextCommand, `--port=${port}`], {
-    cwd: TOOLPAD_DIR_PATH,
-    preferLocal: true,
+  const serverPath = path.resolve(__dirname, './server.js');
+
+  const cp = execaNode(serverPath, [], {
+    cwd: dir,
     stdio: 'pipe',
     env: {
-      TOOLPAD_PROJECT_DIR: process.cwd(),
+      NODE_ENV: devMode ? 'development' : 'production',
+      TOOLPAD_DIR: toolpadDir,
+      TOOLPAD_PROJECT_DIR: dir,
+      TOOLPAD_PORT: String(port),
       TOOLPAD_CMD: cmd,
       FORCE_COLOR: '1',
-    } as any,
+    },
   });
 
   invariant(cp.stdout, 'child process must be started with "stdio: \'pipe\'"');
@@ -111,7 +116,7 @@ async function buildCommand() {
     setTimeout(resolve, 1000);
   });
   // eslint-disable-next-line no-console
-  console.log('done.');
+  console.log(`${chalk.green('success')} - build done.`);
 }
 
 async function startCommand(args: RunCommandArgs) {
@@ -137,11 +142,13 @@ export default async function cli(argv: string[]) {
     },
   );
 
-  const command = args._[0];
+  const command: string | undefined = args._[0];
+  const dir: string = path.resolve(process.cwd(), args._[1] || '.');
 
   const runArgs = {
     devMode: args['--dev'],
     port: args['--port'],
+    dir,
   };
 
   switch (command) {

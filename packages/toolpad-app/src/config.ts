@@ -53,12 +53,6 @@ export interface RuntimeConfig {
 }
 
 declare global {
-  namespace NodeJS {
-    interface ProcessEnv extends BuildEnvVars {}
-  }
-}
-
-declare global {
   interface Window {
     [RUNTIME_CONFIG_WINDOW_PROPERTY]?: RuntimeConfig;
   }

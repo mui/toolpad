@@ -60,18 +60,13 @@ test.describe('with fixture', () => {
 
   test('can move elements in page', async ({ page }) => {
     const editorModel = new ToolpadEditor(page);
-    const TEXT_FIELD_COMPONENT_DISPLAY_NAME = 'Text field';
 
     await editorModel.goto();
 
     await editorModel.pageRoot.waitFor();
 
-    const canvasMoveElementHandleSelector = `:has-text("${TEXT_FIELD_COMPONENT_DISPLAY_NAME}")[draggable]`;
-
     const canvasInputLocator = editorModel.appCanvas.locator('input');
-    const canvasMoveElementHandleLocator = editorModel.appCanvas.locator(
-      canvasMoveElementHandleSelector,
-    );
+    const canvasMoveElementHandleLocator = editorModel.appCanvas.getByTestId('node-hud-tag');
 
     const firstTextFieldLocator = canvasInputLocator.first();
     const secondTextFieldLocator = canvasInputLocator.nth(1);
@@ -98,7 +93,7 @@ test.describe('with fixture', () => {
     const moveTargetY = secondTextFieldBoundingBox!.y + secondTextFieldBoundingBox!.height / 2;
 
     await editorModel.dragToAppCanvas(
-      editorModel.appCanvas.locator(canvasMoveElementHandleSelector),
+      editorModel.appCanvas.getByTestId('node-hud-tag'),
       moveTargetX,
       moveTargetY,
     );

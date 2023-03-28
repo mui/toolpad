@@ -15,7 +15,7 @@ test.describe('basic tests', () => {
     const editorModel = new ToolpadEditor(page);
     await editorModel.goto();
 
-    await editorModel.pageRoot.waitFor();
+    await editorModel.waitForOverlay();
 
     const canvasInputLocator = editorModel.appCanvas.locator('input');
 
@@ -44,7 +44,7 @@ test.describe('basic tests', () => {
     const editorModel = new ToolpadEditor(page);
     await editorModel.goto();
 
-    await editorModel.pageRoot.waitFor();
+    await editorModel.waitForOverlay();
 
     const input = editorModel.appCanvas.locator('input').first();
 
@@ -86,7 +86,7 @@ test.describe('multiple pages', () => {
     const editorModel = new ToolpadEditor(page);
     await editorModel.goto();
 
-    await editorModel.pageRoot.waitFor();
+    await editorModel.waitForOverlay();
 
     const pageButton1 = editorModel.appCanvas.getByRole('button', {
       name: 'page1Button',

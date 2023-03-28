@@ -16,7 +16,7 @@ test.describe('basic', () => {
 
     await editorModel.goto();
 
-    await editorModel.pageRoot.waitFor();
+    await editorModel.waitForOverlay();
 
     const canvasInputLocator = editorModel.appCanvas.locator('input');
 
@@ -68,7 +68,7 @@ test.describe('default values', () => {
     const editorModel = new ToolpadEditor(page);
     await editorModel.goto();
 
-    await editorModel.pageRoot.waitFor();
+    await editorModel.waitForOverlay();
 
     const firstInput = editorModel.appCanvas.locator('input').nth(0);
     const secondInput = editorModel.appCanvas.locator('input').nth(1);

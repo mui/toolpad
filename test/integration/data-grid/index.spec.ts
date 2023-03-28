@@ -15,7 +15,7 @@ test.describe('custom component columns', () => {
     const editorModel = new ToolpadEditor(page);
     editorModel.goto();
 
-    await editorModel.pageRoot.waitFor();
+    await editorModel.waitForOverlay();
 
     await expect(editorModel.pageRoot.getByText('value: {"test":"value"}')).toBeVisible();
     await expect(
@@ -39,7 +39,7 @@ test.describe('basic tests', () => {
     const editorModel = new ToolpadEditor(page);
     editorModel.goto();
 
-    await editorModel.pageRoot.waitFor({ state: 'visible' });
+    await editorModel.waitForOverlay();
 
     const canvasGridLocator = editorModel.appCanvas.getByRole('grid');
 

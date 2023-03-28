@@ -15,7 +15,7 @@ test.describe('from new application', () => {
 
     await editorModel.goto();
 
-    await editorModel.pageRoot.waitFor();
+    await editorModel.waitForOverlay();
 
     const canvasInputLocator = editorModel.appCanvas.locator('input');
 
@@ -63,7 +63,7 @@ test.describe('with fixture', () => {
 
     await editorModel.goto();
 
-    await editorModel.pageRoot.waitFor();
+    await editorModel.waitForOverlay();
 
     const canvasInputLocator = editorModel.appCanvas.locator('input');
     const canvasMoveElementHandleLocator = editorModel.appCanvas.getByTestId('node-hud-tag');
@@ -107,7 +107,7 @@ test.describe('with fixture', () => {
 
     await editorModel.goto();
 
-    await editorModel.pageRoot.waitFor();
+    await editorModel.waitForOverlay();
 
     const canvasInputLocator = editorModel.appCanvas.locator('input');
 

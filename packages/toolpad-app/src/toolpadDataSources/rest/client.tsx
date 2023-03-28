@@ -354,8 +354,6 @@ function QueryEditor({
     [previewParams],
   );
 
-  console.log(queryScope);
-
   const liveUrl: LiveBinding = useEvaluateLiveBinding({
     jsRuntime: jsServerRuntime,
     input: urlValue,

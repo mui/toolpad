@@ -6,14 +6,6 @@ export default defineConfig({
   format: ['esm', 'cjs'],
   dts: false,
   silent: true,
-  esbuildOptions: (options) => {
-    // jest can't handle untranspiled import()
-    // https://github.com/evanw/esbuild/issues/2966
-    options.supported ??= {};
-    options.supported['dynamic-import'] = false;
-
-    return options;
-  },
   async onSuccess() {
     // eslint-disable-next-line no-console
     console.log('build successful');

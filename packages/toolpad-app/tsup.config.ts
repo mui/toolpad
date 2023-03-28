@@ -20,6 +20,7 @@ export default defineConfig([
     bundle: true,
     target: 'es6',
     format: 'iife',
+    replaceNodeEnv: true,
     async onSuccess() {
       // eslint-disable-next-line no-console
       console.log('reactDevtools: build successful');

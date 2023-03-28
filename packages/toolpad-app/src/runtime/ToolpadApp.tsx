@@ -1175,8 +1175,12 @@ function ToolpadAppLayout({ dom, version, hasShell: hasShellProp = true }: Toolp
           />
         </ThemeProvider>
       ) : null}
-      {hasShell && pages.length > 0 ? <AppNavigation pages={pages} isPreview={isPreview} /> : null}
-      <RenderedPages pages={pages} />
+      <Box sx={{ display: 'flex' }}>
+        {hasShell && pages.length > 0 ? (
+          <AppNavigation pages={pages} isPreview={isPreview} />
+        ) : null}
+        <RenderedPages pages={pages} />
+      </Box>
     </React.Fragment>
   );
 }

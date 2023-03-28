@@ -4,9 +4,11 @@ import SyncIcon from '@mui/icons-material/Sync';
 import SyncProblemIcon from '@mui/icons-material/SyncProblem';
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 import * as React from 'react';
+import { useLocation } from 'react-router-dom';
 import { DomLoader, useDomLoader } from '../AppState';
 import ToolpadShell from '../ToolpadShell';
 import PagePanel from './PagePanel';
+import { getViewFromPathname } from '../../utils/domView';
 
 function getSaveState(domLoader: DomLoader): React.ReactNode {
   if (domLoader.saveDomError) {
@@ -42,6 +44,11 @@ export interface ToolpadShellProps {
 export default function AppEditorShell({ children, ...props }: ToolpadShellProps) {
   const domLoader = useDomLoader();
 
+  const location = useLocation();
+
+  const currentView = getViewFromPathname(location.pathname);
+  const currentPageId = currentView?.kind === 'page' ? currentView.nodeId : null;
+
   return (
     <ToolpadShell
       actions={
@@ -51,7 +58,7 @@ export default function AppEditorShell({ children, ...props }: ToolpadShellProps
             endIcon={<OpenInNewIcon />}
             color="primary"
             component="a"
-            href="/preview"
+            href={currentPageId ? `/preview/pages/${currentPageId}` : '/preview'}
             target="_blank"
           >
             Preview

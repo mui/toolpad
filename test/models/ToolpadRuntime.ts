@@ -14,7 +14,7 @@ export class ToolpadRuntime {
 
   async gotoPage(pageName: string) {
     await this.goto();
-    await this.page.getByRole('link', { name: pageName }).click();
+    await this.page.getByRole('button', { name: pageName }).click();
   }
 
   async gotoPageById(appId: string, pageId: string) {

@@ -51,7 +51,7 @@ import ErrorIcon from '@mui/icons-material/Error';
 import EditIcon from '@mui/icons-material/Edit';
 import { useBrowserJsRuntime } from '@mui/toolpad-core/jsBrowserRuntime';
 import * as appDom from '../appDom';
-import { RuntimeState, VersionOrPreview } from '../types';
+import { RuntimeState, AppVersion } from '../types';
 import {
   getElementNodeComponentId,
   isPageLayoutComponent,
@@ -1136,7 +1136,7 @@ const queryClient = new QueryClient({
 export interface ToolpadAppLayoutProps {
   dom: appDom.RenderTree;
   hasShell?: boolean;
-  version: VersionOrPreview;
+  version: AppVersion;
 }
 
 function ToolpadAppLayout({ dom, version, hasShell: hasShellProp = true }: ToolpadAppLayoutProps) {
@@ -1152,7 +1152,7 @@ function ToolpadAppLayout({ dom, version, hasShell: hasShellProp = true }: Toolp
 
   return (
     <React.Fragment>
-      {isPreview && hasShell ? (
+      {isPreview ? (
         <ThemeProvider>
           <Header
             enableUserFeedback={false}
@@ -1186,7 +1186,7 @@ export interface ToolpadAppProps {
   catalog?: Record<string, ToolpadComponent>;
   hasShell?: boolean;
   basename: string;
-  version: VersionOrPreview;
+  version: AppVersion;
   state: RuntimeState;
 }
 

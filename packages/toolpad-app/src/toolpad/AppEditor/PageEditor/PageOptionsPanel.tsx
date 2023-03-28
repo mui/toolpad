@@ -1,6 +1,5 @@
-import { Stack, Button, Typography, Divider } from '@mui/material';
+import { Stack, Typography, Divider } from '@mui/material';
 import * as React from 'react';
-import PageIcon from '@mui/icons-material/Web';
 import { useDom } from '../../AppState';
 import { usePageEditorState } from './PageEditorProvider';
 import QueryEditor from './QueryEditor';
@@ -23,15 +22,6 @@ export default function PageOptionsPanel() {
       <Stack spacing={1} alignItems="start">
         <Typography variant="subtitle1">Page:</Typography>
         <NodeNameEditor node={page} />
-        <Button
-          startIcon={<PageIcon />}
-          color="inherit"
-          component="a"
-          href={`/preview/pages/${pageNodeId}`}
-          aria-label={'Preview'}
-        >
-          Preview
-        </Button>
         {ENABLE_PAGE_MODULE_EDITOR ? <PageModuleEditor pageNodeId={pageNodeId} /> : null}
         <Divider variant="middle" sx={{ alignSelf: 'stretch' }} />
         <Typography variant="overline">Page State:</Typography>

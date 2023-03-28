@@ -137,7 +137,7 @@ export default function AppCanvas({ catalog, basename, initialState = null }: Ap
             rootRef={onAppRoot}
             catalog={catalog}
             hasShell={false}
-            version="preview"
+            version="development"
             basename={basename}
             state={state}
           />

@@ -24,7 +24,7 @@
     "build": "tsc",
     "dev": "tsc --watch",
     "test": "echo \"Error: run tests from root\" && exit 1",
-    "check-types": "tsc"
+    "check-types": "tsc --noEmit"
   },
   "bugs": {
     "url": "https://github.com/mui/mui-toolpad/issues"

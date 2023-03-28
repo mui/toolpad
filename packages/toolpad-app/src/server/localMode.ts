@@ -54,6 +54,11 @@ function getComponentFolder(root: string): string {
   return path.resolve(toolpadFolder, './components');
 }
 
+function getPagesFolder(root: string): string {
+  const toolpadFolder = getToolpadFolder(root);
+  return path.resolve(toolpadFolder, './pages');
+}
+
 function getComponentFilePath(componentsFolder: string, componentName: string): string {
   return path.resolve(componentsFolder, `${componentName}.tsx`);
 }
@@ -254,6 +259,68 @@ function mergeComponentsContentIntoDom(
   return dom;
 }
 
+function expand(node: appDom.AppDomNode, nodes: appDom.AppDomNode[]) {
+  const allChildNodes = nodes.filter((child) => child.parentId === node.id);
+  const childProps = new Set(allChildNodes.map((child) => child.parentProp || 'children'));
+  const result = {
+    ...node,
+    id: undefined,
+    parentId: undefined,
+    parentProp: undefined,
+    parentIndex: undefined,
+  };
+  for (const prop of childProps) {
+    result[prop] = allChildNodes
+      .filter((child) => child.parentProp === prop)
+      .sort((child1, child2) =>
+        appDom.compareFractionalIndex(child1.parentIndex, child2.parentIndex),
+      )
+      .map((child) => expand(child, nodes));
+  }
+  return result;
+}
+
+function flatten(): appDom.AppDomNode[] {}
+
+type PagesContent = Record<string, readonly appDom.AppDomNode[]>;
+
+interface ExtractedPages {
+  pages: PagesContent;
+  dom: appDom.AppDom;
+}
+
+function extractNewPagesFromDom(dom: appDom.AppDom): ExtractedPages {
+  const rootNode = appDom.getApp(dom);
+  const { pages: pageNodes = [] } = appDom.getChildNodes(dom, rootNode);
+
+  const pages: PagesContent = {};
+
+  for (const pageNode of pageNodes) {
+    if (pageNode.attributes.isNew?.value) {
+      const pageNodes = [
+        { ...pageNode, attributes: { ...pageNode.attributes, isNew: undefined } },
+        ...appDom.getDescendants(dom, pageNode),
+      ];
+      pages[pageNode.name] = expand(pageNodes[0], pageNodes);
+      pages[pageNode.name].id = pageNodes[0].id;
+    }
+    // dom = appDom.removeNode(dom, pageNode.id);
+  }
+
+  return { pages, dom };
+}
+
+async function writePagesToFiles(pagesFolder: string, pages: Record<string, unknown>) {
+  await Promise.all(
+    Object.entries(pages).map(async ([name, nodes]) => {
+      const pageFolder = path.resolve(pagesFolder, name);
+      const pageFileName = path.resolve(pageFolder, 'page.yml');
+      await fs.mkdir(pageFolder, { recursive: true });
+      await fs.writeFile(pageFileName, yaml.stringify(nodes));
+    }),
+  );
+}
+
 interface ExtractedComponents {
   components: ComponentsContent;
   dom: appDom.AppDom;
@@ -279,12 +346,19 @@ export async function writeDomToDisk(dom: appDom.AppDom): Promise<void> {
   const root = getUserProjectRoot();
   const configFilePath = await getConfigFilePath(root);
   const componentsFolder = getComponentFolder(root);
+  const pagesFolder = getPagesFolder(root);
 
   const { components: componentsContent, dom: domWithoutComponents } =
     extractNewComponentsContentFromDom(dom);
+  dom = domWithoutComponents;
+
+  const { pages: pagesContent, dom: domWithoutPages } = extractNewPagesFromDom(dom);
+  dom = domWithoutPages;
+
   await Promise.all([
-    writeConfigFile(configFilePath, domWithoutComponents),
+    writeConfigFile(configFilePath, dom),
     writeCodeComponentsToFiles(componentsFolder, componentsContent),
+    writePagesToFiles(pagesFolder, pagesContent),
   ]);
 }
 

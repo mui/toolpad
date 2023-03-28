@@ -17,7 +17,7 @@ import { pascalCase, removeDiacritics, uncapitalize } from '../utils/strings';
 import { ExactEntriesOf, Maybe } from '../utils/types';
 import { mapProperties, mapValues } from '../utils/collections';
 
-export const CURRENT_APPDOM_VERSION = 6;
+export const CURRENT_APPDOM_VERSION = 7;
 
 export const RESERVED_NODE_PROPERTIES = [
   'id',
@@ -85,6 +85,7 @@ export interface PageNode extends AppDomNodeBase {
     readonly title: ConstantAttrValue<string>;
     readonly parameters?: ConstantAttrValue<[string, string][]>;
     readonly module?: ConstantAttrValue<string>;
+    readonly isNew?: ConstantAttrValue<boolean>;
   };
 }
 

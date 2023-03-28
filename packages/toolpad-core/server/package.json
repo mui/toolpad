@@ -1,0 +1,5 @@
+{
+  "main": "../dist/cjs/server.js",
+  "types": "../dist/cjs/server.d.ts",
+  "type": "commonjs"
+}

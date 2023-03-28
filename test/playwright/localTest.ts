@@ -107,7 +107,7 @@ const test = base.extend<
   },
   { browserCloser: null }
 >({
-  toolpadDev: !!process.env.TOOLPAD_DEV,
+  toolpadDev: !!process.env.TOOLPAD_NEXT_DEV,
   localAppConfig: [undefined, { option: true }],
   localApp: async ({ localAppConfig, toolpadDev }, use) => {
     if (!localAppConfig) {

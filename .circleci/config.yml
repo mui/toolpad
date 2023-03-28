@@ -87,9 +87,6 @@ jobs:
       - image: cimg/node:18.10.0
         environment:
           TOOLPAD_SHADOW_DATABASE_URL: postgresql://postgres@localhost/circle_test
-      - image: cimg/postgres:14.5
-        environment:
-          POSTGRES_USER: postgres
     steps:
       - checkout
       - install_js
@@ -135,7 +132,7 @@ jobs:
     <<: *defaults
     resource_class: 'large'
     docker:
-      - image: mcr.microsoft.com/playwright:v1.31.1-focal
+      - image: mcr.microsoft.com/playwright:v1.32.1-focal
         environment:
           NODE_ENV: test
       - image: kennethreitz/httpbin:latest

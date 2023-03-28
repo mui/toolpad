@@ -44,6 +44,8 @@ test.describe('basic', () => {
     await firstInputLocator.fill(TEST_VALUE_1);
     expect(await valueControl.inputValue()).toBe(TEST_VALUE_1);
 
+    await expect(valueControl).toBeDisabled();
+
     // Change component prop values through controls
     const TEST_VALUE_2 = 'value2';
     const inputByLabel = editorModel.appCanvas.getByLabel(TEST_VALUE_2, { exact: true });

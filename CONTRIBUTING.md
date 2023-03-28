@@ -96,6 +96,50 @@ _If you're looking into contributing to the docs, follow the [instructions](#bui
 
 1. Open the docs application in the browser [http://localhost:3003/toolpad](http://localhost:3003/toolpad)
 
+## Reviewing PRs
+
+- Check out the PR branch locally with your tool of choice ([GitHub Docs](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/reviewing-changes-in-pull-requests/checking-out-pull-requests-locally?tool=cli))
+- Run to build the project
+
+  ```sh
+  yarn && yarn release:build
+  ```
+
+- Run it on your project of choice
+
+  ```sh
+  yarn toolpad dev /path/to/my/toolpad/project
+  ```
+
+## Integration tests
+
+- To run Toolpad on a fixture
+
+  ```sh
+  yarn toolpad dev --dev ./path/to/fixture
+  ```
+
+- To run the tests locally in production mode
+
+  ```sh
+  yarn build:release
+  yarn test:integration --project chromiun
+  ```
+
+- To run the tests locally in dev mode
+
+  ```sh
+  yarn dev
+  ```
+
+  then run
+
+  ```sh
+  TOOLPAD_NEXT_DEV=1 yarn test:integration --project chromiun
+  ```
+
+- Use the `--ui` flag to run the tests interactively
+
 ## Sending a pull request
 
 Please have a look at our general guidelines for sending pull requests [here](https://mui-org.notion.site/GitHub-PRs-7112d03a6c4346168090b29a970c0154) and [here](https://github.com/mui/material-ui/blob/master/CONTRIBUTING.md#sending-a-pull-request).

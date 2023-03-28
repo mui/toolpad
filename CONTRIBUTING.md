@@ -135,7 +135,7 @@ _If you're looking into contributing to the docs, follow the [instructions](#bui
   then run
 
   ```sh
-  TOOLPAD_NEXT_DEV=1 yarn test:integration --project chromiun
+  TOOLPAD_NEXT_DEV=1 yarn test:integration --project chromium
   ```
 
 - Use the `--ui` flag to run the tests interactively

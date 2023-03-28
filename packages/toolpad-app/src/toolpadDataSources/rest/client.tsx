@@ -62,10 +62,6 @@ import QueryPreview from '../QueryPreview';
 const HTTP_METHODS = ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'HEAD'];
 
 const QUERY_SCOPE_META: ScopeMeta = {
-  query: {
-    deprecated: 'Use parameters variable instead',
-    description: 'Parameters that can be bound to app scope variables',
-  },
   parameters: {
     description: 'Parameters that can be bound to app scope variables',
   },
@@ -353,12 +349,12 @@ function QueryEditor({
 
   const queryScope = React.useMemo(
     () => ({
-      // TODO mark query as @deprecated remove after v1
-      query: previewParams,
       parameters: previewParams,
     }),
     [previewParams],
   );
+
+  console.log(queryScope);
 
   const liveUrl: LiveBinding = useEvaluateLiveBinding({
     jsRuntime: jsServerRuntime,

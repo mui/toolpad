@@ -47,12 +47,6 @@
       yarn release:build
       ```
 
-   1. Create a new version
-
-      ```sh
-      yarn release:version
-      ```
-
    1. Publish to `npm`
 
       ```sh

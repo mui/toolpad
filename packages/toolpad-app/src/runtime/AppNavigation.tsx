@@ -12,8 +12,6 @@ import {
 import { useNavigate, useLocation, useHref } from 'react-router-dom';
 import * as appDom from '../appDom';
 
-const NAV_LIST_SUBHEADER_ID = 'nav-list-subheader';
-
 const DRAWER_WIDTH = 250; // px
 
 interface AppNavigationProps {
@@ -35,6 +33,8 @@ export default function AppNavigation({ pages, isPreview = false }: AppNavigatio
 
   const activePagePath = location.pathname.replace(href, '');
 
+  const navListSubheaderId = React.useId();
+
   return (
     <Drawer
       variant="permanent"
@@ -51,11 +51,11 @@ export default function AppNavigation({ pages, isPreview = false }: AppNavigatio
         <List
           component="nav"
           subheader={
-            <ListSubheader id={NAV_LIST_SUBHEADER_ID} sx={{ px: 4 }}>
+            <ListSubheader id={navListSubheaderId} sx={{ px: 4 }}>
               Pages
             </ListSubheader>
           }
-          aria-labelledby={NAV_LIST_SUBHEADER_ID}
+          aria-labelledby={navListSubheaderId}
         >
           {pages.map((page) => (
             <ListItem key={page.id} onClick={handlePageClick(page)} disablePadding>

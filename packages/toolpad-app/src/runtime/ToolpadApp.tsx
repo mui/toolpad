@@ -39,6 +39,8 @@ import {
   Navigate,
   Location as RouterLocation,
   useNavigate,
+  useHref,
+  matchPath,
 } from 'react-router-dom';
 import { ErrorBoundary, FallbackProps } from 'react-error-boundary';
 import {
@@ -81,6 +83,7 @@ import Header from '../toolpad/ToolpadShell/Header';
 import { ThemeProvider } from '../ThemeContext';
 import { BridgeContext } from '../canvas/BridgeContext';
 import AppNavigation from './AppNavigation';
+import { PREVIEW_PAGE_ROUTE } from '../routes';
 
 const ReactQueryDevtoolsProduction = React.lazy(() =>
   import('@tanstack/react-query-devtools/build/lib/index.prod.js').then((d) => ({
@@ -1143,8 +1146,11 @@ function ToolpadAppLayout({ dom, version, hasShell: hasShellProp = true }: Toolp
   const root = appDom.getApp(dom);
   const { pages = [] } = appDom.getChildNodes(dom, root);
 
-  const { search } = useLocation();
+  const location = useLocation();
+  const { pathname, search } = location;
   const urlParams = React.useMemo(() => new URLSearchParams(search), [search]);
+
+  const pageMatch = matchPath(PREVIEW_PAGE_ROUTE, `/preview${pathname}`);
 
   const hasShell = hasShellProp && urlParams.get('toolpad-display') !== 'standalone';
 
@@ -1166,7 +1172,7 @@ function ToolpadAppLayout({ dom, version, hasShell: hasShellProp = true }: Toolp
                   endIcon={<EditIcon />}
                   color="primary"
                   component="a"
-                  href={`/_toolpad/app`}
+                  href={`/_toolpad/app/pages/${pageMatch?.params.nodeId}`}
                 >
                   Edit
                 </Button>

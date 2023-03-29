@@ -55,6 +55,10 @@ const pages: MuiPage[] = [
     pathname: '/toolpad/data-binding',
     icon: 'CodeIcon',
   },
+  {
+    pathname: '/toolpad/deployment',
+    icon: 'CodeIcon',
+  },
   // {
   //   pathname: '/toolpad/versioning-and-deploying',
   //   title: 'Versioning & deploying [TODO]',

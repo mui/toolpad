@@ -37,3 +37,15 @@ Empty field:
 Field with value:
 
 <img src="/static/toolpad/docs/data-binding/bind-6.png" alt="Binding result 2" width="902px" />
+
+## Event handling
+
+Components like MUI Button have onClick event handler props. This can be binded to run a piece of code to mutate the page state.
+
+(In the example below you can see how on Click of a button, the value is copied from one component to the other)
+
+<img src="/static/toolpad/docs/data-binding/bind-10.png" alt="Binding result 2" width="902px" style="margin-bottom: 8px;" />
+
+After clicking the Button:
+
+<img src="/static/toolpad/docs/data-binding/bind-11.png" alt="Binding result 2" width="200px" />

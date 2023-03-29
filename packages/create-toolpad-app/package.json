@@ -23,6 +23,7 @@
   "scripts": {
     "prebuild": "rimraf ./dist",
     "build": "tsc -p ./tsconfig.json",
+    "build2": "tsup",
     "dev": "tsc -p ./tsconfig.json --watch"
   },
   "engines": {

@@ -1171,7 +1171,9 @@ function ToolpadAppLayout({ dom, version, hasShell: hasShellProp = true }: Toolp
                   endIcon={<EditIcon />}
                   color="primary"
                   component="a"
-                  href={`/_toolpad/app/pages/${pageMatch?.params.nodeId}`}
+                  href={
+                    pageMatch ? `/_toolpad/app/pages/${pageMatch.params.nodeId}` : '/_toolpad/app'
+                  }
                 >
                   Edit
                 </Button>

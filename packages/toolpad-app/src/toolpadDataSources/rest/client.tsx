@@ -349,8 +349,6 @@ function QueryEditor({
 
   const queryScope = React.useMemo(
     () => ({
-      // @TODO: remove deprecated query after v1
-      query: previewParams,
       parameters: previewParams,
     }),
     [previewParams],

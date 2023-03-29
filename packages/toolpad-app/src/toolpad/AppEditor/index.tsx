@@ -1,7 +1,6 @@
 import * as React from 'react';
 import { styled } from '@mui/material';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { JsRuntimeProvider } from '@mui/toolpad-core/jsServerRuntime';
 import PageEditor from './PageEditor';
 import DomProvider, { useAppState } from '../AppState';
 import AppEditorShell from './AppEditorShell';
@@ -63,12 +62,10 @@ function FileEditor() {
 
 export default function Editor() {
   return (
-    <JsRuntimeProvider>
-      <DomProvider>
-        <EditorRoot>
-          <FileEditor />
-        </EditorRoot>
-      </DomProvider>
-    </JsRuntimeProvider>
+    <DomProvider>
+      <EditorRoot>
+        <FileEditor />
+      </EditorRoot>
+    </DomProvider>
   );
 }

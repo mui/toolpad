@@ -69,7 +69,6 @@ export const QUERIES_FILE = `./toolpad/queries.ts`;
 
 async function loadCodeComponentsFromFiles(root: string): Promise<ComponentsContent> {
   const componentsFolder = getComponentsFolder(root);
-  await fs.mkdir(componentsFolder, { recursive: true });
   let entries: Dirent[] = [];
   try {
     entries = await fs.readdir(componentsFolder, { withFileTypes: true });

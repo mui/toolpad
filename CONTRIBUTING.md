@@ -96,6 +96,21 @@ _If you're looking into contributing to the docs, follow the [instructions](#bui
 
 1. Open the docs application in the browser [http://localhost:3003/toolpad](http://localhost:3003/toolpad)
 
+## Reviewing PRs
+
+- Check out the PR branch locally with your tool of choice ([GitHub Docs](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/reviewing-changes-in-pull-requests/checking-out-pull-requests-locally?tool=cli))
+- Run to build the project
+
+  ```sh
+  yarn && yarn release:build
+  ```
+
+- Run it on your project of choice
+
+  ```sh
+  yarn toolpad dev /path/to/my/toolpad/project
+  ```
+
 ## Integration tests
 
 - To run Toolpad on a fixture
@@ -120,7 +135,7 @@ _If you're looking into contributing to the docs, follow the [instructions](#bui
   then run
 
   ```sh
-  TOOLPAD_NEXT_DEV=1 yarn test:integration --project chromiun
+  TOOLPAD_NEXT_DEV=1 yarn test:integration --project chromium
   ```
 
 - Use the `--ui` flag to run the tests interactively

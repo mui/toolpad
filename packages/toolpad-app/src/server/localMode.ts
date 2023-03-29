@@ -14,6 +14,7 @@ import { errorFrom } from '../utils/errors';
 import { migrateUp } from '../appDom/migrations';
 import insecureHash from '../utils/insecureHash';
 import { writeFileRecursive, readMaybeFile } from '../utils/fs';
+import { format } from '../utils/prettier';
 
 export function getUserProjectRoot(): string {
   const { projectDir } = config;
@@ -103,6 +104,42 @@ async function loadCodeComponentsFromFiles(root: string): Promise<ComponentsCont
   );
 
   return Object.fromEntries(resultEntries.filter(Boolean));
+}
+
+function createDefaultCodeComponent(name: string): string {
+  const componentId = name.replace(/\s/g, '');
+  const propTypeId = `${componentId}Props`;
+  return format(`
+    import * as React from 'react';
+    import { Typography } from '@mui/material';
+    import { createComponent } from '@mui/toolpad/browser';
+    
+    export interface ${propTypeId} {
+      msg: string;
+    }
+    
+    function ${componentId}({ msg }: ${propTypeId}) {
+      return (
+        <Typography>{msg}</Typography>
+      );
+    }
+
+    export default createComponent(${componentId}, {
+      argTypes: {
+        msg: {
+          typeDef: { type: "string", default: "Hello world!" },
+        },
+      },
+    });    
+  `);
+}
+
+export async function createComponent(name: string) {
+  const root = getUserProjectRoot();
+  const componentsFolder = getComponentFolder(root);
+  const filePath = getComponentFilePath(componentsFolder, name);
+  const content = createDefaultCodeComponent(name);
+  await writeFileRecursive(filePath, content, { encoding: 'utf-8' });
 }
 
 class Lock {

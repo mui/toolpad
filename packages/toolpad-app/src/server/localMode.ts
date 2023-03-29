@@ -8,7 +8,7 @@ import chalk from 'chalk';
 import config from '../config';
 import * as appDom from '../appDom';
 import { errorFrom } from '../utils/errors';
-import { migrateUp } from '../appDom/migrations';
+import { isUpToDate, migrateUp } from '../appDom/migrations';
 import insecureHash from '../utils/insecureHash';
 import { writeFileRecursive, readMaybeFile } from '../utils/fs';
 import { format } from '../utils/prettier';
@@ -145,9 +145,10 @@ class Lock {
 
 const configFileLock = new Lock();
 
-async function writeConfigFile(filePath: string, dom: appDom.AppDom): Promise<void> {
+async function writeConfigFile(root: string, dom: appDom.AppDom): Promise<void> {
+  const configFilePath = await getConfigFilePath(root);
   await configFileLock.use(() =>
-    writeFileRecursive(filePath, yaml.stringify(dom), { encoding: 'utf-8' }),
+    writeFileRecursive(configFilePath, yaml.stringify(dom), { encoding: 'utf-8' }),
   );
 }
 
@@ -182,7 +183,7 @@ async function initToolpadFile(root: string): Promise<void> {
     // eslint-disable-next-line no-console
     console.log(`${chalk.blue('info')}  - Initializing Toolpad config file`);
     const defaultDom = appDom.createDefaultDom();
-    await writeConfigFile(configFilePath, defaultDom);
+    await writeConfigFile(root, defaultDom);
   }
 }
 
@@ -202,16 +203,32 @@ async function initGeneratedGitignore(root: string) {
   }
 }
 
+async function migrateProject(root: string) {
+  let dom = await loadConfigFile(root);
+  const domVersion = dom.version ?? 0;
+  if (domVersion > appDom.CURRENT_APPDOM_VERSION) {
+    console.error(
+      `${chalk.red(
+        'error',
+      )} - This project was created with a newer version of Toolpad, please upgrade your ${chalk.cyan(
+        '@mui/toolpad',
+      )} installation`,
+    );
+  } else if (domVersion < appDom.CURRENT_APPDOM_VERSION) {
+    // eslint-disable-next-line no-console
+    console.log(`${chalk.blue('info')}  - This project was created by an older version of Toolpad. Upgrading...`)
+    dom = migrateUp(dom);
+    await writeConfigFile(root, dom);
+  }
+}
+
 async function initProjectFolder(): Promise<void> {
   try {
     const root = getUserProjectRoot();
     if (config.cmd === 'dev') {
       await initToolpadFolder(root);
-      await Promise.all([
-        initGeneratedGitignore(root),
-        initToolpadFile(root),
-        // initQueriesFile(root),
-      ]);
+      await Promise.all([initGeneratedGitignore(root), initToolpadFile(root)]);
+      await migrateProject(root);
     } else {
       // TODO: verify files exist?
     }
@@ -302,13 +319,12 @@ function extractNewComponentsContentFromDom(dom: appDom.AppDom): ExtractedCompon
 
 export async function writeDomToDisk(dom: appDom.AppDom): Promise<void> {
   const root = getUserProjectRoot();
-  const configFilePath = await getConfigFilePath(root);
   const componentsFolder = getComponentsFolder(root);
 
   const { components: componentsContent, dom: domWithoutComponents } =
     extractNewComponentsContentFromDom(dom);
   await Promise.all([
-    writeConfigFile(configFilePath, domWithoutComponents),
+    writeConfigFile(root, domWithoutComponents),
     writeCodeComponentsToFiles(componentsFolder, componentsContent),
   ]);
 }
@@ -322,7 +338,6 @@ export async function saveLocalDom(dom: appDom.AppDom): Promise<void> {
 }
 
 async function loadConfigFileFrom(configFilePath: string): Promise<appDom.AppDom | null> {
-  await isInitialized;
   // Using a lock to avoid read during write which may result in reading truncated file content
   const configContent = await configFileLock.use(() => readMaybeFile(configFilePath));
 
@@ -335,8 +350,7 @@ async function loadConfigFileFrom(configFilePath: string): Promise<appDom.AppDom
   return parsedConfig;
 }
 
-async function loadConfigFile() {
-  const root = getUserProjectRoot();
+async function loadConfigFile(root: string) {
   const configFilePath = await getConfigFilePath(root);
   const dom = await loadConfigFileFrom(configFilePath);
 
@@ -351,16 +365,20 @@ export async function loadDomFromDisk(): Promise<appDom.AppDom> {
   const root = getUserProjectRoot();
   await isInitialized;
   const [configContent, componentsContent] = await Promise.all([
-    loadConfigFile(),
+    loadConfigFile(root),
     loadCodeComponentsFromFiles(root),
   ]);
   const dom = mergeComponentsContentIntoDom(configContent, componentsContent);
   return dom;
 }
 
-export async function loadLocalDom(): Promise<appDom.AppDom> {
+export async function loadLocalDom(): Promise<appDom.AppDom> {]
+  await isInitialized
   const dom = await loadDomFromDisk();
-  return migrateUp(dom);
+  if (!isUpToDate(dom)) {
+    throw new Error(`Incompatible dom`);
+  }
+  return dom;
 }
 
 export async function openCodeEditor(file: string): Promise<void> {
@@ -403,7 +421,7 @@ async function getQueriesFileContent(root: string): Promise<string | null> {
 export async function getDomFingerprint() {
   const root = getUserProjectRoot();
   const [configContent, componentsContent, queriesFile] = await Promise.all([
-    loadConfigFile(),
+    loadConfigFile(root),
     loadCodeComponentsFromFiles(root),
     getQueriesFileContent(root),
   ]);

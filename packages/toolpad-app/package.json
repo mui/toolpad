@@ -106,7 +106,9 @@
     "superjson": "^1.12.2",
     "ts-node": "^10.9.1",
     "whatwg-url": "^12.0.1",
-    "yaml": "^2.2.1"
+    "yaml": "^2.2.1",
+    "zod": "^3.21.4",
+    "zod-validation-error": "^1.1.0"
   },
   "devDependencies": {
     "@types/babel__code-frame": "^7.0.3",

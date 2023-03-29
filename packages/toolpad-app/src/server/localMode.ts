@@ -2,18 +2,22 @@ import * as yaml from 'yaml';
 import * as path from 'path';
 import * as fs from 'fs/promises';
 import invariant from 'invariant';
-import { Dirent } from 'fs';
 import * as chokidar from 'chokidar';
 import { debounce } from 'lodash';
 import Emitter from '@mui/toolpad-core/utils/Emitter';
 import openEditor from 'open-editor';
 import chalk from 'chalk';
+import { BindableAttrValue, NodeId } from '@mui/toolpad-core';
+import { fromZodError } from 'zod-validation-error';
+import { getPageFiles } from 'next/dist/server/get-page-files';
 import config from '../config';
 import * as appDom from '../appDom';
 import { errorFrom } from '../utils/errors';
 import { migrateUp } from '../appDom/migrations';
 import insecureHash from '../utils/insecureHash';
-import { writeFileRecursive, readMaybeFile } from '../utils/fs';
+import { writeFileRecursive, readMaybeFile, readMaybeDir } from '../utils/fs';
+import { PageType, QueryType, ElementType, NavigationActionType, Page } from './schema';
+import { mapValues } from '../utils/collections';
 
 export function getUserProjectRoot(): string {
   const { projectDir } = config;
@@ -84,15 +88,7 @@ export const QUERIES_FILE = `./toolpad/queries.ts`;
 
 async function loadCodeComponentsFromFiles(root: string): Promise<ComponentsContent> {
   const componentsFolder = getComponentFolder(root);
-  await fs.mkdir(componentsFolder, { recursive: true });
-  let entries: Dirent[] = [];
-  try {
-    entries = await fs.readdir(componentsFolder, { withFileTypes: true });
-  } catch (err: unknown) {
-    if (errorFrom(err).code !== 'ENOENT') {
-      throw err;
-    }
-  }
+  const entries = (await readMaybeDir(componentsFolder)) || [];
   const resultEntries = await Promise.all(
     entries.map(async (entry): Promise<[string, string] | null> => {
       if (entry.isFile()) {
@@ -101,6 +97,52 @@ async function loadCodeComponentsFromFiles(root: string): Promise<ComponentsCont
         const filePath = path.resolve(componentsFolder, fileName);
         const content = await fs.readFile(filePath, { encoding: 'utf-8' });
         return [componentName, content];
+      }
+
+      return null;
+    }),
+  );
+
+  return Object.fromEntries(resultEntries.filter(Boolean));
+}
+
+async function loadPagesFromFiles(root: string): Promise<PagesContent> {
+  const pagesFolder = getPagesFolder(root);
+  const entries = (await readMaybeDir(pagesFolder)) || [];
+  const resultEntries = await Promise.all(
+    entries.map(async (entry): Promise<[string, PageType] | null> => {
+      if (entry.isDirectory()) {
+        const pageName = entry.name;
+        const filePath = path.resolve(pagesFolder, pageName, './page.yml');
+        const content = await readMaybeFile(filePath);
+        if (!content) {
+          return null;
+        }
+        let parsedFile: string | undefined;
+        try {
+          parsedFile = yaml.parse(content);
+        } catch (rawError) {
+          const error = errorFrom(rawError);
+
+          console.error(
+            `${chalk.red('error')} - Failed to read page ${chalk.cyan(pageName)}. ${error.message}`,
+          );
+
+          return null;
+        }
+
+        const result = Page.safeParse(parsedFile);
+        if (result.success) {
+          return [pageName, result.data];
+        }
+
+        console.error(
+          `${chalk.red('error')} - Failed to read page ${chalk.cyan(pageName)}. ${fromZodError(
+            result.error,
+          )}`,
+        );
+
+        return null;
       }
 
       return null;
@@ -259,30 +301,248 @@ function mergeComponentsContentIntoDom(
   return dom;
 }
 
-function expand(node: appDom.AppDomNode, nodes: appDom.AppDomNode[]) {
-  const allChildNodes = nodes.filter((child) => child.parentId === node.id);
-  const childProps = new Set(allChildNodes.map((child) => child.parentProp || 'children'));
-  const result = {
-    ...node,
-    id: undefined,
-    parentId: undefined,
-    parentProp: undefined,
-    parentIndex: undefined,
-  };
-  for (const prop of childProps) {
-    result[prop] = allChildNodes
-      .filter((child) => child.parentProp === prop)
-      .sort((child1, child2) =>
-        appDom.compareFractionalIndex(child1.parentIndex, child2.parentIndex),
-      )
-      .map((child) => expand(child, nodes));
+function toBindable<V>(value: V | { $$jsExpression: string }): BindableAttrValue<V> {
+  if (value && typeof value === 'object' && typeof (value as any).$$jsExpression === 'string') {
+    return { type: 'jsExpression', value: (value as any).$$jsExpression };
   }
-  return result;
+  return { type: 'const', value: value as V };
 }
 
-function flatten(): appDom.AppDomNode[] {}
+function fromBindable<V>(bindable: BindableAttrValue<V>) {
+  switch (bindable.type) {
+    case 'const':
+      return bindable.value;
+    case 'jsExpression':
+      return { $$jsExpression: bindable.value };
+    default:
+      throw new Error(`Unsupported bindable "${bindable.type}"`);
+  }
+}
 
-type PagesContent = Record<string, readonly appDom.AppDomNode[]>;
+function toBindableProp<V>(value: V | { $$jsExpression: string }): BindableAttrValue<V> {
+  if (value && typeof value === 'object') {
+    if (typeof (value as any).$$jsExpression === 'string') {
+      return { type: 'jsExpression', value: (value as any).$$jsExpression };
+    }
+    if (typeof (value as any).$$jsExpressionAction === 'string') {
+      return { type: 'jsExpressionAction', value: (value as any).$$jsExpressionAction };
+    }
+    if (typeof (value as any).$$navigationAction === 'string') {
+      const action = value as any as NavigationActionType;
+      return {
+        type: 'navigationAction',
+        value: {
+          page: { $$ref: action.$$navigationAction.page as NodeId },
+          parameters: mapValues(
+            action.$$navigationAction.parameters,
+            (param) => param && toBindable(param),
+          ),
+        },
+      };
+    }
+  }
+  return { type: 'const', value: value as V };
+}
+
+function fromBindableProp<V>(bindable: BindableAttrValue<V>) {
+  switch (bindable.type) {
+    case 'const':
+      return bindable.value;
+    case 'jsExpression':
+      return { $$jsExpression: bindable.value };
+    case 'jsExpressionAction':
+      return { $$jsExpressionAction: bindable.value };
+    case 'navigationAction':
+      return {
+        $$navigationAction: {
+          page: bindable.value.page.$$ref,
+          parameters:
+            bindable.value.parameters &&
+            mapValues(bindable.value.parameters, (param) => param && fromBindable(param)),
+        },
+      };
+    default:
+      throw new Error(`Unsupported bindable "${bindable.type}"`);
+  }
+}
+
+function stringOnly(maybeString: unknown): string | undefined {
+  return typeof maybeString === 'string' ? maybeString : undefined;
+}
+
+function expandChildren(children: appDom.ElementNode[], dom: appDom.AppDom): ElementType[];
+function expandChildren(children: appDom.QueryNode[], dom: appDom.AppDom): QueryType[];
+function expandChildren<N extends appDom.AppDomNode>(
+  children: N[],
+  dom: appDom.AppDom,
+): (QueryType | ElementType)[];
+function expandChildren<N extends appDom.AppDomNode>(children: N[], dom: appDom.AppDom) {
+  return (
+    children
+      .sort((child1, child2) => {
+        invariant(
+          child1.parentIndex && child2.parentIndex,
+          'Nodes are not children of another node',
+        );
+        return appDom.compareFractionalIndex(child1.parentIndex, child2.parentIndex);
+      })
+      // eslint-disable-next-line @typescript-eslint/no-use-before-define
+      .map((child) => expandFromDom(child, dom))
+  );
+}
+
+function undefinedWhenEmpty<O extends object | any[]>(obj?: O): O | undefined {
+  if (!obj || Object.values(obj).every((property) => property === undefined)) {
+    return undefined;
+  }
+  return obj;
+}
+
+function expandFromDom(node: appDom.ElementNode, dom: appDom.AppDom): ElementType;
+function expandFromDom(node: appDom.QueryNode, dom: appDom.AppDom): QueryType;
+function expandFromDom(node: appDom.PageNode, dom: appDom.AppDom): PageType;
+function expandFromDom<N extends appDom.AppDomNode>(
+  node: N,
+  dom: appDom.AppDom,
+): PageType | QueryType | ElementType;
+function expandFromDom<N extends appDom.AppDomNode>(
+  node: N,
+  dom: appDom.AppDom,
+): PageType | QueryType | ElementType {
+  if (appDom.isPage(node)) {
+    const children = appDom.getChildNodes(dom, node);
+
+    return {
+      id: node.id,
+      title: node.attributes.title?.value,
+      parameters: undefinedWhenEmpty(
+        node.attributes.parameters?.value.map(([name, value]) => ({ name, value })) ?? [],
+      ),
+      children: undefinedWhenEmpty(expandChildren(children.children || [], dom)),
+      queries: undefinedWhenEmpty(expandChildren(children.queries || [], dom)),
+    } satisfies PageType;
+  }
+
+  if (appDom.isQuery(node)) {
+    return {
+      name: node.name,
+      enabled: node.attributes.enabled ? fromBindable(node.attributes.enabled) : undefined,
+      mode: node.attributes.mode?.value,
+      dataSource: node.attributes.dataSource?.value,
+      query: node.attributes.query.value,
+      parameters: undefinedWhenEmpty(node.params?.map(([name, value]) => ({ name, value }))),
+      cacheTime: node.attributes.cacheTime?.value,
+      refetchInterval: node.attributes.refetchInterval?.value,
+      transform: node.attributes.transform?.value,
+      transformEnabled: node.attributes.transformEnabled?.value,
+    } satisfies QueryType;
+  }
+
+  if (appDom.isElement(node)) {
+    const children = appDom.getChildNodes(dom, node);
+
+    return {
+      component: node.attributes.component.value,
+      name: node.name,
+      layout: undefinedWhenEmpty({
+        columnSize: node.layout?.columnSize?.value,
+        horizontalAlign: stringOnly(node.layout?.horizontalAlign?.value),
+        verticalAlign: stringOnly(node.layout?.verticalAlign?.value),
+      }),
+      props: undefinedWhenEmpty(
+        mapValues(node.props || {}, (prop) => prop && fromBindableProp(prop)),
+      ),
+      children: undefinedWhenEmpty(expandChildren(children.children || [], dom)),
+    } satisfies ElementType;
+  }
+
+  throw new Error(`Unsupported node type "${node.type}"`);
+}
+
+function mergeElementIntoDom(
+  dom: appDom.AppDom,
+  parent: appDom.ElementNode | appDom.PageNode,
+  elm: ElementType,
+): appDom.AppDom {
+  const elmNode = appDom.createElement(
+    dom,
+    elm.component,
+    mapValues(elm.props || {}, (propValue) => toBindableProp(propValue)),
+    mapValues(elm.layout || {}, (propValue) => appDom.createConst(propValue)),
+    elm.name,
+  );
+  dom = appDom.addNode(dom, elmNode, parent, 'children');
+
+  if (elm.children) {
+    for (const child of elm.children) {
+      dom = mergeElementIntoDom(dom, elmNode, child);
+    }
+  }
+
+  return dom;
+}
+
+function mergePageIntoDom(dom: appDom.AppDom, pageName: string, pageFile: PageType): appDom.AppDom {
+  const pageNode = appDom.createNode(dom, 'page', {
+    name: pageName,
+    attributes: {
+      title: appDom.createConst(pageFile.title || ''),
+      parameters: appDom.createConst(
+        pageFile.parameters?.map(({ name, value }) => [name, value]) || [],
+      ),
+    },
+  });
+  pageNode.id = pageFile.id;
+  if (appDom.getMaybeNode(dom, pageFile.id)) {
+    dom = appDom.removeNode(dom, pageFile.id);
+  }
+  dom = appDom.addNode(dom, pageNode, appDom.getApp(dom), 'pages');
+
+  if (pageFile.queries) {
+    for (const query of pageFile.queries) {
+      const queryNode = appDom.createNode(dom, 'query', {
+        name: query.name,
+        attributes: {
+          connectionId: appDom.createConst(null),
+          dataSource:
+            typeof query.dataSource === 'string' ? appDom.createConst(query.dataSource) : undefined,
+          query: appDom.createConst(query.query),
+          cacheTime:
+            typeof query.cacheTime === 'number' ? appDom.createConst(query.cacheTime) : undefined,
+          enabled: query.enabled ? toBindable(query.enabled) : undefined,
+          mode: typeof query.mode === 'string' ? appDom.createConst(query.mode) : undefined,
+          transform:
+            typeof query.transform === 'string' ? appDom.createConst(query.transform) : undefined,
+          refetchInterval:
+            typeof query.refetchInterval === 'number'
+              ? appDom.createConst(query.refetchInterval)
+              : undefined,
+          transformEnabled: query.transformEnabled
+            ? appDom.createConst(query.transformEnabled)
+            : undefined,
+        },
+      });
+      dom = appDom.addNode(dom, queryNode, pageNode, 'queries');
+    }
+  }
+
+  if (pageFile.children) {
+    for (const child of pageFile.children) {
+      dom = mergeElementIntoDom(dom, pageNode, child);
+    }
+  }
+
+  return dom;
+}
+
+function mergPagesIntoDom(dom: appDom.AppDom, pages: PagesContent): appDom.AppDom {
+  for (const [name, page] of Object.entries(pages)) {
+    dom = mergePageIntoDom(dom, name, page);
+  }
+  return dom;
+}
+
+type PagesContent = Record<string, PageType>;
 
 interface ExtractedPages {
   pages: PagesContent;
@@ -297,26 +557,21 @@ function extractNewPagesFromDom(dom: appDom.AppDom): ExtractedPages {
 
   for (const pageNode of pageNodes) {
     if (pageNode.attributes.isNew?.value) {
-      const pageNodes = [
-        { ...pageNode, attributes: { ...pageNode.attributes, isNew: undefined } },
-        ...appDom.getDescendants(dom, pageNode),
-      ];
-      pages[pageNode.name] = expand(pageNodes[0], pageNodes);
-      pages[pageNode.name].id = pageNodes[0].id;
+      pages[pageNode.name] = expandFromDom(pageNode, dom);
     }
-    // dom = appDom.removeNode(dom, pageNode.id);
+    dom = appDom.removeNode(dom, pageNode.id);
   }
 
   return { pages, dom };
 }
 
-async function writePagesToFiles(pagesFolder: string, pages: Record<string, unknown>) {
+async function writePagesToFiles(pagesFolder: string, pages: PagesContent) {
   await Promise.all(
-    Object.entries(pages).map(async ([name, nodes]) => {
+    Object.entries(pages).map(async ([name, page]) => {
       const pageFolder = path.resolve(pagesFolder, name);
       const pageFileName = path.resolve(pageFolder, 'page.yml');
       await fs.mkdir(pageFolder, { recursive: true });
-      await fs.writeFile(pageFileName, yaml.stringify(nodes));
+      await fs.writeFile(pageFileName, yaml.stringify(page));
     }),
   );
 }
@@ -399,11 +654,21 @@ async function loadConfigFile() {
 export async function loadDomFromDisk(): Promise<appDom.AppDom> {
   const root = getUserProjectRoot();
   await isInitialized;
-  const [configContent, componentsContent] = await Promise.all([
+  const [configContent, componentsContent, pagesContent] = await Promise.all([
     loadConfigFile(),
     loadCodeComponentsFromFiles(root),
+    loadPagesFromFiles(root),
   ]);
-  const dom = mergeComponentsContentIntoDom(configContent, componentsContent);
+  let dom = configContent;
+  dom = mergeComponentsContentIntoDom(configContent, componentsContent);
+
+  const app = appDom.getApp(dom);
+  const { pages = [] } = appDom.getChildNodes(dom, app);
+  for (const page of pages) {
+    dom = appDom.removeNode(dom, page.id);
+  }
+
+  dom = mergPagesIntoDom(configContent, pagesContent);
   return dom;
 }
 
@@ -437,13 +702,16 @@ async function getQueriesFileContent(root: string): Promise<string | null> {
 
 export async function getDomFingerprint() {
   const root = getUserProjectRoot();
-  const [configContent, componentsContent, queriesFile] = await Promise.all([
+  const [configContent, componentsContent, queriesFile, pagesContent] = await Promise.all([
     loadConfigFile(),
     loadCodeComponentsFromFiles(root),
     getQueriesFileContent(root),
+    loadPagesFromFiles(root),
   ]);
 
-  return insecureHash(JSON.stringify([configContent, componentsContent, queriesFile]));
+  return insecureHash(
+    JSON.stringify([configContent, componentsContent, queriesFile, pagesContent]),
+  );
 }
 
 export type ProjectFolderEntry = {

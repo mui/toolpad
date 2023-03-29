@@ -1,5 +1,6 @@
 import * as fs from 'fs/promises';
 import * as path from 'path';
+import { Dirent } from 'fs';
 import { errorFrom } from './errors';
 
 /**
@@ -16,6 +17,18 @@ export async function readMaybeFile(filePath: string): Promise<string | null> {
   } catch (rawError) {
     const error = errorFrom(rawError);
     if (error.code === 'ENOENT') {
+      return null;
+    }
+    throw error;
+  }
+}
+
+export async function readMaybeDir(dirPath: string): Promise<Dirent[] | null> {
+  try {
+    return await fs.readdir(dirPath, { withFileTypes: true });
+  } catch (rawError: unknown) {
+    const error = errorFrom(rawError);
+    if (errorFrom(error).code === 'ENOENT') {
       return null;
     }
     throw error;

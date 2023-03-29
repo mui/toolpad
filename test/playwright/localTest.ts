@@ -100,23 +100,27 @@ export async function withApp(
 }
 
 const test = base.extend<
+  {},
   {
+    browserCloser: null;
+    localApp: RunningLocalApp;
     toolpadDev: boolean;
     localAppConfig?: WithAppOptions;
-    localApp: RunningLocalApp;
-  },
-  { browserCloser: null }
+  }
 >({
-  toolpadDev: !!process.env.TOOLPAD_NEXT_DEV,
-  localAppConfig: [undefined, { option: true }],
-  localApp: async ({ localAppConfig, toolpadDev }, use) => {
-    if (!localAppConfig) {
-      throw new Error('localAppConfig missing');
-    }
-    await withApp({ toolpadDev, ...localAppConfig }, async (app) => {
-      await use(app);
-    });
-  },
+  toolpadDev: [!!process.env.TOOLPAD_NEXT_DEV, { option: true, scope: 'worker' }],
+  localAppConfig: [undefined, { option: true, scope: 'worker' }],
+  localApp: [
+    async ({ localAppConfig, toolpadDev }, use) => {
+      if (!localAppConfig) {
+        throw new Error('localAppConfig missing');
+      }
+      await withApp({ toolpadDev, ...localAppConfig }, async (app) => {
+        await use(app);
+      });
+    },
+    { scope: 'worker' },
+  ],
   baseURL: async ({ localApp }, use) => {
     await use(localApp.url);
   },

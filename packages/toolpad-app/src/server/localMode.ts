@@ -8,7 +8,7 @@ import chalk from 'chalk';
 import config from '../config';
 import * as appDom from '../appDom';
 import { errorFrom } from '../utils/errors';
-import { isUpToDate, migrateUp } from '../appDom/migrations';
+import { migrateUp, isUpToDate } from './migrations';
 import insecureHash from '../utils/insecureHash';
 import { writeFileRecursive, readMaybeFile } from '../utils/fs';
 import { format } from '../utils/prettier';
@@ -145,6 +145,30 @@ class Lock {
 
 const configFileLock = new Lock();
 
+async function loadConfigFileFrom(configFilePath: string): Promise<appDom.AppDom | null> {
+  // Using a lock to avoid read during write which may result in reading truncated file content
+  const configContent = await configFileLock.use(() => readMaybeFile(configFilePath));
+
+  if (!configContent) {
+    return null;
+  }
+
+  const parsedConfig = yaml.parse(configContent);
+  invariant(parsedConfig, 'Invalid Toolpad config');
+  return parsedConfig;
+}
+
+async function loadConfigFile(root: string) {
+  const configFilePath = await getConfigFilePath(root);
+  const dom = await loadConfigFileFrom(configFilePath);
+
+  if (dom) {
+    return dom;
+  }
+
+  throw new Error(`No toolpad dom found`);
+}
+
 async function writeConfigFile(root: string, dom: appDom.AppDom): Promise<void> {
   const configFilePath = await getConfigFilePath(root);
   await configFileLock.use(() =>
@@ -204,7 +228,7 @@ async function initGeneratedGitignore(root: string) {
 }
 
 async function migrateProject(root: string) {
-  let dom = await loadConfigFile(root);
+  const dom = await loadConfigFile(root);
   const domVersion = dom.version ?? 0;
   if (domVersion > appDom.CURRENT_APPDOM_VERSION) {
     console.error(
@@ -216,8 +240,12 @@ async function migrateProject(root: string) {
     );
   } else if (domVersion < appDom.CURRENT_APPDOM_VERSION) {
     // eslint-disable-next-line no-console
-    console.log(`${chalk.blue('info')}  - This project was created by an older version of Toolpad. Upgrading...`)
-    dom = migrateUp(dom);
+    console.log(
+      `${chalk.blue(
+        'info',
+      )}  - This project was created by an older version of Toolpad. Upgrading...`,
+    );
+    migrateUp(dom);
     await writeConfigFile(root, dom);
   }
 }
@@ -317,7 +345,7 @@ function extractNewComponentsContentFromDom(dom: appDom.AppDom): ExtractedCompon
   return { components, dom };
 }
 
-export async function writeDomToDisk(dom: appDom.AppDom): Promise<void> {
+async function writeDomToDisk(dom: appDom.AppDom): Promise<void> {
   const root = getUserProjectRoot();
   const componentsFolder = getComponentsFolder(root);
 
@@ -337,33 +365,8 @@ export async function saveLocalDom(dom: appDom.AppDom): Promise<void> {
   await writeDomToDisk(dom);
 }
 
-async function loadConfigFileFrom(configFilePath: string): Promise<appDom.AppDom | null> {
-  // Using a lock to avoid read during write which may result in reading truncated file content
-  const configContent = await configFileLock.use(() => readMaybeFile(configFilePath));
-
-  if (!configContent) {
-    return null;
-  }
-
-  const parsedConfig = yaml.parse(configContent);
-  invariant(parsedConfig, 'Invalid Toolpad config');
-  return parsedConfig;
-}
-
-async function loadConfigFile(root: string) {
-  const configFilePath = await getConfigFilePath(root);
-  const dom = await loadConfigFileFrom(configFilePath);
-
-  if (dom) {
-    return dom;
-  }
-
-  throw new Error(`No toolpad dom found`);
-}
-
-export async function loadDomFromDisk(): Promise<appDom.AppDom> {
+async function loadDomFromDisk(): Promise<appDom.AppDom> {
   const root = getUserProjectRoot();
-  await isInitialized;
   const [configContent, componentsContent] = await Promise.all([
     loadConfigFile(root),
     loadCodeComponentsFromFiles(root),
@@ -372,8 +375,8 @@ export async function loadDomFromDisk(): Promise<appDom.AppDom> {
   return dom;
 }
 
-export async function loadLocalDom(): Promise<appDom.AppDom> {]
-  await isInitialized
+export async function loadLocalDom(): Promise<appDom.AppDom> {
+  await isInitialized;
   const dom = await loadDomFromDisk();
   if (!isUpToDate(dom)) {
     throw new Error(`Incompatible dom`);
@@ -406,15 +409,7 @@ export async function openQueryEditor() {
   await openCodeEditor(queriesFilePath);
 }
 
-export async function createNewFunction() {
-  const root = getUserProjectRoot();
-  await initQueriesFile(root);
-  const queriesFilePath = getQueriesFile(root);
-  await openCodeEditor(queriesFilePath);
-}
-
 async function getQueriesFileContent(root: string): Promise<string | null> {
-  await isInitialized;
   return readMaybeFile(getQueriesFile(root));
 }
 

@@ -15,3 +15,11 @@ npm run build
 ```
 
 Once the build has been made. You can deploy it to any service of your choice!
+
+## Standalone display mode
+
+By default, Toolpad apps include built-in page navigation in a sidebar on the left of screen.
+
+<!--- Include optional image highlighting built-in navigation sidebar -->
+
+You can hide the built-in navigation by adding `toolpad-display=standalone` as a query parameter to the URL.

@@ -56,7 +56,7 @@ export default function CardGrid(props) {
         <SectionHeadline overline={content.overline} title={content.Headline} />
         <Grid container spacing={{ xs: 2, sm: 2, md: 3 }} columns={{ xs: 1, sm: 2 }}>
           {content.cards.map(({ icon, title, wip, imageUrl, description }) => (
-            <Grid key={title} xs={6} sm={4}>
+            <Grid key={title} xs={2} sm={1}>
               <Paper variant="outlined" sx={cardRootStyle(imageUrl)}>
                 {imageUrl ? <Box sx={cardMediaStyle(imageUrl)} /> : null}
                 <Box sx={cardContentRootStyle(imageUrl)}>

@@ -44,9 +44,9 @@ export default function CardGrid(props) {
     >
       <Container sx={{ py: { xs: 4, sm: 12 } }}>
         <SectionHeadline overline={content.overline} title={content.Headline} />
-        <Grid container spacing={6} columns={{ xs: 1, sm: 2 }}>
+        <Grid container spacing={6} columns={{ xs: 1, sm: 3 }}>
           {content.cards.map(({ title, imageUrl, description }) => (
-            <Grid xs={2} sm={4} md={4}>
+            <Grid xs={3} sm={1}>
               <Box key={title}>
                 <Box sx={cardMediaStyle(imageUrl)} />
                 <Box mt={2}>

@@ -85,7 +85,6 @@ export interface PageNode extends AppDomNodeBase {
     readonly title: ConstantAttrValue<string>;
     readonly parameters?: ConstantAttrValue<[string, string][]>;
     readonly module?: ConstantAttrValue<string>;
-    readonly isNew?: ConstantAttrValue<boolean>;
   };
 }
 

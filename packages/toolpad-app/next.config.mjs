@@ -102,15 +102,6 @@ export default withBundleAnalyzer({
    * @param {import('webpack').Configuration} config
    */
   webpack: (config, options) => {
-    config.resolve ??= {};
-    config.resolve.fallback = {
-      ...config.resolve.fallback,
-      // We need these because quickjs-emscripten doesn't export pure browser compatible modules yet
-      // https://github.com/justjake/quickjs-emscripten/issues/33
-      fs: false,
-      path: false,
-    };
-
     config.module ??= {};
     config.module.strictExportPresence = true;
 

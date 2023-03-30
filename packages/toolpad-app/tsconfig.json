@@ -11,7 +11,7 @@
       "@mui/toolpad-core/utils/*": ["../toolpad-core/dist/esm/utils/*"]
     },
     "target": "es5",
-    "lib": ["dom", "dom.iterable", "esnext"],
+    "lib": ["dom", "dom.iterable", "es2022"],
     "allowJs": true,
     "checkJs": true,
     "skipLibCheck": true,
@@ -26,7 +26,9 @@
     "isolatedModules": true,
     "jsx": "preserve",
     "incremental": true,
-    "noUnusedLocals": true
+    "noUnusedLocals": true,
+    "pretty": true,
+    "preserveWatchOutput": true
   },
   "include": [
     "next.config.mjs",

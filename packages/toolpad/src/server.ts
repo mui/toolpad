@@ -1,2 +1,2 @@
-export { default as createQuery } from '@mui/toolpad-core/createQuery';
-export * from '@mui/toolpad-core/createQuery';
+export { default } from '@mui/toolpad-core/server';
+export * from '@mui/toolpad-core/server';

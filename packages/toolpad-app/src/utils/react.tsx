@@ -1,4 +1,4 @@
-import mitt from 'mitt';
+import Emitter from '@mui/toolpad-core/utils/Emitter';
 import * as React from 'react';
 
 /**
@@ -19,10 +19,10 @@ export function interleave(items: React.ReactNode[], separator: React.ReactNode)
 
 /**
  * Create a shared state to be used across the application. Returns a useState hook that
- * is synchronised on the same state between all instances where it is called.
+ * is synchronized on the same state between all instances where it is called.
  */
 export function createGlobalState<T = undefined>(initialValue: T) {
-  const emitter = mitt();
+  const emitter = new Emitter<{ change: {} }>();
 
   let result: [T, React.Dispatch<React.SetStateAction<T>>];
 
@@ -32,7 +32,7 @@ export function createGlobalState<T = undefined>(initialValue: T) {
 
     if (updateValue !== result[0]) {
       result = [updateValue, setState];
-      emitter.emit('change');
+      emitter.emit('change', {});
     }
   };
 

@@ -38,7 +38,6 @@ function Overlay(props: OverlayProps) {
 
 export interface EditorCanvasHostProps {
   className?: string;
-  appId: string;
   pageNodeId: NodeId;
   dom: appDom.AppDom;
   savedNodes: NodeHashes;
@@ -78,7 +77,6 @@ function useOnChange<T = unknown>(value: T, handler: (newValue: T, oldValue: T) 
 }
 
 export default function EditorCanvasHost({
-  appId,
   className,
   pageNodeId,
   dom,
@@ -94,10 +92,10 @@ export default function EditorCanvasHost({
 
   const updateOnBridge = React.useCallback(() => {
     if (bridge) {
-      const data = createRuntimeState({ appId, dom });
+      const data = createRuntimeState({ dom });
       bridge.canvasCommands.update({ ...data, savedNodes });
     }
-  }, [appId, bridge, dom, savedNodes]);
+  }, [bridge, dom, savedNodes]);
 
   React.useEffect(() => {
     updateOnBridge();
@@ -126,7 +124,7 @@ export default function EditorCanvasHost({
     }
   });
 
-  const src = `/app-canvas/${appId}/pages/${pageNodeId}`;
+  const src = `/app-canvas/pages/${pageNodeId}`;
 
   const [loading, setLoading] = React.useState(true);
   useOnChange(src, () => setLoading(true));

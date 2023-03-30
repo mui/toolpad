@@ -27,7 +27,7 @@ const IGNORED_ERRORS = [
 export type Options = { ignoreConsoleErrors: RegExp[] };
 
 export const test = base.extend<Options & { api: RpcClient<ServerDefinition> }>({
-  ignoreConsoleErrors: [],
+  ignoreConsoleErrors: [[], { option: true }],
 
   page: async ({ page, ignoreConsoleErrors }, use) => {
     const entryPromises: Promise<ConsoleEntry>[] = [];

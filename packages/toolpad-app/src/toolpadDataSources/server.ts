@@ -1,6 +1,5 @@
 import * as _ from 'lodash-es';
 import { ServerDataSource } from '../types';
-import functionSrc from './function/server';
 import postgres from './postgres/server';
 import mysql from './mysql/server';
 import rest from './rest/server';
@@ -15,11 +14,10 @@ type ServerDataSources = { [key: string]: ServerDataSource<any, any, any> | unde
 const serverDataSources: ServerDataSources = _.pick(
   {
     rest,
-    function: functionSrc,
     postgres,
     googleSheets,
     mysql,
-    ...(config.localMode ? { local } : {}),
+    local,
   },
   [...(config.isDemo ? DEMO_DATASOURCES : PRODUCTION_DATASOURCES)],
 );

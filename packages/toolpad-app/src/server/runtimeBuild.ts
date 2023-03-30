@@ -6,7 +6,7 @@ import * as appDom from '../appDom';
 import { MUI_X_PRO_LICENSE } from '../constants';
 import createRuntimeState from '../createRuntimeState';
 import { getToolpadComponents } from '../toolpadComponents';
-import { loadDomFromDisk } from './localMode';
+import { loadLocalDom } from './localMode';
 import projectRoot from './projectRoot';
 
 async function createMain(dom: appDom.AppDom) {
@@ -77,7 +77,7 @@ interface BuilderOptions {
 }
 
 export async function createBuilder({ filePath, dev }: BuilderOptions) {
-  const dom = await loadDomFromDisk();
+  const dom = await loadLocalDom();
 
   const userProjectRoot = path.dirname(filePath);
 

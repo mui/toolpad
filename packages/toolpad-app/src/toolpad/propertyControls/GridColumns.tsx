@@ -199,6 +199,7 @@ function GridColumnsPropEditor({
                     handleColumnChange({ ...editedColumn, field: event.target.value })
                   }
                 />
+
                 <TextField
                   label="header"
                   value={editedColumn.headerName}
@@ -207,6 +208,37 @@ function GridColumnsPropEditor({
                     handleColumnChange({ ...editedColumn, headerName: event.target.value })
                   }
                 />
+
+                <TextField
+                  select
+                  fullWidth
+                  label="align"
+                  value={editedColumn.align ?? ''}
+                  disabled={disabled}
+                  onChange={(event) =>
+                    handleColumnChange({
+                      ...editedColumn,
+                      align: (event.target.value as GridAlignment) || undefined,
+                    })
+                  }
+                >
+                  {ALIGNMENTS.map((alignment) => (
+                    <MenuItem key={alignment} value={alignment}>
+                      {alignment}
+                    </MenuItem>
+                  ))}
+                </TextField>
+
+                <TextField
+                  label="width"
+                  type="number"
+                  value={editedColumn.width}
+                  disabled={disabled}
+                  onChange={(event) =>
+                    handleColumnChange({ ...editedColumn, width: Number(event.target.value) })
+                  }
+                />
+
                 <TextField
                   select
                   fullWidth
@@ -227,6 +259,7 @@ function GridColumnsPropEditor({
                     </MenuItem>
                   ))}
                 </TextField>
+
                 {editedColumn.type === 'number' ? (
                   <React.Fragment>
                     <TextField
@@ -293,41 +326,18 @@ function GridColumnsPropEditor({
                   </React.Fragment>
                 ) : null}
 
-                <TextField
-                  select
-                  fullWidth
-                  label="align"
-                  value={editedColumn.align ?? ''}
-                  disabled={disabled}
-                  onChange={(event) =>
-                    handleColumnChange({
-                      ...editedColumn,
-                      align: (event.target.value as GridAlignment) || undefined,
-                    })
-                  }
-                >
-                  {ALIGNMENTS.map((alignment) => (
-                    <MenuItem key={alignment} value={alignment}>
-                      {alignment}
-                    </MenuItem>
-                  ))}
-                </TextField>
-                <TextField
-                  label="width"
-                  type="number"
-                  value={editedColumn.width}
-                  disabled={disabled}
-                  onChange={(event) =>
-                    handleColumnChange({ ...editedColumn, width: Number(event.target.value) })
-                  }
-                />
                 {editedColumn.type === 'codeComponent' ? (
                   <TextField
                     select
+                    required
                     fullWidth
                     label="Custom component"
                     value={editedColumn.codeComponent ?? ''}
                     disabled={disabled}
+                    error={!editedColumn.codeComponent}
+                    helperText={
+                      editedColumn.codeComponent ? undefined : 'Please select a component'
+                    }
                     onChange={(event) =>
                       handleColumnChange({
                         ...editedColumn,

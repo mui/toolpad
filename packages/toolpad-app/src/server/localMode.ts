@@ -9,7 +9,6 @@ import openEditor from 'open-editor';
 import chalk from 'chalk';
 import { BindableAttrValue, NodeId } from '@mui/toolpad-core';
 import { fromZodError } from 'zod-validation-error';
-import { getPageFiles } from 'next/dist/server/get-page-files';
 import config from '../config';
 import * as appDom from '../appDom';
 import { errorFrom } from '../utils/errors';

@@ -498,18 +498,25 @@ export function createNode<T extends AppDomNodeType>(
   });
 }
 
-export function createDom(): AppDom {
+export function createFragment<T extends AppDomNodeType>(
+  type: T,
+  init: AppDomNodeInitOfType<T> & { name: string },
+) {
   const rootId = createId();
   return {
     nodes: {
-      [rootId]: createNodeInternal(rootId, 'app', {
-        name: 'Application',
-        attributes: {},
-      }),
+      [rootId]: createNodeInternal(rootId, type, init),
     },
     root: rootId,
     version: CURRENT_APPDOM_VERSION,
   };
+}
+
+export function createDom(): AppDom {
+  return createFragment('app', {
+    name: 'Application',
+    attributes: {},
+  });
 }
 
 /**

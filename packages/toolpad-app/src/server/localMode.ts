@@ -11,7 +11,7 @@ import * as appDom from '../appDom';
 import { errorFrom } from '../utils/errors';
 import { migrateUp, isUpToDate } from '../appDom/migrations';
 import insecureHash from '../utils/insecureHash';
-import { writeFileRecursive, readMaybeFile, readMaybeDir } from '../utils/fs';
+import { writeFileRecursive, readMaybeFile, readMaybeDir, updateYamlFile } from '../utils/fs';
 import { PageType, QueryType, ElementType, NavigationActionType, Page } from './schema';
 import { mapValues } from '../utils/collections';
 import { format } from '../utils/prettier';
@@ -218,9 +218,7 @@ async function loadConfigFile(root: string) {
 
 async function writeConfigFile(root: string, dom: appDom.AppDom): Promise<void> {
   const configFilePath = await getConfigFilePath(root);
-  await configFileLock.use(() =>
-    writeFileRecursive(configFilePath, yaml.stringify(dom), { encoding: 'utf-8' }),
-  );
+  await configFileLock.use(() => updateYamlFile(configFilePath, dom));
 }
 
 const DEFAULT_QUERIES_FILE_CONTENT = `// Toolpad queries:
@@ -606,8 +604,7 @@ async function writePagesToFiles(pagesFolder: string, pages: PagesContent) {
     Object.entries(pages).map(async ([name, page]) => {
       const pageFolder = path.resolve(pagesFolder, name);
       const pageFileName = path.resolve(pageFolder, 'page.yml');
-      await fs.mkdir(pageFolder, { recursive: true });
-      await fs.writeFile(pageFileName, yaml.stringify(page));
+      await updateYamlFile(pageFileName, page);
     }),
   );
 }

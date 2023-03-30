@@ -20,7 +20,6 @@ const VIDEO_BREAKPOINT_GAP = 100;
 
 const VideoContainer = styled(Box)(({ theme }) => ({
   maxWidth: 1100,
-  height: { xs: 200, sm: 390, md: 445, lg: 615 },
   height: '100%',
   width: {
     xs: 360,
@@ -54,12 +53,12 @@ const VideoContainer = styled(Box)(({ theme }) => ({
 export default function DemoVideo() {
   return (
     <Box
-      sx={(theme) => ({
+      sx={{
         display: 'flex',
         flexDirection: 'row',
         justifyContent: 'center',
         py: { xs: 4, sm: 8 },
-      })}
+      }}
     >
       <Container>
         <VideoContainer>

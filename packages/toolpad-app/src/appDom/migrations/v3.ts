@@ -1,5 +1,5 @@
 import invariant from 'invariant';
-import * as appDom from '../../appDom';
+import * as appDom from '..';
 import { mapValues } from '../../utils/collections';
 
 function replaceQueryParams(node: any): appDom.AppDomNode {

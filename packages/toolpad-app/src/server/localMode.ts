@@ -8,7 +8,7 @@ import chalk from 'chalk';
 import config from '../config';
 import * as appDom from '../appDom';
 import { errorFrom } from '../utils/errors';
-import { migrateUp, isUpToDate } from './migrations';
+import { migrateUp, isUpToDate } from '../appDom/migrations';
 import insecureHash from '../utils/insecureHash';
 import { writeFileRecursive, readMaybeFile } from '../utils/fs';
 import { format } from '../utils/prettier';

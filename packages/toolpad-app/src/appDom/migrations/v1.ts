@@ -1,5 +1,5 @@
 import invariant from 'invariant';
-import { AppDom, QueryNode, createConst, isQuery, ElementNode, isElement, ref } from '../../appDom';
+import { AppDom, QueryNode, createConst, isQuery, ElementNode, isElement, ref } from '..';
 import { update } from '../../utils/immutability';
 
 function migrateLegacyQueryNode(node: QueryNode<any>): QueryNode<any> {

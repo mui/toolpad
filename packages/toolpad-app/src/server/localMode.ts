@@ -614,16 +614,14 @@ interface ExtractedComponents {
   dom: appDom.AppDom;
 }
 
-function extractNewComponentsContentFromDom(dom: appDom.AppDom): ExtractedComponents {
+function extractComponentsContentFromDom(dom: appDom.AppDom): ExtractedComponents {
   const rootNode = appDom.getApp(dom);
   const { codeComponents: codeComponentNodes = [] } = appDom.getChildNodes(dom, rootNode);
 
   const components: ComponentsContent = {};
 
   for (const codeComponent of codeComponentNodes) {
-    if (codeComponent.attributes.isNew?.value) {
-      components[codeComponent.name] = codeComponent.attributes.code.value;
-    }
+    components[codeComponent.name] = codeComponent.attributes.code.value;
     dom = appDom.removeNode(dom, codeComponent.id);
   }
 
@@ -632,21 +630,12 @@ function extractNewComponentsContentFromDom(dom: appDom.AppDom): ExtractedCompon
 
 async function writeDomToDisk(dom: appDom.AppDom): Promise<void> {
   const root = getUserProjectRoot();
-  const componentsFolder = getComponentsFolder(root);
   const pagesFolder = getPagesFolder(root);
-
-  const { components: componentsContent, dom: domWithoutComponents } =
-    extractNewComponentsContentFromDom(dom);
-  dom = domWithoutComponents;
 
   const { pages: pagesContent, dom: domWithoutPages } = extractPagesFromDom(dom);
   dom = domWithoutPages;
 
-  await Promise.all([
-    writeConfigFile(root, dom),
-    writeCodeComponentsToFiles(componentsFolder, componentsContent),
-    writePagesToFiles(pagesFolder, pagesContent),
-  ]);
+  await Promise.all([writeConfigFile(root, dom), writePagesToFiles(pagesFolder, pagesContent)]);
 }
 
 async function loadDomFromDisk(): Promise<appDom.AppDom> {
@@ -739,6 +728,31 @@ export async function readProjectFolder(): Promise<ProjectFolderEntry[]> {
   });
 }
 
+async function migrateLegacyPages(root: string) {
+  const dom = await loadConfigFile(root);
+  const { pages: pagesContent, dom: domWithoutPages } = extractPagesFromDom(dom);
+  if (Object.keys(pagesContent).length > 0) {
+    const pagesFolder = getPagesFolder(root);
+    await Promise.all([
+      writePagesToFiles(pagesFolder, pagesContent),
+      writeConfigFile(root, domWithoutPages),
+    ]);
+  }
+}
+
+async function migrateLegacyComponents(root: string) {
+  const dom = await loadConfigFile(root);
+  const { components: componentsContent, dom: domWithoutComponents } =
+    extractComponentsContentFromDom(dom);
+  if (Object.keys(componentsContent).length > 0) {
+    const pagesFolder = getPagesFolder(root);
+    await Promise.all([
+      writeCodeComponentsToFiles(pagesFolder, componentsContent),
+      writeConfigFile(root, domWithoutComponents),
+    ]);
+  }
+}
+
 async function migrateProject(root: string) {
   let dom = await loadConfigFile(root);
   const domVersion = dom.version ?? 0;
@@ -763,15 +777,8 @@ async function migrateProject(root: string) {
     await writeConfigFile(root, dom);
   }
 
-  const { pages: pagesContent, dom: domWithoutPages } = extractPagesFromDom(dom);
-  if (Object.keys(pagesContent).length > 0) {
-    dom = domWithoutPages;
-    const pagesFolder = getPagesFolder(root);
-    await Promise.all([
-      writePagesToFiles(pagesFolder, pagesContent),
-      writeConfigFile(root, domWithoutPages),
-    ]);
-  }
+  await migrateLegacyPages(root);
+  await migrateLegacyComponents(root);
 }
 
 async function initProjectFolder(): Promise<void> {

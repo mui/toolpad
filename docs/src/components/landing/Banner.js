@@ -16,8 +16,9 @@ export default function Banner(props) {
       <Container
         sx={{
           pt: 0,
-          pb: { xs: 2, sm: 8, md: docs ? 1 : 12 },
+          pb: { xs: 2, sm: 8, md: docs ? 1 : 8 },
           px: docs ? { xs: 0, sm: 0, md: 0 } : 'default',
+          mb: 4,
           display: 'flex',
           flexDirection: 'row',
           justifyContent: 'center',

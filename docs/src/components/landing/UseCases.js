@@ -5,22 +5,13 @@ import Container from '@mui/material/Container';
 import Typography from '@mui/material/Typography';
 import Grid from '@mui/material/Unstable_Grid2';
 import SectionHeadline from 'docs/src/components/typography/SectionHeadline';
-import { alpha } from '@mui/material/styles';
-
-const cardRootStyle = () => ({
-  px: 0,
-  pb: 3,
-  pt: 0,
-  height: '100%',
-  maxWidth: 360,
-});
 
 const cardMediaStyle = (imageUrl) => ({
   display: 'block',
   backgroundRepeat: 'no-repeat',
   backgroundPosition: 'center',
   objectFit: 'contain',
-  background: `#001E3C url(${imageUrl})`,
+  background: (theme) => `${theme.palette.primaryDark[800]} url(${imageUrl})`,
   backgroundSize: 'cover',
   borderRadius: '8px',
   paddingTop: '55%',
@@ -42,9 +33,9 @@ export default function CardGrid(props) {
             : `radial-gradient(200% 150% at 50% 80%, transparent 30%, ${theme.palette.primary[100]} 100%, ${theme.palette.primary[50]} 0)`,
       }}
     >
-      <Container sx={{ py: { xs: 4, sm: 12 } }}>
+      <Container sx={{ py: { xs: 8, sm: 12 } }}>
         <SectionHeadline overline={content.overline} title={content.Headline} />
-        <Grid container spacing={6} columns={{ xs: 1, sm: 3 }}>
+        <Grid container columns={{ xs: 1, sm: 3 }} spacing={4}>
           {content.cards.map(({ title, imageUrl, description }) => (
             <Grid xs={3} sm={1}>
               <Box key={title}>
@@ -53,7 +44,7 @@ export default function CardGrid(props) {
                   <Typography component="h3" fontWeight="medium" color="text.primary" mb={0.5}>
                     {title}
                   </Typography>
-                  <Typography variant="body2" color="text.secondary">
+                  <Typography variant="body" color="text.secondary">
                     {description}
                   </Typography>
                 </Box>

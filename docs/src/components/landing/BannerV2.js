@@ -7,17 +7,17 @@ import Typography from '@mui/material/Typography';
 import KeyboardArrowRightRounded from '@mui/icons-material/KeyboardArrowRightRounded';
 
 function BannerV2(props) {
-  const { title, description, href, label, category, action, docs } = props;
+  const { title, description, href, label, category, action } = props;
   return (
     <Container
-      sx={(theme) => ({
+      sx={{
         mx: 0,
         minWidth: '100%',
         py: { xs: 4, sm: 8 },
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
-      })}
+      }}
     >
       <Typography
         textAlign="center"
@@ -66,7 +66,6 @@ BannerV2.propTypes = {
   action: PropTypes.string.isRequired,
   category: PropTypes.string.isRequired,
   description: PropTypes.string.isRequired,
-  docs: PropTypes.bool,
   href: PropTypes.string.isRequired,
   label: PropTypes.string.isRequired,
   title: PropTypes.string,

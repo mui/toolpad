@@ -24,7 +24,7 @@ export default {
 
         return node;
       }),
-      version: 6,
+      version: 7,
     };
   },
 };

@@ -531,6 +531,8 @@ export default function AppProvider({ children }: DomContextProps) {
     [dispatchWithHistory, scheduleTextInputHistoryUpdate],
   );
 
+  const fingerprint = React.useRef<number | undefined>();
+
   const handleSave = React.useCallback(() => {
     if (!state.dom || state.savingDom || state.savedDom === state.dom) {
       return;
@@ -540,7 +542,8 @@ export default function AppProvider({ children }: DomContextProps) {
     dispatch({ type: 'DOM_SAVING' });
     client.mutation
       .saveDom(domToSave)
-      .then(() => {
+      .then(({ fingerprint: newFingerPrint }) => {
+        fingerprint.current = newFingerPrint;
         dispatch({ type: 'DOM_SAVED', savedDom: domToSave });
       })
       .catch((err) => {
@@ -573,7 +576,6 @@ export default function AppProvider({ children }: DomContextProps) {
   useShortcut({ key: 's', metaKey: true }, handleSave);
 
   // Quick and dirty polling for dom updates
-  const fingerprint = React.useRef<number | undefined>();
   React.useEffect(() => {
     let active = true;
 

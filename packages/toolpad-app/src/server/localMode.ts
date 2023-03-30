@@ -292,7 +292,9 @@ async function migrateProject(root: string) {
         'info',
       )}  - This project was created by an older version of Toolpad. Upgrading...`,
     );
+
     dom = migrateUp(dom);
+
     await writeConfigFile(root, dom);
   }
 }
@@ -696,14 +698,6 @@ async function writeDomToDisk(dom: appDom.AppDom): Promise<void> {
   ]);
 }
 
-export async function saveLocalDom(dom: appDom.AppDom): Promise<void> {
-  if (config.cmd !== 'dev') {
-    throw new Error(`Writing to disk is only possible in toolpad dev mode.`);
-  }
-
-  await writeDomToDisk(dom);
-}
-
 async function loadDomFromDisk(): Promise<appDom.AppDom> {
   const root = getUserProjectRoot();
   const [configContent, componentsContent, pagesContent] = await Promise.all([
@@ -800,4 +794,16 @@ export async function readProjectFolder(): Promise<ProjectFolderEntry[]> {
     }
     return [];
   });
+}
+
+export async function saveLocalDom(dom: appDom.AppDom): Promise<{ fingerprint: number }> {
+  if (config.cmd !== 'dev') {
+    throw new Error(`Writing to disk is only possible in toolpad dev mode.`);
+  }
+
+  await writeDomToDisk(dom);
+
+  const fingerprint = await getDomFingerprint();
+
+  return { fingerprint };
 }

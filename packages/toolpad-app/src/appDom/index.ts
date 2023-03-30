@@ -355,17 +355,14 @@ export function assertIsMutation<P>(node: AppDomNode): asserts node is MutationN
   assertIsType<MutationNode>(node, 'mutation');
 }
 
-export function getRoot(dom: AppDom): AppNode {
-  const rootNode = getNode(dom, dom.root);
-  assertIsApp(rootNode);
-  return rootNode;
+export function getRoot(dom: AppDom): AppDomNode {
+  return getNode(dom, dom.root);
 }
 
-/**
- * @deprecated use getRoot()
- */
 export function getApp(dom: AppDom): AppNode {
-  return getRoot(dom);
+  const app = getRoot(dom);
+  assertIsApp(app);
+  return app;
 }
 
 export type NodeChildren<N extends AppDomNode = any> = ChildNodesOf<N>;

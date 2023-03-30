@@ -17,7 +17,7 @@ import { pascalCase, removeDiacritics, uncapitalize } from '../utils/strings';
 import { ExactEntriesOf, Maybe } from '../utils/types';
 import { mapProperties, mapValues } from '../utils/collections';
 
-export const CURRENT_APPDOM_VERSION = 7;
+export const CURRENT_APPDOM_VERSION = 6;
 
 export const RESERVED_NODE_PROPERTIES = [
   'id',

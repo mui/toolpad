@@ -176,7 +176,7 @@ export async function execfetch(
   { connection, jsRuntime, fetchImpl }: ExecBaseOptions,
 ): Promise<FetchResult> {
   const queryScope = {
-    // TODO: remove deprecated query after v1
+    // @TODO: remove deprecated query after v1
     query: params,
     parameters: params,
   };

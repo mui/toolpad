@@ -12,6 +12,10 @@ const versions = [v1, v2, v3, v4, v5, v6, v7];
 
 invariant(versions.length === appDom.CURRENT_APPDOM_VERSION, 'Unable to find the latest version');
 
+export function isUpToDate(dom: appDom.AppDom) {
+  return dom.version === appDom.CURRENT_APPDOM_VERSION;
+}
+
 export function migrateUp(
   fromDom: appDom.AppDom,
   toVersion = appDom.CURRENT_APPDOM_VERSION,

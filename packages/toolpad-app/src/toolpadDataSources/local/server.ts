@@ -15,7 +15,7 @@ import { Maybe } from '../../utils/types';
 import {
   getUserProjectRoot,
   isInitialized,
-  openCodeEditor,
+  openQueryEditor,
   QUERIES_FILE,
   readProjectFolder,
 } from '../../server/localMode';
@@ -478,7 +478,7 @@ async function execPrivate(connection: Maybe<LocalConnectionParams>, query: Loca
     case 'debugExec':
       return execBase(connection, query.query, query.params);
     case 'openEditor':
-      return openCodeEditor(QUERIES_FILE);
+      return openQueryEditor();
     default:
       throw new Error(`Unknown private query "${(query as LocalPrivateQuery).kind}"`);
   }

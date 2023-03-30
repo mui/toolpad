@@ -37,7 +37,7 @@ export default function CardGrid(props) {
         <SectionHeadline overline={content.overline} title={content.Headline} />
         <Grid container columns={{ xs: 1, sm: 3 }} spacing={4}>
           {content.cards.map(({ title, imageUrl, description }) => (
-            <Grid xs={3} sm={1}>
+            <Grid key={title} xs={3} sm={1}>
               <Box key={title}>
                 <Box sx={cardMediaStyle(imageUrl)} />
                 <Box mt={2}>
@@ -69,5 +69,4 @@ CardGrid.propTypes = {
     Headline: PropTypes.node.isRequired,
     overline: PropTypes.string.isRequired,
   }).isRequired,
-  darker: PropTypes.bool,
 };

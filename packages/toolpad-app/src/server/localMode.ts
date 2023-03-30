@@ -657,7 +657,8 @@ async function loadDomFromDisk(): Promise<appDom.AppDom> {
     loadPagesFromFiles(root),
   ]);
   let dom = configContent;
-  dom = mergeComponentsContentIntoDom(configContent, componentsContent);
+
+  dom = mergeComponentsContentIntoDom(dom, componentsContent);
 
   const app = appDom.getApp(dom);
   const { pages = [] } = appDom.getChildNodes(dom, app);
@@ -665,7 +666,7 @@ async function loadDomFromDisk(): Promise<appDom.AppDom> {
     dom = appDom.removeNode(dom, page.id);
   }
 
-  dom = mergPagesIntoDom(configContent, pagesContent);
+  dom = mergPagesIntoDom(dom, pagesContent);
   return dom;
 }
 
@@ -759,14 +760,17 @@ async function migrateProject(root: string) {
 
     dom = migrateUp(dom);
 
-    const { pages: pagesContent, dom: domWithoutPages } = extractPagesFromDom(dom);
-    if (Object.keys(pagesContent).length > 0) {
-      dom = domWithoutPages;
-      const pagesFolder = getPagesFolder(root);
-      await writePagesToFiles(pagesFolder, pagesContent);
-    }
-
     await writeConfigFile(root, dom);
+  }
+
+  const { pages: pagesContent, dom: domWithoutPages } = extractPagesFromDom(dom);
+  if (Object.keys(pagesContent).length > 0) {
+    dom = domWithoutPages;
+    const pagesFolder = getPagesFolder(root);
+    await Promise.all([
+      writePagesToFiles(pagesFolder, pagesContent),
+      writeConfigFile(root, domWithoutPages),
+    ]);
   }
 }
 

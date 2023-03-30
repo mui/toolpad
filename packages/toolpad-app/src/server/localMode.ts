@@ -274,50 +274,6 @@ async function initGeneratedGitignore(root: string) {
   }
 }
 
-async function migrateProject(root: string) {
-  let dom = await loadConfigFile(root);
-  const domVersion = dom.version ?? 0;
-  if (domVersion > appDom.CURRENT_APPDOM_VERSION) {
-    console.error(
-      `${chalk.red(
-        'error',
-      )} - This project was created with a newer version of Toolpad, please upgrade your ${chalk.cyan(
-        '@mui/toolpad',
-      )} installation`,
-    );
-  } else if (domVersion < appDom.CURRENT_APPDOM_VERSION) {
-    // eslint-disable-next-line no-console
-    console.log(
-      `${chalk.blue(
-        'info',
-      )}  - This project was created by an older version of Toolpad. Upgrading...`,
-    );
-
-    dom = migrateUp(dom);
-
-    await writeConfigFile(root, dom);
-  }
-}
-
-async function initProjectFolder(): Promise<void> {
-  try {
-    const root = getUserProjectRoot();
-
-    await initToolpadFolder(root);
-    await Promise.all([initGeneratedGitignore(root), initToolpadFile(root)]);
-    await migrateProject(root);
-  } catch (err) {
-    console.error(`${chalk.red('error')} - Failed to intialize Toolpad`);
-    console.error(err);
-    process.exit(1);
-  }
-}
-
-// eslint-disable-next-line no-underscore-dangle
-(globalThis as any).__init_project__ ??= initProjectFolder();
-// eslint-disable-next-line no-underscore-dangle
-export const isInitialized = (globalThis as any).__init_project__;
-
 async function writeCodeComponentsToFiles(
   componentsFolder: string,
   components: ComponentsContent,
@@ -631,16 +587,14 @@ interface ExtractedPages {
   dom: appDom.AppDom;
 }
 
-function extractNewPagesFromDom(dom: appDom.AppDom): ExtractedPages {
+function extractPagesFromDom(dom: appDom.AppDom): ExtractedPages {
   const rootNode = appDom.getApp(dom);
   const { pages: pageNodes = [] } = appDom.getChildNodes(dom, rootNode);
 
   const pages: PagesContent = {};
 
   for (const pageNode of pageNodes) {
-    if (pageNode.attributes.isNew?.value) {
-      pages[pageNode.name] = expandFromDom(pageNode, dom);
-    }
+    pages[pageNode.name] = expandFromDom(pageNode, dom);
     dom = appDom.removeNode(dom, pageNode.id);
   }
 
@@ -688,7 +642,7 @@ async function writeDomToDisk(dom: appDom.AppDom): Promise<void> {
     extractNewComponentsContentFromDom(dom);
   dom = domWithoutComponents;
 
-  const { pages: pagesContent, dom: domWithoutPages } = extractNewPagesFromDom(dom);
+  const { pages: pagesContent, dom: domWithoutPages } = extractPagesFromDom(dom);
   dom = domWithoutPages;
 
   await Promise.all([
@@ -715,15 +669,6 @@ async function loadDomFromDisk(): Promise<appDom.AppDom> {
   }
 
   dom = mergPagesIntoDom(configContent, pagesContent);
-  return dom;
-}
-
-export async function loadLocalDom(): Promise<appDom.AppDom> {
-  await isInitialized;
-  const dom = await loadDomFromDisk();
-  if (!isUpToDate(dom)) {
-    throw new Error(`Incompatible dom`);
-  }
   return dom;
 }
 
@@ -794,6 +739,69 @@ export async function readProjectFolder(): Promise<ProjectFolderEntry[]> {
     }
     return [];
   });
+}
+
+async function migrateProject(root: string) {
+  let dom = await loadConfigFile(root);
+  const domVersion = dom.version ?? 0;
+  if (domVersion > appDom.CURRENT_APPDOM_VERSION) {
+    console.error(
+      `${chalk.red(
+        'error',
+      )} - This project was created with a newer version of Toolpad, please upgrade your ${chalk.cyan(
+        '@mui/toolpad',
+      )} installation`,
+    );
+  } else if (domVersion < appDom.CURRENT_APPDOM_VERSION) {
+    // eslint-disable-next-line no-console
+    console.log(
+      `${chalk.blue(
+        'info',
+      )}  - This project was created by an older version of Toolpad. Upgrading...`,
+    );
+
+    dom = migrateUp(dom);
+
+    const { pages: pagesContent, dom: domWithoutPages } = extractPagesFromDom(dom);
+    if (Object.keys(pagesContent).length > 0) {
+      dom = domWithoutPages;
+      const pagesFolder = getPagesFolder(root);
+      await writePagesToFiles(pagesFolder, pagesContent);
+    }
+
+    await writeConfigFile(root, dom);
+  }
+}
+
+async function initProjectFolder(): Promise<void> {
+  try {
+    const root = getUserProjectRoot();
+
+    await initToolpadFolder(root);
+    await Promise.all([initGeneratedGitignore(root), initToolpadFile(root)]);
+    await migrateProject(root);
+  } catch (err) {
+    console.error(`${chalk.red('error')} - Failed to intialize Toolpad`);
+    console.error(err);
+    process.exit(1);
+  }
+}
+
+// eslint-disable-next-line no-underscore-dangle
+(globalThis as any).__init_project__ ??= initProjectFolder();
+
+export async function waitForInit() {
+  // eslint-disable-next-line no-underscore-dangle
+  await (globalThis as any).__init_project__;
+}
+
+export async function loadLocalDom(): Promise<appDom.AppDom> {
+  await waitForInit();
+  const dom = await loadDomFromDisk();
+  if (!isUpToDate(dom)) {
+    throw new Error(`Incompatible dom`);
+  }
+  return dom;
 }
 
 export async function saveLocalDom(dom: appDom.AppDom): Promise<{ fingerprint: number }> {

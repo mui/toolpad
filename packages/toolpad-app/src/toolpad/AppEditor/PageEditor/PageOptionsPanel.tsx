@@ -45,7 +45,7 @@ export default function PageOptionsPanel() {
         <NodeNameEditor node={page} />
         <TextField
           select
-          defaultValue={PAGE_DISPLAY_OPTIONS[0].value}
+          defaultValue="shell"
           value={page.attributes.defaultDisplay?.value}
           onChange={handleDisplayModeChange}
           label="Display mode"

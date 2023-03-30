@@ -55,7 +55,7 @@ The most powerful way of bringing data into Toolpad is through serverside JavaSc
 To be really useful, these backend functions need to be parametrizable with actual state on the page. You can do so by wrapping them in our `createQuery` function.
 
 ```tsx
-import { createQuery } from '@mui/toolpad-core';
+import { createQuery } from '@mui/toolpad/server';
 
 export const example = createQuery(
   async ({ parameters }) => {

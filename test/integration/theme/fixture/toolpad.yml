@@ -1,0 +1,57 @@
+nodes:
+  m20v9f3:
+    name: Application
+    attributes: {}
+    id: m20v9f3
+    type: app
+    parentId: null
+    parentProp: null
+    parentIndex: null
+  m31v9c7:
+    name: Page1
+    attributes:
+      title:
+        type: const
+        value: Page 1
+    id: m31v9c7
+    type: page
+    parentId: m20v9f3
+    parentProp: pages
+    parentIndex: a0
+  3213l6x:
+    name: pageRow
+    props: {}
+    attributes:
+      component:
+        type: const
+        value: PageRow
+    layout: {}
+    id: 3213l6x
+    type: element
+    parentId: m31v9c7
+    parentProp: children
+    parentIndex: a0
+  nl03lnv:
+    name: button
+    props: {}
+    attributes:
+      component:
+        type: const
+        value: Button
+    layout: {}
+    id: nl03lnv
+    type: element
+    parentId: 3213l6x
+    parentProp: children
+    parentIndex: a0
+  p123lgu:
+    name: Theme
+    theme: {}
+    attributes: {}
+    id: p123lgu
+    type: theme
+    parentId: m20v9f3
+    parentProp: themes
+    parentIndex: a0
+root: m20v9f3
+version: 6

@@ -1,32 +1,16 @@
 import { NextApiHandler } from 'next';
 import type { IncomingMessage, ServerResponse } from 'http';
 import superjson from 'superjson';
-import {
-  getApps,
-  getApp,
-  getActiveDeployments,
-  createApp,
-  updateApp,
-  duplicateApp,
-  execQuery,
-  dataSourceFetchPrivate,
-  loadDom,
-  saveDom,
-  createRelease,
-  getReleases,
-  getRelease,
-  createDeployment,
-  findActiveDeployment,
-  findLastRelease,
-  deleteApp,
-  deploy,
-  getDeployments,
-} from '../../src/server/data';
+import { execQuery, dataSourceFetchPrivate, loadDom, saveDom } from '../../src/server/data';
 import { getLatestToolpadRelease } from '../../src/server/getLatestRelease';
 import { hasOwnProperty } from '../../src/utils/collections';
 import { errorFrom, serializeError } from '../../src/utils/errors';
 import logger from '../../src/server/logs/logger';
-import { getDomFingerprint, openCodeComponentEditor } from '../../src/server/localMode';
+import {
+  createComponent,
+  getDomFingerprint,
+  openCodeComponentEditor,
+} from '../../src/server/localMode';
 
 export interface Method<P extends any[] = any[], R = any> {
   (...params: P): Promise<R>;
@@ -130,35 +114,11 @@ const rpcServer = {
     dataSourceFetchPrivate: createMethod<typeof dataSourceFetchPrivate>(({ params }) => {
       return dataSourceFetchPrivate(...params);
     }),
-    getApps: createMethod<typeof getApps>(({ params }) => {
-      return getApps(...params);
-    }),
-    getActiveDeployments: createMethod<typeof getActiveDeployments>(({ params }) => {
-      return getActiveDeployments(...params);
-    }),
-    getDeployments: createMethod<typeof getDeployments>(({ params }) => {
-      return getDeployments(...params);
-    }),
-    getApp: createMethod<typeof getApp>(({ params }) => {
-      return getApp(...params);
-    }),
     execQuery: createMethod<typeof execQuery>(({ params }) => {
       return execQuery(...params);
     }),
-    getReleases: createMethod<typeof getReleases>(({ params }) => {
-      return getReleases(...params);
-    }),
-    getRelease: createMethod<typeof getRelease>(({ params }) => {
-      return getRelease(...params);
-    }),
-    findActiveDeployment: createMethod<typeof findActiveDeployment>(({ params }) => {
-      return findActiveDeployment(...params);
-    }),
     loadDom: createMethod<typeof loadDom>(({ params }) => {
       return loadDom(...params);
-    }),
-    findLastRelease: createMethod<typeof findLastRelease>(({ params }) => {
-      return findLastRelease(...params);
     }),
     getLatestToolpadRelease: createMethod<typeof getLatestToolpadRelease>(({ params }) => {
       return getLatestToolpadRelease(...params);
@@ -168,32 +128,14 @@ const rpcServer = {
     }),
   },
   mutation: {
-    createApp: createMethod<typeof createApp>(({ params }) => {
-      return createApp(...params);
-    }),
-    updateApp: createMethod<typeof updateApp>(({ params }) => {
-      return updateApp(...params);
-    }),
-    duplicateApp: createMethod<typeof duplicateApp>(({ params }) => {
-      return duplicateApp(...params);
-    }),
-    deleteApp: createMethod<typeof deleteApp>(({ params }) => {
-      return deleteApp(...params);
-    }),
-    createRelease: createMethod<typeof createRelease>(({ params }) => {
-      return createRelease(...params);
-    }),
-    createDeployment: createMethod<typeof createDeployment>(({ params }) => {
-      return createDeployment(...params);
-    }),
-    deploy: createMethod<typeof deploy>(({ params }) => {
-      return deploy(...params);
-    }),
     saveDom: createMethod<typeof saveDom>(({ params }) => {
       return saveDom(...params);
     }),
     openCodeComponentEditor: createMethod<typeof openCodeComponentEditor>(({ params }) => {
       return openCodeComponentEditor(...params);
+    }),
+    createComponent: createMethod<typeof createComponent>(({ params }) => {
+      return createComponent(...params);
     }),
   },
 } as const;

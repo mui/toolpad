@@ -1,4 +1,5 @@
 import { expect, FrameLocator, Locator, Page } from '@playwright/test';
+import { setTimeout } from 'timers/promises';
 import { gotoIfNotCurrent } from './shared';
 
 class CreatePageDialog {
@@ -55,6 +56,8 @@ export class ToolpadEditor {
 
   readonly componentEditor: Locator;
 
+  readonly themeEditor: Locator;
+
   readonly appCanvas: FrameLocator;
 
   readonly pageRoot: Locator;
@@ -71,11 +74,13 @@ export class ToolpadEditor {
     this.createPageBtn = page.locator('[aria-label="Create page"]');
     this.createPageDialog = new CreatePageDialog(page);
 
-    this.createComponentBtn = page.locator('[aria-label="Create component"]');
-    this.createComponentDialog = new CreateComponentDialog(page);
-
     this.componentCatalog = page.getByTestId('component-catalog');
     this.componentEditor = page.getByTestId('component-editor');
+
+    this.themeEditor = page.getByTestId('theme-editor');
+
+    this.createComponentBtn = this.componentCatalog.getByRole('button', { name: 'Create' });
+    this.createComponentDialog = new CreateComponentDialog(page);
 
     this.appCanvas = page.frameLocator('[name=data-toolpad-canvas]');
     this.pageRoot = this.appCanvas.getByTestId('page-root');
@@ -85,8 +90,8 @@ export class ToolpadEditor {
     this.confirmationDialog = page.getByRole('dialog').filter({ hasText: 'Confirm' });
   }
 
-  async goto(appId: string) {
-    await gotoIfNotCurrent(this.page, `/_toolpad/app/${appId}`);
+  async goto() {
+    await gotoIfNotCurrent(this.page, `/_toolpad/app`);
   }
 
   async createPage(name: string) {
@@ -101,28 +106,20 @@ export class ToolpadEditor {
   }
 
   async createComponent(name: string) {
+    await this.componentCatalog.hover();
     await this.createComponentBtn.click();
     await this.createComponentDialog.nameInput.fill(name);
-    await Promise.all([
-      this.createComponentDialog.createButton.click(),
-      this.page.waitForNavigation(),
-    ]);
+    await this.createComponentDialog.createButton.click();
   }
 
-  waitForOverlay() {
-    return expect(this.pageOverlay).toBeVisible();
+  async waitForOverlay() {
+    await this.pageOverlay.waitFor({ state: 'visible' });
+    // Some tests seem to be flaky around this waitFor and perform better with a short timeout
+    // Not sure yet where the race condition is happening
+    await setTimeout(100);
   }
 
-  async dragToAppCanvas(
-    sourceSelector: string,
-    isSourceInCanvas: boolean,
-    moveTargetX: number,
-    moveTargetY: number,
-  ) {
-    const sourceLocator = isSourceInCanvas
-      ? this.appCanvas.locator(sourceSelector)
-      : this.page.locator(sourceSelector);
-
+  async dragToAppCanvas(sourceLocator: Locator, moveTargetX: number, moveTargetY: number) {
     const sourceBoundingBox = await sourceLocator.boundingBox();
     const targetBoundingBox = await this.pageRoot.boundingBox();
 
@@ -153,15 +150,17 @@ export class ToolpadEditor {
     // Account for opening transition
     await this.page.waitForTimeout(200);
 
-    const sourceSelector = `data-testid=component-catalog >> div:has-text("${componentName}")[draggable]`;
-
     const targetBoundingBox = await this.pageRoot.boundingBox();
     expect(targetBoundingBox).toBeDefined();
 
     const moveTargetX = targetBoundingBox!.x + targetBoundingBox!.width / 2;
     const moveTargetY = targetBoundingBox!.y + targetBoundingBox!.height / 2;
 
-    this.dragToAppCanvas(sourceSelector, false, moveTargetX, moveTargetY);
+    const sourceLocator = this.page.getByTestId('component-catalog').getByRole('button', {
+      name: componentName,
+    });
+
+    this.dragToAppCanvas(sourceLocator, moveTargetX, moveTargetY);
   }
 
   hierarchyItem(group: string, name: string): Locator {

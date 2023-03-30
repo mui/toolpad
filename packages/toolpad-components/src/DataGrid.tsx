@@ -37,7 +37,7 @@ import { getObjectKey } from '@mui/toolpad-core/objectKey';
 import { errorFrom } from '@mui/toolpad-core/utils/errors';
 import { hasImageExtension } from '@mui/toolpad-core/path';
 import { ErrorBoundary, FallbackProps } from 'react-error-boundary';
-import { SX_PROP_HELPER_TEXT } from './constants';
+import { SX_PROP_HELPER_TEXT } from './constants.js';
 
 const DEFAULT_COLUMN_TYPES = getGridDefaultColumnTypes();
 
@@ -591,6 +591,7 @@ export default createComponent(DataGridComponent, {
       helperText: 'The currently selected row. Or `null` in case no row has been selected.',
       typeDef: { type: 'object', default: null },
       onChangeProp: 'onSelectionChange',
+      tsType: `ThisComponent['rows'][number] | undefined`,
     },
     density: {
       helperText:

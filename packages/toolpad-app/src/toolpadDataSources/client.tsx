@@ -1,5 +1,4 @@
 import * as _ from 'lodash-es';
-import functionSrc from './function/client';
 import postgres from './postgres/client';
 import mysql from './mysql/client';
 import rest from './rest/client';
@@ -13,11 +12,10 @@ type ClientDataSources = { [key: string]: ClientDataSource<any, any> | undefined
 
 export const allClientDataSources: ClientDataSources = {
   rest,
-  function: functionSrc,
   postgres,
   googleSheets,
   mysql,
-  ...(config.localMode ? { local } : {}),
+  local,
 };
 
 const clientDataSources = _.pick(allClientDataSources, [

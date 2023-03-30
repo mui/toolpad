@@ -15,7 +15,6 @@ import useEvent from '../utils/useEvent';
 import { NodeHashes } from '../types';
 import { hasFieldFocus } from '../utils/fields';
 import { DomView, getViewFromPathname, PageViewTab } from '../utils/domView';
-import config from '../config';
 
 export function getNodeHashes(dom: appDom.AppDom): NodeHashes {
   return mapValues(dom.nodes, (node) => insecureHash(JSON.stringify(node)));
@@ -446,12 +445,11 @@ function isCancellableAction(action: AppStateAction): boolean {
 }
 
 export interface DomContextProps {
-  appId: string;
   children?: React.ReactNode;
 }
 
-export default function AppProvider({ appId, children }: DomContextProps) {
-  const { data: dom } = client.useQuery('loadDom', [appId], { suspense: true });
+export default function AppProvider({ children }: DomContextProps) {
+  const { data: dom } = client.useQuery('loadDom', [], { suspense: true });
 
   invariant(dom, 'Suspense should load the dom');
 
@@ -541,14 +539,14 @@ export default function AppProvider({ appId, children }: DomContextProps) {
     const domToSave = state.dom;
     dispatch({ type: 'DOM_SAVING' });
     client.mutation
-      .saveDom(appId, domToSave)
+      .saveDom(domToSave)
       .then(() => {
         dispatch({ type: 'DOM_SAVED', savedDom: domToSave });
       })
       .catch((err) => {
         dispatch({ type: 'DOM_SAVING_ERROR', error: err.message });
       });
-  }, [appId, state]);
+  }, [state]);
 
   const debouncedHandleSave = useDebouncedHandler(handleSave, 100);
 
@@ -577,10 +575,6 @@ export default function AppProvider({ appId, children }: DomContextProps) {
   // Quick and dirty polling for dom updates
   const fingerprint = React.useRef<number | undefined>();
   React.useEffect(() => {
-    if (!config.localMode) {
-      return () => {};
-    }
-
     let active = true;
 
     (async () => {
@@ -590,7 +584,7 @@ export default function AppProvider({ appId, children }: DomContextProps) {
           // eslint-disable-next-line no-await-in-loop
           const newFingerPrint = await client.query.getDomFingerprint();
           if (currentFingerprint && currentFingerprint !== newFingerPrint) {
-            client.invalidateQueries('loadDom', [appId]);
+            client.invalidateQueries('loadDom', []);
           }
           fingerprint.current = newFingerPrint;
           // eslint-disable-next-line no-await-in-loop
@@ -606,7 +600,7 @@ export default function AppProvider({ appId, children }: DomContextProps) {
     return () => {
       active = false;
     };
-  }, [appId]);
+  }, []);
 
   return (
     <AppStateProvider value={state}>

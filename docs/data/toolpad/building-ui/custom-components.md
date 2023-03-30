@@ -21,7 +21,7 @@ The file has been initialized with a sample component. Replace its content with 
 ```tsx
 import * as React from 'react';
 import { Paper, Typography, Stack } from '@mui/material';
-import { createComponent } from '@mui/toolpad-core';
+import { createComponent } from '@mui/toolpad/browser';
 
 export interface NumberDisplayProps {
   label: string;

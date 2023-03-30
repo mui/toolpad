@@ -12,9 +12,6 @@ import {
   Typography,
   Alert,
   styled,
-  Checkbox,
-  FormControlLabel,
-  FormGroup,
 } from '@mui/material';
 import { Controller, useForm } from 'react-hook-form';
 import { TabContext, TabList } from '@mui/lab';
@@ -65,10 +62,6 @@ import QueryPreview from '../QueryPreview';
 const HTTP_METHODS = ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'HEAD'];
 
 const QUERY_SCOPE_META: ScopeMeta = {
-  query: {
-    deprecated: 'Use parameters variable instead',
-    description: 'Parameters that can be bound to app scope variables',
-  },
   parameters: {
     description: 'Parameters that can be bound to app scope variables',
   },
@@ -294,13 +287,6 @@ function QueryEditor({
     [setInput],
   );
 
-  const handleRunInBrowserChange = React.useCallback(
-    (event: React.ChangeEvent<HTMLInputElement>) => {
-      setInput((existing) => appDom.setQueryProp(existing, 'browser', event.target.checked));
-    },
-    [setInput],
-  );
-
   const handleTransformEnabledChange = React.useCallback(
     (transformEnabled: boolean) => {
       setInput((existing) => appDom.setQueryProp(existing, 'transformEnabled', transformEnabled));
@@ -363,8 +349,6 @@ function QueryEditor({
 
   const queryScope = React.useMemo(
     () => ({
-      // TODO mark query as @deprecated remove after v1
-      query: previewParams,
       parameters: previewParams,
     }),
     [previewParams],
@@ -428,25 +412,7 @@ function QueryEditor({
   return (
     <SplitPane split="vertical" size="50%" allowResize>
       <SplitPane split="horizontal" size={85} primary="second" allowResize>
-        <QueryInputPanel
-          onRunPreview={handleRunPreview}
-          actions={
-            config.localMode ? undefined : (
-              <FormGroup>
-                <FormControlLabel
-                  control={
-                    <Checkbox
-                      checked={isBrowserSide}
-                      onChange={handleRunInBrowserChange}
-                      disabled={config.isDemo}
-                    />
-                  }
-                  label="Run in the browser"
-                />
-              </FormGroup>
-            )
-          }
-        >
+        <QueryInputPanel onRunPreview={handleRunPreview}>
           <Stack gap={2} sx={{ px: 3, pt: 1 }}>
             <Typography>Query</Typography>
             <Box sx={{ display: 'flex', flexDirection: 'row', gap: 1 }}>

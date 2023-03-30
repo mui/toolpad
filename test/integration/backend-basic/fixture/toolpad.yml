@@ -1,0 +1,309 @@
+root: 5q0xd7j
+nodes:
+  0yp3pg4:
+    id: 0yp3pg4
+    name: pageRow1
+    type: element
+    props: {}
+    layout: {}
+    parentId: 5q1xd0t
+    attributes:
+      component:
+        type: const
+        value: PageRow
+    parentProp: children
+    parentIndex: a1
+  3bv3ppv:
+    id: 3bv3ppv
+    name: typography2
+    type: element
+    props:
+      value:
+        type: jsExpression
+        value: |
+          `throws, data ${throws.data}`
+    layout: {}
+    parentId: ipw3psy
+    attributes:
+      component:
+        type: const
+        value: Text
+    parentProp: children
+    parentIndex: a0
+  5q0xd7j:
+    id: 5q0xd7j
+    name: Application
+    type: app
+    parentId: null
+    attributes: {}
+    parentProp: null
+    parentIndex: null
+  5q1xd0t:
+    id: 5q1xd0t
+    name: page1
+    type: page
+    parentId: 5q0xd7j
+    attributes:
+      title:
+        type: const
+        value: Page 1
+    parentProp: pages
+    parentIndex: a0
+  6gl3pm4:
+    id: 6gl3pm4
+    name: pageRow
+    type: element
+    props: {}
+    layout: {}
+    parentId: 5q1xd0t
+    attributes:
+      component:
+        type: const
+        value: PageRow
+    parentProp: children
+    parentIndex: a0
+  bv33p6x:
+    id: bv33p6x
+    name: pageRow4
+    type: element
+    props: {}
+    layout: {}
+    parentId: 5q1xd0t
+    attributes:
+      component:
+        type: const
+        value: PageRow
+    parentProp: children
+    parentIndex: a4
+  ipw3psy:
+    id: ipw3psy
+    name: pageRow2
+    type: element
+    props: {}
+    layout: {}
+    parentId: 5q1xd0t
+    attributes:
+      component:
+        type: const
+        value: PageRow
+    parentProp: children
+    parentIndex: a2
+  oe93prg:
+    id: oe93prg
+    name: typography4
+    type: element
+    props:
+      value:
+        type: jsExpression
+        value: |
+          `echo, secret: ${echo.data.secrets.bar}`
+    layout: {}
+    parentId: x0b3py9
+    attributes:
+      component:
+        type: const
+        value: Text
+    parentProp: children
+    parentIndex: a0
+  v9o3p9k:
+    id: v9o3p9k
+    name: typography1
+    type: element
+    props:
+      value:
+        type: jsExpression
+        value: |
+          `throws, error.message: ${throws.error.message}`
+    layout: {}
+    parentId: 0yp3pg4
+    attributes:
+      component:
+        type: const
+        value: Text
+    parentProp: children
+    parentIndex: a0
+  x0b3py9:
+    id: x0b3py9
+    name: pageRow6
+    type: element
+    props: {}
+    layout: {}
+    parentId: 5q1xd0t
+    attributes:
+      component:
+        type: const
+        value: PageRow
+    parentProp: children
+    parentIndex: a5
+  yik3pld:
+    id: yik3pld
+    name: typography
+    type: element
+    props:
+      value:
+        type: jsExpression
+        value: |
+          `hello, message: ${hello.data.message}`
+    layout: {}
+    parentId: 6gl3pm4
+    attributes:
+      component:
+        type: const
+        value: Text
+    parentProp: children
+    parentIndex: a0
+  ym23prd:
+    id: ym23prd
+    name: typography3
+    type: element
+    props:
+      value:
+        type: jsExpression
+        value: |
+          `echo, parameter: ${echo.data.params.foo}`
+    layout: {}
+    parentId: bv33p6x
+    attributes:
+      component:
+        type: const
+        value: Text
+    parentProp: children
+    parentIndex: a0
+  v1143pm9:
+    id: v1143pm9
+    name: pageRow3
+    type: element
+    props: {}
+    layout: {}
+    parentId: 5q1xd0t
+    attributes:
+      component:
+        type: const
+        value: PageRow
+    parentProp: children
+    parentIndex: a3
+  zz133pwd:
+    id: zz133pwd
+    name: dataGrid
+    type: element
+    props:
+      rows:
+        type: jsExpression
+        value: |
+          throws.data
+    layout: {}
+    parentId: v1143pm9
+    attributes:
+      component:
+        type: const
+        value: DataGrid
+    parentProp: children
+    parentIndex: a0
+  ib830c5:
+    name: pageRow5
+    props: {}
+    attributes:
+      component:
+        type: const
+        value: PageRow
+    layout: {}
+    id: ib830c5
+    type: element
+    parentId: 5q1xd0t
+    parentProp: children
+    parentIndex: a6
+  yv630a2:
+    name: text5
+    props:
+      value:
+        type: jsExpression
+        value: |
+          edited.data
+    attributes:
+      component:
+        type: const
+        value: Text
+    layout: {}
+    id: yv630a2
+    type: element
+    parentId: ib830c5
+    parentProp: children
+    parentIndex: a0
+  v153hba:
+    attributes:
+      query:
+        type: const
+        value:
+          function: hello
+      connectionId:
+        type: const
+        value: null
+      dataSource:
+        type: const
+        value: local
+    name: hello
+    id: v153hba
+    type: query
+    parentId: 5q1xd0t
+    parentProp: queries
+    parentIndex: a4
+  at63hsa:
+    attributes:
+      query:
+        type: const
+        value:
+          function: throws
+      connectionId:
+        type: const
+        value: null
+      dataSource:
+        type: const
+        value: local
+    name: throws
+    id: at63hsa
+    type: query
+    parentId: 5q1xd0t
+    parentProp: queries
+    parentIndex: a5
+  8qd3h8t:
+    attributes:
+      query:
+        type: const
+        value:
+          function: echo
+      connectionId:
+        type: const
+        value: null
+      dataSource:
+        type: const
+        value: local
+    name: echo
+    id: 8qd3h8t
+    type: query
+    parentId: 5q1xd0t
+    parentProp: queries
+    parentIndex: a6
+    params:
+      - - foo
+        - type: jsExpression
+          value: |
+            "bound foo parameter"
+  fgj3h1p:
+    attributes:
+      query:
+        type: const
+        value:
+          function: edited
+      connectionId:
+        type: const
+        value: null
+      dataSource:
+        type: const
+        value: local
+    name: edited
+    id: fgj3h1p
+    type: query
+    parentId: 5q1xd0t
+    parentProp: queries
+    parentIndex: a7
+version: 6

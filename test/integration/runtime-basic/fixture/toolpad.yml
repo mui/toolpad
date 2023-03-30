@@ -1,0 +1,317 @@
+root: vkowdut
+nodes:
+  1s23u4g:
+    id: 1s23u4g
+    name: typography
+    type: element
+    props:
+      value:
+        type: jsExpression
+        value: |
+          `foo ${textField1.value} bar`
+    layout: {}
+    parentId: uw13uls
+    attributes:
+      component:
+        type: const
+        value: Text
+    parentProp: children
+    parentIndex: a1
+  4t13u7b:
+    id: 4t13u7b
+    name: pageRow2
+    type: element
+    props: {}
+    layout: {}
+    parentId: vlpwdwr
+    attributes:
+      component:
+        type: const
+        value: PageRow
+    parentProp: children
+    parentIndex: a2
+  5w73u7v:
+    id: 5w73u7v
+    name: pageRow1
+    type: element
+    props: {}
+    layout: {}
+    parentId: vlpwdwr
+    attributes:
+      component:
+        type: const
+        value: PageRow
+    parentProp: children
+    parentIndex: a1
+  fb03uzl:
+    id: fb03uzl
+    name: textField1
+    type: element
+    props:
+      fullWidth:
+        type: const
+        value: true
+      label:
+        type: const
+        value: textField1
+    layout: {}
+    parentId: uw13uls
+    attributes:
+      component:
+        type: const
+        value: TextField
+    parentProp: children
+    parentIndex: a0
+  re63uod:
+    id: re63uod
+    name: textField2
+    type: element
+    props:
+      defaultValue:
+        type: const
+        value: hello1
+      label:
+        type: const
+        value: textField2
+    layout: {}
+    parentId: 5w73u7v
+    attributes:
+      component:
+        type: const
+        value: TextField
+    parentProp: children
+    parentIndex: a0
+  sb03uuh:
+    id: sb03uuh
+    name: textField3
+    type: element
+    props:
+      defaultValue:
+        type: jsExpression
+        value: |
+          page.parameters.msg
+      label:
+        type: const
+        value: textField3
+    layout: {}
+    parentId: 4t13u7b
+    attributes:
+      component:
+        type: const
+        value: TextField
+    parentProp: children
+    parentIndex: a0
+  uw13uls:
+    id: uw13uls
+    name: pageRow
+    type: element
+    props: {}
+    layout: {}
+    parentId: vlpwdwr
+    attributes:
+      component:
+        type: const
+        value: PageRow
+    parentProp: children
+    parentIndex: a0
+  vkowdut:
+    id: vkowdut
+    name: Application
+    type: app
+    parentId: null
+    attributes: {}
+    parentProp: null
+    parentIndex: null
+  vlpwdwr:
+    id: vlpwdwr
+    name: page1
+    type: page
+    parentId: vkowdut
+    attributes:
+      title:
+        type: const
+        value: Page 1
+      parameters:
+        type: const
+        value:
+          - - msg
+            - hello2
+    parentProp: pages
+    parentIndex: a0
+  r703qxy:
+    name: page2
+    attributes:
+      title:
+        type: const
+        value: page2
+    id: r703qxy
+    type: page
+    parentId: vkowdut
+    parentProp: pages
+    parentIndex: a1
+  hi33qcw:
+    name: pageRow
+    props: {}
+    attributes:
+      component:
+        type: const
+        value: PageRow
+    layout: {}
+    id: hi33qcw
+    type: element
+    parentId: r703qxy
+    parentProp: children
+    parentIndex: a0
+  4b13qgc:
+    name: button1
+    props:
+      content:
+        type: const
+        value: Button 1
+      onClick:
+        type: jsExpressionAction
+        value: |-
+          text1.value = 'result 1'
+          text2.value = 'result 2'
+    attributes:
+      component:
+        type: const
+        value: Button
+    layout: {}
+    id: 4b13qgc
+    type: element
+    parentId: hi33qcw
+    parentProp: children
+    parentIndex: a0
+  f223vwf:
+    name: pageRow3
+    props: {}
+    attributes:
+      component:
+        type: const
+        value: PageRow
+    layout: {}
+    id: f223vwf
+    type: element
+    parentId: r703qxy
+    parentProp: children
+    parentIndex: a3
+  v303vsx:
+    name: button2
+    props:
+      content:
+        type: const
+        value: Button 2
+      onClick:
+        type: jsExpressionAction
+        value: |-
+          await new Promise(r => setTimeout(r, 10))
+          text3.value = 'result 3'
+    attributes:
+      component:
+        type: const
+        value: Button
+    layout: {}
+    id: v303vsx
+    type: element
+    parentId: f223vwf
+    parentProp: children
+    parentIndex: a0
+  mia3vvd:
+    name: pageRow1
+    props: {}
+    attributes:
+      component:
+        type: const
+        value: PageRow
+    layout: {}
+    id: mia3vvd
+    type: element
+    parentId: r703qxy
+    parentProp: children
+    parentIndex: a1
+  xg83vov:
+    name: text1
+    props: {}
+    attributes:
+      component:
+        type: const
+        value: Text
+    layout: {}
+    id: xg83vov
+    type: element
+    parentId: mia3vvd
+    parentProp: children
+    parentIndex: a0
+  00c3v9a:
+    name: text2
+    props: {}
+    attributes:
+      component:
+        type: const
+        value: Text
+    layout: {}
+    id: 00c3v9a
+    type: element
+    parentId: mia3vvd
+    parentProp: children
+    parentIndex: a1
+  weg3vyd:
+    name: text3
+    props: {}
+    attributes:
+      component:
+        type: const
+        value: Text
+    layout: {}
+    id: weg3vyd
+    type: element
+    parentId: exk3v6j
+    parentProp: children
+    parentIndex: a0
+  exk3v6j:
+    name: pageRow2
+    props: {}
+    attributes:
+      component:
+        type: const
+        value: PageRow
+    layout: {}
+    id: exk3v6j
+    type: element
+    parentId: r703qxy
+    parentProp: children
+    parentIndex: a4
+  n5r3v66:
+    name: pageRow4
+    props: {}
+    attributes:
+      component:
+        type: const
+        value: PageRow
+    layout: {}
+    id: n5r3v66
+    type: element
+    parentId: r703qxy
+    parentProp: children
+    parentIndex: Zz
+  wmp3vn3:
+    name: text
+    props:
+      value:
+        type: const
+        value: Mutation tests
+      variant:
+        type: const
+        value: h2
+    attributes:
+      component:
+        type: const
+        value: Text
+    layout: {}
+    id: wmp3vn3
+    type: element
+    parentId: n5r3v66
+    parentProp: children
+    parentIndex: a0
+version: 6

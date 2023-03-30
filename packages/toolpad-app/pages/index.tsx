@@ -2,7 +2,7 @@ import type { GetServerSideProps } from 'next';
 import config from '../src/config';
 
 export const getServerSideProps: GetServerSideProps<{}> = async () => {
-  if (config.localMode && config.cmd === 'start') {
+  if (config.cmd === 'start') {
     return {
       redirect: { destination: '/prod', permanent: false },
     };

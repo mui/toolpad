@@ -253,13 +253,10 @@ async function migrateProject(root: string) {
 async function initProjectFolder(): Promise<void> {
   try {
     const root = getUserProjectRoot();
-    if (config.cmd === 'dev') {
-      await initToolpadFolder(root);
-      await Promise.all([initGeneratedGitignore(root), initToolpadFile(root)]);
-      await migrateProject(root);
-    } else {
-      // TODO: verify files exist?
-    }
+
+    await initToolpadFolder(root);
+    await Promise.all([initGeneratedGitignore(root), initToolpadFile(root)]);
+    await migrateProject(root);
   } catch (err) {
     console.error(`${chalk.red('error')} - Failed to intialize Toolpad`);
     console.error(err);

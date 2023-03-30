@@ -228,7 +228,7 @@ async function initGeneratedGitignore(root: string) {
 }
 
 async function migrateProject(root: string) {
-  const dom = await loadConfigFile(root);
+  let dom = await loadConfigFile(root);
   const domVersion = dom.version ?? 0;
   if (domVersion > appDom.CURRENT_APPDOM_VERSION) {
     console.error(
@@ -245,7 +245,7 @@ async function migrateProject(root: string) {
         'info',
       )}  - This project was created by an older version of Toolpad. Upgrading...`,
     );
-    migrateUp(dom);
+    dom = migrateUp(dom);
     await writeConfigFile(root, dom);
   }
 }

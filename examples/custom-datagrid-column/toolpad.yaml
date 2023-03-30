@@ -1,0 +1,64 @@
+nodes:
+  yp04du0:
+    name: Application
+    attributes: {}
+    id: yp04du0
+    type: app
+    parentId: null
+    parentProp: null
+    parentIndex: null
+  yq14d6o:
+    name: example
+    attributes:
+      title:
+        type: const
+        value: Page 1
+    id: yq14d6o
+    type: page
+    parentId: yp04du0
+    parentProp: pages
+    parentIndex: a0
+  0h23qy9:
+    name: pageRow
+    props: {}
+    attributes:
+      component:
+        type: const
+        value: PageRow
+    layout: {}
+    id: 0h23qy9
+    type: element
+    parentId: yq14d6o
+    parentProp: children
+    parentIndex: a0
+  u903qie:
+    name: dataGrid
+    props:
+      rows:
+        type: const
+        value:
+          - value: 12
+          - value: -15
+          - value: -6
+          - value: 2
+          - value: -3
+          - value: 7
+          - value: 23
+      columns:
+        type: const
+        value:
+          - field: value
+            type: codeComponent
+            codeComponent: LabelColumn
+    attributes:
+      component:
+        type: const
+        value: DataGrid
+    layout: {}
+    id: u903qie
+    type: element
+    parentId: 0h23qy9
+    parentProp: children
+    parentIndex: a0
+root: yp04du0
+version: 6

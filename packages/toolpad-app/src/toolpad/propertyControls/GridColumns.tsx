@@ -75,12 +75,10 @@ function GridColumnsPropEditor({
   const [editedIndex, setEditedIndex] = React.useState<number | null>(null);
   const { dom } = useDom();
   const toolpadComponents = useToolpadComponents(dom);
-  const codeComponents = React.useMemo(() => {
-    const entries = Object.entries(toolpadComponents);
-
-    return entries
-      .map(([, definition]) => definition)
-      .filter((definition) => definition && !definition.builtIn) as ToolpadComponentDefinition[];
+  const codeComponents: ToolpadComponentDefinition[] = React.useMemo(() => {
+    return Object.values(toolpadComponents)
+      .filter(Boolean)
+      .filter((definition) => !definition.builtIn);
   }, [toolpadComponents]);
 
   const editedColumn = typeof editedIndex === 'number' ? value[editedIndex] : null;
@@ -337,8 +335,8 @@ function GridColumnsPropEditor({
                       })
                     }
                   >
-                    {codeComponents.map(({ displayName, codeComponentId }) => (
-                      <MenuItem key={displayName} value={codeComponentId}>
+                    {codeComponents.map(({ displayName }) => (
+                      <MenuItem key={displayName} value={displayName}>
                         {displayName}
                       </MenuItem>
                     ))}

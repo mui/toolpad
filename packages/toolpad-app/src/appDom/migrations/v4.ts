@@ -19,7 +19,6 @@ function replaceTypographyWithText(node: appDom.AppDomNode): appDom.AppDomNode {
 }
 
 export default {
-  domOnly: true,
   up(dom: appDom.AppDom): appDom.AppDom {
     invariant(dom.version === 3, 'Can only migrate dom of version 3');
     return {

@@ -68,7 +68,6 @@ function migrateLegacyNavigationAction(node: ElementNode<any>): ElementNode<any>
 }
 
 export default {
-  domOnly: true,
   up(dom: AppDom): AppDom {
     const { nodes, version = 0 } = dom;
     invariant(version === 0, 'Can only migrate dom of version 0');

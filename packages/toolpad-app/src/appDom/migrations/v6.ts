@@ -4,7 +4,6 @@ import * as appDom from '..';
 import { mapValues } from '../../utils/collections';
 
 export default {
-  domOnly: true,
   up(dom: appDom.AppDom): appDom.AppDom {
     invariant(dom.version === 5, 'Can only migrate dom of version 4');
 

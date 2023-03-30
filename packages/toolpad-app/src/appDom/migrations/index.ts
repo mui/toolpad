@@ -7,7 +7,7 @@ import v5 from './v5';
 import v6 from './v6';
 import * as appDom from '..';
 
-export const versions = [v1, v2, v3, v4, v5, v6];
+const versions = [v1, v2, v3, v4, v5, v6];
 
 invariant(versions.length === appDom.CURRENT_APPDOM_VERSION, 'Unable to find the latest version');
 

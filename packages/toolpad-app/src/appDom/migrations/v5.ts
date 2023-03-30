@@ -19,7 +19,6 @@ function replaceLinkWithText(node: appDom.AppDomNode): appDom.AppDomNode {
 }
 
 export default {
-  domOnly: true,
   up(dom: appDom.AppDom): appDom.AppDom {
     invariant(dom.version === 4, 'Can only migrate dom of version 4');
     return {

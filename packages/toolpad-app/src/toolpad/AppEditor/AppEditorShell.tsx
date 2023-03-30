@@ -49,6 +49,8 @@ export default function AppEditorShell({ children, ...props }: ToolpadShellProps
   const currentView = getViewFromPathname(location.pathname);
   const currentPageId = currentView?.kind === 'page' ? currentView.nodeId : null;
 
+  const previewPath = currentPageId ? `/preview/pages/${currentPageId}` : '/preview';
+
   return (
     <ToolpadShell
       actions={
@@ -58,7 +60,7 @@ export default function AppEditorShell({ children, ...props }: ToolpadShellProps
             endIcon={<OpenInNewIcon />}
             color="primary"
             component="a"
-            href={currentPageId ? `/preview/pages/${currentPageId}` : '/preview'}
+            href={previewPath}
             target="_blank"
           >
             Preview

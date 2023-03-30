@@ -1077,11 +1077,10 @@ function RenderedPage({ nodeId }: RenderedNodeProps) {
 
 interface RenderedPagesProps {
   pages: appDom.PageNode[];
+  defaultPage: appDom.PageNode;
 }
 
-function RenderedPages({ pages }: RenderedPagesProps) {
-  const defaultPage = pages[0];
-
+function RenderedPages({ pages, defaultPage }: RenderedPagesProps) {
   return (
     <Routes>
       {pages.map((page) => (
@@ -1150,8 +1149,16 @@ function ToolpadAppLayout({ dom, version, hasShell: hasShellProp = true }: Toolp
   const urlParams = React.useMemo(() => new URLSearchParams(search), [search]);
 
   const pageMatch = matchPath(PREVIEW_PAGE_ROUTE, `/preview${pathname}`);
+  const pageId = pageMatch?.params.nodeId;
 
-  const hasShell = hasShellProp && urlParams.get('toolpad-display') !== 'standalone';
+  const defaultPage = pages[0];
+  const page = pageId
+    ? (appDom.getNode<'page'>(dom, pageId as NodeId) as appDom.PageNode)
+    : defaultPage;
+
+  const pageDisplay = urlParams.get('toolpad-display') || page.attributes.defaultDisplay?.value;
+
+  const hasShell = hasShellProp && pageDisplay !== 'standalone';
 
   const isPreview = version === 'preview';
 
@@ -1171,9 +1178,7 @@ function ToolpadAppLayout({ dom, version, hasShell: hasShellProp = true }: Toolp
                   endIcon={<EditIcon />}
                   color="primary"
                   component="a"
-                  href={
-                    pageMatch ? `/_toolpad/app/pages/${pageMatch.params.nodeId}` : '/_toolpad/app'
-                  }
+                  href={pageId ? `/_toolpad/app/pages/${pageId}` : '/_toolpad/app'}
                 >
                   Edit
                 </Button>
@@ -1186,7 +1191,7 @@ function ToolpadAppLayout({ dom, version, hasShell: hasShellProp = true }: Toolp
         {hasShell && pages.length > 0 ? (
           <AppNavigation pages={pages} isPreview={isPreview} />
         ) : null}
-        <RenderedPages pages={pages} />
+        <RenderedPages pages={pages} defaultPage={defaultPage} />
       </Box>
     </React.Fragment>
   );

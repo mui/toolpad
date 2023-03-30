@@ -1117,7 +1117,7 @@ export function deref(nodeRef: Maybe<NodeReference>): NodeId | null {
 
 export function createDefaultDom(): AppDom {
   let dom = createDom();
-  const appNode = getRoot(dom);
+  const appNode = getApp(dom);
 
   // Create default page
   const newPageNode = createNode(dom, 'page', {

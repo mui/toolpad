@@ -355,10 +355,17 @@ export function assertIsMutation<P>(node: AppDomNode): asserts node is MutationN
   assertIsType<MutationNode>(node, 'mutation');
 }
 
-export function getApp(dom: AppDom): AppNode {
+export function getRoot(dom: AppDom): AppNode {
   const rootNode = getNode(dom, dom.root);
   assertIsApp(rootNode);
   return rootNode;
+}
+
+/**
+ * @deprecated use getRoot()
+ */
+export function getApp(dom: AppDom): AppNode {
+  return getRoot(dom);
 }
 
 export type NodeChildren<N extends AppDomNode = any> = ChildNodesOf<N>;
@@ -498,18 +505,26 @@ export function createNode<T extends AppDomNodeType>(
   });
 }
 
+export function createFragmentInternal<T extends AppDomNodeType>(
+  id: NodeId,
+  type: T,
+  init: AppDomNodeInitOfType<T> & { name: string },
+): AppDom {
+  return {
+    nodes: {
+      [id]: createNodeInternal(id, type, init),
+    },
+    root: id,
+    version: CURRENT_APPDOM_VERSION,
+  };
+}
+
 export function createFragment<T extends AppDomNodeType>(
   type: T,
   init: AppDomNodeInitOfType<T> & { name: string },
-) {
+): AppDom {
   const rootId = createId();
-  return {
-    nodes: {
-      [rootId]: createNodeInternal(rootId, type, init),
-    },
-    root: rootId,
-    version: CURRENT_APPDOM_VERSION,
-  };
+  return createFragmentInternal(rootId, type, init);
 }
 
 export function createDom(): AppDom {
@@ -1106,7 +1121,7 @@ export function deref(nodeRef: Maybe<NodeReference>): NodeId | null {
 
 export function createDefaultDom(): AppDom {
   let dom = createDom();
-  const appNode = getApp(dom);
+  const appNode = getRoot(dom);
 
   // Create default page
   const newPageNode = createNode(dom, 'page', {

@@ -11,7 +11,6 @@ import * as appDom from '../appDom';
 import { errorFrom } from '../utils/errors';
 import { migrateUp, isUpToDate } from '../appDom/migrations';
 import insecureHash from '../utils/insecureHash';
-
 import { writeFileRecursive, readMaybeFile, readMaybeDir } from '../utils/fs';
 import { PageType, QueryType, ElementType, NavigationActionType, Page } from './schema';
 import { mapValues } from '../utils/collections';
@@ -550,8 +549,8 @@ function mergeElementIntoDom(
   return dom;
 }
 
-function mergePageIntoDom(dom: appDom.AppDom, pageName: string, pageFile: PageType): appDom.AppDom {
-  const pageNode = appDom.createNode(dom, 'page', {
+function createPageDomFromPageFile(pageName: string, pageFile: PageType): appDom.AppDom {
+  let fragment = appDom.createFragmentInternal(pageFile.id as NodeId, 'page', {
     name: pageName,
     attributes: {
       title: appDom.createConst(pageFile.title || ''),
@@ -560,15 +559,13 @@ function mergePageIntoDom(dom: appDom.AppDom, pageName: string, pageFile: PageTy
       ),
     },
   });
-  pageNode.id = pageFile.id;
-  if (appDom.getMaybeNode(dom, pageFile.id)) {
-    dom = appDom.removeNode(dom, pageFile.id);
-  }
-  dom = appDom.addNode(dom, pageNode, appDom.getApp(dom), 'pages');
+
+  const pageNode = appDom.getRoot(fragment);
+  appDom.assertIsPage(pageNode);
 
   if (pageFile.queries) {
     for (const query of pageFile.queries) {
-      const queryNode = appDom.createNode(dom, 'query', {
+      const queryNode = appDom.createNode(fragment, 'query', {
         name: query.name,
         attributes: {
           connectionId: appDom.createConst(null),
@@ -590,15 +587,30 @@ function mergePageIntoDom(dom: appDom.AppDom, pageName: string, pageFile: PageTy
             : undefined,
         },
       });
-      dom = appDom.addNode(dom, queryNode, pageNode, 'queries');
+      fragment = appDom.addNode(fragment, queryNode, pageNode, 'queries');
     }
   }
 
   if (pageFile.children) {
     for (const child of pageFile.children) {
-      dom = mergeElementIntoDom(dom, pageNode, child);
+      fragment = mergeElementIntoDom(fragment, pageNode, child);
     }
   }
+
+  return fragment;
+}
+
+function mergePageIntoDom(dom: appDom.AppDom, pageName: string, pageFile: PageType): appDom.AppDom {
+  const appRoot = appDom.getRoot(dom);
+  const pageFragment = createPageDomFromPageFile(pageName, pageFile);
+
+  const newPageNode = appDom.getRoot(pageFragment);
+
+  if (appDom.getMaybeNode(dom, newPageNode.id)) {
+    dom = appDom.removeNode(dom, newPageNode.id);
+  }
+
+  dom = appDom.addFragment(dom, pageFragment, appRoot.id, 'pages');
 
   return dom;
 }

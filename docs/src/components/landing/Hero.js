@@ -5,10 +5,9 @@ import Typography from '@mui/material/Typography';
 import SvgMuiLogo from 'docs/src/icons/SvgMuiLogo';
 import IconImage from 'docs/src/components/icon/IconImage';
 import GradientText from 'docs/src/components/typography/GradientText';
+import DataObjectRoundedIcon from '@mui/icons-material/DataObjectRounded';
 import SignUp from './SignUp';
 import ToolpadHeroContainer from '../../layouts/ToolpadHeroContainer';
-import DataObjectRoundedIcon from '@mui/icons-material/DataObjectRounded';
-import ROUTES from '../../route';
 
 export default function Hero() {
   return (

@@ -37,19 +37,46 @@ nodes:
       rows:
         type: const
         value:
-          - value: 12
-          - value: -15
-          - value: -6
-          - value: 2
-          - value: -3
-          - value: 7
-          - value: 23
+          - firstname: Salman
+            lastname: Anthony
+            age: 17
+          - firstname: Crystal
+            lastname: Wise
+            age: 32
+          - firstname: Yasmin
+            lastname: Cherry
+            age: 56
+          - firstname: Maisha
+            lastname: Browning
+            age: 8
+          - firstname: Ronald
+            lastname: Santana
+            age: 11
+          - firstname: Bronwyn
+            lastname: Odling
+            age: 3
+          - firstname: Bushra
+            lastname: Chen
+            age: 43
+          - firstname: Savanna
+            lastname: Hardy
+            age: 45
+          - firstname: John
+            lastname: Sutherland
+            age: 19
+          - firstname: Romeo
+            lastname: Kerr
+            age: 21
       columns:
         type: const
         value:
-          - field: value
+          - field: fullname
             type: codeComponent
-            codeComponent: LabelColumn
+            codeComponent: FullNameColumn
+            width: 212
+          - field: age
+            type: codeComponent
+            codeComponent: AgeColumn
     attributes:
       component:
         type: const

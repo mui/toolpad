@@ -12,7 +12,7 @@ import DemoVideo from '../../src/components/landing/DemoVideo';
 import SignUpToast from '../../src/components/landing/SignUpToast';
 import UseCases from '../../src/components/landing/UseCases';
 import CardGrid from '../../src/components/landing/CardGrid';
-import BannerV2 from '../../src/components/landing/BannerV2';
+import Banner from '../../src/components/landing/Banner';
 import Pricing from '../../src/components/landing/PricingTable';
 import Marquee from '../../src/components/landing/Marquee';
 import features from '../../src/content/features';
@@ -46,14 +46,13 @@ export default function Home() {
         <ToolpadHero />
         <DemoVideo />
         <CardGrid content={features} />
-        <BannerV2
+        <Banner
           action={action}
           category={category}
           title={title}
           description={description}
           href={href}
           label={label}
-          docs={false}
         />
         <Divider sx={{ maxWidth: '1200px', m: 'auto' }} />
         <UseCases content={useCases} />

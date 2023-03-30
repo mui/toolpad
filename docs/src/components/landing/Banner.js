@@ -1,89 +1,64 @@
 import * as React from 'react';
 import PropTypes from 'prop-types';
-import { alpha } from '@mui/material/styles';
-import Box from '@mui/material/Box';
 import Container from '@mui/material/Container';
-import Typography from '@mui/material/Typography';
-import Stack from '@mui/material/Stack';
 import Button from '@mui/material/Button';
 import Link from 'docs/src/modules/components/Link';
+import Typography from '@mui/material/Typography';
 import KeyboardArrowRightRounded from '@mui/icons-material/KeyboardArrowRightRounded';
 
-export default function Banner(props) {
-  const { title, description, href, label, category, action, docs } = props;
+function Banner(props) {
+  const { title, description, href, label, category, action } = props;
   return (
-    <Box>
-      <Container
+    <Container
+      sx={{
+        mx: 0,
+        minWidth: '100%',
+        py: { xs: 4, sm: 8 },
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+      }}
+    >
+      <Typography
+        textAlign="center"
+        variant="h4"
         sx={{
-          pt: 0,
-          pb: { xs: 2, sm: 8, md: docs ? 1 : 8 },
-          px: docs ? { xs: 0, sm: 0, md: 0 } : 'default',
-          mb: 4,
-          display: 'flex',
-          flexDirection: 'row',
-          justifyContent: 'center',
+          mt: 4,
+          mx: 'auto',
         }}
       >
-        <Stack
-          flexDirection="column"
-          sx={{
-            borderRadius: 1,
-            px: 2,
-            py: docs ? 2.5 : 4,
-            background: (theme) =>
-              theme.palette.mode === 'dark'
-                ? `radial-gradient(150% 100% at 50% 80%, ${alpha(
-                    theme.palette.primaryDark[400],
-                    0.2,
-                  )} 10%, ${theme.palette.primaryDark[900]} 100%, ${
-                    theme.palette.primaryDark[900]
-                  } 0)`
-                : `radial-gradient(150% 100% at 50% 80%, ${theme.palette.primary[50]} 10%, #fff 100%, ${theme.palette.primary[50]} 0)`,
-            border: '1px solid',
-            borderColor: (theme) => `${alpha(theme.palette.primaryDark[300], 0.3)}`,
-            width: '100%',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-          }}
-        >
-          <Stack flexDirection="column" spacing={1} sx={{ mb: 2 }}>
-            <Typography fontWeight="bold" variant="h6" sx={{ textAlign: 'center' }}>
-              {title}
-            </Typography>
-            <Typography
-              variant="body1"
-              color="text.secondary"
-              sx={{ maxWidth: 500, textAlign: 'center' }}
-            >
-              {description}
-            </Typography>
-          </Stack>
-          <Button
-            component={Link}
-            noLinkStyle
-            data-ga-event-category={category}
-            data-ga-event-label={label}
-            data-ga-event-action={action}
-            target="_blank"
-            rel="noopener"
-            href={href}
-            variant="contained"
-            fullWidth
-            endIcon={<KeyboardArrowRightRounded />}
-            sx={{
-              py: 1,
-              px: {
-                md: 2,
-              },
-              ml: { xs: 0, sm: 2 },
-              width: { xs: '100%', sm: '50%', md: 'auto' },
-            }}
-          >
-            {label}
-          </Button>
-        </Stack>
-      </Container>
-    </Box>
+        {title}
+      </Typography>
+      <Typography
+        color="text.secondary"
+        textAlign="center"
+        sx={{
+          mt: 1,
+          mb: 4,
+          mx: 'auto',
+          maxWidth: '500px',
+        }}
+      >
+        {description}
+      </Typography>
+      <Button
+        component={Link}
+        noLinkStyle
+        data-ga-event-category={category}
+        data-ga-event-label={label}
+        data-ga-event-action={action}
+        target="_blank"
+        rel="noopener"
+        href={href}
+        variant="contained"
+        fullWidth
+        size="large"
+        endIcon={<KeyboardArrowRightRounded />}
+        sx={{ width: { xs: '100%', sm: 'auto' } }}
+      >
+        {label}
+      </Button>
+    </Container>
   );
 }
 
@@ -91,8 +66,9 @@ Banner.propTypes = {
   action: PropTypes.string.isRequired,
   category: PropTypes.string.isRequired,
   description: PropTypes.string.isRequired,
-  docs: PropTypes.bool,
   href: PropTypes.string.isRequired,
   label: PropTypes.string.isRequired,
   title: PropTypes.string,
 };
+
+export default Banner;

@@ -1487,7 +1487,7 @@
     prop-types "^15.8.1"
     reselect "^4.1.7"
 
-"@mui/x-data-grid-pro@6.0.4", "@mui/x-data-grid-pro@^6.0.3":
+"@mui/x-data-grid-pro@6.0.4", "@mui/x-data-grid-pro@^6.0.4":
   version "6.0.4"
   resolved "https://registry.yarnpkg.com/@mui/x-data-grid-pro/-/x-data-grid-pro-6.0.4.tgz#d3b99d728bb945297cf49205f18e75ce017f8cf1"
   integrity sha512-AQLWdExHXOrRtvjquE04LLqc8Ul9n0xIOsjAXYTqNiFjqsn/n/mq8RrEBVtoTJ95HenzZ6C4w5aVNYu5r2O/CA==
@@ -1512,10 +1512,10 @@
     prop-types "^15.8.1"
     reselect "^4.1.7"
 
-"@mui/x-date-pickers-pro@^6.0.3":
-  version "6.0.3"
-  resolved "https://registry.yarnpkg.com/@mui/x-date-pickers-pro/-/x-date-pickers-pro-6.0.3.tgz#56faeb2c8ead94ca90c95f4c16ce077318c30b70"
-  integrity sha512-IxJtq7EAkLNz3VS3gNEewCRmM0ufuuokyMueIU+tX8D1ifV5eEtiFC3NpbygRCzojB+DeLT+YyieIQbsj9Tyyw==
+"@mui/x-date-pickers-pro@^6.0.4":
+  version "6.0.4"
+  resolved "https://registry.yarnpkg.com/@mui/x-date-pickers-pro/-/x-date-pickers-pro-6.0.4.tgz#5edd864b4618ff181e7d2625c100557dfbe3c212"
+  integrity sha512-QU4eKacOjGunBGjcGyMJDH+D3ZtYtz+zOXbWKNjGspWr1kZQuACVyPqPugfKA+itE7wfZh6XAWgsX5Xnq9x3yQ==
   dependencies:
     "@babel/runtime" "^7.21.0"
     "@date-io/date-fns" "^2.16.0"
@@ -1523,16 +1523,16 @@
     "@date-io/luxon" "^2.16.1"
     "@date-io/moment" "^2.16.1"
     "@mui/utils" "^5.11.13"
-    "@mui/x-date-pickers" "6.0.3"
+    "@mui/x-date-pickers" "6.0.4"
     "@mui/x-license-pro" "6.0.3"
     clsx "^1.2.1"
     prop-types "^15.8.1"
     react-transition-group "^4.4.5"
 
-"@mui/x-date-pickers@6.0.3", "@mui/x-date-pickers@^6.0.3":
-  version "6.0.3"
-  resolved "https://registry.yarnpkg.com/@mui/x-date-pickers/-/x-date-pickers-6.0.3.tgz#f95a76bf95c41aeea9163106e9a1a785968dc406"
-  integrity sha512-TgKfWf47WiNzSAY3C8R+FQ2grtVveoS3WCtLf6E1I/O2adxruxXA+AFiIRVnfv8QX9QFLNayTKoaVUISg/PcXQ==
+"@mui/x-date-pickers@6.0.4", "@mui/x-date-pickers@^6.0.4":
+  version "6.0.4"
+  resolved "https://registry.yarnpkg.com/@mui/x-date-pickers/-/x-date-pickers-6.0.4.tgz#f82c0ab3d66603c70dcb3a64f51e633d2f570a07"
+  integrity sha512-blh91rqgnr8mdm+bn5vdde7fQII0gUDmeOMttKrMLv6P6OxkQXdz5aLSroXUpPTAAbX53zciFW/UG5Ynxqxtpw==
   dependencies:
     "@babel/runtime" "^7.21.0"
     "@date-io/core" "^2.16.0"

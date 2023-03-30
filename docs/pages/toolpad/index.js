@@ -55,19 +55,8 @@ export default function Home() {
           label={label}
           docs={false}
         />
-        {/* <Banner
-          action={action}
-          category={category}
-          title={title}
-          description={description}
-          href={href}
-          label={label}
-          docs={false}
-        /> */}
-        {/* <CardGrid content={useCases} darker /> */}
         <Divider sx={{ maxWidth: '1200px', m: 'auto' }} />
         <UseCases content={useCases} />
-
         <Pricing
           Headline={Headline}
           plans={plans}

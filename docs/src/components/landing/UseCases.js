@@ -29,8 +29,8 @@ export default function CardGrid(props) {
       sx={{
         background: (theme) =>
           theme.palette.mode === 'dark'
-            ? `radial-gradient(200% 150% at 50% 80%, transparent 30%, ${theme.palette.primaryDark[300]} 100%, ${theme.palette.primaryDark[100]} 0)`
-            : `radial-gradient(200% 150% at 50% 80%, transparent 30%, ${theme.palette.primary[100]} 100%, ${theme.palette.primary[50]} 0)`,
+            ? `radial-gradient(140% 150% at 50% 10%, transparent 40%,  ${theme.palette.primary[700]} 90%,  transparent 100%)`
+            : `radial-gradient(140% 150% at 50% 10%, transparent 50%,  ${theme.palette.primary[100]} 90%,  transparent 100%)`,
       }}
     >
       <Container sx={{ py: { xs: 8, sm: 12 } }}>

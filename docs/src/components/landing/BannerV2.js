@@ -6,71 +6,70 @@ import Link from 'docs/src/modules/components/Link';
 import Typography from '@mui/material/Typography';
 import KeyboardArrowRightRounded from '@mui/icons-material/KeyboardArrowRightRounded';
 
-function Marquee({ content }) {
+function BannerV2(props) {
+  const { title, description, href, label, category, action, docs } = props;
   return (
     <Container
       sx={(theme) => ({
-        mt: 8,
         mx: 0,
         minWidth: '100%',
-        py: { xs: 4, sm: 6, md: 12 },
+        py: { xs: 4, sm: 8 },
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
-        background: `linear-gradient(180deg, ${theme.palette.primaryDark[900]} 0%, ${theme.palette.primaryDark[800]})`,
-        borderBottom: '1px solid',
-        borderColor: theme.palette.mode === 'dark' ? 'primaryDark.600' : 'grey.200',
       })}
     >
       <Typography
-        color="white"
         textAlign="center"
-        variant="h2"
+        variant="h4"
         sx={{
           mt: 4,
           mx: 'auto',
         }}
       >
-        {content.title}
+        {title}
       </Typography>
       <Typography
-        color="grey.500"
+        color="text.secondary"
         textAlign="center"
         sx={{
           mt: 1,
           mb: 4,
           mx: 'auto',
+          maxWidth: '500px',
         }}
       >
-        {content.subtitle}
+        {description}
       </Typography>
       <Button
         component={Link}
-        href={content.action.href}
-        data-ga-event-category="ToolpadLanding"
-        data-ga-event-label={content.action.label}
-        data-ga-event-action="SelfHost"
         noLinkStyle
-        size="large"
+        data-ga-event-category={category}
+        data-ga-event-label={label}
+        data-ga-event-action={action}
+        target="_blank"
+        rel="noopener"
+        href={href}
         variant="contained"
+        fullWidth
+        size="large"
         endIcon={<KeyboardArrowRightRounded />}
         sx={{ width: { xs: '100%', sm: 'auto' } }}
       >
-        {content.action.label}
+        {label}
       </Button>
     </Container>
   );
 }
 
-Marquee.propTypes = {
-  content: PropTypes.shape({
-    action: PropTypes.shape({
-      href: PropTypes.string.isRequired,
-      label: PropTypes.string.isRequired,
-    }).isRequired,
-    subtitle: PropTypes.string.isRequired,
-    title: PropTypes.string.isRequired,
-  }).isRequired,
+BannerV2.propTypes = {
+  action: PropTypes.string.isRequired,
+  category: PropTypes.string.isRequired,
+  description: PropTypes.string.isRequired,
+  docs: PropTypes.bool,
+  href: PropTypes.string.isRequired,
+  label: PropTypes.string.isRequired,
+  title: PropTypes.string,
 };
 
-export default Marquee;
+export default BannerV2;

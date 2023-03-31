@@ -28,7 +28,7 @@ function withSerializedError<T extends { error?: unknown }>(
     : withoutError;
 }
 
-async function handleDataRequest(req: NextApiRequest, res: NextApiResponse<ExecFetchResult<any>>) {
+const apiHandler = (async (req, res) => {
   if (req.method !== 'POST') {
     // This endpoint is used both by queries and mutations
     res.status(405).end();
@@ -68,10 +68,6 @@ async function handleDataRequest(req: NextApiRequest, res: NextApiResponse<ExecF
   } catch (error) {
     res.json(withSerializedError({ error }));
   }
-}
-
-const apiHandler = (async (req, res) => {
-  await handleDataRequest(req, res);
-}) as NextApiHandler<ExecFetchResult<any>>;
+}) satisfies NextApiHandler<ExecFetchResult<any>>;
 
 export default withReqResLogs(apiHandler);

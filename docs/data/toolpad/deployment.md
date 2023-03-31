@@ -16,10 +16,11 @@ npm run build
 
 Once the build has been made. You can deploy it to any service of your choice!
 
-## Standalone display mode
+## Overriding page display mode
 
-By default, Toolpad apps include built-in page navigation in a sidebar on the left of screen.
+You can override any page's display mode by adding the `toolpad-display` query parameter to the URL.
 
-<!--- Include optional image highlighting built-in navigation sidebar -->
+Possible values:
 
-You can hide the built-in navigation by adding `toolpad-display=standalone` as a query parameter to the URL.
+- `standalone` - Hide app shell
+- `shell` - Show navigation UI sidebar

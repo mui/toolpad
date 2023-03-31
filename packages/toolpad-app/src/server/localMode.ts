@@ -12,8 +12,16 @@ import { errorFrom } from '../utils/errors';
 import { migrateUp, isUpToDate } from '../appDom/migrations';
 import insecureHash from '../utils/insecureHash';
 import { writeFileRecursive, readMaybeFile, readMaybeDir, updateYamlFile } from '../utils/fs';
-import { PageType, QueryType, ElementType, NavigationActionType, Page } from './schema';
-import { mapValues } from '../utils/collections';
+import {
+  PageType,
+  QueryType,
+  ElementType,
+  NavigationActionType,
+  Page,
+  TemplateType,
+  BindablePropType,
+} from './schema';
+import { filterValues, hasOwnProperty, mapValues } from '../utils/collections';
 import { format } from '../utils/prettier';
 
 export function getUserProjectRoot(): string {
@@ -462,7 +470,17 @@ function expandFromDom<N extends appDom.AppDomNode>(
   }
 
   if (appDom.isElement(node)) {
-    const children = appDom.getChildNodes(dom, node);
+    const { children, ...templates } = appDom.getChildNodes(dom, node);
+
+    const plainProps = mapValues(node.props || {}, (prop) => prop && fromBindableProp(prop));
+
+    const templateProps = mapValues(templates, (subtree) =>
+      subtree
+        ? {
+            $$template: expandChildren(subtree, dom),
+          }
+        : undefined,
+    );
 
     return {
       component: node.attributes.component.value,
@@ -472,33 +490,56 @@ function expandFromDom<N extends appDom.AppDomNode>(
         horizontalAlign: stringOnly(node.layout?.horizontalAlign?.value),
         verticalAlign: stringOnly(node.layout?.verticalAlign?.value),
       }),
-      props: undefinedWhenEmpty(
-        mapValues(node.props || {}, (prop) => prop && fromBindableProp(prop)),
-      ),
-      children: undefinedWhenEmpty(expandChildren(children.children || [], dom)),
+      props: undefinedWhenEmpty({ ...plainProps, ...templateProps }),
+      children: undefinedWhenEmpty(expandChildren(children || [], dom)),
     } satisfies ElementType;
   }
 
   throw new Error(`Unsupported node type "${node.type}"`);
 }
 
+function isTemplate(bindableProp?: BindablePropType): bindableProp is TemplateType {
+  return !!(
+    bindableProp &&
+    typeof bindableProp === 'object' &&
+    hasOwnProperty(bindableProp, '$$template')
+  );
+}
+
 function mergeElementIntoDom(
   dom: appDom.AppDom,
   parent: appDom.ElementNode | appDom.PageNode,
+  parentProp: string,
   elm: ElementType,
 ): appDom.AppDom {
+  const plainProps = filterValues(elm.props ?? {}, (prop) => !isTemplate(prop)) as Record<
+    string,
+    Exclude<BindablePropType, TemplateType>
+  >;
+
+  const templateProps = filterValues(elm.props ?? {}, isTemplate) as Record<string, TemplateType>;
+
   const elmNode = appDom.createElement(
     dom,
     elm.component,
-    mapValues(elm.props || {}, (propValue) => toBindableProp(propValue)),
-    mapValues(elm.layout || {}, (propValue) => appDom.createConst(propValue)),
+    mapValues(plainProps, (propValue) => toBindableProp(propValue)),
+    mapValues(elm.layout ?? {}, (propValue) =>
+      propValue ? appDom.createConst(propValue) : undefined,
+    ),
     elm.name,
   );
-  dom = appDom.addNode(dom, elmNode, parent, 'children');
+
+  dom = appDom.addNode(dom, elmNode, parent, parentProp as any);
 
   if (elm.children) {
     for (const child of elm.children) {
-      dom = mergeElementIntoDom(dom, elmNode, child);
+      dom = mergeElementIntoDom(dom, elmNode, 'children', child);
+    }
+  }
+
+  for (const [propName, templateProp] of Object.entries(templateProps)) {
+    for (const child of templateProp.$$template) {
+      dom = mergeElementIntoDom(dom, elmNode, propName, child);
     }
   }
 
@@ -549,9 +590,11 @@ function createPageDomFromPageFile(pageName: string, pageFile: PageType): appDom
 
   if (pageFile.children) {
     for (const child of pageFile.children) {
-      fragment = mergeElementIntoDom(fragment, pageNode, child);
+      fragment = mergeElementIntoDom(fragment, pageNode, 'children', child);
     }
   }
+
+  // console.log(fragment.nodes);
 
   return fragment;
 }

@@ -1,5 +1,12 @@
 import { z } from 'zod';
 
+const literalSchema = z.union([z.string(), z.number(), z.boolean(), z.null()]);
+type Literal = z.infer<typeof literalSchema>;
+type Json = Literal | { [key: string]: Json } | Json[];
+const jsonSchema: z.ZodType<Json> = z.lazy(() =>
+  z.union([literalSchema, z.array(jsonSchema), z.record(jsonSchema)]),
+);
+
 function nameValuePair<V extends z.ZodTypeAny>(valueType: V) {
   return z.object({ name: z.string(), value: valueType });
 }
@@ -25,8 +32,6 @@ const NavigationAction = z.object({
 
 export type NavigationActionType = z.infer<typeof NavigationAction>;
 
-const BindableAction = z.union([JsExpressionAction, NavigationAction]);
-
 const FetchMode = z.union([z.literal('query'), z.literal('mutation')]);
 
 const NameValuePair = nameValuePair(z.string());
@@ -46,10 +51,19 @@ const Query = z.object({
 
 export type QueryType = z.infer<typeof Query>;
 
+export type TemplateType = {
+  $$template: ElementType[];
+};
+
+let Element: z.ZodType<ElementType>;
+
+const Template: z.ZodType<TemplateType> = z.object({
+  $$template: z.lazy(() => z.array(Element)),
+});
+
 const BaseElement = z.object({
   component: z.string(),
   name: z.string(),
-  props: z.record(z.union([bindable(z.any()), BindableAction])).optional(),
   layout: z
     .object({
       horizontalAlign: z.string().optional(),
@@ -61,12 +75,24 @@ const BaseElement = z.object({
 
 type BaseElementType = z.infer<typeof BaseElement>;
 
+const BindableProp = z.union([
+  jsonSchema,
+  JsExpressionBinding,
+  JsExpressionAction,
+  NavigationAction,
+  Template,
+]);
+
+export type BindablePropType = z.infer<typeof BindableProp>;
+
 export type ElementType = BaseElementType & {
   children?: ElementType[];
+  props?: Record<string, BindablePropType>;
 };
 
-const Element: z.ZodType<ElementType> = BaseElement.extend({
+Element = BaseElement.extend({
   children: z.lazy(() => z.array(Element).optional()),
+  props: z.lazy(() => z.record(BindableProp).optional()),
 });
 
 export const Page = z.object({

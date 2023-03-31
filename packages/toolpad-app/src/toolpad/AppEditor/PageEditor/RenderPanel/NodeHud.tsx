@@ -42,7 +42,7 @@ const NodeHudWrapper = styled('div', {
   position: 'absolute',
   userSelect: 'none',
   outline: `1px dotted ${isOutlineVisible ? theme.palette.primary[500] : 'transparent'}`,
-  zIndex: 2,
+  zIndex: 80,
   '&:hover': {
     outline: `2px dashed ${isHoverable ? 'transparent' : theme.palette.primary[500]}`,
   },
@@ -53,7 +53,7 @@ const NodeHudWrapper = styled('div', {
     outline: `2px solid ${theme.palette.primary[500]}`,
     left: 0,
     top: 0,
-    zIndex: 2,
+    zIndex: 80,
   },
   [`&.${nodeHudClasses.allowNodeInteraction}`]: {
     // block pointer-events so we can interact with the selection
@@ -90,7 +90,7 @@ const SelectionHintWrapper = styled('div', {
 const DraggableEdgeWrapper = styled('div')({
   userSelect: 'none',
   position: 'absolute',
-  zIndex: 3,
+  zIndex: 90,
 });
 
 const DraggableEdge = styled('div', {
@@ -131,14 +131,14 @@ const DraggableEdge = styled('div', {
     ...dynamicStyles,
     position: 'absolute',
     pointerEvents: 'initial',
-    zIndex: 3,
+    zIndex: 90,
   };
 });
 
 const ResizePreview = styled('div')(({ theme }) => ({
   backgroundColor: theme.palette.primary[500],
   opacity: 0.2,
-  zIndex: 3,
+  zIndex: 90,
 }));
 
 interface NodeHudProps {

@@ -461,7 +461,9 @@ function expandFromDom<N extends appDom.AppDomNode>(
       mode: node.attributes.mode?.value,
       dataSource: node.attributes.dataSource?.value,
       query: node.attributes.query.value,
-      parameters: undefinedWhenEmpty(node.params?.map(([name, value]) => ({ name, value }))),
+      parameters: undefinedWhenEmpty(
+        node.params?.map(([name, value]) => ({ name, value: fromBindable(value) })),
+      ),
       cacheTime: node.attributes.cacheTime?.value,
       refetchInterval: node.attributes.refetchInterval?.value,
       transform: node.attributes.transform?.value,
@@ -583,6 +585,9 @@ function createPageDomFromPageFile(pageName: string, pageFile: PageType): appDom
             ? appDom.createConst(query.transformEnabled)
             : undefined,
         },
+        params: query.parameters?.map(
+          ({ name, value }) => [name, toBindable(value)] satisfies [string, BindableAttrValue<any>],
+        ),
       });
       fragment = appDom.addNode(fragment, queryNode, pageNode, 'queries');
     }

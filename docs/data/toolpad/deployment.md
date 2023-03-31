@@ -23,4 +23,4 @@ You can override any page's display mode by adding the `toolpad-display` query p
 Possible values:
 
 - `standalone` - Hide app shell
-- `shell` - Show navigation UI sidebar
+- `shell` - Show navigation sidebar

@@ -5,7 +5,7 @@ import invariant from 'invariant';
 import { debounce, DebouncedFunc } from 'lodash-es';
 import { useLocation } from 'react-router-dom';
 import * as appDom from '../appDom';
-import { update } from '../utils/immutability';
+import { omit, update } from '../utils/immutability';
 import client from '../api';
 import useShortcut from '../utils/useShortcut';
 import useDebouncedHandler from '../utils/useDebouncedHandler';
@@ -17,7 +17,7 @@ import { hasFieldFocus } from '../utils/fields';
 import { DomView, getViewFromPathname, PageViewTab } from '../utils/domView';
 
 export function getNodeHashes(dom: appDom.AppDom): NodeHashes {
-  return mapValues(dom.nodes, (node) => insecureHash(JSON.stringify(node)));
+  return mapValues(dom.nodes, (node) => insecureHash(JSON.stringify(omit(node, 'id'))));
 }
 
 export type DomAction = {

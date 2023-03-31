@@ -86,7 +86,7 @@ export default function ComponentEditor({ className }: ComponentEditorProps) {
   };
 
   return (
-    <div className={className}>
+    <div className={className} data-testid="theme-editor">
       {theme ? (
         <Stack spacing={2}>
           <ToggleButtonGroup

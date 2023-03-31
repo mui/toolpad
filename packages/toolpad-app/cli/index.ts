@@ -39,7 +39,8 @@ interface Options {
   dir?: string;
 }
 
-async function runApp(cmd: Command, { port, dev = false, dir = process.cwd() }: Options) {
+async function runApp(cmd: Command, { port, dev = false, dir = '.' }: Options) {
+  const projectDir = path.resolve(process.cwd(), dir);
   const { execaNode } = await import('execa');
   const { default: chalk } = await import('chalk');
   const { default: getPort } = await import('get-port');
@@ -59,12 +60,12 @@ async function runApp(cmd: Command, { port, dev = false, dir = process.cwd() }: 
   const serverPath = path.resolve(__dirname, './server.js');
 
   const cp = execaNode(serverPath, [], {
-    cwd: dir,
+    cwd: projectDir,
     stdio: 'pipe',
     env: {
       NODE_ENV: dev ? 'development' : 'production',
       TOOLPAD_DIR: toolpadDir,
-      TOOLPAD_PROJECT_DIR: dir,
+      TOOLPAD_PROJECT_DIR: projectDir,
       TOOLPAD_PORT: String(port),
       TOOLPAD_CMD: cmd,
       FORCE_COLOR: '1',

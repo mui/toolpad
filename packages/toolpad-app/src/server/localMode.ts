@@ -3,17 +3,15 @@ import * as path from 'path';
 import * as fs from 'fs/promises';
 import invariant from 'invariant';
 import { Dirent } from 'fs';
-import * as chokidar from 'chokidar';
-import { debounce } from 'lodash';
-import Emitter from '@mui/toolpad-core/utils/Emitter';
 import openEditor from 'open-editor';
 import chalk from 'chalk';
 import config from '../config';
 import * as appDom from '../appDom';
 import { errorFrom } from '../utils/errors';
-import { migrateUp } from '../appDom/migrations';
+import { migrateUp, isUpToDate } from '../appDom/migrations';
 import insecureHash from '../utils/insecureHash';
 import { writeFileRecursive, readMaybeFile } from '../utils/fs';
+import { format } from '../utils/prettier';
 
 export function getUserProjectRoot(): string {
   const { projectDir } = config;
@@ -37,19 +35,11 @@ function getToolpadFolder(root: string): string {
   return path.resolve(root, './toolpad');
 }
 
-function getComponentsFolder(root: string): string {
-  return path.resolve(getToolpadFolder(root), './components');
-}
-
 function getQueriesFile(root: string): string {
   return path.resolve(getToolpadFolder(root), './queries.ts');
 }
 
-function getDomFile(root: string): string {
-  return path.resolve(getToolpadFolder(root), './toolpad.yml');
-}
-
-function getComponentFolder(root: string): string {
+function getComponentsFolder(root: string): string {
   const toolpadFolder = getToolpadFolder(root);
   return path.resolve(toolpadFolder, './components');
 }
@@ -78,8 +68,7 @@ type ComponentsContent = Record<string, string>;
 export const QUERIES_FILE = `./toolpad/queries.ts`;
 
 async function loadCodeComponentsFromFiles(root: string): Promise<ComponentsContent> {
-  const componentsFolder = getComponentFolder(root);
-  await fs.mkdir(componentsFolder, { recursive: true });
+  const componentsFolder = getComponentsFolder(root);
   let entries: Dirent[] = [];
   try {
     entries = await fs.readdir(componentsFolder, { withFileTypes: true });
@@ -105,6 +94,42 @@ async function loadCodeComponentsFromFiles(root: string): Promise<ComponentsCont
   return Object.fromEntries(resultEntries.filter(Boolean));
 }
 
+function createDefaultCodeComponent(name: string): string {
+  const componentId = name.replace(/\s/g, '');
+  const propTypeId = `${componentId}Props`;
+  return format(`
+    import * as React from 'react';
+    import { Typography } from '@mui/material';
+    import { createComponent } from '@mui/toolpad/browser';
+    
+    export interface ${propTypeId} {
+      msg: string;
+    }
+    
+    function ${componentId}({ msg }: ${propTypeId}) {
+      return (
+        <Typography>{msg}</Typography>
+      );
+    }
+
+    export default createComponent(${componentId}, {
+      argTypes: {
+        msg: {
+          typeDef: { type: "string", default: "Hello world!" },
+        },
+      },
+    });    
+  `);
+}
+
+export async function createComponent(name: string) {
+  const root = getUserProjectRoot();
+  const componentsFolder = getComponentsFolder(root);
+  const filePath = getComponentFilePath(componentsFolder, name);
+  const content = createDefaultCodeComponent(name);
+  await writeFileRecursive(filePath, content, { encoding: 'utf-8' });
+}
+
 class Lock {
   pending: Promise<any> | null = null;
 
@@ -120,9 +145,34 @@ class Lock {
 
 const configFileLock = new Lock();
 
-async function writeConfigFile(filePath: string, dom: appDom.AppDom): Promise<void> {
+async function loadConfigFileFrom(configFilePath: string): Promise<appDom.AppDom | null> {
+  // Using a lock to avoid read during write which may result in reading truncated file content
+  const configContent = await configFileLock.use(() => readMaybeFile(configFilePath));
+
+  if (!configContent) {
+    return null;
+  }
+
+  const parsedConfig = yaml.parse(configContent);
+  invariant(parsedConfig, 'Invalid Toolpad config');
+  return parsedConfig;
+}
+
+async function loadConfigFile(root: string) {
+  const configFilePath = await getConfigFilePath(root);
+  const dom = await loadConfigFileFrom(configFilePath);
+
+  if (dom) {
+    return dom;
+  }
+
+  throw new Error(`No toolpad dom found`);
+}
+
+async function writeConfigFile(root: string, dom: appDom.AppDom): Promise<void> {
+  const configFilePath = await getConfigFilePath(root);
   await configFileLock.use(() =>
-    writeFileRecursive(filePath, yaml.stringify(dom), { encoding: 'utf-8' }),
+    writeFileRecursive(configFilePath, yaml.stringify(dom), { encoding: 'utf-8' }),
   );
 }
 
@@ -157,7 +207,7 @@ async function initToolpadFile(root: string): Promise<void> {
     // eslint-disable-next-line no-console
     console.log(`${chalk.blue('info')}  - Initializing Toolpad config file`);
     const defaultDom = appDom.createDefaultDom();
-    await writeConfigFile(configFilePath, defaultDom);
+    await writeConfigFile(root, defaultDom);
   }
 }
 
@@ -177,19 +227,36 @@ async function initGeneratedGitignore(root: string) {
   }
 }
 
+async function migrateProject(root: string) {
+  let dom = await loadConfigFile(root);
+  const domVersion = dom.version ?? 0;
+  if (domVersion > appDom.CURRENT_APPDOM_VERSION) {
+    console.error(
+      `${chalk.red(
+        'error',
+      )} - This project was created with a newer version of Toolpad, please upgrade your ${chalk.cyan(
+        '@mui/toolpad',
+      )} installation`,
+    );
+  } else if (domVersion < appDom.CURRENT_APPDOM_VERSION) {
+    // eslint-disable-next-line no-console
+    console.log(
+      `${chalk.blue(
+        'info',
+      )}  - This project was created by an older version of Toolpad. Upgrading...`,
+    );
+    dom = migrateUp(dom);
+    await writeConfigFile(root, dom);
+  }
+}
+
 async function initProjectFolder(): Promise<void> {
   try {
     const root = getUserProjectRoot();
-    if (config.cmd === 'dev') {
-      await initToolpadFolder(root);
-      await Promise.all([
-        initGeneratedGitignore(root),
-        initToolpadFile(root),
-        initQueriesFile(root),
-      ]);
-    } else {
-      // TODO: verify files exist?
-    }
+
+    await initToolpadFolder(root);
+    await Promise.all([initGeneratedGitignore(root), initToolpadFile(root)]);
+    await migrateProject(root);
   } catch (err) {
     console.error(`${chalk.red('error')} - Failed to intialize Toolpad`);
     console.error(err);
@@ -275,15 +342,14 @@ function extractNewComponentsContentFromDom(dom: appDom.AppDom): ExtractedCompon
   return { components, dom };
 }
 
-export async function writeDomToDisk(dom: appDom.AppDom): Promise<void> {
+async function writeDomToDisk(dom: appDom.AppDom): Promise<void> {
   const root = getUserProjectRoot();
-  const configFilePath = await getConfigFilePath(root);
-  const componentsFolder = getComponentFolder(root);
+  const componentsFolder = getComponentsFolder(root);
 
   const { components: componentsContent, dom: domWithoutComponents } =
     extractNewComponentsContentFromDom(dom);
   await Promise.all([
-    writeConfigFile(configFilePath, domWithoutComponents),
+    writeConfigFile(root, domWithoutComponents),
     writeCodeComponentsToFiles(componentsFolder, componentsContent),
   ]);
 }
@@ -296,37 +362,10 @@ export async function saveLocalDom(dom: appDom.AppDom): Promise<void> {
   await writeDomToDisk(dom);
 }
 
-async function loadConfigFileFrom(configFilePath: string): Promise<appDom.AppDom | null> {
-  await isInitialized;
-  // Using a lock to avoid read during write which may result in reading truncated file content
-  const configContent = await configFileLock.use(() => readMaybeFile(configFilePath));
-
-  if (!configContent) {
-    return null;
-  }
-
-  const parsedConfig = yaml.parse(configContent);
-  invariant(parsedConfig, 'Invalid Toolpad config');
-  return parsedConfig;
-}
-
-async function loadConfigFile() {
+async function loadDomFromDisk(): Promise<appDom.AppDom> {
   const root = getUserProjectRoot();
-  const configFilePath = await getConfigFilePath(root);
-  const dom = await loadConfigFileFrom(configFilePath);
-
-  if (dom) {
-    return dom;
-  }
-
-  throw new Error(`No toolpad dom found`);
-}
-
-export async function loadDomFromDisk(): Promise<appDom.AppDom> {
-  const root = getUserProjectRoot();
-  await isInitialized;
   const [configContent, componentsContent] = await Promise.all([
-    loadConfigFile(),
+    loadConfigFile(root),
     loadCodeComponentsFromFiles(root),
   ]);
   const dom = mergeComponentsContentIntoDom(configContent, componentsContent);
@@ -334,8 +373,12 @@ export async function loadDomFromDisk(): Promise<appDom.AppDom> {
 }
 
 export async function loadLocalDom(): Promise<appDom.AppDom> {
+  await isInitialized;
   const dom = await loadDomFromDisk();
-  return migrateUp(dom);
+  if (!isUpToDate(dom)) {
+    throw new Error(`Incompatible dom`);
+  }
+  return dom;
 }
 
 export async function openCodeEditor(file: string): Promise<void> {
@@ -348,7 +391,7 @@ export async function openCodeEditor(file: string): Promise<void> {
 
 export async function openCodeComponentEditor(componentName: string): Promise<void> {
   const root = getUserProjectRoot();
-  const componentsFolder = getComponentFolder(root);
+  const componentsFolder = getComponentsFolder(root);
   const fullPath = getComponentFilePath(componentsFolder, componentName);
   const userProjectRoot = getUserProjectRoot();
   openEditor([fullPath, userProjectRoot], {
@@ -356,15 +399,21 @@ export async function openCodeComponentEditor(componentName: string): Promise<vo
   });
 }
 
+export async function openQueryEditor() {
+  const root = getUserProjectRoot();
+  await initQueriesFile(root);
+  const queriesFilePath = getQueriesFile(root);
+  await openCodeEditor(queriesFilePath);
+}
+
 async function getQueriesFileContent(root: string): Promise<string | null> {
-  await isInitialized;
   return readMaybeFile(getQueriesFile(root));
 }
 
 export async function getDomFingerprint() {
   const root = getUserProjectRoot();
   const [configContent, componentsContent, queriesFile] = await Promise.all([
-    loadConfigFile(),
+    loadConfigFile(root),
     loadCodeComponentsFromFiles(root),
     getQueriesFileContent(root),
   ]);
@@ -397,223 +446,3 @@ export async function readProjectFolder(): Promise<ProjectFolderEntry[]> {
     return [];
   });
 }
-
-export interface QueryFile {
-  name: string;
-  kind: 'query';
-  filepath: string;
-  hash: string;
-  content: string;
-}
-
-export interface QueriesFile {
-  name: string;
-  kind: 'queries';
-  filepath: string;
-  hash: string;
-  content: string;
-}
-
-export interface DomFile {
-  name: string;
-  kind: 'dom';
-  filepath: string;
-  hash: string;
-  content: appDom.AppDom;
-}
-
-export interface PageFile {
-  name: string;
-  kind: 'page';
-  filepath: string;
-  hash: string;
-  content: string;
-}
-
-export interface ComponentFile {
-  name: string;
-  kind: 'component';
-  filepath: string;
-  hash: string;
-  content: string;
-}
-
-export type ToolpadFile = QueryFile | QueriesFile | PageFile | ComponentFile;
-
-export interface ToolpadProjectFiles {
-  /** @depcrecated We will phase out a single dom file for multiple individual files in the toolpad folder */
-  dom: DomFile | null;
-  /** @depcrecated We will phase out a single queries file for multiple individual query files in the toolpad folder */
-  queries: QueriesFile | null;
-  files: ToolpadFile[];
-}
-async function readDomFile(root: string): Promise<DomFile | null> {
-  const filepath = getDomFile(root);
-  const configContent = await readMaybeFile(filepath);
-
-  if (!configContent) {
-    return null;
-  }
-
-  const parsedConfig = yaml.parse(configContent);
-  return {
-    name: 'dom',
-    kind: 'dom',
-    filepath,
-    hash: String(insecureHash(configContent)),
-    content: parsedConfig,
-  };
-}
-
-async function readQueriesFile(root: string): Promise<QueriesFile | null> {
-  const filepath = getQueriesFile(root);
-  const content = await readMaybeFile(filepath);
-
-  if (!content) {
-    return null;
-  }
-
-  return {
-    name: 'queries',
-    kind: 'queries',
-    filepath,
-    hash: String(insecureHash(content)),
-    content,
-  };
-}
-
-async function readComponentsFolder(root: string) {
-  const componentsFolder = getComponentsFolder(root);
-  const entries = await fs.readdir(componentsFolder, { withFileTypes: true });
-  const filePromises: Promise<ComponentFile | null>[] = entries.map(async (entry) => {
-    if (entry.isFile()) {
-      const filepath = path.resolve(componentsFolder, entry.name);
-
-      const content = await fs.readFile(filepath, { encoding: 'utf-8' });
-
-      return {
-        name: entry.name.replace(/\.[^.]+$/, ''),
-        kind: 'component',
-        filepath,
-        hash: String(insecureHash(content)),
-        content,
-      } satisfies ToolpadFile;
-    }
-
-    return null;
-  });
-
-  const maybeFiles = await Promise.all(filePromises);
-
-  return maybeFiles.filter(Boolean);
-}
-
-async function readProjectFiles(root: string): Promise<ToolpadFile[]> {
-  const toolpadFolder = getToolpadFolder(root);
-  await fs.mkdir(toolpadFolder, { recursive: true });
-  const entries = await fs.readdir(toolpadFolder, { withFileTypes: true });
-  const filePromises: Promise<ToolpadFile | null>[] = entries.map(async (entry) => {
-    const match =
-      /^(?<name>.*)\.(?<kind>query|page|component)\.(?<extension>js|jsx|ts|tsx|yml)$/.exec(
-        entry.name,
-      );
-
-    const filepath = path.resolve(toolpadFolder, entry.name);
-    if (entry.isFile() && match?.groups) {
-      const { name, kind } = match.groups;
-
-      const content = await fs.readFile(filepath, { encoding: 'utf-8' });
-
-      invariant(
-        kind === 'query' || kind === 'page' || kind === 'component',
-        `Invalid file kind detected "${kind}"`,
-      );
-
-      return {
-        name,
-        kind,
-        filepath,
-        hash: String(insecureHash(content)),
-        content,
-      } satisfies ToolpadFile;
-    }
-
-    return null;
-  });
-
-  const maybeFiles = await Promise.all(filePromises);
-
-  return maybeFiles.filter(Boolean);
-}
-
-export async function readToolpadProjectFiles(root: string): Promise<ToolpadProjectFiles> {
-  const [dom, queries, files, components] = await Promise.all([
-    readDomFile(root),
-    readQueriesFile(root),
-    readProjectFiles(root),
-    readComponentsFolder(root),
-  ]);
-
-  return { dom, queries, files: [...files, ...components] };
-}
-
-type ToolpadProjectEvents = {
-  change: {};
-};
-
-export class ToolpadProject {
-  private root: string;
-
-  private watcher: chokidar.FSWatcher | undefined;
-
-  private files: Promise<ToolpadProjectFiles> | undefined;
-
-  private emitter = new Emitter<ToolpadProjectEvents>();
-
-  constructor(root: string) {
-    this.root = root;
-  }
-
-  on(...args: Parameters<typeof this.emitter.on>) {
-    return this.emitter.on(...args);
-  }
-
-  off(...args: Parameters<typeof this.emitter.off>) {
-    return this.emitter.off(...args);
-  }
-
-  watch() {
-    if (!this.watcher) {
-      const handleProjectFileChanged = debounce(async () => {
-        this.files = readToolpadProjectFiles(this.root);
-        await this.files;
-        this.emitter.emit('change', {});
-      }, 200);
-
-      this.watcher = chokidar
-        .watch([getToolpadFolder(this.root), getDomFile(this.root)])
-        .on('all', handleProjectFileChanged);
-    }
-  }
-
-  async getFiles(): Promise<ToolpadProjectFiles> {
-    if (!this.files) {
-      this.files = readToolpadProjectFiles(this.root);
-    }
-    return this.files;
-  }
-}
-
-/*
-// WIP
-
-(globalThis as any).toolpadProject = (globalThis as any).toolpadProject || (() => {
-  const project = new ToolpadProject(getUserProjectRoot())
-
-  if (config.cmd === 'dev') {
-    project.watch()
-  }
-
-  return project
-})()
-*/

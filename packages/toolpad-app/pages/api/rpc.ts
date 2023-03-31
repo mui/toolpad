@@ -6,7 +6,11 @@ import { getLatestToolpadRelease } from '../../src/server/getLatestRelease';
 import { hasOwnProperty } from '../../src/utils/collections';
 import { errorFrom, serializeError } from '../../src/utils/errors';
 import logger from '../../src/server/logs/logger';
-import { getDomFingerprint, openCodeComponentEditor } from '../../src/server/localMode';
+import {
+  createComponent,
+  getDomFingerprint,
+  openCodeComponentEditor,
+} from '../../src/server/localMode';
 
 export interface Method<P extends any[] = any[], R = any> {
   (...params: P): Promise<R>;
@@ -129,6 +133,9 @@ const rpcServer = {
     }),
     openCodeComponentEditor: createMethod<typeof openCodeComponentEditor>(({ params }) => {
       return openCodeComponentEditor(...params);
+    }),
+    createComponent: createMethod<typeof createComponent>(({ params }) => {
+      return createComponent(...params);
     }),
   },
 } as const;

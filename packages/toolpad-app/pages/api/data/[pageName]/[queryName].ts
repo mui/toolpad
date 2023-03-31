@@ -1,4 +1,4 @@
-import { NextApiHandler, NextApiRequest, NextApiResponse } from 'next';
+import { NextApiHandler } from 'next';
 import Cors from 'cors';
 import { ExecFetchResult, SerializedError } from '@mui/toolpad-core';
 import { asArray } from '@mui/toolpad-core/utils/collections';

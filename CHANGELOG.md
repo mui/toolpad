@@ -1,5 +1,29 @@
 # Changelog
 
+## 0.1.2
+
+<!-- generated comparing v0.1.1..master -->
+
+_Mar 31, 2023_
+
+A big thanks to the 3 contributors who made this release possible. Here are some highlights ✨:
+
+Add end-user application navigation! Various fixes.
+
+- &#8203;<!-- 11 -->Add app navigation sidebar (#1819) @apedroferreira
+- &#8203;<!-- 10 -->Load queries by name instead of id (#1842) @Janpot
+- &#8203;<!-- 09 -->Fix issues around custom datagrid columns (#1840) @Janpot
+- &#8203;<!-- 08 -->Fix broken theming (#1834) @apedroferreira
+- &#8203;<!-- 07 -->Do Toolpad app migration on startup (#1832) @Janpot
+- &#8203;<!-- 06 -->Remove ECS and Recaptcha + move request/response logs to trace level (#1833) @apedroferreira
+- &#8203;<!-- 05 -->Remove deprecated scope query (#1827) @apedroferreira
+- &#8203;<!-- 04 -->Use worker scoped fixtures for integration tests (#1813) @Janpot
+- &#8203;<!-- 03 -->Remove quickjs-emscripten (#1820) @Janpot
+- &#8203;<!-- 02 -->Rewrite argument handling in `@mui/toolpad` CLI with `yargs` (#1794) @bharatkashyap
+- &#8203;<!-- 01 -->Update CONTRIBUTING.md (Fix typo) (#1826) @apedroferreira
+
+All contributors of this release in alphabetical order: @apedroferreira, @bharatkashyap, @Janpot
+
 ## 0.1.1
 
 <!-- generated comparing v0.1.0..master -->

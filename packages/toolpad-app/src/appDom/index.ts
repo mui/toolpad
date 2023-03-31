@@ -1116,3 +1116,14 @@ export function createDefaultDom(): AppDom {
 
   return dom;
 }
+
+export function getPageByName(dom: AppDom, name: string): PageNode | null {
+  const rootNode = getApp(dom);
+  const { pages = [] } = getChildNodes(dom, rootNode);
+  return pages.find((page) => page.name === name) ?? null;
+}
+
+export function getQueryByName(dom: AppDom, page: PageNode, name: string): QueryNode | null {
+  const { queries = [] } = getChildNodes(dom, page);
+  return queries.find((query) => query.name === name) ?? null;
+}

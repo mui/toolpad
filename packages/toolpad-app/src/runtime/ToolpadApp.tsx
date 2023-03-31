@@ -542,10 +542,11 @@ function resolveBindables(
 }
 
 interface QueryNodeProps {
+  page: appDom.PageNode;
   node: appDom.QueryNode;
 }
 
-function QueryNode({ node }: QueryNodeProps) {
+function QueryNode({ page, node }: QueryNodeProps) {
   const getBindings = useBindingsContext();
   const setControlledBinding = useSetControlledBindingContext();
 
@@ -559,7 +560,7 @@ function QueryNode({ node }: QueryNodeProps) {
 
   const configBindings = _.pick(node.attributes, USE_DATA_QUERY_CONFIG_KEYS);
   const options = resolveBindables(bindings, `${node.id}.config`, configBindings);
-  const queryResult = useDataQuery(node, params, options);
+  const queryResult = useDataQuery(page, node, params, options);
 
   React.useEffect(() => {
     const { isLoading, error, data, rows, ...result } = queryResult;
@@ -582,10 +583,11 @@ function QueryNode({ node }: QueryNodeProps) {
 }
 
 interface MutationNodeProps {
+  page: appDom.PageNode;
   node: appDom.QueryNode;
 }
 
-function MutationNode({ node }: MutationNodeProps) {
+function MutationNode({ node, page }: MutationNodeProps) {
   const { version } = useAppContext();
   const getBindings = useBindingsContext();
   const setControlledBinding = useSetControlledBindingContext();
@@ -603,7 +605,8 @@ function MutationNode({ node }: MutationNodeProps) {
   } = useMutation(
     async (overrides: any = {}) =>
       execDataSourceQuery({
-        queryId,
+        pageName: page.name,
+        queryName: node.name,
         params: { ...params, ...overrides },
       }),
     {
@@ -643,16 +646,17 @@ function MutationNode({ node }: MutationNodeProps) {
 }
 
 interface FetchNodeProps {
+  page: appDom.PageNode;
   node: appDom.QueryNode;
 }
 
-function FetchNode({ node }: FetchNodeProps) {
+function FetchNode({ node, page }: FetchNodeProps) {
   const mode: appDom.FetchMode = node.attributes.mode?.value || 'query';
   switch (mode) {
     case 'query':
-      return <QueryNode node={node} />;
+      return <QueryNode node={node} page={page} />;
     case 'mutation':
-      return <MutationNode node={node} />;
+      return <MutationNode node={node} page={page} />;
     default:
       throw new Error(`Unrecognized fetch mdoe "${mode}"`);
   }
@@ -1066,7 +1070,7 @@ function RenderedPage({ nodeId }: RenderedNodeProps) {
             />
 
             {queries.map((node) => (
-              <FetchNode key={node.id} node={node} />
+              <FetchNode key={node.id} page={page} node={node} />
             ))}
           </LocalScopeContextProvider>
         </EvaluatePageExpressionProvider>

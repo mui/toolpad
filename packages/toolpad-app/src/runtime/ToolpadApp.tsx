@@ -1156,9 +1156,11 @@ function ToolpadAppLayout({ dom, version, hasShell: hasShellProp = true }: Toolp
     ? (appDom.getNode<'page'>(dom, pageId as NodeId) as appDom.PageNode)
     : defaultPage;
 
-  const pageDisplay = urlParams.get('toolpad-display') || page.attributes.defaultDisplay?.value;
+  const initialPageDisplay = React.useRef(
+    urlParams.get('toolpad-display') || page.attributes.defaultDisplay?.value,
+  ).current;
 
-  const hasShell = hasShellProp && pageDisplay !== 'standalone';
+  const hasShell = hasShellProp && initialPageDisplay !== 'standalone';
 
   const isPreview = version === 'preview';
 

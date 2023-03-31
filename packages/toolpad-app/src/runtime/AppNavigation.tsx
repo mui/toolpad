@@ -22,17 +22,13 @@ interface AppNavigationProps {
 export default function AppNavigation({ pages, isPreview = false }: AppNavigationProps) {
   const navigate = useNavigate();
   const location = useLocation();
-  const { search } = location;
   const href = useHref('');
-
-  const urlParams = React.useMemo(() => new URLSearchParams(search), [search]);
 
   const handlePageClick = React.useCallback(
     (page: appDom.PageNode) => () => {
-      const urlPageDisplay = urlParams.get('toolpad-display');
-      navigate(`pages/${page.id}${urlPageDisplay ? `?toolpad-display=${urlPageDisplay}` : ''}`);
+      navigate(`pages/${page.id}`);
     },
-    [navigate, urlParams],
+    [navigate],
   );
 
   const activePagePath = location.pathname.replace(href, '');

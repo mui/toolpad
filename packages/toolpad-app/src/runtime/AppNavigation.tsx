@@ -25,13 +25,11 @@ export default function AppNavigation({ pages, isPreview = false }: AppNavigatio
   const { search } = location;
   const href = useHref('');
 
-  const urlParams = React.useMemo(() => new URLSearchParams(search), [search]);
-
   const handlePageClick = React.useCallback(
     (page: appDom.PageNode) => () => {
-      navigate(`pages/${page.id}?${urlParams.toString()}`);
+      navigate(`pages/${page.id}${search}`);
     },
-    [navigate, urlParams],
+    [navigate, search],
   );
 
   const activePagePath = location.pathname.replace(href, '');

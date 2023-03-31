@@ -542,11 +542,10 @@ function resolveBindables(
 }
 
 interface QueryNodeProps {
-  page: appDom.PageNode;
   node: appDom.QueryNode;
 }
 
-function QueryNode({ page, node }: QueryNodeProps) {
+function QueryNode({ node }: QueryNodeProps) {
   const getBindings = useBindingsContext();
   const setControlledBinding = useSetControlledBindingContext();
 
@@ -560,7 +559,7 @@ function QueryNode({ page, node }: QueryNodeProps) {
 
   const configBindings = _.pick(node.attributes, USE_DATA_QUERY_CONFIG_KEYS);
   const options = resolveBindables(bindings, `${node.id}.config`, configBindings);
-  const queryResult = useDataQuery(page, node, params, options);
+  const queryResult = useDataQuery(node, params, options);
 
   React.useEffect(() => {
     const { isLoading, error, data, rows, ...result } = queryResult;
@@ -583,11 +582,10 @@ function QueryNode({ page, node }: QueryNodeProps) {
 }
 
 interface MutationNodeProps {
-  page: appDom.PageNode;
   node: appDom.QueryNode;
 }
 
-function MutationNode({ node, page }: MutationNodeProps) {
+function MutationNode({ node }: MutationNodeProps) {
   const { version } = useAppContext();
   const getBindings = useBindingsContext();
   const setControlledBinding = useSetControlledBindingContext();
@@ -605,8 +603,7 @@ function MutationNode({ node, page }: MutationNodeProps) {
   } = useMutation(
     async (overrides: any = {}) =>
       execDataSourceQuery({
-        pageName: page.name,
-        queryName: node.name,
+        queryId,
         params: { ...params, ...overrides },
       }),
     {
@@ -646,17 +643,16 @@ function MutationNode({ node, page }: MutationNodeProps) {
 }
 
 interface FetchNodeProps {
-  page: appDom.PageNode;
   node: appDom.QueryNode;
 }
 
-function FetchNode({ node, page }: FetchNodeProps) {
+function FetchNode({ node }: FetchNodeProps) {
   const mode: appDom.FetchMode = node.attributes.mode?.value || 'query';
   switch (mode) {
     case 'query':
-      return <QueryNode node={node} page={page} />;
+      return <QueryNode node={node} />;
     case 'mutation':
-      return <MutationNode node={node} page={page} />;
+      return <MutationNode node={node} />;
     default:
       throw new Error(`Unrecognized fetch mdoe "${mode}"`);
   }
@@ -1070,7 +1066,7 @@ function RenderedPage({ nodeId }: RenderedNodeProps) {
             />
 
             {queries.map((node) => (
-              <FetchNode key={node.id} page={page} node={node} />
+              <FetchNode key={node.id} node={node} />
             ))}
           </LocalScopeContextProvider>
         </EvaluatePageExpressionProvider>
@@ -1160,11 +1156,9 @@ function ToolpadAppLayout({ dom, version, hasShell: hasShellProp = true }: Toolp
     ? (appDom.getNode<'page'>(dom, pageId as NodeId) as appDom.PageNode)
     : defaultPage;
 
-  const initialPageDisplay = React.useRef(
-    urlParams.get('toolpad-display') || page.attributes.defaultDisplay?.value,
-  ).current;
+  const pageDisplay = urlParams.get('toolpad-display') || page.attributes.display?.value;
 
-  const hasShell = hasShellProp && initialPageDisplay !== 'standalone';
+  const hasShell = hasShellProp && pageDisplay !== 'standalone';
 
   const isPreview = version === 'preview';
 

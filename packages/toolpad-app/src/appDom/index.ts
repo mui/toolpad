@@ -87,7 +87,7 @@ export interface PageNode extends AppDomNodeBase {
     readonly title: ConstantAttrValue<string>;
     readonly parameters?: ConstantAttrValue<[string, string][]>;
     readonly module?: ConstantAttrValue<string>;
-    readonly defaultDisplay?: ConstantAttrValue<PageDisplayMode>;
+    readonly display?: ConstantAttrValue<PageDisplayMode>;
   };
 }
 
@@ -1108,7 +1108,7 @@ export function createDefaultDom(): AppDom {
     name: 'Page 1',
     attributes: {
       title: createConst('Page 1'),
-      defaultDisplay: createConst('shell'),
+      display: createConst('shell'),
     },
   });
 

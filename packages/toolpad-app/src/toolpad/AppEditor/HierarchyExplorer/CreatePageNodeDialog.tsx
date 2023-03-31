@@ -57,7 +57,7 @@ export default function CreatePageDialog({ open, onClose, ...props }: CreatePage
             name,
             attributes: {
               title: appDom.createConst(name),
-              defaultDisplay: appDom.createConst('shell'),
+              display: appDom.createConst('shell'),
             },
           });
           const appNode = appDom.getApp(dom);

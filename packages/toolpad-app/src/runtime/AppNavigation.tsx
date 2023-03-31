@@ -22,13 +22,16 @@ interface AppNavigationProps {
 export default function AppNavigation({ pages, isPreview = false }: AppNavigationProps) {
   const navigate = useNavigate();
   const location = useLocation();
+  const { search } = location;
   const href = useHref('');
+
+  const urlParams = React.useMemo(() => new URLSearchParams(search), [search]);
 
   const handlePageClick = React.useCallback(
     (page: appDom.PageNode) => () => {
-      navigate(`pages/${page.id}`);
+      navigate(`pages/${page.id}?${urlParams.toString()}`);
     },
-    [navigate],
+    [navigate, urlParams],
   );
 
   const activePagePath = location.pathname.replace(href, '');

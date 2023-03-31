@@ -30,7 +30,7 @@ export default function PageOptionsPanel() {
           draft,
           page,
           'attributes',
-          'defaultDisplay',
+          'display',
           appDom.createConst(event.target.value as appDom.PageDisplayMode),
         ),
       );
@@ -46,7 +46,7 @@ export default function PageOptionsPanel() {
         <TextField
           select
           defaultValue="shell"
-          value={page.attributes.defaultDisplay?.value}
+          value={page.attributes.display?.value}
           onChange={handleDisplayModeChange}
           label="Display mode"
           fullWidth

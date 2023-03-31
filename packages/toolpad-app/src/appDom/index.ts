@@ -79,12 +79,15 @@ export interface ConnectionNode<P = unknown> extends AppDomNodeBase {
   };
 }
 
+export type PageDisplayMode = 'standalone' | 'shell';
+
 export interface PageNode extends AppDomNodeBase {
   readonly type: 'page';
   readonly attributes: {
     readonly title: ConstantAttrValue<string>;
     readonly parameters?: ConstantAttrValue<[string, string][]>;
     readonly module?: ConstantAttrValue<string>;
+    readonly display?: ConstantAttrValue<PageDisplayMode>;
   };
 }
 
@@ -1105,6 +1108,7 @@ export function createDefaultDom(): AppDom {
     name: 'Page 1',
     attributes: {
       title: createConst('Page 1'),
+      display: createConst('shell'),
     },
   });
 

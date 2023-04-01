@@ -6,10 +6,13 @@ import openEditor from 'open-editor';
 import chalk from 'chalk';
 import { BindableAttrValue, NodeId } from '@mui/toolpad-core';
 import { fromZodError } from 'zod-validation-error';
+import { glob } from 'glob';
+import * as chokidar from 'chokidar';
+import { debounce } from 'lodash-es';
 import config from '../config';
 import * as appDom from '../appDom';
 import { errorFrom } from '../utils/errors';
-import { migrateUp, isUpToDate } from '../appDom/migrations';
+import { migrateUp } from '../appDom/migrations';
 import insecureHash from '../utils/insecureHash';
 import { writeFileRecursive, readMaybeFile, readMaybeDir, updateYamlFile } from '../utils/fs';
 import {
@@ -683,6 +686,9 @@ async function writeDomToDisk(dom: appDom.AppDom): Promise<void> {
   const { pages: pagesContent, dom: domWithoutPages } = extractPagesFromDom(dom);
   dom = domWithoutPages;
 
+  const { dom: domWithoutComponents } = extractComponentsContentFromDom(dom);
+  dom = domWithoutComponents;
+
   await Promise.all([writeConfigFile(root, dom), writePagesToFiles(pagesFolder, pagesContent)]);
 }
 
@@ -730,24 +736,6 @@ export async function openQueryEditor() {
   await initQueriesFile(root);
   const queriesFilePath = getQueriesFile(root);
   await openCodeEditor(queriesFilePath);
-}
-
-async function getQueriesFileContent(root: string): Promise<string | null> {
-  return readMaybeFile(getQueriesFile(root));
-}
-
-export async function getDomFingerprint() {
-  const root = getUserProjectRoot();
-  const [configContent, componentsContent, queriesFile, pagesContent] = await Promise.all([
-    loadConfigFile(root),
-    loadCodeComponentsFromFiles(root),
-    getQueriesFileContent(root),
-    loadPagesFromFiles(root),
-  ]);
-
-  return insecureHash(
-    JSON.stringify([configContent, componentsContent, queriesFile, pagesContent]),
-  );
 }
 
 export type ProjectFolderEntry = {
@@ -829,45 +817,107 @@ async function migrateProject(root: string) {
   await migrateLegacyComponents(root);
 }
 
-async function initProjectFolder(): Promise<void> {
-  try {
-    const root = getUserProjectRoot();
+function getDomFilePatterns(root: string) {
+  return [
+    path.resolve(root, './toolpad.yml'),
+    path.resolve(root, './toolpad.yml'),
+    path.resolve(root, './toolpad/pages/*/page.yml'),
+    path.resolve(root, './toolpad/components/*.*'),
+  ];
+}
 
-    await initToolpadFolder(root);
-    await Promise.all([initGeneratedGitignore(root), initToolpadFile(root)]);
-    await migrateProject(root);
-  } catch (err) {
-    console.error(`${chalk.red('error')} - Failed to intialize Toolpad`);
-    console.error(err);
-    process.exit(1);
+/**
+ * Calculates a fingerprint from all files that influence the dom structure
+ */
+async function calculateDomFingerprint(root: string): Promise<number> {
+  const files = await glob(getDomFilePatterns(root));
+
+  const mtimes = await Promise.all(
+    files.sort().map(async (file) => {
+      const stats = await fs.stat(file);
+      return [file, stats.mtimeMs];
+    }),
+  );
+
+  return insecureHash(JSON.stringify(mtimes));
+}
+
+async function initProject() {
+  const root = getUserProjectRoot();
+
+  await initToolpadFolder(root);
+  await Promise.all([initGeneratedGitignore(root), initToolpadFile(root)]);
+  await migrateProject(root);
+
+  let [dom, fingerprint] = await Promise.all([loadDomFromDisk(), calculateDomFingerprint(root)]);
+
+  const lock = new Lock();
+
+  const updateDomFromExternal = debounce(() => {
+    lock.use(async () => {
+      const newFingerprint = await calculateDomFingerprint(root);
+      if (fingerprint !== newFingerprint) {
+        // eslint-disable-next-line no-console
+        console.log(`${chalk.magenta('event')} - Project changed on disk, updating...`);
+        [dom, fingerprint] = await Promise.all([loadDomFromDisk(), calculateDomFingerprint(root)]);
+      }
+    });
+  }, 100);
+
+  if (config.cmd === 'dev') {
+    chokidar.watch(getDomFilePatterns(root)).on('all', () => {
+      updateDomFromExternal();
+    });
   }
+
+  return {
+    async loadDom() {
+      return dom;
+    },
+    async saveDom(newDom: appDom.AppDom) {
+      if (config.cmd !== 'dev') {
+        throw new Error(`Writing to disk is only possible in toolpad dev mode.`);
+      }
+
+      await lock.use(async () => {
+        await writeDomToDisk(newDom);
+        const newFingerprint = await calculateDomFingerprint(root);
+
+        dom = newDom;
+        fingerprint = newFingerprint;
+      });
+
+      return { fingerprint };
+    },
+    async getDomFingerPrint() {
+      return fingerprint;
+    },
+  };
 }
 
 // eslint-disable-next-line no-underscore-dangle
-(globalThis as any).__init_project__ ??= initProjectFolder();
+(globalThis as any).__project__ ??= initProject().catch((err) => {
+  console.error(`${chalk.red('error')} - Failed to intialize Toolpad`);
+  console.error(err);
+  process.exit(1);
+});
 
-export async function waitForInit() {
+export async function waitForInit(): Promise<ReturnType<typeof initProject>> {
   // eslint-disable-next-line no-underscore-dangle
-  await (globalThis as any).__init_project__;
+  return (globalThis as any).__project__;
 }
 
 export async function loadLocalDom(): Promise<appDom.AppDom> {
-  await waitForInit();
-  const dom = await loadDomFromDisk();
-  if (!isUpToDate(dom)) {
-    throw new Error(`Incompatible dom`);
-  }
-  return dom;
+  const project = await waitForInit();
+  return project.loadDom();
 }
 
-export async function saveLocalDom(dom: appDom.AppDom): Promise<{ fingerprint: number }> {
-  if (config.cmd !== 'dev') {
-    throw new Error(`Writing to disk is only possible in toolpad dev mode.`);
-  }
+export async function saveLocalDom(newDom: appDom.AppDom): Promise<{ fingerprint: number }> {
+  const project = await waitForInit();
+  return project.saveDom(newDom);
+}
 
-  await writeDomToDisk(dom);
-
-  const fingerprint = await getDomFingerprint();
-
-  return { fingerprint };
+export async function getDomFingerprint() {
+  const project = await waitForInit();
+  return project.getDomFingerPrint();
 }

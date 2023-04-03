@@ -54,10 +54,10 @@
   "dependencies": {
     "@tanstack/react-query": "^4.28.0",
     "quickjs-emscripten": "^0.22.0",
-    "react-error-boundary": "^4.0.2"
+    "react-error-boundary": "^4.0.3"
   },
   "devDependencies": {
-    "concurrently": "^7.6.0"
+    "concurrently": "^8.0.1"
   },
   "peerDependencies": {
     "react": "^18.0.0"

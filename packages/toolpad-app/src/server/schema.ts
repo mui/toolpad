@@ -101,6 +101,7 @@ export const Page = z.object({
   parameters: z.array(NameValuePair).optional(),
   queries: z.array(Query).optional(),
   content: z.array(Element).optional(),
+  display: z.union([z.literal('standalone'), z.literal('shell')]).optional(),
 });
 
 export type PageType = z.infer<typeof Page>;

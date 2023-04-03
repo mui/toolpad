@@ -454,6 +454,7 @@ function expandFromDom<N extends appDom.AppDomNode>(
       ),
       content: undefinedWhenEmpty(expandChildren(children.children || [], dom)),
       queries: undefinedWhenEmpty(expandChildren(children.queries || [], dom)),
+      display: node.attributes.display?.value,
     } satisfies PageType;
   }
 
@@ -559,6 +560,7 @@ function createPageDomFromPageFile(pageName: string, pageFile: PageType): appDom
       parameters: appDom.createConst(
         pageFile.parameters?.map(({ name, value }) => [name, value]) || [],
       ),
+      display: pageFile.display ? appDom.createConst(pageFile.display) : undefined,
     },
   });
 
@@ -798,6 +800,7 @@ async function migrateProject(root: string) {
         '@mui/toolpad',
       )} installation`,
     );
+    process.exit(1);
   } else if (domVersion < appDom.CURRENT_APPDOM_VERSION) {
     // eslint-disable-next-line no-console
     console.log(

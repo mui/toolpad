@@ -100,7 +100,7 @@ export const Page = z.object({
   title: z.string().optional(),
   parameters: z.array(NameValuePair).optional(),
   queries: z.array(Query).optional(),
-  children: z.array(Element).optional(),
+  content: z.array(Element).optional(),
 });
 
 export type PageType = z.infer<typeof Page>;

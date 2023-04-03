@@ -452,7 +452,7 @@ function expandFromDom<N extends appDom.AppDomNode>(
       parameters: undefinedWhenEmpty(
         node.attributes.parameters?.value.map(([name, value]) => ({ name, value })) ?? [],
       ),
-      children: undefinedWhenEmpty(expandChildren(children.children || [], dom)),
+      content: undefinedWhenEmpty(expandChildren(children.children || [], dom)),
       queries: undefinedWhenEmpty(expandChildren(children.queries || [], dom)),
     } satisfies PageType;
   }
@@ -596,13 +596,11 @@ function createPageDomFromPageFile(pageName: string, pageFile: PageType): appDom
     }
   }
 
-  if (pageFile.children) {
-    for (const child of pageFile.children) {
+  if (pageFile.content) {
+    for (const child of pageFile.content) {
       fragment = mergeElementIntoDom(fragment, pageNode, 'children', child);
     }
   }
-
-  // console.log(fragment.nodes);
 
   return fragment;
 }

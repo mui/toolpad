@@ -23,9 +23,20 @@ import {
   Page,
   TemplateType,
   BindablePropType,
+  LocalQueryConfigType,
+  FetchQueryConfigType,
+  QueryConfigType,
+  BodyType,
+  ResponseType,
 } from './schema';
 import { filterValues, hasOwnProperty, mapValues } from '../utils/collections';
 import { format } from '../utils/prettier';
+import {
+  Body,
+  FetchQuery,
+  ResponseType as AppDomRestResponseType,
+} from '../toolpadDataSources/rest/types';
+import { LocalQuery } from '../toolpadDataSources/local/types';
 
 export function getUserProjectRoot(): string {
   const { projectDir } = config;
@@ -432,6 +443,99 @@ function undefinedWhenEmpty<O extends object | any[]>(obj?: O): O | undefined {
   return obj;
 }
 
+function createPageFileQueryFromDomQuery(
+  dataSource: string,
+  query: FetchQuery | LocalQuery | undefined,
+): QueryConfigType {
+  switch (dataSource) {
+    case 'rest': {
+      if (!query) {
+        return { kind: 'rest' };
+      }
+      query = query as FetchQuery;
+
+      let body: BodyType | undefined;
+
+      if (query.body) {
+        switch (query.body.kind) {
+          case 'raw': {
+            body = {
+              kind: 'raw',
+              content: fromBindable(query.body.content),
+              contentType: query.body.contentType.value,
+            };
+            break;
+          }
+          case 'urlEncoded': {
+            body = {
+              kind: 'urlEncoded',
+              content: query.body.content.map(([name, value]) => ({
+                name,
+                value: fromBindable(value),
+              })),
+            };
+            break;
+          }
+          default:
+            throw new Error(`Unrecognized body kind "${(query.body as any).kind}"`);
+        }
+      }
+
+      let response: ResponseType | undefined;
+
+      if (query.response) {
+        switch (query.response.kind) {
+          case 'csv': {
+            response = { kind: 'csv', headers: query.response.headers };
+            break;
+          }
+          case 'json': {
+            response = { kind: 'json' };
+            break;
+          }
+          case 'xml': {
+            response = { kind: 'xml' };
+            break;
+          }
+          case 'raw': {
+            response = { kind: 'raw' };
+            break;
+          }
+          default:
+            throw new Error(`Unrecognized response kind "${(query.response as any).kind}"`);
+        }
+      }
+
+      return {
+        kind: 'rest',
+        url: query.url ? fromBindable(query.url) : undefined,
+        searchParams: query.searchParams?.map(([name, value]) => ({
+          name,
+          value: fromBindable(value),
+        })),
+        headers: query.headers.map(([name, value]) => ({ name, value: fromBindable(value) })),
+        body,
+        method: query.method,
+        response,
+        transform: query.transform,
+        transformEnabled: query.transformEnabled,
+      } satisfies FetchQueryConfigType;
+    }
+    case 'local':
+      if (!query) {
+        return { kind: 'local' };
+      }
+
+      query = query as LocalQuery;
+      return {
+        function: query.function,
+        kind: 'local',
+      } satisfies LocalQueryConfigType;
+    default:
+      throw new Error(`Unsupported dataSource "${dataSource}"`);
+  }
+}
+
 function expandFromDom(node: appDom.ElementNode, dom: appDom.AppDom): ElementType;
 function expandFromDom(node: appDom.QueryNode, dom: appDom.AppDom): QueryType;
 function expandFromDom(node: appDom.PageNode, dom: appDom.AppDom): PageType;
@@ -463,8 +567,12 @@ function expandFromDom<N extends appDom.AppDomNode>(
       name: node.name,
       enabled: node.attributes.enabled ? fromBindable(node.attributes.enabled) : undefined,
       mode: node.attributes.mode?.value,
-      dataSource: node.attributes.dataSource?.value,
-      query: node.attributes.query.value,
+      query: node.attributes.dataSource
+        ? createPageFileQueryFromDomQuery(
+            node.attributes.dataSource.value,
+            node.attributes.query?.value as FetchQuery | LocalQuery | undefined,
+          )
+        : undefined,
       parameters: undefinedWhenEmpty(
         node.params?.map(([name, value]) => ({ name, value: fromBindable(value) })),
       ),
@@ -552,6 +660,79 @@ function mergeElementIntoDom(
   return dom;
 }
 
+function createDomQueryFromPageFileQuery(query: QueryConfigType): FetchQuery | LocalQuery {
+  switch (query.kind) {
+    case 'local':
+      return {
+        function: query.function,
+      } satisfies LocalQuery;
+    case 'rest': {
+      let body: Body | undefined;
+
+      if (query.body) {
+        switch (query.body.kind) {
+          case 'raw': {
+            body = {
+              kind: 'raw',
+              content: toBindable(query.body.content),
+              contentType: appDom.createConst(query.body.contentType),
+            };
+            break;
+          }
+          case 'urlEncoded': {
+            body = {
+              kind: 'urlEncoded',
+              content: query.body.content.map(({ name, value }) => [name, toBindable(value)]),
+            };
+            break;
+          }
+          default:
+            throw new Error(`Unrecognized body kind "${(query.body as any).kind}"`);
+        }
+      }
+
+      let response: AppDomRestResponseType | undefined;
+
+      if (query.response) {
+        switch (query.response.kind) {
+          case 'csv': {
+            response = { kind: 'csv', headers: query.response.headers };
+            break;
+          }
+          case 'json': {
+            response = { kind: 'json' };
+            break;
+          }
+          case 'xml': {
+            response = { kind: 'xml' };
+            break;
+          }
+          case 'raw': {
+            response = { kind: 'raw' };
+            break;
+          }
+          default:
+            throw new Error(`Unrecognized response kind "${(query.response as any).kind}"`);
+        }
+      }
+
+      return {
+        url: query.url ? toBindable(query.url) : undefined,
+        headers: query.headers?.map(({ name, value }) => [name, toBindable(value)]) || [],
+        method: query.method || 'GET',
+        browser: false,
+        transform: query.transform,
+        transformEnabled: query.transformEnabled,
+        searchParams: query.searchParams?.map(({ name, value }) => [name, toBindable(value)]) || [],
+        body,
+        response,
+      } satisfies FetchQuery;
+    }
+    default:
+      throw new Error(`Unrecognized query kind "${(query as any).kind}"`);
+  }
+}
+
 function createPageDomFromPageFile(pageName: string, pageFile: PageType): appDom.AppDom {
   let fragment = appDom.createFragmentInternal(pageFile.id as NodeId, 'page', {
     name: pageName,
@@ -569,32 +750,37 @@ function createPageDomFromPageFile(pageName: string, pageFile: PageType): appDom
 
   if (pageFile.queries) {
     for (const query of pageFile.queries) {
-      const queryNode = appDom.createNode(fragment, 'query', {
-        name: query.name,
-        attributes: {
-          connectionId: appDom.createConst(null),
-          dataSource:
-            typeof query.dataSource === 'string' ? appDom.createConst(query.dataSource) : undefined,
-          query: appDom.createConst(query.query),
-          cacheTime:
-            typeof query.cacheTime === 'number' ? appDom.createConst(query.cacheTime) : undefined,
-          enabled: query.enabled ? toBindable(query.enabled) : undefined,
-          mode: typeof query.mode === 'string' ? appDom.createConst(query.mode) : undefined,
-          transform:
-            typeof query.transform === 'string' ? appDom.createConst(query.transform) : undefined,
-          refetchInterval:
-            typeof query.refetchInterval === 'number'
-              ? appDom.createConst(query.refetchInterval)
+      if (query.query) {
+        const queryNode = appDom.createNode(fragment, 'query', {
+          name: query.name,
+          attributes: {
+            connectionId: appDom.createConst(null),
+            dataSource:
+              typeof query.query?.kind === 'string'
+                ? appDom.createConst(query.query.kind)
+                : undefined,
+            query: appDom.createConst(createDomQueryFromPageFileQuery(query.query)),
+            cacheTime:
+              typeof query.cacheTime === 'number' ? appDom.createConst(query.cacheTime) : undefined,
+            enabled: query.enabled ? toBindable(query.enabled) : undefined,
+            mode: typeof query.mode === 'string' ? appDom.createConst(query.mode) : undefined,
+            transform:
+              typeof query.transform === 'string' ? appDom.createConst(query.transform) : undefined,
+            refetchInterval:
+              typeof query.refetchInterval === 'number'
+                ? appDom.createConst(query.refetchInterval)
+                : undefined,
+            transformEnabled: query.transformEnabled
+              ? appDom.createConst(query.transformEnabled)
               : undefined,
-          transformEnabled: query.transformEnabled
-            ? appDom.createConst(query.transformEnabled)
-            : undefined,
-        },
-        params: query.parameters?.map(
-          ({ name, value }) => [name, toBindable(value)] satisfies [string, BindableAttrValue<any>],
-        ),
-      });
-      fragment = appDom.addNode(fragment, queryNode, pageNode, 'queries');
+          },
+          params: query.parameters?.map(
+            ({ name, value }) =>
+              [name, toBindable(value)] satisfies [string, BindableAttrValue<any>],
+          ),
+        });
+        fragment = appDom.addNode(fragment, queryNode, pageNode, 'queries');
+      }
     }
   }
 

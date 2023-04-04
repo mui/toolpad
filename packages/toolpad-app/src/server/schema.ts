@@ -36,13 +36,84 @@ const FetchMode = z.union([z.literal('query'), z.literal('mutation')]);
 
 const NameValuePair = nameValuePair(z.string());
 
+const RawBody = z.object({
+  kind: z.literal('raw'),
+  content: bindable(z.string()),
+  contentType: z.string(),
+});
+
+const UrlEncodedBody = z.object({
+  kind: z.literal('urlEncoded'),
+  content: z.array(nameValuePair(bindable(z.string()))),
+});
+
+const Body = z.discriminatedUnion('kind', [RawBody, UrlEncodedBody]);
+
+export type BodyType = z.infer<typeof Body>;
+
+const RawResponse = z.object({
+  kind: z.literal('raw'),
+});
+
+const JsonResponse = z.object({
+  kind: z.literal('json'),
+});
+
+const CsvResponse = z.object({
+  kind: z.literal('csv'),
+  headers: z.boolean().describe('First row contains headers'),
+});
+
+const XmlResponse = z.object({
+  kind: z.literal('xml'),
+});
+
+const Response = z.discriminatedUnion('kind', [
+  RawResponse,
+  JsonResponse,
+  CsvResponse,
+  XmlResponse,
+]);
+
+export type ResponseType = z.infer<typeof Response>;
+
+const FetchQueryConfig = z.object({
+  kind: z.literal('rest'),
+  url: bindable(z.string()).optional().describe('The URL of the request'),
+  method: z.string().optional().describe('The request method.'),
+  headers: z
+    .array(nameValuePair(bindable(z.string())))
+    .optional()
+    .describe('Extra request headers.'),
+  searchParams: z
+    .array(nameValuePair(bindable(z.string())))
+    .optional()
+    .describe('Extra url query parameters.'),
+  body: Body.optional().describe('The request body.'),
+  transformEnabled: z.boolean().optional().describe('Run a custom transformer on the response.'),
+  transform: z.string().optional().describe('The custom transformer to run when enabled.'),
+  response: Response.optional().describe('How to parse the response.'),
+});
+
+export type FetchQueryConfigType = z.infer<typeof FetchQueryConfig>;
+
+const LocalQueryConfig = z.object({
+  kind: z.literal('local'),
+  function: z.string().optional(),
+});
+
+export type LocalQueryConfigType = z.infer<typeof LocalQueryConfig>;
+
+const QueryConfig = z.discriminatedUnion('kind', [FetchQueryConfig, LocalQueryConfig]);
+
+export type QueryConfigType = z.infer<typeof QueryConfig>;
+
 const Query = z.object({
   name: z.string().describe('A name for the query'),
   enabled: bindable(z.boolean()).optional(),
   parameters: z.array(nameValuePair(bindable(z.any()))).optional(),
   mode: FetchMode.optional(),
-  dataSource: z.string().optional(),
-  query: z.any(),
+  query: QueryConfig.optional(),
   transform: z.string().optional(),
   transformEnabled: z.boolean().optional(),
   refetchInterval: z.number().optional(),

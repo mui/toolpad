@@ -176,3 +176,11 @@ export const Page = z.object({
 });
 
 export type PageType = z.infer<typeof Page>;
+
+export const Theme = z.object({
+  'palette.mode': z.union([z.literal('light'), z.literal('dark')]).optional(),
+  'palette.primary.main': z.string().optional(),
+  'palette.secondary.main': z.string().optional(),
+});
+
+export type ThemeType = z.infer<typeof Theme>;

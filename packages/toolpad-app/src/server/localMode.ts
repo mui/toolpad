@@ -28,6 +28,8 @@ import {
   QueryConfigType,
   BodyType,
   ResponseType,
+  ThemeType,
+  Theme,
 } from './schema';
 import { filterValues, hasOwnProperty, mapValues } from '../utils/collections';
 import { format } from '../utils/prettier';
@@ -64,6 +66,10 @@ function getQueriesFile(root: string): string {
   return path.resolve(getToolpadFolder(root), './queries.ts');
 }
 
+function getThemeFile(root: string): string {
+  return path.resolve(getToolpadFolder(root), './theme.yml');
+}
+
 function getComponentsFolder(root: string): string {
   const toolpadFolder = getToolpadFolder(root);
   return path.resolve(toolpadFolder, './components');
@@ -93,7 +99,7 @@ export async function getConfigFilePath(root: string) {
   return yamlFilePath;
 }
 
-type ComponentsContent = Record<string, string>;
+type ComponentsContent = Record<string, { code: string }>;
 
 export const QUERIES_FILE = `./toolpad/queries.ts`;
 
@@ -101,13 +107,13 @@ async function loadCodeComponentsFromFiles(root: string): Promise<ComponentsCont
   const componentsFolder = getComponentsFolder(root);
   const entries = (await readMaybeDir(componentsFolder)) || [];
   const resultEntries = await Promise.all(
-    entries.map(async (entry): Promise<[string, string] | null> => {
+    entries.map(async (entry): Promise<[string, { code: string }] | null> => {
       if (entry.isFile()) {
         const fileName = entry.name;
         const componentName = entry.name.replace(/\.tsx$/, '');
         const filePath = path.resolve(componentsFolder, fileName);
         const content = await fs.readFile(filePath, { encoding: 'utf-8' });
-        return [componentName, content];
+        return [componentName, { code: content }];
       }
 
       return null;
@@ -161,6 +167,15 @@ async function loadPagesFromFiles(root: string): Promise<PagesContent> {
   );
 
   return Object.fromEntries(resultEntries.filter(Boolean));
+}
+
+async function loadThemeFromFile(root: string): Promise<ThemeType | null> {
+  const themeFilePath = getThemeFile(root);
+  const content = await readMaybeFile(themeFilePath);
+  if (content) {
+    return Theme.parse(yaml.parse(content));
+  }
+  return null;
 }
 
 function createDefaultCodeComponent(name: string): string {
@@ -227,15 +242,10 @@ async function loadConfigFileFrom(configFilePath: string): Promise<appDom.AppDom
   return parsedConfig;
 }
 
-async function loadConfigFile(root: string) {
+async function loadConfigFile(root: string): Promise<appDom.AppDom | null> {
   const configFilePath = await getConfigFilePath(root);
   const dom = await loadConfigFileFrom(configFilePath);
-
-  if (dom) {
-    return dom;
-  }
-
-  throw new Error(`No toolpad dom found`);
+  return dom;
 }
 
 async function writeConfigFile(root: string, dom: appDom.AppDom): Promise<void> {
@@ -301,7 +311,7 @@ async function writeCodeComponentsToFiles(
   await Promise.all(
     Object.entries(components).map(async ([componentName, content]) => {
       const filePath = getComponentFilePath(componentsFolder, componentName);
-      await writeFileRecursive(filePath, content, { encoding: 'utf-8' });
+      await writeFileRecursive(filePath, content.code, { encoding: 'utf-8' });
     }),
   );
 }
@@ -318,7 +328,7 @@ function mergeComponentsContentIntoDom(
   ]);
 
   for (const name of names) {
-    const content: string | undefined = componentsContent[name];
+    const content: { code: string } | undefined = componentsContent[name];
     const codeComponentNode = codeComponentNodes.find((node) => node.name === name);
     if (content) {
       if (codeComponentNode) {
@@ -327,13 +337,13 @@ function mergeComponentsContentIntoDom(
           codeComponentNode,
           'attributes',
           'code',
-          appDom.createConst(content),
+          appDom.createConst(content.code),
         );
       } else {
         const newNode = appDom.createNode(dom, 'codeComponent', {
           name,
           attributes: {
-            code: appDom.createConst(content),
+            code: appDom.createConst(content.code),
           },
         });
         dom = appDom.addNode(dom, newNode, rootNode, 'codeComponents');
@@ -343,6 +353,24 @@ function mergeComponentsContentIntoDom(
     }
   }
 
+  return dom;
+}
+
+function mergeThemeIntoAppDom(dom: appDom.AppDom, theme: ThemeType): appDom.AppDom {
+  const app = appDom.getApp(dom);
+  dom = appDom.addNode(
+    dom,
+    appDom.createNode(dom, 'theme', {
+      theme: {
+        'palette.mode': appDom.toConstPropValue(theme['palette.mode']),
+        'palette.primary.main': appDom.toConstPropValue(theme['palette.primary.main']),
+        'palette.secondary.main': appDom.toConstPropValue(theme['palette.secondary.main']),
+      },
+      attributes: {},
+    }),
+    app,
+    'themes',
+  );
   return dom;
 }
 
@@ -846,6 +874,11 @@ async function writePagesToFiles(pagesFolder: string, pages: PagesContent) {
   );
 }
 
+async function writeThemeFile(root: string, theme: ThemeType) {
+  const themeFilePath = getThemeFile(root);
+  await updateYamlFile(themeFilePath, theme);
+}
+
 interface ExtractedComponents {
   components: ComponentsContent;
   dom: appDom.AppDom;
@@ -858,11 +891,26 @@ function extractComponentsContentFromDom(dom: appDom.AppDom): ExtractedComponent
   const components: ComponentsContent = {};
 
   for (const codeComponent of codeComponentNodes) {
-    components[codeComponent.name] = codeComponent.attributes.code.value;
+    components[codeComponent.name] = { code: codeComponent.attributes.code.value };
     dom = appDom.removeNode(dom, codeComponent.id);
   }
 
   return { components, dom };
+}
+
+function extractThemeContentFromDom(dom: appDom.AppDom): ThemeType | null {
+  const app = appDom.getApp(dom);
+  const { themes = [] } = appDom.getChildNodes(dom, app);
+  if (themes[0]?.theme) {
+    return {
+      'palette.mode': appDom.fromConstPropValue(themes[0].theme['palette.mode']),
+      'palette.primary.main': appDom.fromConstPropValue(themes[0].theme['palette.primary.main']),
+      'palette.secondary.main': appDom.fromConstPropValue(
+        themes[0].theme['palette.secondary.main'],
+      ),
+    };
+  }
+  return null;
 }
 
 async function writeDomToDisk(dom: appDom.AppDom): Promise<void> {
@@ -876,27 +924,6 @@ async function writeDomToDisk(dom: appDom.AppDom): Promise<void> {
   dom = domWithoutComponents;
 
   await Promise.all([writeConfigFile(root, dom), writePagesToFiles(pagesFolder, pagesContent)]);
-}
-
-async function loadDomFromDisk(): Promise<appDom.AppDom> {
-  const root = getUserProjectRoot();
-  const [configContent, componentsContent, pagesContent] = await Promise.all([
-    loadConfigFile(root),
-    loadCodeComponentsFromFiles(root),
-    loadPagesFromFiles(root),
-  ]);
-  let dom = configContent;
-
-  dom = mergeComponentsContentIntoDom(dom, componentsContent);
-
-  const app = appDom.getApp(dom);
-  const { pages = [] } = appDom.getChildNodes(dom, app);
-  for (const page of pages) {
-    dom = appDom.removeNode(dom, page.id);
-  }
-
-  dom = mergPagesIntoDom(dom, pagesContent);
-  return dom;
 }
 
 export async function openCodeEditor(file: string): Promise<void> {
@@ -930,53 +957,70 @@ export type ProjectFolderEntry = {
   filepath: string;
 };
 
-export async function readProjectFolder(): Promise<ProjectFolderEntry[]> {
-  const userProjectRoot = getUserProjectRoot();
-  const toolpadFolder = path.resolve(userProjectRoot, 'toolpad');
-  const entries = await fs.readdir(toolpadFolder, { withFileTypes: true });
-  return entries.flatMap((entry) => {
-    const match = /^(.*)\.query\.[jt]sx?$/.exec(entry.name);
-    if (entry.isFile() && match) {
-      const name = match[1];
-      return [
-        {
-          name,
-          kind: 'query',
-          filepath: path.resolve(toolpadFolder, entry.name),
-        },
-      ];
-    }
-    return [];
-  });
+interface ToolpadProjectFolder {
+  pages: Record<string, PageType>;
+  components: Record<string, { code: string }>;
+  theme: ThemeType | null;
 }
 
-async function migrateLegacyPages(root: string) {
-  const dom = await loadConfigFile(root);
-  const { pages: pagesContent, dom: domWithoutPages } = extractPagesFromDom(dom);
-  if (Object.keys(pagesContent).length > 0) {
-    const pagesFolder = getPagesFolder(root);
-    await Promise.all([
-      writePagesToFiles(pagesFolder, pagesContent),
-      writeConfigFile(root, domWithoutPages),
-    ]);
+async function readProjectFolder(root: string): Promise<ToolpadProjectFolder> {
+  const [componentsContent, pagesContent, theme] = await Promise.all([
+    loadCodeComponentsFromFiles(root),
+    loadPagesFromFiles(root),
+    loadThemeFromFile(root),
+  ]);
+
+  return {
+    pages: pagesContent,
+    components: componentsContent,
+    theme,
+  };
+}
+
+async function writeProjectFolder(
+  root: string,
+  folder: ToolpadProjectFolder,
+  writeComponents: boolean = false,
+): Promise<void> {
+  const pagesFolder = getPagesFolder(root);
+  await writePagesToFiles(pagesFolder, folder.pages);
+  if (folder.theme) {
+    await writeThemeFile(root, folder.theme);
+  }
+  if (writeComponents) {
+    const componentsFolder = getComponentsFolder(root);
+    await writeCodeComponentsToFiles(componentsFolder, folder.components);
   }
 }
 
-async function migrateLegacyComponents(root: string) {
-  const dom = await loadConfigFile(root);
-  const { components: componentsContent, dom: domWithoutComponents } =
-    extractComponentsContentFromDom(dom);
-  if (Object.keys(componentsContent).length > 0) {
-    const pagesFolder = getPagesFolder(root);
-    await Promise.all([
-      writeCodeComponentsToFiles(pagesFolder, componentsContent),
-      writeConfigFile(root, domWithoutComponents),
-    ]);
+function projectFolderToAppDom(projectFolder: ToolpadProjectFolder): appDom.AppDom {
+  let dom = appDom.createDom();
+  dom = mergPagesIntoDom(dom, projectFolder.pages);
+  dom = mergeComponentsContentIntoDom(dom, projectFolder.components);
+  if (projectFolder.theme) {
+    dom = mergeThemeIntoAppDom(dom, projectFolder.theme);
   }
+  return dom;
 }
 
-async function migrateProject(root: string) {
+function appDomToProjectFolder(dom: appDom.AppDom): ToolpadProjectFolder {
+  const { pages } = extractPagesFromDom(dom);
+  const { components } = extractComponentsContentFromDom(dom);
+  const theme = extractThemeContentFromDom(dom);
+  return { pages, components, theme };
+}
+
+async function loadDomFromDisk(): Promise<appDom.AppDom> {
+  const root = getUserProjectRoot();
+  const projectFolder = await readProjectFolder(root);
+  return projectFolderToAppDom(projectFolder);
+}
+
+async function migrateLegacyProject(root: string) {
   let dom = await loadConfigFile(root);
+  if (!dom) {
+    return;
+  }
   const domVersion = dom.version ?? 0;
   if (domVersion > appDom.CURRENT_APPDOM_VERSION) {
     console.error(
@@ -1000,8 +1044,12 @@ async function migrateProject(root: string) {
     await writeConfigFile(root, dom);
   }
 
-  await migrateLegacyPages(root);
-  await migrateLegacyComponents(root);
+  const projectFolder = appDomToProjectFolder(dom);
+
+  await writeProjectFolder(root, projectFolder, true);
+
+  const configFilePath = await getConfigFilePath(root);
+  await fs.unlink(configFilePath);
 }
 
 function getDomFilePatterns(root: string) {
@@ -1034,7 +1082,7 @@ async function initProject() {
 
   await initToolpadFolder(root);
   await Promise.all([initGeneratedGitignore(root), initToolpadFile(root)]);
-  await migrateProject(root);
+  await migrateLegacyProject(root);
 
   let [dom, fingerprint] = await Promise.all([loadDomFromDisk(), calculateDomFingerprint(root)]);
 

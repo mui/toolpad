@@ -17,7 +17,6 @@ import {
   waitForInit,
   openQueryEditor,
   QUERIES_FILE,
-  readProjectFolder,
 } from '../../server/localMode';
 import { errorFrom, serializeError } from '../../utils/errors';
 
@@ -77,15 +76,7 @@ function formatCodeFrame(location: esbuild.Location): string {
   ].join('\n');
 }
 
-interface MainManifest {
-  queryFiles: { name: string; filepath: string }[];
-}
-
-async function createMain(manifest: MainManifest): Promise<string> {
-  const loadLines = manifest.queryFiles.map(
-    ({ name, filepath }) =>
-      `loadQuery(${JSON.stringify(name)}, () => import(${JSON.stringify(filepath)}))`,
-  );
+async function createMain(): Promise<string> {
   return `
     import { TOOLPAD_QUERY } from '@mui/toolpad-core/server';
     import { errorFrom, serializeError } from '@mui/toolpad-core/utils/errors';
@@ -108,17 +99,13 @@ async function createMain(manifest: MainManifest): Promise<string> {
     async function getResolvers() {
       if (!resolversPromise) {
         resolversPromise = (async () => {
-          const fileQueryResolvers = await Promise.all([
-            ${loadLines.join(',')}
-          ]);
-
           const queries = await import(${JSON.stringify(QUERIES_FILE)}).catch(() => ({}));
 
           const queriesFileResolvers = Object.entries(queries).flatMap(([name, resolver]) => {
             return typeof resolver === 'function' ? [[name, resolver]] : []
           })
 
-          return new Map([...fileQueryResolvers, ...queriesFileResolvers]);
+          return new Map(queriesFileResolvers);
         })();
       }
       return resolversPromise
@@ -196,11 +183,6 @@ async function createBuilder() {
   let controller: AbortController | undefined;
   let buildErrors: Error[] = [];
   let runtimeError: Error | undefined;
-
-  const projectEntries = await readProjectFolder();
-  const entryPoints = projectEntries
-    .filter((entry) => entry.kind === 'query')
-    .map((entry) => entry.filepath);
 
   const loadEnvFile = async () => {
     try {
@@ -315,12 +297,9 @@ async function createBuilder() {
 
       build.onLoad({ filter: /.*/, namespace: 'toolpad' }, async (args) => {
         if (args.path === 'main.ts') {
-          const contents = await createMain({
-            queryFiles: projectEntries.filter((entry) => entry.kind === 'query'),
-          });
           return {
             loader: 'tsx',
-            contents,
+            contents: await createMain(),
             resolveDir: userProjectRoot,
           };
         }
@@ -365,7 +344,7 @@ async function createBuilder() {
 
   const ctx = await esbuild.context({
     absWorkingDir: userProjectRoot,
-    entryPoints: ['toolpad:main.ts', ...entryPoints],
+    entryPoints: ['toolpad:main.ts'],
     plugins: [toolpadPlugin],
     write: true,
     bundle: true,

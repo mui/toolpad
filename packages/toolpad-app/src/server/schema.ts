@@ -40,7 +40,10 @@ const navigationActionSchema = z.object({
 
 export type NavigationAction = z.infer<typeof navigationActionSchema>;
 
-const fetchModeSchema = z.union([z.literal('query'), z.literal('mutation')]);
+const fetchModeSchema = z.union([
+  z.literal('query').describe('Fetch automatically when the page opens'),
+  z.literal('mutation').describe('Fetch on manual action only'),
+]);
 
 const nameStringValuePairSchema = nameValuePairSchema(z.string());
 
@@ -126,12 +129,12 @@ const querySchema = z.object({
     .array(nameValuePairSchema(bindableSchema(z.any())))
     .optional()
     .describe('Parameters to pass to this query'),
-  mode: fetchModeSchema.optional().describe('How to fetch'),
-  query: queryConfigSchema.optional(),
-  transform: z.string().optional(),
-  transformEnabled: z.boolean().optional(),
-  refetchInterval: z.number().optional(),
-  cacheTime: z.number().optional(),
+  mode: fetchModeSchema.optional().describe('How to fetch this query'),
+  query: queryConfigSchema.optional().describe('Query definition'),
+  transform: z.string().optional().describe('Transformation to run on the response'),
+  transformEnabled: z.boolean().optional().describe('Enable the transformation'),
+  refetchInterval: z.number().optional().describe('Interval to rerun this query at'),
+  cacheTime: z.number().optional().describe('Time to cache before refetching'),
 });
 
 export type Query = z.infer<typeof querySchema>;

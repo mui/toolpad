@@ -16,25 +16,25 @@ import { migrateUp } from '../appDom/migrations';
 import insecureHash from '../utils/insecureHash';
 import { writeFileRecursive, readMaybeFile, readMaybeDir, updateYamlFile } from '../utils/fs';
 import {
-  PageType,
-  QueryType,
-  ElementType,
-  NavigationActionType,
   Page,
-  TemplateType,
-  BindablePropType,
-  LocalQueryConfigType,
-  FetchQueryConfigType,
-  QueryConfigType,
-  BodyType,
+  Query,
+  ElementType,
+  NavigationAction,
+  pageSchema,
+  Template,
+  BindableProp,
+  LocalQueryConfig,
+  FetchQueryConfig,
+  QueryConfig,
+  FetchBody,
   ResponseType,
-  ThemeType,
   Theme,
+  themeSchema,
 } from './schema';
 import { filterValues, hasOwnProperty, mapValues } from '../utils/collections';
 import { format } from '../utils/prettier';
 import {
-  Body,
+  Body as AppDomFetchBody,
   FetchQuery,
   ResponseType as AppDomRestResponseType,
 } from '../toolpadDataSources/rest/types';
@@ -127,7 +127,7 @@ async function loadPagesFromFiles(root: string): Promise<PagesContent> {
   const pagesFolder = getPagesFolder(root);
   const entries = (await readMaybeDir(pagesFolder)) || [];
   const resultEntries = await Promise.all(
-    entries.map(async (entry): Promise<[string, PageType] | null> => {
+    entries.map(async (entry): Promise<[string, Page] | null> => {
       if (entry.isDirectory()) {
         const pageName = entry.name;
         const filePath = path.resolve(pagesFolder, pageName, './page.yml');
@@ -148,7 +148,7 @@ async function loadPagesFromFiles(root: string): Promise<PagesContent> {
           return null;
         }
 
-        const result = Page.safeParse(parsedFile);
+        const result = pageSchema.safeParse(parsedFile);
         if (result.success) {
           return [pageName, result.data];
         }
@@ -169,11 +169,11 @@ async function loadPagesFromFiles(root: string): Promise<PagesContent> {
   return Object.fromEntries(resultEntries.filter(Boolean));
 }
 
-async function loadThemeFromFile(root: string): Promise<ThemeType | null> {
+async function loadThemeFromFile(root: string): Promise<Theme | null> {
   const themeFilePath = getThemeFile(root);
   const content = await readMaybeFile(themeFilePath);
   if (content) {
-    return Theme.parse(yaml.parse(content));
+    return themeSchema.parse(yaml.parse(content));
   }
   return null;
 }
@@ -356,7 +356,7 @@ function mergeComponentsContentIntoDom(
   return dom;
 }
 
-function mergeThemeIntoAppDom(dom: appDom.AppDom, theme: ThemeType): appDom.AppDom {
+function mergeThemeIntoAppDom(dom: appDom.AppDom, theme: Theme): appDom.AppDom {
   const app = appDom.getApp(dom);
   dom = appDom.addNode(
     dom,
@@ -401,7 +401,7 @@ function toBindableProp<V>(value: V | { $$jsExpression: string }): BindableAttrV
       return { type: 'jsExpressionAction', value: (value as any).$$jsExpressionAction };
     }
     if (typeof (value as any).$$navigationAction === 'string') {
-      const action = value as any as NavigationActionType;
+      const action = value as any as NavigationAction;
       return {
         type: 'navigationAction',
         value: {
@@ -444,11 +444,11 @@ function stringOnly(maybeString: unknown): string | undefined {
 }
 
 function expandChildren(children: appDom.ElementNode[], dom: appDom.AppDom): ElementType[];
-function expandChildren(children: appDom.QueryNode[], dom: appDom.AppDom): QueryType[];
+function expandChildren(children: appDom.QueryNode[], dom: appDom.AppDom): Query[];
 function expandChildren<N extends appDom.AppDomNode>(
   children: N[],
   dom: appDom.AppDom,
-): (QueryType | ElementType)[];
+): (Query | ElementType)[];
 function expandChildren<N extends appDom.AppDomNode>(children: N[], dom: appDom.AppDom) {
   return (
     children
@@ -474,7 +474,7 @@ function undefinedWhenEmpty<O extends object | any[]>(obj?: O): O | undefined {
 function createPageFileQueryFromDomQuery(
   dataSource: string,
   query: FetchQuery | LocalQuery | undefined,
-): QueryConfigType {
+): QueryConfig {
   switch (dataSource) {
     case 'rest': {
       if (!query) {
@@ -482,7 +482,7 @@ function createPageFileQueryFromDomQuery(
       }
       query = query as FetchQuery;
 
-      let body: BodyType | undefined;
+      let body: FetchBody | undefined;
 
       if (query.body) {
         switch (query.body.kind) {
@@ -547,7 +547,7 @@ function createPageFileQueryFromDomQuery(
         response,
         transform: query.transform,
         transformEnabled: query.transformEnabled,
-      } satisfies FetchQueryConfigType;
+      } satisfies FetchQueryConfig;
     }
     case 'local':
       if (!query) {
@@ -558,23 +558,23 @@ function createPageFileQueryFromDomQuery(
       return {
         function: query.function,
         kind: 'local',
-      } satisfies LocalQueryConfigType;
+      } satisfies LocalQueryConfig;
     default:
       throw new Error(`Unsupported dataSource "${dataSource}"`);
   }
 }
 
 function expandFromDom(node: appDom.ElementNode, dom: appDom.AppDom): ElementType;
-function expandFromDom(node: appDom.QueryNode, dom: appDom.AppDom): QueryType;
-function expandFromDom(node: appDom.PageNode, dom: appDom.AppDom): PageType;
+function expandFromDom(node: appDom.QueryNode, dom: appDom.AppDom): Query;
+function expandFromDom(node: appDom.PageNode, dom: appDom.AppDom): Page;
 function expandFromDom<N extends appDom.AppDomNode>(
   node: N,
   dom: appDom.AppDom,
-): PageType | QueryType | ElementType;
+): Page | Query | ElementType;
 function expandFromDom<N extends appDom.AppDomNode>(
   node: N,
   dom: appDom.AppDom,
-): PageType | QueryType | ElementType {
+): Page | Query | ElementType {
   if (appDom.isPage(node)) {
     const children = appDom.getChildNodes(dom, node);
 
@@ -587,7 +587,7 @@ function expandFromDom<N extends appDom.AppDomNode>(
       content: undefinedWhenEmpty(expandChildren(children.children || [], dom)),
       queries: undefinedWhenEmpty(expandChildren(children.queries || [], dom)),
       display: node.attributes.display?.value,
-    } satisfies PageType;
+    } satisfies Page;
   }
 
   if (appDom.isQuery(node)) {
@@ -608,7 +608,7 @@ function expandFromDom<N extends appDom.AppDomNode>(
       refetchInterval: node.attributes.refetchInterval?.value,
       transform: node.attributes.transform?.value,
       transformEnabled: node.attributes.transformEnabled?.value,
-    } satisfies QueryType;
+    } satisfies Query;
   }
 
   if (appDom.isElement(node)) {
@@ -640,7 +640,7 @@ function expandFromDom<N extends appDom.AppDomNode>(
   throw new Error(`Unsupported node type "${node.type}"`);
 }
 
-function isTemplate(bindableProp?: BindablePropType): bindableProp is TemplateType {
+function isTemplate(bindableProp?: BindableProp): bindableProp is Template {
   return !!(
     bindableProp &&
     typeof bindableProp === 'object' &&
@@ -656,10 +656,10 @@ function mergeElementIntoDom(
 ): appDom.AppDom {
   const plainProps = filterValues(elm.props ?? {}, (prop) => !isTemplate(prop)) as Record<
     string,
-    Exclude<BindablePropType, TemplateType>
+    Exclude<BindableProp, Template>
   >;
 
-  const templateProps = filterValues(elm.props ?? {}, isTemplate) as Record<string, TemplateType>;
+  const templateProps = filterValues(elm.props ?? {}, isTemplate) as Record<string, Template>;
 
   const elmNode = appDom.createElement(
     dom,
@@ -688,14 +688,14 @@ function mergeElementIntoDom(
   return dom;
 }
 
-function createDomQueryFromPageFileQuery(query: QueryConfigType): FetchQuery | LocalQuery {
+function createDomQueryFromPageFileQuery(query: QueryConfig): FetchQuery | LocalQuery {
   switch (query.kind) {
     case 'local':
       return {
         function: query.function,
       } satisfies LocalQuery;
     case 'rest': {
-      let body: Body | undefined;
+      let body: AppDomFetchBody | undefined;
 
       if (query.body) {
         switch (query.body.kind) {
@@ -761,7 +761,7 @@ function createDomQueryFromPageFileQuery(query: QueryConfigType): FetchQuery | L
   }
 }
 
-function createPageDomFromPageFile(pageName: string, pageFile: PageType): appDom.AppDom {
+function createPageDomFromPageFile(pageName: string, pageFile: Page): appDom.AppDom {
   let fragment = appDom.createFragmentInternal(pageFile.id as NodeId, 'page', {
     name: pageName,
     attributes: {
@@ -821,7 +821,7 @@ function createPageDomFromPageFile(pageName: string, pageFile: PageType): appDom
   return fragment;
 }
 
-function mergePageIntoDom(dom: appDom.AppDom, pageName: string, pageFile: PageType): appDom.AppDom {
+function mergePageIntoDom(dom: appDom.AppDom, pageName: string, pageFile: Page): appDom.AppDom {
   const appRoot = appDom.getRoot(dom);
   const pageFragment = createPageDomFromPageFile(pageName, pageFile);
 
@@ -843,7 +843,7 @@ function mergPagesIntoDom(dom: appDom.AppDom, pages: PagesContent): appDom.AppDo
   return dom;
 }
 
-type PagesContent = Record<string, PageType>;
+type PagesContent = Record<string, Page>;
 
 interface ExtractedPages {
   pages: PagesContent;
@@ -874,7 +874,7 @@ async function writePagesToFiles(pagesFolder: string, pages: PagesContent) {
   );
 }
 
-async function writeThemeFile(root: string, theme: ThemeType) {
+async function writeThemeFile(root: string, theme: Theme) {
   const themeFilePath = getThemeFile(root);
   await updateYamlFile(themeFilePath, theme);
 }
@@ -898,7 +898,7 @@ function extractComponentsContentFromDom(dom: appDom.AppDom): ExtractedComponent
   return { components, dom };
 }
 
-function extractThemeContentFromDom(dom: appDom.AppDom): ThemeType | null {
+function extractThemeContentFromDom(dom: appDom.AppDom): Theme | null {
   const app = appDom.getApp(dom);
   const { themes = [] } = appDom.getChildNodes(dom, app);
   if (themes[0]?.theme) {
@@ -958,9 +958,9 @@ export type ProjectFolderEntry = {
 };
 
 interface ToolpadProjectFolder {
-  pages: Record<string, PageType>;
+  pages: Record<string, Page>;
   components: Record<string, { code: string }>;
-  theme: ThemeType | null;
+  theme: Theme | null;
 }
 
 async function readProjectFolder(root: string): Promise<ToolpadProjectFolder> {

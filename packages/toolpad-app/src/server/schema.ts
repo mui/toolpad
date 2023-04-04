@@ -7,132 +7,135 @@ const jsonSchema: z.ZodType<Json> = z.lazy(() =>
   z.union([literalSchema, z.array(jsonSchema), z.record(jsonSchema)]),
 );
 
-function nameValuePair<V extends z.ZodTypeAny>(valueType: V) {
+function nameValuePairSchema<V extends z.ZodTypeAny>(valueType: V) {
   return z.object({ name: z.string(), value: valueType });
 }
 
-const JsExpressionBinding = z.object({
+const jsExpressionBindingSchema = z.object({
   $$jsExpression: z.string(),
 });
 
-function bindable<V extends z.ZodTypeAny>(valueType: V) {
-  return z.union([JsExpressionBinding, valueType]);
+function bindableSchema<V extends z.ZodTypeAny>(valueType: V) {
+  return z.union([jsExpressionBindingSchema, valueType]);
 }
 
-const JsExpressionAction = z.object({
+const jsExpressionActionSchema = z.object({
   $$jsExpressionAction: z.string(),
 });
 
-const NavigationAction = z.object({
+const navigationActionSchema = z.object({
   $$navigationAction: z.object({
     page: z.string(),
-    parameters: z.record(bindable(z.any())),
+    parameters: z.record(bindableSchema(z.any())),
   }),
 });
 
-export type NavigationActionType = z.infer<typeof NavigationAction>;
+export type NavigationAction = z.infer<typeof navigationActionSchema>;
 
-const FetchMode = z.union([z.literal('query'), z.literal('mutation')]);
+const fetchModeSchema = z.union([z.literal('query'), z.literal('mutation')]);
 
-const NameValuePair = nameValuePair(z.string());
+const nameStringValuePairSchema = nameValuePairSchema(z.string());
 
-const RawBody = z.object({
+const rawBodySchema = z.object({
   kind: z.literal('raw'),
-  content: bindable(z.string()),
+  content: bindableSchema(z.string()),
   contentType: z.string(),
 });
 
-const UrlEncodedBody = z.object({
+const urlEncodedBodySchema = z.object({
   kind: z.literal('urlEncoded'),
-  content: z.array(nameValuePair(bindable(z.string()))),
+  content: z.array(nameValuePairSchema(bindableSchema(z.string()))),
 });
 
-const Body = z.discriminatedUnion('kind', [RawBody, UrlEncodedBody]);
+const fetchBodySchema = z.discriminatedUnion('kind', [rawBodySchema, urlEncodedBodySchema]);
 
-export type BodyType = z.infer<typeof Body>;
+export type FetchBody = z.infer<typeof fetchBodySchema>;
 
-const RawResponse = z.object({
+const rawResponseTypeSchema = z.object({
   kind: z.literal('raw'),
 });
 
-const JsonResponse = z.object({
+const jsonResponseTypeSchema = z.object({
   kind: z.literal('json'),
 });
 
-const CsvResponse = z.object({
+const csvResponseTypeSchema = z.object({
   kind: z.literal('csv'),
   headers: z.boolean().describe('First row contains headers'),
 });
 
-const XmlResponse = z.object({
+const xmlResponseTypeSchema = z.object({
   kind: z.literal('xml'),
 });
 
-const Response = z.discriminatedUnion('kind', [
-  RawResponse,
-  JsonResponse,
-  CsvResponse,
-  XmlResponse,
+const responseTypeSchema = z.discriminatedUnion('kind', [
+  rawResponseTypeSchema,
+  jsonResponseTypeSchema,
+  csvResponseTypeSchema,
+  xmlResponseTypeSchema,
 ]);
 
-export type ResponseType = z.infer<typeof Response>;
+export type ResponseType = z.infer<typeof responseTypeSchema>;
 
-const FetchQueryConfig = z.object({
+const fetchQueryConfigSchema = z.object({
   kind: z.literal('rest'),
-  url: bindable(z.string()).optional().describe('The URL of the request'),
+  url: bindableSchema(z.string()).optional().describe('The URL of the request'),
   method: z.string().optional().describe('The request method.'),
   headers: z
-    .array(nameValuePair(bindable(z.string())))
+    .array(nameValuePairSchema(bindableSchema(z.string())))
     .optional()
     .describe('Extra request headers.'),
   searchParams: z
-    .array(nameValuePair(bindable(z.string())))
+    .array(nameValuePairSchema(bindableSchema(z.string())))
     .optional()
     .describe('Extra url query parameters.'),
-  body: Body.optional().describe('The request body.'),
+  body: fetchBodySchema.optional().describe('The request body.'),
   transformEnabled: z.boolean().optional().describe('Run a custom transformer on the response.'),
   transform: z.string().optional().describe('The custom transformer to run when enabled.'),
-  response: Response.optional().describe('How to parse the response.'),
+  response: responseTypeSchema.optional().describe('How to parse the response.'),
 });
 
-export type FetchQueryConfigType = z.infer<typeof FetchQueryConfig>;
+export type FetchQueryConfig = z.infer<typeof fetchQueryConfigSchema>;
 
-const LocalQueryConfig = z.object({
+const localQueryConfigSchema = z.object({
   kind: z.literal('local'),
   function: z.string().optional(),
 });
 
-export type LocalQueryConfigType = z.infer<typeof LocalQueryConfig>;
+export type LocalQueryConfig = z.infer<typeof localQueryConfigSchema>;
 
-const QueryConfig = z.discriminatedUnion('kind', [FetchQueryConfig, LocalQueryConfig]);
+const queryConfigSchema = z.discriminatedUnion('kind', [
+  fetchQueryConfigSchema,
+  localQueryConfigSchema,
+]);
 
-export type QueryConfigType = z.infer<typeof QueryConfig>;
+export type QueryConfig = z.infer<typeof queryConfigSchema>;
 
-const Query = z.object({
+const querySchema = z.object({
   name: z.string().describe('A name for the query'),
-  enabled: bindable(z.boolean()).optional(),
-  parameters: z.array(nameValuePair(bindable(z.any()))).optional(),
-  mode: FetchMode.optional(),
-  query: QueryConfig.optional(),
+  enabled: bindableSchema(z.boolean()).optional(),
+  parameters: z.array(nameValuePairSchema(bindableSchema(z.any()))).optional(),
+  mode: fetchModeSchema.optional(),
+  query: queryConfigSchema.optional(),
   transform: z.string().optional(),
   transformEnabled: z.boolean().optional(),
   refetchInterval: z.number().optional(),
   cacheTime: z.number().optional(),
 });
 
-export type QueryType = z.infer<typeof Query>;
+export type Query = z.infer<typeof querySchema>;
 
-export type TemplateType = {
+export type Template = {
   $$template: ElementType[];
 };
 
-let Element: z.ZodType<ElementType>;
+let elementSchema: z.ZodType<ElementType>;
 
-const Template: z.ZodType<TemplateType> = z.object({
-  $$template: z.lazy(() => z.array(Element)),
+const templateSchema: z.ZodType<Template> = z.object({
+  $$template: z.lazy(() => z.array(elementSchema)),
 });
 
-const BaseElement = z.object({
+const baseElementSchema = z.object({
   component: z.string(),
   name: z.string(),
   layout: z
@@ -144,43 +147,43 @@ const BaseElement = z.object({
     .optional(),
 });
 
-type BaseElementType = z.infer<typeof BaseElement>;
+type BaseElement = z.infer<typeof baseElementSchema>;
 
-const BindableProp = z.union([
+const bindablePropSchema = z.union([
   jsonSchema,
-  JsExpressionBinding,
-  JsExpressionAction,
-  NavigationAction,
-  Template,
+  jsExpressionBindingSchema,
+  jsExpressionActionSchema,
+  navigationActionSchema,
+  templateSchema,
 ]);
 
-export type BindablePropType = z.infer<typeof BindableProp>;
+export type BindableProp = z.infer<typeof bindablePropSchema>;
 
-export type ElementType = BaseElementType & {
+export type ElementType = BaseElement & {
   children?: ElementType[];
-  props?: Record<string, BindablePropType>;
+  props?: Record<string, BindableProp>;
 };
 
-Element = BaseElement.extend({
-  children: z.lazy(() => z.array(Element).optional()),
-  props: z.lazy(() => z.record(BindableProp).optional()),
+elementSchema = baseElementSchema.extend({
+  children: z.lazy(() => z.array(elementSchema).optional()),
+  props: z.lazy(() => z.record(bindablePropSchema).optional()),
 });
 
-export const Page = z.object({
+export const pageSchema = z.object({
   id: z.string(),
   title: z.string().optional(),
-  parameters: z.array(NameValuePair).optional(),
-  queries: z.array(Query).optional(),
-  content: z.array(Element).optional(),
+  parameters: z.array(nameStringValuePairSchema).optional(),
+  queries: z.array(querySchema).optional(),
+  content: z.array(elementSchema).optional(),
   display: z.union([z.literal('standalone'), z.literal('shell')]).optional(),
 });
 
-export type PageType = z.infer<typeof Page>;
+export type Page = z.infer<typeof pageSchema>;
 
-export const Theme = z.object({
+export const themeSchema = z.object({
   'palette.mode': z.union([z.literal('light'), z.literal('dark')]).optional(),
   'palette.primary.main': z.string().optional(),
   'palette.secondary.main': z.string().optional(),
 });
 
-export type ThemeType = z.infer<typeof Theme>;
+export type Theme = z.infer<typeof themeSchema>;

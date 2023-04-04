@@ -1,5 +1,13 @@
 import { z } from 'zod';
 
+function toolpadObjectSchema<K extends string, T extends z.ZodType>(kind: K, spec: T) {
+  return z.object({
+    apiVersion: z.string(),
+    kind: z.literal(kind),
+    spec,
+  });
+}
+
 const literalSchema = z.union([z.string(), z.number(), z.boolean(), z.null()]);
 type Literal = z.infer<typeof literalSchema>;
 type Json = Literal | { [key: string]: Json } | Json[];
@@ -113,9 +121,12 @@ export type QueryConfig = z.infer<typeof queryConfigSchema>;
 
 const querySchema = z.object({
   name: z.string().describe('A name for the query'),
-  enabled: bindableSchema(z.boolean()).optional(),
-  parameters: z.array(nameValuePairSchema(bindableSchema(z.any()))).optional(),
-  mode: fetchModeSchema.optional(),
+  enabled: bindableSchema(z.boolean()).optional().describe('This query is active'),
+  parameters: z
+    .array(nameValuePairSchema(bindableSchema(z.any())))
+    .optional()
+    .describe('Parameters to pass to this query'),
+  mode: fetchModeSchema.optional().describe('How to fetch'),
   query: queryConfigSchema.optional(),
   transform: z.string().optional(),
   transformEnabled: z.boolean().optional(),
@@ -169,21 +180,27 @@ elementSchema = baseElementSchema.extend({
   props: z.lazy(() => z.record(bindablePropSchema).optional()),
 });
 
-export const pageSchema = z.object({
-  id: z.string(),
-  title: z.string().optional(),
-  parameters: z.array(nameStringValuePairSchema).optional(),
-  queries: z.array(querySchema).optional(),
-  content: z.array(elementSchema).optional(),
-  display: z.union([z.literal('standalone'), z.literal('shell')]).optional(),
-});
+export const pageSchema = toolpadObjectSchema(
+  'page',
+  z.object({
+    id: z.string(),
+    title: z.string().optional(),
+    parameters: z.array(nameStringValuePairSchema).optional(),
+    queries: z.array(querySchema).optional(),
+    content: z.array(elementSchema).optional(),
+    display: z.union([z.literal('standalone'), z.literal('shell')]).optional(),
+  }),
+);
 
 export type Page = z.infer<typeof pageSchema>;
 
-export const themeSchema = z.object({
-  'palette.mode': z.union([z.literal('light'), z.literal('dark')]).optional(),
-  'palette.primary.main': z.string().optional(),
-  'palette.secondary.main': z.string().optional(),
-});
+export const themeSchema = toolpadObjectSchema(
+  'theme',
+  z.object({
+    'palette.mode': z.union([z.literal('light'), z.literal('dark')]).optional(),
+    'palette.primary.main': z.string().optional(),
+    'palette.secondary.main': z.string().optional(),
+  }),
+);
 
 export type Theme = z.infer<typeof themeSchema>;

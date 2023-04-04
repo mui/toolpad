@@ -40,6 +40,8 @@ import {
 } from '../toolpadDataSources/rest/types';
 import { LocalQuery } from '../toolpadDataSources/local/types';
 
+const CURRENT_API_VERSION = '1';
+
 export function getUserProjectRoot(): string {
   const { projectDir } = config;
   invariant(projectDir, 'Toolpad in local mode must have a project directory defined');
@@ -356,15 +358,16 @@ function mergeComponentsContentIntoDom(
   return dom;
 }
 
-function mergeThemeIntoAppDom(dom: appDom.AppDom, theme: Theme): appDom.AppDom {
+function mergeThemeIntoAppDom(dom: appDom.AppDom, themeFile: Theme): appDom.AppDom {
+  const themeFileSpec = themeFile.spec;
   const app = appDom.getApp(dom);
   dom = appDom.addNode(
     dom,
     appDom.createNode(dom, 'theme', {
       theme: {
-        'palette.mode': appDom.toConstPropValue(theme['palette.mode']),
-        'palette.primary.main': appDom.toConstPropValue(theme['palette.primary.main']),
-        'palette.secondary.main': appDom.toConstPropValue(theme['palette.secondary.main']),
+        'palette.mode': appDom.toConstPropValue(themeFileSpec['palette.mode']),
+        'palette.primary.main': appDom.toConstPropValue(themeFileSpec['palette.primary.main']),
+        'palette.secondary.main': appDom.toConstPropValue(themeFileSpec['palette.secondary.main']),
       },
       attributes: {},
     }),
@@ -579,14 +582,18 @@ function expandFromDom<N extends appDom.AppDomNode>(
     const children = appDom.getChildNodes(dom, node);
 
     return {
-      id: node.id,
-      title: node.attributes.title?.value,
-      parameters: undefinedWhenEmpty(
-        node.attributes.parameters?.value.map(([name, value]) => ({ name, value })) ?? [],
-      ),
-      content: undefinedWhenEmpty(expandChildren(children.children || [], dom)),
-      queries: undefinedWhenEmpty(expandChildren(children.queries || [], dom)),
-      display: node.attributes.display?.value,
+      apiVersion: CURRENT_API_VERSION,
+      kind: 'page',
+      spec: {
+        id: node.id,
+        title: node.attributes.title?.value,
+        parameters: undefinedWhenEmpty(
+          node.attributes.parameters?.value.map(([name, value]) => ({ name, value })) ?? [],
+        ),
+        content: undefinedWhenEmpty(expandChildren(children.children || [], dom)),
+        queries: undefinedWhenEmpty(expandChildren(children.queries || [], dom)),
+        display: node.attributes.display?.value,
+      },
     } satisfies Page;
   }
 
@@ -762,22 +769,23 @@ function createDomQueryFromPageFileQuery(query: QueryConfig): FetchQuery | Local
 }
 
 function createPageDomFromPageFile(pageName: string, pageFile: Page): appDom.AppDom {
-  let fragment = appDom.createFragmentInternal(pageFile.id as NodeId, 'page', {
+  const pageFileSpec = pageFile.spec;
+  let fragment = appDom.createFragmentInternal(pageFileSpec.id as NodeId, 'page', {
     name: pageName,
     attributes: {
-      title: appDom.createConst(pageFile.title || ''),
+      title: appDom.createConst(pageFileSpec.title || ''),
       parameters: appDom.createConst(
-        pageFile.parameters?.map(({ name, value }) => [name, value]) || [],
+        pageFileSpec.parameters?.map(({ name, value }) => [name, value]) || [],
       ),
-      display: pageFile.display ? appDom.createConst(pageFile.display) : undefined,
+      display: pageFileSpec.display ? appDom.createConst(pageFileSpec.display) : undefined,
     },
   });
 
   const pageNode = appDom.getRoot(fragment);
   appDom.assertIsPage(pageNode);
 
-  if (pageFile.queries) {
-    for (const query of pageFile.queries) {
+  if (pageFileSpec.queries) {
+    for (const query of pageFileSpec.queries) {
       if (query.query) {
         const queryNode = appDom.createNode(fragment, 'query', {
           name: query.name,
@@ -812,8 +820,8 @@ function createPageDomFromPageFile(pageName: string, pageFile: Page): appDom.App
     }
   }
 
-  if (pageFile.content) {
-    for (const child of pageFile.content) {
+  if (pageFileSpec.content) {
+    for (const child of pageFileSpec.content) {
       fragment = mergeElementIntoDom(fragment, pageNode, 'children', child);
     }
   }
@@ -903,11 +911,15 @@ function extractThemeContentFromDom(dom: appDom.AppDom): Theme | null {
   const { themes = [] } = appDom.getChildNodes(dom, app);
   if (themes[0]?.theme) {
     return {
-      'palette.mode': appDom.fromConstPropValue(themes[0].theme['palette.mode']),
-      'palette.primary.main': appDom.fromConstPropValue(themes[0].theme['palette.primary.main']),
-      'palette.secondary.main': appDom.fromConstPropValue(
-        themes[0].theme['palette.secondary.main'],
-      ),
+      apiVersion: CURRENT_API_VERSION,
+      kind: 'theme',
+      spec: {
+        'palette.mode': appDom.fromConstPropValue(themes[0].theme['palette.mode']),
+        'palette.primary.main': appDom.fromConstPropValue(themes[0].theme['palette.primary.main']),
+        'palette.secondary.main': appDom.fromConstPropValue(
+          themes[0].theme['palette.secondary.main'],
+        ),
+      },
     };
   }
   return null;

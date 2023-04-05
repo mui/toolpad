@@ -6,6 +6,7 @@ export default defineConfig({
   format: ['esm', 'cjs'],
   dts: false,
   silent: true,
+  clean: true,
   async onSuccess() {
     // eslint-disable-next-line no-console
     console.log('build successful');

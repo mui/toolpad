@@ -8,6 +8,7 @@ export default defineConfig([
     },
     silent: true,
     noExternal: ['open-editor', 'execa', 'fractional-indexing'],
+    clean: true,
     async onSuccess() {
       // eslint-disable-next-line no-console
       console.log('cli: build successful');
@@ -21,6 +22,7 @@ export default defineConfig([
     target: 'es6',
     format: 'iife',
     replaceNodeEnv: true,
+    clean: true,
     async onSuccess() {
       // eslint-disable-next-line no-console
       console.log('reactDevtools: build successful');

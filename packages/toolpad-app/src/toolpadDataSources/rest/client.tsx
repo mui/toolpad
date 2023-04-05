@@ -53,17 +53,20 @@ import useQueryPreview from '../useQueryPreview';
 import TransformInput from '../TranformInput';
 import Devtools from '../../components/Devtools';
 import { createHarLog, mergeHar } from '../../utils/har';
-import config from '../../config';
 import QueryInputPanel from '../QueryInputPanel';
 import useFetchPrivate from '../useFetchPrivate';
 import { clientExec } from './runtime';
 import QueryPreview from '../QueryPreview';
+import { ToolpadContext } from '../../ToolpadContext';
 
 const HTTP_METHODS = ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'HEAD'];
 
 const QUERY_SCOPE_META: ScopeMeta = {
   parameters: {
     description: 'Parameters that can be bound to app scope variables',
+  },
+  process: {
+    description: 'Contains information about the current Node.js process.',
   },
 };
 
@@ -347,11 +350,16 @@ function QueryEditor({
     [paramsEditorLiveValue],
   );
 
+  const { envVarNames } = React.useContext(ToolpadContext);
+
   const queryScope = React.useMemo(
     () => ({
       parameters: previewParams,
+      process: {
+        env: Object.fromEntries(envVarNames.map((varName) => [varName, '<SECRET>'])),
+      },
     }),
-    [previewParams],
+    [envVarNames, previewParams],
   );
 
   const liveUrl: LiveBinding = useEvaluateLiveBinding({
@@ -551,7 +559,7 @@ function getInitialQueryValue(): FetchQuery {
   return {
     method: 'GET',
     headers: [],
-    browser: config.isDemo,
+    browser: false,
   };
 }
 

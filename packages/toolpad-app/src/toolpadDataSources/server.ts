@@ -6,8 +6,7 @@ import rest from './rest/server';
 import googleSheets from './googleSheets/server';
 import local from './local/server';
 
-import config from '../server/config';
-import { DEMO_DATASOURCES, PRODUCTION_DATASOURCES } from '../constants';
+import { PRODUCTION_DATASOURCES } from '../constants';
 
 type ServerDataSources = { [key: string]: ServerDataSource<any, any, any> | undefined };
 
@@ -19,7 +18,7 @@ const serverDataSources: ServerDataSources = _.pick(
     mysql,
     local,
   },
-  [...(config.isDemo ? DEMO_DATASOURCES : PRODUCTION_DATASOURCES)],
+  [...PRODUCTION_DATASOURCES],
 );
 
 export default serverDataSources;

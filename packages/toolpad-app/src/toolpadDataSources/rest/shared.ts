@@ -20,6 +20,7 @@ import {
 import applyTransform from '../applyTransform';
 import { errorFrom, serializeError } from '../../utils/errors';
 import { MOVIES_API_DEMO_URL } from '../demo';
+import { loadEnvFile } from '../local/server';
 
 export const HTTP_NO_BODY = new Set(['GET', 'HEAD']);
 
@@ -174,11 +175,15 @@ export async function execfetch(
   fetchQuery: FetchQuery,
   params: Record<string, string>,
   { connection, jsRuntime, fetchImpl }: ExecBaseOptions,
+  envVarNames: string[] = [],
 ): Promise<FetchResult> {
   const queryScope = {
     // @TODO: remove deprecated query after v1
     query: params,
     parameters: params,
+    process: {
+      env: Object.fromEntries(envVarNames.map((varName) => [varName, process.env[varName]])),
+    },
   };
 
   const urlvalue = fetchQuery.url || getDefaultUrl(connection);

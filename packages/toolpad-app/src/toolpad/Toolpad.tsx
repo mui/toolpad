@@ -5,6 +5,7 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import NoSsr from '../components/NoSsr';
 import AppEditor from './AppEditor';
 import ErrorAlert from './AppEditor/PageEditor/ErrorAlert';
+import { ToolpadContext } from '../ToolpadContext';
 
 const Centered = styled('div')({
   height: '100%',
@@ -39,23 +40,33 @@ function ErrorFallback({ error }: FallbackProps) {
 
 export interface ToolpadProps {
   basename: string;
+  envVarNames: string[];
 }
 
-export default function Toolpad({ basename }: ToolpadProps) {
+export default function Toolpad({ basename, envVarNames }: ToolpadProps) {
+  const toolpadContextValue = React.useMemo(
+    () => ({
+      envVarNames,
+    }),
+    [envVarNames],
+  );
+
   return (
     <NoSsr>
       {/* Container that allows children to size to it with height: 100% */}
-      <Box sx={{ height: '1px', minHeight: '100vh' }}>
-        <ErrorBoundary fallbackRender={ErrorFallback}>
-          <React.Suspense fallback={<FullPageLoader />}>
-            <BrowserRouter basename={basename}>
-              <Routes>
-                <Route path="/*" element={<AppEditor />} />
-              </Routes>
-            </BrowserRouter>
-          </React.Suspense>
-        </ErrorBoundary>
-      </Box>
+      <ToolpadContext.Provider value={toolpadContextValue}>
+        <Box sx={{ height: '1px', minHeight: '100vh' }}>
+          <ErrorBoundary fallbackRender={ErrorFallback}>
+            <React.Suspense fallback={<FullPageLoader />}>
+              <BrowserRouter basename={basename}>
+                <Routes>
+                  <Route path="/*" element={<AppEditor />} />
+                </Routes>
+              </BrowserRouter>
+            </React.Suspense>
+          </ErrorBoundary>
+        </Box>
+      </ToolpadContext.Provider>
     </NoSsr>
   );
 }

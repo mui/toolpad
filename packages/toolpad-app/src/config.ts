@@ -38,8 +38,6 @@ export interface RuntimeConfig {
   // Enable input field for seeding a dom in the app creation dialog
   // (For testing purposes)
   enableCreateByDom?: boolean;
-  // Enable demo mode
-  isDemo: boolean;
   // Google Analytics measurement ID
   gaId?: string;
   // Sentry DSN
@@ -69,7 +67,6 @@ const runtimeConfig: RuntimeConfig =
     ? {
         // Define runtime config here
         enableCreateByDom: !!process.env.TOOLPAD_ENABLE_CREATE_BY_DOM,
-        isDemo: !!process.env.TOOLPAD_DEMO,
         gaId: process.env.TOOLPAD_GA_ID,
         sentryDsn: process.env.TOOLPAD_SENTRY_DSN,
         externalUrl:

@@ -186,11 +186,36 @@ async function createMain(manifest: MainManifest): Promise<string> {
   `;
 }
 
+export async function loadEnvFile() {
+  const userProjectRoot = getUserProjectRoot();
+
+  const envFilePath = path.resolve(userProjectRoot, '.env');
+
+  try {
+    const envFileContent = await fs.readFile(envFilePath);
+    const parsed = dotenv.parse(envFileContent) as any;
+    // eslint-disable-next-line no-console
+    console.log(
+      `Loaded env file "${envFilePath}" with keys ${truncate(
+        Object.keys(parsed).join(', '),
+        1000,
+      )}`,
+    );
+
+    return parsed;
+  } catch (err) {
+    if (errorFrom(err).code !== 'ENOENT') {
+      throw err;
+    }
+  }
+
+  return {};
+}
+
 async function createBuilder() {
   await isInitialized;
 
   const userProjectRoot = getUserProjectRoot();
-  const envFilePath = path.resolve(userProjectRoot, '.env');
 
   let currentRuntimeProcess: child_process.ChildProcess | undefined;
   let controller: AbortController | undefined;
@@ -201,28 +226,6 @@ async function createBuilder() {
   const entryPoints = projectEntries
     .filter((entry) => entry.kind === 'query')
     .map((entry) => entry.filepath);
-
-  const loadEnvFile = async () => {
-    try {
-      const envFileContent = await fs.readFile(envFilePath);
-      const parsed = dotenv.parse(envFileContent) as any;
-      // eslint-disable-next-line no-console
-      console.log(
-        `Loaded env file "${envFilePath}" with keys ${truncate(
-          Object.keys(parsed).join(', '),
-          1000,
-        )}`,
-      );
-
-      return parsed;
-    } catch (err) {
-      if (errorFrom(err).code !== 'ENOENT') {
-        throw err;
-      }
-    }
-
-    return {};
-  };
 
   let outputFile: string | undefined;
   let metafile: esbuild.Metafile | undefined;
@@ -419,6 +422,8 @@ async function createBuilder() {
   }
 
   let envFileWatcher: chokidar.FSWatcher | undefined;
+
+  const envFilePath = path.resolve(userProjectRoot, '.env');
 
   return {
     watch() {

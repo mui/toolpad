@@ -22,8 +22,9 @@
   ],
   "scripts": {
     "prebuild": "rimraf ./dist",
-    "build": "tsc -p ./tsconfig.json",
-    "dev": "tsc -p ./tsconfig.json --watch"
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "check-types": "tsc --noEmit"
   },
   "engines": {
     "node": ">=16.17"

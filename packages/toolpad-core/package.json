@@ -5,26 +5,26 @@
   "author": "MUI Toolpad team",
   "homepage": "https://github.com/mui/mui-toolpad#readme",
   "license": "MIT",
-  "main": "dist/cjs/index.js",
-  "module": "dist/esm/index.js",
-  "types": "dist/esm/index.d.ts",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
   "type": "module",
   "exports": {
     "./package.json": "./package.json",
     ".": {
-      "types": "./dist/esm/index.d.ts",
-      "import": "./dist/esm/index.js",
-      "require": "./dist/cjs/index.js"
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
     },
     "./*": {
-      "types": "./dist/esm/*.d.ts",
-      "import": "./dist/esm/*.js",
-      "require": "./dist/cjs/*.js"
+      "types": "./dist/*.d.ts",
+      "import": "./dist/*.js",
+      "require": "./dist/*.cjs"
     },
     "./utils/*": {
-      "types": "./dist/esm/utils/*.d.ts",
-      "import": "./dist/esm/utils/*.js",
-      "require": "./dist/cjs/utils/*.js"
+      "types": "./dist/utils/*.d.ts",
+      "import": "./dist/utils/*.js",
+      "require": "./dist/utils/*.cjs"
     }
   },
   "files": [
@@ -38,13 +38,8 @@
   },
   "scripts": {
     "prebuild": "rimraf dist",
-    "cjsify": "mkdir -p ./dist/cjs && echo \"{ \\\"type\\\":\\\"commonjs\\\" }\" > ./dist/cjs/package.json",
-    "build": "concurrently \"yarn:build:*\" && yarn cjsify",
-    "build:esm": "tsc --outDir dist/esm --module esnext",
-    "build:cjs": "tsc --outDir dist/cjs --module commonjs",
-    "dev": "concurrently \"yarn:dev:*\" yarn:cjsify",
-    "dev:esm": "yarn build:esm --watch",
-    "dev:cjs": "yarn build:cjs --watch",
+    "build": "tsup",
+    "dev": "tsup --watch",
     "test": "echo \"Error: run tests from root\" && exit 1",
     "check-types": "yarn build"
   },

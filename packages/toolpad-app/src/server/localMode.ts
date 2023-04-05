@@ -86,6 +86,10 @@ function getComponentFilePath(componentsFolder: string, componentName: string): 
   return path.join(componentsFolder, `${componentName}.tsx`);
 }
 
+export function getOutputFolder(root: string) {
+  return path.join(getToolpadFolder(root), '.generated');
+}
+
 export async function getConfigFilePath(root: string) {
   const yamlFilePath = path.join(root, './toolpad.yaml');
   const ymlFilePath = path.join(root, './toolpad.yml');
@@ -270,13 +274,12 @@ async function initQueriesFile(root: string): Promise<void> {
   }
 }
 
-const DEFAULT_GENERATED_GITIGNORE_FILE_CONTENT = `*
-!.gitignore
+const DEFAULT_GENERATED_GITIGNORE_FILE_CONTENT = `.generated
 `;
 
-async function initGeneratedGitignore(root: string) {
-  const generatedFolder = path.resolve(root, '.toolpad-generated');
-  const generatedGitignorePath = path.resolve(generatedFolder, '.gitignore');
+async function initGitignore(root: string) {
+  const projectFolder = getToolpadFolder(root);
+  const generatedGitignorePath = path.resolve(projectFolder, '.gitignore');
   if (!(await fileExists(generatedGitignorePath))) {
     // eslint-disable-next-line no-console
     console.log(`${chalk.blue('info')}  - Initializing Toolpad queries file`);
@@ -1042,7 +1045,10 @@ async function migrateLegacyProject(root: string) {
   }
 
   const configFilePath = await getConfigFilePath(root);
-  await fs.unlink(configFilePath);
+  await Promise.all([
+    fs.rm(configFilePath, { recursive: true, force: true }),
+    fs.rm(path.resolve(root, '.toolpad-generated'), { recursive: true, force: true }),
+  ]);
 }
 
 function getDomFilePatterns(root: string) {
@@ -1084,7 +1090,7 @@ async function initToolpadFolder(root: string) {
     await writeProjectFolder(root, projectFolder);
   }
 
-  await initGeneratedGitignore(root);
+  await initGitignore(root);
 }
 
 async function initProject() {

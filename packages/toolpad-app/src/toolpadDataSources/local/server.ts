@@ -17,6 +17,7 @@ import {
   waitForInit,
   openQueryEditor,
   getFunctionsFile,
+  getOutputFolder,
 } from '../../server/localMode';
 import { errorFrom, serializeError } from '../../utils/errors';
 
@@ -355,7 +356,7 @@ async function createBuilder() {
     write: true,
     bundle: true,
     metafile: true,
-    outdir: path.resolve(userProjectRoot, './.toolpad-generated/'),
+    outdir: path.resolve(getOutputFolder(userProjectRoot), 'functions'),
     platform: 'node',
     packages: 'external',
     target: 'es2022',

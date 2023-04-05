@@ -60,34 +60,34 @@ export async function fileExists(filepath: string): Promise<boolean> {
 }
 
 function getToolpadFolder(root: string): string {
-  return path.resolve(root, './toolpad');
+  return path.join(root, './toolpad');
 }
 
-function getQueriesFile(root: string): string {
-  return path.resolve(getToolpadFolder(root), './queries.ts');
+export function getFunctionsFile(root: string): string {
+  return path.join(getToolpadFolder(root), './resources/functions.ts');
 }
 
 function getThemeFile(root: string): string {
-  return path.resolve(getToolpadFolder(root), './theme.yml');
+  return path.join(getToolpadFolder(root), './theme.yml');
 }
 
 function getComponentsFolder(root: string): string {
   const toolpadFolder = getToolpadFolder(root);
-  return path.resolve(toolpadFolder, './components');
+  return path.join(toolpadFolder, './components');
 }
 
 function getPagesFolder(root: string): string {
   const toolpadFolder = getToolpadFolder(root);
-  return path.resolve(toolpadFolder, './pages');
+  return path.join(toolpadFolder, './pages');
 }
 
 function getComponentFilePath(componentsFolder: string, componentName: string): string {
-  return path.resolve(componentsFolder, `${componentName}.tsx`);
+  return path.join(componentsFolder, `${componentName}.tsx`);
 }
 
 export async function getConfigFilePath(root: string) {
-  const yamlFilePath = path.resolve(root, './toolpad.yaml');
-  const ymlFilePath = path.resolve(root, './toolpad.yml');
+  const yamlFilePath = path.join(root, './toolpad.yaml');
+  const ymlFilePath = path.join(root, './toolpad.yml');
 
   if (await fileExists(yamlFilePath)) {
     return yamlFilePath;
@@ -101,8 +101,6 @@ export async function getConfigFilePath(root: string) {
 }
 
 type ComponentsContent = Record<string, { code: string }>;
-
-export const QUERIES_FILE = `./toolpad/queries.ts`;
 
 async function loadCodeComponentsFromFiles(root: string): Promise<ComponentsContent> {
   const componentsFolder = getComponentsFolder(root);
@@ -249,12 +247,7 @@ async function loadConfigFile(root: string): Promise<appDom.AppDom | null> {
   return dom;
 }
 
-async function writeConfigFile(root: string, dom: appDom.AppDom): Promise<void> {
-  const configFilePath = await getConfigFilePath(root);
-  await configFileLock.use(() => updateYamlFile(configFilePath, dom));
-}
-
-const DEFAULT_QUERIES_FILE_CONTENT = `// Toolpad queries:
+const DEFAULT_FUNCTIONS_FILE_CONTENT = `// Toolpad queries:
 
 export async function example() {
   return [
@@ -271,21 +264,13 @@ async function initToolpadFolder(root: string) {
 }
 
 async function initQueriesFile(root: string): Promise<void> {
-  const queriesFilePath = getQueriesFile(root);
+  const queriesFilePath = getFunctionsFile(root);
   if (!(await fileExists(queriesFilePath))) {
     // eslint-disable-next-line no-console
-    console.log(`${chalk.blue('info')}  - Initializing Toolpad queries file`);
-    await writeFileRecursive(queriesFilePath, DEFAULT_QUERIES_FILE_CONTENT, { encoding: 'utf-8' });
-  }
-}
-
-async function initToolpadFile(root: string): Promise<void> {
-  const configFilePath = await getConfigFilePath(root);
-  if (!(await fileExists(configFilePath))) {
-    // eslint-disable-next-line no-console
-    console.log(`${chalk.blue('info')}  - Initializing Toolpad config file`);
-    const defaultDom = appDom.createDefaultDom();
-    await writeConfigFile(root, defaultDom);
+    console.log(`${chalk.blue('info')}  - Initializing Toolpad functions file`);
+    await writeFileRecursive(queriesFilePath, DEFAULT_FUNCTIONS_FILE_CONTENT, {
+      encoding: 'utf-8',
+    });
   }
 }
 
@@ -931,14 +916,8 @@ function extractThemeContentFromDom(dom: appDom.AppDom): Theme | null {
 async function writeDomToDisk(dom: appDom.AppDom): Promise<void> {
   const root = getUserProjectRoot();
   const pagesFolder = getPagesFolder(root);
-
-  const { pages: pagesContent, dom: domWithoutPages } = extractPagesFromDom(dom);
-  dom = domWithoutPages;
-
-  const { dom: domWithoutComponents } = extractComponentsContentFromDom(dom);
-  dom = domWithoutComponents;
-
-  await Promise.all([writeConfigFile(root, dom), writePagesToFiles(pagesFolder, pagesContent)]);
+  const { pages: pagesContent } = extractPagesFromDom(dom);
+  await Promise.all([writePagesToFiles(pagesFolder, pagesContent)]);
 }
 
 export async function openCodeEditor(file: string): Promise<void> {
@@ -962,7 +941,7 @@ export async function openCodeComponentEditor(componentName: string): Promise<vo
 export async function openQueryEditor() {
   const root = getUserProjectRoot();
   await initQueriesFile(root);
-  const queriesFilePath = getQueriesFile(root);
+  const queriesFilePath = getFunctionsFile(root);
   await openCodeEditor(queriesFilePath);
 }
 
@@ -1053,13 +1032,18 @@ async function migrateLegacyProject(root: string) {
     );
 
     dom = migrateUp(dom);
-
-    await writeConfigFile(root, dom);
   }
 
   const projectFolder = appDomToProjectFolder(dom);
 
   await writeProjectFolder(root, projectFolder, true);
+
+  const legacyQueriesFile = path.resolve(getToolpadFolder(root), 'queries.ts');
+  if (await fileExists(legacyQueriesFile)) {
+    const functionsFile = getFunctionsFile(root);
+    await fs.mkdir(path.dirname(functionsFile), { recursive: true });
+    await fs.rename(legacyQueriesFile, functionsFile);
+  }
 
   const configFilePath = await getConfigFilePath(root);
   await fs.unlink(configFilePath);
@@ -1094,7 +1078,7 @@ async function initProject() {
   const root = getUserProjectRoot();
 
   await initToolpadFolder(root);
-  await Promise.all([initGeneratedGitignore(root), initToolpadFile(root)]);
+  await Promise.all([initGeneratedGitignore(root)]);
   await migrateLegacyProject(root);
 
   let [dom, fingerprint] = await Promise.all([loadDomFromDisk(), calculateDomFingerprint(root)]);

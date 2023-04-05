@@ -16,7 +16,7 @@ import {
   getUserProjectRoot,
   waitForInit,
   openQueryEditor,
-  getQueriesFile,
+  getFunctionsFile,
 } from '../../server/localMode';
 import { errorFrom, serializeError } from '../../utils/errors';
 
@@ -76,7 +76,8 @@ function formatCodeFrame(location: esbuild.Location): string {
   ].join('\n');
 }
 
-async function createMain(root: string): Promise<string> {
+async function createMain(): Promise<string> {
+  const relativeFunctionsFilePath = [`.`, getFunctionsFile('.')].join(path.sep);
   return `
     import { TOOLPAD_QUERY } from '@mui/toolpad-core/server';
     import { errorFrom, serializeError } from '@mui/toolpad-core/utils/errors';
@@ -99,7 +100,12 @@ async function createMain(root: string): Promise<string> {
     async function getResolvers() {
       if (!resolversPromise) {
         resolversPromise = (async () => {
-          const queries = await import(${JSON.stringify(getQueriesFile(root))}).catch(() => ({}));
+          const queries = await import(${JSON.stringify(
+            relativeFunctionsFilePath,
+          )}).catch((err) => {
+            console.error(err);
+            return {};
+          });
 
           const queriesFileResolvers = Object.entries(queries).flatMap(([name, resolver]) => {
             return typeof resolver === 'function' ? [[name, resolver]] : []
@@ -299,7 +305,7 @@ async function createBuilder() {
         if (args.path === 'main.ts') {
           return {
             loader: 'tsx',
-            contents: await createMain(userProjectRoot),
+            contents: await createMain(),
             resolveDir: userProjectRoot,
           };
         }

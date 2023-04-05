@@ -112,6 +112,7 @@ export type FetchQueryConfig = z.infer<typeof fetchQueryConfigSchema>;
 
 const localQueryConfigSchema = z.object({
   kind: z.literal('local'),
+  resource: z.string().optional(),
   function: z.string().optional(),
 });
 

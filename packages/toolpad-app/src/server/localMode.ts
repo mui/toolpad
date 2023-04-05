@@ -886,7 +886,7 @@ async function writeThemeFile(root: string, theme: Theme | null) {
   if (theme) {
     await updateYamlFile(themeFilePath, theme);
   } else {
-    await fs.rm(themeFilePath, { recursive: true });
+    await fs.rm(themeFilePath, { recursive: true, force: true });
   }
 }
 

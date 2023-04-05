@@ -16,7 +16,7 @@ import {
   getUserProjectRoot,
   waitForInit,
   openQueryEditor,
-  QUERIES_FILE,
+  getQueriesFile,
 } from '../../server/localMode';
 import { errorFrom, serializeError } from '../../utils/errors';
 
@@ -76,7 +76,7 @@ function formatCodeFrame(location: esbuild.Location): string {
   ].join('\n');
 }
 
-async function createMain(): Promise<string> {
+async function createMain(root: string): Promise<string> {
   return `
     import { TOOLPAD_QUERY } from '@mui/toolpad-core/server';
     import { errorFrom, serializeError } from '@mui/toolpad-core/utils/errors';
@@ -99,7 +99,7 @@ async function createMain(): Promise<string> {
     async function getResolvers() {
       if (!resolversPromise) {
         resolversPromise = (async () => {
-          const queries = await import(${JSON.stringify(QUERIES_FILE)}).catch(() => ({}));
+          const queries = await import(${JSON.stringify(getQueriesFile(root))}).catch(() => ({}));
 
           const queriesFileResolvers = Object.entries(queries).flatMap(([name, resolver]) => {
             return typeof resolver === 'function' ? [[name, resolver]] : []
@@ -299,7 +299,7 @@ async function createBuilder() {
         if (args.path === 'main.ts') {
           return {
             loader: 'tsx',
-            contents: await createMain(),
+            contents: await createMain(userProjectRoot),
             resolveDir: userProjectRoot,
           };
         }
@@ -311,7 +311,7 @@ async function createBuilder() {
         // TODO: use for hot reloading
         // eslint-disable-next-line no-console
         console.log(
-          `${chalk.green('ready')} - built queries.ts: ${args.errors.length} error(s), ${
+          `${chalk.green('ready')} - built functions.ts: ${args.errors.length} error(s), ${
             args.warnings.length
           } warning(s)`,
         );

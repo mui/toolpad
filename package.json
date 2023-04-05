@@ -87,6 +87,7 @@
     "dotenv-cli": "^7.1.0",
     "inquirer": "^9.1.5",
     "semver": "^7.3.8",
+    "tsup": "^6.7.0",
     "yargs": "^17.7.1"
   },
   "engines": {

@@ -1,8 +1,10 @@
 import { z } from 'zod';
 
+export const API_VERSION = 'v1';
+
 function toolpadObjectSchema<K extends string, T extends z.ZodType>(kind: K, spec: T) {
   return z.object({
-    apiVersion: z.string(),
+    apiVersion: z.literal(API_VERSION),
     kind: z.literal(kind),
     spec,
   });

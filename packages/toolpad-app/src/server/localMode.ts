@@ -30,6 +30,7 @@ import {
   ResponseType,
   Theme,
   themeSchema,
+  API_VERSION,
 } from './schema';
 import { filterValues, hasOwnProperty, mapValues } from '../utils/collections';
 import { format } from '../utils/prettier';
@@ -39,8 +40,6 @@ import {
   ResponseType as AppDomRestResponseType,
 } from '../toolpadDataSources/rest/types';
 import { LocalQuery } from '../toolpadDataSources/local/types';
-
-const CURRENT_API_VERSION = '1';
 
 export function getUserProjectRoot(): string {
   const { projectDir } = config;
@@ -582,7 +581,7 @@ function expandFromDom<N extends appDom.AppDomNode>(
     const children = appDom.getChildNodes(dom, node);
 
     return {
-      apiVersion: CURRENT_API_VERSION,
+      apiVersion: API_VERSION,
       kind: 'page',
       spec: {
         id: node.id,
@@ -882,9 +881,13 @@ async function writePagesToFiles(pagesFolder: string, pages: PagesContent) {
   );
 }
 
-async function writeThemeFile(root: string, theme: Theme) {
+async function writeThemeFile(root: string, theme: Theme | null) {
   const themeFilePath = getThemeFile(root);
-  await updateYamlFile(themeFilePath, theme);
+  if (theme) {
+    await updateYamlFile(themeFilePath, theme);
+  } else {
+    await fs.rm(themeFilePath, { recursive: true });
+  }
 }
 
 interface ExtractedComponents {
@@ -911,7 +914,7 @@ function extractThemeContentFromDom(dom: appDom.AppDom): Theme | null {
   const { themes = [] } = appDom.getChildNodes(dom, app);
   if (themes[0]?.theme) {
     return {
-      apiVersion: CURRENT_API_VERSION,
+      apiVersion: API_VERSION,
       kind: 'theme',
       spec: {
         'palette.mode': appDom.fromConstPropValue(themes[0].theme['palette.mode']),
@@ -996,9 +999,7 @@ async function writeProjectFolder(
 ): Promise<void> {
   const pagesFolder = getPagesFolder(root);
   await writePagesToFiles(pagesFolder, folder.pages);
-  if (folder.theme) {
-    await writeThemeFile(root, folder.theme);
-  }
+  await writeThemeFile(root, folder.theme);
   if (writeComponents) {
     const componentsFolder = getComponentsFolder(root);
     await writeCodeComponentsToFiles(componentsFolder, folder.components);

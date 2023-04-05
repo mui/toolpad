@@ -71,23 +71,20 @@ const validatePath = async (relativePath: string): Promise<boolean | string> => 
   const absolutePath = path.join(process.cwd(), relativePath);
 
   try {
-    await fs.mkdir(absolutePath);
+    await fs.mkdir(absolutePath, { recursive: true });
 
     return true;
-  } catch {
+  } catch (error: any) {
     // Directory exists, verify if it's empty to proceed
-    try {
+    if (error.code !== 'EEXIST') {
       if (await isFolderEmpty(absolutePath)) {
         return true;
       }
       return `${chalk.red('error')} - The directory at ${chalk.blue(
         absolutePath,
       )} contains files that could conflict. Either use a new directory, or remove conflicting files.`;
-    } catch {
-      return `${chalk.red('error')} - Unable to access directory at ${chalk.red(
-        absolutePath,
-      )}. Please provide a different path.`;
     }
+    throw new Error(error);
   }
 };
 

@@ -9,6 +9,7 @@ import { fromZodError } from 'zod-validation-error';
 import { glob } from 'glob';
 import * as chokidar from 'chokidar';
 import { debounce } from 'lodash-es';
+import cuid from 'cuid';
 import config from '../config';
 import * as appDom from '../appDom';
 import { errorFrom } from '../utils/errors';
@@ -257,11 +258,6 @@ export async function example() {
   ];
 }
 `;
-
-async function initToolpadFolder(root: string) {
-  const toolpadFolder = getToolpadFolder(root);
-  await fs.mkdir(toolpadFolder, { recursive: true });
-}
 
 async function initQueriesFile(root: string): Promise<void> {
   const queriesFilePath = getFunctionsFile(root);
@@ -1074,12 +1070,29 @@ async function calculateDomFingerprint(root: string): Promise<number> {
   return insecureHash(JSON.stringify(mtimes));
 }
 
+async function initToolpadFolder(root: string) {
+  const projectFolder = await readProjectFolder(root);
+  if (Object.keys(projectFolder.pages).length <= 0) {
+    projectFolder.pages.page = {
+      apiVersion: 'v1',
+      kind: 'page',
+      spec: {
+        id: cuid.slug(),
+        title: 'Default page',
+      },
+    };
+    await writeProjectFolder(root, projectFolder);
+  }
+
+  await initGeneratedGitignore(root);
+}
+
 async function initProject() {
   const root = getUserProjectRoot();
 
-  await initToolpadFolder(root);
-  await Promise.all([initGeneratedGitignore(root)]);
   await migrateLegacyProject(root);
+
+  await initToolpadFolder(root);
 
   let [dom, fingerprint] = await Promise.all([loadDomFromDisk(), calculateDomFingerprint(root)]);
 

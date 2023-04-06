@@ -302,7 +302,7 @@ function PricingTable({
                 flexDirection: 'column',
                 p: 2,
                 borderRadius: '12px 12px 0 0',
-                ...(planInfo.commercial && {
+                ...(planInfo.commercial?.title?.toLowerCase() === plan && {
                   borderWidth: '1px 1px 0 1px',
                   borderStyle: 'solid',
                   borderColor: (theme) =>

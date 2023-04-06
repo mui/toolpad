@@ -34,6 +34,8 @@ test('rest basics', async ({ page, context, localApp }) => {
   await page.locator('button:has-text("fetch query2")').click();
   await expect(page.locator('text="query2: query2_value"')).toBeVisible();
 
+  await expect(page.getByText('query3: Transformed')).toBeVisible();
+
   const editorModel = new ToolpadEditor(page);
   await editorModel.goto();
 

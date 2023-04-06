@@ -79,12 +79,15 @@ export interface ConnectionNode<P = unknown> extends AppDomNodeBase {
   };
 }
 
+export type PageDisplayMode = 'standalone' | 'shell';
+
 export interface PageNode extends AppDomNodeBase {
   readonly type: 'page';
   readonly attributes: {
     readonly title: ConstantAttrValue<string>;
     readonly parameters?: ConstantAttrValue<[string, string][]>;
     readonly module?: ConstantAttrValue<string>;
+    readonly display?: ConstantAttrValue<PageDisplayMode>;
   };
 }
 
@@ -1114,10 +1117,22 @@ export function createDefaultDom(): AppDom {
     name: 'Page 1',
     attributes: {
       title: createConst('Page 1'),
+      display: createConst('shell'),
     },
   });
 
   dom = addNode(dom, newPageNode, appNode, 'pages');
 
   return dom;
+}
+
+export function getPageByName(dom: AppDom, name: string): PageNode | null {
+  const rootNode = getApp(dom);
+  const { pages = [] } = getChildNodes(dom, rootNode);
+  return pages.find((page) => page.name === name) ?? null;
+}
+
+export function getQueryByName(dom: AppDom, page: PageNode, name: string): QueryNode | null {
+  const { queries = [] } = getChildNodes(dom, page);
+  return queries.find((query) => query.name === name) ?? null;
 }

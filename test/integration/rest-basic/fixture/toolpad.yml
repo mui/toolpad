@@ -181,4 +181,60 @@ nodes:
         value: PageRow
     parentProp: children
     parentIndex: a2
+  oh53p0s:
+    id: oh53p0s
+    name: queryWithTransform
+    type: query
+    params: []
+    parentId: cn1tds0
+    attributes:
+      query:
+        type: const
+        value:
+          url:
+            type: const
+            value: https://httpbin.org/get
+          method: GET
+          headers: []
+          searchParams: []
+          transformEnabled: true
+          transform: 'return `query3: Transformed ${data?.url}`'
+      dataSource:
+        type: const
+        value: rest
+      connectionId:
+        type: const
+        value: null
+    parentProp: queries
+    parentIndex: a2
+  15d3pu5:
+    name: pageRow3
+    props: {}
+    attributes:
+      component:
+        type: const
+        value: PageRow
+    layout: {}
+    id: 15d3pu5
+    type: element
+    parentId: cn1tds0
+    parentProp: children
+    parentIndex: a3
+  ilb3phd:
+    name: text
+    props:
+      value:
+        type: jsExpression
+        value: |
+          queryWithTransform.data
+    attributes:
+      component:
+        type: const
+        value: Text
+    layout: {}
+    id: ilb3phd
+    type: element
+    parentId: 15d3pu5
+    parentProp: children
+    parentIndex: a0
 version: 6

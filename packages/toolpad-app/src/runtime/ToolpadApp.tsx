@@ -39,6 +39,7 @@ import {
   Navigate,
   Location as RouterLocation,
   useNavigate,
+  matchPath,
 } from 'react-router-dom';
 import { ErrorBoundary, FallbackProps } from 'react-error-boundary';
 import {
@@ -51,14 +52,13 @@ import ErrorIcon from '@mui/icons-material/Error';
 import EditIcon from '@mui/icons-material/Edit';
 import { useBrowserJsRuntime } from '@mui/toolpad-core/jsBrowserRuntime';
 import * as appDom from '../appDom';
-import { RuntimeState, VersionOrPreview } from '../types';
+import { RuntimeState, AppVersion } from '../types';
 import {
   getElementNodeComponentId,
   isPageLayoutComponent,
   isPageRow,
   PAGE_ROW_COMPONENT_ID,
 } from '../toolpadComponents';
-import AppOverview from './AppOverview';
 import AppThemeProvider from './AppThemeProvider';
 import evalJsBindings, {
   buildGlobalScope,
@@ -81,6 +81,8 @@ import { errorFrom } from '../utils/errors';
 import Header from '../toolpad/ToolpadShell/Header';
 import { ThemeProvider } from '../ThemeContext';
 import { BridgeContext } from '../canvas/BridgeContext';
+import AppNavigation from './AppNavigation';
+import { PREVIEW_PAGE_ROUTE } from '../routes';
 
 const ReactQueryDevtoolsProduction = React.lazy(() =>
   import('@tanstack/react-query-devtools/build/lib/index.prod.js').then((d) => ({
@@ -541,10 +543,11 @@ function resolveBindables(
 }
 
 interface QueryNodeProps {
+  page: appDom.PageNode;
   node: appDom.QueryNode;
 }
 
-function QueryNode({ node }: QueryNodeProps) {
+function QueryNode({ page, node }: QueryNodeProps) {
   const getBindings = useBindingsContext();
   const setControlledBinding = useSetControlledBindingContext();
 
@@ -558,7 +561,7 @@ function QueryNode({ node }: QueryNodeProps) {
 
   const configBindings = _.pick(node.attributes, USE_DATA_QUERY_CONFIG_KEYS);
   const options = resolveBindables(bindings, `${node.id}.config`, configBindings);
-  const queryResult = useDataQuery(node, params, options);
+  const queryResult = useDataQuery(page, node, params, options);
 
   React.useEffect(() => {
     const { isLoading, error, data, rows, ...result } = queryResult;
@@ -581,10 +584,11 @@ function QueryNode({ node }: QueryNodeProps) {
 }
 
 interface MutationNodeProps {
+  page: appDom.PageNode;
   node: appDom.QueryNode;
 }
 
-function MutationNode({ node }: MutationNodeProps) {
+function MutationNode({ node, page }: MutationNodeProps) {
   const { version } = useAppContext();
   const getBindings = useBindingsContext();
   const setControlledBinding = useSetControlledBindingContext();
@@ -602,7 +606,8 @@ function MutationNode({ node }: MutationNodeProps) {
   } = useMutation(
     async (overrides: any = {}) =>
       execDataSourceQuery({
-        queryId,
+        pageName: page.name,
+        queryName: node.name,
         params: { ...params, ...overrides },
       }),
     {
@@ -642,16 +647,17 @@ function MutationNode({ node }: MutationNodeProps) {
 }
 
 interface FetchNodeProps {
+  page: appDom.PageNode;
   node: appDom.QueryNode;
 }
 
-function FetchNode({ node }: FetchNodeProps) {
+function FetchNode({ node, page }: FetchNodeProps) {
   const mode: appDom.FetchMode = node.attributes.mode?.value || 'query';
   switch (mode) {
     case 'query':
-      return <QueryNode node={node} />;
+      return <QueryNode node={node} page={page} />;
     case 'mutation':
-      return <MutationNode node={node} />;
+      return <MutationNode node={node} page={page} />;
     default:
       throw new Error(`Unrecognized fetch mdoe "${mode}"`);
   }
@@ -1064,7 +1070,7 @@ function RenderedPage({ nodeId }: RenderedNodeProps) {
               Component={PageRootComponent}
             />
             {queries.map((node) => (
-              <FetchNode key={node.id} node={node} />
+              <FetchNode key={node.id} page={page} node={node} />
             ))}
           </LocalScopeContextProvider>
         </EvaluatePageExpressionProvider>
@@ -1074,17 +1080,13 @@ function RenderedPage({ nodeId }: RenderedNodeProps) {
 }
 
 interface RenderedPagesProps {
-  dom: appDom.AppDom;
+  pages: appDom.PageNode[];
+  defaultPage: appDom.PageNode;
 }
 
-function RenderedPages({ dom }: RenderedPagesProps) {
-  const root = appDom.getApp(dom);
-  const { pages = [] } = appDom.getChildNodes(dom, root);
-
+function RenderedPages({ pages, defaultPage }: RenderedPagesProps) {
   return (
     <Routes>
-      <Route path="/" element={<Navigate replace to="/pages" />} />
-      <Route path="/pages" element={<AppOverview dom={dom} />} />
       {pages.map((page) => (
         <Route
           key={page.id}
@@ -1099,6 +1101,7 @@ function RenderedPages({ dom }: RenderedPagesProps) {
           }
         />
       ))}
+      <Route path="/" element={<Navigate to={`pages/${defaultPage.id}`} replace />} />
     </Routes>
   );
 }
@@ -1135,12 +1138,75 @@ const queryClient = new QueryClient({
   },
 });
 
+export interface ToolpadAppLayoutProps {
+  dom: appDom.RenderTree;
+  hasShell?: boolean;
+  version: AppVersion;
+}
+
+function ToolpadAppLayout({ dom, version, hasShell: hasShellProp = true }: ToolpadAppLayoutProps) {
+  const root = appDom.getApp(dom);
+  const { pages = [] } = appDom.getChildNodes(dom, root);
+
+  const location = useLocation();
+  const { pathname, search } = location;
+  const urlParams = React.useMemo(() => new URLSearchParams(search), [search]);
+
+  const pageMatch = matchPath(PREVIEW_PAGE_ROUTE, `/preview${pathname}`);
+  const pageId = pageMatch?.params.nodeId;
+
+  const defaultPage = pages[0];
+  const page = pageId
+    ? (appDom.getNode<'page'>(dom, pageId as NodeId) as appDom.PageNode)
+    : defaultPage;
+
+  const pageDisplay = urlParams.get('toolpad-display') || page.attributes.display?.value;
+
+  const hasShell = hasShellProp && pageDisplay !== 'standalone';
+
+  const isPreview = version === 'preview';
+
+  return (
+    <React.Fragment>
+      {isPreview ? (
+        <ThemeProvider>
+          <Header
+            enableUserFeedback={false}
+            actions={
+              <Stack direction="row" spacing={1} alignItems="center">
+                <Typography variant="body2" sx={{ color: 'primary.main' }}>
+                  This is a preview version of the application.
+                </Typography>
+                <Button
+                  variant="outlined"
+                  endIcon={<EditIcon />}
+                  color="primary"
+                  component="a"
+                  href={pageId ? `/_toolpad/app/pages/${pageId}` : '/_toolpad/app'}
+                >
+                  Edit
+                </Button>
+              </Stack>
+            }
+          />
+        </ThemeProvider>
+      ) : null}
+      <Box sx={{ display: 'flex' }}>
+        {hasShell && pages.length > 0 ? (
+          <AppNavigation pages={pages} isPreview={isPreview} />
+        ) : null}
+        <RenderedPages pages={pages} defaultPage={defaultPage} />
+      </Box>
+    </React.Fragment>
+  );
+}
+
 export interface ToolpadAppProps {
   rootRef?: React.Ref<HTMLDivElement>;
   catalog?: Record<string, ToolpadComponent>;
-  hidePreviewBanner?: boolean;
+  hasShell?: boolean;
   basename: string;
-  version: VersionOrPreview;
+  version: AppVersion;
   state: RuntimeState;
 }
 
@@ -1149,7 +1215,7 @@ export default function ToolpadApp({
   catalog,
   basename,
   version,
-  hidePreviewBanner,
+  hasShell = true,
   state,
 }: ToolpadAppProps) {
   const { dom } = state;
@@ -1171,29 +1237,6 @@ export default function ToolpadApp({
         <DomContextProvider value={dom}>
           <AppThemeProvider dom={dom}>
             <CssBaseline enableColorScheme />
-            {version === 'preview' && !hidePreviewBanner ? (
-              <ThemeProvider>
-                <Header
-                  enableUserFeedback={false}
-                  actions={
-                    <Stack direction="row" spacing={1} alignItems="center">
-                      <Typography variant="body2" sx={{ color: 'primary.main' }}>
-                        This is a preview version of the application.
-                      </Typography>
-                      <Button
-                        variant="outlined"
-                        endIcon={<EditIcon />}
-                        color="primary"
-                        component="a"
-                        href={`/_toolpad/app`}
-                      >
-                        Edit
-                      </Button>
-                    </Stack>
-                  }
-                />
-              </ThemeProvider>
-            ) : null}
             <ErrorBoundary FallbackComponent={AppError}>
               <ResetNodeErrorsKeyProvider value={resetNodeErrorsKey}>
                 <React.Suspense fallback={<AppLoading />}>
@@ -1202,7 +1245,7 @@ export default function ToolpadApp({
                       <AppContextProvider value={appContext}>
                         <QueryClientProvider client={queryClient}>
                           <BrowserRouter basename={basename}>
-                            <RenderedPages dom={dom} />
+                            <ToolpadAppLayout dom={dom} version={version} hasShell={hasShell} />
                           </BrowserRouter>
                           {showDevtools ? (
                             <ReactQueryDevtoolsProduction initialIsOpen={false} />

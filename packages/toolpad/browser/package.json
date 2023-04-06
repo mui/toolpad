@@ -1,5 +1,5 @@
 {
   "type": "commonjs",
-  "main": "../dist/cjs/browser.js",
-  "types": "../dist/esm/browser.d.ts"
+  "main": "../dist/browser.cjs",
+  "types": "../dist/browser.d.ts"
 }

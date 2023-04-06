@@ -39,6 +39,7 @@ import {
   RECTANGLE_EDGE_TOP,
   rectContainsPoint,
 } from '../../../../utils/geometry';
+import { omit } from '../../../../utils/immutability';
 import NodeHud from './NodeHud';
 import { OverlayGrid, OverlayGridHandle } from './OverlayGrid';
 import { NodeInfo } from '../../../../types';
@@ -1282,7 +1283,7 @@ export default function RenderOverlay({ bridge }: RenderOverlayProps) {
           return normalizePageRowColumnSizes(draft);
         },
         currentView.kind === 'page'
-          ? { ...currentView, selectedNodeId: newNode?.id || draggedNodeId }
+          ? { ...omit(currentView, 'tab'), selectedNodeId: newNode?.id || draggedNodeId }
           : currentView,
       );
 
@@ -1595,7 +1596,7 @@ export default function RenderOverlay({ bridge }: RenderOverlayProps) {
         const isPageColumnChild = parent ? appDom.isElement(parent) && isPageColumn(parent) : false;
 
         const isSelected = selectedNode && !newNode ? selectedNode.id === node.id : false;
-        const isInteractive = interactiveNodes.has(node.id) && !draggedEdge;
+        const isInteractive = interactiveNodes.has(node.id) && !draggedNode && !draggedEdge;
 
         const isHorizontallyResizable = isSelected && (isPageRowChild || isPageColumnChild);
         const isVerticallyResizable =

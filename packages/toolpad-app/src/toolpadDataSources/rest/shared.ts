@@ -20,7 +20,6 @@ import {
 import applyTransform from '../applyTransform';
 import { errorFrom, serializeError } from '../../utils/errors';
 import { MOVIES_API_DEMO_URL } from '../demo';
-import { loadEnvFile } from '../local/server';
 
 export const HTTP_NO_BODY = new Set(['GET', 'HEAD']);
 

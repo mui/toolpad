@@ -7,12 +7,12 @@ type SuspenseCacheEntry =
   | { state: 'pending'; promise: Promise<any> }
   | { state: 'loaded'; module: unknown; error?: Error };
 
-interface LoadedModule {
+export interface LoadedModule {
   module: unknown;
   error?: Error;
 }
 
-type LoadedModules = Partial<Record<string, LoadedModule>>;
+export type LoadedModules = Partial<Record<string, LoadedModule>>;
 
 const AppModulesContext = React.createContext<LoadedModules | null>(null);
 

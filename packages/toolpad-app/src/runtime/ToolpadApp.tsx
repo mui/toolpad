@@ -69,7 +69,7 @@ import { HTML_ID_EDITOR_OVERLAY, NON_BINDABLE_CONTROL_TYPES } from '../constants
 import { mapProperties, mapValues } from '../utils/collections';
 import usePageTitle from '../utils/usePageTitle';
 import ComponentsContext, { useComponents, useComponent } from './ComponentsContext';
-import { AppModulesProvider, useAppModules } from './AppModulesProvider';
+import { AppModulesProvider } from './AppModulesProvider';
 import Pre from '../components/Pre';
 import { layoutBoxArgTypes } from '../toolpadComponents/layoutBox';
 import NoSsr from '../components/NoSsr';
@@ -939,9 +939,7 @@ function RenderedPage({ nodeId }: RenderedNodeProps) {
     [parsedBindings, controlled],
   );
 
-  const modules = useAppModules();
-  const moduleEntry = modules[`pages/${nodeId}`];
-  const globalScope = (moduleEntry?.module as any)?.globalScope || EMPTY_OBJECT;
+  const globalScope = EMPTY_OBJECT;
 
   const browserJsRuntime = useBrowserJsRuntime();
 
@@ -1203,7 +1201,7 @@ function ToolpadAppLayout({ dom, version, hasShell: hasShellProp = true }: Toolp
 
 export interface ToolpadAppProps {
   rootRef?: React.Ref<HTMLDivElement>;
-  catalog?: Record<string, ToolpadComponent>;
+  components?: Record<string, ToolpadComponent>;
   hasShell?: boolean;
   basename: string;
   version: AppVersion;
@@ -1212,7 +1210,7 @@ export interface ToolpadAppProps {
 
 export default function ToolpadApp({
   rootRef,
-  catalog,
+  components,
   basename,
   version,
   hasShell = true,
@@ -1241,7 +1239,7 @@ export default function ToolpadApp({
               <ResetNodeErrorsKeyProvider value={resetNodeErrorsKey}>
                 <React.Suspense fallback={<AppLoading />}>
                   <AppModulesProvider modules={state.modules}>
-                    <ComponentsContext catalog={catalog} dom={dom}>
+                    <ComponentsContext dom={dom}>
                       <AppContextProvider value={appContext}>
                         <QueryClientProvider client={queryClient}>
                           <BrowserRouter basename={basename}>

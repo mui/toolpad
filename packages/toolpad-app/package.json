@@ -24,6 +24,17 @@
     "cli.js",
     ".next"
   ],
+  "exports": {
+    "./package.json": "./package.json",
+    "./cli": {
+      "require": "./dist/cli/index.js"
+    },
+    "./runtime": {
+      "types": "./dist/runtime.d.ts",
+      "import": "./dist/runtime.mjs",
+      "require": "./dist/runtime.js"
+    }
+  },
   "dependencies": {
     "@babel/code-frame": "^7.21.4",
     "@emotion/cache": "^11.10.5",
@@ -50,6 +61,7 @@
     "@tanstack/react-query-devtools": "^4.28.0",
     "@types/cors": "^2.8.13",
     "@types/react-dev-utils": "^9.0.11",
+    "@vitejs/plugin-react": "^3.1.0",
     "abort-controller": "^3.0.0",
     "arg": "^5.0.2",
     "basic-auth": "^2.0.1",
@@ -64,6 +76,7 @@
     "dotenv": "^16.0.3",
     "esbuild": "0.17.15",
     "execa": "^7.1.1",
+    "express": "^4.18.2",
     "find-up": "^6.3.0",
     "fractional-indexing": "^3.2.0",
     "get-port": "^6.1.2",
@@ -100,6 +113,7 @@
     "sucrase": "^3.31.0",
     "superjson": "^1.12.2",
     "ts-node": "^10.9.1",
+    "vite": "^4.2.1",
     "whatwg-url": "^12.0.1",
     "yaml": "^2.2.1"
   },

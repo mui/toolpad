@@ -1,3 +1,4 @@
+import { spawnSync } from 'child_process';
 import { defineConfig } from 'tsup';
 
 export default defineConfig([
@@ -24,6 +25,20 @@ export default defineConfig([
     async onSuccess() {
       // eslint-disable-next-line no-console
       console.log('reactDevtools: build successful');
+    },
+  },
+  {
+    entry: {
+      runtime: './src/runtime/entrypoint.tsx',
+    },
+    format: ['esm', 'cjs'],
+    dts: false,
+    silent: true,
+    tsconfig: './tsconfig.esbuild.json',
+    async onSuccess() {
+      // eslint-disable-next-line no-console
+      console.log('runtime: build successful');
+      spawnSync('tsc', ['--emitDeclarationOnly', '--declaration']);
     },
   },
 ]);

@@ -1,13 +1,19 @@
-import { createServer } from 'http';
 import { parse } from 'url';
 import next from 'next';
+import express from 'express';
 import invariant from 'invariant';
+import { createHandler } from '../src/server/toolpadAppServer';
+import { getUserProjectRoot } from '../src/server/localMode';
 
 async function main() {
   const { default: chalk } = await import('chalk');
 
-  const projectDir = process.env.TOOLPAD_PROJECT_DIR;
+  const server = express();
 
+  const userApp = await createHandler(getUserProjectRoot());
+  server.use('/app', userApp);
+
+  const projectDir = process.env.TOOLPAD_PROJECT_DIR;
   const dir = process.env.TOOLPAD_DIR;
   const dev = process.env.NODE_ENV !== 'production';
   const hostname = 'localhost';
@@ -17,7 +23,7 @@ async function main() {
   const app = next({ dir, dev, hostname, port });
   const handle = app.getRequestHandler();
 
-  const server = createServer(async (req, res) => {
+  server.use(async (req, res) => {
     try {
       invariant(req.url, 'request must have a url');
       // Be sure to pass `true` as the second argument to `url.parse`.

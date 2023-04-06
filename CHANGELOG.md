@@ -1,5 +1,22 @@
 # Changelog
 
+## 0.1.3
+
+<!-- generated comparing v0.1.2..master -->
+
+_Apr 5, 2023_
+
+A big thanks to the 3 contributors who made this release possible. Here are some highlights ✨:
+
+Fixed a regression with the query transformation feature, removed some obsolete code and a few improvements to the editor user experience!
+
+- &#8203;<!-- 4 -->Fix transform regression (#1856) @bharatkashyap
+- &#8203;<!-- 3 -->Try replacing tsc with tsup as build tool (#1727) @Janpot
+- &#8203;<!-- 2 -->Remove obsolete onDelete datagrid property (#1850) @Janpot
+- &#8203;<!-- 1 -->Editor UX fixes (#1844) @apedroferreira
+
+All contributors of this release in alphabetical order: @apedroferreira, @bharatkashyap, @Janpot
+
 ## 0.1.2
 
 <!-- generated comparing v0.1.1..master -->

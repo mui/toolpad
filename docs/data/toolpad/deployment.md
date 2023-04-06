@@ -1,6 +1,6 @@
 # Deployment
 
-<p class="description">Deploying a Toolpad app is a 3-step process and quite like any other react application.</p>
+<p class="description">Deploying a Toolpad app is like deploying any other React application and has 3 steps:</p>
 
 To serve your app locally:
 
@@ -8,13 +8,13 @@ To serve your app locally:
 npm start
 ```
 
-This command will create an optimized production build for the Toolpad app and will output what files it has generated and how large each file is:
+This command will create an optimized production build for the Toolpad app and will output the generated files:
 
 ```sh
 npm run build
 ```
 
-Once the build has been made. You can deploy it to any service of your choice!
+Once the build has been made, you can deploy it to any service of your choice!
 
 ## Overriding page display mode
 

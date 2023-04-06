@@ -40,9 +40,9 @@ Field with value:
 
 ## Event handling
 
-Components like MUI Button have onClick event handler props. This can be binded to run a piece of code to mutate the page state.
+Some components have event handler props, such as the `Button` component and its `onClick` prop. Event handler props can be bound to run a piece of code to mutate the page state.
 
-(In the example below you can see how on Click of a button, the value is copied from one component to the other)
+(In the example below you can see how after clicking the button, the value is copied from one component to the other)
 
 <img src="/static/toolpad/docs/data-binding/bind-10.png" alt="Binding result 2" width="902px" style="margin-bottom: 8px;" />
 

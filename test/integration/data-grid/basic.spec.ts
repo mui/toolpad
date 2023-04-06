@@ -14,7 +14,7 @@ test('Column prop updates are not lost on drag interactions', async ({ page }) =
   const editorModel = new ToolpadEditor(page);
   editorModel.goto();
 
-  await editorModel.pageRoot.waitFor({ state: 'visible' });
+  await editorModel.waitForOverlay();
 
   const canvasGridLocator = editorModel.appCanvas.getByRole('grid');
 

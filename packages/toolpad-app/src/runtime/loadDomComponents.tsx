@@ -3,14 +3,14 @@ import {
   ToolpadComponent,
   TOOLPAD_COMPONENT,
   createComponent,
+  createToolpadComponentThatThrows,
 } from '@mui/toolpad-core';
 import { resolveValues } from '@mui/toolpad-core/utils/promises';
 import * as ReactIs from 'react-is';
-import * as builtIns from '@mui/toolpad-components';
 import * as React from 'react';
 import * as ReactDom from 'react-dom';
 import { RuntimeState, CompiledModule } from '../types';
-import { mapValues, hasOwnProperty } from '../utils/collections';
+import { mapValues } from '../utils/collections';
 import { ToolpadComponentDefinitions, getToolpadComponents } from '../toolpadComponents';
 import { errorFrom } from '../utils/errors';
 
@@ -108,24 +108,6 @@ export interface LoadedModule {
   error?: Error;
 }
 
-function createToolpadComponentThatThrows(error: Error) {
-  return createComponent(() => {
-    throw error;
-  });
-}
-
-function isToolpadComponent(maybeComponent: unknown): maybeComponent is ToolpadComponent<any> {
-  if (
-    !ReactIs.isValidElementType(maybeComponent) ||
-    typeof maybeComponent === 'string' ||
-    !hasOwnProperty(maybeComponent, TOOLPAD_COMPONENT)
-  ) {
-    return false;
-  }
-
-  return true;
-}
-
 interface InitComponentsConfig {
   catalog: ToolpadComponentDefinitions;
   modules: Partial<Record<string, LoadedModule>>;
@@ -139,18 +121,6 @@ function initComponents({
 
   for (const [id, componentDef] of Object.entries(catalog)) {
     if (componentDef) {
-      if (componentDef.builtIn) {
-        const builtIn = (builtIns as any)[componentDef.builtIn];
-
-        if (!isToolpadComponent(builtIn)) {
-          result[id] = createToolpadComponentThatThrows(
-            new Error(`Imported builtIn "${componentDef.builtIn}" is not a ToolpadComponent`),
-          );
-        } else {
-          result[id] = builtIn;
-        }
-      }
-
       if (componentDef?.codeComponentId) {
         const componentId = componentDef.codeComponentId;
         const moduleEntry = modules[`codeComponents/${componentId}`];

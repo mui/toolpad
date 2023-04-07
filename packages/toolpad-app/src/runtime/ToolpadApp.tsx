@@ -29,6 +29,10 @@ import {
   getArgTypeDefaultValue,
   ScopeMetaPropField,
   ComponentsContextProvider,
+  isToolpadComponent,
+  createToolpadComponentThatThrows,
+  useComponents,
+  useComponent,
 } from '@mui/toolpad-core';
 import { createProvidedContext } from '@mui/toolpad-core/utils/react';
 import { QueryClient, QueryClientProvider, useMutation } from '@tanstack/react-query';
@@ -52,10 +56,12 @@ import * as _ from 'lodash-es';
 import ErrorIcon from '@mui/icons-material/Error';
 import EditIcon from '@mui/icons-material/Edit';
 import { useBrowserJsRuntime } from '@mui/toolpad-core/jsBrowserRuntime';
+import * as builtIns from '@mui/toolpad-components';
 import * as appDom from '../appDom';
 import { RuntimeState, AppVersion } from '../types';
 import {
   getElementNodeComponentId,
+  INTERNAL_COMPONENTS,
   isPageLayoutComponent,
   isPageRow,
   PAGE_ROW_COMPONENT_ID,
@@ -69,7 +75,6 @@ import evalJsBindings, {
 import { HTML_ID_EDITOR_OVERLAY, NON_BINDABLE_CONTROL_TYPES } from '../constants';
 import { mapProperties, mapValues } from '../utils/collections';
 import usePageTitle from '../utils/usePageTitle';
-import { useComponents, useComponent } from './ComponentsContext';
 import Pre from '../components/Pre';
 import { layoutBoxArgTypes } from '../toolpadComponents/layoutBox';
 import NoSsr from '../components/NoSsr';
@@ -83,6 +88,20 @@ import { ThemeProvider } from '../ThemeContext';
 import { BridgeContext } from '../canvas/BridgeContext';
 import AppNavigation from './AppNavigation';
 import { PREVIEW_PAGE_ROUTE } from '../routes';
+
+const internalComponents: ToolpadComponents = Object.fromEntries(
+  [...INTERNAL_COMPONENTS].map(([name]) => {
+    let builtIn = (builtIns as any)[name];
+
+    if (!isToolpadComponent(builtIn)) {
+      builtIn = createToolpadComponentThatThrows(
+        new Error(`Imported builtIn "${name}" is not a ToolpadComponent`),
+      );
+    }
+
+    return [name, builtIn];
+  }),
+);
 
 const ReactQueryDevtoolsProduction = React.lazy(() =>
   import('@tanstack/react-query-devtools/build/lib/index.prod.js').then((d) => ({
@@ -1235,7 +1254,9 @@ export default function ToolpadApp({
   }, [toggleDevtools]);
 
   React.useEffect(() => {
-    loadComponents(state).then(setComponents);
+    loadComponents(state).then((codeComponents) =>
+      setComponents({ ...codeComponents, ...internalComponents }),
+    );
   }, [loadComponents, state]);
 
   return (

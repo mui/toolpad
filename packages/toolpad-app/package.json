@@ -1,6 +1,6 @@
 {
   "name": "@mui/toolpad-app",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "license": "MIT",
   "scripts": {
     "build": "concurrently \"yarn:build:*\" && rimraf ./.next/cache",
@@ -9,12 +9,10 @@
     "cli": "./cli.js",
     "lint": "next lint && prettier --check .",
     "fix": "next lint --fix && prettier --write .",
-    "build:cli": "tsc -p tsconfig.cli.json",
+    "build:cli": "tsup",
     "build:next": "NODE_OPTIONS=--max-old-space-size=8192 next build",
-    "build:react-devtools": "rimraf ./public/reactDevtools && esbuild ./reactDevtools/bootstrap.ts --target=es6 --bundle --format=iife --outdir=./public/reactDevtools",
     "build:typings": "ts-node --esm ./scripts/typings.mts",
-    "dev:cli": "yarn build:cli --watch",
-    "dev:react-devtools": "yarn build:react-devtools --watch",
+    "dev:cli": "tsup --watch",
     "dev:typings": "yarn build:typings",
     "waitForApp": "ts-node --esm ./scripts/waitForApp.mts",
     "check-types": "tsc --noEmit"
@@ -38,8 +36,8 @@
     "@mui/lab": "^5.0.0-alpha.125",
     "@mui/material": "^5.11.16",
     "@mui/system": "^5.11.16",
-    "@mui/toolpad-components": "^0.1.2",
-    "@mui/toolpad-core": "^0.1.2",
+    "@mui/toolpad-components": "^0.1.3",
+    "@mui/toolpad-core": "^0.1.3",
     "@mui/types": "^7.2.3",
     "@mui/utils": "^5.11.13",
     "@mui/x-data-grid-generator": "^6.0.4",
@@ -141,5 +139,5 @@
   "publishConfig": {
     "access": "public"
   },
-  "gitHead": "dcb31076f097fc44028a6fb704691d0f40489593"
+  "gitHead": "53da43a28ad75dac925f4f4e7716483c937e5056"
 }

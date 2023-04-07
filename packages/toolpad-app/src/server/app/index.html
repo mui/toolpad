@@ -4,17 +4,9 @@
     <title>Toolpad</title>
   </head>
   <body>
-    <script>
-      // Add the data-toolpad-canvas attribute to the canvas iframe element
-      if (window.frameElement?.dataset.toolpadCanvas) {
-        var script = document.createElement('script');
-        script.src = '/reactDevtools/bootstrap.global.js';
-        document.write(script.outerHTML);
-      }
-    </script>
-    __TOOLPAD_CONFIG__ __TOOLPAD_RUNTIME_STATE__
-
     <div id="root"></div>
+
+    <!-- __TOOLPAD_SCRIPTS__ -->
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

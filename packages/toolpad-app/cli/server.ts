@@ -2,16 +2,30 @@ import { parse } from 'url';
 import next from 'next';
 import express from 'express';
 import invariant from 'invariant';
+import { createServer } from 'http';
 import { createHandler } from '../src/server/toolpadAppServer';
 import { getUserProjectRoot } from '../src/server/localMode';
 
 async function main() {
   const { default: chalk } = await import('chalk');
 
-  const server = express();
+  const app = express();
+  const httpServer = createServer(app);
 
-  const userApp = await createHandler(getUserProjectRoot());
-  server.use('/app', userApp);
+  const previewApp = await createHandler({
+    server: httpServer,
+    root: getUserProjectRoot(),
+    base: '/preview',
+  });
+  app.use('/preview', previewApp);
+
+  const canvasApp = await createHandler({
+    server: httpServer,
+    root: getUserProjectRoot(),
+    base: '/app-canvas',
+    canvas: true,
+  });
+  app.use('/app-canvas', canvasApp);
 
   const projectDir = process.env.TOOLPAD_PROJECT_DIR;
   const dir = process.env.TOOLPAD_DIR;
@@ -20,10 +34,10 @@ async function main() {
   const port = Number(process.env.TOOLPAD_PORT);
 
   // when using middleware `hostname` and `port` must be provided below
-  const app = next({ dir, dev, hostname, port });
-  const handle = app.getRequestHandler();
+  const editorNextApp = next({ dir, dev, hostname, port });
+  const handle = editorNextApp.getRequestHandler();
 
-  server.use(async (req, res) => {
+  app.use(async (req, res) => {
     try {
       invariant(req.url, 'request must have a url');
       // Be sure to pass `true` as the second argument to `url.parse`.
@@ -38,7 +52,7 @@ async function main() {
   });
 
   await new Promise<void>((resolve, reject) => {
-    server
+    httpServer
       .once('error', (err) => {
         reject(err);
       })
@@ -54,7 +68,7 @@ async function main() {
     )}`,
   );
 
-  await app.prepare();
+  await editorNextApp.prepare();
 }
 
 main().catch((err) => {

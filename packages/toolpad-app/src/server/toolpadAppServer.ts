@@ -4,6 +4,7 @@ import * as path from 'path';
 import * as fs from 'fs/promises';
 import serializeJavascript from 'serialize-javascript';
 import { Router } from 'express';
+import { Server } from 'http';
 import { MUI_X_PRO_LICENSE, RUNTIME_CONFIG_WINDOW_PROPERTY } from '../constants';
 import config from '../config';
 import createRuntimeState from '../createRuntimeState';
@@ -11,7 +12,12 @@ import { loadDom } from './data';
 import * as appDom from '../appDom';
 import { indent } from '../utils/strings';
 
-function virtualModules(root: string): Plugin {
+interface ToolpadVitePluginParams {
+  root: string;
+  base: string;
+}
+
+function toolpadVitePlugin({ root, base }: ToolpadVitePluginParams): Plugin {
   const entryPointId = '/src/main.tsx';
   const resolvedEntryPointId = `\0${entryPointId}`;
 
@@ -19,7 +25,7 @@ function virtualModules(root: string): Plugin {
   const resolvedComponentsId = `\0${componentsId}`;
 
   return {
-    name: 'virtual-modules',
+    name: 'toolpad',
 
     async resolveId(id, importer) {
       if (id === entryPointId) {
@@ -46,7 +52,11 @@ function virtualModules(root: string): Plugin {
             
             const initialState = window.initialToolpadState;
 
-            init(components, initialState)
+            init({
+              base: ${JSON.stringify(base)},
+              components,
+              initialState,
+            })
           `,
           map: null,
         };
@@ -81,12 +91,22 @@ function virtualModules(root: string): Plugin {
   };
 }
 
-export async function createHandler(root: string) {
+export interface CreateHandlerparams {
+  server: Server;
+  root: string;
+  base: string;
+  canvas?: true;
+}
+
+export async function createHandler({ root, base, canvas, server }: CreateHandlerparams) {
   const toolpadRoot = path.resolve(__dirname, '../../src/server/app');
-  const server = await createServer({
+  const devServer = await createServer({
     configFile: false,
     server: {
       middlewareMode: true,
+      hmr: {
+        server,
+      },
       fs: {
         allow: [root, path.resolve(__dirname, '../../../../')],
       },
@@ -97,8 +117,8 @@ export async function createHandler(root: string) {
     resolve: {
       alias: {},
     },
-    plugins: [react(), virtualModules(root)],
-    base: '/app',
+    plugins: [react(), toolpadVitePlugin({ root, base })],
+    base,
     define: {
       'process.env': {},
     },
@@ -106,7 +126,7 @@ export async function createHandler(root: string) {
 
   const router = Router();
 
-  router.use(server.middlewares);
+  router.use(devServer.middlewares);
 
   router.use('*', async (req, res, next) => {
     const url = req.originalUrl;
@@ -120,17 +140,27 @@ export async function createHandler(root: string) {
       });
 
       const template = await fs.readFile(path.resolve(toolpadRoot, 'index.html'), 'utf-8');
-      let html = await server.transformIndexHtml(url, template);
-      html = html.replaceAll(
-        `__TOOLPAD_CONFIG__`,
+
+      const toolpadScripts = [
         `<script>window[${JSON.stringify(
           RUNTIME_CONFIG_WINDOW_PROPERTY,
         )}] = ${serializedConfig}</script>`,
-      );
-      html = html.replaceAll(
-        `__TOOLPAD_RUNTIME_STATE__`,
         `<script>window.initialToolpadState = ${serializedInitialState}</script>`,
-      );
+        canvas
+          ? `
+          <script>
+          // Add the data-toolpad-canvas attribute to the canvas iframe element
+          if (window.frameElement?.dataset.toolpadCanvas) {
+            var script = document.createElement('script');
+            script.src = '/reactDevtools/bootstrap.global.js';
+            document.write(script.outerHTML);
+          }
+        </script>
+        `
+          : '',
+      ];
+      let html = await devServer.transformIndexHtml(url, template);
+      html = html.replaceAll(`<!-- __TOOLPAD_SCRIPTS__ -->`, toolpadScripts.join('\n'));
       res.status(200).set({ 'Content-Type': 'text/html' }).end(html);
     } catch (e) {
       next(e);

@@ -18,7 +18,7 @@ export const PAGE_ROW_COMPONENT_ID = 'PageRow';
 export const PAGE_COLUMN_COMPONENT_ID = 'PageColumn';
 export const STACK_COMPONENT_ID = 'Stack';
 
-const INTERNAL_COMPONENTS = new Map<string, ToolpadComponentDefinition>([
+export const INTERNAL_COMPONENTS = new Map<string, ToolpadComponentDefinition>([
   [PAGE_ROW_COMPONENT_ID, { displayName: 'Row', builtIn: 'PageRow', system: true }],
   [PAGE_COLUMN_COMPONENT_ID, { displayName: 'Column', builtIn: 'PageColumn', system: true }],
   [STACK_COMPONENT_ID, { displayName: 'Stack', builtIn: 'Stack', system: true }],

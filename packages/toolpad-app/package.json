@@ -30,9 +30,9 @@
       "require": "./dist/cli/index.js"
     },
     "./runtime": {
-      "types": "./dist/runtime.d.ts",
-      "import": "./dist/runtime.mjs",
-      "require": "./dist/runtime.js"
+      "types": "./dist/runtime/index.d.ts",
+      "import": "./dist/runtime/index.mjs",
+      "require": "./dist/runtime/index.js"
     }
   },
   "dependencies": {

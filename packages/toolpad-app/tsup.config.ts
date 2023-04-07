@@ -4,11 +4,12 @@ import { defineConfig } from 'tsup';
 export default defineConfig([
   {
     entry: {
-      'cli/index': './cli/index.ts',
-      'cli/server': './cli/server.ts',
+      index: './cli/index.ts',
+      server: './cli/server.ts',
     },
+    outDir: 'dist/cli',
     silent: true,
-    noExternal: ['open-editor', 'execa', 'fractional-indexing'],
+    noExternal: ['open-editor', 'execa', 'fractional-indexing', 'lodash-es'],
     clean: true,
     async onSuccess() {
       // eslint-disable-next-line no-console
@@ -31,11 +32,13 @@ export default defineConfig([
   },
   {
     entry: {
-      runtime: './src/runtime/entrypoint.tsx',
+      index: './src/runtime/entrypoint.tsx',
+      canvas: './src/canvas/index.tsx',
     },
     format: ['esm', 'cjs'],
     dts: false,
     silent: true,
+    outDir: 'dist/runtime',
     tsconfig: './tsconfig.esbuild.json',
     async onSuccess() {
       // eslint-disable-next-line no-console

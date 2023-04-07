@@ -9,6 +9,7 @@ import config from '../config';
 import createRuntimeState from '../createRuntimeState';
 import { loadDom } from './data';
 import * as appDom from '../appDom';
+import { indent } from '../utils/strings';
 
 function virtualModules(root: string): Plugin {
   const entryPointId = '/src/main.tsx';
@@ -39,15 +40,13 @@ function virtualModules(root: string): Plugin {
           code: `
             import { init } from '@mui/toolpad/runtime';
             import { LicenseInfo } from '@mui/x-data-grid-pro';
-            import * as components from 'virtual:components';
-
-            console.log(components)
+            import components from 'virtual:components';
             
             LicenseInfo.setLicenseKey(${JSON.stringify(MUI_X_PRO_LICENSE)});
             
             const initialState = window.initialToolpadState;
 
-            init(initialState)
+            init(components, initialState)
           `,
           map: null,
         };
@@ -58,16 +57,21 @@ function virtualModules(root: string): Plugin {
         const app = appDom.getApp(dom);
         const { codeComponents = [] } = appDom.getChildNodes(dom, app);
 
-        const exports = codeComponents.map(
-          ({ name }) => `export { default as ${name} } from './components/${name}'`,
+        const imports = codeComponents.map(
+          ({ name }) => `import ${name} from './components/${name}';`,
         );
 
-        console.log(exports);
+        const defaultExportProperties = codeComponents.map(
+          ({ name }) => `${JSON.stringify(`codeComponent.${name}`)}: ${name}`,
+        );
 
         return {
           code: `
-            export {}
-            ${exports.join('\n')}
+            ${imports.join('\n')}
+
+            export default {
+              ${indent(defaultExportProperties.join(',\n'), 2)}
+            }
           `,
           map: null,
         };
@@ -83,12 +87,12 @@ export async function createHandler(root: string) {
     configFile: false,
     server: {
       middlewareMode: true,
-
       fs: {
         allow: [root, path.resolve(__dirname, '../../../../')],
       },
     },
     appType: 'custom',
+    logLevel: 'warn',
     root,
     resolve: {
       alias: {},

@@ -28,6 +28,7 @@ import {
   DEFAULT_LOCAL_SCOPE_PARAMS,
   getArgTypeDefaultValue,
   ScopeMetaPropField,
+  ComponentsContextProvider,
 } from '@mui/toolpad-core';
 import { createProvidedContext } from '@mui/toolpad-core/utils/react';
 import { QueryClient, QueryClientProvider, useMutation } from '@tanstack/react-query';
@@ -68,8 +69,7 @@ import evalJsBindings, {
 import { HTML_ID_EDITOR_OVERLAY, NON_BINDABLE_CONTROL_TYPES } from '../constants';
 import { mapProperties, mapValues } from '../utils/collections';
 import usePageTitle from '../utils/usePageTitle';
-import ComponentsContext, { useComponents, useComponent } from './ComponentsContext';
-import { AppModulesProvider } from './AppModulesProvider';
+import { useComponents, useComponent } from './ComponentsContext';
 import Pre from '../components/Pre';
 import { layoutBoxArgTypes } from '../toolpadComponents/layoutBox';
 import NoSsr from '../components/NoSsr';
@@ -1199,9 +1199,13 @@ function ToolpadAppLayout({ dom, version, hasShell: hasShellProp = true }: Toolp
   );
 }
 
+export interface LoadComponents {
+  (state: RuntimeState): Promise<ToolpadComponents>;
+}
+
 export interface ToolpadAppProps {
   rootRef?: React.Ref<HTMLDivElement>;
-  components?: Record<string, ToolpadComponent>;
+  loadComponents: LoadComponents;
   hasShell?: boolean;
   basename: string;
   version: AppVersion;
@@ -1210,7 +1214,7 @@ export interface ToolpadAppProps {
 
 export default function ToolpadApp({
   rootRef,
-  components,
+  loadComponents,
   basename,
   version,
   hasShell = true,
@@ -1218,6 +1222,7 @@ export default function ToolpadApp({
 }: ToolpadAppProps) {
   const { dom } = state;
   const appContext = React.useMemo(() => ({ version }), [version]);
+  const [components, setComponents] = React.useState<ToolpadComponents | null>(null);
 
   const [resetNodeErrorsKey, setResetNodeErrorsKey] = React.useState(0);
 
@@ -1229,17 +1234,21 @@ export default function ToolpadApp({
     (window as any).toggleDevtools = () => toggleDevtools();
   }, [toggleDevtools]);
 
+  React.useEffect(() => {
+    loadComponents(state).then(setComponents);
+  }, [loadComponents, state]);
+
   return (
     <AppRoot ref={rootRef}>
       <NoSsr>
-        <DomContextProvider value={dom}>
-          <AppThemeProvider dom={dom}>
-            <CssBaseline enableColorScheme />
-            <ErrorBoundary FallbackComponent={AppError}>
-              <ResetNodeErrorsKeyProvider value={resetNodeErrorsKey}>
-                <React.Suspense fallback={<AppLoading />}>
-                  <AppModulesProvider modules={state.modules}>
-                    <ComponentsContext dom={dom}>
+        {components ? (
+          <ComponentsContextProvider value={components}>
+            <DomContextProvider value={dom}>
+              <AppThemeProvider dom={dom}>
+                <CssBaseline enableColorScheme />
+                <ErrorBoundary FallbackComponent={AppError}>
+                  <ResetNodeErrorsKeyProvider value={resetNodeErrorsKey}>
+                    <React.Suspense fallback={<AppLoading />}>
                       <AppContextProvider value={appContext}>
                         <QueryClientProvider client={queryClient}>
                           <BrowserRouter basename={basename}>
@@ -1250,13 +1259,15 @@ export default function ToolpadApp({
                           ) : null}
                         </QueryClientProvider>
                       </AppContextProvider>
-                    </ComponentsContext>
-                  </AppModulesProvider>
-                </React.Suspense>
-              </ResetNodeErrorsKeyProvider>
-            </ErrorBoundary>
-          </AppThemeProvider>
-        </DomContextProvider>
+                    </React.Suspense>
+                  </ResetNodeErrorsKeyProvider>
+                </ErrorBoundary>
+              </AppThemeProvider>
+            </DomContextProvider>
+          </ComponentsContextProvider>
+        ) : (
+          <AppLoading />
+        )}
       </NoSsr>
       <EditorOverlay id={HTML_ID_EDITOR_OVERLAY} />
     </AppRoot>

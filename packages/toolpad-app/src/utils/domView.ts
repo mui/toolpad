@@ -2,10 +2,7 @@ import { NodeId } from '@mui/toolpad-core';
 import { matchPath } from 'react-router-dom';
 import { APP_PAGE_ROUTE, APP_CONNECTION_ROUTE, APP_CODE_COMPONENT_ROUTE } from '../routes';
 
-export type PageView =
-  | { kind: 'query'; nodeId: NodeId }
-  | { kind: 'pageModule' }
-  | { kind: 'pageParameters' };
+export type PageView = { kind: 'query'; nodeId: NodeId } | { kind: 'pageParameters' };
 
 export type PageViewTab = 'component' | 'theme';
 

@@ -6,10 +6,6 @@ import QueryEditor from './QueryEditor';
 import UrlQueryEditor from './UrlQueryEditor';
 import NodeNameEditor from '../NodeNameEditor';
 import * as appDom from '../../../appDom';
-import PageModuleEditor from './PageModuleEditor';
-
-// Page modules are deprecated
-const ENABLE_PAGE_MODULE_EDITOR = false;
 
 const PAGE_DISPLAY_OPTIONS: { value: appDom.PageDisplayMode; label: string }[] = [
   { value: 'shell', label: 'App shell' },
@@ -59,7 +55,6 @@ export default function PageOptionsPanel() {
             );
           })}
         </TextField>
-        {ENABLE_PAGE_MODULE_EDITOR ? <PageModuleEditor pageNodeId={pageNodeId} /> : null}
         <Divider variant="middle" sx={{ alignSelf: 'stretch' }} />
         <Typography variant="overline">Page State:</Typography>
         <UrlQueryEditor pageNodeId={pageNodeId} />

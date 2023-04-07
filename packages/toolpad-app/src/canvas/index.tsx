@@ -2,8 +2,7 @@ import * as React from 'react';
 import invariant from 'invariant';
 import { throttle } from 'lodash-es';
 import { CanvasEventsContext } from '@mui/toolpad-core/runtime';
-import { ToolpadComponent } from '@mui/toolpad-core';
-import ToolpadApp from '../runtime';
+import ToolpadApp, { LoadComponents } from '../runtime';
 import { NodeHashes, RuntimeState } from '../types';
 import getPageViewState from './getPageViewState';
 import { rectContainsPoint } from '../utils/geometry';
@@ -26,10 +25,14 @@ const handleScreenUpdate = throttle(
 export interface AppCanvasProps {
   initialState?: AppCanvasState | null;
   basename: string;
-  catalog?: Record<string, ToolpadComponent>;
+  loadComponents: LoadComponents;
 }
 
-export default function AppCanvas({ catalog, basename, initialState = null }: AppCanvasProps) {
+export default function AppCanvas({
+  loadComponents,
+  basename,
+  initialState = null,
+}: AppCanvasProps) {
   const [state, setState] = React.useState<AppCanvasState | null>(initialState);
 
   const appRootRef = React.useRef<HTMLDivElement>();
@@ -135,7 +138,7 @@ export default function AppCanvas({ catalog, basename, initialState = null }: Ap
         <CanvasEventsContext.Provider value={bridge.canvasEvents}>
           <ToolpadApp
             rootRef={onAppRoot}
-            catalog={catalog}
+            loadComponents={loadComponents}
             hasShell={false}
             version="development"
             basename={basename}

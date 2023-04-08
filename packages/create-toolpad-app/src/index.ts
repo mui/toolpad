@@ -71,19 +71,22 @@ const validatePath = async (relativePath: string): Promise<boolean | string> => 
   const absolutePath = path.join(process.cwd(), relativePath);
 
   try {
-    await fs.mkdir(absolutePath, { recursive: true });
+    await fs.access(absolutePath, fs.constants.F_OK);
 
-    return true;
-  } catch (error: any) {
     // Directory exists, verify if it's empty to proceed
-    if (error.code !== 'EEXIST') {
-      if (await isFolderEmpty(absolutePath)) {
-        return true;
-      }
-      return `${chalk.red('error')} - The directory at ${chalk.blue(
-        absolutePath,
-      )} contains files that could conflict. Either use a new directory, or remove conflicting files.`;
+    if (await isFolderEmpty(absolutePath)) {
+      return true;
     }
+    return `${chalk.red('error')} - The directory at ${chalk.blue(
+      absolutePath,
+    )} contains files that could conflict. Either use a new directory, or remove conflicting files.`;
+  } catch (error: any) {
+    // Directory does not exist, create it
+    if (error.code === 'ENOENT') {
+      await fs.mkdir(absolutePath, { recursive: true });
+      return true;
+    }
+    // Unexpected error, let it bubble up and crash the process
     throw new Error(error);
   }
 };

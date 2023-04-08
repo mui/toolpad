@@ -13,8 +13,7 @@ import * as React from 'react';
 import invariant from 'invariant';
 import CloseIcon from '@mui/icons-material/Close';
 import * as appDom from '../../../appDom';
-import { useAppStateApi, useDom } from '../../AppState';
-import { format } from '../../../utils/prettier';
+import { useDom } from '../../AppState';
 import DialogForm from '../../../components/DialogForm';
 import useEvent from '../../../utils/useEvent';
 import { useNodeNameValidation } from './validation';
@@ -22,34 +21,6 @@ import client from '../../../api';
 import useLatest from '../../../utils/useLatest';
 
 const DEFAULT_NAME = 'MyComponent';
-
-function createDefaultCodeComponent(name: string): string {
-  const componentId = name.replace(/\s/g, '');
-  const propTypeId = `${componentId}Props`;
-  return format(`
-    import * as React from 'react';
-    import { Typography } from '@mui/material';
-    import { createComponent } from '@mui/toolpad/browser';
-    
-    export interface ${propTypeId} {
-      msg: string;
-    }
-    
-    function ${componentId}({ msg }: ${propTypeId}) {
-      return (
-        <Typography>{msg}</Typography>
-      );
-    }
-
-    export default createComponent(${componentId}, {
-      argTypes: {
-        msg: {
-          typeDef: { type: "string", default: "Hello world!" },
-        },
-      },
-    });    
-  `);
-}
 
 export interface CreateCodeComponentDialogProps {
   open: boolean;
@@ -62,7 +33,6 @@ export default function CreateCodeComponentDialog({
   ...props
 }: CreateCodeComponentDialogProps) {
   const { dom } = useDom();
-  const appStateApi = useAppStateApi();
 
   const existingNames = React.useMemo(
     () => appDom.getExistingNamesForChildren(dom, appDom.getApp(dom), 'codeComponents'),
@@ -99,26 +69,12 @@ export default function CreateCodeComponentDialog({
       <Dialog open={open} onClose={onClose} {...props}>
         <DialogForm
           autoComplete="off"
-          onSubmit={(event) => {
-            invariant(isFormValid, 'Invalid form should not be submitted when submit is disabled');
-
+          onSubmit={async (event) => {
             event.preventDefault();
-            const newNode = appDom.createNode(dom, 'codeComponent', {
-              name,
-              attributes: {
-                code: appDom.createConst(createDefaultCodeComponent(name)),
-                isNew: appDom.createConst(true),
-              },
-            });
-            const appNode = appDom.getApp(dom);
-
-            appStateApi.update((draft) =>
-              appDom.addNode(draft, newNode, appNode, 'codeComponents'),
-            );
-
-            setSnackbarState({ name });
-
+            invariant(isFormValid, 'Invalid form should not be submitted when submit is disabled');
+            await client.mutation.createComponent(name);
             onClose();
+            setSnackbarState({ name });
           }}
         >
           <DialogTitle>Create a new Code Component</DialogTitle>

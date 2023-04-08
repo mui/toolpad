@@ -163,7 +163,7 @@ export interface AppTheme {
   'palette.secondary.main'?: string;
 }
 
-export type VersionOrPreview = 'preview' | number;
+export type AppVersion = 'development' | 'preview' | number;
 
 export type AppTemplateId = 'default' | 'hr' | 'images';
 

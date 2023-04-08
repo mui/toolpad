@@ -1,5 +1,87 @@
 # Changelog
 
+## 0.1.3
+
+<!-- generated comparing v0.1.2..master -->
+
+_Apr 5, 2023_
+
+A big thanks to the 3 contributors who made this release possible. Here are some highlights ✨:
+
+Fixed a regression with the query transformation feature, removed some obsolete code and a few improvements to the editor user experience!
+
+- &#8203;<!-- 4 -->Fix transform regression (#1856) @bharatkashyap
+- &#8203;<!-- 3 -->Try replacing tsc with tsup as build tool (#1727) @Janpot
+- &#8203;<!-- 2 -->Remove obsolete onDelete datagrid property (#1850) @Janpot
+- &#8203;<!-- 1 -->Editor UX fixes (#1844) @apedroferreira
+
+All contributors of this release in alphabetical order: @apedroferreira, @bharatkashyap, @Janpot
+
+## 0.1.2
+
+<!-- generated comparing v0.1.1..master -->
+
+_Mar 31, 2023_
+
+A big thanks to the 3 contributors who made this release possible. Here are some highlights ✨:
+
+Add end-user application navigation! Various fixes.
+
+- &#8203;<!-- 11 -->Add app navigation sidebar (#1819) @apedroferreira
+- &#8203;<!-- 10 -->Load queries by name instead of id (#1842) @Janpot
+- &#8203;<!-- 09 -->Fix issues around custom datagrid columns (#1840) @Janpot
+- &#8203;<!-- 08 -->Fix broken theming (#1834) @apedroferreira
+- &#8203;<!-- 07 -->Do Toolpad app migration on startup (#1832) @Janpot
+- &#8203;<!-- 06 -->Remove ECS and Recaptcha + move request/response logs to trace level (#1833) @apedroferreira
+- &#8203;<!-- 05 -->Remove deprecated scope query (#1827) @apedroferreira
+- &#8203;<!-- 04 -->Use worker scoped fixtures for integration tests (#1813) @Janpot
+- &#8203;<!-- 03 -->Remove quickjs-emscripten (#1820) @Janpot
+- &#8203;<!-- 02 -->Rewrite argument handling in `@mui/toolpad` CLI with `yargs` (#1794) @bharatkashyap
+- &#8203;<!-- 01 -->Update CONTRIBUTING.md (Fix typo) (#1826) @apedroferreira
+
+All contributors of this release in alphabetical order: @apedroferreira, @bharatkashyap, @Janpot
+
+## 0.1.1
+
+<!-- generated comparing v0.1.0..master -->
+
+_Mar 28, 2023_
+
+A big thanks to the 4 contributors who made this release possible. Here are some highlights ✨:
+
+Mutate state in event handlers by assigning to properties of page elements. Make binding to DataGrid selection easier with improved typings. Big cleanup of dead code.
+
+- &#8203;<!-- 28 -->Use node name in the canvas HUD (#1818) @Janpot
+- &#8203;<!-- 27 -->Allow mutating page state in event handlers (#1807) @Janpot
+- &#8203;<!-- 26 -->Improve UX around integration testing (#1808) @Janpot
+- &#8203;<!-- 25 -->Disable property control for controlled properties (#1809) @Janpot
+- &#8203;<!-- 24 -->Use next.js custom server (#1723) @Janpot
+- &#8203;<!-- 23 -->Remove postgres (#1799) @Janpot
+- &#8203;<!-- 22 -->Remove example and docker files (#1798) @Janpot
+- &#8203;<!-- 21 -->Clean up more obsolete things in the repo (#1797) @Janpot
+- &#8203;<!-- 20 -->Fix errors when running the project the first time (#1796) @Janpot
+- &#8203;<!-- 19 -->Fix imports from toolpad (#1793) @Janpot
+- &#8203;<!-- 18 -->Fix changing tabs closing query editor (#1784) @apedroferreira
+- &#8203;<!-- 17 -->Generate .gitignore on dev command (#1705) @apedroferreira
+- &#8203;<!-- 16 -->Improve dataGrid.selection types (#1790) @Janpot
+- &#8203;<!-- 15 -->Dependency cleanup (#1791) @Janpot
+- &#8203;<!-- 14 -->Fixes on the dev pipeline (#1789) @Janpot
+- &#8203;<!-- 13 -->Remove Prisma, isolated-vm and dead code (#1787) @Janpot
+- &#8203;<!-- 12 -->Update release instructions (#1788) @Janpot
+- &#8203;<!-- 11 -->Fix capitalization of elements (#1782) @Janpot
+- &#8203;<!-- 10 -->Update moduleresolution for core and components (#1780) @Janpot
+- &#8203;<!-- 09 -->Remove the localMode flag (#1768) @Janpot
+- &#8203;<!-- 08 -->Convert tests to local mode (#1718) @Janpot
+- &#8203;<!-- 07 -->Add docs contributing instructions (#1779) @Janpot
+- &#8203;<!-- 06 -->Allow falsy MySQL variable values (#1738) @evankennedy
+- &#8203;<!-- 05 -->Add Toolpad to cspell config for the workspace (#1767) @Janpot
+- &#8203;<!-- 04 -->Use latest version for examples (#1764) @Janpot
+- &#8203;<!-- 03 -->Rename dev13 script to dev (#1766) @Janpot
+- &#8203;<!-- 02 -->Small typo fix @prakhargupta1
+- &#8203;<!-- 01 -->Docs updates for the new direction (#1743) @Janpot
+
+All contributors of this release in alphabetical order: @apedroferreira, @evankennedy, @Janpot, @prakhargupta1
+
 ## 0.1.0
 
 <!-- generated comparing v0.0.41..master -->

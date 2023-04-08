@@ -21,9 +21,8 @@ export function createToolpadTheme(toolpadTheme: AppTheme = {}): ThemeOptions {
     palette.mode = mode;
   }
 
-  const theme = createTheme();
-
-  return createTheme(theme, {
+  return createTheme({
+    palette,
     typography: {
       h1: {
         fontSize: `3.25rem`,
@@ -55,7 +54,6 @@ export function createToolpadTheme(toolpadTheme: AppTheme = {}): ThemeOptions {
         fontWeight: 700,
       },
     },
-    palette,
   });
 }
 

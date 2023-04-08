@@ -1,14 +1,6 @@
 import * as React from 'react';
 import { BindableAttrEntries, CreateQueryConfig } from '@mui/toolpad-core';
-import {
-  Button,
-  CircularProgress,
-  InputAdornment,
-  MenuItem,
-  Stack,
-  TextField,
-  Typography,
-} from '@mui/material';
+import { Autocomplete, Button, Stack, TextField, Typography } from '@mui/material';
 import { useBrowserJsRuntime } from '@mui/toolpad-core/jsBrowserRuntime';
 import { ClientDataSource, QueryEditorProps } from '../../types';
 import {
@@ -42,13 +34,6 @@ function QueryEditor({
   value: input,
   onChange: setInput,
 }: QueryEditorProps<LocalConnectionParams, LocalQuery>) {
-  const handleQueryFunctionNameChange = React.useCallback(
-    (event: React.ChangeEvent<HTMLInputElement>) => {
-      setInput((existing) => appDom.setQueryProp(existing, 'function', event.target.value));
-    },
-    [setInput],
-  );
-
   const introspection = usePrivateQuery<LocalPrivateQuery, IntrospectionResult>(
     {
       kind: 'introspection',
@@ -108,36 +93,38 @@ function QueryEditor({
     ? errorFrom(introspection.error).message
     : '';
 
+  const methodSelectOptions: string[] = React.useMemo(
+    () => Object.keys(introspection.data?.functions ?? {}),
+    [introspection.data?.functions],
+  );
+
   return (
     <SplitPane split="vertical" size="50%" allowResize>
       <QueryInputPanel onRunPreview={handleRunPreview}>
         <Stack gap={2} sx={{ px: 3, pt: 1 }}>
           <Stack gap={2} direction="row">
-            <TextField
-              fullWidth
-              select
-              InputProps={
-                introspection.isLoading
-                  ? {
-                      startAdornment: (
-                        <InputAdornment position="start">
-                          <CircularProgress size={16} />
-                        </InputAdornment>
-                      ),
-                    }
-                  : {}
-              }
+            <Autocomplete
               value={functionName ?? ''}
-              onChange={handleQueryFunctionNameChange}
-              error={!!introspectionError}
-              helperText={introspectionError}
-            >
-              {Object.keys(introspection.data?.functions ?? {}).map((method) => (
-                <MenuItem key={method} value={method}>
-                  {method}
-                </MenuItem>
-              ))}
-            </TextField>
+              onChange={(event, newValue) => {
+                setInput((existing) =>
+                  appDom.setQueryProp(existing, 'function', newValue ?? undefined),
+                );
+              }}
+              loading={introspection.isLoading}
+              options={methodSelectOptions}
+              selectOnFocus
+              clearOnBlur
+              handleHomeEndKeys
+              fullWidth
+              renderInput={(params) => (
+                <TextField
+                  {...params}
+                  label="Function"
+                  error={!!introspectionError}
+                  helperText={introspectionError}
+                />
+              )}
+            />
             <Button onClick={openEditor}>Open editor</Button>
           </Stack>
           <Typography>Parameters:</Typography>

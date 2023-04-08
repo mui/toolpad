@@ -7,7 +7,7 @@ export default async function applyTransform(
 ): Promise<any> {
   const transformFn = `(data) => {${transform}}`;
   const { error, value } = jsRuntime.evaluateExpression(
-    `${transformFn}(${JSON.stringify(data)})`,
+    `(${transformFn})(${JSON.stringify(data)})`,
     {},
   );
   if (error) {

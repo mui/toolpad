@@ -56,6 +56,8 @@ export class ToolpadEditor {
 
   readonly componentEditor: Locator;
 
+  readonly themeEditor: Locator;
+
   readonly appCanvas: FrameLocator;
 
   readonly pageRoot: Locator;
@@ -74,6 +76,8 @@ export class ToolpadEditor {
 
     this.componentCatalog = page.getByTestId('component-catalog');
     this.componentEditor = page.getByTestId('component-editor');
+
+    this.themeEditor = page.getByTestId('theme-editor');
 
     this.createComponentBtn = this.componentCatalog.getByRole('button', { name: 'Create' });
     this.createComponentDialog = new CreateComponentDialog(page);

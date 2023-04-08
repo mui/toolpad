@@ -1,10 +1,13 @@
-import { NextApiRequest, NextApiResponse } from 'next';
+import { NextApiHandler } from 'next';
 import Cors from 'cors';
-import { ExecFetchResult, NodeId, SerializedError } from '@mui/toolpad-core';
-import { execQuery, loadDom } from './data';
-import initMiddleware from './initMiddleware';
-import * as appDom from '../appDom';
-import { errorFrom, serializeError } from '../utils/errors';
+import { ExecFetchResult, SerializedError } from '@mui/toolpad-core';
+import { asArray } from '@mui/toolpad-core/utils/collections';
+import invariant from 'invariant';
+import { withReqResLogs } from '../../../../src/server/logs/withLogs';
+import { execQuery, loadDom } from '../../../../src/server/data';
+import initMiddleware from '../../../../src/server/initMiddleware';
+import * as appDom from '../../../../src/appDom';
+import { errorFrom, serializeError } from '../../../../src/utils/errors';
 
 // Initialize the cors middleware
 const cors = initMiddleware<any>(
@@ -25,7 +28,7 @@ function withSerializedError<T extends { error?: unknown }>(
     : withoutError;
 }
 
-export default async (req: NextApiRequest, res: NextApiResponse<ExecFetchResult<any>>) => {
+const apiHandler = (async (req, res) => {
   if (req.method !== 'POST') {
     // This endpoint is used both by queries and mutations
     res.status(405).end();
@@ -33,10 +36,22 @@ export default async (req: NextApiRequest, res: NextApiResponse<ExecFetchResult<
   }
 
   await cors(req, res);
-  const queryNodeId = req.query.queryId as NodeId;
+  const [pageName] = asArray(req.query.pageName);
+  invariant(pageName, 'pageName url variable required');
+
+  const [queryName] = asArray(req.query.queryName);
+  invariant(queryName, 'queryName url variable required');
 
   const dom = await loadDom();
-  const dataNode = appDom.getMaybeNode(dom, queryNodeId);
+
+  const page = appDom.getPageByName(dom, pageName);
+
+  if (!page) {
+    res.status(404).end();
+    return;
+  }
+
+  const dataNode = appDom.getQueryByName(dom, page, queryName);
 
   if (!dataNode) {
     res.status(404).end();
@@ -53,4 +68,6 @@ export default async (req: NextApiRequest, res: NextApiResponse<ExecFetchResult<
   } catch (error) {
     res.json(withSerializedError({ error }));
   }
-};
+}) satisfies NextApiHandler<ExecFetchResult<any>>;
+
+export default withReqResLogs(apiHandler);

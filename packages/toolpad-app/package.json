@@ -114,14 +114,14 @@
     "@types/node-fetch": "^2.6.3",
     "@types/pg": "^8.6.6",
     "@types/prettier": "^2.7.2",
-    "@types/react": "^18.0.32",
+    "@types/react": "^18.0.33",
     "@types/react-dom": "^18.0.11",
     "@types/react-inspector": "^4.0.2",
     "@types/serialize-javascript": "^5.0.2",
     "@types/whatwg-url": "^11.0.0",
     "ajv": "^8.12.0",
-    "eslint": "8.37.0",
-    "eslint-config-next": "^13.2.4",
+    "eslint": "8.38.0",
+    "eslint-config-next": "^13.3.0",
     "eslint-config-prettier": "^8.8.0",
     "eslint-plugin-import": "^2.27.5",
     "formidable": "^2.1.1",
@@ -129,8 +129,8 @@
     "glob": "^9.3.4",
     "pino-pretty": "^10.0.0",
     "react-transition-group": "^4.4.5",
-    "typescript": "^5.0.3",
-    "webpack": "^5.77.0"
+    "typescript": "^5.0.4",
+    "webpack": "^5.78.0"
   },
   "typings": "./index.d.ts",
   "publishConfig": {

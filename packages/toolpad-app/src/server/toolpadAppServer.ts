@@ -18,7 +18,7 @@ interface ToolpadVitePluginParams {
 }
 
 function toolpadVitePlugin({ root, base }: ToolpadVitePluginParams): Plugin {
-  const entryPointId = '/src/main.tsx';
+  const entryPointId = '/main.tsx';
   const resolvedEntryPointId = `\0${entryPointId}`;
 
   const componentsId = `virtual:components`;
@@ -87,6 +87,19 @@ function toolpadVitePlugin({ root, base }: ToolpadVitePluginParams): Plugin {
         };
       }
       return null;
+    },
+
+    async transformIndexHtml(html, ctx) {
+      return {
+        html,
+        tags: [
+          {
+            tag: 'script',
+            attrs: { type: 'module', src: base + entryPointId },
+            injectTo: 'body',
+          },
+        ],
+      };
     },
   };
 }

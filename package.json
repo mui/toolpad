@@ -84,7 +84,7 @@
   },
   "dependencies": {
     "cross-env": "^7.0.3",
-    "dotenv-cli": "^7.1.0",
+    "dotenv-cli": "^7.2.1",
     "inquirer": "^9.1.5",
     "semver": "^7.3.8",
     "tsup": "^6.7.0",

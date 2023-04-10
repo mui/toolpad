@@ -103,7 +103,9 @@ test(`simple databinding`, async () => {
     fireEvent.change(textField, { target: { value: 'Hello Everybody' } });
   });
 
-  expect(text).toHaveTextContent('Hello Everybody');
+  await waitFor(() => {
+    expect(text).toHaveTextContent('Hello Everybody');
+  });
 });
 
 test(`default Value for binding`, async () => {

@@ -129,7 +129,7 @@ function Form({
 }
 
 interface UseFormInputInput<V> {
-  name?: string | null;
+  name: string;
   value?: V;
   onChange: (newValue: V) => void;
   emptyValue?: V;
@@ -153,7 +153,7 @@ export function useFormInput<V>({
 
   const handleFormInputChange = React.useCallback(
     (newValue: V) => {
-      if (form && name) {
+      if (form) {
         form.setValue(name, newValue, {
           shouldValidate: true,
           shouldDirty: true,
@@ -167,7 +167,7 @@ export function useFormInput<V>({
 
   const previousDefaultValueRef = React.useRef(defaultValue);
   React.useEffect(() => {
-    if (form && name && defaultValue !== previousDefaultValueRef.current) {
+    if (form && defaultValue !== previousDefaultValueRef.current) {
       onChange(defaultValue as V);
       form.setValue(name, defaultValue);
       previousDefaultValueRef.current = defaultValue;
@@ -177,7 +177,7 @@ export function useFormInput<V>({
   const isInitialForm = Object.keys(fieldValues).length === 0;
 
   React.useEffect(() => {
-    if (form && name) {
+    if (form) {
       if (!fieldValues[name] && defaultValue && isInitialForm) {
         onChange((defaultValue || emptyValue) as V);
         form.setValue(name, defaultValue || emptyValue);
@@ -191,7 +191,7 @@ export function useFormInput<V>({
   React.useEffect(() => {
     const previousNodeName = previousNodeNameRef.current;
 
-    if (form && previousNodeName && previousNodeName !== name) {
+    if (form && previousNodeName !== name) {
       form.unregister(previousNodeName);
       previousNodeNameRef.current = name;
     }
@@ -201,7 +201,6 @@ export function useFormInput<V>({
   React.useEffect(() => {
     if (
       form &&
-      name &&
       !_.isEqual(validationProps, previousManualValidationPropsRef.current) &&
       form.formState.dirtyFields[name]
     ) {

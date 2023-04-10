@@ -34,7 +34,8 @@ function TextField({
 }: TextFieldProps) {
   const nodeRuntime = useNode();
 
-  const nodeName = rest.name || nodeRuntime?.nodeName;
+  const fallbackName = React.useId();
+  const nodeName = rest.name || nodeRuntime?.nodeName || fallbackName;
 
   const { form } = React.useContext(FormContext);
   const fieldError = nodeName && form?.formState.errors[nodeName];

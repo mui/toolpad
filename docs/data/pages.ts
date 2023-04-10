@@ -57,7 +57,7 @@ const pages: MuiPage[] = [
   },
   {
     pathname: '/toolpad/deployment',
-    icon: 'CodeIcon',
+    icon: 'BuildIcon',
   },
   // {
   //   pathname: '/toolpad/versioning-and-deploying',

@@ -51,6 +51,10 @@ pnpm create toolpad-app
 
 Check out our [documentation](https://mui.com/toolpad/getting-started/overview/).
 
+## Examples
+
+Check out the [mui-public](https://github.com/mui/mui-public) repo to see how a Toolpad app looks in production.
+
 ## Contributing
 
 Read the [contributing guide](/CONTRIBUTING.md) to learn about our development process, how to propose bugfixes and improvements, and how to build and test your changes to MUI.

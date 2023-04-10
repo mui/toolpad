@@ -53,7 +53,7 @@ Check out our [documentation](https://mui.com/toolpad/getting-started/overview/)
 
 ## Examples
 
-Check out the [mui-public](https://github.com/mui/mui-public) repo to see how a Toolpad app looks in production.
+Check out our [mui-public](https://github.com/mui/mui-public) repo to see how a Toolpad app looks in production.
 
 ## Contributing
 

@@ -35,7 +35,7 @@ const features = {
     {
       icon: <LinkIcon fontSize="small" color="primary" />,
       title: 'Connect any data source',
-      wip: true,
+      wip: false,
       description:
         'No need for integrations - use your existing code to connect to your data sources - from databases to APIs.',
     },

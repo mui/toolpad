@@ -34,8 +34,10 @@ function TextField({
 }: TextFieldProps) {
   const nodeRuntime = useNode();
 
+  const fieldName = rest.name || nodeRuntime?.nodeName;
+
   const fallbackName = React.useId();
-  const nodeName = rest.name || nodeRuntime?.nodeName || fallbackName;
+  const nodeName = fieldName || fallbackName;
 
   const { form } = React.useContext(FormContext);
   const fieldError = nodeName && form?.formState.errors[nodeName];
@@ -67,19 +69,19 @@ function TextField({
     [form, onChange, onFormInputChange],
   );
 
-  const textFieldProps = {
-    ...rest,
-    value,
-    onChange: handleChange,
-    ...(form && {
-      error: Boolean(fieldError),
-      helperText: (fieldError as FieldError)?.message || '',
-    }),
-  };
+  const textFieldElement = (
+    <MuiTextField
+      {...rest}
+      value={value}
+      onChange={handleChange}
+      {...(form && {
+        error: Boolean(fieldError),
+        helperText: (fieldError as FieldError)?.message || '',
+      })}
+    />
+  );
 
-  const textFieldElement = <MuiTextField {...textFieldProps} />;
-
-  const fieldDisplayName = rest.label || nodeName;
+  const fieldDisplayName = rest.label || fieldName || 'Field';
 
   return form && nodeName ? (
     <Controller

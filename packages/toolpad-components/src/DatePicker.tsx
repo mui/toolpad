@@ -1,10 +1,6 @@
 import * as React from 'react';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
-import {
-  DesktopDatePicker,
-  DesktopDatePickerProps,
-  DesktopDatePickerSlotsComponentsProps,
-} from '@mui/x-date-pickers/DesktopDatePicker';
+import { DesktopDatePicker, DesktopDatePickerProps } from '@mui/x-date-pickers/DesktopDatePicker';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { createComponent, useNode } from '@mui/toolpad-core';
 import dayjs from 'dayjs';
@@ -98,8 +94,10 @@ function DatePicker({
 }: DatePickerProps) {
   const nodeRuntime = useNode();
 
+  const fieldName = rest.name || nodeRuntime?.nodeName;
+
   const fallbackName = React.useId();
-  const nodeName = rest.name || nodeRuntime?.nodeName || fallbackName;
+  const nodeName = fieldName || fallbackName;
 
   const { form } = React.useContext(FormContext);
   const fieldError = nodeName && form?.formState.errors[nodeName];
@@ -144,29 +142,29 @@ function DatePicker({
     [defaultValueProp],
   );
 
-  const datePickerProps: DesktopDatePickerProps<dayjs.Dayjs> = {
-    ...rest,
-    format: format || 'L',
-    value: value || null,
-    onChange: handleChange,
-    defaultValue,
-    slotProps: {
-      textField: {
-        fullWidth: rest.fullWidth,
-        variant: rest.variant,
-        size: rest.size,
-        sx: rest.sx,
-        ...(form && {
-          error: Boolean(fieldError),
-          helperText: (fieldError as FieldError)?.message || '',
-        }),
-      },
-    } as DesktopDatePickerSlotsComponentsProps<dayjs.Dayjs>,
-  };
+  const datePickerElement = (
+    <DesktopDatePicker<dayjs.Dayjs>
+      {...rest}
+      format={format || 'L'}
+      value={value || null}
+      onChange={handleChange}
+      defaultValue={defaultValue}
+      slotProps={{
+        textField: {
+          fullWidth: rest.fullWidth,
+          variant: rest.variant,
+          size: rest.size,
+          sx: rest.sx,
+          ...(form && {
+            error: Boolean(fieldError),
+            helperText: (fieldError as FieldError)?.message || '',
+          }),
+        },
+      }}
+    />
+  );
 
-  const datePickerElement = <DesktopDatePicker<dayjs.Dayjs> {...datePickerProps} />;
-
-  const fieldDisplayName = rest.label || nodeName;
+  const fieldDisplayName = rest.label || fieldName || 'Field';
 
   return (
     <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale={adapterLocale}>

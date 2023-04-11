@@ -47,8 +47,10 @@ function FilePicker({
 }: FilePickerProps) {
   const nodeRuntime = useNode();
 
+  const fieldName = rest.name || nodeRuntime?.nodeName;
+
   const fallbackName = React.useId();
-  const nodeName = rest.name || nodeRuntime?.nodeName || fallbackName;
+  const nodeName = fieldName || fallbackName;
 
   const { form } = React.useContext(FormContext);
   const fieldError = nodeName && form?.formState.errors[nodeName];
@@ -83,22 +85,22 @@ function FilePicker({
     }
   };
 
-  const filePickerProps = {
-    ...rest,
-    type: 'file',
-    value: undefined,
-    onChange: handleChange,
-    inputProps: {
-      multiple,
-    },
-    InputLabelProps: { shrink: true },
-    ...(form && {
-      error: Boolean(fieldError),
-      helperText: (fieldError as FieldError)?.message || '',
-    }),
-  };
+  const filePickerElement = (
+    <MuiTextField
+      {...rest}
+      type="file"
+      value={undefined}
+      onChange={handleChange}
+      inputProps={{ multiple }}
+      InputLabelProps={{ shrink: true }}
+      {...(form && {
+        error: Boolean(fieldError),
+        helperText: (fieldError as FieldError)?.message || '',
+      })}
+    />
+  );
 
-  const fieldDisplayName = rest.label || nodeName;
+  const fieldDisplayName = rest.label || fieldName || 'Field';
 
   return form && nodeName ? (
     <Controller
@@ -108,10 +110,10 @@ function FilePicker({
         required: isRequired ? `${fieldDisplayName} is required.` : false,
         validate: () => !isInvalid || `${fieldDisplayName} is invalid.`,
       }}
-      render={() => <MuiTextField {...filePickerProps} />}
+      render={() => filePickerElement}
     />
   ) : (
-    <MuiTextField {...filePickerProps} />
+    filePickerElement
   );
 }
 

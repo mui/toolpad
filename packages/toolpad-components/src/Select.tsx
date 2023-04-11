@@ -33,8 +33,10 @@ function Select({
 }: SelectProps) {
   const nodeRuntime = useNode();
 
+  const fieldName = rest.name || nodeRuntime?.nodeName;
+
   const fallbackName = React.useId();
-  const nodeName = rest.name || nodeRuntime?.nodeName || fallbackName;
+  const nodeName = fieldName || fallbackName;
 
   const { form } = React.useContext(FormContext);
   const fieldError = nodeName && form?.formState.errors[nodeName];
@@ -78,22 +80,24 @@ function Select({
     [id, options],
   );
 
-  const selectProps = {
-    ...rest,
-    value,
-    onChange: handleChange,
-    select: true,
-    sx: { ...(!fullWidth && !value ? { width: 120 } : {}), ...sx },
-    fullWidth: true,
-    ...(form && {
-      error: Boolean(fieldError),
-      helperText: (fieldError as FieldError)?.message || '',
-    }),
-  };
+  const selectElement = (
+    <TextField
+      {...rest}
+      value={value}
+      onChange={handleChange}
+      select
+      fullWidth
+      sx={{ ...(!fullWidth && !value ? { width: 120 } : {}), ...sx }}
+      {...(form && {
+        error: Boolean(fieldError),
+        helperText: (fieldError as FieldError)?.message || '',
+      })}
+    >
+      {renderedOptions}
+    </TextField>
+  );
 
-  const selectElement = <TextField {...selectProps}>{renderedOptions}</TextField>;
-
-  const fieldDisplayName = rest.label || nodeName;
+  const fieldDisplayName = rest.label || fieldName || 'Field';
 
   return form && nodeName ? (
     <Controller

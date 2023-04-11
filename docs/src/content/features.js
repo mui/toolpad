@@ -37,7 +37,7 @@ const features = {
       title: 'Connect any data source',
       wip: false,
       description:
-        'No need for integrations - use your existing code to connect to your data sources - from databases to APIs.',
+        'No need for integrations — use your existing code to connect to your data sources, from databases to APIs.',
     },
     {
       icon: <ViewModuleIcon fontSize="small" color="primary" />,

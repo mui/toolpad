@@ -33,13 +33,13 @@ function* getPreferredPorts(port: number = DEFAULT_PORT): Iterable<number> {
 }
 
 type Command = 'dev' | 'start' | 'build';
-interface Options {
+interface RunOptions {
+  dir: string;
   port?: number;
   dev?: boolean;
-  dir?: string;
 }
 
-async function runApp(cmd: Command, { port, dev = false, dir = '.' }: Options) {
+async function runApp(cmd: Command, { port, dev = false, dir }: RunOptions) {
   const projectDir = path.resolve(process.cwd(), dir);
   const { execaNode } = await import('execa');
   const { default: chalk } = await import('chalk');
@@ -98,7 +98,7 @@ async function runApp(cmd: Command, { port, dev = false, dir = '.' }: Options) {
   });
 }
 
-async function devCommand(args: yargs.ArgumentsCamelCase<Options>) {
+async function devCommand(args: RunOptions) {
   const { default: chalk } = await import('chalk');
 
   // eslint-disable-next-line no-console
@@ -106,7 +106,11 @@ async function devCommand(args: yargs.ArgumentsCamelCase<Options>) {
   await runApp('dev', args);
 }
 
-async function buildCommand({ dir = '.' }) {
+interface BuildOptions {
+  dir: string;
+}
+
+async function buildCommand({ dir }: BuildOptions) {
   const projectDir = path.resolve(process.cwd(), dir);
   const { default: chalk } = await import('chalk');
   // eslint-disable-next-line no-console
@@ -121,7 +125,7 @@ async function buildCommand({ dir = '.' }) {
   console.log(`${chalk.green('success')} - build done.`);
 }
 
-async function startCommand(args: yargs.ArgumentsCamelCase<Options>) {
+async function startCommand(args: RunOptions) {
   const { default: chalk } = await import('chalk');
   // eslint-disable-next-line no-console
   console.log(`${chalk.blue('info')}  - Starting Toolpad application...`);
@@ -129,59 +133,60 @@ async function startCommand(args: yargs.ArgumentsCamelCase<Options>) {
 }
 
 export default async function cli(argv: string[]) {
+  const sharedOptions = {
+    dir: {
+      type: 'string',
+      describe: 'Directory of the Toolpad application',
+      default: '.',
+    },
+  } as const;
+
+  const sharedRunOptions = {
+    ...sharedOptions,
+    port: {
+      type: 'number',
+      describe: 'Port to run the Toolpad application on',
+      demandOption: false,
+    },
+    dev: {
+      type: 'boolean',
+      describe: 'Run the Toolpad editor Next.js app in development mode',
+      demandOption: false,
+      default: false,
+      hidden: true,
+    },
+  } as const;
+
   await yargs(argv)
     // See https://github.com/yargs/yargs/issues/538
     .scriptName('toolpad')
-    .command({
-      command: 'dev [dir]',
-      describe: 'Run Toolpad in development mode',
-      builder: {
-        port: {
-          type: 'number',
-          describe: 'Port to run the application on',
-          demandOption: false,
-        },
-        dev: {
-          type: 'boolean',
-          describe: 'Run the Toolpad editor Next.js app in production mode',
-          demandOption: false,
-          default: false,
-          hidden: true,
-        },
+    .command(
+      ['$0 [dir]', 'dev [dir]'],
+      'Run Toolpad in development mode',
+      {
+        ...sharedRunOptions,
       },
-      handler: (args) => devCommand(args),
-    })
-    .command({
-      command: 'start [dir]',
-      describe: 'Run built Toolpad application in production mode',
-      builder: {
-        port: {
-          type: 'number',
-          describe: 'Port to run the application on',
-          demandOption: false,
-        },
-        dev: {
-          type: 'boolean',
-          describe: 'Run the Toolpad editor Next.js app in production mode',
-          demandOption: false,
-          default: false,
-          hidden: true,
-        },
+      (args) => devCommand(args),
+    )
+    .command(
+      'start [dir]',
+      'Run built Toolpad application in production mode',
+      {
+        ...sharedRunOptions,
       },
-      handler: (args) => startCommand(args),
-    })
-    .command({
-      command: 'build [dir]',
-      describe: 'Build Toolpad app for production',
-      handler: (args) => buildCommand(args),
-    })
-    .command({
-      command: 'help',
-      describe: 'Show help',
-      handler: async () => {
-        // eslint-disable-next-line no-console
-        console.log(await yargs.getHelp());
+      (args) => startCommand(args),
+    )
+    .command(
+      'build [dir]',
+      'Build Toolpad app for production',
+      {
+        ...sharedOptions,
       },
+      (args) => buildCommand(args),
+    )
+    .command('help', 'Show help', {}, async () => {
+      // eslint-disable-next-line no-console
+      console.log(await yargs.getHelp());
     })
     .help().argv;
 }

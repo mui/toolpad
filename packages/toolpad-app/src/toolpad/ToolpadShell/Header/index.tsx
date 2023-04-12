@@ -1,6 +1,5 @@
 import * as React from 'react';
 import { AppBar, Box, Toolbar, Tooltip, Chip, Link, useTheme } from '@mui/material';
-import Image from 'next/image';
 import UserFeedback from './UserFeedback';
 import ThemeModeMenu from './ThemeModeMenu';
 import { useThemeMode, ThemeMode } from '../../../ThemeContext';
@@ -49,7 +48,7 @@ function Header({ actions, status, enableUserFeedback = true }: HeaderProps) {
                 underline="none"
                 sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center', gap: 1 }}
               >
-                <Image
+                <img
                   src={theme.palette.mode === 'dark' ? productIconDark : productIconLight}
                   alt="Toolpad product icon"
                   width={25}

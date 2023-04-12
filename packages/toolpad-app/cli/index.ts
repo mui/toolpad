@@ -62,8 +62,8 @@ async function runApp(cmd: Command, { port, dev = false, dir }: RunOptions) {
   const cp = execaNode(serverPath, [], {
     cwd: projectDir,
     stdio: 'pipe',
+    // @ts-expect-error Next.js is enforcing NODE_ENV, but we don't want that
     env: {
-      NODE_ENV: dev ? 'development' : 'production',
       TOOLPAD_DIR: toolpadDir,
       TOOLPAD_PROJECT_DIR: projectDir,
       TOOLPAD_PORT: String(port),

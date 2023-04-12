@@ -183,9 +183,10 @@ export function createViteConfig({
   base,
   server,
 }: CreateViteConfigParams): InlineConfig {
+  const mode = dev ? 'development' : 'production';
   return {
     configFile: false,
-    mode: dev ? 'development' : 'production',
+    mode,
     build: {
       outDir: getAppOutputFolder(root),
     },
@@ -207,7 +208,7 @@ export function createViteConfig({
     plugins: [react(), toolpadVitePlugin({ root, base })],
     base,
     define: {
-      'process.env': {},
+      'process.env.NODE_ENV': JSON.stringify(mode),
     },
   };
 }

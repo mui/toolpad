@@ -161,6 +161,6 @@ export function prependLines(text: string, prefix: string): string {
 /**
  * Indent the text with [length] number of spaces
  */
-export function indent(text: string, length: 2): string {
+export function indent(text: string, length = 2): string {
   return prependLines(text, ' '.repeat(length));
 }

@@ -208,7 +208,7 @@ export function createViteConfig({
     plugins: [react(), toolpadVitePlugin({ root, base })],
     base,
     define: {
-      'process.env.NODE_ENV': JSON.stringify(mode),
+      'process.env.NODE_ENV': `'${mode}'`,
     },
   };
 }

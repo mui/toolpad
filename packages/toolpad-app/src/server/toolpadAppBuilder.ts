@@ -10,6 +10,8 @@ import { RuntimeConfig } from '../config';
 import * as appDom from '../appDom';
 import createRuntimeState from '../createRuntimeState';
 
+const MAIN_ENTRY = '/main.tsx';
+const CANVAS_ENTRY = '/canvas.tsx';
 const INITIAL_STATE_WINDOW_PROPERTY = '__initialToolpadState__';
 
 export interface GetHtmlContentParams {
@@ -17,6 +19,7 @@ export interface GetHtmlContentParams {
 }
 
 export function getHtmlContent({ canvas }: GetHtmlContentParams) {
+  const entryPoint = canvas ? CANVAS_ENTRY : MAIN_ENTRY;
   return `
     <!DOCTYPE html>
     <html lang="en">
@@ -43,7 +46,7 @@ export function getHtmlContent({ canvas }: GetHtmlContentParams) {
     
         <!-- __TOOLPAD_SCRIPTS__ -->
 
-        <script type="module" src="/main.tsx"></script>
+        <script type="module" src=${JSON.stringify(entryPoint)}></script>
       </body>
     </html>
   `;
@@ -76,15 +79,32 @@ export function postProcessHtml(html: string, { config, dom }: PostProcessHtmlPa
 interface ToolpadVitePluginParams {
   root: string;
   base: string;
-  canvas: boolean;
 }
 
-function toolpadVitePlugin({ root, base, canvas }: ToolpadVitePluginParams): Plugin {
-  const runtimeEntryPointId = '/main.tsx';
-  const resolvedRuntimeEntryPointId = `\0${runtimeEntryPointId}`;
+function toolpadVitePlugin({ root, base }: ToolpadVitePluginParams): Plugin {
+  const resolvedRuntimeEntryPointId = `\0${MAIN_ENTRY}`;
+  const resolvedCanvasEntryPointId = `\0${CANVAS_ENTRY}`;
 
   const componentsId = `virtual:toolpad:components`;
   const resolvedComponentsId = `\0${componentsId}`;
+
+  const getEntryPoint = (isCanvas: boolean) => `
+    import { init } from '@mui/toolpad-app/runtime';
+    import { LicenseInfo } from '@mui/x-data-grid-pro';
+    import components from 'virtual:toolpad:components';
+    ${isCanvas ? `import AppCanvas from '@mui/toolpad-app/canvas'` : ''}
+    
+    LicenseInfo.setLicenseKey(${JSON.stringify(MUI_X_PRO_LICENSE)});
+    
+    const initialState = window[${JSON.stringify(INITIAL_STATE_WINDOW_PROPERTY)}];
+
+    init({
+      ${isCanvas ? `ToolpadApp: AppCanvas,` : ''}
+      base: ${JSON.stringify(base)},
+      components,
+      initialState,
+    })
+  `;
 
   return {
     name: 'toolpad',
@@ -93,8 +113,11 @@ function toolpadVitePlugin({ root, base, canvas }: ToolpadVitePluginParams): Plu
       if (id.endsWith(`/index.html`)) {
         return id;
       }
-      if (id === runtimeEntryPointId) {
+      if (id === MAIN_ENTRY) {
         return resolvedRuntimeEntryPointId;
+      }
+      if (id === CANVAS_ENTRY) {
+        return resolvedCanvasEntryPointId;
       }
       if (id === componentsId) {
         return resolvedComponentsId;
@@ -107,27 +130,18 @@ function toolpadVitePlugin({ root, base, canvas }: ToolpadVitePluginParams): Plu
 
     async load(id) {
       if (id.endsWith(`/index.html`)) {
-        return getHtmlContent({ canvas });
+        // production build only
+        return getHtmlContent({ canvas: false });
       }
       if (id === resolvedRuntimeEntryPointId) {
         return {
-          code: `
-            import { init } from '@mui/toolpad-app/runtime';
-            import { LicenseInfo } from '@mui/x-data-grid-pro';
-            import components from 'virtual:toolpad:components';
-            ${canvas ? `import AppCanvas from '@mui/toolpad-app/canvas'` : ''}
-            
-            LicenseInfo.setLicenseKey(${JSON.stringify(MUI_X_PRO_LICENSE)});
-            
-            const initialState = window[${JSON.stringify(INITIAL_STATE_WINDOW_PROPERTY)}];
-
-            init({
-              ${canvas ? `ToolpadApp: AppCanvas,` : ''}
-              base: ${JSON.stringify(base)},
-              components,
-              initialState,
-            })
-          `,
+          code: getEntryPoint(false),
+          map: null,
+        };
+      }
+      if (id === resolvedCanvasEntryPointId) {
+        return {
+          code: getEntryPoint(true),
           map: null,
         };
       }
@@ -161,14 +175,12 @@ export interface CreateViteConfigParams {
   dev: boolean;
   root: string;
   base: string;
-  canvas: boolean;
 }
 
 export function createViteConfig({
   root,
   dev,
   base,
-  canvas,
   server,
 }: CreateViteConfigParams): InlineConfig {
   return {
@@ -192,7 +204,7 @@ export function createViteConfig({
     resolve: {
       alias: {},
     },
-    plugins: [react(), toolpadVitePlugin({ root, base, canvas })],
+    plugins: [react(), toolpadVitePlugin({ root, base })],
     base,
     define: {
       'process.env': {},
@@ -206,5 +218,5 @@ export interface ToolpadBuilderParams {
 }
 
 export async function buildApp({ root, base }: ToolpadBuilderParams) {
-  await build(createViteConfig({ dev: false, root, base, canvas: false }));
+  await build(createViteConfig({ dev: false, root, base }));
 }

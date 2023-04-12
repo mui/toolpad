@@ -19,11 +19,10 @@ export interface ToolpadAppHandlerParams {
   server: Server;
   root: string;
   base: string;
-  canvas: boolean;
 }
 
-export async function createDevHandler({ root, base, canvas, server }: ToolpadAppHandlerParams) {
-  const devServer = await createServer(createViteConfig({ dev: true, root, base, canvas, server }));
+export async function createDevHandler({ root, base, server }: ToolpadAppHandlerParams) {
+  const devServer = await createServer(createViteConfig({ dev: true, root, base, server }));
 
   const router = express.Router();
 
@@ -31,6 +30,7 @@ export async function createDevHandler({ root, base, canvas, server }: ToolpadAp
 
   router.use('*', async (req, res, next) => {
     const url = req.originalUrl;
+    const canvas = req.query['toolpad-display'] === 'canvas';
 
     try {
       const dom = await loadDom();

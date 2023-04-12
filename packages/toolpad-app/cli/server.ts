@@ -20,17 +20,8 @@ async function main() {
         server: httpServer,
         root: getUserProjectRoot(),
         base: '/preview',
-        canvas: false,
       });
       app.use('/preview', previewApp);
-
-      const canvasApp = await createDevHandler({
-        server: httpServer,
-        root: getUserProjectRoot(),
-        base: '/app-canvas',
-        canvas: true,
-      });
-      app.use('/app-canvas', canvasApp);
       break;
     }
     case 'start': {
@@ -38,7 +29,6 @@ async function main() {
         server: httpServer,
         root: getUserProjectRoot(),
         base: '/prod',
-        canvas: false,
       });
       app.use('/prod', prodHandler);
       break;

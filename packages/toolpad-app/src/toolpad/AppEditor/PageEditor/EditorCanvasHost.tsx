@@ -124,7 +124,7 @@ export default function EditorCanvasHost({
     }
   });
 
-  const src = `/app-canvas/pages/${pageNodeId}`;
+  const src = `/preview/pages/${pageNodeId}?toolpad-display=canvas`;
 
   const [loading, setLoading] = React.useState(true);
   useOnChange(src, () => setLoading(true));

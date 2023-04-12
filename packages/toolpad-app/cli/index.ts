@@ -121,6 +121,7 @@ async function buildCommand({ dir }: BuildOptions) {
   const { buildApp } = await import('../src/server/toolpadAppBuilder');
 
   await buildApp({ root: projectDir, base: '/prod' });
+
   // eslint-disable-next-line no-console
   console.log(`${chalk.green('success')} - build done.`);
 }
@@ -146,6 +147,7 @@ export default async function cli(argv: string[]) {
     port: {
       type: 'number',
       describe: 'Port to run the Toolpad application on',
+      default: DEFAULT_PORT,
       demandOption: false,
     },
     dev: {

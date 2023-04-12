@@ -28,7 +28,7 @@
     "./package.json": "./package.json",
     "./cli": {
       "require": "./dist/cli/index.js"
-    },
+    }
   },
   "dependencies": {
     "@babel/code-frame": "^7.21.4",

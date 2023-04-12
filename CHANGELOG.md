@@ -1,5 +1,26 @@
 # Changelog
 
+## 0.1.4
+
+<!-- generated comparing v0.1.3..master -->
+
+_Apr 12, 2023_
+
+A big thanks to the 3 contributors who made this release possible. Here are some highlights ✨:
+
+Revamped file system layout, updated docs.
+
+- &#8203;<!-- 8 -->Factor out in-memory toolpad project (#1878) @Janpot
+- &#8203;<!-- 7 -->Revamp toolpad file system layout (#1831) @Janpot
+- &#8203;<!-- 6 -->Docs-update (#1829) @prakhargupta1
+- &#8203;<!-- 5 -->Update README.md @prakhargupta1
+- &#8203;<!-- 4 -->Update README.md @prakhargupta1
+- &#8203;<!-- 3 -->Refactor: extract custom components loading logic (#1862) @Janpot
+- &#8203;<!-- 2 -->Clean dist dirs on rebuild (#1858) @Janpot
+- &#8203;<!-- 1 -->[docs] Fix 301 redirections @oliviertassinari
+
+All contributors of this release in alphabetical order: @Janpot, @oliviertassinari, @prakhargupta1
+
 ## 0.1.3
 
 <!-- generated comparing v0.1.2..master -->

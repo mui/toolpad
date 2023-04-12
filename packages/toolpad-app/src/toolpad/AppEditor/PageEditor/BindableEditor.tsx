@@ -7,9 +7,14 @@ import {
   ScopeMeta,
   JsRuntime,
 } from '@mui/toolpad-core';
-import { BindingEditor } from '../BindingEditor';
 import { WithControlledProp } from '../../../utils/types';
 import { getDefaultControl } from '../../propertyControls';
+import { BindingEditor } from '../BindingEditor';
+import {
+  BindingEditorDialog,
+  BindingEditorDialogProps,
+} from '../BindingEditor/BindingEditorDialog';
+import type { PropBindingEditorDialogProps } from '../BindingEditor/PropBindingEditorDialog';
 
 function renderDefaultControl(params: RenderControlParams<any>) {
   const Control = getDefaultControl({ typeDef: params.propType });
@@ -32,6 +37,9 @@ export interface BindableEditorProps<V> extends WithControlledProp<BindableAttrV
   liveBinding?: LiveBinding;
   globalScope?: Record<string, unknown>;
   globalScopeMeta: ScopeMeta;
+  Dialog?:
+    | React.ComponentType<BindingEditorDialogProps<V>>
+    | React.ComponentType<PropBindingEditorDialogProps<V>>;
   sx?: SxProps;
 }
 
@@ -47,6 +55,7 @@ export default function BindableEditor<V>({
   liveBinding,
   globalScope = {},
   globalScopeMeta = {},
+  Dialog = BindingEditorDialog,
   sx,
 }: BindableEditorProps<V>) {
   const handlePropConstChange = React.useCallback(
@@ -87,6 +96,7 @@ export default function BindableEditor<V>({
           disabled={disabled || !bindable}
           hidden={!bindable}
           liveBinding={liveBinding}
+          Dialog={Dialog}
         />
       </React.Fragment>
     </Stack>

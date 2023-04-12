@@ -4,6 +4,7 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import { BindableAttrValue, ScopeMeta, JsRuntime, LiveBinding } from '@mui/toolpad-core';
 import { WithControlledProp } from '../../../utils/types';
 import BindableEditor from './BindableEditor';
+import { PropBindingEditorDialog } from '../BindingEditor/PropBindingEditorDialog';
 
 export interface StringRecordEntriesEditorProps
   extends WithControlledProp<[string, BindableAttrValue<any>][]> {
@@ -88,6 +89,7 @@ export default function ParametersEditor({
                 )
               }
               disabled={disabled}
+              Dialog={PropBindingEditorDialog}
             />
 
             <IconButton aria-label="Delete property" onClick={handleRemove(index)}>

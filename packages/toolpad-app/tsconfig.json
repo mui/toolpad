@@ -38,8 +38,7 @@
     "**/*.ts",
     "**/*.tsx",
     "typings/**/*.d.ts",
-    "scripts/*.mts",
-    "src/toolpad/AppEditor/BindingEditor/index.tsx"
+    "scripts/*.mts"
   ],
   "exclude": ["node_modules", "./scripts", "./public"]
 }

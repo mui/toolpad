@@ -75,8 +75,8 @@
 
 1. [Create a new GitHub release](https://github.com/mui/mui-toolpad/releases/new).
    1. Use `<version number>` to **Choose a tag** (when you enter new version GH UI will pop a suggestion `Create new tag: *** on publish`)
-   2. Use `<commit of merged PR>` as the **target**
-   3. Use the cleaned changelog as the content of **Describe this release**
-   4. Use `<version number>` as the **Release title**
-   5. Mark as prerelease if necessary.
-   6. **Publish release**
+   1. Use `<commit of merged PR>` as the **target**
+   1. Use the cleaned changelog as the content of **Describe this release**
+   1. Use `<version number>` as the **Release title**
+   1. Mark as prerelease if necessary.
+   1. **Publish release**

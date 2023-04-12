@@ -106,13 +106,17 @@ async function devCommand(args: yargs.ArgumentsCamelCase<Options>) {
   await runApp('dev', args);
 }
 
-async function buildCommand() {
+async function buildCommand({ dir = '.' }) {
+  const projectDir = path.resolve(process.cwd(), dir);
   const { default: chalk } = await import('chalk');
   // eslint-disable-next-line no-console
   console.log(`${chalk.blue('info')}  - building Toolpad application...`);
-  await new Promise((resolve) => {
-    setTimeout(resolve, 1000);
-  });
+
+  process.env.TOOLPAD_PROJECT_DIR = projectDir;
+
+  const { buildApp } = await import('../src/server/toolpadAppServer');
+
+  await buildApp({ root: projectDir, base: '/prod' });
   // eslint-disable-next-line no-console
   console.log(`${chalk.green('success')} - build done.`);
 }
@@ -167,9 +171,9 @@ export default async function cli(argv: string[]) {
       handler: (args) => startCommand(args),
     })
     .command({
-      command: 'build',
+      command: 'build [dir]',
       describe: 'Build Toolpad app for production',
-      handler: () => buildCommand(),
+      handler: (args) => buildCommand(args),
     })
     .command({
       command: 'help',

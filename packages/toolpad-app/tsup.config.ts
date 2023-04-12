@@ -11,6 +11,7 @@ export default defineConfig([
     silent: true,
     noExternal: ['open-editor', 'execa', 'fractional-indexing', 'lodash-es'],
     clean: true,
+    sourcemap: true,
     async onSuccess() {
       // eslint-disable-next-line no-console
       console.log('cli: build successful');

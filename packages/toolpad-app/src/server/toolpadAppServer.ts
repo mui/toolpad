@@ -1,4 +1,4 @@
-import { createServer, Plugin } from 'vite';
+import { createServer, InlineConfig, Plugin, build } from 'vite';
 import react from '@vitejs/plugin-react';
 import * as path from 'path';
 import * as fs from 'fs/promises';
@@ -15,9 +15,10 @@ import { indent } from '../utils/strings';
 interface ToolpadVitePluginParams {
   root: string;
   base: string;
+  canvas: boolean;
 }
 
-function toolpadVitePlugin({ root, base }: ToolpadVitePluginParams): Plugin {
+function toolpadVitePlugin({ root, base, canvas }: ToolpadVitePluginParams): Plugin {
   const entryPointId = '/main.tsx';
   const resolvedEntryPointId = `\0${entryPointId}`;
 
@@ -93,6 +94,21 @@ function toolpadVitePlugin({ root, base }: ToolpadVitePluginParams): Plugin {
       return {
         html,
         tags: [
+          ...(canvas
+            ? [
+                {
+                  tag: 'script',
+                  children: `
+                    // Add the data-toolpad-canvas attribute to the canvas iframe element
+                    if (window.frameElement?.dataset.toolpadCanvas) {
+                      var script = document.createElement('script');
+                      script.src = '/reactDevtools/bootstrap.global.js';
+                      document.write(script.outerHTML);
+                    }
+                  `,
+                },
+              ]
+            : []),
           {
             tag: 'script',
             attrs: { type: 'module', src: base + entryPointId },
@@ -104,16 +120,15 @@ function toolpadVitePlugin({ root, base }: ToolpadVitePluginParams): Plugin {
   };
 }
 
-export interface CreateHandlerparams {
-  server: Server;
+export interface CreateViteConfigParams {
+  server?: Server;
   root: string;
   base: string;
-  canvas?: true;
+  canvas: boolean;
 }
 
-export async function createHandler({ root, base, canvas, server }: CreateHandlerparams) {
-  const toolpadRoot = path.resolve(__dirname, '../../src/server/app');
-  const devServer = await createServer({
+function createViteConfig({ root, base, canvas, server }: CreateViteConfigParams): InlineConfig {
+  return {
     configFile: false,
     server: {
       middlewareMode: true,
@@ -130,12 +145,24 @@ export async function createHandler({ root, base, canvas, server }: CreateHandle
     resolve: {
       alias: {},
     },
-    plugins: [react(), toolpadVitePlugin({ root, base })],
+    plugins: [react(), toolpadVitePlugin({ root, base, canvas })],
     base,
     define: {
       'process.env': {},
     },
-  });
+  };
+}
+
+export interface ToolpadAppHandlerParams {
+  server: Server;
+  root: string;
+  base: string;
+  canvas: boolean;
+}
+
+export async function createHandler({ root, base, canvas, server }: ToolpadAppHandlerParams) {
+  const toolpadRoot = path.resolve(__dirname, '../../src/server/app');
+  const devServer = await createServer(createViteConfig({ root, base, canvas, server }));
 
   const router = Router();
 
@@ -159,19 +186,8 @@ export async function createHandler({ root, base, canvas, server }: CreateHandle
           RUNTIME_CONFIG_WINDOW_PROPERTY,
         )}] = ${serializedConfig}</script>`,
         `<script>window.initialToolpadState = ${serializedInitialState}</script>`,
-        canvas
-          ? `
-          <script>
-          // Add the data-toolpad-canvas attribute to the canvas iframe element
-          if (window.frameElement?.dataset.toolpadCanvas) {
-            var script = document.createElement('script');
-            script.src = '/reactDevtools/bootstrap.global.js';
-            document.write(script.outerHTML);
-          }
-        </script>
-        `
-          : '',
       ];
+
       let html = await devServer.transformIndexHtml(url, template);
       html = html.replaceAll(`<!-- __TOOLPAD_SCRIPTS__ -->`, toolpadScripts.join('\n'));
       res.status(200).set({ 'Content-Type': 'text/html' }).end(html);
@@ -181,4 +197,13 @@ export async function createHandler({ root, base, canvas, server }: CreateHandle
   });
 
   return router;
+}
+
+export interface ToolpadBuilderParams {
+  root: string;
+  base: string;
+}
+
+export async function buildApp({ root, base }: ToolpadBuilderParams) {
+  await build(createViteConfig({ root, base, canvas: false }));
 }

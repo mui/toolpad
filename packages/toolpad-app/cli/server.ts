@@ -16,6 +16,7 @@ async function main() {
     server: httpServer,
     root: getUserProjectRoot(),
     base: '/preview',
+    canvas: false,
   });
   app.use('/preview', previewApp);
 

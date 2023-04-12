@@ -1,9 +1,9 @@
-import { NodeId } from '@mui/toolpad-core';
+import { NavigationAction, NodeId } from '@mui/toolpad-core';
 import * as React from 'react';
 import { NodeHashes } from '../types';
 
 export interface NavigateToPage {
-  (pageNodeId: NodeId): void;
+  (pageNodeId: NodeId, pageParameters?: NavigationAction['value']['parameters']): void;
 }
 
 /**

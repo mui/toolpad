@@ -131,8 +131,19 @@ const USE_DATA_QUERY_CONFIG_KEYS: readonly (keyof UseDataQueryConfig)[] = [
 function usePageNavigator(): NavigateToPage {
   const navigate = useNavigate();
   const navigateToPage: NavigateToPage = React.useCallback(
-    (pageNodeId: NodeId) => {
-      navigate(`/pages/${pageNodeId}`);
+    (pageNodeId, pageParameters) => {
+      const urlParams =
+        pageParameters &&
+        new URLSearchParams(mapValues(pageParameters, (pageParameter) => pageParameter?.value));
+
+      navigate({
+        pathname: `/pages/${pageNodeId}`,
+        ...(urlParams
+          ? {
+              search: urlParams.toString(),
+            }
+          : {}),
+      });
     },
     [navigate],
   );
@@ -346,9 +357,9 @@ function RenderedNodeContent({ node, childNodeGroups, Component }: RenderedNodeC
 
       if (action?.type === 'navigationAction') {
         const handler = () => {
-          const { page } = action.value;
+          const { page, parameters } = action.value;
           if (page) {
-            navigateToPage(appDom.deref(page));
+            navigateToPage(appDom.deref(page), parameters);
           }
         };
 

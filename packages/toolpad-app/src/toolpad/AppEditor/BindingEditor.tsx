@@ -31,6 +31,8 @@ import {
   ScopeMeta,
   ScopeMetaField,
   JsRuntime,
+  BindableAttrValues,
+  ConstantAttrValue,
 } from '@mui/toolpad-core';
 import { createProvidedContext } from '@mui/toolpad-core/utils/react';
 import { TabContext, TabList } from '@mui/lab';
@@ -48,6 +50,7 @@ import { usePageEditorState } from './PageEditor/PageEditorProvider';
 import GlobalScopeExplorer from './GlobalScopeExplorer';
 import TabPanel from '../../components/TabPanel';
 import useUnsavedChangesConfirm from '../hooks/useUnsavedChangesConfirm';
+import { mapValues } from '../../utils/collections';
 
 interface BindingEditorContext {
   label: string;
@@ -204,6 +207,13 @@ function JsExpressionActionEditor({ value, onChange }: JsExpressionActionEditorP
   );
 }
 
+const getActionParametersFromPageParameters = (
+  pageParameters: [string, string][],
+): BindableAttrValues<ConstantAttrValue<string>> =>
+  mapValues(Object.fromEntries(pageParameters), (pageParameterValue) =>
+    appDom.createConst(pageParameterValue),
+  );
+
 export interface NavigationActionEditorProps extends WithControlledProp<NavigationAction | null> {}
 
 function NavigationActionEditor({ value, onChange }: NavigationActionEditorProps) {
@@ -214,12 +224,49 @@ function NavigationActionEditor({ value, onChange }: NavigationActionEditorProps
 
   const handlePageChange = React.useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
+      const pageId = event.target.value as NodeId;
+      const page = appDom.getNode(dom, pageId);
+
+      const defaultPageParameters =
+        (appDom.isPage(page) && page.attributes.parameters?.value) || [];
+
       onChange({
         type: 'navigationAction',
-        value: { page: appDom.ref(event.target.value as NodeId) },
+        value: {
+          page: appDom.ref(pageId),
+          parameters: getActionParametersFromPageParameters(defaultPageParameters),
+        },
       });
     },
-    [onChange],
+    [dom, onChange],
+  );
+
+  const actionPageParameters = React.useMemo(
+    () =>
+      Object.entries(value?.value.parameters || []).map(
+        ([actionParameterName, actionParameterValue]) => [
+          actionParameterName,
+          actionParameterValue?.value || '',
+        ],
+      ),
+    [value?.value.parameters],
+  );
+
+  const handleActionParameterChange = React.useCallback(
+    (page: appDom.PageNode, actionParameterName: string) =>
+      (event: React.ChangeEvent<HTMLInputElement>) => {
+        onChange({
+          type: 'navigationAction',
+          value: {
+            page: appDom.ref(page.id),
+            parameters: {
+              ...(value?.value.parameters || {}),
+              [actionParameterName]: appDom.createConst(String(event.target.value)),
+            },
+          },
+        });
+      },
+    [onChange, value?.value.parameters],
   );
 
   const availablePages = React.useMemo(
@@ -248,6 +295,23 @@ function NavigationActionEditor({ value, onChange }: NavigationActionEditorProps
           </MenuItem>
         ))}
       </TextField>
+      <Typography variant="overline">Page parameters:</Typography>
+      {availablePages.map((page) => {
+        return actionPageParameters.map((actionParameter) => {
+          const [actionParameterName, actionParameterValue] = actionParameter;
+
+          return (
+            <Box key={actionParameterName}>
+              <TextField
+                label={actionParameterName}
+                defaultValue={actionParameterValue}
+                onChange={handleActionParameterChange(page, actionParameterName)}
+                fullWidth
+              />
+            </Box>
+          );
+        });
+      })}
     </Box>
   );
 }

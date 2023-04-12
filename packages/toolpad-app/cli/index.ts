@@ -114,7 +114,7 @@ async function buildCommand({ dir = '.' }) {
 
   process.env.TOOLPAD_PROJECT_DIR = projectDir;
 
-  const { buildApp } = await import('../src/server/toolpadAppServer');
+  const { buildApp } = await import('../src/server/toolpadAppBuilder');
 
   await buildApp({ root: projectDir, base: '/prod' });
   // eslint-disable-next-line no-console

@@ -1,156 +1,18 @@
-import { createServer, InlineConfig, Plugin, build } from 'vite';
-import react from '@vitejs/plugin-react';
+import { createServer } from 'vite';
 import * as path from 'path';
 import * as fs from 'fs/promises';
-import serializeJavascript from 'serialize-javascript';
-import { Router } from 'express';
+import * as express from 'express';
 import { Server } from 'http';
-import { MUI_X_PRO_LICENSE, RUNTIME_CONFIG_WINDOW_PROPERTY } from '../constants';
 import config from '../config';
-import createRuntimeState from '../createRuntimeState';
-import { loadDom } from './data';
-import * as appDom from '../appDom';
-import { indent } from '../utils/strings';
-
-interface ToolpadVitePluginParams {
-  root: string;
-  base: string;
-  canvas: boolean;
-}
-
-function toolpadVitePlugin({ root, base, canvas }: ToolpadVitePluginParams): Plugin {
-  const entryPointId = '/main.tsx';
-  const resolvedEntryPointId = `\0${entryPointId}`;
-
-  const componentsId = `virtual:components`;
-  const resolvedComponentsId = `\0${componentsId}`;
-
-  return {
-    name: 'toolpad',
-
-    async resolveId(id, importer) {
-      if (id === entryPointId) {
-        return resolvedEntryPointId;
-      }
-      if (id === componentsId) {
-        return resolvedComponentsId;
-      }
-      if (importer === resolvedEntryPointId || importer === resolvedComponentsId) {
-        return path.resolve(root, 'toolpad', id);
-      }
-      return null;
-    },
-
-    async load(id) {
-      if (id === resolvedEntryPointId) {
-        return {
-          code: `
-            import { init } from '@mui/toolpad/runtime';
-            import { LicenseInfo } from '@mui/x-data-grid-pro';
-            import components from 'virtual:components';
-            
-            LicenseInfo.setLicenseKey(${JSON.stringify(MUI_X_PRO_LICENSE)});
-            
-            const initialState = window.initialToolpadState;
-
-            init({
-              base: ${JSON.stringify(base)},
-              components,
-              initialState,
-            })
-          `,
-          map: null,
-        };
-      }
-      if (id === resolvedComponentsId) {
-        const dom = await loadDom();
-
-        const app = appDom.getApp(dom);
-        const { codeComponents = [] } = appDom.getChildNodes(dom, app);
-
-        const imports = codeComponents.map(
-          ({ name }) => `import ${name} from './components/${name}';`,
-        );
-
-        const defaultExportProperties = codeComponents.map(
-          ({ name }) => `${JSON.stringify(`codeComponent.${name}`)}: ${name}`,
-        );
-
-        return {
-          code: `
-            ${imports.join('\n')}
-
-            export default {
-              ${indent(defaultExportProperties.join(',\n'), 2)}
-            }
-          `,
-          map: null,
-        };
-      }
-      return null;
-    },
-
-    async transformIndexHtml(html, ctx) {
-      return {
-        html,
-        tags: [
-          ...(canvas
-            ? [
-                {
-                  tag: 'script',
-                  children: `
-                    // Add the data-toolpad-canvas attribute to the canvas iframe element
-                    if (window.frameElement?.dataset.toolpadCanvas) {
-                      var script = document.createElement('script');
-                      script.src = '/reactDevtools/bootstrap.global.js';
-                      document.write(script.outerHTML);
-                    }
-                  `,
-                },
-              ]
-            : []),
-          {
-            tag: 'script',
-            attrs: { type: 'module', src: base + entryPointId },
-            injectTo: 'body',
-          },
-        ],
-      };
-    },
-  };
-}
+import { createViteConfig, getHtmlContent, postProcessHtml } from './toolpadAppBuilder';
+import { loadDom } from './liveProject';
+import { getAppOutputFolder } from './localMode';
 
 export interface CreateViteConfigParams {
   server?: Server;
   root: string;
   base: string;
   canvas: boolean;
-}
-
-function createViteConfig({ root, base, canvas, server }: CreateViteConfigParams): InlineConfig {
-  return {
-    configFile: false,
-    server: {
-      middlewareMode: true,
-      hmr: {
-        server,
-      },
-      fs: {
-        allow: [root, path.resolve(__dirname, '../../../../')],
-      },
-    },
-    appType: 'custom',
-    logLevel: 'warn',
-    root,
-    resolve: {
-      alias: {},
-    },
-    plugins: [react(), toolpadVitePlugin({ root, base, canvas })],
-    base,
-    define: {
-      'process.env': {},
-    },
-  };
 }
 
 export interface ToolpadAppHandlerParams {
@@ -160,11 +22,10 @@ export interface ToolpadAppHandlerParams {
   canvas: boolean;
 }
 
-export async function createHandler({ root, base, canvas, server }: ToolpadAppHandlerParams) {
-  const toolpadRoot = path.resolve(__dirname, '../../src/server/app');
-  const devServer = await createServer(createViteConfig({ root, base, canvas, server }));
+export async function createDevHandler({ root, base, canvas, server }: ToolpadAppHandlerParams) {
+  const devServer = await createServer(createViteConfig({ dev: true, root, base, canvas, server }));
 
-  const router = Router();
+  const router = express.Router();
 
   router.use(devServer.middlewares);
 
@@ -173,23 +34,13 @@ export async function createHandler({ root, base, canvas, server }: ToolpadAppHa
 
     try {
       const dom = await loadDom();
-      const serializedConfig = serializeJavascript(config, { ignoreFunction: true });
-      const initialState = createRuntimeState({ dom });
-      const serializedInitialState = serializeJavascript(initialState, {
-        ignoreFunction: true,
-      });
 
-      const template = await fs.readFile(path.resolve(toolpadRoot, 'index.html'), 'utf-8');
-
-      const toolpadScripts = [
-        `<script>window[${JSON.stringify(
-          RUNTIME_CONFIG_WINDOW_PROPERTY,
-        )}] = ${serializedConfig}</script>`,
-        `<script>window.initialToolpadState = ${serializedInitialState}</script>`,
-      ];
+      const template = getHtmlContent({ canvas });
 
       let html = await devServer.transformIndexHtml(url, template);
-      html = html.replaceAll(`<!-- __TOOLPAD_SCRIPTS__ -->`, toolpadScripts.join('\n'));
+
+      html = postProcessHtml(html, { config, dom });
+
       res.status(200).set({ 'Content-Type': 'text/html' }).end(html);
     } catch (e) {
       next(e);
@@ -199,11 +50,25 @@ export async function createHandler({ root, base, canvas, server }: ToolpadAppHa
   return router;
 }
 
-export interface ToolpadBuilderParams {
-  root: string;
-  base: string;
-}
+export async function createProdHandler({ root }: ToolpadAppHandlerParams) {
+  const router = express.Router();
 
-export async function buildApp({ root, base }: ToolpadBuilderParams) {
-  await build(createViteConfig({ root, base, canvas: false }));
+  router.use(express.static(getAppOutputFolder(root), { index: false }));
+
+  router.use('*', async (req, res, next) => {
+    try {
+      const dom = await loadDom();
+
+      const htmlFilePath = path.resolve(getAppOutputFolder(root), './index.html');
+      let html = await fs.readFile(htmlFilePath, { encoding: 'utf-8' });
+
+      html = postProcessHtml(html, { config, dom });
+
+      res.status(200).set({ 'Content-Type': 'text/html' }).end(html);
+    } catch (e) {
+      next(e);
+    }
+  });
+
+  return router;
 }

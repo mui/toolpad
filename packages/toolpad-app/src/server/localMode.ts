@@ -84,6 +84,10 @@ export function getOutputFolder(root: string) {
   return path.join(getToolpadFolder(root), '.generated');
 }
 
+export function getAppOutputFolder(root: string) {
+  return path.join(getOutputFolder(root), 'app');
+}
+
 export async function getConfigFilePath(root: string) {
   const yamlFilePath = path.join(root, './toolpad.yaml');
   const ymlFilePath = path.join(root, './toolpad.yml');
@@ -101,24 +105,31 @@ export async function getConfigFilePath(root: string) {
 
 type ComponentsContent = Record<string, { code: string }>;
 
-async function loadCodeComponentsFromFiles(root: string): Promise<ComponentsContent> {
+export async function getComponents(root: string) {
   const componentsFolder = getComponentsFolder(root);
   const entries = (await readMaybeDir(componentsFolder)) || [];
-  const resultEntries = await Promise.all(
-    entries.map(async (entry): Promise<[string, { code: string }] | null> => {
-      if (entry.isFile()) {
-        const fileName = entry.name;
-        const componentName = entry.name.replace(/\.tsx$/, '');
-        const filePath = path.resolve(componentsFolder, fileName);
-        const content = await fs.readFile(filePath, { encoding: 'utf-8' });
-        return [componentName, { code: content }];
-      }
+  const result = entries.map((entry) => {
+    if (entry.isFile()) {
+      const fileName = entry.name;
+      const componentName = entry.name.replace(/\.tsx$/, '');
+      const filePath = path.resolve(componentsFolder, fileName);
+      return { name: componentName, path: filePath };
+    }
+    return null;
+  });
+  return result.filter(Boolean);
+}
 
-      return null;
+async function loadCodeComponentsFromFiles(root: string): Promise<ComponentsContent> {
+  const components = await getComponents(root);
+  const resultEntries = await Promise.all(
+    components.map(async (component): Promise<[string, { code: string }]> => {
+      const content = await fs.readFile(component.path, { encoding: 'utf-8' });
+      return [component.name, { code: content }];
     }),
   );
 
-  return Object.fromEntries(resultEntries.filter(Boolean));
+  return Object.fromEntries(resultEntries);
 }
 
 async function loadPagesFromFiles(root: string): Promise<PagesContent> {

@@ -3,7 +3,7 @@ import next from 'next';
 import express from 'express';
 import invariant from 'invariant';
 import { createServer } from 'http';
-import { createHandler } from '../src/server/toolpadAppServer';
+import { createDevHandler, createProdHandler } from '../src/server/toolpadAppServer';
 import { getUserProjectRoot } from '../src/server/localMode';
 
 async function main() {
@@ -12,21 +12,40 @@ async function main() {
   const app = express();
   const httpServer = createServer(app);
 
-  const previewApp = await createHandler({
-    server: httpServer,
-    root: getUserProjectRoot(),
-    base: '/preview',
-    canvas: false,
-  });
-  app.use('/preview', previewApp);
+  const cmd = process.env.TOOLPAD_CMD;
 
-  const canvasApp = await createHandler({
-    server: httpServer,
-    root: getUserProjectRoot(),
-    base: '/app-canvas',
-    canvas: true,
-  });
-  app.use('/app-canvas', canvasApp);
+  switch (cmd) {
+    case 'dev': {
+      const previewApp = await createDevHandler({
+        server: httpServer,
+        root: getUserProjectRoot(),
+        base: '/preview',
+        canvas: false,
+      });
+      app.use('/preview', previewApp);
+
+      const canvasApp = await createDevHandler({
+        server: httpServer,
+        root: getUserProjectRoot(),
+        base: '/app-canvas',
+        canvas: true,
+      });
+      app.use('/app-canvas', canvasApp);
+      break;
+    }
+    case 'start': {
+      const prodHandler = await createProdHandler({
+        server: httpServer,
+        root: getUserProjectRoot(),
+        base: '/prod',
+        canvas: false,
+      });
+      app.use('/prod', prodHandler);
+      break;
+    }
+    default:
+      throw new Error(`Unknown toolpad command ${cmd}`);
+  }
 
   const projectDir = process.env.TOOLPAD_PROJECT_DIR;
   const dir = process.env.TOOLPAD_DIR;

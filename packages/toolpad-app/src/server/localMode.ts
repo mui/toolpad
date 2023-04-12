@@ -15,7 +15,13 @@ import * as appDom from '../appDom';
 import { errorFrom } from '../utils/errors';
 import { migrateUp } from '../appDom/migrations';
 import insecureHash from '../utils/insecureHash';
-import { writeFileRecursive, readMaybeFile, readMaybeDir, updateYamlFile } from '../utils/fs';
+import {
+  writeFileRecursive,
+  readMaybeFile,
+  readMaybeDir,
+  updateYamlFile,
+  fileExists,
+} from '../utils/fs';
 import {
   Page,
   Query,
@@ -46,18 +52,6 @@ export function getUserProjectRoot(): string {
   const { projectDir } = config;
   invariant(projectDir, 'Toolpad in local mode must have a project directory defined');
   return projectDir;
-}
-
-export async function fileExists(filepath: string): Promise<boolean> {
-  try {
-    const stat = await fs.stat(filepath);
-    return stat.isFile();
-  } catch (err) {
-    if (errorFrom(err).code === 'ENOENT') {
-      return false;
-    }
-    throw err;
-  }
 }
 
 function getToolpadFolder(root: string): string {
@@ -1093,7 +1087,7 @@ async function initToolpadFolder(root: string) {
   await initGitignore(root);
 }
 
-async function initProject() {
+export async function initProject() {
   const root = getUserProjectRoot();
 
   await migrateLegacyProject(root);
@@ -1144,31 +1138,4 @@ async function initProject() {
       return fingerprint;
     },
   };
-}
-
-// eslint-disable-next-line no-underscore-dangle
-(globalThis as any).__project__ ??= initProject().catch((err) => {
-  console.error(`${chalk.red('error')} - Failed to intialize Toolpad`);
-  console.error(err);
-  process.exit(1);
-});
-
-export async function waitForInit(): Promise<ReturnType<typeof initProject>> {
-  // eslint-disable-next-line no-underscore-dangle
-  return (globalThis as any).__project__;
-}
-
-export async function loadLocalDom(): Promise<appDom.AppDom> {
-  const project = await waitForInit();
-  return project.loadDom();
-}
-
-export async function saveLocalDom(newDom: appDom.AppDom): Promise<{ fingerprint: number }> {
-  const project = await waitForInit();
-  return project.saveDom(newDom);
-}
-
-export async function getDomFingerprint() {
-  const project = await waitForInit();
-  return project.getDomFingerPrint();
 }

@@ -14,12 +14,12 @@ import { LocalPrivateQuery, LocalQuery, LocalConnectionParams } from './types';
 import { Maybe } from '../../utils/types';
 import {
   getUserProjectRoot,
-  waitForInit,
   openQueryEditor,
   getFunctionsFile,
   getOutputFolder,
 } from '../../server/localMode';
 import { errorFrom, serializeError } from '../../utils/errors';
+import { waitForInit } from '../../server/liveProject';
 
 type MessageToChildProcess =
   | {

@@ -56,3 +56,15 @@ export async function updateYamlFile(filePath: string, content: object) {
     await writeFileRecursive(filePath, newContent);
   }
 }
+
+export async function fileExists(filepath: string): Promise<boolean> {
+  try {
+    const stat = await fs.stat(filepath);
+    return stat.isFile();
+  } catch (err) {
+    if (errorFrom(err).code === 'ENOENT') {
+      return false;
+    }
+    throw err;
+  }
+}

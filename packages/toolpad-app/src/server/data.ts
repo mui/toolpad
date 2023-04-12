@@ -7,8 +7,8 @@ import applyTransform from '../toolpadDataSources/applyTransform';
 import createRuntimeState from '../createRuntimeState';
 import { saveLocalDom, loadLocalDom } from './localMode';
 
-export async function saveDom(app: appDom.AppDom): Promise<void> {
-  await saveLocalDom(app);
+export async function saveDom(app: appDom.AppDom): Promise<{ fingerprint: number }> {
+  return saveLocalDom(app);
 }
 
 export async function loadDom(): Promise<appDom.AppDom> {

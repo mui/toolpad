@@ -62,6 +62,10 @@ export function mapValues<P, V>(
  * Filters an objects' property values. Similar to `array.filter` but for objects. The result is a new
  * object with all the properties removed for which `filter` returned `false`.
  */
+export function filterValues<K extends PropertyKey, P, Q extends P>(
+  obj: Record<K, P>,
+  filter: (old: P) => old is Q,
+): Record<K, Q>;
 export function filterValues<P>(obj: P, filter: (old: P[keyof P]) => boolean): Partial<P>;
 export function filterValues<U>(
   obj: Record<string, U>,

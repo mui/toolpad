@@ -5,7 +5,7 @@ import { CompiledModule, RuntimeState } from './types';
 function compileModules(dom: appDom.AppDom): Record<string, CompiledModule> {
   const result: Record<string, CompiledModule> = {};
   const root = appDom.getApp(dom);
-  const { codeComponents = [], pages = [] } = appDom.getChildNodes(dom, root);
+  const { codeComponents = [] } = appDom.getChildNodes(dom, root);
 
   for (const node of codeComponents) {
     const src = node.attributes.code.value;
@@ -13,13 +13,6 @@ function compileModules(dom: appDom.AppDom): Record<string, CompiledModule> {
     result[name] = compileModule(src, name);
   }
 
-  for (const node of pages) {
-    const src = node.attributes.module?.value;
-    if (src) {
-      const name = `pages/${node.id}`;
-      result[name] = compileModule(src, name);
-    }
-  }
   return result;
 }
 

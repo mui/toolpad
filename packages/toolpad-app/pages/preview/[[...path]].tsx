@@ -1,9 +1,15 @@
 import type { GetServerSideProps, NextPage } from 'next';
 import * as React from 'react';
-import ToolpadApp, { ToolpadAppProps } from '../../src/runtime/ToolpadApp';
+import ToolpadApp from '../../src/runtime/ToolpadApp';
 import config from '../../src/config';
+import { RuntimeState } from '../../src/types';
+import loadComponents from '../../src/runtime/loadDomComponents';
 
-export const getServerSideProps: GetServerSideProps<ToolpadAppProps> = async () => {
+interface PreviewPageProps {
+  state: RuntimeState;
+}
+
+export const getServerSideProps: GetServerSideProps<PreviewPageProps> = async () => {
   const { loadRuntimeState } = await import('../../src/server/data');
 
   if (config.cmd !== 'dev') {
@@ -17,11 +23,11 @@ export const getServerSideProps: GetServerSideProps<ToolpadAppProps> = async () 
   return {
     props: {
       state,
-      version: 'preview',
-      basename: `/preview`,
     },
   };
 };
 
-const App: NextPage<ToolpadAppProps> = (props) => <ToolpadApp {...props} />;
+const App: NextPage<PreviewPageProps> = (props) => (
+  <ToolpadApp {...props} loadComponents={loadComponents} basename="/preview" version="preview" />
+);
 export default App;

@@ -24,6 +24,12 @@
     "cli.js",
     ".next"
   ],
+  "exports": {
+    "./package.json": "./package.json",
+    "./cli": {
+      "require": "./dist/cli/index.js"
+    }
+  },
   "dependencies": {
     "@babel/code-frame": "^7.21.4",
     "@emotion/cache": "^11.10.7",

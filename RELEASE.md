@@ -31,9 +31,15 @@
 
 1. Prepend the changelog to [`CHANGELOG.md`](./CHANGELOG.md).
 
-1. Open a PR with the proposed changes.
+1. Open a PR to the `master` branch with the proposed changes. Merge the changes.
 
 1. Publish the package to `npm`
+
+   1. If you are not logged in to `npm` in your CLI, first log in with:
+
+      ```sh
+      npm login
+      ```
 
    1. Make sure dependencies are up to date
 
@@ -69,8 +75,8 @@
 
 1. [Create a new GitHub release](https://github.com/mui/mui-toolpad/releases/new).
    1. Use `<version number>` to **Choose a tag** (when you enter new version GH UI will pop a suggestion `Create new tag: *** on publish`)
-   1. Use `<commit of merged PR>` as the **target**
-   1. Use the cleaned changelog as the content of **Describe this release**
-   1. Use `<version number>` as the **Release title**
-   1. Mark as prerelease if necessary.
-   1. **Publish release**
+   2. Use `<commit of merged PR>` as the **target**
+   3. Use the cleaned changelog as the content of **Describe this release**
+   4. Use `<version number>` as the **Release title**
+   5. Mark as prerelease if necessary.
+   6. **Publish release**

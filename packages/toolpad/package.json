@@ -19,11 +19,6 @@
       "types": "./dist/browser.d.ts",
       "import": "./dist/browser.mjs",
       "require": "./dist/browser.js"
-    },
-    "./runtime": {
-      "types": "./dist/runtime.d.ts",
-      "import": "./dist/runtime.mjs",
-      "require": "./dist/runtime.js"
     }
   },
   "files": [

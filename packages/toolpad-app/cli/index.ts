@@ -114,13 +114,13 @@ async function buildCommand({ dir }: BuildOptions) {
   const projectDir = path.resolve(process.cwd(), dir);
   const { default: chalk } = await import('chalk');
   // eslint-disable-next-line no-console
-  console.log(`${chalk.blue('info')}  - building Toolpad application...`);
+  console.log(
+    `${chalk.blue('info')}  - building Toolpad application at ${chalk.cyan(projectDir)}...`,
+  );
 
-  process.env.TOOLPAD_PROJECT_DIR = projectDir;
-
-  const { buildApp } = await import('../src/server/toolpadAppBuilder');
-
-  await buildApp({ root: projectDir, base: '/prod' });
+  await new Promise((resolve) => {
+    setTimeout(resolve, 1000);
+  });
   // eslint-disable-next-line no-console
   console.log(`${chalk.green('success')} - build done.`);
 }

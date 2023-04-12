@@ -1,9 +1,16 @@
 import type { MuiPage } from '@mui/monorepo/docs/src/MuiPage';
+import ArticleRoundedIcon from '@mui/icons-material/ArticleRounded';
+import TableViewRoundedIcon from '@mui/icons-material/TableViewRounded';
+import VisibilityRoundedIcon from '@mui/icons-material/VisibilityRounded';
+import CodeRoundedIcon from '@mui/icons-material/CodeRounded';
+import RocketLaunchIcon from '@mui/icons-material/RocketLaunch';
+// import ToggleOffRoundedIcon from '@mui/icons-material/ToggleOffRounded';
+// import ChromeReaderModeRoundedIcon from '@mui/icons-material/ChromeReaderModeRounded';
 
 const pages: MuiPage[] = [
   {
     pathname: '/toolpad/getting-started',
-    icon: 'DescriptionIcon',
+    icon: ArticleRoundedIcon,
     children: [
       { pathname: '/toolpad/getting-started/overview' },
       { pathname: '/toolpad/getting-started/quickstart' },
@@ -13,7 +20,7 @@ const pages: MuiPage[] = [
   },
   {
     pathname: '/toolpad/connecting-to-datasources',
-    icon: 'TableViewIcon',
+    icon: TableViewRoundedIcon,
     children: [
       {
         pathname: '/toolpad/connecting-to-datasources/queries',
@@ -31,7 +38,7 @@ const pages: MuiPage[] = [
   {
     pathname: '/toolpad/building-ui',
     title: 'Building UI',
-    icon: 'VisibilityIcon',
+    icon: VisibilityRoundedIcon,
     children: [
       {
         pathname: '/toolpad/building-ui/component-library',
@@ -53,16 +60,16 @@ const pages: MuiPage[] = [
   },
   {
     pathname: '/toolpad/data-binding',
-    icon: 'CodeIcon',
+    icon: CodeRoundedIcon,
   },
   {
     pathname: '/toolpad/deployment',
-    icon: 'BuildIcon',
+    icon: RocketLaunchIcon,
   },
   // {
   //   pathname: '/toolpad/versioning-and-deploying',
   //   title: 'Versioning & deploying [TODO]',
-  //   icon: 'ToggleOnIcon',
+  //   icon: ToggleOffRoundedIcon,
   //   children: [
   //     {
   //       pathname: '/toolpad/versioning-and-deploying/releases',
@@ -72,7 +79,7 @@ const pages: MuiPage[] = [
   // {
   //   pathname: '/toolpad/faq',
   //   title: 'FAQ [TODO]',
-  //   icon: 'ReaderIcon',
+  //   icon: ChromeReaderModeRoundedIcon,
   // },
 ];
 

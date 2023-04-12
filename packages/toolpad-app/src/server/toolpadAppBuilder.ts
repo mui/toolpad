@@ -10,6 +10,8 @@ import { RuntimeConfig } from '../config';
 import * as appDom from '../appDom';
 import createRuntimeState from '../createRuntimeState';
 
+const INITIAL_STATE_WINDOW_PROPERTY = '__initialToolpadState__';
+
 export interface GetHtmlContentParams {
   canvas: boolean;
 }
@@ -63,7 +65,9 @@ export function postProcessHtml(html: string, { config, dom }: PostProcessHtmlPa
     `<script>window[${JSON.stringify(
       RUNTIME_CONFIG_WINDOW_PROPERTY,
     )}] = ${serializedConfig}</script>`,
-    `<script>window.initialToolpadState = ${serializedInitialState}</script>`,
+    `<script>window[${JSON.stringify(
+      INITIAL_STATE_WINDOW_PROPERTY,
+    )}] = ${serializedInitialState}</script>`,
   ];
 
   return html.replaceAll(`<!-- __TOOLPAD_SCRIPTS__ -->`, toolpadScripts.join('\n'));
@@ -76,53 +80,49 @@ interface ToolpadVitePluginParams {
 }
 
 function toolpadVitePlugin({ root, base, canvas }: ToolpadVitePluginParams): Plugin {
-  const resolvedIndexHtmlId = `\0virtual:index.html`;
+  const runtimeEntryPointId = '/main.tsx';
+  const resolvedRuntimeEntryPointId = `\0${runtimeEntryPointId}`;
 
-  const entryPointId = '/main.tsx';
-  const resolvedEntryPointId = `\0${entryPointId}`;
-
-  const componentsId = `virtual:components`;
+  const componentsId = `virtual:toolpad:components`;
   const resolvedComponentsId = `\0${componentsId}`;
 
   return {
     name: 'toolpad',
 
     async resolveId(id, importer) {
-      if (id.endsWith(`.html`)) {
+      if (id.endsWith(`/index.html`)) {
         return id;
       }
-      if (id === entryPointId) {
-        return resolvedEntryPointId;
+      if (id === runtimeEntryPointId) {
+        return resolvedRuntimeEntryPointId;
       }
       if (id === componentsId) {
         return resolvedComponentsId;
       }
-      if (
-        importer === resolvedEntryPointId ||
-        importer === resolvedComponentsId ||
-        importer === resolvedIndexHtmlId
-      ) {
+      if (importer === resolvedRuntimeEntryPointId || importer === resolvedComponentsId) {
         return path.resolve(root, 'toolpad', id);
       }
       return null;
     },
 
     async load(id) {
-      if (id.endsWith(`.html`)) {
+      if (id.endsWith(`/index.html`)) {
         return getHtmlContent({ canvas });
       }
-      if (id === resolvedEntryPointId) {
+      if (id === resolvedRuntimeEntryPointId) {
         return {
           code: `
-            import { init } from '@mui/toolpad/runtime';
+            import { init } from '@mui/toolpad-app/runtime';
             import { LicenseInfo } from '@mui/x-data-grid-pro';
-            import components from 'virtual:components';
+            import components from 'virtual:toolpad:components';
+            ${canvas ? `import AppCanvas from '@mui/toolpad-app/canvas'` : ''}
             
             LicenseInfo.setLicenseKey(${JSON.stringify(MUI_X_PRO_LICENSE)});
             
-            const initialState = window.initialToolpadState;
+            const initialState = window[${JSON.stringify(INITIAL_STATE_WINDOW_PROPERTY)}];
 
             init({
+              ${canvas ? `ToolpadApp: AppCanvas,` : ''}
               base: ${JSON.stringify(base)},
               components,
               initialState,

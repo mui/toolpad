@@ -34,7 +34,7 @@ export default defineConfig([
   {
     entry: {
       index: './src/runtime/entrypoint.tsx',
-      canvas: './src/canvas/index.tsx',
+      canvas: './src/canvas/entrypoint.tsx',
     },
     format: ['esm', 'cjs'],
     dts: false,

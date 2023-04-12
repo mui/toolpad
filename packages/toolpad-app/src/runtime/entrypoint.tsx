@@ -2,16 +2,22 @@ import Button from '@mui/material/Button';
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { ToolpadComponents } from '@mui/toolpad-core';
-import ToolpadApp from './index';
+import RuntimeToolpadApp, { ToolpadAppProps } from './index';
 import { RuntimeState } from '../types';
 
 export interface InitParams {
   components: ToolpadComponents;
   initialState: RuntimeState;
   base: string;
+  ToolpadApp?: React.ComponentType<ToolpadAppProps>;
 }
 
-export function init({ components, initialState, base }: InitParams) {
+export function init({
+  ToolpadApp = RuntimeToolpadApp,
+  components,
+  initialState,
+  base,
+}: InitParams) {
   const loadComponents = async () => components;
   ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
     <React.StrictMode>

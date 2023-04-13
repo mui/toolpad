@@ -1,5 +1,57 @@
 # Changelog
 
+## 0.1.6
+
+<!-- generated comparing v0.1.5..master -->
+
+_Apr 13, 2023_
+
+A big thanks to the 1 contributors who made this release possible. Here are some highlights ✨:
+
+Fix regression that applies the wrong theme to the user application when they have dark color scheme.
+
+- &#8203;<!-- 1 -->Fix app theming (#1888) @Janpot
+
+All contributors of this release in alphabetical order: @Janpot
+
+## 0.1.5
+
+<!-- generated comparing v0.1.4..master -->
+
+_Apr 13, 2023_
+
+A big thanks to the 2 contributors who made this release possible. Here are some highlights ✨:
+
+Fix broken CLI due to missing dependency
+
+- &#8203;<!-- 4 -->Add missing extraneous dependencies (#1885) @Janpot
+- &#8203;<!-- 3 -->Update playwright to latest (#1884) @Janpot
+- &#8203;<!-- 2 -->Small fixes to CLI (#1882) @Janpot
+- &#8203;<!-- 1 -->Update release instructions (#1880) @apedroferreira
+
+All contributors of this release in alphabetical order: @apedroferreira, @Janpot
+
+## 0.1.4
+
+<!-- generated comparing v0.1.3..master -->
+
+_Apr 12, 2023_
+
+A big thanks to the 3 contributors who made this release possible. Here are some highlights ✨:
+
+Revamped file system layout, updated docs.
+
+- &#8203;<!-- 8 -->Factor out in-memory toolpad project (#1878) @Janpot
+- &#8203;<!-- 7 -->Revamp toolpad file system layout (#1831) @Janpot
+- &#8203;<!-- 6 -->Docs-update (#1829) @prakhargupta1
+- &#8203;<!-- 5 -->Update README.md @prakhargupta1
+- &#8203;<!-- 4 -->Update README.md @prakhargupta1
+- &#8203;<!-- 3 -->Refactor: extract custom components loading logic (#1862) @Janpot
+- &#8203;<!-- 2 -->Clean dist dirs on rebuild (#1858) @Janpot
+- &#8203;<!-- 1 -->[docs] Fix 301 redirections @oliviertassinari
+
+All contributors of this release in alphabetical order: @Janpot, @oliviertassinari, @prakhargupta1
+
 ## 0.1.3
 
 <!-- generated comparing v0.1.2..master -->

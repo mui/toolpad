@@ -1,5 +1,22 @@
 # Changelog
 
+## 0.1.5
+
+<!-- generated comparing v0.1.4..master -->
+
+_Apr 13, 2023_
+
+A big thanks to the 2 contributors who made this release possible. Here are some highlights ✨:
+
+Fix broken CLI due to missing dependency
+
+- &#8203;<!-- 4 -->Add missing extraneous dependencies (#1885) @Janpot
+- &#8203;<!-- 3 -->Update playwright to latest (#1884) @Janpot
+- &#8203;<!-- 2 -->Small fixes to CLI (#1882) @Janpot
+- &#8203;<!-- 1 -->Update release instructions (#1880) @apedroferreira
+
+All contributors of this release in alphabetical order: @apedroferreira, @Janpot
+
 ## 0.1.4
 
 <!-- generated comparing v0.1.3..master -->

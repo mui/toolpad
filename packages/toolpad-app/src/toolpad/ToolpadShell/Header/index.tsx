@@ -49,7 +49,7 @@ function Header({ actions, status, enableUserFeedback = true }: HeaderProps) {
                 sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center', gap: 1 }}
               >
                 <img
-                  src={theme.palette.mode === 'dark' ? productIconDark : productIconLight}
+                  src={theme.palette.mode === 'dark' ? productIconDark.src : productIconLight.src}
                   alt="Toolpad product icon"
                   width={25}
                   height={25}

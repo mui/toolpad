@@ -9,7 +9,7 @@ export default defineConfig([
     },
     outDir: 'dist/cli',
     silent: true,
-    noExternal: ['open-editor', 'execa', 'fractional-indexing', 'lodash-es'],
+    noExternal: ['open-editor', 'execa', 'fractional-indexing', 'lodash-es', 'chalk'],
     clean: true,
     sourcemap: true,
     async onSuccess() {

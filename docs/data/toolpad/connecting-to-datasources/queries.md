@@ -26,3 +26,5 @@ Be it a database table or an external API, most data we want to display in Toolp
      - **Only fetch on manual action** - The query has to be executed manually.
    - **Enabled** - Whether the query should be active, you can use this to disable fetching until certain conditions are met. It may for instance be dependant on certain input.
    - **Refetch interval** - You can configure the query to run on an interval, e.g. **every 30s**. To disable this option, keep the field empty.
+
+<div style="position: relative; padding-bottom: calc(82.1875% + 41px); height: 0;"><iframe src="https://demo.arcade.software/rsfo1Gfp0W2Py4Qcc0jk?embed" frameborder="0" loading="lazy" webkitallowfullscreen mozallowfullscreen allowfullscreen style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;color-scheme: light;" title="Page 1 | Toolpad editor"></iframe></div>

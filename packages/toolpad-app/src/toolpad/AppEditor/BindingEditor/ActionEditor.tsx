@@ -1,7 +1,7 @@
 import { TabContext, TabList } from '@mui/lab';
 import { Box, Tab } from '@mui/material';
 import * as React from 'react';
-import { BindableAttrValue, JsRuntime, LiveBinding, ScopeMeta } from '@mui/toolpad-core';
+import { BindableAttrValue } from '@mui/toolpad-core';
 import { NavigationActionEditor } from './NavigationActionEditor';
 import TabPanel from '../../../components/TabPanel';
 import { Maybe, WithControlledProp } from '../../../utils/types';
@@ -11,21 +11,9 @@ function getActionTab(value: Maybe<BindableAttrValue<any>>) {
   return value?.type || 'jsExpressionAction';
 }
 
-export interface ActionEditorProps extends WithControlledProp<BindableAttrValue<any> | null> {
-  globalScope: Record<string, unknown>;
-  globalScopeMeta: ScopeMeta;
-  jsRuntime: JsRuntime;
-  liveBinding?: LiveBinding;
-}
+export interface ActionEditorProps extends WithControlledProp<BindableAttrValue<any> | null> {}
 
-export function ActionEditor({
-  value,
-  onChange,
-  globalScope,
-  globalScopeMeta,
-  jsRuntime,
-  liveBinding,
-}: ActionEditorProps) {
+export function ActionEditor({ value, onChange }: ActionEditorProps) {
   const [activeTab, setActiveTab] = React.useState<BindableType>(getActionTab(value));
   React.useEffect(() => setActiveTab(getActionTab(value)), [value]);
 
@@ -52,10 +40,6 @@ export function ActionEditor({
           <NavigationActionEditor
             value={value?.type === 'navigationAction' ? value : null}
             onChange={onChange}
-            globalScope={globalScope}
-            globalScopeMeta={globalScopeMeta}
-            jsRuntime={jsRuntime}
-            liveBinding={liveBinding}
           />
         </TabPanel>
       </TabContext>

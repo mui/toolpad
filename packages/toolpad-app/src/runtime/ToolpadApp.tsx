@@ -132,9 +132,7 @@ function usePageNavigator(): NavigateToPage {
   const navigate = useNavigate();
   const navigateToPage: NavigateToPage = React.useCallback(
     (pageNodeId, pageParameters) => {
-      const urlParams =
-        pageParameters &&
-        new URLSearchParams(mapValues(pageParameters, (pageParameter) => pageParameter?.value));
+      const urlParams = pageParameters && new URLSearchParams(pageParameters);
 
       navigate({
         pathname: `/pages/${pageNodeId}`,
@@ -356,10 +354,28 @@ function RenderedNodeContent({ node, childNodeGroups, Component }: RenderedNodeC
       const action = (node as appDom.ElementNode).props?.[key];
 
       if (action?.type === 'navigationAction') {
-        const handler = () => {
-          const { page, parameters } = action.value;
+        const handler = async () => {
+          const { page, parameters = {} } = action.value;
           if (page) {
-            navigateToPage(appDom.deref(page), parameters);
+            const parsedParameterEntries = await Promise.all(
+              Object.keys(parameters).map(async (parameterName) => {
+                const parameterValue = parameters[parameterName];
+
+                if (parameterValue && parameterValue.type === 'jsExpression') {
+                  const result = await evaluatePageExpression(
+                    parameterValue.value,
+                    scopeId,
+                    localScopeParams,
+                  );
+                  return [parameterName, result.value];
+                }
+                return [parameterName, parameterValue?.value];
+              }),
+            );
+
+            const parsedParameters = Object.fromEntries(parsedParameterEntries);
+
+            navigateToPage(appDom.deref(page), parsedParameters);
           }
         };
 
@@ -746,9 +762,10 @@ function parseBindings(
           ? `${elm.id}.props.${argType.defaultValueProp}`
           : undefined;
 
+        const propValue = elm.props?.[propName];
+
         const binding: BindableAttrValue<any> =
-          elm.props?.[propName] ||
-          appDom.createConst(argType ? getArgTypeDefaultValue(argType) : undefined);
+          propValue || appDom.createConst(argType ? getArgTypeDefaultValue(argType) : undefined);
 
         const bindingId = `${elm.id}.props.${propName}`;
 

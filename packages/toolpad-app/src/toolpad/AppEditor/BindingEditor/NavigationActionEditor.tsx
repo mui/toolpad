@@ -1,35 +1,52 @@
 import { Box, Typography, TextField, MenuItem } from '@mui/material';
 import * as React from 'react';
-import {
-  BindableAttrValue,
-  JsRuntime,
-  LiveBinding,
-  NavigationAction,
-  NodeId,
-  ScopeMeta,
-} from '@mui/toolpad-core';
+import { BindableAttrValue, NavigationAction, NodeId } from '@mui/toolpad-core';
 import { WithControlledProp } from '../../../utils/types';
 import { useDom } from '../../AppState';
 import * as appDom from '../../../appDom';
 import { usePageEditorState } from '../PageEditor/PageEditorProvider';
 import { mapValues } from '../../../utils/collections';
 import BindableEditor from '../PageEditor/BindableEditor';
+import { useBindingEditorContext } from '.';
+import { useEvaluateLiveBinding } from '../useEvaluateLiveBinding';
 
-export interface NavigationActionEditorProps extends WithControlledProp<NavigationAction | null> {
-  globalScope: Record<string, unknown>;
-  globalScopeMeta: ScopeMeta;
-  jsRuntime: JsRuntime;
-  liveBinding?: LiveBinding;
+export interface NavigationActionParameterEditorProps
+  extends WithControlledProp<BindableAttrValue<string> | null> {
+  label: string;
 }
 
-export function NavigationActionEditor({
+function NavigationActionParameterEditor({
+  label,
   value,
   onChange,
-  globalScope,
-  globalScopeMeta,
-  jsRuntime,
-  liveBinding,
-}: NavigationActionEditorProps) {
+}: NavigationActionParameterEditorProps) {
+  const { jsRuntime, globalScope, globalScopeMeta } = useBindingEditorContext();
+
+  const liveBinding = useEvaluateLiveBinding({
+    jsRuntime,
+    input: value,
+    globalScope,
+  });
+
+  return (
+    <Box>
+      <BindableEditor<string>
+        liveBinding={liveBinding}
+        jsRuntime={jsRuntime}
+        globalScope={globalScope}
+        globalScopeMeta={globalScopeMeta}
+        label={label}
+        propType={{ type: 'string' }}
+        value={value || null}
+        onChange={onChange}
+      />
+    </Box>
+  );
+}
+
+export interface NavigationActionEditorProps extends WithControlledProp<NavigationAction | null> {}
+
+export function NavigationActionEditor({ value, onChange }: NavigationActionEditorProps) {
   const { dom } = useDom();
   const root = appDom.getApp(dom);
   const { pages = [] } = appDom.getChildNodes(dom, root);
@@ -113,18 +130,12 @@ export function NavigationActionEditor({
             const [actionParameterName, actionParameterValue] = actionParameter;
 
             return (
-              <Box key={actionParameterName}>
-                <BindableEditor<string>
-                  liveBinding={liveBinding}
-                  jsRuntime={jsRuntime}
-                  globalScope={globalScope}
-                  globalScopeMeta={globalScopeMeta}
-                  label={actionParameterName}
-                  propType={{ type: 'string' }}
-                  value={actionParameterValue || null}
-                  onChange={handleActionParameterChange(page, actionParameterName)}
-                />
-              </Box>
+              <NavigationActionParameterEditor
+                key={actionParameterName}
+                label={actionParameterName}
+                value={actionParameterValue as BindableAttrValue<string>}
+                onChange={handleActionParameterChange(page, actionParameterName)}
+              />
             );
           },
         );

@@ -283,16 +283,7 @@ export function BindingEditor<V>({
   return (
     <BindingEditorContextProvider value={bindingEditorContext}>
       {bindingButtonWithTooltip}
-      <Dialog
-        open={open}
-        onClose={handleClose}
-        value={value}
-        onChange={onChange}
-        globalScope={globalScope}
-        globalScopeMeta={globalScopeMeta || {}}
-        jsRuntime={jsRuntime}
-        liveBinding={liveBinding}
-      />
+      <Dialog open={open} onClose={handleClose} value={value} onChange={onChange} />
     </BindingEditorContextProvider>
   );
 }

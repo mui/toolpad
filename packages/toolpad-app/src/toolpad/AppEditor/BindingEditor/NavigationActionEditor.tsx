@@ -78,29 +78,41 @@ export function NavigationActionEditor({ value, onChange }: NavigationActionEdit
     [dom, getDefaultActionParameters, onChange],
   );
 
-  const handleActionParameterChange = React.useCallback(
-    (page: appDom.PageNode, actionParameterName: string) =>
-      (newValue: BindableAttrValue<string> | null) => {
-        onChange({
-          type: 'navigationAction',
-          value: {
-            page: appDom.ref(page.id),
-            parameters: {
-              ...(value?.value.parameters || {}),
-              ...(newValue ? { [actionParameterName]: newValue } : {}),
-            },
-          },
-        });
-      },
-    [onChange, value?.value.parameters],
-  );
-
   const availablePages = React.useMemo(
     () => pages.filter((page) => page.id !== currentPageNodeId),
     [pages, currentPageNodeId],
   );
 
+  const actionPageRef = value?.value?.page || null;
+  const actionParameters = React.useMemo(
+    () => value?.value.parameters || {},
+    [value?.value.parameters],
+  );
+
+  const actionPageId = actionPageRef ? appDom.deref(actionPageRef) : null;
+  const actionPage = availablePages.find((availablePage) => availablePage.id === actionPageId);
+
+  const handleActionParameterChange = React.useCallback(
+    (actionParameterName: string) => (newValue: BindableAttrValue<string> | null) => {
+      if (actionPageRef) {
+        onChange({
+          type: 'navigationAction',
+          value: {
+            page: actionPageRef,
+            parameters: {
+              ...actionParameters,
+              ...(newValue ? { [actionParameterName]: newValue } : {}),
+            },
+          },
+        });
+      }
+    },
+    [actionPageRef, actionParameters, onChange],
+  );
+
   const hasPagesAvailable = availablePages.length > 0;
+
+  const defaultActionParameters = actionPage ? getDefaultActionParameters(actionPage) : {};
 
   return (
     <Box sx={{ my: 1 }}>
@@ -108,9 +120,9 @@ export function NavigationActionEditor({ value, onChange }: NavigationActionEdit
       <TextField
         fullWidth
         sx={{ my: 3 }}
-        label="page"
+        label="Select a page"
         select
-        value={value?.value?.page ? appDom.deref(value.value.page) : ''}
+        value={actionPageId || ''}
         onChange={handlePageChange}
         disabled={!hasPagesAvailable}
         helperText={hasPagesAvailable ? null : 'No other pages available'}
@@ -121,12 +133,10 @@ export function NavigationActionEditor({ value, onChange }: NavigationActionEdit
           </MenuItem>
         ))}
       </TextField>
-      <Typography variant="overline">Page parameters:</Typography>
-      {availablePages.map((page) => {
-        const defaultActionParameters = getDefaultActionParameters(page);
-
-        return Object.entries(value?.value.parameters || defaultActionParameters).map(
-          (actionParameter) => {
+      {actionPage ? (
+        <React.Fragment>
+          <Typography variant="overline">Page parameters:</Typography>
+          {Object.entries(actionParameters || defaultActionParameters).map((actionParameter) => {
             const [actionParameterName, actionParameterValue] = actionParameter;
 
             return (
@@ -134,12 +144,12 @@ export function NavigationActionEditor({ value, onChange }: NavigationActionEdit
                 key={actionParameterName}
                 label={actionParameterName}
                 value={actionParameterValue as BindableAttrValue<string>}
-                onChange={handleActionParameterChange(page, actionParameterName)}
+                onChange={handleActionParameterChange(actionParameterName)}
               />
             );
-          },
-        );
-      })}
+          })}
+        </React.Fragment>
+      ) : null}
     </Box>
   );
 }

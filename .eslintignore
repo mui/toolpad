@@ -7,4 +7,4 @@
 
 /examples/*/toolpad.yml
 
-/test/integration/**/toolpad.yml
+/test/integration/*/fixture*/

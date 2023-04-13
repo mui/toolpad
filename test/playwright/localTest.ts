@@ -63,6 +63,20 @@ export async function withApp(
       args.push('--dev');
     }
 
+    if (cmd === 'start') {
+      const child = childProcess.spawn('toolpad', ['build'], {
+        cwd: projectDir,
+        stdio: 'pipe',
+      });
+
+      if (VERBOSE) {
+        child.stdout?.pipe(process.stdout);
+        child.stderr?.pipe(process.stderr);
+      }
+
+      await once(child, 'exit');
+    }
+
     const child = childProcess.spawn('toolpad', args, {
       cwd: projectDir,
       stdio: 'pipe',

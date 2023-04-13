@@ -39,7 +39,7 @@ async function main() {
 
   const projectDir = process.env.TOOLPAD_PROJECT_DIR;
   const dir = process.env.TOOLPAD_DIR;
-  const dev = process.env.NODE_ENV !== 'production';
+  const dev = !!process.env.TOOLPAD_NEXT_DEV;
   const hostname = 'localhost';
   const port = Number(process.env.TOOLPAD_PORT);
 

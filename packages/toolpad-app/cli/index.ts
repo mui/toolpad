@@ -64,6 +64,7 @@ async function runApp(cmd: Command, { port, dev = false, dir }: RunOptions) {
     stdio: 'pipe',
     // @ts-expect-error Next.js is enforcing NODE_ENV, but we don't want that
     env: {
+      TOOLPAD_NEXT_DEV: dev ? '1' : '',
       TOOLPAD_DIR: toolpadDir,
       TOOLPAD_PROJECT_DIR: projectDir,
       TOOLPAD_PORT: String(port),

@@ -9,7 +9,7 @@ test.use({
   },
 });
 
-test('can change between light and dark themes', async ({ page }) => {
+test.only('can change between light and dark themes', async ({ page }) => {
   const editorModel = new ToolpadEditor(page);
 
   await editorModel.goto();
@@ -21,6 +21,8 @@ test('can change between light and dark themes', async ({ page }) => {
   const canvasBodyLocator = editorModel.appCanvas.locator('body');
 
   await expect(canvasBodyLocator).toHaveCSS('background-color', 'rgb(255, 255, 255)');
+
+  await editorModel.themeEditor.getByRole('button', { name: 'Add theme' }).click();
 
   await editorModel.themeEditor.getByRole('button', { name: 'Dark' }).click();
   await expect(canvasBodyLocator).toHaveCSS('background-color', 'rgb(18, 18, 18)');

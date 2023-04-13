@@ -24,7 +24,7 @@ test.use({
 });
 
 test('rest basics', async ({ page, context, localApp }) => {
-  const queriesFilePath = path.resolve(localApp.dir, './toolpad.yml');
+  const queriesFilePath = path.resolve(localApp.dir, './toolpad/pages/page1/page.yml');
   await fileReplaceAll(queriesFilePath, HTTPBIN_SOURCE_URL, HTTPBIN_TARGET_URL);
 
   const runtimeModel = new ToolpadRuntime(page);

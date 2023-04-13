@@ -1,5 +1,19 @@
 # Changelog
 
+## 0.1.6
+
+<!-- generated comparing v0.1.5..master -->
+
+_Apr 13, 2023_
+
+A big thanks to the 1 contributors who made this release possible. Here are some highlights ✨:
+
+Fix regression that applies the wrong theme to the user application when they have dark color scheme.
+
+- &#8203;<!-- 1 -->Fix app theming (#1888) @Janpot
+
+All contributors of this release in alphabetical order: @Janpot
+
 ## 0.1.5
 
 <!-- generated comparing v0.1.4..master -->

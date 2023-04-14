@@ -41,7 +41,7 @@ export async function createDevHandler({ root, base, server }: ToolpadAppHandler
 
       html = postProcessHtml(html, { config, dom });
 
-      res.status(200).set({ 'Content-Type': 'text/html' }).end(html);
+      res.status(200).set('content-type', 'text/html').end(html);
     } catch (e) {
       next(e);
     }

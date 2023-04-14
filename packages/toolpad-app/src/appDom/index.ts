@@ -608,6 +608,15 @@ export function getPageAncestor(dom: AppDom, node: AppDomNode): PageNode | null 
 }
 
 /**
+ * Returns all nodes with a given component type
+ */
+export function getComponentTypeNodes(dom: AppDom, componentId: string): readonly AppDomNode[] {
+  return Object.values(dom.nodes).filter(
+    (node) => isElement(node) && node.attributes.component.value === componentId,
+  );
+}
+
+/**
  * Returns the set of names for which the given node must have a different name
  */
 export function getExistingNamesForNode(dom: AppDom, node: AppDomNode): Set<string> {

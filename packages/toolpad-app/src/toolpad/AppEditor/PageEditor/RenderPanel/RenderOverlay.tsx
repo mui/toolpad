@@ -433,17 +433,6 @@ export default function RenderOverlay({ bridge }: RenderOverlayProps) {
 
   const selectedRect = selectedNode && !newNode ? nodesInfo[selectedNode.id]?.rect : null;
 
-  const interactiveNodes = React.useMemo<Set<NodeId>>(() => {
-    if (!selectedNode) {
-      return new Set();
-    }
-    return new Set(
-      [...appDom.getPageAncestors(dom, selectedNode), selectedNode].map(
-        (interactiveNode) => interactiveNode.id,
-      ),
-    );
-  }, [dom, selectedNode]);
-
   const handleNodeDragStart = React.useCallback(
     (node: appDom.ElementNode) => (event: React.DragEvent<HTMLDivElement>) => {
       event.stopPropagation();
@@ -1596,7 +1585,6 @@ export default function RenderOverlay({ bridge }: RenderOverlayProps) {
         const isPageColumnChild = parent ? appDom.isElement(parent) && isPageColumn(parent) : false;
 
         const isSelected = selectedNode && !newNode ? selectedNode.id === node.id : false;
-        const isInteractive = interactiveNodes.has(node.id) && !draggedNode && !draggedEdge;
 
         const isHorizontallyResizable = isSelected && (isPageRowChild || isPageColumnChild);
         const isVerticallyResizable =
@@ -1616,7 +1604,6 @@ export default function RenderOverlay({ bridge }: RenderOverlayProps) {
                 node={node}
                 rect={nodeRect}
                 isSelected={isSelected}
-                isInteractive={isInteractive}
                 onNodeDragStart={handleNodeDragStart(node as appDom.ElementNode)}
                 onDuplicate={handleNodeDuplicate(node as appDom.ElementNode)}
                 draggableEdges={[
@@ -1633,7 +1620,7 @@ export default function RenderOverlay({ bridge }: RenderOverlayProps) {
                 onDelete={handleNodeDelete(node.id)}
                 isResizing={isResizingNode}
                 resizePreviewElementRef={resizePreviewElementRef}
-                isHoverable={isResizing && !isDraggingOver}
+                isHoverable={!isResizing && !isDraggingOver}
                 isOutlineVisible={isDraggingOver}
               />
             ) : null}

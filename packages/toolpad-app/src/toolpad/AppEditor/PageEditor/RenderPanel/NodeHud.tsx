@@ -1,5 +1,4 @@
 import * as React from 'react';
-import clsx from 'clsx';
 import DragIndicatorIcon from '@mui/icons-material/DragIndicator';
 import DeleteIcon from '@mui/icons-material/Delete';
 import ContentCopy from '@mui/icons-material/ContentCopy';
@@ -26,7 +25,6 @@ function stopPropagationHandler(event: React.SyntheticEvent) {
 }
 
 const nodeHudClasses = {
-  allowNodeInteraction: 'NodeHud_AllowNodeInteraction',
   selected: 'NodeHud_Selected',
   selectionHint: 'NodeHud_SelectionHint',
 };
@@ -44,7 +42,7 @@ const NodeHudWrapper = styled('div', {
   outline: `1px dotted ${isOutlineVisible ? theme.palette.primary[500] : 'transparent'}`,
   zIndex: 80,
   '&:hover': {
-    outline: `2px dashed ${isHoverable ? 'transparent' : theme.palette.primary[500]}`,
+    outline: `2px dashed ${isHoverable ? theme.palette.primary[500] : 'transparent'}`,
   },
   [`.${nodeHudClasses.selected}`]: {
     position: 'absolute',
@@ -54,10 +52,6 @@ const NodeHudWrapper = styled('div', {
     left: 0,
     top: 0,
     zIndex: 80,
-  },
-  [`&.${nodeHudClasses.allowNodeInteraction}`]: {
-    // block pointer-events so we can interact with the selection
-    pointerEvents: 'none',
   },
 }));
 
@@ -145,7 +139,6 @@ interface NodeHudProps {
   node: appDom.AppDomNode;
   rect: Rectangle;
   isSelected?: boolean;
-  isInteractive?: boolean;
   onNodeDragStart?: React.DragEventHandler<HTMLElement>;
   draggableEdges?: RectangleEdge[];
   onEdgeDragStart?: (edge: RectangleEdge) => React.MouseEventHandler<HTMLElement>;
@@ -161,7 +154,6 @@ export default function NodeHud({
   node,
   rect,
   isSelected,
-  isInteractive,
   onNodeDragStart,
   draggableEdges = [],
   onEdgeDragStart,
@@ -179,9 +171,6 @@ export default function NodeHud({
       <NodeHudWrapper
         data-node-id={node.id}
         style={absolutePositionCss(rect)}
-        className={clsx({
-          [nodeHudClasses.allowNodeInteraction]: isInteractive,
-        })}
         isOutlineVisible={isOutlineVisible}
         isHoverable={isHoverable}
       >

@@ -188,9 +188,6 @@ export function createViteConfig({
   return {
     configFile: false,
     mode,
-    optimizeDeps: {
-      disabled: true,
-    },
     build: {
       outDir: getAppOutputFolder(root),
       chunkSizeWarningLimit: Infinity,
@@ -215,9 +212,6 @@ export function createViteConfig({
     appType: 'custom',
     logLevel: 'info',
     root,
-    resolve: {
-      alias: {},
-    },
     plugins: [react(), toolpadVitePlugin({ root, base })],
     base,
     define: {

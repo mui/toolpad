@@ -30,6 +30,7 @@ export async function createDevHandler({ root, base, server }: ToolpadAppHandler
     const oldEend = res.end;
     res.end = (data) => {
       if (!res.getHeader('content-type')) {
+        // eslint-disable-next-line no-console
         console.log(res.req.url);
       }
       res.end = oldEend; // set function back to avoid the 'double-send'

@@ -433,6 +433,20 @@ export default function RenderOverlay({ bridge }: RenderOverlayProps) {
 
   const selectedRect = selectedNode && !newNode ? nodesInfo[selectedNode.id]?.rect : null;
 
+  const interactiveNodes = React.useMemo<Set<NodeId>>(() => {
+    if (!selectedNode) {
+      return new Set();
+    }
+    return new Set(
+      [
+        ...appDom
+          .getPageAncestors(dom, selectedNode)
+          .filter((ancestor) => appDom.isElement(ancestor) && isPageLayoutComponent(ancestor)),
+        selectedNode,
+      ].map((ancestor) => ancestor.id),
+    );
+  }, [dom, selectedNode]);
+
   const handleNodeDragStart = React.useCallback(
     (node: appDom.ElementNode) => (event: React.DragEvent<HTMLDivElement>) => {
       event.stopPropagation();
@@ -1585,7 +1599,6 @@ export default function RenderOverlay({ bridge }: RenderOverlayProps) {
         const isPageColumnChild = parent ? appDom.isElement(parent) && isPageColumn(parent) : false;
 
         const isSelected = selectedNode && !newNode ? selectedNode.id === node.id : false;
-        const isInteractive = !draggedNode && !draggedEdge;
 
         const isHorizontallyResizable = isSelected && (isPageRowChild || isPageColumnChild);
         const isVerticallyResizable =
@@ -1593,6 +1606,8 @@ export default function RenderOverlay({ bridge }: RenderOverlayProps) {
 
         const isResizing = Boolean(draggedEdge);
         const isResizingNode = isResizing && node.id === draggedNodeId;
+
+        const isInteractive = interactiveNodes.has(node.id) && !isResizing && !isDraggingOver;
 
         if (!nodeRect) {
           return null;

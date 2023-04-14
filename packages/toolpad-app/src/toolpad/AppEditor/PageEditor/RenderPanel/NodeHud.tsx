@@ -26,7 +26,7 @@ function stopPropagationHandler(event: React.SyntheticEvent) {
 }
 
 const nodeHudClasses = {
-  allowNodeInteraction: 'NodeHud_AllowNodeInteraction',
+  disableNodeInteraction: 'NodeHud_DisableNodeInteraction',
   selected: 'NodeHud_Selected',
   selectionHint: 'NodeHud_SelectionHint',
 };
@@ -55,7 +55,7 @@ const NodeHudWrapper = styled('div', {
     top: 0,
     zIndex: 80,
   },
-  [`&.${nodeHudClasses.allowNodeInteraction}`]: {
+  [`&.${nodeHudClasses.disableNodeInteraction}`]: {
     // block pointer-events so we can interact with the selection
     pointerEvents: 'none',
   },
@@ -180,7 +180,7 @@ export default function NodeHud({
         data-node-id={node.id}
         style={absolutePositionCss(rect)}
         className={clsx({
-          [nodeHudClasses.allowNodeInteraction]: isInteractive,
+          [nodeHudClasses.disableNodeInteraction]: !isInteractive,
         })}
         isOutlineVisible={isOutlineVisible}
         isHoverable={isHoverable}

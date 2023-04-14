@@ -12,14 +12,14 @@ const config: PlaywrightTestConfig<{ toolpadDev: boolean }> = {
     baseURL: process.env.PLAYWRIGHT_TEST_BASE_URL || 'http://localhost:3000/',
   },
   projects: [
-    {
-      name: 'chromium',
-      use: { ...devices['Desktop Chrome'] },
-    },
     // {
-    //   name: 'firefox',
-    //   use: { ...devices['Desktop Firefox'] },
+    //   name: 'chromium',
+    //   use: { ...devices['Desktop Chrome'] },
     // },
+    {
+      name: 'firefox',
+      use: { ...devices['Desktop Firefox'] },
+    },
   ],
 };
 

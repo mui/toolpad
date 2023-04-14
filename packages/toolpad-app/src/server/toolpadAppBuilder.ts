@@ -188,6 +188,9 @@ export function createViteConfig({
   return {
     configFile: false,
     mode,
+    optimizeDeps: {
+      disabled: true,
+    },
     build: {
       outDir: getAppOutputFolder(root),
       chunkSizeWarningLimit: Infinity,

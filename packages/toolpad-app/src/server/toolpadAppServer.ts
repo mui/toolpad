@@ -31,17 +31,20 @@ export async function createDevHandler({ root, base, server }: ToolpadAppHandler
     const oldEnd = res.end;
     res.end = (data) => {
       if (!res.getHeader('content-type')) {
-        const type = mime.getType(res.req.url);
+        const { pathname } = new URL(res.req.url, 'http://x');
+        const type = mime.getType(pathname);
+        // For some reason this is happening in circleci and failing firefox tests
+        // TODO: investigate what happens en report to vite
         // eslint-disable-next-line no-console
         console.log(
-          `Sending a file "${res.req.url}" without content-type, setting it to "${type}"`,
+          `Sending a file "${res.req.url}" without content-type, forcing it to be "${type}"`,
         );
         if (type) {
           res.setHeader('content-type', type);
         }
       }
-      res.end = oldEnd; // set function back to avoid the 'double-send'
-      return res.end(data); // just call as normal with data
+      res.end = oldEnd;
+      return res.end(data);
     };
     next();
   });

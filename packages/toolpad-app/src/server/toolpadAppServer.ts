@@ -26,6 +26,18 @@ export async function createDevHandler({ root, base, server }: ToolpadAppHandler
 
   const router = express.Router();
 
+  router.use((req, res, next) => {
+    const oldEend = res.end;
+    res.end = (data) => {
+      if (!res.getHeader('content-type')) {
+        console.log(res.req.url);
+      }
+      res.end = oldEend; // set function back to avoid the 'double-send'
+      return res.end(data); // just call as normal with data
+    };
+    next();
+  });
+
   router.use(devServer.middlewares);
 
   router.use('*', async (req, res, next) => {

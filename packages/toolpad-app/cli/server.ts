@@ -3,6 +3,7 @@ import next from 'next';
 import express from 'express';
 import invariant from 'invariant';
 import { createServer } from 'http';
+import { setTimeout } from 'timers/promises';
 import { createDevHandler, createProdHandler } from '../src/server/toolpadAppServer';
 import { getUserProjectRoot } from '../src/server/localMode';
 
@@ -36,6 +37,8 @@ async function main() {
     default:
       throw new Error(`Unknown toolpad command ${cmd}`);
   }
+
+  await setTimeout(1000);
 
   const projectDir = process.env.TOOLPAD_PROJECT_DIR;
   const dir = process.env.TOOLPAD_DIR;

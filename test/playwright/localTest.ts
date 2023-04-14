@@ -6,7 +6,6 @@ import { Readable } from 'stream';
 import { once } from 'events';
 import invariant from 'invariant';
 import { test as base } from './test';
-import { folderExists } from '../../packages/toolpad-app/src/utils/fs';
 
 interface RunningLocalApp {
   url: string;
@@ -154,15 +153,6 @@ const test = base.extend<
       auto: true,
     },
   ],
-});
-
-test.beforeEach(async () => {
-  const nodeModulesFolder = path.resolve(__dirname, '../../node_modules');
-  if (!(await folderExists(nodeModulesFolder))) {
-    throw new Error(`Dependencies not installed`);
-  }
-  const optimizedDepsFolder = path.resolve(nodeModulesFolder, './.vite');
-  await fs.rm(optimizedDepsFolder, { recursive: true, force: true });
 });
 
 // eslint-disable-next-line import/export

@@ -5,15 +5,7 @@ import serverDataSources from '../toolpadDataSources/server';
 import * as appDom from '../appDom';
 import applyTransform from '../toolpadDataSources/applyTransform';
 import createRuntimeState from '../createRuntimeState';
-import { saveLocalDom, loadLocalDom } from './localMode';
-
-export async function saveDom(app: appDom.AppDom): Promise<void> {
-  await saveLocalDom(app);
-}
-
-export async function loadDom(): Promise<appDom.AppDom> {
-  return loadLocalDom();
-}
+import { loadDom, saveDom } from './liveProject';
 
 export async function getConnectionParams<P = unknown>(
   connectionId: string | null,

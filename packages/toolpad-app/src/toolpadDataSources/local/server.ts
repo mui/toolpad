@@ -14,12 +14,12 @@ import { LocalPrivateQuery, LocalQuery, LocalConnectionParams } from './types';
 import { Maybe } from '../../utils/types';
 import {
   getUserProjectRoot,
-  isInitialized,
   openQueryEditor,
-  QUERIES_FILE,
-  readProjectFolder,
+  getFunctionsFile,
+  getOutputFolder,
 } from '../../server/localMode';
 import { errorFrom, serializeError } from '../../utils/errors';
+import { waitForInit } from '../../server/liveProject';
 
 type MessageToChildProcess =
   | {
@@ -77,15 +77,8 @@ function formatCodeFrame(location: esbuild.Location): string {
   ].join('\n');
 }
 
-interface MainManifest {
-  queryFiles: { name: string; filepath: string }[];
-}
-
-async function createMain(manifest: MainManifest): Promise<string> {
-  const loadLines = manifest.queryFiles.map(
-    ({ name, filepath }) =>
-      `loadQuery(${JSON.stringify(name)}, () => import(${JSON.stringify(filepath)}))`,
-  );
+async function createMain(): Promise<string> {
+  const relativeFunctionsFilePath = [`.`, getFunctionsFile('.')].join(path.sep);
   return `
     import { TOOLPAD_QUERY } from '@mui/toolpad-core/server';
     import { errorFrom, serializeError } from '@mui/toolpad-core/utils/errors';
@@ -108,17 +101,18 @@ async function createMain(manifest: MainManifest): Promise<string> {
     async function getResolvers() {
       if (!resolversPromise) {
         resolversPromise = (async () => {
-          const fileQueryResolvers = await Promise.all([
-            ${loadLines.join(',')}
-          ]);
-
-          const queries = await import(${JSON.stringify(QUERIES_FILE)}).catch(() => ({}));
+          const queries = await import(${JSON.stringify(
+            relativeFunctionsFilePath,
+          )}).catch((err) => {
+            console.error(err);
+            return {};
+          });
 
           const queriesFileResolvers = Object.entries(queries).flatMap(([name, resolver]) => {
             return typeof resolver === 'function' ? [[name, resolver]] : []
           })
 
-          return new Map([...fileQueryResolvers, ...queriesFileResolvers]);
+          return new Map(queriesFileResolvers);
         })();
       }
       return resolversPromise
@@ -213,7 +207,7 @@ export async function loadEnvFile() {
 }
 
 async function createBuilder() {
-  await isInitialized;
+  await waitForInit();
 
   const userProjectRoot = getUserProjectRoot();
 
@@ -221,11 +215,6 @@ async function createBuilder() {
   let controller: AbortController | undefined;
   let buildErrors: Error[] = [];
   let runtimeError: Error | undefined;
-
-  const projectEntries = await readProjectFolder();
-  const entryPoints = projectEntries
-    .filter((entry) => entry.kind === 'query')
-    .map((entry) => entry.filepath);
 
   let outputFile: string | undefined;
   let metafile: esbuild.Metafile | undefined;
@@ -318,12 +307,9 @@ async function createBuilder() {
 
       build.onLoad({ filter: /.*/, namespace: 'toolpad' }, async (args) => {
         if (args.path === 'main.ts') {
-          const contents = await createMain({
-            queryFiles: projectEntries.filter((entry) => entry.kind === 'query'),
-          });
           return {
             loader: 'tsx',
-            contents,
+            contents: await createMain(),
             resolveDir: userProjectRoot,
           };
         }
@@ -335,7 +321,7 @@ async function createBuilder() {
         // TODO: use for hot reloading
         // eslint-disable-next-line no-console
         console.log(
-          `${chalk.green('ready')} - built queries.ts: ${args.errors.length} error(s), ${
+          `${chalk.green('ready')} - built functions.ts: ${args.errors.length} error(s), ${
             args.warnings.length
           } warning(s)`,
         );
@@ -368,12 +354,12 @@ async function createBuilder() {
 
   const ctx = await esbuild.context({
     absWorkingDir: userProjectRoot,
-    entryPoints: ['toolpad:main.ts', ...entryPoints],
+    entryPoints: ['toolpad:main.ts'],
     plugins: [toolpadPlugin],
     write: true,
     bundle: true,
     metafile: true,
-    outdir: path.resolve(userProjectRoot, './.toolpad-generated/'),
+    outdir: path.resolve(getOutputFolder(userProjectRoot), 'functions'),
     platform: 'node',
     packages: 'external',
     target: 'es2022',

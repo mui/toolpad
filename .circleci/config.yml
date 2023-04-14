@@ -152,9 +152,6 @@ jobs:
           name: Tests fake browser
           command: yarn test
       - run:
-          name: Debug
-          command: find . -name .vite
-      - run:
           name: Tests real browser
           environment:
             HTTPBIN_BASEURL: 'http://localhost/'

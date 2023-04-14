@@ -22,7 +22,7 @@ test.use({
   },
 });
 
-test.only('functions basics', async ({ page }) => {
+test('functions basics', async ({ page }) => {
   const runtimeModel = new ToolpadRuntime(page);
   await runtimeModel.gotoPage('page1');
 
@@ -33,7 +33,7 @@ test.only('functions basics', async ({ page }) => {
   await page.locator('text="echo, secret: Some bar secret"').waitFor({ state: 'visible' });
 });
 
-test.only('function editor reload', async ({ page, localApp }) => {
+test('function editor reload', async ({ page, localApp }) => {
   const editorModel = new ToolpadEditor(page);
   await editorModel.goto();
 

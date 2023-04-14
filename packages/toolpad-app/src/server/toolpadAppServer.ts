@@ -3,6 +3,7 @@ import * as path from 'path';
 import * as fs from 'fs/promises';
 import * as express from 'express';
 import { Server } from 'http';
+import * as mime from 'mime';
 import config from '../config';
 import { createViteConfig, getHtmlContent, postProcessHtml } from './toolpadAppBuilder';
 import { loadDom } from './liveProject';
@@ -27,13 +28,19 @@ export async function createDevHandler({ root, base, server }: ToolpadAppHandler
   const router = express.Router();
 
   router.use((req, res, next) => {
-    const oldEend = res.end;
+    const oldEnd = res.end;
     res.end = (data) => {
       if (!res.getHeader('content-type')) {
+        const type = mime.getType(res.req.url);
         // eslint-disable-next-line no-console
-        console.log(res.req.url);
+        console.log(
+          `Sending a file "${res.req.url}" without content-type, setting it to "${type}"`,
+        );
+        if (type) {
+          res.setHeader('content-type', type);
+        }
       }
-      res.end = oldEend; // set function back to avoid the 'double-send'
+      res.end = oldEnd; // set function back to avoid the 'double-send'
       return res.end(data); // just call as normal with data
     };
     next();

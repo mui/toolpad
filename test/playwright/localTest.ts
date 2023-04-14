@@ -152,7 +152,7 @@ const test = base.extend<
   ],
 });
 
-test.beforeAll(async () => {
+test.beforeEach(async () => {
   const nodeModulesFolder = path.resolve(__dirname, '../../node_modules');
   if (!(await folderExists(nodeModulesFolder))) {
     throw new Error(`Dependencies not installed`);

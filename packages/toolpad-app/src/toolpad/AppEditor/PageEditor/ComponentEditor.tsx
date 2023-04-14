@@ -1,6 +1,5 @@
 import { Stack, styled, Typography, Divider } from '@mui/material';
 import * as React from 'react';
-import * as _ from 'lodash-es';
 import {
   ArgTypeDefinition,
   ArgTypeDefinitions,
@@ -98,11 +97,6 @@ function ComponentPropsEditor<P extends object>({
     );
   }, [bindings, node.id]);
 
-  const argTypesByCategory = _.groupBy(
-    Object.entries(componentConfig.argTypes || {}) as ExactEntriesOf<ArgTypeDefinitions<P>>,
-    ([, propTypeDef]) => propTypeDef?.category || 'properties',
-  );
-
   return (
     <React.Fragment>
       {hasLayoutControls ? (
@@ -127,26 +121,24 @@ function ComponentPropsEditor<P extends object>({
           <Divider sx={{ mt: 1 }} />
         </React.Fragment>
       ) : null}
-      {Object.entries(argTypesByCategory).map(([category, argTypeEntries]) => (
-        <React.Fragment key={category}>
-          <Typography variant="overline" className={classes.sectionHeading}>
-            {category}:
-          </Typography>
-          {argTypeEntries.map(([propName, propTypeDef]) =>
-            propTypeDef && shouldRenderControl(propTypeDef, propName, props, componentConfig) ? (
-              <div key={propName} className={classes.control}>
-                <NodeAttributeEditor
-                  node={node}
-                  namespace="props"
-                  props={props}
-                  name={propName}
-                  argType={propTypeDef}
-                />
-              </div>
-            ) : null,
-          )}
-        </React.Fragment>
-      ))}
+      <Typography variant="overline" className={classes.sectionHeading}>
+        Properties:
+      </Typography>
+      {(
+        Object.entries(componentConfig.argTypes || {}) as ExactEntriesOf<ArgTypeDefinitions<P>>
+      ).map(([propName, propTypeDef]) =>
+        propTypeDef && shouldRenderControl(propTypeDef, propName, props, componentConfig) ? (
+          <div key={propName} className={classes.control}>
+            <NodeAttributeEditor
+              node={node}
+              namespace="props"
+              props={props}
+              name={propName}
+              argType={propTypeDef}
+            />
+          </div>
+        ) : null,
+      )}
     </React.Fragment>
   );
 }

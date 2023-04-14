@@ -44,7 +44,7 @@ const NodeHudWrapper = styled('div', {
   outline: `1px dotted ${isOutlineVisible ? theme.palette.primary[500] : 'transparent'}`,
   zIndex: 80,
   '&:hover': {
-    outline: `2px dashed ${isHoverable ? theme.palette.primary[500] : 'transparent'}`,
+    outline: `2px dashed ${isHoverable ? 'transparent' : theme.palette.primary[500]}`,
   },
   [`.${nodeHudClasses.selected}`]: {
     position: 'absolute',

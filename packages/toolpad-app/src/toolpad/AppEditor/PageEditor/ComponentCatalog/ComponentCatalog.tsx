@@ -23,6 +23,7 @@ const FUTURE_COMPONENTS = new Map<string, FutureComponentSpec>([
   ['Drawer', { url: 'https://github.com/mui/mui-toolpad/issues/1540', displayName: 'Drawer' }],
   ['Html', { url: 'https://github.com/mui/mui-toolpad/issues/1311', displayName: 'Html' }],
   ['Icon', { url: 'https://github.com/mui/mui-toolpad/issues/83', displayName: 'Icon' }],
+  ['Form', { url: 'https://github.com/mui/mui-toolpad/issues/749', displayName: 'Form' }],
   ['Card', { url: 'https://github.com/mui/mui-toolpad/issues/748', displayName: 'Card' }],
   ['Slider', { url: 'https://github.com/mui/mui-toolpad/issues/746', displayName: 'Slider' }],
   ['Switch', { url: 'https://github.com/mui/mui-toolpad/issues/745', displayName: 'Switch' }],

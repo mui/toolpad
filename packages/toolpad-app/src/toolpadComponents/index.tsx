@@ -17,7 +17,6 @@ export type InstantiatedComponents = Record<string, InstantiatedComponent | unde
 export const PAGE_ROW_COMPONENT_ID = 'PageRow';
 export const PAGE_COLUMN_COMPONENT_ID = 'PageColumn';
 export const STACK_COMPONENT_ID = 'Stack';
-export const FORM_COMPONENT_ID = 'Form';
 
 export const INTERNAL_COMPONENTS = new Map<string, ToolpadComponentDefinition>([
   [PAGE_ROW_COMPONENT_ID, { displayName: 'Row', builtIn: 'PageRow', system: true }],
@@ -41,7 +40,6 @@ export const INTERNAL_COMPONENTS = new Map<string, ToolpadComponentDefinition>([
   ['Paper', { displayName: 'Paper', builtIn: 'Paper' }],
   ['Tabs', { displayName: 'Tabs', builtIn: 'Tabs' }],
   ['Container', { displayName: 'Container', builtIn: 'Container' }],
-  [FORM_COMPONENT_ID, { displayName: 'Form', builtIn: 'Form' }],
 ]);
 
 function createCodeComponent(domNode: appDom.CodeComponentNode): ToolpadComponentDefinition {
@@ -85,8 +83,4 @@ export function isPageColumn(elementNode: appDom.ElementNode): boolean {
 
 export function isPageLayoutComponent(elementNode: appDom.ElementNode): boolean {
   return isPageRow(elementNode) || isPageColumn(elementNode);
-}
-
-export function isFormComponent(elementNode: appDom.ElementNode): boolean {
-  return getElementNodeComponentId(elementNode) === FORM_COMPONENT_ID;
 }

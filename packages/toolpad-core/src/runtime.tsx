@@ -19,13 +19,7 @@ declare global {
   }
 }
 
-export const NodeRuntimeContext = React.createContext<{
-  nodeId: string | null;
-  nodeName: string | null;
-}>({
-  nodeId: null,
-  nodeName: null,
-});
+export const NodeRuntimeContext = React.createContext<string | null>(null);
 export const CanvasEventsContext = React.createContext<Emitter<RuntimeEvents>>(new Emitter());
 
 // NOTE: These props aren't used, they are only there to transfer information from the
@@ -88,14 +82,12 @@ function NodeFiberHost({ children }: NodeFiberHostProps) {
 export interface NodeRuntimeWrapperProps {
   children: React.ReactElement;
   nodeId: string;
-  nodeName: string;
   componentConfig: ComponentConfig<any>;
   NodeError: React.ComponentType<NodeErrorProps>;
 }
 
 export function NodeRuntimeWrapper({
   nodeId,
-  nodeName,
   componentConfig,
   children,
   NodeError,
@@ -117,11 +109,9 @@ export function NodeRuntimeWrapper({
     [NodeError, componentConfig, nodeId],
   );
 
-  const nodeRuntimeValue = React.useMemo(() => ({ nodeId, nodeName }), [nodeId, nodeName]);
-
   return (
     <ErrorBoundary resetKeys={[resetNodeErrorsKey]} fallbackRender={ErrorFallback}>
-      <NodeRuntimeContext.Provider value={nodeRuntimeValue}>
+      <NodeRuntimeContext.Provider value={nodeId}>
         <NodeFiberHost
           {...{
             [RUNTIME_PROP_NODE_ID]: nodeId,
@@ -136,8 +126,6 @@ export function NodeRuntimeWrapper({
 }
 
 export interface NodeRuntime<P> {
-  nodeId: string | null;
-  nodeName: string | null;
   updateAppDomConstProp: <K extends keyof P & string>(
     key: K,
     value: React.SetStateAction<P[K]>,
@@ -145,7 +133,7 @@ export interface NodeRuntime<P> {
 }
 
 export function useNode<P = {}>(): NodeRuntime<P> | null {
-  const { nodeId, nodeName } = React.useContext(NodeRuntimeContext);
+  const nodeId = React.useContext(NodeRuntimeContext);
   const canvasEvents = React.useContext(CanvasEventsContext);
 
   return React.useMemo(() => {
@@ -153,8 +141,6 @@ export function useNode<P = {}>(): NodeRuntime<P> | null {
       return null;
     }
     return {
-      nodeId,
-      nodeName,
       updateAppDomConstProp: (prop, value) => {
         canvasEvents.emit('propUpdated', {
           nodeId,
@@ -163,7 +149,7 @@ export function useNode<P = {}>(): NodeRuntime<P> | null {
         });
       },
     };
-  }, [canvasEvents, nodeId, nodeName]);
+  }, [canvasEvents, nodeId]);
 }
 
 export interface PlaceholderProps {
@@ -173,7 +159,7 @@ export interface PlaceholderProps {
 }
 
 export function Placeholder({ prop, children, hasLayout = false }: PlaceholderProps) {
-  const { nodeId } = React.useContext(NodeRuntimeContext);
+  const nodeId = React.useContext(NodeRuntimeContext);
   if (!nodeId) {
     return <React.Fragment>{children}</React.Fragment>;
   }
@@ -197,7 +183,7 @@ export interface SlotsProps {
 }
 
 export function Slots({ prop, children }: SlotsProps) {
-  const { nodeId } = React.useContext(NodeRuntimeContext);
+  const nodeId = React.useContext(NodeRuntimeContext);
   if (!nodeId) {
     return <React.Fragment>{children}</React.Fragment>;
   }

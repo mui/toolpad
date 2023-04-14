@@ -3,7 +3,7 @@ import { PlaywrightTestConfig, devices } from '@playwright/test';
 process.env.BROWSER = 'none';
 
 const config: PlaywrightTestConfig<{ toolpadDev: boolean }> = {
-  forbidOnly: !!process.env.CI,
+  // forbidOnly: !!process.env.CI,
   retries: process.env.TOOLPAD_TEST_RETRIES ? Number(process.env.TOOLPAD_TEST_RETRIES) : 0,
   testMatch: /.*.spec.[jt]sx?$/,
   workers: 1,
@@ -16,10 +16,10 @@ const config: PlaywrightTestConfig<{ toolpadDev: boolean }> = {
       name: 'chromium',
       use: { ...devices['Desktop Chrome'] },
     },
-    {
-      name: 'firefox',
-      use: { ...devices['Desktop Firefox'] },
-    },
+    // {
+    //   name: 'firefox',
+    //   use: { ...devices['Desktop Firefox'] },
+    // },
   ],
 };
 

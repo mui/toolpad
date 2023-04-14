@@ -82,6 +82,13 @@ module.exports = {
       },
     },
     {
+      files: ['packages/toolpad-app/**/*'],
+      excludedFiles: ['**/jest-environment-jsdom.ts', 'tsup.config.ts', '*.spec.ts', '*.spec.tsx'],
+      rules: {
+        'import/no-extraneous-dependencies': ['error'],
+      },
+    },
+    {
       files: ['packages/toolpad-app/pages/**/*'],
       rules: {
         // The pattern is useful to type Next.js pages

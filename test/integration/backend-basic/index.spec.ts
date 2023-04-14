@@ -39,7 +39,7 @@ test('function editor reload', async ({ page, localApp }) => {
 
   await expect(editorModel.appCanvas.getByText('edited hello')).toBeVisible();
 
-  const queriesFilePath = path.resolve(localApp.dir, './toolpad/queries.ts');
+  const queriesFilePath = path.resolve(localApp.dir, './toolpad/resources/functions.ts');
   await fileReplace(queriesFilePath, "'edited hello'", "'edited goodbye!!!'");
 
   // TODO: make this unnecessary:

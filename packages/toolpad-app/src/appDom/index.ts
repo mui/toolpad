@@ -357,10 +357,14 @@ export function assertIsMutation<P>(node: AppDomNode): asserts node is MutationN
   assertIsType<MutationNode>(node, 'mutation');
 }
 
+export function getRoot(dom: AppDom): AppDomNode {
+  return getNode(dom, dom.root);
+}
+
 export function getApp(dom: AppDom): AppNode {
-  const rootNode = getNode(dom, dom.root);
-  assertIsApp(rootNode);
-  return rootNode;
+  const app = getRoot(dom);
+  assertIsApp(app);
+  return app;
 }
 
 export type NodeChildren<N extends AppDomNode = any> = ChildNodesOf<N>;
@@ -500,18 +504,33 @@ export function createNode<T extends AppDomNodeType>(
   });
 }
 
-export function createDom(): AppDom {
-  const rootId = createId();
+export function createFragmentInternal<T extends AppDomNodeType>(
+  id: NodeId,
+  type: T,
+  init: AppDomNodeInitOfType<T> & { name: string },
+): AppDom {
   return {
     nodes: {
-      [rootId]: createNodeInternal(rootId, 'app', {
-        name: 'Application',
-        attributes: {},
-      }),
+      [id]: createNodeInternal(id, type, init),
     },
-    root: rootId,
+    root: id,
     version: CURRENT_APPDOM_VERSION,
   };
+}
+
+export function createFragment<T extends AppDomNodeType>(
+  type: T,
+  init: AppDomNodeInitOfType<T> & { name: string },
+): AppDom {
+  const rootId = createId();
+  return createFragmentInternal(rootId, type, init);
+}
+
+export function createDom(): AppDom {
+  return createFragment('app', {
+    name: 'Application',
+    attributes: {},
+  });
 }
 
 /**

@@ -1,6 +1,6 @@
 {
   "name": "@mui/toolpad-app",
-  "version": "0.1.3",
+  "version": "0.1.6",
   "license": "MIT",
   "scripts": {
     "build": "concurrently \"yarn:build:*\" && rimraf ./.next/cache",
@@ -24,6 +24,12 @@
     "cli.js",
     ".next"
   ],
+  "exports": {
+    "./package.json": "./package.json",
+    "./cli": {
+      "require": "./dist/cli/index.js"
+    }
+  },
   "dependencies": {
     "@babel/code-frame": "^7.21.4",
     "@emotion/cache": "^11.10.7",
@@ -33,17 +39,18 @@
     "@googleapis/drive": "^5.0.2",
     "@googleapis/sheets": "^4.0.2",
     "@mui/icons-material": "^5.11.16",
-    "@mui/lab": "^5.0.0-alpha.125",
-    "@mui/material": "^5.11.16",
-    "@mui/system": "^5.11.16",
-    "@mui/toolpad-components": "^0.1.3",
-    "@mui/toolpad-core": "^0.1.3",
-    "@mui/types": "^7.2.3",
-    "@mui/utils": "^5.11.13",
-    "@mui/x-data-grid-generator": "^6.1.0",
-    "@mui/x-data-grid-pro": "^6.1.0",
-    "@mui/x-date-pickers": "^6.1.0",
-    "@mui/x-date-pickers-pro": "^6.1.0",
+    "@mui/lab": "^5.0.0-alpha.126",
+    "@mui/material": "^5.12.0",
+    "@mui/system": "^5.12.0",
+    "@mui/toolpad-components": "^0.1.6",
+    "@mui/toolpad-core": "^0.1.6",
+    "@mui/types": "^7.2.4",
+    "@mui/utils": "^5.12.0",
+    "@mui/x-data-grid": "^6.2.0",
+    "@mui/x-data-grid-generator": "^6.2.0",
+    "@mui/x-data-grid-pro": "^6.2.0",
+    "@mui/x-date-pickers": "^6.2.0",
+    "@mui/x-date-pickers-pro": "^6.2.0",
     "@next/bundle-analyzer": "^13.3.0",
     "@swc/wasm": "^1.3.46",
     "@tanstack/react-query": "^4.28.0",
@@ -53,6 +60,7 @@
     "abort-controller": "^3.0.0",
     "arg": "^5.0.2",
     "basic-auth": "^2.0.1",
+    "chalk": "^5.2.0",
     "chokidar": "^3.5.3",
     "clsx": "^1.2.1",
     "concurrently": "^8.0.1",
@@ -67,6 +75,8 @@
     "find-up": "^6.3.0",
     "fractional-indexing": "^3.2.0",
     "get-port": "^6.1.2",
+    "glob": "^9.3.4",
+    "google-auth-library": "^8.7.0",
     "history": "^5.3.0",
     "invariant": "^2.2.4",
     "json-to-ts": "^1.7.0",
@@ -101,7 +111,11 @@
     "superjson": "^1.12.2",
     "ts-node": "^10.9.1",
     "whatwg-url": "^12.0.1",
-    "yaml": "^2.2.1"
+    "yaml": "^2.2.1",
+    "yaml-diff-patch": "^2.0.0",
+    "yargs": "^17.7.1",
+    "zod": "^3.21.4",
+    "zod-validation-error": "^1.1.0"
   },
   "devDependencies": {
     "@types/babel__code-frame": "^7.0.3",
@@ -126,7 +140,6 @@
     "eslint-plugin-import": "^2.27.5",
     "formidable": "^2.1.1",
     "get-port": "^6.1.2",
-    "glob": "^9.3.4",
     "pino-pretty": "^10.0.0",
     "react-transition-group": "^4.4.5",
     "typescript": "^5.0.4",
@@ -136,5 +149,5 @@
   "publishConfig": {
     "access": "public"
   },
-  "gitHead": "53da43a28ad75dac925f4f4e7716483c937e5056"
+  "gitHead": "5c310012b1b92ee53a0a1051b92f84564f915faf"
 }

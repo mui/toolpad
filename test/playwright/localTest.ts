@@ -76,6 +76,10 @@ export async function withApp(
       }
 
       await once(child, 'exit');
+
+      if (child.exitCode !== 0) {
+        throw new Error('Build failed');
+      }
     }
 
     const child = childProcess.spawn('toolpad', args, {

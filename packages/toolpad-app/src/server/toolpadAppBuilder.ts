@@ -123,7 +123,8 @@ function toolpadVitePlugin({ root, base }: ToolpadVitePluginParams): Plugin {
         return resolvedComponentsId;
       }
       if (importer === resolvedRuntimeEntryPointId || importer === resolvedComponentsId) {
-        return path.resolve(root, 'toolpad', id);
+        const newId = path.resolve(root, 'toolpad', id);
+        return this.resolve(newId, importer);
       }
       return null;
     },
@@ -189,6 +190,15 @@ export function createViteConfig({
     mode,
     build: {
       outDir: getAppOutputFolder(root),
+      chunkSizeWarningLimit: Infinity,
+      rollupOptions: {
+        onwarn(warning, warn) {
+          if (warning.code === 'MODULE_LEVEL_DIRECTIVE') {
+            return;
+          }
+          warn(warning);
+        },
+      },
     },
     server: {
       middlewareMode: true,
@@ -200,7 +210,7 @@ export function createViteConfig({
       },
     },
     appType: 'custom',
-    logLevel: 'warn',
+    logLevel: 'info',
     root,
     resolve: {
       alias: {},

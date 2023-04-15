@@ -37,7 +37,7 @@ export async function createDevHandler({ root, base, server }: ToolpadAppHandler
         // TODO: investigate what happens en report to vite
         // eslint-disable-next-line no-console
         console.log(
-          `Sending a file "${res.req.url}" without content-type, forcing it to be "${type}"`,
+          `Sending a file "${res.req.url}" ${res.statusCode} without content-type, forcing it to be "${type}"`,
         );
         if (type) {
           res.setHeader('content-type', type);

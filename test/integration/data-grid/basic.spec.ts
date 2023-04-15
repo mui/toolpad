@@ -10,7 +10,7 @@ test.use({
   },
 });
 
-test('Column prop updates are not lost on drag interactions', async ({ page }) => {
+test.only('Column prop updates are not lost on drag interactions', async ({ page }) => {
   const editorModel = new ToolpadEditor(page);
   editorModel.goto();
 

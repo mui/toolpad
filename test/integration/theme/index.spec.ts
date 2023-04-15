@@ -9,7 +9,7 @@ test.use({
   },
 });
 
-test('can change between light and dark themes', async ({ page }) => {
+test.only('can change between light and dark themes', async ({ page }) => {
   const editorModel = new ToolpadEditor(page);
 
   await editorModel.goto();

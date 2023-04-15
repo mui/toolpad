@@ -188,6 +188,15 @@ export function createViteConfig({
   return {
     configFile: false,
     mode,
+    optimizeDeps: {
+      include: [
+        '@mui/toolpad-app/runtime',
+        '@mui/toolpad-app/canvas',
+        '@mui/toolpad-components',
+        '@mui/x-data-grid-pro',
+      ],
+      force: true,
+    },
     build: {
       outDir: getAppOutputFolder(root),
       chunkSizeWarningLimit: Infinity,

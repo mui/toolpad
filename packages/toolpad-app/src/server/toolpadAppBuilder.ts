@@ -194,6 +194,8 @@ export function createViteConfig({
         '@mui/toolpad-app/canvas',
         '@mui/toolpad-components',
         '@mui/x-data-grid-pro',
+        '@mui/material',
+        'react-is',
       ],
       force: true,
     },

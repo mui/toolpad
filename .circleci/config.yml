@@ -156,6 +156,9 @@ jobs:
           environment:
             HTTPBIN_BASEURL: 'http://localhost/'
           command: yarn test:integration
+      - store_artifacts:
+          path: test-results
+          destination: playwright-test-results
 
 workflows:
   pipeline:

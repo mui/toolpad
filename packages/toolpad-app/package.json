@@ -128,7 +128,7 @@
     "@types/node-fetch": "^2.6.3",
     "@types/pg": "^8.6.6",
     "@types/prettier": "^2.7.2",
-    "@types/react": "^18.0.33",
+    "@types/react": "^18.0.35",
     "@types/react-dom": "^18.0.11",
     "@types/react-inspector": "^4.0.2",
     "@types/serialize-javascript": "^5.0.2",
@@ -143,7 +143,7 @@
     "pino-pretty": "^10.0.0",
     "react-transition-group": "^4.4.5",
     "typescript": "^5.0.4",
-    "webpack": "^5.78.0"
+    "webpack": "^5.79.0"
   },
   "typings": "./index.d.ts",
   "publishConfig": {

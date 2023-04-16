@@ -57,7 +57,7 @@ async function runApp(cmd: Command, { port, dev = false, dir }: RunOptions) {
     }
   }
 
-  const serverPath = path.resolve(__dirname, './server.cjs');
+  const serverPath = path.resolve(__dirname, './server.js');
 
   const cp = execaNode(serverPath, [], {
     cwd: projectDir,

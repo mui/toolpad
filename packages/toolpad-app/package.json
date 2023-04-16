@@ -24,11 +24,10 @@
     "cli.js",
     ".next"
   ],
-  "type": "module",
   "exports": {
     "./package.json": "./package.json",
     "./cli": {
-      "require": "./dist/cli/index.cjs"
+      "require": "./dist/cli/index.js"
     },
     "./runtime": {
       "types": "./dist/runtime/index.d.ts",

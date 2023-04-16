@@ -48,6 +48,7 @@
     "@swc/helpers": "^0.5.0",
     "@testing-library/jest-dom": "^5.16.5",
     "@testing-library/react": "^14.0.0",
+    "@types/archiver": "^5.3.2",
     "@types/gtag.js": "^0.0.12",
     "@types/jest": "^29.5.0",
     "@types/node": "^18.15.11",
@@ -83,6 +84,7 @@
     "yarn-deduplicate": "^6.0.1"
   },
   "dependencies": {
+    "archiver": "^5.3.1",
     "cross-env": "^7.0.3",
     "dotenv-cli": "^7.2.1",
     "inquirer": "^9.1.5",

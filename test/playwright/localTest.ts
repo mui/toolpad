@@ -5,6 +5,9 @@ import childProcess from 'child_process';
 import { Readable } from 'stream';
 import { once } from 'events';
 import invariant from 'invariant';
+import * as archiver from 'archiver';
+import { createWriteStream } from 'fs';
+import { pipeline } from 'stream/promises';
 import { test as base } from './test';
 
 interface RunningLocalApp {
@@ -118,7 +121,9 @@ export async function withApp(
 }
 
 const test = base.extend<
-  {},
+  {
+    projectSnapshot: null;
+  },
   {
     browserCloser: null;
     localApp: RunningLocalApp;
@@ -152,6 +157,25 @@ const test = base.extend<
       scope: 'worker',
       auto: true,
     },
+  ],
+  projectSnapshot: [
+    async ({ localApp }, use, testInfo) => {
+      if (testInfo.status === 'passed' || testInfo.status === 'skipped') {
+        return;
+      }
+
+      await use(null);
+      await fs.mkdir(testInfo.outputDir, { recursive: true });
+      const output = createWriteStream(
+        path.resolve(testInfo.outputDir, './projectSnapshot.zip'),
+        {},
+      );
+      const archive = archiver.create('zip');
+      archive.directory(localApp.dir, false);
+      archive.finalize();
+      await pipeline(archive, output);
+    },
+    { auto: true },
   ],
 });
 

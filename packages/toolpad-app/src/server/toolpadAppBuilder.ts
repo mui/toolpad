@@ -212,7 +212,13 @@ export function createViteConfig({
     appType: 'custom',
     logLevel: 'info',
     root,
-    plugins: [react({ jsxRuntime: 'classic' }), toolpadVitePlugin({ root, base })],
+    plugins: [
+      react({
+        // TODO: investigate why leaving this undefined breaks production in CI
+        jsxRuntime: 'classic',
+      }),
+      toolpadVitePlugin({ root, base }),
+    ],
     base,
     define: {
       'process.env.NODE_ENV': `'${mode}'`,

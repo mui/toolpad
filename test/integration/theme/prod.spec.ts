@@ -9,7 +9,7 @@ test.use({
   },
 });
 
-test.only('Uses correct theme background with preferred color scheme', async ({ page }) => {
+test('Uses correct theme background with preferred color scheme', async ({ page }) => {
   await page.goto('/prod/pages/m31v9c7');
   await page.getByText('Hello world!').waitFor();
   const body = await page.waitForSelector('body');

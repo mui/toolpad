@@ -3,13 +3,12 @@ import { PlaywrightTestConfig, devices } from '@playwright/test';
 process.env.BROWSER = 'none';
 
 const config: PlaywrightTestConfig<{ toolpadDev: boolean }> = {
-  // forbidOnly: !!process.env.CI,
+  forbidOnly: !!process.env.CI,
   retries: process.env.TOOLPAD_TEST_RETRIES ? Number(process.env.TOOLPAD_TEST_RETRIES) : 0,
   testMatch: /.*.spec.[jt]sx?$/,
   workers: 1,
   use: {
-    // trace: 'on-first-retry',
-    trace: { mode: 'retain-on-failure', screenshots: true },
+    // trace: { mode: 'on', screenshots: true },
     screenshot: 'only-on-failure',
 
     baseURL: process.env.PLAYWRIGHT_TEST_BASE_URL || 'http://localhost:3000/',

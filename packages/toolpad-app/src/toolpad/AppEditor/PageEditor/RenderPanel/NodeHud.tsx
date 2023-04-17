@@ -190,7 +190,7 @@ export default function NodeHud({
               -100% ${selectedNodeRect.y - rect.y}px
           )`
         : '',
-    [isInteractive, rect.x, rect.y, selectedNodeRect],
+    [isInteractive, rect, selectedNodeRect],
   );
 
   return (

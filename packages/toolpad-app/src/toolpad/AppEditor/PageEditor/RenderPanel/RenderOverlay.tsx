@@ -51,7 +51,6 @@ const overlayClasses = {
   hud: 'Toolpad_Hud',
   nodeHud: 'Toolpad_NodeHud',
   container: 'Toolpad_Container',
-  hudOverlay: 'Toolpad_HudOverlay',
   nodeDrag: 'Toolpad_NodeDrag',
   resizeHorizontal: 'Toolpad_ResizeHorizontal',
   resizeVertical: 'Toolpad_ResizeVertical',
@@ -72,10 +71,6 @@ const OverlayRoot = styled('div')({
   },
   [`&.${overlayClasses.resizeVertical}`]: {
     cursor: 'ns-resize',
-  },
-  [`.${overlayClasses.hudOverlay}`]: {
-    position: 'absolute',
-    inset: '0 0 0 0',
   },
 });
 

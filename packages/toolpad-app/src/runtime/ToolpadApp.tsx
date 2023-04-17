@@ -1260,13 +1260,13 @@ export default function ToolpadApp({
   }, [loadComponents, state]);
 
   return (
-    <AppRoot ref={rootRef}>
-      <NoSsr>
-        {components ? (
-          <ComponentsContextProvider value={components}>
-            <DomContextProvider value={dom}>
-              <AppThemeProvider dom={dom}>
-                <CssBaseline enableColorScheme />
+    <AppThemeProvider dom={dom}>
+      <CssBaseline enableColorScheme />
+      <AppRoot ref={rootRef}>
+        <NoSsr>
+          {components ? (
+            <ComponentsContextProvider value={components}>
+              <DomContextProvider value={dom}>
                 <ErrorBoundary FallbackComponent={AppError}>
                   <ResetNodeErrorsKeyProvider value={resetNodeErrorsKey}>
                     <React.Suspense fallback={<AppLoading />}>
@@ -1283,14 +1283,14 @@ export default function ToolpadApp({
                     </React.Suspense>
                   </ResetNodeErrorsKeyProvider>
                 </ErrorBoundary>
-              </AppThemeProvider>
-            </DomContextProvider>
-          </ComponentsContextProvider>
-        ) : (
-          <AppLoading />
-        )}
-      </NoSsr>
-      <EditorOverlay id={HTML_ID_EDITOR_OVERLAY} />
-    </AppRoot>
+              </DomContextProvider>
+            </ComponentsContextProvider>
+          ) : (
+            <AppLoading />
+          )}
+        </NoSsr>
+        <EditorOverlay id={HTML_ID_EDITOR_OVERLAY} />
+      </AppRoot>
+    </AppThemeProvider>
   );
 }

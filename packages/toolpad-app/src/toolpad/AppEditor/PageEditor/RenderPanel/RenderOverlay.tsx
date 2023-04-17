@@ -42,6 +42,7 @@ import { OverlayGrid, OverlayGridHandle } from './OverlayGrid';
 import { NodeInfo } from '../../../../types';
 import NodeDropArea from './NodeDropArea';
 import type { ToolpadBridge } from '../../../../canvas/ToolpadBridge';
+import { PinholeOverlay } from '../../../../PinholeOverlay';
 
 const VERTICAL_RESIZE_SNAP_UNITS = 2; // px
 
@@ -51,6 +52,7 @@ const overlayClasses = {
   hud: 'Toolpad_Hud',
   nodeHud: 'Toolpad_NodeHud',
   container: 'Toolpad_Container',
+  hudOverlay: 'Toolpad_HudOverlay',
   nodeDrag: 'Toolpad_NodeDrag',
   resizeHorizontal: 'Toolpad_ResizeHorizontal',
   resizeVertical: 'Toolpad_ResizeVertical',
@@ -71,6 +73,10 @@ const OverlayRoot = styled('div')({
   },
   [`&.${overlayClasses.resizeVertical}`]: {
     cursor: 'ns-resize',
+  },
+  [`.${overlayClasses.hudOverlay}`]: {
+    position: 'absolute',
+    inset: '0 0 0 0',
   },
 });
 
@@ -1642,6 +1648,7 @@ export default function RenderOverlay({ bridge }: RenderOverlayProps) {
             This allows interactivity on the selected element only, while maintaining
             a reliable click target for the rest of the page 
       */}
+      <PinholeOverlay className={overlayClasses.hudOverlay} pinhole={selectedRect} />
       {draggedEdge ? <OverlayGrid ref={overlayGridRef} /> : null}
     </OverlayRoot>
   );

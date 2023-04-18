@@ -40,15 +40,16 @@ async function main() {
         },
       });
 
-      await new Promise<void>((resolve, reject) => {
+      cp.once('exit', () => {
+        console.error(`App dev server failed`);
+        process.exit(1);
+      });
+
+      await new Promise<void>((resolve) => {
         cp.on('message', (msg: AppDevServerEvent) => {
           if (msg.kind === 'ready') {
             resolve();
           }
-        });
-
-        cp.once('exit', () => {
-          reject(new Error('Failed to start dev server'));
         });
       });
 

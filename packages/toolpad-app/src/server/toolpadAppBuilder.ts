@@ -232,6 +232,9 @@ export function createViteConfig({
       ...plugins,
     ],
     base,
+    define: {
+      'process.env.NODE_ENV': `'${mode}'`,
+    },
   };
 }
 

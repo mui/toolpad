@@ -38,7 +38,7 @@ async function main() {
       LIBS.map(async ({ name }) => {
         const files: { filename: string; moduleId: string }[] = [];
         const resolvedPkg = require.resolve(`${name}/package.json`);
-        const pkgJson = await import(resolvedPkg, { assert: { type: 'json' } });
+        const pkgJson = await import(url.pathToFileURL(resolvedPkg).toString(), { assert: { type: 'json' } });
         const pkgDir = path.dirname(resolvedPkg);
 
         const dtsFiles = await glob('**/*.d.ts', {

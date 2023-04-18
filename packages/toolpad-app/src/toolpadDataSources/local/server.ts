@@ -78,7 +78,7 @@ function formatCodeFrame(location: esbuild.Location): string {
 }
 
 async function createMain(): Promise<string> {
-  const relativeFunctionsFilePath = [`.`, getFunctionsFile('.')].join(path.sep);
+  const relativeFunctionsFilePath = path.resolve([`.`, getFunctionsFile('.')].join(path.sep));
   return `
     import { TOOLPAD_QUERY } from '@mui/toolpad-core/server';
     import { errorFrom, serializeError } from '@mui/toolpad-core/utils/errors';

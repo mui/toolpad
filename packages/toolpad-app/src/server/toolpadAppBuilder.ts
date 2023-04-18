@@ -14,6 +14,9 @@ const MAIN_ENTRY = '/main.tsx';
 const CANVAS_ENTRY = '/canvas.tsx';
 const INITIAL_STATE_WINDOW_PROPERTY = '__initialToolpadState__';
 
+const componentsId = `virtual:toolpad:components.js`;
+export const resolvedComponentsId = `\0${componentsId}`;
+
 export interface GetHtmlContentParams {
   canvas: boolean;
 }
@@ -85,25 +88,33 @@ function toolpadVitePlugin({ root, base }: ToolpadVitePluginParams): Plugin {
   const resolvedRuntimeEntryPointId = `\0${MAIN_ENTRY}`;
   const resolvedCanvasEntryPointId = `\0${CANVAS_ENTRY}`;
 
-  const componentsId = `virtual:toolpad:components`;
-  const resolvedComponentsId = `\0${componentsId}`;
-
   const getEntryPoint = (isCanvas: boolean) => `
-    import { init } from '@mui/toolpad-app/runtime';
+    import { init, setComponents } from '@mui/toolpad-app/runtime';
     import { LicenseInfo } from '@mui/x-data-grid-pro';
-    import components from 'virtual:toolpad:components';
+    import components from ${JSON.stringify(componentsId)};
     ${isCanvas ? `import AppCanvas from '@mui/toolpad-app/canvas'` : ''}
     
     LicenseInfo.setLicenseKey(${JSON.stringify(MUI_X_PRO_LICENSE)});
     
     const initialState = window[${JSON.stringify(INITIAL_STATE_WINDOW_PROPERTY)}];
 
+    setComponents(components);
+
     init({
       ${isCanvas ? `ToolpadApp: AppCanvas,` : ''}
       base: ${JSON.stringify(base)},
-      components,
       initialState,
     })
+
+    if (import.meta.hot) {
+      // TODO: investigate why this doesn't work:
+      import.meta.hot.accept(${JSON.stringify(`/@id/__x00__${componentsId}`)}, (newComponents) => {
+        if (newComponents) {
+          console.log('hot updating Toolpad components')
+          setComponents(newComponents);
+        }
+      });
+    }
   `;
 
   return {
@@ -155,14 +166,16 @@ function toolpadVitePlugin({ root, base }: ToolpadVitePluginParams): Plugin {
           ({ name }) => `${JSON.stringify(`codeComponent.${name}`)}: ${name}`,
         );
 
-        return {
-          code: `
-            ${imports.join('\n')}
+        const code = `
+          ${imports.join('\n')}
 
-            export default {
-              ${indent(defaultExportProperties.join(',\n'), 2)}
-            }
-          `,
+          export default {
+            ${indent(defaultExportProperties.join(',\n'), 2)}
+          };
+        `;
+
+        return {
+          code,
           map: null,
         };
       }
@@ -172,17 +185,19 @@ function toolpadVitePlugin({ root, base }: ToolpadVitePluginParams): Plugin {
 }
 
 export interface CreateViteConfigParams {
+  middlewareMode?: boolean;
   server?: Server;
   dev: boolean;
   root: string;
   base: string;
+  plugins?: Plugin[];
 }
 
 export function createViteConfig({
   root,
   dev,
   base,
-  server,
+  plugins = [],
 }: CreateViteConfigParams): InlineConfig {
   const mode = dev ? 'development' : 'production';
   return {
@@ -201,10 +216,6 @@ export function createViteConfig({
       },
     },
     server: {
-      middlewareMode: true,
-      hmr: {
-        server,
-      },
       fs: {
         allow: [root, path.resolve(__dirname, '../../../../')],
       },
@@ -218,6 +229,7 @@ export function createViteConfig({
         jsxRuntime: 'classic',
       }),
       toolpadVitePlugin({ root, base }),
+      ...plugins,
     ],
     base,
     define: {

@@ -1,10 +1,17 @@
 import { parse } from 'url';
 import next from 'next';
+import * as path from 'path';
 import express from 'express';
 import invariant from 'invariant';
 import { createServer } from 'http';
-import { createDevHandler, createProdHandler } from '../src/server/toolpadAppServer';
+import { execaNode } from 'execa';
+import getPort from 'get-port';
+import { createProxyMiddleware } from 'http-proxy-middleware';
+import { createProdHandler } from '../src/server/toolpadAppServer';
 import { getUserProjectRoot } from '../src/server/localMode';
+import { listen } from '../src/utils/http';
+import { getProject } from '../src/server/liveProject';
+import { Command as AppDevServerCommand, Event as AppDevServerEvent } from './appServer';
 
 async function main() {
   const { default: chalk } = await import('chalk');
@@ -16,12 +23,50 @@ async function main() {
 
   switch (cmd) {
     case 'dev': {
-      const previewApp = await createDevHandler({
-        server: httpServer,
-        root: getUserProjectRoot(),
-        base: '/preview',
+      const projectDir = getUserProjectRoot();
+
+      const appServerPath = path.resolve(__dirname, './appServer.js');
+      const devPort = await getPort();
+      const project = await getProject();
+
+      const cp = execaNode(appServerPath, [], {
+        cwd: projectDir,
+        stdio: 'inherit',
+        env: {
+          NODE_ENV: 'development',
+          TOOLPAD_PROJECT_DIR: projectDir,
+          TOOLPAD_PORT: String(devPort),
+          FORCE_COLOR: '1',
+        },
       });
-      app.use('/preview', previewApp);
+
+      await new Promise<void>((resolve, reject) => {
+        cp.on('message', (msg: AppDevServerEvent) => {
+          if (msg.kind === 'ready') {
+            resolve();
+          }
+        });
+
+        cp.once('exit', () => {
+          reject(new Error('Failed to start dev server'));
+        });
+      });
+
+      project.events.on('componentsListChanged', () => {
+        cp.send({ kind: 'reload-components' } satisfies AppDevServerCommand);
+      });
+
+      app.use(
+        '/preview',
+        createProxyMiddleware({
+          logLevel: 'silent',
+          ws: true,
+          target: {
+            host: 'localhost',
+            port: devPort,
+          },
+        }),
+      );
       break;
     }
     case 'start': {
@@ -61,15 +106,7 @@ async function main() {
     }
   });
 
-  await new Promise<void>((resolve, reject) => {
-    httpServer
-      .once('error', (err) => {
-        reject(err);
-      })
-      .listen(port, () => {
-        resolve();
-      });
-  });
+  await listen(httpServer, port);
 
   // eslint-disable-next-line no-console
   console.log(

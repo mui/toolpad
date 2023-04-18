@@ -6,10 +6,11 @@ export default defineConfig([
     entry: {
       index: './cli/index.ts',
       server: './cli/server.ts',
+      appServer: './cli/appServer.ts',
     },
     outDir: 'dist/cli',
     silent: true,
-    noExternal: ['open-editor', 'execa', 'fractional-indexing', 'lodash-es', 'chalk'],
+    noExternal: ['open-editor', 'execa', 'fractional-indexing', 'lodash-es', 'chalk', 'get-port'],
     clean: true,
     sourcemap: true,
     async onSuccess() {

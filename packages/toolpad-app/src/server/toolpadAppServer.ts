@@ -1,10 +1,9 @@
-import { createServer } from 'vite';
 import * as path from 'path';
 import * as fs from 'fs/promises';
 import * as express from 'express';
 import { Server } from 'http';
 import config from '../config';
-import { createViteConfig, getHtmlContent, postProcessHtml } from './toolpadAppBuilder';
+import { postProcessHtml } from './toolpadAppBuilder';
 import { loadDom } from './liveProject';
 import { getAppOutputFolder } from './localMode';
 
@@ -19,35 +18,6 @@ export interface ToolpadAppHandlerParams {
   server: Server;
   root: string;
   base: string;
-}
-
-export async function createDevHandler({ root, base, server }: ToolpadAppHandlerParams) {
-  const devServer = await createServer(createViteConfig({ dev: true, root, base, server }));
-
-  const router = express.Router();
-
-  router.use(devServer.middlewares);
-
-  router.use('*', async (req, res, next) => {
-    const url = req.originalUrl;
-    const canvas = req.query['toolpad-display'] === 'canvas';
-
-    try {
-      const dom = await loadDom();
-
-      const template = getHtmlContent({ canvas });
-
-      let html = await devServer.transformIndexHtml(url, template);
-
-      html = postProcessHtml(html, { config, dom });
-
-      res.status(200).set('content-type', 'text/html').end(html);
-    } catch (e) {
-      next(e);
-    }
-  });
-
-  return router;
 }
 
 export async function createProdHandler({ root }: ToolpadAppHandlerParams) {

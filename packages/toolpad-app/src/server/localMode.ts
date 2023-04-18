@@ -10,6 +10,7 @@ import { glob } from 'glob';
 import * as chokidar from 'chokidar';
 import { debounce } from 'lodash-es';
 import cuid from 'cuid';
+import Emitter from '@mui/toolpad-core/utils/Emitter';
 import config from '../config';
 import * as appDom from '../appDom';
 import { errorFrom } from '../utils/errors';
@@ -1006,9 +1007,13 @@ function appDomToProjectFolder(dom: appDom.AppDom): ToolpadProjectFolder {
   return { pages, components, theme };
 }
 
-async function loadDomFromDisk(): Promise<appDom.AppDom> {
+async function loadProjectFolder(): Promise<ToolpadProjectFolder> {
   const root = getUserProjectRoot();
-  const projectFolder = await readProjectFolder(root);
+  return readProjectFolder(root);
+}
+
+export async function loadDomFromDisk(): Promise<appDom.AppDom> {
+  const projectFolder = await loadProjectFolder();
   return projectFolderToAppDom(projectFolder);
 }
 
@@ -1098,6 +1103,11 @@ async function initToolpadFolder(root: string) {
   await initGitignore(root);
 }
 
+function getCodeComponentsFingerprint(dom: appDom.AppDom) {
+  const { codeComponents = [] } = appDom.getChildNodes(dom, appDom.getApp(dom));
+  return codeComponents.map(({ name }) => name).join('|');
+}
+
 export async function initProject() {
   const root = getUserProjectRoot();
 
@@ -1106,8 +1116,13 @@ export async function initProject() {
   await initToolpadFolder(root);
 
   let [dom, fingerprint] = await Promise.all([loadDomFromDisk(), calculateDomFingerprint(root)]);
-
+  let codeComponentsFingerprint = getCodeComponentsFingerprint(dom);
   const lock = new Lock();
+
+  const events = new Emitter<{
+    change: { fingerprint: number };
+    componentsListChanged: {};
+  }>();
 
   const updateDomFromExternal = debounce(() => {
     lock.use(async () => {
@@ -1116,6 +1131,13 @@ export async function initProject() {
         // eslint-disable-next-line no-console
         console.log(`${chalk.magenta('event')} - Project changed on disk, updating...`);
         [dom, fingerprint] = await Promise.all([loadDomFromDisk(), calculateDomFingerprint(root)]);
+        events.emit('change', { fingerprint });
+
+        const newCodeComponentsFingerprint = getCodeComponentsFingerprint(dom);
+        if (codeComponentsFingerprint !== newCodeComponentsFingerprint) {
+          codeComponentsFingerprint = newCodeComponentsFingerprint;
+          events.emit('componentsListChanged', {});
+        }
       }
     });
   }, 100);
@@ -1127,9 +1149,12 @@ export async function initProject() {
   }
 
   return {
+    events,
+
     async loadDom() {
       return dom;
     },
+
     async saveDom(newDom: appDom.AppDom) {
       if (config.cmd !== 'dev') {
         throw new Error(`Writing to disk is only possible in toolpad dev mode.`);
@@ -1145,6 +1170,7 @@ export async function initProject() {
 
       return { fingerprint };
     },
+
     async getDomFingerPrint() {
       return fingerprint;
     },

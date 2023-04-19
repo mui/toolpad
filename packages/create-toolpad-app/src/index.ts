@@ -27,7 +27,7 @@ function hasOwnProperty<X extends {}, Y extends PropertyKey>(obj: X, prop: Y): o
 /**
  * Limits the length of a string and adds ellipsis if necessary.
  */
-export function truncate(str: string, maxLength: number, dots: string = '...') {
+function truncate(str: string, maxLength: number, dots: string = '...') {
   if (str.length <= maxLength) {
     return str;
   }

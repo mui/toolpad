@@ -144,6 +144,10 @@ export class ToolpadEditor {
     await this.page.mouse.up();
   }
 
+  componentCatalogItem(name: string): Locator {
+    return this.page.getByTestId('component-catalog').getByRole('button', { name });
+  }
+
   async dragNewComponentToAppCanvas(componentName: string) {
     await this.componentCatalog.hover();
 
@@ -151,16 +155,14 @@ export class ToolpadEditor {
     await this.page.waitForTimeout(200);
 
     const targetBoundingBox = await this.pageRoot.boundingBox();
-    expect(targetBoundingBox).toBeDefined();
+    await expect(targetBoundingBox).toBeDefined();
 
     const moveTargetX = targetBoundingBox!.x + targetBoundingBox!.width / 2;
     const moveTargetY = targetBoundingBox!.y + targetBoundingBox!.height / 2;
 
-    const sourceLocator = this.page.getByTestId('component-catalog').getByRole('button', {
-      name: componentName,
-    });
+    const sourceLocator = this.componentCatalogItem(componentName);
 
-    this.dragToAppCanvas(sourceLocator, moveTargetX, moveTargetY);
+    await this.dragToAppCanvas(sourceLocator, moveTargetX, moveTargetY);
   }
 
   hierarchyItem(group: string, name: string): Locator {

@@ -83,9 +83,7 @@ function pathToNodeImportSpecifier(importPath: string): string {
 }
 
 async function createMain(): Promise<string> {
-  const relativeFunctionsFilePath = pathToNodeImportSpecifier(
-    [`.`, getFunctionsFile('.')].join(path.sep),
-  );
+  const relativeFunctionsFilePath = [`.`, getFunctionsFile('.')].join(path.sep);
   return `
     import { TOOLPAD_FUNCTION } from '@mui/toolpad-core/server';
     import { errorFrom, serializeError } from '@mui/toolpad-core/utils/errors';
@@ -108,8 +106,8 @@ async function createMain(): Promise<string> {
     async function getResolvers() {
       if (!resolversPromise) {
         resolversPromise = (async () => {
-          const functions = await import(${JSON.stringify(
-            relativeFunctionsFilePath,
+          const functions = await import(${pathToNodeImportSpecifier(
+            JSON.stringify(relativeFunctionsFilePath),
           )}).catch((err) => {
             console.error(err);
             return {};

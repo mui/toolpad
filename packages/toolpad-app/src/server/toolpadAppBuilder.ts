@@ -107,8 +107,8 @@ function toolpadVitePlugin({ root, base }: ToolpadVitePluginParams): Plugin {
     })
 
     if (import.meta.hot) {
-      // TODO: investigate why this doesn't work:
-      import.meta.hot.accept(${JSON.stringify(`/@id/__x00__${componentsId}`)}, (newComponents) => {
+      // TODO: investigate why this doesn't work, see https://github.com/vitejs/vite/issues/12912
+      import.meta.hot.accept(${JSON.stringify(componentsId)}, (newComponents) => {
         if (newComponents) {
           console.log('hot updating Toolpad components')
           setComponents(newComponents);

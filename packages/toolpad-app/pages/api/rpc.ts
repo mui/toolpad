@@ -6,7 +6,7 @@ import { getLatestToolpadRelease } from '../../src/server/getLatestRelease';
 import { hasOwnProperty } from '../../src/utils/collections';
 import { errorFrom, serializeError } from '../../src/utils/errors';
 import logger from '../../src/server/logs/logger';
-import { createComponent, openCodeComponentEditor } from '../../src/server/localMode';
+import { createComponent, deletePage, openCodeComponentEditor } from '../../src/server/localMode';
 import { getDomFingerprint, loadDom, saveDom } from '../../src/server/liveProject';
 
 export interface Method<P extends any[] = any[], R = any> {
@@ -133,6 +133,9 @@ const rpcServer = {
     }),
     createComponent: createMethod<typeof createComponent>(({ params }) => {
       return createComponent(...params);
+    }),
+    deletePage: createMethod<typeof deletePage>(({ params }) => {
+      return deletePage(...params);
     }),
   },
 } as const;

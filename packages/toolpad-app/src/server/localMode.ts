@@ -76,6 +76,18 @@ function getPagesFolder(root: string): string {
   return path.join(toolpadFolder, './pages');
 }
 
+function getPageFolder(root: string, name: string): string {
+  const pagesFolder = getPagesFolder(root);
+  const pageFolder = path.resolve(pagesFolder, name);
+  return pageFolder;
+}
+
+function getPageFile(root: string, name: string): string {
+  const pageFolder = getPageFolder(root, name);
+  const pageFileName = path.resolve(pageFolder, 'page.yml');
+  return pageFileName;
+}
+
 function getComponentFilePath(componentsFolder: string, componentName: string): string {
   return path.join(componentsFolder, `${componentName}.tsx`);
 }
@@ -210,6 +222,12 @@ export async function createComponent(name: string) {
   const filePath = getComponentFilePath(componentsFolder, name);
   const content = createDefaultCodeComponent(name);
   await writeFileRecursive(filePath, content, { encoding: 'utf-8' });
+}
+
+export async function deletePage(name: string) {
+  const root = getUserProjectRoot();
+  const pageFolder = getPageFolder(root, name);
+  await fs.rm(pageFolder, { force: true, recursive: true });
 }
 
 class Lock {
@@ -849,11 +867,10 @@ function extractPagesFromDom(dom: appDom.AppDom): ExtractedPages {
   return { pages, dom };
 }
 
-async function writePagesToFiles(pagesFolder: string, pages: PagesContent) {
+async function writePagesToFiles(root: string, pages: PagesContent) {
   await Promise.all(
     Object.entries(pages).map(async ([name, page]) => {
-      const pageFolder = path.resolve(pagesFolder, name);
-      const pageFileName = path.resolve(pageFolder, 'page.yml');
+      const pageFileName = getPageFile(root, name);
       await updateYamlFile(pageFileName, page);
     }),
   );
@@ -908,9 +925,8 @@ function extractThemeContentFromDom(dom: appDom.AppDom): Theme | null {
 
 async function writeDomToDisk(dom: appDom.AppDom): Promise<void> {
   const root = getUserProjectRoot();
-  const pagesFolder = getPagesFolder(root);
   const { pages: pagesContent } = extractPagesFromDom(dom);
-  await Promise.all([writePagesToFiles(pagesFolder, pagesContent)]);
+  await Promise.all([writePagesToFiles(root, pagesContent)]);
 }
 
 export async function openCodeEditor(file: string): Promise<void> {
@@ -969,8 +985,7 @@ async function writeProjectFolder(
   folder: ToolpadProjectFolder,
   writeComponents: boolean = false,
 ): Promise<void> {
-  const pagesFolder = getPagesFolder(root);
-  await writePagesToFiles(pagesFolder, folder.pages);
+  await writePagesToFiles(root, folder.pages);
   await writeThemeFile(root, folder.theme);
   if (writeComponents) {
     const componentsFolder = getComponentsFolder(root);

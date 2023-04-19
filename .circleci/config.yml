@@ -135,6 +135,7 @@ jobs:
       - image: mcr.microsoft.com/playwright:v1.32.3-focal
         environment:
           NODE_ENV: test
+          TOOLPAD_TEST_RETRIES: 1
       - image: kennethreitz/httpbin:latest
 
     steps:

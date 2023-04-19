@@ -220,6 +220,17 @@ export function createViteConfig({
         allow: [root, path.resolve(__dirname, '../../../../')],
       },
     },
+    optimizeDeps: {
+      include: [
+        'react/jsx-runtime',
+        'react/jsx-dev-runtime',
+        '@mui/x-data-grid-pro',
+        '@mui/material/Button',
+        'react-dom/client',
+        'invariant',
+        'lodash-es',
+      ],
+    },
     appType: 'custom',
     logLevel: 'info',
     root,

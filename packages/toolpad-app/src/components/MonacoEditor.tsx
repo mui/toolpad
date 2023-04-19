@@ -7,7 +7,7 @@ import * as React from 'react';
 import * as monaco from 'monaco-editor';
 import { styled, SxProps } from '@mui/material';
 import clsx from 'clsx';
-import cuid from 'cuid';
+import { createId } from '@paralleldrive/cuid2';
 import invariant from 'invariant';
 import {
   conf as jsonBasicConf,
@@ -370,7 +370,7 @@ export default React.forwardRef<MonacoEditorHandle, MonacoEditorProps>(function 
         }
       }
     } else {
-      const pathUri = monaco.Uri.parse(`./scripts/${cuid()}${getExtension(language)}`);
+      const pathUri = monaco.Uri.parse(`./scripts/${createId()}${getExtension(language)}`);
       const model = monaco.editor.createModel(value || '', language, pathUri);
 
       instance = monaco.editor.create(rootRef.current, {

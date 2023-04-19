@@ -9,7 +9,7 @@ import { fromZodError } from 'zod-validation-error';
 import { glob } from 'glob';
 import * as chokidar from 'chokidar';
 import { debounce } from 'lodash-es';
-import cuid from 'cuid';
+import { init as cuid2 } from '@paralleldrive/cuid2';
 import config from '../config';
 import * as appDom from '../appDom';
 import { errorFrom } from '../utils/errors';
@@ -1077,7 +1077,7 @@ async function initToolpadFolder(root: string) {
       apiVersion: 'v1',
       kind: 'page',
       spec: {
-        id: cuid.slug(),
+        id: cuid2({ length: appDom.SLUG_LENGTH })(),
         title: 'Default page',
       },
     };

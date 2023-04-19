@@ -3,7 +3,6 @@ import * as path from 'path';
 import * as url from 'url';
 import { createRequire } from 'module';
 import { glob } from 'glob';
-import { readJsonFile } from '../src/utils/fs';
 
 const require = createRequire(import.meta.url);
 

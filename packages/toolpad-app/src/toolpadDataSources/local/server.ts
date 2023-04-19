@@ -106,8 +106,8 @@ async function createMain(): Promise<string> {
     async function getResolvers() {
       if (!resolversPromise) {
         resolversPromise = (async () => {
-          const functions = await import(${pathToNodeImportSpecifier(
-            JSON.stringify(relativeFunctionsFilePath),
+          const functions = await import(${JSON.stringify(
+            pathToNodeImportSpecifier(relativeFunctionsFilePath),
           )}).catch((err) => {
             console.error(err);
             return {};

@@ -8,7 +8,7 @@ const config: PlaywrightTestConfig<{ toolpadDev: boolean }> = {
   testMatch: /.*.spec.[jt]sx?$/,
   workers: 1,
   use: {
-    // trace: { mode: 'on', screenshots: true },
+    trace: { mode: 'on-first-retry', screenshots: true },
     screenshot: 'only-on-failure',
 
     baseURL: process.env.PLAYWRIGHT_TEST_BASE_URL || 'http://localhost:3000/',

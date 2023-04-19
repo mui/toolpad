@@ -6,6 +6,71 @@ import yargs from 'yargs';
 
 type PackageManager = 'npm' | 'pnpm' | 'yarn';
 
+type Require<T, K extends keyof T> = T & { [P in K]-?: T[P] };
+
+type Ensure<U, K extends PropertyKey> = K extends keyof U ? Require<U, K> : U & Record<K, unknown>;
+
+declare global {
+  interface Error {
+    code?: unknown;
+  }
+}
+/**
+ * Type aware version of Object.protoype.hasOwnProperty.
+ * See https://fettblog.eu/typescript-hasownproperty/
+ */
+
+function hasOwnProperty<X extends {}, Y extends PropertyKey>(obj: X, prop: Y): obj is Ensure<X, Y> {
+  return obj.hasOwnProperty(prop);
+}
+
+/**
+ * Limits the length of a string and adds ellipsis if necessary.
+ */
+export function truncate(str: string, maxLength: number, dots: string = '...') {
+  if (str.length <= maxLength) {
+    return str;
+  }
+  return str.slice(0, maxLength) + dots;
+}
+
+/**
+ * Creates a javascript `Error` from an unkown value if it's not already an error.
+ * Does a best effort at inferring a message. Intended to be used typically in `catch`
+ * blocks, as there is no way to enforce only `Error` objects being thrown.
+ *
+ * ```
+ * try {
+ *   // ...
+ * } catch (rawError) {
+ *   const error = errorFrom(rawError);
+ *   console.assert(error instancof Error);
+ * }
+ * ```
+ */
+
+function errorFrom(maybeError: unknown): Error {
+  if (maybeError instanceof Error) {
+    return maybeError;
+  }
+
+  if (
+    typeof maybeError === 'object' &&
+    maybeError &&
+    hasOwnProperty(maybeError, 'message') &&
+    typeof maybeError.message! === 'string'
+  ) {
+    return new Error(maybeError.message, { cause: maybeError });
+  }
+
+  if (typeof maybeError === 'string') {
+    return new Error(maybeError, { cause: maybeError });
+  }
+
+  const message = truncate(JSON.stringify(maybeError), 500);
+  return new Error(message, { cause: maybeError });
+}
+
 function getPackageManager(): PackageManager {
   const userAgent = process.env.npm_config_user_agent;
 
@@ -80,14 +145,15 @@ const validatePath = async (relativePath: string): Promise<boolean | string> => 
     return `${chalk.red('error')} - The directory at ${chalk.blue(
       absolutePath,
     )} contains files that could conflict. Either use a new directory, or remove conflicting files.`;
-  } catch (error: any) {
+  } catch (rawError: unknown) {
     // Directory does not exist, create it
+    const error = errorFrom(rawError);
     if (error.code === 'ENOENT') {
       await fs.mkdir(absolutePath, { recursive: true });
       return true;
     }
     // Unexpected error, let it bubble up and crash the process
-    throw new Error(error);
+    throw error;
   }
 };
 

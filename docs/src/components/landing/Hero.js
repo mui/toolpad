@@ -1,14 +1,13 @@
 import * as React from 'react';
 import Box from '@mui/material/Box';
-import Button from '@mui/material/Button';
-import KeyboardArrowRightRounded from '@mui/icons-material/KeyboardArrowRightRounded';
 import Chip from '@mui/material/Chip';
 import Typography from '@mui/material/Typography';
+import SvgMuiLogo from 'docs/src/icons/SvgMuiLogo';
 import IconImage from 'docs/src/components/icon/IconImage';
 import GradientText from 'docs/src/components/typography/GradientText';
+import DataObjectRoundedIcon from '@mui/icons-material/DataObjectRounded';
 import SignUp from './SignUp';
 import ToolpadHeroContainer from '../../layouts/ToolpadHeroContainer';
-import ROUTES from '../../route';
 
 export default function Hero() {
   return (
@@ -33,30 +32,22 @@ export default function Hero() {
           <Box component="span" sx={{ mr: 1 }}>
             MUI Toolpad
           </Box>
-          <Chip label="Alpha" component="span" color="grey" size="small" />
+          <Chip label="Alpha" component="span" color="primary" size="small" variant="outlined" />
         </Typography>
         <Typography variant="h1" sx={{ my: 2 }}>
           Low-code
           <br />
           <GradientText>admin builder</GradientText>
         </Typography>
-        <Typography color="text.secondary" sx={{ mb: 3, maxWidth: 540, mx: 'auto' }}>
+        <Typography color="text.secondary" sx={{ maxWidth: 520, mx: 'auto', mb: 4 }}>
           Build scalable and secure internal tools locally. Use your own IDE, drag and drop
-          pre-built components or create yours. Open source and powered by MUI
+          pre-built components or create yours.
         </Typography>
-        <Button
-          size="large"
-          variant="contained"
-          href={ROUTES.toolpadQuickstart}
-          endIcon={<KeyboardArrowRightRounded />}
-          sx={{ width: { xs: '100%', sm: 'auto' }, mb: 3 }}
-        >
-          Get started
-        </Button>
         <Typography
           component="label"
+          variant="body2"
           color={(theme) => (theme.palette.mode === 'dark' ? '#fff' : `text.secondary`)}
-          sx={{ fontWeight: 'bold', display: 'block', mb: 1, mx: 'auto' }}
+          sx={{ fontWeight: 'medium', display: 'block', mb: 1, mx: 'auto' }}
           htmlFor="email-landing"
         >
           Sign up for early access to the beta release.
@@ -71,6 +62,29 @@ export default function Hero() {
             },
           }}
         />
+        <Box
+          sx={{
+            mx: 'auto',
+            mt: 6,
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            gap: 4,
+          }}
+        >
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+            <SvgMuiLogo width={20} />
+            <Typography color="text.primary" fontWeight="medium" variant="body2">
+              Powered by MUI
+            </Typography>
+          </Box>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+            <DataObjectRoundedIcon color="primary" />
+            <Typography color="text.primary" fontWeight="medium" variant="body2">
+              Open source
+            </Typography>
+          </Box>
+        </Box>
       </Box>
     </ToolpadHeroContainer>
   );

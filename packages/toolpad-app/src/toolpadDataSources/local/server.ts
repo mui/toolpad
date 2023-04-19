@@ -80,7 +80,7 @@ function formatCodeFrame(location: esbuild.Location): string {
 async function createMain(): Promise<string> {
   const relativeFunctionsFilePath = [`.`, getFunctionsFile('.')].join(path.sep);
   return `
-    import { TOOLPAD_QUERY } from '@mui/toolpad-core/server';
+    import { TOOLPAD_FUNCTION } from '@mui/toolpad-core/server';
     import { errorFrom, serializeError } from '@mui/toolpad-core/utils/errors';
     import fetch, { Headers, Request, Response } from 'node-fetch'
 
@@ -92,7 +92,7 @@ async function createMain(): Promise<string> {
       global.Response = Response
     }
 
-    async function loadQuery (name, importFn) {
+    async function loadFunction (name, importFn) {
       const { default: resolver } = await importFn()
       return [name, resolver]
     }
@@ -101,18 +101,18 @@ async function createMain(): Promise<string> {
     async function getResolvers() {
       if (!resolversPromise) {
         resolversPromise = (async () => {
-          const queries = await import(${JSON.stringify(
+          const functions = await import(${JSON.stringify(
             relativeFunctionsFilePath,
           )}).catch((err) => {
             console.error(err);
             return {};
           });
 
-          const queriesFileResolvers = Object.entries(queries).flatMap(([name, resolver]) => {
+          const functionsFileResolvers = Object.entries(functions).flatMap(([name, resolver]) => {
             return typeof resolver === 'function' ? [[name, resolver]] : []
           })
 
-          return new Map(queriesFileResolvers);
+          return new Map(functionsFileResolvers);
         })();
       }
       return resolversPromise
@@ -158,7 +158,7 @@ async function createMain(): Promise<string> {
             const resolvers = await getResolvers()
             const resolvedResolvers =  Array.from(resolvers, ([name, resolver]) => [
               name,
-              resolver[TOOLPAD_QUERY] || {}
+              resolver[TOOLPAD_FUNCTION] || {}
             ]);
             data = { 
               functions: Object.fromEntries(resolvedResolvers.filter(Boolean))

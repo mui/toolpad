@@ -10,6 +10,4 @@ export async function gotoIfNotCurrent(
   if (pathname !== expectedPath) {
     await page.goto(expectedPath, opts);
   }
-
-  await page.waitForURL((url) => url.pathname === expectedPath);
 }

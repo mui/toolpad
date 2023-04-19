@@ -37,9 +37,10 @@ interface RunOptions {
   dir: string;
   port?: number;
   dev?: boolean;
+  viteRuntime: boolean;
 }
 
-async function runApp(cmd: Command, { port, dev = false, dir }: RunOptions) {
+async function runApp(cmd: Command, { port, dev = false, dir, viteRuntime }: RunOptions) {
   const projectDir = path.resolve(process.cwd(), dir);
   const { execaNode } = await import('execa');
   const { default: chalk } = await import('chalk');
@@ -65,6 +66,7 @@ async function runApp(cmd: Command, { port, dev = false, dir }: RunOptions) {
     env: {
       NODE_ENV: process.env.NODE_ENV,
       TOOLPAD_NEXT_DEV: dev ? '1' : '',
+      TOOLPAD_VITE_RUNTIME: viteRuntime ? '1' : '',
       TOOLPAD_DIR: toolpadDir,
       TOOLPAD_PROJECT_DIR: projectDir,
       TOOLPAD_PORT: String(port),
@@ -110,27 +112,30 @@ async function devCommand(args: RunOptions) {
 
 interface BuildOptions {
   dir: string;
+  viteRuntime: boolean;
 }
 
-async function buildCommand({ dir }: BuildOptions) {
+async function buildCommand({ dir, viteRuntime }: BuildOptions) {
   const projectDir = path.resolve(process.cwd(), dir);
   const { default: chalk } = await import('chalk');
   // eslint-disable-next-line no-console
   console.log(`${chalk.blue('info')}  - building Toolpad application...`);
 
-  const { execaNode } = await import('execa');
+  if (viteRuntime) {
+    const { execaNode } = await import('execa');
 
-  const builderPath = path.resolve(__dirname, './appBuilder.js');
+    const builderPath = path.resolve(__dirname, './appBuilder.js');
 
-  await execaNode(builderPath, [], {
-    cwd: projectDir,
-    stdio: 'inherit',
-    env: {
-      NODE_ENV: 'production',
-      TOOLPAD_PROJECT_DIR: projectDir,
-      FORCE_COLOR: '1',
-    },
-  });
+    await execaNode(builderPath, [], {
+      cwd: projectDir,
+      stdio: 'inherit',
+      env: {
+        NODE_ENV: 'production',
+        TOOLPAD_PROJECT_DIR: projectDir,
+        FORCE_COLOR: '1',
+      },
+    });
+  }
 
   // eslint-disable-next-line no-console
   console.log(`${chalk.green('success')} - build done.`);
@@ -149,6 +154,11 @@ export default async function cli(argv: string[]) {
       type: 'string',
       describe: 'Directory of the Toolpad application',
       default: '.',
+    },
+    viteRuntime: {
+      type: 'boolean',
+      describe: 'Use the new experimental vite runtime',
+      default: false,
     },
   } as const;
 

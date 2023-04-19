@@ -146,7 +146,6 @@ export default async function cli(argv: string[]) {
     port: {
       type: 'number',
       describe: 'Port to run the Toolpad application on',
-      default: DEFAULT_PORT,
       demandOption: false,
     },
     dev: {

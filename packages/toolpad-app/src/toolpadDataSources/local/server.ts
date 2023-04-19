@@ -77,6 +77,11 @@ function formatCodeFrame(location: esbuild.Location): string {
   ].join('\n');
 }
 
+function pathToNodeImportSpecifier(importPath: string): string {
+  const normalized = path.normalize(importPath).split(path.sep).join('/');
+  return normalized.startsWith('/') ? normalized : `./${normalized}`;
+}
+
 async function createMain(): Promise<string> {
   const relativeFunctionsFilePath = [`.`, getFunctionsFile('.')].join(path.sep);
   return `
@@ -102,7 +107,7 @@ async function createMain(): Promise<string> {
       if (!resolversPromise) {
         resolversPromise = (async () => {
           const functions = await import(${JSON.stringify(
-            relativeFunctionsFilePath,
+            pathToNodeImportSpecifier(relativeFunctionsFilePath),
           )}).catch((err) => {
             console.error(err);
             return {};

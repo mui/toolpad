@@ -62,8 +62,8 @@ async function runApp(cmd: Command, { port, dev = false, dir }: RunOptions) {
   const cp = execaNode(serverPath, [], {
     cwd: projectDir,
     stdio: 'pipe',
-    // @ts-expect-error Next.js is enforcing NODE_ENV, but we don't want that
     env: {
+      NODE_ENV: process.env.NODE_ENV,
       TOOLPAD_NEXT_DEV: dev ? '1' : '',
       TOOLPAD_DIR: toolpadDir,
       TOOLPAD_PROJECT_DIR: projectDir,
@@ -74,10 +74,11 @@ async function runApp(cmd: Command, { port, dev = false, dir }: RunOptions) {
   });
 
   invariant(cp.stdout, 'child process must be started with "stdio: \'pipe\'"');
+  invariant(cp.stderr, 'child process must be started with "stdio: \'pipe\'"');
 
   process.stdin.pipe(cp.stdin!);
-  cp.stdout?.pipe(process.stdout);
-  cp.stderr?.pipe(process.stderr);
+  cp.stdout.pipe(process.stdout);
+  cp.stderr.pipe(process.stderr);
 
   if (cmd === 'dev') {
     // Poll stdout for "http://localhost:3000" first
@@ -117,11 +118,19 @@ async function buildCommand({ dir }: BuildOptions) {
   // eslint-disable-next-line no-console
   console.log(`${chalk.blue('info')}  - building Toolpad application...`);
 
-  process.env.TOOLPAD_PROJECT_DIR = projectDir;
+  const { execaNode } = await import('execa');
 
-  const { buildApp } = await import('../src/server/toolpadAppBuilder');
+  const builderPath = path.resolve(__dirname, './appBuilder.js');
 
-  await buildApp({ root: projectDir, base: '/prod' });
+  await execaNode(builderPath, [], {
+    cwd: projectDir,
+    stdio: 'inherit',
+    env: {
+      NODE_ENV: 'production',
+      TOOLPAD_PROJECT_DIR: projectDir,
+      FORCE_COLOR: '1',
+    },
+  });
 
   // eslint-disable-next-line no-console
   console.log(`${chalk.green('success')} - build done.`);

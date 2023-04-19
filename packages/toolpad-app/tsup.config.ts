@@ -7,6 +7,7 @@ export default defineConfig([
       index: './cli/index.ts',
       server: './cli/server.ts',
       appServer: './cli/appServer.ts',
+      appBuilder: './cli/appBuilder.ts',
     },
     outDir: 'dist/cli',
     silent: true,

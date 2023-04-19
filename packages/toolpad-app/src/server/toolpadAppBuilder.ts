@@ -222,6 +222,7 @@ export function createViteConfig({
     },
     optimizeDeps: {
       include: [
+        'react',
         'react/jsx-runtime',
         'react/jsx-dev-runtime',
         'react-dom/client',
@@ -232,6 +233,9 @@ export function createViteConfig({
         '@mui/icons-material/Error',
         '@mui/icons-material/Edit',
         '@mui/icons-material/HelpOutlined',
+        '@mui/icons-material/OpenInNew',
+        '@mui/icons-material/LightMode',
+        '@mui/icons-material/DarkMode',
         '@mui/material',
         '@tanstack/react-query',
         'invariant',
@@ -239,6 +243,7 @@ export function createViteConfig({
         'react-router-dom',
         'fractional-indexing',
         'cuid',
+        'superjson',
       ],
     },
     appType: 'custom',

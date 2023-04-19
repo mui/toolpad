@@ -223,7 +223,6 @@ interface CustomColumnProps {
 function CustomColumn({ params }: CustomColumnProps) {
   const { value, colDef, row, field } = params;
   const column = colDef as SerializableGridColumn;
-
   const components = useComponents();
   const Component = components[`codeComponent.${column.codeComponent}`];
 

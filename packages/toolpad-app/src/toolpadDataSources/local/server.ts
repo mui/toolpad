@@ -1,5 +1,5 @@
 import { ExecFetchResult } from '@mui/toolpad-core';
-import { SerializedError , errorFrom, serializeError } from '@mui/toolpad-utils/errors';
+import { SerializedError, errorFrom, serializeError } from '@mui/toolpad-utils/errors';
 import * as child_process from 'child_process';
 import * as esbuild from 'esbuild';
 import * as fs from 'fs/promises';

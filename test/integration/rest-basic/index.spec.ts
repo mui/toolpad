@@ -3,7 +3,6 @@ import { test, expect } from '../../playwright/localTest';
 import { ToolpadRuntime } from '../../models/ToolpadRuntime';
 import { fileReplaceAll } from '../../utils/fs';
 import { ToolpadEditor } from '../../models/ToolpadEditor';
-import { fileExists } from '../../../packages/toolpad-app/src/utils/fs';
 
 // We can run our own httpbin instance if necessary:
 //    $ docker run -p 80:80 kennethreitz/httpbin

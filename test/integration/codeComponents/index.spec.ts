@@ -12,6 +12,8 @@ test.use({
 });
 
 test('custom components can use external libraries', async ({ page }) => {
+  test.skip(!!process.env.TOOLPAD_VITE_RUNTIME, 'tests are testing the new runtime capabilities');
+
   const runtimeModel = new ToolpadRuntime(page);
   await runtimeModel.gotoPage('page');
 
@@ -20,6 +22,8 @@ test('custom components can use external libraries', async ({ page }) => {
 });
 
 test('can create new custom components', async ({ page, localApp }) => {
+  test.skip(!!process.env.TOOLPAD_VITE_RUNTIME, 'tests are testing the new runtime capabilities');
+
   const editorModel = new ToolpadEditor(page);
 
   await editorModel.goto();

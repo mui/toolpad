@@ -14,6 +14,7 @@ import { useAppStateApi } from '../../AppState';
 import createRuntimeState from '../../../createRuntimeState';
 import type { ToolpadBridge } from '../../../canvas/ToolpadBridge';
 import CenteredSpinner from '../../../components/CenteredSpinner';
+import config from '../../../config';
 
 interface OverlayProps {
   children?: React.ReactNode;
@@ -122,7 +123,9 @@ export default function EditorCanvasHost({
     }
   });
 
-  const src = `/preview/pages/${pageNodeId}?toolpad-display=canvas`;
+  const src = config.viteRuntime
+    ? `/preview/pages/${pageNodeId}?toolpad-display=canvas`
+    : `/app-canvas/pages/${pageNodeId}`;
 
   const [loading, setLoading] = React.useState(true);
   useOnChange(src, () => setLoading(true));

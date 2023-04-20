@@ -11,7 +11,16 @@ export default defineConfig([
     },
     outDir: 'dist/cli',
     silent: true,
-    noExternal: ['open-editor', 'execa', 'fractional-indexing', 'lodash-es', 'chalk', 'get-port'],
+    noExternal: [
+      'open-editor',
+      'execa',
+      'fractional-indexing',
+      'lodash-es',
+      'chalk',
+      'get-port',
+      'pretty-bytes',
+      'latest-version',
+    ],
     clean: true,
     sourcemap: true,
     async onSuccess() {

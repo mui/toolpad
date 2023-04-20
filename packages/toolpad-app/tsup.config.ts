@@ -1,3 +1,4 @@
+import { spawnSync } from 'child_process';
 import { defineConfig } from 'tsup';
 
 export default defineConfig([
@@ -5,10 +6,12 @@ export default defineConfig([
     entry: {
       index: './cli/index.ts',
       server: './cli/server.ts',
+      appServer: './cli/appServer.ts',
+      appBuilder: './cli/appBuilder.ts',
     },
     outDir: 'dist/cli',
     silent: true,
-    noExternal: ['open-editor', 'execa', 'fractional-indexing', 'lodash-es'],
+    noExternal: ['open-editor', 'execa', 'fractional-indexing', 'lodash-es', 'chalk', 'get-port'],
     clean: true,
     sourcemap: true,
     async onSuccess() {
@@ -28,6 +31,22 @@ export default defineConfig([
     async onSuccess() {
       // eslint-disable-next-line no-console
       console.log('reactDevtools: build successful');
+    },
+  },
+  {
+    entry: {
+      index: './src/runtime/entrypoint.tsx',
+      canvas: './src/canvas/index.tsx',
+    },
+    format: ['esm', 'cjs'],
+    dts: false,
+    silent: true,
+    outDir: 'dist/runtime',
+    tsconfig: './tsconfig.esbuild.json',
+    async onSuccess() {
+      // eslint-disable-next-line no-console
+      console.log('runtime: build successful');
+      spawnSync('tsc', ['--emitDeclarationOnly', '--declaration']);
     },
   },
 ]);

@@ -9,7 +9,7 @@ export class ToolpadRuntime {
   }
 
   async goto() {
-    await gotoIfNotCurrent(this.page, `/preview/pages`);
+    await gotoIfNotCurrent(this.page, `/preview`);
   }
 
   async gotoPage(pageName: string) {

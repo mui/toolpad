@@ -19,14 +19,15 @@ const HTTPBIN_TARGET_URL = customHttbinBaseUrl || HTTPBIN_SOURCE_URL;
 test.use({
   localAppConfig: {
     template: path.resolve(__dirname, './fixture'),
+    async setup({ dir }) {
+      const configFilePath = path.resolve(dir, './toolpad.yml');
+      await fileReplaceAll(configFilePath, HTTPBIN_SOURCE_URL, HTTPBIN_TARGET_URL);
+    },
     cmd: 'dev',
   },
 });
 
-test('rest basics', async ({ page, context, localApp }) => {
-  const queriesFilePath = path.resolve(localApp.dir, './toolpad.yml');
-  await fileReplaceAll(queriesFilePath, HTTPBIN_SOURCE_URL, HTTPBIN_TARGET_URL);
-
+test('rest basics', async ({ page, context }) => {
   const runtimeModel = new ToolpadRuntime(page);
   await runtimeModel.gotoPage('page1');
   await expect(page.locator('text="query1: query1_value"')).toBeVisible();

@@ -61,18 +61,18 @@ nodes:
         value:
           - type: string
             field: ID
-          - type: string
-            field: Name
-            width: 169
-          - type: string
-            field: Designation
-            width: 126
           - type: link
             field: Profile
             width: 254
           - type: link
             field: Avatar
             width: 147
+          - type: string
+            field: Name
+            width: 169
+          - type: string
+            field: Designation
+            width: 126
       hideToolbar:
         type: jsExpression
         value: |

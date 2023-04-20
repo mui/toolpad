@@ -25,7 +25,6 @@ import {
   isFormComponent,
   FORM_COMPONENT_ID,
 } from '../../../../toolpadComponents';
-import { PinholeOverlay } from '../../../../PinholeOverlay';
 import {
   getRectanglePointActiveEdge,
   isHorizontalFlow,
@@ -45,6 +44,7 @@ import { OverlayGrid, OverlayGridHandle } from './OverlayGrid';
 import { NodeInfo } from '../../../../types';
 import NodeDropArea from './NodeDropArea';
 import type { ToolpadBridge } from '../../../../canvas/ToolpadBridge';
+import { PinholeOverlay } from '../../../../PinholeOverlay';
 
 const VERTICAL_RESIZE_SNAP_UNITS = 2; // px
 
@@ -431,7 +431,7 @@ export default function RenderOverlay({ bridge }: RenderOverlayProps) {
     [appStateApi, currentView, dom, normalizePageRowColumnSizes],
   );
 
-  const selectedRect = selectedNode && !newNode ? nodesInfo[selectedNode.id]?.rect : null;
+  const selectedRect = (selectedNode && !newNode && nodesInfo[selectedNode.id]?.rect) || null;
 
   const interactiveNodes = React.useMemo<Set<NodeId>>(() => {
     if (!selectedNode) {
@@ -1619,6 +1619,7 @@ export default function RenderOverlay({ bridge }: RenderOverlayProps) {
               <NodeHud
                 node={node}
                 rect={nodeRect}
+                selectedNodeRect={selectedRect}
                 isSelected={isSelected}
                 isInteractive={isInteractive}
                 onNodeDragStart={handleNodeDragStart(node as appDom.ElementNode)}

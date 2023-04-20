@@ -123,7 +123,7 @@ export default createComponent(FormWrappedTextField, {
       defaultValueProp: 'defaultValue',
     },
     defaultValue: {
-      helperText: 'A default value for when the inoput is still empty.',
+      helperText: 'A default value for when the input is still empty.',
       typeDef: { type: 'string', default: '' },
     },
     label: {

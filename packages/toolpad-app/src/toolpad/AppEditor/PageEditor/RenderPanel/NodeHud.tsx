@@ -1,5 +1,4 @@
 import * as React from 'react';
-import clsx from 'clsx';
 import DragIndicatorIcon from '@mui/icons-material/DragIndicator';
 import DeleteIcon from '@mui/icons-material/Delete';
 import ContentCopy from '@mui/icons-material/ContentCopy';
@@ -26,7 +25,6 @@ function stopPropagationHandler(event: React.SyntheticEvent) {
 }
 
 const nodeHudClasses = {
-  allowNodeInteraction: 'NodeHud_AllowNodeInteraction',
   selected: 'NodeHud_Selected',
   selectionHint: 'NodeHud_SelectionHint',
 };
@@ -54,10 +52,6 @@ const NodeHudWrapper = styled('div', {
     left: 0,
     top: 0,
     zIndex: 80,
-  },
-  [`&.${nodeHudClasses.allowNodeInteraction}`]: {
-    // block pointer-events so we can interact with the selection
-    pointerEvents: 'none',
   },
 }));
 
@@ -144,6 +138,7 @@ const ResizePreview = styled('div')(({ theme }) => ({
 interface NodeHudProps {
   node: appDom.AppDomNode;
   rect: Rectangle;
+  selectedNodeRect: Rectangle | null;
   isSelected?: boolean;
   isInteractive?: boolean;
   onNodeDragStart?: React.DragEventHandler<HTMLElement>;
@@ -160,8 +155,9 @@ interface NodeHudProps {
 export default function NodeHud({
   node,
   rect,
+  selectedNodeRect,
   isSelected,
-  isInteractive,
+  isInteractive = false,
   onNodeDragStart,
   draggableEdges = [],
   onEdgeDragStart,
@@ -174,14 +170,41 @@ export default function NodeHud({
 }: NodeHudProps) {
   const hintPosition = rect.y > HUD_HEIGHT ? HINT_POSITION_TOP : HINT_POSITION_BOTTOM;
 
+  const interactiveNodeClipPath = React.useMemo(
+    () =>
+      isInteractive && selectedNodeRect
+        ? `
+            polygon(
+              -100% -100%, 
+              200% -100%,
+              200% 200%,
+              -100% 200%,
+              -100% ${selectedNodeRect.y - rect.y}px,
+              ${selectedNodeRect.x - rect.x}px ${selectedNodeRect.y - rect.y}px, 
+              ${selectedNodeRect.x - rect.x}px 
+              ${selectedNodeRect.y + selectedNodeRect.height - rect.y}px,
+              ${selectedNodeRect.x + selectedNodeRect.width - rect.x}px
+              ${selectedNodeRect.y + selectedNodeRect.height - rect.y}px, 
+              ${selectedNodeRect.x + selectedNodeRect.width - rect.x}px 
+              ${selectedNodeRect.y - rect.y}px,
+              -100% ${selectedNodeRect.y - rect.y}px
+          )`
+        : '',
+    [isInteractive, rect, selectedNodeRect],
+  );
+
   return (
     <React.Fragment>
       <NodeHudWrapper
         data-node-id={node.id}
-        style={absolutePositionCss(rect)}
-        className={clsx({
-          [nodeHudClasses.allowNodeInteraction]: isInteractive,
-        })}
+        style={{
+          ...absolutePositionCss(rect),
+          ...(interactiveNodeClipPath
+            ? {
+                clipPath: interactiveNodeClipPath,
+              }
+            : {}),
+        }}
         isOutlineVisible={isOutlineVisible}
         isHoverable={isHoverable}
       >

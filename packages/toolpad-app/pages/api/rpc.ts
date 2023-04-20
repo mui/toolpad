@@ -2,7 +2,7 @@ import { NextApiHandler } from 'next';
 import type { IncomingMessage, ServerResponse } from 'http';
 import superjson from 'superjson';
 import { execQuery, dataSourceFetchPrivate } from '../../src/server/data';
-import { getLatestToolpadRelease } from '../../src/server/getLatestRelease';
+import { getVersionInfo } from '../../src/server/versionInfo';
 import { hasOwnProperty } from '../../src/utils/collections';
 import { errorFrom, serializeError } from '../../src/utils/errors';
 import logger from '../../src/server/logs/logger';
@@ -117,8 +117,8 @@ const rpcServer = {
     loadDom: createMethod<typeof loadDom>(({ params }) => {
       return loadDom(...params);
     }),
-    getLatestToolpadRelease: createMethod<typeof getLatestToolpadRelease>(({ params }) => {
-      return getLatestToolpadRelease(...params);
+    getVersionInfo: createMethod<typeof getVersionInfo>(({ params }) => {
+      return getVersionInfo(...params);
     }),
     getDomFingerprint: createMethod<typeof getDomFingerprint>(({ params }) => {
       return getDomFingerprint(...params);

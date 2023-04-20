@@ -47,6 +47,7 @@ export interface RuntimeConfig {
   externalUrl: string;
   projectDir?: string;
   cmd: 'dev' | 'start';
+  viteRuntime?: boolean;
 }
 
 declare global {
@@ -75,6 +76,7 @@ const runtimeConfig: RuntimeConfig =
         externalUrl:
           process.env.TOOLPAD_EXTERNAL_URL || `http://localhost:${process.env.PORT || 3000}`,
         projectDir: process.env.TOOLPAD_PROJECT_DIR,
+        viteRuntime: !!process.env.TOOLPAD_VITE_RUNTIME,
         cmd:
           process.env.TOOLPAD_CMD === 'dev' || process.env.TOOLPAD_CMD === 'start'
             ? process.env.TOOLPAD_CMD

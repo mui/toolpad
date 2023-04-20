@@ -44,10 +44,6 @@ test('Column prop updates are not lost on drag interactions', async ({ page }) =
   // Expect the "Avatar" column to continue to be of type "boolean" instead of "link"
 
   await expect(
-    editorModel.pageRoot
-      .getByRole('row', {
-        name: '1 Todd Breitenberg International http://spotless-octopus.name',
-      })
-      .getByTestId('CheckIcon'),
+    editorModel.pageRoot.getByRole('row', { name: 'Todd Breitenberg' }).getByTestId('CheckIcon'),
   ).toBeVisible();
 });

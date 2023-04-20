@@ -1,4 +1,4 @@
-import { init as cuid2 } from '@paralleldrive/cuid2';
+import { init as cuid2Init } from '@paralleldrive/cuid2';
 import { generateKeyBetween } from 'fractional-indexing';
 import {
   NodeId,
@@ -18,8 +18,6 @@ import { ExactEntriesOf, Maybe } from '../utils/types';
 import { mapProperties, mapValues } from '../utils/collections';
 
 export const CURRENT_APPDOM_VERSION = 6;
-
-export const SLUG_LENGTH = 7;
 
 export const RESERVED_NODE_PROPERTIES = [
   'id',
@@ -236,8 +234,10 @@ function assertIsType<T extends AppDomNode>(node: AppDomNode, type: T['type']): 
   invariant(isType(node, type), `Expected node type "${type}" but got "${node.type}"`);
 }
 
-function createId(): NodeId {
-  return cuid2({ length: SLUG_LENGTH })() as NodeId;
+const createIdInternal = cuid2Init({ length: 7 });
+
+export function createId(): NodeId {
+  return createIdInternal() as NodeId;
 }
 
 export function createConst<V>(value: V): ConstantAttrValue<V> {

@@ -8,44 +8,5 @@ spec:
     - component: PageRow
       name: pageRow
       children:
-        - component: Button
-          name: button
-    - component: PageRow
-      name: pageRow1
-      children:
-        - component: TextField
-          name: textField
-    - component: PageRow
-      name: pageRow2
-      children:
-        - component: DataGrid
-          name: dataGrid
-          props:
-            rows:
-              $$jsExpression: |
-                query.data.movies
-            columns:
-              - field: id
-                type: number
-              - field: title
-                type: string
-              - field: year
-                type: string
-              - field: runtime
-                type: string
-              - field: genres
-                type: json
-              - field: director
-                type: string
-              - field: actors
-                type: string
-              - field: plot
-                type: string
-              - field: posterUrl
-                type: image
-  queries:
-    - name: query
-      query:
-        kind: rest
-        headers: []
-        method: GET
+        - component: codeComponent.MyBarChart
+          name: codeComponent_MyBarChart

@@ -36,6 +36,10 @@ async function waitForMatch(input: Readable, regex: RegExp): Promise<RegExpExecA
   });
 }
 
+interface SetupContext {
+  dir: string;
+}
+
 interface WithAppOptions {
   // Command to start toolpad with
   cmd?: 'start' | 'dev';
@@ -44,6 +48,7 @@ interface WithAppOptions {
   template?: string;
   // Run toolpad next.js app in local dev mode
   toolpadDev?: boolean;
+  setup?: (ctx: SetupContext) => Promise<void>;
 }
 
 /**
@@ -58,13 +63,17 @@ export async function withApp(
     console.log('Using new vite runtime');
   }
 
-  const { cmd = 'start', template } = options;
+  const { cmd = 'start', template, setup } = options;
 
   const projectDir = await fs.mkdtemp(path.resolve(__dirname, './tmp-'));
 
   try {
     if (template) {
       await fs.cp(template, projectDir, { recursive: true });
+    }
+
+    if (setup) {
+      await setup({ dir: projectDir });
     }
 
     const args: string[] = [cmd];

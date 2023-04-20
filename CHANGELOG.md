@@ -1,6 +1,6 @@
 # Changelog
 
-## TODO RELEASE NAME
+## 0.1.7
 
 <!-- generated comparing v0.1.6..master -->
 

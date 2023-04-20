@@ -1,5 +1,14 @@
 import { NextApiRequest, NextApiResponse } from 'next';
-import type { RecaptchaResJson } from '../validateRecaptchaToken';
+import { errorFrom } from '../../utils/errors';
+
+function getReqLoggableIPAddress(req: NextApiRequest): string | null {
+  const forwardedHeader = req.headers['x-forwarded-for'];
+  return (
+    (typeof forwardedHeader === 'string' && forwardedHeader.split(',').shift()) ||
+    req.socket?.remoteAddress ||
+    null
+  );
+}
 
 export function reqSerializer(req: NextApiRequest) {
   return {
@@ -7,6 +16,8 @@ export function reqSerializer(req: NextApiRequest) {
     method: req.method,
     query: req.query,
     body: {
+      type: req.body.type,
+      name: req.body.name,
       // Omitting request params, but we could enable them if it would be useful
       // params: req.body.params,
     },
@@ -18,6 +29,7 @@ export function reqSerializer(req: NextApiRequest) {
     socket: {
       remoteAddress: req.socket?.remoteAddress,
     },
+    ipAddress: getReqLoggableIPAddress(req),
   };
 }
 
@@ -27,21 +39,12 @@ export function resSerializer(res: NextApiResponse) {
   };
 }
 
-export function rpcReqSerializer(req: NextApiRequest) {
+export function errSerializer(rawError: unknown) {
+  const error = errorFrom(rawError);
   return {
-    ...reqSerializer(req),
-    body: {
-      type: req.body.type,
-      name: req.body.name,
-    },
-  };
-}
-
-export function recaptchaResSerializer(res: RecaptchaResJson) {
-  return {
-    success: res.success,
-    score: res.score,
-    action: res.action,
-    errorCodes: res['error-codes'],
+    message: error.message,
+    name: error.name,
+    stack: error.stack,
+    code: error.code,
   };
 }

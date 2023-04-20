@@ -1,14 +1,16 @@
 import * as React from 'react';
 
 export interface ShortCut {
-  code: string;
+  key: string;
   metaKey?: boolean;
+  shiftKey?: boolean;
   disabled?: boolean;
+  preventDefault?: boolean;
 }
 
 export default function useShortcut(
-  { code, metaKey = false, disabled = false }: ShortCut,
-  handler: () => void,
+  { key, metaKey = false, disabled = false, shiftKey = false, preventDefault = true }: ShortCut,
+  handler: (event: KeyboardEvent) => void,
 ) {
   React.useEffect(() => {
     if (disabled) {
@@ -16,13 +18,19 @@ export default function useShortcut(
     }
 
     const handleKeydown = (event: KeyboardEvent) => {
-      if (event.code === code && event.metaKey === metaKey) {
-        handler();
-        event.preventDefault();
+      if (
+        event.key.toLowerCase() === key &&
+        (event.metaKey === metaKey || event.ctrlKey === metaKey) &&
+        event.shiftKey === shiftKey
+      ) {
+        handler(event);
+        if (preventDefault) {
+          event.preventDefault();
+        }
       }
     };
 
     document.addEventListener('keydown', handleKeydown);
     return () => document.removeEventListener('keydown', handleKeydown);
-  }, [code, metaKey, handler, disabled]);
+  }, [key, metaKey, shiftKey, handler, disabled, preventDefault]);
 }

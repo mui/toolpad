@@ -44,15 +44,10 @@ export interface RuntimeConfig {
   gaId?: string;
   // Sentry DSN
   sentryDsn?: string;
-  // Google reCAPTCHA site key
-  recaptchaSiteKey?: string;
   externalUrl: string;
-}
-
-declare global {
-  namespace NodeJS {
-    interface ProcessEnv extends BuildEnvVars {}
-  }
+  projectDir?: string;
+  cmd: 'dev' | 'start';
+  viteRuntime?: boolean;
 }
 
 declare global {
@@ -78,9 +73,14 @@ const runtimeConfig: RuntimeConfig =
         isDemo: !!process.env.TOOLPAD_DEMO,
         gaId: process.env.TOOLPAD_GA_ID,
         sentryDsn: process.env.TOOLPAD_SENTRY_DSN,
-        recaptchaSiteKey: process.env.TOOLPAD_RECAPTCHA_SITE_KEY,
         externalUrl:
           process.env.TOOLPAD_EXTERNAL_URL || `http://localhost:${process.env.PORT || 3000}`,
+        projectDir: process.env.TOOLPAD_PROJECT_DIR,
+        viteRuntime: !!process.env.TOOLPAD_VITE_RUNTIME,
+        cmd:
+          process.env.TOOLPAD_CMD === 'dev' || process.env.TOOLPAD_CMD === 'start'
+            ? process.env.TOOLPAD_CMD
+            : 'dev',
       }
     : getBrowsersideRuntimeConfig();
 

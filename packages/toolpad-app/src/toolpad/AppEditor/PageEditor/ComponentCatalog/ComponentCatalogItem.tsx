@@ -4,7 +4,6 @@ import Box from '@mui/material/Box';
 import SmartButtonIcon from '@mui/icons-material/SmartButton';
 import ImageIcon from '@mui/icons-material/Image';
 import GridOnIcon from '@mui/icons-material/GridOn';
-import TextFieldsIcon from '@mui/icons-material/TextFields';
 import Crop75Icon from '@mui/icons-material/Crop75';
 import ArrowDropDownCircleIcon from '@mui/icons-material/ArrowDropDownCircle';
 import LayersIcon from '@mui/icons-material/Layers';
@@ -13,33 +12,50 @@ import ContactPageIcon from '@mui/icons-material/ContactPage';
 import TabIcon from '@mui/icons-material/Tab';
 import TuneIcon from '@mui/icons-material/Tune';
 import ToggleOnIcon from '@mui/icons-material/ToggleOn';
+import ListIcon from '@mui/icons-material/List';
 import RadioButtonCheckedIcon from '@mui/icons-material/RadioButtonChecked';
 import DateRangeIcon from '@mui/icons-material/DateRange';
 import CheckBoxIcon from '@mui/icons-material/CheckBox';
 import DashboardCustomizeSharpIcon from '@mui/icons-material/DashboardCustomizeSharp';
 import AddIcon from '@mui/icons-material/Add';
-import LinkIcon from '@mui/icons-material/Link';
+import UploadFileIcon from '@mui/icons-material/UploadFile';
+import NotesIcon from '@mui/icons-material/Notes';
+import AutoAwesomeMosaicIcon from '@mui/icons-material/AutoAwesomeMosaic';
+import InsightsIcon from '@mui/icons-material/Insights';
 import { SvgIconProps } from '@mui/material/SvgIcon';
+import PlaceIcon from '@mui/icons-material/Place';
+import ViewSidebarIcon from '@mui/icons-material/ViewSidebar';
+import MoodIcon from '@mui/icons-material/Mood';
+import HtmlIcon from '@mui/icons-material/Html';
+import { ButtonBase } from '@mui/material';
 
 const iconMap = new Map<string, React.ComponentType<SvgIconProps>>([
+  ['Text', NotesIcon],
   ['Button', SmartButtonIcon],
   ['Image', ImageIcon],
   ['DataGrid', GridOnIcon],
-  ['Typography', TextFieldsIcon],
   ['TextField', Crop75Icon],
   ['Select', ArrowDropDownCircleIcon],
+  ['List', ListIcon],
   ['Paper', LayersIcon],
   ['Form', DnsIcon],
   ['Card', ContactPageIcon],
   ['Tabs', TabIcon],
-  ['Link', LinkIcon],
   ['Slider', TuneIcon],
   ['Switch', ToggleOnIcon],
   ['Radio', RadioButtonCheckedIcon],
   ['DatePicker', DateRangeIcon],
+  ['FilePicker', UploadFileIcon],
   ['Checkbox', CheckBoxIcon],
   ['CodeComponent', DashboardCustomizeSharpIcon],
   ['CreateNew', AddIcon],
+  ['Tabs', TabIcon],
+  ['Container', AutoAwesomeMosaicIcon],
+  ['Chart', InsightsIcon],
+  ['Map', PlaceIcon],
+  ['Drawer', ViewSidebarIcon],
+  ['Icon', MoodIcon],
+  ['Html', HtmlIcon],
 ]);
 
 type ComponentItemKind = 'future' | 'builtIn' | 'create' | 'custom';
@@ -79,6 +95,7 @@ function ComponentCatalogItem({
       onClick={onClick}
       draggable={draggable}
       onDragStart={onDragStart}
+      component={ButtonBase}
       sx={{
         display: 'flex',
         flexDirection: 'column',
@@ -92,6 +109,9 @@ function ComponentCatalogItem({
         borderColor: 'divider',
         borderStyle: kind === 'create' ? 'dashed' : 'solid',
         color: 'text.secondary',
+        backgroundColor: 'paper',
+        // https://stackoverflow.com/q/22922761
+        transform: 'translate(0, 0)',
         '&:hover': {
           backgroundColor: 'action.hover',
         },

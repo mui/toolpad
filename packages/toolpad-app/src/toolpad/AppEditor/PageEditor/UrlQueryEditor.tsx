@@ -10,45 +10,82 @@ import * as React from 'react';
 import AddIcon from '@mui/icons-material/Add';
 import { NodeId } from '@mui/toolpad-core';
 import * as appDom from '../../../appDom';
-import { useDom, useDomApi } from '../../DomLoader';
+import { useDom, useDomApi, useAppState, useAppStateApi } from '../../AppState';
 import MapEntriesEditor from '../../../components/MapEntriesEditor';
 import useBoolean from '../../../utils/useBoolean';
+import useUnsavedChangesConfirm from '../../hooks/useUnsavedChangesConfirm';
 
 export interface UrlQueryEditorProps {
   pageNodeId: NodeId;
 }
 
 export default function UrlQueryEditor({ pageNodeId }: UrlQueryEditorProps) {
-  const dom = useDom();
+  const { dom } = useDom();
+  const { currentView } = useAppState();
+
   const domApi = useDomApi();
+  const appStateApi = useAppStateApi();
 
   const page = appDom.getNode(dom, pageNodeId, 'page');
 
-  const {
-    value: dialogOpen,
-    setTrue: handleDialogOpen,
-    setFalse: handleDialogClose,
-  } = useBoolean(false);
+  const { value: isDialogOpen, setTrue: openDialog, setFalse: closeDialog } = useBoolean(false);
 
   const value = page.attributes.parameters?.value;
+
   const [input, setInput] = React.useState(value);
+
+  const hasUnsavedChanges = input !== value;
+
   React.useEffect(() => {
-    if (dialogOpen) {
+    if (isDialogOpen) {
       setInput(value);
     }
-  }, [dialogOpen, value]);
+  }, [isDialogOpen, value]);
+
+  const handleButtonClick = React.useCallback(() => {
+    appStateApi.setView({
+      kind: 'page',
+      nodeId: pageNodeId,
+      view: { kind: 'pageParameters' },
+    });
+  }, [appStateApi, pageNodeId]);
+
+  const handleDialogClose = React.useCallback(() => {
+    appStateApi.setView({ kind: 'page', nodeId: pageNodeId });
+  }, [appStateApi, pageNodeId]);
+
+  const { handleCloseWithUnsavedChanges } = useUnsavedChangesConfirm({
+    hasUnsavedChanges,
+    onClose: handleDialogClose,
+  });
 
   const handleSave = React.useCallback(() => {
-    domApi.setNodeNamespacedProp(page, 'attributes', 'parameters', appDom.createConst(input || []));
+    domApi.update((draft) =>
+      appDom.setNodeNamespacedProp(
+        draft,
+        page,
+        'attributes',
+        'parameters',
+        appDom.createConst(input || []),
+      ),
+    );
     handleDialogClose();
-  }, [domApi, page, input, handleDialogClose]);
+  }, [domApi, handleDialogClose, input, page]);
+
+  React.useEffect(() => {
+    if (currentView.kind === 'page' && currentView.view?.kind === 'pageParameters') {
+      openDialog();
+    } else {
+      closeDialog();
+    }
+  }, [closeDialog, currentView, openDialog]);
 
   return (
     <React.Fragment>
-      <Button color="inherit" startIcon={<AddIcon />} onClick={handleDialogOpen}>
+      <Button color="inherit" startIcon={<AddIcon />} onClick={handleButtonClick}>
         Add page parameters
       </Button>
-      <Dialog fullWidth open={dialogOpen} onClose={handleDialogClose}>
+      <Dialog fullWidth open={isDialogOpen} onClose={handleCloseWithUnsavedChanges}>
         <DialogTitle>Edit page parameters</DialogTitle>
         <DialogContent>
           <Typography>

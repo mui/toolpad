@@ -2,7 +2,6 @@ import * as React from 'react';
 import clsx from 'clsx';
 import { styled } from '@mui/material';
 import Typography from '@mui/material/Typography';
-import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 
 import { FlowDirection } from '../../../../types';
 import * as appDom from '../../../../appDom';
@@ -13,7 +12,7 @@ import {
   Rectangle,
 } from '../../../../utils/geometry';
 
-import { useDom } from '../../../DomLoader';
+import { useDom } from '../../../AppState';
 
 import {
   DROP_ZONE_CENTER,
@@ -38,7 +37,7 @@ const StyledNodeDropArea = styled('div', {
   shouldForwardProp: (prop) => prop !== 'highlightRelativeRect',
 })<{
   highlightRelativeRect?: Partial<Rectangle>;
-}>(({ highlightRelativeRect = {} }) => {
+}>(({ highlightRelativeRect = {}, theme }) => {
   const {
     x: highlightRelativeX = 0,
     y: highlightRelativeY = 0,
@@ -51,66 +50,64 @@ const StyledNodeDropArea = styled('div', {
     position: 'absolute',
     [`&.${dropAreaHighlightClasses.highlightedTop}`]: {
       '&:after': {
-        backgroundColor: '#44EB2D',
+        backgroundColor: theme.palette.primary[500],
         content: "''",
         position: 'absolute',
-        height: 4,
+        height: 2,
         width: highlightWidth,
-        top: -2,
+        top: -1,
         left: highlightRelativeX,
       },
     },
     [`&.${dropAreaHighlightClasses.highlightedRight}`]: {
       '&:after': {
-        backgroundColor: '#44EB2D',
+        backgroundColor: theme.palette.primary[500],
         content: "''",
         position: 'absolute',
         height: highlightHeight,
-        width: 4,
+        width: 2,
         top: highlightRelativeY,
-        right: -2,
+        right: -1,
       },
     },
     [`&.${dropAreaHighlightClasses.highlightedBottom}`]: {
       '&:after': {
-        backgroundColor: '#44EB2D',
+        backgroundColor: theme.palette.primary[500],
         content: "''",
         position: 'absolute',
-        height: 4,
+        height: 2,
         width: highlightWidth,
-        bottom: -2,
+        bottom: -1,
         left: highlightRelativeX,
       },
     },
     [`&.${dropAreaHighlightClasses.highlightedLeft}`]: {
       '&:after': {
-        backgroundColor: '#44EB2D',
+        backgroundColor: theme.palette.primary[500],
         content: "''",
         position: 'absolute',
         height: highlightHeight,
-        width: 4,
-        left: -2,
+        width: 2,
+        left: -1,
         top: highlightRelativeY,
       },
     },
     [`&.${dropAreaHighlightClasses.highlightedCenter}`]: {
-      border: '4px solid #44EB2D',
+      border: `2px solid ${theme.palette.primary[500]}`,
     },
   };
 });
 
-const EmptySlot = styled('div')({
+const EmptySlot = styled('div')(({ theme }) => ({
   alignItems: 'center',
-  border: '1px dashed green',
-  color: 'green',
+  border: `2px dotted ${theme.palette.primary[500]}`,
+  color: theme.palette.primary[500],
   display: 'flex',
   flexDirection: 'column',
   justifyContent: 'center',
   position: 'absolute',
-  opacity: 0.75,
   textAlign: 'center',
-  fontSize: 30,
-});
+}));
 
 function getChildNodeHighlightedZone(parentFlowDirection: FlowDirection): DropZone | null {
   switch (parentFlowDirection) {
@@ -129,7 +126,7 @@ function getChildNodeHighlightedZone(parentFlowDirection: FlowDirection): DropZo
 
 function getHighlightedZoneOverlayClass(
   highlightedZone: DropZone,
-): typeof dropAreaHighlightClasses[keyof typeof dropAreaHighlightClasses] | null {
+): (typeof dropAreaHighlightClasses)[keyof typeof dropAreaHighlightClasses] | null {
   switch (highlightedZone) {
     case DROP_ZONE_TOP:
       return dropAreaHighlightClasses.highlightedTop;
@@ -159,7 +156,7 @@ export default function NodeDropArea({
   dropAreaRect,
   availableDropZones,
 }: NodeDropAreaProps) {
-  const dom = useDom();
+  const { dom } = useDom();
   const { dragOverNodeId, dragOverSlotParentProp, dragOverZone, viewState } = usePageEditorState();
 
   const { nodes: nodesInfo } = viewState;
@@ -361,8 +358,7 @@ export default function NodeDropArea({
       />
       {isEmptySlot && slotRect ? (
         <EmptySlot style={absolutePositionCss(slotRect)}>
-          <AddCircleOutlineIcon fontSize="inherit" sx={{ mb: 0.2 }} />
-          <Typography variant="caption">Drop component here</Typography>
+          <Typography variant="subtitle2">Drop component here</Typography>
         </EmptySlot>
       ) : null}
     </React.Fragment>

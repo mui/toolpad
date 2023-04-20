@@ -1,0 +1,132 @@
+{
+  "root": "6j034xh",
+  "nodes": {
+    "0d23u7b": {
+      "id": "0d23u7b",
+      "name": "pageRow2",
+      "type": "element",
+      "props": {},
+      "layout": {},
+      "parentId": "6k134xi",
+      "attributes": {
+        "component": {
+          "type": "const",
+          "value": "PageRow"
+        }
+      },
+      "parentProp": "children",
+      "parentIndex": "a2"
+    },
+    "5z83u5r": {
+      "id": "5z83u5r",
+      "name": "text1",
+      "type": "element",
+      "props": {
+        "value": {
+          "type": "jsExpression",
+          "value": "filePicker.value && filePicker.value[0].base64 ? \"Uploaded\" : \"Empty\"\n"
+        }
+      },
+      "layout": {},
+      "parentId": "0d23u7b",
+      "attributes": {
+        "component": {
+          "type": "const",
+          "value": "Text"
+        }
+      },
+      "parentProp": "children",
+      "parentIndex": "a1"
+    },
+    "6j034xh": {
+      "id": "6j034xh",
+      "name": "Application",
+      "type": "app",
+      "parentId": null,
+      "attributes": {},
+      "parentProp": null,
+      "parentIndex": null
+    },
+    "6k134xi": {
+      "id": "6k134xi",
+      "name": "page1",
+      "type": "page",
+      "parentId": "6j034xh",
+      "attributes": {
+        "title": {
+          "type": "const",
+          "value": "Page 1"
+        },
+        "module": {
+          "type": "const",
+          "value": "// All properties of this object will be available on the global scope in bindings\nexport const globalScope = {\n  value: 3,\n};\n"
+        }
+      },
+      "parentProp": "pages",
+      "parentIndex": "a0"
+    },
+    "9e23ub5": {
+      "id": "9e23ub5",
+      "name": "pageRow",
+      "type": "element",
+      "props": {},
+      "layout": {},
+      "parentId": "6k134xi",
+      "attributes": {
+        "component": {
+          "type": "const",
+          "value": "PageRow"
+        }
+      },
+      "parentProp": "children",
+      "parentIndex": "a1V"
+    },
+    "f403uuw": {
+      "id": "f403uuw",
+      "name": "filePicker",
+      "type": "element",
+      "props": {
+        "label": {
+          "type": "const",
+          "value": "File pick"
+        },
+        "variant": {
+          "type": "const",
+          "value": "filled"
+        }
+      },
+      "layout": {},
+      "parentId": "9e23ub5",
+      "attributes": {
+        "component": {
+          "type": "const",
+          "value": "FilePicker"
+        }
+      },
+      "parentProp": "children",
+      "parentIndex": "a0"
+    },
+    "qc03u5d": {
+      "id": "qc03u5d",
+      "name": "text",
+      "type": "element",
+      "props": {
+        "value": {
+          "type": "jsExpression",
+          "value": "filePicker.value && filePicker.value[0].name\n"
+        }
+      },
+      "layout": {},
+      "parentId": "0d23u7b",
+      "attributes": {
+        "component": {
+          "type": "const",
+          "value": "Text"
+        }
+      },
+      "parentProp": "children",
+      "parentIndex": "a0"
+    }
+  },
+  "version": 5
+}

@@ -7,8 +7,8 @@ import invariant from 'invariant';
 import ComponentCatalogItem from './ComponentCatalogItem';
 import CreateCodeComponentNodeDialog from '../../HierarchyExplorer/CreateCodeComponentNodeDialog';
 import * as appDom from '../../../../appDom';
-import { useDom } from '../../../DomLoader';
-import { usePageEditorApi, usePageEditorState } from '../PageEditorProvider';
+import { useDom } from '../../../AppState';
+import { usePageEditorApi } from '../PageEditorProvider';
 import { useToolpadComponents } from '../../toolpadComponents';
 import useLocalStorageState from '../../../../utils/useLocalStorageState';
 
@@ -18,16 +18,16 @@ interface FutureComponentSpec {
 }
 
 const FUTURE_COMPONENTS = new Map<string, FutureComponentSpec>([
+  ['Chart', { url: 'https://github.com/mui/mui-toolpad/issues/789', displayName: 'Chart' }],
+  ['Map', { url: 'https://github.com/mui/mui-toolpad/issues/864', displayName: 'Map' }],
+  ['Drawer', { url: 'https://github.com/mui/mui-toolpad/issues/1540', displayName: 'Drawer' }],
+  ['Html', { url: 'https://github.com/mui/mui-toolpad/issues/1311', displayName: 'Html' }],
+  ['Icon', { url: 'https://github.com/mui/mui-toolpad/issues/83', displayName: 'Icon' }],
   ['Form', { url: 'https://github.com/mui/mui-toolpad/issues/749', displayName: 'Form' }],
   ['Card', { url: 'https://github.com/mui/mui-toolpad/issues/748', displayName: 'Card' }],
-  ['Tabs', { url: 'https://github.com/mui/mui-toolpad/issues/747', displayName: 'Tabs' }],
   ['Slider', { url: 'https://github.com/mui/mui-toolpad/issues/746', displayName: 'Slider' }],
   ['Switch', { url: 'https://github.com/mui/mui-toolpad/issues/745', displayName: 'Switch' }],
   ['Radio', { url: 'https://github.com/mui/mui-toolpad/issues/744', displayName: 'Radio' }],
-  [
-    'DatePicker',
-    { url: 'https://github.com/mui/mui-toolpad/issues/743', displayName: 'Date picker' },
-  ],
   ['Checkbox', { url: 'https://github.com/mui/mui-toolpad/issues/742', displayName: 'Checkbox' }],
 ]);
 
@@ -47,8 +47,7 @@ export interface ComponentCatalogProps {
 
 export default function ComponentCatalog({ className }: ComponentCatalogProps) {
   const api = usePageEditorApi();
-  const pageState = usePageEditorState();
-  const dom = useDom();
+  const { dom } = useDom();
 
   const [openStart, setOpenStart] = React.useState(0);
   const [openCustomComponents, setOpenCustomComponents] = useLocalStorageState(
@@ -58,15 +57,6 @@ export default function ComponentCatalog({ className }: ComponentCatalogProps) {
   const [openFutureComponents, setOpenFutureComponents] = useLocalStorageState(
     'catalog-future-expanded',
     true,
-  );
-  const [createCodeComponentDialogOpen, setCreateCodeComponentDialogOpen] = React.useState(0);
-
-  const handleCreateCodeComponentDialogOpen = React.useCallback(() => {
-    setCreateCodeComponentDialogOpen(Math.random());
-  }, []);
-  const handleCreateCodeComponentDialogClose = React.useCallback(
-    () => setCreateCodeComponentDialogOpen(0),
-    [],
   );
 
   const closeTimeoutRef = React.useRef<NodeJS.Timeout>();
@@ -89,7 +79,6 @@ export default function ComponentCatalog({ className }: ComponentCatalogProps) {
   const handleDragStart = (componentType: string) => (event: React.DragEvent<HTMLElement>) => {
     event.dataTransfer.dropEffect = 'copy';
     const newNode = appDom.createElement(dom, componentType, {});
-    api.deselect();
     api.newNodeDragStart(newNode);
     closeDrawer(0);
   };
@@ -98,6 +87,17 @@ export default function ComponentCatalog({ className }: ComponentCatalogProps) {
 
   const handleMouseEnter = React.useCallback(() => openDrawer(), [openDrawer]);
   const handleMouseLeave = React.useCallback(() => closeDrawer(), [closeDrawer]);
+
+  const [createCodeComponentDialogOpen, setCreateCodeComponentDialogOpen] = React.useState(false);
+
+  const handleCreateCodeComponentDialogOpen = React.useCallback(() => {
+    setCreateCodeComponentDialogOpen(true);
+    closeDrawer(0);
+  }, [closeDrawer]);
+  const handleCreateCodeComponentDialogClose = React.useCallback(
+    () => setCreateCodeComponentDialogOpen(false),
+    [],
+  );
 
   return (
     <ComponentCatalogRoot
@@ -118,8 +118,20 @@ export default function ComponentCatalog({ className }: ComponentCatalogProps) {
           borderColor: 'divider',
         }}
       >
-        <Collapse in={!!openStart} orientation="horizontal" timeout={200} sx={{ height: '100%' }}>
-          <Box sx={{ width: 250, height: '100%', overflow: 'auto', scrollbarGutter: 'stable' }}>
+        <Collapse
+          in={!!openStart}
+          orientation="horizontal"
+          timeout={200}
+          sx={{ height: '100%', justifyContent: 'flex-end', display: 'flex' }}
+        >
+          <Box
+            sx={{
+              width: 250,
+              height: '100%',
+              overflow: 'auto',
+              scrollbarGutter: 'stable',
+            }}
+          >
             <Box display="grid" gridTemplateColumns="1fr 1fr 1fr" gap={1} padding={1}>
               {Object.entries(toolpadComponents).map(([componentId, componentType]) => {
                 invariant(componentType, `No component definition found for "${componentId}"`);
@@ -177,9 +189,9 @@ export default function ComponentCatalog({ className }: ComponentCatalogProps) {
                   ) : null;
                 })}
                 <ComponentCatalogItem
-                  id={'CreateNew'}
-                  displayName={'Create'}
-                  kind={'create'}
+                  id="CreateNew"
+                  displayName="Create"
+                  kind="create"
                   onClick={handleCreateCodeComponentDialogOpen}
                 />
               </Box>
@@ -217,10 +229,10 @@ export default function ComponentCatalog({ className }: ComponentCatalogProps) {
                     <ArrowDropDownSharpIcon />
                   </IconButton>
                 </Box>
-                <Typography variant="caption" color="text.secondary">
-                  👍 Upvote on GitHub to get it prioritized.
-                </Typography>
                 <Collapse in={openFutureComponents} orientation={'vertical'}>
+                  <Typography variant="caption" color="text.secondary">
+                    👍 Upvote on GitHub to get it prioritized.
+                  </Typography>
                   <Box display="grid" gridTemplateColumns="1fr 1fr 1fr" gap={1} pt={1} pb={0}>
                     {Array.from(FUTURE_COMPONENTS, ([key, { displayName, url }]) => {
                       return (
@@ -272,8 +284,6 @@ export default function ComponentCatalog({ className }: ComponentCatalogProps) {
         </Box>
       </Box>
       <CreateCodeComponentNodeDialog
-        key={createCodeComponentDialogOpen || undefined}
-        appId={pageState.appId}
         open={!!createCodeComponentDialogOpen}
         onClose={handleCreateCodeComponentDialogClose}
       />

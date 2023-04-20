@@ -4,6 +4,8 @@ on:
   issue_comment:
     types: [created]
 
+permissions: {}
+
 jobs:
   mark-duplicate:
     runs-on: ubuntu-latest
@@ -12,7 +14,7 @@ jobs:
       issues: write
     steps:
       - name: mark-duplicate
-        uses: actions-cool/issues-helper@v3
+        uses: actions-cool/issues-helper@65840f57fe2b3b9a796776577b6b19d2a16adc72 # v3.4.0
         with:
           actions: 'mark-duplicate'
           token: ${{ secrets.GITHUB_TOKEN }}

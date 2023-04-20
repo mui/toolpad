@@ -102,14 +102,14 @@ function SignUp({ sx }) {
             boxShadow: (theme) =>
               theme.palette.mode === 'dark'
                 ? '0 1px 2px 0 rgba(0 0 0 / 1)'
-                : '0 1px 2px 0 rgba(0 0 0 / 0.1)',
+                : '0 2px 4px 0 rgba(0 0 0 / 0.08)',
             borderRadius: 1,
             border: '1px solid',
             borderColor: (theme) =>
-              theme.palette.mode === 'dark' ? theme.palette.primaryDark[500] : 'grey.400',
+              theme.palette.mode === 'dark' ? theme.palette.primaryDark[500] : 'grey.300',
             px: 1,
             py: 0.5,
-            height: 50,
+            // height: 48,
             typography: 'body2',
             '&:hover': {
               borderColor: (theme) =>
@@ -128,14 +128,14 @@ function SignUp({ sx }) {
               outlineColor: (theme) =>
                 theme.palette.mode === 'dark'
                   ? theme.palette.primaryDark[500]
-                  : theme.palette.primary[300],
+                  : theme.palette.primary[100],
             },
           }}
         />
         <Button
           disabled={form.status === 'loading'}
           type="submit"
-          size="large"
+          size="medium"
           variant="contained"
           endIcon={<KeyboardArrowRightRounded />}
           sx={{ width: { xs: '100%', sm: 'auto' } }}

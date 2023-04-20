@@ -1,31 +1,16 @@
 import { NextApiHandler, NextApiRequest, NextApiResponse } from 'next';
-import logInfo from './logInfo';
+import logger from './logger';
 
 export const withReqResLogs =
   (apiHandler: NextApiHandler) =>
   (req: NextApiRequest, res: NextApiResponse): unknown | Promise<unknown> => {
-    logInfo(
+    logger.trace(
       {
         key: 'apiReqRes',
         req,
         res,
       },
-      'Handled request',
-    );
-
-    return apiHandler(req, res);
-  };
-
-export const withRpcReqResLogs =
-  (apiHandler: NextApiHandler) =>
-  (req: NextApiRequest, res: NextApiResponse): unknown | Promise<unknown> => {
-    logInfo(
-      {
-        key: 'rpcReqRes',
-        rpcReq: req,
-        res,
-      },
-      `Handled request (${req.body.type}:${req.body.name})`,
+      'Handled API request',
     );
 
     return apiHandler(req, res);

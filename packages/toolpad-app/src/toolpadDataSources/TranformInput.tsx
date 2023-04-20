@@ -1,6 +1,5 @@
 import { Stack, Grid, Checkbox, FormControlLabel, IconButton } from '@mui/material';
 import * as React from 'react';
-
 import AutorenewIcon from '@mui/icons-material/Autorenew';
 import JsonView from '../components/JsonView';
 import { JsExpressionEditor } from '../toolpad/AppEditor/PageEditor/JsExpressionEditor';
@@ -14,6 +13,8 @@ export interface TransformInputProps {
   loading: boolean;
   onUpdatePreview?: () => void;
 }
+
+const SCOPE_META = {};
 
 export default function TransformInput({
   value,
@@ -79,6 +80,7 @@ export default function TransformInput({
           ) : null}
           <JsExpressionEditor
             globalScope={globalScope}
+            globalScopeMeta={SCOPE_META}
             autoFocus
             value={value}
             sx={{

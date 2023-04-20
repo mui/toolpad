@@ -1,11 +1,14 @@
-import { VersionOrPreview } from '../types';
-import { createProvidedContext } from '../utils/react';
+import * as React from 'react';
+import { useNonNullableContext } from '@mui/toolpad-core/utils/react';
+import { AppVersion } from '../types';
 
 export interface AppContext {
-  appId: string;
-  version: VersionOrPreview;
+  version: AppVersion;
 }
 
-const [useAppContext, AppContextProvider] = createProvidedContext<AppContext>('App');
+const Context = React.createContext<AppContext | null>(null);
 
-export { useAppContext, AppContextProvider };
+export const AppContextProvider = Context.Provider;
+export function useAppContext() {
+  return useNonNullableContext(Context);
+}

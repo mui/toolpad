@@ -4,63 +4,35 @@ import {
   DialogActions,
   DialogContent,
   DialogTitle,
+  IconButton,
+  Portal,
+  Snackbar,
   TextField,
 } from '@mui/material';
 import * as React from 'react';
-import { useNavigate } from 'react-router-dom';
 import invariant from 'invariant';
+import CloseIcon from '@mui/icons-material/Close';
 import * as appDom from '../../../appDom';
-import { useDom, useDomApi } from '../../DomLoader';
-import { format } from '../../../utils/prettier';
+import { useDom } from '../../AppState';
 import DialogForm from '../../../components/DialogForm';
 import useEvent from '../../../utils/useEvent';
 import { useNodeNameValidation } from './validation';
+import client from '../../../api';
+import useLatest from '../../../utils/useLatest';
 
 const DEFAULT_NAME = 'MyComponent';
 
-function createDefaultCodeComponent(name: string): string {
-  const componentId = name.replace(/\s/g, '');
-  const propTypeId = `${componentId}Props`;
-  return format(`
-    import * as React from 'react';
-    import { Typography } from '@mui/material';
-    import { createComponent } from '@mui/toolpad-core';
-    
-    export interface ${propTypeId} {
-      msg: string;
-    }
-    
-    function ${componentId}({ msg }: ${propTypeId}) {
-      return (
-        <Typography>{msg}</Typography>
-      );
-    }
-
-    export default createComponent(${componentId}, {
-      argTypes: {
-        msg: {
-          typeDef: { type: "string" },
-          defaultValue: "Hello world!",
-        },
-      },
-    });    
-  `);
-}
-
 export interface CreateCodeComponentDialogProps {
-  appId: string;
   open: boolean;
   onClose: () => void;
 }
 
 export default function CreateCodeComponentDialog({
-  appId,
   open,
   onClose,
   ...props
 }: CreateCodeComponentDialogProps) {
-  const dom = useDom();
-  const domApi = useDomApi();
+  const { dom } = useDom();
 
   const existingNames = React.useMemo(
     () => appDom.getExistingNamesForChildren(dom, appDom.getApp(dom), 'codeComponents'),
@@ -68,8 +40,6 @@ export default function CreateCodeComponentDialog({
   );
 
   const [name, setName] = React.useState(appDom.proposeName(DEFAULT_NAME, existingNames));
-
-  const navigate = useNavigate();
 
   // Reset form
   const handleReset = useEvent(() => setName(appDom.proposeName(DEFAULT_NAME, existingNames)));
@@ -88,50 +58,80 @@ export default function CreateCodeComponentDialog({
   const isNameValid = !inputErrorMsg;
   const isFormValid = isNameValid;
 
-  return (
-    <Dialog open={open} onClose={onClose} {...props}>
-      <DialogForm
-        autoComplete="off"
-        onSubmit={(event) => {
-          invariant(isFormValid, 'Invalid form should not be submitted when submit is disabled');
+  const [snackbarState, setSnackbarState] = React.useState<{ name: string } | null>(null);
+  const lastSnackbarState = useLatest(snackbarState);
+  const handleSnackbarClose = React.useCallback(() => {
+    setSnackbarState(null);
+  }, []);
 
-          event.preventDefault();
-          const newNode = appDom.createNode(dom, 'codeComponent', {
-            name,
-            attributes: {
-              code: appDom.createConst(createDefaultCodeComponent(name)),
-            },
-          });
-          const appNode = appDom.getApp(dom);
-          domApi.addNode(newNode, appNode, 'codeComponents');
-          onClose();
-          navigate(`/app/${appId}/codeComponents/${newNode.id}`);
-        }}
-      >
-        <DialogTitle>Create a new MUI Toolpad Code Component</DialogTitle>
-        <DialogContent>
-          <TextField
-            sx={{ my: 1 }}
-            required
-            onFocus={handleInputFocus}
-            autoFocus
-            fullWidth
-            label="name"
-            value={name}
-            onChange={(event) => setName(event.target.value)}
-            error={!isNameValid}
-            helperText={inputErrorMsg}
+  return (
+    <React.Fragment>
+      <Dialog open={open} onClose={onClose} {...props}>
+        <DialogForm
+          autoComplete="off"
+          onSubmit={async (event) => {
+            event.preventDefault();
+            invariant(isFormValid, 'Invalid form should not be submitted when submit is disabled');
+            await client.mutation.createComponent(name);
+            onClose();
+            setSnackbarState({ name });
+          }}
+        >
+          <DialogTitle>Create a new Code Component</DialogTitle>
+          <DialogContent>
+            <TextField
+              sx={{ my: 1 }}
+              required
+              onFocus={handleInputFocus}
+              autoFocus
+              fullWidth
+              label="name"
+              value={name}
+              onChange={(event) => setName(event.target.value)}
+              error={open && !isNameValid}
+              helperText={inputErrorMsg}
+            />
+          </DialogContent>
+          <DialogActions>
+            <Button color="inherit" variant="text" onClick={onClose}>
+              Cancel
+            </Button>
+            <Button type="submit" disabled={!isFormValid}>
+              Create
+            </Button>
+          </DialogActions>
+        </DialogForm>
+      </Dialog>
+      {lastSnackbarState ? (
+        <Portal>
+          <Snackbar
+            open={!!snackbarState}
+            onClose={handleSnackbarClose}
+            message={`Component "${lastSnackbarState.name}" created`}
+            anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+            action={
+              <React.Fragment>
+                <Button
+                  size="small"
+                  onClick={() => {
+                    client.mutation.openCodeComponentEditor(name);
+                  }}
+                >
+                  Open
+                </Button>
+                <IconButton
+                  size="small"
+                  aria-label="close"
+                  color="inherit"
+                  onClick={handleSnackbarClose}
+                >
+                  <CloseIcon fontSize="small" />
+                </IconButton>
+              </React.Fragment>
+            }
           />
-        </DialogContent>
-        <DialogActions>
-          <Button color="inherit" variant="text" onClick={onClose}>
-            Cancel
-          </Button>
-          <Button type="submit" disabled={!isFormValid}>
-            Create
-          </Button>
-        </DialogActions>
-      </DialogForm>
-    </Dialog>
+        </Portal>
+      ) : null}
+    </React.Fragment>
   );
 }

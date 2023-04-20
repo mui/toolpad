@@ -12,7 +12,8 @@ import {
   Typography,
 } from '@mui/material';
 import { TabContext } from '@mui/lab';
-import { BindableAttrValue, LiveBinding } from '@mui/toolpad-core';
+import { BindableAttrValue, LiveBinding, ScopeMeta } from '@mui/toolpad-core';
+import { useServerJsRuntime } from '@mui/toolpad-core/jsServerRuntime';
 import { Body, RawBody, UrlEncodedBody } from './types';
 import { Maybe, WithControlledProp } from '../../utils/types';
 import {
@@ -65,6 +66,7 @@ const MonacoEditor = lazyComponent(() => import('../../components/MonacoEditor')
 });
 
 interface BodyTypeEditorProps<B = Body> extends WithControlledProp<Maybe<B>> {
+  globalScopeMeta: ScopeMeta;
   globalScope: Record<string, any>;
   renderToolbar: RenderBodyToolbar;
   disabled?: boolean;
@@ -75,6 +77,7 @@ function RawBodyEditor({
   value: valueProp,
   onChange,
   globalScope,
+  globalScopeMeta,
   disabled,
 }: BodyTypeEditorProps<RawBody>) {
   const value: RawBody = React.useMemo(
@@ -103,8 +106,10 @@ function RawBodyEditor({
 
   const content = value?.content ?? null;
 
+  const jsServerRuntime = useServerJsRuntime();
+
   const liveContent: LiveBinding = useEvaluateLiveBinding({
-    server: true,
+    jsRuntime: jsServerRuntime,
     input: content,
     globalScope,
   });
@@ -135,7 +140,9 @@ function RawBodyEditor({
         sx={{ mt: 1 }}
         liveBinding={liveContent}
         globalScope={globalScope}
+        globalScopeMeta={globalScopeMeta}
         propType={{ type: 'string' }}
+        jsRuntime={jsServerRuntime}
         renderControl={(props) => (
           <MonacoEditor
             sx={{ flex: 1, height: 250 }}
@@ -159,6 +166,7 @@ function UrlEncodedBodyEditor({
   value: valueProp,
   onChange,
   globalScope,
+  globalScopeMeta,
   disabled,
 }: BodyTypeEditorProps<UrlEncodedBody>) {
   const value: UrlEncodedBody = React.useMemo(
@@ -178,8 +186,9 @@ function UrlEncodedBodyEditor({
     [onChange, value],
   );
 
+  const jsServerRuntime = useServerJsRuntime();
   const liveContent = useEvaluateLiveBindingEntries({
-    server: true,
+    jsRuntime: jsServerRuntime,
     input: value.content,
     globalScope,
   });
@@ -192,8 +201,10 @@ function UrlEncodedBodyEditor({
         value={value.content}
         onChange={handleParamsChange}
         globalScope={globalScope}
+        globalScopeMeta={globalScopeMeta}
         liveValue={liveContent}
         disabled={disabled}
+        jsRuntime={jsServerRuntime}
       />
     </React.Fragment>
   );
@@ -202,6 +213,7 @@ function UrlEncodedBodyEditor({
 type BodyKind = Body['kind'];
 
 export interface BodyEditorProps extends WithControlledProp<Maybe<Body>> {
+  globalScopeMeta: ScopeMeta;
   globalScope: Record<string, any>;
   sx?: SxProps;
   method?: string;
@@ -209,6 +221,7 @@ export interface BodyEditorProps extends WithControlledProp<Maybe<Body>> {
 
 export default function BodyEditor({
   globalScope,
+  globalScopeMeta,
   value,
   onChange,
   sx,
@@ -251,6 +264,7 @@ export default function BodyEditor({
           <RawBodyEditor
             renderToolbar={renderToolbar}
             globalScope={globalScope}
+            globalScopeMeta={globalScopeMeta}
             value={value?.kind === 'raw' ? (value as RawBody) : null}
             onChange={onChange}
             disabled={disabled}
@@ -260,6 +274,7 @@ export default function BodyEditor({
           <UrlEncodedBodyEditor
             renderToolbar={renderToolbar}
             globalScope={globalScope}
+            globalScopeMeta={globalScopeMeta}
             value={value?.kind === 'urlEncoded' ? (value as UrlEncodedBody) : null}
             onChange={onChange}
             disabled={disabled}

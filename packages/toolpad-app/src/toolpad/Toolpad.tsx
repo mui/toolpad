@@ -1,11 +1,13 @@
+import { CircularProgress, Box, styled, CssBaseline } from '@mui/material';
 import * as React from 'react';
-import { BrowserRouter, Routes, Route, Navigate, useParams } from 'react-router-dom';
-import { Box, CircularProgress, styled } from '@mui/material';
 import { ErrorBoundary, FallbackProps } from 'react-error-boundary';
-import AppEditor from './AppEditor';
-import Home from './Home';
-import ErrorAlert from './AppEditor/PageEditor/ErrorAlert';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import Head from 'next/head';
 import NoSsr from '../components/NoSsr';
+import AppEditor from './AppEditor';
+import ErrorAlert from './AppEditor/PageEditor/ErrorAlert';
+import { ThemeProvider, usePaletteMode } from '../ThemeContext';
+import { getMetaThemeColor } from '../theme';
 
 const Centered = styled('div')({
   height: '100%',
@@ -34,46 +36,42 @@ function FullPageError({ error }: FullPageErrorProps) {
   );
 }
 
-function LegacyEditorUrlRedirect() {
-  const { '*': editorRoute } = useParams();
-  return <Navigate to={`../${editorRoute}`} />;
-}
-
-function AppWorkspace() {
-  return (
-    <Routes>
-      <Route>
-        <Route path="editor/*" element={<LegacyEditorUrlRedirect />} />
-        <Route path="*" element={<AppEditor />} />
-      </Route>
-    </Routes>
-  );
-}
-
 function ErrorFallback({ error }: FallbackProps) {
   return <FullPageError error={error} />;
 }
 
-export interface EditorProps {
+export interface ToolpadProps {
   basename: string;
 }
 
-export default function Toolpad({ basename }: EditorProps) {
+export default function Toolpad({ basename }: ToolpadProps) {
+  const paletteMode = usePaletteMode();
   return (
     <NoSsr>
-      {/* Container that allows children to size to it with height: 100% */}
-      <Box sx={{ height: '1px', minHeight: '100vh' }}>
-        <ErrorBoundary fallbackRender={ErrorFallback}>
-          <React.Suspense fallback={<FullPageLoader />}>
-            <BrowserRouter basename={basename}>
-              <Routes>
-                <Route path="/" element={<Home />} />
-                <Route path="/app/:appId/*" element={<AppWorkspace />} />
-              </Routes>
-            </BrowserRouter>
-          </React.Suspense>
-        </ErrorBoundary>
-      </Box>
+      <ThemeProvider>
+        <Head>
+          {/* PWA primary color */}
+          <meta
+            name="theme-color"
+            content={getMetaThemeColor(paletteMode)}
+            media={`(prefers-color-scheme: ${paletteMode})`}
+          />
+        </Head>
+        {/* CssBaseline kickstart an elegant, consistent, and simple baseline to build upon. */}
+        <CssBaseline />
+        {/* Container that allows children to size to it with height: 100% */}
+        <Box sx={{ height: '1px', minHeight: '100vh' }}>
+          <ErrorBoundary fallbackRender={ErrorFallback}>
+            <React.Suspense fallback={<FullPageLoader />}>
+              <BrowserRouter basename={basename}>
+                <Routes>
+                  <Route path="/*" element={<AppEditor />} />
+                </Routes>
+              </BrowserRouter>
+            </React.Suspense>
+          </ErrorBoundary>
+        </Box>
+      </ThemeProvider>
     </NoSsr>
   );
 }

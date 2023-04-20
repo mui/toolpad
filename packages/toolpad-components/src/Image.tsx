@@ -1,6 +1,7 @@
 import { Box, Skeleton, SxProps } from '@mui/material';
 import * as React from 'react';
 import { createComponent } from '@mui/toolpad-core';
+import { SX_PROP_HELPER_TEXT } from './constants.js';
 
 export interface ImageProps {
   src: string;
@@ -32,7 +33,7 @@ function Image({ sx: sxProp, src, width, height, alt, loading: loadingProp, fit 
   const loading = loadingProp || imgLoading;
 
   return (
-    <Box sx={sx}>
+    <Box sx={{ maxWidth: '100%', ...sx }}>
       {loading ? <Skeleton variant="rectangular" width={width} height={height} /> : null}
       <Box
         component="img"
@@ -52,36 +53,43 @@ function Image({ sx: sxProp, src, width, height, alt, loading: loadingProp, fit 
 }
 
 export default createComponent(Image, {
+  helperText: 'The Image component lets you display images.',
   layoutDirection: 'both',
   loadingPropSource: ['src'],
   loadingProp: 'loading',
   argTypes: {
     src: {
+      helperText: 'The url of the image. Must resolve to an image file.',
       typeDef: { type: 'string' },
     },
     alt: {
-      typeDef: { type: 'string' },
-      defaultValue: '',
+      helperText:
+        "The `alt` attribute holds a text description of the image. screen readers read this description out to their users so they know what the image means. Alt text is also displayed on the page if the image can't be loaded for some reason: for example, network errors, content blocking, or linkrot.",
+      typeDef: { type: 'string', default: '' },
     },
     fit: {
-      typeDef: { type: 'string', enum: ['contain', 'cover', 'fill', 'none', 'scale-down'] },
-      defaultValue: 'contain',
+      helperText:
+        'Defines how the image should [resize](https://developer.mozilla.org/en-US/docs/Web/CSS/object-fit) to its container.',
+      typeDef: {
+        type: 'string',
+        enum: ['contain', 'cover', 'fill', 'none', 'scale-down'],
+        default: 'contain',
+      },
     },
     width: {
-      typeDef: { type: 'number' },
-      defaultValue: 400,
+      helperText: 'The image width in pixels',
+      typeDef: { type: 'number', default: 400 },
     },
     height: {
-      typeDef: { type: 'number' },
-      defaultValue: 300,
+      typeDef: { type: 'number', default: 300 },
     },
     loading: {
-      typeDef: { type: 'boolean' },
-      defaultValue: false,
+      helperText: 'Displays a loading animation indicating the image is still loading',
+      typeDef: { type: 'boolean', default: false },
     },
     sx: {
+      helperText: SX_PROP_HELPER_TEXT,
       typeDef: { type: 'object' },
-      defaultValue: { maxWidth: '100%' },
     },
   },
 });

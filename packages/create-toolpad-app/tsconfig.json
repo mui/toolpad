@@ -1,0 +1,19 @@
+{
+  "compilerOptions": {
+    "target": "es2020",
+    "module": "commonjs",
+    "moduleResolution": "node16",
+    "lib": ["esnext"],
+    "isolatedModules": true,
+    "strict": true,
+    "resolveJsonModule": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "noEmit": false,
+    "rootDir": "src",
+    "outDir": "./dist",
+    "pretty": true,
+    "preserveWatchOutput": true
+  },
+  "include": ["src/**/*.ts", "src/**/*.tsx"]
+}

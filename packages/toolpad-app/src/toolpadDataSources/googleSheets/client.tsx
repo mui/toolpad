@@ -7,6 +7,7 @@ import {
   FormControlLabel,
   Typography,
   Skeleton,
+  Box,
 } from '@mui/material';
 import * as React from 'react';
 import { inferColumns, parseColumns } from '@mui/toolpad-components';
@@ -27,10 +28,11 @@ import {
 } from './types';
 import useDebounced from '../../utils/useDebounced';
 import { usePrivateQuery } from '../context';
-import ErrorAlert from '../../toolpad/AppEditor/PageEditor/ErrorAlert';
 import QueryInputPanel from '../QueryInputPanel';
 import SplitPane from '../../components/SplitPane';
 import useQueryPreview from '../useQueryPreview';
+import useFetchPrivate from '../useFetchPrivate';
+import * as appDom from '../../appDom';
 
 const EMPTY_ROWS: any[] = [];
 
@@ -52,19 +54,19 @@ function QueryEditor({
   });
 
   const fetchedFile: UseQueryResult<GoogleDriveFile> = usePrivateQuery(
-    input.query.spreadsheetId
+    input.attributes.query.value.spreadsheetId
       ? {
           type: 'FILE_GET',
-          spreadsheetId: input.query.spreadsheetId,
+          spreadsheetId: input.attributes.query.value.spreadsheetId,
         }
       : null,
   );
 
   const fetchedSpreadsheet: UseQueryResult<GoogleSpreadsheet> = usePrivateQuery(
-    input.query.spreadsheetId
+    input.attributes.query.value.spreadsheetId
       ? {
           type: 'FETCH_SPREADSHEET',
-          spreadsheetId: input.query.spreadsheetId,
+          spreadsheetId: input.attributes.query.value.spreadsheetId,
         }
       : null,
   );
@@ -72,47 +74,41 @@ function QueryEditor({
   const selectedSheet = React.useMemo(
     () =>
       fetchedSpreadsheet.data?.sheets?.find(
-        (sheet) => sheet.properties?.title === input.query.sheetName,
+        (sheet) => sheet.properties?.title === input.attributes.query.value.sheetName,
       ) ?? null,
     [fetchedSpreadsheet, input],
   );
 
   const handleSpreadsheetChange = React.useCallback(
     (event: React.SyntheticEvent<Element, Event>, newValue: GoogleDriveFile | null) => {
-      setInput((existing) => ({
-        ...existing,
-        query: { ...existing.query, sheetName: null, spreadsheetId: newValue?.id ?? null },
-      }));
+      setInput((existing) => {
+        existing = appDom.setQueryProp(existing, 'sheetName', null);
+        existing = appDom.setQueryProp(existing, 'spreadsheetId', newValue?.id ?? null);
+        return existing;
+      });
     },
     [setInput],
   );
 
   const handleSheetChange = React.useCallback(
     (event: React.SyntheticEvent<Element, Event>, newValue: GoogleSheet | null) => {
-      setInput((existing) => ({
-        ...existing,
-        query: { ...existing.query, sheetName: newValue?.properties?.title ?? null },
-      }));
+      setInput((existing) =>
+        appDom.setQueryProp(existing, 'sheetName', newValue?.properties?.title ?? null),
+      );
     },
     [setInput],
   );
 
   const handleRangeChange = React.useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
-      setInput((existing) => ({
-        ...existing,
-        query: { ...existing.query, ranges: event.target.value },
-      }));
+      setInput((existing) => appDom.setQueryProp(existing, 'ranges', event.target.value));
     },
     [setInput],
   );
 
   const handleTransformChange = React.useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
-      setInput((existing) => ({
-        ...existing,
-        query: { ...existing.query, headerRow: event.target.checked },
-      }));
+      setInput((existing) => appDom.setQueryProp(existing, 'headerRow', event.target.checked));
     },
     [setInput],
   );
@@ -126,13 +122,17 @@ function QueryEditor({
     [],
   );
 
-  const { preview, runPreview: handleRunPreview } = useQueryPreview<
-    GoogleSheetsPrivateQuery,
-    GoogleSheetsResult
-  >({
-    type: 'DEBUG_EXEC',
-    query: input.query,
-  });
+  const fetchPrivate = useFetchPrivate<GoogleSheetsPrivateQuery, GoogleSheetsResult>();
+  const fetchServerPreview = React.useCallback(
+    (query: GoogleSheetsApiQuery) => fetchPrivate({ type: 'DEBUG_EXEC', query }),
+    [fetchPrivate],
+  );
+
+  const {
+    preview,
+    runPreview: handleRunPreview,
+    isLoading: previewIsLoading,
+  } = useQueryPreview(fetchServerPreview, input.attributes.query.value, {});
 
   const rawRows: any[] = preview?.data || EMPTY_ROWS;
   const columns: GridColDef[] = React.useMemo(() => parseColumns(inferColumns(rawRows)), [rawRows]);
@@ -147,7 +147,7 @@ function QueryEditor({
             fullWidth
             value={fetchedFile.data ?? null}
             loading={fetchedFiles.isLoading}
-            loadingText={'Loading...'}
+            loadingText={'Loading…'}
             options={fetchedFiles.data?.files ?? []}
             getOptionLabel={(option: GoogleDriveFile) => option.name ?? ''}
             onInputChange={handleSpreadsheetInput}
@@ -168,7 +168,7 @@ function QueryEditor({
             fullWidth
             loading={fetchedSpreadsheet.isLoading}
             value={selectedSheet}
-            loadingText={'Loading...'}
+            loadingText={'Loading…'}
             options={fetchedSpreadsheet.data?.sheets ?? []}
             getOptionLabel={(option: GoogleSheet) => option.properties?.title ?? ''}
             onChange={handleSheetChange}
@@ -184,15 +184,15 @@ function QueryEditor({
           <TextField
             label="Range"
             helperText={`In the form of A1:Z999`}
-            value={input.query.ranges}
-            disabled={!input.query.sheetName}
+            value={input.attributes.query.value.ranges}
+            disabled={!input.attributes.query.value.sheetName}
             onChange={handleRangeChange}
           />
           <FormControlLabel
             label="First row contains column headers"
             control={
               <Checkbox
-                checked={input.query.headerRow}
+                checked={input.attributes.query.value.headerRow}
                 onChange={handleTransformChange}
                 inputProps={{ 'aria-label': 'controlled' }}
               />
@@ -201,17 +201,39 @@ function QueryEditor({
         </Stack>
       </QueryInputPanel>
 
-      {preview?.error ? (
-        <ErrorAlert error={preview?.error} />
-      ) : (
-        <DataGridPro sx={{ border: 'none' }} columns={columns} key={previewGridKey} rows={rows} />
-      )}
+      <Box
+        sx={{
+          height: '100%',
+          display: 'flex',
+          flexDirection: 'column',
+        }}
+      >
+        {preview?.error ? (
+          <Box
+            sx={{
+              display: 'flex',
+              flex: 1,
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}
+          >
+            <Typography color="error">{preview?.error?.message}</Typography>
+          </Box>
+        ) : (
+          <DataGridPro
+            sx={{ border: 'none', flex: 1 }}
+            columns={columns}
+            key={previewGridKey}
+            rows={rows}
+            loading={previewIsLoading}
+          />
+        )}
+      </Box>
     </SplitPane>
   );
 }
 
 function ConnectionParamsInput({
-  appId,
   connectionId,
   handlerBasePath,
 }: ConnectionEditorProps<GoogleSheetsConnectionParams>) {
@@ -227,7 +249,7 @@ function ConnectionParamsInput({
         component="a"
         disabled={Boolean(validatedUser.data)}
         href={`${handlerBasePath}/auth/login?state=${encodeURIComponent(
-          JSON.stringify({ appId, connectionId }),
+          JSON.stringify({ connectionId }),
         )}
         `}
         variant="outlined"

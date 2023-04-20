@@ -36,12 +36,10 @@ export class ToolpadHome {
     this.createNewbtn = page.locator('button:has-text("create new")');
 
     this.newAppDialog = page.locator('[role="dialog"]', {
-      hasText: 'Create a new MUI Toolpad App',
+      hasText: 'Create a new App',
     });
     this.newAppNameInput = this.newAppDialog.locator('label:has-text("name")');
-    this.newAppTemplateSelect = this.newAppDialog.locator(
-      '[aria-haspopup="listbox"]:has-text("blank")',
-    );
+    this.newAppTemplateSelect = page.getByRole('button', { name: /Use template/ });
     this.newAppDomInput = this.newAppDialog.locator('label:has-text("dom")');
     this.newAppDomCreateBtn = this.newAppDialog.locator('button:has-text("create")');
 
@@ -78,9 +76,10 @@ export class ToolpadHome {
       await this.newAppDomInput.fill(JSON.stringify(dom));
     }
 
-    await this.newAppDomCreateBtn.click();
-
-    await this.page.waitForNavigation({ url: /\/_toolpad\/app\/[^/]+\/pages\/[^/]+/ });
+    await Promise.all([
+      this.newAppDomCreateBtn.click(),
+      this.page.waitForNavigation({ url: /\/_toolpad\/app\/[^/]+\/pages\/[^/]+/ }),
+    ]);
 
     const { pathname } = new URL(this.page.url());
     const idMatch = /^\/_toolpad\/app\/([^/]+)\//.exec(pathname);
@@ -95,9 +94,12 @@ export class ToolpadHome {
     await this.getAppRow(appName).locator('[aria-label="Application menu"]').click();
 
     await this.page.click('[role="menuitem"]:has-text("Duplicate"):visible');
-
+    const textField = this.page.getByLabel('name');
+    await textField.focus();
+    await textField.fill(appName);
+    await this.page.click('[aria-label="Duplicate app submit button"]');
     // Navigate to the new app
-    await this.getAppRow(appName).locator('a:has-text("Edit")').click();
+    await this.getAppRow(`${appName} (copy)`).locator('a:has-text("Edit")').click();
     await this.page.waitForNavigation({ url: /\/_toolpad\/app\/[^/]+\/pages\/[^/]+/ });
 
     const { pathname } = new URL(this.page.url());
@@ -107,5 +109,11 @@ export class ToolpadHome {
     }
 
     return { id: idMatch[1] };
+  }
+
+  async searchFor(name: string) {
+    const textField = this.page.getByPlaceholder('Search apps');
+    await textField.focus();
+    await textField.fill(name);
   }
 }

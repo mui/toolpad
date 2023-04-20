@@ -1,44 +1,41 @@
 import pino from 'pino';
-import ecsFormat from '@elastic/ecs-pino-format';
+import type { NextApiRequest, NextApiResponse } from 'next';
+import { errSerializer, reqSerializer, resSerializer } from './logSerializers';
 
-import config from '../config';
-import {
-  recaptchaResSerializer,
-  reqSerializer,
-  resSerializer,
-  rpcReqSerializer,
-} from './logSerializers';
+const logger = pino({
+  level: process.env.LOG_LEVEL || 'info',
+  redact: { paths: [] },
+  serializers: {
+    err: errSerializer,
+    error: errSerializer,
+    req: reqSerializer,
+    res: resSerializer,
+  },
+});
 
-let transport;
-if (config.ecsNodeUrl) {
-  transport = pino.transport({
-    target: 'pino-elasticsearch',
-    options: {
-      index: 'toolpad-pino',
-      node: config.ecsNodeUrl,
-      op_type: 'create',
-      auth: {
-        apiKey: config.ecsApiKey,
-      },
-    },
-  });
+interface ReqResLogPayload {
+  key: 'apiReqRes';
+  req: NextApiRequest;
+  res: NextApiResponse;
 }
 
-const logger = pino(
-  {
-    enabled: config.serverLogsEnabled,
-    level: process.env.LOG_LEVEL || 'info',
-    redact: { paths: [] },
-    serializers: {
-      err: pino.stdSerializers.err,
-      req: reqSerializer,
-      rpcReq: rpcReqSerializer,
-      res: resSerializer,
-      recaptchaRes: recaptchaResSerializer,
-    },
-    ...(config.ecsNodeUrl ? ecsFormat() : {}),
-  },
-  transport,
-);
+interface RpcReqResLogPayload {
+  key: 'rpc';
+  type: 'query' | 'mutation';
+  name: string;
+  error: Error | null;
+}
 
-export default logger;
+type LogPayload = ReqResLogPayload | RpcReqResLogPayload;
+
+function logMethod(method: 'info' | 'trace' | 'error' | 'warn' | 'fatal') {
+  return (obj: LogPayload, msg: string) => logger[method](obj, msg);
+}
+
+export default {
+  info: logMethod('info'),
+  trace: logMethod('trace'),
+  error: logMethod('error'),
+  warn: logMethod('warn'),
+  fatal: logMethod('fatal'),
+};

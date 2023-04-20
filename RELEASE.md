@@ -24,28 +24,46 @@
 
 1. Copy the generated changelog from the console, clean it up, add a short summary of the release highlights and use the new version number as the title.
 
+   Writing good highlights:
+
+   - Focus on new user facing features or changes
+   - Be concise, link to relevant documentation for extra clarity
+
 1. Prepend the changelog to [`CHANGELOG.md`](./CHANGELOG.md).
 
-1. Open a PR with the proposed changes.
+1. Open a PR to the `master` branch with the proposed changes. Merge the changes.
 
-1. Review/merge the PR — once the PR is merged to `master` a Docker image is built for the commit, tagged with the commit SHA and then pushed to Docker Hub, just like for any other commit in `master`.
+1. Publish the package to `npm`
 
-1. Wait for the Docker build to finish. (You can find the job in the [CircleCI pipelines](https://app.circleci.com/pipelines/github/mui/mui-toolpad?branch=master)). Note that you can always verify the built docker image by running it as
+   1. If you are not logged in to `npm` in your CLI, first log in with:
 
-   ```sh
-   TAG=<git-sha> docker-compose -f docker/compose/docker-compose.yml up
-   ```
+      ```sh
+      npm login
+      ```
 
-   Where `<git-sha>` is the commit on master that you want to test.
+   1. Make sure dependencies are up to date
 
-1. Release the Docker image using (requires GitHub authentication token):
+      ```sh
+      yarn
+      ```
 
-   ```sh
-   # add --prerelease if necessary
-   yarn release:docker
-   ```
+   1. Build the release version, make sure you don't have the project running in dev mode somewhere.
 
-   This command runs a GitHub action that retags the Docker image of the release commit in `master` to the version being released and also to "latest", and pushes those new tags. During the release, no new Docker images are created.
+      ```sh
+      yarn release:build
+      ```
+
+   1. Publish to `npm`
+
+      ```sh
+      yarn release:publish
+      ```
+
+      If you've created a prerelease, then instead use
+
+      ```sh
+      yarn release:publish-canary
+      ```
 
 1. Publish the documentation. The documentation must be updated on the `docs-latest` branch.
 

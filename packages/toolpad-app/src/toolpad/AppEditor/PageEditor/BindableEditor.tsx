@@ -1,8 +1,14 @@
 import { Stack, SxProps } from '@mui/material';
 import * as React from 'react';
-import { BindableAttrValue, PropValueType, LiveBinding } from '@mui/toolpad-core';
+import {
+  BindableAttrValue,
+  PropValueType,
+  LiveBinding,
+  ScopeMeta,
+  JsRuntime,
+} from '@mui/toolpad-core';
 import { BindingEditor } from '../BindingEditor';
-import { WithControlledProp, GlobalScopeMeta } from '../../../utils/types';
+import { WithControlledProp } from '../../../utils/types';
 import { getDefaultControl } from '../../propertyControls';
 
 function renderDefaultControl(params: RenderControlParams<any>) {
@@ -20,12 +26,12 @@ export interface BindableEditorProps<V> extends WithControlledProp<BindableAttrV
   label: string;
   bindable?: boolean;
   disabled?: boolean;
-  server?: boolean;
+  jsRuntime: JsRuntime;
   propType: PropValueType;
   renderControl?: (params: RenderControlParams<any>) => React.ReactNode;
   liveBinding?: LiveBinding;
   globalScope?: Record<string, unknown>;
-  globalScopeMeta?: GlobalScopeMeta;
+  globalScopeMeta: ScopeMeta;
   sx?: SxProps;
 }
 
@@ -36,7 +42,7 @@ export default function BindableEditor<V>({
   propType,
   renderControl = renderDefaultControl,
   value,
-  server,
+  jsRuntime,
   onChange,
   liveBinding,
   globalScope = {},
@@ -74,7 +80,7 @@ export default function BindableEditor<V>({
           globalScope={globalScope}
           globalScopeMeta={globalScopeMeta}
           label={label}
-          server={server}
+          jsRuntime={jsRuntime}
           propType={propType}
           value={value}
           onChange={onChange}

@@ -1,19 +1,19 @@
 import { ExecFetchResult } from '@mui/toolpad-core';
 import * as React from 'react';
 import { errorFrom, serializeError } from '../utils/errors';
-import useFetchPrivate from './useFetchPrivate';
 
 export interface UseQueryPreviewOptions<R> {
   onPreview?: (result: R) => void;
 }
 
-export default function useQueryPreview<PQ, R extends ExecFetchResult<any> & Partial<any>>(
-  privateQuery: PQ,
+export default function useQueryPreview<Q, P, R extends ExecFetchResult<any> & Partial<any>>(
+  dofetch: (query: Q, params: P) => Promise<R>,
+  query: Q,
+  params: P,
   { onPreview = () => {} }: UseQueryPreviewOptions<R> = {},
 ) {
   const [preview, setPreview] = React.useState<R | null>(null);
-
-  const fetchPrivate = useFetchPrivate<PQ, R>();
+  const [isLoading, setIsloading] = React.useState(false);
 
   const cancelRunPreview = React.useRef<(() => void) | null>(null);
   const runPreview = React.useCallback(() => {
@@ -24,7 +24,8 @@ export default function useQueryPreview<PQ, R extends ExecFetchResult<any> & Par
       canceled = true;
     };
 
-    fetchPrivate(privateQuery)
+    setIsloading(true);
+    dofetch(query, params)
       .then(
         (result) => {
           if (!canceled) {
@@ -37,9 +38,10 @@ export default function useQueryPreview<PQ, R extends ExecFetchResult<any> & Par
         },
       )
       .finally(() => {
+        setIsloading(false);
         cancelRunPreview.current = null;
       });
-  }, [fetchPrivate, privateQuery, onPreview]);
+  }, [dofetch, query, params, onPreview]);
 
-  return { preview, runPreview };
+  return { preview, runPreview, isLoading };
 }

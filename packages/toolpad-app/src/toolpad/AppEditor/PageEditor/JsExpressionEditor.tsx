@@ -1,9 +1,9 @@
 import * as React from 'react';
 import jsonToTs from 'json-to-ts';
 import { Skeleton, styled, SxProps } from '@mui/material';
-import { WithControlledProp, GlobalScopeMeta } from '../../../utils/types';
+import { ScopeMeta } from '@mui/toolpad-core';
+import { WithControlledProp } from '../../../utils/types';
 import lazyComponent from '../../../utils/lazyComponent';
-import { hasOwnProperty } from '../../../utils/collections';
 import ElementContext from '../ElementContext';
 
 const TypescriptEditor = lazyComponent(() => import('../../../components/TypescriptEditor'), {
@@ -17,8 +17,8 @@ const JsExpressionEditorRoot = styled('div')(({ theme }) => ({
 }));
 
 export interface JsExpressionEditorProps extends WithControlledProp<string> {
-  globalScope?: Record<string, unknown>;
-  globalScopeMeta?: GlobalScopeMeta;
+  globalScope: Record<string, unknown>;
+  globalScopeMeta: ScopeMeta;
   disabled?: boolean;
   autoFocus?: boolean;
   functionBody?: boolean;
@@ -31,8 +31,8 @@ export interface JsExpressionEditorProps extends WithControlledProp<string> {
 export function JsExpressionEditor({
   value,
   onChange,
-  globalScope = {},
-  globalScopeMeta = {},
+  globalScope,
+  globalScopeMeta,
   disabled,
   autoFocus,
   functionBody,
@@ -46,13 +46,25 @@ export function JsExpressionEditor({
   const nodeName = element?.name;
 
   const extraLibs = React.useMemo(() => {
-    const type = jsonToTs(globalScope);
+    const generatedTypes = jsonToTs(globalScope);
 
-    const globalDeclarations = Object.keys(globalScope).map((key) => {
-      const metaData = hasOwnProperty(globalScopeMeta, key) ? globalScopeMeta[key] : {};
-      const { deprecated, description } = metaData;
+    const globalDeclarations = Object.entries(globalScopeMeta).map(([key, metaData = {}]) => {
+      const { deprecated, description, tsType } = metaData;
 
-      const commentLines = [];
+      const overrides: Record<string, string> = {};
+
+      if (metaData.kind === 'element') {
+        const { props } = metaData;
+        if (props) {
+          for (const [prop, meta] of Object.entries(props)) {
+            if (meta.tsType) {
+              overrides[prop] = meta.tsType;
+            }
+          }
+        }
+      }
+
+      const commentLines: string[] = [];
 
       if (description) {
         commentLines.push(description);
@@ -67,28 +79,40 @@ export function JsExpressionEditor({
       const comment =
         commentLines.length > 0 ? ['/**', ...commentLines.map((line) => ` * ${line}`), ' */'] : [];
 
-      return [...comment, `declare const ${key}: RootObject[${JSON.stringify(key)}];`].join('\n');
+      const overridesType = `{ 
+        ${Object.entries(overrides)
+          .map(([propKey, propValue]) => {
+            return `${propKey}: ${propValue.replaceAll(
+              /\bThisComponent\b/g,
+              `RootObject[${JSON.stringify(key)}]`,
+            )}`;
+          })
+          .join('\n')} 
+      }`;
+
+      const globalType =
+        typeof tsType === 'string'
+          ? tsType
+          : `OverrideProps<RootObject[${JSON.stringify(key)}], ${overridesType}>;`;
+
+      const declaration = `declare const ${key}: Expand<${globalType}>`;
+      return [...comment, declaration].join('\n');
     });
 
-    const valueKeys = new Set(Object.keys(globalScope));
-    const extraGlobalKeys = Object.keys(globalScopeMeta).filter((key) => !valueKeys.has(key));
-
-    const extraDeclarationLines: string[] = [];
-    for (const key of extraGlobalKeys) {
-      const { tsType } = globalScopeMeta[key];
-      if (tsType) {
-        extraDeclarationLines.push(`declare const ${key}: ${tsType}`);
-      }
-    }
-
     const content = `
-      ${type.join('\n')}
+      type OverrideProps<T, S extends Partial<Record<keyof T, unknown>>> = {
+        [K in keyof T]:  S extends { [M in K]: any } ? S[K] : T[K]
+      }
+
+      // Pretty-print types on hover:
+      // See https://github.com/microsoft/vscode/issues/94679#issuecomment-755194161
+      type Expand<T> = T extends infer O ? { [K in keyof O]: Expand<O[K]> } : never;
+      
+      ${generatedTypes.join('\n')}
 
       ${globalDeclarations.join('\n')}
 
       ${nodeName ? `type ThisComponent = typeof ${nodeName}` : ''}
-      
-      ${extraDeclarationLines.join('\n')}
     `;
 
     return [{ content, filePath: 'global.d.ts' }];

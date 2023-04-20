@@ -1,56 +1,24 @@
-import { test, expect } from '@playwright/test';
-import { ToolpadHome } from '../../models/ToolpadHome';
+import * as path from 'path';
+import { test, expect } from '../../playwright/localTest';
 import { ToolpadEditor } from '../../models/ToolpadEditor';
 import clickCenter from '../../utils/clickCenter';
-import domInput from './domInput.json';
 
-test('can place new components from catalog', async ({ page, browserName }) => {
-  const homeModel = new ToolpadHome(page);
-  const editorModel = new ToolpadEditor(page, browserName);
-
-  await homeModel.goto();
-  const app = await homeModel.createApplication({});
-  await editorModel.goto(app.id);
-
-  await editorModel.pageRoot.waitFor();
-
-  const canvasInputLocator = editorModel.appCanvas.locator('input');
-
-  await expect(canvasInputLocator).toHaveCount(0);
-
-  const TEXT_FIELD_COMPONENT_DISPLAY_NAME = 'Text field';
-
-  // Drag in a first component
-
-  await editorModel.dragNewComponentToAppCanvas(TEXT_FIELD_COMPONENT_DISPLAY_NAME);
-
-  await expect(canvasInputLocator).toHaveCount(1);
-  await expect(canvasInputLocator).toBeVisible();
-
-  // Drag in a second component
-
-  await editorModel.dragNewComponentToAppCanvas(TEXT_FIELD_COMPONENT_DISPLAY_NAME);
-
-  await expect(canvasInputLocator).toHaveCount(2);
+test.use({
+  localAppConfig: {
+    template: path.resolve(__dirname, './fixture'),
+    cmd: 'dev',
+  },
 });
 
-test('can move elements in page', async ({ page, browserName }) => {
-  const homeModel = new ToolpadHome(page);
-  const editorModel = new ToolpadEditor(page, browserName);
-  const TEXT_FIELD_COMPONENT_DISPLAY_NAME = 'Text field';
+test('can move elements in page', async ({ page }) => {
+  const editorModel = new ToolpadEditor(page);
 
-  await homeModel.goto();
-  const app = await homeModel.createApplication({ dom: domInput });
-  await editorModel.goto(app.id);
+  await editorModel.goto();
 
-  await editorModel.pageRoot.waitFor();
-
-  const canvasMoveElementHandleSelector = `:has-text("${TEXT_FIELD_COMPONENT_DISPLAY_NAME}")[draggable]`;
+  await editorModel.waitForOverlay();
 
   const canvasInputLocator = editorModel.appCanvas.locator('input');
-  const canvasMoveElementHandleLocator = editorModel.appCanvas.locator(
-    canvasMoveElementHandleSelector,
-  );
+  const canvasMoveElementHandleLocator = editorModel.appCanvas.getByTestId('node-hud-tag');
 
   const firstTextFieldLocator = canvasInputLocator.first();
   const secondTextFieldLocator = canvasInputLocator.nth(1);
@@ -77,8 +45,7 @@ test('can move elements in page', async ({ page, browserName }) => {
   const moveTargetY = secondTextFieldBoundingBox!.y + secondTextFieldBoundingBox!.height / 2;
 
   await editorModel.dragToAppCanvas(
-    canvasMoveElementHandleSelector,
-    true,
+    editorModel.appCanvas.getByTestId('node-hud-tag'),
     moveTargetX,
     moveTargetY,
   );
@@ -87,22 +54,20 @@ test('can move elements in page', async ({ page, browserName }) => {
   await expect(secondTextFieldLocator).toHaveAttribute('value', 'textField1');
 });
 
-test('can delete elements from page', async ({ page, browserName }) => {
-  const homeModel = new ToolpadHome(page);
-  const editorModel = new ToolpadEditor(page, browserName);
+test('can delete elements from page', async ({ page }) => {
+  const editorModel = new ToolpadEditor(page);
 
-  await homeModel.goto();
-  const app = await homeModel.createApplication({ dom: domInput });
-  await editorModel.goto(app.id);
+  await editorModel.goto();
 
-  await editorModel.pageRoot.waitFor();
+  await editorModel.waitForOverlay();
 
   const canvasInputLocator = editorModel.appCanvas.locator('input');
-  const canvasRemoveElementButtonLocator = editorModel.appCanvas.locator(
-    'button[aria-label="Remove element"]',
-  );
 
   await expect(canvasInputLocator).toHaveCount(2);
+
+  const canvasRemoveElementButtonLocator = editorModel.appCanvas.getByRole('button', {
+    name: 'Remove',
+  });
 
   // Delete element by clicking
 
@@ -111,6 +76,9 @@ test('can delete elements from page', async ({ page, browserName }) => {
   const firstTextFieldLocator = canvasInputLocator.first();
 
   await clickCenter(page, firstTextFieldLocator);
+
+  await expect(canvasRemoveElementButtonLocator).toBeVisible();
+
   await canvasRemoveElementButtonLocator.click();
 
   await expect(canvasInputLocator).toHaveCount(1);
@@ -121,17 +89,4 @@ test('can delete elements from page', async ({ page, browserName }) => {
   await page.keyboard.press('Backspace');
 
   await expect(canvasInputLocator).toHaveCount(0);
-});
-
-test('can create new component', async ({ page, browserName }) => {
-  const homeModel = new ToolpadHome(page);
-  const editorModel = new ToolpadEditor(page, browserName);
-
-  await homeModel.goto();
-  const app = await homeModel.createApplication({});
-
-  await editorModel.goto(app.id);
-
-  await editorModel.createPage('somePage');
-  await editorModel.createComponent('someComponent');
 });

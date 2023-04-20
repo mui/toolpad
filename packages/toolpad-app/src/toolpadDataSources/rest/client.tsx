@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { BindableAttrEntries, BindableAttrValue, LiveBinding } from '@mui/toolpad-core';
+import { BindableAttrEntries, BindableAttrValue, ScopeMeta, LiveBinding } from '@mui/toolpad-core';
 import {
   Box,
   Button,
@@ -15,7 +15,14 @@ import {
 } from '@mui/material';
 import { Controller, useForm } from 'react-hook-form';
 import { TabContext, TabList } from '@mui/lab';
-import { ClientDataSource, ConnectionEditorProps, QueryEditorProps } from '../../types';
+import { useBrowserJsRuntime } from '@mui/toolpad-core/jsBrowserRuntime';
+import { useServerJsRuntime } from '@mui/toolpad-core/jsServerRuntime';
+import {
+  ClientDataSource,
+  ConnectionEditorProps,
+  ExecFetchFn,
+  QueryEditorProps,
+} from '../../types';
 import {
   FetchPrivateQuery,
   FetchQuery,
@@ -24,7 +31,7 @@ import {
   Body,
   ResponseType,
 } from './types';
-import { getAuthenticationHeaders, parseBaseUrl } from './shared';
+import { getAuthenticationHeaders, getDefaultUrl, parseBaseUrl } from './shared';
 import BindableEditor, {
   RenderControlParams,
 } from '../../toolpad/AppEditor/PageEditor/BindableEditor';
@@ -33,7 +40,7 @@ import {
   useEvaluateLiveBindingEntries,
 } from '../../toolpad/AppEditor/useEvaluateLiveBinding';
 import MapEntriesEditor from '../../components/MapEntriesEditor';
-import { Maybe, GlobalScopeMeta } from '../../utils/types';
+import { Maybe } from '../../utils/types';
 import AuthenticationEditor from './AuthenticationEditor';
 import { isSaveDisabled, validation } from '../../utils/forms';
 import * as appDom from '../../appDom';
@@ -41,7 +48,6 @@ import ParametersEditor from '../../toolpad/AppEditor/PageEditor/ParametersEdito
 import BodyEditor from './BodyEditor';
 import TabPanel from '../../components/TabPanel';
 import SplitPane from '../../components/SplitPane';
-import ErrorAlert from '../../toolpad/AppEditor/PageEditor/ErrorAlert';
 import JsonView from '../../components/JsonView';
 import useQueryPreview from '../useQueryPreview';
 import TransformInput from '../TranformInput';
@@ -49,15 +55,13 @@ import Devtools from '../../components/Devtools';
 import { createHarLog, mergeHar } from '../../utils/har';
 import config from '../../config';
 import QueryInputPanel from '../QueryInputPanel';
-import DEMO_BASE_URLS from './demoBaseUrls';
+import useFetchPrivate from '../useFetchPrivate';
+import { clientExec } from './runtime';
+import QueryPreview from '../QueryPreview';
 
 const HTTP_METHODS = ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'HEAD'];
 
-const GLOBAL_SCOPE_META: GlobalScopeMeta = {
-  query: {
-    deprecated: 'Use parameters variable instead',
-    description: 'Parameters that can be bound to app scope variables',
-  },
+const QUERY_SCOPE_META: ScopeMeta = {
   parameters: {
     description: 'Parameters that can be bound to app scope variables',
   },
@@ -73,7 +77,7 @@ const ButtonLink = styled('button')(({ theme }) => ({
 }));
 
 interface UrlControlProps extends RenderControlParams<string> {
-  baseUrl?: string;
+  baseUrl: string | null;
 }
 
 function UrlControl({ label, disabled, baseUrl, value, onChange }: UrlControlProps) {
@@ -158,17 +162,7 @@ function ConnectionParamsInput({ value, onChange }: ConnectionEditorProps<RestCo
 
   return (
     <Stack direction="column" gap={3} sx={{ py: 3 }}>
-      {config.isDemo ? (
-        <TextField select {...baseUrlInputProps} defaultValue="">
-          {DEMO_BASE_URLS.map(({ url, name }) => (
-            <MenuItem key={url} value={url}>
-              {url} ({name})
-            </MenuItem>
-          ))}
-        </TextField>
-      ) : (
-        <TextField {...baseUrlInputProps} />
-      )}
+      <TextField {...baseUrlInputProps} />
       <Typography>Headers:</Typography>
       <Controller
         name="headers"
@@ -178,7 +172,7 @@ function ConnectionParamsInput({ value, onChange }: ConnectionEditorProps<RestCo
           return (
             <MapEntriesEditor
               {...field}
-              disabled={!headersAllowed || config.isDemo}
+              disabled={!headersAllowed}
               fieldLabel="header"
               value={allHeaders}
               onChange={(headers) => onFieldChange(headers.slice(authenticationHeaders.length))}
@@ -192,11 +186,7 @@ function ConnectionParamsInput({ value, onChange }: ConnectionEditorProps<RestCo
         name="authentication"
         control={control}
         render={({ field: { value: fieldValue, ref, ...field } }) => (
-          <AuthenticationEditor
-            {...field}
-            disabled={!headersAllowed || config.isDemo}
-            value={fieldValue ?? null}
-          />
+          <AuthenticationEditor {...field} disabled={!headersAllowed} value={fieldValue ?? null} />
         )}
       />
 
@@ -257,13 +247,22 @@ function ResolvedPreview({
   );
 }
 
+const EMPTY_PARAMS: BindableAttrEntries = [];
+
 function QueryEditor({
   globalScope,
-  connectionParams,
+  globalScopeMeta,
+  connectionParams: rawConnectionParams,
   value: input,
   onChange: setInput,
 }: QueryEditorProps<RestConnectionParams, FetchQuery>) {
-  const baseUrl = connectionParams?.baseUrl;
+  const isBrowserSide = input.attributes.query.value.browser;
+
+  const connectionParams = isBrowserSide ? null : rawConnectionParams;
+  const baseUrl = isBrowserSide ? null : connectionParams?.baseUrl ?? null;
+
+  const urlValue: BindableAttrValue<string> =
+    input.attributes.query.value.url || getDefaultUrl(connectionParams);
 
   const handleParamsChange = React.useCallback(
     (newParams: [string, BindableAttrValue<string>][]) => {
@@ -274,86 +273,72 @@ function QueryEditor({
 
   const handleUrlChange = React.useCallback(
     (newUrl: BindableAttrValue<string> | null) => {
-      setInput((existing) => ({
-        ...existing,
-        query: { ...existing.query, url: newUrl || appDom.createConst('') },
-      }));
+      setInput((existing) =>
+        appDom.setQueryProp(existing, 'url', newUrl || appDom.createConst('')),
+      );
     },
     [setInput],
   );
 
   const handleMethodChange = React.useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
-      setInput((existing) => ({
-        ...existing,
-        query: { ...existing.query, method: event.target.value },
-      }));
+      setInput((existing) => appDom.setQueryProp(existing, 'method', event.target.value));
     },
     [setInput],
   );
 
   const handleTransformEnabledChange = React.useCallback(
     (transformEnabled: boolean) => {
-      setInput((existing) => ({
-        ...existing,
-        query: { ...existing.query, transformEnabled },
-      }));
+      setInput((existing) => appDom.setQueryProp(existing, 'transformEnabled', transformEnabled));
     },
     [setInput],
   );
 
   const handleTransformChange = React.useCallback(
     (transform: string) => {
-      setInput((existing) => ({
-        ...existing,
-        query: { ...existing.query, transform },
-      }));
+      setInput((existing) => appDom.setQueryProp(existing, 'transform', transform));
     },
     [setInput],
   );
 
   const handleBodyChange = React.useCallback(
     (newBody: Maybe<Body>) => {
-      setInput((existing) => ({
-        ...existing,
-        query: { ...existing.query, body: newBody || undefined },
-      }));
+      setInput((existing) => appDom.setQueryProp(existing, 'body', newBody || undefined));
     },
     [setInput],
   );
 
   const handleSearchParamsChange = React.useCallback(
     (newSearchParams: BindableAttrEntries) => {
-      setInput((existing) => ({
-        ...existing,
-        query: { ...existing.query, searchParams: newSearchParams },
-      }));
+      setInput((existing) => appDom.setQueryProp(existing, 'searchParams', newSearchParams));
     },
     [setInput],
   );
 
   const handleHeadersChange = React.useCallback(
     (newHeaders: BindableAttrEntries) => {
-      setInput((existing) => ({
-        ...existing,
-        query: { ...existing.query, headers: newHeaders },
-      }));
+      setInput((existing) => appDom.setQueryProp(existing, 'headers', newHeaders));
     },
     [setInput],
   );
 
   const handleResponseTypeChange = React.useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
-      setInput((existing) => ({
-        ...existing,
-        query: { ...existing.query, response: { kind: event.target.value } as ResponseType },
-      }));
+      setInput((existing) =>
+        appDom.setQueryProp(existing, 'response', { kind: event.target.value } as ResponseType),
+      );
     },
     [setInput],
   );
 
+  const paramsEntries = input.params || EMPTY_PARAMS;
+
+  const jsBrowserRuntime = useBrowserJsRuntime();
+  const jsServerRuntime = useServerJsRuntime();
+
   const paramsEditorLiveValue = useEvaluateLiveBindingEntries({
-    input: input.params,
+    jsRuntime: jsBrowserRuntime,
+    input: paramsEntries,
     globalScope,
   });
 
@@ -362,42 +347,57 @@ function QueryEditor({
     [paramsEditorLiveValue],
   );
 
-  const queryScope = {
-    // TODO mark query as @deprecated remove after v1
-    query: previewParams,
-    parameters: previewParams,
-  };
+  const queryScope = React.useMemo(
+    () => ({
+      parameters: previewParams,
+    }),
+    [previewParams],
+  );
 
   const liveUrl: LiveBinding = useEvaluateLiveBinding({
-    server: true,
-    input: input.query.url,
+    jsRuntime: jsServerRuntime,
+    input: urlValue,
     globalScope: queryScope,
   });
 
   const liveSearchParams = useEvaluateLiveBindingEntries({
-    server: true,
-    input: input.query.searchParams || [],
+    jsRuntime: jsServerRuntime,
+    input: input.attributes.query.value.searchParams || [],
     globalScope: queryScope,
   });
 
   const liveHeaders = useEvaluateLiveBindingEntries({
-    server: true,
-    input: input.query.headers || [],
+    jsRuntime: jsServerRuntime,
+    input: input.attributes.query.value.headers || [],
     globalScope: queryScope,
   });
 
   const [activeTab, setActiveTab] = React.useState('urlQuery');
 
+  const fetchPrivate = useFetchPrivate<FetchPrivateQuery, FetchResult>();
+  const fetchServerPreview = React.useCallback(
+    (query: FetchQuery, params: Record<string, string>) =>
+      fetchPrivate({ kind: 'debugExec', query, params }),
+    [fetchPrivate],
+  );
+
+  const fetchPreview: ExecFetchFn<FetchQuery, FetchResult> = (query, params) =>
+    clientExec(query, params, fetchServerPreview);
+
   const [previewHar, setPreviewHar] = React.useState(() => createHarLog());
-  const { preview, runPreview: handleRunPreview } = useQueryPreview<FetchPrivateQuery, FetchResult>(
-    {
-      kind: 'debugExec',
-      query: input.query,
-      params: previewParams,
-    },
+  const {
+    preview,
+    runPreview: handleRunPreview,
+    isLoading: previewIsLoading,
+  } = useQueryPreview(
+    fetchPreview,
+    input.attributes.query.value,
+    previewParams as Record<string, string>,
     {
       onPreview(result) {
-        setPreviewHar((existing) => mergeHar(createHarLog(), existing, result.har));
+        setPreviewHar((existing) =>
+          result.har ? mergeHar(createHarLog(), existing, result.har) : existing,
+        );
       },
     },
   );
@@ -418,9 +418,8 @@ function QueryEditor({
             <Box sx={{ display: 'flex', flexDirection: 'row', gap: 1 }}>
               <TextField
                 select
-                value={config.isDemo ? 'GET' : input.query.method || 'GET'}
+                value={input.attributes.query.value.method || 'GET'}
                 onChange={handleMethodChange}
-                disabled={config.isDemo}
               >
                 {HTTP_METHODS.map((method) => (
                   <MenuItem key={method} value={method}>
@@ -431,13 +430,13 @@ function QueryEditor({
               <BindableEditor
                 liveBinding={liveUrl}
                 globalScope={queryScope}
-                globalScopeMeta={GLOBAL_SCOPE_META}
+                globalScopeMeta={QUERY_SCOPE_META}
                 sx={{ flex: 1 }}
-                server
+                jsRuntime={jsServerRuntime}
                 label="url"
                 propType={{ type: 'string' }}
                 renderControl={(props) => <UrlControl baseUrl={baseUrl} {...props} />}
-                value={input.query.url}
+                value={urlValue}
                 onChange={handleUrlChange}
               />
             </Box>
@@ -446,34 +445,39 @@ function QueryEditor({
                 <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
                   <TabList onChange={handleActiveTabChange} aria-label="Fetch options active tab">
                     <Tab label="URL query" value="urlQuery" />
-                    <Tab label="Body" value="body" disabled={config.isDemo} />
-                    <Tab label="Headers" value="headers" disabled={config.isDemo} />
-                    <Tab label="Response" value="response" disabled={config.isDemo} />
+                    <Tab label="Body" value="body" />
+                    <Tab label="Headers" value="headers" />
+                    <Tab label="Response" value="response" />
                     <Tab label="Transform" value="transform" />
                   </TabList>
                 </Box>
                 <TabPanel disableGutters value="urlQuery">
                   <ParametersEditor
-                    value={input.query.searchParams ?? []}
+                    value={input.attributes.query.value.searchParams ?? []}
                     onChange={handleSearchParamsChange}
                     globalScope={queryScope}
+                    globalScopeMeta={QUERY_SCOPE_META}
                     liveValue={liveSearchParams}
+                    jsRuntime={jsServerRuntime}
                   />
                 </TabPanel>
                 <TabPanel disableGutters value="body">
                   <BodyEditor
-                    globalScope={queryScope}
-                    value={input.query.body}
+                    value={input.attributes.query.value.body}
                     onChange={handleBodyChange}
-                    method={input.query.method || 'GET'}
+                    globalScope={queryScope}
+                    globalScopeMeta={QUERY_SCOPE_META}
+                    method={input.attributes.query.value.method || 'GET'}
                   />
                 </TabPanel>
                 <TabPanel disableGutters value="headers">
                   <ParametersEditor
-                    value={input.query.headers ?? []}
+                    value={input.attributes.query.value.headers ?? []}
                     onChange={handleHeadersChange}
                     globalScope={queryScope}
+                    globalScopeMeta={QUERY_SCOPE_META}
                     liveValue={liveHeaders}
+                    jsRuntime={jsServerRuntime}
                   />
                 </TabPanel>
                 <TabPanel disableGutters value="response">
@@ -481,7 +485,7 @@ function QueryEditor({
                     select
                     label="response type"
                     sx={{ width: 200, mt: 1 }}
-                    value={input.query.response?.kind || 'json'}
+                    value={input.attributes.query.value.response?.kind || 'json'}
                     onChange={handleResponseTypeChange}
                   >
                     <MenuItem value="raw">raw</MenuItem>
@@ -496,9 +500,9 @@ function QueryEditor({
                 </TabPanel>
                 <TabPanel disableGutters value="transform">
                   <TransformInput
-                    value={input.query.transform ?? 'return data;'}
+                    value={input.attributes.query.value.transform ?? 'return data;'}
                     onChange={handleTransformChange}
-                    enabled={input.query.transformEnabled ?? false}
+                    enabled={input.attributes.query.value.transformEnabled ?? false}
                     onEnabledChange={handleTransformEnabledChange}
                     globalScope={{ data: preview?.untransformedData }}
                     loading={false}
@@ -512,10 +516,12 @@ function QueryEditor({
         <Box sx={{ p: 2, height: '100%', overflow: 'auto' }}>
           <Typography>Parameters</Typography>
           <ParametersEditor
-            value={input.params}
+            value={paramsEntries}
             onChange={handleParamsChange}
             globalScope={globalScope}
+            globalScopeMeta={globalScopeMeta}
             liveValue={paramsEditorLiveValue}
+            jsRuntime={jsBrowserRuntime}
           />
         </Box>
       </SplitPane>
@@ -528,11 +534,9 @@ function QueryEditor({
         allowResize
         pane1Style={{ overflow: 'auto' }}
       >
-        {preview?.error ? (
-          <ErrorAlert error={preview?.error} />
-        ) : (
+        <QueryPreview isLoading={previewIsLoading} error={preview?.error}>
           <ResolvedPreview preview={preview} onShowTransform={() => setActiveTab('transform')} />
-        )}
+        </QueryPreview>
         <Devtools
           sx={{ width: '100%', height: '100%' }}
           har={previewHar}
@@ -544,10 +548,14 @@ function QueryEditor({
 }
 
 function getInitialQueryValue(): FetchQuery {
-  return { url: { type: 'const', value: '' }, method: 'GET', headers: [] };
+  return {
+    method: 'GET',
+    headers: [],
+    browser: config.isDemo,
+  };
 }
 
-const dataSource: ClientDataSource<{}, FetchQuery> = {
+const dataSource: ClientDataSource<RestConnectionParams, FetchQuery> = {
   displayName: 'Fetch',
   ConnectionParamsInput,
   QueryEditor,

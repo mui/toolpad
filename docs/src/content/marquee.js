@@ -1,10 +1,11 @@
 import ROUTES from '../route';
 
 const marquee = {
-  title: 'Want to try it first? Download the alpha version.',
+  title: 'Import in your existing codebase',
+  subtitle: 'Using a simple command, build your first app in a few minutes.',
   action: {
-    href: ROUTES.toolpadDocs,
-    label: 'Self-host',
+    href: ROUTES.toolpadQuickstart,
+    label: 'Get Started',
   },
 };
 

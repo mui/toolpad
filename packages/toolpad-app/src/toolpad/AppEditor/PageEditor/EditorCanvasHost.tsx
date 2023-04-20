@@ -1,19 +1,20 @@
 import * as React from 'react';
-import { Box, CircularProgress, styled } from '@mui/material';
-import { NodeId, RuntimeEvent } from '@mui/toolpad-core';
+import { Fade, styled } from '@mui/material';
+import { NodeId } from '@mui/toolpad-core';
 import createCache from '@emotion/cache';
 import { CacheProvider } from '@emotion/react';
 import ReactDOM from 'react-dom';
 import invariant from 'invariant';
 import * as appDom from '../../../appDom';
-import { HTML_ID_EDITOR_OVERLAY } from '../../../constants';
-import { NodeHashes, PageViewState } from '../../../types';
-import { ToolpadBridge } from '../../../canvas';
+import { HTML_ID_EDITOR_OVERLAY, TOOLPAD_BRIDGE_GLOBAL } from '../../../constants';
+import { NodeHashes } from '../../../types';
 import useEvent from '../../../utils/useEvent';
 import { LogEntry } from '../../../components/Console';
-import { Maybe } from '../../../utils/types';
-
-type IframeContentWindow = Window & typeof globalThis;
+import { useAppStateApi } from '../../AppState';
+import createRuntimeState from '../../../createRuntimeState';
+import type { ToolpadBridge } from '../../../canvas/ToolpadBridge';
+import CenteredSpinner from '../../../components/CenteredSpinner';
+import config from '../../../config';
 
 interface OverlayProps {
   children?: React.ReactNode;
@@ -36,26 +37,27 @@ function Overlay(props: OverlayProps) {
   return <CacheProvider value={cache}>{children}</CacheProvider>;
 }
 
-export interface EditorCanvasHostHandle {
-  getViewCoordinates(clientX: number, clientY: number): { x: number; y: number } | null;
-  getPageViewState(): PageViewState;
-}
-
 export interface EditorCanvasHostProps {
   className?: string;
-  appId: string;
   pageNodeId: NodeId;
   dom: appDom.AppDom;
   savedNodes: NodeHashes;
-  onRuntimeEvent?: (event: RuntimeEvent) => void;
   onConsoleEntry?: (entry: LogEntry) => void;
   overlay?: React.ReactNode;
+  onInit?: (bridge: ToolpadBridge) => void;
 }
 
 const CanvasRoot = styled('div')({
   width: '100%',
   position: 'relative',
 });
+
+const CanvasOverlay = styled('div')(({ theme }) => ({
+  backgroundColor: theme.palette.background.default,
+  position: 'absolute',
+  width: '100%',
+  height: '100%',
+}));
 
 const CanvasFrame = styled('iframe')({
   border: 'none',
@@ -64,144 +66,138 @@ const CanvasFrame = styled('iframe')({
   height: '100%',
 });
 
-export default React.forwardRef<EditorCanvasHostHandle, EditorCanvasHostProps>(
-  function EditorCanvasHost(
-    {
-      appId,
-      className,
-      pageNodeId,
-      dom,
-      savedNodes,
-      overlay,
-      onRuntimeEvent = () => {},
-      onConsoleEntry,
-    },
-    forwardedRef,
-  ) {
-    const frameRef = React.useRef<HTMLIFrameElement>(null);
+function useOnChange<T = unknown>(value: T, handler: (newValue: T, oldValue: T) => void) {
+  const stableHandler = useEvent(handler);
+  const prevValue = React.useRef(value);
+  React.useEffect(() => {
+    if (prevValue.current !== value) {
+      stableHandler(value, prevValue.current);
+      prevValue.current = value;
+    }
+  }, [value, stableHandler]);
+}
 
-    const [bridge, setBridge] = React.useState<ToolpadBridge | null>(null);
+export default function EditorCanvasHost({
+  className,
+  pageNodeId,
+  dom,
+  savedNodes,
+  overlay,
+  onConsoleEntry,
+  onInit,
+}: EditorCanvasHostProps) {
+  const appStateApi = useAppStateApi();
 
-    const updateOnBridge = React.useCallback(
-      (bridgeInstance: ToolpadBridge) => {
-        const renderDom = appDom.createRenderTree(dom);
-        bridgeInstance.update({ appId, dom: renderDom, savedNodes });
-      },
-      [appId, dom, savedNodes],
-    );
+  const [bridge, setBridge] = React.useState<ToolpadBridge | null>(null);
 
-    React.useEffect(() => {
-      if (bridge) {
-        // Update every time dom prop updates
-        updateOnBridge(bridge);
-      }
-    }, [updateOnBridge, bridge]);
+  const updateOnBridge = React.useCallback(() => {
+    if (bridge) {
+      const data = createRuntimeState({ dom });
+      bridge.canvasCommands.update({ ...data, savedNodes });
+    }
+  }, [bridge, dom, savedNodes]);
 
-    const handleInit = useEvent((newBridge: ToolpadBridge) => {
-      setBridge(newBridge);
-      updateOnBridge(newBridge);
-    });
+  React.useEffect(() => {
+    updateOnBridge();
+  }, [updateOnBridge]);
 
-    const onConsoleEntryRef = React.useRef(onConsoleEntry);
-    React.useLayoutEffect(() => {
-      onConsoleEntryRef.current = onConsoleEntry;
-    });
+  const onConsoleEntryRef = React.useRef(onConsoleEntry);
+  React.useLayoutEffect(() => {
+    onConsoleEntryRef.current = onConsoleEntry;
+  });
 
-    React.useEffect(() => {
-      const frameWindow = frameRef.current?.contentWindow as Maybe<IframeContentWindow>;
-      invariant(frameWindow, 'Iframe ref not attached');
+  const [editorOverlayRoot, setEditorOverlayRoot] = React.useState<HTMLElement | null>(null);
 
-      // eslint-disable-next-line no-underscore-dangle
-      if (typeof frameWindow.__TOOLPAD_BRIDGE__ === 'object') {
-        // eslint-disable-next-line no-underscore-dangle
-        handleInit(frameWindow.__TOOLPAD_BRIDGE__);
-        // eslint-disable-next-line no-underscore-dangle
-      } else if (typeof frameWindow.__TOOLPAD_BRIDGE__ === 'undefined') {
-        // eslint-disable-next-line no-underscore-dangle
-        frameWindow.__TOOLPAD_BRIDGE__ = (newBridge: ToolpadBridge) => {
-          handleInit(newBridge);
-        };
-      }
-    }, [handleInit]);
+  const handleKeyDown = useEvent((event: KeyboardEvent) => {
+    const isZ = event.key.toLowerCase() === 'z';
 
-    const [contentWindow, setContentWindow] = React.useState<Window | null>(null);
-    const [editorOverlayRoot, setEditorOverlayRoot] = React.useState<HTMLElement | null>(null);
+    const undoShortcut = isZ && (event.metaKey || event.ctrlKey);
+    const redoShortcut = undoShortcut && event.shiftKey;
 
-    React.useImperativeHandle(
-      forwardedRef,
-      () => {
-        return {
-          getViewCoordinates(clientX, clientY) {
-            return bridge?.getViewCoordinates(clientX, clientY) || null;
-          },
-          getPageViewState() {
-            invariant(bridge, 'bridge not initialized');
-            return bridge.getPageViewState();
-          },
-        };
-      },
-      [bridge],
-    );
+    if (redoShortcut) {
+      event.preventDefault();
+      appStateApi.redo();
+    } else if (undoShortcut) {
+      event.preventDefault();
+      appStateApi.undo();
+    }
+  });
 
-    const handleRuntimeEvent = useEvent(onRuntimeEvent);
+  const src = config.viteRuntime
+    ? `/preview/pages/${pageNodeId}?toolpad-display=canvas`
+    : `/app-canvas/pages/${pageNodeId}`;
 
-    const handleFrameLoad = React.useCallback(() => {
-      invariant(frameRef.current, 'Iframe ref not attached');
-      setContentWindow(frameRef.current.contentWindow);
-    }, []);
+  const [loading, setLoading] = React.useState(true);
+  useOnChange(src, () => setLoading(true));
 
-    React.useEffect(() => {
-      if (!contentWindow) {
-        return undefined;
-      }
+  const handleReady = useEvent((bridgeInstance) => {
+    setLoading(false);
+    setBridge(bridgeInstance);
+    onInit?.(bridgeInstance);
+  });
 
-      setEditorOverlayRoot(contentWindow.document.getElementById(HTML_ID_EDITOR_OVERLAY));
+  const handleFrameLoad = React.useCallback<React.ReactEventHandler<HTMLIFrameElement>>(
+    (event) => {
+      const iframeWindow = event.currentTarget.contentWindow;
+      invariant(iframeWindow, 'Iframe not attached');
+
+      setEditorOverlayRoot(iframeWindow.document.getElementById(HTML_ID_EDITOR_OVERLAY));
 
       const observer = new MutationObserver(() => {
-        setEditorOverlayRoot(contentWindow.document.getElementById(HTML_ID_EDITOR_OVERLAY));
+        setEditorOverlayRoot(iframeWindow.document.getElementById(HTML_ID_EDITOR_OVERLAY));
       });
 
-      observer.observe(contentWindow.document.body, {
+      observer.observe(iframeWindow.document.body, {
         subtree: true,
         childList: true,
+      });
+
+      const bridgeInstance = iframeWindow?.[TOOLPAD_BRIDGE_GLOBAL];
+      invariant(bridgeInstance, 'Bridge not set up');
+
+      if (bridgeInstance.canvasCommands.isReady()) {
+        handleReady(bridgeInstance);
+      } else {
+        const readyHandler = () => {
+          handleReady(bridgeInstance);
+          bridgeInstance.canvasEvents.off('ready', readyHandler);
+        };
+        bridgeInstance.canvasEvents.on('ready', readyHandler);
+      }
+
+      iframeWindow.addEventListener('keydown', handleKeyDown);
+      iframeWindow.addEventListener('unload', () => {
+        iframeWindow.removeEventListener('keydown', handleKeyDown);
       });
 
       return () => {
         observer.disconnect();
       };
-    }, [contentWindow]);
+    },
+    [handleReady, handleKeyDown],
+  );
 
-    React.useEffect(() => bridge?.onRuntimeEvent(handleRuntimeEvent), [handleRuntimeEvent, bridge]);
+  return (
+    <CanvasRoot className={className}>
+      <CanvasFrame
+        name="data-toolpad-canvas"
+        onLoad={handleFrameLoad}
+        src={src}
+        // Used by the runtime to know when to load react devtools
+        data-toolpad-canvas
+      />
+      {editorOverlayRoot
+        ? ReactDOM.createPortal(
+            <Overlay container={editorOverlayRoot}>{overlay}</Overlay>,
+            editorOverlayRoot,
+          )
+        : null}
 
-    return (
-      <CanvasRoot className={className}>
-        <Box
-          sx={{
-            position: 'absolute',
-            width: '100%',
-            height: '100%',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-          }}
-        >
-          <CircularProgress />
-        </Box>
-        <CanvasFrame
-          ref={frameRef}
-          name="data-toolpad-canvas"
-          onLoad={handleFrameLoad}
-          src={`/app-canvas/${appId}/pages/${pageNodeId}`}
-          // Used by the runtime to know when to load react devtools
-          data-toolpad-canvas
-        />
-        {editorOverlayRoot
-          ? ReactDOM.createPortal(
-              <Overlay container={editorOverlayRoot}>{overlay}</Overlay>,
-              editorOverlayRoot,
-            )
-          : null}
-      </CanvasRoot>
-    );
-  },
-);
+      <Fade in={loading} appear={false} timeout={{ enter: 0, exit: 100 }}>
+        <CanvasOverlay>
+          <CenteredSpinner />
+        </CanvasOverlay>
+      </Fade>
+    </CanvasRoot>
+  );
+}

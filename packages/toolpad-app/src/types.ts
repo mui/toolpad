@@ -6,13 +6,19 @@ import {
   ComponentConfig,
   NodeId,
   PropValueType,
-  BindableAttrEntries,
   ExecFetchResult,
+  ScopeMeta,
 } from '@mui/toolpad-core';
-
 import { PaletteMode } from '@mui/material';
+import type * as appDom from './appDom';
 import type { Maybe, WithControlledProp } from './utils/types';
 import type { Rectangle } from './utils/geometry';
+
+declare global {
+  interface Error {
+    code?: unknown;
+  }
+}
 
 export interface EditorProps<T> {
   /**
@@ -52,7 +58,7 @@ export interface NodeInfo {
   error?: RuntimeError | null;
   rect?: Rectangle;
   slots?: SlotsState;
-  componentConfig?: ComponentConfig<unknown>;
+  componentConfig?: ComponentConfig;
   props: { [key: string]: unknown };
 }
 
@@ -65,28 +71,21 @@ export interface PageViewState {
 }
 
 export interface CreateHandlerApi<P = unknown> {
-  setConnectionParams: (appId: string, connectionId: string, props: P) => Promise<void>;
-  getConnectionParams: (appId: string, connectionId: string) => Promise<P>;
+  setConnectionParams: (connectionId: string, props: P) => Promise<void>;
+  getConnectionParams: (connectionId: string) => Promise<P>;
 }
 
 export interface ConnectionEditorProps<P> extends WithControlledProp<P | null> {
   handlerBasePath: string;
-  appId: string;
   connectionId: NodeId;
 }
 export type ConnectionParamsEditor<P = {}> = React.FC<ConnectionEditorProps<P>>;
 
-export interface QueryEditorModel<Q> {
-  query: Q;
-  /** @deprecated Use parameters instead */
-  params: BindableAttrEntries;
-  parameters: BindableAttrEntries;
-}
-
-export interface QueryEditorProps<C, Q> extends WithControlledProp<QueryEditorModel<Q>> {
+export interface QueryEditorProps<C, Q> extends WithControlledProp<appDom.QueryNode<Q>> {
   connectionParams: Maybe<C>;
   globalScope: Record<string, any>;
-  onChange: React.Dispatch<React.SetStateAction<QueryEditorModel<Q>>>;
+  globalScopeMeta: ScopeMeta;
+  onChange: React.Dispatch<React.SetStateAction<appDom.QueryNode<Q>>>;
   onCommit?: () => void;
 }
 
@@ -97,18 +96,30 @@ export interface ConnectionStatus {
   error?: string;
 }
 
+export interface ExecFetchFn<Q, R extends ExecFetchResult> {
+  (fetchQuery: Q, params: Record<string, string>): Promise<R>;
+}
+
+export interface ExecClientFetchFn<Q, R extends ExecFetchResult> {
+  (fetchQuery: Q, params: Record<string, string>, serverFetch: ExecFetchFn<Q, R>): Promise<R>;
+}
+
 export interface ClientDataSource<C = {}, Q = {}> {
   displayName: string;
-  ConnectionParamsInput: ConnectionParamsEditor<C>;
+  ConnectionParamsInput?: ConnectionParamsEditor<C>;
   transformQueryBeforeCommit?: (query: Q) => Q;
   QueryEditor: QueryEditor<C, Q>;
   getInitialQueryValue: () => Q;
   hasDefault?: boolean;
 }
 
+export interface RuntimeDataSource<Q = {}, R extends ExecFetchResult = ExecFetchResult> {
+  exec?: ExecClientFetchFn<Q, R>;
+}
+
 export interface ServerDataSource<P = {}, Q = {}, PQ = {}, D = {}> {
   // Execute a private query on this connection, intended for editors only
-  execPrivate?: (connection: Maybe<P>, query: PQ) => Promise<any>;
+  execPrivate?: (connection: Maybe<P>, query: PQ) => Promise<unknown>;
   // Execute a query on this connection, intended for viewers
   exec: (connection: Maybe<P>, query: Q, params: any) => Promise<ExecFetchResult<D>>;
   createHandler?: () => (
@@ -152,8 +163,33 @@ export interface AppTheme {
   'palette.secondary.main'?: string;
 }
 
-export type VersionOrPreview = 'preview' | number;
+export type AppVersion = 'development' | 'preview' | number;
 
-export type AppTemplateId = 'blank' | 'stats' | 'images';
+export type AppTemplateId = 'default' | 'hr' | 'images';
 
 export type NodeHashes = Record<NodeId, number | undefined>;
+
+export type CompiledModule =
+  | {
+      code: string;
+      urlImports: string[];
+      error?: undefined;
+    }
+  | {
+      error: Error;
+    };
+
+/**
+ * Defines all the data needed to render the runtime.
+ * While the dom is optimized for storage and editing. It isn't the ideal format used to render the application
+ * `RuntimeData` will hold all data to render a toolpad app and will contain things like:
+ * - precompile assets, like code component modules
+ * - precompiled expressions
+ * - datastructures optimized for rendering with less processing required
+ * - ...
+ */
+export interface RuntimeState {
+  // We start out with just the rendertree. The ultimate goal will be to move things out of this tree
+  dom: appDom.RenderTree;
+  modules: Record<string, CompiledModule>;
+}

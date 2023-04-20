@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { LoadingButton as MuiButton, LoadingButtonProps as MuiButtonProps } from '@mui/lab';
 import { createComponent } from '@mui/toolpad-core';
+import { SX_PROP_HELPER_TEXT } from './constants.js';
 
 interface ButtonProps extends Omit<MuiButtonProps, 'children'> {
   content: string;
@@ -11,36 +12,49 @@ function Button({ content, ...rest }: ButtonProps) {
 }
 
 export default createComponent(Button, {
+  helperText:
+    'The MUI [Button](https://mui.com/material-ui/react-button/) component.\n\nButtons allow users to take actions, and make choices, with a single tap.',
   layoutDirection: 'both',
   argTypes: {
     onClick: {
+      helperText: 'Add logic to be executed when the user clicks the button.',
       typeDef: { type: 'event' },
     },
     content: {
-      typeDef: { type: 'string' },
-      defaultValue: 'Button Text',
+      helperText: 'Will appear as the text content of the button.',
+      typeDef: { type: 'string', default: 'Button Text' },
     },
     variant: {
-      typeDef: { type: 'string', enum: ['contained', 'outlined', 'text'] },
-      defaultValue: 'contained',
+      helperText:
+        'One of the available MUI Button [variants](https://mui.com/material-ui/react-button/#basic-button). Possible values are `contained`, `outlined` or `text`',
+      typeDef: {
+        type: 'string',
+        enum: ['contained', 'outlined', 'text'],
+        default: 'contained',
+      },
     },
     size: {
-      typeDef: { type: 'string', enum: ['small', 'medium', 'large'] },
+      helperText: 'The size of the component. One of `small`, `medium`, or `large`.',
+      typeDef: { type: 'string', enum: ['small', 'medium', 'large'], default: 'small' },
     },
     color: {
-      typeDef: { type: 'string', enum: ['primary', 'secondary'] },
-      defaultValue: 'primary',
+      helperText: 'The theme color of the component.',
+      typeDef: { type: 'string', enum: ['primary', 'secondary'], default: 'primary' },
     },
     fullWidth: {
+      helperText: 'Whether the button should occupy all available horizontal space.',
       typeDef: { type: 'boolean' },
     },
     loading: {
+      helperText: "Displays a loading animation indicating the button isn't interactive yet",
       typeDef: { type: 'boolean' },
     },
     disabled: {
+      helperText: 'Whether the button is disabled.',
       typeDef: { type: 'boolean' },
     },
     sx: {
+      helperText: SX_PROP_HELPER_TEXT,
       typeDef: { type: 'object' },
     },
   },

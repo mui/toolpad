@@ -1,14 +1,15 @@
 import * as React from 'react';
 import { Box, Container, Stack, Typography } from '@mui/material';
-import { useParams } from 'react-router-dom';
 import { NodeId } from '@mui/toolpad-core';
+import invariant from 'invariant';
 import { ConnectionEditorProps, ClientDataSource } from '../../../types';
-import { useDom, useDomApi } from '../../DomLoader';
+import { useDom, useDomApi } from '../../AppState';
 import * as appDom from '../../../appDom';
 import dataSources from '../../../toolpadDataSources/client';
 import { ConnectionContextProvider } from '../../../toolpadDataSources/context';
 import NodeNameEditor from '../NodeNameEditor';
 import NotFoundEditor from '../NotFoundEditor';
+import useUndoRedo from '../../hooks/useUndoRedo';
 
 interface ConnectionParamsEditorProps<P> extends ConnectionEditorProps<P> {
   dataSource: ClientDataSource<P, any>;
@@ -19,29 +20,28 @@ function ConnectionParamsEditor<P>({
   value,
   onChange,
   connectionId,
-  appId,
   handlerBasePath,
 }: ConnectionParamsEditorProps<P>) {
   const { ConnectionParamsInput } = dataSource;
+
+  invariant(ConnectionParamsInput, 'Datasource has no ConnectionParamsInput');
+
   return (
     <ConnectionParamsInput
       handlerBasePath={handlerBasePath}
       connectionId={connectionId}
       value={value}
       onChange={onChange}
-      appId={appId}
     />
   );
 }
 
 interface ConnectionEditorContentProps<P> {
-  appId: string;
   className?: string;
   connectionNode: appDom.ConnectionNode<P>;
 }
 
 function ConnectionEditorContent<P>({
-  appId,
   className,
   connectionNode,
 }: ConnectionEditorContentProps<P>) {
@@ -49,11 +49,14 @@ function ConnectionEditorContent<P>({
 
   const handleConnectionChange = React.useCallback(
     (connectionParams: P | null) => {
-      domApi.setNodeNamespacedProp(
-        connectionNode,
-        'attributes',
-        'params',
-        appDom.createSecret(connectionParams),
+      domApi.update((draft) =>
+        appDom.setNodeNamespacedProp(
+          draft,
+          connectionNode,
+          'attributes',
+          'params',
+          appDom.createSecret(connectionParams),
+        ),
       );
     },
     [connectionNode, domApi],
@@ -62,8 +65,8 @@ function ConnectionEditorContent<P>({
   const dataSourceId = connectionNode.attributes.dataSource.value;
   const dataSource = dataSources[dataSourceId];
   const connectionEditorContext = React.useMemo(
-    () => ({ appId, dataSourceId, connectionId: connectionNode.id }),
-    [appId, dataSourceId, connectionNode.id],
+    () => ({ dataSourceId, connectionId: connectionNode.id }),
+    [dataSourceId, connectionNode.id],
   );
 
   return (
@@ -78,7 +81,6 @@ function ConnectionEditorContent<P>({
                 value={connectionNode.attributes.params.value}
                 onChange={handleConnectionChange}
                 handlerBasePath={`/api/dataSources/${dataSourceId}`}
-                appId={appId}
                 connectionId={connectionNode.id}
               />
             </ConnectionContextProvider>
@@ -94,15 +96,17 @@ function ConnectionEditorContent<P>({
 }
 
 export interface ConnectionProps {
-  appId: string;
+  nodeId?: NodeId;
 }
 
-export default function ConnectionEditor({ appId }: ConnectionProps) {
-  const dom = useDom();
-  const { nodeId } = useParams();
+export default function ConnectionEditor({ nodeId }: ConnectionProps) {
+  const { dom } = useDom();
   const connectionNode = appDom.getMaybeNode(dom, nodeId as NodeId, 'connection');
+
+  useUndoRedo();
+
   return connectionNode ? (
-    <ConnectionEditorContent appId={appId} key={nodeId} connectionNode={connectionNode} />
+    <ConnectionEditorContent key={nodeId} connectionNode={connectionNode} />
   ) : (
     <NotFoundEditor message={`Non-existing Connection "${nodeId}"`} />
   );

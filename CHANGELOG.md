@@ -1,5 +1,32 @@
 # Changelog
 
+## TODO RELEASE NAME
+
+<!-- generated comparing v0.1.6..master -->
+
+_Apr 20, 2023_
+
+A big thanks to the 5 contributors who made this release possible. Here are some highlights ✨:
+
+Tweak the landing page design. Improve `create-toolpad-app` CLI, support node modules in custom code components.
+
+- &#8203;<!-- 14 -->Add folder as argument to `create-toolpad-app` (#1795) @bharatkashyap
+- &#8203;<!-- 13 -->Delete page on file system when deleted in UI (#1913) @Janpot
+- &#8203;<!-- 12 -->New vite based application runtime (#1881) @Janpot
+- &#8203;<!-- 11 -->Fix Windows issues (WIP) (#1910) @apedroferreira
+- &#8203;<!-- 10 -->Use npm registry to check for new versions (#1895) @Janpot
+- &#8203;<!-- 09 -->Update MUI monorepo (#1883) @apedroferreira
+- &#8203;<!-- 08 -->Fix: Remove `default` from `toolpad dev --port` option (#1911) @bharatkashyap
+- &#8203;<!-- 07 -->Deprecate `createQuery` and replace with `createFunction` (#1908) @bharatkashyap
+- &#8203;<!-- 06 -->Show border on hover in interactive nodes (#1907) @apedroferreira
+- &#8203;<!-- 05 -->Fix: Better represent the new direction on landing (#1863) @bharatkashyap
+- &#8203;<!-- 04 -->Revert "Form component (#1598)" @apedroferreira
+- &#8203;<!-- 03 -->Form component (#1598) @bytasv
+- &#8203;<!-- 02 -->Update links on contributing guide (#1893) @Janpot
+- &#8203;<!-- 01 -->[website] Landing page design tweaks (#1786) @danilo-leal
+
+All contributors of this release in alphabetical order: @apedroferreira, @bharatkashyap, @bytasv, @danilo-leal, @Janpot
+
 ## 0.1.6
 
 <!-- generated comparing v0.1.5..master -->

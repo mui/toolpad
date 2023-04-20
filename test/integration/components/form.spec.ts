@@ -13,10 +13,13 @@ test('submits form data', async ({ page }) => {
   const runtimeModel = new ToolpadRuntime(page);
   await runtimeModel.gotoPage('form');
 
-  await page.getByLabel('name').clear();
-  await page.getByLabel('name').type('Toolpad');
+  const nameInput = page.getByLabel('name');
+  await nameInput.clear();
+  await nameInput.type('Toolpad');
 
-  await page.getByLabel('date', { exact: true }).type('01011990');
+  const dateInput = page.getByLabel('date', { exact: true });
+  await dateInput.focus();
+  await dateInput.type('01011990');
 
   await page.getByLabel('option').click();
   await page.getByRole('option', { name: 'option 2' }).click();
@@ -49,10 +52,13 @@ test('resets form data', async ({ page }) => {
   const runtimeModel = new ToolpadRuntime(page);
   await runtimeModel.gotoPage('form');
 
-  await page.getByLabel('name').clear();
-  await page.getByLabel('name').type('MUI');
+  const nameInput = page.getByLabel('name');
+  await nameInput.clear();
+  await nameInput.type('MUI');
 
-  await page.getByLabel('date', { exact: true }).type('05051995');
+  const dateInput = page.getByLabel('date', { exact: true });
+  await dateInput.focus();
+  await dateInput.type('05051995');
 
   await page.getByLabel('option').click();
   await page.getByRole('option', { name: 'option 3' }).click();
@@ -73,8 +79,9 @@ test('validates form data', async ({ page }) => {
   const runtimeModel = new ToolpadRuntime(page);
   await runtimeModel.gotoPage('form');
 
-  await page.getByLabel('name').clear();
-  await page.getByLabel('name').type('OK');
+  const nameInput = page.getByLabel('name');
+  await nameInput.clear();
+  await nameInput.type('OK');
 
   await page.getByLabel('option').click();
   await page.getByRole('option', { name: 'option 1' }).click();

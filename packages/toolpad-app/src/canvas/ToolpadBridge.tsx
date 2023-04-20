@@ -1,4 +1,4 @@
-import Emitter from '@mui/toolpad-core/utils/Emitter';
+import { Emitter } from '@mui/toolpad-utils/events';
 import type { RuntimeEvents } from '@mui/toolpad-core';
 import type { AppCanvasState } from '.';
 import { TOOLPAD_BRIDGE_GLOBAL } from '../constants';

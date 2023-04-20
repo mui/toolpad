@@ -4,7 +4,7 @@ import * as path from 'path';
 import { Server } from 'http';
 import serializeJavascript from 'serialize-javascript';
 import { MUI_X_PRO_LICENSE, RUNTIME_CONFIG_WINDOW_PROPERTY } from '../constants';
-import { indent } from '../utils/strings';
+import { indent } from '@mui/toolpad-utils/strings';
 import { getComponents, getAppOutputFolder } from './localMode';
 import { RuntimeConfig } from '../config';
 import * as appDom from '../appDom';

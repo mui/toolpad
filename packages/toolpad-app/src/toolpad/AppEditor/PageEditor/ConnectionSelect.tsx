@@ -5,7 +5,7 @@ import * as appDom from '../../../appDom';
 import { Maybe, WithControlledProp } from '../../../utils/types';
 import { useDom } from '../../AppState';
 import dataSources from '../../../toolpadDataSources/client';
-import { asArray } from '../../../utils/collections';
+import { asArray } from '@mui/toolpad-utils/collections';
 import envConfig from '../../../config';
 import { DEMO_DATASOURCES } from '../../../constants';
 

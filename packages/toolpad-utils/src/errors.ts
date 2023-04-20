@@ -1,6 +1,14 @@
-import { SerializedError } from '../types.js';
-import { hasOwnProperty } from './collections.js';
+import { hasOwnProperty } from './collections';
 import { truncate } from './strings.js';
+
+export type PlainObject = Record<string, unknown>;
+
+export interface SerializedError extends PlainObject {
+  message: string;
+  name: string;
+  stack?: string;
+  code?: unknown;
+}
 
 export function serializeError(error: Error & { code?: unknown }): SerializedError {
   const { message, name, stack, code } = error;

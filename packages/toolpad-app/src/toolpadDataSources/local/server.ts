@@ -1,10 +1,11 @@
-import { ExecFetchResult, SerializedError } from '@mui/toolpad-core';
+import { ExecFetchResult } from '@mui/toolpad-core';
+import { SerializedError } from '@mui/toolpad-utils/errors';
 import * as child_process from 'child_process';
 import * as esbuild from 'esbuild';
 import * as fs from 'fs/promises';
 import * as path from 'path';
 import invariant from 'invariant';
-import { indent, truncate } from '@mui/toolpad-core/utils/strings';
+import { indent, truncate } from '@mui/toolpad-utils/strings';
 import * as dotenv from 'dotenv';
 import * as chokidar from 'chokidar';
 import chalk from 'chalk';
@@ -18,7 +19,7 @@ import {
   getFunctionsFile,
   getOutputFolder,
 } from '../../server/localMode';
-import { errorFrom, serializeError } from '../../utils/errors';
+import { errorFrom, serializeError } from '@mui/toolpad-utils/errors';
 import { waitForInit } from '../../server/liveProject';
 
 type MessageToChildProcess =
@@ -86,7 +87,7 @@ async function createMain(): Promise<string> {
   const relativeFunctionsFilePath = [`.`, getFunctionsFile('.')].join(path.sep);
   return `
     import { TOOLPAD_FUNCTION } from '@mui/toolpad-core/server';
-    import { errorFrom, serializeError } from '@mui/toolpad-core/utils/errors';
+    import { errorFrom, serializeError } from '@mui/toolpad-utils/errors';
     import fetch, { Headers, Request, Response } from 'node-fetch'
 
     // Polyfill fetch() in the Node.js environment

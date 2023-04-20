@@ -11,11 +11,11 @@ import {
 } from '@mui/toolpad-core';
 import invariant from 'invariant';
 import { BoxProps } from '@mui/material';
+import { pascalCase, removeDiacritics, uncapitalize } from '@mui/toolpad-utils/strings';
 import { ConnectionStatus, AppTheme } from '../types';
 import { omit, update, updateOrCreate } from '../utils/immutability';
-import { pascalCase, removeDiacritics, uncapitalize } from '../utils/strings';
 import { ExactEntriesOf, Maybe } from '../utils/types';
-import { mapProperties, mapValues } from '../utils/collections';
+import { mapProperties, mapValues } from '@mui/toolpad-utils/collections';
 
 export const CURRENT_APPDOM_VERSION = 6;
 

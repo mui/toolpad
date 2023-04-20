@@ -3,7 +3,7 @@ import * as path from 'path';
 import * as yaml from 'yaml';
 import { Dirent } from 'fs';
 import { yamlOverwrite } from 'yaml-diff-patch';
-import { errorFrom } from './errors';
+import { errorFrom } from '@mui/toolpad-utils/errors';
 
 /**
  * Like `fs.readFile`, but for JSON files specifically. Will throw on malformed JSON.

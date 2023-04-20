@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { NodeId } from '@mui/toolpad-core';
-import { createProvidedContext } from '@mui/toolpad-core/utils/react';
+import { createProvidedContext } from '@mui/toolpad-utils/react';
 import invariant from 'invariant';
 import { debounce, DebouncedFunc } from 'lodash-es';
 import { useLocation } from 'react-router-dom';
@@ -9,7 +9,7 @@ import { omit, update } from '../utils/immutability';
 import client from '../api';
 import useShortcut from '../utils/useShortcut';
 import useDebouncedHandler from '../utils/useDebouncedHandler';
-import { mapValues } from '../utils/collections';
+import { mapValues } from '@mui/toolpad-utils/collections';
 import insecureHash from '../utils/insecureHash';
 import useEvent from '../utils/useEvent';
 import { NodeHashes } from '../types';

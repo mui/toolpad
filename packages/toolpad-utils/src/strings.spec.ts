@@ -1,3 +1,4 @@
+import { describe, test, expect } from '@jest/globals';
 import { findImports } from './strings';
 
 describe('findImports', () => {

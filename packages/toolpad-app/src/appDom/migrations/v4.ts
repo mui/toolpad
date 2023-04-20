@@ -1,6 +1,6 @@
 import invariant from 'invariant';
 import * as appDom from '..';
-import { mapValues } from '../../utils/collections';
+import { mapValues } from '@mui/toolpad-utils/collections';
 
 function replaceTypographyWithText(node: appDom.AppDomNode): appDom.AppDomNode {
   if (node.type === 'element' && node.attributes.component.value === 'Typography') {

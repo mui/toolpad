@@ -32,7 +32,7 @@ import { useDom } from '../AppState';
 
 // TODO: this import suggests leaky abstraction
 import { usePageEditorState } from '../AppEditor/PageEditor/PageEditorProvider';
-import { generateUniqueString } from '../../utils/strings';
+import { generateUniqueString } from '@mui/toolpad-utils/strings';
 
 type GridAlignment = SerializableGridColumn['align'];
 

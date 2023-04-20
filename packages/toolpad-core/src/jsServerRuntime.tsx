@@ -1,7 +1,7 @@
 import * as vm from 'vm';
 import * as React from 'react';
+import { errorFrom } from '@mui/toolpad-utils/errors';
 import { BindingEvaluationResult, JsRuntime } from './types.js';
-import { errorFrom } from './utils/errors.js';
 
 function evalExpressionInContext(
   expression: string,

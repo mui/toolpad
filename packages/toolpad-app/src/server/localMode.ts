@@ -10,10 +10,10 @@ import { glob } from 'glob';
 import * as chokidar from 'chokidar';
 import { debounce } from 'lodash-es';
 import cuid from 'cuid';
-import Emitter from '@mui/toolpad-core/utils/Emitter';
+import { Emitter } from '@mui/toolpad-utils/events';
 import config from '../config';
 import * as appDom from '../appDom';
-import { errorFrom } from '../utils/errors';
+import { errorFrom } from '@mui/toolpad-utils/errors';
 import { migrateUp } from '../appDom/migrations';
 import insecureHash from '../utils/insecureHash';
 import {
@@ -40,7 +40,7 @@ import {
   themeSchema,
   API_VERSION,
 } from './schema';
-import { filterValues, hasOwnProperty, mapValues } from '../utils/collections';
+import { filterValues, hasOwnProperty, mapValues } from '@mui/toolpad-utils/collections';
 import { format } from '../utils/prettier';
 import {
   Body as AppDomFetchBody,

@@ -5,7 +5,7 @@ import { OAuth2Client } from 'google-auth-library';
 import { match } from 'path-to-regexp';
 import { ServerDataSource, CreateHandlerApi } from '../../types';
 import config from '../../server/config';
-import { asArray } from '../../utils/collections';
+import { asArray } from '@mui/toolpad-utils/collections';
 import {
   GoogleSheetsConnectionParams,
   GoogleSheetsPrivateQuery,

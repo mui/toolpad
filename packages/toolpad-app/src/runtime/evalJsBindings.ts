@@ -1,6 +1,6 @@
 import { BindingEvaluationResult, JsRuntime } from '@mui/toolpad-core';
 import { set } from 'lodash-es';
-import { mapValues } from '../utils/collections';
+import { mapValues } from '@mui/toolpad-utils/collections';
 
 /**
  * Represents the state of a binding. It both describes which place it takes in the gobal scope

@@ -2,7 +2,7 @@ import Button from '@mui/material/Button';
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { ToolpadComponents } from '@mui/toolpad-core';
-import Emitter from '@mui/toolpad-core/utils/Emitter';
+import { Emitter } from '@mui/toolpad-utils/events';
 import RuntimeToolpadApp, { ToolpadAppProps } from './index';
 import { RuntimeState } from '../types';
 

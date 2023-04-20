@@ -9,22 +9,26 @@ import { initProject } from './localMode';
   process.exit(1);
 });
 
-export async function waitForInit(): Promise<ReturnType<typeof initProject>> {
+export async function getProject(): Promise<ReturnType<typeof initProject>> {
   // eslint-disable-next-line no-underscore-dangle
   return (globalThis as any).__project__;
 }
 
+export async function waitForInit(): Promise<void> {
+  await getProject();
+}
+
 export async function getDomFingerprint() {
-  const project = await waitForInit();
+  const project = await getProject();
   return project.getDomFingerPrint();
 }
 
 export async function saveDom(newDom: appDom.AppDom): Promise<{ fingerprint: number }> {
-  const project = await waitForInit();
+  const project = await getProject();
   return project.saveDom(newDom);
 }
 
 export async function loadDom(): Promise<appDom.AppDom> {
-  const project = await waitForInit();
+  const project = await getProject();
   return project.loadDom();
 }

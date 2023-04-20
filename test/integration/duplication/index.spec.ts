@@ -29,6 +29,6 @@ test('duplication', async ({ page }) => {
     const deleteButton = editorModel.confirmationDialog.getByRole('button', { name: 'Delete' });
     await deleteButton.click();
 
-    await expect(editorModel.hierarchyItem('pages', 'page2')).toBeHidden();
+    await expect(editorModel.getHierarchyItem('pages', 'page2')).toBeHidden();
   }
 });

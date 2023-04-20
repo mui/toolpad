@@ -10,6 +10,7 @@ import { glob } from 'glob';
 import * as chokidar from 'chokidar';
 import { debounce } from 'lodash-es';
 import cuid from 'cuid';
+import Emitter from '@mui/toolpad-core/utils/Emitter';
 import config from '../config';
 import * as appDom from '../appDom';
 import { errorFrom } from '../utils/errors';
@@ -76,12 +77,28 @@ function getPagesFolder(root: string): string {
   return path.join(toolpadFolder, './pages');
 }
 
+function getPageFolder(root: string, name: string): string {
+  const pagesFolder = getPagesFolder(root);
+  const pageFolder = path.resolve(pagesFolder, name);
+  return pageFolder;
+}
+
+function getPageFile(root: string, name: string): string {
+  const pageFolder = getPageFolder(root, name);
+  const pageFileName = path.resolve(pageFolder, 'page.yml');
+  return pageFileName;
+}
+
 function getComponentFilePath(componentsFolder: string, componentName: string): string {
   return path.join(componentsFolder, `${componentName}.tsx`);
 }
 
 export function getOutputFolder(root: string) {
   return path.join(getToolpadFolder(root), '.generated');
+}
+
+export function getAppOutputFolder(root: string) {
+  return path.join(getOutputFolder(root), 'app');
 }
 
 export async function getConfigFilePath(root: string) {
@@ -101,24 +118,31 @@ export async function getConfigFilePath(root: string) {
 
 type ComponentsContent = Record<string, { code: string }>;
 
-async function loadCodeComponentsFromFiles(root: string): Promise<ComponentsContent> {
+export async function getComponents(root: string) {
   const componentsFolder = getComponentsFolder(root);
   const entries = (await readMaybeDir(componentsFolder)) || [];
-  const resultEntries = await Promise.all(
-    entries.map(async (entry): Promise<[string, { code: string }] | null> => {
-      if (entry.isFile()) {
-        const fileName = entry.name;
-        const componentName = entry.name.replace(/\.tsx$/, '');
-        const filePath = path.resolve(componentsFolder, fileName);
-        const content = await fs.readFile(filePath, { encoding: 'utf-8' });
-        return [componentName, { code: content }];
-      }
+  const result = entries.map((entry) => {
+    if (entry.isFile()) {
+      const fileName = entry.name;
+      const componentName = entry.name.replace(/\.tsx$/, '');
+      const filePath = path.resolve(componentsFolder, fileName);
+      return { name: componentName, path: filePath };
+    }
+    return null;
+  });
+  return result.filter(Boolean);
+}
 
-      return null;
+async function loadCodeComponentsFromFiles(root: string): Promise<ComponentsContent> {
+  const components = await getComponents(root);
+  const resultEntries = await Promise.all(
+    components.map(async (component): Promise<[string, { code: string }]> => {
+      const content = await fs.readFile(component.path, { encoding: 'utf-8' });
+      return [component.name, { code: content }];
     }),
   );
 
-  return Object.fromEntries(resultEntries.filter(Boolean));
+  return Object.fromEntries(resultEntries);
 }
 
 async function loadPagesFromFiles(root: string): Promise<PagesContent> {
@@ -210,6 +234,12 @@ export async function createComponent(name: string) {
   const filePath = getComponentFilePath(componentsFolder, name);
   const content = createDefaultCodeComponent(name);
   await writeFileRecursive(filePath, content, { encoding: 'utf-8' });
+}
+
+export async function deletePage(name: string) {
+  const root = getUserProjectRoot();
+  const pageFolder = getPageFolder(root, name);
+  await fs.rm(pageFolder, { force: true, recursive: true });
 }
 
 class Lock {
@@ -849,11 +879,10 @@ function extractPagesFromDom(dom: appDom.AppDom): ExtractedPages {
   return { pages, dom };
 }
 
-async function writePagesToFiles(pagesFolder: string, pages: PagesContent) {
+async function writePagesToFiles(root: string, pages: PagesContent) {
   await Promise.all(
     Object.entries(pages).map(async ([name, page]) => {
-      const pageFolder = path.resolve(pagesFolder, name);
-      const pageFileName = path.resolve(pageFolder, 'page.yml');
+      const pageFileName = getPageFile(root, name);
       await updateYamlFile(pageFileName, page);
     }),
   );
@@ -908,9 +937,8 @@ function extractThemeContentFromDom(dom: appDom.AppDom): Theme | null {
 
 async function writeDomToDisk(dom: appDom.AppDom): Promise<void> {
   const root = getUserProjectRoot();
-  const pagesFolder = getPagesFolder(root);
   const { pages: pagesContent } = extractPagesFromDom(dom);
-  await Promise.all([writePagesToFiles(pagesFolder, pagesContent)]);
+  await Promise.all([writePagesToFiles(root, pagesContent)]);
 }
 
 export async function openCodeEditor(file: string): Promise<void> {
@@ -969,8 +997,7 @@ async function writeProjectFolder(
   folder: ToolpadProjectFolder,
   writeComponents: boolean = false,
 ): Promise<void> {
-  const pagesFolder = getPagesFolder(root);
-  await writePagesToFiles(pagesFolder, folder.pages);
+  await writePagesToFiles(root, folder.pages);
   await writeThemeFile(root, folder.theme);
   if (writeComponents) {
     const componentsFolder = getComponentsFolder(root);
@@ -995,9 +1022,13 @@ function appDomToProjectFolder(dom: appDom.AppDom): ToolpadProjectFolder {
   return { pages, components, theme };
 }
 
-async function loadDomFromDisk(): Promise<appDom.AppDom> {
+async function loadProjectFolder(): Promise<ToolpadProjectFolder> {
   const root = getUserProjectRoot();
-  const projectFolder = await readProjectFolder(root);
+  return readProjectFolder(root);
+}
+
+export async function loadDomFromDisk(): Promise<appDom.AppDom> {
+  const projectFolder = await loadProjectFolder();
   return projectFolderToAppDom(projectFolder);
 }
 
@@ -1087,6 +1118,11 @@ async function initToolpadFolder(root: string) {
   await initGitignore(root);
 }
 
+function getCodeComponentsFingerprint(dom: appDom.AppDom) {
+  const { codeComponents = [] } = appDom.getChildNodes(dom, appDom.getApp(dom));
+  return codeComponents.map(({ name }) => name).join('|');
+}
+
 export async function initProject() {
   const root = getUserProjectRoot();
 
@@ -1095,8 +1131,13 @@ export async function initProject() {
   await initToolpadFolder(root);
 
   let [dom, fingerprint] = await Promise.all([loadDomFromDisk(), calculateDomFingerprint(root)]);
-
+  let codeComponentsFingerprint = getCodeComponentsFingerprint(dom);
   const lock = new Lock();
+
+  const events = new Emitter<{
+    change: { fingerprint: number };
+    componentsListChanged: {};
+  }>();
 
   const updateDomFromExternal = debounce(() => {
     lock.use(async () => {
@@ -1105,6 +1146,13 @@ export async function initProject() {
         // eslint-disable-next-line no-console
         console.log(`${chalk.magenta('event')} - Project changed on disk, updating...`);
         [dom, fingerprint] = await Promise.all([loadDomFromDisk(), calculateDomFingerprint(root)]);
+        events.emit('change', { fingerprint });
+
+        const newCodeComponentsFingerprint = getCodeComponentsFingerprint(dom);
+        if (codeComponentsFingerprint !== newCodeComponentsFingerprint) {
+          codeComponentsFingerprint = newCodeComponentsFingerprint;
+          events.emit('componentsListChanged', {});
+        }
       }
     });
   }, 100);
@@ -1116,9 +1164,12 @@ export async function initProject() {
   }
 
   return {
+    events,
+
     async loadDom() {
       return dom;
     },
+
     async saveDom(newDom: appDom.AppDom) {
       if (config.cmd !== 'dev') {
         throw new Error(`Writing to disk is only possible in toolpad dev mode.`);
@@ -1134,6 +1185,7 @@ export async function initProject() {
 
       return { fingerprint };
     },
+
     async getDomFingerPrint() {
       return fingerprint;
     },

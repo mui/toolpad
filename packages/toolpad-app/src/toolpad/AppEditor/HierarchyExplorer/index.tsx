@@ -15,6 +15,7 @@ import CreatePageNodeDialog from './CreatePageNodeDialog';
 import useLocalStorageState from '../../../utils/useLocalStorageState';
 import NodeMenu from '../NodeMenu';
 import { DomView } from '../../../utils/domView';
+import client from '../../../api';
 
 const HierarchyExplorerRoot = styled('div')({
   overflow: 'auto',
@@ -187,15 +188,18 @@ export default function HierarchyExplorer({ className }: HierarchyExplorerProps)
   }, []);
   const handleCreatepageDialogClose = React.useCallback(() => setCreatePageDialogOpen(0), []);
 
-  const handleDeleteNode = React.useCallback(
-    (nodeId: NodeId) => {
+  const handleDeletePage = React.useCallback(
+    async (nodeId: NodeId) => {
+      const deletedNode = appDom.getNode(dom, nodeId);
+
       let domViewAfterDelete: DomView | undefined;
       if (nodeId === activeNode) {
-        const deletedNode = appDom.getNode(dom, nodeId);
         const siblings = appDom.getSiblings(dom, deletedNode);
         const firstSiblingOfType = siblings.find((sibling) => sibling.type === deletedNode.type);
         domViewAfterDelete = firstSiblingOfType && getNodeEditorDomView(firstSiblingOfType);
       }
+
+      await client.mutation.deletePage(deletedNode.name);
 
       appStateApi.update(
         (draft) => appDom.removeNode(draft, nodeId),
@@ -265,7 +269,7 @@ export default function HierarchyExplorer({ className }: HierarchyExplorerProps)
               aria-level={2}
               labelText={page.name}
               onDuplicateNode={handleDuplicateNode}
-              onDeleteNode={handleDeleteNode}
+              onDeleteNode={handleDeletePage}
               onSettingsNode={handlePageSettingsNode}
             />
           ))}

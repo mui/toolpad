@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { BindableAttrEntries, CreateQueryConfig } from '@mui/toolpad-core';
+import { BindableAttrEntries, CreateFunctionConfig } from '@mui/toolpad-core';
 import { Autocomplete, Button, Stack, TextField, Typography } from '@mui/material';
 import { useBrowserJsRuntime } from '@mui/toolpad-core/jsBrowserRuntime';
 import { ClientDataSource, QueryEditorProps } from '../../types';
@@ -43,7 +43,8 @@ function QueryEditor({
   );
 
   const functionName: string | undefined = input.attributes.query.value.function;
-  const functionDefs: Record<string, CreateQueryConfig<any>> = introspection.data?.functions ?? {};
+  const functionDefs: Record<string, CreateFunctionConfig<any>> = introspection.data?.functions ??
+  {};
   const parameterDefs = (functionName ? functionDefs?.[functionName]?.parameters : null) || {};
 
   const paramsEntries = input.params?.filter(([key]) => !!parameterDefs[key]) || EMPTY_PARAMS;

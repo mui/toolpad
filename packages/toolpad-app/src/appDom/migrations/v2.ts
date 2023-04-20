@@ -1,6 +1,6 @@
 import invariant from 'invariant';
-import * as appDom from '..';
 import { mapValues } from '@mui/toolpad-utils/collections';
+import * as appDom from '..';
 
 function replaceMutation(node: any): appDom.AppDomNode {
   if (node.type === 'mutation') {

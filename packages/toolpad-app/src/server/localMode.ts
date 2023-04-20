@@ -11,9 +11,10 @@ import * as chokidar from 'chokidar';
 import { debounce } from 'lodash-es';
 import cuid from 'cuid';
 import { Emitter } from '@mui/toolpad-utils/events';
+import { errorFrom } from '@mui/toolpad-utils/errors';
+import { filterValues, hasOwnProperty, mapValues } from '@mui/toolpad-utils/collections';
 import config from '../config';
 import * as appDom from '../appDom';
-import { errorFrom } from '@mui/toolpad-utils/errors';
 import { migrateUp } from '../appDom/migrations';
 import insecureHash from '../utils/insecureHash';
 import {
@@ -40,7 +41,6 @@ import {
   themeSchema,
   API_VERSION,
 } from './schema';
-import { filterValues, hasOwnProperty, mapValues } from '@mui/toolpad-utils/collections';
 import { format } from '../utils/prettier';
 import {
   Body as AppDomFetchBody,

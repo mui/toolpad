@@ -1,10 +1,10 @@
 import { NextApiHandler } from 'next';
 import type { IncomingMessage, ServerResponse } from 'http';
 import superjson from 'superjson';
-import { execQuery, dataSourceFetchPrivate } from '../../src/server/data';
-import { getVersionInfo } from '../../src/server/versionInfo';
 import { hasOwnProperty } from '@mui/toolpad-utils/collections';
 import { errorFrom, serializeError } from '@mui/toolpad-utils/errors';
+import { execQuery, dataSourceFetchPrivate } from '../../src/server/data';
+import { getVersionInfo } from '../../src/server/versionInfo';
 import logger from '../../src/server/logs/logger';
 import { createComponent, openCodeComponentEditor } from '../../src/server/localMode';
 import { getDomFingerprint, loadDom, saveDom } from '../../src/server/liveProject';

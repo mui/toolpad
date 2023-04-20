@@ -106,6 +106,7 @@ export function createDataHandler() {
 
   router.post(
     '/:pageName/:queryName',
+    express.json(),
     asyncHandler(async (req, res) => {
       const { pageName, queryName } = req.params;
 

@@ -143,6 +143,11 @@ async function main() {
     expressNext();
   });
 
+  app.use('/app-canvas', (req, res, expressNext) => {
+    res.setHeader('X-Frame-Options', 'SAMEORIGIN');
+    expressNext();
+  });
+
   app.use(async (req, res) => {
     try {
       invariant(req.url, 'request must have a url');

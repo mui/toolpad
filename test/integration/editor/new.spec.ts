@@ -53,7 +53,7 @@ test('can create/delete page', async ({ page, localApp }) => {
 
   await editorModel.createPage('somePage');
 
-  const pageMenuItem = editorModel.hierarchyItem('pages', 'somePage');
+  const pageMenuItem = editorModel.getHierarchyItem('pages', 'somePage');
   const pageFolder = path.resolve(localApp.dir, './toolpad/pages/somePage');
   const pageFile = path.resolve(pageFolder, './page.yml');
 

@@ -68,3 +68,15 @@ export async function fileExists(filepath: string): Promise<boolean> {
     throw err;
   }
 }
+
+export async function folderExists(folderpath: string): Promise<boolean> {
+  try {
+    const stat = await fs.stat(folderpath);
+    return stat.isDirectory();
+  } catch (err) {
+    if (errorFrom(err).code === 'ENOENT') {
+      return false;
+    }
+    throw err;
+  }
+}

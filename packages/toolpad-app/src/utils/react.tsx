@@ -38,12 +38,7 @@ export function createGlobalState<T = undefined>(initialValue: T) {
 
   result = [initialValue, setState];
 
-  const subscribe = (cb: () => void) => {
-    emitter.on('change', cb);
-    return () => {
-      emitter.off('change', cb);
-    };
-  };
+  const subscribe = (cb: () => void) => emitter.subscribe('change', cb);
 
   const getSnapshot = () => result;
 

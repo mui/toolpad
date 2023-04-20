@@ -1102,6 +1102,7 @@ interface RenderedPagesProps {
 }
 
 function RenderedPages({ pages, defaultPage }: RenderedPagesProps) {
+  const defaultPageNavigation = <Navigate to={`/pages/${defaultPage.id}`} replace />;
   return (
     <Routes>
       {pages.map((page) => (
@@ -1118,7 +1119,8 @@ function RenderedPages({ pages, defaultPage }: RenderedPagesProps) {
           }
         />
       ))}
-      <Route path="/" element={<Navigate to={`pages/${defaultPage.id}`} replace />} />
+      <Route path="/pages" element={defaultPageNavigation} />
+      <Route path="/" element={defaultPageNavigation} />
     </Routes>
   );
 }

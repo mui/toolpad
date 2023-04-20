@@ -202,7 +202,7 @@ async function createBuilder() {
       const parsed = dotenv.parse(envFileContent) as any;
       // eslint-disable-next-line no-console
       console.log(
-        `Loaded env file "${envFilePath}" with keys ${truncate(
+        `${chalk.blue('info')}  - loaded env file "${envFilePath}" with keys ${truncate(
           Object.keys(parsed).join(', '),
           1000,
         )}`,

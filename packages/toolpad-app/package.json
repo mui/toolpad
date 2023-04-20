@@ -28,6 +28,16 @@
     "./package.json": "./package.json",
     "./cli": {
       "require": "./dist/cli/index.js"
+    },
+    "./runtime": {
+      "types": "./dist/runtime/index.d.ts",
+      "import": "./dist/runtime/index.mjs",
+      "require": "./dist/runtime/index.js"
+    },
+    "./canvas": {
+      "types": "./dist/runtime/canvas.d.ts",
+      "import": "./dist/runtime/canvas.mjs",
+      "require": "./dist/runtime/canvas.js"
     }
   },
   "dependencies": {
@@ -57,6 +67,7 @@
     "@tanstack/react-query-devtools": "^4.29.3",
     "@types/cors": "^2.8.13",
     "@types/react-dev-utils": "^9.0.11",
+    "@vitejs/plugin-react": "4.0.0-beta.1",
     "abort-controller": "^3.0.0",
     "arg": "^5.0.2",
     "basic-auth": "^2.0.1",
@@ -72,18 +83,21 @@
     "dotenv": "^16.0.3",
     "esbuild": "0.17.16",
     "execa": "^7.1.1",
+    "express": "^4.18.2",
     "find-up": "^6.3.0",
     "fractional-indexing": "^3.2.0",
     "get-port": "^6.1.2",
     "glob": "^10.1.0",
     "google-auth-library": "^8.7.0",
     "history": "^5.3.0",
+    "http-proxy-middleware": "^2.0.6",
     "invariant": "^2.2.4",
     "json-to-ts": "^1.7.0",
     "json5": "^2.2.3",
     "latest-version": "^7.0.0",
     "lodash-es": "^4.17.21",
     "markdown-to-jsx": "^7.2.0",
+    "mime": "^3.0.0",
     "monaco-editor": "0.37.1",
     "mysql2": "^3.2.2",
     "next": "^13.3.0",
@@ -112,6 +126,7 @@
     "sucrase": "^3.32.0",
     "superjson": "^1.12.2",
     "ts-node": "^10.9.1",
+    "vite": "^4.3.0-beta.8",
     "whatwg-url": "^12.0.1",
     "yaml": "^2.2.1",
     "yaml-diff-patch": "^2.0.0",

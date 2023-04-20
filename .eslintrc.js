@@ -79,6 +79,7 @@ module.exports = {
       extends: ['plugin:@next/next/recommended'],
       rules: {
         '@next/next/no-html-link-for-pages': ['error', 'packages/toolpad-app/pages/'],
+        '@next/next/no-img-element': 'off',
       },
     },
     {

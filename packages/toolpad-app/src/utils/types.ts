@@ -6,6 +6,9 @@ export type WithControlledProp<
 
 export type ExactEntriesOf<P> = Exclude<{ [K in keyof P]: [K, P[K]] }[keyof P], undefined>[];
 
+/**
+ * The inverse of Awaited.
+ */
 export type Awaitable<T> = T | Promise<T> | PromiseLike<T>;
 
 /**
@@ -64,6 +67,7 @@ export type CapitalizeTail<T extends string[]> = T extends []
   : never;
 
 /**
+ * sString template type that converts snake-case to camel-case
  * @example
  * type T0 = SnakeToCamel<'foo-bar-baz'>;  // 'fooBarBaz'
  * type T1 = CapitalizeAll<'foo'>;  // 'foo'
@@ -71,14 +75,9 @@ export type CapitalizeTail<T extends string[]> = T extends []
  */
 export type SnakeToCamel<T extends string> = Join<CapitalizeTail<Split<T, '-'>>, ''>;
 
+/**
+ * The inverso of NonNullable
+ */
 export type Maybe<T> = T | undefined | null;
-
-export interface MetaField {
-  description?: string;
-  deprecated?: boolean | string;
-  tsType?: string;
-  value?: any;
-}
-export type GlobalScopeMeta = Record<string, MetaField>;
 
 export type ValueOf<T> = T[keyof T];

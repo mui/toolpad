@@ -32,12 +32,20 @@
     },
     {
       "groupName": "playwright",
-      "matchPackageNames": ["playwright", "^@playwright/", "mcr.microsoft.com/playwright"]
+      "matchPackageNames": ["playwright", "mcr.microsoft.com/playwright"],
+      "matchPackagePatterns": ["^@playwright/"]
     },
     {
       "groupName": "node",
       "matchPackageNames": ["cimg/node", "node"],
       "allowedVersions": "<=16"
+    },
+    {
+      "description": "Ignore nodejs in engines",
+      "matchPackageNames": ["node"],
+      "matchManagers": ["npm"],
+      "matchDepTypes": ["engines"],
+      "enabled": false
     },
     {
       "groupName": "react-inspector",
@@ -53,11 +61,6 @@
       "groupName": "react-router",
       "matchPackageNames": ["react-router", "react-router-dom"],
       "allowedVersions": "< 6.4.0"
-    },
-    {
-      "groupName": "chalk",
-      "matchPackageNames": ["chalk"],
-      "allowedVersions": "< 5.0.0"
     },
     {
       "groupName": "core-js",
@@ -82,21 +85,5 @@
   "vulnerabilityAlerts": {
     "schedule": ["at any time"],
     "addLabels": ["priority: important"]
-  },
-  "regexManagers": [
-    {
-      "fileMatch": ["^render.yml$"],
-      "matchStringsStrategy": "combination",
-      "matchStrings": ["- key: NODE_VERSION", "value: '(?<currentValue>.*)"],
-      "depNameTemplate": "node",
-      "datasourceTemplate": "docker"
-    },
-    {
-      "fileMatch": ["^.circleci/config.yml$"],
-      "matchStrings": ["mcr.microsoft.com/playwright:(?<currentValue>.*)"],
-      "packageNameTemplate": "mcr.microsoft.com/playwright",
-      "depNameTemplate": "playwright",
-      "datasourceTemplate": "docker"
-    }
-  ]
+  }
 }

@@ -1,8 +1,8 @@
 import type { Entry } from 'har-format';
+import { getBrowserRuntime } from '@mui/toolpad-core/jsBrowserRuntime';
 import { ExecFetchFn, RuntimeDataSource } from '../../types';
 import { FetchQuery, FetchResult } from './types';
 import { execfetch } from './shared';
-import evalExpression from '../../utils/evalExpression';
 import { createHarLog } from '../../utils/har';
 
 export async function clientExec(
@@ -14,12 +14,12 @@ export async function clientExec(
     const har = createHarLog();
 
     const instrumentedFetch = async (...args: Parameters<typeof fetch>) => {
-      const startedDateTime = new Date().toISOString();
+      const startTime = Date.now();
       const req = new Request(...args);
       const url = new URL(req.url);
       const res = await window.fetch(req);
       const entry: Entry = {
-        startedDateTime,
+        startedDateTime: new Date(startTime).toISOString(),
         request: {
           bodySize: 0,
           cookies: [],
@@ -45,7 +45,7 @@ export async function clientExec(
           statusText: res.statusText,
         },
         cache: {},
-        time: Date.now(),
+        time: Date.now() - startTime,
         timings: {
           wait: 0,
           receive: 0,
@@ -58,7 +58,7 @@ export async function clientExec(
     const result = await execfetch(fetchQuery, params, {
       connection: null,
       fetchImpl: instrumentedFetch,
-      evalExpression,
+      jsRuntime: getBrowserRuntime(),
     });
 
     return { ...result, har };

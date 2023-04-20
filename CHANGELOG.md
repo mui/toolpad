@@ -1,5 +1,515 @@
 # Changelog
 
+## 0.1.7
+
+<!-- generated comparing v0.1.6..master -->
+
+_Apr 20, 2023_
+
+A big thanks to the 5 contributors who made this release possible. Here are some highlights ✨:
+
+Tweak the landing page design. Improve `create-toolpad-app` CLI, support node modules in custom code components.
+
+- &#8203;<!-- 14 -->Add folder as argument to `create-toolpad-app` (#1795) @bharatkashyap
+- &#8203;<!-- 13 -->Delete page on file system when deleted in UI (#1913) @Janpot
+- &#8203;<!-- 12 -->New vite based application runtime (#1881) @Janpot
+- &#8203;<!-- 11 -->Fix Windows issues (WIP) (#1910) @apedroferreira
+- &#8203;<!-- 10 -->Use npm registry to check for new versions (#1895) @Janpot
+- &#8203;<!-- 09 -->Update MUI monorepo (#1883) @apedroferreira
+- &#8203;<!-- 08 -->Fix: Remove `default` from `toolpad dev --port` option (#1911) @bharatkashyap
+- &#8203;<!-- 07 -->Deprecate `createQuery` and replace with `createFunction` (#1908) @bharatkashyap
+- &#8203;<!-- 06 -->Show border on hover in interactive nodes (#1907) @apedroferreira
+- &#8203;<!-- 05 -->Fix: Better represent the new direction on landing (#1863) @bharatkashyap
+- &#8203;<!-- 04 -->Revert "Form component (#1598)" @apedroferreira
+- &#8203;<!-- 03 -->Form component (#1598) @bytasv
+- &#8203;<!-- 02 -->Update links on contributing guide (#1893) @Janpot
+- &#8203;<!-- 01 -->[website] Landing page design tweaks (#1786) @danilo-leal
+
+All contributors of this release in alphabetical order: @apedroferreira, @bharatkashyap, @bytasv, @danilo-leal, @Janpot
+
+## 0.1.6
+
+<!-- generated comparing v0.1.5..master -->
+
+_Apr 13, 2023_
+
+A big thanks to the 1 contributors who made this release possible. Here are some highlights ✨:
+
+Fix regression that applies the wrong theme to the user application when they have dark color scheme.
+
+- &#8203;<!-- 1 -->Fix app theming (#1888) @Janpot
+
+All contributors of this release in alphabetical order: @Janpot
+
+## 0.1.5
+
+<!-- generated comparing v0.1.4..master -->
+
+_Apr 13, 2023_
+
+A big thanks to the 2 contributors who made this release possible. Here are some highlights ✨:
+
+Fix broken CLI due to missing dependency
+
+- &#8203;<!-- 4 -->Add missing extraneous dependencies (#1885) @Janpot
+- &#8203;<!-- 3 -->Update playwright to latest (#1884) @Janpot
+- &#8203;<!-- 2 -->Small fixes to CLI (#1882) @Janpot
+- &#8203;<!-- 1 -->Update release instructions (#1880) @apedroferreira
+
+All contributors of this release in alphabetical order: @apedroferreira, @Janpot
+
+## 0.1.4
+
+<!-- generated comparing v0.1.3..master -->
+
+_Apr 12, 2023_
+
+A big thanks to the 3 contributors who made this release possible. Here are some highlights ✨:
+
+Revamped file system layout, updated docs.
+
+- &#8203;<!-- 8 -->Factor out in-memory toolpad project (#1878) @Janpot
+- &#8203;<!-- 7 -->Revamp toolpad file system layout (#1831) @Janpot
+- &#8203;<!-- 6 -->Docs-update (#1829) @prakhargupta1
+- &#8203;<!-- 5 -->Update README.md @prakhargupta1
+- &#8203;<!-- 4 -->Update README.md @prakhargupta1
+- &#8203;<!-- 3 -->Refactor: extract custom components loading logic (#1862) @Janpot
+- &#8203;<!-- 2 -->Clean dist dirs on rebuild (#1858) @Janpot
+- &#8203;<!-- 1 -->[docs] Fix 301 redirections @oliviertassinari
+
+All contributors of this release in alphabetical order: @Janpot, @oliviertassinari, @prakhargupta1
+
+## 0.1.3
+
+<!-- generated comparing v0.1.2..master -->
+
+_Apr 5, 2023_
+
+A big thanks to the 3 contributors who made this release possible. Here are some highlights ✨:
+
+Fixed a regression with the query transformation feature, removed some obsolete code and a few improvements to the editor user experience!
+
+- &#8203;<!-- 4 -->Fix transform regression (#1856) @bharatkashyap
+- &#8203;<!-- 3 -->Try replacing tsc with tsup as build tool (#1727) @Janpot
+- &#8203;<!-- 2 -->Remove obsolete onDelete datagrid property (#1850) @Janpot
+- &#8203;<!-- 1 -->Editor UX fixes (#1844) @apedroferreira
+
+All contributors of this release in alphabetical order: @apedroferreira, @bharatkashyap, @Janpot
+
+## 0.1.2
+
+<!-- generated comparing v0.1.1..master -->
+
+_Mar 31, 2023_
+
+A big thanks to the 3 contributors who made this release possible. Here are some highlights ✨:
+
+Add end-user application navigation! Various fixes.
+
+- &#8203;<!-- 11 -->Add app navigation sidebar (#1819) @apedroferreira
+- &#8203;<!-- 10 -->Load queries by name instead of id (#1842) @Janpot
+- &#8203;<!-- 09 -->Fix issues around custom datagrid columns (#1840) @Janpot
+- &#8203;<!-- 08 -->Fix broken theming (#1834) @apedroferreira
+- &#8203;<!-- 07 -->Do Toolpad app migration on startup (#1832) @Janpot
+- &#8203;<!-- 06 -->Remove ECS and Recaptcha + move request/response logs to trace level (#1833) @apedroferreira
+- &#8203;<!-- 05 -->Remove deprecated scope query (#1827) @apedroferreira
+- &#8203;<!-- 04 -->Use worker scoped fixtures for integration tests (#1813) @Janpot
+- &#8203;<!-- 03 -->Remove quickjs-emscripten (#1820) @Janpot
+- &#8203;<!-- 02 -->Rewrite argument handling in `@mui/toolpad` CLI with `yargs` (#1794) @bharatkashyap
+- &#8203;<!-- 01 -->Update CONTRIBUTING.md (Fix typo) (#1826) @apedroferreira
+
+All contributors of this release in alphabetical order: @apedroferreira, @bharatkashyap, @Janpot
+
+## 0.1.1
+
+<!-- generated comparing v0.1.0..master -->
+
+_Mar 28, 2023_
+
+A big thanks to the 4 contributors who made this release possible. Here are some highlights ✨:
+
+Mutate state in event handlers by assigning to properties of page elements. Make binding to DataGrid selection easier with improved typings. Big cleanup of dead code.
+
+- &#8203;<!-- 28 -->Use node name in the canvas HUD (#1818) @Janpot
+- &#8203;<!-- 27 -->Allow mutating page state in event handlers (#1807) @Janpot
+- &#8203;<!-- 26 -->Improve UX around integration testing (#1808) @Janpot
+- &#8203;<!-- 25 -->Disable property control for controlled properties (#1809) @Janpot
+- &#8203;<!-- 24 -->Use next.js custom server (#1723) @Janpot
+- &#8203;<!-- 23 -->Remove postgres (#1799) @Janpot
+- &#8203;<!-- 22 -->Remove example and docker files (#1798) @Janpot
+- &#8203;<!-- 21 -->Clean up more obsolete things in the repo (#1797) @Janpot
+- &#8203;<!-- 20 -->Fix errors when running the project the first time (#1796) @Janpot
+- &#8203;<!-- 19 -->Fix imports from toolpad (#1793) @Janpot
+- &#8203;<!-- 18 -->Fix changing tabs closing query editor (#1784) @apedroferreira
+- &#8203;<!-- 17 -->Generate .gitignore on dev command (#1705) @apedroferreira
+- &#8203;<!-- 16 -->Improve dataGrid.selection types (#1790) @Janpot
+- &#8203;<!-- 15 -->Dependency cleanup (#1791) @Janpot
+- &#8203;<!-- 14 -->Fixes on the dev pipeline (#1789) @Janpot
+- &#8203;<!-- 13 -->Remove Prisma, isolated-vm and dead code (#1787) @Janpot
+- &#8203;<!-- 12 -->Update release instructions (#1788) @Janpot
+- &#8203;<!-- 11 -->Fix capitalization of elements (#1782) @Janpot
+- &#8203;<!-- 10 -->Update moduleresolution for core and components (#1780) @Janpot
+- &#8203;<!-- 09 -->Remove the localMode flag (#1768) @Janpot
+- &#8203;<!-- 08 -->Convert tests to local mode (#1718) @Janpot
+- &#8203;<!-- 07 -->Add docs contributing instructions (#1779) @Janpot
+- &#8203;<!-- 06 -->Allow falsy MySQL variable values (#1738) @evankennedy
+- &#8203;<!-- 05 -->Add Toolpad to cspell config for the workspace (#1767) @Janpot
+- &#8203;<!-- 04 -->Use latest version for examples (#1764) @Janpot
+- &#8203;<!-- 03 -->Rename dev13 script to dev (#1766) @Janpot
+- &#8203;<!-- 02 -->Small typo fix @prakhargupta1
+- &#8203;<!-- 01 -->Docs updates for the new direction (#1743) @Janpot
+
+All contributors of this release in alphabetical order: @apedroferreira, @evankennedy, @Janpot, @prakhargupta1
+
+## 0.1.0
+
+<!-- generated comparing v0.0.41..master -->
+
+_Mar 20, 2023_
+
+A big thanks to the 3 contributors who made this release possible. Here are some highlights ✨:
+
+Today we're taking a big step. We're making Toolpad focus much more on integrating with your IDE, while providing the ease of building UI fast with a drag and drop. Read more [here](https://github.com/mui/mui-toolpad/discussions/1748).
+
+- &#8203;<!-- 8 -->Add create-toolpad-app CLI (#1700) @bharatkashyap
+- &#8203;<!-- 7 -->Direction 13 (#1651) @Janpot
+- &#8203;<!-- 6 -->Fix dragged element corners (#1750) @Janpot
+- &#8203;<!-- 5 -->Turn off preview environments (#1697) @Janpot
+- &#8203;<!-- 4 -->this don't work @Janpot
+- &#8203;<!-- 3 -->build to legacy master @Janpot
+- &#8203;<!-- 2 -->add ignore console to test @Janpot
+- &#8203;<!-- 1 -->Disable bindings for properties that can be controlled in canvas (#1696) @apedroferreira
+
+All contributors of this release in alphabetical order: @apedroferreira, @bharatkashyap, @Janpot
+
+## 0.0.41
+
+<!-- generated comparing v0.0.40..master -->
+
+_Feb 22, 2023_
+
+A big thanks to the 4 contributors who made this release possible. Here are some highlights ✨:
+
+Add a List component, polish Markdown component, easier access to Page module settings, feedback for mutation queries, and a new option to edit Text component directly in canvas!
+
+- &#8203;<!-- 17 -->Fix binding editor confirm on unsaved changes (#1695) @apedroferreira
+- &#8203;<!-- 16 -->Adjust margins for Markdown component (#1690) @Janpot
+- &#8203;<!-- 15 -->Remove deprecated waitForNavigation playwright API (#1699) @Janpot
+- &#8203;<!-- 14 -->Make text component editable in the canvas (#1694) @Janpot
+- &#8203;<!-- 13 -->Hide resizable height prop controls (#1641) @apedroferreira
+- &#8203;<!-- 12 -->Move selected node state to page view only (#1679) @apedroferreira
+- &#8203;<!-- 11 -->Fix DataGrid number formats for non-numerical values (#1626) @Janpot
+- &#8203;<!-- 10 -->Add feedback for mutating queries (#1691) @Janpot
+- &#8203;<!-- 09 -->Show confirmation dialog when there are unsaved changes (#1618) @apedroferreira
+- &#8203;<!-- 08 -->Fix resizing after drag & drop UI changes (#1639) @apedroferreira
+- &#8203;<!-- 07 -->Polish Markdown component (#1477) @bharatkashyap
+- &#8203;<!-- 06 -->Confirm unsaved code component changes (#1628) @apedroferreira
+- &#8203;<!-- 05 -->Add in page settings option to sidebar to allow for easier access to page module settings (#1672) @scouttyg
+- &#8203;<!-- 04 -->Add List component (#1527) @apedroferreira
+- &#8203;<!-- 03 -->Fix: Column changes dropped on prop update (#1583) @bharatkashyap
+- &#8203;<!-- 02 -->Fix: Disable "Remove" on draft nodes (#1681) @bharatkashyap
+- &#8203;<!-- 01 -->Align headers and typography in the theme (#1627) @Janpot
+
+All contributors of this release in alphabetical order: @apedroferreira, @bharatkashyap, @Janpot, @scouttyg
+
+## 0.0.40
+
+<!-- generated comparing v0.0.39..master -->
+
+_Feb 15, 2023_
+
+A big thanks to the 1 contributors who made this release possible. Here are some highlights ✨:
+
+- &#8203;<!-- 1 -->Fix HMR issues with the canvas bridge (#1640) @Janpot
+
+All contributors of this release in alphabetical order: @Janpot
+
+## 0.0.39
+
+<!-- generated comparing v0.0.39-alpha.0..master -->
+
+_Feb 8, 2023_
+
+A big thanks to the 3 contributors who made this release possible. Here are some highlights ✨:
+
+Edit option from preview, improved Select component behavior, updated drag & drop UI/UX, improved image columns in Data Grid, add Data Grid documentation.
+
+- &#8203;<!-- 13 -->Improve behavior of image columns (#1637) @Janpot
+- &#8203;<!-- 12 -->Add DataGrid docs (#1616) @bytasv
+- &#8203;<!-- 11 -->Fix console errors @apedroferreira
+- &#8203;<!-- 10 -->Improve drag & drop / canvas UI (#1553) @apedroferreira
+- &#8203;<!-- 09 -->Add some new future components (#1631) @Janpot
+- &#8203;<!-- 08 -->Fix design issue template (#1636) @bytasv
+- &#8203;<!-- 07 -->Add design GH template (#1632) @bytasv
+- &#8203;<!-- 06 -->Remove - from select options (#1630) @Janpot
+- &#8203;<!-- 05 -->Improve deploy in iframe tests (#1622) @Janpot
+- &#8203;<!-- 04 -->disable server code build when not in local mode @Janpot
+- &#8203;<!-- 03 -->Remove firefox specific branch in tests (#1620) @Janpot
+- &#8203;<!-- 02 -->Add fast edit option from preview (#1603) @bytasv
+- &#8203;<!-- 01 -->Be more accepting of select options (#1604) @Janpot
+
+All contributors of this release in alphabetical order: @apedroferreira, @bytasv, @Janpot
+
+## 0.0.38
+
+<!-- generated comparing v0.0.37..master -->
+
+_Feb 1, 2023_
+
+A big thanks to the 5 contributors who made this release possible. Here are some highlights ✨:
+
+Improved default template.
+
+- &#8203;<!-- 7 -->Dual build toolpad-core for esm and cjs (#1617) @Janpot
+- &#8203;<!-- 6 -->Add new custom GA events to demo (#1588) @apedroferreira
+- &#8203;<!-- 5 -->Change default template (#1601) @bytasv
+- &#8203;<!-- 4 -->Add MySQL datasource (#1313) @bharatkashyap
+- &#8203;<!-- 3 -->Cherrypick some changes from direction 13 branch (#1599) @Janpot
+- &#8203;<!-- 2 -->[core] Remove dead code @oliviertassinari
+- &#8203;<!-- 1 -->[core] Fix Next.js warning @oliviertassinari
+
+All contributors of this release in alphabetical order: @apedroferreira, @bharatkashyap, @bytasv, @Janpot, @oliviertassinari
+
+## 0.0.37
+
+<!-- generated comparing v0.0.36..master -->
+
+_Jan 25, 2023_
+
+A big thanks to the 3 contributors who made this release possible. Here are some highlights ✨:
+
+Added a new FilePicker component, some changes to page navigation and improvements to JavaScript runtime code.
+
+- &#8203;<!-- 8 -->Fix navigation through DOM views with pages (#1565) @apedroferreira
+- &#8203;<!-- 7 -->Add FilePicker component (#1537) @bytasv
+- &#8203;<!-- 6 -->Split browser and server js runtimes (#1584) @Janpot
+- &#8203;<!-- 5 -->Fix webpack missing exports warnings (#1582) @Janpot
+- &#8203;<!-- 4 -->Make applyTransform runtime agnostic (#1585) @Janpot
+- &#8203;<!-- 3 -->Recreate yarn.lock (#1577) @Janpot
+- &#8203;<!-- 2 -->Upgrade monorepo dependency (#1580) @Janpot
+- &#8203;<!-- 1 -->Remove onChangeHandler from Select and TextField (#1576) @Janpot
+
+All contributors of this release in alphabetical order: @apedroferreira, @bytasv, @Janpot
+
+✨ Done in 1.69s.
+
+## 0.0.36
+
+<!-- generated comparing v0.0.35..master -->
+
+_Jan 18, 2023_
+
+A big thanks to the 3 contributors who made this release possible. Here are some highlights ✨:
+
+Added Tabs component and new canvas bridge implementation, fixed DatePicker localization, binding to objects, link redirection. Improved code around js evaluation.
+
+- &#8203;<!-- 9 -->Fix DatePicker localization issues (#1575) @Janpot
+- &#8203;<!-- 8 -->Avoid resubscribing in useSyncExternalStore on every render (#1554) @Janpot
+- &#8203;<!-- 7 -->Rename Tabs main prop (#1568) @bytasv
+- &#8203;<!-- 6 -->Add tabs and container components (#1549) @bytasv
+- &#8203;<!-- 5 -->Reorganize js evaluation across project (#1548) @Janpot
+- &#8203;<!-- 4 -->New canvas bridge implementation (#1550) @Janpot
+- &#8203;<!-- 3 -->Fix binding to objects with more than one property (#1542) @Janpot
+- &#8203;<!-- 2 -->[core] Add missing need triage label on RFC @oliviertassinari
+- &#8203;<!-- 1 -->[docs] Fix link redirection @oliviertassinari
+
+All contributors of this release in alphabetical order: @bytasv, @Janpot, @oliviertassinari
+
+## 0.0.35
+
+<!-- generated comparing v0.0.34..master -->
+
+_Jan 11, 2023_
+
+A big thanks to the 4 contributors who made this release possible. Here are some highlights ✨:
+
+Custom column types, add search to apps overview, add inline tooltips to components and properties, component library tweaks.
+
+- &#8203;<!-- 12 -->Fix templates after dog API changed (#1544) @Janpot
+- &#8203;<!-- 11 -->Reorganize shared utils (#1539) @Janpot
+- &#8203;<!-- 10 -->Remove obsolete dom reducer actions (#1541) @Janpot
+- &#8203;<!-- 09 -->Some component library tweaks (#1526) @Janpot
+- &#8203;<!-- 08 -->Pin react-router-dom instead of resolutions (#1519) @Janpot
+- &#8203;<!-- 07 -->Update README.md @prakhargupta1
+- &#8203;<!-- 06 -->Add inline documentation to components and properties (#1518) @Janpot
+- &#8203;<!-- 05 -->Correct types in Datepicker (#1517) @Janpot
+- &#8203;<!-- 04 -->Promote previously experimental config (#1515) @Janpot
+- &#8203;<!-- 03 -->Add search to the apps overview (#1402) @bharatkashyap
+- &#8203;<!-- 02 -->Custom column types (#1462) @bytasv
+- &#8203;<!-- 01 -->Restructure installation docs (#1511) @Janpot
+
+All contributors of this release in alphabetical order: @bharatkashyap, @bytasv, @Janpot, @prakhargupta1
+
+## 0.0.34
+
+<!-- generated comparing v0.0.33..master -->
+
+_Jan 4, 2023_
+
+A big thanks to the 4 contributors who made this release possible. Here are some highlights ✨:
+
+New date picker component, Make switching views part of undo/redo cycle.
+
+- &#8203;<!-- 13 -->Fix dependabot vulnerabilities (#1512) @Janpot
+- &#8203;<!-- 12 -->Don't import from dist folders (#1513) @Janpot
+- &#8203;<!-- 11 -->Root type check (#1510) @bytasv
+- &#8203;<!-- 10 -->Fix function editor save (#1507) @Janpot
+- &#8203;<!-- 09 -->Do not rename nodes when migrating Typography components (#1509) @Janpot
+- &#8203;<!-- 08 -->Just re-export the prettier config (#1508) @Janpot
+- &#8203;<!-- 07 -->Datepicker format handling changes (#1504) @bytasv
+- &#8203;<!-- 04 -->Undo/redo through different views (#1417) @apedroferreira
+- &#8203;<!-- 03 -->Make sure npm package is splitted out correctly (#1502) @Janpot
+- &#8203;<!-- 02 -->Date picker component (#1499) @bytasv
+- &#8203;<!-- 01 -->[core] Remove dead prettier config @oliviertassinari
+
+All contributors of this release in alphabetical order: @apedroferreira, @bytasv, @Janpot, @oliviertassinari
+
+## 0.0.33
+
+<!-- generated comparing v0.0.32..master -->
+
+_Dec 28, 2022_
+
+A big thanks to the 2 contributors who made this release possible. Here are some highlights ✨:
+
+Improvements to the scope explorer, and some other bug fixes an improvements.
+
+- &#8203;<!-- 4 -->Fix: Demo reCaptcha v2 fallback does not work (#1485) @bharatkashyap
+- &#8203;<!-- 3 -->Group scope variables by function in global scope explorer (#1464) @Janpot
+- &#8203;<!-- 2 -->Fix canvas ref timing issues (#1476) @Janpot
+- &#8203;<!-- 1 -->Fix flaky rest-basics test (#1481) @Janpot
+
+All contributors of this release in alphabetical order: @bharatkashyap, @Janpot
+
+## 0.0.32
+
+<!-- generated comparing v0.0.31..master -->
+
+_Dec 21, 2022_
+
+A big thanks to the 5 contributors who made this release possible. Here are some highlights ✨:
+
+Added survey for the Toolpad usage, simplified RPC logs, added latest deployment preview in the editor, undo/redo improvements, improved grid columns editor, added visual feedback when query runs, as well as various fixes.
+
+- &#8203;<!-- 12 -->Add survey dialog (#1480) @bytasv
+- &#8203;<!-- 11 -->Simplify RPC logs (#1473) @Janpot
+- &#8203;<!-- 10 -->Move recaptcha script away from \_app (#1472) @Janpot
+- &#8203;<!-- 09 -->Add latest deployment preview in editor (#1423) @bytasv
+- &#8203;<!-- 08 -->Single-update undo/redo (#1374) @apedroferreira
+- &#8203;<!-- 07 -->Non permanent root redirection (#1468) @oliviertassinari
+- &#8203;<!-- 06 -->Fix display of errors during loading of data (#1457) @Janpot
+- &#8203;<!-- 05 -->Replace gridcolumns editor dialog with popover (#1455) @Janpot
+- &#8203;<!-- 04 -->Fix: Incorrect migration for Text component (#1451) @bharatkashyap
+- &#8203;<!-- 03 -->Add formatting options to DataGrid columns (#1449) @Janpot
+- &#8203;<!-- 02 -->Add visual feedback when query is running (#1454) @Janpot
+- &#8203;<!-- 01 -->[docs] Banner tweaks (#1475) @bharatkashyap
+
+All contributors of this release in alphabetical order: @apedroferreira, @bharatkashyap, @bytasv, @Janpot, @oliviertassinari
+
+## 0.0.31
+
+<!-- generated comparing v0.0.30..master -->
+
+_Dec 14, 2022_
+
+A big thanks to the 5 contributors who made this release possible. Here are some highlights ✨:
+
+Add a new Text component that subsumes Typography and Link, and allows support for Markdown. Allow support for dynamic templates, and fix a bug around the default value of components.
+
+- &#8203;<!-- 11 -->Add Text component to merge Typography, Markdown, Link (#1298) @bharatkashyap
+- &#8203;<!-- 10 -->Document and cleanup of utility functions (#1442) @Janpot
+- &#8203;<!-- 09 -->Revert react-router-dom to 6.3 (#1444) @Janpot
+- &#8203;<!-- 08 -->Update README.md @prakhargupta1
+- &#8203;<!-- 07 -->Fix yarnlock (#1443) @bytasv
+- &#8203;<!-- 06 -->Add roadmap to the docs (#1424) @bytasv
+- &#8203;<!-- 05 -->Landing page tweaks (#1433) @bharatkashyap
+- &#8203;<!-- 04 -->Fix controlled value reset when default value changes (#1434) @bytasv
+- &#8203;<!-- 03 -->Add integration test for default template (#1429) @bharatkashyap
+- &#8203;<!-- 02 -->Support dynamic app templates (#1430) @apedroferreira
+- &#8203;<!-- 01 -->Fix changelog @Janpot
+
+All contributors of this release in alphabetical order: @apedroferreira, @bharatkashyap, @bytasv, @Janpot, @prakhargupta1
+
+✨ Done in 1.75s.
+
+## 0.0.30
+
+<!-- generated comparing v0.0.29..master -->
+
+_Dec 7, 2022_
+
+A big thanks to the 3 contributors who made this release possible. Here are some highlights ✨:
+
+Release the demo version, update app duplication UX.
+
+- &#8203;<!-- 13 -->Revert accidental react-router-dom update (#1426) @Janpot
+- &#8203;<!-- 12 -->Add demo link to the docs (#1319) @bharatkashyap
+- &#8203;<!-- 11 -->Add Demo link to landing page (#1228) @bharatkashyap
+- &#8203;<!-- 10 -->Add a Default app template (#1381) @bharatkashyap
+- &#8203;<!-- 09 -->Remove stats template (#1418) @apedroferreira
+- &#8203;<!-- 08 -->Propose solution for flaky undo test (#1415) @Janpot
+- &#8203;<!-- 07 -->Update dependencies (#1403) @Janpot
+- &#8203;<!-- 06 -->Move to next.config.mjs (#1404) @Janpot
+- &#8203;<!-- 05 -->Add note about missing connections to demo footer (#1406) @apedroferreira
+- &#8203;<!-- 04 -->Try out transpilePackages on latest next (#1362) @Janpot
+- &#8203;<!-- 03 -->Don't immediately open duplicated apps (#1397) @Janpot
+- &#8203;<!-- 02 -->Make sure EditableText updates when underlying string changes (#1400) @Janpot
+- &#8203;<!-- 01 -->Undoable/redoable node selection (#1394) @apedroferreira
+
+All contributors of this release in alphabetical order: @apedroferreira, @bharatkashyap, @Janpot
+
+## 0.0.29
+
+<!-- generated comparing v0.0.28..master -->
+
+_Nov 30, 2022_
+
+A big thanks to the 4 contributors who made this release possible. Here are some highlights ✨:
+
+Improved query options in demo, fixed time property in HAR, unified app editor options menus
+
+- &#8203;<!-- 7 -->Undo redo tests (#1308) @bytasv
+- &#8203;<!-- 6 -->Hide connections tree in demo (#1393) @apedroferreira
+- &#8203;<!-- 5 -->Create apps programmatically in integration tests (#1384) @Janpot
+- &#8203;<!-- 4 -->Set connection/query available options in demo (#1323) @apedroferreira
+- &#8203;<!-- 3 -->Add some tips about writing highlights in release docs (#1352) @Janpot
+- &#8203;<!-- 2 -->Fix time property in HAR (#1383) @Janpot
+- &#8203;<!-- 1 -->Unify app editor options menus (#1286) @bharatkashyap
+
+All contributors of this release in alphabetical order: @apedroferreira, @bharatkashyap, @bytasv, @Janpot
+
+## 0.0.28
+
+<!-- generated comparing v0.0.27..master -->
+
+_Nov 23, 2022_
+
+A big thanks to the 4 contributors who made this release possible. Here are some highlights ✨:
+
+Client-side functions, migration fixes, add sidebar to overview page, support visual captcha as fallback, add "alpha" label to app and landing page, automatic app names in demo.
+
+- &#8203;<!-- 19 -->Fix landing page hydration issue (#1375) @bharatkashyap
+- &#8203;<!-- 18 -->Update demo bar copy (#1371) @apedroferreira
+- &#8203;<!-- 17 -->Fix overflow for explorer (#1372) @Janpot
+- &#8203;<!-- 16 -->Add "alpha" label to app and landing page hero (#1356) @bharatkashyap
+- &#8203;<!-- 15 -->Add missing sucrase helper (#1360) @Janpot
+- &#8203;<!-- 14 -->Remove demo docker (#1369) @apedroferreira
+- &#8203;<!-- 13 -->Remove demo configuration from render.yaml (#1368) @apedroferreira
+- &#8203;<!-- 12 -->Move typescript to devDependencies (#1366) @Janpot
+- &#8203;<!-- 11 -->Remove sentry debug option (#1361) @Janpot
+- &#8203;<!-- 10 -->Fix yarn.lock @Janpot
+- &#8203;<!-- 09 -->Upgrade eslint (#1287) @Janpot
+- &#8203;<!-- 08 -->Fallback to visible captcha if invisible captcha fails (#1272) @apedroferreira
+- &#8203;<!-- 07 -->Refactor overview page (#1357) @Janpot
+- &#8203;<!-- 06 -->Fix migration to v3 (#1359) @Janpot
+- &#8203;<!-- 05 -->Run functions client side (#1325) @Janpot
+- &#8203;<!-- 04 -->Show IP address in log messages (#1350) @apedroferreira
+- &#8203;<!-- 03 -->Fix prettier script in CI (#1355) @Janpot
+- &#8203;<!-- 02 -->Automatic app names in demo (#1351) @apedroferreira
+- &#8203;<!-- 01 -->[core] Group renovate GitHub Action dependency updates (#1341) @oliviertassinari
+
+All contributors of this release in alphabetical order: @apedroferreira, @bharatkashyap, @Janpot, @oliviertassinari
+
 ## 0.0.27
 
 <!-- generated comparing v0.0.26..master -->

@@ -3,7 +3,6 @@ import * as React from 'react';
 import { Har } from 'har-format';
 import { styled, SxProps } from '@mui/material';
 import { useTheme, Theme } from '@mui/material/styles';
-import 'perf-cascade/dist/perf-cascade.css';
 import { createHarLog } from '../utils/har';
 
 const HarViewerRoot = styled('div')({});

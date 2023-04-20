@@ -1,49 +1,9 @@
+import Emitter from '@mui/toolpad-core/utils/Emitter';
 import * as React from 'react';
 
-export function createProvidedContext<T>(
-  name: string,
-): [() => T, React.ComponentType<React.ProviderProps<T>>] {
-  const context = React.createContext<T | undefined>(undefined);
-
-  const useContext = () => {
-    const maybeContext = React.useContext(context);
-    if (!maybeContext) {
-      throw new Error(`context "${name}" was used without a Provider`);
-    }
-    return maybeContext;
-  };
-
-  return [useContext, context.Provider as React.ComponentType<React.ProviderProps<T>>];
-}
-
-export function suspendPromise<T>(promise: Promise<T>): () => T {
-  let status = 'pending';
-  let error: Error;
-  let response: T;
-
-  const suspender = promise.then(
-    (res) => {
-      status = 'success';
-      response = res;
-    },
-    (err: Error) => {
-      status = 'error';
-      error = err;
-    },
-  );
-
-  return () => {
-    switch (status) {
-      case 'pending':
-        throw suspender;
-      case 'error':
-        throw error;
-      default:
-        return response;
-    }
-  };
-}
-
+/**
+ * Like `Array.prototype.join`, but for React nodes.
+ */
 export function interleave(items: React.ReactNode[], separator: React.ReactNode): React.ReactNode {
   const result: React.ReactNode[] = [];
 
@@ -55,4 +15,38 @@ export function interleave(items: React.ReactNode[], separator: React.ReactNode)
   }
 
   return result;
+}
+
+/**
+ * Create a shared state to be used across the application. Returns a useState hook that
+ * is synchronized on the same state between all instances where it is called.
+ */
+export function createGlobalState<T = undefined>(initialValue: T) {
+  const emitter = new Emitter<{ change: {} }>();
+
+  let result: [T, React.Dispatch<React.SetStateAction<T>>];
+
+  const setState: React.Dispatch<React.SetStateAction<T>> = (newValue) => {
+    const updateValue =
+      typeof newValue === 'function' ? (newValue as (newValue: T) => T)(result[0]) : newValue;
+
+    if (updateValue !== result[0]) {
+      result = [updateValue, setState];
+      emitter.emit('change', {});
+    }
+  };
+
+  result = [initialValue, setState];
+
+  const subscribe = (cb: () => void) => emitter.subscribe('change', cb);
+
+  const getSnapshot = () => result;
+
+  return function useGlobalState() {
+    return React.useSyncExternalStore<[T, React.Dispatch<React.SetStateAction<T>>]>(
+      subscribe,
+      getSnapshot,
+      getSnapshot,
+    );
+  };
 }

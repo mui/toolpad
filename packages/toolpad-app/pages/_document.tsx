@@ -74,8 +74,7 @@ export default class MyDocument extends Document<ToolpadDocumentProps> {
                 // Add the data-toolpad-canvas attribute to the canvas iframe element
                 if (window.frameElement?.dataset.toolpadCanvas){
                   var script = document.createElement('script');
-                  script.type = 'module';
-                  script.src = '/reactDevtools/bootstrap.js';
+                  script.src = '/reactDevtools/bootstrap.global.js';
                   document.write(script.outerHTML);
                 }
               `,
@@ -100,13 +99,13 @@ export default class MyDocument extends Document<ToolpadDocumentProps> {
             strategy="afterInteractive"
             dangerouslySetInnerHTML={{
               __html: `
-            window.dataLayer = window.dataLayer || [];
-            function gtag(){dataLayer.push(arguments);}
-            gtag('js', new Date());
-            gtag('config', '${config.gaId}', {
-              page_path: window.location.pathname,
-            });
-          `,
+                window.dataLayer = window.dataLayer || [];
+                function gtag(){dataLayer.push(arguments);}
+                gtag('js', new Date());
+                gtag('config', '${config.gaId}', {
+                  page_path: window.location.pathname,
+                });
+              `,
             }}
           />
         </Head>

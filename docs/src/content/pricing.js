@@ -103,22 +103,8 @@ const rowHeaders = {
   Apps: <ColumnHead label="Apps" />,
   'Data sources': <ColumnHead label="Data sources" />,
   'Export to code': <ColumnHead label="Export to code" />,
-  'Plugging API': (
-    <ColumnHead label="Plugging API" tooltip={'Extend the platform with community extensions.'} />
-  ),
-  'Built-in version control': (
-    <ColumnHead
-      label="Built-in version control"
-      tooltip={
-        'Create and manage releases for your app, and revert to any previous state in its history.'
-      }
-    />
-  ),
-  'Git version control': (
-    <ColumnHead
-      label="Git version control"
-      tooltip={'Branch-based editing workflows, compatible with Git.'}
-    />
+  'Plugin API': (
+    <ColumnHead label="Plugin API" tooltip={'Extend the platform with community extensions.'} />
   ),
   'Staging environments': <ColumnHead label="Staging environments" />,
   'White label': <ColumnHead label="White label" tooltip={'Custom domain and branding'} />,
@@ -132,19 +118,6 @@ const rowHeaders = {
     />
   ),
   'Premium components': <ColumnHead label="Premium components" tooltip={'MUI X Premium'} />,
-  // Users
-  'Real-time commenting': (
-    <ColumnHead
-      label="Real-time commenting"
-      tooltip={'Multiple users can interact through comments'}
-    />
-  ),
-  'Multiple organizations': (
-    <ColumnHead
-      label="Multiple organizations"
-      tooltip={'Create and manage multiple organizations'}
-    />
-  ),
   // Security
   'OAuth2/OpenID SSO': <ColumnHead label="OAuth2/OpenID SSO" />,
   'SSO enforcement': <ColumnHead label="SSO enforcement" />,
@@ -208,11 +181,7 @@ const communityData = {
   Apps: <Info value={'Unlimited'} />,
   'Data sources': <Info value={'Unlimited'} />,
   'Export to code': pending,
-  'Plugging API': pending,
-  'Built-in version control': no,
-  'Git version control': (
-    <Info value={pending} metadata={'Unlimited public repositories, 1 private repository'} />
-  ),
+  'Plugin API': pending,
   'Staging environments': <Info value={pending} metadata={'1 env'} />,
   'White label': no,
   'Custom themes': no,
@@ -220,9 +189,6 @@ const communityData = {
   Components: yes,
   'Custom components': yes,
   'Premium components': no,
-  // Users
-  'Real-time commenting': no,
-  'Multiple organizations': no,
   // Security
   'OAuth2/OpenID SSO': pending,
   'SSO enforcement': no,
@@ -241,9 +207,7 @@ const commercialData = {
   Apps: <Info value={'Unlimited'} />,
   'Data sources': <Info value={'Unlimited'} />,
   'Export to code': pending,
-  'Plugging API': pending,
-  'Built-in version control': pending,
-  'Git version control': <Info value={pending} />,
+  'Plugin API': pending,
   'Staging environments': <Info value={pending} metadata={'Unlimited'} />,
   'White label': pending,
   'Custom themes': pending,
@@ -251,9 +215,6 @@ const commercialData = {
   Components: pending,
   'Custom components': pending,
   'Premium components': pending,
-  // Users
-  'Real-time commenting': pending,
-  'Multiple organizations': pending,
   // Security
   'OAuth2/OpenID SSO': pending,
   'SSO enforcement': pending,

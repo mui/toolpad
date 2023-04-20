@@ -1,41 +1,39 @@
 import * as React from 'react';
-import { fireEvent, setEventHandler } from '@mui/toolpad-core/runtime';
 import invariant from 'invariant';
 import { throttle } from 'lodash-es';
-import { RuntimeEvent } from '@mui/toolpad-core';
-import ToolpadApp from '../runtime';
-import { NodeHashes, PageViewState, RuntimeState } from '../types';
+import { CanvasEventsContext } from '@mui/toolpad-core/runtime';
+import ToolpadApp, { LoadComponents } from '../runtime';
+import { NodeHashes, RuntimeState } from '../types';
 import getPageViewState from './getPageViewState';
 import { rectContainsPoint } from '../utils/geometry';
 import { CanvasHooks, CanvasHooksContext } from '../runtime/CanvasHooksContext';
+import { bridge, setCommandHandler } from './ToolpadBridge';
+import { BridgeContext } from './BridgeContext';
 
 export interface AppCanvasState extends RuntimeState {
   savedNodes: NodeHashes;
 }
 
-export interface ToolpadBridge {
-  onRuntimeEvent(handler: (event: RuntimeEvent) => void): void;
-  update(updates: AppCanvasState): void;
-  getViewCoordinates(clientX: number, clientY: number): { x: number; y: number } | null;
-  getPageViewState(): PageViewState;
-}
-
-declare global {
-  interface Window {
-    __TOOLPAD_BRIDGE__?: ToolpadBridge | ((bridge: ToolpadBridge) => void);
-  }
-}
-
-const handleScreenUpdate = throttle(() => fireEvent({ type: 'screenUpdate' }), 50, {
-  trailing: true,
-});
+const handleScreenUpdate = throttle(
+  () => {
+    bridge.canvasEvents.emit('screenUpdate', {});
+  },
+  50,
+  { trailing: true },
+);
 
 export interface AppCanvasProps {
+  initialState?: AppCanvasState | null;
   basename: string;
+  loadComponents: LoadComponents;
 }
 
-export default function AppCanvas({ basename }: AppCanvasProps) {
-  const [state, setState] = React.useState<AppCanvasState | null>(null);
+export default function AppCanvas({
+  loadComponents,
+  basename,
+  initialState = null,
+}: AppCanvasProps) {
+  const [state, setState] = React.useState<AppCanvasState | null>(initialState);
 
   const appRootRef = React.useRef<HTMLDivElement>();
   const appRootCleanupRef = React.useRef<() => void>();
@@ -87,14 +85,19 @@ export default function AppCanvas({ basename }: AppCanvasProps) {
   });
 
   React.useEffect(() => {
-    const bridge: ToolpadBridge = {
-      onRuntimeEvent: (handler) => setEventHandler(window, handler),
-      update: (newState) => React.startTransition(() => setState(newState)),
-      getPageViewState: () => {
+    const unsetGetPageViewState = setCommandHandler(
+      bridge.canvasCommands,
+      'getPageViewState',
+      () => {
         invariant(appRootRef.current, 'App ref not attached');
         return getPageViewState(appRootRef.current);
       },
-      getViewCoordinates(clientX, clientY) {
+    );
+
+    const unsetGetViewCoordinates = setCommandHandler(
+      bridge.canvasCommands,
+      'getViewCoordinates',
+      (clientX, clientY) => {
         if (!appRootRef.current) {
           return null;
         }
@@ -104,18 +107,19 @@ export default function AppCanvas({ basename }: AppCanvasProps) {
         }
         return null;
       },
+    );
+
+    const unsetUpdate = setCommandHandler(bridge.canvasCommands, 'update', (newState) => {
+      React.startTransition(() => setState(newState));
+    });
+
+    bridge.canvasEvents.emit('ready', {});
+
+    return () => {
+      unsetGetPageViewState();
+      unsetGetViewCoordinates();
+      unsetUpdate();
     };
-
-    // eslint-disable-next-line no-underscore-dangle
-    if (typeof window.__TOOLPAD_BRIDGE__ === 'function') {
-      // eslint-disable-next-line no-underscore-dangle
-      window.__TOOLPAD_BRIDGE__(bridge);
-    } else {
-      // eslint-disable-next-line no-underscore-dangle
-      window.__TOOLPAD_BRIDGE__ = bridge;
-    }
-
-    return () => {};
   }, []);
 
   const savedNodes = state?.savedNodes;
@@ -123,22 +127,25 @@ export default function AppCanvas({ basename }: AppCanvasProps) {
     return {
       savedNodes,
       navigateToPage(pageNodeId) {
-        fireEvent({ type: 'pageNavigationRequest', pageNodeId });
+        bridge.canvasEvents.emit('pageNavigationRequest', { pageNodeId });
       },
     };
   }, [savedNodes]);
 
   return state ? (
-    <CanvasHooksContext.Provider value={editorHooks}>
-      <ToolpadApp
-        rootRef={onAppRoot}
-        hidePreviewBanner
-        version="preview"
-        basename={`${basename}/${state.appId}`}
-        state={state}
-      />
-    </CanvasHooksContext.Provider>
-  ) : (
-    <div>loading...</div>
-  );
+    <BridgeContext.Provider value={bridge}>
+      <CanvasHooksContext.Provider value={editorHooks}>
+        <CanvasEventsContext.Provider value={bridge.canvasEvents}>
+          <ToolpadApp
+            rootRef={onAppRoot}
+            loadComponents={loadComponents}
+            hasShell={false}
+            version="development"
+            basename={basename}
+            state={state}
+          />
+        </CanvasEventsContext.Provider>
+      </CanvasHooksContext.Provider>
+    </BridgeContext.Provider>
+  ) : null;
 }

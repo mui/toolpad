@@ -1,30 +1,13 @@
 import { NextApiHandler } from 'next';
 import type { IncomingMessage, ServerResponse } from 'http';
 import superjson from 'superjson';
-import {
-  getApps,
-  getApp,
-  getActiveDeployments,
-  createApp,
-  updateApp,
-  duplicateApp,
-  execQuery,
-  dataSourceFetchPrivate,
-  loadDom,
-  saveDom,
-  createRelease,
-  getReleases,
-  getRelease,
-  createDeployment,
-  findActiveDeployment,
-  findLastRelease,
-  deleteApp,
-  deploy,
-  getDeployments,
-} from '../../src/server/data';
-import { getLatestToolpadRelease } from '../../src/server/getLatestRelease';
+import { execQuery, dataSourceFetchPrivate } from '../../src/server/data';
+import { getVersionInfo } from '../../src/server/versionInfo';
 import { hasOwnProperty } from '../../src/utils/collections';
-import { withRpcReqResLogs } from '../../src/server/logs/withLogs';
+import { errorFrom, serializeError } from '../../src/utils/errors';
+import logger from '../../src/server/logs/logger';
+import { createComponent, deletePage, openCodeComponentEditor } from '../../src/server/localMode';
+import { getDomFingerprint, loadDom, saveDom } from '../../src/server/liveProject';
 
 export interface Method<P extends any[] = any[], R = any> {
   (...params: P): Promise<R>;
@@ -72,6 +55,7 @@ function createRpcHandler(definition: Definition): NextApiHandler<RpcResponse> {
       res.status(405).end();
       return;
     }
+
     const { type, name, params } = req.body as RpcRequest;
 
     if (!hasOwnProperty(definition, type) || !hasOwnProperty(definition[type], name)) {
@@ -82,20 +66,29 @@ function createRpcHandler(definition: Definition): NextApiHandler<RpcResponse> {
     const method: MethodResolver<any> = definition[type][name];
 
     let rawResult;
+    let error: Error | null = null;
     try {
       rawResult = await method({ params, req, res });
-    } catch (error) {
-      console.error(error);
-      if (error instanceof Error) {
-        res.json({ error: { message: error.message, code: error.code, stack: error.stack } });
-      } else {
-        res.status(500).end();
-      }
-
-      return;
+    } catch (rawError) {
+      error = errorFrom(rawError);
     }
-    const responseData: RpcResponse = { result: superjson.stringify(rawResult) };
+
+    const responseData: RpcResponse = error
+      ? { error: serializeError(error) }
+      : { result: superjson.stringify(rawResult) };
+
     res.json(responseData);
+
+    const logLevel = error ? 'warn' : 'trace';
+    logger[logLevel](
+      {
+        key: 'rpc',
+        type,
+        name,
+        error,
+      },
+      'Handled RPC request',
+    );
   };
 }
 
@@ -118,68 +111,35 @@ const rpcServer = {
     dataSourceFetchPrivate: createMethod<typeof dataSourceFetchPrivate>(({ params }) => {
       return dataSourceFetchPrivate(...params);
     }),
-    getApps: createMethod<typeof getApps>(({ params }) => {
-      return getApps(...params);
-    }),
-    getActiveDeployments: createMethod<typeof getActiveDeployments>(({ params }) => {
-      return getActiveDeployments(...params);
-    }),
-    getDeployments: createMethod<typeof getDeployments>(({ params }) => {
-      return getDeployments(...params);
-    }),
-    getApp: createMethod<typeof getApp>(({ params }) => {
-      return getApp(...params);
-    }),
     execQuery: createMethod<typeof execQuery>(({ params }) => {
       return execQuery(...params);
-    }),
-    getReleases: createMethod<typeof getReleases>(({ params }) => {
-      return getReleases(...params);
-    }),
-    getRelease: createMethod<typeof getRelease>(({ params }) => {
-      return getRelease(...params);
-    }),
-    findActiveDeployment: createMethod<typeof findActiveDeployment>(({ params }) => {
-      return findActiveDeployment(...params);
     }),
     loadDom: createMethod<typeof loadDom>(({ params }) => {
       return loadDom(...params);
     }),
-    findLastRelease: createMethod<typeof findLastRelease>(({ params }) => {
-      return findLastRelease(...params);
+    getVersionInfo: createMethod<typeof getVersionInfo>(({ params }) => {
+      return getVersionInfo(...params);
     }),
-    getLatestToolpadRelease: createMethod<typeof getLatestToolpadRelease>(({ params }) => {
-      return getLatestToolpadRelease(...params);
+    getDomFingerprint: createMethod<typeof getDomFingerprint>(({ params }) => {
+      return getDomFingerprint(...params);
     }),
   },
   mutation: {
-    createApp: createMethod<typeof createApp>(({ params }) => {
-      return createApp(...params);
-    }),
-    updateApp: createMethod<typeof updateApp>(({ params }) => {
-      return updateApp(...params);
-    }),
-    duplicateApp: createMethod<typeof duplicateApp>(({ params }) => {
-      return duplicateApp(...params);
-    }),
-    deleteApp: createMethod<typeof deleteApp>(({ params }) => {
-      return deleteApp(...params);
-    }),
-    createRelease: createMethod<typeof createRelease>(({ params }) => {
-      return createRelease(...params);
-    }),
-    createDeployment: createMethod<typeof createDeployment>(({ params }) => {
-      return createDeployment(...params);
-    }),
-    deploy: createMethod<typeof deploy>(({ params }) => {
-      return deploy(...params);
-    }),
     saveDom: createMethod<typeof saveDom>(({ params }) => {
       return saveDom(...params);
+    }),
+    openCodeComponentEditor: createMethod<typeof openCodeComponentEditor>(({ params }) => {
+      return openCodeComponentEditor(...params);
+    }),
+    createComponent: createMethod<typeof createComponent>(({ params }) => {
+      return createComponent(...params);
+    }),
+    deletePage: createMethod<typeof deletePage>(({ params }) => {
+      return deletePage(...params);
     }),
   },
 } as const;
 
 export type ServerDefinition = MethodsOf<typeof rpcServer>;
 
-export default withRpcReqResLogs(createRpcHandler(rpcServer));
+export default createRpcHandler(rpcServer);

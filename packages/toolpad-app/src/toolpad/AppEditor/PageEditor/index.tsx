@@ -1,20 +1,18 @@
 import * as React from 'react';
 import { styled } from '@mui/material';
-import { useParams } from 'react-router-dom';
 import { NodeId } from '@mui/toolpad-core';
 import SplitPane from '../../../components/SplitPane';
 import RenderPanel from './RenderPanel';
 import ComponentPanel from './ComponentPanel';
 import { PageEditorProvider } from './PageEditorProvider';
-import { useDom, useDomApi } from '../../DomLoader';
+import { useDom } from '../../AppState';
 import * as appDom from '../../../appDom';
 import ComponentCatalog from './ComponentCatalog';
 import NotFoundEditor from '../NotFoundEditor';
 import usePageTitle from '../../../utils/usePageTitle';
 import useLocalStorageState from '../../../utils/useLocalStorageState';
 import useDebouncedHandler from '../../../utils/useDebouncedHandler';
-import useShortcut from '../../../utils/useShortcut';
-import { hasFieldFocus } from '../../../utils/fields';
+import useUndoRedo from '../../hooks/useUndoRedo';
 
 const classes = {
   renderPanel: 'Toolpad_RenderPanel',
@@ -32,22 +30,21 @@ const PageEditorRoot = styled('div')({
 });
 
 interface PageEditorContentProps {
-  appId: string;
   node: appDom.PageNode;
 }
 
-function PageEditorContent({ appId, node }: PageEditorContentProps) {
+function PageEditorContent({ node }: PageEditorContentProps) {
   usePageTitle(`${node.attributes.title.value} | Toolpad editor`);
 
   const [splitDefaultSize, setSplitDefaultSize] = useLocalStorageState<number>(
-    `editor/${appId}/component-panel-split`,
+    `editor/component-panel-split`,
     300,
   );
 
   const handleSplitChange = useDebouncedHandler((newSize) => setSplitDefaultSize(newSize), 100);
 
   return (
-    <PageEditorProvider key={node.id} appId={appId} nodeId={node.id}>
+    <PageEditorProvider key={node.id} nodeId={node.id}>
       <SplitPane
         allowResize
         split="vertical"
@@ -67,30 +64,17 @@ function PageEditorContent({ appId, node }: PageEditorContentProps) {
 }
 
 interface PageEditorProps {
-  appId: string;
+  nodeId?: NodeId;
 }
 
-export default function PageEditor({ appId }: PageEditorProps) {
-  const dom = useDom();
-  const domApi = useDomApi();
-  const { nodeId } = useParams();
+export default function PageEditor({ nodeId }: PageEditorProps) {
+  const { dom } = useDom();
   const pageNode = appDom.getMaybeNode(dom, nodeId as NodeId, 'page');
 
-  useShortcut({ key: 'z', metaKey: true, preventDefault: false }, () => {
-    if (hasFieldFocus()) {
-      return;
-    }
-    domApi.undo();
-  });
-  useShortcut({ key: 'z', metaKey: true, shiftKey: true, preventDefault: false }, () => {
-    if (hasFieldFocus()) {
-      return;
-    }
-    domApi.redo();
-  });
+  useUndoRedo();
 
   return pageNode ? (
-    <PageEditorContent appId={appId} node={pageNode} />
+    <PageEditorContent node={pageNode} />
   ) : (
     <NotFoundEditor message={`Non-existing Page "${nodeId}"`} />
   );

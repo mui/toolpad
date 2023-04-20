@@ -14,13 +14,14 @@ import {
 } from '@mui/material';
 import * as React from 'react';
 import { BindableAttrValue } from '@mui/toolpad-core';
+import { useBrowserJsRuntime } from '@mui/toolpad-core/jsBrowserRuntime';
 import useLatest from '../../../../utils/useLatest';
 import { usePageEditorState } from '../PageEditorProvider';
 import * as appDom from '../../../../appDom';
 import dataSources from '../../../../toolpadDataSources/client';
 import { omit, update } from '../../../../utils/immutability';
 import { useEvaluateLiveBinding } from '../../useEvaluateLiveBinding';
-import { useDom } from '../../../DomLoader';
+import { useDom } from '../../../AppState';
 import { ConnectionContextProvider } from '../../../../toolpadDataSources/context';
 import ConnectionSelect, { ConnectionOption } from '../ConnectionSelect';
 import BindableEditor from '../BindableEditor';
@@ -28,20 +29,23 @@ import { ConfirmDialog } from '../../../../components/SystemDialogs';
 import useBoolean from '../../../../utils/useBoolean';
 import { useNodeNameValidation } from '../../HierarchyExplorer/validation';
 import useEvent from '../../../../utils/useEvent';
+import useUnsavedChangesConfirm from '../../../hooks/useUnsavedChangesConfirm';
 
-interface QueryeditorDialogActionsProps {
+interface QueryEditorDialogActionsProps {
   saveDisabled?: boolean;
   onSave?: () => void;
   onRemove?: () => void;
+  isDraft?: boolean;
   onClose?: () => void;
 }
 
-function QueryeditorDialogActions({
+function QueryEditorDialogActions({
   saveDisabled,
   onSave,
   onRemove,
   onClose,
-}: QueryeditorDialogActionsProps) {
+  isDraft,
+}: QueryEditorDialogActionsProps) {
   const {
     value: removeConfirmOpen,
     setTrue: handleRemoveConfirmOpen,
@@ -63,7 +67,9 @@ function QueryeditorDialogActions({
       <Button color="inherit" variant="text" onClick={onClose}>
         Cancel
       </Button>
-      <Button onClick={handleRemoveConfirmOpen}>Remove</Button>
+      <Button onClick={handleRemoveConfirmOpen} disabled={isDraft}>
+        Remove
+      </Button>
       <ConfirmDialog open={removeConfirmOpen} onClose={handleRemoveConfirm} severity="error">
         Are you sure your want to remove this query?
       </ConfirmDialog>
@@ -99,13 +105,15 @@ export default function QueryNodeEditorDialog<Q>({
   onSave,
   isDraft,
 }: QueryNodeEditorProps<Q>) {
-  const { appId } = usePageEditorState();
-  const dom = useDom();
+  const { dom } = useDom();
 
   // To keep it around during closing animation
   const node = useLatest(nodeProp);
 
   const [input, setInput] = React.useState<appDom.QueryNode<Q>>(node);
+  React.useEffect(() => {
+    setInput(node);
+  }, [node]);
 
   const reset = useEvent(() => setInput(node));
 
@@ -118,6 +126,7 @@ export default function QueryNodeEditorDialog<Q>({
   const connectionId = input.attributes.connectionId.value
     ? appDom.deref(input.attributes.connectionId.value)
     : null;
+
   const connection = connectionId ? appDom.getMaybeNode(dom, connectionId, 'connection') : null;
   const dataSourceId = input.attributes.dataSource?.value || null;
   const dataSource = (dataSourceId && dataSources[dataSourceId]) || null;
@@ -140,7 +149,7 @@ export default function QueryNodeEditorDialog<Q>({
     onSave(toCommit);
   }, [dataSource, input, onSave]);
 
-  const { pageState } = usePageEditorState();
+  const { pageState, globalScopeMeta } = usePageEditorState();
 
   const handleConnectionChange = React.useCallback(
     (newConnectionOption: ConnectionOption | null) => {
@@ -206,24 +215,18 @@ export default function QueryNodeEditorDialog<Q>({
   );
 
   const handleRemove = React.useCallback(() => {
-    onRemove(node);
+    if (!isDraft) {
+      onRemove(node);
+    }
     onClose();
-  }, [onRemove, node, onClose]);
+  }, [isDraft, onClose, onRemove, node]);
 
   const isInputSaved = !isDraft && node === input;
 
-  const handleClose = React.useCallback(() => {
-    const ok = isInputSaved
-      ? true
-      : // eslint-disable-next-line no-alert
-        window.confirm(
-          'Are you sure you want to close the editor. All unsaved progress will be lost.',
-        );
-
-    if (ok) {
-      onClose();
-    }
-  }, [onClose, isInputSaved]);
+  const { handleCloseWithUnsavedChanges } = useUnsavedChangesConfirm({
+    hasUnsavedChanges: !isInputSaved,
+    onClose,
+  });
 
   const handleSave = React.useCallback(() => {
     handleCommit();
@@ -231,11 +234,14 @@ export default function QueryNodeEditorDialog<Q>({
   }, [handleCommit, onClose]);
 
   const queryEditorContext = React.useMemo(
-    () => (dataSourceId ? { appId, dataSourceId, connectionId } : null),
-    [appId, dataSourceId, connectionId],
+    () => (dataSourceId ? { dataSourceId, connectionId } : null),
+    [dataSourceId, connectionId],
   );
 
+  const jsBrowserRuntime = useBrowserJsRuntime();
+
   const liveEnabled = useEvaluateLiveBinding({
+    jsRuntime: jsBrowserRuntime,
     input: input.attributes.enabled || null,
     globalScope: pageState,
   });
@@ -251,7 +257,7 @@ export default function QueryNodeEditorDialog<Q>({
   const isNameValid = !nodeNameError;
 
   return (
-    <Dialog fullWidth maxWidth="xl" open={open} onClose={handleClose}>
+    <Dialog fullWidth maxWidth="xl" open={open} onClose={handleCloseWithUnsavedChanges}>
       {dataSourceId && dataSource && queryEditorContext ? (
         <ConnectionContextProvider value={queryEditorContext}>
           <DialogTitle>
@@ -306,6 +312,7 @@ export default function QueryNodeEditorDialog<Q>({
                 onChange={setInput}
                 onCommit={handleCommit}
                 globalScope={pageState}
+                globalScopeMeta={globalScopeMeta}
               />
             </Box>
             <Stack direction="row" alignItems="center" sx={{ pt: 2, px: 3, gap: 2 }}>
@@ -318,7 +325,8 @@ export default function QueryNodeEditorDialog<Q>({
               <BindableEditor
                 liveBinding={liveEnabled}
                 globalScope={pageState}
-                server
+                globalScopeMeta={globalScopeMeta}
+                jsRuntime={jsBrowserRuntime}
                 label="Enabled"
                 propType={{ type: 'boolean' }}
                 value={input.attributes.enabled ?? appDom.createConst(true)}
@@ -338,10 +346,11 @@ export default function QueryNodeEditorDialog<Q>({
               />
             </Stack>
           </DialogContent>
-          <QueryeditorDialogActions
+          <QueryEditorDialogActions
             onSave={handleSave}
-            onClose={handleClose}
+            onClose={onClose}
             onRemove={handleRemove}
+            isDraft={isDraft}
             saveDisabled={isInputSaved || !isNameValid}
           />
         </ConnectionContextProvider>

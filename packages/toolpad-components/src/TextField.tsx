@@ -5,48 +5,63 @@ import {
   BoxProps,
 } from '@mui/material';
 import { createComponent } from '@mui/toolpad-core';
+import { SX_PROP_HELPER_TEXT } from './constants.js';
 
-export type TextFieldProps = MuiTextFieldProps & {
+export type TextFieldProps = Omit<MuiTextFieldProps, 'value' | 'onChange'> & {
+  value: string;
+  onChange: (newValue: string) => void;
   alignItems?: BoxProps['alignItems'];
   justifyContent?: BoxProps['justifyContent'];
 };
 
-function TextField({ defaultValue, ...props }: TextFieldProps) {
-  return <MuiTextField {...props} />;
+function TextField({ defaultValue, onChange, ...props }: TextFieldProps) {
+  const handleChange = React.useCallback(
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      onChange(event.target.value);
+    },
+    [onChange],
+  );
+
+  return <MuiTextField {...props} onChange={handleChange} />;
 }
 
 export default createComponent(TextField, {
+  helperText: 'The TextField component lets you input a text value.',
   layoutDirection: 'both',
   argTypes: {
     value: {
-      typeDef: { type: 'string' },
+      helperText: 'The value that is controlled by this text input.',
+      typeDef: { type: 'string', default: '' },
       onChangeProp: 'onChange',
-      onChangeHandler: (event: React.ChangeEvent<HTMLInputElement>) => event.target.value,
-      defaultValue: '',
       defaultValueProp: 'defaultValue',
     },
     defaultValue: {
-      typeDef: { type: 'string' },
-      defaultValue: '',
+      helperText: 'A default value for when the input is still empty.',
+      typeDef: { type: 'string', default: '' },
     },
     label: {
+      helperText: 'A label that describes the content of the text field. e.g. "First name".',
       typeDef: { type: 'string' },
     },
     variant: {
-      typeDef: { type: 'string', enum: ['outlined', 'filled', 'standard'] },
-      defaultValue: 'outlined',
+      helperText:
+        'One of the available MUI TextField [variants](https://mui.com/material-ui/react-button/#basic-button). Possible values are `outlined`, `filled` or `standard`',
+      typeDef: { type: 'string', enum: ['outlined', 'filled', 'standard'], default: 'outlined' },
     },
     size: {
-      typeDef: { type: 'string', enum: ['small', 'normal'] },
-      defaultValue: 'small',
+      helperText: 'The size of the input. One of `small`, or `medium`.',
+      typeDef: { type: 'string', enum: ['small', 'medium'], default: 'small' },
     },
     fullWidth: {
+      helperText: 'Whether the input should occupy all available horizontal space.',
       typeDef: { type: 'boolean' },
     },
     disabled: {
+      helperText: 'Whether the input is disabled.',
       typeDef: { type: 'boolean' },
     },
     sx: {
+      helperText: SX_PROP_HELPER_TEXT,
       typeDef: { type: 'object' },
     },
   },

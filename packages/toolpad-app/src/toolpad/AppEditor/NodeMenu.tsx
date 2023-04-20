@@ -2,9 +2,10 @@ import { MenuItem, Menu, ListItemIcon, ListItemText, ButtonProps, MenuProps } fr
 import * as React from 'react';
 import DeleteIcon from '@mui/icons-material/Delete';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
+import SettingsIcon from '@mui/icons-material/Settings';
 import { NodeId } from '@mui/toolpad-core';
 import * as appDom from '../../appDom';
-import { useDom } from '../DomLoader';
+import { useDom } from '../AppState';
 import useLatest from '../../utils/useLatest';
 import { ConfirmDialog } from '../../components/SystemDialogs';
 import useMenu from '../../utils/useMenu';
@@ -14,8 +15,10 @@ export interface NodeMenuProps {
   renderButton: (params: { buttonProps: ButtonProps; menuProps: MenuProps }) => React.ReactNode;
   deleteLabelText?: string;
   duplicateLabelText?: string;
+  settingsLabelText?: string;
   onDeleteNode?: (nodeId: NodeId) => void;
   onDuplicateNode?: (nodeId: NodeId) => void;
+  onSettingsNode?: (nodeId: NodeId) => void;
 }
 
 export default function NodeMenu({
@@ -23,10 +26,12 @@ export default function NodeMenu({
   renderButton,
   deleteLabelText,
   duplicateLabelText,
+  settingsLabelText,
   onDeleteNode,
   onDuplicateNode,
+  onSettingsNode,
 }: NodeMenuProps) {
-  const dom = useDom();
+  const { dom } = useDom();
 
   const { menuProps, buttonProps, onMenuClose } = useMenu();
 
@@ -62,6 +67,14 @@ export default function NodeMenu({
     [onDuplicateNode, nodeId, onMenuClose],
   );
 
+  const handleSettingsClick = React.useCallback(
+    (event: React.MouseEvent) => {
+      onMenuClose(event);
+      onSettingsNode?.(nodeId);
+    },
+    [onSettingsNode, nodeId, onMenuClose],
+  );
+
   return (
     <React.Fragment>
       {renderButton({
@@ -75,6 +88,14 @@ export default function NodeMenu({
           menuProps.onClick?.(event);
         }}
       >
+        {onSettingsNode ? (
+          <MenuItem onClick={handleSettingsClick}>
+            <ListItemIcon>
+              <SettingsIcon />
+            </ListItemIcon>
+            <ListItemText>{settingsLabelText}</ListItemText>
+          </MenuItem>
+        ) : null}
         <MenuItem onClick={handleDuplicateClick}>
           <ListItemIcon>
             <ContentCopyIcon />

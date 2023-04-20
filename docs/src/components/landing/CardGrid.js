@@ -4,16 +4,16 @@ import Box from '@mui/material/Box';
 import Container from '@mui/material/Container';
 import Paper from '@mui/material/Paper';
 import Typography from '@mui/material/Typography';
-import Grid from '@mui/material/Grid';
+import Grid from '@mui/material/Unstable_Grid2';
 import SectionHeadline from 'docs/src/components/typography/SectionHeadline';
 import IconImage from 'docs/src/components/icon/IconImage';
+import { alpha } from '@mui/material/styles';
 
 const cardRootStyle = (imageUrl) => ({
   px: imageUrl ? 0 : 2,
-  pb: 3,
-  pt: imageUrl ? 0 : 3,
+  pt: imageUrl ? 0 : 2,
+  pb: 2,
   height: '100%',
-  maxWidth: 360,
 });
 
 const cardMediaStyle = (imageUrl) => ({
@@ -31,41 +31,56 @@ const cardMediaStyle = (imageUrl) => ({
 });
 
 const cardContentRootStyle = (imageUrl) => ({
-  px: imageUrl ? 2 : 0,
-  pt: imageUrl ? 2 : 0,
-  pb: 0,
+  p: imageUrl ? 2 : 0,
 });
 
 export default function CardGrid(props) {
-  const { content } = props;
+  const { content, darker } = props;
   return (
     <Box
-      sx={{
-        bgcolor: (theme) => (theme.palette.mode === 'dark' ? 'primaryDark.900' : 'grey.50'),
-      }}
+      sx={
+        darker
+          ? {
+              background: (theme) =>
+                theme.palette.mode === 'dark'
+                  ? `radial-gradient(200% 150% at 50% 20%, transparent 30%, ${theme.palette.primaryDark[300]} 100%, ${theme.palette.primaryDark[100]} 0)`
+                  : `linear-gradient(180deg, ${theme.palette.grey[50]} 0%, ${alpha(
+                      theme.palette.grey[100],
+                      0.4,
+                    )} 100%)`,
+            }
+          : null
+      }
     >
-      <Container sx={{ py: { xs: 4, sm: 6, md: 8 } }}>
+      <Container sx={{ py: { xs: 4, sm: 8 } }}>
         <SectionHeadline overline={content.overline} title={content.Headline} />
-        <Grid container spacing={2}>
+        <Grid container spacing={{ xs: 2, sm: 2, md: 3 }} columns={{ xs: 1, sm: 2 }}>
           {content.cards.map(({ icon, title, wip, imageUrl, description }) => (
-            <Grid key={title} item xs={12} sm={6} md={4}>
+            <Grid key={title} xs={2} sm={1}>
               <Paper variant="outlined" sx={cardRootStyle(imageUrl)}>
                 {imageUrl ? <Box sx={cardMediaStyle(imageUrl)} /> : null}
                 <Box sx={cardContentRootStyle(imageUrl)}>
-                  <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
-                    {icon ?? null}
-                    <Typography
-                      fontWeight="bold"
-                      component="h3"
-                      color="text.primary"
-                      variant="body2"
-                      sx={{ ml: imageUrl ? 0 : 1 }}
-                    >
-                      {title}
-                    </Typography>
-                    {wip ? (
-                      <IconImage name="time" title="Work in progress" sx={{ ml: 'auto', mr: 2 }} />
-                    ) : null}
+                  <Box
+                    sx={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                      mb: 1,
+                    }}
+                  >
+                    <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                      {icon ?? null}
+                      <Typography
+                        fontWeight="bold"
+                        component="h3"
+                        color="text.primary"
+                        variant="body2"
+                        sx={{ ml: imageUrl ? 0 : 1 }}
+                      >
+                        {title}
+                      </Typography>
+                    </Box>
+                    {wip ? <IconImage name="time" title="Work in progress" /> : null}
                   </Box>
                   <Typography variant="body2" color="text.secondary">
                     {description}
@@ -94,4 +109,5 @@ CardGrid.propTypes = {
     Headline: PropTypes.node.isRequired,
     overline: PropTypes.string.isRequired,
   }).isRequired,
+  darker: PropTypes.bool,
 };

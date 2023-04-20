@@ -9,25 +9,40 @@ import KeyboardArrowRightRounded from '@mui/icons-material/KeyboardArrowRightRou
 function Marquee({ content }) {
   return (
     <Container
-      sx={{
-        py: { xs: 4, sm: 6, md: 8 },
+      sx={(theme) => ({
+        mt: 8,
+        mx: 0,
+        minWidth: '100%',
+        py: { xs: 4, sm: 6, md: 12 },
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
-        // TODO: Figure out why blueDark.700 does not work here
-        borderImage: `conic-gradient(#132F4C 0deg 360deg) fill 1/ /0 50vw`,
-      }}
+        background: `linear-gradient(180deg, ${theme.palette.primaryDark[900]} 0%, ${theme.palette.primaryDark[800]})`,
+        borderBottom: '1px solid',
+        borderColor: theme.palette.mode === 'dark' ? 'primaryDark.600' : 'grey.200',
+      })}
     >
       <Typography
-        color="grey.50"
+        color="white"
         textAlign="center"
         variant="h2"
         sx={{
-          my: 4,
+          mt: 4,
           mx: 'auto',
         }}
       >
         {content.title}
+      </Typography>
+      <Typography
+        color="grey.500"
+        textAlign="center"
+        sx={{
+          mt: 1,
+          mb: 4,
+          mx: 'auto',
+        }}
+      >
+        {content.subtitle}
       </Typography>
       <Button
         component={Link}
@@ -53,6 +68,7 @@ Marquee.propTypes = {
       href: PropTypes.string.isRequired,
       label: PropTypes.string.isRequired,
     }).isRequired,
+    subtitle: PropTypes.string.isRequired,
     title: PropTypes.string.isRequired,
   }).isRequired,
 };

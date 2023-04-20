@@ -11,6 +11,10 @@ import {
   IconButton,
   styled,
   ListItemButton,
+  ButtonBase,
+  Popover,
+  Paper,
+  Typography,
 } from '@mui/material';
 import * as React from 'react';
 import AddIcon from '@mui/icons-material/Add';
@@ -21,10 +25,24 @@ import clsx from 'clsx';
 import { usePageEditorState } from '../PageEditorProvider';
 import * as appDom from '../../../../appDom';
 import dataSources from '../../../../toolpadDataSources/client';
-import { useDom, useDomApi } from '../../../DomLoader';
-import ConnectionSelect, { ConnectionOption } from '../ConnectionSelect';
+import { useAppStateApi, useDom, useDomApi, useAppState } from '../../../AppState';
 import NodeMenu from '../../NodeMenu';
 import QueryNodeEditorDialog from './QueryEditorDialog';
+
+const DataSourceButton = styled(ButtonBase)(({ theme }) => ({
+  position: 'relative',
+  width: 150,
+  height: 70,
+  border: 1,
+  borderColor: 'divider',
+  borderStyle: 'solid',
+  color: 'text.secondary',
+  padding: theme.spacing(1),
+  borderRadius: 8,
+  '&:hover': {
+    backgroundColor: theme.palette.action.hover,
+  },
+}));
 
 interface DataSourceSelectorProps<Q> {
   open: boolean;
@@ -33,46 +51,38 @@ interface DataSourceSelectorProps<Q> {
 }
 
 function ConnectionSelectorDialog<Q>({ open, onCreated, onClose }: DataSourceSelectorProps<Q>) {
-  const dom = useDom();
+  const { dom } = useDom();
 
-  const [input, setInput] = React.useState<ConnectionOption | null>(null);
+  const handleCreateClick = React.useCallback(
+    (dataSourceId: string) => () => {
+      const dataSource = dataSources[dataSourceId];
+      invariant(dataSource, `Selected non-existing dataSource "${dataSourceId}"`);
 
-  const handleCreateClick = React.useCallback(() => {
-    invariant(input, `Create button should be disabled when there's no input`);
+      const queryNode = appDom.createNode(dom, 'query', {
+        attributes: {
+          query: appDom.createConst(dataSource.getInitialQueryValue()),
+          connectionId: appDom.createConst(null),
+          dataSource: appDom.createConst(dataSourceId),
+        },
+      });
 
-    const { connectionId = null, dataSourceId } = input;
-
-    if (connectionId) {
-      const connection = appDom.getMaybeNode(dom, connectionId, 'connection');
-      invariant(connection, `Selected non-existing connection "${connectionId}"`);
-    }
-
-    const dataSource = dataSources[dataSourceId];
-    invariant(dataSource, `Selected non-existing dataSource "${dataSourceId}"`);
-
-    const queryNode = appDom.createNode(dom, 'query', {
-      attributes: {
-        query: appDom.createConst(dataSource.getInitialQueryValue()),
-        connectionId: appDom.createConst(appDom.ref(connectionId)),
-        dataSource: appDom.createConst(dataSourceId),
-      },
-    });
-
-    onCreated(queryNode);
-  }, [dom, input, onCreated]);
+      onCreated(queryNode);
+    },
+    [dom, onCreated],
+  );
 
   return (
-    <Dialog fullWidth open={open} onClose={onClose} scroll="body">
+    <Dialog open={open} onClose={onClose} scroll="body">
       <DialogTitle>Create Query</DialogTitle>
       <DialogContent>
-        <ConnectionSelect sx={{ my: 1 }} value={input} onChange={setInput} />
+        <Stack direction="row" gap={1}>
+          <DataSourceButton onClick={handleCreateClick('local')}>Local function</DataSourceButton>
+          <DataSourceButton onClick={handleCreateClick('rest')}>Fetch</DataSourceButton>
+        </Stack>
       </DialogContent>
       <DialogActions>
         <Button color="inherit" variant="text" onClick={onClose}>
           Cancel
-        </Button>
-        <Button disabled={!input} onClick={handleCreateClick}>
-          Create query
         </Button>
       </DialogActions>
     </Dialog>
@@ -107,44 +117,50 @@ type DialogState =
     };
 
 export default function QueryEditor() {
-  const dom = useDom();
+  const { dom } = useDom();
+  const { currentView } = useAppState();
   const state = usePageEditorState();
+
+  const appStateApi = useAppStateApi();
   const domApi = useDomApi();
 
   const [dialogState, setDialogState] = React.useState<DialogState | null>(null);
-
-  const handleEditStateDialogClose = React.useCallback(() => setDialogState(null), []);
+  const isDraft = dialogState?.isDraft || false;
 
   const page = appDom.getNode(dom, state.nodeId, 'page');
   const { queries = [] } = appDom.getChildNodes(dom, page) ?? [];
 
-  const handleCreate = React.useCallback(() => {
-    setDialogState({});
-  }, []);
+  const handleEditStateDialogClose = React.useCallback(() => {
+    if (isDraft) {
+      setDialogState(null);
+    } else {
+      appStateApi.setView({ kind: 'page', nodeId: page.id });
+    }
+  }, [appStateApi, isDraft, page.id]);
 
-  const handleCreated = React.useCallback(
-    (node: appDom.QueryNode) => setDialogState({ node, isDraft: true }),
-    [],
-  );
+  const handleCreated = React.useCallback((node: appDom.QueryNode) => {
+    setDialogState({ node, isDraft: true });
+  }, []);
 
   const handleSave = React.useCallback(
     (node: appDom.QueryNode) => {
       if (appDom.nodeExists(dom, node.id)) {
         domApi.saveNode(node);
       } else {
-        domApi.addNode(node, page, 'queries');
+        appStateApi.update((draft) => appDom.addNode(draft, node, page, 'queries'));
       }
-      setDialogState({ node, isDraft: false });
     },
-    [dom, domApi, page],
+    [dom, domApi, appStateApi, page],
   );
 
   const handleDeleteNode = React.useCallback(
     (nodeId: NodeId) => {
-      domApi.removeNode(nodeId);
-      handleEditStateDialogClose();
+      appStateApi.update((draft) => appDom.removeNode(draft, nodeId), {
+        kind: 'page',
+        nodeId: page.id,
+      });
     },
-    [domApi, handleEditStateDialogClose],
+    [appStateApi, page.id],
   );
 
   const handleRemove = React.useCallback(
@@ -162,9 +178,56 @@ export default function QueryEditor() {
       const existingNames = appDom.getExistingNamesForChildren(dom, page);
       const newName = appDom.proposeName(node.name, existingNames);
       const copy = appDom.createNode(dom, 'query', { ...node, name: newName });
+
       setDialogState({ node: copy, isDraft: true });
     },
     [dom, page],
+  );
+
+  React.useEffect(() => {
+    setDialogState((previousState) => {
+      if (currentView.kind === 'page' && currentView.view?.kind === 'query') {
+        const node = appDom.getNode(dom, currentView.view?.nodeId, 'query');
+        return { node, isDraft: false };
+      }
+
+      if (isDraft) {
+        return previousState;
+      }
+
+      return null;
+    });
+  }, [currentView, dom, isDraft]);
+
+  const [anchorEl, setAnchorEl] = React.useState<Element | null>(null);
+
+  const handleCreate = (event: React.MouseEvent) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
+
+  const open = Boolean(anchorEl);
+
+  const handleCreateClick = React.useCallback(
+    (dataSourceId: string) => () => {
+      const dataSource = dataSources[dataSourceId];
+      invariant(dataSource, `Selected non-existing dataSource "${dataSourceId}"`);
+
+      const node = appDom.createNode(dom, 'query', {
+        attributes: {
+          query: appDom.createConst(dataSource.getInitialQueryValue()),
+          connectionId: appDom.createConst(null),
+          dataSource: appDom.createConst(dataSourceId),
+        },
+      });
+
+      setAnchorEl(null);
+      setDialogState({ node, isDraft: true });
+    },
+    [dom],
   );
 
   return (
@@ -172,13 +235,40 @@ export default function QueryEditor() {
       <Button color="inherit" startIcon={<AddIcon />} onClick={handleCreate}>
         Add query
       </Button>
+      <Popover
+        open={open}
+        anchorEl={anchorEl}
+        onClose={handleClose}
+        anchorOrigin={{
+          vertical: 'bottom',
+          horizontal: 'left',
+        }}
+      >
+        <Paper sx={{ p: 2 }}>
+          <Typography sx={{ mb: 2 }}>Make backend data available as state on the page.</Typography>
+          <Stack direction="row" gap={1}>
+            <DataSourceButton onClick={handleCreateClick('local')}>
+              serverside javascript
+            </DataSourceButton>
+            <DataSourceButton onClick={handleCreateClick('rest')}>
+              serverside HTTP request
+            </DataSourceButton>
+          </Stack>
+        </Paper>
+      </Popover>
       <List sx={{ width: '100%' }}>
         {queries.map((queryNode) => {
           return (
             <QueryListItem
               key={queryNode.id}
               disablePadding
-              onClick={() => setDialogState({ node: queryNode, isDraft: false })}
+              onClick={() => {
+                appStateApi.setView({
+                  kind: 'page',
+                  nodeId: page.id,
+                  view: { kind: 'query', nodeId: queryNode.id },
+                });
+              }}
               secondaryAction={
                 <NodeMenu
                   renderButton={({ buttonProps, menuProps }) => (
@@ -212,7 +302,7 @@ export default function QueryEditor() {
         <QueryNodeEditorDialog
           open={!!dialogState}
           node={dialogState.node}
-          isDraft={dialogState.isDraft}
+          isDraft={isDraft}
           onSave={handleSave}
           onRemove={handleRemove}
           onClose={handleEditStateDialogClose}

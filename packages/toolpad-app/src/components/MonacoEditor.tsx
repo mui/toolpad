@@ -17,6 +17,10 @@ import {
   conf as typescriptBasicConf,
   language as typescriptBasicLanguage,
 } from 'monaco-editor/esm/vs/basic-languages/typescript/typescript';
+import {
+  conf as mdBasicConf,
+  language as mdBasicLanguage,
+} from 'monaco-editor/esm/vs/basic-languages/markdown/markdown';
 import { useTheme, Theme, lighten, rgbToHex } from '@mui/material/styles';
 import { getDesignTokens } from '../theme';
 
@@ -33,6 +37,8 @@ function getExtension(language: string): string {
       return '.json';
     case 'javascript':
       return '.jsx';
+    case 'markdown':
+      return '.md';
     case 'css':
       return '.css';
     case 'html':
@@ -131,6 +137,7 @@ function registerLanguage(
  */
 registerLanguage('jsonBasic', jsonBasicLanguage, jsonBasicConf);
 registerLanguage('typescriptBasic', typescriptBasicLanguage, typescriptBasicConf);
+registerLanguage('markdownBasic', mdBasicLanguage, mdBasicConf);
 
 const JSON_DEFAULT_DIAGNOSTICS_OPTIONS: monaco.languages.json.DiagnosticsOptions = {};
 
@@ -157,6 +164,7 @@ const TYPESCRIPT_DEFAULT_COMPILER_OPTIONS: monaco.languages.typescript.CompilerO
   allowJs: true,
   lib: ['es2020'],
   typeRoots: ['node_modules/@types'],
+  strictNullChecks: true,
 };
 
 monaco.languages.typescript.typescriptDefaults.setCompilerOptions(
@@ -225,6 +233,7 @@ interface MonacoEditorBaseProps {
   onBlur?: () => void;
   options?: EditorOptions;
   className?: string;
+  'data-testid'?: string;
 }
 
 export type MonacoEditorProps = MonacoEditorBaseProps &
@@ -238,6 +247,12 @@ export type MonacoEditorProps = MonacoEditorBaseProps &
     | {
         language: 'json';
         diagnostics?: monaco.languages.json.DiagnosticsOptions;
+        compilerOptions?: undefined;
+        extraLibs?: undefined;
+      }
+    | {
+        language: 'markdown';
+        diagnostics?: undefined;
         compilerOptions?: undefined;
         extraLibs?: undefined;
       }
@@ -264,6 +279,7 @@ export default React.forwardRef<MonacoEditorHandle, MonacoEditorProps>(function 
     disabled,
     options,
     autoFocus,
+    ...props
   },
   ref,
 ) {
@@ -318,7 +334,6 @@ export default React.forwardRef<MonacoEditorHandle, MonacoEditorProps>(function 
 
   React.useEffect(() => {
     invariant(rootRef.current, 'Ref not attached');
-
     const extraOptions: EditorOptions = {
       readOnly: disabled,
       theme: monacoTheme,
@@ -443,7 +458,7 @@ export default React.forwardRef<MonacoEditorHandle, MonacoEditorProps>(function 
   );
 
   return (
-    <EditorRoot className={clsx({ [classes.disabled]: disabled }, className)} sx={sx}>
+    <EditorRoot className={clsx({ [classes.disabled]: disabled }, className)} sx={sx} {...props}>
       <div className={classes.monacoHost} ref={rootRef} />
       <div className={classes.overlay} />
     </EditorRoot>

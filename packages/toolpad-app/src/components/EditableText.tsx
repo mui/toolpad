@@ -45,10 +45,7 @@ const EditableText = React.forwardRef<HTMLInputElement, EditableTextProps>(
     const appTitleInput = React.useRef<HTMLInputElement | null>(null);
 
     React.useEffect(() => {
-      let inputElement: HTMLInputElement | null = appTitleInput.current;
-      if (ref) {
-        inputElement = (ref as React.MutableRefObject<HTMLInputElement>).current;
-      }
+      const inputElement = appTitleInput.current;
       if (inputElement) {
         if (editable) {
           inputElement.focus();
@@ -83,10 +80,7 @@ const EditableText = React.forwardRef<HTMLInputElement, EditableTextProps>(
 
     const handleInput = React.useCallback(
       (event: React.KeyboardEvent<HTMLInputElement>) => {
-        let inputElement: HTMLInputElement | null = appTitleInput.current;
-        if (ref) {
-          inputElement = (ref as React.MutableRefObject<HTMLInputElement>).current;
-        }
+        const inputElement = appTitleInput.current;
         if (inputElement) {
           if (event.key === 'Escape') {
             if (defaultValue) {
@@ -109,7 +103,7 @@ const EditableText = React.forwardRef<HTMLInputElement, EditableTextProps>(
           }
         }
       },
-      [defaultValue, onChange, onSave, onClose, ref],
+      [defaultValue, onChange, onSave, onClose],
     );
 
     return (
@@ -118,7 +112,8 @@ const EditableText = React.forwardRef<HTMLInputElement, EditableTextProps>(
         disabled={disabled || !editable}
         error={error}
         helperText={helperText}
-        inputRef={ref ?? appTitleInput}
+        ref={ref}
+        inputRef={appTitleInput}
         inputProps={{
           tabIndex: editable ? 0 : -1,
           'aria-readonly': !editable,

@@ -1,18 +1,17 @@
 import * as path from 'path';
-import { ToolpadHome } from '../../models/ToolpadHome';
 import { ToolpadRuntime } from '../../models/ToolpadRuntime';
-import { test, expect } from '../../playwright/test';
-import { readJsonFile } from '../../utils/fs';
+import { test, expect } from '../../playwright/localTest';
+
+test.use({
+  localAppConfig: {
+    template: path.resolve(__dirname, './fixture'),
+    cmd: 'dev',
+  },
+});
 
 test('input basics', async ({ page }) => {
-  const dom = await readJsonFile(path.resolve(__dirname, './basicDom.json'));
-
-  const homeModel = new ToolpadHome(page);
-  await homeModel.goto();
-  const app = await homeModel.createApplication({ dom });
-
   const runtimeModel = new ToolpadRuntime(page);
-  await runtimeModel.gotoPage(app.id, 'page1');
+  await runtimeModel.gotoPage('page1');
 
   const textField1 = page.locator('label:has-text("textField1")');
   const textField2 = page.locator('label:has-text("textField2")');
@@ -31,4 +30,21 @@ test('input basics', async ({ page }) => {
   await page.goto(`${page.url()}?msg=hello3`);
 
   expect(await textField3.inputValue()).toBe('hello3');
+});
+
+test('event mutations', async ({ page }) => {
+  const runtimeModel = new ToolpadRuntime(page);
+  await runtimeModel.gotoPage('page2');
+
+  await page.getByText('Mutation tests').waitFor({ state: 'visible' });
+
+  await expect(page.getByText('result 1')).not.toBeVisible();
+  await expect(page.getByText('result 2')).not.toBeVisible();
+  await page.getByRole('button', { name: 'button 1' }).click();
+  await expect(page.getByText('result 1')).toBeVisible();
+  await expect(page.getByText('result 2')).toBeVisible();
+
+  await expect(page.getByText('result 3')).not.toBeVisible();
+  await page.getByRole('button', { name: 'button 2' }).click();
+  await expect(page.getByText('result 3')).toBeVisible();
 });

@@ -1,4 +1,11 @@
-import { BindableAttrEntries, BindableAttrValue, BindableAttrValues } from '@mui/toolpad-core';
+import {
+  BindableAttrEntries,
+  BindableAttrValue,
+  BindableAttrValues,
+  JsRuntime,
+  SerializedError,
+} from '@mui/toolpad-core';
+import { evaluateBindable } from '@mui/toolpad-core/jsRuntime';
 import { ensureSuffix, removePrefix } from '../../utils/strings';
 import { Maybe } from '../../utils/types';
 import {
@@ -10,12 +17,8 @@ import {
   RestConnectionParams,
   UrlEncodedBody,
 } from './types';
-// TODO: move to ../../types
-import type { Serializable } from '../../server/evalExpression';
-import applyTransform from '../../server/applyTransform';
-import { errorFrom } from '../../utils/errors';
-import config from '../../config';
-import DEMO_BASE_URLS from './demoBaseUrls';
+import applyTransform from '../applyTransform';
+import { errorFrom, serializeError } from '../../utils/errors';
 import { MOVIES_API_DEMO_URL } from '../demo';
 
 export const HTTP_NO_BODY = new Set(['GET', 'HEAD']);
@@ -50,43 +53,33 @@ export function parseBaseUrl(baseUrl: string): URL {
   return parsedBase;
 }
 
-interface EvalExpression {
-  (expression: string, scope: Record<string, Serializable>): Promise<any>;
-}
-
-async function resolveBindable(
+function resolveBindable(
+  jsRuntime: JsRuntime,
   bindable: BindableAttrValue<string>,
-  evalExpression: EvalExpression,
-  scope: Record<string, Serializable>,
-): Promise<any> {
-  if (bindable.type === 'const') {
-    return bindable.value;
+  scope: Record<string, unknown>,
+): any {
+  const { value, error } = evaluateBindable(jsRuntime, bindable, scope);
+  if (error) {
+    throw error;
   }
-  if (bindable.type === 'jsExpression') {
-    return evalExpression(bindable.value, scope);
-  }
-  throw new Error(
-    `Can't resolve bindable of type "${(bindable as BindableAttrValue<unknown>).type}"`,
-  );
+  return value;
 }
 
-async function resolveBindableEntries(
+function resolveBindableEntries(
+  jsRuntime: JsRuntime,
   entries: BindableAttrEntries,
-  evalExpression: EvalExpression,
-  scope: Record<string, Serializable>,
-): Promise<[string, any][]> {
-  return Promise.all(
-    entries.map(async ([key, value]) => [key, await resolveBindable(value, evalExpression, scope)]),
-  );
+  scope: Record<string, unknown>,
+): [string, any][] {
+  return entries.map(([key, value]) => [key, resolveBindable(jsRuntime, value, scope)]);
 }
 
-async function resolveBindables<P>(
+function resolveBindables<P>(
+  jsRuntime: JsRuntime,
   obj: BindableAttrValues<P>,
-  evalExpression: EvalExpression,
-  scope: Record<string, Serializable>,
-): Promise<P> {
+  scope: Record<string, unknown>,
+): P {
   return Object.fromEntries(
-    await resolveBindableEntries(Object.entries(obj) as BindableAttrEntries, evalExpression, scope),
+    resolveBindableEntries(jsRuntime, Object.entries(obj) as BindableAttrEntries, scope),
   ) as P;
 }
 
@@ -105,17 +98,17 @@ interface ResolvedRawBody {
   content: string;
 }
 
-async function resolveRawBody(
+function resolveRawBody(
+  jsRuntime: JsRuntime,
   body: RawBody,
-  evalExpression: EvalExpression,
-  scope: Record<string, Serializable>,
-): Promise<ResolvedRawBody> {
-  const { content, contentType } = await resolveBindables(
+  scope: Record<string, unknown>,
+): ResolvedRawBody {
+  const { content, contentType } = resolveBindables(
+    jsRuntime,
     {
       contentType: body.contentType,
       content: body.content,
     },
-    evalExpression,
     scope,
   );
   return {
@@ -130,27 +123,23 @@ interface ResolveUrlEncodedBodyBody {
   content: [string, string][];
 }
 
-async function resolveUrlEncodedBody(
+function resolveUrlEncodedBody(
+  jsRuntime: JsRuntime,
   body: UrlEncodedBody,
-  evalExpression: EvalExpression,
-  scope: Record<string, Serializable>,
-): Promise<ResolveUrlEncodedBodyBody> {
+  scope: Record<string, unknown>,
+): ResolveUrlEncodedBodyBody {
   return {
     kind: 'urlEncoded',
-    content: await resolveBindableEntries(body.content, evalExpression, scope),
+    content: resolveBindableEntries(jsRuntime, body.content, scope),
   };
 }
 
-async function resolveBody(
-  body: Body,
-  evalExpression: EvalExpression,
-  scope: Record<string, Serializable>,
-) {
+function resolveBody(jsRuntime: JsRuntime, body: Body, scope: Record<string, unknown>) {
   switch (body.kind) {
     case 'raw':
-      return resolveRawBody(body, evalExpression, scope);
+      return resolveRawBody(jsRuntime, body, scope);
     case 'urlEncoded':
-      return resolveUrlEncodedBody(body, evalExpression, scope);
+      return resolveUrlEncodedBody(jsRuntime, body, scope);
     default:
       throw new Error(`Missing case for "${(body as Body).kind}"`);
   }
@@ -168,6 +157,7 @@ async function readData(res: Response, fetchQuery: FetchQuery): Promise<any> {
 
 export function getDefaultUrl(connection?: RestConnectionParams | null): BindableAttrValue<string> {
   const baseUrl = connection?.baseUrl;
+
   return {
     type: 'const',
     value: baseUrl ? '' : MOVIES_API_DEMO_URL,
@@ -176,43 +166,30 @@ export function getDefaultUrl(connection?: RestConnectionParams | null): Bindabl
 
 interface ExecBaseOptions {
   connection?: Maybe<RestConnectionParams>;
-  evalExpression: EvalExpression;
+  jsRuntime: JsRuntime;
   fetchImpl: typeof fetch;
 }
 
 export async function execfetch(
   fetchQuery: FetchQuery,
   params: Record<string, string>,
-  { connection, evalExpression, fetchImpl }: ExecBaseOptions,
+  { connection, jsRuntime, fetchImpl }: ExecBaseOptions,
 ): Promise<FetchResult> {
   const queryScope = {
-    // TODO: remove deprecated query after v1
+    // @TODO: remove deprecated query after v1
     query: params,
     parameters: params,
   };
 
   const urlvalue = fetchQuery.url || getDefaultUrl(connection);
 
-  const [resolvedUrl, resolvedSearchParams, resolvedHeaders] = await Promise.all([
-    resolveBindable(urlvalue, evalExpression, queryScope),
-    resolveBindableEntries(fetchQuery.searchParams || [], evalExpression, queryScope),
-    resolveBindableEntries(fetchQuery.headers || [], evalExpression, queryScope),
-  ]);
-
-  if (config.isDemo) {
-    const demoUrls = DEMO_BASE_URLS.map((baseUrl) => baseUrl.url);
-
-    const hasNonDemoConnectionParams =
-      !demoUrls.includes(connection?.baseUrl || '') ||
-      (!!connection?.headers && connection.headers.length > 0) ||
-      !!connection?.authentication;
-    const hasNonDemoQueryParams =
-      fetchQuery.method !== 'GET' || (!!fetchQuery.headers && fetchQuery.headers.length > 0);
-
-    if (hasNonDemoConnectionParams || hasNonDemoQueryParams) {
-      throw new Error(`Cannot use these features in demo version.`);
-    }
-  }
+  const resolvedUrl = resolveBindable(jsRuntime, urlvalue, queryScope);
+  const resolvedSearchParams = resolveBindableEntries(
+    jsRuntime,
+    fetchQuery.searchParams || [],
+    queryScope,
+  );
+  const resolvedHeaders = resolveBindableEntries(jsRuntime, fetchQuery.headers || [], queryScope);
 
   const queryUrl = parseQueryUrl(resolvedUrl, connection?.baseUrl);
   resolvedSearchParams.forEach(([key, value]) => queryUrl.searchParams.append(key, value));
@@ -228,7 +205,7 @@ export async function execfetch(
   const requestInit: RequestInit = { method, headers };
 
   if (!HTTP_NO_BODY.has(method) && fetchQuery.body) {
-    const resolvedBody = await resolveBody(fetchQuery.body, evalExpression, queryScope);
+    const resolvedBody = resolveBody(jsRuntime, fetchQuery.body, queryScope);
 
     switch (resolvedBody.kind) {
       case 'raw': {
@@ -246,7 +223,7 @@ export async function execfetch(
     }
   }
 
-  let error: Error | undefined;
+  let error: SerializedError | undefined;
   let untransformedData;
   let data;
 
@@ -261,10 +238,10 @@ export async function execfetch(
     data = untransformedData;
 
     if (fetchQuery.transformEnabled && fetchQuery.transform) {
-      data = await applyTransform(fetchQuery.transform, untransformedData);
+      data = await applyTransform(jsRuntime, fetchQuery.transform, untransformedData);
     }
   } catch (rawError) {
-    error = errorFrom(rawError);
+    error = serializeError(errorFrom(rawError));
   }
 
   return { data, untransformedData, error };

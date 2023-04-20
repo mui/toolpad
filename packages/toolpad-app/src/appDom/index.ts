@@ -13,11 +13,11 @@ import invariant from 'invariant';
 import { BoxProps } from '@mui/material';
 import { ConnectionStatus, AppTheme } from '../types';
 import { omit, update, updateOrCreate } from '../utils/immutability';
-import { camelCase, removeDiacritics } from '../utils/strings';
+import { pascalCase, removeDiacritics, uncapitalize } from '../utils/strings';
 import { ExactEntriesOf, Maybe } from '../utils/types';
 import { mapProperties, mapValues } from '../utils/collections';
 
-export const CURRENT_APPDOM_VERSION = 3;
+export const CURRENT_APPDOM_VERSION = 6;
 
 export const RESERVED_NODE_PROPERTIES = [
   'id',
@@ -26,7 +26,7 @@ export const RESERVED_NODE_PROPERTIES = [
   'parentProp',
   'parentIndex',
 ] as const;
-export type ReservedNodeProperty = typeof RESERVED_NODE_PROPERTIES[number];
+export type ReservedNodeProperty = (typeof RESERVED_NODE_PROPERTIES)[number];
 
 export function createFractionalIndex(index1: string | null, index2: string | null) {
   return generateKeyBetween(index1, index2);
@@ -79,12 +79,15 @@ export interface ConnectionNode<P = unknown> extends AppDomNodeBase {
   };
 }
 
+export type PageDisplayMode = 'standalone' | 'shell';
+
 export interface PageNode extends AppDomNodeBase {
   readonly type: 'page';
   readonly attributes: {
     readonly title: ConstantAttrValue<string>;
     readonly parameters?: ConstantAttrValue<[string, string][]>;
     readonly module?: ConstantAttrValue<string>;
+    readonly display?: ConstantAttrValue<PageDisplayMode>;
   };
 }
 
@@ -105,6 +108,7 @@ export interface CodeComponentNode extends AppDomNodeBase {
   readonly type: 'codeComponent';
   readonly attributes: {
     readonly code: ConstantAttrValue<string>;
+    readonly isNew?: ConstantAttrValue<boolean>;
   };
 }
 
@@ -353,10 +357,14 @@ export function assertIsMutation<P>(node: AppDomNode): asserts node is MutationN
   assertIsType<MutationNode>(node, 'mutation');
 }
 
+export function getRoot(dom: AppDom): AppDomNode {
+  return getNode(dom, dom.root);
+}
+
 export function getApp(dom: AppDom): AppNode {
-  const rootNode = getNode(dom, dom.root);
-  assertIsApp(rootNode);
-  return rootNode;
+  const app = getRoot(dom);
+  assertIsApp(app);
+  return app;
 }
 
 export type NodeChildren<N extends AppDomNode = any> = ChildNodesOf<N>;
@@ -439,7 +447,8 @@ function slugifyNodeName(nameCandidate: string, fallback: string): string {
   // try to replace accents with relevant ascii
   slug = removeDiacritics(slug);
   // replace spaces with camelcase
-  slug = camelCase(...slug.split(/\s+/));
+  const [first, ...rest] = slug.split(/\s+/);
+  slug = first + pascalCase(...rest);
   // replace disallowed characters for js identifiers
   slug = slug.replace(/[^a-zA-Z0-9]+/g, '_');
   // remove leading digits
@@ -495,18 +504,33 @@ export function createNode<T extends AppDomNodeType>(
   });
 }
 
-export function createDom(): AppDom {
-  const rootId = createId();
+export function createFragmentInternal<T extends AppDomNodeType>(
+  id: NodeId,
+  type: T,
+  init: AppDomNodeInitOfType<T> & { name: string },
+): AppDom {
   return {
     nodes: {
-      [rootId]: createNodeInternal(rootId, 'app', {
-        name: 'Application',
-        attributes: {},
-      }),
+      [id]: createNodeInternal(id, type, init),
     },
-    root: rootId,
+    root: id,
     version: CURRENT_APPDOM_VERSION,
   };
+}
+
+export function createFragment<T extends AppDomNodeType>(
+  type: T,
+  init: AppDomNodeInitOfType<T> & { name: string },
+): AppDom {
+  const rootId = createId();
+  return createFragmentInternal(rootId, type, init);
+}
+
+export function createDom(): AppDom {
+  return createFragment('app', {
+    name: 'Application',
+    attributes: {},
+  });
 }
 
 /**
@@ -520,7 +544,7 @@ export function createElement<P>(
   name?: string,
 ): ElementNode {
   return createNode(dom, 'element', {
-    name: name || component,
+    name: name || uncapitalize(component),
     props,
     attributes: {
       component: createConst(component),
@@ -714,13 +738,13 @@ export function setQueryProp<Q, K extends keyof Q>(
 export function setNodeNamespacedProp<
   Node extends AppDomNode,
   Namespace extends PropNamespaces<Node>,
-  Prop extends keyof Node[Namespace] & string,
+  Prop extends keyof NonNullable<Node[Namespace]> & string,
 >(
   dom: AppDom,
   node: Node,
   namespace: Namespace,
   prop: Prop,
-  value: Node[Namespace][Prop] | null,
+  value: NonNullable<Node[Namespace]>[Prop] | null,
 ): AppDom {
   if (value) {
     return update(dom, {
@@ -736,22 +760,7 @@ export function setNodeNamespacedProp<
   return update(dom, {
     nodes: update(dom.nodes, {
       [node.id]: update(node, {
-        [namespace]: omit(node[namespace], prop) as Partial<Node[Namespace]>,
-      } as Partial<Node>),
-    }),
-  });
-}
-
-export function setNodeNamespace<Node extends AppDomNode, Namespace extends PropNamespaces<Node>>(
-  dom: AppDom,
-  node: Node,
-  namespace: Namespace,
-  value: Node[Namespace] | null,
-): AppDom {
-  return update(dom, {
-    nodes: update(dom.nodes, {
-      [node.id]: update(node, {
-        [namespace]: value ? (value as Partial<Node[Namespace]>) : {},
+        [namespace]: omit(node[namespace]!, prop) as Partial<Node[Namespace]>,
       } as Partial<Node>),
     }),
   });
@@ -1046,7 +1055,7 @@ const RENDERTREE_NODES = [
   'codeComponent',
 ] as const;
 
-export type RenderTreeNodeType = typeof RENDERTREE_NODES[number];
+export type RenderTreeNodeType = (typeof RENDERTREE_NODES)[number];
 export type RenderTreeNode = { [K in RenderTreeNodeType]: AppDomNodeOfType<K> }[RenderTreeNodeType];
 export type RenderTreeNodes = Record<NodeId, RenderTreeNode>;
 
@@ -1107,4 +1116,33 @@ export function deref(nodeRef: Maybe<NodeReference>): NodeId | null {
     return nodeRef.$$ref;
   }
   return null;
+}
+
+export function createDefaultDom(): AppDom {
+  let dom = createDom();
+  const appNode = getApp(dom);
+
+  // Create default page
+  const newPageNode = createNode(dom, 'page', {
+    name: 'Page 1',
+    attributes: {
+      title: createConst('Page 1'),
+      display: createConst('shell'),
+    },
+  });
+
+  dom = addNode(dom, newPageNode, appNode, 'pages');
+
+  return dom;
+}
+
+export function getPageByName(dom: AppDom, name: string): PageNode | null {
+  const rootNode = getApp(dom);
+  const { pages = [] } = getChildNodes(dom, rootNode);
+  return pages.find((page) => page.name === name) ?? null;
+}
+
+export function getQueryByName(dom: AppDom, page: PageNode, name: string): QueryNode | null {
+  const { queries = [] } = getChildNodes(dom, page);
+  return queries.find((query) => query.name === name) ?? null;
 }

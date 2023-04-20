@@ -7,6 +7,7 @@ import {
   FormControlLabel,
   Typography,
   Skeleton,
+  Box,
 } from '@mui/material';
 import * as React from 'react';
 import { inferColumns, parseColumns } from '@mui/toolpad-components';
@@ -27,7 +28,6 @@ import {
 } from './types';
 import useDebounced from '../../utils/useDebounced';
 import { usePrivateQuery } from '../context';
-import ErrorAlert from '../../toolpad/AppEditor/PageEditor/ErrorAlert';
 import QueryInputPanel from '../QueryInputPanel';
 import SplitPane from '../../components/SplitPane';
 import useQueryPreview from '../useQueryPreview';
@@ -128,11 +128,11 @@ function QueryEditor({
     [fetchPrivate],
   );
 
-  const { preview, runPreview: handleRunPreview } = useQueryPreview(
-    fetchServerPreview,
-    input.attributes.query.value,
-    {},
-  );
+  const {
+    preview,
+    runPreview: handleRunPreview,
+    isLoading: previewIsLoading,
+  } = useQueryPreview(fetchServerPreview, input.attributes.query.value, {});
 
   const rawRows: any[] = preview?.data || EMPTY_ROWS;
   const columns: GridColDef[] = React.useMemo(() => parseColumns(inferColumns(rawRows)), [rawRows]);
@@ -201,17 +201,39 @@ function QueryEditor({
         </Stack>
       </QueryInputPanel>
 
-      {preview?.error ? (
-        <ErrorAlert error={preview?.error} />
-      ) : (
-        <DataGridPro sx={{ border: 'none' }} columns={columns} key={previewGridKey} rows={rows} />
-      )}
+      <Box
+        sx={{
+          height: '100%',
+          display: 'flex',
+          flexDirection: 'column',
+        }}
+      >
+        {preview?.error ? (
+          <Box
+            sx={{
+              display: 'flex',
+              flex: 1,
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}
+          >
+            <Typography color="error">{preview?.error?.message}</Typography>
+          </Box>
+        ) : (
+          <DataGridPro
+            sx={{ border: 'none', flex: 1 }}
+            columns={columns}
+            key={previewGridKey}
+            rows={rows}
+            loading={previewIsLoading}
+          />
+        )}
+      </Box>
     </SplitPane>
   );
 }
 
 function ConnectionParamsInput({
-  appId,
   connectionId,
   handlerBasePath,
 }: ConnectionEditorProps<GoogleSheetsConnectionParams>) {
@@ -227,7 +249,7 @@ function ConnectionParamsInput({
         component="a"
         disabled={Boolean(validatedUser.data)}
         href={`${handlerBasePath}/auth/login?state=${encodeURIComponent(
-          JSON.stringify({ appId, connectionId }),
+          JSON.stringify({ connectionId }),
         )}
         `}
         variant="outlined"

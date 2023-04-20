@@ -3,6 +3,7 @@ import { test, expect } from '../../playwright/localTest';
 import { ToolpadRuntime } from '../../models/ToolpadRuntime';
 import { fileReplaceAll } from '../../utils/fs';
 import { ToolpadEditor } from '../../models/ToolpadEditor';
+import { fileExists } from '../../../packages/toolpad-app/src/utils/fs';
 
 // We can run our own httpbin instance if necessary:
 //    $ docker run -p 80:80 kennethreitz/httpbin
@@ -24,8 +25,9 @@ test.use({
 });
 
 test('rest basics', async ({ page, context, localApp }) => {
-  const queriesFilePath = path.resolve(localApp.dir, './toolpad/pages/page1/page.yml');
-  await fileReplaceAll(queriesFilePath, HTTPBIN_SOURCE_URL, HTTPBIN_TARGET_URL);
+  const pageFilePath = path.resolve(localApp.dir, './toolpad/pages/page1/page.yml');
+  await expect.poll(async () => fileExists(pageFilePath)).toBe(true);
+  await fileReplaceAll(pageFilePath, HTTPBIN_SOURCE_URL, HTTPBIN_TARGET_URL);
 
   const runtimeModel = new ToolpadRuntime(page);
   await runtimeModel.gotoPage('page1');

@@ -55,7 +55,7 @@ export default createComponent(MyInspector, {
   );
 
   await editorModel.componentCatalog.hover();
-  await expect(editorModel.componentCatalogItem('MyInspector')).toBeVisible();
+  await expect(editorModel.getComponentCatalogItem('MyInspector')).toBeVisible();
 
   await editorModel.dragNewComponentToAppCanvas('MyInspector');
 

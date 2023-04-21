@@ -154,6 +154,11 @@ async function main() {
       expressNext();
     });
 
+    app.use('/prod', (req, res, expressNext) => {
+      res.setHeader('X-Frame-Options', 'ALLOW');
+      expressNext();
+    });
+
     app.use('/app-canvas', (req, res, expressNext) => {
       res.setHeader('X-Frame-Options', 'SAMEORIGIN');
       expressNext();

@@ -129,40 +129,44 @@ async function main() {
   }
 
   const projectDir = process.env.TOOLPAD_PROJECT_DIR;
-  const dir = process.env.TOOLPAD_DIR;
-  const dev = !!process.env.TOOLPAD_NEXT_DEV;
   const hostname = 'localhost';
   const port = Number(process.env.TOOLPAD_PORT);
+  let editorNextApp: ReturnType<typeof next> | undefined;
 
-  // when using middleware `hostname` and `port` must be provided below
-  const editorNextApp = next({ dir, dev, hostname, port });
-  const handle = editorNextApp.getRequestHandler();
+  if (cmd === 'dev') {
+    const dir = process.env.TOOLPAD_DIR;
+    const dev = !!process.env.TOOLPAD_NEXT_DEV;
 
-  app.use((req, res, expressNext) => {
-    res.setHeader('X-Frame-Options', 'DENY');
-    expressNext();
-  });
+    // when using middleware `hostname` and `port` must be provided below
+    editorNextApp = next({ dir, dev, hostname, port });
+    const handle = editorNextApp.getRequestHandler();
 
-  app.use('/app-canvas', (req, res, expressNext) => {
-    res.setHeader('X-Frame-Options', 'SAMEORIGIN');
-    expressNext();
-  });
+    app.use((req, res, expressNext) => {
+      res.setHeader('X-Frame-Options', 'DENY');
+      expressNext();
+    });
 
-  app.use(async (req, res) => {
-    try {
-      invariant(req.url, 'request must have a url');
-      // Be sure to pass `true` as the second argument to `url.parse`.
-      // This tells it to parse the query portion of the URL.
-      const parsedUrl = parse(req.url, true);
-      await handle(req, res, parsedUrl);
-    } catch (err) {
-      console.error('Error occurred handling', req.url, err);
-      res.statusCode = 500;
-      res.end('internal server error');
-    }
-  });
+    app.use('/app-canvas', (req, res, expressNext) => {
+      res.setHeader('X-Frame-Options', 'SAMEORIGIN');
+      expressNext();
+    });
 
-  await listen(httpServer, port);
+    app.use(async (req, res) => {
+      try {
+        invariant(req.url, 'request must have a url');
+        // Be sure to pass `true` as the second argument to `url.parse`.
+        // This tells it to parse the query portion of the URL.
+        const parsedUrl = parse(req.url, true);
+        await handle(req, res, parsedUrl);
+      } catch (err) {
+        console.error('Error occurred handling', req.url, err);
+        res.statusCode = 500;
+        res.end('internal server error');
+      }
+    });
+
+    await listen(httpServer, port);
+  }
 
   // eslint-disable-next-line no-console
   console.log(
@@ -171,7 +175,7 @@ async function main() {
     )}`,
   );
 
-  await editorNextApp.prepare();
+  await editorNextApp?.prepare();
 }
 
 main().catch((err) => {

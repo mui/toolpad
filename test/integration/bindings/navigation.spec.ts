@@ -24,7 +24,7 @@ test('navigation action', async ({ page }) => {
 
   await runtimeModel.waitForNavigation();
 
-  // await expect(page.getByText('welcome to page 2')).toBeVisible();
+  await expect(page.getByText('welcome to page 2')).toBeVisible();
 
   expect(getPageUrlSearch()).toBe('?abc=zyx&def=test');
 });

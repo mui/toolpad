@@ -385,7 +385,6 @@ function mergeThemeIntoAppDom(dom: appDom.AppDom, themeFile: Theme): appDom.AppD
 }
 
 function toBindable<V>(value: V | { $$jsExpression: string }): BindableAttrValue<V> {
-  console.log('fuck');
   if (value && typeof value === 'object' && typeof (value as any).$$jsExpression === 'string') {
     return { type: 'jsExpression', value: (value as any).$$jsExpression };
   }

@@ -51,6 +51,9 @@ async function main() {
     } satisfies HealthCheck);
   });
 
+  const publicPath = path.resolve(__dirname, '../../public');
+  app.use(express.static(publicPath, { index: false }));
+
   app.use('/api/data', createDataHandler());
 
   if (cmd === 'dev') {

@@ -7,7 +7,7 @@ import {
 } from '@mui/toolpad-core';
 import * as React from 'react';
 import { evaluateBindable } from '@mui/toolpad-core/jsRuntime';
-import { mapValues } from '../../utils/collections';
+import { mapValues } from '@mui/toolpad-utils/collections';
 
 function evaluateBindableAttrEntries(
   jsRuntime: JsRuntime,

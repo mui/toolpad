@@ -1,5 +1,5 @@
 import { Client, QueryConfig } from 'pg';
-import { errorFrom } from '../../utils/errors';
+import { errorFrom } from '@mui/toolpad-utils/errors';
 import { Maybe } from '../../utils/types';
 import { SqlConnectionParams, SqlQuery, SqlResult } from '../sql/types';
 import { createSqlServerDatasource } from '../sql/server';

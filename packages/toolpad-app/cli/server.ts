@@ -133,7 +133,7 @@ async function main() {
   const port = Number(process.env.TOOLPAD_PORT);
   let editorNextApp: ReturnType<typeof next> | undefined;
 
-  if (cmd === 'dev' && !viteRuntime) {
+  if (cmd === 'dev' || !viteRuntime) {
     const dir = process.env.TOOLPAD_DIR;
     const dev = !!process.env.TOOLPAD_NEXT_DEV;
 

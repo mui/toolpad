@@ -1,5 +1,5 @@
 import { hasOwnProperty } from './collections';
-import { truncate } from './strings.js';
+import { truncate } from './strings';
 
 export type PlainObject = Record<string, unknown>;
 

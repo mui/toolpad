@@ -13,6 +13,8 @@ test('navigation action', async ({ page }) => {
   const runtimeModel = new ToolpadRuntime(page);
   await runtimeModel.gotoPage('page1');
 
+  await expect(page.getByText('welcome to page 2')).not.toBeVisible();
+
   const getPageUrlSearch = (): string => new URL(page.url()).search;
 
   expect(getPageUrlSearch()).toBe('');

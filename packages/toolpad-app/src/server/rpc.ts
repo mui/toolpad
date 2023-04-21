@@ -8,7 +8,7 @@ import { errorFrom, serializeError } from '@mui/toolpad-utils/errors';
 import { execQuery, dataSourceFetchPrivate } from './data';
 import { getVersionInfo } from './versionInfo';
 import logger from './logs/logger';
-import { createComponent, openCodeComponentEditor } from './localMode';
+import { createComponent, deletePage, openCodeComponentEditor } from './localMode';
 import { getDomFingerprint, loadDom, saveDom } from './liveProject';
 import { asyncHandler } from '../utils/http';
 
@@ -145,6 +145,9 @@ export const rpcServer = {
     }),
     createComponent: createMethod<typeof createComponent>(({ params }) => {
       return createComponent(...params);
+    }),
+    deletePage: createMethod<typeof deletePage>(({ params }) => {
+      return deletePage(...params);
     }),
   },
 } as const;

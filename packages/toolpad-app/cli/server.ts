@@ -155,7 +155,7 @@ async function main() {
     });
 
     app.use('/prod', (req, res, expressNext) => {
-      res.setHeader('X-Frame-Options', 'ALLOW');
+      res.removeHeader('X-Frame-Options');
       expressNext();
     });
 

@@ -19,23 +19,12 @@ const pages: MuiPage[] = [
         pathname: '/toolpad/connecting-to-datasources/queries',
       },
       {
-        pathname: '/toolpad/connecting-to-datasources/connections',
+        pathname: '/toolpad/connecting-to-datasources/serverside-http-request',
+        title: 'serverside HTTP request',
       },
       {
-        pathname: '/toolpad/connecting-to-datasources/fetch',
-        title: 'Fetch datasource',
-      },
-      {
-        pathname: '/toolpad/connecting-to-datasources/function',
-        title: 'Function datasource',
-      },
-      {
-        pathname: '/toolpad/connecting-to-datasources/google-sheets',
-        title: 'Google Sheets datasource',
-      },
-      {
-        pathname: '/toolpad/connecting-to-datasources/postgre-sql',
-        title: 'PostgreSQL datasource',
+        pathname: '/toolpad/connecting-to-datasources/serverside-javascript',
+        title: 'serverside JavaScript',
       },
     ],
   },
@@ -56,11 +45,19 @@ const pages: MuiPage[] = [
         pathname: '/toolpad/building-ui/custom-components',
         title: 'Custom components',
       },
+      {
+        pathname: '/toolpad/building-ui/data-grid-component',
+        title: 'DataGrid component',
+      },
     ],
   },
   {
     pathname: '/toolpad/data-binding',
     icon: 'CodeIcon',
+  },
+  {
+    pathname: '/toolpad/deployment',
+    icon: 'BuildIcon',
   },
   // {
   //   pathname: '/toolpad/versioning-and-deploying',

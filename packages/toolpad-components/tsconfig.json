@@ -1,18 +1,16 @@
 {
   "extends": "../../tsconfig.json",
   "compilerOptions": {
-    "paths": {
-      // TODO: remove when we move to typescript 4.7 (supports package exports)
-      "@mui/toolpad-core/path": ["../toolpad-core/dist/path"],
-      "@mui/toolpad-core/objectKey": ["../toolpad-core/dist/objectKey"]
-    },
     "module": "esnext",
+    "moduleResolution": "nodenext",
     "alwaysStrict": true,
     "rootDir": "src",
     "outDir": "dist",
     "declaration": true,
     "target": "ES2020",
-    "skipLibCheck": true
+    "skipLibCheck": true,
+    "pretty": true,
+    "preserveWatchOutput": true
   },
-  "include": ["**/*.ts", "**/*.tsx"]
+  "include": ["src/**/*.ts", "src/**/*.tsx"]
 }

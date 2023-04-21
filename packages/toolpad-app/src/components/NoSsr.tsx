@@ -1,14 +1,22 @@
 import * as React from 'react';
 
+function subscribe() {
+  return () => {};
+}
+
+function getSnapshot() {
+  return false;
+}
+
+function getServerSnapshot() {
+  return true;
+}
+
 /**
  * Returns true when serverside rendering, or when hydrating.
  */
 export function useIsSsr(defer: boolean = false): boolean {
-  const isSsrInitialValue = React.useSyncExternalStore(
-    () => () => {},
-    () => false,
-    () => true,
-  );
+  const isSsrInitialValue = React.useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
   const [isSsr, setIsSsr] = React.useState(defer ? true : isSsrInitialValue);
   React.useEffect(() => setIsSsr(false), []);
   return isSsr;

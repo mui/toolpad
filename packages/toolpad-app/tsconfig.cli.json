@@ -1,0 +1,11 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "noEmit": false,
+    "rootDir": ".",
+    "outDir": "./dist",
+    "module": "commonjs",
+    "moduleResolution": "node16"
+  },
+  "include": ["./cli/**/*"]
+}

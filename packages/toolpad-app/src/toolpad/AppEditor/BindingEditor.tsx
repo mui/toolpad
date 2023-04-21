@@ -28,9 +28,11 @@ import {
   NavigationAction,
   NodeId,
   JsExpressionAction,
-  GlobalScopeMeta,
-  GlobalScopeMetaField,
+  ScopeMeta,
+  ScopeMetaField,
+  JsRuntime,
 } from '@mui/toolpad-core';
+import { createProvidedContext } from '@mui/toolpad-utils/react';
 import { TabContext, TabList } from '@mui/lab';
 import { Maybe, WithControlledProp } from '../../utils/types';
 import { JsExpressionEditor } from './PageEditor/JsExpressionEditor';
@@ -40,21 +42,21 @@ import useLatest from '../../utils/useLatest';
 import useDebounced from '../../utils/useDebounced';
 import { useEvaluateLiveBinding } from './useEvaluateLiveBinding';
 import useShortcut from '../../utils/useShortcut';
-import { createProvidedContext } from '../../utils/react';
-import { useDom } from '../DomLoader';
+import { useDom } from '../AppState';
 import * as appDom from '../../appDom';
 import { usePageEditorState } from './PageEditor/PageEditorProvider';
 import GlobalScopeExplorer from './GlobalScopeExplorer';
 import TabPanel from '../../components/TabPanel';
+import useUnsavedChangesConfirm from '../hooks/useUnsavedChangesConfirm';
 
 interface BindingEditorContext {
   label: string;
   globalScope: Record<string, unknown>;
-  globalScopeMeta: GlobalScopeMeta;
+  globalScopeMeta: ScopeMeta;
   /**
    * Serverside binding, use the QuickJs runtime to evaluate bindings
    */
-  server?: boolean;
+  jsRuntime: JsRuntime;
   disabled?: boolean;
   propType?: PropValueType;
   liveBinding?: LiveBinding;
@@ -73,7 +75,7 @@ const ErrorTooltip = styled(({ className, ...props }: TooltipProps) => (
 
 interface JsExpressionBindingEditorProps extends WithControlledProp<JsExpressionAttrValue | null> {
   globalScope: Record<string, unknown>;
-  globalScopeMeta: GlobalScopeMeta;
+  globalScopeMeta: ScopeMeta;
 }
 
 function JsExpressionBindingEditor({
@@ -99,13 +101,13 @@ function JsExpressionBindingEditor({
 }
 
 interface JsExpressionPreviewProps {
-  server?: boolean;
+  jsRuntime: JsRuntime;
   input: BindableAttrValue<any> | null;
   globalScope: Record<string, unknown>;
 }
 
-function JsExpressionPreview({ server, input, globalScope }: JsExpressionPreviewProps) {
-  const previewValue: LiveBinding = useEvaluateLiveBinding({ server, input, globalScope });
+function JsExpressionPreview({ jsRuntime, input, globalScope }: JsExpressionPreviewProps) {
+  const previewValue: LiveBinding = useEvaluateLiveBinding({ jsRuntime, input, globalScope });
 
   const lastGoodPreview = useLatest(previewValue?.error ? undefined : previewValue);
   const previewErrorDebounced = useDebounced(previewValue?.error, 500);
@@ -124,7 +126,13 @@ function JsExpressionPreview({ server, input, globalScope }: JsExpressionPreview
 export interface JsBindingEditorProps extends WithControlledProp<JsExpressionAttrValue | null> {}
 
 export function JsBindingEditor({ value, onChange }: JsBindingEditorProps) {
-  const { label, globalScope, globalScopeMeta = {}, server, propType } = useBindingEditorContext();
+  const {
+    label,
+    globalScope,
+    globalScopeMeta = {},
+    jsRuntime,
+    propType,
+  } = useBindingEditorContext();
 
   return (
     <Stack direction="row" sx={{ height: 400, gap: 2 }}>
@@ -151,7 +159,7 @@ export function JsBindingEditor({ value, onChange }: JsBindingEditorProps) {
           onChange={onChange}
         />
 
-        <JsExpressionPreview server={server} input={value} globalScope={globalScope} />
+        <JsExpressionPreview jsRuntime={jsRuntime} input={value} globalScope={globalScope} />
       </Box>
     </Stack>
   );
@@ -298,7 +306,7 @@ export function BindingEditorDialog<V>({
   open,
   onClose,
 }: BindingEditorDialogProps<V>) {
-  const { propType } = useBindingEditorContext();
+  const { propType, label } = useBindingEditorContext();
 
   const [input, setInput] = React.useState(value);
   React.useEffect(() => {
@@ -307,7 +315,7 @@ export function BindingEditorDialog<V>({
     }
   }, [open, value]);
 
-  const committedInput = React.useRef<BindableAttrValue<V> | null>(null);
+  const committedInput = React.useRef<BindableAttrValue<V> | null>(input);
 
   const handleSave = React.useCallback(() => {
     let newValue = input;
@@ -323,23 +331,36 @@ export function BindingEditorDialog<V>({
     onChange(newValue);
   }, [onChange, input]);
 
+  const hasUnsavedChanges = input
+    ? input.type !== committedInput.current?.type || input.value !== committedInput.current?.value
+    : false;
+
+  const { handleCloseWithUnsavedChanges } = useUnsavedChangesConfirm({
+    hasUnsavedChanges,
+    onClose,
+  });
+
   const handleCommit = React.useCallback(() => {
     handleSave();
     onClose();
-  }, [handleSave, onClose]);
+  }, [onClose, handleSave]);
 
   const handleRemove = React.useCallback(() => {
     onChange(null);
     onClose();
-  }, [onChange, onClose]);
+  }, [onClose, onChange]);
 
   useShortcut({ key: 's', metaKey: true, disabled: !open }, handleSave);
 
-  const hasUnsavedChanges = input && input !== committedInput.current;
-
   return (
-    <Dialog onClose={onClose} open={open} fullWidth scroll="body" maxWidth="lg">
-      <DialogTitle>Bind a property</DialogTitle>
+    <Dialog
+      onClose={handleCloseWithUnsavedChanges}
+      open={open}
+      fullWidth
+      scroll="body"
+      maxWidth="lg"
+    >
+      <DialogTitle>Bind property &quot;{label}&quot;</DialogTitle>
       <DialogContent>
         {propType?.type === 'event' ? (
           <ActionEditor value={input} onChange={(newValue) => setInput(newValue)} />
@@ -368,11 +389,11 @@ export function BindingEditorDialog<V>({
 export interface BindingEditorProps<V> extends WithControlledProp<BindableAttrValue<V> | null> {
   label: string;
   globalScope: Record<string, unknown>;
-  globalScopeMeta?: GlobalScopeMeta;
+  globalScopeMeta?: ScopeMeta;
   /**
    * Uses the QuickJs runtime to evaluate bindings, just like on the server
    */
-  server?: boolean;
+  jsRuntime: JsRuntime;
   disabled?: boolean;
   hidden?: boolean;
   propType?: PropValueType;
@@ -383,7 +404,7 @@ export function BindingEditor<V>({
   label,
   globalScope,
   globalScopeMeta,
-  server,
+  jsRuntime,
   disabled,
   hidden = false,
   propType,
@@ -425,10 +446,10 @@ export function BindingEditor<V>({
   );
 
   const resolvedMeta = React.useMemo(() => {
-    const meta: GlobalScopeMeta = { ...globalScopeMeta };
+    const meta: ScopeMeta = { ...globalScopeMeta };
     if (propType?.type === 'event' && propType.arguments) {
       for (const { name, tsType } of propType.arguments) {
-        const metaField: GlobalScopeMetaField = meta[name] ?? {};
+        const metaField: ScopeMetaField = meta[name] ?? {};
         metaField.kind = 'local';
         metaField.tsType = tsType;
         meta[name] = metaField;
@@ -443,12 +464,12 @@ export function BindingEditor<V>({
       label,
       globalScope,
       globalScopeMeta: resolvedMeta,
-      server,
+      jsRuntime,
       disabled,
       propType,
       liveBinding,
     }),
-    [disabled, globalScope, label, liveBinding, propType, resolvedMeta, server],
+    [disabled, globalScope, jsRuntime, label, liveBinding, propType, resolvedMeta],
   );
 
   return (

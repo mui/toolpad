@@ -1,8 +1,8 @@
 import * as React from 'react';
-import mitt from 'mitt';
+import { Emitter } from '@mui/toolpad-utils/events';
 
 // storage events only work across windows, we'll use an event emitter to announce within the window
-const emitter = mitt();
+const emitter = new Emitter<Record<string, undefined>>();
 // local cache, needed for getSnapshot
 const cache = new Map<string, any>();
 
@@ -62,7 +62,7 @@ function setValue<T = unknown>(key: string, value: T) {
  *
  * Things this hook does different from existing solutions:
  * - SSR-capable: it shows initial value during SSR and hydration, but immediately
- *   initiallizes when clientside mounted.
+ *   initializes when clientside mounted.
  * - Sync state across tabs: When another tab changes the value in local storage, the
  *   current tab follows suit.
  */
@@ -70,10 +70,17 @@ export default function useLocalStorageState<V>(
   key: string,
   initialValue: V,
 ): [V, React.Dispatch<React.SetStateAction<V>>] {
+  const subscribeKey = React.useCallback((cb: () => void) => subscribe(key, cb), [key]);
+  const getKeySnapshot = React.useCallback(
+    () => getSnapshot<V>(key) ?? initialValue,
+    [initialValue, key],
+  );
+  const getKeyServerSnapshot = React.useCallback(() => initialValue, [initialValue]);
+
   const storedValue: V = React.useSyncExternalStore(
-    (cb) => subscribe(key, cb),
-    () => getSnapshot(key) ?? initialValue,
-    () => initialValue,
+    subscribeKey,
+    getKeySnapshot,
+    getKeyServerSnapshot,
   );
 
   const setStoredValue = React.useCallback(

@@ -2,26 +2,28 @@
 
 <p class="description">Setup Toolpad to run on your own machine.</p>
 
-## Installing Docker
+## Create a Toolpad app
 
-In order to run Toolpad you will need to have Docker set up on your machine. Follow [official instructions](https://www.docker.com/get-started/) to get started.
-
-## Downloading Toolpad
-
-Toolpad runs inside a docker container so you first need to download the docker compose file. Run following command in your terminal:
+Start by opening a terminal and `cd` into a folder you'd like to create your applicarion in. Then run the command
 
 ```sh
-curl -LO https://raw.githubusercontent.com/mui/mui-toolpad/master/docker/compose/docker-compose.yml
+npx create-toolpad-app my-app
 ```
 
-## Running Toolpad
+> This will run the `create-toolpad-app` CLI which initializes the directory `./my-app` with a Toolpad application.
 
-Now you need to run the docker container by running the following command:
+## Run the Toolpad editor
+
+Change the current working directory to the application folder:
 
 ```sh
-docker-compose -f docker-compose.yml up -d
+cd my-app
 ```
 
-## Opening Toolpad
+Then start the development mode
 
-You should now be able to open Toolpad on http://localhost:3000/.
+```sh
+npm run dev
+```
+
+This starts the development server on port `3000` or the first available port after that and opens the browser to the Toolpad editor.

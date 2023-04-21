@@ -6,18 +6,16 @@ import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import ArrowRightIcon from '@mui/icons-material/ArrowRight';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import AddIcon from '@mui/icons-material/Add';
-import { useNavigate, useLocation, matchRoutes, Location } from 'react-router-dom';
 import { NodeId } from '@mui/toolpad-core';
 import clsx from 'clsx';
 import invariant from 'invariant';
 import * as appDom from '../../../appDom';
-import { useDom, useDomApi } from '../../DomLoader';
+import { useAppStateApi, useDom, useAppState } from '../../AppState';
 import CreatePageNodeDialog from './CreatePageNodeDialog';
-import CreateCodeComponentNodeDialog from './CreateCodeComponentNodeDialog';
-import CreateConnectionNodeDialog from './CreateConnectionNodeDialog';
 import useLocalStorageState from '../../../utils/useLocalStorageState';
 import NodeMenu from '../NodeMenu';
-import config from '../../../config';
+import { DomView } from '../../../utils/domView';
+import client from '../../../api';
 
 const HierarchyExplorerRoot = styled('div')({
   overflow: 'auto',
@@ -41,31 +39,17 @@ const StyledTreeItem = styled(TreeItem)({
   },
 });
 
-function getActiveNodeId(location: Location): NodeId | null {
-  const match =
-    matchRoutes(
-      [
-        { path: `/app/:appId/pages/:activeNodeId` },
-        { path: `/app/:appId/apis/:activeNodeId` },
-        { path: `/app/:appId/codeComponents/:activeNodeId` },
-        { path: `/app/:appId/connections/:activeNodeId` },
-      ],
-      location,
-    ) || [];
-
-  const selected: NodeId[] = match.map((route) => route.params.activeNodeId as NodeId);
-  return selected.length > 0 ? selected[0] : null;
-}
-
 type StyledTreeItemProps = TreeItemProps & {
   onDeleteNode?: (nodeId: NodeId) => void;
   onDuplicateNode?: (nodeId: NodeId) => void;
+  onSettingsNode?: (nodeId: NodeId) => void;
   onCreate?: React.MouseEventHandler;
   labelIcon?: React.ReactNode;
   labelText: string;
   createLabelText?: string;
   deleteLabelText?: string;
   duplicateLabelText?: string;
+  settingsLabelText?: string;
   toolpadNodeId?: NodeId;
 };
 
@@ -76,9 +60,11 @@ function HierarchyTreeItem(props: StyledTreeItemProps) {
     onCreate,
     onDeleteNode,
     onDuplicateNode,
+    onSettingsNode,
     createLabelText,
     deleteLabelText = 'Delete',
     duplicateLabelText = 'Duplicate',
+    settingsLabelText = 'Settings',
     toolpadNodeId,
     ...other
   } = props;
@@ -114,6 +100,8 @@ function HierarchyTreeItem(props: StyledTreeItemProps) {
               duplicateLabelText={duplicateLabelText}
               onDeleteNode={onDeleteNode}
               onDuplicateNode={onDuplicateNode}
+              onSettingsNode={onSettingsNode}
+              settingsLabelText={settingsLabelText}
             />
           ) : null}
         </Box>
@@ -123,45 +111,42 @@ function HierarchyTreeItem(props: StyledTreeItemProps) {
   );
 }
 
-function getLinkToNodeEditor(appId: string, node: appDom.AppDomNode): string | undefined {
+function getNodeEditorDomView(node: appDom.AppDomNode): DomView | undefined {
   switch (node.type) {
     case 'page':
-      return `/app/${appId}/pages/${node.id}`;
+      return { kind: 'page', nodeId: node.id };
     case 'connection':
-      return `/app/${appId}/connections/${node.id}`;
+      return { kind: 'connection', nodeId: node.id };
     case 'codeComponent':
-      return `/app/${appId}/codeComponents/${node.id}`;
+      return { kind: 'codeComponent', nodeId: node.id };
     default:
       return undefined;
   }
 }
 
 export interface HierarchyExplorerProps {
-  appId: string;
   className?: string;
 }
 
-export default function HierarchyExplorer({ appId, className }: HierarchyExplorerProps) {
+export default function HierarchyExplorer({ className }: HierarchyExplorerProps) {
   const { dom } = useDom();
-  const domApi = useDomApi();
+  const { currentView } = useAppState();
+
+  const appStateApi = useAppStateApi();
 
   const app = appDom.getApp(dom);
-  const { codeComponents = [], pages = [], connections = [] } = appDom.getChildNodes(dom, app);
+  const { pages = [] } = appDom.getChildNodes(dom, app);
 
   const [expanded, setExpanded] = useLocalStorageState<string[]>(
     `editor/${app.id}/hierarchy-expansion`,
     [':connections', ':pages', ':codeComponents'],
   );
 
-  const location = useLocation();
-
-  const activeNode = getActiveNodeId(location);
+  const activeNode = currentView.nodeId || null;
 
   const handleToggle = (event: React.SyntheticEvent, nodeIds: string[]) => {
     setExpanded(nodeIds as NodeId[]);
   };
-
-  const navigate = useNavigate();
 
   const handleSelect = (event: React.SyntheticEvent, nodeIds: string[]) => {
     if (nodeIds.length <= 0) {
@@ -179,32 +164,22 @@ export default function HierarchyExplorer({ appId, className }: HierarchyExplore
       // TODO: sort out in-page selection
       const page = appDom.getPageAncestor(dom, node);
       if (page) {
-        navigate(`/app/${appId}/pages/${page.id}`);
+        appStateApi.setView({ kind: 'page', nodeId: page.id });
       }
     }
 
     if (appDom.isPage(node)) {
-      navigate(`/app/${appId}/pages/${node.id}`);
+      appStateApi.setView({ kind: 'page', nodeId: node.id });
     }
 
     if (appDom.isCodeComponent(node)) {
-      navigate(`/app/${appId}/codeComponents/${node.id}`);
+      appStateApi.setView({ kind: 'codeComponent', nodeId: node.id });
     }
 
     if (appDom.isConnection(node)) {
-      navigate(`/app/${appId}/connections/${node.id}`);
+      appStateApi.setView({ kind: 'connection', nodeId: node.id });
     }
   };
-
-  const [createConnectionDialogOpen, setCreateConnectionDialogOpen] = React.useState(0);
-  const handleCreateConnectionDialogOpen = React.useCallback((event: React.MouseEvent) => {
-    event.stopPropagation();
-    setCreateConnectionDialogOpen(Math.random());
-  }, []);
-  const handleCreateConnectionDialogClose = React.useCallback(
-    () => setCreateConnectionDialogOpen(0),
-    [],
-  );
 
   const [createPageDialogOpen, setCreatePageDialogOpen] = React.useState(0);
   const handleCreatePageDialogOpen = React.useCallback((event: React.MouseEvent) => {
@@ -213,64 +188,59 @@ export default function HierarchyExplorer({ appId, className }: HierarchyExplore
   }, []);
   const handleCreatepageDialogClose = React.useCallback(() => setCreatePageDialogOpen(0), []);
 
-  const [createCodeComponentDialogOpen, setCreateCodeComponentDialogOpen] = React.useState(0);
-  const handleCreateCodeComponentDialogOpen = React.useCallback((event: React.MouseEvent) => {
-    event.stopPropagation();
-    setCreateCodeComponentDialogOpen(Math.random());
-  }, []);
-  const handleCreateCodeComponentDialogClose = React.useCallback(
-    () => setCreateCodeComponentDialogOpen(0),
-    [],
-  );
+  const handleDeletePage = React.useCallback(
+    async (nodeId: NodeId) => {
+      const deletedNode = appDom.getNode(dom, nodeId);
 
-  const handleDeleteNode = React.useCallback(
-    (nodeId: NodeId) => {
-      let redirectAfterDelete: string | undefined;
+      let domViewAfterDelete: DomView | undefined;
       if (nodeId === activeNode) {
-        const deletedNode = appDom.getNode(dom, nodeId);
         const siblings = appDom.getSiblings(dom, deletedNode);
         const firstSiblingOfType = siblings.find((sibling) => sibling.type === deletedNode.type);
-        if (firstSiblingOfType) {
-          redirectAfterDelete = getLinkToNodeEditor(appId, firstSiblingOfType);
-        } else {
-          redirectAfterDelete = `/app/${appId}`;
-        }
+        domViewAfterDelete = firstSiblingOfType && getNodeEditorDomView(firstSiblingOfType);
       }
 
-      domApi.update((draft) => appDom.removeNode(draft, nodeId));
+      await client.mutation.deletePage(deletedNode.name);
 
-      if (redirectAfterDelete) {
-        navigate(redirectAfterDelete);
-      }
+      appStateApi.update(
+        (draft) => appDom.removeNode(draft, nodeId),
+        domViewAfterDelete || { kind: 'page' },
+      );
     },
-    [activeNode, appId, dom, domApi, navigate],
+    [activeNode, appStateApi, dom],
   );
 
   const handleDuplicateNode = React.useCallback(
     (nodeId: NodeId) => {
       const node = appDom.getNode(dom, nodeId);
 
+      invariant(
+        node.parentId && node.parentProp,
+        'Duplication should never be called on nodes that are not placed in the dom',
+      );
+
       const fragment = appDom.cloneFragment(dom, nodeId);
 
-      domApi.update((draft) => {
-        invariant(
-          node.parentId && node.parentProp,
-          'Duplication should never be called on nodes that are not placed in the dom',
-        );
-
-        return appDom.addFragment(draft, fragment, node.parentId, node.parentProp);
-      });
-
       const newNode = appDom.getNode(fragment, fragment.root);
-      const editorLink = getLinkToNodeEditor(appId, newNode);
-      if (editorLink) {
-        navigate(editorLink);
-      }
+      const editorDomView = getNodeEditorDomView(newNode);
+
+      appStateApi.update(
+        (draft) => appDom.addFragment(draft, fragment, node.parentId!, node.parentProp!),
+        editorDomView || { kind: 'page' },
+      );
     },
-    [appId, dom, domApi, navigate],
+    [appStateApi, dom],
   );
 
-  const hasConnectionsView = !config.isDemo;
+  const handlePageSettingsNode = React.useCallback(
+    (nodeId: NodeId) => {
+      const node = appDom.getNode(dom, nodeId);
+
+      if (appDom.isPage(node)) {
+        appStateApi.setView({ kind: 'page', nodeId: node.id, selectedNodeId: null });
+      }
+    },
+    [appStateApi, dom],
+  );
 
   return (
     <HierarchyExplorerRoot data-testid="hierarchy-explorer" className={className}>
@@ -284,46 +254,6 @@ export default function HierarchyExplorer({ appId, className }: HierarchyExplore
         defaultCollapseIcon={<ArrowDropDownIcon />}
         defaultExpandIcon={<ArrowRightIcon />}
       >
-        {hasConnectionsView ? (
-          <HierarchyTreeItem
-            nodeId=":connections"
-            aria-level={1}
-            labelText="Connections"
-            createLabelText="Create connection"
-            onCreate={handleCreateConnectionDialogOpen}
-          >
-            {connections.map((connectionNode) => (
-              <HierarchyTreeItem
-                key={connectionNode.id}
-                nodeId={connectionNode.id}
-                toolpadNodeId={connectionNode.id}
-                aria-level={2}
-                labelText={connectionNode.name}
-                onDuplicateNode={handleDuplicateNode}
-                onDeleteNode={handleDeleteNode}
-              />
-            ))}
-          </HierarchyTreeItem>
-        ) : null}
-        <HierarchyTreeItem
-          nodeId=":codeComponents"
-          aria-level={1}
-          labelText="Components"
-          createLabelText="Create component"
-          onCreate={handleCreateCodeComponentDialogOpen}
-        >
-          {codeComponents.map((codeComponent) => (
-            <HierarchyTreeItem
-              key={codeComponent.id}
-              nodeId={codeComponent.id}
-              toolpadNodeId={codeComponent.id}
-              aria-level={2}
-              labelText={codeComponent.name}
-              onDuplicateNode={handleDuplicateNode}
-              onDeleteNode={handleDeleteNode}
-            />
-          ))}
-        </HierarchyTreeItem>
         <HierarchyTreeItem
           nodeId=":pages"
           aria-level={1}
@@ -339,29 +269,17 @@ export default function HierarchyExplorer({ appId, className }: HierarchyExplore
               aria-level={2}
               labelText={page.name}
               onDuplicateNode={handleDuplicateNode}
-              onDeleteNode={handleDeleteNode}
+              onDeleteNode={handleDeletePage}
+              onSettingsNode={handlePageSettingsNode}
             />
           ))}
         </HierarchyTreeItem>
       </TreeView>
 
-      <CreateConnectionNodeDialog
-        key={createConnectionDialogOpen || undefined}
-        appId={appId}
-        open={!!createConnectionDialogOpen}
-        onClose={handleCreateConnectionDialogClose}
-      />
       <CreatePageNodeDialog
         key={createPageDialogOpen || undefined}
-        appId={appId}
         open={!!createPageDialogOpen}
         onClose={handleCreatepageDialogClose}
-      />
-      <CreateCodeComponentNodeDialog
-        key={createCodeComponentDialogOpen || undefined}
-        appId={appId}
-        open={!!createCodeComponentDialogOpen}
-        onClose={handleCreateCodeComponentDialogClose}
       />
     </HierarchyExplorerRoot>
   );

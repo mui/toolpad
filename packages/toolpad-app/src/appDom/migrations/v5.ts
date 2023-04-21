@@ -1,13 +1,13 @@
 import invariant from 'invariant';
+import { mapValues } from '@mui/toolpad-utils/collections';
 import * as appDom from '..';
-import { mapValues } from '../../utils/collections';
 
 function replaceLinkWithText(node: appDom.AppDomNode): appDom.AppDomNode {
   if (node.type === 'element' && node.attributes.component.value === 'Link') {
     return {
       ...node,
-      name: node.name.replace(/Link/gi, 'text'),
       attributes: {
+        ...node.attributes,
         component: {
           ...node.attributes.component,
           value: 'Text',

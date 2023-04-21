@@ -15,6 +15,9 @@ out/
 # production
 /build
 
+# typescript
+tsconfig.tsbuildinfo
+
 # misc
 .DS_Store
 *.pem
@@ -51,4 +54,8 @@ packages/toolpad-app/public/runtime
 packages/toolpad-app/public/reactDevtools
 packages/toolpad-app/public/runtime
 packages/toolpad-app/public/typings.json
-packages/toolpad-app/prisma/generated
+
+examples/*/yarn.lock
+
+test-results
+.toolpad-generated

@@ -1,11 +1,9 @@
-import { NodeId, LiveBindings, GlobalScopeMeta } from '@mui/toolpad-core';
+import { NodeId, LiveBindings, ScopeMeta } from '@mui/toolpad-core';
 import * as React from 'react';
 import * as appDom from '../../../appDom';
 import { PageViewState } from '../../../types';
 import { RectangleEdge } from '../../../utils/geometry';
 import { update } from '../../../utils/immutability';
-
-export type ComponentPanelTab = 'component' | 'theme';
 
 export const DROP_ZONE_TOP = 'top';
 export const DROP_ZONE_BOTTOM = 'bottom';
@@ -20,20 +18,18 @@ export type DropZone =
   | typeof DROP_ZONE_CENTER;
 
 export interface PageEditorState {
-  readonly appId: string;
   readonly type: 'page';
   readonly nodeId: NodeId;
-  readonly componentPanelTab: ComponentPanelTab;
   readonly newNode: appDom.ElementNode | null;
   readonly draggedNodeId: NodeId | null;
   readonly isDraggingOver: boolean;
   readonly dragOverNodeId: NodeId | null;
-  readonly dragOverSlotParentProp: string | null;
+  readonly dragOverSlotParentProp: appDom.ParentProp<appDom.ElementNode | appDom.PageNode> | null;
   readonly dragOverZone: DropZone | null;
   readonly draggedEdge: RectangleEdge | null;
   readonly viewState: PageViewState;
   readonly pageState: Record<string, unknown>;
-  readonly globalScopeMeta: GlobalScopeMeta;
+  readonly globalScopeMeta: ScopeMeta;
   readonly bindings: LiveBindings;
 }
 
@@ -41,10 +37,6 @@ export type PageEditorAction =
   | {
       type: 'REPLACE';
       state: PageEditorState;
-    }
-  | {
-      type: 'PAGE_SET_COMPONENT_PANEL_TAB';
-      tab: ComponentPanelTab;
     }
   | {
       type: 'PAGE_NEW_NODE_DRAG_START';
@@ -65,7 +57,7 @@ export type PageEditorAction =
       type: 'PAGE_NODE_DRAG_OVER';
       dragOverState: {
         nodeId: NodeId | null;
-        parentProp: string | null;
+        parentProp: appDom.ParentProp<appDom.ElementNode | appDom.PageNode> | null;
         zone: DropZone | null;
       };
     }
@@ -75,7 +67,7 @@ export type PageEditorAction =
   | {
       type: 'PAGE_STATE_UPDATE';
       pageState: Record<string, unknown>;
-      globalScopeMeta: GlobalScopeMeta;
+      globalScopeMeta: ScopeMeta;
     }
   | {
       type: 'PAGE_VIEW_STATE_UPDATE';
@@ -86,12 +78,10 @@ export type PageEditorAction =
       bindings: LiveBindings;
     };
 
-export function createPageEditorState(appId: string, nodeId: NodeId): PageEditorState {
+export function createPageEditorState(nodeId: NodeId): PageEditorState {
   return {
-    appId,
     type: 'page',
     nodeId,
-    componentPanelTab: 'component',
     newNode: null,
     draggedNodeId: null,
     isDraggingOver: false,
@@ -114,10 +104,6 @@ export function pageEditorReducer(
     case 'REPLACE': {
       return action.state;
     }
-    case 'PAGE_SET_COMPONENT_PANEL_TAB':
-      return update(state, {
-        componentPanelTab: action.tab,
-      });
     case 'PAGE_NEW_NODE_DRAG_START': {
       if (state.newNode) {
         return state;
@@ -186,9 +172,6 @@ export function pageEditorReducer(
 function createPageEditorApi(dispatch: React.Dispatch<PageEditorAction>) {
   return {
     replace: (state: PageEditorState) => dispatch({ type: 'REPLACE', state }),
-    setComponentPanelTab(tab: ComponentPanelTab) {
-      dispatch({ type: 'PAGE_SET_COMPONENT_PANEL_TAB', tab });
-    },
     newNodeDragStart(newNode: appDom.ElementNode) {
       dispatch({ type: 'PAGE_NEW_NODE_DRAG_START', newNode });
     },
@@ -210,7 +193,7 @@ function createPageEditorApi(dispatch: React.Dispatch<PageEditorAction>) {
       zone,
     }: {
       nodeId: NodeId | null;
-      parentProp: string | null;
+      parentProp: appDom.ParentProp<appDom.ElementNode | appDom.PageNode> | null;
       zone: DropZone | null;
     }) {
       dispatch({
@@ -224,7 +207,7 @@ function createPageEditorApi(dispatch: React.Dispatch<PageEditorAction>) {
         viewState,
       });
     },
-    pageStateUpdate(pageState: Record<string, unknown>, globalScopeMeta: GlobalScopeMeta) {
+    pageStateUpdate(pageState: Record<string, unknown>, globalScopeMeta: ScopeMeta) {
       dispatch({
         type: 'PAGE_STATE_UPDATE',
         pageState,
@@ -253,7 +236,6 @@ export function usePageEditorState() {
 }
 
 export interface PageEditorProviderProps {
-  appId: string;
   children?: React.ReactNode;
   nodeId: NodeId;
 }
@@ -264,14 +246,14 @@ const PageEditorApiContext = React.createContext<PageEditorApi>(
   createPageEditorApi(() => undefined),
 );
 
-export function PageEditorProvider({ appId, children, nodeId }: PageEditorProviderProps) {
-  const initialState = createPageEditorState(appId, nodeId);
+export function PageEditorProvider({ children, nodeId }: PageEditorProviderProps) {
+  const initialState = createPageEditorState(nodeId);
   const [state, dispatch] = React.useReducer(pageEditorReducer, initialState);
   const api = React.useMemo(() => createPageEditorApi(dispatch), []);
 
   React.useEffect(() => {
-    api.replace(createPageEditorState(appId, nodeId));
-  }, [appId, api, nodeId]);
+    api.replace(createPageEditorState(nodeId));
+  }, [api, nodeId]);
 
   return (
     <PageEditorContext.Provider value={state}>

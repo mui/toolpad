@@ -1,6 +1,7 @@
 import type * as React from 'react';
-import type { TOOLPAD_COMPONENT } from './constants';
-import type { Branded } from './utils';
+import type { Branded } from '@mui/toolpad-utils/types';
+import type { SerializedError } from '@mui/toolpad-utils/errors';
+import type { TOOLPAD_COMPONENT } from './constants.js';
 
 export type NodeId = Branded<string, 'NodeId'>;
 
@@ -75,36 +76,46 @@ export type BindableAttrEntries = [string, BindableAttrValue<any>][];
 export type SlotType = 'single' | 'multiple' | 'layout';
 
 export interface ValueTypeBase {
-  type: 'string' | 'boolean' | 'number' | 'object' | 'array' | 'element' | 'event';
+  type: 'string' | 'boolean' | 'number' | 'object' | 'array' | 'element' | 'template' | 'event';
+  default?: unknown;
 }
 
 export interface StringValueType extends ValueTypeBase {
   type: 'string';
   enum?: string[];
+  default?: string;
 }
 
 export interface NumberValueType extends ValueTypeBase {
   type: 'number';
   minimum?: number;
   maximum?: number;
+  default?: number;
 }
 
 export interface BooleanValueType extends ValueTypeBase {
   type: 'boolean';
+  default?: boolean;
 }
 
 export interface ObjectValueType extends ValueTypeBase {
   type: 'object';
   schema?: string;
+  default?: any;
 }
 
 export interface ArrayValueType extends ValueTypeBase {
   type: 'array';
   schema?: string;
+  default?: any[];
 }
 
 export interface ElementValueType extends ValueTypeBase {
   type: 'element';
+}
+
+export interface TemplateValueType extends ValueTypeBase {
+  type: 'template';
 }
 
 export interface EventValueType extends ValueTypeBase {
@@ -141,20 +152,29 @@ export interface ArgControlSpec {
     | 'RowIdFieldSelect'; // Row id field specialized select
 }
 
-type PrimitiveValueType =
+export type PrimitiveValueType =
   | StringValueType
   | NumberValueType
   | BooleanValueType
   | ObjectValueType
   | ArrayValueType;
 
-export type PropValueType = PrimitiveValueType | ElementValueType | EventValueType;
+export type PropValueType =
+  | PrimitiveValueType
+  | ElementValueType
+  | TemplateValueType
+  | EventValueType;
 
 export type PropValueTypes<K extends string = string> = Partial<{
   [key in K]?: PropValueType;
 }>;
 
 export interface ArgTypeDefinition<P extends object = {}, V = P[keyof P]> {
+  /**
+   * A short explanatory text that'll be shown in the editor UI when this property is referenced.
+   * May contain Markdown.
+   */
+  helperText?: string;
   /**
    * To be used instead of the property name for UI purposes in the editor.
    */
@@ -173,6 +193,7 @@ export interface ArgTypeDefinition<P extends object = {}, V = P[keyof P]> {
   description?: string;
   /**
    * A default value for the property.
+   * @deprecated Use `typeDef.default` instead.
    */
   defaultValue?: V;
   /**
@@ -196,6 +217,8 @@ export interface ArgTypeDefinition<P extends object = {}, V = P[keyof P]> {
    * @returns {boolean} a boolean value indicating whether the property should be visible or not
    */
   visible?: ((props: P) => boolean) | boolean;
+
+  tsType?: string;
 }
 
 export type ArgTypeDefinitions<P extends object = {}> = {
@@ -212,12 +235,31 @@ export interface LiveBindingError {
   stack?: string;
 }
 
-export interface LiveBinding {
-  value?: any;
-  error?: LiveBindingError;
+/**
+ * Represents the actual state of an evaluated binding.
+ */
+export type BindingEvaluationResult<T = unknown> = {
+  /**
+   * The actual value.
+   */
+  value?: T;
+  /**
+   * The evaluation of the value resulted in error.
+   */
+  error?: Error;
+  /**
+   * The parts that this value depends on are still loading.
+   */
+  loading?: boolean;
+};
+
+export type LiveBinding = BindingEvaluationResult;
+
+export interface ScopeMetaPropField {
+  tsType?: string;
 }
 
-export type GlobalScopeMetaField = {
+export type ScopeMetaField = {
   description?: string;
   deprecated?: boolean | string;
   tsType?: string;
@@ -228,13 +270,14 @@ export type GlobalScopeMetaField = {
   | {
       kind: 'element';
       componentId: string;
+      props?: Record<string, ScopeMetaPropField>;
     }
   | {
       kind: 'query' | 'local';
     }
 );
 
-export type GlobalScopeMeta = Partial<Record<string, GlobalScopeMetaField>>;
+export type ScopeMeta = Partial<Record<string, ScopeMetaField>>;
 
 export type RuntimeEvents = {
   propUpdated: {
@@ -244,12 +287,13 @@ export type RuntimeEvents = {
   };
   pageStateUpdated: {
     pageState: Record<string, unknown>;
-    globalScopeMeta: GlobalScopeMeta;
+    globalScopeMeta: ScopeMeta;
   };
   pageBindingsUpdated: {
     bindings: LiveBindings;
   };
   screenUpdate: {};
+  ready: {};
   pageNavigationRequest: { pageNodeId: NodeId };
 };
 
@@ -258,6 +302,11 @@ export type RuntimeEvent = {
 }[keyof RuntimeEvents];
 
 export interface ComponentConfig<P extends object = {}> {
+  /**
+   * A short explanatory text that'll be shown in the editor UI when this component is referenced.
+   * May contain Markdown
+   */
+  helperText?: string;
   /**
    * Designates a property as "the error property". If Toolpad detects an error
    * on any of the inputs, it will forward it to this property.
@@ -302,14 +351,29 @@ export interface RuntimeError {
 
 export type FlowDirection = 'row' | 'column' | 'row-reverse' | 'column-reverse';
 
-export interface SerializedError {
-  message: string;
-  name: string;
-  stack?: string;
-  code?: unknown;
-}
-
 export type ExecFetchResult<T = any> = {
   data?: T;
   error?: SerializedError;
 };
+
+export type Serializable =
+  | string
+  | number
+  | boolean
+  | null
+  | undefined
+  | Serializable[]
+  | { [key: string]: Serializable }
+  | ((...args: Serializable[]) => Serializable);
+
+export interface JsRuntime {
+  evaluateExpression(code: string, globalScope: Record<string, unknown>): BindingEvaluationResult;
+}
+
+export type LocalScopeParams = Record<string, unknown>;
+
+export interface TemplateScopeParams {
+  i: number;
+}
+
+export type TemplateRenderer = ({ i }: TemplateScopeParams) => React.ReactNode;

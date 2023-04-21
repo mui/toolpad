@@ -1,10 +1,9 @@
 import * as React from 'react';
-import { styled, SxProps, Skeleton, Box, Divider } from '@mui/material';
+import { styled, SxProps, Box, Divider, Typography } from '@mui/material';
 import HierarchyExplorer from './HierarchyExplorer';
-import client from '../../api';
-import { useDom } from '../DomLoader';
+import { useDom } from '../AppState';
 import AppOptions from '../AppOptions';
-import AppNameEditable from '../AppOptions/AppNameEditable';
+import config from '../../config';
 
 const PagePanelRoot = styled('div')({
   display: 'flex',
@@ -12,19 +11,12 @@ const PagePanelRoot = styled('div')({
 });
 
 export interface ComponentPanelProps {
-  appId: string;
   className?: string;
   sx?: SxProps;
 }
 
-export default function PagePanel({ appId, className, sx }: ComponentPanelProps) {
-  const { data: app, isLoading } = client.useQuery('getApp', [appId]);
-  const [editingName, setEditingName] = React.useState<boolean>(false);
+export default function PagePanel({ className, sx }: ComponentPanelProps) {
   const { dom } = useDom();
-
-  const handleRename = React.useCallback(() => {
-    setEditingName(true);
-  }, []);
 
   return (
     <PagePanelRoot className={className} sx={sx}>
@@ -39,15 +31,12 @@ export default function PagePanel({ appId, className, sx }: ComponentPanelProps)
           alignItems: 'center',
         }}
       >
-        {isLoading || !app ? (
-          <Skeleton variant="text" width={70} />
-        ) : (
-          <AppNameEditable app={app} editing={editingName} setEditing={setEditingName} />
-        )}
-        {app ? <AppOptions app={app} dom={dom} redirectOnDelete onRename={handleRename} /> : null}
+        <Typography noWrap>{config.projectDir?.split(/[/\\]/).pop()}</Typography>
+
+        <AppOptions dom={dom} />
       </Box>
       <Divider />
-      <HierarchyExplorer appId={appId} />
+      <HierarchyExplorer />
     </PagePanelRoot>
   );
 }

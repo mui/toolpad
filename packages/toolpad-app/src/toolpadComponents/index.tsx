@@ -18,7 +18,7 @@ export const PAGE_ROW_COMPONENT_ID = 'PageRow';
 export const PAGE_COLUMN_COMPONENT_ID = 'PageColumn';
 export const STACK_COMPONENT_ID = 'Stack';
 
-const INTERNAL_COMPONENTS = new Map<string, ToolpadComponentDefinition>([
+export const INTERNAL_COMPONENTS = new Map<string, ToolpadComponentDefinition>([
   [PAGE_ROW_COMPONENT_ID, { displayName: 'Row', builtIn: 'PageRow', system: true }],
   [PAGE_COLUMN_COMPONENT_ID, { displayName: 'Column', builtIn: 'PageColumn', system: true }],
   [STACK_COMPONENT_ID, { displayName: 'Stack', builtIn: 'Stack', system: true }],
@@ -40,9 +40,13 @@ const INTERNAL_COMPONENTS = new Map<string, ToolpadComponentDefinition>([
   ['DataGrid', { displayName: 'Data grid', builtIn: 'DataGrid' }],
   ['TextField', { displayName: 'Text field', builtIn: 'TextField' }],
   ['DatePicker', { displayName: 'Date picker', builtIn: 'DatePicker' }],
+  ['FilePicker', { displayName: 'File picker', builtIn: 'FilePicker' }],
   ['Text', { displayName: 'Text', builtIn: 'Text' }],
   ['Select', { displayName: 'Select', builtIn: 'Select' }],
+  ['List', { displayName: 'List', builtIn: 'List' }],
   ['Paper', { displayName: 'Paper', builtIn: 'Paper' }],
+  ['Tabs', { displayName: 'Tabs', builtIn: 'Tabs' }],
+  ['Container', { displayName: 'Container', builtIn: 'Container' }],
 ]);
 
 function createCodeComponent(domNode: appDom.CodeComponentNode): ToolpadComponentDefinition {
@@ -58,7 +62,7 @@ export function getToolpadComponents(dom: appDom.AppDom): ToolpadComponentDefini
   return Object.fromEntries([
     ...INTERNAL_COMPONENTS.entries(),
     ...codeComponents.map((codeComponent) => [
-      `codeComponent.${codeComponent.id}`,
+      `codeComponent.${codeComponent.name}`,
       createCodeComponent(codeComponent),
     ]),
   ]);

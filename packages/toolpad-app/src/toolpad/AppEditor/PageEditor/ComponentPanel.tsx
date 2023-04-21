@@ -3,7 +3,8 @@ import { Tab, Box, styled } from '@mui/material';
 import * as React from 'react';
 import ComponentEditor from './ComponentEditor';
 import ThemeEditor from './ThemeEditor';
-import { ComponentPanelTab, usePageEditorApi, usePageEditorState } from './PageEditorProvider';
+import { useAppState, useAppStateApi } from '../../AppState';
+import { PageViewTab } from '../../../utils/domView';
 
 const classes = {
   panel: 'Toolpad_Panel',
@@ -25,15 +26,16 @@ export interface ComponentPanelProps {
 }
 
 export default function ComponentPanel({ className }: ComponentPanelProps) {
-  const state = usePageEditorState();
-  const api = usePageEditorApi();
+  const { currentView } = useAppState();
+  const appStateApi = useAppStateApi();
+  const currentTab = currentView.kind === 'page' ? currentView.tab : null;
 
-  const handleChange = (event: React.SyntheticEvent, newValue: ComponentPanelTab) =>
-    api.setComponentPanelTab(newValue);
+  const handleChange = (event: React.SyntheticEvent, newValue: PageViewTab) =>
+    appStateApi.setTab(newValue);
 
   return (
     <ComponentPanelRoot className={className}>
-      <TabContext value={state.componentPanelTab}>
+      <TabContext value={currentTab || 'component'}>
         <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
           <TabList onChange={handleChange} aria-label="Component options">
             <Tab label="Component" value="component" />

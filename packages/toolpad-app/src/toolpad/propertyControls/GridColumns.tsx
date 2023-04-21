@@ -25,15 +25,27 @@ import {
   SerializableGridColumn,
   SerializableGridColumns,
 } from '@mui/toolpad-components';
+import { generateUniqueString } from '@mui/toolpad-utils/strings';
 import type { EditorProps } from '../../types';
+import { useToolpadComponents } from '../AppEditor/toolpadComponents';
+import { ToolpadComponentDefinition } from '../../toolpadComponents';
+import { useDom } from '../AppState';
 
 // TODO: this import suggests leaky abstraction
 import { usePageEditorState } from '../AppEditor/PageEditor/PageEditorProvider';
-import { generateUniqueString } from '../../utils/strings';
 
 type GridAlignment = SerializableGridColumn['align'];
 
-const COLUMN_TYPES: string[] = ['string', 'number', 'date', 'dateTime', 'boolean', 'link', 'image'];
+const COLUMN_TYPES: string[] = [
+  'string',
+  'number',
+  'date',
+  'dateTime',
+  'boolean',
+  'link',
+  'image',
+  'codeComponent',
+];
 const ALIGNMENTS: GridAlignment[] = ['left', 'right', 'center'];
 
 function formatNumberOptionValue(numberFormat: NumberFormat | undefined) {
@@ -61,6 +73,13 @@ function GridColumnsPropEditor({
 }: EditorProps<SerializableGridColumns>) {
   const { bindings } = usePageEditorState();
   const [editedIndex, setEditedIndex] = React.useState<number | null>(null);
+  const { dom } = useDom();
+  const toolpadComponents = useToolpadComponents(dom);
+  const codeComponents: ToolpadComponentDefinition[] = React.useMemo(() => {
+    return Object.values(toolpadComponents)
+      .filter(Boolean)
+      .filter((definition) => !definition.builtIn);
+  }, [toolpadComponents]);
 
   const editedColumn = typeof editedIndex === 'number' ? value[editedIndex] : null;
 
@@ -180,6 +199,7 @@ function GridColumnsPropEditor({
                     handleColumnChange({ ...editedColumn, field: event.target.value })
                   }
                 />
+
                 <TextField
                   label="header"
                   value={editedColumn.headerName}
@@ -188,6 +208,37 @@ function GridColumnsPropEditor({
                     handleColumnChange({ ...editedColumn, headerName: event.target.value })
                   }
                 />
+
+                <TextField
+                  select
+                  fullWidth
+                  label="align"
+                  value={editedColumn.align ?? ''}
+                  disabled={disabled}
+                  onChange={(event) =>
+                    handleColumnChange({
+                      ...editedColumn,
+                      align: (event.target.value as GridAlignment) || undefined,
+                    })
+                  }
+                >
+                  {ALIGNMENTS.map((alignment) => (
+                    <MenuItem key={alignment} value={alignment}>
+                      {alignment}
+                    </MenuItem>
+                  ))}
+                </TextField>
+
+                <TextField
+                  label="width"
+                  type="number"
+                  value={editedColumn.width}
+                  disabled={disabled}
+                  onChange={(event) =>
+                    handleColumnChange({ ...editedColumn, width: Number(event.target.value) })
+                  }
+                />
+
                 <TextField
                   select
                   fullWidth
@@ -208,6 +259,7 @@ function GridColumnsPropEditor({
                     </MenuItem>
                   ))}
                 </TextField>
+
                 {editedColumn.type === 'number' ? (
                   <React.Fragment>
                     <TextField
@@ -274,34 +326,32 @@ function GridColumnsPropEditor({
                   </React.Fragment>
                 ) : null}
 
-                <TextField
-                  select
-                  fullWidth
-                  label="align"
-                  value={editedColumn.align ?? ''}
-                  disabled={disabled}
-                  onChange={(event) =>
-                    handleColumnChange({
-                      ...editedColumn,
-                      align: (event.target.value as GridAlignment) || undefined,
-                    })
-                  }
-                >
-                  {ALIGNMENTS.map((alignment) => (
-                    <MenuItem key={alignment} value={alignment}>
-                      {alignment}
-                    </MenuItem>
-                  ))}
-                </TextField>
-                <TextField
-                  label="width"
-                  type="number"
-                  value={editedColumn.width}
-                  disabled={disabled}
-                  onChange={(event) =>
-                    handleColumnChange({ ...editedColumn, width: Number(event.target.value) })
-                  }
-                />
+                {editedColumn.type === 'codeComponent' ? (
+                  <TextField
+                    select
+                    required
+                    fullWidth
+                    label="Custom component"
+                    value={editedColumn.codeComponent ?? ''}
+                    disabled={disabled}
+                    error={!editedColumn.codeComponent}
+                    helperText={
+                      editedColumn.codeComponent ? undefined : 'Please select a component'
+                    }
+                    onChange={(event) =>
+                      handleColumnChange({
+                        ...editedColumn,
+                        codeComponent: event.target.value,
+                      })
+                    }
+                  >
+                    {codeComponents.map(({ displayName }) => (
+                      <MenuItem key={displayName} value={displayName}>
+                        {displayName}
+                      </MenuItem>
+                    ))}
+                  </TextField>
+                ) : null}
               </Stack>
             </React.Fragment>
           ) : (

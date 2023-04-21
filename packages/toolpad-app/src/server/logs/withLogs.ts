@@ -4,7 +4,7 @@ import logger from './logger';
 export const withReqResLogs =
   (apiHandler: NextApiHandler) =>
   (req: NextApiRequest, res: NextApiResponse): unknown | Promise<unknown> => {
-    logger.info(
+    logger.trace(
       {
         key: 'apiReqRes',
         req,

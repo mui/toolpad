@@ -1,10 +1,5 @@
 import * as React from 'react';
-import {
-  BindableAttrEntries,
-  BindableAttrValue,
-  GlobalScopeMeta,
-  LiveBinding,
-} from '@mui/toolpad-core';
+import { BindableAttrEntries, BindableAttrValue, ScopeMeta, LiveBinding } from '@mui/toolpad-core';
 import {
   Box,
   Button,
@@ -17,12 +12,11 @@ import {
   Typography,
   Alert,
   styled,
-  Checkbox,
-  FormControlLabel,
-  FormGroup,
 } from '@mui/material';
 import { Controller, useForm } from 'react-hook-form';
 import { TabContext, TabList } from '@mui/lab';
+import { useBrowserJsRuntime } from '@mui/toolpad-core/jsBrowserRuntime';
+import { useServerJsRuntime } from '@mui/toolpad-core/jsServerRuntime';
 import {
   ClientDataSource,
   ConnectionEditorProps,
@@ -67,11 +61,7 @@ import QueryPreview from '../QueryPreview';
 
 const HTTP_METHODS = ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'HEAD'];
 
-const QUERY_SCOPE_META: GlobalScopeMeta = {
-  query: {
-    deprecated: 'Use parameters variable instead',
-    description: 'Parameters that can be bound to app scope variables',
-  },
+const QUERY_SCOPE_META: ScopeMeta = {
   parameters: {
     description: 'Parameters that can be bound to app scope variables',
   },
@@ -297,13 +287,6 @@ function QueryEditor({
     [setInput],
   );
 
-  const handleRunInBrowserChange = React.useCallback(
-    (event: React.ChangeEvent<HTMLInputElement>) => {
-      setInput((existing) => appDom.setQueryProp(existing, 'browser', event.target.checked));
-    },
-    [setInput],
-  );
-
   const handleTransformEnabledChange = React.useCallback(
     (transformEnabled: boolean) => {
       setInput((existing) => appDom.setQueryProp(existing, 'transformEnabled', transformEnabled));
@@ -350,7 +333,11 @@ function QueryEditor({
 
   const paramsEntries = input.params || EMPTY_PARAMS;
 
+  const jsBrowserRuntime = useBrowserJsRuntime();
+  const jsServerRuntime = useServerJsRuntime();
+
   const paramsEditorLiveValue = useEvaluateLiveBindingEntries({
+    jsRuntime: jsBrowserRuntime,
     input: paramsEntries,
     globalScope,
   });
@@ -362,27 +349,25 @@ function QueryEditor({
 
   const queryScope = React.useMemo(
     () => ({
-      // TODO mark query as @deprecated remove after v1
-      query: previewParams,
       parameters: previewParams,
     }),
     [previewParams],
   );
 
   const liveUrl: LiveBinding = useEvaluateLiveBinding({
-    server: true,
+    jsRuntime: jsServerRuntime,
     input: urlValue,
     globalScope: queryScope,
   });
 
   const liveSearchParams = useEvaluateLiveBindingEntries({
-    server: true,
+    jsRuntime: jsServerRuntime,
     input: input.attributes.query.value.searchParams || [],
     globalScope: queryScope,
   });
 
   const liveHeaders = useEvaluateLiveBindingEntries({
-    server: true,
+    jsRuntime: jsServerRuntime,
     input: input.attributes.query.value.headers || [],
     globalScope: queryScope,
   });
@@ -404,13 +389,18 @@ function QueryEditor({
     preview,
     runPreview: handleRunPreview,
     isLoading: previewIsLoading,
-  } = useQueryPreview(fetchPreview, input.attributes.query.value, previewParams, {
-    onPreview(result) {
-      setPreviewHar((existing) =>
-        result.har ? mergeHar(createHarLog(), existing, result.har) : existing,
-      );
+  } = useQueryPreview(
+    fetchPreview,
+    input.attributes.query.value,
+    previewParams as Record<string, string>,
+    {
+      onPreview(result) {
+        setPreviewHar((existing) =>
+          result.har ? mergeHar(createHarLog(), existing, result.har) : existing,
+        );
+      },
     },
-  });
+  );
 
   const handleHarClear = React.useCallback(() => setPreviewHar(createHarLog()), []);
 
@@ -422,23 +412,7 @@ function QueryEditor({
   return (
     <SplitPane split="vertical" size="50%" allowResize>
       <SplitPane split="horizontal" size={85} primary="second" allowResize>
-        <QueryInputPanel
-          onRunPreview={handleRunPreview}
-          actions={
-            <FormGroup>
-              <FormControlLabel
-                control={
-                  <Checkbox
-                    checked={isBrowserSide}
-                    onChange={handleRunInBrowserChange}
-                    disabled={config.isDemo}
-                  />
-                }
-                label="Run in the browser"
-              />
-            </FormGroup>
-          }
-        >
+        <QueryInputPanel onRunPreview={handleRunPreview}>
           <Stack gap={2} sx={{ px: 3, pt: 1 }}>
             <Typography>Query</Typography>
             <Box sx={{ display: 'flex', flexDirection: 'row', gap: 1 }}>
@@ -458,7 +432,7 @@ function QueryEditor({
                 globalScope={queryScope}
                 globalScopeMeta={QUERY_SCOPE_META}
                 sx={{ flex: 1 }}
-                server
+                jsRuntime={jsServerRuntime}
                 label="url"
                 propType={{ type: 'string' }}
                 renderControl={(props) => <UrlControl baseUrl={baseUrl} {...props} />}
@@ -484,6 +458,7 @@ function QueryEditor({
                     globalScope={queryScope}
                     globalScopeMeta={QUERY_SCOPE_META}
                     liveValue={liveSearchParams}
+                    jsRuntime={jsServerRuntime}
                   />
                 </TabPanel>
                 <TabPanel disableGutters value="body">
@@ -502,6 +477,7 @@ function QueryEditor({
                     globalScope={queryScope}
                     globalScopeMeta={QUERY_SCOPE_META}
                     liveValue={liveHeaders}
+                    jsRuntime={jsServerRuntime}
                   />
                 </TabPanel>
                 <TabPanel disableGutters value="response">
@@ -545,6 +521,7 @@ function QueryEditor({
             globalScope={globalScope}
             globalScopeMeta={globalScopeMeta}
             liveValue={paramsEditorLiveValue}
+            jsRuntime={jsBrowserRuntime}
           />
         </Box>
       </SplitPane>

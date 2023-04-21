@@ -12,14 +12,23 @@ import ContactPageIcon from '@mui/icons-material/ContactPage';
 import TabIcon from '@mui/icons-material/Tab';
 import TuneIcon from '@mui/icons-material/Tune';
 import ToggleOnIcon from '@mui/icons-material/ToggleOn';
+import ListIcon from '@mui/icons-material/List';
 import RadioButtonCheckedIcon from '@mui/icons-material/RadioButtonChecked';
 import DateRangeIcon from '@mui/icons-material/DateRange';
 import CheckBoxIcon from '@mui/icons-material/CheckBox';
 import DashboardCustomizeSharpIcon from '@mui/icons-material/DashboardCustomizeSharp';
 import ManageSearchIcon from '@mui/icons-material/ManageSearch';
 import AddIcon from '@mui/icons-material/Add';
+import UploadFileIcon from '@mui/icons-material/UploadFile';
 import NotesIcon from '@mui/icons-material/Notes';
+import AutoAwesomeMosaicIcon from '@mui/icons-material/AutoAwesomeMosaic';
+import InsightsIcon from '@mui/icons-material/Insights';
 import { SvgIconProps } from '@mui/material/SvgIcon';
+import PlaceIcon from '@mui/icons-material/Place';
+import ViewSidebarIcon from '@mui/icons-material/ViewSidebar';
+import MoodIcon from '@mui/icons-material/Mood';
+import HtmlIcon from '@mui/icons-material/Html';
+import { ButtonBase } from '@mui/material';
 
 const iconMap = new Map<string, React.ComponentType<SvgIconProps>>([
   ['Autocomplete', ManageSearchIcon],
@@ -29,6 +38,7 @@ const iconMap = new Map<string, React.ComponentType<SvgIconProps>>([
   ['DataGrid', GridOnIcon],
   ['TextField', Crop75Icon],
   ['Select', ArrowDropDownCircleIcon],
+  ['List', ListIcon],
   ['Paper', LayersIcon],
   ['Form', DnsIcon],
   ['Card', ContactPageIcon],
@@ -37,9 +47,17 @@ const iconMap = new Map<string, React.ComponentType<SvgIconProps>>([
   ['Switch', ToggleOnIcon],
   ['Radio', RadioButtonCheckedIcon],
   ['DatePicker', DateRangeIcon],
+  ['FilePicker', UploadFileIcon],
   ['Checkbox', CheckBoxIcon],
   ['CodeComponent', DashboardCustomizeSharpIcon],
   ['CreateNew', AddIcon],
+  ['Tabs', TabIcon],
+  ['Container', AutoAwesomeMosaicIcon],
+  ['Chart', InsightsIcon],
+  ['Map', PlaceIcon],
+  ['Drawer', ViewSidebarIcon],
+  ['Icon', MoodIcon],
+  ['Html', HtmlIcon],
 ]);
 
 type ComponentItemKind = 'future' | 'builtIn' | 'create' | 'custom';
@@ -79,6 +97,7 @@ function ComponentCatalogItem({
       onClick={onClick}
       draggable={draggable}
       onDragStart={onDragStart}
+      component={ButtonBase}
       sx={{
         display: 'flex',
         flexDirection: 'column',
@@ -92,6 +111,9 @@ function ComponentCatalogItem({
         borderColor: 'divider',
         borderStyle: kind === 'create' ? 'dashed' : 'solid',
         color: 'text.secondary',
+        backgroundColor: 'paper',
+        // https://stackoverflow.com/q/22922761
+        transform: 'translate(0, 0)',
         '&:hover': {
           backgroundColor: 'action.hover',
         },

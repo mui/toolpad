@@ -8,7 +8,7 @@ import SelectControl from './select';
 function ColumnSelect({ nodeId, ...props }: EditorProps<string>) {
   const { bindings } = usePageEditorState();
   const columnsValue = nodeId && bindings[`${nodeId}.props.columns`];
-  const definedColumns: GridColDef[] = columnsValue?.value;
+  const definedColumns: GridColDef[] = columnsValue?.value as any;
 
   const newPropType: PropValueType = React.useMemo(() => {
     const columnNames = definedColumns?.map((column) => column.field);

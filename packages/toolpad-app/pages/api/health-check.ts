@@ -1,6 +1,6 @@
 import { NextApiHandler } from 'next';
 import prettyBytes from 'pretty-bytes';
-import { mapValues } from '../../src/utils/collections';
+import { mapValues } from '@mui/toolpad-utils/collections';
 
 interface HealthCheck {
   gitSha1: string | null;

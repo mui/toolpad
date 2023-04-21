@@ -1,18 +1,19 @@
 import * as React from 'react';
 import { render, waitFor as waitForOrig, screen, fireEvent, act } from '@testing-library/react';
 import '@testing-library/jest-dom';
-import { LiveBindings } from '@mui/toolpad-core';
-import { setEventHandler } from '@mui/toolpad-core/runtime';
+import { LiveBindings, RuntimeEvents } from '@mui/toolpad-core';
 import ToolpadApp from './ToolpadApp';
 import * as appDom from '../appDom';
 import createRuntimeState from '../createRuntimeState';
+import { bridge } from '../canvas/ToolpadBridge';
+import { BridgeContext } from '../canvas/BridgeContext';
+import loadComponents from './loadDomComponents';
 
 // More sensible default for these tests
 const waitFor: typeof waitForOrig = (waiter, options) =>
   waitForOrig(waiter, { timeout: 10000, ...options });
 
 function renderPage(initPage: (dom: appDom.AppDom, page: appDom.PageNode) => appDom.AppDom) {
-  const appId = '12345';
   const version = 'preview';
 
   let dom = appDom.createDom();
@@ -29,16 +30,19 @@ function renderPage(initPage: (dom: appDom.AppDom, page: appDom.PageNode) => app
 
   window.history.replaceState({}, 'Test page', `/toolpad/pages/${page.id}`);
 
-  const state = createRuntimeState({ appId, dom });
+  const state = createRuntimeState({ dom });
 
-  return render(<ToolpadApp state={state} version={version} basename="toolpad" />);
+  return render(
+    <BridgeContext.Provider value={bridge}>
+      <ToolpadApp
+        loadComponents={loadComponents}
+        state={state}
+        version={version}
+        basename="toolpad"
+      />
+    </BridgeContext.Provider>,
+  );
 }
-
-afterEach(() => {
-  // Make sure to clean up events after each test
-  const cleanup = setEventHandler(window, () => {});
-  cleanup();
-});
 
 test(`Static Text`, async () => {
   renderPage((dom, page) => {
@@ -70,7 +74,7 @@ test(`Default Text`, async () => {
 
   await waitFor(() => screen.getByTestId('page-root'));
 
-  const text = screen.getByText('', { selector: 'p' });
+  const text = screen.getByText('text', { selector: 'p' });
   expect(text).toHaveClass('MuiTypography-root');
 });
 
@@ -131,11 +135,10 @@ test(`Databinding errors`, async () => {
   const consoleErrorMock = jest.spyOn(console, 'error').mockImplementation();
   let bindings: LiveBindings | undefined;
 
-  const cleanup = setEventHandler(window, (event) => {
-    if (event.type === 'pageBindingsUpdated') {
-      bindings = event.bindings;
-    }
-  });
+  const bindingsUpdateHandler = (event: RuntimeEvents['pageBindingsUpdated']) => {
+    bindings = event.bindings;
+  };
+  bridge.canvasEvents.on('pageBindingsUpdated', bindingsUpdateHandler);
 
   try {
     let nonExisting: appDom.ElementNode;
@@ -203,7 +206,7 @@ test(`Databinding errors`, async () => {
 
     expect(consoleErrorMock).toHaveBeenCalled();
   } finally {
-    cleanup();
+    bridge.canvasEvents.off('pageBindingsUpdated', bindingsUpdateHandler);
     consoleErrorMock.mockRestore();
   }
 });

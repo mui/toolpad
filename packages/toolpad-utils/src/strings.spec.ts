@@ -1,5 +1,5 @@
 import { describe, test, expect } from '@jest/globals';
-import { findImports } from './strings';
+import { findImports, capitalize, uncapitalize, pascalCase, camelCase } from './strings';
 
 describe('findImports', () => {
   test('finds all imports', () => {
@@ -33,5 +33,57 @@ import * from './smdn';
     expect(imports[9]).toBe('module-9');
     expect(imports[10]).toBe('module-10');
     expect(imports[11]).toBe('./smdn');
+  });
+});
+
+describe('capitalize', () => {
+  test.each([
+    ['foo', 'Foo'],
+    ['FOO', 'FOO'],
+    ['fOO', 'FOO'],
+    ['', ''],
+    ['a', 'A'],
+    ['A', 'A'],
+    ['-', '-'],
+  ])('should convert %p to %p', (got, expected) => {
+    expect(capitalize(got)).toEqual(expected);
+  });
+});
+
+describe('uncapitalize', () => {
+  test.each([
+    ['foo', 'foo'],
+    ['FOO', 'fOO'],
+    ['fOO', 'fOO'],
+    ['', ''],
+    ['a', 'a'],
+    ['A', 'a'],
+    ['-', '-'],
+  ])('should convert %p to %p', (got, expected) => {
+    expect(uncapitalize(got)).toEqual(expected);
+  });
+});
+
+describe('pascalCase', () => {
+  test.each([
+    [['foo'], 'Foo'],
+    [['foo', 'bar'], 'FooBar'],
+    [['FOO', 'BAR'], 'FooBar'],
+    [['foo', '-', 'bar'], 'Foo-Bar'],
+    [[''], ''],
+  ])('should convert %p to %p', (got, expected) => {
+    expect(pascalCase(...got)).toEqual(expected);
+  });
+});
+
+describe('camelCase', () => {
+  test.each([
+    [['foo'], 'foo'],
+    [['foo', 'bar'], 'fooBar'],
+    [['foo', '-', 'bar'], 'foo-Bar'],
+    [['foo', 'bar', 'baz'], 'fooBarBaz'],
+    [[''], ''],
+  ])('should convert %p to %p', (got, expected) => {
+    expect(camelCase(...got)).toEqual(expected);
   });
 });

@@ -1,9 +1,9 @@
-import { NodeId, ExecFetchResult, SerializedError } from '@mui/toolpad-core';
+import { NodeId, ExecFetchResult } from '@mui/toolpad-core';
 import { createServerJsRuntime } from '@mui/toolpad-core/jsServerRuntime';
 import express from 'express';
 import cors from 'cors';
 import invariant from 'invariant';
-import { errorFrom, serializeError } from '@mui/toolpad-core/utils/errors';
+import { errorFrom, serializeError, SerializedError } from '@mui/toolpad-utils/errors';
 import { ServerDataSource } from '../types';
 import serverDataSources from '../toolpadDataSources/server';
 import * as appDom from '../appDom';

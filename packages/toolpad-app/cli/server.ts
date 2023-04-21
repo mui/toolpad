@@ -7,7 +7,7 @@ import { createServer } from 'http';
 import { execaNode } from 'execa';
 import getPort from 'get-port';
 import { createProxyMiddleware } from 'http-proxy-middleware';
-import { mapValues } from '@mui/toolpad-core/utils/collections';
+import { mapValues } from '@mui/toolpad-utils/collections';
 import prettyBytes from 'pretty-bytes';
 import { createProdHandler } from '../src/server/toolpadAppServer';
 import { getUserProjectRoot } from '../src/server/localMode';

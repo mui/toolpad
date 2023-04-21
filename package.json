@@ -42,6 +42,7 @@
     "toolpad": "toolpad"
   },
   "devDependencies": {
+    "@jest/globals": "^29.5.0",
     "@mui/monorepo": "https://github.com/mui/material-ui.git",
     "@next/eslint-plugin-next": "13.3.0",
     "@playwright/test": "^1.32.3",
@@ -83,6 +84,7 @@
     "recharts": "^2.5.0",
     "regenerator-runtime": "^0.13.11",
     "rimraf": "^5.0.0",
+    "ts-jest": "^29.1.0",
     "typescript": "^5.0.4",
     "yarn-deduplicate": "^6.0.1"
   },

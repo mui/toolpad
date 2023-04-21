@@ -1,5 +1,5 @@
 import { NextApiRequest, NextApiResponse } from 'next';
-import { errorFrom } from '../../utils/errors';
+import { errorFrom } from '@mui/toolpad-utils/errors';
 
 function getReqLoggableIPAddress(req: NextApiRequest): string | null {
   const forwardedHeader = req.headers['x-forwarded-for'];

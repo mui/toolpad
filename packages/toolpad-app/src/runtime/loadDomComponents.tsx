@@ -5,14 +5,14 @@ import {
   createComponent,
   createToolpadComponentThatThrows,
 } from '@mui/toolpad-core';
-import { resolveValues } from '@mui/toolpad-core/utils/promises';
+import { resolveValues } from '@mui/toolpad-utils/promises';
 import * as ReactIs from 'react-is';
 import * as React from 'react';
 import * as ReactDom from 'react-dom';
+import { mapValues } from '@mui/toolpad-utils/collections';
+import { errorFrom } from '@mui/toolpad-utils/errors';
 import { RuntimeState, CompiledModule } from '../types';
-import { mapValues } from '../utils/collections';
 import { ToolpadComponentDefinitions, getToolpadComponents } from '../toolpadComponents';
-import { errorFrom } from '../utils/errors';
 
 async function resolveMapValues(
   input: Map<string, Promise<unknown>>,

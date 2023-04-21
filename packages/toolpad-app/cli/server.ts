@@ -41,6 +41,11 @@ async function main() {
     expressNext();
   });
 
+  app.get('/', (req, res) => {
+    const redirectUrl = cmd === 'dev' ? '/_toolpad' : '/prod';
+    res.redirect(302, redirectUrl);
+  });
+
   app.get('/health-check', (req, res) => {
     const memoryUsage = process.memoryUsage();
     res.json({

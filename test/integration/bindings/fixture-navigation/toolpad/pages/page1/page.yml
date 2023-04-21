@@ -2,7 +2,7 @@ apiVersion: v1
 kind: page
 spec:
   id: ld03upm
-  title: page
+  title: page1
   content:
     - component: PageRow
       name: pageRow

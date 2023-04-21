@@ -41,7 +41,7 @@ async function main() {
     expressNext();
   });
 
-  app.use('/health-check', (req, res) => {
+  app.get('/health-check', (req, res) => {
     const memoryUsage = process.memoryUsage();
     res.json({
       gitSha1: process.env.GIT_SHA1 || null,
@@ -133,7 +133,7 @@ async function main() {
   const port = Number(process.env.TOOLPAD_PORT);
   let editorNextApp: ReturnType<typeof next> | undefined;
 
-  if (cmd === 'dev') {
+  if (cmd === 'dev' && !viteRuntime) {
     const dir = process.env.TOOLPAD_DIR;
     const dev = !!process.env.TOOLPAD_NEXT_DEV;
 
@@ -164,9 +164,9 @@ async function main() {
         res.end('internal server error');
       }
     });
-
-    await listen(httpServer, port);
   }
+
+  await listen(httpServer, port);
 
   // eslint-disable-next-line no-console
   console.log(

@@ -1,0 +1,78 @@
+apiVersion: v1
+kind: page
+spec:
+  id: 5w03xpv
+  title: form
+  display: shell
+  content:
+    - component: PageRow
+      name: pageRow
+      children:
+        - component: Form
+          name: form
+          props:
+            hasResetButton: true
+            onSubmit:
+              $$jsExpressionAction: button.content = 'Submitted'
+          children:
+            - component: PageRow
+              name: pageRow1
+              children:
+                - component: PageColumn
+                  name: pageColumn
+                  layout:
+                    columnSize: 1
+                  children:
+                    - component: TextField
+                      name: textField
+                      props:
+                        label: name
+                        name: name
+                        defaultValue: Default Name
+                        minLength: 3
+                    - component: DatePicker
+                      name: datePicker
+                      props:
+                        name: date
+                        label: date
+                        isRequired: true
+                    - component: Select
+                      name: select
+                      props:
+                        label: option
+                        name: option
+                        options:
+                          - option 1
+                          - option 2
+                          - option 3
+                        isInvalid:
+                          $$jsExpression: |
+                            select.value === "option 1"
+                    - component: FilePicker
+                      name: filePicker
+                      props:
+                        name: file
+                        label: file
+    - component: PageRow
+      name: pageRow2
+      children:
+        - component: Text
+          name: text
+          props:
+            value:
+              $$jsExpression: |
+                `My form data: ${JSON.stringify(form.value || {})}`
+    - component: PageRow
+      name: pageRow3
+      children:
+        - component: Button
+          name: button
+    - component: PageRow
+      name: pageRow4
+      children:
+        - component: TextField
+          name: textField1
+          props:
+            name: outside
+            maxLength: 3
+            label: outside

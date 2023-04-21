@@ -438,12 +438,9 @@ export default function RenderOverlay({ bridge }: RenderOverlayProps) {
       return new Set();
     }
     return new Set(
-      [
-        ...appDom
-          .getPageAncestors(dom, selectedNode)
-          .filter((ancestor) => appDom.isElement(ancestor) && isPageLayoutComponent(ancestor)),
-        selectedNode,
-      ].map((ancestor) => ancestor.id),
+      [...appDom.getPageAncestors(dom, selectedNode), selectedNode].map(
+        (interactiveNode) => interactiveNode.id,
+      ),
     );
   }, [dom, selectedNode]);
 

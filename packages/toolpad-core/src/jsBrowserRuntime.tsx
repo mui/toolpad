@@ -1,6 +1,6 @@
+import { errorFrom } from '@mui/toolpad-utils/errors';
 import { TOOLPAD_LOADING_MARKER } from './jsRuntime.js';
 import { BindingEvaluationResult, JsRuntime } from './types.js';
-import { errorFrom } from './utils/errors.js';
 
 function createBrowserRuntime(): JsRuntime {
   let iframe: HTMLIFrameElement;

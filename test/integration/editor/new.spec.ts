@@ -1,5 +1,7 @@
+import path from 'path';
 import { test, expect } from '../../playwright/localTest';
 import { ToolpadEditor } from '../../models/ToolpadEditor';
+import { fileExists, folderExists } from '../../../packages/toolpad-app/src/utils/fs';
 
 test.use({
   localAppConfig: {
@@ -42,4 +44,36 @@ test('can create new component', async ({ page }) => {
 
   await editorModel.createPage('somePage');
   await editorModel.createComponent('someComponent');
+});
+
+test('can create/delete page', async ({ page, localApp }) => {
+  const editorModel = new ToolpadEditor(page);
+
+  await editorModel.goto();
+
+  await editorModel.createPage('somePage');
+
+  const pageMenuItem = editorModel.getHierarchyItem('pages', 'somePage');
+  const pageFolder = path.resolve(localApp.dir, './toolpad/pages/somePage');
+  const pageFile = path.resolve(pageFolder, './page.yml');
+
+  await expect(pageMenuItem).toBeVisible();
+
+  await expect.poll(async () => folderExists(pageFolder)).toBe(true);
+  await expect.poll(async () => fileExists(pageFile)).toBe(true);
+
+  await pageMenuItem.hover();
+
+  await pageMenuItem.getByRole('button', { name: 'Open hierarchy menu' }).click();
+
+  await page.getByRole('menuitem', { name: 'Delete' }).click();
+
+  await page
+    .getByRole('dialog', { name: 'Confirm' })
+    .getByRole('button', { name: 'Delete' })
+    .click();
+
+  await expect(pageMenuItem).toBeHidden();
+
+  await expect.poll(async () => folderExists(pageFolder)).toBe(false);
 });

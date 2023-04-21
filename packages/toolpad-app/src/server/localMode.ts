@@ -10,10 +10,11 @@ import { glob } from 'glob';
 import * as chokidar from 'chokidar';
 import { debounce } from 'lodash-es';
 import cuid from 'cuid';
-import Emitter from '@mui/toolpad-core/utils/Emitter';
+import { Emitter } from '@mui/toolpad-utils/events';
+import { errorFrom } from '@mui/toolpad-utils/errors';
+import { filterValues, hasOwnProperty, mapValues } from '@mui/toolpad-utils/collections';
 import config from '../config';
 import * as appDom from '../appDom';
-import { errorFrom } from '../utils/errors';
 import { migrateUp } from '../appDom/migrations';
 import insecureHash from '../utils/insecureHash';
 import {
@@ -40,7 +41,6 @@ import {
   themeSchema,
   API_VERSION,
 } from './schema';
-import { filterValues, hasOwnProperty, mapValues } from '../utils/collections';
 import { format } from '../utils/prettier';
 import {
   Body as AppDomFetchBody,
@@ -75,6 +75,18 @@ function getComponentsFolder(root: string): string {
 function getPagesFolder(root: string): string {
   const toolpadFolder = getToolpadFolder(root);
   return path.join(toolpadFolder, './pages');
+}
+
+function getPageFolder(root: string, name: string): string {
+  const pagesFolder = getPagesFolder(root);
+  const pageFolder = path.resolve(pagesFolder, name);
+  return pageFolder;
+}
+
+function getPageFile(root: string, name: string): string {
+  const pageFolder = getPageFolder(root, name);
+  const pageFileName = path.resolve(pageFolder, 'page.yml');
+  return pageFileName;
 }
 
 function getComponentFilePath(componentsFolder: string, componentName: string): string {
@@ -224,6 +236,12 @@ export async function createComponent(name: string) {
   await writeFileRecursive(filePath, content, { encoding: 'utf-8' });
 }
 
+export async function deletePage(name: string) {
+  const root = getUserProjectRoot();
+  const pageFolder = getPageFolder(root, name);
+  await fs.rm(pageFolder, { force: true, recursive: true });
+}
+
 class Lock {
   pending: Promise<any> | null = null;
 
@@ -288,7 +306,7 @@ async function initGitignore(root: string) {
   const generatedGitignorePath = path.resolve(projectFolder, '.gitignore');
   if (!(await fileExists(generatedGitignorePath))) {
     // eslint-disable-next-line no-console
-    console.log(`${chalk.blue('info')}  - Initializing Toolpad queries file`);
+    console.log(`${chalk.blue('info')}  - Initializing .gitignore file`);
     await writeFileRecursive(generatedGitignorePath, DEFAULT_GENERATED_GITIGNORE_FILE_CONTENT, {
       encoding: 'utf-8',
     });
@@ -861,11 +879,10 @@ function extractPagesFromDom(dom: appDom.AppDom): ExtractedPages {
   return { pages, dom };
 }
 
-async function writePagesToFiles(pagesFolder: string, pages: PagesContent) {
+async function writePagesToFiles(root: string, pages: PagesContent) {
   await Promise.all(
     Object.entries(pages).map(async ([name, page]) => {
-      const pageFolder = path.resolve(pagesFolder, name);
-      const pageFileName = path.resolve(pageFolder, 'page.yml');
+      const pageFileName = getPageFile(root, name);
       await updateYamlFile(pageFileName, page);
     }),
   );
@@ -920,9 +937,8 @@ function extractThemeContentFromDom(dom: appDom.AppDom): Theme | null {
 
 async function writeDomToDisk(dom: appDom.AppDom): Promise<void> {
   const root = getUserProjectRoot();
-  const pagesFolder = getPagesFolder(root);
   const { pages: pagesContent } = extractPagesFromDom(dom);
-  await Promise.all([writePagesToFiles(pagesFolder, pagesContent)]);
+  await Promise.all([writePagesToFiles(root, pagesContent)]);
 }
 
 export async function openCodeEditor(file: string): Promise<void> {
@@ -981,8 +997,7 @@ async function writeProjectFolder(
   folder: ToolpadProjectFolder,
   writeComponents: boolean = false,
 ): Promise<void> {
-  const pagesFolder = getPagesFolder(root);
-  await writePagesToFiles(pagesFolder, folder.pages);
+  await writePagesToFiles(root, folder.pages);
   await writeThemeFile(root, folder.theme);
   if (writeComponents) {
     const componentsFolder = getComponentsFolder(root);

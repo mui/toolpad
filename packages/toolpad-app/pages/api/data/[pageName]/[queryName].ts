@@ -1,13 +1,13 @@
 import { NextApiHandler } from 'next';
 import Cors from 'cors';
-import { ExecFetchResult, SerializedError } from '@mui/toolpad-core';
-import { asArray } from '@mui/toolpad-core/utils/collections';
+import { ExecFetchResult } from '@mui/toolpad-core';
+import { asArray } from '@mui/toolpad-utils/collections';
+import { SerializedError, errorFrom, serializeError } from '@mui/toolpad-utils/errors';
 import invariant from 'invariant';
 import { withReqResLogs } from '../../../../src/server/logs/withLogs';
 import { execQuery } from '../../../../src/server/data';
 import initMiddleware from '../../../../src/server/initMiddleware';
 import * as appDom from '../../../../src/appDom';
-import { errorFrom, serializeError } from '../../../../src/utils/errors';
 import { loadDom } from '../../../../src/server/liveProject';
 
 // Initialize the cors middleware

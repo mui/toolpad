@@ -25,6 +25,7 @@ import {
   SerializableGridColumn,
   SerializableGridColumns,
 } from '@mui/toolpad-components';
+import { generateUniqueString } from '@mui/toolpad-utils/strings';
 import type { EditorProps } from '../../types';
 import { useToolpadComponents } from '../AppEditor/toolpadComponents';
 import { ToolpadComponentDefinition } from '../../toolpadComponents';
@@ -32,7 +33,6 @@ import { useDom } from '../AppState';
 
 // TODO: this import suggests leaky abstraction
 import { usePageEditorState } from '../AppEditor/PageEditor/PageEditorProvider';
-import { generateUniqueString } from '../../utils/strings';
 
 type GridAlignment = SerializableGridColumn['align'];
 

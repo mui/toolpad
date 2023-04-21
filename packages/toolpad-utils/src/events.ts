@@ -2,7 +2,10 @@ export type EventName = string | symbol;
 
 export type EventHandler<T = unknown> = (event: T) => void;
 
-export default class Emitter<T extends Record<EventName, unknown> = {}> {
+/**
+ * Lightweight event emitter
+ */
+export class Emitter<T extends Record<EventName, unknown> = {}> {
   private handlers = new Map<keyof T, Set<EventHandler<any>>>();
 
   /**

@@ -1,9 +1,9 @@
 import * as React from 'react';
-import { useNonNullableContext } from '@mui/toolpad-core/utils/react';
-import { VersionOrPreview } from '../types';
+import { useNonNullableContext } from '@mui/toolpad-utils/react';
+import { AppVersion } from '../types';
 
 export interface AppContext {
-  version: VersionOrPreview;
+  version: AppVersion;
 }
 
 const Context = React.createContext<AppContext | null>(null);

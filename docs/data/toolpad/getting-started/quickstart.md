@@ -3,7 +3,7 @@
 <p class="description">Learn the fundamentals of building with Toolpad by creating a small application.</p>
 
 This guide will walk you through the process of creating a small Toolpad application.
-You'll use the MUI X DataGrid component to display a list of dog breeds from the [Dog API](https://dog.ceo/dog-api).
+You'll use the MUI X DataGrid component to display a list of dog breeds from the [Dog API](https://dog.ceo/dog-api/).
 When you click on the name of a breed, a random photo of the breed will be displayed using the Material UI Image component.
 
 ## Purpose
@@ -17,7 +17,7 @@ By the end, you should be able to:
 
 ## Prerequisites
 
-Make sure to [install Node.js](https://nodejs.org/en/) on your system.
+Make sure to [install Node.js](https://nodejs.org/en) on your system.
 
 ## Building your first application
 
@@ -56,7 +56,7 @@ Make sure to [install Node.js](https://nodejs.org/en/) on your system.
 
    <img src="/static/toolpad/docs/quickstart/step-3b.png" alt="Choose serverside HTTP request" width="464px" />
 
-1. We'll be using the [open source dog API](https://dog.ceo/dog-api) for our example. First give the query a name "dogQuery". The name must be unique in the page. Then set `https://dog.ceo/api/breeds/list/all` as the **URL**. The HTTP method can be left at GET. Click the preview button to inspect the result of this request. If all went well it should like like this:
+1. We'll be using the [open source dog API](https://dog.ceo/dog-api/) for our example. First give the query a name "dogQuery". The name must be unique in the page. Then set `https://dog.ceo/api/breeds/list/all` as the **URL**. The HTTP method can be left at GET. Click the preview button to inspect the result of this request. If all went well it should like like this:
 
    <img src="/static/toolpad/docs/quickstart/step-5.png?v=0" alt="Fetch URL"/>
 

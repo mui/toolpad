@@ -16,7 +16,7 @@
 
 The most powerful way of bringing data into Toolpad is through serverside JavaScript functions. The setup is as follows:
 
-1. Start by changing `toolpad/queries.ts` and set its content to:
+1. Start by changing `toolpad/resources/functions.ts` and set its content to:
 
    ```tsx
    export async function example() {
@@ -48,16 +48,16 @@ The most powerful way of bringing data into Toolpad is through serverside JavaSc
 
    <img src="/static/toolpad/docs/serverside-js/js-3.png?v=0" alt="Runs in Node.js" width="890px" />
 
-   You can import and use any Node.js module in `toolpad/queries.ts`. That means that you can access any API or database that distributes a client library as a Node.js module.
+   You can import and use any Node.js module in `toolpad/resources/functions.ts`. That means that you can access any API or database that distributes a client library as a Node.js module.
 
 ## Parameters
 
-To be really useful, these backend functions need to be parametrizable with actual state on the page. You can do so by wrapping them in our `createQuery` function.
+To be really useful, these backend functions need to be parametrizable with actual state on the page. You can do so by wrapping them in our `createFunction` method.
 
 ```tsx
-import { createQuery } from '@mui/toolpad-core';
+import { createFunction } from '@mui/toolpad/server';
 
-export const example = createQuery(
+export const example = createFunction(
   async ({ parameters }) => {
     return {
       message: `3 x ${parameters.value} = ${parameters.value * 3}`,

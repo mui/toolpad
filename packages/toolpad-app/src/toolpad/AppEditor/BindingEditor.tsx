@@ -32,7 +32,7 @@ import {
   ScopeMetaField,
   JsRuntime,
 } from '@mui/toolpad-core';
-import { createProvidedContext } from '@mui/toolpad-core/utils/react';
+import { createProvidedContext } from '@mui/toolpad-utils/react';
 import { TabContext, TabList } from '@mui/lab';
 import { Maybe, WithControlledProp } from '../../utils/types';
 import { JsExpressionEditor } from './PageEditor/JsExpressionEditor';
@@ -306,7 +306,7 @@ export function BindingEditorDialog<V>({
   open,
   onClose,
 }: BindingEditorDialogProps<V>) {
-  const { propType } = useBindingEditorContext();
+  const { propType, label } = useBindingEditorContext();
 
   const [input, setInput] = React.useState(value);
   React.useEffect(() => {
@@ -360,7 +360,7 @@ export function BindingEditorDialog<V>({
       scroll="body"
       maxWidth="lg"
     >
-      <DialogTitle>Bind a property</DialogTitle>
+      <DialogTitle>Bind property &quot;{label}&quot;</DialogTitle>
       <DialogContent>
         {propType?.type === 'event' ? (
           <ActionEditor value={input} onChange={(newValue) => setInput(newValue)} />

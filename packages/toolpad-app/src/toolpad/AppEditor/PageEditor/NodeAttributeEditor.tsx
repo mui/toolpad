@@ -9,7 +9,7 @@ import {
 } from '@mui/toolpad-core';
 import { Alert, Box } from '@mui/material';
 import { useBrowserJsRuntime } from '@mui/toolpad-core/jsBrowserRuntime';
-import { mapValues } from '../../../utils/collections';
+import { mapValues } from '@mui/toolpad-utils/collections';
 import * as appDom from '../../../appDom';
 import { useDom, useDomApi } from '../../AppState';
 import BindableEditor from './BindableEditor';
@@ -58,7 +58,7 @@ export default function NodeAttributeEditor<P extends object>({
 
   // NOTE: Doesn't make much sense to bind controlled props. In the future we might opt
   // to make them bindable to other controlled props only
-  const isDisabled = !!argType.onChangeHandler;
+  const isDisabled = !!argType.onChangeProp;
 
   const isBindable =
     !isDisabled &&

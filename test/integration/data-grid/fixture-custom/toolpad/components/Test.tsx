@@ -1,4 +1,4 @@
-import { createComponent } from '@mui/toolpad-core';
+import { createComponent } from '@mui/toolpad/browser';
 import * as React from 'react';
 
 export interface Props {

@@ -34,7 +34,7 @@ import {
   Popover,
 } from '@mui/material';
 import { getObjectKey } from '@mui/toolpad-core/objectKey';
-import { errorFrom } from '@mui/toolpad-core/utils/errors';
+import { errorFrom } from '@mui/toolpad-utils/errors';
 import { hasImageExtension } from '@mui/toolpad-core/path';
 import { ErrorBoundary, FallbackProps } from 'react-error-boundary';
 import { SX_PROP } from './constants.js';
@@ -223,7 +223,6 @@ interface CustomColumnProps {
 function CustomColumn({ params }: CustomColumnProps) {
   const { value, colDef, row, field } = params;
   const column = colDef as SerializableGridColumn;
-
   const components = useComponents();
   const Component = components[`codeComponent.${column.codeComponent}`];
 
@@ -393,10 +392,6 @@ interface Selection {
   id?: any;
 }
 
-interface OnDeleteEvent {
-  row: GridRowsProp[number];
-}
-
 interface ToolpadDataGridProps extends Omit<DataGridProProps, 'columns' | 'rows' | 'error'> {
   rows?: GridRowsProp;
   columns?: SerializableGridColumns;
@@ -405,7 +400,6 @@ interface ToolpadDataGridProps extends Omit<DataGridProProps, 'columns' | 'rows'
   error?: Error | string;
   selection?: Selection | null;
   onSelectionChange?: (newSelection?: Selection | null) => void;
-  onDelete?: (event: OnDeleteEvent) => void;
   hideToolbar?: boolean;
 }
 
@@ -591,6 +585,7 @@ export default createComponent(DataGridComponent, {
       helperText: 'The currently selected row. Or `null` in case no row has been selected.',
       typeDef: { type: 'object', default: null },
       onChangeProp: 'onSelectionChange',
+      tsType: `ThisComponent['rows'][number] | undefined`,
     },
     density: {
       helperText:
@@ -610,16 +605,5 @@ export default createComponent(DataGridComponent, {
       typeDef: { type: 'boolean' },
     },
     sx: SX_PROP,
-    onDelete: {
-      typeDef: {
-        type: 'event',
-        arguments: [
-          {
-            name: 'event',
-            tsType: `{ row: ThisComponent['rows'][number] }`,
-          },
-        ],
-      },
-    },
   },
 });

@@ -23,7 +23,6 @@ import {
   PAGE_ROW_COMPONENT_ID,
   PAGE_COLUMN_COMPONENT_ID,
 } from '../../../../toolpadComponents';
-import { PinholeOverlay } from '../../../../PinholeOverlay';
 import {
   getRectanglePointActiveEdge,
   isHorizontalFlow,
@@ -37,11 +36,13 @@ import {
   RECTANGLE_EDGE_TOP,
   rectContainsPoint,
 } from '../../../../utils/geometry';
+import { omit } from '../../../../utils/immutability';
 import NodeHud from './NodeHud';
 import { OverlayGrid, OverlayGridHandle } from './OverlayGrid';
 import { NodeInfo } from '../../../../types';
 import NodeDropArea from './NodeDropArea';
 import type { ToolpadBridge } from '../../../../canvas/ToolpadBridge';
+import { PinholeOverlay } from '../../../../PinholeOverlay';
 
 const VERTICAL_RESIZE_SNAP_UNITS = 2; // px
 
@@ -428,7 +429,7 @@ export default function RenderOverlay({ bridge }: RenderOverlayProps) {
     [appStateApi, currentView, dom, normalizePageRowColumnSizes],
   );
 
-  const selectedRect = selectedNode && !newNode ? nodesInfo[selectedNode.id]?.rect : null;
+  const selectedRect = (selectedNode && !newNode && nodesInfo[selectedNode.id]?.rect) || null;
 
   const interactiveNodes = React.useMemo<Set<NodeId>>(() => {
     if (!selectedNode) {
@@ -1267,7 +1268,7 @@ export default function RenderOverlay({ bridge }: RenderOverlayProps) {
           return normalizePageRowColumnSizes(draft);
         },
         currentView.kind === 'page'
-          ? { ...currentView, selectedNodeId: newNode?.id || draggedNodeId }
+          ? { ...omit(currentView, 'tab'), selectedNodeId: newNode?.id || draggedNodeId }
           : currentView,
       );
 
@@ -1580,7 +1581,6 @@ export default function RenderOverlay({ bridge }: RenderOverlayProps) {
         const isPageColumnChild = parent ? appDom.isElement(parent) && isPageColumn(parent) : false;
 
         const isSelected = selectedNode && !newNode ? selectedNode.id === node.id : false;
-        const isInteractive = interactiveNodes.has(node.id) && !draggedEdge;
 
         const isHorizontallyResizable = isSelected && (isPageRowChild || isPageColumnChild);
         const isVerticallyResizable =
@@ -1588,6 +1588,8 @@ export default function RenderOverlay({ bridge }: RenderOverlayProps) {
 
         const isResizing = Boolean(draggedEdge);
         const isResizingNode = isResizing && node.id === draggedNodeId;
+
+        const isInteractive = interactiveNodes.has(node.id) && !isResizing && !isDraggingOver;
 
         if (!nodeRect) {
           return null;
@@ -1599,6 +1601,7 @@ export default function RenderOverlay({ bridge }: RenderOverlayProps) {
               <NodeHud
                 node={node}
                 rect={nodeRect}
+                selectedNodeRect={selectedRect}
                 isSelected={isSelected}
                 isInteractive={isInteractive}
                 onNodeDragStart={handleNodeDragStart(node as appDom.ElementNode)}
@@ -1617,7 +1620,7 @@ export default function RenderOverlay({ bridge }: RenderOverlayProps) {
                 onDelete={handleNodeDelete(node.id)}
                 isResizing={isResizingNode}
                 resizePreviewElementRef={resizePreviewElementRef}
-                isHoverable={isResizing && !isDraggingOver}
+                isHoverable={!isResizing && !isDraggingOver}
                 isOutlineVisible={isDraggingOver}
               />
             ) : null}

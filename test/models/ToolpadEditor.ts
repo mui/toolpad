@@ -1,4 +1,5 @@
 import { expect, FrameLocator, Locator, Page } from '@playwright/test';
+import { setTimeout } from 'timers/promises';
 import { gotoIfNotCurrent } from './shared';
 
 class CreatePageDialog {
@@ -55,6 +56,8 @@ export class ToolpadEditor {
 
   readonly componentEditor: Locator;
 
+  readonly themeEditor: Locator;
+
   readonly appCanvas: FrameLocator;
 
   readonly pageRoot: Locator;
@@ -73,6 +76,8 @@ export class ToolpadEditor {
 
     this.componentCatalog = page.getByTestId('component-catalog');
     this.componentEditor = page.getByTestId('component-editor');
+
+    this.themeEditor = page.getByTestId('theme-editor');
 
     this.createComponentBtn = this.componentCatalog.getByRole('button', { name: 'Create' });
     this.createComponentDialog = new CreateComponentDialog(page);
@@ -109,6 +114,9 @@ export class ToolpadEditor {
 
   async waitForOverlay() {
     await this.pageOverlay.waitFor({ state: 'visible' });
+    // Some tests seem to be flaky around this waitFor and perform better with a short timeout
+    // Not sure yet where the race condition is happening
+    await setTimeout(100);
   }
 
   async dragToAppCanvas(sourceLocator: Locator, moveTargetX: number, moveTargetY: number) {
@@ -136,6 +144,10 @@ export class ToolpadEditor {
     await this.page.mouse.up();
   }
 
+  getComponentCatalogItem(name: string): Locator {
+    return this.page.getByTestId('component-catalog').getByRole('button', { name });
+  }
+
   async dragNewComponentToAppCanvas(componentName: string) {
     await this.componentCatalog.hover();
 
@@ -143,19 +155,17 @@ export class ToolpadEditor {
     await this.page.waitForTimeout(200);
 
     const targetBoundingBox = await this.pageRoot.boundingBox();
-    expect(targetBoundingBox).toBeDefined();
+    await expect(targetBoundingBox).toBeDefined();
 
     const moveTargetX = targetBoundingBox!.x + targetBoundingBox!.width / 2;
     const moveTargetY = targetBoundingBox!.y + targetBoundingBox!.height / 2;
 
-    const sourceLocator = this.page.getByTestId('component-catalog').getByRole('button', {
-      name: componentName,
-    });
+    const sourceLocator = this.getComponentCatalogItem(componentName);
 
-    this.dragToAppCanvas(sourceLocator, moveTargetX, moveTargetY);
+    await this.dragToAppCanvas(sourceLocator, moveTargetX, moveTargetY);
   }
 
-  hierarchyItem(group: string, name: string): Locator {
+  getHierarchyItem(group: string, name: string): Locator {
     return this.explorer
       .getByRole('treeitem')
       .filter({ hasText: group })
@@ -164,7 +174,7 @@ export class ToolpadEditor {
   }
 
   async openHierarchyMenu(group: string, name: string) {
-    const hierarchyItem = this.hierarchyItem(group, name);
+    const hierarchyItem = this.getHierarchyItem(group, name);
     const menuButton = hierarchyItem.getByRole('button', { name: 'Open hierarchy menu' });
     await hierarchyItem.hover();
     await menuButton.click();

@@ -1,6 +1,6 @@
 import { NextApiHandler } from 'next';
 import invariant from 'invariant';
-import { asArray } from '../../../../src/utils/collections';
+import { asArray } from '@mui/toolpad-utils/collections';
 import serverDataSources from '../../../../src/toolpadDataSources/server';
 import { getConnectionParams, setConnectionParams } from '../../../../src/server/data';
 import { withReqResLogs } from '../../../../src/server/logs/withLogs';

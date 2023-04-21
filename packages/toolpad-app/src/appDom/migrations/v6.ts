@@ -1,11 +1,11 @@
 import { NodeId } from '@mui/toolpad-core';
 import invariant from 'invariant';
+import { mapValues } from '@mui/toolpad-utils/collections';
 import * as appDom from '..';
-import { mapValues } from '../../utils/collections';
 
 export default {
   up(dom: appDom.AppDom): appDom.AppDom {
-    invariant(dom.version === 5, 'Can only migrate dom of version 4');
+    invariant(dom.version === 5, 'Can only migrate dom of version 5');
 
     const prefix = 'codeComponent.';
     return {

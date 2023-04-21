@@ -1,5 +1,5 @@
 import * as React from 'react';
-import Emitter from '@mui/toolpad-core/utils/Emitter';
+import { Emitter } from '@mui/toolpad-utils/events';
 
 // storage events only work across windows, we'll use an event emitter to announce within the window
 const emitter = new Emitter<Record<string, undefined>>();

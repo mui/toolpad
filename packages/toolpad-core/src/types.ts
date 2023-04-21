@@ -1,6 +1,7 @@
 import type * as React from 'react';
+import type { Branded } from '@mui/toolpad-utils/types';
+import type { SerializedError } from '@mui/toolpad-utils/errors';
 import type { TOOLPAD_COMPONENT } from './constants.js';
-import type { Branded } from './utils/types.js';
 
 export type NodeId = Branded<string, 'NodeId'>;
 
@@ -216,6 +217,8 @@ export interface ArgTypeDefinition<P extends object = {}, V = P[keyof P]> {
    * @returns {boolean} a boolean value indicating whether the property should be visible or not
    */
   visible?: ((props: P) => boolean) | boolean;
+
+  tsType?: string;
 }
 
 export type ArgTypeDefinitions<P extends object = {}> = {
@@ -252,6 +255,10 @@ export type BindingEvaluationResult<T = unknown> = {
 
 export type LiveBinding = BindingEvaluationResult;
 
+export interface ScopeMetaPropField {
+  tsType?: string;
+}
+
 export type ScopeMetaField = {
   description?: string;
   deprecated?: boolean | string;
@@ -263,6 +270,7 @@ export type ScopeMetaField = {
   | {
       kind: 'element';
       componentId: string;
+      props?: Record<string, ScopeMetaPropField>;
     }
   | {
       kind: 'query' | 'local';
@@ -342,15 +350,6 @@ export interface RuntimeError {
 }
 
 export type FlowDirection = 'row' | 'column' | 'row-reverse' | 'column-reverse';
-
-export type PlainObject = Record<string, unknown>;
-
-export interface SerializedError extends PlainObject {
-  message: string;
-  name: string;
-  stack?: string;
-  code?: unknown;
-}
 
 export type ExecFetchResult<T = any> = {
   data?: T;

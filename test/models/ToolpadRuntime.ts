@@ -9,12 +9,14 @@ export class ToolpadRuntime {
   }
 
   async goto() {
-    await gotoIfNotCurrent(this.page, `/preview/pages`);
+    await gotoIfNotCurrent(this.page, `/preview`);
   }
 
   async gotoPage(pageName: string) {
     await this.goto();
-    await this.page.getByRole('link', { name: pageName }).click();
+
+    const navLocator = this.page.locator('nav');
+    await navLocator.getByRole('button', { name: pageName }).click();
   }
 
   async gotoPageById(appId: string, pageId: string) {

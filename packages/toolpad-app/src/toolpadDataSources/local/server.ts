@@ -1,23 +1,25 @@
-import { ExecFetchResult, SerializedError } from '@mui/toolpad-core';
+import { ExecFetchResult } from '@mui/toolpad-core';
+import { SerializedError, errorFrom, serializeError } from '@mui/toolpad-utils/errors';
 import * as child_process from 'child_process';
 import * as esbuild from 'esbuild';
 import * as fs from 'fs/promises';
 import * as path from 'path';
 import invariant from 'invariant';
-import { indent, truncate } from '@mui/toolpad-core/utils/strings';
+import { indent, truncate } from '@mui/toolpad-utils/strings';
 import * as dotenv from 'dotenv';
 import * as chokidar from 'chokidar';
+import chalk from 'chalk';
 import config from '../../config';
 import { ServerDataSource } from '../../types';
 import { LocalPrivateQuery, LocalQuery, LocalConnectionParams } from './types';
 import { Maybe } from '../../utils/types';
 import {
   getUserProjectRoot,
-  openCodeEditor,
-  QUERIES_FILE,
-  readProjectFolder,
+  openQueryEditor,
+  getFunctionsFile,
+  getOutputFolder,
 } from '../../server/localMode';
-import { errorFrom, serializeError } from '../../utils/errors';
+import { waitForInit } from '../../server/liveProject';
 
 type MessageToChildProcess =
   | {
@@ -75,18 +77,16 @@ function formatCodeFrame(location: esbuild.Location): string {
   ].join('\n');
 }
 
-interface MainManifest {
-  queryFiles: { name: string; filepath: string }[];
+function pathToNodeImportSpecifier(importPath: string): string {
+  const normalized = path.normalize(importPath).split(path.sep).join('/');
+  return normalized.startsWith('/') ? normalized : `./${normalized}`;
 }
 
-async function createMain(manifest: MainManifest): Promise<string> {
-  const loadLines = manifest.queryFiles.map(
-    ({ name, filepath }) =>
-      `loadQuery(${JSON.stringify(name)}, () => import(${JSON.stringify(filepath)}))`,
-  );
+async function createMain(): Promise<string> {
+  const relativeFunctionsFilePath = [`.`, getFunctionsFile('.')].join(path.sep);
   return `
-    import { TOOLPAD_QUERY } from '@mui/toolpad-core/server';
-    import { errorFrom, serializeError } from '@mui/toolpad-core/utils/errors';
+    import { TOOLPAD_FUNCTION } from '@mui/toolpad-core/server';
+    import { errorFrom, serializeError } from '@mui/toolpad-utils/errors';
     import fetch, { Headers, Request, Response } from 'node-fetch'
 
     // Polyfill fetch() in the Node.js environment
@@ -97,7 +97,7 @@ async function createMain(manifest: MainManifest): Promise<string> {
       global.Response = Response
     }
 
-    async function loadQuery (name, importFn) {
+    async function loadFunction (name, importFn) {
       const { default: resolver } = await importFn()
       return [name, resolver]
     }
@@ -106,17 +106,18 @@ async function createMain(manifest: MainManifest): Promise<string> {
     async function getResolvers() {
       if (!resolversPromise) {
         resolversPromise = (async () => {
-          const fileQueryResolvers = await Promise.all([
-            ${loadLines.join(',')}
-          ]);
+          const functions = await import(${JSON.stringify(
+            pathToNodeImportSpecifier(relativeFunctionsFilePath),
+          )}).catch((err) => {
+            console.error(err);
+            return {};
+          });
 
-          const queries = await import(${JSON.stringify(QUERIES_FILE)})
-
-          const queriesFileResolvers = Object.entries(queries).flatMap(([name, resolver]) => {
+          const functionsFileResolvers = Object.entries(functions).flatMap(([name, resolver]) => {
             return typeof resolver === 'function' ? [[name, resolver]] : []
           })
 
-          return new Map([...fileQueryResolvers, ...queriesFileResolvers]);
+          return new Map(functionsFileResolvers);
         })();
       }
       return resolversPromise
@@ -162,7 +163,7 @@ async function createMain(manifest: MainManifest): Promise<string> {
             const resolvers = await getResolvers()
             const resolvedResolvers =  Array.from(resolvers, ([name, resolver]) => [
               name,
-              resolver[TOOLPAD_QUERY] || {}
+              resolver[TOOLPAD_FUNCTION] || {}
             ]);
             data = { 
               functions: Object.fromEntries(resolvedResolvers.filter(Boolean))
@@ -185,6 +186,8 @@ async function createMain(manifest: MainManifest): Promise<string> {
 }
 
 async function createBuilder() {
+  await waitForInit();
+
   const userProjectRoot = getUserProjectRoot();
   const envFilePath = path.resolve(userProjectRoot, '.env');
 
@@ -193,18 +196,13 @@ async function createBuilder() {
   let buildErrors: Error[] = [];
   let runtimeError: Error | undefined;
 
-  const projectEntries = await readProjectFolder();
-  const entryPoints = projectEntries
-    .filter((entry) => entry.kind === 'query')
-    .map((entry) => entry.filepath);
-
   const loadEnvFile = async () => {
     try {
       const envFileContent = await fs.readFile(envFilePath);
       const parsed = dotenv.parse(envFileContent) as any;
       // eslint-disable-next-line no-console
       console.log(
-        `Loaded env file "${envFilePath}" with keys ${truncate(
+        `${chalk.blue('info')}  - loaded env file "${envFilePath}" with keys ${truncate(
           Object.keys(parsed).join(', '),
           1000,
         )}`,
@@ -311,12 +309,9 @@ async function createBuilder() {
 
       build.onLoad({ filter: /.*/, namespace: 'toolpad' }, async (args) => {
         if (args.path === 'main.ts') {
-          const contents = await createMain({
-            queryFiles: projectEntries.filter((entry) => entry.kind === 'query'),
-          });
           return {
             loader: 'tsx',
-            contents,
+            contents: await createMain(),
             resolveDir: userProjectRoot,
           };
         }
@@ -327,7 +322,11 @@ async function createBuilder() {
       build.onEnd((args) => {
         // TODO: use for hot reloading
         // eslint-disable-next-line no-console
-        console.log(`Rebuild: ${args.errors.length} error(s), ${args.warnings.length} warning(s)`);
+        console.log(
+          `${chalk.green('ready')} - built functions.ts: ${args.errors.length} error(s), ${
+            args.warnings.length
+          } warning(s)`,
+        );
 
         buildErrors = args.errors.map((message) => {
           let messageText = message.text;
@@ -357,12 +356,12 @@ async function createBuilder() {
 
   const ctx = await esbuild.context({
     absWorkingDir: userProjectRoot,
-    entryPoints: ['toolpad:main.ts', ...entryPoints],
+    entryPoints: ['toolpad:main.ts'],
     plugins: [toolpadPlugin],
     write: true,
     bundle: true,
     metafile: true,
-    outdir: path.resolve(userProjectRoot, './.toolpad-generated/'),
+    outdir: path.resolve(getOutputFolder(userProjectRoot), 'functions'),
     platform: 'node',
     packages: 'external',
     target: 'es2022',
@@ -470,7 +469,7 @@ async function execPrivate(connection: Maybe<LocalConnectionParams>, query: Loca
     case 'debugExec':
       return execBase(connection, query.query, query.params);
     case 'openEditor':
-      return openCodeEditor(QUERIES_FILE);
+      return openQueryEditor();
     default:
       throw new Error(`Unknown private query "${(query as LocalPrivateQuery).kind}"`);
   }

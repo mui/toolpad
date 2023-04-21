@@ -1,12 +1,13 @@
 import { NextApiHandler } from 'next';
 import type { IncomingMessage, ServerResponse } from 'http';
 import superjson from 'superjson';
-import { execQuery, dataSourceFetchPrivate, loadDom, saveDom } from '../../src/server/data';
-import { getLatestToolpadRelease } from '../../src/server/getLatestRelease';
-import { hasOwnProperty } from '../../src/utils/collections';
-import { errorFrom, serializeError } from '../../src/utils/errors';
+import { hasOwnProperty } from '@mui/toolpad-utils/collections';
+import { errorFrom, serializeError } from '@mui/toolpad-utils/errors';
+import { execQuery, dataSourceFetchPrivate } from '../../src/server/data';
+import { getVersionInfo } from '../../src/server/versionInfo';
 import logger from '../../src/server/logs/logger';
-import { getDomFingerprint, openCodeComponentEditor } from '../../src/server/localMode';
+import { createComponent, deletePage, openCodeComponentEditor } from '../../src/server/localMode';
+import { getDomFingerprint, loadDom, saveDom } from '../../src/server/liveProject';
 
 export interface Method<P extends any[] = any[], R = any> {
   (...params: P): Promise<R>;
@@ -116,8 +117,8 @@ const rpcServer = {
     loadDom: createMethod<typeof loadDom>(({ params }) => {
       return loadDom(...params);
     }),
-    getLatestToolpadRelease: createMethod<typeof getLatestToolpadRelease>(({ params }) => {
-      return getLatestToolpadRelease(...params);
+    getVersionInfo: createMethod<typeof getVersionInfo>(({ params }) => {
+      return getVersionInfo(...params);
     }),
     getDomFingerprint: createMethod<typeof getDomFingerprint>(({ params }) => {
       return getDomFingerprint(...params);
@@ -129,6 +130,12 @@ const rpcServer = {
     }),
     openCodeComponentEditor: createMethod<typeof openCodeComponentEditor>(({ params }) => {
       return openCodeComponentEditor(...params);
+    }),
+    createComponent: createMethod<typeof createComponent>(({ params }) => {
+      return createComponent(...params);
+    }),
+    deletePage: createMethod<typeof deletePage>(({ params }) => {
+      return deletePage(...params);
     }),
   },
 } as const;

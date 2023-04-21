@@ -79,6 +79,14 @@ module.exports = {
       extends: ['plugin:@next/next/recommended'],
       rules: {
         '@next/next/no-html-link-for-pages': ['error', 'packages/toolpad-app/pages/'],
+        '@next/next/no-img-element': 'off',
+      },
+    },
+    {
+      files: ['packages/toolpad-app/**/*'],
+      excludedFiles: ['**/jest-environment-jsdom.ts', 'tsup.config.ts', '*.spec.ts', '*.spec.tsx'],
+      rules: {
+        'import/no-extraneous-dependencies': ['error'],
       },
     },
     {

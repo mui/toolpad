@@ -5,6 +5,9 @@ import childProcess from 'child_process';
 import { Readable } from 'stream';
 import { once } from 'events';
 import invariant from 'invariant';
+import * as archiver from 'archiver';
+import { createWriteStream } from 'fs';
+import { pipeline } from 'stream/promises';
 import { test as base } from './test';
 
 interface RunningLocalApp {
@@ -14,6 +17,7 @@ interface RunningLocalApp {
 
 // You'll need to have `yarn dev` running for this
 const VERBOSE = true;
+const VITE_RUNTIME = process.env.TOOLPAD_VITE_RUNTIME;
 
 async function waitForMatch(input: Readable, regex: RegExp): Promise<RegExpExecArray | null> {
   return new Promise((resolve, reject) => {
@@ -32,6 +36,10 @@ async function waitForMatch(input: Readable, regex: RegExp): Promise<RegExpExecA
   });
 }
 
+interface SetupContext {
+  dir: string;
+}
+
 interface WithAppOptions {
   // Command to start toolpad with
   cmd?: 'start' | 'dev';
@@ -40,6 +48,7 @@ interface WithAppOptions {
   template?: string;
   // Run toolpad next.js app in local dev mode
   toolpadDev?: boolean;
+  setup?: (ctx: SetupContext) => Promise<void>;
 }
 
 /**
@@ -49,7 +58,12 @@ export async function withApp(
   options: WithAppOptions,
   doWork: (app: RunningLocalApp) => Promise<void>,
 ) {
-  const { cmd = 'start', template } = options;
+  if (VITE_RUNTIME) {
+    // eslint-disable-next-line no-console
+    console.log('Using new vite runtime');
+  }
+
+  const { cmd = 'start', template, setup } = options;
 
   const projectDir = await fs.mkdtemp(path.resolve(__dirname, './tmp-'));
 
@@ -58,9 +72,41 @@ export async function withApp(
       await fs.cp(template, projectDir, { recursive: true });
     }
 
+    if (setup) {
+      await setup({ dir: projectDir });
+    }
+
     const args: string[] = [cmd];
     if (options.toolpadDev) {
       args.push('--dev');
+    }
+
+    if (VITE_RUNTIME) {
+      args.push('--viteRuntime');
+    }
+
+    if (cmd === 'start') {
+      const buildArgs = ['build'];
+
+      if (VITE_RUNTIME) {
+        buildArgs.push('--viteRuntime');
+      }
+
+      const child = childProcess.spawn('toolpad', buildArgs, {
+        cwd: projectDir,
+        stdio: 'pipe',
+      });
+
+      if (VERBOSE) {
+        child.stdout?.pipe(process.stdout);
+        child.stderr?.pipe(process.stderr);
+      }
+
+      await once(child, 'exit');
+
+      if (child.exitCode !== 0) {
+        throw new Error('Build failed');
+      }
     }
 
     const child = childProcess.spawn('toolpad', args, {
@@ -101,22 +147,28 @@ export async function withApp(
 
 const test = base.extend<
   {
+    projectSnapshot: null;
+  },
+  {
+    browserCloser: null;
+    localApp: RunningLocalApp;
     toolpadDev: boolean;
     localAppConfig?: WithAppOptions;
-    localApp: RunningLocalApp;
-  },
-  { browserCloser: null }
+  }
 >({
-  toolpadDev: !!process.env.TOOLPAD_DEV,
-  localAppConfig: [undefined, { option: true }],
-  localApp: async ({ localAppConfig, toolpadDev }, use) => {
-    if (!localAppConfig) {
-      throw new Error('localAppConfig missing');
-    }
-    await withApp({ toolpadDev, ...localAppConfig }, async (app) => {
-      await use(app);
-    });
-  },
+  toolpadDev: [!!process.env.TOOLPAD_NEXT_DEV, { option: true, scope: 'worker' }],
+  localAppConfig: [undefined, { option: true, scope: 'worker' }],
+  localApp: [
+    async ({ localAppConfig, toolpadDev }, use) => {
+      if (!localAppConfig) {
+        throw new Error('localAppConfig missing');
+      }
+      await withApp({ toolpadDev, ...localAppConfig }, async (app) => {
+        await use(app);
+      });
+    },
+    { scope: 'worker' },
+  ],
   baseURL: async ({ localApp }, use) => {
     await use(localApp.url);
   },
@@ -130,6 +182,22 @@ const test = base.extend<
       scope: 'worker',
       auto: true,
     },
+  ],
+  projectSnapshot: [
+    async ({ localApp }, use, testInfo) => {
+      await use(null);
+
+      if (testInfo.status !== 'passed' && testInfo.status !== 'skipped') {
+        await fs.mkdir(testInfo.outputDir, { recursive: true });
+        const output = createWriteStream(path.resolve(testInfo.outputDir, './projectSnapshot.zip'));
+        const archive = archiver.create('zip');
+        archive.directory(localApp.dir, '/project');
+        archive.finalize();
+
+        await pipeline(archive, output);
+      }
+    },
+    { scope: 'test', auto: true },
   ],
 });
 

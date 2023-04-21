@@ -27,8 +27,14 @@ import {
   ScopeMeta,
   DEFAULT_LOCAL_SCOPE_PARAMS,
   getArgTypeDefaultValue,
+  ScopeMetaPropField,
+  ComponentsContextProvider,
+  isToolpadComponent,
+  createToolpadComponentThatThrows,
+  useComponents,
+  useComponent,
 } from '@mui/toolpad-core';
-import { createProvidedContext } from '@mui/toolpad-core/utils/react';
+import { createProvidedContext } from '@mui/toolpad-utils/react';
 import { QueryClient, QueryClientProvider, useMutation } from '@tanstack/react-query';
 import {
   BrowserRouter,
@@ -38,6 +44,7 @@ import {
   Navigate,
   Location as RouterLocation,
   useNavigate,
+  matchPath,
 } from 'react-router-dom';
 import { ErrorBoundary, FallbackProps } from 'react-error-boundary';
 import {
@@ -49,15 +56,18 @@ import * as _ from 'lodash-es';
 import ErrorIcon from '@mui/icons-material/Error';
 import EditIcon from '@mui/icons-material/Edit';
 import { useBrowserJsRuntime } from '@mui/toolpad-core/jsBrowserRuntime';
+import * as builtIns from '@mui/toolpad-components';
+import { errorFrom } from '@mui/toolpad-utils/errors';
+import { mapProperties, mapValues } from '@mui/toolpad-utils/collections';
 import * as appDom from '../appDom';
-import { RuntimeState, VersionOrPreview } from '../types';
+import { RuntimeState, AppVersion } from '../types';
 import {
   getElementNodeComponentId,
+  INTERNAL_COMPONENTS,
   isPageLayoutComponent,
   isPageRow,
   PAGE_ROW_COMPONENT_ID,
 } from '../toolpadComponents';
-import AppOverview from './AppOverview';
 import AppThemeProvider from './AppThemeProvider';
 import evalJsBindings, {
   buildGlobalScope,
@@ -65,10 +75,7 @@ import evalJsBindings, {
   ParsedBinding,
 } from './evalJsBindings';
 import { HTML_ID_EDITOR_OVERLAY, NON_BINDABLE_CONTROL_TYPES } from '../constants';
-import { mapProperties, mapValues } from '../utils/collections';
 import usePageTitle from '../utils/usePageTitle';
-import ComponentsContext, { useComponents, useComponent } from './ComponentsContext';
-import { AppModulesProvider, useAppModules } from './AppModulesProvider';
 import Pre from '../components/Pre';
 import { layoutBoxArgTypes } from '../toolpadComponents/layoutBox';
 import NoSsr from '../components/NoSsr';
@@ -76,10 +83,25 @@ import { execDataSourceQuery, useDataQuery, UseDataQueryConfig, UseFetch } from 
 import { useAppContext, AppContextProvider } from './AppContext';
 import { CanvasHooksContext, NavigateToPage } from './CanvasHooksContext';
 import useBoolean from '../utils/useBoolean';
-import { errorFrom } from '../utils/errors';
 import Header from '../toolpad/ToolpadShell/Header';
 import { ThemeProvider } from '../ThemeContext';
 import { BridgeContext } from '../canvas/BridgeContext';
+import AppNavigation from './AppNavigation';
+import { PREVIEW_PAGE_ROUTE } from '../routes';
+
+const internalComponents: ToolpadComponents = Object.fromEntries(
+  [...INTERNAL_COMPONENTS].map(([name]) => {
+    let builtIn = (builtIns as any)[name];
+
+    if (!isToolpadComponent(builtIn)) {
+      builtIn = createToolpadComponentThatThrows(
+        new Error(`Imported builtIn "${name}" is not a ToolpadComponent`),
+      );
+    }
+
+    return [name, builtIn];
+  }),
+);
 
 const ReactQueryDevtoolsProduction = React.lazy(() =>
   import('@tanstack/react-query-devtools/build/lib/index.prod.js').then((d) => ({
@@ -539,10 +561,11 @@ function resolveBindables(
 }
 
 interface QueryNodeProps {
+  page: appDom.PageNode;
   node: appDom.QueryNode;
 }
 
-function QueryNode({ node }: QueryNodeProps) {
+function QueryNode({ page, node }: QueryNodeProps) {
   const getBindings = useBindingsContext();
   const setControlledBinding = useSetControlledBindingContext();
 
@@ -556,7 +579,7 @@ function QueryNode({ node }: QueryNodeProps) {
 
   const configBindings = _.pick(node.attributes, USE_DATA_QUERY_CONFIG_KEYS);
   const options = resolveBindables(bindings, `${node.id}.config`, configBindings);
-  const queryResult = useDataQuery(node, params, options);
+  const queryResult = useDataQuery(page, node, params, options);
 
   React.useEffect(() => {
     const { isLoading, error, data, rows, ...result } = queryResult;
@@ -579,10 +602,11 @@ function QueryNode({ node }: QueryNodeProps) {
 }
 
 interface MutationNodeProps {
+  page: appDom.PageNode;
   node: appDom.QueryNode;
 }
 
-function MutationNode({ node }: MutationNodeProps) {
+function MutationNode({ node, page }: MutationNodeProps) {
   const { version } = useAppContext();
   const getBindings = useBindingsContext();
   const setControlledBinding = useSetControlledBindingContext();
@@ -600,7 +624,8 @@ function MutationNode({ node }: MutationNodeProps) {
   } = useMutation(
     async (overrides: any = {}) =>
       execDataSourceQuery({
-        queryId,
+        pageName: page.name,
+        queryName: node.name,
         params: { ...params, ...overrides },
       }),
     {
@@ -640,16 +665,17 @@ function MutationNode({ node }: MutationNodeProps) {
 }
 
 interface FetchNodeProps {
+  page: appDom.PageNode;
   node: appDom.QueryNode;
 }
 
-function FetchNode({ node }: FetchNodeProps) {
+function FetchNode({ node, page }: FetchNodeProps) {
   const mode: appDom.FetchMode = node.attributes.mode?.value || 'query';
   switch (mode) {
     case 'query':
-      return <QueryNode node={node} />;
+      return <QueryNode node={node} page={page} />;
     case 'mutation':
-      return <MutationNode node={node} />;
+      return <MutationNode node={node} page={page} />;
     default:
       throw new Error(`Unrecognized fetch mdoe "${mode}"`);
   }
@@ -702,6 +728,8 @@ function parseBindings(
 
       const { argTypes = {} } = componentConfig ?? {};
 
+      const propsMeta: Record<string, ScopeMetaPropField> = {};
+
       for (const [propName, argType] of Object.entries(argTypes)) {
         const initializerId = argType?.defaultValueProp
           ? `${elm.id}.props.${argType.defaultValueProp}`
@@ -724,11 +752,11 @@ function parseBindings(
           !NON_BINDABLE_CONTROL_TYPES.includes(argType?.control?.type as string)
         ) {
           scopePath = `${elm.name}.${propName}`;
-          scopeMeta[elm.name] = {
-            kind: 'element',
-            componentId,
-          };
         }
+
+        propsMeta[propName] = {
+          tsType: argType?.tsType,
+        };
 
         if (argType) {
           if (argType.onChangeProp) {
@@ -741,6 +769,14 @@ function parseBindings(
             parsedBindingsMap.set(bindingId, parseBinding(binding, { scopePath }));
           }
         }
+      }
+
+      if (componentId !== PAGE_ROW_COMPONENT_ID) {
+        scopeMeta[elm.name] = {
+          kind: 'element',
+          componentId,
+          props: propsMeta,
+        };
       }
 
       if (!isPageLayoutComponent(elm)) {
@@ -922,9 +958,7 @@ function RenderedPage({ nodeId }: RenderedNodeProps) {
     [parsedBindings, controlled],
   );
 
-  const modules = useAppModules();
-  const moduleEntry = modules[`pages/${nodeId}`];
-  const globalScope = (moduleEntry?.module as any)?.globalScope || EMPTY_OBJECT;
+  const globalScope = EMPTY_OBJECT;
 
   const browserJsRuntime = useBrowserJsRuntime();
 
@@ -961,12 +995,68 @@ function RenderedPage({ nodeId }: RenderedNodeProps) {
   );
 
   const evaluatePageExpression = React.useCallback(
-    (expression: string, scopeId?: string, localScopeParams?: LocalScopeParams) => {
+    async (expression: string, scopeId?: string, localScopeParams?: LocalScopeParams) => {
       const scopeState = getScopeState(scopeId);
-      return browserJsRuntime.evaluateExpression(expression, {
+
+      const scope = {
         ...scopeState,
         ...localScopeParams,
+      };
+
+      const updates: Record<string, unknown> = {};
+
+      const proxify = <T extends object>(obj: T, scopePathSegments: string[]): T => {
+        return new Proxy(obj, {
+          get(target, prop, receiver) {
+            if (typeof prop === 'symbol') {
+              return Reflect.get(target, prop, receiver);
+            }
+
+            const result = target[prop as keyof T];
+
+            if (result && typeof result === 'object') {
+              return proxify(result, [...scopePathSegments, prop]);
+            }
+
+            return Reflect.get(target, prop, receiver);
+          },
+          set(target, prop, newValue, receiver) {
+            if (typeof prop === 'symbol') {
+              return Reflect.set(target, prop, newValue, receiver);
+            }
+
+            const scopePath = [...scopePathSegments, prop].join('.');
+            updates[scopePath] = newValue;
+            return Reflect.set(target, prop, newValue, receiver);
+          },
+        });
+      };
+
+      const result = browserJsRuntime.evaluateExpression(expression, proxify(scope, []));
+
+      await result.value;
+
+      setPageBindings((existingBindings) => {
+        return mapValues(existingBindings, (binding) => {
+          for (const [scopePath, newValue] of Object.entries(updates)) {
+            if (binding.scopePath === scopePath) {
+              if (typeof binding.expression === 'string') {
+                console.warn(`Can't update "${scopePath}", it already has a binding`);
+              } else {
+                return {
+                  ...binding,
+                  expression: undefined,
+                  initializer: undefined,
+                  result: { value: newValue },
+                } satisfies EvaluatedBinding;
+              }
+            }
+          }
+          return binding;
+        });
       });
+
+      return result;
     },
     [browserJsRuntime, getScopeState],
   );
@@ -997,7 +1087,7 @@ function RenderedPage({ nodeId }: RenderedNodeProps) {
             />
 
             {queries.map((node) => (
-              <FetchNode key={node.id} node={node} />
+              <FetchNode key={node.id} page={page} node={node} />
             ))}
           </LocalScopeContextProvider>
         </EvaluatePageExpressionProvider>
@@ -1007,17 +1097,14 @@ function RenderedPage({ nodeId }: RenderedNodeProps) {
 }
 
 interface RenderedPagesProps {
-  dom: appDom.AppDom;
+  pages: appDom.PageNode[];
+  defaultPage: appDom.PageNode;
 }
 
-function RenderedPages({ dom }: RenderedPagesProps) {
-  const root = appDom.getApp(dom);
-  const { pages = [] } = appDom.getChildNodes(dom, root);
-
+function RenderedPages({ pages, defaultPage }: RenderedPagesProps) {
+  const defaultPageNavigation = <Navigate to={`/pages/${defaultPage.id}`} replace />;
   return (
     <Routes>
-      <Route path="/" element={<Navigate replace to="/pages" />} />
-      <Route path="/pages" element={<AppOverview dom={dom} />} />
       {pages.map((page) => (
         <Route
           key={page.id}
@@ -1032,6 +1119,8 @@ function RenderedPages({ dom }: RenderedPagesProps) {
           }
         />
       ))}
+      <Route path="/pages" element={defaultPageNavigation} />
+      <Route path="/" element={defaultPageNavigation} />
     </Routes>
   );
 }
@@ -1068,25 +1157,93 @@ const queryClient = new QueryClient({
   },
 });
 
+export interface ToolpadAppLayoutProps {
+  dom: appDom.RenderTree;
+  hasShell?: boolean;
+  version: AppVersion;
+}
+
+function ToolpadAppLayout({ dom, version, hasShell: hasShellProp = true }: ToolpadAppLayoutProps) {
+  const root = appDom.getApp(dom);
+  const { pages = [] } = appDom.getChildNodes(dom, root);
+
+  const location = useLocation();
+  const { pathname, search } = location;
+  const urlParams = React.useMemo(() => new URLSearchParams(search), [search]);
+
+  const pageMatch = matchPath(PREVIEW_PAGE_ROUTE, `/preview${pathname}`);
+  const pageId = pageMatch?.params.nodeId;
+
+  const defaultPage = pages[0];
+  const page = pageId
+    ? (appDom.getNode<'page'>(dom, pageId as NodeId) as appDom.PageNode)
+    : defaultPage;
+
+  const pageDisplay = urlParams.get('toolpad-display') || page.attributes.display?.value;
+
+  const hasShell = hasShellProp && pageDisplay !== 'standalone';
+
+  const isPreview = version === 'preview';
+
+  return (
+    <React.Fragment>
+      {isPreview ? (
+        <ThemeProvider>
+          <Header
+            enableUserFeedback={false}
+            actions={
+              <Stack direction="row" spacing={1} alignItems="center">
+                <Typography variant="body2" sx={{ color: 'primary.main' }}>
+                  This is a preview version of the application.
+                </Typography>
+                <Button
+                  variant="outlined"
+                  endIcon={<EditIcon />}
+                  color="primary"
+                  component="a"
+                  href={pageId ? `/_toolpad/app/pages/${pageId}` : '/_toolpad/app'}
+                >
+                  Edit
+                </Button>
+              </Stack>
+            }
+          />
+        </ThemeProvider>
+      ) : null}
+      <Box sx={{ display: 'flex' }}>
+        {hasShell && pages.length > 0 ? (
+          <AppNavigation pages={pages} isPreview={isPreview} />
+        ) : null}
+        <RenderedPages pages={pages} defaultPage={defaultPage} />
+      </Box>
+    </React.Fragment>
+  );
+}
+
+export interface LoadComponents {
+  (state: RuntimeState): Promise<ToolpadComponents>;
+}
+
 export interface ToolpadAppProps {
   rootRef?: React.Ref<HTMLDivElement>;
-  catalog?: Record<string, ToolpadComponent>;
-  hidePreviewBanner?: boolean;
+  loadComponents: LoadComponents;
+  hasShell?: boolean;
   basename: string;
-  version: VersionOrPreview;
+  version: AppVersion;
   state: RuntimeState;
 }
 
 export default function ToolpadApp({
   rootRef,
-  catalog,
+  loadComponents,
   basename,
   version,
-  hidePreviewBanner,
+  hasShell = true,
   state,
 }: ToolpadAppProps) {
   const { dom } = state;
   const appContext = React.useMemo(() => ({ version }), [version]);
+  const [components, setComponents] = React.useState<ToolpadComponents | null>(null);
 
   const [resetNodeErrorsKey, setResetNodeErrorsKey] = React.useState(0);
 
@@ -1098,59 +1255,44 @@ export default function ToolpadApp({
     (window as any).toggleDevtools = () => toggleDevtools();
   }, [toggleDevtools]);
 
+  React.useEffect(() => {
+    loadComponents(state).then((codeComponents) =>
+      setComponents({ ...codeComponents, ...internalComponents }),
+    );
+  }, [loadComponents, state]);
+
   return (
-    <AppRoot ref={rootRef}>
-      <NoSsr>
-        <DomContextProvider value={dom}>
-          <AppThemeProvider dom={dom}>
-            <CssBaseline enableColorScheme />
-            {version === 'preview' && !hidePreviewBanner ? (
-              <ThemeProvider>
-                <Header
-                  enableUserFeedback={false}
-                  actions={
-                    <Stack direction="row" spacing={1} alignItems="center">
-                      <Typography variant="body2" sx={{ color: 'primary.main' }}>
-                        This is a preview version of the application.
-                      </Typography>
-                      <Button
-                        variant="outlined"
-                        endIcon={<EditIcon />}
-                        color="primary"
-                        component="a"
-                        href={`/_toolpad/app`}
-                      >
-                        Edit
-                      </Button>
-                    </Stack>
-                  }
-                />
-              </ThemeProvider>
-            ) : null}
-            <ErrorBoundary FallbackComponent={AppError}>
-              <ResetNodeErrorsKeyProvider value={resetNodeErrorsKey}>
-                <React.Suspense fallback={<AppLoading />}>
-                  <AppModulesProvider modules={state.modules}>
-                    <ComponentsContext catalog={catalog} dom={dom}>
+    <AppThemeProvider dom={dom}>
+      <CssBaseline enableColorScheme />
+      <AppRoot ref={rootRef}>
+        <NoSsr>
+          {components ? (
+            <ComponentsContextProvider value={components}>
+              <DomContextProvider value={dom}>
+                <ErrorBoundary FallbackComponent={AppError}>
+                  <ResetNodeErrorsKeyProvider value={resetNodeErrorsKey}>
+                    <React.Suspense fallback={<AppLoading />}>
                       <AppContextProvider value={appContext}>
                         <QueryClientProvider client={queryClient}>
                           <BrowserRouter basename={basename}>
-                            <RenderedPages dom={dom} />
+                            <ToolpadAppLayout dom={dom} version={version} hasShell={hasShell} />
                           </BrowserRouter>
                           {showDevtools ? (
                             <ReactQueryDevtoolsProduction initialIsOpen={false} />
                           ) : null}
                         </QueryClientProvider>
                       </AppContextProvider>
-                    </ComponentsContext>
-                  </AppModulesProvider>
-                </React.Suspense>
-              </ResetNodeErrorsKeyProvider>
-            </ErrorBoundary>
-          </AppThemeProvider>
-        </DomContextProvider>
-      </NoSsr>
-      <EditorOverlay id={HTML_ID_EDITOR_OVERLAY} />
-    </AppRoot>
+                    </React.Suspense>
+                  </ResetNodeErrorsKeyProvider>
+                </ErrorBoundary>
+              </DomContextProvider>
+            </ComponentsContextProvider>
+          ) : (
+            <AppLoading />
+          )}
+        </NoSsr>
+        <EditorOverlay id={HTML_ID_EDITOR_OVERLAY} />
+      </AppRoot>
+    </AppThemeProvider>
   );
 }

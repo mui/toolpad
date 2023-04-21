@@ -1,10 +1,9 @@
 import * as React from 'react';
-import Head from 'next/head';
-import { PaletteMode } from '@mui/material';
+import { PaletteMode, ScopedCssBaseline } from '@mui/material';
 import { ThemeProvider as MuiThemeProvider, createTheme } from '@mui/material/styles';
 import { deepmerge } from '@mui/utils';
 import useMediaQuery from '@mui/material/useMediaQuery';
-import { getDesignTokens, getThemedComponents, getMetaThemeColor } from './theme';
+import { getDesignTokens, getThemedComponents } from './theme';
 import useLocalStorageState from './utils/useLocalStorageState';
 
 interface ThemeProviderProps {
@@ -50,15 +49,7 @@ export function ThemeProvider({ children }: ThemeProviderProps) {
 
   return (
     <MuiThemeProvider theme={theme}>
-      <Head>
-        {/* PWA primary color */}
-        <meta
-          name="theme-color"
-          content={getMetaThemeColor(paletteMode)}
-          media={`(prefers-color-scheme: ${paletteMode})`}
-        />
-      </Head>
-      {children}
+      <ScopedCssBaseline enableColorScheme>{children}</ScopedCssBaseline>
     </MuiThemeProvider>
   );
 }

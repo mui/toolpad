@@ -31,9 +31,15 @@
 
 1. Prepend the changelog to [`CHANGELOG.md`](./CHANGELOG.md).
 
-1. Open a PR with the proposed changes.
+1. Open a PR to the `master` branch with the proposed changes. Merge the changes.
 
 1. Publish the package to `npm`
+
+   1. If you are not logged in to `npm` in your CLI, first log in with:
+
+      ```sh
+      npm login
+      ```
 
    1. Make sure dependencies are up to date
 
@@ -45,12 +51,6 @@
 
       ```sh
       yarn release:build
-      ```
-
-   1. Create a new version
-
-      ```sh
-      yarn release:version
       ```
 
    1. Publish to `npm`

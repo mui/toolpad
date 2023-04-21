@@ -3,11 +3,10 @@ import {
   BindableAttrValue,
   BindableAttrValues,
   JsRuntime,
-  Serializable,
-  SerializedError,
 } from '@mui/toolpad-core';
+import { SerializedError, errorFrom, serializeError } from '@mui/toolpad-utils/errors';
 import { evaluateBindable } from '@mui/toolpad-core/jsRuntime';
-import { ensureSuffix, removePrefix } from '../../utils/strings';
+import { ensureSuffix, removePrefix } from '@mui/toolpad-utils/strings';
 import { Maybe } from '../../utils/types';
 import {
   Authentication,
@@ -19,7 +18,6 @@ import {
   UrlEncodedBody,
 } from './types';
 import applyTransform from '../applyTransform';
-import { errorFrom, serializeError } from '../../utils/errors';
 import { MOVIES_API_DEMO_URL } from '../demo';
 
 export const HTTP_NO_BODY = new Set(['GET', 'HEAD']);
@@ -57,7 +55,7 @@ export function parseBaseUrl(baseUrl: string): URL {
 function resolveBindable(
   jsRuntime: JsRuntime,
   bindable: BindableAttrValue<string>,
-  scope: Record<string, Serializable>,
+  scope: Record<string, unknown>,
 ): any {
   const { value, error } = evaluateBindable(jsRuntime, bindable, scope);
   if (error) {
@@ -69,7 +67,7 @@ function resolveBindable(
 function resolveBindableEntries(
   jsRuntime: JsRuntime,
   entries: BindableAttrEntries,
-  scope: Record<string, Serializable>,
+  scope: Record<string, unknown>,
 ): [string, any][] {
   return entries.map(([key, value]) => [key, resolveBindable(jsRuntime, value, scope)]);
 }
@@ -77,7 +75,7 @@ function resolveBindableEntries(
 function resolveBindables<P>(
   jsRuntime: JsRuntime,
   obj: BindableAttrValues<P>,
-  scope: Record<string, Serializable>,
+  scope: Record<string, unknown>,
 ): P {
   return Object.fromEntries(
     resolveBindableEntries(jsRuntime, Object.entries(obj) as BindableAttrEntries, scope),
@@ -102,7 +100,7 @@ interface ResolvedRawBody {
 function resolveRawBody(
   jsRuntime: JsRuntime,
   body: RawBody,
-  scope: Record<string, Serializable>,
+  scope: Record<string, unknown>,
 ): ResolvedRawBody {
   const { content, contentType } = resolveBindables(
     jsRuntime,
@@ -127,7 +125,7 @@ interface ResolveUrlEncodedBodyBody {
 function resolveUrlEncodedBody(
   jsRuntime: JsRuntime,
   body: UrlEncodedBody,
-  scope: Record<string, Serializable>,
+  scope: Record<string, unknown>,
 ): ResolveUrlEncodedBodyBody {
   return {
     kind: 'urlEncoded',
@@ -135,7 +133,7 @@ function resolveUrlEncodedBody(
   };
 }
 
-function resolveBody(jsRuntime: JsRuntime, body: Body, scope: Record<string, Serializable>) {
+function resolveBody(jsRuntime: JsRuntime, body: Body, scope: Record<string, unknown>) {
   switch (body.kind) {
     case 'raw':
       return resolveRawBody(jsRuntime, body, scope);
@@ -177,7 +175,7 @@ export async function execfetch(
   { connection, jsRuntime, fetchImpl }: ExecBaseOptions,
 ): Promise<FetchResult> {
   const queryScope = {
-    // TODO: remove deprecated query after v1
+    // @TODO: remove deprecated query after v1
     query: params,
     parameters: params,
   };

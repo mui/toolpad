@@ -34,7 +34,7 @@ import {
   Popover,
 } from '@mui/material';
 import { getObjectKey } from '@mui/toolpad-core/objectKey';
-import { errorFrom } from '@mui/toolpad-core/utils/errors';
+import { errorFrom } from '@mui/toolpad-utils/errors';
 import { hasImageExtension } from '@mui/toolpad-core/path';
 import { ErrorBoundary, FallbackProps } from 'react-error-boundary';
 import { SX_PROP_HELPER_TEXT } from './constants.js';

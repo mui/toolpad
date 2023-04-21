@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { ErrorBoundary, FallbackProps } from 'react-error-boundary';
-import Emitter from './utils/Emitter.js';
+import { Emitter } from '@mui/toolpad-utils/events';
 import { RuntimeEvents, ToolpadComponents } from './types.js';
 import { RUNTIME_PROP_NODE_ID, RUNTIME_PROP_SLOTS } from './constants.js';
 import type { SlotType, ComponentConfig, RuntimeEvent, RuntimeError } from './types.js';

@@ -34,7 +34,7 @@ import {
   useComponents,
   useComponent,
 } from '@mui/toolpad-core';
-import { createProvidedContext } from '@mui/toolpad-core/utils/react';
+import { createProvidedContext } from '@mui/toolpad-utils/react';
 import { QueryClient, QueryClientProvider, useMutation } from '@tanstack/react-query';
 import {
   BrowserRouter,
@@ -57,6 +57,8 @@ import ErrorIcon from '@mui/icons-material/Error';
 import EditIcon from '@mui/icons-material/Edit';
 import { useBrowserJsRuntime } from '@mui/toolpad-core/jsBrowserRuntime';
 import * as builtIns from '@mui/toolpad-components';
+import { errorFrom } from '@mui/toolpad-utils/errors';
+import { mapProperties, mapValues } from '@mui/toolpad-utils/collections';
 import * as appDom from '../appDom';
 import { RuntimeState, AppVersion } from '../types';
 import {
@@ -73,7 +75,6 @@ import evalJsBindings, {
   ParsedBinding,
 } from './evalJsBindings';
 import { HTML_ID_EDITOR_OVERLAY, NON_BINDABLE_CONTROL_TYPES } from '../constants';
-import { mapProperties, mapValues } from '../utils/collections';
 import usePageTitle from '../utils/usePageTitle';
 import Pre from '../components/Pre';
 import { layoutBoxArgTypes } from '../toolpadComponents/layoutBox';
@@ -82,7 +83,6 @@ import { execDataSourceQuery, useDataQuery, UseDataQueryConfig, UseFetch } from 
 import { useAppContext, AppContextProvider } from './AppContext';
 import { CanvasHooksContext, NavigateToPage } from './CanvasHooksContext';
 import useBoolean from '../utils/useBoolean';
-import { errorFrom } from '../utils/errors';
 import Header from '../toolpad/ToolpadShell/Header';
 import { ThemeProvider } from '../ThemeContext';
 import { BridgeContext } from '../canvas/BridgeContext';

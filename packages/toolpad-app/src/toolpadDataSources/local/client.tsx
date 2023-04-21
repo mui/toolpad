@@ -2,6 +2,7 @@ import * as React from 'react';
 import { BindableAttrEntries, CreateFunctionConfig } from '@mui/toolpad-core';
 import { Autocomplete, Button, Stack, TextField, Typography } from '@mui/material';
 import { useBrowserJsRuntime } from '@mui/toolpad-core/jsBrowserRuntime';
+import { errorFrom } from '@mui/toolpad-utils/errors';
 import { ClientDataSource, QueryEditorProps } from '../../types';
 import {
   LocalPrivateQuery,
@@ -24,7 +25,6 @@ import QueryPreview from '../QueryPreview';
 import { usePrivateQuery } from '../context';
 import BindableEditor from '../../toolpad/AppEditor/PageEditor/BindableEditor';
 import { getDefaultControl } from '../../toolpad/propertyControls';
-import { errorFrom } from '../../utils/errors';
 import { PropBindingEditorDialog } from '../../toolpad/AppEditor/BindingEditor/PropBindingEditorDialog';
 
 const EMPTY_PARAMS: BindableAttrEntries = [];

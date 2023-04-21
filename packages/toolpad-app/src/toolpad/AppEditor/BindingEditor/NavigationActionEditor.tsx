@@ -1,11 +1,11 @@
 import { Box, Typography, TextField, MenuItem } from '@mui/material';
 import * as React from 'react';
 import { BindableAttrValue, NavigationAction, NodeId } from '@mui/toolpad-core';
+import { mapValues } from '@mui/toolpad-utils/collections';
 import { WithControlledProp } from '../../../utils/types';
 import { useDom } from '../../AppState';
 import * as appDom from '../../../appDom';
 import { usePageEditorState } from '../PageEditor/PageEditorProvider';
-import { mapValues } from '../../../utils/collections';
 import BindableEditor from '../PageEditor/BindableEditor';
 import { useBindingEditorContext } from '.';
 import { useEvaluateLiveBinding } from '../useEvaluateLiveBinding';

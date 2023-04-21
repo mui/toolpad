@@ -385,6 +385,7 @@ function mergeThemeIntoAppDom(dom: appDom.AppDom, themeFile: Theme): appDom.AppD
 }
 
 function toBindable<V>(value: V | { $$jsExpression: string }): BindableAttrValue<V> {
+  console.log('fuck');
   if (value && typeof value === 'object' && typeof (value as any).$$jsExpression === 'string') {
     return { type: 'jsExpression', value: (value as any).$$jsExpression };
   }
@@ -410,7 +411,10 @@ function toBindableProp<V>(value: V | { $$jsExpression: string }): BindableAttrV
     if (typeof (value as any).$$jsExpressionAction === 'string') {
       return { type: 'jsExpressionAction', value: (value as any).$$jsExpressionAction };
     }
-    if (typeof (value as any).$$navigationAction === 'string') {
+    if (
+      typeof (value as any).$$navigationAction === 'string' ||
+      typeof (value as any).$$navigationAction === 'object'
+    ) {
       const action = value as any as NavigationAction;
       return {
         type: 'navigationAction',

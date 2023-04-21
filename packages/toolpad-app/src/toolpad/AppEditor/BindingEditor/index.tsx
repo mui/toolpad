@@ -22,7 +22,7 @@ import {
   BindableAttrValue,
   PropValueType,
 } from '@mui/toolpad-core';
-import { createProvidedContext } from '@mui/toolpad-core/utils/react';
+import { createProvidedContext } from '@mui/toolpad-utils/react';
 import { JsExpressionEditor } from '../PageEditor/JsExpressionEditor';
 import JsonView from '../../../components/JsonView';
 import useLatest from '../../../utils/useLatest';

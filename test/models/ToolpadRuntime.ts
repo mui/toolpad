@@ -22,4 +22,8 @@ export class ToolpadRuntime {
   async gotoPageById(appId: string, pageId: string) {
     await this.page.goto(`/preview/pages/${pageId}`);
   }
+
+  async waitForNavigation() {
+    await this.page.waitForURL(/\/preview\/pages\/[^/]+$/);
+  }
 }

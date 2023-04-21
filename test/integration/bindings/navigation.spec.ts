@@ -22,6 +22,8 @@ test('navigation action', async ({ page }) => {
   const testButton = page.getByRole('button', { name: 'test' });
   await testButton.click();
 
+  await runtimeModel.waitForNavigation();
+
   await expect(page.getByText('welcome to page 2')).toBeVisible();
 
   expect(getPageUrlSearch()).toBe('?abc=zyx&def=test');

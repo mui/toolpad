@@ -9,3 +9,11 @@ spec:
     - name: def
       value: "456"
   display: shell
+  content:
+    - component: PageRow
+      name: pageRow
+      children:
+        - component: Text
+          name: text
+          props:
+            value: welcome to page 2

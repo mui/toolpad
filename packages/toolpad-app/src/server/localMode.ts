@@ -410,10 +410,7 @@ function toBindableProp<V>(value: V | { $$jsExpression: string }): BindableAttrV
     if (typeof (value as any).$$jsExpressionAction === 'string') {
       return { type: 'jsExpressionAction', value: (value as any).$$jsExpressionAction };
     }
-    if (
-      typeof (value as any).$$navigationAction === 'string' ||
-      typeof (value as any).$$navigationAction === 'object'
-    ) {
+    if (typeof (value as any).$$navigationAction === 'object') {
       const action = value as any as NavigationAction;
       return {
         type: 'navigationAction',

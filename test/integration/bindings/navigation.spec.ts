@@ -9,7 +9,7 @@ test.use({
   },
 });
 
-test('navigation action bindings', async ({ page }) => {
+test('navigation action', async ({ page }) => {
   const runtimeModel = new ToolpadRuntime(page);
   await runtimeModel.gotoPage('page1');
 
@@ -19,6 +19,8 @@ test('navigation action bindings', async ({ page }) => {
 
   const testButton = page.getByRole('button', { name: 'test' });
   await testButton.click();
+
+  await expect(page.getByText('welcome to page 2')).toBeVisible();
 
   expect(getPageUrlSearch()).toBe('?abc=zyx&def=test');
 });

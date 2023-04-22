@@ -1,16 +1,16 @@
 # Queries
 
-<p class="description">Toolpad allows you to bring remote data as state to the page and allows your UI to bind itself to this state.</p>
+<p class="description">A query allows to bring remote data as "state" to the page and allows your UI to bind itself to that state.</p>
 
-Be it a database table or an external API, most data we want to display in Toolpad pages originates serverside. Toolpad offers mechanisms to bring this serverside data to the page. The most common way is through **queries**. To configure a query we need to follow these steps:
+Be it a database table or an external API, most data you want to display in Toolpad pages originates serverside. Toolpad offers mechanisms to bring this serverside data to the page. The most common way is through **queries**. To configure a query you need to follow these steps:
 
 1. Click **Add query** button in the **Inspector** on the right:
 
-   <img src="/static/toolpad/docs/queries/query-1.png?v=0" alt="Query" width="284px" />
+   <img src="/static/toolpad/docs/queries/query-1.png?v=0" alt="Query" width="284" />
 
-1. At the moment there are two remote data sources we support:
+1. At the moment there are two remote data sources that are supported:
 
-   <img src="/static/toolpad/docs/queries/query-2.png?v=0" alt="Select query type" width="464px" />
+   <img src="/static/toolpad/docs/queries/query-2.png?v=0" alt="Select query type" width="464" />
 
    - [serverside JavaScript](/toolpad/connecting-to-datasources/serverside-javascript/) - Write serverside JavaScript functions and their result will be automatically made available on the page. These have full access to the Node.js environment they run under.
    - [serverside HTTP request](/toolpad/connecting-to-datasources/serverside-http-request/) - Basic, but very powerful. Just pass URL of an API endpoint and you are ready to query your data.
@@ -19,7 +19,7 @@ Be it a database table or an external API, most data we want to display in Toolp
 
 1. There are a few configuration options that are applicable to every query type:
 
-   <img src="/static/toolpad/docs/queries/query-3.png?v=0" alt="Query configuration" width="855px" />
+   <img src="/static/toolpad/docs/queries/query-3.png?v=0" alt="Query configuration" width="855" />
 
    - **mode**
      - **Fetch at any time to always be availabe on the page** - Execute the query automatically to make sure the latest data is always available on the page. Use this when you want to display remote data in the UI. The data must be idempotent, the query will be retried on error and executed on regular times to make sure the data on the page is up to date.

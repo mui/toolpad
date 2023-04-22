@@ -51,10 +51,10 @@ test('can create/delete page', async ({ page, localApp }) => {
 
   await editorModel.goto();
 
-  await editorModel.createPage('somePage');
+  await editorModel.createPage('someOtherPage');
 
-  const pageMenuItem = editorModel.getHierarchyItem('pages', 'somePage');
-  const pageFolder = path.resolve(localApp.dir, './toolpad/pages/somePage');
+  const pageMenuItem = editorModel.getHierarchyItem('pages', 'someOtherPage');
+  const pageFolder = path.resolve(localApp.dir, './toolpad/pages/someOtherPage');
   const pageFile = path.resolve(pageFolder, './page.yml');
 
   await expect(pageMenuItem).toBeVisible();

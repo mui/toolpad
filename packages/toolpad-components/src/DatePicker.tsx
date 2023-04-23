@@ -132,7 +132,7 @@ function DatePicker({
 
 export default createComponent(DatePicker, {
   helperText:
-    'The MUI X [Date picker](https://mui.com/x/react-date-pickers/date-picker/) component.\n\nThe date picker lets the user select a date.',
+    'The MUI X [Date Picker](https://mui.com/x/react-date-pickers/date-picker/) component.\n\nThe date picker lets the user select a date.',
   argTypes: {
     value: {
       helperText: 'The currently selected date.',

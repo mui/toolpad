@@ -348,7 +348,7 @@ _Jan 4, 2023_
 
 A big thanks to the 4 contributors who made this release possible. Here are some highlights ✨:
 
-New date picker component, Make switching views part of undo/redo cycle.
+New Date Picker component, Make switching views part of undo/redo cycle.
 
 - &#8203;<!-- 13 -->Fix dependabot vulnerabilities (#1512) @Janpot
 - &#8203;<!-- 12 -->Don't import from dist folders (#1513) @Janpot
@@ -359,7 +359,7 @@ New date picker component, Make switching views part of undo/redo cycle.
 - &#8203;<!-- 07 -->Datepicker format handling changes (#1504) @bytasv
 - &#8203;<!-- 04 -->Undo/redo through different views (#1417) @apedroferreira
 - &#8203;<!-- 03 -->Make sure npm package is splitted out correctly (#1502) @Janpot
-- &#8203;<!-- 02 -->Date picker component (#1499) @bytasv
+- &#8203;<!-- 02 -->Date Picker component (#1499) @bytasv
 - &#8203;<!-- 01 -->[core] Remove dead prettier config @oliviertassinari
 
 All contributors of this release in alphabetical order: @apedroferreira, @bytasv, @Janpot, @oliviertassinari

@@ -2,7 +2,9 @@
 
 <p class="description">A query allows to bring remote data as "state" to the page and allows your UI to bind itself to that state.</p>
 
-Be it a database table or an external API, most data you want to display in Toolpad pages originates serverside. Toolpad offers mechanisms to bring this serverside data to the page. The most common way is through **queries**. To configure a query you need to follow these steps:
+Be it a database table or an external API, most data you want to display in Toolpad pages originates serverside.
+Toolpad offers mechanisms to bring this serverside data to the page.
+The most common way is through **queries**, to configure a query you need to follow these steps:
 
 1. Click **Add query** button in the **Inspector** on the right:
 

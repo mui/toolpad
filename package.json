@@ -93,7 +93,7 @@
     "cross-env": "^7.0.3",
     "dotenv-cli": "^7.2.1",
     "inquirer": "^9.1.5",
-    "semver": "^7.4.0",
+    "semver": "^7.5.0",
     "tsup": "^6.7.0",
     "yargs": "^17.7.1"
   },

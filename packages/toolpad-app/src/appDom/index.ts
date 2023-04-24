@@ -1,4 +1,4 @@
-import { init as cuid2Init } from '@paralleldrive/cuid2';
+import { nanoid } from 'nanoid/non-secure';
 import { generateKeyBetween } from 'fractional-indexing';
 import {
   NodeId,
@@ -234,10 +234,8 @@ function assertIsType<T extends AppDomNode>(node: AppDomNode, type: T['type']): 
   invariant(isType(node, type), `Expected node type "${type}" but got "${node.type}"`);
 }
 
-const createIdInternal = cuid2Init({ length: 7 });
-
 export function createId(): NodeId {
-  return createIdInternal() as NodeId;
+  return nanoid(7) as NodeId;
 }
 
 export function createConst<V>(value: V): ConstantAttrValue<V> {

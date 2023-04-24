@@ -13,6 +13,7 @@ import cuid from 'cuid';
 import { Emitter } from '@mui/toolpad-utils/events';
 import { errorFrom } from '@mui/toolpad-utils/errors';
 import { filterValues, hasOwnProperty, mapValues } from '@mui/toolpad-utils/collections';
+import { execa } from 'execa';
 import config from '../config';
 import * as appDom from '../appDom';
 import { migrateUp } from '../appDom/migrations';
@@ -941,11 +942,39 @@ async function writeDomToDisk(dom: appDom.AppDom): Promise<void> {
   await Promise.all([writePagesToFiles(root, pagesContent)]);
 }
 
+const DEFAULT_EDITOR = 'code';
+
+export async function findSupportedEditor(): Promise<string | null> {
+  const maybeEditor = process.env.EDITOR ?? DEFAULT_EDITOR;
+  if (!maybeEditor) {
+    return null;
+  }
+  try {
+    await execa('which', [maybeEditor]);
+    return maybeEditor;
+  } catch (err) {
+    return null;
+  }
+}
+
+let supportedEditorPromise: Promise<string | null>;
+
+export async function getSupportedEditor(): Promise<string | null> {
+  if (!supportedEditorPromise) {
+    supportedEditorPromise = findSupportedEditor();
+  }
+  return supportedEditorPromise;
+}
+
 export async function openCodeEditor(file: string): Promise<void> {
+  const supportedEditor = await getSupportedEditor();
+  if (!supportedEditor) {
+    throw new Error(`No code editor found`);
+  }
   const userProjectRoot = getUserProjectRoot();
   const fullPath = path.resolve(userProjectRoot, file);
   openEditor([fullPath, userProjectRoot], {
-    editor: process.env.EDITOR ? undefined : 'vscode',
+    editor: process.env.EDITOR ? undefined : DEFAULT_EDITOR,
   });
 }
 
@@ -953,10 +982,7 @@ export async function openCodeComponentEditor(componentName: string): Promise<vo
   const root = getUserProjectRoot();
   const componentsFolder = getComponentsFolder(root);
   const fullPath = getComponentFilePath(componentsFolder, componentName);
-  const userProjectRoot = getUserProjectRoot();
-  openEditor([fullPath, userProjectRoot], {
-    editor: process.env.EDITOR ? undefined : 'vscode',
-  });
+  await openCodeEditor(fullPath);
 }
 
 export async function openQueryEditor() {

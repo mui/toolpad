@@ -19,12 +19,12 @@ test('navigation action', async ({ page }) => {
 
   expect(getPageUrlSearch()).toBe('');
 
-  const testButton = page.getByRole('button', { name: 'test' });
-  await testButton.click();
+  const navigationButton = page.getByRole('button', { name: 'goToPage2' });
+  await navigationButton.click();
 
   await runtimeModel.waitForNavigation();
 
   await expect(page.getByText('welcome to page 2')).toBeVisible();
 
-  expect(getPageUrlSearch()).toBe('?abc=zyx&def=test');
+  expect(getPageUrlSearch()).toBe('?abc=zyx&def=goToPage2');
 });

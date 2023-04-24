@@ -18,5 +18,5 @@ spec:
                   def:
                     $$jsExpression: |
                       button.content
-            content: test
+            content: goToPage2
   display: shell

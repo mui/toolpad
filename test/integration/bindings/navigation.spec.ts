@@ -13,18 +13,17 @@ test('navigation action', async ({ page }) => {
   const runtimeModel = new ToolpadRuntime(page);
   await runtimeModel.gotoPage('page1');
 
-  await expect(page.getByText('welcome to page 2')).not.toBeVisible();
-
   const getPageUrlSearch = (): string => new URL(page.url()).search;
 
+  const navigationButton = page.getByRole('button', { name: 'goToPage2' });
+
+  await expect(navigationButton).toBeVisible();
+  await expect(page.getByText('welcome to page 2')).not.toBeVisible();
   expect(getPageUrlSearch()).toBe('');
 
-  const navigationButton = page.getByRole('button', { name: 'goToPage2' });
   await navigationButton.click();
-
   await runtimeModel.waitForNavigation();
 
   await expect(page.getByText('welcome to page 2')).toBeVisible();
-
   expect(getPageUrlSearch()).toBe('?abc=zyx&def=goToPage2');
 });

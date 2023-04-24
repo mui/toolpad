@@ -144,6 +144,10 @@ export class ToolpadEditor {
     await this.page.mouse.up();
   }
 
+  getComponentCatalogItem(name: string): Locator {
+    return this.page.getByTestId('component-catalog').getByRole('button', { name });
+  }
+
   async dragNewComponentToAppCanvas(componentName: string) {
     await this.componentCatalog.hover();
 
@@ -151,19 +155,17 @@ export class ToolpadEditor {
     await this.page.waitForTimeout(200);
 
     const targetBoundingBox = await this.pageRoot.boundingBox();
-    expect(targetBoundingBox).toBeDefined();
+    await expect(targetBoundingBox).toBeDefined();
 
     const moveTargetX = targetBoundingBox!.x + targetBoundingBox!.width / 2;
     const moveTargetY = targetBoundingBox!.y + targetBoundingBox!.height / 2;
 
-    const sourceLocator = this.page.getByTestId('component-catalog').getByRole('button', {
-      name: componentName,
-    });
+    const sourceLocator = this.getComponentCatalogItem(componentName);
 
-    this.dragToAppCanvas(sourceLocator, moveTargetX, moveTargetY);
+    await this.dragToAppCanvas(sourceLocator, moveTargetX, moveTargetY);
   }
 
-  hierarchyItem(group: string, name: string): Locator {
+  getHierarchyItem(group: string, name: string): Locator {
     return this.explorer
       .getByRole('treeitem')
       .filter({ hasText: group })
@@ -172,7 +174,7 @@ export class ToolpadEditor {
   }
 
   async openHierarchyMenu(group: string, name: string) {
-    const hierarchyItem = this.hierarchyItem(group, name);
+    const hierarchyItem = this.getHierarchyItem(group, name);
     const menuButton = hierarchyItem.getByRole('button', { name: 'Open hierarchy menu' });
     await hierarchyItem.hover();
     await menuButton.click();

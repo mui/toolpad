@@ -135,6 +135,7 @@ jobs:
       - image: mcr.microsoft.com/playwright:v1.32.3-focal
         environment:
           NODE_ENV: test
+          TOOLPAD_TEST_RETRIES: 1
       - image: kennethreitz/httpbin:latest
 
     steps:
@@ -154,9 +155,12 @@ jobs:
       - run:
           name: Tests real browser
           environment:
-            - LOCAL_MODE_TESTS: '1'
-            - HTTPBIN_BASEURL: 'http://localhost/'
+            HTTPBIN_BASEURL: 'http://localhost/'
+            TOOLPAD_VITE_RUNTIME: 1
           command: yarn test:integration
+      - store_artifacts:
+          path: test-results
+          destination: playwright-test-results
 
 workflows:
   pipeline:

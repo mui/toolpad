@@ -16,7 +16,7 @@
 
 1. In addition you can configure following properties inline:
 
-   <img src="/static/toolpad/docs/google-sheets/sheets-2.png" alt="Google Sheets configuration" width="1438px" />
+   <img src="/static/toolpad/docs/google-sheets/sheets-2.png" alt="Google Sheets configuration" width="1438" />
 
    - **Select spreadsheet** - browse for a spreadsheet that you own or that is shared with you.
 

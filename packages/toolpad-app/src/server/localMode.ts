@@ -307,7 +307,7 @@ async function initGitignore(root: string) {
   const generatedGitignorePath = path.resolve(projectFolder, '.gitignore');
   if (!(await fileExists(generatedGitignorePath))) {
     // eslint-disable-next-line no-console
-    console.log(`${chalk.blue('info')}  - Initializing Toolpad queries file`);
+    console.log(`${chalk.blue('info')}  - Initializing .gitignore file`);
     await writeFileRecursive(generatedGitignorePath, DEFAULT_GENERATED_GITIGNORE_FILE_CONTENT, {
       encoding: 'utf-8',
     });

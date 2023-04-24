@@ -124,7 +124,7 @@ _If you're looking into contributing to the docs, follow the [instructions](#bui
 
   ```sh
   yarn build:release
-  yarn test:integration --project chromiun
+  yarn test:integration --project chromium
   ```
 
 - To run the tests locally in dev mode

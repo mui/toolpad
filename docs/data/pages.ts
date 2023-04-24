@@ -20,11 +20,11 @@ const pages: MuiPage[] = [
       },
       {
         pathname: '/toolpad/connecting-to-datasources/serverside-http-request',
-        title: 'serverside HTTP request',
+        title: 'Serverside HTTP requests',
       },
       {
         pathname: '/toolpad/connecting-to-datasources/serverside-javascript',
-        title: 'serverside JavaScript',
+        title: 'Serverside JavaScript',
       },
     ],
   },
@@ -47,7 +47,7 @@ const pages: MuiPage[] = [
       },
       {
         pathname: '/toolpad/building-ui/data-grid-component',
-        title: 'DataGrid component',
+        title: 'Data Grid component',
       },
     ],
   },

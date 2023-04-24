@@ -62,7 +62,7 @@ function FilePicker({ multiple, onChange, ...props }: Props) {
 }
 
 export default createComponent(FilePicker, {
-  helperText: 'File picker component.\nIt allows users to take select and read files.',
+  helperText: 'File Picker component.\nIt allows users to take select and read files.',
   argTypes: {
     value: {
       typeDef: { type: 'object' },

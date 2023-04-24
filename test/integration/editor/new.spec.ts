@@ -20,7 +20,7 @@ test('can place new components from catalog', async ({ page }) => {
 
   await expect(canvasInputLocator).toHaveCount(0);
 
-  const TEXT_FIELD_COMPONENT_DISPLAY_NAME = 'Text field';
+  const TEXT_FIELD_COMPONENT_DISPLAY_NAME = 'Text Field';
 
   // Drag in a first component
 

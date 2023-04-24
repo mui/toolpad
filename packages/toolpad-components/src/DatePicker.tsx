@@ -2,8 +2,10 @@ import * as React from 'react';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DesktopDatePicker, DesktopDatePickerProps } from '@mui/x-date-pickers/DesktopDatePicker';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
-import { createComponent } from '@mui/toolpad-core';
+import { createComponent, useNode } from '@mui/toolpad-core';
 import dayjs from 'dayjs';
+import { Controller, FieldError } from 'react-hook-form';
+import { FormContext, useFormInput, withComponentForm } from './Form.js';
 import { SX_PROP_HELPER_TEXT } from './constants.js';
 
 const LOCALE_LOADERS = new Map(
@@ -69,13 +71,16 @@ function getSnapshot() {
 export interface DatePickerProps
   extends Omit<DesktopDatePickerProps<dayjs.Dayjs>, 'value' | 'onChange' | 'defaultValue'> {
   value?: string;
-  onChange?: (newValue: string) => void;
+  onChange: (newValue: string | null) => void;
   format: string;
   fullWidth: boolean;
   variant: 'outlined' | 'filled' | 'standard';
   size: 'small' | 'medium';
   sx: any;
   defaultValue?: string;
+  name: string;
+  isRequired: boolean;
+  isInvalid: boolean;
 }
 
 function DatePicker({
@@ -83,18 +88,46 @@ function DatePicker({
   onChange,
   value: valueProp,
   defaultValue: defaultValueProp,
-  ...props
+  isRequired,
+  isInvalid,
+  ...rest
 }: DatePickerProps) {
+  const nodeRuntime = useNode();
+
+  const fieldName = rest.name || nodeRuntime?.nodeName;
+
+  const fallbackName = React.useId();
+  const nodeName = fieldName || fallbackName;
+
+  const { form } = React.useContext(FormContext);
+  const fieldError = nodeName && form?.formState.errors[nodeName];
+
+  const validationProps = React.useMemo(() => ({ isRequired, isInvalid }), [isInvalid, isRequired]);
+
+  const { onFormInputChange } = useFormInput<string | null>({
+    name: nodeName,
+    value: valueProp,
+    onChange,
+    defaultValue: defaultValueProp,
+    emptyValue: null,
+    validationProps,
+  });
+
   const handleChange = React.useMemo(
     () =>
       onChange
-        ? (value: dayjs.Dayjs | null) => {
+        ? (newValue: dayjs.Dayjs | null) => {
             // date-only form of ISO8601. See https://tc39.es/ecma262/#sec-date-time-string-format
-            const stringValue = value?.format('YYYY-MM-DD') || '';
-            onChange(stringValue);
+            const stringValue = newValue?.format('YYYY-MM-DD') || '';
+
+            if (form) {
+              onFormInputChange(stringValue);
+            } else {
+              onChange(stringValue);
+            }
           }
         : undefined,
-    [onChange],
+    [form, onChange, onFormInputChange],
   );
 
   const adapterLocale = React.useSyncExternalStore(subscribeLocaleLoader, getSnapshot);
@@ -109,28 +142,52 @@ function DatePicker({
     [defaultValueProp],
   );
 
+  const datePickerElement = (
+    <DesktopDatePicker<dayjs.Dayjs>
+      {...rest}
+      format={format || 'L'}
+      value={value || null}
+      onChange={handleChange}
+      defaultValue={defaultValue}
+      slotProps={{
+        textField: {
+          fullWidth: rest.fullWidth,
+          variant: rest.variant,
+          size: rest.size,
+          sx: rest.sx,
+          ...(form && {
+            error: Boolean(fieldError),
+            helperText: (fieldError as FieldError)?.message || '',
+          }),
+        },
+      }}
+    />
+  );
+
+  const fieldDisplayName = rest.label || fieldName || 'Field';
+
   return (
     <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale={adapterLocale}>
-      <DesktopDatePicker<dayjs.Dayjs>
-        {...props}
-        format={format || 'L'}
-        value={value}
-        onChange={handleChange}
-        defaultValue={defaultValue}
-        slotProps={{
-          textField: {
-            fullWidth: props.fullWidth,
-            variant: props.variant,
-            size: props.size,
-            sx: props.sx,
-          },
-        }}
-      />
+      {form && nodeName ? (
+        <Controller
+          name={nodeName}
+          control={form.control}
+          rules={{
+            required: isRequired ? `${fieldDisplayName} is required.` : false,
+            validate: () => !isInvalid || `${fieldDisplayName} is invalid.`,
+          }}
+          render={() => datePickerElement}
+        />
+      ) : (
+        datePickerElement
+      )}
     </LocalizationProvider>
   );
 }
 
-export default createComponent(DatePicker, {
+const FormWrappedDatePicker = withComponentForm(DatePicker);
+
+export default createComponent(FormWrappedDatePicker, {
   helperText:
     'The MUI X [Date Picker](https://mui.com/x/react-date-pickers/date-picker/) component.\n\nThe date picker lets the user select a date.',
   argTypes: {
@@ -156,6 +213,10 @@ export default createComponent(DatePicker, {
       helperText: 'A label that describes the content of the date picker. e.g. "Arrival date".',
       typeDef: { type: 'string' },
     },
+    name: {
+      helperText: 'Name of this element. Used as a reference in form data.',
+      typeDef: { type: 'string' },
+    },
     variant: {
       helperText:
         'One of the available MUI TextField [variants](https://mui.com/material-ui/react-button/#basic-button). Possible values are `outlined`, `filled` or `standard`',
@@ -172,6 +233,16 @@ export default createComponent(DatePicker, {
     disabled: {
       helperText: 'The date picker is disabled.',
       typeDef: { type: 'boolean' },
+    },
+    isRequired: {
+      helperText: 'Whether the date picker is required to have a value.',
+      typeDef: { type: 'boolean', default: false },
+      category: 'validation',
+    },
+    isInvalid: {
+      helperText: 'Whether the date picker value is invalid.',
+      typeDef: { type: 'boolean', default: false },
+      category: 'validation',
     },
     sx: {
       helperText: SX_PROP_HELPER_TEXT,

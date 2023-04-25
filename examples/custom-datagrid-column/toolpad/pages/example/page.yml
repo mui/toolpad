@@ -1,0 +1,51 @@
+apiVersion: v1
+kind: page
+spec:
+  id: yq14d6o
+  title: Page 1
+  content:
+    - component: PageRow
+      name: pageRow
+      children:
+        - component: DataGrid
+          name: dataGrid
+          props:
+            rows:
+              - firstname: Salman
+                lastname: Anthony
+                age: 17
+              - firstname: Crystal
+                lastname: Wise
+                age: 32
+              - firstname: Yasmin
+                lastname: Cherry
+                age: 56
+              - firstname: Maisha
+                lastname: Browning
+                age: 8
+              - firstname: Ronald
+                lastname: Santana
+                age: 11
+              - firstname: Bronwyn
+                lastname: Odling
+                age: 3
+              - firstname: Bushra
+                lastname: Chen
+                age: 43
+              - firstname: Savanna
+                lastname: Hardy
+                age: 45
+              - firstname: John
+                lastname: Sutherland
+                age: 19
+              - firstname: Romeo
+                lastname: Kerr
+                age: 21
+            columns:
+              - field: fullname
+                type: codeComponent
+                codeComponent: FullNameColumn
+                width: 212
+              - field: age
+                type: codeComponent
+                codeComponent: AgeColumn

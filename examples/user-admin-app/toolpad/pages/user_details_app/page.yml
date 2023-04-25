@@ -1,0 +1,396 @@
+apiVersion: v1
+kind: page
+spec:
+  id: 8n63lnb
+  title: Employees
+  content:
+    - component: PageRow
+      name: pageRow11
+      children:
+        - component: Paper
+          name: paper5
+          props:
+            sx:
+              border: 1
+              borderColor: "#424B54"
+            elevation: 0
+          children:
+            - component: PageRow
+              name: pageRow13
+              children:
+                - component: PageColumn
+                  name: pageColumn2
+                  layout:
+                    columnSize: 1
+                  children:
+                    - component: PageRow
+                      name: pageRow3
+                      props:
+                        justifyContent: start
+                      children:
+                        - component: Image
+                          name: image1
+                          layout:
+                            columnSize: 0.13695090439276486
+                            verticalAlign: end
+                          props:
+                            src: https://iili.io/HoCHfyv.png
+                            width: 70
+                            height: 40
+                        - component: Text
+                          name: typography3
+                          layout:
+                            columnSize: 1.8630490956072352
+                            horizontalAlign: center
+                          props:
+                            sx:
+                              color: "#424B54"
+                              fontWeight: bold
+                            value: Acme corp. admin app
+                            variant: h4
+                    - component: Text
+                      name: typography4
+                      props:
+                        value: Acme corp. is a global ecom company and this is a customer support
+                          application to update user details.
+                    - component: Paper
+                      name: paper3
+                      layout:
+                        columnSize: 1
+                      props:
+                        sx:
+                          bgcolor: "#424B54"
+                      children:
+                        - component: PageRow
+                          name: pageRow5
+                          children:
+                            - component: Text
+                              name: typography1
+                              layout:
+                                columnSize: 1.7493609828496042
+                              props:
+                                sx:
+                                  color: "#EBCFB2"
+                                value: User list
+                                variant: h5
+                            - component: Button
+                              name: button1
+                              layout:
+                                columnSize: 0.25063901715039577
+                                horizontalAlign: end
+                              props:
+                                sx:
+                                  color: "#EBCFB2"
+                                  borderColor: "#EBCFB2"
+                                size: large
+                                content: REFRESH
+                                onClick:
+                                  $$jsExpressionAction: xano_get.refetch()
+                                variant: outlined
+                    - component: DataGrid
+                      name: dataGrid2
+                      props:
+                        rows:
+                          $$jsExpression: |
+                            xano_get.data
+                        height: 514
+                        columns:
+                          - type: number
+                            field: id
+                          - type: string
+                            field: name
+                          - type: string
+                            field: account_creation_date
+                          - type: string
+                            field: country_of_residence
+                          - type: number
+                            field: phone_number
+                          - type: string
+                            field: email
+                          - type: string
+                            field: address
+                          - type: string
+                            field: gender
+                          - type: string
+                            field: id_1
+                          - type: string
+                            field: id_number
+                          - type: image
+                            align: center
+                            field: image
+                        loading:
+                          $$jsExpression: |
+                            xano_get.isFetching
+                    - component: PageRow
+                      name: pageRow2
+                      props:
+                        justifyContent: start
+                      children:
+                        - component: Paper
+                          name: paper
+                          layout:
+                            columnSize: 1
+                          props:
+                            elevation: 1
+                          children:
+                            - component: PageRow
+                              name: pageRow9
+                              children:
+                                - component: PageColumn
+                                  name: pageColumn1
+                                  layout:
+                                    columnSize: 1
+                                  children:
+                                    - component: PageRow
+                                      name: pageRow1
+                                      props:
+                                        justifyContent: start
+                                      children:
+                                        - component: Paper
+                                          name: paper1
+                                          props:
+                                            sx:
+                                              bgcolor: "#424B54"
+                                          children:
+                                            - component: PageRow
+                                              name: pageRow6
+                                              children:
+                                                - component: Text
+                                                  name: typography
+                                                  layout:
+                                                    columnSize: 0.9973082099596231
+                                                  props:
+                                                    sx:
+                                                      color: "#EBCFB2"
+                                                    value: User contact details
+                                                    variant: h5
+                                    - component: TextField
+                                      name: name
+                                      props:
+                                        label: Name
+                                        disabled: false
+                                        fullWidth: true
+                                        defaultValue:
+                                          $$jsExpression: |
+                                            dataGrid2.selection.name
+                                    - component: PageRow
+                                      name: pageRow
+                                      props:
+                                        justifyContent: start
+                                      children:
+                                        - component: TextField
+                                          name: account_creation_date
+                                          props:
+                                            label: Account creation date
+                                            defaultValue:
+                                              $$jsExpression: >
+                                                dataGrid2.selection.account_creation_date
+                                        - component: TextField
+                                          name: country
+                                          layout:
+                                            columnSize: 1
+                                          props:
+                                            label: Country
+                                            defaultValue:
+                                              $$jsExpression: >
+                                                dataGrid2.selection.country_of_residence
+                                    - component: PageRow
+                                      name: pageRow8
+                                      props:
+                                        justifyContent: start
+                                      children:
+                                        - component: TextField
+                                          name: phone_number
+                                          layout:
+                                            columnSize: 1
+                                          props:
+                                            label: Phone number
+                                            defaultValue:
+                                              $$jsExpression: |
+                                                dataGrid2.selection.phone_number
+                                        - component: TextField
+                                          name: email
+                                          layout:
+                                            columnSize: 1
+                                          props:
+                                            label: Email
+                                            defaultValue:
+                                              $$jsExpression: |
+                                                dataGrid2.selection.email
+                                    - component: PageRow
+                                      name: pageRow7
+                                      props:
+                                        justifyContent: start
+                                      children:
+                                        - component: TextField
+                                          name: gender
+                                          props:
+                                            label: Gender
+                                            defaultValue:
+                                              $$jsExpression: |
+                                                dataGrid2.selection.gender
+                                        - component: TextField
+                                          name: id_1
+                                          props:
+                                            label: ID
+                                            defaultValue:
+                                              $$jsExpression: |
+                                                dataGrid2.selection.id_1
+                                    - component: TextField
+                                      name: id_number
+                                      props:
+                                        label: ID number
+                                        fullWidth: true
+                                        defaultValue:
+                                          $$jsExpression: |
+                                            dataGrid2.selection.id_number
+                                    - component: TextField
+                                      name: address
+                                      props:
+                                        label: Address
+                                        fullWidth: true
+                                        defaultValue:
+                                          $$jsExpression: |
+                                            dataGrid2.selection.address
+                                    - component: Button
+                                      name: button
+                                      props:
+                                        sx:
+                                          bgcolor: "#424B54"
+                                          onHover: "#424B54"
+                                        content: Update
+                                        loading: false
+                                        onClick:
+                                          $$jsExpressionAction: |-
+                                            xano_get.refetch() 
+                                            xano_put.refetch()
+                                        disabled: false
+                                        fullWidth: true
+                        - component: Paper
+                          name: paper2
+                          layout:
+                            columnSize: 1
+                          children:
+                            - component: PageRow
+                              name: pageRow12
+                              children:
+                                - component: PageColumn
+                                  name: pageColumn
+                                  layout:
+                                    columnSize: 1
+                                  children:
+                                    - component: Paper
+                                      name: paper4
+                                      props:
+                                        sx:
+                                          bgcolor: "#424B54"
+                                      children:
+                                        - component: PageRow
+                                          name: pageRow10
+                                          children:
+                                            - component: Text
+                                              name: typography2
+                                              layout:
+                                                verticalAlign: center
+                                              props:
+                                                sx:
+                                                  color: "#EBCFB2"
+                                                value: User image
+                                                variant: h5
+                                    - component: Image
+                                      name: image
+                                      layout:
+                                        columnSize: 1
+                                        horizontalAlign: center
+                                      props:
+                                        src:
+                                          $$jsExpression: |
+                                            dataGrid2.selection.image
+                                        width: 330
+                                        height: 330
+                                        loading: false
+  queries:
+    - name: xano_get
+      enabled: true
+      mode: query
+      query:
+        kind: rest
+        url: https://x8ki-letl-twmt.n7.xano.io/api:mBnDLSzI/employees
+        headers: []
+        method: GET
+        searchParams: []
+    - name: xano_put
+      mode: query
+      query:
+        kind: rest
+        url:
+          $$jsExpression: >
+            `https://x8ki-letl-twmt.n7.xano.io/api:mBnDLSzI/employees/${parameters.id}`
+        headers: []
+        body:
+          kind: raw
+          content:
+            $$jsExpression: |
+              `{
+                "name": "${parameters.name}",
+                "account_creation_date": "${parameters.account_creation_date}",
+                "country_of_residence": "${parameters.country_of_residence}",
+                "phone_number": "${parameters.phone}",
+                "email": "${parameters.email}",
+                "address": "${parameters.address}",
+                "gender": "${parameters.gender}",
+                "id_1": "${parameters.id_1}",
+                "id_number": "${parameters.id_number}",
+                "image": "https://i.pravatar.cc/300"
+              }`
+          contentType: application/json
+        method: PUT
+        searchParams: []
+      parameters:
+        - name: id
+          value:
+            $$jsExpression: |
+              dataGrid2.selection.id
+        - name: name
+          value:
+            $$jsExpression: |
+              name.value
+        - name: account_creation_date
+          value:
+            $$jsExpression: |
+              account_creation_date.value
+        - name: country_of_residence
+          value:
+            $$jsExpression: |
+              country.value
+        - name: email
+          value:
+            $$jsExpression: |
+              email.value
+        - name: phone
+          value:
+            $$jsExpression: |
+              phone_number.value
+        - name: gender
+          value:
+            $$jsExpression: |
+              gender.value
+        - name: id_1
+          value:
+            $$jsExpression: |
+              id_1.value
+        - name: id_number
+          value:
+            $$jsExpression: |
+              id_number.value
+        - name: address
+          value:
+            $$jsExpression: |
+              address.value
+    - name: xano_post
+      query:
+        kind: rest
+        url: https://x8ki-letl-twmt.n7.xano.io/api:mBnDLSzI/employees_post
+        headers: []
+        method: POST
+        searchParams: []

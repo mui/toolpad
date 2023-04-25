@@ -39,7 +39,8 @@
     "test:integration": "rm -rf ./node_modules/.vite && playwright test --config ./test/integration/playwright.config.ts",
     "test": "jest",
     "check-types": "lerna run check-types",
-    "toolpad": "toolpad"
+    "toolpad": "toolpad",
+    "jsonSchemas": "ts-node --esm ./scripts/generateJsonSchemas.mts"
   },
   "devDependencies": {
     "@jest/globals": "^29.5.0",
@@ -94,6 +95,7 @@
     "dotenv-cli": "^7.2.1",
     "inquirer": "^9.1.5",
     "semver": "^7.5.0",
+    "ts-node": "^10.9.1",
     "tsup": "^6.7.0",
     "yargs": "^17.7.1"
   },

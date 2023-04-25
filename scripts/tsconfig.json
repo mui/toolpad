@@ -1,0 +1,10 @@
+{
+  "compilerOptions": {
+    "module": "ESNext",
+    "moduleResolution": "nodenext",
+    "noEmit": true
+  },
+  "ts-node": {
+    "transpileOnly": true
+  }
+}

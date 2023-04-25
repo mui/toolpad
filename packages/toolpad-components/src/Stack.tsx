@@ -1,6 +1,6 @@
 import { Stack } from '@mui/material';
 import { createComponent } from '@mui/toolpad-core';
-import { SX_PROP_HELPER_TEXT } from './constants';
+import { SX_PROP_HELPER_TEXT } from './constants.js';
 
 export default createComponent(Stack, {
   argTypes: {
@@ -8,26 +8,25 @@ export default createComponent(Stack, {
       typeDef: {
         type: 'string',
         enum: ['row', 'row-reverse', 'column', 'column-reverse'],
+        default: 'row',
       },
-      defaultValue: 'row',
     },
     alignItems: {
       typeDef: {
         type: 'string',
         enum: ['start', 'center', 'end', 'stretch', 'baseline'],
+        default: 'start',
       },
-      defaultValue: 'start',
     },
     justifyContent: {
       typeDef: {
         type: 'string',
         enum: ['start', 'center', 'end', 'space-between', 'space-around', 'space-evenly'],
+        default: 'start',
       },
-      defaultValue: 'start',
     },
     gap: {
-      typeDef: { type: 'number' },
-      defaultValue: 2,
+      typeDef: { type: 'number', default: 2 },
     },
     margin: {
       typeDef: { type: 'number' },

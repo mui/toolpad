@@ -1,34 +1,37 @@
 import * as React from 'react';
-import { useDom, useDomApi } from '../DomLoader';
+import { useAppState, useAppStateApi } from '../AppState';
 import useShortcut from '../../utils/useShortcut';
 import { hasFieldFocus } from '../../utils/fields';
 
 export default function useUndoRedo() {
-  const domApi = useDomApi();
-  const { currentView } = useDom();
+  const { currentView } = useAppState();
+
+  const appStateApi = useAppStateApi();
+
+  const currentPageView = currentView.kind === 'page' ? currentView.view : null;
 
   const handleUndo = React.useCallback(
     (event: KeyboardEvent) => {
-      if (currentView.kind === 'page') {
+      if (currentView.kind === 'page' && !currentPageView) {
         event.preventDefault();
-        domApi.undo();
+        appStateApi.undo();
       } else if (!hasFieldFocus()) {
-        domApi.undo();
+        appStateApi.undo();
       }
     },
-    [currentView.kind, domApi],
+    [currentView.kind, currentPageView, appStateApi],
   );
 
   const handleRedo = React.useCallback(
     (event: KeyboardEvent) => {
-      if (currentView.kind === 'page') {
+      if (currentView.kind === 'page' && !currentPageView) {
         event.preventDefault();
-        domApi.redo();
+        appStateApi.redo();
       } else if (!hasFieldFocus()) {
-        domApi.redo();
+        appStateApi.redo();
       }
     },
-    [currentView.kind, domApi],
+    [currentView.kind, currentPageView, appStateApi],
   );
 
   useShortcut({ key: 'z', metaKey: true, preventDefault: false }, handleUndo);

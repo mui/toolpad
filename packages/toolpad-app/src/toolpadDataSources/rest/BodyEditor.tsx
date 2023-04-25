@@ -12,7 +12,8 @@ import {
   Typography,
 } from '@mui/material';
 import { TabContext } from '@mui/lab';
-import { BindableAttrValue, LiveBinding, GlobalScopeMeta } from '@mui/toolpad-core';
+import { BindableAttrValue, LiveBinding, ScopeMeta } from '@mui/toolpad-core';
+import { useServerJsRuntime } from '@mui/toolpad-core/jsServerRuntime';
 import { Body, RawBody, UrlEncodedBody } from './types';
 import { Maybe, WithControlledProp } from '../../utils/types';
 import {
@@ -65,7 +66,7 @@ const MonacoEditor = lazyComponent(() => import('../../components/MonacoEditor')
 });
 
 interface BodyTypeEditorProps<B = Body> extends WithControlledProp<Maybe<B>> {
-  globalScopeMeta: GlobalScopeMeta;
+  globalScopeMeta: ScopeMeta;
   globalScope: Record<string, any>;
   renderToolbar: RenderBodyToolbar;
   disabled?: boolean;
@@ -105,8 +106,10 @@ function RawBodyEditor({
 
   const content = value?.content ?? null;
 
+  const jsServerRuntime = useServerJsRuntime();
+
   const liveContent: LiveBinding = useEvaluateLiveBinding({
-    server: true,
+    jsRuntime: jsServerRuntime,
     input: content,
     globalScope,
   });
@@ -139,6 +142,7 @@ function RawBodyEditor({
         globalScope={globalScope}
         globalScopeMeta={globalScopeMeta}
         propType={{ type: 'string' }}
+        jsRuntime={jsServerRuntime}
         renderControl={(props) => (
           <MonacoEditor
             sx={{ flex: 1, height: 250 }}
@@ -182,8 +186,9 @@ function UrlEncodedBodyEditor({
     [onChange, value],
   );
 
+  const jsServerRuntime = useServerJsRuntime();
   const liveContent = useEvaluateLiveBindingEntries({
-    server: true,
+    jsRuntime: jsServerRuntime,
     input: value.content,
     globalScope,
   });
@@ -199,6 +204,7 @@ function UrlEncodedBodyEditor({
         globalScopeMeta={globalScopeMeta}
         liveValue={liveContent}
         disabled={disabled}
+        jsRuntime={jsServerRuntime}
       />
     </React.Fragment>
   );
@@ -207,7 +213,7 @@ function UrlEncodedBodyEditor({
 type BodyKind = Body['kind'];
 
 export interface BodyEditorProps extends WithControlledProp<Maybe<Body>> {
-  globalScopeMeta: GlobalScopeMeta;
+  globalScopeMeta: ScopeMeta;
   globalScope: Record<string, any>;
   sx?: SxProps;
   method?: string;

@@ -1,5 +1,6 @@
 import { Stack, styled, Typography, Divider } from '@mui/material';
 import * as React from 'react';
+import * as _ from 'lodash-es';
 import {
   ArgTypeDefinition,
   ArgTypeDefinitions,
@@ -9,7 +10,7 @@ import {
 import { ExactEntriesOf } from '../../../utils/types';
 import * as appDom from '../../../appDom';
 import NodeAttributeEditor from './NodeAttributeEditor';
-import { useDom } from '../../DomLoader';
+import { useDom, useAppState } from '../../AppState';
 import { usePageEditorState } from './PageEditorProvider';
 import PageOptionsPanel from './PageOptionsPanel';
 import ErrorAlert from './ErrorAlert';
@@ -39,9 +40,18 @@ const ComponentEditorRoot = styled('div')(({ theme }) => ({
   },
 }));
 
-function shouldRenderControl<P extends object>(propTypeDef: ArgTypeDefinition<P>, props: P) {
-  if (propTypeDef.typeDef.type === 'element') {
-    return propTypeDef.control?.type !== 'slot' && propTypeDef.control?.type !== 'slots';
+function shouldRenderControl<P extends object>(
+  propTypeDef: ArgTypeDefinition<P>,
+  propName: keyof P,
+  props: P,
+  componentConfig: ComponentConfig<P>,
+) {
+  if (propTypeDef.typeDef.type === 'element' || propTypeDef.typeDef.type === 'template') {
+    return (
+      propTypeDef.control?.type !== 'slot' &&
+      propTypeDef.control?.type !== 'slots' &&
+      propTypeDef.control?.type !== 'layoutSlot'
+    );
   }
 
   if (typeof propTypeDef.visible === 'boolean') {
@@ -50,6 +60,10 @@ function shouldRenderControl<P extends object>(propTypeDef: ArgTypeDefinition<P>
 
   if (typeof propTypeDef.visible === 'function') {
     return propTypeDef.visible(props);
+  }
+
+  if (componentConfig.resizableHeightProp && propName === componentConfig.resizableHeightProp) {
+    return false;
   }
 
   return true;
@@ -84,6 +98,11 @@ function ComponentPropsEditor<P extends object>({
     );
   }, [bindings, node.id]);
 
+  const argTypesByCategory = _.groupBy(
+    Object.entries(componentConfig.argTypes || {}) as ExactEntriesOf<ArgTypeDefinitions<P>>,
+    ([, propTypeDef]) => propTypeDef?.category || 'properties',
+  );
+
   return (
     <React.Fragment>
       {hasLayoutControls ? (
@@ -108,24 +127,26 @@ function ComponentPropsEditor<P extends object>({
           <Divider sx={{ mt: 1 }} />
         </React.Fragment>
       ) : null}
-      <Typography variant="overline" className={classes.sectionHeading}>
-        Properties:
-      </Typography>
-      {(
-        Object.entries(componentConfig.argTypes || {}) as ExactEntriesOf<ArgTypeDefinitions<P>>
-      ).map(([propName, propTypeDef]) =>
-        propTypeDef && shouldRenderControl(propTypeDef, props) ? (
-          <div key={propName} className={classes.control}>
-            <NodeAttributeEditor
-              node={node}
-              namespace="props"
-              props={props}
-              name={propName}
-              argType={propTypeDef}
-            />
-          </div>
-        ) : null,
-      )}
+      {Object.entries(argTypesByCategory).map(([category, argTypeEntries]) => (
+        <React.Fragment key={category}>
+          <Typography variant="overline" className={classes.sectionHeading}>
+            {category}:
+          </Typography>
+          {argTypeEntries.map(([propName, propTypeDef]) =>
+            propTypeDef && shouldRenderControl(propTypeDef, propName, props, componentConfig) ? (
+              <div key={propName} className={classes.control}>
+                <NodeAttributeEditor
+                  node={node}
+                  namespace="props"
+                  props={props}
+                  name={propName}
+                  argType={propTypeDef}
+                />
+              </div>
+            ) : null,
+          )}
+        </React.Fragment>
+      ))}
     </React.Fragment>
   );
 }
@@ -170,7 +191,9 @@ export interface ComponentEditorProps {
 }
 
 export default function ComponentEditor({ className }: ComponentEditorProps) {
-  const { dom, selectedNodeId } = useDom();
+  const { dom } = useDom();
+  const { currentView } = useAppState();
+  const selectedNodeId = currentView.kind === 'page' ? currentView.selectedNodeId : null;
 
   const selectedNode = selectedNodeId ? appDom.getMaybeNode(dom, selectedNodeId) : null;
 

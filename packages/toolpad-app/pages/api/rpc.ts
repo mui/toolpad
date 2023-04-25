@@ -1,31 +1,13 @@
 import { NextApiHandler } from 'next';
 import type { IncomingMessage, ServerResponse } from 'http';
 import superjson from 'superjson';
-import {
-  getApps,
-  getApp,
-  getActiveDeployments,
-  createApp,
-  updateApp,
-  duplicateApp,
-  execQuery,
-  dataSourceFetchPrivate,
-  loadDom,
-  saveDom,
-  createRelease,
-  getReleases,
-  getRelease,
-  createDeployment,
-  findActiveDeployment,
-  findLastRelease,
-  deleteApp,
-  deploy,
-  getDeployments,
-} from '../../src/server/data';
-import { getLatestToolpadRelease } from '../../src/server/getLatestRelease';
-import { hasOwnProperty } from '../../src/utils/collections';
-import { errorFrom, serializeError } from '../../src/utils/errors';
+import { hasOwnProperty } from '@mui/toolpad-utils/collections';
+import { errorFrom, serializeError } from '@mui/toolpad-utils/errors';
+import { execQuery, dataSourceFetchPrivate } from '../../src/server/data';
+import { getVersionInfo } from '../../src/server/versionInfo';
 import logger from '../../src/server/logs/logger';
+import { createComponent, deletePage, openCodeComponentEditor } from '../../src/server/localMode';
+import { getDomFingerprint, loadDom, saveDom } from '../../src/server/liveProject';
 
 export interface Method<P extends any[] = any[], R = any> {
   (...params: P): Promise<R>;
@@ -129,64 +111,31 @@ const rpcServer = {
     dataSourceFetchPrivate: createMethod<typeof dataSourceFetchPrivate>(({ params }) => {
       return dataSourceFetchPrivate(...params);
     }),
-    getApps: createMethod<typeof getApps>(({ params }) => {
-      return getApps(...params);
-    }),
-    getActiveDeployments: createMethod<typeof getActiveDeployments>(({ params }) => {
-      return getActiveDeployments(...params);
-    }),
-    getDeployments: createMethod<typeof getDeployments>(({ params }) => {
-      return getDeployments(...params);
-    }),
-    getApp: createMethod<typeof getApp>(({ params }) => {
-      return getApp(...params);
-    }),
     execQuery: createMethod<typeof execQuery>(({ params }) => {
       return execQuery(...params);
-    }),
-    getReleases: createMethod<typeof getReleases>(({ params }) => {
-      return getReleases(...params);
-    }),
-    getRelease: createMethod<typeof getRelease>(({ params }) => {
-      return getRelease(...params);
-    }),
-    findActiveDeployment: createMethod<typeof findActiveDeployment>(({ params }) => {
-      return findActiveDeployment(...params);
     }),
     loadDom: createMethod<typeof loadDom>(({ params }) => {
       return loadDom(...params);
     }),
-    findLastRelease: createMethod<typeof findLastRelease>(({ params }) => {
-      return findLastRelease(...params);
+    getVersionInfo: createMethod<typeof getVersionInfo>(({ params }) => {
+      return getVersionInfo(...params);
     }),
-    getLatestToolpadRelease: createMethod<typeof getLatestToolpadRelease>(({ params }) => {
-      return getLatestToolpadRelease(...params);
+    getDomFingerprint: createMethod<typeof getDomFingerprint>(({ params }) => {
+      return getDomFingerprint(...params);
     }),
   },
   mutation: {
-    createApp: createMethod<typeof createApp>(({ params }) => {
-      return createApp(...params);
-    }),
-    updateApp: createMethod<typeof updateApp>(({ params }) => {
-      return updateApp(...params);
-    }),
-    duplicateApp: createMethod<typeof duplicateApp>(({ params }) => {
-      return duplicateApp(...params);
-    }),
-    deleteApp: createMethod<typeof deleteApp>(({ params }) => {
-      return deleteApp(...params);
-    }),
-    createRelease: createMethod<typeof createRelease>(({ params }) => {
-      return createRelease(...params);
-    }),
-    createDeployment: createMethod<typeof createDeployment>(({ params }) => {
-      return createDeployment(...params);
-    }),
-    deploy: createMethod<typeof deploy>(({ params }) => {
-      return deploy(...params);
-    }),
     saveDom: createMethod<typeof saveDom>(({ params }) => {
       return saveDom(...params);
+    }),
+    openCodeComponentEditor: createMethod<typeof openCodeComponentEditor>(({ params }) => {
+      return openCodeComponentEditor(...params);
+    }),
+    createComponent: createMethod<typeof createComponent>(({ params }) => {
+      return createComponent(...params);
+    }),
+    deletePage: createMethod<typeof deletePage>(({ params }) => {
+      return deletePage(...params);
     }),
   },
 } as const;

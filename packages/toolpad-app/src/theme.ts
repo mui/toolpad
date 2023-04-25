@@ -52,7 +52,7 @@ declare module '@mui/material/Chip' {
 
 const defaultTheme = createTheme();
 
-export const blue = {
+const blue = {
   50: '#F0F7FF',
   100: '#C2E0FF',
   200: '#99CCF3',
@@ -65,7 +65,7 @@ export const blue = {
   800: '#004C99',
   900: '#003A75',
 };
-export const blueDark = {
+const blueDark = {
   50: '#E2EDF8',
   100: '#CEE0F3',
   200: '#91B9E3',
@@ -78,7 +78,7 @@ export const blueDark = {
   800: '#001E3C',
   900: '#0A1929',
 };
-export const grey = {
+const grey = {
   50: '#F3F6F9',
   100: '#E7EBF0',
   200: '#E0E3E7',

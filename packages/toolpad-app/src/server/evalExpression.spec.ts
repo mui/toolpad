@@ -1,4 +1,15 @@
-import evalExpression from './evalExpression';
+import { createServerJsRuntime } from '@mui/toolpad-core/jsServerRuntime';
+
+async function evalExpression(expression: string, globalScope: Record<string, unknown> = {}) {
+  const jsServerRuntime = await createServerJsRuntime();
+  const { value, error } = jsServerRuntime.evaluateExpression(expression, globalScope);
+
+  if (error) {
+    throw error;
+  }
+
+  return value;
+}
 
 describe('evalExpression', () => {
   test('Basic expression', async () => {
@@ -16,7 +27,7 @@ describe('evalExpression', () => {
 
   test('With functions', async () => {
     const result = await evalExpression(`x('Jack', 'Joe') + y()`, {
-      x: (a, b) => `hello ${a} and ${b}`,
+      x: (a: string, b: string) => `hello ${a} and ${b}`,
       y: () => `!`,
     });
     expect(result).toBe('hello Jack and Joe!');

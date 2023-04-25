@@ -5,7 +5,7 @@ import clsx from 'clsx';
 import invariant from 'invariant';
 
 import * as appDom from '../../../../appDom';
-import { useDom, useDomApi } from '../../../DomLoader';
+import { useAppStateApi, useDom, useDomApi, useAppState } from '../../../AppState';
 import {
   DropZone,
   DROP_ZONE_BOTTOM,
@@ -22,8 +22,9 @@ import {
   isPageColumn,
   PAGE_ROW_COMPONENT_ID,
   PAGE_COLUMN_COMPONENT_ID,
+  isFormComponent,
+  FORM_COMPONENT_ID,
 } from '../../../../toolpadComponents';
-import { PinholeOverlay } from '../../../../PinholeOverlay';
 import {
   getRectanglePointActiveEdge,
   isHorizontalFlow,
@@ -37,14 +38,13 @@ import {
   RECTANGLE_EDGE_TOP,
   rectContainsPoint,
 } from '../../../../utils/geometry';
+import { omit } from '../../../../utils/immutability';
 import NodeHud from './NodeHud';
 import { OverlayGrid, OverlayGridHandle } from './OverlayGrid';
 import { NodeInfo } from '../../../../types';
 import NodeDropArea from './NodeDropArea';
-import { ToolpadBridge } from '../../../../canvas';
-
-const HORIZONTAL_RESIZE_SNAP_UNITS = 4; // px
-const SNAP_TO_GRID_COLUMN_MARGIN = 10; // px
+import type { ToolpadBridge } from '../../../../canvas/ToolpadBridge';
+import { PinholeOverlay } from '../../../../PinholeOverlay';
 
 const VERTICAL_RESIZE_SNAP_UNITS = 2; // px
 
@@ -198,6 +198,7 @@ function deleteOrphanedLayoutNodes(
           parentParent.parentIndex &&
           parentParentParent &&
           appDom.isElement(parentParentParent) &&
+          isPageLayoutComponent(parentParentParent) &&
           isParentOnlyLayoutContainerChild &&
           moveTargetNodeId !== parentParent.id &&
           moveTargetNodeId !== lastContainerChild.id
@@ -272,8 +273,12 @@ interface RenderOverlayProps {
 }
 
 export default function RenderOverlay({ bridge }: RenderOverlayProps) {
-  const { dom, selectedNodeId } = useDom();
+  const { dom } = useDom();
+  const { currentView } = useAppState();
+  const selectedNodeId = currentView.kind === 'page' ? currentView.selectedNodeId : null;
+
   const domApi = useDomApi();
+  const appStateApi = useAppStateApi();
   const api = usePageEditorApi();
   const {
     viewState,
@@ -366,21 +371,21 @@ export default function RenderOverlay({ bridge }: RenderOverlayProps) {
   const selectNode = React.useCallback(
     (nodeId: NodeId) => {
       if (selectedNodeId !== nodeId) {
-        domApi.selectNode(nodeId);
+        appStateApi.selectNode(nodeId);
       }
     },
-    [domApi, selectedNodeId],
+    [appStateApi, selectedNodeId],
   );
 
   const deselectNode = React.useCallback(() => {
     if (selectedNodeId) {
-      domApi.deselectNode();
+      appStateApi.deselectNode();
     }
-  }, [domApi, selectedNodeId]);
+  }, [appStateApi, selectedNodeId]);
 
   const handleNodeMouseUp = React.useCallback(
     (event: React.MouseEvent<HTMLDivElement>) => {
-      const cursorPos = bridge?.getViewCoordinates(event.clientX, event.clientY);
+      const cursorPos = bridge?.canvasCommands.getViewCoordinates(event.clientX, event.clientY);
 
       if (!cursorPos || draggedNodeId) {
         return;
@@ -404,7 +409,7 @@ export default function RenderOverlay({ bridge }: RenderOverlayProps) {
         event.stopPropagation();
       }
 
-      domApi.update(
+      appStateApi.update(
         (draft) => {
           const toRemove = appDom.getNode(draft, nodeId);
 
@@ -415,15 +420,18 @@ export default function RenderOverlay({ bridge }: RenderOverlayProps) {
 
           return normalizePageRowColumnSizes(draft);
         },
-        {
-          selectedNodeId: null,
-        },
+        currentView.kind === 'page'
+          ? {
+              ...currentView,
+              selectedNodeId: null,
+            }
+          : currentView,
       );
     },
-    [dom, domApi, normalizePageRowColumnSizes],
+    [appStateApi, currentView, dom, normalizePageRowColumnSizes],
   );
 
-  const selectedRect = selectedNode && !newNode ? nodesInfo[selectedNode.id]?.rect : null;
+  const selectedRect = (selectedNode && !newNode && nodesInfo[selectedNode.id]?.rect) || null;
 
   const interactiveNodes = React.useMemo<Set<NodeId>>(() => {
     if (!selectedNode) {
@@ -461,14 +469,44 @@ export default function RenderOverlay({ bridge }: RenderOverlayProps) {
     [domApi, normalizePageRowColumnSizes],
   );
 
-  const handleEdgeDragStart = React.useCallback(
-    (node: appDom.ElementNode, edge: RectangleEdge) => (event: React.MouseEvent<HTMLElement>) => {
-      event.stopPropagation();
+  const getNodeDraggableHorizontalEdges = React.useCallback(
+    (node: appDom.AppDomNode): RectangleEdge[] => {
+      const nodeParentProp = node.parentProp;
 
-      api.edgeDragStart({ nodeId: node.id, edge });
+      const parent = appDom.getParent(dom, node);
 
-      selectNode(node.id);
+      const isFirstChild =
+        parent && appDom.isElement(parent) && nodeParentProp
+          ? appDom.getNodeFirstChild(dom, parent, node.parentProp)?.id === node.id
+          : false;
+      const isLastChild =
+        parent && appDom.isElement(parent) && nodeParentProp
+          ? appDom.getNodeLastChild(dom, parent, nodeParentProp)?.id === node.id
+          : false;
+
+      const isPageRowChild = parent ? appDom.isElement(parent) && isPageRow(parent) : false;
+
+      const isDraggableLeft = isPageRowChild ? !isFirstChild : false;
+      const isDraggableRight = isPageRowChild ? !isLastChild : false;
+
+      return [
+        ...(isDraggableLeft ? [RECTANGLE_EDGE_LEFT] : []),
+        ...(isDraggableRight ? [RECTANGLE_EDGE_RIGHT] : []),
+      ] as RectangleEdge[];
     },
+    [dom],
+  );
+
+  const handleEdgeDragStart = React.useCallback(
+    (node: appDom.AppDomNode) =>
+      (edge: RectangleEdge) =>
+      (event: React.MouseEvent<HTMLElement>) => {
+        event.stopPropagation();
+
+        api.edgeDragStart({ nodeId: node.id, edge });
+
+        selectNode(node.id);
+      },
     [api, selectNode],
   );
 
@@ -483,20 +521,33 @@ export default function RenderOverlay({ bridge }: RenderOverlayProps) {
 
   const isEmptyPage = pageNodes.length <= 1;
 
+  /**
+   * Return all nodes that are available for insertion.
+   * i.e. Exclude all descendants of the current selection since inserting in one of
+   * them would create a cyclic structure.
+   */
   const availableDropTargets = React.useMemo((): appDom.AppDomNode[] => {
     if (!draggedNode) {
       return [];
     }
 
-    /**
-     * Return all nodes that are available for insertion.
-     * i.e. Exclude all descendants of the current selection since inserting in one of
-     * them would create a cyclic structure.
-     */
-    const excludedNodes =
-      selectedNode && !newNode
-        ? new Set<appDom.AppDomNode>([selectedNode, ...appDom.getDescendants(dom, selectedNode)])
-        : new Set();
+    let excludedNodes = new Set();
+
+    if (selectedNode && !newNode) {
+      excludedNodes = new Set<appDom.AppDomNode>([
+        selectedNode,
+        ...appDom.getDescendants(dom, selectedNode),
+      ]);
+    }
+
+    if (isFormComponent(draggedNode)) {
+      const formNodes = appDom.getComponentTypeNodes(dom, FORM_COMPONENT_ID);
+      const formNodeDescendants = formNodes
+        .map((formNode) => appDom.getDescendants(dom, formNode))
+        .flat();
+
+      formNodeDescendants.forEach(excludedNodes.add, excludedNodes);
+    }
 
     return pageNodes.filter((n) => !excludedNodes.has(n));
   }, [dom, draggedNode, newNode, pageNodes, selectedNode]);
@@ -748,7 +799,7 @@ export default function RenderOverlay({ bridge }: RenderOverlayProps) {
     (event: React.DragEvent<Element>) => {
       event.preventDefault();
 
-      const cursorPos = bridge?.getViewCoordinates(event.clientX, event.clientY);
+      const cursorPos = bridge?.canvasCommands.getViewCoordinates(event.clientX, event.clientY);
 
       if (!cursorPos || !draggedNode) {
         return;
@@ -824,7 +875,12 @@ export default function RenderOverlay({ bridge }: RenderOverlayProps) {
         const edgeDetectionMargin = 10; // px
 
         // Detect center in layout containers
-        if (isDraggingOverElement && activeDropNodeInfo && activeDropSlot) {
+        if (
+          isDraggingOverElement &&
+          !isDraggingOverEmptyContainer &&
+          activeDropNodeInfo &&
+          activeDropSlot
+        ) {
           const isDraggingOverPageChild = activeDropNodeParent
             ? appDom.isPage(activeDropNodeParent)
             : false;
@@ -890,7 +946,9 @@ export default function RenderOverlay({ bridge }: RenderOverlayProps) {
 
         api.nodeDragOver({
           nodeId: hasDragOverParentRowOverride ? activeDropNodeParent.id : activeDropNodeId,
-          parentProp: activeDropSlotParentProp,
+          parentProp: activeDropSlotParentProp as appDom.ParentProp<
+            appDom.ElementNode | appDom.PageNode
+          >,
           zone: activeDropZone as DropZone,
         });
       }
@@ -914,7 +972,7 @@ export default function RenderOverlay({ bridge }: RenderOverlayProps) {
 
   const handleNodeDrop = React.useCallback(
     (event: React.DragEvent<Element>) => {
-      const cursorPos = bridge?.getViewCoordinates(event.clientX, event.clientY);
+      const cursorPos = bridge?.canvasCommands.getViewCoordinates(event.clientX, event.clientY);
 
       if (
         !draggedNode ||
@@ -955,7 +1013,7 @@ export default function RenderOverlay({ bridge }: RenderOverlayProps) {
       const isDraggingOverLayoutSlot = dragOverSlot?.type === 'layout';
       const isDraggingOverElement = appDom.isElement(dragOverNode);
 
-      domApi.update(
+      appStateApi.update(
         (draft) => {
           let parent = appDom.getParent(draft, dragOverNode);
 
@@ -978,20 +1036,32 @@ export default function RenderOverlay({ bridge }: RenderOverlayProps) {
           }
 
           // Drop on page or layout slot
-          if (isDraggingOverPage || isDraggingOverLayoutSlot) {
+          if ((isDraggingOverPage || isDraggingOverLayoutSlot) && dragOverSlotParentProp) {
             const newParentIndex =
               dragOverZone === DROP_ZONE_TOP
-                ? appDom.getNewFirstParentIndexInNode(draft, dragOverNode, 'children')
-                : appDom.getNewLastParentIndexInNode(draft, dragOverNode, 'children');
+                ? appDom.getNewFirstParentIndexInNode(draft, dragOverNode, dragOverSlotParentProp)
+                : appDom.getNewLastParentIndexInNode(draft, dragOverNode, dragOverSlotParentProp);
 
             if (!isPageRow(draggedNode)) {
               const rowContainer = appDom.createElement(draft, PAGE_ROW_COMPONENT_ID, {});
-              draft = appDom.addNode(draft, rowContainer, dragOverNode, 'children', newParentIndex);
+              draft = appDom.addNode(
+                draft,
+                rowContainer,
+                dragOverNode,
+                dragOverSlotParentProp,
+                newParentIndex,
+              );
               parent = rowContainer;
 
               draft = addOrMoveNode(draft, draggedNode, rowContainer, 'children');
             } else {
-              draft = addOrMoveNode(draft, draggedNode, dragOverNode, 'children', newParentIndex);
+              draft = addOrMoveNode(
+                draft,
+                draggedNode,
+                dragOverNode,
+                dragOverSlotParentProp,
+                newParentIndex,
+              );
             }
           }
 
@@ -1212,7 +1282,9 @@ export default function RenderOverlay({ bridge }: RenderOverlayProps) {
 
           return normalizePageRowColumnSizes(draft);
         },
-        { selectedNodeId: newNode?.id || draggedNodeId },
+        currentView.kind === 'page'
+          ? { ...omit(currentView, 'tab'), selectedNodeId: newNode?.id || draggedNodeId }
+          : currentView,
       );
 
       api.dragEnd();
@@ -1226,10 +1298,11 @@ export default function RenderOverlay({ bridge }: RenderOverlayProps) {
     },
     [
       api,
+      appStateApi,
       availableDropZones,
-      bridge,
+      bridge?.canvasCommands,
+      currentView,
       dom,
-      domApi,
       dragOverNodeId,
       dragOverSlotParentProp,
       dragOverZone,
@@ -1287,26 +1360,24 @@ export default function RenderOverlay({ bridge }: RenderOverlayProps) {
       const parentInfo = parent ? nodesInfo[parent.id] : null;
       const parentRect = parentInfo?.rect;
 
-      const cursorPos = bridge?.getViewCoordinates(event.clientX, event.clientY);
+      const cursorPos = bridge?.canvasCommands.getViewCoordinates(event.clientX, event.clientY);
 
       if (draggedNodeRect && parentRect && resizePreviewElement && cursorPos) {
         if (draggedEdge === RECTANGLE_EDGE_LEFT || draggedEdge === RECTANGLE_EDGE_RIGHT) {
-          let snappedToGridCursorRelativePosX =
-            Math.ceil((cursorPos.x - draggedNodeRect.x) / HORIZONTAL_RESIZE_SNAP_UNITS) *
-            HORIZONTAL_RESIZE_SNAP_UNITS;
+          let snappedToGridCursorRelativePosX = cursorPos.x - draggedNodeRect.x;
 
           const activeSnapGridColumnEdges =
             draggedEdge === RECTANGLE_EDGE_LEFT
               ? overlayGridRef.current.getLeftColumnEdges()
               : overlayGridRef.current.getRightColumnEdges();
 
+          const minGridColumnWidth = overlayGridRef.current.getMinColumnWidth();
+
           for (const gridColumnEdge of activeSnapGridColumnEdges) {
-            if (Math.abs(gridColumnEdge - cursorPos.x) <= SNAP_TO_GRID_COLUMN_MARGIN) {
+            if (Math.abs(gridColumnEdge - cursorPos.x) <= minGridColumnWidth) {
               snappedToGridCursorRelativePosX = gridColumnEdge - draggedNodeRect.x;
             }
           }
-
-          const minGridColumnWidth = overlayGridRef.current.getMinColumnWidth();
 
           const previousSibling = appDom.getSiblingBeforeNode(dom, draggedNode, 'children');
           const previousSiblingInfo = previousSibling && nodesInfo[previousSibling.id];
@@ -1514,8 +1585,6 @@ export default function RenderOverlay({ bridge }: RenderOverlayProps) {
           })}
     >
       {pageNodes.map((node) => {
-        const nodeParentProp = node.parentProp;
-
         const nodeInfo = nodesInfo[node.id];
         const nodeRect = nodeInfo?.rect || null;
 
@@ -1523,23 +1592,19 @@ export default function RenderOverlay({ bridge }: RenderOverlayProps) {
 
         const isPageNode = appDom.isPage(node);
 
-        const isFirstChild =
-          parent && appDom.isElement(parent) && nodeParentProp
-            ? appDom.getNodeFirstChild(dom, parent, node.parentProp)?.id === node.id
-            : false;
-        const isLastChild =
-          parent && appDom.isElement(parent) && nodeParentProp
-            ? appDom.getNodeLastChild(dom, parent, nodeParentProp)?.id === node.id
-            : false;
-
         const isPageRowChild = parent ? appDom.isElement(parent) && isPageRow(parent) : false;
+        const isPageColumnChild = parent ? appDom.isElement(parent) && isPageColumn(parent) : false;
 
         const isSelected = selectedNode && !newNode ? selectedNode.id === node.id : false;
-        const isInteractive = interactiveNodes.has(node.id) && !draggedEdge;
 
-        const isVerticallyResizable = Boolean(nodeInfo?.componentConfig?.resizableHeightProp);
+        const isHorizontallyResizable = isSelected && (isPageRowChild || isPageColumnChild);
+        const isVerticallyResizable =
+          isSelected && Boolean(nodeInfo?.componentConfig?.resizableHeightProp);
 
-        const isResizing = Boolean(draggedEdge) && node.id === draggedNodeId;
+        const isResizing = Boolean(draggedEdge);
+        const isResizingNode = isResizing && node.id === draggedNodeId;
+
+        const isInteractive = interactiveNodes.has(node.id) && !isResizing && !isDraggingOver;
 
         if (!nodeRect) {
           return null;
@@ -1551,25 +1616,27 @@ export default function RenderOverlay({ bridge }: RenderOverlayProps) {
               <NodeHud
                 node={node}
                 rect={nodeRect}
+                selectedNodeRect={selectedRect}
                 isSelected={isSelected}
                 isInteractive={isInteractive}
                 onNodeDragStart={handleNodeDragStart(node as appDom.ElementNode)}
                 onDuplicate={handleNodeDuplicate(node as appDom.ElementNode)}
                 draggableEdges={[
-                  ...(isPageRowChild
-                    ? [
-                        ...(isFirstChild ? [] : [RECTANGLE_EDGE_LEFT as RectangleEdge]),
-                        ...(isLastChild ? [] : [RECTANGLE_EDGE_RIGHT as RectangleEdge]),
-                      ]
-                    : []),
+                  ...getNodeDraggableHorizontalEdges(parent && isPageColumnChild ? parent : node),
                   ...(isVerticallyResizable ? [RECTANGLE_EDGE_BOTTOM as RectangleEdge] : []),
                 ]}
                 onEdgeDragStart={
-                  isPageRowChild || isVerticallyResizable ? handleEdgeDragStart : undefined
+                  isHorizontallyResizable || isVerticallyResizable
+                    ? handleEdgeDragStart(
+                        parent && isPageColumnChild && !isVerticallyResizable ? parent : node,
+                      )
+                    : undefined
                 }
                 onDelete={handleNodeDelete(node.id)}
-                isResizing={isResizing}
+                isResizing={isResizingNode}
                 resizePreviewElementRef={resizePreviewElementRef}
+                isHoverable={!isResizing && !isDraggingOver}
+                isOutlineVisible={isDraggingOver}
               />
             ) : null}
           </React.Fragment>

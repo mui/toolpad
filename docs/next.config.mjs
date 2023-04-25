@@ -17,47 +17,47 @@ const withTM = require('next-transpile-modules')(['@mui/monorepo'], {
 const pkg = require('../package.json');
 const { findPages } = require('./src/modules/utils/find');
 
-const MONORPO_PATH = path.resolve(currentDirectory, './node_modules/@mui/monorepo');
+const MONOREPO_PATH = path.resolve(currentDirectory, './node_modules/@mui/monorepo');
 const MONOREPO_PACKAGES = {
-  '@mui/base': path.resolve(MONORPO_PATH, './packages/mui-base/src'),
-  '@mui/codemod': path.resolve(MONORPO_PATH, './packages/mui-codemod/src'),
-  '@mui/docs': path.resolve(MONORPO_PATH, './packages/mui-docs/src'),
-  '@mui/envinfo': path.resolve(MONORPO_PATH, './packages/mui-envinfo'),
-  '@mui/icons-material': path.resolve(MONORPO_PATH, './packages/mui-icons-material/lib'),
-  '@mui/joy': path.resolve(MONORPO_PATH, './packages/mui-joy/src'),
-  '@mui/lab': path.resolve(MONORPO_PATH, './packages/mui-lab/src'),
-  '@mui/material': path.resolve(MONORPO_PATH, './packages/mui-material/src'),
-  '@mui/material-next': path.resolve(MONORPO_PATH, './packages/mui-material-next/src'),
-  '@mui/private-theming': path.resolve(MONORPO_PATH, './packages/mui-private-theming/src'),
-  '@mui/styled-engine': path.resolve(MONORPO_PATH, './packages/mui-styled-engine/src'),
-  '@mui/styled-engine-sc': path.resolve(MONORPO_PATH, './packages/mui-styled-engine-sc/src'),
-  '@mui/styles': path.resolve(MONORPO_PATH, './packages/mui-styles'),
-  '@mui/system': path.resolve(MONORPO_PATH, './packages/mui-system/src'),
-  '@mui/types': path.resolve(MONORPO_PATH, './packages/mui-types'),
-  '@mui/markdown': path.resolve(MONORPO_PATH, './docs/packages/markdown'),
-  '@mui/utils': path.resolve(MONORPO_PATH, './packages/mui-utils'),
+  '@mui/base': path.resolve(MONOREPO_PATH, './packages/mui-base/src'),
+  '@mui/codemod': path.resolve(MONOREPO_PATH, './packages/mui-codemod/src'),
+  '@mui/docs': path.resolve(MONOREPO_PATH, './packages/mui-docs/src'),
+  '@mui/envinfo': path.resolve(MONOREPO_PATH, './packages/mui-envinfo'),
+  '@mui/icons-material': path.resolve(MONOREPO_PATH, './packages/mui-icons-material/lib'),
+  '@mui/joy': path.resolve(MONOREPO_PATH, './packages/mui-joy/src'),
+  '@mui/lab': path.resolve(MONOREPO_PATH, './packages/mui-lab/src'),
+  '@mui/material': path.resolve(MONOREPO_PATH, './packages/mui-material/src'),
+  '@mui/material-next': path.resolve(MONOREPO_PATH, './packages/mui-material-next/src'),
+  '@mui/private-theming': path.resolve(MONOREPO_PATH, './packages/mui-private-theming/src'),
+  '@mui/styled-engine': path.resolve(MONOREPO_PATH, './packages/mui-styled-engine/src'),
+  '@mui/styled-engine-sc': path.resolve(MONOREPO_PATH, './packages/mui-styled-engine-sc/src'),
+  '@mui/styles': path.resolve(MONOREPO_PATH, './packages/mui-styles'),
+  '@mui/system': path.resolve(MONOREPO_PATH, './packages/mui-system/src'),
+  '@mui/types': path.resolve(MONOREPO_PATH, './packages/mui-types'),
+  '@mui/markdown': path.resolve(MONOREPO_PATH, './packages/markdown'),
+  '@mui/utils': path.resolve(MONOREPO_PATH, './packages/mui-utils'),
 };
 
 export default withTM(
   withDocsInfra(
     /** @type {import('next').NextConfig  }} */ ({
       // Avoid conflicts with the other Next.js apps hosted under https://mui.com/
-      assetPrefix: process.env.DEPLOY_ENV === 'development' ? '' : '/toolpad',
+      assetPrefix: process.env.DEPLOY_ENV === 'development' ? undefined : '/toolpad',
       env: {
         LIB_VERSION: pkg.version,
         // #default-branch-switch
         SOURCE_CODE_ROOT_URL: 'https://github.com/mui/mui-toolpad/blob/master',
         SOURCE_CODE_REPO: 'https://github.com/mui/mui-toolpad',
       },
-      webpack: (config) => {
+      webpack: (config, options) => {
         return {
           ...config,
           resolve: {
             ...config.resolve,
             alias: {
               ...config.resolve.alias,
-              docs: path.resolve(MONORPO_PATH, './docs'),
-              [path.resolve(MONORPO_PATH, './packages/mui-utils/macros/MuiError.macro')]: 'react',
+              docs: path.resolve(MONOREPO_PATH, './docs'),
+              [path.resolve(MONOREPO_PATH, './packages/mui-utils/macros/MuiError.macro')]: 'react',
               ...MONOREPO_PACKAGES,
             },
           },
@@ -70,7 +70,18 @@ export default withTM(
                 oneOf: [
                   {
                     resourceQuery: /@mui\/markdown/,
-                    use: require.resolve('@mui/monorepo/docs/packages/markdown/loader'),
+                    use: [
+                      options.defaultLoaders.babel,
+                      {
+                        loader: require.resolve('@mui/monorepo/packages/markdown/loader'),
+                        options: {
+                          env: {
+                            SOURCE_CODE_REPO: options.config.env.SOURCE_CODE_REPO,
+                            LIB_VERSION: options.config.env.LIB_VERSION,
+                          },
+                        },
+                      },
+                    ],
                   },
                 ],
               },

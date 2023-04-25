@@ -1,5 +1,4 @@
 import * as React from 'react';
-import clsx from 'clsx';
 import DragIndicatorIcon from '@mui/icons-material/DragIndicator';
 import DeleteIcon from '@mui/icons-material/Delete';
 import ContentCopy from '@mui/icons-material/ContentCopy';
@@ -13,45 +12,55 @@ import {
   RECTANGLE_EDGE_LEFT,
   RECTANGLE_EDGE_RIGHT,
 } from '../../../../utils/geometry';
-import { useDom } from '../../../DomLoader';
-import { useToolpadComponent } from '../../toolpadComponents';
-import { getElementNodeComponentId } from '../../../../toolpadComponents';
 
-const HUD_POSITION_TOP = 'top';
-const HUD_POSITION_BOTTOM = 'bottom';
+const HINT_POSITION_TOP = 'top';
+const HINT_POSITION_BOTTOM = 'bottom';
 
 const HUD_HEIGHT = 30; // px
 
-type HudPosition = typeof HUD_POSITION_TOP | typeof HUD_POSITION_BOTTOM;
+type HintPosition = typeof HINT_POSITION_TOP | typeof HINT_POSITION_BOTTOM;
 
 function stopPropagationHandler(event: React.SyntheticEvent) {
   event.stopPropagation();
 }
 
 const nodeHudClasses = {
-  allowNodeInteraction: 'NodeHud_AllowNodeInteraction',
   selected: 'NodeHud_Selected',
   selectionHint: 'NodeHud_SelectionHint',
 };
 
 const NodeHudWrapper = styled('div', {
-  shouldForwardProp: (prop) => prop !== 'hudPosition',
+  shouldForwardProp: (prop) => prop !== 'isOutlineVisible' && prop !== 'isHoverable',
 })<{
-  hudPosition: HudPosition;
-}>(({ hudPosition }) => ({
+  isOutlineVisible: boolean;
+  isHoverable: boolean;
+}>(({ isOutlineVisible, isHoverable, theme }) => ({
   // capture mouse events
   pointerEvents: 'initial',
   position: 'absolute',
-  outline: '1px dotted rgba(255,0,0,.2)',
   userSelect: 'none',
+  outline: `1px dotted ${isOutlineVisible ? theme.palette.primary[500] : 'transparent'}`,
+  zIndex: 80,
+  '&:hover': {
+    outline: `2px dashed ${isHoverable ? theme.palette.primary[500] : 'transparent'}`,
+  },
   [`.${nodeHudClasses.selected}`]: {
     position: 'absolute',
     height: '100%',
     width: '100%',
-    outline: '1px solid red',
+    outline: `2px solid ${theme.palette.primary[500]}`,
     left: 0,
     top: 0,
+    zIndex: 80,
   },
+}));
+
+const SelectionHintWrapper = styled('div', {
+  shouldForwardProp: (prop) => prop !== 'hintPosition',
+})<{
+  hintPosition: HintPosition;
+}>(({ hintPosition, theme }) => ({
+  position: 'absolute',
   [`.${nodeHudClasses.selectionHint}`]: {
     // capture mouse events
     pointerEvents: 'initial',
@@ -60,21 +69,23 @@ const NodeHudWrapper = styled('div', {
     position: 'absolute',
     alignItems: 'center',
     right: -1,
-    background: 'red',
+    background: theme.palette.primary[500],
     color: 'white',
     fontSize: 11,
     padding: `0 0 0 8px`,
     height: HUD_HEIGHT,
     zIndex: 1000,
-    ...(hudPosition === HUD_POSITION_TOP
+    ...(hintPosition === HINT_POSITION_TOP
       ? { top: 0, transform: 'translate(0, -100%)' }
       : { bottom: 0, transform: 'translate(0, 100%)' }),
   },
-  [`&.${nodeHudClasses.allowNodeInteraction}`]: {
-    // block pointer-events so we can interact with the selection
-    pointerEvents: 'none',
-  },
 }));
+
+const DraggableEdgeWrapper = styled('div')({
+  userSelect: 'none',
+  position: 'absolute',
+  zIndex: 90,
+});
 
 const DraggableEdge = styled('div', {
   shouldForwardProp: (prop) => prop !== 'edge',
@@ -86,25 +97,25 @@ const DraggableEdge = styled('div', {
     dynamicStyles = {
       cursor: 'ew-resize',
       top: 0,
-      right: -2,
+      right: -10,
       height: '100%',
-      width: 12,
+      width: 22,
     };
   }
   if (edge === RECTANGLE_EDGE_LEFT) {
     dynamicStyles = {
       cursor: 'ew-resize',
       top: 0,
-      left: -2,
+      left: -10,
       height: '100%',
-      width: 12,
+      width: 22,
     };
   }
   if (edge === RECTANGLE_EDGE_BOTTOM) {
     dynamicStyles = {
       cursor: 'ns-resize',
-      bottom: -2,
-      height: 12,
+      bottom: -10,
+      height: 22,
       left: 0,
       width: '100%',
     };
@@ -114,37 +125,39 @@ const DraggableEdge = styled('div', {
     ...dynamicStyles,
     position: 'absolute',
     pointerEvents: 'initial',
-    zIndex: 1,
+    zIndex: 90,
   };
 });
 
-const ResizePreview = styled('div')({
-  backgroundColor: '#44EB2D',
-  opacity: 0.5,
-});
+const ResizePreview = styled('div')(({ theme }) => ({
+  backgroundColor: theme.palette.primary[500],
+  opacity: 0.2,
+  zIndex: 90,
+}));
 
 interface NodeHudProps {
   node: appDom.AppDomNode;
   rect: Rectangle;
+  selectedNodeRect: Rectangle | null;
   isSelected?: boolean;
   isInteractive?: boolean;
   onNodeDragStart?: React.DragEventHandler<HTMLElement>;
   draggableEdges?: RectangleEdge[];
-  onEdgeDragStart?: (
-    node: appDom.ElementNode,
-    edge: RectangleEdge,
-  ) => React.MouseEventHandler<HTMLElement>;
+  onEdgeDragStart?: (edge: RectangleEdge) => React.MouseEventHandler<HTMLElement>;
   onDelete?: React.MouseEventHandler<HTMLElement>;
   isResizing?: boolean;
   resizePreviewElementRef: React.MutableRefObject<HTMLDivElement | null>;
   onDuplicate?: (event: React.MouseEvent) => void;
+  isOutlineVisible?: boolean;
+  isHoverable?: boolean;
 }
 
 export default function NodeHud({
   node,
   rect,
+  selectedNodeRect,
   isSelected,
-  isInteractive,
+  isInteractive = false,
   onNodeDragStart,
   draggableEdges = [],
   onEdgeDragStart,
@@ -152,28 +165,59 @@ export default function NodeHud({
   isResizing = false,
   resizePreviewElementRef,
   onDuplicate,
+  isOutlineVisible = false,
+  isHoverable = true,
 }: NodeHudProps) {
-  const { dom } = useDom();
+  const hintPosition = rect.y > HUD_HEIGHT ? HINT_POSITION_TOP : HINT_POSITION_BOTTOM;
 
-  const componentId = appDom.isElement(node) ? getElementNodeComponentId(node) : '';
-  const component = useToolpadComponent(dom, componentId);
-
-  const hudPosition = rect.y > HUD_HEIGHT ? HUD_POSITION_TOP : HUD_POSITION_BOTTOM;
+  const interactiveNodeClipPath = React.useMemo(
+    () =>
+      isInteractive && selectedNodeRect
+        ? `
+            polygon(
+              -100% -100%, 
+              200% -100%,
+              200% 200%,
+              -100% 200%,
+              -100% ${selectedNodeRect.y - rect.y}px,
+              ${selectedNodeRect.x - rect.x}px ${selectedNodeRect.y - rect.y}px, 
+              ${selectedNodeRect.x - rect.x}px 
+              ${selectedNodeRect.y + selectedNodeRect.height - rect.y}px,
+              ${selectedNodeRect.x + selectedNodeRect.width - rect.x}px
+              ${selectedNodeRect.y + selectedNodeRect.height - rect.y}px, 
+              ${selectedNodeRect.x + selectedNodeRect.width - rect.x}px 
+              ${selectedNodeRect.y - rect.y}px,
+              -100% ${selectedNodeRect.y - rect.y}px
+          )`
+        : '',
+    [isInteractive, rect, selectedNodeRect],
+  );
 
   return (
-    <NodeHudWrapper
-      data-node-id={node.id}
-      style={absolutePositionCss(rect)}
-      className={clsx({
-        [nodeHudClasses.allowNodeInteraction]: isInteractive,
-      })}
-      hudPosition={hudPosition}
-    >
+    <React.Fragment>
+      <NodeHudWrapper
+        data-node-id={node.id}
+        style={{
+          ...absolutePositionCss(rect),
+          ...(interactiveNodeClipPath
+            ? {
+                clipPath: interactiveNodeClipPath,
+              }
+            : {}),
+        }}
+        isOutlineVisible={isOutlineVisible}
+        isHoverable={isHoverable}
+      >
+        {isSelected ? <span className={nodeHudClasses.selected} /> : null}
+        {isResizing ? (
+          <ResizePreview ref={resizePreviewElementRef} style={absolutePositionCss(rect)} />
+        ) : null}
+      </NodeHudWrapper>
       {isSelected ? (
-        <React.Fragment>
-          <span className={nodeHudClasses.selected} />
+        <SelectionHintWrapper style={absolutePositionCss(rect)} hintPosition={hintPosition}>
           <div
             draggable
+            data-testid="node-hud-tag"
             className={nodeHudClasses.selectionHint}
             onDragStart={onNodeDragStart}
             role="presentation"
@@ -181,7 +225,7 @@ export default function NodeHud({
             onMouseDown={stopPropagationHandler}
             onMouseUp={stopPropagationHandler}
           >
-            {component?.displayName || '<unknown>'}
+            {node.name}
             <DragIndicatorIcon color="inherit" />
             <IconButton aria-label="Duplicate" color="inherit" onMouseUp={onDuplicate}>
               <Tooltip title="Duplicate" enterDelay={400}>
@@ -194,20 +238,19 @@ export default function NodeHud({
               </Tooltip>
             </IconButton>
           </div>
-        </React.Fragment>
+        </SelectionHintWrapper>
       ) : null}
-      {onEdgeDragStart
-        ? draggableEdges.map((edge) => (
+      {onEdgeDragStart ? (
+        <DraggableEdgeWrapper style={absolutePositionCss(rect)}>
+          {draggableEdges.map((edge) => (
             <DraggableEdge
               key={`${node.id}-edge-${edge}`}
               edge={edge}
-              onMouseDown={onEdgeDragStart(node as appDom.ElementNode, edge)}
+              onMouseDown={onEdgeDragStart(edge)}
             />
-          ))
-        : null}
-      {isResizing ? (
-        <ResizePreview ref={resizePreviewElementRef} style={absolutePositionCss(rect)} />
+          ))}
+        </DraggableEdgeWrapper>
       ) : null}
-    </NodeHudWrapper>
+    </React.Fragment>
   );
 }

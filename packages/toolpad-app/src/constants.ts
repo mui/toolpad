@@ -1,5 +1,5 @@
 export const MUI_X_PRO_LICENSE =
-  '82281641f885336d8c6b61faa73edecdT1JERVI6c3R1ZGlvXzEyMyxFWFBJUlk9MTY3NzY2NTQ3MjM4MSxLRVlWRVJTSU9OPTE=';
+  'f359d9c0d105599a7d83c3f8d775eca5Tz0xMjMsRT0yNTI0NjA0NDAwMDAwLFM9cHJlbWl1bSxMTT1wZXJwZXR1YWwsS1Y9Mg==';
 export const HTML_ID_EDITOR_OVERLAY = 'editor-overlay';
 export const WINDOW_PROP_TOOLPAD_APP_RENDER_PARAMS = '__TOOLPAD_APP_RENDER_PARAMS__';
 export const RUNTIME_CONFIG_WINDOW_PROPERTY = '__TOOLPAD_RUNTIME_CONFIG__';
@@ -16,4 +16,17 @@ export const ROADMAP_URL = 'https://github.com/orgs/mui/projects/9';
 export const SCHEDULE_DEMO_URL = 'https://calendly.com/prakhar-mui/toolpad';
 
 export const DEMO_DATASOURCES = new Set(['rest', 'function']);
-export const PRODUCTION_DATASOURCES = new Set(['rest', 'function', 'googleSheets', 'postgres']);
+export const PRODUCTION_DATASOURCES = new Set([
+  'rest',
+  'function',
+  'googleSheets',
+  'postgres',
+  'mysql',
+  'local',
+]);
+
+export const TOOLPAD_BRIDGE_GLOBAL = '__TOOLPAD_BRIDGE__';
+
+export const NON_BINDABLE_CONTROL_TYPES = ['GridColumns'];
+
+export const VERSION_CHECK_INTERVAL = 1000 * 60 * 10;

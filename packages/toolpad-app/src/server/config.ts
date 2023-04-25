@@ -11,25 +11,17 @@ type BasicAuthConfig =
     };
 
 export type ServerConfig = {
-  databaseUrl: string;
+  databaseUrl?: string;
   googleSheetsClientId?: string;
   googleSheetsClientSecret?: string;
   encryptionKeys: string[];
   basicAuthUser?: string;
   basicAuthPassword?: string;
-  recaptchaV2SecretKey?: string;
-  recaptchaV3SecretKey?: string;
-  ecsNodeUrl?: string;
-  ecsApiKey?: string;
 } & BasicAuthConfig;
 
 function readConfig(): ServerConfig & typeof sharedConfig {
   if (typeof window !== 'undefined') {
     throw new Error(`Serverside config can't be loaded on the client side`);
-  }
-
-  if (!process.env.TOOLPAD_DATABASE_URL) {
-    throw new Error(`App started without config env variable TOOLPAD_DATABASE_URL`);
   }
 
   // Whitespace separated, do not use spaces in your keys
@@ -54,10 +46,6 @@ function readConfig(): ServerConfig & typeof sharedConfig {
     databaseUrl: process.env.TOOLPAD_DATABASE_URL,
     googleSheetsClientId: process.env.TOOLPAD_DATASOURCE_GOOGLESHEETS_CLIENT_ID,
     googleSheetsClientSecret: process.env.TOOLPAD_DATASOURCE_GOOGLESHEETS_CLIENT_SECRET,
-    recaptchaV2SecretKey: process.env.TOOLPAD_RECAPTCHA_V2_SECRET_KEY,
-    recaptchaV3SecretKey: process.env.TOOLPAD_RECAPTCHA_V3_SECRET_KEY,
-    ecsNodeUrl: process.env.TOOLPAD_ECS_NODE_URL,
-    ecsApiKey: process.env.TOOLPAD_ECS_API_KEY,
     encryptionKeys,
   };
 }

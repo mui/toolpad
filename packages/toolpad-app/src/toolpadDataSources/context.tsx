@@ -1,10 +1,9 @@
 import { UseQueryResult } from '@tanstack/react-query';
 import { NodeId } from '@mui/toolpad-core';
-import { createProvidedContext } from '@mui/toolpad-core/utils/react';
+import { createProvidedContext } from '@mui/toolpad-utils/react';
 import client, { UseQueryFnOptions } from '../api';
 
 export interface ConnectionContext {
-  appId: string;
   dataSourceId: string;
   connectionId: NodeId | null;
 }
@@ -18,10 +17,10 @@ export function usePrivateQuery<Q = unknown, R = unknown>(
   query: Q | null,
   options?: UseQueryFnOptions<any>,
 ): UseQueryResult<R> {
-  const { appId, dataSourceId, connectionId } = useConnectionContext();
+  const { dataSourceId, connectionId } = useConnectionContext();
   return client.useQuery(
     'dataSourceFetchPrivate',
-    query == null ? null : [appId, dataSourceId, connectionId, query],
+    query == null ? null : [dataSourceId, connectionId, query],
     options,
   );
 }

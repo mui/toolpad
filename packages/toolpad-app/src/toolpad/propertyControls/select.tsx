@@ -20,7 +20,7 @@ function SelectPropEditor({ label, propType, value, onChange, disabled }: Editor
       disabled={disabled}
       onChange={handleChange}
     >
-      <MenuItem value="">-</MenuItem>
+      {typeof propType.default === 'undefined' ? <MenuItem value="">-</MenuItem> : null}
       {items.map((item) => (
         <MenuItem key={item} value={item}>
           {item}

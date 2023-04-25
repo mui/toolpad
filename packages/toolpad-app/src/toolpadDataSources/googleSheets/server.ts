@@ -3,9 +3,9 @@ import { drive_v3 } from '@googleapis/drive';
 import { sheets_v4 } from '@googleapis/sheets';
 import { OAuth2Client } from 'google-auth-library';
 import { match } from 'path-to-regexp';
+import { asArray } from '@mui/toolpad-utils/collections';
 import { ServerDataSource, CreateHandlerApi } from '../../types';
 import config from '../../server/config';
-import { asArray } from '../../utils/collections';
 import {
   GoogleSheetsConnectionParams,
   GoogleSheetsPrivateQuery,
@@ -110,9 +110,7 @@ async function exec(
       `${response.status}: ${response.statusText} Failed to fetch "${JSON.stringify(query)}"`,
     );
   }
-  return {
-    data: {},
-  };
+  throw new Error(`No sheet selected`);
 }
 
 /**
@@ -224,10 +222,10 @@ async function handler(
     if (!state) {
       return res.status(400).send(`Missing query parameter "state"`);
     }
-    const { connectionId, appId } = JSON.parse(decodeURIComponent(state));
+    const { connectionId } = JSON.parse(decodeURIComponent(state));
 
     // Check if connection with connectionId exists, if so: merge
-    const savedConnection = await api.getConnectionParams(appId, connectionId);
+    const savedConnection = await api.getConnectionParams(connectionId);
     if (savedConnection) {
       client.setCredentials(savedConnection);
     }
@@ -260,13 +258,9 @@ async function handler(
       }
       if (tokens) {
         client.setCredentials(tokens);
-        await api.setConnectionParams(appId, connectionId, client.credentials);
+        await api.setConnectionParams(connectionId, client.credentials);
       }
-      return res.redirect(
-        `/_toolpad/app/${encodeURIComponent(appId)}/connections/${encodeURIComponent(
-          connectionId,
-        )}`,
-      );
+      return res.redirect(`/_toolpad/app/connections/${encodeURIComponent(connectionId)}`);
     }
     return res.status(404).send('No handler exists for given path');
   } catch (e) {

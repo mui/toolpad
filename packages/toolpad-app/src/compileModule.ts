@@ -1,8 +1,8 @@
 import { codeFrameColumns } from '@babel/code-frame';
 import { transform, TransformResult } from 'sucrase';
+import { errorFrom } from '@mui/toolpad-utils/errors';
+import { findImports, isAbsoluteUrl } from '@mui/toolpad-utils/strings';
 import { CompiledModule } from './types';
-import { errorFrom } from './utils/errors';
-import { findImports, isAbsoluteUrl } from './utils/strings';
 
 export default function compileModule(src: string, filename: string): CompiledModule {
   const urlImports = findImports(src).filter((spec) => isAbsoluteUrl(spec));

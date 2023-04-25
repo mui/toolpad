@@ -1,8 +1,9 @@
 import * as React from 'react';
 import { ErrorBoundary, FallbackProps } from 'react-error-boundary';
-import { ToolpadComponents } from './types';
+import { Emitter } from '@mui/toolpad-utils/events';
+import { RuntimeEvents, ToolpadComponents } from './types.js';
 import { RUNTIME_PROP_NODE_ID, RUNTIME_PROP_SLOTS } from './constants.js';
-import type { SlotType, ComponentConfig, RuntimeEvent, RuntimeError } from './types';
+import type { SlotType, ComponentConfig, RuntimeEvent, RuntimeError } from './types.js';
 
 const ResetNodeErrorsKeyContext = React.createContext(0);
 
@@ -18,7 +19,14 @@ declare global {
   }
 }
 
-export const NodeRuntimeContext = React.createContext<string | null>(null);
+export const NodeRuntimeContext = React.createContext<{
+  nodeId: string | null;
+  nodeName: string | null;
+}>({
+  nodeId: null,
+  nodeName: null,
+});
+export const CanvasEventsContext = React.createContext<Emitter<RuntimeEvents>>(new Emitter());
 
 // NOTE: These props aren't used, they are only there to transfer information from the
 // React elements to the fibers.
@@ -80,12 +88,14 @@ function NodeFiberHost({ children }: NodeFiberHostProps) {
 export interface NodeRuntimeWrapperProps {
   children: React.ReactElement;
   nodeId: string;
+  nodeName: string;
   componentConfig: ComponentConfig<any>;
   NodeError: React.ComponentType<NodeErrorProps>;
 }
 
 export function NodeRuntimeWrapper({
   nodeId,
+  nodeName,
   componentConfig,
   children,
   NodeError,
@@ -107,9 +117,11 @@ export function NodeRuntimeWrapper({
     [NodeError, componentConfig, nodeId],
   );
 
+  const nodeRuntimeValue = React.useMemo(() => ({ nodeId, nodeName }), [nodeId, nodeName]);
+
   return (
     <ErrorBoundary resetKeys={[resetNodeErrorsKey]} fallbackRender={ErrorFallback}>
-      <NodeRuntimeContext.Provider value={nodeId}>
+      <NodeRuntimeContext.Provider value={nodeRuntimeValue}>
         <NodeFiberHost
           {...{
             [RUNTIME_PROP_NODE_ID]: nodeId,
@@ -124,69 +136,34 @@ export function NodeRuntimeWrapper({
 }
 
 export interface NodeRuntime<P> {
+  nodeId: string | null;
+  nodeName: string | null;
   updateAppDomConstProp: <K extends keyof P & string>(
     key: K,
     value: React.SetStateAction<P[K]>,
   ) => void;
 }
 
-export function fireEvent(event: RuntimeEvent) {
-  // eslint-disable-next-line no-underscore-dangle
-  if (!window.__TOOLPAD_RUNTIME_EVENT__) {
-    // eslint-disable-next-line no-underscore-dangle
-    window.__TOOLPAD_RUNTIME_EVENT__ = [] as RuntimeEvent[];
-  }
-  // eslint-disable-next-line no-underscore-dangle
-  if (typeof window.__TOOLPAD_RUNTIME_EVENT__ === 'function') {
-    // eslint-disable-next-line no-underscore-dangle
-    window.__TOOLPAD_RUNTIME_EVENT__(event);
-  } else {
-    // eslint-disable-next-line no-underscore-dangle
-    window.__TOOLPAD_RUNTIME_EVENT__.push(event);
-  }
-}
-
-export function setEventHandler(window: Window, handleEvent: (event: RuntimeEvent) => void) {
-  // eslint-disable-next-line no-underscore-dangle
-  if (typeof window.__TOOLPAD_RUNTIME_EVENT__ === 'function') {
-    throw new Error(`Event handler already attached.`);
-  }
-
-  // eslint-disable-next-line no-underscore-dangle
-  const queuedEvents = Array.isArray(window.__TOOLPAD_RUNTIME_EVENT__)
-    ? // eslint-disable-next-line no-underscore-dangle
-      window.__TOOLPAD_RUNTIME_EVENT__
-    : [];
-
-  queuedEvents.forEach((event) => handleEvent(event));
-
-  // eslint-disable-next-line no-underscore-dangle
-  window.__TOOLPAD_RUNTIME_EVENT__ = (event) => handleEvent(event);
-
-  return () => {
-    // eslint-disable-next-line no-underscore-dangle
-    delete window.__TOOLPAD_RUNTIME_EVENT__;
-  };
-}
-
 export function useNode<P = {}>(): NodeRuntime<P> | null {
-  const nodeId = React.useContext(NodeRuntimeContext);
+  const { nodeId, nodeName } = React.useContext(NodeRuntimeContext);
+  const canvasEvents = React.useContext(CanvasEventsContext);
 
   return React.useMemo(() => {
     if (!nodeId) {
       return null;
     }
     return {
+      nodeId,
+      nodeName,
       updateAppDomConstProp: (prop, value) => {
-        fireEvent({
-          type: 'propUpdated',
+        canvasEvents.emit('propUpdated', {
           nodeId,
           prop,
           value,
         });
       },
     };
-  }, [nodeId]);
+  }, [canvasEvents, nodeId, nodeName]);
 }
 
 export interface PlaceholderProps {
@@ -196,7 +173,7 @@ export interface PlaceholderProps {
 }
 
 export function Placeholder({ prop, children, hasLayout = false }: PlaceholderProps) {
-  const nodeId = React.useContext(NodeRuntimeContext);
+  const { nodeId } = React.useContext(NodeRuntimeContext);
   if (!nodeId) {
     return <React.Fragment>{children}</React.Fragment>;
   }
@@ -220,7 +197,7 @@ export interface SlotsProps {
 }
 
 export function Slots({ prop, children }: SlotsProps) {
-  const nodeId = React.useContext(NodeRuntimeContext);
+  const { nodeId } = React.useContext(NodeRuntimeContext);
   if (!nodeId) {
     return <React.Fragment>{children}</React.Fragment>;
   }

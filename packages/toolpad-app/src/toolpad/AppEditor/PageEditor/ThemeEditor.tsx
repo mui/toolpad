@@ -12,7 +12,7 @@ import LightModeIcon from '@mui/icons-material/LightMode';
 import DarkModeIcon from '@mui/icons-material/DarkMode';
 import * as appDom from '../../../appDom';
 import { WithControlledProp } from '../../../utils/types';
-import { useDom, useDomApi } from '../../DomLoader';
+import { useDom, useDomApi } from '../../AppState';
 
 const IconToggleButton = styled(ToggleButton)({
   display: 'flex',
@@ -86,7 +86,7 @@ export default function ComponentEditor({ className }: ComponentEditorProps) {
   };
 
   return (
-    <div className={className}>
+    <div className={className} data-testid="theme-editor">
       {theme ? (
         <Stack spacing={2}>
           <ToggleButtonGroup

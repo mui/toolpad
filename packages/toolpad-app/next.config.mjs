@@ -170,15 +170,6 @@ export default withBundleAnalyzer({
         source: '/((?!(?:deploy|prod))/.*)',
         headers: securityHeaders,
       },
-      {
-        source: '/app-canvas/:path*',
-        headers: [
-          {
-            key: 'X-Frame-Options',
-            value: 'SAMEORIGIN',
-          },
-        ],
-      },
     ];
   },
 });

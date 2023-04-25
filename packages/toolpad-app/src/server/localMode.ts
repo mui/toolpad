@@ -9,7 +9,6 @@ import { fromZodError } from 'zod-validation-error';
 import { glob } from 'glob';
 import * as chokidar from 'chokidar';
 import { debounce } from 'lodash-es';
-import cuid from 'cuid';
 import { Emitter } from '@mui/toolpad-utils/events';
 import { errorFrom } from '@mui/toolpad-utils/errors';
 import { filterValues, hasOwnProperty, mapValues } from '@mui/toolpad-utils/collections';
@@ -306,7 +305,7 @@ async function initGitignore(root: string) {
   const generatedGitignorePath = path.resolve(projectFolder, '.gitignore');
   if (!(await fileExists(generatedGitignorePath))) {
     // eslint-disable-next-line no-console
-    console.log(`${chalk.blue('info')}  - Initializing Toolpad queries file`);
+    console.log(`${chalk.blue('info')}  - Initializing .gitignore file`);
     await writeFileRecursive(generatedGitignorePath, DEFAULT_GENERATED_GITIGNORE_FILE_CONTENT, {
       encoding: 'utf-8',
     });
@@ -1108,7 +1107,7 @@ async function initToolpadFolder(root: string) {
       apiVersion: 'v1',
       kind: 'page',
       spec: {
-        id: cuid.slug(),
+        id: appDom.createId(),
         title: 'Default page',
       },
     };

@@ -9,7 +9,6 @@ import { fromZodError } from 'zod-validation-error';
 import { glob } from 'glob';
 import * as chokidar from 'chokidar';
 import { debounce } from 'lodash-es';
-import cuid from 'cuid';
 import { Emitter } from '@mui/toolpad-utils/events';
 import { errorFrom } from '@mui/toolpad-utils/errors';
 import { filterValues, hasOwnProperty, mapValues } from '@mui/toolpad-utils/collections';
@@ -1108,7 +1107,7 @@ async function initToolpadFolder(root: string) {
       apiVersion: 'v1',
       kind: 'page',
       spec: {
-        id: cuid.slug(),
+        id: appDom.createId(),
         title: 'Default page',
       },
     };

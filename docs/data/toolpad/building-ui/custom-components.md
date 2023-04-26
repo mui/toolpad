@@ -4,17 +4,17 @@
 
 ## Creating a new custom component
 
-In order to create a new custom component open the **Component library** and click the create button under the **custom components** section
+In order to create a new custom component open the **Component library** and click the create button under the **custom components** section:
 
-<img src="/static/toolpad/docs/building-ui/ui-10.png?v=0" width="309px" alt="Custom component" />
+<img src="/static/toolpad/docs/building-ui/ui-10.png?v=0" width="309" alt="Custom component" />
 
 Choose the name for your component and click **Create**:
 
-<img src="/static/toolpad/docs/building-ui/ui-11.png?v=0" width="370px" alt="Custom create" />
+<img src="/static/toolpad/docs/building-ui/ui-11.png?v=0" width="370" alt="Custom create" />
 
 A snackbar appears acknowledging the successful creation of the component. This will create a code file in the `toolpad/components` folder of the project. Use the **Open** button to start open this file in your code editor:
 
-<img src="/static/toolpad/docs/building-ui/ui-12.png?v=0" width="494px" alt="Custom component IDE" />
+<img src="/static/toolpad/docs/building-ui/ui-12.png?v=0" width="494" alt="Custom component IDE" />
 
 The file has been initialized with a sample component. Replace its content with the following code:
 
@@ -53,11 +53,11 @@ export default createComponent(NumberDisplay, {
 
 When you now open the **Component library** again you'll see your **NumberDisplay** available.
 
-<img src="/static/toolpad/docs/building-ui/ui-13.png?v=0" width="370px" alt="Custom create" />
+<img src="/static/toolpad/docs/building-ui/ui-13.png?v=0" width="370" alt="Custom create" />
 
 Drag two of them on the canvas and select the first one. In the **Inspector** you'll see both the `label` and `value` properties available as fully bindable properties.
 
-<img src="/static/toolpad/docs/building-ui/ui-14.png?v=0" width="370px" alt="Custom create" />
+<img src="/static/toolpad/docs/building-ui/ui-14.png?v=0" width="370" alt="Custom create" />
 
 ## Supported features
 

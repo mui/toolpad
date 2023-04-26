@@ -20,6 +20,7 @@ export default defineConfig([
       'get-port',
       'pretty-bytes',
       'latest-version',
+      'nanoid',
     ],
     clean: true,
     sourcemap: true,

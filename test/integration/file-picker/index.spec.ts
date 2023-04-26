@@ -9,7 +9,7 @@ test.use({
   },
 });
 
-test('File picker component', async ({ page }) => {
+test('File Picker component', async ({ page }) => {
   const testFilePath = path.resolve(__dirname, './test.txt');
 
   const editorModel = new ToolpadEditor(page);

@@ -43,7 +43,8 @@ _If you're looking into contributing to the docs, follow the [instructions](#bui
      "resolutions": {
        "@mui/toolpad-app": "portal:<your-local-toolpad-monorepo>/packages/toolpad-app",
        "@mui/toolpad-core": "portal:<your-local-toolpad-monorepo>/packages/toolpad-core",
-       "@mui/toolpad-components": "portal:<your-local-toolpad-monorepo>/packages/toolpad-components"
+       "@mui/toolpad-components": "portal:<your-local-toolpad-monorepo>/packages/toolpad-components",
+       "@mui/toolpad-utils": "portal:<your-local-toolpad-monorepo>/packages/toolpad-utils"
      }
    }
    ```
@@ -123,7 +124,7 @@ _If you're looking into contributing to the docs, follow the [instructions](#bui
 
   ```sh
   yarn build:release
-  yarn test:integration --project chromiun
+  yarn test:integration --project chromium
   ```
 
 - To run the tests locally in dev mode

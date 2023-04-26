@@ -7,14 +7,14 @@ interface TabProps {
   name: string;
 }
 
-interface Props {
+interface TabsProps {
   value: string;
   onChange: (value: number) => void;
   tabs: TabProps[];
   defaultValue: string;
 }
 
-function Tabs({ value, onChange, tabs, defaultValue }: Props) {
+function Tabs({ value, onChange, tabs, defaultValue }: TabsProps) {
   return (
     <MUITabs
       value={value || defaultValue}

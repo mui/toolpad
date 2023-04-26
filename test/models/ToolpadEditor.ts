@@ -97,7 +97,9 @@ export class ToolpadEditor {
   async createPage(name: string) {
     await this.createPageBtn.click();
     await this.createPageDialog.nameInput.fill(name);
-    await Promise.all([this.createPageDialog.createButton.click(), this.page.waitForNavigation()]);
+    const { href: currentUrl } = new URL(this.page.url());
+    await this.createPageDialog.createButton.click();
+    await this.page.waitForURL((url) => url.href !== currentUrl);
   }
 
   async goToPage(name: string) {
@@ -149,10 +151,9 @@ export class ToolpadEditor {
   }
 
   async dragNewComponentToAppCanvas(componentName: string) {
-    await this.componentCatalog.hover();
+    const style = await this.page.addStyleTag({ content: `* { transition: none !important; }` });
 
-    // Account for opening transition
-    await this.page.waitForTimeout(200);
+    await this.componentCatalog.hover();
 
     const targetBoundingBox = await this.pageRoot.boundingBox();
     await expect(targetBoundingBox).toBeDefined();
@@ -161,8 +162,11 @@ export class ToolpadEditor {
     const moveTargetY = targetBoundingBox!.y + targetBoundingBox!.height / 2;
 
     const sourceLocator = this.getComponentCatalogItem(componentName);
+    await expect(sourceLocator).toBeVisible();
 
     await this.dragToAppCanvas(sourceLocator, moveTargetX, moveTargetY);
+
+    await style.evaluate((elm) => elm.parentNode?.removeChild(elm));
   }
 
   getHierarchyItem(group: string, name: string): Locator {

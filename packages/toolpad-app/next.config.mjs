@@ -64,28 +64,6 @@ const regexEqual = (x, y) => {
   );
 };
 
-// See https://nextjs.org/docs/advanced-features/security-headers
-const securityHeaders = [
-  {
-    key: 'X-Frame-Options',
-    value: 'DENY',
-  },
-  {
-    // Force the browser to trust the Content-Type header
-    // https://stackoverflow.com/questions/18337630/what-is-x-content-type-options-nosniff
-    key: 'X-Content-Type-Options',
-    value: 'nosniff',
-  },
-  {
-    key: 'X-XSS-Protection',
-    value: '1; mode=block',
-  },
-  {
-    key: 'Referrer-Policy',
-    value: 'strict-origin-when-cross-origin',
-  },
-];
-
 const NEVER = () => false;
 
 export default withBundleAnalyzer({
@@ -146,30 +124,5 @@ export default withBundleAnalyzer({
     }
 
     return config;
-  },
-  async redirects() {
-    return [
-      {
-        source: '/release/:path*',
-        destination: '/app/:path*',
-        permanent: true,
-      },
-    ];
-  },
-  async rewrites() {
-    return [
-      {
-        source: '/health-check',
-        destination: '/api/health-check',
-      },
-    ];
-  },
-  headers: async () => {
-    return [
-      {
-        source: '/((?!(?:deploy|prod))/.*)',
-        headers: securityHeaders,
-      },
-    ];
   },
 });

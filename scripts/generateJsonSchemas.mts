@@ -1,4 +1,6 @@
-import { JSONSCHEMA } from '@mui/toolpad-app/schema';
+import { META } from '@mui/toolpad-app/schema';
+import { zodToJsonSchema } from '@janpotoms/zod-to-json-schema';
+import * as z from 'zod';
 import * as fs from 'fs/promises';
 import * as path from 'path';
 import * as url from 'url';
@@ -10,7 +12,10 @@ async function main() {
   await fs.rm(SCHEMA_DIR, { recursive: true });
   await fs.mkdir(SCHEMA_DIR, { recursive: true });
   const schemaFile = path.resolve(SCHEMA_DIR, `./definitions.json`);
-  await fs.writeFile(schemaFile, JSON.stringify(JSONSCHEMA, null, 2));
+  const jsonSchema = zodToJsonSchema(z.object(META.schemas), {
+    definitions: META.definitions,
+  });
+  await fs.writeFile(schemaFile, JSON.stringify(jsonSchema, null, 2));
 }
 
 main().catch((err) => {

@@ -19,7 +19,7 @@
           "properties": {
             "id": {
               "type": "string",
-              "description": "Serves as canonical id of the page."
+              "description": "Serves as a canonical id of the page."
             },
             "title": {
               "type": "string",
@@ -394,7 +394,7 @@
             "content": {
               "type": "array",
               "items": {
-                "$ref": "#/definitions/BindableProp/anyOf/4/properties/$$template/items"
+                "$ref": "#/definitions/Element"
               },
               "default": [],
               "description": "The content of the page. This defines the UI."
@@ -510,6 +510,51 @@
       ],
       "additionalProperties": false
     },
+    "JsExpressionAction": {
+      "type": "object",
+      "properties": {
+        "$$jsExpressionAction": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "$$jsExpressionAction"
+      ],
+      "additionalProperties": false
+    },
+    "NavigationAction": {
+      "type": "object",
+      "properties": {
+        "$$navigationAction": {
+          "type": "object",
+          "properties": {
+            "page": {
+              "type": "string"
+            },
+            "parameters": {
+              "type": "object",
+              "additionalProperties": {
+                "anyOf": [
+                  {
+                    "$ref": "#/definitions/JsExpressionBinding"
+                  },
+                  {}
+                ]
+              }
+            }
+          },
+          "required": [
+            "page",
+            "parameters"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "$$navigationAction"
+      ],
+      "additionalProperties": false
+    },
     "BindableProp": {
       "anyOf": [
         {
@@ -519,123 +564,84 @@
           "$ref": "#/definitions/JsExpressionBinding"
         },
         {
-          "type": "object",
-          "properties": {
-            "$$jsExpressionAction": {
-              "type": "string"
-            }
-          },
-          "required": [
-            "$$jsExpressionAction"
-          ],
-          "additionalProperties": false
+          "$ref": "#/definitions/JsExpressionAction"
         },
         {
-          "type": "object",
-          "properties": {
-            "$$navigationAction": {
-              "type": "object",
-              "properties": {
-                "page": {
-                  "type": "string"
-                },
-                "parameters": {
-                  "type": "object",
-                  "additionalProperties": {
-                    "anyOf": [
-                      {
-                        "$ref": "#/definitions/JsExpressionBinding"
-                      },
-                      {}
-                    ]
-                  }
-                }
-              },
-              "required": [
-                "page",
-                "parameters"
-              ],
-              "additionalProperties": false
-            }
-          },
-          "required": [
-            "$$navigationAction"
-          ],
-          "additionalProperties": false
+          "$ref": "#/definitions/NavigationAction"
         },
         {
-          "type": "object",
-          "properties": {
-            "$$template": {
-              "type": "array",
-              "items": {
-                "type": "object",
-                "properties": {
-                  "component": {
-                    "type": "string",
-                    "description": "The component that this element was based on."
-                  },
-                  "name": {
-                    "type": "string",
-                    "description": "a name for this component, which is used to reference it inside bindings."
-                  },
-                  "layout": {
-                    "type": "object",
-                    "properties": {
-                      "horizontalAlign": {
-                        "type": "string",
-                        "description": "Lays out the element along the horizontal axis."
-                      },
-                      "verticalAlign": {
-                        "type": "string",
-                        "description": "lays out the element along the verical axis."
-                      },
-                      "columnSize": {
-                        "type": "number",
-                        "description": "The width this element takes up, expressed in terms of columns on the page."
-                      }
-                    },
-                    "additionalProperties": false,
-                    "description": "Layout properties for this element."
-                  },
-                  "children": {
-                    "type": "array",
-                    "items": {
-                      "$ref": "#/definitions/BindableProp/anyOf/4/properties/$$template/items"
-                    },
-                    "description": "The children of this element."
-                  },
-                  "props": {
-                    "type": "object",
-                    "additionalProperties": {
-                      "$ref": "#/definitions/BindableProp"
-                    },
-                    "description": "The properties to configure this instance of the component."
-                  }
-                },
-                "required": [
-                  "component",
-                  "name"
-                ],
-                "additionalProperties": false,
-                "description": "The instance of a component. Used to build user interfaces in pages."
-              },
-              "description": "The subtree, that describes the UI to be rendered by the template."
-            }
-          },
-          "required": [
-            "$$template"
-          ],
-          "additionalProperties": false,
-          "description": "Describes a fragment of Toolpad elements, to be used as a template."
+          "$ref": "#/definitions/Template"
         }
       ]
     },
     "Element": {
-      "$ref": "#/definitions/BindableProp/anyOf/4/properties/$$template/items"
+      "type": "object",
+      "properties": {
+        "component": {
+          "type": "string",
+          "description": "The component that this element was based on."
+        },
+        "name": {
+          "type": "string",
+          "description": "a name for this component, which is used to reference it inside bindings."
+        },
+        "layout": {
+          "type": "object",
+          "properties": {
+            "horizontalAlign": {
+              "type": "string",
+              "description": "Lays out the element along the horizontal axis."
+            },
+            "verticalAlign": {
+              "type": "string",
+              "description": "lays out the element along the verical axis."
+            },
+            "columnSize": {
+              "type": "number",
+              "description": "The width this element takes up, expressed in terms of columns on the page."
+            }
+          },
+          "additionalProperties": false,
+          "description": "Layout properties for this element."
+        },
+        "children": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Element"
+          },
+          "description": "The children of this element."
+        },
+        "props": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/definitions/BindableProp"
+          },
+          "description": "The properties to configure this instance of the component."
+        }
+      },
+      "required": [
+        "component",
+        "name"
+      ],
+      "additionalProperties": false,
+      "description": "The instance of a component. Used to build user interfaces in pages."
     },
     "Template": {
-      "$ref": "#/definitions/BindableProp/anyOf/4"
+      "type": "object",
+      "properties": {
+        "$$template": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Element"
+          },
+          "description": "The subtree, that describes the UI to be rendered by the template."
+        }
+      },
+      "required": [
+        "$$template"
+      ],
+      "additionalProperties": false,
+      "description": "Describes a fragment of Toolpad elements, to be used as a template."
     }
   },
   "$schema": "http://json-schema.org/draft-07/schema#"

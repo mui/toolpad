@@ -1,5 +1,4 @@
 import { z } from 'zod';
-import { zodToJsonSchema } from 'zod-to-json-schema';
 
 export const API_VERSION = 'v1';
 
@@ -284,17 +283,18 @@ export const themeSchema = toolpadObjectSchema(
 
 export type Theme = z.infer<typeof themeSchema>;
 
-const definitions = {
-  Json: jsonSchema,
-  JsExpressionBinding: jsExpressionBindingSchema,
-  BindableProp: bindablePropSchema,
-  Element: elementSchema,
-  Template: templateSchema,
-};
-export const JSONSCHEMA = zodToJsonSchema(
-  z.object({
+export const META = {
+  schemas: {
     Page: pageSchema,
     Theme: themeSchema,
-  }),
-  { definitions },
-);
+  },
+  definitions: {
+    Json: jsonSchema,
+    JsExpressionBinding: jsExpressionBindingSchema,
+    JsExpressionAction: jsExpressionActionSchema,
+    NavigationAction: navigationActionSchema,
+    BindableProp: bindablePropSchema,
+    Element: elementSchema,
+    Template: templateSchema,
+  },
+};

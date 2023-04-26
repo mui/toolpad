@@ -59,21 +59,11 @@ const pages: MuiPage[] = [
     pathname: '/toolpad/deployment',
     icon: 'BuildIcon',
   },
-  // {
-  //   pathname: '/toolpad/versioning-and-deploying',
-  //   title: 'Versioning & deploying [TODO]',
-  //   icon: 'ToggleOnIcon',
-  //   children: [
-  //     {
-  //       pathname: '/toolpad/versioning-and-deploying/releases',
-  //     },
-  //   ],
-  // },
-  // {
-  //   pathname: '/toolpad/faq',
-  //   title: 'FAQ [TODO]',
-  //   icon: 'ReaderIcon',
-  // },
+  {
+    pathname: '/toolpad/schema-reference',
+    title: 'Schema Reference',
+    icon: 'SchemaIcon',
+  },
 ];
 
 export default pages;

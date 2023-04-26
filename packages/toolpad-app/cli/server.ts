@@ -107,10 +107,6 @@ async function main() {
 
         app.use(
           '/preview',
-          (req, res, expressNext) => {
-            res.setHeader('X-Frame-Options', 'SAMEORIGIN');
-            expressNext();
-          },
           createProxyMiddleware({
             logLevel: 'silent',
             ws: true,
@@ -148,21 +144,6 @@ async function main() {
     // when using middleware `hostname` and `port` must be provided below
     editorNextApp = next({ dir, dev, hostname, port });
     const handle = editorNextApp.getRequestHandler();
-
-    app.use((req, res, expressNext) => {
-      res.setHeader('X-Frame-Options', 'DENY');
-      expressNext();
-    });
-
-    app.use('/prod', (req, res, expressNext) => {
-      res.removeHeader('X-Frame-Options');
-      expressNext();
-    });
-
-    app.use('/app-canvas', (req, res, expressNext) => {
-      res.setHeader('X-Frame-Options', 'SAMEORIGIN');
-      expressNext();
-    });
 
     app.use(async (req, res) => {
       try {

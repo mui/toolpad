@@ -35,7 +35,6 @@ export async function createProdHandler({ root }: ToolpadAppHandlerParams) {
 
       html = postProcessHtml(html, { config, dom });
 
-      res.removeHeader('X-Frame-Options');
       res.setHeader('Content-Type', 'text/html').status(200).end(html);
     }),
   );

@@ -4,14 +4,23 @@ import ToolpadApp from '../../src/runtime/ToolpadApp';
 import config from '../../src/config';
 import { RuntimeState } from '../../src/types';
 import loadComponents from '../../src/runtime/loadDomComponents';
+import createRuntimeState from '../../src/createRuntimeState';
+import * as appDom from '../../src/appDom';
 
 interface ProdPageProps {
   state: RuntimeState;
 }
 
-export const getServerSideProps: GetServerSideProps<ProdPageProps> = async () => {
-  const { loadRuntimeState } = await import('../../src/server/data');
+let domPromise: Promise<appDom.AppDom> | undefined;
+async function loadDom() {
+  if (!domPromise) {
+    const { loadDomFromDisk } = await import('../../src/server/localMode');
+    domPromise = loadDomFromDisk();
+  }
+  return domPromise;
+}
 
+export const getServerSideProps: GetServerSideProps<ProdPageProps> = async () => {
   if (config.cmd !== 'start') {
     return {
       notFound: true,
@@ -23,11 +32,11 @@ export const getServerSideProps: GetServerSideProps<ProdPageProps> = async () =>
   //   context.res.setHeader('X-Frame-Options', 'DENY');
   // }
 
-  const state = await loadRuntimeState();
+  const state = createRuntimeState({ dom: await loadDom() });
 
   return {
     props: {
-      state,
+      state: JSON.parse(JSON.stringify(state)),
     },
   };
 };

@@ -27,7 +27,7 @@
     "@emotion/server": "^11.10.0",
     "@emotion/styled": "^11.10.6",
     "@mui/icons-material": "^5.11.16",
-    "@mui/material": "^5.12.1",
+    "@mui/material": "^5.12.2",
     "@mui/monorepo": "https://github.com/mui/material-ui.git",
     "@mui/styles": "^5.12.0",
     "@mui/utils": "^5.12.0",

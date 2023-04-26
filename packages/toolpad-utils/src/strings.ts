@@ -89,7 +89,7 @@ export function removePrefix(input: string, prefix: string): string {
  * Removes a suffix from a string if it ends with it.
  */
 export function removeSuffix(input: string, suffix: string): string {
-  return input.endsWith(suffix) ? input.slice(0, input.length - suffix.length) : input;
+  return input.endsWith(suffix) ? input.slice(0, -suffix.length) : input;
 }
 
 /**

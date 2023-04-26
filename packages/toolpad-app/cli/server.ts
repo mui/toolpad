@@ -7,19 +7,64 @@ import { createServer } from 'http';
 import { execaNode } from 'execa';
 import getPort from 'get-port';
 import { createProxyMiddleware } from 'http-proxy-middleware';
+import { mapValues } from '@mui/toolpad-utils/collections';
+import prettyBytes from 'pretty-bytes';
 import { createProdHandler } from '../src/server/toolpadAppServer';
 import { getUserProjectRoot } from '../src/server/localMode';
 import { listen } from '../src/utils/http';
 import { getProject } from '../src/server/liveProject';
 import { Command as AppDevServerCommand, Event as AppDevServerEvent } from './appServer';
+import { createRpcHandler, rpcServer } from '../src/server/rpc';
+import { createDataHandler, createDataSourcesHandler } from '../src/server/data';
+
+interface HealthCheck {
+  gitSha1: string | null;
+  circleBuildNum: string | null;
+  memoryUsage: NodeJS.MemoryUsage;
+  memoryUsagePretty: Record<keyof NodeJS.MemoryUsage, string>;
+}
 
 async function main() {
   const { default: chalk } = await import('chalk');
+  const cmd = process.env.TOOLPAD_CMD;
 
   const app = express();
   const httpServer = createServer(app);
 
-  const cmd = process.env.TOOLPAD_CMD;
+  // See https://nextjs.org/docs/advanced-features/security-headers
+  app.use((req, res, expressNext) => {
+    // Force the browser to trust the Content-Type header
+    // https://stackoverflow.com/questions/18337630/what-is-x-content-type-options-nosniff
+    res.setHeader('X-Content-Type-Options', 'nosniff');
+    res.setHeader('X-XSS-Protection', '1; mode=block');
+    res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
+    expressNext();
+  });
+
+  app.get('/', (req, res) => {
+    const redirectUrl = cmd === 'dev' ? '/_toolpad' : '/prod';
+    res.redirect(302, redirectUrl);
+  });
+
+  app.get('/health-check', (req, res) => {
+    const memoryUsage = process.memoryUsage();
+    res.json({
+      gitSha1: process.env.GIT_SHA1 || null,
+      circleBuildNum: process.env.CIRCLE_BUILD_NUM || null,
+      memoryUsage,
+      memoryUsagePretty: mapValues(memoryUsage, (usage) => prettyBytes(usage)),
+    } satisfies HealthCheck);
+  });
+
+  const publicPath = path.resolve(__dirname, '../../public');
+  app.use(express.static(publicPath, { index: false }));
+
+  app.use('/api/data', createDataHandler());
+
+  if (cmd === 'dev') {
+    app.use('/api/rpc', createRpcHandler(rpcServer));
+    app.use('/api/dataSources', createDataSourcesHandler());
+  }
 
   const viteRuntime = !!process.env.TOOLPAD_VITE_RUNTIME;
 
@@ -88,28 +133,32 @@ async function main() {
   }
 
   const projectDir = process.env.TOOLPAD_PROJECT_DIR;
-  const dir = process.env.TOOLPAD_DIR;
-  const dev = !!process.env.TOOLPAD_NEXT_DEV;
   const hostname = 'localhost';
   const port = Number(process.env.TOOLPAD_PORT);
+  let editorNextApp: ReturnType<typeof next> | undefined;
 
-  // when using middleware `hostname` and `port` must be provided below
-  const editorNextApp = next({ dir, dev, hostname, port });
-  const handle = editorNextApp.getRequestHandler();
+  if (cmd === 'dev' || !viteRuntime) {
+    const dir = process.env.TOOLPAD_DIR;
+    const dev = !!process.env.TOOLPAD_NEXT_DEV;
 
-  app.use(async (req, res) => {
-    try {
-      invariant(req.url, 'request must have a url');
-      // Be sure to pass `true` as the second argument to `url.parse`.
-      // This tells it to parse the query portion of the URL.
-      const parsedUrl = parse(req.url, true);
-      await handle(req, res, parsedUrl);
-    } catch (err) {
-      console.error('Error occurred handling', req.url, err);
-      res.statusCode = 500;
-      res.end('internal server error');
-    }
-  });
+    // when using middleware `hostname` and `port` must be provided below
+    editorNextApp = next({ dir, dev, hostname, port });
+    const handle = editorNextApp.getRequestHandler();
+
+    app.use(async (req, res) => {
+      try {
+        invariant(req.url, 'request must have a url');
+        // Be sure to pass `true` as the second argument to `url.parse`.
+        // This tells it to parse the query portion of the URL.
+        const parsedUrl = parse(req.url, true);
+        await handle(req, res, parsedUrl);
+      } catch (err) {
+        console.error('Error occurred handling', req.url, err);
+        res.statusCode = 500;
+        res.end('internal server error');
+      }
+    });
+  }
 
   await listen(httpServer, port);
 
@@ -120,7 +169,7 @@ async function main() {
     )}`,
   );
 
-  await editorNextApp.prepare();
+  await editorNextApp?.prepare();
 }
 
 main().catch((err) => {

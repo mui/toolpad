@@ -27,8 +27,15 @@ test('submits form data', async ({ page }) => {
   const testFilePath = path.resolve(__dirname, './test.txt');
   await page.getByLabel('file').setInputFiles(testFilePath);
 
-  await expect(page.getByText('My form data')).toContainText(
-    JSON.stringify({
+  await expect
+    .poll(async () => {
+      const text = await page.getByText('My form data').textContent();
+      if (text) {
+        return JSON.parse(text.slice('My form data: '.length));
+      }
+      return null;
+    })
+    .toStrictEqual({
       name: 'Toolpad',
       date: '1990-01-01',
       option: 'option 2',
@@ -40,8 +47,7 @@ test('submits form data', async ({ page }) => {
           base64: 'data:text/plain;base64,d29ya3MK',
         },
       ],
-    }),
-  );
+    });
 
   await expect(page.getByRole('button', { name: 'Submitted' })).not.toBeVisible();
   await page.getByRole('button', { name: 'Submit' }).click();

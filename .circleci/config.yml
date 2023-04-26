@@ -156,7 +156,7 @@ jobs:
           name: Tests real browser
           environment:
             HTTPBIN_BASEURL: 'http://localhost/'
-            # TOOLPAD_VITE_RUNTIME: 1
+            TOOLPAD_VITE_RUNTIME: 1
           command: yarn test:integration
       - store_artifacts:
           path: test-results

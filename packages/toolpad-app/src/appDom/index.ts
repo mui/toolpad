@@ -1114,7 +1114,7 @@ export function ref(nodeId: NodeId): NodeReference;
 export function ref(nodeId: null | undefined): null;
 export function ref(nodeId: Maybe<NodeId>): NodeReference | null;
 export function ref(nodeId: Maybe<NodeId>): NodeReference | null {
-  return nodeId ? { $$ref: nodeId } : null;
+  return nodeId ? { $ref: nodeId } : null;
 }
 
 export function deref(nodeRef: NodeReference): NodeId;
@@ -1122,7 +1122,7 @@ export function deref(nodeRef: null | undefined): null;
 export function deref(nodeRef: Maybe<NodeReference>): NodeId | null;
 export function deref(nodeRef: Maybe<NodeReference>): NodeId | null {
   if (nodeRef) {
-    return nodeRef.$$ref;
+    return nodeRef.$ref;
   }
   return null;
 }

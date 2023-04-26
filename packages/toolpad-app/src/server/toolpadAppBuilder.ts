@@ -256,7 +256,7 @@ export function createViteConfig({
         'lodash-es',
         'react-router-dom',
         'fractional-indexing',
-        'cuid',
+        'nanoid/non-secure',
         'superjson',
         '@tanstack/react-query-devtools/build/lib/index.prod.js',
         'react-is',

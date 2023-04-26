@@ -114,7 +114,12 @@ export default function CreateCodeComponentDialog({
                 <Button
                   size="small"
                   onClick={() => {
-                    client.mutation.openCodeComponentEditor(name);
+                    client.mutation.openCodeComponentEditor(name).catch((err) => {
+                      // TODO: Write docs with instructions on how to install editor
+                      // Add a good looking alert box and inline some instructions and link to docs
+                      // eslint-disable-next-line no-alert
+                      alert(err.message);
+                    });
                   }}
                 >
                   Open

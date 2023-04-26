@@ -5,7 +5,7 @@ import Ad from '@mui/monorepo/docs/src/modules/components/Ad';
 import { JSONSchema7, JSONSchema7Definition } from 'json-schema';
 import { Typography, Chip, Box, Divider, styled, lighten } from '@mui/material';
 import invariant from 'invariant';
-import { interleave } from '@mui/toolpad-utils/react';
+import { interleave } from '../utils/react';
 
 function coloredChipCss(color: string) {
   return {

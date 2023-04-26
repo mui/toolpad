@@ -251,17 +251,14 @@ export const pageSchema = toolpadObjectSchema(
     parameters: z
       .array(nameStringValuePairSchema)
       .optional()
-      .default([])
       .describe('Parameters for the page. These can be set inside of the url query string.'),
     queries: z
       .array(querySchema)
       .optional()
-      .default([])
       .describe('Queries that are used by the page. These will load data when the page opens.'),
     content: z
       .array(elementSchema)
       .optional()
-      .default([])
       .describe('The content of the page. This defines the UI.'),
     display: z
       .union([
@@ -271,7 +268,6 @@ export const pageSchema = toolpadObjectSchema(
         z.literal('shell').describe('Show Toolpad header and navigation.'),
       ])
       .optional()
-      .default('shell')
       .describe(
         'Display mode of the page. This can also be set at runtime with the toolpad-display query parameter',
       ),

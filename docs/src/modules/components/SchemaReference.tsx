@@ -2,7 +2,7 @@ import * as React from 'react';
 import MarkdownElement from '@mui/monorepo/docs/src/modules/components/MarkdownElement';
 import AppLayoutDocs from '@mui/monorepo/docs/src/modules/components/AppLayoutDocs';
 import Ad from '@mui/monorepo/docs/src/modules/components/Ad';
-import { JSONSchema7, JSONSchema7Definition, JSONSchema7TypeName } from 'json-schema';
+import { JSONSchema7, JSONSchema7Definition } from 'json-schema';
 import { Typography, Chip, Box, Divider, styled, lighten } from '@mui/material';
 import invariant from 'invariant';
 import { interleave } from '@mui/toolpad-utils/react';
@@ -125,7 +125,17 @@ function JsonSchemaDisplay({ name, schema }: JsonSchemaDisplayProps) {
         <div>
           <strong>Items:</strong>
           <Box sx={{ ml: 2 }}>
-            <JsonSchemaDisplay schema={schema.items} />
+            {Array.isArray(schema.items) ? (
+              <ul>
+                {schema.items.map((item, i) => (
+                  <li key={i}>
+                    <JsonSchemaDisplay schema={item} />
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <JsonSchemaDisplay schema={schema.items} />
+            )}
           </Box>
         </div>
       ) : null}

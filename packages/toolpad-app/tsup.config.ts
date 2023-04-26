@@ -18,6 +18,8 @@ export default defineConfig([
       'lodash-es',
       'chalk',
       'get-port',
+      'pretty-bytes',
+      'latest-version',
       'nanoid',
     ],
     clean: true,

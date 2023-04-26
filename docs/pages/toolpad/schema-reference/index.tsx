@@ -2,13 +2,11 @@ import * as React from 'react';
 import { GetStaticProps } from 'next';
 import * as path from 'path';
 import * as fs from 'fs/promises';
-import { JSONSchema7 } from 'json-schema';
+import SchemaReference, {
+  SchemaReferenceProps,
+} from '../../../src/modules/components/SchemaReference';
 
-export interface ApiReferenceProps {
-  definitions: JSONSchema7;
-}
-
-export const getStaticProps: GetStaticProps<ApiReferenceProps> = async () => {
+export const getStaticProps: GetStaticProps<SchemaReferenceProps> = async () => {
   const schemaFile = path.join(process.cwd(), './schemas/v1/definitions.json');
   const content = await fs.readFile(schemaFile, { encoding: 'utf-8' });
 
@@ -19,6 +17,6 @@ export const getStaticProps: GetStaticProps<ApiReferenceProps> = async () => {
   };
 };
 
-export default function ApiReference({ definitions }: ApiReferenceProps) {
-  return <pre>{JSON.stringify(definitions, null, 2)}</pre>;
+export default function ApiReference(props: SchemaReferenceProps) {
+  return <SchemaReference {...props} />;
 }

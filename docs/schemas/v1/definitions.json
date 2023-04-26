@@ -28,23 +28,7 @@
             "parameters": {
               "type": "array",
               "items": {
-                "type": "object",
-                "properties": {
-                  "name": {
-                    "type": "string",
-                    "description": "The name"
-                  },
-                  "value": {
-                    "type": "string",
-                    "description": "The value"
-                  }
-                },
-                "required": [
-                  "name",
-                  "value"
-                ],
-                "additionalProperties": false,
-                "description": "a name/value pair with a string value."
+                "$ref": "#/definitions/NameStringValuePair"
               },
               "default": [],
               "description": "Parameters for the page. These can be set inside of the url query string."
@@ -61,10 +45,10 @@
                   "enabled": {
                     "anyOf": [
                       {
-                        "$ref": "#/definitions/JsExpressionBinding"
+                        "type": "boolean"
                       },
                       {
-                        "type": "boolean"
+                        "$ref": "#/definitions/JsExpressionBinding"
                       }
                     ],
                     "description": "Activates or deactivates the query. When deactivated the data won't be loaded when the page opens."
@@ -80,10 +64,10 @@
                         },
                         "value": {
                           "anyOf": [
+                            {},
                             {
                               "$ref": "#/definitions/JsExpressionBinding"
-                            },
-                            {}
+                            }
                           ],
                           "description": "The value"
                         }
@@ -117,10 +101,10 @@
                           "url": {
                             "anyOf": [
                               {
-                                "$ref": "#/definitions/JsExpressionBinding"
+                                "type": "string"
                               },
                               {
-                                "type": "string"
+                                "$ref": "#/definitions/JsExpressionBinding"
                               }
                             ],
                             "description": "The URL of the request"
@@ -132,60 +116,14 @@
                           "headers": {
                             "type": "array",
                             "items": {
-                              "type": "object",
-                              "properties": {
-                                "name": {
-                                  "type": "string",
-                                  "description": "The name"
-                                },
-                                "value": {
-                                  "anyOf": [
-                                    {
-                                      "$ref": "#/definitions/JsExpressionBinding"
-                                    },
-                                    {
-                                      "type": "string"
-                                    }
-                                  ],
-                                  "description": "The value"
-                                }
-                              },
-                              "required": [
-                                "name",
-                                "value"
-                              ],
-                              "additionalProperties": false,
-                              "description": "A name/value pair."
+                              "$ref": "#/definitions/BindableNameStringValue"
                             },
                             "description": "Extra request headers."
                           },
                           "searchParams": {
                             "type": "array",
                             "items": {
-                              "type": "object",
-                              "properties": {
-                                "name": {
-                                  "type": "string",
-                                  "description": "The name"
-                                },
-                                "value": {
-                                  "anyOf": [
-                                    {
-                                      "$ref": "#/definitions/JsExpressionBinding"
-                                    },
-                                    {
-                                      "type": "string"
-                                    }
-                                  ],
-                                  "description": "The value"
-                                }
-                              },
-                              "required": [
-                                "name",
-                                "value"
-                              ],
-                              "additionalProperties": false,
-                              "description": "A name/value pair."
+                              "$ref": "#/definitions/BindableNameStringValue"
                             },
                             "description": "Extra url query parameters."
                           },
@@ -201,10 +139,10 @@
                                   "content": {
                                     "anyOf": [
                                       {
-                                        "$ref": "#/definitions/JsExpressionBinding"
+                                        "type": "string"
                                       },
                                       {
-                                        "type": "string"
+                                        "$ref": "#/definitions/JsExpressionBinding"
                                       }
                                     ]
                                   },
@@ -229,30 +167,7 @@
                                   "content": {
                                     "type": "array",
                                     "items": {
-                                      "type": "object",
-                                      "properties": {
-                                        "name": {
-                                          "type": "string",
-                                          "description": "The name"
-                                        },
-                                        "value": {
-                                          "anyOf": [
-                                            {
-                                              "$ref": "#/definitions/JsExpressionBinding"
-                                            },
-                                            {
-                                              "type": "string"
-                                            }
-                                          ],
-                                          "description": "The value"
-                                        }
-                                      },
-                                      "required": [
-                                        "name",
-                                        "value"
-                                      ],
-                                      "additionalProperties": false,
-                                      "description": "A name/value pair."
+                                      "$ref": "#/definitions/BindableNameStringValue"
                                     }
                                   }
                                 },
@@ -477,12 +392,16 @@
     "Json": {
       "anyOf": [
         {
-          "type": [
-            "string",
-            "number",
-            "boolean",
-            "null"
-          ]
+          "type": "string"
+        },
+        {
+          "type": "number"
+        },
+        {
+          "type": "boolean"
+        },
+        {
+          "type": "null"
         },
         {
           "type": "array",
@@ -496,31 +415,36 @@
             "$ref": "#/definitions/Json"
           }
         }
-      ]
+      ],
+      "description": "A JSON compatible value, anything that is serializable to JSON."
     },
     "JsExpressionBinding": {
       "type": "object",
       "properties": {
         "$$jsExpression": {
-          "type": "string"
+          "type": "string",
+          "description": "The expression to be evaluated."
         }
       },
       "required": [
         "$$jsExpression"
       ],
-      "additionalProperties": false
+      "additionalProperties": false,
+      "description": "A binding that evaluates an expression and returns the result."
     },
     "JsExpressionAction": {
       "type": "object",
       "properties": {
         "$$jsExpressionAction": {
-          "type": "string"
+          "type": "string",
+          "description": "The code to be executed."
         }
       },
       "required": [
         "$$jsExpressionAction"
       ],
-      "additionalProperties": false
+      "additionalProperties": false,
+      "description": "A javascript expression to be executed when this action is triggered."
     },
     "NavigationAction": {
       "type": "object",
@@ -529,18 +453,20 @@
           "type": "object",
           "properties": {
             "page": {
-              "type": "string"
+              "type": "string",
+              "description": "The page that is being navigated to"
             },
             "parameters": {
               "type": "object",
               "additionalProperties": {
                 "anyOf": [
+                  {},
                   {
                     "$ref": "#/definitions/JsExpressionBinding"
-                  },
-                  {}
+                  }
                 ]
-              }
+              },
+              "description": "Parameters to pass when navigating to this page"
             }
           },
           "required": [
@@ -553,7 +479,8 @@
       "required": [
         "$$navigationAction"
       ],
-      "additionalProperties": false
+      "additionalProperties": false,
+      "description": "A navigation from one page to another, optionally passing parameters to the next page."
     },
     "BindableProp": {
       "anyOf": [
@@ -642,6 +569,51 @@
       ],
       "additionalProperties": false,
       "description": "Describes a fragment of Toolpad elements, to be used as a template."
+    },
+    "NameStringValuePair": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "The name"
+        },
+        "value": {
+          "type": "string",
+          "description": "The value"
+        }
+      },
+      "required": [
+        "name",
+        "value"
+      ],
+      "additionalProperties": false,
+      "description": "a name/value pair with a string value."
+    },
+    "BindableNameStringValue": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "The name"
+        },
+        "value": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "$ref": "#/definitions/JsExpressionBinding"
+            }
+          ],
+          "description": "The value"
+        }
+      },
+      "required": [
+        "name",
+        "value"
+      ],
+      "additionalProperties": false,
+      "description": "A name/value pair where the value is dynamically bindable to strings."
     }
   },
   "$schema": "http://json-schema.org/draft-07/schema#"

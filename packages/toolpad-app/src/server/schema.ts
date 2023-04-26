@@ -17,9 +17,9 @@ function toolpadObjectSchema<K extends string, T extends z.ZodType>(kind: K, spe
 const literalSchema = z.union([z.string(), z.number(), z.boolean(), z.null()]);
 type Literal = z.infer<typeof literalSchema>;
 type Json = Literal | { [key: string]: Json } | Json[];
-export const jsonSchema: z.ZodType<Json> = z.lazy(() =>
-  z.union([literalSchema, z.array(jsonSchema), z.record(jsonSchema)]),
-);
+export const jsonSchema: z.ZodType<Json> = z
+  .lazy(() => z.union([...literalSchema.options, z.array(jsonSchema), z.record(jsonSchema)]))
+  .describe('A JSON compatible value, anything that is serializable to JSON.');
 
 function nameValuePairSchema<V extends z.ZodTypeAny>(valueType: V) {
   return z
@@ -30,24 +30,34 @@ function nameValuePairSchema<V extends z.ZodTypeAny>(valueType: V) {
     .describe('A name/value pair.');
 }
 
-export const jsExpressionBindingSchema = z.object({
-  $$jsExpression: z.string(),
-});
+export const jsExpressionBindingSchema = z
+  .object({
+    $$jsExpression: z.string().describe('The expression to be evaluated.'),
+  })
+  .describe('A binding that evaluates an expression and returns the result.');
 
 function bindableSchema<V extends z.ZodTypeAny>(valueType: V) {
-  return z.union([jsExpressionBindingSchema, valueType]);
+  return z.union([valueType, jsExpressionBindingSchema]);
 }
 
-const jsExpressionActionSchema = z.object({
-  $$jsExpressionAction: z.string(),
-});
+const jsExpressionActionSchema = z
+  .object({
+    $$jsExpressionAction: z.string().describe('The code to be executed.'),
+  })
+  .describe('A javascript expression to be executed when this action is triggered.');
 
-const navigationActionSchema = z.object({
-  $$navigationAction: z.object({
-    page: z.string(),
-    parameters: z.record(bindableSchema(z.any())),
-  }),
-});
+const navigationActionSchema = z
+  .object({
+    $$navigationAction: z.object({
+      page: z.string().describe('The page that is being navigated to'),
+      parameters: z
+        .record(bindableSchema(z.any()))
+        .describe('Parameters to pass when navigating to this page'),
+    }),
+  })
+  .describe(
+    'A navigation from one page to another, optionally passing parameters to the next page.',
+  );
 
 export type NavigationAction = z.infer<typeof navigationActionSchema>;
 
@@ -66,9 +76,13 @@ const rawBodySchema = z.object({
   contentType: z.string(),
 });
 
+const bindableNameStringValueSchema = nameValuePairSchema(bindableSchema(z.string())).describe(
+  'A name/value pair where the value is dynamically bindable to strings.',
+);
+
 const urlEncodedBodySchema = z.object({
   kind: z.literal('urlEncoded'),
-  content: z.array(nameValuePairSchema(bindableSchema(z.string()))),
+  content: z.array(bindableNameStringValueSchema),
 });
 
 const fetchBodySchema = z.discriminatedUnion('kind', [rawBodySchema, urlEncodedBodySchema]);
@@ -115,12 +129,9 @@ const fetchQueryConfigSchema = z.object({
   kind: z.literal('rest').describe('Designates this object as a fetch query.'),
   url: bindableSchema(z.string()).optional().describe('The URL of the request'),
   method: z.string().optional().describe('The request method.'),
-  headers: z
-    .array(nameValuePairSchema(bindableSchema(z.string())))
-    .optional()
-    .describe('Extra request headers.'),
+  headers: z.array(bindableNameStringValueSchema).optional().describe('Extra request headers.'),
   searchParams: z
-    .array(nameValuePairSchema(bindableSchema(z.string())))
+    .array(bindableNameStringValueSchema)
     .optional()
     .describe('Extra url query parameters.'),
   body: fetchBodySchema.optional().describe('The request body.'),
@@ -296,5 +307,7 @@ export const META = {
     BindableProp: bindablePropSchema,
     Element: elementSchema,
     Template: templateSchema,
+    NameStringValuePair: nameStringValuePairSchema,
+    BindableNameStringValue: bindableNameStringValueSchema,
   },
 };

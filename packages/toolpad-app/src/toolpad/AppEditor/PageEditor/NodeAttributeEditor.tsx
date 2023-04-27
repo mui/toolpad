@@ -18,7 +18,6 @@ import { getDefaultControl } from '../../propertyControls';
 import MarkdownTooltip from '../../../components/MarkdownTooltip';
 import { isTemplateDescendant } from '../../../toolpadComponents/template';
 import { NON_BINDABLE_CONTROL_TYPES } from '../../../constants';
-import { PropBindingEditorDialog } from '../BindingEditor/PropBindingEditorDialog';
 
 export interface NodeAttributeEditorProps<P extends object> {
   node: appDom.AppDomNode;
@@ -103,7 +102,6 @@ export default function NodeAttributeEditor<P extends object>({
       )}
       value={propValue}
       onChange={handlePropChange}
-      Dialog={PropBindingEditorDialog}
     />
   ) : (
     <Alert severity="warning">

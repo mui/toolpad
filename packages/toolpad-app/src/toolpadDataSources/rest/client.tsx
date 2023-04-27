@@ -58,7 +58,6 @@ import QueryInputPanel from '../QueryInputPanel';
 import useFetchPrivate from '../useFetchPrivate';
 import { clientExec } from './runtime';
 import QueryPreview from '../QueryPreview';
-import { PropBindingEditorDialog } from '../../toolpad/AppEditor/BindingEditor/PropBindingEditorDialog';
 
 const HTTP_METHODS = ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'HEAD'];
 
@@ -439,7 +438,6 @@ function QueryEditor({
                 renderControl={(props) => <UrlControl baseUrl={baseUrl} {...props} />}
                 value={urlValue}
                 onChange={handleUrlChange}
-                Dialog={PropBindingEditorDialog}
               />
             </Box>
             <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>

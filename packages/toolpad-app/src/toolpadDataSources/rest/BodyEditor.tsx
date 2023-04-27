@@ -26,7 +26,6 @@ import * as appDom from '../../appDom';
 import TabPanel from '../../components/TabPanel';
 import ParametersEditor from '../../toolpad/AppEditor/PageEditor/ParametersEditor';
 import { HTTP_NO_BODY } from './shared';
-import { PropBindingEditorDialog } from '../../toolpad/AppEditor/BindingEditor/PropBindingEditorDialog';
 
 interface ContentTypeSpec {
   alias: string;
@@ -157,7 +156,6 @@ function RawBodyEditor({
         onChange={handleValueChange}
         label="json"
         disabled={disabled}
-        Dialog={PropBindingEditorDialog}
       />
     </React.Fragment>
   );

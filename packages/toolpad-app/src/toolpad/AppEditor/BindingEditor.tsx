@@ -52,7 +52,6 @@ import TabPanel from '../../components/TabPanel';
 import { useDom } from '../AppState';
 import * as appDom from '../../appDom';
 import { usePageEditorState } from './PageEditor/PageEditorProvider';
-// eslint-disable-next-line import/no-cycle
 import BindableEditor from './PageEditor/BindableEditor';
 
 interface BindingEditorContext {
@@ -68,7 +67,7 @@ interface BindingEditorContext {
   liveBinding?: LiveBinding;
 }
 
-export const [useBindingEditorContext, BindingEditorContextProvider] =
+const [useBindingEditorContext, BindingEditorContextProvider] =
   createProvidedContext<BindingEditorContext>('BindingEditor');
 
 const ErrorTooltip = styled(({ className, ...props }: TooltipProps) => (
@@ -174,7 +173,7 @@ export function JsBindingEditor({ value, onChange }: JsBindingEditorProps) {
 export interface JsExpressionActionEditorProps
   extends WithControlledProp<JsExpressionAction | null> {}
 
-export function JsExpressionActionEditor({ value, onChange }: JsExpressionActionEditorProps) {
+function JsExpressionActionEditor({ value, onChange }: JsExpressionActionEditorProps) {
   const { globalScope, globalScopeMeta } = useBindingEditorContext();
   const handleCodeChange = React.useCallback(
     (newValue: string) => onChange({ type: 'jsExpressionAction', value: newValue }),
@@ -246,7 +245,7 @@ function NavigationActionParameterEditor({
 
 export interface NavigationActionEditorProps extends WithControlledProp<NavigationAction | null> {}
 
-export function NavigationActionEditor({ value, onChange }: NavigationActionEditorProps) {
+function NavigationActionEditor({ value, onChange }: NavigationActionEditorProps) {
   const { dom } = useDom();
   const root = appDom.getApp(dom);
   const { pages = [] } = appDom.getChildNodes(dom, root);
@@ -354,7 +353,7 @@ export function NavigationActionEditor({ value, onChange }: NavigationActionEdit
   );
 }
 
-export type BindableType = BindableAttrValue<any>['type'];
+type BindableType = BindableAttrValue<any>['type'];
 
 function getActionTab(value: Maybe<BindableAttrValue<any>>) {
   return value?.type || 'jsExpressionAction';
@@ -362,7 +361,7 @@ function getActionTab(value: Maybe<BindableAttrValue<any>>) {
 
 export interface ActionEditorProps extends WithControlledProp<BindableAttrValue<any> | null> {}
 
-export function ActionEditor({ value, onChange }: ActionEditorProps) {
+function ActionEditor({ value, onChange }: ActionEditorProps) {
   const [activeTab, setActiveTab] = React.useState<BindableType>(getActionTab(value));
   React.useEffect(() => setActiveTab(getActionTab(value)), [value]);
 

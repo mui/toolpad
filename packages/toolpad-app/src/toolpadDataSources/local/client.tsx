@@ -25,7 +25,6 @@ import QueryPreview from '../QueryPreview';
 import { usePrivateQuery } from '../context';
 import BindableEditor from '../../toolpad/AppEditor/PageEditor/BindableEditor';
 import { getDefaultControl } from '../../toolpad/propertyControls';
-import { PropBindingEditorDialog } from '../../toolpad/AppEditor/BindingEditor/PropBindingEditorDialog';
 
 const EMPTY_PARAMS: BindableAttrEntries = [];
 
@@ -162,7 +161,6 @@ function QueryEditor({
                       params: newParams,
                     }));
                   }}
-                  Dialog={PropBindingEditorDialog}
                 />
               ) : null;
             })}

@@ -30,7 +30,6 @@ import useBoolean from '../../../../utils/useBoolean';
 import { useNodeNameValidation } from '../../HierarchyExplorer/validation';
 import useEvent from '../../../../utils/useEvent';
 import useUnsavedChangesConfirm from '../../../hooks/useUnsavedChangesConfirm';
-import { PropBindingEditorDialog } from '../../BindingEditor/PropBindingEditorDialog';
 
 interface QueryEditorDialogActionsProps {
   saveDisabled?: boolean;
@@ -333,7 +332,6 @@ export default function QueryNodeEditorDialog<Q>({
                 value={input.attributes.enabled ?? appDom.createConst(true)}
                 onChange={handleEnabledChange}
                 disabled={mode !== 'query'}
-                Dialog={PropBindingEditorDialog}
               />
               <TextField
                 InputProps={{

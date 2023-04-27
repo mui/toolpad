@@ -52,6 +52,7 @@ import TabPanel from '../../components/TabPanel';
 import { useDom } from '../AppState';
 import * as appDom from '../../appDom';
 import { usePageEditorState } from './PageEditor/PageEditorProvider';
+// eslint-disable-next-line import/no-cycle
 import BindableEditor from './PageEditor/BindableEditor';
 
 interface BindingEditorContext {

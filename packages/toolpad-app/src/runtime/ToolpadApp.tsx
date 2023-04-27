@@ -562,7 +562,7 @@ function flattenNestedBindables(
       return flattenNestedBindables(param[1], `${prefix}[${i}][1]`);
     });
   }
-  // TODO: create a marker in bindables (similar to $$ref) to recognize them automatically
+  // TODO: create a marker in bindables (similar to $ref) to recognize them automatically
   // in a nested structure. This would allow us to build deeply nested structures
   if (typeof params.type === 'string') {
     return [[prefix, params as BindableAttrValue<any>]];

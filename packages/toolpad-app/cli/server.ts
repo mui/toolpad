@@ -66,70 +66,66 @@ async function main() {
     app.use('/api/dataSources', createDataSourcesHandler());
   }
 
-  const viteRuntime = !!process.env.TOOLPAD_VITE_RUNTIME;
+  switch (cmd) {
+    case 'dev': {
+      const projectDir = getUserProjectRoot();
 
-  if (viteRuntime) {
-    switch (cmd) {
-      case 'dev': {
-        const projectDir = getUserProjectRoot();
+      const appServerPath = path.resolve(__dirname, './appServer.js');
+      const devPort = await getPort();
+      const project = await getProject();
 
-        const appServerPath = path.resolve(__dirname, './appServer.js');
-        const devPort = await getPort();
-        const project = await getProject();
+      const cp = execaNode(appServerPath, [], {
+        cwd: projectDir,
+        stdio: 'inherit',
+        env: {
+          NODE_ENV: 'development',
+          TOOLPAD_PROJECT_DIR: projectDir,
+          TOOLPAD_PORT: String(devPort),
+          FORCE_COLOR: '1',
+        },
+      });
 
-        const cp = execaNode(appServerPath, [], {
-          cwd: projectDir,
-          stdio: 'inherit',
-          env: {
-            NODE_ENV: 'development',
-            TOOLPAD_PROJECT_DIR: projectDir,
-            TOOLPAD_PORT: String(devPort),
-            FORCE_COLOR: '1',
+      cp.once('exit', () => {
+        console.error(`App dev server failed`);
+        process.exit(1);
+      });
+
+      await new Promise<void>((resolve) => {
+        cp.on('message', (msg: AppDevServerEvent) => {
+          if (msg.kind === 'ready') {
+            resolve();
+          }
+        });
+      });
+
+      project.events.on('componentsListChanged', () => {
+        cp.send({ kind: 'reload-components' } satisfies AppDevServerCommand);
+      });
+
+      app.use(
+        '/preview',
+        createProxyMiddleware({
+          logLevel: 'silent',
+          ws: true,
+          target: {
+            host: 'localhost',
+            port: devPort,
           },
-        });
-
-        cp.once('exit', () => {
-          console.error(`App dev server failed`);
-          process.exit(1);
-        });
-
-        await new Promise<void>((resolve) => {
-          cp.on('message', (msg: AppDevServerEvent) => {
-            if (msg.kind === 'ready') {
-              resolve();
-            }
-          });
-        });
-
-        project.events.on('componentsListChanged', () => {
-          cp.send({ kind: 'reload-components' } satisfies AppDevServerCommand);
-        });
-
-        app.use(
-          '/preview',
-          createProxyMiddleware({
-            logLevel: 'silent',
-            ws: true,
-            target: {
-              host: 'localhost',
-              port: devPort,
-            },
-          }),
-        );
-        break;
-      }
-      case 'start': {
-        const prodHandler = await createProdHandler({
-          server: httpServer,
-          root: getUserProjectRoot(),
-          base: '/prod',
-        });
-        app.use('/prod', prodHandler);
-        break;
-      }
-      default:
-        throw new Error(`Unknown toolpad command ${cmd}`);
+        }),
+      );
+      break;
     }
+    case 'start': {
+      const prodHandler = await createProdHandler({
+        server: httpServer,
+        root: getUserProjectRoot(),
+        base: '/prod',
+      });
+      app.use('/prod', prodHandler);
+      break;
+    }
+    default:
+      throw new Error(`Unknown toolpad command ${cmd}`);
   }
 
   const projectDir = process.env.TOOLPAD_PROJECT_DIR;
@@ -137,7 +133,7 @@ async function main() {
   const port = Number(process.env.TOOLPAD_PORT);
   let editorNextApp: ReturnType<typeof next> | undefined;
 
-  if (cmd === 'dev' || !viteRuntime) {
+  if (cmd === 'dev') {
     const dir = process.env.TOOLPAD_DIR;
     const dev = !!process.env.TOOLPAD_NEXT_DEV;
 

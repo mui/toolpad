@@ -1,6 +1,7 @@
 import type * as React from 'react';
+import type { Branded } from '@mui/toolpad-utils/types';
+import type { SerializedError } from '@mui/toolpad-utils/errors';
 import type { TOOLPAD_COMPONENT } from './constants.js';
-import type { Branded } from './utils/types.js';
 
 export type NodeId = Branded<string, 'NodeId'>;
 
@@ -216,7 +217,10 @@ export interface ArgTypeDefinition<P extends object = {}, V = P[keyof P]> {
    * @returns {boolean} a boolean value indicating whether the property should be visible or not
    */
   visible?: ((props: P) => boolean) | boolean;
-
+  /**
+   * Name of category that this property belongs to.
+   */
+  category?: string;
   tsType?: string;
 }
 
@@ -349,15 +353,6 @@ export interface RuntimeError {
 }
 
 export type FlowDirection = 'row' | 'column' | 'row-reverse' | 'column-reverse';
-
-export type PlainObject = Record<string, unknown>;
-
-export interface SerializedError extends PlainObject {
-  message: string;
-  name: string;
-  stack?: string;
-  code?: unknown;
-}
 
 export type ExecFetchResult<T = any> = {
   data?: T;

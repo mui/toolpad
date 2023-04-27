@@ -1,6 +1,6 @@
 import { ExecFetchResult } from '@mui/toolpad-core';
 import * as React from 'react';
-import { errorFrom, serializeError } from '../utils/errors';
+import { errorFrom, serializeError } from '@mui/toolpad-utils/errors';
 
 export interface UseQueryPreviewOptions<R> {
   onPreview?: (result: R) => void;

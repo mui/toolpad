@@ -3,10 +3,10 @@ import {
   BindableAttrValue,
   BindableAttrValues,
   JsRuntime,
-  SerializedError,
 } from '@mui/toolpad-core';
+import { SerializedError, errorFrom, serializeError } from '@mui/toolpad-utils/errors';
 import { evaluateBindable } from '@mui/toolpad-core/jsRuntime';
-import { ensureSuffix, removePrefix } from '../../utils/strings';
+import { ensureSuffix, removePrefix } from '@mui/toolpad-utils/strings';
 import { Maybe } from '../../utils/types';
 import {
   Authentication,
@@ -18,7 +18,6 @@ import {
   UrlEncodedBody,
 } from './types';
 import applyTransform from '../applyTransform';
-import { errorFrom, serializeError } from '../../utils/errors';
 import { MOVIES_API_DEMO_URL } from '../demo';
 
 export const HTTP_NO_BODY = new Set(['GET', 'HEAD']);

@@ -97,7 +97,9 @@ export class ToolpadEditor {
   async createPage(name: string) {
     await this.createPageBtn.click();
     await this.createPageDialog.nameInput.fill(name);
-    await Promise.all([this.createPageDialog.createButton.click(), this.page.waitForNavigation()]);
+    const { href: currentUrl } = new URL(this.page.url());
+    await this.createPageDialog.createButton.click();
+    await this.page.waitForURL((url) => url.href !== currentUrl);
   }
 
   async goToPage(name: string) {
@@ -144,26 +146,30 @@ export class ToolpadEditor {
     await this.page.mouse.up();
   }
 
+  getComponentCatalogItem(name: string): Locator {
+    return this.page.getByTestId('component-catalog').getByRole('button', { name });
+  }
+
   async dragNewComponentToAppCanvas(componentName: string) {
+    const style = await this.page.addStyleTag({ content: `* { transition: none !important; }` });
+
     await this.componentCatalog.hover();
 
-    // Account for opening transition
-    await this.page.waitForTimeout(200);
-
     const targetBoundingBox = await this.pageRoot.boundingBox();
-    expect(targetBoundingBox).toBeDefined();
+    await expect(targetBoundingBox).toBeDefined();
 
     const moveTargetX = targetBoundingBox!.x + targetBoundingBox!.width / 2;
     const moveTargetY = targetBoundingBox!.y + targetBoundingBox!.height / 2;
 
-    const sourceLocator = this.page.getByTestId('component-catalog').getByRole('button', {
-      name: componentName,
-    });
+    const sourceLocator = this.getComponentCatalogItem(componentName);
+    await expect(sourceLocator).toBeVisible();
 
-    this.dragToAppCanvas(sourceLocator, moveTargetX, moveTargetY);
+    await this.dragToAppCanvas(sourceLocator, moveTargetX, moveTargetY);
+
+    await style.evaluate((elm) => elm.parentNode?.removeChild(elm));
   }
 
-  hierarchyItem(group: string, name: string): Locator {
+  getHierarchyItem(group: string, name: string): Locator {
     return this.explorer
       .getByRole('treeitem')
       .filter({ hasText: group })
@@ -172,7 +178,7 @@ export class ToolpadEditor {
   }
 
   async openHierarchyMenu(group: string, name: string) {
-    const hierarchyItem = this.hierarchyItem(group, name);
+    const hierarchyItem = this.getHierarchyItem(group, name);
     const menuButton = hierarchyItem.getByRole('button', { name: 'Open hierarchy menu' });
     await hierarchyItem.hover();
     await menuButton.click();

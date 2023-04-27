@@ -22,8 +22,9 @@ import {
   isPageColumn,
   PAGE_ROW_COMPONENT_ID,
   PAGE_COLUMN_COMPONENT_ID,
+  isFormComponent,
+  FORM_COMPONENT_ID,
 } from '../../../../toolpadComponents';
-import { PinholeOverlay } from '../../../../PinholeOverlay';
 import {
   getRectanglePointActiveEdge,
   isHorizontalFlow,
@@ -43,6 +44,7 @@ import { OverlayGrid, OverlayGridHandle } from './OverlayGrid';
 import { NodeInfo } from '../../../../types';
 import NodeDropArea from './NodeDropArea';
 import type { ToolpadBridge } from '../../../../canvas/ToolpadBridge';
+import { PinholeOverlay } from '../../../../PinholeOverlay';
 
 const VERTICAL_RESIZE_SNAP_UNITS = 2; // px
 
@@ -429,7 +431,7 @@ export default function RenderOverlay({ bridge }: RenderOverlayProps) {
     [appStateApi, currentView, dom, normalizePageRowColumnSizes],
   );
 
-  const selectedRect = selectedNode && !newNode ? nodesInfo[selectedNode.id]?.rect : null;
+  const selectedRect = (selectedNode && !newNode && nodesInfo[selectedNode.id]?.rect) || null;
 
   const interactiveNodes = React.useMemo<Set<NodeId>>(() => {
     if (!selectedNode) {
@@ -519,20 +521,33 @@ export default function RenderOverlay({ bridge }: RenderOverlayProps) {
 
   const isEmptyPage = pageNodes.length <= 1;
 
+  /**
+   * Return all nodes that are available for insertion.
+   * i.e. Exclude all descendants of the current selection since inserting in one of
+   * them would create a cyclic structure.
+   */
   const availableDropTargets = React.useMemo((): appDom.AppDomNode[] => {
     if (!draggedNode) {
       return [];
     }
 
-    /**
-     * Return all nodes that are available for insertion.
-     * i.e. Exclude all descendants of the current selection since inserting in one of
-     * them would create a cyclic structure.
-     */
-    const excludedNodes =
-      selectedNode && !newNode
-        ? new Set<appDom.AppDomNode>([selectedNode, ...appDom.getDescendants(dom, selectedNode)])
-        : new Set();
+    let excludedNodes = new Set();
+
+    if (selectedNode && !newNode) {
+      excludedNodes = new Set<appDom.AppDomNode>([
+        selectedNode,
+        ...appDom.getDescendants(dom, selectedNode),
+      ]);
+    }
+
+    if (isFormComponent(draggedNode)) {
+      const formNodes = appDom.getComponentTypeNodes(dom, FORM_COMPONENT_ID);
+      const formNodeDescendants = formNodes
+        .map((formNode) => appDom.getDescendants(dom, formNode))
+        .flat();
+
+      formNodeDescendants.forEach(excludedNodes.add, excludedNodes);
+    }
 
     return pageNodes.filter((n) => !excludedNodes.has(n));
   }, [dom, draggedNode, newNode, pageNodes, selectedNode]);
@@ -1581,7 +1596,6 @@ export default function RenderOverlay({ bridge }: RenderOverlayProps) {
         const isPageColumnChild = parent ? appDom.isElement(parent) && isPageColumn(parent) : false;
 
         const isSelected = selectedNode && !newNode ? selectedNode.id === node.id : false;
-        const isInteractive = interactiveNodes.has(node.id) && !draggedNode && !draggedEdge;
 
         const isHorizontallyResizable = isSelected && (isPageRowChild || isPageColumnChild);
         const isVerticallyResizable =
@@ -1589,6 +1603,8 @@ export default function RenderOverlay({ bridge }: RenderOverlayProps) {
 
         const isResizing = Boolean(draggedEdge);
         const isResizingNode = isResizing && node.id === draggedNodeId;
+
+        const isInteractive = interactiveNodes.has(node.id) && !isResizing && !isDraggingOver;
 
         if (!nodeRect) {
           return null;
@@ -1600,6 +1616,7 @@ export default function RenderOverlay({ bridge }: RenderOverlayProps) {
               <NodeHud
                 node={node}
                 rect={nodeRect}
+                selectedNodeRect={selectedRect}
                 isSelected={isSelected}
                 isInteractive={isInteractive}
                 onNodeDragStart={handleNodeDragStart(node as appDom.ElementNode)}
@@ -1618,7 +1635,7 @@ export default function RenderOverlay({ bridge }: RenderOverlayProps) {
                 onDelete={handleNodeDelete(node.id)}
                 isResizing={isResizingNode}
                 resizePreviewElementRef={resizePreviewElementRef}
-                isHoverable={isResizing && !isDraggingOver}
+                isHoverable={!isResizing && !isDraggingOver}
                 isOutlineVisible={isDraggingOver}
               />
             ) : null}

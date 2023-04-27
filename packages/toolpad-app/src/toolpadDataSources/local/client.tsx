@@ -1,7 +1,8 @@
 import * as React from 'react';
-import { BindableAttrEntries, CreateQueryConfig } from '@mui/toolpad-core';
+import { BindableAttrEntries, CreateFunctionConfig } from '@mui/toolpad-core';
 import { Autocomplete, Button, Stack, TextField, Typography } from '@mui/material';
 import { useBrowserJsRuntime } from '@mui/toolpad-core/jsBrowserRuntime';
+import { errorFrom } from '@mui/toolpad-utils/errors';
 import { ClientDataSource, QueryEditorProps } from '../../types';
 import {
   LocalPrivateQuery,
@@ -24,7 +25,6 @@ import QueryPreview from '../QueryPreview';
 import { usePrivateQuery } from '../context';
 import BindableEditor from '../../toolpad/AppEditor/PageEditor/BindableEditor';
 import { getDefaultControl } from '../../toolpad/propertyControls';
-import { errorFrom } from '../../utils/errors';
 
 const EMPTY_PARAMS: BindableAttrEntries = [];
 
@@ -42,7 +42,8 @@ function QueryEditor({
   );
 
   const functionName: string | undefined = input.attributes.query.value.function;
-  const functionDefs: Record<string, CreateQueryConfig<any>> = introspection.data?.functions ?? {};
+  const functionDefs: Record<string, CreateFunctionConfig<any>> = introspection.data?.functions ??
+  {};
   const parameterDefs = (functionName ? functionDefs?.[functionName]?.parameters : null) || {};
 
   const paramsEntries = input.params?.filter(([key]) => !!parameterDefs[key]) || EMPTY_PARAMS;
@@ -70,7 +71,12 @@ function QueryEditor({
   );
 
   const openEditor = React.useCallback(() => {
-    fetchPrivate({ kind: 'openEditor' });
+    fetchPrivate({ kind: 'openEditor' }).catch((err) => {
+      // TODO: Write docs with instructions on how to install editor
+      // Add a good looking alert box and inline some instructions and link to docs
+      // eslint-disable-next-line no-alert
+      alert(err.message);
+    });
   }, [fetchPrivate]);
 
   const {

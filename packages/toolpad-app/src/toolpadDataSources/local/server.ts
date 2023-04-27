@@ -1,10 +1,11 @@
-import { ExecFetchResult, SerializedError } from '@mui/toolpad-core';
+import { ExecFetchResult } from '@mui/toolpad-core';
+import { SerializedError, errorFrom, serializeError } from '@mui/toolpad-utils/errors';
 import * as child_process from 'child_process';
 import * as esbuild from 'esbuild';
 import * as fs from 'fs/promises';
 import * as path from 'path';
 import invariant from 'invariant';
-import { indent, truncate } from '@mui/toolpad-core/utils/strings';
+import { indent, truncate } from '@mui/toolpad-utils/strings';
 import * as dotenv from 'dotenv';
 import * as chokidar from 'chokidar';
 import chalk from 'chalk';
@@ -18,7 +19,6 @@ import {
   getFunctionsFile,
   getOutputFolder,
 } from '../../server/localMode';
-import { errorFrom, serializeError } from '../../utils/errors';
 import { waitForInit } from '../../server/liveProject';
 
 type MessageToChildProcess =
@@ -77,11 +77,16 @@ function formatCodeFrame(location: esbuild.Location): string {
   ].join('\n');
 }
 
+function pathToNodeImportSpecifier(importPath: string): string {
+  const normalized = path.normalize(importPath).split(path.sep).join('/');
+  return normalized.startsWith('/') ? normalized : `./${normalized}`;
+}
+
 async function createMain(): Promise<string> {
   const relativeFunctionsFilePath = [`.`, getFunctionsFile('.')].join(path.sep);
   return `
-    import { TOOLPAD_QUERY } from '@mui/toolpad-core/server';
-    import { errorFrom, serializeError } from '@mui/toolpad-core/utils/errors';
+    import { TOOLPAD_FUNCTION } from '@mui/toolpad-core/server';
+    import { errorFrom, serializeError } from '@mui/toolpad-utils/errors';
     import fetch, { Headers, Request, Response } from 'node-fetch'
 
     // Polyfill fetch() in the Node.js environment
@@ -92,7 +97,7 @@ async function createMain(): Promise<string> {
       global.Response = Response
     }
 
-    async function loadQuery (name, importFn) {
+    async function loadFunction (name, importFn) {
       const { default: resolver } = await importFn()
       return [name, resolver]
     }
@@ -101,18 +106,18 @@ async function createMain(): Promise<string> {
     async function getResolvers() {
       if (!resolversPromise) {
         resolversPromise = (async () => {
-          const queries = await import(${JSON.stringify(
-            relativeFunctionsFilePath,
+          const functions = await import(${JSON.stringify(
+            pathToNodeImportSpecifier(relativeFunctionsFilePath),
           )}).catch((err) => {
             console.error(err);
             return {};
           });
 
-          const queriesFileResolvers = Object.entries(queries).flatMap(([name, resolver]) => {
+          const functionsFileResolvers = Object.entries(functions).flatMap(([name, resolver]) => {
             return typeof resolver === 'function' ? [[name, resolver]] : []
           })
 
-          return new Map(queriesFileResolvers);
+          return new Map(functionsFileResolvers);
         })();
       }
       return resolversPromise
@@ -158,7 +163,7 @@ async function createMain(): Promise<string> {
             const resolvers = await getResolvers()
             const resolvedResolvers =  Array.from(resolvers, ([name, resolver]) => [
               name,
-              resolver[TOOLPAD_QUERY] || {}
+              resolver[TOOLPAD_FUNCTION] || {}
             ]);
             data = { 
               functions: Object.fromEntries(resolvedResolvers.filter(Boolean))
@@ -197,7 +202,7 @@ async function createBuilder() {
       const parsed = dotenv.parse(envFileContent) as any;
       // eslint-disable-next-line no-console
       console.log(
-        `Loaded env file "${envFilePath}" with keys ${truncate(
+        `${chalk.blue('info')}  - loaded env file "${envFilePath}" with keys ${truncate(
           Object.keys(parsed).join(', '),
           1000,
         )}`,

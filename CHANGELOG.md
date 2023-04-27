@@ -1,5 +1,86 @@
 # Changelog
 
+## 0.1.8
+
+<!-- generated comparing v0.1.7..master -->
+
+_Apr 26, 2023_
+
+A big thanks to the 4 contributors who made this release possible. Here are some highlights ✨:
+
+Use page name as a routing alias, add a Form component, and replace Next.js API routes with Express under the hood.
+
+- &#8203;<!-- 12 -->Add page name as an alias for routing in the runtime (#1925) @Janpot
+- &#8203;<!-- 11 -->Use correct command for opening vscode (#1931) @Janpot
+- &#8203;<!-- 10 -->Replace next api routes with express (#1920) @Janpot
+- &#8203;<!-- 09 -->Add link to open example in CodeSandbox (#1936) @Janpot
+- &#8203;<!-- 08 -->Fix: Local installation needs new resolution (#1932) @bharatkashyap
+- &#8203;<!-- 07 -->Fix: Use `nanonid/non-secure` instead of `cuid` (#1912) @bharatkashyap
+- &#8203;<!-- 06 -->Form component (#1926) @apedroferreira
+- &#8203;<!-- 05 -->Import correct font in vite runtime (#1924) @Janpot
+- &#8203;<!-- 04 -->Update CONTRIBUTING.md @apedroferreira
+- &#8203;<!-- 03 -->Fix gitignore file creation log message (#1923) @Janpot
+- &#8203;<!-- 02 -->Add utils package for generic non-toolpad utilities (#1915) @Janpot
+- &#8203;<!-- 01 -->[docs] Polish a bit the docs (#1927) @oliviertassinari
+
+## 0.1.7
+
+<!-- generated comparing v0.1.6..master -->
+
+_Apr 20, 2023_
+
+A big thanks to the 5 contributors who made this release possible. Here are some highlights ✨:
+
+Tweak the landing page design. Improve `create-toolpad-app` CLI, support node modules in custom code components.
+
+- &#8203;<!-- 14 -->Add folder as argument to `create-toolpad-app` (#1795) @bharatkashyap
+- &#8203;<!-- 13 -->Delete page on file system when deleted in UI (#1913) @Janpot
+- &#8203;<!-- 12 -->New vite based application runtime (#1881) @Janpot
+- &#8203;<!-- 11 -->Fix Windows issues (WIP) (#1910) @apedroferreira
+- &#8203;<!-- 10 -->Use npm registry to check for new versions (#1895) @Janpot
+- &#8203;<!-- 09 -->Update MUI monorepo (#1883) @apedroferreira
+- &#8203;<!-- 08 -->Fix: Remove `default` from `toolpad dev --port` option (#1911) @bharatkashyap
+- &#8203;<!-- 07 -->Deprecate `createQuery` and replace with `createFunction` (#1908) @bharatkashyap
+- &#8203;<!-- 06 -->Show border on hover in interactive nodes (#1907) @apedroferreira
+- &#8203;<!-- 05 -->Fix: Better represent the new direction on landing (#1863) @bharatkashyap
+- &#8203;<!-- 04 -->Revert "Form component (#1598)" @apedroferreira
+- &#8203;<!-- 03 -->Form component (#1598) @bytasv
+- &#8203;<!-- 02 -->Update links on contributing guide (#1893) @Janpot
+- &#8203;<!-- 01 -->[website] Landing page design tweaks (#1786) @danilo-leal
+
+All contributors of this release in alphabetical order: @apedroferreira, @bharatkashyap, @bytasv, @danilo-leal, @Janpot
+
+## 0.1.6
+
+<!-- generated comparing v0.1.5..master -->
+
+_Apr 13, 2023_
+
+A big thanks to the 1 contributors who made this release possible. Here are some highlights ✨:
+
+Fix regression that applies the wrong theme to the user application when they have dark color scheme.
+
+- &#8203;<!-- 1 -->Fix app theming (#1888) @Janpot
+
+All contributors of this release in alphabetical order: @Janpot
+
+## 0.1.5
+
+<!-- generated comparing v0.1.4..master -->
+
+_Apr 13, 2023_
+
+A big thanks to the 2 contributors who made this release possible. Here are some highlights ✨:
+
+Fix broken CLI due to missing dependency
+
+- &#8203;<!-- 4 -->Add missing extraneous dependencies (#1885) @Janpot
+- &#8203;<!-- 3 -->Update playwright to latest (#1884) @Janpot
+- &#8203;<!-- 2 -->Small fixes to CLI (#1882) @Janpot
+- &#8203;<!-- 1 -->Update release instructions (#1880) @apedroferreira
+
+All contributors of this release in alphabetical order: @apedroferreira, @Janpot
+
 ## 0.1.4
 
 <!-- generated comparing v0.1.3..master -->
@@ -290,7 +371,7 @@ _Jan 4, 2023_
 
 A big thanks to the 4 contributors who made this release possible. Here are some highlights ✨:
 
-New date picker component, Make switching views part of undo/redo cycle.
+New Date Picker component, Make switching views part of undo/redo cycle.
 
 - &#8203;<!-- 13 -->Fix dependabot vulnerabilities (#1512) @Janpot
 - &#8203;<!-- 12 -->Don't import from dist folders (#1513) @Janpot
@@ -301,7 +382,7 @@ New date picker component, Make switching views part of undo/redo cycle.
 - &#8203;<!-- 07 -->Datepicker format handling changes (#1504) @bytasv
 - &#8203;<!-- 04 -->Undo/redo through different views (#1417) @apedroferreira
 - &#8203;<!-- 03 -->Make sure npm package is splitted out correctly (#1502) @Janpot
-- &#8203;<!-- 02 -->Date picker component (#1499) @bytasv
+- &#8203;<!-- 02 -->Date Picker component (#1499) @bytasv
 - &#8203;<!-- 01 -->[core] Remove dead prettier config @oliviertassinari
 
 All contributors of this release in alphabetical order: @apedroferreira, @bytasv, @Janpot, @oliviertassinari

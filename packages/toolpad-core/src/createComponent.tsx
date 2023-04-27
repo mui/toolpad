@@ -1,7 +1,7 @@
 import * as ReactIs from 'react-is';
+import { hasOwnProperty } from '@mui/toolpad-utils/collections';
 import { TOOLPAD_COMPONENT } from './constants.js';
 import { ArgTypeDefinition, ComponentConfig, ToolpadComponent } from './types.js';
-import { hasOwnProperty } from './utils/collections.js';
 
 export function isToolpadComponent(
   maybeComponent: unknown,

@@ -30,6 +30,7 @@ import {
   RestConnectionParams,
   Body,
   ResponseType,
+  IntrospectionResult,
 } from './types';
 import { getAuthenticationHeaders, getDefaultUrl, parseBaseUrl } from './shared';
 import BindableEditor, {
@@ -57,7 +58,7 @@ import QueryInputPanel from '../QueryInputPanel';
 import useFetchPrivate from '../useFetchPrivate';
 import { clientExec } from './runtime';
 import QueryPreview from '../QueryPreview';
-import { ToolpadContext } from '../../ToolpadContext';
+import { usePrivateQuery } from '../context';
 
 const HTTP_METHODS = ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'HEAD'];
 
@@ -267,6 +268,14 @@ function QueryEditor({
   const urlValue: BindableAttrValue<string> =
     input.attributes.query.value.url || getDefaultUrl(connectionParams);
 
+  const introspection = usePrivateQuery<FetchPrivateQuery, IntrospectionResult>(
+    {
+      kind: 'introspection',
+    },
+    { retry: false },
+  );
+  const env = React.useMemo(() => introspection?.data?.env || [], [introspection]);
+
   const handleParamsChange = React.useCallback(
     (newParams: [string, BindableAttrValue<string>][]) => {
       setInput((existing) => ({ ...existing, params: newParams }));
@@ -350,16 +359,14 @@ function QueryEditor({
     [paramsEditorLiveValue],
   );
 
-  const { envVarNames } = React.useContext(ToolpadContext);
-
   const queryScope = React.useMemo(
     () => ({
       parameters: previewParams,
       process: {
-        env: Object.fromEntries(envVarNames.map((varName) => [varName, '<SECRET>'])),
+        env,
       },
     }),
-    [envVarNames, previewParams],
+    [env, previewParams],
   );
 
   const liveUrl: LiveBinding = useEvaluateLiveBinding({

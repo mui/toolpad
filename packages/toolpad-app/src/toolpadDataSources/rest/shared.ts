@@ -173,14 +173,14 @@ export async function execfetch(
   fetchQuery: FetchQuery,
   params: Record<string, string>,
   { connection, jsRuntime, fetchImpl }: ExecBaseOptions,
-  envVarNames: string[] = [],
+  env: Record<string, string>,
 ): Promise<FetchResult> {
   const queryScope = {
     // @TODO: remove deprecated query after v1
     query: params,
     parameters: params,
     process: {
-      env: Object.fromEntries(envVarNames.map((varName) => [varName, process.env[varName]])),
+      env,
     },
   };
 

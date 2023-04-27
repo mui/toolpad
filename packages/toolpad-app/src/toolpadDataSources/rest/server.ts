@@ -18,8 +18,7 @@ async function execBase(
 
   const jsServerRuntime = await createServerJsRuntime();
 
-  const envFile = await loadEnvFile();
-  const envVarNames = Object.keys(envFile);
+  const env = await loadEnvFile();
 
   const result = await execfetch(
     fetchQuery,
@@ -29,7 +28,7 @@ async function execBase(
       jsRuntime: jsServerRuntime,
       fetchImpl: instrumentedFetch as any,
     },
-    envVarNames,
+    env,
   );
 
   return { ...result, har };
@@ -37,6 +36,10 @@ async function execBase(
 
 async function execPrivate(connection: Maybe<RestConnectionParams>, query: FetchPrivateQuery) {
   switch (query.kind) {
+    case 'introspection': {
+      const env = await loadEnvFile();
+      return { env };
+    }
     case 'debugExec':
       return execBase(connection, query.query, query.params);
     default:

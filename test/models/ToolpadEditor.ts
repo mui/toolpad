@@ -104,7 +104,10 @@ export class ToolpadEditor {
 
   async goToPage(name: string) {
     await this.explorer.getByText(name).click();
-    this.page.waitForNavigation();
+  }
+
+  async goToPageById(id: string) {
+    await gotoIfNotCurrent(this.page, `/_toolpad/app/pages/${id}`);
   }
 
   async createComponent(name: string) {

@@ -1,4 +1,5 @@
 import * as path from 'path';
+import { setTimeout } from 'timers/promises';
 import { test, expect } from '../../playwright/localTest';
 import { ToolpadEditor } from '../../models/ToolpadEditor';
 import clickCenter from '../../utils/clickCenter';
@@ -89,4 +90,29 @@ test('can delete elements from page', async ({ page }) => {
   await page.keyboard.press('Backspace');
 
   await expect(canvasInputLocator).toHaveCount(0);
+});
+
+test('code editor auto-complete', async ({ page }) => {
+  const editorModel = new ToolpadEditor(page);
+
+  await editorModel.goToPageById('K7SkzhT');
+
+  await editorModel.waitForOverlay();
+
+  const text = editorModel.appCanvas.getByText('text-foo');
+
+  await clickCenter(page, text);
+
+  const bindingButton = editorModel.componentEditor.getByLabel('Bind property "Value"');
+
+  await bindingButton.click();
+
+  const editor = page
+    .getByRole('dialog', { name: 'Bind property "Value"' })
+    .locator('.monaco-editor');
+
+  await editor.waitFor();
+
+  await page.keyboard.type('textF');
+  await expect(page.getByRole('option', { name: 'textField' })).toBeVisible();
 });

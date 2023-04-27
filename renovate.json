@@ -68,6 +68,10 @@
       "allowedVersions": "< 2.0.0"
     },
     {
+      "groupName": "monaco-editor",
+      "matchPackageNames": ["monaco-editor"]
+    },
+    {
       "matchDepTypes": ["action"],
       "pinDigests": true
     },

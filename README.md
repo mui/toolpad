@@ -40,11 +40,11 @@ MUI Toolpad is in its alpha stages of development. Feel free to run this applica
 Run:
 
 ```sh
-npx create-toolpad-app
+npx create-toolpad-app my-app
 # or
-yarn create toolpad-app
+yarn create toolpad-app my-app
 # or
-pnpm create toolpad-app
+pnpm create toolpad-app my-app
 ```
 
 ## Documentation

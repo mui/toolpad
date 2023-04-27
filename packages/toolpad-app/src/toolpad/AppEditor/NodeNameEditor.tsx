@@ -46,7 +46,7 @@ export default function NodeNameEditor({ node, sx }: NodeNameEditorProps) {
     <TextField
       sx={sx}
       fullWidth
-      label="name"
+      label="Node name"
       error={!isNameValid}
       helperText={nodeNameError}
       value={nameInput}

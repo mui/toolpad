@@ -49,7 +49,7 @@ export default withTM(
         SOURCE_CODE_ROOT_URL: 'https://github.com/mui/mui-toolpad/blob/master',
         SOURCE_CODE_REPO: 'https://github.com/mui/mui-toolpad',
       },
-      webpack: (config) => {
+      webpack: (config, options) => {
         return {
           ...config,
           resolve: {
@@ -70,7 +70,18 @@ export default withTM(
                 oneOf: [
                   {
                     resourceQuery: /@mui\/markdown/,
-                    use: require.resolve('@mui/monorepo/packages/markdown/loader'),
+                    use: [
+                      options.defaultLoaders.babel,
+                      {
+                        loader: require.resolve('@mui/monorepo/packages/markdown/loader'),
+                        options: {
+                          env: {
+                            SOURCE_CODE_REPO: options.config.env.SOURCE_CODE_REPO,
+                            LIB_VERSION: options.config.env.LIB_VERSION,
+                          },
+                        },
+                      },
+                    ],
                   },
                 ],
               },

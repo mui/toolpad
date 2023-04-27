@@ -4,13 +4,14 @@ import ToolpadApp from '../../src/runtime/ToolpadApp';
 import config from '../../src/config';
 import { RuntimeState } from '../../src/types';
 import loadComponents from '../../src/runtime/loadDomComponents';
+import createRuntimeState from '../../src/createRuntimeState';
 
 interface PreviewPageProps {
   state: RuntimeState;
 }
 
 export const getServerSideProps: GetServerSideProps<PreviewPageProps> = async () => {
-  const { loadRuntimeState } = await import('../../src/server/data');
+  const { loadDomFromDisk } = await import('../../src/server/localMode');
 
   if (config.cmd !== 'dev') {
     return {
@@ -18,11 +19,11 @@ export const getServerSideProps: GetServerSideProps<PreviewPageProps> = async ()
     };
   }
 
-  const state = await loadRuntimeState();
+  const state = createRuntimeState({ dom: await loadDomFromDisk() });
 
   return {
     props: {
-      state,
+      state: JSON.parse(JSON.stringify(state)),
     },
   };
 };

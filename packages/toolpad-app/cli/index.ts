@@ -63,7 +63,8 @@ async function runApp(cmd: Command, { port, dev = false, dir }: RunOptions) {
     cwd: projectDir,
     stdio: 'pipe',
     env: {
-      NODE_ENV: dev ? 'development' : 'production',
+      NODE_ENV: process.env.NODE_ENV,
+      TOOLPAD_NEXT_DEV: dev ? '1' : '',
       TOOLPAD_DIR: toolpadDir,
       TOOLPAD_PROJECT_DIR: projectDir,
       TOOLPAD_PORT: String(port),
@@ -73,10 +74,11 @@ async function runApp(cmd: Command, { port, dev = false, dir }: RunOptions) {
   });
 
   invariant(cp.stdout, 'child process must be started with "stdio: \'pipe\'"');
+  invariant(cp.stderr, 'child process must be started with "stdio: \'pipe\'"');
 
   process.stdin.pipe(cp.stdin!);
-  cp.stdout?.pipe(process.stdout);
-  cp.stderr?.pipe(process.stderr);
+  cp.stdout.pipe(process.stdout);
+  cp.stderr.pipe(process.stderr);
 
   if (cmd === 'dev') {
     // Poll stdout for "http://localhost:3000" first
@@ -114,13 +116,22 @@ async function buildCommand({ dir }: BuildOptions) {
   const projectDir = path.resolve(process.cwd(), dir);
   const { default: chalk } = await import('chalk');
   // eslint-disable-next-line no-console
-  console.log(
-    `${chalk.blue('info')}  - building Toolpad application at ${chalk.cyan(projectDir)}...`,
-  );
+  console.log(`${chalk.blue('info')}  - building Toolpad application...`);
 
-  await new Promise((resolve) => {
-    setTimeout(resolve, 1000);
+  const { execaNode } = await import('execa');
+
+  const builderPath = path.resolve(__dirname, './appBuilder.js');
+
+  await execaNode(builderPath, [], {
+    cwd: projectDir,
+    stdio: 'inherit',
+    env: {
+      NODE_ENV: 'production',
+      TOOLPAD_PROJECT_DIR: projectDir,
+      FORCE_COLOR: '1',
+    },
   });
+
   // eslint-disable-next-line no-console
   console.log(`${chalk.green('success')} - build done.`);
 }
@@ -146,7 +157,6 @@ export default async function cli(argv: string[]) {
     port: {
       type: 'number',
       describe: 'Port to run the Toolpad application on',
-      default: DEFAULT_PORT,
       demandOption: false,
     },
     dev: {

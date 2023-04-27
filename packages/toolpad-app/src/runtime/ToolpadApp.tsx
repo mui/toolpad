@@ -34,7 +34,7 @@ import {
   useComponents,
   useComponent,
 } from '@mui/toolpad-core';
-import { createProvidedContext } from '@mui/toolpad-core/utils/react';
+import { createProvidedContext } from '@mui/toolpad-utils/react';
 import { QueryClient, QueryClientProvider, useMutation } from '@tanstack/react-query';
 import {
   BrowserRouter,
@@ -57,6 +57,8 @@ import ErrorIcon from '@mui/icons-material/Error';
 import EditIcon from '@mui/icons-material/Edit';
 import { useBrowserJsRuntime } from '@mui/toolpad-core/jsBrowserRuntime';
 import * as builtIns from '@mui/toolpad-components';
+import { errorFrom } from '@mui/toolpad-utils/errors';
+import { mapProperties, mapValues } from '@mui/toolpad-utils/collections';
 import * as appDom from '../appDom';
 import { RuntimeState, AppVersion } from '../types';
 import {
@@ -73,7 +75,6 @@ import evalJsBindings, {
   ParsedBinding,
 } from './evalJsBindings';
 import { HTML_ID_EDITOR_OVERLAY, NON_BINDABLE_CONTROL_TYPES } from '../constants';
-import { mapProperties, mapValues } from '../utils/collections';
 import usePageTitle from '../utils/usePageTitle';
 import Pre from '../components/Pre';
 import { layoutBoxArgTypes } from '../toolpadComponents/layoutBox';
@@ -82,7 +83,6 @@ import { execDataSourceQuery, useDataQuery, UseDataQueryConfig, UseFetch } from 
 import { useAppContext, AppContextProvider } from './AppContext';
 import { CanvasHooksContext, NavigateToPage } from './CanvasHooksContext';
 import useBoolean from '../utils/useBoolean';
-import { errorFrom } from '../utils/errors';
 import Header from '../toolpad/ToolpadShell/Header';
 import { ThemeProvider } from '../ThemeContext';
 import { BridgeContext } from '../canvas/BridgeContext';
@@ -462,6 +462,7 @@ function RenderedNodeContent({ node, childNodeGroups, Component }: RenderedNodeC
   return (
     <NodeRuntimeWrapper
       nodeId={nodeId}
+      nodeName={node.name}
       componentConfig={Component[TOOLPAD_COMPONENT]}
       NodeError={NodeError}
     >
@@ -1085,7 +1086,6 @@ function RenderedPage({ nodeId }: RenderedNodeProps) {
               childNodeGroups={{ children }}
               Component={PageRootComponent}
             />
-
             {queries.map((node) => (
               <FetchNode key={node.id} page={page} node={node} />
             ))}
@@ -1102,23 +1102,34 @@ interface RenderedPagesProps {
 }
 
 function RenderedPages({ pages, defaultPage }: RenderedPagesProps) {
+  const defaultPageNavigation = <Navigate to={`/pages/${defaultPage.id}`} replace />;
   return (
     <Routes>
       {pages.map((page) => (
-        <Route
-          key={page.id}
-          path={`/pages/${page.id}`}
-          element={
-            <RenderedPage
-              nodeId={page.id}
-              // Make sure the page itself mounts when the route changes. This make sure all pageBindings are reinitialized
-              // during first render. Fixes https://github.com/mui/mui-toolpad/issues/1050
-              key={page.id}
-            />
-          }
-        />
+        <React.Fragment key={page.id}>
+          <Route
+            path={`/pages/${page.id}`}
+            element={
+              <RenderedPage
+                nodeId={page.id}
+                // Make sure the page itself mounts when the route changes. This make sure all pageBindings are reinitialized
+                // during first render. Fixes https://github.com/mui/mui-toolpad/issues/1050
+                key={page.id}
+              />
+            }
+          />
+        </React.Fragment>
       ))}
-      <Route path="/" element={<Navigate to={`pages/${defaultPage.id}`} replace />} />
+      {pages.map((page) => (
+        <React.Fragment key={page.id}>
+          <Route
+            path={`/pages/${page.name}`}
+            element={<Navigate to={`/pages/${page.id}`} replace />}
+          />
+        </React.Fragment>
+      ))}
+      <Route path="/pages" element={defaultPageNavigation} />
+      <Route path="/" element={defaultPageNavigation} />
     </Routes>
   );
 }
@@ -1173,11 +1184,9 @@ function ToolpadAppLayout({ dom, version, hasShell: hasShellProp = true }: Toolp
   const pageId = pageMatch?.params.nodeId;
 
   const defaultPage = pages[0];
-  const page = pageId
-    ? (appDom.getNode<'page'>(dom, pageId as NodeId) as appDom.PageNode)
-    : defaultPage;
+  const page = pageId ? appDom.getMaybeNode(dom, pageId as NodeId, 'page') : defaultPage;
 
-  const pageDisplay = urlParams.get('toolpad-display') || page.attributes.display?.value;
+  const pageDisplay = urlParams.get('toolpad-display') || page?.attributes.display?.value;
 
   const hasShell = hasShellProp && pageDisplay !== 'standalone';
 

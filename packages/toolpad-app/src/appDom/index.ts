@@ -1,5 +1,5 @@
+import { nanoid } from 'nanoid/non-secure';
 import { generateKeyBetween } from 'fractional-indexing';
-import cuid from 'cuid';
 import {
   NodeId,
   NodeReference,
@@ -11,11 +11,11 @@ import {
 } from '@mui/toolpad-core';
 import invariant from 'invariant';
 import { BoxProps } from '@mui/material';
+import { pascalCase, removeDiacritics, uncapitalize } from '@mui/toolpad-utils/strings';
+import { mapProperties, mapValues } from '@mui/toolpad-utils/collections';
 import { ConnectionStatus, AppTheme } from '../types';
 import { omit, update, updateOrCreate } from '../utils/immutability';
-import { pascalCase, removeDiacritics, uncapitalize } from '../utils/strings';
 import { ExactEntriesOf, Maybe } from '../utils/types';
-import { mapProperties, mapValues } from '../utils/collections';
 
 export const CURRENT_APPDOM_VERSION = 6;
 
@@ -234,8 +234,8 @@ function assertIsType<T extends AppDomNode>(node: AppDomNode, type: T['type']): 
   invariant(isType(node, type), `Expected node type "${type}" but got "${node.type}"`);
 }
 
-function createId(): NodeId {
-  return cuid.slug() as NodeId;
+export function createId(): NodeId {
+  return nanoid(7) as NodeId;
 }
 
 export function createConst<V>(value: V): ConstantAttrValue<V> {
@@ -605,6 +605,15 @@ export function getPageAncestor(dom: AppDom, node: AppDomNode): PageNode | null 
     return getPageAncestor(dom, parent);
   }
   return null;
+}
+
+/**
+ * Returns all nodes with a given component type
+ */
+export function getComponentTypeNodes(dom: AppDom, componentId: string): readonly AppDomNode[] {
+  return Object.values(dom.nodes).filter(
+    (node) => isElement(node) && node.attributes.component.value === componentId,
+  );
 }
 
 /**

@@ -3,7 +3,7 @@ import * as path from 'path';
 import * as yaml from 'yaml';
 import { Dirent } from 'fs';
 import { yamlOverwrite } from 'yaml-diff-patch';
-import { errorFrom } from './errors';
+import { errorFrom } from '@mui/toolpad-utils/errors';
 
 /**
  * Like `fs.readFile`, but for JSON files specifically. Will throw on malformed JSON.
@@ -61,6 +61,18 @@ export async function fileExists(filepath: string): Promise<boolean> {
   try {
     const stat = await fs.stat(filepath);
     return stat.isFile();
+  } catch (err) {
+    if (errorFrom(err).code === 'ENOENT') {
+      return false;
+    }
+    throw err;
+  }
+}
+
+export async function folderExists(folderpath: string): Promise<boolean> {
+  try {
+    const stat = await fs.stat(folderpath);
+    return stat.isDirectory();
   } catch (err) {
     if (errorFrom(err).code === 'ENOENT') {
       return false;

@@ -3,3 +3,63 @@ kind: page
 spec:
   id: ux0chdh
   title: Default page
+  content:
+    - component: PageRow
+      name: pageRow
+      children:
+        - component: TextField
+          name: textField
+          props:
+            fullWidth: true
+    - component: PageRow
+      name: pageRow1
+      children:
+        - component: Button
+          name: button
+          props:
+            onClick:
+              $$jsExpressionAction: |
+                query.refetch();
+                textField.reset();
+        - component: Button
+          name: button1
+          props:
+            onClick:
+              $$jsExpressionAction: |
+                
+                //textField.value = '';
+                query2.refetch();
+    - component: PageRow
+      name: pageRow2
+      children:
+        - component: Text
+          name: text
+          props:
+            value:
+              $$jsExpression: |
+                query2.data
+  queries:
+    - name: query
+      query:
+        function: query_open3
+        kind: local
+      parameters:
+        - name: prompt
+          value:
+            $$jsExpression: |
+              textField.value
+      mode: mutation
+    - name: query2
+      mode: mutation
+      query:
+        function: query_open4
+        kind: local
+      parameters:
+        - name: prompt
+          value:
+            $$jsExpression: |
+              textField.value
+        - name: prompt2
+          value:
+            $$jsExpression: |
+              textField1.value

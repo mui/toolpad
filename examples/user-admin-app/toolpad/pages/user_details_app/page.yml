@@ -311,7 +311,7 @@ spec:
                                         loading: false
   queries:
     - name: xano_get
-      enabled: true
+      enabled: false
       mode: query
       query:
         kind: rest
@@ -320,7 +320,7 @@ spec:
         method: GET
         searchParams: []
     - name: xano_put
-      mode: query
+      mode: mutation
       query:
         kind: rest
         url:
@@ -387,6 +387,7 @@ spec:
           value:
             $$jsExpression: |
               address.value
+      enabled: false
     - name: xano_post
       query:
         kind: rest

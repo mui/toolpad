@@ -187,7 +187,6 @@ async function createMain(): Promise<string> {
 
 export async function loadEnvFile() {
   const userProjectRoot = getUserProjectRoot();
-
   const envFilePath = path.resolve(userProjectRoot, '.env');
 
   try {
@@ -195,7 +194,7 @@ export async function loadEnvFile() {
     const parsed = dotenv.parse(envFileContent) as any;
     // eslint-disable-next-line no-console
     console.log(
-      `Loaded env file "${envFilePath}" with keys ${truncate(
+      `${chalk.blue('info')}  - loaded env file "${envFilePath}" with keys ${truncate(
         Object.keys(parsed).join(', '),
         1000,
       )}`,

@@ -7,6 +7,7 @@ export const getServerSideProps: GetServerSideProps<{}> = async () => {
   if (config.cmd !== 'dev') {
     return { notFound: true };
   }
+
   return {
     props: {},
   };

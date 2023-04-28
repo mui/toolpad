@@ -51,7 +51,6 @@ import TabPanel from '../../components/TabPanel';
 
 import { useDom } from '../AppState';
 import * as appDom from '../../appDom';
-import { usePageEditorState } from './PageEditor/PageEditorProvider';
 // eslint-disable-next-line import/no-cycle
 import BindableEditor from './PageEditor/BindableEditor';
 
@@ -250,7 +249,6 @@ function NavigationActionEditor({ value, onChange }: NavigationActionEditorProps
   const { dom } = useDom();
   const root = appDom.getApp(dom);
   const { pages = [] } = appDom.getChildNodes(dom, root);
-  const { nodeId: currentPageNodeId } = usePageEditorState();
 
   const getDefaultActionParameters = React.useCallback((page: appDom.PageNode) => {
     const defaultPageParameters = page.attributes.parameters?.value || [];
@@ -278,11 +276,6 @@ function NavigationActionEditor({ value, onChange }: NavigationActionEditorProps
     [dom, getDefaultActionParameters, onChange],
   );
 
-  const availablePages = React.useMemo(
-    () => pages.filter((page) => page.id !== currentPageNodeId),
-    [pages, currentPageNodeId],
-  );
-
   const actionPageRef = value?.value?.page || null;
   const actionParameters = React.useMemo(
     () => value?.value.parameters || {},
@@ -290,7 +283,7 @@ function NavigationActionEditor({ value, onChange }: NavigationActionEditorProps
   );
 
   const actionPageId = actionPageRef ? appDom.deref(actionPageRef) : null;
-  const actionPage = availablePages.find((availablePage) => availablePage.id === actionPageId);
+  const actionPage = pages.find((availablePage) => availablePage.id === actionPageId);
 
   const handleActionParameterChange = React.useCallback(
     (actionParameterName: string) => (newValue: BindableAttrValue<string> | null) => {
@@ -310,9 +303,11 @@ function NavigationActionEditor({ value, onChange }: NavigationActionEditorProps
     [actionPageRef, actionParameters, onChange],
   );
 
-  const hasPagesAvailable = availablePages.length > 0;
+  const hasPagesAvailable = pages.length > 0;
 
   const defaultActionParameters = actionPage ? getDefaultActionParameters(actionPage) : {};
+
+  const actionParameterEntries = Object.entries(actionParameters || defaultActionParameters);
 
   return (
     <Box sx={{ my: 1 }}>
@@ -327,13 +322,13 @@ function NavigationActionEditor({ value, onChange }: NavigationActionEditorProps
         disabled={!hasPagesAvailable}
         helperText={hasPagesAvailable ? null : 'No other pages available'}
       >
-        {availablePages.map((page) => (
+        {pages.map((page) => (
           <MenuItem key={page.id} value={page.id}>
             {page.name}
           </MenuItem>
         ))}
       </TextField>
-      {actionPage ? (
+      {actionParameterEntries.length > 0 ? (
         <React.Fragment>
           <Typography variant="overline">Page parameters:</Typography>
           {Object.entries(actionParameters || defaultActionParameters).map((actionParameter) => {

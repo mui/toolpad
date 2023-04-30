@@ -87,7 +87,7 @@
   },
   "devDependencies": {
     "@babel/plugin-transform-react-constant-elements": "^7.21.3",
-    "@babel/preset-typescript": "^7.21.4",
+    "@babel/preset-typescript": "^7.21.5",
     "@types/doctrine": "^0.0.5",
     "cpy-cli": "^4.2.0",
     "cross-fetch": "^3.1.5",

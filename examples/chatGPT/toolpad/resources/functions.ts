@@ -50,11 +50,10 @@ export const query_open4 = createFunction(
     const configuration = new Configuration({ apiKey: process.env.OPENAI_API_KEY });
     const openai = new OpenAIApi(configuration);
 
-    const userInput = `${parameters.prompt}`;
-    const messages = [{ role: 'system', content: 'Hello, What do you want to know?' }];
+    // const userInput = `${parameters.prompt}`;
+    const messages = [{ role: 'user', content: 'What day was on 1st Jan 2000?' }];
 
-    messages.push({ role: 'user', content: userInput });
-    console.log(userInput);
+    console.log(messages);
 
     try {
       const response = await openai.createChatCompletion({
@@ -64,12 +63,10 @@ export const query_open4 = createFunction(
 
       const botMessage = response.data?.choices[0].message;
       messages.push(botMessage);
-      // userInput = `${parameters.prompt}`;
-      // botMessage.content;
+
       console.log(messages);
-      // userInput = 'How many people died?';
-      console.log(userInput);
-      return botMessage.content;
+
+      return messages;
     } catch (error) {
       console.log(error.message);
     }

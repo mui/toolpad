@@ -262,8 +262,8 @@ spec:
                                         loading: false
                                         onClick:
                                           $$jsExpressionAction: |-
-                                            xano_get.refetch() 
                                             xano_put.refetch()
+                                            //xano_get.refetch() 
                                         disabled: false
                                         fullWidth: true
                         - component: Paper
@@ -311,7 +311,6 @@ spec:
                                         loading: false
   queries:
     - name: xano_get
-      enabled: false
       mode: query
       query:
         kind: rest
@@ -387,7 +386,6 @@ spec:
           value:
             $$jsExpression: |
               address.value
-      enabled: false
     - name: xano_post
       query:
         kind: rest
@@ -395,3 +393,4 @@ spec:
         headers: []
         method: POST
         searchParams: []
+      mode: mutation

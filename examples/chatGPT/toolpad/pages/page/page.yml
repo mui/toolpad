@@ -11,33 +11,43 @@ spec:
           name: textField
           props:
             fullWidth: true
-    - component: PageRow
-      name: pageRow1
-      children:
-        - component: Button
-          name: button
-          props:
-            onClick:
-              $$jsExpressionAction: |
-                query.refetch();
-                textField.reset();
+            label: Write prompt here..
+          layout:
+            columnSize: 1.853658536585366
         - component: Button
           name: button1
           props:
             onClick:
-              $$jsExpressionAction: |
-                
+              $$jsExpressionAction: |+
+                query2.call();
+
+                text.value = textField.value;
                 //textField.value = '';
-                query2.refetch();
+
+            content: Submit
+            size: medium
+          layout:
+            columnSize: 0.14634146341463414
     - component: PageRow
       name: pageRow2
       children:
         - component: Text
           name: text
+    - component: PageRow
+      name: pageRow4
+      children:
+        - component: DataGrid
+          name: dataGrid
           props:
-            value:
+            rows:
               $$jsExpression: |
                 query2.data
+            columns:
+              - field: role
+                type: string
+              - field: content
+                type: string
+                width: 693
   queries:
     - name: query
       query:
@@ -59,7 +69,13 @@ spec:
           value:
             $$jsExpression: |
               textField.value
-        - name: prompt2
+      enabled: true
+    - name: query3
+      query:
+        function: query_open5
+        kind: local
+      parameters:
+        - name: prompt
           value:
             $$jsExpression: |
-              textField1.value
+              textField.value

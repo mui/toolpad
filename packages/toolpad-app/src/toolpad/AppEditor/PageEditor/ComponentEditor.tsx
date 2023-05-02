@@ -172,9 +172,6 @@ function SelectedNodeEditor({ node }: SelectedNodeEditorProps) {
         <MarkdownTooltip placement="left" title={componentConfig.helperText ?? displayName}>
           <Typography variant="subtitle1">Component: {displayName}</Typography>
         </MarkdownTooltip>
-        <Typography variant="subtitle2" sx={{ mb: 1 }}>
-          ID: {node.id}
-        </Typography>
         <NodeNameEditor node={node} />
         {nodeError ? <ErrorAlert error={nodeError} /> : null}
         <Divider sx={{ mt: 1 }} />

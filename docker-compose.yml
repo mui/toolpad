@@ -1,0 +1,8 @@
+services:
+  playwright:
+    build:
+      context: .
+      dockerfile: ./playwright.Dockerfile
+    volumes:
+      - ./:/work/
+    working_dir: /work/

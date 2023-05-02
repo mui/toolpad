@@ -370,7 +370,7 @@ export default React.forwardRef<MonacoEditorHandle, MonacoEditorProps>(function 
         }
       }
     } else {
-      const pathUri = monaco.Uri.parse(`./scripts/${nanoid(7)}${getExtension(language)}`);
+      const pathUri = monaco.Uri.parse(`/scripts/${nanoid(7)}${getExtension(language)}`);
       const model = monaco.editor.createModel(value || '', language, pathUri);
 
       instance = monaco.editor.create(rootRef.current, {

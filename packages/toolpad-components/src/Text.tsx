@@ -154,6 +154,7 @@ function Text({ value, markdown, href, loading, mode, sx, ...rest }: TextProps) 
             minWidth: loading || !value ? 150 : undefined,
             // Same as Typography
             [`&:empty::before`]: { content: '""', display: 'inline-block' },
+            overflowWrap: 'anywhere',
             ...sx,
           }}
         >
@@ -199,6 +200,7 @@ function Text({ value, markdown, href, loading, mode, sx, ...rest }: TextProps) 
             [`&:empty::before`]: { content: '""', display: 'inline-block' },
             outline: 'none',
             whiteSpace: 'pre-wrap',
+            overflowWrap: 'break-word',
           }}
           onDoubleClick={() => {
             if (nodeRuntime) {

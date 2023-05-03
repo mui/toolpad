@@ -16,10 +16,10 @@ const DRAWER_WIDTH = 250; // px
 
 interface AppNavigationProps {
   pages: appDom.PageNode[];
-  isPreview?: boolean;
+  clipped?: boolean;
 }
 
-export default function AppNavigation({ pages, isPreview = false }: AppNavigationProps) {
+export default function AppNavigation({ pages, clipped = false }: AppNavigationProps) {
   const navigate = useNavigate();
   const location = useLocation();
   const { search } = location;
@@ -47,7 +47,7 @@ export default function AppNavigation({ pages, isPreview = false }: AppNavigatio
         [`& .MuiDrawer-paper`]: { width: DRAWER_WIDTH, boxSizing: 'border-box' },
       }}
     >
-      {isPreview ? <Toolbar /> : null}
+      {clipped ? <Toolbar /> : null}
       <Box>
         <List
           component="nav"

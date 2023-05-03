@@ -140,7 +140,7 @@ export default function AppCanvas({
             rootRef={onAppRoot}
             loadComponents={loadComponents}
             hasShell={false}
-            version="development"
+            showPreviewHeader={false}
             basename={basename}
             state={state}
           />

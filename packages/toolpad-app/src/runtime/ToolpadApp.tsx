@@ -60,7 +60,7 @@ import * as builtIns from '@mui/toolpad-components';
 import { errorFrom } from '@mui/toolpad-utils/errors';
 import { mapProperties, mapValues } from '@mui/toolpad-utils/collections';
 import * as appDom from '../appDom';
-import { RuntimeState, AppVersion } from '../types';
+import { RuntimeState } from '../types';
 import {
   getElementNodeComponentId,
   INTERNAL_COMPONENTS,
@@ -80,7 +80,6 @@ import Pre from '../components/Pre';
 import { layoutBoxArgTypes } from '../toolpadComponents/layoutBox';
 import NoSsr from '../components/NoSsr';
 import { execDataSourceQuery, useDataQuery, UseDataQueryConfig, UseFetch } from './useDataQuery';
-import { useAppContext, AppContextProvider } from './AppContext';
 import { CanvasHooksContext, NavigateToPage } from './CanvasHooksContext';
 import useBoolean from '../utils/useBoolean';
 import Header from '../toolpad/ToolpadShell/Header';
@@ -607,7 +606,6 @@ interface MutationNodeProps {
 }
 
 function MutationNode({ node, page }: MutationNodeProps) {
-  const { version } = useAppContext();
   const getBindings = useBindingsContext();
   const setControlledBinding = useSetControlledBindingContext();
 
@@ -629,7 +627,7 @@ function MutationNode({ node, page }: MutationNodeProps) {
         params: { ...params, ...overrides },
       }),
     {
-      mutationKey: [version, queryId, params],
+      mutationKey: [queryId, params],
     },
   );
 
@@ -1160,10 +1158,14 @@ const queryClient = new QueryClient({
 export interface ToolpadAppLayoutProps {
   dom: appDom.RenderTree;
   hasShell?: boolean;
-  version: AppVersion;
+  showPreviewHeader?: boolean;
 }
 
-function ToolpadAppLayout({ dom, version, hasShell: hasShellProp = true }: ToolpadAppLayoutProps) {
+function ToolpadAppLayout({
+  dom,
+  showPreviewHeader = true,
+  hasShell: hasShellProp = true,
+}: ToolpadAppLayoutProps) {
   const root = appDom.getApp(dom);
   const { pages = [] } = appDom.getChildNodes(dom, root);
 
@@ -1183,11 +1185,9 @@ function ToolpadAppLayout({ dom, version, hasShell: hasShellProp = true }: Toolp
 
   const hasShell = hasShellProp && pageDisplay !== 'standalone';
 
-  const isPreview = version === 'preview';
-
   return (
     <React.Fragment>
-      {isPreview ? (
+      {showPreviewHeader ? (
         <ThemeProvider>
           <Header
             enableUserFeedback={false}
@@ -1212,7 +1212,7 @@ function ToolpadAppLayout({ dom, version, hasShell: hasShellProp = true }: Toolp
       ) : null}
       <Box sx={{ display: 'flex' }}>
         {hasShell && pages.length > 0 ? (
-          <AppNavigation pages={pages} isPreview={isPreview} />
+          <AppNavigation pages={pages} clipped={showPreviewHeader} />
         ) : null}
         <RenderedPages pages={pages} defaultPage={defaultPage} />
       </Box>
@@ -1228,8 +1228,8 @@ export interface ToolpadAppProps {
   rootRef?: React.Ref<HTMLDivElement>;
   loadComponents: LoadComponents;
   hasShell?: boolean;
+  showPreviewHeader?: boolean;
   basename: string;
-  version: AppVersion;
   state: RuntimeState;
 }
 
@@ -1237,12 +1237,12 @@ export default function ToolpadApp({
   rootRef,
   loadComponents,
   basename,
-  version,
+  showPreviewHeader,
   hasShell = true,
   state,
 }: ToolpadAppProps) {
   const { dom } = state;
-  const appContext = React.useMemo(() => ({ version }), [version]);
+
   const [components, setComponents] = React.useState<ToolpadComponents | null>(null);
 
   const [resetNodeErrorsKey, setResetNodeErrorsKey] = React.useState(0);
@@ -1272,16 +1272,18 @@ export default function ToolpadApp({
                 <ErrorBoundary FallbackComponent={AppError}>
                   <ResetNodeErrorsKeyProvider value={resetNodeErrorsKey}>
                     <React.Suspense fallback={<AppLoading />}>
-                      <AppContextProvider value={appContext}>
-                        <QueryClientProvider client={queryClient}>
-                          <BrowserRouter basename={basename}>
-                            <ToolpadAppLayout dom={dom} version={version} hasShell={hasShell} />
-                          </BrowserRouter>
-                          {showDevtools ? (
-                            <ReactQueryDevtoolsProduction initialIsOpen={false} />
-                          ) : null}
-                        </QueryClientProvider>
-                      </AppContextProvider>
+                      <QueryClientProvider client={queryClient}>
+                        <BrowserRouter basename={basename}>
+                          <ToolpadAppLayout
+                            dom={dom}
+                            hasShell={hasShell}
+                            showPreviewHeader={showPreviewHeader}
+                          />
+                        </BrowserRouter>
+                        {showDevtools ? (
+                          <ReactQueryDevtoolsProduction initialIsOpen={false} />
+                        ) : null}
+                      </QueryClientProvider>
                     </React.Suspense>
                   </ResetNodeErrorsKeyProvider>
                 </ErrorBoundary>

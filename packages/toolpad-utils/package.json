@@ -1,6 +1,6 @@
 {
   "name": "@mui/toolpad-utils",
-  "version": "0.1.7",
+  "version": "0.1.9",
   "description": "Build MUI apps quickly",
   "author": "MUI Toolpad team",
   "homepage": "https://github.com/mui/mui-toolpad#readme",
@@ -47,7 +47,7 @@
   "publishConfig": {
     "access": "public"
   },
-  "gitHead": "5c310012b1b92ee53a0a1051b92f84564f915faf",
+  "gitHead": "974acafd8deadb91951c814d0a5028fb4e5f47ec",
   "dependencies": {
     "react-is": "^18.2.0"
   }

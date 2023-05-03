@@ -37,12 +37,7 @@ function Root({ ToolpadApp, initialState, base }: RootProps) {
     <React.StrictMode>
       {/* For some reason this helps with https://github.com/vitejs/vite/issues/12423 */}
       <Button sx={{ display: 'none' }} />
-      <ToolpadApp
-        basename={base}
-        version="development"
-        state={initialState}
-        loadComponents={loadComponents}
-      />
+      <ToolpadApp basename={base} state={initialState} loadComponents={loadComponents} />
     </React.StrictMode>
   );
 }

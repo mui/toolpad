@@ -47,7 +47,7 @@ export default function AppNavigation({ pages, clipped = false }: AppNavigationP
         [`& .MuiDrawer-paper`]: { width: DRAWER_WIDTH, boxSizing: 'border-box' },
       }}
     >
-      {clipped ? <Toolbar /> : null}
+      {clipped ? <Toolbar variant="dense" /> : null}
       <Box>
         <List
           component="nav"

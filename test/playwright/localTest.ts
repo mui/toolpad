@@ -98,7 +98,6 @@ export async function withApp(
       }
     }
 
-    console.log(args, projectDir);
     const child = childProcess.spawn('toolpad', args, {
       cwd: projectDir,
       stdio: 'pipe',

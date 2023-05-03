@@ -59,3 +59,5 @@ examples/*/yarn.lock
 
 test-results
 .toolpad-generated
+
+.yarn-playwright-cache

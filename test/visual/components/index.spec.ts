@@ -22,6 +22,8 @@ test('rendering components in the app editor', async ({ page }) => {
   const editorModel = new ToolpadEditor(page);
   await editorModel.goto();
 
+  await editorModel.waitForOverlay();
+
   await expect(page).toHaveScreenshot('no-selection.png');
 
   const image = editorModel.appCanvas.locator('img').first();

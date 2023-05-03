@@ -3,25 +3,9 @@ import MarkdownElement from '@mui/monorepo/docs/src/modules/components/MarkdownE
 import AppLayoutDocs from '@mui/monorepo/docs/src/modules/components/AppLayoutDocs';
 import Ad from '@mui/monorepo/docs/src/modules/components/Ad';
 import { JSONSchema7, JSONSchema7Definition } from 'json-schema';
-import { Typography, Chip, Box, Divider, styled, lighten } from '@mui/material';
+import { Typography, Box, Divider } from '@mui/material';
 import invariant from 'invariant';
 import { interleave } from '../utils/react';
-
-function coloredChipCss(color: string) {
-  return {
-    color,
-    borderColor: color,
-    background: lighten(color, 0.9),
-  };
-}
-
-const TypeChip = styled(Chip)({
-  '&.type-string': coloredChipCss('#fc929e'),
-  '&.type-object': coloredChipCss('#a6e22e'),
-  '&.type-number': coloredChipCss('#00F'),
-  '&.type-boolean': coloredChipCss('#66d9ef'),
-  '&.type-array': coloredChipCss('#00F'),
-});
 
 export interface SchemaReferenceProps {
   disableAd?: boolean;
@@ -48,16 +32,6 @@ function JsonSchemaTypeDisplay({ schema }: JsonSchemaTypeDisplayProps) {
             <strong>type:</strong> <code>{typeId}</code>
           </React.Fragment>
         );
-        return (
-          <TypeChip
-            className={`type-${typeId}`}
-            variant="outlined"
-            key={typeId}
-            size="small"
-            label={typeId}
-            sx={{ mr: 1 }}
-          />
-        );
       })}
     </React.Fragment>
   );
@@ -66,9 +40,10 @@ function JsonSchemaTypeDisplay({ schema }: JsonSchemaTypeDisplayProps) {
 interface JsonSchemaDisplayProps {
   name?: string;
   schema: JSONSchema7Definition;
+  idPrefix?: string;
 }
 
-function JsonSchemaDisplay({ name, schema }: JsonSchemaDisplayProps) {
+function JsonSchemaDisplay({ name, schema, idPrefix = '' }: JsonSchemaDisplayProps) {
   invariant(typeof schema === 'object', `Expected an object but got ${typeof schema}`);
 
   if (schema.$ref) {
@@ -98,12 +73,25 @@ function JsonSchemaDisplay({ name, schema }: JsonSchemaDisplayProps) {
     properties.push(['*', schema.additionalProperties]);
   }
 
+  const id = `${idPrefix}-${name || ''}`;
+
   return (
-    <React.Fragment>
-      <div>
-        {name ? <code>{name}</code> : null}
-        {schema.description ? <div>{schema.description}</div> : null}
-      </div>
+    <div>
+      {name ? (
+        <Box sx={{ flexShrink: 0 }}>
+          <a href={`#${id}`} tabIndex={-1}>
+            <code id={id}>{name}</code>
+          </a>
+        </Box>
+      ) : null}
+      {schema.description ? (
+        <Box sx={{ display: 'flex', flexDirection: 'row' }}>
+          <Box component="strong" sx={{ flexShrink: 0 }}>
+            Description:
+          </Box>
+          <Box sx={{ ml: 1 }}>{schema.description}</Box>
+        </Box>
+      ) : null}
 
       <JsonSchemaTypeDisplay schema={schema} />
 
@@ -113,7 +101,14 @@ function JsonSchemaDisplay({ name, schema }: JsonSchemaDisplayProps) {
           <Box sx={{ ml: 2 }}>
             {interleave(
               properties.map(([propName, propSchema]) => {
-                return <JsonSchemaDisplay key={propName} name={propName} schema={propSchema} />;
+                return (
+                  <JsonSchemaDisplay
+                    key={propName}
+                    name={propName}
+                    schema={propSchema}
+                    idPrefix={id}
+                  />
+                );
               }),
               <Divider sx={{ m: `8px 0 !important` }} />,
             )}
@@ -129,12 +124,12 @@ function JsonSchemaDisplay({ name, schema }: JsonSchemaDisplayProps) {
               <ul>
                 {schema.items.map((item, i) => (
                   <li key={i}>
-                    <JsonSchemaDisplay schema={item} />
+                    <JsonSchemaDisplay schema={item} idPrefix={id} />
                   </li>
                 ))}
               </ul>
             ) : (
-              <JsonSchemaDisplay schema={schema.items} />
+              <JsonSchemaDisplay schema={schema.items} idPrefix={id} />
             )}
           </Box>
         </div>
@@ -147,15 +142,14 @@ function JsonSchemaDisplay({ name, schema }: JsonSchemaDisplayProps) {
             {schema.anyOf.map((subSchema, i) => {
               return (
                 <li key={i}>
-                  <JsonSchemaDisplay schema={subSchema} />
+                  <JsonSchemaDisplay schema={subSchema} idPrefix={id} />
                 </li>
               );
             })}
           </ul>
         </React.Fragment>
       ) : null}
-      {/*       <pre>{JSON.stringify(schema, null, 2)}</pre> */}
-    </React.Fragment>
+    </div>
   );
 }
 
@@ -239,7 +233,7 @@ export default function SchemaReference({ disableAd, definitions }: SchemaRefere
                 return (
                   <React.Fragment key={tocItemNode.hash}>
                     <Heading hash={tocItemNode.hash} level="h3" title={tocItemNode.text} />
-                    <JsonSchemaDisplay schema={tocItemNode.content} />
+                    <JsonSchemaDisplay schema={tocItemNode.content} idPrefix={tocItemNode.hash} />
                   </React.Fragment>
                 );
               })}

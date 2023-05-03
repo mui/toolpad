@@ -34,12 +34,7 @@ function renderPage(initPage: (dom: appDom.AppDom, page: appDom.PageNode) => app
 
   return render(
     <BridgeContext.Provider value={bridge}>
-      <ToolpadApp
-        loadComponents={loadComponents}
-        state={state}
-        version={version}
-        basename="toolpad"
-      />
+      <ToolpadApp loadComponents={loadComponents} state={state} basename="toolpad" />
     </BridgeContext.Provider>,
   );
 }

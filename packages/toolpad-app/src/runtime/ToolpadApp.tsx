@@ -1167,14 +1167,9 @@ const queryClient = new QueryClient({
 export interface ToolpadAppLayoutProps {
   dom: appDom.RenderTree;
   hasShell?: boolean;
-  showPreviewHeader?: boolean;
 }
 
-function ToolpadAppLayout({
-  dom,
-  showPreviewHeader = true,
-  hasShell: hasShellProp = true,
-}: ToolpadAppLayoutProps) {
+function ToolpadAppLayout({ dom, hasShell: hasShellProp = true }: ToolpadAppLayoutProps) {
   const root = appDom.getApp(dom);
   const { pages = [] } = appDom.getChildNodes(dom, root);
 
@@ -1191,6 +1186,11 @@ function ToolpadAppLayout({
   const pageDisplay = urlParams.get('toolpad-display') || page?.attributes.display?.value;
 
   const hasShell = hasShellProp && pageDisplay !== 'standalone';
+
+  const isCanvas = pageDisplay === 'canvas';
+  const isPreview = process.env.NODE_ENV !== 'production';
+
+  const showPreviewHeader = isPreview && !isCanvas;
 
   return (
     <React.Fragment>
@@ -1235,7 +1235,6 @@ export interface ToolpadAppProps {
   rootRef?: React.Ref<HTMLDivElement>;
   loadComponents: LoadComponents;
   hasShell?: boolean;
-  showPreviewHeader?: boolean;
   basename: string;
   state: RuntimeState;
 }
@@ -1244,7 +1243,6 @@ export default function ToolpadApp({
   rootRef,
   loadComponents,
   basename,
-  showPreviewHeader,
   hasShell = true,
   state,
 }: ToolpadAppProps) {
@@ -1281,11 +1279,7 @@ export default function ToolpadApp({
                     <React.Suspense fallback={<AppLoading />}>
                       <QueryClientProvider client={queryClient}>
                         <BrowserRouter basename={basename}>
-                          <ToolpadAppLayout
-                            dom={dom}
-                            hasShell={hasShell}
-                            showPreviewHeader={showPreviewHeader}
-                          />
+                          <ToolpadAppLayout dom={dom} hasShell={hasShell} />
                         </BrowserRouter>
                         {showDevtools ? (
                           <ReactQueryDevtoolsProduction initialIsOpen={false} />

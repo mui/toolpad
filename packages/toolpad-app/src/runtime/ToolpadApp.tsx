@@ -1183,11 +1183,11 @@ function ToolpadAppLayout({ dom, hasShell: hasShellProp = true }: ToolpadAppLayo
   const defaultPage = pages[0];
   const page = pageId ? appDom.getMaybeNode(dom, pageId as NodeId, 'page') : defaultPage;
 
-  const pageDisplay = urlParams.get('toolpad-display') || page?.attributes.display?.value;
+  const displayMode = urlParams.get('toolpad-display') || page?.attributes.display?.value;
 
-  const hasShell = hasShellProp && pageDisplay !== 'standalone';
+  const hasShell = hasShellProp && displayMode !== 'standalone';
 
-  const isCanvas = pageDisplay === 'canvas';
+  const isCanvas = displayMode === 'canvas';
   const isPreview = process.env.NODE_ENV !== 'production';
 
   const showPreviewHeader = isPreview && !isCanvas;

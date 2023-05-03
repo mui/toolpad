@@ -461,6 +461,7 @@ function RenderedNodeContent({ node, childNodeGroups, Component }: RenderedNodeC
   return (
     <NodeRuntimeWrapper
       nodeId={nodeId}
+      nodeName={node.name}
       componentConfig={Component[TOOLPAD_COMPONENT]}
       NodeError={NodeError}
     >
@@ -1083,7 +1084,6 @@ function RenderedPage({ nodeId }: RenderedNodeProps) {
               childNodeGroups={{ children }}
               Component={PageRootComponent}
             />
-
             {queries.map((node) => (
               <FetchNode key={node.id} page={page} node={node} />
             ))}
@@ -1104,18 +1104,27 @@ function RenderedPages({ pages, defaultPage }: RenderedPagesProps) {
   return (
     <Routes>
       {pages.map((page) => (
-        <Route
-          key={page.id}
-          path={`/pages/${page.id}`}
-          element={
-            <RenderedPage
-              nodeId={page.id}
-              // Make sure the page itself mounts when the route changes. This make sure all pageBindings are reinitialized
-              // during first render. Fixes https://github.com/mui/mui-toolpad/issues/1050
-              key={page.id}
-            />
-          }
-        />
+        <React.Fragment key={page.id}>
+          <Route
+            path={`/pages/${page.id}`}
+            element={
+              <RenderedPage
+                nodeId={page.id}
+                // Make sure the page itself mounts when the route changes. This make sure all pageBindings are reinitialized
+                // during first render. Fixes https://github.com/mui/mui-toolpad/issues/1050
+                key={page.id}
+              />
+            }
+          />
+        </React.Fragment>
+      ))}
+      {pages.map((page) => (
+        <React.Fragment key={page.id}>
+          <Route
+            path={`/pages/${page.name}`}
+            element={<Navigate to={`/pages/${page.id}`} replace />}
+          />
+        </React.Fragment>
       ))}
       <Route path="/pages" element={defaultPageNavigation} />
       <Route path="/" element={defaultPageNavigation} />
@@ -1177,11 +1186,9 @@ function ToolpadAppLayout({
   const pageId = pageMatch?.params.nodeId;
 
   const defaultPage = pages[0];
-  const page = pageId
-    ? (appDom.getNode<'page'>(dom, pageId as NodeId) as appDom.PageNode)
-    : defaultPage;
+  const page = pageId ? appDom.getMaybeNode(dom, pageId as NodeId, 'page') : defaultPage;
 
-  const pageDisplay = urlParams.get('toolpad-display') || page.attributes.display?.value;
+  const pageDisplay = urlParams.get('toolpad-display') || page?.attributes.display?.value;
 
   const hasShell = hasShellProp && pageDisplay !== 'standalone';
 

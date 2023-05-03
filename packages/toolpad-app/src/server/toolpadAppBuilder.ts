@@ -28,6 +28,11 @@ export function getHtmlContent({ canvas }: GetHtmlContentParams) {
     <html lang="en">
       <head>
         <title>Toolpad</title>
+
+        <link
+          rel="stylesheet"
+          href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap"
+        />
       </head>
       <body>
         <div id="root"></div>
@@ -251,7 +256,7 @@ export function createViteConfig({
         'lodash-es',
         'react-router-dom',
         'fractional-indexing',
-        'cuid',
+        'nanoid/non-secure',
         'superjson',
         '@tanstack/react-query-devtools/build/lib/index.prod.js',
         'react-is',

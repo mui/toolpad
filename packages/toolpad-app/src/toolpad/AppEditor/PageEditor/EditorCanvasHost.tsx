@@ -14,7 +14,6 @@ import { useAppStateApi } from '../../AppState';
 import createRuntimeState from '../../../createRuntimeState';
 import type { ToolpadBridge } from '../../../canvas/ToolpadBridge';
 import CenteredSpinner from '../../../components/CenteredSpinner';
-import config from '../../../config';
 
 interface OverlayProps {
   children?: React.ReactNode;
@@ -109,7 +108,7 @@ export default function EditorCanvasHost({
   const [editorOverlayRoot, setEditorOverlayRoot] = React.useState<HTMLElement | null>(null);
 
   const handleKeyDown = useEvent((event: KeyboardEvent) => {
-    const isZ = event.key.toLowerCase() === 'z';
+    const isZ = !!event.key && event.key.toLowerCase() === 'z';
 
     const undoShortcut = isZ && (event.metaKey || event.ctrlKey);
     const redoShortcut = undoShortcut && event.shiftKey;
@@ -123,9 +122,7 @@ export default function EditorCanvasHost({
     }
   });
 
-  const src = config.viteRuntime
-    ? `/preview/pages/${pageNodeId}?toolpad-display=canvas`
-    : `/app-canvas/pages/${pageNodeId}`;
+  const src = `/preview/pages/${pageNodeId}?toolpad-display=canvas`;
 
   const [loading, setLoading] = React.useState(true);
   useOnChange(src, () => setLoading(true));

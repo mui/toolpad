@@ -1,5 +1,28 @@
 # Changelog
 
+## 0.1.8
+
+<!-- generated comparing v0.1.7..master -->
+
+_Apr 26, 2023_
+
+A big thanks to the 4 contributors who made this release possible. Here are some highlights ✨:
+
+Use page name as a routing alias, add a Form component, and replace Next.js API routes with Express under the hood.
+
+- &#8203;<!-- 12 -->Add page name as an alias for routing in the runtime (#1925) @Janpot
+- &#8203;<!-- 11 -->Use correct command for opening vscode (#1931) @Janpot
+- &#8203;<!-- 10 -->Replace next api routes with express (#1920) @Janpot
+- &#8203;<!-- 09 -->Add link to open example in CodeSandbox (#1936) @Janpot
+- &#8203;<!-- 08 -->Fix: Local installation needs new resolution (#1932) @bharatkashyap
+- &#8203;<!-- 07 -->Fix: Use `nanonid/non-secure` instead of `cuid` (#1912) @bharatkashyap
+- &#8203;<!-- 06 -->Form component (#1926) @apedroferreira
+- &#8203;<!-- 05 -->Import correct font in vite runtime (#1924) @Janpot
+- &#8203;<!-- 04 -->Update CONTRIBUTING.md @apedroferreira
+- &#8203;<!-- 03 -->Fix gitignore file creation log message (#1923) @Janpot
+- &#8203;<!-- 02 -->Add utils package for generic non-toolpad utilities (#1915) @Janpot
+- &#8203;<!-- 01 -->[docs] Polish a bit the docs (#1927) @oliviertassinari
+
 ## 0.1.7
 
 <!-- generated comparing v0.1.6..master -->
@@ -348,7 +371,7 @@ _Jan 4, 2023_
 
 A big thanks to the 4 contributors who made this release possible. Here are some highlights ✨:
 
-New date picker component, Make switching views part of undo/redo cycle.
+New Date Picker component, Make switching views part of undo/redo cycle.
 
 - &#8203;<!-- 13 -->Fix dependabot vulnerabilities (#1512) @Janpot
 - &#8203;<!-- 12 -->Don't import from dist folders (#1513) @Janpot
@@ -359,7 +382,7 @@ New date picker component, Make switching views part of undo/redo cycle.
 - &#8203;<!-- 07 -->Datepicker format handling changes (#1504) @bytasv
 - &#8203;<!-- 04 -->Undo/redo through different views (#1417) @apedroferreira
 - &#8203;<!-- 03 -->Make sure npm package is splitted out correctly (#1502) @Janpot
-- &#8203;<!-- 02 -->Date picker component (#1499) @bytasv
+- &#8203;<!-- 02 -->Date Picker component (#1499) @bytasv
 - &#8203;<!-- 01 -->[core] Remove dead prettier config @oliviertassinari
 
 All contributors of this release in alphabetical order: @apedroferreira, @bytasv, @Janpot, @oliviertassinari

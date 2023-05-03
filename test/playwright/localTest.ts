@@ -60,9 +60,11 @@ export async function withApp(
   const { cmd = 'start', template, setup } = options;
 
   const tmpTestDir = await fs.mkdtemp(path.resolve(__dirname, './tmp-'));
-  const projectDir = path.resolve(tmpTestDir, './fixture');
 
   try {
+    const projectDir = path.resolve(tmpTestDir, './fixture');
+    await fs.mkdir(projectDir, { recursive: true });
+
     if (template) {
       await fs.cp(template, projectDir, { recursive: true });
     }
@@ -96,6 +98,7 @@ export async function withApp(
       }
     }
 
+    console.log(args, projectDir);
     const child = childProcess.spawn('toolpad', args, {
       cwd: projectDir,
       stdio: 'pipe',

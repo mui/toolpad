@@ -59,9 +59,12 @@ export async function withApp(
 ) {
   const { cmd = 'start', template, setup } = options;
 
-  const projectDir = await fs.mkdtemp(path.resolve(__dirname, './tmp-'));
+  const tmpTestDir = await fs.mkdtemp(path.resolve(__dirname, './tmp-'));
 
   try {
+    const projectDir = path.resolve(tmpTestDir, './fixture');
+    await fs.mkdir(projectDir, { recursive: true });
+
     if (template) {
       await fs.cp(template, projectDir, { recursive: true });
     }
@@ -127,7 +130,7 @@ export async function withApp(
       child.kill();
     }
   } finally {
-    await fs.rm(projectDir, { recursive: true });
+    await fs.rm(tmpTestDir, { recursive: true });
   }
 }
 

@@ -119,7 +119,7 @@ async function main() {
       const prodHandler = await createProdHandler({
         server: httpServer,
         root: getUserProjectRoot(),
-        base: '/prod',
+        base: '/prod/',
       });
       app.use('/prod', prodHandler);
       break;

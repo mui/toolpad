@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: page
+spec:
+  id: -DidO-4
+  title: Default page
+  content:
+    - component: PageRow
+      name: pageRow
+      children:
+        - component: Button
+          name: button
+    - component: PageRow
+      name: pageRow1
+      children:
+        - component: TextField
+          name: textField

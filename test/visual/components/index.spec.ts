@@ -1,12 +1,12 @@
 import * as path from 'path';
-import { ToolpadEditor } from '../models/ToolpadEditor';
-import { ToolpadRuntime } from '../models/ToolpadRuntime';
-import { test, expect } from '../playwright/localTest';
-import clickCenter from '../utils/clickCenter';
+import { ToolpadEditor } from '../../models/ToolpadEditor';
+import { ToolpadRuntime } from '../../models/ToolpadRuntime';
+import { test, expect } from '../../playwright/localTest';
+import clickCenter from '../../utils/clickCenter';
 
 test.use({
   localAppConfig: {
-    template: path.resolve(__dirname, './fixture-basic'),
+    template: path.resolve(__dirname, './fixture'),
     cmd: 'dev',
   },
 });
@@ -20,7 +20,7 @@ test('rendering components in the app runtime', async ({ page }) => {
 
 test('rendering components in the app editor', async ({ page }) => {
   const editorModel = new ToolpadEditor(page);
-  editorModel.goto();
+  await editorModel.goto();
 
   await expect(page).toHaveScreenshot('no-selection.png');
 

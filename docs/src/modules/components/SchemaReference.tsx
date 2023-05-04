@@ -7,19 +7,30 @@ import { Typography, Divider, styled } from '@mui/material';
 import invariant from 'invariant';
 import { interleave } from '../utils/react';
 
+const classNames = {
+  description: 'jsonschema-description',
+  name: 'jsonschema-name',
+  keyword: 'jsonschema-keyword',
+  constString: 'jsonschema-const-string',
+};
+
 const Wrapper = styled('div')(({ theme }) => ({
-  '& .definition': {
-    display: 'flex',
-    flexDirection: 'row',
-  },
-  '& .definition-term': {
-    flexShrink: 0,
-  },
-  '& .definition-definition': {
-    marginLeft: theme.spacing(1),
-  },
+  fontFamily: 'Menlo,Consolas,"Droid Sans Mono",monospace;',
+  fontSize: '0.8125rem',
   '& .indent': {
     marginLeft: theme.spacing(2),
+  },
+  [`& .${classNames.description}`]: {
+    color: '#b2b2b2',
+  },
+  [`& .${classNames.name}`]: {
+    color: '#ffffff',
+  },
+  [`& .${classNames.constString}`]: {
+    color: '#a6e22e',
+  },
+  [`& .${classNames.keyword}`]: {
+    color: '#66d9ef',
   },
 }));
 
@@ -28,27 +39,133 @@ export interface SchemaReferenceProps {
   definitions: JSONSchema7;
 }
 
+function getConstClass(type: string) {
+  switch (type) {
+    case 'string':
+      return classNames.constString;
+    default:
+      return undefined;
+  }
+}
+
 interface JsonSchemaTypeDisplayProps {
   schema: JSONSchema7;
 }
 
 function JsonSchemaTypeDisplay({ schema }: JsonSchemaTypeDisplayProps) {
   let types: string[] = [];
+  if (typeof schema.const !== 'undefined') {
+    return (
+      <span className={getConstClass(typeof schema.const)}>{JSON.stringify(schema.const)}</span>
+    );
+  }
+
   if (schema.type) {
     types = Array.isArray(schema.type) ? schema.type : [schema.type];
   } else if (!schema.anyOf) {
     types = ['any'];
   }
+
   return (
     <React.Fragment>
-      {types.map((type) => {
-        const typeId = type ?? 'any';
+      {interleave(
+        types.map((type) => (
+          <span key={type} className={classNames.keyword}>
+            {type}
+          </span>
+        )),
+        ' | ',
+      )}
+    </React.Fragment>
+  );
+}
+
+interface JsonSchemaValueDisplayProps {
+  schema: JSONSchema7;
+  idPrefix: string;
+}
+
+function JsonSchemaValueDisplay({ schema, idPrefix }: JsonSchemaValueDisplayProps) {
+  const properties: [string, JSONSchema7Definition][] = [];
+
+  if (schema.properties) {
+    properties.push(...Object.entries(schema.properties));
+  }
+
+  if (schema.additionalProperties) {
+    properties.push(['*', schema.additionalProperties]);
+  }
+
+  if (schema.$ref) {
+    if (schema.$ref.startsWith('#/definitions/')) {
+      const definition = schema.$ref.slice('#/definitions/'.length);
+      if (!definition.includes('/')) {
+        const hash = `definition-${definition}`;
         return (
-          <React.Fragment key={typeId}>
-            <strong>type:</strong> <code>{typeId}</code>
-          </React.Fragment>
+          <a aria-labelledby={hash} className="anchor-link" href={`#${hash}`} tabIndex={-1}>
+            {definition}
+          </a>
         );
-      })}
+      }
+    }
+  }
+
+  return (
+    <React.Fragment>
+      <JsonSchemaTypeDisplay schema={schema} />
+
+      {properties.length > 0 ? (
+        <div>
+          <div className="indent">
+            {interleave(
+              properties.map(([propName, propSchema]) => {
+                return (
+                  <JsonSchemaDisplay
+                    key={propName}
+                    name={propName}
+                    schema={propSchema}
+                    idPrefix={idPrefix}
+                  />
+                );
+              }),
+              <Divider sx={{ m: `8px 0 !important` }} />,
+            )}
+          </div>
+        </div>
+      ) : null}
+
+      {schema.items ? (
+        <div>
+          <strong>Items: </strong>
+
+          {Array.isArray(schema.items) ? (
+            <ul>
+              {schema.items.map((item, i) => (
+                <li key={i}>
+                  <JsonSchemaValueDisplay schema={item} idPrefix={idPrefix} />
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <JsonSchemaValueDisplay schema={schema.items} idPrefix={idPrefix} />
+          )}
+        </div>
+      ) : null}
+
+      {schema.anyOf ? (
+        <React.Fragment>
+          <strong>Must be any of:</strong>
+          <ul>
+            {schema.anyOf.map((subSchema, i) => {
+              return (
+                <li key={i}>
+                  <JsonSchemaValueDisplay schema={subSchema} idPrefix={idPrefix} />
+                </li>
+              );
+            })}
+          </ul>
+        </React.Fragment>
+      ) : null}
     </React.Fragment>
   );
 }
@@ -61,23 +178,6 @@ interface JsonSchemaDisplayProps {
 
 function JsonSchemaDisplay({ name, schema, idPrefix = '' }: JsonSchemaDisplayProps) {
   invariant(typeof schema === 'object', `Expected an object but got ${typeof schema}`);
-
-  if (schema.$ref) {
-    if (schema.$ref.startsWith('#/definitions/')) {
-      const definition = schema.$ref.slice('#/definitions/'.length);
-      if (!definition.includes('/')) {
-        const hash = `definition-${definition}`;
-        return (
-          <div>
-            {name ? <code>{name}</code> : null}
-            <a aria-labelledby={hash} className="anchor-link" href={`#${hash}`} tabIndex={-1}>
-              {definition}
-            </a>
-          </div>
-        );
-      }
-    }
-  }
 
   const properties: [string, JSONSchema7Definition][] = [];
 
@@ -93,76 +193,19 @@ function JsonSchemaDisplay({ name, schema, idPrefix = '' }: JsonSchemaDisplayPro
 
   return (
     <Wrapper>
-      {name ? (
-        <a href={`#${id}`} tabIndex={-1}>
-          <code id={id}>{name}</code>
-        </a>
-      ) : null}
       {schema.description ? (
-        <div className="definition">
-          <div className="definition-term">
-            <strong>Description:</strong>
-          </div>
-          <div className="definition-definition">{schema.description}</div>
-        </div>
+        <div className={classNames.description}>{schema.description}</div>
       ) : null}
-
-      <JsonSchemaTypeDisplay schema={schema} />
-
-      {properties.length > 0 ? (
-        <div>
-          <strong>Properties:</strong>
-          <div className="indent">
-            {interleave(
-              properties.map(([propName, propSchema]) => {
-                return (
-                  <JsonSchemaDisplay
-                    key={propName}
-                    name={propName}
-                    schema={propSchema}
-                    idPrefix={id}
-                  />
-                );
-              }),
-              <Divider sx={{ m: `8px 0 !important` }} />,
-            )}
-          </div>
-        </div>
-      ) : null}
-
-      {schema.items ? (
-        <div>
-          <strong>Items:</strong>
-          <div className="indent">
-            {Array.isArray(schema.items) ? (
-              <ul>
-                {schema.items.map((item, i) => (
-                  <li key={i}>
-                    <JsonSchemaDisplay schema={item} idPrefix={id} />
-                  </li>
-                ))}
-              </ul>
-            ) : (
-              <JsonSchemaDisplay schema={schema.items} idPrefix={id} />
-            )}
-          </div>
-        </div>
-      ) : null}
-
-      {schema.anyOf ? (
+      {name ? (
         <React.Fragment>
-          <strong>Must be any of:</strong>
-          <ul>
-            {schema.anyOf.map((subSchema, i) => {
-              return (
-                <li key={i}>
-                  <JsonSchemaDisplay schema={subSchema} idPrefix={id} />
-                </li>
-              );
-            })}
-          </ul>
+          <a href={`#${id}`} tabIndex={-1} className={classNames.name}>
+            <span id={id}>{name}</span>
+          </a>
+          :{' '}
         </React.Fragment>
       ) : null}
+
+      <JsonSchemaValueDisplay schema={schema} idPrefix={id} />
     </Wrapper>
   );
 }

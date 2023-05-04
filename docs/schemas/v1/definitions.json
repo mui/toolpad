@@ -30,7 +30,6 @@
               "items": {
                 "$ref": "#/definitions/NameStringValuePair"
               },
-              "default": [],
               "description": "Parameters for the page. These can be set inside of the url query string."
             },
             "queries": {
@@ -303,7 +302,6 @@
                 ],
                 "additionalProperties": false
               },
-              "default": [],
               "description": "Queries that are used by the page. These will load data when the page opens."
             },
             "content": {
@@ -311,7 +309,6 @@
               "items": {
                 "$ref": "#/definitions/Element"
               },
-              "default": [],
               "description": "The content of the page. This defines the UI."
             },
             "display": {
@@ -320,7 +317,6 @@
                 "standalone",
                 "shell"
               ],
-              "default": "shell",
               "description": "Display mode of the page. This can also be set at runtime with the toolpad-display query parameter"
             }
           },
@@ -521,7 +517,7 @@
             },
             "verticalAlign": {
               "type": "string",
-              "description": "lays out the element along the verical axis."
+              "description": "Lays out the element along the vertical axis."
             },
             "columnSize": {
               "type": "number",

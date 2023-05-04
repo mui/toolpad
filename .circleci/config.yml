@@ -128,11 +128,10 @@ jobs:
           name: '`yarn prettier` changes committed?'
           command: yarn prettier --check
       - run:
-          name: Generate json schema
-          command: yarn generateJsonSchemas
-      - run:
-          name: '`yarn generateJsonSchemas` changes commited?'
-          command: yarn prettier --check
+          name: '`yarn jsonSchemas` changes committed?'
+          command: |
+            yarn jsonSchemas
+            git diff --exit-code
 
   test_unit:
     <<: *defaults

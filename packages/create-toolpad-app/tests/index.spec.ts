@@ -8,12 +8,14 @@ jest.setTimeout(60000);
 
 const currentDirectory = url.fileURLToPath(new URL('.', import.meta.url));
 
+const cliPath = path.resolve(currentDirectory, '../dist/index.js');
+
 let testDir: string | undefined;
 let cp: ExecaChildProcess<string> | undefined;
 
 it('start', async () => {
   testDir = await fs.mkdtemp(path.resolve(currentDirectory, './test-app-'));
-  cp = execa('create-toolpad-app', [path.basename(testDir)], {
+  cp = execa(cliPath, [path.basename(testDir)], {
     cwd: currentDirectory,
   });
   const result = await cp;

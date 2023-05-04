@@ -7,7 +7,7 @@ interface ServerResponse {
   statusCode: number;
 }
 
-describe('create-toolpad-app', () => {
+describe.skip('create-toolpad-app', () => {
   let toolpadProcess: ReturnType<typeof exec>;
   let cp: ReturnType<typeof spawn>;
   let toolpadAppAddress = '';

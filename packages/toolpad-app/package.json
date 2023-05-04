@@ -29,11 +29,6 @@
     "./cli": {
       "require": "./dist/cli/index.js"
     },
-    "./schema": {
-      "types": "./dist/schema/index.d.ts",
-      "import": "./dist/schema/index.mjs",
-      "require": "./dist/schema/index.js"
-    },
     "./runtime": {
       "types": "./dist/runtime/index.d.ts",
       "import": "./dist/runtime/index.mjs",

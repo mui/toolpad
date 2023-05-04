@@ -30,21 +30,6 @@ export default defineConfig([
     },
   },
   {
-    entry: {
-      index: 'src/server/schema.ts',
-    },
-    format: ['esm', 'cjs'],
-    outDir: 'dist/schema',
-    silent: true,
-    clean: true,
-    sourcemap: true,
-    dts: true,
-    async onSuccess() {
-      // eslint-disable-next-line no-console
-      console.log('schema: build successful');
-    },
-  },
-  {
     entry: ['./reactDevtools/bootstrap.ts'],
     silent: true,
     outDir: './public/reactDevtools',

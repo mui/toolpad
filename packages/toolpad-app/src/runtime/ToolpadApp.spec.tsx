@@ -2,12 +2,15 @@ import * as React from 'react';
 import { render, waitFor as waitForOrig, screen, fireEvent, act } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { LiveBindings, RuntimeEvents } from '@mui/toolpad-core';
+import failOnConsole from 'jest-fail-on-console';
 import ToolpadApp from './ToolpadApp';
 import * as appDom from '../appDom';
 import createRuntimeState from '../createRuntimeState';
 import { bridge } from '../canvas/ToolpadBridge';
 import { BridgeContext } from '../canvas/BridgeContext';
 import loadComponents from './loadDomComponents';
+
+failOnConsole();
 
 // More sensible default for these tests
 const waitFor: typeof waitForOrig = (waiter, options) =>
@@ -97,7 +100,7 @@ test(`simple databinding`, async () => {
   const text = screen.getByText('Default Text');
   const textField = screen.getByLabelText('The Input');
 
-  act(() => {
+  await act(async () => {
     textField.focus();
     fireEvent.change(textField, { target: { value: 'Hello Everybody' } });
   });

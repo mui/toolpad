@@ -127,6 +127,12 @@ jobs:
       - run:
           name: '`yarn prettier` changes committed?'
           command: yarn prettier --check
+      - run:
+          name: Generate json schema
+          command: yarn generateJsonSchemas
+      - run:
+          name: '`yarn generateJsonSchemas` changes commited?'
+          command: yarn prettier --check
 
   test_unit:
     <<: *defaults

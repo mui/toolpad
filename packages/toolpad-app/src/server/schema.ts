@@ -205,7 +205,10 @@ const baseElementSchema = z.object({
         .string()
         .optional()
         .describe('Lays out the element along the horizontal axis.'),
-      verticalAlign: z.string().optional().describe('lays out the element along the verical axis.'),
+      verticalAlign: z
+        .string()
+        .optional()
+        .describe('Lays out the element along the vertical axis.'),
       columnSize: z
         .number()
         .optional()

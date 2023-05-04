@@ -3,9 +3,25 @@ import MarkdownElement from '@mui/monorepo/docs/src/modules/components/MarkdownE
 import AppLayoutDocs from '@mui/monorepo/docs/src/modules/components/AppLayoutDocs';
 import Ad from '@mui/monorepo/docs/src/modules/components/Ad';
 import { JSONSchema7, JSONSchema7Definition } from 'json-schema';
-import { Typography, Box, Divider } from '@mui/material';
+import { Typography, Divider, styled } from '@mui/material';
 import invariant from 'invariant';
 import { interleave } from '../utils/react';
+
+const Wrapper = styled('div')(({ theme }) => ({
+  '& .definition': {
+    display: 'flex',
+    flexDirection: 'row',
+  },
+  '& .definition-term': {
+    flexShrink: 0,
+  },
+  '& .definition-definition': {
+    marginLeft: theme.spacing(1),
+  },
+  '& .indent': {
+    marginLeft: theme.spacing(2),
+  },
+}));
 
 export interface SchemaReferenceProps {
   disableAd?: boolean;
@@ -76,21 +92,19 @@ function JsonSchemaDisplay({ name, schema, idPrefix = '' }: JsonSchemaDisplayPro
   const id = `${idPrefix}-${name || ''}`;
 
   return (
-    <div>
+    <Wrapper>
       {name ? (
-        <Box sx={{ flexShrink: 0 }}>
-          <a href={`#${id}`} tabIndex={-1}>
-            <code id={id}>{name}</code>
-          </a>
-        </Box>
+        <a href={`#${id}`} tabIndex={-1}>
+          <code id={id}>{name}</code>
+        </a>
       ) : null}
       {schema.description ? (
-        <Box sx={{ display: 'flex', flexDirection: 'row' }}>
-          <Box component="strong" sx={{ flexShrink: 0 }}>
-            Description:
-          </Box>
-          <Box sx={{ ml: 1 }}>{schema.description}</Box>
-        </Box>
+        <div className="definition">
+          <div className="definition-term">
+            <strong>Description:</strong>
+          </div>
+          <div className="definition-definition">{schema.description}</div>
+        </div>
       ) : null}
 
       <JsonSchemaTypeDisplay schema={schema} />
@@ -98,7 +112,7 @@ function JsonSchemaDisplay({ name, schema, idPrefix = '' }: JsonSchemaDisplayPro
       {properties.length > 0 ? (
         <div>
           <strong>Properties:</strong>
-          <Box sx={{ ml: 2 }}>
+          <div className="indent">
             {interleave(
               properties.map(([propName, propSchema]) => {
                 return (
@@ -112,14 +126,14 @@ function JsonSchemaDisplay({ name, schema, idPrefix = '' }: JsonSchemaDisplayPro
               }),
               <Divider sx={{ m: `8px 0 !important` }} />,
             )}
-          </Box>
+          </div>
         </div>
       ) : null}
 
       {schema.items ? (
         <div>
           <strong>Items:</strong>
-          <Box sx={{ ml: 2 }}>
+          <div className="indent">
             {Array.isArray(schema.items) ? (
               <ul>
                 {schema.items.map((item, i) => (
@@ -131,7 +145,7 @@ function JsonSchemaDisplay({ name, schema, idPrefix = '' }: JsonSchemaDisplayPro
             ) : (
               <JsonSchemaDisplay schema={schema.items} idPrefix={id} />
             )}
-          </Box>
+          </div>
         </div>
       ) : null}
 
@@ -149,7 +163,7 @@ function JsonSchemaDisplay({ name, schema, idPrefix = '' }: JsonSchemaDisplayPro
           </ul>
         </React.Fragment>
       ) : null}
-    </div>
+    </Wrapper>
   );
 }
 
@@ -241,6 +255,11 @@ export default function SchemaReference({ disableAd, definitions }: SchemaRefere
           );
         })}
       </MarkdownElement>
+      <svg style={{ display: 'none' }} xmlns="http://www.w3.org/2000/svg">
+        <symbol id="anchor-link-icon" viewBox="0 0 16 16">
+          <path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z" />
+        </symbol>
+      </svg>
     </AppLayoutDocs>
   );
 }

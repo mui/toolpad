@@ -5,7 +5,6 @@ import Ad from '@mui/monorepo/docs/src/modules/components/Ad';
 import { JSONSchema7, JSONSchema7Definition } from 'json-schema';
 import { Typography, styled } from '@mui/material';
 import invariant from 'invariant';
-import clsx from 'clsx';
 import { interleave } from '../utils/react';
 
 const classNames = {

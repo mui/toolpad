@@ -35,7 +35,6 @@
     "prebuild": "rimraf dist",
     "build": "tsup",
     "dev": "tsup --watch",
-    "test": "echo \"Error: run tests from root\" && exit 1",
     "check-types": "yarn build"
   },
   "bugs": {

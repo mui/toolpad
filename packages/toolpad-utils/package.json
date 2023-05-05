@@ -42,13 +42,13 @@
     "url": "https://github.com/mui/mui-toolpad/issues"
   },
   "peerDependencies": {
-    "react": "^18.0.0"
+    "react": "18.0.0"
   },
   "publishConfig": {
     "access": "public"
   },
   "gitHead": "28308edc7bd61700e63b44e6ff5ff1508d1f2a8b",
   "dependencies": {
-    "react-is": "^18.2.0"
+    "react-is": "18.2.0"
   }
 }

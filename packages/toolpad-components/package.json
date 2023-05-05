@@ -40,18 +40,18 @@
     "url": "https://github.com/mui/mui-toolpad/issues"
   },
   "dependencies": {
-    "@mui/lab": "^5.0.0-alpha.129",
-    "@mui/material": "^5.12.3",
-    "@mui/toolpad-core": "^0.1.10",
-    "@mui/toolpad-utils": "^0.1.10",
-    "@mui/x-data-grid-pro": "^6.3.0",
-    "@mui/x-date-pickers": "^6.3.0",
-    "dayjs": "^1.11.7",
-    "markdown-to-jsx": "^7.2.0",
-    "react-error-boundary": "^4.0.4"
+    "@mui/lab": "5.0.0-alpha.129",
+    "@mui/material": "5.12.3",
+    "@mui/toolpad-core": "0.1.10",
+    "@mui/toolpad-utils": "0.1.10",
+    "@mui/x-data-grid-pro": "6.3.1",
+    "@mui/x-date-pickers": "6.3.1",
+    "dayjs": "1.11.7",
+    "markdown-to-jsx": "7.2.0",
+    "react-error-boundary": "4.0.4"
   },
   "devDependencies": {
-    "react": "^18.2.0"
+    "react": "18.2.0"
   },
   "peerDependencies": {
     "react": "^18.0.0"

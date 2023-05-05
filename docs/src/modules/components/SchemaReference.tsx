@@ -22,6 +22,17 @@ const Wrapper = styled('div')(({ theme }) => ({
   },
   [`& .${classNames.description}`]: {
     color: '#b2b2b2',
+    position: 'relative',
+    paddingLeft: '2em',
+    overflow: 'hidden',
+  },
+  [`& .${classNames.description}:before`]: {
+    content:
+      '"//\\a//\\a//\\a//\\a//\\a//\\a//\\a//\\a//\\a//\\a//\\a//\\a//\\a//\\a//\\a//\\a//\\a//\\a//\\a"',
+    whiteSpace: 'pre',
+    position: 'absolute',
+    left: 0,
+    top: 0,
   },
   [`& .${classNames.name}`]: {
     color: '#ffffff',
@@ -31,6 +42,10 @@ const Wrapper = styled('div')(({ theme }) => ({
   },
   [`& .${classNames.keyword}`]: {
     color: '#66d9ef',
+  },
+  '& ul': {
+    listStyle: 'disc',
+    listStylePosition: 'inside',
   },
 }));
 

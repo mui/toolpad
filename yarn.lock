@@ -9580,7 +9580,7 @@ next-transpile-modules@^10.0.0:
   dependencies:
     enhanced-resolve "^5.10.0"
 
-next@13.3.2, next@^13.3.2:
+next@13.3.2:
   version "13.3.2"
   resolved "https://registry.yarnpkg.com/next/-/next-13.3.2.tgz#3409425593410571aa835867865b6db9c3fddd68"
   integrity sha512-82VuWoMGWFqGUwCEWcqkIhGgdRry+VKVBZ9KNte1Uk2byZKvPZrC5c62fYHrIhSf36YKY6m21hxdyDzn6MDHFA==

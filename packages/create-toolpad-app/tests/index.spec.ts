@@ -13,7 +13,7 @@ const cliPath = path.resolve(currentDirectory, '../dist/index.js');
 let testDir: string | undefined;
 let cp: ExecaChildProcess<string> | undefined;
 
-it('start', async () => {
+test('create-toolpad-app can bootstrap a Toolpad app', async () => {
   testDir = await fs.mkdtemp(path.resolve(currentDirectory, './test-app-'));
   cp = execa(cliPath, [path.basename(testDir)], {
     cwd: currentDirectory,

@@ -11,6 +11,8 @@ const classNames = {
   description: 'jsonschema-description',
   name: 'jsonschema-name',
   keyword: 'jsonschema-keyword',
+  comment: 'jsonschema-comment',
+  objectLabel: 'jsonschema-object-label',
   constString: 'jsonschema-const-string',
 };
 
@@ -18,17 +20,24 @@ const Wrapper = styled('div')(({ theme }) => ({
   fontFamily: 'Menlo,Consolas,"Droid Sans Mono",monospace;',
   fontSize: '0.8125rem',
   '& .indent': {
-    marginLeft: theme.spacing(2),
+    marginLeft: '2ch',
+  },
+  [`& .${classNames.objectLabel}`]: {
+    fontFamily: theme.typography.fontFamily,
+    color: '#b2b2b2',
+  },
+  [`& .${classNames.comment}`]: {
+    color: '#b2b2b2',
   },
   [`& .${classNames.description}`]: {
+    fontFamily: theme.typography.fontFamily,
     color: '#b2b2b2',
     position: 'relative',
-    paddingLeft: '2em',
+    // paddingLeft: '1em',
     overflow: 'hidden',
   },
   [`& .${classNames.description}:before`]: {
-    content:
-      '"//\\a//\\a//\\a//\\a//\\a//\\a//\\a//\\a//\\a//\\a//\\a//\\a//\\a//\\a//\\a//\\a//\\a//\\a//\\a"',
+    // content: '"#\\a#\\a#\\a#\\a#\\a#\\a#\\a#\\a#\\a#\\a#\\a#\\a#\\a#\\a#\\a#\\a#\\a#\\a#\\a"',
     whiteSpace: 'pre',
     position: 'absolute',
     left: 0,
@@ -45,7 +54,7 @@ const Wrapper = styled('div')(({ theme }) => ({
   },
   '& ul': {
     listStyle: 'disc',
-    listStylePosition: 'inside',
+    paddingLeft: '3ch',
   },
 }));
 
@@ -75,6 +84,18 @@ function JsonSchemaTypeDisplay({ schema }: JsonSchemaTypeDisplayProps) {
     );
   }
 
+  if (schema.type === 'object') {
+    return <span className={classNames.objectLabel}>object </span>;
+  }
+
+  if (schema.type === 'array') {
+    return <span className={classNames.objectLabel}>array of </span>;
+  }
+
+  if (schema.anyOf) {
+    return <span className={classNames.objectLabel}>any of </span>;
+  }
+
   if (schema.type) {
     types = Array.isArray(schema.type) ? schema.type : [schema.type];
   } else if (!schema.anyOf) {
@@ -93,6 +114,41 @@ function JsonSchemaTypeDisplay({ schema }: JsonSchemaTypeDisplayProps) {
       )}
     </React.Fragment>
   );
+}
+
+interface JsonSchemaItemDisplayProps {
+  schema?: JSONSchema7Definition;
+  idPrefix: string;
+}
+
+function JsonSchemaItemDisplay({ schema, idPrefix }: JsonSchemaItemDisplayProps) {
+  if (!schema || typeof schema === 'boolean') {
+    return null;
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-use-before-define
+  return <JsonSchemaValueDisplay schema={schema} idPrefix={idPrefix} />;
+}
+
+interface JsonSchemaItemsDisplayProps {
+  schema: JSONSchema7;
+  idPrefix: string;
+}
+
+function JsonSchemaItemsDisplay({ schema, idPrefix }: JsonSchemaItemsDisplayProps) {
+  if (Array.isArray(schema.items)) {
+    return (
+      <ul>
+        {schema.items.map((item, i) => (
+          <li key={i}>
+            <JsonSchemaItemDisplay schema={item} idPrefix={idPrefix} />
+          </li>
+        ))}
+      </ul>
+    );
+  }
+
+  return <JsonSchemaItemDisplay schema={schema.items} idPrefix={idPrefix} />;
 }
 
 interface JsonSchemaValueDisplayProps {
@@ -130,56 +186,36 @@ function JsonSchemaValueDisplay({ schema, idPrefix }: JsonSchemaValueDisplayProp
       <JsonSchemaTypeDisplay schema={schema} />
 
       {properties.length > 0 ? (
-        <div>
-          <div className="indent">
-            {interleave(
-              properties.map(([propName, propSchema]) => {
-                return (
-                  <JsonSchemaDisplay
-                    key={propName}
-                    name={propName}
-                    schema={propSchema}
-                    idPrefix={idPrefix}
-                  />
-                );
-              }),
-              <Divider sx={{ m: `8px 0 !important` }} />,
-            )}
-          </div>
-        </div>
-      ) : null}
-
-      {schema.items ? (
-        <div>
-          <strong>Items: </strong>
-
-          {Array.isArray(schema.items) ? (
-            <ul>
-              {schema.items.map((item, i) => (
-                <li key={i}>
-                  <JsonSchemaValueDisplay schema={item} idPrefix={idPrefix} />
-                </li>
-              ))}
-            </ul>
-          ) : (
-            <JsonSchemaValueDisplay schema={schema.items} idPrefix={idPrefix} />
+        <div className="indent">
+          {interleave(
+            properties.map(([propName, propSchema]) => {
+              return (
+                // eslint-disable-next-line @typescript-eslint/no-use-before-define
+                <JsonSchemaDisplay
+                  key={propName}
+                  name={propName}
+                  schema={propSchema}
+                  idPrefix={idPrefix}
+                />
+              );
+            }),
+            <Divider sx={{ m: `8px 0 !important` }} />,
           )}
         </div>
       ) : null}
 
+      {schema.items ? <JsonSchemaItemsDisplay schema={schema} idPrefix={idPrefix} /> : null}
+
       {schema.anyOf ? (
-        <React.Fragment>
-          <strong>Must be any of:</strong>
-          <ul>
-            {schema.anyOf.map((subSchema, i) => {
-              return (
-                <li key={i}>
-                  <JsonSchemaValueDisplay schema={subSchema} idPrefix={idPrefix} />
-                </li>
-              );
-            })}
-          </ul>
-        </React.Fragment>
+        <ul>
+          {schema.anyOf.map((subSchema, i) => {
+            return (
+              <li key={i}>
+                <JsonSchemaItemDisplay schema={subSchema} idPrefix={idPrefix} />
+              </li>
+            );
+          })}
+        </ul>
       ) : null}
     </React.Fragment>
   );

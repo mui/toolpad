@@ -31,7 +31,7 @@
 
 1. Prepend the changelog to [`CHANGELOG.md`](./CHANGELOG.md).
 
-1. Open a PR to the `master` branch with the proposed changes. Merge the changes.
+1. Open a PR to the `master` branch with the proposed changes. Add the "release" label.
 
 1. Publish the package to `npm`
 
@@ -64,6 +64,8 @@
       ```sh
       yarn release:publish-canary
       ```
+
+1. Merge the changes.
 
 1. Publish the documentation. The documentation must be updated on the `docs-latest` branch.
 

@@ -3,8 +3,9 @@ import MarkdownElement from '@mui/monorepo/docs/src/modules/components/MarkdownE
 import AppLayoutDocs from '@mui/monorepo/docs/src/modules/components/AppLayoutDocs';
 import Ad from '@mui/monorepo/docs/src/modules/components/Ad';
 import { JSONSchema7, JSONSchema7Definition } from 'json-schema';
-import { Typography, Divider, styled } from '@mui/material';
+import { Typography, styled } from '@mui/material';
 import invariant from 'invariant';
+import clsx from 'clsx';
 import { interleave } from '../utils/react';
 
 const classNames = {
@@ -12,6 +13,7 @@ const classNames = {
   name: 'jsonschema-name',
   keyword: 'jsonschema-keyword',
   comment: 'jsonschema-comment',
+  divider: 'jsonschema-divider',
   objectLabel: 'jsonschema-object-label',
   constString: 'jsonschema-const-string',
 };
@@ -19,7 +21,8 @@ const classNames = {
 const Wrapper = styled('div')(({ theme }) => ({
   fontFamily: 'Menlo,Consolas,"Droid Sans Mono",monospace;',
   backgroundColor: 'rgb(0, 30, 60)',
-  padding: theme.spacing(1),
+  color: 'rgb(255, 255, 255)',
+  padding: theme.spacing(2),
   borderRadius: theme.shape.borderRadius,
   fontSize: '0.8125rem',
   '& .indent': {
@@ -35,16 +38,6 @@ const Wrapper = styled('div')(({ theme }) => ({
   [`& .${classNames.description}`]: {
     fontFamily: theme.typography.fontFamily,
     color: '#b2b2b2',
-    position: 'relative',
-    // paddingLeft: '1em',
-    overflow: 'hidden',
-  },
-  [`& .${classNames.description}:before`]: {
-    // content: '"#\\a#\\a#\\a#\\a#\\a#\\a#\\a#\\a#\\a#\\a#\\a#\\a#\\a#\\a#\\a#\\a#\\a#\\a#\\a"',
-    whiteSpace: 'pre',
-    position: 'absolute',
-    left: 0,
-    top: 0,
   },
   [`& .${classNames.name}`]: {
     color: '#ffffff',
@@ -57,7 +50,15 @@ const Wrapper = styled('div')(({ theme }) => ({
   },
   '& ul': {
     listStyle: 'disc',
+    color: '#B2BAC2',
     paddingLeft: '3ch',
+  },
+  [`& .${classNames.divider}`]: {
+    backgroundColor: 'rgba(194, 224, 255, 0.08)',
+    margin: theme.spacing(1, 0),
+  },
+  '& a': {
+    color: '#66B2FF',
   },
 }));
 
@@ -154,12 +155,12 @@ function JsonSchemaItemsDisplay({ schema, idPrefix }: JsonSchemaItemsDisplayProp
   return <JsonSchemaItemDisplay schema={schema.items} idPrefix={idPrefix} />;
 }
 
-interface JsonSchemaValueDisplayProps {
+interface JsonSchemaPropertiesDisplayProps {
   schema: JSONSchema7;
   idPrefix: string;
 }
 
-function JsonSchemaValueDisplay({ schema, idPrefix }: JsonSchemaValueDisplayProps) {
+function JsonSchemaPropertiesDisplay({ schema, idPrefix }: JsonSchemaPropertiesDisplayProps) {
   const properties: [string, JSONSchema7Definition][] = [];
 
   if (schema.properties) {
@@ -170,6 +171,32 @@ function JsonSchemaValueDisplay({ schema, idPrefix }: JsonSchemaValueDisplayProp
     properties.push(['*', schema.additionalProperties]);
   }
 
+  return properties.length > 0 ? (
+    <div className="indent">
+      {interleave(
+        properties.map(([propName, propSchema]) => {
+          return (
+            // eslint-disable-next-line @typescript-eslint/no-use-before-define
+            <JsonSchemaNameValueDisplay
+              key={propName}
+              name={propName}
+              schema={propSchema}
+              idPrefix={idPrefix}
+            />
+          );
+        }),
+        <hr className={classNames.divider} />,
+      )}
+    </div>
+  ) : null;
+}
+
+interface JsonSchemaValueDisplayProps {
+  schema: JSONSchema7;
+  idPrefix: string;
+}
+
+function JsonSchemaValueDisplay({ schema, idPrefix }: JsonSchemaValueDisplayProps) {
   if (schema.$ref) {
     if (schema.$ref.startsWith('#/definitions/')) {
       const definition = schema.$ref.slice('#/definitions/'.length);
@@ -188,24 +215,7 @@ function JsonSchemaValueDisplay({ schema, idPrefix }: JsonSchemaValueDisplayProp
     <React.Fragment>
       <JsonSchemaTypeDisplay schema={schema} />
 
-      {properties.length > 0 ? (
-        <div className="indent">
-          {interleave(
-            properties.map(([propName, propSchema]) => {
-              return (
-                // eslint-disable-next-line @typescript-eslint/no-use-before-define
-                <JsonSchemaNameValueDisplay
-                  key={propName}
-                  name={propName}
-                  schema={propSchema}
-                  idPrefix={idPrefix}
-                />
-              );
-            }),
-            <Divider sx={{ m: `8px 0 !important` }} />,
-          )}
-        </div>
-      ) : null}
+      <JsonSchemaPropertiesDisplay schema={schema} idPrefix={idPrefix} />
 
       {schema.items ? <JsonSchemaItemsDisplay schema={schema} idPrefix={idPrefix} /> : null}
 
@@ -250,7 +260,7 @@ function JsonSchemaNameValueDisplay({
   const id = `${idPrefix}-${name || ''}`;
 
   return (
-    <Wrapper>
+    <React.Fragment>
       {schema.description ? (
         <div className={classNames.description}>{schema.description}</div>
       ) : null}
@@ -264,21 +274,7 @@ function JsonSchemaNameValueDisplay({
       ) : null}
 
       <JsonSchemaValueDisplay schema={schema} idPrefix={id} />
-    </Wrapper>
-  );
-}
-
-interface JsonSchemaDisplayProps {
-  name?: string;
-  schema: JSONSchema7Definition;
-  idPrefix?: string;
-}
-
-function JsonSchemaDisplay({ name, schema, idPrefix = '' }: JsonSchemaDisplayProps) {
-  return (
-    <Wrapper>
-      <JsonSchemaNameValueDisplay name={name} schema={schema} idPrefix={idPrefix} />
-    </Wrapper>
+    </React.Fragment>
   );
 }
 
@@ -298,6 +294,25 @@ function Heading({ hash, level: Level, title }: HeadingProps) {
         </svg>
       </a>
     </Level>
+  );
+}
+
+interface JsonSchemaDisplayProps {
+  name: string;
+  hash: string;
+  schema: JSONSchema7;
+  idPrefix?: string;
+}
+
+function JsonSchemaDisplay({ name, hash, schema, idPrefix = '' }: JsonSchemaDisplayProps) {
+  return (
+    <React.Fragment>
+      <Heading hash={hash} level="h3" title={name} />
+      <Typography>{schema.description}</Typography>
+      <Wrapper>
+        <JsonSchemaValueDisplay schema={schema} idPrefix={idPrefix} />
+      </Wrapper>
+    </React.Fragment>
   );
 }
 
@@ -359,11 +374,15 @@ export default function SchemaReference({ disableAd, definitions }: SchemaRefere
               <Typography>{tocNode.introduction}</Typography>
 
               {tocNode.children.map((tocItemNode) => {
+                invariant(typeof tocItemNode.content !== 'boolean', 'Invalid top level schema');
                 return (
-                  <React.Fragment key={tocItemNode.hash}>
-                    <Heading hash={tocItemNode.hash} level="h3" title={tocItemNode.text} />
-                    <JsonSchemaDisplay schema={tocItemNode.content} idPrefix={tocItemNode.hash} />
-                  </React.Fragment>
+                  <JsonSchemaDisplay
+                    key={tocItemNode.hash}
+                    hash={tocItemNode.hash}
+                    name={tocItemNode.text}
+                    schema={tocItemNode.content}
+                    idPrefix={tocItemNode.hash}
+                  />
                 );
               })}
             </React.Fragment>

@@ -951,7 +951,7 @@
   resolved "https://registry.yarnpkg.com/@istanbuljs/schema/-/schema-0.1.3.tgz#e45e384e4b8ec16bce2fd903af78450f6bf7ec98"
   integrity sha512-ZXRY4jNvVgSVQ8DL3LTcakaAtXwTVUxE81hslsyD2AtoXW/wVob10HkOJ1X/pAlcI7D+2YoZKg5do8G/w6RYgA==
 
-"@janpotoms/zod-to-json-schema@^3.20.6":
+"@janpotoms/zod-to-json-schema@3.20.6":
   version "3.20.6"
   resolved "https://registry.yarnpkg.com/@janpotoms/zod-to-json-schema/-/zod-to-json-schema-3.20.6.tgz#34d25c7ab9f0b8542e3ab638ea8462f058c704c3"
   integrity sha512-yihciwsbkBsz0RG+npScYHc6wSt+q+JlW3KdlEsgG3YJOZp0qu1zQGUgxgzIe/2tV5VmqtArWSnJ/siRhPC0PQ==
@@ -2557,7 +2557,7 @@
     "@types/tough-cookie" "*"
     parse5 "^7.0.0"
 
-"@types/json-schema@*", "@types/json-schema@^7.0.11", "@types/json-schema@^7.0.4", "@types/json-schema@^7.0.5", "@types/json-schema@^7.0.8", "@types/json-schema@^7.0.9":
+"@types/json-schema@*", "@types/json-schema@7.0.11", "@types/json-schema@^7.0.4", "@types/json-schema@^7.0.5", "@types/json-schema@^7.0.8", "@types/json-schema@^7.0.9":
   version "7.0.11"
   resolved "https://registry.yarnpkg.com/@types/json-schema/-/json-schema-7.0.11.tgz#d421b6c527a3037f7c84433fd2c4229e016863d3"
   integrity sha512-wOuvG1SN4Us4rez+tylwwwCV1psiNVOkJeM3AUWUNWg/jDQY2+HE/444y5gc+jBmRqASOm2Oeh5c1axHobwRKQ==

@@ -18,6 +18,9 @@ const classNames = {
 
 const Wrapper = styled('div')(({ theme }) => ({
   fontFamily: 'Menlo,Consolas,"Droid Sans Mono",monospace;',
+  backgroundColor: 'rgb(0, 30, 60)',
+  padding: theme.spacing(1),
+  borderRadius: theme.shape.borderRadius,
   fontSize: '0.8125rem',
   '& .indent': {
     marginLeft: '2ch',
@@ -191,7 +194,7 @@ function JsonSchemaValueDisplay({ schema, idPrefix }: JsonSchemaValueDisplayProp
             properties.map(([propName, propSchema]) => {
               return (
                 // eslint-disable-next-line @typescript-eslint/no-use-before-define
-                <JsonSchemaDisplay
+                <JsonSchemaNameValueDisplay
                   key={propName}
                   name={propName}
                   schema={propSchema}
@@ -221,13 +224,17 @@ function JsonSchemaValueDisplay({ schema, idPrefix }: JsonSchemaValueDisplayProp
   );
 }
 
-interface JsonSchemaDisplayProps {
+interface JsonSchemaNameValueDisplayProps {
   name?: string;
   schema: JSONSchema7Definition;
   idPrefix?: string;
 }
 
-function JsonSchemaDisplay({ name, schema, idPrefix = '' }: JsonSchemaDisplayProps) {
+function JsonSchemaNameValueDisplay({
+  name,
+  schema,
+  idPrefix = '',
+}: JsonSchemaNameValueDisplayProps) {
   invariant(typeof schema === 'object', `Expected an object but got ${typeof schema}`);
 
   const properties: [string, JSONSchema7Definition][] = [];
@@ -257,6 +264,20 @@ function JsonSchemaDisplay({ name, schema, idPrefix = '' }: JsonSchemaDisplayPro
       ) : null}
 
       <JsonSchemaValueDisplay schema={schema} idPrefix={id} />
+    </Wrapper>
+  );
+}
+
+interface JsonSchemaDisplayProps {
+  name?: string;
+  schema: JSONSchema7Definition;
+  idPrefix?: string;
+}
+
+function JsonSchemaDisplay({ name, schema, idPrefix = '' }: JsonSchemaDisplayProps) {
+  return (
+    <Wrapper>
+      <JsonSchemaNameValueDisplay name={name} schema={schema} idPrefix={idPrefix} />
     </Wrapper>
   );
 }

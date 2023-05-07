@@ -58,6 +58,10 @@
       "allowedVersions": "< 3.0.0"
     },
     {
+      "groupName": "Next.js",
+      "matchPackageNames": ["next"]
+    },
+    {
       "groupName": "react-router",
       "matchPackageNames": ["react-router", "react-router-dom"],
       "allowedVersions": "< 6.4.0"

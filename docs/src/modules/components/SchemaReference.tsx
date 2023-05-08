@@ -340,8 +340,8 @@ function JsonSchemaNameValueDisplay({
       <JsonDescriptionDisplay schema={schema} />
       {name ? (
         <React.Fragment>
-          <a href={`#${id}`} tabIndex={-1} className={classNames.name}>
-            <span id={anchor}>{name}</span>
+          <a id={anchor} href={`#${id}`} tabIndex={-1} className={classNames.name}>
+            {name}
           </a>
           :{' '}
         </React.Fragment>

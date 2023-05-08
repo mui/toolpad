@@ -1,5 +1,5 @@
-import React from "react";
-import { createComponent } from "@mui/toolpad-core";
+import React from 'react';
+import { createComponent } from '@mui/toolpad/browser';
 import {
   XYPlot,
   XAxis,
@@ -8,8 +8,8 @@ import {
   HorizontalGridLines,
   VerticalBarSeries,
   makeWidthFlexible,
-} from "https://cdn.skypack.dev/react-vis";
-import prettyMs from "https://cdn.skypack.dev/pretty-ms";
+} from 'https://cdn.skypack.dev/react-vis';
+import prettyMs from 'https://cdn.skypack.dev/pretty-ms';
 
 const FlexibleXYPlot = makeWidthFlexible(XYPlot);
 
@@ -24,11 +24,7 @@ function Bar(props: BarProps) {
   const data = dataProp;
 
   return (
-    <FlexibleXYPlot
-      margin={{ bottom: 80, left: 100 }}
-      xType="ordinal"
-      height={400}
-    >
+    <FlexibleXYPlot margin={{ bottom: 80, left: 100 }} xType="ordinal" height={400}>
       <VerticalGridLines />
       <HorizontalGridLines />
       <XAxis tickLabelAngle={-45} />
@@ -41,16 +37,16 @@ function Bar(props: BarProps) {
 export default createComponent(Bar, {
   argTypes: {
     data: {
-      typeDef: { type: "array" },
+      typeDef: { type: 'array' },
       defaultValue: [
-        { x: "Apples", y: 12 },
-        { x: "Bananas", y: 2 },
+        { x: 'Apples', y: 12 },
+        { x: 'Bananas', y: 2 },
       ],
     },
   },
 });
 
-//{[
+// {[
 //          { x: "Apples", y: 10 },
 //          { x: "Bananas", y: 5 },
 //          { x: "Cranberries", y: 15 },

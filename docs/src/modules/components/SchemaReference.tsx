@@ -294,6 +294,18 @@ function JsonSchemaValueDisplay({ schema, idPrefix }: JsonSchemaValueDisplayProp
   );
 }
 
+interface JsonDescriptionDisplayProps {
+  schema: JSONSchema7;
+}
+
+function JsonDescriptionDisplay({ schema }: JsonDescriptionDisplayProps) {
+  if (schema.description) {
+    return <div className={classNames.description}>{schema.description}</div>;
+  }
+
+  return null;
+}
+
 interface JsonSchemaNameValueDisplayProps {
   name?: string;
   schema: JSONSchema7Definition;
@@ -325,9 +337,7 @@ function JsonSchemaNameValueDisplay({
 
   return (
     <React.Fragment>
-      {schema.description ? (
-        <div className={classNames.description}>{schema.description}</div>
-      ) : null}
+      <JsonDescriptionDisplay schema={schema} />
       {name ? (
         <React.Fragment>
           <a href={`#${id}`} tabIndex={-1} className={classNames.name}>

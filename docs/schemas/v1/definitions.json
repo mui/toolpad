@@ -85,7 +85,7 @@
                       "query",
                       "mutation"
                     ],
-                    "description": "How to fetch this query"
+                    "description": "How to fetch this query."
                   },
                   "query": {
                     "anyOf": [

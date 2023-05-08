@@ -170,7 +170,7 @@ const querySchema = z.object({
     .array(nameValuePairSchema(bindableSchema(z.any())))
     .optional()
     .describe('Parameters to pass to this query.'),
-  mode: fetchModeSchema.optional().describe('How to fetch this query'),
+  mode: fetchModeSchema.optional().describe('How to fetch this query.'),
   query: queryConfigSchema.optional().describe('Query definition'),
   transform: z.string().optional().describe('Transformation to run on the response'),
   transformEnabled: z.boolean().optional().describe('Enable the transformation'),

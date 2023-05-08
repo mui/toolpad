@@ -3,9 +3,9 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "toolpad dev --viteRuntime",
-    "build": "toolpad build --viteRuntime",
-    "start": "toolpad start --viteRuntime"
+    "dev": "toolpad dev",
+    "build": "toolpad build",
+    "start": "toolpad start"
   },
   "dependencies": {
     "@mui/toolpad": "latest"

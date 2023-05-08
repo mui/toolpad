@@ -1,5 +1,40 @@
 # Changelog
 
+## 0.1.10
+
+<!-- generated comparing v0.1.9..master -->
+
+_May 5, 2023_
+
+A big thanks to the 1 contributors who made this release possible. Here are some highlights ✨:
+
+This is a hotfix to deal with broken dependency upgrade in next.js.
+
+- &#8203;<!-- 2 -->Pin next.js (#1967) @Janpot
+- &#8203;<!-- 1 -->Upgrade monorepo (#1964) @Janpot
+
+All contributors of this release in alphabetical order: @Janpot
+
+## 0.1.9
+
+<!-- generated comparing v0.1.8..master -->
+
+_May 3, 2023_
+
+A big thanks to the 4 contributors who made this release possible. Here are some highlights ✨:
+
+Fixing regressions, set new runtime as default.
+
+- &#8203;<!-- 7 -->Fix preview header missing in app preview (#1962) @Janpot
+- &#8203;<!-- 6 -->small improvements (#1960) @Janpot
+- &#8203;<!-- 5 -->Fix: Wrapping on Text/Link (#1956) @bharatkashyap
+- &#8203;<!-- 4 -->Added dog app arcade to quickstart section of docs (#1942) @prakhargupta1
+- &#8203;<!-- 3 -->Optimize some docs images (#1946) @apedroferreira
+- &#8203;<!-- 2 -->Fix autocomplete after monaco-editor upgrade (#1943) @Janpot
+- &#8203;<!-- 1 -->Make vite runtime default (#1938) @Janpot
+
+All contributors of this release in alphabetical order: @apedroferreira, @bharatkashyap, @Janpot, @prakhargupta1
+
 ## 0.1.8
 
 <!-- generated comparing v0.1.7..master -->

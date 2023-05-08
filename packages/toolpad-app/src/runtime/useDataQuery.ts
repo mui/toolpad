@@ -1,7 +1,6 @@
 import { GridRowsProp } from '@mui/x-data-grid-pro';
 import * as React from 'react';
 import { useQuery, UseQueryOptions } from '@tanstack/react-query';
-import { useAppContext } from './AppContext';
 import { CanvasHooksContext } from './CanvasHooksContext';
 import dataSources from '../toolpadDataSources/runtime';
 import * as appDom from '../appDom';
@@ -68,7 +67,6 @@ export function useDataQuery(
     ...options
   }: Pick<UseQueryOptions<any, unknown, unknown, any[]>, 'enabled' | 'refetchInterval'>,
 ): UseFetch {
-  const { version } = useAppContext();
   const { savedNodes } = React.useContext(CanvasHooksContext);
   const queryName = node.name;
   const pageName = page.name;
@@ -88,7 +86,7 @@ export function useDataQuery(
     data: responseData = EMPTY_OBJECT,
     refetch,
   } = useQuery(
-    [version, nodeHash, pageName, queryName, params],
+    [nodeHash, pageName, queryName, params],
     ({ signal }) => {
       const fetchFromServer = () => execDataSourceQuery({ signal, pageName, queryName, params });
 

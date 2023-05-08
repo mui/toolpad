@@ -42,7 +42,7 @@ const Wrapper = styled('div')(({ theme }) => ({
   border: 1,
   borderStyle: 'solid',
   borderColor: 'rgba(194, 224, 255, 0.08)',
-  [`& .${classNames.objectLabel}`]: {
+  [`& .${classNames.indent}`]: {
     marginLeft: '2ch',
   },
   [`& .${classNames.objectLabel}`]: {
@@ -103,6 +103,20 @@ function JsonSchemaTypeDisplay({ schema }: JsonSchemaTypeDisplayProps) {
   if (typeof schema.const !== 'undefined') {
     return (
       <span className={getConstClass(typeof schema.const)}>{JSON.stringify(schema.const)}</span>
+    );
+  }
+
+  if (typeof schema.enum !== 'undefined') {
+    return interleave(
+      schema.enum.map((enumValue) => {
+        const asString = JSON.stringify(enumValue);
+        return (
+          <span key={asString} className={getConstClass(typeof enumValue)}>
+            {asString}
+          </span>
+        );
+      }),
+      ' | ',
     );
   }
 

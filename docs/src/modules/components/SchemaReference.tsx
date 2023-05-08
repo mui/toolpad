@@ -3,11 +3,26 @@ import MarkdownElement from '@mui/monorepo/docs/src/modules/components/MarkdownE
 import AppLayoutDocs from '@mui/monorepo/docs/src/modules/components/AppLayoutDocs';
 import Ad from '@mui/monorepo/docs/src/modules/components/Ad';
 import { JSONSchema7, JSONSchema7Definition } from 'json-schema';
-import { Typography, styled } from '@mui/material';
+import { Tooltip, TooltipProps, Typography, styled, tooltipClasses } from '@mui/material';
 import invariant from 'invariant';
 import { interleave } from '../utils/react';
 
+const EMPTY_OBJECT = {};
+
+const SchemaContext = React.createContext<{ [key: string]: JSONSchema7Definition }>(EMPTY_OBJECT);
+
+const TooltipContext = React.createContext<{} | null>(null);
+
+const SchemaTooltip = styled(({ className, ...props }: TooltipProps) => (
+  <Tooltip {...props} classes={{ popper: className }} />
+))({
+  [`& .${tooltipClasses.tooltip}`]: {
+    padding: 0,
+  },
+});
+
 const classNames = {
+  indent: 'jsonschema-indent',
   description: 'jsonschema-description',
   name: 'jsonschema-name',
   keyword: 'jsonschema-keyword',
@@ -24,7 +39,10 @@ const Wrapper = styled('div')(({ theme }) => ({
   padding: theme.spacing(2),
   borderRadius: theme.shape.borderRadius,
   fontSize: '0.8125rem',
-  '& .indent': {
+  border: 1,
+  borderStyle: 'solid',
+  borderColor: 'rgba(194, 224, 255, 0.08)',
+  [`& .${classNames.objectLabel}`]: {
     marginLeft: '2ch',
   },
   [`& .${classNames.objectLabel}`]: {
@@ -39,6 +57,7 @@ const Wrapper = styled('div')(({ theme }) => ({
     color: '#b2b2b2',
   },
   [`& .${classNames.name}`]: {
+    scrollMarginTop: 'calc(var(--MuiDocs-header-height) + 32px)',
     color: '#ffffff',
   },
   [`& .${classNames.constString}`]: {
@@ -171,7 +190,7 @@ function JsonSchemaPropertiesDisplay({ schema, idPrefix }: JsonSchemaPropertiesD
   }
 
   return properties.length > 0 ? (
-    <div className="indent">
+    <div className={classNames.indent}>
       {interleave(
         properties.map(([propName, propSchema]) => {
           return (
@@ -190,6 +209,28 @@ function JsonSchemaPropertiesDisplay({ schema, idPrefix }: JsonSchemaPropertiesD
   ) : null;
 }
 
+interface DefinitionTooltipProps {
+  name: string;
+}
+
+function DefinitionTooltip({ name }: DefinitionTooltipProps) {
+  const definitions = React.useContext(SchemaContext);
+  const definition = definitions[name];
+
+  if (!definition || typeof definition === 'boolean') {
+    return null;
+  }
+
+  return (
+    <TooltipContext.Provider value={EMPTY_OBJECT}>
+      <Wrapper>
+        {/* eslint-disable-next-line @typescript-eslint/no-use-before-define */}
+        <JsonSchemaNameValueDisplay name={name} schema={definition} idPrefix={`definition`} />
+      </Wrapper>
+    </TooltipContext.Provider>
+  );
+}
+
 interface JsonSchemaValueDisplayProps {
   schema: JSONSchema7;
   idPrefix: string;
@@ -202,9 +243,11 @@ function JsonSchemaValueDisplay({ schema, idPrefix }: JsonSchemaValueDisplayProp
       if (!definition.includes('/')) {
         const hash = `definition-${definition}`;
         return (
-          <a aria-labelledby={hash} className="anchor-link" href={`#${hash}`} tabIndex={-1}>
-            {definition}
-          </a>
+          <SchemaTooltip title={<DefinitionTooltip name={definition} />}>
+            <a aria-labelledby={hash} className="anchor-link" href={`#${hash}`} tabIndex={-1}>
+              {definition}
+            </a>
+          </SchemaTooltip>
         );
       }
     }
@@ -256,7 +299,11 @@ function JsonSchemaNameValueDisplay({
     properties.push(['*', schema.additionalProperties]);
   }
 
+  const tooltipContext = React.useContext(TooltipContext);
+  const isInsideTooltip = !!tooltipContext;
+
   const id = `${idPrefix}-${name || ''}`;
+  const anchor = isInsideTooltip ? undefined : id;
 
   return (
     <React.Fragment>
@@ -266,7 +313,7 @@ function JsonSchemaNameValueDisplay({
       {name ? (
         <React.Fragment>
           <a href={`#${id}`} tabIndex={-1} className={classNames.name}>
-            <span id={id}>{name}</span>
+            <span id={anchor}>{name}</span>
           </a>
           :{' '}
         </React.Fragment>
@@ -352,47 +399,49 @@ export default function SchemaReference({ disableAd, definitions }: SchemaRefere
       title={`Schema Reference`}
       toc={toc}
     >
-      <MarkdownElement>
-        <h1>Schema Reference</h1>
+      <SchemaContext.Provider value={definitions.definitions || EMPTY_OBJECT}>
+        <MarkdownElement>
+          <h1>Schema Reference</h1>
 
-        <Typography
-          variant="h5"
-          component="p"
-          className={`description${disableAd ? '' : ' ad'}`}
-          gutterBottom
-        >
-          {description}
-          {disableAd ? null : <Ad />}
-        </Typography>
+          <Typography
+            variant="h5"
+            component="p"
+            className={`description${disableAd ? '' : ' ad'}`}
+            gutterBottom
+          >
+            {description}
+            {disableAd ? null : <Ad />}
+          </Typography>
 
-        {toc.map((tocNode) => {
-          return (
-            <React.Fragment key={tocNode.hash}>
-              <Heading hash={tocNode.hash} level="h2" title={tocNode.text} />
+          {toc.map((tocNode) => {
+            return (
+              <React.Fragment key={tocNode.hash}>
+                <Heading hash={tocNode.hash} level="h2" title={tocNode.text} />
 
-              <Typography>{tocNode.introduction}</Typography>
+                <Typography>{tocNode.introduction}</Typography>
 
-              {tocNode.children.map((tocItemNode) => {
-                invariant(typeof tocItemNode.content !== 'boolean', 'Invalid top level schema');
-                return (
-                  <JsonSchemaDisplay
-                    key={tocItemNode.hash}
-                    hash={tocItemNode.hash}
-                    name={tocItemNode.text}
-                    schema={tocItemNode.content}
-                    idPrefix={tocItemNode.hash}
-                  />
-                );
-              })}
-            </React.Fragment>
-          );
-        })}
-      </MarkdownElement>
-      <svg style={{ display: 'none' }} xmlns="http://www.w3.org/2000/svg">
-        <symbol id="anchor-link-icon" viewBox="0 0 16 16">
-          <path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z" />
-        </symbol>
-      </svg>
+                {tocNode.children.map((tocItemNode) => {
+                  invariant(typeof tocItemNode.content !== 'boolean', 'Invalid top level schema');
+                  return (
+                    <JsonSchemaDisplay
+                      key={tocItemNode.hash}
+                      hash={tocItemNode.hash}
+                      name={tocItemNode.text}
+                      schema={tocItemNode.content}
+                      idPrefix={tocItemNode.hash}
+                    />
+                  );
+                })}
+              </React.Fragment>
+            );
+          })}
+        </MarkdownElement>
+        <svg style={{ display: 'none' }} xmlns="http://www.w3.org/2000/svg">
+          <symbol id="anchor-link-icon" viewBox="0 0 16 16">
+            <path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z" />
+          </symbol>
+        </svg>
+      </SchemaContext.Provider>
     </AppLayoutDocs>
   );
 }

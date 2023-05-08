@@ -1,10 +1,14 @@
-import { createRequire } from 'module';
 import createBundleAnalyzer from '@next/bundle-analyzer';
+import * as fs from 'fs';
+import * as url from 'url';
+import * as path from 'path';
 
 const withBundleAnalyzer = createBundleAnalyzer({ enabled: !!process.env.ANALYZE });
 
-const require = createRequire(import.meta.url);
-const pkgJson = require('./package.json');
+const currentDirectory = url.fileURLToPath(new URL('.', import.meta.url));
+const pkgJson = JSON.parse(
+  fs.readFileSync(path.resolve(currentDirectory, './package.json'), { encoding: 'utf-8' }),
+);
 
 // Keep in sync with src/constants.ts. Convert to imports once next.config.ts is a feature
 // See https://github.com/vercel/next.js/discussions/35969#discussioncomment-2523010

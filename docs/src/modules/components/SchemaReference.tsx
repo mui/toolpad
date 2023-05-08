@@ -107,16 +107,20 @@ function JsonSchemaTypeDisplay({ schema }: JsonSchemaTypeDisplayProps) {
   }
 
   if (typeof schema.enum !== 'undefined') {
-    return interleave(
-      schema.enum.map((enumValue) => {
-        const asString = JSON.stringify(enumValue);
-        return (
-          <span key={asString} className={getConstClass(typeof enumValue)}>
-            {asString}
-          </span>
-        );
-      }),
-      ' | ',
+    return (
+      <React.Fragment>
+        {interleave(
+          schema.enum.map((enumValue) => {
+            const asString = JSON.stringify(enumValue);
+            return (
+              <span key={asString} className={getConstClass(typeof enumValue)}>
+                {asString}
+              </span>
+            );
+          }),
+          ' | ',
+        )}
+      </React.Fragment>
     );
   }
 

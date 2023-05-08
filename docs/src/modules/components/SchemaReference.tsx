@@ -112,6 +112,9 @@ const Wrapper = styled('div')(({ theme }) => ({
   '& a': {
     color: '#66B2FF',
   },
+  ul: {
+    marginBottom: 0,
+  },
 }));
 
 export interface SchemaReferenceProps {

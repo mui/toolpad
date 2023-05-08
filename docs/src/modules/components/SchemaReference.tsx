@@ -3,8 +3,18 @@ import MarkdownElement from '@mui/monorepo/docs/src/modules/components/MarkdownE
 import AppLayoutDocs from '@mui/monorepo/docs/src/modules/components/AppLayoutDocs';
 import Ad from '@mui/monorepo/docs/src/modules/components/Ad';
 import { JSONSchema7, JSONSchema7Definition } from 'json-schema';
-import { Tooltip, TooltipProps, Typography, styled, tooltipClasses } from '@mui/material';
+import KeyboardArrowRightRoundedIcon from '@mui/icons-material/KeyboardArrowRightRounded';
+import {
+  ButtonBase,
+  Collapse,
+  Tooltip,
+  TooltipProps,
+  Typography,
+  styled,
+  tooltipClasses,
+} from '@mui/material';
 import invariant from 'invariant';
+import clsx from 'clsx';
 import { interleave } from '../utils/react';
 
 const EMPTY_OBJECT = {};
@@ -23,6 +33,8 @@ const SchemaTooltip = styled(({ className, ...props }: TooltipProps) => (
 
 const classNames = {
   indent: 'jsonschema-indent',
+  open: 'jsonschema-open',
+  arrow: 'jsonschema-arrow',
   description: 'jsonschema-description',
   name: 'jsonschema-name',
   keyword: 'jsonschema-keyword',
@@ -42,12 +54,33 @@ const Wrapper = styled('div')(({ theme }) => ({
   border: 1,
   borderStyle: 'solid',
   borderColor: 'rgba(194, 224, 255, 0.08)',
+  whiteSpace: 'pre-wrap',
   [`& .${classNames.indent}`]: {
     marginLeft: '2ch',
   },
   [`& .${classNames.objectLabel}`]: {
     fontFamily: theme.typography.fontFamily,
+    display: 'inline-flex',
+    alignItems: 'center',
     color: '#b2b2b2',
+    [`& .${classNames.arrow}`]: {
+      fontSize: 'small',
+    },
+    [`&.${classNames.open} .${classNames.arrow}`]: {
+      transform: 'rotate(90deg)',
+    },
+  },
+  [`& .${classNames.open}`]: {
+    fontSize: 'small',
+    [`& .${classNames.arrow}`]: {
+      transform: 'rotate(90deg)',
+    },
+  },
+  [`& .${classNames.open}`]: {
+    fontSize: 'small',
+    [`& .${classNames.arrow}`]: {
+      transform: 'rotate(90deg)',
+    },
   },
   [`& .${classNames.comment}`]: {
     color: '#b2b2b2',
@@ -55,6 +88,7 @@ const Wrapper = styled('div')(({ theme }) => ({
   [`& .${classNames.description}`]: {
     fontFamily: theme.typography.fontFamily,
     color: '#b2b2b2',
+    whiteSpace: 'normal',
   },
   [`& .${classNames.name}`]: {
     scrollMarginTop: 'calc(var(--MuiDocs-header-height) + 32px)',
@@ -94,11 +128,31 @@ function getConstClass(type: string) {
   }
 }
 
-interface JsonSchemaTypeDisplayProps {
-  schema: JSONSchema7;
+interface CollapsibleLabelProps {
+  children?: React.ReactNode;
+  open?: boolean;
+  onOpenChange?: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-function JsonSchemaTypeDisplay({ schema }: JsonSchemaTypeDisplayProps) {
+function CollapsibleLabel({ children, open, onOpenChange }: CollapsibleLabelProps) {
+  return (
+    <ButtonBase
+      component="span"
+      className={clsx(classNames.objectLabel, { [classNames.open]: open })}
+      onClick={() => onOpenChange?.((isOpen) => !isOpen)}
+    >
+      {children} <KeyboardArrowRightRoundedIcon className={classNames.arrow} />
+    </ButtonBase>
+  );
+}
+
+interface JsonSchemaTypeDisplayProps {
+  schema: JSONSchema7;
+  open?: boolean;
+  onOpenChange?: React.Dispatch<React.SetStateAction<boolean>>;
+}
+
+function JsonSchemaTypeDisplay({ schema, open, onOpenChange }: JsonSchemaTypeDisplayProps) {
   let types: string[] = [];
   if (typeof schema.const !== 'undefined') {
     return (
@@ -125,7 +179,11 @@ function JsonSchemaTypeDisplay({ schema }: JsonSchemaTypeDisplayProps) {
   }
 
   if (schema.type === 'object') {
-    return <span className={classNames.objectLabel}>object </span>;
+    return (
+      <CollapsibleLabel open={open} onOpenChange={onOpenChange}>
+        object
+      </CollapsibleLabel>
+    );
   }
 
   if (schema.type === 'array') {
@@ -133,7 +191,11 @@ function JsonSchemaTypeDisplay({ schema }: JsonSchemaTypeDisplayProps) {
   }
 
   if (schema.anyOf) {
-    return <span className={classNames.objectLabel}>any of </span>;
+    return (
+      <CollapsibleLabel open={open} onOpenChange={onOpenChange}>
+        any of{' '}
+      </CollapsibleLabel>
+    );
   }
 
   if (schema.type) {
@@ -194,9 +256,10 @@ function JsonSchemaItemsDisplay({ schema, idPrefix }: JsonSchemaItemsDisplayProp
 interface JsonSchemaPropertiesDisplayProps {
   schema: JSONSchema7;
   idPrefix: string;
+  open?: boolean;
 }
 
-function JsonSchemaPropertiesDisplay({ schema, idPrefix }: JsonSchemaPropertiesDisplayProps) {
+function JsonSchemaPropertiesDisplay({ schema, idPrefix, open }: JsonSchemaPropertiesDisplayProps) {
   const properties: [string, JSONSchema7Definition][] = [];
 
   if (schema.properties) {
@@ -208,7 +271,7 @@ function JsonSchemaPropertiesDisplay({ schema, idPrefix }: JsonSchemaPropertiesD
   }
 
   return properties.length > 0 ? (
-    <div className={classNames.indent}>
+    <Collapse in={open} className={classNames.indent}>
       {interleave(
         properties.map(([propName, propSchema]) => {
           return (
@@ -223,7 +286,7 @@ function JsonSchemaPropertiesDisplay({ schema, idPrefix }: JsonSchemaPropertiesD
         }),
         <hr className={classNames.divider} />,
       )}
-    </div>
+    </Collapse>
   ) : null;
 }
 
@@ -255,6 +318,8 @@ interface JsonSchemaValueDisplayProps {
 }
 
 function JsonSchemaValueDisplay({ schema, idPrefix }: JsonSchemaValueDisplayProps) {
+  const [detailsOpen, setDetailsOpen] = React.useState(true);
+
   if (schema.$ref) {
     if (schema.$ref.startsWith('#/definitions/')) {
       const definition = schema.$ref.slice('#/definitions/'.length);
@@ -273,22 +338,24 @@ function JsonSchemaValueDisplay({ schema, idPrefix }: JsonSchemaValueDisplayProp
 
   return (
     <React.Fragment>
-      <JsonSchemaTypeDisplay schema={schema} />
+      <JsonSchemaTypeDisplay schema={schema} open={detailsOpen} onOpenChange={setDetailsOpen} />
 
-      <JsonSchemaPropertiesDisplay schema={schema} idPrefix={idPrefix} />
+      <JsonSchemaPropertiesDisplay open={detailsOpen} schema={schema} idPrefix={idPrefix} />
 
       {schema.items ? <JsonSchemaItemsDisplay schema={schema} idPrefix={idPrefix} /> : null}
 
       {schema.anyOf ? (
-        <ul>
-          {schema.anyOf.map((subSchema, i) => {
-            return (
-              <li key={i}>
-                <JsonSchemaItemDisplay schema={subSchema} idPrefix={idPrefix} />
-              </li>
-            );
-          })}
-        </ul>
+        <Collapse in={detailsOpen}>
+          <ul>
+            {schema.anyOf.map((subSchema, i) => {
+              return (
+                <li key={i}>
+                  <JsonSchemaItemDisplay schema={subSchema} idPrefix={idPrefix} />
+                </li>
+              );
+            })}
+          </ul>
+        </Collapse>
       ) : null}
     </React.Fragment>
   );

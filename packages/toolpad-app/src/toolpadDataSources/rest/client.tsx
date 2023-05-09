@@ -427,7 +427,7 @@ function QueryEditor({
                   </MenuItem>
                 ))}
               </TextField>
-              <BindableEditor
+              <BindableEditor<string>
                 liveBinding={liveUrl}
                 globalScope={queryScope}
                 globalScopeMeta={QUERY_SCOPE_META}

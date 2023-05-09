@@ -35,8 +35,8 @@
     "prebuild": "rimraf dist",
     "build": "tsup",
     "dev": "tsup --watch",
-    "test": "echo \"Error: run tests from root\" && exit 1",
-    "check-types": "yarn build"
+    "check-types": "yarn build",
+    "test": "jest"
   },
   "bugs": {
     "url": "https://github.com/mui/mui-toolpad/issues"

@@ -97,7 +97,7 @@ test(`simple databinding`, async () => {
   const text = screen.getByText('Default Text');
   const textField = screen.getByLabelText('The Input');
 
-  act(() => {
+  await act(async () => {
     textField.focus();
     fireEvent.change(textField, { target: { value: 'Hello Everybody' } });
   });

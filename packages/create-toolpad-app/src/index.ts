@@ -3,7 +3,6 @@
 import * as fs from 'fs/promises';
 import path from 'path';
 import yargs from 'yargs';
-import { errorFrom } from '@mui/toolpad-utils/errors';
 
 type PackageManager = 'npm' | 'pnpm' | 'yarn';
 declare global {
@@ -72,6 +71,7 @@ async function isFolderEmpty(pathDir: string): Promise<boolean> {
 const packageManager = getPackageManager();
 
 const validatePath = async (relativePath: string): Promise<boolean | string> => {
+  const { errorFrom } = await import('@mui/toolpad-utils/errors');
   const { default: chalk } = await import('chalk');
 
   const absolutePath = path.join(process.cwd(), relativePath);

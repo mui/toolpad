@@ -322,7 +322,7 @@ export default function QueryNodeEditorDialog<Q>({
                 </MenuItem>
                 <MenuItem value="mutation">Only fetch on manual action</MenuItem>
               </TextField>
-              <BindableEditor
+              <BindableEditor<boolean>
                 liveBinding={liveEnabled}
                 globalScope={pageState}
                 globalScopeMeta={globalScopeMeta}

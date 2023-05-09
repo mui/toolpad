@@ -9,6 +9,7 @@ function StringPropEditor({ label, value, onChange, disabled }: EditorProps<stri
     },
     [onChange],
   );
+
   return (
     <TextField
       fullWidth

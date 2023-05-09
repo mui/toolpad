@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: page
+spec:
+  id: au03sef
+  title: page2
+  parameters:
+    - name: abc
+      value: "123"
+    - name: def
+      value: "456"
+  display: shell
+  content:
+    - component: PageRow
+      name: pageRow
+      children:
+        - component: Text
+          name: text
+          props:
+            value: welcome to page 2

@@ -19,12 +19,12 @@ const pages: MuiPage[] = [
         pathname: '/toolpad/connecting-to-datasources/queries',
       },
       {
-        pathname: '/toolpad/connecting-to-datasources/serverside-http-request',
-        title: 'Serverside HTTP requests',
+        pathname: '/toolpad/connecting-to-datasources/http-requests',
+        title: 'HTTP requests',
       },
       {
-        pathname: '/toolpad/connecting-to-datasources/serverside-javascript',
-        title: 'Serverside JavaScript',
+        pathname: '/toolpad/connecting-to-datasources/custom-functions',
+        title: 'Custom Functions',
       },
     ],
   },

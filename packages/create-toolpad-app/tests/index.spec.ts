@@ -6,6 +6,7 @@ import { execa, ExecaChildProcess } from 'execa';
 import readline from 'readline';
 import { Readable } from 'stream';
 import { once } from 'events';
+import { setTimeout } from 'timers/promises';
 
 jest.setTimeout(60000);
 
@@ -80,6 +81,7 @@ afterEach(async () => {
   if (toolpadProcess && typeof toolpadProcess.exitCode !== 'number') {
     toolpadProcess.kill();
     await once(toolpadProcess, 'exit');
+    await setTimeout(500);
   }
 });
 
@@ -90,7 +92,8 @@ afterEach(async () => {
 });
 
 afterEach(async () => {
-  if (cp) {
+  if (cp && typeof cp.exitCode !== 'number') {
     cp.kill();
+    await once(cp, 'exit');
   }
 });

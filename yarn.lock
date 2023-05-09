@@ -2709,6 +2709,13 @@
   dependencies:
     "@types/react" "*"
 
+"@types/react-is@^18.2.0":
+  version "18.2.0"
+  resolved "https://registry.yarnpkg.com/@types/react-is/-/react-is-18.2.0.tgz#2f5137853a46017b3d56447940fb3eb92bbf24a5"
+  integrity sha512-1vz2yObaQkLL7YFe/pme2cpvDsCwI1WXIfL+5eLz0MI9gFG24Re16RzUsI8t9XZn9ZWvgLNDrJBmrqXJO7GNQQ==
+  dependencies:
+    "@types/react" "*"
+
 "@types/react-router-dom@5.3.3":
   version "5.3.3"
   resolved "https://registry.yarnpkg.com/@types/react-router-dom/-/react-router-dom-5.3.3.tgz#e9d6b4a66fcdbd651a5f106c2656a30088cc1e83"
@@ -7979,6 +7986,13 @@ jest-environment-node@^29.5.0:
     "@types/node" "*"
     jest-mock "^29.5.0"
     jest-util "^29.5.0"
+
+jest-fail-on-console@3.1.1:
+  version "3.1.1"
+  resolved "https://registry.yarnpkg.com/jest-fail-on-console/-/jest-fail-on-console-3.1.1.tgz#4ca0d0cc8f11675e8e9f52159a37a6602a7e6c09"
+  integrity sha512-g9HGhKcWOz8lHeZhLCXGg+RD/7upngiKkkBrHimsO/tGB0qi++QZffOgybjeI2bDW1qgdFiJJEG6t/WeTlfmOw==
+  dependencies:
+    chalk "^4.1.0"
 
 jest-get-type@^29.4.3:
   version "29.4.3"

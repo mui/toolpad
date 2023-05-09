@@ -15,7 +15,8 @@
     "dev:cli": "tsup --watch",
     "dev:typings": "yarn build:typings",
     "waitForApp": "ts-node --esm ./scripts/waitForApp.mts",
-    "check-types": "tsc --noEmit"
+    "check-types": "tsc --noEmit",
+    "test": "jest"
   },
   "files": [
     "public",
@@ -149,6 +150,7 @@
     "@types/react": "18.2.6",
     "@types/react-dom": "18.2.4",
     "@types/react-inspector": "4.0.2",
+    "@types/react-is": "^18.2.0",
     "@types/serialize-javascript": "5.0.2",
     "@types/whatwg-url": "11.0.0",
     "ajv": "8.12.0",

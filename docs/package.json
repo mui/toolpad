@@ -91,6 +91,7 @@
     "@babel/preset-typescript": "7.21.5",
     "@types/doctrine": "0.0.5",
     "@types/json-schema": "7.0.11",
+    "@types/react-is": "^18.2.0",
     "cpy-cli": "4.2.0",
     "cross-fetch": "3.1.5",
     "gm": "1.25.0",

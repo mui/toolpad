@@ -4,6 +4,8 @@ import * as colors from '@mui/material/colors';
 import * as appDom from '../appDom';
 import { AppTheme } from '../types';
 
+import { getDesignTokens } from '../theme';
+
 export function createToolpadTheme(toolpadTheme: AppTheme = {}): ThemeOptions {
   const palette: PaletteOptions = {};
   const primary = toolpadTheme['palette.primary.main'];
@@ -21,8 +23,11 @@ export function createToolpadTheme(toolpadTheme: AppTheme = {}): ThemeOptions {
     palette.mode = mode;
   }
 
+  const designTokens = getDesignTokens(mode || 'light');
+
   return createTheme({
     palette,
+    spacing: designTokens.spacing,
     typography: {
       h1: {
         fontSize: `3.25rem`,

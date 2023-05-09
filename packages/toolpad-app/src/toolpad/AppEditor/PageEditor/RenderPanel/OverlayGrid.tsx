@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Grid, styled } from '@mui/material';
+import { Grid, Container, styled } from '@mui/material';
 import invariant from 'invariant';
 
 export interface OverlayGridHandle {
@@ -12,12 +12,15 @@ export interface OverlayGridHandle {
 export const GRID_NUMBER_OF_COLUMNS = 12;
 export const GRID_COLUMN_GAP = 1;
 
-const StyledGrid = styled(Grid)({
-  height: '100vh',
+const GridContainer = styled(Container)({
+  height: '100%',
   pointerEvents: 'none',
   position: 'absolute',
   zIndex: 1,
-  border: '4px solid transparent',
+});
+
+const StyledGrid = styled(Grid)({
+  height: '100%',
 });
 
 const StyledGridColumn = styled('div')(({ theme }) => ({
@@ -65,12 +68,14 @@ export const OverlayGrid = React.forwardRef<OverlayGridHandle>(function OverlayG
   );
 
   return (
-    <StyledGrid ref={gridRef} container columnSpacing={GRID_COLUMN_GAP} px={2}>
-      {[...Array(GRID_NUMBER_OF_COLUMNS)].map((column, index) => (
-        <Grid key={index} item xs={1}>
-          <StyledGridColumn />
-        </Grid>
-      ))}
-    </StyledGrid>
+    <GridContainer>
+      <StyledGrid ref={gridRef} container columnSpacing={GRID_COLUMN_GAP}>
+        {[...Array(GRID_NUMBER_OF_COLUMNS)].map((column, index) => (
+          <Grid key={index} item xs={1}>
+            <StyledGridColumn />
+          </Grid>
+        ))}
+      </StyledGrid>
+    </GridContainer>
   );
 });

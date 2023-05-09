@@ -1,5 +1,20 @@
 # Changelog
 
+## 0.1.10
+
+<!-- generated comparing v0.1.9..master -->
+
+_May 5, 2023_
+
+A big thanks to the 1 contributors who made this release possible. Here are some highlights ✨:
+
+This is a hotfix to deal with broken dependency upgrade in next.js.
+
+- &#8203;<!-- 2 -->Pin next.js (#1967) @Janpot
+- &#8203;<!-- 1 -->Upgrade monorepo (#1964) @Janpot
+
+All contributors of this release in alphabetical order: @Janpot
+
 ## 0.1.9
 
 <!-- generated comparing v0.1.8..master -->

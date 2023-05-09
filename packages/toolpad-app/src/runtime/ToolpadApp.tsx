@@ -130,8 +130,17 @@ const USE_DATA_QUERY_CONFIG_KEYS: readonly (keyof UseDataQueryConfig)[] = [
 function usePageNavigator(): NavigateToPage {
   const navigate = useNavigate();
   const navigateToPage: NavigateToPage = React.useCallback(
-    (pageNodeId: NodeId) => {
-      navigate(`/pages/${pageNodeId}`);
+    (pageNodeId, pageParameters) => {
+      const urlParams = pageParameters && new URLSearchParams(pageParameters);
+
+      navigate({
+        pathname: `/pages/${pageNodeId}`,
+        ...(urlParams
+          ? {
+              search: urlParams.toString(),
+            }
+          : {}),
+      });
     },
     [navigate],
   );
@@ -344,10 +353,28 @@ function RenderedNodeContent({ node, childNodeGroups, Component }: RenderedNodeC
       const action = (node as appDom.ElementNode).props?.[key];
 
       if (action?.type === 'navigationAction') {
-        const handler = () => {
-          const { page } = action.value;
+        const handler = async () => {
+          const { page, parameters = {} } = action.value;
           if (page) {
-            navigateToPage(appDom.deref(page));
+            const parsedParameterEntries = await Promise.all(
+              Object.keys(parameters).map(async (parameterName) => {
+                const parameterValue = parameters[parameterName];
+
+                if (parameterValue && parameterValue.type === 'jsExpression') {
+                  const result = await evaluatePageExpression(
+                    parameterValue.value,
+                    scopeId,
+                    localScopeParams,
+                  );
+                  return [parameterName, result.value];
+                }
+                return [parameterName, parameterValue?.value];
+              }),
+            );
+
+            const parsedParameters = Object.fromEntries(parsedParameterEntries);
+
+            navigateToPage(appDom.deref(page), parsedParameters);
           }
         };
 
@@ -534,7 +561,7 @@ function flattenNestedBindables(
       return flattenNestedBindables(param[1], `${prefix}[${i}][1]`);
     });
   }
-  // TODO: create a marker in bindables (similar to $$ref) to recognize them automatically
+  // TODO: create a marker in bindables (similar to $ref) to recognize them automatically
   // in a nested structure. This would allow us to build deeply nested structures
   if (typeof params.type === 'string') {
     return [[prefix, params as BindableAttrValue<any>]];
@@ -734,9 +761,10 @@ function parseBindings(
           ? `${elm.id}.props.${argType.defaultValueProp}`
           : undefined;
 
+        const propValue = elm.props?.[propName];
+
         const binding: BindableAttrValue<any> =
-          elm.props?.[propName] ||
-          appDom.createConst(argType ? getArgTypeDefaultValue(argType) : undefined);
+          propValue || appDom.createConst(argType ? getArgTypeDefaultValue(argType) : undefined);
 
         const bindingId = `${elm.id}.props.${propName}`;
 

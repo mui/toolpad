@@ -1,11 +1,7 @@
+import * as React from 'react';
 import {
   Box,
-  Button,
   Checkbox,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogTitle,
   Stack,
   Toolbar,
   Tooltip,
@@ -13,41 +9,50 @@ import {
   styled,
   tooltipClasses,
   TooltipProps,
+  Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  Tab,
   TextField,
   MenuItem,
-  Tab,
 } from '@mui/material';
-import * as React from 'react';
 import LinkIcon from '@mui/icons-material/Link';
 import AddLinkIcon from '@mui/icons-material/AddLink';
 import {
   LiveBinding,
-  PropValueType,
-  BindableAttrValue,
   JsExpressionAttrValue,
-  NavigationAction,
-  NodeId,
   JsExpressionAction,
   ScopeMeta,
   ScopeMetaField,
   JsRuntime,
+  PropValueType,
+  BindableAttrValue,
+  NavigationAction,
+  NodeId,
 } from '@mui/toolpad-core';
 import { createProvidedContext } from '@mui/toolpad-utils/react';
 import { TabContext, TabList } from '@mui/lab';
-import { Maybe, WithControlledProp } from '../../utils/types';
+import { mapValues } from '@mui/toolpad-utils/collections';
 import { JsExpressionEditor } from './PageEditor/JsExpressionEditor';
 import JsonView from '../../components/JsonView';
-import { tryFormatExpression } from '../../utils/prettier';
 import useLatest from '../../utils/useLatest';
 import useDebounced from '../../utils/useDebounced';
 import { useEvaluateLiveBinding } from './useEvaluateLiveBinding';
+import GlobalScopeExplorer from './GlobalScopeExplorer';
+import { WithControlledProp, Maybe } from '../../utils/types';
+
+import { tryFormatExpression } from '../../utils/prettier';
 import useShortcut from '../../utils/useShortcut';
+import useUnsavedChangesConfirm from '../hooks/useUnsavedChangesConfirm';
+
+import TabPanel from '../../components/TabPanel';
+
 import { useDom } from '../AppState';
 import * as appDom from '../../appDom';
-import { usePageEditorState } from './PageEditor/PageEditorProvider';
-import GlobalScopeExplorer from './GlobalScopeExplorer';
-import TabPanel from '../../components/TabPanel';
-import useUnsavedChangesConfirm from '../hooks/useUnsavedChangesConfirm';
+// eslint-disable-next-line import/no-cycle
+import BindableEditor from './PageEditor/BindableEditor';
 
 interface BindingEditorContext {
   label: string;
@@ -204,30 +209,105 @@ function JsExpressionActionEditor({ value, onChange }: JsExpressionActionEditorP
   );
 }
 
+export interface NavigationActionParameterEditorProps
+  extends WithControlledProp<BindableAttrValue<string> | null> {
+  label: string;
+}
+
+function NavigationActionParameterEditor({
+  label,
+  value,
+  onChange,
+}: NavigationActionParameterEditorProps) {
+  const { jsRuntime, globalScope, globalScopeMeta } = useBindingEditorContext();
+
+  const liveBinding = useEvaluateLiveBinding({
+    jsRuntime,
+    input: value,
+    globalScope,
+  });
+
+  return (
+    <Box>
+      <BindableEditor<string>
+        liveBinding={liveBinding}
+        jsRuntime={jsRuntime}
+        globalScope={globalScope}
+        globalScopeMeta={globalScopeMeta}
+        label={label}
+        propType={{ type: 'string' }}
+        value={value || null}
+        onChange={onChange}
+      />
+    </Box>
+  );
+}
+
 export interface NavigationActionEditorProps extends WithControlledProp<NavigationAction | null> {}
 
 function NavigationActionEditor({ value, onChange }: NavigationActionEditorProps) {
   const { dom } = useDom();
   const root = appDom.getApp(dom);
   const { pages = [] } = appDom.getChildNodes(dom, root);
-  const { nodeId: currentPageNodeId } = usePageEditorState();
+
+  const getDefaultActionParameters = React.useCallback((page: appDom.PageNode) => {
+    const defaultPageParameters = page.attributes.parameters?.value || [];
+
+    return mapValues(Object.fromEntries(defaultPageParameters), (pageParameterValue) =>
+      appDom.createConst(pageParameterValue),
+    );
+  }, []);
 
   const handlePageChange = React.useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
+      const pageId = event.target.value as NodeId;
+      const page = appDom.getNode(dom, pageId);
+
+      const defaultActionParameters = appDom.isPage(page) ? getDefaultActionParameters(page) : {};
+
       onChange({
         type: 'navigationAction',
-        value: { page: appDom.ref(event.target.value as NodeId) },
+        value: {
+          page: appDom.ref(pageId),
+          parameters: defaultActionParameters,
+        },
       });
     },
-    [onChange],
+    [dom, getDefaultActionParameters, onChange],
   );
 
-  const availablePages = React.useMemo(
-    () => pages.filter((page) => page.id !== currentPageNodeId),
-    [pages, currentPageNodeId],
+  const actionPageRef = value?.value?.page || null;
+  const actionParameters = React.useMemo(
+    () => value?.value.parameters || {},
+    [value?.value.parameters],
   );
 
-  const hasPagesAvailable = availablePages.length > 0;
+  const actionPageId = actionPageRef ? appDom.deref(actionPageRef) : null;
+  const actionPage = pages.find((availablePage) => availablePage.id === actionPageId);
+
+  const handleActionParameterChange = React.useCallback(
+    (actionParameterName: string) => (newValue: BindableAttrValue<string> | null) => {
+      if (actionPageRef) {
+        onChange({
+          type: 'navigationAction',
+          value: {
+            page: actionPageRef,
+            parameters: {
+              ...actionParameters,
+              ...(newValue ? { [actionParameterName]: newValue } : {}),
+            },
+          },
+        });
+      }
+    },
+    [actionPageRef, actionParameters, onChange],
+  );
+
+  const hasPagesAvailable = pages.length > 0;
+
+  const defaultActionParameters = actionPage ? getDefaultActionParameters(actionPage) : {};
+
+  const actionParameterEntries = Object.entries(actionParameters || defaultActionParameters);
 
   return (
     <Box sx={{ my: 1 }}>
@@ -235,19 +315,36 @@ function NavigationActionEditor({ value, onChange }: NavigationActionEditorProps
       <TextField
         fullWidth
         sx={{ my: 3 }}
-        label="page"
+        label="Select a page"
         select
-        value={value?.value?.page ? appDom.deref(value.value.page) : ''}
+        value={actionPageId || ''}
         onChange={handlePageChange}
         disabled={!hasPagesAvailable}
         helperText={hasPagesAvailable ? null : 'No other pages available'}
       >
-        {availablePages.map((page) => (
+        {pages.map((page) => (
           <MenuItem key={page.id} value={page.id}>
             {page.name}
           </MenuItem>
         ))}
       </TextField>
+      {actionParameterEntries.length > 0 ? (
+        <React.Fragment>
+          <Typography variant="overline">Page parameters:</Typography>
+          {Object.entries(actionParameters || defaultActionParameters).map((actionParameter) => {
+            const [actionParameterName, actionParameterValue] = actionParameter;
+
+            return (
+              <NavigationActionParameterEditor
+                key={actionParameterName}
+                label={actionParameterName}
+                value={actionParameterValue as BindableAttrValue<string>}
+                onChange={handleActionParameterChange(actionParameterName)}
+              />
+            );
+          })}
+        </React.Fragment>
+      ) : null}
     </Box>
   );
 }

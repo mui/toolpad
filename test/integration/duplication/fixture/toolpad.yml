@@ -60,7 +60,7 @@
                       'headers': [],
                     },
                 },
-              'connectionId': { 'type': 'const', 'value': { '$$ref': '8u43umy' } },
+              'connectionId': { 'type': 'const', 'value': { '$ref': '8u43umy' } },
               'dataSource': { 'type': 'const', 'value': 'rest' },
             },
           'name': 'query',

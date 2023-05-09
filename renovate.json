@@ -21,6 +21,10 @@
       "matchDepTypes": ["devDependencies"]
     },
     {
+      "groupName": "docs",
+      "matchFiles": ["docs/package.json"]
+    },
+    {
       "groupName": "MUI Core",
       "matchPackagePatterns": ["^@mui/"],
       "schedule": ["at any time"]

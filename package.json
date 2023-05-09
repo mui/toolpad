@@ -37,7 +37,7 @@
     "release:changelog": "dotenv -- node ./scripts/releaseChangelog.mjs --repo mui-toolpad",
     "test:build": "lerna run build --scope @mui/toolpad-core --scope @mui/toolpad-components --stream",
     "test:integration": "rm -rf ./node_modules/.vite && playwright test --config ./test/playwright.config.ts",
-    "test": "jest",
+    "test": "lerna run test",
     "check-types": "lerna run check-types",
     "toolpad": "toolpad"
   },
@@ -93,7 +93,7 @@
     "archiver": "5.3.1",
     "cross-env": "7.0.3",
     "dotenv-cli": "7.2.1",
-    "inquirer": "9.2.0",
+    "inquirer": "9.2.2",
     "semver": "7.5.0",
     "tsup": "6.7.0",
     "yargs": "17.7.2"

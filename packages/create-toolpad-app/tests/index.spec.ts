@@ -3,6 +3,9 @@ import { jest } from '@jest/globals';
 import * as path from 'path';
 import * as url from 'url';
 import { execa, ExecaChildProcess } from 'execa';
+import readline from 'readline';
+import { Readable } from 'stream';
+import { once } from 'events';
 
 jest.setTimeout(60000);
 
@@ -13,6 +16,23 @@ const cliPath = path.resolve(currentDirectory, '../dist/index.js');
 let testDir: string | undefined;
 let cp: ExecaChildProcess<string> | undefined;
 let toolpadProcess: ExecaChildProcess<string> | undefined;
+
+async function waitForMatch(input: Readable, regex: RegExp): Promise<RegExpExecArray | null> {
+  return new Promise((resolve, reject) => {
+    const rl = readline.createInterface({ input });
+
+    rl.on('line', (line) => {
+      const match = regex.exec(line);
+      if (match) {
+        rl.close();
+        input.resume();
+        resolve(match);
+      }
+    });
+    rl.on('error', (err) => reject(err));
+    rl.on('end', () => resolve(null));
+  });
+}
 
 test('create-toolpad-app can bootstrap a Toolpad app', async () => {
   testDir = await fs.mkdtemp(path.resolve(currentDirectory, './test-app-'));
@@ -39,40 +59,27 @@ test('create-toolpad-app can bootstrap a Toolpad app', async () => {
   );
   toolpadProcess = execa('yarn', ['dev'], {
     cwd: testDir,
+    env: {
+      FORCE_COLOR: '0',
+      BROWSER: 'none',
+    },
   });
-  const { stdout: toolpadStream } = toolpadProcess;
-  if (toolpadStream) {
-    for await (const data of toolpadStream) {
-      const output = data.toString();
-      let appUrl = '';
-      // Check if the output contains the desired URL
-      if (output.includes('ready on')) {
-        const readyRegex = /ready on (.*)/;
-        const urlRegex = /http:\/\/localhost:(\d+)/;
-        const match = output.match(readyRegex);
+  const { stdout: toolpadDevOutput } = toolpadProcess;
 
-        if (match && match[1]) {
-          appUrl = match[1].trim().match(urlRegex)?.[0] ?? '';
-        }
-      }
-      // Check if the output contains the desired compilation success message
-      if (appUrl) {
-        try {
-          // Perform the health check on the running app
-          const healthCheckResponse = await (await fetch(`${appUrl}/health-check`)).json();
-          expect(healthCheckResponse).toEqual(
-            expect.objectContaining({
-              memoryUsage: expect.any(Object),
-              memoryUsagePretty: expect.any(Object),
-            }),
-          );
-        } catch (error) {
-          throw new Error(`Health check failed: ${error}`);
-        } finally {
-          toolpadProcess?.kill();
-        }
-      }
-    }
+  expect(toolpadDevOutput).toBeTruthy();
+  const match = await waitForMatch(toolpadDevOutput!, /http:\/\/localhost:(\d+)/);
+
+  expect(match).toBeTruthy();
+
+  const appUrl = match![0];
+  const res = await fetch(`${appUrl}/health-check`);
+  expect(res).toHaveProperty('status', 200);
+});
+
+afterEach(async () => {
+  if (toolpadProcess && typeof toolpadProcess.exitCode !== 'number') {
+    toolpadProcess.kill();
+    await once(toolpadProcess, 'exit');
   }
 });
 

@@ -15,7 +15,8 @@
     "dev:cli": "tsup --watch",
     "dev:typings": "yarn build:typings",
     "waitForApp": "ts-node --esm ./scripts/waitForApp.mts",
-    "check-types": "tsc --noEmit"
+    "check-types": "tsc --noEmit",
+    "test": "jest"
   },
   "files": [
     "public",

@@ -274,7 +274,7 @@ function QueryEditor({
     },
     { retry: false },
   );
-  const envVarNames = React.useMemo(() => introspection?.data?.envVarNames || [], [introspection]);
+  const env = React.useMemo(() => introspection?.data?.env || [], [introspection]);
 
   const handleParamsChange = React.useCallback(
     (newParams: [string, BindableAttrValue<string>][]) => {
@@ -363,10 +363,10 @@ function QueryEditor({
     () => ({
       parameters: previewParams,
       process: {
-        env: Object.fromEntries(envVarNames.map((varName) => [varName, '<SECRET>'])),
+        env,
       },
     }),
-    [envVarNames, previewParams],
+    [env, previewParams],
   );
 
   const liveUrl: LiveBinding = useEvaluateLiveBinding({

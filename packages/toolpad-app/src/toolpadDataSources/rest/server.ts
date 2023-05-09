@@ -38,9 +38,7 @@ async function execPrivate(connection: Maybe<RestConnectionParams>, query: Fetch
   switch (query.kind) {
     case 'introspection': {
       const env = await loadEnvFile();
-      const envVarNames = Object.keys(env);
-
-      return { envVarNames };
+      return { env };
     }
     case 'debugExec':
       return execBase(connection, query.query, query.params);

@@ -3,6 +3,10 @@
 import * as fs from 'fs/promises';
 import path from 'path';
 import yargs from 'yargs';
+import inquirer from 'inquirer';
+import chalk from 'chalk';
+import { errorFrom } from '@mui/toolpad-utils/errors';
+import { execaCommand } from 'execa';
 
 type PackageManager = 'npm' | 'pnpm' | 'yarn';
 declare global {
@@ -71,9 +75,6 @@ async function isFolderEmpty(pathDir: string): Promise<boolean> {
 const packageManager = getPackageManager();
 
 const validatePath = async (relativePath: string): Promise<boolean | string> => {
-  const { errorFrom } = await import('@mui/toolpad-utils/errors');
-  const { default: chalk } = await import('chalk');
-
   const absolutePath = path.join(process.cwd(), relativePath);
 
   try {
@@ -100,9 +101,6 @@ const validatePath = async (relativePath: string): Promise<boolean | string> => 
 
 // Create a new `package.json` file and install dependencies
 const scaffoldProject = async (absolutePath: string, installFlag: boolean): Promise<void> => {
-  const { default: chalk } = await import('chalk');
-  const { execaCommand } = await import('execa');
-
   // eslint-disable-next-line no-console
   console.log();
   // eslint-disable-next-line no-console
@@ -151,9 +149,6 @@ const scaffoldProject = async (absolutePath: string, installFlag: boolean): Prom
 
 // Run the CLI interaction with Inquirer.js
 const run = async () => {
-  const { default: chalk } = await import('chalk');
-  const { default: inquirer } = await import('inquirer');
-
   const args = await yargs(process.argv.slice(2))
     .scriptName('create-toolpad-app')
     .usage('$0 [path] [options]')

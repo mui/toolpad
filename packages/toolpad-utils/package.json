@@ -50,5 +50,8 @@
   "gitHead": "28308edc7bd61700e63b44e6ff5ff1508d1f2a8b",
   "dependencies": {
     "react-is": "18.2.0"
+  },
+  "devDependencies": {
+    "@types/react-is": "^18.2.0"
   }
 }

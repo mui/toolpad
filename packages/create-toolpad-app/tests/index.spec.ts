@@ -12,6 +12,7 @@ const cliPath = path.resolve(currentDirectory, '../dist/index.js');
 
 let testDir: string | undefined;
 let cp: ExecaChildProcess<string> | undefined;
+let toolpadProcess: ExecaChildProcess<string> | undefined;
 
 test('create-toolpad-app can bootstrap a Toolpad app', async () => {
   testDir = await fs.mkdtemp(path.resolve(currentDirectory, './test-app-'));
@@ -36,6 +37,43 @@ test('create-toolpad-app can bootstrap a Toolpad app', async () => {
       }),
     }),
   );
+  toolpadProcess = execa('yarn', ['dev'], {
+    cwd: testDir,
+  });
+  const { stdout: toolpadStream } = toolpadProcess;
+  if (toolpadStream) {
+    for await (const data of toolpadStream) {
+      const output = data.toString();
+      let appUrl = '';
+      // Check if the output contains the desired URL
+      if (output.includes('ready on')) {
+        const readyRegex = /ready on (.*)/;
+        const urlRegex = /http:\/\/localhost:(\d+)/;
+        const match = output.match(readyRegex);
+
+        if (match && match[1]) {
+          appUrl = match[1].trim().match(urlRegex)?.[0] ?? '';
+        }
+      }
+      // Check if the output contains the desired compilation success message
+      if (appUrl) {
+        try {
+          // Perform the health check on the running app
+          const healthCheckResponse = await (await fetch(`${appUrl}/health-check`)).json();
+          expect(healthCheckResponse).toEqual(
+            expect.objectContaining({
+              memoryUsage: expect.any(Object),
+              memoryUsagePretty: expect.any(Object),
+            }),
+          );
+        } catch (error) {
+          throw new Error(`Health check failed: ${error}`);
+        } finally {
+          toolpadProcess?.kill();
+        }
+      }
+    }
+  }
 });
 
 afterEach(async () => {

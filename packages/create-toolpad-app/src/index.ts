@@ -3,73 +3,13 @@
 import * as fs from 'fs/promises';
 import path from 'path';
 import yargs from 'yargs';
+import { errorFrom } from '@mui/toolpad-utils/errors';
 
 type PackageManager = 'npm' | 'pnpm' | 'yarn';
-
-type Require<T, K extends keyof T> = T & { [P in K]-?: T[P] };
-
-type Ensure<U, K extends PropertyKey> = K extends keyof U ? Require<U, K> : U & Record<K, unknown>;
-
 declare global {
   interface Error {
     code?: unknown;
   }
-}
-/**
- * Type aware version of Object.protoype.hasOwnProperty.
- * See https://fettblog.eu/typescript-hasownproperty/
- */
-
-function hasOwnProperty<X extends {}, Y extends PropertyKey>(obj: X, prop: Y): obj is Ensure<X, Y> {
-  return obj.hasOwnProperty(prop);
-}
-
-/**
- * Limits the length of a string and adds ellipsis if necessary.
- */
-
-function truncate(str: string, maxLength: number, dots: string = '...') {
-  if (str.length <= maxLength) {
-    return str;
-  }
-  return str.slice(0, maxLength) + dots;
-}
-
-/**
- * Creates a javascript `Error` from an unkown value if it's not already an error.
- * Does a best effort at inferring a message. Intended to be used typically in `catch`
- * blocks, as there is no way to enforce only `Error` objects being thrown.
- *
- * ```
- * try {
- *   // ...
- * } catch (rawError) {
- *   const error = errorFrom(rawError);
- *   console.assert(error instancof Error);
- * }
- * ```
- */
-
-function errorFrom(maybeError: unknown): Error {
-  if (maybeError instanceof Error) {
-    return maybeError;
-  }
-
-  if (
-    typeof maybeError === 'object' &&
-    maybeError &&
-    hasOwnProperty(maybeError, 'message') &&
-    typeof maybeError.message! === 'string'
-  ) {
-    return new Error(maybeError.message, { cause: maybeError });
-  }
-
-  if (typeof maybeError === 'string') {
-    return new Error(maybeError, { cause: maybeError });
-  }
-
-  const message = truncate(JSON.stringify(maybeError), 500);
-  return new Error(message, { cause: maybeError });
 }
 
 function getPackageManager(): PackageManager {
@@ -159,7 +99,7 @@ const validatePath = async (relativePath: string): Promise<boolean | string> => 
 };
 
 // Create a new `package.json` file and install dependencies
-const scaffoldProject = async (absolutePath: string): Promise<void> => {
+const scaffoldProject = async (absolutePath: string, installFlag: boolean): Promise<void> => {
   const { default: chalk } = await import('chalk');
   const { execaCommand } = await import('execa');
 
@@ -179,29 +119,34 @@ const scaffoldProject = async (absolutePath: string): Promise<void> => {
       build: 'toolpad build',
       start: 'toolpad start',
     },
+    dependencies: {
+      '@mui/toolpad': 'latest',
+    },
   };
 
   await fs.writeFile(path.join(absolutePath, 'package.json'), JSON.stringify(packageJson, null, 2));
 
-  // eslint-disable-next-line no-console
-  console.log(
-    `${chalk.blue('info')} - Installing the following dependencies: ${chalk.magenta(
-      '@mui/toolpad',
-    )}`,
-  );
-  // eslint-disable-next-line no-console
-  console.log();
+  if (installFlag) {
+    // eslint-disable-next-line no-console
+    console.log(
+      `${chalk.blue('info')} - Installing the following dependencies: ${chalk.magenta(
+        '@mui/toolpad',
+      )}`,
+    );
+    // eslint-disable-next-line no-console
+    console.log();
 
-  const installVerb = packageManager === 'yarn' ? 'add' : 'install';
-  const command = `${packageManager} ${installVerb} @mui/toolpad`;
-  await execaCommand(command, { stdio: 'inherit', cwd: absolutePath });
+    const installVerb = packageManager === 'yarn' ? 'add' : 'install';
+    const command = `${packageManager} ${installVerb} @mui/toolpad`;
+    await execaCommand(command, { stdio: 'inherit', cwd: absolutePath });
 
-  // eslint-disable-next-line no-console
-  console.log();
-  // eslint-disable-next-line no-console
-  console.log(`${chalk.green('success')} - Dependencies installed successfully!`);
-  // eslint-disable-next-line no-console
-  console.log();
+    // eslint-disable-next-line no-console
+    console.log();
+    // eslint-disable-next-line no-console
+    console.log(`${chalk.green('success')} - Dependencies installed successfully!`);
+    // eslint-disable-next-line no-console
+    console.log();
+  }
 };
 
 // Run the CLI interaction with Inquirer.js
@@ -211,14 +156,20 @@ const run = async () => {
 
   const args = await yargs(process.argv.slice(2))
     .scriptName('create-toolpad-app')
-    .usage('$0 [path]')
+    .usage('$0 [path] [options]')
     .positional('path', {
       type: 'string',
       describe: 'The path where the Toolpad project directory will be created',
     })
+    .option('install', {
+      type: 'boolean',
+      describe: 'Where to intall dependencies',
+      default: true,
+    })
     .help().argv;
 
   const pathArg = args._?.[0] as string;
+  const installFlag = args.install as boolean;
 
   if (pathArg) {
     const pathValidOrError = await validatePath(pathArg);
@@ -248,7 +199,7 @@ const run = async () => {
 
   const absolutePath = path.join(process.cwd(), answers.path || pathArg);
 
-  await scaffoldProject(absolutePath);
+  await scaffoldProject(absolutePath, installFlag);
 
   const changeDirectoryInstruction =
     /* `path.relative` is truth-y if the relative path
@@ -256,11 +207,15 @@ const run = async () => {
      * is not empty
      */
     path.relative(process.cwd(), absolutePath)
-      ? `cd ${path.relative(process.cwd(), absolutePath)} && `
+      ? `  cd ${path.relative(process.cwd(), absolutePath)}\n`
       : '';
 
+  const installInstruction = installFlag ? '' : `  ${packageManager} install\n`;
+
   const message = `Run the following to get started: \n\n${chalk.magentaBright(
-    `${changeDirectoryInstruction}${packageManager}${packageManager === 'yarn' ? '' : ' run'} dev`,
+    `${changeDirectoryInstruction}${installInstruction}  ${packageManager}${
+      packageManager === 'yarn' ? '' : ' run'
+    } dev`,
   )}`;
   // eslint-disable-next-line no-console
   console.log(message);

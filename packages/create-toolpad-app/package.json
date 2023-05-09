@@ -31,6 +31,7 @@
     "node": ">=16.17"
   },
   "dependencies": {
+    "@mui/toolpad-utils": "^0.1.10",
     "chalk": "5.2.0",
     "execa": "7.1.1",
     "inquirer": "9.2.2"

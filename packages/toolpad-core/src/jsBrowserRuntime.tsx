@@ -24,7 +24,8 @@ function createBrowserRuntime(): JsRuntime {
         // NOTE: This is by no means intended to be a secure way to hide DOM globals 
         const globalThis = new Proxy(window.__SCOPE, {
           has(target, name) {
-            return name === 'globalThis' || Object.hasOwnProperty(target, name) || ecmaGlobals.has(name);
+            // catch all global access
+            return true;
           },
           get(target, prop, receiver) {
             if (prop === 'globalThis') {
@@ -33,6 +34,9 @@ function createBrowserRuntime(): JsRuntime {
             if (Object.hasOwnProperty(target, prop)) {
               return Reflect.get(...arguments);
             }
+            if (prop === Symbol.unscopables) {
+              return undefined;
+            }
             if (ecmaGlobals.has(prop)) {
               return Reflect.get(window, prop, receiver);
             }
@@ -40,23 +44,7 @@ function createBrowserRuntime(): JsRuntime {
           },
         });
 
-        const globalScope = new Proxy(globalThis, {
-          has(target, name) {
-            // catch all global access
-            return true;
-          },
-          get(target, prop, receiver) {
-            if (prop in target) {
-              return Reflect.get(...arguments);
-            }
-            if (prop === Symbol.unscopables) {
-              return undefined;
-            }
-            throw new ReferenceError(\`\${String(prop)} is not defined\`)
-          },
-        });
-
-        with (globalScope) { 
+        with (globalThis) { 
           return (${code})
         }
       })()

@@ -30,3 +30,14 @@ test('bindings', async ({ page }) => {
   expect(color).toBe('rgb(25, 118, 210)');
   await expect(page.getByText('-test2-')).toBeVisible();
 });
+
+test('global scope', async ({ page }) => {
+  const runtimeModel = new ToolpadRuntime(page);
+  await runtimeModel.gotoPage('globalScope');
+
+  await expect(page.getByText('|test1 ok|')).toBeVisible();
+  await expect(page.getByText('|test2 ok|')).toBeVisible();
+  await expect(page.getByText('|test3 ok|')).toBeVisible();
+  await expect(page.getByText('|test4 ok|')).toBeVisible();
+  await expect(page.getByText('|test5 ok|')).toBeVisible();
+});

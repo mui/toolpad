@@ -25,7 +25,6 @@
     "resolveJsonModule": true,
     "isolatedModules": true,
     "jsx": "preserve",
-    "incremental": true,
     "noUnusedLocals": true,
     "pretty": true,
     "preserveWatchOutput": true

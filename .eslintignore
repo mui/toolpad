@@ -1,6 +1,7 @@
 .next
 .yarn
 /docs/export
+/docs/schemas
 /packages/**/dist
 /packages/toolpad-app/.next
 /packages/toolpad-app/public

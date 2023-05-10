@@ -1,0 +1,14 @@
+{
+  "compilerOptions": {
+    "module": "ESNext",
+    "moduleResolution": "nodenext",
+    "noEmit": true,
+    "allowImportingTsExtensions": true
+  },
+  "ts-node": {
+    "transpileOnly": true,
+    "moduleTypes": {
+      "../packages/toolpad-app/src/server/schema.ts": "esm"
+    }
+  }
+}

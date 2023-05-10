@@ -81,7 +81,7 @@ afterEach(async () => {
   if (toolpadProcess && typeof toolpadProcess.exitCode !== 'number') {
     toolpadProcess.kill();
     await once(toolpadProcess, 'exit');
-    await setTimeout(500);
+    await setTimeout(5000);
   }
 });
 

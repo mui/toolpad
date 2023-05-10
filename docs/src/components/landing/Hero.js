@@ -6,7 +6,8 @@ import SvgMuiLogo from 'docs/src/icons/SvgMuiLogo';
 import IconImage from 'docs/src/components/icon/IconImage';
 import GradientText from 'docs/src/components/typography/GradientText';
 import DataObjectRoundedIcon from '@mui/icons-material/DataObjectRounded';
-import SignUp from './SignUp';
+import GetStartedButtons from 'docs/src/components/home/GetStartedButtons';
+import ROUTES from '../../route';
 import ToolpadHeroContainer from '../../layouts/ToolpadHeroContainer';
 
 export default function Hero() {
@@ -43,24 +44,10 @@ export default function Hero() {
           Build scalable and secure internal tools locally. Use your own IDE, drag and drop
           pre-built components or create yours.
         </Typography>
-        <Typography
-          component="label"
-          variant="body2"
-          color={(theme) => (theme.palette.mode === 'dark' ? '#fff' : `text.secondary`)}
-          sx={{ fontWeight: 'medium', display: 'block', mb: 1, mx: 'auto' }}
-          htmlFor="email-landing"
-        >
-          Sign up for early access to the beta release.
-        </Typography>
-        <SignUp
-          sx={{
-            '& > div': {
-              display: 'flex',
-              flexDirection: { xs: 'column', sm: 'row' },
-              justifyContent: 'center',
-              maxWidth: 'initial',
-            },
-          }}
+        <GetStartedButtons
+          sx={{ justifyContent: 'center' }}
+          installation={'npx create-toolpad-app my-toolpad-app'}
+          to={ROUTES.toolpadQuickstart}
         />
         <Box
           sx={{

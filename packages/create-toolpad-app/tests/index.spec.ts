@@ -79,26 +79,20 @@ test('create-toolpad-app can bootstrap a Toolpad app', async () => {
 
 afterEach(async () => {
   if (toolpadProcess && typeof toolpadProcess.exitCode !== 'number') {
-    const success = toolpadProcess.kill('SIGKILL');
-    // eslint-disable-next-line no-console
-    console.log('killed toolpad', success);
+    toolpadProcess.kill('SIGKILL');
     await once(toolpadProcess, 'exit');
   }
 });
 
 afterEach(async () => {
   if (testDir) {
-    // eslint-disable-next-line no-console
-    console.log('process exit code', toolpadProcess?.exitCode);
-    await fs.rm(testDir, { recursive: true, force: true });
+    await fs.rm(testDir, { recursive: true, force: true, maxRetries: 3 });
   }
 });
 
 afterEach(async () => {
   if (cp && typeof cp.exitCode !== 'number') {
-    const success = cp.kill();
-    // eslint-disable-next-line no-console
-    console.log('killed toolpad', success);
+    cp.kill('SIGKILL');
     await once(cp, 'exit');
   }
 });

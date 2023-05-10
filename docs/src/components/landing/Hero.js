@@ -46,7 +46,7 @@ export default function Hero() {
         </Typography>
         <GetStartedButtons
           sx={{ justifyContent: 'center' }}
-          installation={'npx create-toolpad-app my-toolpad-app'}
+          installation={'npx create-toolpad-app'}
           to={ROUTES.toolpadQuickstart}
         />
         <Box

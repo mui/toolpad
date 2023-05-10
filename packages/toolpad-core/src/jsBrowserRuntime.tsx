@@ -14,6 +14,7 @@ function createBrowserRuntime(): JsRuntime {
 
     // eslint-disable-next-line no-underscore-dangle
     (iframe.contentWindow as any).__SCOPE = globalScope;
+    (iframe.contentWindow as any).console = window.console;
 
     return (iframe.contentWindow as any).eval(`
       (() => {

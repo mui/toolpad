@@ -1,9 +1,15 @@
 import type { MuiPage } from '@mui/monorepo/docs/src/MuiPage';
+import SchemaIcon from '@mui/icons-material/Schema';
+import BuildIcon from '@mui/icons-material/Build';
+import CodeIcon from '@mui/icons-material/Code';
+import DescriptionIcon from '@mui/icons-material/Description';
+import TableViewIcon from '@mui/icons-material/TableView';
+import VisibilityIcon from '@mui/icons-material/Visibility';
 
 const pages: MuiPage[] = [
   {
     pathname: '/toolpad/getting-started',
-    icon: 'DescriptionIcon',
+    icon: DescriptionIcon,
     children: [
       { pathname: '/toolpad/getting-started/overview' },
       { pathname: '/toolpad/getting-started/quickstart' },
@@ -13,7 +19,7 @@ const pages: MuiPage[] = [
   },
   {
     pathname: '/toolpad/connecting-to-datasources',
-    icon: 'TableViewIcon',
+    icon: TableViewIcon,
     children: [
       {
         pathname: '/toolpad/connecting-to-datasources/queries',
@@ -31,7 +37,7 @@ const pages: MuiPage[] = [
   {
     pathname: '/toolpad/building-ui',
     title: 'Building UI',
-    icon: 'VisibilityIcon',
+    icon: VisibilityIcon,
     children: [
       {
         pathname: '/toolpad/building-ui/component-library',
@@ -53,27 +59,17 @@ const pages: MuiPage[] = [
   },
   {
     pathname: '/toolpad/data-binding',
-    icon: 'CodeIcon',
+    icon: CodeIcon,
   },
   {
     pathname: '/toolpad/deployment',
-    icon: 'BuildIcon',
+    icon: BuildIcon,
   },
-  // {
-  //   pathname: '/toolpad/versioning-and-deploying',
-  //   title: 'Versioning & deploying [TODO]',
-  //   icon: 'ToggleOnIcon',
-  //   children: [
-  //     {
-  //       pathname: '/toolpad/versioning-and-deploying/releases',
-  //     },
-  //   ],
-  // },
-  // {
-  //   pathname: '/toolpad/faq',
-  //   title: 'FAQ [TODO]',
-  //   icon: 'ReaderIcon',
-  // },
+  {
+    pathname: '/toolpad/schema-reference',
+    title: 'Schema Reference',
+    icon: SchemaIcon,
+  },
 ];
 
 export default pages;

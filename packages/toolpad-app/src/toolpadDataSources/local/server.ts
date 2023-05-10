@@ -493,6 +493,9 @@ export default dataSource;
 
 async function startDev() {
   const builder = await createBuilder();
+  process.on('SIGTERM', async () => {
+    await builder.dispose();
+  });
   await builder.watch();
   return builder;
 }

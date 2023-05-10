@@ -248,11 +248,9 @@ export default function QueryEditor() {
           <Typography sx={{ mb: 2 }}>Make backend data available as state on the page.</Typography>
           <Stack direction="row" gap={1}>
             <DataSourceButton onClick={handleCreateClick('local')}>
-              serverside javascript
+              Custom function
             </DataSourceButton>
-            <DataSourceButton onClick={handleCreateClick('rest')}>
-              serverside HTTP request
-            </DataSourceButton>
+            <DataSourceButton onClick={handleCreateClick('rest')}>HTTP request</DataSourceButton>
           </Stack>
         </Paper>
       </Popover>

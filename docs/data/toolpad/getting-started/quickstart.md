@@ -58,9 +58,9 @@ Interactive walkthrough of the app building process:
 
    <img src="/static/toolpad/docs/quickstart/step-3.png" alt="Add query" width="284" />
 
-   Press the button and choose "serverside HTTP request".
+   Press the button and choose "HTTP request".
 
-   <img src="/static/toolpad/docs/quickstart/step-3b.png" alt="Choose serverside HTTP request" width="464" />
+   <img src="/static/toolpad/docs/quickstart/step-3b.png" alt="Choose HTTP request" width="464" />
 
 1. We'll be using the [open source dog API](https://dog.ceo/dog-api/) for our example. First give the query a name "dogQuery". The name must be unique in the page. Then set `https://dog.ceo/api/breeds/list/all` as the **URL**. The HTTP method can be left at GET. Click the preview button to inspect the result of this request. If all went well it should like like this:
 
@@ -94,7 +94,7 @@ Interactive walkthrough of the app building process:
 
    <img src="/static/toolpad/docs/quickstart/step-9.png" alt="Connected data" width="1512" />
 
-1. Now let's make our app interactive by displaying a random image of the selected breed. We'll create a dynamic query which reacts to the selection inside Data Grid component. Click **Add query** and select "serverside HTTP request" again. Name it "imageQuery" and add a parameter "breed"
+1. Now let's make our app interactive by displaying a random image of the selected breed. We'll create a dynamic query which reacts to the selection inside Data Grid component. Click **Add query** and select "HTTP request" again. Name it "imageQuery" and add a parameter "breed"
 
    <img src="/static/toolpad/docs/quickstart/step-10.png" alt="Breed parameter" width="707" />
 

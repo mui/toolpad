@@ -40,7 +40,7 @@ In the inspector panel you can see the values of the selected component's proper
 
 <img src="/static/toolpad/docs/building-ui/ui-4.png?v=0" width="291" alt="Inspector" />
 
-You can either use a static or dynamic values as described in [data binding](/toolpad/data-binding/binding-state/) section
+You can either use static or dynamic values as described in [data binding](/toolpad/data-binding/binding-state/) section
 
 ## Canvas grid
 

@@ -42,7 +42,7 @@ export default function Hero() {
         </Typography>
         <Typography color="text.secondary" sx={{ maxWidth: 520, mx: 'auto', mb: 4 }}>
           Build scalable and secure internal tools locally. Use your own IDE, drag and drop
-          pre-built components or create yours.
+          pre-built components or create your own.
         </Typography>
         <GetStartedButtons
           sx={{ justifyContent: 'center' }}

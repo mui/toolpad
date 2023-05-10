@@ -18,16 +18,18 @@ function Container({ children, visible, sx, ...props }: Props) {
 export default createComponent(Container, {
   argTypes: {
     children: {
-      typeDef: { type: 'element' },
+      type: 'element',
       control: { type: 'layoutSlot' },
     },
     visible: {
-      typeDef: { type: 'boolean', default: true },
+      type: 'boolean',
+      default: true,
       helperText: 'Control whether container element is visible.',
     },
     sx: {
       helperText: SX_PROP_HELPER_TEXT,
-      typeDef: { type: 'object', default: { padding: 1, border: 'solid 1px' } },
+      type: 'object',
+      default: { padding: 1, border: 'solid 1px' },
     },
   },
 });

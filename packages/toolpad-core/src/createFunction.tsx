@@ -9,14 +9,9 @@ interface ParameterTypeLookup {
   object: Record<string, unknown>;
 }
 
-export interface FunctionParameterConfig<P, K extends keyof P> {
-  typeDef: PrimitiveValueType;
-  defaultValue?: P[K];
-}
-
 export interface CreateFunctionConfig<P> {
   parameters: {
-    [K in keyof P]: FunctionParameterConfig<P, K>;
+    [K in keyof P]: PrimitiveValueType;
   };
 }
 
@@ -28,7 +23,7 @@ export interface FunctionResolverParams<
   C extends CreateFunctionConfig<CreateFunctionConfigParameters<C>>,
 > {
   parameters: {
-    [K in keyof C['parameters']]: ParameterTypeLookup[C['parameters'][K]['typeDef']['type']];
+    [K in keyof C['parameters']]: ParameterTypeLookup[C['parameters'][K]['type']];
   };
 }
 

@@ -26,10 +26,11 @@ function PageColumn({ gap, children }: PageColumnProps) {
 export default createComponent(PageColumn, {
   argTypes: {
     gap: {
-      typeDef: { type: 'number', default: 1 },
+      type: 'number',
+      default: 1,
     },
     children: {
-      typeDef: { type: 'element' },
+      type: 'element',
       control: { type: 'slots' },
     },
   },

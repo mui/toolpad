@@ -1,5 +1,29 @@
 # Changelog
 
+## 0.1.11
+
+<!-- generated comparing v0.1.10..master -->
+
+_May 10, 2023_
+
+A big thanks to the 3 contributors who made this release possible. Here are some highlights ✨:
+
+Allow setting page parameters in navigation actions, fix overlay grid spacing, add schema reference to docs.
+
+- &#8203;<!-- 11 -->Update references and screenshots (#1987) @apedroferreira
+- &#8203;<!-- 10 -->Add Toolpad file schema reference to the docs (#1940) @Janpot
+- &#8203;<!-- 09 -->Fix broken preview in vite runtime (#1989) @Janpot
+- &#8203;<!-- 08 -->Deps fix (#1985) @Janpot
+- &#8203;<!-- 07 -->Fix console.error being called in tests (#1966) @Janpot
+- &#8203;<!-- 06 -->Change tests structure to use ESM (#1970) @bharatkashyap
+- &#8203;<!-- 05 -->Fix overlay grid spacing (#1947) @apedroferreira
+- &#8203;<!-- 04 -->Add page parameters to navigation actions (#1876) @apedroferreira
+- &#8203;<!-- 03 -->Separate deps updates for docs in renovatebot (#1980) @Janpot
+- &#8203;<!-- 02 -->Isolate next updates (#1979) @Janpot
+- &#8203;<!-- 01 -->Pin all dependencies (#1968) @Janpot
+
+All contributors of this release in alphabetical order: @apedroferreira, @bharatkashyap, @Janpot
+
 ## 0.1.10
 
 <!-- generated comparing v0.1.9..master -->

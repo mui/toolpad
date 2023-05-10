@@ -16,3 +16,9 @@ In the theme options you can:
 - set primary and secondary colors for your UI, from a predefined list of colors.
 
 <img src="/static/toolpad/docs/building-ui/theme-2.png?v=0" width="260" alt="Theme options" />
+
+## Theme file
+
+The theme used in a project is configured by an auto-generated `theme.yml` file inside the `toolpad` folder.
+
+For a detailed look at the schema for this file and the different options it supports, please check out the [Schema Reference](/toolpad/schema-reference/#file-Theme) for theme files.

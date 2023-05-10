@@ -17,12 +17,3 @@ To serve the app once built, run:
 ```sh
 npm start
 ```
-
-## Overriding page display mode
-
-You can override any page's display mode by adding the `toolpad-display` query parameter to the URL.
-
-Possible values:
-
-- `?toolpad-display=standalone` - Hide app shell
-- `?toolpad-display=shell` - Show navigation sidebar

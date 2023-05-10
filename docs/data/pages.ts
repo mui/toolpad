@@ -5,6 +5,7 @@ import CodeIcon from '@mui/icons-material/Code';
 import DescriptionIcon from '@mui/icons-material/Description';
 import TableViewIcon from '@mui/icons-material/TableView';
 import VisibilityIcon from '@mui/icons-material/Visibility';
+import ArticleRoundedIcon from '@mui/icons-material/ArticleRounded';
 
 const pages: MuiPage[] = [
   {
@@ -16,6 +17,11 @@ const pages: MuiPage[] = [
       { pathname: '/toolpad/getting-started/installation' },
       { pathname: '/toolpad/getting-started/roadmap' },
     ],
+  },
+  {
+    pathname: '/toolpad/page-configuration',
+    title: 'Configuring pages',
+    icon: ArticleRoundedIcon,
   },
   {
     pathname: '/toolpad/connecting-to-datasources',

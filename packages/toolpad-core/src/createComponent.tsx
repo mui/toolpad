@@ -1,6 +1,5 @@
 import * as ReactIs from 'react-is';
 import { hasOwnProperty } from '@mui/toolpad-utils/collections';
-import { satisfies } from 'semver';
 import { TOOLPAD_COMPONENT } from './constants.js';
 import { ArgTypeDefinition, ComponentConfig, PropValueType, ToolpadComponent } from './types.js';
 
@@ -24,13 +23,14 @@ export default function createComponent<P extends object>(
   Component: React.ComponentType<P>,
   config?: ComponentConfig<P>,
 ): ToolpadComponent<P> {
+  // TODO: Remove post beta
   if (config?.argTypes) {
     for (const [name, argType] of Object.entries(config.argTypes)) {
-      const maybeLegacyargtype = argType as MaybeLegacyArgTypeDefinition;
-      if (maybeLegacyargtype.typeDef) {
-        console.warn(`Detected legacy argType definition for "${name}".`);
-        Object.assign(maybeLegacyargtype, maybeLegacyargtype.typeDef);
-        delete maybeLegacyargtype.typeDef;
+      const maybeLegacyArgtype = argType as MaybeLegacyArgTypeDefinition;
+      if (maybeLegacyArgtype.typeDef) {
+        console.warn(`Detected deprecated argType definition for "${name}".`);
+        Object.assign(maybeLegacyArgtype, maybeLegacyArgtype.typeDef);
+        delete maybeLegacyArgtype.typeDef;
       }
     }
   }

@@ -1,5 +1,5 @@
 import { TOOLPAD_FUNCTION } from './constants.js';
-import { PrimitiveValueType } from './types.js';
+import { PrimitiveValueType, PropValueType } from './types.js';
 
 interface ParameterTypeLookup {
   number: number;
@@ -38,9 +38,30 @@ export interface ToolpadFunction<C extends CreateFunctionConfig<CreateFunctionCo
   [TOOLPAD_FUNCTION]: C;
 }
 
+type MaybeLegacyParametersDefinition = PropValueType & {
+  typeDef?: PropValueType;
+  defaultValue?: any;
+};
+
 export default function createFunction<
   C extends CreateFunctionConfig<CreateFunctionConfigParameters<C>>,
 >(resolver: FunctionResolver<C>, config?: C) {
+  // TODO: Remove post beta
+  if (config?.parameters) {
+    for (const [name, argType] of Object.entries(config.parameters)) {
+      const maybeLegacyParamtype = argType as MaybeLegacyParametersDefinition;
+      if (maybeLegacyParamtype.typeDef) {
+        console.warn(`Detected deprecated parameter definition for "${name}".`);
+        Object.assign(maybeLegacyParamtype, maybeLegacyParamtype.typeDef);
+        if (!('default' in maybeLegacyParamtype)) {
+          maybeLegacyParamtype.default = maybeLegacyParamtype.defaultValue;
+        }
+        delete maybeLegacyParamtype.defaultValue;
+        delete maybeLegacyParamtype.typeDef;
+      }
+    }
+  }
+
   return Object.assign(resolver, {
     [TOOLPAD_FUNCTION]: config || { parameters: {} },
   });

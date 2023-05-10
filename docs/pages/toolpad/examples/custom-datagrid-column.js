@@ -4,7 +4,7 @@ import {
   demos,
   docs,
   demoComponents,
-} from '../../../../examples/user-admin-app/README.md?@mui/markdown';
+} from '../../../../examples/custom-datagrid-column/README.md?@mui/markdown';
 
 export default function Page() {
   return <MarkdownDocs demos={demos} docs={docs} demoComponents={demoComponents} disableAd />;

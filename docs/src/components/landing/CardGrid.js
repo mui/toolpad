@@ -1,7 +1,6 @@
 import * as React from 'react';
 import PropTypes from 'prop-types';
 import Box from '@mui/material/Box';
-import Button from '@mui/material/Button';
 import Container from '@mui/material/Container';
 import Paper from '@mui/material/Paper';
 import Typography from '@mui/material/Typography';
@@ -83,19 +82,10 @@ export default function CardGrid(props) {
                     </Box>
                     {wip ? <IconImage name="time" title="Work in progress" /> : null}
                   </Box>
-                </div>
-                {action ? (
-                  <Button
-                    sx={{ py: 1, mx: 2, width: 'fit-content' }}
-                    variant="contained"
-                    endIcon={<KeyboardArrowRightRounded />}
-                    target="_blank"
-                    rel="noopener"
-                    href={action.href}
-                  >
-                    {action.label}
-                  </Button>
-                ) : null}
+                  <Typography variant="body2" color="text.secondary">
+                    {description}
+                  </Typography>
+                </Box>
               </Paper>
             </Grid>
           ))}

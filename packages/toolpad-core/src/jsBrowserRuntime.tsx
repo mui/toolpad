@@ -23,15 +23,14 @@ function createBrowserRuntime(): JsRuntime {
 
         // NOTE: This is by no means intended to be a secure way to hide DOM globals 
         const globalThis = new Proxy(window.__SCOPE, {
-          has(target, name) {
-            // catch all global access
-            return true;
+          has(target, prop) {
+            return (prop === 'globalThis') || Object.prototype.hasOwnProperty.call(target, prop) || (prop in window);
           },
           get(target, prop, receiver) {
             if (prop === 'globalThis') {
               return globalThis;
             }
-            if (Object.hasOwnProperty(target, prop)) {
+            if (Object.prototype.hasOwnProperty.call(window.__SCOPE, prop)) {
               return Reflect.get(...arguments);
             }
             if (prop === Symbol.unscopables) {

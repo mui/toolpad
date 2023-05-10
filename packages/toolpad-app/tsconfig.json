@@ -27,8 +27,7 @@
     "jsx": "preserve",
     "noUnusedLocals": true,
     "pretty": true,
-    "preserveWatchOutput": true,
-    "incremental": true
+    "preserveWatchOutput": true
   },
   "include": [
     "next.config.mjs",

@@ -1,3 +1,5 @@
-# DOG APP
+# Dog app
 
-<p class="description">TBD</p>
+<p class="description">A basic Toolpad app that shows how to call an API</p>
+
+The app can be accessed from [Codesandbox]()

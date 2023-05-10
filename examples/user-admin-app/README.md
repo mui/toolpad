@@ -1,5 +1,13 @@
-# User admin app example
+# User admin app
 
-<p class="description">TBD</p>
+<p class="description">A basic user admin app. This example app has 2 pages.</p>
 
-Example showcasing a CRUD admin app. Check out the [docs]()
+## A BI dashboard
+
+It shows a bar chart as a custom component.
+
+## A CRUD app
+
+It shows a basic admin app that adds a new user and shows a list existing users.
+
+The app can be accessed from this [Codesandbox]()

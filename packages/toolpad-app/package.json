@@ -51,7 +51,7 @@
     "@googleapis/sheets": "4.0.2",
     "@mui/icons-material": "5.11.16",
     "@mui/lab": "5.0.0-alpha.129",
-    "@mui/material": "5.12.3",
+    "@mui/material": "5.13.0",
     "@mui/system": "5.12.3",
     "@mui/toolpad-components": "0.1.10",
     "@mui/toolpad-core": "0.1.10",

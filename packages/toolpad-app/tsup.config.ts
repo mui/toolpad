@@ -53,8 +53,6 @@ export default defineConfig([
     silent: true,
     outDir: 'dist/runtime',
     tsconfig: './tsconfig.esbuild.json',
-    // FIXME(https://github.com/mui/material-ui/issues/35233)
-    noExternal: ['@mui/icons-material'],
     clean: true,
     async onSuccess() {
       // eslint-disable-next-line no-console

@@ -19,6 +19,15 @@ export function isToolpadComponent(
 
 type MaybeLegacyArgTypeDefinition = ArgTypeDefinition & { typeDef?: PropValueType };
 
+/**
+ * Marks the wrapped React component as a Toolpad compatible component.
+ * This makes it available in the Toolpad editor.
+ * Optionally, you can pass a configuration object to specify the component's argument types.
+ * Argument types define the properties that can be set in the Toolpad editor for this component.
+ * Additionally, you'll be able to bind page state to these properties.
+ * @param Component The React component to wrap.
+ * @param config The configuration for the component.
+ */
 export default function createComponent<P extends object>(
   Component: React.ComponentType<P>,
   config?: ComponentConfig<P>,

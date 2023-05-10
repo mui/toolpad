@@ -43,6 +43,14 @@ type MaybeLegacyParametersDefinition = PropValueType & {
   defaultValue?: any;
 };
 
+/**
+ * Use this to define a function that will load the data for a Toolpad query.
+ * You can define parameters for the function in the configuration object.
+ * These parameters will be available in the Toolpad editor when creating a query and can be bound to page state.
+ * The return value of this function will appear as state on the page and can be bound to.
+ * @param resolver The function that will load the data for the query.
+ * @param config The configuration for the function.
+ */
 export default function createFunction<
   C extends CreateFunctionConfig<CreateFunctionConfigParameters<C>>,
 >(resolver: FunctionResolver<C>, config?: C) {

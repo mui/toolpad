@@ -6,7 +6,6 @@ import { execa, ExecaChildProcess } from 'execa';
 import readline from 'readline';
 import { Readable } from 'stream';
 import { once } from 'events';
-import { setTimeout } from 'timers/promises';
 
 jest.setTimeout(60000);
 
@@ -58,6 +57,7 @@ test('create-toolpad-app can bootstrap a Toolpad app', async () => {
       }),
     }),
   );
+
   toolpadProcess = execa('yarn', ['dev'], {
     cwd: testDir,
     env: {
@@ -79,21 +79,26 @@ test('create-toolpad-app can bootstrap a Toolpad app', async () => {
 
 afterEach(async () => {
   if (toolpadProcess && typeof toolpadProcess.exitCode !== 'number') {
-    toolpadProcess.kill();
+    const success = toolpadProcess.kill('SIGKILL');
+    // eslint-disable-next-line no-console
+    console.log('killed toolpad', success);
     await once(toolpadProcess, 'exit');
-    await setTimeout(5000);
   }
 });
 
 afterEach(async () => {
   if (testDir) {
+    // eslint-disable-next-line no-console
+    console.log('process exit code', toolpadProcess?.exitCode);
     await fs.rm(testDir, { recursive: true, force: true });
   }
 });
 
 afterEach(async () => {
   if (cp && typeof cp.exitCode !== 'number') {
-    cp.kill();
+    const success = cp.kill();
+    // eslint-disable-next-line no-console
+    console.log('killed toolpad', success);
     await once(cp, 'exit');
   }
 });

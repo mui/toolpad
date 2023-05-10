@@ -12,6 +12,7 @@ import {
 import prettyMs from 'https://cdn.skypack.dev/pretty-ms';
 
 const FlexibleXYPlot = makeWidthFlexible(XYPlot);
+const barColor = '#EBCFB2'; // Set the color for the bars
 
 export interface BarProps {
   data: Array<any>;
@@ -29,7 +30,7 @@ function Bar(props: BarProps) {
       <HorizontalGridLines />
       <XAxis tickLabelAngle={-45} />
       <YAxis />
-      <VerticalBarSeries data={data} />
+      <VerticalBarSeries data={data} color={barColor} />
     </FlexibleXYPlot>
   );
 }

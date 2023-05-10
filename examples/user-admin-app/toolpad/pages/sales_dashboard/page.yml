@@ -45,7 +45,6 @@ spec:
                             horizontalAlign: center
                           props:
                             sx:
-                              color: "#424B54"
                               fontWeight: bold
                             value: Acme corp. sales dashboard
                             variant: h4
@@ -73,9 +72,6 @@ spec:
                                   name: paper
                                   layout:
                                     columnSize: 1
-                                  props:
-                                    sx:
-                                      bgcolor: "#424B54"
                                   children:
                                     - component: PageRow
                                       name: pageRow9
@@ -83,17 +79,12 @@ spec:
                                         - component: Text
                                           name: typography1
                                           props:
-                                            sx:
-                                              color: "#EBCFB2"
                                             value: Total Sales
                                             variant: h5
                                 - component: Paper
                                   name: paper2
                                   layout:
                                     columnSize: 1
-                                  props:
-                                    sx:
-                                      bgcolor: "#424B54"
                                   children:
                                     - component: PageRow
                                       name: pageRow1
@@ -101,8 +92,6 @@ spec:
                                         - component: Text
                                           name: typography
                                           props:
-                                            sx:
-                                              color: "#EBCFB2"
                                             value:
                                               $$jsExpression: >
                                                 Intl.NumberFormat("en-US", {

@@ -80,7 +80,7 @@ export async function getCustomers() {
 }
 
 export const addCustomer = createFunction(
-  async ({ parameters }) =>
+  async ({ parameters }) => {
     customers.push({
       name: parameters.name,
       id: parameters.id,
@@ -92,7 +92,9 @@ export const addCustomer = createFunction(
       gender: parameters.gender,
       id_1: parameters.id_1,
       image: parameters.image,
-    }),
+    });
+    return customers[customers.length - 1];
+  },
   {
     parameters: {
       id: {

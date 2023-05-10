@@ -1,6 +1,0 @@
-apiVersion: v1
-kind: theme
-spec:
-  palette.mode: light
-  palette.primary.main: indigo
-  palette.secondary.main: amber

@@ -13,6 +13,7 @@
     "build:next": "NODE_OPTIONS=--max-old-space-size=8192 next build",
     "build:typings": "ts-node --esm ./scripts/typings.mts",
     "dev:cli": "tsup --watch",
+    "dev:editor": "vite ./src/toolpad",
     "dev:typings": "yarn build:typings",
     "waitForApp": "ts-node --esm ./scripts/waitForApp.mts",
     "check-types": "tsc --noEmit",

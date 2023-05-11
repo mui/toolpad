@@ -9,6 +9,7 @@ import getPort from 'get-port';
 import { createProxyMiddleware } from 'http-proxy-middleware';
 import { mapValues } from '@mui/toolpad-utils/collections';
 import prettyBytes from 'pretty-bytes';
+import { createServer as createViteServer } from 'vite';
 import { createProdHandler } from '../src/server/toolpadAppServer';
 import { getUserProjectRoot } from '../src/server/localMode';
 import { listen } from '../src/utils/http';
@@ -132,6 +133,14 @@ async function main() {
   const hostname = 'localhost';
   const port = Number(process.env.TOOLPAD_PORT);
   let editorNextApp: ReturnType<typeof next> | undefined;
+
+  const viteApp = await createViteServer({
+    configFile: path.resolve(__dirname, '../../src/toolpad/vite.config.ts'),
+    root: path.resolve(__dirname, '../../src/toolpad'),
+    server: { middlewareMode: true },
+  });
+
+  app.use('/_toolpad2', viteApp.middlewares);
 
   if (cmd === 'dev') {
     const dir = process.env.TOOLPAD_DIR;

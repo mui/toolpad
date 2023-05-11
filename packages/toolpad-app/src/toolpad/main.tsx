@@ -8,7 +8,7 @@ import { queryClient } from '../api';
 function Main() {
   return (
     <QueryClientProvider client={queryClient}>
-      <Toolpad basename="/_toolpad" />
+      <Toolpad basename="/_toolpad2" />
     </QueryClientProvider>
   );
 }

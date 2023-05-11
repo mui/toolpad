@@ -1,6 +1,6 @@
 {
   "name": "@mui/toolpad",
-  "version": "0.1.10",
+  "version": "0.1.11",
   "license": "MIT",
   "scripts": {
     "prebuild": "rimraf dist",
@@ -31,8 +31,8 @@
     "toolpad": "./index.cjs"
   },
   "dependencies": {
-    "@mui/toolpad-app": "0.1.10",
-    "@mui/toolpad-core": "0.1.10",
+    "@mui/toolpad-app": "^0.1.11",
+    "@mui/toolpad-core": "^0.1.11",
     "arg": "5.0.2",
     "concurrently": "8.0.1",
     "dotenv": "16.0.3",

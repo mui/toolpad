@@ -1,6 +1,6 @@
 {
   "name": "@mui/toolpad-app",
-  "version": "0.1.10",
+  "version": "0.1.11",
   "license": "MIT",
   "scripts": {
     "build": "concurrently \"yarn:build:*\" && rimraf ./.next/cache",
@@ -42,7 +42,6 @@
     }
   },
   "dependencies": {
-    "@babel/code-frame": "7.21.4",
     "@emotion/cache": "11.11.0",
     "@emotion/react": "11.11.0",
     "@emotion/server": "11.11.0",
@@ -51,11 +50,11 @@
     "@googleapis/sheets": "4.0.2",
     "@mui/icons-material": "5.11.16",
     "@mui/lab": "5.0.0-alpha.129",
-    "@mui/material": "5.12.3",
+    "@mui/material": "5.13.0",
     "@mui/system": "5.12.3",
-    "@mui/toolpad-components": "0.1.10",
-    "@mui/toolpad-core": "0.1.10",
-    "@mui/toolpad-utils": "0.1.10",
+    "@mui/toolpad-components": "^0.1.11",
+    "@mui/toolpad-core": "^0.1.11",
+    "@mui/toolpad-utils": "^0.1.11",
     "@mui/types": "7.2.4",
     "@mui/utils": "5.12.3",
     "@mui/x-data-grid": "6.3.1",
@@ -125,7 +124,6 @@
     "semver": "7.5.0",
     "serialize-javascript": "6.0.1",
     "ses": "0.18.4",
-    "sucrase": "3.32.0",
     "superjson": "1.12.3",
     "ts-node": "10.9.1",
     "vite": "4.3.5",
@@ -150,6 +148,7 @@
     "@types/react": "18.2.6",
     "@types/react-dom": "18.2.4",
     "@types/react-inspector": "4.0.2",
+    "@types/react-is": "^18.2.0",
     "@types/serialize-javascript": "5.0.2",
     "@types/whatwg-url": "11.0.0",
     "ajv": "8.12.0",

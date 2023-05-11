@@ -220,6 +220,15 @@ export function createViteConfig({
         },
       },
     },
+    resolve: {
+      alias: [
+        {
+          // FIXME(https://github.com/mui/material-ui/issues/35233)
+          find: /^@mui\/icons-material\/([^/]*)/,
+          replacement: '@mui/icons-material/esm/$1',
+        },
+      ],
+    },
     server: {
       fs: {
         allow: [root, path.resolve(__dirname, '../../../../')],

@@ -103,26 +103,20 @@ spec:
                                                   }, 0) / 100
                                                 )
                                             variant: h5
-                            - component: Paper
-                              name: paper4
+                            - component: codeComponent.bar2
+                              name: codeComponent_bar2
                               props:
-                                sx:
-                                  maxWidth: 100%
-                              children:
-                                - component: PageRow
-                                  name: pageRow8
-                                  children:
-                                    - component: codeComponent.bar
-                                      name: codeComponent_v41c3lqs
-                                      props:
-                                        data:
-                                          $$jsExpression: >
-                                            query.data.map((item) => {
-                                              return {
-                                                y: parseFloat(item.price.replace(/[€,]/g, "")),
-                                                x: item.dateoforder,
-                                              }
-                                            })
+                                data:
+                                  $$jsExpression: >
+                                    query.data.map((item) => {
+                                      let [month, day, year] = item.dateoforder.split("/") // split the input date into month, day, and year
+                                      let outputdate = `${month}-${year.slice(-2)}`
+
+                                      return {
+                                        y: (parseFloat(item.price.replace(/[€,]/g, "")) / 1000000).toFixed(2),
+                                        x: outputdate,
+                                      }
+                                    })
                             - component: DataGrid
                               name: dataGrid
                               props:

@@ -9,19 +9,19 @@ import {
   VerticalBarSeries,
   makeWidthFlexible,
 } from 'https://cdn.skypack.dev/react-vis';
-import prettyMs from 'https://cdn.skypack.dev/pretty-ms';
+// import prettyMs from 'https://cdn.skypack.dev/pretty-ms';
 
 const FlexibleXYPlot = makeWidthFlexible(XYPlot);
-const barColor = '#EBCFB2'; // Set the color for the bars
+const barColor = '#027FFE'; // Set the color for the bars
 
 export interface BarProps {
   data: Array<any>;
 }
 
 function Bar(props: BarProps) {
-  const root = React.useRef(null);
+  // const root = React.useRef(null);
   const { data: dataProp } = props;
-  const [value, setValue] = React.useState(null);
+  // const [value, setValue] = React.useState(null);
   const data = dataProp;
 
   return (
@@ -46,9 +46,3 @@ export default createComponent(Bar, {
     },
   },
 });
-
-// {[
-//          { x: "Apples", y: 10 },
-//          { x: "Bananas", y: 5 },
-//          { x: "Cranberries", y: 15 },
-//        ]}

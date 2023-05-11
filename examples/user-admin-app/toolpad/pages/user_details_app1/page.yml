@@ -45,7 +45,7 @@ spec:
                             sx:
                               fontWeight: bold
                             value: Acme corp. admin app
-                            variant: h4
+                            variant: h5
                     - component: Text
                       name: typography4
                       props:
@@ -241,14 +241,15 @@ spec:
                                             multiple: false
   queries:
     - name: get
+      enabled: true
       query:
-        kind: local
         function: getCustomers
+        kind: local
       parameters:
         - name: name
           value: hi
-      enabled: true
     - name: add
+      mode: mutation
       query:
         function: addCustomer
         kind: local
@@ -293,4 +294,3 @@ spec:
           value:
             $$jsExpression: |
               id_number.value
-      mode: mutation

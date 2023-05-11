@@ -134,14 +134,26 @@ async function main() {
   const port = Number(process.env.TOOLPAD_PORT);
   let editorNextApp: ReturnType<typeof next> | undefined;
 
-  const viteApp = await createViteServer({
-    configFile: path.resolve(__dirname, '../../src/toolpad/vite.config.ts'),
-    root: path.resolve(__dirname, '../../src/toolpad'),
-    server: { middlewareMode: true },
-  });
+  if (cmd === 'dev') {
+    const editorBasename = '/_toolpad2';
+    if (process.env.NODE_ENV === 'development') {
+      const viteApp = await createViteServer({
+        configFile: path.resolve(__dirname, '../../src/toolpad/vite.config.ts'),
+        root: path.resolve(__dirname, '../../src/toolpad'),
+        server: { middlewareMode: true },
+      });
 
-  app.use('/_toolpad2', viteApp.middlewares);
-
+      app.use(editorBasename, viteApp.middlewares);
+    } else {
+      app.use(
+        editorBasename,
+        express.static(path.resolve(__dirname, '../../dist/editor'), { index: false }),
+      );
+      app.use(editorBasename, (req, res) =>
+        res.sendFile(path.resolve(__dirname, '../../dist/editor/index.html')),
+      );
+    }
+  }
   if (cmd === 'dev') {
     const dir = process.env.TOOLPAD_DIR;
     const dev = !!process.env.TOOLPAD_NEXT_DEV;

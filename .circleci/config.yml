@@ -127,6 +127,11 @@ jobs:
       - run:
           name: '`yarn prettier` changes committed?'
           command: yarn prettier --check
+      - run:
+          name: '`yarn jsonSchemas` changes committed?'
+          command: |
+            yarn jsonSchemas
+            git diff --exit-code
 
   test_unit:
     <<: *defaults

@@ -8,7 +8,7 @@ export type NodeId = Branded<string, 'NodeId'>;
 export type BindingAttrValueFormat = 'stringLiteral' | 'default';
 
 export interface NodeReference {
-  $$ref: NodeId;
+  $ref: NodeId;
 }
 
 export interface BoundExpressionAttrValue {

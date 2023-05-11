@@ -37,9 +37,10 @@
     "release:changelog": "dotenv -- node ./scripts/releaseChangelog.mjs --repo mui-toolpad",
     "test:build": "lerna run build --scope @mui/toolpad-core --scope @mui/toolpad-components --stream",
     "test:integration": "rm -rf ./node_modules/.vite && playwright test --config ./test/playwright.config.ts",
-    "test": "jest",
+    "test": "lerna run test",
     "check-types": "lerna run check-types",
-    "toolpad": "toolpad"
+    "toolpad": "toolpad",
+    "jsonSchemas": "ts-node --esm ./scripts/generateJsonSchemas.mts"
   },
   "devDependencies": {
     "@jest/globals": "29.5.0",
@@ -76,6 +77,7 @@
     "globby": "13.1.4",
     "jest": "29.5.0",
     "jest-environment-jsdom": "29.5.0",
+    "jest-fail-on-console": "3.1.1",
     "lerna": "6.6.2",
     "markdownlint-cli2": "0.7.1",
     "prettier": "2.8.8",
@@ -89,13 +91,16 @@
     "yarn-deduplicate": "6.0.1"
   },
   "dependencies": {
+    "@janpotoms/zod-to-json-schema": "3.20.6",
     "archiver": "5.3.1",
     "cross-env": "7.0.3",
     "dotenv-cli": "7.2.1",
     "inquirer": "9.2.2",
     "semver": "7.5.0",
+    "ts-node": "10.9.1",
     "tsup": "6.7.0",
-    "yargs": "17.7.2"
+    "yargs": "17.7.2",
+    "zod": "3.21.4"
   },
   "engines": {
     "npm": "please-use-yarn",

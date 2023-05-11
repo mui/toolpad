@@ -2,16 +2,34 @@
   "compilerOptions": {
     "paths": {
       // TODO: remove when typescript module resolution supports package exports. (v5.0 with moduleResolution: 'bundler')
-      "@mui/toolpad-core": ["../toolpad-core/dist"],
-      "@mui/toolpad-core/runtime": ["../toolpad-core/dist/runtime"],
-      "@mui/toolpad-core/jsRuntime": ["../toolpad-core/dist/jsRuntime"],
-      "@mui/toolpad-core/jsBrowserRuntime": ["../toolpad-core/dist/jsBrowserRuntime"],
-      "@mui/toolpad-core/jsServerRuntime": ["../toolpad-core/dist/jsServerRuntime"],
-      "@mui/toolpad-core/objectKey": ["../toolpad-core/dist/objectKey"],
-      "@mui/toolpad-utils/*": ["../toolpad-utils/dist/*"]
+      "@mui/toolpad-core": [
+        "../toolpad-core/dist"
+      ],
+      "@mui/toolpad-core/runtime": [
+        "../toolpad-core/dist/runtime"
+      ],
+      "@mui/toolpad-core/jsRuntime": [
+        "../toolpad-core/dist/jsRuntime"
+      ],
+      "@mui/toolpad-core/jsBrowserRuntime": [
+        "../toolpad-core/dist/jsBrowserRuntime"
+      ],
+      "@mui/toolpad-core/jsServerRuntime": [
+        "../toolpad-core/dist/jsServerRuntime"
+      ],
+      "@mui/toolpad-core/objectKey": [
+        "../toolpad-core/dist/objectKey"
+      ],
+      "@mui/toolpad-utils/*": [
+        "../toolpad-utils/dist/*"
+      ]
     },
     "target": "esnext",
-    "lib": ["dom", "dom.iterable", "esnext"],
+    "lib": [
+      "dom",
+      "dom.iterable",
+      "esnext"
+    ],
     "allowJs": true,
     "checkJs": true,
     "skipLibCheck": true,
@@ -27,7 +45,8 @@
     "jsx": "preserve",
     "noUnusedLocals": true,
     "pretty": true,
-    "preserveWatchOutput": true
+    "preserveWatchOutput": true,
+    "incremental": true
   },
   "include": [
     "next.config.mjs",
@@ -39,5 +58,9 @@
     "typings/**/*.d.ts",
     "scripts/*.mts"
   ],
-  "exclude": ["node_modules", "./scripts", "./public"]
+  "exclude": [
+    "node_modules",
+    "./scripts",
+    "./public"
+  ]
 }

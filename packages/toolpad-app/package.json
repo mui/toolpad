@@ -42,7 +42,6 @@
     }
   },
   "dependencies": {
-    "@babel/code-frame": "7.21.4",
     "@emotion/cache": "11.11.0",
     "@emotion/react": "11.11.0",
     "@emotion/server": "11.11.0",

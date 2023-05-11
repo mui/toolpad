@@ -43,7 +43,6 @@
     }
   },
   "dependencies": {
-    "@babel/code-frame": "7.21.4",
     "@emotion/cache": "11.11.0",
     "@emotion/react": "11.11.0",
     "@emotion/server": "11.11.0",
@@ -126,7 +125,6 @@
     "semver": "7.5.0",
     "serialize-javascript": "6.0.1",
     "ses": "0.18.4",
-    "sucrase": "3.32.0",
     "superjson": "1.12.3",
     "ts-node": "10.9.1",
     "vite": "4.3.5",

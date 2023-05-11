@@ -24,12 +24,14 @@
     "prebuild": "rimraf ./dist",
     "build": "tsup",
     "dev": "tsup --watch",
-    "check-types": "tsc --noEmit"
+    "check-types": "tsc --noEmit",
+    "test": "NODE_OPTIONS=--experimental-vm-modules jest --detectOpenHandles --forceExit"
   },
   "engines": {
     "node": ">=16.17"
   },
   "dependencies": {
+    "@mui/toolpad-utils": "^0.1.10",
     "chalk": "5.2.0",
     "execa": "7.1.1",
     "inquirer": "9.2.2"

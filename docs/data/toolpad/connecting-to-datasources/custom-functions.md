@@ -1,12 +1,12 @@
-# Serverside JavaScript
+# Custom Functions
 
 <p class="description">Write async serverside JavaScript functions to load external data.</p>
 
-## Working with serverside JavaScript
+## Working with custom functions
 
 1. Choose **Add query** in the **Inspector** on the right.
 
-1. Select **serverside JavaScript function**:
+1. Select **Custom function**:
 
    <img src="/static/toolpad/docs/queries/query-2.png?v=0" alt="Select query type" width="464" />
 

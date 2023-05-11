@@ -41,7 +41,7 @@ test('rest basics', async ({ page, context }) => {
   await editorModel.goto();
 
   await editorModel.componentEditor.getByRole('button', { name: 'Add query' }).click();
-  await page.getByRole('button', { name: 'serverside HTTP request' }).click();
+  await page.getByRole('button', { name: 'HTTP request' }).click();
 
   const newQueryEditor = page.getByRole('dialog', { name: 'query' });
 

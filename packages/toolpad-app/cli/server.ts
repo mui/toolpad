@@ -10,13 +10,17 @@ import { createProxyMiddleware } from 'http-proxy-middleware';
 import { mapValues } from '@mui/toolpad-utils/collections';
 import prettyBytes from 'pretty-bytes';
 import { createServer as createViteServer } from 'vite';
+import * as fs from 'fs/promises';
+import serializeJavascript from 'serialize-javascript';
 import { createProdHandler } from '../src/server/toolpadAppServer';
 import { getUserProjectRoot } from '../src/server/localMode';
-import { listen } from '../src/utils/http';
+import { asyncHandler, listen } from '../src/utils/http';
 import { getProject } from '../src/server/liveProject';
 import { Command as AppDevServerCommand, Event as AppDevServerEvent } from './appServer';
 import { createRpcHandler, rpcServer } from '../src/server/rpc';
 import { createDataHandler, createDataSourcesHandler } from '../src/server/data';
+import { RUNTIME_CONFIG_WINDOW_PROPERTY } from '../src/constants';
+import config from '../src/config';
 
 interface HealthCheck {
   gitSha1: string | null;
@@ -135,12 +139,30 @@ async function main() {
   let editorNextApp: ReturnType<typeof next> | undefined;
 
   if (cmd === 'dev') {
+    const transformIndexHtml = (html: string) => {
+      const serializedConfig = serializeJavascript(config, { isJSON: true });
+      return html.replace(
+        '<!-- __TOOLPAD_SCRIPTS__ -->',
+        `
+          <script>
+            window[${JSON.stringify(RUNTIME_CONFIG_WINDOW_PROPERTY)}] = ${serializedConfig}
+          </script>
+        `,
+      );
+    };
+
     const editorBasename = '/_toolpad2';
     if (process.env.NODE_ENV === 'development') {
       const viteApp = await createViteServer({
         configFile: path.resolve(__dirname, '../../src/toolpad/vite.config.ts'),
         root: path.resolve(__dirname, '../../src/toolpad'),
         server: { middlewareMode: true },
+        plugins: [
+          {
+            name: 'toolpad:transform-index-html',
+            transformIndexHtml,
+          },
+        ],
       });
 
       app.use(editorBasename, viteApp.middlewares);
@@ -149,11 +171,18 @@ async function main() {
         editorBasename,
         express.static(path.resolve(__dirname, '../../dist/editor'), { index: false }),
       );
-      app.use(editorBasename, (req, res) =>
-        res.sendFile(path.resolve(__dirname, '../../dist/editor/index.html')),
+
+      app.use(
+        asyncHandler(async (req, res) => {
+          const htmlFilePath = path.resolve(__dirname, '../../dist/editor/index.html');
+          let html = await fs.readFile(htmlFilePath, { encoding: 'utf-8' });
+          html = transformIndexHtml(html);
+          res.setHeader('Content-Type', 'text/html').status(200).end(html);
+        }),
       );
     }
   }
+
   if (cmd === 'dev') {
     const dir = process.env.TOOLPAD_DIR;
     const dev = !!process.env.TOOLPAD_NEXT_DEV;

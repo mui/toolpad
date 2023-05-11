@@ -63,7 +63,7 @@ async function runApp(cmd: Command, { port, dev = false, dir }: RunOptions) {
     cwd: projectDir,
     stdio: 'pipe',
     env: {
-      NODE_ENV: process.env.NODE_ENV,
+      NODE_ENV: dev ? 'development' : 'production',
       TOOLPAD_NEXT_DEV: dev ? '1' : '',
       TOOLPAD_DIR: toolpadDir,
       TOOLPAD_PROJECT_DIR: projectDir,

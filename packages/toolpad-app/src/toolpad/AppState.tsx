@@ -16,6 +16,19 @@ import { NodeHashes } from '../types';
 import { hasFieldFocus } from '../utils/fields';
 import { DomView, getViewFromPathname, PageViewTab } from '../utils/domView';
 
+let ws: WebSocket | null = null;
+
+if (typeof window !== 'undefined') {
+  ws = new WebSocket(`ws://${window.location.host}/toolpad-ws`);
+
+  ws.addEventListener('error', (err) => console.error(err));
+
+  ws.addEventListener('open', () => {
+    // eslint-disable-next-line no-console
+    console.log('Socket connected');
+  });
+}
+
 export function getNodeHashes(dom: appDom.AppDom): NodeHashes {
   return mapValues(dom.nodes, (node) => insecureHash(JSON.stringify(omit(node, 'id'))));
 }
@@ -575,32 +588,25 @@ export default function AppProvider({ children }: DomContextProps) {
 
   useShortcut({ key: 's', metaKey: true }, handleSave);
 
-  // Quick and dirty polling for dom updates
   React.useEffect(() => {
-    let active = true;
+    invariant(ws, 'ws should be initialized at this point');
 
-    (async () => {
-      while (active) {
-        try {
-          const currentFingerprint = fingerprint.current;
-          // eslint-disable-next-line no-await-in-loop
-          const newFingerPrint = await client.query.getDomFingerprint();
-          if (currentFingerprint && currentFingerprint !== newFingerPrint) {
-            client.invalidateQueries('loadDom', []);
-          }
-          fingerprint.current = newFingerPrint;
-          // eslint-disable-next-line no-await-in-loop
-          await new Promise((resolve) => {
-            setTimeout(resolve, 1000);
-          });
-        } catch (err) {
-          console.error(err);
+    const onMessage = (event: MessageEvent<any>) => {
+      const message = JSON.parse(event.data);
+      switch (message.kind) {
+        case 'externalChange': {
+          client.invalidateQueries('loadDom', []);
+          break;
         }
+        default:
+          throw new Error(`Unknown message kind: ${message.kind}`);
       }
-    })();
+    };
+
+    ws.addEventListener('message', onMessage);
 
     return () => {
-      active = false;
+      ws?.removeEventListener('message', onMessage);
     };
   }, []);
 

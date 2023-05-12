@@ -60,36 +60,38 @@ export default createComponent(Image, {
   argTypes: {
     src: {
       helperText: 'The url of the image. Must resolve to an image file.',
-      typeDef: { type: 'string' },
+      type: 'string',
     },
     alt: {
       helperText:
         "The `alt` attribute holds a text description of the image. screen readers read this description out to their users so they know what the image means. Alt text is also displayed on the page if the image can't be loaded for some reason: for example, network errors, content blocking, or linkrot.",
-      typeDef: { type: 'string', default: '' },
+      type: 'string',
+      default: '',
     },
     fit: {
       helperText:
         'Defines how the image should [resize](https://developer.mozilla.org/en-US/docs/Web/CSS/object-fit) to its container.',
-      typeDef: {
-        type: 'string',
-        enum: ['contain', 'cover', 'fill', 'none', 'scale-down'],
-        default: 'contain',
-      },
+      type: 'string',
+      enum: ['contain', 'cover', 'fill', 'none', 'scale-down'],
+      default: 'contain',
     },
     width: {
       helperText: 'The image width in pixels',
-      typeDef: { type: 'number', default: 400 },
+      type: 'number',
+      default: 400,
     },
     height: {
-      typeDef: { type: 'number', default: 300 },
+      type: 'number',
+      default: 300,
     },
     loading: {
       helperText: 'Displays a loading animation indicating the image is still loading',
-      typeDef: { type: 'boolean', default: false },
+      type: 'boolean',
+      default: false,
     },
     sx: {
       helperText: SX_PROP_HELPER_TEXT,
-      typeDef: { type: 'object' },
+      type: 'object',
     },
   },
 });

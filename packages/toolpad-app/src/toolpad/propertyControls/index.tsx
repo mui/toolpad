@@ -73,10 +73,10 @@ export function getDefaultControl<P extends { [key in string]?: unknown }>(
         }
       }
     }
-    return propTypeControls[argType.control.type] ?? getDefaultControlForType(argType.typeDef);
+    return propTypeControls[argType.control.type] ?? getDefaultControlForType(argType);
   }
 
-  return getDefaultControlForType(argType.typeDef);
+  return getDefaultControlForType(argType);
 }
 
 export default propTypeControls;

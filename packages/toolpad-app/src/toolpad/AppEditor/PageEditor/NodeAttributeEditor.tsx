@@ -53,7 +53,7 @@ export default function NodeAttributeEditor<P extends object>({
 
   const liveBinding = bindings[bindingId];
 
-  const propType = argType.typeDef;
+  const propType = argType;
   const Control = getDefaultControl(argType, props);
 
   // NOTE: Doesn't make much sense to bind controlled props. In the future we might opt

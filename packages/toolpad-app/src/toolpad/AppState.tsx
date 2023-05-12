@@ -158,7 +158,7 @@ export function domLoaderReducer(state: DomLoader, action: AppStateAction): DomL
         return state;
       }
 
-      return update(state, { dom: action.dom });
+      return update(state, { dom: action.dom, savedDom: action.dom });
     }
     default:
       return state;

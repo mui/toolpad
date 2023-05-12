@@ -128,6 +128,7 @@
     "superjson": "1.12.3",
     "ts-node": "10.9.1",
     "vite": "4.3.5",
+    "vm-browserify": "^1.1.2",
     "whatwg-url": "12.0.1",
     "yaml": "2.2.2",
     "yaml-diff-patch": "2.0.0",

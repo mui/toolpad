@@ -17,6 +17,11 @@ export default defineConfig({
     outDir: path.resolve(__dirname, '../../dist/editor'),
     emptyOutDir: true,
   },
+  resolve: {
+    alias: {
+      vm: 'vm-browserify',
+    },
+  },
   define: {
     'process.env.TOOLPAD_VERSION': JSON.stringify(pkgJson.version),
     'process.env.TOOLPAD_BUILD': JSON.stringify(TOOLPAD_BUILD),

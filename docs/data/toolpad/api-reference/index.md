@@ -5,6 +5,6 @@
 ## Functions
 
 - [createComponent](./create-component/)
-- [createQuery](./create-query/)
+- [createFunction](./create-function/)
 
 ## Interfaces

@@ -5,6 +5,9 @@ import CodeIcon from '@mui/icons-material/Code';
 import DescriptionIcon from '@mui/icons-material/Description';
 import TableViewIcon from '@mui/icons-material/TableView';
 import VisibilityIcon from '@mui/icons-material/Visibility';
+import ToggleOffIcon from '@mui/icons-material/ToggleOff';
+import LinkIcon from '@mui/icons-material/Link';
+import componentsManifest from './toolpad/components/manifest.json';
 
 const pages: MuiPage[] = [
   {
@@ -59,11 +62,42 @@ const pages: MuiPage[] = [
   },
   {
     pathname: '/toolpad/data-binding',
-    icon: CodeIcon,
+    icon: LinkIcon,
   },
   {
     pathname: '/toolpad/deployment',
     icon: BuildIcon,
+  },
+  {
+    pathname: '/toolpad/components-group',
+    title: 'Components',
+    icon: ToggleOffIcon,
+    children: componentsManifest.pages,
+  },
+  {
+    pathname: '/toolpad/api-reference-group',
+    title: 'API Reference',
+    icon: CodeIcon,
+    children: [
+      {
+        pathname: '/toolpad/api-reference',
+        title: 'Index',
+      },
+      {
+        pathname: '/toolpad/api-reference/functions-group',
+        subheader: 'Functions',
+        children: [
+          {
+            title: 'createFunction',
+            pathname: '/toolpad/api-reference/create-function',
+          },
+          {
+            title: 'createComponent',
+            pathname: '/toolpad/api-reference/create-component',
+          },
+        ],
+      },
+    ],
   },
   {
     pathname: '/toolpad/schema-reference',

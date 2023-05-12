@@ -1,13 +1,5 @@
 import { TOOLPAD_FUNCTION } from './constants.js';
-import { PrimitiveValueType } from './types.js';
-
-interface ParameterTypeLookup {
-  number: number;
-  string: string;
-  boolean: boolean;
-  array: unknown[];
-  object: Record<string, unknown>;
-}
+import { InferParameterType, PrimitiveValueType } from './types.js';
 
 export interface FunctionParameterConfig<P, K extends keyof P> {
   typeDef: PrimitiveValueType;
@@ -28,7 +20,7 @@ export interface FunctionResolverParams<
   C extends CreateFunctionConfig<CreateFunctionConfigParameters<C>>,
 > {
   parameters: {
-    [K in keyof C['parameters']]: ParameterTypeLookup[C['parameters'][K]['typeDef']['type']];
+    [K in keyof C['parameters']]: InferParameterType<C['parameters'][K]['typeDef']>;
   };
 }
 

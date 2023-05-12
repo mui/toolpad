@@ -1,6 +1,6 @@
 # createFunction
 
-<p class="description">Provide backend function that load data on the page.</p>
+<p class="description">Provide backend function that loads data on the page.</p>
 
 ## Data Loading
 

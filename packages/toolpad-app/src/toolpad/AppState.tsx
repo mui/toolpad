@@ -27,6 +27,18 @@ if (typeof window !== 'undefined') {
     // eslint-disable-next-line no-console
     console.log('Socket connected');
   });
+
+  ws.addEventListener('message', (event) => {
+    const message = JSON.parse(event.data);
+    switch (message.kind) {
+      case 'externalChange': {
+        client.invalidateQueries('loadDom', []);
+        break;
+      }
+      default:
+        throw new Error(`Unknown message kind: ${message.kind}`);
+    }
+  });
 }
 
 export function getNodeHashes(dom: appDom.AppDom): NodeHashes {
@@ -587,28 +599,6 @@ export default function AppProvider({ children }: DomContextProps) {
   }, [state.hasUnsavedChanges, state.unsavedDomChanges]);
 
   useShortcut({ key: 's', metaKey: true }, handleSave);
-
-  React.useEffect(() => {
-    invariant(ws, 'ws should be initialized at this point');
-
-    const onMessage = (event: MessageEvent<any>) => {
-      const message = JSON.parse(event.data);
-      switch (message.kind) {
-        case 'externalChange': {
-          client.invalidateQueries('loadDom', []);
-          break;
-        }
-        default:
-          throw new Error(`Unknown message kind: ${message.kind}`);
-      }
-    };
-
-    ws.addEventListener('message', onMessage);
-
-    return () => {
-      ws?.removeEventListener('message', onMessage);
-    };
-  }, []);
 
   return (
     <AppStateProvider value={state}>

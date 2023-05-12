@@ -1,4 +1,4 @@
-import { zodToJsonSchema } from '@janpotoms/zod-to-json-schema';
+import { zodToJsonSchema } from 'zod-to-json-schema';
 import * as z from 'zod';
 import * as fs from 'fs/promises';
 import * as path from 'path';

@@ -229,39 +229,42 @@ export default createComponent(Text, {
     mode: {
       helperText:
         'Defines how the content is rendered. Either as plain text, markdown, or as a link.',
-      typeDef: { type: 'string', enum: ['text', 'markdown', 'link'], default: 'text' },
+      type: 'string',
+      enum: ['text', 'markdown', 'link'],
+      default: 'text',
       label: 'Mode',
     },
     value: {
       helperText: 'The text content.',
-      typeDef: { type: 'string', default: 'text' },
+      type: 'string',
+      default: 'text',
       label: 'Value',
       control: { type: 'markdown' },
     },
     href: {
       helperText: 'The url that is being linked.',
-      typeDef: { type: 'string', default: 'about:blank' },
+      type: 'string',
+      default: 'about:blank',
       visible: ({ mode }) => mode === 'link',
     },
     variant: {
       helperText:
         'The MUI typography [variant](https://mui.com/material-ui/customization/typography/#variants) that is used to display the text.',
-      typeDef: {
-        type: 'string',
-        enum: ['h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'subtitle1', 'subtitle2', 'body1', 'body2'],
-        default: 'body1',
-      },
+      type: 'string',
+      enum: ['h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'subtitle1', 'subtitle2', 'body1', 'body2'],
+      default: 'body1',
       label: 'Variant',
       visible: ({ mode }) => mode === 'text',
     },
     loading: {
       helperText:
         'Displays a loading animation instead of the text. Can be used when the content is not available yet.',
-      typeDef: { type: 'boolean', default: false },
+      type: 'boolean',
+      default: false,
     },
     sx: {
       helperText: SX_PROP_HELPER_TEXT,
-      typeDef: { type: 'object' },
+      type: 'object',
       visible: ({ mode }) => mode !== 'markdown',
     },
   },

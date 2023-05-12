@@ -170,9 +170,6 @@ async function main() {
       app.use(
         editorBasename,
         express.static(path.resolve(__dirname, '../../dist/editor'), { index: false }),
-      );
-
-      app.use(
         asyncHandler(async (req, res) => {
           const htmlFilePath = path.resolve(__dirname, '../../dist/editor/index.html');
           let html = await fs.readFile(htmlFilePath, { encoding: 'utf-8' });

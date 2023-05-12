@@ -730,7 +730,7 @@ function createDomQueryFromPageFileQuery(query: QueryConfig): FetchQuery | Local
           case 'raw': {
             body = {
               kind: 'raw',
-              content: toBindable(query.body.content),
+              content: toBindable<string>(query.body.content),
               contentType: appDom.createConst(query.body.contentType),
             };
             break;
@@ -738,7 +738,10 @@ function createDomQueryFromPageFileQuery(query: QueryConfig): FetchQuery | Local
           case 'urlEncoded': {
             body = {
               kind: 'urlEncoded',
-              content: query.body.content.map(({ name, value }) => [name, toBindable(value)]),
+              content: query.body.content.map(({ name, value }) => [
+                name,
+                toBindable<string>(value),
+              ]),
             };
             break;
           }
@@ -774,12 +777,13 @@ function createDomQueryFromPageFileQuery(query: QueryConfig): FetchQuery | Local
 
       return {
         url: query.url ? toBindable(query.url) : undefined,
-        headers: query.headers?.map(({ name, value }) => [name, toBindable(value)]) || [],
+        headers: query.headers?.map(({ name, value }) => [name, toBindable<string>(value)]) || [],
         method: query.method || 'GET',
         browser: false,
         transform: query.transform,
         transformEnabled: query.transformEnabled,
-        searchParams: query.searchParams?.map(({ name, value }) => [name, toBindable(value)]) || [],
+        searchParams:
+          query.searchParams?.map(({ name, value }) => [name, toBindable<string>(value)]) || [],
         body,
         response,
       } satisfies FetchQuery;

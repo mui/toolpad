@@ -249,7 +249,7 @@ export type ArgTypeDefinition<P extends object = {}, V = P[keyof P]> = PropValue
   description?: string;
   /**
    * A default value for the property.
-   * @deprecated Use `typeDef.default` instead.
+   * @deprecated Use `default` instead.
    */
   defaultValue?: V;
   /**

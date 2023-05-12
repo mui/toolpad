@@ -21,7 +21,7 @@ export const myFunction = createFunction(
   {
     parameters: {
       message: {
-        typeDef: { type: 'string' },
+        type: 'string',
       },
     },
   },

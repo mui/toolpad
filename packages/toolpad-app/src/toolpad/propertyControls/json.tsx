@@ -8,7 +8,7 @@ import {
   Skeleton,
 } from '@mui/material';
 import * as React from 'react';
-import * as JSON5 from 'json5';
+import JSON5 from 'json5';
 import type { EditorProps } from '../../types';
 import useShortcut from '../../utils/useShortcut';
 import lazyComponent from '../../utils/lazyComponent';

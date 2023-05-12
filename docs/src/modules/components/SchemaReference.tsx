@@ -231,8 +231,14 @@ function JsonSchemaItemDisplay({ schema, idPrefix }: JsonSchemaItemDisplayProps)
     return null;
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-use-before-define
-  return <JsonSchemaValueDisplay schema={schema} idPrefix={idPrefix} />;
+  return (
+    <React.Fragment>
+      {/* eslint-disable-next-line @typescript-eslint/no-use-before-define */}
+      <JsonDescriptionDisplay schema={schema} />
+      {/* eslint-disable-next-line @typescript-eslint/no-use-before-define */}
+      <JsonSchemaValueDisplay schema={schema} idPrefix={idPrefix} />
+    </React.Fragment>
+  );
 }
 
 interface JsonSchemaItemsDisplayProps {

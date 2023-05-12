@@ -1,10 +1,8 @@
 import * as React from 'react';
 import PropTypes from 'prop-types';
 import Container from '@mui/material/Container';
-import Button from '@mui/material/Button';
-import Link from 'docs/src/modules/components/Link';
 import Typography from '@mui/material/Typography';
-import KeyboardArrowRightRounded from '@mui/icons-material/KeyboardArrowRightRounded';
+import SignUp from './SignUp';
 
 function Marquee({ content }) {
   return (
@@ -44,20 +42,25 @@ function Marquee({ content }) {
       >
         {content.subtitle}
       </Typography>
-      <Button
-        component={Link}
-        href={content.action.href}
-        data-ga-event-category="ToolpadLanding"
-        data-ga-event-label={content.action.label}
-        data-ga-event-action="SelfHost"
-        noLinkStyle
-        size="large"
-        variant="contained"
-        endIcon={<KeyboardArrowRightRounded />}
-        sx={{ width: { xs: '100%', sm: 'auto' } }}
+      <Typography
+        component="label"
+        variant="body2"
+        color={(theme) => (theme.palette.mode === 'dark' ? '#fff' : `text.secondary`)}
+        sx={{ fontWeight: 'medium', display: 'block', mb: 1, mx: 'auto' }}
+        htmlFor="email-landing"
       >
         {content.action.label}
-      </Button>
+      </Typography>
+      <SignUp
+        sx={{
+          '& > div': {
+            display: 'flex',
+            flexDirection: { xs: 'column', sm: 'row' },
+            justifyContent: 'center',
+            maxWidth: 'initial',
+          },
+        }}
+      />
     </Container>
   );
 }

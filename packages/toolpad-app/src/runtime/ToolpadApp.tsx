@@ -88,7 +88,7 @@ import { BridgeContext } from '../canvas/BridgeContext';
 import AppNavigation from './AppNavigation';
 import { PREVIEW_PAGE_ROUTE } from '../routes';
 
-const internalComponents: ToolpadComponents = Object.fromEntries(
+export const internalComponents: ToolpadComponents = Object.fromEntries(
   [...INTERNAL_COMPONENTS].map(([name]) => {
     let builtIn = (builtIns as any)[name];
 

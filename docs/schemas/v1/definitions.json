@@ -48,6 +48,9 @@
                       },
                       {
                         "$ref": "#/definitions/JsExpressionBinding"
+                      },
+                      {
+                        "$ref": "#/definitions/EnvBinding"
                       }
                     ],
                     "description": "Activates or deactivates the query. When deactivated the data won't be loaded when the page opens."
@@ -66,6 +69,9 @@
                             {},
                             {
                               "$ref": "#/definitions/JsExpressionBinding"
+                            },
+                            {
+                              "$ref": "#/definitions/EnvBinding"
                             }
                           ],
                           "description": "The value"
@@ -104,6 +110,9 @@
                               },
                               {
                                 "$ref": "#/definitions/JsExpressionBinding"
+                              },
+                              {
+                                "$ref": "#/definitions/EnvBinding"
                               }
                             ],
                             "description": "The URL of the request"
@@ -142,6 +151,9 @@
                                       },
                                       {
                                         "$ref": "#/definitions/JsExpressionBinding"
+                                      },
+                                      {
+                                        "$ref": "#/definitions/EnvBinding"
                                       }
                                     ]
                                   },
@@ -428,6 +440,20 @@
       "additionalProperties": false,
       "description": "A binding that evaluates an expression and returns the result."
     },
+    "EnvBinding": {
+      "type": "object",
+      "properties": {
+        "$$env": {
+          "type": "string",
+          "description": "The name of an environment variable."
+        }
+      },
+      "required": [
+        "$$env"
+      ],
+      "additionalProperties": false,
+      "description": "An environment variable."
+    },
     "JsExpressionAction": {
       "type": "object",
       "properties": {
@@ -459,6 +485,9 @@
                   {},
                   {
                     "$ref": "#/definitions/JsExpressionBinding"
+                  },
+                  {
+                    "$ref": "#/definitions/EnvBinding"
                   }
                 ]
               },
@@ -485,6 +514,9 @@
         },
         {
           "$ref": "#/definitions/JsExpressionBinding"
+        },
+        {
+          "$ref": "#/definitions/EnvBinding"
         },
         {
           "$ref": "#/definitions/JsExpressionAction"
@@ -599,6 +631,9 @@
             },
             {
               "$ref": "#/definitions/JsExpressionBinding"
+            },
+            {
+              "$ref": "#/definitions/EnvBinding"
             }
           ],
           "description": "The value"

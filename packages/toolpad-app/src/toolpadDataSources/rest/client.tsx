@@ -66,9 +66,6 @@ const QUERY_SCOPE_META: ScopeMeta = {
   parameters: {
     description: 'Parameters that can be bound to app scope variables',
   },
-  process: {
-    description: 'Contains information about the current Node.js process.',
-  },
 };
 
 const ButtonLink = styled('button')(({ theme }) => ({
@@ -274,7 +271,7 @@ function QueryEditor({
     },
     { retry: false },
   );
-  const env = React.useMemo(() => introspection?.data?.env || [], [introspection]);
+  const env = React.useMemo(() => introspection?.data?.env, [introspection]);
 
   const handleParamsChange = React.useCallback(
     (newParams: [string, BindableAttrValue<string>][]) => {
@@ -352,6 +349,7 @@ function QueryEditor({
     jsRuntime: jsBrowserRuntime,
     input: paramsEntries,
     globalScope,
+    env,
   });
 
   const previewParams = React.useMemo(
@@ -362,29 +360,29 @@ function QueryEditor({
   const queryScope = React.useMemo(
     () => ({
       parameters: previewParams,
-      process: {
-        env,
-      },
     }),
-    [env, previewParams],
+    [previewParams],
   );
 
   const liveUrl: LiveBinding = useEvaluateLiveBinding({
     jsRuntime: jsServerRuntime,
     input: urlValue,
     globalScope: queryScope,
+    env,
   });
 
   const liveSearchParams = useEvaluateLiveBindingEntries({
     jsRuntime: jsServerRuntime,
     input: input.attributes.query.value.searchParams || [],
     globalScope: queryScope,
+    env,
   });
 
   const liveHeaders = useEvaluateLiveBindingEntries({
     jsRuntime: jsServerRuntime,
     input: input.attributes.query.value.headers || [],
     globalScope: queryScope,
+    env,
   });
 
   const [activeTab, setActiveTab] = React.useState('urlQuery');
@@ -453,6 +451,7 @@ function QueryEditor({
                 renderControl={(props) => <UrlControl baseUrl={baseUrl} {...props} />}
                 value={urlValue}
                 onChange={handleUrlChange}
+                env={env}
               />
             </Box>
             <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
@@ -493,6 +492,7 @@ function QueryEditor({
                     globalScopeMeta={QUERY_SCOPE_META}
                     liveValue={liveHeaders}
                     jsRuntime={jsServerRuntime}
+                    env={env}
                   />
                 </TabPanel>
                 <TabPanel disableGutters value="response">

@@ -56,8 +56,9 @@ function resolveBindable(
   jsRuntime: JsRuntime,
   bindable: BindableAttrValue<string>,
   scope: Record<string, unknown>,
+  env?: Record<string, string>,
 ): any {
-  const { value, error } = evaluateBindable(jsRuntime, bindable, scope);
+  const { value, error } = evaluateBindable(jsRuntime, bindable, scope, env);
   if (error) {
     throw error;
   }
@@ -68,17 +69,19 @@ function resolveBindableEntries(
   jsRuntime: JsRuntime,
   entries: BindableAttrEntries,
   scope: Record<string, unknown>,
+  env?: Record<string, string>,
 ): [string, any][] {
-  return entries.map(([key, value]) => [key, resolveBindable(jsRuntime, value, scope)]);
+  return entries.map(([key, value]) => [key, resolveBindable(jsRuntime, value, scope, env)]);
 }
 
 function resolveBindables<P>(
   jsRuntime: JsRuntime,
   obj: BindableAttrValues<P>,
   scope: Record<string, unknown>,
+  env?: Record<string, string>,
 ): P {
   return Object.fromEntries(
-    resolveBindableEntries(jsRuntime, Object.entries(obj) as BindableAttrEntries, scope),
+    resolveBindableEntries(jsRuntime, Object.entries(obj) as BindableAttrEntries, scope, env),
   ) as P;
 }
 
@@ -126,10 +129,11 @@ function resolveUrlEncodedBody(
   jsRuntime: JsRuntime,
   body: UrlEncodedBody,
   scope: Record<string, unknown>,
+  env?: Record<string, string>,
 ): ResolveUrlEncodedBodyBody {
   return {
     kind: 'urlEncoded',
-    content: resolveBindableEntries(jsRuntime, body.content, scope),
+    content: resolveBindableEntries(jsRuntime, body.content, scope, env),
   };
 }
 
@@ -179,20 +183,23 @@ export async function execfetch(
     // @TODO: remove deprecated query after v1
     query: params,
     parameters: params,
-    process: {
-      env,
-    },
   };
 
   const urlvalue = fetchQuery.url || getDefaultUrl(connection);
 
-  const resolvedUrl = resolveBindable(jsRuntime, urlvalue, queryScope);
+  const resolvedUrl = resolveBindable(jsRuntime, urlvalue, queryScope, env);
   const resolvedSearchParams = resolveBindableEntries(
     jsRuntime,
     fetchQuery.searchParams || [],
     queryScope,
+    env,
   );
-  const resolvedHeaders = resolveBindableEntries(jsRuntime, fetchQuery.headers || [], queryScope);
+  const resolvedHeaders = resolveBindableEntries(
+    jsRuntime,
+    fetchQuery.headers || [],
+    queryScope,
+    env,
+  );
 
   const queryUrl = parseQueryUrl(resolvedUrl, connection?.baseUrl);
   resolvedSearchParams.forEach(([key, value]) => queryUrl.searchParams.append(key, value));

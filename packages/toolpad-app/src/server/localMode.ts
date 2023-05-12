@@ -384,9 +384,14 @@ function mergeThemeIntoAppDom(dom: appDom.AppDom, themeFile: Theme): appDom.AppD
   return dom;
 }
 
-function toBindable<V>(value: V | { $$jsExpression: string }): BindableAttrValue<V> {
+function toBindable<V>(
+  value: V | { $$jsExpression: string } | { $$env: string },
+): BindableAttrValue<V> {
   if (value && typeof value === 'object' && typeof (value as any).$$jsExpression === 'string') {
     return { type: 'jsExpression', value: (value as any).$$jsExpression };
+  }
+  if (value && typeof value === 'object' && typeof (value as any).$$env === 'string') {
+    return { type: 'env', value: (value as any).$$env };
   }
   return { type: 'const', value: value as V };
 }
@@ -397,15 +402,22 @@ function fromBindable<V>(bindable: BindableAttrValue<V>) {
       return bindable.value;
     case 'jsExpression':
       return { $$jsExpression: bindable.value };
+    case 'env':
+      return { $$env: bindable.value };
     default:
       throw new Error(`Unsupported bindable "${bindable.type}"`);
   }
 }
 
-function toBindableProp<V>(value: V | { $$jsExpression: string }): BindableAttrValue<V> {
+function toBindableProp<V>(
+  value: V | { $$jsExpression: string } | { $$env: string },
+): BindableAttrValue<V> {
   if (value && typeof value === 'object') {
     if (typeof (value as any).$$jsExpression === 'string') {
       return { type: 'jsExpression', value: (value as any).$$jsExpression };
+    }
+    if (typeof (value as any).$$env === 'string') {
+      return { type: 'env', value: (value as any).$$env };
     }
     if (typeof (value as any).$$jsExpressionAction === 'string') {
       return { type: 'jsExpressionAction', value: (value as any).$$jsExpressionAction };
@@ -433,6 +445,8 @@ function fromBindableProp<V>(bindable: BindableAttrValue<V>) {
       return bindable.value;
     case 'jsExpression':
       return { $$jsExpression: bindable.value };
+    case 'env':
+      return { $$env: bindable.value };
     case 'jsExpressionAction':
       return { $$jsExpressionAction: bindable.value };
     case 'navigationAction':

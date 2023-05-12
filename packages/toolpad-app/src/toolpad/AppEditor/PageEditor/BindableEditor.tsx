@@ -13,7 +13,7 @@ import { getDefaultControl } from '../../propertyControls';
 import { BindingEditor } from '../BindingEditor';
 
 function renderDefaultControl(params: RenderControlParams<any>) {
-  const Control = getDefaultControl({ typeDef: params.propType });
+  const Control = getDefaultControl(params.propType);
   return Control ? <Control {...params} /> : null;
 }
 

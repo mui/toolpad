@@ -82,52 +82,111 @@ export type BindableAttrEntries = [string, BindableAttrValue<any>][];
 export type SlotType = 'single' | 'multiple' | 'layout';
 
 export interface ValueTypeBase {
-  type: 'string' | 'boolean' | 'number' | 'object' | 'array' | 'element' | 'template' | 'event';
+  /**
+   * Specifies the type of the value.
+   */
+  type?: 'string' | 'boolean' | 'number' | 'object' | 'array' | 'element' | 'template' | 'event';
+  /**
+   * A default value for the property.
+   */
   default?: unknown;
 }
 
+export interface AnyValueType extends ValueTypeBase {
+  type?: undefined;
+  default?: any;
+}
+
 export interface StringValueType extends ValueTypeBase {
+  /**
+   * the property is a string.
+   */
   type: 'string';
+  /**
+   * The different possible values for the property.
+   */
   enum?: string[];
   default?: string;
 }
 
 export interface NumberValueType extends ValueTypeBase {
+  /**
+   * the property is a number.
+   */
   type: 'number';
+  /**
+   * A minimum value for the property.
+   */
   minimum?: number;
+  /**
+   * A maximum value for the property.
+   */
   maximum?: number;
   default?: number;
 }
 
 export interface BooleanValueType extends ValueTypeBase {
+  /**
+   * the property is a boolean.
+   */
   type: 'boolean';
   default?: boolean;
 }
 
 export interface ObjectValueType extends ValueTypeBase {
+  /**
+   * the property is an object.
+   */
   type: 'object';
+  /**
+   * the url of a JSON schema describing the object.
+   */
   schema?: string;
   default?: any;
 }
 
 export interface ArrayValueType extends ValueTypeBase {
+  /**
+   * the property is an array.
+   */
   type: 'array';
+  /**
+   * the url of a JSON schema describing the array.
+   */
   schema?: string;
   default?: any[];
 }
 
 export interface ElementValueType extends ValueTypeBase {
+  /**
+   * the property is a React.ReactNode.
+   */
   type: 'element';
 }
 
 export interface TemplateValueType extends ValueTypeBase {
+  /**
+   * the property is a render function.
+   */
   type: 'template';
 }
 
 export interface EventValueType extends ValueTypeBase {
+  /**
+   * the property is an event handler.
+   */
   type: 'event';
+  /**
+   * Description of the handler's arguments.
+   */
   arguments?: {
+    /**
+     * The argument's name.
+     */
     name: string;
+    /**
+     * The argument's type.
+     */
     tsType: string;
   }[];
 }
@@ -166,6 +225,7 @@ export type PrimitiveValueType =
   | ArrayValueType;
 
 export type PropValueType =
+  | AnyValueType
   | PrimitiveValueType
   | ElementValueType
   | TemplateValueType
@@ -175,7 +235,7 @@ export type PropValueTypes<K extends string = string> = Partial<{
   [key in K]?: PropValueType;
 }>;
 
-export interface ArgTypeDefinition<P extends object = {}, V = P[keyof P]> {
+export type ArgTypeDefinition<P extends object = {}, V = P[keyof P]> = PropValueType & {
   /**
    * A short explanatory text that'll be shown in the editor UI when this property is referenced.
    * May contain Markdown.
@@ -185,10 +245,6 @@ export interface ArgTypeDefinition<P extends object = {}, V = P[keyof P]> {
    * To be used instead of the property name for UI purposes in the editor.
    */
   label?: string;
-  /**
-   * Describes the type of the values this property can accept.
-   */
-  typeDef: PropValueType;
   /**
    * The control to be used to manipulate values for this property from the editor.
    */
@@ -228,7 +284,7 @@ export interface ArgTypeDefinition<P extends object = {}, V = P[keyof P]> {
    */
   category?: string;
   tsType?: string;
-}
+};
 
 export type ArgTypeDefinitions<P extends object = {}> = {
   [K in keyof P & string]?: ArgTypeDefinition<P, P[K]>;

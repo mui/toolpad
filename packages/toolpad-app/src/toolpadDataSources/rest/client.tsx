@@ -451,7 +451,6 @@ function QueryEditor({
                 renderControl={(props) => <UrlControl baseUrl={baseUrl} {...props} />}
                 value={urlValue}
                 onChange={handleUrlChange}
-                env={env}
               />
             </Box>
             <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>

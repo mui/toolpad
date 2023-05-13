@@ -124,61 +124,68 @@ export default createComponent(FormWrappedSelect, {
   argTypes: {
     options: {
       helperText: 'The available options to select from.',
-      typeDef: { type: 'array', schema: '/schemas/SelectOptions.json', default: [] },
+      type: 'array',
+      schema: '/schemas/SelectOptions.json',
+      default: [],
       control: { type: 'SelectOptions' },
     },
     value: {
       helperText: 'The currently selected value.',
-      typeDef: { type: 'string', default: '' },
+      type: 'string',
+      default: '',
       onChangeProp: 'onChange',
       defaultValueProp: 'defaultValue',
     },
     defaultValue: {
       helperText: 'A default value.',
-      typeDef: { type: 'string', default: '' },
+      type: 'string',
+      default: '',
     },
     label: {
       helperText: 'A label that describes the option that can be selected. e.g. "Country".',
-      typeDef: { type: 'string', default: '' },
+      type: 'string',
+      default: '',
     },
     name: {
       helperText: 'Name of this element. Used as a reference in form data.',
-      typeDef: { type: 'string' },
+      type: 'string',
     },
     variant: {
       helperText:
         'One of the available MUI TextField [variants](https://mui.com/material-ui/react-button/#basic-button). Possible values are `outlined`, `filled` or `standard`',
-      typeDef: {
-        type: 'string',
-        enum: ['outlined', 'filled', 'standard'],
-        default: 'outlined',
-      },
+      type: 'string',
+      enum: ['outlined', 'filled', 'standard'],
+      default: 'outlined',
     },
     size: {
       helperText: 'The size of the select. One of `small`, or `medium`.',
-      typeDef: { type: 'string', enum: ['small', 'medium'], default: 'small' },
+      type: 'string',
+      enum: ['small', 'medium'],
+      default: 'small',
     },
     fullWidth: {
       helperText: 'Whether the select should occupy all available horizontal space.',
-      typeDef: { type: 'boolean' },
+      type: 'boolean',
     },
     disabled: {
       helperText: 'Whether the select is disabled.',
-      typeDef: { type: 'boolean' },
+      type: 'boolean',
     },
     isRequired: {
       helperText: 'Whether the select is required to have a value.',
-      typeDef: { type: 'boolean', default: false },
+      type: 'boolean',
+      default: false,
       category: 'validation',
     },
     isInvalid: {
       helperText: 'Whether the select value is invalid.',
-      typeDef: { type: 'boolean', default: false },
+      type: 'boolean',
+      default: false,
       category: 'validation',
     },
     sx: {
       helperText: SX_PROP_HELPER_TEXT,
-      typeDef: { type: 'object' },
+      type: 'object',
     },
   },
 });

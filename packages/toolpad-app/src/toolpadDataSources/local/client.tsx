@@ -144,10 +144,10 @@ function QueryEditor({
                   globalScope={globalScope}
                   globalScopeMeta={globalScopeMeta}
                   label={name}
-                  propType={definiton.typeDef}
+                  propType={definiton}
                   jsRuntime={jsBrowserRuntime}
                   renderControl={(renderControlParams) => (
-                    <Control {...renderControlParams} propType={definiton.typeDef} />
+                    <Control {...renderControlParams} propType={definiton} />
                   )}
                   value={paramsObject[name]}
                   onChange={(newValue) => {

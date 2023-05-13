@@ -27,4 +27,5 @@ export default defineConfig({
     'process.env.TOOLPAD_VERSION': JSON.stringify(pkgJson.version),
     'process.env.TOOLPAD_BUILD': JSON.stringify(TOOLPAD_BUILD),
   },
+  publicDir: path.resolve(__dirname, '../../public'),
 });

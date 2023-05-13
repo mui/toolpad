@@ -1,7 +1,7 @@
-import { NextApiRequest, NextApiResponse } from 'next';
 import { errorFrom } from '@mui/toolpad-utils/errors';
+import { IncomingMessage, ServerResponse } from 'http';
 
-function getReqLoggableIPAddress(req: NextApiRequest): string | null {
+function getReqLoggableIPAddress(req: IncomingMessage): string | null {
   const forwardedHeader = req.headers['x-forwarded-for'];
   return (
     (typeof forwardedHeader === 'string' && forwardedHeader.split(',').shift()) ||
@@ -10,17 +10,10 @@ function getReqLoggableIPAddress(req: NextApiRequest): string | null {
   );
 }
 
-export function reqSerializer(req: NextApiRequest) {
+export function reqSerializer(req: IncomingMessage) {
   return {
     url: req.url,
     method: req.method,
-    query: req.query,
-    body: {
-      type: req.body.type,
-      name: req.body.name,
-      // Omitting request params, but we could enable them if it would be useful
-      // params: req.body.params,
-    },
     headers: {
       'x-forwarded-for': req.headers['x-forwarded-for'],
       host: req.headers.host,
@@ -33,7 +26,7 @@ export function reqSerializer(req: NextApiRequest) {
   };
 }
 
-export function resSerializer(res: NextApiResponse) {
+export function resSerializer(res: ServerResponse) {
   return {
     statusCode: res.statusCode,
   };

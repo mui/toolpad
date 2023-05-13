@@ -1,5 +1,5 @@
 import type * as React from 'react';
-import { NextApiRequest, NextApiResponse } from 'next';
+import * as express from 'express';
 import {
   SlotType,
   RuntimeError,
@@ -124,8 +124,8 @@ export interface ServerDataSource<P = {}, Q = {}, PQ = {}, D = {}> {
   exec: (connection: Maybe<P>, query: Q, params: any) => Promise<ExecFetchResult<D>>;
   createHandler?: () => (
     api: CreateHandlerApi<P>,
-    req: NextApiRequest,
-    res: NextApiResponse,
+    req: express.Request,
+    res: express.Response,
   ) => void;
 }
 

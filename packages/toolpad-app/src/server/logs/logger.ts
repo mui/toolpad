@@ -1,5 +1,5 @@
 import pino from 'pino';
-import type { NextApiRequest, NextApiResponse } from 'next';
+import { IncomingMessage, ServerResponse } from 'http';
 import { errSerializer, reqSerializer, resSerializer } from './logSerializers';
 
 const logger = pino({
@@ -15,8 +15,8 @@ const logger = pino({
 
 interface ReqResLogPayload {
   key: 'apiReqRes';
-  req: NextApiRequest;
-  res: NextApiResponse;
+  req: IncomingMessage;
+  res: ServerResponse;
 }
 
 interface RpcReqResLogPayload {

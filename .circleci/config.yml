@@ -127,12 +127,17 @@ jobs:
       - run:
           name: '`yarn prettier` changes committed?'
           command: yarn prettier --check
+      - run:
+          name: '`yarn jsonSchemas` changes committed?'
+          command: |
+            yarn jsonSchemas
+            git diff --exit-code
 
   test_unit:
     <<: *defaults
     resource_class: 'large'
     docker:
-      - image: mcr.microsoft.com/playwright:v1.32.3-focal
+      - image: mcr.microsoft.com/playwright:v1.33.0-focal
         environment:
           NODE_ENV: test
           TOOLPAD_TEST_RETRIES: 1

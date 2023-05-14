@@ -4,15 +4,16 @@ import {
   BindableAttrValue,
   PropValueType,
   LiveBinding,
-  ScopeMeta,
   JsRuntime,
+  ScopeMeta,
 } from '@mui/toolpad-core';
-import { BindingEditor } from '../BindingEditor';
 import { WithControlledProp } from '../../../utils/types';
 import { getDefaultControl } from '../../propertyControls';
+// eslint-disable-next-line import/no-cycle
+import { BindingEditor } from '../BindingEditor';
 
 function renderDefaultControl(params: RenderControlParams<any>) {
-  const Control = getDefaultControl({ typeDef: params.propType });
+  const Control = getDefaultControl(params.propType);
   return Control ? <Control {...params} /> : null;
 }
 

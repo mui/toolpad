@@ -7,14 +7,14 @@ interface TabProps {
   name: string;
 }
 
-interface Props {
+interface TabsProps {
   value: string;
   onChange: (value: number) => void;
   tabs: TabProps[];
   defaultValue: string;
 }
 
-function Tabs({ value, onChange, tabs, defaultValue }: Props) {
+function Tabs({ value, onChange, tabs, defaultValue }: TabsProps) {
   return (
     <MUITabs
       value={value || defaultValue}
@@ -33,28 +33,27 @@ export default createComponent(Tabs, {
   layoutDirection: 'horizontal',
   argTypes: {
     value: {
-      typeDef: { type: 'string' },
+      type: 'string',
       onChangeProp: 'onChange',
       defaultValueProp: 'defaultValue',
       helperText: 'Currently active tab.',
     },
     defaultValue: {
       label: 'Default active tab',
-      typeDef: { type: 'string', default: 'tab-one' },
+      type: 'string',
+      default: 'tab-one',
       helperText: 'The tab which will be active by default.',
     },
     tabs: {
-      typeDef: {
-        type: 'array',
-        default: [
-          {
-            title: 'Tab one',
-            name: 'tab-one',
-          },
-          { title: 'Tab two', name: 'tab-two' },
-          { title: 'Tab three', name: 'tab-three' },
-        ],
-      },
+      type: 'array',
+      default: [
+        {
+          title: 'Tab one',
+          name: 'tab-one',
+        },
+        { title: 'Tab two', name: 'tab-two' },
+        { title: 'Tab three', name: 'tab-three' },
+      ],
       helperText: 'Tabs configuration object.',
     },
   },

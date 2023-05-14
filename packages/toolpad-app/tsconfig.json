@@ -25,10 +25,10 @@
     "resolveJsonModule": true,
     "isolatedModules": true,
     "jsx": "preserve",
-    "incremental": true,
     "noUnusedLocals": true,
     "pretty": true,
-    "preserveWatchOutput": true
+    "preserveWatchOutput": true,
+    "incremental": true
   },
   "include": [
     "next.config.mjs",

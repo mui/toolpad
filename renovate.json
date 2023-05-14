@@ -21,6 +21,10 @@
       "matchDepTypes": ["devDependencies"]
     },
     {
+      "groupName": "docs",
+      "matchFiles": ["docs/package.json"]
+    },
+    {
       "groupName": "MUI Core",
       "matchPackagePatterns": ["^@mui/"],
       "schedule": ["at any time"]
@@ -56,6 +60,10 @@
       "groupName": "node-fetch",
       "matchPackageNames": ["node-fetch"],
       "allowedVersions": "< 3.0.0"
+    },
+    {
+      "groupName": "Next.js",
+      "matchPackageNames": ["next"]
     },
     {
       "groupName": "react-router",

@@ -28,6 +28,11 @@ export function getHtmlContent({ canvas }: GetHtmlContentParams) {
     <html lang="en">
       <head>
         <title>Toolpad</title>
+
+        <link
+          rel="stylesheet"
+          href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap"
+        />
       </head>
       <body>
         <div id="root"></div>
@@ -215,6 +220,15 @@ export function createViteConfig({
         },
       },
     },
+    resolve: {
+      alias: [
+        {
+          // FIXME(https://github.com/mui/material-ui/issues/35233)
+          find: /^@mui\/icons-material\/([^/]*)/,
+          replacement: '@mui/icons-material/esm/$1',
+        },
+      ],
+    },
     server: {
       fs: {
         allow: [root, path.resolve(__dirname, '../../../../')],
@@ -251,7 +265,7 @@ export function createViteConfig({
         'lodash-es',
         'react-router-dom',
         'fractional-indexing',
-        'cuid',
+        'nanoid/non-secure',
         'superjson',
         '@tanstack/react-query-devtools/build/lib/index.prod.js',
         'react-is',

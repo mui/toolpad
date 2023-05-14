@@ -17,7 +17,6 @@ interface RunningLocalApp {
 
 // You'll need to have `yarn dev` running for this
 const VERBOSE = true;
-const VITE_RUNTIME = process.env.TOOLPAD_VITE_RUNTIME;
 
 async function waitForMatch(input: Readable, regex: RegExp): Promise<RegExpExecArray | null> {
   return new Promise((resolve, reject) => {
@@ -58,16 +57,14 @@ export async function withApp(
   options: WithAppOptions,
   doWork: (app: RunningLocalApp) => Promise<void>,
 ) {
-  if (VITE_RUNTIME) {
-    // eslint-disable-next-line no-console
-    console.log('Using new vite runtime');
-  }
-
   const { cmd = 'start', template, setup } = options;
 
-  const projectDir = await fs.mkdtemp(path.resolve(__dirname, './tmp-'));
+  const tmpTestDir = await fs.mkdtemp(path.resolve(__dirname, './tmp-'));
 
   try {
+    const projectDir = path.resolve(tmpTestDir, './fixture');
+    await fs.mkdir(projectDir, { recursive: true });
+
     if (template) {
       await fs.cp(template, projectDir, { recursive: true });
     }
@@ -81,16 +78,8 @@ export async function withApp(
       args.push('--dev');
     }
 
-    if (VITE_RUNTIME) {
-      args.push('--viteRuntime');
-    }
-
     if (cmd === 'start') {
       const buildArgs = ['build'];
-
-      if (VITE_RUNTIME) {
-        buildArgs.push('--viteRuntime');
-      }
 
       const child = childProcess.spawn('toolpad', buildArgs, {
         cwd: projectDir,
@@ -141,7 +130,7 @@ export async function withApp(
       child.kill();
     }
   } finally {
-    await fs.rm(projectDir, { recursive: true });
+    await fs.rm(tmpTestDir, { recursive: true });
   }
 }
 

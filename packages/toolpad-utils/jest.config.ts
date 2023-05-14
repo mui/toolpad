@@ -1,5 +1,6 @@
 import { Config } from 'jest';
 
 export default {
-  preset: 'ts-jest',
+  preset: 'ts-jest/presets/default-esm',
+  setupFilesAfterEnv: ['<rootDir>/../../test/setupJest.ts'],
 } satisfies Config;

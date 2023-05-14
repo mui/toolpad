@@ -1,5 +1,5 @@
+import { nanoid } from 'nanoid/non-secure';
 import { generateKeyBetween } from 'fractional-indexing';
-import cuid from 'cuid';
 import {
   NodeId,
   NodeReference,
@@ -234,8 +234,8 @@ function assertIsType<T extends AppDomNode>(node: AppDomNode, type: T['type']): 
   invariant(isType(node, type), `Expected node type "${type}" but got "${node.type}"`);
 }
 
-function createId(): NodeId {
-  return cuid.slug() as NodeId;
+export function createId(): NodeId {
+  return nanoid(7) as NodeId;
 }
 
 export function createConst<V>(value: V): ConstantAttrValue<V> {
@@ -605,6 +605,15 @@ export function getPageAncestor(dom: AppDom, node: AppDomNode): PageNode | null 
     return getPageAncestor(dom, parent);
   }
   return null;
+}
+
+/**
+ * Returns all nodes with a given component type
+ */
+export function getComponentTypeNodes(dom: AppDom, componentId: string): readonly AppDomNode[] {
+  return Object.values(dom.nodes).filter(
+    (node) => isElement(node) && node.attributes.component.value === componentId,
+  );
 }
 
 /**
@@ -1105,7 +1114,7 @@ export function ref(nodeId: NodeId): NodeReference;
 export function ref(nodeId: null | undefined): null;
 export function ref(nodeId: Maybe<NodeId>): NodeReference | null;
 export function ref(nodeId: Maybe<NodeId>): NodeReference | null {
-  return nodeId ? { $$ref: nodeId } : null;
+  return nodeId ? { $ref: nodeId } : null;
 }
 
 export function deref(nodeRef: NodeReference): NodeId;
@@ -1113,7 +1122,7 @@ export function deref(nodeRef: null | undefined): null;
 export function deref(nodeRef: Maybe<NodeReference>): NodeId | null;
 export function deref(nodeRef: Maybe<NodeReference>): NodeId | null {
   if (nodeRef) {
-    return nodeRef.$$ref;
+    return nodeRef.$ref;
   }
   return null;
 }

@@ -15,7 +15,7 @@ function AgeColumn({ value }: AgeColumnProps) {
 export default createComponent(AgeColumn, {
   argTypes: {
     value: {
-      typeDef: { type: 'number' },
+      type: 'number',
     },
   },
 });

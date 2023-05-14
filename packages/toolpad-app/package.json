@@ -102,7 +102,7 @@
     "mysql2": "3.3.0",
     "nanoid": "4.0.2",
     "next": "13.3.2",
-    "node-fetch": "2.6.9",
+    "node-fetch": "2.6.11",
     "node-fetch-har": "1.0.1",
     "open-editor": "4.0.0",
     "path-to-regexp": "6.2.1",

@@ -137,7 +137,7 @@
   "devDependencies": {
     "@types/babel__code-frame": "7.0.3",
     "@types/crypto-js": "4.1.1",
-    "@types/formidable": "2.0.5",
+    "@types/formidable": "2.0.6",
     "@types/glob": "8.1.0",
     "@types/har-format": "1.2.10",
     "@types/invariant": "2.2.35",
@@ -153,7 +153,7 @@
     "@types/whatwg-url": "11.0.0",
     "ajv": "8.12.0",
     "eslint": "8.40.0",
-    "eslint-config-next": "13.4.1",
+    "eslint-config-next": "13.4.2",
     "eslint-config-prettier": "8.8.0",
     "eslint-plugin-import": "2.27.5",
     "formidable": "2.1.1",
@@ -161,7 +161,7 @@
     "pino-pretty": "10.0.0",
     "react-transition-group": "4.4.5",
     "typescript": "5.0.4",
-    "webpack": "5.82.0"
+    "webpack": "5.82.1"
   },
   "typings": "./index.d.ts",
   "publishConfig": {

@@ -28,35 +28,36 @@ export default createComponent(Autocomplete, {
   layoutDirection: 'both',
   argTypes: {
     options: {
-      typeDef: { type: 'array' },
-      defaultValue: [],
+      type: 'array',
+      default: [],
     },
     label: {
-      typeDef: { type: 'string' },
-      defaultValue: 'Search…',
+      type: 'string',
+      default: 'Search…',
     },
     value: {
-      typeDef: { type: 'string' },
+      type: 'string',
       onChangeProp: 'onChange',
       onChangeHandler: (event: React.ChangeEvent<HTMLInputElement>) => event.target.textContent,
-      defaultValue: '',
+      default: '',
     },
     fullWidth: {
-      typeDef: { type: 'boolean' },
-      defaultValue: true,
+      type: 'boolean',
+      default: true,
     },
     size: {
-      typeDef: { type: 'string', enum: ['small', 'medium', 'large'] },
-      defaultValue: 'small',
+      type: 'string',
+      enum: ['small', 'medium', 'large'],
+      default: 'small',
     },
     loading: {
-      typeDef: { type: 'boolean' },
+      type: 'boolean',
     },
     disabled: {
-      typeDef: { type: 'boolean' },
+      type: 'boolean',
     },
     sx: {
-      typeDef: { type: 'object' },
+      type: 'object',
     },
   },
 });

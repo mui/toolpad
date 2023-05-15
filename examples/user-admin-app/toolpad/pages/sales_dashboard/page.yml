@@ -113,7 +113,7 @@ spec:
                                       let outputdate = `${month}-${year.slice(-2)}`
 
                                       return {
-                                        y: (parseFloat(item.price.replace(/[€,]/g, "")) / 1000000).toFixed(2),
+                                        y: (parseFloat(item.price.slice(1).replace(",", "")) / 1000000).toFixed(2),
                                         x: outputdate,
                                       }
                                     })

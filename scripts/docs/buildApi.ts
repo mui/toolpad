@@ -1,5 +1,7 @@
 import * as path from 'path';
 import * as fs from 'fs/promises';
+import * as fsCb from 'fs';
+import * as ts from 'typescript';
 import { kebabCase } from 'lodash';
 import type { ComponentConfig } from '@mui/toolpad-core';
 import prettier from 'prettier';
@@ -56,7 +58,58 @@ export default function Page() {
   );
 }
 
+export async function buildInterfaceDocs() {
+  const corePackageRoot = path.resolve(projectRoot, 'packages/toolpad-core');
+  const tsconfigPath = path.resolve(corePackageRoot, 'tsconfig.json');
+  const entries = [
+    path.resolve(corePackageRoot, 'src/server.ts'),
+    path.resolve(corePackageRoot, 'src/browser.tsx'),
+  ];
+
+  const tsconfigFile = ts.readConfigFile(tsconfigPath, (filePath) =>
+    fsCb.readFileSync(filePath).toString(),
+  );
+
+  if (tsconfigFile.error) {
+    throw tsconfigFile.error;
+  }
+
+  const tsconfigFileContent = ts.parseJsonConfigFileContent(
+    tsconfigFile.config,
+    ts.sys,
+    path.dirname(tsconfigPath),
+  );
+
+  if (tsconfigFileContent.errors.length > 0) {
+    throw tsconfigFileContent.errors[0];
+  }
+
+  const program = ts.createProgram({
+    rootNames: entries,
+    options: tsconfigFileContent.options,
+  });
+
+  const checker = program.getTypeChecker();
+
+  const allExports = entries.map((entryPointPath) => {
+    const sourceFile = program.getSourceFile(entryPointPath);
+
+    const exports = Object.fromEntries(
+      checker.getExportsOfModule(checker.getSymbolAtLocation(sourceFile!)!).map((symbol) => {
+        return [symbol.name, symbol];
+      }),
+    );
+
+    return [entryPointPath, exports];
+  });
+
+  console.log(allExports);
+}
+
+console.log(toolpadCore);
+
 async function main() {
+  await buildInterfaceDocs();
   await fs.rm(componentDocsRoot, { recursive: true, force: true });
   await fs.mkdir(componentDocsRoot, { recursive: true });
   await fs.rm(componentPagesRoot, { recursive: true, force: true });

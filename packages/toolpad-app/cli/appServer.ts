@@ -29,7 +29,7 @@ function devServerPlugin(): Plugin {
 
             html = postProcessHtml(html, { config, dom });
 
-            res.setHeader('content-type', 'text/html').end(html);
+            res.setHeader('content-type', 'text/html; charset=utf-8').end(html);
           } catch (e) {
             next(e);
           }

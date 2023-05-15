@@ -24,7 +24,7 @@ async function writePrettifiedFile(filename: string, data: string, prettierConfi
 const AUTO_GENERATED_WARNING = 'This file has been auto-generated using `yarn docs:build:api`.';
 
 // Some dependencies of @mui/toolpad-components are not ESM. Bundlers can handle
-// this transparently, but ts-node doesn't bundle. So we'll just use teh commonjs
+// this transparently, but ts-node doesn't bundle. So we'll just use the commonjs
 // version of @mui/toolpad-components.
 const builtins = require('@mui/toolpad-components');
 const toolpadCore = require('@mui/toolpad-core');

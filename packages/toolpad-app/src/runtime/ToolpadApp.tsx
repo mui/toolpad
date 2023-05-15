@@ -9,8 +9,6 @@ import {
   LinearProgress,
   Container,
   Tooltip,
-  Button,
-  Typography,
 } from '@mui/material';
 import {
   ToolpadComponent,
@@ -54,11 +52,12 @@ import {
 } from '@mui/toolpad-core/runtime';
 import * as _ from 'lodash-es';
 import ErrorIcon from '@mui/icons-material/Error';
-import EditIcon from '@mui/icons-material/Edit';
 import { useBrowserJsRuntime } from '@mui/toolpad-core/jsBrowserRuntime';
 import * as builtIns from '@mui/toolpad-components';
 import { errorFrom } from '@mui/toolpad-utils/errors';
 import { mapProperties, mapValues } from '@mui/toolpad-utils/collections';
+import useBoolean from '@mui/toolpad-utils/hooks/useBoolean';
+import usePageTitle from '@mui/toolpad-utils/hooks/usePageTitle';
 import * as appDom from '../appDom';
 import { RuntimeState } from '../types';
 import {
@@ -74,19 +73,26 @@ import evalJsBindings, {
   EvaluatedBinding,
   ParsedBinding,
 } from './evalJsBindings';
-import { HTML_ID_EDITOR_OVERLAY, NON_BINDABLE_CONTROL_TYPES } from '../constants';
-import usePageTitle from '../utils/usePageTitle';
-import Pre from '../components/Pre';
+import { HTML_ID_EDITOR_OVERLAY, NON_BINDABLE_CONTROL_TYPES } from './constants';
 import { layoutBoxArgTypes } from '../toolpadComponents/layoutBox';
-import NoSsr from '../components/NoSsr';
 import { execDataSourceQuery, useDataQuery, UseDataQueryConfig, UseFetch } from './useDataQuery';
 import { CanvasHooksContext, NavigateToPage } from './CanvasHooksContext';
-import useBoolean from '../utils/useBoolean';
-import Header from '../toolpad/ToolpadShell/Header';
-import { ThemeProvider } from '../ThemeContext';
-import { BridgeContext } from '../canvas/BridgeContext';
 import AppNavigation from './AppNavigation';
-import { PREVIEW_PAGE_ROUTE } from '../routes';
+import PreviewHeader from './PreviewHeader';
+import { BridgeContext } from '../canvas/BridgeContext';
+
+const isPreview = process.env.NODE_ENV !== 'production';
+const isRenderedInCanvas =
+  typeof window === 'undefined'
+    ? false
+    : !!(window.frameElement as HTMLIFrameElement)?.dataset?.toolpadCanvas;
+
+const Pre = styled('pre')(({ theme }) => ({
+  margin: 0,
+  fontFamily: theme.fontFamilyMonospaced,
+}));
+
+const PREVIEW_PAGE_ROUTE = '/preview/pages/:nodeId';
 
 export const internalComponents: ToolpadComponents = Object.fromEntries(
   [...INTERNAL_COMPONENTS].map(([name]) => {
@@ -1215,36 +1221,11 @@ function ToolpadAppLayout({ dom, hasShell: hasShellProp = true }: ToolpadAppLayo
 
   const hasShell = hasShellProp && displayMode !== 'standalone';
 
-  const isCanvas = displayMode === 'canvas';
-  const isPreview = process.env.NODE_ENV !== 'production';
-
-  const showPreviewHeader = isPreview && !isCanvas;
+  const showPreviewHeader = isPreview && !isRenderedInCanvas;
 
   return (
     <React.Fragment>
-      {showPreviewHeader ? (
-        <ThemeProvider>
-          <Header
-            enableUserFeedback={false}
-            actions={
-              <Stack direction="row" spacing={1} alignItems="center">
-                <Typography variant="body2" sx={{ color: 'primary.main' }}>
-                  This is a preview version of the application.
-                </Typography>
-                <Button
-                  variant="outlined"
-                  endIcon={<EditIcon />}
-                  color="primary"
-                  component="a"
-                  href={pageId ? `/_toolpad/app/pages/${pageId}` : '/_toolpad/app'}
-                >
-                  Edit
-                </Button>
-              </Stack>
-            }
-          />
-        </ThemeProvider>
-      ) : null}
+      {showPreviewHeader ? <PreviewHeader pageId={pageId} /> : null}
       <Box sx={{ display: 'flex' }}>
         {hasShell && pages.length > 0 ? (
           <AppNavigation pages={pages} clipped={showPreviewHeader} />
@@ -1298,30 +1279,26 @@ export default function ToolpadApp({
     <AppThemeProvider dom={dom}>
       <CssBaseline enableColorScheme />
       <AppRoot ref={rootRef}>
-        <NoSsr>
-          {components ? (
-            <ComponentsContextProvider value={components}>
-              <DomContextProvider value={dom}>
-                <ErrorBoundary FallbackComponent={AppError}>
-                  <ResetNodeErrorsKeyProvider value={resetNodeErrorsKey}>
-                    <React.Suspense fallback={<AppLoading />}>
-                      <QueryClientProvider client={queryClient}>
-                        <BrowserRouter basename={basename}>
-                          <ToolpadAppLayout dom={dom} hasShell={hasShell} />
-                        </BrowserRouter>
-                        {showDevtools ? (
-                          <ReactQueryDevtoolsProduction initialIsOpen={false} />
-                        ) : null}
-                      </QueryClientProvider>
-                    </React.Suspense>
-                  </ResetNodeErrorsKeyProvider>
-                </ErrorBoundary>
-              </DomContextProvider>
-            </ComponentsContextProvider>
-          ) : (
-            <AppLoading />
-          )}
-        </NoSsr>
+        {components ? (
+          <ComponentsContextProvider value={components}>
+            <DomContextProvider value={dom}>
+              <ErrorBoundary FallbackComponent={AppError}>
+                <ResetNodeErrorsKeyProvider value={resetNodeErrorsKey}>
+                  <React.Suspense fallback={<AppLoading />}>
+                    <QueryClientProvider client={queryClient}>
+                      <BrowserRouter basename={basename}>
+                        <ToolpadAppLayout dom={dom} hasShell={hasShell} />
+                      </BrowserRouter>
+                      {showDevtools ? <ReactQueryDevtoolsProduction initialIsOpen={false} /> : null}
+                    </QueryClientProvider>
+                  </React.Suspense>
+                </ResetNodeErrorsKeyProvider>
+              </ErrorBoundary>
+            </DomContextProvider>
+          </ComponentsContextProvider>
+        ) : (
+          <AppLoading />
+        )}
         <EditorOverlay id={HTML_ID_EDITOR_OVERLAY} />
       </AppRoot>
     </AppThemeProvider>

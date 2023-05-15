@@ -17,7 +17,7 @@ import { usePageEditorState } from './PageEditorProvider';
 import { getDefaultControl } from '../../propertyControls';
 import MarkdownTooltip from '../../../components/MarkdownTooltip';
 import { isTemplateDescendant } from '../../../toolpadComponents/template';
-import { NON_BINDABLE_CONTROL_TYPES } from '../../../constants';
+import { NON_BINDABLE_CONTROL_TYPES } from '../../../runtime/constants';
 
 export interface NodeAttributeEditorProps<P extends object> {
   node: appDom.AppDomNode;

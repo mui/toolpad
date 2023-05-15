@@ -30,4 +30,9 @@ All that's left is to click **Update binding** and you can observe how applicati
 
 (In this example you can see TextField value bound to the value of Typography component).
 
-<img src="/static/toolpad/docs/data-binding/bind-16.gif" alt="Binding result" width="902px" style="margin-bottom: 8px;" />
+<!-- <img src="/static/toolpad/docs/data-binding/bind-16.gif" alt="Binding result" width="902px" // style="margin-bottom: 8px;" />
+!-->
+
+<video autoplay muted loop playsinline controls>
+  <source src="/static/toolpad/docs/data-binding/bind-17.mp4" type="video/mp4">
+</video>

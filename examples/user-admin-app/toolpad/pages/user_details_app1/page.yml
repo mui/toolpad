@@ -105,6 +105,7 @@ spec:
                             type: string
                           - field: image
                             type: image
+                        height: 346
                     - component: Paper
                       name: paper
                       props:
@@ -125,7 +126,9 @@ spec:
                         sx:
                           color: "#EBCFB2"
                         onSubmit:
-                          $$jsExpressionAction: get.refetch();
+                          $$jsExpressionAction: |-
+                            add.call(form.value);
+                            get.refetch();
                         submitButtonText: Add user
                       children:
                         - component: PageRow

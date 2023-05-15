@@ -83,7 +83,7 @@ export const addCustomer = createFunction(
   async ({ parameters }) => {
     customers.push({
       name: parameters.name,
-      id: parameters.id,
+      id: customers.length + 1,
       account_creation_date: parameters.account_creation_date,
       country_of_residence: parameters.country_of_residence,
       phone_number: parameters.phone_number,
@@ -97,9 +97,6 @@ export const addCustomer = createFunction(
   },
   {
     parameters: {
-      id: {
-        typeDef: { type: 'number' },
-      },
       name: {
         typeDef: { type: 'string' },
       },

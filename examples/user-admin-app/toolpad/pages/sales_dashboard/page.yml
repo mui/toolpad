@@ -98,7 +98,7 @@ spec:
                                                 style: "currency", currency:
                                                 "EUR" }).format(
                                                   query.data.reduce((total, item) => {
-                                                    const price = parseFloat(item.price.replace(/[€,]/g, ""))
+                                                    const price = parseFloat(item.price.slice(1).replace(",", ""))
                                                     return total + price
                                                   }, 0) / 100
                                                 )

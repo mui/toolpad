@@ -1,18 +1,9 @@
-import * as url from 'url';
-import { createRequire } from 'module';
 import * as path from 'path';
 import * as fs from 'fs/promises';
-import { kebabCase } from 'lodash-es';
+import { kebabCase } from 'lodash';
 import type { ComponentConfig } from '@mui/toolpad-core';
 import prettier from 'prettier';
-
-function escapeCell(value: string): string {
-  return value
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/\|/g, '\\|')
-    .replace(/\r?\n/g, '<br />');
-}
+import { escapeCell } from './utils';
 
 async function writePrettifiedFile(filename: string, data: string, prettierConfigPath: string) {
   const prettierConfig = await prettier.resolveConfig(filename, {
@@ -32,16 +23,14 @@ async function writePrettifiedFile(filename: string, data: string, prettierConfi
 
 const AUTO_GENERATED_WARNING = 'This file has been auto-generated using `yarn docs:build:api`.';
 
-const require = createRequire(import.meta.url);
-
 // Some dependencies of @mui/toolpad-components are not ESM. Bundlers can handle
 // this transparently, but ts-node doesn't bundle. So we'll just use teh commonjs
 // version of @mui/toolpad-components.
 const builtins = require('@mui/toolpad-components');
 const toolpadCore = require('@mui/toolpad-core');
 
-const currentDirectory = url.fileURLToPath(new URL('.', import.meta.url));
-const projectRoot = path.resolve(currentDirectory, '..');
+const currentDirectory = __dirname;
+const projectRoot = path.resolve(currentDirectory, '..', '..');
 const prettierConfigPath = path.resolve(projectRoot, 'prettier.config.js');
 const docsRoot = path.resolve(projectRoot, 'docs');
 const componentDocsRoot = path.resolve(docsRoot, 'data/toolpad/components');

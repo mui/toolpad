@@ -27,7 +27,7 @@
     "dev": "dotenv cross-env FORCE_COLOR=1 lerna -- run dev --stream --parallel --ignore docs",
     "docs:dev": "yarn workspace docs dev",
     "docs:build": "yarn workspace docs build",
-    "docs:build:api": "ts-node --esm ./scripts/buildApi.mts",
+    "docs:build:api": "ts-node --esm ./scripts/docs/buildApi.ts",
     "docs:export": "yarn workspace docs export",
     "eslint": "eslint . --report-unused-disable-directives --ext .js,.ts,.tsx",
     "jsonlint": "node ./scripts/jsonlint.mjs",
@@ -41,7 +41,7 @@
     "test": "lerna run test",
     "check-types": "lerna run check-types",
     "toolpad": "toolpad",
-    "jsonSchemas": "ts-node --esm ./scripts/generateJsonSchemas.mts"
+    "jsonSchemas": "ts-node --esm ./scripts/docs/generateJsonSchemas.ts"
   },
   "devDependencies": {
     "@jest/globals": "29.5.0",
@@ -96,7 +96,7 @@
     "cross-env": "7.0.3",
     "dotenv-cli": "7.2.1",
     "inquirer": "9.2.3",
-    "lodash-es": "^4.17.21",
+    "lodash": "^4.17.21",
     "semver": "7.5.1",
     "ts-node": "10.9.1",
     "tsup": "6.7.0",

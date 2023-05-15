@@ -101,9 +101,7 @@ async function main() {
           ...Object.entries(config.argTypes).map(([argName, argType]) => {
             const formattedName = `<span class="prop-name">${escapeCell(argName)}</span>`;
             const defaultValue = argType.default;
-            const formattedType = `<span class="prop-type">${escapeCell(
-              JSON.stringify(argType.type),
-            )}</span>`;
+            const formattedType = `<span class="prop-type">${escapeCell(argType.type)}</span>`;
 
             const formattedDefaultValue =
               typeof defaultValue === 'undefined'

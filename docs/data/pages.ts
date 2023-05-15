@@ -76,7 +76,7 @@ const pages: MuiPage[] = [
   },
   {
     pathname: '/toolpad/api-reference-group',
-    title: 'API Reference',
+    title: 'API reference',
     icon: CodeIcon,
     children: [
       {

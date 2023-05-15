@@ -1,13 +1,16 @@
-import { NextApiHandler } from 'next';
 import type { IncomingMessage, ServerResponse } from 'http';
 import superjson from 'superjson';
+import express from 'express';
+import * as z from 'zod';
+import { fromZodError } from 'zod-validation-error';
 import { hasOwnProperty } from '@mui/toolpad-utils/collections';
 import { errorFrom, serializeError } from '@mui/toolpad-utils/errors';
-import { execQuery, dataSourceFetchPrivate } from '../../src/server/data';
-import { getVersionInfo } from '../../src/server/versionInfo';
-import logger from '../../src/server/logs/logger';
-import { createComponent, deletePage, openCodeComponentEditor } from '../../src/server/localMode';
-import { getDomFingerprint, loadDom, saveDom } from '../../src/server/liveProject';
+import { execQuery, dataSourceFetchPrivate } from './data';
+import { getVersionInfo } from './versionInfo';
+import logger from './logs/logger';
+import { createComponent, deletePage, openCodeComponentEditor } from './localMode';
+import { getDomFingerprint, loadDom, saveDom } from './liveProject';
+import { asyncHandler } from '../utils/http';
 
 export interface Method<P extends any[] = any[], R = any> {
   (...params: P): Promise<R>;
@@ -34,11 +37,13 @@ export interface MethodsOf<D extends Definition> {
   readonly mutation: MethodsOfGroup<D['mutation']>;
 }
 
-export interface RpcRequest {
-  type: 'query' | 'mutation';
-  name: string;
-  params: any[];
-}
+const rpcRequestSchema = z.object({
+  type: z.union([z.literal('query'), z.literal('mutation')]),
+  name: z.string(),
+  params: z.array(z.any()),
+});
+
+export type RpcRequest = z.infer<typeof rpcRequestSchema>;
 
 export type RpcResponse =
   | {
@@ -49,47 +54,54 @@ export type RpcResponse =
       error: { message: string; code?: unknown; stack?: string };
     };
 
-function createRpcHandler(definition: Definition): NextApiHandler<RpcResponse> {
-  return async (req, res) => {
-    if (req.method !== 'POST') {
-      res.status(405).end();
-      return;
-    }
+export function createRpcHandler(definition: Definition): express.RequestHandler {
+  const router = express.Router();
+  router.post(
+    '/',
+    express.json(),
+    asyncHandler(async (req, res) => {
+      const parseResult = rpcRequestSchema.safeParse(req.body);
+      if (!parseResult.success) {
+        res.status(400).send(fromZodError(parseResult.error));
+        return;
+      }
 
-    const { type, name, params } = req.body as RpcRequest;
+      const { type, name, params } = parseResult.data;
 
-    if (!hasOwnProperty(definition, type) || !hasOwnProperty(definition[type], name)) {
-      // This is important to avoid RCE
-      res.status(404).end();
-      return;
-    }
-    const method: MethodResolver<any> = definition[type][name];
+      if (!hasOwnProperty(definition, type) || !hasOwnProperty(definition[type], name)) {
+        // This is important to avoid RCE
+        res.status(404).end();
+        return;
+      }
+      const method: MethodResolver<any> = definition[type][name];
 
-    let rawResult;
-    let error: Error | null = null;
-    try {
-      rawResult = await method({ params, req, res });
-    } catch (rawError) {
-      error = errorFrom(rawError);
-    }
+      let rawResult;
+      let error: Error | null = null;
+      try {
+        rawResult = await method({ params, req, res });
+      } catch (rawError) {
+        error = errorFrom(rawError);
+      }
 
-    const responseData: RpcResponse = error
-      ? { error: serializeError(error) }
-      : { result: superjson.stringify(rawResult) };
+      const responseData: RpcResponse = error
+        ? { error: serializeError(error) }
+        : { result: superjson.stringify(rawResult) };
 
-    res.json(responseData);
+      res.json(responseData);
 
-    const logLevel = error ? 'warn' : 'trace';
-    logger[logLevel](
-      {
-        key: 'rpc',
-        type,
-        name,
-        error,
-      },
-      'Handled RPC request',
-    );
-  };
+      const logLevel = error ? 'warn' : 'trace';
+      logger[logLevel](
+        {
+          key: 'rpc',
+          type,
+          name,
+          error,
+        },
+        'Handled RPC request',
+      );
+    }),
+  );
+  return router;
 }
 
 interface ResolverInput<P> {
@@ -106,7 +118,7 @@ function createMethod<F extends Method>(handler: MethodResolver<F>): MethodResol
   return handler;
 }
 
-const rpcServer = {
+export const rpcServer = {
   query: {
     dataSourceFetchPrivate: createMethod<typeof dataSourceFetchPrivate>(({ params }) => {
       return dataSourceFetchPrivate(...params);
@@ -141,5 +153,3 @@ const rpcServer = {
 } as const;
 
 export type ServerDefinition = MethodsOf<typeof rpcServer>;
-
-export default createRpcHandler(rpcServer);

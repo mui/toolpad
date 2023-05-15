@@ -76,7 +76,7 @@ async function main() {
 
   const app = await createDevServer({
     root: process.env.TOOLPAD_PROJECT_DIR,
-    base: '/preview',
+    base: '/preview/',
   });
 
   await app.listen(Number(process.env.TOOLPAD_PORT));

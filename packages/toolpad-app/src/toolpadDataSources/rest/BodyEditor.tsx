@@ -136,7 +136,7 @@ function RawBodyEditor({
           </TextField>
         ),
       })}
-      <BindableEditor
+      <BindableEditor<string>
         sx={{ mt: 1 }}
         liveBinding={liveContent}
         globalScope={globalScope}

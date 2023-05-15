@@ -14,8 +14,8 @@ The most common way is through **queries**, to configure a query you need to fol
 
    <img src="/static/toolpad/docs/queries/query-2.png?v=0" alt="Select query type" width="464" />
 
-   - [serverside JavaScript](/toolpad/connecting-to-datasources/serverside-javascript/) - Write serverside JavaScript functions and their result will be automatically made available on the page. These have full access to the Node.js environment they run under.
-   - [serverside HTTP request](/toolpad/connecting-to-datasources/serverside-http-request/) - Basic, but very powerful. Just pass URL of an API endpoint and you are ready to query your data.
+   - [Custom functions](/toolpad/connecting-to-datasources/custom-functions/) - Write serverside JavaScript functions and their result will be automatically made available on the page. These have full access to the Node.js environment they run under.
+   - [HTTP requests](/toolpad/connecting-to-datasources/http-requests/) - Basic, but very powerful. Just pass the URL of an API endpoint and you are ready to query your data.
 
    Click any of these to start configuration.
 
@@ -24,7 +24,7 @@ The most common way is through **queries**, to configure a query you need to fol
    <img src="/static/toolpad/docs/queries/query-3.png?v=0" alt="Query configuration" width="855" />
 
    - **mode**
-     - **Fetch at any time to always be availabe on the page** - Execute the query automatically to make sure the latest data is always available on the page. Use this when you want to display remote data in the UI. The data must be idempotent, the query will be retried on error and executed on regular times to make sure the data on the page is up to date.
+     - **Fetch at any time to always be available on the page** - Execute the query automatically to make sure the latest data is always available on the page. Use this when you want to display remote data in the UI. The data must be idempotent, the query will be retried on error and executed on regular times to make sure the data on the page is up to date.
      - **Only fetch on manual action** - The query has to be executed manually.
    - **Enabled** - Whether the query should be active, you can use this to disable fetching until certain conditions are met. It may for instance be dependant on certain input.
    - **Refetch interval** - You can configure the query to run on an interval, e.g. **every 30s**. To disable this option, keep the field empty.

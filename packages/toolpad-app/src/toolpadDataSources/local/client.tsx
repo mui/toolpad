@@ -71,7 +71,12 @@ function QueryEditor({
   );
 
   const openEditor = React.useCallback(() => {
-    fetchPrivate({ kind: 'openEditor' });
+    fetchPrivate({ kind: 'openEditor' }).catch((err) => {
+      // TODO: Write docs with instructions on how to install editor
+      // Add a good looking alert box and inline some instructions and link to docs
+      // eslint-disable-next-line no-alert
+      alert(err.message);
+    });
   }, [fetchPrivate]);
 
   const {
@@ -139,10 +144,10 @@ function QueryEditor({
                   globalScope={globalScope}
                   globalScopeMeta={globalScopeMeta}
                   label={name}
-                  propType={definiton.typeDef}
+                  propType={definiton}
                   jsRuntime={jsBrowserRuntime}
                   renderControl={(renderControlParams) => (
-                    <Control {...renderControlParams} propType={definiton.typeDef} />
+                    <Control {...renderControlParams} propType={definiton} />
                   )}
                   value={paramsObject[name]}
                   onChange={(newValue) => {

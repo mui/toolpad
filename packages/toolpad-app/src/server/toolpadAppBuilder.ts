@@ -220,6 +220,15 @@ export function createViteConfig({
         },
       },
     },
+    resolve: {
+      alias: [
+        {
+          // FIXME(https://github.com/mui/material-ui/issues/35233)
+          find: /^@mui\/icons-material\/([^/]*)/,
+          replacement: '@mui/icons-material/esm/$1',
+        },
+      ],
+    },
     server: {
       fs: {
         allow: [root, path.resolve(__dirname, '../../../../')],
@@ -256,7 +265,7 @@ export function createViteConfig({
         'lodash-es',
         'react-router-dom',
         'fractional-indexing',
-        'cuid',
+        'nanoid/non-secure',
         'superjson',
         '@tanstack/react-query-devtools/build/lib/index.prod.js',
         'react-is',

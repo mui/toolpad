@@ -13,7 +13,7 @@ function myComponent({ msg }: MyComponentProps) {
 export default createComponent(myComponent, {
   argTypes: {
     msg: {
-      typeDef: { type: 'string' },
+      type: 'string',
       defaultValue: '',
     },
   },

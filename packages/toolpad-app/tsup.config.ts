@@ -18,6 +18,8 @@ export default defineConfig([
       'lodash-es',
       'chalk',
       'get-port',
+      'pretty-bytes',
+      'latest-version',
       'nanoid',
     ],
     clean: true,
@@ -51,6 +53,7 @@ export default defineConfig([
     silent: true,
     outDir: 'dist/runtime',
     tsconfig: './tsconfig.esbuild.json',
+    clean: true,
     async onSuccess() {
       // eslint-disable-next-line no-console
       console.log('runtime: build successful');

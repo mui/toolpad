@@ -60,7 +60,7 @@ import * as builtIns from '@mui/toolpad-components';
 import { errorFrom } from '@mui/toolpad-utils/errors';
 import { mapProperties, mapValues } from '@mui/toolpad-utils/collections';
 import * as appDom from '../appDom';
-import { RuntimeState, AppVersion } from '../types';
+import { RuntimeState } from '../types';
 import {
   getElementNodeComponentId,
   INTERNAL_COMPONENTS,
@@ -80,7 +80,6 @@ import Pre from '../components/Pre';
 import { layoutBoxArgTypes } from '../toolpadComponents/layoutBox';
 import NoSsr from '../components/NoSsr';
 import { execDataSourceQuery, useDataQuery, UseDataQueryConfig, UseFetch } from './useDataQuery';
-import { useAppContext, AppContextProvider } from './AppContext';
 import { CanvasHooksContext, NavigateToPage } from './CanvasHooksContext';
 import useBoolean from '../utils/useBoolean';
 import Header from '../toolpad/ToolpadShell/Header';
@@ -89,7 +88,7 @@ import { BridgeContext } from '../canvas/BridgeContext';
 import AppNavigation from './AppNavigation';
 import { PREVIEW_PAGE_ROUTE } from '../routes';
 
-const internalComponents: ToolpadComponents = Object.fromEntries(
+export const internalComponents: ToolpadComponents = Object.fromEntries(
   [...INTERNAL_COMPONENTS].map(([name]) => {
     let builtIn = (builtIns as any)[name];
 
@@ -131,8 +130,17 @@ const USE_DATA_QUERY_CONFIG_KEYS: readonly (keyof UseDataQueryConfig)[] = [
 function usePageNavigator(): NavigateToPage {
   const navigate = useNavigate();
   const navigateToPage: NavigateToPage = React.useCallback(
-    (pageNodeId: NodeId) => {
-      navigate(`/pages/${pageNodeId}`);
+    (pageNodeId, pageParameters) => {
+      const urlParams = pageParameters && new URLSearchParams(pageParameters);
+
+      navigate({
+        pathname: `/pages/${pageNodeId}`,
+        ...(urlParams
+          ? {
+              search: urlParams.toString(),
+            }
+          : {}),
+      });
     },
     [navigate],
   );
@@ -338,17 +346,35 @@ function RenderedNodeContent({ node, childNodeGroups, Component }: RenderedNodeC
 
   const eventHandlers: Record<string, (param: any) => void> = React.useMemo(() => {
     return mapProperties(argTypes, ([key, argType]) => {
-      if (!argType || argType.typeDef.type !== 'event' || !appDom.isElement(node)) {
+      if (!argType || argType.type !== 'event' || !appDom.isElement(node)) {
         return null;
       }
 
       const action = (node as appDom.ElementNode).props?.[key];
 
       if (action?.type === 'navigationAction') {
-        const handler = () => {
-          const { page } = action.value;
+        const handler = async () => {
+          const { page, parameters = {} } = action.value;
           if (page) {
-            navigateToPage(appDom.deref(page));
+            const parsedParameterEntries = await Promise.all(
+              Object.keys(parameters).map(async (parameterName) => {
+                const parameterValue = parameters[parameterName];
+
+                if (parameterValue && parameterValue.type === 'jsExpression') {
+                  const result = await evaluatePageExpression(
+                    parameterValue.value,
+                    scopeId,
+                    localScopeParams,
+                  );
+                  return [parameterName, result.value];
+                }
+                return [parameterName, parameterValue?.value];
+              }),
+            );
+
+            const parsedParameters = Object.fromEntries(parsedParameterEntries);
+
+            navigateToPage(appDom.deref(page), parsedParameters);
           }
         };
 
@@ -417,8 +443,8 @@ function RenderedNodeContent({ node, childNodeGroups, Component }: RenderedNodeC
 
   // Wrap element props
   for (const [propName, argType] of Object.entries(argTypes)) {
-    const isElement = argType?.typeDef.type === 'element';
-    const isTemplate = argType?.typeDef.type === 'template';
+    const isElement = argType?.type === 'element';
+    const isTemplate = argType?.type === 'template';
 
     if (isElement || isTemplate) {
       const value = props[propName];
@@ -508,7 +534,7 @@ function PageRoot({ children }: PageRootProps) {
 const PageRootComponent = createComponent(PageRoot, {
   argTypes: {
     children: {
-      typeDef: { type: 'element' },
+      type: 'element',
       control: { type: 'slots' },
     },
   },
@@ -535,7 +561,7 @@ function flattenNestedBindables(
       return flattenNestedBindables(param[1], `${prefix}[${i}][1]`);
     });
   }
-  // TODO: create a marker in bindables (similar to $$ref) to recognize them automatically
+  // TODO: create a marker in bindables (similar to $ref) to recognize them automatically
   // in a nested structure. This would allow us to build deeply nested structures
   if (typeof params.type === 'string') {
     return [[prefix, params as BindableAttrValue<any>]];
@@ -608,7 +634,6 @@ interface MutationNodeProps {
 }
 
 function MutationNode({ node, page }: MutationNodeProps) {
-  const { version } = useAppContext();
   const getBindings = useBindingsContext();
   const setControlledBinding = useSetControlledBindingContext();
 
@@ -630,7 +655,7 @@ function MutationNode({ node, page }: MutationNodeProps) {
         params: { ...params, ...overrides },
       }),
     {
-      mutationKey: [version, queryId, params],
+      mutationKey: [queryId, params],
     },
   );
 
@@ -736,9 +761,10 @@ function parseBindings(
           ? `${elm.id}.props.${argType.defaultValueProp}`
           : undefined;
 
+        const propValue = elm.props?.[propName];
+
         const binding: BindableAttrValue<any> =
-          elm.props?.[propName] ||
-          appDom.createConst(argType ? getArgTypeDefaultValue(argType) : undefined);
+          propValue || appDom.createConst(argType ? getArgTypeDefaultValue(argType) : undefined);
 
         const bindingId = `${elm.id}.props.${propName}`;
 
@@ -1106,18 +1132,27 @@ function RenderedPages({ pages, defaultPage }: RenderedPagesProps) {
   return (
     <Routes>
       {pages.map((page) => (
-        <Route
-          key={page.id}
-          path={`/pages/${page.id}`}
-          element={
-            <RenderedPage
-              nodeId={page.id}
-              // Make sure the page itself mounts when the route changes. This make sure all pageBindings are reinitialized
-              // during first render. Fixes https://github.com/mui/mui-toolpad/issues/1050
-              key={page.id}
-            />
-          }
-        />
+        <React.Fragment key={page.id}>
+          <Route
+            path={`/pages/${page.id}`}
+            element={
+              <RenderedPage
+                nodeId={page.id}
+                // Make sure the page itself mounts when the route changes. This make sure all pageBindings are reinitialized
+                // during first render. Fixes https://github.com/mui/mui-toolpad/issues/1050
+                key={page.id}
+              />
+            }
+          />
+        </React.Fragment>
+      ))}
+      {pages.map((page) => (
+        <React.Fragment key={page.id}>
+          <Route
+            path={`/pages/${page.name}`}
+            element={<Navigate to={`/pages/${page.id}`} replace />}
+          />
+        </React.Fragment>
       ))}
       <Route path="/pages" element={defaultPageNavigation} />
       <Route path="/" element={defaultPageNavigation} />
@@ -1160,10 +1195,9 @@ const queryClient = new QueryClient({
 export interface ToolpadAppLayoutProps {
   dom: appDom.RenderTree;
   hasShell?: boolean;
-  version: AppVersion;
 }
 
-function ToolpadAppLayout({ dom, version, hasShell: hasShellProp = true }: ToolpadAppLayoutProps) {
+function ToolpadAppLayout({ dom, hasShell: hasShellProp = true }: ToolpadAppLayoutProps) {
   const root = appDom.getApp(dom);
   const { pages = [] } = appDom.getChildNodes(dom, root);
 
@@ -1175,19 +1209,20 @@ function ToolpadAppLayout({ dom, version, hasShell: hasShellProp = true }: Toolp
   const pageId = pageMatch?.params.nodeId;
 
   const defaultPage = pages[0];
-  const page = pageId
-    ? (appDom.getNode<'page'>(dom, pageId as NodeId) as appDom.PageNode)
-    : defaultPage;
+  const page = pageId ? appDom.getMaybeNode(dom, pageId as NodeId, 'page') : defaultPage;
 
-  const pageDisplay = urlParams.get('toolpad-display') || page.attributes.display?.value;
+  const displayMode = urlParams.get('toolpad-display') || page?.attributes.display?.value;
 
-  const hasShell = hasShellProp && pageDisplay !== 'standalone';
+  const hasShell = hasShellProp && displayMode !== 'standalone';
 
-  const isPreview = version === 'preview';
+  const isCanvas = displayMode === 'canvas';
+  const isPreview = process.env.NODE_ENV !== 'production';
+
+  const showPreviewHeader = isPreview && !isCanvas;
 
   return (
     <React.Fragment>
-      {isPreview ? (
+      {showPreviewHeader ? (
         <ThemeProvider>
           <Header
             enableUserFeedback={false}
@@ -1212,7 +1247,7 @@ function ToolpadAppLayout({ dom, version, hasShell: hasShellProp = true }: Toolp
       ) : null}
       <Box sx={{ display: 'flex' }}>
         {hasShell && pages.length > 0 ? (
-          <AppNavigation pages={pages} isPreview={isPreview} />
+          <AppNavigation pages={pages} clipped={showPreviewHeader} />
         ) : null}
         <RenderedPages pages={pages} defaultPage={defaultPage} />
       </Box>
@@ -1229,7 +1264,6 @@ export interface ToolpadAppProps {
   loadComponents: LoadComponents;
   hasShell?: boolean;
   basename: string;
-  version: AppVersion;
   state: RuntimeState;
 }
 
@@ -1237,12 +1271,11 @@ export default function ToolpadApp({
   rootRef,
   loadComponents,
   basename,
-  version,
   hasShell = true,
   state,
 }: ToolpadAppProps) {
   const { dom } = state;
-  const appContext = React.useMemo(() => ({ version }), [version]);
+
   const [components, setComponents] = React.useState<ToolpadComponents | null>(null);
 
   const [resetNodeErrorsKey, setResetNodeErrorsKey] = React.useState(0);
@@ -1272,16 +1305,14 @@ export default function ToolpadApp({
                 <ErrorBoundary FallbackComponent={AppError}>
                   <ResetNodeErrorsKeyProvider value={resetNodeErrorsKey}>
                     <React.Suspense fallback={<AppLoading />}>
-                      <AppContextProvider value={appContext}>
-                        <QueryClientProvider client={queryClient}>
-                          <BrowserRouter basename={basename}>
-                            <ToolpadAppLayout dom={dom} version={version} hasShell={hasShell} />
-                          </BrowserRouter>
-                          {showDevtools ? (
-                            <ReactQueryDevtoolsProduction initialIsOpen={false} />
-                          ) : null}
-                        </QueryClientProvider>
-                      </AppContextProvider>
+                      <QueryClientProvider client={queryClient}>
+                        <BrowserRouter basename={basename}>
+                          <ToolpadAppLayout dom={dom} hasShell={hasShell} />
+                        </BrowserRouter>
+                        {showDevtools ? (
+                          <ReactQueryDevtoolsProduction initialIsOpen={false} />
+                        ) : null}
+                      </QueryClientProvider>
                     </React.Suspense>
                   </ResetNodeErrorsKeyProvider>
                 </ErrorBoundary>

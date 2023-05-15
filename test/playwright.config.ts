@@ -16,11 +16,18 @@ const config: PlaywrightTestConfig<{ toolpadDev: boolean }> = {
   projects: [
     {
       name: 'chromium',
+      testDir: './integration',
       use: { ...devices['Desktop Chrome'] },
     },
     {
       name: 'firefox',
+      testDir: './integration',
       use: { ...devices['Desktop Firefox'] },
+    },
+    {
+      name: 'visual',
+      testDir: './visual',
+      use: { ...devices['Desktop Chrome'] },
     },
   ],
 };

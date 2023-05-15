@@ -242,46 +242,49 @@ export function withComponentForm<P extends Record<string, any>>(
 export default createComponent(Form, {
   argTypes: {
     children: {
-      typeDef: { type: 'element' },
+      type: 'element',
       control: { type: 'layoutSlot' },
     },
     value: {
       helperText: 'The value that is controlled by this text input.',
-      typeDef: { type: 'object', default: {} },
+      type: 'object',
+      default: {},
       onChangeProp: 'onChange',
     },
     onSubmit: {
       helperText: 'Add logic to be executed when the user submits the form.',
-      typeDef: { type: 'event' },
+      type: 'event',
     },
     formControlsAlign: {
-      typeDef: {
-        type: 'string',
-        enum: ['start', 'center', 'end'],
-        default: 'end',
-      },
+      type: 'string',
+      enum: ['start', 'center', 'end'],
+      default: 'end',
       label: 'Form controls alignment',
       control: { type: 'HorizontalAlign' },
     },
     formControlsFullWidth: {
       helperText: 'Whether the form controls should occupy all available horizontal space.',
-      typeDef: { type: 'boolean', default: false },
+      type: 'boolean',
+      default: false,
     },
     submitButtonText: {
       helperText: 'Submit button text.',
-      typeDef: { type: 'string', default: 'Submit' },
+      type: 'string',
+      default: 'Submit',
     },
     hasResetButton: {
       helperText: 'Show button to reset form values.',
-      typeDef: { type: 'boolean', default: false },
+      type: 'boolean',
+      default: false,
     },
     hideControls: {
       helperText: 'Hide form controls.',
-      typeDef: { type: 'boolean', default: false },
+      type: 'boolean',
+      default: false,
     },
     sx: {
       helperText: SX_PROP_HELPER_TEXT,
-      typeDef: { type: 'object' },
+      type: 'object',
     },
   },
 });

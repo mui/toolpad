@@ -21,7 +21,6 @@ spec:
             `https://dog.ceo/api/breed/${parameters.breed}/images/random`
         headers: []
         method: GET
-        searchParams: []
       parameters:
         - name: breed
           value:

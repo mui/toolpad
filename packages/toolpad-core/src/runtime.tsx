@@ -1,9 +1,13 @@
 import * as React from 'react';
 import { ErrorBoundary, FallbackProps } from 'react-error-boundary';
 import { Emitter } from '@mui/toolpad-utils/events';
-import { RuntimeEvents, ToolpadComponents } from './types.js';
-import { RUNTIME_PROP_NODE_ID, RUNTIME_PROP_SLOTS } from './constants.js';
+import * as ReactIs from 'react-is';
+import { hasOwnProperty } from '@mui/toolpad-utils/collections';
+import { createProvidedContext } from '@mui/toolpad-utils/react';
+import { RuntimeEvents, ToolpadComponents, ToolpadComponent, ArgTypeDefinition } from './types.js';
+import { RUNTIME_PROP_NODE_ID, RUNTIME_PROP_SLOTS, TOOLPAD_COMPONENT } from './constants.js';
 import type { SlotType, ComponentConfig, RuntimeEvent, RuntimeError } from './types.js';
+import createComponent from './createComponent.js';
 
 const ResetNodeErrorsKeyContext = React.createContext(0);
 
@@ -215,4 +219,43 @@ export function Slots({ prop, children }: SlotsProps) {
   ) : (
     <Placeholder prop={prop} />
   );
+}
+
+export function isToolpadComponent(
+  maybeComponent: unknown,
+): maybeComponent is ToolpadComponent<any> {
+  if (
+    !ReactIs.isValidElementType(maybeComponent) ||
+    typeof maybeComponent === 'string' ||
+    !hasOwnProperty(maybeComponent, TOOLPAD_COMPONENT)
+  ) {
+    return false;
+  }
+
+  return true;
+}
+
+export function getArgTypeDefaultValue<V>(argType: ArgTypeDefinition<{}, V>): V | undefined {
+  return argType.default ?? argType.defaultValue ?? undefined;
+}
+
+export function createToolpadComponentThatThrows(error: Error) {
+  return createComponent(() => {
+    throw error;
+  });
+}
+
+const [useComponents, ComponentsContextProvider] =
+  createProvidedContext<ToolpadComponents>('Components');
+
+export { useComponents, ComponentsContextProvider };
+
+export function useComponent(id: string) {
+  const components = useComponents();
+  return React.useMemo(() => {
+    return (
+      components?.[id] ??
+      createToolpadComponentThatThrows(new Error(`Can't find component for "${id}"`))
+    );
+  }, [components, id]);
 }

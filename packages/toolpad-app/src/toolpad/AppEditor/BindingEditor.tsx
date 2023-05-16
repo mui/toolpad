@@ -549,7 +549,8 @@ export function BindingEditorDialog<V>({
       <DialogTitle>Bind property &quot;{label}&quot;</DialogTitle>
       <DialogContent
         sx={{
-          height: 560,
+          height: '100vh',
+          maxHeight: 560,
         }}
       >
         {propType?.type === 'event' ? (

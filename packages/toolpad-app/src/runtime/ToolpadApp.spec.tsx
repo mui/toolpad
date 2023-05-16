@@ -1,4 +1,3 @@
-/* eslint-disable import/no-restricted-paths */
 import * as React from 'react';
 import { render, waitFor as waitForOrig, screen, fireEvent, act } from '@testing-library/react';
 import '@testing-library/jest-dom';

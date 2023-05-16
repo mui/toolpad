@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Grid, Container, styled } from '@mui/material';
+import { Grid, Container, styled, ThemeProvider } from '@mui/material';
 import invariant from 'invariant';
 import { createToolpadAppTheme } from '../../../../runtime/AppThemeProvider';
 import { useDom } from '../../../AppState';
@@ -73,14 +73,16 @@ export const OverlayGrid = React.forwardRef<OverlayGridHandle>(function OverlayG
   );
 
   return (
-    <GridContainer>
-      <StyledGrid ref={gridRef} container columnSpacing={appTheme.spacing(GRID_COLUMN_GAP)}>
-        {[...Array(GRID_NUMBER_OF_COLUMNS)].map((column, index) => (
-          <Grid key={index} item xs={1}>
-            <StyledGridColumn />
-          </Grid>
-        ))}
-      </StyledGrid>
-    </GridContainer>
+    <ThemeProvider theme={appTheme}>
+      <GridContainer>
+        <StyledGrid ref={gridRef} container columnSpacing={GRID_COLUMN_GAP}>
+          {[...Array(GRID_NUMBER_OF_COLUMNS)].map((column, index) => (
+            <Grid key={index} item xs={1}>
+              <StyledGridColumn />
+            </Grid>
+          ))}
+        </StyledGrid>
+      </GridContainer>
+    </ThemeProvider>
   );
 });

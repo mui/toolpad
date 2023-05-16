@@ -3,8 +3,8 @@ import { defineConfig } from 'tsup';
 
 export default defineConfig({
   entry: [
-    'src/*.tsx?',
-    'src/hooks/*.tsx?',
+    'src/*{.ts,.tsx}',
+    'src/hooks/*{.ts,.tsx}',
     '!src/**/*.spec.*', // Avoid building tests
   ],
   format: ['esm', 'cjs'],

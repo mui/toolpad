@@ -8,6 +8,7 @@ import { loadDom } from './liveProject';
 import { getAppOutputFolder } from './localMode';
 import { asyncHandler } from '../utils/http';
 import { createDataHandler } from './data';
+import { basicAuthUnauthorized, checkBasicAuthHeader } from './basicAuth';
 
 export interface CreateViteConfigParams {
   server?: Server;
@@ -24,6 +25,15 @@ export async function createProdHandler({ root }: ToolpadAppHandlerParams) {
   const router = express.Router();
 
   router.use(express.static(getAppOutputFolder(root), { index: false }));
+
+  // Allow static assets, block everything else
+  router.use((req, res, next) => {
+    if (checkBasicAuthHeader(req.headers.authorization ?? null)) {
+      next();
+      return;
+    }
+    basicAuthUnauthorized(res);
+  });
 
   router.use('/api/data', createDataHandler());
 

@@ -16,7 +16,7 @@ export interface StringRecordEntriesEditorProps
   autoFocus?: boolean;
   sx?: SxProps;
   jsRuntime: JsRuntime;
-  env?: Record<string, string>;
+  envVarNames?: string[];
   disabled?: boolean;
 }
 
@@ -33,7 +33,7 @@ export default function ParametersEditor({
   jsRuntime,
   disabled,
   globalScopeMeta,
-  env,
+  envVarNames,
 }: StringRecordEntriesEditorProps) {
   const fieldInputRef = React.useRef<HTMLInputElement>(null);
 
@@ -90,7 +90,7 @@ export default function ParametersEditor({
                 )
               }
               disabled={disabled}
-              env={env}
+              envVarNames={envVarNames}
             />
 
             <IconButton aria-label="Delete property" onClick={handleRemove(index)}>

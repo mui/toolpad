@@ -17,6 +17,8 @@ import {
   Tab,
   TextField,
   MenuItem,
+  Autocomplete,
+  AutocompleteProps,
 } from '@mui/material';
 import LinkIcon from '@mui/icons-material/Link';
 import AddLinkIcon from '@mui/icons-material/AddLink';
@@ -66,7 +68,7 @@ interface BindingEditorContext {
   disabled?: boolean;
   propType?: PropValueType;
   liveBinding?: LiveBinding;
-  env?: Record<string, string>;
+  envVarNames?: string[];
 }
 
 const [useBindingEditorContext, BindingEditorContextProvider] =
@@ -133,16 +135,15 @@ function JsExpressionPreview({ jsRuntime, input, globalScope }: JsExpressionPrev
 export interface EnvBindingEditorProps extends WithControlledProp<EnvAttrValue | null> {}
 
 export function EnvBindingEditor({ value, onChange }: EnvBindingEditorProps) {
-  const { env = {} } = useBindingEditorContext();
+  const { envVarNames = [] } = useBindingEditorContext();
 
-  const envVarNames = Object.keys(env);
   const hasEnvVars = envVarNames.length > 0;
 
   const handleChange = React.useCallback(
-    (event: React.ChangeEvent<HTMLInputElement>) => {
+    (event: React.SyntheticEvent, newValue: string | null) => {
       onChange({
         type: 'env',
-        value: event.target.value,
+        value: newValue,
       });
     },
     [onChange],
@@ -151,22 +152,22 @@ export function EnvBindingEditor({ value, onChange }: EnvBindingEditorProps) {
   return (
     <Box sx={{ my: 1 }}>
       <Typography>Assign to an environment variable</Typography>
-      <TextField
-        fullWidth
-        sx={{ my: 3 }}
-        label="Select environment variable"
-        select
+      <Autocomplete
+        freeSolo
+        options={envVarNames}
         value={value?.value || ''}
         onChange={handleChange}
-        disabled={!hasEnvVars}
-        helperText={hasEnvVars ? null : 'No environment variables available'}
-      >
-        {Object.keys(env).map((envVarName) => (
-          <MenuItem key={envVarName} value={envVarName}>
-            {envVarName}
-          </MenuItem>
-        ))}
-      </TextField>
+        renderInput={(params) => (
+          <TextField
+            {...params}
+            fullWidth
+            sx={{ my: 3 }}
+            label="Select environment variable"
+            disabled={!hasEnvVars}
+            helperText={hasEnvVars ? null : 'No environment variables available'}
+          />
+        )}
+      />
     </Box>
   );
 }
@@ -185,10 +186,10 @@ export function ValueBindingEditor({ value, onChange }: ValueBindingEditorProps)
     globalScopeMeta = {},
     jsRuntime,
     propType,
-    env,
+    envVarNames,
   } = useBindingEditorContext();
 
-  const hasEnv = Boolean(env);
+  const hasEnv = Boolean(envVarNames);
 
   const [activeTab, setActiveTab] = React.useState<BindableType>(getValueBindingTab(value));
   React.useEffect(() => {
@@ -577,7 +578,7 @@ export interface BindingEditorProps<V> extends WithControlledProp<BindableAttrVa
   hidden?: boolean;
   propType?: PropValueType;
   liveBinding?: LiveBinding;
-  env?: Record<string, string>;
+  envVarNames?: string[];
 }
 
 export function BindingEditor<V>({
@@ -591,7 +592,7 @@ export function BindingEditor<V>({
   value,
   onChange,
   liveBinding,
-  env,
+  envVarNames,
 }: BindingEditorProps<V>) {
   const [open, setOpen] = React.useState(false);
 
@@ -649,9 +650,9 @@ export function BindingEditor<V>({
       disabled,
       propType,
       liveBinding,
-      env,
+      envVarNames,
     }),
-    [disabled, env, globalScope, jsRuntime, label, liveBinding, propType, resolvedMeta],
+    [disabled, envVarNames, globalScope, jsRuntime, label, liveBinding, propType, resolvedMeta],
   );
 
   return (

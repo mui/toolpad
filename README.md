@@ -13,7 +13,7 @@ Quickly build internal tools. MUI Toolpad is a self-hosted low-code internal too
 
 <!--
 [![npm latest package](https://img.shields.io/npm/v/@mui/toolpad/latest.svg)](https://www.npmjs.com/package/@mui/toolpad)
-[![npm next package](https://img.shields.io/npm/v/@mui/toolpad/next.svg)](https://www.npmjs.com/package/@mui/toolpad@beta)
+[![npm next package](https://img.shields.io/npm/v/@mui/toolpad/next.svg)](https://www.npmjs.com/package/@mui/toolpad@alpha)
 [![npm downloads](https://img.shields.io/npm/dm/@mui/toolpad.svg)](https://www.npmjs.com/package/@mui/toolpad)
 -->
 
@@ -31,7 +31,7 @@ A [big change](https://github.com/mui/mui-toolpad/discussions/1748) is coming: w
 
 ## Notice
 
-MUI Toolpad is in its beta stages of development. Feel free to run this application for testing purposes, but keep in mind, in no way is it ready or suitable to run it in production. It's both lacking in features and stability.
+MUI Toolpad is in its alpha stages of development. Feel free to run this application for testing purposes, but keep in mind, in no way is it ready or suitable to run it in production. It's both lacking in features and stability.
 
 ## Quick setup locally
 

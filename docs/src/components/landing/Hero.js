@@ -33,7 +33,7 @@ export default function Hero() {
           <Box component="span" sx={{ mr: 1 }}>
             MUI Toolpad
           </Box>
-          <Chip label="Beta" component="span" color="primary" size="small" variant="outlined" />
+          <Chip label="Alpha" component="span" color="primary" size="small" variant="outlined" />
         </Typography>
         <Typography variant="h1" sx={{ my: 2 }}>
           Low-code

@@ -8,7 +8,7 @@ In order to initiate data binding, look around in the UI for a binding button:
 
 <img src="/static/toolpad/docs/data-binding/bind-1.png" alt="Binding icon" width="47" />
 
-The easiest way to tell if a value can be "data bound" is by locating this binding button, i.e. the Text Field component allows you to bind every property that you could otherwise control manually.
+The easiest way to tell if a value can be made dynamic is by locating this binding button, i.e. the Text Field component allows you to bind every property that you could otherwise control manually.
 
 <img src="/static/toolpad/docs/data-binding/bind-2.png" alt="Binding example" width="292" />
 

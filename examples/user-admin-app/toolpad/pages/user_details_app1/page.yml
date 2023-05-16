@@ -105,19 +105,15 @@ spec:
                             type: string
                           - field: image
                             type: image
-                        height: 346
-                    - component: Paper
-                      name: paper
-                      props:
-                        elevation: 0
+                        height: 416
                     - component: Text
                       name: typography2
-                      layout:
-                        columnSize: 1
-                        horizontalAlign: center
                       props:
                         value: Form to add a new user
                         variant: h4
+                      layout:
+                        columnSize: 1
+                        horizontalAlign: center
                     - component: Form
                       name: form
                       layout:
@@ -297,3 +293,4 @@ spec:
           value:
             $$jsExpression: |
               id_number.value
+  display: standalone

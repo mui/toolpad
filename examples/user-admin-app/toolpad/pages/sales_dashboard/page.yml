@@ -508,3 +508,4 @@ spec:
           });
         transformEnabled: true
         searchParams: []
+  display: standalone

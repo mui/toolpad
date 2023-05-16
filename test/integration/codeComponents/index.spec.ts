@@ -47,7 +47,7 @@ function MyInspector({ data }: MyInspectorProps) {
 
 export default createComponent(MyInspector, {
   argTypes: {
-    data: { typeDef: { type: 'object' } },
+    data: { type: 'object' },
   },
 });
     `,

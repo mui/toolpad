@@ -71,7 +71,7 @@ const pages: MuiPage[] = [
   },
   {
     pathname: '/toolpad/schema-reference',
-    title: 'Schema Reference',
+    title: 'Schema reference',
     icon: SchemaIcon,
   },
 ];

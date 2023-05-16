@@ -193,60 +193,67 @@ export default createComponent(FormWrappedDatePicker, {
   argTypes: {
     value: {
       helperText: 'The currently selected date.',
-      typeDef: { type: 'string', default: '' },
+      type: 'string',
+      default: '',
       onChangeProp: 'onChange',
       defaultValueProp: 'defaultValue',
     },
     format: {
       helperText:
         'The [format](https://day.js.org/docs/en/display/format) of the date in the UI. The value for the bindings will always be in the `YYYY-MM-DD` format. Leave empty to let the end-user locale define the format.',
-      typeDef: {
-        type: 'string',
-        default: '',
-      },
+
+      type: 'string',
+      default: '',
     },
     defaultValue: {
       helperText: 'A default value for the date picker.',
-      typeDef: { type: 'string', default: '' },
+      type: 'string',
+      default: '',
     },
     label: {
       helperText: 'A label that describes the content of the date picker. e.g. "Arrival date".',
-      typeDef: { type: 'string' },
+      type: 'string',
     },
     name: {
       helperText: 'Name of this element. Used as a reference in form data.',
-      typeDef: { type: 'string' },
+      type: 'string',
     },
     variant: {
       helperText:
         'One of the available MUI TextField [variants](https://mui.com/material-ui/react-button/#basic-button). Possible values are `outlined`, `filled` or `standard`',
-      typeDef: { type: 'string', enum: ['outlined', 'filled', 'standard'], default: 'outlined' },
+      type: 'string',
+      enum: ['outlined', 'filled', 'standard'],
+      default: 'outlined',
     },
     size: {
       helperText: 'The size of the component. One of `small`, or `medium`.',
-      typeDef: { type: 'string', enum: ['small', 'medium'], default: 'small' },
+      type: 'string',
+      enum: ['small', 'medium'],
+      default: 'small',
     },
     fullWidth: {
       helperText: 'Whether the button should occupy all available horizontal space.',
-      typeDef: { type: 'boolean' },
+      type: 'boolean',
     },
     disabled: {
       helperText: 'The date picker is disabled.',
-      typeDef: { type: 'boolean' },
+      type: 'boolean',
     },
     isRequired: {
       helperText: 'Whether the date picker is required to have a value.',
-      typeDef: { type: 'boolean', default: false },
+      type: 'boolean',
+      default: false,
       category: 'validation',
     },
     isInvalid: {
       helperText: 'Whether the date picker value is invalid.',
-      typeDef: { type: 'boolean', default: false },
+      type: 'boolean',
+      default: false,
       category: 'validation',
     },
     sx: {
       helperText: SX_PROP_HELPER_TEXT,
-      typeDef: { type: 'object' },
+      type: 'object',
     },
   },
 });

@@ -567,46 +567,53 @@ export default createComponent(DataGridComponent, {
   argTypes: {
     rows: {
       helperText: 'The data to be displayed as rows. Must be an array of objects.',
-      typeDef: { type: 'array', schema: '/schemas/DataGridRows.json' },
+      type: 'array',
+      schema: '/schemas/DataGridRows.json',
     },
     columns: {
       helperText: '',
-      typeDef: { type: 'array', schema: '/schemas/DataGridColumns.json' },
+      type: 'array',
+      schema: '/schemas/DataGridColumns.json',
       control: { type: 'GridColumns' },
     },
     rowIdField: {
       helperText:
         'Defines which column contains the [id](https://mui.com/x/react-data-grid/row-definition/#row-identifier) that uniquely identifies each row.',
-      typeDef: { type: 'string' },
+      type: 'string',
       control: { type: 'RowIdFieldSelect' },
       label: 'Id field',
     },
     selection: {
       helperText: 'The currently selected row. Or `null` in case no row has been selected.',
-      typeDef: { type: 'object', default: null },
+      type: 'object',
+      default: null,
       onChangeProp: 'onSelectionChange',
       tsType: `ThisComponent['rows'][number] | undefined`,
     },
     density: {
       helperText:
         'The [density](https://mui.com/x/react-data-grid/accessibility/#density-prop) of the rows. Possible values are `compact`, `standard`, or `comfortable`.',
-      typeDef: { type: 'string', enum: ['compact', 'standard', 'comfortable'], default: 'compact' },
+      type: 'string',
+      enum: ['compact', 'standard', 'comfortable'],
+      default: 'compact',
     },
     height: {
-      typeDef: { type: 'number', default: 350, minimum: 100 },
+      type: 'number',
+      default: 350,
+      minimum: 100,
     },
     loading: {
       helperText:
         "Displays a loading animation indicating the datagrid isn't ready to present data yet.",
-      typeDef: { type: 'boolean' },
+      type: 'boolean',
     },
     hideToolbar: {
       helperText: 'Hide the toolbar area that contains the data grid user controls.',
-      typeDef: { type: 'boolean' },
+      type: 'boolean',
     },
     sx: {
       helperText: SX_PROP_HELPER_TEXT,
-      typeDef: { type: 'object' },
+      type: 'object',
     },
   },
 });

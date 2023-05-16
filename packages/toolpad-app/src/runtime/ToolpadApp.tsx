@@ -88,7 +88,7 @@ import { BridgeContext } from '../canvas/BridgeContext';
 import AppNavigation from './AppNavigation';
 import { PREVIEW_PAGE_ROUTE } from '../routes';
 
-const internalComponents: ToolpadComponents = Object.fromEntries(
+export const internalComponents: ToolpadComponents = Object.fromEntries(
   [...INTERNAL_COMPONENTS].map(([name]) => {
     let builtIn = (builtIns as any)[name];
 
@@ -346,7 +346,7 @@ function RenderedNodeContent({ node, childNodeGroups, Component }: RenderedNodeC
 
   const eventHandlers: Record<string, (param: any) => void> = React.useMemo(() => {
     return mapProperties(argTypes, ([key, argType]) => {
-      if (!argType || argType.typeDef.type !== 'event' || !appDom.isElement(node)) {
+      if (!argType || argType.type !== 'event' || !appDom.isElement(node)) {
         return null;
       }
 
@@ -443,8 +443,8 @@ function RenderedNodeContent({ node, childNodeGroups, Component }: RenderedNodeC
 
   // Wrap element props
   for (const [propName, argType] of Object.entries(argTypes)) {
-    const isElement = argType?.typeDef.type === 'element';
-    const isTemplate = argType?.typeDef.type === 'template';
+    const isElement = argType?.type === 'element';
+    const isTemplate = argType?.type === 'template';
 
     if (isElement || isTemplate) {
       const value = props[propName];
@@ -534,7 +534,7 @@ function PageRoot({ children }: PageRootProps) {
 const PageRootComponent = createComponent(PageRoot, {
   argTypes: {
     children: {
-      typeDef: { type: 'element' },
+      type: 'element',
       control: { type: 'slots' },
     },
   },

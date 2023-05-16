@@ -21,8 +21,7 @@ export const isTemplateDescendant = (
       | undefined = parentComponentConfig?.argTypes;
 
     const argTypeDef =
-      (parentComponentArgTypes && parentProp && parentComponentArgTypes[parentProp]?.typeDef) ||
-      null;
+      (parentComponentArgTypes && parentProp && parentComponentArgTypes[parentProp]) || null;
 
     if (parent && argTypeDef?.type === 'template') {
       return true;

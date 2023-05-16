@@ -42,10 +42,12 @@ function NumberDisplay({ label, value }: NumberDisplayProps) {
 export default createComponent(NumberDisplay, {
   argTypes: {
     label: {
-      typeDef: { type: 'string', default: 'label' },
+      type: 'string',
+      default: 'label',
     },
     value: {
-      typeDef: { type: 'number', default: 0 },
+      type: 'number',
+      default: 0,
     },
   },
 });

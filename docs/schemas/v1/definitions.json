@@ -80,10 +80,17 @@
                     "description": "Parameters to pass to this query."
                   },
                   "mode": {
-                    "type": "string",
-                    "enum": [
-                      "query",
-                      "mutation"
+                    "anyOf": [
+                      {
+                        "type": "string",
+                        "const": "query",
+                        "description": "Fetch automatically when the page opens"
+                      },
+                      {
+                        "type": "string",
+                        "const": "mutation",
+                        "description": "Fetch on manual action only"
+                      }
                     ],
                     "description": "How to fetch this query."
                   },
@@ -312,10 +319,17 @@
               "description": "The content of the page. This defines the UI."
             },
             "display": {
-              "type": "string",
-              "enum": [
-                "standalone",
-                "shell"
+              "anyOf": [
+                {
+                  "type": "string",
+                  "const": "standalone",
+                  "description": "Hide the Toolpad chrome and just display the content of the page"
+                },
+                {
+                  "type": "string",
+                  "const": "shell",
+                  "description": "Show Toolpad header and navigation."
+                }
               ],
               "description": "Display mode of the page. This can also be set at runtime with the toolpad-display query parameter"
             }

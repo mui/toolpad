@@ -9,6 +9,7 @@ import {
 } from '@mui/toolpad-core';
 import { WithControlledProp } from '../../../utils/types';
 import { getDefaultControl } from '../../propertyControls';
+// eslint-disable-next-line import/no-cycle
 import { BindingEditor } from '../BindingEditor';
 
 function renderDefaultControl(params: RenderControlParams<any>) {

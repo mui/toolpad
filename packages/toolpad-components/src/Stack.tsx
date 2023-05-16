@@ -5,39 +5,34 @@ import { SX_PROP_HELPER_TEXT } from './constants.js';
 export default createComponent(Stack, {
   argTypes: {
     direction: {
-      typeDef: {
-        type: 'string',
-        enum: ['row', 'row-reverse', 'column', 'column-reverse'],
-        default: 'row',
-      },
+      type: 'string',
+      enum: ['row', 'row-reverse', 'column', 'column-reverse'],
+      default: 'row',
     },
     alignItems: {
-      typeDef: {
-        type: 'string',
-        enum: ['start', 'center', 'end', 'stretch', 'baseline'],
-        default: 'start',
-      },
+      type: 'string',
+      enum: ['start', 'center', 'end', 'stretch', 'baseline'],
+      default: 'start',
     },
     justifyContent: {
-      typeDef: {
-        type: 'string',
-        enum: ['start', 'center', 'end', 'space-between', 'space-around', 'space-evenly'],
-        default: 'start',
-      },
+      type: 'string',
+      enum: ['start', 'center', 'end', 'space-between', 'space-around', 'space-evenly'],
+      default: 'start',
     },
     gap: {
-      typeDef: { type: 'number', default: 2 },
+      type: 'number',
+      default: 2,
     },
     margin: {
-      typeDef: { type: 'number' },
+      type: 'number',
     },
     children: {
-      typeDef: { type: 'element' },
+      type: 'element',
       control: { type: 'slots' },
     },
     sx: {
       helperText: SX_PROP_HELPER_TEXT,
-      typeDef: { type: 'object' },
+      type: 'object',
     },
   },
 });

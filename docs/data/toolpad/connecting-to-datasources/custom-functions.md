@@ -66,7 +66,7 @@ export const example = createFunction(
   {
     parameters: {
       value: {
-        typeDef: { type: 'number' },
+        type: 'number',
       },
     },
   },

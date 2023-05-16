@@ -7,7 +7,10 @@ import * as appDom from '../appDom';
 import createRuntimeState from '../createRuntimeState';
 import { bridge } from '../canvas/ToolpadBridge';
 import { BridgeContext } from '../canvas/BridgeContext';
-import loadComponents from './loadDomComponents';
+
+async function loadComponents() {
+  return {};
+}
 
 // More sensible default for these tests
 const waitFor: typeof waitForOrig = (waiter, options) =>

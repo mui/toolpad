@@ -1,5 +1,5 @@
 import { parse as superjsonParse } from 'superjson';
-import type { MethodsOf, MethodsOfGroup, RpcRequest, RpcResponse } from '../pages/api/rpc';
+import type { MethodsOf, MethodsOfGroup, RpcRequest, RpcResponse } from './server/rpc';
 
 function createFetcher(endpoint: string, type: 'query' | 'mutation'): MethodsOfGroup<any> {
   return new Proxy(

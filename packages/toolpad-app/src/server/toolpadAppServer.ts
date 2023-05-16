@@ -7,6 +7,7 @@ import { postProcessHtml } from './toolpadAppBuilder';
 import { loadDom } from './liveProject';
 import { getAppOutputFolder } from './localMode';
 import { asyncHandler } from '../utils/http';
+import { createDataHandler } from './data';
 
 export interface CreateViteConfigParams {
   server?: Server;
@@ -16,15 +17,15 @@ export interface CreateViteConfigParams {
 }
 
 export interface ToolpadAppHandlerParams {
-  server: Server;
   root: string;
-  base: string;
 }
 
 export async function createProdHandler({ root }: ToolpadAppHandlerParams) {
   const router = express.Router();
 
   router.use(express.static(getAppOutputFolder(root), { index: false }));
+
+  router.use('/api/data', createDataHandler());
 
   router.use(
     asyncHandler(async (req, res) => {

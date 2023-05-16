@@ -72,6 +72,18 @@ module.exports = {
         skipShapeProps: true,
       },
     ],
+    'import/no-restricted-paths': [
+      'error',
+      {
+        zones: [
+          {
+            target: './packages/toolpad-app/src/runtime',
+            from: './packages/toolpad-app/src/',
+            except: ['./runtime', './appDom', './types.ts', './toolpadComponents'],
+          },
+        ],
+      },
+    ],
   },
   overrides: [
     {

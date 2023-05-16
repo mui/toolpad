@@ -1,3 +1,5 @@
+/// <reference types="vite/client" />
+
 import { GridRowsProp } from '@mui/x-data-grid-pro';
 import * as React from 'react';
 import { useQuery, UseQueryOptions } from '@tanstack/react-query';
@@ -18,7 +20,7 @@ export async function execDataSourceQuery({
   queryName,
   params,
 }: ExecDataSourceQueryParams) {
-  const dataUrl = new URL(`/api/data/`, window.location.href);
+  const dataUrl = new URL(`${import.meta.env.BASE_URL}/api/data/`, window.location.href);
   const url = new URL(
     `./${encodeURIComponent(pageName)}/${encodeURIComponent(queryName)}`,
     dataUrl,

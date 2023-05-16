@@ -281,6 +281,7 @@ export function createViteConfig({
     base,
     define: {
       'process.env.NODE_ENV': `'${mode}'`,
+      'process.env.BASE_URL': `'${base}'`,
     },
   };
 }

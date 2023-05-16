@@ -20,7 +20,7 @@ export async function execDataSourceQuery({
   queryName,
   params,
 }: ExecDataSourceQueryParams) {
-  const dataUrl = new URL(`${import.meta.env.BASE_URL}/api/data/`, window.location.href);
+  const dataUrl = new URL(`${process.env.BASE_URL}/api/data/`, window.location.href);
   const url = new URL(
     `./${encodeURIComponent(pageName)}/${encodeURIComponent(queryName)}`,
     dataUrl,

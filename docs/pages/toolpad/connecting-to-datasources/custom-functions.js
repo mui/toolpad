@@ -4,7 +4,7 @@ import {
   demos,
   docs,
   demoComponents,
-} from '../../../data/toolpad/connecting-to-datasources/serverside-http-request.md?@mui/markdown';
+} from '../../../data/toolpad/connecting-to-datasources/custom-functions.md?@mui/markdown';
 
 export default function Page() {
   return <MarkdownDocs demos={demos} docs={docs} demoComponents={demoComponents} disableAd />;

@@ -17,7 +17,7 @@ function FullNameColumn({ row }: FullNameColumnProps) {
 export default createComponent(FullNameColumn, {
   argTypes: {
     row: {
-      typeDef: { type: 'object' },
+      type: 'object',
     },
   },
 });

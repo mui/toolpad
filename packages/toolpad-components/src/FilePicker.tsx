@@ -123,38 +123,41 @@ export default createComponent(FormWrappedFilePicker, {
   helperText: 'File Picker component.\nIt allows users to take select and read files.',
   argTypes: {
     value: {
-      typeDef: { type: 'object' },
+      type: 'object',
       visible: false,
       onChangeProp: 'onChange',
     },
     label: {
       helperText: 'A label that describes the content of the FilePicker. e.g. "Profile Image".',
-      typeDef: { type: 'string' },
+      type: 'string',
     },
     name: {
       helperText: 'Name of this element. Used as a reference in form data.',
-      typeDef: { type: 'string' },
+      type: 'string',
     },
     multiple: {
       helperText: 'Whether the FilePicker should accept multiple files.',
-      typeDef: { type: 'boolean', default: true },
+      type: 'boolean',
+      default: true,
     },
     disabled: {
       helperText: 'Whether the FilePicker is disabled.',
-      typeDef: { type: 'boolean' },
+      type: 'boolean',
     },
     isRequired: {
       helperText: 'Whether the FilePicker is required to have a value.',
-      typeDef: { type: 'boolean', default: false },
+      type: 'boolean',
+      default: false,
       category: 'validation',
     },
     isInvalid: {
       helperText: 'Whether the FilePicker value is invalid.',
-      typeDef: { type: 'boolean', default: false },
+      type: 'boolean',
+      default: false,
       category: 'validation',
     },
     sx: {
-      typeDef: { type: 'object' },
+      type: 'object',
     },
   },
 });

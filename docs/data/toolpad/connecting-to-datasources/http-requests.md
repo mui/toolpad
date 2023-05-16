@@ -1,4 +1,4 @@
-# Serverside HTTP requests
+# HTTP requests
 
 <p class="description">A fast way to load external data from REST APIs.</p>
 
@@ -6,11 +6,11 @@
 
 1. Choose **Add query** in the **Inspector** on the right.
 
-1. Select **serverside HTTP request**:
+2. Select **HTTP request**:
 
    <img src="/static/toolpad/docs/queries/query-2.png?v=0" alt="Select query type" width="464" />
 
-1. The query editor opens in which you can configure the HTTP request
+3. The query editor opens in which you can configure the HTTP request
 
 ## Basic options
 

@@ -24,7 +24,6 @@ interface FormProps extends ContainerProps {
   hasResetButton?: boolean;
   mode?: keyof ValidationMode | undefined;
   hasChrome?: boolean;
-  hideControls?: boolean;
 }
 
 function Form({
@@ -38,7 +37,6 @@ function Form({
   submitButtonText = 'Submit',
   mode = 'onSubmit',
   hasChrome = true,
-  hideControls = false,
   sx,
   ...rest
 }: FormProps) {
@@ -83,42 +81,41 @@ function Form({
         <Container disableGutters sx={sx} {...rest}>
           <form onSubmit={form.handleSubmit(handleSubmit)} onReset={handleReset}>
             {children}
-            {!hideControls ? (
-              <Box
-                sx={{
-                  display: 'flex',
-                  flexDirection: 'row',
-                  justifyContent: formControlsAlign,
-                  pt: 1,
-                }}
+
+            <Box
+              sx={{
+                display: 'flex',
+                flexDirection: 'row',
+                justifyContent: formControlsAlign,
+                pt: 1,
+              }}
+            >
+              <Stack
+                direction="row"
+                spacing={1}
+                sx={{ flex: formControlsFullWidth ? 1 : '0 1 auto' }}
               >
-                <Stack
-                  direction="row"
-                  spacing={1}
-                  sx={{ flex: formControlsFullWidth ? 1 : '0 1 auto' }}
-                >
-                  {hasResetButton ? (
-                    <LoadingButton
-                      type="reset"
-                      color="secondary"
-                      variant="contained"
-                      sx={{ flex: formControlsFullWidth ? 1 : '0 1 auto' }}
-                    >
-                      Reset
-                    </LoadingButton>
-                  ) : null}
+                {hasResetButton ? (
                   <LoadingButton
-                    type="submit"
-                    color="primary"
+                    type="reset"
+                    color="secondary"
                     variant="contained"
-                    loading={form.formState.isSubmitting}
                     sx={{ flex: formControlsFullWidth ? 1 : '0 1 auto' }}
                   >
-                    {submitButtonText}
+                    Reset
                   </LoadingButton>
-                </Stack>
-              </Box>
-            ) : null}
+                ) : null}
+                <LoadingButton
+                  type="submit"
+                  color="primary"
+                  variant="contained"
+                  loading={form.formState.isSubmitting}
+                  sx={{ flex: formControlsFullWidth ? 1 : '0 1 auto' }}
+                >
+                  {submitButtonText}
+                </LoadingButton>
+              </Stack>
+            </Box>
           </form>
         </Container>
       ) : (
@@ -242,46 +239,44 @@ export function withComponentForm<P extends Record<string, any>>(
 export default createComponent(Form, {
   argTypes: {
     children: {
-      typeDef: { type: 'element' },
+      type: 'element',
       control: { type: 'layoutSlot' },
     },
     value: {
       helperText: 'The value that is controlled by this text input.',
-      typeDef: { type: 'object', default: {} },
+      type: 'object',
+      default: {},
       onChangeProp: 'onChange',
     },
     onSubmit: {
       helperText: 'Add logic to be executed when the user submits the form.',
-      typeDef: { type: 'event' },
+      type: 'event',
     },
     formControlsAlign: {
-      typeDef: {
-        type: 'string',
-        enum: ['start', 'center', 'end'],
-        default: 'end',
-      },
+      type: 'string',
+      enum: ['start', 'center', 'end'],
+      default: 'end',
       label: 'Form controls alignment',
       control: { type: 'HorizontalAlign' },
     },
     formControlsFullWidth: {
       helperText: 'Whether the form controls should occupy all available horizontal space.',
-      typeDef: { type: 'boolean', default: false },
+      type: 'boolean',
+      default: false,
     },
     submitButtonText: {
       helperText: 'Submit button text.',
-      typeDef: { type: 'string', default: 'Submit' },
+      type: 'string',
+      default: 'Submit',
     },
     hasResetButton: {
       helperText: 'Show button to reset form values.',
-      typeDef: { type: 'boolean', default: false },
-    },
-    hideControls: {
-      helperText: 'Hide form controls.',
-      typeDef: { type: 'boolean', default: false },
+      type: 'boolean',
+      default: false,
     },
     sx: {
       helperText: SX_PROP_HELPER_TEXT,
-      typeDef: { type: 'object' },
+      type: 'object',
     },
   },
 });

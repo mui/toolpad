@@ -148,11 +148,18 @@ export function EnvBindingEditor({ value, onChange }: EnvBindingEditorProps) {
     [onChange],
   );
 
+  const helperText = React.useMemo(() => {
+    if (!hasEnvVars) {
+      return 'No environment variables available';
+    }
+
+    return null;
+  }, [hasEnvVars]);
+
   return (
     <Box sx={{ my: 1 }}>
       <Typography>Assign to an environment variable</Typography>
       <Autocomplete
-        freeSolo
         options={envVarNames}
         value={value?.value || ''}
         onChange={handleChange}
@@ -163,7 +170,7 @@ export function EnvBindingEditor({ value, onChange }: EnvBindingEditorProps) {
             sx={{ my: 3 }}
             label="Select environment variable"
             disabled={!hasEnvVars}
-            helperText={hasEnvVars ? null : 'No environment variables available'}
+            helperText={helperText}
           />
         )}
       />
@@ -540,7 +547,11 @@ export function BindingEditorDialog<V>({
       maxWidth="lg"
     >
       <DialogTitle>Bind property &quot;{label}&quot;</DialogTitle>
-      <DialogContent>
+      <DialogContent
+        sx={{
+          height: 560,
+        }}
+      >
         {propType?.type === 'event' ? (
           <ActionEditor value={input} onChange={(newValue) => setInput(newValue)} />
         ) : (

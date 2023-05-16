@@ -118,8 +118,9 @@ const Wrapper = styled('div')(({ theme }) => ({
 }));
 
 export interface SchemaReferenceProps {
-  disableAd?: boolean;
   definitions: JSONSchema7;
+  disableAd?: boolean;
+  location?: string;
 }
 
 function getConstClass(type: string) {
@@ -466,7 +467,10 @@ function JsonSchemaDisplay({ name, hash, schema, idPrefix = '' }: JsonSchemaDisp
   );
 }
 
-export default function SchemaReference({ disableAd, definitions }: SchemaReferenceProps) {
+const description = 'An exhaustive reference for the Toolpad file formats.';
+
+export default function SchemaReference(props: SchemaReferenceProps) {
+  const { definitions, disableAd, location } = props;
   const toc = [
     {
       text: 'Files',
@@ -492,21 +496,18 @@ export default function SchemaReference({ disableAd, definitions }: SchemaRefere
     },
   ];
 
-  const description = 'An exhaustive reference for the Toolpad file formats.';
-
   return (
     <AppLayoutDocs
       description={description}
       disableAd={disableAd}
       disableToc={false}
-      location="hello"
-      title={`Schema Reference`}
+      location={location}
+      title="Schema reference"
       toc={toc}
     >
       <SchemaContext.Provider value={definitions.definitions || EMPTY_OBJECT}>
         <MarkdownElement>
-          <h1>Schema Reference</h1>
-
+          <h1>Schema reference</h1>
           <Typography
             variant="h5"
             component="p"
@@ -516,14 +517,11 @@ export default function SchemaReference({ disableAd, definitions }: SchemaRefere
             {description}
             {disableAd ? null : <Ad />}
           </Typography>
-
           {toc.map((tocNode) => {
             return (
               <React.Fragment key={tocNode.hash}>
                 <Heading hash={tocNode.hash} level="h2" title={tocNode.text} />
-
                 <Typography>{tocNode.introduction}</Typography>
-
                 {tocNode.children.map((tocItemNode) => {
                   invariant(typeof tocItemNode.content !== 'boolean', 'Invalid top level schema');
                   return (

@@ -56,12 +56,6 @@ export default createComponent(Button, {
       helperText: 'Whether the button is disabled.',
       type: 'boolean',
     },
-    type: {
-      helperText: 'Button HTML type',
-      type: 'string',
-      enum: ['button', 'submit', 'reset'],
-      default: 'button',
-    },
     sx: {
       helperText: SX_PROP_HELPER_TEXT,
       type: 'object',

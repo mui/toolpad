@@ -46,7 +46,7 @@ export async function createProdHandler({ root }: ToolpadAppHandlerParams) {
 
       html = postProcessHtml(html, { config, dom });
 
-      res.setHeader('Content-Type', 'text/html').status(200).end(html);
+      res.setHeader('Content-Type', 'text/html; charset=utf-8').status(200).end(html);
     }),
   );
 

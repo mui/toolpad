@@ -3,7 +3,7 @@ import { test, expect } from '../../playwright/localTest';
 
 test.use({
   ignoreConsoleErrors: [
-    /Failed to load resource: the server responded with a status of 401 (Unauthorized)/,
+    /Failed to load resource: the server responded with a status of 401 \(Unauthorized\)/,
   ],
 });
 

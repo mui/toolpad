@@ -14,6 +14,7 @@ const pages: MuiPage[] = [
       { pathname: '/toolpad/getting-started/overview' },
       { pathname: '/toolpad/getting-started/quickstart' },
       { pathname: '/toolpad/getting-started/installation' },
+      { pathname: '/toolpad/getting-started/configuration' },
       { pathname: '/toolpad/getting-started/roadmap' },
     ],
   },

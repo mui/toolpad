@@ -17,6 +17,12 @@ export const getStaticProps: GetStaticProps<SchemaReferenceProps> = async () => 
   };
 };
 
-export default function ApiReference(props: SchemaReferenceProps) {
-  return <SchemaReference {...props} />;
+export default function Page(props: SchemaReferenceProps) {
+  return (
+    <SchemaReference
+      disableAd
+      location="/docs/pages/toolpad/schema-reference/index.tsx"
+      {...props}
+    />
+  );
 }

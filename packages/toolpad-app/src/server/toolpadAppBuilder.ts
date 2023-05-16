@@ -27,8 +27,8 @@ export function getHtmlContent({ canvas }: GetHtmlContentParams) {
     <!DOCTYPE html>
     <html lang="en">
       <head>
+        <meta charset="utf-8" />
         <title>Toolpad</title>
-
         <link
           rel="stylesheet"
           href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap"
@@ -68,9 +68,7 @@ export interface PostProcessHtmlParams {
 export function postProcessHtml(html: string, { config, dom }: PostProcessHtmlParams): string {
   const serializedConfig = serializeJavascript(config, { ignoreFunction: true });
   const initialState = createRuntimeState({ dom });
-  const serializedInitialState = serializeJavascript(initialState, {
-    ignoreFunction: true,
-  });
+  const serializedInitialState = serializeJavascript(initialState, { isJSON: true });
 
   const toolpadScripts = [
     `<script>window[${JSON.stringify(

@@ -58,6 +58,6 @@ You can set a navigation action in the **Navigation** tab of the binding editor 
 
 <img src="/static/toolpad/docs/data-binding/bind-12.png" alt="Binding editor for navigation actions" width="800" />
 
-The binding editor for navigation actions allows you to select a page to go to, as well as set values for any [page parameters](/toolpad/page-configuration/#page-parameters) that the destination page supports.
+The binding editor for navigation actions allows you to select a page to go to, as well as set values for any [page parameters](/toolpad/building-ui/page-configuration/#page-parameters) that the destination page supports.
 
 You can also bind the query parameter values to any page state of the origin page by clicking on the binding button near the respective parameter's input.

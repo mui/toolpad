@@ -1177,6 +1177,7 @@ function AppError({ error }: FallbackProps) {
     <FullPageCentered>
       <Alert severity="error">
         <AlertTitle>Something went wrong</AlertTitle>
+        <Pre>{error.message}</Pre>
         <Pre>{error.stack}</Pre>
       </Alert>
     </FullPageCentered>

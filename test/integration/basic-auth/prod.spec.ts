@@ -28,7 +28,12 @@ test('Access is blocked to API route', async ({ request }) => {
   expect(res.status()).toBe(401);
 });
 
-test('Access is granted when authenticated', async ({ page, localApp }) => {
+test('Access is granted when authenticated', async ({ browserName, page, localApp }) => {
+  test.skip(
+    browserName === 'firefox',
+    'Fails due to https://bugzilla.mozilla.org/show_bug.cgi?id=1742396',
+  );
+
   const url = new URL(localApp.url);
   url.username = 'foo';
   url.password = 'bar';

@@ -6,8 +6,8 @@ export const LAYOUT_DIRECTION_VERTICAL = 'vertical';
 export const LAYOUT_DIRECTION_BOTH = 'both';
 
 export const layoutBoxArgTypes: {
-  horizontalAlign: ArgTypeDefinition<BoxProps, BoxProps['justifyContent']>;
-  verticalAlign: ArgTypeDefinition<BoxProps, BoxProps['alignItems']>;
+  horizontalAlign: ArgTypeDefinition<BoxProps, 'justifyContent'>;
+  verticalAlign: ArgTypeDefinition<BoxProps, 'alignItems'>;
 } = {
   horizontalAlign: {
     type: 'string',

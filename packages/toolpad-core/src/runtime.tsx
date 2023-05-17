@@ -30,7 +30,7 @@ export const NodeRuntimeContext = React.createContext<{
   nodeId: null,
   nodeName: null,
 });
-export const CanvasEventsContext = React.createContext<Emitter<RuntimeEvents>>(new Emitter());
+export const CanvasEventsContext = React.createContext<Emitter<RuntimeEvents> | null>(null);
 
 // NOTE: These props aren't used, they are only there to transfer information from the
 // React elements to the fibers.
@@ -153,7 +153,7 @@ export function useNode<P = {}>(): NodeRuntime<P> | null {
   const canvasEvents = React.useContext(CanvasEventsContext);
 
   return React.useMemo(() => {
-    if (!nodeId) {
+    if (!nodeId || !canvasEvents) {
       return null;
     }
     return {

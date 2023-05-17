@@ -11,8 +11,6 @@ import {
 import { createComponent, useNode } from '@mui/toolpad-core';
 import { SX_PROP_HELPER_TEXT } from './constants.js';
 
-// @ts-expect-error Missing "type": "module" in markdown-to-jsx package.json
-// See https://github.com/probablyup/markdown-to-jsx/pull/414
 const Markdown = React.lazy(async () => import('markdown-to-jsx'));
 
 const StyledTextareaAutosize = styled(TextareaAutosize)(({ theme }) => ({

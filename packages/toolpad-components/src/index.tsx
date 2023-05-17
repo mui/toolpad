@@ -4,6 +4,8 @@ export { default as PageColumn } from './PageColumn.js';
 
 export { default as Stack } from './Stack.js';
 
+export { default as Autocomplete } from './Autocomplete.js';
+
 export { default as Text } from './Text.js';
 
 export { default as Button } from './Button.js';

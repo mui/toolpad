@@ -45,6 +45,7 @@
     "@mui/toolpad-utils": "^0.1.11",
     "@mui/x-data-grid-pro": "6.4.0",
     "@mui/x-date-pickers": "6.4.0",
+    "clsx": "^1.2.1",
     "dayjs": "1.11.7",
     "markdown-to-jsx": "7.2.0",
     "react-error-boundary": "4.0.4"

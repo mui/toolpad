@@ -142,7 +142,7 @@ export function EnvBindingEditor({ value, onChange }: EnvBindingEditorProps) {
     (event: React.SyntheticEvent, newValue: string | null) => {
       onChange({
         type: 'env',
-        value: newValue,
+        value: newValue || '',
       });
     },
     [onChange],

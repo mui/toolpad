@@ -62,6 +62,10 @@ export default function BindableEditor<V>({
       return value.value;
     }
 
+    if (value?.type === 'env') {
+      return value.value;
+    }
+
     return liveBinding?.value;
   }, [liveBinding, value]);
 

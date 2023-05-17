@@ -37,6 +37,8 @@ test('rest basics', async ({ page, context }) => {
 
   await expect(page.getByText('query3: Transformed')).toBeVisible();
 
+  await expect(page.getByText('query4 authorization: test')).toBeVisible();
+
   const editorModel = new ToolpadEditor(page);
   await editorModel.goto();
 

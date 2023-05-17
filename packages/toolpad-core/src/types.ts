@@ -24,7 +24,7 @@ export interface JsExpressionAttrValue {
 
 export interface EnvAttrValue {
   type: 'env';
-  value: string | null;
+  value: string;
 }
 
 export interface BindingAttrValue {

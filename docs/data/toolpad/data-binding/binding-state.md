@@ -26,7 +26,7 @@ You can either simply pass a path to a property of the object, or you can also u
 
 <img src="/static/toolpad/docs/data-binding/bind-4.png" alt="Binding custom expression" width="1190" />
 
-All that's left is to click **Update binding** and you can observe how application behaves.
+All that's left is to click **Update binding** and you can observe how the application behaves.
 
 (In this example you can see TextField value bound to the value of Typography component).
 

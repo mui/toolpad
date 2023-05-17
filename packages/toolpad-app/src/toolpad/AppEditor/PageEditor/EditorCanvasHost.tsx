@@ -12,7 +12,7 @@ import { NodeHashes } from '../../../types';
 import useEvent from '../../../utils/useEvent';
 import { LogEntry } from '../../../components/Console';
 import { useAppStateApi } from '../../AppState';
-import createRuntimeState from '../../../createRuntimeState';
+import createRuntimeState from '../../../runtime/createRuntimeState';
 import type { ToolpadBridge } from '../../../canvas/ToolpadBridge';
 import CenteredSpinner from '../../../components/CenteredSpinner';
 

@@ -10,6 +10,10 @@
       "subheader": "Components",
       "children": [
         {
+          "title": "Autocomplete",
+          "pathname": "/toolpad/components/autocomplete"
+        },
+        {
           "title": "Button",
           "pathname": "/toolpad/components/button"
         },

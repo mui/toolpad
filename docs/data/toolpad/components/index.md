@@ -4,6 +4,7 @@
 
 ## Components
 
+- [Autocomplete](/toolpad/components/autocomplete/)
 - [Button](/toolpad/components/button/)
 - [Container](/toolpad/components/container/)
 - [DataGrid](/toolpad/components/data-grid/)

@@ -30,4 +30,10 @@ All that's left is to click **Update binding** and you can observe how applicati
 
 (In this example you can see TextField value bound to the value of Typography component).
 
-<img src="/static/toolpad/docs/data-binding/bind-16.gif" alt="Binding result" width="902px" style="margin-bottom: 8px;" />
+Empty field:
+
+<img src="/static/toolpad/docs/data-binding/bind-5.png" alt="Binding result 1" width="905px" style="margin-bottom: 8px;" />
+
+Field with value:
+
+<img src="/static/toolpad/docs/data-binding/bind-6.png" alt="Binding result 2" width="902" />

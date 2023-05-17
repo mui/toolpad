@@ -20,7 +20,7 @@ test.use({
   localAppConfig: {
     template: path.resolve(__dirname, './fixture'),
     async setup({ dir }) {
-      const configFilePath = path.resolve(dir, './toolpad.yml');
+      const configFilePath = path.resolve(dir, './toolpad/pages/page1/page.yml');
       await fileReplaceAll(configFilePath, HTTPBIN_SOURCE_URL, HTTPBIN_TARGET_URL);
     },
     cmd: 'dev',

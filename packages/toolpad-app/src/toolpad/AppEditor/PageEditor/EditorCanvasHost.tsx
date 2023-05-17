@@ -6,7 +6,8 @@ import { CacheProvider } from '@emotion/react';
 import ReactDOM from 'react-dom';
 import invariant from 'invariant';
 import * as appDom from '../../../appDom';
-import { HTML_ID_EDITOR_OVERLAY, TOOLPAD_BRIDGE_GLOBAL } from '../../../constants';
+import { TOOLPAD_BRIDGE_GLOBAL } from '../../../constants';
+import { HTML_ID_EDITOR_OVERLAY } from '../../../runtime/constants';
 import { NodeHashes } from '../../../types';
 import useEvent from '../../../utils/useEvent';
 import { LogEntry } from '../../../components/Console';
@@ -127,16 +128,45 @@ export default function EditorCanvasHost({
   const [loading, setLoading] = React.useState(true);
   useOnChange(src, () => setLoading(true));
 
-  const handleReady = useEvent((bridgeInstance) => {
-    setLoading(false);
-    setBridge(bridgeInstance);
-    onInit?.(bridgeInstance);
+  const initBridge = useEvent((bridgeInstance: ToolpadBridge) => {
+    const handleReady = (readyBridge: ToolpadBridge) => {
+      setLoading(false);
+      setBridge(readyBridge);
+      onInit?.(readyBridge);
+    };
+
+    if (bridgeInstance.canvasCommands.isReady()) {
+      handleReady(bridgeInstance);
+    } else {
+      const readyHandler = () => {
+        handleReady(bridgeInstance);
+        bridgeInstance.canvasEvents.off('ready', readyHandler);
+      };
+      bridgeInstance.canvasEvents.on('ready', readyHandler);
+    }
   });
 
   const handleFrameLoad = React.useCallback<React.ReactEventHandler<HTMLIFrameElement>>(
     (event) => {
       const iframeWindow = event.currentTarget.contentWindow;
       invariant(iframeWindow, 'Iframe not attached');
+
+      const bridgeInstance = iframeWindow[TOOLPAD_BRIDGE_GLOBAL];
+
+      invariant(
+        typeof bridgeInstance !== 'function',
+        'Only the host should set the bridge to a handler',
+      );
+      if (bridgeInstance) {
+        initBridge(bridgeInstance);
+      } else {
+        iframeWindow[TOOLPAD_BRIDGE_GLOBAL] = initBridge;
+      }
+
+      iframeWindow.addEventListener('keydown', handleKeyDown);
+      iframeWindow.addEventListener('unload', () => {
+        iframeWindow.removeEventListener('keydown', handleKeyDown);
+      });
 
       setEditorOverlayRoot(iframeWindow.document.getElementById(HTML_ID_EDITOR_OVERLAY));
 
@@ -149,29 +179,11 @@ export default function EditorCanvasHost({
         childList: true,
       });
 
-      const bridgeInstance = iframeWindow?.[TOOLPAD_BRIDGE_GLOBAL];
-      invariant(bridgeInstance, 'Bridge not set up');
-
-      if (bridgeInstance.canvasCommands.isReady()) {
-        handleReady(bridgeInstance);
-      } else {
-        const readyHandler = () => {
-          handleReady(bridgeInstance);
-          bridgeInstance.canvasEvents.off('ready', readyHandler);
-        };
-        bridgeInstance.canvasEvents.on('ready', readyHandler);
-      }
-
-      iframeWindow.addEventListener('keydown', handleKeyDown);
-      iframeWindow.addEventListener('unload', () => {
-        iframeWindow.removeEventListener('keydown', handleKeyDown);
-      });
-
       return () => {
         observer.disconnect();
       };
     },
-    [handleReady, handleKeyDown],
+    [handleKeyDown, initBridge],
   );
 
   return (

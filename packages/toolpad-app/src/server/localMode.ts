@@ -1180,6 +1180,7 @@ export async function initProject() {
 
   const events = new Emitter<{
     change: { fingerprint: number };
+    externalChange: { fingerprint: number };
     componentsListChanged: {};
   }>();
 
@@ -1191,6 +1192,7 @@ export async function initProject() {
         console.log(`${chalk.magenta('event')} - Project changed on disk, updating...`);
         [dom, fingerprint] = await Promise.all([loadDomFromDisk(), calculateDomFingerprint(root)]);
         events.emit('change', { fingerprint });
+        events.emit('externalChange', { fingerprint });
 
         const newCodeComponentsFingerprint = getCodeComponentsFingerprint(dom);
         if (codeComponentsFingerprint !== newCodeComponentsFingerprint) {
@@ -1225,13 +1227,10 @@ export async function initProject() {
 
         dom = newDom;
         fingerprint = newFingerprint;
+        events.emit('change', { fingerprint });
       });
 
       return { fingerprint };
-    },
-
-    async getDomFingerPrint() {
-      return fingerprint;
     },
   };
 }

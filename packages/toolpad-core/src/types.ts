@@ -274,7 +274,7 @@ export type ArgTypeDefinition<
   description?: string;
   /**
    * A default value for the property.
-   * @deprecated Use `typeDef.default` instead.
+   * @deprecated Use `default` instead.
    */
   defaultValue?: P[K];
   /**

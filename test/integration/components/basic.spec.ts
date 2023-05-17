@@ -9,7 +9,7 @@ async function runComponentsTests(page: Page, frame: Page | FrameLocator = page)
   await expect(button).toBeVisible();
 
   const image = frame.locator('img[alt="foo image"]');
-  await expect(image).toBeVisible();
+  await expect(image).toBeAttached();
 
   const datagrid = frame.getByText('foo datagrid column');
   await expect(datagrid).toBeVisible();

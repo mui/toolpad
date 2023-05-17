@@ -1,13 +1,9 @@
 # KPI app
 
-<p class="description">A basic user admin app. This example app has 2 pages.</p>
+<p class="description">A KPI monitoring app</p>
 
-## A BI dashboard
+[App embed]
 
-It shows a bar chart as a custom component.
+This app demonstrates how to track a GitHub repo through some fake KPIs. It fetches data from GitHub API using HTTP request.
 
-## A CRUD app
-
-It shows a basic admin app that adds a new user and shows a list existing users.
-
-The app can be accessed from this [Codesandbox]()
+It also shows the usage of a code component. It can be edited from the app codebase.

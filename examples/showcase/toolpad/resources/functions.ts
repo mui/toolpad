@@ -91,12 +91,64 @@ export const addCustomer = createFunction(
       address: parameters.address,
       gender: parameters.gender,
       id_1: parameters.id_1,
-      image: parameters.image,
+      image: 'https://i.pravatar.cc/300',
     });
     return customers[customers.length - 1];
   },
   {
     parameters: {
+      name: {
+        typeDef: { type: 'string' },
+      },
+      account_creation_date: {
+        typeDef: { type: 'string', format: 'date' },
+      },
+      country_of_residence: {
+        typeDef: { type: 'string' },
+      },
+      phone_number: {
+        typeDef: { type: 'number' },
+      },
+      email: {
+        typeDef: { type: 'string', format: 'email' },
+      },
+      address: {
+        typeDef: { type: 'string' },
+      },
+      gender: {
+        typeDef: { type: 'string', enum: ['Male', 'Female', 'Other'] },
+      },
+      id_1: {
+        typeDef: { type: 'string' },
+      },
+      image: {
+        typeDef: { type: 'string', format: 'uri' },
+      },
+    },
+  },
+);
+
+export const updateCustomer = createFunction(
+  async ({ parameters }) => {
+    customers[parameters.id - 1] = {
+      id: parameters.id,
+      name: parameters.name,
+      account_creation_date: parameters.account_creation_date,
+      country_of_residence: parameters.country_of_residence,
+      phone_number: parameters.phone_number,
+      email: parameters.email,
+      address: parameters.address,
+      gender: parameters.gender,
+      id_1: parameters.id_1,
+      image: 'https://i.pravatar.cc/300',
+    };
+    return customers[parameters.id - 1];
+  },
+  {
+    parameters: {
+      id: {
+        typeDef: { type: 'number' },
+      },
       name: {
         typeDef: { type: 'string' },
       },

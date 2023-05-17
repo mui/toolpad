@@ -1,13 +1,7 @@
-# User admin app
+# Sales dashboard
 
-<p class="description">A basic user admin app. This example app has 2 pages.</p>
+<p class="description">A BI dashboard to track sales</p>
 
-## A BI dashboard
+[App embed]
 
-It shows a bar chart as a custom component.
-
-## A CRUD app
-
-It shows a basic admin app that adds a new user and shows a list existing users.
-
-The app can be accessed from this [Codesandbox]()
+This app primarily shows how to add a bar chart using custom component feature of Toolpad.

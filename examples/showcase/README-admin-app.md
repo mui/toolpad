@@ -1,13 +1,12 @@
 # User admin app
 
-<p class="description">A basic user admin app. This example app has 2 pages.</p>
+<p class="description">A basic user admin app that does CRUD operation</p>
 
-## A BI dashboard
+[App embed]
 
-It shows a bar chart as a custom component.
+The app demonstrates following actions:
 
-## A CRUD app
-
-It shows a basic admin app that adds a new user and shows a list existing users.
-
-The app can be accessed from this [Codesandbox]()
+1. Adds a new user. It uses a Form component from the component library.
+2. Shows a list of existing users
+3. Update an existing user
+4. Delete a user

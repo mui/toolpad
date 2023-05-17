@@ -14,6 +14,7 @@ module.exports = {
   rules: {
     ...baseline.rules,
     'import/prefer-default-export': ['off'],
+    'import/no-cycle': ['error', { ignoreExternal: true }],
     // TODO move rule into the main repo once it has upgraded
     '@typescript-eslint/return-await': ['off'],
 

@@ -47,6 +47,8 @@ In the **Headers** tab you can define extra headers to be sent along with the re
 
    <img src="/static/toolpad/docs/fetch/query-7.png?v=0" alt="Request headers" width="701" />
 
+You can also bind any request header to an [environment variable](/toolpad/data-binding/#environment-variables).
+
 ## Response
 
 In the **Response** tab you can define how the response should be parsed.

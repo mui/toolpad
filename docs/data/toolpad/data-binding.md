@@ -65,3 +65,13 @@ You can set a navigation action in the **Navigation** tab of the binding editor 
 The binding editor for navigation actions allows you to select a page to go to, as well as set values for any query string parameters that the destination page supports.
 
 You can also bind the query parameter values to any page state of the origin page by clicking on the binding button near the respective parameter's input.
+
+### Environment variables
+
+Certain properties, such as HTTP request headers, can be bound to **environment variables**.
+
+In the binding editor for such properties, the **Environment variable** tab will be available, where any environment variable currently in the project can be selected.
+
+<img src="/static/toolpad/docs/data-binding/bind-13.png" alt="Binding editor for navigation actions" width="800" />
+
+You can safely store secrets in environment variables and use them in this type of binding, as the values of environment variables are only used serverside.

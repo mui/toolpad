@@ -225,11 +225,30 @@ export type PropValueType =
   | TemplateValueType
   | EventValueType;
 
+interface ParameterTypeLookup {
+  number: number;
+  string: string;
+  boolean: boolean;
+  array: unknown[];
+  object: Record<string, unknown>;
+  element: React.ReactNode;
+  template: () => React.ReactNode;
+  event: (...args: any[]) => void;
+}
+
+export type InferParameterType<T extends PropValueType> = ParameterTypeLookup[Exclude<
+  T['type'],
+  undefined
+>];
+
 export type PropValueTypes<K extends string = string> = Partial<{
   [key in K]?: PropValueType;
 }>;
 
-export type ArgTypeDefinition<P extends object = {}, V = P[keyof P]> = PropValueType & {
+export type ArgTypeDefinition<
+  P extends object = {},
+  K extends keyof P = keyof P,
+> = PropValueType & {
   /**
    * A short explanatory text that'll be shown in the editor UI when this property is referenced.
    * May contain Markdown.
@@ -251,21 +270,21 @@ export type ArgTypeDefinition<P extends object = {}, V = P[keyof P]> = PropValue
    * A default value for the property.
    * @deprecated Use `default` instead.
    */
-  defaultValue?: V;
+  defaultValue?: P[K];
   /**
    * The property that will supply the default value.
    */
-  defaultValueProp?: V;
+  defaultValueProp?: keyof P & string;
   /**
    * The property that is used to control this property.
    */
-  onChangeProp?: string;
+  onChangeProp?: keyof P & string;
   /**
    * Provides a way to manipulate the value from the onChange event before it is assigned to state.
    * @param {...any} params params for the function assigned to [onChangeProp]
    * @returns {any} a value for the controlled prop
    */
-  onChangeHandler?: (...params: any[]) => V;
+  onChangeHandler?: (...params: any[]) => P[K];
   /**
    * For compound components, this property is used to control the visibility of this property based on the selected value of another property.
    * If this property is not defined, the property will be visible at all times.
@@ -281,12 +300,11 @@ export type ArgTypeDefinition<P extends object = {}, V = P[keyof P]> = PropValue
 };
 
 export type ArgTypeDefinitions<P extends object = {}> = {
-  [K in keyof P & string]?: ArgTypeDefinition<P, P[K]>;
+  [K in keyof P & string]?: ArgTypeDefinition<P, K>;
 };
 
 export interface ComponentDefinition<P extends object = {}> {
-  // props: PropDefinitions<P>;
-  argTypes: ArgTypeDefinitions<P>;
+  argTypes?: ArgTypeDefinitions<P>;
 }
 
 export interface LiveBindingError {

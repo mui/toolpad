@@ -24,7 +24,6 @@ interface FormProps extends ContainerProps {
   hasResetButton?: boolean;
   mode?: keyof ValidationMode | undefined;
   hasChrome?: boolean;
-  hideControls?: boolean;
 }
 
 function Form({
@@ -38,7 +37,6 @@ function Form({
   submitButtonText = 'Submit',
   mode = 'onSubmit',
   hasChrome = true,
-  hideControls = false,
   sx,
   ...rest
 }: FormProps) {
@@ -83,42 +81,41 @@ function Form({
         <Container disableGutters sx={sx} {...rest}>
           <form onSubmit={form.handleSubmit(handleSubmit)} onReset={handleReset}>
             {children}
-            {!hideControls ? (
-              <Box
-                sx={{
-                  display: 'flex',
-                  flexDirection: 'row',
-                  justifyContent: formControlsAlign,
-                  pt: 1,
-                }}
+
+            <Box
+              sx={{
+                display: 'flex',
+                flexDirection: 'row',
+                justifyContent: formControlsAlign,
+                pt: 1,
+              }}
+            >
+              <Stack
+                direction="row"
+                spacing={1}
+                sx={{ flex: formControlsFullWidth ? 1 : '0 1 auto' }}
               >
-                <Stack
-                  direction="row"
-                  spacing={1}
-                  sx={{ flex: formControlsFullWidth ? 1 : '0 1 auto' }}
-                >
-                  {hasResetButton ? (
-                    <LoadingButton
-                      type="reset"
-                      color="secondary"
-                      variant="contained"
-                      sx={{ flex: formControlsFullWidth ? 1 : '0 1 auto' }}
-                    >
-                      Reset
-                    </LoadingButton>
-                  ) : null}
+                {hasResetButton ? (
                   <LoadingButton
-                    type="submit"
-                    color="primary"
+                    type="reset"
+                    color="secondary"
                     variant="contained"
-                    loading={form.formState.isSubmitting}
                     sx={{ flex: formControlsFullWidth ? 1 : '0 1 auto' }}
                   >
-                    {submitButtonText}
+                    Reset
                   </LoadingButton>
-                </Stack>
-              </Box>
-            ) : null}
+                ) : null}
+                <LoadingButton
+                  type="submit"
+                  color="primary"
+                  variant="contained"
+                  loading={form.formState.isSubmitting}
+                  sx={{ flex: formControlsFullWidth ? 1 : '0 1 auto' }}
+                >
+                  {submitButtonText}
+                </LoadingButton>
+              </Stack>
+            </Box>
           </form>
         </Container>
       ) : (
@@ -274,11 +271,6 @@ export default createComponent(Form, {
     },
     hasResetButton: {
       helperText: 'Show button to reset form values.',
-      type: 'boolean',
-      default: false,
-    },
-    hideControls: {
-      helperText: 'Hide form controls.',
       type: 'boolean',
       default: false,
     },

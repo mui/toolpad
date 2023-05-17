@@ -4,33 +4,33 @@ import { ToolpadRuntime } from '../../models/ToolpadRuntime';
 import { FrameLocator, Page, test, expect } from '../../playwright/localTest';
 import clickCenter from '../../utils/clickCenter';
 
-async function runComponentsTests(page: Page, frame: Page | FrameLocator = page) {
-  const button = frame.getByText('foo button');
-  await expect(button).toBeVisible();
+async function waitForComponents(page: Page, frame: Page | FrameLocator = page) {
+  const button = frame.locator('text="foo button"');
+  await button.waitFor({ state: 'visible' });
 
   const image = frame.locator('img[alt="foo image"]');
-  await expect(image).toBeAttached();
+  await image.waitFor({ state: 'attached' });
 
-  const datagrid = frame.getByText('foo datagrid column');
-  await expect(datagrid).toBeVisible();
+  const datagrid = frame.locator('text="foo datagrid column"');
+  await datagrid.waitFor({ state: 'visible' });
 
-  const customComponent = frame.getByText('custom component 1');
-  await expect(customComponent).toBeVisible();
+  const customComponent = frame.locator('text="custom component 1"');
+  await customComponent.waitFor({ state: 'visible' });
 
   const textField = frame.locator('label:has-text("foo textfield")');
-  await expect(textField).toBeVisible();
+  await textField.waitFor({ state: 'visible' });
 
-  const text = frame.getByText('foo typography');
-  await expect(text).toBeVisible();
+  const text = frame.locator('text="foo typography"');
+  await text.waitFor({ state: 'visible' });
 
   const select = frame.locator('label:has-text("foo select")');
-  await expect(select).toBeVisible();
+  await select.waitFor({ state: 'visible' });
 
-  const list = frame.getByText('List Button 3');
-  await expect(list).toBeVisible();
+  const list = frame.locator('text="List Button 3"');
+  await list.waitFor({ state: 'visible' });
 
   const markdown = frame.getByText('markdown text');
-  await expect(markdown).toBeVisible();
+  await markdown.waitFor({ state: 'visible' });
 }
 
 test.use({
@@ -44,14 +44,14 @@ test('rendering components in the app runtime', async ({ page }) => {
   const runtimeModel = new ToolpadRuntime(page);
   await runtimeModel.gotoPage('components');
 
-  await runComponentsTests(page);
+  await waitForComponents(page);
 });
 
 test('rendering components in the app editor', async ({ page }) => {
   const editorModel = new ToolpadEditor(page);
   editorModel.goto();
 
-  await runComponentsTests(page, editorModel.appCanvas);
+  await waitForComponents(page, editorModel.appCanvas);
 });
 
 test('select component behavior', async ({ page }) => {

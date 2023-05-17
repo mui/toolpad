@@ -1,6 +1,6 @@
 {
   "name": "@mui/toolpad-app",
-  "version": "0.1.11",
+  "version": "0.1.12",
   "license": "MIT",
   "scripts": {
     "build": "concurrently \"yarn:build:*\" && rimraf ./.next/cache",
@@ -49,14 +49,14 @@
     "@googleapis/drive": "5.1.0",
     "@googleapis/sheets": "4.0.2",
     "@mui/icons-material": "5.11.16",
-    "@mui/lab": "5.0.0-alpha.129",
-    "@mui/material": "5.13.0",
-    "@mui/system": "5.12.3",
-    "@mui/toolpad-components": "^0.1.11",
-    "@mui/toolpad-core": "^0.1.11",
-    "@mui/toolpad-utils": "^0.1.11",
+    "@mui/lab": "5.0.0-alpha.130",
+    "@mui/material": "5.13.1",
+    "@mui/system": "5.13.1",
+    "@mui/toolpad-components": "^0.1.12",
+    "@mui/toolpad-core": "^0.1.12",
+    "@mui/toolpad-utils": "^0.1.12",
     "@mui/types": "7.2.4",
-    "@mui/utils": "5.12.3",
+    "@mui/utils": "5.13.1",
     "@mui/x-data-grid": "6.4.0",
     "@mui/x-data-grid-generator": "6.4.0",
     "@mui/x-data-grid-pro": "6.4.0",
@@ -128,6 +128,7 @@
     "ts-node": "10.9.1",
     "vite": "4.3.5",
     "whatwg-url": "12.0.1",
+    "ws": "^8.13.0",
     "yaml": "2.2.2",
     "yaml-diff-patch": "2.0.0",
     "yargs": "17.7.2",
@@ -151,6 +152,7 @@
     "@types/react-is": "^18.2.0",
     "@types/serialize-javascript": "5.0.2",
     "@types/whatwg-url": "11.0.0",
+    "@types/ws": "^8.5.4",
     "ajv": "8.12.0",
     "eslint": "8.40.0",
     "eslint-config-next": "13.4.2",
@@ -167,5 +169,5 @@
   "publishConfig": {
     "access": "public"
   },
-  "gitHead": "28308edc7bd61700e63b44e6ff5ff1508d1f2a8b"
+  "gitHead": "0186b46c7abd26f06583227cc21d448baf11cd46"
 }

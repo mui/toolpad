@@ -2,7 +2,7 @@
   "extends": "../../tsconfig.json",
   "compilerOptions": {
     "module": "esnext",
-    "moduleResolution": "nodenext",
+    "moduleResolution": "bundler",
     "alwaysStrict": true,
     "rootDir": "src",
     "outDir": "dist",

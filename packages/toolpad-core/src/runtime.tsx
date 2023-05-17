@@ -235,7 +235,9 @@ export function isToolpadComponent(
   return true;
 }
 
-export function getArgTypeDefaultValue<V>(argType: ArgTypeDefinition<{}, V>): V | undefined {
+export function getArgTypeDefaultValue<P extends object, K extends keyof P>(
+  argType: ArgTypeDefinition<P, K>,
+): P[K] | undefined {
   return argType.default ?? argType.defaultValue ?? undefined;
 }
 

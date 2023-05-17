@@ -95,6 +95,7 @@ function Autocomplete({
 
 export default createComponent(Autocomplete, {
   layoutDirection: 'both',
+  loadingProp: 'loading',
   argTypes: {
     options: {
       helperText: 'The options available to search from.',

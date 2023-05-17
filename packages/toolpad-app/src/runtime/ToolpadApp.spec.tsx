@@ -6,7 +6,7 @@ import { CanvasEventsContext } from '@mui/toolpad-core/runtime';
 import { Emitter } from '@mui/toolpad-utils/events';
 import ToolpadApp from './ToolpadApp';
 import * as appDom from '../appDom';
-import createRuntimeState from '../createRuntimeState';
+import createRuntimeState from './createRuntimeState';
 
 async function loadComponents() {
   return {};

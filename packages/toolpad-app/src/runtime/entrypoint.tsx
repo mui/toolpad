@@ -16,6 +16,7 @@ const cache = createCache({
   prepend: true,
 });
 
+// See https://github.com/emotion-js/emotion/issues/1105#issuecomment-1058225197
 cache.compat = true;
 
 /**

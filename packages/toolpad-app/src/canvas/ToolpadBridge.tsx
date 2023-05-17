@@ -5,7 +5,7 @@ import type { AppCanvasState, PageViewState } from '../types';
 
 declare global {
   interface Window {
-    [TOOLPAD_BRIDGE_GLOBAL]?: ToolpadBridge;
+    [TOOLPAD_BRIDGE_GLOBAL]?: ToolpadBridge | ((bridge: ToolpadBridge) => void);
   }
 }
 
@@ -94,5 +94,8 @@ bridge.canvasEvents.on('ready', () => {
 });
 
 if (typeof window !== 'undefined') {
+  if (typeof window[TOOLPAD_BRIDGE_GLOBAL] === 'function') {
+    window[TOOLPAD_BRIDGE_GLOBAL](bridge);
+  }
   window[TOOLPAD_BRIDGE_GLOBAL] = bridge;
 }

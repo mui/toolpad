@@ -8,12 +8,8 @@ import {
   styled,
   TextareaAutosize,
 } from '@mui/material';
-import clsx from 'clsx';
-import type { MarkdownToJSX } from 'markdown-to-jsx';
 import { createComponent, useNode } from '@mui/toolpad-core';
 import { SX_PROP_HELPER_TEXT } from './constants.js';
-
-const MARKDOWN_ELM_CLASS = 'toolpad-markdown-element';
 
 const Markdown = React.lazy(async () => import('markdown-to-jsx'));
 
@@ -82,10 +78,10 @@ const MarkdownContainer = styled('div')(({ theme }) => ({
     marginTop: 12,
     marginBottom: 12,
   },
-  [`& .${MARKDOWN_ELM_CLASS}:first-of-type`]: {
+  '& *:first-child': {
     marginTop: 0,
   },
-  [`& .${MARKDOWN_ELM_CLASS}:last-of-type`]: {
+  '& *:last-child': {
     marginBottom: 0,
   },
 }));
@@ -102,17 +98,6 @@ const CodeContainer = styled('pre')(({ theme }) => ({
 function parseInput(text: unknown): string {
   return String(text).replaceAll('\n', '');
 }
-
-const createMarkdownElement: MarkdownToJSX.Options['createElement'] = (type, props, children) => {
-  return React.createElement<any>(
-    type,
-    {
-      ...props,
-      className: clsx((props as any).className, MARKDOWN_ELM_CLASS),
-    },
-    children,
-  );
-};
 
 function Text({ value, markdown, href, loading, mode, sx, ...rest }: TextProps) {
   const [contentEditable, setContentEditable] = React.useState<null | {
@@ -147,7 +132,6 @@ function Text({ value, markdown, href, loading, mode, sx, ...rest }: TextProps) 
                     component: CodeContainer,
                   },
                 },
-                createElement: createMarkdownElement,
                 slugify: () => '',
               }}
             >

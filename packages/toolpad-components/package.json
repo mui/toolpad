@@ -39,8 +39,8 @@
     "url": "https://github.com/mui/mui-toolpad/issues"
   },
   "dependencies": {
-    "@mui/lab": "5.0.0-alpha.129",
-    "@mui/material": "5.13.0",
+    "@mui/lab": "5.0.0-alpha.130",
+    "@mui/material": "5.13.1",
     "@mui/toolpad-core": "^0.1.11",
     "@mui/toolpad-utils": "^0.1.11",
     "@mui/x-data-grid-pro": "6.4.0",

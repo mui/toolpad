@@ -3,12 +3,13 @@ import next from 'next';
 import * as path from 'path';
 import express from 'express';
 import invariant from 'invariant';
-import { createServer } from 'http';
+import { IncomingMessage, createServer } from 'http';
 import { execaNode } from 'execa';
 import getPort from 'get-port';
 import { createProxyMiddleware } from 'http-proxy-middleware';
 import { mapValues } from '@mui/toolpad-utils/collections';
 import prettyBytes from 'pretty-bytes';
+import { WebSocket, WebSocketServer } from 'ws';
 import { createProdHandler } from '../src/server/toolpadAppServer';
 import { getUserProjectRoot } from '../src/server/localMode';
 import { listen } from '../src/utils/http';
@@ -177,6 +178,34 @@ async function main() {
   );
 
   await editorNextApp?.prepare();
+
+  const wsServer = new WebSocketServer({ noServer: true });
+
+  const project = await getProject();
+
+  project.events.on('externalChange', () => {
+    wsServer.clients.forEach((client) => {
+      if (client.readyState === WebSocket.OPEN) {
+        client.send(JSON.stringify({ kind: 'externalChange' }));
+      }
+    });
+  });
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  wsServer.on('connection', (ws: WebSocket, _request: IncomingMessage) => {
+    ws.on('error', console.error);
+  });
+
+  httpServer.on('upgrade', (request, socket, head) => {
+    invariant(request.url, 'request must have a url');
+    const { pathname } = new URL(request.url, 'http://x');
+
+    if (pathname === '/toolpad-ws') {
+      wsServer.handleUpgrade(request, socket, head, (ws) => {
+        wsServer.emit('connection', ws, request);
+      });
+    }
+  });
 }
 
 main().catch((err) => {

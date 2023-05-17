@@ -91,8 +91,6 @@ async function main() {
     }
   });
 
-  process.send({});
-
   process.send({ kind: 'ready' } satisfies Event);
 }
 

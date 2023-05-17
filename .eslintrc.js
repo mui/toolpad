@@ -14,7 +14,6 @@ module.exports = {
   rules: {
     ...baseline.rules,
     'import/prefer-default-export': ['off'],
-    'import/no-cycle': ['error', { ignoreExternal: true }],
     // TODO move rule into the main repo once it has upgraded
     '@typescript-eslint/return-await': ['off'],
 
@@ -102,6 +101,9 @@ module.exports = {
       // https://github.com/mui/material-ui/blob/9737bc85bb6960adb742e7709e9c3710c4b6cedd/.eslintrc.js#L359
       files: ['packages/*/src/**/*{.ts,.tsx,.js}'],
       excludedFiles: ['*.d.ts', '*.spec.ts', '*.spec.tsx'],
+      rules: {
+        'import/no-cycle': ['error', { ignoreExternal: true }],
+      },
     },
     {
       files: ['packages/toolpad-core/**/*', 'packages/toolpad-components/**/*'],

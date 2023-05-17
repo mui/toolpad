@@ -18,59 +18,37 @@ interface AutocompleteProps
   value: AutocompleteValue;
   onChange: (newValue: AutocompleteValue) => void;
   options: AutocompleteOption[];
-  labelField?: string;
-  valueField?: string;
   label: string;
 }
 
-function Autocomplete({
-  options,
-  labelField,
-  valueField,
-  label,
-  onChange,
-  value,
-  ...rest
-}: AutocompleteProps) {
+function Autocomplete({ options, label, onChange, value, ...rest }: AutocompleteProps) {
   const [selectedVal, setSelectedVal] = React.useState<AutocompleteOption | null>(null);
 
-  const getValue = React.useCallback(
-    (selection: AutocompleteOption | null): AutocompleteValue => {
-      if (!selection) {
-        return null;
-      }
-      if (typeof selection === 'string') {
-        return selection;
-      }
-      if (typeof selection === 'object') {
-        if (valueField) {
-          return (selection as any)?.[valueField];
-        }
-        return selection?.value ?? selection?.label ?? null;
-      }
+  const getValue = React.useCallback((selection: AutocompleteOption | null): AutocompleteValue => {
+    if (!selection) {
       return null;
-    },
-    [valueField],
-  );
+    }
+    if (typeof selection === 'string') {
+      return selection;
+    }
+    if (typeof selection === 'object') {
+      return selection?.value ?? selection?.label ?? null;
+    }
+    return null;
+  }, []);
 
-  const getOptionLabel = React.useCallback(
-    (option: AutocompleteOption) => {
-      if (!option) {
-        return '';
-      }
-      if (typeof option === 'string') {
-        return option;
-      }
-      if (typeof option === 'object') {
-        if (labelField) {
-          return (option as any)?.[labelField];
-        }
-        return option?.label ?? '';
-      }
+  const getOptionLabel = React.useCallback((option: AutocompleteOption) => {
+    if (!option) {
       return '';
-    },
-    [labelField],
-  );
+    }
+    if (typeof option === 'string') {
+      return option;
+    }
+    if (typeof option === 'object') {
+      return option?.label ?? '';
+    }
+    return '';
+  }, []);
 
   const handleChange = React.useCallback(
     (event: React.SyntheticEvent<Element>, selection: AutocompleteOption | null) => {
@@ -115,14 +93,6 @@ export default createComponent(Autocomplete, {
       helperText: 'The label to display for the autocomplete.',
       type: 'string',
       default: 'Search…',
-    },
-    labelField: {
-      helperText: 'The field to use as the label for each option.',
-      type: 'string',
-    },
-    valueField: {
-      helperText: 'The field to use as the value for each option.',
-      type: 'string',
     },
     fullWidth: {
       helperText: 'If true, the autocomplete will take up the full width of its container.',

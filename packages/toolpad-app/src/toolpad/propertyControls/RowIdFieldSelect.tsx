@@ -4,8 +4,9 @@ import * as React from 'react';
 import { EditorProps } from '../../types';
 import { usePageEditorState } from '../AppEditor/PageEditor/PageEditorProvider';
 import SelectControl from './select';
+import PropertyControl from '../../components/PropertyControl';
 
-function ColumnSelect({ nodeId, ...props }: EditorProps<string>) {
+function ColumnSelect({ propType, nodeId, ...props }: EditorProps<string>) {
   const { bindings } = usePageEditorState();
   const columnsValue = nodeId && bindings[`${nodeId}.props.columns`];
   const definedColumns: GridColDef[] = columnsValue?.value as any;
@@ -15,7 +16,11 @@ function ColumnSelect({ nodeId, ...props }: EditorProps<string>) {
     return { type: 'string', enum: columnNames };
   }, [definedColumns]);
 
-  return <SelectControl nodeId={nodeId} {...props} propType={newPropType} />;
+  return (
+    <PropertyControl propType={propType}>
+      <SelectControl nodeId={nodeId} {...props} propType={newPropType} />
+    </PropertyControl>
+  );
 }
 
 export default ColumnSelect;

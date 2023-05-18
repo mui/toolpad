@@ -2,7 +2,6 @@ import * as React from 'react';
 import { Grid, styled } from '@mui/material';
 import invariant from 'invariant';
 import { usePageEditorState } from '../PageEditorProvider';
-import { absolutePositionCss } from '../../../../utils/geometry';
 import { useDom } from '../../../AppState';
 import { createToolpadAppTheme } from '../../../../runtime/AppThemeProvider';
 
@@ -79,10 +78,10 @@ export const OverlayGrid = React.forwardRef<OverlayGridHandle>(function OverlayG
     [],
   );
 
-  const gridContainerRect = pageNode?.slots?.children?.rect;
+  const pageChildrenSlotRect = pageNode?.slots?.children?.rect;
 
-  return gridContainerRect ? (
-    <GridContainer style={{ ...absolutePositionCss(gridContainerRect), height: '100%' }}>
+  return pageChildrenSlotRect ? (
+    <GridContainer style={{ width: pageChildrenSlotRect.width, height: '100%' }}>
       <StyledGrid ref={gridRef} container columnSpacing={appTheme.spacing(GRID_COLUMN_GAP)}>
         {[...Array(GRID_NUMBER_OF_COLUMNS)].map((column, index) => (
           <Grid key={index} item xs={1}>

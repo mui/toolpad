@@ -37,3 +37,13 @@ Empty field:
 Field with value:
 
 <img src="/static/toolpad/docs/data-binding/bind-6.png" alt="Binding result 2" width="902" />
+
+### Environment variables
+
+Certain properties, such as HTTP request headers, can also be bound to **environment variables**.
+
+In the binding editor for such properties, the **Environment variable** tab will be available, where any environment variable currently in the project can be selected.
+
+<img src="/static/toolpad/docs/data-binding/bind-13.png" alt="Binding editor for navigation actions" width="800" />
+
+You can safely store secrets in environment variables and use them in this type of binding, as the values of environment variables are only used serverside.

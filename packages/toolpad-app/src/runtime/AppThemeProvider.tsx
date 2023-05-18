@@ -4,6 +4,16 @@ import * as colors from '@mui/material/colors';
 import * as appDom from '../appDom';
 import { AppTheme } from '../types';
 
+declare module '@mui/material/styles' {
+  interface Theme {
+    fontFamilyMonospaced: string;
+  }
+  // allow configuration using `createTheme`
+  interface ThemeOptions {
+    fontFamilyMonospaced?: string;
+  }
+}
+
 function createMuiThemeFromToolpadTheme(toolpadTheme: AppTheme = {}): Theme {
   const palette: PaletteOptions = {};
   const primary = toolpadTheme['palette.primary.main'];
@@ -54,6 +64,7 @@ function createMuiThemeFromToolpadTheme(toolpadTheme: AppTheme = {}): Theme {
         fontWeight: 700,
       },
     },
+    fontFamilyMonospaced: 'Consolas, Menlo, Monaco, "Andale Mono", "Ubuntu Mono", monospace',
   });
 }
 

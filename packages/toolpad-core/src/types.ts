@@ -22,6 +22,11 @@ export interface JsExpressionAttrValue {
   value: string;
 }
 
+export interface EnvAttrValue {
+  type: 'env';
+  value: string;
+}
+
 export interface BindingAttrValue {
   type: 'binding';
   value: string;
@@ -58,6 +63,7 @@ export type BindableAttrValue<V> =
   | SecretAttrValue<V>
   | BoundExpressionAttrValue
   | JsExpressionAttrValue
+  | EnvAttrValue
   | BindableAction;
 
 export type ConstantAttrValues<P> = { [K in keyof P]: ConstantAttrValue<P[K]> };
@@ -268,7 +274,7 @@ export type ArgTypeDefinition<
   description?: string;
   /**
    * A default value for the property.
-   * @deprecated Use `typeDef.default` instead.
+   * @deprecated Use `default` instead.
    */
   defaultValue?: P[K];
   /**

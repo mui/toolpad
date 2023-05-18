@@ -7,7 +7,7 @@ import { createProvidedContext } from '@mui/toolpad-utils/react';
 import { RuntimeEvents, ToolpadComponents, ToolpadComponent, ArgTypeDefinition } from './types.js';
 import { RUNTIME_PROP_NODE_ID, RUNTIME_PROP_SLOTS, TOOLPAD_COMPONENT } from './constants.js';
 import type { SlotType, ComponentConfig, RuntimeEvent, RuntimeError } from './types.js';
-import createComponent from './createComponent.js';
+import { createComponent } from './browser.js';
 
 const ResetNodeErrorsKeyContext = React.createContext(0);
 

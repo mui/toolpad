@@ -1,4 +1,4 @@
-import { createComponent } from '@mui/toolpad-core';
+import { createComponent } from '@mui/toolpad/browser';
 import * as React from 'react';
 
 export interface Props {
@@ -22,13 +22,13 @@ function Test({ value, field, row }: Props) {
 export default createComponent(Test, {
   argTypes: {
     value: {
-      typeDef: { type: 'object' },
+      type: 'object',
     },
     row: {
-      typeDef: { type: 'object' },
+      type: 'object',
     },
     field: {
-      typeDef: { type: 'string' },
+      type: 'string',
       defaultValue: 'Field name',
     },
   },

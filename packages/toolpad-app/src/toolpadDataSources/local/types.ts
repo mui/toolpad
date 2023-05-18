@@ -1,4 +1,4 @@
-import { BindableAttrValue, CreateQueryConfig, ExecFetchResult } from '@mui/toolpad-core';
+import { BindableAttrValue, CreateFunctionConfig, ExecFetchResult } from '@mui/toolpad-core';
 
 export interface LocalConnectionParams {}
 
@@ -29,5 +29,5 @@ export interface FetchResult extends ExecFetchResult<any> {
 }
 
 export type IntrospectionResult = {
-  functions: Record<string, CreateQueryConfig<unknown>>;
+  functions: Record<string, CreateFunctionConfig<unknown>>;
 };

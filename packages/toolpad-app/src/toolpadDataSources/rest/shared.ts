@@ -3,11 +3,10 @@ import {
   BindableAttrValue,
   BindableAttrValues,
   JsRuntime,
-  Serializable,
-  SerializedError,
 } from '@mui/toolpad-core';
+import { SerializedError, errorFrom, serializeError } from '@mui/toolpad-utils/errors';
 import { evaluateBindable } from '@mui/toolpad-core/jsRuntime';
-import { ensureSuffix, removePrefix } from '../../utils/strings';
+import { ensureSuffix, removePrefix } from '@mui/toolpad-utils/strings';
 import { Maybe } from '../../utils/types';
 import {
   Authentication,
@@ -19,7 +18,6 @@ import {
   UrlEncodedBody,
 } from './types';
 import applyTransform from '../applyTransform';
-import { errorFrom, serializeError } from '../../utils/errors';
 import { MOVIES_API_DEMO_URL } from '../demo';
 
 export const HTTP_NO_BODY = new Set(['GET', 'HEAD']);
@@ -57,9 +55,10 @@ export function parseBaseUrl(baseUrl: string): URL {
 function resolveBindable(
   jsRuntime: JsRuntime,
   bindable: BindableAttrValue<string>,
-  scope: Record<string, Serializable>,
+  scope: Record<string, unknown>,
+  env?: Record<string, string>,
 ): any {
-  const { value, error } = evaluateBindable(jsRuntime, bindable, scope);
+  const { value, error } = evaluateBindable(jsRuntime, bindable, scope, env);
   if (error) {
     throw error;
   }
@@ -69,18 +68,20 @@ function resolveBindable(
 function resolveBindableEntries(
   jsRuntime: JsRuntime,
   entries: BindableAttrEntries,
-  scope: Record<string, Serializable>,
+  scope: Record<string, unknown>,
+  env?: Record<string, string>,
 ): [string, any][] {
-  return entries.map(([key, value]) => [key, resolveBindable(jsRuntime, value, scope)]);
+  return entries.map(([key, value]) => [key, resolveBindable(jsRuntime, value, scope, env)]);
 }
 
 function resolveBindables<P>(
   jsRuntime: JsRuntime,
   obj: BindableAttrValues<P>,
-  scope: Record<string, Serializable>,
+  scope: Record<string, unknown>,
+  env?: Record<string, string>,
 ): P {
   return Object.fromEntries(
-    resolveBindableEntries(jsRuntime, Object.entries(obj) as BindableAttrEntries, scope),
+    resolveBindableEntries(jsRuntime, Object.entries(obj) as BindableAttrEntries, scope, env),
   ) as P;
 }
 
@@ -102,7 +103,7 @@ interface ResolvedRawBody {
 function resolveRawBody(
   jsRuntime: JsRuntime,
   body: RawBody,
-  scope: Record<string, Serializable>,
+  scope: Record<string, unknown>,
 ): ResolvedRawBody {
   const { content, contentType } = resolveBindables(
     jsRuntime,
@@ -127,15 +128,16 @@ interface ResolveUrlEncodedBodyBody {
 function resolveUrlEncodedBody(
   jsRuntime: JsRuntime,
   body: UrlEncodedBody,
-  scope: Record<string, Serializable>,
+  scope: Record<string, unknown>,
+  env?: Record<string, string>,
 ): ResolveUrlEncodedBodyBody {
   return {
     kind: 'urlEncoded',
-    content: resolveBindableEntries(jsRuntime, body.content, scope),
+    content: resolveBindableEntries(jsRuntime, body.content, scope, env),
   };
 }
 
-function resolveBody(jsRuntime: JsRuntime, body: Body, scope: Record<string, Serializable>) {
+function resolveBody(jsRuntime: JsRuntime, body: Body, scope: Record<string, unknown>) {
   switch (body.kind) {
     case 'raw':
       return resolveRawBody(jsRuntime, body, scope);
@@ -175,22 +177,29 @@ export async function execfetch(
   fetchQuery: FetchQuery,
   params: Record<string, string>,
   { connection, jsRuntime, fetchImpl }: ExecBaseOptions,
+  env: Record<string, string> = {},
 ): Promise<FetchResult> {
   const queryScope = {
-    // TODO: remove deprecated query after v1
+    // @TODO: remove deprecated query after v1
     query: params,
     parameters: params,
   };
 
   const urlvalue = fetchQuery.url || getDefaultUrl(connection);
 
-  const resolvedUrl = resolveBindable(jsRuntime, urlvalue, queryScope);
+  const resolvedUrl = resolveBindable(jsRuntime, urlvalue, queryScope, env);
   const resolvedSearchParams = resolveBindableEntries(
     jsRuntime,
     fetchQuery.searchParams || [],
     queryScope,
+    env,
   );
-  const resolvedHeaders = resolveBindableEntries(jsRuntime, fetchQuery.headers || [], queryScope);
+  const resolvedHeaders = resolveBindableEntries(
+    jsRuntime,
+    fetchQuery.headers || [],
+    queryScope,
+    env,
+  );
 
   const queryUrl = parseQueryUrl(resolvedUrl, connection?.baseUrl);
   resolvedSearchParams.forEach(([key, value]) => queryUrl.searchParams.append(key, value));

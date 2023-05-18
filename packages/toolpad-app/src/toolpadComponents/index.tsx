@@ -17,11 +17,19 @@ export type InstantiatedComponents = Record<string, InstantiatedComponent | unde
 export const PAGE_ROW_COMPONENT_ID = 'PageRow';
 export const PAGE_COLUMN_COMPONENT_ID = 'PageColumn';
 export const STACK_COMPONENT_ID = 'Stack';
+export const FORM_COMPONENT_ID = 'Form';
 
-const INTERNAL_COMPONENTS = new Map<string, ToolpadComponentDefinition>([
+export const INTERNAL_COMPONENTS = new Map<string, ToolpadComponentDefinition>([
   [PAGE_ROW_COMPONENT_ID, { displayName: 'Row', builtIn: 'PageRow', system: true }],
   [PAGE_COLUMN_COMPONENT_ID, { displayName: 'Column', builtIn: 'PageColumn', system: true }],
   [STACK_COMPONENT_ID, { displayName: 'Stack', builtIn: 'Stack', system: true }],
+  [
+    'Autocomplete',
+    {
+      displayName: 'Autocomplete',
+      builtIn: 'Autocomplete',
+    },
+  ],
   [
     'Button',
     {
@@ -30,16 +38,17 @@ const INTERNAL_COMPONENTS = new Map<string, ToolpadComponentDefinition>([
     },
   ],
   ['Image', { displayName: 'Image', builtIn: 'Image' }],
-  ['DataGrid', { displayName: 'Data grid', builtIn: 'DataGrid' }],
-  ['TextField', { displayName: 'Text field', builtIn: 'TextField' }],
-  ['DatePicker', { displayName: 'Date picker', builtIn: 'DatePicker' }],
-  ['FilePicker', { displayName: 'File picker', builtIn: 'FilePicker' }],
+  ['DataGrid', { displayName: 'Data Grid', builtIn: 'DataGrid' }],
+  ['TextField', { displayName: 'Text Field', builtIn: 'TextField' }],
+  ['DatePicker', { displayName: 'Date Picker', builtIn: 'DatePicker' }],
+  ['FilePicker', { displayName: 'File Picker', builtIn: 'FilePicker' }],
   ['Text', { displayName: 'Text', builtIn: 'Text' }],
   ['Select', { displayName: 'Select', builtIn: 'Select' }],
   ['List', { displayName: 'List', builtIn: 'List' }],
   ['Paper', { displayName: 'Paper', builtIn: 'Paper' }],
   ['Tabs', { displayName: 'Tabs', builtIn: 'Tabs' }],
   ['Container', { displayName: 'Container', builtIn: 'Container' }],
+  [FORM_COMPONENT_ID, { displayName: 'Form', builtIn: 'Form' }],
 ]);
 
 function createCodeComponent(domNode: appDom.CodeComponentNode): ToolpadComponentDefinition {
@@ -83,4 +92,8 @@ export function isPageColumn(elementNode: appDom.ElementNode): boolean {
 
 export function isPageLayoutComponent(elementNode: appDom.ElementNode): boolean {
   return isPageRow(elementNode) || isPageColumn(elementNode);
+}
+
+export function isFormComponent(elementNode: appDom.ElementNode): boolean {
+  return getElementNodeComponentId(elementNode) === FORM_COMPONENT_ID;
 }

@@ -40,16 +40,20 @@ MUI Toolpad is in its alpha stages of development. Feel free to run this applica
 Run:
 
 ```sh
-npx create-toolpad-app
+npx create-toolpad-app my-app
 # or
-yarn create toolpad-app
+yarn create toolpad-app my-app
 # or
-pnpm create toolpad-app
+pnpm create toolpad-app my-app
 ```
 
 ## Documentation
 
 Check out our [documentation](https://mui.com/toolpad/getting-started/overview/).
+
+## Examples
+
+Check out our [mui-public](https://github.com/mui/mui-public) repo to see how a Toolpad app looks in production.
 
 ## Contributing
 

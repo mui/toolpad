@@ -1,5 +1,6 @@
 import { Stack, styled, Typography, Divider } from '@mui/material';
 import * as React from 'react';
+import * as _ from 'lodash-es';
 import {
   ArgTypeDefinition,
   ArgTypeDefinitions,
@@ -45,7 +46,7 @@ function shouldRenderControl<P extends object>(
   props: P,
   componentConfig: ComponentConfig<P>,
 ) {
-  if (propTypeDef.typeDef.type === 'element' || propTypeDef.typeDef.type === 'template') {
+  if (propTypeDef.type === 'element' || propTypeDef.type === 'template') {
     return (
       propTypeDef.control?.type !== 'slot' &&
       propTypeDef.control?.type !== 'slots' &&
@@ -97,6 +98,11 @@ function ComponentPropsEditor<P extends object>({
     );
   }, [bindings, node.id]);
 
+  const argTypesByCategory = _.groupBy(
+    Object.entries(componentConfig.argTypes || {}) as ExactEntriesOf<ArgTypeDefinitions<P>>,
+    ([, propTypeDef]) => propTypeDef?.category || 'properties',
+  );
+
   return (
     <React.Fragment>
       {hasLayoutControls ? (
@@ -121,24 +127,26 @@ function ComponentPropsEditor<P extends object>({
           <Divider sx={{ mt: 1 }} />
         </React.Fragment>
       ) : null}
-      <Typography variant="overline" className={classes.sectionHeading}>
-        Properties:
-      </Typography>
-      {(
-        Object.entries(componentConfig.argTypes || {}) as ExactEntriesOf<ArgTypeDefinitions<P>>
-      ).map(([propName, propTypeDef]) =>
-        propTypeDef && shouldRenderControl(propTypeDef, propName, props, componentConfig) ? (
-          <div key={propName} className={classes.control}>
-            <NodeAttributeEditor
-              node={node}
-              namespace="props"
-              props={props}
-              name={propName}
-              argType={propTypeDef}
-            />
-          </div>
-        ) : null,
-      )}
+      {Object.entries(argTypesByCategory).map(([category, argTypeEntries]) => (
+        <React.Fragment key={category}>
+          <Typography variant="overline" className={classes.sectionHeading}>
+            {category}:
+          </Typography>
+          {argTypeEntries.map(([propName, propTypeDef]) =>
+            propTypeDef && shouldRenderControl(propTypeDef, propName, props, componentConfig) ? (
+              <div key={propName} className={classes.control}>
+                <NodeAttributeEditor
+                  node={node}
+                  namespace="props"
+                  props={props}
+                  name={propName}
+                  argType={propTypeDef}
+                />
+              </div>
+            ) : null,
+          )}
+        </React.Fragment>
+      ))}
     </React.Fragment>
   );
 }
@@ -164,9 +172,6 @@ function SelectedNodeEditor({ node }: SelectedNodeEditorProps) {
         <MarkdownTooltip placement="left" title={componentConfig.helperText ?? displayName}>
           <Typography variant="subtitle1">Component: {displayName}</Typography>
         </MarkdownTooltip>
-        <Typography variant="subtitle2" sx={{ mb: 1 }}>
-          ID: {node.id}
-        </Typography>
         <NodeNameEditor node={node} />
         {nodeError ? <ErrorAlert error={nodeError} /> : null}
         <Divider sx={{ mt: 1 }} />

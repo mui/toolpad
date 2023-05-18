@@ -33,7 +33,7 @@ commands:
       - restore_cache:
           name: Restore yarn cache
           keys:
-            - v10-yarn-{{ checksum "yarn.lock" }}
+            - v11-yarn-{{ checksum "yarn.lock" }}
             - v0-next-{{ checksum "yarn.lock" }}
       - run:
           name: Set yarn cache folder
@@ -62,24 +62,13 @@ commands:
           environment:
             PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: <<# parameters.browsers >>0<</ parameters.browsers >><<^ parameters.browsers >>1<</ parameters.browsers >>
 
-      - run:
-          name: Generate prisma client
-          command: yarn prisma generate
       - save_cache:
           name: Save yarn cache
-          key: v10-yarn-{{ checksum "yarn.lock" }}
+          key: v11-yarn-{{ checksum "yarn.lock" }}
           paths:
             # Keep path in sync with "Set yarn cache folder"
             # Can't use environment variables for `save_cache` paths (tested in https://app.circleci.com/pipelines/github/mui/material-ui/37813/workflows/5b1e207f-ac8b-44e7-9ba4-d0f9a01f5c55/jobs/223370)
             - /tmp/yarn-cache
-            # monorepo node_modules folders ("paths" doesn't support globbing, see https://circleci.com/docs/caching#saving-cache)
-            - node_modules
-            - docs/node_modules
-            - packages/eslint-plugin-material-ui/node_modules
-            - packages/toolpad-app/node_modules
-            - packages/toolpad-components/node_modules
-            - packages/toolpad-core/node_modules
-            - packages/create-toolpad-app/node_modules
       - when:
           condition: << parameters.browsers >>
           steps:
@@ -98,18 +87,12 @@ jobs:
       - image: cimg/node:18.10.0
         environment:
           TOOLPAD_SHADOW_DATABASE_URL: postgresql://postgres@localhost/circle_test
-      - image: cimg/postgres:14.5
-        environment:
-          POSTGRES_USER: postgres
     steps:
       - checkout
       - install_js
       - run:
           name: Should not have any git not staged
           command: git diff --exit-code
-      - run:
-          name: should not have any prisma schema drift
-          command: yarn workspace @mui/toolpad-app prisma-detect-drift
       - run:
           name: Check for duplicated packages
           command: yarn deduplicate
@@ -144,14 +127,20 @@ jobs:
       - run:
           name: '`yarn prettier` changes committed?'
           command: yarn prettier --check
+      - run:
+          name: '`yarn jsonSchemas` changes committed?'
+          command: |
+            yarn jsonSchemas
+            git diff --exit-code
 
   test_unit:
     <<: *defaults
     resource_class: 'large'
     docker:
-      - image: mcr.microsoft.com/playwright:v1.31.1-focal
+      - image: mcr.microsoft.com/playwright:v1.33.0-focal
         environment:
           NODE_ENV: test
+          TOOLPAD_TEST_RETRIES: 1
       - image: kennethreitz/httpbin:latest
 
     steps:
@@ -171,9 +160,11 @@ jobs:
       - run:
           name: Tests real browser
           environment:
-            - LOCAL_MODE_TESTS: '1'
-            - HTTPBIN_BASEURL: 'http://localhost/'
+            HTTPBIN_BASEURL: 'http://localhost/'
           command: yarn test:integration
+      - store_artifacts:
+          path: test-results
+          destination: playwright-test-results
 
 workflows:
   pipeline:

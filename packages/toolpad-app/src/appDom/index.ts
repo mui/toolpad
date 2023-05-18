@@ -1,5 +1,5 @@
+import { nanoid } from 'nanoid/non-secure';
 import { generateKeyBetween } from 'fractional-indexing';
-import cuid from 'cuid';
 import {
   NodeId,
   NodeReference,
@@ -11,11 +11,11 @@ import {
 } from '@mui/toolpad-core';
 import invariant from 'invariant';
 import { BoxProps } from '@mui/material';
+import { pascalCase, removeDiacritics, uncapitalize } from '@mui/toolpad-utils/strings';
+import { mapProperties, mapValues } from '@mui/toolpad-utils/collections';
 import { ConnectionStatus, AppTheme } from '../types';
 import { omit, update, updateOrCreate } from '../utils/immutability';
-import { pascalCase, removeDiacritics } from '../utils/strings';
 import { ExactEntriesOf, Maybe } from '../utils/types';
-import { mapProperties, mapValues } from '../utils/collections';
 
 export const CURRENT_APPDOM_VERSION = 6;
 
@@ -79,12 +79,15 @@ export interface ConnectionNode<P = unknown> extends AppDomNodeBase {
   };
 }
 
+export type PageDisplayMode = 'standalone' | 'shell';
+
 export interface PageNode extends AppDomNodeBase {
   readonly type: 'page';
   readonly attributes: {
     readonly title: ConstantAttrValue<string>;
     readonly parameters?: ConstantAttrValue<[string, string][]>;
     readonly module?: ConstantAttrValue<string>;
+    readonly display?: ConstantAttrValue<PageDisplayMode>;
   };
 }
 
@@ -231,8 +234,8 @@ function assertIsType<T extends AppDomNode>(node: AppDomNode, type: T['type']): 
   invariant(isType(node, type), `Expected node type "${type}" but got "${node.type}"`);
 }
 
-function createId(): NodeId {
-  return cuid.slug() as NodeId;
+export function createId(): NodeId {
+  return nanoid(7) as NodeId;
 }
 
 export function createConst<V>(value: V): ConstantAttrValue<V> {
@@ -354,10 +357,14 @@ export function assertIsMutation<P>(node: AppDomNode): asserts node is MutationN
   assertIsType<MutationNode>(node, 'mutation');
 }
 
+export function getRoot(dom: AppDom): AppDomNode {
+  return getNode(dom, dom.root);
+}
+
 export function getApp(dom: AppDom): AppNode {
-  const rootNode = getNode(dom, dom.root);
-  assertIsApp(rootNode);
-  return rootNode;
+  const app = getRoot(dom);
+  assertIsApp(app);
+  return app;
 }
 
 export type NodeChildren<N extends AppDomNode = any> = ChildNodesOf<N>;
@@ -497,18 +504,33 @@ export function createNode<T extends AppDomNodeType>(
   });
 }
 
-export function createDom(): AppDom {
-  const rootId = createId();
+export function createFragmentInternal<T extends AppDomNodeType>(
+  id: NodeId,
+  type: T,
+  init: AppDomNodeInitOfType<T> & { name: string },
+): AppDom {
   return {
     nodes: {
-      [rootId]: createNodeInternal(rootId, 'app', {
-        name: 'Application',
-        attributes: {},
-      }),
+      [id]: createNodeInternal(id, type, init),
     },
-    root: rootId,
+    root: id,
     version: CURRENT_APPDOM_VERSION,
   };
+}
+
+export function createFragment<T extends AppDomNodeType>(
+  type: T,
+  init: AppDomNodeInitOfType<T> & { name: string },
+): AppDom {
+  const rootId = createId();
+  return createFragmentInternal(rootId, type, init);
+}
+
+export function createDom(): AppDom {
+  return createFragment('app', {
+    name: 'Application',
+    attributes: {},
+  });
 }
 
 /**
@@ -522,7 +544,7 @@ export function createElement<P>(
   name?: string,
 ): ElementNode {
   return createNode(dom, 'element', {
-    name: name || component,
+    name: name || uncapitalize(component),
     props,
     attributes: {
       component: createConst(component),
@@ -583,6 +605,15 @@ export function getPageAncestor(dom: AppDom, node: AppDomNode): PageNode | null 
     return getPageAncestor(dom, parent);
   }
   return null;
+}
+
+/**
+ * Returns all nodes with a given component type
+ */
+export function getComponentTypeNodes(dom: AppDom, componentId: string): readonly AppDomNode[] {
+  return Object.values(dom.nodes).filter(
+    (node) => isElement(node) && node.attributes.component.value === componentId,
+  );
 }
 
 /**
@@ -1083,7 +1114,7 @@ export function ref(nodeId: NodeId): NodeReference;
 export function ref(nodeId: null | undefined): null;
 export function ref(nodeId: Maybe<NodeId>): NodeReference | null;
 export function ref(nodeId: Maybe<NodeId>): NodeReference | null {
-  return nodeId ? { $$ref: nodeId } : null;
+  return nodeId ? { $ref: nodeId } : null;
 }
 
 export function deref(nodeRef: NodeReference): NodeId;
@@ -1091,7 +1122,7 @@ export function deref(nodeRef: null | undefined): null;
 export function deref(nodeRef: Maybe<NodeReference>): NodeId | null;
 export function deref(nodeRef: Maybe<NodeReference>): NodeId | null {
   if (nodeRef) {
-    return nodeRef.$$ref;
+    return nodeRef.$ref;
   }
   return null;
 }
@@ -1105,10 +1136,22 @@ export function createDefaultDom(): AppDom {
     name: 'Page 1',
     attributes: {
       title: createConst('Page 1'),
+      display: createConst('shell'),
     },
   });
 
   dom = addNode(dom, newPageNode, appNode, 'pages');
 
   return dom;
+}
+
+export function getPageByName(dom: AppDom, name: string): PageNode | null {
+  const rootNode = getApp(dom);
+  const { pages = [] } = getChildNodes(dom, rootNode);
+  return pages.find((page) => page.name === name) ?? null;
+}
+
+export function getQueryByName(dom: AppDom, page: PageNode, name: string): QueryNode | null {
+  const { queries = [] } = getChildNodes(dom, page);
+  return queries.find((query) => query.name === name) ?? null;
 }

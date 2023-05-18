@@ -1,15 +1,8 @@
 import * as React from 'react';
-import { BindableAttrEntries, CreateQueryConfig } from '@mui/toolpad-core';
-import {
-  Button,
-  CircularProgress,
-  InputAdornment,
-  MenuItem,
-  Stack,
-  TextField,
-  Typography,
-} from '@mui/material';
+import { BindableAttrEntries, CreateFunctionConfig } from '@mui/toolpad-core';
+import { Autocomplete, Button, Stack, TextField, Typography } from '@mui/material';
 import { useBrowserJsRuntime } from '@mui/toolpad-core/jsBrowserRuntime';
+import { errorFrom } from '@mui/toolpad-utils/errors';
 import { ClientDataSource, QueryEditorProps } from '../../types';
 import {
   LocalPrivateQuery,
@@ -32,7 +25,6 @@ import QueryPreview from '../QueryPreview';
 import { usePrivateQuery } from '../context';
 import BindableEditor from '../../toolpad/AppEditor/PageEditor/BindableEditor';
 import { getDefaultControl } from '../../toolpad/propertyControls';
-import { errorFrom } from '../../utils/errors';
 
 const EMPTY_PARAMS: BindableAttrEntries = [];
 
@@ -42,13 +34,6 @@ function QueryEditor({
   value: input,
   onChange: setInput,
 }: QueryEditorProps<LocalConnectionParams, LocalQuery>) {
-  const handleQueryFunctionNameChange = React.useCallback(
-    (event: React.ChangeEvent<HTMLInputElement>) => {
-      setInput((existing) => appDom.setQueryProp(existing, 'function', event.target.value));
-    },
-    [setInput],
-  );
-
   const introspection = usePrivateQuery<LocalPrivateQuery, IntrospectionResult>(
     {
       kind: 'introspection',
@@ -57,7 +42,8 @@ function QueryEditor({
   );
 
   const functionName: string | undefined = input.attributes.query.value.function;
-  const functionDefs: Record<string, CreateQueryConfig<any>> = introspection.data?.functions ?? {};
+  const functionDefs: Record<string, CreateFunctionConfig<any>> = introspection.data?.functions ??
+  {};
   const parameterDefs = (functionName ? functionDefs?.[functionName]?.parameters : null) || {};
 
   const paramsEntries = input.params?.filter(([key]) => !!parameterDefs[key]) || EMPTY_PARAMS;
@@ -85,7 +71,12 @@ function QueryEditor({
   );
 
   const openEditor = React.useCallback(() => {
-    fetchPrivate({ kind: 'openEditor' });
+    fetchPrivate({ kind: 'openEditor' }).catch((err) => {
+      // TODO: Write docs with instructions on how to install editor
+      // Add a good looking alert box and inline some instructions and link to docs
+      // eslint-disable-next-line no-alert
+      alert(err.message);
+    });
   }, [fetchPrivate]);
 
   const {
@@ -108,36 +99,38 @@ function QueryEditor({
     ? errorFrom(introspection.error).message
     : '';
 
+  const methodSelectOptions: string[] = React.useMemo(
+    () => Object.keys(introspection.data?.functions ?? {}),
+    [introspection.data?.functions],
+  );
+
   return (
     <SplitPane split="vertical" size="50%" allowResize>
       <QueryInputPanel onRunPreview={handleRunPreview}>
         <Stack gap={2} sx={{ px: 3, pt: 1 }}>
           <Stack gap={2} direction="row">
-            <TextField
-              fullWidth
-              select
-              InputProps={
-                introspection.isLoading
-                  ? {
-                      startAdornment: (
-                        <InputAdornment position="start">
-                          <CircularProgress size={16} />
-                        </InputAdornment>
-                      ),
-                    }
-                  : {}
-              }
+            <Autocomplete
               value={functionName ?? ''}
-              onChange={handleQueryFunctionNameChange}
-              error={!!introspectionError}
-              helperText={introspectionError}
-            >
-              {Object.keys(introspection.data?.functions ?? {}).map((method) => (
-                <MenuItem key={method} value={method}>
-                  {method}
-                </MenuItem>
-              ))}
-            </TextField>
+              onChange={(event, newValue) => {
+                setInput((existing) =>
+                  appDom.setQueryProp(existing, 'function', newValue ?? undefined),
+                );
+              }}
+              loading={introspection.isLoading}
+              options={methodSelectOptions}
+              selectOnFocus
+              clearOnBlur
+              handleHomeEndKeys
+              fullWidth
+              renderInput={(params) => (
+                <TextField
+                  {...params}
+                  label="Function"
+                  error={!!introspectionError}
+                  helperText={introspectionError}
+                />
+              )}
+            />
             <Button onClick={openEditor}>Open editor</Button>
           </Stack>
           <Typography>Parameters:</Typography>
@@ -151,10 +144,10 @@ function QueryEditor({
                   globalScope={globalScope}
                   globalScopeMeta={globalScopeMeta}
                   label={name}
-                  propType={definiton.typeDef}
+                  propType={definiton}
                   jsRuntime={jsBrowserRuntime}
                   renderControl={(renderControlParams) => (
-                    <Control {...renderControlParams} propType={definiton.typeDef} />
+                    <Control {...renderControlParams} propType={definiton} />
                   )}
                   value={paramsObject[name]}
                   onChange={(newValue) => {

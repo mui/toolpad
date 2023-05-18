@@ -163,21 +163,11 @@ export interface AppTheme {
   'palette.secondary.main'?: string;
 }
 
-export type VersionOrPreview = 'preview' | number;
+export type AppVersion = 'development' | 'preview' | number;
 
 export type AppTemplateId = 'default' | 'hr' | 'images';
 
 export type NodeHashes = Record<NodeId, number | undefined>;
-
-export type CompiledModule =
-  | {
-      code: string;
-      urlImports: string[];
-      error?: undefined;
-    }
-  | {
-      error: Error;
-    };
 
 /**
  * Defines all the data needed to render the runtime.
@@ -191,5 +181,4 @@ export type CompiledModule =
 export interface RuntimeState {
   // We start out with just the rendertree. The ultimate goal will be to move things out of this tree
   dom: appDom.RenderTree;
-  modules: Record<string, CompiledModule>;
 }

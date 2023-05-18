@@ -79,6 +79,14 @@ module.exports = {
       extends: ['plugin:@next/next/recommended'],
       rules: {
         '@next/next/no-html-link-for-pages': ['error', 'packages/toolpad-app/pages/'],
+        '@next/next/no-img-element': 'off',
+      },
+    },
+    {
+      files: ['packages/toolpad-app/**/*'],
+      excludedFiles: ['**/jest-environment-jsdom.ts', 'tsup.config.ts', '*.spec.ts', '*.spec.tsx'],
+      rules: {
+        'import/no-extraneous-dependencies': ['error'],
       },
     },
     {
@@ -93,6 +101,9 @@ module.exports = {
       // https://github.com/mui/material-ui/blob/9737bc85bb6960adb742e7709e9c3710c4b6cedd/.eslintrc.js#L359
       files: ['packages/*/src/**/*{.ts,.tsx,.js}'],
       excludedFiles: ['*.d.ts', '*.spec.ts', '*.spec.tsx'],
+      rules: {
+        'import/no-cycle': ['error', { ignoreExternal: true }],
+      },
     },
     {
       files: ['packages/toolpad-core/**/*', 'packages/toolpad-components/**/*'],

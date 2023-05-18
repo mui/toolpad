@@ -35,9 +35,9 @@ const features = {
     {
       icon: <LinkIcon fontSize="small" color="primary" />,
       title: 'Connect any data source',
-      wip: true,
+      wip: false,
       description:
-        'Find all the integrations that you need. So far, it supports REST, Google sheets, PostgreSQL. We are working on adding MySQL, GraphQL, and a plugin system to add new ones.',
+        'No need for integrations — use your existing code to connect to your data sources, from databases to APIs.',
     },
     {
       icon: <ViewModuleIcon fontSize="small" color="primary" />,

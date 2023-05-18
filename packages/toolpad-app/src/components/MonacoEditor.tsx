@@ -7,7 +7,7 @@ import * as React from 'react';
 import * as monaco from 'monaco-editor';
 import { styled, SxProps } from '@mui/material';
 import clsx from 'clsx';
-import cuid from 'cuid';
+import { nanoid } from 'nanoid/non-secure';
 import invariant from 'invariant';
 import {
   conf as jsonBasicConf,
@@ -164,6 +164,7 @@ const TYPESCRIPT_DEFAULT_COMPILER_OPTIONS: monaco.languages.typescript.CompilerO
   allowJs: true,
   lib: ['es2020'],
   typeRoots: ['node_modules/@types'],
+  strictNullChecks: true,
 };
 
 monaco.languages.typescript.typescriptDefaults.setCompilerOptions(
@@ -369,7 +370,7 @@ export default React.forwardRef<MonacoEditorHandle, MonacoEditorProps>(function 
         }
       }
     } else {
-      const pathUri = monaco.Uri.parse(`./scripts/${cuid()}${getExtension(language)}`);
+      const pathUri = monaco.Uri.parse(`/scripts/${nanoid(7)}${getExtension(language)}`);
       const model = monaco.editor.createModel(value || '', language, pathUri);
 
       instance = monaco.editor.create(rootRef.current, {

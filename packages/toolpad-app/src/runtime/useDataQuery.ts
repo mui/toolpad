@@ -1,20 +1,30 @@
+/// <reference types="vite/client" />
+
 import { GridRowsProp } from '@mui/x-data-grid-pro';
 import * as React from 'react';
 import { useQuery, UseQueryOptions } from '@tanstack/react-query';
-import { useAppContext } from './AppContext';
 import { CanvasHooksContext } from './CanvasHooksContext';
 import dataSources from '../toolpadDataSources/runtime';
 import * as appDom from '../appDom';
 
 interface ExecDataSourceQueryParams {
   signal?: AbortSignal;
-  queryId: string;
+  pageName: string;
+  queryName: string;
   params: any;
 }
 
-export async function execDataSourceQuery({ signal, queryId, params }: ExecDataSourceQueryParams) {
-  const dataUrl = new URL(`/api/data/`, window.location.href);
-  const url = new URL(`./${encodeURIComponent(queryId)}`, dataUrl);
+export async function execDataSourceQuery({
+  signal,
+  pageName,
+  queryName,
+  params,
+}: ExecDataSourceQueryParams) {
+  const dataUrl = new URL(`${process.env.BASE_URL}/api/data/`, window.location.href);
+  const url = new URL(
+    `./${encodeURIComponent(pageName)}/${encodeURIComponent(queryName)}`,
+    dataUrl,
+  );
 
   const res = await fetch(String(url), {
     method: 'POST',
@@ -51,6 +61,7 @@ const EMPTY_ARRAY: any[] = [];
 const EMPTY_OBJECT: any = {};
 
 export function useDataQuery(
+  page: appDom.PageNode,
   node: appDom.QueryNode,
   params: any,
   {
@@ -58,17 +69,17 @@ export function useDataQuery(
     ...options
   }: Pick<UseQueryOptions<any, unknown, unknown, any[]>, 'enabled' | 'refetchInterval'>,
 ): UseFetch {
-  const { version } = useAppContext();
   const { savedNodes } = React.useContext(CanvasHooksContext);
-  const queryId = node.id;
+  const queryName = node.name;
+  const pageName = page.name;
   const query = node.attributes.query?.value;
   const dataSourceId = node.attributes.dataSource?.value;
 
   const dataSource = dataSourceId ? dataSources[dataSourceId] : null;
 
   // These are only used by the editor to invalidate caches whenever the query changes during editing
-  const nodeHash: number | undefined = savedNodes ? savedNodes[queryId] : undefined;
-  const isNodeAvailableOnServer: boolean = savedNodes ? !!savedNodes[queryId] : true;
+  const nodeHash: number | undefined = savedNodes ? savedNodes[node.id] : undefined;
+  const isNodeAvailableOnServer: boolean = savedNodes ? !!savedNodes[node.id] : true;
 
   const {
     isLoading,
@@ -77,13 +88,9 @@ export function useDataQuery(
     data: responseData = EMPTY_OBJECT,
     refetch,
   } = useQuery(
-    [version, nodeHash, queryId, params],
+    [nodeHash, pageName, queryName, params],
     ({ signal }) => {
-      if (!queryId) {
-        return null;
-      }
-
-      const fetchFromServer = () => execDataSourceQuery({ signal, queryId, params });
+      const fetchFromServer = () => execDataSourceQuery({ signal, pageName, queryName, params });
 
       if (query && dataSource?.exec) {
         return dataSource?.exec(query, params, fetchFromServer);
@@ -93,7 +100,7 @@ export function useDataQuery(
     },
     {
       ...options,
-      enabled: isNodeAvailableOnServer && !!queryId && enabled,
+      enabled: isNodeAvailableOnServer && enabled,
     },
   );
 

@@ -125,13 +125,18 @@ export default function QueryEditor() {
   const domApi = useDomApi();
 
   const [dialogState, setDialogState] = React.useState<DialogState | null>(null);
+  const isDraft = dialogState?.isDraft || false;
 
   const page = appDom.getNode(dom, state.nodeId, 'page');
   const { queries = [] } = appDom.getChildNodes(dom, page) ?? [];
 
   const handleEditStateDialogClose = React.useCallback(() => {
-    appStateApi.setView({ kind: 'page', nodeId: page.id });
-  }, [appStateApi, page.id]);
+    if (isDraft) {
+      setDialogState(null);
+    } else {
+      appStateApi.setView({ kind: 'page', nodeId: page.id });
+    }
+  }, [appStateApi, isDraft, page.id]);
 
   const handleCreated = React.useCallback((node: appDom.QueryNode) => {
     setDialogState({ node, isDraft: true });
@@ -142,11 +147,7 @@ export default function QueryEditor() {
       if (appDom.nodeExists(dom, node.id)) {
         domApi.saveNode(node);
       } else {
-        appStateApi.update((draft) => appDom.addNode(draft, node, page, 'queries'), {
-          kind: 'page',
-          nodeId: page.id,
-          view: { kind: 'query', nodeId: node.id },
-        });
+        appStateApi.update((draft) => appDom.addNode(draft, node, page, 'queries'));
       }
     },
     [dom, domApi, appStateApi, page],
@@ -184,15 +185,19 @@ export default function QueryEditor() {
   );
 
   React.useEffect(() => {
-    setDialogState(() => {
+    setDialogState((previousState) => {
       if (currentView.kind === 'page' && currentView.view?.kind === 'query') {
         const node = appDom.getNode(dom, currentView.view?.nodeId, 'query');
         return { node, isDraft: false };
       }
 
+      if (isDraft) {
+        return previousState;
+      }
+
       return null;
     });
-  }, [dom, currentView]);
+  }, [currentView, dom, isDraft]);
 
   const [anchorEl, setAnchorEl] = React.useState<Element | null>(null);
 
@@ -243,11 +248,9 @@ export default function QueryEditor() {
           <Typography sx={{ mb: 2 }}>Make backend data available as state on the page.</Typography>
           <Stack direction="row" gap={1}>
             <DataSourceButton onClick={handleCreateClick('local')}>
-              serverside javascript
+              Custom function
             </DataSourceButton>
-            <DataSourceButton onClick={handleCreateClick('rest')}>
-              serverside HTTP request
-            </DataSourceButton>
+            <DataSourceButton onClick={handleCreateClick('rest')}>HTTP request</DataSourceButton>
           </Stack>
         </Paper>
       </Popover>
@@ -297,7 +300,7 @@ export default function QueryEditor() {
         <QueryNodeEditorDialog
           open={!!dialogState}
           node={dialogState.node}
-          isDraft={dialogState.isDraft}
+          isDraft={isDraft}
           onSave={handleSave}
           onRemove={handleRemove}
           onClose={handleEditStateDialogClose}

@@ -1,5 +1,280 @@
 # Changelog
 
+## 0.1.12
+
+<!-- generated comparing v0.1.11..master -->
+
+_May 17, 2023_
+
+A big thanks to the 4 contributors who made this release possible. Here are some highlights ✨:
+
+Added a new Autocomplete component, simplify the configuration for creating custom components, improve performance with websocket updates instead of polling.
+
+- &#8203;<!-- 21 -->Fix race condition with initializing the canvas bridge (#2035) @Janpot
+- &#8203;<!-- 20 -->Add Autocomplete component (#1427) @bharatkashyap
+- &#8203;<!-- 19 -->Upgrade monorepo (#2023) @bharatkashyap
+- &#8203;<!-- 18 -->Improve isolation of runtime from editor (#2021) @Janpot
+- &#8203;<!-- 17 -->Replace polling for updates with websocket (#2007) @Janpot
+- &#8203;<!-- 16 -->Improve and test basic auth implementation (#2022) @Janpot
+- &#8203;<!-- 15 -->Reorganize @mui/toolpad-core exports (#2018) @Janpot
+- &#8203;<!-- 14 -->version examples instead of using latest (#2030) @Janpot
+- &#8203;<!-- 13 -->Add section about page configuration to docs (#1997) @apedroferreira
+- &#8203;<!-- 12 -->Add theming to docs (#1993) @apedroferreira
+- &#8203;<!-- 11 -->Improve types for onChangeProp (#2002) @Janpot
+- &#8203;<!-- 10 -->Remove hideControls and button type (#2017) @Janpot
+- &#8203;<!-- 09 -->Correctly set charset for preview html (#2020) @Janpot
+- &#8203;<!-- 08 -->Remove unused config (#2008) @Janpot
+- &#8203;<!-- 07 -->Make canvas column spacing the same as in the runtime (#2016) @Janpot
+- &#8203;<!-- 06 -->Move to zod-to-json-schema (#2003) @Janpot
+- &#8203;<!-- 05 -->Deprecate typeDef (#1994) @Janpot
+- &#8203;<!-- 04 -->Clean up dead code (#2000) @Janpot
+- &#8203;<!-- 03 -->Add jest tests for `create-toolpad-app` (#1965) @bharatkashyap
+- &#8203;<!-- 02 -->[docs] Make code the hero (#1992) @bharatkashyap
+- &#8203;<!-- 01 -->[docs] Fix 404 link to fix the page (#2009) @oliviertassinari
+
+## 0.1.11
+
+<!-- generated comparing v0.1.10..master -->
+
+_May 10, 2023_
+
+A big thanks to the 3 contributors who made this release possible. Here are some highlights ✨:
+
+Allow setting page parameters in navigation actions, fix overlay grid spacing, add schema reference to docs.
+
+- &#8203;<!-- 11 -->Update references and screenshots (#1987) @apedroferreira
+- &#8203;<!-- 10 -->Add Toolpad file schema reference to the docs (#1940) @Janpot
+- &#8203;<!-- 09 -->Fix broken preview in vite runtime (#1989) @Janpot
+- &#8203;<!-- 08 -->Deps fix (#1985) @Janpot
+- &#8203;<!-- 07 -->Fix console.error being called in tests (#1966) @Janpot
+- &#8203;<!-- 06 -->Change tests structure to use ESM (#1970) @bharatkashyap
+- &#8203;<!-- 05 -->Fix overlay grid spacing (#1947) @apedroferreira
+- &#8203;<!-- 04 -->Add page parameters to navigation actions (#1876) @apedroferreira
+- &#8203;<!-- 03 -->Separate deps updates for docs in renovatebot (#1980) @Janpot
+- &#8203;<!-- 02 -->Isolate next updates (#1979) @Janpot
+- &#8203;<!-- 01 -->Pin all dependencies (#1968) @Janpot
+
+All contributors of this release in alphabetical order: @apedroferreira, @bharatkashyap, @Janpot
+
+## 0.1.10
+
+<!-- generated comparing v0.1.9..master -->
+
+_May 5, 2023_
+
+A big thanks to the 1 contributors who made this release possible. Here are some highlights ✨:
+
+This is a hotfix to deal with broken dependency upgrade in next.js.
+
+- &#8203;<!-- 2 -->Pin next.js (#1967) @Janpot
+- &#8203;<!-- 1 -->Upgrade monorepo (#1964) @Janpot
+
+All contributors of this release in alphabetical order: @Janpot
+
+## 0.1.9
+
+<!-- generated comparing v0.1.8..master -->
+
+_May 3, 2023_
+
+A big thanks to the 4 contributors who made this release possible. Here are some highlights ✨:
+
+Fixing regressions, set new runtime as default.
+
+- &#8203;<!-- 7 -->Fix preview header missing in app preview (#1962) @Janpot
+- &#8203;<!-- 6 -->small improvements (#1960) @Janpot
+- &#8203;<!-- 5 -->Fix: Wrapping on Text/Link (#1956) @bharatkashyap
+- &#8203;<!-- 4 -->Added dog app arcade to quickstart section of docs (#1942) @prakhargupta1
+- &#8203;<!-- 3 -->Optimize some docs images (#1946) @apedroferreira
+- &#8203;<!-- 2 -->Fix autocomplete after monaco-editor upgrade (#1943) @Janpot
+- &#8203;<!-- 1 -->Make vite runtime default (#1938) @Janpot
+
+All contributors of this release in alphabetical order: @apedroferreira, @bharatkashyap, @Janpot, @prakhargupta1
+
+## 0.1.8
+
+<!-- generated comparing v0.1.7..master -->
+
+_Apr 26, 2023_
+
+A big thanks to the 4 contributors who made this release possible. Here are some highlights ✨:
+
+Use page name as a routing alias, add a Form component, and replace Next.js API routes with Express under the hood.
+
+- &#8203;<!-- 12 -->Add page name as an alias for routing in the runtime (#1925) @Janpot
+- &#8203;<!-- 11 -->Use correct command for opening vscode (#1931) @Janpot
+- &#8203;<!-- 10 -->Replace next api routes with express (#1920) @Janpot
+- &#8203;<!-- 09 -->Add link to open example in CodeSandbox (#1936) @Janpot
+- &#8203;<!-- 08 -->Fix: Local installation needs new resolution (#1932) @bharatkashyap
+- &#8203;<!-- 07 -->Fix: Use `nanonid/non-secure` instead of `cuid` (#1912) @bharatkashyap
+- &#8203;<!-- 06 -->Form component (#1926) @apedroferreira
+- &#8203;<!-- 05 -->Import correct font in vite runtime (#1924) @Janpot
+- &#8203;<!-- 04 -->Update CONTRIBUTING.md @apedroferreira
+- &#8203;<!-- 03 -->Fix gitignore file creation log message (#1923) @Janpot
+- &#8203;<!-- 02 -->Add utils package for generic non-toolpad utilities (#1915) @Janpot
+- &#8203;<!-- 01 -->[docs] Polish a bit the docs (#1927) @oliviertassinari
+
+## 0.1.7
+
+<!-- generated comparing v0.1.6..master -->
+
+_Apr 20, 2023_
+
+A big thanks to the 5 contributors who made this release possible. Here are some highlights ✨:
+
+Tweak the landing page design. Improve `create-toolpad-app` CLI, support node modules in custom code components.
+
+- &#8203;<!-- 14 -->Add folder as argument to `create-toolpad-app` (#1795) @bharatkashyap
+- &#8203;<!-- 13 -->Delete page on file system when deleted in UI (#1913) @Janpot
+- &#8203;<!-- 12 -->New vite based application runtime (#1881) @Janpot
+- &#8203;<!-- 11 -->Fix Windows issues (WIP) (#1910) @apedroferreira
+- &#8203;<!-- 10 -->Use npm registry to check for new versions (#1895) @Janpot
+- &#8203;<!-- 09 -->Update MUI monorepo (#1883) @apedroferreira
+- &#8203;<!-- 08 -->Fix: Remove `default` from `toolpad dev --port` option (#1911) @bharatkashyap
+- &#8203;<!-- 07 -->Deprecate `createQuery` and replace with `createFunction` (#1908) @bharatkashyap
+- &#8203;<!-- 06 -->Show border on hover in interactive nodes (#1907) @apedroferreira
+- &#8203;<!-- 05 -->Fix: Better represent the new direction on landing (#1863) @bharatkashyap
+- &#8203;<!-- 04 -->Revert "Form component (#1598)" @apedroferreira
+- &#8203;<!-- 03 -->Form component (#1598) @bytasv
+- &#8203;<!-- 02 -->Update links on contributing guide (#1893) @Janpot
+- &#8203;<!-- 01 -->[website] Landing page design tweaks (#1786) @danilo-leal
+
+All contributors of this release in alphabetical order: @apedroferreira, @bharatkashyap, @bytasv, @danilo-leal, @Janpot
+
+## 0.1.6
+
+<!-- generated comparing v0.1.5..master -->
+
+_Apr 13, 2023_
+
+A big thanks to the 1 contributors who made this release possible. Here are some highlights ✨:
+
+Fix regression that applies the wrong theme to the user application when they have dark color scheme.
+
+- &#8203;<!-- 1 -->Fix app theming (#1888) @Janpot
+
+All contributors of this release in alphabetical order: @Janpot
+
+## 0.1.5
+
+<!-- generated comparing v0.1.4..master -->
+
+_Apr 13, 2023_
+
+A big thanks to the 2 contributors who made this release possible. Here are some highlights ✨:
+
+Fix broken CLI due to missing dependency
+
+- &#8203;<!-- 4 -->Add missing extraneous dependencies (#1885) @Janpot
+- &#8203;<!-- 3 -->Update playwright to latest (#1884) @Janpot
+- &#8203;<!-- 2 -->Small fixes to CLI (#1882) @Janpot
+- &#8203;<!-- 1 -->Update release instructions (#1880) @apedroferreira
+
+All contributors of this release in alphabetical order: @apedroferreira, @Janpot
+
+## 0.1.4
+
+<!-- generated comparing v0.1.3..master -->
+
+_Apr 12, 2023_
+
+A big thanks to the 3 contributors who made this release possible. Here are some highlights ✨:
+
+Revamped file system layout, updated docs.
+
+- &#8203;<!-- 8 -->Factor out in-memory toolpad project (#1878) @Janpot
+- &#8203;<!-- 7 -->Revamp toolpad file system layout (#1831) @Janpot
+- &#8203;<!-- 6 -->Docs-update (#1829) @prakhargupta1
+- &#8203;<!-- 5 -->Update README.md @prakhargupta1
+- &#8203;<!-- 4 -->Update README.md @prakhargupta1
+- &#8203;<!-- 3 -->Refactor: extract custom components loading logic (#1862) @Janpot
+- &#8203;<!-- 2 -->Clean dist dirs on rebuild (#1858) @Janpot
+- &#8203;<!-- 1 -->[docs] Fix 301 redirections @oliviertassinari
+
+All contributors of this release in alphabetical order: @Janpot, @oliviertassinari, @prakhargupta1
+
+## 0.1.3
+
+<!-- generated comparing v0.1.2..master -->
+
+_Apr 5, 2023_
+
+A big thanks to the 3 contributors who made this release possible. Here are some highlights ✨:
+
+Fixed a regression with the query transformation feature, removed some obsolete code and a few improvements to the editor user experience!
+
+- &#8203;<!-- 4 -->Fix transform regression (#1856) @bharatkashyap
+- &#8203;<!-- 3 -->Try replacing tsc with tsup as build tool (#1727) @Janpot
+- &#8203;<!-- 2 -->Remove obsolete onDelete datagrid property (#1850) @Janpot
+- &#8203;<!-- 1 -->Editor UX fixes (#1844) @apedroferreira
+
+All contributors of this release in alphabetical order: @apedroferreira, @bharatkashyap, @Janpot
+
+## 0.1.2
+
+<!-- generated comparing v0.1.1..master -->
+
+_Mar 31, 2023_
+
+A big thanks to the 3 contributors who made this release possible. Here are some highlights ✨:
+
+Add end-user application navigation! Various fixes.
+
+- &#8203;<!-- 11 -->Add app navigation sidebar (#1819) @apedroferreira
+- &#8203;<!-- 10 -->Load queries by name instead of id (#1842) @Janpot
+- &#8203;<!-- 09 -->Fix issues around custom datagrid columns (#1840) @Janpot
+- &#8203;<!-- 08 -->Fix broken theming (#1834) @apedroferreira
+- &#8203;<!-- 07 -->Do Toolpad app migration on startup (#1832) @Janpot
+- &#8203;<!-- 06 -->Remove ECS and Recaptcha + move request/response logs to trace level (#1833) @apedroferreira
+- &#8203;<!-- 05 -->Remove deprecated scope query (#1827) @apedroferreira
+- &#8203;<!-- 04 -->Use worker scoped fixtures for integration tests (#1813) @Janpot
+- &#8203;<!-- 03 -->Remove quickjs-emscripten (#1820) @Janpot
+- &#8203;<!-- 02 -->Rewrite argument handling in `@mui/toolpad` CLI with `yargs` (#1794) @bharatkashyap
+- &#8203;<!-- 01 -->Update CONTRIBUTING.md (Fix typo) (#1826) @apedroferreira
+
+All contributors of this release in alphabetical order: @apedroferreira, @bharatkashyap, @Janpot
+
+## 0.1.1
+
+<!-- generated comparing v0.1.0..master -->
+
+_Mar 28, 2023_
+
+A big thanks to the 4 contributors who made this release possible. Here are some highlights ✨:
+
+Mutate state in event handlers by assigning to properties of page elements. Make binding to DataGrid selection easier with improved typings. Big cleanup of dead code.
+
+- &#8203;<!-- 28 -->Use node name in the canvas HUD (#1818) @Janpot
+- &#8203;<!-- 27 -->Allow mutating page state in event handlers (#1807) @Janpot
+- &#8203;<!-- 26 -->Improve UX around integration testing (#1808) @Janpot
+- &#8203;<!-- 25 -->Disable property control for controlled properties (#1809) @Janpot
+- &#8203;<!-- 24 -->Use next.js custom server (#1723) @Janpot
+- &#8203;<!-- 23 -->Remove postgres (#1799) @Janpot
+- &#8203;<!-- 22 -->Remove example and docker files (#1798) @Janpot
+- &#8203;<!-- 21 -->Clean up more obsolete things in the repo (#1797) @Janpot
+- &#8203;<!-- 20 -->Fix errors when running the project the first time (#1796) @Janpot
+- &#8203;<!-- 19 -->Fix imports from toolpad (#1793) @Janpot
+- &#8203;<!-- 18 -->Fix changing tabs closing query editor (#1784) @apedroferreira
+- &#8203;<!-- 17 -->Generate .gitignore on dev command (#1705) @apedroferreira
+- &#8203;<!-- 16 -->Improve dataGrid.selection types (#1790) @Janpot
+- &#8203;<!-- 15 -->Dependency cleanup (#1791) @Janpot
+- &#8203;<!-- 14 -->Fixes on the dev pipeline (#1789) @Janpot
+- &#8203;<!-- 13 -->Remove Prisma, isolated-vm and dead code (#1787) @Janpot
+- &#8203;<!-- 12 -->Update release instructions (#1788) @Janpot
+- &#8203;<!-- 11 -->Fix capitalization of elements (#1782) @Janpot
+- &#8203;<!-- 10 -->Update moduleresolution for core and components (#1780) @Janpot
+- &#8203;<!-- 09 -->Remove the localMode flag (#1768) @Janpot
+- &#8203;<!-- 08 -->Convert tests to local mode (#1718) @Janpot
+- &#8203;<!-- 07 -->Add docs contributing instructions (#1779) @Janpot
+- &#8203;<!-- 06 -->Allow falsy MySQL variable values (#1738) @evankennedy
+- &#8203;<!-- 05 -->Add Toolpad to cspell config for the workspace (#1767) @Janpot
+- &#8203;<!-- 04 -->Use latest version for examples (#1764) @Janpot
+- &#8203;<!-- 03 -->Rename dev13 script to dev (#1766) @Janpot
+- &#8203;<!-- 02 -->Small typo fix @prakhargupta1
+- &#8203;<!-- 01 -->Docs updates for the new direction (#1743) @Janpot
+
+All contributors of this release in alphabetical order: @apedroferreira, @evankennedy, @Janpot, @prakhargupta1
+
 ## 0.1.0
 
 <!-- generated comparing v0.0.41..master -->
@@ -187,7 +462,7 @@ _Jan 4, 2023_
 
 A big thanks to the 4 contributors who made this release possible. Here are some highlights ✨:
 
-New date picker component, Make switching views part of undo/redo cycle.
+New Date Picker component, Make switching views part of undo/redo cycle.
 
 - &#8203;<!-- 13 -->Fix dependabot vulnerabilities (#1512) @Janpot
 - &#8203;<!-- 12 -->Don't import from dist folders (#1513) @Janpot
@@ -198,7 +473,7 @@ New date picker component, Make switching views part of undo/redo cycle.
 - &#8203;<!-- 07 -->Datepicker format handling changes (#1504) @bytasv
 - &#8203;<!-- 04 -->Undo/redo through different views (#1417) @apedroferreira
 - &#8203;<!-- 03 -->Make sure npm package is splitted out correctly (#1502) @Janpot
-- &#8203;<!-- 02 -->Date picker component (#1499) @bytasv
+- &#8203;<!-- 02 -->Date Picker component (#1499) @bytasv
 - &#8203;<!-- 01 -->[core] Remove dead prettier config @oliviertassinari
 
 All contributors of this release in alphabetical order: @apedroferreira, @bytasv, @Janpot, @oliviertassinari

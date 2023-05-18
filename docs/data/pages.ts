@@ -1,37 +1,44 @@
 import type { MuiPage } from '@mui/monorepo/docs/src/MuiPage';
+import SchemaIcon from '@mui/icons-material/Schema';
+import BuildIcon from '@mui/icons-material/Build';
+import CodeIcon from '@mui/icons-material/Code';
+import DescriptionIcon from '@mui/icons-material/Description';
+import TableViewIcon from '@mui/icons-material/TableView';
+import VisibilityIcon from '@mui/icons-material/Visibility';
 
 const pages: MuiPage[] = [
   {
     pathname: '/toolpad/getting-started',
-    icon: 'DescriptionIcon',
+    icon: DescriptionIcon,
     children: [
       { pathname: '/toolpad/getting-started/overview' },
       { pathname: '/toolpad/getting-started/quickstart' },
       { pathname: '/toolpad/getting-started/installation' },
+      { pathname: '/toolpad/getting-started/configuration' },
       { pathname: '/toolpad/getting-started/roadmap' },
     ],
   },
   {
     pathname: '/toolpad/connecting-to-datasources',
-    icon: 'TableViewIcon',
+    icon: TableViewIcon,
     children: [
       {
         pathname: '/toolpad/connecting-to-datasources/queries',
       },
       {
-        pathname: '/toolpad/connecting-to-datasources/serverside-http-request',
-        title: 'serverside HTTP request',
+        pathname: '/toolpad/connecting-to-datasources/http-requests',
+        title: 'HTTP requests',
       },
       {
-        pathname: '/toolpad/connecting-to-datasources/serverside-javascript',
-        title: 'serverside JavaScript',
+        pathname: '/toolpad/connecting-to-datasources/custom-functions',
+        title: 'Custom Functions',
       },
     ],
   },
   {
     pathname: '/toolpad/building-ui',
     title: 'Building UI',
-    icon: 'VisibilityIcon',
+    icon: VisibilityIcon,
     children: [
       {
         pathname: '/toolpad/building-ui/component-library',
@@ -47,29 +54,42 @@ const pages: MuiPage[] = [
       },
       {
         pathname: '/toolpad/building-ui/data-grid-component',
-        title: 'DataGrid component',
+        title: 'Data Grid component',
+      },
+      {
+        pathname: '/toolpad/building-ui/page-configuration',
+        title: 'Page configuration',
+      },
+      {
+        pathname: '/toolpad/building-ui/theming',
+        title: 'Theming',
       },
     ],
   },
   {
     pathname: '/toolpad/data-binding',
-    icon: 'CodeIcon',
+    title: 'Data Binding',
+    icon: CodeIcon,
+    children: [
+      {
+        pathname: '/toolpad/data-binding/binding-state',
+        title: 'Binding state',
+      },
+      {
+        pathname: '/toolpad/data-binding/event-handling',
+        title: 'Event handling',
+      },
+    ],
   },
-  // {
-  //   pathname: '/toolpad/versioning-and-deploying',
-  //   title: 'Versioning & deploying [TODO]',
-  //   icon: 'ToggleOnIcon',
-  //   children: [
-  //     {
-  //       pathname: '/toolpad/versioning-and-deploying/releases',
-  //     },
-  //   ],
-  // },
-  // {
-  //   pathname: '/toolpad/faq',
-  //   title: 'FAQ [TODO]',
-  //   icon: 'ReaderIcon',
-  // },
+  {
+    pathname: '/toolpad/deployment',
+    icon: BuildIcon,
+  },
+  {
+    pathname: '/toolpad/schema-reference',
+    title: 'Schema reference',
+    icon: SchemaIcon,
+  },
 ];
 
 export default pages;

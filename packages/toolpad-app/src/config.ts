@@ -35,27 +35,9 @@ export type BuildEnvVars = Record<
 // These are set at runtime and passed to the browser.
 // Do not add secrets
 export interface RuntimeConfig {
-  // Enable input field for seeding a dom in the app creation dialog
-  // (For testing purposes)
-  enableCreateByDom?: boolean;
-  // Enable demo mode
-  isDemo: boolean;
-  // Google Analytics measurement ID
-  gaId?: string;
-  // Sentry DSN
-  sentryDsn?: string;
-  // Google reCAPTCHA site keys
-  recaptchaV2SiteKey?: string;
-  recaptchaV3SiteKey?: string;
   externalUrl: string;
   projectDir?: string;
   cmd: 'dev' | 'start';
-}
-
-declare global {
-  namespace NodeJS {
-    interface ProcessEnv extends BuildEnvVars {}
-  }
 }
 
 declare global {
@@ -76,13 +58,6 @@ function getBrowsersideRuntimeConfig(): RuntimeConfig {
 const runtimeConfig: RuntimeConfig =
   typeof window === 'undefined'
     ? {
-        // Define runtime config here
-        enableCreateByDom: !!process.env.TOOLPAD_ENABLE_CREATE_BY_DOM,
-        isDemo: !!process.env.TOOLPAD_DEMO,
-        gaId: process.env.TOOLPAD_GA_ID,
-        sentryDsn: process.env.TOOLPAD_SENTRY_DSN,
-        recaptchaV2SiteKey: process.env.TOOLPAD_RECAPTCHA_V2_SITE_KEY,
-        recaptchaV3SiteKey: process.env.TOOLPAD_RECAPTCHA_V3_SITE_KEY,
         externalUrl:
           process.env.TOOLPAD_EXTERNAL_URL || `http://localhost:${process.env.PORT || 3000}`,
         projectDir: process.env.TOOLPAD_PROJECT_DIR,

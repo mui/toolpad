@@ -10,13 +10,13 @@ As explained in the [connections](/toolpad/connecting-to-datasources/connections
 
 1. Select function datasource and click **CREATE QUERY**:
 
-   <img src="/static/toolpad/docs/function/function-1.png" alt="Function datasource" width="592px" />
+   <img src="/static/toolpad/docs/function/function-1.png" alt="Function datasource" width="592" />
 
 1. You can modify all the basic configuration settings as described in [queries](/toolpad/connecting-to-datasources/queries/) section.
 
 1. In addition you are now presented with a **code editor** where you can write a custom code for data fetching:
 
-   <img src="/static/toolpad/docs/function/function-2.png" alt="Function configuration" width="1441px" />
+   <img src="/static/toolpad/docs/function/function-2.png" alt="Function configuration" width="1441" />
 
    Supported features:
 
@@ -82,7 +82,7 @@ While [function](/toolpad/connecting-to-datasources/function/) datasource can su
    -->
    <!-- markdownlint-enable MD032 -->
 
-   <img src="/static/toolpad/docs/function/function-4.png" alt="Function combined result" width="1038px" />
+   <img src="/static/toolpad/docs/function/function-4.png" alt="Function combined result" width="1038" />
 
 1. **Chaining** multiple request:
 
@@ -101,7 +101,7 @@ While [function](/toolpad/connecting-to-datasources/function/) datasource can su
    -->
    <!-- markdownlint-enable MD032 -->
 
-   <img src="/static/toolpad/docs/function/function-5.png" alt="Function chained" width="875px" />
+   <img src="/static/toolpad/docs/function/function-5.png" alt="Function chained" width="875" />
 
 1. **Custom error handling**:
 
@@ -121,4 +121,4 @@ While [function](/toolpad/connecting-to-datasources/function/) datasource can su
    -->
    <!-- markdownlint-enable MD032 -->
 
-   <img src="/static/toolpad/docs/function/function-6.png" alt="Function error handling" width="831px" />
+   <img src="/static/toolpad/docs/function/function-6.png" alt="Function error handling" width="831" />

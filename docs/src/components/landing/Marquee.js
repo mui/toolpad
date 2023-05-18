@@ -1,24 +1,27 @@
 import * as React from 'react';
 import PropTypes from 'prop-types';
 import Container from '@mui/material/Container';
-import Button from '@mui/material/Button';
-import Link from 'docs/src/modules/components/Link';
 import Typography from '@mui/material/Typography';
-import KeyboardArrowRightRounded from '@mui/icons-material/KeyboardArrowRightRounded';
+import SignUp from './SignUp';
 
 function Marquee({ content }) {
   return (
     <Container
       sx={(theme) => ({
-        py: { xs: 4, sm: 6, md: 8 },
+        mt: 8,
+        mx: 0,
+        minWidth: '100%',
+        py: { xs: 4, sm: 6, md: 12 },
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
-        borderImage: `conic-gradient(${theme.palette.primaryDark[700]} 0deg 360deg) fill 1/ /0 50vw`,
+        background: `linear-gradient(180deg, ${theme.palette.primaryDark[900]} 0%, ${theme.palette.primaryDark[800]})`,
+        borderBottom: '1px solid',
+        borderColor: theme.palette.mode === 'dark' ? 'primaryDark.600' : 'grey.200',
       })}
     >
       <Typography
-        color="grey.50"
+        color="white"
         textAlign="center"
         variant="h2"
         sx={{
@@ -32,26 +35,32 @@ function Marquee({ content }) {
         color="grey.500"
         textAlign="center"
         sx={{
-          my: 2,
+          mt: 1,
+          mb: 4,
           mx: 'auto',
         }}
       >
         {content.subtitle}
       </Typography>
-      <Button
-        component={Link}
-        href={content.action.href}
-        data-ga-event-category="ToolpadLanding"
-        data-ga-event-label={content.action.label}
-        data-ga-event-action="SelfHost"
-        noLinkStyle
-        size="large"
-        variant="contained"
-        endIcon={<KeyboardArrowRightRounded />}
-        sx={{ width: { xs: '100%', sm: 'auto' } }}
+      <Typography
+        component="label"
+        variant="body2"
+        color={(theme) => (theme.palette.mode === 'dark' ? '#fff' : `text.secondary`)}
+        sx={{ fontWeight: 'medium', display: 'block', mb: 1, mx: 'auto' }}
+        htmlFor="email-landing"
       >
         {content.action.label}
-      </Button>
+      </Typography>
+      <SignUp
+        sx={{
+          '& > div': {
+            display: 'flex',
+            flexDirection: { xs: 'column', sm: 'row' },
+            justifyContent: 'center',
+            maxWidth: 'initial',
+          },
+        }}
+      />
     </Container>
   );
 }

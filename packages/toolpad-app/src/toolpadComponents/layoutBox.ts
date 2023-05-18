@@ -6,24 +6,20 @@ export const LAYOUT_DIRECTION_VERTICAL = 'vertical';
 export const LAYOUT_DIRECTION_BOTH = 'both';
 
 export const layoutBoxArgTypes: {
-  horizontalAlign: ArgTypeDefinition<BoxProps, BoxProps['justifyContent']>;
-  verticalAlign: ArgTypeDefinition<BoxProps, BoxProps['alignItems']>;
+  horizontalAlign: ArgTypeDefinition<BoxProps, 'justifyContent'>;
+  verticalAlign: ArgTypeDefinition<BoxProps, 'alignItems'>;
 } = {
   horizontalAlign: {
-    typeDef: {
-      type: 'string',
-      enum: ['start', 'center', 'end', 'space-between', 'space-around', 'space-evenly'],
-      default: 'start',
-    },
+    type: 'string',
+    enum: ['start', 'center', 'end', 'space-between', 'space-around', 'space-evenly'],
+    default: 'start',
     label: 'Horizontal alignment',
     control: { type: 'HorizontalAlign' },
   },
   verticalAlign: {
-    typeDef: {
-      type: 'string',
-      enum: ['start', 'center', 'end', 'space-between', 'space-around', 'space-evenly'],
-      default: 'center',
-    },
+    type: 'string',
+    enum: ['start', 'center', 'end', 'space-between', 'space-around', 'space-evenly'],
+    default: 'center',
     label: 'Vertical alignment',
     control: { type: 'VerticalAlign' },
   },

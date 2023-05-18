@@ -1,4 +1,4 @@
-import Emitter from '@mui/toolpad-core/utils/Emitter';
+import { Emitter } from '@mui/toolpad-utils/events';
 import type { RuntimeEvents } from '@mui/toolpad-core';
 import type { AppCanvasState } from '.';
 import { TOOLPAD_BRIDGE_GLOBAL } from '../constants';
@@ -6,7 +6,7 @@ import type { PageViewState } from '../types';
 
 declare global {
   interface Window {
-    [TOOLPAD_BRIDGE_GLOBAL]?: ToolpadBridge;
+    [TOOLPAD_BRIDGE_GLOBAL]?: ToolpadBridge | ((bridge: ToolpadBridge) => void);
   }
 }
 
@@ -95,5 +95,8 @@ bridge.canvasEvents.on('ready', () => {
 });
 
 if (typeof window !== 'undefined') {
+  if (typeof window[TOOLPAD_BRIDGE_GLOBAL] === 'function') {
+    window[TOOLPAD_BRIDGE_GLOBAL](bridge);
+  }
   window[TOOLPAD_BRIDGE_GLOBAL] = bridge;
 }

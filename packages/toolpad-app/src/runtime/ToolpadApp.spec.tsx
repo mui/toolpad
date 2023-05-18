@@ -8,13 +8,15 @@ import createRuntimeState from '../createRuntimeState';
 import { bridge } from '../canvas/ToolpadBridge';
 import { BridgeContext } from '../canvas/BridgeContext';
 
+async function loadComponents() {
+  return {};
+}
+
 // More sensible default for these tests
 const waitFor: typeof waitForOrig = (waiter, options) =>
   waitForOrig(waiter, { timeout: 10000, ...options });
 
 function renderPage(initPage: (dom: appDom.AppDom, page: appDom.PageNode) => appDom.AppDom) {
-  const version = 'preview';
-
   let dom = appDom.createDom();
   const root = appDom.getNode(dom, dom.root, 'app');
   const page = appDom.createNode(dom, 'page', {
@@ -33,7 +35,7 @@ function renderPage(initPage: (dom: appDom.AppDom, page: appDom.PageNode) => app
 
   return render(
     <BridgeContext.Provider value={bridge}>
-      <ToolpadApp state={state} version={version} basename="toolpad" />
+      <ToolpadApp loadComponents={loadComponents} state={state} basename="toolpad" />
     </BridgeContext.Provider>,
   );
 }
@@ -98,7 +100,7 @@ test(`simple databinding`, async () => {
   const text = screen.getByText('Default Text');
   const textField = screen.getByLabelText('The Input');
 
-  act(() => {
+  await act(async () => {
     textField.focus();
     fireEvent.change(textField, { target: { value: 'Hello Everybody' } });
   });

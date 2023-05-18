@@ -43,7 +43,8 @@ _If you're looking into contributing to the docs, follow the [instructions](#bui
      "resolutions": {
        "@mui/toolpad-app": "portal:<your-local-toolpad-monorepo>/packages/toolpad-app",
        "@mui/toolpad-core": "portal:<your-local-toolpad-monorepo>/packages/toolpad-core",
-       "@mui/toolpad-components": "portal:<your-local-toolpad-monorepo>/packages/toolpad-components"
+       "@mui/toolpad-components": "portal:<your-local-toolpad-monorepo>/packages/toolpad-components",
+       "@mui/toolpad-utils": "portal:<your-local-toolpad-monorepo>/packages/toolpad-utils"
      }
    }
    ```
@@ -74,26 +75,6 @@ _If you're looking into contributing to the docs, follow the [instructions](#bui
    yarn dev
    ```
 
-### Notes for contributors
-
-- Changes that you make to the prisma model will be automatically compiled, but you'll have to push them to the db manually, either by restarting the `yarn dev` command, or by running
-
-  ```sh
-  yarn prisma db push
-  ```
-
-- In some cases, after the schema changes, the app may not start up and you may see the message:
-
-  ```sh
-  ⚠️  There might be data loss when applying the changes:
-  ```
-
-  This means your database is out of sync with the prisma schema and can't be synchronized without data loss. You can synchronize the database manually using:
-
-  ```sh
-  yarn prisma db push --accept-data-loss
-  ```
-
 ## Building and running the documentation
 
 1. If you haven't already, install the project dependencies using
@@ -116,9 +97,53 @@ _If you're looking into contributing to the docs, follow the [instructions](#bui
 
 1. Open the docs application in the browser [http://localhost:3003/toolpad](http://localhost:3003/toolpad)
 
+## Reviewing PRs
+
+- Check out the PR branch locally with your tool of choice ([GitHub Docs](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/reviewing-changes-in-pull-requests/checking-out-pull-requests-locally?tool=cli))
+- Run to build the project
+
+  ```sh
+  yarn && yarn release:build
+  ```
+
+- Run it on your project of choice
+
+  ```sh
+  yarn toolpad dev /path/to/my/toolpad/project
+  ```
+
+## Integration tests
+
+- To run Toolpad on a fixture
+
+  ```sh
+  yarn toolpad dev --dev ./path/to/fixture
+  ```
+
+- To run the tests locally in production mode
+
+  ```sh
+  yarn build:release
+  yarn test:integration --project chromium
+  ```
+
+- To run the tests locally in dev mode
+
+  ```sh
+  yarn dev
+  ```
+
+  then run
+
+  ```sh
+  TOOLPAD_NEXT_DEV=1 yarn test:integration --project chromium
+  ```
+
+- Use the `--ui` flag to run the tests interactively
+
 ## Sending a pull request
 
-Please have a look at our general guidelines for sending pull requests [here](https://mui-org.notion.site/GitHub-PRs-7112d03a6c4346168090b29a970c0154) and [here](https://github.com/mui/material-ui/blob/master/CONTRIBUTING.md#sending-a-pull-request).
+Please have a look at our general [guidelines](https://github.com/mui/material-ui/blob/master/CONTRIBUTING.md#sending-a-pull-request) for sending pull requests.
 
 ## Release process
 

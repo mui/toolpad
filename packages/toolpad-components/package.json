@@ -1,16 +1,26 @@
 {
   "name": "@mui/toolpad-components",
-  "version": "0.1.0",
+  "version": "0.1.12",
   "description": "Build MUI apps quickly",
   "author": "MUI Toolpad team",
   "homepage": "https://github.com/mui/mui-toolpad#readme",
   "license": "MIT",
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
   "type": "module",
   "exports": {
-    ".": "./dist/index.js",
-    "./package.json": "./package.json"
+    "./package.json": "./package.json",
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    },
+    "./*": {
+      "types": "./dist/*.d.ts",
+      "import": "./dist/*.js",
+      "require": "./dist/*.cjs"
+    }
   },
   "files": [
     "dist"
@@ -21,24 +31,26 @@
   },
   "scripts": {
     "prebuild": "rimraf dist",
-    "build": "tsc",
-    "dev": "tsc --pretty --watch --preserveWatchOutput",
-    "test": "echo \"Error: run tests from root\" && exit 1",
-    "check-types": "tsc"
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "check-types": "tsup && tsc --noEmit"
   },
   "bugs": {
     "url": "https://github.com/mui/mui-toolpad/issues"
   },
   "dependencies": {
-    "@mui/material": "^5.11.14",
-    "@mui/toolpad-core": "^0.1.0",
-    "@mui/x-data-grid-pro": "^6.0.2",
-    "@mui/x-date-pickers": "^6.0.2",
-    "dayjs": "^1.11.7",
-    "markdown-to-jsx": "^7.2.0"
+    "@mui/lab": "5.0.0-alpha.130",
+    "@mui/material": "5.13.1",
+    "@mui/toolpad-core": "^0.1.12",
+    "@mui/toolpad-utils": "^0.1.12",
+    "@mui/x-data-grid-pro": "6.4.0",
+    "@mui/x-date-pickers": "6.4.0",
+    "dayjs": "1.11.7",
+    "markdown-to-jsx": "7.2.0",
+    "react-error-boundary": "4.0.4"
   },
   "devDependencies": {
-    "react": "^18.2.0"
+    "react": "18.2.0"
   },
   "peerDependencies": {
     "react": "^18.0.0"
@@ -46,5 +58,5 @@
   "publishConfig": {
     "access": "public"
   },
-  "gitHead": "de68953329881ccd3aa40e82a7302c0baa38c3c5"
+  "gitHead": "0186b46c7abd26f06583227cc21d448baf11cd46"
 }

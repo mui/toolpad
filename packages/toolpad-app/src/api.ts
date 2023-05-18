@@ -8,7 +8,7 @@ import {
   UseQueryOptions,
   UseQueryResult,
 } from '@tanstack/react-query';
-import type { Definition, MethodsGroup, MethodsOf, ServerDefinition } from '../pages/api/rpc';
+import type { Definition, MethodsGroup, MethodsOf, ServerDefinition } from './server/rpc';
 import { createRpcClient } from './rpcClient';
 
 export const queryClient = new QueryClient({

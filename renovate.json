@@ -21,6 +21,10 @@
       "matchDepTypes": ["devDependencies"]
     },
     {
+      "groupName": "docs",
+      "matchFiles": ["docs/package.json"]
+    },
+    {
       "groupName": "MUI Core",
       "matchPackagePatterns": ["^@mui/"],
       "schedule": ["at any time"]
@@ -41,6 +45,13 @@
       "allowedVersions": "<=16"
     },
     {
+      "description": "Ignore nodejs in engines",
+      "matchPackageNames": ["node"],
+      "matchManagers": ["npm"],
+      "matchDepTypes": ["engines"],
+      "enabled": false
+    },
+    {
       "groupName": "react-inspector",
       "matchPackageNames": ["react-inspector"],
       "allowedVersions": "< 6.0.0"
@@ -49,6 +60,10 @@
       "groupName": "node-fetch",
       "matchPackageNames": ["node-fetch"],
       "allowedVersions": "< 3.0.0"
+    },
+    {
+      "groupName": "Next.js",
+      "matchPackageNames": ["next"]
     },
     {
       "groupName": "react-router",
@@ -78,21 +93,5 @@
   "vulnerabilityAlerts": {
     "schedule": ["at any time"],
     "addLabels": ["priority: important"]
-  },
-  "regexManagers": [
-    {
-      "fileMatch": ["^render.yml$"],
-      "matchStringsStrategy": "combination",
-      "matchStrings": ["- key: NODE_VERSION", "value: '(?<currentValue>.*)"],
-      "depNameTemplate": "node",
-      "datasourceTemplate": "docker"
-    },
-    {
-      "fileMatch": ["^.circleci/config.yml$"],
-      "matchStrings": ["mcr.microsoft.com/playwright:(?<currentValue>.*)"],
-      "packageNameTemplate": "mcr.microsoft.com/playwright",
-      "depNameTemplate": "playwright",
-      "datasourceTemplate": "docker"
-    }
-  ]
+  }
 }

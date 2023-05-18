@@ -1,15 +1,19 @@
 {
   "compilerOptions": {
-    "target": "es5",
-    "module": "commonjs",
-    "moduleResolution": "node16",
+    "target": "es2020",
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "lib": ["esnext"],
     "isolatedModules": true,
     "strict": true,
     "resolveJsonModule": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
     "noEmit": false,
-    "outDir": "./dist"
+    "rootDir": "src",
+    "outDir": "./dist",
+    "pretty": true,
+    "preserveWatchOutput": true
   },
-  "exclude": ["templates", "dist"]
+  "include": ["src/**/*.ts", "src/**/*.tsx"]
 }

@@ -1,5 +1,4 @@
 import * as React from 'react';
-import clsx from 'clsx';
 import DragIndicatorIcon from '@mui/icons-material/DragIndicator';
 import DeleteIcon from '@mui/icons-material/Delete';
 import ContentCopy from '@mui/icons-material/ContentCopy';
@@ -13,9 +12,6 @@ import {
   RECTANGLE_EDGE_LEFT,
   RECTANGLE_EDGE_RIGHT,
 } from '../../../../utils/geometry';
-import { useDom } from '../../../AppState';
-import { useToolpadComponent } from '../../toolpadComponents';
-import { getElementNodeComponentId } from '../../../../toolpadComponents';
 
 const HINT_POSITION_TOP = 'top';
 const HINT_POSITION_BOTTOM = 'bottom';
@@ -29,7 +25,6 @@ function stopPropagationHandler(event: React.SyntheticEvent) {
 }
 
 const nodeHudClasses = {
-  allowNodeInteraction: 'NodeHud_AllowNodeInteraction',
   selected: 'NodeHud_Selected',
   selectionHint: 'NodeHud_SelectionHint',
 };
@@ -45,9 +40,9 @@ const NodeHudWrapper = styled('div', {
   position: 'absolute',
   userSelect: 'none',
   outline: `1px dotted ${isOutlineVisible ? theme.palette.primary[500] : 'transparent'}`,
-  zIndex: 2,
+  zIndex: 80,
   '&:hover': {
-    outline: `2px dashed ${isHoverable ? 'transparent' : theme.palette.primary[500]}`,
+    outline: `2px dashed ${isHoverable ? theme.palette.primary[500] : 'transparent'}`,
   },
   [`.${nodeHudClasses.selected}`]: {
     position: 'absolute',
@@ -56,11 +51,7 @@ const NodeHudWrapper = styled('div', {
     outline: `2px solid ${theme.palette.primary[500]}`,
     left: 0,
     top: 0,
-    zIndex: 2,
-  },
-  [`&.${nodeHudClasses.allowNodeInteraction}`]: {
-    // block pointer-events so we can interact with the selection
-    pointerEvents: 'none',
+    zIndex: 80,
   },
 }));
 
@@ -93,7 +84,7 @@ const SelectionHintWrapper = styled('div', {
 const DraggableEdgeWrapper = styled('div')({
   userSelect: 'none',
   position: 'absolute',
-  zIndex: 3,
+  zIndex: 90,
 });
 
 const DraggableEdge = styled('div', {
@@ -134,19 +125,20 @@ const DraggableEdge = styled('div', {
     ...dynamicStyles,
     position: 'absolute',
     pointerEvents: 'initial',
-    zIndex: 3,
+    zIndex: 90,
   };
 });
 
 const ResizePreview = styled('div')(({ theme }) => ({
   backgroundColor: theme.palette.primary[500],
   opacity: 0.2,
-  zIndex: 3,
+  zIndex: 90,
 }));
 
 interface NodeHudProps {
   node: appDom.AppDomNode;
   rect: Rectangle;
+  selectedNodeRect: Rectangle | null;
   isSelected?: boolean;
   isInteractive?: boolean;
   onNodeDragStart?: React.DragEventHandler<HTMLElement>;
@@ -163,8 +155,9 @@ interface NodeHudProps {
 export default function NodeHud({
   node,
   rect,
+  selectedNodeRect,
   isSelected,
-  isInteractive,
+  isInteractive = false,
   onNodeDragStart,
   draggableEdges = [],
   onEdgeDragStart,
@@ -175,21 +168,43 @@ export default function NodeHud({
   isOutlineVisible = false,
   isHoverable = true,
 }: NodeHudProps) {
-  const { dom } = useDom();
-
-  const componentId = appDom.isElement(node) ? getElementNodeComponentId(node) : '';
-  const component = useToolpadComponent(dom, componentId);
-
   const hintPosition = rect.y > HUD_HEIGHT ? HINT_POSITION_TOP : HINT_POSITION_BOTTOM;
+
+  const interactiveNodeClipPath = React.useMemo(
+    () =>
+      isInteractive && selectedNodeRect
+        ? `
+            polygon(
+              -100% -100%, 
+              200% -100%,
+              200% 200%,
+              -100% 200%,
+              -100% ${selectedNodeRect.y - rect.y}px,
+              ${selectedNodeRect.x - rect.x}px ${selectedNodeRect.y - rect.y}px, 
+              ${selectedNodeRect.x - rect.x}px 
+              ${selectedNodeRect.y + selectedNodeRect.height - rect.y}px,
+              ${selectedNodeRect.x + selectedNodeRect.width - rect.x}px
+              ${selectedNodeRect.y + selectedNodeRect.height - rect.y}px, 
+              ${selectedNodeRect.x + selectedNodeRect.width - rect.x}px 
+              ${selectedNodeRect.y - rect.y}px,
+              -100% ${selectedNodeRect.y - rect.y}px
+          )`
+        : '',
+    [isInteractive, rect, selectedNodeRect],
+  );
 
   return (
     <React.Fragment>
       <NodeHudWrapper
         data-node-id={node.id}
-        style={absolutePositionCss(rect)}
-        className={clsx({
-          [nodeHudClasses.allowNodeInteraction]: isInteractive,
-        })}
+        style={{
+          ...absolutePositionCss(rect),
+          ...(interactiveNodeClipPath
+            ? {
+                clipPath: interactiveNodeClipPath,
+              }
+            : {}),
+        }}
         isOutlineVisible={isOutlineVisible}
         isHoverable={isHoverable}
       >
@@ -202,6 +217,7 @@ export default function NodeHud({
         <SelectionHintWrapper style={absolutePositionCss(rect)} hintPosition={hintPosition}>
           <div
             draggable
+            data-testid="node-hud-tag"
             className={nodeHudClasses.selectionHint}
             onDragStart={onNodeDragStart}
             role="presentation"
@@ -209,7 +225,7 @@ export default function NodeHud({
             onMouseDown={stopPropagationHandler}
             onMouseUp={stopPropagationHandler}
           >
-            {component?.displayName || '<unknown>'}
+            {node.name}
             <DragIndicatorIcon color="inherit" />
             <IconButton aria-label="Duplicate" color="inherit" onMouseUp={onDuplicate}>
               <Tooltip title="Duplicate" enterDelay={400}>

@@ -34,7 +34,7 @@ import {
   Popover,
 } from '@mui/material';
 import { getObjectKey } from '@mui/toolpad-core/objectKey';
-import { errorFrom } from '@mui/toolpad-core/utils/errors';
+import { errorFrom } from '@mui/toolpad-utils/errors';
 import { hasImageExtension } from '@mui/toolpad-core/path';
 import { ErrorBoundary, FallbackProps } from 'react-error-boundary';
 import { SX_PROP_HELPER_TEXT } from './constants.js';
@@ -223,7 +223,6 @@ interface CustomColumnProps {
 function CustomColumn({ params }: CustomColumnProps) {
   const { value, colDef, row, field } = params;
   const column = colDef as SerializableGridColumn;
-
   const components = useComponents();
   const Component = components[`codeComponent.${column.codeComponent}`];
 
@@ -393,10 +392,6 @@ interface Selection {
   id?: any;
 }
 
-interface OnDeleteEvent {
-  row: GridRowsProp[number];
-}
-
 interface ToolpadDataGridProps extends Omit<DataGridProProps, 'columns' | 'rows' | 'error'> {
   rows?: GridRowsProp;
   columns?: SerializableGridColumns;
@@ -405,7 +400,6 @@ interface ToolpadDataGridProps extends Omit<DataGridProProps, 'columns' | 'rows'
   error?: Error | string;
   selection?: Selection | null;
   onSelectionChange?: (newSelection?: Selection | null) => void;
-  onDelete?: (event: OnDeleteEvent) => void;
   hideToolbar?: boolean;
 }
 
@@ -565,7 +559,7 @@ const DataGridComponent = React.forwardRef(function DataGridComponent(
 
 export default createComponent(DataGridComponent, {
   helperText:
-    'The MUI X [Data grid](https://mui.com/x/react-data-grid/) component.\n\nThe datagrid lets users display tabular data in a flexible grid.',
+    'The MUI X [Data Grid](https://mui.com/x/react-data-grid/) component.\n\nThe datagrid lets users display tabular data in a flexible grid.',
   errorProp: 'error',
   loadingPropSource: ['rows', 'columns'],
   loadingProp: 'loading',
@@ -573,56 +567,53 @@ export default createComponent(DataGridComponent, {
   argTypes: {
     rows: {
       helperText: 'The data to be displayed as rows. Must be an array of objects.',
-      typeDef: { type: 'array', schema: '/schemas/DataGridRows.json' },
+      type: 'array',
+      schema: '/schemas/DataGridRows.json',
     },
     columns: {
       helperText: '',
-      typeDef: { type: 'array', schema: '/schemas/DataGridColumns.json' },
+      type: 'array',
+      schema: '/schemas/DataGridColumns.json',
       control: { type: 'GridColumns' },
     },
     rowIdField: {
       helperText:
         'Defines which column contains the [id](https://mui.com/x/react-data-grid/row-definition/#row-identifier) that uniquely identifies each row.',
-      typeDef: { type: 'string' },
+      type: 'string',
       control: { type: 'RowIdFieldSelect' },
       label: 'Id field',
     },
     selection: {
       helperText: 'The currently selected row. Or `null` in case no row has been selected.',
-      typeDef: { type: 'object', default: null },
+      type: 'object',
+      default: null,
       onChangeProp: 'onSelectionChange',
+      tsType: `ThisComponent['rows'][number] | undefined`,
     },
     density: {
       helperText:
         'The [density](https://mui.com/x/react-data-grid/accessibility/#density-prop) of the rows. Possible values are `compact`, `standard`, or `comfortable`.',
-      typeDef: { type: 'string', enum: ['compact', 'standard', 'comfortable'], default: 'compact' },
+      type: 'string',
+      enum: ['compact', 'standard', 'comfortable'],
+      default: 'compact',
     },
     height: {
-      typeDef: { type: 'number', default: 350, minimum: 100 },
+      type: 'number',
+      default: 350,
+      minimum: 100,
     },
     loading: {
       helperText:
         "Displays a loading animation indicating the datagrid isn't ready to present data yet.",
-      typeDef: { type: 'boolean' },
+      type: 'boolean',
     },
     hideToolbar: {
       helperText: 'Hide the toolbar area that contains the data grid user controls.',
-      typeDef: { type: 'boolean' },
+      type: 'boolean',
     },
     sx: {
       helperText: SX_PROP_HELPER_TEXT,
-      typeDef: { type: 'object' },
-    },
-    onDelete: {
-      typeDef: {
-        type: 'event',
-        arguments: [
-          {
-            name: 'event',
-            tsType: `{ row: ThisComponent['rows'][number] }`,
-          },
-        ],
-      },
+      type: 'object',
     },
   },
 });

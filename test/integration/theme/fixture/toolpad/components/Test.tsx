@@ -13,7 +13,8 @@ function Test({ msg }: TestProps) {
 export default createComponent(Test, {
   argTypes: {
     msg: {
-      typeDef: { type: 'string', default: 'Hello world!' },
+      type: 'string',
+      default: 'Hello world!',
     },
   },
 });

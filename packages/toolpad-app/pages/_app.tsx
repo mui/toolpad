@@ -1,14 +1,12 @@
 import * as React from 'react';
 import Head from 'next/head';
-import App, { AppContext, AppProps, NextWebVitalsMetric } from 'next/app';
+import App, { AppContext, AppProps } from 'next/app';
 import { CacheProvider, EmotionCache } from '@emotion/react';
 import { QueryClientProvider } from '@tanstack/react-query';
 import { LicenseInfo } from '@mui/x-data-grid-pro';
-import { useRouter } from 'next/router';
 import createEmotionCache from '../src/createEmotionCache';
 import { MUI_X_PRO_LICENSE } from '../src/constants';
 import { queryClient } from '../src/api';
-import { reportWebVitalsToGA, setGAPage } from '../src/utils/ga';
 import '../src/appStyles.css';
 import 'perf-cascade/dist/perf-cascade.css';
 
@@ -21,28 +19,12 @@ LicenseInfo.setLicenseKey(MUI_X_PRO_LICENSE);
 // Client-side cache, shared for the whole session of the user in the browser.
 const clientSideEmotionCache = createEmotionCache();
 
-export const reportWebVitals = (metric: NextWebVitalsMetric): void => {
-  reportWebVitalsToGA(metric);
-};
-
 interface MyAppProps extends AppProps {
   emotionCache?: EmotionCache;
 }
 
 export default function MyApp(props: MyAppProps) {
   const { Component, emotionCache = clientSideEmotionCache, pageProps } = props;
-
-  const router = useRouter();
-
-  React.useEffect(() => {
-    router.events.on('routeChangeComplete', setGAPage);
-    router.events.on('hashChangeComplete', setGAPage);
-
-    return () => {
-      router.events.off('routeChangeComplete', setGAPage);
-      router.events.off('hashChangeComplete', setGAPage);
-    };
-  }, [router.events]);
 
   return (
     <CacheProvider value={emotionCache}>

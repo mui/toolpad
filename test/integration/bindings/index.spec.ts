@@ -41,3 +41,11 @@ test('global scope', async ({ page }) => {
   await expect(page.getByText('|test4 ok|')).toBeVisible();
   await expect(page.getByText('|test5 ok|')).toBeVisible();
 });
+
+test('charset', async ({ page }) => {
+  const runtimeModel = new ToolpadRuntime(page);
+  await runtimeModel.gotoPage('charset');
+
+  const test1 = page.getByText('Can pass utf-8: "€"');
+  await expect(test1).toBeVisible();
+});

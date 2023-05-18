@@ -20,7 +20,7 @@ export const echo = createFunction(
   {
     parameters: {
       foo: {
-        typeDef: { type: 'string' },
+        type: 'string',
       },
     },
   },

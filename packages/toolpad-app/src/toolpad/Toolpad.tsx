@@ -46,6 +46,7 @@ export interface ToolpadProps {
 
 export default function Toolpad({ basename }: ToolpadProps) {
   const paletteMode = usePaletteMode();
+
   return (
     <NoSsr>
       <ThemeProvider>

@@ -9,7 +9,7 @@ import { execQuery, dataSourceFetchPrivate } from './data';
 import { getVersionInfo } from './versionInfo';
 import logger from './logs/logger';
 import { createComponent, deletePage, openCodeComponentEditor } from './localMode';
-import { getDomFingerprint, loadDom, saveDom } from './liveProject';
+import { loadDom, saveDom } from './liveProject';
 import { asyncHandler } from '../utils/http';
 
 export interface Method<P extends any[] = any[], R = any> {
@@ -131,9 +131,6 @@ export const rpcServer = {
     }),
     getVersionInfo: createMethod<typeof getVersionInfo>(({ params }) => {
       return getVersionInfo(...params);
-    }),
-    getDomFingerprint: createMethod<typeof getDomFingerprint>(({ params }) => {
-      return getDomFingerprint(...params);
     }),
   },
   mutation: {

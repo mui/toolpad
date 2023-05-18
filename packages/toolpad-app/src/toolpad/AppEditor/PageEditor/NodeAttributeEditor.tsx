@@ -15,7 +15,6 @@ import { useDom, useDomApi } from '../../AppState';
 import BindableEditor from './BindableEditor';
 import { usePageEditorState } from './PageEditorProvider';
 import { getDefaultControl } from '../../propertyControls';
-import MarkdownTooltip from '../../../components/MarkdownTooltip';
 import { isTemplateDescendant } from '../../../toolpadComponents/template';
 import { NON_BINDABLE_CONTROL_TYPES } from '../../../runtime/constants';
 

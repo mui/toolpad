@@ -18,9 +18,9 @@
 
 - **HTTP method** - by default GET is used, but you can also use the POST, PUT, DELETE, PATCH, and HEAD methods.
 
-- **url** - is an endpoint to which requests will be made. You also have an option to dynamically generate url by using [data binding](/toolpad/data-binding/). **Parameters** can be accessed by using **query** object inside url data binding editor.
+- **url** - is an endpoint to which requests will be made. You also have an option to dynamically generate url by using [data binding](/toolpad/data-binding/binding-state/). **Parameters** can be accessed by using **query** object inside url data binding editor.
 
-- **parameters** - allows us to use [data bound](/toolpad/data-binding/) properties which can then be used to construct dynamic **url** values.
+- **parameters** - allows us to use [data bound](/toolpad/data-binding/binding-state/) properties which can then be used to construct dynamic **url** values.
 
    <img src="/static/toolpad/docs/fetch/query-3.png?v=0" alt="Dynamic url" width="915" />
 

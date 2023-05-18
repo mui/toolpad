@@ -72,6 +72,16 @@ const pages: MuiPage[] = [
   {
     pathname: '/toolpad/data-binding',
     icon: LinkIcon,
+    children: [
+      {
+        pathname: '/toolpad/data-binding/binding-state',
+        title: 'Binding state',
+      },
+      {
+        pathname: '/toolpad/data-binding/event-handling',
+        title: 'Event handling',
+      },
+    ],
   },
   {
     pathname: '/toolpad/deployment',

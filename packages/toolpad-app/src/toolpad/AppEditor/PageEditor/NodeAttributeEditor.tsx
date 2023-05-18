@@ -53,7 +53,6 @@ export default function NodeAttributeEditor<P extends object>({
 
   const liveBinding = bindings[bindingId];
 
-  const propType = argType;
   const Control = getDefaultControl(argType, props);
 
   // NOTE: Doesn't make much sense to bind controlled props. In the future we might opt
@@ -91,21 +90,19 @@ export default function NodeAttributeEditor<P extends object>({
       label={argType.label || name}
       bindable={isBindable}
       disabled={isDisabled}
-      propType={propType}
+      propType={argType}
       jsRuntime={jsBrowserRuntime}
       renderControl={(params) => (
-        <MarkdownTooltip placement="left" title={argType.helperText ?? ''}>
-          <Box sx={{ flex: 1 }}>
-            <Control nodeId={node.id} {...params} propType={propType} />
-          </Box>
-        </MarkdownTooltip>
+        <Box sx={{ flex: 1 }}>
+          <Control nodeId={node.id} {...params} propType={argType} />
+        </Box>
       )}
       value={propValue}
       onChange={handlePropChange}
     />
   ) : (
     <Alert severity="warning">
-      {`No control for '${name}' (type '${propType.type}' ${
+      {`No control for '${name}' (type '${argType.type}' ${
         argType.control ? `, control: '${argType.control.type}'` : ''
       })`}
     </Alert>

@@ -84,6 +84,11 @@ export interface ValueTypeBase {
    * A default value for the property.
    */
   default?: unknown;
+  /**
+   * A short explanatory text that'll be shown in the editor UI when this property is referenced.
+   * May contain Markdown.
+   */
+  helperText?: string;
 }
 
 export interface AnyValueType extends ValueTypeBase {
@@ -249,11 +254,6 @@ export type ArgTypeDefinition<
   P extends object = {},
   K extends keyof P = keyof P,
 > = PropValueType & {
-  /**
-   * A short explanatory text that'll be shown in the editor UI when this property is referenced.
-   * May contain Markdown.
-   */
-  helperText?: string;
   /**
    * To be used instead of the property name for UI purposes in the editor.
    */

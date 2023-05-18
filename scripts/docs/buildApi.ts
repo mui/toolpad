@@ -58,12 +58,40 @@ export default function Page() {
   );
 }
 
+function getSymbolIsDeprecated(symbol: ts.Symbol, checker: ts.TypeChecker) {
+  return symbol.getJsDocTags(checker).some((tag) => tag.name === 'deprecated');
+}
+
+function getSymbolDescription(symbol: ts.Symbol, checker: ts.TypeChecker) {
+  return symbol
+    .getDocumentationComment(checker)
+    .map((comment) => comment.text)
+    .join('\n\n');
+}
+
+const stringifySymbol = (symbol: ts.Symbol, checker: ts.TypeChecker) => {
+  let rawType: string;
+
+  const declaration = symbol.declarations?.[0];
+  if (declaration && ts.isPropertySignature(declaration)) {
+    rawType = declaration.type?.getText() ?? '';
+  } else {
+    rawType = checker.typeToString(
+      checker.getTypeOfSymbolAtLocation(symbol, symbol.valueDeclaration!),
+      symbol.valueDeclaration,
+      ts.TypeFormatFlags.NoTruncation,
+    );
+  }
+
+  return rawType;
+};
+
 export async function buildInterfaceDocs() {
   const corePackageRoot = path.resolve(projectRoot, 'packages/toolpad-core');
   const tsconfigPath = path.resolve(corePackageRoot, 'tsconfig.json');
   const entries = [
-    path.resolve(corePackageRoot, 'src/server.ts'),
-    path.resolve(corePackageRoot, 'src/browser.tsx'),
+    { entrypoint: path.resolve(corePackageRoot, 'src/server.ts') },
+    { entrypoint: path.resolve(corePackageRoot, 'src/browser.tsx') },
   ];
 
   const tsconfigFile = ts.readConfigFile(tsconfigPath, (filePath) =>
@@ -85,28 +113,35 @@ export async function buildInterfaceDocs() {
   }
 
   const program = ts.createProgram({
-    rootNames: entries,
+    rootNames: entries.map((entry) => entry.entrypoint),
     options: tsconfigFileContent.options,
   });
 
   const checker = program.getTypeChecker();
 
-  const allExports = entries.map((entryPointPath) => {
-    const sourceFile = program.getSourceFile(entryPointPath);
+  const allExports = entries.map(({ entrypoint }) => {
+    const sourceFile = program.getSourceFile(entrypoint);
 
     const exports = Object.fromEntries(
       checker.getExportsOfModule(checker.getSymbolAtLocation(sourceFile!)!).map((symbol) => {
-        return [symbol.name, symbol];
+        console.log(symbol.name, stringifySymbol(symbol, checker));
+        return [
+          symbol.name,
+          {
+            // symbol,
+            name: symbol.name,
+            description: getSymbolDescription(symbol, checker),
+            deprecated: getSymbolIsDeprecated(symbol, checker),
+          },
+        ];
       }),
     );
 
-    return [entryPointPath, exports];
+    return [entrypoint, exports];
   });
 
-  console.log(allExports);
+  console.log(JSON.stringify(allExports, null, 2));
 }
-
-console.log(toolpadCore);
 
 async function main() {
   await buildInterfaceDocs();

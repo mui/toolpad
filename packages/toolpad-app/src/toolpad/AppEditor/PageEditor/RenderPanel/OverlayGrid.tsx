@@ -4,6 +4,7 @@ import invariant from 'invariant';
 import { usePageEditorState } from '../PageEditorProvider';
 import { useDom } from '../../../AppState';
 import { createToolpadAppTheme } from '../../../../runtime/AppThemeProvider';
+import { absolutePositionCss } from '../../../../utils/geometry';
 
 export interface OverlayGridHandle {
   gridElement: HTMLDivElement | null;
@@ -16,8 +17,8 @@ export const GRID_NUMBER_OF_COLUMNS = 12;
 export const GRID_COLUMN_GAP = 1;
 
 const GridContainer = styled('div')({
-  margin: '0 auto',
   pointerEvents: 'none',
+  position: 'absolute',
   zIndex: 1,
 });
 
@@ -81,7 +82,7 @@ export const OverlayGrid = React.forwardRef<OverlayGridHandle>(function OverlayG
   const pageChildrenSlotRect = pageNode?.slots?.children?.rect;
 
   return pageChildrenSlotRect ? (
-    <GridContainer style={{ width: pageChildrenSlotRect.width, height: '100%' }}>
+    <GridContainer style={{ ...absolutePositionCss(pageChildrenSlotRect), height: '100%' }}>
       <StyledGrid ref={gridRef} container columnSpacing={appTheme.spacing(GRID_COLUMN_GAP)}>
         {[...Array(GRID_NUMBER_OF_COLUMNS)].map((column, index) => (
           <Grid key={index} item xs={1}>

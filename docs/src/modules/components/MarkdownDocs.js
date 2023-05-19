@@ -1,16 +1,18 @@
 import * as React from 'react';
 import PropTypes from 'prop-types';
 import path from 'path';
-import { useRouter } from 'next/router';
 import { useTheme } from '@mui/system';
 import { exactProp } from '@mui/utils';
-import { CssVarsProvider, useColorScheme } from '@mui/joy/styles';
+import { styled } from '@mui/material/styles';
+import Button from '@mui/material/Button';
+import Dialog from '@mui/material/Dialog';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
 import Demo from 'docs/src/modules/components/Demo';
+import useMediaQuery from '@mui/material/useMediaQuery';
 import MarkdownElement from 'docs/src/modules/components/MarkdownElement';
-import { pathnameToLanguage } from 'docs/src/modules/utils/helpers';
 import AppLayoutDocs from 'docs/src/modules/components/AppLayoutDocs';
 import { useTranslate, useUserLanguage } from 'docs/src/modules/utils/i18n';
-import BrandingProvider from 'docs/src/BrandingProvider';
 import Ad from 'docs/src/modules/components/Ad';
 import AdGuest from 'docs/src/modules/components/AdGuest';
 
@@ -20,30 +22,111 @@ function noComponent(moduleID) {
   };
 }
 
-function JoyModeObserver({ mode }) {
-  const { setMode } = useColorScheme();
-  React.useEffect(() => {
-    setMode(mode);
-  }, [mode, setMode]);
-  return null;
-}
-
-JoyModeObserver.propTypes = {
-  mode: PropTypes.oneOf(['light', 'dark']),
+const classes = {
+  imageContainer: 'MuiToolpadDocs-ImageContainer',
+  enlargeIcon: 'MuiToolpadDocs-EnlargeIcon',
+  fullSizeImage: 'MuiToolpadDocs-FullSizeImage',
+  fullSizeImageDialog: 'MuiToolpadDocs-FullSizeImageDialog',
+  fullSizeImageDialogTitle: 'MuiToolpadDocs-FullSizeImageDialogTitle',
+  fullSizeImageDialogCloseButton: 'MuiToolpadDocs-FullSizeImageDialogCloseButton',
 };
+
+const Root = styled('div')(
+  ({ theme }) => {
+    const isMdUp = useMediaQuery(theme.breakpoints.up('md'));
+    return {
+      '& .markdown-body': {
+        lineHeight: 1.7,
+      },
+      '& .arcade': {
+        position: 'relative',
+        paddingBottom: 'calc(54.79166666666667% + 41px)',
+        height: 0,
+      },
+      [`& .${classes.imageContainer}`]: {
+        position: 'relative',
+        display: 'inline-block',
+        cursor: 'pointer',
+      },
+
+      '& img, & video': {
+        border: `1px solid ${theme.palette.divider}`,
+        marginTop: theme.spacing(3),
+        marginBottom: theme.spacing(2),
+        marginLeft: 'auto',
+        marginRight: 'auto',
+
+        // Override styles defined in MarkdownElement
+        borderRadius: '4px!important',
+        display: 'block!important',
+      },
+
+      [`& .${classes.imageContainer}:hover .${classes.enlargeIcon}`]: {
+        // breakpoints
+        opacity: isMdUp ? 0.7 : 0,
+      },
+
+      [`& .${classes.enlargeIcon}`]: {
+        position: 'absolute',
+        top: '50%',
+        left: '50%',
+        transform: 'translate(-50%, -50%)',
+        width: 40,
+        height: 40,
+        backgroundImage: 'url(/static/icons/enlarge.svg)',
+        backgroundPosition: 'center',
+        backgroundRepeat: 'no-repeat',
+        opacity: 0,
+        transition: 'opacity 0.3s',
+      },
+
+      '& .image-caption': {
+        fontSize: theme.typography.pxToRem(13),
+        marginTop: 0,
+        marginBottom: theme.spacing(2),
+        textAlign: 'center',
+        color: (theme.vars || theme).palette.grey[700],
+        '& a': {
+          color: 'inherit',
+          textDecoration: 'underline',
+        },
+      },
+    };
+  },
+  ({ theme }) =>
+    theme.applyDarkStyles({
+      // '& img, & video, & .arcade': {
+      //   boxShadow: `0 0 10px ${theme.palette.grey[700]}`,
+      // },
+      '& .image-caption': {
+        color: (theme.vars || theme).palette.grey[500],
+      },
+    }),
+);
+
+const ImageViewer = styled(Dialog)(({ theme }) => ({
+  [`& .${classes.fullSizeImageDialog}`]: {
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    height: '100%',
+    width: '100%',
+    paddingBottom: 0,
+  },
+  [`& .${classes.fullSizeImage}`]: {
+    maxWidth: '100%',
+    maxHeight: '100%',
+    border: `1px solid ${theme.palette.divider}`,
+    borderRadius: 4,
+  },
+}));
 
 export default function MarkdownDocs(props) {
   const theme = useTheme();
-  const router = useRouter();
-  const { canonicalAs } = pathnameToLanguage(router.asPath);
+
   const {
     disableAd = false,
     disableToc = false,
-    /**
-     * Some Joy pages, e.g. Joy theme builder, should not be a nested CssVarsProvider to control its own state.
-     * This config will skip the CssVarsProvider at the root of the page.
-     */
-    disableCssVarsProvider = false,
     demos = {},
     docs,
     demoComponents,
@@ -56,9 +139,32 @@ export default function MarkdownDocs(props) {
   const localizedDoc = docs[userLanguage] || docs.en;
   const { description, location, rendered, title, toc } = localizedDoc;
 
-  const isJoy = canonicalAs.startsWith('/joy-ui/') && !disableCssVarsProvider;
-  const Provider = isJoy ? CssVarsProvider : React.Fragment;
-  const Wrapper = isJoy ? BrandingProvider : React.Fragment;
+  const isMdUp = useMediaQuery(theme.breakpoints.up('md'));
+
+  const [imageViewerOpen, setImageViewerOpen] = React.useState(false);
+  const [imageViewerSrc, setImageViewerSrc] = React.useState(null);
+
+  const handleImageViewerOpen = React.useCallback(
+    (event) => {
+      let src = event.target.currentSrc;
+      if (isMdUp) {
+        if (event.target.tagName === 'SPAN') {
+          src = event.target.previousElementSibling.currentSrc;
+        }
+        setImageViewerOpen(true);
+        setImageViewerSrc(src);
+      }
+    },
+    [isMdUp],
+  );
+
+  if (typeof window !== 'undefined') {
+    window.handleImageViewerOpen = handleImageViewerOpen;
+  }
+
+  const handleImageViewerClose = React.useCallback(() => {
+    setImageViewerOpen(false);
+  }, []);
 
   return (
     <AppLayoutDocs
@@ -69,21 +175,18 @@ export default function MarkdownDocs(props) {
       title={title}
       toc={toc}
     >
-      <Provider>
+      <Root>
         {disableAd ? null : (
-          <Wrapper>
-            <AdGuest>
-              <Ad />
-            </AdGuest>
-          </Wrapper>
+          <AdGuest>
+            <Ad />
+          </AdGuest>
         )}
-        {isJoy ? <JoyModeObserver mode={theme.palette.mode} /> : null}
         {rendered.map((renderedMarkdownOrDemo, index) => {
           if (typeof renderedMarkdownOrDemo === 'string') {
             return (
-              <Wrapper key={index} {...(isJoy && { mode: theme.palette.mode })}>
+              <React.Fragment key={index}>
                 <MarkdownElement renderedMarkdown={renderedMarkdownOrDemo} />
-              </Wrapper>
+              </React.Fragment>
             );
           }
 
@@ -96,9 +199,9 @@ export default function MarkdownDocs(props) {
             }
 
             return (
-              <Wrapper key={index} {...(isJoy && { mode: theme.palette.mode })}>
+              <React.Fragment key={index}>
                 <Component {...renderedMarkdownOrDemo} markdown={localizedDoc} />
-              </Wrapper>
+              </React.Fragment>
             );
           }
 
@@ -154,7 +257,26 @@ export default function MarkdownDocs(props) {
             />
           );
         })}
-      </Provider>
+        <ImageViewer
+          open={imageViewerOpen}
+          onClose={handleImageViewerClose}
+          maxWidth="lg"
+          fullWidth
+        >
+          <DialogContent className={classes.fullSizeImageDialog}>
+            <img src={imageViewerSrc} className={classes.fullSizeImage} alt="Sup" />
+          </DialogContent>
+          <DialogActions>
+            <Button
+              size="small"
+              className={classes.fullSizeImageDialogCloseButton}
+              onClick={handleImageViewerClose}
+            >
+              Close
+            </Button>
+          </DialogActions>
+        </ImageViewer>
+      </Root>
     </AppLayoutDocs>
   );
 }

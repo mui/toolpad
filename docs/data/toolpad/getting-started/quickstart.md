@@ -23,7 +23,7 @@ Make sure to [install Node.js](https://nodejs.org/en) on your system.
 
 Interactive walkthrough of the app building process:
 
-<div style="position: relative; padding-bottom: calc(54.79166666666667% + 41px); height: 0;"><iframe src="https://demo.arcade.software/BhTsUpHyAYGApTZ2mFNj?embed" frameborder="0" loading="lazy" webkitallowfullscreen mozallowfullscreen allowfullscreen style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;color-scheme: light;" title="Default page | Toolpad editor"></iframe></div>
+<div class="arcade"><iframe src="https://demo.arcade.software/BhTsUpHyAYGApTZ2mFNj?embed" frameborder="0" loading="lazy" webkitallowfullscreen mozallowfullscreen allowfullscreen style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;color-scheme: light;" title="Default page | Toolpad editor"></iframe></div>
 
 ## Detailed steps
 
@@ -46,72 +46,163 @@ Interactive walkthrough of the app building process:
 
 ### Assemble the UI
 
-1. Hover over **Component library** and drag Data Grid component into **Canvas**. Now repeat the process and drag an Image component on the **Canvas** as well. When you're done, the canvas should look like:
+1. Hover over the component library and drag a **Data Grid** component into the canvas. Now repeat the process and drag an **Image** component as well. When you're done, the canvas should look like this:
 
-   <img src="/static/toolpad/docs/quickstart/step-2.png" alt="Drag components" width="1512" />
+   <div class="MuiToolpadDocs-ImageContainer" onClick="window.handleImageViewerOpen(event)">
+      <img src="/static/toolpad/docs/quickstart/step-2.png" alt="Drag components"  />
+      <span class="MuiToolpadDocs-EnlargeIcon">    
+      </span>
+   </div>
 
-   This will be the user interface of our application. Next we'll proceed with connecting it to backend data.
+   <p class="image-caption">The Toolpad editor with components dragged</p>
 
-1. Click anywhere inside **Canvas** (except on the components that you just added) to deselect all components.
+### Fetch data
 
-1. Locate **Add query** button inside **Inspector**
+1. Click anywhere inside the canvas (except on the components that you just added) to deselect all components.
 
-   <img src="/static/toolpad/docs/quickstart/step-3.png" alt="Add query" width="284" />
+1. Locate the **Add query** button inside the inspector. Press it and choose **HTTP request**.
 
-   Press the button and choose "HTTP request".
+   <img src="/static/toolpad/docs/quickstart/step-3.png" alt="Choose HTTP request"  />
 
-   <img src="/static/toolpad/docs/quickstart/step-3b.png" alt="Choose HTTP request" width="464" />
+   <p class="image-caption">The Add query menu</p>
 
-1. We'll be using the [open source dog API](https://dog.ceo/dog-api/) for our example. First give the query a name "dogQuery". The name must be unique in the page. Then set `https://dog.ceo/api/breeds/list/all` as the **URL**. The HTTP method can be left at GET. Click the preview button to inspect the result of this request. If all went well it should like like this:
+1. We'll be using the [dog API](https://dog.ceo/dog-api/) for this tutorial. First give the query a unique name: `dogQuery`. Then, set `https://dog.ceo/api/breeds/list/all` as the **URL**. Click the **Preview** button to inspect the result of this request, and expand the `message` object in the response. If all went well, it will look like this:
 
-   <img src="/static/toolpad/docs/quickstart/step-5.png?v=0" alt="Fetch URL"/>
+   <div class="MuiToolpadDocs-ImageContainer" onClick="window.handleImageViewerOpen(event)">
+      <img src="/static/toolpad/docs/quickstart/step-5.png" alt="Fetch URL"/>
+      <span class="MuiToolpadDocs-EnlargeIcon">    
+      </span>
+   </div>
 
-1. APIs expose data in different shapes and forms. As you can see, this API returns an object containing a `message` property. This is not ideal for displaying in a datagrid. Luckily we can freely transform this data serverside. To do so choose the **Transform** tab and enable the **Transform response** option. Add the expression `return Object.entries(data.message)` in the editor. Click **Preview** again to verify the result.
+   <p class="image-caption">The dog API response</p>
 
-   <img src="/static/toolpad/docs/quickstart/step-6.png?v=0" alt="Transform response" width="698" />
+1. To transform the response according to our needs, we choose the **Transform** tab and enable the **Transform response** option. Write the JavaScript expression:
 
-1. **Save** the query and close the editor to get back to the **Canvas**. The result of this HTTP request will now be available as state on the page. You'll learn how to bind the user interface to this state next.
+   ```js
+   return Object.entries(data.message);
+   ```
 
-1. Click the Data Grid component to select it.
+in the editor. Click **Preview** again to verify the result.
 
-1. Find the "rows" property in the **Inspector**. Notice there's a small link icon to the right of it. All bindable properties in Toolpad can be bound to state on the page. You can identify bindable properties by this link icon.
+   <div class="MuiToolpadDocs-ImageContainer" onClick="window.handleImageViewerOpen(event)">
+      <img src="/static/toolpad/docs/quickstart/step-6.png" alt="Transform response"   />
+      <span class="MuiToolpadDocs-EnlargeIcon">    
+      </span>
+   </div>
 
-   <img src="/static/toolpad/docs/quickstart/step-7.png" alt="Bind data" width="295" />
+   <p class="image-caption">The dog API data transformed</p>
 
-   Click the icon to open the binding editor. On the left you'll see a list of all bindable state in the page, on the right there's a code editor that accepts any JavaScript expression. All bindable state is available in the scope of this expression.
+### Bind data to UI
 
-1. Use a `dogQuery` variable available in the scope as a binding expression.
+1. Save the query and close the query editor. Next, we will bind this data to components on the page. Click the **Data Grid** component to select it.
+
+1. Find the **rows** property in the inspector. Notice that there's a small **Bind** button to its right. Properties with this button next to them can be bound to state available on the page:
+
+   <img src="/static/toolpad/docs/quickstart/step-7.png" alt="Bind data" width="300"/>
+   <p class="image-caption">The bindable rows property</p>
+
+1. Click the button to open the binding editor. On the left you'll see a list of all bindable state in the page and on the right there's a code editor that accepts any JavaScript expression.
+
+1. Use the `dogQuery` available in the scope as a binding expression.
 
    ```js
    dogQuery.data;
    ```
 
-   then click **Update binding**
+   save the binding and close the binding editor.
 
-   <img src="/static/toolpad/docs/quickstart/step-8.png?v=0" alt="dogQuery.data" width="1192" />
+   <div class="MuiToolpadDocs-ImageContainer" onClick="window.handleImageViewerOpen(event)">
+      <img src="/static/toolpad/docs/quickstart/step-8.png" alt="dogQuery.data" />
+      <span class="MuiToolpadDocs-EnlargeIcon">    
+      </span>
+   </div>
 
-   If all went well, the DataGrid should now display the data from the HTTP request
+   <p class="image-caption">The binding editor</p>
 
-   <img src="/static/toolpad/docs/quickstart/step-9.png" alt="Connected data" width="1512" />
+1. If all went well, the Data Grid will now display the data from our query:
 
-1. Now let's make our app interactive by displaying a random image of the selected breed. We'll create a dynamic query which reacts to the selection inside Data Grid component. Click **Add query** and select "HTTP request" again. Name it "imageQuery" and add a parameter "breed"
+   <div class="MuiToolpadDocs-ImageContainer" onClick="window.handleImageViewerOpen(event)">
+      <img src="/static/toolpad/docs/quickstart/step-9.png" alt="Connected data/>
+      <span class="MuiToolpadDocs-EnlargeIcon">    
+      </span>
+   </div>
 
-   <img src="/static/toolpad/docs/quickstart/step-10.png" alt="Breed parameter" width="707" />
+   <p class="image-caption">The Data Grid with bound data</p>
 
-   Bind the breed parameter value to `dataGrid.selection?.[0] ?? 'akita'`. This will use the selected value from `dataGrid` and defaults to the "akita" breed when no row has been selected.
+### Make the app interactive
 
-   <img src="/static/toolpad/docs/quickstart/step-11.png" alt="Breed binding" width="1191" />
+1. Now, we can make this app interactive by displaying a random image of the selected breed. We'll create another query which reacts to the selection inside the Data Grid component. Deselect all components and click on **Add query** &rarr; **HTTP request**. Name it "imageQuery" and add a `breed` parameter in the **Parameters** section on the bottom:
 
-   Then bind the query **URL** to
+   <div class="MuiToolpadDocs-ImageContainer" onClick="window.handleImageViewerOpen(event)">
+      <img src="/static/toolpad/docs/quickstart/step-10.png" alt="Breed parameter" />
+      <span class="MuiToolpadDocs-EnlargeIcon">    
+      </span>
+   </div>
+
+   <p class="image-caption">Editing imageQuery</p>
+
+2. Click on the **Bind** button next to the breed parameter value, and add the following JavaScript expression in the binding editor:
+
+   ```jsx
+   dataGrid.selection?.[0] ?? 'akita';
+   ```
+
+   This will use the selected value from the Data Grid, and default to the "akita" breed when no row has been selected.
+
+   <div class="MuiToolpadDocs-ImageContainer" onClick="window.handleImageViewerOpen(event)">
+      <img src="/static/toolpad/docs/quickstart/step-11.png" alt="Breed binding"  />
+      <span class="MuiToolpadDocs-EnlargeIcon">    
+      </span>
+   </div>
+
+   <p class="image-caption">Binding `breed` to the selected value</p>
+
+3. Then bind the query **URL** to the following JavaScript expression:
 
    ```js
    `https://dog.ceo/api/breed/${parameters.breed}/images/random`;
    ```
 
-   <img src="/static/toolpad/docs/quickstart/step-12.png?v=0" alt="url binding" width="1191" />
+   <div class="MuiToolpadDocs-ImageContainer" onClick="window.handleImageViewerOpen(event)">
+      <img src="/static/toolpad/docs/quickstart/step-12.png" alt="url binding"/>
+      <span class="MuiToolpadDocs-EnlargeIcon">    
+      </span>
+   </div>
 
-   Click **Update binding** to exit the query editor.
+   <p class="image-caption">Binding the URL to a JavaScript expression</p>
 
-1. In the **canvas** select the Image component and bind **src** prop to `imageQuery.data.message`. Try selecting different rows in the datagrid to see the image update to a random image of the selected breed.
+4. Save the binding and close the binding editor. Save the query and exit the query editor.
 
-   <img src="/static/toolpad/docs/quickstart/step-13.png" alt="Preview image" width="1511" />
+5. In the canvas select the **Image** component to view its properties in the inspector. Click on the **Bind** button next to the **src** prop to open the binding editor, and bind it to `imageQuery.data.message`.
+
+   <div class="MuiToolpadDocs-ImageContainer" onClick="window.handleImageViewerOpen(event)">
+      <img src="/static/toolpad/docs/quickstart/step-13.png" alt="Bind image src to js" />
+      <span class="MuiToolpadDocs-EnlargeIcon">    
+      </span>
+   </div>
+
+   <p class="image-caption">Binding the Image src to the query response</p>
+
+6. Try selecting different rows in the datagrid to see the image update to a random image of the selected breed.
+
+   <div class="MuiToolpadDocs-ImageContainer" onClick="window.handleImageViewerOpen(event)">
+      <img src="/static/toolpad/docs/quickstart/step-14.png" alt="Preview image" />
+      <span class="MuiToolpadDocs-EnlargeIcon">    
+      </span>
+   </div>
+
+   <p class="image-caption">The image changing based on the selected row</p>
+
+### Preview the app
+
+1. Click on the **Preview** button to see a preview of what your app will look like when deployed:
+
+   <div class="MuiToolpadDocs-ImageContainer" onClick="window.handleImageViewerOpen(event)">
+      <img src="/static/toolpad/docs/quickstart/step-15.png" alt="Preview image" />
+      <span class="MuiToolpadDocs-EnlargeIcon">    
+      </span>
+   </div>
+
+   <p class="image-caption">The preview of our application</p>
+
+2. That's it! Feel free to browse through the rest of the documentation to know more about what you can do with Toolpad.

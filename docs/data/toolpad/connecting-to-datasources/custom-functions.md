@@ -1,4 +1,4 @@
-# Custom Functions
+# Custom functions
 
 <p class="description">Write async serverside JavaScript functions to load external data.</p>
 

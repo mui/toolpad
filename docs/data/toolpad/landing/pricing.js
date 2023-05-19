@@ -31,17 +31,32 @@ function ColumnHead({ label, metadata, tooltip, nested = false, href }) {
     >
       {label}{' '}
       {href ? (
-        <LaunchRounded color="primary" sx={{ fontSize: 14, opacity: 0, transition: '0.3s' }} />
+        <LaunchRounded
+          color="primary"
+          sx={{ fontSize: 14, opacity: 0, transition: '0.3s' }}
+        />
       ) : null}
       {tooltip ? (
         <InfoOutlinedIcon
-          sx={{ fontSize: 16, verticalAlign: 'middle', ml: 0.5, color: 'text.secondary' }}
+          sx={{
+            fontSize: 16,
+            verticalAlign: 'middle',
+            ml: 0.5,
+            color: 'text.secondary',
+          }}
         />
       ) : null}
     </Typography>
   );
   return (
-    <Box sx={{ pl: nested ? 2.5 : 1, pr: 1, alignSelf: 'center', justifySelf: 'flex-start' }}>
+    <Box
+      sx={{
+        pl: nested ? 2.5 : 1,
+        pr: 1,
+        alignSelf: 'center',
+        justifySelf: 'flex-start',
+      }}
+    >
       {tooltip ? (
         <Tooltip title={tooltip} placement="right" describeChild>
           {text}
@@ -104,10 +119,15 @@ const rowHeaders = {
   'Data sources': <ColumnHead label="Data sources" />,
   'Export to code': <ColumnHead label="Export to code" />,
   'Plugin API': (
-    <ColumnHead label="Plugin API" tooltip={'Extend the platform with community extensions.'} />
+    <ColumnHead
+      label="Plugin API"
+      tooltip={'Extend the platform with community extensions.'}
+    />
   ),
   'Staging environments': <ColumnHead label="Staging environments" />,
-  'White label': <ColumnHead label="White label" tooltip={'Custom domain and branding'} />,
+  'White label': (
+    <ColumnHead label="White label" tooltip={'Custom domain and branding'} />
+  ),
   'Custom themes': <ColumnHead label="Custom themes" />,
   // Components
   Components: <ColumnHead label="Components" tooltip={'Material UI + MUI X Pro'} />,
@@ -117,7 +137,9 @@ const rowHeaders = {
       tooltip={'Extend the platform with custom React components.'}
     />
   ),
-  'Premium components': <ColumnHead label="Premium components" tooltip={'MUI X Premium'} />,
+  'Premium components': (
+    <ColumnHead label="Premium components" tooltip={'MUI X Premium'} />
+  ),
   // Security
   'OAuth2/OpenID SSO': <ColumnHead label="OAuth2/OpenID SSO" />,
   'SSO enforcement': <ColumnHead label="SSO enforcement" />,
@@ -138,7 +160,9 @@ const rowHeaders = {
   'Audit logs': (
     <ColumnHead
       label="Audit logs"
-      tooltip={'Track every query run against your databases and APIs, as well as user actions.'}
+      tooltip={
+        'Track every query run against your databases and APIs, as well as user actions.'
+      }
     />
   ),
   // Support
@@ -153,7 +177,11 @@ function Info(props) {
   const { value, metadata } = props;
   return (
     <React.Fragment>
-      {typeof value === 'string' ? <Typography variant="body2">{value}</Typography> : value}
+      {typeof value === 'string' ? (
+        <Typography variant="body2">{value}</Typography>
+      ) : (
+        value
+      )}
       {metadata ? (
         <Typography
           variant="caption"

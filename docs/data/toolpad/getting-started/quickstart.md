@@ -82,7 +82,7 @@ Interactive walkthrough of the app building process:
    return Object.entries(data.message);
    ```
 
-in the editor. Click **Preview** again to verify the result.
+   in the editor. Click **Preview** again to verify the result.
 
    <div class="MuiToolpadDocs-ImageContainer" onClick="window.handleImageViewerOpen(event)">
       <img src="/static/toolpad/docs/quickstart/step-6.png" alt="Transform response"   />

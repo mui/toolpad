@@ -143,7 +143,7 @@
     "@types/har-format": "1.2.10",
     "@types/invariant": "2.2.35",
     "@types/lodash-es": "4.17.7",
-    "@types/node-fetch": "2.6.3",
+    "@types/node-fetch": "2.6.4",
     "@types/pg": "8.6.6",
     "@types/prettier": "2.7.2",
     "@types/react": "18.2.6",
@@ -154,8 +154,8 @@
     "@types/whatwg-url": "11.0.0",
     "@types/ws": "^8.5.4",
     "ajv": "8.12.0",
-    "eslint": "8.40.0",
-    "eslint-config-next": "13.4.2",
+    "eslint": "8.41.0",
+    "eslint-config-next": "13.4.3",
     "eslint-config-prettier": "8.8.0",
     "eslint-plugin-import": "2.27.5",
     "formidable": "2.1.1",
@@ -163,7 +163,7 @@
     "pino-pretty": "10.0.0",
     "react-transition-group": "4.4.5",
     "typescript": "5.0.4",
-    "webpack": "5.82.1"
+    "webpack": "5.83.1"
   },
   "typings": "./index.d.ts",
   "publishConfig": {

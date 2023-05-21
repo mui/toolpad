@@ -46,7 +46,7 @@
     "@jest/globals": "29.5.0",
     "@mui/monorepo": "https://github.com/mui/material-ui.git",
     "@next/eslint-plugin-next": "13.4.3",
-    "@playwright/test": "1.33.0",
+    "@playwright/test": "1.34.0",
     "@swc/helpers": "0.5.1",
     "@testing-library/jest-dom": "5.16.5",
     "@testing-library/react": "14.0.0",

@@ -26,11 +26,11 @@ test('functions basics', async ({ page }) => {
   const runtimeModel = new ToolpadRuntime(page);
   await runtimeModel.gotoPage('page1');
 
-  await page.locator('text="hello, message: hello world"').waitFor({ state: 'visible' });
-  await page.locator('text="throws, error.message: BOOM!"').waitFor({ state: 'visible' });
-  await page.locator('text="throws, data undefined"').waitFor({ state: 'visible' });
-  await page.locator('text="echo, parameter: bound foo parameter"').waitFor({ state: 'visible' });
-  await page.locator('text="echo, secret: Some bar secret"').waitFor({ state: 'visible' });
+  await expect(page.locator('text="hello, message: hello world"')).toBeVisible();
+  await expect(page.locator('text="throws, error.message: BOOM!"')).toBeVisible();
+  await expect(page.locator('text="throws, data undefined"')).toBeVisible();
+  await expect(page.locator('text="echo, parameter: bound foo parameter"')).toBeVisible();
+  await expect(page.locator('text="echo, secret: Some bar secret"')).toBeVisible();
 });
 
 test('function editor reload', async ({ page, localApp }) => {

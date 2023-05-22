@@ -1,42 +1,48 @@
 import { TOOLPAD_FUNCTION } from './constants.js';
 import { InferParameterType, PrimitiveValueType, PropValueType } from './types.js';
 
-/**
- * The runtime configuration for a Toolpad function. Describes the parameters it accepts and their
- * corresponding types.
- */
-export interface CreateFunctionConfig<P> {
+export interface CreateFunctionConfigObject<P> {
   parameters: {
     [K in keyof P]: PrimitiveValueType;
   };
 }
 
-type CreateFunctionConfigParameters<
-  C extends CreateFunctionConfig<CreateFunctionConfigParameters<C>>,
-> = FunctionResolverParams<C>['parameters'];
+type CreateFunctionConfigParameters<C> = FunctionResolverParams<C>['parameters'];
 
-export interface FunctionResolverParams<
-  C extends CreateFunctionConfig<CreateFunctionConfigParameters<C>>,
-> {
+export interface FunctionResolverParams<C> {
   parameters: {
     [K in keyof C['parameters']]: InferParameterType<C['parameters'][K]>;
   };
 }
 
 export interface FunctionResolver<
-  C extends CreateFunctionConfig<CreateFunctionConfigParameters<C>>,
+  C extends CreateFunctionConfigObject<CreateFunctionConfigParameters<C>>,
 > {
   (params: FunctionResolverParams<C>): Promise<unknown>;
 }
 
-export interface ToolpadFunction<C extends CreateFunctionConfig<CreateFunctionConfigParameters<C>>>
-  extends FunctionResolver<C> {
+export interface ToolpadFunction<
+  C extends CreateFunctionConfigObject<CreateFunctionConfigParameters<C>>,
+> extends FunctionResolver<C> {
   [TOOLPAD_FUNCTION]: C;
 }
 
 type MaybeLegacyParametersDefinition = PropValueType & {
   typeDef?: PropValueType;
   defaultValue?: any;
+};
+/**
+ * The runtime configuration for a Toolpad function. Describes the parameters it accepts and their
+ * corresponding types.
+ * @muidoc interface
+ */
+export type CreateFunctionConfig<C> = CreateFunctionConfigObject<CreateFunctionConfigParameters<C>>;
+
+export type {
+  /**
+   * @muidoc interface
+   */
+  PrimitiveValueType,
 };
 
 /**
@@ -46,8 +52,10 @@ type MaybeLegacyParametersDefinition = PropValueType & {
  * The return value of this function will appear as state on the page and can be bound to.
  * @param resolver The function that will load the data for the query.
  * @param config The configuration for the function.
+ * override: Config
+ * @muidoc function
  */
-export function createFunction<C extends CreateFunctionConfig<CreateFunctionConfigParameters<C>>>(
+export function createFunction<C extends CreateFunctionConfig<C>>(
   resolver: FunctionResolver<C>,
   config?: C,
 ) {

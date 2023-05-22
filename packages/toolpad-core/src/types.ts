@@ -225,7 +225,7 @@ export type PropValueType =
   | TemplateValueType
   | EventValueType;
 
-interface ParameterTypeLookup {
+export interface ParameterTypeLookup {
   number: number;
   string: string;
   boolean: boolean;

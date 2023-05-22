@@ -14,6 +14,7 @@ const pages: MuiPage[] = [
       { pathname: '/toolpad/getting-started/overview' },
       { pathname: '/toolpad/getting-started/quickstart' },
       { pathname: '/toolpad/getting-started/installation' },
+      { pathname: '/toolpad/getting-started/configuration' },
       { pathname: '/toolpad/getting-started/roadmap' },
     ],
   },
@@ -30,7 +31,7 @@ const pages: MuiPage[] = [
       },
       {
         pathname: '/toolpad/connecting-to-datasources/custom-functions',
-        title: 'Custom Functions',
+        title: 'Custom functions',
       },
     ],
   },
@@ -55,11 +56,30 @@ const pages: MuiPage[] = [
         pathname: '/toolpad/building-ui/data-grid-component',
         title: 'Data Grid component',
       },
+      {
+        pathname: '/toolpad/building-ui/page-configuration',
+        title: 'Page configuration',
+      },
+      {
+        pathname: '/toolpad/building-ui/theming',
+        title: 'Theming',
+      },
     ],
   },
   {
     pathname: '/toolpad/data-binding',
+    title: 'Data Binding',
     icon: CodeIcon,
+    children: [
+      {
+        pathname: '/toolpad/data-binding/binding-state',
+        title: 'Binding state',
+      },
+      {
+        pathname: '/toolpad/data-binding/event-handling',
+        title: 'Event handling',
+      },
+    ],
   },
   {
     pathname: '/toolpad/deployment',

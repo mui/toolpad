@@ -1,0 +1,13 @@
+{
+  "type": "array",
+  "items": {
+    "type": ["object", "string"],
+    "additionalProperties": true,
+    "properties": {
+      "label": {
+        "type": "string",
+        "nullable": true
+      }
+    }
+  }
+}

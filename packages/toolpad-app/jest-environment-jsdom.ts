@@ -14,7 +14,6 @@ export default class CustomJsdomEnvironment extends JsdomEnvironment {
 
     setRuntimeConfig(this.global, {
       externalUrl: 'http://localhost:3000',
-      isDemo: false,
       cmd: 'dev',
     });
 

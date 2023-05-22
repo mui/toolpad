@@ -385,9 +385,14 @@ function mergeThemeIntoAppDom(dom: appDom.AppDom, themeFile: Theme): appDom.AppD
   return dom;
 }
 
-function toBindable<V>(value: V | { $$jsExpression: string }): BindableAttrValue<V> {
+function toBindable<V>(
+  value: V | { $$jsExpression: string } | { $$env: string },
+): BindableAttrValue<V> {
   if (value && typeof value === 'object' && typeof (value as any).$$jsExpression === 'string') {
     return { type: 'jsExpression', value: (value as any).$$jsExpression };
+  }
+  if (value && typeof value === 'object' && typeof (value as any).$$env === 'string') {
+    return { type: 'env', value: (value as any).$$env };
   }
   return { type: 'const', value: value as V };
 }
@@ -398,15 +403,22 @@ function fromBindable<V>(bindable: BindableAttrValue<V>) {
       return bindable.value;
     case 'jsExpression':
       return { $$jsExpression: bindable.value };
+    case 'env':
+      return { $$env: bindable.value };
     default:
       throw new Error(`Unsupported bindable "${bindable.type}"`);
   }
 }
 
-function toBindableProp<V>(value: V | { $$jsExpression: string }): BindableAttrValue<V> {
+function toBindableProp<V>(
+  value: V | { $$jsExpression: string } | { $$env: string },
+): BindableAttrValue<V> {
   if (value && typeof value === 'object') {
     if (typeof (value as any).$$jsExpression === 'string') {
       return { type: 'jsExpression', value: (value as any).$$jsExpression };
+    }
+    if (typeof (value as any).$$env === 'string') {
+      return { type: 'env', value: (value as any).$$env };
     }
     if (typeof (value as any).$$jsExpressionAction === 'string') {
       return { type: 'jsExpressionAction', value: (value as any).$$jsExpressionAction };
@@ -434,6 +446,8 @@ function fromBindableProp<V>(bindable: BindableAttrValue<V>) {
       return bindable.value;
     case 'jsExpression':
       return { $$jsExpression: bindable.value };
+    case 'env':
+      return { $$env: bindable.value };
     case 'jsExpressionAction':
       return { $$jsExpressionAction: bindable.value };
     case 'navigationAction':
@@ -717,7 +731,7 @@ function createDomQueryFromPageFileQuery(query: QueryConfig): FetchQuery | Local
           case 'raw': {
             body = {
               kind: 'raw',
-              content: toBindable(query.body.content),
+              content: toBindable<string>(query.body.content),
               contentType: appDom.createConst(query.body.contentType),
             };
             break;
@@ -725,7 +739,10 @@ function createDomQueryFromPageFileQuery(query: QueryConfig): FetchQuery | Local
           case 'urlEncoded': {
             body = {
               kind: 'urlEncoded',
-              content: query.body.content.map(({ name, value }) => [name, toBindable(value)]),
+              content: query.body.content.map(({ name, value }) => [
+                name,
+                toBindable<string>(value),
+              ]),
             };
             break;
           }
@@ -761,12 +778,13 @@ function createDomQueryFromPageFileQuery(query: QueryConfig): FetchQuery | Local
 
       return {
         url: query.url ? toBindable(query.url) : undefined,
-        headers: query.headers?.map(({ name, value }) => [name, toBindable(value)]) || [],
+        headers: query.headers?.map(({ name, value }) => [name, toBindable<string>(value)]) || [],
         method: query.method || 'GET',
         browser: false,
         transform: query.transform,
         transformEnabled: query.transformEnabled,
-        searchParams: query.searchParams?.map(({ name, value }) => [name, toBindable(value)]) || [],
+        searchParams:
+          query.searchParams?.map(({ name, value }) => [name, toBindable<string>(value)]) || [],
         body,
         response,
       } satisfies FetchQuery;
@@ -1162,6 +1180,7 @@ export async function initProject() {
 
   const events = new Emitter<{
     change: { fingerprint: number };
+    externalChange: { fingerprint: number };
     componentsListChanged: {};
   }>();
 
@@ -1173,6 +1192,7 @@ export async function initProject() {
         console.log(`${chalk.magenta('event')} - Project changed on disk, updating...`);
         [dom, fingerprint] = await Promise.all([loadDomFromDisk(), calculateDomFingerprint(root)]);
         events.emit('change', { fingerprint });
+        events.emit('externalChange', { fingerprint });
 
         const newCodeComponentsFingerprint = getCodeComponentsFingerprint(dom);
         if (codeComponentsFingerprint !== newCodeComponentsFingerprint) {
@@ -1207,13 +1227,10 @@ export async function initProject() {
 
         dom = newDom;
         fingerprint = newFingerprint;
+        events.emit('change', { fingerprint });
       });
 
       return { fingerprint };
-    },
-
-    async getDomFingerPrint() {
-      return fingerprint;
     },
   };
 }

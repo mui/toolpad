@@ -16,6 +16,31 @@ import { NodeHashes } from '../types';
 import { hasFieldFocus } from '../utils/fields';
 import { DomView, getViewFromPathname, PageViewTab } from '../utils/domView';
 
+let ws: WebSocket | null = null;
+
+if (typeof window !== 'undefined') {
+  ws = new WebSocket(`ws://${window.location.host}/toolpad-ws`);
+
+  ws.addEventListener('error', (err) => console.error(err));
+
+  ws.addEventListener('open', () => {
+    // eslint-disable-next-line no-console
+    console.log('Socket connected');
+  });
+
+  ws.addEventListener('message', (event) => {
+    const message = JSON.parse(event.data);
+    switch (message.kind) {
+      case 'externalChange': {
+        client.invalidateQueries('loadDom', []);
+        break;
+      }
+      default:
+        throw new Error(`Unknown message kind: ${message.kind}`);
+    }
+  });
+}
+
 export function getNodeHashes(dom: appDom.AppDom): NodeHashes {
   return mapValues(dom.nodes, (node) => insecureHash(JSON.stringify(omit(node, 'id'))));
 }
@@ -133,7 +158,7 @@ export function domLoaderReducer(state: DomLoader, action: AppStateAction): DomL
         return state;
       }
 
-      return update(state, { dom: action.dom });
+      return update(state, { dom: action.dom, savedDom: action.dom });
     }
     default:
       return state;
@@ -574,35 +599,6 @@ export default function AppProvider({ children }: DomContextProps) {
   }, [state.hasUnsavedChanges, state.unsavedDomChanges]);
 
   useShortcut({ key: 's', metaKey: true }, handleSave);
-
-  // Quick and dirty polling for dom updates
-  React.useEffect(() => {
-    let active = true;
-
-    (async () => {
-      while (active) {
-        try {
-          const currentFingerprint = fingerprint.current;
-          // eslint-disable-next-line no-await-in-loop
-          const newFingerPrint = await client.query.getDomFingerprint();
-          if (currentFingerprint && currentFingerprint !== newFingerPrint) {
-            client.invalidateQueries('loadDom', []);
-          }
-          fingerprint.current = newFingerPrint;
-          // eslint-disable-next-line no-await-in-loop
-          await new Promise((resolve) => {
-            setTimeout(resolve, 1000);
-          });
-        } catch (err) {
-          console.error(err);
-        }
-      }
-    })();
-
-    return () => {
-      active = false;
-    };
-  }, []);
 
   return (
     <AppStateProvider value={state}>

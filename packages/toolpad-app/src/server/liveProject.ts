@@ -18,11 +18,6 @@ export async function waitForInit(): Promise<void> {
   await getProject();
 }
 
-export async function getDomFingerprint() {
-  const project = await getProject();
-  return project.getDomFingerPrint();
-}
-
 export async function saveDom(newDom: appDom.AppDom): Promise<{ fingerprint: number }> {
   const project = await getProject();
   return project.saveDom(newDom);

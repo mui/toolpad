@@ -48,6 +48,8 @@ interface WithAppOptions {
   // Run toolpad next.js app in local dev mode
   toolpadDev?: boolean;
   setup?: (ctx: SetupContext) => Promise<void>;
+  // Extra environment variables when running Toolpad
+  env?: Record<string, string>;
 }
 
 /**
@@ -57,7 +59,7 @@ export async function withApp(
   options: WithAppOptions,
   doWork: (app: RunningLocalApp) => Promise<void>,
 ) {
-  const { cmd = 'start', template, setup } = options;
+  const { cmd = 'start', template, setup, env } = options;
 
   const tmpTestDir = await fs.mkdtemp(path.resolve(__dirname, './tmp-'));
 
@@ -84,6 +86,10 @@ export async function withApp(
       const child = childProcess.spawn('toolpad', buildArgs, {
         cwd: projectDir,
         stdio: 'pipe',
+        env: {
+          ...process.env,
+          ...env,
+        },
       });
 
       if (VERBOSE) {
@@ -101,6 +107,10 @@ export async function withApp(
     const child = childProcess.spawn('toolpad', args, {
       cwd: projectDir,
       stdio: 'pipe',
+      env: {
+        ...process.env,
+        ...env,
+      },
     });
 
     try {

@@ -1,5 +1,4 @@
 import * as path from 'path';
-import { setTimeout } from 'timers/promises';
 import { test, expect, Page } from '../../playwright/localTest';
 import { ToolpadRuntime } from '../../models/ToolpadRuntime';
 import { ToolpadEditor } from '../../models/ToolpadEditor';

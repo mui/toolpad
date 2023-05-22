@@ -31,7 +31,7 @@ A [big change](https://github.com/mui/mui-toolpad/discussions/1748) is coming: w
 
 ## Notice
 
-MUI Toolpad is in its beta stages of development. Feel free to run this application for testing purposes, but keep in mind, in no way is it ready or suitable to run it in production. It's both lacking in features and stability.
+MUI Toolpad is in its beta stages of development. Feel free to run this application to try it out for your use-cases, and share any feedback, bug reports or feature requests that you come across.
 
 ## Quick setup locally
 

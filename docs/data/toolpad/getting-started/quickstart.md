@@ -23,7 +23,7 @@ Make sure to [install Node.js](https://nodejs.org/en) on your system.
 
 Interactive walkthrough of the app building process:
 
-<div class="arcade"><iframe src="https://demo.arcade.software/BhTsUpHyAYGApTZ2mFNj?embed" frameborder="0" loading="lazy" webkitallowfullscreen mozallowfullscreen allowfullscreen style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;color-scheme: light;" title="Default page | Toolpad editor"></iframe></div>
+<div class="arcade"><iframe src="https://demo.arcade.software/MDlpNzHbuXwvPh4MK9ff?embed" frameborder="0" loading="lazy" webkitallowfullscreen mozallowfullscreen allowfullscreen style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;color-scheme: light;" title="Default page | Toolpad editor"></iframe></div>
 
 ## Detailed steps
 

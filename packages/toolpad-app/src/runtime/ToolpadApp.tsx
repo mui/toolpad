@@ -577,6 +577,31 @@ function flattenNestedBindables(
   );
 }
 
+/**
+ * Returns an object with the resolved values of the bindables.
+ * Example:
+ * { foo: { bar: { type: 'const', value:1 } }, baz: [{ type: 'jsExpression', value: 'quux' }] }
+ * =>
+ * { foo: { bar: 1 }, baz: ['quux'] }
+ * @param bindings
+ * Example bindings:
+ * {
+ *  'mLbjY24.params.order': { error: undefined, loading: false, value: { "OrderID": "" } },
+ * }
+ * @param bindingId
+ * Example bindingId: 'mLbjY24.params'
+ * @param params
+ * Example params:
+ * {
+ *  ["order", { type: 'jsExpression', value: 'form.value\n' }]
+ * }
+ * @returns {Record<string, unknown>}
+ * Example result:
+ * {
+ * order: { "OrderID": "" }
+ * }
+ */
+
 function resolveBindables(
   bindings: Partial<Record<string, BindingEvaluationResult>>,
   bindingId: string,
@@ -646,7 +671,11 @@ function MutationNode({ node, page }: MutationNodeProps) {
   const bindings = React.useMemo(() => getBindings(), [getBindings]);
 
   const queryId = node.id;
-  const params = resolveBindables(bindings, `${node.id}.params`, node.params);
+  const params = resolveBindables(
+    bindings,
+    `${node.id}.params`,
+    Object.fromEntries(node.params ?? []),
+  );
 
   const {
     isLoading,

@@ -571,7 +571,7 @@ export default createComponent(DataGridComponent, {
       schema: '/schemas/DataGridRows.json',
     },
     columns: {
-      helperText: '',
+      helperText: 'The columns to be displayed.',
       type: 'array',
       schema: '/schemas/DataGridColumns.json',
       control: { type: 'GridColumns' },

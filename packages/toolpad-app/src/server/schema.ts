@@ -36,8 +36,14 @@ export const jsExpressionBindingSchema = z
   })
   .describe('A binding that evaluates an expression and returns the result.');
 
+export const envBindingSchema = z
+  .object({
+    $$env: z.string().describe('The name of an environment variable.'),
+  })
+  .describe('An environment variable.');
+
 function bindableSchema<V extends z.ZodTypeAny>(valueType: V) {
-  return z.union([valueType, jsExpressionBindingSchema]);
+  return z.union([valueType, jsExpressionBindingSchema, envBindingSchema]);
 }
 
 const jsExpressionActionSchema = z
@@ -223,6 +229,7 @@ type BaseElement = z.infer<typeof baseElementSchema>;
 export const bindablePropSchema = z.union([
   jsonSchema,
   jsExpressionBindingSchema,
+  envBindingSchema,
   jsExpressionActionSchema,
   navigationActionSchema,
   templateSchema,
@@ -301,6 +308,7 @@ export const META = {
   definitions: {
     Json: jsonSchema,
     JsExpressionBinding: jsExpressionBindingSchema,
+    EnvBinding: envBindingSchema,
     JsExpressionAction: jsExpressionActionSchema,
     NavigationAction: navigationActionSchema,
     BindableProp: bindablePropSchema,

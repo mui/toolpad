@@ -29,3 +29,15 @@ export const echo = createFunction(
 export async function edited() {
   return 'edited hello';
 }
+
+export const withParams = createFunction(
+  async ({ parameters }) => {
+    return { parameters };
+  },
+  {
+    parameters: {
+      foo: { type: 'string' },
+      // __NEW_PARAMETER__
+    },
+  },
+);

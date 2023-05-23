@@ -1,5 +1,37 @@
 # Changelog
 
+## 0.1.12
+
+<!-- generated comparing v0.1.11..master -->
+
+_May 17, 2023_
+
+A big thanks to the 4 contributors who made this release possible. Here are some highlights ✨:
+
+Added a new Autocomplete component, simplify the configuration for creating custom components, improve performance with websocket updates instead of polling.
+
+- &#8203;<!-- 21 -->Fix race condition with initializing the canvas bridge (#2035) @Janpot
+- &#8203;<!-- 20 -->Add Autocomplete component (#1427) @bharatkashyap
+- &#8203;<!-- 19 -->Upgrade monorepo (#2023) @bharatkashyap
+- &#8203;<!-- 18 -->Improve isolation of runtime from editor (#2021) @Janpot
+- &#8203;<!-- 17 -->Replace polling for updates with websocket (#2007) @Janpot
+- &#8203;<!-- 16 -->Improve and test basic auth implementation (#2022) @Janpot
+- &#8203;<!-- 15 -->Reorganize @mui/toolpad-core exports (#2018) @Janpot
+- &#8203;<!-- 14 -->version examples instead of using latest (#2030) @Janpot
+- &#8203;<!-- 13 -->Add section about page configuration to docs (#1997) @apedroferreira
+- &#8203;<!-- 12 -->Add theming to docs (#1993) @apedroferreira
+- &#8203;<!-- 11 -->Improve types for onChangeProp (#2002) @Janpot
+- &#8203;<!-- 10 -->Remove hideControls and button type (#2017) @Janpot
+- &#8203;<!-- 09 -->Correctly set charset for preview html (#2020) @Janpot
+- &#8203;<!-- 08 -->Remove unused config (#2008) @Janpot
+- &#8203;<!-- 07 -->Make canvas column spacing the same as in the runtime (#2016) @Janpot
+- &#8203;<!-- 06 -->Move to zod-to-json-schema (#2003) @Janpot
+- &#8203;<!-- 05 -->Deprecate typeDef (#1994) @Janpot
+- &#8203;<!-- 04 -->Clean up dead code (#2000) @Janpot
+- &#8203;<!-- 03 -->Add jest tests for `create-toolpad-app` (#1965) @bharatkashyap
+- &#8203;<!-- 02 -->[docs] Make code the hero (#1992) @bharatkashyap
+- &#8203;<!-- 01 -->[docs] Fix 404 link to fix the page (#2009) @oliviertassinari
+
 ## 0.1.11
 
 <!-- generated comparing v0.1.10..master -->

@@ -143,7 +143,12 @@ function AppWrapper(props) {
   const pageContextValue = React.useMemo(() => {
     const { activePage, activePageParents } = findActivePage(pages, router.pathname);
 
-    return { activePage, activePageParents, pages };
+    const productIdentifier = {
+      name: 'Toolpad',
+      metadata: 'MUI Toolpad',
+    };
+
+    return { activePage, activePageParents, pages, productIdentifier };
   }, [router.pathname]);
 
   return (

@@ -1,6 +1,6 @@
 {
   "name": "@mui/toolpad-components",
-  "version": "0.1.11",
+  "version": "0.1.12",
   "description": "Build MUI apps quickly",
   "author": "MUI Toolpad team",
   "homepage": "https://github.com/mui/mui-toolpad#readme",
@@ -33,18 +33,18 @@
     "prebuild": "rimraf dist",
     "build": "tsup",
     "dev": "tsup --watch",
-    "check-types": "tsc"
+    "check-types": "tsup && tsc --noEmit"
   },
   "bugs": {
     "url": "https://github.com/mui/mui-toolpad/issues"
   },
   "dependencies": {
-    "@mui/lab": "5.0.0-alpha.129",
-    "@mui/material": "5.13.0",
-    "@mui/toolpad-core": "^0.1.11",
-    "@mui/toolpad-utils": "^0.1.11",
-    "@mui/x-data-grid-pro": "6.4.0",
-    "@mui/x-date-pickers": "6.4.0",
+    "@mui/lab": "5.0.0-alpha.131",
+    "@mui/material": "5.13.2",
+    "@mui/toolpad-core": "0.1.12",
+    "@mui/toolpad-utils": "0.1.12",
+    "@mui/x-data-grid-pro": "6.5.0",
+    "@mui/x-date-pickers": "6.5.0",
     "dayjs": "1.11.7",
     "markdown-to-jsx": "7.2.0",
     "react-error-boundary": "4.0.4"
@@ -58,5 +58,5 @@
   "publishConfig": {
     "access": "public"
   },
-  "gitHead": "28308edc7bd61700e63b44e6ff5ff1508d1f2a8b"
+  "gitHead": "0186b46c7abd26f06583227cc21d448baf11cd46"
 }

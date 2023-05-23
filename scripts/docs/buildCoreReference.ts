@@ -182,5 +182,6 @@ export async function buildCoreReference() {
     return [entrypoint, exports];
   });
 
+  // eslint-disable-next-line no-console
   console.log(JSON.stringify(allExports, null, 2));
 }

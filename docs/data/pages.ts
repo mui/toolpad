@@ -1,11 +1,9 @@
 import type { MuiPage } from '@mui/monorepo/docs/src/MuiPage';
-import SchemaIcon from '@mui/icons-material/Schema';
 import BuildIcon from '@mui/icons-material/Build';
 import CodeIcon from '@mui/icons-material/Code';
 import DescriptionIcon from '@mui/icons-material/Description';
 import TableViewIcon from '@mui/icons-material/TableView';
 import VisibilityIcon from '@mui/icons-material/Visibility';
-import ToggleOffIcon from '@mui/icons-material/ToggleOff';
 import LinkIcon from '@mui/icons-material/Link';
 import componentsManifest from './toolpad/reference/components/manifest.json';
 
@@ -90,7 +88,7 @@ const pages: MuiPage[] = [
   {
     pathname: '/toolpad/reference-group',
     title: 'Reference',
-    icon: ToggleOffIcon,
+    icon: CodeIcon,
     children: [
       {
         pathname: '/toolpad/reference/file-schema',

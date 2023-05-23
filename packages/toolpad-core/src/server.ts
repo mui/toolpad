@@ -1,29 +1,37 @@
 import { TOOLPAD_FUNCTION } from './constants.js';
 import { InferParameterType, PrimitiveValueType, PropValueType } from './types.js';
 
-export interface CreateFunctionConfigObject<P> {
+/**
+ * The runtime configuration for a Toolpad function. Describes the parameters it accepts and their
+ * corresponding types.
+ * @muidoc interface
+ */
+export interface CreateFunctionConfig<C> {
   parameters: {
-    [K in keyof P]: PrimitiveValueType;
+    [K in keyof C]: PrimitiveValueType;
   };
 }
 
-type CreateFunctionConfigParameters<C> = FunctionResolverParams<C>['parameters'];
+type CreateFunctionConfigParameters<
+  C extends CreateFunctionConfig<CreateFunctionConfigParameters<C>>,
+> = FunctionResolverParams<C>['parameters'];
 
-export interface FunctionResolverParams<C> {
+export interface FunctionResolverParams<
+  C extends CreateFunctionConfig<CreateFunctionConfigParameters<C>>,
+> {
   parameters: {
     [K in keyof C['parameters']]: InferParameterType<C['parameters'][K]>;
   };
 }
 
 export interface FunctionResolver<
-  C extends CreateFunctionConfigObject<CreateFunctionConfigParameters<C>>,
+  C extends CreateFunctionConfig<CreateFunctionConfigParameters<C>>,
 > {
   (params: FunctionResolverParams<C>): Promise<unknown>;
 }
 
-export interface ToolpadFunction<
-  C extends CreateFunctionConfigObject<CreateFunctionConfigParameters<C>>,
-> extends FunctionResolver<C> {
+export interface ToolpadFunction<C extends CreateFunctionConfig<CreateFunctionConfigParameters<C>>>
+  extends FunctionResolver<C> {
   [TOOLPAD_FUNCTION]: C;
 }
 
@@ -31,12 +39,6 @@ type MaybeLegacyParametersDefinition = PropValueType & {
   typeDef?: PropValueType;
   defaultValue?: any;
 };
-/**
- * The runtime configuration for a Toolpad function. Describes the parameters it accepts and their
- * corresponding types.
- * @muidoc interface
- */
-export type CreateFunctionConfig<C> = CreateFunctionConfigObject<CreateFunctionConfigParameters<C>>;
 
 export type {
   /**
@@ -55,7 +57,7 @@ export type {
  * override: Config
  * @muidoc function
  */
-export function createFunction<C extends CreateFunctionConfig<C>>(
+export function createFunction<C extends CreateFunctionConfig<CreateFunctionConfigParameters<C>>>(
   resolver: FunctionResolver<C>,
   config?: C,
 ) {

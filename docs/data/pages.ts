@@ -34,7 +34,7 @@ const pages: MuiPage[] = [
       },
       {
         pathname: '/toolpad/connecting-to-datasources/custom-functions',
-        title: 'Custom Functions',
+        title: 'Custom functions',
       },
     ],
   },

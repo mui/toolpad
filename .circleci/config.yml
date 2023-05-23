@@ -137,7 +137,7 @@ jobs:
     <<: *defaults
     resource_class: 'large'
     docker:
-      - image: mcr.microsoft.com/playwright:v1.33.0-focal
+      - image: mcr.microsoft.com/playwright:v1.34.0-focal
         environment:
           NODE_ENV: test
           TOOLPAD_TEST_RETRIES: 1

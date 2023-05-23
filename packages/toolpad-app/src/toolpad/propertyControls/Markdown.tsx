@@ -11,13 +11,14 @@ import * as React from 'react';
 import type { EditorProps } from '../../types';
 import useShortcut from '../../utils/useShortcut';
 import lazyComponent from '../../utils/lazyComponent';
+import PropertyControl from '../../components/PropertyControl';
 
 const MarkdownEditor = lazyComponent(() => import('../../components/MarkdownEditor'), {
   noSsr: true,
   fallback: <Skeleton variant="rectangular" height="100%" />,
 });
 
-function MarkdownPropEditor({ value, onChange }: EditorProps<any>) {
+function MarkdownPropEditor({ propType, value, onChange }: EditorProps<any>) {
   const [dialogOpen, setDialogOpen] = React.useState(false);
 
   useShortcut({ key: 's', metaKey: true, disabled: !dialogOpen }, () => {
@@ -26,9 +27,11 @@ function MarkdownPropEditor({ value, onChange }: EditorProps<any>) {
 
   return (
     <React.Fragment>
-      <Button variant="outlined" color="inherit" fullWidth onClick={() => setDialogOpen(true)}>
-        Edit Markdown
-      </Button>
+      <PropertyControl propType={propType}>
+        <Button variant="outlined" color="inherit" fullWidth onClick={() => setDialogOpen(true)}>
+          Edit Markdown
+        </Button>
+      </PropertyControl>
       <Dialog fullWidth open={dialogOpen} onClose={() => setDialogOpen(false)}>
         <DialogTitle>Edit Markdown</DialogTitle>
         <DialogContent>

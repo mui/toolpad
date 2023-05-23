@@ -16,6 +16,7 @@ import * as React from 'react';
 import DeleteIcon from '@mui/icons-material/Delete';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import type { EditorProps } from '../../types';
+import PropertyControl from '../../components/PropertyControl';
 
 interface SelectOption {
   label?: string;
@@ -23,6 +24,7 @@ interface SelectOption {
 }
 
 function SelectOptionsPropEditor({
+  propType,
   label,
   value = [],
   onChange,
@@ -97,16 +99,18 @@ function SelectOptionsPropEditor({
 
   return (
     <React.Fragment>
-      <Button
-        variant="outlined"
-        color="inherit"
-        fullWidth
-        onClick={() => {
-          setEditOptionsDialogOpen(true);
-        }}
-      >
-        {label}
-      </Button>
+      <PropertyControl propType={propType}>
+        <Button
+          variant="outlined"
+          color="inherit"
+          fullWidth
+          onClick={() => {
+            setEditOptionsDialogOpen(true);
+          }}
+        >
+          {label}
+        </Button>
+      </PropertyControl>
       <Dialog
         fullWidth
         open={editOptionsDialogOpen}

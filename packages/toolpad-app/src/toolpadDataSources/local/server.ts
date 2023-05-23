@@ -85,7 +85,7 @@ function pathToNodeImportSpecifier(importPath: string): string {
 async function createMain(): Promise<string> {
   const relativeFunctionsFilePath = [`.`, getFunctionsFile('.')].join(path.sep);
   return `
-    import { TOOLPAD_FUNCTION } from '@mui/toolpad-core/server';
+    import { TOOLPAD_FUNCTION } from '@mui/toolpad-core';
     import { errorFrom, serializeError } from '@mui/toolpad-utils/errors';
     import fetch, { Headers, Request, Response } from 'node-fetch'
 
@@ -185,38 +185,40 @@ async function createMain(): Promise<string> {
   `;
 }
 
+export async function loadEnvFile() {
+  const userProjectRoot = getUserProjectRoot();
+  const envFilePath = path.resolve(userProjectRoot, '.env');
+
+  try {
+    const envFileContent = await fs.readFile(envFilePath);
+    const parsed = dotenv.parse(envFileContent) as any;
+    // eslint-disable-next-line no-console
+    console.log(
+      `${chalk.blue('info')}  - loaded env file "${envFilePath}" with keys ${truncate(
+        Object.keys(parsed).join(', '),
+        1000,
+      )}`,
+    );
+
+    return parsed;
+  } catch (err) {
+    if (errorFrom(err).code !== 'ENOENT') {
+      throw err;
+    }
+  }
+
+  return {};
+}
+
 async function createBuilder() {
   await waitForInit();
 
   const userProjectRoot = getUserProjectRoot();
-  const envFilePath = path.resolve(userProjectRoot, '.env');
 
   let currentRuntimeProcess: child_process.ChildProcess | undefined;
   let controller: AbortController | undefined;
   let buildErrors: Error[] = [];
   let runtimeError: Error | undefined;
-
-  const loadEnvFile = async () => {
-    try {
-      const envFileContent = await fs.readFile(envFilePath);
-      const parsed = dotenv.parse(envFileContent) as any;
-      // eslint-disable-next-line no-console
-      console.log(
-        `${chalk.blue('info')}  - loaded env file "${envFilePath}" with keys ${truncate(
-          Object.keys(parsed).join(', '),
-          1000,
-        )}`,
-      );
-
-      return parsed;
-    } catch (err) {
-      if (errorFrom(err).code !== 'ENOENT') {
-        throw err;
-      }
-    }
-
-    return {};
-  };
 
   let outputFile: string | undefined;
   let metafile: esbuild.Metafile | undefined;
@@ -410,6 +412,8 @@ async function createBuilder() {
   }
 
   let envFileWatcher: chokidar.FSWatcher | undefined;
+
+  const envFilePath = path.resolve(userProjectRoot, '.env');
 
   return {
     watch() {

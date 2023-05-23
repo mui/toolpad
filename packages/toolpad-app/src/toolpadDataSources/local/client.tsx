@@ -168,18 +168,9 @@ function QueryEditor({
         </Stack>
       </QueryInputPanel>
 
-      <SplitPane
-        split="horizontal"
-        size="30%"
-        minSize={30}
-        primary="second"
-        allowResize
-        pane1Style={{ overflow: 'auto' }}
-      >
-        <QueryPreview isLoading={previewIsLoading} error={preview?.error}>
-          <JsonView sx={{ height: '100%' }} copyToClipboard src={preview?.data} />
-        </QueryPreview>
-      </SplitPane>
+      <QueryPreview isLoading={previewIsLoading} error={preview?.error}>
+        <JsonView sx={{ height: '100%' }} copyToClipboard src={preview?.data} />
+      </QueryPreview>
     </SplitPane>
   );
 }

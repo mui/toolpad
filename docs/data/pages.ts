@@ -100,11 +100,11 @@ const pages: MuiPage[] = [
         children: componentsManifest.pages,
       },
       {
-        pathname: '/toolpad/reference/api',
+        pathname: '/toolpad/reference/api-group',
         title: 'API',
         children: [
           {
-            pathname: '/toolpad/reference/api-group',
+            pathname: '/toolpad/reference/api',
             title: 'Index',
           },
           {

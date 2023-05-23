@@ -22,7 +22,7 @@ const componentPagesRoot = path.resolve(docsRoot, `pages${absolutePathRoot}`);
 
 async function writePageFile(mdFilePath: string) {
   const slug = path.basename(mdFilePath, '.md');
-  const pageFilePath = path.resolve(componentPagesRoot, `${slug}.tsx`);
+  const pageFilePath = path.resolve(componentPagesRoot, `${slug}.js`);
   const relativeMdPath = path.relative(componentPagesRoot, mdFilePath);
   await writePrettifiedFile(
     pageFilePath,

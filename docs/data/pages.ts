@@ -31,7 +31,7 @@ const pages: MuiPage[] = [
       },
       {
         pathname: '/toolpad/connecting-to-datasources/custom-functions',
-        title: 'Custom Functions',
+        title: 'Custom functions',
       },
     ],
   },
@@ -68,7 +68,18 @@ const pages: MuiPage[] = [
   },
   {
     pathname: '/toolpad/data-binding',
+    title: 'Data Binding',
     icon: CodeIcon,
+    children: [
+      {
+        pathname: '/toolpad/data-binding/binding-state',
+        title: 'Binding state',
+      },
+      {
+        pathname: '/toolpad/data-binding/event-handling',
+        title: 'Event handling',
+      },
+    ],
   },
   {
     pathname: '/toolpad/deployment',

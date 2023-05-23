@@ -110,14 +110,20 @@ export type FetchParams = {
   readonly body?: Body;
 };
 
-export type FetchPrivateQuery = {
-  kind: 'debugExec';
-  query: FetchQuery;
-  params: Record<string, any>;
-};
+export type FetchPrivateQuery =
+  | {
+      kind: 'debugExec';
+      query: FetchQuery;
+      params: Record<string, any>;
+    }
+  | { kind: 'introspection' };
 
 export interface FetchResult extends ExecFetchResult<any> {
   data: any;
   untransformedData: any;
   har?: Har;
 }
+
+export type IntrospectionResult = {
+  envVarNames: string[];
+};

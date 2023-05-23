@@ -1,8 +1,10 @@
 import * as React from 'react';
-import { Grid, Container, styled } from '@mui/material';
+import { Grid, styled } from '@mui/material';
 import invariant from 'invariant';
-import { createToolpadAppTheme } from '../../../../runtime/AppThemeProvider';
+import { usePageEditorState } from '../PageEditorProvider';
 import { useDom } from '../../../AppState';
+import { createToolpadAppTheme } from '../../../../runtime/AppThemeProvider';
+import { absolutePositionCss } from '../../../../utils/geometry';
 
 export interface OverlayGridHandle {
   gridElement: HTMLDivElement | null;
@@ -14,8 +16,7 @@ export interface OverlayGridHandle {
 export const GRID_NUMBER_OF_COLUMNS = 12;
 export const GRID_COLUMN_GAP = 1;
 
-const GridContainer = styled(Container)({
-  height: '100%',
+const GridContainer = styled('div')({
   pointerEvents: 'none',
   position: 'absolute',
   zIndex: 1,
@@ -38,6 +39,12 @@ export const OverlayGrid = React.forwardRef<OverlayGridHandle>(function OverlayG
   const gridRef = React.useRef<HTMLDivElement | null>(null);
 
   const { dom } = useDom();
+  const { viewState, nodeId: pageNodeId } = usePageEditorState();
+
+  const { nodes: nodesInfo } = viewState;
+
+  const pageNode = nodesInfo[pageNodeId];
+
   const appTheme = React.useMemo(() => createToolpadAppTheme(dom), [dom]);
 
   React.useImperativeHandle(
@@ -72,8 +79,10 @@ export const OverlayGrid = React.forwardRef<OverlayGridHandle>(function OverlayG
     [],
   );
 
-  return (
-    <GridContainer>
+  const pageChildrenSlotRect = pageNode?.slots?.children?.rect;
+
+  return pageChildrenSlotRect ? (
+    <GridContainer style={{ ...absolutePositionCss(pageChildrenSlotRect), height: '100%' }}>
       <StyledGrid ref={gridRef} container columnSpacing={appTheme.spacing(GRID_COLUMN_GAP)}>
         {[...Array(GRID_NUMBER_OF_COLUMNS)].map((column, index) => (
           <Grid key={index} item xs={1}>
@@ -82,5 +91,5 @@ export const OverlayGrid = React.forwardRef<OverlayGridHandle>(function OverlayG
         ))}
       </StyledGrid>
     </GridContainer>
-  );
+  ) : null;
 });

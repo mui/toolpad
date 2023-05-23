@@ -28,6 +28,9 @@ async function waitForComponents(page: Page, frame: Page | FrameLocator = page) 
 
   const list = frame.locator('text="List Button 3"');
   await list.waitFor({ state: 'visible' });
+
+  const markdown = frame.getByText('markdown text');
+  await markdown.waitFor({ state: 'visible' });
 }
 
 test.use({

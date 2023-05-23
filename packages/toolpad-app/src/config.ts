@@ -35,8 +35,6 @@ export type BuildEnvVars = Record<
 // These are set at runtime and passed to the browser.
 // Do not add secrets
 export interface RuntimeConfig {
-  // Enable demo mode
-  isDemo: boolean;
   externalUrl: string;
   projectDir?: string;
   cmd: 'dev' | 'start';
@@ -60,7 +58,6 @@ function getBrowsersideRuntimeConfig(): RuntimeConfig {
 const runtimeConfig: RuntimeConfig =
   typeof window === 'undefined'
     ? {
-        isDemo: !!process.env.TOOLPAD_DEMO,
         externalUrl:
           process.env.TOOLPAD_EXTERNAL_URL || `http://localhost:${process.env.PORT || 3000}`,
         projectDir: process.env.TOOLPAD_PROJECT_DIR,

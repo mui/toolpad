@@ -17,6 +17,7 @@ import {
   Tab,
   TextField,
   MenuItem,
+  Autocomplete,
 } from '@mui/material';
 import LinkIcon from '@mui/icons-material/Link';
 import AddLinkIcon from '@mui/icons-material/AddLink';
@@ -31,6 +32,7 @@ import {
   BindableAttrValue,
   NavigationAction,
   NodeId,
+  EnvAttrValue,
 } from '@mui/toolpad-core';
 import { createProvidedContext } from '@mui/toolpad-utils/react';
 import { TabContext, TabList } from '@mui/lab';
@@ -65,6 +67,7 @@ interface BindingEditorContext {
   disabled?: boolean;
   propType?: PropValueType;
   liveBinding?: LiveBinding;
+  envVarNames?: string[];
 }
 
 const [useBindingEditorContext, BindingEditorContextProvider] =
@@ -128,19 +131,83 @@ function JsExpressionPreview({ jsRuntime, input, globalScope }: JsExpressionPrev
   );
 }
 
-export interface JsBindingEditorProps extends WithControlledProp<JsExpressionAttrValue | null> {}
+export interface EnvBindingEditorProps extends WithControlledProp<EnvAttrValue | null> {}
 
-export function JsBindingEditor({ value, onChange }: JsBindingEditorProps) {
+export function EnvBindingEditor({ value, onChange }: EnvBindingEditorProps) {
+  const { envVarNames = [] } = useBindingEditorContext();
+
+  const hasEnvVars = envVarNames.length > 0;
+
+  const handleChange = React.useCallback(
+    (event: React.SyntheticEvent, newValue: string | null) => {
+      onChange({
+        type: 'env',
+        value: newValue || '',
+      });
+    },
+    [onChange],
+  );
+
+  const helperText = React.useMemo(() => {
+    if (!hasEnvVars) {
+      return 'No environment variables available';
+    }
+
+    return null;
+  }, [hasEnvVars]);
+
+  return (
+    <Box sx={{ my: 1 }}>
+      <Typography>Assign to an environment variable</Typography>
+      <Autocomplete
+        options={envVarNames}
+        value={value?.value || ''}
+        onChange={handleChange}
+        renderInput={(params) => (
+          <TextField
+            {...params}
+            fullWidth
+            sx={{ my: 3 }}
+            label="Select environment variable"
+            disabled={!hasEnvVars}
+            helperText={helperText}
+          />
+        )}
+      />
+    </Box>
+  );
+}
+
+function getValueBindingTab(value: Maybe<BindableAttrValue<any>>) {
+  return value?.type || 'jsExpression';
+}
+
+export interface ValueBindingEditorProps
+  extends WithControlledProp<JsExpressionAttrValue | EnvAttrValue | null> {}
+
+export function ValueBindingEditor({ value, onChange }: ValueBindingEditorProps) {
   const {
     label,
     globalScope,
     globalScopeMeta = {},
     jsRuntime,
     propType,
+    envVarNames,
   } = useBindingEditorContext();
 
-  return (
-    <Stack direction="row" sx={{ height: 400, gap: 2 }}>
+  const hasEnv = Boolean(envVarNames);
+
+  const [activeTab, setActiveTab] = React.useState<BindableType>(getValueBindingTab(value));
+  React.useEffect(() => {
+    setActiveTab(getValueBindingTab(value));
+  }, [value]);
+
+  const handleTabChange = (event: React.SyntheticEvent, newValue: BindableType) => {
+    setActiveTab(newValue);
+  };
+
+  const jsExpressionBindingEditor = (
+    <Stack direction="row" sx={{ height: 400, gap: 2, my: hasEnv ? 3 : 0 }}>
       <GlobalScopeExplorer sx={{ width: 250 }} value={globalScope} meta={globalScopeMeta} />
 
       <Box
@@ -160,13 +227,35 @@ export function JsBindingEditor({ value, onChange }: JsBindingEditorProps) {
         <JsExpressionBindingEditor
           globalScope={globalScope}
           globalScopeMeta={globalScopeMeta}
-          value={value}
+          value={value?.type === 'jsExpression' ? value : null}
           onChange={onChange}
         />
 
         <JsExpressionPreview jsRuntime={jsRuntime} input={value} globalScope={globalScope} />
       </Box>
     </Stack>
+  );
+
+  return hasEnv ? (
+    <TabContext value={activeTab}>
+      <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
+        <TabList onChange={handleTabChange} aria-label="Choose action kind ">
+          <Tab label="JS expression" value="jsExpression" />
+          <Tab label="Environment variable" value="env" />
+        </TabList>
+      </Box>
+      <TabPanel value="jsExpression" disableGutters>
+        <Box sx={{ my: 1 }}>
+          <Typography>Bind to a JavaScript expression.</Typography>
+          {jsExpressionBindingEditor}
+        </Box>
+      </TabPanel>
+      <TabPanel value="env" disableGutters>
+        <EnvBindingEditor value={value?.type === 'env' ? value : null} onChange={onChange} />
+      </TabPanel>
+    </TabContext>
+  ) : (
+    jsExpressionBindingEditor
   );
 }
 
@@ -407,9 +496,7 @@ export function BindingEditorDialog<V>({
 
   const [input, setInput] = React.useState(value);
   React.useEffect(() => {
-    if (open) {
-      setInput(value);
-    }
+    setInput(value);
   }, [open, value]);
 
   const committedInput = React.useRef<BindableAttrValue<V> | null>(input);
@@ -443,7 +530,9 @@ export function BindingEditorDialog<V>({
   }, [onClose, handleSave]);
 
   const handleRemove = React.useCallback(() => {
+    committedInput.current = null;
     onChange(null);
+
     onClose();
   }, [onClose, onChange]);
 
@@ -458,12 +547,17 @@ export function BindingEditorDialog<V>({
       maxWidth="lg"
     >
       <DialogTitle>Bind property &quot;{label}&quot;</DialogTitle>
-      <DialogContent>
+      <DialogContent
+        sx={{
+          height: '100vh',
+          maxHeight: 560,
+        }}
+      >
         {propType?.type === 'event' ? (
           <ActionEditor value={input} onChange={(newValue) => setInput(newValue)} />
         ) : (
-          <JsBindingEditor
-            value={input?.type === 'jsExpression' ? input : null}
+          <ValueBindingEditor
+            value={input?.type === 'jsExpression' || input?.type === 'env' ? input : null}
             onChange={(newValue) => setInput(newValue)}
           />
         )}
@@ -472,7 +566,7 @@ export function BindingEditorDialog<V>({
         <Button color="inherit" variant="text" onClick={onClose}>
           {hasUnsavedChanges ? 'Cancel' : 'Close'}
         </Button>
-        <Button color="inherit" disabled={!value} onClick={handleRemove}>
+        <Button color="inherit" disabled={!value?.value} onClick={handleRemove}>
           Remove binding
         </Button>
         <Button disabled={!hasUnsavedChanges} color="primary" onClick={handleCommit}>
@@ -495,6 +589,7 @@ export interface BindingEditorProps<V> extends WithControlledProp<BindableAttrVa
   hidden?: boolean;
   propType?: PropValueType;
   liveBinding?: LiveBinding;
+  envVarNames?: string[];
 }
 
 export function BindingEditor<V>({
@@ -508,6 +603,7 @@ export function BindingEditor<V>({
   value,
   onChange,
   liveBinding,
+  envVarNames,
 }: BindingEditorProps<V>) {
   const [open, setOpen] = React.useState(false);
 
@@ -565,8 +661,9 @@ export function BindingEditor<V>({
       disabled,
       propType,
       liveBinding,
+      envVarNames,
     }),
-    [disabled, globalScope, jsRuntime, label, liveBinding, propType, resolvedMeta],
+    [disabled, envVarNames, globalScope, jsRuntime, label, liveBinding, propType, resolvedMeta],
   );
 
   return (

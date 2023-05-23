@@ -10,6 +10,7 @@ export const layoutBoxArgTypes: {
   verticalAlign: ArgTypeDefinition<BoxProps, 'alignItems'>;
 } = {
   horizontalAlign: {
+    helperText: 'Horizontal alignment of the component',
     type: 'string',
     enum: ['start', 'center', 'end', 'space-between', 'space-around', 'space-evenly'],
     default: 'start',
@@ -17,6 +18,7 @@ export const layoutBoxArgTypes: {
     control: { type: 'HorizontalAlign' },
   },
   verticalAlign: {
+    helperText: 'Vertical alignment of the component.',
     type: 'string',
     enum: ['start', 'center', 'end', 'space-between', 'space-around', 'space-evenly'],
     default: 'center',

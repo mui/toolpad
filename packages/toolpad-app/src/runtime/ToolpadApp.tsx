@@ -579,19 +579,15 @@ function flattenNestedBindables(
 
 /**
  * Returns an object with the resolved values of the bindables.
- * @param bindings
  * Example bindings:
  * {
  *  'nodeId.params.order': { error: undefined, loading: false, value: { "OrderID": "" } },
  * }
- * @param bindingId
  * Example bindingId: 'nodeId.params'
- * @param params
  * Example params:
  * {
  *  ["order", { type: 'jsExpression', value: 'form.value\n' }]
  * }
- * @returns {Record<string, unknown>}
  * Example result:
  * {
  * order: { "OrderID": "" }

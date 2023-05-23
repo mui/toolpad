@@ -6,5 +6,3 @@
 
 - [createComponent](./create-component/)
 - [createFunction](./create-function/)
-
-## Interfaces

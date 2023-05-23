@@ -7,7 +7,7 @@ import TableViewIcon from '@mui/icons-material/TableView';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import ToggleOffIcon from '@mui/icons-material/ToggleOff';
 import LinkIcon from '@mui/icons-material/Link';
-import componentsManifest from './toolpad/components/manifest.json';
+import componentsManifest from './toolpad/reference/components/manifest.json';
 
 const pages: MuiPage[] = [
   {
@@ -88,40 +88,44 @@ const pages: MuiPage[] = [
     icon: BuildIcon,
   },
   {
-    pathname: '/toolpad/components-group',
-    title: 'Components',
+    pathname: '/toolpad/reference-group',
+    title: 'Reference',
     icon: ToggleOffIcon,
-    children: componentsManifest.pages,
-  },
-  {
-    pathname: '/toolpad/api-reference-group',
-    title: 'API reference',
-    icon: CodeIcon,
     children: [
       {
-        pathname: '/toolpad/api-reference',
-        title: 'Index',
+        pathname: '/toolpad/reference/file-schema',
+        title: 'File schema',
       },
       {
-        pathname: '/toolpad/api-reference/functions-group',
-        subheader: 'Functions',
+        pathname: '/toolpad/reference/components-group',
+        title: 'Components',
+        children: componentsManifest.pages,
+      },
+      {
+        pathname: '/toolpad/reference/api',
+        title: 'API',
         children: [
           {
-            title: 'createFunction',
-            pathname: '/toolpad/api-reference/create-function',
+            pathname: '/toolpad/reference/api-group',
+            title: 'Index',
           },
           {
-            title: 'createComponent',
-            pathname: '/toolpad/api-reference/create-component',
+            pathname: '/toolpad/reference/api/functions-group',
+            subheader: 'Functions',
+            children: [
+              {
+                title: 'createFunction',
+                pathname: '/toolpad/reference/api/create-function',
+              },
+              {
+                title: 'createComponent',
+                pathname: '/toolpad/reference/api/create-component',
+              },
+            ],
           },
         ],
       },
     ],
-  },
-  {
-    pathname: '/toolpad/schema-reference',
-    title: 'Schema reference',
-    icon: SchemaIcon,
   },
 ];
 

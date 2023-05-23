@@ -16,8 +16,9 @@ const currentDirectory = __dirname;
 const projectRoot = path.resolve(currentDirectory, '..', '..');
 const prettierConfigPath = path.resolve(projectRoot, 'prettier.config.js');
 const docsRoot = path.resolve(projectRoot, 'docs');
-const componentDocsRoot = path.resolve(docsRoot, 'data/toolpad/components');
-const componentPagesRoot = path.resolve(docsRoot, 'pages/toolpad/components');
+const absolutePathRoot = '/toolpad/reference/components';
+const componentDocsRoot = path.resolve(docsRoot, `data${absolutePathRoot}`);
+const componentPagesRoot = path.resolve(docsRoot, `pages${absolutePathRoot}`);
 
 async function writePageFile(mdFilePath: string) {
   const slug = path.basename(mdFilePath, '.md');
@@ -105,7 +106,7 @@ export async function buildComponentsReference() {
     '## Components',
     '',
     ...components.map(([name]) => {
-      return `- [${name}](/toolpad/components/${kebabCase(name)}/)`;
+      return `- [${name}](${absolutePathRoot}/${kebabCase(name)}/)`;
     }),
   ].join('\n');
 
@@ -116,13 +117,13 @@ export async function buildComponentsReference() {
   const manifest = {
     '//': AUTO_GENERATED_WARNING,
     pages: [
-      { pathname: '/toolpad/components', title: 'Index' },
+      { pathname: absolutePathRoot, title: 'Index' },
       {
-        pathname: '/toolpad/components/components-group',
+        pathname: `${absolutePathRoot}/components-group`,
         subheader: 'Components',
         children: components.map(([name]) => ({
           title: name,
-          pathname: `/toolpad/components/${kebabCase(name)}`,
+          pathname: `${absolutePathRoot}/${kebabCase(name)}`,
         })),
       },
     ],

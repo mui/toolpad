@@ -579,17 +579,13 @@ function flattenNestedBindables(
 
 /**
  * Returns an object with the resolved values of the bindables.
- * Example:
- * { foo: { bar: { type: 'const', value:1 } }, baz: [{ type: 'jsExpression', value: 'quux' }] }
- * =>
- * { foo: { bar: 1 }, baz: ['quux'] }
  * @param bindings
  * Example bindings:
  * {
- *  'mLbjY24.params.order': { error: undefined, loading: false, value: { "OrderID": "" } },
+ *  'nodeId.params.order': { error: undefined, loading: false, value: { "OrderID": "" } },
  * }
  * @param bindingId
- * Example bindingId: 'mLbjY24.params'
+ * Example bindingId: 'nodeId.params'
  * @param params
  * Example params:
  * {

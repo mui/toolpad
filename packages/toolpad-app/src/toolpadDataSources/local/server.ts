@@ -1,5 +1,5 @@
 import { ExecFetchResult } from '@mui/toolpad-core';
-import { Message as MessageToChildProcess } from '@mui/toolpad-core/localRuntime';
+import type { Message as MessageToChildProcess } from '@mui/toolpad-core/localRuntime';
 import { SerializedError, errorFrom, serializeError } from '@mui/toolpad-utils/errors';
 import * as child_process from 'child_process';
 import * as esbuild from 'esbuild';
@@ -10,6 +10,7 @@ import { indent, truncate } from '@mui/toolpad-utils/strings';
 import * as dotenv from 'dotenv';
 import * as chokidar from 'chokidar';
 import chalk from 'chalk';
+import { glob } from 'glob';
 import config from '../../config';
 import { ServerDataSource } from '../../types';
 import { LocalPrivateQuery, LocalQuery, LocalConnectionParams } from './types';
@@ -17,8 +18,8 @@ import { Maybe } from '../../utils/types';
 import {
   getUserProjectRoot,
   openQueryEditor,
-  getFunctionsFile,
   getOutputFolder,
+  getResourcesFolder,
 } from '../../server/localMode';
 import { waitForInit } from '../../server/liveProject';
 
@@ -71,9 +72,19 @@ function pathToNodeImportSpecifier(importPath: string): string {
   return normalized.startsWith('/') ? normalized : `./${normalized}`;
 }
 
-async function createMain(): Promise<string> {
-  const relativeFunctionsFilePath = [`.`, getFunctionsFile('.')].join(path.sep);
-  const functionsImportSpec = pathToNodeImportSpecifier(relativeFunctionsFilePath);
+async function createMain(root: string): Promise<string> {
+  const resourcesFolder = getResourcesFolder(root);
+  const functionFiles = await glob(`${resourcesFolder}/*.ts`);
+
+  const functionImports = functionFiles.map((file) => {
+    const fileName = path.relative(resourcesFolder, file);
+    const importSpec = pathToNodeImportSpecifier(
+      ['.', getResourcesFolder('.'), fileName].join(path.sep),
+    );
+    const name = path.basename(fileName).replace(/\..*$/, '');
+    return `[${JSON.stringify(name)}, () => import(${JSON.stringify(importSpec)})]`;
+  });
+
   return `
     import fetch, { Headers, Request, Response } from 'node-fetch'
     import { setup } from '@mui/toolpad-core/localRuntime';
@@ -87,7 +98,7 @@ async function createMain(): Promise<string> {
     }
 
     setup({
-      loadFunctionsFile: () => import(${JSON.stringify(functionsImportSpec)})
+      functions: new Map([${functionImports.join(', ')}]),
     })
   `;
 }
@@ -117,7 +128,7 @@ export async function loadEnvFile() {
   return {};
 }
 
-async function createBuilder() {
+async function createBuilder(root: string) {
   await waitForInit();
 
   const userProjectRoot = getUserProjectRoot();
@@ -201,7 +212,7 @@ async function createBuilder() {
           break;
         }
         default:
-          console.error(`Unknowm message received "${msg.kind}"`);
+          console.error(`Unknown message received "${msg.kind}"`);
       }
     });
 
@@ -220,7 +231,7 @@ async function createBuilder() {
         if (args.path === 'main.ts') {
           return {
             loader: 'tsx',
-            contents: await createMain(),
+            contents: await createMain(root),
             resolveDir: userProjectRoot,
           };
         }
@@ -403,7 +414,7 @@ const dataSource: ServerDataSource<{}, LocalQuery, any> = {
 export default dataSource;
 
 async function startDev() {
-  const builder = await createBuilder();
+  const builder = await createBuilder(getUserProjectRoot());
   await builder.watch();
   return builder;
 }

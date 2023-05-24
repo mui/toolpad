@@ -3,7 +3,7 @@ import invariant from 'invariant';
 import { TOOLPAD_FUNCTION } from './index';
 
 export interface SetupConfig {
-  loadFunctionsFile: () => Promise<unknown>;
+  functions: Map<string, () => Promise<Record<string, unknown>>>;
 }
 
 export type ResolversMap = Map<string, Function>;
@@ -20,25 +20,61 @@ export type Message =
       parameters: Record<string, any>;
     };
 
-export function setup({ loadFunctionsFile }: SetupConfig) {
+async function loadDefaultExportsAsFunctions(
+  functions: Map<string, () => Promise<{ default?: unknown }>>,
+): Promise<ResolversMap> {
+  const functionsResolvers = new Map<string, Function>();
+  await Promise.all(
+    Array.from(functions.entries(), async ([name, fn]) => {
+      const mod = await fn();
+      if (typeof mod.default === 'function') {
+        functionsResolvers.set(name, mod.default);
+      } else if (name !== 'functions') {
+        console.warn(`Function "${name}" is missing a default export`);
+      }
+    }),
+  );
+
+  return functionsResolvers;
+}
+
+async function loadResolversFromFunctionsFile(
+  functions: Map<string, () => Promise<{ default?: unknown }>>,
+): Promise<ResolversMap> {
+  const functionsFileLoader = functions.get('functions');
+  if (!functionsFileLoader) {
+    return new Map();
+  }
+
+  const functionsFileModule = await functionsFileLoader().catch((err) => {
+    console.error(err);
+    return {};
+  });
+
+  invariant(
+    functionsFileModule && typeof functionsFileModule === 'object',
+    'Expected functions to be an object',
+  );
+
+  const functionsFileResolvers: [string, Function][] = Object.entries(functionsFileModule).flatMap(
+    ([name, resolver]) => {
+      return typeof resolver === 'function' ? [[name, resolver]] : [];
+    },
+  );
+
+  return new Map(functionsFileResolvers);
+}
+
+export function setup({ functions }: SetupConfig) {
   let resolversPromise: Promise<ResolversMap> | undefined;
   async function getResolvers() {
     if (!resolversPromise) {
       resolversPromise = (async () => {
-        const functions = await loadFunctionsFile().catch((err) => {
-          console.error(err);
-          return {};
-        });
-
-        invariant(functions && typeof functions === 'object', 'Expected functions to be an object');
-
-        const functionsFileResolvers: [string, Function][] = Object.entries(functions).flatMap(
-          ([name, resolver]) => {
-            return typeof resolver === 'function' ? [[name, resolver]] : [];
-          },
-        );
-
-        return new Map(functionsFileResolvers);
+        const [functionFileResolvers, resolvers] = await Promise.all([
+          loadResolversFromFunctionsFile(functions),
+          loadDefaultExportsAsFunctions(functions),
+        ]);
+        return new Map([...functionFileResolvers, ...resolvers]);
       })();
     }
 

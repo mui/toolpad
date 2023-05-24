@@ -59,8 +59,12 @@ function getToolpadFolder(root: string): string {
   return path.join(root, './toolpad');
 }
 
+export function getResourcesFolder(root: string): string {
+  return path.join(getToolpadFolder(root), './resources');
+}
+
 export function getFunctionsFile(root: string): string {
-  return path.join(getToolpadFolder(root), './resources/functions.ts');
+  return path.join(getResourcesFolder(root), './functions.ts');
 }
 
 function getThemeFile(root: string): string {

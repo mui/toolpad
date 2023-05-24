@@ -6,7 +6,12 @@ export interface SetupConfig {
   functions: Map<string, () => Promise<Record<string, unknown>>>;
 }
 
-export type ResolversMap = Map<string, Function>;
+export interface Resolver {
+  file: string;
+  exec: Function;
+}
+
+export type ResolversMap = Map<string, Resolver>;
 
 export type Message =
   | {
@@ -23,12 +28,15 @@ export type Message =
 async function loadDefaultExportsAsFunctions(
   functions: Map<string, () => Promise<{ default?: unknown }>>,
 ): Promise<ResolversMap> {
-  const functionsResolvers = new Map<string, Function>();
+  const functionsResolvers: ResolversMap = new Map();
   await Promise.all(
     Array.from(functions.entries(), async ([name, fn]) => {
       const mod = await fn();
       if (typeof mod.default === 'function') {
-        functionsResolvers.set(name, mod.default);
+        functionsResolvers.set(name, {
+          file: `${name}.ts`,
+          exec: mod.default,
+        });
       } else if (name !== 'functions') {
         console.warn(`Function "${name}" is missing a default export`);
       }
@@ -56,9 +64,19 @@ async function loadResolversFromFunctionsFile(
     'Expected functions to be an object',
   );
 
-  const functionsFileResolvers: [string, Function][] = Object.entries(functionsFileModule).flatMap(
+  const functionsFileResolvers: [string, Resolver][] = Object.entries(functionsFileModule).flatMap(
     ([name, resolver]) => {
-      return typeof resolver === 'function' ? [[name, resolver]] : [];
+      return typeof resolver === 'function'
+        ? [
+            [
+              name,
+              {
+                file: 'functions.ts',
+                exec: resolver,
+              },
+            ],
+          ]
+        : [];
     },
   );
 
@@ -94,8 +112,8 @@ export function setup({ functions }: SetupConfig) {
   }
 
   async function execResolver(name: string, parameters: any) {
-    const resolver = await loadResolver(name);
-    return resolver({ parameters });
+    const { exec } = await loadResolver(name);
+    return exec({ parameters });
   }
 
   process.on('message', async (msg: Message) => {
@@ -124,7 +142,11 @@ export function setup({ functions }: SetupConfig) {
           const resolvers = await getResolvers();
           const resolvedResolvers = Array.from(resolvers, ([name, resolver]) => [
             name,
-            (resolver as any)[TOOLPAD_FUNCTION] || {},
+            {
+              name,
+              file: resolver.file,
+              parameters: (resolver.exec as any)[TOOLPAD_FUNCTION]?.parameters,
+            },
           ]);
           data = {
             functions: Object.fromEntries(resolvedResolvers.filter(Boolean)),

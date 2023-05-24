@@ -1007,10 +1007,12 @@ export async function openCodeComponentEditor(componentName: string): Promise<vo
   await openCodeEditor(fullPath);
 }
 
-export async function openQueryEditor() {
+export async function openQueryEditor(fileName: string): Promise<void> {
   const root = getUserProjectRoot();
-  await initQueriesFile(root);
-  const queriesFilePath = getFunctionsFile(root);
+  if (fileName === 'functions.ts') {
+    await initQueriesFile(root);
+  }
+  const queriesFilePath = path.resolve(getResourcesFolder(root), fileName);
   await openCodeEditor(queriesFilePath);
 }
 

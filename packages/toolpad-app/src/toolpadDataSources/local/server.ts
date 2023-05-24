@@ -391,7 +391,7 @@ async function execPrivate(connection: Maybe<LocalConnectionParams>, query: Loca
     case 'debugExec':
       return execBase(connection, query.query, query.params);
     case 'openEditor':
-      return openQueryEditor();
+      return openQueryEditor(query.file);
     default:
       throw new Error(`Unknown private query "${(query as LocalPrivateQuery).kind}"`);
   }

@@ -1,8 +1,9 @@
 import * as React from 'react';
-import { BindableAttrEntries, CreateFunctionConfig } from '@mui/toolpad-core';
+import { BindableAttrEntries } from '@mui/toolpad-core';
 import { Autocomplete, Button, Stack, TextField, Typography } from '@mui/material';
 import { useBrowserJsRuntime } from '@mui/toolpad-core/jsBrowserRuntime';
 import { errorFrom } from '@mui/toolpad-utils/errors';
+import invariant from 'invariant';
 import { ClientDataSource, QueryEditorProps } from '../../types';
 import {
   LocalPrivateQuery,
@@ -10,6 +11,7 @@ import {
   FetchResult,
   LocalConnectionParams,
   IntrospectionResult,
+  IntrospectedFunction,
 } from './types';
 import {
   useEvaluateLiveBindingEntries,
@@ -42,9 +44,10 @@ function QueryEditor({
   );
 
   const functionName: string | undefined = input.attributes.query.value.function;
-  const functionDefs: Record<string, CreateFunctionConfig<any>> = introspection.data?.functions ??
-  {};
+  const functionDefs: Record<string, IntrospectedFunction> | undefined =
+    introspection.data?.functions ?? {};
   const parameterDefs = (functionName ? functionDefs?.[functionName]?.parameters : null) || {};
+  const file = functionName ? functionDefs?.[functionName]?.file : null;
 
   const paramsEntries = input.params?.filter(([key]) => !!parameterDefs[key]) || EMPTY_PARAMS;
 
@@ -70,14 +73,15 @@ function QueryEditor({
     [fetchPrivate],
   );
 
-  const openEditor = React.useCallback(() => {
-    fetchPrivate({ kind: 'openEditor' }).catch((err) => {
+  const handleOpenEditorClick = React.useCallback(() => {
+    invariant(file, 'The "open editor" button should be disabled if there is no function selected');
+    fetchPrivate({ kind: 'openEditor', file }).catch((err) => {
       // TODO: Write docs with instructions on how to install editor
       // Add a good looking alert box and inline some instructions and link to docs
       // eslint-disable-next-line no-alert
       alert(err.message);
     });
-  }, [fetchPrivate]);
+  }, [fetchPrivate, file]);
 
   const {
     preview,
@@ -131,7 +135,9 @@ function QueryEditor({
                 />
               )}
             />
-            <Button onClick={openEditor}>Open editor</Button>
+            <Button disabled={!file} onClick={handleOpenEditorClick}>
+              Open editor
+            </Button>
           </Stack>
           <Typography>Parameters:</Typography>
           <Stack gap={1}>

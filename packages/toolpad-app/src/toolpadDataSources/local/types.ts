@@ -1,4 +1,4 @@
-import { BindableAttrValue, CreateFunctionConfig, ExecFetchResult } from '@mui/toolpad-core';
+import { BindableAttrValue, ExecFetchResult, PrimitiveValueType } from '@mui/toolpad-core';
 
 export interface LocalConnectionParams {}
 
@@ -22,12 +22,19 @@ export type LocalPrivateQuery =
     }
   | {
       kind: 'openEditor';
+      file: string;
     };
 
 export interface FetchResult extends ExecFetchResult<any> {
   data: any;
 }
 
+export interface IntrospectedFunction {
+  name: string;
+  file: string;
+  parameters: Record<string, PrimitiveValueType>;
+}
+
 export type IntrospectionResult = {
-  functions: Record<string, CreateFunctionConfig<unknown>>;
+  functions: Record<string, IntrospectedFunction>;
 };

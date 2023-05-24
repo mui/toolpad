@@ -41,3 +41,14 @@ export const withParams = createFunction(
     },
   },
 );
+
+export const manualQueryWithParams = createFunction(
+  async ({ parameters }) => {
+    return { parameters };
+  },
+  {
+    parameters: {
+      foo: { type: 'string' },
+    },
+  },
+);

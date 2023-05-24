@@ -15,7 +15,7 @@ import { useDom, useDomApi } from '../../AppState';
 import BindableEditor from './BindableEditor';
 import { usePageEditorState } from './PageEditorProvider';
 import { getDefaultControl } from '../../propertyControls';
-import { isTemplateDescendant } from '../../../toolpadComponents/template';
+import { isTemplateDescendant } from '../../../runtime/toolpadComponents/template';
 import { NON_BINDABLE_CONTROL_TYPES } from '../../../runtime/constants';
 
 export interface NodeAttributeEditorProps<P extends object, K extends keyof P = keyof P> {

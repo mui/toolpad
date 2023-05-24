@@ -28,7 +28,7 @@ import {
 import { generateUniqueString } from '@mui/toolpad-utils/strings';
 import type { EditorProps } from '../../types';
 import { useToolpadComponents } from '../AppEditor/toolpadComponents';
-import { ToolpadComponentDefinition } from '../../toolpadComponents';
+import { ToolpadComponentDefinition } from '../../runtime/toolpadComponents';
 import { useDom } from '../AppState';
 import PropertyControl from '../../components/PropertyControl';
 

@@ -183,6 +183,10 @@ export interface RuntimeState {
   dom: appDom.RenderTree;
 }
 
+export interface AppCanvasState extends RuntimeState {
+  savedNodes: NodeHashes;
+}
+
 export type ProjectEvents = {
   // a change in the DOM
   change: { fingerprint: number };

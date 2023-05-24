@@ -68,13 +68,6 @@ spec:
               $$jsExpression: |
                 edited.data
     - component: PageRow
-      name: pageRow7
-      children:
-        - component: Text
-          name: text
-          props:
-            value: "source: checksum"
-    - component: PageRow
       name: pageRow8
       children:
         - component: Button
@@ -129,4 +122,4 @@ spec:
         - name: foo
           value:
             $$jsExpression: |
-              text.value.split(" ")?.[1]
+              "checksum"

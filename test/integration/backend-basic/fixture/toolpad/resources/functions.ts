@@ -49,7 +49,6 @@ export const manualQueryWithParams = createFunction(
   {
     parameters: {
       foo: { type: 'string' },
-      // __NEW_PARAMETER__
     },
   },
 );

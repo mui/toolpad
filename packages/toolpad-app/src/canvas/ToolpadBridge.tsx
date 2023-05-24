@@ -1,8 +1,7 @@
 import { Emitter } from '@mui/toolpad-utils/events';
 import type { RuntimeEvents } from '@mui/toolpad-core';
-import type { AppCanvasState } from '.';
 import { TOOLPAD_BRIDGE_GLOBAL } from '../constants';
-import type { PageViewState } from '../types';
+import type { AppCanvasState, PageViewState } from '../types';
 
 declare global {
   interface Window {

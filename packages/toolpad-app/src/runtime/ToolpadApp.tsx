@@ -46,6 +46,7 @@ import {
 } from 'react-router-dom';
 import { ErrorBoundary, FallbackProps } from 'react-error-boundary';
 import {
+  CanvasEventsContext,
   NodeErrorProps,
   NodeRuntimeWrapper,
   ResetNodeErrorsKeyProvider,
@@ -66,7 +67,7 @@ import {
   isPageLayoutComponent,
   isPageRow,
   PAGE_ROW_COMPONENT_ID,
-} from '../toolpadComponents';
+} from './toolpadComponents';
 import AppThemeProvider from './AppThemeProvider';
 import evalJsBindings, {
   buildGlobalScope,
@@ -74,12 +75,11 @@ import evalJsBindings, {
   ParsedBinding,
 } from './evalJsBindings';
 import { HTML_ID_EDITOR_OVERLAY, NON_BINDABLE_CONTROL_TYPES } from './constants';
-import { layoutBoxArgTypes } from '../toolpadComponents/layoutBox';
+import { layoutBoxArgTypes } from './toolpadComponents/layoutBox';
 import { execDataSourceQuery, useDataQuery, UseDataQueryConfig, UseFetch } from './useDataQuery';
-import { CanvasHooksContext, NavigateToPage } from './CanvasHooksContext';
+import { NavigateToPage } from './CanvasHooksContext';
 import AppNavigation from './AppNavigation';
 import PreviewHeader from './PreviewHeader';
-import { BridgeContext } from '../canvas/BridgeContext';
 
 const isPreview = process.env.NODE_ENV !== 'production';
 const isRenderedInCanvas =
@@ -135,24 +135,30 @@ const USE_DATA_QUERY_CONFIG_KEYS: readonly (keyof UseDataQueryConfig)[] = [
 
 function usePageNavigator(): NavigateToPage {
   const navigate = useNavigate();
+
+  const canvasEvents = React.useContext(CanvasEventsContext);
+
   const navigateToPage: NavigateToPage = React.useCallback(
     (pageNodeId, pageParameters) => {
       const urlParams = pageParameters && new URLSearchParams(pageParameters);
 
-      navigate({
-        pathname: `/pages/${pageNodeId}`,
-        ...(urlParams
-          ? {
-              search: urlParams.toString(),
-            }
-          : {}),
-      });
+      if (canvasEvents) {
+        canvasEvents.emit('pageNavigationRequest', { pageNodeId });
+      } else {
+        navigate({
+          pathname: `/pages/${pageNodeId}`,
+          ...(urlParams
+            ? {
+                search: urlParams.toString(),
+              }
+            : {}),
+        });
+      }
     },
-    [navigate],
+    [canvasEvents, navigate],
   );
 
-  const canvasHooks = React.useContext(CanvasHooksContext);
-  return canvasHooks.navigateToPage || navigateToPage;
+  return navigateToPage;
 }
 
 const AppRoot = styled('div')({
@@ -1094,17 +1100,18 @@ function RenderedPage({ nodeId }: RenderedNodeProps) {
     [browserJsRuntime, getScopeState],
   );
 
-  const bridge = React.useContext(BridgeContext);
+  const canvasEvents = React.useContext(CanvasEventsContext);
 
   React.useEffect(() => {
     const pageState = getScopeState();
-    bridge?.canvasEvents.emit('pageStateUpdated', { pageState, globalScopeMeta });
-  }, [bridge, globalScopeMeta, getScopeState]);
+
+    canvasEvents?.emit('pageStateUpdated', { pageState, globalScopeMeta });
+  }, [canvasEvents, globalScopeMeta, getScopeState]);
 
   React.useEffect(() => {
     const liveBindings = getBindings();
-    bridge?.canvasEvents.emit('pageBindingsUpdated', { bindings: liveBindings });
-  }, [bridge, getBindings]);
+    canvasEvents?.emit('pageBindingsUpdated', { bindings: liveBindings });
+  }, [canvasEvents, getBindings]);
 
   return (
     <BindingsContextProvider value={getBindings}>

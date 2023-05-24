@@ -1,0 +1,21 @@
+{
+  "type": "object",
+  "properties": {
+    "align": {
+      "type": "string",
+      "enum": ["line", "bar", "pie"]
+    },
+    "label": {
+      "type": "string"
+    },
+    "data": {
+      "type": "object"
+    },
+    "xKey": {
+      "type": "string"
+    },
+    "yKey": {
+      "type": "string"
+    }
+  }
+}

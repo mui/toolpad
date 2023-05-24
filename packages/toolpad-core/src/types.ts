@@ -216,6 +216,7 @@ export interface ArgControlSpec {
     | 'markdown' // Markdown editor
     | 'GridColumns' // GridColumns specialized editor
     | 'SelectOptions' // SelectOptions specialized editor
+    | 'ChartData' // Chart data series specialized editor
     | 'HorizontalAlign'
     | 'VerticalAlign'
     | 'event'

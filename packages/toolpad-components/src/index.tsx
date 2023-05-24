@@ -12,6 +12,8 @@ export { default as Button } from './Button.js';
 
 export { default as DataGrid } from './DataGrid.js';
 
+export { default as Chart } from './Chart.js';
+
 export { default as TextField } from './TextField.js';
 
 export { default as Select } from './Select.js';
@@ -39,3 +41,4 @@ export {
   parseColumns,
 } from './DataGrid.js';
 export type { SerializableGridColumn, SerializableGridColumns, NumberFormat } from './DataGrid.js';
+export type { ChartDataSeries, ChartData } from './Chart.js';

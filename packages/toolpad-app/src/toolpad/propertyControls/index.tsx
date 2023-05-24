@@ -8,6 +8,7 @@ import markdown from './Markdown';
 import event from './event';
 import GridColumns from './GridColumns';
 import SelectOptions from './SelectOptions';
+import ChartData from './ChartData';
 import HorizontalAlign from './HorizontalAlign';
 import VerticalAlign from './VerticalAlign';
 import RowIdFieldSelect from './RowIdFieldSelect';
@@ -25,6 +26,7 @@ const propTypeControls: {
   event,
   GridColumns,
   SelectOptions,
+  ChartData,
   RowIdFieldSelect,
   HorizontalAlign,
   VerticalAlign,

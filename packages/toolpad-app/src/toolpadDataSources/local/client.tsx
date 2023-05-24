@@ -34,6 +34,7 @@ import QueryPreview from '../QueryPreview';
 import { usePrivateQuery } from '../context';
 import BindableEditor from '../../toolpad/AppEditor/PageEditor/BindableEditor';
 import { getDefaultControl } from '../../toolpad/propertyControls';
+import { useOnProjectEvent } from '../../projectEvents';
 
 const EMPTY_PARAMS: BindableAttrEntries = [];
 
@@ -53,6 +54,8 @@ function QueryEditor({
     },
     { retry: false },
   );
+
+  useOnProjectEvent('functionsBuildEnd', () => introspection.refetch());
 
   const functionName: string | undefined = input.attributes.query.value.function;
   const functionDefs: Record<string, IntrospectedFunction> | undefined =

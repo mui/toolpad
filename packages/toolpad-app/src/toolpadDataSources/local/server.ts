@@ -22,7 +22,7 @@ import {
   getResourcesFolder,
   createFunctionFile,
 } from '../../server/localMode';
-import { waitForInit } from '../../server/liveProject';
+import { waitForInit, getProject } from '../../server/liveProject';
 
 type MessageFromChildProcess = {
   kind: 'result';
@@ -135,6 +135,7 @@ export async function loadEnvFile() {
 
 async function createBuilder(root: string) {
   await waitForInit();
+  const project = await getProject();
 
   const userProjectRoot = getUserProjectRoot();
 
@@ -273,6 +274,8 @@ async function createBuilder(root: string) {
 
           restartRuntimeProcess();
         }
+
+        project.events.emit('functionsBuildEnd', {});
 
         setInitialized();
       });

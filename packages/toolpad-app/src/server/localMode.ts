@@ -48,6 +48,7 @@ import {
   ResponseType as AppDomRestResponseType,
 } from '../toolpadDataSources/rest/types';
 import { LocalQuery } from '../toolpadDataSources/local/types';
+import { ProjectEvents } from '../types';
 
 export function getUserProjectRoot(): string {
   const { projectDir } = config;
@@ -243,7 +244,7 @@ function createDefaultFunction(): string {
       },
       {
         parameters: {
-          foo: { type: 'string', default: 'world' },
+          foo: { type: 'string' },
         },
       },
     );
@@ -1209,11 +1210,7 @@ export async function initProject() {
   let codeComponentsFingerprint = getCodeComponentsFingerprint(dom);
   const lock = new Lock();
 
-  const events = new Emitter<{
-    change: { fingerprint: number };
-    externalChange: { fingerprint: number };
-    componentsListChanged: {};
-  }>();
+  const events = new Emitter<ProjectEvents>();
 
   const updateDomFromExternal = debounce(() => {
     lock.use(async () => {

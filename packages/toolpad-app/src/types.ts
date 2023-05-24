@@ -182,3 +182,14 @@ export interface RuntimeState {
   // We start out with just the rendertree. The ultimate goal will be to move things out of this tree
   dom: appDom.RenderTree;
 }
+
+export type ProjectEvents = {
+  // a change in the DOM
+  change: { fingerprint: number };
+  // a change in the DOM caused by an external action (e.g. user editing a file outside of toolpad)
+  externalChange: { fingerprint: number };
+  // a component has been added or removed
+  componentsListChanged: {};
+  // the function runtime build has finished
+  functionsBuildEnd: {};
+};

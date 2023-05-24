@@ -1,4 +1,5 @@
 import { ExecFetchResult } from '@mui/toolpad-core';
+import { Message as MessageToChildProcess } from '@mui/toolpad-core/localRuntime';
 import { SerializedError, errorFrom, serializeError } from '@mui/toolpad-utils/errors';
 import * as child_process from 'child_process';
 import * as esbuild from 'esbuild';
@@ -20,18 +21,6 @@ import {
   getOutputFolder,
 } from '../../server/localMode';
 import { waitForInit } from '../../server/liveProject';
-
-type MessageToChildProcess =
-  | {
-      kind: 'introspect';
-      id: number;
-    }
-  | {
-      kind: 'exec';
-      id: number;
-      name: string;
-      parameters: Record<string, any>;
-    };
 
 type MessageFromChildProcess = {
   kind: 'result';

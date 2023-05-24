@@ -8,7 +8,7 @@ export interface SetupConfig {
 
 export type ResolversMap = Map<string, Function>;
 
-type Message =
+export type Message =
   | {
       kind: 'introspect';
       id: number;

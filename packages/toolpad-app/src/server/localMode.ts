@@ -49,6 +49,7 @@ import {
 } from '../toolpadDataSources/rest/types';
 import { LocalQuery } from '../toolpadDataSources/local/types';
 import { ProjectEvents } from '../types';
+import { Awaitable } from '../utils/types';
 
 export function getUserProjectRoot(): string {
   const { projectDir } = config;
@@ -1199,6 +1200,94 @@ function getCodeComponentsFingerprint(dom: appDom.AppDom) {
   return codeComponents.map(({ name }) => name).join('|');
 }
 
+interface ToolpadProjectOptions {
+  dev: boolean;
+}
+
+class ToolpadProject {
+  root: string;
+
+  events = new Emitter<ProjectEvents>();
+
+  private domAndFingerprint: Awaitable<[appDom.AppDom, number]> | null = null;
+
+  private domAndFingerprintLock = new Lock();
+
+  private options: ToolpadProjectOptions;
+
+  private codeComponentsFingerprint: null | string = null;
+
+  constructor(root: string, options: Partial<ToolpadProjectOptions>) {
+    this.root = root;
+    this.options = {
+      dev: false,
+      ...options,
+    };
+    this.initWatcher();
+  }
+
+  private initWatcher() {
+    if (!this.options.dev) {
+      return;
+    }
+
+    const updateDomFromExternal = debounce(() => {
+      this.domAndFingerprintLock.use(async () => {
+        const [dom, fingerprint] = await this.loadDomAndFingerprint();
+        const newFingerprint = await calculateDomFingerprint(this.root);
+        if (fingerprint !== newFingerprint) {
+          // eslint-disable-next-line no-console
+          console.log(`${chalk.magenta('event')} - Project changed on disk, updating...`);
+          this.domAndFingerprint = await Promise.all([
+            loadDomFromDisk(),
+            calculateDomFingerprint(this.root),
+          ]);
+          this.events.emit('change', { fingerprint });
+          this.events.emit('externalChange', { fingerprint });
+
+          const newCodeComponentsFingerprint = getCodeComponentsFingerprint(dom);
+          if (this.codeComponentsFingerprint !== newCodeComponentsFingerprint) {
+            this.codeComponentsFingerprint = newCodeComponentsFingerprint;
+            if (this.codeComponentsFingerprint !== null) {
+              this.events.emit('componentsListChanged', {});
+            }
+          }
+        }
+      });
+    }, 100);
+
+    chokidar.watch(getDomFilePatterns(this.root)).on('all', () => {
+      updateDomFromExternal();
+    });
+  }
+
+  private async loadDomAndFingerprint() {
+    if (!this.domAndFingerprint) {
+      this.domAndFingerprint = Promise.all([loadDomFromDisk(), calculateDomFingerprint(this.root)]);
+    }
+    return this.domAndFingerprint;
+  }
+
+  async loadDom() {
+    const [dom] = await this.loadDomAndFingerprint();
+    return dom;
+  }
+
+  async saveDom(newDom: appDom.AppDom) {
+    if (config.cmd !== 'dev') {
+      throw new Error(`Writing to disk is only possible in toolpad dev mode.`);
+    }
+
+    return this.domAndFingerprintLock.use(async () => {
+      await writeDomToDisk(newDom);
+      const newFingerprint = await calculateDomFingerprint(this.root);
+      this.domAndFingerprint = [newDom, newFingerprint];
+      this.events.emit('change', { fingerprint: newFingerprint });
+      return { fingerprint: newFingerprint };
+    });
+  }
+}
+
 export async function initProject() {
   const root = getUserProjectRoot();
 
@@ -1206,59 +1295,5 @@ export async function initProject() {
 
   await initToolpadFolder(root);
 
-  let [dom, fingerprint] = await Promise.all([loadDomFromDisk(), calculateDomFingerprint(root)]);
-  let codeComponentsFingerprint = getCodeComponentsFingerprint(dom);
-  const lock = new Lock();
-
-  const events = new Emitter<ProjectEvents>();
-
-  const updateDomFromExternal = debounce(() => {
-    lock.use(async () => {
-      const newFingerprint = await calculateDomFingerprint(root);
-      if (fingerprint !== newFingerprint) {
-        // eslint-disable-next-line no-console
-        console.log(`${chalk.magenta('event')} - Project changed on disk, updating...`);
-        [dom, fingerprint] = await Promise.all([loadDomFromDisk(), calculateDomFingerprint(root)]);
-        events.emit('change', { fingerprint });
-        events.emit('externalChange', { fingerprint });
-
-        const newCodeComponentsFingerprint = getCodeComponentsFingerprint(dom);
-        if (codeComponentsFingerprint !== newCodeComponentsFingerprint) {
-          codeComponentsFingerprint = newCodeComponentsFingerprint;
-          events.emit('componentsListChanged', {});
-        }
-      }
-    });
-  }, 100);
-
-  if (config.cmd === 'dev') {
-    chokidar.watch(getDomFilePatterns(root)).on('all', () => {
-      updateDomFromExternal();
-    });
-  }
-
-  return {
-    events,
-
-    async loadDom() {
-      return dom;
-    },
-
-    async saveDom(newDom: appDom.AppDom) {
-      if (config.cmd !== 'dev') {
-        throw new Error(`Writing to disk is only possible in toolpad dev mode.`);
-      }
-
-      await lock.use(async () => {
-        await writeDomToDisk(newDom);
-        const newFingerprint = await calculateDomFingerprint(root);
-
-        dom = newDom;
-        fingerprint = newFingerprint;
-        events.emit('change', { fingerprint });
-      });
-
-      return { fingerprint };
-    },
-  };
+  return new ToolpadProject(root, { dev: config.cmd === 'dev' });
 }

@@ -84,10 +84,10 @@ function pathToNodeImportSpecifier(importPath: string): string {
 
 async function createMain(): Promise<string> {
   const relativeFunctionsFilePath = [`.`, getFunctionsFile('.')].join(path.sep);
+  const functionsImportSpec = pathToNodeImportSpecifier(relativeFunctionsFilePath);
   return `
-    import { TOOLPAD_FUNCTION } from '@mui/toolpad-core';
-    import { errorFrom, serializeError } from '@mui/toolpad-utils/errors';
     import fetch, { Headers, Request, Response } from 'node-fetch'
+    import { setup } from '@mui/toolpad-core/localRuntime';
 
     // Polyfill fetch() in the Node.js environment
     if (!global.fetch) {
@@ -97,91 +97,9 @@ async function createMain(): Promise<string> {
       global.Response = Response
     }
 
-    async function loadFunction (name, importFn) {
-      const { default: resolver } = await importFn()
-      return [name, resolver]
-    }
-
-    let resolversPromise
-    async function getResolvers() {
-      if (!resolversPromise) {
-        resolversPromise = (async () => {
-          const functions = await import(${JSON.stringify(
-            pathToNodeImportSpecifier(relativeFunctionsFilePath),
-          )}).catch((err) => {
-            console.error(err);
-            return {};
-          });
-
-          const functionsFileResolvers = Object.entries(functions).flatMap(([name, resolver]) => {
-            return typeof resolver === 'function' ? [[name, resolver]] : []
-          })
-
-          return new Map(functionsFileResolvers);
-        })();
-      }
-      return resolversPromise
-    }
-
-    async function loadResolver (name) {
-      const resolvers = await getResolvers()
-
-      const resolver = resolvers.get(name);
-
-      if (!resolver) {
-        throw new Error(\`Can't find "\${name}"\`);
-      }
-
-      return resolver
-    }
-
-    async function execResolver (name, parameters) {
-      const resolver = await loadResolver(name);
-      return resolver({ parameters })
-    }
-
-    process.on('message', async msg => {
-      switch (msg.kind) {
-        case 'exec': {
-          let data, error;
-          try {
-            data = await execResolver(msg.name, msg.parameters);
-          } catch (err) {
-            error =  serializeError(errorFrom(err))
-          }
-          process.send({
-            kind: 'result',
-            id: msg.id,
-            data,
-            error
-          });
-          break;
-        }
-        case 'introspect': {
-          let data, error
-          try {
-            const resolvers = await getResolvers()
-            const resolvedResolvers =  Array.from(resolvers, ([name, resolver]) => [
-              name,
-              resolver[TOOLPAD_FUNCTION] || {}
-            ]);
-            data = { 
-              functions: Object.fromEntries(resolvedResolvers.filter(Boolean))
-            };
-          } catch (err) {
-            error =  serializeError(errorFrom(err))
-          }
-          process.send({
-            kind: 'result',
-            id: msg.id,
-            data,
-            error
-          });
-          break;
-        }
-        default: console.log(\`Unknown message kind "\${msg.kind}"\`);
-      }
-    });
+    setup({
+      loadFunctionsFile: () => import(${JSON.stringify(functionsImportSpec)})
+    })
   `;
 }
 

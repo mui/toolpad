@@ -23,6 +23,10 @@ export type LocalPrivateQuery =
   | {
       kind: 'openEditor';
       file: string;
+    }
+  | {
+      kind: 'createFunctionFile';
+      name: string;
     };
 
 export interface FetchResult extends ExecFetchResult<any> {

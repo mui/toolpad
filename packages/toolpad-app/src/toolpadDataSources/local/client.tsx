@@ -1,6 +1,13 @@
 import * as React from 'react';
 import { BindableAttrEntries } from '@mui/toolpad-core';
-import { Autocomplete, Button, Stack, TextField, Typography } from '@mui/material';
+import {
+  Autocomplete,
+  Button,
+  Stack,
+  TextField,
+  Typography,
+  createFilterOptions,
+} from '@mui/material';
 import { useBrowserJsRuntime } from '@mui/toolpad-core/jsBrowserRuntime';
 import { errorFrom } from '@mui/toolpad-utils/errors';
 import invariant from 'invariant';
@@ -29,6 +36,10 @@ import BindableEditor from '../../toolpad/AppEditor/PageEditor/BindableEditor';
 import { getDefaultControl } from '../../toolpad/propertyControls';
 
 const EMPTY_PARAMS: BindableAttrEntries = [];
+
+type FunctionOptionType = string | { kind: 'create'; suggestion: string };
+
+const filter = createFilterOptions<FunctionOptionType>();
 
 function QueryEditor({
   globalScope,
@@ -103,7 +114,7 @@ function QueryEditor({
     ? errorFrom(introspection.error).message
     : '';
 
-  const methodSelectOptions: string[] = React.useMemo(
+  const methodSelectOptions: FunctionOptionType[] = React.useMemo(
     () => Object.keys(introspection.data?.functions ?? {}),
     [introspection.data?.functions],
   );
@@ -116,12 +127,46 @@ function QueryEditor({
             <Autocomplete
               value={functionName ?? ''}
               onChange={(event, newValue) => {
-                setInput((existing) =>
-                  appDom.setQueryProp(existing, 'function', newValue ?? undefined),
-                );
+                if (typeof newValue === 'string') {
+                  setInput((existing) =>
+                    appDom.setQueryProp(existing, 'function', newValue ?? undefined),
+                  );
+                } else if (newValue) {
+                  const newFunctionName = newValue.suggestion;
+                  fetchPrivate({ kind: 'createFunctionFile', name: newFunctionName })
+                    .catch(console.error)
+                    .finally(() => {
+                      introspection.refetch();
+                    });
+                  setInput((existing) =>
+                    appDom.setQueryProp(existing, 'function', newFunctionName),
+                  );
+                }
               }}
               loading={introspection.isLoading}
               options={methodSelectOptions}
+              filterOptions={(options, params) => {
+                const filtered = filter(options, params);
+
+                if (params.inputValue !== '' && !filtered.includes(params.inputValue)) {
+                  filtered.push({
+                    kind: 'create',
+                    suggestion: params.inputValue,
+                  });
+                }
+
+                return filtered;
+              }}
+              getOptionLabel={(option) => {
+                // e.g value selected with enter, right from the input
+                if (typeof option === 'string') {
+                  return option;
+                }
+                if (option) {
+                  return `Create new function "${option.suggestion}"`;
+                }
+                return '';
+              }}
               selectOnFocus
               clearOnBlur
               handleHomeEndKeys

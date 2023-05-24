@@ -233,6 +233,24 @@ function createDefaultCodeComponent(name: string): string {
   `);
 }
 
+function createDefaultFunction(): string {
+  return format(`
+    import { createFunction } from '@mui/toolpad/server';
+
+    export default createFunction(
+      async ({ parameters }) => {
+        return \`Hello \${parameters.foo}\`;
+      },
+      {
+        parameters: {
+          foo: { type: 'string', default: 'world' },
+        },
+      },
+    );
+  
+  `);
+}
+
 export async function createComponent(name: string) {
   const root = getUserProjectRoot();
   const componentsFolder = getComponentsFolder(root);
@@ -1014,6 +1032,13 @@ export async function openQueryEditor(fileName: string): Promise<void> {
   }
   const queriesFilePath = path.resolve(getResourcesFolder(root), fileName);
   await openCodeEditor(queriesFilePath);
+}
+
+export async function createFunctionFile(name: string): Promise<void> {
+  const root = getUserProjectRoot();
+  const filePath = path.resolve(getResourcesFolder(root), `${name}.ts`);
+  const content = createDefaultFunction();
+  await writeFileRecursive(filePath, content, { encoding: 'utf-8' });
 }
 
 export type ProjectFolderEntry = {

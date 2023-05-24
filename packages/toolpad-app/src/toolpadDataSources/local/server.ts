@@ -20,6 +20,7 @@ import {
   openQueryEditor,
   getOutputFolder,
   getResourcesFolder,
+  createFunctionFile,
 } from '../../server/localMode';
 import { waitForInit } from '../../server/liveProject';
 
@@ -72,9 +73,13 @@ function pathToNodeImportSpecifier(importPath: string): string {
   return normalized.startsWith('/') ? normalized : `./${normalized}`;
 }
 
+function getFunctionResourcesPattern(root: string): string {
+  return path.join(getResourcesFolder(root), '*.ts');
+}
+
 async function createMain(root: string): Promise<string> {
   const resourcesFolder = getResourcesFolder(root);
-  const functionFiles = await glob(`${resourcesFolder}/*.ts`);
+  const functionFiles = await glob(getFunctionResourcesPattern(root));
 
   const functionImports = functionFiles.map((file) => {
     const fileName = path.relative(resourcesFolder, file);
@@ -330,6 +335,7 @@ async function createBuilder(root: string) {
   }
 
   let envFileWatcher: chokidar.FSWatcher | undefined;
+  let resourcesWatcher: chokidar.FSWatcher | undefined;
 
   const envFilePath = path.resolve(userProjectRoot, '.env');
 
@@ -347,6 +353,38 @@ async function createBuilder(root: string) {
           envFileWatcher.on('all', async () => {
             env = await loadEnvFile();
             restartRuntimeProcess();
+          });
+        } catch (err: unknown) {
+          if (errorFrom(err).name === 'AbortError') {
+            return;
+          }
+          throw err;
+        }
+      })();
+
+      // Make sure we pick up added/removed function files
+      (async () => {
+        try {
+          if (resourcesWatcher) {
+            await resourcesWatcher.close();
+          }
+          const pattern = getFunctionResourcesPattern(root);
+
+          const calculateFingerPrint = async () => {
+            const functionFiles = await glob(pattern);
+            return functionFiles.join('|');
+          };
+
+          let fingerprint = await calculateFingerPrint();
+
+          const globalResourcesFolder = path.resolve(pattern);
+          resourcesWatcher = chokidar.watch([globalResourcesFolder]);
+          resourcesWatcher.on('all', async () => {
+            const newFingerprint = await calculateFingerPrint();
+            if (fingerprint !== newFingerprint) {
+              fingerprint = newFingerprint;
+              ctx.rebuild();
+            }
           });
         } catch (err: unknown) {
           if (errorFrom(err).name === 'AbortError') {
@@ -392,6 +430,8 @@ async function execPrivate(connection: Maybe<LocalConnectionParams>, query: Loca
       return execBase(connection, query.query, query.params);
     case 'openEditor':
       return openQueryEditor(query.file);
+    case 'createFunctionFile':
+      return createFunctionFile(query.name);
     default:
       throw new Error(`Unknown private query "${(query as LocalPrivateQuery).kind}"`);
   }

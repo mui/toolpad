@@ -16,13 +16,13 @@ import PageOptionsPanel from './PageOptionsPanel';
 import ErrorAlert from './ErrorAlert';
 import NodeNameEditor from '../NodeNameEditor';
 import { useToolpadComponent } from '../toolpadComponents';
-import { getElementNodeComponentId } from '../../../toolpadComponents';
+import { getElementNodeComponentId } from '../../../runtime/toolpadComponents';
 import {
   layoutBoxArgTypes,
   LAYOUT_DIRECTION_BOTH,
   LAYOUT_DIRECTION_HORIZONTAL,
   LAYOUT_DIRECTION_VERTICAL,
-} from '../../../toolpadComponents/layoutBox';
+} from '../../../runtime/toolpadComponents/layoutBox';
 import ElementContext from '../ElementContext';
 import MarkdownTooltip from '../../../components/MarkdownTooltip';
 
@@ -46,7 +46,7 @@ function shouldRenderControl<P extends object>(
   props: P,
   componentConfig: ComponentConfig<P>,
 ) {
-  if (propTypeDef.typeDef.type === 'element' || propTypeDef.typeDef.type === 'template') {
+  if (propTypeDef.type === 'element' || propTypeDef.type === 'template') {
     return (
       propTypeDef.control?.type !== 'slot' &&
       propTypeDef.control?.type !== 'slots' &&

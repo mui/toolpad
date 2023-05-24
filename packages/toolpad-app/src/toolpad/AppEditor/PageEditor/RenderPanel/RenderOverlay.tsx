@@ -24,7 +24,7 @@ import {
   PAGE_COLUMN_COMPONENT_ID,
   isFormComponent,
   FORM_COMPONENT_ID,
-} from '../../../../toolpadComponents';
+} from '../../../../runtime/toolpadComponents';
 import {
   getRectanglePointActiveEdge,
   isHorizontalFlow,
@@ -203,6 +203,32 @@ function deleteOrphanedLayoutNodes(
           moveTargetNodeId !== parentParent.id &&
           moveTargetNodeId !== lastContainerChild.id
         ) {
+          if (
+            moveTargetNodeId !== parent.id &&
+            moveTargetNodeId !== lastContainerChild.id &&
+            isPageLayoutComponent(parentParent)
+          ) {
+            draftDom = appDom.moveNode(
+              draftDom,
+              lastContainerChild,
+              parentParent,
+              lastContainerChild.parentProp,
+              parent.parentIndex,
+            );
+
+            if (isPageColumn(parent)) {
+              draftDom = appDom.setNodeNamespacedProp(
+                draftDom,
+                lastContainerChild,
+                'layout',
+                'columnSize',
+                parent.layout?.columnSize || appDom.createConst(1),
+              );
+            }
+
+            orphanedLayoutNodeIds = [...orphanedLayoutNodeIds, parent.id];
+          }
+
           draftDom = appDom.moveNode(
             draftDom,
             lastContainerChild,
@@ -222,32 +248,6 @@ function deleteOrphanedLayoutNodes(
           }
 
           orphanedLayoutNodeIds = [...orphanedLayoutNodeIds, parentParent.id];
-        }
-
-        if (
-          moveTargetNodeId !== parent.id &&
-          moveTargetNodeId !== lastContainerChild.id &&
-          isPageLayoutComponent(parentParent)
-        ) {
-          draftDom = appDom.moveNode(
-            draftDom,
-            lastContainerChild,
-            parentParent,
-            lastContainerChild.parentProp,
-            parent.parentIndex,
-          );
-
-          if (isPageColumn(parent)) {
-            draftDom = appDom.setNodeNamespacedProp(
-              draftDom,
-              lastContainerChild,
-              'layout',
-              'columnSize',
-              parent.layout?.columnSize || appDom.createConst(1),
-            );
-          }
-
-          orphanedLayoutNodeIds = [...orphanedLayoutNodeIds, parent.id];
         }
       }
     }

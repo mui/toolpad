@@ -6,8 +6,6 @@ import * as appDom from '../../../appDom';
 import { Maybe, WithControlledProp } from '../../../utils/types';
 import { useDom } from '../../AppState';
 import dataSources from '../../../toolpadDataSources/client';
-import envConfig from '../../../config';
-import { DEMO_DATASOURCES } from '../../../constants';
 
 export type ConnectionOption = {
   connectionId: NodeId | null;
@@ -35,7 +33,7 @@ export default function ConnectionSelect({
     const result: ConnectionOption[] = [];
 
     for (const [dataSourceId, config] of Object.entries(dataSources)) {
-      if (config?.hasDefault || (envConfig.isDemo && DEMO_DATASOURCES.has(dataSourceId))) {
+      if (config?.hasDefault) {
         if (!dataSource || filteredSources.has(dataSourceId)) {
           result.push({
             dataSourceId,

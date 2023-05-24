@@ -144,10 +144,10 @@ function QueryEditor({
                   globalScope={globalScope}
                   globalScopeMeta={globalScopeMeta}
                   label={name}
-                  propType={definiton.typeDef}
+                  propType={definiton}
                   jsRuntime={jsBrowserRuntime}
                   renderControl={(renderControlParams) => (
-                    <Control {...renderControlParams} propType={definiton.typeDef} />
+                    <Control {...renderControlParams} propType={definiton} />
                   )}
                   value={paramsObject[name]}
                   onChange={(newValue) => {
@@ -168,18 +168,9 @@ function QueryEditor({
         </Stack>
       </QueryInputPanel>
 
-      <SplitPane
-        split="horizontal"
-        size="30%"
-        minSize={30}
-        primary="second"
-        allowResize
-        pane1Style={{ overflow: 'auto' }}
-      >
-        <QueryPreview isLoading={previewIsLoading} error={preview?.error}>
-          <JsonView sx={{ height: '100%' }} copyToClipboard src={preview?.data} />
-        </QueryPreview>
-      </SplitPane>
+      <QueryPreview isLoading={previewIsLoading} error={preview?.error}>
+        <JsonView sx={{ height: '100%' }} copyToClipboard src={preview?.data} />
+      </QueryPreview>
     </SplitPane>
   );
 }

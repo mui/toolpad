@@ -1,4 +1,4 @@
-# Custom Functions
+# Custom functions
 
 <p class="description">Write async serverside JavaScript functions to load external data.</p>
 
@@ -66,7 +66,7 @@ export const example = createFunction(
   {
     parameters: {
       value: {
-        typeDef: { type: 'number' },
+        type: 'number',
       },
     },
   },

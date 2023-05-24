@@ -20,7 +20,7 @@ test.use({
   localAppConfig: {
     template: path.resolve(__dirname, './fixture'),
     async setup({ dir }) {
-      const configFilePath = path.resolve(dir, './toolpad.yml');
+      const configFilePath = path.resolve(dir, './toolpad/pages/page1/page.yml');
       await fileReplaceAll(configFilePath, HTTPBIN_SOURCE_URL, HTTPBIN_TARGET_URL);
     },
     cmd: 'dev',
@@ -36,6 +36,8 @@ test('rest basics', async ({ page, context }) => {
   await expect(page.locator('text="query2: query2_value"')).toBeVisible();
 
   await expect(page.getByText('query3: Transformed')).toBeVisible();
+
+  await expect(page.getByText('query4 authorization: test')).toBeVisible();
 
   const editorModel = new ToolpadEditor(page);
   await editorModel.goto();

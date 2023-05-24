@@ -28,8 +28,9 @@ import {
 import { generateUniqueString } from '@mui/toolpad-utils/strings';
 import type { EditorProps } from '../../types';
 import { useToolpadComponents } from '../AppEditor/toolpadComponents';
-import { ToolpadComponentDefinition } from '../../toolpadComponents';
+import { ToolpadComponentDefinition } from '../../runtime/toolpadComponents';
 import { useDom } from '../AppState';
+import PropertyControl from '../../components/PropertyControl';
 
 // TODO: this import suggests leaky abstraction
 import { usePageEditorState } from '../AppEditor/PageEditor/PageEditorProvider';
@@ -65,6 +66,7 @@ function formatNumberOptionValue(numberFormat: NumberFormat | undefined) {
 }
 
 function GridColumnsPropEditor({
+  propType,
   label,
   nodeId,
   value = [],
@@ -167,9 +169,11 @@ function GridColumnsPropEditor({
 
   return (
     <React.Fragment>
-      <Button aria-describedby={popoverId} onClick={handlePopoverClick}>
-        {label}
-      </Button>
+      <PropertyControl propType={propType}>
+        <Button aria-describedby={popoverId} onClick={handlePopoverClick}>
+          {label}
+        </Button>
+      </PropertyControl>
       <Popover
         id={popoverId}
         open={open}

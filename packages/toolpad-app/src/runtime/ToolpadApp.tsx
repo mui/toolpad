@@ -9,8 +9,6 @@ import {
   LinearProgress,
   Container,
   Tooltip,
-  Button,
-  Typography,
 } from '@mui/material';
 import {
   ToolpadComponent,
@@ -48,17 +46,19 @@ import {
 } from 'react-router-dom';
 import { ErrorBoundary, FallbackProps } from 'react-error-boundary';
 import {
+  CanvasEventsContext,
   NodeErrorProps,
   NodeRuntimeWrapper,
   ResetNodeErrorsKeyProvider,
 } from '@mui/toolpad-core/runtime';
 import * as _ from 'lodash-es';
 import ErrorIcon from '@mui/icons-material/Error';
-import EditIcon from '@mui/icons-material/Edit';
 import { useBrowserJsRuntime } from '@mui/toolpad-core/jsBrowserRuntime';
 import * as builtIns from '@mui/toolpad-components';
 import { errorFrom } from '@mui/toolpad-utils/errors';
 import { mapProperties, mapValues } from '@mui/toolpad-utils/collections';
+import useBoolean from '@mui/toolpad-utils/hooks/useBoolean';
+import usePageTitle from '@mui/toolpad-utils/hooks/usePageTitle';
 import * as appDom from '../appDom';
 import { RuntimeState } from '../types';
 import {
@@ -67,26 +67,32 @@ import {
   isPageLayoutComponent,
   isPageRow,
   PAGE_ROW_COMPONENT_ID,
-} from '../toolpadComponents';
+} from './toolpadComponents';
 import AppThemeProvider from './AppThemeProvider';
 import evalJsBindings, {
   buildGlobalScope,
   EvaluatedBinding,
   ParsedBinding,
 } from './evalJsBindings';
-import { HTML_ID_EDITOR_OVERLAY, NON_BINDABLE_CONTROL_TYPES } from '../constants';
-import usePageTitle from '../utils/usePageTitle';
-import Pre from '../components/Pre';
-import { layoutBoxArgTypes } from '../toolpadComponents/layoutBox';
-import NoSsr from '../components/NoSsr';
+import { HTML_ID_EDITOR_OVERLAY, NON_BINDABLE_CONTROL_TYPES } from './constants';
+import { layoutBoxArgTypes } from './toolpadComponents/layoutBox';
 import { execDataSourceQuery, useDataQuery, UseDataQueryConfig, UseFetch } from './useDataQuery';
-import { CanvasHooksContext, NavigateToPage } from './CanvasHooksContext';
-import useBoolean from '../utils/useBoolean';
-import Header from '../toolpad/ToolpadShell/Header';
-import { ThemeProvider } from '../ThemeContext';
-import { BridgeContext } from '../canvas/BridgeContext';
+import { NavigateToPage } from './CanvasHooksContext';
 import AppNavigation from './AppNavigation';
-import { PREVIEW_PAGE_ROUTE } from '../routes';
+import PreviewHeader from './PreviewHeader';
+
+const isPreview = process.env.NODE_ENV !== 'production';
+const isRenderedInCanvas =
+  typeof window === 'undefined'
+    ? false
+    : !!(window.frameElement as HTMLIFrameElement)?.dataset?.toolpadCanvas;
+
+const Pre = styled('pre')(({ theme }) => ({
+  margin: 0,
+  fontFamily: theme.fontFamilyMonospaced,
+}));
+
+const PREVIEW_PAGE_ROUTE = '/preview/pages/:nodeId';
 
 export const internalComponents: ToolpadComponents = Object.fromEntries(
   [...INTERNAL_COMPONENTS].map(([name]) => {
@@ -129,24 +135,30 @@ const USE_DATA_QUERY_CONFIG_KEYS: readonly (keyof UseDataQueryConfig)[] = [
 
 function usePageNavigator(): NavigateToPage {
   const navigate = useNavigate();
+
+  const canvasEvents = React.useContext(CanvasEventsContext);
+
   const navigateToPage: NavigateToPage = React.useCallback(
     (pageNodeId, pageParameters) => {
       const urlParams = pageParameters && new URLSearchParams(pageParameters);
 
-      navigate({
-        pathname: `/pages/${pageNodeId}`,
-        ...(urlParams
-          ? {
-              search: urlParams.toString(),
-            }
-          : {}),
-      });
+      if (canvasEvents) {
+        canvasEvents.emit('pageNavigationRequest', { pageNodeId });
+      } else {
+        navigate({
+          pathname: `/pages/${pageNodeId}`,
+          ...(urlParams
+            ? {
+                search: urlParams.toString(),
+              }
+            : {}),
+        });
+      }
     },
-    [navigate],
+    [canvasEvents, navigate],
   );
 
-  const canvasHooks = React.useContext(CanvasHooksContext);
-  return canvasHooks.navigateToPage || navigateToPage;
+  return navigateToPage;
 }
 
 const AppRoot = styled('div')({
@@ -346,7 +358,7 @@ function RenderedNodeContent({ node, childNodeGroups, Component }: RenderedNodeC
 
   const eventHandlers: Record<string, (param: any) => void> = React.useMemo(() => {
     return mapProperties(argTypes, ([key, argType]) => {
-      if (!argType || argType.typeDef.type !== 'event' || !appDom.isElement(node)) {
+      if (!argType || argType.type !== 'event' || !appDom.isElement(node)) {
         return null;
       }
 
@@ -443,8 +455,8 @@ function RenderedNodeContent({ node, childNodeGroups, Component }: RenderedNodeC
 
   // Wrap element props
   for (const [propName, argType] of Object.entries(argTypes)) {
-    const isElement = argType?.typeDef.type === 'element';
-    const isTemplate = argType?.typeDef.type === 'template';
+    const isElement = argType?.type === 'element';
+    const isTemplate = argType?.type === 'template';
 
     if (isElement || isTemplate) {
       const value = props[propName];
@@ -534,7 +546,7 @@ function PageRoot({ children }: PageRootProps) {
 const PageRootComponent = createComponent(PageRoot, {
   argTypes: {
     children: {
-      typeDef: { type: 'element' },
+      type: 'element',
       control: { type: 'slots' },
     },
   },
@@ -1088,17 +1100,18 @@ function RenderedPage({ nodeId }: RenderedNodeProps) {
     [browserJsRuntime, getScopeState],
   );
 
-  const bridge = React.useContext(BridgeContext);
+  const canvasEvents = React.useContext(CanvasEventsContext);
 
   React.useEffect(() => {
     const pageState = getScopeState();
-    bridge?.canvasEvents.emit('pageStateUpdated', { pageState, globalScopeMeta });
-  }, [bridge, globalScopeMeta, getScopeState]);
+
+    canvasEvents?.emit('pageStateUpdated', { pageState, globalScopeMeta });
+  }, [canvasEvents, globalScopeMeta, getScopeState]);
 
   React.useEffect(() => {
     const liveBindings = getBindings();
-    bridge?.canvasEvents.emit('pageBindingsUpdated', { bindings: liveBindings });
-  }, [bridge, getBindings]);
+    canvasEvents?.emit('pageBindingsUpdated', { bindings: liveBindings });
+  }, [canvasEvents, getBindings]);
 
   return (
     <BindingsContextProvider value={getBindings}>
@@ -1177,6 +1190,7 @@ function AppError({ error }: FallbackProps) {
     <FullPageCentered>
       <Alert severity="error">
         <AlertTitle>Something went wrong</AlertTitle>
+        <Pre>{error.message}</Pre>
         <Pre>{error.stack}</Pre>
       </Alert>
     </FullPageCentered>
@@ -1215,36 +1229,11 @@ function ToolpadAppLayout({ dom, hasShell: hasShellProp = true }: ToolpadAppLayo
 
   const hasShell = hasShellProp && displayMode !== 'standalone';
 
-  const isCanvas = displayMode === 'canvas';
-  const isPreview = process.env.NODE_ENV !== 'production';
-
-  const showPreviewHeader = isPreview && !isCanvas;
+  const showPreviewHeader = isPreview && !isRenderedInCanvas;
 
   return (
     <React.Fragment>
-      {showPreviewHeader ? (
-        <ThemeProvider>
-          <Header
-            enableUserFeedback={false}
-            actions={
-              <Stack direction="row" spacing={1} alignItems="center">
-                <Typography variant="body2" sx={{ color: 'primary.main' }}>
-                  This is a preview version of the application.
-                </Typography>
-                <Button
-                  variant="outlined"
-                  endIcon={<EditIcon />}
-                  color="primary"
-                  component="a"
-                  href={pageId ? `/_toolpad/app/pages/${pageId}` : '/_toolpad/app'}
-                >
-                  Edit
-                </Button>
-              </Stack>
-            }
-          />
-        </ThemeProvider>
-      ) : null}
+      {showPreviewHeader ? <PreviewHeader pageId={pageId} /> : null}
       <Box sx={{ display: 'flex' }}>
         {hasShell && pages.length > 0 ? (
           <AppNavigation pages={pages} clipped={showPreviewHeader} />
@@ -1298,30 +1287,26 @@ export default function ToolpadApp({
     <AppThemeProvider dom={dom}>
       <CssBaseline enableColorScheme />
       <AppRoot ref={rootRef}>
-        <NoSsr>
-          {components ? (
-            <ComponentsContextProvider value={components}>
-              <DomContextProvider value={dom}>
-                <ErrorBoundary FallbackComponent={AppError}>
-                  <ResetNodeErrorsKeyProvider value={resetNodeErrorsKey}>
-                    <React.Suspense fallback={<AppLoading />}>
-                      <QueryClientProvider client={queryClient}>
-                        <BrowserRouter basename={basename}>
-                          <ToolpadAppLayout dom={dom} hasShell={hasShell} />
-                        </BrowserRouter>
-                        {showDevtools ? (
-                          <ReactQueryDevtoolsProduction initialIsOpen={false} />
-                        ) : null}
-                      </QueryClientProvider>
-                    </React.Suspense>
-                  </ResetNodeErrorsKeyProvider>
-                </ErrorBoundary>
-              </DomContextProvider>
-            </ComponentsContextProvider>
-          ) : (
-            <AppLoading />
-          )}
-        </NoSsr>
+        {components ? (
+          <ComponentsContextProvider value={components}>
+            <DomContextProvider value={dom}>
+              <ErrorBoundary FallbackComponent={AppError}>
+                <ResetNodeErrorsKeyProvider value={resetNodeErrorsKey}>
+                  <React.Suspense fallback={<AppLoading />}>
+                    <QueryClientProvider client={queryClient}>
+                      <BrowserRouter basename={basename}>
+                        <ToolpadAppLayout dom={dom} hasShell={hasShell} />
+                      </BrowserRouter>
+                      {showDevtools ? <ReactQueryDevtoolsProduction initialIsOpen={false} /> : null}
+                    </QueryClientProvider>
+                  </React.Suspense>
+                </ResetNodeErrorsKeyProvider>
+              </ErrorBoundary>
+            </DomContextProvider>
+          </ComponentsContextProvider>
+        ) : (
+          <AppLoading />
+        )}
         <EditorOverlay id={HTML_ID_EDITOR_OVERLAY} />
       </AppRoot>
     </AppThemeProvider>

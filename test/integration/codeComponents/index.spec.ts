@@ -12,8 +12,6 @@ test.use({
 });
 
 test('custom components can use external libraries', async ({ page }) => {
-  test.skip(!process.env.TOOLPAD_VITE_RUNTIME, 'New runtime tests are not activated');
-
   const runtimeModel = new ToolpadRuntime(page);
   await runtimeModel.gotoPage('page');
 
@@ -22,8 +20,6 @@ test('custom components can use external libraries', async ({ page }) => {
 });
 
 test('can create new custom components', async ({ page, localApp }) => {
-  test.skip(!process.env.TOOLPAD_VITE_RUNTIME, 'New runtime tests are not activated');
-
   const editorModel = new ToolpadEditor(page);
 
   await editorModel.goto();
@@ -47,7 +43,7 @@ function MyInspector({ data }: MyInspectorProps) {
 
 export default createComponent(MyInspector, {
   argTypes: {
-    data: { typeDef: { type: 'object' } },
+    data: { type: 'object' },
   },
 });
     `,

@@ -44,7 +44,8 @@ export default class EnvManager {
 
     const envFileWatcher = chokidar.watch([this.getEnvFilePath()]);
     envFileWatcher.on('all', async () => {
-      this.values = await this.loadEnvFile();
+      // Invalidate cache
+      this.values = undefined;
       this.project.events.emit('envChanged', {});
     });
   }
@@ -67,13 +68,13 @@ export default class EnvManager {
     return parsed;
   }
 
-  private async loadEnvFile() {
+  private async loadEnvFile(): Promise<Record<string, string>> {
     const envFilePath = this.getEnvFilePath();
 
     try {
       const newContent = await fs.readFile(envFilePath, { encoding: 'utf-8' });
 
-      if (newContent !== this.content) {
+      if (!this.values || newContent !== this.content) {
         this.content = newContent;
         return this.parseValues();
       }
@@ -91,7 +92,7 @@ export default class EnvManager {
   /**
    * returns the parsed environment variables from the .env file.
    */
-  async getValues() {
+  async getValues(): Promise<Record<string, string>> {
     if (!this.values) {
       this.values = this.loadEnvFile();
     }

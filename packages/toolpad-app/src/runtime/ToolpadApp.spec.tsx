@@ -2,11 +2,11 @@ import * as React from 'react';
 import { render, waitFor as waitForOrig, screen, fireEvent, act } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { LiveBindings, RuntimeEvents } from '@mui/toolpad-core';
+import { CanvasEventsContext } from '@mui/toolpad-core/runtime';
+import { Emitter } from '@mui/toolpad-utils/events';
 import ToolpadApp from './ToolpadApp';
 import * as appDom from '../appDom';
-import createRuntimeState from '../createRuntimeState';
-import { bridge } from '../canvas/ToolpadBridge';
-import { BridgeContext } from '../canvas/BridgeContext';
+import createRuntimeState from './createRuntimeState';
 
 async function loadComponents() {
   return {};
@@ -16,7 +16,10 @@ async function loadComponents() {
 const waitFor: typeof waitForOrig = (waiter, options) =>
   waitForOrig(waiter, { timeout: 10000, ...options });
 
-function renderPage(initPage: (dom: appDom.AppDom, page: appDom.PageNode) => appDom.AppDom) {
+function renderPage(
+  initPage: (dom: appDom.AppDom, page: appDom.PageNode) => appDom.AppDom,
+  canvasEvents: Emitter<RuntimeEvents> | null = null,
+) {
   let dom = appDom.createDom();
   const root = appDom.getNode(dom, dom.root, 'app');
   const page = appDom.createNode(dom, 'page', {
@@ -34,9 +37,9 @@ function renderPage(initPage: (dom: appDom.AppDom, page: appDom.PageNode) => app
   const state = createRuntimeState({ dom });
 
   return render(
-    <BridgeContext.Provider value={bridge}>
+    <CanvasEventsContext.Provider value={canvasEvents}>
       <ToolpadApp loadComponents={loadComponents} state={state} basename="toolpad" />
-    </BridgeContext.Provider>,
+    </CanvasEventsContext.Provider>,
   );
 }
 
@@ -128,13 +131,14 @@ test(`default Value for binding`, async () => {
 });
 
 test(`Databinding errors`, async () => {
+  const canvasEvents = new Emitter<RuntimeEvents>();
   const consoleErrorMock = jest.spyOn(console, 'error').mockImplementation();
   let bindings: LiveBindings | undefined;
 
   const bindingsUpdateHandler = (event: RuntimeEvents['pageBindingsUpdated']) => {
     bindings = event.bindings;
   };
-  bridge.canvasEvents.on('pageBindingsUpdated', bindingsUpdateHandler);
+  canvasEvents.on('pageBindingsUpdated', bindingsUpdateHandler);
 
   try {
     let nonExisting: appDom.ElementNode;
@@ -170,7 +174,7 @@ test(`Databinding errors`, async () => {
       dom = appDom.addNode(dom, cyclic2, page, 'children');
 
       return dom;
-    });
+    }, canvasEvents);
 
     await waitFor(() => screen.getByTestId('page-root'));
     await waitFor(() => expect(bindings).toBeDefined());
@@ -202,7 +206,7 @@ test(`Databinding errors`, async () => {
 
     expect(consoleErrorMock).toHaveBeenCalled();
   } finally {
-    bridge.canvasEvents.off('pageBindingsUpdated', bindingsUpdateHandler);
+    canvasEvents.off('pageBindingsUpdated', bindingsUpdateHandler);
     consoleErrorMock.mockRestore();
   }
 });

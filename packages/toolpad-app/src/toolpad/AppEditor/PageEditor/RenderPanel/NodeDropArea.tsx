@@ -23,7 +23,7 @@ import {
   DropZone,
   usePageEditorState,
 } from '../PageEditorProvider';
-import { isPageRow } from '../../../../toolpadComponents';
+import { isPageRow } from '../../../../runtime/toolpadComponents';
 
 const dropAreaHighlightClasses = {
   highlightedTop: 'DropArea_HighlightedTop',

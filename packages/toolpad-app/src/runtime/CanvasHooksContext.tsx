@@ -11,7 +11,6 @@ export interface NavigateToPage {
  */
 export interface CanvasHooks {
   savedNodes?: NodeHashes;
-  navigateToPage?: NavigateToPage;
 }
 
 export const CanvasHooksContext = React.createContext<CanvasHooks>({});

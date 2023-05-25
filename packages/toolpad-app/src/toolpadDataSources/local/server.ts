@@ -85,7 +85,7 @@ function pathToNodeImportSpecifier(importPath: string): string {
 async function createMain(): Promise<string> {
   const relativeFunctionsFilePath = [`.`, getFunctionsFile('.')].join(path.sep);
   return `
-    import { TOOLPAD_FUNCTION } from '@mui/toolpad-core/server';
+    import { TOOLPAD_FUNCTION } from '@mui/toolpad-core';
     import { errorFrom, serializeError } from '@mui/toolpad-utils/errors';
     import fetch, { Headers, Request, Response } from 'node-fetch'
 

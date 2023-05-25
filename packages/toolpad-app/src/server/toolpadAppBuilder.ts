@@ -8,7 +8,7 @@ import { MUI_X_PRO_LICENSE, RUNTIME_CONFIG_WINDOW_PROPERTY } from '../constants'
 import { getComponents, getAppOutputFolder } from './localMode';
 import { RuntimeConfig } from '../config';
 import * as appDom from '../appDom';
-import createRuntimeState from '../createRuntimeState';
+import createRuntimeState from '../runtime/createRuntimeState';
 
 const MAIN_ENTRY = '/main.tsx';
 const CANVAS_ENTRY = '/canvas.tsx';

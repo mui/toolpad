@@ -15,6 +15,9 @@ interface IToolpadProject {
   getRoot(): string;
 }
 
+/**
+ * Handles loading env files and watches for updates.
+ */
 export default class EnvManager {
   private project: IToolpadProject;
 
@@ -27,6 +30,9 @@ export default class EnvManager {
     this.initWatcher();
   }
 
+  /**
+   * Get file path for the env file.
+   */
   getEnvFilePath() {
     return path.resolve(this.project.getRoot(), '.env');
   }
@@ -82,6 +88,9 @@ export default class EnvManager {
     return {};
   }
 
+  /**
+   * returns the parsed environment variables from the .env file.
+   */
   async getValues() {
     if (!this.values) {
       this.values = this.loadEnvFile();

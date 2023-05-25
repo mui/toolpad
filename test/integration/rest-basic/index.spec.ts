@@ -1,7 +1,7 @@
 import * as path from 'path';
 import { test, expect } from '../../playwright/localTest';
 import { ToolpadRuntime } from '../../models/ToolpadRuntime';
-import { fileReplaceAll } from '../../utils/fs';
+import { fileReplace, fileReplaceAll } from '../../utils/fs';
 import { ToolpadEditor } from '../../models/ToolpadEditor';
 
 // We can run our own httpbin instance if necessary:
@@ -27,7 +27,7 @@ test.use({
   },
 });
 
-test('rest basics', async ({ page, context }) => {
+test('rest basics', async ({ page, context, localApp }) => {
   const runtimeModel = new ToolpadRuntime(page);
   await runtimeModel.gotoPage('page1');
   await expect(page.locator('text="query1: query1_value"')).toBeVisible();
@@ -37,7 +37,15 @@ test('rest basics', async ({ page, context }) => {
 
   await expect(page.getByText('query3: Transformed')).toBeVisible();
 
-  await expect(page.getByText('query4 authorization: test')).toBeVisible();
+  await expect(page.getByText('query4 authorization: foo')).toBeVisible();
+
+  const envFilePath = path.resolve(localApp.dir, './.env');
+  await fileReplace(envFilePath, '=foo', '=bar');
+
+  // TODO: Make this reload unnecessary. The queries should be invalidated when the env file changes.
+  await page.reload();
+
+  await expect(page.getByText('query4 authorization: bar')).toBeVisible();
 
   const editorModel = new ToolpadEditor(page);
   await editorModel.goto();

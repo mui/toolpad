@@ -25,6 +25,8 @@ export default class EnvManager {
 
   private values: Awaitable<Record<string, string>> | undefined;
 
+  private invalidated = false;
+
   constructor(project: IToolpadProject) {
     this.project = project;
     this.initWatcher();
@@ -96,6 +98,7 @@ export default class EnvManager {
     if (!this.values) {
       this.values = this.loadEnvFile();
     }
+    this.values = await this.values;
     return this.values;
   }
 }

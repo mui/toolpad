@@ -1,9 +1,10 @@
-# KPI app
+# KPI performance tracker
 
-<p class="description">A KPI monitoring app</p>
+<p class="description">A KPI monitoring app that demonstrates use of code component in Toolpad.</p>
 
 [App embed]
+[GitHub](https://github.com/mui/mui-toolpad/tree/master/examples/showcase)
 
-This app demonstrates how to track a GitHub repo through some fake KPIs. It fetches data from GitHub API using HTTP request.
+This app tracks the health of a GitHub repo through some fake KPIs. It fetches some data from GitHub API using HTTP request.
 
 It also shows the usage of a code component. It can be edited from the app codebase.

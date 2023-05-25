@@ -7,7 +7,8 @@ let ws: WebSocket | null = null;
 const projectEvents = new Emitter<ProjectEvents>();
 
 if (typeof window !== 'undefined') {
-  ws = new WebSocket(`ws://${window.location.host}/toolpad-ws`);
+  const wsProtocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+  ws = new WebSocket(`${wsProtocol}//${window.location.host}/toolpad-ws`);
 
   ws.addEventListener('error', (err) => console.error(err));
 

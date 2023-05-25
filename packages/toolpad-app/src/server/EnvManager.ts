@@ -25,8 +25,6 @@ export default class EnvManager {
 
   private values: Awaitable<Record<string, string>> | undefined;
 
-  private invalidated = false;
-
   constructor(project: IToolpadProject) {
     this.project = project;
     this.initWatcher();

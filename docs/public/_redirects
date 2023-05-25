@@ -1,11 +1,18 @@
 / /toolpad/
+
 # Avoid conflicts with the other Next.js apps hosted under https://mui.com/
-/toolpad/_next/* /_next/:splat
+
+/toolpad/\_next/\* /\_next/:splat
 
 # Legacy redirection
+
 # 2022
+
 /toolpad/getting-started/setup/ /toolpad/getting-started/overview/ 301
 /toolpad/getting-started/tutorial/ /toolpad/getting-started/overview/ 301
 /toolpad/data-fetching/rest/ /toolpad/connecting-to-datasources/fetch/ 301
 /toolpad/data-fetching/google-sheets/ /toolpad/connecting-to-datasources/google-sheets/ 301
+
 # 2023
+
+/toolpad/getting-started/quickstart /toolpad/getting-started/first-app

@@ -1,3 +1,4 @@
+import * as dotenv from 'dotenv';
 import * as yaml from 'yaml';
 import * as path from 'path';
 import * as fs from 'fs/promises';
@@ -13,6 +14,7 @@ import { Emitter } from '@mui/toolpad-utils/events';
 import { errorFrom } from '@mui/toolpad-utils/errors';
 import { filterValues, hasOwnProperty, mapValues } from '@mui/toolpad-utils/collections';
 import { execa } from 'execa';
+import { truncate } from '@mui/toolpad-utils/strings';
 import config from '../config';
 import * as appDom from '../appDom';
 import { migrateUp } from '../appDom/migrations';
@@ -1200,6 +1202,87 @@ function getCodeComponentsFingerprint(dom: appDom.AppDom) {
   return codeComponents.map(({ name }) => name).join('|');
 }
 
+interface IToolpadProject {
+  options: ToolpadProjectOptions;
+  events: Emitter<ProjectEvents>;
+  getRoot(): string;
+}
+
+class EnvManager {
+  private project: IToolpadProject;
+
+  private content: string | undefined;
+
+  private values: Awaitable<Record<string, string>> | undefined;
+
+  constructor(project: IToolpadProject) {
+    this.project = project;
+    this.initWatcher();
+  }
+
+  getEnvFilePath() {
+    return path.resolve(this.project.getRoot(), '.env');
+  }
+
+  private initWatcher() {
+    if (!this.project.options.dev) {
+      return;
+    }
+
+    const envFileWatcher = chokidar.watch([this.getEnvFilePath()]);
+    envFileWatcher.on('all', async () => {
+      this.values = await this.loadEnvFile();
+      this.project.events.emit('envChanged', {});
+    });
+  }
+
+  private async parseValues() {
+    if (!this.content) {
+      return {};
+    }
+    const parsed = dotenv.parse(this.content) as any;
+
+    const envFilePath = this.getEnvFilePath();
+    // eslint-disable-next-line no-console
+    console.log(
+      `${chalk.blue('info')}  - loaded env file "${envFilePath}" with keys ${truncate(
+        Object.keys(parsed).join(', '),
+        1000,
+      )}`,
+    );
+
+    return parsed;
+  }
+
+  private async loadEnvFile() {
+    const envFilePath = this.getEnvFilePath();
+
+    try {
+      const newContent = await fs.readFile(envFilePath, { encoding: 'utf-8' });
+
+      if (newContent !== this.content) {
+        this.content = newContent;
+        return this.parseValues();
+      }
+
+      return this.values;
+    } catch (err) {
+      if (errorFrom(err).code !== 'ENOENT') {
+        throw err;
+      }
+    }
+
+    return {};
+  }
+
+  async getValues() {
+    if (!this.values) {
+      this.values = this.loadEnvFile();
+    }
+    return this.values;
+  }
+}
+
 interface ToolpadProjectOptions {
   dev: boolean;
 }
@@ -1213,9 +1296,11 @@ class ToolpadProject {
 
   private domAndFingerprintLock = new Lock();
 
-  private options: ToolpadProjectOptions;
+  options: ToolpadProjectOptions;
 
   private codeComponentsFingerprint: null | string = null;
+
+  envManager: EnvManager;
 
   constructor(root: string, options: Partial<ToolpadProjectOptions>) {
     this.root = root;
@@ -1223,6 +1308,9 @@ class ToolpadProject {
       dev: false,
       ...options,
     };
+
+    this.envManager = new EnvManager(this);
+
     this.initWatcher();
   }
 
@@ -1266,6 +1354,10 @@ class ToolpadProject {
       this.domAndFingerprint = Promise.all([loadDomFromDisk(), calculateDomFingerprint(this.root)]);
     }
     return this.domAndFingerprint;
+  }
+
+  getRoot() {
+    return this.root;
   }
 
   async loadDom() {

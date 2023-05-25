@@ -3,11 +3,9 @@ import type { Message as MessageToChildProcess } from '@mui/toolpad-core/localRu
 import { SerializedError, errorFrom, serializeError } from '@mui/toolpad-utils/errors';
 import * as child_process from 'child_process';
 import * as esbuild from 'esbuild';
-import * as fs from 'fs/promises';
 import * as path from 'path';
 import invariant from 'invariant';
-import { indent, truncate } from '@mui/toolpad-utils/strings';
-import * as dotenv from 'dotenv';
+import { indent } from '@mui/toolpad-utils/strings';
 import * as chokidar from 'chokidar';
 import chalk from 'chalk';
 import { glob } from 'glob';
@@ -108,31 +106,6 @@ async function createMain(root: string): Promise<string> {
   `;
 }
 
-export async function loadEnvFile() {
-  const userProjectRoot = getUserProjectRoot();
-  const envFilePath = path.resolve(userProjectRoot, '.env');
-
-  try {
-    const envFileContent = await fs.readFile(envFilePath);
-    const parsed = dotenv.parse(envFileContent) as any;
-    // eslint-disable-next-line no-console
-    console.log(
-      `${chalk.blue('info')}  - loaded env file "${envFilePath}" with keys ${truncate(
-        Object.keys(parsed).join(', '),
-        1000,
-      )}`,
-    );
-
-    return parsed;
-  } catch (err) {
-    if (errorFrom(err).code !== 'ENOENT') {
-      throw err;
-    }
-  }
-
-  return {};
-}
-
 async function createBuilder(root: string) {
   await waitForInit();
   const project = await getProject();
@@ -146,7 +119,7 @@ async function createBuilder(root: string) {
 
   let outputFile: string | undefined;
   let metafile: esbuild.Metafile | undefined;
-  let env: any = loadEnvFile();
+  let env: Record<string, string> = await project.envManager.getValues();
 
   const restartRuntimeProcess = () => {
     if (controller) {
@@ -337,33 +310,20 @@ async function createBuilder(root: string) {
     });
   }
 
-  let envFileWatcher: chokidar.FSWatcher | undefined;
   let resourcesWatcher: chokidar.FSWatcher | undefined;
 
-  const envFilePath = path.resolve(userProjectRoot, '.env');
+  const unsubscribers: (() => void)[] = [];
 
   return {
     watch() {
       ctx.watch();
 
-      (async () => {
-        try {
-          if (envFileWatcher) {
-            await envFileWatcher.close();
-          }
+      const unsubscribeEnv = project.events.subscribe('envChanged', async () => {
+        env = await project.envManager.getValues();
+        restartRuntimeProcess();
+      });
 
-          envFileWatcher = chokidar.watch([envFilePath]);
-          envFileWatcher.on('all', async () => {
-            env = await loadEnvFile();
-            restartRuntimeProcess();
-          });
-        } catch (err: unknown) {
-          if (errorFrom(err).name === 'AbortError') {
-            return;
-          }
-          throw err;
-        }
-      })();
+      unsubscribers.push(unsubscribeEnv);
 
       // Make sure we pick up added/removed function files
       (async () => {
@@ -400,7 +360,8 @@ async function createBuilder(root: string) {
     introspect,
     execute,
     async dispose() {
-      await Promise.all([ctx.dispose(), envFileWatcher?.close(), controller?.abort()]);
+      unsubscribers.forEach((unsubscribe) => unsubscribe());
+      await Promise.all([ctx.dispose(), controller?.abort()]);
     },
   };
 }

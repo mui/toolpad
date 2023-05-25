@@ -196,4 +196,6 @@ export type ProjectEvents = {
   componentsListChanged: {};
   // the function runtime build has finished
   functionsBuildEnd: {};
+  // An environment variable has changed
+  envChanged: {};
 };

@@ -199,3 +199,7 @@ export type ProjectEvents = {
   // An environment variable has changed
   envChanged: {};
 };
+
+export interface ToolpadProjectOptions {
+  dev: boolean;
+}

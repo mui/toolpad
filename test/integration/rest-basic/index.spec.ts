@@ -5,7 +5,9 @@ import { fileReplace, fileReplaceAll } from '../../utils/fs';
 import { ToolpadEditor } from '../../models/ToolpadEditor';
 
 // We can run our own httpbin instance if necessary:
-//    $ docker run -p 80:80 kennethreitz/httpbin
+//    $ docker run -p 8080:80 kennethreitz/httpbin
+// Then run the tests with:
+//    $ HTTPBIN_BASEURL=http://localhost:8080/ yarn test:integration
 const customHttbinBaseUrl = process.env.HTTPBIN_BASEURL;
 
 if (customHttbinBaseUrl) {

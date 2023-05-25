@@ -79,6 +79,36 @@ export async function getCustomers() {
   return customers;
 }
 
+const customerParams = {
+  name: {
+    typeDef: { type: 'string' },
+  },
+  account_creation_date: {
+    typeDef: { type: 'string', format: 'date' },
+  },
+  country_of_residence: {
+    typeDef: { type: 'string' },
+  },
+  phone_number: {
+    typeDef: { type: 'number' },
+  },
+  email: {
+    typeDef: { type: 'string', format: 'email' },
+  },
+  address: {
+    typeDef: { type: 'string' },
+  },
+  gender: {
+    typeDef: { type: 'string', enum: ['Male', 'Female', 'Other'] },
+  },
+  id_1: {
+    typeDef: { type: 'string' },
+  },
+  image: {
+    typeDef: { type: 'string', format: 'uri' },
+  },
+};
+
 export const addCustomer = createFunction(
   async ({ parameters }) => {
     customers.push({
@@ -96,35 +126,7 @@ export const addCustomer = createFunction(
     return customers[customers.length - 1];
   },
   {
-    parameters: {
-      name: {
-        typeDef: { type: 'string' },
-      },
-      account_creation_date: {
-        typeDef: { type: 'string', format: 'date' },
-      },
-      country_of_residence: {
-        typeDef: { type: 'string' },
-      },
-      phone_number: {
-        typeDef: { type: 'number' },
-      },
-      email: {
-        typeDef: { type: 'string', format: 'email' },
-      },
-      address: {
-        typeDef: { type: 'string' },
-      },
-      gender: {
-        typeDef: { type: 'string', enum: ['Male', 'Female', 'Other'] },
-      },
-      id_1: {
-        typeDef: { type: 'string' },
-      },
-      image: {
-        typeDef: { type: 'string', format: 'uri' },
-      },
-    },
+    parameters: customerParams,
   },
 );
 
@@ -149,33 +151,23 @@ export const updateCustomer = createFunction(
       id: {
         typeDef: { type: 'number' },
       },
-      name: {
-        typeDef: { type: 'string' },
-      },
-      account_creation_date: {
-        typeDef: { type: 'string', format: 'date' },
-      },
-      country_of_residence: {
-        typeDef: { type: 'string' },
-      },
-      phone_number: {
+      ...customerParams,
+    },
+  },
+);
+
+/* To be added
+export const del = createFunction(
+  async ({ parameters }) => {
+    customers = customers.filter(({ id }) => id !== parameters.id);
+    return customers;
+  },
+  {
+    parameters: {
+      id: {
         typeDef: { type: 'number' },
-      },
-      email: {
-        typeDef: { type: 'string', format: 'email' },
-      },
-      address: {
-        typeDef: { type: 'string' },
-      },
-      gender: {
-        typeDef: { type: 'string', enum: ['Male', 'Female', 'Other'] },
-      },
-      id_1: {
-        typeDef: { type: 'string' },
-      },
-      image: {
-        typeDef: { type: 'string', format: 'uri' },
       },
     },
   },
 );
+*/

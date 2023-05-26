@@ -1,7 +1,8 @@
-import { Box, Skeleton, SxProps } from '@mui/material';
+import { Box, Skeleton, SxProps, styled } from '@mui/material';
 import * as React from 'react';
 import { createComponent } from '@mui/toolpad-core';
 import { SX_PROP_HELPER_TEXT } from './constants.js';
+import ErrorOverlay from './components/ErrorOverlay.js';
 
 export interface ImageProps {
   src: string;
@@ -10,10 +11,26 @@ export interface ImageProps {
   width: number;
   height: number;
   loading?: boolean;
+  error?: string;
   fit: 'contain' | 'cover' | 'fill' | 'none' | 'scale-down';
 }
 
-function Image({ sx: sxProp, src, width, height, alt, loading: loadingProp, fit }: ImageProps) {
+const Img = styled('img')({
+  width: '100%',
+  height: '100%',
+  position: 'absolute',
+});
+
+function Image({
+  sx: sxProp,
+  src,
+  width,
+  height,
+  alt,
+  loading: loadingProp,
+  error: errorProp,
+  fit,
+}: ImageProps) {
   const sx: SxProps = React.useMemo(
     () => ({
       ...sxProp,
@@ -27,26 +44,38 @@ function Image({ sx: sxProp, src, width, height, alt, loading: loadingProp, fit 
     [sxProp, width, height],
   );
 
-  const [imgLoading, setImgLoading] = React.useState(true);
-  const handleLoad = React.useCallback(() => setImgLoading(false), []);
+  const [imgError, setImgError] = React.useState<Error | null>(null);
+  const [imgLoading, setImgLoading] = React.useState(false);
+
+  const handleLoad = React.useCallback(() => {
+    setImgLoading(false);
+  }, []);
+
+  const handleError = React.useCallback(() => {
+    setImgError(new Error(`Failed to load image "${src}"`));
+    setImgLoading(false);
+  }, [src]);
+
+  React.useEffect(() => {
+    setImgLoading(true);
+    setImgError(null);
+  }, [src]);
 
   const loading = loadingProp || imgLoading;
-
+  const error = errorProp || imgError;
   return (
-    <Box sx={{ maxWidth: '100%', ...sx }}>
-      {loading ? <Skeleton variant="rectangular" width={width} height={height} /> : null}
-      <Box
-        component="img"
+    <Box sx={{ maxWidth: '100%', position: 'relative', ...sx }}>
+      <ErrorOverlay error={error} />
+      {loading && !error ? <Skeleton variant="rectangular" width={width} height={height} /> : null}
+      <Img
         src={src}
         alt={alt}
         sx={{
-          width: '100%',
-          height: '100%',
           objectFit: fit,
-          position: 'absolute',
-          visibility: loading ? 'hidden' : 'visible',
+          visibility: loading || error ? 'hidden' : 'visible',
         }}
         onLoad={handleLoad}
+        onError={handleError}
       />
     </Box>
   );
@@ -57,6 +86,8 @@ export default createComponent(Image, {
   layoutDirection: 'both',
   loadingPropSource: ['src'],
   loadingProp: 'loading',
+  errorProp: ['error'],
+  errorPropSource: ['src'],
   argTypes: {
     src: {
       helperText: 'The url of the image. Must resolve to an image file.',

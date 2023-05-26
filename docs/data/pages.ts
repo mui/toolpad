@@ -47,6 +47,7 @@ const pages: MuiPage[] = [
   },
   {
     pathname: '/toolpad/how-to-guides',
+    title: 'How-to guides',
     icon: BuildIcon,
     children: [
       {
@@ -62,7 +63,7 @@ const pages: MuiPage[] = [
       },
       {
         pathname: '/toolpad/how-to-guides/deploy-render',
-        title: 'Deploy your app to Render.com',
+        title: 'Deploy your app to Render',
       },
       {
         pathname: '/toolpad/how-to-guides/embed-apps',

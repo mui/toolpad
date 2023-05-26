@@ -1,30 +1,74 @@
-# Theming
+# Custom components
 
-<p class="description">Toolpad allows you to add your custom theme to your app, or customize individual component styles</p>
+<p class="description">You can bring your own custom components inside the Toolpad editor</p>
 
-## Adding a global theme
+## Creating custom components
 
-1. In order to use a custom theme, go to the **Theme** tab in the inspector panel and click on **Add theme**:
+Toolpad exposes a `createComponent` API to bring in custom components to the Toolpad component catalog.
 
-{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/concepts/theming/theme-1.png", "alt": "Add theme", "caption": "Adding a theme via the Theme tab", "indent": 1 }}
+<img src="/static/toolpad/docs/building-ui/ui-10.png?v=0" width="309" alt="Custom component" />
 
-2. In the theme options you can:
+Choose the name for your component and click **Create**:
 
-   - change your UI to light or dark mode.
-   - set primary and secondary colors for your UI, from a predefined list of colors.
+<img src="/static/toolpad/docs/building-ui/ui-11.png?v=0" width="370" alt="Custom create" />
 
-{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/concepts/theming/theme-2.png", "alt": "Add theme", "caption": "Adding a theme via the Theme tab", "indent": 2 }}
+A snackbar appears acknowledging the successful creation of the component. This will create a code file in the `toolpad/components` folder of the project. Use the **Open** button to start open this file in your code editor:
 
-3. The theme used in a project is configured by an auto-generated `theme.yml` file inside the `toolpad` folder.
+<img src="/static/toolpad/docs/building-ui/ui-12.png?v=0" width="494" alt="Custom component IDE" />
 
-   > For a detailed look at the schema for this file and the different options it supports, please check out the [schema reference](/toolpad/schema-reference/#file-Theme).
+The file has been initialized with a sample component. Replace its content with the following code:
 
-## Overrides
+```tsx
+import * as React from 'react';
+import { Paper, Typography, Stack } from '@mui/material';
+import { createComponent } from '@mui/toolpad/browser';
 
-In order to provide a customised styling to the components used in your pages, you can use style overrides via the **sx** prop in the **Inspector.**
+export interface NumberDisplayProps {
+  label: string;
+  value: number;
+}
 
-{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/concepts/theming/theme-3.png", "alt": "Add sx prop", "caption": "Adding custom styles via the sx prop" }}
+function NumberDisplay({ label, value }: NumberDisplayProps) {
+  return (
+    <Paper sx={{ px: 4, py: 2, width: '100%' }}>
+      <Stack sx={{ alignItems: 'center' }}>
+        <Typography>{label}</Typography>
+        <Typography variant="h3">{value}</Typography>
+      </Stack>
+    </Paper>
+  );
+}
 
-Once you click on the `sx` prop, add style overrides in the JSON editor. Any value that is accepted by the MUI System [sx](https://mui.com/system/getting-started/the-sx-prop/) prop is acceptable here.
+export default createComponent(NumberDisplay, {
+  argTypes: {
+    label: {
+      type: 'string',
+      default: 'label',
+    },
+    value: {
+      type: 'number',
+      default: 0,
+    },
+  },
+});
+```
 
-{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/concepts/theming/theme-4.png", "alt": "Add custom styles", "caption": "Styling the Image component" }}
+When you now open the **Component library** again you'll see your **NumberDisplay** available.
+
+<img src="/static/toolpad/docs/building-ui/ui-13.png?v=0" width="370" alt="Custom create" />
+
+Drag two of them on the canvas and select the first one. In the **Inspector** you'll see both the `label` and `value` properties available as fully bindable properties.
+
+<img src="/static/toolpad/docs/building-ui/ui-14.png?v=0" width="370" alt="Custom create" />
+
+## Supported features
+
+- Expose props API through `argTypes` definition when using `createComponent` method.
+- Import anything from `@mui/*` packages:
+  - [@mui/material](https://mui.com/material-ui/getting-started/overview/)
+  - [@mui/x-data-grid](https://mui.com/x/react-data-grid/)
+  - [@mui/x-date-pickers](https://mui.com/x/react-date-pickers/getting-started/)
+  - [@mui/x-data-grid-pro](https://mui.com/x/api/data-grid/data-grid-pro/) (free of charge within Toolpad)
+  - [@mui/x-date-pickers-pro](https://mui.com/x/react-date-pickers/getting-started/) (free of charge within Toolpad)
+  - [@mui/icons-material](https://mui.com/material-ui/material-icons/)
+- 🚧 In progress: import any installed node module.

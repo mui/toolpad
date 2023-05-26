@@ -1,30 +1,47 @@
-# Theming
+# Managing State
 
-<p class="description">Toolpad allows you to add your custom theme to your app, or customize individual component styles</p>
+<p class="description">You can use bindings to make your components reactive to data on the page</p>
 
-## Adding a global theme
+## Binding
 
-1. In order to use a custom theme, go to the **Theme** tab in the inspector panel and click on **Add theme**:
+### Binding button
 
-{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/concepts/theming/theme-1.png", "alt": "Add theme", "caption": "Adding a theme via the Theme tab", "indent": 1 }}
+Each property of component that may be bound to data present on the page is surrounded by a **Binding** button, which you can click to initiate data binding.
 
-2. In the theme options you can:
+{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/concepts/managing-state/binding-button.png", "alt": "Binding button", "caption": "The binding button", "zoom": false }}
 
-   - change your UI to light or dark mode.
-   - set primary and secondary colors for your UI, from a predefined list of colors.
+### Binding editor
 
-{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/concepts/theming/theme-2.png", "alt": "Add theme", "caption": "Adding a theme via the Theme tab", "indent": 2 }}
+You can write JavaScript expressions in the editor which opens up.
 
-3. The theme used in a project is configured by an auto-generated `theme.yml` file inside the `toolpad` folder.
+The editor will expect a return type, for example `string`.
 
-   > For a detailed look at the schema for this file and the different options it supports, please check out the [schema reference](/toolpad/schema-reference/#file-Theme).
+The **scope** includes the current values of all components and queries that you have added on the page. You can use anything from within this scope to write your JavaScript expressions.
 
-## Overrides
+The evaluated value of the binding will be visible to you in the editor.
 
-In order to provide a customised styling to the components used in your pages, you can use style overrides via the **sx** prop in the **Inspector.**
+{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/concepts/managing-state/binding-editor.png", "alt": "Binding editor", "caption": "The binding editor" }}
 
-{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/concepts/theming/theme-3.png", "alt": "Add sx prop", "caption": "Adding custom styles via the sx prop" }}
+## Page parameters
 
-Once you click on the `sx` prop, add style overrides in the JSON editor. Any value that is accepted by the MUI System [sx](https://mui.com/system/getting-started/the-sx-prop/) prop is acceptable here.
+Page parameters allow you to pass external data into the Toolpad page state via the URL query parameters.
 
-{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/concepts/theming/theme-4.png", "alt": "Add custom styles", "caption": "Styling the Image component" }}
+### Setting parameters
+
+You can set page parameters through the option to do so available in the **Inspector** when no component is selected.
+
+{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/concepts/managing-state/page-parameters.png", "alt": "Page parameters", "caption": "Page parameters" }}
+
+In the editor, you can add multiple parameters along with a default value for each:
+
+{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/concepts/managing-state/add-page-params.png", "alt": "Page parameters", "caption": "Page parameters", "zoom": false }}
+
+### Using parameters
+
+The parameters that you add are made available in the **scope** for data binding under the `page.parameters` global variable.
+
+{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/concepts/managing-state/binding-page-params.png", "alt": "Using page parameters", "caption": "Using page parameters in bindings" }}
+
+The value that the parameter assumes at runtime is the value that is passed in through a URL query parameter.
+
+{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/concepts/managing-state/page-parameters-showcase.png", "alt": "Page parameters on runtime", "caption": "Runtime value passed in through a URL query parameter " }}

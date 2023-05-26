@@ -1,30 +1,21 @@
-# Theming
+# Deployment
 
-<p class="description">Toolpad allows you to add your custom theme to your app, or customize individual component styles</p>
+<p class="description">Deploying a Toolpad app is like deploying any other React/Node application.</p>
 
-## Adding a global theme
+## Build steps
 
-1. In order to use a custom theme, go to the **Theme** tab in the inspector panel and click on **Add theme**:
+This command will create an optimized production build for the Toolpad app and will output the generated files:
 
-{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/concepts/theming/theme-1.png", "alt": "Add theme", "caption": "Adding a theme via the Theme tab", "indent": 1 }}
+```sh
+yarn build
+```
 
-2. In the theme options you can:
+Once the build has been made, you can deploy it to any service of your choice!
 
-   - change your UI to light or dark mode.
-   - set primary and secondary colors for your UI, from a predefined list of colors.
+To serve the app once built, run:
 
-{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/concepts/theming/theme-2.png", "alt": "Add theme", "caption": "Adding a theme via the Theme tab", "indent": 2 }}
+```sh
+yarn start
+```
 
-3. The theme used in a project is configured by an auto-generated `theme.yml` file inside the `toolpad` folder.
-
-   > For a detailed look at the schema for this file and the different options it supports, please check out the [schema reference](/toolpad/schema-reference/#file-Theme).
-
-## Overrides
-
-In order to provide a customised styling to the components used in your pages, you can use style overrides via the **sx** prop in the **Inspector.**
-
-{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/concepts/theming/theme-3.png", "alt": "Add sx prop", "caption": "Adding custom styles via the sx prop" }}
-
-Once you click on the `sx` prop, add style overrides in the JSON editor. Any value that is accepted by the MUI System [sx](https://mui.com/system/getting-started/the-sx-prop/) prop is acceptable here.
-
-{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/concepts/theming/theme-4.png", "alt": "Add custom styles", "caption": "Styling the Image component" }}
+Look into detailed, platform-specific guides in the [How-to guides](/toolpad/how-to-guides/deploy-render/)

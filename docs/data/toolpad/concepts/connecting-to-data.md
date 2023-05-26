@@ -32,9 +32,9 @@ The following options are configurable here:
 
 - ### Request headers
 
-  You can define extra headers to be sent along with the request in this tab. You can also bind request headers to environment variables:
+  You can define extra headers to be sent along with the request in this tab.
 
-{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/concepts/connecting-to-data/query-4.png", "alt": "Add request header", "caption": "Adding a request header", "indent": 1 }}
+{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/concepts/connecting-to-data/http-query-headers.png", "alt": "Add request header", "caption": "Adding a request header", "indent": 1 }}
 
 - ### Response
 
@@ -78,7 +78,7 @@ You can configure the following options here:
 
 <ul>
 <li style="list-style-type: none">
-Toolpad custom functions run fully server-side in Node.js. For example, if you change the content of the above example to:
+Toolpad custom functions run fully server-side in Node. For example, if you change the content of the above example to:
 
 ```tsx
 export async function example() {
@@ -98,7 +98,7 @@ You get the following response:
 <ul>
 <li style="list-style-type: none">
 
-> You can import and use any Node.js module in your custom functions.
+> You can import and use any Node module in your custom functions.
 
 </li>
 </ul>
@@ -138,18 +138,90 @@ To be really useful, you need to connect these queries with data present on your
   );
   ```
 
-  This will make the `value` property available in the query editor to be bound to page state.
+  This will make the `value` property available in the query editor. You can pass a value, or bind this to the page state:
 
-{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/concepts/connecting-to-data/custom-function-parameter.png", "alt": "Server-side values", "caption": "Using the parameter in the query URL", "indent": 1 }}
+{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/concepts/connecting-to-data/params-custom-fn.png", "alt": "Custom function parameter", "caption": "Using the value parameter in the query", "indent": 1 }}
+
+## Mode
+
+You can set the **mode** of the query to either be automatically refetched on page load, or only be called on manual action.
+
+{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/concepts/connecting-to-data/mode-query.gif", "alt": "Query mode", "caption": "Setting the query mode", "indent": 1 }}
+
+- ### Automatic
+
+  You can configure the following settings in this mode:
+
+  - #### Enabled
+
+    You can use this option to enable or disable the query from running
+
+  - #### Refetch interval
+    You can configure the query to run on an interval, for example every 30s.
+    To disable this option, keep the field empty.
+
+- ### Manual
+
+  Queries set to this mode can be called via a JavaScript expression in a binding. For example, for a query named `createCustomer`, we can add
+
+  ```js
+  createCustomer.call();
+  ```
+
+  in the `onClick` binding of a Button component. This will trigger this query when the Button is clicked.
 
 ## Secrets
 
-As these functions are running fully serverside they have access to the available environment variables through `process.env.DB_PASS`. Toolpad reads the `.env` file at the root of the project and will load its values in the environment.
+Toolpad has access to the environment variables defined in the `.env` file at the root of the project.
 
-An example `.env` file:
+- ### HTTP Requests
 
-```sh
-DB_HOST=localhost
-DB_USER=myuser
-DB_PASS=mypassword
-```
+  You can connect to environment variables inside HTTP request queries. For example, you can define an `Authorization` header and bind it to a value from your environment variables:
+
+{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/concepts/connecting-to-data/secrets-http-query.png", "alt": "Secret in HTTP request query", "caption": "Using an environment variable in the request header", "indent": 1 }}
+
+- ### Custom Functions
+
+  You can even directly use the environment variables when defining custom functions, as you normally would when writing backend code. For example:
+
+  ```sh
+  OPENAI_API_KEY=...
+  ```
+
+  And you can then use them in a custom function like so:
+
+  ```ts
+  import { Configuration, OpenAIApi } from 'openai';
+
+  export const askGPT = createFunction(
+    async function open4({ parameters }) {
+      const configuration = new Configuration({
+        apiKey: process.env.OPENAI_API_KEY,
+      });
+
+      const openai = new OpenAIApi(configuration);
+      const completion = await openai.createChatCompletion({
+        model: 'gpt-3.5-turbo',
+        messages: parameters.messages,
+      });
+
+      const response = completion.data?.choices[0].message ?? {
+        role: 'assistant',
+        content: 'No response',
+      };
+
+      return response;
+    },
+    {
+      parameters: {
+        messages: {
+          type: 'array',
+        },
+      },
+    },
+  );
+  ```
+
+  You can then use this function on your page:
+
+{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/concepts/connecting-to-data/ask-gpt.gif", "alt": "Custom function with secret", "caption": "Using a custom function with environment variables", "indent": 1 }}

@@ -2,12 +2,10 @@ import { zodToJsonSchema } from 'zod-to-json-schema';
 import * as z from 'zod';
 import * as fs from 'fs/promises';
 import * as path from 'path';
-import * as url from 'url';
-// eslint-disable-next-line import/extensions
-import { META } from '../packages/toolpad-app/src/server/schema.ts';
+import { META } from '../../packages/toolpad-app/src/server/schema';
 
-const currentDirectory = url.fileURLToPath(new URL('.', import.meta.url));
-const SCHEMA_DIR = path.resolve(currentDirectory, '../docs/schemas/v1/');
+const currentDirectory = __dirname;
+const SCHEMA_DIR = path.resolve(currentDirectory, '../../docs/schemas/v1/');
 
 async function main() {
   await fs.rm(SCHEMA_DIR, { recursive: true });

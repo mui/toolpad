@@ -4,10 +4,11 @@ import { InferParameterType, PrimitiveValueType, PropValueType } from './types.j
 /**
  * The runtime configuration for a Toolpad function. Describes the parameters it accepts and their
  * corresponding types.
+ * @muidoc interface
  */
-export interface CreateFunctionConfig<P> {
+export interface CreateFunctionConfig<C> {
   parameters: {
-    [K in keyof P]: PrimitiveValueType;
+    [K in keyof C]: PrimitiveValueType;
   };
 }
 
@@ -39,6 +40,13 @@ type MaybeLegacyParametersDefinition = PropValueType & {
   defaultValue?: any;
 };
 
+export type {
+  /**
+   * @muidoc interface
+   */
+  PrimitiveValueType,
+};
+
 /**
  * Use this to define a function that will load the data for a Toolpad query.
  * You can define parameters for the function in the configuration object.
@@ -46,6 +54,8 @@ type MaybeLegacyParametersDefinition = PropValueType & {
  * The return value of this function will appear as state on the page and can be bound to.
  * @param resolver The function that will load the data for the query.
  * @param config The configuration for the function.
+ * override: Config
+ * @muidoc function
  */
 export function createFunction<C extends CreateFunctionConfig<CreateFunctionConfigParameters<C>>>(
   resolver: FunctionResolver<C>,

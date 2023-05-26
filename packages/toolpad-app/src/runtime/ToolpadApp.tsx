@@ -1218,7 +1218,7 @@ function AppError({ error }: FallbackProps) {
   );
 }
 
-const queryClient = new QueryClient({
+export const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
       retry: false,

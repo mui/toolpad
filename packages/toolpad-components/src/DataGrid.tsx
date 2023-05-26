@@ -568,12 +568,41 @@ export default createComponent(DataGridComponent, {
     rows: {
       helperText: 'The data to be displayed as rows. Must be an array of objects.',
       type: 'array',
-      schema: '/schemas/DataGridRows.json',
+      schema: {
+        type: 'array',
+        items: {
+          type: 'object',
+          additionalProperties: true,
+          properties: {
+            id: {
+              type: 'string',
+            },
+          },
+          required: ['id'],
+        },
+      },
     },
     columns: {
       helperText: 'The columns to be displayed.',
       type: 'array',
-      schema: '/schemas/DataGridColumns.json',
+      schema: {
+        type: 'array',
+        items: {
+          type: 'object',
+          additionalProperties: true,
+          properties: {
+            field: {
+              type: 'string',
+            },
+            align: {
+              type: 'string',
+              nullable: true,
+              enum: ['center', 'right', 'left'],
+            },
+          },
+          required: ['field'],
+        },
+      },
       control: { type: 'GridColumns' },
     },
     rowIdField: {

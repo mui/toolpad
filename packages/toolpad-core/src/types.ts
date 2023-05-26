@@ -1,6 +1,7 @@
 import type * as React from 'react';
 import type { Branded } from '@mui/toolpad-utils/types';
 import type { SerializedError } from '@mui/toolpad-utils/errors';
+import { JSONSchema7 } from 'json-schema';
 import type { TOOLPAD_COMPONENT } from './constants.js';
 
 export type NodeId = Branded<string, 'NodeId'>;
@@ -144,9 +145,9 @@ export interface ObjectValueType extends ValueTypeBase {
    */
   type: 'object';
   /**
-   * the url of a JSON schema describing the object.
+   * A JSON schema describing the object.
    */
-  schema?: string;
+  schema?: JSONSchema7;
   default?: any;
 }
 
@@ -156,7 +157,7 @@ export interface ArrayValueType extends ValueTypeBase {
    */
   type: 'array';
   /**
-   * the url of a JSON schema describing the array.
+   * A JSON schema describing the array.
    */
   schema?: string;
   default?: any[];

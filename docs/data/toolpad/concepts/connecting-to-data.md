@@ -4,6 +4,10 @@
 
 You can create two kinds of **queries** in Toolpad to bring data to your page.
 
+:::info
+Toolpad uses `react-query` internally to run queries. Look into [its documentation](https://tanstack.com/query/latest/docs/react/guides/queries) for more details on query objects.
+:::
+
 ## HTTP Requests
 
 These offer a fast way to load external data from REST APIs, via a configurable interface.
@@ -96,6 +100,7 @@ You get the following response:
 {{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/concepts/connecting-to-data/query-8.png", "alt": "Server-side values", "caption": "Using server-side values in custom functions", "indent": 1 }}
 
 <ul>
+
 <li style="list-style-type: none">
 
 > You can import and use any Node module in your custom functions.
@@ -140,6 +145,10 @@ To be really useful, you need to connect these queries with data present on your
 
   This will make the `value` property available in the query editor. You can pass a value, or bind this to the page state:
 
+  :::info
+  See the `createFunction` [reference](/toolpad/reference/api/create-function/) section for complete details on this API
+  :::
+
 {{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/concepts/connecting-to-data/params-custom-fn.png", "alt": "Custom function parameter", "caption": "Using the value parameter in the query", "indent": 1 }}
 
 ## Mode
@@ -160,6 +169,14 @@ You can set the **mode** of the query to either be automatically refetched on pa
     You can configure the query to run on an interval, for example every 30s.
     To disable this option, keep the field empty.
 
+  Queries set to this mode may be re-fetched via the `refetch` function available on these query objects. For example, for a query named `getOrders`, we can add
+
+  ```js
+  getOrders.refetch();
+  ```
+
+  in the `onClick` binding of a Button component.
+
 - ### Manual
 
   Queries set to this mode can be called via a JavaScript expression in a binding. For example, for a query named `createCustomer`, we can add
@@ -169,6 +186,10 @@ You can set the **mode** of the query to either be automatically refetched on pa
   ```
 
   in the `onClick` binding of a Button component. This will trigger this query when the Button is clicked.
+
+:::info
+See the [event handling](/toolpad/concepts/managing-state/#event-handling) section for more details, and the [deleting data grid row](/toolpad/how-to-guides/delete-datagrid-row/) guide for a detailed usage example.
+:::
 
 ## Secrets
 

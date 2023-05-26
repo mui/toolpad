@@ -2,24 +2,26 @@
 
 <p class="description">Toolpad pages can be embedded anywhere you want to use them</p>
 
-- Set the display mode on your page to **No shell**
+## Using an `iframe`
 
-{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/how-to-guides/embed-page/no-shell.png", "alt": "No shell display mode", "caption": "Set display mode to no shell" }}
+1. Set the display mode on the page to be embedded to **No shell**
 
-- Deploy the Toolpad application
+{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/how-to-guides/embed-page/no-shell.png", "alt": "No shell display mode", "caption": "Set display mode to no shell", "indent": 1 }}
 
-  :::info
-  See the tutorial on [deploying to Render](/toolpad/tutorials/render-deploy/) on more details
-  :::
+2. Deploy the Toolpad application
 
-- Use an `iframe` with `src` set to the URL of the page you wish to embed. For example,
-  using
+   :::info
+   See the tutorial on [deploying to Render](/toolpad/tutorials/render-deploy/) for more details
+   :::
 
-  ```html
-  <iframe src="https://tools-public.onrender.com/prod/pages/fn03hvq" loading="lazy">
-  </iframe>
-  ```
+3. Use an `iframe` with `src` set to the URL of the page you wish to embed. For example,
+   using
 
-  we can embed a Toolpad page, like so:
+   ```html
+   <iframe src="https://tools-public.onrender.com/prod/pages/fn03hvq" loading="lazy">
+   </iframe>
+   ```
+
+   we can embed a Toolpad page, like so:
 
     <iframe src="https://tools-public.onrender.com/prod/pages/fn03hvq" loading="lazy"></iframe>

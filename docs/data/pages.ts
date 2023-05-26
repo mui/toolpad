@@ -56,16 +56,16 @@ const pages: MuiPage[] = [
         pathname: '/toolpad/how-to-guides/connect-to-databases',
       },
       {
-        pathname: '/toolpad/how-to-guides/delete-datagrid-row',
-        title: 'Delete a data grid row',
-      },
-      {
         pathname: '/toolpad/how-to-guides/number-display',
         title: 'Create a number component',
       },
       {
         pathname: '/toolpad/how-to-guides/customize-datagrid',
         title: 'Customize data grids',
+      },
+      {
+        pathname: '/toolpad/how-to-guides/delete-datagrid-row',
+        title: 'Delete a data grid row',
       },
       {
         pathname: '/toolpad/how-to-guides/embed-pages',

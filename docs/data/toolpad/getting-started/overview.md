@@ -8,7 +8,7 @@ Toolpad is a self-hosted, low-code internal tool builder. It is open-sourced, an
 Toolpad is designed for any developer who wants to create internal apps faster.
 Drag and drop pre-built UI components, connect your data sources, release your app, and you're done!
 
-{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/overview/main.png", "alt": "Editor screenshot", "caption": "The Toolpad editor"  }}
+{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/getting-started/overview/main.png", "alt": "Editor screenshot", "caption": "The Toolpad editor"  }}
 
 ## Key features
 

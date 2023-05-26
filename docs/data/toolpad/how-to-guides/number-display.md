@@ -4,53 +4,77 @@
 
 Supposing we want to use a component to display a large number value along with a smaller label, like so:
 
-<img src="/static/toolpad/docs/building-ui/ui-11.png?v=0" width="370" alt="Custom create" />
+{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/how-to-guides/custom-number-component/number-component.png", "alt": "Number component", "caption": "The number component" }}
 
-A snackbar appears acknowledging the successful creation of the component. This will create a code file in the `toolpad/components` folder of the project. Use the **Open** button to start open this file in your code editor:
+We can do this through a **custom component**.
 
-<img src="/static/toolpad/docs/building-ui/ui-12.png?v=0" width="494" alt="Custom component IDE" />
+## Creating the component
 
-The file has been initialized with a sample component. Replace its content with the following code:
+### In the Toolpad editor
 
-```tsx
-import * as React from 'react';
-import { Paper, Typography, Stack } from '@mui/material';
-import { createComponent } from '@mui/toolpad/browser';
+1. To get started creating this, hover over the component library and click on the **Create** button in the **Custom Components** section.
 
-export interface NumberDisplayProps {
-  label: string;
-  value: number;
-}
+{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/how-to-guides/custom-number-component/create-custom.png", "alt": "Create custom component", "caption": "Create a custom component", "indent": 1, "zoom": false }}
 
-function NumberDisplay({ label, value }: NumberDisplayProps) {
-  return (
-    <Paper sx={{ px: 4, py: 2, width: '100%' }}>
-      <Stack sx={{ alignItems: 'center' }}>
-        <Typography>{label}</Typography>
-        <Typography variant="h3">{value}</Typography>
-      </Stack>
-    </Paper>
-  );
-}
+2. A dialog box appears asking you to name it. Name it "NumberDisplay".
 
-export default createComponent(NumberDisplay, {
-  argTypes: {
-    label: {
-      type: 'string',
-      default: 'label',
-    },
-    value: {
-      type: 'number',
-      default: 0,
-    },
-  },
-});
-```
+   :::warning
+   You can use any name, as long as it complies with the [rules of naming](https://react.dev/learn/your-first-component) components in React
+   :::
 
-When you now open the **Component library** again you'll see your **NumberDisplay** available.
+{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/how-to-guides/custom-number-component/number-display-name.png", "alt": "Name custom component", "caption": "Naming a custom component", "indent": 1, "zoom": false }}
 
-<img src="/static/toolpad/docs/building-ui/ui-13.png?v=0" width="370" alt="Custom create" />
+3. A snackbar appears acknowledging the successful creation of the component. A started file is created in `toolpad/components`. Use the **Open** button to open this file in your code editor:
 
-Drag two of them on the canvas and select the first one. In the **Inspector** you'll see both the `label` and `value` properties available as fully bindable properties.
+{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/how-to-guides/custom-number-component/snackbar-open.png", "alt": "Open custom component", "caption": "Open the custom component", "indent": 1, "zoom": false }}
 
-<img src="/static/toolpad/docs/building-ui/ui-14.png?v=0" width="370" alt="Custom create" />
+### In the code editor
+
+1. A file with some sample code for a custom component is initialised for you. Replace its content with the following code:
+
+   ```tsx
+   import * as React from 'react';
+   import { Paper, Typography, Stack } from '@mui/material';
+   import { createComponent } from '@mui/toolpad/browser';
+
+   export interface NumberDisplayProps {
+     label: string;
+     value: number;
+   }
+
+   function NumberDisplay({ label, value }: NumberDisplayProps) {
+     return (
+       <Paper sx={{ px: 4, py: 2, width: '100%' }}>
+         <Stack sx={{ alignItems: 'center' }}>
+           <Typography>{label}</Typography>
+           <Typography variant="h3">{value}</Typography>
+         </Stack>
+       </Paper>
+     );
+   }
+
+   export default createComponent(NumberDisplay, {
+     argTypes: {
+       label: {
+         type: 'string',
+         default: 'label',
+       },
+       value: {
+         type: 'number',
+         default: 0,
+       },
+     },
+   });
+   ```
+
+   `label` and `value` are the props that we will make available for binding in the Toolpad editor.
+
+2. **NumberDisplay** is now available as a custom component in the component library:
+
+{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/how-to-guides/custom-number-component/number-in-library.png", "alt": "custom component in library", "caption": "The custom component appears in the component library", "indent": 1, "zoom": false }}
+
+## Using the component
+
+1. Drag two of the number components on the canvas and select the first one. In the inspector, you'll see both the `label` and `value` properties available as bindable properties.
+
+{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/how-to-guides/custom-number-component/number-components.png", "alt": "Use custom components with numbers and labels", "caption": "Using the custom component", "indent": 1 }}

@@ -30,7 +30,11 @@ Event handler props can be bound to either a JavaScript expression action or a N
 
 - #### JavaScript expression actions
 
-  You can run arbitrary JavaScript `onClick`, including manipulating the state of other components on the page. For example:
+  You can run arbitrary JavaScript `onClick`, including manipulating the state of other components on the page.
+
+  :::info
+  See the [deleting data grid row](/toolpad/how-to-guides/delete-datagrid-row/) guide for a detailed usage example.
+  :::
 
 {{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/concepts/managing-state/on-click.gif", "alt": "onClick JavaScript ", "caption": "Running JavaScript on click", "indent": 1}}
 

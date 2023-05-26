@@ -8,7 +8,7 @@ When you click on the name of a breed, a random photo of the breed will be displ
 
 ## Purpose
 
-This Quickstart guide is intended to introduce you to the fundamentals of building with Toolpad.
+This guide is intended to introduce you to the fundamentals of building with Toolpad.
 By the end, you should be able to:
 
 - set up a new Toolpad app
@@ -23,7 +23,7 @@ Make sure to [install Node](https://nodejs.org/en) on your system.
 
 Interactive walkthrough of the app building process:
 
-<iframe id="toolpad-quickstart" src="https://demo.arcade.software/MDlpNzHbuXwvPh4MK9ff?embed" frameborder="0" loading="lazy" webkitallowfullscreen mozallowfullscreen allowfullscreen title="Default page | Toolpad editor" style="width: 100%; height: min(60vw, 500px); border-radius: 0.75rem"></iframe>
+<iframe id="toolpad-first-app" src="https://demo.arcade.software/MDlpNzHbuXwvPh4MK9ff?embed" frameborder="0" loading="lazy" webkitallowfullscreen mozallowfullscreen allowfullscreen title="Default page | Toolpad editor" style="width: 100%; height: min(60vw, 500px); border-radius: 0.75rem"></iframe>
 
 ## Detailed steps
 
@@ -50,7 +50,7 @@ Interactive walkthrough of the app building process:
 
 1. Hover over the component library and drag a **Data Grid** component into the canvas. Now repeat the process and drag an **Image** component as well. When you're done, the canvas should look like this:
 
-{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/quickstart/step-1.png", "alt": "Toolpad editor", "caption": "The Toolpad editor with components dragged", "indent": 1  }}
+{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/getting-started/first-app/step-1.png", "alt": "Toolpad editor", "caption": "The Toolpad editor with components dragged", "indent": 1  }}
 
 ### Fetch data
 
@@ -58,11 +58,11 @@ Interactive walkthrough of the app building process:
 
 1. Locate the **Add query** button inside the inspector. Press it and choose **HTTP request**.
 
-{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/quickstart/step-2.png", "alt":"Choose HTTP request", "caption":"The Add query menu", "zoom": false  }}
+{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/getting-started/first-app/step-2.png", "alt":"Choose HTTP request", "caption":"The Add query menu", "zoom": false, "indent": 1  }}
 
 3. We'll be using the [dog API](https://dog.ceo/dog-api/) for this tutorial. First give the query a unique name: `dogQuery`. Then, set `https://dog.ceo/api/breeds/list/all` as the **URL**. Click the **Preview** button to inspect the result of this request, and expand the `message` object in the response. If all went well, it will look like this:
 
-{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/quickstart/step-3.png", "alt": "Fetch URL", "caption": "The dog API response", "indent": 1  }}
+{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/getting-started/first-app/step-3.png", "alt": "Fetch URL", "caption": "The dog API response", "indent": 1  }}
 
 4. To transform the response according to our needs, we choose the **Transform** tab and enable the **Transform response** option. Write the JavaScript expression:
 
@@ -72,7 +72,7 @@ Interactive walkthrough of the app building process:
 
    in the editor. Click **Preview** again to verify the result.
 
-{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/quickstart/step-4.png", "alt": "Transform response", "caption": "The dog API response transformed", "indent": 1  }}
+{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/getting-started/first-app/step-4.png", "alt": "Transform response", "caption": "The dog API response transformed", "indent": 1  }}
 
 ### Bind data to UI
 
@@ -80,7 +80,7 @@ Interactive walkthrough of the app building process:
 
 1. Find the **rows** property in the inspector. Notice that there's a small **Bind** button to its right. Properties with this button next to them can be bound to state available on the page:
 
-{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/quickstart/step-5.png", "alt": "Bind data", "caption": "The bindable rows property", "zoom": false }}
+{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/getting-started/first-app/step-5.png", "alt": "Bind data", "caption": "The bindable rows property", "zoom": false, "indent": 1 }}
 
 3. Click the button to open the binding editor. On the left you'll see a list of all bindable state in the page and on the right there's a code editor that accepts any JavaScript expression.
 
@@ -92,17 +92,17 @@ Interactive walkthrough of the app building process:
 
    save the binding and close the binding editor.
 
-{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/quickstart/step-6.png", "alt": "dogQuery.data", "caption": "The binding editor", "indent": 1  }}
+{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/getting-started/first-app/step-6.png", "alt": "dogQuery.data", "caption": "The binding editor", "indent": 1  }}
 
 5. If all went well, the Data Grid will now display the data from our query:
 
-{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/quickstart/step-7.png", "alt": "Connected data", "caption": "The data grid with bound data", "indent": 1  }}
+{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/getting-started/first-app/step-7.png", "alt": "Connected data", "caption": "The data grid with bound data", "indent": 1  }}
 
 ### Make the app interactive
 
 1. Now, we can make this app interactive by displaying a random image of the selected breed. We'll create another query which reacts to the selection inside the Data Grid component. Deselect all components and click on **Add query** &rarr; **HTTP request**. Name it "imageQuery" and add a `breed` parameter in the **Parameters** section on the bottom:
 
-{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/quickstart/step-8.png", "alt": "Breed parameter", "caption": "Editing imageQuery", "indent": 1  }}
+{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/getting-started/first-app/step-8.png", "alt": "Breed parameter", "caption": "Editing imageQuery", "indent": 1  }}
 
 2. Click on the **Bind** button next to the breed parameter value, and add the following JavaScript expression in the binding editor:
 
@@ -112,7 +112,7 @@ Interactive walkthrough of the app building process:
 
    This will use the selected value from the Data Grid, and default to the "akita" breed when no row has been selected.
 
-{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/quickstart/step-9.png", "alt": "Breed binding", "caption": "Binding breed to the selected value", "indent": 1  }}
+{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/getting-started/first-app/step-9.png", "alt": "Breed binding", "caption": "Binding breed to the selected value", "indent": 1  }}
 
 3. Then bind the query **URL** to the following JavaScript expression:
 
@@ -120,22 +120,22 @@ Interactive walkthrough of the app building process:
    `https://dog.ceo/api/breed/${parameters.breed}/images/random`;
    ```
 
-{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/quickstart/step-10.png", "alt": "URL binding", "caption": "Binding the URL to a JavaScript expression", "indent": 1 }}
+{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/getting-started/first-app/step-10.png", "alt": "URL binding", "caption": "Binding the URL to a JavaScript expression", "indent": 1 }}
 
 4. Save the binding and close the binding editor. Save the query and exit the query editor.
 
 5. In the canvas select the **Image** component to view its properties in the inspector. Click on the **Bind** button next to the **src** prop to open the binding editor, and bind it to `imageQuery.data.message`.
 
-{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/quickstart/step-11.png", "alt": "Bind image src to Java", "caption": "Binding the Image src to the query response", "indent": 1  }}
+{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/getting-started/first-app/step-11.png", "alt": "Bind image src to Java", "caption": "Binding the Image src to the query response", "indent": 1  }}
 
 6. Try selecting different rows in the datagrid to see the image update to a random image of the selected breed.
 
-{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/quickstart/step-12.png", "alt": "Image changes based on selection", "caption": "The image changing based on the selected row", "indent": 1  }}
+{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/getting-started/first-app/step-12.png", "alt": "Image changes based on selection", "caption": "The image changing based on the selected row", "indent": 1  }}
 
 ### Preview the app
 
 1. Click on the **Preview** button to see a preview of what your app will look like when deployed:
 
-{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/quickstart/step-13.png", "alt": "Preview of app", "caption": "The preview of our application", "indent": 1  }}
+{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/getting-started/first-app/step-13.png", "alt": "Preview of app", "caption": "The preview of our application", "indent": 1  }}
 
 2. That's it! Feel free to browse through the rest of the documentation to know more about what you can do with Toolpad.

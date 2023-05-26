@@ -4,5 +4,5 @@
 
 ## Functions
 
-- [createComponent](./create-component/)
-- [createFunction](./create-function/)
+- [createComponent](/toolpad/reference/api/create-component/)
+- [createFunction](/toolpad/reference/api/create-function/)

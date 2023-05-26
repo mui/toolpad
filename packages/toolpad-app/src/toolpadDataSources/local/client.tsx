@@ -36,6 +36,8 @@ import BindableEditor from '../../toolpad/AppEditor/PageEditor/BindableEditor';
 import { getDefaultControl } from '../../toolpad/propertyControls';
 import { useOnProjectEvent } from '../../projectEvents';
 
+const EXPERIMENT_ONE_FUNCTION_PER_FILE = false;
+
 const EMPTY_PARAMS: BindableAttrEntries = [];
 
 type FunctionOptionType = string | { kind: 'create'; suggestion: string };
@@ -151,7 +153,11 @@ function QueryEditor({
               filterOptions={(options, params) => {
                 const filtered = filter(options, params);
 
-                if (params.inputValue !== '' && !filtered.includes(params.inputValue)) {
+                if (
+                  EXPERIMENT_ONE_FUNCTION_PER_FILE &&
+                  params.inputValue !== '' &&
+                  !filtered.includes(params.inputValue)
+                ) {
                   filtered.push({
                     kind: 'create',
                     suggestion: params.inputValue,
@@ -183,7 +189,10 @@ function QueryEditor({
                 />
               )}
             />
-            <Button disabled={!file} onClick={handleOpenEditorClick}>
+            <Button
+              disabled={EXPERIMENT_ONE_FUNCTION_PER_FILE ? !file : false}
+              onClick={handleOpenEditorClick}
+            >
               Open editor
             </Button>
           </Stack>

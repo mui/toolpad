@@ -218,6 +218,7 @@ export function createViteConfig({
         },
       },
     },
+    envFile: false,
     resolve: {
       alias: [
         {

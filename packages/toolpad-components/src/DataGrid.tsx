@@ -522,7 +522,6 @@ const DataGridComponent = React.forwardRef(function DataGridComponent(
 
   const apiRef = useGridApiRef();
   React.useEffect(() => {
-    console.log(apiRef.current, apiRef.current.updateColumns);
     apiRef.current.updateColumns(columns);
   }, [apiRef, columns]);
 
@@ -533,7 +532,7 @@ const DataGridComponent = React.forwardRef(function DataGridComponent(
     [getRowId, columns],
   );
 
-  const error: Error = errorProp ? errorFrom(errorProp) : null;
+  const error: Error | null = errorProp ? errorFrom(errorProp) : null;
 
   return (
     <div

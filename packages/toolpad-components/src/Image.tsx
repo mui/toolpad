@@ -86,7 +86,7 @@ export default createComponent(Image, {
   layoutDirection: 'both',
   loadingPropSource: ['src'],
   loadingProp: 'loading',
-  errorProp: ['error'],
+  errorProp: 'error',
   errorPropSource: ['src'],
   argTypes: {
     src: {

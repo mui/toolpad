@@ -1,7 +1,7 @@
 {
   "type": "object",
   "properties": {
-    "align": {
+    "kind": {
       "type": "string",
       "enum": ["line", "bar", "pie"]
     },

@@ -8,7 +8,7 @@ type ChartDataSeriesKind = 'line' | 'bar' | 'pie';
 export interface ChartDataSeries<D = Record<string, unknown>> {
   kind: ChartDataSeriesKind;
   label: string;
-  data: D;
+  data: D[];
   xKey: keyof D;
   yKey: keyof D;
 }

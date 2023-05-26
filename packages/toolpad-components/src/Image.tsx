@@ -87,7 +87,6 @@ export default createComponent(Image, {
   loadingPropSource: ['src'],
   loadingProp: 'loading',
   errorProp: 'error',
-  errorPropSource: ['src'],
   argTypes: {
     src: {
       helperText: 'The url of the image. Must resolve to an image file.',

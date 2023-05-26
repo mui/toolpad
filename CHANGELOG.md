@@ -1,5 +1,31 @@
 # Changelog
 
+## 0.1.13
+
+<!-- generated comparing v0.1.12..master -->
+
+_May 24, 2023_
+
+A big thanks to the 5 contributors who made this release possible. Here are some highlights ✨:
+
+Allow binding to environment variables, UI and docs improvements, bug fixes.
+
+- &#8203;<!-- 13 -->Fix manual queries losing parameters when called (#2060) @bharatkashyap
+- &#8203;<!-- 12 -->Fix function parameters (#2056) @Janpot
+- &#8203;<!-- 11 -->Fix overlay grid spacing (#2026) @apedroferreira
+- &#8203;<!-- 10 -->pin toolpad packages versions again (#2054) @Janpot
+- &#8203;<!-- 09 -->Fix orphaned node delete order (#2042) @apedroferreira
+- &#8203;<!-- 08 -->Fix property control tooltips showing over dialogs (#2041) @Janpot
+- &#8203;<!-- 07 -->Ignore warning for first-child pseudo selector in Markdown component (#2034) @Janpot
+- &#8203;<!-- 06 -->Allow binding to environment variables (#1859) @apedroferreira
+- &#8203;<!-- 05 -->Reorganize core exports to ease extracting API docs (#2040) @Janpot
+- &#8203;<!-- 04 -->Split data binding page in docs (#1996) @apedroferreira
+- &#8203;<!-- 03 -->[docs] Fix casing (#2046) @oliviertassinari
+- &#8203;<!-- 02 -->[docs] Add product identifier to page context (#2043) @m4theushw
+- &#8203;<!-- 01 -->[refactor] Move toolpad components into the runtime (#2036) @Janpot
+
+All contributors of this release in alphabetical order: @apedroferreira, @bharatkashyap, @Janpot, @m4theushw, @oliviertassinari
+
 ## 0.1.12
 
 <!-- generated comparing v0.1.11..master -->

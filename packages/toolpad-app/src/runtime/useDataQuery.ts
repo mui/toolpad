@@ -4,7 +4,6 @@ import { GridRowsProp } from '@mui/x-data-grid-pro';
 import * as React from 'react';
 import { useQuery, UseQueryOptions } from '@tanstack/react-query';
 import { CanvasHooksContext } from './CanvasHooksContext';
-import dataSources from '../toolpadDataSources/runtime';
 import * as appDom from '../appDom';
 
 interface ExecDataSourceQueryParams {
@@ -72,10 +71,6 @@ export function useDataQuery(
   const { savedNodes } = React.useContext(CanvasHooksContext);
   const queryName = node.name;
   const pageName = page.name;
-  const query = node.attributes.query?.value;
-  const dataSourceId = node.attributes.dataSource?.value;
-
-  const dataSource = dataSourceId ? dataSources[dataSourceId] : null;
 
   // These are only used by the editor to invalidate caches whenever the query changes during editing
   const nodeHash: number | undefined = savedNodes ? savedNodes[node.id] : undefined;
@@ -89,15 +84,7 @@ export function useDataQuery(
     refetch,
   } = useQuery(
     [nodeHash, pageName, queryName, params],
-    ({ signal }) => {
-      const fetchFromServer = () => execDataSourceQuery({ signal, pageName, queryName, params });
-
-      if (query && dataSource?.exec) {
-        return dataSource?.exec(query, params, fetchFromServer);
-      }
-
-      return fetchFromServer();
-    },
+    ({ signal }) => execDataSourceQuery({ signal, pageName, queryName, params }),
     {
       ...options,
       enabled: isNodeAvailableOnServer && enabled,

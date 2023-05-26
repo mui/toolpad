@@ -3,16 +3,12 @@ import invariant from 'invariant';
 import { throttle } from 'lodash-es';
 import { CanvasEventsContext } from '@mui/toolpad-core/runtime';
 import ToolpadApp, { LoadComponents } from '../runtime';
-import { NodeHashes, RuntimeState } from '../types';
+import { AppCanvasState } from '../types';
 import getPageViewState from './getPageViewState';
 import { rectContainsPoint } from '../utils/geometry';
 import { CanvasHooks, CanvasHooksContext } from '../runtime/CanvasHooksContext';
 import { bridge, setCommandHandler } from './ToolpadBridge';
 import { BridgeContext } from './BridgeContext';
-
-export interface AppCanvasState extends RuntimeState {
-  savedNodes: NodeHashes;
-}
 
 const handleScreenUpdate = throttle(
   () => {
@@ -126,9 +122,6 @@ export default function AppCanvas({
   const editorHooks: CanvasHooks = React.useMemo(() => {
     return {
       savedNodes,
-      navigateToPage(pageNodeId) {
-        bridge.canvasEvents.emit('pageNavigationRequest', { pageNodeId });
-      },
     };
   }, [savedNodes]);
 

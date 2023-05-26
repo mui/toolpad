@@ -83,3 +83,12 @@ test('function editor parameters update', async ({ page, localApp }) => {
 
   await expect(queryEditor.getByLabel('bar', { exact: true })).toBeVisible();
 });
+
+test('bound parameters are preserved on manual call', async ({ page }) => {
+  const runtimeModel = new ToolpadRuntime(page);
+  await runtimeModel.gotoPage('page1');
+
+  await page.getByRole('button', { name: 'Run Manual Query' }).click();
+
+  await expect(page.getByText('destination: checksum', { exact: true })).toBeVisible();
+});

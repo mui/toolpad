@@ -1,10 +1,11 @@
 import type { MuiPage } from '@mui/monorepo/docs/src/MuiPage';
-import SchemaIcon from '@mui/icons-material/Schema';
 import BuildIcon from '@mui/icons-material/Build';
 import CodeIcon from '@mui/icons-material/Code';
 import DescriptionIcon from '@mui/icons-material/Description';
 import TableViewIcon from '@mui/icons-material/TableView';
 import VisibilityIcon from '@mui/icons-material/Visibility';
+import LinkIcon from '@mui/icons-material/Link';
+import componentsManifest from './toolpad/reference/components/manifest.json';
 
 const pages: MuiPage[] = [
   {
@@ -31,7 +32,7 @@ const pages: MuiPage[] = [
       },
       {
         pathname: '/toolpad/connecting-to-datasources/custom-functions',
-        title: 'Custom Functions',
+        title: 'Custom functions',
       },
     ],
   },
@@ -68,8 +69,7 @@ const pages: MuiPage[] = [
   },
   {
     pathname: '/toolpad/data-binding',
-    title: 'Data Binding',
-    icon: CodeIcon,
+    icon: LinkIcon,
     children: [
       {
         pathname: '/toolpad/data-binding/binding-state',
@@ -86,9 +86,44 @@ const pages: MuiPage[] = [
     icon: BuildIcon,
   },
   {
-    pathname: '/toolpad/schema-reference',
-    title: 'Schema reference',
-    icon: SchemaIcon,
+    pathname: '/toolpad/reference-group',
+    title: 'Reference',
+    icon: CodeIcon,
+    children: [
+      {
+        pathname: '/toolpad/reference/file-schema',
+        title: 'File schema',
+      },
+      {
+        pathname: '/toolpad/reference/components-group',
+        title: 'Components',
+        children: componentsManifest.pages,
+      },
+      {
+        pathname: '/toolpad/reference/api-group',
+        title: 'API',
+        children: [
+          {
+            pathname: '/toolpad/reference/api',
+            title: 'Index',
+          },
+          {
+            pathname: '/toolpad/reference/api/functions-group',
+            subheader: 'Functions',
+            children: [
+              {
+                title: 'createFunction',
+                pathname: '/toolpad/reference/api/create-function',
+              },
+              {
+                title: 'createComponent',
+                pathname: '/toolpad/reference/api/create-component',
+              },
+            ],
+          },
+        ],
+      },
+    ],
   },
 ];
 

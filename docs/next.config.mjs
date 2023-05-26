@@ -119,9 +119,6 @@ export default withTM(
 
         return map;
       },
-      rewrites: async () => {
-        return [{ source: '/api/:rest*', destination: '/api-docs/:rest*' }];
-      },
       // redirects only take effect in the development, not production (because of `next export`).
       redirects: async () => [
         {

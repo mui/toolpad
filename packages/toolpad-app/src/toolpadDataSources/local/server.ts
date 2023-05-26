@@ -18,7 +18,6 @@ import {
   openQueryEditor,
   getOutputFolder,
   getResourcesFolder,
-  createFunctionFile,
 } from '../../server/localMode';
 import { waitForInit, getProject } from '../../server/liveProject';
 

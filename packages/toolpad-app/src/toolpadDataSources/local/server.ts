@@ -1,14 +1,14 @@
 import { ExecFetchResult } from '@mui/toolpad-core';
+import type { Message as MessageToChildProcess } from '@mui/toolpad-core/localRuntime';
 import { SerializedError, errorFrom, serializeError } from '@mui/toolpad-utils/errors';
 import * as child_process from 'child_process';
 import * as esbuild from 'esbuild';
-import * as fs from 'fs/promises';
 import * as path from 'path';
 import invariant from 'invariant';
-import { indent, truncate } from '@mui/toolpad-utils/strings';
-import * as dotenv from 'dotenv';
+import { indent } from '@mui/toolpad-utils/strings';
 import * as chokidar from 'chokidar';
 import chalk from 'chalk';
+import { glob } from 'glob';
 import config from '../../config';
 import { ServerDataSource } from '../../types';
 import { LocalPrivateQuery, LocalQuery, LocalConnectionParams } from './types';
@@ -16,22 +16,11 @@ import { Maybe } from '../../utils/types';
 import {
   getUserProjectRoot,
   openQueryEditor,
-  getFunctionsFile,
   getOutputFolder,
+  getResourcesFolder,
+  createFunctionFile,
 } from '../../server/localMode';
-import { waitForInit } from '../../server/liveProject';
-
-type MessageToChildProcess =
-  | {
-      kind: 'introspect';
-      id: number;
-    }
-  | {
-      kind: 'exec';
-      id: number;
-      name: string;
-      parameters: Record<string, any>;
-    };
+import { waitForInit, getProject } from '../../server/liveProject';
 
 type MessageFromChildProcess = {
   kind: 'result';
@@ -82,12 +71,26 @@ function pathToNodeImportSpecifier(importPath: string): string {
   return normalized.startsWith('/') ? normalized : `./${normalized}`;
 }
 
-async function createMain(): Promise<string> {
-  const relativeFunctionsFilePath = [`.`, getFunctionsFile('.')].join(path.sep);
+function getFunctionResourcesPattern(root: string): string {
+  return path.join(getResourcesFolder(root), 'functions.ts');
+}
+
+async function createMain(root: string): Promise<string> {
+  const resourcesFolder = getResourcesFolder(root);
+  const functionFiles = await glob(getFunctionResourcesPattern(root));
+
+  const functionImports = functionFiles.map((file) => {
+    const fileName = path.relative(resourcesFolder, file);
+    const importSpec = pathToNodeImportSpecifier(
+      ['.', getResourcesFolder('.'), fileName].join(path.sep),
+    );
+    const name = path.basename(fileName).replace(/\..*$/, '');
+    return `[${JSON.stringify(name)}, () => import(${JSON.stringify(importSpec)})]`;
+  });
+
   return `
-    import { TOOLPAD_FUNCTION } from '@mui/toolpad-core';
-    import { errorFrom, serializeError } from '@mui/toolpad-utils/errors';
     import fetch, { Headers, Request, Response } from 'node-fetch'
+    import { setup } from '@mui/toolpad-core/localRuntime';
 
     // Polyfill fetch() in the Node.js environment
     if (!global.fetch) {
@@ -97,121 +100,15 @@ async function createMain(): Promise<string> {
       global.Response = Response
     }
 
-    async function loadFunction (name, importFn) {
-      const { default: resolver } = await importFn()
-      return [name, resolver]
-    }
-
-    let resolversPromise
-    async function getResolvers() {
-      if (!resolversPromise) {
-        resolversPromise = (async () => {
-          const functions = await import(${JSON.stringify(
-            pathToNodeImportSpecifier(relativeFunctionsFilePath),
-          )}).catch((err) => {
-            console.error(err);
-            return {};
-          });
-
-          const functionsFileResolvers = Object.entries(functions).flatMap(([name, resolver]) => {
-            return typeof resolver === 'function' ? [[name, resolver]] : []
-          })
-
-          return new Map(functionsFileResolvers);
-        })();
-      }
-      return resolversPromise
-    }
-
-    async function loadResolver (name) {
-      const resolvers = await getResolvers()
-
-      const resolver = resolvers.get(name);
-
-      if (!resolver) {
-        throw new Error(\`Can't find "\${name}"\`);
-      }
-
-      return resolver
-    }
-
-    async function execResolver (name, parameters) {
-      const resolver = await loadResolver(name);
-      return resolver({ parameters })
-    }
-
-    process.on('message', async msg => {
-      switch (msg.kind) {
-        case 'exec': {
-          let data, error;
-          try {
-            data = await execResolver(msg.name, msg.parameters);
-          } catch (err) {
-            error =  serializeError(errorFrom(err))
-          }
-          process.send({
-            kind: 'result',
-            id: msg.id,
-            data,
-            error
-          });
-          break;
-        }
-        case 'introspect': {
-          let data, error
-          try {
-            const resolvers = await getResolvers()
-            const resolvedResolvers =  Array.from(resolvers, ([name, resolver]) => [
-              name,
-              resolver[TOOLPAD_FUNCTION] || {}
-            ]);
-            data = { 
-              functions: Object.fromEntries(resolvedResolvers.filter(Boolean))
-            };
-          } catch (err) {
-            error =  serializeError(errorFrom(err))
-          }
-          process.send({
-            kind: 'result',
-            id: msg.id,
-            data,
-            error
-          });
-          break;
-        }
-        default: console.log(\`Unknown message kind "\${msg.kind}"\`);
-      }
-    });
+    setup({
+      functions: new Map([${functionImports.join(', ')}]),
+    })
   `;
 }
 
-export async function loadEnvFile() {
-  const userProjectRoot = getUserProjectRoot();
-  const envFilePath = path.resolve(userProjectRoot, '.env');
-
-  try {
-    const envFileContent = await fs.readFile(envFilePath);
-    const parsed = dotenv.parse(envFileContent) as any;
-    // eslint-disable-next-line no-console
-    console.log(
-      `${chalk.blue('info')}  - loaded env file "${envFilePath}" with keys ${truncate(
-        Object.keys(parsed).join(', '),
-        1000,
-      )}`,
-    );
-
-    return parsed;
-  } catch (err) {
-    if (errorFrom(err).code !== 'ENOENT') {
-      throw err;
-    }
-  }
-
-  return {};
-}
-
-async function createBuilder() {
+async function createBuilder(root: string) {
   await waitForInit();
+  const project = await getProject();
 
   const userProjectRoot = getUserProjectRoot();
 
@@ -222,7 +119,7 @@ async function createBuilder() {
 
   let outputFile: string | undefined;
   let metafile: esbuild.Metafile | undefined;
-  let env: any = loadEnvFile();
+  let env: Record<string, string> = await project.envManager.getValues();
 
   const restartRuntimeProcess = () => {
     if (controller) {
@@ -294,7 +191,7 @@ async function createBuilder() {
           break;
         }
         default:
-          console.error(`Unknowm message received "${msg.kind}"`);
+          console.error(`Unknown message received "${msg.kind}"`);
       }
     });
 
@@ -313,7 +210,7 @@ async function createBuilder() {
         if (args.path === 'main.ts') {
           return {
             loader: 'tsx',
-            contents: await createMain(),
+            contents: await createMain(root),
             resolveDir: userProjectRoot,
           };
         }
@@ -350,6 +247,8 @@ async function createBuilder() {
 
           restartRuntimeProcess();
         }
+
+        project.events.emit('functionsBuildEnd', {});
 
         setInitialized();
       });
@@ -411,24 +310,44 @@ async function createBuilder() {
     });
   }
 
-  let envFileWatcher: chokidar.FSWatcher | undefined;
+  let resourcesWatcher: chokidar.FSWatcher | undefined;
 
-  const envFilePath = path.resolve(userProjectRoot, '.env');
+  const unsubscribers: (() => void)[] = [];
 
   return {
     watch() {
       ctx.watch();
 
+      const unsubscribeEnv = project.events.subscribe('envChanged', async () => {
+        env = await project.envManager.getValues();
+        restartRuntimeProcess();
+      });
+
+      unsubscribers.push(unsubscribeEnv);
+
+      // Make sure we pick up added/removed function files
       (async () => {
         try {
-          if (envFileWatcher) {
-            await envFileWatcher.close();
+          if (resourcesWatcher) {
+            await resourcesWatcher.close();
           }
+          const pattern = getFunctionResourcesPattern(root);
 
-          envFileWatcher = chokidar.watch([envFilePath]);
-          envFileWatcher.on('all', async () => {
-            env = await loadEnvFile();
-            restartRuntimeProcess();
+          const calculateFingerPrint = async () => {
+            const functionFiles = await glob(pattern);
+            return functionFiles.join('|');
+          };
+
+          let fingerprint = await calculateFingerPrint();
+
+          const globalResourcesFolder = path.resolve(pattern);
+          resourcesWatcher = chokidar.watch([globalResourcesFolder]);
+          resourcesWatcher.on('all', async () => {
+            const newFingerprint = await calculateFingerPrint();
+            if (fingerprint !== newFingerprint) {
+              fingerprint = newFingerprint;
+              ctx.rebuild();
+            }
           });
         } catch (err: unknown) {
           if (errorFrom(err).name === 'AbortError') {
@@ -441,7 +360,8 @@ async function createBuilder() {
     introspect,
     execute,
     async dispose() {
-      await Promise.all([ctx.dispose(), envFileWatcher?.close(), controller?.abort()]);
+      unsubscribers.forEach((unsubscribe) => unsubscribe());
+      await Promise.all([ctx.dispose(), controller?.abort()]);
     },
   };
 }
@@ -496,7 +416,7 @@ const dataSource: ServerDataSource<{}, LocalQuery, any> = {
 export default dataSource;
 
 async function startDev() {
-  const builder = await createBuilder();
+  const builder = await createBuilder(getUserProjectRoot());
   await builder.watch();
   return builder;
 }

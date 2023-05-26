@@ -2,16 +2,23 @@ export type EventName = string | symbol;
 
 export type EventHandler<T = unknown> = (event: T) => void;
 
+export type AllEventsHandler<T extends Record<EventName, unknown>, K extends keyof T = keyof T> = (
+  type: keyof T,
+  event: T[K],
+) => void;
+
 /**
  * Lightweight event emitter
  */
 export class Emitter<T extends Record<EventName, unknown> = {}> {
-  private handlers = new Map<keyof T, Set<EventHandler<any>>>();
+  private handlers = new Map<keyof T, Set<EventHandler<any> | AllEventsHandler<T>>>();
 
   /**
    * Add a listener for an event
    */
-  on<K extends keyof T>(name: K, handler: EventHandler<T[K]>) {
+  on(name: '*', handler: AllEventsHandler<T>): void;
+  on<K extends keyof T>(name: K, handler: EventHandler<T[K]>): void;
+  on<K extends keyof T>(name: string, handler: EventHandler<T[K]> | AllEventsHandler<T>): void {
     let eventHandlers = this.handlers.get(name);
     if (!eventHandlers) {
       eventHandlers = new Set();
@@ -50,7 +57,13 @@ export class Emitter<T extends Record<EventName, unknown> = {}> {
     const eventHandlers = this.handlers.get(name);
     if (eventHandlers) {
       for (const eventHandler of eventHandlers) {
-        eventHandler(event);
+        (eventHandler as EventHandler<any>)(event);
+      }
+    }
+    const allHandlers = this.handlers.get('*');
+    if (allHandlers) {
+      for (const eventHandler of allHandlers) {
+        (eventHandler as AllEventsHandler<any>)(name, event);
       }
     }
   }

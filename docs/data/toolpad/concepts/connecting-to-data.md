@@ -17,6 +17,7 @@ These offer a fast way to load external data from REST APIs, via a configurable 
 The following options are configurable here:
 
 - ### URL query
+
   You can add query parameters to your request here. These get appended to the request URL, like
   `https://dog.ceo/api/breed/akita/images/random?param1=value1`
 
@@ -161,15 +162,16 @@ You can set the **mode** of the query to either be automatically refetched on pa
 
   You can configure the following settings in this mode:
 
-  - #### Enabled
+  - **Enabled**
 
     You can use this option to enable or disable the query from running
 
-  - #### Refetch interval
+  - **Refetch interval**
+
     You can configure the query to run on an interval, for example every 30s.
     To disable this option, keep the field empty.
 
-  Queries set to this mode may be re-fetched via the `refetch` function available on these query objects. For example, for a query named `getOrders`, we can add
+  Queries set to the automatic mode may be re-fetched via the `refetch` function available on these query objects. For example, for a query named `getOrders`, we can add
 
   ```js
   getOrders.refetch();

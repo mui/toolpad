@@ -18,4 +18,6 @@ To serve the app once built, run:
 yarn start
 ```
 
-Look into detailed, platform-specific guides in the [How-to guides](/toolpad/how-to-guides/deploy-render/)
+:::info
+Detailed, step-by-step instructions for deploying a Toolpad app are available in the tutorial on [deploying to Render](/toolpad/tutorials/deploy-render/)
+:::

@@ -36,9 +36,9 @@ This describes the behavior of the custom function.
 
 **Properties**
 
-| Name          | Type                                      | Description                                                                                                                               |
-| :------------ | :---------------------------------------- | :---------------------------------------------------------------------------------------------------------------------------------------- |
-| `parameters?` | `{ [name: string]: ParameterDefinition }` | Describes the parameters that will be passed in the `parameters` property of the function. See [ParameterDefinition](parameterdefinition) |
+| Name          | Type                                      | Description                                                                                                                                |
+| :------------ | :---------------------------------------- | :----------------------------------------------------------------------------------------------------------------------------------------- |
+| `parameters?` | `{ [name: string]: ParameterDefinition }` | Describes the parameters that will be passed in the `parameters` property of the function. See [ParameterDefinition](#parameterdefinition) |
 
 ### ParameterDefinition
 
@@ -58,4 +58,6 @@ this describes the type of the parameter that will be passed to the custom funct
 
 ## Usage
 
-- See [Custom functions](/toolpad/connecting-to-datasources/custom-functions/)
+:::info
+See [custom functions](/toolpad/concepts/connecting-to-data/#custom-functions)
+:::

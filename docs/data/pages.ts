@@ -2,9 +2,8 @@ import type { MuiPage } from '@mui/monorepo/docs/src/MuiPage';
 import BuildIcon from '@mui/icons-material/Build';
 import CodeIcon from '@mui/icons-material/Code';
 import DescriptionIcon from '@mui/icons-material/Description';
-// import TableViewIcon from '@mui/icons-material/TableView';
+import SchoolIcon from '@mui/icons-material/School';
 import VisibilityIcon from '@mui/icons-material/Visibility';
-import LinkIcon from '@mui/icons-material/Link';
 import componentsManifest from './toolpad/reference/components/manifest.json';
 
 const pages: MuiPage[] = [
@@ -43,6 +42,9 @@ const pages: MuiPage[] = [
       {
         pathname: '/toolpad/concepts/theming',
       },
+      {
+        pathname: '/toolpad/concepts/display-mode',
+      },
     ],
   },
   {
@@ -58,16 +60,16 @@ const pages: MuiPage[] = [
         title: 'Delete a data grid row',
       },
       {
-        pathname: '/toolpad/connecting-to-datasources/custom-columns',
-        title: 'Create custom columns',
+        pathname: '/toolpad/how-to-guides/number-display',
+        title: 'Create a number component',
       },
       {
-        pathname: '/toolpad/how-to-guides/deploy-render',
-        title: 'Deploy your app to Render',
+        pathname: '/toolpad/how-to-guides/customize-datagrid',
+        title: 'Customize data grids',
       },
       {
-        pathname: '/toolpad/how-to-guides/embed-apps',
-        title: 'Embed your app',
+        pathname: '/toolpad/how-to-guides/embed-pages',
+        title: 'Embed a Toolpad page',
       },
       {
         pathname: '/toolpad/how-to-guides/basic-auth',
@@ -76,8 +78,15 @@ const pages: MuiPage[] = [
     ],
   },
   {
-    pathname: '/toolpad/deployment',
-    icon: BuildIcon,
+    pathname: '/toolpad/tutorials',
+    title: 'Tutorials',
+    icon: SchoolIcon,
+    children: [
+      {
+        pathname: '/toolpad/tutorials/render-deploy',
+        title: 'Deploy your app to Render',
+      },
+    ],
   },
   {
     pathname: '/toolpad/reference-group',

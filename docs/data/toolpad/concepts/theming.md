@@ -17,7 +17,9 @@
 
 3. The theme used in a project is configured by an auto-generated `theme.yml` file inside the `toolpad` folder.
 
-   > For a detailed look at the schema for this file and the different options it supports, please check out the [schema reference](/toolpad/schema-reference/#file-Theme).
+   :::info
+   For a detailed look at the supported options, please check out the [file schema](/toolpad/reference/file-schema/#file-Theme).
+   :::
 
 ## Overrides
 

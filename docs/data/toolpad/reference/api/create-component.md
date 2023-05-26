@@ -5,7 +5,7 @@
 ## Import
 
 ```tsx
-import { createFunction } from '@mui/toolpad/server';
+import { createComponent } from '@mui/toolpad/server';
 ```
 
 ## Description
@@ -67,4 +67,6 @@ Argument types describe the type and constraints of custom component properties.
 
 ## Usage
 
-See [Custom components](/toolpad/building-ui/custom-components/)
+:::info
+See [custom components](/toolpad/concepts/custom-components/)
+:::

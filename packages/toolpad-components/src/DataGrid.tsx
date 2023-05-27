@@ -596,7 +596,6 @@ export default createComponent(DataGridComponent, {
             },
             align: {
               type: 'string',
-              nullable: true,
               enum: ['center', 'right', 'left'],
             },
           },

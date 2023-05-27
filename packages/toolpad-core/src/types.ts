@@ -159,7 +159,7 @@ export interface ArrayValueType extends ValueTypeBase {
   /**
    * A JSON schema describing the array.
    */
-  schema?: string;
+  schema?: JSONSchema7;
   default?: any[];
 }
 

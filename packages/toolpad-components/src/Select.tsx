@@ -136,7 +136,6 @@ export default createComponent(FormWrappedSelect, {
             },
             label: {
               type: 'string',
-              nullable: true,
             },
           },
           required: ['value'],

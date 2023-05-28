@@ -1517,10 +1517,10 @@
     "@babel/runtime" "^7.21.0"
     "@mui/utils" "^5.11.13"
 
-"@next/bundle-analyzer@13.4.3":
-  version "13.4.3"
-  resolved "https://registry.yarnpkg.com/@next/bundle-analyzer/-/bundle-analyzer-13.4.3.tgz#7e48a91eac582e32e4d235d8cf7503843f100000"
-  integrity sha512-jzWk6eaCFaIXfIswyQQWnR6FN22HpWoSWe3nLa3JCNkNd2ksriJgn86oQyZRxgAPaEbVKQXBp8GZi8e5DrhVJg==
+"@next/bundle-analyzer@13.4.4":
+  version "13.4.4"
+  resolved "https://registry.yarnpkg.com/@next/bundle-analyzer/-/bundle-analyzer-13.4.4.tgz#629f318007291203645a335e5387f50053223a98"
+  integrity sha512-OxdqGfzElMjcLDw3XkUTqpEjyB/R2n3sOjiWuOGm414j5hAD2AIcXWv4q6FTN9rERgojrkw+g3z5yeLZgJ3YKg==
   dependencies:
     webpack-bundle-analyzer "4.7.0"
 
@@ -2083,10 +2083,10 @@
   dependencies:
     tslib "^2.4.0"
 
-"@swc/wasm@1.3.59":
-  version "1.3.59"
-  resolved "https://registry.yarnpkg.com/@swc/wasm/-/wasm-1.3.59.tgz#2340698ee32b846e50c06f6c1ce7ac07f1c0fb9e"
-  integrity sha512-HMC6y2rqtomrspvHwEZZuQb8kzw1GZSmaZ8fbbjSRvvvtOHLbIetuFWGVJ6dgthkt10YII21AMZcvxvrTC6H/Q==
+"@swc/wasm@1.3.60":
+  version "1.3.60"
+  resolved "https://registry.yarnpkg.com/@swc/wasm/-/wasm-1.3.60.tgz#c286af9bbeae9ca44324d3fcd9aaf4633e29a6b6"
+  integrity sha512-vQvb7UtJkLuX1vMaW3Tm24CSu7i+ngU34LoDfx9EnVlp6upmayq/wNnaTi4XNCX5PFZtByj8CM3RdpyNhzxYPA==
 
 "@szmarczak/http-timer@^5.0.1":
   version "5.0.1"
@@ -2102,26 +2102,26 @@
   dependencies:
     remove-accents "0.4.2"
 
-"@tanstack/query-core@4.29.7":
-  version "4.29.7"
-  resolved "https://registry.yarnpkg.com/@tanstack/query-core/-/query-core-4.29.7.tgz#9fe4587e23cb9566b937c518ffa44226041d388d"
-  integrity sha512-GXG4b5hV2Loir+h2G+RXhJdoZhJLnrBWsuLB2r0qBRyhWuXq9w/dWxzvpP89H0UARlH6Mr9DiVj4SMtpkF/aUA==
+"@tanstack/query-core@4.29.11":
+  version "4.29.11"
+  resolved "https://registry.yarnpkg.com/@tanstack/query-core/-/query-core-4.29.11.tgz#fa338f7d6897c6be5de6d8dabd603d9b78ee48c7"
+  integrity sha512-8C+hF6SFAb/TlFZyS9FItgNwrw4PMa7YeX+KQYe2ZAiEz6uzg6yIr+QBzPkUwZ/L0bXvGd1sufTm3wotoz+GwQ==
 
-"@tanstack/react-query-devtools@4.29.7":
-  version "4.29.7"
-  resolved "https://registry.yarnpkg.com/@tanstack/react-query-devtools/-/react-query-devtools-4.29.7.tgz#1e2b742b144748efa3ae0f0f7abe945fb4179085"
-  integrity sha512-fckNnBV6Kfbtq6EJqQen8oBjPqGFcOPS9SJmNKLbFLQgd7OpNIlA4M0r37iJYUY9m14/ESKc1wzKd36VfeiPjg==
+"@tanstack/react-query-devtools@4.29.11":
+  version "4.29.11"
+  resolved "https://registry.yarnpkg.com/@tanstack/react-query-devtools/-/react-query-devtools-4.29.11.tgz#53cf2aab343c8579567e1a2fc179992a14063872"
+  integrity sha512-paOSRfNtUbeo3anTtKgRSaMGplAN2VilmzLR9a3lbVZVCF4EzvL1Xmp4Xv9cDN8kGuv2CZTvUP6lvyxPlKSpew==
   dependencies:
     "@tanstack/match-sorter-utils" "^8.7.0"
     superjson "^1.10.0"
     use-sync-external-store "^1.2.0"
 
-"@tanstack/react-query@4.29.7":
-  version "4.29.7"
-  resolved "https://registry.yarnpkg.com/@tanstack/react-query/-/react-query-4.29.7.tgz#772996905a81ca64172582891c5a82e88dbafccd"
-  integrity sha512-ijBWEzAIo09fB1yd22slRZzprrZ5zMdWYzBnCg5qiXuFbH78uGN1qtGz8+Ed4MuhaPaYSD+hykn+QEKtQviEtg==
+"@tanstack/react-query@4.29.11":
+  version "4.29.11"
+  resolved "https://registry.yarnpkg.com/@tanstack/react-query/-/react-query-4.29.11.tgz#053bd6e9d63ce07a523976263ae78a5e130eb2ad"
+  integrity sha512-aLaOAhBnCr12YKPjDsZOc0fAtkyaW7f9KfVfw49oYpfe0H9EPXBUgDBIKJ8qdHF3uGzTVSMcmpiw1Za41BLZlw==
   dependencies:
-    "@tanstack/query-core" "4.29.7"
+    "@tanstack/query-core" "4.29.11"
     use-sync-external-store "^1.2.0"
 
 "@testing-library/dom@^9.0.0":
@@ -7294,10 +7294,10 @@ inquirer@8.2.4:
     through "^2.3.6"
     wrap-ansi "^7.0.0"
 
-inquirer@9.2.5:
-  version "9.2.5"
-  resolved "https://registry.yarnpkg.com/inquirer/-/inquirer-9.2.5.tgz#2a9df864c8b579083736e9c25161e2bb0a21841d"
-  integrity sha512-Vy3qZFUPKILCgfeg6eEfKSlv4QbwwfGmdoAYqXYGlPEhY4HH0jQv+ynHkEYYE4eBDCDMWKHs77ByfHcy1GyDfA==
+inquirer@9.2.6:
+  version "9.2.6"
+  resolved "https://registry.yarnpkg.com/inquirer/-/inquirer-9.2.6.tgz#802a61ee3eefbf1cb82a7fb6c2ae95a106050e01"
+  integrity sha512-y71l237eJJKS4rl7sQcEUiMhrR0pB/ZnRMMTxLpjJhWL4hdWCT03a6jJnC1w6qIPSRZWEozuieGt3v7XaEJYFw==
   dependencies:
     ansi-escapes "^4.3.2"
     chalk "^5.2.0"
@@ -9439,10 +9439,10 @@ mute-stream@1.0.0:
   resolved "https://registry.yarnpkg.com/mute-stream/-/mute-stream-1.0.0.tgz#e31bd9fe62f0aed23520aa4324ea6671531e013e"
   integrity sha512-avsJQhyd+680gKXyG/sQc0nXaC6rBkPOfyHYcFb9+hdkqQkR9bdnkJ0AMZhke0oesPqIO+mFFJ+IdBc7mst4IA==
 
-mysql2@3.3.1:
-  version "3.3.1"
-  resolved "https://registry.yarnpkg.com/mysql2/-/mysql2-3.3.1.tgz#b7e055812adeb46d96bc65a5b37fa57e70bc0388"
-  integrity sha512-UD84/AvLwO5qmSABEsBTZ7y7JKv3sM8JzWGhuL4tDkJwVsClVVAcelNSR5Unyhxj6/KHBAkjS7qe5/c+gEmNvA==
+mysql2@3.3.3:
+  version "3.3.3"
+  resolved "https://registry.yarnpkg.com/mysql2/-/mysql2-3.3.3.tgz#b1010dffa394edf5c397c52bc340dfd3ada80257"
+  integrity sha512-MxDQJztArk4JFX1PKVjDhIXRzAmVJfuqZrVU+my6NeYBAA/XZRaDw5q7vga8TNvgyy3Lv3rivBFBBuJFbsdjaw==
   dependencies:
     denque "^2.1.0"
     generate-function "^2.3.1"
@@ -11008,10 +11008,10 @@ react-dom@18.2.0:
     loose-envify "^1.1.0"
     scheduler "^0.23.0"
 
-react-error-boundary@4.0.4:
-  version "4.0.4"
-  resolved "https://registry.yarnpkg.com/react-error-boundary/-/react-error-boundary-4.0.4.tgz#d2e84505b0a67cec7a6bf33b0146faadfe31597d"
-  integrity sha512-AbqMFx8bCsob8rCHZvJYQ42MQijK0/034RUvan9qrqyJCpazr8d9vKHrysbxcr6odoHLZvQEcYomFPoIqH9fow==
+react-error-boundary@4.0.7:
+  version "4.0.7"
+  resolved "https://registry.yarnpkg.com/react-error-boundary/-/react-error-boundary-4.0.7.tgz#dd65b16d1939894d59ab084af1d371fb10a16ebb"
+  integrity sha512-XyDSL7Uhv3PMs0e1k29cMSnZPSlUCsF7Ci0dtdcpkaWDi9bM2hw6ru2l+PgBhiqilE1ne2XIlsllcaHsn0B6Dw==
   dependencies:
     "@babel/runtime" "^7.12.5"
 
@@ -11024,6 +11024,11 @@ react-hook-form@7.43.9:
   version "7.43.9"
   resolved "https://registry.yarnpkg.com/react-hook-form/-/react-hook-form-7.43.9.tgz#84b56ac2f38f8e946c6032ccb760e13a1037c66d"
   integrity sha512-AUDN3Pz2NSeoxQ7Hs6OhQhDr6gtF9YRuutGDwPQqhSUAHJSgGl2VeY3qN19MG0SucpjgDiuMJ4iC5T5uB+eaNQ==
+
+react-hook-form@7.44.1:
+  version "7.44.1"
+  resolved "https://registry.yarnpkg.com/react-hook-form/-/react-hook-form-7.44.1.tgz#5385819f399d6675f367fc78f555c8352ca11f04"
+  integrity sha512-ZVmDuQQCq6agpVE2eoGjH3ZMDgo/aFV4JVobUQGOQ0/tgfcY/WY30mBSVnxmFOpzS+iSqD2ax7hw9Thg5F931A==
 
 react-inspector@5.1.1:
   version "5.1.1"
@@ -13040,10 +13045,10 @@ victory-vendor@^36.6.8:
     d3-time "^3.0.0"
     d3-timer "^3.0.1"
 
-vite@4.3.8:
-  version "4.3.8"
-  resolved "https://registry.yarnpkg.com/vite/-/vite-4.3.8.tgz#70cd6a294ab52d7fb8f37f5bc63d117dd19e9918"
-  integrity sha512-uYB8PwN7hbMrf4j1xzGDk/lqjsZvCDbt/JC5dyfxc19Pg8kRm14LinK/uq+HSLNswZEoKmweGdtpbnxRtrAXiQ==
+vite@4.3.9:
+  version "4.3.9"
+  resolved "https://registry.yarnpkg.com/vite/-/vite-4.3.9.tgz#db896200c0b1aa13b37cdc35c9e99ee2fdd5f96d"
+  integrity sha512-qsTNZjO9NoJNW7KnOrgYwczm0WctJ8m/yqYAMAK9Lxt4SoySUfS5S8ia9K7JHpa3KEeMfyF8LoJ3c5NeBJy6pg==
   dependencies:
     esbuild "^0.17.5"
     postcss "^8.4.23"
@@ -13420,10 +13425,15 @@ yaml-diff-patch@2.0.0:
     oppa "^0.4.0"
     yaml "^2.0.0-10"
 
-yaml@2.2.2, yaml@^2.0.0-10:
+yaml@2.2.2:
   version "2.2.2"
   resolved "https://registry.yarnpkg.com/yaml/-/yaml-2.2.2.tgz#ec551ef37326e6d42872dad1970300f8eb83a073"
   integrity sha512-CBKFWExMn46Foo4cldiChEzn7S7SRV+wqiluAb6xmueD/fGyRHIhX8m14vVGgeFWjN540nKCNVj6P21eQjgTuA==
+
+yaml@2.3.1, yaml@^2.0.0-10:
+  version "2.3.1"
+  resolved "https://registry.yarnpkg.com/yaml/-/yaml-2.3.1.tgz#02fe0975d23cd441242aa7204e09fc28ac2ac33b"
+  integrity sha512-2eHWfjaoXgTBC2jNM1LRef62VQa0umtvRiDSk6HSzW7RvS5YtkabJrwYLLEKWBc8a5U2PTSCs+dJjUTJdlHsWQ==
 
 yaml@^1.10.0, yaml@^1.10.2, yaml@^1.7.2:
   version "1.10.2"

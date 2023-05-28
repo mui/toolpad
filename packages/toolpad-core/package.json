@@ -42,9 +42,9 @@
   },
   "dependencies": {
     "@mui/toolpad-utils": "0.1.13",
-    "@tanstack/react-query": "4.29.7",
+    "@tanstack/react-query": "4.29.11",
     "quickjs-emscripten": "0.23.0",
-    "react-error-boundary": "4.0.4",
+    "react-error-boundary": "4.0.7",
     "react-is": "18.2.0"
   },
   "devDependencies": {

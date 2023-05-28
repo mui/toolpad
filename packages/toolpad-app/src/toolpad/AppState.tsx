@@ -15,32 +15,9 @@ import useEvent from '../utils/useEvent';
 import { NodeHashes } from '../types';
 import { hasFieldFocus } from '../utils/fields';
 import { DomView, getViewFromPathname, PageViewTab } from '../utils/domView';
+import { projectEvents } from '../projectEvents';
 
-let ws: WebSocket | null = null;
-
-if (typeof window !== 'undefined') {
-  const wsProtocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-  ws = new WebSocket(`${wsProtocol}//${window.location.host}/toolpad-ws`);
-
-  ws.addEventListener('error', (err) => console.error(err));
-
-  ws.addEventListener('open', () => {
-    // eslint-disable-next-line no-console
-    console.log('Socket connected');
-  });
-
-  ws.addEventListener('message', (event) => {
-    const message = JSON.parse(event.data);
-    switch (message.kind) {
-      case 'externalChange': {
-        client.invalidateQueries('loadDom', []);
-        break;
-      }
-      default:
-        throw new Error(`Unknown message kind: ${message.kind}`);
-    }
-  });
-}
+projectEvents.on('externalChange', () => client.invalidateQueries('loadDom', []));
 
 export function getNodeHashes(dom: appDom.AppDom): NodeHashes {
   return mapValues(dom.nodes, (node) => insecureHash(JSON.stringify(omit(node, 'id'))));

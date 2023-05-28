@@ -52,11 +52,6 @@ test('function editor reload', async ({ page, localApp }) => {
   const functionsFilePath = path.resolve(localApp.dir, './toolpad/resources/functions.ts');
   await fileReplace(functionsFilePath, "'edited hello'", "'edited goodbye!!!'");
 
-  // Frontend doesn't update because no way to simulate page hide/show in playwright
-  // In real world scenario this wouldn't be necessary
-  // See https://github.com/microsoft/playwright/issues/3570#issuecomment-689407637
-  await page.reload();
-
   await expect(editorModel.appCanvas.getByText('edited goodbye!!!')).toBeVisible();
 });
 

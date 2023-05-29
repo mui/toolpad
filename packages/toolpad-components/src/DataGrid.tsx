@@ -122,22 +122,8 @@ function SkeletonLoadingOverlay() {
     </div>
   );
 }
-function checkISOFormat(value: string): string {
-  const isDate = /^\d{4}-\d{2}-\d{2}$/.test(value);
-  const isDatetime = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}$/.test(value);
-
-  if (isDate) {
-    return 'date';
-  }
-  if (isDatetime) {
-    return 'datetime';
-  }
-  return 'string';
-}
 
 function inferColumnType(value: unknown): string {
-  // check if value string is a date string
-
   if (value instanceof Date) {
     return 'dateTime';
   }
@@ -156,7 +142,7 @@ function inferColumnType(value: unknown): string {
 
         return 'link';
       } catch (error) {
-        return checkISOFormat(value);
+        return valueType;
       }
     case 'object':
       return 'json';
@@ -216,7 +202,7 @@ function ImageCell({ field, id, value: src }: GridRenderCellParams<any, any, any
 }
 
 function dateValueGetter({ value }: GridValueGetterParams<any, any>) {
-  return typeof value === 'number' || typeof value === 'string' ? new Date(value) : value;
+  return typeof value === 'number' ? new Date(value) : value;
 }
 
 function ComponentErrorFallback({ error }: FallbackProps) {
@@ -390,14 +376,6 @@ export function parseColumns(columns: SerializableGridColumns): GridColDef[] {
           return column;
         }
       }
-    }
-
-    if (column.type === 'date' || column.type === 'dateTime') {
-      return {
-        ...column,
-        valueGetter: (params: GridValueGetterParams) => new Date(params.value),
-        editable: true,
-      };
     }
 
     const customType = column.type ? CUSTOM_COLUMN_TYPES[column.type] : {};

@@ -2,7 +2,7 @@ import * as React from 'react';
 import invariant from 'invariant';
 import { throttle } from 'lodash-es';
 import { CanvasEventsContext } from '@mui/toolpad-core/runtime';
-import ToolpadApp, { LoadComponents } from '../runtime';
+import ToolpadApp, { LoadComponents, queryClient } from '../runtime';
 import { AppCanvasState } from '../types';
 import getPageViewState from './getPageViewState';
 import { rectContainsPoint } from '../utils/geometry';
@@ -109,12 +109,21 @@ export default function AppCanvas({
       React.startTransition(() => setState(newState));
     });
 
+    const unsetInvalidateQueries = setCommandHandler(
+      bridge.canvasCommands,
+      'invalidateQueries',
+      () => {
+        queryClient.invalidateQueries();
+      },
+    );
+
     bridge.canvasEvents.emit('ready', {});
 
     return () => {
       unsetGetPageViewState();
       unsetGetViewCoordinates();
       unsetUpdate();
+      unsetInvalidateQueries();
     };
   }, []);
 

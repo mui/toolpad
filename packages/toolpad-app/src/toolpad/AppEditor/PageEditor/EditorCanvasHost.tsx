@@ -15,6 +15,7 @@ import { useAppStateApi } from '../../AppState';
 import createRuntimeState from '../../../runtime/createRuntimeState';
 import type { ToolpadBridge } from '../../../canvas/ToolpadBridge';
 import CenteredSpinner from '../../../components/CenteredSpinner';
+import { useOnProjectEvent } from '../../../projectEvents';
 
 interface OverlayProps {
   children?: React.ReactNode;
@@ -185,6 +186,10 @@ export default function EditorCanvasHost({
     },
     [handleKeyDown, initBridge],
   );
+
+  const invalidateCanvasQueries = useEvent(() => bridge?.canvasCommands.invalidateQueries());
+
+  useOnProjectEvent('functionsBuildEnd', invalidateCanvasQueries);
 
   return (
     <CanvasRoot className={className}>

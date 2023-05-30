@@ -15,15 +15,14 @@ import { useDom, useDomApi } from '../../AppState';
 import BindableEditor from './BindableEditor';
 import { usePageEditorState } from './PageEditorProvider';
 import { getDefaultControl } from '../../propertyControls';
-import MarkdownTooltip from '../../../components/MarkdownTooltip';
-import { isTemplateDescendant } from '../../../toolpadComponents/template';
-import { NON_BINDABLE_CONTROL_TYPES } from '../../../constants';
+import { isTemplateDescendant } from '../../../runtime/toolpadComponents/template';
+import { NON_BINDABLE_CONTROL_TYPES } from '../../../runtime/constants';
 
-export interface NodeAttributeEditorProps<P extends object> {
+export interface NodeAttributeEditorProps<P extends object, K extends keyof P = keyof P> {
   node: appDom.AppDomNode;
   namespace?: string;
   name: string;
-  argType: ArgTypeDefinition<P>;
+  argType: ArgTypeDefinition<P, K>;
   props?: P;
 }
 
@@ -53,7 +52,6 @@ export default function NodeAttributeEditor<P extends object>({
 
   const liveBinding = bindings[bindingId];
 
-  const propType = argType.typeDef;
   const Control = getDefaultControl(argType, props);
 
   // NOTE: Doesn't make much sense to bind controlled props. In the future we might opt
@@ -91,21 +89,19 @@ export default function NodeAttributeEditor<P extends object>({
       label={argType.label || name}
       bindable={isBindable}
       disabled={isDisabled}
-      propType={propType}
+      propType={argType}
       jsRuntime={jsBrowserRuntime}
       renderControl={(params) => (
-        <MarkdownTooltip placement="left" title={argType.helperText ?? ''}>
-          <Box sx={{ flex: 1 }}>
-            <Control nodeId={node.id} {...params} propType={propType} />
-          </Box>
-        </MarkdownTooltip>
+        <Box sx={{ flex: 1 }}>
+          <Control nodeId={node.id} {...params} propType={argType} />
+        </Box>
       )}
       value={propValue}
       onChange={handlePropChange}
     />
   ) : (
     <Alert severity="warning">
-      {`No control for '${name}' (type '${propType.type}' ${
+      {`No control for '${name}' (type '${argType.type}' ${
         argType.control ? `, control: '${argType.control.type}'` : ''
       })`}
     </Alert>

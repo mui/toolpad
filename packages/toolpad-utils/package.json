@@ -1,6 +1,6 @@
 {
   "name": "@mui/toolpad-utils",
-  "version": "0.1.7",
+  "version": "0.1.13",
   "description": "Build MUI apps quickly",
   "author": "MUI Toolpad team",
   "homepage": "https://github.com/mui/mui-toolpad#readme",
@@ -20,6 +20,11 @@
       "types": "./dist/*.d.ts",
       "import": "./dist/*.js",
       "require": "./dist/*.cjs"
+    },
+    "./hooks/*": {
+      "types": "./dist/hooks/*.d.ts",
+      "import": "./dist/hooks/*.js",
+      "require": "./dist/hooks/*.cjs"
     }
   },
   "files": [
@@ -35,8 +40,8 @@
     "prebuild": "rimraf dist",
     "build": "tsup",
     "dev": "tsup --watch",
-    "test": "echo \"Error: run tests from root\" && exit 1",
-    "check-types": "yarn build"
+    "check-types": "tsup && tsc --noEmit",
+    "test": "jest"
   },
   "bugs": {
     "url": "https://github.com/mui/mui-toolpad/issues"
@@ -47,8 +52,11 @@
   "publishConfig": {
     "access": "public"
   },
-  "gitHead": "5c310012b1b92ee53a0a1051b92f84564f915faf",
+  "gitHead": "0186b46c7abd26f06583227cc21d448baf11cd46",
   "dependencies": {
-    "react-is": "^18.2.0"
+    "react-is": "18.2.0"
+  },
+  "devDependencies": {
+    "@types/react-is": "^18.2.0"
   }
 }

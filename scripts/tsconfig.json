@@ -1,0 +1,15 @@
+{
+  "compilerOptions": {
+    "module": "CommonJS",
+    "noEmit": true,
+    "esModuleInterop": true,
+    "moduleResolution": "node",
+    "allowImportingTsExtensions": true
+  },
+  "ts-node": {
+    "transpileOnly": true,
+    "moduleTypes": {
+      "../node_modules/@mui/monorepo/packages/api-docs-builder/**/*": "esm"
+    }
+  }
+}

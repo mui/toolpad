@@ -1,6 +1,7 @@
 import { MenuItem, TextField } from '@mui/material';
 import * as React from 'react';
 import type { EditorProps } from '../../types';
+import PropertyControl from '../../components/PropertyControl';
 
 function SelectPropEditor({ label, propType, value, onChange, disabled }: EditorProps<string>) {
   const items = propType.type === 'string' ? propType.enum ?? [] : [];
@@ -12,21 +13,23 @@ function SelectPropEditor({ label, propType, value, onChange, disabled }: Editor
   );
 
   return (
-    <TextField
-      select
-      fullWidth
-      label={label}
-      value={value ?? ''}
-      disabled={disabled}
-      onChange={handleChange}
-    >
-      {typeof propType.default === 'undefined' ? <MenuItem value="">-</MenuItem> : null}
-      {items.map((item) => (
-        <MenuItem key={item} value={item}>
-          {item}
-        </MenuItem>
-      ))}
-    </TextField>
+    <PropertyControl propType={propType}>
+      <TextField
+        select
+        fullWidth
+        label={label}
+        value={value ?? ''}
+        disabled={disabled}
+        onChange={handleChange}
+      >
+        {typeof propType.default === 'undefined' ? <MenuItem value="">-</MenuItem> : null}
+        {items.map((item) => (
+          <MenuItem key={item} value={item}>
+            {item}
+          </MenuItem>
+        ))}
+      </TextField>
+    </PropertyControl>
   );
 }
 

@@ -5,7 +5,7 @@ const marquee = {
   subtitle: 'Using a simple command, build your first app in a few minutes.',
   action: {
     href: ROUTES.toolpadQuickstart,
-    label: 'Get Started',
+    label: 'Sign up for early access to the beta release',
   },
 };
 

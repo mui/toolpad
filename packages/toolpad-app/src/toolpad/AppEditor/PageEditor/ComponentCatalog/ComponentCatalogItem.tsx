@@ -17,6 +17,7 @@ import RadioButtonCheckedIcon from '@mui/icons-material/RadioButtonChecked';
 import DateRangeIcon from '@mui/icons-material/DateRange';
 import CheckBoxIcon from '@mui/icons-material/CheckBox';
 import DashboardCustomizeSharpIcon from '@mui/icons-material/DashboardCustomizeSharp';
+import ManageSearchIcon from '@mui/icons-material/ManageSearch';
 import AddIcon from '@mui/icons-material/Add';
 import UploadFileIcon from '@mui/icons-material/UploadFile';
 import NotesIcon from '@mui/icons-material/Notes';
@@ -30,6 +31,7 @@ import HtmlIcon from '@mui/icons-material/Html';
 import { ButtonBase } from '@mui/material';
 
 const iconMap = new Map<string, React.ComponentType<SvgIconProps>>([
+  ['Autocomplete', ManageSearchIcon],
   ['Text', NotesIcon],
   ['Button', SmartButtonIcon],
   ['Image', ImageIcon],

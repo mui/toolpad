@@ -1,10 +1,20 @@
 import * as React from 'react';
-import { createTheme, ThemeOptions, PaletteOptions, ThemeProvider } from '@mui/material';
+import { createTheme, Theme, PaletteOptions, ThemeProvider } from '@mui/material';
 import * as colors from '@mui/material/colors';
 import * as appDom from '../appDom';
 import { AppTheme } from '../types';
 
-export function createToolpadTheme(toolpadTheme: AppTheme = {}): ThemeOptions {
+declare module '@mui/material/styles' {
+  interface Theme {
+    fontFamilyMonospaced: string;
+  }
+  // allow configuration using `createTheme`
+  interface ThemeOptions {
+    fontFamilyMonospaced?: string;
+  }
+}
+
+function createMuiThemeFromToolpadTheme(toolpadTheme: AppTheme = {}): Theme {
   const palette: PaletteOptions = {};
   const primary = toolpadTheme['palette.primary.main'];
   if (primary) {
@@ -54,7 +64,18 @@ export function createToolpadTheme(toolpadTheme: AppTheme = {}): ThemeOptions {
         fontWeight: 700,
       },
     },
+    fontFamilyMonospaced: 'Consolas, Menlo, Monaco, "Andale Mono", "Ubuntu Mono", monospace',
   });
+}
+
+export function createToolpadAppTheme(dom: appDom.AppDom): Theme {
+  const root = appDom.getApp(dom);
+  const { themes = [] } = appDom.getChildNodes(dom, root);
+  const themeNode = themes.length > 0 ? themes[0] : null;
+  const toolpadTheme: AppTheme = themeNode?.theme
+    ? appDom.fromConstPropValues(themeNode.theme)
+    : {};
+  return createMuiThemeFromToolpadTheme(toolpadTheme);
 }
 
 export interface ThemeProviderProps {
@@ -63,15 +84,6 @@ export interface ThemeProviderProps {
 }
 
 export default function AppThemeProvider({ dom, children }: ThemeProviderProps) {
-  const theme = React.useMemo(() => {
-    const root = appDom.getApp(dom);
-    const { themes = [] } = appDom.getChildNodes(dom, root);
-    const themeNode = themes.length > 0 ? themes[0] : null;
-    const toolpadTheme: AppTheme = themeNode?.theme
-      ? appDom.fromConstPropValues(themeNode.theme)
-      : {};
-    return createToolpadTheme(toolpadTheme);
-  }, [dom]);
-
+  const theme = React.useMemo(() => createToolpadAppTheme(dom), [dom]);
   return <ThemeProvider theme={theme}>{children}</ThemeProvider>;
 }

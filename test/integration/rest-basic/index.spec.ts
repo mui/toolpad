@@ -5,7 +5,9 @@ import { fileReplaceAll } from '../../utils/fs';
 import { ToolpadEditor } from '../../models/ToolpadEditor';
 
 // We can run our own httpbin instance if necessary:
-//    $ docker run -p 80:80 kennethreitz/httpbin
+//    $ docker run -p 8080:80 kennethreitz/httpbin
+// Then run the tests with:
+//    $ HTTPBIN_BASEURL=http://localhost:8080/ yarn test:integration
 const customHttbinBaseUrl = process.env.HTTPBIN_BASEURL;
 
 if (customHttbinBaseUrl) {
@@ -20,14 +22,14 @@ test.use({
   localAppConfig: {
     template: path.resolve(__dirname, './fixture'),
     async setup({ dir }) {
-      const configFilePath = path.resolve(dir, './toolpad.yml');
+      const configFilePath = path.resolve(dir, './toolpad/pages/page1/page.yml');
       await fileReplaceAll(configFilePath, HTTPBIN_SOURCE_URL, HTTPBIN_TARGET_URL);
     },
     cmd: 'dev',
   },
 });
 
-test('rest basics', async ({ page, context }) => {
+test('rest basics', async ({ page, context, localApp }) => {
   const runtimeModel = new ToolpadRuntime(page);
   await runtimeModel.gotoPage('page1');
   await expect(page.locator('text="query1: query1_value"')).toBeVisible();
@@ -37,11 +39,21 @@ test('rest basics', async ({ page, context }) => {
 
   await expect(page.getByText('query3: Transformed')).toBeVisible();
 
+  await expect(page.getByText('query4 authorization: foo')).toBeVisible();
+
+  const envFilePath = path.resolve(localApp.dir, './.env');
+  await fileReplaceAll(envFilePath, 'TEST_VAR=foo', 'TEST_VAR=bar');
+
+  // TODO: Make this reload unnecessary. The queries should be invalidated when the env file changes.
+  await page.reload();
+
+  await expect(page.getByText('query4 authorization: bar')).toBeVisible();
+
   const editorModel = new ToolpadEditor(page);
   await editorModel.goto();
 
   await editorModel.componentEditor.getByRole('button', { name: 'Add query' }).click();
-  await page.getByRole('button', { name: 'serverside HTTP request' }).click();
+  await page.getByRole('button', { name: 'HTTP request' }).click();
 
   const newQueryEditor = page.getByRole('dialog', { name: 'query' });
 

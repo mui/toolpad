@@ -4,6 +4,8 @@ export { default as PageColumn } from './PageColumn.js';
 
 export { default as Stack } from './Stack.js';
 
+export { default as Autocomplete } from './Autocomplete.js';
+
 export { default as Text } from './Text.js';
 
 export { default as Button } from './Button.js';
@@ -27,6 +29,8 @@ export { default as FilePicker } from './FilePicker.js';
 export { default as Tabs } from './Tabs.js';
 
 export { default as Container } from './Container.js';
+
+export { default as Form } from './Form.js';
 
 export {
   CUSTOM_COLUMN_TYPES,

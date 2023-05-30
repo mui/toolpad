@@ -1,6 +1,89 @@
-export * from './constants.js';
-export { default as createQuery } from './createQuery.js';
-export * from './createQuery.js';
+import { TOOLPAD_FUNCTION } from './constants.js';
+import { InferParameterType, PrimitiveValueType, PropValueType } from './types.js';
 
-export { default as createFunction } from './createFunction.js';
-export * from './createFunction.js';
+/**
+ * The runtime configuration for a Toolpad function. Describes the parameters it accepts and their
+ * corresponding types.
+ * @muidoc interface
+ */
+export interface CreateFunctionConfig<C> {
+  parameters: {
+    [K in keyof C]: PrimitiveValueType;
+  };
+}
+
+type CreateFunctionConfigParameters<
+  C extends CreateFunctionConfig<CreateFunctionConfigParameters<C>>,
+> = FunctionResolverParams<C>['parameters'];
+
+export interface FunctionResolverParams<
+  C extends CreateFunctionConfig<CreateFunctionConfigParameters<C>>,
+> {
+  parameters: {
+    [K in keyof C['parameters']]: InferParameterType<C['parameters'][K]>;
+  };
+}
+
+export interface FunctionResolver<
+  C extends CreateFunctionConfig<CreateFunctionConfigParameters<C>>,
+> {
+  (params: FunctionResolverParams<C>): Promise<unknown>;
+}
+
+export interface ToolpadFunction<C extends CreateFunctionConfig<CreateFunctionConfigParameters<C>>>
+  extends FunctionResolver<C> {
+  [TOOLPAD_FUNCTION]: C;
+}
+
+type MaybeLegacyParametersDefinition = PropValueType & {
+  typeDef?: PropValueType;
+  defaultValue?: any;
+};
+
+export type {
+  /**
+   * @muidoc interface
+   */
+  PrimitiveValueType,
+};
+
+/**
+ * Use this to define a function that will load the data for a Toolpad query.
+ * You can define parameters for the function in the configuration object.
+ * These parameters will be available in the Toolpad editor when creating a query and can be bound to page state.
+ * The return value of this function will appear as state on the page and can be bound to.
+ * @param resolver The function that will load the data for the query.
+ * @param config The configuration for the function.
+ * override: Config
+ * @muidoc function
+ */
+export function createFunction<C extends CreateFunctionConfig<CreateFunctionConfigParameters<C>>>(
+  resolver: FunctionResolver<C>,
+  config?: C,
+) {
+  // TODO: Remove post beta
+  if (config?.parameters) {
+    for (const [name, argType] of Object.entries(config.parameters)) {
+      const maybeLegacyParamtype = argType as MaybeLegacyParametersDefinition;
+      if (maybeLegacyParamtype.typeDef) {
+        console.warn(`Detected deprecated parameter definition for "${name}".`);
+        Object.assign(maybeLegacyParamtype, maybeLegacyParamtype.typeDef);
+        if (!('default' in maybeLegacyParamtype)) {
+          maybeLegacyParamtype.default = maybeLegacyParamtype.defaultValue;
+        }
+        delete maybeLegacyParamtype.defaultValue;
+        delete maybeLegacyParamtype.typeDef;
+      }
+    }
+  }
+
+  return Object.assign(resolver, {
+    [TOOLPAD_FUNCTION]: config || { parameters: {} },
+  });
+}
+
+/**
+ * @deprecated
+ * createQuery is deprecated. Use createFunction instead.
+ */
+export const createQuery = createFunction;

@@ -1,10 +1,11 @@
 # Data Grid component
 
-<p class="description">Build powerful and feature rich data tables using <a href='https://mui.com/x/react-data-grid' target='_blank' rel="noopener noreferrer">MUI Data Grid</a> component</p>
+<p class="description">Render powerful and feature rich data tables.</p>
 
-<img src="/static/toolpad/docs/building-ui/datagrid.png" width="884px" alt="Custom component" />
+<img src="/static/toolpad/docs/building-ui/datagrid.png" width="884" alt="Custom component" />
 
 By default, you can render JSON data using the Data Grid component and it will automatically recognize most of the data types.
+Toolpad is built-in with the [MUI X Data Grid](https://mui.com/x/react-data-grid/) component.
 
 ## Customizing cell rendering
 
@@ -20,19 +21,19 @@ First, you'll have to [create a custom component](/toolpad/building-ui/custom-co
 
 ### Configuring columns
 
-1. Select `DataGrid` component
+1. Select **Data Grid** component
 2. Click on "columns" button
 
-<img src="/static/toolpad/docs/building-ui/edit-columns.png" width="286px" alt="Edit columns" />
+<img src="/static/toolpad/docs/building-ui/edit-columns.png" width="286" alt="Edit columns" />
 
 3. Choose the column
 
-<img src="/static/toolpad/docs/building-ui/choose-column.png" width="314px" alt="Choose column" />
+<img src="/static/toolpad/docs/building-ui/choose-column.png" width="314" alt="Choose column" />
 
 4. Change type to use codeComponent
 
-<img src="/static/toolpad/docs/building-ui/choose-column-type.png" width="318px" alt="Choose column type" />
+<img src="/static/toolpad/docs/building-ui/choose-column-type.png" width="318" alt="Choose column type" />
 
 5. Choose the custom component that you created
 
-<img src="/static/toolpad/docs/building-ui/choose-cell-component.png" width="306px" alt="Choose component" />
+<img src="/static/toolpad/docs/building-ui/choose-cell-component.png" width="306" alt="Choose component" />

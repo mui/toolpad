@@ -8,7 +8,7 @@ import { MUI_X_PRO_LICENSE, RUNTIME_CONFIG_WINDOW_PROPERTY } from '../constants'
 import { getComponents, getAppOutputFolder } from './localMode';
 import { RuntimeConfig } from '../config';
 import * as appDom from '../appDom';
-import createRuntimeState from '../createRuntimeState';
+import createRuntimeState from '../runtime/createRuntimeState';
 
 const MAIN_ENTRY = '/main.tsx';
 const CANVAS_ENTRY = '/canvas.tsx';
@@ -27,7 +27,12 @@ export function getHtmlContent({ canvas }: GetHtmlContentParams) {
     <!DOCTYPE html>
     <html lang="en">
       <head>
+        <meta charset="utf-8" />
         <title>Toolpad</title>
+        <link
+          rel="stylesheet"
+          href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap"
+        />
       </head>
       <body>
         <div id="root"></div>
@@ -63,9 +68,7 @@ export interface PostProcessHtmlParams {
 export function postProcessHtml(html: string, { config, dom }: PostProcessHtmlParams): string {
   const serializedConfig = serializeJavascript(config, { ignoreFunction: true });
   const initialState = createRuntimeState({ dom });
-  const serializedInitialState = serializeJavascript(initialState, {
-    ignoreFunction: true,
-  });
+  const serializedInitialState = serializeJavascript(initialState, { isJSON: true });
 
   const toolpadScripts = [
     `<script>window[${JSON.stringify(
@@ -215,6 +218,16 @@ export function createViteConfig({
         },
       },
     },
+    envFile: false,
+    resolve: {
+      alias: [
+        {
+          // FIXME(https://github.com/mui/material-ui/issues/35233)
+          find: /^@mui\/icons-material\/([^/]*)/,
+          replacement: '@mui/icons-material/esm/$1',
+        },
+      ],
+    },
     server: {
       fs: {
         allow: [root, path.resolve(__dirname, '../../../../')],
@@ -251,7 +264,7 @@ export function createViteConfig({
         'lodash-es',
         'react-router-dom',
         'fractional-indexing',
-        'cuid',
+        'nanoid/non-secure',
         'superjson',
         '@tanstack/react-query-devtools/build/lib/index.prod.js',
         'react-is',
@@ -269,6 +282,7 @@ export function createViteConfig({
     base,
     define: {
       'process.env.NODE_ENV': `'${mode}'`,
+      'process.env.BASE_URL': `'${base}'`,
     },
   };
 }

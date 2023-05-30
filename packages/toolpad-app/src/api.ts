@@ -7,8 +7,9 @@ import {
   useQuery,
   UseQueryOptions,
   UseQueryResult,
+  focusManager,
 } from '@tanstack/react-query';
-import type { Definition, MethodsGroup, MethodsOf, ServerDefinition } from '../pages/api/rpc';
+import type { Definition, MethodsGroup, MethodsOf, ServerDefinition } from './server/rpc';
 import { createRpcClient } from './rpcClient';
 
 export const queryClient = new QueryClient({
@@ -21,6 +22,13 @@ export const queryClient = new QueryClient({
     },
   },
 });
+
+if (typeof window !== 'undefined') {
+  // eslint-disable-next-line no-underscore-dangle
+  (window as any).__TOOLPAD_PLAYWRIGHT_TOOLS__ ??= {
+    focusManager,
+  };
+}
 
 export interface UseQueryFnOptions<F extends (...args: any[]) => any>
   extends Omit<

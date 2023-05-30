@@ -17,12 +17,7 @@ import { Controller, useForm } from 'react-hook-form';
 import { TabContext, TabList } from '@mui/lab';
 import { useBrowserJsRuntime } from '@mui/toolpad-core/jsBrowserRuntime';
 import { useServerJsRuntime } from '@mui/toolpad-core/jsServerRuntime';
-import {
-  ClientDataSource,
-  ConnectionEditorProps,
-  ExecFetchFn,
-  QueryEditorProps,
-} from '../../types';
+import { ClientDataSource, ConnectionEditorProps, QueryEditorProps } from '../../types';
 import {
   FetchPrivateQuery,
   FetchQuery,
@@ -30,6 +25,7 @@ import {
   RestConnectionParams,
   Body,
   ResponseType,
+  IntrospectionResult,
 } from './types';
 import { getAuthenticationHeaders, getDefaultUrl, parseBaseUrl } from './shared';
 import BindableEditor, {
@@ -53,11 +49,10 @@ import useQueryPreview from '../useQueryPreview';
 import TransformInput from '../TranformInput';
 import Devtools from '../../components/Devtools';
 import { createHarLog, mergeHar } from '../../utils/har';
-import config from '../../config';
 import QueryInputPanel from '../QueryInputPanel';
 import useFetchPrivate from '../useFetchPrivate';
-import { clientExec } from './runtime';
 import QueryPreview from '../QueryPreview';
+import { usePrivateQuery } from '../context';
 
 const HTTP_METHODS = ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'HEAD'];
 
@@ -264,6 +259,14 @@ function QueryEditor({
   const urlValue: BindableAttrValue<string> =
     input.attributes.query.value.url || getDefaultUrl(connectionParams);
 
+  const introspection = usePrivateQuery<FetchPrivateQuery, IntrospectionResult>(
+    {
+      kind: 'introspection',
+    },
+    { retry: false },
+  );
+  const envVarNames = React.useMemo(() => introspection?.data?.envVarNames || [], [introspection]);
+
   const handleParamsChange = React.useCallback(
     (newParams: [string, BindableAttrValue<string>][]) => {
       setInput((existing) => ({ ...existing, params: newParams }));
@@ -375,14 +378,11 @@ function QueryEditor({
   const [activeTab, setActiveTab] = React.useState('urlQuery');
 
   const fetchPrivate = useFetchPrivate<FetchPrivateQuery, FetchResult>();
-  const fetchServerPreview = React.useCallback(
+  const fetchPreview = React.useCallback(
     (query: FetchQuery, params: Record<string, string>) =>
       fetchPrivate({ kind: 'debugExec', query, params }),
     [fetchPrivate],
   );
-
-  const fetchPreview: ExecFetchFn<FetchQuery, FetchResult> = (query, params) =>
-    clientExec(query, params, fetchServerPreview);
 
   const [previewHar, setPreviewHar] = React.useState(() => createHarLog());
   const {
@@ -427,7 +427,7 @@ function QueryEditor({
                   </MenuItem>
                 ))}
               </TextField>
-              <BindableEditor
+              <BindableEditor<string>
                 liveBinding={liveUrl}
                 globalScope={queryScope}
                 globalScopeMeta={QUERY_SCOPE_META}
@@ -478,6 +478,7 @@ function QueryEditor({
                     globalScopeMeta={QUERY_SCOPE_META}
                     liveValue={liveHeaders}
                     jsRuntime={jsServerRuntime}
+                    envVarNames={envVarNames}
                   />
                 </TabPanel>
                 <TabPanel disableGutters value="response">
@@ -551,7 +552,7 @@ function getInitialQueryValue(): FetchQuery {
   return {
     method: 'GET',
     headers: [],
-    browser: config.isDemo,
+    browser: false,
   };
 }
 

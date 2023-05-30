@@ -66,6 +66,7 @@ export interface ToolpadBridge {
     getViewCoordinates(clientX: number, clientY: number): { x: number; y: number } | null;
     getPageViewState(): PageViewState;
     isReady(): boolean;
+    invalidateQueries(): void;
   }>;
 }
 

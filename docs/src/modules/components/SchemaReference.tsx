@@ -377,7 +377,9 @@ interface JsonDescriptionDisplayProps {
 
 function JsonDescriptionDisplay({ schema }: JsonDescriptionDisplayProps) {
   if (schema.description) {
-    return <div className={classNames.description}>{schema.description}</div>;
+    return (
+      <div className={clsx(classNames.description, 'algolia-content')}>{schema.description}</div>
+    );
   }
 
   return null;
@@ -417,7 +419,12 @@ function JsonSchemaNameValueDisplay({
       <JsonDescriptionDisplay schema={schema} />
       {name ? (
         <React.Fragment>
-          <a id={anchor} href={`#${id}`} tabIndex={-1} className={classNames.name}>
+          <a
+            id={anchor}
+            href={`#${id}`}
+            tabIndex={-1}
+            className={clsx(classNames.name, 'algolia-lvl4')}
+          >
             {name}
           </a>
           :{' '}

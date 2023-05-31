@@ -236,7 +236,7 @@ export type PropValueType =
   | TemplateValueType
   | EventValueType;
 
-interface ParameterTypeLookup {
+export interface ParameterTypeLookup {
   number: number;
   string: string;
   boolean: boolean;
@@ -401,7 +401,7 @@ export interface ComponentConfig<P extends object = {}> {
   loadingPropSource?: (keyof P & string)[];
   /**
    * Designates a property as "the loading property". If Toolpad detects any of the
-   * inputs is still loading it will set this property to true
+   * inputs is still loading it will set this property to `true`
    */
   loadingProp?: keyof P & string;
   /**

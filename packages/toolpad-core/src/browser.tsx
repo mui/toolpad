@@ -11,6 +11,7 @@ type MaybeLegacyArgTypeDefinition = ArgTypeDefinition & { typeDef?: PropValueTyp
  * Additionally, you'll be able to bind page state to these properties.
  * @param Component The React component to wrap.
  * @param config The configuration for the component.
+ * @muidoc function
  */
 export function createComponent<P extends object>(
   Component: React.ComponentType<P>,

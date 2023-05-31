@@ -20,6 +20,7 @@ export default createComponent(Container, {
     children: {
       type: 'element',
       control: { type: 'layoutSlot' },
+      helperText: 'The content of the component.',
     },
     visible: {
       type: 'boolean',

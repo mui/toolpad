@@ -17,12 +17,7 @@ import { Controller, useForm } from 'react-hook-form';
 import { TabContext, TabList } from '@mui/lab';
 import { useBrowserJsRuntime } from '@mui/toolpad-core/jsBrowserRuntime';
 import { useServerJsRuntime } from '@mui/toolpad-core/jsServerRuntime';
-import {
-  ClientDataSource,
-  ConnectionEditorProps,
-  ExecFetchFn,
-  QueryEditorProps,
-} from '../../types';
+import { ClientDataSource, ConnectionEditorProps, QueryEditorProps } from '../../types';
 import {
   FetchPrivateQuery,
   FetchQuery,
@@ -56,7 +51,6 @@ import Devtools from '../../components/Devtools';
 import { createHarLog, mergeHar } from '../../utils/har';
 import QueryInputPanel from '../QueryInputPanel';
 import useFetchPrivate from '../useFetchPrivate';
-import { clientExec } from './runtime';
 import QueryPreview from '../QueryPreview';
 import { usePrivateQuery } from '../context';
 
@@ -384,14 +378,11 @@ function QueryEditor({
   const [activeTab, setActiveTab] = React.useState('urlQuery');
 
   const fetchPrivate = useFetchPrivate<FetchPrivateQuery, FetchResult>();
-  const fetchServerPreview = React.useCallback(
+  const fetchPreview = React.useCallback(
     (query: FetchQuery, params: Record<string, string>) =>
       fetchPrivate({ kind: 'debugExec', query, params }),
     [fetchPrivate],
   );
-
-  const fetchPreview: ExecFetchFn<FetchQuery, FetchResult> = (query, params) =>
-    clientExec(query, params, fetchServerPreview);
 
   const [previewHar, setPreviewHar] = React.useState(() => createHarLog());
   const {

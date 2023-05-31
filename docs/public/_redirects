@@ -9,3 +9,5 @@
 /toolpad/data-fetching/rest/ /toolpad/connecting-to-datasources/fetch/ 301
 /toolpad/data-fetching/google-sheets/ /toolpad/connecting-to-datasources/google-sheets/ 301
 # 2023
+/toolpad/schema-reference/ /toolpad/reference/file-schema/ 301
+/toolpad/data-binding/ /toolpad/data-binding/binding-state/ 301

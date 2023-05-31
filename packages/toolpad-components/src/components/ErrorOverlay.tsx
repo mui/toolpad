@@ -1,6 +1,7 @@
 import { Typography, styled } from '@mui/material';
 import * as React from 'react';
 import { errorFrom } from '@mui/toolpad-utils/errors';
+import ErrorIcon from '@mui/icons-material/Error';
 
 const OverlayRoot = styled('div')(({ theme }) => ({
   position: 'absolute',
@@ -20,11 +21,14 @@ interface ErrorOverlayProps {
 }
 
 export default function ErrorOverlay({ error }: ErrorOverlayProps) {
-  const errMEssage = error ? errorFrom(error).message : null;
-  return (
-    <OverlayRoot sx={{ display: error ? undefined : 'none' }}>
-      <Typography>Error</Typography>
-      <Typography variant="body2">{errMEssage}</Typography>
+  const errMessage = error ? errorFrom(error).message : null;
+  return errMessage ? (
+    <OverlayRoot>
+      <Typography sx={{ display: 'flex', flexDirection: 'row', gap: 1 }}>
+        <ErrorIcon fontSize="small" color="error" />
+        Error
+      </Typography>
+      <Typography variant="body2">{errMessage}</Typography>
     </OverlayRoot>
-  );
+  ) : null;
 }

@@ -17,7 +17,7 @@ export interface BarProps {
   data: Array<any>;
 }
 
-function Bar_component({ data }: BarProps) {
+function BarComponent({ data }: BarProps) {
   // const { data: dataProp } = props;
   // const data = dataProp;
 
@@ -45,7 +45,7 @@ function Bar_component({ data }: BarProps) {
   );
 }
 
-export default createComponent(Bar_component, {
+export default createComponent(BarComponent, {
   argTypes: {
     data: {
       typeDef: { type: 'array' },

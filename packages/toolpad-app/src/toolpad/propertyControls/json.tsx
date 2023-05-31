@@ -43,26 +43,28 @@ function JsonPropEditor({ label, propType, value, onChange, disabled }: EditorPr
     onChange(newValue);
   }, [onChange, input]);
 
-  const schemaUri = React.useMemo(() => {
+  const [schemaUri, setSchemaUri] = React.useState<string | undefined>(undefined);
+
+  React.useEffect(() => {
     if (propType.type !== 'object' && propType.type !== 'array') {
-      return undefined;
+      return () => {};
     }
 
     if (!propType.schema) {
-      return undefined;
-    }
-
-    if (typeof propType.schema === 'string') {
-      return propType.schema;
+      return () => {};
     }
 
     const blob = new Blob([JSON.stringify(propType.schema, null, 2)], {
       type: 'application/json',
     });
 
-    const url = URL.createObjectURL(blob);
+    const uri = URL.createObjectURL(blob);
 
-    return url;
+    setSchemaUri(uri);
+
+    return () => {
+      URL.revokeObjectURL(uri);
+    };
   }, [propType]);
 
   useShortcut({ key: 's', metaKey: true, disabled: !dialogOpen }, handleSave);

@@ -50,7 +50,7 @@ spec:
                     columnSize: 2.030188679245283
                     horizontalAlign: center
                   props:
-                    value: User list
+                    value: Customer list
                     variant: h4
                 - component: Button
                   name: button1

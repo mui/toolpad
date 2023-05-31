@@ -1,5 +1,33 @@
 # Changelog
 
+## 0.1.14
+
+<!-- generated comparing v0.1.13..master -->
+
+_May 31, 2023_
+
+A big thanks to the 3 contributors who made this release possible. Here are some highlights ✨:
+
+Add new reference documentation, add new QR-code example.
+
+- &#8203;<!-- 15 -->Pin dependencies (#2102) @Janpot
+- &#8203;<!-- 14 -->Fix React function ref warning for the row id selector component (#2100) @Janpot
+- &#8203;<!-- 13 -->Allow inlining the proptype jsonschema (#2080) @Janpot
+- &#8203;<!-- 12 -->Add redirect for moved file-schema page (#2090) @Janpot
+- &#8203;<!-- 11 -->Several fixes around local functions (#2074) @Janpot
+- &#8203;<!-- 10 -->Add 404 page to application runtime (#2077) @Janpot
+- &#8203;<!-- 09 -->Avoid component catalog opening while hovering the snackbar (#2079) @Janpot
+- &#8203;<!-- 08 -->Fix broken documentation links (#2076) @Janpot
+- &#8203;<!-- 07 -->Add new example for QR code generator (#2067) @Janpot
+- &#8203;<!-- 06 -->Avoid restarting vite devserver when env file changes (#2069) @Janpot
+- &#8203;<!-- 05 -->Reference documentation (#2001) @Janpot
+- &#8203;<!-- 04 -->Fix websocket connection in codesandbox (#2068) @Janpot
+- &#8203;<!-- 03 -->Remove dead code from browser queries (#2066) @Janpot
+- &#8203;<!-- 02 -->[docs] Add docs update checklist item (#2078) @bharatkashyap
+- &#8203;<!-- 01 -->[docs] Fix missing redirection for data binding (#2083) @oliviertassinari
+
+All contributors of this release in alphabetical order: @bharatkashyap, @Janpot, @oliviertassinari
+
 ## 0.1.13
 
 <!-- generated comparing v0.1.12..master -->

@@ -1,6 +1,6 @@
 import { createFunction } from '@mui/toolpad/server';
 
-const customers = [
+let customers = [
   {
     id: 1,
     name: 'Emily Lee',
@@ -14,7 +14,7 @@ const customers = [
     image: 'https://i.pravatar.cc/300',
   },
   {
-    id: 2,
+    id: 23,
     name: 'Liam Patel',
     account_creation_date: '2022-02-02',
     country_of_residence: 'India',
@@ -38,7 +38,7 @@ const customers = [
     image: 'https://i.pravatar.cc/300',
   },
   {
-    id: 4,
+    id: 9,
     name: 'William Wong',
     account_creation_date: '2022-04-08',
     country_of_residence: 'United States',
@@ -62,7 +62,7 @@ const customers = [
     image: 'https://i.pravatar.cc/300',
   },
   {
-    id: 6,
+    id: 12,
     name: 'Ethan Chen',
     account_creation_date: '2022-03-01',
     country_of_residence: 'China',
@@ -111,9 +111,10 @@ const customerParams = {
 
 export const addCustomer = createFunction(
   async ({ parameters }) => {
+    const maxId = customers.reduce((max, customer) => Math.max(max, customer.id), -1);
     customers.push({
       name: parameters.name,
-      id: customers.length + 1,
+      id: maxId + 1,
       account_creation_date: parameters.account_creation_date,
       country_of_residence: parameters.country_of_residence,
       phone_number: parameters.phone_number,
@@ -123,7 +124,7 @@ export const addCustomer = createFunction(
       id_1: parameters.id_1,
       image: 'https://i.pravatar.cc/300',
     });
-    return customers[customers.length - 1];
+    return customers[maxId + 1];
   },
   {
     parameters: customerParams,
@@ -132,7 +133,9 @@ export const addCustomer = createFunction(
 
 export const updateCustomer = createFunction(
   async ({ parameters }) => {
-    customers[parameters.id - 1] = {
+    const index = customers.findIndex((item) => item.id === parameters.id);
+
+    customers[index] = {
       id: parameters.id,
       name: parameters.name,
       account_creation_date: parameters.account_creation_date,
@@ -144,7 +147,7 @@ export const updateCustomer = createFunction(
       id_1: parameters.id_1,
       image: 'https://i.pravatar.cc/300',
     };
-    return customers[parameters.id - 1];
+    return customers[index];
   },
   {
     parameters: {
@@ -156,7 +159,6 @@ export const updateCustomer = createFunction(
   },
 );
 
-/* To be added
 export const del = createFunction(
   async ({ parameters }) => {
     customers = customers.filter(({ id }) => id !== parameters.id);
@@ -170,4 +172,3 @@ export const del = createFunction(
     },
   },
 );
-*/

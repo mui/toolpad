@@ -9,6 +9,10 @@ spec:
       children:
         - component: Paper
           name: paper5
+          props:
+            sx:
+              border: 1
+            elevation: 0
           children:
             - component: PageRow
               name: pageRow13
@@ -45,8 +49,7 @@ spec:
                     - component: Text
                       name: typography4
                       props:
-                        value:
-                          Acme corp. is a global e-com company and this is a support application to
+                        value: Acme corp. is a global e-com company and this is a support application to
                           add new users
                     - component: PageRow
                       name: pageRow2
@@ -56,7 +59,7 @@ spec:
                         - component: Text
                           name: typography1
                           layout:
-                            columnSize: 1.6957605985037407
+                            columnSize: 2.288908765652952
                             horizontalAlign: center
                           props:
                             value: User list
@@ -64,7 +67,7 @@ spec:
                         - component: Button
                           name: button1
                           layout:
-                            columnSize: 0.30423940149625933
+                            columnSize: 0.23881932021466906
                             horizontalAlign: center
                           props:
                             size: medium
@@ -74,6 +77,17 @@ spec:
                             onClick:
                               $$jsExpressionAction: get.refetch()
                             loading: false
+                        - component: Button
+                          name: button
+                          layout:
+                            columnSize: 0.47227191413237923
+                          props:
+                            content: Delete user
+                            size: medium
+                            onClick:
+                              $$jsExpressionAction: |-
+                                await delete.call(dataGrid2.selection);
+                                get.refetch();
                     - component: DataGrid
                       name: dataGrid2
                       props:
@@ -117,7 +131,7 @@ spec:
                         columnSize: 1
                       props:
                         sx:
-                          color: '#EBCFB2'
+                          color: "#EBCFB2"
                         onSubmit:
                           $$jsExpressionAction: |-
                             await update.call(form.value);
@@ -253,7 +267,7 @@ spec:
                         columnSize: 1
                       props:
                         sx:
-                          color: '#EBCFB2'
+                          color: "#EBCFB2"
                         onSubmit:
                           $$jsExpressionAction: |-
                             await add.call(form1.value);
@@ -375,10 +389,6 @@ spec:
                                           props:
                                             label: Image
                                             multiple: false
-          props:
-            sx:
-              border: 1
-            elevation: 0
   queries:
     - name: get
       enabled: true
@@ -468,4 +478,14 @@ spec:
           value:
             $$jsExpression: |
               id_1.value
+    - name: delete
+      query:
+        function: del
+        kind: local
+      parameters:
+        - name: id
+          value:
+            $$jsExpression: |
+              dataGrid2.selection.id
+      mode: mutation
   display: standalone

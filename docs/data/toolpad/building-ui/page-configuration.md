@@ -32,4 +32,4 @@ A dialog will show where you can set as many parameters as you wish by typing in
 
 <img src="/static/toolpad/docs/building-ui/page-parameters-2.png" alt="Page display mode selection" width="560" />
 
-Page parameters can also be used in [data bindings](/toolpad/data-binding/) by accessing the `page.parameters` global variable.
+Page parameters can also be used in [data bindings](/toolpad/data-binding/binding-state/) by accessing the `page.parameters` global variable.

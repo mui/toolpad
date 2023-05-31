@@ -88,8 +88,6 @@ interface IToolpadProject {
   envManager: EnvManager;
 }
 
-const RELATIVE_RESOURCES_FOLDER = './resources';
-
 export default class FunctionsManager {
   private project: IToolpadProject;
 
@@ -101,7 +99,7 @@ export default class FunctionsManager {
   }
 
   getResourcesFolder(): string {
-    return path.join(this.project.getToolpadFolder(), RELATIVE_RESOURCES_FOLDER);
+    return path.join(this.project.getToolpadFolder(), './resources');
   }
 
   getFunctionsFile() {
@@ -125,10 +123,12 @@ export default class FunctionsManager {
     const resourcesFolder = this.getResourcesFolder();
     const functionFiles = await glob(this.getFunctionResourcesPattern());
 
+    const relativeResourcesFolder = path.relative(this.project.getRoot(), resourcesFolder);
+
     const functionImports = functionFiles.map((file) => {
       const fileName = path.relative(resourcesFolder, file);
       const importSpec = pathToNodeImportSpecifier(
-        [RELATIVE_RESOURCES_FOLDER, fileName].join(path.sep),
+        ['.', relativeResourcesFolder, fileName].join(path.sep),
       );
       const name = path.basename(fileName).replace(/\..*$/, '');
       return `[${JSON.stringify(name)}, () => import(${JSON.stringify(importSpec)})]`;

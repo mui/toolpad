@@ -37,9 +37,9 @@ spec:
               $$jsExpression: |
                 dogQuery.data
             columns:
-              - field: "0"
+              - field: '0'
                 type: string
-              - field: "1"
+              - field: '1'
                 type: json
                 width: 276
     - component: PageRow

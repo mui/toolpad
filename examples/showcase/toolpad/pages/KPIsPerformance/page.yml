@@ -136,9 +136,9 @@ spec:
         url: https://api.github.com/repos/mui/mui-toolpad/issues
         searchParams:
           - name: labels
-            value: "status: needs triage"
+            value: 'status: needs triage'
           - name: per_page
-            value: "100"
+            value: '100'
         headers: []
         method: GET
     - name: countQuery

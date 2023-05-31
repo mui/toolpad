@@ -45,7 +45,8 @@ spec:
                     - component: Text
                       name: typography4
                       props:
-                        value: Acme corp. is a global e-com company and this is a support application to
+                        value:
+                          Acme corp. is a global e-com company and this is a support application to
                           add new users
                     - component: PageRow
                       name: pageRow2
@@ -116,7 +117,7 @@ spec:
                         columnSize: 1
                       props:
                         sx:
-                          color: "#EBCFB2"
+                          color: '#EBCFB2'
                         onSubmit:
                           $$jsExpressionAction: |-
                             await update.call(form.value);
@@ -252,7 +253,7 @@ spec:
                         columnSize: 1
                       props:
                         sx:
-                          color: "#EBCFB2"
+                          color: '#EBCFB2'
                         onSubmit:
                           $$jsExpressionAction: |-
                             await add.call(form1.value);

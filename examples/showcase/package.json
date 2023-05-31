@@ -8,7 +8,6 @@
     "start": "toolpad start"
   },
   "dependencies": {
-    "@mui/toolpad": "^0.1.13",
-    "recharts": "^2.6.1"
+    "@mui/toolpad": "^0.1.13"
   }
 }

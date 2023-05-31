@@ -80,9 +80,9 @@ spec:
                     fullWidth: true
                     disabled:
                       $$jsExpression: |
-                        !dataGrid2.selection
+                        !customersGrid.selection
             - component: DataGrid
-              name: dataGrid2
+              name: customersGrid
               props:
                 rows:
                   $$jsExpression: |
@@ -112,18 +112,18 @@ spec:
                 columnSize: 1
                 horizontalAlign: start
               props:
-                value: Update user
+                value: Update customer
                 variant: h4
             - component: Form
-              name: form
+              name: updateCustomerForm
               layout:
                 columnSize: 1
               props:
                 onSubmit:
                   $$jsExpressionAction: |-
-                    await updateCustomer.call(form.value);
+                    await updateCustomer.call(updateCustomerForm.value);
                     getCustomers.refetch();
-                submitButtonText: Update user
+                submitButtonText: Update
                 hasResetButton: false
                 hideControls: false
                 formControlsFullWidth: false
@@ -147,7 +147,7 @@ spec:
                             fullWidth: true
                             defaultValue:
                               $$jsExpression: |
-                                dataGrid2.selection.name
+                                customersGrid.selection.name
                             isRequired: true
                         - component: PageRow
                           name: pageRow
@@ -165,7 +165,7 @@ spec:
                                     label: Account creation date
                                     defaultValue:
                                       $$jsExpression: >
-                                        dataGrid2.selection.account_creation_date
+                                        customersGrid.selection.account_creation_date
                                     isRequired: true
                                 - component: Select
                                   name: gender
@@ -173,7 +173,7 @@ spec:
                                     label: Gender
                                     defaultValue:
                                       $$jsExpression: |
-                                        dataGrid2.selection.gender
+                                        customersGrid.selection.gender
                                     options:
                                       - Male
                                       - Female
@@ -187,7 +187,7 @@ spec:
                                     label: Phone number
                                     defaultValue:
                                       $$jsExpression: |
-                                        dataGrid2.selection.phone_number
+                                        customersGrid.selection.phone_number
                                     isRequired: true
                             - component: PageColumn
                               name: pageColumn6
@@ -202,7 +202,7 @@ spec:
                                     label: Address
                                     defaultValue:
                                       $$jsExpression: |
-                                        dataGrid2.selection.address
+                                        customersGrid.selection.address
                                     fullWidth: true
                                 - component: TextField
                                   name: country
@@ -212,7 +212,7 @@ spec:
                                     label: Country
                                     defaultValue:
                                       $$jsExpression: >
-                                        dataGrid2.selection.country_of_residence
+                                        customersGrid.selection.country_of_residence
                                     fullWidth: true
                                     isRequired: true
                                 - component: TextField
@@ -223,7 +223,7 @@ spec:
                                     label: Email
                                     defaultValue:
                                       $$jsExpression: |
-                                        dataGrid2.selection.email
+                                        customersGrid.selection.email
                                     isRequired: true
                                     isInvalid: false
                                     fullWidth: true
@@ -233,18 +233,18 @@ spec:
                 columnSize: 1
                 horizontalAlign: center
               props:
-                value: Add user
+                value: Add Customer
                 variant: h4
             - component: Form
-              name: form1
+              name: addCustomerForm
               layout:
                 columnSize: 1
               props:
                 onSubmit:
                   $$jsExpressionAction: |-
-                    await addCustomer.call(form1.value);
+                    await addCustomer.call(addCustomerForm.value);
                     getCustomers.refetch();
-                submitButtonText: Add user
+                submitButtonText: Add
                 hasResetButton: false
                 hideControls: false
                 formControlsFullWidth: false
@@ -268,7 +268,7 @@ spec:
                             fullWidth: true
                             defaultValue:
                               $$jsExpression: |
-                                dataGrid2.selection.name
+                                customersGrid.selection.name
                             isRequired: true
                         - component: PageRow
                           name: pageRow4
@@ -286,7 +286,7 @@ spec:
                                     label: Account creation date
                                     defaultValue:
                                       $$jsExpression: >
-                                        dataGrid2.selection.account_creation_date
+                                        customersGrid.selection.account_creation_date
                                     isRequired: true
                                 - component: Select
                                   name: gender1
@@ -294,7 +294,7 @@ spec:
                                     label: Gender
                                     defaultValue:
                                       $$jsExpression: |
-                                        dataGrid2.selection.gender
+                                        customersGrid.selection.gender
                                     options:
                                       - Male
                                       - Female
@@ -308,7 +308,7 @@ spec:
                                     label: Phone number
                                     defaultValue:
                                       $$jsExpression: |
-                                        dataGrid2.selection.phone_number
+                                        customersGrid.selection.phone_number
                                     isRequired: true
                             - component: PageColumn
                               name: pageColumn7
@@ -323,7 +323,7 @@ spec:
                                     label: Address
                                     defaultValue:
                                       $$jsExpression: |
-                                        dataGrid2.selection.address
+                                        customersGrid.selection.address
                                     fullWidth: true
                                 - component: TextField
                                   name: country1
@@ -333,7 +333,7 @@ spec:
                                     label: Country
                                     defaultValue:
                                       $$jsExpression: >
-                                        dataGrid2.selection.country_of_residence
+                                        customersGrid.selection.country_of_residence
                                     fullWidth: true
                                     isRequired: true
                                 - component: TextField
@@ -344,7 +344,7 @@ spec:
                                     label: Email
                                     defaultValue:
                                       $$jsExpression: |
-                                        dataGrid2.selection.email
+                                        customersGrid.selection.email
                                     isRequired: true
                                     isInvalid: false
                                     fullWidth: true
@@ -400,7 +400,7 @@ spec:
         - name: id
           value:
             $$jsExpression: |
-              dataGrid2.selection.id
+              customersGrid.selection.id
         - name: name
           value:
             $$jsExpression: |
@@ -437,6 +437,6 @@ spec:
         - name: id
           value:
             $$jsExpression: |
-              dataGrid2.selection.id
+              customersGrid.selection.id
       mode: mutation
   display: standalone

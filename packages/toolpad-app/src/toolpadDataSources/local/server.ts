@@ -15,7 +15,7 @@ async function execPrivate(connection: Maybe<LocalConnectionParams>, query: Loca
       if (!query.query.function) {
         throw new Error('Missing function name');
       }
-      return project.functionsManager.exec(query.query.function, query.params);
+      return project.functionsManager.exec('functions.ts', query.query.function, query.params);
     }
     case 'openEditor': {
       const project = await getProject();
@@ -35,7 +35,11 @@ async function exec(
   if (!fetchQuery.function) {
     throw new Error('Missing function name');
   }
-  const { data, error } = await project.functionsManager.exec(fetchQuery.function, params);
+  const { data, error } = await project.functionsManager.exec(
+    'functions.ts',
+    fetchQuery.function,
+    params,
+  );
   return { data, error };
 }
 

@@ -1,7 +1,4 @@
 import { Emitter } from '@mui/toolpad-utils/events';
-import type { Message as MessageToChildProcess } from '@mui/toolpad-core/localRuntime';
-import { SerializedError, errorFrom, serializeError } from '@mui/toolpad-utils/errors';
-import * as child_process from 'child_process';
 import * as esbuild from 'esbuild';
 import * as path from 'path';
 import invariant from 'invariant';
@@ -12,8 +9,8 @@ import { glob } from 'glob';
 import * as fs from 'fs/promises';
 import EnvManager from './EnvManager';
 import { ProjectEvents, ToolpadProjectOptions } from '../types';
-import config from '../config';
 import { writeFileRecursive, fileExists } from '../utils/fs';
+import { createWorker } from './functionsDevWorker';
 
 const DEFAULT_FUNCTIONS_FILE_CONTENT = `// Toolpad queries:
 
@@ -26,20 +23,6 @@ export async function example() {
 }
 `;
 
-type MessageFromChildProcess = {
-  kind: 'result';
-  id: number;
-  data: unknown;
-  error: SerializedError;
-};
-
-interface Execution {
-  id: number;
-  reject: (err: Error) => void;
-  resolve: (result: any) => void;
-  timeout: NodeJS.Timeout;
-}
-
 function formatCodeFrame(location: esbuild.Location): string {
   const lineNumberCharacters = Math.ceil(Math.log10(location.line));
   return [
@@ -49,11 +32,6 @@ function formatCodeFrame(location: esbuild.Location): string {
       Math.max(location.lineText.length - 1, 0),
     )}^`,
   ].join('\n');
-}
-
-function pathToNodeImportSpecifier(importPath: string): string {
-  const normalized = path.normalize(importPath).split(path.sep).join('/');
-  return normalized.startsWith('/') ? normalized : `./${normalized}`;
 }
 
 interface IToolpadProject {
@@ -69,31 +47,19 @@ interface IToolpadProject {
 export default class FunctionsManager {
   private project: IToolpadProject;
 
-  private currentRuntimeProcess: child_process.ChildProcess | undefined;
-
-  private pendingExecutions = new Map<number, Execution>();
-
   private controller: AbortController | undefined;
 
   private buildMetafile: esbuild.Metafile | undefined;
 
   private buildErrors: Error[] = [];
 
-  private runtimeError: Error | undefined;
-
   private env: Record<string, string> | undefined;
 
   private unsubscribeFromEnv: (() => void) | undefined;
 
+  private devWorker: ReturnType<typeof createWorker>;
+
   private initPromise: Promise<void>;
-
-  private nextMsgId = 1;
-
-  private getNextMsgId() {
-    const id = this.nextMsgId;
-    this.nextMsgId += 1;
-    return id;
-  }
 
   // eslint-disable-next-line class-methods-use-this
   private setInitialized: () => void = () => {
@@ -105,6 +71,11 @@ export default class FunctionsManager {
     this.initPromise = new Promise((resolve) => {
       this.setInitialized = resolve;
     });
+    const relativeResourcesFolder = path.relative(
+      this.project.getRoot(),
+      this.getResourcesFolder(),
+    );
+    this.devWorker = createWorker(relativeResourcesFolder, {});
     this.startDev();
   }
 
@@ -129,191 +100,36 @@ export default class FunctionsManager {
     }
   }
 
-  async createMain(): Promise<string> {
-    const resourcesFolder = this.getResourcesFolder();
-    const functionFiles = await glob(this.getFunctionResourcesPattern());
-
-    const relativeResourcesFolder = path.relative(this.project.getRoot(), resourcesFolder);
-
-    const functionImports = functionFiles.map((file) => {
-      const fileName = path.relative(resourcesFolder, file);
-      const importSpec = pathToNodeImportSpecifier(
-        ['.', relativeResourcesFolder, fileName].join(path.sep),
-      );
-      const name = path.basename(fileName).replace(/\..*$/, '');
-      return `[${JSON.stringify(name)}, () => import(${JSON.stringify(importSpec)})]`;
-    });
-
-    return `
-    import fetch, { Headers, Request, Response } from 'node-fetch'
-    import { setup } from '@mui/toolpad-core/localRuntime';
-
-    // Polyfill fetch() in the Node.js environment
-    if (!global.fetch) {
-      global.fetch = fetch
-      global.Headers = Headers
-      global.Request = Request
-      global.Response = Response
-    }
-
-    setup({
-      functions: new Map([${functionImports.join(', ')}]),
-    })
-  `;
-  }
-
-  restartRuntimeProcess() {
-    invariant(this.env, 'by this time env should be always be initialized');
-    const root = this.project.getRoot();
-
-    if (this.controller) {
-      this.controller.abort();
-      this.controller = undefined;
-
-      // clean up handlers
-      for (const [id, execution] of this.pendingExecutions) {
-        execution.reject(new Error(`Aborted`));
-        clearTimeout(execution.timeout);
-        this.pendingExecutions.delete(id);
-      }
-    }
-
-    let outputFile: string | undefined;
-
+  getOutputFile(): string | undefined {
     if (this.buildErrors.length <= 0) {
       invariant(this.buildMetafile, 'esbuild settings should enable metafile');
       const mainEntry = Object.entries(this.buildMetafile.outputs).find(
         ([, entry]) => entry.entryPoint === 'toolpad:main.ts',
       );
       invariant(mainEntry, 'No output found for main entry point');
-      outputFile = mainEntry[0];
+      return mainEntry[0];
     }
-
-    if (!outputFile) {
-      return;
-    }
-
-    this.controller = new AbortController();
-
-    const runtimeProcess = child_process.fork(`./${outputFile}`, {
-      cwd: root,
-      silent: true,
-      signal: this.controller.signal,
-      stdio: 'inherit',
-      env: {
-        ...process.env,
-        NODE_ENV: config.cmd === 'start' ? 'production' : 'development',
-        ...this.env,
-      },
-    });
-
-    this.runtimeError = undefined;
-
-    runtimeProcess.on('error', (error) => {
-      if (error.name === 'AbortError') {
-        return;
-      }
-      this.runtimeError = error;
-      console.error(`cp ${runtimeProcess.pid} error`, error);
-    });
-
-    runtimeProcess.on('exit', (code) => {
-      if (this.currentRuntimeProcess === runtimeProcess) {
-        this.currentRuntimeProcess = undefined;
-        if (code !== 0) {
-          this.runtimeError = new Error(`The runtime process exited with code ${code}`);
-          if (config.cmd === 'start') {
-            console.error(`The runtime process exited with code ${code}`);
-            process.exit(1);
-          }
-        }
-      }
-    });
-
-    runtimeProcess.on('message', (msg: MessageFromChildProcess) => {
-      switch (msg.kind) {
-        case 'result': {
-          const execution = this.pendingExecutions.get(msg.id);
-          if (execution) {
-            this.pendingExecutions.delete(msg.id);
-            clearTimeout(execution.timeout);
-            if (msg.error) {
-              execution.reject(new Error(msg.error.message || 'Unknown error'));
-            } else {
-              execution.resolve(msg.data);
-            }
-          }
-          break;
-        }
-        default:
-          console.error(`Unknown message received "${msg.kind}"`);
-      }
-    });
-
-    this.currentRuntimeProcess = runtimeProcess;
+    return undefined;
   }
 
-  async sendMsgToRuntimeProcess(msg: MessageToChildProcess) {
-    await this.initPromise;
-    return new Promise((resolve, reject) => {
-      if (this.buildErrors.length > 0) {
-        const firstError = this.buildErrors[0];
-        reject(firstError);
-      } else if (this.runtimeError) {
-        reject(this.runtimeError);
-      } else if (this.currentRuntimeProcess) {
-        const timeout = setTimeout(() => {
-          this.pendingExecutions.delete(msg.id);
-          reject(new Error(`Timeout`));
-        }, 60000);
-        this.pendingExecutions.set(msg.id, {
-          id: msg.id,
-          resolve,
-          reject,
-          timeout,
-        });
-        this.currentRuntimeProcess.send(msg);
-      } else {
-        reject(new Error(`Toolpad local runtime is not running`));
-      }
-    });
+  async getFunctionFiles(): Promise<string[]> {
+    const paths = await glob(this.getFunctionResourcesPattern());
+    return paths.map((fullPath) => path.relative(this.project.getRoot(), fullPath));
+  }
+
+  getOutputFileForEntryPoint(entryPoint: string): string | undefined {
+    const [outputFile] =
+      Object.entries(this.buildMetafile?.outputs ?? {}).find(
+        (entry) => entry[1].entryPoint === entryPoint,
+      ) ?? [];
+
+    return outputFile;
   }
 
   async createBuilder() {
     const root = this.project.getRoot();
 
-    const createMain = async (): Promise<string> => {
-      const resourcesFolder = this.getResourcesFolder();
-      const functionFiles = await glob(this.getFunctionResourcesPattern());
-
-      const relativeResourcesFolder = path.relative(this.project.getRoot(), resourcesFolder);
-
-      const functionImports = functionFiles.map((file) => {
-        const fileName = path.relative(resourcesFolder, file);
-        const importSpec = pathToNodeImportSpecifier(
-          ['.', relativeResourcesFolder, fileName].join(path.sep),
-        );
-        const name = path.basename(fileName).replace(/\..*$/, '');
-        return `[${JSON.stringify(name)}, () => import(${JSON.stringify(importSpec)})]`;
-      });
-
-      return `
-      import fetch, { Headers, Request, Response } from 'node-fetch'
-      import { setup } from '@mui/toolpad-core/localRuntime';
-  
-      // Polyfill fetch() in the Node.js environment
-      if (!global.fetch) {
-        global.fetch = fetch
-        global.Headers = Headers
-        global.Request = Request
-        global.Response = Response
-      }
-  
-      setup({
-        functions: new Map([${functionImports.join(', ')}]),
-      })
-    `;
-    };
+    const entryPoints = await this.getFunctionFiles();
 
     const onFunctionsBuildEnd = async (args: esbuild.BuildResult<esbuild.BuildOptions>) => {
       // TODO: use for hot reloading
@@ -335,7 +151,6 @@ export default class FunctionsManager {
 
       this.buildMetafile = args.metafile;
 
-      this.restartRuntimeProcess();
       this.project.events.emit('functionsBuildEnd', {});
 
       this.setInitialized();
@@ -344,23 +159,6 @@ export default class FunctionsManager {
     const toolpadPlugin: esbuild.Plugin = {
       name: 'toolpad',
       setup(build) {
-        build.onResolve({ filter: /^toolpad:/ }, (args) => ({
-          path: args.path.slice('toolpad:'.length),
-          namespace: 'toolpad',
-        }));
-
-        build.onLoad({ filter: /.*/, namespace: 'toolpad' }, async (args) => {
-          if (args.path === 'main.ts') {
-            return {
-              loader: 'tsx',
-              contents: await createMain(),
-              resolveDir: root,
-            };
-          }
-
-          throw new Error(`Can't resolve "${args.path}" for toolpad namespace`);
-        });
-
         build.onEnd((args) => {
           onFunctionsBuildEnd(args);
         });
@@ -369,7 +167,7 @@ export default class FunctionsManager {
 
     const ctx = await esbuild.context({
       absWorkingDir: root,
-      entryPoints: ['toolpad:main.ts'],
+      entryPoints,
       plugins: [toolpadPlugin],
       write: true,
       bundle: true,
@@ -397,17 +195,15 @@ export default class FunctionsManager {
         if (resourcesWatcher) {
           await resourcesWatcher.close();
         }
-        const pattern = this.getFunctionResourcesPattern();
 
         const calculateFingerPrint = async () => {
-          const functionFiles = await glob(pattern);
+          const functionFiles = await this.getFunctionFiles();
           return functionFiles.join('|');
         };
 
         let fingerprint = await calculateFingerPrint();
 
-        const globalResourcesFolder = path.resolve(pattern);
-        resourcesWatcher = chokidar.watch([globalResourcesFolder]);
+        resourcesWatcher = chokidar.watch([this.getFunctionResourcesPattern()]);
         resourcesWatcher.on('all', async () => {
           const newFingerprint = await calculateFingerPrint();
           if (fingerprint !== newFingerprint) {
@@ -427,37 +223,46 @@ export default class FunctionsManager {
   async startDev() {
     await this.migrateLegacy();
     this.env = await this.project.envManager.getValues();
+
+    const relativeResourcesFolder = path.relative(
+      this.project.getRoot(),
+      this.getResourcesFolder(),
+    );
+    this.devWorker = createWorker(relativeResourcesFolder, this.env);
+
     const builder = await this.createBuilder();
     await builder.watch();
 
     this.unsubscribeFromEnv = this.project.events.subscribe('envChanged', async () => {
       this.env = await this.project.envManager.getValues();
-      this.restartRuntimeProcess();
+      this.devWorker = createWorker(relativeResourcesFolder, this.env);
     });
 
     return builder;
   }
 
-  async exec(name: string, parameters: Record<string, unknown>) {
-    try {
-      const data = await this.sendMsgToRuntimeProcess({
-        kind: 'exec',
-        id: this.getNextMsgId(),
-        name,
-        parameters,
-      });
-      return { data };
-    } catch (rawError) {
-      return { error: serializeError(errorFrom(rawError)) };
+  async exec(fileName: string, name: string, parameters: Record<string, unknown>) {
+    await this.initPromise;
+    const resourcesFolder = this.getResourcesFolder();
+    const fullPath = path.resolve(resourcesFolder, fileName);
+    const entryPoint = path.relative(this.project.getRoot(), fullPath);
+    const outputFilePath = this.getOutputFileForEntryPoint(entryPoint);
+    if (!outputFilePath) {
+      throw new Error(`No build found for "${fileName}"`);
     }
+    return this.devWorker.execute(outputFilePath, name, parameters);
   }
 
   async introspect() {
-    const introspectionResult = await this.sendMsgToRuntimeProcess({
-      kind: 'introspect',
-      id: this.getNextMsgId(),
-    });
-    return introspectionResult;
+    await this.initPromise;
+    const functionFiles = await this.getFunctionFiles();
+    const outputFiles = new Map(
+      functionFiles.flatMap((functionFile) => {
+        const file = this.getOutputFileForEntryPoint(functionFile);
+        return file ? [[functionFile, { file }]] : [];
+      }),
+    );
+    return this.devWorker.introspect(outputFiles);
   }
 
   async initQueriesFile(): Promise<void> {

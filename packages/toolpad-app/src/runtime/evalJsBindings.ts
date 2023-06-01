@@ -115,6 +115,19 @@ export function buildGlobalScope(
   return globalScope;
 }
 
+// @TODO: This is a copy from the function in `src/server/localMode` - should it be a shared utility?
+function toBindable<V>(
+  value: V | { $$jsExpression: string } | { $$env: string },
+): BindableAttrValue<V> {
+  if (value && typeof value === 'object' && typeof (value as any).$$jsExpression === 'string') {
+    return { type: 'jsExpression', value: (value as any).$$jsExpression };
+  }
+  if (value && typeof value === 'object' && typeof (value as any).$$env === 'string') {
+    return { type: 'env', value: (value as any).$$env };
+  }
+  return { type: 'const', value: value as V };
+}
+
 /**
  * Evaluates the expressions and replace with their result
  */
@@ -239,11 +252,38 @@ export default function evalJsBindings(
   return mapValues(bindings, (binding, bindingId) => {
     const { scopePath } = binding;
 
+    let resultData = results[bindingId];
+
+    const mergeNestedBindings = (value: unknown, parentBindingId: string) => {
+      if (value && typeof value === 'object') {
+        for (const nestedPropName of Object.keys(value)) {
+          const nestedBindingId = `${parentBindingId}${
+            Array.isArray(value) ? `[${nestedPropName}]` : `.${nestedPropName}`
+          }`;
+
+          if (results[nestedBindingId]) {
+            const updatedResultData = set(
+              resultData,
+              `value.${nestedBindingId}`.replace(bindingId, ''),
+              results[nestedBindingId],
+            );
+            resultData = updatedResultData;
+          }
+
+          mergeNestedBindings((value as Record<string, unknown>)[nestedPropName], nestedBindingId);
+        }
+      }
+    };
+
+    if (resultData.value) {
+      mergeNestedBindings(resultData.value, bindingId);
+    }
+
     return {
       scopePath,
       dependencies: Array.from(flatDependencies.get(bindingId) ?? []),
       result: {
-        ...results[bindingId],
+        ...resultData,
         error: bubbleError(flatDependencies, results, bindingId),
         loading: bubbleLoading(flatDependencies, results, bindingId),
       },

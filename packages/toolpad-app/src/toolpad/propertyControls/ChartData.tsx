@@ -25,8 +25,31 @@ import { useDom, useDomApi } from '../AppState';
 // eslint-disable-next-line import/no-cycle
 import BindableEditor from '../AppEditor/PageEditor/BindableEditor';
 
-function getDataSeriesProp(dataId: string): string {
-  return `data.${dataId}`;
+// @TODO: This is a copy from the function in `src/server/localMode` - should it be a shared utility?
+function toBindable<V>(
+  value: V | { $$jsExpression: string } | { $$env: string },
+): BindableAttrValue<V> {
+  if (value && typeof value === 'object' && typeof (value as any).$$jsExpression === 'string') {
+    return { type: 'jsExpression', value: (value as any).$$jsExpression };
+  }
+  if (value && typeof value === 'object' && typeof (value as any).$$env === 'string') {
+    return { type: 'env', value: (value as any).$$env };
+  }
+  return { type: 'const', value: value as V };
+}
+
+// @TODO: This is a copy from the function in `src/server/localMode` - should it be a shared utility?
+function fromBindable<V>(bindable: BindableAttrValue<V>) {
+  switch (bindable.type) {
+    case 'const':
+      return bindable.value;
+    case 'jsExpression':
+      return { $$jsExpression: bindable.value };
+    case 'env':
+      return { $$env: bindable.value };
+    default:
+      throw new Error(`Unsupported bindable "${bindable.type}"`);
+  }
 }
 
 function ChartDataPropEditor({
@@ -34,10 +57,10 @@ function ChartDataPropEditor({
   propType,
   value = [],
   onChange,
-}: EditorProps<(Omit<ChartDataSeries, 'data'> & { dataId?: string })[]>) {
+}: EditorProps<ChartDataSeries[]>) {
   const { dom } = useDom();
   const domApi = useDomApi();
-  const { pageState, globalScopeMeta } = usePageEditorState();
+  const { pageState, bindings, globalScopeMeta } = usePageEditorState();
   const jsBrowserRuntime = useBrowserJsRuntime();
 
   const node = nodeId ? (appDom.getMaybeNode(dom, nodeId) as appDom.ElementNode) : null;
@@ -50,7 +73,8 @@ function ChartDataPropEditor({
       ...value,
       {
         kind: 'line',
-        label: `dataSeries${value.length}`,
+        label: `dataSeries${value.length + 1}`,
+        data: [],
         xKey: 'x',
         yKey: 'y',
       },
@@ -67,17 +91,9 @@ function ChartDataPropEditor({
 
   const handleRemoveDataSeries = React.useCallback(
     (index: number) => () => {
-      const { dataId } = value[index];
-
-      if (node && dataId) {
-        domApi.update((draft) =>
-          appDom.setNodeNamespacedProp(draft, node, 'props', getDataSeriesProp(dataId), undefined),
-        );
-      }
-
       onChange([...value.slice(0, index), ...value.slice(index + 1)]);
     },
-    [domApi, node, onChange, value],
+    [onChange, value],
   );
 
   const popoverId = React.useId();
@@ -89,32 +105,29 @@ function ChartDataPropEditor({
 
   const handleDataSeriesDataChange = React.useCallback(
     (index: number) => (newValue: BindableAttrValue<ChartDataSeries['data']> | null) => {
-      const existingDataId = value[index].dataId;
-
-      const dataId = existingDataId || appDom.createId();
-
       if (node) {
+        const previousData = node.props?.data?.value || [];
+
         domApi.update((draft) =>
-          appDom.setNodeNamespacedProp(draft, node, 'props', `data.${dataId}`, newValue),
+          appDom.setNodeNamespacedProp(draft, node, 'props', 'data', {
+            type: 'const',
+            value: [
+              ...previousData.slice(0, index),
+              { ...previousData[index], data: newValue ? fromBindable(newValue) : [] },
+              ...previousData.slice(index + 1),
+            ],
+          }),
         );
       }
-
-      if (!existingDataId) {
-        onChange([
-          ...value.slice(0, index),
-          { ...value[index], dataId },
-          ...value.slice(index + 1),
-        ]);
-      }
     },
-    [domApi, node, onChange, value],
+    [domApi, node],
   );
-
-  const editDataSeries = dataSeriesEditIndex !== null ? value[dataSeriesEditIndex] : null;
 
   if (!node) {
     return null;
   }
+
+  const editDataSeries = dataSeriesEditIndex !== null ? value[dataSeriesEditIndex] : null;
 
   return (
     <React.Fragment>
@@ -169,13 +182,15 @@ function ChartDataPropEditor({
             </Typography>
             <Stack gap={1} py={1}>
               <BindableEditor
+                liveBinding={bindings[`${nodeId}.props.data[${dataSeriesEditIndex}].data`]}
                 globalScope={pageState}
                 globalScopeMeta={globalScopeMeta}
                 label="data"
                 jsRuntime={jsBrowserRuntime}
                 propType={{ type: 'array' }}
                 value={
-                  (node?.props && node.props[getDataSeriesProp(editDataSeries.dataId || '')]) ??
+                  (node.props?.data?.value &&
+                    toBindable(node.props.data.value[dataSeriesEditIndex].data)) ??
                   null
                 }
                 onChange={handleDataSeriesDataChange(dataSeriesEditIndex)}

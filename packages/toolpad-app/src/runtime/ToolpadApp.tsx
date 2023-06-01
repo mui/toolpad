@@ -739,6 +739,19 @@ function parseBinding(
   };
 }
 
+// @TODO: This is a copy from the function in `src/server/localMode` - should it be a shared utility?
+function toBindable<V>(
+  value: V | { $$jsExpression: string } | { $$env: string },
+): BindableAttrValue<V> {
+  if (value && typeof value === 'object' && typeof (value as any).$$jsExpression === 'string') {
+    return { type: 'jsExpression', value: (value as any).$$jsExpression };
+  }
+  if (value && typeof value === 'object' && typeof (value as any).$$env === 'string') {
+    return { type: 'env', value: (value as any).$$env };
+  }
+  return { type: 'const', value: value as V };
+}
+
 function parseBindings(
   dom: appDom.AppDom,
   rootNode: appDom.ElementNode | appDom.PageNode,
@@ -802,6 +815,97 @@ function parseBindings(
             parsedBindingsMap.set(bindingId, parseBinding(binding, { scopePath }));
           }
         }
+
+        const parseNestedBindings = (value: unknown, parentBindingId: string) => {
+          if (value && typeof value === 'object') {
+            for (const [nestedPropName, nestedProp] of Object.entries(value)) {
+              const nestedBindingId = `${parentBindingId}${
+                Array.isArray(value) ? `[${nestedPropName}]` : `.${nestedPropName}`
+              }`;
+
+              const bindableNestedProp = toBindable(nestedProp);
+
+              if (bindableNestedProp.type !== 'const') {
+                parsedBindingsMap.set(nestedBindingId, parseBinding(bindableNestedProp));
+              }
+
+              parseNestedBindings(
+                (value as Record<string, unknown>)[nestedPropName],
+                nestedBindingId,
+              );
+            }
+          }
+        };
+
+        if (propValue?.value) {
+          parseNestedBindings(propValue.value, bindingId);
+        }
+
+        // if (propValue) {
+        //   if (Array.isArray(propValue.value)) {
+        //     for (const [index, propItem] of propValue.value.entries()) {
+        //       if (typeof propItem === 'object') {
+        //         for (const [nestedPropName, nestedProp] of Object.entries(propItem)) {
+        //           const bindableNestedProp = toBindable(nestedProp);
+
+        //           if (bindableNestedProp.type !== 'const') {
+        //             const nestedBindingId = `${bindingId}[${index}].${nestedPropName}`;
+
+        //             const propBinding = parsedBindingsMap.get(bindingId);
+        //             if (propBinding && propBinding.result?.value) {
+        //               parsedBindingsMap.set(bindingId, {
+        //                 ...propBinding,
+        //                 result: {
+        //                   ...propBinding.result,
+        //                   value: [
+        //                     ...propBinding.result.value.slice(0, index),
+        //                     {
+        //                       ...propBinding.result.value[index],
+        //                       [nestedPropName]: {
+        //                         type: 'binding',
+        //                         value: nestedBindingId,
+        //                       },
+        //                     },
+        //                     ...propBinding.result.value.slice(index + 1),
+        //                   ],
+        //                 },
+        //               });
+        //             }
+
+        //             parsedBindingsMap.set(nestedBindingId, parseBinding(bindableNestedProp));
+        //           }
+        //         }
+        //       }
+        //     }
+        //   } else if (typeof propValue.value === 'object') {
+        //     for (const [nestedPropName, nestedProp] of Object.entries(propValue.value)) {
+        //       const bindableNestedProp = toBindable(nestedProp);
+
+        //       if (bindableNestedProp.type !== 'const') {
+        //         const nestedBindingId = `${bindingId}.${nestedPropName}`;
+
+        //         const propBinding = parsedBindingsMap.get(bindingId);
+        //         if (propBinding && propBinding.result?.value) {
+        //           parsedBindingsMap.set(bindingId, {
+        //             ...propBinding,
+        //             result: {
+        //               ...propBinding.result,
+        //               value: {
+        //                 ...propBinding.result.value,
+        //                 [nestedPropName]: {
+        //                   type: 'binding',
+        //                   value: nestedBindingId,
+        //                 },
+        //               },
+        //             },
+        //           });
+        //         }
+
+        //         parsedBindingsMap.set(nestedBindingId, parseBinding(bindableNestedProp));
+        //       }
+        //     }
+        //   }
+        // }
       }
 
       if (componentId !== PAGE_ROW_COMPONENT_ID) {

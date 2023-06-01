@@ -1,5 +1,3 @@
-/ /toolpad/
-
 # Avoid conflicts with the other Next.js apps hosted under https://mui.com/
 
 /toolpad/\_next/\* /\_next/:splat
@@ -15,5 +13,9 @@
 
 # 2023
 
-/toolpad/getting-started/quickstart /toolpad/getting-started/first-app 301
+/toolpad/getting-started/quickstart/ /toolpad/getting-started/first-app/ 301
 /toolpad/schema-reference/ /toolpad/reference/file-schema/ 301
+
+# Create separate namespace on https://mui.com
+
+/ /toolpad/

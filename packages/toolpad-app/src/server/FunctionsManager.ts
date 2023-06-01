@@ -47,15 +47,11 @@ interface IToolpadProject {
 export default class FunctionsManager {
   private project: IToolpadProject;
 
-  private controller: AbortController | undefined;
-
   private buildMetafile: esbuild.Metafile | undefined;
 
   private buildErrors: Error[] = [];
 
   private env: Record<string, string> | undefined;
-
-  private unsubscribeFromEnv: (() => void) | undefined;
 
   private devWorker: ReturnType<typeof createWorker>;
 
@@ -174,45 +170,20 @@ export default class FunctionsManager {
       target: 'es2022',
     });
 
-    let resourcesWatcher: chokidar.FSWatcher | undefined;
-
-    const unsubscribers: (() => void)[] = [];
-
-    const dispose = async () => {
-      unsubscribers.forEach((unsubscribe) => unsubscribe());
-      await Promise.all([ctx.dispose(), this.controller?.abort(), this.unsubscribeFromEnv?.()]);
-    };
-
     const watch = () => {
       ctx.watch({});
 
       // Make sure we pick up added/removed function files
-      (async () => {
-        if (resourcesWatcher) {
-          await resourcesWatcher.close();
-        }
-
-        const calculateFingerPrint = async () => {
-          const functionFiles = await this.getFunctionFiles();
-          return functionFiles.join('|');
-        };
-
-        let fingerprint = await calculateFingerPrint();
-
-        resourcesWatcher = chokidar.watch([this.getFunctionResourcesPattern()]);
-        resourcesWatcher.on('all', async () => {
-          const newFingerprint = await calculateFingerPrint();
-          if (fingerprint !== newFingerprint) {
-            fingerprint = newFingerprint;
-            ctx.rebuild();
-          }
-        });
-      })();
+      const resourcesWatcher = chokidar.watch([this.getFunctionResourcesPattern()]);
+      const handleFileAddedOrRemoved = async () => {
+        await ctx.rebuild();
+      };
+      resourcesWatcher.on('add', handleFileAddedOrRemoved);
+      resourcesWatcher.on('unlink', handleFileAddedOrRemoved);
     };
 
     return {
       watch,
-      dispose,
     };
   }
 
@@ -225,12 +196,10 @@ export default class FunctionsManager {
     const builder = await this.createBuilder();
     await builder.watch();
 
-    this.unsubscribeFromEnv = this.project.events.subscribe('envChanged', async () => {
+    this.project.events.subscribe('envChanged', async () => {
       this.env = await this.project.envManager.getValues();
       this.devWorker = createWorker(this.env);
     });
-
-    return builder;
   }
 
   async exec(fileName: string, name: string, parameters: Record<string, unknown>) {

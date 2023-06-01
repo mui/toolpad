@@ -33,27 +33,12 @@ type MessageFromChildProcess = {
   error: SerializedError;
 };
 
-let nextMsgId = 1;
-
-function getNextId() {
-  const id = nextMsgId;
-  nextMsgId += 1;
-  return id;
-}
-
 interface Execution {
   id: number;
   reject: (err: Error) => void;
   resolve: (result: any) => void;
   timeout: NodeJS.Timeout;
 }
-
-const pendingExecutions = new Map<number, Execution>();
-
-let setInitialized: () => void;
-const initPromise = new Promise<void>((resolve) => {
-  setInitialized = resolve;
-});
 
 function formatCodeFrame(location: esbuild.Location): string {
   const lineNumberCharacters = Math.ceil(Math.log10(location.line));
@@ -71,13 +56,6 @@ function pathToNodeImportSpecifier(importPath: string): string {
   return normalized.startsWith('/') ? normalized : `./${normalized}`;
 }
 
-interface Builder {
-  watch(): void;
-  introspect: () => Promise<unknown>;
-  execute: (name: string, parameters: Record<string, unknown>) => Promise<unknown>;
-  dispose(): Promise<void>;
-}
-
 interface IToolpadProject {
   options: ToolpadProjectOptions;
   events: Emitter<ProjectEvents>;
@@ -91,11 +69,43 @@ interface IToolpadProject {
 export default class FunctionsManager {
   private project: IToolpadProject;
 
-  private builder: Promise<Builder>;
+  private currentRuntimeProcess: child_process.ChildProcess | undefined;
+
+  private pendingExecutions = new Map<number, Execution>();
+
+  private controller: AbortController | undefined;
+
+  private buildMetafile: esbuild.Metafile | undefined;
+
+  private buildErrors: Error[] = [];
+
+  private runtimeError: Error | undefined;
+
+  private env: Record<string, string> | undefined;
+
+  private unsubscribeFromEnv: (() => void) | undefined;
+
+  private initPromise: Promise<void>;
+
+  private nextMsgId = 1;
+
+  private getNextMsgId() {
+    const id = this.nextMsgId;
+    this.nextMsgId += 1;
+    return id;
+  }
+
+  // eslint-disable-next-line class-methods-use-this
+  private setInitialized: () => void = () => {
+    throw new Error('setInitialized should be initialized');
+  };
 
   constructor(project: IToolpadProject) {
     this.project = project;
-    this.builder = this.startDev();
+    this.initPromise = new Promise((resolve) => {
+      this.setInitialized = resolve;
+    });
+    this.startDev();
   }
 
   getResourcesFolder(): string {
@@ -152,96 +162,183 @@ export default class FunctionsManager {
   `;
   }
 
+  restartRuntimeProcess() {
+    invariant(this.env, 'by this time env should be always be initialized');
+    const root = this.project.getRoot();
+
+    if (this.controller) {
+      this.controller.abort();
+      this.controller = undefined;
+
+      // clean up handlers
+      for (const [id, execution] of this.pendingExecutions) {
+        execution.reject(new Error(`Aborted`));
+        clearTimeout(execution.timeout);
+        this.pendingExecutions.delete(id);
+      }
+    }
+
+    let outputFile: string | undefined;
+
+    if (this.buildErrors.length <= 0) {
+      invariant(this.buildMetafile, 'esbuild settings should enable metafile');
+      const mainEntry = Object.entries(this.buildMetafile.outputs).find(
+        ([, entry]) => entry.entryPoint === 'toolpad:main.ts',
+      );
+      invariant(mainEntry, 'No output found for main entry point');
+      outputFile = mainEntry[0];
+    }
+
+    if (!outputFile) {
+      return;
+    }
+
+    this.controller = new AbortController();
+
+    const runtimeProcess = child_process.fork(`./${outputFile}`, {
+      cwd: root,
+      silent: true,
+      signal: this.controller.signal,
+      stdio: 'inherit',
+      env: {
+        ...process.env,
+        NODE_ENV: config.cmd === 'start' ? 'production' : 'development',
+        ...this.env,
+      },
+    });
+
+    this.runtimeError = undefined;
+
+    runtimeProcess.on('error', (error) => {
+      if (error.name === 'AbortError') {
+        return;
+      }
+      this.runtimeError = error;
+      console.error(`cp ${runtimeProcess.pid} error`, error);
+    });
+
+    runtimeProcess.on('exit', (code) => {
+      if (this.currentRuntimeProcess === runtimeProcess) {
+        this.currentRuntimeProcess = undefined;
+        if (code !== 0) {
+          this.runtimeError = new Error(`The runtime process exited with code ${code}`);
+          if (config.cmd === 'start') {
+            console.error(`The runtime process exited with code ${code}`);
+            process.exit(1);
+          }
+        }
+      }
+    });
+
+    runtimeProcess.on('message', (msg: MessageFromChildProcess) => {
+      switch (msg.kind) {
+        case 'result': {
+          const execution = this.pendingExecutions.get(msg.id);
+          if (execution) {
+            this.pendingExecutions.delete(msg.id);
+            clearTimeout(execution.timeout);
+            if (msg.error) {
+              execution.reject(new Error(msg.error.message || 'Unknown error'));
+            } else {
+              execution.resolve(msg.data);
+            }
+          }
+          break;
+        }
+        default:
+          console.error(`Unknown message received "${msg.kind}"`);
+      }
+    });
+
+    this.currentRuntimeProcess = runtimeProcess;
+  }
+
+  async sendMsgToRuntimeProcess(msg: MessageToChildProcess) {
+    await this.initPromise;
+    return new Promise((resolve, reject) => {
+      if (this.buildErrors.length > 0) {
+        const firstError = this.buildErrors[0];
+        reject(firstError);
+      } else if (this.runtimeError) {
+        reject(this.runtimeError);
+      } else if (this.currentRuntimeProcess) {
+        const timeout = setTimeout(() => {
+          this.pendingExecutions.delete(msg.id);
+          reject(new Error(`Timeout`));
+        }, 60000);
+        this.pendingExecutions.set(msg.id, {
+          id: msg.id,
+          resolve,
+          reject,
+          timeout,
+        });
+        this.currentRuntimeProcess.send(msg);
+      } else {
+        reject(new Error(`Toolpad local runtime is not running`));
+      }
+    });
+  }
+
   async createBuilder() {
     const root = this.project.getRoot();
 
-    // eslint-disable-next-line consistent-this
-    const that = this;
+    const createMain = async (): Promise<string> => {
+      const resourcesFolder = this.getResourcesFolder();
+      const functionFiles = await glob(this.getFunctionResourcesPattern());
 
-    let currentRuntimeProcess: child_process.ChildProcess | undefined;
-    let controller: AbortController | undefined;
-    let buildErrors: Error[] = [];
-    let runtimeError: Error | undefined;
+      const relativeResourcesFolder = path.relative(this.project.getRoot(), resourcesFolder);
 
-    let outputFile: string | undefined;
-    let metafile: esbuild.Metafile | undefined;
-    let env: Record<string, string> = await this.project.envManager.getValues();
+      const functionImports = functionFiles.map((file) => {
+        const fileName = path.relative(resourcesFolder, file);
+        const importSpec = pathToNodeImportSpecifier(
+          ['.', relativeResourcesFolder, fileName].join(path.sep),
+        );
+        const name = path.basename(fileName).replace(/\..*$/, '');
+        return `[${JSON.stringify(name)}, () => import(${JSON.stringify(importSpec)})]`;
+      });
 
-    const restartRuntimeProcess = () => {
-      if (controller) {
-        controller.abort();
-        controller = undefined;
-
-        // clean up handlers
-        for (const [id, execution] of pendingExecutions) {
-          execution.reject(new Error(`Aborted`));
-          clearTimeout(execution.timeout);
-          pendingExecutions.delete(id);
-        }
+      return `
+      import fetch, { Headers, Request, Response } from 'node-fetch'
+      import { setup } from '@mui/toolpad-core/localRuntime';
+  
+      // Polyfill fetch() in the Node.js environment
+      if (!global.fetch) {
+        global.fetch = fetch
+        global.Headers = Headers
+        global.Request = Request
+        global.Response = Response
       }
+  
+      setup({
+        functions: new Map([${functionImports.join(', ')}]),
+      })
+    `;
+    };
 
-      if (!outputFile) {
-        return;
-      }
+    const onFunctionsBuildEnd = async (args: esbuild.BuildResult<esbuild.BuildOptions>) => {
+      // TODO: use for hot reloading
+      // eslint-disable-next-line no-console
+      console.log(
+        `${chalk.green('ready')} - built functions.ts: ${args.errors.length} error(s), ${
+          args.warnings.length
+        } warning(s)`,
+      );
 
-      controller = new AbortController();
-
-      const runtimeProcess = child_process.fork(`./${outputFile}`, {
-        cwd: root,
-        silent: true,
-        signal: controller.signal,
-        stdio: 'inherit',
-        env: {
-          ...process.env,
-          NODE_ENV: config.cmd === 'start' ? 'production' : 'development',
-          ...env,
-        },
-      });
-
-      runtimeError = undefined;
-
-      runtimeProcess.on('error', (error) => {
-        if (error.name === 'AbortError') {
-          return;
+      this.buildErrors = args.errors.map((message) => {
+        let messageText = message.text;
+        if (message.location) {
+          const formattedLocation = indent(formatCodeFrame(message.location), 2);
+          messageText = [messageText, formattedLocation].join('\n');
         }
-        runtimeError = error;
-        console.error(`cp ${runtimeProcess.pid} error`, error);
+        return new Error(messageText);
       });
 
-      runtimeProcess.on('exit', (code) => {
-        if (currentRuntimeProcess === runtimeProcess) {
-          currentRuntimeProcess = undefined;
-          if (code !== 0) {
-            runtimeError = new Error(`The runtime process exited with code ${code}`);
-            if (config.cmd === 'start') {
-              console.error(`The runtime process exited with code ${code}`);
-              process.exit(1);
-            }
-          }
-        }
-      });
+      this.buildMetafile = args.metafile;
 
-      runtimeProcess.on('message', (msg: MessageFromChildProcess) => {
-        switch (msg.kind) {
-          case 'result': {
-            const execution = pendingExecutions.get(msg.id);
-            if (execution) {
-              pendingExecutions.delete(msg.id);
-              clearTimeout(execution.timeout);
-              if (msg.error) {
-                execution.reject(new Error(msg.error.message || 'Unknown error'));
-              } else {
-                execution.resolve(msg.data);
-              }
-            }
-            break;
-          }
-          default:
-            console.error(`Unknown message received "${msg.kind}"`);
-        }
-      });
+      this.restartRuntimeProcess();
+      this.project.events.emit('functionsBuildEnd', {});
 
-      currentRuntimeProcess = runtimeProcess;
+      this.setInitialized();
     };
 
     const toolpadPlugin: esbuild.Plugin = {
@@ -256,7 +353,7 @@ export default class FunctionsManager {
           if (args.path === 'main.ts') {
             return {
               loader: 'tsx',
-              contents: await that.createMain(),
+              contents: await createMain(),
               resolveDir: root,
             };
           }
@@ -265,38 +362,7 @@ export default class FunctionsManager {
         });
 
         build.onEnd((args) => {
-          // TODO: use for hot reloading
-          // eslint-disable-next-line no-console
-          console.log(
-            `${chalk.green('ready')} - built functions.ts: ${args.errors.length} error(s), ${
-              args.warnings.length
-            } warning(s)`,
-          );
-
-          buildErrors = args.errors.map((message) => {
-            let messageText = message.text;
-            if (message.location) {
-              const formattedLocation = indent(formatCodeFrame(message.location), 2);
-              messageText = [messageText, formattedLocation].join('\n');
-            }
-            return new Error(messageText);
-          });
-
-          if (buildErrors.length <= 0) {
-            metafile = args.metafile;
-            invariant(metafile, 'esbuild settings should enable metafile');
-            const mainEntry = Object.entries(metafile.outputs).find(
-              ([, entry]) => entry.entryPoint === 'toolpad:main.ts',
-            );
-            invariant(mainEntry, 'No output found for main entry point');
-            outputFile = mainEntry[0];
-
-            restartRuntimeProcess();
-          }
-
-          that.project.events.emit('functionsBuildEnd', {});
-
-          setInitialized();
+          onFunctionsBuildEnd(args);
         });
       },
     };
@@ -308,121 +374,78 @@ export default class FunctionsManager {
       write: true,
       bundle: true,
       metafile: true,
-      outdir: path.resolve(that.project.getOutputFolder(), 'functions'),
+      outdir: path.resolve(this.project.getOutputFolder(), 'functions'),
       platform: 'node',
       packages: 'external',
       target: 'es2022',
     });
 
-    async function sendRequest(msg: MessageToChildProcess) {
-      await initPromise;
-      return new Promise((resolve, reject) => {
-        if (buildErrors.length > 0) {
-          const firstError = buildErrors[0];
-          reject(firstError);
-        } else if (runtimeError) {
-          reject(runtimeError);
-        } else if (currentRuntimeProcess) {
-          const timeout = setTimeout(() => {
-            pendingExecutions.delete(msg.id);
-            reject(new Error(`Timeout`));
-          }, 60000);
-          pendingExecutions.set(msg.id, {
-            id: msg.id,
-            resolve,
-            reject,
-            timeout,
-          });
-          currentRuntimeProcess.send(msg);
-        } else {
-          reject(new Error(`Toolpad local runtime is not running`));
-        }
-      });
-    }
-
-    async function execute(name: string, parameters: Record<string, unknown>) {
-      return sendRequest({
-        kind: 'exec',
-        id: getNextId(),
-        name,
-        parameters,
-      });
-    }
-
-    async function introspect() {
-      return sendRequest({
-        kind: 'introspect',
-        id: getNextId(),
-      });
-    }
-
     let resourcesWatcher: chokidar.FSWatcher | undefined;
 
     const unsubscribers: (() => void)[] = [];
 
-    return {
-      watch() {
-        ctx.watch();
+    const dispose = async () => {
+      unsubscribers.forEach((unsubscribe) => unsubscribe());
+      await Promise.all([ctx.dispose(), this.controller?.abort(), this.unsubscribeFromEnv?.()]);
+    };
 
-        const unsubscribeEnv = that.project.events.subscribe('envChanged', async () => {
-          env = await that.project.envManager.getValues();
-          restartRuntimeProcess();
-        });
+    const watch = () => {
+      ctx.watch({});
 
-        unsubscribers.push(unsubscribeEnv);
+      // Make sure we pick up added/removed function files
+      (async () => {
+        if (resourcesWatcher) {
+          await resourcesWatcher.close();
+        }
+        const pattern = this.getFunctionResourcesPattern();
 
-        // Make sure we pick up added/removed function files
-        (async () => {
-          try {
-            if (resourcesWatcher) {
-              await resourcesWatcher.close();
-            }
-            const pattern = that.getFunctionResourcesPattern();
+        const calculateFingerPrint = async () => {
+          const functionFiles = await glob(pattern);
+          return functionFiles.join('|');
+        };
 
-            const calculateFingerPrint = async () => {
-              const functionFiles = await glob(pattern);
-              return functionFiles.join('|');
-            };
+        let fingerprint = await calculateFingerPrint();
 
-            let fingerprint = await calculateFingerPrint();
-
-            const globalResourcesFolder = path.resolve(pattern);
-            resourcesWatcher = chokidar.watch([globalResourcesFolder]);
-            resourcesWatcher.on('all', async () => {
-              const newFingerprint = await calculateFingerPrint();
-              if (fingerprint !== newFingerprint) {
-                fingerprint = newFingerprint;
-                ctx.rebuild();
-              }
-            });
-          } catch (err: unknown) {
-            if (errorFrom(err).name === 'AbortError') {
-              return;
-            }
-            throw err;
+        const globalResourcesFolder = path.resolve(pattern);
+        resourcesWatcher = chokidar.watch([globalResourcesFolder]);
+        resourcesWatcher.on('all', async () => {
+          const newFingerprint = await calculateFingerPrint();
+          if (fingerprint !== newFingerprint) {
+            fingerprint = newFingerprint;
+            ctx.rebuild();
           }
-        })();
-      },
-      introspect,
-      execute,
-      async dispose() {
-        unsubscribers.forEach((unsubscribe) => unsubscribe());
-        await Promise.all([ctx.dispose(), controller?.abort()]);
-      },
+        });
+      })();
+    };
+
+    return {
+      watch,
+      dispose,
     };
   }
 
   async startDev() {
     await this.migrateLegacy();
+    this.env = await this.project.envManager.getValues();
     const builder = await this.createBuilder();
     await builder.watch();
+
+    this.unsubscribeFromEnv = this.project.events.subscribe('envChanged', async () => {
+      this.env = await this.project.envManager.getValues();
+      this.restartRuntimeProcess();
+    });
+
     return builder;
   }
 
-  async exec(name: string, params: Record<string, unknown>) {
+  async exec(name: string, parameters: Record<string, unknown>) {
     try {
-      const builder = await this.builder;
-      const data = await builder.execute(name, params);
+      const data = await this.sendMsgToRuntimeProcess({
+        kind: 'exec',
+        id: this.getNextMsgId(),
+        name,
+        parameters,
+      });
       return { data };
     } catch (rawError) {
       return { error: serializeError(errorFrom(rawError)) };
@@ -430,8 +453,10 @@ export default class FunctionsManager {
   }
 
   async introspect() {
-    const builder = await this.builder;
-    const introspectionResult = await builder.introspect();
+    const introspectionResult = await this.sendMsgToRuntimeProcess({
+      kind: 'introspect',
+      id: this.getNextMsgId(),
+    });
     return introspectionResult;
   }
 

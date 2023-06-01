@@ -91,7 +91,7 @@ spec:
         searchParams: []
         headers: []
         method: GET
-        transform: "return `query3: Transformed ${data?.url}`"
+        transform: 'return `query3: Transformed ${data?.url}`'
         transformEnabled: true
     - name: queryWithEnv
       query:
@@ -99,7 +99,7 @@ spec:
         headers:
           - name: Authorization
             value:
-              $$env: TEST_VAR
+              $$env: TEST_ENV_VAR
         method: GET
         searchParams: []
         url: https://httpbin.org/get

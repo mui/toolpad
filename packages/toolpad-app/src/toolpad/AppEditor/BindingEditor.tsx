@@ -155,7 +155,17 @@ export function EnvBindingEditor({ value, onChange }: EnvBindingEditorProps) {
         value={value?.value || ''}
         onInputChange={handleInputChange}
         renderInput={(params) => (
-          <TextField {...params} fullWidth sx={{ my: 3 }} label="Environment variable name" />
+          <TextField
+            {...params}
+            fullWidth
+            sx={{ my: 3 }}
+            label="Environment variable name"
+            helperText={
+              value?.value && !envVarNames.includes(value.value)
+                ? 'Warning: This variable is not in your env file!'
+                : ''
+            }
+          />
         )}
       />
     </Box>

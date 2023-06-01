@@ -26,10 +26,13 @@ test.use({
       await fileReplaceAll(configFilePath, HTTPBIN_SOURCE_URL, HTTPBIN_TARGET_URL);
     },
     cmd: 'dev',
+    env: {
+      TEST_ENV_VAR: 'foo',
+    },
   },
 });
 
-test('rest basics', async ({ page, context, localApp }) => {
+test('rest basics', async ({ page, context }) => {
   const runtimeModel = new ToolpadRuntime(page);
   await runtimeModel.gotoPage('page1');
   await expect(page.locator('text="query1: query1_value"')).toBeVisible();
@@ -40,14 +43,6 @@ test('rest basics', async ({ page, context, localApp }) => {
   await expect(page.getByText('query3: Transformed')).toBeVisible();
 
   await expect(page.getByText('query4 authorization: foo')).toBeVisible();
-
-  const envFilePath = path.resolve(localApp.dir, './.env');
-  await fileReplaceAll(envFilePath, 'TEST_VAR=foo', 'TEST_VAR=bar');
-
-  // TODO: Make this reload unnecessary. The queries should be invalidated when the env file changes.
-  await page.reload();
-
-  await expect(page.getByText('query4 authorization: bar')).toBeVisible();
 
   const editorModel = new ToolpadEditor(page);
   await editorModel.goto();

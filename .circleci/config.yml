@@ -166,7 +166,6 @@ jobs:
           name: Tests real browser
           environment:
             HTTPBIN_BASEURL: 'http://localhost/'
-            TEST_ENV_VAR: 'foo'
           command: yarn test:integration
       - store_artifacts:
           path: test-results

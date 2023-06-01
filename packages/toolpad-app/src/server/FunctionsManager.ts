@@ -71,11 +71,7 @@ export default class FunctionsManager {
     this.initPromise = new Promise((resolve) => {
       this.setInitialized = resolve;
     });
-    const relativeResourcesFolder = path.relative(
-      this.project.getRoot(),
-      this.getResourcesFolder(),
-    );
-    this.devWorker = createWorker(relativeResourcesFolder, {});
+    this.devWorker = createWorker({});
     this.startDev();
   }
 
@@ -224,18 +220,14 @@ export default class FunctionsManager {
     await this.migrateLegacy();
     this.env = await this.project.envManager.getValues();
 
-    const relativeResourcesFolder = path.relative(
-      this.project.getRoot(),
-      this.getResourcesFolder(),
-    );
-    this.devWorker = createWorker(relativeResourcesFolder, this.env);
+    this.devWorker = createWorker(this.env);
 
     const builder = await this.createBuilder();
     await builder.watch();
 
     this.unsubscribeFromEnv = this.project.events.subscribe('envChanged', async () => {
       this.env = await this.project.envManager.getValues();
-      this.devWorker = createWorker(relativeResourcesFolder, this.env);
+      this.devWorker = createWorker(this.env);
     });
 
     return builder;

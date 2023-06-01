@@ -58,6 +58,12 @@ spec:
             value:
               $$jsExpression: |
                 `echo, secret: ${echo.data.secrets.bar}`
+        - component: Text
+          name: typography5
+          props:
+            value:
+              $$jsExpression: |
+                `echo, secret not in .env: ${echo.data.secrets.baz}`
     - component: PageRow
       name: pageRow5
       children:

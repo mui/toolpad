@@ -59,8 +59,6 @@ export default class FunctionsManager {
 
   private buildErrors: esbuild.Message[] = [];
 
-  private env: Record<string, string> | undefined;
-
   private devWorker: ReturnType<typeof createWorker>;
 
   private initPromise: Promise<void>;
@@ -75,7 +73,7 @@ export default class FunctionsManager {
     this.initPromise = new Promise((resolve) => {
       this.setInitialized = resolve;
     });
-    this.devWorker = createWorker({});
+    this.devWorker = createWorker({ ...process.env });
     this.startDev();
   }
 
@@ -180,18 +178,21 @@ export default class FunctionsManager {
     };
   }
 
+  async createRuntimeWorkerWithEnv() {
+    const env = await this.project.envManager.getValues();
+    this.devWorker = createWorker({ ...process.env, ...env });
+  }
+
   async startDev() {
     await this.migrateLegacy();
-    this.env = await this.project.envManager.getValues();
 
-    this.devWorker = createWorker(this.env);
+    await this.createRuntimeWorkerWithEnv();
 
     const builder = await this.createBuilder();
     await builder.watch();
 
     this.project.events.subscribe('envChanged', async () => {
-      this.env = await this.project.envManager.getValues();
-      this.devWorker = createWorker(this.env);
+      await this.createRuntimeWorkerWithEnv();
     });
   }
 

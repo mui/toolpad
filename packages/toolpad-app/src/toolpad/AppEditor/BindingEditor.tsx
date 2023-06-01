@@ -136,9 +136,7 @@ export interface EnvBindingEditorProps extends WithControlledProp<EnvAttrValue |
 export function EnvBindingEditor({ value, onChange }: EnvBindingEditorProps) {
   const { envVarNames = [] } = useBindingEditorContext();
 
-  const hasEnvVars = envVarNames.length > 0;
-
-  const handleChange = React.useCallback(
+  const handleInputChange = React.useCallback(
     (event: React.SyntheticEvent, newValue: string | null) => {
       onChange({
         type: 'env',
@@ -148,30 +146,16 @@ export function EnvBindingEditor({ value, onChange }: EnvBindingEditorProps) {
     [onChange],
   );
 
-  const helperText = React.useMemo(() => {
-    if (!hasEnvVars) {
-      return 'No environment variables available';
-    }
-
-    return null;
-  }, [hasEnvVars]);
-
   return (
     <Box sx={{ my: 1 }}>
       <Typography>Assign to an environment variable</Typography>
       <Autocomplete
+        freeSolo
         options={envVarNames}
         value={value?.value || ''}
-        onChange={handleChange}
+        onInputChange={handleInputChange}
         renderInput={(params) => (
-          <TextField
-            {...params}
-            fullWidth
-            sx={{ my: 3 }}
-            label="Select environment variable"
-            disabled={!hasEnvVars}
-            helperText={helperText}
-          />
+          <TextField {...params} fullWidth sx={{ my: 3 }} label="Environment variable name" />
         )}
       />
     </Box>

@@ -86,7 +86,7 @@ export default class FunctionsManager {
   }
 
   getFunctionResourcesPattern(): string {
-    return path.join(this.getResourcesFolder(), 'functions.ts');
+    return path.join(this.getResourcesFolder(), '*.ts');
   }
 
   private async migrateLegacy() {

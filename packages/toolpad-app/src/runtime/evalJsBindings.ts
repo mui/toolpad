@@ -1,5 +1,5 @@
 import { BindingEvaluationResult, JsRuntime } from '@mui/toolpad-core';
-import { set } from 'lodash-es';
+import { set, setWith, clone } from 'lodash-es';
 import { mapValues } from '@mui/toolpad-utils/collections';
 
 /**
@@ -261,16 +261,20 @@ export default function evalJsBindings(
             Array.isArray(value) ? `[${nestedPropName}]` : `.${nestedPropName}`
           }`;
 
-          if (results[nestedBindingId]) {
-            const updatedResultData = set(
-              resultData,
-              `value.${nestedBindingId}`.replace(bindingId, ''),
-              results[nestedBindingId],
+          const nestedBindingResultValue = results[nestedBindingId]?.value;
+          if (nestedBindingResultValue) {
+            resultData = setWith(
+              clone(resultData),
+              `value.${nestedBindingId.replace(bindingId, '')}`,
+              nestedBindingResultValue,
+              clone,
             );
-            resultData = updatedResultData;
+          } else {
+            mergeNestedBindings(
+              (value as Record<string, unknown>)[nestedPropName],
+              nestedBindingId,
+            );
           }
-
-          mergeNestedBindings((value as Record<string, unknown>)[nestedPropName], nestedBindingId);
         }
       }
     };

@@ -827,12 +827,12 @@ function parseBindings(
 
               if (bindableNestedProp.type !== 'const') {
                 parsedBindingsMap.set(nestedBindingId, parseBinding(bindableNestedProp));
+              } else {
+                parseNestedBindings(
+                  (value as Record<string, unknown>)[nestedPropName],
+                  nestedBindingId,
+                );
               }
-
-              parseNestedBindings(
-                (value as Record<string, unknown>)[nestedPropName],
-                nestedBindingId,
-              );
             }
           }
         };
@@ -840,72 +840,6 @@ function parseBindings(
         if (propValue?.value) {
           parseNestedBindings(propValue.value, bindingId);
         }
-
-        // if (propValue) {
-        //   if (Array.isArray(propValue.value)) {
-        //     for (const [index, propItem] of propValue.value.entries()) {
-        //       if (typeof propItem === 'object') {
-        //         for (const [nestedPropName, nestedProp] of Object.entries(propItem)) {
-        //           const bindableNestedProp = toBindable(nestedProp);
-
-        //           if (bindableNestedProp.type !== 'const') {
-        //             const nestedBindingId = `${bindingId}[${index}].${nestedPropName}`;
-
-        //             const propBinding = parsedBindingsMap.get(bindingId);
-        //             if (propBinding && propBinding.result?.value) {
-        //               parsedBindingsMap.set(bindingId, {
-        //                 ...propBinding,
-        //                 result: {
-        //                   ...propBinding.result,
-        //                   value: [
-        //                     ...propBinding.result.value.slice(0, index),
-        //                     {
-        //                       ...propBinding.result.value[index],
-        //                       [nestedPropName]: {
-        //                         type: 'binding',
-        //                         value: nestedBindingId,
-        //                       },
-        //                     },
-        //                     ...propBinding.result.value.slice(index + 1),
-        //                   ],
-        //                 },
-        //               });
-        //             }
-
-        //             parsedBindingsMap.set(nestedBindingId, parseBinding(bindableNestedProp));
-        //           }
-        //         }
-        //       }
-        //     }
-        //   } else if (typeof propValue.value === 'object') {
-        //     for (const [nestedPropName, nestedProp] of Object.entries(propValue.value)) {
-        //       const bindableNestedProp = toBindable(nestedProp);
-
-        //       if (bindableNestedProp.type !== 'const') {
-        //         const nestedBindingId = `${bindingId}.${nestedPropName}`;
-
-        //         const propBinding = parsedBindingsMap.get(bindingId);
-        //         if (propBinding && propBinding.result?.value) {
-        //           parsedBindingsMap.set(bindingId, {
-        //             ...propBinding,
-        //             result: {
-        //               ...propBinding.result,
-        //               value: {
-        //                 ...propBinding.result.value,
-        //                 [nestedPropName]: {
-        //                   type: 'binding',
-        //                   value: nestedBindingId,
-        //                 },
-        //               },
-        //             },
-        //           });
-        //         }
-
-        //         parsedBindingsMap.set(nestedBindingId, parseBinding(bindableNestedProp));
-        //       }
-        //     }
-        //   }
-        // }
       }
 
       if (componentId !== PAGE_ROW_COMPONENT_ID) {

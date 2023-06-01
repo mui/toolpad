@@ -1,7 +1,6 @@
 import { Emitter } from '@mui/toolpad-utils/events';
 import * as esbuild from 'esbuild';
 import * as path from 'path';
-import invariant from 'invariant';
 import { indent } from '@mui/toolpad-utils/strings';
 import * as chokidar from 'chokidar';
 import chalk from 'chalk';
@@ -34,6 +33,15 @@ function formatCodeFrame(location: esbuild.Location): string {
   ].join('\n');
 }
 
+function formatError(esbuildError: esbuild.Message): Error {
+  let messageText = esbuildError.text;
+  if (esbuildError.location) {
+    const formattedLocation = indent(formatCodeFrame(esbuildError.location), 2);
+    messageText = [messageText, formattedLocation].join('\n');
+  }
+  return new Error(messageText);
+}
+
 interface IToolpadProject {
   options: ToolpadProjectOptions;
   events: Emitter<ProjectEvents>;
@@ -49,7 +57,7 @@ export default class FunctionsManager {
 
   private buildMetafile: esbuild.Metafile | undefined;
 
-  private buildErrors: Error[] = [];
+  private buildErrors: esbuild.Message[] = [];
 
   private env: Record<string, string> | undefined;
 
@@ -92,21 +100,13 @@ export default class FunctionsManager {
     }
   }
 
-  getOutputFile(): string | undefined {
-    if (this.buildErrors.length <= 0) {
-      invariant(this.buildMetafile, 'esbuild settings should enable metafile');
-      const mainEntry = Object.entries(this.buildMetafile.outputs).find(
-        ([, entry]) => entry.entryPoint === 'toolpad:main.ts',
-      );
-      invariant(mainEntry, 'No output found for main entry point');
-      return mainEntry[0];
-    }
-    return undefined;
-  }
-
   async getFunctionFiles(): Promise<string[]> {
     const paths = await glob(this.getFunctionResourcesPattern());
     return paths.map((fullPath) => path.relative(this.project.getRoot(), fullPath));
+  }
+
+  getBuildErrorsForFile(entryPoint: string) {
+    return this.buildErrors.filter((error) => error.location?.file === entryPoint);
   }
 
   getOutputFileForEntryPoint(entryPoint: string): string | undefined {
@@ -132,14 +132,7 @@ export default class FunctionsManager {
         } warning(s)`,
       );
 
-      this.buildErrors = args.errors.map((message) => {
-        let messageText = message.text;
-        if (message.location) {
-          const formattedLocation = indent(formatCodeFrame(message.location), 2);
-          messageText = [messageText, formattedLocation].join('\n');
-        }
-        return new Error(messageText);
-      });
+      this.buildErrors = args.errors;
 
       this.buildMetafile = args.metafile;
 
@@ -176,7 +169,7 @@ export default class FunctionsManager {
       // Make sure we pick up added/removed function files
       const resourcesWatcher = chokidar.watch([this.getFunctionResourcesPattern()]);
       const handleFileAddedOrRemoved = async () => {
-        await ctx.rebuild();
+        await ctx.rebuild().catch(() => {});
       };
       resourcesWatcher.on('add', handleFileAddedOrRemoved);
       resourcesWatcher.on('unlink', handleFileAddedOrRemoved);
@@ -207,10 +200,18 @@ export default class FunctionsManager {
     const resourcesFolder = this.getResourcesFolder();
     const fullPath = path.resolve(resourcesFolder, fileName);
     const entryPoint = path.relative(this.project.getRoot(), fullPath);
+
+    const buildErrors = this.getBuildErrorsForFile(entryPoint);
+
+    if (buildErrors.length > 0) {
+      throw formatError(buildErrors[0]);
+    }
+
     const outputFilePath = this.getOutputFileForEntryPoint(entryPoint);
     if (!outputFilePath) {
       throw new Error(`No build found for "${fileName}"`);
     }
+
     return this.devWorker.execute(outputFilePath, name, parameters);
   }
 

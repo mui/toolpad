@@ -5,7 +5,6 @@ import {
   TextField,
 } from '@mui/material';
 import { createComponent } from '@mui/toolpad-core';
-import { FieldError } from 'react-hook-form';
 import * as _ from 'lodash-es';
 import { SX_PROP_HELPER_TEXT } from './constants.js';
 import { FORM_INPUT_VALIDATION_ARG_TYPES, FormInputValidationProps, useFormInput } from './Form.js';
@@ -100,7 +99,7 @@ function Autocomplete({
       {...rest}
       {...(formInputError && {
         error: Boolean(formInputError),
-        helperText: (formInputError as FieldError)?.message || '',
+        helperText: formInputError?.message || '',
       })}
     />
   );

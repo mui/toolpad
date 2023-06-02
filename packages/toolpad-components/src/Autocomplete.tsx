@@ -8,12 +8,7 @@ import { createComponent } from '@mui/toolpad-core';
 import { FieldError } from 'react-hook-form';
 import * as _ from 'lodash-es';
 import { SX_PROP_HELPER_TEXT } from './constants.js';
-import {
-  FORM_INPUT_VALIDATION_ARG_TYPES,
-  FormInputValidationProps,
-  useFormInput,
-  withComponentForm,
-} from './Form.js';
+import { FORM_INPUT_VALIDATION_ARG_TYPES, FormInputValidationProps, useFormInput } from './Form.js';
 
 type AutocompleteOption = string | { label?: string; value?: string };
 type AutocompleteValue = string | null;
@@ -27,8 +22,8 @@ interface AutocompleteProps
   value: AutocompleteValue;
   onChange: (newValue: AutocompleteValue) => void;
   options: AutocompleteOption[];
-  label: string;
   name: string;
+  label: string;
 }
 
 function Autocomplete({
@@ -44,7 +39,7 @@ function Autocomplete({
 }: AutocompleteProps) {
   const [selectedVal, setSelectedVal] = React.useState<AutocompleteOption | null>(null);
 
-  const { form, onFormInputChange, fieldError, renderFormInput } = useFormInput<string | null>({
+  const { onFormInputChange, formInputError, renderFormInput } = useFormInput<string | null>({
     name: rest.name,
     label,
     value,
@@ -103,9 +98,9 @@ function Autocomplete({
       value={selectedVal}
       renderInput={(params) => <TextField {...params} label={label} variant="outlined" />}
       {...rest}
-      {...(form && {
-        error: Boolean(fieldError),
-        helperText: (fieldError as FieldError)?.message || '',
+      {...(formInputError && {
+        error: Boolean(formInputError),
+        helperText: (formInputError as FieldError)?.message || '',
       })}
     />
   );
@@ -113,9 +108,7 @@ function Autocomplete({
   return renderFormInput(autocompleteElement);
 }
 
-const FormWrappedAutocomplete = withComponentForm(Autocomplete);
-
-export default createComponent(FormWrappedAutocomplete, {
+export default createComponent(Autocomplete, {
   layoutDirection: 'both',
   loadingProp: 'loading',
   argTypes: {

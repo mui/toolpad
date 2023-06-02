@@ -125,6 +125,51 @@ function Form({
   );
 }
 
+export default createComponent(Form, {
+  argTypes: {
+    children: {
+      type: 'element',
+      control: { type: 'layoutSlot' },
+    },
+    value: {
+      helperText: 'The value that is controlled by this text input.',
+      type: 'object',
+      default: {},
+      onChangeProp: 'onChange',
+    },
+    onSubmit: {
+      helperText: 'Add logic to be executed when the user submits the form.',
+      type: 'event',
+    },
+    formControlsAlign: {
+      type: 'string',
+      enum: ['start', 'center', 'end'],
+      default: 'end',
+      label: 'Form controls alignment',
+      control: { type: 'HorizontalAlign' },
+    },
+    formControlsFullWidth: {
+      helperText: 'Whether the form controls should occupy all available horizontal space.',
+      type: 'boolean',
+      default: false,
+    },
+    submitButtonText: {
+      helperText: 'Submit button text.',
+      type: 'string',
+      default: 'Submit',
+    },
+    hasResetButton: {
+      helperText: 'Show button to reset form values.',
+      type: 'boolean',
+      default: false,
+    },
+    sx: {
+      helperText: SX_PROP_HELPER_TEXT,
+      type: 'object',
+    },
+  },
+});
+
 export interface FormInputValidationProps {
   isRequired: boolean;
   minLength: number;
@@ -143,9 +188,8 @@ interface UseFormInputInput<V> {
 }
 
 interface UseFormInputPayload<V> {
-  form: ReturnType<typeof useForm> | null;
   onFormInputChange: (newValue: V) => void;
-  fieldError?: FieldError;
+  formInputError?: FieldError;
   renderFormInput: (element: JSX.Element) => JSX.Element;
 }
 
@@ -158,7 +202,11 @@ export function useFormInput<V>({
   defaultValue,
   validationProps,
 }: UseFormInputInput<V>): UseFormInputPayload<V> {
+  const { isRequired, minLength, maxLength, isInvalid } = validationProps;
+
   const nodeRuntime = useNode();
+
+  const { form, fieldValues } = React.useContext(FormContext);
 
   const fieldName = name || nodeRuntime?.nodeName;
   const fallbackName = React.useId();
@@ -166,11 +214,9 @@ export function useFormInput<V>({
 
   const formInputDisplayName = label || fieldName || 'Field';
 
-  const { isRequired, minLength, maxLength, isInvalid } = validationProps;
+  const formInputError = formInputName && form?.formState.errors[formInputName];
 
-  const { form, fieldValues } = React.useContext(FormContext);
-
-  const fieldError = formInputName && form?.formState.errors[formInputName];
+  const [componentFormValue, setComponentFormValue] = React.useState({});
 
   const handleFormInputChange = React.useCallback(
     (newValue: V) => {
@@ -259,41 +305,31 @@ export function useFormInput<V>({
           render={() => element}
         />
       ) : (
-        element
+        <Form
+          value={componentFormValue}
+          onChange={setComponentFormValue}
+          mode="onBlur"
+          hasChrome={false}
+        >
+          {element}
+        </Form>
       ),
-    [form, formInputDisplayName, formInputName, isInvalid, isRequired, maxLength, minLength],
+    [
+      componentFormValue,
+      form,
+      formInputDisplayName,
+      formInputName,
+      isInvalid,
+      isRequired,
+      maxLength,
+      minLength,
+    ],
   );
 
   return {
-    form,
     onFormInputChange: handleFormInputChange,
-    fieldError,
+    formInputError,
     renderFormInput,
-  };
-}
-
-export function withComponentForm<P extends Record<string, any>>(
-  InputComponent: React.ComponentType<P>,
-) {
-  return function ComponentWithForm(props: P) {
-    const { form } = React.useContext(FormContext);
-
-    const [componentFormValue, setComponentFormValue] = React.useState({});
-
-    const inputElement = <InputComponent {...props} />;
-
-    return form ? (
-      inputElement
-    ) : (
-      <Form
-        value={componentFormValue}
-        onChange={setComponentFormValue}
-        mode="onBlur"
-        hasChrome={false}
-      >
-        {inputElement}
-      </Form>
-    );
   };
 }
 
@@ -327,48 +363,3 @@ export const FORM_INPUT_VALIDATION_ARG_TYPES = {
     category: 'validation',
   },
 };
-
-export default createComponent(Form, {
-  argTypes: {
-    children: {
-      type: 'element',
-      control: { type: 'layoutSlot' },
-    },
-    value: {
-      helperText: 'The value that is controlled by this text input.',
-      type: 'object',
-      default: {},
-      onChangeProp: 'onChange',
-    },
-    onSubmit: {
-      helperText: 'Add logic to be executed when the user submits the form.',
-      type: 'event',
-    },
-    formControlsAlign: {
-      type: 'string',
-      enum: ['start', 'center', 'end'],
-      default: 'end',
-      label: 'Form controls alignment',
-      control: { type: 'HorizontalAlign' },
-    },
-    formControlsFullWidth: {
-      helperText: 'Whether the form controls should occupy all available horizontal space.',
-      type: 'boolean',
-      default: false,
-    },
-    submitButtonText: {
-      helperText: 'Submit button text.',
-      type: 'string',
-      default: 'Submit',
-    },
-    hasResetButton: {
-      helperText: 'Show button to reset form values.',
-      type: 'boolean',
-      default: false,
-    },
-    sx: {
-      helperText: SX_PROP_HELPER_TEXT,
-      type: 'object',
-    },
-  },
-});

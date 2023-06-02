@@ -24,7 +24,7 @@ export function updateOrCreate<T>(dest: T | null | undefined, src: NonNullable<T
 }
 
 /**
- * Updates an objects' property value for a given path in an immutable way.
+ * Updates an object's property value for a given path in an immutable way.
  */
 export function updatePath<P extends object, V>(obj: P, path: string, value: V): P {
   return setWith(clone(obj), path, value, clone);

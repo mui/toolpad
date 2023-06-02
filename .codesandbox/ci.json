@@ -1,0 +1,13 @@
+{
+  "buildCommand": "release:build",
+  "installCommand": "yarn install",
+  "node": "16.4",
+  "packages": [
+    "packages/create-toolpad-app",
+    "packages/toolpad",
+    "packages/toolpad-app",
+    "packages/toolpad-core",
+    "packages/toolpad-components",
+    "packages/toolpad-utils"
+  ]
+}

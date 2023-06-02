@@ -9,7 +9,7 @@ import * as fs from 'fs/promises';
 import EnvManager from './EnvManager';
 import { ProjectEvents, ToolpadProjectOptions } from '../types';
 import { writeFileRecursive, fileExists } from '../utils/fs';
-import { createWorker } from './functionsDevWorker';
+import { createWorker as createDevWorker } from './functionsDevWorker';
 
 const DEFAULT_FUNCTIONS_FILE_CONTENT = `// Toolpad queries:
 
@@ -59,7 +59,7 @@ export default class FunctionsManager {
 
   private buildErrors: esbuild.Message[] = [];
 
-  private devWorker: ReturnType<typeof createWorker>;
+  private devWorker: ReturnType<typeof createDevWorker>;
 
   private initPromise: Promise<void>;
 
@@ -73,7 +73,7 @@ export default class FunctionsManager {
     this.initPromise = new Promise((resolve) => {
       this.setInitialized = resolve;
     });
-    this.devWorker = createWorker({ ...process.env });
+    this.devWorker = createDevWorker({ ...process.env });
     this.startDev();
   }
 
@@ -180,7 +180,7 @@ export default class FunctionsManager {
 
   async createRuntimeWorkerWithEnv() {
     const env = await this.project.envManager.getValues();
-    this.devWorker = createWorker({ ...process.env, ...env });
+    this.devWorker = createDevWorker({ ...process.env, ...env });
   }
 
   async startDev() {

@@ -125,7 +125,22 @@ export default createComponent(FormWrappedSelect, {
     options: {
       helperText: 'The available options to select from.',
       type: 'array',
-      schema: '/schemas/SelectOptions.json',
+      schema: {
+        type: 'array',
+        items: {
+          type: ['object', 'string'],
+          additionalProperties: true,
+          properties: {
+            value: {
+              type: 'string',
+            },
+            label: {
+              type: 'string',
+            },
+          },
+          required: ['value'],
+        },
+      },
       default: [],
       control: { type: 'SelectOptions' },
     },

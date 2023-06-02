@@ -5,7 +5,7 @@ import {
   getToolpadComponents,
   ToolpadComponentDefinition,
   ToolpadComponentDefinitions,
-} from '../../toolpadComponents';
+} from '../../runtime/toolpadComponents';
 
 export function useToolpadComponents(dom: appDom.AppDom): ToolpadComponentDefinitions {
   return React.useMemo(() => getToolpadComponents(dom), [dom]);

@@ -24,7 +24,7 @@ import {
   PAGE_COLUMN_COMPONENT_ID,
   isFormComponent,
   FORM_COMPONENT_ID,
-} from '../../../../toolpadComponents';
+} from '../../../../runtime/toolpadComponents';
 import {
   getRectanglePointActiveEdge,
   isHorizontalFlow,

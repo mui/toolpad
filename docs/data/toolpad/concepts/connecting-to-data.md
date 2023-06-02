@@ -156,7 +156,7 @@ To be really useful, you need to connect these queries with data present on your
 
 You can set the **mode** of the query to either be automatically refetched on page load, or only be called on manual action.
 
-{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/concepts/connecting-to-data/mode-query.gif", "alt": "Query mode", "caption": "Setting the query mode", "indent": 1 }}
+{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/concepts/connecting-to-data/mode-query.gif", "alt": "Query mode", "caption": "Setting the query mode", "indent": 1, "aspectRatio": 6}}
 
 - ### Automatic
 

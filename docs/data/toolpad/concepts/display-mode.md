@@ -23,7 +23,7 @@ You can override this setting for any page using the `toolpad-display` query par
 - `?toolpad-display=shell` - Same as App shell mode.
 - `?toolpad-display=standalone` - Same as No shell mode.
 
-{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/concepts/display-mode/display-mode-override.gif", "alt": "No shell display mode ", "caption": "Page with display mode set to No shell", "indent": 1}}
+{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/concepts/display-mode/display-mode-override.png", "alt": "No shell display mode ", "caption": "Overriding the display mode", "indent": 1}}
 
 :::info
 See the how-to guide on [how to embed Toolpad pages](/toolpad/how-to-guides/embed-pages/) using the display mode property.

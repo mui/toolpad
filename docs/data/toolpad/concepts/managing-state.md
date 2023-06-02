@@ -48,7 +48,7 @@ Event handler props can be bound to either a JavaScript expression action or a N
 
 {{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/concepts/managing-state/navigation-action.png", "alt": "onClick navigation ", "caption": "Navigation on click (1/2)", "indent": 1}}
 
-{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/concepts/managing-state/navigate.gif", "alt": "onClick navigation ", "caption": "Navigation on click (2/2)", "indent": 1}}
+{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/concepts/managing-state/navigate.gif", "alt": "onClick navigation ", "caption": "Navigation on click (2/2)", "indent": 1, "aspectRatio": 2.5 }}
 
 ## Page parameters
 
@@ -72,4 +72,4 @@ The parameters that you add are made available in the **scope** for data binding
 
 The value that the parameter assumes at runtime is the value that is passed in through a URL query parameter.
 
-{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/concepts/managing-state/page-parameters-showcase.png", "alt": "Page parameters on runtime", "caption": "Runtime value passed in through a URL query parameter " }}
+{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/concepts/managing-state/page-parameters-showcase.png", "alt": "Page parameters on runtime", "caption": "Runtime value passed in through a URL query parameter ", "aspectRatio": 2.7 }}

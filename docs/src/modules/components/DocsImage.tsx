@@ -13,6 +13,7 @@ interface DocsImageProps {
   caption?: string;
   zoom?: boolean;
   indent?: number;
+  aspectRatio?: number;
 }
 
 interface ImageViewerProps {
@@ -22,11 +23,12 @@ interface ImageViewerProps {
   handleClose: () => void;
 }
 
-const Img = styled('img')<DocsImageProps>(({ theme, zoom, indent }) => ({
+const Img = styled('img')<DocsImageProps>(({ theme, zoom, indent, aspectRatio }) => ({
   border: `1px solid ${theme.palette.divider}`,
   width: '-webkit-fill-available',
   display: 'block',
   position: 'relative',
+  aspectRatio: aspectRatio ?? zoom === false ? 'unset' : '1.80904522613', // 1440 / 796
   marginTop: theme.spacing(3),
   marginLeft: indent ? theme.spacing(5 * indent) : 'auto',
   marginBottom: 0,
@@ -35,6 +37,11 @@ const Img = styled('img')<DocsImageProps>(({ theme, zoom, indent }) => ({
   borderRadius: 4,
   maxWidth: zoom === false ? 'min(50vw, 500px)' : 'unset',
   cursor: zoom ? 'zoom-in' : 'initial',
+  '&:hover': {
+    '& ~ div': {
+      opacity: 1,
+    },
+  },
 }));
 
 const ImageCaption = styled('p')<Pick<DocsImageProps, 'indent'>>(({ theme, indent }) => ({
@@ -49,6 +56,27 @@ const ImageCaption = styled('p')<Pick<DocsImageProps, 'indent'>>(({ theme, inden
     color: 'inherit',
     textDecoration: 'underline',
   },
+}));
+
+const ImageExpand = styled('div')(({ theme }) => ({
+  display: 'flex',
+  justifyContent: 'center',
+  alignItems: 'center',
+  position: 'absolute',
+  top: theme.spacing(2),
+  right: theme.spacing(2),
+  width: theme.typography.pxToRem(32),
+  height: theme.typography.pxToRem(32),
+  borderRadius: theme.shape.borderRadius,
+  backgroundColor: theme.palette.mode === 'dark' ? 'rgba(0,0,0,0.8)' : 'rgba(255,255,255,0.5)',
+  cursor: 'pointer',
+  transition: 'all 0.2s ease-in-out',
+  '&:hover': {
+    opacity: 1,
+    backgroundColor: theme.palette.mode === 'dark' ? 'rgba(0,0,0,1)' : 'rgba(255,255,255,0.7)',
+  },
+  opacity: 0,
+  zIndex: 10,
 }));
 
 function ImageViewer({ open, src, alt, handleClose }: ImageViewerProps) {
@@ -75,7 +103,7 @@ function ImageViewer({ open, src, alt, handleClose }: ImageViewerProps) {
 }
 
 export default function DocsImage(props: DocsImageProps) {
-  const { src, alt, caption, zoom = true, indent = 0 } = props;
+  const { src, alt, caption, zoom = true, indent = 0, aspectRatio } = props;
   const [open, setOpen] = React.useState(false);
 
   const handleClick = React.useCallback(() => {
@@ -92,7 +120,34 @@ export default function DocsImage(props: DocsImageProps) {
   return (
     <React.Fragment>
       <Root>
-        <Img src={src} alt={alt} zoom={zoom} indent={indent} onClick={handleClick} />
+        <Img
+          src={src}
+          alt={alt}
+          zoom={zoom}
+          indent={indent}
+          onClick={handleClick}
+          aspectRatio={aspectRatio}
+        />
+        {zoom ? (
+          <ImageExpand onClick={handleClick}>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="#FFFFFF"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <polyline points="15 3 21 3 21 9" />
+              <polyline points="9 21 3 21 3 15" />
+              <line x1="21" x2="14" y1="3" y2="10" />
+              <line x1="3" x2="10" y1="21" y2="14" />
+            </svg>
+          </ImageExpand>
+        ) : null}
         <ImageCaption indent={indent}>{caption}</ImageCaption>
       </Root>
       <ImageViewer open={open} src={src} alt={alt} handleClose={handleViewerClose} />

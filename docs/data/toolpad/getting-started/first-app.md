@@ -44,7 +44,9 @@ Interactive walkthrough of the app building process:
 
    The Toolpad application editor opens automatically in your browser.
 
-   > Refer the [installation](/toolpad/getting-started/installation/) docs for more details on installing.
+   :::info
+   Refer the [installation](/toolpad/getting-started/installation/) docs for more details on installing.
+   :::
 
 ### Assemble the UI
 

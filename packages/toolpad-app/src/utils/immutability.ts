@@ -38,10 +38,17 @@ export function insert<T>(array: readonly T[], value: T, index: number): T[] {
 }
 
 /**
+ * Updates a value in an immutable array.
+ */
+export function updateArray<T>(array: readonly T[], value: T, index: number): T[] {
+  return [...array.slice(0, index), value, ...array.slice(index + 1)];
+}
+
+/**
  * Removes a value in an immutable array.
  */
 export function remove<T>(array: readonly T[], index: number): T[] {
-  return [...array.slice(0, index), ...array.slice(index)];
+  return [...array.slice(0, index), ...array.slice(index + 1)];
 }
 
 /**

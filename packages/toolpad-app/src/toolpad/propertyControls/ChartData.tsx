@@ -24,8 +24,8 @@ import { useDom, useDomApi } from '../AppState';
 
 // eslint-disable-next-line import/no-cycle
 import BindableEditor from '../AppEditor/PageEditor/BindableEditor';
-import { fromBindable } from '../../bindings';
-import { insert, remove } from '../../utils/immutability';
+import { fromBindable, toBindable } from '../../bindings';
+import { updateArray, remove } from '../../utils/immutability';
 
 function ChartDataPropEditor({
   nodeId,
@@ -86,10 +86,14 @@ function ChartDataPropEditor({
         domApi.update((draft) =>
           appDom.setNodeNamespacedProp(draft, node, 'props', 'data', {
             type: 'const',
-            value: insert(previousData, index, {
-              ...previousData[index],
-              data: newValue ? fromBindable(newValue) : [],
-            }),
+            value: updateArray(
+              previousData,
+              {
+                ...previousData[index],
+                data: newValue ? fromBindable(newValue) : [],
+              },
+              index,
+            ),
           }),
         );
       }

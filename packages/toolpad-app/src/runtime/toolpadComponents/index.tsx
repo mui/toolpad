@@ -39,7 +39,6 @@ export const INTERNAL_COMPONENTS = new Map<string, ToolpadComponentDefinition>([
   ],
   ['Image', { displayName: 'Image', builtIn: 'Image' }],
   ['DataGrid', { displayName: 'Data Grid', builtIn: 'DataGrid' }],
-  ['Chart', { displayName: 'Chart', builtIn: 'Chart' }],
   ['TextField', { displayName: 'Text Field', builtIn: 'TextField' }],
   ['DatePicker', { displayName: 'Date Picker', builtIn: 'DatePicker' }],
   ['FilePicker', { displayName: 'File Picker', builtIn: 'FilePicker' }],

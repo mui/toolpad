@@ -9,10 +9,9 @@ import {
 } from '@mui/toolpad-core';
 import { WithControlledProp } from '../../../utils/types';
 
-/* eslint-disable import/no-cycle */
 import { getDefaultControl } from '../../propertyControls';
+// eslint-disable-next-line import/no-cycle
 import { BindingEditor } from '../BindingEditor';
-/* eslint-enable import/no-cycle */
 
 function renderDefaultControl(params: RenderControlParams<any>) {
   const Control = getDefaultControl(params.propType);

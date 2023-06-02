@@ -80,6 +80,7 @@ import { CanvasHooksContext, NavigateToPage } from './CanvasHooksContext';
 import AppNavigation from './AppNavigation';
 import PreviewHeader from './PreviewHeader';
 import { BridgeContext } from '../canvas/BridgeContext';
+import { toBindable } from '../bindings';
 
 const isPreview = process.env.NODE_ENV !== 'production';
 const isRenderedInCanvas =
@@ -737,19 +738,6 @@ function parseBinding(
     scopePath,
     result: { value: undefined },
   };
-}
-
-// @TODO: This is a copy from the function in `src/server/localMode` - should it be a shared utility?
-function toBindable<V>(
-  value: V | { $$jsExpression: string } | { $$env: string },
-): BindableAttrValue<V> {
-  if (value && typeof value === 'object' && typeof (value as any).$$jsExpression === 'string') {
-    return { type: 'jsExpression', value: (value as any).$$jsExpression };
-  }
-  if (value && typeof value === 'object' && typeof (value as any).$$env === 'string') {
-    return { type: 'env', value: (value as any).$$env };
-  }
-  return { type: 'const', value: value as V };
 }
 
 function parseBindings(

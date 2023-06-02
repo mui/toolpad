@@ -1,6 +1,7 @@
 import { BindingEvaluationResult, JsRuntime } from '@mui/toolpad-core';
-import { set, setWith, clone } from 'lodash-es';
+import { set } from 'lodash-es';
 import { mapValues } from '@mui/toolpad-utils/collections';
+import { updatePath } from '../utils/immutability';
 
 /**
  * Represents the state of a binding. It both describes which place it takes in the gobal scope
@@ -113,19 +114,6 @@ export function buildGlobalScope(
     }
   }
   return globalScope;
-}
-
-// @TODO: This is a copy from the function in `src/server/localMode` - should it be a shared utility?
-function toBindable<V>(
-  value: V | { $$jsExpression: string } | { $$env: string },
-): BindableAttrValue<V> {
-  if (value && typeof value === 'object' && typeof (value as any).$$jsExpression === 'string') {
-    return { type: 'jsExpression', value: (value as any).$$jsExpression };
-  }
-  if (value && typeof value === 'object' && typeof (value as any).$$env === 'string') {
-    return { type: 'env', value: (value as any).$$env };
-  }
-  return { type: 'const', value: value as V };
 }
 
 /**
@@ -252,7 +240,7 @@ export default function evalJsBindings(
   return mapValues(bindings, (binding, bindingId) => {
     const { scopePath } = binding;
 
-    let resultData = results[bindingId];
+    let bindingResult = results[bindingId];
 
     const mergeNestedBindings = (value: unknown, parentBindingId: string) => {
       if (value && typeof value === 'object') {
@@ -263,11 +251,10 @@ export default function evalJsBindings(
 
           const nestedBindingResultValue = results[nestedBindingId]?.value;
           if (nestedBindingResultValue) {
-            resultData = setWith(
-              clone(resultData),
+            bindingResult = updatePath(
+              bindingResult,
               `value.${nestedBindingId.replace(bindingId, '')}`,
               nestedBindingResultValue,
-              clone,
             );
           } else {
             mergeNestedBindings(
@@ -279,15 +266,15 @@ export default function evalJsBindings(
       }
     };
 
-    if (resultData.value) {
-      mergeNestedBindings(resultData.value, bindingId);
+    if (bindingResult.value) {
+      mergeNestedBindings(bindingResult.value, bindingId);
     }
 
     return {
       scopePath,
       dependencies: Array.from(flatDependencies.get(bindingId) ?? []),
       result: {
-        ...resultData,
+        ...bindingResult,
         error: bubbleError(flatDependencies, results, bindingId),
         loading: bubbleLoading(flatDependencies, results, bindingId),
       },

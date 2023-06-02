@@ -48,6 +48,7 @@ import {
   ResponseType as AppDomRestResponseType,
 } from '../toolpadDataSources/rest/types';
 import { LocalQuery } from '../toolpadDataSources/local/types';
+import { fromBindable, toBindable } from '../bindings';
 
 export function getUserProjectRoot(): string {
   const { projectDir } = config;
@@ -383,31 +384,6 @@ function mergeThemeIntoAppDom(dom: appDom.AppDom, themeFile: Theme): appDom.AppD
     'themes',
   );
   return dom;
-}
-
-function toBindable<V>(
-  value: V | { $$jsExpression: string } | { $$env: string },
-): BindableAttrValue<V> {
-  if (value && typeof value === 'object' && typeof (value as any).$$jsExpression === 'string') {
-    return { type: 'jsExpression', value: (value as any).$$jsExpression };
-  }
-  if (value && typeof value === 'object' && typeof (value as any).$$env === 'string') {
-    return { type: 'env', value: (value as any).$$env };
-  }
-  return { type: 'const', value: value as V };
-}
-
-function fromBindable<V>(bindable: BindableAttrValue<V>) {
-  switch (bindable.type) {
-    case 'const':
-      return bindable.value;
-    case 'jsExpression':
-      return { $$jsExpression: bindable.value };
-    case 'env':
-      return { $$env: bindable.value };
-    default:
-      throw new Error(`Unsupported bindable "${bindable.type}"`);
-  }
 }
 
 function toBindableProp<V>(

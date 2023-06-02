@@ -24,33 +24,8 @@ import { useDom, useDomApi } from '../AppState';
 
 // eslint-disable-next-line import/no-cycle
 import BindableEditor from '../AppEditor/PageEditor/BindableEditor';
-
-// @TODO: This is a copy from the function in `src/server/localMode` - should it be a shared utility?
-function toBindable<V>(
-  value: V | { $$jsExpression: string } | { $$env: string },
-): BindableAttrValue<V> {
-  if (value && typeof value === 'object' && typeof (value as any).$$jsExpression === 'string') {
-    return { type: 'jsExpression', value: (value as any).$$jsExpression };
-  }
-  if (value && typeof value === 'object' && typeof (value as any).$$env === 'string') {
-    return { type: 'env', value: (value as any).$$env };
-  }
-  return { type: 'const', value: value as V };
-}
-
-// @TODO: This is a copy from the function in `src/server/localMode` - should it be a shared utility?
-function fromBindable<V>(bindable: BindableAttrValue<V>) {
-  switch (bindable.type) {
-    case 'const':
-      return bindable.value;
-    case 'jsExpression':
-      return { $$jsExpression: bindable.value };
-    case 'env':
-      return { $$env: bindable.value };
-    default:
-      throw new Error(`Unsupported bindable "${bindable.type}"`);
-  }
-}
+import { fromBindable } from '../../bindings';
+import { insert, remove } from '../../utils/immutability';
 
 function ChartDataPropEditor({
   nodeId,
@@ -91,7 +66,7 @@ function ChartDataPropEditor({
 
   const handleRemoveDataSeries = React.useCallback(
     (index: number) => () => {
-      onChange([...value.slice(0, index), ...value.slice(index + 1)]);
+      onChange(remove(value, index));
     },
     [onChange, value],
   );
@@ -111,11 +86,10 @@ function ChartDataPropEditor({
         domApi.update((draft) =>
           appDom.setNodeNamespacedProp(draft, node, 'props', 'data', {
             type: 'const',
-            value: [
-              ...previousData.slice(0, index),
-              { ...previousData[index], data: newValue ? fromBindable(newValue) : [] },
-              ...previousData.slice(index + 1),
-            ],
+            value: insert(previousData, index, {
+              ...previousData[index],
+              data: newValue ? fromBindable(newValue) : [],
+            }),
           }),
         );
       }

@@ -1,8 +1,8 @@
 import * as React from 'react';
 import { Container, ContainerProps, Box, Stack, BoxProps } from '@mui/material';
 import { LoadingButton } from '@mui/lab';
-import { createComponent } from '@mui/toolpad-core';
-import { useForm, FieldValues, ValidationMode } from 'react-hook-form';
+import { createComponent, useNode } from '@mui/toolpad-core';
+import { useForm, FieldValues, ValidationMode, FieldError } from 'react-hook-form';
 import * as _ from 'lodash-es';
 import { SX_PROP_HELPER_TEXT } from './constants.js';
 
@@ -127,6 +127,7 @@ function Form({
 
 interface UseFormInputInput<V> {
   name: string;
+  label?: string;
   value?: V;
   onChange: (newValue: V) => void;
   emptyValue?: V;
@@ -135,18 +136,33 @@ interface UseFormInputInput<V> {
 }
 
 interface UseFormInputPayload<V> {
+  form: ReturnType<typeof useForm> | null;
+  formInputName: string;
+  formInputDisplayName: string;
   onFormInputChange: (newValue: V) => void;
+  fieldError?: FieldError;
 }
 
 export function useFormInput<V>({
   name,
+  label,
   value,
   onChange,
   emptyValue,
   defaultValue,
   validationProps,
 }: UseFormInputInput<V>): UseFormInputPayload<V> {
+  const nodeRuntime = useNode();
+
+  const fieldName = name || nodeRuntime?.nodeName;
+  const fallbackName = React.useId();
+  const formInputName = fieldName || fallbackName;
+
+  const formInputDisplayName = label || fieldName || 'Field';
+
   const { form, fieldValues } = React.useContext(FormContext);
+
+  const fieldError = formInputName && form?.formState.errors[formInputName];
 
   const handleFormInputChange = React.useCallback(
     (newValue: V) => {
@@ -156,8 +172,8 @@ export function useFormInput<V>({
           shouldDirty: true,
           shouldTouch: true,
         });
-        onChange(newValue);
       }
+      onChange(newValue);
     },
     [form, name, onChange],
   );
@@ -207,7 +223,11 @@ export function useFormInput<V>({
   }, [form, name, validationProps]);
 
   return {
+    form,
+    formInputName,
+    formInputDisplayName,
     onFormInputChange: handleFormInputChange,
+    fieldError,
   };
 }
 

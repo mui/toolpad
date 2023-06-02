@@ -4,10 +4,10 @@ import {
   AutocompleteProps as MuiAutocompleteProps,
   TextField,
 } from '@mui/material';
-import { createComponent, useNode } from '@mui/toolpad-core';
+import { createComponent } from '@mui/toolpad-core';
 import { FieldError, Controller } from 'react-hook-form';
 import { SX_PROP_HELPER_TEXT } from './constants.js';
-import { FormContext, useFormInput, withComponentForm } from './Form.js';
+import { useFormInput, withComponentForm } from './Form.js';
 
 type AutocompleteOption = string | { label?: string; value?: string };
 type AutocompleteValue = string | null;
@@ -41,23 +41,16 @@ function Autocomplete({
 }: AutocompleteProps) {
   const [selectedVal, setSelectedVal] = React.useState<AutocompleteOption | null>(null);
 
-  const nodeRuntime = useNode();
-
-  const fieldName = rest.name || nodeRuntime?.nodeName;
-
-  const fallbackName = React.useId();
-  const nodeName = fieldName || fallbackName;
-
-  const { form } = React.useContext(FormContext);
-  const fieldError = nodeName && form?.formState.errors[nodeName];
-
   const validationProps = React.useMemo(
     () => ({ isRequired, minLength, maxLength, isInvalid }),
     [isInvalid, isRequired, maxLength, minLength],
   );
 
-  const { onFormInputChange } = useFormInput<string | null>({
-    name: nodeName,
+  const { form, formInputName, formInputDisplayName, onFormInputChange, fieldError } = useFormInput<
+    string | null
+  >({
+    name: rest.name,
+    label,
     value,
     onChange,
     emptyValue: null,
@@ -93,16 +86,10 @@ function Autocomplete({
   const handleChange = React.useCallback(
     (event: React.SyntheticEvent<Element>, selection: AutocompleteOption | null) => {
       const newValue: AutocompleteValue = getValue(selection);
-
-      if (form) {
-        onFormInputChange(newValue);
-      } else {
-        onChange(newValue);
-      }
-
+      onFormInputChange(newValue);
       setSelectedVal(selection);
     },
-    [getValue, form, onFormInputChange, onChange],
+    [getValue, onFormInputChange],
   );
 
   React.useEffect(() => {
@@ -127,27 +114,25 @@ function Autocomplete({
     />
   );
 
-  const fieldDisplayName = label || fieldName || 'Field';
-
-  return form && nodeName ? (
+  return form ? (
     <Controller
-      name={nodeName}
+      name={formInputName}
       control={form.control}
       rules={{
-        required: isRequired ? `${fieldDisplayName} is required.` : false,
+        required: isRequired ? `${formInputDisplayName} is required.` : false,
         minLength: minLength
           ? {
               value: minLength,
-              message: `${fieldDisplayName} must have at least ${minLength} characters.`,
+              message: `${formInputDisplayName} must have at least ${minLength} characters.`,
             }
           : undefined,
         maxLength: maxLength
           ? {
               value: maxLength,
-              message: `${fieldDisplayName} must have no more than ${maxLength} characters.`,
+              message: `${formInputDisplayName} must have no more than ${maxLength} characters.`,
             }
           : undefined,
-        validate: () => !isInvalid || `${fieldDisplayName} is invalid.`,
+        validate: () => !isInvalid || `${formInputDisplayName} is invalid.`,
       }}
       render={() => autocompleteElement}
     />

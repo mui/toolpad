@@ -4,8 +4,10 @@ import {
   AutocompleteProps as MuiAutocompleteProps,
   TextField,
 } from '@mui/material';
-import { createComponent } from '@mui/toolpad-core';
+import { createComponent, useNode } from '@mui/toolpad-core';
+import { FieldError, Controller } from 'react-hook-form';
 import { SX_PROP_HELPER_TEXT } from './constants.js';
+import { FormContext, useFormInput, withComponentForm } from './Form.js';
 
 type AutocompleteOption = string | { label?: string; value?: string };
 type AutocompleteValue = string | null;
@@ -19,10 +21,48 @@ interface AutocompleteProps
   onChange: (newValue: AutocompleteValue) => void;
   options: AutocompleteOption[];
   label: string;
+  name: string;
+  isRequired: boolean;
+  minLength: number;
+  maxLength: number;
+  isInvalid: boolean;
 }
 
-function Autocomplete({ options, label, onChange, value, ...rest }: AutocompleteProps) {
+function Autocomplete({
+  options,
+  label,
+  onChange,
+  value,
+  isRequired,
+  minLength,
+  maxLength,
+  isInvalid,
+  ...rest
+}: AutocompleteProps) {
   const [selectedVal, setSelectedVal] = React.useState<AutocompleteOption | null>(null);
+
+  const nodeRuntime = useNode();
+
+  const fieldName = rest.name || nodeRuntime?.nodeName;
+
+  const fallbackName = React.useId();
+  const nodeName = fieldName || fallbackName;
+
+  const { form } = React.useContext(FormContext);
+  const fieldError = nodeName && form?.formState.errors[nodeName];
+
+  const validationProps = React.useMemo(
+    () => ({ isRequired, minLength, maxLength, isInvalid }),
+    [isInvalid, isRequired, maxLength, minLength],
+  );
+
+  const { onFormInputChange } = useFormInput<string | null>({
+    name: nodeName,
+    value,
+    onChange,
+    emptyValue: null,
+    validationProps,
+  });
 
   const getValue = React.useCallback((selection: AutocompleteOption | null): AutocompleteValue => {
     if (!selection) {
@@ -53,12 +93,25 @@ function Autocomplete({ options, label, onChange, value, ...rest }: Autocomplete
   const handleChange = React.useCallback(
     (event: React.SyntheticEvent<Element>, selection: AutocompleteOption | null) => {
       const newValue: AutocompleteValue = getValue(selection);
-      onChange(newValue);
+
+      if (form) {
+        onFormInputChange(newValue);
+      } else {
+        onChange(newValue);
+      }
+
       setSelectedVal(selection);
     },
-    [onChange, getValue],
+    [getValue, form, onFormInputChange, onChange],
   );
-  return (
+
+  React.useEffect(() => {
+    if (!value) {
+      setSelectedVal(null);
+    }
+  }, [value]);
+
+  const autocompleteElement = (
     <MuiAutocomplete
       onChange={handleChange}
       options={options ?? []}
@@ -67,11 +120,45 @@ function Autocomplete({ options, label, onChange, value, ...rest }: Autocomplete
       value={selectedVal}
       renderInput={(params) => <TextField {...params} label={label} variant="outlined" />}
       {...rest}
+      {...(form && {
+        error: Boolean(fieldError),
+        helperText: (fieldError as FieldError)?.message || '',
+      })}
     />
+  );
+
+  const fieldDisplayName = label || fieldName || 'Field';
+
+  return form && nodeName ? (
+    <Controller
+      name={nodeName}
+      control={form.control}
+      rules={{
+        required: isRequired ? `${fieldDisplayName} is required.` : false,
+        minLength: minLength
+          ? {
+              value: minLength,
+              message: `${fieldDisplayName} must have at least ${minLength} characters.`,
+            }
+          : undefined,
+        maxLength: maxLength
+          ? {
+              value: maxLength,
+              message: `${fieldDisplayName} must have no more than ${maxLength} characters.`,
+            }
+          : undefined,
+        validate: () => !isInvalid || `${fieldDisplayName} is invalid.`,
+      }}
+      render={() => autocompleteElement}
+    />
+  ) : (
+    autocompleteElement
   );
 }
 
-export default createComponent(Autocomplete, {
+const FormWrappedAutocomplete = withComponentForm(Autocomplete);
+
+export default createComponent(FormWrappedAutocomplete, {
   layoutDirection: 'both',
   loadingProp: 'loading',
   argTypes: {
@@ -112,6 +199,34 @@ export default createComponent(Autocomplete, {
     disabled: {
       helperText: 'If true, the autocomplete will be disabled.',
       type: 'boolean',
+    },
+    isRequired: {
+      helperText: 'Whether the input is required to have a value.',
+      type: 'boolean',
+      default: false,
+      category: 'validation',
+    },
+    minLength: {
+      helperText: 'Minimum value length.',
+      type: 'number',
+      minimum: 0,
+      maximum: 512,
+      default: 0,
+      category: 'validation',
+    },
+    maxLength: {
+      helperText: 'Maximum value length.',
+      type: 'number',
+      minimum: 0,
+      maximum: 512,
+      default: 0,
+      category: 'validation',
+    },
+    isInvalid: {
+      helperText: 'Whether the input value is invalid.',
+      type: 'boolean',
+      default: false,
+      category: 'validation',
     },
     sx: {
       helperText: SX_PROP_HELPER_TEXT,

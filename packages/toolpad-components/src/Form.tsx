@@ -2,7 +2,7 @@ import * as React from 'react';
 import { Container, ContainerProps, Box, Stack, BoxProps } from '@mui/material';
 import { LoadingButton } from '@mui/lab';
 import { createComponent, useNode } from '@mui/toolpad-core';
-import { useForm, FieldValues, ValidationMode, FieldError } from 'react-hook-form';
+import { useForm, FieldValues, ValidationMode, FieldError, Controller } from 'react-hook-form';
 import * as _ from 'lodash-es';
 import { SX_PROP_HELPER_TEXT } from './constants.js';
 
@@ -125,6 +125,13 @@ function Form({
   );
 }
 
+export interface FormInputValidationProps {
+  isRequired: boolean;
+  minLength: number;
+  maxLength: number;
+  isInvalid: boolean;
+}
+
 interface UseFormInputInput<V> {
   name: string;
   label?: string;
@@ -132,15 +139,14 @@ interface UseFormInputInput<V> {
   onChange: (newValue: V) => void;
   emptyValue?: V;
   defaultValue?: V;
-  validationProps: Record<string, unknown>;
+  validationProps: FormInputValidationProps;
 }
 
 interface UseFormInputPayload<V> {
   form: ReturnType<typeof useForm> | null;
-  formInputName: string;
-  formInputDisplayName: string;
   onFormInputChange: (newValue: V) => void;
   fieldError?: FieldError;
+  renderFormInput: (element: JSX.Element) => JSX.Element;
 }
 
 export function useFormInput<V>({
@@ -159,6 +165,8 @@ export function useFormInput<V>({
   const formInputName = fieldName || fallbackName;
 
   const formInputDisplayName = label || fieldName || 'Field';
+
+  const { isRequired, minLength, maxLength, isInvalid } = validationProps;
 
   const { form, fieldValues } = React.useContext(FormContext);
 
@@ -222,12 +230,45 @@ export function useFormInput<V>({
     }
   }, [form, name, validationProps]);
 
+  const renderFormInput = React.useCallback(
+    (element: JSX.Element) =>
+      form ? (
+        <Controller
+          name={formInputName}
+          control={form.control}
+          rules={{
+            required: isRequired ? `${formInputDisplayName} is required.` : false,
+            ...(minLength
+              ? {
+                  minLength: {
+                    value: minLength,
+                    message: `${formInputDisplayName} must have at least ${minLength} characters.`,
+                  },
+                }
+              : {}),
+            ...(maxLength
+              ? {
+                  maxLength: {
+                    value: maxLength,
+                    message: `${formInputDisplayName} must have no more than ${maxLength} characters.`,
+                  },
+                }
+              : {}),
+            validate: () => !isInvalid || `${formInputDisplayName} is invalid.`,
+          }}
+          render={() => element}
+        />
+      ) : (
+        element
+      ),
+    [form, formInputDisplayName, formInputName, isInvalid, isRequired, maxLength, minLength],
+  );
+
   return {
     form,
-    formInputName,
-    formInputDisplayName,
     onFormInputChange: handleFormInputChange,
     fieldError,
+    renderFormInput,
   };
 }
 
@@ -255,6 +296,37 @@ export function withComponentForm<P extends Record<string, any>>(
     );
   };
 }
+
+export const FORM_INPUT_VALIDATION_ARG_TYPES = {
+  isRequired: {
+    helperText: 'Whether the input is required to have a value.',
+    type: 'boolean',
+    default: false,
+    category: 'validation',
+  },
+  minLength: {
+    helperText: 'Minimum value length.',
+    type: 'number',
+    minimum: 0,
+    maximum: 512,
+    default: 0,
+    category: 'validation',
+  },
+  maxLength: {
+    helperText: 'Maximum value length.',
+    type: 'number',
+    minimum: 0,
+    maximum: 512,
+    default: 0,
+    category: 'validation',
+  },
+  isInvalid: {
+    helperText: 'Whether the input value is invalid.',
+    type: 'boolean',
+    default: false,
+    category: 'validation',
+  },
+};
 
 export default createComponent(Form, {
   argTypes: {

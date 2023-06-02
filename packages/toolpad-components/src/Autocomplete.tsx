@@ -5,27 +5,30 @@ import {
   TextField,
 } from '@mui/material';
 import { createComponent } from '@mui/toolpad-core';
-import { FieldError, Controller } from 'react-hook-form';
+import { FieldError } from 'react-hook-form';
+import * as _ from 'lodash-es';
 import { SX_PROP_HELPER_TEXT } from './constants.js';
-import { useFormInput, withComponentForm } from './Form.js';
+import {
+  FORM_INPUT_VALIDATION_ARG_TYPES,
+  FormInputValidationProps,
+  useFormInput,
+  withComponentForm,
+} from './Form.js';
 
 type AutocompleteOption = string | { label?: string; value?: string };
 type AutocompleteValue = string | null;
 
 interface AutocompleteProps
   extends Omit<
-    MuiAutocompleteProps<AutocompleteOption, false, false, false>,
-    'renderInput' | 'value' | 'onChange'
-  > {
+      MuiAutocompleteProps<AutocompleteOption, false, false, false>,
+      'renderInput' | 'value' | 'onChange'
+    >,
+    Pick<FormInputValidationProps, 'isRequired' | 'minLength' | 'maxLength' | 'isInvalid'> {
   value: AutocompleteValue;
   onChange: (newValue: AutocompleteValue) => void;
   options: AutocompleteOption[];
   label: string;
   name: string;
-  isRequired: boolean;
-  minLength: number;
-  maxLength: number;
-  isInvalid: boolean;
 }
 
 function Autocomplete({
@@ -41,20 +44,13 @@ function Autocomplete({
 }: AutocompleteProps) {
   const [selectedVal, setSelectedVal] = React.useState<AutocompleteOption | null>(null);
 
-  const validationProps = React.useMemo(
-    () => ({ isRequired, minLength, maxLength, isInvalid }),
-    [isInvalid, isRequired, maxLength, minLength],
-  );
-
-  const { form, formInputName, formInputDisplayName, onFormInputChange, fieldError } = useFormInput<
-    string | null
-  >({
+  const { form, onFormInputChange, fieldError, renderFormInput } = useFormInput<string | null>({
     name: rest.name,
     label,
     value,
     onChange,
     emptyValue: null,
-    validationProps,
+    validationProps: { isRequired, minLength, maxLength, isInvalid },
   });
 
   const getValue = React.useCallback((selection: AutocompleteOption | null): AutocompleteValue => {
@@ -114,31 +110,7 @@ function Autocomplete({
     />
   );
 
-  return form ? (
-    <Controller
-      name={formInputName}
-      control={form.control}
-      rules={{
-        required: isRequired ? `${formInputDisplayName} is required.` : false,
-        minLength: minLength
-          ? {
-              value: minLength,
-              message: `${formInputDisplayName} must have at least ${minLength} characters.`,
-            }
-          : undefined,
-        maxLength: maxLength
-          ? {
-              value: maxLength,
-              message: `${formInputDisplayName} must have no more than ${maxLength} characters.`,
-            }
-          : undefined,
-        validate: () => !isInvalid || `${formInputDisplayName} is invalid.`,
-      }}
-      render={() => autocompleteElement}
-    />
-  ) : (
-    autocompleteElement
-  );
+  return renderFormInput(autocompleteElement);
 }
 
 const FormWrappedAutocomplete = withComponentForm(Autocomplete);
@@ -185,34 +157,7 @@ export default createComponent(FormWrappedAutocomplete, {
       helperText: 'If true, the autocomplete will be disabled.',
       type: 'boolean',
     },
-    isRequired: {
-      helperText: 'Whether the input is required to have a value.',
-      type: 'boolean',
-      default: false,
-      category: 'validation',
-    },
-    minLength: {
-      helperText: 'Minimum value length.',
-      type: 'number',
-      minimum: 0,
-      maximum: 512,
-      default: 0,
-      category: 'validation',
-    },
-    maxLength: {
-      helperText: 'Maximum value length.',
-      type: 'number',
-      minimum: 0,
-      maximum: 512,
-      default: 0,
-      category: 'validation',
-    },
-    isInvalid: {
-      helperText: 'Whether the input value is invalid.',
-      type: 'boolean',
-      default: false,
-      category: 'validation',
-    },
+    ..._.pick(FORM_INPUT_VALIDATION_ARG_TYPES, ['required', 'minLength', 'maxLength', 'isInvalid']),
     sx: {
       helperText: SX_PROP_HELPER_TEXT,
       type: 'object',

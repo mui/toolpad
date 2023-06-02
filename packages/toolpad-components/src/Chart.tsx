@@ -29,7 +29,31 @@ export default createComponent(Chart, {
     data: {
       helperText: 'The data to be displayed.',
       type: 'array',
-      schema: '/schemas/ChartData.json',
+      schema: {
+        type: 'array',
+        items: {
+          type: 'object',
+          properties: {
+            kind: {
+              type: 'string',
+              enum: ['line', 'bar', 'pie'],
+            },
+            label: {
+              type: 'string',
+            },
+            data: {
+              type: 'object',
+              default: [],
+            },
+            xKey: {
+              type: 'string',
+            },
+            yKey: {
+              type: 'string',
+            },
+          },
+        },
+      },
       control: { type: 'ChartData' },
     },
     sx: {

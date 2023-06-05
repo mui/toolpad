@@ -9,7 +9,7 @@ import chalk from 'chalk';
 import { errorFrom } from '@mui/toolpad-utils/errors';
 import { execaCommand } from 'execa';
 import { satisfies } from 'semver';
-import packageJson from '../package.json';
+import { readJsonFile } from './util';
 import { PackageJson } from './packageType';
 
 type PackageManager = 'npm' | 'pnpm' | 'yarn';
@@ -164,8 +164,9 @@ const scaffoldProject = async (absolutePath: string, installFlag: boolean): Prom
 
 // Run the CLI interaction with Inquirer.js
 const run = async () => {
+  const pj = await readJsonFile(path.resolve(__dirname, `./package.json`));
   // check the node version before create
-  if (!satisfies(process.version, packageJson.engines.node)) {
+  if (!satisfies(process.version, pj.engines?.node)) {
     console.error('Please upgrade your node version. Your node version is too low');
     process.exit(1);
   }

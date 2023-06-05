@@ -12,6 +12,7 @@
     "noEmit": false,
     "outDir": "./dist",
     "pretty": true,
+    "rootDir": "src",
     "preserveWatchOutput": true
   },
   "include": ["src/**/*.ts", "src/**/*.tsx"]

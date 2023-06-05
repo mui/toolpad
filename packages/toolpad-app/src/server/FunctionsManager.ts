@@ -10,6 +10,7 @@ import EnvManager from './EnvManager';
 import { ProjectEvents, ToolpadProjectOptions } from '../types';
 import { writeFileRecursive, fileExists } from '../utils/fs';
 import { createWorker as createDevWorker } from './functionsDevWorker';
+import { createWorker as createTypesWorker } from './functionsTypesWorker';
 
 const DEFAULT_FUNCTIONS_FILE_CONTENT = `// Toolpad queries:
 
@@ -61,6 +62,8 @@ export default class FunctionsManager {
 
   private devWorker: ReturnType<typeof createDevWorker>;
 
+  private typesWorker: ReturnType<typeof createTypesWorker>;
+
   private initPromise: Promise<void>;
 
   // eslint-disable-next-line class-methods-use-this
@@ -74,6 +77,7 @@ export default class FunctionsManager {
       this.setInitialized = resolve;
     });
     this.devWorker = createDevWorker({ ...process.env });
+    this.typesWorker = createTypesWorker({ resourcesFolder: this.getResourcesFolder() });
     this.startDev();
   }
 

@@ -492,7 +492,7 @@ declare namespace PackageJsonTypes {
 		Engines that this package runs on.
 		*/
     engines?: {
-      [EngineName in 'npm' | 'node' | string]?: string; // eslint-disable-line 
+      [EngineName in 'npm' | 'node' | string]?: string;
     };
 
     /**

@@ -1,4 +1,5 @@
 import * as path from 'path';
+import * as fs from 'fs/promises';
 import { test, expect } from '../../playwright/localTest';
 import { ToolpadRuntime } from '../../models/ToolpadRuntime';
 import { fileReplaceAll } from '../../utils/fs';
@@ -27,12 +28,12 @@ test.use({
     },
     cmd: 'dev',
     env: {
-      TEST_ENV_VAR: 'foo',
+      TEST_VAR: 'foo',
     },
   },
 });
 
-test('rest basics', async ({ page, context }) => {
+test('rest basics', async ({ page, context, localApp }) => {
   const runtimeModel = new ToolpadRuntime(page);
   await runtimeModel.gotoPage('page1');
   await expect(page.locator('text="query1: query1_value"')).toBeVisible();
@@ -43,6 +44,11 @@ test('rest basics', async ({ page, context }) => {
   await expect(page.getByText('query3: Transformed')).toBeVisible();
 
   await expect(page.getByText('query4 authorization: foo')).toBeVisible();
+
+  const envFilePath = path.resolve(localApp.dir, './.env');
+  await fs.writeFile(envFilePath, 'TEST_VAR=bar');
+
+  await expect(page.getByText('query4 authorization: bar')).toBeVisible();
 
   const editorModel = new ToolpadEditor(page);
   await editorModel.goto();

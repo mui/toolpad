@@ -99,7 +99,7 @@ spec:
         headers:
           - name: Authorization
             value:
-              $$env: TEST_ENV_VAR
+              $$env: TEST_VAR
         method: GET
         searchParams: []
         url: https://httpbin.org/get

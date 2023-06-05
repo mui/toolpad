@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 
 import * as fs from 'fs/promises';
+import { constants as fsConstants } from 'fs';
 import path from 'path';
 import yargs from 'yargs';
 import inquirer from 'inquirer';
@@ -81,7 +82,7 @@ const validatePath = async (relativePath: string): Promise<boolean | string> => 
   const absolutePath = path.join(process.cwd(), relativePath);
 
   try {
-    await fs.access(absolutePath, fs.constants.F_OK);
+    await fs.access(absolutePath, fsConstants.F_OK);
 
     // Directory exists, verify if it's empty to proceed
     if (await isFolderEmpty(absolutePath)) {

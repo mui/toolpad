@@ -20,6 +20,9 @@ test.use({
   localAppConfig: {
     template: path.resolve(__dirname, './fixture'),
     cmd: 'dev',
+    env: {
+      SECRET_BAZ: 'Some baz secret',
+    },
   },
 });
 
@@ -41,6 +44,7 @@ test('functions basics', async ({ page }) => {
   await expect(page.locator('text="throws, data undefined"')).toBeVisible();
   await expect(page.locator('text="echo, parameter: bound foo parameter"')).toBeVisible();
   await expect(page.locator('text="echo, secret: Some bar secret"')).toBeVisible();
+  await expect(page.locator('text="echo, secret not in .env: Some baz secret"')).toBeVisible();
 });
 
 test('function editor reload', async ({ page, localApp }) => {

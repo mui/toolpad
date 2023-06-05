@@ -14,6 +14,7 @@ export const echo = createFunction(
       params: parameters,
       secrets: {
         bar: process.env.SECRET_BAR,
+        baz: process.env.SECRET_BAZ,
       },
     };
   },

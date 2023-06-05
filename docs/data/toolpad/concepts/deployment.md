@@ -19,5 +19,7 @@ yarn start
 ```
 
 :::info
-Detailed, step-by-step instructions for deploying a Toolpad app are available in the tutorial on [deploying to Render](/toolpad/tutorials/deploy-render/)
-:::
+Detailed, step-by-step instructions are available in the tutorial section for deploying a Toolpad app to the following services:
+
+- [Render](/toolpad/tutorials/render-deploy/)
+  :::

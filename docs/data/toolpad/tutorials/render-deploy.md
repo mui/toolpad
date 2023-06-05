@@ -11,7 +11,7 @@
 
 1. With a GitHub account, we can create a new repository using the **+** button available in the header menu, followed by **New repository**. Then, select an appropriate name:
 
-{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/tutorials/deploy-render/render-github-new.png", "alt": "GitHub new repo ", "caption": "Creating a new GitHub repository", "indent": 1 }}
+{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/tutorials/deploy-render/render-github-new.png", "alt": "GitHub new repo ", "caption": "Creating a new GitHub repository", "indent": 1, "aspectRatio": 1 }}
 
 2. If the Toolpad app is not currently a Git repository, we can run
 

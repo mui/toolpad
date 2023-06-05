@@ -48,6 +48,9 @@ test('rest basics', async ({ page, context, localApp }) => {
   const envFilePath = path.resolve(localApp.dir, './.env');
   await fs.writeFile(envFilePath, 'TEST_VAR=bar');
 
+  // TODO: Make this reload unnecessary. The queries should be invalidated when the env file changes.
+  await page.reload();
+
   await expect(page.getByText('query4 authorization: bar')).toBeVisible();
 
   const editorModel = new ToolpadEditor(page);

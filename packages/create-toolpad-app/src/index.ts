@@ -121,7 +121,6 @@ const scaffoldProject = async (absolutePath: string, installFlag: boolean): Prom
       build: 'toolpad build',
       start: 'toolpad start',
     },
-
     dependencies: {
       '@mui/toolpad': 'latest',
     },

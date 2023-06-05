@@ -8,6 +8,7 @@ export default defineConfig([
       server: './cli/server.ts',
       appServer: './cli/appServer.ts',
       appBuilder: './cli/appBuilder.ts',
+      functionsDevWorker: './src/server/functionsDevWorker.ts',
     },
     outDir: 'dist/cli',
     silent: true,

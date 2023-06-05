@@ -51,6 +51,7 @@ import { LocalQuery } from '../toolpadDataSources/local/types';
 import { ProjectEvents, ToolpadProjectOptions } from '../types';
 import { Awaitable } from '../utils/types';
 import EnvManager from './EnvManager';
+import FunctionsManager from './FunctionsManager';
 
 export function getUserProjectRoot(): string {
   const { projectDir } = config;
@@ -60,14 +61,6 @@ export function getUserProjectRoot(): string {
 
 function getToolpadFolder(root: string): string {
   return path.join(root, './toolpad');
-}
-
-export function getResourcesFolder(root: string): string {
-  return path.join(getToolpadFolder(root), './resources');
-}
-
-export function getFunctionsFile(root: string): string {
-  return path.join(getResourcesFolder(root), './functions.ts');
 }
 
 function getThemeFile(root: string): string {
@@ -282,28 +275,6 @@ async function loadConfigFile(root: string): Promise<appDom.AppDom | null> {
   const configFilePath = await getConfigFilePath(root);
   const dom = await loadConfigFileFrom(configFilePath);
   return dom;
-}
-
-const DEFAULT_FUNCTIONS_FILE_CONTENT = `// Toolpad queries:
-
-export async function example() {
-  return [
-    { firstname: 'Nell', lastName: 'Lester' },
-    { firstname: 'Keanu', lastName: 'Walter' },
-    { firstname: 'Daniella', lastName: 'Sweeney' },
-  ];
-}
-`;
-
-async function initQueriesFile(root: string): Promise<void> {
-  const queriesFilePath = getFunctionsFile(root);
-  if (!(await fileExists(queriesFilePath))) {
-    // eslint-disable-next-line no-console
-    console.log(`${chalk.blue('info')}  - Initializing Toolpad functions file`);
-    await writeFileRecursive(queriesFilePath, DEFAULT_FUNCTIONS_FILE_CONTENT, {
-      encoding: 'utf-8',
-    });
-  }
 }
 
 async function writeCodeComponentsToFiles(
@@ -976,7 +947,7 @@ export async function getSupportedEditor(): Promise<string | null> {
   return supportedEditorPromise;
 }
 
-export async function openCodeEditor(file: string): Promise<void> {
+async function openCodeEditor(file: string): Promise<void> {
   const supportedEditor = await getSupportedEditor();
   if (!supportedEditor) {
     throw new Error(`No code editor found`);
@@ -993,13 +964,6 @@ export async function openCodeComponentEditor(componentName: string): Promise<vo
   const componentsFolder = getComponentsFolder(root);
   const fullPath = getComponentFilePath(componentsFolder, componentName);
   await openCodeEditor(fullPath);
-}
-
-export async function openQueryEditor(): Promise<void> {
-  const root = getUserProjectRoot();
-  await initQueriesFile(root);
-  const queriesFilePath = getFunctionsFile(root);
-  await openCodeEditor(queriesFilePath);
 }
 
 export type ProjectFolderEntry = {
@@ -1098,13 +1062,6 @@ async function migrateLegacyProject(root: string) {
 
   await writeProjectFolder(root, projectFolder, true);
 
-  const legacyQueriesFile = path.resolve(getToolpadFolder(root), 'queries.ts');
-  if (await fileExists(legacyQueriesFile)) {
-    const functionsFile = getFunctionsFile(root);
-    await fs.mkdir(path.dirname(functionsFile), { recursive: true });
-    await fs.rename(legacyQueriesFile, functionsFile);
-  }
-
   const configFilePath = await getConfigFilePath(root);
   await Promise.all([
     fs.rm(configFilePath, { recursive: true, force: true }),
@@ -1172,6 +1129,8 @@ class ToolpadProject {
 
   envManager: EnvManager;
 
+  functionsManager: FunctionsManager;
+
   constructor(root: string, options: Partial<ToolpadProjectOptions>) {
     this.root = root;
     this.options = {
@@ -1180,6 +1139,7 @@ class ToolpadProject {
     };
 
     this.envManager = new EnvManager(this);
+    this.functionsManager = new FunctionsManager(this);
 
     this.initWatcher();
   }
@@ -1230,6 +1190,14 @@ class ToolpadProject {
     return this.root;
   }
 
+  getToolpadFolder() {
+    return getToolpadFolder(this.getRoot());
+  }
+
+  getOutputFolder() {
+    return getOutputFolder(this.getRoot());
+  }
+
   async loadDom() {
     const [dom] = await this.loadDomAndFingerprint();
     return dom;
@@ -1246,6 +1214,17 @@ class ToolpadProject {
       this.domAndFingerprint = [newDom, newFingerprint];
       this.events.emit('change', { fingerprint: newFingerprint });
       return { fingerprint: newFingerprint };
+    });
+  }
+
+  async openCodeEditor(file: string): Promise<void> {
+    const supportedEditor = await getSupportedEditor();
+    if (!supportedEditor) {
+      throw new Error(`No code editor found`);
+    }
+    const fullPath = path.resolve(this.getRoot(), file);
+    openEditor([fullPath, this.getRoot()], {
+      editor: process.env.EDITOR ? undefined : DEFAULT_EDITOR,
     });
   }
 }

@@ -3,17 +3,21 @@
     "target": "es2020",
     "module": "ESNext",
     "moduleResolution": "bundler",
-    "lib": ["esnext"],
+    "lib": [
+      "esnext"
+    ],
     "isolatedModules": true,
     "strict": true,
     "resolveJsonModule": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
     "noEmit": false,
-    "rootDir": "src",
     "outDir": "./dist",
     "pretty": true,
     "preserveWatchOutput": true
   },
-  "include": ["src/**/*.ts", "src/**/*.tsx"]
+  "include": [
+    "src/**/*.ts",
+    "src/**/*.tsx"
+  ]
 }

@@ -306,20 +306,6 @@ async function initQueriesFile(root: string): Promise<void> {
   }
 }
 
-const DEFAULT_GENERATED_GITIGNORE_FILE_CONTENT = `.generated
-`;
-
-async function initGitignore(root: string) {
-  const projectFolder = getToolpadFolder(root);
-  const generatedGitignorePath = path.resolve(projectFolder, '.gitignore');
-  if (!(await fileExists(generatedGitignorePath))) {
-    // eslint-disable-next-line no-console
-    console.log(`${chalk.blue('info')}  - Initializing .gitignore file`);
-    await writeFileRecursive(generatedGitignorePath, DEFAULT_GENERATED_GITIGNORE_FILE_CONTENT, {
-      encoding: 'utf-8',
-    });
-  }
-}
 
 async function writeCodeComponentsToFiles(
   componentsFolder: string,
@@ -1165,8 +1151,6 @@ async function initToolpadFolder(root: string) {
     };
     await writeProjectFolder(root, projectFolder);
   }
-
-  await initGitignore(root);
 }
 
 function getCodeComponentsFingerprint(dom: appDom.AppDom) {

@@ -58,6 +58,13 @@ test('create-toolpad-app can bootstrap a Toolpad app', async () => {
     }),
   );
 
+  // check that file exists or not in the directory
+  const gitignore = await fs.readFile(path.resolve(testDir, './.gitignore'), { 
+    encoding: 'utf-8' 
+  });
+  
+  expect(gitignore.length).toBeGreaterThan(0); 
+
   toolpadProcess = execa('yarn', ['dev'], {
     cwd: testDir,
     env: {

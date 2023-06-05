@@ -7,6 +7,9 @@ import inquirer from 'inquirer';
 import chalk from 'chalk';
 import { errorFrom } from '@mui/toolpad-utils/errors';
 import { execaCommand } from 'execa';
+import { satisfies } from 'semver'
+import packageJosn from '../package.json'
+import { PackageJson } from './packageType'
 
 type PackageManager = 'npm' | 'pnpm' | 'yarn';
 declare global {
@@ -108,7 +111,7 @@ const scaffoldProject = async (absolutePath: string, installFlag: boolean): Prom
   // eslint-disable-next-line no-console
   console.log();
 
-  const packageJson = {
+  const packageJson:PackageJson = {
     name: path.basename(absolutePath),
     version: '0.1.0',
     private: true,
@@ -117,12 +120,21 @@ const scaffoldProject = async (absolutePath: string, installFlag: boolean): Prom
       build: 'toolpad build',
       start: 'toolpad start',
     },
+
     dependencies: {
       '@mui/toolpad': 'latest',
     },
   };
+  
+  const DEFAULT_GENERATED_GITIGNORE_FILE_CONTENT = '.gitignore'
 
   await fs.writeFile(path.join(absolutePath, 'package.json'), JSON.stringify(packageJson, null, 2));
+  // eslint-disable-next-line no-console
+  console.log(`${chalk.blue('info')}  - Initializing package.json file`);
+
+  await fs.copyFile(path.resolve(__dirname, `./${DEFAULT_GENERATED_GITIGNORE_FILE_CONTENT}`), path.join(absolutePath, DEFAULT_GENERATED_GITIGNORE_FILE_CONTENT));
+  // eslint-disable-next-line no-console
+  console.log(`${chalk.blue('info')}  - Initializing .gitignore file`);
 
   if (installFlag) {
     // eslint-disable-next-line no-console
@@ -149,6 +161,9 @@ const scaffoldProject = async (absolutePath: string, installFlag: boolean): Prom
 
 // Run the CLI interaction with Inquirer.js
 const run = async () => {
+  // check the node version before create
+  if (!satisfies(process.version, packageJosn.engines.node))  {process.exit(1);}
+
   const args = await yargs(process.argv.slice(2))
     .scriptName('create-toolpad-app')
     .usage('$0 [path] [options]')

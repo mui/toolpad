@@ -306,7 +306,6 @@ async function initQueriesFile(root: string): Promise<void> {
   }
 }
 
-
 async function writeCodeComponentsToFiles(
   componentsFolder: string,
   components: ComponentsContent,

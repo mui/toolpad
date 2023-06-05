@@ -138,9 +138,17 @@ spec:
                         columnSize: 1
                       children:
                         - component: TextField
+                          name: textField
+                          props:
+                            defaultValue:
+                              $$jsExpression: |
+                                customersGrid.selection.id
+                            disabled: true
+                            fullWidth: true
+                            label: id
+                            name: id
+                        - component: TextField
                           name: name
-                          layout:
-                            columnSize: 0.8268733850129198
                           props:
                             label: Name
                             disabled: false
@@ -149,6 +157,9 @@ spec:
                               $$jsExpression: |
                                 customersGrid.selection.name
                             isRequired: true
+                            name: name
+                          layout:
+                            columnSize: 0.8268733850129198
                         - component: PageRow
                           name: pageRow
                           props:
@@ -167,6 +178,7 @@ spec:
                                       $$jsExpression: >
                                         customersGrid.selection.account_creation_date
                                     isRequired: true
+                                    name: account_creation_date
                                 - component: Select
                                   name: gender
                                   props:
@@ -179,6 +191,7 @@ spec:
                                       - Female
                                       - Other
                                     fullWidth: false
+                                    name: gender
                                 - component: TextField
                                   name: phone_number
                                   layout:
@@ -189,6 +202,7 @@ spec:
                                       $$jsExpression: |
                                         customersGrid.selection.phone_number
                                     isRequired: true
+                                    name: phone_number
                             - component: PageColumn
                               name: pageColumn6
                               layout:
@@ -204,6 +218,7 @@ spec:
                                       $$jsExpression: |
                                         customersGrid.selection.address
                                     fullWidth: true
+                                    name: address
                                 - component: TextField
                                   name: country
                                   layout:
@@ -215,6 +230,7 @@ spec:
                                         customersGrid.selection.country_of_residence
                                     fullWidth: true
                                     isRequired: true
+                                    name: country_of_residence
                                 - component: TextField
                                   name: email
                                   layout:
@@ -227,6 +243,7 @@ spec:
                                     isRequired: true
                                     isInvalid: false
                                     fullWidth: true
+                                    name: email
             - component: Text
               name: typography5
               layout:
@@ -266,10 +283,8 @@ spec:
                             label: Name
                             disabled: false
                             fullWidth: true
-                            defaultValue:
-                              $$jsExpression: |
-                                customersGrid.selection.name
                             isRequired: true
+                            name: name
                         - component: PageRow
                           name: pageRow4
                           props:
@@ -284,32 +299,26 @@ spec:
                                   name: account_creation_date1
                                   props:
                                     label: Account creation date
-                                    defaultValue:
-                                      $$jsExpression: >
-                                        customersGrid.selection.account_creation_date
                                     isRequired: true
+                                    name: account_creation_date
                                 - component: Select
                                   name: gender1
                                   props:
                                     label: Gender
-                                    defaultValue:
-                                      $$jsExpression: |
-                                        customersGrid.selection.gender
                                     options:
                                       - Male
                                       - Female
                                       - Other
                                     fullWidth: false
+                                    name: gender
                                 - component: TextField
                                   name: phone_number1
                                   layout:
                                     columnSize: 1
                                   props:
                                     label: Phone number
-                                    defaultValue:
-                                      $$jsExpression: |
-                                        customersGrid.selection.phone_number
                                     isRequired: true
+                                    name: phone_number
                             - component: PageColumn
                               name: pageColumn7
                               layout:
@@ -321,9 +330,6 @@ spec:
                                     columnSize: 1.17312661498708
                                   props:
                                     label: Address
-                                    defaultValue:
-                                      $$jsExpression: |
-                                        customersGrid.selection.address
                                     fullWidth: true
                                 - component: TextField
                                   name: country1
@@ -331,23 +337,19 @@ spec:
                                     columnSize: 1
                                   props:
                                     label: Country
-                                    defaultValue:
-                                      $$jsExpression: >
-                                        customersGrid.selection.country_of_residence
                                     fullWidth: true
                                     isRequired: true
+                                    name: country_of_residence
                                 - component: TextField
                                   name: email1
                                   layout:
                                     columnSize: 1
                                   props:
                                     label: Email
-                                    defaultValue:
-                                      $$jsExpression: |
-                                        customersGrid.selection.email
                                     isRequired: true
                                     isInvalid: false
                                     fullWidth: true
+                                    name: email
   queries:
     - name: getCustomers
       enabled: true
@@ -363,72 +365,20 @@ spec:
         function: addCustomer
         kind: local
       parameters:
-        - name: name
+        - name: customer
           value:
             $$jsExpression: |
-              name1.value
-        - name: account_creation_date
-          value:
-            $$jsExpression: |
-              account_creation_date1.value
-        - name: country_of_residence
-          value:
-            $$jsExpression: |
-              country1.value
-        - name: phone_number
-          value:
-            $$jsExpression: |
-              phone_number1.value
-        - name: email
-          value:
-            $$jsExpression: |
-              email1.value
-        - name: address
-          value:
-            $$jsExpression: |
-              address1.value
-        - name: gender
-          value:
-            $$jsExpression: |
-              gender1.value
+              addCustomerForm.value
     - name: updateCustomer
       query:
         function: updateCustomer
         kind: local
       mode: mutation
       parameters:
-        - name: id
+        - name: customer
           value:
             $$jsExpression: |
-              customersGrid.selection.id
-        - name: name
-          value:
-            $$jsExpression: |
-              name.value
-        - name: account_creation_date
-          value:
-            $$jsExpression: |
-              account_creation_date.value
-        - name: country_of_residence
-          value:
-            $$jsExpression: |
-              country.value
-        - name: phone_number
-          value:
-            $$jsExpression: |
-              phone_number.value
-        - name: email
-          value:
-            $$jsExpression: |
-              email.value
-        - name: address
-          value:
-            $$jsExpression: |
-              address.value
-        - name: gender
-          value:
-            $$jsExpression: |
-              gender.value
+              updateCustomerForm.value
     - name: deleteCustomer
       query:
         function: deleteCustomer

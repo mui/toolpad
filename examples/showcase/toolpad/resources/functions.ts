@@ -75,61 +75,75 @@ export async function getCustomers() {
   return customers;
 }
 
-const customerParams = {
+const customerProperties = {
   name: {
-    type: 'string' as const,
+    type: 'string',
   },
   account_creation_date: {
-    type: 'string' as const,
+    type: 'string',
   },
   country_of_residence: {
-    type: 'string' as const,
+    type: 'string',
   },
   phone_number: {
-    type: 'number' as const,
+    type: 'number',
   },
   email: {
-    type: 'string' as const,
+    type: 'string',
   },
   address: {
-    type: 'string' as const,
+    type: 'string',
   },
   gender: {
-    type: 'string' as const,
+    type: 'string',
     enum: ['Male', 'Female', 'Other'],
   },
-};
+} as const;
 
 export const addCustomer = createFunction(
   async ({ parameters }) => {
-    const newCustomer = {
+    const newCustumer = {
       id: generateId(),
-      ...parameters,
+      ...parameters.customer,
     };
-    customers.push(newCustomer);
+    customers.push(newCustumer);
     return newCustomer;
   },
   {
-    parameters: customerParams,
+    parameters: {
+      customer: {
+        type: 'object',
+        schema: {
+          type: 'object',
+          properties: {
+            id: { type: 'number' },
+            ...customerProperties,
+          },
+        },
+      },
+    },
   },
 );
 
 export const updateCustomer = createFunction(
   async ({ parameters }) => {
-    const index = customers.findIndex((item) => item.id === parameters.id);
+    const index = customers.findIndex((item) => item.id === parameters.customer.id);
 
     if (customers[index]) {
-      Object.assign(customers[index], parameters);
+      Object.assign(customers[index], parameters.customer);
     }
 
     return customers[index];
   },
   {
     parameters: {
-      id: {
-        type: 'number',
+      customer: {
+        type: 'object',
+        schema: {
+          type: 'object',
+          properties: customerProperties,
+        },
       },
-      ...customerParams,
     },
   },
 );
@@ -140,10 +154,6 @@ export const deleteCustomer = createFunction(
     customers.splice(index, 1);
   },
   {
-    parameters: {
-      id: {
-        type: 'number',
-      },
-    },
+    parameters: {},
   },
 );

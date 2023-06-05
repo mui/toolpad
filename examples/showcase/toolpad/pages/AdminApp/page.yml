@@ -121,7 +121,7 @@ spec:
               props:
                 onSubmit:
                   $$jsExpressionAction: |-
-                    await updateCustomer.call(updateCustomerForm.value);
+                    await updateCustomer.call();
                     getCustomers.refetch();
                 submitButtonText: Update
                 hasResetButton: false
@@ -138,26 +138,16 @@ spec:
                         columnSize: 1
                       children:
                         - component: TextField
-                          name: textField
-                          props:
-                            defaultValue:
-                              $$jsExpression: |
-                                customersGrid.selection.id
-                            disabled: true
-                            fullWidth: true
-                            label: id
-                            name: id
-                        - component: TextField
                           name: name
                           props:
-                            label: Name
-                            disabled: false
-                            fullWidth: true
                             defaultValue:
                               $$jsExpression: |
                                 customersGrid.selection.name
-                            isRequired: true
+                            disabled: false
+                            fullWidth: true
+                            label: Name
                             name: name
+                            isRequired: true
                           layout:
                             columnSize: 0.8268733850129198
                         - component: PageRow
@@ -259,7 +249,7 @@ spec:
               props:
                 onSubmit:
                   $$jsExpressionAction: |-
-                    await addCustomer.call(addCustomerForm.value);
+                    await addCustomer.call();
                     getCustomers.refetch();
                 submitButtonText: Add
                 hasResetButton: false
@@ -365,7 +355,7 @@ spec:
         function: addCustomer
         kind: local
       parameters:
-        - name: customer
+        - name: values
           value:
             $$jsExpression: |
               addCustomerForm.value
@@ -375,7 +365,11 @@ spec:
         kind: local
       mode: mutation
       parameters:
-        - name: customer
+        - name: id
+          value:
+            $$jsExpression: |
+              customersGrid.selection?.id
+        - name: values
           value:
             $$jsExpression: |
               updateCustomerForm.value

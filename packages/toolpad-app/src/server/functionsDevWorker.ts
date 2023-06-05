@@ -8,6 +8,7 @@ import * as url from 'url';
 import { TOOLPAD_FUNCTION } from '@mui/toolpad-core';
 import fetch, { Headers, Request, Response } from 'node-fetch';
 import { errorFrom } from '@mui/toolpad-utils/errors';
+import invariant from 'invariant';
 
 type IntrospectedFiles = Map<string, { file: string }>;
 
@@ -121,6 +122,8 @@ if (!isMainThread && parentPort) {
 }
 
 export function createWorker(env: Record<string, any>) {
+  invariant(isMainThread, 'createWorker() must be called from the main thread');
+
   const worker = new Worker(path.join(__dirname, 'functionsDevWorker.js'), { env });
 
   const runOnWorker = async (msg: WorkerMessage) => {

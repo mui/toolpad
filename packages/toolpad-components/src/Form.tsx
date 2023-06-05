@@ -284,22 +284,18 @@ export function useFormInput<V>({
           control={form.control}
           rules={{
             required: isRequired ? `${formInputDisplayName} is required.` : false,
-            ...(minLength
-              ? {
-                  minLength: {
-                    value: minLength,
-                    message: `${formInputDisplayName} must have at least ${minLength} characters.`,
-                  },
-                }
-              : {}),
-            ...(maxLength
-              ? {
-                  maxLength: {
-                    value: maxLength,
-                    message: `${formInputDisplayName} must have no more than ${maxLength} characters.`,
-                  },
-                }
-              : {}),
+            ...(minLength && {
+              minLength: {
+                value: minLength,
+                message: `${formInputDisplayName} must have at least ${minLength} characters.`,
+              },
+            }),
+            ...(maxLength && {
+              maxLength: {
+                value: maxLength,
+                message: `${formInputDisplayName} must have no more than ${maxLength} characters.`,
+              },
+            }),
             validate: () => !isInvalid || `${formInputDisplayName} is invalid.`,
           }}
           render={() => element}

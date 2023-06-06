@@ -4,7 +4,7 @@ import * as path from 'path';
 import * as fs from 'fs/promises';
 import SchemaReference, {
   SchemaReferenceProps,
-} from '../../../src/modules/components/SchemaReference';
+} from '../../../../src/modules/components/SchemaReference';
 
 export const getStaticProps: GetStaticProps<SchemaReferenceProps> = async () => {
   const schemaFile = path.join(process.cwd(), './schemas/v1/definitions.json');
@@ -21,7 +21,7 @@ export default function Page(props: SchemaReferenceProps) {
   return (
     <SchemaReference
       disableAd
-      location="/docs/pages/toolpad/schema-reference/index.tsx"
+      location="/docs/pages/toolpad/reference/file-schema/index.tsx"
       {...props}
     />
   );

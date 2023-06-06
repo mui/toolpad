@@ -4,10 +4,11 @@ import { InferParameterType, PrimitiveValueType, PropValueType } from './types.j
 /**
  * The runtime configuration for a Toolpad function. Describes the parameters it accepts and their
  * corresponding types.
+ * @muidoc interface
  */
-export interface CreateFunctionConfig<P> {
+export interface CreateFunctionConfig<C> {
   parameters: {
-    [K in keyof P]: PrimitiveValueType;
+    [K in keyof C]: PrimitiveValueType;
   };
 }
 
@@ -25,18 +26,28 @@ export interface FunctionResolverParams<
 
 export interface FunctionResolver<
   C extends CreateFunctionConfig<CreateFunctionConfigParameters<C>>,
+  R,
 > {
-  (params: FunctionResolverParams<C>): Promise<unknown>;
+  (params: FunctionResolverParams<C>): Promise<R>;
 }
 
-export interface ToolpadFunction<C extends CreateFunctionConfig<CreateFunctionConfigParameters<C>>>
-  extends FunctionResolver<C> {
+export interface ToolpadFunction<
+  C extends CreateFunctionConfig<CreateFunctionConfigParameters<C>>,
+  R,
+> extends FunctionResolver<C, R> {
   [TOOLPAD_FUNCTION]: C;
 }
 
 type MaybeLegacyParametersDefinition = PropValueType & {
   typeDef?: PropValueType;
   defaultValue?: any;
+};
+
+export type {
+  /**
+   * @muidoc interface
+   */
+  PrimitiveValueType,
 };
 
 /**
@@ -46,11 +57,13 @@ type MaybeLegacyParametersDefinition = PropValueType & {
  * The return value of this function will appear as state on the page and can be bound to.
  * @param resolver The function that will load the data for the query.
  * @param config The configuration for the function.
+ * override: Config
+ * @muidoc function
  */
-export function createFunction<C extends CreateFunctionConfig<CreateFunctionConfigParameters<C>>>(
-  resolver: FunctionResolver<C>,
-  config?: C,
-) {
+export function createFunction<
+  C extends CreateFunctionConfig<CreateFunctionConfigParameters<C>>,
+  R,
+>(resolver: FunctionResolver<C, R>, config?: C) {
   // TODO: Remove post beta
   if (config?.parameters) {
     for (const [name, argType] of Object.entries(config.parameters)) {

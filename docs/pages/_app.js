@@ -146,6 +146,7 @@ function AppWrapper(props) {
     const productIdentifier = {
       name: 'Toolpad',
       metadata: 'MUI Toolpad',
+      versions: [],
     };
 
     return { activePage, activePageParents, pages, productIdentifier };

@@ -30,7 +30,7 @@ A custom component that renders inside the data grid receives a `params` object 
 
 Using the `value` prop, we can create a custom component like the following:
 
-```tsx
+```jsx
 import * as React from 'react';
 import Chip from '@mui/material/Chip';
 import Tooltip from '@mui/material/Tooltip';

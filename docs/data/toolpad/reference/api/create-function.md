@@ -4,13 +4,13 @@
 
 ## Import
 
-```tsx
+```jsx
 import { createFunction } from '@mui/toolpad/server';
 ```
 
 ## Description
 
-```tsx
+```jsx
 export const myApi = createFunction(config, resolver);
 ```
 

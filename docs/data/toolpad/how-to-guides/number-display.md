@@ -32,7 +32,7 @@ We can do this through a **custom component**.
 
 1. A file with some sample code for a custom component is initialised for you. Replace its content with the following code:
 
-   ```tsx
+   ```jsx
    import * as React from 'react';
    import { Paper, Typography, Stack } from '@mui/material';
    import { createComponent } from '@mui/toolpad/browser';

@@ -4,7 +4,7 @@
 
 ## Import
 
-```tsx
+```jsx
 import { createComponent } from '@mui/toolpad/server';
 ```
 
@@ -12,7 +12,7 @@ import { createComponent } from '@mui/toolpad/server';
 
 By convention, Toolpad custom components are placed inside of the `toolpad/components/` folder. Each file in this folder describes one custom Toolpad component. As soon as the file exports a valid custom component in its default export it will be available in Toolpad to be used in UI. The `createComponent` function attaches extra information to React components to signal to Toolpad how they can be used and composed together.
 
-```tsx
+```jsx
 export default createComponent(MyComponent, config);
 ```
 

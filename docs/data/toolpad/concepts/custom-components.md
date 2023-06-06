@@ -8,7 +8,7 @@ Toolpad exposes a `createComponent` API to bring in custom components to the Too
 
 For example, in `toolpad/components/HelloWorld.tsx`:
 
-```tsx
+```jsx
 import * as React from 'react';
 import { Typography } from '@mui/material';
 import { createComponent } from '@mui/toolpad/browser';

@@ -71,7 +71,7 @@ You can configure the following options here:
 
   This corresponds to a function that you create on your file system, inside the `toolpad/resources` folder. For example, in `toolpad/resources/functions.ts`
 
-  ```tsx
+  ```jsx
   export async function example() {
     return {
       message: 'hello world',
@@ -85,7 +85,7 @@ You can configure the following options here:
 <li style="list-style-type: none">
 Toolpad custom functions run fully server-side in Node. For example, if you change the content of the above example to:
 
-```tsx
+```jsx
 export async function example() {
   return {
     message: process.versions,
@@ -125,7 +125,7 @@ To be really useful, you need to connect these queries with data present on your
 
   Toolpad provides a `createFunction` API to be able to define your parameters when creating custom functions:
 
-  ```tsx
+  ```jsx
   import { createFunction } from '@mui/toolpad/server';
 
   export const example = createFunction(

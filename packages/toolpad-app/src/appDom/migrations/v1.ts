@@ -1,5 +1,5 @@
 import invariant from 'invariant';
-import { AppDom, QueryNode, createConst, isQuery, ElementNode, isElement, ref } from '..';
+import { AppDom, QueryNode, isQuery, ElementNode, isElement, ref } from '..';
 import { update } from '../../utils/immutability';
 
 function migrateLegacyQueryNode(node: QueryNode<any>): QueryNode<any> {
@@ -25,11 +25,14 @@ function migrateLegacyQueryNode(node: QueryNode<any>): QueryNode<any> {
       attributes: update(node.attributes, {
         transformEnabled: undefined,
         transform: undefined,
-        query: createConst({
-          ...node.attributes.query.value,
-          transformEnabled: node.attributes.transformEnabled?.value,
-          transform: node.attributes.transform?.value,
-        }),
+        query: {
+          type: 'const',
+          value: {
+            ...node.attributes.query.value,
+            transformEnabled: node.attributes.transformEnabled?.value,
+            transform: node.attributes.transform?.value,
+          },
+        },
       }),
     });
   }
@@ -39,10 +42,16 @@ function migrateLegacyQueryNode(node: QueryNode<any>): QueryNode<any> {
     if (typeof node.attributes.query.value?.connectionId?.value === 'string') {
       return update(node, {
         attributes: update(node.attributes, {
-          query: createConst({
-            ...node.attributes.query.value,
-            connectionId: createConst(ref(node.attributes.query.value.connectionId.value)),
-          }),
+          query: {
+            type: 'const',
+            value: {
+              ...node.attributes.query.value,
+              connectionId: {
+                type: 'const',
+                value: ref(node.attributes.query.value.connectionId.value),
+              },
+            },
+          },
         }),
       });
     }

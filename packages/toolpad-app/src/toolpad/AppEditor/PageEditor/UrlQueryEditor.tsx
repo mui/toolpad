@@ -30,7 +30,7 @@ export default function UrlQueryEditor({ pageNodeId }: UrlQueryEditorProps) {
 
   const { value: isDialogOpen, setTrue: openDialog, setFalse: closeDialog } = useBoolean(false);
 
-  const value = page.attributes.parameters?.value;
+  const value = page.attributes.parameters;
 
   const [input, setInput] = React.useState(value);
 
@@ -61,13 +61,7 @@ export default function UrlQueryEditor({ pageNodeId }: UrlQueryEditorProps) {
 
   const handleSave = React.useCallback(() => {
     domApi.update((draft) =>
-      appDom.setNodeNamespacedProp(
-        draft,
-        page,
-        'attributes',
-        'parameters',
-        appDom.createConst(input || []),
-      ),
+      appDom.setNodeNamespacedProp(draft, page, 'attributes', 'parameters', input || []),
     );
     handleDialogClose();
   }, [domApi, handleDialogClose, input, page]);

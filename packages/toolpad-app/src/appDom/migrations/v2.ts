@@ -10,7 +10,10 @@ function replaceMutation(node: any): appDom.AppDomNode {
       parentProp: 'queries',
       attributes: {
         ...node.attributes,
-        mode: appDom.createConst('mutation'),
+        mode: {
+          type: 'const',
+          value: 'mutation',
+        },
       },
     };
   }

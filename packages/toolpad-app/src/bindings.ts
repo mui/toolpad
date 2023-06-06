@@ -1,26 +1,60 @@
-import { BindableAttrValue } from '@mui/toolpad-core';
+import {
+  BindableAttrValue,
+  EnvAttrValue,
+  JsExpressionAction,
+  JsExpressionAttrValue,
+  SecretAttrValue,
+} from '@mui/toolpad-core';
+import { NavigationAction } from './server/schema';
 
-export function toBindable<V>(
-  value: V | { $$jsExpression: string } | { $$env: string },
-): BindableAttrValue<V> {
-  if (value && typeof value === 'object' && typeof (value as any).$$jsExpression === 'string') {
-    return { type: 'jsExpression', value: (value as any).$$jsExpression };
+type BindingType =
+  | 'const'
+  | 'jsExpression'
+  | 'env'
+  | 'jsExpressionAction'
+  | 'navigationAction'
+  | 'secret';
+
+export function getBindingType<V>(binding: BindableAttrValue<V>): BindingType {
+  if ((binding as JsExpressionAttrValue).$$jsExpression) {
+    return 'jsExpression';
   }
-  if (value && typeof value === 'object' && typeof (value as any).$$env === 'string') {
-    return { type: 'env', value: (value as any).$$env };
+  if ((binding as EnvAttrValue).$$env) {
+    return 'env';
   }
-  return { type: 'const', value: value as V };
+  if ((binding as JsExpressionAction).$$jsExpressionAction) {
+    return 'jsExpressionAction';
+  }
+  if ((binding as NavigationAction).$$navigationAction) {
+    return 'navigationAction';
+  }
+  if ((binding as SecretAttrValue<V>).$$secret) {
+    return 'secret';
+  }
+  return 'const';
 }
 
-export function fromBindable<V>(bindable: BindableAttrValue<V>) {
-  switch (bindable.type) {
-    case 'const':
-      return bindable.value;
-    case 'jsExpression':
-      return { $$jsExpression: bindable.value };
-    case 'env':
-      return { $$env: bindable.value };
-    default:
-      throw new Error(`Unsupported bindable "${bindable.type}"`);
+export function getBindingValue<V>(binding: BindableAttrValue<V>):
+  | V
+  | string
+  | {
+      page: string;
+      parameters?: Record<string, unknown>;
+    } {
+  if ((binding as JsExpressionAttrValue).$$jsExpression) {
+    return (binding as JsExpressionAttrValue).$$jsExpression;
   }
+  if ((binding as EnvAttrValue).$$env) {
+    return (binding as EnvAttrValue).$$env;
+  }
+  if ((binding as JsExpressionAction).$$jsExpressionAction) {
+    return (binding as JsExpressionAction).$$jsExpressionAction;
+  }
+  if ((binding as NavigationAction).$$navigationAction) {
+    return (binding as NavigationAction).$$navigationAction;
+  }
+  if ((binding as SecretAttrValue<V>).$$secret) {
+    return (binding as SecretAttrValue<V>).$$secret;
+  }
+  return binding as V;
 }

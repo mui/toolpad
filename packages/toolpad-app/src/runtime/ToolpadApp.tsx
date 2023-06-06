@@ -32,6 +32,7 @@ import {
   createToolpadComponentThatThrows,
   useComponents,
   useComponent,
+  JsExpressionAttrValue,
 } from '@mui/toolpad-core';
 import { createProvidedContext } from '@mui/toolpad-utils/react';
 import { QueryClient, QueryClientProvider, useMutation } from '@tanstack/react-query';
@@ -81,7 +82,7 @@ import { execDataSourceQuery, useDataQuery, UseDataQueryConfig, UseFetch } from 
 import { NavigateToPage } from './CanvasHooksContext';
 import AppNavigation from './AppNavigation';
 import PreviewHeader from './PreviewHeader';
-import { toBindable } from '../bindings';
+import { getBindingType, getBindingValue } from '../bindings';
 
 const isPreview = process.env.NODE_ENV !== 'production';
 const isRenderedInCanvas =
@@ -376,9 +377,9 @@ function RenderedNodeContent({ node, childNodeGroups, Component }: RenderedNodeC
               Object.keys(parameters).map(async (parameterName) => {
                 const parameterValue = parameters[parameterName];
 
-                if (parameterValue && parameterValue.type === 'jsExpression') {
+                if (parameterValue?.$$jsExpression) {
                   const result = await evaluatePageExpression(
-                    parameterValue.value,
+                    parameterValue.$$jsExpression,
                     scopeId,
                     localScopeParams,
                   );
@@ -397,7 +398,7 @@ function RenderedNodeContent({ node, childNodeGroups, Component }: RenderedNodeC
         return [key, handler];
       }
 
-      if (action?.type === 'jsExpressionAction') {
+      if (action?.$$jsExpressionAction) {
         const handler = () => {
           const code = action.value;
           const exprToEvaluate = `(async () => {${code}})()`;
@@ -418,7 +419,7 @@ function RenderedNodeContent({ node, childNodeGroups, Component }: RenderedNodeC
   const layoutElementProps = React.useMemo(() => {
     if (appDom.isElement(node) && isPageRow(node)) {
       return {
-        layoutColumnSizes: childNodeGroups.children.map((child) => child.layout?.columnSize?.value),
+        layoutColumnSizes: childNodeGroups.children.map((child) => child.layout?.columnSize),
       };
     }
     return {};
@@ -560,10 +561,10 @@ const PageRootComponent = createComponent(PageRoot, {
  * Turns an object consisting of a nested structure of BindableAttrValues
  * into a flat array of relative paths associated with their value.
  * Example:
- *   { foo: { bar: { type: 'const', value:1 } }, baz: [{ type: 'jsExpression', value: 'quux' }] }
+ *   { foo: { bar: 1 }, baz: [{ $$jsExpression: 'quux' }] }
  *   =>
- *   [['.foo.bar', { type: 'const', value:1 }],
- *    ['.baz[0]', { type: 'jsExpression', value: 'quux' }]]
+ *   [['.foo.bar', 1],
+ *    ['.baz[0]', { $$jsExpression: 'quux' }]]
  */
 function flattenNestedBindables(
   params?: NestedBindableAttrs,
@@ -579,7 +580,7 @@ function flattenNestedBindables(
   }
   // TODO: create a marker in bindables (similar to $ref) to recognize them automatically
   // in a nested structure. This would allow us to build deeply nested structures
-  if (typeof params.type === 'string') {
+  if (getBindingType(params) !== 'const') {
     return [[prefix, params as BindableAttrValue<any>]];
   }
   return Object.entries(params).flatMap(([key, param]) =>
@@ -596,7 +597,7 @@ function flattenNestedBindables(
  * Example bindingId: 'nodeId.params'
  * Example params:
  * {
- *  ["order", { type: 'jsExpression', value: 'form.value\n' }]
+ *  ["order", { $$jsExpression: 'form.value\n' }]
  * }
  * Example result:
  * {
@@ -733,7 +734,7 @@ interface FetchNodeProps {
 }
 
 function FetchNode({ node, page }: FetchNodeProps) {
-  const mode: appDom.FetchMode = node.attributes.mode?.value || 'query';
+  const mode: appDom.FetchMode = node.attributes.mode || 'query';
   switch (mode) {
     case 'query':
       return <QueryNode node={node} page={page} />;
@@ -752,16 +753,18 @@ function parseBinding(
   bindable: BindableAttrValue<any>,
   { scopePath }: ParseBindingOptions = {},
 ): ParsedBinding | EvaluatedBinding {
-  if (bindable?.type === 'const') {
+  const bindingType = bindable && getBindingType(bindable);
+
+  if (bindingType === 'const') {
     return {
       scopePath,
-      result: { value: bindable.value },
+      result: { value: bindable },
     };
   }
-  if (bindable?.type === 'jsExpression') {
+  if (bindingType === 'jsExpression') {
     return {
       scopePath,
-      expression: bindable.value,
+      expression: bindable.$$jsExpression,
     };
   }
   return {
@@ -798,10 +801,10 @@ function parseBindings(
           ? `${elm.id}.props.${argType.defaultValueProp}`
           : undefined;
 
-        const propValue = elm.props?.[propName];
+        const propValue: BindableAttrValue<any> = elm.props?.[propName];
 
         const binding: BindableAttrValue<any> =
-          propValue || appDom.createConst(argType ? getArgTypeDefaultValue(argType) : undefined);
+          propValue || (argType ? getArgTypeDefaultValue(argType) : undefined);
 
         const bindingId = `${elm.id}.props.${propName}`;
 
@@ -841,10 +844,8 @@ function parseBindings(
                 Array.isArray(value) ? `[${nestedPropName}]` : `.${nestedPropName}`
               }`;
 
-              const bindableNestedProp = toBindable(nestedProp);
-
-              if (bindableNestedProp.type !== 'const') {
-                parsedBindingsMap.set(nestedBindingId, parseBinding(bindableNestedProp));
+              if (getBindingType(nestedProp) !== 'const') {
+                parsedBindingsMap.set(nestedBindingId, parseBinding(nestedProp));
               } else {
                 parseNestedBindings(
                   (value as Record<string, unknown>)[nestedPropName],
@@ -855,8 +856,9 @@ function parseBindings(
           }
         };
 
-        if (propValue?.value) {
-          parseNestedBindings(propValue.value, bindingId);
+        const propBindingValue = propValue && getBindingValue(propValue);
+        if (propBindingValue) {
+          parseNestedBindings(propBindingValue, bindingId);
         }
       }
 
@@ -871,8 +873,9 @@ function parseBindings(
       if (!isPageLayoutComponent(elm)) {
         for (const [propName, argType] of Object.entries(layoutBoxArgTypes)) {
           const binding =
-            elm.layout?.[propName as keyof typeof layoutBoxArgTypes] ||
-            appDom.createConst(argType ? getArgTypeDefaultValue(argType) : undefined);
+            elm.layout?.[propName as keyof typeof layoutBoxArgTypes] || argType
+              ? getArgTypeDefaultValue(argType)
+              : undefined;
           const bindingId = `${elm.id}.layout.${propName}`;
           parsedBindingsMap.set(bindingId, parseBinding(binding, {}));
         }
@@ -890,7 +893,7 @@ function parseBindings(
         for (const [nestedPath, paramValue] of nestedBindablePaths) {
           const bindingId = `${elm.id}.params${nestedPath}`;
           const scopePath = `${elm.name}.params${nestedPath}`;
-          const bindable = paramValue || appDom.createConst(undefined);
+          const bindable = paramValue;
           parsedBindingsMap.set(bindingId, parseBinding(bindable, { scopePath }));
         }
       }
@@ -911,7 +914,7 @@ function parseBindings(
       for (const [nestedPath, paramValue] of nestedBindablePaths) {
         const bindingId = `${elm.id}.config${nestedPath}`;
         const scopePath = `${elm.name}.config${nestedPath}`;
-        const bindable = paramValue || appDom.createConst(undefined);
+        const bindable = paramValue;
         parsedBindingsMap.set(bindingId, parseBinding(bindable, { scopePath }));
       }
     }
@@ -921,15 +924,17 @@ function parseBindings(
         for (const [paramName, bindable] of Object.entries(elm.params)) {
           const bindingId = `${elm.id}.params.${paramName}`;
           const scopePath = `${elm.name}.params.${paramName}`;
-          if (bindable?.type === 'const') {
+
+          const bindingType = bindable && getBindingType(bindable);
+          if (bindingType === 'const') {
             parsedBindingsMap.set(bindingId, {
               scopePath,
-              result: { value: bindable.value },
+              result: { value: bindable },
             });
-          } else if (bindable?.type === 'jsExpression') {
+          } else if (bindingType === 'jsExpression') {
             parsedBindingsMap.set(bindingId, {
               scopePath,
-              expression: bindable.value,
+              expression: (bindable as JsExpressionAttrValue).$$jsExpression,
             });
           }
         }
@@ -949,7 +954,7 @@ function parseBindings(
 
   if (appDom.isPage(rootNode)) {
     const urlParams = new URLSearchParams(location.search);
-    const pageParameters = rootNode.attributes.parameters?.value || [];
+    const pageParameters = rootNode.attributes.parameters || [];
 
     for (const [paramName, paramDefault] of pageParameters) {
       const bindingId = `${rootNode.id}.parameters.${paramName}`;
@@ -972,7 +977,7 @@ function RenderedPage({ nodeId }: RenderedNodeProps) {
   const page = appDom.getNode(dom, nodeId, 'page');
   const { children = [], queries = [] } = appDom.getChildNodes(dom, page);
 
-  usePageTitle(page.attributes.title.value);
+  usePageTitle(page.attributes.title);
 
   const location = useLocation();
   const components = useComponents();
@@ -1292,7 +1297,7 @@ function ToolpadAppLayout({ dom, hasShell: hasShellProp = true }: ToolpadAppLayo
   const defaultPage = pages[0];
   const page = pageId ? appDom.getMaybeNode(dom, pageId as NodeId, 'page') : defaultPage;
 
-  const displayMode = urlParams.get('toolpad-display') || page?.attributes.display?.value;
+  const displayMode = urlParams.get('toolpad-display') || page?.attributes.display;
 
   const hasShell = hasShellProp && displayMode !== 'standalone';
 

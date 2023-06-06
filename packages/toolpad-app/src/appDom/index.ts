@@ -3,11 +3,12 @@ import { generateKeyBetween } from 'fractional-indexing';
 import {
   NodeId,
   NodeReference,
-  ConstantAttrValue,
   BindableAttrValue,
   BindableAttrValues,
   SecretAttrValue,
   BindableAttrEntries,
+  JsExpressionAttrValue,
+  EnvAttrValue,
 } from '@mui/toolpad-core';
 import invariant from 'invariant';
 import { BoxProps } from '@mui/material';
@@ -73,9 +74,9 @@ export interface ThemeNode extends AppDomNodeBase {
 export interface ConnectionNode<P = unknown> extends AppDomNodeBase {
   readonly type: 'connection';
   readonly attributes: {
-    readonly dataSource: ConstantAttrValue<string>;
+    readonly dataSource: string;
     readonly params: SecretAttrValue<P | null>;
-    readonly status: ConstantAttrValue<ConnectionStatus | null>;
+    readonly status: ConnectionStatus | null;
   };
 }
 
@@ -84,31 +85,31 @@ export type PageDisplayMode = 'standalone' | 'shell';
 export interface PageNode extends AppDomNodeBase {
   readonly type: 'page';
   readonly attributes: {
-    readonly title: ConstantAttrValue<string>;
-    readonly parameters?: ConstantAttrValue<[string, string][]>;
-    readonly module?: ConstantAttrValue<string>;
-    readonly display?: ConstantAttrValue<PageDisplayMode>;
+    readonly title: string;
+    readonly parameters?: [string, string][];
+    readonly module?: string;
+    readonly display?: PageDisplayMode;
   };
 }
 
 export interface ElementNode<P = any> extends AppDomNodeBase {
   readonly type: 'element';
   readonly attributes: {
-    readonly component: ConstantAttrValue<string>;
+    readonly component: string;
   };
   readonly props?: BindableAttrValues<P>;
   readonly layout?: {
-    readonly horizontalAlign?: ConstantAttrValue<BoxProps['justifyContent']>;
-    readonly verticalAlign?: ConstantAttrValue<BoxProps['alignItems']>;
-    readonly columnSize?: ConstantAttrValue<number>;
+    readonly horizontalAlign?: BoxProps['justifyContent'];
+    readonly verticalAlign?: BoxProps['alignItems'];
+    readonly columnSize?: number;
   };
 }
 
 export interface CodeComponentNode extends AppDomNodeBase {
   readonly type: 'codeComponent';
   readonly attributes: {
-    readonly code: ConstantAttrValue<string>;
-    readonly isNew?: ConstantAttrValue<boolean>;
+    readonly code: string;
+    readonly isNew?: boolean;
   };
 }
 
@@ -124,18 +125,18 @@ export interface QueryNode<Q = any> extends AppDomNodeBase {
   readonly type: 'query';
   readonly params?: BindableAttrEntries;
   readonly attributes: {
-    readonly mode?: ConstantAttrValue<FetchMode>;
-    readonly dataSource?: ConstantAttrValue<string>;
-    readonly connectionId: ConstantAttrValue<NodeReference | null>;
-    readonly query: ConstantAttrValue<Q>;
-    readonly transform?: ConstantAttrValue<string>;
-    readonly transformEnabled?: ConstantAttrValue<boolean>;
+    readonly mode?: FetchMode;
+    readonly dataSource?: string;
+    readonly connectionId: NodeReference | null;
+    readonly query: Q;
+    readonly transform?: string;
+    readonly transformEnabled?: boolean;
     /** @deprecated Not necessary to be user-facing, we will expose staleTime instead if necessary */
-    readonly refetchOnWindowFocus?: ConstantAttrValue<boolean>;
+    readonly refetchOnWindowFocus?: boolean;
     /** @deprecated Not necessary to be user-facing, we will expose staleTime instead if necessary */
-    readonly refetchOnReconnect?: ConstantAttrValue<boolean>;
-    readonly refetchInterval?: ConstantAttrValue<number>;
-    readonly cacheTime?: ConstantAttrValue<number>;
+    readonly refetchOnReconnect?: boolean;
+    readonly refetchInterval?: number;
+    readonly cacheTime?: number;
     readonly enabled?: BindableAttrValue<boolean>;
   };
 }
@@ -147,9 +148,9 @@ export interface MutationNode<Q = any> extends AppDomNodeBase {
   readonly type: 'mutation';
   readonly params?: BindableAttrValues;
   readonly attributes: {
-    readonly dataSource?: ConstantAttrValue<string>;
-    readonly connectionId: ConstantAttrValue<NodeReference | null>;
-    readonly query: ConstantAttrValue<Q>;
+    readonly dataSource?: string;
+    readonly connectionId: NodeReference | null;
+    readonly query: Q;
   };
 }
 
@@ -238,12 +239,8 @@ export function createId(): NodeId {
   return nanoid(7) as NodeId;
 }
 
-export function createConst<V>(value: V): ConstantAttrValue<V> {
-  return { type: 'const', value };
-}
-
 export function createSecret<V>(value: V): SecretAttrValue<V> {
-  return { type: 'secret', value };
+  return { $$secret: value };
 }
 
 export function getMaybeNode<T extends AppDomNodeType>(
@@ -547,7 +544,7 @@ export function createElement<P>(
     name: name || uncapitalize(component),
     props,
     attributes: {
-      component: createConst(component),
+      component,
     },
     layout,
   });
@@ -612,7 +609,7 @@ export function getPageAncestor(dom: AppDom, node: AppDomNode): PageNode | null 
  */
 export function getComponentTypeNodes(dom: AppDom, componentId: string): readonly AppDomNode[] {
   return Object.values(dom.nodes).filter(
-    (node) => isElement(node) && node.attributes.component.value === componentId,
+    (node) => isElement(node) && node.attributes.component === componentId,
   );
 }
 
@@ -735,13 +732,8 @@ export function setQueryProp<Q, K extends keyof Q>(
   prop: K,
   value: Q[K],
 ): QueryNode<Q> {
-  const original = node.attributes.query.value;
-  return setNamespacedProp(
-    node,
-    'attributes',
-    'query',
-    createConst<Q>({ ...original, [prop]: value }),
-  );
+  const original = node.attributes.query;
+  return setNamespacedProp(node, 'attributes', 'query', { ...original, [prop]: value });
 }
 
 export function setNodeNamespacedProp<
@@ -863,10 +855,6 @@ export function removeNode(dom: AppDom, nodeId: NodeId) {
   });
 }
 
-export function toConstPropValue<T = any>(value: T): ConstantAttrValue<T> {
-  return { type: 'const', value };
-}
-
 export function fromConstPropValue(prop: undefined): undefined;
 export function fromConstPropValue<T>(prop: BindableAttrValue<T>): T;
 export function fromConstPropValue<T>(prop?: BindableAttrValue<T | undefined>): T | undefined;
@@ -874,10 +862,10 @@ export function fromConstPropValue<T>(prop?: BindableAttrValue<T | undefined>): 
   if (!prop) {
     return undefined;
   }
-  if (prop.type !== 'const') {
+  if ((prop as JsExpressionAttrValue).$$jsExpression || (prop as EnvAttrValue).$$env) {
     throw new Error(`trying to unbox a non-constant prop value`);
   }
-  return prop.value;
+  return prop as T;
 }
 
 export function fromConstPropValues<P>(props: BindableAttrValues<P>): Partial<P> {
@@ -1081,7 +1069,7 @@ function createRenderTreeNode(node: AppDomNode): RenderTreeNode | null {
   }
 
   if (isQuery(node) || isMutation(node)) {
-    if (node.attributes.query.value) {
+    if (node.attributes.query) {
       node = setNamespacedProp(node, 'attributes', 'query', null);
     }
   }
@@ -1129,8 +1117,8 @@ export function createDefaultDom(): AppDom {
   const newPageNode = createNode(dom, 'page', {
     name: 'Page 1',
     attributes: {
-      title: createConst('Page 1'),
-      display: createConst('shell'),
+      title: 'Page 1',
+      display: 'shell',
     },
   });
 

@@ -1,6 +1,6 @@
 # Avoid conflicts with the other Next.js apps hosted under https://mui.com/
 
-/toolpad/_next/* /_next/:splat 301
+/toolpad/\_next/\* /\_next/:splat 301
 
 # Legacy redirection
 
@@ -15,6 +15,19 @@
 
 /toolpad/getting-started/quickstart/ /toolpad/getting-started/first-app/ 301
 /toolpad/schema-reference/ /toolpad/reference/file-schema/ 301
+/toolpad/getting-started/configuration/ /toolpad/how-to-guides/basic-auth/ 301
+/toolpad/connecting-to-datasources/queries/ /toolpad/concepts/connecting-to-data/ 301
+/toolpad/connecting-to-datasources/http-requests/ /toolpad/concepts/connecting-to-data/#http-requests 301
+/toolpad/connecting-to-datasources/custom-functions/ /toolpad/concepts/connecting-to-data/#custom-functions 301
+/toolpad/building-ui/component-library/ /toolpad/concepts/building-ui/#component-library 301
+/toolpad/building-ui/canvas-and-inspector/ /toolpad/concepts/building-ui/#inspector 301
+/toolpad/building-ui/custom-components/ /toolpad/concepts/custom-components/ 301
+/toolpad/building-ui/data-grid-component/ /toolpad/how-to-guides/customize-datagrid/ 301
+/toolpad/building-ui/page-configuration/ /toolpad/concepts/managing-state/#page-parameters 301
+/toolpad/building-ui/theming/ /toolpad/concepts/theming/ 301
+/toolpad/data-binding/binding-state/ /toolpad/concepts/managing-state/ 301
+/toolpad/data-binding/event-handling/ /toolpad/concepts/managing-state/#event-handling 301
+/toolpad/deployment/ /toolpad/concepts/deployment/ 301
 
 # Create separate namespace on https://mui.com
 

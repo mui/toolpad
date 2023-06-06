@@ -166,7 +166,12 @@ const run = async () => {
   const pj = await readJsonFile(path.resolve(__dirname, `../package.json`));
   // check the node version before create
   if (!satisfies(process.version, pj.engines?.node)) {
-    console.error('Please upgrade your node version. Your node version is too low');
+    // eslint-disable-next-line no-console
+    console.log(
+      `${chalk.red('error')} - Your node version ${
+        process.version
+      } is unsupported. Please upgrade it to at least ${pj.engines?.node}`,
+    );
     process.exit(1);
   }
 

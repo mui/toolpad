@@ -2,13 +2,24 @@ import { createFunction } from '@mui/toolpad/server';
 
 let nextId = 1;
 
-function generateId() {
+function generateId(): number {
   const id = nextId;
   nextId += 1;
   return id;
 }
 
-globalThis.customers = globalThis.customers ?? [
+interface Customer {
+  id: number;
+  name?: string;
+  account_creation_date?: string;
+  country_of_residence?: string;
+  phone_number?: number;
+  email?: string;
+  address?: string;
+  gender?: string;
+}
+
+const customers: Customer[] = [
   {
     id: generateId(),
     name: 'Emily Lee',
@@ -71,34 +82,35 @@ globalThis.customers = globalThis.customers ?? [
   },
 ];
 
-const customers = globalThis.customers;
-
 export async function getCustomers() {
   return customers;
 }
 
-const customerProperties = {
-  name: {
-    type: 'string' as const,
-  },
-  account_creation_date: {
-    type: 'string' as const,
-  },
-  country_of_residence: {
-    type: 'string' as const,
-  },
-  phone_number: {
-    type: 'number' as const,
-  },
-  email: {
-    type: 'string' as const,
-  },
-  address: {
-    type: 'string' as const,
-  },
-  gender: {
-    type: 'string' as const,
-    enum: ['Male', 'Female', 'Other'],
+const customerSchema = {
+  type: 'object' as const,
+  properties: {
+    name: {
+      type: 'string' as const,
+    },
+    account_creation_date: {
+      type: 'string' as const,
+    },
+    country_of_residence: {
+      type: 'string' as const,
+    },
+    phone_number: {
+      type: 'number' as const,
+    },
+    email: {
+      type: 'string' as const,
+    },
+    address: {
+      type: 'string' as const,
+    },
+    gender: {
+      type: 'string' as const,
+      enum: ['Male', 'Female', 'Other'],
+    },
   },
 };
 
@@ -108,17 +120,14 @@ export const addCustomer = createFunction(
       id: generateId(),
       ...parameters.values,
     };
-    customers.push(newCustomer as any);
+    customers.push(newCustomer);
     return newCustomer;
   },
   {
     parameters: {
       values: {
         type: 'object',
-        schema: {
-          type: 'object',
-          properties: customerProperties,
-        },
+        schema: customerSchema,
       },
     },
   },
@@ -139,10 +148,7 @@ export const updateCustomer = createFunction(
       id: { type: 'number' },
       values: {
         type: 'object',
-        schema: {
-          type: 'object',
-          properties: customerProperties,
-        },
+        schema: customerSchema,
       },
     },
   },

@@ -163,7 +163,7 @@ const scaffoldProject = async (absolutePath: string, installFlag: boolean): Prom
 
 // Run the CLI interaction with Inquirer.js
 const run = async () => {
-  const pj = await readJsonFile(path.resolve(__dirname, `./package.json`));
+  const pj = await readJsonFile(path.resolve(__dirname, `../package.json`));
   // check the node version before create
   if (!satisfies(process.version, pj.engines?.node)) {
     console.error('Please upgrade your node version. Your node version is too low');

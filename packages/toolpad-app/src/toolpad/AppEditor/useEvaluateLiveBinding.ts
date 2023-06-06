@@ -13,11 +13,10 @@ function evaluateBindableAttrEntries(
   jsRuntime: JsRuntime,
   input: BindableAttrEntries,
   globalScope: Record<string, unknown>,
-  env?: Record<string, string>,
 ): [string, LiveBinding][] {
   return input.map(([key, bindable]) => [
     key,
-    evaluateBindable(jsRuntime, bindable || null, globalScope, env),
+    evaluateBindable(jsRuntime, bindable || null, globalScope),
   ]);
 }
 
@@ -25,29 +24,24 @@ function evaluateBindableAttrValues(
   jsRuntime: JsRuntime,
   input: BindableAttrValues<any>,
   globalScope: Record<string, unknown>,
-  env?: Record<string, string>,
 ): Record<string, LiveBinding> {
-  return mapValues(input, (bindable) =>
-    evaluateBindable(jsRuntime, bindable || null, globalScope, env),
-  );
+  return mapValues(input, (bindable) => evaluateBindable(jsRuntime, bindable || null, globalScope));
 }
 
 export interface UseEvaluateLiveBinding {
   jsRuntime: JsRuntime;
   input: BindableAttrValue<any> | null;
   globalScope: Record<string, unknown>;
-  env?: Record<string, string>;
 }
 
 export function useEvaluateLiveBinding({
   jsRuntime,
   input,
   globalScope,
-  env = {},
 }: UseEvaluateLiveBinding): LiveBinding {
   return React.useMemo(() => {
-    return evaluateBindable(jsRuntime, input, globalScope, env);
-  }, [jsRuntime, input, globalScope, env]);
+    return evaluateBindable(jsRuntime, input, globalScope);
+  }, [jsRuntime, input, globalScope]);
 }
 
 export interface UseEvaluateLiveBindings {
@@ -55,34 +49,30 @@ export interface UseEvaluateLiveBindings {
   server?: boolean;
   input: BindableAttrValues<any>;
   globalScope: Record<string, unknown>;
-  env?: Record<string, string>;
 }
 
 export function useEvaluateLiveBindings({
   jsRuntime,
   input,
   globalScope,
-  env = {},
 }: UseEvaluateLiveBindings): Partial<Record<string, LiveBinding>> {
   return React.useMemo(() => {
-    return evaluateBindableAttrValues(jsRuntime, input, globalScope, env);
-  }, [jsRuntime, input, globalScope, env]);
+    return evaluateBindableAttrValues(jsRuntime, input, globalScope);
+  }, [jsRuntime, input, globalScope]);
 }
 
 export interface UseEvaluateLiveBindingEntries {
   jsRuntime: JsRuntime;
   input: BindableAttrEntries;
   globalScope: Record<string, unknown>;
-  env?: Record<string, string>;
 }
 
 export function useEvaluateLiveBindingEntries({
   jsRuntime,
   input,
   globalScope,
-  env = {},
 }: UseEvaluateLiveBindingEntries): [string, LiveBinding][] {
   return React.useMemo(() => {
-    return evaluateBindableAttrEntries(jsRuntime, input, globalScope, env);
-  }, [jsRuntime, input, globalScope, env]);
+    return evaluateBindableAttrEntries(jsRuntime, input, globalScope);
+  }, [jsRuntime, input, globalScope]);
 }

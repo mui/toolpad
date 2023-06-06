@@ -229,10 +229,10 @@ async function main() {
 
   const project = await getProject();
 
-  project.events.on('externalChange', () => {
+  project.events.on('*', (event, payload) => {
     wsServer.clients.forEach((client) => {
       if (client.readyState === WebSocket.OPEN) {
-        client.send(JSON.stringify({ kind: 'externalChange' }));
+        client.send(JSON.stringify({ kind: 'projectEvent', event, payload }));
       }
     });
   });

@@ -14,6 +14,7 @@ export const echo = createFunction(
       params: parameters,
       secrets: {
         bar: process.env.SECRET_BAR,
+        baz: process.env.SECRET_BAZ,
       },
     };
   },
@@ -38,6 +39,17 @@ export const withParams = createFunction(
     parameters: {
       foo: { type: 'string' },
       // __NEW_PARAMETER__
+    },
+  },
+);
+
+export const manualQueryWithParams = createFunction(
+  async ({ parameters }) => {
+    return { parameters };
+  },
+  {
+    parameters: {
+      foo: { type: 'string' },
     },
   },
 );

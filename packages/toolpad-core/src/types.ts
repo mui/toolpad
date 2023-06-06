@@ -1,6 +1,7 @@
 import type * as React from 'react';
 import type { Branded } from '@mui/toolpad-utils/types';
 import type { SerializedError } from '@mui/toolpad-utils/errors';
+import { JSONSchema7 } from 'json-schema';
 import type { TOOLPAD_COMPONENT } from './constants.js';
 
 export type NodeId = Branded<string, 'NodeId'>;
@@ -144,9 +145,9 @@ export interface ObjectValueType extends ValueTypeBase {
    */
   type: 'object';
   /**
-   * the url of a JSON schema describing the object.
+   * A JSON schema describing the object.
    */
-  schema?: string;
+  schema?: JSONSchema7;
   default?: any;
 }
 
@@ -156,9 +157,9 @@ export interface ArrayValueType extends ValueTypeBase {
    */
   type: 'array';
   /**
-   * the url of a JSON schema describing the array.
+   * A JSON schema describing the array.
    */
-  schema?: string;
+  schema?: JSONSchema7;
   default?: any[];
 }
 
@@ -236,7 +237,7 @@ export type PropValueType =
   | TemplateValueType
   | EventValueType;
 
-interface ParameterTypeLookup {
+export interface ParameterTypeLookup {
   number: number;
   string: string;
   boolean: boolean;
@@ -401,7 +402,7 @@ export interface ComponentConfig<P extends object = {}> {
   loadingPropSource?: (keyof P & string)[];
   /**
    * Designates a property as "the loading property". If Toolpad detects any of the
-   * inputs is still loading it will set this property to true
+   * inputs is still loading it will set this property to `true`
    */
   loadingProp?: keyof P & string;
   /**

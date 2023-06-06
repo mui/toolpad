@@ -1081,13 +1081,7 @@ function createRenderTreeNode(node: AppDomNode): RenderTreeNode | null {
   }
 
   if (isQuery(node) || isMutation(node)) {
-    // This is hacky, should we delegate this check to the datasources?
-    const isBrowserSideRestQuery: boolean =
-      (node.attributes.dataSource?.value === 'rest' ||
-        node.attributes.dataSource?.value === 'function') &&
-      !!(node.attributes.query.value as any).browser;
-
-    if (node.attributes.query.value && !isBrowserSideRestQuery) {
+    if (node.attributes.query.value) {
       node = setNamespacedProp(node, 'attributes', 'query', null);
     }
   }

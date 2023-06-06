@@ -6,7 +6,7 @@ defaults: &defaults
   working_directory: /tmp/mui-toolpad
   resource_class: medium
   docker:
-    - image: cimg/node:18.10.0
+    - image: cimg/node:16.14.2
 # CircleCI has disabled the cache across forks for security reasons.
 # Following their official statement, it was a quick solution, they
 # are working on providing this feature back with appropriate security measures.
@@ -83,10 +83,6 @@ commands:
 jobs:
   checkout:
     <<: *defaults
-    docker:
-      - image: cimg/node:18.10.0
-        environment:
-          TOOLPAD_SHADOW_DATABASE_URL: postgresql://postgres@localhost/circle_test
     steps:
       - checkout
       - install_js
@@ -137,7 +133,7 @@ jobs:
     <<: *defaults
     resource_class: 'large'
     docker:
-      - image: mcr.microsoft.com/playwright:v1.34.0-focal
+      - image: mcr.microsoft.com/playwright:v1.34.3-focal
         environment:
           NODE_ENV: test
           TOOLPAD_TEST_RETRIES: 1
@@ -149,6 +145,11 @@ jobs:
       - run:
           name: 'Build packages'
           command: yarn release:build
+      - run:
+          name: '`yarn docs:build:api` changes committed?'
+          command: |
+            yarn docs:build:api
+            git diff --exit-code
       - save_cache:
           name: Save Next.js cache
           key: v0-next-{{ checksum "yarn.lock" }}

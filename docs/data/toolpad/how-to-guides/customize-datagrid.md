@@ -6,7 +6,7 @@
 
 By default, you can connect any JSON data to a Toolpad data grid and it will attempt to guess each column's type display it appropriately:
 
-{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/how-to-guides/customize-datagrid/datagrid.png", "alt": "Data grid with data", "caption": "The default data grid showing multiple data types" }}
+{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/how-to-guides/customize-datagrid/datagrid.png", "alt": "Data grid with data", "caption": "The default data grid showing multiple data types", "aspectRatio": 3 }}
 
 ## Customizing cell rendering
 
@@ -76,4 +76,4 @@ The `OrderIdChip` component should appear in our component library on saving:
 
 4. That's it! We have the desired functionality:
 
-{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/how-to-guides/customize-datagrid/chip-column.gif", "alt": "Custom chip inside data grid", "caption": "Using our custom component in the data grid", "indent": 1 }}
+{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/how-to-guides/customize-datagrid/chip-column.gif", "alt": "Custom chip inside data grid", "caption": "Using our custom component in the data grid", "indent": 1, "aspectRatio": 3 }}

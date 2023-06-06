@@ -45,11 +45,11 @@
 
 2. Depending on whether the visibility of the GitHub repository is set to private or public, we will need to either connect our GitHub account to Render, or paste in the URL of the repository we created above:
 
-{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/tutorials/deploy-render/render-connect-github.png", "alt": "GitHub new repo ", "caption": "Connecting GitHub to Render", "indent": 1 }}
+{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/tutorials/deploy-render/render-connect-github.png", "alt": "GitHub new repo ", "caption": "Connecting GitHub to Render", "indent": 1, "aspectRatio": 2 }}
 
 3. If using a private repository, we need to search for and select the repository we intend to deploy once connected to GitHub:
 
-{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/tutorials/deploy-render/render-search.png", "alt": "GitHub repo on Render ", "caption": "Connecting our GitHub repository", "indent": 1 }}
+{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/tutorials/deploy-render/render-search.png", "alt": "GitHub repo on Render ", "caption": "Connecting our GitHub repository", "indent": 1, "aspectRatio": 1.5}}
 
 4. With the repository selected, we advance to deployment configuration. Render can guess that we are deploying a Node app. Set the name which will appear in the URL of our deployed app, like `<APP-NAME>.onrender.com`:
 
@@ -92,4 +92,4 @@ That's it! We're up and running in a few minutes.
 
 Make changes, push to GitHub, and your app will automatically redeploy each time.
 
-Check out Render documentation for more advanced settings, like adding [environment variables](https://render.com/docs/configure-environment-variables) to your app.
+Check out the Render documentation for more advanced settings, like adding [environment variables](https://render.com/docs/configure-environment-variables) to your app.

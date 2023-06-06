@@ -3,14 +3,16 @@ import * as path from 'path';
 import * as yaml from 'yaml';
 import { Dirent } from 'fs';
 import { yamlOverwrite } from 'yaml-diff-patch';
-import { errorFrom } from '@mui/toolpad-utils/errors';
+import { errorFrom } from './errors';
+
+export type Reviver = NonNullable<Parameters<typeof JSON.parse>[1]>;
 
 /**
  * Like `fs.readFile`, but for JSON files specifically. Will throw on malformed JSON.
  */
-export async function readJsonFile(filePath: string): Promise<any> {
+export async function readJsonFile(filePath: string, reviver?: Reviver): Promise<any> {
   const content = await fs.readFile(filePath, { encoding: 'utf-8' });
-  return JSON.parse(content);
+  return JSON.parse(content, reviver);
 }
 
 export async function readMaybeFile(filePath: string): Promise<string | null> {
@@ -79,4 +81,24 @@ export async function folderExists(folderpath: string): Promise<boolean> {
     }
     throw err;
   }
+}
+
+export async function fileReplace(
+  filePath: string,
+  searchValue: string | RegExp,
+  replaceValue: string,
+): Promise<void> {
+  const queriesFileContent = await fs.readFile(filePath, { encoding: 'utf-8' });
+  const updatedFileContent = queriesFileContent.replace(searchValue, replaceValue);
+  await fs.writeFile(filePath, updatedFileContent);
+}
+
+export async function fileReplaceAll(
+  filePath: string,
+  searchValue: string | RegExp,
+  replaceValue: string,
+) {
+  const queriesFileContent = await fs.readFile(filePath, { encoding: 'utf-8' });
+  const updatedFileContent = queriesFileContent.replaceAll(searchValue, replaceValue);
+  await fs.writeFile(filePath, updatedFileContent);
 }

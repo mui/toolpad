@@ -1,8 +1,8 @@
 import * as path from 'path';
+import { fileReplace } from '../../../packages/toolpad-utils/src/fs';
 import { test, expect, Page } from '../../playwright/localTest';
 import { ToolpadRuntime } from '../../models/ToolpadRuntime';
 import { ToolpadEditor } from '../../models/ToolpadEditor';
-import { fileReplace } from '../../utils/fs';
 import { waitForMatch } from '../../utils/streams';
 
 test.use({

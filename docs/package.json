@@ -27,7 +27,7 @@
     "@emotion/server": "11.11.0",
     "@emotion/styled": "11.11.0",
     "@mui/icons-material": "5.11.16",
-    "@mui/material": "5.13.3",
+    "@mui/material": "5.13.4",
     "@mui/monorepo": "https://github.com/mui/material-ui.git",
     "@mui/styles": "5.13.2",
     "@mui/utils": "5.13.1",
@@ -59,19 +59,19 @@
     "jss-rtl": "0.3.0",
     "lodash": "4.17.21",
     "lz-string": "1.5.0",
-    "markdown-to-jsx": "7.2.0",
+    "markdown-to-jsx": "7.2.1",
     "marked": "4.3.0",
     "next": "13.4.4",
     "next-transpile-modules": "10.0.0",
     "nprogress": "0.2.0",
-    "postcss": "8.4.23",
+    "postcss": "8.4.24",
     "prismjs": "1.29.0",
     "prop-types": "15.8.1",
     "raw-loader": "4.0.2",
     "react": "18.2.0",
     "react-docgen": "5.4.3",
     "react-dom": "18.2.0",
-    "react-hook-form": "7.44.1",
+    "react-hook-form": "7.44.3",
     "react-is": "18.2.0",
     "react-router": "6.4.4",
     "react-router-dom": "6.4.4",
@@ -84,7 +84,7 @@
     "stylis": "4.2.0",
     "stylis-plugin-rtl": "npm:stylis-plugin-rtl@^2.1.1",
     "stylis-plugin-rtl-sc": "npm:stylis-plugin-rtl@^2.1.1",
-    "webpack-bundle-analyzer": "4.8.0"
+    "webpack-bundle-analyzer": "4.9.0"
   },
   "devDependencies": {
     "@babel/plugin-transform-react-constant-elements": "7.22.3",
@@ -95,7 +95,7 @@
     "cpy-cli": "4.2.0",
     "cross-fetch": "3.1.6",
     "gm": "1.25.0",
-    "typescript": "5.0.4",
+    "typescript": "5.1.3",
     "typescript-to-proptypes": "2.2.1"
   }
 }

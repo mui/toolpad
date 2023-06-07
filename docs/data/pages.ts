@@ -131,7 +131,8 @@ const pages: MuiPage[] = [
     children: [
       // { pathname: '/toolpad/examples/admin-app' },
       // { pathname: '/toolpad/examples/KPI-performance' },
-      { pathname: '/toolpad/examples/qr-generator' },
+      { pathname: '/toolpad/examples/qr-generator',
+         title: 'QR Code generator' }
     ],
   },
   // {

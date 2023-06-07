@@ -20,7 +20,7 @@ export function hasOwnProperty<X extends {}, Y extends PropertyKey>(
 }
 
 /**
- * Maps `obj` to a new object. The `mapper` function receices an entry array of jey and value and
+ * Maps `obj` to a new object. The `mapper` function receices an entry array of key and value and
  * is allowed to manipulate both. It can also return `null` to omit a property from the result.
  */
 export function mapProperties<P, L extends PropertyKey, U>(

@@ -207,8 +207,8 @@ function createScope(
 
 const RuntimeScopeContext = React.createContext<RuntimeScope | undefined>(undefined);
 const [useDomContext, DomContextProvider] = createProvidedContext<appDom.AppDom>('Dom');
-const [useEvaluatePageExpression, EvaluatePageExpressionProvider] =
-  createProvidedContext<(expr: string, scope: RuntimeScope) => any>('EvaluatePageExpression');
+const [useEvaluateScopeExpression, EvaluateScopeExpressionProvider] =
+  createProvidedContext<(expr: string) => any>('EvaluateScopeExpression');
 const [useSetControlledBindingContext, SetControlledBindingContextProvider] =
   createProvidedContext<(id: string, result: BindingEvaluationResult, scopeId?: string) => void>(
     'SetControlledBinding',
@@ -546,16 +546,22 @@ interface ScopedTemplateProps {
   propName: string;
   node: appDom.ElementNode;
   i: number;
+  onUpdate?: (params: { scope: RuntimeScope; scopeMeta: ScopeMeta }) => void;
   children?: React.ReactNode;
 }
 
-function RuntimeScoped({ node, i, propName, children }: ScopedTemplateProps) {
-  const scope = useAssertedContext(RuntimeScopeContext);
+function RuntimeScoped({ node, i, propName, onUpdate, children }: ScopedTemplateProps) {
+  const parentScope = useAssertedContext(RuntimeScopeContext);
   const dom = useDomContext();
   const components = useComponents();
 
   const { [propName]: templateChildren = [] } = appDom.getChildNodes(dom, node);
-  const { parsedBindings, controlled } = parseBindings(dom, templateChildren, components, null);
+  const { parsedBindings, controlled, scopeMeta } = parseBindings(
+    dom,
+    templateChildren,
+    components,
+    null,
+  );
 
   const [scopeBindings, setScopeBindings] =
     React.useState<Record<string, ParsedBinding | EvaluatedBinding>>(parsedBindings);
@@ -616,15 +622,85 @@ function RuntimeScoped({ node, i, propName, children }: ScopedTemplateProps) {
             scopePath: 'i',
           },
         },
-        scope,
+        parentScope,
       ),
-    [i, node.id, propName, scope, scopeBindings],
+    [i, node.id, propName, parentScope, scopeBindings],
   );
+
+  const evaluateScopeExpression = React.useCallback(
+    async (expression: string) => {
+      const updates: Record<string, unknown> = {};
+
+      const proxify = <T extends object>(obj: T, scopePathSegments: string[]): T => {
+        return new Proxy(obj, {
+          get(target, prop, receiver) {
+            if (typeof prop === 'symbol') {
+              return Reflect.get(target, prop, receiver);
+            }
+
+            const result = target[prop as keyof T];
+
+            if (result && typeof result === 'object') {
+              return proxify(result, [...scopePathSegments, prop]);
+            }
+
+            return Reflect.get(target, prop, receiver);
+          },
+          set(target, prop, newValue, receiver) {
+            if (typeof prop === 'symbol') {
+              return Reflect.set(target, prop, newValue, receiver);
+            }
+
+            const scopePath = [...scopePathSegments, prop].join('.');
+            updates[scopePath] = newValue;
+            return Reflect.set(target, prop, newValue, receiver);
+          },
+        });
+      };
+
+      const scopeValues = childScope.values;
+      const result = browserJsRuntime.evaluateExpression(expression, proxify(scopeValues, []));
+
+      await result.value;
+
+      setScopeBindings((existingBindings) => {
+        return mapValues(existingBindings, (binding) => {
+          for (const [scopePath, newValue] of Object.entries(updates)) {
+            if (binding.scopePath === scopePath) {
+              if (typeof binding.expression === 'string') {
+                console.warn(`Can't update "${scopePath}", it already has a binding`);
+              } else {
+                return {
+                  ...binding,
+                  expression: undefined,
+                  initializer: undefined,
+                  result: { value: newValue },
+                } satisfies EvaluatedBinding;
+              }
+            }
+          }
+          return binding;
+        });
+      });
+
+      return result;
+    },
+    [childScope.values],
+  );
+
+  React.useEffect(() => {
+    onUpdate?.({
+      scopeMeta,
+      scope: childScope,
+    });
+  }, [scopeMeta, childScope, onUpdate]);
 
   return (
     <RuntimeScopeContext.Provider value={childScope}>
       <SetControlledBindingContextProvider value={setControlledBinding}>
-        {children}
+        <EvaluateScopeExpressionProvider value={evaluateScopeExpression}>
+          {children}
+        </EvaluateScopeExpressionProvider>
       </SetControlledBindingContextProvider>
     </RuntimeScopeContext.Provider>
   );
@@ -750,7 +826,7 @@ function RenderedNodeContent({ node, childNodeGroups, Component }: RenderedNodeC
   );
 
   const navigateToPage = usePageNavigator();
-  const evaluatePageExpression = useEvaluatePageExpression();
+  const evaluateScopeExpression = useEvaluateScopeExpression();
 
   const eventHandlers: Record<string, (param: any) => void> = React.useMemo(() => {
     return mapProperties(argTypes, ([key, argType]) => {
@@ -769,7 +845,7 @@ function RenderedNodeContent({ node, childNodeGroups, Component }: RenderedNodeC
                 const parameterValue = parameters[parameterName];
 
                 if (parameterValue && parameterValue.type === 'jsExpression') {
-                  const result = await evaluatePageExpression(parameterValue.value, scope);
+                  const result = await evaluateScopeExpression(parameterValue.value);
                   return [parameterName, result.value];
                 }
                 return [parameterName, parameterValue?.value];
@@ -789,7 +865,7 @@ function RenderedNodeContent({ node, childNodeGroups, Component }: RenderedNodeC
         const handler = () => {
           const code = action.value;
           const exprToEvaluate = `(async () => {${code}})()`;
-          evaluatePageExpression(exprToEvaluate, scope);
+          evaluateScopeExpression(exprToEvaluate);
         };
 
         return [key, handler];
@@ -797,7 +873,7 @@ function RenderedNodeContent({ node, childNodeGroups, Component }: RenderedNodeC
 
       return null;
     });
-  }, [argTypes, node, navigateToPage, evaluatePageExpression, scope]);
+  }, [argTypes, node, navigateToPage, evaluateScopeExpression]);
 
   const reactChildren = React.useMemo(() => {
     const result: Record<string, React.ReactNode> = {};
@@ -1135,9 +1211,9 @@ function RenderedPage({ nodeId }: RenderedNodeProps) {
     return createScope(pageBindings);
   }, [pageBindings]);
 
-  const evaluatePageExpression = React.useCallback(
-    async (expression: string, currentScope: RuntimeScope) => {
-      const scope = currentScope.values;
+  const evaluateScopeExpression = React.useCallback(
+    async (expression: string) => {
+      const scope = pageScope.values;
 
       const updates: Record<string, unknown> = {};
 
@@ -1194,7 +1270,7 @@ function RenderedPage({ nodeId }: RenderedNodeProps) {
 
       return result;
     },
-    [],
+    [pageScope],
   );
 
   const canvasEvents = React.useContext(CanvasEventsContext);
@@ -1209,7 +1285,7 @@ function RenderedPage({ nodeId }: RenderedNodeProps) {
   return (
     <RuntimeScopeContext.Provider value={pageScope}>
       <SetControlledBindingContextProvider value={setControlledBinding}>
-        <EvaluatePageExpressionProvider value={evaluatePageExpression}>
+        <EvaluateScopeExpressionProvider value={evaluateScopeExpression}>
           <RenderedNodeContent
             node={page}
             childNodeGroups={{ children }}
@@ -1218,7 +1294,7 @@ function RenderedPage({ nodeId }: RenderedNodeProps) {
           {queries.map((node) => (
             <FetchNode key={node.id} page={page} node={node} />
           ))}
-        </EvaluatePageExpressionProvider>
+        </EvaluateScopeExpressionProvider>
       </SetControlledBindingContextProvider>
     </RuntimeScopeContext.Provider>
   );

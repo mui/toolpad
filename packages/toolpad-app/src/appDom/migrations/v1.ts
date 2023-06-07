@@ -1,6 +1,7 @@
 import invariant from 'invariant';
-import { AppDom, QueryNode, isQuery, ElementNode, isElement, ref } from '..';
+import { ref } from '..';
 import { update } from '../../utils/immutability';
+import { AppDom, ElementNode, QueryNode, isElement, isQuery } from './v7LegacyTypes';
 
 function migrateLegacyQueryNode(node: QueryNode<any>): QueryNode<any> {
   if (node.attributes.dataSource?.value !== 'rest') {

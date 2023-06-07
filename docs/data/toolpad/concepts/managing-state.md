@@ -8,7 +8,7 @@
 
 Each property of component that may be bound to data present on the page is surrounded by a **Binding** button, which you can click to initiate data binding.
 
-{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/concepts/managing-state/binding-button.png", "alt": "Binding button", "caption": "The binding button", "zoom": false }}
+{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/concepts/managing-state/binding-button.png", "alt": "Binding button", "caption": "The binding button", "zoom": false, "width": 300 }}
 
 You can write JavaScript expressions in the editor which opens up.
 

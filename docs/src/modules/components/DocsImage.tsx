@@ -12,6 +12,7 @@ interface DocsImageProps {
   alt: string;
   caption?: string;
   zoom?: boolean;
+  width?: number;
   indent?: number;
   aspectRatio?: number;
 }
@@ -23,9 +24,9 @@ interface ImageViewerProps {
   handleClose: () => void;
 }
 
-const Img = styled('img')<DocsImageProps>(({ theme, zoom, indent, aspectRatio }) => ({
+const Img = styled('img')<DocsImageProps>(({ theme, zoom, indent, width, aspectRatio }) => ({
   border: `1px solid ${theme.palette.divider}`,
-  width: '-webkit-fill-available',
+  width: width ?? '-webkit-fill-available',
   display: 'block',
   position: 'relative',
   aspectRatio: aspectRatio ?? zoom === false ? 'unset' : '1.80904522613', // 1440 / 796
@@ -103,7 +104,7 @@ function ImageViewer({ open, src, alt, handleClose }: ImageViewerProps) {
 }
 
 export default function DocsImage(props: DocsImageProps) {
-  const { src, alt, caption, zoom = true, indent = 0, aspectRatio } = props;
+  const { src, alt, caption, zoom = true, indent = 0, width, aspectRatio } = props;
   const [open, setOpen] = React.useState(false);
 
   const handleClick = React.useCallback(() => {
@@ -127,6 +128,7 @@ export default function DocsImage(props: DocsImageProps) {
           indent={indent}
           onClick={handleClick}
           aspectRatio={aspectRatio}
+          width={width}
         />
         {zoom ? (
           <ImageExpand onClick={handleClick}>

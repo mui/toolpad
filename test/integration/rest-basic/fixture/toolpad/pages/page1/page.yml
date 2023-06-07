@@ -91,7 +91,7 @@ spec:
         searchParams: []
         headers: []
         method: GET
-        transform: "return `query3: Transformed ${data?.url}`"
+        transform: 'return `query3: Transformed ${data?.url}`'
         transformEnabled: true
     - name: queryWithEnv
       query:

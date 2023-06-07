@@ -21,7 +21,7 @@ export default function Page(props: SchemaReferenceProps) {
   return (
     <SchemaReference
       disableAd
-      location="/docs/pages/toolpad/schema-reference/index.tsx"
+      location="/docs/pages/toolpad/reference/file-schema/index.tsx"
       {...props}
     />
   );

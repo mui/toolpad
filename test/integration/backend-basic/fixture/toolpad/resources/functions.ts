@@ -14,6 +14,7 @@ export const echo = createFunction(
       params: parameters,
       secrets: {
         bar: process.env.SECRET_BAR,
+        baz: process.env.SECRET_BAZ,
       },
     };
   },
@@ -52,3 +53,13 @@ export const manualQueryWithParams = createFunction(
     },
   },
 );
+
+let x = 1;
+
+export async function increment() {
+  x += 1;
+}
+
+export async function getGlobal() {
+  return x;
+}

@@ -38,6 +38,7 @@ import { errorFrom } from '@mui/toolpad-utils/errors';
 import { hasImageExtension } from '@mui/toolpad-core/path';
 import { ErrorBoundary, FallbackProps } from 'react-error-boundary';
 import { SX_PROP_HELPER_TEXT } from './constants.js';
+import ErrorOverlay from './components/ErrorOverlay.js';
 
 const DEFAULT_COLUMN_TYPES = getGridDefaultColumnTypes();
 
@@ -520,7 +521,9 @@ const DataGridComponent = React.forwardRef(function DataGridComponent(
   );
 
   const apiRef = useGridApiRef();
-  React.useEffect(() => apiRef.current.updateColumns(columns), [apiRef, columns]);
+  React.useEffect(() => {
+    apiRef.current.updateColumns(columns);
+  }, [apiRef, columns]);
 
   // The grid doesn't update when the getRowId or columns properties change, so it needs to be remounted
   // TODO: remove columns from this equation once https://github.com/mui/mui-x/issues/5970 gets resolved
@@ -529,13 +532,18 @@ const DataGridComponent = React.forwardRef(function DataGridComponent(
     [getRowId, columns],
   );
 
-  const error = errorProp ? errorFrom(errorProp) : null;
+  const error: Error | null = errorProp ? errorFrom(errorProp) : null;
 
   return (
-    <div ref={ref} style={{ height: heightProp, minHeight: '100%', width: '100%' }}>
-      {error ? (
-        <div>{error.message}</div>
-      ) : (
+    <div
+      ref={ref}
+      style={{ height: heightProp, minHeight: '100%', width: '100%', position: 'relative' }}
+    >
+      <ErrorOverlay error={error} />
+
+      <div
+        style={{ position: 'absolute', inset: '0 0 0 0', visibility: error ? 'hidden' : 'visible' }}
+      >
         <DataGridPro
           apiRef={apiRef}
           components={{
@@ -552,7 +560,7 @@ const DataGridComponent = React.forwardRef(function DataGridComponent(
           rowSelectionModel={selectionModel}
           {...props}
         />
-      )}
+      </div>
     </div>
   );
 });
@@ -568,12 +576,40 @@ export default createComponent(DataGridComponent, {
     rows: {
       helperText: 'The data to be displayed as rows. Must be an array of objects.',
       type: 'array',
-      schema: '/schemas/DataGridRows.json',
+      schema: {
+        type: 'array',
+        items: {
+          type: 'object',
+          additionalProperties: true,
+          properties: {
+            id: {
+              type: 'string',
+            },
+          },
+          required: ['id'],
+        },
+      },
     },
     columns: {
       helperText: 'The columns to be displayed.',
       type: 'array',
-      schema: '/schemas/DataGridColumns.json',
+      schema: {
+        type: 'array',
+        items: {
+          type: 'object',
+          additionalProperties: true,
+          properties: {
+            field: {
+              type: 'string',
+            },
+            align: {
+              type: 'string',
+              enum: ['center', 'right', 'left'],
+            },
+          },
+          required: ['field'],
+        },
+      },
       control: { type: 'GridColumns' },
     },
     rowIdField: {

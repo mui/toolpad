@@ -1,5 +1,11 @@
 import * as React from 'react';
-import { ArgTypeDefinition, BindableAttrValue, ScopeMeta, ScopeMetaField } from '@mui/toolpad-core';
+import {
+  ArgTypeDefinition,
+  BindableAttrValue,
+  LocalScopeParams,
+  ScopeMeta,
+  ScopeMetaField,
+} from '@mui/toolpad-core';
 import { Alert, Box } from '@mui/material';
 import { useBrowserJsRuntime } from '@mui/toolpad-core/jsBrowserRuntime';
 import { mapValues } from '@mui/toolpad-utils/collections';
@@ -40,9 +46,10 @@ export default function NodeAttributeEditor<P extends object>({
   const propValue: BindableAttrValue<unknown> | null = (node as any)[namespace]?.[name] ?? null;
 
   const bindingId = `${node.id}${namespace ? `.${namespace}` : ''}.${name}`;
-  const { bindings, pageState, globalScopeMeta, viewState } = usePageEditorState();
+  const { bindings, pageState, globalScopeMeta } = usePageEditorState();
 
   const liveBinding = bindings[bindingId];
+  console.log(bindingId);
 
   const Control = getDefaultControl(argType, props);
 

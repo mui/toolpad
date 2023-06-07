@@ -21,7 +21,6 @@ import {
   BindableAttrValue,
   NestedBindableAttrs,
   BindingEvaluationResult,
-  TemplateScopeParams,
   ScopeMeta,
   getArgTypeDefaultValue,
   ScopeMetaPropField,
@@ -188,24 +187,81 @@ const EditorOverlay = styled('div')({
 type ToolpadComponents = Partial<Record<string, ToolpadComponent<any>>>;
 
 interface RuntimeScope {
+  id: string;
   bindings: Record<string, BindingEvaluationResult<unknown>>;
   values: Record<string, unknown>;
 }
 
 function createScope(
+  id: string,
   bindings: Record<string, ParsedBinding | EvaluatedBinding<unknown>>,
+  localScope: Record<string, unknown> | undefined,
   parentScope?: RuntimeScope,
 ): RuntimeScope {
-  const parentScopeValues = parentScope?.values ?? EMPTY_OBJECT;
+  const scopeValues = { ...parentScope?.values, ...localScope };
 
-  const evaluatedBindings = evalJsBindings(browserJsRuntime, bindings, parentScopeValues);
+  const evaluatedBindings = evalJsBindings(browserJsRuntime, bindings, scopeValues);
 
   return {
+    id,
     bindings: mapValues(evaluatedBindings, (binding) => binding.result || { value: undefined }),
-    values: buildGlobalScope(parentScopeValues, evaluatedBindings),
+    values: buildGlobalScope(scopeValues, evaluatedBindings),
   };
 }
 
+interface ScopeRegistry {
+  scopes: { [id in string]?: RuntimeScope };
+  bindingScopes: { [id in string]?: string };
+}
+
+type ScopeRegistryApi = {
+  registerScope: (scope: RuntimeScope) => () => void;
+  registerBindingScope: (bindingId: string, scope: RuntimeScope) => () => void;
+};
+
+function useScopeRegistry(onUpdate: (registry: ScopeRegistry) => void) {
+  const registry: ScopeRegistry = { scopes: {}, bindingScopes: {} };
+
+  let scheduledUpdate: Promise<void> | undefined;
+  const scheduleUpdate = () => {
+    if (scheduledUpdate) {
+      return;
+    }
+    scheduledUpdate = Promise.resolve().then(() => {
+      onUpdate(registry);
+      scheduledUpdate = undefined;
+    });
+  };
+
+  return React.useRef<ScopeRegistryApi>({
+    registerScope(scope: RuntimeScope) {
+      if (registry.scopes[scope.id]) {
+        throw new Error(`Scope with id "${scope.id}" already registered`);
+      }
+      registry.scopes[scope.id] = scope;
+      scheduleUpdate();
+      return () => {
+        delete registry.scopes[scope.id];
+        scheduleUpdate();
+      };
+    },
+    registerBindingScope(bindingId: string, scope: RuntimeScope) {
+      if (registry.bindingScopes[bindingId]) {
+        return () => {};
+      }
+      registry.bindingScopes[bindingId] = scope.id;
+      scheduleUpdate();
+      return () => {
+        delete registry.bindingScopes[bindingId];
+        scheduleUpdate();
+      };
+    },
+  });
+}
+
+const ScopeRegistryContext = React.createContext<
+  React.MutableRefObject<ScopeRegistryApi> | undefined
+>(undefined);
 const RuntimeScopeContext = React.createContext<RuntimeScope | undefined>(undefined);
 const [useDomContext, DomContextProvider] = createProvidedContext<appDom.AppDom>('Dom');
 const [useEvaluateScopeExpression, EvaluateScopeExpressionProvider] =
@@ -318,7 +374,7 @@ function getScopeElements(
   dom: appDom.AppDom,
   rootNode: appDom.AppDomNode | appDom.AppDomNode[],
   components: ToolpadComponents,
-): appDom.AppDomNode[] {
+): readonly appDom.AppDomNode[] {
   if (Array.isArray(rootNode)) {
     return [...rootNode, ...rootNode.flatMap((child) => getScopeElements(dom, child, components))];
   }
@@ -544,12 +600,20 @@ function RenderedNode({ nodeId }: RenderedNodeProps) {
 }
 
 interface RuntimeScopedProps {
+  id: string;
   parseBindingsResult: ReturnType<typeof parseBindings>;
+  localScope?: Record<string, unknown>;
   onUpdate?: (params: { scope: RuntimeScope; scopeMeta: ScopeMeta }) => void;
   children?: React.ReactNode;
 }
 
-function RuntimeScoped({ parseBindingsResult, onUpdate, children }: RuntimeScopedProps) {
+function RuntimeScoped({
+  id,
+  parseBindingsResult,
+  localScope,
+  onUpdate,
+  children,
+}: RuntimeScopedProps) {
   const parentScope = React.useContext(RuntimeScopeContext);
   const dom = useDomContext();
 
@@ -579,15 +643,15 @@ function RuntimeScoped({ parseBindingsResult, onUpdate, children }: RuntimeScope
   }, [parsedBindings, controlled, dom]);
 
   const setControlledBinding = React.useCallback(
-    (id: string, result: BindingEvaluationResult) => {
-      const { expression, initializer, ...parsedBinding } = parsedBindings[id];
+    (bindingId: string, result: BindingEvaluationResult) => {
+      const { expression, initializer, ...parsedBinding } = parsedBindings[bindingId];
 
-      if (!controlled.has(id)) {
-        throw new Error(`Not a controlled binding "${id}"`);
+      if (!controlled.has(bindingId)) {
+        throw new Error(`Not a controlled binding "${bindingId}"`);
       }
 
       setScopeBindings((existingBindings): Record<string, ParsedBinding | EvaluatedBinding> => {
-        const existingBinding = existingBindings[id];
+        const existingBinding = existingBindings[bindingId];
 
         if (existingBinding?.result && isEqual(existingBinding.result, result)) {
           return existingBindings;
@@ -596,7 +660,7 @@ function RuntimeScoped({ parseBindingsResult, onUpdate, children }: RuntimeScope
         return {
           ...existingBindings,
           ...{
-            [id]: { ...parsedBinding, result },
+            [bindingId]: { ...parsedBinding, result },
           },
         };
       });
@@ -605,9 +669,17 @@ function RuntimeScoped({ parseBindingsResult, onUpdate, children }: RuntimeScope
   );
 
   const childScope = React.useMemo(
-    () => createScope(scopeBindings, parentScope),
-    [parentScope, scopeBindings],
+    () => createScope(id, scopeBindings, localScope, parentScope),
+    [id, localScope, parentScope, scopeBindings],
   );
+
+  const registryRef = React.useContext(ScopeRegistryContext);
+  React.useEffect(() => {
+    if (!registryRef) {
+      return () => {};
+    }
+    return registryRef.current.registerScope(childScope);
+  }, [registryRef, childScope]);
 
   const evaluateScopeExpression = React.useCallback(
     async (expression: string) => {
@@ -689,13 +761,14 @@ function RuntimeScoped({ parseBindingsResult, onUpdate, children }: RuntimeScope
 }
 
 interface TemplateScopedProps {
+  id: string;
   propName: string;
   node: appDom.ElementNode;
-  i: number;
+  localScope: Record<string, unknown>;
   children?: React.ReactNode;
 }
 
-function TemplateScoped({ node, i, propName, children }: TemplateScopedProps) {
+function TemplateScoped({ id, node, localScope, propName, children }: TemplateScopedProps) {
   const dom = useDomContext();
   const components = useComponents();
 
@@ -704,12 +777,11 @@ function TemplateScoped({ node, i, propName, children }: TemplateScopedProps) {
     return parseBindings(dom, templateChildren, components, null);
   }, [components, dom, node, propName]);
 
-  parseBindingsResult.parsedBindings[`${node.id}.props.${propName}[${i}]`] = {
-    result: { value: i },
-    scopePath: 'i',
-  };
-
-  return <RuntimeScoped parseBindingsResult={parseBindingsResult}>{children}</RuntimeScoped>;
+  return (
+    <RuntimeScoped id={id} parseBindingsResult={parseBindingsResult} localScope={localScope}>
+      {children}
+    </RuntimeScoped>
+  );
 }
 
 function NodeError({ error }: NodeErrorProps) {
@@ -954,9 +1026,14 @@ function RenderedNodeContent({ node, childNodeGroups, Component }: RenderedNodeC
 
         if (isTemplate) {
           appDom.assertIsElement(node);
-          hookResult[propName] = ({ i }: TemplateScopeParams) => {
+          hookResult[propName] = (key: string, localScope: Record<string, unknown>) => {
             return (
-              <TemplateScoped i={i} node={node} propName={propName}>
+              <TemplateScoped
+                id={`${node.id}.props.${propName}.${key}`}
+                localScope={localScope}
+                node={node}
+                propName={propName}
+              >
                 {wrappedValue}
               </TemplateScoped>
             );
@@ -968,6 +1045,24 @@ function RenderedNodeContent({ node, childNodeGroups, Component }: RenderedNodeC
     }
     return hookResult;
   }, [argTypes, node, props]);
+
+  const registryRef = React.useContext(ScopeRegistryContext);
+  React.useEffect(() => {
+    if (!registryRef) {
+      return () => {};
+    }
+    const unsubscribers: (() => void)[] = [];
+    for (const propName of Object.keys(argTypes)) {
+      const unsubscribe = registryRef.current.registerBindingScope(
+        `${nodeId}.props.${propName}`,
+        scope,
+      );
+      unsubscribers.push(unsubscribe);
+    }
+    return () => {
+      unsubscribers.forEach((unsubscribe) => unsubscribe());
+    };
+  }, [nodeId, argTypes, registryRef, scope]);
 
   return (
     <NodeRuntimeWrapper
@@ -1172,17 +1267,23 @@ function RenderedPage({ nodeId }: RenderedNodeProps) {
     }
   });
 
+  const scopeRegistry = useScopeRegistry((registry) => {
+    console.log('updating', registry);
+  });
+
   return (
-    <RuntimeScoped parseBindingsResult={parseBindingsResult} onUpdate={onUpdate}>
-      <RenderedNodeContent
-        node={page}
-        childNodeGroups={{ children }}
-        Component={PageRootComponent}
-      />
-      {queries.map((node) => (
-        <FetchNode key={node.id} page={page} node={node} />
-      ))}
-    </RuntimeScoped>
+    <ScopeRegistryContext.Provider value={scopeRegistry}>
+      <RuntimeScoped id={'global'} parseBindingsResult={parseBindingsResult} onUpdate={onUpdate}>
+        <RenderedNodeContent
+          node={page}
+          childNodeGroups={{ children }}
+          Component={PageRootComponent}
+        />
+        {queries.map((node) => (
+          <FetchNode key={node.id} page={page} node={node} />
+        ))}
+      </RuntimeScoped>
+    </ScopeRegistryContext.Provider>
   );
 }
 

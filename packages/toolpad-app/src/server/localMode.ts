@@ -15,6 +15,7 @@ import { filterValues, hasOwnProperty, mapValues } from '@mui/toolpad-utils/coll
 import { execa } from 'execa';
 import config from '../config';
 import * as appDom from '../appDom';
+import * as v7LegacyDom from '../appDom/migrations/v7LegacyTypes';
 import { migrateUp } from '../appDom/migrations';
 import insecureHash from '../utils/insecureHash';
 import {
@@ -257,7 +258,9 @@ class Lock {
 
 const configFileLock = new Lock();
 
-async function loadConfigFileFrom(configFilePath: string): Promise<appDom.AppDom | null> {
+async function loadConfigFileFrom(
+  configFilePath: string,
+): Promise<appDom.AppDom | v7LegacyDom.AppDom | null> {
   // Using a lock to avoid read during write which may result in reading truncated file content
   const configContent = await configFileLock.use(() => readMaybeFile(configFilePath));
 
@@ -270,7 +273,7 @@ async function loadConfigFileFrom(configFilePath: string): Promise<appDom.AppDom
   return parsedConfig;
 }
 
-async function loadConfigFile(root: string): Promise<appDom.AppDom | null> {
+async function loadConfigFile(root: string): Promise<appDom.AppDom | v7LegacyDom.AppDom | null> {
   const configFilePath = await getConfigFilePath(root);
   const dom = await loadConfigFileFrom(configFilePath);
   return dom;
@@ -964,10 +967,10 @@ async function migrateLegacyProject(root: string) {
       )}  - This project was created by an older version of Toolpad. Upgrading...`,
     );
 
-    dom = migrateUp(dom);
+    dom = migrateUp(dom as v7LegacyDom.AppDom);
   }
 
-  const projectFolder = appDomToProjectFolder(dom);
+  const projectFolder = appDomToProjectFolder(dom as appDom.AppDom);
 
   await writeProjectFolder(root, projectFolder, true);
 

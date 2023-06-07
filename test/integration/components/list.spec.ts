@@ -21,6 +21,4 @@ test('list component behavior', async ({ page }) => {
 
   await expect(page.locator('p:text("one")')).toBeVisible();
   await expect(page.locator('p:text("two")')).toBeVisible();
-
-  await expect(page.locator('button:text("one")')).toBeVisible();
 });

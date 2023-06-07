@@ -16,6 +16,10 @@ const pages: MuiPage[] = [
       { pathname: '/toolpad/getting-started/quickstart' },
       { pathname: '/toolpad/getting-started/installation' },
       { pathname: '/toolpad/getting-started/configuration' },
+      {
+        pathname: '/toolpad/examples',
+        children: [{ pathname: '/toolpad/examples/qr-generator', title: 'QR Code generator' }],
+      },
       { pathname: '/toolpad/getting-started/roadmap' },
     ],
   },
@@ -125,26 +129,6 @@ const pages: MuiPage[] = [
       },
     ],
   },
-  {
-    pathname: '/toolpad/examples',
-    icon: DescriptionIcon,
-    children: [{ pathname: '/toolpad/examples/qr-generator', title: 'QR Code generator' }],
-  },
-  // {
-  //   pathname: '/toolpad/versioning-and-deploying',
-  //   title: 'Versioning & deploying [TODO]',
-  //   icon: 'ToggleOnIcon',
-  //   children: [
-  //     {
-  //       pathname: '/toolpad/versioning-and-deploying/releases',
-  //     },
-  //   ],
-  // },
-  // {
-  //   pathname: '/toolpad/faq',
-  //   title: 'FAQ [TODO]',
-  //   icon: 'ReaderIcon',
-  // },
 ];
 
 export default pages;

@@ -4,13 +4,13 @@
 
 ## Import
 
-```tsx
+```jsx
 import { createFunction } from '@mui/toolpad/server';
 ```
 
 ## Description
 
-```tsx
+```jsx
 export const myApi = createFunction(config, resolver);
 ```
 
@@ -58,4 +58,6 @@ this describes the type of the parameter that will be passed to the custom funct
 
 ## Usage
 
-- See [Custom functions](/toolpad/connecting-to-datasources/custom-functions/)
+:::info
+See [custom functions](/toolpad/concepts/connecting-to-data/#custom-functions)
+:::

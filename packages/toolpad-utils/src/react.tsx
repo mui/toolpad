@@ -79,3 +79,11 @@ export function createProvidedContext<T>(
   const useContext = () => useNonNullableContext(context, name);
   return [useContext, context.Provider as React.ComponentType<React.ProviderProps<T>>];
 }
+
+export function useAssertedContext<T>(context: React.Context<T | undefined>): T {
+  const value = React.useContext(context);
+  if (value === undefined) {
+    throw new Error('context was used without a Provider');
+  }
+  return value;
+}

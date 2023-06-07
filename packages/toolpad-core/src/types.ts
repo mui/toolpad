@@ -454,8 +454,6 @@ export interface JsRuntime {
   evaluateExpression(code: string, globalScope: Record<string, unknown>): BindingEvaluationResult;
 }
 
-export type LocalScopeParams = Record<string, unknown>;
-
 export interface TemplateScopeParams {
   i: number;
 }

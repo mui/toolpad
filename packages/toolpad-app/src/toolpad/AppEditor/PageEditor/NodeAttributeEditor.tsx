@@ -1,12 +1,5 @@
 import * as React from 'react';
-import {
-  ArgTypeDefinition,
-  BindableAttrValue,
-  DEFAULT_LOCAL_SCOPE_PARAMS,
-  LocalScopeParams,
-  ScopeMeta,
-  ScopeMetaField,
-} from '@mui/toolpad-core';
+import { ArgTypeDefinition, BindableAttrValue, ScopeMeta, ScopeMetaField } from '@mui/toolpad-core';
 import { Alert, Box } from '@mui/material';
 import { useBrowserJsRuntime } from '@mui/toolpad-core/jsBrowserRuntime';
 import { mapValues } from '@mui/toolpad-utils/collections';
@@ -15,7 +8,6 @@ import { useDom, useDomApi } from '../../AppState';
 import BindableEditor from './BindableEditor';
 import { usePageEditorState } from './PageEditorProvider';
 import { getDefaultControl } from '../../propertyControls';
-import { isTemplateDescendant } from '../../../runtime/toolpadComponents/template';
 import { NON_BINDABLE_CONTROL_TYPES } from '../../../runtime/constants';
 
 export interface NodeAttributeEditorProps<P extends object, K extends keyof P = keyof P> {
@@ -65,14 +57,7 @@ export default function NodeAttributeEditor<P extends object>({
 
   const jsBrowserRuntime = useBrowserJsRuntime();
 
-  const isNodeTemplateDescendant = React.useMemo(
-    () => appDom.isElement(node) && isTemplateDescendant(dom, node, viewState),
-    [dom, node, viewState],
-  );
-
-  const localState: LocalScopeParams = isNodeTemplateDescendant
-    ? { i: DEFAULT_LOCAL_SCOPE_PARAMS.i }
-    : {};
+  const localState: LocalScopeParams = {};
   const localScopeMeta: ScopeMeta = mapValues(
     localState,
     () => ({ kind: 'local' } as ScopeMetaField),

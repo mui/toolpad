@@ -21,10 +21,8 @@ import {
   BindableAttrValue,
   NestedBindableAttrs,
   BindingEvaluationResult,
-  LocalScopeParams,
   TemplateScopeParams,
   ScopeMeta,
-  DEFAULT_LOCAL_SCOPE_PARAMS,
   getArgTypeDefaultValue,
   ScopeMetaPropField,
   ComponentsContextProvider,
@@ -33,7 +31,7 @@ import {
   useComponents,
   useComponent,
 } from '@mui/toolpad-core';
-import { createProvidedContext } from '@mui/toolpad-utils/react';
+import { createProvidedContext, useAssertedContext } from '@mui/toolpad-utils/react';
 import { QueryClient, QueryClientProvider, useMutation } from '@tanstack/react-query';
 import {
   BrowserRouter,
@@ -54,7 +52,7 @@ import {
 } from '@mui/toolpad-core/runtime';
 import * as _ from 'lodash-es';
 import ErrorIcon from '@mui/icons-material/Error';
-import { useBrowserJsRuntime } from '@mui/toolpad-core/jsBrowserRuntime';
+import { getBrowserRuntime } from '@mui/toolpad-core/jsBrowserRuntime';
 import * as builtIns from '@mui/toolpad-components';
 import { errorFrom } from '@mui/toolpad-utils/errors';
 import { mapProperties, mapValues } from '@mui/toolpad-utils/collections';
@@ -81,6 +79,8 @@ import { execDataSourceQuery, useDataQuery, UseDataQueryConfig, UseFetch } from 
 import { NavigateToPage } from './CanvasHooksContext';
 import AppNavigation from './AppNavigation';
 import PreviewHeader from './PreviewHeader';
+
+const browserJsRuntime = getBrowserRuntime();
 
 const isPreview = process.env.NODE_ENV !== 'production';
 const isRenderedInCanvas =
@@ -162,6 +162,13 @@ function usePageNavigator(): NavigateToPage {
   return navigateToPage;
 }
 
+function isEqual(
+  a: BindingEvaluationResult<unknown>,
+  b: BindingEvaluationResult<unknown>,
+): boolean {
+  return a.value === b.value && !!a.error === !!b.error && a.loading === b.loading;
+}
+
 const AppRoot = styled('div')({
   overflow: 'auto' /* Prevents margins from collapsing into root */,
   position: 'relative' /* Makes sure that the editor overlay that renders inside sizes correctly */,
@@ -179,381 +186,38 @@ const EditorOverlay = styled('div')({
 
 type ToolpadComponents = Partial<Record<string, ToolpadComponent<any>>>;
 
+interface RuntimeScope {
+  bindings: Record<string, BindingEvaluationResult<unknown>>;
+  values: Record<string, unknown>;
+}
+
+function createScope(
+  bindings: Record<string, ParsedBinding | EvaluatedBinding<unknown>>,
+  parentScope?: RuntimeScope,
+): RuntimeScope {
+  const parentScopeValues = parentScope?.values ?? EMPTY_OBJECT;
+
+  const evaluatedBindings = evalJsBindings(browserJsRuntime, bindings, parentScopeValues);
+
+  return {
+    bindings: mapValues(evaluatedBindings, (binding) => binding.result || { value: undefined }),
+    values: buildGlobalScope(parentScopeValues, evaluatedBindings),
+  };
+}
+
+const RuntimeScopeContext = React.createContext<RuntimeScope | undefined>(undefined);
 const [useDomContext, DomContextProvider] = createProvidedContext<appDom.AppDom>('Dom');
 const [useEvaluatePageExpression, EvaluatePageExpressionProvider] =
-  createProvidedContext<
-    (expr: string, scopeId?: string, localScopeParams?: LocalScopeParams) => any
-  >('EvaluatePageExpression');
-const [useBindingsContext, BindingsContextProvider] =
-  createProvidedContext<
-    (
-      scopeId?: string,
-      localScopeParams?: LocalScopeParams,
-    ) => Record<string, BindingEvaluationResult>
-  >('GetBindings');
+  createProvidedContext<(expr: string, scope: RuntimeScope) => any>('EvaluatePageExpression');
 const [useSetControlledBindingContext, SetControlledBindingContextProvider] =
   createProvidedContext<(id: string, result: BindingEvaluationResult, scopeId?: string) => void>(
     'SetControlledBinding',
   );
 
-const [useLocalScopeContext, LocalScopeContextProvider] = createProvidedContext<{
-  id?: string;
-  isDefaultScope: boolean;
-  params: LocalScopeParams;
-}>('IteratorItem');
-
 function getComponentId(elm: appDom.ElementNode): string {
   const componentId = getElementNodeComponentId(elm);
   return componentId;
 }
-
-function useElmToolpadComponent(elm: appDom.ElementNode): ToolpadComponent {
-  const componentId = getElementNodeComponentId(elm);
-  return useComponent(componentId);
-}
-
-interface RenderedNodeProps {
-  nodeId: NodeId;
-}
-
-function RenderedNode({ nodeId }: RenderedNodeProps) {
-  const dom = useDomContext();
-  const node = appDom.getNode(dom, nodeId, 'element');
-  const Component: ToolpadComponent<any> = useElmToolpadComponent(node);
-  const childNodeGroups = appDom.getChildNodes(dom, node);
-
-  return (
-    /* eslint-disable-next-line @typescript-eslint/no-use-before-define */
-    <RenderedNodeContent node={node} childNodeGroups={childNodeGroups} Component={Component} />
-  );
-}
-
-function NodeError({ error }: NodeErrorProps) {
-  return (
-    <Tooltip title={error.message}>
-      <span
-        style={{
-          display: 'inline-flex',
-          flexDirection: 'row',
-          alignItems: 'center',
-          padding: 8,
-          background: 'red',
-          color: 'white',
-        }}
-      >
-        <ErrorIcon color="inherit" style={{ marginRight: 8 }} /> Error
-      </span>
-    </Tooltip>
-  );
-}
-
-interface RenderedNodeContentProps {
-  node: appDom.PageNode | appDom.ElementNode;
-  childNodeGroups: appDom.NodeChildren<appDom.ElementNode>;
-  Component: ToolpadComponent<any>;
-}
-
-function RenderedNodeContent({ node, childNodeGroups, Component }: RenderedNodeContentProps) {
-  const setControlledBinding = useSetControlledBindingContext();
-
-  const nodeId = node.id;
-
-  const { id: scopeId, params: localScopeParams, isDefaultScope } = useLocalScopeContext();
-
-  const componentConfig = Component[TOOLPAD_COMPONENT];
-  const { argTypes = {}, errorProp, loadingProp, loadingPropSource } = componentConfig;
-
-  const isLayoutNode =
-    appDom.isPage(node) || (appDom.isElement(node) && isPageLayoutComponent(node));
-
-  const getBindings = useBindingsContext();
-  const liveBindings = React.useMemo(
-    () => getBindings(scopeId, localScopeParams),
-    [getBindings, localScopeParams, scopeId],
-  );
-
-  const boundProps: Record<string, any> = React.useMemo(() => {
-    const loadingPropSourceSet = new Set(loadingPropSource);
-    const hookResult: Record<string, any> = {};
-
-    // error state we will propagate to the component
-    let error: Error | undefined;
-    // loading state we will propagate to the component
-    let loading: boolean = false;
-
-    for (const [propName, argType] of Object.entries(argTypes)) {
-      const bindingId = `${nodeId}.props.${propName}`;
-      const binding = liveBindings[bindingId];
-
-      if (binding) {
-        hookResult[propName] = binding.value;
-
-        if (binding.loading && loadingPropSourceSet.has(propName)) {
-          loading = true;
-        } else {
-          error = error || binding.error;
-        }
-      }
-
-      if (typeof hookResult[propName] === 'undefined' && argType) {
-        hookResult[propName] = getArgTypeDefaultValue(argType);
-      }
-    }
-
-    if (error) {
-      if (errorProp) {
-        hookResult[errorProp] = error;
-      } else {
-        console.error(errorFrom(error));
-      }
-    }
-
-    if (loadingProp && loading) {
-      hookResult[loadingProp] = true;
-    }
-
-    return hookResult;
-  }, [argTypes, errorProp, liveBindings, loadingProp, loadingPropSource, nodeId]);
-
-  const boundLayoutProps: Record<string, any> = React.useMemo(() => {
-    const hookResult: Record<string, any> = {};
-
-    for (const [propName, argType] of isLayoutNode ? [] : Object.entries(layoutBoxArgTypes)) {
-      const bindingId = `${nodeId}.layout.${propName}`;
-      const binding = liveBindings[bindingId];
-      if (binding) {
-        hookResult[propName] = binding.value;
-      }
-
-      if (typeof hookResult[propName] === 'undefined' && argType) {
-        hookResult[propName] = getArgTypeDefaultValue(argType);
-      }
-    }
-
-    return hookResult;
-  }, [isLayoutNode, liveBindings, nodeId]);
-
-  const onChangeHandlers: Record<string, (param: any) => void> = React.useMemo(
-    () =>
-      mapProperties(argTypes, ([key, argType]) => {
-        if (!argType || !argType.onChangeProp) {
-          return null;
-        }
-
-        const handler = (param: any) => {
-          const bindingId = `${nodeId}.props.${key}`;
-
-          const value = argType.onChangeHandler ? argType.onChangeHandler(param) : param;
-          setControlledBinding(bindingId, { value }, scopeId);
-
-          if (scopeId && isDefaultScope) {
-            setControlledBinding(bindingId, { value });
-          }
-        };
-
-        return [argType.onChangeProp, handler];
-      }),
-    [argTypes, isDefaultScope, nodeId, scopeId, setControlledBinding],
-  );
-
-  const navigateToPage = usePageNavigator();
-  const evaluatePageExpression = useEvaluatePageExpression();
-
-  const eventHandlers: Record<string, (param: any) => void> = React.useMemo(() => {
-    return mapProperties(argTypes, ([key, argType]) => {
-      if (!argType || argType.type !== 'event' || !appDom.isElement(node)) {
-        return null;
-      }
-
-      const action = (node as appDom.ElementNode).props?.[key];
-
-      if (action?.type === 'navigationAction') {
-        const handler = async () => {
-          const { page, parameters = {} } = action.value;
-          if (page) {
-            const parsedParameterEntries = await Promise.all(
-              Object.keys(parameters).map(async (parameterName) => {
-                const parameterValue = parameters[parameterName];
-
-                if (parameterValue && parameterValue.type === 'jsExpression') {
-                  const result = await evaluatePageExpression(
-                    parameterValue.value,
-                    scopeId,
-                    localScopeParams,
-                  );
-                  return [parameterName, result.value];
-                }
-                return [parameterName, parameterValue?.value];
-              }),
-            );
-
-            const parsedParameters = Object.fromEntries(parsedParameterEntries);
-
-            navigateToPage(appDom.deref(page), parsedParameters);
-          }
-        };
-
-        return [key, handler];
-      }
-
-      if (action?.type === 'jsExpressionAction') {
-        const handler = () => {
-          const code = action.value;
-          const exprToEvaluate = `(async () => {${code}})()`;
-          evaluatePageExpression(exprToEvaluate, scopeId, localScopeParams);
-        };
-
-        return [key, handler];
-      }
-
-      return null;
-    });
-  }, [argTypes, node, navigateToPage, evaluatePageExpression, localScopeParams, scopeId]);
-
-  const reactChildren = mapValues(childNodeGroups, (childNodes) =>
-    childNodes.map((child) => <RenderedNode key={child.id} nodeId={child.id} />),
-  );
-
-  const layoutElementProps = React.useMemo(() => {
-    if (appDom.isElement(node) && isPageRow(node)) {
-      return {
-        layoutColumnSizes: childNodeGroups.children.map((child) => child.layout?.columnSize?.value),
-      };
-    }
-    return {};
-  }, [childNodeGroups.children, node]);
-
-  const props: Record<string, any> = React.useMemo(() => {
-    return {
-      ...boundProps,
-      ...onChangeHandlers,
-      ...eventHandlers,
-      ...layoutElementProps,
-      ...reactChildren,
-    };
-  }, [boundProps, eventHandlers, layoutElementProps, onChangeHandlers, reactChildren]);
-
-  const previousProps = React.useRef<Record<string, any>>(props);
-  const [hasSetInitialBindings, setHasSetInitialBindings] = React.useState(false);
-  React.useEffect(() => {
-    Object.entries(argTypes).forEach(([key, argType]) => {
-      if (!argType?.defaultValueProp) {
-        return;
-      }
-
-      if (
-        hasSetInitialBindings &&
-        previousProps.current[argType.defaultValueProp] === props[argType.defaultValueProp]
-      ) {
-        return;
-      }
-
-      const bindingIdToUpdate = `${nodeId}.props.${key}`;
-      setControlledBinding(bindingIdToUpdate, { value: props[argType.defaultValueProp] }, scopeId);
-    });
-
-    previousProps.current = props;
-    setHasSetInitialBindings(true);
-  }, [props, argTypes, nodeId, setControlledBinding, scopeId, hasSetInitialBindings]);
-
-  // Wrap element props
-  for (const [propName, argType] of Object.entries(argTypes)) {
-    const isElement = argType?.type === 'element';
-    const isTemplate = argType?.type === 'template';
-
-    if (isElement || isTemplate) {
-      const value = props[propName];
-
-      let wrappedValue = value;
-      if (argType.control?.type === 'slots') {
-        wrappedValue = <Slots prop={propName}>{value}</Slots>;
-      } else if (argType.control?.type === 'slot' || argType.control?.type === 'layoutSlot') {
-        wrappedValue = (
-          <Placeholder prop={propName} hasLayout={argType.control?.type === 'layoutSlot'}>
-            {value}
-          </Placeholder>
-        );
-      }
-
-      if (isTemplate) {
-        props[propName] = ({ i }: TemplateScopeParams) => {
-          const templateScopeId = `${node.id}.props.${propName}[${i}]`;
-
-          return (
-            <LocalScopeContextProvider
-              key={i}
-              value={{
-                id: templateScopeId,
-                isDefaultScope: i === DEFAULT_LOCAL_SCOPE_PARAMS.i,
-                params: { i },
-              }}
-            >
-              {wrappedValue}
-            </LocalScopeContextProvider>
-          );
-        };
-      } else {
-        props[propName] = wrappedValue;
-      }
-    }
-  }
-
-  const hasUnsetScopedBindings = scopeId && !hasSetInitialBindings;
-
-  return (
-    <NodeRuntimeWrapper
-      nodeId={nodeId}
-      nodeName={node.name}
-      componentConfig={Component[TOOLPAD_COMPONENT]}
-      NodeError={NodeError}
-    >
-      {isLayoutNode ? (
-        <Component {...props} />
-      ) : (
-        <Box
-          sx={{
-            display: 'flex',
-            alignItems: boundLayoutProps.verticalAlign,
-            justifyContent: boundLayoutProps.horizontalAlign,
-            visibility: hasUnsetScopedBindings ? 'hidden' : 'visible',
-          }}
-        >
-          <Component {...props} />
-        </Box>
-      )}
-    </NodeRuntimeWrapper>
-  );
-}
-
-interface PageRootProps {
-  children?: React.ReactNode;
-}
-
-function PageRoot({ children }: PageRootProps) {
-  return (
-    <Container>
-      <Stack
-        data-testid="page-root"
-        direction="column"
-        sx={{
-          my: 2,
-          gap: 1,
-        }}
-      >
-        {children}
-      </Stack>
-    </Container>
-  );
-}
-
-const PageRootComponent = createComponent(PageRoot, {
-  argTypes: {
-    children: {
-      type: 'element',
-      control: { type: 'slots' },
-    },
-  },
-});
 
 /**
  * Turns an object consisting of a nested structure of BindableAttrValues
@@ -619,130 +283,6 @@ function resolveBindables(
   return result[resultKey] || {};
 }
 
-interface QueryNodeProps {
-  page: appDom.PageNode;
-  node: appDom.QueryNode;
-}
-
-function QueryNode({ page, node }: QueryNodeProps) {
-  const getBindings = useBindingsContext();
-  const setControlledBinding = useSetControlledBindingContext();
-
-  const bindings = React.useMemo(() => getBindings(), [getBindings]);
-
-  const params = resolveBindables(
-    bindings,
-    `${node.id}.params`,
-    Object.fromEntries(node.params ?? []),
-  );
-
-  const configBindings = _.pick(node.attributes, USE_DATA_QUERY_CONFIG_KEYS);
-  const options = resolveBindables(bindings, `${node.id}.config`, configBindings);
-  const queryResult = useDataQuery(page, node, params, options);
-
-  React.useEffect(() => {
-    const { isLoading, error, data, rows, ...result } = queryResult;
-
-    for (const [key, value] of Object.entries(result)) {
-      const bindingId = `${node.id}.${key}`;
-      setControlledBinding(bindingId, { value });
-    }
-
-    // Here we propagate the error and loading state to the data and rows prop prop
-    // TODO: is there a straightforward way for us to generalize this behavior?
-    setControlledBinding(`${node.id}.isLoading`, { value: isLoading });
-    setControlledBinding(`${node.id}.error`, { value: error });
-    const deferredStatus = { loading: isLoading, error };
-    setControlledBinding(`${node.id}.data`, { ...deferredStatus, value: data });
-    setControlledBinding(`${node.id}.rows`, { ...deferredStatus, value: rows });
-  }, [node.id, queryResult, setControlledBinding]);
-
-  return null;
-}
-
-interface MutationNodeProps {
-  page: appDom.PageNode;
-  node: appDom.QueryNode;
-}
-
-function MutationNode({ node, page }: MutationNodeProps) {
-  const getBindings = useBindingsContext();
-  const setControlledBinding = useSetControlledBindingContext();
-
-  const bindings = React.useMemo(() => getBindings(), [getBindings]);
-
-  const queryId = node.id;
-  const params = resolveBindables(
-    bindings,
-    `${node.id}.params`,
-    Object.fromEntries(node.params ?? []),
-  );
-
-  const {
-    isLoading,
-    data: responseData = EMPTY_OBJECT,
-    error: fetchError,
-    mutateAsync,
-  } = useMutation(
-    async (overrides: any = {}) =>
-      execDataSourceQuery({
-        pageName: page.name,
-        queryName: node.name,
-        params: { ...params, ...overrides },
-      }),
-    {
-      mutationKey: [queryId, params],
-    },
-  );
-
-  const { data, error: apiError } = responseData;
-
-  const error = apiError || fetchError;
-
-  // Stabilize the mutation and prepare for inclusion in global scope
-  const mutationResult: UseFetch = React.useMemo(
-    () => ({
-      isLoading,
-      isFetching: isLoading,
-      error,
-      data,
-      rows: Array.isArray(data) ? data : EMPTY_ARRAY,
-      call: mutateAsync,
-      fetch: mutateAsync,
-      refetch: () => {
-        throw new Error(`refetch is not supported in manual queries`);
-      },
-    }),
-    [isLoading, error, mutateAsync, data],
-  );
-
-  React.useEffect(() => {
-    for (const [key, value] of Object.entries(mutationResult)) {
-      const bindingId = `${node.id}.${key}`;
-      setControlledBinding(bindingId, { value });
-    }
-  }, [node.id, mutationResult, setControlledBinding]);
-
-  return null;
-}
-
-interface FetchNodeProps {
-  page: appDom.PageNode;
-  node: appDom.QueryNode;
-}
-
-function FetchNode({ node, page }: FetchNodeProps) {
-  const mode: appDom.FetchMode = node.attributes.mode?.value || 'query';
-  switch (mode) {
-    case 'query':
-      return <QueryNode node={node} page={page} />;
-    case 'mutation':
-      return <MutationNode node={node} page={page} />;
-    default:
-      throw new Error(`Unrecognized fetch mdoe "${mode}"`);
-  }
-}
-
 interface ParseBindingOptions {
   scopePath?: string;
 }
@@ -769,19 +309,59 @@ function parseBinding(
   };
 }
 
+/**
+ * Returns all elements for the current scope. This includes the root node and all of its descendants.
+ * Templates are not included.
+ */
+function getScopeElements(
+  dom: appDom.AppDom,
+  rootNode: appDom.AppDomNode | appDom.AppDomNode[],
+  components: ToolpadComponents,
+): appDom.AppDomNode[] {
+  if (Array.isArray(rootNode)) {
+    return [...rootNode, ...rootNode.flatMap((child) => getScopeElements(dom, child, components))];
+  }
+
+  const childNodes = appDom.getChildNodes(dom, rootNode);
+  const result: appDom.AppDomNode[] = [];
+
+  for (const [prop, children] of Object.entries(childNodes) as [string, appDom.AppDomNode[]][]) {
+    if (appDom.isElement(rootNode)) {
+      const componentId = getComponentId(rootNode);
+      const Component = components[componentId];
+      const componentConfig = Component?.[TOOLPAD_COMPONENT];
+      const { argTypes = {} } = componentConfig ?? {};
+
+      if (argTypes[prop]?.type !== 'template') {
+        result.push(
+          ...children,
+          ...children.flatMap((child) => getScopeElements(dom, child, components)),
+        );
+      }
+    } else {
+      result.push(
+        ...children,
+        ...children.flatMap((child) => getScopeElements(dom, child, components)),
+      );
+    }
+  }
+
+  return result;
+}
+
 function parseBindings(
   dom: appDom.AppDom,
-  rootNode: appDom.ElementNode | appDom.PageNode,
+  rootNode: appDom.ElementNode | appDom.PageNode | appDom.ElementNode[],
   components: ToolpadComponents,
-  location: RouterLocation,
+  location: RouterLocation | null,
 ) {
-  const elements = appDom.getDescendants(dom, rootNode);
+  const scopeElements = getScopeElements(dom, rootNode, components);
 
   const parsedBindingsMap = new Map<string, ParsedBinding | EvaluatedBinding>();
   const controlled = new Set<string>();
   const scopeMeta: ScopeMeta = {};
 
-  for (const elm of elements) {
+  for (const elm of scopeElements) {
     if (appDom.isElement<any>(elm)) {
       const componentId = getComponentId(elm);
       const Component = components[componentId];
@@ -921,7 +501,7 @@ function parseBindings(
     }
   }
 
-  if (appDom.isPage(rootNode)) {
+  if (location && !Array.isArray(rootNode) && appDom.isPage(rootNode)) {
     const urlParams = new URLSearchParams(location.search);
     const pageParameters = rootNode.attributes.parameters?.value || [];
 
@@ -939,6 +519,528 @@ function parseBindings(
     Object.fromEntries(parsedBindingsMap);
 
   return { parsedBindings, controlled, scopeMeta };
+}
+
+function useElmToolpadComponent(elm: appDom.ElementNode): ToolpadComponent {
+  const componentId = getElementNodeComponentId(elm);
+  return useComponent(componentId);
+}
+
+interface RenderedNodeProps {
+  nodeId: NodeId;
+}
+
+function RenderedNode({ nodeId }: RenderedNodeProps) {
+  const dom = useDomContext();
+  const node = appDom.getNode(dom, nodeId, 'element');
+  const Component: ToolpadComponent<any> = useElmToolpadComponent(node);
+  const childNodeGroups = appDom.getChildNodes(dom, node);
+
+  return (
+    /* eslint-disable-next-line @typescript-eslint/no-use-before-define */
+    <RenderedNodeContent node={node} childNodeGroups={childNodeGroups} Component={Component} />
+  );
+}
+
+interface ScopedTemplateProps {
+  propName: string;
+  node: appDom.ElementNode;
+  i: number;
+  children?: React.ReactNode;
+}
+
+function RuntimeScoped({ node, i, propName, children }: ScopedTemplateProps) {
+  const scope = useAssertedContext(RuntimeScopeContext);
+  const dom = useDomContext();
+  const components = useComponents();
+
+  const { [propName]: templateChildren = [] } = appDom.getChildNodes(dom, node);
+  const { parsedBindings, controlled } = parseBindings(dom, templateChildren, components, null);
+
+  const [templateBindings, setTemplateBindings] =
+    React.useState<Record<string, ParsedBinding | EvaluatedBinding>>(parsedBindings);
+
+  const setControlledBinding = React.useCallback(
+    (id: string, result: BindingEvaluationResult) => {
+      const { expression, initializer, ...parsedBinding } = parsedBindings[id];
+
+      if (!controlled.has(id)) {
+        throw new Error(`Not a controlled binding "${id}"`);
+      }
+
+      setTemplateBindings((existingBindings): Record<string, ParsedBinding | EvaluatedBinding> => {
+        const existingBinding = existingBindings[id];
+
+        if (existingBinding?.result && isEqual(existingBinding.result, result)) {
+          return existingBindings;
+        }
+
+        return {
+          ...existingBindings,
+          ...{
+            [id]: { ...parsedBinding, result },
+          },
+        };
+      });
+    },
+    [parsedBindings, controlled],
+  );
+
+  const childScope = React.useMemo(
+    () =>
+      createScope(
+        {
+          ...templateBindings,
+          [`${node.id}.props.${propName}[${i}]`]: {
+            result: { value: i },
+            scopePath: 'i',
+          },
+        },
+        scope,
+      ),
+    [i, node.id, propName, scope, templateBindings],
+  );
+
+  return (
+    <RuntimeScopeContext.Provider value={childScope}>
+      <SetControlledBindingContextProvider value={setControlledBinding}>
+        {children}
+      </SetControlledBindingContextProvider>
+    </RuntimeScopeContext.Provider>
+  );
+}
+
+function NodeError({ error }: NodeErrorProps) {
+  return (
+    <Tooltip title={error.message}>
+      <span
+        style={{
+          display: 'inline-flex',
+          flexDirection: 'row',
+          alignItems: 'center',
+          padding: 8,
+          background: 'red',
+          color: 'white',
+        }}
+      >
+        <ErrorIcon color="inherit" style={{ marginRight: 8 }} /> Error
+      </span>
+    </Tooltip>
+  );
+}
+
+interface RenderedNodeContentProps {
+  node: appDom.PageNode | appDom.ElementNode;
+  childNodeGroups: appDom.NodeChildren<appDom.ElementNode>;
+  Component: ToolpadComponent<any>;
+}
+
+function RenderedNodeContent({ node, childNodeGroups, Component }: RenderedNodeContentProps) {
+  const setControlledBinding = useSetControlledBindingContext();
+
+  const nodeId = node.id;
+
+  const componentConfig = Component[TOOLPAD_COMPONENT];
+  const { argTypes = {}, errorProp, loadingProp, loadingPropSource } = componentConfig;
+
+  const isLayoutNode =
+    appDom.isPage(node) || (appDom.isElement(node) && isPageLayoutComponent(node));
+
+  const scope = useAssertedContext(RuntimeScopeContext);
+  const liveBindings = scope.bindings;
+
+  const boundProps: Record<string, any> = React.useMemo(() => {
+    const loadingPropSourceSet = new Set(loadingPropSource);
+    const hookResult: Record<string, any> = {};
+
+    // error state we will propagate to the component
+    let error: Error | undefined;
+    // loading state we will propagate to the component
+    let loading: boolean = false;
+
+    for (const [propName, argType] of Object.entries(argTypes)) {
+      const bindingId = `${nodeId}.props.${propName}`;
+      const binding = liveBindings[bindingId];
+
+      if (binding) {
+        hookResult[propName] = binding.value;
+
+        if (binding.loading && loadingPropSourceSet.has(propName)) {
+          loading = true;
+        } else {
+          error = error || binding.error;
+        }
+      }
+
+      if (typeof hookResult[propName] === 'undefined' && argType) {
+        hookResult[propName] = getArgTypeDefaultValue(argType);
+      }
+    }
+
+    if (error) {
+      if (errorProp) {
+        hookResult[errorProp] = error;
+      } else {
+        console.error(errorFrom(error));
+      }
+    }
+
+    if (loadingProp && loading) {
+      hookResult[loadingProp] = true;
+    }
+
+    return hookResult;
+  }, [argTypes, errorProp, liveBindings, loadingProp, loadingPropSource, nodeId]);
+
+  const boundLayoutProps: Record<string, any> = React.useMemo(() => {
+    const hookResult: Record<string, any> = {};
+
+    for (const [propName, argType] of isLayoutNode ? [] : Object.entries(layoutBoxArgTypes)) {
+      const bindingId = `${nodeId}.layout.${propName}`;
+      const binding = liveBindings[bindingId];
+      if (binding) {
+        hookResult[propName] = binding.value;
+      }
+
+      if (typeof hookResult[propName] === 'undefined' && argType) {
+        hookResult[propName] = getArgTypeDefaultValue(argType);
+      }
+    }
+
+    return hookResult;
+  }, [isLayoutNode, liveBindings, nodeId]);
+
+  const onChangeHandlers: Record<string, (param: any) => void> = React.useMemo(
+    () =>
+      mapProperties(argTypes, ([key, argType]) => {
+        if (!argType || !argType.onChangeProp) {
+          return null;
+        }
+
+        const handler = (param: any) => {
+          const bindingId = `${nodeId}.props.${key}`;
+
+          const value = argType.onChangeHandler ? argType.onChangeHandler(param) : param;
+          setControlledBinding(bindingId, { value });
+        };
+
+        return [argType.onChangeProp, handler];
+      }),
+    [argTypes, nodeId, setControlledBinding],
+  );
+
+  const navigateToPage = usePageNavigator();
+  const evaluatePageExpression = useEvaluatePageExpression();
+
+  const eventHandlers: Record<string, (param: any) => void> = React.useMemo(() => {
+    return mapProperties(argTypes, ([key, argType]) => {
+      if (!argType || argType.type !== 'event' || !appDom.isElement(node)) {
+        return null;
+      }
+
+      const action = (node as appDom.ElementNode).props?.[key];
+
+      if (action?.type === 'navigationAction') {
+        const handler = async () => {
+          const { page, parameters = {} } = action.value;
+          if (page) {
+            const parsedParameterEntries = await Promise.all(
+              Object.keys(parameters).map(async (parameterName) => {
+                const parameterValue = parameters[parameterName];
+
+                if (parameterValue && parameterValue.type === 'jsExpression') {
+                  const result = await evaluatePageExpression(parameterValue.value, scope);
+                  return [parameterName, result.value];
+                }
+                return [parameterName, parameterValue?.value];
+              }),
+            );
+
+            const parsedParameters = Object.fromEntries(parsedParameterEntries);
+
+            navigateToPage(appDom.deref(page), parsedParameters);
+          }
+        };
+
+        return [key, handler];
+      }
+
+      if (action?.type === 'jsExpressionAction') {
+        const handler = () => {
+          const code = action.value;
+          const exprToEvaluate = `(async () => {${code}})()`;
+          evaluatePageExpression(exprToEvaluate, scope);
+        };
+
+        return [key, handler];
+      }
+
+      return null;
+    });
+  }, [argTypes, node, navigateToPage, evaluatePageExpression, scope]);
+
+  const reactChildren = React.useMemo(() => {
+    const result: Record<string, React.ReactNode> = {};
+    for (const [prop, childNodes] of Object.entries(childNodeGroups)) {
+      result[prop] = childNodes.map((child) => <RenderedNode key={child.id} nodeId={child.id} />);
+    }
+    return result;
+  }, [childNodeGroups]);
+
+  const layoutElementProps = React.useMemo(() => {
+    if (appDom.isElement(node) && isPageRow(node)) {
+      return {
+        layoutColumnSizes: childNodeGroups.children.map((child) => child.layout?.columnSize?.value),
+      };
+    }
+    return {};
+  }, [childNodeGroups.children, node]);
+
+  const props: Record<string, any> = React.useMemo(() => {
+    return {
+      ...boundProps,
+      ...onChangeHandlers,
+      ...eventHandlers,
+      ...layoutElementProps,
+      ...reactChildren,
+    };
+  }, [boundProps, eventHandlers, layoutElementProps, onChangeHandlers, reactChildren]);
+
+  const previousProps = React.useRef<Record<string, any>>(props);
+  const [hasSetInitialBindings, setHasSetInitialBindings] = React.useState(false);
+  React.useEffect(() => {
+    Object.entries(argTypes).forEach(([key, argType]) => {
+      if (!argType?.defaultValueProp) {
+        return;
+      }
+
+      if (
+        hasSetInitialBindings &&
+        previousProps.current[argType.defaultValueProp] === props[argType.defaultValueProp]
+      ) {
+        return;
+      }
+
+      const bindingIdToUpdate = `${nodeId}.props.${key}`;
+      setControlledBinding(bindingIdToUpdate, { value: props[argType.defaultValueProp] });
+    });
+
+    previousProps.current = props;
+    setHasSetInitialBindings(true);
+  }, [props, argTypes, nodeId, setControlledBinding, hasSetInitialBindings]);
+
+  const wrappedProps = React.useMemo(() => {
+    const hookResult: Record<string, any> = { ...props };
+    // Wrap element props
+    for (const [propName, argType] of Object.entries(argTypes)) {
+      const isElement = argType?.type === 'element';
+      const isTemplate = argType?.type === 'template';
+
+      if (isElement || isTemplate) {
+        const value = hookResult[propName];
+
+        let wrappedValue = value;
+        if (argType.control?.type === 'slots') {
+          wrappedValue = <Slots prop={propName}>{value}</Slots>;
+        } else if (argType.control?.type === 'slot' || argType.control?.type === 'layoutSlot') {
+          wrappedValue = (
+            <Placeholder prop={propName} hasLayout={argType.control?.type === 'layoutSlot'}>
+              {value}
+            </Placeholder>
+          );
+        }
+
+        if (isTemplate) {
+          appDom.assertIsElement(node);
+          hookResult[propName] = ({ i }: TemplateScopeParams) => {
+            return (
+              <RuntimeScoped i={i} node={node} propName={propName}>
+                {wrappedValue}
+              </RuntimeScoped>
+            );
+          };
+        } else {
+          hookResult[propName] = wrappedValue;
+        }
+      }
+    }
+    return hookResult;
+  }, [argTypes, node, props]);
+
+  return (
+    <NodeRuntimeWrapper
+      nodeId={nodeId}
+      nodeName={node.name}
+      componentConfig={Component[TOOLPAD_COMPONENT]}
+      NodeError={NodeError}
+    >
+      {isLayoutNode ? (
+        <Component {...wrappedProps} />
+      ) : (
+        <Box
+          sx={{
+            display: 'flex',
+            alignItems: boundLayoutProps.verticalAlign,
+            justifyContent: boundLayoutProps.horizontalAlign,
+          }}
+        >
+          <Component {...wrappedProps} />
+        </Box>
+      )}
+    </NodeRuntimeWrapper>
+  );
+}
+
+interface PageRootProps {
+  children?: React.ReactNode;
+}
+
+function PageRoot({ children }: PageRootProps) {
+  return (
+    <Container>
+      <Stack
+        data-testid="page-root"
+        direction="column"
+        sx={{
+          my: 2,
+          gap: 1,
+        }}
+      >
+        {children}
+      </Stack>
+    </Container>
+  );
+}
+
+const PageRootComponent = createComponent(PageRoot, {
+  argTypes: {
+    children: {
+      type: 'element',
+      control: { type: 'slots' },
+    },
+  },
+});
+
+interface QueryNodeProps {
+  page: appDom.PageNode;
+  node: appDom.QueryNode;
+}
+
+function QueryNode({ page, node }: QueryNodeProps) {
+  const setControlledBinding = useSetControlledBindingContext();
+
+  const { bindings } = useAssertedContext(RuntimeScopeContext);
+
+  const params = resolveBindables(
+    bindings,
+    `${node.id}.params`,
+    Object.fromEntries(node.params ?? []),
+  );
+
+  const configBindings = _.pick(node.attributes, USE_DATA_QUERY_CONFIG_KEYS);
+  const options = resolveBindables(bindings, `${node.id}.config`, configBindings);
+  const queryResult = useDataQuery(page, node, params, options);
+
+  React.useEffect(() => {
+    const { isLoading, error, data, rows, ...result } = queryResult;
+
+    for (const [key, value] of Object.entries(result)) {
+      const bindingId = `${node.id}.${key}`;
+      setControlledBinding(bindingId, { value });
+    }
+
+    // Here we propagate the error and loading state to the data and rows prop prop
+    // TODO: is there a straightforward way for us to generalize this behavior?
+    setControlledBinding(`${node.id}.isLoading`, { value: isLoading });
+    setControlledBinding(`${node.id}.error`, { value: error });
+    const deferredStatus = { loading: isLoading, error };
+    setControlledBinding(`${node.id}.data`, { ...deferredStatus, value: data });
+    setControlledBinding(`${node.id}.rows`, { ...deferredStatus, value: rows });
+  }, [node.id, queryResult, setControlledBinding]);
+
+  return null;
+}
+
+interface MutationNodeProps {
+  page: appDom.PageNode;
+  node: appDom.QueryNode;
+}
+
+function MutationNode({ node, page }: MutationNodeProps) {
+  const setControlledBinding = useSetControlledBindingContext();
+
+  const { bindings } = useAssertedContext(RuntimeScopeContext);
+
+  const queryId = node.id;
+  const params = resolveBindables(
+    bindings,
+    `${node.id}.params`,
+    Object.fromEntries(node.params ?? []),
+  );
+
+  const {
+    isLoading,
+    data: responseData = EMPTY_OBJECT,
+    error: fetchError,
+    mutateAsync,
+  } = useMutation(
+    async (overrides: any = {}) =>
+      execDataSourceQuery({
+        pageName: page.name,
+        queryName: node.name,
+        params: { ...params, ...overrides },
+      }),
+    {
+      mutationKey: [queryId, params],
+    },
+  );
+
+  const { data, error: apiError } = responseData;
+
+  const error = apiError || fetchError;
+
+  // Stabilize the mutation and prepare for inclusion in global scope
+  const mutationResult: UseFetch = React.useMemo(
+    () => ({
+      isLoading,
+      isFetching: isLoading,
+      error,
+      data,
+      rows: Array.isArray(data) ? data : EMPTY_ARRAY,
+      call: mutateAsync,
+      fetch: mutateAsync,
+      refetch: () => {
+        throw new Error(`refetch is not supported in manual queries`);
+      },
+    }),
+    [isLoading, error, mutateAsync, data],
+  );
+
+  React.useEffect(() => {
+    for (const [key, value] of Object.entries(mutationResult)) {
+      const bindingId = `${node.id}.${key}`;
+      setControlledBinding(bindingId, { value });
+    }
+  }, [node.id, mutationResult, setControlledBinding]);
+
+  return null;
+}
+
+interface FetchNodeProps {
+  page: appDom.PageNode;
+  node: appDom.QueryNode;
+}
+
+function FetchNode({ node, page }: FetchNodeProps) {
+  const mode: appDom.FetchMode = node.attributes.mode?.value || 'query';
+  switch (mode) {
+    case 'query':
+      return <QueryNode node={node} page={page} />;
+    case 'mutation':
+      return <MutationNode node={node} page={page} />;
+    default:
+      throw new Error(`Unrecognized fetch mdoe "${mode}"`);
+  }
 }
 
 function RenderedPage({ nodeId }: RenderedNodeProps) {
@@ -963,10 +1065,6 @@ function RenderedPage({ nodeId }: RenderedNodeProps) {
   const [pageBindings, setPageBindings] =
     React.useState<Record<string, ParsedBinding | EvaluatedBinding>>(parsedBindings);
 
-  const [scopedBindings, setScopedBindings] = React.useState<
-    Record<string, Record<string, ParsedBinding | EvaluatedBinding>>
-  >({});
-
   const prevDom = React.useRef(dom);
   React.useEffect(() => {
     if (dom === prevDom.current) {
@@ -988,83 +1086,38 @@ function RenderedPage({ nodeId }: RenderedNodeProps) {
   }, [parsedBindings, controlled, dom]);
 
   const setControlledBinding = React.useCallback(
-    (id: string, result: BindingEvaluationResult, scopeId?: string) => {
+    (id: string, result: BindingEvaluationResult) => {
       const { expression, initializer, ...parsedBinding } = parsedBindings[id];
 
       if (!controlled.has(id)) {
         throw new Error(`Not a controlled binding "${id}"`);
       }
 
-      if (scopeId) {
-        setScopedBindings(
-          (existing): Record<string, Record<string, ParsedBinding | EvaluatedBinding>> => ({
-            ...existing,
-            ...{
-              [scopeId]: {
-                ...(existing[scopeId] || {}),
-                [id]: { ...parsedBinding, result },
-              },
-            },
-          }),
-        );
-      } else {
-        setPageBindings(
-          (existing): Record<string, ParsedBinding | EvaluatedBinding> => ({
-            ...existing,
-            ...{
-              [id]: { ...parsedBinding, result },
-            },
-          }),
-        );
-      }
+      setPageBindings((existingBindings): Record<string, ParsedBinding | EvaluatedBinding> => {
+        const existingBinding = existingBindings[id];
+
+        if (existingBinding?.result && isEqual(existingBinding.result, result)) {
+          return existingBindings;
+        }
+
+        return {
+          ...existingBindings,
+          ...{
+            [id]: { ...parsedBinding, result },
+          },
+        };
+      });
     },
     [parsedBindings, controlled],
   );
 
-  const globalScope = EMPTY_OBJECT;
-
-  const browserJsRuntime = useBrowserJsRuntime();
-
-  const getEvaluatedBindings = React.useCallback(
-    (scopeId?: string, localScopeParams: LocalScopeParams = DEFAULT_LOCAL_SCOPE_PARAMS) => {
-      const localBindings = scopeId ? scopedBindings[scopeId] : null;
-
-      return evalJsBindings(
-        browserJsRuntime,
-        {
-          ...pageBindings,
-          ...(localBindings || {}),
-        },
-        {
-          ...globalScope,
-          ...localScopeParams,
-        },
-      );
-    },
-    [browserJsRuntime, globalScope, pageBindings, scopedBindings],
-  );
-
-  const getScopeState = React.useCallback(
-    (scopeId?: string) => buildGlobalScope(globalScope, getEvaluatedBindings(scopeId)),
-    [getEvaluatedBindings, globalScope],
-  );
-
-  const getBindings = React.useCallback(
-    (scopeId?: string, localScopeParams?: LocalScopeParams) => {
-      const evaluatedBindings = getEvaluatedBindings(scopeId, localScopeParams);
-      return mapValues(evaluatedBindings, (binding) => binding.result || { value: undefined });
-    },
-    [getEvaluatedBindings],
-  );
+  const pageScope = React.useMemo(() => {
+    return createScope(pageBindings);
+  }, [pageBindings]);
 
   const evaluatePageExpression = React.useCallback(
-    async (expression: string, scopeId?: string, localScopeParams?: LocalScopeParams) => {
-      const scopeState = getScopeState(scopeId);
-
-      const scope = {
-        ...scopeState,
-        ...localScopeParams,
-      };
+    async (expression: string, currentScope: RuntimeScope) => {
+      const scope = currentScope.values;
 
       const updates: Record<string, unknown> = {};
 
@@ -1121,41 +1174,33 @@ function RenderedPage({ nodeId }: RenderedNodeProps) {
 
       return result;
     },
-    [browserJsRuntime, getScopeState],
+    [],
   );
 
   const canvasEvents = React.useContext(CanvasEventsContext);
 
   React.useEffect(() => {
-    const pageState = getScopeState();
-
-    canvasEvents?.emit('pageStateUpdated', { pageState, globalScopeMeta });
-  }, [canvasEvents, globalScopeMeta, getScopeState]);
-
-  React.useEffect(() => {
-    const liveBindings = getBindings();
-    canvasEvents?.emit('pageBindingsUpdated', { bindings: liveBindings });
-  }, [canvasEvents, getBindings]);
+    if (canvasEvents) {
+      canvasEvents.emit('pageStateUpdated', { pageState: pageScope.values, globalScopeMeta });
+      canvasEvents.emit('pageBindingsUpdated', { bindings: pageScope.bindings });
+    }
+  }, [canvasEvents, globalScopeMeta, pageScope]);
 
   return (
-    <BindingsContextProvider value={getBindings}>
+    <RuntimeScopeContext.Provider value={pageScope}>
       <SetControlledBindingContextProvider value={setControlledBinding}>
         <EvaluatePageExpressionProvider value={evaluatePageExpression}>
-          <LocalScopeContextProvider
-            value={{ params: DEFAULT_LOCAL_SCOPE_PARAMS, isDefaultScope: true }}
-          >
-            <RenderedNodeContent
-              node={page}
-              childNodeGroups={{ children }}
-              Component={PageRootComponent}
-            />
-            {queries.map((node) => (
-              <FetchNode key={node.id} page={page} node={node} />
-            ))}
-          </LocalScopeContextProvider>
+          <RenderedNodeContent
+            node={page}
+            childNodeGroups={{ children }}
+            Component={PageRootComponent}
+          />
+          {queries.map((node) => (
+            <FetchNode key={node.id} page={page} node={node} />
+          ))}
         </EvaluatePageExpressionProvider>
       </SetControlledBindingContextProvider>
-    </BindingsContextProvider>
+    </RuntimeScopeContext.Provider>
   );
 }
 

@@ -104,7 +104,13 @@ module.exports = {
         'packages/toolpad-core/**/*',
         'packages/toolpad-components/**/*',
       ],
-      excludedFiles: ['**/jest-environment-jsdom.ts', 'tsup.config.ts', '*.spec.ts', '*.spec.tsx'],
+      excludedFiles: [
+        '**/jest-environment-jsdom.ts',
+        'tsup.config.ts',
+        '*.spec.ts',
+        '*.spec.tsx',
+        'jest.config.ts',
+      ],
       rules: {
         'import/no-extraneous-dependencies': ['error'],
       },

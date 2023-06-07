@@ -47,15 +47,7 @@ function updateBindingsSyntax(value: any): any {
 
 export default {
   up(dom: v7LegacyAppDom.AppDom): appDom.AppDom {
-    invariant(dom.version === 6, 'Can only migrate dom of version 5');
-
-    console.log(
-      JSON.stringify({
-        ...dom,
-        nodes: updateBindingsSyntax(dom.nodes),
-        version: 7,
-      }),
-    );
+    invariant(dom.version === 6, 'Can only migrate dom of version 6');
 
     return {
       ...dom,

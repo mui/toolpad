@@ -129,9 +129,9 @@ const pages: MuiPage[] = [
     pathname: '/toolpad/examples',
     icon: DescriptionIcon,
     children: [
-      { pathname: '/toolpad/examples/admin-app' },
-      { pathname: '/toolpad/examples/KPI-performance' },
-      { pathname: '/toolpad/examples/sales-dashboard' },
+      // { pathname: '/toolpad/examples/admin-app' },
+      // { pathname: '/toolpad/examples/KPI-performance' },
+      { pathname: '/toolpad/examples/qr-generator' },
     ],
   },
   // {

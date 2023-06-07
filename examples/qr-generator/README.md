@@ -1,6 +1,6 @@
 # QR code generator
 
-<p class="description">A basic Toolpad application that defines a backend function to encode some text/URL into a QR code.</p>
+<p class="description">A basic Toolpad application that can be used to turn any text or URL into a QR code.</p>
 
 [Open in CodeSandbox](https://codesandbox.io/p/sandbox/github/mui/mui-toolpad/tree/master/examples/qr-generator)
 

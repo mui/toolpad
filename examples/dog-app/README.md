@@ -1,6 +1,9 @@
 # Dog app
 
-<p class="description">A basic Toolpad app that shows how to call an API</p>
+<p class="description">An app that shows dog images based on selected breeds or sub-breeds. </p>
 
-The app can be accessed from:
-Todo: Add codesandbox link
+A basic Toolpad app that shows how to call an API and work with data grid and image component.
+
+To build this app step-by-step, visit the [docs](https://mui.com/toolpad/getting-started/quickstart/#building-your-first-application)
+
+[Open in CodeSandbox](https://codesandbox.io/p/sandbox/github/mui/mui-toolpad/tree/master/examples/dog-app)

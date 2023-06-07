@@ -82,7 +82,7 @@ Interactive walkthrough of the app building process:
 
 1. Find the **rows** property in the inspector. Notice that there's a small **Bind** button to its right. Properties with this button next to them can be bound to state available on the page:
 
-{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/getting-started/first-app/step-5.png", "alt": "Bind data", "caption": "The bindable rows property", "zoom": false, "indent": 1 }}
+{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/getting-started/first-app/step-5.png", "alt": "Bind data", "caption": "The bindable rows property", "zoom": false, "width": 300 }}
 
 3. Click the button to open the binding editor. On the left you'll see a list of all bindable state in the page and on the right there's a code editor that accepts any JavaScript expression.
 

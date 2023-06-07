@@ -2,7 +2,7 @@
 
 <p class="description">Toolpad apps allow for a display mode configurable per-page</p>
 
-{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/concepts/display-mode/display-mode.png", "alt": "Display mode property ", "caption": "Display mode page property", "zoom": false }}
+{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/concepts/display-mode/display-mode.png", "alt": "Display mode property ", "caption": "Display mode page property", "zoom": false, "width": 300 }}
 
 ## Options
 

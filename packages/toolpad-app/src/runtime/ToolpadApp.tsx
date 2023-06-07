@@ -542,26 +542,17 @@ function RenderedNode({ nodeId }: RenderedNodeProps) {
   );
 }
 
-interface ScopedTemplateProps {
-  propName: string;
-  node: appDom.ElementNode;
-  i: number;
+interface RuntimeScopedProps {
+  parseBindingsResult: ReturnType<typeof parseBindings>;
   onUpdate?: (params: { scope: RuntimeScope; scopeMeta: ScopeMeta }) => void;
   children?: React.ReactNode;
 }
 
-function RuntimeScoped({ node, i, propName, onUpdate, children }: ScopedTemplateProps) {
+function RuntimeScoped({ parseBindingsResult, onUpdate, children }: RuntimeScopedProps) {
   const parentScope = useAssertedContext(RuntimeScopeContext);
   const dom = useDomContext();
-  const components = useComponents();
 
-  const { [propName]: templateChildren = [] } = appDom.getChildNodes(dom, node);
-  const { parsedBindings, controlled, scopeMeta } = parseBindings(
-    dom,
-    templateChildren,
-    components,
-    null,
-  );
+  const { parsedBindings, controlled, scopeMeta } = parseBindingsResult;
 
   const [scopeBindings, setScopeBindings] =
     React.useState<Record<string, ParsedBinding | EvaluatedBinding>>(parsedBindings);
@@ -613,18 +604,8 @@ function RuntimeScoped({ node, i, propName, onUpdate, children }: ScopedTemplate
   );
 
   const childScope = React.useMemo(
-    () =>
-      createScope(
-        {
-          ...scopeBindings,
-          [`${node.id}.props.${propName}[${i}]`]: {
-            result: { value: i },
-            scopePath: 'i',
-          },
-        },
-        parentScope,
-      ),
-    [i, node.id, propName, parentScope, scopeBindings],
+    () => createScope(scopeBindings, parentScope),
+    [parentScope, scopeBindings],
   );
 
   const evaluateScopeExpression = React.useCallback(
@@ -704,6 +685,28 @@ function RuntimeScoped({ node, i, propName, onUpdate, children }: ScopedTemplate
       </SetControlledBindingContextProvider>
     </RuntimeScopeContext.Provider>
   );
+}
+
+interface TemplateScopedProps {
+  propName: string;
+  node: appDom.ElementNode;
+  i: number;
+  children?: React.ReactNode;
+}
+
+function TemplateScoped({ node, i, propName, children }: TemplateScopedProps) {
+  const dom = useDomContext();
+  const components = useComponents();
+
+  const { [propName]: templateChildren = [] } = appDom.getChildNodes(dom, node);
+  const parseBindingsResult = parseBindings(dom, templateChildren, components, null);
+
+  parseBindingsResult.parsedBindings[`${node.id}.props.${propName}[${i}]`] = {
+    result: { value: i },
+    scopePath: 'i',
+  };
+
+  return <RuntimeScoped parseBindingsResult={parseBindingsResult}>{children}</RuntimeScoped>;
 }
 
 function NodeError({ error }: NodeErrorProps) {
@@ -950,9 +953,9 @@ function RenderedNodeContent({ node, childNodeGroups, Component }: RenderedNodeC
           appDom.assertIsElement(node);
           hookResult[propName] = ({ i }: TemplateScopeParams) => {
             return (
-              <RuntimeScoped i={i} node={node} propName={propName}>
+              <TemplateScoped i={i} node={node} propName={propName}>
                 {wrappedValue}
-              </RuntimeScoped>
+              </TemplateScoped>
             );
           };
         } else {

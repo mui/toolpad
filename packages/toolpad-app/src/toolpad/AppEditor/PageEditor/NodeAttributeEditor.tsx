@@ -1,5 +1,11 @@
 import * as React from 'react';
-import { ArgTypeDefinition, BindableAttrValue } from '@mui/toolpad-core';
+import {
+  ApplicationVm,
+  ArgTypeDefinition,
+  BindableAttrValue,
+  RuntimeScope,
+  ScopeMeta,
+} from '@mui/toolpad-core';
 import { Alert, Box } from '@mui/material';
 import { useBrowserJsRuntime } from '@mui/toolpad-core/jsBrowserRuntime';
 import * as appDom from '../../../appDom';
@@ -8,6 +14,16 @@ import BindableEditor from './BindableEditor';
 import { usePageEditorState } from './PageEditorProvider';
 import { getDefaultControl } from '../../propertyControls';
 import { NON_BINDABLE_CONTROL_TYPES } from '../../../runtime/constants';
+
+function buildScopeMeta(vm: ApplicationVm, bindingScope?: RuntimeScope): ScopeMeta {
+  if (bindingScope?.parentScope) {
+    return {
+      ...buildScopeMeta(vm, bindingScope?.parentScope),
+      ...bindingScope?.meta,
+    };
+  }
+  return bindingScope?.meta ?? {};
+}
 
 export interface NodeAttributeEditorProps<P extends object, K extends keyof P = keyof P> {
   node: appDom.AppDomNode;
@@ -38,12 +54,14 @@ export default function NodeAttributeEditor<P extends object>({
   const propValue: BindableAttrValue<unknown> | null = (node as any)[namespace]?.[name] ?? null;
 
   const bindingId = `${node.id}${namespace ? `.${namespace}` : ''}.${name}`;
-  const { globalScopeMeta, vm } = usePageEditorState();
+  const { vm } = usePageEditorState();
 
   const scopeId = vm.bindingScopes[bindingId];
-  const bindingScope = scopeId ? vm.scopes[scopeId] : null;
+  const bindingScope = scopeId ? vm.scopes[scopeId] : undefined;
 
   const liveBinding = bindingScope?.bindings[bindingId];
+
+  const scopeMeta = React.useMemo(() => buildScopeMeta(vm, bindingScope), [vm, bindingScope]);
 
   const Control = getDefaultControl(argType, props);
 
@@ -58,11 +76,13 @@ export default function NodeAttributeEditor<P extends object>({
 
   const jsBrowserRuntime = useBrowserJsRuntime();
 
+  console.log('meta', scopeMeta);
+
   return Control ? (
     <BindableEditor
       liveBinding={liveBinding}
-      globalScope={bindingScope?.values}
-      globalScopeMeta={globalScopeMeta}
+      globalScope={bindingScope?.values ?? {}}
+      globalScopeMeta={scopeMeta}
       label={argType.label || name}
       bindable={isBindable}
       disabled={isDisabled}

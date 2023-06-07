@@ -462,8 +462,10 @@ export type TemplateRenderer = (
 
 export interface RuntimeScope {
   id: string;
+  parentScope?: RuntimeScope;
   bindings: Record<string, BindingEvaluationResult<unknown>>;
   values: Record<string, unknown>;
+  meta: ScopeMeta;
 }
 
 export interface ApplicationVm {

@@ -188,20 +188,27 @@ const EditorOverlay = styled('div')({
 
 type ToolpadComponents = Partial<Record<string, ToolpadComponent<any>>>;
 
+interface CreateScopeParams {
+  parentScope?: RuntimeScope;
+  localValues?: Record<string, unknown> | undefined;
+  meta: ScopeMeta;
+}
+
 function createScope(
   id: string,
   bindings: Record<string, ParsedBinding | EvaluatedBinding<unknown>>,
-  localScope: Record<string, unknown> | undefined,
-  parentScope?: RuntimeScope,
+  { localValues, parentScope, meta = {} }: CreateScopeParams,
 ): RuntimeScope {
-  const scopeValues = { ...parentScope?.values, ...localScope };
+  const scopeValues = { ...parentScope?.values, ...localValues };
 
   const evaluatedBindings = evalJsBindings(browserJsRuntime, bindings, scopeValues);
 
   return {
     id,
+    parentScope,
     bindings: mapValues(evaluatedBindings, (binding) => binding.result || { value: undefined }),
     values: buildGlobalScope(scopeValues, evaluatedBindings),
+    meta,
   };
 }
 
@@ -660,8 +667,13 @@ function RuntimeScoped({
   );
 
   const childScope = React.useMemo(
-    () => createScope(id, scopeBindings, localScope, parentScope),
-    [id, localScope, parentScope, scopeBindings],
+    () =>
+      createScope(id, scopeBindings, {
+        localValues: localScope,
+        parentScope,
+        meta: scopeMeta,
+      }),
+    [id, localScope, parentScope, scopeBindings, scopeMeta],
   );
 
   const vmRef = React.useContext(ApplicationVmApiContext);

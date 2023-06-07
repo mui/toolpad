@@ -79,6 +79,7 @@ import { execDataSourceQuery, useDataQuery, UseDataQueryConfig, UseFetch } from 
 import { NavigateToPage } from './CanvasHooksContext';
 import AppNavigation from './AppNavigation';
 import PreviewHeader from './PreviewHeader';
+import useEvent from '../utils/useEvent';
 
 const browserJsRuntime = getBrowserRuntime();
 
@@ -549,7 +550,7 @@ interface RuntimeScopedProps {
 }
 
 function RuntimeScoped({ parseBindingsResult, onUpdate, children }: RuntimeScopedProps) {
-  const parentScope = useAssertedContext(RuntimeScopeContext);
+  const parentScope = React.useContext(RuntimeScopeContext);
   const dom = useDomContext();
 
   const { parsedBindings, controlled, scopeMeta } = parseBindingsResult;
@@ -698,8 +699,10 @@ function TemplateScoped({ node, i, propName, children }: TemplateScopedProps) {
   const dom = useDomContext();
   const components = useComponents();
 
-  const { [propName]: templateChildren = [] } = appDom.getChildNodes(dom, node);
-  const parseBindingsResult = parseBindings(dom, templateChildren, components, null);
+  const parseBindingsResult = React.useMemo(() => {
+    const { [propName]: templateChildren = [] } = appDom.getChildNodes(dom, node);
+    return parseBindings(dom, templateChildren, components, null);
+  }, [components, dom, node, propName]);
 
   parseBindingsResult.parsedBindings[`${node.id}.props.${propName}[${i}]`] = {
     result: { value: i },
@@ -1152,154 +1155,34 @@ function RenderedPage({ nodeId }: RenderedNodeProps) {
   const location = useLocation();
   const components = useComponents();
 
-  const {
-    parsedBindings,
-    controlled,
-    scopeMeta: globalScopeMeta,
-  } = React.useMemo(
+  const parseBindingsResult = React.useMemo(
     () => parseBindings(dom, page, components, location),
     [components, dom, location, page],
   );
 
-  const [pageBindings, setPageBindings] =
-    React.useState<Record<string, ParsedBinding | EvaluatedBinding>>(parsedBindings);
-
-  const prevDom = React.useRef(dom);
-  React.useEffect(() => {
-    if (dom === prevDom.current) {
-      // Ignore this effect if there are no dom updates.
-      // IMPORTANT!!! This assumes the `RenderedPage` component is remounted when the `nodeId` changes
-      //  <RenderedPage nodeId={someId} key={someId} />
-      return;
-    }
-    prevDom.current = dom;
-
-    setPageBindings((existingBindings) => {
-      // Make sure to patch page bindings after dom nodes have been added or removed
-      const updated: Record<string, ParsedBinding | EvaluatedBinding> = {};
-      for (const [key, binding] of Object.entries(parsedBindings)) {
-        updated[key] = controlled.has(key) ? existingBindings[key] || binding : binding;
-      }
-      return updated;
-    });
-  }, [parsedBindings, controlled, dom]);
-
-  const setControlledBinding = React.useCallback(
-    (id: string, result: BindingEvaluationResult) => {
-      const { expression, initializer, ...parsedBinding } = parsedBindings[id];
-
-      if (!controlled.has(id)) {
-        throw new Error(`Not a controlled binding "${id}"`);
-      }
-
-      setPageBindings((existingBindings): Record<string, ParsedBinding | EvaluatedBinding> => {
-        const existingBinding = existingBindings[id];
-
-        if (existingBinding?.result && isEqual(existingBinding.result, result)) {
-          return existingBindings;
-        }
-
-        return {
-          ...existingBindings,
-          ...{
-            [id]: { ...parsedBinding, result },
-          },
-        };
-      });
-    },
-    [parsedBindings, controlled],
-  );
-
-  const pageScope = React.useMemo(() => {
-    return createScope(pageBindings);
-  }, [pageBindings]);
-
-  const evaluateScopeExpression = React.useCallback(
-    async (expression: string) => {
-      const scope = pageScope.values;
-
-      const updates: Record<string, unknown> = {};
-
-      const proxify = <T extends object>(obj: T, scopePathSegments: string[]): T => {
-        return new Proxy(obj, {
-          get(target, prop, receiver) {
-            if (typeof prop === 'symbol') {
-              return Reflect.get(target, prop, receiver);
-            }
-
-            const result = target[prop as keyof T];
-
-            if (result && typeof result === 'object') {
-              return proxify(result, [...scopePathSegments, prop]);
-            }
-
-            return Reflect.get(target, prop, receiver);
-          },
-          set(target, prop, newValue, receiver) {
-            if (typeof prop === 'symbol') {
-              return Reflect.set(target, prop, newValue, receiver);
-            }
-
-            const scopePath = [...scopePathSegments, prop].join('.');
-            updates[scopePath] = newValue;
-            return Reflect.set(target, prop, newValue, receiver);
-          },
-        });
-      };
-
-      const result = browserJsRuntime.evaluateExpression(expression, proxify(scope, []));
-
-      await result.value;
-
-      setPageBindings((existingBindings) => {
-        return mapValues(existingBindings, (binding) => {
-          for (const [scopePath, newValue] of Object.entries(updates)) {
-            if (binding.scopePath === scopePath) {
-              if (typeof binding.expression === 'string') {
-                console.warn(`Can't update "${scopePath}", it already has a binding`);
-              } else {
-                return {
-                  ...binding,
-                  expression: undefined,
-                  initializer: undefined,
-                  result: { value: newValue },
-                } satisfies EvaluatedBinding;
-              }
-            }
-          }
-          return binding;
-        });
-      });
-
-      return result;
-    },
-    [pageScope],
-  );
-
   const canvasEvents = React.useContext(CanvasEventsContext);
 
-  React.useEffect(() => {
+  const onUpdate = useEvent(({ scope, scopeMeta }) => {
     if (canvasEvents) {
-      canvasEvents.emit('pageStateUpdated', { pageState: pageScope.values, globalScopeMeta });
-      canvasEvents.emit('pageBindingsUpdated', { bindings: pageScope.bindings });
+      canvasEvents.emit('pageStateUpdated', {
+        pageState: scope.values,
+        globalScopeMeta: scopeMeta,
+      });
+      canvasEvents.emit('pageBindingsUpdated', { bindings: scope.bindings });
     }
-  }, [canvasEvents, globalScopeMeta, pageScope]);
+  });
 
   return (
-    <RuntimeScopeContext.Provider value={pageScope}>
-      <SetControlledBindingContextProvider value={setControlledBinding}>
-        <EvaluateScopeExpressionProvider value={evaluateScopeExpression}>
-          <RenderedNodeContent
-            node={page}
-            childNodeGroups={{ children }}
-            Component={PageRootComponent}
-          />
-          {queries.map((node) => (
-            <FetchNode key={node.id} page={page} node={node} />
-          ))}
-        </EvaluateScopeExpressionProvider>
-      </SetControlledBindingContextProvider>
-    </RuntimeScopeContext.Provider>
+    <RuntimeScoped parseBindingsResult={parseBindingsResult} onUpdate={onUpdate}>
+      <RenderedNodeContent
+        node={page}
+        childNodeGroups={{ children }}
+        Component={PageRootComponent}
+      />
+      {queries.map((node) => (
+        <FetchNode key={node.id} page={page} node={node} />
+      ))}
+    </RuntimeScoped>
   );
 }
 

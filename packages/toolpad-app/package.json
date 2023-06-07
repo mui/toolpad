@@ -168,5 +168,6 @@
   "typings": "./index.d.ts",
   "publishConfig": {
     "access": "public"
-  }
+  },
+  "gitHead": "1ca88be01a8dffd9a390ffde8c2a1b4164496b33"
 }

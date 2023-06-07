@@ -557,8 +557,28 @@ function RuntimeScoped({ node, i, propName, children }: ScopedTemplateProps) {
   const { [propName]: templateChildren = [] } = appDom.getChildNodes(dom, node);
   const { parsedBindings, controlled } = parseBindings(dom, templateChildren, components, null);
 
-  const [templateBindings, setTemplateBindings] =
+  const [scopeBindings, setScopeBindings] =
     React.useState<Record<string, ParsedBinding | EvaluatedBinding>>(parsedBindings);
+
+  const prevDom = React.useRef(dom);
+  React.useEffect(() => {
+    if (dom === prevDom.current) {
+      // Ignore this effect if there are no dom updates.
+      // IMPORTANT!!! This assumes the `RenderedPage` component is remounted when the `nodeId` changes
+      //  <RenderedPage nodeId={someId} key={someId} />
+      return;
+    }
+    prevDom.current = dom;
+
+    setScopeBindings((existingBindings) => {
+      // Make sure to patch page bindings after dom nodes have been added or removed
+      const updated: Record<string, ParsedBinding | EvaluatedBinding> = {};
+      for (const [key, binding] of Object.entries(parsedBindings)) {
+        updated[key] = controlled.has(key) ? existingBindings[key] || binding : binding;
+      }
+      return updated;
+    });
+  }, [parsedBindings, controlled, dom]);
 
   const setControlledBinding = React.useCallback(
     (id: string, result: BindingEvaluationResult) => {
@@ -568,7 +588,7 @@ function RuntimeScoped({ node, i, propName, children }: ScopedTemplateProps) {
         throw new Error(`Not a controlled binding "${id}"`);
       }
 
-      setTemplateBindings((existingBindings): Record<string, ParsedBinding | EvaluatedBinding> => {
+      setScopeBindings((existingBindings): Record<string, ParsedBinding | EvaluatedBinding> => {
         const existingBinding = existingBindings[id];
 
         if (existingBinding?.result && isEqual(existingBinding.result, result)) {
@@ -590,7 +610,7 @@ function RuntimeScoped({ node, i, propName, children }: ScopedTemplateProps) {
     () =>
       createScope(
         {
-          ...templateBindings,
+          ...scopeBindings,
           [`${node.id}.props.${propName}[${i}]`]: {
             result: { value: i },
             scopePath: 'i',
@@ -598,7 +618,7 @@ function RuntimeScoped({ node, i, propName, children }: ScopedTemplateProps) {
         },
         scope,
       ),
-    [i, node.id, propName, scope, templateBindings],
+    [i, node.id, propName, scope, scopeBindings],
   );
 
   return (

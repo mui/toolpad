@@ -1,7 +1,7 @@
-import * as React from "react";
-import Chip from "@mui/material/Chip";
-import Tooltip from "@mui/material/Tooltip";
-import { createComponent } from "@mui/toolpad/browser";
+import * as React from 'react';
+import Chip from '@mui/material/Chip';
+import Tooltip from '@mui/material/Tooltip';
+import { createComponent } from '@mui/toolpad/browser';
 
 export interface OrderIdChipProps {
   value: string;
@@ -18,8 +18,8 @@ function OrderIdChip({ value }: OrderIdChipProps) {
 export default createComponent(OrderIdChip, {
   argTypes: {
     value: {
-      type: "string",
-      default: "",
+      type: 'string',
+      default: '',
     },
   },
 });

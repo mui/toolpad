@@ -14,11 +14,11 @@ spec:
               $$jsExpression: |
                 dogQuery.data
             columns:
-              - field: "0"
+              - field: '0'
                 type: string
                 headerName: Breed
                 width: 141
-              - field: "1"
+              - field: '1'
                 type: json
                 headerName: Sub-breeds
                 width: 179

@@ -35,27 +35,19 @@ The props defined in the `argTypes` object are available as editable properties 
 
 {{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/concepts/custom-components/custom-component-props.png", "alt": "Custom component props ", "caption": "Props of our custom component" }}
 
-You can import anything from these `@mui/` libraries when defining custom components:
-
-- `@mui/material`
-- `@mui/x-data-grid`
-- `@mui/x-date-pickers`
-- `@mui/x-data-grid-pro`
-- `@mui/x-date-pickers-pro`
-- `@mui/icons-material`
-
-:::warning
-Support for importing any `npm` package is not implemented yet. It's coming.
-
-👍 Upvote [issue #362](https://github.com/mui/mui-toolpad/issues/362) if you want to see it land faster.
-:::
-
-:::info
-Detailed documentation on the API is available in the reference section for [`createComponent`](/toolpad/reference/api/create-component/).
-:::
-
 ## Component Library
 
 Custom components become available in the component library, alongside an option to create a new one.
 
 {{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/concepts/custom-components/library.png", "alt": "Custom components ", "caption": "Custom components in the library"}}
+
+:::info
+You can look at more detailed guides of creating custom components in the how-to guides section:
+
+- [Number](/toolpad/how-to-guides/number-display/)
+- [Cube](/toolpad/how-to-guides/cube-component/)
+  :::
+
+:::info
+Detailed documentation on the API is available in the reference section for [`createComponent`](/toolpad/reference/api/create-component/).
+:::

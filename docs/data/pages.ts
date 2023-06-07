@@ -56,9 +56,20 @@ const pages: MuiPage[] = [
         pathname: '/toolpad/how-to-guides/connect-to-databases',
       },
       {
-        pathname: '/toolpad/how-to-guides/number-display',
-        title: 'Create a number component',
+        pathname: '/toolpad/how-to-guides/custom-components',
+        title: 'Create custom components',
+        children: [
+          {
+            pathname: '/toolpad/how-to-guides/number-display',
+            title: 'Number component',
+          },
+          {
+            pathname: '/toolpad/how-to-guides/cube-component',
+            title: '3D cube component',
+          },
+        ],
       },
+
       {
         pathname: '/toolpad/how-to-guides/customize-datagrid',
         title: 'Customize data grids',

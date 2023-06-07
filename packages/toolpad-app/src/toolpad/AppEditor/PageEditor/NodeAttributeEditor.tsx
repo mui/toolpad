@@ -76,8 +76,6 @@ export default function NodeAttributeEditor<P extends object>({
 
   const jsBrowserRuntime = useBrowserJsRuntime();
 
-  console.log('meta', scopeMeta);
-
   return Control ? (
     <BindableEditor
       liveBinding={liveBinding}

@@ -60,7 +60,7 @@ Interactive walkthrough of the app building process:
 
 1. Locate the **Add query** button inside the inspector. Press it and choose **HTTP request**.
 
-{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/getting-started/first-app/step-2.png", "alt":"Choose HTTP request", "caption":"The Add query menu", "zoom": false, "indent": 1  }}
+{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/getting-started/first-app/step-2.png", "alt":"Choose HTTP request", "caption":"The Add query menu", "zoom": false  }}
 
 3. We'll be using the [dog API](https://dog.ceo/dog-api/) for this tutorial. First give the query a unique name: `dogQuery`. Then, set `https://dog.ceo/api/breeds/list/all` as the **URL**. Click the **Preview** button to inspect the result of this request, and expand the `message` object in the response. If all went well, it will look like this:
 

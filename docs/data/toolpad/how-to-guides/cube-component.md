@@ -18,7 +18,7 @@ We can use any package available on `npm` to extend our Toolpad application. Thi
 
 2. Then, hover over the component library and click on the **Create** button in the **Custom Components** section.
 
-{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/how-to-guides/custom-components/create-custom.png", "alt": "Create custom component", "caption": "Create a custom component", "indent": 1, "zoom": false }}
+{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/how-to-guides/custom-components/create-custom.png", "alt": "Create custom component", "caption": "Create a custom component", "zoom": false }}
 
 3. A dialog box appears asking you to name it. Name it "Cube".
 
@@ -26,11 +26,11 @@ We can use any package available on `npm` to extend our Toolpad application. Thi
    You can use any name, as long as it is unique and complies with the [rules of naming](https://react.dev/learn/your-first-component) components in React
    :::
 
-{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/how-to-guides/custom-components/cube/display-name.png", "alt": "Name custom component", "caption": "Naming the cube component", "indent": 1, "zoom": false }}
+{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/how-to-guides/custom-components/cube/display-name.png", "alt": "Name custom component", "caption": "Naming the cube component", "width": 300, "zoom": false }}
 
 4. A snackbar appears acknowledging the successful creation of the component. A starter file is created in `toolpad/components`. Use the **Open** button to open this file in your code editor:
 
-{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/how-to-guides/custom-components/cube/snackbar-open.png", "alt": "Open custom component", "caption": "Open the cube component", "indent": 1, "zoom": false }}
+{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/how-to-guides/custom-components/cube/snackbar-open.png", "alt": "Open custom component", "caption": "Open the cube component", "width": 400, "zoom": false }}
 
 ### In the code editor
 
@@ -111,7 +111,7 @@ We can use any package available on `npm` to extend our Toolpad application. Thi
 
 2. **Cube** will now be available as a custom component in the component library:
 
-{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/how-to-guides/custom-components/cube/in-library.png", "alt": "custom component in library", "caption": "The cube component appears in the component library", "indent": 1, "zoom": false }}
+{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/how-to-guides/custom-components/cube/in-library.png", "alt": "custom component in library", "caption": "The cube component appears in the component library", "width": 300, "zoom": false }}
 
 ## Using the component
 

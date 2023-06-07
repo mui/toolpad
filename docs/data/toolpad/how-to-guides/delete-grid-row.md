@@ -75,4 +75,4 @@ We can add a delete button to a data grid connected to any REST API, like so:
 
 If all went well, this is how our app should behave:
 
-{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/how-to-guides/delete-grid-row/delete-row.gif", "alt": "Delete row", "caption": "The delete row operation in effect", "indent": 1, "aspectRatio": 3 }}
+{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/how-to-guides/delete-grid-row/delete-row.gif", "alt": "Delete row", "caption": "The delete row operation in effect", "aspectRatio": 3 }}

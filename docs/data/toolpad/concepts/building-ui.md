@@ -45,7 +45,7 @@ Click any component in the canvas to select it. An overlay indicates the selecte
 
 In order to change position of a component, first you must select it. Then, click on the drag handler present in the overlay handle, drag it, and drop it at its new location. The canvas will highlight available drop locations with a blue indicator.
 
-{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/concepts/building-ui/canvas-4.gif", "alt": "Move component", "caption": "Moving a component" }}
+{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/concepts/building-ui/canvas-4.gif", "alt": "Move component", "caption": "Moving a component", "aspectRatio": 2 }}
 
 ## Removing components
 

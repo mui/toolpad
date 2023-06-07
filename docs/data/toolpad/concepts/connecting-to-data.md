@@ -79,7 +79,7 @@ You can configure the following options here:
   }
   ```
 
-{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/concepts/connecting-to-data/query-7.gif", "alt": "Add custom function", "caption": "Adding a custom function to the query", "indent": 1 }}
+{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/concepts/connecting-to-data/custom-function-example.gif", "alt": "Select custom function in the query", "caption": "Adding a custom function to the query", "indent": 1 }}
 
 <ul>
 <li style="list-style-type: none">

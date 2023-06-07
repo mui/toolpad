@@ -1141,7 +1141,7 @@ function FetchNode({ node, page }: FetchNodeProps) {
     case 'mutation':
       return <MutationNode node={node} page={page} />;
     default:
-      throw new Error(`Unrecognized fetch mdoe "${mode}"`);
+      throw new Error(`Unrecognized fetch mode "${mode}"`);
   }
 }
 

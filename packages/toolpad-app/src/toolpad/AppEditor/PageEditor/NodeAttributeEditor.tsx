@@ -1,16 +1,9 @@
 import * as React from 'react';
-import {
-  ArgTypeDefinition,
-  BindableAttrValue,
-  LocalScopeParams,
-  ScopeMeta,
-  ScopeMetaField,
-} from '@mui/toolpad-core';
+import { ArgTypeDefinition, BindableAttrValue } from '@mui/toolpad-core';
 import { Alert, Box } from '@mui/material';
 import { useBrowserJsRuntime } from '@mui/toolpad-core/jsBrowserRuntime';
-import { mapValues } from '@mui/toolpad-utils/collections';
 import * as appDom from '../../../appDom';
-import { useDom, useDomApi } from '../../AppState';
+import { useDomApi } from '../../AppState';
 import BindableEditor from './BindableEditor';
 import { usePageEditorState } from './PageEditorProvider';
 import { getDefaultControl } from '../../propertyControls';
@@ -31,7 +24,6 @@ export default function NodeAttributeEditor<P extends object>({
   argType,
   props,
 }: NodeAttributeEditorProps<P>) {
-  const { dom } = useDom();
   const domApi = useDomApi();
 
   const handlePropChange = React.useCallback(
@@ -46,10 +38,12 @@ export default function NodeAttributeEditor<P extends object>({
   const propValue: BindableAttrValue<unknown> | null = (node as any)[namespace]?.[name] ?? null;
 
   const bindingId = `${node.id}${namespace ? `.${namespace}` : ''}.${name}`;
-  const { bindings, pageState, globalScopeMeta } = usePageEditorState();
+  const { globalScopeMeta, vm } = usePageEditorState();
 
-  const liveBinding = bindings[bindingId];
-  console.log(bindingId);
+  const scopeId = vm.bindingScopes[bindingId];
+  const bindingScope = scopeId ? vm.scopes[scopeId] : null;
+
+  const liveBinding = bindingScope?.bindings[bindingId];
 
   const Control = getDefaultControl(argType, props);
 
@@ -64,20 +58,11 @@ export default function NodeAttributeEditor<P extends object>({
 
   const jsBrowserRuntime = useBrowserJsRuntime();
 
-  const localState: LocalScopeParams = {};
-  const localScopeMeta: ScopeMeta = mapValues(
-    localState,
-    () => ({ kind: 'local' } as ScopeMetaField),
-  );
-
   return Control ? (
     <BindableEditor
       liveBinding={liveBinding}
-      globalScope={{ ...pageState, ...localState }}
-      globalScopeMeta={{
-        ...globalScopeMeta,
-        ...localScopeMeta,
-      }}
+      globalScope={bindingScope?.values}
+      globalScopeMeta={globalScopeMeta}
       label={argType.label || name}
       bindable={isBindable}
       disabled={isDisabled}

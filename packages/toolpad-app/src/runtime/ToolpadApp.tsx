@@ -29,6 +29,8 @@ import {
   createToolpadComponentThatThrows,
   useComponents,
   useComponent,
+  RuntimeScope,
+  ApplicationVm,
 } from '@mui/toolpad-core';
 import { createProvidedContext, useAssertedContext } from '@mui/toolpad-utils/react';
 import { QueryClient, QueryClientProvider, useMutation } from '@tanstack/react-query';
@@ -186,12 +188,6 @@ const EditorOverlay = styled('div')({
 
 type ToolpadComponents = Partial<Record<string, ToolpadComponent<any>>>;
 
-interface RuntimeScope {
-  id: string;
-  bindings: Record<string, BindingEvaluationResult<unknown>>;
-  values: Record<string, unknown>;
-}
-
 function createScope(
   id: string,
   bindings: Record<string, ParsedBinding | EvaluatedBinding<unknown>>,
@@ -209,18 +205,13 @@ function createScope(
   };
 }
 
-interface ScopeRegistry {
-  scopes: { [id in string]?: RuntimeScope };
-  bindingScopes: { [id in string]?: string };
-}
-
-type ScopeRegistryApi = {
+type ApplicationVmApi = {
   registerScope: (scope: RuntimeScope) => () => void;
   registerBindingScope: (bindingId: string, scope: RuntimeScope) => () => void;
 };
 
-function useScopeRegistry(onUpdate: (registry: ScopeRegistry) => void) {
-  const registry: ScopeRegistry = { scopes: {}, bindingScopes: {} };
+function useApplicationVm(onUpdate: (registry: ApplicationVm) => void) {
+  const vm: ApplicationVm = { scopes: {}, bindingScopes: {} };
 
   let scheduledUpdate: Promise<void> | undefined;
   const scheduleUpdate = () => {
@@ -228,39 +219,39 @@ function useScopeRegistry(onUpdate: (registry: ScopeRegistry) => void) {
       return;
     }
     scheduledUpdate = Promise.resolve().then(() => {
-      onUpdate(registry);
+      onUpdate(vm);
       scheduledUpdate = undefined;
     });
   };
 
-  return React.useRef<ScopeRegistryApi>({
+  return React.useRef<ApplicationVmApi>({
     registerScope(scope: RuntimeScope) {
-      if (registry.scopes[scope.id]) {
+      if (vm.scopes[scope.id]) {
         throw new Error(`Scope with id "${scope.id}" already registered`);
       }
-      registry.scopes[scope.id] = scope;
+      vm.scopes[scope.id] = scope;
       scheduleUpdate();
       return () => {
-        delete registry.scopes[scope.id];
+        delete vm.scopes[scope.id];
         scheduleUpdate();
       };
     },
     registerBindingScope(bindingId: string, scope: RuntimeScope) {
-      if (registry.bindingScopes[bindingId]) {
+      if (vm.bindingScopes[bindingId]) {
         return () => {};
       }
-      registry.bindingScopes[bindingId] = scope.id;
+      vm.bindingScopes[bindingId] = scope.id;
       scheduleUpdate();
       return () => {
-        delete registry.bindingScopes[bindingId];
+        delete vm.bindingScopes[bindingId];
         scheduleUpdate();
       };
     },
   });
 }
 
-const ScopeRegistryContext = React.createContext<
-  React.MutableRefObject<ScopeRegistryApi> | undefined
+const ApplicationVmApiContext = React.createContext<
+  React.MutableRefObject<ApplicationVmApi> | undefined
 >(undefined);
 const RuntimeScopeContext = React.createContext<RuntimeScope | undefined>(undefined);
 const [useDomContext, DomContextProvider] = createProvidedContext<appDom.AppDom>('Dom');
@@ -673,13 +664,13 @@ function RuntimeScoped({
     [id, localScope, parentScope, scopeBindings],
   );
 
-  const registryRef = React.useContext(ScopeRegistryContext);
+  const vmRef = React.useContext(ApplicationVmApiContext);
   React.useEffect(() => {
-    if (!registryRef) {
+    if (!vmRef) {
       return () => {};
     }
-    return registryRef.current.registerScope(childScope);
-  }, [registryRef, childScope]);
+    return vmRef.current.registerScope(childScope);
+  }, [vmRef, childScope]);
 
   const evaluateScopeExpression = React.useCallback(
     async (expression: string) => {
@@ -1046,23 +1037,20 @@ function RenderedNodeContent({ node, childNodeGroups, Component }: RenderedNodeC
     return hookResult;
   }, [argTypes, node, props]);
 
-  const registryRef = React.useContext(ScopeRegistryContext);
+  const vmRef = React.useContext(ApplicationVmApiContext);
   React.useEffect(() => {
-    if (!registryRef) {
+    if (!vmRef) {
       return () => {};
     }
     const unsubscribers: (() => void)[] = [];
     for (const propName of Object.keys(argTypes)) {
-      const unsubscribe = registryRef.current.registerBindingScope(
-        `${nodeId}.props.${propName}`,
-        scope,
-      );
+      const unsubscribe = vmRef.current.registerBindingScope(`${nodeId}.props.${propName}`, scope);
       unsubscribers.push(unsubscribe);
     }
     return () => {
       unsubscribers.forEach((unsubscribe) => unsubscribe());
     };
-  }, [nodeId, argTypes, registryRef, scope]);
+  }, [nodeId, argTypes, vmRef, scope]);
 
   return (
     <NodeRuntimeWrapper
@@ -1267,12 +1255,14 @@ function RenderedPage({ nodeId }: RenderedNodeProps) {
     }
   });
 
-  const scopeRegistry = useScopeRegistry((registry) => {
-    console.log('updating', registry);
+  const applicationVm = useApplicationVm((vm) => {
+    if (canvasEvents) {
+      canvasEvents.emit('vmUpdated', { vm });
+    }
   });
 
   return (
-    <ScopeRegistryContext.Provider value={scopeRegistry}>
+    <ApplicationVmApiContext.Provider value={applicationVm}>
       <RuntimeScoped id={'global'} parseBindingsResult={parseBindingsResult} onUpdate={onUpdate}>
         <RenderedNodeContent
           node={page}
@@ -1283,7 +1273,7 @@ function RenderedPage({ nodeId }: RenderedNodeProps) {
           <FetchNode key={node.id} page={page} node={node} />
         ))}
       </RuntimeScoped>
-    </ScopeRegistryContext.Provider>
+    </ApplicationVmApiContext.Provider>
   );
 }
 

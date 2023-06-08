@@ -35,6 +35,7 @@ export default defineConfig([
     silent: true,
     outDir: './public/reactDevtools',
     bundle: true,
+    sourcemap: true,
     target: 'es6',
     format: 'iife',
     replaceNodeEnv: true,
@@ -55,6 +56,7 @@ export default defineConfig([
     outDir: 'dist/runtime',
     tsconfig: './tsconfig.esbuild.json',
     clean: true,
+    sourcemap: true,
     async onSuccess() {
       // eslint-disable-next-line no-console
       console.log('runtime: build successful');

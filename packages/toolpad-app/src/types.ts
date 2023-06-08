@@ -186,3 +186,20 @@ export interface RuntimeState {
 export interface AppCanvasState extends RuntimeState {
   savedNodes: NodeHashes;
 }
+
+export type ProjectEvents = {
+  // a change in the DOM
+  change: { fingerprint: number };
+  // a change in the DOM caused by an external action (e.g. user editing a file outside of toolpad)
+  externalChange: { fingerprint: number };
+  // a component has been added or removed
+  componentsListChanged: {};
+  // the function runtime build has finished
+  functionsBuildEnd: {};
+  // An environment variable has changed
+  envChanged: {};
+};
+
+export interface ToolpadProjectOptions {
+  dev: boolean;
+}

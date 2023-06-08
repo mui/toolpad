@@ -9,6 +9,7 @@ import {
   LinearProgress,
   Container,
   Tooltip,
+  Typography,
 } from '@mui/material';
 import {
   ToolpadComponent,
@@ -165,6 +166,8 @@ const AppRoot = styled('div')({
   overflow: 'auto' /* Prevents margins from collapsing into root */,
   position: 'relative' /* Makes sure that the editor overlay that renders inside sizes correctly */,
   minHeight: '100vh',
+  display: 'flex',
+  flexDirection: 'column',
 });
 
 const EditorOverlay = styled('div')({
@@ -1156,6 +1159,22 @@ function RenderedPage({ nodeId }: RenderedNodeProps) {
   );
 }
 
+function PageNotFound() {
+  return (
+    <Container
+      sx={{
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        flexDirection: 'column',
+      }}
+    >
+      <Typography variant="h1">Not found</Typography>
+      <Typography>The page doesn&apos;t exist in this application.</Typography>
+    </Container>
+  );
+}
+
 interface RenderedPagesProps {
   pages: appDom.PageNode[];
   defaultPage: appDom.PageNode;
@@ -1190,6 +1209,7 @@ function RenderedPages({ pages, defaultPage }: RenderedPagesProps) {
       ))}
       <Route path="/pages" element={defaultPageNavigation} />
       <Route path="/" element={defaultPageNavigation} />
+      <Route path="*" element={<PageNotFound />} />
     </Routes>
   );
 }
@@ -1218,7 +1238,7 @@ function AppError({ error }: FallbackProps) {
   );
 }
 
-const queryClient = new QueryClient({
+export const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
       retry: false,
@@ -1255,7 +1275,7 @@ function ToolpadAppLayout({ dom, hasShell: hasShellProp = true }: ToolpadAppLayo
   return (
     <React.Fragment>
       {showPreviewHeader ? <PreviewHeader pageId={pageId} /> : null}
-      <Box sx={{ display: 'flex' }}>
+      <Box sx={{ flex: 1, display: 'flex' }}>
         {hasShell && pages.length > 0 ? (
           <AppNavigation pages={pages} clipped={showPreviewHeader} />
         ) : null}

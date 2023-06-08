@@ -1,6 +1,7 @@
 import type * as React from 'react';
 import type { Branded } from '@mui/toolpad-utils/types';
 import type { SerializedError } from '@mui/toolpad-utils/errors';
+import { JSONSchema7 } from 'json-schema';
 import type { TOOLPAD_COMPONENT } from './constants.js';
 
 export type NodeId = Branded<string, 'NodeId'>;
@@ -144,9 +145,9 @@ export interface ObjectValueType extends ValueTypeBase {
    */
   type: 'object';
   /**
-   * the url of a JSON schema describing the object.
+   * A JSON schema describing the object.
    */
-  schema?: string;
+  schema?: JSONSchema7;
   default?: any;
 }
 
@@ -156,9 +157,9 @@ export interface ArrayValueType extends ValueTypeBase {
    */
   type: 'array';
   /**
-   * the url of a JSON schema describing the array.
+   * A JSON schema describing the array.
    */
-  schema?: string;
+  schema?: JSONSchema7;
   default?: any[];
 }
 
@@ -247,10 +248,33 @@ export interface ParameterTypeLookup {
   event: (...args: any[]) => void;
 }
 
-export type InferParameterType<T extends PropValueType> = ParameterTypeLookup[Exclude<
-  T['type'],
-  undefined
->];
+export type JsonSchemaToTs<T extends JSONSchema7> = T extends {
+  type: 'object';
+  properties?: Record<string, JSONSchema7>;
+}
+  ? {
+      [K in keyof T['properties']]?: JsonSchemaToTs<NonNullable<T['properties']>[K]>;
+    }
+  : T extends { type: 'array'; items?: JSONSchema7 }
+  ? T['items'] extends undefined
+    ? unknown[]
+    : JsonSchemaToTs<NonNullable<T['items']>>[]
+  : T extends { type: 'string' }
+  ? string
+  : T extends { type: 'number' | 'integer' }
+  ? number
+  : T extends { type: 'boolean' }
+  ? boolean
+  : T extends { type: 'null' }
+  ? null
+  : unknown;
+
+export type InferParameterType<T extends PropValueType> = T extends {
+  type: 'object' | 'array';
+  schema: JSONSchema7;
+}
+  ? JsonSchemaToTs<T['schema']>
+  : ParameterTypeLookup[NonNullable<T['type']>];
 
 export type PropValueTypes<K extends string = string> = Partial<{
   [key in K]?: PropValueType;

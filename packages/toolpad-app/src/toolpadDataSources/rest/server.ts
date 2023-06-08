@@ -6,7 +6,12 @@ import { ServerDataSource } from '../../types';
 import { FetchPrivateQuery, FetchQuery, RestConnectionParams } from './types';
 import { Maybe } from '../../utils/types';
 import { execfetch } from './shared';
-import { loadEnvFile } from '../local/server';
+import { getProject } from '../../server/liveProject';
+
+export async function loadEnvFile() {
+  const project = await getProject();
+  return project.envManager.getValues();
+}
 
 async function execBase(
   connection: Maybe<RestConnectionParams>,
@@ -18,18 +23,11 @@ async function execBase(
 
   const jsServerRuntime = await createServerJsRuntime();
 
-  const env = await loadEnvFile();
-
-  const result = await execfetch(
-    fetchQuery,
-    params,
-    {
-      connection,
-      jsRuntime: jsServerRuntime,
-      fetchImpl: instrumentedFetch as any,
-    },
-    env,
-  );
+  const result = await execfetch(fetchQuery, params, {
+    connection,
+    jsRuntime: jsServerRuntime,
+    fetchImpl: instrumentedFetch as any,
+  });
 
   return { ...result, har };
 }

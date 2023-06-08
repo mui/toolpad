@@ -59,6 +59,7 @@ import { errorFrom } from '@mui/toolpad-utils/errors';
 import { mapProperties, mapValues } from '@mui/toolpad-utils/collections';
 import useBoolean from '@mui/toolpad-utils/hooks/useBoolean';
 import usePageTitle from '@mui/toolpad-utils/hooks/usePageTitle';
+import invariant from 'invariant';
 import * as appDom from '../appDom';
 import { RuntimeState } from '../types';
 import {
@@ -264,10 +265,18 @@ const RuntimeScopeContext = React.createContext<RuntimeScope | undefined>(undefi
 const [useDomContext, DomContextProvider] = createProvidedContext<appDom.AppDom>('Dom');
 const [useEvaluateScopeExpression, EvaluateScopeExpressionProvider] =
   createProvidedContext<(expr: string) => any>('EvaluateScopeExpression');
-const [useSetControlledBindingContext, SetControlledBindingContextProvider] =
-  createProvidedContext<(id: string, result: BindingEvaluationResult, scopeId?: string) => void>(
-    'SetControlledBinding',
-  );
+
+interface SetBindingContextValue {
+  setBinding: (id: string, result: BindingEvaluationResult, scopeId?: string) => void;
+  setControlledBinding: (id: string, result: BindingEvaluationResult, scopeId?: string) => void;
+  setBindingByScopePath: (
+    scopePath: string,
+    result: BindingEvaluationResult,
+    scopeId?: string,
+  ) => void;
+}
+
+const SetBindingContext = React.createContext<SetBindingContextValue | undefined>(undefined);
 
 function getComponentId(elm: appDom.ElementNode): string {
   const componentId = getElementNodeComponentId(elm);
@@ -640,15 +649,13 @@ function RuntimeScoped({
     });
   }, [parsedBindings, controlled, dom]);
 
-  const setControlledBinding = React.useCallback(
+  const { setBindingByScopePath: setParentBindingByScopePath } =
+    React.useContext(SetBindingContext) ?? {};
+
+  const setBinding = React.useCallback(
     (bindingId: string, result: BindingEvaluationResult) => {
-      const { expression, initializer, ...parsedBinding } = parsedBindings[bindingId];
-
-      if (!controlled.has(bindingId)) {
-        throw new Error(`Not a controlled binding "${bindingId}"`);
-      }
-
       setScopeBindings((existingBindings): Record<string, ParsedBinding | EvaluatedBinding> => {
+        const { expression, initializer, ...parsedBinding } = parsedBindings[bindingId];
         const existingBinding = existingBindings[bindingId];
 
         if (existingBinding?.result && isEqual(existingBinding.result, result)) {
@@ -663,7 +670,42 @@ function RuntimeScoped({
         };
       });
     },
-    [parsedBindings, controlled],
+    [parsedBindings],
+  );
+
+  const bindingsByScopePath = React.useMemo(
+    () =>
+      new Map<string, string>(
+        Object.entries(scopeBindings).map(
+          ([bindingId, binding]) => [binding.scopePath, bindingId] as [string, string],
+        ),
+      ),
+    [scopeBindings],
+  );
+
+  const setBindingByScopePath = React.useCallback(
+    (scopePath: string, result: BindingEvaluationResult) => {
+      const bindingToUpdateId = bindingsByScopePath.get(scopePath);
+      if (bindingToUpdateId) {
+        setBinding(bindingToUpdateId, result);
+      } else if (setParentBindingByScopePath) {
+        setParentBindingByScopePath(scopePath, result);
+      } else {
+        throw new Error(`No binding found for scope path "${scopePath}"`);
+      }
+    },
+    [bindingsByScopePath, setBinding, setParentBindingByScopePath],
+  );
+
+  const setControlledBinding = React.useCallback(
+    (bindingId: string, result: BindingEvaluationResult) => {
+      if (!controlled.has(bindingId)) {
+        throw new Error(`Not a controlled binding "${bindingId}"`);
+      }
+
+      setBinding(bindingId, result);
+    },
+    [controlled, setBinding],
   );
 
   const childScope = React.useMemo(
@@ -720,29 +762,13 @@ function RuntimeScoped({
 
       await result.value;
 
-      setScopeBindings((existingBindings) => {
-        return mapValues(existingBindings, (binding) => {
-          for (const [scopePath, newValue] of Object.entries(updates)) {
-            if (binding.scopePath === scopePath) {
-              if (typeof binding.expression === 'string') {
-                console.warn(`Can't update "${scopePath}", it already has a binding`);
-              } else {
-                return {
-                  ...binding,
-                  expression: undefined,
-                  initializer: undefined,
-                  result: { value: newValue },
-                } satisfies EvaluatedBinding;
-              }
-            }
-          }
-          return binding;
-        });
-      });
+      for (const [scopePath, newValue] of Object.entries(updates)) {
+        setBindingByScopePath(scopePath, { value: newValue });
+      }
 
       return result;
     },
-    [childScope.values],
+    [childScope.values, setBindingByScopePath],
   );
 
   React.useEffect(() => {
@@ -752,13 +778,22 @@ function RuntimeScoped({
     });
   }, [scopeMeta, childScope, onUpdate]);
 
+  const setBindingContext = React.useMemo<SetBindingContextValue>(
+    () => ({
+      setBinding,
+      setControlledBinding,
+      setBindingByScopePath,
+    }),
+    [setBinding, setControlledBinding, setBindingByScopePath],
+  );
+
   return (
     <RuntimeScopeContext.Provider value={childScope}>
-      <SetControlledBindingContextProvider value={setControlledBinding}>
+      <SetBindingContext.Provider value={setBindingContext}>
         <EvaluateScopeExpressionProvider value={evaluateScopeExpression}>
           {children}
         </EvaluateScopeExpressionProvider>
-      </SetControlledBindingContextProvider>
+      </SetBindingContext.Provider>
     </RuntimeScopeContext.Provider>
   );
 }
@@ -813,7 +848,8 @@ interface RenderedNodeContentProps {
 }
 
 function RenderedNodeContent({ node, childNodeGroups, Component }: RenderedNodeContentProps) {
-  const setControlledBinding = useSetControlledBindingContext();
+  const { setControlledBinding } = React.useContext(SetBindingContext) ?? {};
+  invariant(setControlledBinding, 'Node must be rendered in a RuntimeScoped context');
 
   const nodeId = node.id;
 
@@ -1124,7 +1160,8 @@ interface QueryNodeProps {
 }
 
 function QueryNode({ page, node }: QueryNodeProps) {
-  const setControlledBinding = useSetControlledBindingContext();
+  const { setControlledBinding } = React.useContext(SetBindingContext) ?? {};
+  invariant(setControlledBinding, 'QueryNode must be rendered in a RuntimeScoped context');
 
   const { bindings } = useAssertedContext(RuntimeScopeContext);
 
@@ -1164,7 +1201,8 @@ interface MutationNodeProps {
 }
 
 function MutationNode({ node, page }: MutationNodeProps) {
-  const setControlledBinding = useSetControlledBindingContext();
+  const { setControlledBinding } = React.useContext(SetBindingContext) ?? {};
+  invariant(setControlledBinding, 'MutationNode must be rendered in a RuntimeScoped context');
 
   const { bindings } = useAssertedContext(RuntimeScopeContext);
 

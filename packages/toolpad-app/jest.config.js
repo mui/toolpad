@@ -1,16 +1,18 @@
-import type { Config } from '@jest/types';
-import nextJest from 'next/jest';
+const nextJest = require('next/jest');
 
 const createJestConfig = nextJest({
   dir: __dirname,
 });
 
-async function jestConfig(): Promise<Config.InitialOptions> {
-  const baseConfig: Config.InitialOptions = {
+/** @returns {Promise<import('jest').InitialOptions>} */
+async function jestConfig() {
+  /** @type {import('jest').InitialOptions} */
+  const baseConfig = {
     testEnvironment: '<rootDir>/jest-environment-jsdom.ts',
     setupFilesAfterEnv: ['<rootDir>/../../test/setupJest.ts'],
   };
-  const nextJestConfig: Config.InitialOptions = await createJestConfig(baseConfig)();
+  /** @type {import('jest').InitialOptions} */
+  const nextJestConfig = await createJestConfig(baseConfig)();
 
   // Workaround, see https://github.com/vercel/next.js/issues/35634#issuecomment-1115250297
   nextJestConfig.transformIgnorePatterns ??= [];
@@ -19,4 +21,4 @@ async function jestConfig(): Promise<Config.InitialOptions> {
   return nextJestConfig;
 }
 
-export default jestConfig;
+module.exports = jestConfig;

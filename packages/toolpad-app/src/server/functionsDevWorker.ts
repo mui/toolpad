@@ -5,10 +5,11 @@ import { createRequire } from 'node:module';
 import * as fs from 'fs/promises';
 import * as vm from 'vm';
 import * as url from 'url';
-import { TOOLPAD_FUNCTION } from '@mui/toolpad-core';
+import { PrimitiveValueType, TOOLPAD_FUNCTION } from '@mui/toolpad-core';
 import fetch, { Headers, Request, Response } from 'node-fetch';
 import { errorFrom } from '@mui/toolpad-utils/errors';
 import invariant from 'invariant';
+import type { IntrospectionResult } from './functionsTypesWorker';
 
 type IntrospectedFiles = Map<string, { file: string }>;
 
@@ -83,7 +84,7 @@ async function execute(msg: ExecuteMessage) {
   return { data };
 }
 
-async function introspect(msg: IntrospectMessage) {
+async function introspect(msg: IntrospectMessage): Promise<IntrospectionResult> {
   const resolvedFiles = await Promise.all(
     Array.from(msg.files.entries()).map(async ([entry, { file }]) => {
       const resolvers = await resolveFunctions(file).catch(() => ({}));
@@ -98,13 +99,22 @@ async function introspect(msg: IntrospectMessage) {
     }),
   );
 
-  const functions = Object.fromEntries(
-    resolvedFiles.flatMap((resolvedFunctions) =>
-      resolvedFunctions.map((resolver) => [resolver.name, resolver]),
-    ),
+  const handlers = resolvedFiles.flatMap((resolvedFunctions) =>
+    resolvedFunctions.map((resolver) => ({
+      name: resolver.name,
+      file: resolver.file,
+      parameters: (Object.entries(resolver.parameters) as [string, PrimitiveValueType][]).map(
+        ([name, propValueType]) => ({
+          name,
+          schema: { type: propValueType.type },
+          optional: !propValueType.default,
+        }),
+      ),
+      returnType: { schema: {} },
+    })),
   );
 
-  return { functions };
+  return { handlers };
 }
 
 async function handleMessage(msg: WorkerMessage) {
@@ -156,7 +166,11 @@ export function createWorker(env: Record<string, any>) {
   };
 
   return {
-    async introspect(files: IntrospectedFiles) {
+    async terminate() {
+      return worker.terminate();
+    },
+
+    async introspect(files: IntrospectedFiles): Promise<IntrospectionResult> {
       return runOnWorker({
         kind: 'introspect',
         files,

@@ -78,6 +78,7 @@ export default class FunctionsManager {
     });
     this.devWorker = createDevWorker({ ...process.env });
     this.typesWorker = createTypesWorker({ resourcesFolder: this.getResourcesFolder() });
+
     this.startDev();
   }
 
@@ -184,7 +185,10 @@ export default class FunctionsManager {
 
   async createRuntimeWorkerWithEnv() {
     const env = await this.project.envManager.getValues();
+
+    const oldWorker = this.devWorker;
     this.devWorker = createDevWorker({ ...process.env, ...env });
+    await oldWorker.terminate();
   }
 
   async startDev() {
@@ -229,7 +233,15 @@ export default class FunctionsManager {
         return file ? [[functionFile, { file }]] : [];
       }),
     );
-    return this.devWorker.introspect(outputFiles);
+
+    const [runtimeIntrospection, introspection] = await Promise.all([
+      this.devWorker.introspect(outputFiles),
+      this.typesWorker.api.introspect(),
+    ]);
+
+    console.log(runtimeIntrospection, introspection);
+
+    return runtimeIntrospection;
   }
 
   async initQueriesFile(): Promise<void> {

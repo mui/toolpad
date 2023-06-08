@@ -1,14 +1,40 @@
 import invariant from 'invariant';
 import * as path from 'path';
 import chokidar from 'chokidar';
-import { Worker, isMainThread, workerData } from 'worker_threads';
+import { Worker, isMainThread, workerData, parentPort } from 'worker_threads';
 import * as ts from 'typescript';
 import { glob } from 'glob';
-import { Stats } from 'fs';
 import chalk from 'chalk';
 import { JSONSchema7, JSONSchema7TypeName, JSONSchema7Type } from 'json-schema';
 import { asArray } from '@mui/toolpad-utils/collections';
-import { has } from 'lodash';
+import { Emitter } from '@mui/toolpad-utils/events';
+import { debounce } from 'lodash-es';
+import { createWorkerApi, serveWorkerApi } from './workerRpc';
+
+export interface ParameterIntrospectionResult {
+  name: string;
+  schema: JSONSchema7 | null;
+  optional: boolean;
+}
+
+export interface ReturnTypeIntrospectionResult {
+  schema: JSONSchema7 | null;
+}
+
+export interface HandlerIntrospectionResult {
+  name: string;
+  file: string;
+  parameters: ParameterIntrospectionResult[];
+  returnType: ReturnTypeIntrospectionResult;
+}
+
+export interface IntrospectionResult {
+  handlers: HandlerIntrospectionResult[];
+}
+
+export type WorkerApi = {
+  introspect(): Promise<IntrospectionResult>;
+};
 
 export interface TypesWorkerData {
   resourcesFolder: string;
@@ -18,18 +44,31 @@ interface CreateWorkerParams extends TypesWorkerData {
   resourcesFolder: string;
 }
 
+type WorkerEvents = {
+  notify: {};
+};
+
+type WorkerEventMessage<T> = {
+  event: keyof T;
+  payload: T[keyof T];
+};
+
 export function createWorker({ resourcesFolder }: CreateWorkerParams) {
   invariant(isMainThread, 'createWorker() must be called from the main thread');
-  const worker = new Worker(path.join(__dirname, 'functionsTypesWorker.js'), {
-    workerData: {
-      resourcesFolder,
-    } satisfies TypesWorkerData,
-  });
-  return worker;
-}
 
-function getFirstCallsignature(type: ts.Type): ts.Signature | undefined {
-  return type.getCallSignatures()[0];
+  const worker = new Worker(path.join(__dirname, 'functionsTypesWorker.js'), {
+    workerData: { resourcesFolder } satisfies TypesWorkerData,
+  });
+
+  const events = new Emitter<WorkerEvents>();
+  worker.on('message', (msg: WorkerEventMessage<WorkerEvents>) =>
+    events.emit(msg.event, msg.payload),
+  );
+
+  return {
+    api: createWorkerApi<WorkerApi>(worker),
+    events,
+  };
 }
 
 function formatDiagnostic(diagnostic: ts.Diagnostic): string {
@@ -198,19 +237,19 @@ function toJsonSchema(
   return {};
 }
 
-function getParameters(exportType: ts.Type, checker: ts.TypeChecker, sourceFile: ts.SourceFile) {
-  const callSignature = getFirstCallsignature(exportType);
+function getParameters(
+  callSignatures: readonly ts.Signature[],
+  checker: ts.TypeChecker,
+  sourceFile: ts.SourceFile,
+) {
+  invariant(callSignatures.length > 0, 'Expected at least 1 call signature');
 
-  if (!callSignature) {
-    return [];
-  }
-
-  const args = callSignature.getParameters().map((parameter) => {
+  const args = callSignatures[0].getParameters().map((parameter) => {
     const paramType = checker.getTypeOfSymbolAtLocation(parameter, parameter.valueDeclaration!);
-
+    const schema = toJsonSchema(paramType, checker, sourceFile);
     return {
       name: parameter.getName(),
-      schema: toJsonSchema(paramType, checker, sourceFile),
+      schema,
       optional: checker.isOptionalParameter(parameter.valueDeclaration as ts.ParameterDeclaration),
     };
   });
@@ -247,12 +286,12 @@ function getAwaitedType(
   return type;
 }
 
-function getReturnType(exportType: ts.Type, checker: ts.TypeChecker, sourceFile: ts.SourceFile) {
-  const callSignatures = exportType.getCallSignatures();
-
-  if (callSignatures.length <= 0) {
-    return {};
-  }
+function getReturnType(
+  callSignatures: readonly ts.Signature[],
+  checker: ts.TypeChecker,
+  sourceFile: ts.SourceFile,
+) {
+  invariant(callSignatures.length > 0, 'Expected at least 1 call signature');
 
   const returnType = callSignatures[0].getReturnType();
 
@@ -263,10 +302,12 @@ function getReturnType(exportType: ts.Type, checker: ts.TypeChecker, sourceFile:
   };
 }
 
-async function generateTypes(resourcesFolder: string) {
-  const files = await glob(path.join(resourcesFolder, './*.ts'));
+let introspectionResult: IntrospectionResult = { handlers: [] };
 
-  const program = ts.createProgram(files, {
+async function generateTypes(resourcesFolder: string) {
+  const entryPoints = await glob(path.join(resourcesFolder, './*.ts'));
+
+  const program = ts.createProgram(entryPoints, {
     noEmit: true,
     target: ts.ScriptTarget.ESNext,
     module: ts.ModuleKind.CommonJS,
@@ -278,11 +319,12 @@ async function generateTypes(resourcesFolder: string) {
 
   const checker = program.getTypeChecker();
 
-  const allExports = files.map((entrypoint) => {
+  const handlers: HandlerIntrospectionResult[] = entryPoints.flatMap((entrypoint) => {
     const sourceFile = program.getSourceFile(entrypoint);
+    const relativeEntrypoint = path.relative(resourcesFolder, entrypoint);
 
     if (!sourceFile) {
-      return [entrypoint, null];
+      return [];
     }
 
     const diagnostics = program.getSemanticDiagnostics(sourceFile);
@@ -295,37 +337,50 @@ async function generateTypes(resourcesFolder: string) {
     const moduleSymbol = checker.getSymbolAtLocation(sourceFile);
 
     if (!moduleSymbol) {
-      return [entrypoint, null];
+      return [];
     }
 
-    const exports = Object.fromEntries(
-      checker.getExportsOfModule(moduleSymbol).map((symbol) => {
-        const exportType = checker.getTypeOfSymbolAtLocation(symbol, symbol.valueDeclaration!);
+    return checker.getExportsOfModule(moduleSymbol).flatMap((symbol) => {
+      const exportType = checker.getTypeOfSymbolAtLocation(symbol, symbol.valueDeclaration!);
+      const callSignatures = exportType.getCallSignatures();
 
-        return [
-          symbol.name,
-          {
-            parameters: getParameters(exportType, checker, sourceFile),
-            returnType: getReturnType(exportType, checker, sourceFile),
-          },
-        ];
-      }),
-    );
+      if (callSignatures.length <= 0) {
+        return [];
+      }
 
-    return [entrypoint, exports];
+      return [
+        {
+          name: symbol.name,
+          file: relativeEntrypoint,
+          parameters: getParameters(callSignatures, checker, sourceFile),
+          returnType: getReturnType(callSignatures, checker, sourceFile),
+        },
+      ];
+    });
   });
 
-  console.log('yooo', JSON.stringify(allExports, null, 2));
+  introspectionResult = { handlers };
+
+  parentPort?.postMessage({
+    event: 'notify',
+    payload: {},
+  } satisfies WorkerEventMessage<WorkerEvents>);
 }
 
 async function doWork({ resourcesFolder }: TypesWorkerData) {
-  // TODO: debounce?
-  const handleChange = (filePath: string, stats?: Stats | undefined) => {
+  const handleChange = debounce(() => {
     generateTypes(resourcesFolder);
-  };
+  }, 50);
+
   chokidar.watch(resourcesFolder).on('add', handleChange);
   chokidar.watch(resourcesFolder).on('unlink', handleChange);
   chokidar.watch(resourcesFolder).on('change', handleChange);
+
+  serveWorkerApi<WorkerApi>({
+    async introspect() {
+      return introspectionResult;
+    },
+  });
 }
 
 if (!isMainThread) {

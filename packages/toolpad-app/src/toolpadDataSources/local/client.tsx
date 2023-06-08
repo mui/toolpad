@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { BindableAttrEntries, CreateFunctionConfig } from '@mui/toolpad-core';
+import { BindableAttrEntries, PrimitiveValueType } from '@mui/toolpad-core';
 import { Autocomplete, Button, Stack, TextField, Typography } from '@mui/material';
 import { useBrowserJsRuntime } from '@mui/toolpad-core/jsBrowserRuntime';
 import { errorFrom } from '@mui/toolpad-utils/errors';
@@ -25,6 +25,42 @@ import QueryPreview from '../QueryPreview';
 import { usePrivateQuery } from '../context';
 import BindableEditor from '../../toolpad/AppEditor/PageEditor/BindableEditor';
 import { getDefaultControl } from '../../toolpad/propertyControls';
+import type { ParameterIntrospectionResult } from '../../server/functionsTypesWorker';
+
+const NULL_PROP_VALUE: PrimitiveValueType = {
+  type: 'object',
+  schema: { type: 'null' },
+  default: null,
+};
+
+function propValueFromIntrospectedParameter(
+  param: ParameterIntrospectionResult,
+): PrimitiveValueType {
+  if (!param.schema) {
+    return NULL_PROP_VALUE;
+  }
+
+  if (Array.isArray(param.schema.type)) {
+    return propValueFromIntrospectedParameter({
+      ...param,
+      schema: {
+        ...param.schema,
+        type: param.schema.type[0],
+      },
+    });
+  }
+
+  switch (param.schema.type) {
+    case 'integer':
+      return { type: 'number' };
+    case 'null':
+    case null:
+    case undefined:
+      return NULL_PROP_VALUE;
+    default:
+      return { type: param.schema.type, schema: param.schema };
+  }
+}
 
 const EMPTY_PARAMS: BindableAttrEntries = [];
 
@@ -42,9 +78,14 @@ function QueryEditor({
   );
 
   const functionName: string | undefined = input.attributes.query.value.function;
-  const functionDefs: Record<string, CreateFunctionConfig<any>> = introspection.data?.functions ??
-  {};
-  const parameterDefs = (functionName ? functionDefs?.[functionName]?.parameters : null) || {};
+
+  const selectedFunction = React.useMemo(() => {
+    return introspection.data?.handlers?.find((handler) => handler.name === functionName);
+  }, [functionName, introspection.data?.handlers]);
+
+  const parameterDefs = Object.fromEntries(
+    (selectedFunction?.parameters || []).map((parameter) => [parameter.name, parameter]),
+  );
 
   const paramsEntries = input.params?.filter(([key]) => !!parameterDefs[key]) || EMPTY_PARAMS;
 
@@ -99,10 +140,7 @@ function QueryEditor({
     ? errorFrom(introspection.error).message
     : '';
 
-  const methodSelectOptions: string[] = React.useMemo(
-    () => Object.keys(introspection.data?.functions ?? {}),
-    [introspection.data?.functions],
-  );
+  const methodSelectOptions = introspection.data?.handlers?.map((handler) => handler.name) ?? [];
 
   return (
     <SplitPane split="vertical" size="50%" allowResize>
@@ -135,7 +173,8 @@ function QueryEditor({
           </Stack>
           <Typography>Parameters:</Typography>
           <Stack gap={1}>
-            {Object.entries(parameterDefs).map(([name, definiton]) => {
+            {Object.entries(parameterDefs).map(([name, introspectedParameter]) => {
+              const definiton = propValueFromIntrospectedParameter(introspectedParameter);
               const Control = getDefaultControl(definiton, liveBindings);
               return Control ? (
                 <BindableEditor

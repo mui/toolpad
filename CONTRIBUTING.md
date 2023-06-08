@@ -61,10 +61,11 @@ If your application has dependencies other than `@mui/toolpad`, you have to temp
     yarn toolpad dev examples/qr-generator --dev
     ```
 
-<details>
+#### Linking Toolpad in a folder on your system (advanced)
 
+<details>
 <summary>
-Linking Toolpad in a folder on your system (advanced)
+Expand instructions
 </summary>
 
 In some cases you may want to link local toolpad into a project on your laptop.

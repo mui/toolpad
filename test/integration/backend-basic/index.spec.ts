@@ -20,6 +20,9 @@ test.use({
   localAppConfig: {
     template: path.resolve(__dirname, './fixture'),
     cmd: 'dev',
+    env: {
+      SECRET_BAZ: 'Some baz secret',
+    },
   },
 });
 
@@ -41,6 +44,7 @@ test('functions basics', async ({ page }) => {
   await expect(page.locator('text="throws, data undefined"')).toBeVisible();
   await expect(page.locator('text="echo, parameter: bound foo parameter"')).toBeVisible();
   await expect(page.locator('text="echo, secret: Some bar secret"')).toBeVisible();
+  await expect(page.locator('text="echo, secret not in .env: Some baz secret"')).toBeVisible();
 });
 
 test('function editor reload', async ({ page, localApp }) => {
@@ -51,11 +55,6 @@ test('function editor reload', async ({ page, localApp }) => {
 
   const functionsFilePath = path.resolve(localApp.dir, './toolpad/resources/functions.ts');
   await fileReplace(functionsFilePath, "'edited hello'", "'edited goodbye!!!'");
-
-  // Frontend doesn't update because no way to simulate page hide/show in playwright
-  // In real world scenario this wouldn't be necessary
-  // See https://github.com/microsoft/playwright/issues/3570#issuecomment-689407637
-  await page.reload();
 
   await expect(editorModel.appCanvas.getByText('edited goodbye!!!')).toBeVisible();
 });
@@ -91,4 +90,16 @@ test('bound parameters are preserved on manual call', async ({ page }) => {
   await page.getByRole('button', { name: 'Run Manual Query' }).click();
 
   await expect(page.getByText('destination: checksum', { exact: true })).toBeVisible();
+});
+
+test('global variables are retained in function runtime', async ({ page }) => {
+  const runtimeModel = new ToolpadRuntime(page);
+  await runtimeModel.gotoPage('page1');
+
+  await expect(page.getByText('global value: 1', { exact: true })).toBeVisible();
+  await expect(page.getByText('global value: 2', { exact: true })).not.toBeVisible();
+
+  await page.getByRole('button', { name: 'increment' }).click();
+
+  await expect(page.getByText('global value: 2', { exact: true })).toBeVisible();
 });

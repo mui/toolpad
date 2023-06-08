@@ -14,7 +14,6 @@ import CircularProgress from '@mui/material/CircularProgress';
 
 export interface LineChartProps {
   data: object[];
-  series: string[];
 }
 
 function ChartExport({ data }: LineChartProps) {

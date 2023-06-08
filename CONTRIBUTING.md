@@ -35,9 +35,9 @@ This will use the local version of Toolpad as built in the monorepo. This is rec
 
    **Note:** It's important to note the difference between `yarn toolpad dev` and the `--dev` parameter. The first instruction runs Toolpad in dev mode. The `--dev` parameter is one for contributors only and runs the underlying next.js app that powers the editor in dev mode. The latter makes sure the development build of React is being used and the editor frontend application runs in watch mode.
 
-**Note:** If your application has dependencies other than `@mui/toolpad`, you have to temporarily add it to the workspace:
+If your application has dependencies other than `@mui/toolpad`, you have to temporarily add it to the workspace:
 
-1.  update `package.json` in the workspace root, not in your app. Add your app folder to `workspaces. packages`. e.g. for `examples/qr-generator` which has a dependency on `qrcode`:
+1.  update `package.json` (in the workspace root, not in your app), add your app folder to `workspaces.packages`. e.g. for `examples/qr-generator` which has a dependency on `qrcode` this would be:
 
     ```json
     "workspaces": {
@@ -49,19 +49,17 @@ This will use the local version of Toolpad as built in the monorepo. This is rec
     },
     ```
 
-````
+1.  Run
 
-1. Run
- ```sh
- yarn install
- ```
+    ```sh
+    yarn install
+    ```
 
-1. Make sure to start the build in watch mode again and the run the app with
+1.  Make sure to start the build in watch mode again and the run the app with
 
- ```sh
- yarn toolpad dev examples/qr-generator --dev
- ```
-
+    ```sh
+    yarn toolpad dev examples/qr-generator --dev
+    ```
 
 <details>
 
@@ -75,7 +73,7 @@ In some cases you may want to link local toolpad into a project on your laptop.
 
 ```sh
 yarn install
-````
+```
 
 1. Run the build in watch mode
 

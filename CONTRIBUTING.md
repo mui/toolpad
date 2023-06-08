@@ -65,7 +65,9 @@ If your application has dependencies other than `@mui/toolpad`, you have to temp
 
 <details>
 <summary>
+
 Expand instructions
+
 </summary>
 
 In some cases you may want to link local toolpad into a project on your laptop.

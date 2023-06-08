@@ -189,8 +189,6 @@ import /* muiXDataGridDataGridDefault, */ * as muiXDataGridDataGrid from '@mui/x
 import /* muiXDataGridProDefault, */ * as muiXDataGridPro from '@mui/x-data-grid-pro';
 import /* muiXDataGridProDataGridProDefault, */ * as muiXDataGridProDataGridPro from '@mui/x-data-grid-pro/DataGridPro';
 
-import /* muiXDataGridGeneratorDefault, */ * as muiXDataGridGenerator from '@mui/x-data-grid-generator';
-
 function esm(namedExports: any, defaultExport?: any) {
   return { ...namedExports, default: defaultExport, __esModule: true };
 }
@@ -614,5 +612,4 @@ export default new Map([
   ...muiDatePickersProExports,
   ...muiDataGridExports,
   ...muiDataGridProExports,
-  ['@mui/x-data-grid-generator', esm(muiXDataGridGenerator /* , muiXDataGridGeneratorDefault */)],
 ]);

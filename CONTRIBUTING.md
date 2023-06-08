@@ -37,31 +37,31 @@ This will use the local version of Toolpad as built in the monorepo. This is rec
 
 If your application has dependencies other than `@mui/toolpad`, you have to temporarily add it to the workspace:
 
-1.  update `package.json` (in the workspace root, not in your app), add your app folder to `workspaces.packages`. e.g. for `examples/qr-generator` which has a dependency on `qrcode` this would be:
+1. update `package.json` (in the workspace root, not in your app), add your app folder to `workspaces.packages`. e.g. for `examples/qr-generator` which has a dependency on `qrcode` this would be:
 
-    ```json
-    "workspaces": {
+   ```json
+   "workspaces": {
      "packages": [
        "packages/*",
        "docs",
        "examples/qr-generator"
      ]
-    },
-    ```
+   },
+   ```
 
-1.  Run
+1. Run
 
-    ```sh
-    yarn install
-    ```
+   ```sh
+   yarn install
+   ```
 
-1.  Make sure to start the build in watch mode again and the run the app with
+1. Make sure to start the build in watch mode again and the run the app with
 
-    ```sh
-    yarn toolpad dev examples/qr-generator --dev
-    ```
+   ```sh
+   yarn toolpad dev examples/qr-generator --dev
+   ```
 
-#### Linking Toolpad in a folder on your system (advanced)
+### Linking Toolpad in a folder on your system (advanced)
 
 <details>
 <summary>

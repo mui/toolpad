@@ -9,7 +9,7 @@ import chalk from 'chalk';
 import { errorFrom } from '@mui/toolpad-utils/errors';
 import { execaCommand } from 'execa';
 import { satisfies } from 'semver';
-import { readJsonFile } from './util';
+import { readJsonFile } from '@mui/toolpad-utils/fs';
 import { PackageJson } from './packageType';
 
 type PackageManager = 'npm' | 'pnpm' | 'yarn';

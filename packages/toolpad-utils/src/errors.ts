@@ -1,6 +1,12 @@
 import { hasOwnProperty } from './collections';
 import { truncate } from './strings';
 
+declare global {
+  interface Error {
+    code?: unknown;
+  }
+}
+
 export type PlainObject = Record<string, unknown>;
 
 export interface SerializedError extends PlainObject {

@@ -13,13 +13,11 @@ import invariant from 'invariant';
 type IntrospectedFiles = Map<string, { file: string }>;
 
 interface IntrospectMessage {
-  // response: MessagePort;
   kind: 'introspect';
   files: IntrospectedFiles;
 }
 
 interface ExecuteMessage {
-  // response: MessagePort;
   kind: 'execute';
   filePath: string;
   name: string;
@@ -30,20 +28,44 @@ type WorkerMessage = IntrospectMessage | ExecuteMessage;
 
 type TransferredMessage = WorkerMessage & { port: MessagePort };
 
+interface ModuleObject {
+  exports: Record<string, unknown>;
+}
+
+const fileContents = new Map<string, string>();
+const moduleCache = new Map<string, ModuleObject>();
+
+function loadModule(fullPath: string, content: string) {
+  const moduleRequire = createRequire(url.pathToFileURL(fullPath));
+  const moduleObject: ModuleObject = { exports: {} };
+
+  vm.runInThisContext(`
+    ((require, exports, module) => {
+      ${content}
+    })
+  `)(moduleRequire, moduleObject.exports, moduleObject);
+
+  return moduleObject;
+}
+
 async function resolveFunctions(filePath: string): Promise<Record<string, Function>> {
   const fullPath = path.resolve(filePath);
   const content = await fs.readFile(fullPath, 'utf-8');
-  const moduleRequire = createRequire(url.pathToFileURL(fullPath));
-  const moduleObject: { exports: Record<string, unknown> } = { exports: {} };
 
-  vm.runInThisContext(`
-      ((require, exports, module) => {
-        ${content}
-      })
-    `)(moduleRequire, moduleObject.exports, moduleObject);
+  if (content !== fileContents.get(fullPath)) {
+    moduleCache.delete(fullPath);
+    fileContents.set(fullPath, content);
+  }
+
+  let cachedModule = moduleCache.get(fullPath);
+
+  if (!cachedModule) {
+    cachedModule = loadModule(fullPath, content);
+    moduleCache.set(fullPath, cachedModule);
+  }
 
   return Object.fromEntries(
-    Object.entries(moduleObject.exports).flatMap(([key, value]) =>
+    Object.entries(cachedModule.exports).flatMap(([key, value]) =>
       typeof value === 'function' ? [[key, value]] : [],
     ),
   );

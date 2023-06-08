@@ -46,6 +46,8 @@ export default class EnvManager {
     envFileWatcher.on('all', async () => {
       // Invalidate cache
       this.values = undefined;
+
+      dotenv.config({ override: true });
       this.project.events.emit('envChanged', {});
     });
   }

@@ -4,15 +4,15 @@
 
 ## Import
 
-```tsx
-import { createFunction } from '@mui/toolpad/server';
+```jsx
+import { createComponent } from '@mui/toolpad/server';
 ```
 
 ## Description
 
 By convention, Toolpad custom components are placed inside of the `toolpad/components/` folder. Each file in this folder describes one custom Toolpad component. As soon as the file exports a valid custom component in its default export it will be available in Toolpad to be used in UI. The `createComponent` function attaches extra information to React components to signal to Toolpad how they can be used and composed together.
 
-```tsx
+```jsx
 export default createComponent(MyComponent, config);
 ```
 
@@ -67,4 +67,6 @@ Argument types describe the type and constraints of custom component properties.
 
 ## Usage
 
-See [Custom components](/toolpad/building-ui/custom-components/)
+:::info
+See [custom components](/toolpad/concepts/custom-components/)
+:::

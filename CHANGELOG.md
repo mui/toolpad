@@ -1,5 +1,34 @@
 # Changelog
 
+## 0.1.15
+
+<!-- generated comparing v0.1.14..master -->
+
+_Jun 7, 2023_
+
+A big thanks to the 5 contributors who made this release possible. Here are some highlights ✨:
+
+Allow binding arbitrary environment variables in bindings, improved error handling in Image and Data grid components, and a new version of the documentation!
+
+- &#8203;<!-- 16 -->[core] Improve publish process (#2134) @Janpot
+- &#8203;<!-- 15 -->[core] Upgrade monorepo (#2141) @bharatkashyap
+- &#8203;<!-- 14 -->Make sure global variables are retained in between invocations (#2136) @Janpot
+- &#8203;<!-- 13 -->Allow arbitrary env variables in bindings, use process.env (#2109) @apedroferreira
+- &#8203;<!-- 12 -->[core] add ts declaration for package and check node version on initial star… (#2124) @JerryWu1234
+- &#8203;<!-- 11 -->Try fixing build on windows (#2131) @Janpot
+- &#8203;<!-- 10 -->Improve error handling in image and datagrid (#2073) @Janpot
+- &#8203;<!-- 09 -->Restrict node version for renovatebot (#2129) @Janpot
+- &#8203;<!-- 08 -->Create global functions manager (#2103) @Janpot
+- &#8203;<!-- 07 -->[core] Add codesandbox CI (#2111) @Janpot
+- &#8203;<!-- 06 -->[chore] Set minimum node at 16.14.2 (#1934) @Janpot
+- &#8203;<!-- 05 -->[chore] Update @mui/monorepo (#2106) @Janpot
+- &#8203;<!-- 04 -->[core] Avoid PR sandbox notifications (#2116) @oliviertassinari
+- &#8203;<!-- 03 -->[core] Fix GitHub typo @oliviertassinari
+- &#8203;<!-- 02 -->[docs] Restructure (#2082) @bharatkashyap
+- &#8203;<!-- 01 -->[docs] Fix docs issues (#2123) @oliviertassinari
+
+All contributors of this release in alphabetical order: @apedroferreira, @bharatkashyap, @Janpot, @JerryWu1234, @oliviertassinari
+
 ## 0.1.14
 
 <!-- generated comparing v0.1.13..master -->

@@ -17,7 +17,7 @@ export interface LineChartProps {
   series: string[];
 }
 
-function ChartExport({ data, series }: LineChartProps) {
+function ChartExport({ data }: LineChartProps) {
   if (!data || data.length === 0) {
     return <CircularProgress />;
   }
@@ -31,9 +31,7 @@ function ChartExport({ data, series }: LineChartProps) {
           <YAxis />
           <Tooltip />
           <Legend />
-          {series.map((serie) => (
-            <Line type="monotone" dataKey={serie} stroke="#87bc45" />
-          ))}
+          <Line type="monotone" dataKey="downloads" stroke="#87bc45" />
         </LineChart>
       </ResponsiveContainer>
     </div>
@@ -45,10 +43,6 @@ export default createComponent(ChartExport, {
     data: {
       type: 'array',
       defaultValue: [],
-    },
-    series: {
-      type: 'array',
-      defaultValue: ['downloads'],
     },
   },
 });

@@ -102,7 +102,7 @@ spec:
                   layout:
                     columnSize: 0.8853503184713376
                   props:
-                    defaultValue: "@mui/toolpad"
+                    defaultValue: '@mui/toolpad'
                 - component: Text
                   name: text2
                   props:
@@ -162,11 +162,11 @@ spec:
               $$jsExpression: |
                 Object.entries(versionLastweek.data.downloads)
             columns:
-              - field: "0"
+              - field: '0'
                 type: string
                 headerName: Version
                 width: 160
-              - field: "1"
+              - field: '1'
                 type: number
                 width: 152
                 headerName: No. of downloads

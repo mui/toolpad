@@ -11,13 +11,71 @@ _If you're looking into contributing to the docs, follow the [instructions](#bui
 - git
 - node.js
 
-### Steps
+### Running apps inside the monorepo (recommended)
+
+This will use the local version of Toolpad as built in the monorepo. This is recommended when your app is in a folder inside of the monorepo. You may even decide to temporarily move your app into the monorepo.
 
 1. Install dependencies:
 
    ```sh
    yarn install
    ```
+
+1. Run the build in watch mode
+
+   ```sh
+   yarn dev
+   ```
+
+1. Run Toolpad
+
+   ```sh
+   yarn toolpad dev test/integration/backend-basic/fixture --dev
+   ```
+
+   **Note:** It's important to note the difference between `yarn toolpad dev` and the `--dev` parameter. The first instruction runs Toolpad in dev mode. The `--dev` parameter is one for contributors only and runs the underlying next.js app that powers the editor in dev mode. The latter makes sure the development build of React is being used and the editor frontend application runs in watch mode.
+
+**Note:** If your application has dependencies other than `@mui/toolpad`, you have to temporarily add it to the workspace:
+
+1.  update `package.json` in the workspace root, not in your app. Add your app folder to `workspaces. packages`. e.g. for `examples/qr-generator` which has a dependency on `qrcode`:
+
+    ```json
+    "workspaces": {
+     "packages": [
+       "packages/*",
+       "docs",
+       "examples/qr-generator"
+     ]
+    },
+    ```
+
+````
+
+1. Run
+ ```sh
+ yarn install
+ ```
+
+1. Make sure to start the build in watch mode again and the run the app with
+
+ ```sh
+ yarn toolpad dev examples/qr-generator --dev
+ ```
+
+
+<details>
+
+<summary>
+### Linking Toolpad in a folder on your system (advanced)
+</summary>
+
+In some cases you may want to link local toolpad into a project on your laptop.
+
+1. Install dependencies:
+
+```sh
+yarn install
+````
 
 1. Run the build in watch mode
 
@@ -74,6 +132,8 @@ _If you're looking into contributing to the docs, follow the [instructions](#bui
    ```sh
    yarn dev
    ```
+
+</details>
 
 ## Building and running the documentation
 

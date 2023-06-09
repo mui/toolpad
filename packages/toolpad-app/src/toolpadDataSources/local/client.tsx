@@ -79,9 +79,13 @@ function QueryEditor({
 
   const functionName: string | undefined = input.attributes.query.value.function;
 
+  const allHandlers = React.useMemo(() => {
+    return (introspection.data?.files ?? []).flatMap((file) => file.handlers);
+  }, [introspection.data?.files]);
+
   const selectedFunction = React.useMemo(() => {
-    return introspection.data?.handlers?.find((handler) => handler.name === functionName);
-  }, [functionName, introspection.data?.handlers]);
+    return allHandlers.find((handler) => handler.name === functionName);
+  }, [allHandlers, functionName]);
 
   const parameterDefs = Object.fromEntries(
     (selectedFunction?.parameters || []).map((parameter) => [parameter.name, parameter]),
@@ -140,7 +144,7 @@ function QueryEditor({
     ? errorFrom(introspection.error).message
     : '';
 
-  const methodSelectOptions = introspection.data?.handlers?.map((handler) => handler.name) ?? [];
+  const methodSelectOptions = allHandlers.map((handler) => handler.name) ?? [];
 
   return (
     <SplitPane split="vertical" size="50%" allowResize>

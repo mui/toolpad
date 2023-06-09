@@ -23,13 +23,23 @@ export interface ReturnTypeIntrospectionResult {
 
 export interface HandlerIntrospectionResult {
   name: string;
-  file: string;
   parameters: ParameterIntrospectionResult[];
   returnType: ReturnTypeIntrospectionResult;
 }
 
-export interface IntrospectionResult {
+export interface IntrospectionMessage {
+  message: string;
+}
+
+export interface FileIntrospectionResult {
+  name: string;
+  errors: IntrospectionMessage[];
+  warnings: IntrospectionMessage[];
   handlers: HandlerIntrospectionResult[];
+}
+
+export interface IntrospectionResult {
+  files: FileIntrospectionResult[];
 }
 
 export type WorkerApi = {
@@ -302,7 +312,7 @@ function getReturnType(
   };
 }
 
-let introspectionResult: IntrospectionResult = { handlers: [] };
+let introspectionResult: IntrospectionResult = { files: [] };
 
 async function generateTypes(resourcesFolder: string) {
   const entryPoints = await glob(path.join(resourcesFolder, './*.ts'));
@@ -319,7 +329,7 @@ async function generateTypes(resourcesFolder: string) {
 
   const checker = program.getTypeChecker();
 
-  const handlers: HandlerIntrospectionResult[] = entryPoints.flatMap((entrypoint) => {
+  const files: FileIntrospectionResult[] = entryPoints.flatMap((entrypoint) => {
     const sourceFile = program.getSourceFile(entrypoint);
     const relativeEntrypoint = path.relative(resourcesFolder, entrypoint);
 
@@ -340,7 +350,7 @@ async function generateTypes(resourcesFolder: string) {
       return [];
     }
 
-    return checker.getExportsOfModule(moduleSymbol).flatMap((symbol) => {
+    const handlers = checker.getExportsOfModule(moduleSymbol).flatMap((symbol) => {
       const exportType = checker.getTypeOfSymbolAtLocation(symbol, symbol.valueDeclaration!);
       const callSignatures = exportType.getCallSignatures();
 
@@ -351,15 +361,25 @@ async function generateTypes(resourcesFolder: string) {
       return [
         {
           name: symbol.name,
-          file: relativeEntrypoint,
           parameters: getParameters(callSignatures, checker, sourceFile),
           returnType: getReturnType(callSignatures, checker, sourceFile),
-        },
+        } satisfies HandlerIntrospectionResult,
       ];
     });
+
+    return {
+      name: relativeEntrypoint,
+      errors: diagnostics
+        .filter((diagnostic) => diagnostic.category === ts.DiagnosticCategory.Error)
+        .map((diagnostic) => ({ message: formatDiagnostic(diagnostic) })),
+      warnings: diagnostics
+        .filter((diagnostic) => diagnostic.category === ts.DiagnosticCategory.Warning)
+        .map((diagnostic) => ({ message: formatDiagnostic(diagnostic) })),
+      handlers,
+    } satisfies FileIntrospectionResult;
   });
 
-  introspectionResult = { handlers };
+  introspectionResult = { files };
 
   parentPort?.postMessage({
     event: 'notify',

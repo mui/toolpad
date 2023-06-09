@@ -12,6 +12,8 @@ import { writeFileRecursive, fileExists } from '../utils/fs';
 import { createWorker as createDevWorker } from './functionsDevWorker';
 import { createWorker as createTypesWorker } from './functionsTypesWorker';
 
+const EXPERIMENTAL_USE_EXTRACTED_TYPES = false;
+
 const DEFAULT_FUNCTIONS_FILE_CONTENT = `// Toolpad queries:
 
 export async function example() {
@@ -239,9 +241,7 @@ export default class FunctionsManager {
       this.typesWorker.api.introspect(),
     ]);
 
-    console.log(runtimeIntrospection, introspection);
-
-    return runtimeIntrospection;
+    return EXPERIMENTAL_USE_EXTRACTED_TYPES ? introspection : runtimeIntrospection;
   }
 
   async initQueriesFile(): Promise<void> {

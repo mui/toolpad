@@ -5,11 +5,15 @@ import { createRequire } from 'node:module';
 import * as fs from 'fs/promises';
 import * as vm from 'vm';
 import * as url from 'url';
-import { PrimitiveValueType, TOOLPAD_FUNCTION } from '@mui/toolpad-core';
+import { CreateFunctionConfig, TOOLPAD_FUNCTION } from '@mui/toolpad-core';
 import fetch, { Headers, Request, Response } from 'node-fetch';
 import { errorFrom } from '@mui/toolpad-utils/errors';
 import invariant from 'invariant';
-import type { IntrospectionResult } from './functionsTypesWorker';
+import type {
+  FileIntrospectionResult,
+  HandlerIntrospectionResult,
+  IntrospectionResult,
+} from './functionsTypesWorker';
 
 type IntrospectedFiles = Map<string, { file: string }>;
 
@@ -85,36 +89,34 @@ async function execute(msg: ExecuteMessage) {
 }
 
 async function introspect(msg: IntrospectMessage): Promise<IntrospectionResult> {
-  const resolvedFiles = await Promise.all(
+  const files = await Promise.all(
     Array.from(msg.files.entries()).map(async ([entry, { file }]) => {
       const resolvers = await resolveFunctions(file).catch(() => ({}));
-      return Object.entries(resolvers).map(([name, value]) => {
-        const fnConfig = (value as any)[TOOLPAD_FUNCTION];
+      const handlers = Object.entries(resolvers).map(([name, value]) => {
+        const fnConfig = (value as any)[TOOLPAD_FUNCTION] as CreateFunctionConfig<any>;
         return {
           name,
-          file: path.basename(entry),
-          parameters: fnConfig?.parameters ?? {},
-        };
+          parameters: Object.entries(fnConfig?.parameters ?? {}).map(
+            ([parameterName, parameterDef]) => ({
+              name: parameterName,
+              schema: parameterDef,
+              optional: false,
+            }),
+          ),
+          returnType: { schema: {} },
+        } satisfies HandlerIntrospectionResult;
       });
+
+      return {
+        name: path.basename(entry),
+        errors: [],
+        warnings: [],
+        handlers,
+      } satisfies FileIntrospectionResult;
     }),
   );
 
-  const handlers = resolvedFiles.flatMap((resolvedFunctions) =>
-    resolvedFunctions.map((resolver) => ({
-      name: resolver.name,
-      file: resolver.file,
-      parameters: (Object.entries(resolver.parameters) as [string, PrimitiveValueType][]).map(
-        ([name, propValueType]) => ({
-          name,
-          schema: { type: propValueType.type },
-          optional: !propValueType.default,
-        }),
-      ),
-      returnType: { schema: {} },
-    })),
-  );
-
-  return { handlers };
+  return { files };
 }
 
 async function handleMessage(msg: WorkerMessage) {

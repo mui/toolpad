@@ -48,12 +48,12 @@ export function JsExpressionEditor({
   const extraLibs = React.useMemo(() => {
     const generatedTypes = jsonToTs(globalScope);
 
-    const globalDeclarations = Object.entries(globalScopeMeta).map(([key, metaData = {}]) => {
-      const { deprecated, description, tsType } = metaData;
+    const globalDeclarations = Object.keys(globalScope).map((key) => {
+      const metaData = globalScopeMeta[key];
 
       const overrides: Record<string, string> = {};
 
-      if (metaData.kind === 'element') {
+      if (metaData?.kind === 'element') {
         const { props } = metaData;
         if (props) {
           for (const [prop, meta] of Object.entries(props)) {
@@ -66,14 +66,14 @@ export function JsExpressionEditor({
 
       const commentLines: string[] = [];
 
-      if (description) {
-        commentLines.push(description);
+      if (metaData?.description) {
+        commentLines.push(metaData.description);
       }
 
-      if (typeof deprecated === 'boolean') {
+      if (typeof metaData?.deprecated === 'boolean') {
         commentLines.push('@deprecated');
-      } else if (typeof deprecated === 'string') {
-        commentLines.push(`@deprecated ${deprecated}`);
+      } else if (typeof metaData?.deprecated === 'string') {
+        commentLines.push(`@deprecated ${metaData.deprecated}`);
       }
 
       const comment =
@@ -91,8 +91,8 @@ export function JsExpressionEditor({
       }`;
 
       const globalType =
-        typeof tsType === 'string'
-          ? tsType
+        typeof metaData?.tsType === 'string'
+          ? metaData.tsType
           : `OverrideProps<RootObject[${JSON.stringify(key)}], ${overridesType}>;`;
 
       const declaration = `declare const ${key}: Expand<${globalType}>`;

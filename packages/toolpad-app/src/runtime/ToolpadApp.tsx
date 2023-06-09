@@ -417,7 +417,7 @@ function parseBindings(
   dom: appDom.AppDom,
   rootNode: appDom.ElementNode | appDom.PageNode | appDom.ElementNode[],
   components: ToolpadComponents,
-  location: RouterLocation | null,
+  location: RouterLocation,
 ) {
   const scopeElements = getScopeElements(dom, rootNode, components);
 
@@ -565,17 +565,19 @@ function parseBindings(
     }
   }
 
-  if (location && !Array.isArray(rootNode) && appDom.isPage(rootNode)) {
-    const urlParams = new URLSearchParams(location.search);
-    const pageParameters = rootNode.attributes.parameters?.value || [];
+  if (!Array.isArray(rootNode) && appDom.isPage(rootNode)) {
+    if (location && !Array.isArray(rootNode) && appDom.isPage(rootNode)) {
+      const urlParams = new URLSearchParams(location.search);
+      const pageParameters = rootNode.attributes.parameters?.value || [];
 
-    for (const [paramName, paramDefault] of pageParameters) {
-      const bindingId = `${rootNode.id}.parameters.${paramName}`;
-      const scopePath = `page.parameters.${paramName}`;
-      parsedBindingsMap.set(bindingId, {
-        scopePath,
-        result: { value: urlParams.get(paramName) || paramDefault },
-      });
+      for (const [paramName, paramDefault] of pageParameters) {
+        const bindingId = `${rootNode.id}.parameters.${paramName}`;
+        const scopePath = `page.parameters.${paramName}`;
+        parsedBindingsMap.set(bindingId, {
+          scopePath,
+          result: { value: urlParams.get(paramName) || paramDefault },
+        });
+      }
     }
   }
 
@@ -809,11 +811,12 @@ interface TemplateScopedProps {
 function TemplateScoped({ id, node, localScope, propName, children }: TemplateScopedProps) {
   const dom = useDomContext();
   const components = useComponents();
+  const location = useLocation();
 
   const parseBindingsResult = React.useMemo(() => {
     const { [propName]: templateChildren = [] } = appDom.getChildNodes(dom, node);
-    return parseBindings(dom, templateChildren, components, null);
-  }, [components, dom, node, propName]);
+    return parseBindings(dom, templateChildren, components, location);
+  }, [components, dom, node, propName, location]);
 
   return (
     <RuntimeScoped id={id} parseBindingsResult={parseBindingsResult} localScope={localScope}>

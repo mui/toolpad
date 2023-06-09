@@ -1,5 +1,88 @@
 # Changelog
 
+## 0.1.15
+
+<!-- generated comparing v0.1.14..master -->
+
+_Jun 7, 2023_
+
+A big thanks to the 5 contributors who made this release possible. Here are some highlights ✨:
+
+Allow binding arbitrary environment variables in bindings, improved error handling in Image and Data grid components, and a new version of the documentation!
+
+- &#8203;<!-- 16 -->[core] Improve publish process (#2134) @Janpot
+- &#8203;<!-- 15 -->[core] Upgrade monorepo (#2141) @bharatkashyap
+- &#8203;<!-- 14 -->Make sure global variables are retained in between invocations (#2136) @Janpot
+- &#8203;<!-- 13 -->Allow arbitrary env variables in bindings, use process.env (#2109) @apedroferreira
+- &#8203;<!-- 12 -->[core] add ts declaration for package and check node version on initial star… (#2124) @JerryWu1234
+- &#8203;<!-- 11 -->Try fixing build on windows (#2131) @Janpot
+- &#8203;<!-- 10 -->Improve error handling in image and datagrid (#2073) @Janpot
+- &#8203;<!-- 09 -->Restrict node version for renovatebot (#2129) @Janpot
+- &#8203;<!-- 08 -->Create global functions manager (#2103) @Janpot
+- &#8203;<!-- 07 -->[core] Add codesandbox CI (#2111) @Janpot
+- &#8203;<!-- 06 -->[chore] Set minimum node at 16.14.2 (#1934) @Janpot
+- &#8203;<!-- 05 -->[chore] Update @mui/monorepo (#2106) @Janpot
+- &#8203;<!-- 04 -->[core] Avoid PR sandbox notifications (#2116) @oliviertassinari
+- &#8203;<!-- 03 -->[core] Fix GitHub typo @oliviertassinari
+- &#8203;<!-- 02 -->[docs] Restructure (#2082) @bharatkashyap
+- &#8203;<!-- 01 -->[docs] Fix docs issues (#2123) @oliviertassinari
+
+All contributors of this release in alphabetical order: @apedroferreira, @bharatkashyap, @Janpot, @JerryWu1234, @oliviertassinari
+
+## 0.1.14
+
+<!-- generated comparing v0.1.13..master -->
+
+_May 31, 2023_
+
+A big thanks to the 3 contributors who made this release possible. Here are some highlights ✨:
+
+Add new reference documentation, add new QR-code example.
+
+- &#8203;<!-- 15 -->Pin dependencies (#2102) @Janpot
+- &#8203;<!-- 14 -->Fix React function ref warning for the row id selector component (#2100) @Janpot
+- &#8203;<!-- 13 -->Allow inlining the proptype jsonschema (#2080) @Janpot
+- &#8203;<!-- 12 -->Add redirect for moved file-schema page (#2090) @Janpot
+- &#8203;<!-- 11 -->Several fixes around local functions (#2074) @Janpot
+- &#8203;<!-- 10 -->Add 404 page to application runtime (#2077) @Janpot
+- &#8203;<!-- 09 -->Avoid component catalog opening while hovering the snackbar (#2079) @Janpot
+- &#8203;<!-- 08 -->Fix broken documentation links (#2076) @Janpot
+- &#8203;<!-- 07 -->Add new example for QR code generator (#2067) @Janpot
+- &#8203;<!-- 06 -->Avoid restarting vite devserver when env file changes (#2069) @Janpot
+- &#8203;<!-- 05 -->Reference documentation (#2001) @Janpot
+- &#8203;<!-- 04 -->Fix websocket connection in codesandbox (#2068) @Janpot
+- &#8203;<!-- 03 -->Remove dead code from browser queries (#2066) @Janpot
+- &#8203;<!-- 02 -->[docs] Add docs update checklist item (#2078) @bharatkashyap
+- &#8203;<!-- 01 -->[docs] Fix missing redirection for data binding (#2083) @oliviertassinari
+
+All contributors of this release in alphabetical order: @bharatkashyap, @Janpot, @oliviertassinari
+
+## 0.1.13
+
+<!-- generated comparing v0.1.12..master -->
+
+_May 24, 2023_
+
+A big thanks to the 5 contributors who made this release possible. Here are some highlights ✨:
+
+Allow binding to environment variables, UI and docs improvements, bug fixes.
+
+- &#8203;<!-- 13 -->Fix manual queries losing parameters when called (#2060) @bharatkashyap
+- &#8203;<!-- 12 -->Fix function parameters (#2056) @Janpot
+- &#8203;<!-- 11 -->Fix overlay grid spacing (#2026) @apedroferreira
+- &#8203;<!-- 10 -->pin toolpad packages versions again (#2054) @Janpot
+- &#8203;<!-- 09 -->Fix orphaned node delete order (#2042) @apedroferreira
+- &#8203;<!-- 08 -->Fix property control tooltips showing over dialogs (#2041) @Janpot
+- &#8203;<!-- 07 -->Ignore warning for first-child pseudo selector in Markdown component (#2034) @Janpot
+- &#8203;<!-- 06 -->Allow binding to environment variables (#1859) @apedroferreira
+- &#8203;<!-- 05 -->Reorganize core exports to ease extracting API docs (#2040) @Janpot
+- &#8203;<!-- 04 -->Split data binding page in docs (#1996) @apedroferreira
+- &#8203;<!-- 03 -->[docs] Fix casing (#2046) @oliviertassinari
+- &#8203;<!-- 02 -->[docs] Add product identifier to page context (#2043) @m4theushw
+- &#8203;<!-- 01 -->[refactor] Move toolpad components into the runtime (#2036) @Janpot
+
+All contributors of this release in alphabetical order: @apedroferreira, @bharatkashyap, @Janpot, @m4theushw, @oliviertassinari
+
 ## 0.1.12
 
 <!-- generated comparing v0.1.11..master -->

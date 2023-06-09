@@ -1,10 +1,10 @@
 import type { MuiPage } from '@mui/monorepo/docs/src/MuiPage';
-import SchemaIcon from '@mui/icons-material/Schema';
 import BuildIcon from '@mui/icons-material/Build';
 import CodeIcon from '@mui/icons-material/Code';
 import DescriptionIcon from '@mui/icons-material/Description';
-import TableViewIcon from '@mui/icons-material/TableView';
+import SchoolIcon from '@mui/icons-material/School';
 import VisibilityIcon from '@mui/icons-material/Visibility';
+import componentsManifest from './toolpad/reference/components/manifest.json';
 
 const pages: MuiPage[] = [
   {
@@ -12,83 +12,132 @@ const pages: MuiPage[] = [
     icon: DescriptionIcon,
     children: [
       { pathname: '/toolpad/getting-started/overview' },
-      { pathname: '/toolpad/getting-started/quickstart' },
       { pathname: '/toolpad/getting-started/installation' },
-      { pathname: '/toolpad/getting-started/configuration' },
+      { pathname: '/toolpad/getting-started/first-app', title: 'Build your first app' },
       { pathname: '/toolpad/getting-started/roadmap' },
     ],
   },
   {
-    pathname: '/toolpad/connecting-to-datasources',
-    icon: TableViewIcon,
-    children: [
-      {
-        pathname: '/toolpad/connecting-to-datasources/queries',
-      },
-      {
-        pathname: '/toolpad/connecting-to-datasources/http-requests',
-        title: 'HTTP requests',
-      },
-      {
-        pathname: '/toolpad/connecting-to-datasources/custom-functions',
-        title: 'Custom functions',
-      },
-    ],
-  },
-  {
-    pathname: '/toolpad/building-ui',
-    title: 'Building UI',
+    pathname: '/toolpad/concepts',
     icon: VisibilityIcon,
     children: [
       {
-        pathname: '/toolpad/building-ui/component-library',
-        title: 'Component library',
+        pathname: '/toolpad/concepts/building-ui',
+        title: 'Building UI',
       },
       {
-        pathname: '/toolpad/building-ui/canvas-and-inspector',
-        title: 'Canvas & Inspector',
+        pathname: '/toolpad/concepts/connecting-to-data',
+        title: 'Connecting to data',
       },
       {
-        pathname: '/toolpad/building-ui/custom-components',
-        title: 'Custom components',
+        pathname: '/toolpad/concepts/managing-state',
+        title: 'Managing state',
       },
       {
-        pathname: '/toolpad/building-ui/data-grid-component',
-        title: 'Data Grid component',
+        pathname: '/toolpad/concepts/deployment',
       },
       {
-        pathname: '/toolpad/building-ui/page-configuration',
-        title: 'Page configuration',
+        pathname: '/toolpad/concepts/custom-components',
       },
       {
-        pathname: '/toolpad/building-ui/theming',
-        title: 'Theming',
+        pathname: '/toolpad/concepts/theming',
+      },
+      {
+        pathname: '/toolpad/concepts/display-mode',
       },
     ],
   },
   {
-    pathname: '/toolpad/data-binding',
-    title: 'Data Binding',
+    pathname: '/toolpad/how-to-guides',
+    title: 'How-to guides',
+    icon: BuildIcon,
+    children: [
+      {
+        pathname: '/toolpad/how-to-guides/connect-to-databases',
+      },
+      {
+        pathname: '/toolpad/how-to-guides/custom-components',
+        title: 'Create custom components',
+        children: [
+          {
+            pathname: '/toolpad/how-to-guides/number-display',
+            title: 'Number component',
+          },
+          {
+            pathname: '/toolpad/how-to-guides/cube-component',
+            title: '3D cube component',
+          },
+        ],
+      },
+
+      {
+        pathname: '/toolpad/how-to-guides/customize-datagrid',
+        title: 'Customize data grids',
+      },
+      {
+        pathname: '/toolpad/how-to-guides/delete-datagrid-row',
+        title: 'Delete a data grid row',
+      },
+      {
+        pathname: '/toolpad/how-to-guides/embed-pages',
+        title: 'Embed a Toolpad page',
+      },
+      {
+        pathname: '/toolpad/how-to-guides/basic-auth',
+        title: 'Enable basic auth',
+      },
+    ],
+  },
+  {
+    pathname: '/toolpad/tutorials',
+    title: 'Tutorials',
+    icon: SchoolIcon,
+    children: [
+      {
+        pathname: '/toolpad/tutorials/render-deploy',
+        title: 'Deploy your app to Render',
+      },
+    ],
+  },
+  {
+    pathname: '/toolpad/reference-group',
+    title: 'Reference',
     icon: CodeIcon,
     children: [
       {
-        pathname: '/toolpad/data-binding/binding-state',
-        title: 'Binding state',
+        pathname: '/toolpad/reference/file-schema',
+        title: 'File schema',
       },
       {
-        pathname: '/toolpad/data-binding/event-handling',
-        title: 'Event handling',
+        pathname: '/toolpad/reference/components-group',
+        title: 'Components',
+        children: componentsManifest.pages,
+      },
+      {
+        pathname: '/toolpad/reference/api-group',
+        title: 'API',
+        children: [
+          {
+            pathname: '/toolpad/reference/api',
+            title: 'Index',
+          },
+          {
+            pathname: '/toolpad/reference/api/functions-group',
+            subheader: 'Functions',
+            children: [
+              {
+                title: 'createFunction',
+                pathname: '/toolpad/reference/api/create-function',
+              },
+              {
+                title: 'createComponent',
+                pathname: '/toolpad/reference/api/create-component',
+              },
+            ],
+          },
+        ],
       },
     ],
-  },
-  {
-    pathname: '/toolpad/deployment',
-    icon: BuildIcon,
-  },
-  {
-    pathname: '/toolpad/schema-reference',
-    title: 'Schema reference',
-    icon: SchemaIcon,
   },
 ];
 

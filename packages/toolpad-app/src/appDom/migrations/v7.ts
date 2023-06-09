@@ -1,46 +1,32 @@
 import invariant from 'invariant';
 import { mapValues } from '@mui/toolpad-utils/collections';
-import { BindableAttrValue } from './types/v7Down';
 import * as appDom from '..';
 import * as v7LegacyAppDom from './types/v7Down';
 
-function updateBindingSyntax<V>(binding: BindableAttrValue<V>) {
-  if (binding.type === 'jsExpression') {
-    return { $$jsExpression: binding.value };
+function updateBindingSyntax<V>(value: V): unknown {
+  if ((value as v7LegacyAppDom.JsExpressionAttrValue)?.type === 'jsExpression') {
+    return { $$jsExpression: (value as v7LegacyAppDom.JsExpressionAttrValue).value };
   }
-  if (binding.type === 'env') {
-    return { $$env: binding.value };
+  if ((value as v7LegacyAppDom.EnvAttrValue)?.type === 'env') {
+    return { $$env: (value as v7LegacyAppDom.EnvAttrValue).value };
   }
-  if (binding.type === 'jsExpressionAction') {
-    return { $$jsExpressionAction: binding.value };
+  if ((value as v7LegacyAppDom.JsExpressionAction)?.type === 'jsExpressionAction') {
+    return { $$jsExpressionAction: (value as v7LegacyAppDom.JsExpressionAction).value };
   }
-  if (binding.type === 'navigationAction') {
-    return { $$navigationAction: binding.value };
+  if ((value as v7LegacyAppDom.NavigationAction)?.type === 'navigationAction') {
+    return { $$navigationAction: (value as v7LegacyAppDom.NavigationAction).value };
   }
-  if (binding.type === 'secret') {
-    return { $$secret: binding.value };
+  if ((value as v7LegacyAppDom.SecretAttrValue<V>)?.type === 'secret') {
+    return { $$secret: (value as v7LegacyAppDom.SecretAttrValue<V>).value };
   }
-  if (binding.type === 'const') {
-    return binding.value;
+  if ((value as v7LegacyAppDom.ConstantAttrValue<V>)?.type === 'const') {
+    return updateBindingSyntax((value as v7LegacyAppDom.ConstantAttrValue<V>).value);
   }
-  return binding;
-}
-
-function updateBindingsSyntax(value: any): any {
   if (value && typeof value === 'object') {
     if (Array.isArray(value)) {
-      return value.map((valueItem) =>
-        valueItem?.type && valueItem?.value
-          ? updateBindingSyntax(valueItem)
-          : updateBindingsSyntax(valueItem),
-      );
+      return value.map((valueItem) => updateBindingSyntax(valueItem));
     }
-
-    return mapValues(value, (valuePropValue) =>
-      valuePropValue?.type && valuePropValue?.value
-        ? updateBindingSyntax(valuePropValue)
-        : updateBindingsSyntax(valuePropValue),
-    );
+    return mapValues(value, (valuePropValue) => updateBindingSyntax(valuePropValue));
   }
   return value;
 }
@@ -48,10 +34,9 @@ function updateBindingsSyntax(value: any): any {
 export default {
   up(dom: v7LegacyAppDom.AppDom): appDom.AppDom {
     invariant(dom.version === 6, 'Can only migrate dom of version 6');
-
     return {
       ...dom,
-      nodes: updateBindingsSyntax(dom.nodes),
+      nodes: updateBindingSyntax<v7LegacyAppDom.AppDomNodes>(dom.nodes) as appDom.AppDomNodes,
       version: 7,
     };
   },

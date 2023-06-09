@@ -1,8 +1,8 @@
 import * as path from 'path';
 import * as fs from 'fs/promises';
+import { fileReplaceAll } from '../../../packages/toolpad-utils/src/fs';
 import { test, expect } from '../../playwright/localTest';
 import { ToolpadRuntime } from '../../models/ToolpadRuntime';
-import { fileReplaceAll } from '../../utils/fs';
 import { ToolpadEditor } from '../../models/ToolpadEditor';
 
 // We can run our own httpbin instance if necessary:

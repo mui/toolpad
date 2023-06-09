@@ -6,7 +6,7 @@ import { Readable } from 'stream';
 import * as readline from 'readline';
 import openBrowser from 'react-dev-utils/openBrowser';
 import chalk from 'chalk';
-import { folderExists } from '../src/utils/fs';
+import { folderExists } from '@mui/toolpad-utils/fs';
 
 const DEFAULT_PORT = 3000;
 

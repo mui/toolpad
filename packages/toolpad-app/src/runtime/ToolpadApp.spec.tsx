@@ -155,7 +155,7 @@ test(`Databinding errors`, async () => {
       selfReferencing = appDom.createNode(dom, 'element', {
         name: 'selfReferencing',
         attributes: { component: 'Text' },
-        props: { value: { $$jsExpressione: 'selfReferencing.value' } },
+        props: { value: { $$jsExpression: 'selfReferencing.value' } },
       });
       dom = appDom.addNode(dom, selfReferencing, page, 'children');
 

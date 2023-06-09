@@ -66,7 +66,7 @@ function Header({ actions, status, enableUserFeedback = true }: HeaderProps) {
                 </Box>
               </Link>
             </Tooltip>
-            <Chip sx={{ ml: 1 }} label="Alpha" size="small" color="grey" />
+            <Chip sx={{ ml: 1 }} label="Beta" size="small" color="grey" />
           </Box>
           <Box
             sx={{

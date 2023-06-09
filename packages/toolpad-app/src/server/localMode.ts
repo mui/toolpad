@@ -705,12 +705,12 @@ function createPageDomFromPageFile(pageName: string, pageFile: Page): appDom.App
             dataSource: typeof query.query?.kind === 'string' ? query.query.kind : undefined,
             query: createDomQueryFromPageFileQuery(query.query),
             cacheTime: typeof query.cacheTime === 'number' ? query.cacheTime : undefined,
-            enabled: query.enabled || undefined,
+            enabled: query.enabled ?? undefined,
             mode: typeof query.mode === 'string' ? query.mode : undefined,
             transform: typeof query.transform === 'string' ? query.transform : undefined,
             refetchInterval:
               typeof query.refetchInterval === 'number' ? query.refetchInterval : undefined,
-            transformEnabled: query.transformEnabled || undefined,
+            transformEnabled: query.transformEnabled ?? undefined,
           },
           params: query.parameters?.map(
             ({ name, value }) => [name, value] satisfies [string, BindableAttrValue<any>],

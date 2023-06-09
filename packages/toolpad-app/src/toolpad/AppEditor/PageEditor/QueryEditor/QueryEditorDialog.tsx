@@ -188,7 +188,7 @@ export default function QueryNodeEditorDialog<Q>({
     setInput((existing) =>
       update(existing, {
         attributes: update(existing.attributes, {
-          enabled: newValue || undefined,
+          enabled: newValue ?? undefined,
         }),
       }),
     );

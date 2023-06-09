@@ -13,17 +13,17 @@ import { Emitter } from '@mui/toolpad-utils/events';
 import { errorFrom } from '@mui/toolpad-utils/errors';
 import { filterValues, hasOwnProperty, mapValues } from '@mui/toolpad-utils/collections';
 import { execa } from 'execa';
-import config from '../config';
-import * as appDom from '../appDom';
-import { migrateUp } from '../appDom/migrations';
-import insecureHash from '../utils/insecureHash';
 import {
   writeFileRecursive,
   readMaybeFile,
   readMaybeDir,
   updateYamlFile,
   fileExists,
-} from '../utils/fs';
+} from '@mui/toolpad-utils/fs';
+import config from '../config';
+import * as appDom from '../appDom';
+import { migrateUp } from '../appDom/migrations';
+import insecureHash from '../utils/insecureHash';
 import {
   Page,
   Query,

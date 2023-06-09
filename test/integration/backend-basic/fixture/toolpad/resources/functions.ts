@@ -53,3 +53,13 @@ export const manualQueryWithParams = createFunction(
     },
   },
 );
+
+let x = 1;
+
+export async function increment() {
+  x += 1;
+}
+
+export async function getGlobal() {
+  return x;
+}

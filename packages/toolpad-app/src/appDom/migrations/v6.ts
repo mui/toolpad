@@ -1,7 +1,7 @@
 import { NodeId } from '@mui/toolpad-core';
 import invariant from 'invariant';
 import { mapValues } from '@mui/toolpad-utils/collections';
-import * as appDom from './v7LegacyTypes';
+import * as appDom from './types/v7Down';
 
 export default {
   up(dom: appDom.AppDom): appDom.AppDom {

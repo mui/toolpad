@@ -1,6 +1,6 @@
 import invariant from 'invariant';
 import { mapValues } from '@mui/toolpad-utils/collections';
-import * as appDom from './v7LegacyTypes';
+import * as appDom from './types/v7Down';
 
 function replaceLinkWithText(node: appDom.AppDomNode): appDom.AppDomNode {
   if (node.type === 'element' && node.attributes.component.value === 'Link') {

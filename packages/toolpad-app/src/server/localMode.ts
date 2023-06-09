@@ -22,7 +22,7 @@ import {
 } from '@mui/toolpad-utils/fs';
 import config from '../config';
 import * as appDom from '../appDom';
-import * as v7LegacyDom from '../appDom/migrations/v7LegacyTypes';
+import * as v7LegacyDom from '../appDom/migrations/types/v7Down';
 import { migrateUp } from '../appDom/migrations';
 import insecureHash from '../utils/insecureHash';
 import {

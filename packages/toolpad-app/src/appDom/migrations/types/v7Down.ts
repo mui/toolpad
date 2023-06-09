@@ -1,8 +1,8 @@
 import { BoxProps } from '@mui/system';
 import { NodeId, NodeReference } from '@mui/toolpad-core';
 import invariant from 'invariant';
-import { PageDisplayMode } from '..';
-import { AppTheme, ConnectionStatus } from '../../types';
+import { PageDisplayMode } from '../..';
+import { AppTheme, ConnectionStatus } from '../../../types';
 
 export interface JsExpressionAttrValue {
   type: 'jsExpression';

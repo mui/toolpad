@@ -45,7 +45,7 @@
     "@mui/toolpad-core": "0.1.15",
     "@mui/toolpad-utils": "0.1.15",
     "@mui/x-data-grid-pro": "6.7.0",
-    "@mui/x-date-pickers": "6.6.0",
+    "@mui/x-date-pickers": "6.7.0",
     "dayjs": "1.11.8",
     "lodash-es": "4.17.21",
     "markdown-to-jsx": "7.2.1",

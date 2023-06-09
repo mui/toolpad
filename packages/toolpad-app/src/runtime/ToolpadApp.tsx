@@ -563,8 +563,10 @@ const PageRootComponent = createComponent(PageRoot, {
  * Example:
  *   { foo: { bar: 1 }, baz: [{ $$jsExpression: 'quux' }] }
  *   =>
- *   [['.foo.bar', 1],
- *    ['.baz[0]', { $$jsExpression: 'quux' }]]
+ *   [
+ *    ['.foo.bar', 1],
+ *    ['.baz[0]', { $$jsExpression: 'quux' }]
+ *   ]
  */
 function flattenNestedBindables(
   params?: NestedBindableAttrs,
@@ -580,7 +582,7 @@ function flattenNestedBindables(
   }
   // TODO: create a marker in bindables (similar to $ref) to recognize them automatically
   // in a nested structure. This would allow us to build deeply nested structures
-  if (getBindingType(params) !== 'const') {
+  if (typeof params !== 'object' || getBindingType(params) !== 'const') {
     return [[prefix, params as BindableAttrValue<any>]];
   }
   return Object.entries(params).flatMap(([key, param]) =>

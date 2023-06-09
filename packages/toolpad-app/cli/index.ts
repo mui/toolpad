@@ -6,7 +6,9 @@ import { Readable } from 'stream';
 import * as readline from 'readline';
 import openBrowser from 'react-dev-utils/openBrowser';
 import chalk from 'chalk';
-import { folderExists } from '../src/utils/fs';
+import { folderExists } from '@mui/toolpad-utils/fs';
+import { execaNode } from 'execa';
+import getPort from 'get-port';
 
 const DEFAULT_PORT = 3000;
 
@@ -49,8 +51,6 @@ async function runApp(cmd: Command, { port, dev = false, dir }: RunOptions) {
     process.exit(1);
   }
 
-  const { execaNode } = await import('execa');
-  const { default: getPort } = await import('get-port');
   const toolpadDir = path.resolve(__dirname, '../..'); // from ./dist/server
 
   if (!port) {
@@ -121,8 +121,6 @@ async function buildCommand({ dir }: BuildOptions) {
   const projectDir = path.resolve(process.cwd(), dir);
   // eslint-disable-next-line no-console
   console.log(`${chalk.blue('info')}  - building Toolpad application...`);
-
-  const { execaNode } = await import('execa');
 
   const builderPath = path.resolve(__dirname, './appBuilder.js');
 

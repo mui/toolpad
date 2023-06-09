@@ -43,15 +43,20 @@ function QueryEditor({
 
   const functionName: string | undefined = input.attributes.query.value.function;
 
-  const allHandlers = React.useMemo(() => {
-    return (introspection.data?.files ?? []).flatMap((file) => file.handlers);
+  const allOPtions = React.useMemo(() => {
+    return (introspection.data?.files ?? []).flatMap((file) => {
+      return file.handlers.map((handler) => ({
+        ...handler,
+        file: file.name,
+      }));
+    });
   }, [introspection.data?.files]);
 
-  const selectedFunction = React.useMemo(() => {
-    return allHandlers.find((handler) => handler.name === functionName);
-  }, [allHandlers, functionName]);
+  const selectedOption = React.useMemo(() => {
+    return allOPtions.find((handler) => handler.name === functionName);
+  }, [allOPtions, functionName]);
 
-  const parameterDefs = selectedFunction?.parameters || {};
+  const parameterDefs = selectedOption?.parameters || {};
 
   const paramsEntries = input.params?.filter(([key]) => !!parameterDefs[key]) || EMPTY_PARAMS;
 
@@ -106,22 +111,21 @@ function QueryEditor({
     ? errorFrom(introspection.error).message
     : '';
 
-  const methodSelectOptions = allHandlers.map((handler) => handler.name) ?? [];
-
   return (
     <SplitPane split="vertical" size="50%" allowResize>
       <QueryInputPanel onRunPreview={handleRunPreview}>
         <Stack gap={2} sx={{ px: 3, pt: 1 }}>
           <Stack gap={2} direction="row">
             <Autocomplete
-              value={functionName ?? ''}
+              value={selectedOption}
               onChange={(event, newValue) => {
                 setInput((existing) =>
-                  appDom.setQueryProp(existing, 'function', newValue ?? undefined),
+                  appDom.setQueryProp(existing, 'function', newValue?.name ?? undefined),
                 );
               }}
               loading={introspection.isLoading}
-              options={methodSelectOptions}
+              getOptionLabel={(option) => option.name}
+              options={allOPtions}
               selectOnFocus
               clearOnBlur
               handleHomeEndKeys

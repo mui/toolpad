@@ -96,13 +96,7 @@ async function introspect(msg: IntrospectMessage): Promise<IntrospectionResult> 
         const fnConfig = (value as any)[TOOLPAD_FUNCTION] as CreateFunctionConfig<any>;
         return {
           name,
-          parameters: Object.entries(fnConfig?.parameters ?? {}).map(
-            ([parameterName, parameterDef]) => ({
-              name: parameterName,
-              schema: parameterDef,
-              optional: false,
-            }),
-          ),
+          parameters: fnConfig?.parameters ?? {},
           returnType: { schema: {} },
         } satisfies HandlerIntrospectionResult;
       });

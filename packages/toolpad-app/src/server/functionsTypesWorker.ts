@@ -9,13 +9,8 @@ import { JSONSchema7, JSONSchema7TypeName, JSONSchema7Type } from 'json-schema';
 import { asArray } from '@mui/toolpad-utils/collections';
 import { Emitter } from '@mui/toolpad-utils/events';
 import { debounce } from 'lodash-es';
+import { PrimitiveValueType } from '@mui/toolpad-core';
 import { createWorkerApi, serveWorkerApi } from './workerRpc';
-
-export interface ParameterIntrospectionResult {
-  name: string;
-  schema: JSONSchema7 | null;
-  optional: boolean;
-}
 
 export interface ReturnTypeIntrospectionResult {
   schema: JSONSchema7 | null;
@@ -23,7 +18,7 @@ export interface ReturnTypeIntrospectionResult {
 
 export interface HandlerIntrospectionResult {
   name: string;
-  parameters: ParameterIntrospectionResult[];
+  parameters: Record<string, PrimitiveValueType>;
   returnType: ReturnTypeIntrospectionResult;
 }
 
@@ -62,6 +57,36 @@ type WorkerEventMessage<T> = {
   event: keyof T;
   payload: T[keyof T];
 };
+
+const NULL_PROP_VALUE: PrimitiveValueType = {
+  type: 'object',
+  schema: { type: 'null' },
+  default: null,
+};
+
+function propValueFromJsonSchema(schema: JSONSchema7 | null): PrimitiveValueType {
+  if (!schema) {
+    return NULL_PROP_VALUE;
+  }
+
+  if (Array.isArray(schema.type)) {
+    return propValueFromJsonSchema({
+      ...schema,
+      type: schema.type[0],
+    });
+  }
+
+  switch (schema.type) {
+    case 'integer':
+      return { type: 'number' };
+    case 'null':
+    case null:
+    case undefined:
+      return NULL_PROP_VALUE;
+    default:
+      return { type: schema.type, schema };
+  }
+}
 
 export function createWorker({ resourcesFolder }: CreateWorkerParams) {
   invariant(isMainThread, 'createWorker() must be called from the main thread');
@@ -251,20 +276,24 @@ function getParameters(
   callSignatures: readonly ts.Signature[],
   checker: ts.TypeChecker,
   sourceFile: ts.SourceFile,
-) {
+): Record<string, PrimitiveValueType> {
   invariant(callSignatures.length > 0, 'Expected at least 1 call signature');
 
-  const args = callSignatures[0].getParameters().map((parameter) => {
+  const paramEntries = callSignatures[0].getParameters().map((parameter) => {
     const paramType = checker.getTypeOfSymbolAtLocation(parameter, parameter.valueDeclaration!);
     const schema = toJsonSchema(paramType, checker, sourceFile);
-    return {
-      name: parameter.getName(),
-      schema,
-      optional: checker.isOptionalParameter(parameter.valueDeclaration as ts.ParameterDeclaration),
-    };
+    return [
+      parameter.getName(),
+      {
+        ...propValueFromJsonSchema(schema),
+        required: !checker.isOptionalParameter(
+          parameter.valueDeclaration as ts.ParameterDeclaration,
+        ),
+      },
+    ];
   });
 
-  return args;
+  return Object.fromEntries(paramEntries);
 }
 
 function getAwaitedType(

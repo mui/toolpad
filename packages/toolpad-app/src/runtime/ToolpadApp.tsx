@@ -875,9 +875,8 @@ function parseBindings(
       if (!isPageLayoutComponent(elm)) {
         for (const [propName, argType] of Object.entries(layoutBoxArgTypes)) {
           const binding =
-            elm.layout?.[propName as keyof typeof layoutBoxArgTypes] || argType
-              ? getArgTypeDefaultValue(argType)
-              : undefined;
+            elm.layout?.[propName as keyof typeof layoutBoxArgTypes] ||
+            (argType ? getArgTypeDefaultValue(argType) : undefined);
           const bindingId = `${elm.id}.layout.${propName}`;
           parsedBindingsMap.set(bindingId, parseBinding(binding, {}));
         }

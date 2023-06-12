@@ -200,3 +200,8 @@ export function createWorker(env: Record<string, any>) {
     },
   };
 }
+
+process.on('unhandledRejection', (error) => {
+  console.error(error);
+  process.exit(1);
+});

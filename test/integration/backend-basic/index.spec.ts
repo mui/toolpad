@@ -37,7 +37,7 @@ async function setReactQueryFocused(page: Page, focus: boolean) {
 
 test('functions basics', async ({ page }) => {
   const runtimeModel = new ToolpadRuntime(page);
-  await runtimeModel.gotoPage('page1');
+  await runtimeModel.gotoPage('basic');
 
   await expect(page.locator('text="hello, message: hello world"')).toBeVisible();
   await expect(page.locator('text="throws, error.message: BOOM!"')).toBeVisible();
@@ -85,7 +85,7 @@ test('function editor parameters update', async ({ page, localApp }) => {
 
 test('bound parameters are preserved on manual call', async ({ page }) => {
   const runtimeModel = new ToolpadRuntime(page);
-  await runtimeModel.gotoPage('page1');
+  await runtimeModel.gotoPage('basic');
 
   await page.getByRole('button', { name: 'Run Manual Query' }).click();
 
@@ -94,7 +94,7 @@ test('bound parameters are preserved on manual call', async ({ page }) => {
 
 test('global variables are retained in function runtime', async ({ page }) => {
   const runtimeModel = new ToolpadRuntime(page);
-  await runtimeModel.gotoPage('page1');
+  await runtimeModel.gotoPage('basic');
 
   await expect(page.getByText('global value: 1', { exact: true })).toBeVisible();
   await expect(page.getByText('global value: 2', { exact: true })).not.toBeVisible();
@@ -102,4 +102,13 @@ test('global variables are retained in function runtime', async ({ page }) => {
   await page.getByRole('button', { name: 'increment' }).click();
 
   await expect(page.getByText('global value: 2', { exact: true })).toBeVisible();
+});
+
+test('Query serialization', async ({ page }) => {
+  const runtimeModel = new ToolpadRuntime(page);
+  await runtimeModel.gotoPage('serialization');
+
+  await expect(page.getByText('Circlular property: [Circular]', { exact: true })).toBeVisible();
+  await expect(page.getByText('Non-circular: hello:hello', { exact: true })).toBeVisible();
+  await expect(page.getByText('Invalid error: undefined', { exact: true })).toBeVisible();
 });

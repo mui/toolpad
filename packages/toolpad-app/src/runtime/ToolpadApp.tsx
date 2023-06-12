@@ -385,7 +385,7 @@ function RenderedNodeContent({ node, childNodeGroups, Component }: RenderedNodeC
                   );
                   return [parameterName, result.value];
                 }
-                return [parameterName, parameterValue?.value];
+                return [parameterName, parameterValue];
               }),
             );
 

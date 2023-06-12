@@ -12,7 +12,8 @@ spec:
           props:
             onClick:
               $navigationAction:
-                page: au03sef
+                page:
+                  $ref: au03sef
                 parameters:
                   abc: zyx
                   def:

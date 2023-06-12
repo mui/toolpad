@@ -22,7 +22,7 @@ import {
 } from '@mui/toolpad-utils/fs';
 import config from '../config';
 import * as appDom from '../appDom';
-import * as v7LegacyDom from '../appDom/migrations/types/v7Down';
+import * as v7LegacyDom from '../appDom/migrations/types/v7Legacy';
 import { migrateUp } from '../appDom/migrations';
 import insecureHash from '../utils/insecureHash';
 import {
@@ -39,7 +39,7 @@ import {
   ResponseType,
   Theme,
   themeSchema,
-  API_VERSION,
+  LATEST_API_VERSION,
 } from './schema';
 import { format } from '../utils/prettier';
 import {
@@ -52,6 +52,7 @@ import { ProjectEvents, ToolpadProjectOptions } from '../types';
 import { Awaitable } from '../utils/types';
 import EnvManager from './EnvManager';
 import FunctionsManager from './FunctionsManager';
+import { migratePageUp } from './pageMigrations';
 
 export function getUserProjectRoot(): string {
   const { projectDir } = config;
@@ -157,7 +158,7 @@ async function loadPagesFromFiles(root: string): Promise<PagesContent> {
         if (!content) {
           return null;
         }
-        let parsedFile: string | undefined;
+        let parsedFile: Page | undefined;
         try {
           parsedFile = yaml.parse(content);
         } catch (rawError) {
@@ -170,7 +171,12 @@ async function loadPagesFromFiles(root: string): Promise<PagesContent> {
           return null;
         }
 
-        const result = pageSchema.safeParse(parsedFile);
+        const migratedParsedFile = migratePageUp(parsedFile!);
+        if (migratedParsedFile.apiVersion !== parsedFile!.apiVersion) {
+          await updateYamlFile(filePath, migratedParsedFile);
+        }
+
+        const result = pageSchema.safeParse(migratedParsedFile);
         if (result.success) {
           return [pageName, result.data];
         }
@@ -504,7 +510,7 @@ function expandFromDom<N extends appDom.AppDomNode>(
     const children = appDom.getChildNodes(dom, node);
 
     return {
-      apiVersion: API_VERSION,
+      apiVersion: LATEST_API_VERSION,
       kind: 'page',
       spec: {
         id: node.id,
@@ -815,7 +821,7 @@ function extractThemeContentFromDom(dom: appDom.AppDom): Theme | null {
   const { themes = [] } = appDom.getChildNodes(dom, app);
   if (themes[0]?.theme) {
     return {
-      apiVersion: API_VERSION,
+      apiVersion: LATEST_API_VERSION,
       kind: 'theme',
       spec: {
         'palette.mode': appDom.fromConstPropValue(themes[0].theme['palette.mode']),

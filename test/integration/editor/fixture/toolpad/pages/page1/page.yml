@@ -1,4 +1,4 @@
-apiVersion: v1
+apiVersion: v2
 kind: page
 spec:
   id: y4d19z0

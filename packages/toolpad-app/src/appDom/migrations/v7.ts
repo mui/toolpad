@@ -1,7 +1,7 @@
 import invariant from 'invariant';
 import { mapValues } from '@mui/toolpad-utils/collections';
 import * as appDom from '..';
-import * as v7LegacyAppDom from './types/v7Down';
+import * as v7LegacyAppDom from './types/v7Legacy';
 
 function updateBindingSyntax<V>(value: V): unknown {
   if ((value as v7LegacyAppDom.JsExpressionAttrValue)?.type === 'jsExpression') {

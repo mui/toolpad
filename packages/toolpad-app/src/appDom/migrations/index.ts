@@ -7,7 +7,7 @@ import v5 from './v5';
 import v6 from './v6';
 import v7 from './v7';
 import * as appDom from '..';
-import * as v7LegacyAppDom from './types/v7Down';
+import * as v7LegacyAppDom from './types/v7Legacy';
 
 const versions = [v1, v2, v3, v4, v5, v6, v7];
 

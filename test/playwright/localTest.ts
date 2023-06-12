@@ -7,6 +7,7 @@ import * as archiver from 'archiver';
 import { createWriteStream } from 'fs';
 import { pipeline } from 'stream/promises';
 import { Readable } from 'stream';
+import getPort from 'get-port';
 import { test as base } from './test';
 import { waitForMatch } from '../utils/streams';
 
@@ -34,6 +35,7 @@ interface WithAppOptions {
   setup?: (ctx: SetupContext) => Promise<void>;
   // Extra environment variables when running Toolpad
   env?: Record<string, string>;
+  port?: number;
 }
 
 /**
@@ -63,6 +65,8 @@ export async function withApp(
     if (options.toolpadDev) {
       args.push('--dev');
     }
+
+    args.push('--port', String(options.port || (await getPort())));
 
     if (cmd === 'start') {
       const buildArgs = ['build'];

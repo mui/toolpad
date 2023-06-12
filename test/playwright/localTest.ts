@@ -35,7 +35,6 @@ interface WithAppOptions {
   setup?: (ctx: SetupContext) => Promise<void>;
   // Extra environment variables when running Toolpad
   env?: Record<string, string>;
-  port?: number;
 }
 
 /**
@@ -47,6 +46,8 @@ export async function withApp(
 ) {
   const { cmd = 'start', template, setup, env } = options;
 
+  // Each test runs in its own temporary folder to avoid race conditions when running tests in parallel.
+  // It also avoids mutating the source code of the fixture while running the test.
   const tmpTestDir = await fs.mkdtemp(path.resolve(__dirname, './tmp-'));
 
   try {
@@ -66,7 +67,8 @@ export async function withApp(
       args.push('--dev');
     }
 
-    args.push('--port', String(options.port || (await getPort())));
+    // Run each test on its own port to avoid race conditions when running tests in parallel.
+    args.push('--port', String(await getPort()));
 
     if (cmd === 'start') {
       const buildArgs = ['build'];

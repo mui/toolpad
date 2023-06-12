@@ -369,9 +369,9 @@ function RenderedNodeContent({ node, childNodeGroups, Component }: RenderedNodeC
 
       const action = (node as appDom.ElementNode).props?.[key];
 
-      if (action?.type === 'navigationAction') {
+      if (action?.$navigationAction) {
         const handler = async () => {
-          const { page, parameters = {} } = action.value;
+          const { page, parameters = {} } = action.$navigationAction;
           if (page) {
             const parsedParameterEntries = await Promise.all(
               Object.keys(parameters).map(async (parameterName) => {
@@ -400,7 +400,7 @@ function RenderedNodeContent({ node, childNodeGroups, Component }: RenderedNodeC
 
       if (action?.$jsExpressionAction) {
         const handler = () => {
-          const code = action.value;
+          const code = action.$jsExpressionAction;
           const exprToEvaluate = `(async () => {${code}})()`;
           evaluatePageExpression(exprToEvaluate, scopeId, localScopeParams);
         };

@@ -93,7 +93,7 @@ function JsExpressionBindingEditor({
   onChange,
 }: JsExpressionBindingEditorProps) {
   const handleChange = React.useCallback(
-    (newValue: string) => onChange({ $$jsExpression: newValue }),
+    (newValue: string) => onChange({ $jsExpression: newValue }),
     [onChange],
   );
 
@@ -101,7 +101,7 @@ function JsExpressionBindingEditor({
     <JsExpressionEditor
       globalScope={globalScope}
       globalScopeMeta={globalScopeMeta}
-      value={value?.$$jsExpression || ''}
+      value={value?.$jsExpression || ''}
       onChange={handleChange}
       autoFocus
     />
@@ -139,7 +139,7 @@ export function EnvBindingEditor({ value, onChange }: EnvBindingEditorProps) {
   const handleInputChange = React.useCallback(
     (event: React.SyntheticEvent, newValue: string | null) => {
       onChange({
-        $$env: newValue || '',
+        $env: newValue || '',
       });
     },
     [onChange],
@@ -151,7 +151,7 @@ export function EnvBindingEditor({ value, onChange }: EnvBindingEditorProps) {
       <Autocomplete
         freeSolo
         options={envVarNames}
-        value={value?.$$env || ''}
+        value={value?.$env || ''}
         onInputChange={handleInputChange}
         renderInput={(params) => (
           <TextField
@@ -160,7 +160,7 @@ export function EnvBindingEditor({ value, onChange }: EnvBindingEditorProps) {
             sx={{ my: 3 }}
             label="Environment variable name"
             helperText={
-              value?.$$env && !envVarNames.includes(value.$$env)
+              value?.$env && !envVarNames.includes(value.$env)
                 ? 'Warning: This variable is not in your env file!'
                 : ''
             }
@@ -172,7 +172,7 @@ export function EnvBindingEditor({ value, onChange }: EnvBindingEditorProps) {
 }
 
 function getValueBindingTab(value: Maybe<BindableAttrValue<any>>) {
-  if (value?.$$env) {
+  if (value?.$env) {
     return 'env';
   }
 
@@ -225,7 +225,7 @@ export function ValueBindingEditor({ value, onChange }: ValueBindingEditorProps)
           globalScope={globalScope}
           globalScopeMeta={globalScopeMeta}
           value={
-            (value as JsExpressionAttrValue)?.$$jsExpression
+            (value as JsExpressionAttrValue)?.$jsExpression
               ? (value as JsExpressionAttrValue)
               : null
           }
@@ -253,7 +253,7 @@ export function ValueBindingEditor({ value, onChange }: ValueBindingEditorProps)
       </TabPanel>
       <TabPanel value="env" disableGutters>
         <EnvBindingEditor
-          value={(value as EnvAttrValue)?.$$env ? (value as EnvAttrValue) : null}
+          value={(value as EnvAttrValue)?.$env ? (value as EnvAttrValue) : null}
           onChange={onChange}
         />
       </TabPanel>
@@ -269,7 +269,7 @@ export interface JsExpressionActionEditorProps
 function JsExpressionActionEditor({ value, onChange }: JsExpressionActionEditorProps) {
   const { globalScope, globalScopeMeta } = useBindingEditorContext();
   const handleCodeChange = React.useCallback(
-    (newValue: string) => onChange({ $$jsExpressionAction: newValue }),
+    (newValue: string) => onChange({ $jsExpressionAction: newValue }),
     [onChange],
   );
 
@@ -292,7 +292,7 @@ function JsExpressionActionEditor({ value, onChange }: JsExpressionActionEditorP
           sx={{ flex: 1 }}
           globalScope={globalScope}
           globalScopeMeta={globalScopeMeta}
-          value={value?.$$jsExpressionAction || ''}
+          value={value?.$jsExpressionAction || ''}
           onChange={handleCodeChange}
           functionBody
           topLevelAwait
@@ -357,7 +357,7 @@ function NavigationActionEditor({ value, onChange }: NavigationActionEditorProps
       const defaultActionParameters = appDom.isPage(page) ? getDefaultActionParameters(page) : {};
 
       onChange({
-        $$navigationAction: {
+        $navigationAction: {
           page: appDom.ref(pageId),
           parameters: defaultActionParameters,
         },
@@ -366,10 +366,10 @@ function NavigationActionEditor({ value, onChange }: NavigationActionEditorProps
     [dom, getDefaultActionParameters, onChange],
   );
 
-  const actionPageRef = value?.$$navigationAction?.page || null;
+  const actionPageRef = value?.$navigationAction?.page || null;
   const actionParameters = React.useMemo(
-    () => value?.$$navigationAction.parameters || {},
-    [value?.$$navigationAction.parameters],
+    () => value?.$navigationAction.parameters || {},
+    [value?.$navigationAction.parameters],
   );
 
   const actionPageId = actionPageRef ? appDom.deref(actionPageRef) : null;
@@ -379,7 +379,7 @@ function NavigationActionEditor({ value, onChange }: NavigationActionEditorProps
     (actionParameterName: string) => (newValue: BindableAttrValue<string> | null) => {
       if (actionPageRef) {
         onChange({
-          $$navigationAction: {
+          $navigationAction: {
             page: actionPageRef,
             parameters: {
               ...actionParameters,
@@ -441,7 +441,7 @@ function NavigationActionEditor({ value, onChange }: NavigationActionEditorProps
 type BindableType = BindableAttrValue<any>['type'];
 
 function getActionTab(value: Maybe<BindableAttrValue<any>>) {
-  if (value?.$$navigationAction) {
+  if (value?.$navigationAction) {
     return 'navigationAction';
   }
 
@@ -469,13 +469,13 @@ function ActionEditor({ value, onChange }: ActionEditorProps) {
         </Box>
         <TabPanel value="jsExpressionAction" disableGutters>
           <JsExpressionActionEditor
-            value={value?.$$jsExpressionAction ? value : null}
+            value={value?.$jsExpressionAction ? value : null}
             onChange={onChange}
           />
         </TabPanel>
         <TabPanel value="navigationAction" disableGutters>
           <NavigationActionEditor
-            value={value?.$$navigationAction ? value : null}
+            value={value?.$navigationAction ? value : null}
             onChange={onChange}
           />
         </TabPanel>
@@ -508,9 +508,9 @@ export function BindingEditorDialog<V>({
   const handleSave = React.useCallback(() => {
     let newValue = input;
 
-    if ((input as JsExpressionAttrValue)?.$$jsExpression) {
+    if ((input as JsExpressionAttrValue)?.$jsExpression) {
       newValue = {
-        $$jsExpression: tryFormatExpression((input as JsExpressionAttrValue).$$jsExpression),
+        $jsExpression: tryFormatExpression((input as JsExpressionAttrValue).$jsExpression),
       };
     }
 
@@ -563,7 +563,7 @@ export function BindingEditorDialog<V>({
         ) : (
           <ValueBindingEditor
             value={
-              (input as JsExpressionAttrValue)?.$$jsExpression || (input as EnvAttrValue)?.$$env
+              (input as JsExpressionAttrValue)?.$jsExpression || (input as EnvAttrValue)?.$env
                 ? (input as JsExpressionAttrValue | EnvAttrValue)
                 : null
             }

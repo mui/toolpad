@@ -11,7 +11,7 @@ spec:
           name: typography
           props:
             value:
-              $$jsExpression: |
+              $jsExpression: |
                 `message: ${hello.data.message}`
   queries:
     - name: hello

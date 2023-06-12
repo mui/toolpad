@@ -78,7 +78,7 @@ function ConnectionEditorContent<P>({
             <ConnectionContextProvider value={connectionEditorContext}>
               <ConnectionParamsEditor
                 dataSource={dataSource}
-                value={connectionNode.attributes.params.$$secret}
+                value={connectionNode.attributes.params.$secret}
                 onChange={handleConnectionChange}
                 handlerBasePath={`/api/dataSources/${dataSourceId}`}
                 connectionId={connectionNode.id}

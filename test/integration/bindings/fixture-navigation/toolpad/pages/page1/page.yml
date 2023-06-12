@@ -11,12 +11,12 @@ spec:
           name: button
           props:
             onClick:
-              $$navigationAction:
+              $navigationAction:
                 page: au03sef
                 parameters:
                   abc: zyx
                   def:
-                    $$jsExpression: |
+                    $jsExpression: |
                       button.content
             content: goToPage2
   display: shell

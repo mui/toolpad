@@ -377,9 +377,9 @@ function RenderedNodeContent({ node, childNodeGroups, Component }: RenderedNodeC
               Object.keys(parameters).map(async (parameterName) => {
                 const parameterValue = parameters[parameterName];
 
-                if (parameterValue?.$$jsExpression) {
+                if (parameterValue?.$jsExpression) {
                   const result = await evaluatePageExpression(
-                    parameterValue.$$jsExpression,
+                    parameterValue.$jsExpression,
                     scopeId,
                     localScopeParams,
                   );
@@ -398,7 +398,7 @@ function RenderedNodeContent({ node, childNodeGroups, Component }: RenderedNodeC
         return [key, handler];
       }
 
-      if (action?.$$jsExpressionAction) {
+      if (action?.$jsExpressionAction) {
         const handler = () => {
           const code = action.value;
           const exprToEvaluate = `(async () => {${code}})()`;
@@ -561,11 +561,11 @@ const PageRootComponent = createComponent(PageRoot, {
  * Turns an object consisting of a nested structure of BindableAttrValues
  * into a flat array of relative paths associated with their value.
  * Example:
- *   { foo: { bar: 1 }, baz: [{ $$jsExpression: 'quux' }] }
+ *   { foo: { bar: 1 }, baz: [{ $jsExpression: 'quux' }] }
  *   =>
  *   [
  *    ['.foo.bar', 1],
- *    ['.baz[0]', { $$jsExpression: 'quux' }]
+ *    ['.baz[0]', { $jsExpression: 'quux' }]
  *   ]
  */
 function flattenNestedBindables(
@@ -599,7 +599,7 @@ function flattenNestedBindables(
  * Example bindingId: 'nodeId.params'
  * Example params:
  * {
- *  ["order", { $$jsExpression: 'form.value\n' }]
+ *  ["order", { $jsExpression: 'form.value\n' }]
  * }
  * Example result:
  * {
@@ -766,7 +766,7 @@ function parseBinding(
   if (bindingType === 'jsExpression') {
     return {
       scopePath,
-      expression: bindable.$$jsExpression,
+      expression: bindable.$jsExpression,
     };
   }
   return {
@@ -935,7 +935,7 @@ function parseBindings(
           } else if (bindingType === 'jsExpression') {
             parsedBindingsMap.set(bindingId, {
               scopePath,
-              expression: (bindable as JsExpressionAttrValue).$$jsExpression,
+              expression: (bindable as JsExpressionAttrValue).$jsExpression,
             });
           }
         }

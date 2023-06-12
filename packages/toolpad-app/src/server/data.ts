@@ -20,7 +20,7 @@ export async function getConnectionParams<P = unknown>(
     connectionId as NodeId,
     'connection',
   ) as appDom.ConnectionNode<P>;
-  return node.attributes.params.$$secret;
+  return node.attributes.params.$secret;
 }
 
 export async function setConnectionParams<P>(connectionId: NodeId, params: P): Promise<void> {

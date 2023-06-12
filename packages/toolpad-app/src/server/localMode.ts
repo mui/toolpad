@@ -544,7 +544,7 @@ function expandFromDom<N extends appDom.AppDomNode>(
     const templateProps = mapValues(templates, (subtree) =>
       subtree
         ? {
-            $$template: expandChildren(subtree, dom),
+            $template: expandChildren(subtree, dom),
           }
         : undefined,
     );
@@ -569,7 +569,7 @@ function isTemplate(bindableProp?: BindableProp): bindableProp is Template {
   return !!(
     bindableProp &&
     typeof bindableProp === 'object' &&
-    hasOwnProperty(bindableProp, '$$template')
+    hasOwnProperty(bindableProp, '$template')
   );
 }
 
@@ -597,7 +597,7 @@ function mergeElementIntoDom(
   }
 
   for (const [propName, templateProp] of Object.entries(templateProps)) {
-    for (const child of templateProp.$$template) {
+    for (const child of templateProp.$template) {
       dom = mergeElementIntoDom(dom, elmNode, propName, child);
     }
   }

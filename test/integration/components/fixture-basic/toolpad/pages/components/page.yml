@@ -24,7 +24,7 @@ spec:
         - component: codeComponent.MyComponent
           name: codeComponent_eb03t9a
           props:
-            msg: "1"
+            msg: '1'
     - component: PageRow
       name: pageRow5
       children:
@@ -67,7 +67,7 @@ spec:
           name: list
           props:
             renderItem:
-              $$template:
+              $template:
                 - component: PageRow
                   name: pageRow2
                   children:
@@ -75,7 +75,7 @@ spec:
                       name: button1
                       props:
                         content:
-                          $$jsExpression: |
+                          $jsExpression: |
                             `List Button ${i + 1}`
     - component: PageRow
       name: pageRow1
@@ -84,4 +84,4 @@ spec:
           name: text
           props:
             mode: markdown
-            value: "# markdown text"
+            value: '# markdown text'

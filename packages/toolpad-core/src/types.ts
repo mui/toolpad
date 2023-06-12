@@ -11,23 +11,23 @@ export interface NodeReference {
 }
 
 export interface JsExpressionAttrValue {
-  $$jsExpression: string;
+  $jsExpression: string;
 }
 
 export interface EnvAttrValue {
-  $$env: string;
+  $env: string;
 }
 
 export interface SecretAttrValue<V> {
-  $$secret: V;
+  $secret: V;
 }
 
 export interface JsExpressionAction {
-  $$jsExpressionAction: string;
+  $jsExpressionAction: string;
 }
 
 export interface NavigationAction<P = any> {
-  $$navigationAction: {
+  $navigationAction: {
     page: NodeReference;
     parameters?: BindableAttrValues<P>;
   };

@@ -11,7 +11,7 @@ spec:
           name: typography
           props:
             value:
-              $$jsExpression: |
+              $jsExpression: |
                 `query1: ${query1.data.args.query1_param1}`
     - component: PageRow
       name: pageRow1
@@ -21,7 +21,7 @@ spec:
           props:
             content: fetch query2
             onClick:
-              $$jsExpressionAction: "query2.fetch({value: 'query2_value' })"
+              $jsExpressionAction: "query2.fetch({value: 'query2_value' })"
     - component: PageRow
       name: pageRow2
       children:
@@ -29,7 +29,7 @@ spec:
           name: typography1
           props:
             value:
-              $$jsExpression: |
+              $jsExpression: |
                 `query2: ${query2.data?.json.value}`
     - component: PageRow
       name: pageRow3
@@ -38,7 +38,7 @@ spec:
           name: text
           props:
             value:
-              $$jsExpression: |
+              $jsExpression: |
                 queryWithTransform.data
     - component: PageRow
       name: pageRow4
@@ -47,7 +47,7 @@ spec:
           name: text1
           props:
             value:
-              $$jsExpression: >
+              $jsExpression: >
                 `query4 authorization:
                 ${queryWithEnv?.data.headers.Authorization}`
   queries:
@@ -58,14 +58,14 @@ spec:
         searchParams:
           - name: query1_param1
             value:
-              $$jsExpression: |
+              $jsExpression: |
                 parameters.param1
         headers: []
         method: GET
       parameters:
         - name: param1
           value:
-            $$jsExpression: |
+            $jsExpression: |
               "query1_value"
     - name: query2
       mode: mutation
@@ -76,7 +76,7 @@ spec:
         body:
           kind: raw
           content:
-            $$jsExpression: |
+            $jsExpression: |
               JSON.stringify(parameters)
           contentType: application/json
         method: POST
@@ -99,7 +99,7 @@ spec:
         headers:
           - name: Authorization
             value:
-              $$env: TEST_VAR
+              $env: TEST_VAR
         method: GET
         searchParams: []
         url: https://httpbin.org/get

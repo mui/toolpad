@@ -13,12 +13,12 @@ export function evaluateBindable<V>(
   bindable: BindableAttrValue<V> | null,
   globalScope: Record<string, unknown>,
 ): BindingEvaluationResult {
-  if ((bindable as JsExpressionAttrValue)?.$$jsExpression) {
-    return ctx.evaluateExpression((bindable as JsExpressionAttrValue).$$jsExpression, globalScope);
+  if ((bindable as JsExpressionAttrValue)?.$jsExpression) {
+    return ctx.evaluateExpression((bindable as JsExpressionAttrValue).$jsExpression, globalScope);
   }
 
-  if ((bindable as EnvAttrValue)?.$$env) {
-    return { value: process.env[(bindable as EnvAttrValue).$$env] };
+  if ((bindable as EnvAttrValue)?.$env) {
+    return { value: process.env[(bindable as EnvAttrValue).$env] };
   }
 
   if (bindable) {

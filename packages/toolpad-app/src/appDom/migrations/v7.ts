@@ -5,19 +5,19 @@ import * as v7LegacyAppDom from './types/v7Down';
 
 function updateBindingSyntax<V>(value: V): unknown {
   if ((value as v7LegacyAppDom.JsExpressionAttrValue)?.type === 'jsExpression') {
-    return { $$jsExpression: (value as v7LegacyAppDom.JsExpressionAttrValue).value };
+    return { $jsExpression: (value as v7LegacyAppDom.JsExpressionAttrValue).value };
   }
   if ((value as v7LegacyAppDom.EnvAttrValue)?.type === 'env') {
-    return { $$env: (value as v7LegacyAppDom.EnvAttrValue).value };
+    return { $env: (value as v7LegacyAppDom.EnvAttrValue).value };
   }
   if ((value as v7LegacyAppDom.JsExpressionAction)?.type === 'jsExpressionAction') {
-    return { $$jsExpressionAction: (value as v7LegacyAppDom.JsExpressionAction).value };
+    return { $jsExpressionAction: (value as v7LegacyAppDom.JsExpressionAction).value };
   }
   if ((value as v7LegacyAppDom.NavigationAction)?.type === 'navigationAction') {
-    return { $$navigationAction: (value as v7LegacyAppDom.NavigationAction).value };
+    return { $navigationAction: (value as v7LegacyAppDom.NavigationAction).value };
   }
   if ((value as v7LegacyAppDom.SecretAttrValue<V>)?.type === 'secret') {
-    return { $$secret: (value as v7LegacyAppDom.SecretAttrValue<V>).value };
+    return { $secret: (value as v7LegacyAppDom.SecretAttrValue<V>).value };
   }
   if ((value as v7LegacyAppDom.ConstantAttrValue<V>)?.type === 'const') {
     return updateBindingSyntax((value as v7LegacyAppDom.ConstantAttrValue<V>).value);

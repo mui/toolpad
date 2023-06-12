@@ -12,7 +12,7 @@ spec:
           props:
             label: select with options
             options:
-              $$jsExpression: >
+              $jsExpression: >
                 ["one", 2, { value: 3, label: "three" }, { value: 4 }, {
                 noValue: "foo" }]
             fullWidth: true

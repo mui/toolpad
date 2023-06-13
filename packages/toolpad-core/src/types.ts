@@ -377,6 +377,7 @@ export type RuntimeEvents = {
   screenUpdate: {};
   ready: {};
   pageNavigationRequest: { pageNodeId: NodeId };
+  vmUpdated: { vm: ApplicationVm };
 };
 
 export type RuntimeEvent = {
@@ -452,10 +453,20 @@ export interface JsRuntime {
   evaluateExpression(code: string, globalScope: Record<string, unknown>): BindingEvaluationResult;
 }
 
-export type LocalScopeParams = Record<string, unknown>;
+export type TemplateRenderer = (
+  scopeKey: string,
+  params: Record<string, unknown>,
+) => React.ReactNode;
 
-export interface TemplateScopeParams {
-  i: number;
+export interface RuntimeScope {
+  id: string;
+  parentScope?: RuntimeScope;
+  bindings: Record<string, BindingEvaluationResult<unknown>>;
+  values: Record<string, unknown>;
+  meta: ScopeMeta;
 }
 
-export type TemplateRenderer = ({ i }: TemplateScopeParams) => React.ReactNode;
+export interface ApplicationVm {
+  scopes: { [id in string]?: RuntimeScope };
+  bindingScopes: { [id in string]?: string };
+}

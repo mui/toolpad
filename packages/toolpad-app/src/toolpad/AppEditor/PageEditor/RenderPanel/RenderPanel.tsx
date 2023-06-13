@@ -9,7 +9,7 @@ import RenderOverlay from './RenderOverlay';
 import { NodeHashes } from '../../../../types';
 import useEvent from '../../../../utils/useEvent';
 import type { ToolpadBridge } from '../../../../canvas/ToolpadBridge';
-import { getBindingType, getBindingValue } from '../../../../bindings';
+import { getBindingType } from '../../../../bindings';
 
 const classes = {
   view: 'Toolpad_View',

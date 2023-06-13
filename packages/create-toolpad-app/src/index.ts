@@ -128,11 +128,11 @@ const scaffoldProject = async (absolutePath: string, installFlag: boolean): Prom
 
   const DEFAULT_GENERATED_GITIGNORE_FILE = '.gitignore';
   // eslint-disable-next-line no-console
-  console.log(`${chalk.blue('info')}  - Initializing package.json file`);
+  console.log(`${chalk.blue('info')} - Initializing package.json file`);
   await fs.writeFile(path.join(absolutePath, 'package.json'), JSON.stringify(packageJson, null, 2));
 
   // eslint-disable-next-line no-console
-  console.log(`${chalk.blue('info')}  - Initializing .gitignore file`);
+  console.log(`${chalk.blue('info')} - Initializing .gitignore file`);
   await fs.copyFile(
     path.resolve(__dirname, `./gitignoreTemplate`),
     path.join(absolutePath, DEFAULT_GENERATED_GITIGNORE_FILE),
@@ -140,11 +140,7 @@ const scaffoldProject = async (absolutePath: string, installFlag: boolean): Prom
 
   if (installFlag) {
     // eslint-disable-next-line no-console
-    console.log(
-      `${chalk.blue('info')} - Installing the following dependencies: ${chalk.magenta(
-        '@mui/toolpad',
-      )}`,
-    );
+    console.log(`${chalk.blue('info')} - Installing dependencies`);
     // eslint-disable-next-line no-console
     console.log();
 
@@ -184,7 +180,7 @@ const run = async () => {
     })
     .option('install', {
       type: 'boolean',
-      describe: 'Where to intall dependencies',
+      describe: 'Where to install dependencies',
       default: true,
     })
     .help().argv;

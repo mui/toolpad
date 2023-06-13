@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { Container, ContainerProps, Box, Stack, BoxProps } from '@mui/material';
 import { LoadingButton } from '@mui/lab';
-import { createComponent, useNode } from '@mui/toolpad-core';
+import { ArgTypeDefinitions, createComponent, useNode } from '@mui/toolpad-core';
 import { useForm, FieldValues, ValidationMode, FieldError, Controller } from 'react-hook-form';
 import * as _ from 'lodash-es';
 import { SX_PROP_HELPER_TEXT } from './constants.js';
@@ -184,7 +184,7 @@ interface UseFormInputInput<V> {
   onChange: (newValue: V) => void;
   emptyValue?: V;
   defaultValue?: V;
-  validationProps: FormInputValidationProps;
+  validationProps: Partial<FormInputValidationProps>;
 }
 
 interface UseFormInputPayload<V> {
@@ -214,7 +214,9 @@ export function useFormInput<V>({
 
   const formInputDisplayName = label || fieldName || 'Field';
 
-  const formInputError = formInputName && form?.formState.errors[formInputName];
+  const formInputError = formInputName
+    ? (form?.formState.errors[formInputName] as FieldError)
+    : undefined;
 
   const [componentFormValue, setComponentFormValue] = React.useState({});
 
@@ -329,7 +331,7 @@ export function useFormInput<V>({
   };
 }
 
-export const FORM_INPUT_VALIDATION_ARG_TYPES = {
+export const FORM_INPUT_VALIDATION_ARG_TYPES: ArgTypeDefinitions<FormInputValidationProps> = {
   isRequired: {
     helperText: 'Whether the input is required to have a value.',
     type: 'boolean',

@@ -99,7 +99,7 @@ function Autocomplete({
       {...rest}
       {...(formInputError && {
         error: Boolean(formInputError),
-        helperText: formInputError?.message || '',
+        helperText: formInputError.message || '',
       })}
     />
   );
@@ -149,7 +149,12 @@ export default createComponent(Autocomplete, {
       helperText: 'If true, the autocomplete will be disabled.',
       type: 'boolean',
     },
-    ..._.pick(FORM_INPUT_VALIDATION_ARG_TYPES, ['required', 'minLength', 'maxLength', 'isInvalid']),
+    ..._.pick(FORM_INPUT_VALIDATION_ARG_TYPES, [
+      'isRequired',
+      'minLength',
+      'maxLength',
+      'isInvalid',
+    ]),
     sx: {
       helperText: SX_PROP_HELPER_TEXT,
       type: 'object',

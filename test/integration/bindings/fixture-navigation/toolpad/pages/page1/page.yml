@@ -11,7 +11,7 @@ spec:
           name: button
           props:
             onClick:
-              $navigationAction:
+              $$navigationAction:
                 page:
                   $ref: au03sef
                 parameters:

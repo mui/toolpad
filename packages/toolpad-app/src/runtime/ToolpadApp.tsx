@@ -327,7 +327,7 @@ function flattenNestedBindables(
  * Example bindingId: 'nodeId.params'
  * Example params:
  * {
- * ["order", { $jsExpression: 'form.value\n' }]
+ * ["order", { $$jsExpression: 'form.value\n' }]
  * }
  * Example result:
  * {
@@ -490,7 +490,7 @@ function parseBindings(
                 Array.isArray(value) ? `[${nestedPropName}]` : `.${nestedPropName}`
               }`;
 
-              if (getBindingType(nestedProp) !== 'const') {
+              if (nestedProp && getBindingType(nestedProp) !== 'const') {
                 parsedBindingsMap.set(nestedBindingId, parseBinding(nestedProp));
               } else {
                 parseNestedBindings(

@@ -84,7 +84,7 @@ export function JsExpressionEditor({
           .map(([propKey, propValue]) => {
             return `${propKey}: ${propValue.replaceAll(
               /\bThisComponent\b/g,
-              `RootObject[${JSON.stringify(key)}]`,
+              () => `RootObject[${JSON.stringify(key)}]`,
             )}`;
           })
           .join('\n')} 

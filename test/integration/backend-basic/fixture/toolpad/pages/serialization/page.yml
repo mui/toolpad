@@ -45,4 +45,4 @@ spec:
           props:
             value:
               $$jsExpression: |
-                `Invalid error: ${invalidError.error.message}`
+                `Invalid error: ${invalidError.error?.message}`

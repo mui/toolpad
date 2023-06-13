@@ -39,7 +39,7 @@ import {
   ResponseType,
   Theme,
   themeSchema,
-  LATEST_API_VERSION,
+  API_VERSION,
 } from './schema';
 import { format } from '../utils/prettier';
 import {
@@ -52,7 +52,6 @@ import { ProjectEvents, ToolpadProjectOptions } from '../types';
 import { Awaitable } from '../utils/types';
 import EnvManager from './EnvManager';
 import FunctionsManager from './FunctionsManager';
-import { migratePageUp } from './pageMigrations';
 
 export function getUserProjectRoot(): string {
   const { projectDir } = config;
@@ -171,12 +170,7 @@ async function loadPagesFromFiles(root: string): Promise<PagesContent> {
           return null;
         }
 
-        const migratedParsedFile = migratePageUp(parsedFile!);
-        if (migratedParsedFile.apiVersion !== parsedFile!.apiVersion) {
-          await updateYamlFile(filePath, migratedParsedFile);
-        }
-
-        const result = pageSchema.safeParse(migratedParsedFile);
+        const result = pageSchema.safeParse(parsedFile);
         if (result.success) {
           return [pageName, result.data];
         }
@@ -510,7 +504,7 @@ function expandFromDom<N extends appDom.AppDomNode>(
     const children = appDom.getChildNodes(dom, node);
 
     return {
-      apiVersion: LATEST_API_VERSION,
+      apiVersion: API_VERSION,
       kind: 'page',
       spec: {
         id: node.id,
@@ -821,7 +815,7 @@ function extractThemeContentFromDom(dom: appDom.AppDom): Theme | null {
   const { themes = [] } = appDom.getChildNodes(dom, app);
   if (themes[0]?.theme) {
     return {
-      apiVersion: LATEST_API_VERSION,
+      apiVersion: API_VERSION,
       kind: 'theme',
       spec: {
         'palette.mode': appDom.fromConstPropValue(themes[0].theme['palette.mode']),

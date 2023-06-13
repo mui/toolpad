@@ -1,4 +1,4 @@
-apiVersion: v2
+apiVersion: v1
 kind: page
 spec:
   id: f703ps3

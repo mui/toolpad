@@ -1,11 +1,11 @@
 import { z } from 'zod';
 
-export const LATEST_API_VERSION = 'v2';
+export const API_VERSION = 'v1';
 
 function toolpadObjectSchema<K extends string, T extends z.ZodType>(kind: K, spec: T) {
   return z.object({
     apiVersion: z
-      .union([z.literal('v1'), z.literal('v2')])
+      .literal('v1')
       .describe(
         `Defines the version of this object. Used in determining compatibility between Toolpad "${kind}" objects.`,
       ),

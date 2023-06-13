@@ -6,10 +6,7 @@
       "properties": {
         "apiVersion": {
           "type": "string",
-          "enum": [
-            "v1",
-            "v2"
-          ],
+          "const": "v1",
           "description": "Defines the version of this object. Used in determining compatibility between Toolpad \"page\" objects."
         },
         "kind": {
@@ -368,10 +365,7 @@
       "properties": {
         "apiVersion": {
           "type": "string",
-          "enum": [
-            "v1",
-            "v2"
-          ],
+          "const": "v1",
           "description": "Defines the version of this object. Used in determining compatibility between Toolpad \"theme\" objects."
         },
         "kind": {

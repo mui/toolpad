@@ -58,7 +58,7 @@ export default function RenderPanel({ className }: RenderPanelProps) {
         }
 
         const newValue: unknown =
-          typeof event.value === 'function' ? event.value(actual?.value) : event.value;
+          typeof event.value === 'function' ? event.value(actual) : event.value;
 
         draft = appDom.setNodeNamespacedProp(draft, node, 'props', event.prop, newValue);
 

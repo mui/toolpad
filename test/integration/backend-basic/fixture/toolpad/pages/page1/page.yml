@@ -11,7 +11,7 @@ spec:
           name: typography
           props:
             value:
-              $jsExpression: |
+              $$jsExpression: |
                 `hello, message: ${hello.data.message}`
     - component: PageRow
       name: pageRow1
@@ -20,7 +20,7 @@ spec:
           name: typography1
           props:
             value:
-              $jsExpression: |
+              $$jsExpression: |
                 `throws, error.message: ${throws.error.message}`
     - component: PageRow
       name: pageRow2
@@ -29,7 +29,7 @@ spec:
           name: typography2
           props:
             value:
-              $jsExpression: |
+              $$jsExpression: |
                 `throws, data ${throws.data}`
     - component: PageRow
       name: pageRow3
@@ -38,7 +38,7 @@ spec:
           name: dataGrid
           props:
             rows:
-              $jsExpression: |
+              $$jsExpression: |
                 throws.data
     - component: PageRow
       name: pageRow4
@@ -47,7 +47,7 @@ spec:
           name: typography3
           props:
             value:
-              $jsExpression: |
+              $$jsExpression: |
                 `echo, parameter: ${echo.data.params.foo}`
     - component: PageRow
       name: pageRow6
@@ -56,13 +56,13 @@ spec:
           name: typography4
           props:
             value:
-              $jsExpression: |
+              $$jsExpression: |
                 `echo, secret: ${echo.data.secrets.bar}`
         - component: Text
           name: typography5
           props:
             value:
-              $jsExpression: |
+              $$jsExpression: |
                 `echo, secret not in .env: ${echo.data.secrets.baz}`
     - component: PageRow
       name: pageRow5
@@ -71,7 +71,7 @@ spec:
           name: text5
           props:
             value:
-              $jsExpression: |
+              $$jsExpression: |
                 edited.data
     - component: PageRow
       name: pageRow8
@@ -83,7 +83,7 @@ spec:
             size: medium
             content: Run Manual Query
             onClick:
-              $jsExpressionAction: manualQuery.call()
+              $$jsExpressionAction: manualQuery.call()
     - component: PageRow
       name: pageRow9
       children:
@@ -91,7 +91,7 @@ spec:
           name: text1
           props:
             value:
-              $jsExpression: |
+              $$jsExpression: |
                 `destination: ${manualQuery.data?.parameters?.foo}`
     - component: PageRow
       name: pageRow7
@@ -101,14 +101,14 @@ spec:
           props:
             content: increment
             onClick:
-              $jsExpressionAction: |-
+              $$jsExpressionAction: |-
                 await increment.call()
                 getGlobal.refetch()
         - component: Text
           name: text
           props:
             value:
-              $jsExpression: |
+              $$jsExpression: |
                 `global value: ${getGlobal.data}`
   queries:
     - name: hello
@@ -126,7 +126,7 @@ spec:
       parameters:
         - name: foo
           value:
-            $jsExpression: |
+            $$jsExpression: |
               "bound foo parameter"
     - name: edited
       query:
@@ -144,7 +144,7 @@ spec:
       parameters:
         - name: foo
           value:
-            $jsExpression: |
+            $$jsExpression: |
               "checksum"
     - name: increment
       mode: mutation

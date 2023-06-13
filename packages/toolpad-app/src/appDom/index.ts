@@ -240,7 +240,7 @@ export function createId(): NodeId {
 }
 
 export function createSecret<V>(value: V): SecretAttrValue<V> {
-  return { $secret: value };
+  return { $$secret: value };
 }
 
 export function getMaybeNode<T extends AppDomNodeType>(
@@ -862,7 +862,7 @@ export function fromConstPropValue<T>(prop?: BindableAttrValue<T | undefined>): 
   if (!prop) {
     return undefined;
   }
-  if ((prop as JsExpressionAttrValue).$jsExpression || (prop as EnvAttrValue).$env) {
+  if ((prop as JsExpressionAttrValue).$$jsExpression || (prop as EnvAttrValue).$$env) {
     throw new Error(`trying to unbox a non-constant prop value`);
   }
   return prop as T;

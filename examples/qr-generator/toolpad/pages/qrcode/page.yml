@@ -20,7 +20,7 @@ spec:
           name: qrcodeDisplay
           props:
             src:
-              $jsExpression: |
+              $$jsExpression: |
                 qrImage.data
             fit: none
   queries:
@@ -31,5 +31,5 @@ spec:
       parameters:
         - name: content
           value:
-            $jsExpression: |
+            $$jsExpression: |
               input.value

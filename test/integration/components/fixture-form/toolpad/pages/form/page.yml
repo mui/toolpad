@@ -13,7 +13,7 @@ spec:
           props:
             hasResetButton: true
             onSubmit:
-              $jsExpressionAction: button.content = 'Submitted'
+              $$jsExpressionAction: button.content = 'Submitted'
           children:
             - component: PageRow
               name: pageRow1
@@ -46,7 +46,7 @@ spec:
                           - option 2
                           - option 3
                         isInvalid:
-                          $jsExpression: |
+                          $$jsExpression: |
                             select.value === "option 1"
                     - component: FilePicker
                       name: filePicker
@@ -60,7 +60,7 @@ spec:
           name: text
           props:
             value:
-              $jsExpression: |
+              $$jsExpression: |
                 `My form data: ${JSON.stringify(form.value || {})}`
     - component: PageRow
       name: pageRow3

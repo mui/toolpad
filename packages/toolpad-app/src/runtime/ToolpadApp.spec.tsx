@@ -91,7 +91,7 @@ test(`simple databinding`, async () => {
 
     const text = appDom.createNode(dom, 'element', {
       attributes: { component: 'Text' },
-      props: { value: { $jsExpression: 'theTextInput.value' } },
+      props: { value: { $$jsExpression: 'theTextInput.value' } },
     });
     dom = appDom.addNode(dom, text, page, 'children');
 
@@ -118,7 +118,7 @@ test(`default Value for binding`, async () => {
       attributes: { component: 'Select' },
       props: {
         label: 'The select',
-        options: { $jsExpression: 'undefined' },
+        options: { $$jsExpression: 'undefined' },
       },
     });
     dom = appDom.addNode(dom, select, page, 'children');
@@ -148,28 +148,28 @@ test(`Databinding errors`, async () => {
     renderPage((dom, page) => {
       nonExisting = appDom.createNode(dom, 'element', {
         attributes: { component: 'Text' },
-        props: { value: { $jsExpression: 'nonExisting.foo' } },
+        props: { value: { $$jsExpression: 'nonExisting.foo' } },
       });
       dom = appDom.addNode(dom, nonExisting, page, 'children');
 
       selfReferencing = appDom.createNode(dom, 'element', {
         name: 'selfReferencing',
         attributes: { component: 'Text' },
-        props: { value: { $jsExpression: 'selfReferencing.value' } },
+        props: { value: { $$jsExpression: 'selfReferencing.value' } },
       });
       dom = appDom.addNode(dom, selfReferencing, page, 'children');
 
       cyclic1 = appDom.createNode(dom, 'element', {
         name: 'cyclic1',
         attributes: { component: 'Text' },
-        props: { value: { $jsExpression: 'cyclic2.value' } },
+        props: { value: { $$jsExpression: 'cyclic2.value' } },
       });
       dom = appDom.addNode(dom, cyclic1, page, 'children');
 
       cyclic2 = appDom.createNode(dom, 'element', {
         name: 'cyclic2',
         attributes: { component: 'Text' },
-        props: { value: { $jsExpression: 'cyclic1.value' } },
+        props: { value: { $$jsExpression: 'cyclic1.value' } },
       });
       dom = appDom.addNode(dom, cyclic2, page, 'children');
 

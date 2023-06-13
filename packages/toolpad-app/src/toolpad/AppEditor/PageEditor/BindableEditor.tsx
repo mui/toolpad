@@ -64,7 +64,7 @@ export default function BindableEditor<V>({
     }
 
     if (valueBindingType && valueBindingType === 'env') {
-      return (value as EnvAttrValue).$env;
+      return (value as EnvAttrValue).$$env;
     }
 
     return liveBinding?.value;

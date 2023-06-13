@@ -16,19 +16,19 @@ type BindingType =
   | 'secret';
 
 export function getBindingType<V>(binding: BindableAttrValue<V>): BindingType {
-  if ((binding as JsExpressionAttrValue).$jsExpression) {
+  if ((binding as JsExpressionAttrValue).$$jsExpression) {
     return 'jsExpression';
   }
-  if ((binding as EnvAttrValue).$env) {
+  if ((binding as EnvAttrValue).$$env) {
     return 'env';
   }
-  if ((binding as JsExpressionAction).$jsExpressionAction) {
+  if ((binding as JsExpressionAction).$$jsExpressionAction) {
     return 'jsExpressionAction';
   }
-  if ((binding as NavigationAction).$navigationAction) {
+  if ((binding as NavigationAction).$$navigationAction) {
     return 'navigationAction';
   }
-  if ((binding as SecretAttrValue<V>).$secret) {
+  if ((binding as SecretAttrValue<V>).$$secret) {
     return 'secret';
   }
   return 'const';
@@ -41,20 +41,20 @@ export function getBindingValue<V>(binding: BindableAttrValue<V>):
       page: string;
       parameters?: Record<string, unknown>;
     } {
-  if ((binding as JsExpressionAttrValue).$jsExpression) {
-    return (binding as JsExpressionAttrValue).$jsExpression;
+  if ((binding as JsExpressionAttrValue).$$jsExpression) {
+    return (binding as JsExpressionAttrValue).$$jsExpression;
   }
-  if ((binding as EnvAttrValue).$env) {
-    return (binding as EnvAttrValue).$env;
+  if ((binding as EnvAttrValue).$$env) {
+    return (binding as EnvAttrValue).$$env;
   }
-  if ((binding as JsExpressionAction).$jsExpressionAction) {
-    return (binding as JsExpressionAction).$jsExpressionAction;
+  if ((binding as JsExpressionAction).$$jsExpressionAction) {
+    return (binding as JsExpressionAction).$$jsExpressionAction;
   }
-  if ((binding as NavigationAction).$navigationAction) {
-    return (binding as NavigationAction).$navigationAction;
+  if ((binding as NavigationAction).$$navigationAction) {
+    return (binding as NavigationAction).$$navigationAction;
   }
-  if ((binding as SecretAttrValue<V>).$secret) {
-    return (binding as SecretAttrValue<V>).$secret;
+  if ((binding as SecretAttrValue<V>).$$secret) {
+    return (binding as SecretAttrValue<V>).$$secret;
   }
   return binding as V;
 }

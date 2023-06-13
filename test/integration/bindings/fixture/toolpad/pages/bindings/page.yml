@@ -12,7 +12,7 @@ spec:
           props:
             value: -test1-
             sx:
-              $jsExpression: |
+              $$jsExpression: |
                 { color: "primary.main", p: 2 }
     - component: PageRow
       name: pageRow1
@@ -21,5 +21,5 @@ spec:
           name: text1
           props:
             sx:
-              $jsExpression: '{'
+              $$jsExpression: "{"
             value: -test2-

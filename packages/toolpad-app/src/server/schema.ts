@@ -32,13 +32,13 @@ function nameValuePairSchema<V extends z.ZodTypeAny>(valueType: V) {
 
 export const jsExpressionBindingSchema = z
   .object({
-    $jsExpression: z.string().describe('The expression to be evaluated.'),
+    $$jsExpression: z.string().describe('The expression to be evaluated.'),
   })
   .describe('A binding that evaluates an expression and returns the result.');
 
 export const envBindingSchema = z
   .object({
-    $env: z.string().describe('The name of an environment variable.'),
+    $$env: z.string().describe('The name of an environment variable.'),
   })
   .describe('An environment variable.');
 
@@ -48,13 +48,13 @@ function bindableSchema<V extends z.ZodTypeAny>(valueType: V) {
 
 const jsExpressionActionSchema = z
   .object({
-    $jsExpressionAction: z.string().describe('The code to be executed.'),
+    $$jsExpressionAction: z.string().describe('The code to be executed.'),
   })
   .describe('A javascript expression to be executed when this action is triggered.');
 
 const navigationActionSchema = z
   .object({
-    $navigationAction: z.object({
+    $$navigationAction: z.object({
       page: z.string().describe('The page that is being navigated to'),
       parameters: z
         .record(bindableSchema(z.any()))
@@ -187,14 +187,14 @@ const querySchema = z.object({
 export type Query = z.infer<typeof querySchema>;
 
 export type Template = {
-  $template: ElementType[];
+  $$template: ElementType[];
 };
 
 let elementSchema: z.ZodType<ElementType>;
 
 const templateSchema: z.ZodType<Template> = z
   .object({
-    $template: z
+    $$template: z
       .lazy(() => z.array(elementSchema))
       .describe('The subtree, that describes the UI to be rendered by the template.'),
   })

@@ -17,7 +17,7 @@ spec:
                 parameters:
                   abc: zyx
                   def:
-                    $jsExpression: |
+                    $$jsExpression: |
                       button.content
             content: goToPage2
   display: shell

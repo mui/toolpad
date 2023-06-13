@@ -22,7 +22,7 @@ test.use({
 
 test('functions basics', async ({ page }) => {
   const runtimeModel = new ToolpadRuntime(page, { prod: true });
-  await runtimeModel.gotoPage('page1');
+  await runtimeModel.gotoPage('basic');
 
   await expect(page.locator('text="hello, message: hello world"')).toBeVisible();
   await expect(page.locator('text="throws, error.message: BOOM!"')).toBeVisible();

@@ -134,7 +134,7 @@ const scaffoldProject = async (absolutePath: string, installFlag: boolean): Prom
   // eslint-disable-next-line no-console
   console.log(`${chalk.blue('info')}  - Initializing .gitignore file`);
   await fs.copyFile(
-    path.resolve(__dirname, `./${DEFAULT_GENERATED_GITIGNORE_FILE}`),
+    path.resolve(__dirname, `./gitignoreTemplate`),
     path.join(absolutePath, DEFAULT_GENERATED_GITIGNORE_FILE),
   );
 

@@ -7,6 +7,7 @@ import chalk from 'chalk';
 import { glob } from 'glob';
 import * as fs from 'fs/promises';
 import { writeFileRecursive, fileExists } from '@mui/toolpad-utils/fs';
+import { ExecFetchResult } from '@mui/toolpad-core';
 import EnvManager from './EnvManager';
 import { ProjectEvents, ToolpadProjectOptions } from '../types';
 import { createWorker as createDevWorker } from './functionsDevWorker';
@@ -196,7 +197,11 @@ export default class FunctionsManager {
     });
   }
 
-  async exec(fileName: string, name: string, parameters: Record<string, unknown>) {
+  async exec(
+    fileName: string,
+    name: string,
+    parameters: Record<string, unknown>,
+  ): Promise<ExecFetchResult<unknown>> {
     await this.initPromise;
     const resourcesFolder = this.getResourcesFolder();
     const fullPath = path.resolve(resourcesFolder, fileName);
@@ -213,7 +218,9 @@ export default class FunctionsManager {
       throw new Error(`No build found for "${fileName}"`);
     }
 
-    return this.devWorker.execute(outputFilePath, name, parameters);
+    const data = await this.devWorker.execute(outputFilePath, name, parameters);
+
+    return { data };
   }
 
   async introspect() {

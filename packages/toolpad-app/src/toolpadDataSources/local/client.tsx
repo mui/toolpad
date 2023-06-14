@@ -43,7 +43,7 @@ function QueryEditor({
 
   const functionName: string | undefined = input.attributes.query.value.function;
 
-  const allOPtions = React.useMemo(() => {
+  const allOptions = React.useMemo(() => {
     return (introspection.data?.files ?? []).flatMap((file) => {
       return file.handlers.map((handler) => ({
         ...handler,
@@ -53,13 +53,10 @@ function QueryEditor({
   }, [introspection.data?.files]);
 
   const selectedOption = React.useMemo(() => {
-    return allOPtions.find((handler) => handler.name === functionName);
-  }, [allOPtions, functionName]);
+    return allOptions.find((handler) => handler.name === functionName);
+  }, [allOptions, functionName]);
 
   const parameterDefs = Object.fromEntries(selectedOption?.parameters || []);
-  const spreadParameters: string[] | undefined = selectedOption?.isCreateFunction
-    ? selectedOption?.parameters?.map(([key]) => key)
-    : undefined;
 
   const paramsEntries = input.params?.filter(([key]) => !!parameterDefs[key]) || EMPTY_PARAMS;
 
@@ -80,8 +77,9 @@ function QueryEditor({
 
   const fetchPrivate = useFetchPrivate<LocalPrivateQuery, FetchResult>();
   const fetchServerPreview = React.useCallback(
-    (query: LocalQuery, params: Record<string, string>) =>
-      fetchPrivate({ kind: 'debugExec', query, params }),
+    (query: LocalQuery, params: Record<string, string>) => {
+      return fetchPrivate({ kind: 'debugExec', query, params });
+    },
     [fetchPrivate],
   );
 
@@ -120,18 +118,15 @@ function QueryEditor({
         <Stack gap={2} sx={{ px: 3, pt: 1 }}>
           <Stack gap={2} direction="row">
             <Autocomplete
-              value={selectedOption}
+              value={selectedOption || null}
               onChange={(event, newValue) => {
                 setInput((draft) => {
-                  draft = appDom.setQueryProp(draft, 'function', newValue?.name ?? undefined);
-                  draft = appDom.setQueryProp(draft, 'spreadParameters', spreadParameters);
-                  draft = appDom.setQueryProp(draft, 'file', selectedOption?.file ?? undefined);
-                  return draft;
+                  return appDom.setQueryProp(draft, 'function', newValue?.name ?? undefined);
                 });
               }}
               loading={introspection.isLoading}
               getOptionLabel={(option) => option.name}
-              options={allOPtions}
+              options={allOptions}
               selectOnFocus
               clearOnBlur
               handleHomeEndKeys

@@ -125,11 +125,7 @@ function asUnionTypes(type: ts.Type): ts.Type[] {
   return type.isUnion() ? type.types : [type];
 }
 
-function toJsonSchema(
-  tsType: ts.Type,
-  checker: ts.TypeChecker,
-  sourceFile: ts.SourceFile,
-): JSONSchema7 | null {
+function toJsonSchema(tsType: ts.Type, checker: ts.TypeChecker): JSONSchema7 | null {
   if (
     hasTypeFlag(tsType, ts.TypeFlags.Undefined) ||
     hasTypeFlag(tsType, ts.TypeFlags.Void) ||
@@ -172,11 +168,11 @@ function toJsonSchema(
     }
 
     if (withoutUndefined.length === 1) {
-      return toJsonSchema(withoutUndefined[0], checker, sourceFile);
+      return toJsonSchema(withoutUndefined[0], checker);
     }
 
     for (const type of withoutUndefined) {
-      const itemType = toJsonSchema(type, checker, sourceFile);
+      const itemType = toJsonSchema(type, checker);
 
       if (itemType) {
         if (enumValues && itemType.const) {
@@ -241,7 +237,7 @@ function toJsonSchema(
       let items: JSONSchema7 | undefined;
       const indexType = tsType.getNumberIndexType();
       if (indexType) {
-        items = toJsonSchema(indexType, checker, sourceFile) ?? undefined;
+        items = toJsonSchema(indexType, checker) ?? undefined;
       }
 
       return {
@@ -262,7 +258,7 @@ function toJsonSchema(
         if (!isOptional) {
           required.push(propertyName);
         }
-        const propertySchema = toJsonSchema(propertyType, checker, sourceFile);
+        const propertySchema = toJsonSchema(propertyType, checker);
         return propertySchema ? [[propertyName, propertySchema]] : [];
       }),
     );
@@ -276,7 +272,6 @@ function toJsonSchema(
 function getParameters(
   callSignatures: readonly ts.Signature[],
   checker: ts.TypeChecker,
-  sourceFile: ts.SourceFile,
 ): [string, PrimitiveValueType][] {
   invariant(callSignatures.length > 0, 'Expected at least 1 call signature');
 
@@ -284,7 +279,7 @@ function getParameters(
     .getParameters()
     .map((parameter) => {
       const paramType = checker.getTypeOfSymbolAtLocation(parameter, parameter.valueDeclaration!);
-      const schema = toJsonSchema(paramType, checker, sourceFile);
+      const schema = toJsonSchema(paramType, checker);
       return [
         parameter.getName(),
         {
@@ -299,11 +294,7 @@ function getParameters(
   return paramEntries;
 }
 
-function getAwaitedType(
-  type: ts.Type,
-  checker: ts.TypeChecker,
-  sourceFile: ts.SourceFile,
-): ts.Type {
+function getAwaitedType(type: ts.Type, checker: ts.TypeChecker): ts.Type {
   const awaitedType = type.getNonNullableType();
   const then = awaitedType.getProperty('then');
   if (hasTypeFlag(awaitedType, ts.TypeFlags.Object) && then) {
@@ -318,7 +309,7 @@ function getAwaitedType(
           const [value] = onFulfilledCallSignature.getParameters();
           if (value) {
             const valueType = checker.getTypeOfSymbolAtLocation(value, value.valueDeclaration!);
-            return getAwaitedType(valueType, checker, sourceFile);
+            return getAwaitedType(valueType, checker);
           }
         }
       }
@@ -342,25 +333,21 @@ function isToolpadCreateFunction(exportType: ts.Type): boolean {
   return false;
 }
 
-function getReturnType(
-  callSignatures: readonly ts.Signature[],
-  checker: ts.TypeChecker,
-  sourceFile: ts.SourceFile,
-) {
+function getReturnType(callSignatures: readonly ts.Signature[], checker: ts.TypeChecker) {
   invariant(callSignatures.length > 0, 'Expected at least 1 call signature');
 
   const returnType = callSignatures[0].getReturnType();
 
-  const awaitedReturnType = getAwaitedType(returnType, checker, sourceFile);
+  const awaitedReturnType = getAwaitedType(returnType, checker);
 
   return {
-    schema: toJsonSchema(awaitedReturnType, checker, sourceFile),
+    schema: toJsonSchema(awaitedReturnType, checker),
   };
 }
 
 let introspectionResult: IntrospectionResult = { files: [] };
 
-async function generateTypes(resourcesFolder: string) {
+export async function extractTypes(resourcesFolder: string): Promise<IntrospectionResult> {
   const entryPoints = await glob(path.join(resourcesFolder, './*.ts'));
 
   const program = ts.createProgram(entryPoints, {
@@ -410,8 +397,8 @@ async function generateTypes(resourcesFolder: string) {
         {
           name: symbol.name,
           isCreateFunction,
-          parameters: getParameters(callSignatures, checker, sourceFile),
-          returnType: getReturnType(callSignatures, checker, sourceFile),
+          parameters: getParameters(callSignatures, checker),
+          returnType: getReturnType(callSignatures, checker),
         } satisfies HandlerIntrospectionResult,
       ];
     });
@@ -428,17 +415,17 @@ async function generateTypes(resourcesFolder: string) {
     } satisfies FileIntrospectionResult;
   });
 
-  introspectionResult = { files };
-
-  parentPort?.postMessage({
-    event: 'notify',
-    payload: {},
-  } satisfies WorkerEventMessage<WorkerEvents>);
+  return { files };
 }
 
 async function doWork({ resourcesFolder }: TypesWorkerData) {
-  const handleChange = debounce(() => {
-    generateTypes(resourcesFolder);
+  const handleChange = debounce(async () => {
+    introspectionResult = await extractTypes(resourcesFolder);
+
+    parentPort?.postMessage({
+      event: 'notify',
+      payload: {},
+    } satisfies WorkerEventMessage<WorkerEvents>);
   }, 50);
 
   chokidar.watch(resourcesFolder).on('add', handleChange);

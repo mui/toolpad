@@ -14,11 +14,9 @@ async function exec(
     throw new Error('Missing function name');
   }
   const { data, error } = await project.functionsManager.exec(
-    fetchQuery.file || 'functions.ts',
+    'functions.ts',
     fetchQuery.function,
-    fetchQuery.spreadParameters
-      ? fetchQuery.spreadParameters.map((name) => parameters[name])
-      : [{ parameters }],
+    parameters,
   );
   return { data, error };
 }

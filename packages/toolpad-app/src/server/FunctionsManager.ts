@@ -7,12 +7,16 @@ import chalk from 'chalk';
 import { glob } from 'glob';
 import * as fs from 'fs/promises';
 import { writeFileRecursive, fileExists } from '@mui/toolpad-utils/fs';
+import invariant from 'invariant';
 import EnvManager from './EnvManager';
 import { ProjectEvents, ToolpadProjectOptions } from '../types';
 import { createWorker as createDevWorker } from './functionsDevWorker';
-import { createWorker as createTypesWorker } from './functionsTypesWorker';
-
-const EXPERIMENTAL_USE_EXTRACTED_TYPES = false;
+import {
+  IntrospectionResult,
+  createWorker as createTypesWorker,
+  extractTypes,
+} from './functionsTypesWorker';
+import { Awaitable } from '../utils/types';
 
 const DEFAULT_FUNCTIONS_FILE_CONTENT = `// Toolpad queries:
 
@@ -67,6 +71,8 @@ export default class FunctionsManager {
   private typesWorker: ReturnType<typeof createTypesWorker>;
 
   private initPromise: Promise<void>;
+
+  private extractedTypes: Awaitable<IntrospectionResult> | undefined;
 
   // eslint-disable-next-line class-methods-use-this
   private setInitialized: () => void = () => {
@@ -128,6 +134,13 @@ export default class FunctionsManager {
 
     const entryPoints = await this.getFunctionFiles();
 
+    const onFunctionBuildStart = async () => {
+      this.extractedTypes = extractTypes(this.getResourcesFolder()).catch((error) => ({
+        error,
+        files: [],
+      }));
+    };
+
     const onFunctionsBuildEnd = async (args: esbuild.BuildResult<esbuild.BuildOptions>) => {
       // TODO: use for hot reloading
       // eslint-disable-next-line no-console
@@ -136,6 +149,13 @@ export default class FunctionsManager {
           args.warnings.length
         } warning(s)`,
       );
+
+      invariant(
+        this.extractedTypes,
+        'this.extractedTypes should have been initialized during build.onStart',
+      );
+
+      await this.extractedTypes;
 
       this.buildErrors = args.errors;
 
@@ -149,9 +169,8 @@ export default class FunctionsManager {
     const toolpadPlugin: esbuild.Plugin = {
       name: 'toolpad',
       setup(build) {
-        build.onEnd((args) => {
-          onFunctionsBuildEnd(args);
-        });
+        build.onStart(onFunctionBuildStart);
+        build.onEnd(onFunctionsBuildEnd);
       },
     };
 
@@ -206,8 +225,14 @@ export default class FunctionsManager {
     });
   }
 
-  async exec(fileName: string, name: string, parameters: unknown[]) {
+  async exec(fileName: string, name: string, parameters: Record<string, unknown>) {
     await this.initPromise;
+
+    invariant(
+      this.extractedTypes,
+      'this.extractedTypes should have been initialized during build.onStart',
+    );
+
     const resourcesFolder = this.getResourcesFolder();
     const fullPath = path.resolve(resourcesFolder, fileName);
     const entryPoint = path.relative(this.project.getRoot(), fullPath);
@@ -223,11 +248,29 @@ export default class FunctionsManager {
       throw new Error(`No build found for "${fileName}"`);
     }
 
-    return this.devWorker.execute(outputFilePath, name, parameters);
+    const extractedTypes = await this.extractedTypes;
+    const file = extractedTypes.files.find((fileEntry) => fileEntry.name === fileName);
+    const handler = file?.handlers.find((handlerEntry) => handlerEntry.name === name);
+
+    if (!handler) {
+      throw new Error(`No function found with the name "${name}"`);
+    }
+
+    const executeParams = handler.isCreateFunction
+      ? [{ parameters }]
+      : handler.parameters.map(([parameterName]) => parameters[parameterName]);
+
+    return this.devWorker.execute(outputFilePath, name, executeParams);
   }
 
-  async introspect() {
+  async introspect(): Promise<IntrospectionResult> {
     await this.initPromise;
+
+    invariant(
+      this.extractedTypes,
+      'this.extractedTypes should have been initialized before initPromise resolves',
+    );
+
     const functionFiles = await this.getFunctionFiles();
     const outputFiles = new Map(
       functionFiles.flatMap((functionFile) => {
@@ -236,12 +279,45 @@ export default class FunctionsManager {
       }),
     );
 
-    const [runtimeIntrospection, introspection] = await Promise.all([
-      this.devWorker.introspect(outputFiles),
-      this.typesWorker.api.introspect(),
-    ]);
+    const [runtimeIntrospection] = await Promise.all([this.devWorker.introspect(outputFiles)]);
 
-    return EXPERIMENTAL_USE_EXTRACTED_TYPES ? introspection : runtimeIntrospection;
+    const extractedTypes = await this.extractedTypes;
+
+    const extractedFilesMap = new Map(extractedTypes.files.map((file) => [file.name, file]));
+
+    /**
+     * We extract handler information out of the runtime (legacy) and out of the extracted types.
+     * When a function is created through createfunction, we use the runtime handler information.
+     * Over time we will migrate all functions to use the extracted types.
+     */
+    const merged: IntrospectionResult = {
+      files: runtimeIntrospection.files.map((runtimeFile) => {
+        const extractedFile = extractedFilesMap.get(runtimeFile.name);
+
+        if (extractedFile) {
+          const extractedHandlerMap = new Map(
+            extractedFile.handlers.map((handler) => [handler.name, handler]),
+          );
+
+          return {
+            ...runtimeFile,
+            handlers: runtimeFile.handlers.map((runtimeHandler) => {
+              const extractedHandler = extractedHandlerMap.get(runtimeHandler.name);
+
+              if (!runtimeHandler.isCreateFunction && extractedHandler) {
+                return extractedHandler;
+              }
+
+              return runtimeHandler;
+            }),
+          };
+        }
+
+        return runtimeFile;
+      }),
+    };
+
+    return merged;
   }
 
   async initQueriesFile(): Promise<void> {

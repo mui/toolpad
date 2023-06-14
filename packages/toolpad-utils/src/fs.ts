@@ -89,7 +89,7 @@ export async function fileReplace(
   replaceValue: string,
 ): Promise<void> {
   const queriesFileContent = await fs.readFile(filePath, { encoding: 'utf-8' });
-  const updatedFileContent = queriesFileContent.replace(searchValue, replaceValue);
+  const updatedFileContent = queriesFileContent.replace(searchValue, () => replaceValue);
   await fs.writeFile(filePath, updatedFileContent);
 }
 
@@ -99,6 +99,6 @@ export async function fileReplaceAll(
   replaceValue: string,
 ) {
   const queriesFileContent = await fs.readFile(filePath, { encoding: 'utf-8' });
-  const updatedFileContent = queriesFileContent.replaceAll(searchValue, replaceValue);
+  const updatedFileContent = queriesFileContent.replaceAll(searchValue, () => replaceValue);
   await fs.writeFile(filePath, updatedFileContent);
 }

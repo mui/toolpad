@@ -5,6 +5,8 @@ import { ToolpadRuntime } from '../../models/ToolpadRuntime';
 import { ToolpadEditor } from '../../models/ToolpadEditor';
 import { waitForMatch } from '../../utils/streams';
 
+const BASIC_TESTS_PAGE_ID = '5q1xd0t';
+
 test.use({
   ignoreConsoleErrors: [
     // Chrome:
@@ -49,7 +51,7 @@ test('functions basics', async ({ page }) => {
 
 test('function editor reload', async ({ page, localApp }) => {
   const editorModel = new ToolpadEditor(page);
-  await editorModel.goto();
+  await editorModel.goToPageById(BASIC_TESTS_PAGE_ID);
 
   await expect(editorModel.appCanvas.getByText('edited hello')).toBeVisible();
 
@@ -61,7 +63,7 @@ test('function editor reload', async ({ page, localApp }) => {
 
 test('function editor parameters update', async ({ page, localApp }) => {
   const editorModel = new ToolpadEditor(page);
-  await editorModel.goto();
+  await editorModel.goToPageById(BASIC_TESTS_PAGE_ID);
 
   await editorModel.componentEditor.getByRole('button', { name: 'withParams' }).click();
 

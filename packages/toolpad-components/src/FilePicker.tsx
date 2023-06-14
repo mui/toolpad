@@ -68,7 +68,7 @@ function FilePicker({
     onFormInputChange(files);
   };
 
-  const filePickerElement = (
+  return renderFormInput(
     <MuiTextField
       {...rest}
       type="file"
@@ -80,10 +80,8 @@ function FilePicker({
         error: Boolean(formInputError),
         helperText: formInputError.message || '',
       })}
-    />
+    />,
   );
-
-  return renderFormInput(filePickerElement);
 }
 
 export default createComponent(FilePicker, {

@@ -62,7 +62,7 @@ function Select({
     [id, options],
   );
 
-  const selectElement = (
+  return renderFormInput(
     <TextField
       {...rest}
       value={value}
@@ -76,10 +76,8 @@ function Select({
       })}
     >
       {renderedOptions}
-    </TextField>
+    </TextField>,
   );
-
-  return renderFormInput(selectElement);
 }
 
 export default createComponent(Select, {

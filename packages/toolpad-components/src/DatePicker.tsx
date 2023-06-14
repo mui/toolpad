@@ -126,31 +126,29 @@ function DatePicker({
     [defaultValueProp],
   );
 
-  const datePickerElement = (
-    <DesktopDatePicker<dayjs.Dayjs>
-      {...rest}
-      format={format || 'L'}
-      value={value || null}
-      onChange={handleChange}
-      defaultValue={defaultValue}
-      slotProps={{
-        textField: {
-          fullWidth: rest.fullWidth,
-          variant: rest.variant,
-          size: rest.size,
-          sx: rest.sx,
-          ...(formInputError && {
-            error: Boolean(formInputError),
-            helperText: formInputError.message || '',
-          }),
-        },
-      }}
-    />
-  );
-
   return (
     <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale={adapterLocale}>
-      {renderFormInput(datePickerElement)}
+      {renderFormInput(
+        <DesktopDatePicker<dayjs.Dayjs>
+          {...rest}
+          format={format || 'L'}
+          value={value || null}
+          onChange={handleChange}
+          defaultValue={defaultValue}
+          slotProps={{
+            textField: {
+              fullWidth: rest.fullWidth,
+              variant: rest.variant,
+              size: rest.size,
+              sx: rest.sx,
+              ...(formInputError && {
+                error: Boolean(formInputError),
+                helperText: formInputError.message || '',
+              }),
+            },
+          }}
+        />,
+      )}
     </LocalizationProvider>
   );
 }

@@ -46,7 +46,7 @@ function TextField({
     [onFormInputChange],
   );
 
-  const textFieldElement = (
+  return renderFormInput(
     <MuiTextField
       value={value}
       onChange={handleChange}
@@ -55,10 +55,8 @@ function TextField({
         error: Boolean(formInputError),
         helperText: formInputError.message || '',
       })}
-    />
+    />,
   );
-
-  return renderFormInput(textFieldElement);
 }
 
 export default createComponent(TextField, {

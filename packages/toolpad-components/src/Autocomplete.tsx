@@ -88,7 +88,7 @@ function Autocomplete({
     }
   }, [value]);
 
-  const autocompleteElement = (
+  return renderFormInput(
     <MuiAutocomplete
       onChange={handleChange}
       options={options ?? []}
@@ -101,10 +101,8 @@ function Autocomplete({
         error: Boolean(formInputError),
         helperText: formInputError.message || '',
       })}
-    />
+    />,
   );
-
-  return renderFormInput(autocompleteElement);
 }
 
 export default createComponent(Autocomplete, {

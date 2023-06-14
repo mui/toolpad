@@ -6,9 +6,9 @@ import * as chokidar from 'chokidar';
 import chalk from 'chalk';
 import { glob } from 'glob';
 import * as fs from 'fs/promises';
+import { writeFileRecursive, fileExists } from '@mui/toolpad-utils/fs';
 import EnvManager from './EnvManager';
 import { ProjectEvents, ToolpadProjectOptions } from '../types';
-import { writeFileRecursive, fileExists } from '../utils/fs';
 import { createWorker as createDevWorker } from './functionsDevWorker';
 import { createWorker as createTypesWorker } from './functionsTypesWorker';
 

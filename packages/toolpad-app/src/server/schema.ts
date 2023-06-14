@@ -1,4 +1,3 @@
-import { BindableAttrValue } from '@mui/toolpad-core';
 import { z } from 'zod';
 
 export const API_VERSION = 'v1';

@@ -28,9 +28,6 @@ export function getBindingType<V>(binding: BindableAttrValue<V>): BindingType {
   if ((binding as NavigationAction).$$navigationAction) {
     return 'navigationAction';
   }
-  if ((binding as SecretAttrValue<V>).$$secret) {
-    return 'secret';
-  }
   return 'const';
 }
 
@@ -52,9 +49,6 @@ export function getBindingValue<V>(binding: BindableAttrValue<V>):
   }
   if ((binding as NavigationAction).$$navigationAction) {
     return (binding as NavigationAction).$$navigationAction;
-  }
-  if ((binding as SecretAttrValue<V>).$$secret) {
-    return (binding as SecretAttrValue<V>).$$secret;
   }
   return binding as V;
 }

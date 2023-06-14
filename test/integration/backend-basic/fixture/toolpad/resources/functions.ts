@@ -63,3 +63,27 @@ export async function increment() {
 export async function getGlobal() {
   return x;
 }
+
+interface Circular {
+  a?: Circular;
+}
+
+export async function circularData() {
+  const a: Circular = {};
+  a.a = a;
+  return a;
+}
+
+export async function nonCircularData() {
+  const a = { b: 'hello' };
+  return { a1: a, a2: a };
+}
+
+export async function functionData() {
+  return { a() {} };
+}
+
+export async function invalidError() {
+  // Yes, I'm throwing a function here
+  throw function Hello() {};
+}

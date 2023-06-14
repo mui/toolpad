@@ -9,6 +9,7 @@ import * as fs from 'fs/promises';
 import { writeFileRecursive, fileExists } from '@mui/toolpad-utils/fs';
 import invariant from 'invariant';
 import Piscina from 'piscina';
+import { ExecFetchResult } from '@mui/toolpad-core';
 import EnvManager from './EnvManager';
 import { ProjectEvents, ToolpadProjectOptions } from '../types';
 import { createWorker as createDevWorker } from './functionsDevWorker';
@@ -225,7 +226,11 @@ export default class FunctionsManager {
     });
   }
 
-  async exec(fileName: string, name: string, parameters: Record<string, unknown>) {
+  async exec(
+    fileName: string,
+    name: string,
+    parameters: Record<string, unknown>,
+  ): Promise<ExecFetchResult<unknown>> {
     await this.initPromise;
 
     invariant(
@@ -260,7 +265,9 @@ export default class FunctionsManager {
       ? [{ parameters }]
       : handler.parameters.map(([parameterName]) => parameters[parameterName]);
 
-    return this.devWorker.execute(outputFilePath, name, executeParams);
+    const data = this.devWorker.execute(outputFilePath, name, executeParams);
+
+    return { data };
   }
 
   async introspect(): Promise<IntrospectionResult> {

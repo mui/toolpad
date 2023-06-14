@@ -7,13 +7,32 @@ import * as vm from 'vm';
 import * as url from 'url';
 import { CreateFunctionConfig, TOOLPAD_FUNCTION } from '@mui/toolpad-core';
 import fetch, { Headers, Request, Response } from 'node-fetch';
-import { errorFrom } from '@mui/toolpad-utils/errors';
+import { errorFrom, serializeError } from '@mui/toolpad-utils/errors';
 import invariant from 'invariant';
 import type {
   FileIntrospectionResult,
   HandlerIntrospectionResult,
   IntrospectionResult,
 } from './functionsTypesWorker';
+
+function getCircularReplacer() {
+  const ancestors: object[] = [];
+  return function replacer(this: object, key: string, value: unknown) {
+    if (typeof value !== 'object' || value === null) {
+      return value;
+    }
+    // `this` is the object that value is contained in,
+    // i.e., its direct parent.
+    while (ancestors.length > 0 && ancestors.at(-1) !== this) {
+      ancestors.pop();
+    }
+    if (ancestors.includes(value)) {
+      return '[Circular]';
+    }
+    ancestors.push(value);
+    return value;
+  };
+}
 
 type IntrospectedFiles = Map<string, { file: string }>;
 
@@ -146,9 +165,9 @@ if (!isMainThread && parentPort) {
     (async () => {
       try {
         const result = await handleMessage(msg);
-        msg.port.postMessage(result);
+        msg.port.postMessage({ result: JSON.stringify(result, getCircularReplacer()) });
       } catch (rawError) {
-        msg.port.postMessage({ error: errorFrom(rawError) });
+        msg.port.postMessage({ error: serializeError(errorFrom(rawError)) });
       }
     })();
   });
@@ -162,8 +181,13 @@ export function createWorker(env: Record<string, any>) {
   const runOnWorker = async (msg: WorkerMessage) => {
     const { port1, port2 } = new MessageChannel();
     worker.postMessage({ port: port1, ...msg } satisfies TransferredMessage, [port1]);
-    const [value] = await once(port2, 'message');
-    return value;
+    const [{ error, result }] = await once(port2, 'message');
+
+    if (error) {
+      throw errorFrom(error);
+    }
+
+    return JSON.parse(result);
   };
 
   return {
@@ -188,3 +212,8 @@ export function createWorker(env: Record<string, any>) {
     },
   };
 }
+
+process.on('unhandledRejection', (error) => {
+  console.error(error);
+  process.exit(1);
+});

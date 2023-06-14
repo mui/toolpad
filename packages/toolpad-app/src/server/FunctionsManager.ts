@@ -11,11 +11,7 @@ import invariant from 'invariant';
 import EnvManager from './EnvManager';
 import { ProjectEvents, ToolpadProjectOptions } from '../types';
 import { createWorker as createDevWorker } from './functionsDevWorker';
-import {
-  IntrospectionResult,
-  createWorker as createTypesWorker,
-  extractTypes,
-} from './functionsTypesWorker';
+import { IntrospectionResult, extractTypes } from './functionsTypesWorker';
 import { Awaitable } from '../utils/types';
 
 const DEFAULT_FUNCTIONS_FILE_CONTENT = `// Toolpad queries:
@@ -68,8 +64,6 @@ export default class FunctionsManager {
 
   private devWorker: ReturnType<typeof createDevWorker>;
 
-  private typesWorker: ReturnType<typeof createTypesWorker>;
-
   private initPromise: Promise<void>;
 
   private extractedTypes: Awaitable<IntrospectionResult> | undefined;
@@ -85,7 +79,6 @@ export default class FunctionsManager {
       this.setInitialized = resolve;
     });
     this.devWorker = createDevWorker({ ...process.env });
-    this.typesWorker = createTypesWorker({ resourcesFolder: this.getResourcesFolder() });
 
     this.startDev();
   }

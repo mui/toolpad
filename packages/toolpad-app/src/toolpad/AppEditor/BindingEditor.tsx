@@ -358,7 +358,7 @@ function NavigationActionEditor({ value, onChange }: NavigationActionEditorProps
 
       onChange({
         $$navigationAction: {
-          page: appDom.ref(pageId),
+          page: pageId,
           parameters: defaultActionParameters,
         },
       });
@@ -366,21 +366,20 @@ function NavigationActionEditor({ value, onChange }: NavigationActionEditorProps
     [dom, getDefaultActionParameters, onChange],
   );
 
-  const actionPageRef = value?.$$navigationAction?.page || null;
+  const actionPageId = value?.$$navigationAction?.page || null;
   const actionParameters = React.useMemo(
     () => value?.$$navigationAction.parameters || {},
     [value?.$$navigationAction.parameters],
   );
 
-  const actionPageId = actionPageRef ? appDom.deref(actionPageRef) : null;
   const actionPage = pages.find((availablePage) => availablePage.id === actionPageId);
 
   const handleActionParameterChange = React.useCallback(
     (actionParameterName: string) => (newValue: BindableAttrValue<string> | null) => {
-      if (actionPageRef) {
+      if (actionPageId) {
         onChange({
           $$navigationAction: {
-            page: actionPageRef,
+            page: actionPageId,
             parameters: {
               ...actionParameters,
               ...(newValue ? { [actionParameterName]: newValue } : {}),
@@ -389,7 +388,7 @@ function NavigationActionEditor({ value, onChange }: NavigationActionEditorProps
         });
       }
     },
-    [actionPageRef, actionParameters, onChange],
+    [actionPageId, actionParameters, onChange],
   );
 
   const hasPagesAvailable = pages.length > 0;

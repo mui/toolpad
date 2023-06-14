@@ -1,3 +1,4 @@
+import { BindableAttrValue } from '@mui/toolpad-core';
 import { z } from 'zod';
 
 export const API_VERSION = 'v1';
@@ -15,11 +16,6 @@ function toolpadObjectSchema<K extends string, T extends z.ZodType>(kind: K, spe
 }
 
 const literalSchema = z.union([z.string(), z.number(), z.boolean(), z.null()]);
-type Literal = z.infer<typeof literalSchema>;
-type Json = Literal | { [key: string]: Json } | Json[];
-export const jsonSchema: z.ZodType<Json> = z
-  .lazy(() => z.union([...literalSchema.options, z.array(jsonSchema), z.record(jsonSchema)]))
-  .describe('A JSON compatible value, anything that is serializable to JSON.');
 
 function nameValuePairSchema<V extends z.ZodTypeAny>(valueType: V) {
   return z
@@ -226,14 +222,21 @@ const baseElementSchema = z.object({
 
 type BaseElement = z.infer<typeof baseElementSchema>;
 
-export const bindablePropSchema = z.union([
-  jsonSchema,
-  jsExpressionBindingSchema,
-  envBindingSchema,
-  jsExpressionActionSchema,
-  navigationActionSchema,
-  templateSchema,
-]);
+export const bindablePropSchema: z.ZodType = z.lazy(() =>
+  z.union([
+    ...literalSchema.options,
+    z.array(bindablePropSchema),
+    z.record(
+      z.string().refine((key) => !key.startsWith('$$')),
+      bindablePropSchema,
+    ),
+    jsExpressionBindingSchema,
+    envBindingSchema,
+    jsExpressionActionSchema,
+    navigationActionSchema,
+    templateSchema,
+  ]),
+);
 
 export type BindableProp = z.infer<typeof bindablePropSchema>;
 
@@ -306,7 +309,6 @@ export const META = {
     Theme: themeSchema,
   },
   definitions: {
-    Json: jsonSchema,
     JsExpressionBinding: jsExpressionBindingSchema,
     EnvBinding: envBindingSchema,
     JsExpressionAction: jsExpressionActionSchema,

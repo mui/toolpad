@@ -1006,7 +1006,7 @@ function RenderedNodeContent({ node, childNodeGroups, Component }: RenderedNodeC
 
             const parsedParameters = Object.fromEntries(parsedParameterEntries);
 
-            navigateToPage(appDom.deref(page), parsedParameters);
+            navigateToPage(page, parsedParameters);
           }
         };
 

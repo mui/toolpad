@@ -28,7 +28,7 @@ export interface JsExpressionAction {
 
 export interface NavigationAction<P = any> {
   $$navigationAction: {
-    page: NodeReference;
+    page: string;
     parameters?: BindableAttrValues<P>;
   };
 }

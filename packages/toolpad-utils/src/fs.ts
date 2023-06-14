@@ -102,3 +102,7 @@ export async function fileReplaceAll(
   const updatedFileContent = queriesFileContent.replaceAll(searchValue, () => replaceValue);
   await fs.writeFile(filePath, updatedFileContent);
 }
+
+export async function removeWholeFolder(pagepath:string){
+  await fs.rm(pagepath, { recursive: true})
+}

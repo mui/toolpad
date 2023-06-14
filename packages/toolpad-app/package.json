@@ -108,6 +108,7 @@
     "perf-cascade": "3.0.3",
     "pg": "8.11.0",
     "pino": "8.14.1",
+    "piscina": "4.0.0",
     "prettier": "2.8.8",
     "pretty-bytes": "6.1.0",
     "react": "18.2.0",

@@ -8,10 +8,11 @@ import { glob } from 'glob';
 import * as fs from 'fs/promises';
 import { writeFileRecursive, fileExists } from '@mui/toolpad-utils/fs';
 import invariant from 'invariant';
+import Piscina from 'piscina';
 import EnvManager from './EnvManager';
 import { ProjectEvents, ToolpadProjectOptions } from '../types';
 import { createWorker as createDevWorker } from './functionsDevWorker';
-import { IntrospectionResult, extractTypes } from './functionsTypesWorker';
+import type { ExtractTypesParams, IntrospectionResult } from './functionsTypesWorker';
 import { Awaitable } from '../utils/types';
 
 const DEFAULT_FUNCTIONS_FILE_CONTENT = `// Toolpad queries:
@@ -68,6 +69,8 @@ export default class FunctionsManager {
 
   private extractedTypes: Awaitable<IntrospectionResult> | undefined;
 
+  private extractTypesWorker: Piscina;
+
   // eslint-disable-next-line class-methods-use-this
   private setInitialized: () => void = () => {
     throw new Error('setInitialized should be initialized');
@@ -79,7 +82,9 @@ export default class FunctionsManager {
       this.setInitialized = resolve;
     });
     this.devWorker = createDevWorker({ ...process.env });
-
+    this.extractTypesWorker = new Piscina({
+      filename: path.join(__dirname, 'functionsTypesWorker.js'),
+    });
     this.startDev();
   }
 
@@ -128,10 +133,12 @@ export default class FunctionsManager {
     const entryPoints = await this.getFunctionFiles();
 
     const onFunctionBuildStart = async () => {
-      this.extractedTypes = extractTypes(this.getResourcesFolder()).catch((error) => ({
-        error,
-        files: [],
-      }));
+      this.extractedTypes = this.extractTypesWorker
+        .run({ resourcesFolder: this.getResourcesFolder() } satisfies ExtractTypesParams)
+        .catch((error) => ({
+          error,
+          files: [],
+        }));
     };
 
     const onFunctionsBuildEnd = async (args: esbuild.BuildResult<esbuild.BuildOptions>) => {

@@ -1,16 +1,11 @@
 import invariant from 'invariant';
 import * as path from 'path';
-import chokidar from 'chokidar';
-import { Worker, isMainThread, workerData, parentPort } from 'worker_threads';
 import * as ts from 'typescript';
 import { glob } from 'glob';
 import chalk from 'chalk';
 import { JSONSchema7, JSONSchema7TypeName, JSONSchema7Type } from 'json-schema';
 import { asArray } from '@mui/toolpad-utils/collections';
-import { Emitter } from '@mui/toolpad-utils/events';
-import { debounce } from 'lodash-es';
 import { PrimitiveValueType } from '@mui/toolpad-core';
-import { createWorkerApi, serveWorkerApi } from './workerRpc';
 
 export interface ReturnTypeIntrospectionResult {
   schema: JSONSchema7 | null;
@@ -46,19 +41,6 @@ export interface TypesWorkerData {
   resourcesFolder: string;
 }
 
-interface CreateWorkerParams extends TypesWorkerData {
-  resourcesFolder: string;
-}
-
-type WorkerEvents = {
-  notify: {};
-};
-
-type WorkerEventMessage<T> = {
-  event: keyof T;
-  payload: T[keyof T];
-};
-
 const NULL_PROP_VALUE: PrimitiveValueType = {
   type: 'object',
   schema: { type: 'null' },
@@ -87,24 +69,6 @@ function propValueFromJsonSchema(schema: JSONSchema7 | null): PrimitiveValueType
     default:
       return { type: schema.type, schema };
   }
-}
-
-export function createWorker({ resourcesFolder }: CreateWorkerParams) {
-  invariant(isMainThread, 'createWorker() must be called from the main thread');
-
-  const worker = new Worker(path.join(__dirname, 'functionsTypesWorker.js'), {
-    workerData: { resourcesFolder } satisfies TypesWorkerData,
-  });
-
-  const events = new Emitter<WorkerEvents>();
-  worker.on('message', (msg: WorkerEventMessage<WorkerEvents>) =>
-    events.emit(msg.event, msg.payload),
-  );
-
-  return {
-    api: createWorkerApi<WorkerApi>(worker),
-    events,
-  };
 }
 
 function formatDiagnostic(diagnostic: ts.Diagnostic): string {
@@ -345,9 +309,13 @@ function getReturnType(callSignatures: readonly ts.Signature[], checker: ts.Type
   };
 }
 
-let introspectionResult: IntrospectionResult = { files: [] };
+export interface ExtractTypesParams {
+  resourcesFolder: string;
+}
 
-export async function extractTypes(resourcesFolder: string): Promise<IntrospectionResult> {
+export default async function extractTypes({
+  resourcesFolder,
+}: ExtractTypesParams): Promise<IntrospectionResult> {
   const entryPoints = await glob(path.join(resourcesFolder, './*.ts'));
 
   const program = ts.createProgram(entryPoints, {
@@ -416,29 +384,4 @@ export async function extractTypes(resourcesFolder: string): Promise<Introspecti
   });
 
   return { files };
-}
-
-async function doWork({ resourcesFolder }: TypesWorkerData) {
-  const handleChange = debounce(async () => {
-    introspectionResult = await extractTypes(resourcesFolder);
-
-    parentPort?.postMessage({
-      event: 'notify',
-      payload: {},
-    } satisfies WorkerEventMessage<WorkerEvents>);
-  }, 50);
-
-  chokidar.watch(resourcesFolder).on('add', handleChange);
-  chokidar.watch(resourcesFolder).on('unlink', handleChange);
-  chokidar.watch(resourcesFolder).on('change', handleChange);
-
-  serveWorkerApi<WorkerApi>({
-    async introspect() {
-      return introspectionResult;
-    },
-  });
-}
-
-if (!isMainThread) {
-  doWork(workerData);
 }

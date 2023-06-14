@@ -1149,3 +1149,59 @@ export function getQueryByName(dom: AppDom, page: PageNode, name: string): Query
   const { queries = [] } = getChildNodes(dom, page);
   return queries.find((query) => query.name === name) ?? null;
 }
+
+/**
+ * Represents the changes between two doms in terms of added/deleted nodes.
+ */
+export interface DomDiff {
+  set: AppDomNode[];
+  unset: NodeId[];
+}
+
+/**
+ * Compare two doms and return a diff of the changes.
+ */
+export function createDiff(from: AppDom, to: AppDom): DomDiff {
+  const result: DomDiff = {
+    set: [],
+    unset: [],
+  };
+
+  const allIds = new Set<NodeId>([
+    ...(Object.keys(from.nodes) as NodeId[]),
+    ...(Object.keys(to.nodes) as NodeId[]),
+  ]);
+
+  for (const id of allIds) {
+    if (to.nodes[id] && to.nodes[id] !== from.nodes[id]) {
+      result.set.push(to.nodes[id]);
+    } else if (!to.nodes[id] && from.nodes[id]) {
+      result.unset.push(id);
+    }
+  }
+
+  return result;
+}
+
+/**
+ * Apply a diff to a dom and return the new dom.
+ */
+export function applyDiff(dom: AppDom, diff: DomDiff): AppDom {
+  let result = dom;
+
+  for (const node of diff.set) {
+    result = update(result, {
+      nodes: update(result.nodes, {
+        [node.id]: node,
+      }),
+    });
+  }
+
+  for (const id of diff.unset) {
+    result = update(result, {
+      nodes: omit(result.nodes, id),
+    });
+  }
+
+  return result;
+}

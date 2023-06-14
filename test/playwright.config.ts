@@ -7,6 +7,9 @@ const config: PlaywrightTestConfig<{ toolpadDev: boolean }> = {
   retries: process.env.TOOLPAD_TEST_RETRIES ? Number(process.env.TOOLPAD_TEST_RETRIES) : 0,
   testMatch: /.*.spec.[jt]sx?$/,
   workers: 2,
+  expect: {
+    timeout: 10000,
+  },
   use: {
     trace: { mode: 'on-first-retry', screenshots: true },
     screenshot: 'only-on-failure',

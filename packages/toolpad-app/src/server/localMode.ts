@@ -19,7 +19,7 @@ import {
   readMaybeDir,
   updateYamlFile,
   fileExists,
-  removeWholeFolder
+  removeWholeFolder,
 } from '@mui/toolpad-utils/fs';
 import config from '../config';
 import * as appDom from '../appDom';
@@ -936,15 +936,15 @@ function extractThemeContentFromDom(dom: appDom.AppDom): Theme | null {
 async function writeDomToDisk(dom: appDom.AppDom, oldDom?: appDom.AppDom): Promise<void> {
   const root = getUserProjectRoot();
   const { pages: pagesContent } = extractPagesFromDom(dom);
-  if(oldDom) {
+  if (oldDom) {
     const { pages: oldpagesContent } = extractPagesFromDom(oldDom);
-    const pagelist = Object.keys(oldpagesContent)
+    const pagelist = Object.keys(oldpagesContent);
     for await (const page of pagelist) {
-      const pagepath = getPageFolder(root, page)
-      await removeWholeFolder(pagepath)
+      const pagepath = getPageFolder(root, page);
+      await removeWholeFolder(pagepath);
     }
   }
-  
+
   await Promise.all([writePagesToFiles(root, pagesContent)]);
 }
 
@@ -1236,7 +1236,7 @@ class ToolpadProject {
     }
 
     return this.domAndFingerprintLock.use(async () => {
-      const oldDom = await this.loadDom()
+      const oldDom = await this.loadDom();
       await writeDomToDisk(newDom, oldDom);
       const newFingerprint = await calculateDomFingerprint(this.root);
       this.domAndFingerprint = [newDom, newFingerprint];

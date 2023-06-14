@@ -103,6 +103,6 @@ export async function fileReplaceAll(
   await fs.writeFile(filePath, updatedFileContent);
 }
 
-export async function removeWholeFolder(pagepath:string){
-  await fs.rm(pagepath, { recursive: true})
+export async function removeWholeFolder(pagepath: string) {
+  await fs.rm(pagepath, { recursive: true });
 }

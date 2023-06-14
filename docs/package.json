@@ -1,6 +1,6 @@
 {
   "name": "docs",
-  "version": "0.1.14",
+  "version": "0.1.15",
   "private": true,
   "author": "MUI Toolpad",
   "license": "MIT",
@@ -27,7 +27,7 @@
     "@emotion/server": "11.11.0",
     "@emotion/styled": "11.11.0",
     "@mui/icons-material": "5.11.16",
-    "@mui/material": "5.13.4",
+    "@mui/material": "5.13.5",
     "@mui/monorepo": "https://github.com/mui/material-ui.git",
     "@mui/styles": "5.13.2",
     "@mui/utils": "5.13.1",

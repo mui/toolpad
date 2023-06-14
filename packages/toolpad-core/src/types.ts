@@ -248,10 +248,33 @@ export interface ParameterTypeLookup {
   event: (...args: any[]) => void;
 }
 
-export type InferParameterType<T extends PropValueType> = ParameterTypeLookup[Exclude<
-  T['type'],
-  undefined
->];
+export type JsonSchemaToTs<T extends JSONSchema7> = T extends {
+  type: 'object';
+  properties?: Record<string, JSONSchema7>;
+}
+  ? {
+      [K in keyof T['properties']]?: JsonSchemaToTs<NonNullable<T['properties']>[K]>;
+    }
+  : T extends { type: 'array'; items?: JSONSchema7 }
+  ? T['items'] extends undefined
+    ? unknown[]
+    : JsonSchemaToTs<NonNullable<T['items']>>[]
+  : T extends { type: 'string' }
+  ? string
+  : T extends { type: 'number' | 'integer' }
+  ? number
+  : T extends { type: 'boolean' }
+  ? boolean
+  : T extends { type: 'null' }
+  ? null
+  : unknown;
+
+export type InferParameterType<T extends PropValueType> = T extends {
+  type: 'object' | 'array';
+  schema: JSONSchema7;
+}
+  ? JsonSchemaToTs<T['schema']>
+  : ParameterTypeLookup[NonNullable<T['type']>];
 
 export type PropValueTypes<K extends string = string> = Partial<{
   [key in K]?: PropValueType;
@@ -379,6 +402,7 @@ export type RuntimeEvents = {
   screenUpdate: {};
   ready: {};
   pageNavigationRequest: { pageNodeId: NodeId };
+  vmUpdated: { vm: ApplicationVm };
 };
 
 export type RuntimeEvent = {
@@ -454,10 +478,20 @@ export interface JsRuntime {
   evaluateExpression(code: string, globalScope: Record<string, unknown>): BindingEvaluationResult;
 }
 
-export type LocalScopeParams = Record<string, unknown>;
+export type TemplateRenderer = (
+  scopeKey: string,
+  params: Record<string, unknown>,
+) => React.ReactNode;
 
-export interface TemplateScopeParams {
-  i: number;
+export interface RuntimeScope {
+  id: string;
+  parentScope?: RuntimeScope;
+  bindings: Record<string, BindingEvaluationResult<unknown>>;
+  values: Record<string, unknown>;
+  meta: ScopeMeta;
 }
 
-export type TemplateRenderer = ({ i }: TemplateScopeParams) => React.ReactNode;
+export interface ApplicationVm {
+  scopes: { [id in string]?: RuntimeScope };
+  bindingScopes: { [id in string]?: string };
+}

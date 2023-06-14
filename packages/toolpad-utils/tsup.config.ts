@@ -11,6 +11,7 @@ export default defineConfig({
   dts: false,
   silent: true,
   clean: true,
+  sourcemap: true,
   async onSuccess() {
     // eslint-disable-next-line no-console
     console.log('build successful');

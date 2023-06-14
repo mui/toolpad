@@ -3,7 +3,6 @@ import {
   EnvAttrValue,
   JsExpressionAction,
   JsExpressionAttrValue,
-  SecretAttrValue,
 } from '@mui/toolpad-core';
 import { NavigationAction } from './server/schema';
 

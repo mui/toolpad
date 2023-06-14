@@ -56,7 +56,10 @@ function QueryEditor({
     return allOPtions.find((handler) => handler.name === functionName);
   }, [allOPtions, functionName]);
 
-  const parameterDefs = selectedOption?.parameters || {};
+  const parameterDefs = Object.fromEntries(selectedOption?.parameters || []);
+  const spreadParameters: string[] | undefined = selectedOption?.isCreateFunction
+    ? selectedOption?.parameters?.map(([key]) => key)
+    : undefined;
 
   const paramsEntries = input.params?.filter(([key]) => !!parameterDefs[key]) || EMPTY_PARAMS;
 
@@ -119,9 +122,12 @@ function QueryEditor({
             <Autocomplete
               value={selectedOption}
               onChange={(event, newValue) => {
-                setInput((existing) =>
-                  appDom.setQueryProp(existing, 'function', newValue?.name ?? undefined),
-                );
+                setInput((draft) => {
+                  draft = appDom.setQueryProp(draft, 'function', newValue?.name ?? undefined);
+                  draft = appDom.setQueryProp(draft, 'spreadParameters', spreadParameters);
+                  draft = appDom.setQueryProp(draft, 'file', selectedOption?.file ?? undefined);
+                  return draft;
+                });
               }}
               loading={introspection.isLoading}
               getOptionLabel={(option) => option.name}

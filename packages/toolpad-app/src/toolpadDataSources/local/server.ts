@@ -4,6 +4,25 @@ import { LocalPrivateQuery, LocalQuery, LocalConnectionParams } from './types';
 import { Maybe } from '../../utils/types';
 import { getProject } from '../../server/liveProject';
 
+async function exec(
+  connection: Maybe<LocalConnectionParams>,
+  fetchQuery: LocalQuery,
+  parameters: Record<string, string>,
+): Promise<ExecFetchResult<any>> {
+  const project = await getProject();
+  if (!fetchQuery.function) {
+    throw new Error('Missing function name');
+  }
+  const { data, error } = await project.functionsManager.exec(
+    fetchQuery.file || 'functions.ts',
+    fetchQuery.function,
+    fetchQuery.spreadParameters
+      ? fetchQuery.spreadParameters.map((name) => parameters[name])
+      : [{ parameters }],
+  );
+  return { data, error };
+}
+
 async function execPrivate(connection: Maybe<LocalConnectionParams>, query: LocalPrivateQuery) {
   switch (query.kind) {
     case 'introspection': {
@@ -11,11 +30,7 @@ async function execPrivate(connection: Maybe<LocalConnectionParams>, query: Loca
       return project.functionsManager.introspect();
     }
     case 'debugExec': {
-      const project = await getProject();
-      if (!query.query.function) {
-        throw new Error('Missing function name');
-      }
-      return project.functionsManager.exec('functions.ts', query.query.function, query.params);
+      return exec(null, query.query, query.params);
     }
     case 'openEditor': {
       const project = await getProject();
@@ -24,23 +39,6 @@ async function execPrivate(connection: Maybe<LocalConnectionParams>, query: Loca
     default:
       throw new Error(`Unknown private query "${(query as LocalPrivateQuery).kind}"`);
   }
-}
-
-async function exec(
-  connection: Maybe<LocalConnectionParams>,
-  fetchQuery: LocalQuery,
-  params: Record<string, string>,
-): Promise<ExecFetchResult<any>> {
-  const project = await getProject();
-  if (!fetchQuery.function) {
-    throw new Error('Missing function name');
-  }
-  const { data, error } = await project.functionsManager.exec(
-    'functions.ts',
-    fetchQuery.function,
-    params,
-  );
-  return { data, error };
 }
 
 const dataSource: ServerDataSource<{}, LocalQuery, any> = {

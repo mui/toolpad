@@ -206,7 +206,7 @@ export default class FunctionsManager {
     });
   }
 
-  async exec(fileName: string, name: string, parameters: Record<string, unknown>) {
+  async exec(fileName: string, name: string, parameters: unknown[]) {
     await this.initPromise;
     const resourcesFolder = this.getResourcesFolder();
     const fullPath = path.resolve(resourcesFolder, fileName);

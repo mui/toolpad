@@ -18,7 +18,8 @@ export interface ReturnTypeIntrospectionResult {
 
 export interface HandlerIntrospectionResult {
   name: string;
-  parameters: Record<string, PrimitiveValueType>;
+  isCreateFunction: boolean;
+  parameters: [string, PrimitiveValueType][];
   returnType: ReturnTypeIntrospectionResult;
 }
 
@@ -276,24 +277,26 @@ function getParameters(
   callSignatures: readonly ts.Signature[],
   checker: ts.TypeChecker,
   sourceFile: ts.SourceFile,
-): Record<string, PrimitiveValueType> {
+): [string, PrimitiveValueType][] {
   invariant(callSignatures.length > 0, 'Expected at least 1 call signature');
 
-  const paramEntries = callSignatures[0].getParameters().map((parameter) => {
-    const paramType = checker.getTypeOfSymbolAtLocation(parameter, parameter.valueDeclaration!);
-    const schema = toJsonSchema(paramType, checker, sourceFile);
-    return [
-      parameter.getName(),
-      {
-        ...propValueFromJsonSchema(schema),
-        required: !checker.isOptionalParameter(
-          parameter.valueDeclaration as ts.ParameterDeclaration,
-        ),
-      },
-    ];
-  });
+  const paramEntries: [string, PrimitiveValueType][] = callSignatures[0]
+    .getParameters()
+    .map((parameter) => {
+      const paramType = checker.getTypeOfSymbolAtLocation(parameter, parameter.valueDeclaration!);
+      const schema = toJsonSchema(paramType, checker, sourceFile);
+      return [
+        parameter.getName(),
+        {
+          ...propValueFromJsonSchema(schema),
+          required: !checker.isOptionalParameter(
+            parameter.valueDeclaration as ts.ParameterDeclaration,
+          ),
+        },
+      ];
+    });
 
-  return Object.fromEntries(paramEntries);
+  return paramEntries;
 }
 
 function getAwaitedType(
@@ -323,6 +326,20 @@ function getAwaitedType(
   }
 
   return type;
+}
+
+function isToolpadCreateFunction(exportType: ts.Type): boolean {
+  const properties = exportType.getProperties();
+
+  for (const property of properties) {
+    if (ts.isPropertySignature(property.valueDeclaration!)) {
+      if (property.valueDeclaration.name.getText() === '[TOOLPAD_FUNCTION]') {
+        return true;
+      }
+    }
+  }
+
+  return false;
 }
 
 function getReturnType(
@@ -387,9 +404,12 @@ async function generateTypes(resourcesFolder: string) {
         return [];
       }
 
+      const isCreateFunction = isToolpadCreateFunction(exportType);
+
       return [
         {
           name: symbol.name,
+          isCreateFunction,
           parameters: getParameters(callSignatures, checker, sourceFile),
           returnType: getReturnType(callSignatures, checker, sourceFile),
         } satisfies HandlerIntrospectionResult,

@@ -26,7 +26,7 @@ interface ExecuteMessage {
   kind: 'execute';
   filePath: string;
   name: string;
-  parameters: Record<string, unknown>;
+  parameters: unknown[];
 }
 
 type WorkerMessage = IntrospectMessage | ExecuteMessage;
@@ -84,22 +84,27 @@ async function execute(msg: ExecuteMessage) {
     throw new Error(`Function "${msg.name}" not found`);
   }
 
-  const data = await fn({ parameters: msg.parameters });
+  const data = await fn(...msg.parameters);
   return { data };
 }
 
 async function introspect(msg: IntrospectMessage): Promise<IntrospectionResult> {
-  const files = await Promise.all(
+  const files: FileIntrospectionResult[] = await Promise.all(
     Array.from(msg.files.entries()).map(async ([entry, { file }]) => {
       const resolvers = await resolveFunctions(file).catch(() => ({}));
-      const handlers = Object.entries(resolvers).map(([name, value]) => {
-        const fnConfig = (value as any)[TOOLPAD_FUNCTION] as CreateFunctionConfig<any>;
-        return {
-          name,
-          parameters: fnConfig?.parameters ?? {},
-          returnType: { schema: {} },
-        } satisfies HandlerIntrospectionResult;
-      });
+      const handlers: HandlerIntrospectionResult[] = Object.entries(resolvers).map(
+        ([name, value]) => {
+          const fnConfig = (value as any)[TOOLPAD_FUNCTION] as
+            | CreateFunctionConfig<any>
+            | undefined;
+          return {
+            name,
+            isCreateFunction: !!fnConfig,
+            parameters: Object.entries(fnConfig?.parameters ?? {}),
+            returnType: { schema: {} },
+          };
+        },
+      );
 
       return {
         name: path.basename(entry),
@@ -173,11 +178,7 @@ export function createWorker(env: Record<string, any>) {
       });
     },
 
-    async execute(
-      filePath: string,
-      name: string,
-      parameters: Record<string, unknown>,
-    ): Promise<any> {
+    async execute(filePath: string, name: string, parameters: unknown[]): Promise<any> {
       return runOnWorker({
         kind: 'execute',
         filePath,

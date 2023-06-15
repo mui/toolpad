@@ -1,8 +1,8 @@
 import * as React from 'react';
 import { TextField as MuiTextField, TextFieldProps as MuiTextFieldProps } from '@mui/material';
-import { createComponent } from '@mui/toolpad-core';
+import { ArgTypeDefinitions, createComponent } from '@mui/toolpad-core';
 import * as _ from 'lodash-es';
-import { FORM_INPUT_VALIDATION_ARG_TYPES, FormInputValidationProps, useFormInput } from './Form.js';
+import { FORM_INPUT_ARG_TYPES, FormInputComponentProps, useFormInput } from './Form.js';
 
 interface FullFile {
   name: string;
@@ -15,8 +15,7 @@ export type FilePickerProps = MuiTextFieldProps & {
   multiple: boolean;
   value: FullFile[];
   onChange: (files: FullFile[]) => void;
-  name: string;
-} & Pick<FormInputValidationProps, 'isRequired' | 'isInvalid'>;
+} & Pick<FormInputComponentProps, 'name' | 'isRequired' | 'isInvalid'>;
 
 const readFile = async (file: Blob): Promise<string> => {
   return new Promise((resolve, reject) => {
@@ -96,10 +95,6 @@ export default createComponent(FilePicker, {
       helperText: 'A label that describes the content of the FilePicker. e.g. "Profile Image".',
       type: 'string',
     },
-    name: {
-      helperText: 'Name of this element. Used as a reference in form data.',
-      type: 'string',
-    },
     multiple: {
       helperText: 'Whether the FilePicker should accept multiple files.',
       type: 'boolean',
@@ -109,7 +104,11 @@ export default createComponent(FilePicker, {
       helperText: 'Whether the FilePicker is disabled.',
       type: 'boolean',
     },
-    ..._.pick(FORM_INPUT_VALIDATION_ARG_TYPES, ['isRequired', 'isInvalid']),
+    ...(_.pick(FORM_INPUT_ARG_TYPES, [
+      'name',
+      'isRequired',
+      'isInvalid',
+    ]) as ArgTypeDefinitions<FilePickerProps>),
     sx: {
       type: 'object',
     },

@@ -1,8 +1,8 @@
 import * as React from 'react';
 import { TextFieldProps, MenuItem, TextField } from '@mui/material';
-import { createComponent } from '@mui/toolpad-core';
+import { ArgTypeDefinitions, createComponent } from '@mui/toolpad-core';
 import * as _ from 'lodash-es';
-import { FORM_INPUT_VALIDATION_ARG_TYPES, FormInputValidationProps, useFormInput } from './Form.js';
+import { FORM_INPUT_ARG_TYPES, FormInputComponentProps, useFormInput } from './Form.js';
 import { SX_PROP_HELPER_TEXT } from './constants.js';
 
 export interface SelectOption {
@@ -15,8 +15,7 @@ export type SelectProps = Omit<TextFieldProps, 'value' | 'onChange'> & {
   onChange: (newValue: string) => void;
   defaultValue: string;
   options: (string | SelectOption)[];
-  name: string;
-} & Pick<FormInputValidationProps, 'isRequired' | 'isInvalid'>;
+} & Pick<FormInputComponentProps, 'name' | 'isRequired' | 'isInvalid'>;
 
 function Select({
   options,
@@ -125,10 +124,6 @@ export default createComponent(Select, {
       type: 'string',
       default: '',
     },
-    name: {
-      helperText: 'Name of this element. Used as a reference in form data.',
-      type: 'string',
-    },
     variant: {
       helperText:
         'One of the available MUI TextField [variants](https://mui.com/material-ui/react-button/#basic-button). Possible values are `outlined`, `filled` or `standard`',
@@ -150,7 +145,11 @@ export default createComponent(Select, {
       helperText: 'Whether the select is disabled.',
       type: 'boolean',
     },
-    ..._.pick(FORM_INPUT_VALIDATION_ARG_TYPES, ['isRequired', 'isInvalid']),
+    ...(_.pick(FORM_INPUT_ARG_TYPES, [
+      'name',
+      'isRequired',
+      'isInvalid',
+    ]) as ArgTypeDefinitions<SelectProps>),
     sx: {
       helperText: SX_PROP_HELPER_TEXT,
       type: 'object',

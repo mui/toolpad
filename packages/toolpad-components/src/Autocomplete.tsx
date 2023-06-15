@@ -7,7 +7,7 @@ import {
 import { createComponent } from '@mui/toolpad-core';
 import * as _ from 'lodash-es';
 import { SX_PROP_HELPER_TEXT } from './constants.js';
-import { FORM_INPUT_VALIDATION_ARG_TYPES, FormInputValidationProps, useFormInput } from './Form.js';
+import { FORM_INPUT_ARG_TYPES, FormInputComponentProps, useFormInput } from './Form.js';
 
 type AutocompleteOption = string | { label?: string; value?: string };
 type AutocompleteValue = string | null;
@@ -17,11 +17,10 @@ interface AutocompleteProps
       MuiAutocompleteProps<AutocompleteOption, false, false, false>,
       'renderInput' | 'value' | 'onChange'
     >,
-    Pick<FormInputValidationProps, 'isRequired' | 'minLength' | 'maxLength' | 'isInvalid'> {
+    Pick<FormInputComponentProps, 'name' | 'isRequired' | 'minLength' | 'maxLength' | 'isInvalid'> {
   value: AutocompleteValue;
   onChange: (newValue: AutocompleteValue) => void;
   options: AutocompleteOption[];
-  name: string;
   label: string;
 }
 
@@ -95,12 +94,18 @@ function Autocomplete({
       isOptionEqualToValue={(option, selectedValue) => getValue(option) === getValue(selectedValue)}
       getOptionLabel={getOptionLabel}
       value={selectedVal}
-      renderInput={(params) => <TextField {...params} label={label} variant="outlined" />}
+      renderInput={(params) => (
+        <TextField
+          {...params}
+          label={label}
+          variant="outlined"
+          {...(formInputError && {
+            error: Boolean(formInputError),
+            helperText: formInputError.message || '',
+          })}
+        />
+      )}
       {...rest}
-      {...(formInputError && {
-        error: Boolean(formInputError),
-        helperText: formInputError.message || '',
-      })}
     />,
   );
 }
@@ -147,12 +152,7 @@ export default createComponent(Autocomplete, {
       helperText: 'If true, the autocomplete will be disabled.',
       type: 'boolean',
     },
-    ..._.pick(FORM_INPUT_VALIDATION_ARG_TYPES, [
-      'isRequired',
-      'minLength',
-      'maxLength',
-      'isInvalid',
-    ]),
+    ..._.pick(FORM_INPUT_ARG_TYPES, ['name', 'isRequired', 'minLength', 'maxLength', 'isInvalid']),
     sx: {
       helperText: SX_PROP_HELPER_TEXT,
       type: 'object',

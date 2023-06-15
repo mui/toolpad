@@ -2,10 +2,10 @@ import * as React from 'react';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DesktopDatePicker, DesktopDatePickerProps } from '@mui/x-date-pickers/DesktopDatePicker';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
-import { createComponent } from '@mui/toolpad-core';
+import { ArgTypeDefinitions, createComponent } from '@mui/toolpad-core';
 import dayjs from 'dayjs';
 import * as _ from 'lodash-es';
-import { FORM_INPUT_VALIDATION_ARG_TYPES, FormInputValidationProps, useFormInput } from './Form.js';
+import { FORM_INPUT_ARG_TYPES, FormInputComponentProps, useFormInput } from './Form.js';
 import { SX_PROP_HELPER_TEXT } from './constants.js';
 
 const LOCALE_LOADERS = new Map(
@@ -70,7 +70,7 @@ function getSnapshot() {
 
 export interface DatePickerProps
   extends Omit<DesktopDatePickerProps<dayjs.Dayjs>, 'value' | 'onChange' | 'defaultValue'>,
-    Pick<FormInputValidationProps, 'isRequired' | 'isInvalid'> {
+    Pick<FormInputComponentProps, 'name' | 'isRequired' | 'isInvalid'> {
   value?: string;
   onChange: (newValue: string | null) => void;
   format: string;
@@ -79,7 +79,6 @@ export interface DatePickerProps
   size: 'small' | 'medium';
   sx: any;
   defaultValue?: string;
-  name: string;
 }
 
 function DatePicker({
@@ -205,7 +204,11 @@ export default createComponent(DatePicker, {
       helperText: 'The date picker is disabled.',
       type: 'boolean',
     },
-    ..._.pick(FORM_INPUT_VALIDATION_ARG_TYPES, ['isRequired', 'isInvalid']),
+    ...(_.pick(FORM_INPUT_ARG_TYPES, [
+      'name',
+      'isRequired',
+      'isInvalid',
+    ]) as ArgTypeDefinitions<DatePickerProps>),
     sx: {
       helperText: SX_PROP_HELPER_TEXT,
       type: 'object',

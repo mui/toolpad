@@ -6,7 +6,7 @@ import {
 } from '@mui/material';
 import { createComponent } from '@mui/toolpad-core';
 import * as _ from 'lodash-es';
-import { FORM_INPUT_VALIDATION_ARG_TYPES, FormInputValidationProps, useFormInput } from './Form.js';
+import { FORM_INPUT_ARG_TYPES, FormInputComponentProps, useFormInput } from './Form.js';
 import { SX_PROP_HELPER_TEXT } from './constants.js';
 
 export type TextFieldProps = Omit<MuiTextFieldProps, 'value' | 'onChange'> & {
@@ -15,8 +15,7 @@ export type TextFieldProps = Omit<MuiTextFieldProps, 'value' | 'onChange'> & {
   defaultValue: string;
   alignItems?: BoxProps['alignItems'];
   justifyContent?: BoxProps['justifyContent'];
-  name: string;
-} & Pick<FormInputValidationProps, 'isRequired' | 'minLength' | 'maxLength' | 'isInvalid'>;
+} & Pick<FormInputComponentProps, 'name' | 'isRequired' | 'minLength' | 'maxLength' | 'isInvalid'>;
 
 function TextField({
   defaultValue,
@@ -79,10 +78,6 @@ export default createComponent(TextField, {
       helperText: 'A label that describes the content of the text field. e.g. "First name".',
       type: 'string',
     },
-    name: {
-      helperText: 'Name of this element. Used as a reference in form data.',
-      type: 'string',
-    },
     variant: {
       helperText:
         'One of the available MUI TextField [variants](https://mui.com/material-ui/react-button/#basic-button). Possible values are `outlined`, `filled` or `standard`',
@@ -104,12 +99,7 @@ export default createComponent(TextField, {
       helperText: 'Whether the input is disabled.',
       type: 'boolean',
     },
-    ..._.pick(FORM_INPUT_VALIDATION_ARG_TYPES, [
-      'isRequired',
-      'minLength',
-      'maxLength',
-      'isInvalid',
-    ]),
+    ..._.pick(FORM_INPUT_ARG_TYPES, ['name', 'isRequired', 'minLength', 'maxLength', 'isInvalid']),
     sx: {
       helperText: SX_PROP_HELPER_TEXT,
       type: 'object',

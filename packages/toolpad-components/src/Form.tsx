@@ -170,30 +170,28 @@ export default createComponent(Form, {
   },
 });
 
-export interface FormInputValidationProps {
+export interface FormInputComponentProps {
+  name: string;
   isRequired: boolean;
   minLength: number;
   maxLength: number;
   isInvalid: boolean;
 }
 
-interface UseFormInputInput<V> {
+interface FormInputProps<V> {
   name: string;
   label?: string;
   value?: V;
   onChange: (newValue: V) => void;
   emptyValue?: V;
   defaultValue?: V;
-  validationProps: Partial<FormInputValidationProps>;
+  validationProps: Partial<
+    Pick<FormInputComponentProps, 'isRequired' | 'minLength' | 'maxLength' | 'isInvalid'>
+  >;
+  children: JSX.Element;
 }
 
-interface UseFormInputPayload<V> {
-  onFormInputChange: (newValue: V) => void;
-  formInputError?: FieldError;
-  renderFormInput: (element: JSX.Element) => JSX.Element;
-}
-
-export function useFormInput<V>({
+function FormInput<V>({
   name,
   label,
   value,
@@ -201,38 +199,13 @@ export function useFormInput<V>({
   emptyValue,
   defaultValue,
   validationProps,
-}: UseFormInputInput<V>): UseFormInputPayload<V> {
+  children,
+}: FormInputProps<V>) {
   const { isRequired, minLength, maxLength, isInvalid } = validationProps;
-
-  const nodeRuntime = useNode();
 
   const { form, fieldValues } = React.useContext(FormContext);
 
-  const fieldName = name || nodeRuntime?.nodeName;
-  const fallbackName = React.useId();
-  const formInputName = fieldName || fallbackName;
-
-  const formInputDisplayName = label || fieldName || 'Field';
-
-  const formInputError = formInputName
-    ? (form?.formState.errors[formInputName] as FieldError)
-    : undefined;
-
-  const [componentFormValue, setComponentFormValue] = React.useState({});
-
-  const handleFormInputChange = React.useCallback(
-    (newValue: V) => {
-      if (form) {
-        form.setValue(name, newValue, {
-          shouldValidate: true,
-          shouldDirty: true,
-          shouldTouch: true,
-        });
-      }
-      onChange(newValue);
-    },
-    [form, name, onChange],
-  );
+  const formInputDisplayName = label || name || 'Field';
 
   const previousDefaultValueRef = React.useRef(defaultValue);
   React.useEffect(() => {
@@ -241,7 +214,7 @@ export function useFormInput<V>({
       form.setValue(name, defaultValue);
       previousDefaultValueRef.current = defaultValue;
     }
-  }, [form, name, onChange, defaultValue]);
+  }, [form, onChange, defaultValue, name]);
 
   const isInitialForm = Object.keys(fieldValues).length === 0;
 
@@ -256,13 +229,13 @@ export function useFormInput<V>({
     }
   }, [defaultValue, emptyValue, fieldValues, form, isInitialForm, name, onChange, value]);
 
-  const previousNodeNameRef = React.useRef<typeof name>(name);
+  const previousInputNameRef = React.useRef<typeof name>(name);
   React.useEffect(() => {
-    const previousNodeName = previousNodeNameRef.current;
+    const previousInputName = previousInputNameRef.current;
 
-    if (form && previousNodeName !== name) {
-      form.unregister(previousNodeName);
-      previousNodeNameRef.current = name;
+    if (form && previousInputName !== name) {
+      form.unregister(previousInputName);
+      previousInputNameRef.current = name;
     }
   }, [form, name]);
 
@@ -278,30 +251,80 @@ export function useFormInput<V>({
     }
   }, [form, name, validationProps]);
 
+  return form ? (
+    <Controller
+      name={name}
+      control={form.control}
+      rules={{
+        required: isRequired ? `${formInputDisplayName} is required.` : false,
+        ...(minLength && {
+          minLength: {
+            value: minLength,
+            message: `${formInputDisplayName} must have at least ${minLength} characters.`,
+          },
+        }),
+        ...(maxLength && {
+          maxLength: {
+            value: maxLength,
+            message: `${formInputDisplayName} must have no more than ${maxLength} characters.`,
+          },
+        }),
+        validate: () => !isInvalid || `${formInputDisplayName} is invalid.`,
+      }}
+      render={() => children}
+    />
+  ) : (
+    children
+  );
+}
+
+interface UseFormInputPayload<V> {
+  onFormInputChange: (newValue: V) => void;
+  formInputError?: FieldError;
+  renderFormInput: (element: JSX.Element) => JSX.Element;
+}
+
+export function useFormInput<V>(
+  input: Omit<FormInputProps<V>, 'children'>,
+): UseFormInputPayload<V> {
+  const { form } = React.useContext(FormContext);
+
+  const nodeRuntime = useNode();
+  const fieldName = input.name || nodeRuntime?.nodeName;
+  const fallbackName = React.useId();
+
+  const formInputName = fieldName || fallbackName;
+
+  const [componentFormValue, setComponentFormValue] = React.useState({});
+
+  const formInputError = formInputName
+    ? (form?.formState.errors[formInputName] as FieldError)
+    : undefined;
+
+  const handleFormInputChange = React.useCallback(
+    (newValue: V) => {
+      if (form) {
+        form.setValue(formInputName, newValue, {
+          shouldValidate: true,
+          shouldDirty: true,
+          shouldTouch: true,
+        });
+      }
+      input.onChange(newValue);
+    },
+    [form, formInputName, input],
+  );
+
   const renderFormInput = React.useCallback(
-    (element: JSX.Element) =>
-      form ? (
-        <Controller
-          name={formInputName}
-          control={form.control}
-          rules={{
-            required: isRequired ? `${formInputDisplayName} is required.` : false,
-            ...(minLength && {
-              minLength: {
-                value: minLength,
-                message: `${formInputDisplayName} must have at least ${minLength} characters.`,
-              },
-            }),
-            ...(maxLength && {
-              maxLength: {
-                value: maxLength,
-                message: `${formInputDisplayName} must have no more than ${maxLength} characters.`,
-              },
-            }),
-            validate: () => !isInvalid || `${formInputDisplayName} is invalid.`,
-          }}
-          render={() => element}
-        />
+    (element: JSX.Element) => {
+      const formInputElement = (
+        <FormInput {...input} name={formInputName}>
+          {element}
+        </FormInput>
+      );
+
+      return form ? (
+        formInputElement
       ) : (
         <Form
           value={componentFormValue}
@@ -309,19 +332,11 @@ export function useFormInput<V>({
           mode="onBlur"
           hasChrome={false}
         >
-          {element}
+          {formInputElement}
         </Form>
-      ),
-    [
-      componentFormValue,
-      form,
-      formInputDisplayName,
-      formInputName,
-      isInvalid,
-      isRequired,
-      maxLength,
-      minLength,
-    ],
+      );
+    },
+    [componentFormValue, form, formInputName, input],
   );
 
   return {
@@ -331,7 +346,13 @@ export function useFormInput<V>({
   };
 }
 
-export const FORM_INPUT_VALIDATION_ARG_TYPES: ArgTypeDefinitions<FormInputValidationProps> = {
+export const FORM_INPUT_ARG_TYPES: ArgTypeDefinitions<
+  Pick<FormInputComponentProps, 'name' | 'isRequired' | 'minLength' | 'maxLength' | 'isInvalid'>
+> = {
+  name: {
+    helperText: 'Name of this input. Used as a reference in form data.',
+    type: 'string',
+  },
   isRequired: {
     helperText: 'Whether the input is required to have a value.',
     type: 'boolean',

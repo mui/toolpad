@@ -1,7 +1,6 @@
 import * as React from 'react';
 import Typography from '@mui/material/Typography';
 import GradientText from 'docs/src/components/typography/GradientText';
-//  import ROUTES from '../route';
 
 const useCases = {
   overline: 'Use cases',
@@ -18,7 +17,6 @@ const useCases = {
       description:
         'Provide stakeholders with dashboards to track performance of systems and processes, identify potential issues, and ensure that critical services run smoothly. Build and share your monitoring dashboards by combining data from multiple sources with dependable deployment mechanism when needed.',
       action: {
-        //     href: ROUTES.toolpadDashboardExample,
         label: 'View example',
       },
     },
@@ -29,7 +27,6 @@ const useCases = {
       description:
         'Enable your teams to quickly view and manage customer orders, queries, and refunds by creating apps powered by native Toolpad integrations and third party APIs from providers like Stripe, Twilio, etc. Toolpad allows end users to create, read, update or delete records.',
       action: {
-        //     href: ROUTES.toolpadAdminExample,
         label: 'View example',
       },
     },
@@ -40,7 +37,6 @@ const useCases = {
       description:
         'Build customizable BI dashboards for stakeholders to view and analyze various data points, monitor KPIs, track business goals, and identify trends and opportunities. Built with MUI components, apps are fast, manageable and scalable. Toolpad allows you to bind data the pro-code way by writing JavaScript anywhere.',
       action: {
-        //     href: ROUTES.toolpadBIExample,
         label: 'View example',
       },
     },

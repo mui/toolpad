@@ -76,6 +76,10 @@ export default function RenderPanel({ className }: RenderPanelProps) {
       pageEditorApi.pageBindingsUpdate(event.bindings);
     });
 
+    initializedBridge.canvasEvents.on('vmUpdated', (event) => {
+      pageEditorApi.vmUpdate(event.vm);
+    });
+
     initializedBridge.canvasEvents.on('screenUpdate', () => {
       const pageViewState = initializedBridge.canvasCommands.getPageViewState();
       pageEditorApi.pageViewStateUpdate(pageViewState);

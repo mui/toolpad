@@ -5,6 +5,10 @@ import invariant from 'invariant';
 import { Readable } from 'stream';
 import * as readline from 'readline';
 import openBrowser from 'react-dev-utils/openBrowser';
+import chalk from 'chalk';
+import { folderExists } from '@mui/toolpad-utils/fs';
+import { execaNode } from 'execa';
+import getPort from 'get-port';
 
 const DEFAULT_PORT = 3000;
 
@@ -41,9 +45,12 @@ interface RunOptions {
 
 async function runApp(cmd: Command, { port, dev = false, dir }: RunOptions) {
   const projectDir = path.resolve(process.cwd(), dir);
-  const { execaNode } = await import('execa');
-  const { default: chalk } = await import('chalk');
-  const { default: getPort } = await import('get-port');
+
+  if (!(await folderExists(projectDir))) {
+    console.error(`${chalk.red('error')} - No project found at ${chalk.cyan(`"${projectDir}"`)}`);
+    process.exit(1);
+  }
+
   const toolpadDir = path.resolve(__dirname, '../..'); // from ./dist/server
 
   if (!port) {
@@ -101,8 +108,6 @@ async function runApp(cmd: Command, { port, dev = false, dir }: RunOptions) {
 }
 
 async function devCommand(args: RunOptions) {
-  const { default: chalk } = await import('chalk');
-
   // eslint-disable-next-line no-console
   console.log(`${chalk.blue('info')}  - starting Toolpad application in dev mode...`);
   await runApp('dev', args);
@@ -114,11 +119,8 @@ interface BuildOptions {
 
 async function buildCommand({ dir }: BuildOptions) {
   const projectDir = path.resolve(process.cwd(), dir);
-  const { default: chalk } = await import('chalk');
   // eslint-disable-next-line no-console
   console.log(`${chalk.blue('info')}  - building Toolpad application...`);
-
-  const { execaNode } = await import('execa');
 
   const builderPath = path.resolve(__dirname, './appBuilder.js');
 
@@ -137,7 +139,6 @@ async function buildCommand({ dir }: BuildOptions) {
 }
 
 async function startCommand(args: RunOptions) {
-  const { default: chalk } = await import('chalk');
   // eslint-disable-next-line no-console
   console.log(`${chalk.blue('info')}  - Starting Toolpad application...`);
   await runApp('start', args);

@@ -7,8 +7,6 @@ import { JSONSchema7, JSONSchema7TypeName, JSONSchema7Type } from 'json-schema';
 import { asArray } from '@mui/toolpad-utils/collections';
 import { PrimitiveValueType } from '@mui/toolpad-core';
 
-const MAX_DEPTH = 100;
-
 export interface ReturnTypeIntrospectionResult {
   schema: JSONSchema7 | null;
 }
@@ -95,152 +93,160 @@ function asUnionTypes(type: ts.Type): ts.Type[] {
 function toJsonSchema(
   tsType: ts.Type,
   checker: ts.TypeChecker,
-  maxDepth: number,
+  seenTypes: Set<ts.Type>,
 ): JSONSchema7 | null {
-  if (maxDepth <= 0) {
-    return null;
-  }
-  if (
-    hasTypeFlag(tsType, ts.TypeFlags.Undefined) ||
-    hasTypeFlag(tsType, ts.TypeFlags.Void) ||
-    hasTypeFlag(tsType, ts.TypeFlags.VoidLike)
-  ) {
-    return null;
+  if (seenTypes.has(tsType)) {
+    return { const: '[Circular]' };
   }
 
-  if (hasTypeFlag(tsType, ts.TypeFlags.Null)) {
-    return { type: 'null' };
-  }
+  seenTypes.add(tsType);
 
-  if (tsType === checker.getTrueType()) {
-    return { type: 'boolean', const: true };
-  }
-
-  if (tsType === checker.getFalseType()) {
-    return { type: 'boolean', const: false };
-  }
-
-  if (tsType.isNumberLiteral()) {
-    return { type: 'number', const: tsType.value };
-  }
-
-  if (tsType.isStringLiteral()) {
-    return { type: 'string', const: tsType.value };
-  }
-
-  if (tsType.isUnion()) {
-    const anyOf = [];
-    const typeNames = new Set<JSONSchema7TypeName>();
-    let enumValues: Set<JSONSchema7Type> | null = new Set();
-
-    const withoutUndefined = tsType.types.filter(
-      (type) => !hasTypeFlag(type, ts.TypeFlags.Undefined),
-    );
-
-    if (withoutUndefined.length <= 0) {
+  try {
+    if (
+      hasTypeFlag(tsType, ts.TypeFlags.Undefined) ||
+      hasTypeFlag(tsType, ts.TypeFlags.Void) ||
+      hasTypeFlag(tsType, ts.TypeFlags.VoidLike)
+    ) {
       return null;
     }
 
-    if (withoutUndefined.length === 1) {
-      return toJsonSchema(withoutUndefined[0], checker, maxDepth - 1);
+    if (hasTypeFlag(tsType, ts.TypeFlags.Null)) {
+      return { type: 'null' };
     }
 
-    for (const type of withoutUndefined) {
-      const itemType = toJsonSchema(type, checker, maxDepth - 1);
+    if (tsType === checker.getTrueType()) {
+      return { type: 'boolean', const: true };
+    }
 
-      if (itemType) {
-        if (enumValues && itemType.const) {
-          enumValues.add(itemType.const);
-        } else {
-          enumValues = null;
-        }
+    if (tsType === checker.getFalseType()) {
+      return { type: 'boolean', const: false };
+    }
 
-        for (const typeName of asArray(itemType.type)) {
-          if (typeName) {
-            typeNames.add(typeName);
+    if (tsType.isNumberLiteral()) {
+      return { type: 'number', const: tsType.value };
+    }
+
+    if (tsType.isStringLiteral()) {
+      return { type: 'string', const: tsType.value };
+    }
+
+    if (tsType.isUnion()) {
+      const anyOf = [];
+      const typeNames = new Set<JSONSchema7TypeName>();
+      let enumValues: Set<JSONSchema7Type> | null = new Set();
+
+      const withoutUndefined = tsType.types.filter(
+        (type) => !hasTypeFlag(type, ts.TypeFlags.Undefined),
+      );
+
+      if (withoutUndefined.length <= 0) {
+        return null;
+      }
+
+      if (withoutUndefined.length === 1) {
+        console.log('hier', withoutUndefined[0] === tsType);
+        return toJsonSchema(withoutUndefined[0], checker, seenTypes);
+      }
+
+      for (const type of withoutUndefined) {
+        const itemType = toJsonSchema(type, checker, seenTypes);
+
+        if (itemType) {
+          if (enumValues && itemType.const) {
+            enumValues.add(itemType.const);
+          } else {
+            enumValues = null;
           }
+
+          for (const typeName of asArray(itemType.type)) {
+            if (typeName) {
+              typeNames.add(typeName);
+            }
+          }
+
+          anyOf.push(itemType);
+        }
+      }
+
+      if (enumValues) {
+        let type: JSONSchema7TypeName | undefined;
+        if (typeNames.size === 1) {
+          type = Array.from(typeNames)[0];
+        }
+        return {
+          type,
+          enum: Array.from(enumValues),
+        };
+      }
+
+      return { anyOf };
+    }
+
+    if (
+      hasTypeFlag(tsType, ts.TypeFlags.BooleanLike) ||
+      hasTypeFlag(tsType, ts.TypeFlags.Boolean) ||
+      hasTypeFlag(tsType, ts.TypeFlags.BooleanLiteral)
+    ) {
+      return { type: 'boolean' };
+    }
+
+    if (
+      hasTypeFlag(tsType, ts.TypeFlags.NumberLike) ||
+      hasTypeFlag(tsType, ts.TypeFlags.Number) ||
+      hasTypeFlag(tsType, ts.TypeFlags.NumberLiteral) ||
+      hasTypeFlag(tsType, ts.TypeFlags.BigIntLike) ||
+      hasTypeFlag(tsType, ts.TypeFlags.BigInt) ||
+      hasTypeFlag(tsType, ts.TypeFlags.BigIntLiteral)
+    ) {
+      return { type: 'number' };
+    }
+
+    if (
+      hasTypeFlag(tsType, ts.TypeFlags.StringLike) ||
+      hasTypeFlag(tsType, ts.TypeFlags.String) ||
+      hasTypeFlag(tsType, ts.TypeFlags.StringLiteral)
+    ) {
+      return { type: 'string' };
+    }
+
+    if (hasTypeFlag(tsType, ts.TypeFlags.Object)) {
+      if (checker.isArrayLikeType(tsType)) {
+        let items: JSONSchema7 | undefined;
+        const indexType = tsType.getNumberIndexType();
+        if (indexType) {
+          items = toJsonSchema(indexType, checker, seenTypes) ?? undefined;
         }
 
-        anyOf.push(itemType);
-      }
-    }
-
-    if (enumValues) {
-      let type: JSONSchema7TypeName | undefined;
-      if (typeNames.size === 1) {
-        type = Array.from(typeNames)[0];
-      }
-      return {
-        type,
-        enum: Array.from(enumValues),
-      };
-    }
-
-    return { anyOf };
-  }
-
-  if (
-    hasTypeFlag(tsType, ts.TypeFlags.BooleanLike) ||
-    hasTypeFlag(tsType, ts.TypeFlags.Boolean) ||
-    hasTypeFlag(tsType, ts.TypeFlags.BooleanLiteral)
-  ) {
-    return { type: 'boolean' };
-  }
-
-  if (
-    hasTypeFlag(tsType, ts.TypeFlags.NumberLike) ||
-    hasTypeFlag(tsType, ts.TypeFlags.Number) ||
-    hasTypeFlag(tsType, ts.TypeFlags.NumberLiteral) ||
-    hasTypeFlag(tsType, ts.TypeFlags.BigIntLike) ||
-    hasTypeFlag(tsType, ts.TypeFlags.BigInt) ||
-    hasTypeFlag(tsType, ts.TypeFlags.BigIntLiteral)
-  ) {
-    return { type: 'number' };
-  }
-
-  if (
-    hasTypeFlag(tsType, ts.TypeFlags.StringLike) ||
-    hasTypeFlag(tsType, ts.TypeFlags.String) ||
-    hasTypeFlag(tsType, ts.TypeFlags.StringLiteral)
-  ) {
-    return { type: 'string' };
-  }
-
-  if (hasTypeFlag(tsType, ts.TypeFlags.Object)) {
-    if (checker.isArrayLikeType(tsType)) {
-      let items: JSONSchema7 | undefined;
-      const indexType = tsType.getNumberIndexType();
-      if (indexType) {
-        items = toJsonSchema(indexType, checker, maxDepth - 1) ?? undefined;
+        return {
+          type: 'array',
+          items,
+        };
       }
 
-      return {
-        type: 'array',
-        items,
-      };
+      const required: string[] = [];
+
+      const properties = Object.fromEntries(
+        tsType.getProperties().flatMap((propertySymbol) => {
+          const propertyName = propertySymbol.getName();
+          const propertyType = checker.getTypeOfSymbol(propertySymbol);
+          const isOptional = asUnionTypes(propertyType).some((type) =>
+            hasTypeFlag(type, ts.TypeFlags.Undefined),
+          );
+          if (!isOptional) {
+            required.push(propertyName);
+          }
+          const propertySchema = toJsonSchema(propertyType, checker, seenTypes);
+          return propertySchema ? [[propertyName, propertySchema]] : [];
+        }),
+      );
+
+      return { type: 'object', properties, required };
     }
 
-    const required: string[] = [];
-
-    const properties = Object.fromEntries(
-      tsType.getProperties().flatMap((propertySymbol) => {
-        const propertyName = propertySymbol.getName();
-        const propertyType = checker.getTypeOfSymbol(propertySymbol);
-        const isOptional = asUnionTypes(propertyType).some((type) =>
-          hasTypeFlag(type, ts.TypeFlags.Undefined),
-        );
-        if (!isOptional) {
-          required.push(propertyName);
-        }
-        const propertySchema = toJsonSchema(propertyType, checker, maxDepth - 1);
-        return propertySchema ? [[propertyName, propertySchema]] : [];
-      }),
-    );
-
-    return { type: 'object', properties, required };
+    return {};
+  } finally {
+    seenTypes.delete(tsType);
   }
-
-  return {};
 }
 
 function getParameters(
@@ -253,7 +259,8 @@ function getParameters(
     .getParameters()
     .map((parameter) => {
       const paramType = checker.getTypeOfSymbolAtLocation(parameter, parameter.valueDeclaration!);
-      const schema = toJsonSchema(paramType, checker, MAX_DEPTH);
+      const schema = toJsonSchema(paramType, checker, new Set());
+
       return [
         parameter.getName(),
         {
@@ -314,8 +321,10 @@ function getReturnType(callSignatures: readonly ts.Signature[], checker: ts.Type
 
   const awaitedReturnType = getAwaitedType(returnType, checker);
 
+  const schema = toJsonSchema(awaitedReturnType, checker, new Set());
+
   return {
-    schema: toJsonSchema(awaitedReturnType, checker, MAX_DEPTH),
+    schema,
   };
 }
 
@@ -373,7 +382,7 @@ export default async function extractTypes({
           }
 
           const isCreateFunction = isToolpadCreateFunction(exportType);
-
+          console.log(symbol.name);
           return {
             name: symbol.name,
             isCreateFunction,

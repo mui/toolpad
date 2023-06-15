@@ -79,7 +79,7 @@ export function postProcessHtml(html: string, { config, dom }: PostProcessHtmlPa
     )}] = ${serializedInitialState}</script>`,
   ];
 
-  return html.replaceAll(`<!-- __TOOLPAD_SCRIPTS__ -->`, toolpadScripts.join('\n'));
+  return html.replace(`<!-- __TOOLPAD_SCRIPTS__ -->`, () => toolpadScripts.join('\n'));
 }
 
 interface ToolpadVitePluginParams {
@@ -124,7 +124,7 @@ function toolpadVitePlugin({ root, base }: ToolpadVitePluginParams): Plugin {
     name: 'toolpad',
 
     async resolveId(id, importer) {
-      if (id.endsWith(`/index.html`)) {
+      if (id.endsWith('.html')) {
         return id;
       }
       if (id === MAIN_ENTRY) {
@@ -144,7 +144,7 @@ function toolpadVitePlugin({ root, base }: ToolpadVitePluginParams): Plugin {
     },
 
     async load(id) {
-      if (id.endsWith(`/index.html`)) {
+      if (id.endsWith('.html')) {
         // production build only
         return getHtmlContent({ canvas: false });
       }

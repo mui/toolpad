@@ -1,6 +1,12 @@
 import { hasOwnProperty } from './collections';
 import { truncate } from './strings';
 
+declare global {
+  interface Error {
+    code?: unknown;
+  }
+}
+
 export type PlainObject = Record<string, unknown>;
 
 export interface SerializedError extends PlainObject {
@@ -47,6 +53,6 @@ export function errorFrom(maybeError: unknown): Error {
     return new Error(maybeError, { cause: maybeError });
   }
 
-  const message = truncate(JSON.stringify(maybeError), 500);
+  const message = truncate(String(JSON.stringify(maybeError)), 500);
   return new Error(message, { cause: maybeError });
 }

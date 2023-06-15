@@ -222,7 +222,7 @@ function deleteOrphanedLayoutNodes(
                 lastContainerChild,
                 'layout',
                 'columnSize',
-                parent.layout?.columnSize || appDom.createConst(1),
+                parent.layout?.columnSize || 1,
               );
             }
 
@@ -243,7 +243,7 @@ function deleteOrphanedLayoutNodes(
               lastContainerChild,
               'layout',
               'columnSize',
-              parentParent.layout?.columnSize || appDom.createConst(1),
+              parentParent.layout?.columnSize || 1,
             );
           }
 
@@ -337,9 +337,7 @@ export default function RenderOverlay({ bridge }: RenderOverlayProps) {
           const childrenCount = nodeChildren?.length || 0;
 
           if (childrenCount > 0 && childrenCount < previousRowColumnCountsRef.current[node.id]) {
-            const layoutColumnSizes = nodeChildren.map(
-              (child) => child.layout?.columnSize?.value || 1,
-            );
+            const layoutColumnSizes = nodeChildren.map((child) => child.layout?.columnSize || 1);
             const totalLayoutColumnSizes = layoutColumnSizes.reduce((acc, size) => acc + size, 0);
 
             const normalizedLayoutColumnSizes = layoutColumnSizes.map(
@@ -353,7 +351,7 @@ export default function RenderOverlay({ bridge }: RenderOverlayProps) {
                   child,
                   'layout',
                   'columnSize',
-                  appDom.createConst(normalizedLayoutColumnSizes[childIndex]),
+                  normalizedLayoutColumnSizes[childIndex],
                 );
               }
             });
@@ -1129,7 +1127,7 @@ export default function RenderOverlay({ bridge }: RenderOverlayProps) {
                     PAGE_COLUMN_COMPONENT_ID,
                     {},
                     {
-                      columnSize: dragOverNode.layout?.columnSize || appDom.createConst(1),
+                      columnSize: dragOverNode.layout?.columnSize || 1,
                     },
                   );
 
@@ -1138,7 +1136,7 @@ export default function RenderOverlay({ bridge }: RenderOverlayProps) {
                     dragOverNode,
                     'layout',
                     'columnSize',
-                    appDom.createConst(1),
+                    1,
                   );
 
                   draft = appDom.addNode(
@@ -1199,9 +1197,7 @@ export default function RenderOverlay({ bridge }: RenderOverlayProps) {
               if (!isDraggingOverHorizontalContainer) {
                 if (isOriginalParentColumn) {
                   const rowContainer = appDom.createElement(draft, PAGE_ROW_COMPONENT_ID, {
-                    justifyContent: appDom.createConst(
-                      originalParentInfo?.props.alignItems || 'start',
-                    ),
+                    justifyContent: originalParentInfo?.props.alignItems || 'start',
                   });
                   draft = appDom.addNode(
                     draft,
@@ -1266,13 +1262,7 @@ export default function RenderOverlay({ bridge }: RenderOverlayProps) {
               draggedNodeParent &&
               draggedNodeParent.id !== parent.id
             ) {
-              draft = appDom.setNodeNamespacedProp(
-                draft,
-                draggedNode,
-                'layout',
-                'columnSize',
-                appDom.createConst(1),
-              );
+              draft = appDom.setNodeNamespacedProp(draft, draggedNode, 'layout', 'columnSize', 1);
             }
           }
 
@@ -1480,14 +1470,14 @@ export default function RenderOverlay({ bridge }: RenderOverlayProps) {
                     draggedNode,
                     'layout',
                     'columnSize',
-                    appDom.createConst(updatedDraggedNodeColumnSize),
+                    updatedDraggedNodeColumnSize,
                   );
                   draft = appDom.setNodeNamespacedProp(
                     draft,
                     previousSibling,
                     'layout',
                     'columnSize',
-                    appDom.createConst(updatedPreviousSiblingColumnSize),
+                    updatedPreviousSiblingColumnSize,
                   );
                 }
               }
@@ -1510,14 +1500,14 @@ export default function RenderOverlay({ bridge }: RenderOverlayProps) {
                     draggedNode,
                     'layout',
                     'columnSize',
-                    appDom.createConst(updatedDraggedNodeColumnSize),
+                    updatedDraggedNodeColumnSize,
                   );
                   draft = appDom.setNodeNamespacedProp(
                     draft,
                     nextSibling,
                     'layout',
                     'columnSize',
-                    appDom.createConst(updatedNextSiblingColumnSize),
+                    updatedNextSiblingColumnSize,
                   );
                 }
               }
@@ -1533,7 +1523,7 @@ export default function RenderOverlay({ bridge }: RenderOverlayProps) {
                 draggedNode,
                 'props',
                 resizableHeightProp,
-                appDom.createConst(resizePreviewRect.height),
+                resizePreviewRect.height,
               );
             }
           }

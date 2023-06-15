@@ -1,7 +1,7 @@
 import path from 'path';
+import { fileExists, folderExists } from '../../../packages/toolpad-utils/src/fs';
 import { test, expect } from '../../playwright/localTest';
 import { ToolpadEditor } from '../../models/ToolpadEditor';
-import { fileExists, folderExists } from '../../../packages/toolpad-app/src/utils/fs';
 
 test.use({
   localAppConfig: {

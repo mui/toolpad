@@ -7,19 +7,36 @@ import * as vm from 'vm';
 import * as url from 'url';
 import { TOOLPAD_FUNCTION } from '@mui/toolpad-core';
 import fetch, { Headers, Request, Response } from 'node-fetch';
-import { errorFrom } from '@mui/toolpad-utils/errors';
+import { errorFrom, serializeError } from '@mui/toolpad-utils/errors';
 import invariant from 'invariant';
+
+function getCircularReplacer() {
+  const ancestors: object[] = [];
+  return function replacer(this: object, key: string, value: unknown) {
+    if (typeof value !== 'object' || value === null) {
+      return value;
+    }
+    // `this` is the object that value is contained in,
+    // i.e., its direct parent.
+    while (ancestors.length > 0 && ancestors.at(-1) !== this) {
+      ancestors.pop();
+    }
+    if (ancestors.includes(value)) {
+      return '[Circular]';
+    }
+    ancestors.push(value);
+    return value;
+  };
+}
 
 type IntrospectedFiles = Map<string, { file: string }>;
 
 interface IntrospectMessage {
-  // response: MessagePort;
   kind: 'introspect';
   files: IntrospectedFiles;
 }
 
 interface ExecuteMessage {
-  // response: MessagePort;
   kind: 'execute';
   filePath: string;
   name: string;
@@ -30,20 +47,44 @@ type WorkerMessage = IntrospectMessage | ExecuteMessage;
 
 type TransferredMessage = WorkerMessage & { port: MessagePort };
 
+interface ModuleObject {
+  exports: Record<string, unknown>;
+}
+
+const fileContents = new Map<string, string>();
+const moduleCache = new Map<string, ModuleObject>();
+
+function loadModule(fullPath: string, content: string) {
+  const moduleRequire = createRequire(url.pathToFileURL(fullPath));
+  const moduleObject: ModuleObject = { exports: {} };
+
+  vm.runInThisContext(`
+    ((require, exports, module) => {
+      ${content}
+    })
+  `)(moduleRequire, moduleObject.exports, moduleObject);
+
+  return moduleObject;
+}
+
 async function resolveFunctions(filePath: string): Promise<Record<string, Function>> {
   const fullPath = path.resolve(filePath);
   const content = await fs.readFile(fullPath, 'utf-8');
-  const moduleRequire = createRequire(url.pathToFileURL(fullPath));
-  const moduleObject: { exports: Record<string, unknown> } = { exports: {} };
 
-  vm.runInThisContext(`
-      ((require, exports, module) => {
-        ${content}
-      })
-    `)(moduleRequire, moduleObject.exports, moduleObject);
+  if (content !== fileContents.get(fullPath)) {
+    moduleCache.delete(fullPath);
+    fileContents.set(fullPath, content);
+  }
+
+  let cachedModule = moduleCache.get(fullPath);
+
+  if (!cachedModule) {
+    cachedModule = loadModule(fullPath, content);
+    moduleCache.set(fullPath, cachedModule);
+  }
 
   return Object.fromEntries(
-    Object.entries(moduleObject.exports).flatMap(([key, value]) =>
+    Object.entries(cachedModule.exports).flatMap(([key, value]) =>
       typeof value === 'function' ? [[key, value]] : [],
     ),
   );
@@ -57,8 +98,7 @@ async function execute(msg: ExecuteMessage) {
     throw new Error(`Function "${msg.name}" not found`);
   }
 
-  const data = await fn({ parameters: msg.parameters });
-  return { data };
+  return fn({ parameters: msg.parameters });
 }
 
 async function introspect(msg: IntrospectMessage) {
@@ -113,9 +153,9 @@ if (!isMainThread && parentPort) {
     (async () => {
       try {
         const result = await handleMessage(msg);
-        msg.port.postMessage(result);
+        msg.port.postMessage({ result: JSON.stringify(result, getCircularReplacer()) });
       } catch (rawError) {
-        msg.port.postMessage({ error: errorFrom(rawError) });
+        msg.port.postMessage({ error: serializeError(errorFrom(rawError)) });
       }
     })();
   });
@@ -129,8 +169,13 @@ export function createWorker(env: Record<string, any>) {
   const runOnWorker = async (msg: WorkerMessage) => {
     const { port1, port2 } = new MessageChannel();
     worker.postMessage({ port: port1, ...msg } satisfies TransferredMessage, [port1]);
-    const [value] = await once(port2, 'message');
-    return value;
+    const [{ error, result }] = await once(port2, 'message');
+
+    if (error) {
+      throw errorFrom(error);
+    }
+
+    return JSON.parse(result);
   };
 
   return {
@@ -155,3 +200,8 @@ export function createWorker(env: Record<string, any>) {
     },
   };
 }
+
+process.on('unhandledRejection', (error) => {
+  console.error(error);
+  process.exit(1);
+});

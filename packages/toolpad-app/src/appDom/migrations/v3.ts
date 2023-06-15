@@ -1,6 +1,6 @@
 import invariant from 'invariant';
 import { mapValues } from '@mui/toolpad-utils/collections';
-import * as appDom from '..';
+import * as appDom from './types/v7Legacy';
 
 function replaceQueryParams(node: any): appDom.AppDomNode {
   if (node.type === 'query') {

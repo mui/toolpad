@@ -8,6 +8,9 @@ import inquirer from 'inquirer';
 import chalk from 'chalk';
 import { errorFrom } from '@mui/toolpad-utils/errors';
 import { execaCommand } from 'execa';
+import { satisfies } from 'semver';
+import { readJsonFile } from '@mui/toolpad-utils/fs';
+import { PackageJson } from './packageType';
 
 type PackageManager = 'npm' | 'pnpm' | 'yarn';
 declare global {
@@ -109,7 +112,7 @@ const scaffoldProject = async (absolutePath: string, installFlag: boolean): Prom
   // eslint-disable-next-line no-console
   console.log();
 
-  const packageJson = {
+  const packageJson: PackageJson = {
     name: path.basename(absolutePath),
     version: '0.1.0',
     private: true,
@@ -123,15 +126,21 @@ const scaffoldProject = async (absolutePath: string, installFlag: boolean): Prom
     },
   };
 
+  const DEFAULT_GENERATED_GITIGNORE_FILE = '.gitignore';
+  // eslint-disable-next-line no-console
+  console.log(`${chalk.blue('info')} - Initializing package.json file`);
   await fs.writeFile(path.join(absolutePath, 'package.json'), JSON.stringify(packageJson, null, 2));
+
+  // eslint-disable-next-line no-console
+  console.log(`${chalk.blue('info')} - Initializing .gitignore file`);
+  await fs.copyFile(
+    path.resolve(__dirname, `./gitignoreTemplate`),
+    path.join(absolutePath, DEFAULT_GENERATED_GITIGNORE_FILE),
+  );
 
   if (installFlag) {
     // eslint-disable-next-line no-console
-    console.log(
-      `${chalk.blue('info')} - Installing the following dependencies: ${chalk.magenta(
-        '@mui/toolpad',
-      )}`,
-    );
+    console.log(`${chalk.blue('info')} - Installing dependencies`);
     // eslint-disable-next-line no-console
     console.log();
 
@@ -150,6 +159,18 @@ const scaffoldProject = async (absolutePath: string, installFlag: boolean): Prom
 
 // Run the CLI interaction with Inquirer.js
 const run = async () => {
+  const pj = await readJsonFile(path.resolve(__dirname, `../package.json`));
+  // check the node version before create
+  if (!satisfies(process.version, pj.engines?.node)) {
+    // eslint-disable-next-line no-console
+    console.log(
+      `${chalk.red('error')} - Your node version ${
+        process.version
+      } is unsupported. Please upgrade it to at least ${pj.engines?.node}`,
+    );
+    process.exit(1);
+  }
+
   const args = await yargs(process.argv.slice(2))
     .scriptName('create-toolpad-app')
     .usage('$0 [path] [options]')
@@ -159,7 +180,7 @@ const run = async () => {
     })
     .option('install', {
       type: 'boolean',
-      describe: 'Where to intall dependencies',
+      describe: 'Where to install dependencies',
       default: true,
     })
     .help().argv;

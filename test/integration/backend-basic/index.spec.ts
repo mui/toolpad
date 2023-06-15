@@ -114,3 +114,17 @@ test('Query serialization', async ({ page }) => {
   await expect(page.getByText('Non-circular: hello:hello', { exact: true })).toBeVisible();
   await expect(page.getByText('Invalid error: undefined', { exact: true })).toBeVisible();
 });
+
+test('Extracted types', async ({ page }) => {
+  const runtimeModel = new ToolpadRuntime(page);
+  await runtimeModel.gotoPage('extractedTypes');
+
+  await expect(
+    page.getByText('bare function with parameters: foo: bar; typeof bar: number; baz.hello: 5', {
+      exact: true,
+    }),
+  ).toBeVisible();
+  await expect(
+    page.getByText("synchronous function: hello I'm synchronous", { exact: true }),
+  ).toBeVisible();
+});

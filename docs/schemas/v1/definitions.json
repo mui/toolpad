@@ -411,35 +411,6 @@
   ],
   "additionalProperties": false,
   "definitions": {
-    "Json": {
-      "anyOf": [
-        {
-          "type": "string"
-        },
-        {
-          "type": "number"
-        },
-        {
-          "type": "boolean"
-        },
-        {
-          "type": "null"
-        },
-        {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/Json"
-          }
-        },
-        {
-          "type": "object",
-          "additionalProperties": {
-            "$ref": "#/definitions/Json"
-          }
-        }
-      ],
-      "description": "A JSON compatible value, anything that is serializable to JSON."
-    },
     "JsExpressionBinding": {
       "type": "object",
       "properties": {
@@ -524,7 +495,28 @@
     "BindableProp": {
       "anyOf": [
         {
-          "$ref": "#/definitions/Json"
+          "type": "string"
+        },
+        {
+          "type": "number"
+        },
+        {
+          "type": "boolean"
+        },
+        {
+          "type": "null"
+        },
+        {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/BindableProp"
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/definitions/BindableProp"
+          }
         },
         {
           "$ref": "#/definitions/JsExpressionBinding"

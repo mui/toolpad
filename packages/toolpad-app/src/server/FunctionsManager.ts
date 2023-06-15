@@ -74,6 +74,8 @@ export default class FunctionsManager {
 
   private extractTypesWorker: Piscina;
 
+  private cancelTypeExtraction = new AbortController();
+
   // eslint-disable-next-line class-methods-use-this
   private setInitialized: () => void = () => {
     throw new Error('setInitialized should be initialized');
@@ -136,8 +138,12 @@ export default class FunctionsManager {
     const entryPoints = await this.getFunctionFiles();
 
     const onFunctionBuildStart = async () => {
+      this.cancelTypeExtraction.abort();
+      this.cancelTypeExtraction = new AbortController();
       this.extractedTypes = this.extractTypesWorker
-        .run({ resourcesFolder: this.getResourcesFolder() } satisfies ExtractTypesParams)
+        .run({ resourcesFolder: this.getResourcesFolder() } satisfies ExtractTypesParams, {
+          signal: this.cancelTypeExtraction.signal,
+        })
         .catch((error) => ({
           error,
           files: [],

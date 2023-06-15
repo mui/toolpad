@@ -13,17 +13,17 @@ import { Emitter } from '@mui/toolpad-utils/events';
 import { errorFrom } from '@mui/toolpad-utils/errors';
 import { filterValues, hasOwnProperty, mapValues } from '@mui/toolpad-utils/collections';
 import { execa } from 'execa';
-import config from '../config';
-import * as appDom from '../appDom';
-import { migrateUp } from '../appDom/migrations';
-import insecureHash from '../utils/insecureHash';
 import {
   writeFileRecursive,
   readMaybeFile,
   readMaybeDir,
   updateYamlFile,
   fileExists,
-} from '../utils/fs';
+} from '@mui/toolpad-utils/fs';
+import config from '../config';
+import * as appDom from '../appDom';
+import { migrateUp } from '../appDom/migrations';
+import insecureHash from '../utils/insecureHash';
 import {
   Page,
   Query,
@@ -1220,17 +1220,29 @@ class ToolpadProject {
     return dom;
   }
 
-  async saveDom(newDom: appDom.AppDom) {
+  async writeDomToDisk(newDom: appDom.AppDom) {
     if (config.cmd !== 'dev') {
       throw new Error(`Writing to disk is only possible in toolpad dev mode.`);
     }
 
+    await writeDomToDisk(newDom);
+    const newFingerprint = await calculateDomFingerprint(this.root);
+    this.domAndFingerprint = [newDom, newFingerprint];
+    this.events.emit('change', { fingerprint: newFingerprint });
+    return { fingerprint: newFingerprint };
+  }
+
+  async saveDom(newDom: appDom.AppDom) {
     return this.domAndFingerprintLock.use(async () => {
-      await writeDomToDisk(newDom);
-      const newFingerprint = await calculateDomFingerprint(this.root);
-      this.domAndFingerprint = [newDom, newFingerprint];
-      this.events.emit('change', { fingerprint: newFingerprint });
-      return { fingerprint: newFingerprint };
+      return this.writeDomToDisk(newDom);
+    });
+  }
+
+  async applyDomDiff(domDiff: appDom.DomDiff) {
+    return this.domAndFingerprintLock.use(async () => {
+      const dom = await this.loadDom();
+      const newDom = appDom.applyDiff(dom, domDiff);
+      return this.writeDomToDisk(newDom);
     });
   }
 

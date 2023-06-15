@@ -79,7 +79,7 @@ export function postProcessHtml(html: string, { config, dom }: PostProcessHtmlPa
     )}] = ${serializedInitialState}</script>`,
   ];
 
-  return html.replaceAll(`<!-- __TOOLPAD_SCRIPTS__ -->`, toolpadScripts.join('\n'));
+  return html.replace(`<!-- __TOOLPAD_SCRIPTS__ -->`, () => toolpadScripts.join('\n'));
 }
 
 interface ToolpadVitePluginParams {

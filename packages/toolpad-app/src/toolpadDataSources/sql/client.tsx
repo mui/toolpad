@@ -214,7 +214,7 @@ export function QueryEditor({
     isLoading: previewIsLoading,
   } = useQueryPreview(
     fetchServerPreview,
-    input.attributes.query.value,
+    input.attributes.query,
     previewParams as Record<string, string>,
   );
 
@@ -229,7 +229,7 @@ export function QueryEditor({
         <QueryInputPanel onRunPreview={handleRunPreview}>
           <Box sx={{ flex: 1, minHeight: 0 }}>
             <MonacoEditor
-              value={input.attributes.query.value.sql}
+              value={input.attributes.query.sql}
               onChange={(newValue) =>
                 setInput((existing) => appDom.setQueryProp(existing, 'sql', newValue))
               }

@@ -243,7 +243,7 @@ export default createComponent(Form, {
       control: { type: 'layoutSlot' },
     },
     value: {
-      helperText: 'The value that is controlled by this text input.',
+      helperText: 'The value that is controlled by this form.',
       type: 'object',
       default: {},
       onChangeProp: 'onChange',

@@ -1,6 +1,6 @@
 import invariant from 'invariant';
 import { mapValues } from '@mui/toolpad-utils/collections';
-import * as appDom from '..';
+import * as appDom from './types/v7Legacy';
 
 function replaceMutation(node: any): appDom.AppDomNode {
   if (node.type === 'mutation') {
@@ -10,7 +10,10 @@ function replaceMutation(node: any): appDom.AppDomNode {
       parentProp: 'queries',
       attributes: {
         ...node.attributes,
-        mode: appDom.createConst('mutation'),
+        mode: {
+          type: 'const',
+          value: 'mutation',
+        },
       },
     };
   }

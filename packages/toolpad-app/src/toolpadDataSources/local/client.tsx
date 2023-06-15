@@ -41,7 +41,7 @@ function QueryEditor({
     { retry: false },
   );
 
-  const functionName: string | undefined = input.attributes.query.value.function;
+  const functionName: string | undefined = input.attributes.query.function;
 
   const allOptions = React.useMemo(() => {
     return (introspection.data?.files ?? []).flatMap((file) => {
@@ -98,7 +98,7 @@ function QueryEditor({
     isLoading: previewIsLoading,
   } = useQueryPreview(
     fetchServerPreview,
-    input.attributes.query.value,
+    input.attributes.query,
     previewParams as Record<string, string>,
   );
 

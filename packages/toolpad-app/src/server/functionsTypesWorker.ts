@@ -30,6 +30,7 @@ export interface FileIntrospectionResult {
 }
 
 export interface IntrospectionResult {
+  error?: Error;
   files: FileIntrospectionResult[];
 }
 

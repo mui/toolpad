@@ -10,6 +10,7 @@ import { writeFileRecursive, fileExists } from '@mui/toolpad-utils/fs';
 import invariant from 'invariant';
 import Piscina from 'piscina';
 import { ExecFetchResult } from '@mui/toolpad-core';
+import { errorFrom } from '@mui/toolpad-utils/errors';
 import EnvManager from './EnvManager';
 import { ProjectEvents, ToolpadProjectOptions } from '../types';
 import { createWorker as createDevWorker } from './functionsDevWorker';
@@ -254,6 +255,11 @@ export default class FunctionsManager {
     }
 
     const extractedTypes = await this.extractedTypes;
+
+    if (extractedTypes.error) {
+      throw errorFrom(extractedTypes.error);
+    }
+
     const file = extractedTypes.files.find((fileEntry) => fileEntry.name === fileName);
     const handler = file?.handlers.find((handlerEntry) => handlerEntry.name === name);
 

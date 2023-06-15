@@ -10,6 +10,11 @@ import { folderExists } from '@mui/toolpad-utils/fs';
 import { execaNode } from 'execa';
 import getPort from 'get-port';
 
+invariant(
+  process.execArgv.includes('--enable-source-maps'),
+  'Must run Toolpad with --enable-source-maps',
+);
+
 const DEFAULT_PORT = 3000;
 
 async function waitForMatch(input: Readable, regex: RegExp): Promise<RegExpExecArray | null> {

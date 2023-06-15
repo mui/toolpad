@@ -1,4 +1,4 @@
-# Datagrid chip column
+# Datagrid columns
 
 <p class="description">A basic Toolpad app that shows how to add a code component inside a Data Grid</p>
 

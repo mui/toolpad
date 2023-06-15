@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: page
+spec:
+  id: dt1T4rY
+  title: extractedTypes
+  display: shell
+  content:
+    - component: PageRow
+      name: pageRow
+      children:
+        - component: Text
+          name: text
+  queries:
+    - name: bareWithParams
+      query:
+        function: bareWithParams
+        kind: local

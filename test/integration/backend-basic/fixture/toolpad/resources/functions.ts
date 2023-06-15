@@ -87,3 +87,7 @@ export async function invalidError() {
   // Yes, I'm throwing a function here
   throw function Hello() {};
 }
+
+export function bareWithParams(foo: string, bar: number, baz = { hello: 1 }) {
+  return { message: `foo: ${foo}; typeof bar: ${typeof bar}; baz.hello: ${baz.hello}` };
+}

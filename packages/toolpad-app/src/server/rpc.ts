@@ -6,6 +6,7 @@ import { fromZodError } from 'zod-validation-error';
 import { hasOwnProperty } from '@mui/toolpad-utils/collections';
 import { errorFrom, serializeError } from '@mui/toolpad-utils/errors';
 import { indent } from '@mui/toolpad-utils/strings';
+import chalk from 'chalk';
 import { execQuery, dataSourceFetchPrivate } from './data';
 import { getVersionInfo } from './versionInfo';
 import { createComponent, deletePage, openCodeComponentEditor } from './localMode';

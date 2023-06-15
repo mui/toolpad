@@ -34,7 +34,7 @@ interface PageEditorContentProps {
 }
 
 function PageEditorContent({ node }: PageEditorContentProps) {
-  usePageTitle(`${node.attributes.title.value} | Toolpad editor`);
+  usePageTitle(`${node.attributes.title} | Toolpad editor`);
 
   const [splitDefaultSize, setSplitDefaultSize] = useLocalStorageState<number>(
     `editor/component-panel-split`,

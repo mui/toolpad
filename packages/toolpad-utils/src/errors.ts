@@ -53,6 +53,6 @@ export function errorFrom(maybeError: unknown): Error {
     return new Error(maybeError, { cause: maybeError });
   }
 
-  const message = truncate(JSON.stringify(maybeError), 500);
+  const message = truncate(String(JSON.stringify(maybeError)), 500);
   return new Error(message, { cause: maybeError });
 }

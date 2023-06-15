@@ -27,3 +27,8 @@ export async function loadDom(): Promise<appDom.AppDom> {
   const project = await getProject();
   return project.loadDom();
 }
+
+export async function applyDomDiff(diff: appDom.DomDiff): Promise<{ fingerprint: number }> {
+  const project = await getProject();
+  return project.applyDomDiff(diff);
+}

@@ -9,7 +9,7 @@ import { execQuery, dataSourceFetchPrivate } from './data';
 import { getVersionInfo } from './versionInfo';
 import logger from './logs/logger';
 import { createComponent, deletePage, openCodeComponentEditor } from './localMode';
-import { loadDom, saveDom } from './liveProject';
+import { loadDom, saveDom, applyDomDiff } from './liveProject';
 import { asyncHandler } from '../utils/http';
 
 export interface Method<P extends any[] = any[], R = any> {
@@ -136,6 +136,9 @@ export const rpcServer = {
   mutation: {
     saveDom: createMethod<typeof saveDom>(({ params }) => {
       return saveDom(...params);
+    }),
+    applyDomDiff: createMethod<typeof applyDomDiff>(({ params }) => {
+      return applyDomDiff(...params);
     }),
     openCodeComponentEditor: createMethod<typeof openCodeComponentEditor>(({ params }) => {
       return openCodeComponentEditor(...params);

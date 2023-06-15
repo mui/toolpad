@@ -1230,18 +1230,29 @@ class ToolpadProject {
     return dom;
   }
 
-  async saveDom(newDom: appDom.AppDom) {
+  async writeDomToDisk(newDom: appDom.AppDom) {
     if (config.cmd !== 'dev') {
       throw new Error(`Writing to disk is only possible in toolpad dev mode.`);
     }
+    const oldDom = await this.loadDom();
+    await writeDomToDisk(newDom, oldDom);
+    const newFingerprint = await calculateDomFingerprint(this.root);
+    this.domAndFingerprint = [newDom, newFingerprint];
+    this.events.emit('change', { fingerprint: newFingerprint });
+    return { fingerprint: newFingerprint };
+  }
 
+  async saveDom(newDom: appDom.AppDom) {
     return this.domAndFingerprintLock.use(async () => {
-      const oldDom = await this.loadDom();
-      await writeDomToDisk(newDom, oldDom);
-      const newFingerprint = await calculateDomFingerprint(this.root);
-      this.domAndFingerprint = [newDom, newFingerprint];
-      this.events.emit('change', { fingerprint: newFingerprint });
-      return { fingerprint: newFingerprint };
+      return this.writeDomToDisk(newDom);
+    });
+  }
+
+  async applyDomDiff(domDiff: appDom.DomDiff) {
+    return this.domAndFingerprintLock.use(async () => {
+      const dom = await this.loadDom();
+      const newDom = appDom.applyDiff(dom, domDiff);
+      return this.writeDomToDisk(newDom);
     });
   }
 

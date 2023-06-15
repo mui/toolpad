@@ -2,7 +2,7 @@ import * as React from 'react';
 import Box from '@mui/material/Box';
 import Chip from '@mui/material/Chip';
 import Typography from '@mui/material/Typography';
-import SvgMuiLogomark from 'docs/src/icons/SvgMuiLogomark';
+import SvgMuiLogo from 'docs/src/icons/SvgMuiLogo';
 import IconImage from 'docs/src/components/icon/IconImage';
 import GradientText from 'docs/src/components/typography/GradientText';
 import DataObjectRoundedIcon from '@mui/icons-material/DataObjectRounded';
@@ -60,7 +60,7 @@ export default function Hero() {
           }}
         >
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-            <SvgMuiLogomark width={20} />
+            <SvgMuiLogo width={20} />
             <Typography color="text.primary" fontWeight="medium" variant="body2">
               Powered by MUI
             </Typography>

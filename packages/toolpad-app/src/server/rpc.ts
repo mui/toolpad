@@ -5,9 +5,9 @@ import * as z from 'zod';
 import { fromZodError } from 'zod-validation-error';
 import { hasOwnProperty } from '@mui/toolpad-utils/collections';
 import { errorFrom, serializeError } from '@mui/toolpad-utils/errors';
+import { indent } from '@mui/toolpad-utils/strings';
 import { execQuery, dataSourceFetchPrivate } from './data';
 import { getVersionInfo } from './versionInfo';
-import logger from './logs/logger';
 import { createComponent, deletePage, openCodeComponentEditor } from './localMode';
 import { loadDom, saveDom, applyDomDiff } from './liveProject';
 import { asyncHandler } from '../utils/http';
@@ -89,16 +89,17 @@ export function createRpcHandler(definition: Definition): express.RequestHandler
 
       res.json(responseData);
 
-      const logLevel = error ? 'warn' : 'trace';
-      logger[logLevel](
-        {
-          key: 'rpc',
-          type,
-          name,
-          error,
-        },
-        'Handled RPC request',
-      );
+      if (error) {
+        // eslint-disable-next-line no-console
+        console.log(`${chalk.red('error')} - RPC error`);
+        if (error.stack) {
+          // eslint-disable-next-line no-console
+          console.log(indent(error.stack, 2));
+        } else {
+          // eslint-disable-next-line no-console
+          console.log(indent(`${error.name}: ${error.message}`, 2));
+        }
+      }
     }),
   );
   return router;

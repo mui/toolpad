@@ -3,8 +3,6 @@ import { AppBar, Box, Toolbar, Tooltip, Chip, Link, useTheme } from '@mui/materi
 import UserFeedback from './UserFeedback';
 import ThemeModeMenu from './ThemeModeMenu';
 import { useThemeMode, ThemeMode } from '../../../ThemeContext';
-import productIconDark from '../../../../public/product-icon-dark.svg';
-import productIconLight from '../../../../public/product-icon-light.svg';
 
 export interface HeaderProps {
   actions?: React.ReactNode;
@@ -22,6 +20,10 @@ function Header({ actions, status, enableUserFeedback = true }: HeaderProps) {
     },
     [setThemeMode],
   );
+
+  const productIcon =
+    theme.palette.mode === 'dark' ? '/product-icon-dark.svg' : '/product-icon-light.svg';
+
   return (
     <React.Fragment>
       <AppBar
@@ -48,12 +50,7 @@ function Header({ actions, status, enableUserFeedback = true }: HeaderProps) {
                 underline="none"
                 sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center', gap: 1 }}
               >
-                <img
-                  src={theme.palette.mode === 'dark' ? productIconDark.src : productIconLight.src}
-                  alt="Toolpad product icon"
-                  width={25}
-                  height={25}
-                />
+                <img src={productIcon} alt="Toolpad product icon" width={25} height={25} />
                 <Box
                   data-testid="brand"
                   sx={{
@@ -69,7 +66,7 @@ function Header({ actions, status, enableUserFeedback = true }: HeaderProps) {
                 </Box>
               </Link>
             </Tooltip>
-            <Chip sx={{ ml: 1 }} label="Alpha" size="small" color="grey" />
+            <Chip sx={{ ml: 1 }} label="Beta" size="small" color="grey" />
           </Box>
           <Box
             sx={{

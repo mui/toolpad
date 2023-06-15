@@ -21,6 +21,10 @@
       "matchDepTypes": ["devDependencies"]
     },
     {
+      "groupName": "docs",
+      "matchFiles": ["docs/package.json"]
+    },
+    {
       "groupName": "MUI Core",
       "matchPackagePatterns": ["^@mui/"],
       "schedule": ["at any time"]
@@ -38,7 +42,7 @@
     {
       "groupName": "node",
       "matchPackageNames": ["cimg/node", "node"],
-      "allowedVersions": "<=16"
+      "allowedVersions": "16.14.2"
     },
     {
       "description": "Ignore nodejs in engines",
@@ -56,6 +60,10 @@
       "groupName": "node-fetch",
       "matchPackageNames": ["node-fetch"],
       "allowedVersions": "< 3.0.0"
+    },
+    {
+      "groupName": "Next.js",
+      "matchPackageNames": ["next"]
     },
     {
       "groupName": "react-router",

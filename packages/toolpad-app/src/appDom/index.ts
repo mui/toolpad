@@ -1,5 +1,5 @@
+import { nanoid } from 'nanoid/non-secure';
 import { generateKeyBetween } from 'fractional-indexing';
-import cuid from 'cuid';
 import {
   NodeId,
   NodeReference,
@@ -11,11 +11,11 @@ import {
 } from '@mui/toolpad-core';
 import invariant from 'invariant';
 import { BoxProps } from '@mui/material';
+import { pascalCase, removeDiacritics, uncapitalize } from '@mui/toolpad-utils/strings';
+import { mapProperties, mapValues } from '@mui/toolpad-utils/collections';
 import { ConnectionStatus, AppTheme } from '../types';
 import { omit, update, updateOrCreate } from '../utils/immutability';
-import { pascalCase, removeDiacritics, uncapitalize } from '../utils/strings';
 import { ExactEntriesOf, Maybe } from '../utils/types';
-import { mapProperties, mapValues } from '../utils/collections';
 
 export const CURRENT_APPDOM_VERSION = 6;
 
@@ -234,8 +234,8 @@ function assertIsType<T extends AppDomNode>(node: AppDomNode, type: T['type']): 
   invariant(isType(node, type), `Expected node type "${type}" but got "${node.type}"`);
 }
 
-function createId(): NodeId {
-  return cuid.slug() as NodeId;
+export function createId(): NodeId {
+  return nanoid(7) as NodeId;
 }
 
 export function createConst<V>(value: V): ConstantAttrValue<V> {
@@ -605,6 +605,15 @@ export function getPageAncestor(dom: AppDom, node: AppDomNode): PageNode | null 
     return getPageAncestor(dom, parent);
   }
   return null;
+}
+
+/**
+ * Returns all nodes with a given component type
+ */
+export function getComponentTypeNodes(dom: AppDom, componentId: string): readonly AppDomNode[] {
+  return Object.values(dom.nodes).filter(
+    (node) => isElement(node) && node.attributes.component.value === componentId,
+  );
 }
 
 /**
@@ -1072,13 +1081,7 @@ function createRenderTreeNode(node: AppDomNode): RenderTreeNode | null {
   }
 
   if (isQuery(node) || isMutation(node)) {
-    // This is hacky, should we delegate this check to the datasources?
-    const isBrowserSideRestQuery: boolean =
-      (node.attributes.dataSource?.value === 'rest' ||
-        node.attributes.dataSource?.value === 'function') &&
-      !!(node.attributes.query.value as any).browser;
-
-    if (node.attributes.query.value && !isBrowserSideRestQuery) {
+    if (node.attributes.query.value) {
       node = setNamespacedProp(node, 'attributes', 'query', null);
     }
   }
@@ -1105,7 +1108,7 @@ export function ref(nodeId: NodeId): NodeReference;
 export function ref(nodeId: null | undefined): null;
 export function ref(nodeId: Maybe<NodeId>): NodeReference | null;
 export function ref(nodeId: Maybe<NodeId>): NodeReference | null {
-  return nodeId ? { $$ref: nodeId } : null;
+  return nodeId ? { $ref: nodeId } : null;
 }
 
 export function deref(nodeRef: NodeReference): NodeId;
@@ -1113,7 +1116,7 @@ export function deref(nodeRef: null | undefined): null;
 export function deref(nodeRef: Maybe<NodeReference>): NodeId | null;
 export function deref(nodeRef: Maybe<NodeReference>): NodeId | null {
   if (nodeRef) {
-    return nodeRef.$$ref;
+    return nodeRef.$ref;
   }
   return null;
 }
@@ -1145,4 +1148,60 @@ export function getPageByName(dom: AppDom, name: string): PageNode | null {
 export function getQueryByName(dom: AppDom, page: PageNode, name: string): QueryNode | null {
   const { queries = [] } = getChildNodes(dom, page);
   return queries.find((query) => query.name === name) ?? null;
+}
+
+/**
+ * Represents the changes between two doms in terms of added/deleted nodes.
+ */
+export interface DomDiff {
+  set: AppDomNode[];
+  unset: NodeId[];
+}
+
+/**
+ * Compare two doms and return a diff of the changes.
+ */
+export function createDiff(from: AppDom, to: AppDom): DomDiff {
+  const result: DomDiff = {
+    set: [],
+    unset: [],
+  };
+
+  const allIds = new Set<NodeId>([
+    ...(Object.keys(from.nodes) as NodeId[]),
+    ...(Object.keys(to.nodes) as NodeId[]),
+  ]);
+
+  for (const id of allIds) {
+    if (to.nodes[id] && to.nodes[id] !== from.nodes[id]) {
+      result.set.push(to.nodes[id]);
+    } else if (!to.nodes[id] && from.nodes[id]) {
+      result.unset.push(id);
+    }
+  }
+
+  return result;
+}
+
+/**
+ * Apply a diff to a dom and return the new dom.
+ */
+export function applyDiff(dom: AppDom, diff: DomDiff): AppDom {
+  let result = dom;
+
+  for (const node of diff.set) {
+    result = update(result, {
+      nodes: update(result.nodes, {
+        [node.id]: node,
+      }),
+    });
+  }
+
+  for (const id of diff.unset) {
+    result = update(result, {
+      nodes: omit(result.nodes, id),
+    });
+  }
+
+  return result;
 }

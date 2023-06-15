@@ -88,6 +88,19 @@ module.exports = {
         skipShapeProps: true,
       },
     ],
+    'import/no-restricted-paths': [
+      // Disabling this rule for now, still need a few more refactors for it to pass
+      'off',
+      {
+        zones: [
+          {
+            target: './packages/toolpad-app/src/runtime',
+            from: './packages/toolpad-app/src/',
+            except: ['./runtime', './appDom', './types.ts'],
+          },
+        ],
+      },
+    ],
   },
   overrides: [
     {
@@ -99,8 +112,21 @@ module.exports = {
       },
     },
     {
-      files: ['packages/toolpad-app/**/*'],
-      excludedFiles: ['**/jest-environment-jsdom.ts', 'tsup.config.ts', '*.spec.ts', '*.spec.tsx'],
+      files: [
+        'packages/create-toolpad-app/**/*',
+        'packages/toolpad/**/*',
+        'packages/toolpad-app/**/*',
+        'packages/toolpad-utils/**/*',
+        'packages/toolpad-core/**/*',
+        'packages/toolpad-components/**/*',
+      ],
+      excludedFiles: [
+        '**/jest-environment-jsdom.ts',
+        'tsup.config.ts',
+        '*.spec.ts',
+        '*.spec.tsx',
+        'jest.config.ts',
+      ],
       rules: {
         'import/no-extraneous-dependencies': ['error'],
       },
@@ -117,9 +143,6 @@ module.exports = {
       // https://github.com/mui/material-ui/blob/9737bc85bb6960adb742e7709e9c3710c4b6cedd/.eslintrc.js#L359
       files: ['packages/*/src/**/*{.ts,.tsx,.js}'],
       excludedFiles: ['*.d.ts', '*.spec.ts', '*.spec.tsx'],
-    },
-    {
-      files: ['packages/toolpad-core/**/*', 'packages/toolpad-components/**/*'],
       rules: {
         'no-restricted-imports': [
           'error',
@@ -136,6 +159,7 @@ module.exports = {
             ],
           }),
         ],
+        'import/no-cycle': ['error', { ignoreExternal: true }],
       },
     },
   ],

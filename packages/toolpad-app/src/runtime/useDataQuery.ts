@@ -1,9 +1,9 @@
+/// <reference types="vite/client" />
+
 import { GridRowsProp } from '@mui/x-data-grid-pro';
 import * as React from 'react';
 import { useQuery, UseQueryOptions } from '@tanstack/react-query';
-import { useAppContext } from './AppContext';
 import { CanvasHooksContext } from './CanvasHooksContext';
-import dataSources from '../toolpadDataSources/runtime';
 import * as appDom from '../appDom';
 
 interface ExecDataSourceQueryParams {
@@ -19,7 +19,7 @@ export async function execDataSourceQuery({
   queryName,
   params,
 }: ExecDataSourceQueryParams) {
-  const dataUrl = new URL(`/api/data/`, window.location.href);
+  const dataUrl = new URL(`${process.env.BASE_URL}/api/data/`, window.location.href);
   const url = new URL(
     `./${encodeURIComponent(pageName)}/${encodeURIComponent(queryName)}`,
     dataUrl,
@@ -68,14 +68,9 @@ export function useDataQuery(
     ...options
   }: Pick<UseQueryOptions<any, unknown, unknown, any[]>, 'enabled' | 'refetchInterval'>,
 ): UseFetch {
-  const { version } = useAppContext();
   const { savedNodes } = React.useContext(CanvasHooksContext);
   const queryName = node.name;
   const pageName = page.name;
-  const query = node.attributes.query?.value;
-  const dataSourceId = node.attributes.dataSource?.value;
-
-  const dataSource = dataSourceId ? dataSources[dataSourceId] : null;
 
   // These are only used by the editor to invalidate caches whenever the query changes during editing
   const nodeHash: number | undefined = savedNodes ? savedNodes[node.id] : undefined;
@@ -88,16 +83,8 @@ export function useDataQuery(
     data: responseData = EMPTY_OBJECT,
     refetch,
   } = useQuery(
-    [version, nodeHash, pageName, queryName, params],
-    ({ signal }) => {
-      const fetchFromServer = () => execDataSourceQuery({ signal, pageName, queryName, params });
-
-      if (query && dataSource?.exec) {
-        return dataSource?.exec(query, params, fetchFromServer);
-      }
-
-      return fetchFromServer();
-    },
+    [nodeHash, pageName, queryName, params],
+    ({ signal }) => execDataSourceQuery({ signal, pageName, queryName, params }),
     {
       ...options,
       enabled: isNodeAvailableOnServer && enabled,

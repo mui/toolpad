@@ -22,7 +22,9 @@ import {
   isPageColumn,
   PAGE_ROW_COMPONENT_ID,
   PAGE_COLUMN_COMPONENT_ID,
-} from '../../../../toolpadComponents';
+  isFormComponent,
+  FORM_COMPONENT_ID,
+} from '../../../../runtime/toolpadComponents';
 import {
   getRectanglePointActiveEdge,
   isHorizontalFlow,
@@ -201,6 +203,32 @@ function deleteOrphanedLayoutNodes(
           moveTargetNodeId !== parentParent.id &&
           moveTargetNodeId !== lastContainerChild.id
         ) {
+          if (
+            moveTargetNodeId !== parent.id &&
+            moveTargetNodeId !== lastContainerChild.id &&
+            isPageLayoutComponent(parentParent)
+          ) {
+            draftDom = appDom.moveNode(
+              draftDom,
+              lastContainerChild,
+              parentParent,
+              lastContainerChild.parentProp,
+              parent.parentIndex,
+            );
+
+            if (isPageColumn(parent)) {
+              draftDom = appDom.setNodeNamespacedProp(
+                draftDom,
+                lastContainerChild,
+                'layout',
+                'columnSize',
+                parent.layout?.columnSize || appDom.createConst(1),
+              );
+            }
+
+            orphanedLayoutNodeIds = [...orphanedLayoutNodeIds, parent.id];
+          }
+
           draftDom = appDom.moveNode(
             draftDom,
             lastContainerChild,
@@ -220,32 +248,6 @@ function deleteOrphanedLayoutNodes(
           }
 
           orphanedLayoutNodeIds = [...orphanedLayoutNodeIds, parentParent.id];
-        }
-
-        if (
-          moveTargetNodeId !== parent.id &&
-          moveTargetNodeId !== lastContainerChild.id &&
-          isPageLayoutComponent(parentParent)
-        ) {
-          draftDom = appDom.moveNode(
-            draftDom,
-            lastContainerChild,
-            parentParent,
-            lastContainerChild.parentProp,
-            parent.parentIndex,
-          );
-
-          if (isPageColumn(parent)) {
-            draftDom = appDom.setNodeNamespacedProp(
-              draftDom,
-              lastContainerChild,
-              'layout',
-              'columnSize',
-              parent.layout?.columnSize || appDom.createConst(1),
-            );
-          }
-
-          orphanedLayoutNodeIds = [...orphanedLayoutNodeIds, parent.id];
         }
       }
     }
@@ -519,20 +521,33 @@ export default function RenderOverlay({ bridge }: RenderOverlayProps) {
 
   const isEmptyPage = pageNodes.length <= 1;
 
+  /**
+   * Return all nodes that are available for insertion.
+   * i.e. Exclude all descendants of the current selection since inserting in one of
+   * them would create a cyclic structure.
+   */
   const availableDropTargets = React.useMemo((): appDom.AppDomNode[] => {
     if (!draggedNode) {
       return [];
     }
 
-    /**
-     * Return all nodes that are available for insertion.
-     * i.e. Exclude all descendants of the current selection since inserting in one of
-     * them would create a cyclic structure.
-     */
-    const excludedNodes =
-      selectedNode && !newNode
-        ? new Set<appDom.AppDomNode>([selectedNode, ...appDom.getDescendants(dom, selectedNode)])
-        : new Set();
+    let excludedNodes = new Set();
+
+    if (selectedNode && !newNode) {
+      excludedNodes = new Set<appDom.AppDomNode>([
+        selectedNode,
+        ...appDom.getDescendants(dom, selectedNode),
+      ]);
+    }
+
+    if (isFormComponent(draggedNode)) {
+      const formNodes = appDom.getComponentTypeNodes(dom, FORM_COMPONENT_ID);
+      const formNodeDescendants = formNodes
+        .map((formNode) => appDom.getDescendants(dom, formNode))
+        .flat();
+
+      formNodeDescendants.forEach(excludedNodes.add, excludedNodes);
+    }
 
     return pageNodes.filter((n) => !excludedNodes.has(n));
   }, [dom, draggedNode, newNode, pageNodes, selectedNode]);

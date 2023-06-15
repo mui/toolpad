@@ -1,29 +1,35 @@
 import * as React from 'react';
 import {
+  ApplicationVm,
   ArgTypeDefinition,
   BindableAttrValue,
-  DEFAULT_LOCAL_SCOPE_PARAMS,
-  LocalScopeParams,
+  RuntimeScope,
   ScopeMeta,
-  ScopeMetaField,
 } from '@mui/toolpad-core';
 import { Alert, Box } from '@mui/material';
 import { useBrowserJsRuntime } from '@mui/toolpad-core/jsBrowserRuntime';
-import { mapValues } from '../../../utils/collections';
 import * as appDom from '../../../appDom';
-import { useDom, useDomApi } from '../../AppState';
+import { useDomApi } from '../../AppState';
 import BindableEditor from './BindableEditor';
 import { usePageEditorState } from './PageEditorProvider';
 import { getDefaultControl } from '../../propertyControls';
-import MarkdownTooltip from '../../../components/MarkdownTooltip';
-import { isTemplateDescendant } from '../../../toolpadComponents/template';
-import { NON_BINDABLE_CONTROL_TYPES } from '../../../constants';
+import { NON_BINDABLE_CONTROL_TYPES } from '../../../runtime/constants';
 
-export interface NodeAttributeEditorProps<P extends object> {
+function buildScopeMeta(vm: ApplicationVm, bindingScope?: RuntimeScope): ScopeMeta {
+  if (bindingScope?.parentScope) {
+    return {
+      ...buildScopeMeta(vm, bindingScope?.parentScope),
+      ...bindingScope?.meta,
+    };
+  }
+  return bindingScope?.meta ?? {};
+}
+
+export interface NodeAttributeEditorProps<P extends object, K extends keyof P = keyof P> {
   node: appDom.AppDomNode;
   namespace?: string;
   name: string;
-  argType: ArgTypeDefinition<P>;
+  argType: ArgTypeDefinition<P, K>;
   props?: P;
 }
 
@@ -34,7 +40,6 @@ export default function NodeAttributeEditor<P extends object>({
   argType,
   props,
 }: NodeAttributeEditorProps<P>) {
-  const { dom } = useDom();
   const domApi = useDomApi();
 
   const handlePropChange = React.useCallback(
@@ -49,11 +54,15 @@ export default function NodeAttributeEditor<P extends object>({
   const propValue: BindableAttrValue<unknown> | null = (node as any)[namespace]?.[name] ?? null;
 
   const bindingId = `${node.id}${namespace ? `.${namespace}` : ''}.${name}`;
-  const { bindings, pageState, globalScopeMeta, viewState } = usePageEditorState();
+  const { vm } = usePageEditorState();
 
-  const liveBinding = bindings[bindingId];
+  const scopeId = vm.bindingScopes[bindingId];
+  const bindingScope = scopeId ? vm.scopes[scopeId] : undefined;
 
-  const propType = argType.typeDef;
+  const liveBinding = bindingScope?.bindings[bindingId];
+
+  const scopeMeta = React.useMemo(() => buildScopeMeta(vm, bindingScope), [vm, bindingScope]);
+
   const Control = getDefaultControl(argType, props);
 
   // NOTE: Doesn't make much sense to bind controlled props. In the future we might opt
@@ -67,45 +76,27 @@ export default function NodeAttributeEditor<P extends object>({
 
   const jsBrowserRuntime = useBrowserJsRuntime();
 
-  const isNodeTemplateDescendant = React.useMemo(
-    () => appDom.isElement(node) && isTemplateDescendant(dom, node, viewState),
-    [dom, node, viewState],
-  );
-
-  const localState: LocalScopeParams = isNodeTemplateDescendant
-    ? { i: DEFAULT_LOCAL_SCOPE_PARAMS.i }
-    : {};
-  const localScopeMeta: ScopeMeta = mapValues(
-    localState,
-    () => ({ kind: 'local' } as ScopeMetaField),
-  );
-
   return Control ? (
     <BindableEditor
       liveBinding={liveBinding}
-      globalScope={{ ...pageState, ...localState }}
-      globalScopeMeta={{
-        ...globalScopeMeta,
-        ...localScopeMeta,
-      }}
+      globalScope={bindingScope?.values ?? {}}
+      globalScopeMeta={scopeMeta}
       label={argType.label || name}
       bindable={isBindable}
       disabled={isDisabled}
-      propType={propType}
+      propType={argType}
       jsRuntime={jsBrowserRuntime}
       renderControl={(params) => (
-        <MarkdownTooltip placement="left" title={argType.helperText ?? ''}>
-          <Box sx={{ flex: 1 }}>
-            <Control nodeId={node.id} {...params} propType={propType} />
-          </Box>
-        </MarkdownTooltip>
+        <Box sx={{ flex: 1 }}>
+          <Control nodeId={node.id} {...params} propType={argType} />
+        </Box>
       )}
       value={propValue}
       onChange={handlePropChange}
     />
   ) : (
     <Alert severity="warning">
-      {`No control for '${name}' (type '${propType.type}' ${
+      {`No control for '${name}' (type '${argType.type}' ${
         argType.control ? `, control: '${argType.control.type}'` : ''
       })`}
     </Alert>

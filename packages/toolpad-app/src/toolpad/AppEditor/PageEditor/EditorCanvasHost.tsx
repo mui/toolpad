@@ -6,15 +6,16 @@ import { CacheProvider } from '@emotion/react';
 import ReactDOM from 'react-dom';
 import invariant from 'invariant';
 import * as appDom from '../../../appDom';
-import { HTML_ID_EDITOR_OVERLAY, TOOLPAD_BRIDGE_GLOBAL } from '../../../constants';
+import { TOOLPAD_BRIDGE_GLOBAL } from '../../../constants';
+import { HTML_ID_EDITOR_OVERLAY } from '../../../runtime/constants';
 import { NodeHashes } from '../../../types';
 import useEvent from '../../../utils/useEvent';
 import { LogEntry } from '../../../components/Console';
 import { useAppStateApi } from '../../AppState';
-import createRuntimeState from '../../../createRuntimeState';
+import createRuntimeState from '../../../runtime/createRuntimeState';
 import type { ToolpadBridge } from '../../../canvas/ToolpadBridge';
 import CenteredSpinner from '../../../components/CenteredSpinner';
-import config from '../../../config';
+import { useOnProjectEvent } from '../../../projectEvents';
 
 interface OverlayProps {
   children?: React.ReactNode;
@@ -109,7 +110,7 @@ export default function EditorCanvasHost({
   const [editorOverlayRoot, setEditorOverlayRoot] = React.useState<HTMLElement | null>(null);
 
   const handleKeyDown = useEvent((event: KeyboardEvent) => {
-    const isZ = event.key.toLowerCase() === 'z';
+    const isZ = !!event.key && event.key.toLowerCase() === 'z';
 
     const undoShortcut = isZ && (event.metaKey || event.ctrlKey);
     const redoShortcut = undoShortcut && event.shiftKey;
@@ -123,23 +124,50 @@ export default function EditorCanvasHost({
     }
   });
 
-  const src = config.viteRuntime
-    ? `/preview/pages/${pageNodeId}?toolpad-display=canvas`
-    : `/app-canvas/pages/${pageNodeId}`;
+  const src = `/preview/pages/${pageNodeId}?toolpad-display=canvas`;
 
   const [loading, setLoading] = React.useState(true);
   useOnChange(src, () => setLoading(true));
 
-  const handleReady = useEvent((bridgeInstance) => {
-    setLoading(false);
-    setBridge(bridgeInstance);
-    onInit?.(bridgeInstance);
+  const initBridge = useEvent((bridgeInstance: ToolpadBridge) => {
+    const handleReady = (readyBridge: ToolpadBridge) => {
+      setLoading(false);
+      setBridge(readyBridge);
+      onInit?.(readyBridge);
+    };
+
+    if (bridgeInstance.canvasCommands.isReady()) {
+      handleReady(bridgeInstance);
+    } else {
+      const readyHandler = () => {
+        handleReady(bridgeInstance);
+        bridgeInstance.canvasEvents.off('ready', readyHandler);
+      };
+      bridgeInstance.canvasEvents.on('ready', readyHandler);
+    }
   });
 
   const handleFrameLoad = React.useCallback<React.ReactEventHandler<HTMLIFrameElement>>(
     (event) => {
       const iframeWindow = event.currentTarget.contentWindow;
       invariant(iframeWindow, 'Iframe not attached');
+
+      const bridgeInstance = iframeWindow[TOOLPAD_BRIDGE_GLOBAL];
+
+      invariant(
+        typeof bridgeInstance !== 'function',
+        'Only the host should set the bridge to a handler',
+      );
+      if (bridgeInstance) {
+        initBridge(bridgeInstance);
+      } else {
+        iframeWindow[TOOLPAD_BRIDGE_GLOBAL] = initBridge;
+      }
+
+      iframeWindow.addEventListener('keydown', handleKeyDown);
+      iframeWindow.addEventListener('unload', () => {
+        iframeWindow.removeEventListener('keydown', handleKeyDown);
+      });
 
       setEditorOverlayRoot(iframeWindow.document.getElementById(HTML_ID_EDITOR_OVERLAY));
 
@@ -152,30 +180,16 @@ export default function EditorCanvasHost({
         childList: true,
       });
 
-      const bridgeInstance = iframeWindow?.[TOOLPAD_BRIDGE_GLOBAL];
-      invariant(bridgeInstance, 'Bridge not set up');
-
-      if (bridgeInstance.canvasCommands.isReady()) {
-        handleReady(bridgeInstance);
-      } else {
-        const readyHandler = () => {
-          handleReady(bridgeInstance);
-          bridgeInstance.canvasEvents.off('ready', readyHandler);
-        };
-        bridgeInstance.canvasEvents.on('ready', readyHandler);
-      }
-
-      iframeWindow.addEventListener('keydown', handleKeyDown);
-      iframeWindow.addEventListener('unload', () => {
-        iframeWindow.removeEventListener('keydown', handleKeyDown);
-      });
-
       return () => {
         observer.disconnect();
       };
     },
-    [handleReady, handleKeyDown],
+    [handleKeyDown, initBridge],
   );
+
+  const invalidateCanvasQueries = useEvent(() => bridge?.canvasCommands.invalidateQueries());
+
+  useOnProjectEvent('functionsBuildEnd', invalidateCanvasQueries);
 
   return (
     <CanvasRoot className={className}>

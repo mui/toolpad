@@ -23,7 +23,6 @@ const FUTURE_COMPONENTS = new Map<string, FutureComponentSpec>([
   ['Drawer', { url: 'https://github.com/mui/mui-toolpad/issues/1540', displayName: 'Drawer' }],
   ['Html', { url: 'https://github.com/mui/mui-toolpad/issues/1311', displayName: 'Html' }],
   ['Icon', { url: 'https://github.com/mui/mui-toolpad/issues/83', displayName: 'Icon' }],
-  ['Form', { url: 'https://github.com/mui/mui-toolpad/issues/749', displayName: 'Form' }],
   ['Card', { url: 'https://github.com/mui/mui-toolpad/issues/748', displayName: 'Card' }],
   ['Slider', { url: 'https://github.com/mui/mui-toolpad/issues/746', displayName: 'Slider' }],
   ['Switch', { url: 'https://github.com/mui/mui-toolpad/issues/745', displayName: 'Switch' }],
@@ -100,193 +99,195 @@ export default function ComponentCatalog({ className }: ComponentCatalogProps) {
   );
 
   return (
-    <ComponentCatalogRoot
-      data-testid="component-catalog"
-      className={className}
-      onMouseEnter={handleMouseEnter}
-      onMouseLeave={handleMouseLeave}
-    >
-      <Box
-        sx={{
-          display: 'flex',
-          flexDirection: 'row',
-          position: 'absolute',
-          top: 0,
-          bottom: 0,
-          backgroundColor: 'background.default',
-          borderRight: 1,
-          borderColor: 'divider',
-        }}
+    <React.Fragment>
+      <ComponentCatalogRoot
+        data-testid="component-catalog"
+        className={className}
+        onMouseEnter={handleMouseEnter}
+        onMouseLeave={handleMouseLeave}
       >
-        <Collapse
-          in={!!openStart}
-          orientation="horizontal"
-          timeout={200}
-          sx={{ height: '100%', justifyContent: 'flex-end', display: 'flex' }}
+        <Box
+          sx={{
+            display: 'flex',
+            flexDirection: 'row',
+            position: 'absolute',
+            top: 0,
+            bottom: 0,
+            backgroundColor: 'background.default',
+            borderRight: 1,
+            borderColor: 'divider',
+          }}
         >
-          <Box
-            sx={{
-              width: 250,
-              height: '100%',
-              overflow: 'auto',
-              scrollbarGutter: 'stable',
-            }}
+          <Collapse
+            in={!!openStart}
+            orientation="horizontal"
+            timeout={200}
+            sx={{ height: '100%', justifyContent: 'flex-end', display: 'flex' }}
           >
-            <Box display="grid" gridTemplateColumns="1fr 1fr 1fr" gap={1} padding={1}>
-              {Object.entries(toolpadComponents).map(([componentId, componentType]) => {
-                invariant(componentType, `No component definition found for "${componentId}"`);
-                return componentType.builtIn && !componentType.system ? (
-                  <ComponentCatalogItem
-                    key={componentId}
-                    id={componentId}
-                    draggable
-                    onDragStart={handleDragStart(componentId)}
-                    displayName={componentType.displayName}
-                    builtIn={componentType.builtIn}
-                    kind={'builtIn'}
-                  />
-                ) : null;
-              })}
-            </Box>
-
             <Box
-              pl={2}
-              pr={1.5}
-              pb={0}
-              display="flex"
-              flexDirection={'row'}
-              justifyContent="space-between"
+              sx={{
+                width: 250,
+                height: '100%',
+                overflow: 'auto',
+                scrollbarGutter: 'stable',
+              }}
             >
-              <Typography variant="overline">Custom Components</Typography>
-              <IconButton
-                aria-label="Expand custom components"
-                sx={{
-                  p: 0,
-                  height: '100%',
-                  alignSelf: 'center',
-                  cursor: 'pointer',
-                  transform: `rotate(${openCustomComponents ? 180 : 0}deg)`,
-                  transition: 'all 0.2s ease-in',
-                }}
-                onClick={() => setOpenCustomComponents((prev) => !prev)}
-              >
-                <ArrowDropDownSharpIcon />
-              </IconButton>
-            </Box>
-            <Collapse in={openCustomComponents} orientation={'vertical'}>
-              <Box display="grid" gridTemplateColumns="1fr 1fr 1fr" gap={1} padding={1} pt={0}>
+              <Box display="grid" gridTemplateColumns="1fr 1fr 1fr" gap={1} padding={1}>
                 {Object.entries(toolpadComponents).map(([componentId, componentType]) => {
                   invariant(componentType, `No component definition found for "${componentId}"`);
-                  return !componentType.builtIn ? (
+                  return componentType.builtIn && !componentType.system ? (
                     <ComponentCatalogItem
                       key={componentId}
                       id={componentId}
                       draggable
                       onDragStart={handleDragStart(componentId)}
                       displayName={componentType.displayName}
-                      kind={'custom'}
+                      builtIn={componentType.builtIn}
+                      kind={'builtIn'}
                     />
                   ) : null;
                 })}
-                <ComponentCatalogItem
-                  id="CreateNew"
-                  displayName="Create"
-                  kind="create"
-                  onClick={handleCreateCodeComponentDialogOpen}
-                />
               </Box>
-            </Collapse>
 
-            <Box padding={1}>
               <Box
-                sx={(theme) => ({
-                  py: 2,
-                  pl: 1,
-                  pr: 0.5,
-                  borderWidth: 1,
-                  borderStyle: 'solid',
-                  borderRadius: 1,
-                  backgroundColor: darken(theme.palette.background.default, 0.1),
-                  borderColor: theme.palette.divider,
-                })}
+                pl={2}
+                pr={1.5}
+                pb={0}
+                display="flex"
+                flexDirection={'row'}
+                justifyContent="space-between"
               >
-                <Box pb={0} display="flex" flexDirection={'row'} justifyContent="space-between">
-                  <Typography variant="body2" color="text.secondary">
-                    More components coming soon!
-                  </Typography>
-                  <IconButton
-                    aria-label="Expand custom components"
-                    sx={{
-                      p: 0,
-                      height: '100%',
-                      alignSelf: 'start',
-                      cursor: 'pointer',
-                      transform: `rotate(${openFutureComponents ? 180 : 0}deg)`,
-                      transition: 'all 0.2s ease-in',
-                    }}
-                    onClick={() => setOpenFutureComponents((prev) => !prev)}
-                  >
-                    <ArrowDropDownSharpIcon />
-                  </IconButton>
+                <Typography variant="overline">Custom Components</Typography>
+                <IconButton
+                  aria-label="Expand custom components"
+                  sx={{
+                    p: 0,
+                    height: '100%',
+                    alignSelf: 'center',
+                    cursor: 'pointer',
+                    transform: `rotate(${openCustomComponents ? 180 : 0}deg)`,
+                    transition: 'all 0.2s ease-in',
+                  }}
+                  onClick={() => setOpenCustomComponents((prev) => !prev)}
+                >
+                  <ArrowDropDownSharpIcon />
+                </IconButton>
+              </Box>
+              <Collapse in={openCustomComponents} orientation={'vertical'}>
+                <Box display="grid" gridTemplateColumns="1fr 1fr 1fr" gap={1} padding={1} pt={0}>
+                  {Object.entries(toolpadComponents).map(([componentId, componentType]) => {
+                    invariant(componentType, `No component definition found for "${componentId}"`);
+                    return !componentType.builtIn ? (
+                      <ComponentCatalogItem
+                        key={componentId}
+                        id={componentId}
+                        draggable
+                        onDragStart={handleDragStart(componentId)}
+                        displayName={componentType.displayName}
+                        kind={'custom'}
+                      />
+                    ) : null;
+                  })}
+                  <ComponentCatalogItem
+                    id="CreateNew"
+                    displayName="Create"
+                    kind="create"
+                    onClick={handleCreateCodeComponentDialogOpen}
+                  />
                 </Box>
-                <Collapse in={openFutureComponents} orientation={'vertical'}>
-                  <Typography variant="caption" color="text.secondary">
-                    👍 Upvote on GitHub to get it prioritized.
-                  </Typography>
-                  <Box display="grid" gridTemplateColumns="1fr 1fr 1fr" gap={1} pt={1} pb={0}>
-                    {Array.from(FUTURE_COMPONENTS, ([key, { displayName, url }]) => {
-                      return (
-                        <Link
-                          href={url}
-                          underline="none"
-                          target="_blank"
-                          key={`futureComponent.${key}`}
-                        >
-                          <ComponentCatalogItem
-                            id={key}
-                            displayName={displayName}
-                            kind={'future'}
-                          />
-                        </Link>
-                      );
-                    })}
+              </Collapse>
+
+              <Box padding={1}>
+                <Box
+                  sx={(theme) => ({
+                    py: 2,
+                    pl: 1,
+                    pr: 0.5,
+                    borderWidth: 1,
+                    borderStyle: 'solid',
+                    borderRadius: 1,
+                    backgroundColor: darken(theme.palette.background.default, 0.1),
+                    borderColor: theme.palette.divider,
+                  })}
+                >
+                  <Box pb={0} display="flex" flexDirection={'row'} justifyContent="space-between">
+                    <Typography variant="body2" color="text.secondary">
+                      More components coming soon!
+                    </Typography>
+                    <IconButton
+                      aria-label="Expand custom components"
+                      sx={{
+                        p: 0,
+                        height: '100%',
+                        alignSelf: 'start',
+                        cursor: 'pointer',
+                        transform: `rotate(${openFutureComponents ? 180 : 0}deg)`,
+                        transition: 'all 0.2s ease-in',
+                      }}
+                      onClick={() => setOpenFutureComponents((prev) => !prev)}
+                    >
+                      <ArrowDropDownSharpIcon />
+                    </IconButton>
                   </Box>
-                </Collapse>
+                  <Collapse in={openFutureComponents} orientation={'vertical'}>
+                    <Typography variant="caption" color="text.secondary">
+                      👍 Upvote on GitHub to get it prioritized.
+                    </Typography>
+                    <Box display="grid" gridTemplateColumns="1fr 1fr 1fr" gap={1} pt={1} pb={0}>
+                      {Array.from(FUTURE_COMPONENTS, ([key, { displayName, url }]) => {
+                        return (
+                          <Link
+                            href={url}
+                            underline="none"
+                            target="_blank"
+                            key={`futureComponent.${key}`}
+                          >
+                            <ComponentCatalogItem
+                              id={key}
+                              displayName={displayName}
+                              kind={'future'}
+                            />
+                          </Link>
+                        );
+                      })}
+                    </Box>
+                  </Collapse>
+                </Box>
               </Box>
             </Box>
-          </Box>
-        </Collapse>
-        <Box
-          sx={{
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            width: WIDTH_COLLAPSED,
-          }}
-        >
-          <Box sx={{ mt: 2 }}>{openStart ? <ArrowLeftIcon /> : <ArrowRightIcon />}</Box>
-          <Box position="relative">
-            <Typography
-              sx={{
-                position: 'absolute',
-                top: 0,
-                display: 'flex',
-                alignItems: 'center',
-                fontSize: 20,
-                transform: 'rotate(90deg) translate(-10px, 0)',
-                transformOrigin: '0 50%',
-                whiteSpace: 'nowrap',
-              }}
-            >
-              Component library
-            </Typography>
+          </Collapse>
+          <Box
+            sx={{
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              width: WIDTH_COLLAPSED,
+            }}
+          >
+            <Box sx={{ mt: 2 }}>{openStart ? <ArrowLeftIcon /> : <ArrowRightIcon />}</Box>
+            <Box position="relative">
+              <Typography
+                sx={{
+                  position: 'absolute',
+                  top: 0,
+                  display: 'flex',
+                  alignItems: 'center',
+                  fontSize: 20,
+                  transform: 'rotate(90deg) translate(-10px, 0)',
+                  transformOrigin: '0 50%',
+                  whiteSpace: 'nowrap',
+                }}
+              >
+                Component library
+              </Typography>
+            </Box>
           </Box>
         </Box>
-      </Box>
+      </ComponentCatalogRoot>
       <CreateCodeComponentNodeDialog
         open={!!createCodeComponentDialogOpen}
         onClose={handleCreateCodeComponentDialogClose}
       />
-    </ComponentCatalogRoot>
+    </React.Fragment>
   );
 }

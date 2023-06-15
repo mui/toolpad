@@ -1,40 +1,24 @@
 import * as path from 'path';
-import * as readline from 'readline';
 import * as fs from 'fs/promises';
 import childProcess from 'child_process';
-import { Readable } from 'stream';
 import { once } from 'events';
 import invariant from 'invariant';
 import * as archiver from 'archiver';
 import { createWriteStream } from 'fs';
 import { pipeline } from 'stream/promises';
+import { Readable } from 'stream';
+import getPort from 'get-port';
 import { test as base } from './test';
+import { waitForMatch } from '../utils/streams';
 
 interface RunningLocalApp {
   url: string;
   dir: string;
+  stdout: Readable;
 }
 
 // You'll need to have `yarn dev` running for this
 const VERBOSE = true;
-const VITE_RUNTIME = process.env.TOOLPAD_VITE_RUNTIME;
-
-async function waitForMatch(input: Readable, regex: RegExp): Promise<RegExpExecArray | null> {
-  return new Promise((resolve, reject) => {
-    const rl = readline.createInterface({ input });
-
-    rl.on('line', (line) => {
-      const match = regex.exec(line);
-      if (match) {
-        rl.close();
-        input.resume();
-        resolve(match);
-      }
-    });
-    rl.on('error', (err) => reject(err));
-    rl.on('end', () => resolve(null));
-  });
-}
 
 interface SetupContext {
   dir: string;
@@ -49,6 +33,8 @@ interface WithAppOptions {
   // Run toolpad next.js app in local dev mode
   toolpadDev?: boolean;
   setup?: (ctx: SetupContext) => Promise<void>;
+  // Extra environment variables when running Toolpad
+  env?: Record<string, string>;
 }
 
 /**
@@ -58,16 +44,16 @@ export async function withApp(
   options: WithAppOptions,
   doWork: (app: RunningLocalApp) => Promise<void>,
 ) {
-  if (VITE_RUNTIME) {
-    // eslint-disable-next-line no-console
-    console.log('Using new vite runtime');
-  }
+  const { cmd = 'start', template, setup, env } = options;
 
-  const { cmd = 'start', template, setup } = options;
-
-  const projectDir = await fs.mkdtemp(path.resolve(__dirname, './tmp-'));
+  // Each test runs in its own temporary folder to avoid race conditions when running tests in parallel.
+  // It also avoids mutating the source code of the fixture while running the test.
+  const tmpTestDir = await fs.mkdtemp(path.resolve(__dirname, './tmp-'));
 
   try {
+    const projectDir = path.resolve(tmpTestDir, './fixture');
+    await fs.mkdir(projectDir, { recursive: true });
+
     if (template) {
       await fs.cp(template, projectDir, { recursive: true });
     }
@@ -81,20 +67,19 @@ export async function withApp(
       args.push('--dev');
     }
 
-    if (VITE_RUNTIME) {
-      args.push('--viteRuntime');
-    }
+    // Run each test on its own port to avoid race conditions when running tests in parallel.
+    args.push('--port', String(await getPort()));
 
     if (cmd === 'start') {
       const buildArgs = ['build'];
 
-      if (VITE_RUNTIME) {
-        buildArgs.push('--viteRuntime');
-      }
-
       const child = childProcess.spawn('toolpad', buildArgs, {
         cwd: projectDir,
         stdio: 'pipe',
+        env: {
+          ...process.env,
+          ...env,
+        },
       });
 
       if (VERBOSE) {
@@ -112,6 +97,10 @@ export async function withApp(
     const child = childProcess.spawn('toolpad', args, {
       cwd: projectDir,
       stdio: 'pipe',
+      env: {
+        ...process.env,
+        ...env,
+      },
     });
 
     try {
@@ -134,14 +123,14 @@ export async function withApp(
           }
 
           const port = Number(match[1]);
-          await doWork({ url: `http://localhost:${port}`, dir: projectDir });
+          await doWork({ url: `http://localhost:${port}`, dir: projectDir, stdout: child.stdout });
         })(),
       ]);
     } finally {
       child.kill();
     }
   } finally {
-    await fs.rm(projectDir, { recursive: true });
+    await fs.rm(tmpTestDir, { recursive: true });
   }
 }
 

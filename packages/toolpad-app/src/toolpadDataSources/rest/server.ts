@@ -5,22 +5,24 @@ import { withHarInstrumentation, createHarLog } from '../../server/har';
 import { ServerDataSource } from '../../types';
 import { FetchPrivateQuery, FetchQuery, RestConnectionParams } from './types';
 import { Maybe } from '../../utils/types';
-import config from '../../server/config';
 import { execfetch } from './shared';
+import { getProject } from '../../server/liveProject';
+
+export async function loadEnvFile() {
+  const project = await getProject();
+  return project.envManager.getValues();
+}
 
 async function execBase(
   connection: Maybe<RestConnectionParams>,
   fetchQuery: FetchQuery,
   params: Record<string, string>,
 ) {
-  if (config.isDemo) {
-    throw new Error('Cannot use these features in demo version.');
-  }
-
   const har = createHarLog();
   const instrumentedFetch = withHarInstrumentation(fetch, { har });
 
   const jsServerRuntime = await createServerJsRuntime();
+
   const result = await execfetch(fetchQuery, params, {
     connection,
     jsRuntime: jsServerRuntime,
@@ -32,6 +34,12 @@ async function execBase(
 
 async function execPrivate(connection: Maybe<RestConnectionParams>, query: FetchPrivateQuery) {
   switch (query.kind) {
+    case 'introspection': {
+      const env = await loadEnvFile();
+      const envVarNames = Object.keys(env);
+
+      return { envVarNames };
+    }
     case 'debugExec':
       return execBase(connection, query.query, query.params);
     default:

@@ -15,7 +15,7 @@ function List({ itemCount, renderItem, disablePadding = false, sx }: ListProps) 
     <MuiList disablePadding={disablePadding} sx={{ width: '100%', ...sx }}>
       {[...Array(itemCount).keys()].map((index) => (
         <ListItem key={index} disablePadding={disablePadding}>
-          <Box sx={{ width: '100%', p: 0, m: 0 }}>{renderItem({ i: index })}</Box>
+          <Box sx={{ width: '100%', p: 0, m: 0 }}>{renderItem(`item-${index}`, { i: index })}</Box>
         </ListItem>
       ))}
     </MuiList>
@@ -26,19 +26,20 @@ export default createComponent(List, {
   argTypes: {
     itemCount: {
       helperText: 'Number of items to render.',
-      typeDef: { type: 'number', default: 3 },
+      type: 'number',
+      default: 3,
     },
     renderItem: {
-      typeDef: { type: 'template' },
+      type: 'template',
       control: { type: 'layoutSlot' },
     },
     disablePadding: {
       helperText: 'If true, vertical padding is removed from the list.',
-      typeDef: { type: 'boolean' },
+      type: 'boolean',
     },
     sx: {
       helperText: SX_PROP_HELPER_TEXT,
-      typeDef: { type: 'object' },
+      type: 'object',
     },
   },
 });

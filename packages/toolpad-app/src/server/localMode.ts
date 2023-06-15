@@ -9,20 +9,21 @@ import { fromZodError } from 'zod-validation-error';
 import { glob } from 'glob';
 import * as chokidar from 'chokidar';
 import { debounce } from 'lodash-es';
-import cuid from 'cuid';
-import Emitter from '@mui/toolpad-core/utils/Emitter';
-import config from '../config';
-import * as appDom from '../appDom';
-import { errorFrom } from '../utils/errors';
-import { migrateUp } from '../appDom/migrations';
-import insecureHash from '../utils/insecureHash';
+import { Emitter } from '@mui/toolpad-utils/events';
+import { errorFrom } from '@mui/toolpad-utils/errors';
+import { filterValues, hasOwnProperty, mapValues } from '@mui/toolpad-utils/collections';
+import { execa } from 'execa';
 import {
   writeFileRecursive,
   readMaybeFile,
   readMaybeDir,
   updateYamlFile,
   fileExists,
-} from '../utils/fs';
+} from '@mui/toolpad-utils/fs';
+import config from '../config';
+import * as appDom from '../appDom';
+import { migrateUp } from '../appDom/migrations';
+import insecureHash from '../utils/insecureHash';
 import {
   Page,
   Query,
@@ -40,7 +41,6 @@ import {
   themeSchema,
   API_VERSION,
 } from './schema';
-import { filterValues, hasOwnProperty, mapValues } from '../utils/collections';
 import { format } from '../utils/prettier';
 import {
   Body as AppDomFetchBody,
@@ -48,6 +48,10 @@ import {
   ResponseType as AppDomRestResponseType,
 } from '../toolpadDataSources/rest/types';
 import { LocalQuery } from '../toolpadDataSources/local/types';
+import { ProjectEvents, ToolpadProjectOptions } from '../types';
+import { Awaitable } from '../utils/types';
+import EnvManager from './EnvManager';
+import FunctionsManager from './FunctionsManager';
 
 export function getUserProjectRoot(): string {
   const { projectDir } = config;
@@ -57,10 +61,6 @@ export function getUserProjectRoot(): string {
 
 function getToolpadFolder(root: string): string {
   return path.join(root, './toolpad');
-}
-
-export function getFunctionsFile(root: string): string {
-  return path.join(getToolpadFolder(root), './resources/functions.ts');
 }
 
 function getThemeFile(root: string): string {
@@ -221,7 +221,8 @@ function createDefaultCodeComponent(name: string): string {
     export default createComponent(${componentId}, {
       argTypes: {
         msg: {
-          typeDef: { type: "string", default: "Hello world!" },
+          type: "string",
+          default: "Hello world!"
         },
       },
     });    
@@ -276,28 +277,6 @@ async function loadConfigFile(root: string): Promise<appDom.AppDom | null> {
   return dom;
 }
 
-const DEFAULT_FUNCTIONS_FILE_CONTENT = `// Toolpad queries:
-
-export async function example() {
-  return [
-    { firstname: 'Nell', lastName: 'Lester' },
-    { firstname: 'Keanu', lastName: 'Walter' },
-    { firstname: 'Daniella', lastName: 'Sweeney' },
-  ];
-}
-`;
-
-async function initQueriesFile(root: string): Promise<void> {
-  const queriesFilePath = getFunctionsFile(root);
-  if (!(await fileExists(queriesFilePath))) {
-    // eslint-disable-next-line no-console
-    console.log(`${chalk.blue('info')}  - Initializing Toolpad functions file`);
-    await writeFileRecursive(queriesFilePath, DEFAULT_FUNCTIONS_FILE_CONTENT, {
-      encoding: 'utf-8',
-    });
-  }
-}
-
 const DEFAULT_GENERATED_GITIGNORE_FILE_CONTENT = `.generated
 `;
 
@@ -306,7 +285,7 @@ async function initGitignore(root: string) {
   const generatedGitignorePath = path.resolve(projectFolder, '.gitignore');
   if (!(await fileExists(generatedGitignorePath))) {
     // eslint-disable-next-line no-console
-    console.log(`${chalk.blue('info')}  - Initializing Toolpad queries file`);
+    console.log(`${chalk.blue('info')}  - Initializing .gitignore file`);
     await writeFileRecursive(generatedGitignorePath, DEFAULT_GENERATED_GITIGNORE_FILE_CONTENT, {
       encoding: 'utf-8',
     });
@@ -384,9 +363,14 @@ function mergeThemeIntoAppDom(dom: appDom.AppDom, themeFile: Theme): appDom.AppD
   return dom;
 }
 
-function toBindable<V>(value: V | { $$jsExpression: string }): BindableAttrValue<V> {
+function toBindable<V>(
+  value: V | { $$jsExpression: string } | { $$env: string },
+): BindableAttrValue<V> {
   if (value && typeof value === 'object' && typeof (value as any).$$jsExpression === 'string') {
     return { type: 'jsExpression', value: (value as any).$$jsExpression };
+  }
+  if (value && typeof value === 'object' && typeof (value as any).$$env === 'string') {
+    return { type: 'env', value: (value as any).$$env };
   }
   return { type: 'const', value: value as V };
 }
@@ -397,25 +381,32 @@ function fromBindable<V>(bindable: BindableAttrValue<V>) {
       return bindable.value;
     case 'jsExpression':
       return { $$jsExpression: bindable.value };
+    case 'env':
+      return { $$env: bindable.value };
     default:
       throw new Error(`Unsupported bindable "${bindable.type}"`);
   }
 }
 
-function toBindableProp<V>(value: V | { $$jsExpression: string }): BindableAttrValue<V> {
+function toBindableProp<V>(
+  value: V | { $$jsExpression: string } | { $$env: string },
+): BindableAttrValue<V> {
   if (value && typeof value === 'object') {
     if (typeof (value as any).$$jsExpression === 'string') {
       return { type: 'jsExpression', value: (value as any).$$jsExpression };
     }
+    if (typeof (value as any).$$env === 'string') {
+      return { type: 'env', value: (value as any).$$env };
+    }
     if (typeof (value as any).$$jsExpressionAction === 'string') {
       return { type: 'jsExpressionAction', value: (value as any).$$jsExpressionAction };
     }
-    if (typeof (value as any).$$navigationAction === 'string') {
+    if (typeof (value as any).$$navigationAction === 'object') {
       const action = value as any as NavigationAction;
       return {
         type: 'navigationAction',
         value: {
-          page: { $$ref: action.$$navigationAction.page as NodeId },
+          page: { $ref: action.$$navigationAction.page as NodeId },
           parameters: mapValues(
             action.$$navigationAction.parameters,
             (param) => param && toBindable(param),
@@ -433,12 +424,14 @@ function fromBindableProp<V>(bindable: BindableAttrValue<V>) {
       return bindable.value;
     case 'jsExpression':
       return { $$jsExpression: bindable.value };
+    case 'env':
+      return { $$env: bindable.value };
     case 'jsExpressionAction':
       return { $$jsExpressionAction: bindable.value };
     case 'navigationAction':
       return {
         $$navigationAction: {
-          page: bindable.value.page.$$ref,
+          page: bindable.value.page.$ref,
           parameters:
             bindable.value.parameters &&
             mapValues(bindable.value.parameters, (param) => param && fromBindable(param)),
@@ -716,7 +709,7 @@ function createDomQueryFromPageFileQuery(query: QueryConfig): FetchQuery | Local
           case 'raw': {
             body = {
               kind: 'raw',
-              content: toBindable(query.body.content),
+              content: toBindable<string>(query.body.content),
               contentType: appDom.createConst(query.body.contentType),
             };
             break;
@@ -724,7 +717,10 @@ function createDomQueryFromPageFileQuery(query: QueryConfig): FetchQuery | Local
           case 'urlEncoded': {
             body = {
               kind: 'urlEncoded',
-              content: query.body.content.map(({ name, value }) => [name, toBindable(value)]),
+              content: query.body.content.map(({ name, value }) => [
+                name,
+                toBindable<string>(value),
+              ]),
             };
             break;
           }
@@ -760,12 +756,13 @@ function createDomQueryFromPageFileQuery(query: QueryConfig): FetchQuery | Local
 
       return {
         url: query.url ? toBindable(query.url) : undefined,
-        headers: query.headers?.map(({ name, value }) => [name, toBindable(value)]) || [],
+        headers: query.headers?.map(({ name, value }) => [name, toBindable<string>(value)]) || [],
         method: query.method || 'GET',
         browser: false,
         transform: query.transform,
         transformEnabled: query.transformEnabled,
-        searchParams: query.searchParams?.map(({ name, value }) => [name, toBindable(value)]) || [],
+        searchParams:
+          query.searchParams?.map(({ name, value }) => [name, toBindable<string>(value)]) || [],
         body,
         response,
       } satisfies FetchQuery;
@@ -941,11 +938,39 @@ async function writeDomToDisk(dom: appDom.AppDom): Promise<void> {
   await Promise.all([writePagesToFiles(root, pagesContent)]);
 }
 
-export async function openCodeEditor(file: string): Promise<void> {
+const DEFAULT_EDITOR = 'code';
+
+export async function findSupportedEditor(): Promise<string | null> {
+  const maybeEditor = process.env.EDITOR ?? DEFAULT_EDITOR;
+  if (!maybeEditor) {
+    return null;
+  }
+  try {
+    await execa('which', [maybeEditor]);
+    return maybeEditor;
+  } catch (err) {
+    return null;
+  }
+}
+
+let supportedEditorPromise: Promise<string | null>;
+
+export async function getSupportedEditor(): Promise<string | null> {
+  if (!supportedEditorPromise) {
+    supportedEditorPromise = findSupportedEditor();
+  }
+  return supportedEditorPromise;
+}
+
+async function openCodeEditor(file: string): Promise<void> {
+  const supportedEditor = await getSupportedEditor();
+  if (!supportedEditor) {
+    throw new Error(`No code editor found`);
+  }
   const userProjectRoot = getUserProjectRoot();
   const fullPath = path.resolve(userProjectRoot, file);
   openEditor([fullPath, userProjectRoot], {
-    editor: process.env.EDITOR ? undefined : 'vscode',
+    editor: process.env.EDITOR ? undefined : DEFAULT_EDITOR,
   });
 }
 
@@ -953,17 +978,7 @@ export async function openCodeComponentEditor(componentName: string): Promise<vo
   const root = getUserProjectRoot();
   const componentsFolder = getComponentsFolder(root);
   const fullPath = getComponentFilePath(componentsFolder, componentName);
-  const userProjectRoot = getUserProjectRoot();
-  openEditor([fullPath, userProjectRoot], {
-    editor: process.env.EDITOR ? undefined : 'vscode',
-  });
-}
-
-export async function openQueryEditor() {
-  const root = getUserProjectRoot();
-  await initQueriesFile(root);
-  const queriesFilePath = getFunctionsFile(root);
-  await openCodeEditor(queriesFilePath);
+  await openCodeEditor(fullPath);
 }
 
 export type ProjectFolderEntry = {
@@ -1062,13 +1077,6 @@ async function migrateLegacyProject(root: string) {
 
   await writeProjectFolder(root, projectFolder, true);
 
-  const legacyQueriesFile = path.resolve(getToolpadFolder(root), 'queries.ts');
-  if (await fileExists(legacyQueriesFile)) {
-    const functionsFile = getFunctionsFile(root);
-    await fs.mkdir(path.dirname(functionsFile), { recursive: true });
-    await fs.rename(legacyQueriesFile, functionsFile);
-  }
-
   const configFilePath = await getConfigFilePath(root);
   await Promise.all([
     fs.rm(configFilePath, { recursive: true, force: true }),
@@ -1108,7 +1116,7 @@ async function initToolpadFolder(root: string) {
       apiVersion: 'v1',
       kind: 'page',
       spec: {
-        id: cuid.slug(),
+        id: appDom.createId(),
         title: 'Default page',
       },
     };
@@ -1123,6 +1131,133 @@ function getCodeComponentsFingerprint(dom: appDom.AppDom) {
   return codeComponents.map(({ name }) => name).join('|');
 }
 
+class ToolpadProject {
+  root: string;
+
+  events = new Emitter<ProjectEvents>();
+
+  private domAndFingerprint: Awaitable<[appDom.AppDom, number]> | null = null;
+
+  private domAndFingerprintLock = new Lock();
+
+  options: ToolpadProjectOptions;
+
+  private codeComponentsFingerprint: null | string = null;
+
+  envManager: EnvManager;
+
+  functionsManager: FunctionsManager;
+
+  constructor(root: string, options: Partial<ToolpadProjectOptions>) {
+    this.root = root;
+    this.options = {
+      dev: false,
+      ...options,
+    };
+
+    this.envManager = new EnvManager(this);
+    this.functionsManager = new FunctionsManager(this);
+
+    this.initWatcher();
+  }
+
+  private initWatcher() {
+    if (!this.options.dev) {
+      return;
+    }
+
+    const updateDomFromExternal = debounce(() => {
+      this.domAndFingerprintLock.use(async () => {
+        const [dom, fingerprint] = await this.loadDomAndFingerprint();
+        const newFingerprint = await calculateDomFingerprint(this.root);
+        if (fingerprint !== newFingerprint) {
+          // eslint-disable-next-line no-console
+          console.log(`${chalk.magenta('event')} - Project changed on disk, updating...`);
+          this.domAndFingerprint = await Promise.all([
+            loadDomFromDisk(),
+            calculateDomFingerprint(this.root),
+          ]);
+          this.events.emit('change', { fingerprint });
+          this.events.emit('externalChange', { fingerprint });
+
+          const newCodeComponentsFingerprint = getCodeComponentsFingerprint(dom);
+          if (this.codeComponentsFingerprint !== newCodeComponentsFingerprint) {
+            this.codeComponentsFingerprint = newCodeComponentsFingerprint;
+            if (this.codeComponentsFingerprint !== null) {
+              this.events.emit('componentsListChanged', {});
+            }
+          }
+        }
+      });
+    }, 100);
+
+    chokidar.watch(getDomFilePatterns(this.root)).on('all', () => {
+      updateDomFromExternal();
+    });
+  }
+
+  private async loadDomAndFingerprint() {
+    if (!this.domAndFingerprint) {
+      this.domAndFingerprint = Promise.all([loadDomFromDisk(), calculateDomFingerprint(this.root)]);
+    }
+    return this.domAndFingerprint;
+  }
+
+  getRoot() {
+    return this.root;
+  }
+
+  getToolpadFolder() {
+    return getToolpadFolder(this.getRoot());
+  }
+
+  getOutputFolder() {
+    return getOutputFolder(this.getRoot());
+  }
+
+  async loadDom() {
+    const [dom] = await this.loadDomAndFingerprint();
+    return dom;
+  }
+
+  async writeDomToDisk(newDom: appDom.AppDom) {
+    if (config.cmd !== 'dev') {
+      throw new Error(`Writing to disk is only possible in toolpad dev mode.`);
+    }
+
+    await writeDomToDisk(newDom);
+    const newFingerprint = await calculateDomFingerprint(this.root);
+    this.domAndFingerprint = [newDom, newFingerprint];
+    this.events.emit('change', { fingerprint: newFingerprint });
+    return { fingerprint: newFingerprint };
+  }
+
+  async saveDom(newDom: appDom.AppDom) {
+    return this.domAndFingerprintLock.use(async () => {
+      return this.writeDomToDisk(newDom);
+    });
+  }
+
+  async applyDomDiff(domDiff: appDom.DomDiff) {
+    return this.domAndFingerprintLock.use(async () => {
+      const dom = await this.loadDom();
+      const newDom = appDom.applyDiff(dom, domDiff);
+      return this.writeDomToDisk(newDom);
+    });
+  }
+
+  async openCodeEditor(file: string): Promise<void> {
+    const supportedEditor = await getSupportedEditor();
+    if (!supportedEditor) {
+      throw new Error(`No code editor found`);
+    }
+    const fullPath = path.resolve(this.getRoot(), file);
+    openEditor([fullPath, this.getRoot()], {
+      editor: process.env.EDITOR ? undefined : DEFAULT_EDITOR,
+    });
+  }
+}
+
 export async function initProject() {
   const root = getUserProjectRoot();
 
@@ -1130,64 +1265,5 @@ export async function initProject() {
 
   await initToolpadFolder(root);
 
-  let [dom, fingerprint] = await Promise.all([loadDomFromDisk(), calculateDomFingerprint(root)]);
-  let codeComponentsFingerprint = getCodeComponentsFingerprint(dom);
-  const lock = new Lock();
-
-  const events = new Emitter<{
-    change: { fingerprint: number };
-    componentsListChanged: {};
-  }>();
-
-  const updateDomFromExternal = debounce(() => {
-    lock.use(async () => {
-      const newFingerprint = await calculateDomFingerprint(root);
-      if (fingerprint !== newFingerprint) {
-        // eslint-disable-next-line no-console
-        console.log(`${chalk.magenta('event')} - Project changed on disk, updating...`);
-        [dom, fingerprint] = await Promise.all([loadDomFromDisk(), calculateDomFingerprint(root)]);
-        events.emit('change', { fingerprint });
-
-        const newCodeComponentsFingerprint = getCodeComponentsFingerprint(dom);
-        if (codeComponentsFingerprint !== newCodeComponentsFingerprint) {
-          codeComponentsFingerprint = newCodeComponentsFingerprint;
-          events.emit('componentsListChanged', {});
-        }
-      }
-    });
-  }, 100);
-
-  if (config.cmd === 'dev') {
-    chokidar.watch(getDomFilePatterns(root)).on('all', () => {
-      updateDomFromExternal();
-    });
-  }
-
-  return {
-    events,
-
-    async loadDom() {
-      return dom;
-    },
-
-    async saveDom(newDom: appDom.AppDom) {
-      if (config.cmd !== 'dev') {
-        throw new Error(`Writing to disk is only possible in toolpad dev mode.`);
-      }
-
-      await lock.use(async () => {
-        await writeDomToDisk(newDom);
-        const newFingerprint = await calculateDomFingerprint(root);
-
-        dom = newDom;
-        fingerprint = newFingerprint;
-      });
-
-      return { fingerprint };
-    },
-
-    async getDomFingerPrint() {
-      return fingerprint;
-    },
-  };
+  return new ToolpadProject(root, { dev: config.cmd === 'dev' });
 }

@@ -8,11 +8,15 @@ export function evaluateBindable<V>(
   globalScope: Record<string, unknown>,
 ): BindingEvaluationResult {
   if (bindable?.type === 'jsExpression') {
-    return ctx.evaluateExpression(bindable?.value, globalScope);
+    return ctx.evaluateExpression(bindable.value, globalScope);
+  }
+
+  if (bindable?.type === 'env') {
+    return { value: process.env[bindable.value] };
   }
 
   if (bindable?.type === 'const') {
-    return { value: bindable?.value };
+    return { value: bindable.value };
   }
 
   return { value: undefined };

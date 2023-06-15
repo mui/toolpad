@@ -30,3 +30,14 @@ test('bindings', async ({ page }) => {
   expect(color).toBe('rgb(25, 118, 210)');
   await expect(page.getByText('-test2-')).toBeVisible();
 });
+
+test('encoding', async ({ page }) => {
+  const runtimeModel = new ToolpadRuntime(page);
+  await runtimeModel.gotoPage('encoding');
+
+  const test1 = page.getByText('Can pass utf-8: "€"');
+  await expect(test1).toBeVisible();
+
+  const test2 = page.getByText('Can pass double dollars: "$$"');
+  await expect(test2).toBeVisible();
+});

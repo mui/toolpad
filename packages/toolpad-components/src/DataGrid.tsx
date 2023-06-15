@@ -34,10 +34,11 @@ import {
   Popover,
 } from '@mui/material';
 import { getObjectKey } from '@mui/toolpad-core/objectKey';
-import { errorFrom } from '@mui/toolpad-core/utils/errors';
+import { errorFrom } from '@mui/toolpad-utils/errors';
 import { hasImageExtension } from '@mui/toolpad-core/path';
 import { ErrorBoundary, FallbackProps } from 'react-error-boundary';
 import { SX_PROP_HELPER_TEXT } from './constants.js';
+import ErrorOverlay from './components/ErrorOverlay.js';
 
 const DEFAULT_COLUMN_TYPES = getGridDefaultColumnTypes();
 
@@ -520,7 +521,9 @@ const DataGridComponent = React.forwardRef(function DataGridComponent(
   );
 
   const apiRef = useGridApiRef();
-  React.useEffect(() => apiRef.current.updateColumns(columns), [apiRef, columns]);
+  React.useEffect(() => {
+    apiRef.current.updateColumns(columns);
+  }, [apiRef, columns]);
 
   // The grid doesn't update when the getRowId or columns properties change, so it needs to be remounted
   // TODO: remove columns from this equation once https://github.com/mui/mui-x/issues/5970 gets resolved
@@ -529,13 +532,18 @@ const DataGridComponent = React.forwardRef(function DataGridComponent(
     [getRowId, columns],
   );
 
-  const error = errorProp ? errorFrom(errorProp) : null;
+  const error: Error | null = errorProp ? errorFrom(errorProp) : null;
 
   return (
-    <div ref={ref} style={{ height: heightProp, minHeight: '100%', width: '100%' }}>
-      {error ? (
-        <div>{error.message}</div>
-      ) : (
+    <div
+      ref={ref}
+      style={{ height: heightProp, minHeight: '100%', width: '100%', position: 'relative' }}
+    >
+      <ErrorOverlay error={error} />
+
+      <div
+        style={{ position: 'absolute', inset: '0 0 0 0', visibility: error ? 'hidden' : 'visible' }}
+      >
         <DataGridPro
           apiRef={apiRef}
           components={{
@@ -552,14 +560,14 @@ const DataGridComponent = React.forwardRef(function DataGridComponent(
           rowSelectionModel={selectionModel}
           {...props}
         />
-      )}
+      </div>
     </div>
   );
 });
 
 export default createComponent(DataGridComponent, {
   helperText:
-    'The MUI X [Data grid](https://mui.com/x/react-data-grid/) component.\n\nThe datagrid lets users display tabular data in a flexible grid.',
+    'The MUI X [Data Grid](https://mui.com/x/react-data-grid/) component.\n\nThe datagrid lets users display tabular data in a flexible grid.',
   errorProp: 'error',
   loadingPropSource: ['rows', 'columns'],
   loadingProp: 'loading',
@@ -567,46 +575,81 @@ export default createComponent(DataGridComponent, {
   argTypes: {
     rows: {
       helperText: 'The data to be displayed as rows. Must be an array of objects.',
-      typeDef: { type: 'array', schema: '/schemas/DataGridRows.json' },
+      type: 'array',
+      schema: {
+        type: 'array',
+        items: {
+          type: 'object',
+          additionalProperties: true,
+          properties: {
+            id: {
+              type: 'string',
+            },
+          },
+          required: ['id'],
+        },
+      },
     },
     columns: {
-      helperText: '',
-      typeDef: { type: 'array', schema: '/schemas/DataGridColumns.json' },
+      helperText: 'The columns to be displayed.',
+      type: 'array',
+      schema: {
+        type: 'array',
+        items: {
+          type: 'object',
+          additionalProperties: true,
+          properties: {
+            field: {
+              type: 'string',
+            },
+            align: {
+              type: 'string',
+              enum: ['center', 'right', 'left'],
+            },
+          },
+          required: ['field'],
+        },
+      },
       control: { type: 'GridColumns' },
     },
     rowIdField: {
       helperText:
         'Defines which column contains the [id](https://mui.com/x/react-data-grid/row-definition/#row-identifier) that uniquely identifies each row.',
-      typeDef: { type: 'string' },
+      type: 'string',
       control: { type: 'RowIdFieldSelect' },
       label: 'Id field',
     },
     selection: {
       helperText: 'The currently selected row. Or `null` in case no row has been selected.',
-      typeDef: { type: 'object', default: null },
+      type: 'object',
+      default: null,
       onChangeProp: 'onSelectionChange',
       tsType: `ThisComponent['rows'][number] | undefined`,
     },
     density: {
       helperText:
         'The [density](https://mui.com/x/react-data-grid/accessibility/#density-prop) of the rows. Possible values are `compact`, `standard`, or `comfortable`.',
-      typeDef: { type: 'string', enum: ['compact', 'standard', 'comfortable'], default: 'compact' },
+      type: 'string',
+      enum: ['compact', 'standard', 'comfortable'],
+      default: 'compact',
     },
     height: {
-      typeDef: { type: 'number', default: 350, minimum: 100 },
+      type: 'number',
+      default: 350,
+      minimum: 100,
     },
     loading: {
       helperText:
         "Displays a loading animation indicating the datagrid isn't ready to present data yet.",
-      typeDef: { type: 'boolean' },
+      type: 'boolean',
     },
     hideToolbar: {
       helperText: 'Hide the toolbar area that contains the data grid user controls.',
-      typeDef: { type: 'boolean' },
+      type: 'boolean',
     },
     sx: {
       helperText: SX_PROP_HELPER_TEXT,
-      typeDef: { type: 'object' },
+      type: 'object',
     },
   },
 });

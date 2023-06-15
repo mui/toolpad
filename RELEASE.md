@@ -31,7 +31,7 @@
 
 1. Prepend the changelog to [`CHANGELOG.md`](./CHANGELOG.md).
 
-1. Open a PR to the `master` branch with the proposed changes. Merge the changes.
+1. Open a PR to the `master` branch with the proposed changes. Add the "release" label.
 
 1. Publish the package to `npm`
 
@@ -65,6 +65,8 @@
       yarn release:publish-canary
       ```
 
+1. Merge the changes.
+
 1. Publish the documentation. The documentation must be updated on the `docs-latest` branch.
 
    ```sh
@@ -74,9 +76,22 @@
    You can follow the deployment process on the [Netlify Dashboard](https://app.netlify.com/sites/mui-toolpad-docs/deploys?filter=docs-latest). Once deployed, it will be accessible at https://mui-toolpad-docs.netlify.app/.
 
 1. [Create a new GitHub release](https://github.com/mui/mui-toolpad/releases/new).
+
    1. Use `<version number>` to **Choose a tag** (when you enter new version GH UI will pop a suggestion `Create new tag: *** on publish`)
    1. Use `<commit of merged PR>` as the **target**
    1. Use the cleaned changelog as the content of **Describe this release**
    1. Use `<version number>` as the **Release title**
    1. Mark as prerelease if necessary.
    1. **Publish release**
+
+1. Smoke test the release:
+
+   1. Run
+
+   ```sh
+   yarn create toolpad-app test-app
+   cd test-app
+   yarn dev
+   ```
+
+   And verify the editor works

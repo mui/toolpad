@@ -18,11 +18,6 @@ export async function waitForInit(): Promise<void> {
   await getProject();
 }
 
-export async function getDomFingerprint() {
-  const project = await getProject();
-  return project.getDomFingerPrint();
-}
-
 export async function saveDom(newDom: appDom.AppDom): Promise<{ fingerprint: number }> {
   const project = await getProject();
   return project.saveDom(newDom);
@@ -31,4 +26,9 @@ export async function saveDom(newDom: appDom.AppDom): Promise<{ fingerprint: num
 export async function loadDom(): Promise<appDom.AppDom> {
   const project = await getProject();
   return project.loadDom();
+}
+
+export async function applyDomDiff(diff: appDom.DomDiff): Promise<{ fingerprint: number }> {
+  const project = await getProject();
+  return project.applyDomDiff(diff);
 }

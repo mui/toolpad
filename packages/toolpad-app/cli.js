@@ -18,6 +18,7 @@ if (missingFlags.length > 0) {
 
   // Re-running with --enable-source-maps flag
   fork(module, args, {
+    stdio: 'inherit',
     execArgv: [
       // Get the arguments passed to the node binary
       ...process.execArgv,

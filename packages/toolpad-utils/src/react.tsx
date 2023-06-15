@@ -79,3 +79,34 @@ export function createProvidedContext<T>(
   const useContext = () => useNonNullableContext(context, name);
   return [useContext, context.Provider as React.ComponentType<React.ProviderProps<T>>];
 }
+
+export function useAssertedContext<T>(context: React.Context<T | undefined>): T {
+  const value = React.useContext(context);
+  if (value === undefined) {
+    throw new Error('context was used without a Provider');
+  }
+  return value;
+}
+
+/**
+ * Debugging tool that logs updates to props.
+ */
+export function useTraceUpdates<P extends object>(prefix: string, props: P) {
+  const prev = React.useRef<P>(props);
+  React.useEffect(() => {
+    const changedProps: Partial<P> = {};
+
+    for (const key of Object.keys(props) as (keyof P)[]) {
+      if (!Object.is(prev.current[key], props[key])) {
+        changedProps[key] = props[key];
+      }
+    }
+
+    if (Object.keys(changedProps).length > 0) {
+      // eslint-disable-next-line no-console
+      console.log(`${prefix} changed props:`, changedProps);
+    }
+
+    prev.current = props;
+  });
+}

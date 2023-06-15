@@ -543,8 +543,9 @@ export default function AppProvider({ children }: DomContextProps) {
 
     const domToSave = state.dom;
     dispatch({ type: 'DOM_SAVING' });
+    const domDiff = appDom.createDiff(state.savedDom, domToSave);
     client.mutation
-      .saveDom(domToSave)
+      .applyDomDiff(domDiff)
       .then(({ fingerprint: newFingerPrint }) => {
         fingerprint.current = newFingerPrint;
         dispatch({ type: 'DOM_SAVED', savedDom: domToSave });

@@ -90,5 +90,9 @@ export async function invalidError() {
 }
 
 export function syncFunction() {
+  return { message: "hello I'm synchronous" };
+}
+
+export async function bareWithParams(foo: string, bar: number, baz = { hello: 1 }) {
   return { message: `foo: ${foo}; typeof bar: ${typeof bar}; baz.hello: ${baz.hello}` };
 }

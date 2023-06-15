@@ -144,7 +144,6 @@ function toJsonSchema(
       }
 
       if (withoutUndefined.length === 1) {
-        console.log('hier', withoutUndefined[0] === tsType);
         return toJsonSchema(withoutUndefined[0], checker, seenTypes);
       }
 
@@ -382,7 +381,6 @@ export default async function extractTypes({
           }
 
           const isCreateFunction = isToolpadCreateFunction(exportType);
-          console.log(symbol.name);
           return {
             name: symbol.name,
             isCreateFunction,

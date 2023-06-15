@@ -103,8 +103,8 @@ async function execute(msg: ExecuteMessage) {
     throw new Error(`Function "${msg.name}" not found`);
   }
 
-  const data = await fn(...msg.parameters);
-  return { data };
+  const result = await fn(...msg.parameters);
+  return result;
 }
 
 async function introspect(msg: IntrospectMessage): Promise<IntrospectionResult> {

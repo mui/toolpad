@@ -114,7 +114,7 @@ function QueryEditor({
 
   return (
     <SplitPane split="vertical" size="50%" allowResize>
-      <QueryInputPanel onRunPreview={handleRunPreview}>
+      <QueryInputPanel previewDisabled={!selectedOption} onRunPreview={handleRunPreview}>
         <Stack gap={2} sx={{ px: 3, pt: 1 }}>
           <Stack gap={2} direction="row">
             <Autocomplete

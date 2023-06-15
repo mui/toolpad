@@ -17,6 +17,7 @@ import { createWorker as createDevWorker } from './functionsDevWorker';
 import type { ExtractTypesParams, IntrospectionResult } from './functionsTypesWorker';
 import { Awaitable } from '../utils/types';
 
+Error.stackTraceLimit = 100;
 const DEFAULT_FUNCTIONS_FILE_CONTENT = `// Toolpad queries:
 
 export async function example() {
@@ -271,7 +272,7 @@ export default class FunctionsManager {
       ? [{ parameters }]
       : handler.parameters.map(([parameterName]) => parameters[parameterName]);
 
-    const data = this.devWorker.execute(outputFilePath, name, executeParams);
+    const data = await this.devWorker.execute(outputFilePath, name, executeParams);
 
     return { data };
   }

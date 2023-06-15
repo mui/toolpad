@@ -85,9 +85,10 @@ export async function functionData() {
 
 export async function invalidError() {
   // Yes, I'm throwing a function here
+  // eslint-disable-next-line no-throw-literal
   throw function Hello() {};
 }
 
-export function bareWithParams(foo: string, bar: number, baz = { hello: 1 }) {
+export function syncFunction() {
   return { message: `foo: ${foo}; typeof bar: ${typeof bar}; baz.hello: ${baz.hello}` };
 }

@@ -7,6 +7,8 @@ import { JSONSchema7, JSONSchema7TypeName, JSONSchema7Type } from 'json-schema';
 import { asArray } from '@mui/toolpad-utils/collections';
 import { PrimitiveValueType } from '@mui/toolpad-core';
 
+const MAX_DEPTH = 100;
+
 export interface ReturnTypeIntrospectionResult {
   schema: JSONSchema7 | null;
 }
@@ -83,14 +85,21 @@ function formatDiagnostic(diagnostic: ts.Diagnostic): string {
 
 function hasTypeFlag(type: ts.Type, flag: ts.TypeFlags) {
   // eslint-disable-next-line no-bitwise
-  return (type.flags & flag) !== 0;
+  return (type.getFlags() & flag) !== 0;
 }
 
 function asUnionTypes(type: ts.Type): ts.Type[] {
   return type.isUnion() ? type.types : [type];
 }
 
-function toJsonSchema(tsType: ts.Type, checker: ts.TypeChecker): JSONSchema7 | null {
+function toJsonSchema(
+  tsType: ts.Type,
+  checker: ts.TypeChecker,
+  maxDepth: number,
+): JSONSchema7 | null {
+  if (maxDepth <= 0) {
+    return null;
+  }
   if (
     hasTypeFlag(tsType, ts.TypeFlags.Undefined) ||
     hasTypeFlag(tsType, ts.TypeFlags.Void) ||
@@ -133,11 +142,11 @@ function toJsonSchema(tsType: ts.Type, checker: ts.TypeChecker): JSONSchema7 | n
     }
 
     if (withoutUndefined.length === 1) {
-      return toJsonSchema(withoutUndefined[0], checker);
+      return toJsonSchema(withoutUndefined[0], checker, maxDepth - 1);
     }
 
     for (const type of withoutUndefined) {
-      const itemType = toJsonSchema(type, checker);
+      const itemType = toJsonSchema(type, checker, maxDepth - 1);
 
       if (itemType) {
         if (enumValues && itemType.const) {
@@ -202,7 +211,7 @@ function toJsonSchema(tsType: ts.Type, checker: ts.TypeChecker): JSONSchema7 | n
       let items: JSONSchema7 | undefined;
       const indexType = tsType.getNumberIndexType();
       if (indexType) {
-        items = toJsonSchema(indexType, checker) ?? undefined;
+        items = toJsonSchema(indexType, checker, maxDepth - 1) ?? undefined;
       }
 
       return {
@@ -223,7 +232,7 @@ function toJsonSchema(tsType: ts.Type, checker: ts.TypeChecker): JSONSchema7 | n
         if (!isOptional) {
           required.push(propertyName);
         }
-        const propertySchema = toJsonSchema(propertyType, checker);
+        const propertySchema = toJsonSchema(propertyType, checker, maxDepth - 1);
         return propertySchema ? [[propertyName, propertySchema]] : [];
       }),
     );
@@ -244,7 +253,7 @@ function getParameters(
     .getParameters()
     .map((parameter) => {
       const paramType = checker.getTypeOfSymbolAtLocation(parameter, parameter.valueDeclaration!);
-      const schema = toJsonSchema(paramType, checker);
+      const schema = toJsonSchema(paramType, checker, MAX_DEPTH);
       return [
         parameter.getName(),
         {
@@ -306,7 +315,7 @@ function getReturnType(callSignatures: readonly ts.Signature[], checker: ts.Type
   const awaitedReturnType = getAwaitedType(returnType, checker);
 
   return {
-    schema: toJsonSchema(awaitedReturnType, checker),
+    schema: toJsonSchema(awaitedReturnType, checker, MAX_DEPTH),
   };
 }
 
@@ -331,58 +340,61 @@ export default async function extractTypes({
 
   const checker = program.getTypeChecker();
 
-  const files: FileIntrospectionResult[] = entryPoints.flatMap((entrypoint) => {
-    const sourceFile = program.getSourceFile(entrypoint);
-    const relativeEntrypoint = path.relative(resourcesFolder, entrypoint);
+  const files: FileIntrospectionResult[] = entryPoints
+    .map((entrypoint) => {
+      const sourceFile = program.getSourceFile(entrypoint);
+      const relativeEntrypoint = path.relative(resourcesFolder, entrypoint);
 
-    if (!sourceFile) {
-      return [];
-    }
-
-    const diagnostics = program.getSemanticDiagnostics(sourceFile);
-
-    for (const diagnostic of diagnostics) {
-      // eslint-disable-next-line no-console
-      console.log(`${chalk.blue('info')}  - ${formatDiagnostic(diagnostic)}`);
-    }
-
-    const moduleSymbol = checker.getSymbolAtLocation(sourceFile);
-
-    if (!moduleSymbol) {
-      return [];
-    }
-
-    const handlers = checker.getExportsOfModule(moduleSymbol).flatMap((symbol) => {
-      const exportType = checker.getTypeOfSymbolAtLocation(symbol, symbol.valueDeclaration!);
-      const callSignatures = exportType.getCallSignatures();
-
-      if (callSignatures.length <= 0) {
-        return [];
+      if (!sourceFile) {
+        return null;
       }
 
-      const isCreateFunction = isToolpadCreateFunction(exportType);
+      const diagnostics = program.getSemanticDiagnostics(sourceFile);
 
-      return [
-        {
-          name: symbol.name,
-          isCreateFunction,
-          parameters: getParameters(callSignatures, checker),
-          returnType: getReturnType(callSignatures, checker),
-        } satisfies HandlerIntrospectionResult,
-      ];
-    });
+      for (const diagnostic of diagnostics) {
+        // eslint-disable-next-line no-console
+        console.log(`${chalk.blue('info')}  - ${formatDiagnostic(diagnostic)}`);
+      }
 
-    return {
-      name: relativeEntrypoint,
-      errors: diagnostics
-        .filter((diagnostic) => diagnostic.category === ts.DiagnosticCategory.Error)
-        .map((diagnostic) => ({ message: formatDiagnostic(diagnostic) })),
-      warnings: diagnostics
-        .filter((diagnostic) => diagnostic.category === ts.DiagnosticCategory.Warning)
-        .map((diagnostic) => ({ message: formatDiagnostic(diagnostic) })),
-      handlers,
-    } satisfies FileIntrospectionResult;
-  });
+      const moduleSymbol = checker.getSymbolAtLocation(sourceFile);
+
+      if (!moduleSymbol) {
+        return null;
+      }
+
+      const handlers = checker
+        .getExportsOfModule(moduleSymbol)
+        .map((symbol) => {
+          const exportType = checker.getTypeOfSymbolAtLocation(symbol, symbol.valueDeclaration!);
+          const callSignatures = exportType.getCallSignatures();
+
+          if (callSignatures.length <= 0) {
+            return null;
+          }
+
+          const isCreateFunction = isToolpadCreateFunction(exportType);
+
+          return {
+            name: symbol.name,
+            isCreateFunction,
+            parameters: getParameters(callSignatures, checker),
+            returnType: getReturnType(callSignatures, checker),
+          } satisfies HandlerIntrospectionResult;
+        })
+        .filter(Boolean);
+
+      return {
+        name: relativeEntrypoint,
+        errors: diagnostics
+          .filter((diagnostic) => diagnostic.category === ts.DiagnosticCategory.Error)
+          .map((diagnostic) => ({ message: formatDiagnostic(diagnostic) })),
+        warnings: diagnostics
+          .filter((diagnostic) => diagnostic.category === ts.DiagnosticCategory.Warning)
+          .map((diagnostic) => ({ message: formatDiagnostic(diagnostic) })),
+        handlers,
+      } satisfies FileIntrospectionResult;
+    })
+    .filter(Boolean);
 
   return { files };
 }

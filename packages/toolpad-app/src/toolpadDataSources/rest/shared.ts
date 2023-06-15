@@ -157,10 +157,7 @@ async function readData(res: Response, fetchQuery: FetchQuery): Promise<any> {
 export function getDefaultUrl(connection?: RestConnectionParams | null): BindableAttrValue<string> {
   const baseUrl = connection?.baseUrl;
 
-  return {
-    type: 'const',
-    value: baseUrl ? '' : MOVIES_API_DEMO_URL,
-  };
+  return baseUrl ? '' : MOVIES_API_DEMO_URL;
 }
 
 interface ExecBaseOptions {

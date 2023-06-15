@@ -1,6 +1,7 @@
 import { BindingEvaluationResult, JsRuntime } from '@mui/toolpad-core';
 import { set } from 'lodash-es';
 import { mapValues } from '@mui/toolpad-utils/collections';
+import { updatePath } from '../utils/immutability';
 
 /**
  * Represents the state of a binding. It both describes which place it takes in the gobal scope
@@ -239,11 +240,41 @@ export default function evalJsBindings(
   return mapValues(bindings, (binding, bindingId) => {
     const { scopePath } = binding;
 
+    let bindingResult = results[bindingId];
+
+    const mergeNestedBindings = (value: unknown, parentBindingId: string) => {
+      if (value && typeof value === 'object') {
+        for (const nestedPropName of Object.keys(value)) {
+          const nestedBindingId = `${parentBindingId}${
+            Array.isArray(value) ? `[${nestedPropName}]` : `.${nestedPropName}`
+          }`;
+
+          const nestedBindingResultValue = results[nestedBindingId]?.value;
+          if (nestedBindingResultValue) {
+            bindingResult = updatePath(
+              bindingResult,
+              `value.${nestedBindingId.replace(bindingId, '')}`,
+              nestedBindingResultValue,
+            );
+          } else {
+            mergeNestedBindings(
+              (value as Record<string, unknown>)[nestedPropName],
+              nestedBindingId,
+            );
+          }
+        }
+      }
+    };
+
+    if (bindingResult.value) {
+      mergeNestedBindings(bindingResult.value, bindingId);
+    }
+
     return {
       scopePath,
       dependencies: Array.from(flatDependencies.get(bindingId) ?? []),
       result: {
-        ...results[bindingId],
+        ...bindingResult,
         error: bubbleError(flatDependencies, results, bindingId),
         loading: bubbleLoading(flatDependencies, results, bindingId),
       },

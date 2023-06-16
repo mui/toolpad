@@ -4,7 +4,7 @@
 
 ## Create a Toolpad app
 
-Start by opening a terminal and `cd` into a folder you'd like to create your applicarion in. Then run the command
+Start by opening a terminal and `cd` into a folder you'd like to create your application in. Then run the command
 
 ```sh
 npx create-toolpad-app my-app

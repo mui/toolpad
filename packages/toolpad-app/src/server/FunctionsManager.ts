@@ -96,15 +96,15 @@ export default class FunctionsManager {
     this.startDev();
   }
 
-  getResourcesFolder(): string {
+  private getResourcesFolder(): string {
     return path.join(this.project.getToolpadFolder(), './resources');
   }
 
-  getFunctionsFile() {
+  private getFunctionsFile(): string {
     return path.join(this.getResourcesFolder(), './functions.ts');
   }
 
-  getFunctionResourcesPattern(): string {
+  private getFunctionResourcesPattern(): string {
     return path.join(this.getResourcesFolder(), '*.ts');
   }
 
@@ -117,16 +117,16 @@ export default class FunctionsManager {
     }
   }
 
-  async getFunctionFiles(): Promise<string[]> {
+  private async getFunctionFiles(): Promise<string[]> {
     const paths = await glob(this.getFunctionResourcesPattern());
     return paths.map((fullPath) => path.relative(this.project.getRoot(), fullPath));
   }
 
-  getBuildErrorsForFile(entryPoint: string) {
+  private getBuildErrorsForFile(entryPoint: string) {
     return this.buildErrors.filter((error) => error.location?.file === entryPoint);
   }
 
-  getOutputFileForEntryPoint(entryPoint: string): string | undefined {
+  private getOutputFileForEntryPoint(entryPoint: string): string | undefined {
     const [outputFile] =
       Object.entries(this.buildMetafile?.outputs ?? {}).find(
         (entry) => entry[1].entryPoint === entryPoint,
@@ -201,29 +201,21 @@ export default class FunctionsManager {
     });
   }
 
-  async createBuilder() {
-    let ctx = await this.createEsbuildContext();
+  private async startWatchingFunctionFiles() {
+    let ctx: esbuild.BuildContext | undefined;
 
-    const watch = async () => {
-      await ctx.watch({});
-
-      // Make sure we pick up added/removed function files
-      const resourcesWatcher = chokidar.watch([this.getFunctionResourcesPattern()]);
-      const handleFileAddedOrRemoved = async () => {
-        await ctx.dispose();
-        ctx = await this.createEsbuildContext();
-        await ctx.watch({});
-      };
-      resourcesWatcher.on('add', handleFileAddedOrRemoved);
-      resourcesWatcher.on('unlink', handleFileAddedOrRemoved);
+    // Make sure we pick up added/removed function files
+    const resourcesWatcher = chokidar.watch([this.getFunctionResourcesPattern()]);
+    const handleFileAddedOrRemoved = async () => {
+      await ctx?.dispose();
+      ctx = await this.createEsbuildContext();
+      await ctx.watch();
     };
-
-    return {
-      watch,
-    };
+    resourcesWatcher.on('add', handleFileAddedOrRemoved);
+    resourcesWatcher.on('unlink', handleFileAddedOrRemoved);
   }
 
-  async createRuntimeWorkerWithEnv() {
+  private async createRuntimeWorkerWithEnv() {
     const env = await this.project.envManager.getValues();
 
     const oldWorker = this.devWorker;
@@ -234,14 +226,21 @@ export default class FunctionsManager {
   async startDev() {
     await this.migrateLegacy();
 
+    await this.startWatchingFunctionFiles();
+
     await this.createRuntimeWorkerWithEnv();
-
-    const builder = await this.createBuilder();
-    await builder.watch();
-
     this.project.events.subscribe('envChanged', async () => {
       await this.createRuntimeWorkerWithEnv();
     });
+  }
+
+  async build() {
+    const ctx = await this.createEsbuildContext();
+    await ctx.rebuild();
+  }
+
+  async startProd() {
+    await this.createRuntimeWorkerWithEnv();
   }
 
   async exec(

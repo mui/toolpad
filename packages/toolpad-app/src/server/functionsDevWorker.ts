@@ -5,15 +5,9 @@ import { createRequire } from 'node:module';
 import * as fs from 'fs/promises';
 import * as vm from 'vm';
 import * as url from 'url';
-import { CreateFunctionConfig, TOOLPAD_FUNCTION } from '@mui/toolpad-core';
 import fetch, { Headers, Request, Response } from 'node-fetch';
 import { errorFrom, serializeError } from '@mui/toolpad-utils/errors';
 import invariant from 'invariant';
-import type {
-  FileIntrospectionResult,
-  HandlerIntrospectionResult,
-  IntrospectionResult,
-} from './functionsTypesWorker';
 
 function getCircularReplacer() {
   const ancestors: object[] = [];
@@ -107,48 +101,10 @@ async function execute(msg: ExecuteMessage) {
   return result;
 }
 
-async function introspect(msg: IntrospectMessage): Promise<IntrospectionResult> {
-  const files: FileIntrospectionResult[] = await Promise.all(
-    Array.from(msg.files.entries()).map(async ([entry, { file }]) => {
-      let error: Error | undefined;
-      let resolvers: Record<string, Function> = {};
-      try {
-        resolvers = await resolveFunctions(file);
-      } catch (rawError) {
-        error = errorFrom(rawError);
-      }
-      const handlers: HandlerIntrospectionResult[] = Object.entries(resolvers).map(
-        ([name, value]) => {
-          const fnConfig = (value as any)[TOOLPAD_FUNCTION] as
-            | CreateFunctionConfig<any>
-            | undefined;
-          return {
-            name,
-            isCreateFunction: !!fnConfig,
-            parameters: Object.entries(fnConfig?.parameters ?? {}),
-            returnType: { schema: {} },
-          };
-        },
-      );
-
-      return {
-        name: path.basename(entry),
-        errors: error ? [error] : [],
-        warnings: [],
-        handlers,
-      } satisfies FileIntrospectionResult;
-    }),
-  );
-
-  return { files };
-}
-
 async function handleMessage(msg: WorkerMessage) {
   switch (msg.kind) {
     case 'execute':
       return execute(msg);
-    case 'introspect':
-      return introspect(msg);
     default:
       throw new Error(`Unknown kind "${(msg as any).kind}"`);
   }
@@ -199,13 +155,6 @@ export function createWorker(env: Record<string, any>) {
   return {
     async terminate() {
       return worker.terminate();
-    },
-
-    async introspect(files: IntrospectedFiles): Promise<IntrospectionResult> {
-      return runOnWorker({
-        kind: 'introspect',
-        files,
-      });
     },
 
     async execute(filePath: string, name: string, parameters: unknown[]): Promise<any> {

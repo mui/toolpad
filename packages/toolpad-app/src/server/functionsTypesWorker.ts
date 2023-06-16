@@ -313,6 +313,37 @@ function isToolpadCreateFunction(exportType: ts.Type): boolean {
   return false;
 }
 
+function getCreateFunctionParameters(
+  callSignatures: readonly ts.Signature[],
+  checker: ts.TypeChecker,
+): [string, PrimitiveValueType][] {
+  invariant(callSignatures.length > 0, 'Expected at least 1 call signature');
+  const [callSignature] = callSignatures;
+  const [firstParameter] = callSignature.getParameters();
+  invariant(firstParameter, 'Expected at least 1 parameter');
+  const firstParameterType = checker.getTypeOfSymbolAtLocation(
+    firstParameter,
+    firstParameter.valueDeclaration!,
+  );
+  const parametersProperty = firstParameterType.getProperty('parameters');
+  invariant(parametersProperty, 'Expected parameters property');
+  const parametersPropertyType = checker.getTypeOfSymbolAtLocation(
+    parametersProperty,
+    parametersProperty.valueDeclaration!,
+  );
+  return parametersPropertyType.getProperties().map((property) => {
+    const propertyType = checker.getTypeOfSymbol(property);
+    const schema = toJsonSchema(propertyType, checker, new Set());
+    return [
+      property.getName(),
+      {
+        ...propValueFromJsonSchema(schema),
+        required: false,
+      },
+    ];
+  });
+}
+
 function getReturnType(callSignatures: readonly ts.Signature[], checker: ts.TypeChecker) {
   invariant(callSignatures.length > 0, 'Expected at least 1 call signature');
 
@@ -388,7 +419,9 @@ export default async function extractTypes({
           return {
             name: symbol.name,
             isCreateFunction,
-            parameters: getParameters(callSignatures, checker),
+            parameters: isCreateFunction
+              ? getCreateFunctionParameters(callSignatures, checker)
+              : getParameters(callSignatures, checker),
             returnType: getReturnType(callSignatures, checker),
           } satisfies HandlerIntrospectionResult;
         })

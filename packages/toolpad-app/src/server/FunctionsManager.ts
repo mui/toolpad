@@ -18,7 +18,6 @@ import {
   tsConfig,
   type ExtractTypesParams,
   type IntrospectionResult,
-  HandlerIntrospectionResult,
 } from './functionsTypesWorker';
 import { Awaitable } from '../utils/types';
 
@@ -297,63 +296,7 @@ export default class FunctionsManager {
       'this.extractedTypes should have been initialized before initPromise resolves',
     );
 
-    const functionFiles = await this.getFunctionFiles();
-    const outputFiles = new Map(
-      functionFiles.flatMap((functionFile) => {
-        const file = this.getOutputFileForEntryPoint(functionFile);
-        return file ? [[functionFile, { file }]] : [];
-      }),
-    );
-
-    const [runtimeIntrospection] = await Promise.all([this.devWorker.introspect(outputFiles)]);
-
-    const extractedTypes = await this.extractedTypes;
-
-    const runtimeFilesMap = new Map(runtimeIntrospection.files.map((file) => [file.name, file]));
-
-    /**
-     * We extract handler information out of the runtime (legacy) and out of the extracted types.
-     * When a function is created through createfunction, we use the runtime handler information.
-     * Over time we will migrate all functions to use the extracted types.
-     */
-    const merged: IntrospectionResult = {
-      files: extractedTypes.files.map((extractedFile) => {
-        const runtimeFile = runtimeFilesMap.get(extractedFile.name);
-
-        if (runtimeFile) {
-          const runtimeHandlerMap = new Map(
-            runtimeFile.handlers.map((handler) => [handler.name, handler]),
-          );
-
-          return {
-            ...extractedFile,
-            handlers: extractedFile.handlers.map((extractedHandler) => {
-              const runtimeHandler = runtimeHandlerMap.get(extractedHandler.name);
-
-              if (!runtimeHandler) {
-                // Something likely went wrong during evaluation of the module
-                // Let;'s just show the function without parameters and return type
-                return {
-                  ...extractedHandler,
-                  parameters: [],
-                  returnType: { schema: null },
-                } satisfies HandlerIntrospectionResult;
-              }
-
-              if (runtimeHandler.isCreateFunction) {
-                return runtimeHandler;
-              }
-
-              return extractedHandler;
-            }),
-          };
-        }
-
-        return extractedFile;
-      }),
-    };
-
-    return merged;
+    return this.extractedTypes;
   }
 
   async initQueriesFile(): Promise<void> {

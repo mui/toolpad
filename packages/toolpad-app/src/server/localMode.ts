@@ -240,7 +240,7 @@ export async function createComponent(name: string) {
 export async function deletePage(name: string) {
   const root = getUserProjectRoot();
   const pageFolder = getPageFolder(root, name);
-  await fs.rm(pageFolder, { force: true, recursive: true });
+  await fs.rm(pageFolder, { recursive: true });
 }
 
 class Lock {

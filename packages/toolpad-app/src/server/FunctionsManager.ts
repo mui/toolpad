@@ -135,10 +135,8 @@ export default class FunctionsManager {
     return outputFile;
   }
 
-  async createBuilder() {
+  private async createEsbuildContext() {
     const root = this.project.getRoot();
-
-    const entryPoints = await this.getFunctionFiles();
 
     const onFunctionBuildStart = async () => {
       // Cancel ongoing type extraction
@@ -187,7 +185,8 @@ export default class FunctionsManager {
       },
     };
 
-    const ctx = await esbuild.context({
+    const entryPoints = await this.getFunctionFiles();
+    return esbuild.context({
       absWorkingDir: root,
       entryPoints,
       plugins: [toolpadPlugin],
@@ -200,14 +199,20 @@ export default class FunctionsManager {
       target: 'es2022',
       tsconfigRaw: JSON.stringify(tsConfig),
     });
+  }
 
-    const watch = () => {
-      ctx.watch({});
+  async createBuilder() {
+    let ctx = await this.createEsbuildContext();
+
+    const watch = async () => {
+      await ctx.watch({});
 
       // Make sure we pick up added/removed function files
       const resourcesWatcher = chokidar.watch([this.getFunctionResourcesPattern()]);
       const handleFileAddedOrRemoved = async () => {
-        await ctx.rebuild().catch(() => {});
+        await ctx.dispose();
+        ctx = await this.createEsbuildContext();
+        await ctx.watch({});
       };
       resourcesWatcher.on('add', handleFileAddedOrRemoved);
       resourcesWatcher.on('unlink', handleFileAddedOrRemoved);

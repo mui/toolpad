@@ -1,9 +1,11 @@
 import * as path from 'path';
+import { fileReplace } from '../../../packages/toolpad-utils/src/fs';
 import { test, expect, Page } from '../../playwright/localTest';
 import { ToolpadRuntime } from '../../models/ToolpadRuntime';
 import { ToolpadEditor } from '../../models/ToolpadEditor';
-import { fileReplace } from '../../utils/fs';
 import { waitForMatch } from '../../utils/streams';
+
+const BASIC_TESTS_PAGE_ID = '5q1xd0t';
 
 test.use({
   ignoreConsoleErrors: [
@@ -20,6 +22,9 @@ test.use({
   localAppConfig: {
     template: path.resolve(__dirname, './fixture'),
     cmd: 'dev',
+    env: {
+      SECRET_BAZ: 'Some baz secret',
+    },
   },
 });
 
@@ -34,18 +39,19 @@ async function setReactQueryFocused(page: Page, focus: boolean) {
 
 test('functions basics', async ({ page }) => {
   const runtimeModel = new ToolpadRuntime(page);
-  await runtimeModel.gotoPage('page1');
+  await runtimeModel.gotoPage('basic');
 
   await expect(page.locator('text="hello, message: hello world"')).toBeVisible();
   await expect(page.locator('text="throws, error.message: BOOM!"')).toBeVisible();
   await expect(page.locator('text="throws, data undefined"')).toBeVisible();
   await expect(page.locator('text="echo, parameter: bound foo parameter"')).toBeVisible();
   await expect(page.locator('text="echo, secret: Some bar secret"')).toBeVisible();
+  await expect(page.locator('text="echo, secret not in .env: Some baz secret"')).toBeVisible();
 });
 
 test('function editor reload', async ({ page, localApp }) => {
   const editorModel = new ToolpadEditor(page);
-  await editorModel.goto();
+  await editorModel.goToPageById(BASIC_TESTS_PAGE_ID);
 
   await expect(editorModel.appCanvas.getByText('edited hello')).toBeVisible();
 
@@ -57,7 +63,7 @@ test('function editor reload', async ({ page, localApp }) => {
 
 test('function editor parameters update', async ({ page, localApp }) => {
   const editorModel = new ToolpadEditor(page);
-  await editorModel.goto();
+  await editorModel.goToPageById(BASIC_TESTS_PAGE_ID);
 
   await editorModel.componentEditor.getByRole('button', { name: 'withParams' }).click();
 
@@ -81,9 +87,30 @@ test('function editor parameters update', async ({ page, localApp }) => {
 
 test('bound parameters are preserved on manual call', async ({ page }) => {
   const runtimeModel = new ToolpadRuntime(page);
-  await runtimeModel.gotoPage('page1');
+  await runtimeModel.gotoPage('basic');
 
   await page.getByRole('button', { name: 'Run Manual Query' }).click();
 
   await expect(page.getByText('destination: checksum', { exact: true })).toBeVisible();
+});
+
+test('global variables are retained in function runtime', async ({ page }) => {
+  const runtimeModel = new ToolpadRuntime(page);
+  await runtimeModel.gotoPage('basic');
+
+  await expect(page.getByText('global value: 1', { exact: true })).toBeVisible();
+  await expect(page.getByText('global value: 2', { exact: true })).not.toBeVisible();
+
+  await page.getByRole('button', { name: 'increment' }).click();
+
+  await expect(page.getByText('global value: 2', { exact: true })).toBeVisible();
+});
+
+test('Query serialization', async ({ page }) => {
+  const runtimeModel = new ToolpadRuntime(page);
+  await runtimeModel.gotoPage('serialization');
+
+  await expect(page.getByText('Circlular property: [Circular]', { exact: true })).toBeVisible();
+  await expect(page.getByText('Non-circular: hello:hello', { exact: true })).toBeVisible();
+  await expect(page.getByText('Invalid error: undefined', { exact: true })).toBeVisible();
 });

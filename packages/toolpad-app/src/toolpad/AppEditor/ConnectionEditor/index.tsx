@@ -62,7 +62,7 @@ function ConnectionEditorContent<P>({
     [connectionNode, domApi],
   );
 
-  const dataSourceId = connectionNode.attributes.dataSource.value;
+  const dataSourceId = connectionNode.attributes.dataSource;
   const dataSource = dataSources[dataSourceId];
   const connectionEditorContext = React.useMemo(
     () => ({ dataSourceId, connectionId: connectionNode.id }),
@@ -78,7 +78,7 @@ function ConnectionEditorContent<P>({
             <ConnectionContextProvider value={connectionEditorContext}>
               <ConnectionParamsEditor
                 dataSource={dataSource}
-                value={connectionNode.attributes.params.value}
+                value={connectionNode.attributes.params.$$secret}
                 onChange={handleConnectionChange}
                 handlerBasePath={`/api/dataSources/${dataSourceId}`}
                 connectionId={connectionNode.id}
@@ -86,7 +86,7 @@ function ConnectionEditorContent<P>({
             </ConnectionContextProvider>
           ) : (
             <Typography>
-              Unrecognized datasource &quot;{connectionNode.attributes.dataSource.value}&quot;
+              Unrecognized datasource &quot;{connectionNode.attributes.dataSource}&quot;
             </Typography>
           )}
         </Stack>

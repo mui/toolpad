@@ -2,15 +2,11 @@ import * as path from 'path';
 import * as fs from 'fs/promises';
 import { kebabCase } from 'lodash';
 import type { ComponentConfig } from '@mui/toolpad-core';
+import * as builtins from '@mui/toolpad-components';
+import * as toolpadCore from '@mui/toolpad-core';
 import { escapeCell, writePrettifiedFile } from './utils';
 
 const AUTO_GENERATED_WARNING = 'This file has been auto-generated using `yarn docs:build:api`.';
-
-// Some dependencies of @mui/toolpad-components are not ESM. Bundlers can handle
-// this transparently, but ts-node doesn't bundle. So we'll just use the commonjs
-// version of @mui/toolpad-components.
-const builtins = require('@mui/toolpad-components');
-const toolpadCore = require('@mui/toolpad-core');
 
 const currentDirectory = __dirname;
 const projectRoot = path.resolve(currentDirectory, '..', '..');

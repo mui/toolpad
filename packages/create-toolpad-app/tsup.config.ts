@@ -10,4 +10,5 @@ export default defineConfig({
     // eslint-disable-next-line no-console
     console.log('cli: build successful');
   },
+  publicDir: './public',
 });

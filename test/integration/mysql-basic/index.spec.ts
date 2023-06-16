@@ -1,7 +1,7 @@
 import * as path from 'path';
+import { readJsonFile } from '../../../packages/toolpad-utils/src/fs';
 import { test, expect } from '../../playwright/test';
 import { ToolpadRuntime } from '../../models/ToolpadRuntime';
-import { readJsonFile } from '../../utils/fs';
 import generateId from '../../utils/generateId';
 
 test.skip(true, 'Legacy database tests');

@@ -1,7 +1,8 @@
 import * as path from 'path';
+import * as fs from 'fs/promises';
+import { fileReplaceAll } from '../../../packages/toolpad-utils/src/fs';
 import { test, expect } from '../../playwright/localTest';
 import { ToolpadRuntime } from '../../models/ToolpadRuntime';
-import { fileReplaceAll } from '../../utils/fs';
 import { ToolpadEditor } from '../../models/ToolpadEditor';
 
 // We can run our own httpbin instance if necessary:
@@ -26,6 +27,9 @@ test.use({
       await fileReplaceAll(configFilePath, HTTPBIN_SOURCE_URL, HTTPBIN_TARGET_URL);
     },
     cmd: 'dev',
+    env: {
+      TEST_VAR: 'foo',
+    },
   },
 });
 
@@ -42,7 +46,7 @@ test('rest basics', async ({ page, context, localApp }) => {
   await expect(page.getByText('query4 authorization: foo')).toBeVisible();
 
   const envFilePath = path.resolve(localApp.dir, './.env');
-  await fileReplaceAll(envFilePath, 'TEST_VAR=foo', 'TEST_VAR=bar');
+  await fs.writeFile(envFilePath, 'TEST_VAR=bar');
 
   // TODO: Make this reload unnecessary. The queries should be invalidated when the env file changes.
   await page.reload();

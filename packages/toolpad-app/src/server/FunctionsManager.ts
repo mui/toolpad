@@ -21,7 +21,6 @@ import {
 } from './functionsTypesWorker';
 import { Awaitable } from '../utils/types';
 
-Error.stackTraceLimit = 100;
 const DEFAULT_FUNCTIONS_FILE_CONTENT = `// Toolpad queries:
 
 export async function example() {

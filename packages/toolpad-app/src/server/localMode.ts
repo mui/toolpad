@@ -837,29 +837,16 @@ function extractThemeContentFromDom(dom: appDom.AppDom): Theme | null {
 
 async function writeDomToDisk(dom: appDom.AppDom, oldDom?: appDom.AppDom): Promise<void> {
   const root = getUserProjectRoot();
-  let newPageContent: PagesContent = {};
   const { pages: pagesContent } = extractPagesFromDom(dom);
-  if (oldDom) {
+  if(oldDom) {
     const { pages: oldpagesContent } = extractPagesFromDom(oldDom);
-    const oldlist = Object.keys(oldpagesContent);
-    const newlist = Object.keys(pagesContent);
-    for await (const newpage of newlist) {
-      // optimize the create folder and write file
-      // beacuse it doesn't need to create folder and write file when the page is renamed
-      if (!oldlist.includes(newpage)) {
-        const oldpage = oldlist.find(
-          (page) => oldpagesContent[page].spec.id === pagesContent[newpage].spec.id,
-        );
-        await renamePage(oldpage!, newpage);
-      } else {
-        newPageContent[newpage] = pagesContent[newpage];
-      }
+    const pagelist = Object.keys(oldpagesContent)
+    for await (const page of pagelist) {
+      await deletePage(page)
     }
-  } else {
-    newPageContent = pagesContent;
   }
 
-  await Promise.all([writePagesToFiles(root, newPageContent)]);
+  await Promise.all([writePagesToFiles(root, pagesContent)]);
 }
 
 const DEFAULT_EDITOR = 'code';

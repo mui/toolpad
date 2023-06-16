@@ -19,7 +19,6 @@ import {
   readMaybeDir,
   updateYamlFile,
   fileExists,
-  removeWholeFolder,
 } from '@mui/toolpad-utils/fs';
 import config from '../config';
 import * as appDom from '../appDom';
@@ -241,9 +240,15 @@ export async function createComponent(name: string) {
 export async function deletePage(name: string) {
   const root = getUserProjectRoot();
   const pageFolder = getPageFolder(root, name);
-  await fs.rm(pageFolder, { force: true, recursive: true });
+  await fs.rm(pageFolder, { recursive: true });
 }
 
+export async function renamePage(oldname: string, newname: string) {
+  const root = getUserProjectRoot();
+  const oldpageFolder = getPageFolder(root, oldname);
+  const newpageFolder = getPageFolder(root, newname);
+  await fs.rename(oldpageFolder, newpageFolder);
+}
 class Lock {
   pending: Promise<any> | null = null;
 
@@ -832,17 +837,27 @@ function extractThemeContentFromDom(dom: appDom.AppDom): Theme | null {
 
 async function writeDomToDisk(dom: appDom.AppDom, oldDom?: appDom.AppDom): Promise<void> {
   const root = getUserProjectRoot();
+  let newPageContent: PagesContent = {};
   const { pages: pagesContent } = extractPagesFromDom(dom);
   if (oldDom) {
     const { pages: oldpagesContent } = extractPagesFromDom(oldDom);
-    const pagelist = Object.keys(oldpagesContent);
-    for await (const page of pagelist) {
-      const pagepath = getPageFolder(root, page);
-      await removeWholeFolder(pagepath);
+    const oldlist = Object.keys(oldpagesContent);
+    const newlist = Object.keys(pagesContent);
+    for await (const newpage of newlist) {
+      // optimize the create folder and write file
+      // beacuse it doesn't need to create folder and write file when the page is renamed
+      if (!oldlist.includes(newpage)) {
+        const oldpage = oldlist.find((page) => oldpagesContent[page].spec.id === 'newpage')?.[0];
+        await renamePage(oldpage!, newpage);
+      } else {
+        newPageContent[newpage] = pagesContent[newpage];
+      }
     }
+  } else {
+    newPageContent = pagesContent;
   }
 
-  await Promise.all([writePagesToFiles(root, pagesContent)]);
+  await Promise.all([writePagesToFiles(root, newPageContent)]);
 }
 
 const DEFAULT_EDITOR = 'code';

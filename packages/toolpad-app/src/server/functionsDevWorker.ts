@@ -110,7 +110,13 @@ async function execute(msg: ExecuteMessage) {
 async function introspect(msg: IntrospectMessage): Promise<IntrospectionResult> {
   const files: FileIntrospectionResult[] = await Promise.all(
     Array.from(msg.files.entries()).map(async ([entry, { file }]) => {
-      const resolvers = await resolveFunctions(file).catch(() => ({}));
+      let error: Error | undefined;
+      let resolvers: Record<string, Function> = {};
+      try {
+        resolvers = await resolveFunctions(file);
+      } catch (rawError) {
+        error = errorFrom(rawError);
+      }
       const handlers: HandlerIntrospectionResult[] = Object.entries(resolvers).map(
         ([name, value]) => {
           const fnConfig = (value as any)[TOOLPAD_FUNCTION] as
@@ -127,7 +133,7 @@ async function introspect(msg: IntrospectMessage): Promise<IntrospectionResult> 
 
       return {
         name: path.basename(entry),
-        errors: [],
+        errors: error ? [error] : [],
         warnings: [],
         handlers,
       } satisfies FileIntrospectionResult;

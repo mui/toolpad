@@ -18,6 +18,7 @@ import {
   tsConfig,
   type ExtractTypesParams,
   type IntrospectionResult,
+  HandlerIntrospectionResult,
 } from './functionsTypesWorker';
 import { Awaitable } from '../utils/types';
 
@@ -308,7 +309,7 @@ export default class FunctionsManager {
 
     const extractedTypes = await this.extractedTypes;
 
-    const extractedFilesMap = new Map(extractedTypes.files.map((file) => [file.name, file]));
+    const runtimeFilesMap = new Map(runtimeIntrospection.files.map((file) => [file.name, file]));
 
     /**
      * We extract handler information out of the runtime (legacy) and out of the extracted types.
@@ -316,29 +317,39 @@ export default class FunctionsManager {
      * Over time we will migrate all functions to use the extracted types.
      */
     const merged: IntrospectionResult = {
-      files: runtimeIntrospection.files.map((runtimeFile) => {
-        const extractedFile = extractedFilesMap.get(runtimeFile.name);
+      files: extractedTypes.files.map((extractedFile) => {
+        const runtimeFile = runtimeFilesMap.get(extractedFile.name);
 
-        if (extractedFile) {
-          const extractedHandlerMap = new Map(
-            extractedFile.handlers.map((handler) => [handler.name, handler]),
+        if (runtimeFile) {
+          const runtimeHandlerMap = new Map(
+            runtimeFile.handlers.map((handler) => [handler.name, handler]),
           );
 
           return {
-            ...runtimeFile,
-            handlers: runtimeFile.handlers.map((runtimeHandler) => {
-              const extractedHandler = extractedHandlerMap.get(runtimeHandler.name);
+            ...extractedFile,
+            handlers: extractedFile.handlers.map((extractedHandler) => {
+              const runtimeHandler = runtimeHandlerMap.get(extractedHandler.name);
 
-              if (!runtimeHandler.isCreateFunction && extractedHandler) {
-                return extractedHandler;
+              if (!runtimeHandler) {
+                // Something likely went wrong during evaluation of the module
+                // Let;'s just show the function without parameters and return type
+                return {
+                  ...extractedHandler,
+                  parameters: [],
+                  returnType: { schema: null },
+                } satisfies HandlerIntrospectionResult;
               }
 
-              return runtimeHandler;
+              if (runtimeHandler.isCreateFunction) {
+                return runtimeHandler;
+              }
+
+              return extractedHandler;
             }),
           };
         }
 
-        return runtimeFile;
+        return extractedFile;
       }),
     };
 

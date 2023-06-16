@@ -838,11 +838,11 @@ function extractThemeContentFromDom(dom: appDom.AppDom): Theme | null {
 async function writeDomToDisk(dom: appDom.AppDom, oldDom?: appDom.AppDom): Promise<void> {
   const root = getUserProjectRoot();
   const { pages: pagesContent } = extractPagesFromDom(dom);
-  if(oldDom) {
+  if (oldDom) {
     const { pages: oldpagesContent } = extractPagesFromDom(oldDom);
-    const pagelist = Object.keys(oldpagesContent)
+    const pagelist = Object.keys(oldpagesContent);
     for await (const page of pagelist) {
-      await deletePage(page)
+      await deletePage(page);
     }
   }
 

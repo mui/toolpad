@@ -1,0 +1,77 @@
+apiVersion: v1
+kind: page
+spec:
+  id: PCYkw5V
+  title: page1
+  content:
+    - component: PageRow
+      name: pageRow
+      children:
+        - component: DataGrid
+          name: dataGrid
+          props:
+            rows:
+              $$jsExpression: |
+                dogQuery.data
+            columns:
+              - field: '0'
+                type: string
+                headerName: Breed
+                width: 141
+              - field: '1'
+                type: json
+                headerName: Sub-breeds
+                width: 179
+    - component: PageRow
+      name: pageRow2
+      children:
+        - component: Text
+          name: text
+          layout:
+            horizontalAlign: center
+          props:
+            value:
+              $$jsExpression: |
+                `Breed: ${dataGrid.selection[0]}`
+            variant: body1
+            sx:
+              textAlign: center
+            loading:
+              $$jsExpression: |
+                imageQuery.isLoading
+    - component: PageRow
+      name: pageRow1
+      children:
+        - component: Image
+          name: image
+          layout:
+            horizontalAlign: center
+          props:
+            src:
+              $$jsExpression: |
+                imageQuery.data.message
+  queries:
+    - name: dogQuery
+      query:
+        kind: rest
+        url: https://dog.ceo/api/breeds/list/all
+        searchParams: []
+        headers: []
+        method: GET
+        transform: return Object.entries(data.message)
+        transformEnabled: true
+    - name: imageQuery
+      query:
+        kind: rest
+        url:
+          $$jsExpression: |
+            `https://dog.ceo/api/breed/${parameters.breed}/images/random`
+        searchParams: []
+        headers: []
+        method: GET
+      parameters:
+        - name: breed
+          value:
+            $$jsExpression: |
+              dataGrid.selection?.[0] ?? "akita"
+  display: shell

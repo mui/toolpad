@@ -327,6 +327,18 @@ function getReturnType(callSignatures: readonly ts.Signature[], checker: ts.Type
   };
 }
 
+export const tsConfig: ts.CompilerOptions = {
+  noEmit: true,
+  target: ts.ScriptTarget.ESNext,
+  lib: ['lib.esnext.d.ts'],
+  types: ['node'],
+  strict: true,
+  module: ts.ModuleKind.CommonJS,
+  moduleResolution: ts.ModuleResolutionKind.Bundler,
+  esModuleInterop: true,
+  allowSyntheticDefaultImports: true,
+};
+
 export interface ExtractTypesParams {
   resourcesFolder: string;
 }
@@ -336,15 +348,7 @@ export default async function extractTypes({
 }: ExtractTypesParams): Promise<IntrospectionResult> {
   const entryPoints = await glob(path.join(resourcesFolder, './*.ts'));
 
-  const program = ts.createProgram(entryPoints, {
-    noEmit: true,
-    target: ts.ScriptTarget.ESNext,
-    module: ts.ModuleKind.CommonJS,
-    lib: ['lib.esnext.d.ts'],
-    types: ['node'],
-    strict: true,
-    moduleResolution: ts.ModuleResolutionKind.NodeNext,
-  });
+  const program = ts.createProgram(entryPoints, tsConfig);
 
   const checker = program.getTypeChecker();
 

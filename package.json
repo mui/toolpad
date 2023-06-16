@@ -24,7 +24,7 @@
     "prettier:all": "prettier --write . --ignore-path .eslintignore",
     "deduplicate": "node scripts/deduplicate.mjs",
     "start": "dotenv cross-env FORCE_COLOR=1 yarn workspace @mui/toolpad-app start",
-    "dev": "dotenv cross-env FORCE_COLOR=1 lerna -- run dev --stream --parallel --ignore docs --ignore hacker-news-client",
+    "dev": "dotenv cross-env FORCE_COLOR=1 lerna -- run dev --stream --parallel --ignore docs",
     "docs:dev": "yarn workspace docs dev",
     "docs:build": "yarn workspace docs build",
     "docs:build:api": "tsx ./scripts/docs/buildApi.ts",

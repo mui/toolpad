@@ -14,7 +14,11 @@ import { errorFrom } from '@mui/toolpad-utils/errors';
 import EnvManager from './EnvManager';
 import { ProjectEvents, ToolpadProjectOptions } from '../types';
 import { createWorker as createDevWorker } from './functionsDevWorker';
-import type { ExtractTypesParams, IntrospectionResult } from './functionsTypesWorker';
+import {
+  tsConfig,
+  type ExtractTypesParams,
+  type IntrospectionResult,
+} from './functionsTypesWorker';
 import { Awaitable } from '../utils/types';
 
 Error.stackTraceLimit = 100;
@@ -138,6 +142,7 @@ export default class FunctionsManager {
     const entryPoints = await this.getFunctionFiles();
 
     const onFunctionBuildStart = async () => {
+      // Cancel ongoing type extraction
       this.cancelTypeExtraction.abort();
       this.cancelTypeExtraction = new AbortController();
       this.extractedTypes = this.extractTypesWorker
@@ -194,6 +199,7 @@ export default class FunctionsManager {
       platform: 'node',
       packages: 'external',
       target: 'es2022',
+      tsconfigRaw: JSON.stringify(tsConfig),
     });
 
     const watch = () => {

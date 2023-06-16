@@ -849,7 +849,7 @@ async function writeDomToDisk(dom: appDom.AppDom, oldDom?: appDom.AppDom): Promi
       if (!oldlist.includes(newpage)) {
         const oldpage = oldlist.find(
           (page) => oldpagesContent[page].spec.id === pagesContent[newpage].spec.id,
-        )?.[0];
+        );
         await renamePage(oldpage!, newpage);
       } else {
         newPageContent[newpage] = pagesContent[newpage];

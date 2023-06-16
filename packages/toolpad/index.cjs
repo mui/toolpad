@@ -17,7 +17,7 @@ if (missingFlags.length > 0) {
   const [, module, ...args] = process.argv;
 
   // Re-running with --enable-source-maps flag
-  fork(module, args, {
+  const child = fork(module, args, {
     stdio: 'inherit',
     execArgv: [
       // Get the arguments passed to the node binary
@@ -25,7 +25,13 @@ if (missingFlags.length > 0) {
       // Pass more arguments to node binary as desired
       ...missingFlags,
     ],
-  }).once('close', (code) => process.exit(code));
+  });
+
+  process.on('SIGTERM', () => child.kill('SIGTERM'));
+  process.on('SIGINT', () => child.kill('SIGINT'));
+  process.on('SIGBREAK', () => child.kill('SIGBREAK'));
+  process.on('SIGHUP', () => child.kill('SIGHUP'));
+  child.once('close', (code) => process.exit(code));
 } else {
   const { default: cli } = require('@mui/toolpad-app/cli');
   cli(process.argv.slice(2));

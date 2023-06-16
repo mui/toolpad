@@ -847,7 +847,9 @@ async function writeDomToDisk(dom: appDom.AppDom, oldDom?: appDom.AppDom): Promi
       // optimize the create folder and write file
       // beacuse it doesn't need to create folder and write file when the page is renamed
       if (!oldlist.includes(newpage)) {
-        const oldpage = oldlist.find((page) => oldpagesContent[page].spec.id === 'newpage')?.[0];
+        const oldpage = oldlist.find(
+          (page) => oldpagesContent[page].spec.id === pagesContent[newpage].spec.id,
+        )?.[0];
         await renamePage(oldpage!, newpage);
       } else {
         newPageContent[newpage] = pagesContent[newpage];

@@ -63,11 +63,11 @@ function loadModule(fullPath: string, content: string) {
   const moduleRequire = createRequire(url.pathToFileURL(fullPath));
   const moduleObject: ModuleObject = { exports: {} };
 
-  vm.runInThisContext(`
-    ((require, exports, module) => {
-      ${content}
-    })
-  `)(moduleRequire, moduleObject.exports, moduleObject);
+  vm.runInThisContext(`((require, exports, module) => {\n${content}\n})`)(
+    moduleRequire,
+    moduleObject.exports,
+    moduleObject,
+  );
 
   return moduleObject;
 }

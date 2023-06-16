@@ -63,6 +63,12 @@ function propValueFromJsonSchema(schema: JSONSchema7 | null): PrimitiveValueType
   switch (schema.type) {
     case 'integer':
       return { type: 'number' };
+    case 'string': {
+      if (schema.enum) {
+        return { type: 'string', enum: schema.enum.map((value) => String(value)) };
+      }
+      return { type: 'string' };
+    }
     case 'null':
     case null:
     case undefined:

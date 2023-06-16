@@ -10,7 +10,7 @@
     "lint": "next lint && prettier --check .",
     "fix": "next lint --fix && prettier --write .",
     "build:cli": "tsup",
-    "build:next": "NODE_OPTIONS=--max-old-space-size=8192 next build",
+    "build:next": "cross-env NODE_OPTIONS=--max-old-space-size=8192 next build",
     "build:typings": "tsx ./scripts/typings.mts",
     "dev:cli": "tsup --watch",
     "dev:typings": "yarn build:typings",

@@ -5,7 +5,12 @@ import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { ArgTypeDefinitions, createComponent } from '@mui/toolpad-core';
 import dayjs from 'dayjs';
 import * as _ from 'lodash-es';
-import { FORM_INPUT_ARG_TYPES, FormInputComponentProps, useFormInput } from './Form.js';
+import {
+  FORM_INPUT_ARG_TYPES,
+  FormInputComponentProps,
+  useFormInput,
+  withComponentForm,
+} from './Form.js';
 import { SX_PROP_HELPER_TEXT } from './constants.js';
 
 const LOCALE_LOADERS = new Map(
@@ -152,7 +157,9 @@ function DatePicker({
   );
 }
 
-export default createComponent(DatePicker, {
+const FormWrappedDatePicker = withComponentForm(DatePicker);
+
+export default createComponent(FormWrappedDatePicker, {
   helperText:
     'The MUI X [Date Picker](https://mui.com/x/react-date-pickers/date-picker/) component.\n\nThe date picker lets the user select a date.',
   argTypes: {

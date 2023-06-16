@@ -2,7 +2,12 @@ import * as React from 'react';
 import { TextField as MuiTextField, TextFieldProps as MuiTextFieldProps } from '@mui/material';
 import { ArgTypeDefinitions, createComponent } from '@mui/toolpad-core';
 import * as _ from 'lodash-es';
-import { FORM_INPUT_ARG_TYPES, FormInputComponentProps, useFormInput } from './Form.js';
+import {
+  FORM_INPUT_ARG_TYPES,
+  FormInputComponentProps,
+  useFormInput,
+  withComponentForm,
+} from './Form.js';
 
 interface FullFile {
   name: string;
@@ -83,7 +88,9 @@ function FilePicker({
   );
 }
 
-export default createComponent(FilePicker, {
+const FormWrappedFilePicker = withComponentForm(FilePicker);
+
+export default createComponent(FormWrappedFilePicker, {
   helperText: 'File Picker component.\nIt allows users to take select and read files.',
   argTypes: {
     value: {

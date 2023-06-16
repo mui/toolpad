@@ -178,7 +178,7 @@ export interface FormInputComponentProps {
   isInvalid: boolean;
 }
 
-interface FormInputProps<V> {
+interface UseFormInputInput<V> {
   name: string;
   label?: string;
   value?: V;
@@ -188,94 +188,6 @@ interface FormInputProps<V> {
   validationProps: Partial<
     Pick<FormInputComponentProps, 'isRequired' | 'minLength' | 'maxLength' | 'isInvalid'>
   >;
-  children: JSX.Element;
-}
-
-function FormInput<V>({
-  name,
-  label,
-  value,
-  onChange,
-  emptyValue,
-  defaultValue,
-  validationProps,
-  children,
-}: FormInputProps<V>) {
-  const { isRequired, minLength, maxLength, isInvalid } = validationProps;
-
-  const { form, fieldValues } = React.useContext(FormContext);
-
-  const formInputDisplayName = label || name || 'Field';
-
-  const previousDefaultValueRef = React.useRef(defaultValue);
-  React.useEffect(() => {
-    if (form && defaultValue !== previousDefaultValueRef.current) {
-      onChange(defaultValue as V);
-      form.setValue(name, defaultValue);
-      previousDefaultValueRef.current = defaultValue;
-    }
-  }, [form, onChange, defaultValue, name]);
-
-  const isInitialForm = Object.keys(fieldValues).length === 0;
-
-  React.useEffect(() => {
-    if (form) {
-      if (!fieldValues[name] && defaultValue && isInitialForm) {
-        onChange((defaultValue || emptyValue) as V);
-        form.setValue(name, defaultValue || emptyValue);
-      } else if (value !== fieldValues[name]) {
-        onChange(fieldValues[name] || emptyValue);
-      }
-    }
-  }, [defaultValue, emptyValue, fieldValues, form, isInitialForm, name, onChange, value]);
-
-  const previousInputNameRef = React.useRef<typeof name>(name);
-  React.useEffect(() => {
-    const previousInputName = previousInputNameRef.current;
-
-    if (form && previousInputName !== name) {
-      form.unregister(previousInputName);
-      previousInputNameRef.current = name;
-    }
-  }, [form, name]);
-
-  const previousManualValidationPropsRef = React.useRef(validationProps);
-  React.useEffect(() => {
-    if (
-      form &&
-      !_.isEqual(validationProps, previousManualValidationPropsRef.current) &&
-      form.formState.dirtyFields[name]
-    ) {
-      form.trigger(name);
-      previousManualValidationPropsRef.current = validationProps;
-    }
-  }, [form, name, validationProps]);
-
-  return form ? (
-    <Controller
-      name={name}
-      control={form.control}
-      rules={{
-        required: isRequired ? `${formInputDisplayName} is required.` : false,
-        ...(minLength && {
-          minLength: {
-            value: minLength,
-            message: `${formInputDisplayName} must have at least ${minLength} characters.`,
-          },
-        }),
-        ...(maxLength && {
-          maxLength: {
-            value: maxLength,
-            message: `${formInputDisplayName} must have no more than ${maxLength} characters.`,
-          },
-        }),
-        validate: () => !isInvalid || `${formInputDisplayName} is invalid.`,
-      }}
-      render={() => children}
-    />
-  ) : (
-    children
-  );
 }
 
 interface UseFormInputPayload<V> {
@@ -284,22 +196,74 @@ interface UseFormInputPayload<V> {
   renderFormInput: (element: JSX.Element) => JSX.Element;
 }
 
-export function useFormInput<V>(
-  input: Omit<FormInputProps<V>, 'children'>,
-): UseFormInputPayload<V> {
-  const { form } = React.useContext(FormContext);
+export function useFormInput<V>({
+  name,
+  label,
+  value,
+  onChange,
+  emptyValue,
+  defaultValue,
+  validationProps,
+}: UseFormInputInput<V>): UseFormInputPayload<V> {
+  const { isRequired, minLength, maxLength, isInvalid } = validationProps;
+
+  const { form, fieldValues } = React.useContext(FormContext);
 
   const nodeRuntime = useNode();
-  const fieldName = input.name || nodeRuntime?.nodeName;
+  const fieldName = name || nodeRuntime?.nodeName;
   const fallbackName = React.useId();
 
   const formInputName = fieldName || fallbackName;
 
-  const [componentFormValue, setComponentFormValue] = React.useState({});
+  const formInputDisplayName = label || name || 'Field';
 
   const formInputError = formInputName
     ? (form?.formState.errors[formInputName] as FieldError)
     : undefined;
+
+  const previousDefaultValueRef = React.useRef(defaultValue);
+  React.useEffect(() => {
+    if (form && defaultValue !== previousDefaultValueRef.current) {
+      onChange(defaultValue as V);
+      form.setValue(formInputName, defaultValue);
+      previousDefaultValueRef.current = defaultValue;
+    }
+  }, [form, onChange, defaultValue, formInputName]);
+
+  const isInitialForm = Object.keys(fieldValues).length === 0;
+
+  React.useEffect(() => {
+    if (form) {
+      if (!fieldValues[formInputName] && defaultValue && isInitialForm) {
+        onChange((defaultValue || emptyValue) as V);
+        form.setValue(formInputName, defaultValue || emptyValue);
+      } else if (value !== fieldValues[formInputName]) {
+        onChange(fieldValues[formInputName] || emptyValue);
+      }
+    }
+  }, [defaultValue, emptyValue, fieldValues, form, isInitialForm, formInputName, onChange, value]);
+
+  const previousFormInputNameRef = React.useRef<typeof formInputName>(formInputName);
+  React.useEffect(() => {
+    const previousFormInputName = previousFormInputNameRef.current;
+
+    if (form && previousFormInputName !== formInputName) {
+      form.unregister(previousFormInputName);
+      previousFormInputNameRef.current = formInputName;
+    }
+  }, [form, formInputName]);
+
+  const previousManualValidationPropsRef = React.useRef(validationProps);
+  React.useEffect(() => {
+    if (
+      form &&
+      !_.isEqual(validationProps, previousManualValidationPropsRef.current) &&
+      form.formState.dirtyFields[formInputName]
+    ) {
+      form.trigger(formInputName);
+      previousManualValidationPropsRef.current = validationProps;
+    }
+  }, [form, formInputName, validationProps]);
 
   const handleFormInputChange = React.useCallback(
     (newValue: V) => {
@@ -310,39 +274,70 @@ export function useFormInput<V>(
           shouldTouch: true,
         });
       }
-      input.onChange(newValue);
+      onChange(newValue);
     },
-    [form, formInputName, input],
+    [form, formInputName, onChange],
   );
 
   const renderFormInput = React.useCallback(
-    (element: JSX.Element) => {
-      const formInputElement = (
-        <FormInput {...input} name={formInputName}>
-          {element}
-        </FormInput>
-      );
-
-      return form ? (
-        formInputElement
+    (element: JSX.Element) =>
+      form ? (
+        <Controller
+          name={formInputName}
+          control={form.control}
+          rules={{
+            required: isRequired ? `${formInputDisplayName} is required.` : false,
+            ...(minLength && {
+              minLength: {
+                value: minLength,
+                message: `${formInputDisplayName} must have at least ${minLength} characters.`,
+              },
+            }),
+            ...(maxLength && {
+              maxLength: {
+                value: maxLength,
+                message: `${formInputDisplayName} must have no more than ${maxLength} characters.`,
+              },
+            }),
+            validate: () => !isInvalid || `${formInputDisplayName} is invalid.`,
+          }}
+          render={() => element}
+        />
       ) : (
-        <Form
-          value={componentFormValue}
-          onChange={setComponentFormValue}
-          mode="onBlur"
-          hasChrome={false}
-        >
-          {formInputElement}
-        </Form>
-      );
-    },
-    [componentFormValue, form, formInputName, input],
+        element
+      ),
+    [form, formInputDisplayName, formInputName, isInvalid, isRequired, maxLength, minLength],
   );
 
   return {
     onFormInputChange: handleFormInputChange,
     formInputError,
     renderFormInput,
+  };
+}
+
+export function withComponentForm<P extends Record<string, any>>(
+  InputComponent: React.ComponentType<P>,
+) {
+  return function ComponentWithForm(props: P) {
+    const { form } = React.useContext(FormContext);
+
+    const [componentFormValue, setComponentFormValue] = React.useState({});
+
+    const inputElement = <InputComponent {...props} />;
+
+    return form ? (
+      inputElement
+    ) : (
+      <Form
+        value={componentFormValue}
+        onChange={setComponentFormValue}
+        mode="onBlur"
+        hasChrome={false}
+      >
+        {inputElement}
+      </Form>
+    );
   };
 }
 

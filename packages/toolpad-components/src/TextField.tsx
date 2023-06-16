@@ -6,7 +6,12 @@ import {
 } from '@mui/material';
 import { createComponent } from '@mui/toolpad-core';
 import * as _ from 'lodash-es';
-import { FORM_INPUT_ARG_TYPES, FormInputComponentProps, useFormInput } from './Form.js';
+import {
+  FORM_INPUT_ARG_TYPES,
+  FormInputComponentProps,
+  useFormInput,
+  withComponentForm,
+} from './Form.js';
 import { SX_PROP_HELPER_TEXT } from './constants.js';
 
 export type TextFieldProps = Omit<MuiTextFieldProps, 'value' | 'onChange'> & {
@@ -58,7 +63,9 @@ function TextField({
   );
 }
 
-export default createComponent(TextField, {
+const FormWrappedTextField = withComponentForm(TextField);
+
+export default createComponent(FormWrappedTextField, {
   helperText: 'The TextField component lets you input a text value.',
   layoutDirection: 'both',
   argTypes: {

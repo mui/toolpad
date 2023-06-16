@@ -2,7 +2,12 @@ import * as React from 'react';
 import { TextFieldProps, MenuItem, TextField } from '@mui/material';
 import { ArgTypeDefinitions, createComponent } from '@mui/toolpad-core';
 import * as _ from 'lodash-es';
-import { FORM_INPUT_ARG_TYPES, FormInputComponentProps, useFormInput } from './Form.js';
+import {
+  FORM_INPUT_ARG_TYPES,
+  FormInputComponentProps,
+  useFormInput,
+  withComponentForm,
+} from './Form.js';
 import { SX_PROP_HELPER_TEXT } from './constants.js';
 
 export interface SelectOption {
@@ -79,7 +84,9 @@ function Select({
   );
 }
 
-export default createComponent(Select, {
+const FormWrappedSelect = withComponentForm(Select);
+
+export default createComponent(FormWrappedSelect, {
   helperText: 'The Select component lets you select a value from a set of options.',
   layoutDirection: 'both',
   loadingPropSource: ['value', 'options'],

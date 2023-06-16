@@ -7,7 +7,12 @@ import {
 import { createComponent } from '@mui/toolpad-core';
 import * as _ from 'lodash-es';
 import { SX_PROP_HELPER_TEXT } from './constants.js';
-import { FORM_INPUT_ARG_TYPES, FormInputComponentProps, useFormInput } from './Form.js';
+import {
+  FORM_INPUT_ARG_TYPES,
+  FormInputComponentProps,
+  useFormInput,
+  withComponentForm,
+} from './Form.js';
 
 type AutocompleteOption = string | { label?: string; value?: string };
 type AutocompleteValue = string | null;
@@ -110,7 +115,9 @@ function Autocomplete({
   );
 }
 
-export default createComponent(Autocomplete, {
+const FormWrappedAutocomplete = withComponentForm(Autocomplete);
+
+export default createComponent(FormWrappedAutocomplete, {
   layoutDirection: 'both',
   loadingProp: 'loading',
   argTypes: {

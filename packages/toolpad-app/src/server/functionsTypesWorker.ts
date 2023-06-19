@@ -138,8 +138,6 @@ function toJsonSchema(
 
     if (tsType.isUnion()) {
       const anyOf = [];
-      const typeNames = new Set<JSONSchema7TypeName>();
-      let enumValues: Set<JSONSchema7Type> | null = new Set();
 
       const withoutUndefined = tsType.types.filter(
         (type) => !hasTypeFlag(type, ts.TypeFlags.Undefined),
@@ -157,31 +155,52 @@ function toJsonSchema(
         const itemType = toJsonSchema(type, checker, seenTypes);
 
         if (itemType) {
-          if (enumValues && itemType.const) {
-            enumValues.add(itemType.const);
-          } else {
-            enumValues = null;
-          }
-
-          for (const typeName of asArray(itemType.type)) {
-            if (typeName) {
-              typeNames.add(typeName);
-            }
-          }
-
           anyOf.push(itemType);
         }
       }
 
-      if (enumValues) {
+      const typeNames = new Set<JSONSchema7TypeName>();
+      const enumValues = new Set<JSONSchema7Type>();
+      let hasTrue = false;
+      let hasFalse = false;
+      let hasOther = false;
+      let isEnum = true;
+      for (const itemType of anyOf) {
+        if (typeof itemType.const !== 'undefined') {
+          enumValues.add(itemType.const);
+        } else {
+          isEnum = false;
+        }
+
+        if (itemType.const === true) {
+          hasTrue = true;
+        } else if (itemType.const === false) {
+          hasFalse = true;
+        } else {
+          hasOther = true;
+        }
+
+        for (const typeName of asArray(itemType.type)) {
+          if (typeName) {
+            typeNames.add(typeName);
+          }
+        }
+      }
+
+      if (hasTrue && hasFalse && !hasOther) {
+        return { type: 'boolean' };
+      }
+
+      if (isEnum) {
         let type: JSONSchema7TypeName | undefined;
         if (typeNames.size === 1) {
           type = Array.from(typeNames)[0];
         }
-        return {
-          type,
-          enum: Array.from(enumValues),
-        };
+        return { type, enum: Array.from(enumValues) };
+      }
+
+      if (anyOf.length === 1) {
+        return anyOf[0];
       }
 
       return { anyOf };
@@ -266,6 +285,7 @@ function getParameters(
       const paramType = checker.getTypeOfSymbolAtLocation(parameter, parameter.valueDeclaration!);
       const schema = toJsonSchema(paramType, checker, new Set());
 
+      console.log(JSON.stringify(schema, null, 2));
       return [
         parameter.getName(),
         {

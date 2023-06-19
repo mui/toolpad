@@ -33,6 +33,8 @@ spec:
           value: bar
         - name: bar
           value: 42
+        - name: quux
+          value: true
         - name: baz
           value:
             hello: 5

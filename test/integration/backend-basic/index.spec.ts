@@ -120,9 +120,12 @@ test('Extracted types', async ({ page }) => {
   await runtimeModel.gotoPage('extractedTypes');
 
   await expect(
-    page.getByText('bare function with parameters: foo: bar; typeof bar: number; baz.hello: 5', {
-      exact: true,
-    }),
+    page.getByText(
+      'bare function with parameters: foo: bar; typeof bar: number; quux: true; baz.hello: 5',
+      {
+        exact: true,
+      },
+    ),
   ).toBeVisible();
   await expect(
     page.getByText("synchronous function: hello I'm synchronous", { exact: true }),

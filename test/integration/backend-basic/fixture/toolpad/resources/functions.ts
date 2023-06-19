@@ -93,6 +93,8 @@ export function syncFunction() {
   return { message: "hello I'm synchronous" };
 }
 
-export async function bareWithParams(foo: string, bar: number, baz = { hello: 1 }) {
-  return { message: `foo: ${foo}; typeof bar: ${typeof bar}; baz.hello: ${baz.hello}` };
+export async function bareWithParams(foo: string, bar: number, quux: boolean, baz = { hello: 1 }) {
+  return {
+    message: `foo: ${foo}; typeof bar: ${typeof bar}; quux: ${quux}; baz.hello: ${baz.hello}`,
+  };
 }

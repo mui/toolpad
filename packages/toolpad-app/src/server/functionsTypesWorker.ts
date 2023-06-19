@@ -285,7 +285,6 @@ function getParameters(
       const paramType = checker.getTypeOfSymbolAtLocation(parameter, parameter.valueDeclaration!);
       const schema = toJsonSchema(paramType, checker, new Set());
 
-      console.log(JSON.stringify(schema, null, 2));
       return [
         parameter.getName(),
         {

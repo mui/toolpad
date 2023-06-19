@@ -1,6 +1,7 @@
 import * as React from 'react';
 import Typography from '@mui/material/Typography';
 import GradientText from 'docs/src/components/typography/GradientText';
+import ROUTES from 'docs/src/route';
 
 const useCases = {
   overline: 'Use cases',
@@ -17,6 +18,7 @@ const useCases = {
       description:
         'Provide stakeholders with dashboards to track performance of systems and processes, identify potential issues, and ensure that critical services run smoothly. Build and share your monitoring dashboards by combining data from multiple sources with dependable deployment mechanism when needed.',
       action: {
+        href: ROUTES.toolpadAdminExample,
         label: 'View example',
       },
     },

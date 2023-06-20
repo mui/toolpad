@@ -47,14 +47,13 @@ export default function CardGrid(props) {
                   mt={2}
                   sx={{
                     display: 'flex',
-                    height: 280,
+                    height: 250,
                     flexDirection: 'column',
                     justifyContent: 'space-between',
-                    // justifyItem: 'center',
-                    // rowGap: 1,
+                    rowGap: 1,
                   }}
                 >
-                  <Typography component="h3" fontWeight="medium" color="text.primary" mb={0.5}>
+                  <Typography component="h3" fontWeight="medium" color="text.primary">
                     {title}
                   </Typography>
                   <Typography variant="body" color="text.secondary">

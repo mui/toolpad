@@ -1,7 +1,7 @@
 import * as React from 'react';
 import Typography from '@mui/material/Typography';
 import GradientText from 'docs/src/components/typography/GradientText';
-import ROUTES from 'docs/src/route';
+import ROUTES from '../../../src/route';
 
 const useCases = {
   overline: 'Use cases',
@@ -12,13 +12,13 @@ const useCases = {
   ),
   cards: [
     {
-      title: 'Monitoring dashboard',
+      title: 'Utility apps',
       wip: false,
       imageUrl: '/static/toolpad/marketing/index-monitoring-dashboard.svg',
       description:
-        'Provide stakeholders with dashboards to track performance of systems and processes, identify potential issues, and ensure that critical services run smoothly. Build and share your monitoring dashboards by combining data from multiple sources with dependable deployment mechanism when needed.',
+        'Provide the stakeholders with simple apps to manage their daily operations. An app can be quickly built on Toolpad by importing external packages or by calling a REST API. Your code never leaves your network and the app can be securely deployed to any service of your choice.',
       action: {
-        href: ROUTES.toolpadAdminExample,
+        href: ROUTES.toolpadUtilityAppExample,
         label: 'View example',
       },
     },
@@ -29,6 +29,7 @@ const useCases = {
       description:
         'Enable your teams to quickly view and manage customer orders, queries, and refunds by creating apps powered by native Toolpad integrations and third party APIs from providers like Stripe, Twilio, etc. Toolpad allows end users to create, read, update or delete records.',
       action: {
+        href: ROUTES.toolpadUtilityAppExample,
         label: 'View example',
       },
     },
@@ -37,8 +38,9 @@ const useCases = {
       wip: false,
       imageUrl: '/static/toolpad/marketing/index-custom-cms.svg',
       description:
-        'Build customizable BI dashboards for stakeholders to view and analyze various data points, monitor KPIs, track business goals, and identify trends and opportunities. Built with MUI components, apps are fast, manageable and scalable. Toolpad allows you to bind data the pro-code way by writing JavaScript anywhere.',
+        'Build customizable BI dashboards to view and analyze various data points, monitor KPIs, track business goals, and identify trends and opportunities. Toolpad allows you to combine data from multiple sources and bind it the pro-code way by writing JavaScript anywhere.',
       action: {
+        href: ROUTES.toolpadUtilityAppExample,
         label: 'View example',
       },
     },

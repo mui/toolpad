@@ -2,8 +2,7 @@ const ROUTES = {
   toolpadQuickstart: '/toolpad/getting-started/first-app/',
   toolpadDocs: '/toolpad/getting-started/installation/',
   toolpadUpvote: 'https://github.com/mui/mui-toolpad/labels/waiting%20for%20%F0%9F%91%8D',
-  toolpadDashboardExample:
-    'https://master--toolpad.mui.com/deploy/clbf7egoc0001sg87va0oc8q1/pages/ip23ggo',
+  toolpadUtilityAppExample: '/toolpad/examples/qr-generator/',
   toolpadAdminExample:
     'https://master--toolpad.mui.com/deploy/clbff2xyw000iny9jei6me80n/pages/8n63lnb',
   toolpadBIExample:

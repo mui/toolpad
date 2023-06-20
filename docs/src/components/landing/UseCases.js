@@ -42,29 +42,38 @@ export default function CardGrid(props) {
             <Grid key={title} xs={3} sm={1}>
               <Box key={title}>
                 <Box sx={cardMediaStyle(imageUrl)} />
-                <div>
-                  <Box mt={2}>
-                    <Typography component="h3" fontWeight="medium" color="text.primary" mb={0.5}>
-                      {title}
-                    </Typography>
-                    <Typography variant="body" color="text.secondary">
-                      {description}
-                    </Typography>
-                  </Box>
-                </div>
-              </Box>
-              {action ? (
-                <Button
-                  sx={{ py: 1, mx: 2, width: 'fit-content' }}
-                  variant="contained"
-                  endIcon={<KeyboardArrowRightRounded />}
-                  target="_blank"
-                  rel="noopener"
-                  href={action.href}
+
+                <Box
+                  mt={2}
+                  sx={{
+                    display: 'flex',
+                    height: 280,
+                    flexDirection: 'column',
+                    justifyContent: 'space-between',
+                    // justifyItem: 'center',
+                    // rowGap: 1,
+                  }}
                 >
-                  {action.label}
-                </Button>
-              ) : null}
+                  <Typography component="h3" fontWeight="medium" color="text.primary" mb={0.5}>
+                    {title}
+                  </Typography>
+                  <Typography variant="body" color="text.secondary">
+                    {description}
+                  </Typography>
+                  {action ? (
+                    <Button
+                      sx={{ py: 1, width: 'fit-content' }}
+                      variant="contained"
+                      endIcon={<KeyboardArrowRightRounded />}
+                      target="_blank"
+                      rel="noopener"
+                      href={action.href}
+                    >
+                      {action.label}
+                    </Button>
+                  ) : null}
+                </Box>
+              </Box>
             </Grid>
           ))}
         </Grid>

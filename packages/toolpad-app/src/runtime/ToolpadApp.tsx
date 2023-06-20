@@ -343,9 +343,18 @@ function resolveBindables(
   const result: any = {};
   const resultKey = 'value';
   const flattened = flattenNestedBindables(params);
+
   for (const [path] of flattened) {
-    const resolvedValue = bindings[`${bindingId}${path}`]?.value;
-    _.set(result, `${resultKey}${path}`, resolvedValue);
+    const resolvedBinding = bindings[`${bindingId}${path}`];
+
+    if (resolvedBinding?.error) {
+      return { error: resolvedBinding?.error };
+    }
+    if (resolvedBinding?.loading) {
+      return { loading: true };
+    }
+
+    _.set(result, `${resultKey}${path}`, resolvedBinding?.value);
   }
 
   return { value: result[resultKey] || {} };
@@ -1218,21 +1227,26 @@ function QueryNode({ page, node }: QueryNodeProps) {
   });
 
   React.useEffect(() => {
-    const { isLoading, error, data, rows, ...result } = queryResult;
+    const { isLoading: queryIsLoading, error: queryError, data, rows, ...result } = queryResult;
+
+    const error = queryError || inputError;
+    const isLoading = queryIsLoading || inputIsLoading;
 
     for (const [key, value] of Object.entries(result)) {
       const bindingId = `${node.id}.${key}`;
       setControlledBinding(bindingId, { value });
     }
 
-    // Here we propagate the error and loading state to the data and rows prop prop
+    // Here we propagate the error and loading state to the data and rows properties
     // TODO: is there a straightforward way for us to generalize this behavior?
-    setControlledBinding(`${node.id}.isLoading`, { value: isLoading || inputIsLoading });
-    setControlledBinding(`${node.id}.error`, { value: error || inputError });
+    setControlledBinding(`${node.id}.isLoading`, { value: isLoading });
+    setControlledBinding(`${node.id}.error`, {
+      value: error ? String(error.message || error) : undefined,
+    });
     const deferredStatus = { loading: isLoading, error };
     setControlledBinding(`${node.id}.data`, { ...deferredStatus, value: data });
     setControlledBinding(`${node.id}.rows`, { ...deferredStatus, value: rows });
-  }, [node.id, queryResult, setControlledBinding, inputError, inputIsLoading]);
+  }, [node.name, node.id, queryResult, setControlledBinding, inputError, inputIsLoading]);
 
   return null;
 }

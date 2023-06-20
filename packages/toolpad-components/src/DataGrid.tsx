@@ -13,12 +13,12 @@ import {
   GridColDef,
   GridValueGetterParams,
   useGridApiRef,
-  GridColumnTypesRecord,
   GridRenderCellParams,
   useGridRootProps,
   gridDensityFactorSelector,
   useGridSelector,
   getGridDefaultColumnTypes,
+  GridColTypeDef,
 } from '@mui/x-data-grid-pro';
 import * as React from 'react';
 import { useNode, createComponent, useComponents } from '@mui/toolpad-core';
@@ -242,7 +242,7 @@ function CustomColumn({ params }: CustomColumnProps) {
   );
 }
 
-export const CUSTOM_COLUMN_TYPES: GridColumnTypesRecord = {
+export const CUSTOM_COLUMN_TYPES: Record<string, GridColTypeDef> = {
   json: {
     valueFormatter: ({ value: cellValue }: GridValueFormatterParams) => JSON.stringify(cellValue),
   },

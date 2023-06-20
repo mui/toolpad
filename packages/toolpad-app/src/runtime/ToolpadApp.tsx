@@ -339,7 +339,7 @@ function resolveBindables(
   bindings: Partial<Record<string, BindingEvaluationResult>>,
   bindingId: string,
   params?: NestedBindableAttrs,
-): Record<string, unknown> {
+): BindingEvaluationResult<Record<string, unknown>> {
   const result: any = {};
   const resultKey = 'value';
   const flattened = flattenNestedBindables(params);
@@ -348,7 +348,7 @@ function resolveBindables(
     _.set(result, `${resultKey}${path}`, resolvedValue);
   }
 
-  return result[resultKey] || {};
+  return { value: result[resultKey] || {} };
 }
 
 interface ParseBindingOptions {
@@ -1208,7 +1208,14 @@ function QueryNode({ page, node }: QueryNodeProps) {
 
   const configBindings = _.pick(node.attributes, USE_DATA_QUERY_CONFIG_KEYS);
   const options = resolveBindables(bindings, `${node.id}.config`, configBindings);
-  const queryResult = useDataQuery(page, node, params, options);
+
+  const inputError = params.error || options.error;
+  const inputIsLoading = params.loading || options.loading;
+
+  const queryResult = useDataQuery(page, node, params.value, {
+    ...options.value,
+    enabled: !inputIsLoading && !inputError,
+  });
 
   React.useEffect(() => {
     const { isLoading, error, data, rows, ...result } = queryResult;
@@ -1220,12 +1227,12 @@ function QueryNode({ page, node }: QueryNodeProps) {
 
     // Here we propagate the error and loading state to the data and rows prop prop
     // TODO: is there a straightforward way for us to generalize this behavior?
-    setControlledBinding(`${node.id}.isLoading`, { value: isLoading });
-    setControlledBinding(`${node.id}.error`, { value: error });
+    setControlledBinding(`${node.id}.isLoading`, { value: isLoading || inputIsLoading });
+    setControlledBinding(`${node.id}.error`, { value: error || inputError });
     const deferredStatus = { loading: isLoading, error };
     setControlledBinding(`${node.id}.data`, { ...deferredStatus, value: data });
     setControlledBinding(`${node.id}.rows`, { ...deferredStatus, value: rows });
-  }, [node.id, queryResult, setControlledBinding]);
+  }, [node.id, queryResult, setControlledBinding, inputError, inputIsLoading]);
 
   return null;
 }
@@ -1242,7 +1249,7 @@ function MutationNode({ node, page }: MutationNodeProps) {
   const { bindings } = useAssertedContext(RuntimeScopeContext);
 
   const queryId = node.id;
-  const params = resolveBindables(
+  const { value: params } = resolveBindables(
     bindings,
     `${node.id}.params`,
     Object.fromEntries(node.params ?? []),

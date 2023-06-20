@@ -205,14 +205,19 @@ export default class FunctionsManager {
     let ctx: esbuild.BuildContext | undefined;
 
     // Make sure we pick up added/removed function files
-    const resourcesWatcher = chokidar.watch([this.getFunctionResourcesPattern()]);
-    const handleFileAddedOrRemoved = async () => {
+    const resourcesWatcher = chokidar.watch([this.getFunctionResourcesPattern()], {
+      ignoreInitial: true,
+    });
+
+    const reinitializeWatcher = async () => {
       await ctx?.dispose();
       ctx = await this.createEsbuildContext();
       await ctx.watch();
     };
-    resourcesWatcher.on('add', handleFileAddedOrRemoved);
-    resourcesWatcher.on('unlink', handleFileAddedOrRemoved);
+
+    reinitializeWatcher();
+    resourcesWatcher.on('add', reinitializeWatcher);
+    resourcesWatcher.on('unlink', reinitializeWatcher);
   }
 
   private async createRuntimeWorkerWithEnv() {

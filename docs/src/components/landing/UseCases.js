@@ -64,8 +64,6 @@ export default function CardGrid(props) {
                       sx={{ py: 1, width: 'fit-content' }}
                       variant="contained"
                       endIcon={<KeyboardArrowRightRounded />}
-                      target="_blank"
-                      rel="noopener"
                       href={action.href}
                     >
                       {action.label}

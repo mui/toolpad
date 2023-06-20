@@ -49,6 +49,8 @@ If your application has dependencies other than `@mui/toolpad`, you have to temp
    },
    ```
 
+   You may also temporarily remove/rename the `dev`/`build` commands in `examples/qr-generator/package.json` to avoid them getting picked up automatically by `lerna`.
+
 1. Run
 
    ```sh

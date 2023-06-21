@@ -134,6 +134,24 @@ yarn install
 
 </details>
 
+## Running integration tests
+
+The playwright tests can be run in one of two modes:
+
+1. Build the production target, then run the integration tests in production mode:
+
+   ```sh
+   yarn release:build
+   yarn test:integration --project chromium
+   ```
+
+2. Toolpad in dev watchmode and run the integration tests in dev mode with the `TOOLPAD_DEV` environment variable (slower)
+
+   ```sh
+   yarn dev
+   TOOLPAD_DEV=1 yarn test:integration --project chromium
+   ```
+
 ## Building and running the documentation
 
 1. If you haven't already, install the project dependencies using

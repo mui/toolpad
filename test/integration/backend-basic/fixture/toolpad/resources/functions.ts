@@ -87,3 +87,7 @@ export async function invalidError() {
   // Yes, I'm throwing a function here
   throw function Hello() {};
 }
+
+export function neverResolving() {
+  return new Promise(() => {});
+}

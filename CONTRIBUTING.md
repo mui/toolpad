@@ -200,6 +200,34 @@ yarn install
 
 - Use the `--ui` flag to run the tests interactively
 
+## Using CodeSandbox CI
+
+Each pull request is built on [CodeSandbox CI](https://codesandbox.io/docs/learn/sandboxes/ci). As a result of that we have a published Toolpad package for ever pull request. To use the package from the pull request, take the following steps:
+
+1. In the GitHub PR checks, locate the ci/codesandbox check and make sure it has successfully finished building. Click on "details" to open the CodeSandbox CI user interface.
+
+2. In the codesandbox UI, on the right panel, locate and expand the "Packages (6)" section.
+
+3. Right click the link named `@mui/toolpad` and copy the address
+
+   ![Copy CodeSandbox CI package link](contributing/codesandbox-ci-package-link.png)
+
+4. In your `package.json`, for the `@mui/toolpad` dependency, replace the version with aforementioned link. e.g.
+
+   ```json
+   "dependencies": {
+      "@mui/toolpad": "https://pkg.csb.dev/mui/mui-toolpad/commit/<commit>/@mui/toolpad"
+   }
+   ```
+
+5. Run
+
+   ```sh
+   yarn --force
+   ```
+
+You'll now be able to explore your project with the Toolpad version from the GitHub PR.
+
 ## Sending a pull request
 
 Please have a look at our general [guidelines](https://github.com/mui/material-ui/blob/master/CONTRIBUTING.md#sending-a-pull-request) for sending pull requests.

@@ -89,6 +89,7 @@ export async function invalidError() {
   throw function Hello() {};
 }
 
+
 export function syncFunction() {
   return { message: "hello I'm synchronous" };
 }
@@ -104,4 +105,8 @@ export async function bareWithParams(
   return {
     message: `foo: ${foo}; typeof bar: ${typeof bar}; quux: ${quux}; baz.hello: ${baz.hello}`,
   };
+}
+
+export function neverResolving() {
+  return new Promise(() => {});
 }

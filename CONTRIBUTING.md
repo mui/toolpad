@@ -145,11 +145,11 @@ The playwright tests can be run in one of two modes:
    yarn test:integration --project chromium
    ```
 
-2. Toolpad in dev watchmode and run the integration tests in dev mode with the `TOOLPAD_DEV` environment variable (slower)
+2. Toolpad in dev watchmode and run the integration tests in dev mode with the `TOOLPAD_NEXT_DEV` environment variable (slower)
 
    ```sh
    yarn dev
-   TOOLPAD_DEV=1 yarn test:integration --project chromium
+   TOOLPAD_NEXT_DEV=1 yarn test:integration --project chromium
    ```
 
 ## Building and running the documentation

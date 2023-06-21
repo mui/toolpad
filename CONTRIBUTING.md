@@ -134,6 +134,24 @@ yarn install
 
 </details>
 
+## Running integration tests
+
+The playwright tests can be run in one of two modes:
+
+1. Build the production target, then run the integration tests in production mode:
+
+   ```sh
+   yarn release:build
+   yarn test:integration --project chromium
+   ```
+
+2. Toolpad in dev watchmode and run the integration tests in dev mode with the `TOOLPAD_DEV` environment variable (slower)
+
+   ```sh
+   yarn dev
+   TOOLPAD_DEV=1 yarn test:integration --project chromium
+   ```
+
 ## Building and running the documentation
 
 1. If you haven't already, install the project dependencies using
@@ -199,6 +217,34 @@ yarn install
   ```
 
 - Use the `--ui` flag to run the tests interactively
+
+## Using CodeSandbox CI
+
+Each pull request is built on [CodeSandbox CI](https://codesandbox.io/docs/learn/sandboxes/ci). As a result of that we have a published Toolpad package for ever pull request. To use the package from the pull request, take the following steps:
+
+1. In the GitHub PR checks, locate the ci/codesandbox check and make sure it has successfully finished building. Click on "details" to open the CodeSandbox CI user interface.
+
+2. In the codesandbox UI, on the right panel, locate and expand the "Packages (6)" section.
+
+3. Right click the link named `@mui/toolpad` and copy the address
+
+   ![Copy CodeSandbox CI package link](contributing/codesandbox-ci-package-link.png)
+
+4. In your `package.json`, for the `@mui/toolpad` dependency, replace the version with aforementioned link. e.g.
+
+   ```json
+   "dependencies": {
+      "@mui/toolpad": "https://pkg.csb.dev/mui/mui-toolpad/commit/<commit>/@mui/toolpad"
+   }
+   ```
+
+5. Run
+
+   ```sh
+   yarn --force
+   ```
+
+You'll now be able to explore your project with the Toolpad version from the GitHub PR.
 
 ## Sending a pull request
 

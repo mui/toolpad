@@ -47,6 +47,10 @@ test('functions basics', async ({ page }) => {
   await expect(page.locator('text="echo, parameter: bound foo parameter"')).toBeVisible();
   await expect(page.locator('text="echo, secret: Some bar secret"')).toBeVisible();
   await expect(page.locator('text="echo, secret not in .env: Some baz secret"')).toBeVisible();
+  await expect(page.getByText('Propagated error: KABOOM!', { exact: true })).toBeVisible();
+  await expect(
+    page.getByText('Loading: true; Propagated loading: true', { exact: true }),
+  ).toBeVisible();
 });
 
 test('function editor reload', async ({ page, localApp }) => {

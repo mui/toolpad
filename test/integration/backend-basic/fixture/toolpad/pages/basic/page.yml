@@ -30,7 +30,16 @@ spec:
           props:
             value:
               $$jsExpression: |
-                `throws, data ${throws.data}`
+                `throws, data ${throws.error ? "had an error" : throws.data}`
+    - component: PageRow
+      name: pageRow12
+      children:
+        - component: Text
+          name: text4
+          props:
+            value:
+              $$jsExpression: |
+                `throws, data ${throwsError1.data}`
     - component: PageRow
       name: pageRow3
       children:
@@ -198,3 +207,10 @@ spec:
           value:
             $$jsExpression: |
               alwaysLoading.data
+    - name: throwsError1
+      query:
+        function: throwsMsg
+        kind: local
+      parameters:
+        - name: msg
+          value: threw error 1

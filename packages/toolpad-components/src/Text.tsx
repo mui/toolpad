@@ -7,8 +7,11 @@ import {
   styled,
   TextareaAutosize,
   SxProps,
+  Typography,
 } from '@mui/material';
 import { createComponent, useNode } from '@mui/toolpad-core';
+import ErrorIcon from '@mui/icons-material/Error';
+import { errorFrom } from '@mui/toolpad-utils/errors';
 import { SX_PROP_HELPER_TEXT } from './constants.js';
 
 const Markdown = React.lazy(async () => import('markdown-to-jsx'));
@@ -34,14 +37,14 @@ interface TextProps {
   markdown: string;
   href?: string;
   loading?: boolean;
-  error?: string;
+  error?: unknown;
   sx?: SxProps;
-  variant?: MuiTypographyProps['variant'];
+  variant: MuiTypographyProps['variant'];
 }
 
 const MarkdownContainer = styled('div')(({ theme }) => ({
   display: 'block',
-  maxWidth: '100%',
+  width: '100%',
   '&:empty::before, & > span:empty::before': {
     content: '""',
     display: 'inline-block',
@@ -101,6 +104,20 @@ function parseInput(text: unknown): string {
   return String(text).replaceAll('\n', '');
 }
 
+interface ErrorDisplayProps {
+  error: unknown;
+}
+
+function ErrorDisplay({ error }: ErrorDisplayProps) {
+  const errMessage = errorFrom(error).message;
+  return (
+    <MuiTypography sx={{ display: 'flex', flexDirection: 'row', gap: 1, alignItems: 'center' }}>
+      <ErrorIcon fontSize="small" color="error" />
+      <span>{errMessage}</span>
+    </MuiTypography>
+  );
+}
+
 interface LinkContentProps {
   value: string;
   href?: string;
@@ -109,9 +126,14 @@ interface LinkContentProps {
 }
 
 function LinkContent({ value, href, loading, sx }: LinkContentProps) {
-  return loading ? (
-    <Skeleton width={150} />
-  ) : (
+  const content = React.useMemo(() => {
+    if (loading) {
+      return <Skeleton variant="text" />;
+    }
+    return value;
+  }, [value, loading]);
+
+  return (
     <MuiLink
       href={href}
       target="_blank"
@@ -124,7 +146,7 @@ function LinkContent({ value, href, loading, sx }: LinkContentProps) {
         ...sx,
       }}
     >
-      {value}
+      {content}
     </MuiLink>
   );
 }
@@ -136,36 +158,47 @@ interface MarkdownContentProps {
 }
 
 function MarkdownContent({ value, loading, sx }: MarkdownContentProps) {
-  return loading ? (
-    <Skeleton width={'100%'} sx={{ mx: 1 }} />
-  ) : (
+  const loadingFallback = <Skeleton variant="text" width={'100%'} />;
+
+  return (
     <MarkdownContainer sx={sx}>
-      <React.Suspense>
-        <Markdown
-          options={{
-            overrides: {
-              a: {
-                component: MuiLink,
-                props: {
-                  target: '_blank',
-                  rel: 'noopener noreferrer',
+      {loading ? (
+        loadingFallback
+      ) : (
+        <React.Suspense fallback={loadingFallback}>
+          <Markdown
+            options={{
+              overrides: {
+                a: {
+                  component: MuiLink,
+                  props: {
+                    target: '_blank',
+                    rel: 'noopener noreferrer',
+                  },
+                },
+                pre: {
+                  component: CodeContainer,
                 },
               },
-              pre: {
-                component: CodeContainer,
-              },
-            },
-            slugify: () => '',
-          }}
-        >
-          {value}
-        </Markdown>
-      </React.Suspense>
+              slugify: () => '',
+            }}
+          >
+            {value}
+          </Markdown>
+        </React.Suspense>
+      )}
     </MarkdownContainer>
   );
 }
 
-function TextContent({ value, href, loading, mode, sx, ...rest }: TextProps) {
+interface TextContentProps {
+  value: string;
+  loading?: boolean;
+  sx?: SxProps;
+  variant: MuiTypographyProps['variant'];
+}
+
+function TextContent({ value, loading, sx, variant }: TextContentProps) {
   const [contentEditable, setContentEditable] = React.useState<null | {
     selectionStart: number;
     selectionEnd: number;
@@ -202,7 +235,7 @@ function TextContent({ value, href, loading, mode, sx, ...rest }: TextProps) {
           nodeRuntime.updateAppDomConstProp('value', input);
         }
       }}
-      className={`variant-${rest.variant}`}
+      className={`variant-${variant}`}
     />
   ) : (
     <MuiTypography
@@ -225,14 +258,16 @@ function TextContent({ value, href, loading, mode, sx, ...rest }: TextProps) {
           });
         }
       }}
-      {...rest}
     >
-      {loading ? <Skeleton /> : input}
+      {loading ? <Skeleton variant="text" /> : input}
     </MuiTypography>
   );
 }
 
 function Text(props: TextProps) {
+  if (props.error) {
+    return <ErrorDisplay error={props.error} />;
+  }
   switch (props.mode) {
     case 'markdown':
       return <MarkdownContent {...props} />;

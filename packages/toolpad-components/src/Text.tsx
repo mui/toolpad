@@ -7,7 +7,6 @@ import {
   styled,
   TextareaAutosize,
   SxProps,
-  Typography,
 } from '@mui/material';
 import { createComponent, useNode } from '@mui/toolpad-core';
 import ErrorIcon from '@mui/icons-material/Error';

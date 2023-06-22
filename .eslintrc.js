@@ -116,7 +116,15 @@ module.exports = {
       },
     },
     {
-      files: ['packages/toolpad-utils/**/*'],
+      // Starting small, we will progressively expand this to more packages.
+      files: [
+        // 'packages/create-toolpad-app/**/*',
+        // 'packages/toolpad/**/*',
+        // 'packages/toolpad-app/**/*',
+        'packages/toolpad-utils/**/*',
+        // 'packages/toolpad-core/**/*',
+        // 'packages/toolpad-components/**/*',
+      ],
       rules: {
         '@typescript-eslint/no-explicit-any': ['error'],
       },

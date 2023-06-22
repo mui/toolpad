@@ -8,6 +8,7 @@
       "@mui/toolpad-core/jsBrowserRuntime": ["../toolpad-core/dist/jsBrowserRuntime"],
       "@mui/toolpad-core/jsServerRuntime": ["../toolpad-core/dist/jsServerRuntime"],
       "@mui/toolpad-core/objectKey": ["../toolpad-core/dist/objectKey"],
+      "@mui/toolpad-core/numberFormat": ["../toolpad-core/dist/numberFormat"],
       "@mui/toolpad-utils/*": ["../toolpad-utils/dist/*"]
     },
     "target": "esnext",

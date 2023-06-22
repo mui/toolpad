@@ -1,5 +1,31 @@
 # Changelog
 
+## 0.1.17
+
+<!-- generated comparing v0.1.16..master -->
+
+_Jun 22, 2023_
+
+A big thanks to the 3 contributors who made this release possible. Here are some highlights ✨:
+
+Improve error propagation in queries, add product walkthrough video.
+
+- &#8203;<!-- 13 -->Fix wrong environment variable in contributing guide (#2199) @Janpot
+- &#8203;<!-- 12 -->Add contributor guide for running integration tests (#2192) @Janpot
+- &#8203;<!-- 11 -->Disable a query as long as its input is still loading (#2197) @Janpot
+- &#8203;<!-- 10 -->Add contributing docs for codesandbox CI (#2198) @Janpot
+- &#8203;<!-- 09 -->Remove renovate docs dependencies group (#2191) @Janpot
+- &#8203;<!-- 08 -->Added product walkthrough video (#2175) @prakhargupta1
+- &#8203;<!-- 07 -->Update contributing guide for local development (#2176) @Janpot
+- &#8203;<!-- 06 -->Simplify next.config.js (#1944) @Janpot
+- &#8203;<!-- 05 -->Update monorepo dependency (#2172) @apedroferreira
+- &#8203;<!-- 04 -->Add QRcode example to docs and add dogApp (#1445) @prakhargupta1
+- &#8203;<!-- 03 -->Allow nested bindings (#2114) @apedroferreira
+- &#8203;<!-- 02 -->Remove pino for rpc logging (#1839) @Janpot
+- &#8203;<!-- 01 -->[docs] Pass productId to the pagecontext (#2178) @Janpot
+
+All contributors of this release in alphabetical order: @apedroferreira, @Janpot, @prakhargupta1
+
 ## 0.1.16
 
 <!-- generated comparing v0.1.15..master -->

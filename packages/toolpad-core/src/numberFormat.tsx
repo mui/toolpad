@@ -148,8 +148,8 @@ interface FormattedNumberProps {
 
 const PrettyNumberFormatRoot = styled('span')({
   '& .number-token-type-currency, & .number-token-type-percentSign': {
-    // This makes the currency symbol a bit smaller than the number, but only on larger font sizes
-    fontSize: 'max(min(1em, 1rem), 0.8em)',
+    // This makes the currency/percent symbol a bit smaller than the number, but only on larger font sizes
+    fontSize: 'max(1rem, 0.8em)',
   },
 });
 

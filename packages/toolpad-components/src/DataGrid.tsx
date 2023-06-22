@@ -37,7 +37,7 @@ import { getObjectKey } from '@mui/toolpad-core/objectKey';
 import { errorFrom } from '@mui/toolpad-utils/errors';
 import { hasImageExtension } from '@mui/toolpad-core/path';
 import { ErrorBoundary, FallbackProps } from 'react-error-boundary';
-import { NumberFormat, createSafeStringFormatter } from '@mui/toolpad-core/numberFormat';
+import { NumberFormat, createStringFormatter } from '@mui/toolpad-core/numberFormat';
 import { SX_PROP_HELPER_TEXT } from './constants.js';
 import ErrorOverlay from './components/ErrorOverlay.js';
 
@@ -299,7 +299,7 @@ export function parseColumns(columns: SerializableGridColumns): GridColDef[] {
     if (column.type === 'number' && column.numberFormat) {
       return {
         ...column,
-        valueFormatter: createSafeStringFormatter(column.numberFormat),
+        valueFormatter: createStringFormatter(column.numberFormat),
       };
     }
 

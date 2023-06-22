@@ -116,6 +116,12 @@ module.exports = {
       },
     },
     {
+      files: ['packages/toolpad-utils/**/*'],
+      rules: {
+        '@typescript-eslint/no-explicit-any': ['error'],
+      },
+    },
+    {
       files: ['packages/toolpad-app/pages/**/*'],
       rules: {
         // The pattern is useful to type Next.js pages

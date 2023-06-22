@@ -284,6 +284,7 @@ export default createComponent(Text, {
   layoutDirection: 'both',
   loadingPropSource: ['value'],
   loadingProp: 'loading',
+  errorPropSource: ['value'],
   errorProp: 'error',
   argTypes: {
     mode: {

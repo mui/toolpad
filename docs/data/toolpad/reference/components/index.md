@@ -18,6 +18,7 @@
 - [Paper](/toolpad/reference/components/paper/)
 - [Select](/toolpad/reference/components/select/)
 - [Stack](/toolpad/reference/components/stack/)
+- [Statistic](/toolpad/reference/components/statistic/)
 - [Tabs](/toolpad/reference/components/tabs/)
 - [Text](/toolpad/reference/components/text/)
 - [TextField](/toolpad/reference/components/text-field/)

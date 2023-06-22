@@ -66,6 +66,10 @@
           "pathname": "/toolpad/reference/components/stack"
         },
         {
+          "title": "Statistic",
+          "pathname": "/toolpad/reference/components/statistic"
+        },
+        {
           "title": "Tabs",
           "pathname": "/toolpad/reference/components/tabs"
         },

@@ -136,25 +136,9 @@ export function createFormat(numberFormat?: NumberFormat): Intl.NumberFormat {
   }
 }
 
-export function createSafeFormat(numberFormat?: NumberFormat): Intl.NumberFormat {
-  try {
-    return createFormat(numberFormat);
-  } catch {
-    return createFormat();
-  }
-}
-
 export function createStringFormatter(numberFormat?: NumberFormat): NumberFormatter {
   const format = createFormat(numberFormat);
   return ({ value }) => format.format(Number(value));
-}
-
-export function createSafeStringFormatter(numberFormat?: NumberFormat): NumberFormatter {
-  try {
-    return createStringFormatter(numberFormat);
-  } catch {
-    return createStringFormatter();
-  }
 }
 
 interface FormattedNumberProps {
@@ -163,11 +147,9 @@ interface FormattedNumberProps {
 }
 
 const PrettyNumberFormatRoot = styled('span')({
-  '& .number-token-type-currency': {
-    fontSize: '0.8em',
-  },
-  '& .number-token-type-percentSign': {
-    fontSize: '0.8em',
+  '& .number-token-type-currency, & .number-token-type-percentSign': {
+    // This makes the currency symbol a bit smaller than the number, but only on larger font sizes
+    fontSize: 'max(min(1em, 1rem), 0.8em)',
   },
 });
 

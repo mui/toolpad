@@ -3,7 +3,7 @@ import { Skeleton, Typography, Paper } from '@mui/material';
 import { createComponent } from '@mui/toolpad-core';
 import {
   NumberFormat,
-  createSafeFormat,
+  createFormat,
   NUMBER_FORMAT_SCHEMA,
   FormattedNumber,
 } from '@mui/toolpad-core/numberFormat';
@@ -17,7 +17,7 @@ interface StatisticProps {
 }
 
 function Statistic({ loading, value, numberFormat, label, caption }: StatisticProps) {
-  const format = React.useMemo(() => createSafeFormat(numberFormat), [numberFormat]);
+  const format = React.useMemo(() => createFormat(numberFormat), [numberFormat]);
 
   return (
     <Paper sx={{ p: 2 }}>

@@ -103,7 +103,7 @@ spec:
                   layout:
                     columnSize: 1.5161290322580645
                   props:
-                    defaultValue: "@mui/toolpad"
+                    defaultValue: '@mui/toolpad'
                     label: package
                     fullWidth: true
                 - component: DatePicker
@@ -166,11 +166,11 @@ spec:
               $$jsExpression: |
                 Object.entries(versionLastWeek.data.downloads)
             columns:
-              - field: "0"
+              - field: '0'
                 type: string
                 headerName: Version
                 width: 160
-              - field: "1"
+              - field: '1'
                 type: number
                 width: 152
                 headerName: No. of downloads

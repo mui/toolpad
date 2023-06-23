@@ -60,6 +60,7 @@ interface IToolpadProject {
   getOutputFolder(): string;
   openCodeEditor(path: string): Promise<void>;
   envManager: EnvManager;
+  invalidateQueries(): void;
 }
 
 export default class FunctionsManager {
@@ -172,7 +173,7 @@ export default class FunctionsManager {
 
       this.buildMetafile = args.metafile;
 
-      this.project.events.emit('functionsBuildEnd', {});
+      this.project.invalidateQueries();
 
       this.setInitialized();
     };
@@ -221,10 +222,10 @@ export default class FunctionsManager {
   }
 
   private async createRuntimeWorkerWithEnv() {
-    const env = await this.project.envManager.getValues();
-
     const oldWorker = this.devWorker;
-    this.devWorker = createDevWorker({ ...process.env, ...env });
+    this.devWorker = createDevWorker(process.env);
+    this.project.invalidateQueries();
+
     await oldWorker.terminate();
   }
 

@@ -187,9 +187,11 @@ export default function EditorCanvasHost({
     [handleKeyDown, initBridge],
   );
 
-  const invalidateCanvasQueries = useEvent(() => bridge?.canvasCommands.invalidateQueries());
+  const invalidateCanvasQueries = useEvent(() => {
+    bridge?.canvasCommands.invalidateQueries();
+  });
 
-  useOnProjectEvent('functionsBuildEnd', invalidateCanvasQueries);
+  useOnProjectEvent('queriesInvalidated', invalidateCanvasQueries);
 
   return (
     <CanvasRoot className={className}>

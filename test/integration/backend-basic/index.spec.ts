@@ -39,11 +39,11 @@ async function setReactQueryFocused(page: Page, focus: boolean) {
   }, focus);
 }
 
-test('functions basics', async ({ page }) => {
+test('functions basics', async ({ page, localApp }) => {
   const runtimeModel = new ToolpadRuntime(page);
   await runtimeModel.gotoPage('basic');
 
-  await expectBasicPageContent(page);
+  await expectBasicPageContent(page, localApp);
 });
 
 test('function editor reload', async ({ page, localApp }) => {

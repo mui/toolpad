@@ -35,6 +35,7 @@
     "chalk": "5.2.0",
     "execa": "7.1.1",
     "inquirer": "9.2.7",
+    "invariant": "2.2.4",
     "semver": "7.5.2",
     "yargs": "17.7.2"
   },

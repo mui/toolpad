@@ -4,7 +4,7 @@ spec:
   id: evZC-gp
   title: Default page
   queries:
-    - name: versionLastweek
+    - name: versionLastWeek
       query:
         kind: rest
         url:
@@ -80,13 +80,6 @@ spec:
     - component: PageRow
       name: pageRow
       children:
-        - component: Text
-          name: text1
-          props:
-            value: Enter package name
-            variant: h6
-          layout:
-            columnSize: 0.49074074074074076
         - component: PageColumn
           name: pageColumn
           layout:
@@ -100,26 +93,43 @@ spec:
                 - component: TextField
                   name: textField
                   layout:
-                    columnSize: 0.8853503184713376
+                    columnSize: 1.5161290322580645
                   props:
                     defaultValue: '@mui/toolpad'
-                - component: Text
-                  name: text2
-                  props:
-                    value: Enter date range
-                    variant: h6
-                  layout:
-                    columnSize: 1.111813296178344
+                    label: package
+                    fullWidth: true
                 - component: DatePicker
                   name: datePicker
                   layout:
-                    columnSize: 1.002808487874465
+                    columnSize: 0.7352885584677419
                   props:
-                    defaultValue: 2023-06-01
+                    defaultValue:
+                      $$jsExpression: |
+                        new Date(new Date().setMonth(new Date().getMonth() - 1))
+                          .toISOString()
+                          .slice(0, 10)
+                    label: since
+                    fullWidth: true
                 - component: DatePicker
                   name: datePicker1
                   props:
-                    defaultValue: 2023-06-07
+                    label: until
+                    fullWidth: true
+                    defaultValue:
+                      $$jsExpression: |
+                        new Date().toISOString().slice(0, 10)
+                  layout:
+                    columnSize: 0.7419354838709677
+    - component: PageRow
+      name: pageRow1
+      children:
+        - component: Text
+          name: text4
+          props:
+            value:
+              $$jsExpression: |
+                `Total downloads: ${totalRange.data.downloads}`
+            variant: body1
     - component: PageRow
       name: pageRow2
       children:
@@ -132,26 +142,12 @@ spec:
             series:
               - downloads
     - component: PageRow
-      name: pageRow5
-      children:
-        - component: Text
-          name: text4
-          props:
-            value: Total downloads count for the specified duration
-            variant: body1
-        - component: Text
-          name: text
-          props:
-            value:
-              $$jsExpression: |
-                totalRange.data.downloads
-    - component: PageRow
       name: pageRow4
       children:
         - component: Text
           name: text3
           props:
-            value: Version wise data (This is available just for the last week)
+            value: Downloads by version (last week only)
     - component: PageRow
       name: pageRow6
       children:
@@ -160,7 +156,7 @@ spec:
           props:
             rows:
               $$jsExpression: |
-                Object.entries(versionLastweek.data.downloads)
+                Object.entries(versionLastWeek.data.downloads)
             columns:
               - field: '0'
                 type: string

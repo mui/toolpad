@@ -14,13 +14,10 @@ import CircularProgress from '@mui/material/CircularProgress';
 
 export interface LineChartProps {
   data: object[];
+  loading?: boolean;
 }
 
-function ChartExport({ data }: LineChartProps) {
-  if (!data || data.length === 0) {
-    return <CircularProgress />;
-  }
-
+function ChartExport({ loading, data }: LineChartProps) {
   return (
     <div style={{ width: '100%', height: 300 }}>
       <ResponsiveContainer>
@@ -30,14 +27,28 @@ function ChartExport({ data }: LineChartProps) {
           <YAxis />
           <Tooltip />
           <Legend />
-          <Line type="monotone" dataKey="downloads" stroke="#87bc45" />
+          <Line type="monotone" dataKey="downloads" stroke="#87bc45" isAnimationActive={false} />
         </LineChart>
       </ResponsiveContainer>
+      {!data || loading ? (
+        <div
+          style={{
+            position: 'absolute',
+            inset: '0 0 0 0',
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+          }}
+        >
+          <CircularProgress />
+        </div>
+      ) : null}
     </div>
   );
 }
 
 export default createComponent(ChartExport, {
+  loadingProp: 'loading',
   argTypes: {
     data: {
       type: 'array',

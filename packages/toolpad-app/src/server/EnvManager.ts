@@ -2,6 +2,8 @@ import * as path from 'path';
 import * as chokidar from 'chokidar';
 import * as dotenv from 'dotenv';
 import { Emitter } from '@mui/toolpad-utils/events';
+import chalk from 'chalk';
+import { truncate } from '@mui/toolpad-utils/strings';
 import { ProjectEvents, ToolpadProjectOptions } from '../types';
 import { Awaitable } from '../utils/types';
 
@@ -18,16 +20,27 @@ interface IToolpadProject {
 export default class EnvManager {
   private project: IToolpadProject;
 
-  private values: Awaitable<Record<string, string>> | undefined;
+  private values: Awaitable<Record<string, string>> = {};
 
   constructor(project: IToolpadProject) {
     this.project = project;
 
-    const envFilePath = this.getEnvFilePath();
-    const { parsed } = dotenv.config({ path: envFilePath, override: true });
-    this.values = parsed;
+    this.loadEnvFile();
 
     this.initWatcher();
+  }
+
+  private loadEnvFile() {
+    const envFilePath = this.getEnvFilePath();
+    const { parsed = {} } = dotenv.config({ path: envFilePath, override: true });
+    this.values = parsed;
+    // eslint-disable-next-line no-console
+    console.log(
+      `${chalk.blue('info')}  - loaded env file "${envFilePath}" with keys ${truncate(
+        Object.keys(parsed).join(', '),
+        1000,
+      )}`,
+    );
   }
 
   /**
@@ -47,11 +60,7 @@ export default class EnvManager {
     });
 
     const handleChange = async () => {
-      this.values = undefined;
-
-      const envFilePath = this.getEnvFilePath();
-      const { parsed } = dotenv.config({ path: envFilePath, override: true });
-      this.values = parsed;
+      this.loadEnvFile();
 
       this.project.events.emit('envChanged', {});
       this.project.invalidateQueries();
@@ -63,6 +72,6 @@ export default class EnvManager {
   }
 
   async getDeclaredValues(): Promise<Record<string, string>> {
-    return this.values ?? {};
+    return this.values;
   }
 }

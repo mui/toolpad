@@ -69,6 +69,7 @@ test('function editor parameters update', async ({ page, localApp }) => {
   await expect(queryEditor.getByLabel('foo', { exact: true })).toBeVisible();
   await expect(queryEditor.getByLabel('bar', { exact: true })).not.toBeVisible();
 
+  // TODO: figure out window focus issues in playwright https://github.com/microsoft/playwright/issues/3570
   await setReactQueryFocused(page, false); // simulate page hidden
 
   const functionsFilePath = path.resolve(localApp.dir, './toolpad/resources/functions.ts');

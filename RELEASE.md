@@ -41,18 +41,6 @@
       npm login
       ```
 
-   1. Make sure dependencies are up to date
-
-      ```sh
-      yarn
-      ```
-
-   1. Build the release version, make sure you don't have the project running in dev mode somewhere.
-
-      ```sh
-      yarn release:build
-      ```
-
    1. Publish to `npm`
 
       ```sh

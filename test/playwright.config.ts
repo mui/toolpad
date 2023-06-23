@@ -6,7 +6,7 @@ const config: PlaywrightTestConfig<{ toolpadDev: boolean }> = {
   forbidOnly: !!process.env.CI,
   retries: process.env.TOOLPAD_TEST_RETRIES ? Number(process.env.TOOLPAD_TEST_RETRIES) : 0,
   testMatch: /.*.spec.[jt]sx?$/,
-  workers: 2,
+  workers: process.env.CI ? 2 : 1,
   expect: {
     timeout: 10000,
   },

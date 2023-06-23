@@ -4,8 +4,10 @@ import { test, expect, Page } from '../../playwright/localTest';
 import { ToolpadRuntime } from '../../models/ToolpadRuntime';
 import { ToolpadEditor } from '../../models/ToolpadEditor';
 import { waitForMatch } from '../../utils/streams';
+import { expectBasicPageContent } from './shared';
 
 const BASIC_TESTS_PAGE_ID = '5q1xd0t';
+const EXTRACTED_TYPES_PAGE_ID = 'dt1T4rY';
 
 test.use({
   ignoreConsoleErrors: [
@@ -41,16 +43,7 @@ test('functions basics', async ({ page }) => {
   const runtimeModel = new ToolpadRuntime(page);
   await runtimeModel.gotoPage('basic');
 
-  await expect(page.locator('text="hello, message: hello world"')).toBeVisible();
-  await expect(page.locator('text="throws, error.message: BOOM!"')).toBeVisible();
-  await expect(page.locator('text="throws, data undefined"')).toBeVisible();
-  await expect(page.locator('text="echo, parameter: bound foo parameter"')).toBeVisible();
-  await expect(page.locator('text="echo, secret: Some bar secret"')).toBeVisible();
-  await expect(page.locator('text="echo, secret not in .env: Some baz secret"')).toBeVisible();
-  await expect(page.getByText('Propagated error: KABOOM!', { exact: true })).toBeVisible();
-  await expect(
-    page.getByText('Loading: true; Propagated loading: true', { exact: true }),
-  ).toBeVisible();
+  await expectBasicPageContent(page);
 });
 
 test('function editor reload', async ({ page, localApp }) => {
@@ -117,4 +110,65 @@ test('Query serialization', async ({ page }) => {
   await expect(page.getByText('Circlular property: [Circular]', { exact: true })).toBeVisible();
   await expect(page.getByText('Non-circular: hello:hello', { exact: true })).toBeVisible();
   await expect(page.getByText('Invalid error: undefined', { exact: true })).toBeVisible();
+});
+
+test('Extracted types', async ({ page }) => {
+  const runtimeModel = new ToolpadRuntime(page);
+  await runtimeModel.gotoPage('extractedTypes');
+
+  await expect(
+    page.getByText(
+      'bare function with parameters: foo: bar; typeof bar: number; quux: true; baz.hello: 5',
+      {
+        exact: true,
+      },
+    ),
+  ).toBeVisible();
+  await expect(
+    page.getByText("synchronous function: hello I'm synchronous", { exact: true }),
+  ).toBeVisible();
+});
+
+test('function editor extracted parameters', async ({ page, localApp }) => {
+  const editorModel = new ToolpadEditor(page);
+  await editorModel.goToPageById(EXTRACTED_TYPES_PAGE_ID);
+
+  await editorModel.componentEditor.getByRole('button', { name: 'bareWithParams' }).click();
+  const queryEditor = page.getByRole('dialog', { name: 'bareWithParams' });
+
+  await queryEditor.getByRole('button', { name: 'Preview', exact: true }).click();
+  await queryEditor
+    .getByTestId('query-preview')
+    .getByText(
+      'bare function with parameters: foo: bar; typeof bar: number; quux: true; baz.hello: 5',
+    );
+
+  await expect(queryEditor).toBeVisible();
+  await expect(queryEditor.getByRole('checkbox', { name: 'quux', exact: true })).toBeVisible();
+  await expect(queryEditor.getByRole('textbox', { name: 'foo', exact: true })).toBeVisible();
+  await expect(queryEditor.getByRole('textbox', { name: 'foo', exact: true })).toBeVisible();
+  await expect(queryEditor.getByRole('button', { name: 'baz', exact: true })).toBeVisible();
+  await expect(queryEditor.getByRole('spinbutton', { name: 'bar', exact: true })).toBeVisible();
+
+  const fizzCombobox = queryEditor.getByRole('button', { name: 'fizz', exact: true });
+  await expect(fizzCombobox).toBeVisible();
+
+  await fizzCombobox.click();
+  await expect(page.getByRole('option', { name: 'hello', exact: true })).toBeVisible();
+  await expect(page.getByRole('option', { name: 'world', exact: true })).toBeVisible();
+  await page.keyboard.press('Escape');
+
+  await expect(queryEditor.getByRole('textbox', { name: 'buzz', exact: true })).not.toBeVisible();
+
+  await setReactQueryFocused(page, false); // simulate page hidden
+
+  const functionsFilePath = path.resolve(localApp.dir, './toolpad/resources/functions.ts');
+  await Promise.all([
+    fileReplace(functionsFilePath, '/** BARE_DUMMY_PARAM */', 'buzz: string,'),
+    waitForMatch(localApp.stdout, /built functions\.ts/),
+  ]);
+
+  await setReactQueryFocused(page, true); // simulate page restored
+
+  await expect(queryEditor.getByRole('textbox', { name: 'buzz', exact: true })).toBeVisible();
 });

@@ -171,6 +171,7 @@ async function loadPagesFromFiles(root: string): Promise<PagesContent> {
         }
 
         const result = pageSchema.safeParse(parsedFile);
+
         if (result.success) {
           return [pageName, result.data];
         }

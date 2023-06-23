@@ -78,6 +78,14 @@ spec:
               datePicker1.value
   content:
     - component: PageRow
+      name: pageRow5
+      children:
+        - component: Text
+          name: text
+          props:
+            value: NPM stats
+            variant: h3
+    - component: PageRow
       name: pageRow
       children:
         - component: PageColumn
@@ -95,7 +103,7 @@ spec:
                   layout:
                     columnSize: 1.5161290322580645
                   props:
-                    defaultValue: '@mui/toolpad'
+                    defaultValue: "@mui/toolpad"
                     label: package
                     fullWidth: true
                 - component: DatePicker
@@ -112,14 +120,14 @@ spec:
                     fullWidth: true
                 - component: DatePicker
                   name: datePicker1
+                  layout:
+                    columnSize: 0.7419354838709677
                   props:
                     label: until
                     fullWidth: true
                     defaultValue:
                       $$jsExpression: |
                         new Date().toISOString().slice(0, 10)
-                  layout:
-                    columnSize: 0.7419354838709677
     - component: PageRow
       name: pageRow1
       children:
@@ -158,11 +166,11 @@ spec:
               $$jsExpression: |
                 Object.entries(versionLastWeek.data.downloads)
             columns:
-              - field: '0'
+              - field: "0"
                 type: string
                 headerName: Version
                 width: 160
-              - field: '1'
+              - field: "1"
                 type: number
                 width: 152
                 headerName: No. of downloads

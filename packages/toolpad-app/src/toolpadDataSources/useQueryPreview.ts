@@ -1,12 +1,16 @@
-import { ExecFetchResult } from '@mui/toolpad-core';
 import * as React from 'react';
-import { errorFrom, serializeError } from '@mui/toolpad-utils/errors';
+import { errorFrom } from '@mui/toolpad-utils/errors';
 
 export interface UseQueryPreviewOptions<R> {
   onPreview?: (result: R) => void;
 }
 
-export default function useQueryPreview<Q, P, R extends ExecFetchResult<any> & Partial<any>>(
+export interface QueryPreviewResult<T> {
+  data?: T;
+  error?: Error;
+}
+
+export default function useQueryPreview<Q, P, R extends QueryPreviewResult<any> & Partial<any>>(
   dofetch: (query: Q, params: P) => Promise<R>,
   query: Q,
   params: P,
@@ -34,7 +38,7 @@ export default function useQueryPreview<Q, P, R extends ExecFetchResult<any> & P
           }
         },
         (error) => {
-          setPreview({ error: serializeError(errorFrom(error)) } as R);
+          setPreview({ error: errorFrom(error) } as R);
         },
       )
       .finally(() => {

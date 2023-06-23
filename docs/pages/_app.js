@@ -15,6 +15,7 @@ import DocsStyledEngineProvider from 'docs/src/modules/utils/StyledEngineProvide
 import createEmotionCache from 'docs/src/createEmotionCache';
 import findActivePage from 'docs/src/modules/utils/findActivePage';
 import pages from '../data/pages';
+import toolpadPkgJson from '../../packages/toolpad/package.json';
 
 const clientSideEmotionCache = createEmotionCache();
 
@@ -79,7 +80,7 @@ async function registerServiceWorker() {
     window.location.host.indexOf('mui.com') !== -1
   ) {
     // register() automatically attempts to refresh the sw.js.
-    const registration = await navigator.serviceWorker.register('/sw.js');
+    const registration = await navigator.serviceWorker.register('/toolpad/sw.js');
     // Force the page reload for users.
     forcePageReload(registration);
   }
@@ -144,12 +145,18 @@ function AppWrapper(props) {
     const { activePage, activePageParents } = findActivePage(pages, router.pathname);
 
     const productIdentifier = {
+      metadata: '',
       name: 'Toolpad',
-      metadata: 'MUI Toolpad',
-      versions: [],
+      versions: [{ text: `v${toolpadPkgJson.version}`, current: true }],
     };
 
-    return { activePage, activePageParents, pages, productIdentifier };
+    return {
+      activePage,
+      activePageParents,
+      pages,
+      productIdentifier,
+      productId: 'toolpad',
+    };
   }, [router.pathname]);
 
   return (

@@ -1,8 +1,9 @@
 import invariant from 'invariant';
-import { AppDom, QueryNode, createConst, isQuery, ElementNode, isElement, ref } from '..';
+import { ref } from '..';
 import { update } from '../../utils/immutability';
+import * as appDom from './types/v7Legacy';
 
-function migrateLegacyQueryNode(node: QueryNode<any>): QueryNode<any> {
+function migrateLegacyQueryNode(node: appDom.QueryNode<any>): appDom.QueryNode<any> {
   if (node.attributes.dataSource?.value !== 'rest') {
     return node;
   }
@@ -25,11 +26,14 @@ function migrateLegacyQueryNode(node: QueryNode<any>): QueryNode<any> {
       attributes: update(node.attributes, {
         transformEnabled: undefined,
         transform: undefined,
-        query: createConst({
-          ...node.attributes.query.value,
-          transformEnabled: node.attributes.transformEnabled?.value,
-          transform: node.attributes.transform?.value,
-        }),
+        query: {
+          type: 'const',
+          value: {
+            ...node.attributes.query.value,
+            transformEnabled: node.attributes.transformEnabled?.value,
+            transform: node.attributes.transform?.value,
+          },
+        },
       }),
     });
   }
@@ -39,10 +43,16 @@ function migrateLegacyQueryNode(node: QueryNode<any>): QueryNode<any> {
     if (typeof node.attributes.query.value?.connectionId?.value === 'string') {
       return update(node, {
         attributes: update(node.attributes, {
-          query: createConst({
-            ...node.attributes.query.value,
-            connectionId: createConst(ref(node.attributes.query.value.connectionId.value)),
-          }),
+          query: {
+            type: 'const',
+            value: {
+              ...node.attributes.query.value,
+              connectionId: {
+                type: 'const',
+                value: ref(node.attributes.query.value.connectionId.value),
+              },
+            },
+          },
         }),
       });
     }
@@ -50,7 +60,7 @@ function migrateLegacyQueryNode(node: QueryNode<any>): QueryNode<any> {
   return node;
 }
 
-function migrateLegacyNavigationAction(node: ElementNode<any>): ElementNode<any> {
+function migrateLegacyNavigationAction(node: appDom.ElementNode<any>): appDom.ElementNode<any> {
   if (node.props?.onClick?.type === 'navigationAction') {
     if (typeof node.props.onClick.value?.page === 'string') {
       return update(node, {
@@ -68,15 +78,15 @@ function migrateLegacyNavigationAction(node: ElementNode<any>): ElementNode<any>
 }
 
 export default {
-  up(dom: AppDom): AppDom {
+  up(dom: appDom.AppDom): appDom.AppDom {
     const { nodes, version = 0 } = dom;
     invariant(version === 0, 'Can only migrate dom of version 0');
     const migratedNodes = Object.fromEntries(
       Object.entries(nodes).map(([id, node]) => {
-        if (isQuery(node)) {
+        if (appDom.isQuery(node)) {
           return [id, migrateLegacyQueryNode(node)];
         }
-        if (isElement(node)) {
+        if (appDom.isElement(node)) {
           return [id, migrateLegacyNavigationAction(node)];
         }
         return [id, node];

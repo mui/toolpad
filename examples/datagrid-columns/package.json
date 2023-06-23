@@ -1,5 +1,5 @@
 {
-  "name": "showcase",
+  "name": "datagrid-columns",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -8,6 +8,6 @@
     "start": "toolpad start"
   },
   "dependencies": {
-    "@mui/toolpad": "0.1.16"
+    "@mui/toolpad": "0.1.17"
   }
 }

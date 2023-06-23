@@ -9,6 +9,7 @@ export default defineConfig([
       appServer: './cli/appServer.ts',
       appBuilder: './cli/appBuilder.ts',
       functionsDevWorker: './src/server/functionsDevWorker.ts',
+      functionsTypesWorker: './src/server/functionsTypesWorker.ts',
     },
     outDir: 'dist/cli',
     silent: true,

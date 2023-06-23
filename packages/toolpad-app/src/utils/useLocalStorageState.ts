@@ -2,7 +2,7 @@ import * as React from 'react';
 import { Emitter } from '@mui/toolpad-utils/events';
 
 // storage events only work across windows, we'll use an event emitter to announce within the window
-const emitter = new Emitter<Record<string, undefined>>();
+const emitter = new Emitter<Record<string, null>>();
 // local cache, needed for getSnapshot
 const cache = new Map<string, any>();
 
@@ -45,7 +45,7 @@ function setValue<T = unknown>(key: string, value: T) {
     if (typeof window !== 'undefined') {
       cache.set(key, value);
       window.localStorage.setItem(key, JSON.stringify(value));
-      emitter.emit(key);
+      emitter.emit(key, null);
     }
   } catch (error) {
     console.error(error);

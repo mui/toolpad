@@ -4,7 +4,7 @@ import * as fs from 'fs/promises';
 import invariant from 'invariant';
 import openEditor from 'open-editor';
 import chalk from 'chalk';
-import { BindableAttrValue, NodeId } from '@mui/toolpad-core';
+import { BindableAttrValue, NodeId, PropBindableAttrValue } from '@mui/toolpad-core';
 import { fromZodError } from 'zod-validation-error';
 import { glob } from 'glob';
 import * as chokidar from 'chokidar';
@@ -22,13 +22,13 @@ import {
 } from '@mui/toolpad-utils/fs';
 import config from '../config';
 import * as appDom from '../appDom';
+import * as v7LegacyDom from '../appDom/migrations/types/v7Legacy';
 import { migrateUp } from '../appDom/migrations';
 import insecureHash from '../utils/insecureHash';
 import {
   Page,
   Query,
   ElementType,
-  NavigationAction,
   pageSchema,
   Template,
   BindableProp,
@@ -157,7 +157,7 @@ async function loadPagesFromFiles(root: string): Promise<PagesContent> {
         if (!content) {
           return null;
         }
-        let parsedFile: string | undefined;
+        let parsedFile: Page | undefined;
         try {
           parsedFile = yaml.parse(content);
         } catch (rawError) {
@@ -171,6 +171,7 @@ async function loadPagesFromFiles(root: string): Promise<PagesContent> {
         }
 
         const result = pageSchema.safeParse(parsedFile);
+
         if (result.success) {
           return [pageName, result.data];
         }
@@ -258,7 +259,9 @@ class Lock {
 
 const configFileLock = new Lock();
 
-async function loadConfigFileFrom(configFilePath: string): Promise<appDom.AppDom | null> {
+async function loadConfigFileFrom(
+  configFilePath: string,
+): Promise<appDom.AppDom | v7LegacyDom.AppDom | null> {
   // Using a lock to avoid read during write which may result in reading truncated file content
   const configContent = await configFileLock.use(() => readMaybeFile(configFilePath));
 
@@ -271,7 +274,7 @@ async function loadConfigFileFrom(configFilePath: string): Promise<appDom.AppDom
   return parsedConfig;
 }
 
-async function loadConfigFile(root: string): Promise<appDom.AppDom | null> {
+async function loadConfigFile(root: string): Promise<appDom.AppDom | v7LegacyDom.AppDom | null> {
   const configFilePath = await getConfigFilePath(root);
   const dom = await loadConfigFileFrom(configFilePath);
   return dom;
@@ -325,13 +328,13 @@ function mergeComponentsContentIntoDom(
           codeComponentNode,
           'attributes',
           'code',
-          appDom.createConst(content.code),
+          content.code,
         );
       } else {
         const newNode = appDom.createNode(dom, 'codeComponent', {
           name,
           attributes: {
-            code: appDom.createConst(content.code),
+            code: content.code,
           },
         });
         dom = appDom.addNode(dom, newNode, rootNode, 'codeComponents');
@@ -350,96 +353,13 @@ function mergeThemeIntoAppDom(dom: appDom.AppDom, themeFile: Theme): appDom.AppD
   dom = appDom.addNode(
     dom,
     appDom.createNode(dom, 'theme', {
-      theme: {
-        'palette.mode': appDom.toConstPropValue(themeFileSpec['palette.mode']),
-        'palette.primary.main': appDom.toConstPropValue(themeFileSpec['palette.primary.main']),
-        'palette.secondary.main': appDom.toConstPropValue(themeFileSpec['palette.secondary.main']),
-      },
+      theme: themeFileSpec,
       attributes: {},
     }),
     app,
     'themes',
   );
   return dom;
-}
-
-function toBindable<V>(
-  value: V | { $$jsExpression: string } | { $$env: string },
-): BindableAttrValue<V> {
-  if (value && typeof value === 'object' && typeof (value as any).$$jsExpression === 'string') {
-    return { type: 'jsExpression', value: (value as any).$$jsExpression };
-  }
-  if (value && typeof value === 'object' && typeof (value as any).$$env === 'string') {
-    return { type: 'env', value: (value as any).$$env };
-  }
-  return { type: 'const', value: value as V };
-}
-
-function fromBindable<V>(bindable: BindableAttrValue<V>) {
-  switch (bindable.type) {
-    case 'const':
-      return bindable.value;
-    case 'jsExpression':
-      return { $$jsExpression: bindable.value };
-    case 'env':
-      return { $$env: bindable.value };
-    default:
-      throw new Error(`Unsupported bindable "${bindable.type}"`);
-  }
-}
-
-function toBindableProp<V>(
-  value: V | { $$jsExpression: string } | { $$env: string },
-): BindableAttrValue<V> {
-  if (value && typeof value === 'object') {
-    if (typeof (value as any).$$jsExpression === 'string') {
-      return { type: 'jsExpression', value: (value as any).$$jsExpression };
-    }
-    if (typeof (value as any).$$env === 'string') {
-      return { type: 'env', value: (value as any).$$env };
-    }
-    if (typeof (value as any).$$jsExpressionAction === 'string') {
-      return { type: 'jsExpressionAction', value: (value as any).$$jsExpressionAction };
-    }
-    if (typeof (value as any).$$navigationAction === 'object') {
-      const action = value as any as NavigationAction;
-      return {
-        type: 'navigationAction',
-        value: {
-          page: { $ref: action.$$navigationAction.page as NodeId },
-          parameters: mapValues(
-            action.$$navigationAction.parameters,
-            (param) => param && toBindable(param),
-          ),
-        },
-      };
-    }
-  }
-  return { type: 'const', value: value as V };
-}
-
-function fromBindableProp<V>(bindable: BindableAttrValue<V>) {
-  switch (bindable.type) {
-    case 'const':
-      return bindable.value;
-    case 'jsExpression':
-      return { $$jsExpression: bindable.value };
-    case 'env':
-      return { $$env: bindable.value };
-    case 'jsExpressionAction':
-      return { $$jsExpressionAction: bindable.value };
-    case 'navigationAction':
-      return {
-        $$navigationAction: {
-          page: bindable.value.page.$ref,
-          parameters:
-            bindable.value.parameters &&
-            mapValues(bindable.value.parameters, (param) => param && fromBindable(param)),
-        },
-      };
-    default:
-      throw new Error(`Unsupported bindable "${bindable.type}"`);
-  }
 }
 
 function stringOnly(maybeString: unknown): string | undefined {
@@ -492,8 +412,8 @@ function createPageFileQueryFromDomQuery(
           case 'raw': {
             body = {
               kind: 'raw',
-              content: fromBindable(query.body.content),
-              contentType: query.body.contentType.value,
+              content: query.body.content as PropBindableAttrValue<string>,
+              contentType: query.body.contentType,
             };
             break;
           }
@@ -502,7 +422,7 @@ function createPageFileQueryFromDomQuery(
               kind: 'urlEncoded',
               content: query.body.content.map(([name, value]) => ({
                 name,
-                value: fromBindable(value),
+                value: value as PropBindableAttrValue<string>,
               })),
             };
             break;
@@ -539,12 +459,15 @@ function createPageFileQueryFromDomQuery(
 
       return {
         kind: 'rest',
-        url: query.url ? fromBindable(query.url) : undefined,
+        url: query.url as PropBindableAttrValue<string>,
         searchParams: query.searchParams?.map(([name, value]) => ({
           name,
-          value: fromBindable(value),
+          value: value as PropBindableAttrValue<string>,
         })),
-        headers: query.headers.map(([name, value]) => ({ name, value: fromBindable(value) })),
+        headers: query.headers.map(([name, value]) => ({
+          name,
+          value: value as PropBindableAttrValue<string>,
+        })),
         body,
         method: query.method,
         response,
@@ -586,13 +509,13 @@ function expandFromDom<N extends appDom.AppDomNode>(
       kind: 'page',
       spec: {
         id: node.id,
-        title: node.attributes.title?.value,
+        title: node.attributes.title,
         parameters: undefinedWhenEmpty(
-          node.attributes.parameters?.value.map(([name, value]) => ({ name, value })) ?? [],
+          node.attributes.parameters?.map(([name, value]) => ({ name, value })) ?? [],
         ),
         content: undefinedWhenEmpty(expandChildren(children.children || [], dom)),
         queries: undefinedWhenEmpty(expandChildren(children.queries || [], dom)),
-        display: node.attributes.display?.value,
+        display: node.attributes.display,
       },
     } satisfies Page;
   }
@@ -600,28 +523,24 @@ function expandFromDom<N extends appDom.AppDomNode>(
   if (appDom.isQuery(node)) {
     return {
       name: node.name,
-      enabled: node.attributes.enabled ? fromBindable(node.attributes.enabled) : undefined,
-      mode: node.attributes.mode?.value,
+      enabled: node.attributes.enabled as PropBindableAttrValue<boolean>,
+      mode: node.attributes.mode,
       query: node.attributes.dataSource
         ? createPageFileQueryFromDomQuery(
-            node.attributes.dataSource.value,
-            node.attributes.query?.value as FetchQuery | LocalQuery | undefined,
+            node.attributes.dataSource,
+            node.attributes.query as FetchQuery | LocalQuery | undefined,
           )
         : undefined,
-      parameters: undefinedWhenEmpty(
-        node.params?.map(([name, value]) => ({ name, value: fromBindable(value) })),
-      ),
-      cacheTime: node.attributes.cacheTime?.value,
-      refetchInterval: node.attributes.refetchInterval?.value,
-      transform: node.attributes.transform?.value,
-      transformEnabled: node.attributes.transformEnabled?.value,
+      parameters: undefinedWhenEmpty(node.params?.map(([name, value]) => ({ name, value }))),
+      cacheTime: node.attributes.cacheTime,
+      refetchInterval: node.attributes.refetchInterval,
+      transform: node.attributes.transform,
+      transformEnabled: node.attributes.transformEnabled,
     } satisfies Query;
   }
 
   if (appDom.isElement(node)) {
     const { children, ...templates } = appDom.getChildNodes(dom, node);
-
-    const plainProps = mapValues(node.props || {}, (prop) => prop && fromBindableProp(prop));
 
     const templateProps = mapValues(templates, (subtree) =>
       subtree
@@ -632,14 +551,14 @@ function expandFromDom<N extends appDom.AppDomNode>(
     );
 
     return {
-      component: node.attributes.component.value,
+      component: node.attributes.component,
       name: node.name,
       layout: undefinedWhenEmpty({
-        columnSize: node.layout?.columnSize?.value,
-        horizontalAlign: stringOnly(node.layout?.horizontalAlign?.value),
-        verticalAlign: stringOnly(node.layout?.verticalAlign?.value),
+        columnSize: node.layout?.columnSize,
+        horizontalAlign: stringOnly(node.layout?.horizontalAlign),
+        verticalAlign: stringOnly(node.layout?.verticalAlign),
       }),
-      props: undefinedWhenEmpty({ ...plainProps, ...templateProps }),
+      props: undefinedWhenEmpty({ ...node.props, ...templateProps }),
       children: undefinedWhenEmpty(expandChildren(children || [], dom)),
     } satisfies ElementType;
   }
@@ -668,15 +587,7 @@ function mergeElementIntoDom(
 
   const templateProps = filterValues(elm.props ?? {}, isTemplate) as Record<string, Template>;
 
-  const elmNode = appDom.createElement(
-    dom,
-    elm.component,
-    mapValues(plainProps, (propValue) => toBindableProp(propValue)),
-    mapValues(elm.layout ?? {}, (propValue) =>
-      propValue ? appDom.createConst(propValue) : undefined,
-    ),
-    elm.name,
-  );
+  const elmNode = appDom.createElement(dom, elm.component, plainProps, elm.layout ?? {}, elm.name);
 
   dom = appDom.addNode(dom, elmNode, parent, parentProp as any);
 
@@ -709,8 +620,8 @@ function createDomQueryFromPageFileQuery(query: QueryConfig): FetchQuery | Local
           case 'raw': {
             body = {
               kind: 'raw',
-              content: toBindable<string>(query.body.content),
-              contentType: appDom.createConst(query.body.contentType),
+              content: query.body.content,
+              contentType: query.body.contentType,
             };
             break;
           }
@@ -719,7 +630,7 @@ function createDomQueryFromPageFileQuery(query: QueryConfig): FetchQuery | Local
               kind: 'urlEncoded',
               content: query.body.content.map(({ name, value }) => [
                 name,
-                toBindable<string>(value),
+                value as PropBindableAttrValue<string>,
               ]),
             };
             break;
@@ -755,14 +666,13 @@ function createDomQueryFromPageFileQuery(query: QueryConfig): FetchQuery | Local
       }
 
       return {
-        url: query.url ? toBindable(query.url) : undefined,
-        headers: query.headers?.map(({ name, value }) => [name, toBindable<string>(value)]) || [],
+        url: query.url || undefined,
+        headers: query.headers?.map(({ name, value }) => [name, value]) || [],
         method: query.method || 'GET',
         browser: false,
         transform: query.transform,
         transformEnabled: query.transformEnabled,
-        searchParams:
-          query.searchParams?.map(({ name, value }) => [name, toBindable<string>(value)]) || [],
+        searchParams: query.searchParams?.map(({ name, value }) => [name, value]) || [],
         body,
         response,
       } satisfies FetchQuery;
@@ -777,11 +687,9 @@ function createPageDomFromPageFile(pageName: string, pageFile: Page): appDom.App
   let fragment = appDom.createFragmentInternal(pageFileSpec.id as NodeId, 'page', {
     name: pageName,
     attributes: {
-      title: appDom.createConst(pageFileSpec.title || ''),
-      parameters: appDom.createConst(
-        pageFileSpec.parameters?.map(({ name, value }) => [name, value]) || [],
-      ),
-      display: pageFileSpec.display ? appDom.createConst(pageFileSpec.display) : undefined,
+      title: pageFileSpec.title || '',
+      parameters: pageFileSpec.parameters?.map(({ name, value }) => [name, value]) || [],
+      display: pageFileSpec.display || undefined,
     },
   });
 
@@ -794,29 +702,19 @@ function createPageDomFromPageFile(pageName: string, pageFile: Page): appDom.App
         const queryNode = appDom.createNode(fragment, 'query', {
           name: query.name,
           attributes: {
-            connectionId: appDom.createConst(null),
-            dataSource:
-              typeof query.query?.kind === 'string'
-                ? appDom.createConst(query.query.kind)
-                : undefined,
-            query: appDom.createConst(createDomQueryFromPageFileQuery(query.query)),
-            cacheTime:
-              typeof query.cacheTime === 'number' ? appDom.createConst(query.cacheTime) : undefined,
-            enabled: query.enabled ? toBindable(query.enabled) : undefined,
-            mode: typeof query.mode === 'string' ? appDom.createConst(query.mode) : undefined,
-            transform:
-              typeof query.transform === 'string' ? appDom.createConst(query.transform) : undefined,
+            connectionId: null,
+            dataSource: typeof query.query?.kind === 'string' ? query.query.kind : undefined,
+            query: createDomQueryFromPageFileQuery(query.query),
+            cacheTime: typeof query.cacheTime === 'number' ? query.cacheTime : undefined,
+            enabled: query.enabled ?? undefined,
+            mode: typeof query.mode === 'string' ? query.mode : undefined,
+            transform: typeof query.transform === 'string' ? query.transform : undefined,
             refetchInterval:
-              typeof query.refetchInterval === 'number'
-                ? appDom.createConst(query.refetchInterval)
-                : undefined,
-            transformEnabled: query.transformEnabled
-              ? appDom.createConst(query.transformEnabled)
-              : undefined,
+              typeof query.refetchInterval === 'number' ? query.refetchInterval : undefined,
+            transformEnabled: query.transformEnabled ?? undefined,
           },
           params: query.parameters?.map(
-            ({ name, value }) =>
-              [name, toBindable(value)] satisfies [string, BindableAttrValue<any>],
+            ({ name, value }) => [name, value] satisfies [string, BindableAttrValue<any>],
           ),
         });
         fragment = appDom.addNode(fragment, queryNode, pageNode, 'queries');
@@ -906,7 +804,7 @@ function extractComponentsContentFromDom(dom: appDom.AppDom): ExtractedComponent
   const components: ComponentsContent = {};
 
   for (const codeComponent of codeComponentNodes) {
-    components[codeComponent.name] = { code: codeComponent.attributes.code.value };
+    components[codeComponent.name] = { code: codeComponent.attributes.code };
     dom = appDom.removeNode(dom, codeComponent.id);
   }
 
@@ -1070,10 +968,10 @@ async function migrateLegacyProject(root: string) {
       )}  - This project was created by an older version of Toolpad. Upgrading...`,
     );
 
-    dom = migrateUp(dom);
+    dom = migrateUp(dom as v7LegacyDom.AppDom);
   }
 
-  const projectFolder = appDomToProjectFolder(dom);
+  const projectFolder = appDomToProjectFolder(dom as appDom.AppDom);
 
   await writeProjectFolder(root, projectFolder, true);
 

@@ -63,10 +63,8 @@ export default function DemoVideo() {
       <Container>
         <VideoContainer>
           <Video
-            muted
-            autoPlay
             playsInline
-            loop
+            controls
             poster="/static/toolpad/marketing/index-hero-video-poster.png"
           >
             <source src="/static/toolpad/marketing/index-hero-demo-video.mp4" type="video/mp4" />

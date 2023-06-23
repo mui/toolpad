@@ -15,9 +15,9 @@ import DocsStyledEngineProvider from 'docs/src/modules/utils/StyledEngineProvide
 import { pathnameToLanguage } from 'docs/src/modules/utils/helpers';
 import createEmotionCache from 'docs/src/createEmotionCache';
 import findActivePage from 'docs/src/modules/utils/findActivePage';
+import getProductInfoFromUrl from 'docs/src/modules/utils/getProductInfoFromUrl';
 import pages from '../data/pages';
 import toolpadPkgJson from '../../packages/toolpad/package.json';
-import getProductInfoFromUrl from 'docs/src/modules/utils/getProductInfoFromUrl';
 
 const clientSideEmotionCache = createEmotionCache();
 

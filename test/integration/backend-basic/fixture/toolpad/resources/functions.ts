@@ -8,6 +8,19 @@ export async function throws() {
   throw new Error('BOOM!');
 }
 
+export const throwsMsg = createFunction(
+  async function throwsMsg({ parameters }) {
+    throw new Error(parameters.msg);
+  },
+  {
+    parameters: {
+      msg: {
+        type: 'string',
+      },
+    },
+  },
+);
+
 export const echo = createFunction(
   async function echo({ parameters }) {
     return {

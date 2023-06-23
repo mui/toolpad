@@ -4,6 +4,7 @@ import { test, expect, Page } from '../../playwright/localTest';
 import { ToolpadRuntime } from '../../models/ToolpadRuntime';
 import { ToolpadEditor } from '../../models/ToolpadEditor';
 import { waitForMatch } from '../../utils/streams';
+import { expectBasicPageContent } from './shared';
 
 const BASIC_TESTS_PAGE_ID = '5q1xd0t';
 const EXTRACTED_TYPES_PAGE_ID = 'dt1T4rY';
@@ -42,16 +43,7 @@ test('functions basics', async ({ page }) => {
   const runtimeModel = new ToolpadRuntime(page);
   await runtimeModel.gotoPage('basic');
 
-  await expect(page.locator('text="hello, message: hello world"')).toBeVisible();
-  await expect(page.locator('text="throws, error.message: BOOM!"')).toBeVisible();
-  await expect(page.locator('text="throws, data undefined"')).toBeVisible();
-  await expect(page.locator('text="echo, parameter: bound foo parameter"')).toBeVisible();
-  await expect(page.locator('text="echo, secret: Some bar secret"')).toBeVisible();
-  await expect(page.locator('text="echo, secret not in .env: Some baz secret"')).toBeVisible();
-  await expect(page.getByText('Propagated error: KABOOM!', { exact: true })).toBeVisible();
-  await expect(
-    page.getByText('Loading: true; Propagated loading: true', { exact: true }),
-  ).toBeVisible();
+  await expectBasicPageContent(page);
 });
 
 test('function editor reload', async ({ page, localApp }) => {

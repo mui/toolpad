@@ -8,6 +8,19 @@ export async function throws() {
   throw new Error('BOOM!');
 }
 
+export const throwsMsg = createFunction(
+  async function throwsMsg({ parameters }) {
+    throw new Error(parameters.msg);
+  },
+  {
+    parameters: {
+      msg: {
+        type: 'string',
+      },
+    },
+  },
+);
+
 export const echo = createFunction(
   async function echo({ parameters }) {
     return {
@@ -85,7 +98,26 @@ export async function functionData() {
 
 export async function invalidError() {
   // Yes, I'm throwing a function here
+  // eslint-disable-next-line no-throw-literal
   throw function Hello() {};
+}
+
+
+export function syncFunction() {
+  return { message: "hello I'm synchronous" };
+}
+
+export async function bareWithParams(
+  foo: string,
+  bar: number,
+  quux: boolean,
+  fizz: 'hello' | 'world',
+  baz = { hello: 1 },
+  /** BARE_DUMMY_PARAM */
+) {
+  return {
+    message: `foo: ${foo}; typeof bar: ${typeof bar}; quux: ${quux}; baz.hello: ${baz.hello}`,
+  };
 }
 
 export function neverResolving() {

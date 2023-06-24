@@ -898,7 +898,13 @@ function RenderedNodeContent({ node, childNodeGroups, Component }: RenderedNodeC
   const nodeId = node.id;
 
   const componentConfig = Component[TOOLPAD_COMPONENT];
-  const { argTypes = {}, errorProp, loadingProp, loadingPropSource } = componentConfig;
+  const {
+    argTypes = {},
+    errorProp,
+    loadingProp,
+    loadingPropSource,
+    errorPropSource,
+  } = componentConfig;
 
   const isLayoutNode =
     appDom.isPage(node) || (appDom.isElement(node) && isPageLayoutComponent(node));
@@ -907,7 +913,8 @@ function RenderedNodeContent({ node, childNodeGroups, Component }: RenderedNodeC
   const liveBindings = scope.bindings;
 
   const boundProps: Record<string, any> = React.useMemo(() => {
-    const loadingPropSourceSet = new Set(loadingPropSource);
+    const loadingPropSourceSet = loadingPropSource ? new Set(loadingPropSource) : null;
+    const errorPropSourceSet = errorPropSource ? new Set(errorPropSource) : null;
     const hookResult: Record<string, any> = {};
 
     // error state we will propagate to the component
@@ -922,10 +929,14 @@ function RenderedNodeContent({ node, childNodeGroups, Component }: RenderedNodeC
       if (binding) {
         hookResult[propName] = binding.value;
 
-        if (binding.loading && loadingPropSourceSet.has(propName)) {
+        if (binding.loading && (!loadingPropSourceSet || loadingPropSourceSet.has(propName))) {
           loading = true;
-        } else {
-          error = error || binding.error;
+        } else if (
+          !error &&
+          binding.error &&
+          (!errorPropSourceSet || errorPropSourceSet.has(propName))
+        ) {
+          error = binding.error;
         }
       }
 
@@ -947,7 +958,7 @@ function RenderedNodeContent({ node, childNodeGroups, Component }: RenderedNodeC
     }
 
     return hookResult;
-  }, [argTypes, errorProp, liveBindings, loadingProp, loadingPropSource, nodeId]);
+  }, [argTypes, errorProp, errorPropSource, liveBindings, loadingProp, loadingPropSource, nodeId]);
 
   const boundLayoutProps: Record<string, any> = React.useMemo(() => {
     const hookResult: Record<string, any> = {};

@@ -23,7 +23,9 @@ function createFetcher(endpoint: string, type: 'query' | 'mutation'): MethodsOfG
           if (res.ok) {
             const response = (await res.json()) as RpcResponse;
             if (response.error) {
-              const toolpadError = new Error(response.error.message);
+              const toolpadError = new Error(response.error.message, {
+                cause: response.error,
+              });
               if (response.error.code) {
                 toolpadError.code = response.error.code;
               }

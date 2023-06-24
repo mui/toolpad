@@ -1,4 +1,6 @@
 import * as path from 'path';
+import * as fs from 'fs/promises';
+import { setTimeout } from 'timers/promises';
 import { fileReplace } from '../../../packages/toolpad-utils/src/fs';
 import { test, expect } from '../../playwright/localTest';
 import { ToolpadRuntime } from '../../models/ToolpadRuntime';
@@ -31,23 +33,42 @@ test.use({
   },
 });
 
-test('functions basics', async ({ page, localApp }) => {
+async function withTemporaryEdits<T = void>(
+  filePath: string,
+  doWork: () => Promise<T>,
+): Promise<T> {
+  const envOriginal = await fs.readFile(filePath, 'utf-8');
+  try {
+    return await doWork();
+  } finally {
+    await fs.writeFile(filePath, envOriginal);
+  }
+}
+
+test('functions basics', async ({ page }) => {
   const runtimeModel = new ToolpadRuntime(page);
   await runtimeModel.gotoPage('basic');
 
-  await expectBasicPageContent(page, localApp);
+  await expectBasicPageContent(page);
 });
 
 test('function editor reload', async ({ page, localApp }) => {
   const editorModel = new ToolpadEditor(page);
   await editorModel.goToPageById(BASIC_TESTS_PAGE_ID);
 
-  await expect(editorModel.appCanvas.getByText('edited hello')).toBeVisible();
-
   const functionsFilePath = path.resolve(localApp.dir, './toolpad/resources/functions.ts');
-  await fileReplace(functionsFilePath, "'edited hello'", "'edited goodbye!!!'");
+  await withTemporaryEdits(functionsFilePath, async () => {
+    await expect(editorModel.appCanvas.getByText('edited hello')).toBeVisible();
+    await fileReplace(functionsFilePath, "'edited hello'", "'edited goodbye!!!'");
+    await expect(editorModel.appCanvas.getByText('edited goodbye!!!')).toBeVisible();
+  });
 
-  await expect(editorModel.appCanvas.getByText('edited goodbye!!!')).toBeVisible();
+  const envFilePath = path.resolve(localApp.dir, './.env');
+  await withTemporaryEdits(envFilePath, async () => {
+    await expect(editorModel.appCanvas.getByText('echo, secret: Some bar secret')).toBeVisible();
+    await fileReplace(envFilePath, 'SECRET_BAR="Some bar secret"', 'SECRET_BAR="Some quux secret"');
+    await expect(editorModel.appCanvas.getByText('echo, secret: Some quux secret')).toBeVisible();
+  });
 });
 
 test('function editor parameters update', async ({ page, localApp }) => {

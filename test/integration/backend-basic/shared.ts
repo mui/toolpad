@@ -1,10 +1,6 @@
-import * as path from 'path';
-import * as fs from 'fs/promises';
-import { expect, Page, RunningLocalApp } from '../../playwright/localTest';
+import { expect, Page } from '../../playwright/localTest';
 
-import { fileReplace } from '../../../packages/toolpad-utils/src/fs';
-
-export async function expectBasicPageContent(page: Page, localApp: RunningLocalApp) {
+export async function expectBasicPageContent(page: Page) {
   await expect(page.getByText('hello, message: hello world', { exact: true })).toBeVisible();
   await expect(page.getByText('throws, error.message: BOOM!', { exact: true })).toBeVisible();
   await expect(page.getByText('throws, data had an error', { exact: true })).toBeVisible();
@@ -20,15 +16,4 @@ export async function expectBasicPageContent(page: Page, localApp: RunningLocalA
   await expect(
     page.getByText('Loading: true; Propagated loading: true', { exact: true }),
   ).toBeVisible();
-
-  const envFilePath = path.resolve(localApp.dir, './.env');
-  const envOriginal = await fs.readFile(envFilePath, 'utf-8');
-  try {
-    await fileReplace(envFilePath, 'SECRET_BAR="Some bar secret"', 'SECRET_BAR="Some quux secret"');
-
-    // TODO: figure out window focus issues in playwright https://github.com/microsoft/playwright/issues/3570
-    // await expect(page.getByText('echo, secret: Some quux secret', { exact: true })).toBeVisible();
-  } finally {
-    await fs.writeFile(envFilePath, envOriginal);
-  }
 }

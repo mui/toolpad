@@ -90,7 +90,7 @@ export default class FunctionsManager {
     this.initPromise = new Promise((resolve) => {
       this.setInitialized = resolve;
     });
-    this.devWorker = createDevWorker({ ...process.env });
+    this.devWorker = createDevWorker(process.env);
     this.extractTypesWorker = new Piscina({
       filename: path.join(__dirname, 'functionsTypesWorker.js'),
     });
@@ -224,9 +224,10 @@ export default class FunctionsManager {
   private async createRuntimeWorkerWithEnv() {
     const oldWorker = this.devWorker;
     this.devWorker = createDevWorker(process.env);
-    this.project.invalidateQueries();
 
     await oldWorker.terminate();
+
+    this.project.invalidateQueries();
   }
 
   async startDev() {

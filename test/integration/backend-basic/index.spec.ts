@@ -1,6 +1,5 @@
 import * as path from 'path';
 import * as fs from 'fs/promises';
-import { setTimeout } from 'timers/promises';
 import { fileReplace } from '../../../packages/toolpad-utils/src/fs';
 import { test, expect } from '../../playwright/localTest';
 import { ToolpadRuntime } from '../../models/ToolpadRuntime';

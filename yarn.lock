@@ -1406,24 +1406,6 @@
     prop-types "^15.8.1"
     react-is "^18.2.0"
 
-"@mui/material@5.13.5":
-  version "5.13.5"
-  resolved "https://registry.yarnpkg.com/@mui/material/-/material-5.13.5.tgz#c14f14824f3a37ae0c5ebddbc0034956bc6fec30"
-  integrity sha512-eMay+Ue1OYXOFMQA5Aau7qbAa/kWHLAyi0McsbPTWssCbGehqkF6CIdPsfVGw6tlO+xPee1hUitphHJNL3xpOQ==
-  dependencies:
-    "@babel/runtime" "^7.21.0"
-    "@mui/base" "5.0.0-beta.4"
-    "@mui/core-downloads-tracker" "^5.13.4"
-    "@mui/system" "^5.13.5"
-    "@mui/types" "^7.2.4"
-    "@mui/utils" "^5.13.1"
-    "@types/react-transition-group" "^4.4.6"
-    clsx "^1.2.1"
-    csstype "^3.1.2"
-    prop-types "^15.8.1"
-    react-is "^18.2.0"
-    react-transition-group "^4.4.5"
-
 "@mui/material@5.13.6":
   version "5.13.6"
   resolved "https://registry.yarnpkg.com/@mui/material/-/material-5.13.6.tgz#caaba1e071e394c415208404ce6964e6c14c16d6"

@@ -1,14 +1,14 @@
 import { Page } from '@playwright/test';
 
-export async function hideTab(page: Page, hide = true) {
-  await page.evaluate((hideLocal) => {
+export async function setPageHidden(page: Page, hidden = true) {
+  await page.evaluate((hiddenLocal) => {
     const hideDoc = (doc: Document) => {
       Object.defineProperty(doc, 'visibilityState', {
-        value: hideLocal ? 'hidden' : 'visible',
+        value: hiddenLocal ? 'hidden' : 'visible',
         writable: true,
       });
-      Object.defineProperty(doc, 'hidden', { value: hideLocal, writable: true });
-      doc.dispatchEvent(new Event('visibilitychange'));
+      Object.defineProperty(doc, 'hidden', { value: hiddenLocal, writable: true });
+      doc.dispatchEvent(new Event('visibilitychange', { bubbles: true }));
     };
 
     for (const frame of document.querySelectorAll('iframe')) {
@@ -18,5 +18,5 @@ export async function hideTab(page: Page, hide = true) {
     }
 
     hideDoc(document);
-  }, hide);
+  }, hidden);
 }

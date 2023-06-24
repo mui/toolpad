@@ -1,10 +1,11 @@
 import * as path from 'path';
 import { fileReplace } from '../../../packages/toolpad-utils/src/fs';
-import { test, expect, Page } from '../../playwright/localTest';
+import { test, expect } from '../../playwright/localTest';
 import { ToolpadRuntime } from '../../models/ToolpadRuntime';
 import { ToolpadEditor } from '../../models/ToolpadEditor';
 import { waitForMatch } from '../../utils/streams';
 import { expectBasicPageContent } from './shared';
+import { setPageHidden } from '../../utils/page';
 
 const BASIC_TESTS_PAGE_ID = '5q1xd0t';
 const EXTRACTED_TYPES_PAGE_ID = 'dt1T4rY';
@@ -29,15 +30,6 @@ test.use({
     },
   },
 });
-
-// Workaround for missing page blur/focus controls in playwright
-// See https://github.com/microsoft/playwright/issues/3570#issuecomment-689407637
-async function setReactQueryFocused(page: Page, focus: boolean) {
-  await page.evaluate((focusValue) => {
-    // eslint-disable-next-line no-underscore-dangle
-    (window as any).__TOOLPAD_PLAYWRIGHT_TOOLS__.focusManager.setFocused(focusValue);
-  }, focus);
-}
 
 test('functions basics', async ({ page, localApp }) => {
   const runtimeModel = new ToolpadRuntime(page);
@@ -69,8 +61,7 @@ test('function editor parameters update', async ({ page, localApp }) => {
   await expect(queryEditor.getByLabel('foo', { exact: true })).toBeVisible();
   await expect(queryEditor.getByLabel('bar', { exact: true })).not.toBeVisible();
 
-  // TODO: figure out window focus issues in playwright https://github.com/microsoft/playwright/issues/3570
-  await setReactQueryFocused(page, false); // simulate page hidden
+  await setPageHidden(page, true); // simulate page hidden
 
   const functionsFilePath = path.resolve(localApp.dir, './toolpad/resources/functions.ts');
   await Promise.all([
@@ -78,7 +69,7 @@ test('function editor parameters update', async ({ page, localApp }) => {
     waitForMatch(localApp.stdout, /built functions\.ts/),
   ]);
 
-  await setReactQueryFocused(page, true); // simulate page restored
+  await setPageHidden(page, false); // simulate page restored
 
   await expect(queryEditor.getByLabel('bar', { exact: true })).toBeVisible();
 });
@@ -161,7 +152,7 @@ test('function editor extracted parameters', async ({ page, localApp }) => {
 
   await expect(queryEditor.getByRole('textbox', { name: 'buzz', exact: true })).not.toBeVisible();
 
-  await setReactQueryFocused(page, false); // simulate page hidden
+  await setPageHidden(page, true); // simulate page hidden
 
   const functionsFilePath = path.resolve(localApp.dir, './toolpad/resources/functions.ts');
   await Promise.all([
@@ -169,7 +160,7 @@ test('function editor extracted parameters', async ({ page, localApp }) => {
     waitForMatch(localApp.stdout, /built functions\.ts/),
   ]);
 
-  await setReactQueryFocused(page, true); // simulate page restored
+  await setPageHidden(page, false); // simulate page restored
 
   await expect(queryEditor.getByRole('textbox', { name: 'buzz', exact: true })).toBeVisible();
 });

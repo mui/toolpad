@@ -100,7 +100,7 @@
     "monaco-editor": "0.39.0",
     "mysql2": "3.3.5",
     "nanoid": "4.0.2",
-    "next": "13.4.6",
+    "next": "13.4.7",
     "node-fetch": "2.6.11",
     "node-fetch-har": "1.0.1",
     "open-editor": "4.0.0",

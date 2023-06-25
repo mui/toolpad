@@ -41,7 +41,7 @@
   "dependencies": {
     "@mui/icons-material": "5.11.16",
     "@mui/lab": "5.0.0-alpha.134",
-    "@mui/material": "5.13.5",
+    "@mui/material": "5.13.6",
     "@mui/toolpad-core": "0.1.17",
     "@mui/toolpad-utils": "0.1.17",
     "@mui/x-data-grid-pro": "6.9.0",

@@ -58,7 +58,7 @@
     "yaml-diff-patch": "2.0.0"
   },
   "devDependencies": {
-    "@types/react-is": "18.2.0"
+    "@types/react-is": "18.2.1"
   },
   "gitHead": "c8b22003698070cd85b6fc336c05f5645f45da24"
 }

@@ -42,6 +42,9 @@ function createBrowserRuntime(): JsRuntime {
   }
 
   return {
+    getEnv() {
+      throw new Error(`Env variables are not supported in this context`);
+    },
     evaluateExpression,
   };
 }

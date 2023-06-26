@@ -60,6 +60,7 @@ interface IToolpadProject {
   getOutputFolder(): string;
   openCodeEditor(path: string): Promise<void>;
   envManager: EnvManager;
+  invalidateQueries(): void;
 }
 
 export default class FunctionsManager {
@@ -89,7 +90,7 @@ export default class FunctionsManager {
     this.initPromise = new Promise((resolve) => {
       this.setInitialized = resolve;
     });
-    this.devWorker = createDevWorker({ ...process.env });
+    this.devWorker = createDevWorker(process.env);
     this.extractTypesWorker = new Piscina({
       filename: path.join(__dirname, 'functionsTypesWorker.js'),
     });
@@ -172,7 +173,7 @@ export default class FunctionsManager {
 
       this.buildMetafile = args.metafile;
 
-      this.project.events.emit('functionsBuildEnd', {});
+      this.project.invalidateQueries();
 
       this.setInitialized();
     };
@@ -221,11 +222,12 @@ export default class FunctionsManager {
   }
 
   private async createRuntimeWorkerWithEnv() {
-    const env = await this.project.envManager.getValues();
-
     const oldWorker = this.devWorker;
-    this.devWorker = createDevWorker({ ...process.env, ...env });
+    this.devWorker = createDevWorker(process.env);
+
     await oldWorker.terminate();
+
+    this.project.invalidateQueries();
   }
 
   async startDev() {

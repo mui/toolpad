@@ -16,7 +16,7 @@ const useCases = {
       wip: false,
       imageUrl: '/static/toolpad/marketing/index-monitoring-dashboard.svg',
       description:
-        'Provide the stakeholders with simple apps to manage their daily operations. You can quickly build an app on Toolpad by calling APIs or writing custom functions. Your app remains secure as the code never leaves your network, and you can securely deploy the app to any service you choose.',
+        'Provide the stakeholders with simple apps to manage their daily operations. You can quickly build an app on Toolpad by calling APIs or writing custom functions. Your app remains secure as the code never leaves your network, and you can securely deploy it to any service you choose.',
       action: {
         href: ROUTES.toolpadUtilityAppExample,
         label: 'View example',

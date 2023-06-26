@@ -94,10 +94,7 @@ export default function ComponentEditor({ className }: ComponentEditorProps) {
             value={appDom.fromConstPropValue(theme.theme?.['palette.mode']) || 'light'}
             onChange={(event, newValue) => {
               domApi.update((draft) =>
-                appDom.setNodeNamespacedProp(draft, theme, 'theme', 'palette.mode', {
-                  type: 'const',
-                  value: newValue,
-                }),
+                appDom.setNodeNamespacedProp(draft, theme, 'theme', 'palette.mode', newValue),
               );
             }}
             aria-label="Mode"
@@ -116,10 +113,13 @@ export default function ComponentEditor({ className }: ComponentEditorProps) {
             value={appDom.fromConstPropValue(theme.theme?.['palette.primary.main']) || ''}
             onChange={(newValue) => {
               domApi.update((draft) =>
-                appDom.setNodeNamespacedProp(draft, theme, 'theme', 'palette.primary.main', {
-                  type: 'const',
-                  value: newValue,
-                }),
+                appDom.setNodeNamespacedProp(
+                  draft,
+                  theme,
+                  'theme',
+                  'palette.primary.main',
+                  newValue,
+                ),
               );
             }}
           />
@@ -128,10 +128,13 @@ export default function ComponentEditor({ className }: ComponentEditorProps) {
             value={appDom.fromConstPropValue(theme.theme?.['palette.secondary.main']) || ''}
             onChange={(newValue) => {
               domApi.update((draft) =>
-                appDom.setNodeNamespacedProp(draft, theme, 'theme', 'palette.secondary.main', {
-                  type: 'const',
-                  value: newValue,
-                }),
+                appDom.setNodeNamespacedProp(
+                  draft,
+                  theme,
+                  'theme',
+                  'palette.secondary.main',
+                  newValue,
+                ),
               );
             }}
           />

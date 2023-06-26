@@ -4,15 +4,15 @@
 
 ## Import
 
-```tsx
-import { createFunction } from '@mui/toolpad/server';
+```jsx
+import { createComponent } from '@mui/toolpad/server';
 ```
 
 ## Description
 
 By convention, Toolpad custom components are placed inside of the `toolpad/components/` folder. Each file in this folder describes one custom Toolpad component. As soon as the file exports a valid custom component in its default export it will be available in Toolpad to be used in UI. The `createComponent` function attaches extra information to React components to signal to Toolpad how they can be used and composed together.
 
-```tsx
+```jsx
 export default createComponent(MyComponent, config);
 ```
 
@@ -38,6 +38,7 @@ Describes the custom component.
 | :--------------------- | :------------------------------------- | :------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `helperText?`          | `string`                               | A short explanatory text that'll be shown in the editor UI when this component is referenced. May contain Markdown                                       |
 | `errorProp?`           | `string`                               | Designates a property as "the error property". If Toolpad detects an error on any of the inputs, it will forward it to this property.                    |
+| `errorPropSource?`     | `string[]`                             | Configures which properties result in propagating error state to `errorProp`.                                                                            |
 | `loadingProp?`         | `string`                               | Designates a property as "the loading property". If Toolpad detects any of the inputs is still loading it will set this property to `true`               |
 | `loadingPropSource?`   | `string[]`                             | Configures which properties result in propagating loading state to `loadingProp`.                                                                        |
 | `layoutDirection?`     | `'vertical' \| 'horizontal' \| 'both'` | Enables controlling the alignment of the component container box.                                                                                        |
@@ -67,4 +68,6 @@ Argument types describe the type and constraints of custom component properties.
 
 ## Usage
 
-See [Custom components](/toolpad/building-ui/custom-components/)
+:::info
+See [custom components](/toolpad/concepts/custom-components/)
+:::

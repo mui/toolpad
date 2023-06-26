@@ -20,7 +20,7 @@ export async function getConnectionParams<P = unknown>(
     connectionId as NodeId,
     'connection',
   ) as appDom.ConnectionNode<P>;
-  return node.attributes.params.value;
+  return node.attributes.params.$$secret;
 }
 
 export async function setConnectionParams<P>(connectionId: NodeId, params: P): Promise<void> {
@@ -42,19 +42,20 @@ export async function execQuery<P, Q>(
   dataNode: appDom.QueryNode<Q>,
   params: Q,
 ): Promise<ExecFetchResult<any>> {
-  const dataSource: ServerDataSource<P, Q, any> | undefined =
-    dataNode.attributes.dataSource && serverDataSources[dataNode.attributes.dataSource.value];
+  const dataSource: ServerDataSource<P, Q, any> | undefined = dataNode.attributes.dataSource
+    ? serverDataSources[dataNode.attributes.dataSource]
+    : undefined;
   if (!dataSource) {
     throw new Error(
-      `Unknown datasource "${dataNode.attributes.dataSource?.value}" for query "${dataNode.id}"`,
+      `Unknown datasource "${dataNode.attributes.dataSource}" for query "${dataNode.id}"`,
     );
   }
 
-  let result = await dataSource.exec(null, dataNode.attributes.query.value, params);
+  let result = await dataSource.exec(null, dataNode.attributes.query, params);
 
   if (appDom.isQuery(dataNode)) {
-    const transformEnabled = dataNode.attributes.transformEnabled?.value;
-    const transform = dataNode.attributes.transform?.value;
+    const transformEnabled = dataNode.attributes.transformEnabled;
+    const transform = dataNode.attributes.transform;
     if (transformEnabled && transform) {
       const jsServerRuntime = await createServerJsRuntime();
       result = {

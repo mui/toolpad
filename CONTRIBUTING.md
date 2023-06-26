@@ -11,13 +11,70 @@ _If you're looking into contributing to the docs, follow the [instructions](#bui
 - git
 - node.js
 
-### Steps
+### Running apps inside the monorepo (recommended)
+
+This will use the local version of Toolpad as built in the monorepo. This is recommended when your app is in a folder inside of the monorepo. You may even decide to temporarily move your app into the monorepo.
 
 1. Install dependencies:
 
    ```sh
    yarn install
    ```
+
+1. Run the build in watch mode
+
+   ```sh
+   yarn dev
+   ```
+
+1. Run Toolpad
+
+   ```sh
+   yarn toolpad dev test/integration/backend-basic/fixture --dev
+   ```
+
+   **Note:** It's important to note the difference between `yarn toolpad dev` and the `--dev` parameter. The first instruction runs Toolpad in dev mode. The `--dev` parameter is one for contributors only and runs the underlying next.js app that powers the editor in dev mode. The latter makes sure the development build of React is being used and the editor frontend application runs in watch mode.
+
+If your application has dependencies other than `@mui/toolpad`, you have to temporarily add it to the workspace:
+
+1. update `package.json` (in the workspace root, not in your app), add your app folder to `workspaces.packages`. e.g. for `examples/qr-generator` which has a dependency on `qrcode` this would be:
+
+   ```json
+   "workspaces": {
+     "packages": [
+       "packages/*",
+       "docs",
+       "examples/qr-generator"
+     ]
+   },
+   ```
+
+   You may also temporarily remove/rename the `dev`/`build` commands in `examples/qr-generator/package.json` to avoid them getting picked up automatically by `lerna`.
+
+1. Run
+
+   ```sh
+   yarn install
+   ```
+
+1. Make sure to start the build in watch mode again and the run the app with
+
+   ```sh
+   yarn toolpad dev examples/qr-generator --dev
+   ```
+
+### Linking Toolpad in a folder on your system (advanced)
+
+<details>
+<summary>Expand instructions</summary>
+
+In some cases you may want to link local toolpad into a project on your laptop.
+
+1. Install dependencies:
+
+```sh
+yarn install
+```
 
 1. Run the build in watch mode
 
@@ -73,6 +130,26 @@ _If you're looking into contributing to the docs, follow the [instructions](#bui
 
    ```sh
    yarn dev
+   ```
+
+</details>
+
+## Running integration tests
+
+The playwright tests can be run in one of two modes:
+
+1. Build the production target, then run the integration tests in production mode:
+
+   ```sh
+   yarn release:build
+   yarn test:integration --project chromium
+   ```
+
+2. Toolpad in dev watchmode and run the integration tests in dev mode with the `TOOLPAD_NEXT_DEV` environment variable (slower)
+
+   ```sh
+   yarn dev
+   TOOLPAD_NEXT_DEV=1 yarn test:integration --project chromium
    ```
 
 ## Building and running the documentation
@@ -140,6 +217,34 @@ _If you're looking into contributing to the docs, follow the [instructions](#bui
   ```
 
 - Use the `--ui` flag to run the tests interactively
+
+## Using CodeSandbox CI
+
+Each pull request is built on [CodeSandbox CI](https://codesandbox.io/docs/learn/sandboxes/ci). As a result of that we have a published Toolpad package for ever pull request. To use the package from the pull request, take the following steps:
+
+1. In the GitHub PR checks, locate the ci/codesandbox check and make sure it has successfully finished building. Click on "details" to open the CodeSandbox CI user interface.
+
+2. In the codesandbox UI, on the right panel, locate and expand the "Packages (6)" section.
+
+3. Right click the link named `@mui/toolpad` and copy the address
+
+   ![Copy CodeSandbox CI package link](contributing/codesandbox-ci-package-link.png)
+
+4. In your `package.json`, for the `@mui/toolpad` dependency, replace the version with aforementioned link. e.g.
+
+   ```json
+   "dependencies": {
+      "@mui/toolpad": "https://pkg.csb.dev/mui/mui-toolpad/commit/<commit>/@mui/toolpad"
+   }
+   ```
+
+5. Run
+
+   ```sh
+   yarn --force
+   ```
+
+You'll now be able to explore your project with the Toolpad version from the GitHub PR.
 
 ## Sending a pull request
 

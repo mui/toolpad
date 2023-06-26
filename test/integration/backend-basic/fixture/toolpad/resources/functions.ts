@@ -8,6 +8,19 @@ export async function throws() {
   throw new Error('BOOM!');
 }
 
+export const throwsMsg = createFunction(
+  async function throwsMsg({ parameters }) {
+    throw new Error(parameters.msg);
+  },
+  {
+    parameters: {
+      msg: {
+        type: 'string',
+      },
+    },
+  },
+);
+
 export const echo = createFunction(
   async function echo({ parameters }) {
     return {
@@ -53,3 +66,60 @@ export const manualQueryWithParams = createFunction(
     },
   },
 );
+
+let x = 1;
+
+export async function increment() {
+  x += 1;
+}
+
+export async function getGlobal() {
+  return x;
+}
+
+interface Circular {
+  a?: Circular;
+}
+
+export async function circularData() {
+  const a: Circular = {};
+  a.a = a;
+  return a;
+}
+
+export async function nonCircularData() {
+  const a = { b: 'hello' };
+  return { a1: a, a2: a };
+}
+
+export async function functionData() {
+  return { a() {} };
+}
+
+export async function invalidError() {
+  // Yes, I'm throwing a function here
+  // eslint-disable-next-line no-throw-literal
+  throw function Hello() {};
+}
+
+
+export function syncFunction() {
+  return { message: "hello I'm synchronous" };
+}
+
+export async function bareWithParams(
+  foo: string,
+  bar: number,
+  quux: boolean,
+  fizz: 'hello' | 'world',
+  baz = { hello: 1 },
+  /** BARE_DUMMY_PARAM */
+) {
+  return {
+    message: `foo: ${foo}; typeof bar: ${typeof bar}; quux: ${quux}; baz.hello: ${baz.hello}`,
+  };
+}
+
+export function neverResolving() {
+  return new Promise(() => {});
+}

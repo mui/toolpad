@@ -3,7 +3,7 @@ import NoSsr from '@mui/material/NoSsr';
 import Head from 'docs/src/modules/components/Head';
 import CssBaseline from '@mui/material/CssBaseline';
 import Divider from '@mui/material/Divider';
-import BrandingProvider from 'docs/src/BrandingProvider';
+import BrandingCssVarsProvider from 'docs/src/BrandingCssVarsProvider';
 import AppHeader from 'docs/src/layouts/AppHeader';
 import AppFooter from 'docs/src/layouts/AppFooter';
 import AppHeaderBanner from 'docs/src/components/banner/AppHeaderBanner';
@@ -15,10 +15,17 @@ import CardGrid from '../../src/components/landing/CardGrid';
 import Banner from '../../src/components/landing/Banner';
 import Pricing from '../../src/components/landing/PricingTable';
 import Marquee from '../../src/components/landing/Marquee';
-import features from '../../src/content/features';
-import { action, category, title, description, href, label } from '../../src/content/upvote';
-import useCases from '../../src/content/useCases';
-import marquee from '../../src/content/marquee';
+import features from '../../data/toolpad/landing/features';
+import {
+  action,
+  category,
+  title,
+  description,
+  href,
+  label,
+} from '../../data/toolpad/landing/upvote';
+import useCases from '../../data/toolpad/landing/useCases';
+import marquee from '../../data/toolpad/landing/marquee';
 import {
   Headline,
   plans,
@@ -26,11 +33,11 @@ import {
   rowHeaders,
   communityData,
   commercialData,
-} from '../../src/content/pricing';
+} from '../../data/toolpad/landing/pricing';
 
 export default function Home() {
   return (
-    <BrandingProvider>
+    <BrandingCssVarsProvider>
       <Head
         title="MUI Toolpad: Low-code, admin builder"
         description="Build apps with MUI components, connect to data sources, APIs and build your internal tools 10x faster. Open-source and powered by MUI."
@@ -67,6 +74,6 @@ export default function Home() {
         <Marquee content={marquee} />
       </main>
       <AppFooter />
-    </BrandingProvider>
+    </BrandingCssVarsProvider>
   );
 }

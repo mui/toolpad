@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { BindableAttrEntries, CreateFunctionConfig } from '@mui/toolpad-core';
+import { BindableAttrEntries } from '@mui/toolpad-core';
 import { Autocomplete, Button, Stack, TextField, Typography } from '@mui/material';
 import { useBrowserJsRuntime } from '@mui/toolpad-core/jsBrowserRuntime';
 import { errorFrom } from '@mui/toolpad-utils/errors';
@@ -41,10 +41,22 @@ function QueryEditor({
     { retry: false },
   );
 
-  const functionName: string | undefined = input.attributes.query.value.function;
-  const functionDefs: Record<string, CreateFunctionConfig<any>> = introspection.data?.functions ??
-  {};
-  const parameterDefs = (functionName ? functionDefs?.[functionName]?.parameters : null) || {};
+  const functionName: string | undefined = input.attributes.query.function;
+
+  const allOptions = React.useMemo(() => {
+    return (introspection.data?.files ?? []).flatMap((file) => {
+      return file.handlers.map((handler) => ({
+        ...handler,
+        file: file.name,
+      }));
+    });
+  }, [introspection.data?.files]);
+
+  const selectedOption = React.useMemo(() => {
+    return allOptions.find((handler) => handler.name === functionName);
+  }, [allOptions, functionName]);
+
+  const parameterDefs = Object.fromEntries(selectedOption?.parameters || []);
 
   const paramsEntries = input.params?.filter(([key]) => !!parameterDefs[key]) || EMPTY_PARAMS;
 
@@ -65,8 +77,9 @@ function QueryEditor({
 
   const fetchPrivate = useFetchPrivate<LocalPrivateQuery, FetchResult>();
   const fetchServerPreview = React.useCallback(
-    (query: LocalQuery, params: Record<string, string>) =>
-      fetchPrivate({ kind: 'debugExec', query, params }),
+    (query: LocalQuery, params: Record<string, string>) => {
+      return fetchPrivate({ kind: 'debugExec', query, params });
+    },
     [fetchPrivate],
   );
 
@@ -85,7 +98,7 @@ function QueryEditor({
     isLoading: previewIsLoading,
   } = useQueryPreview(
     fetchServerPreview,
-    input.attributes.query.value,
+    input.attributes.query,
     previewParams as Record<string, string>,
   );
 
@@ -99,25 +112,21 @@ function QueryEditor({
     ? errorFrom(introspection.error).message
     : '';
 
-  const methodSelectOptions: string[] = React.useMemo(
-    () => Object.keys(introspection.data?.functions ?? {}),
-    [introspection.data?.functions],
-  );
-
   return (
     <SplitPane split="vertical" size="50%" allowResize>
-      <QueryInputPanel onRunPreview={handleRunPreview}>
+      <QueryInputPanel previewDisabled={!selectedOption} onRunPreview={handleRunPreview}>
         <Stack gap={2} sx={{ px: 3, pt: 1 }}>
           <Stack gap={2} direction="row">
             <Autocomplete
-              value={functionName ?? ''}
+              value={selectedOption || null}
               onChange={(event, newValue) => {
-                setInput((existing) =>
-                  appDom.setQueryProp(existing, 'function', newValue ?? undefined),
-                );
+                setInput((draft) => {
+                  return appDom.setQueryProp(draft, 'function', newValue?.name ?? undefined);
+                });
               }}
               loading={introspection.isLoading}
-              options={methodSelectOptions}
+              getOptionLabel={(option) => option.name}
+              options={allOptions}
               selectOnFocus
               clearOnBlur
               handleHomeEndKeys

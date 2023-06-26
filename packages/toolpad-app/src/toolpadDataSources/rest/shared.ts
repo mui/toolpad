@@ -56,9 +56,8 @@ function resolveBindable(
   jsRuntime: JsRuntime,
   bindable: BindableAttrValue<string>,
   scope: Record<string, unknown>,
-  env?: Record<string, string>,
 ): any {
-  const { value, error } = evaluateBindable(jsRuntime, bindable, scope, env);
+  const { value, error } = evaluateBindable(jsRuntime, bindable, scope);
   if (error) {
     throw error;
   }
@@ -69,19 +68,17 @@ function resolveBindableEntries(
   jsRuntime: JsRuntime,
   entries: BindableAttrEntries,
   scope: Record<string, unknown>,
-  env?: Record<string, string>,
 ): [string, any][] {
-  return entries.map(([key, value]) => [key, resolveBindable(jsRuntime, value, scope, env)]);
+  return entries.map(([key, value]) => [key, resolveBindable(jsRuntime, value, scope)]);
 }
 
 function resolveBindables<P>(
   jsRuntime: JsRuntime,
   obj: BindableAttrValues<P>,
   scope: Record<string, unknown>,
-  env?: Record<string, string>,
 ): P {
   return Object.fromEntries(
-    resolveBindableEntries(jsRuntime, Object.entries(obj) as BindableAttrEntries, scope, env),
+    resolveBindableEntries(jsRuntime, Object.entries(obj) as BindableAttrEntries, scope),
   ) as P;
 }
 
@@ -129,11 +126,10 @@ function resolveUrlEncodedBody(
   jsRuntime: JsRuntime,
   body: UrlEncodedBody,
   scope: Record<string, unknown>,
-  env?: Record<string, string>,
 ): ResolveUrlEncodedBodyBody {
   return {
     kind: 'urlEncoded',
-    content: resolveBindableEntries(jsRuntime, body.content, scope, env),
+    content: resolveBindableEntries(jsRuntime, body.content, scope),
   };
 }
 
@@ -161,10 +157,7 @@ async function readData(res: Response, fetchQuery: FetchQuery): Promise<any> {
 export function getDefaultUrl(connection?: RestConnectionParams | null): BindableAttrValue<string> {
   const baseUrl = connection?.baseUrl;
 
-  return {
-    type: 'const',
-    value: baseUrl ? '' : MOVIES_API_DEMO_URL,
-  };
+  return baseUrl ? '' : MOVIES_API_DEMO_URL;
 }
 
 interface ExecBaseOptions {
@@ -177,7 +170,6 @@ export async function execfetch(
   fetchQuery: FetchQuery,
   params: Record<string, string>,
   { connection, jsRuntime, fetchImpl }: ExecBaseOptions,
-  env: Record<string, string> = {},
 ): Promise<FetchResult> {
   const queryScope = {
     // @TODO: remove deprecated query after v1
@@ -187,19 +179,13 @@ export async function execfetch(
 
   const urlvalue = fetchQuery.url || getDefaultUrl(connection);
 
-  const resolvedUrl = resolveBindable(jsRuntime, urlvalue, queryScope, env);
+  const resolvedUrl = resolveBindable(jsRuntime, urlvalue, queryScope);
   const resolvedSearchParams = resolveBindableEntries(
     jsRuntime,
     fetchQuery.searchParams || [],
     queryScope,
-    env,
   );
-  const resolvedHeaders = resolveBindableEntries(
-    jsRuntime,
-    fetchQuery.headers || [],
-    queryScope,
-    env,
-  );
+  const resolvedHeaders = resolveBindableEntries(jsRuntime, fetchQuery.headers || [], queryScope);
 
   const queryUrl = parseQueryUrl(resolvedUrl, connection?.baseUrl);
   resolvedSearchParams.forEach(([key, value]) => queryUrl.searchParams.append(key, value));

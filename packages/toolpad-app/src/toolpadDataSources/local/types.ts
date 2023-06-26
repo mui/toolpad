@@ -1,8 +1,12 @@
 import { BindableAttrValue, ExecFetchResult, PrimitiveValueType } from '@mui/toolpad-core';
+import type { IntrospectionResult } from '../../server/functionsTypesWorker';
 
 export interface LocalConnectionParams {}
 
 export interface LocalQuery {
+  /**
+   * name of the handler to execute.
+   */
   function?: string;
 }
 
@@ -34,6 +38,4 @@ export interface IntrospectedFunction {
   parameters: Record<string, PrimitiveValueType>;
 }
 
-export type IntrospectionResult = {
-  functions: Record<string, IntrospectedFunction>;
-};
+export type { IntrospectionResult };

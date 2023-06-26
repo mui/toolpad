@@ -3,7 +3,7 @@ import NoSsr from '@mui/material/NoSsr';
 import Head from 'docs/src/modules/components/Head';
 import CssBaseline from '@mui/material/CssBaseline';
 import Divider from '@mui/material/Divider';
-import BrandingProvider from 'docs/src/BrandingProvider';
+import BrandingCssVarsProvider from 'docs/src/BrandingCssVarsProvider';
 import AppHeader from 'docs/src/layouts/AppHeader';
 import AppFooter from 'docs/src/layouts/AppFooter';
 import AppHeaderBanner from 'docs/src/components/banner/AppHeaderBanner';
@@ -37,7 +37,7 @@ import {
 
 export default function Home() {
   return (
-    <BrandingProvider>
+    <BrandingCssVarsProvider>
       <Head
         title="MUI Toolpad: Low-code, admin builder"
         description="Build apps with MUI components, connect to data sources, APIs and build your internal tools 10x faster. Open-source and powered by MUI."
@@ -74,6 +74,6 @@ export default function Home() {
         <Marquee content={marquee} />
       </main>
       <AppFooter />
-    </BrandingProvider>
+    </BrandingCssVarsProvider>
   );
 }

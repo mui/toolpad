@@ -12,11 +12,13 @@ jobs:
       - uses: actions/github-script@v6
         with:
           script: |
-            const labels = await github.rest.issues.listLabelsOnIssue({
+            const { data: labels } = await github.rest.issues.listLabelsOnIssue({
               issue_number: context.issue.number,
               owner: context.repo.owner,
               repo: context.repo.repo,
             });
+
+            console.log(JSON.stringify(labels, null, 2))
 
             if (labels.length <= 0) {
               await github.rest.issues.addLabels({

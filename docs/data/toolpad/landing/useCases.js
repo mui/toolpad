@@ -16,7 +16,7 @@ const useCases = {
       wip: false,
       imageUrl: '/static/toolpad/marketing/index-monitoring-dashboard.svg',
       description:
-        'Provide the stakeholders with simple apps to manage their daily operations. An app can be quickly built on Toolpad by importing external packages or by calling a REST API. Your code never leaves your network and the app can be securely deployed to any service of your choice.',
+        'Provide the stakeholders with simple apps to manage their daily operations. You can quickly build an app on Toolpad by calling APIs or writing custom functions. Your app remains secure as the code never leaves your network, and you can securely deploy the app to any service you choose.',
       action: {
         href: ROUTES.toolpadUtilityAppExample,
         label: 'View example',
@@ -27,7 +27,7 @@ const useCases = {
       wip: false,
       imageUrl: '/static/toolpad/marketing/index-admin-panel.svg',
       description:
-        'Enable your teams to quickly view and manage customer orders, queries, and refunds by creating apps powered by native Toolpad integrations and third party APIs from providers like Stripe, Twilio, etc. Toolpad allows end users to create, read, update or delete records.',
+        'Enable your teams to quickly view and manage customer orders, queries, and refunds by creating admin apps that gather data from third-party APIs providers like Stripe, Twilio, Zendesk, etc. Toolpad allows end users to create, read, update, or delete records.',
       action: {
         href: ROUTES.toolpadUtilityAppExample,
         label: 'View example',
@@ -38,7 +38,7 @@ const useCases = {
       wip: false,
       imageUrl: '/static/toolpad/marketing/index-custom-cms.svg',
       description:
-        'Build customizable BI dashboards to view and analyze various data points, monitor KPIs, track business goals, and identify trends and opportunities. Toolpad allows you to combine data from multiple sources and bind it the pro-code way by writing JavaScript anywhere.',
+        'Build BI dashboards to slice and dice any metric across various dimensions. Further, use them to monitor KPIs, track business goals, and identify trends and opportunities. Toolpad allows you to combine data from multiple sources and bind it by writing JavaScript anywhere.',
       action: {
         href: ROUTES.toolpadUtilityAppExample,
         label: 'View example',

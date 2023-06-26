@@ -11,4 +11,4 @@ This app demonstrates following capabilities of Toolpad:
 3. How to use pre built components like date picker.
 4. How to transform data.
 
-[Check out the source code](https://github.com/mui/mui-toolpad/tree/master/examples/npm-statsya)
+[Check out the source code](https://github.com/mui/mui-toolpad/tree/master/examples/npm-stats)

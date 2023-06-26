@@ -29,7 +29,7 @@ const useCases = {
       description:
         'Enable your teams to quickly view and manage customer orders, queries, and refunds by creating admin apps that gather data from third-party APIs providers like Stripe, Twilio, Zendesk, etc. Toolpad allows end users to create, read, update, or delete records.',
       action: {
-        href: ROUTES.toolpadUtilityAppExample,
+        href: ROUTES.toolpadAdminExample,
         label: 'View example',
       },
     },
@@ -40,7 +40,7 @@ const useCases = {
       description:
         'Build BI dashboards to slice and dice any metric across various dimensions. Further, use them to monitor KPIs, track business goals, and identify trends and opportunities. Toolpad allows you to combine data from multiple sources and bind it by writing JavaScript anywhere.',
       action: {
-        href: ROUTES.toolpadUtilityAppExample,
+        href: ROUTES.toolpadBIExample,
         label: 'View example',
       },
     },

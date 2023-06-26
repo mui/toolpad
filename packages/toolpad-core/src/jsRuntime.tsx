@@ -1,9 +1,9 @@
 import {
   BindableAttrValue,
   BindingEvaluationResult,
-  EnvAttrValue,
   JsExpressionAttrValue,
   JsRuntime,
+  EnvAttrValue,
 } from './types.js';
 
 export const TOOLPAD_LOADING_MARKER = '__TOOLPAD_LOADING_MARKER__';
@@ -18,7 +18,7 @@ export function evaluateBindable<V>(
   }
 
   if ((bindable as EnvAttrValue)?.$$env) {
-    return { value: process.env[(bindable as EnvAttrValue).$$env] };
+    return { value: ctx.getEnv()[(bindable as EnvAttrValue).$$env] };
   }
 
   if (bindable) {

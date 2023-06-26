@@ -1,0 +1,14 @@
+{
+  "name": "npm-stats",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "toolpad dev",
+    "build": "toolpad build",
+    "start": "toolpad start"
+  },
+  "dependencies": {
+    "@mui/toolpad": "0.1.17",
+    "recharts": "2.7.2"
+  }
+}

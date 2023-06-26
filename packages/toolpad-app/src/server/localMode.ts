@@ -8,7 +8,7 @@ import { BindableAttrValue, NodeId, PropBindableAttrValue } from '@mui/toolpad-c
 import { fromZodError } from 'zod-validation-error';
 import { glob } from 'glob';
 import * as chokidar from 'chokidar';
-import { debounce } from 'lodash-es';
+import { debounce, throttle } from 'lodash-es';
 import { Emitter } from '@mui/toolpad-utils/events';
 import { errorFrom } from '@mui/toolpad-utils/errors';
 import { filterValues, hasOwnProperty, mapValues } from '@mui/toolpad-utils/collections';
@@ -1060,6 +1060,8 @@ class ToolpadProject {
 
   functionsManager: FunctionsManager;
 
+  invalidateQueries: () => void;
+
   constructor(root: string, options: Partial<ToolpadProjectOptions>) {
     this.root = root;
     this.options = {
@@ -1071,6 +1073,16 @@ class ToolpadProject {
     this.functionsManager = new FunctionsManager(this);
 
     this.initWatcher();
+
+    this.invalidateQueries = throttle(
+      () => {
+        this.events.emit('queriesInvalidated', {});
+      },
+      250,
+      {
+        leading: false,
+      },
+    );
   }
 
   private initWatcher() {

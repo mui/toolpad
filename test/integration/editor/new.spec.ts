@@ -76,3 +76,18 @@ test('can create/delete page', async ({ page, localApp }) => {
 
   await expect.poll(async () => folderExists(pageFolder)).toBe(false);
 });
+
+test('can rename page', async ({ page, localApp }) => {
+  const editorModel = new ToolpadEditor(page);
+
+  await editorModel.goto();
+
+  await editorModel.createPage('someOtherPage');
+
+  const pageFolder = path.resolve(localApp.dir, './toolpad/pages/someOtherPage');
+  const valueInput = await page.getByLabel('Node name')
+  await valueInput.click();
+  await page.keyboard.type('test1');
+  await valueInput.blur();
+  await expect.poll(async () => folderExists(pageFolder)).toBe(false);
+})

@@ -1,16 +1,7 @@
 import * as React from 'react';
 import { createComponent } from '@mui/toolpad/browser';
-import {
-  ResponsiveContainer,
-  LineChart,
-  Line,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  Legend,
-} from 'recharts';
 import CircularProgress from '@mui/material/CircularProgress';
+import { LineChart as MuiLineChart } from '@mui/x-charts/LineChart';
 
 export interface LineChartProps {
   data: object[];
@@ -18,19 +9,34 @@ export interface LineChartProps {
 }
 
 function ChartExport({ loading, data }: LineChartProps) {
+  const rootRef = React.useRef<HTMLDivElement>(null);
+  const [size, setSize] = React.useState({ clientWidth: 0, clientHeight: 0 });
+
+  React.useEffect(() => {
+    const element = rootRef.current;
+
+    if (!element) {
+      return () => {};
+    }
+
+    const observer = new ResizeObserver(() => {
+      const { clientWidth, clientHeight } = element;
+      setSize({ clientWidth, clientHeight });
+    });
+
+    observer.observe(element);
+    return () => {
+      // Cleanup the observer by unobserving all elements
+      observer.disconnect();
+    };
+  }, []);
+
+  const xAxis = data.map((datum: any) => new Date(datum.day));
+  const yAxis = data.map((datum: any) => datum.downloads ?? 0);
+
   return (
-    <div style={{ width: '100%', height: 300 }}>
-      <ResponsiveContainer>
-        <LineChart data={data}>
-          <CartesianGrid strokeDasharray="3 3" />
-          <XAxis dataKey="day" />
-          <YAxis />
-          <Tooltip />
-          <Legend />
-          <Line type="monotone" dataKey="downloads" stroke="#87bc45" isAnimationActive={false} />
-        </LineChart>
-      </ResponsiveContainer>
-      {!data || loading ? (
+    <div ref={rootRef} style={{ position: 'relative', width: '100%', height: 300 }}>
+      {loading || data.length <= 0 ? (
         <div
           style={{
             position: 'absolute',
@@ -42,7 +48,14 @@ function ChartExport({ loading, data }: LineChartProps) {
         >
           <CircularProgress />
         </div>
-      ) : null}
+      ) : (
+        <MuiLineChart
+          width={size.clientWidth}
+          height={size.clientHeight}
+          series={[{ data: yAxis, label: 'downloads' }]}
+          xAxis={[{ scaleType: 'time', data: xAxis }]}
+        />
+      )}
     </div>
   );
 }

@@ -85,11 +85,11 @@ test('can rename page', async ({ page, localApp }) => {
   await editorModel.createPage('someOtherPage');
 
   const pageFolder = path.resolve(localApp.dir, './toolpad/pages/someOtherPage');
-  const valueInput = await page.getByLabel('Node name')
+  const valueInput = await page.getByLabel('Node name');
   await valueInput.click();
   await page.keyboard.type('test1');
   await valueInput.blur();
   const test1 = path.resolve(localApp.dir, './toolpad/pages/test1');
   await expect.poll(async () => folderExists(pageFolder)).toBe(false);
   await expect.poll(async () => folderExists(test1)).toBe(true);
-})
+});

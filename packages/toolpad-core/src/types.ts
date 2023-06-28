@@ -455,6 +455,7 @@ export type Serializable =
   | ((...args: Serializable[]) => Serializable);
 
 export interface JsRuntime {
+  getEnv(): Record<string, string | undefined>;
   evaluateExpression(code: string, globalScope: Record<string, unknown>): BindingEvaluationResult;
 }
 

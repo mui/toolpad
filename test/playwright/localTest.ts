@@ -11,7 +11,7 @@ import getPort from 'get-port';
 import { test as base } from './test';
 import { waitForMatch } from '../utils/streams';
 
-interface RunningLocalApp {
+export interface RunningLocalApp {
   url: string;
   dir: string;
   stdout: Readable;

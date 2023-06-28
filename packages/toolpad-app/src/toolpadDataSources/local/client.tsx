@@ -1,6 +1,18 @@
 import * as React from 'react';
 import { BindableAttrEntries } from '@mui/toolpad-core';
-import { Autocomplete, Button, Stack, TextField, Typography } from '@mui/material';
+import {
+  Autocomplete,
+  Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
+  Link,
+  Stack,
+  TextField,
+  Typography,
+} from '@mui/material';
 import { useBrowserJsRuntime } from '@mui/toolpad-core/jsBrowserRuntime';
 import { errorFrom } from '@mui/toolpad-utils/errors';
 import { ClientDataSource, QueryEditorProps } from '../../types';
@@ -83,12 +95,16 @@ function QueryEditor({
     [fetchPrivate],
   );
 
+  const [missingEditor, setMissingEditor] = React.useState(false);
+
+  const handleMissingEditorDialogClose = React.useCallback(() => {
+    setMissingEditor(false);
+  }, []);
+
   const openEditor = React.useCallback(() => {
     fetchPrivate({ kind: 'openEditor' }).catch((err) => {
-      // TODO: Write docs with instructions on how to install editor
-      // Add a good looking alert box and inline some instructions and link to docs
-      // eslint-disable-next-line no-alert
-      alert(err.message);
+      console.error(err);
+      setMissingEditor(true);
     });
   }, [fetchPrivate]);
 
@@ -113,74 +129,99 @@ function QueryEditor({
     : '';
 
   return (
-    <SplitPane split="vertical" size="50%" allowResize>
-      <QueryInputPanel previewDisabled={!selectedOption} onRunPreview={handleRunPreview}>
-        <Stack gap={2} sx={{ px: 3, pt: 1 }}>
-          <Stack gap={2} direction="row">
-            <Autocomplete
-              value={selectedOption || null}
-              onChange={(event, newValue) => {
-                setInput((draft) => {
-                  return appDom.setQueryProp(draft, 'function', newValue?.name ?? undefined);
-                });
-              }}
-              loading={introspection.isLoading}
-              getOptionLabel={(option) => option.name}
-              options={allOptions}
-              selectOnFocus
-              clearOnBlur
-              handleHomeEndKeys
-              fullWidth
-              renderInput={(params) => (
-                <TextField
-                  {...params}
-                  label="Function"
-                  error={!!introspectionError}
-                  helperText={introspectionError}
-                />
-              )}
-            />
-            <Button onClick={openEditor}>Open editor</Button>
+    <React.Fragment>
+      <SplitPane split="vertical" size="50%" allowResize>
+        <QueryInputPanel previewDisabled={!selectedOption} onRunPreview={handleRunPreview}>
+          <Stack gap={2} sx={{ px: 3, pt: 1 }}>
+            <Stack gap={2} direction="row">
+              <Autocomplete
+                value={selectedOption || null}
+                onChange={(event, newValue) => {
+                  setInput((draft) => {
+                    return appDom.setQueryProp(draft, 'function', newValue?.name ?? undefined);
+                  });
+                }}
+                loading={introspection.isLoading}
+                getOptionLabel={(option) => option.name}
+                options={allOptions}
+                selectOnFocus
+                clearOnBlur
+                handleHomeEndKeys
+                fullWidth
+                renderInput={(params) => (
+                  <TextField
+                    {...params}
+                    label="Function"
+                    error={!!introspectionError}
+                    helperText={introspectionError}
+                  />
+                )}
+              />
+              <Button onClick={openEditor}>Open editor</Button>
+            </Stack>
+            <Typography>Parameters:</Typography>
+            <Stack gap={1}>
+              {Object.entries(parameterDefs).map(([name, definiton]) => {
+                const Control = getDefaultControl(definiton, liveBindings);
+                return Control ? (
+                  <BindableEditor
+                    key={name}
+                    liveBinding={liveBindings[name]}
+                    globalScope={globalScope}
+                    globalScopeMeta={globalScopeMeta}
+                    label={name}
+                    propType={definiton}
+                    jsRuntime={jsBrowserRuntime}
+                    renderControl={(renderControlParams) => (
+                      <Control {...renderControlParams} propType={definiton} />
+                    )}
+                    value={paramsObject[name]}
+                    onChange={(newValue) => {
+                      const paramKeys = Object.keys(parameterDefs);
+                      const newParams: BindableAttrEntries = paramKeys.flatMap((key) => {
+                        const paramValue = key === name ? newValue : paramsObject[key];
+                        return paramValue ? [[key, paramValue]] : [];
+                      });
+                      setInput((existing) => ({
+                        ...existing,
+                        params: newParams,
+                      }));
+                    }}
+                  />
+                ) : null;
+              })}
+            </Stack>
           </Stack>
-          <Typography>Parameters:</Typography>
-          <Stack gap={1}>
-            {Object.entries(parameterDefs).map(([name, definiton]) => {
-              const Control = getDefaultControl(definiton, liveBindings);
-              return Control ? (
-                <BindableEditor
-                  key={name}
-                  liveBinding={liveBindings[name]}
-                  globalScope={globalScope}
-                  globalScopeMeta={globalScopeMeta}
-                  label={name}
-                  propType={definiton}
-                  jsRuntime={jsBrowserRuntime}
-                  renderControl={(renderControlParams) => (
-                    <Control {...renderControlParams} propType={definiton} />
-                  )}
-                  value={paramsObject[name]}
-                  onChange={(newValue) => {
-                    const paramKeys = Object.keys(parameterDefs);
-                    const newParams: BindableAttrEntries = paramKeys.flatMap((key) => {
-                      const paramValue = key === name ? newValue : paramsObject[key];
-                      return paramValue ? [[key, paramValue]] : [];
-                    });
-                    setInput((existing) => ({
-                      ...existing,
-                      params: newParams,
-                    }));
-                  }}
-                />
-              ) : null;
-            })}
-          </Stack>
-        </Stack>
-      </QueryInputPanel>
+        </QueryInputPanel>
 
-      <QueryPreview isLoading={previewIsLoading} error={preview?.error}>
-        <JsonView sx={{ height: '100%' }} copyToClipboard src={preview?.data} />
-      </QueryPreview>
-    </SplitPane>
+        <QueryPreview isLoading={previewIsLoading} error={preview?.error}>
+          <JsonView sx={{ height: '100%' }} copyToClipboard src={preview?.data} />
+        </QueryPreview>
+      </SplitPane>
+
+      <Dialog
+        open={missingEditor}
+        onClose={handleMissingEditorDialogClose}
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+      >
+        <DialogTitle id="alert-dialog-title">{'Editor not found'}</DialogTitle>
+        <DialogContent>
+          <DialogContentText id="alert-dialog-description">
+            No editor was detected on your system. If using Visual Studio Code, this may be due to a
+            missing &quot;code&quot; command in your PATH. <br />
+            Check the{' '}
+            <Link href="https://mui.com/toolpad/how-to-guides/editor-path" target="_blank">
+              docs
+            </Link>{' '}
+            for more information.
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleMissingEditorDialogClose}>Dismiss</Button>
+        </DialogActions>
+      </Dialog>
+    </React.Fragment>
   );
 }
 

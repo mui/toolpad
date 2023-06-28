@@ -57,7 +57,7 @@ export async function execQuery<P, Q>(
     const transformEnabled = dataNode.attributes.transformEnabled;
     const transform = dataNode.attributes.transform;
     if (transformEnabled && transform) {
-      const jsServerRuntime = await createServerJsRuntime();
+      const jsServerRuntime = await createServerJsRuntime(process.env);
       result = {
         data: await applyTransform(jsServerRuntime, transform, result.data),
       };

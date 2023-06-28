@@ -80,8 +80,6 @@ export default class FunctionsManager {
 
   private extractTypesWorker: Piscina;
 
-  private cancelTypeExtraction = new AbortController();
-
   // eslint-disable-next-line class-methods-use-this
   private setInitialized: () => void = () => {
     throw new Error('setInitialized should be initialized');

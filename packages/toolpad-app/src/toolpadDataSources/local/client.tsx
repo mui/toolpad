@@ -19,7 +19,6 @@ import { TreeItem, TreeView, treeItemClasses } from '@mui/lab';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import EditIcon from '@mui/icons-material/Edit';
-import AddIcon from '@mui/icons-material/Add';
 import useBoolean from '@mui/toolpad-utils/hooks/useBoolean';
 import { useQuery } from '@tanstack/react-query';
 import { ClientDataSource, QueryEditorProps } from '../../types';
@@ -94,11 +93,6 @@ function HandlerFileTreeItem({ file, onOpenEditor }: HandlerFileTreeItemProps) {
         <React.Fragment>
           {file.name}
           <FlexFill />
-          <Tooltip title="Add new handler">
-            <IconButton className={fileTreeItemClasses.actionButton} size="small">
-              <AddIcon fontSize="inherit" />
-            </IconButton>
-          </Tooltip>
           <Tooltip title="Open code editor">
             <IconButton
               className={fileTreeItemClasses.actionButton}
@@ -268,7 +262,7 @@ function QueryEditor({
 
     const newNodeId = serializeFunctionId({ file: fileName, handler: 'default' });
     setSelectedHandler(newNodeId);
-    setExpanded((prev) => Array.from(new Set([...prev, fileName])));
+    setExpanded([fileName]);
     handleCloseCreateNewHandler();
   }, [execApi, handleCloseCreateNewHandler, introspection, newHandlerInput, setSelectedHandler]);
 
@@ -303,11 +297,12 @@ function QueryEditor({
                       disabled={newHandlerLoading}
                       endAdornment={newHandlerLoading ? <CircularProgress size={16} /> : null}
                       onBlur={handleCreateNewCommit}
-                      onKeyUp={(event) => {
+                      onKeyDown={(event) => {
                         if (event.key === 'Enter') {
                           handleCreateNewCommit();
                         } else if (event.key === 'Escape') {
                           handleCloseCreateNewHandler();
+                          event.stopPropagation();
                         }
                       }}
                     />

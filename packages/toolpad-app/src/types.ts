@@ -83,7 +83,7 @@ export type ConnectionParamsEditor<P = {}> = React.FC<ConnectionEditorProps<P>>;
 
 export type Methods = Record<string, (...args: any[]) => Awaitable<any>>;
 
-export interface QueryEditorProps<C, Q, A extends Methods>
+export interface QueryEditorProps<C, Q, A extends Methods = {}>
   extends WithControlledProp<appDom.QueryNode<Q>> {
   connectionParams: Maybe<C>;
   execApi: <K extends keyof A>(

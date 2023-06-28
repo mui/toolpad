@@ -73,8 +73,7 @@
     },
     {
       "groupName": "marked",
-      "matchPackageNames": ["marked"],
-      "allowedVersions": "< 5.0.0"
+      "matchPackageNames": ["marked"]
     },
     {
       "matchDepTypes": ["action"],

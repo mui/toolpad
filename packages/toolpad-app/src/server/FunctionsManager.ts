@@ -28,7 +28,7 @@ function createDefaultFunction(): string {
      * Toolpad handlers file.
      */
 
-    export default async function(message: string) {
+    export default async function handler (message: string) {
       return \`Hello \${message}\`;
     }
   `);

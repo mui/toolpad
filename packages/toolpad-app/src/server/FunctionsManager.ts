@@ -318,6 +318,9 @@ export default class FunctionsManager {
   async createFunctionFile(name: string): Promise<void> {
     const filePath = path.resolve(this.getResourcesFolder(), ensureSuffix(name, '.ts'));
     const content = createDefaultFunction();
+    if (await fileExists(filePath)) {
+      throw new Error(`"${name}" already exists`);
+    }
     await writeFileRecursive(filePath, content, { encoding: 'utf-8' });
     await this.extractTypes();
   }

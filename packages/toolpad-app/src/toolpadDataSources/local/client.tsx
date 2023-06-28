@@ -1,11 +1,13 @@
 import * as React from 'react';
 import { BindableAttrEntries } from '@mui/toolpad-core';
 import {
+  Alert,
   Box,
   Button,
   CircularProgress,
   IconButton,
   InputBase,
+  Popover,
   Skeleton,
   Stack,
   Tooltip,
@@ -246,16 +248,37 @@ function QueryEditor({
 
   const [expanded, setExpanded] = React.useState<string[]>(selectedFile ? [selectedFile] : []);
 
+  const [anchorEl, setAnchorEl] = React.useState<HTMLButtonElement | null>(null);
+  const createNewInputRef = React.useRef(null);
+  const open = !!anchorEl;
+
+  const inputError: string | null = React.useMemo(() => {
+    const alreadyExists = introspection.data?.files.some(
+      (file) => file.name === newHandlerInput || file.name === ensureSuffix(newHandlerInput, '.ts'),
+    );
+
+    return alreadyExists ? 'File already exists' : null;
+  }, [introspection.data?.files, newHandlerInput]);
+
+  React.useEffect(() => {
+    setAnchorEl(inputError ? createNewInputRef.current : null);
+  }, [inputError]);
+
   const handleCreateNewCommit = React.useCallback(async () => {
-    if (!newHandlerInput) {
+    if (!newHandlerInput || inputError) {
       handleCloseCreateNewHandler();
+      return;
     }
+
     const fileName = ensureSuffix(newHandlerInput, '.ts');
 
     setNewHandlerLoading(true);
     try {
       await execApi('createNew', [fileName]);
       await introspection.refetch();
+    } catch (error) {
+      // eslint-disable-next-line no-alert
+      window.alert(errorFrom(error).message);
     } finally {
       setNewHandlerLoading(false);
     }
@@ -264,7 +287,14 @@ function QueryEditor({
     setSelectedHandler(newNodeId);
     setExpanded([fileName]);
     handleCloseCreateNewHandler();
-  }, [execApi, handleCloseCreateNewHandler, introspection, newHandlerInput, setSelectedHandler]);
+  }, [
+    execApi,
+    handleCloseCreateNewHandler,
+    inputError,
+    introspection,
+    newHandlerInput,
+    setSelectedHandler,
+  ]);
 
   return (
     <SplitPane split="vertical" size="50%" allowResize>
@@ -288,24 +318,41 @@ function QueryEditor({
                 <TreeItem
                   nodeId="::create::"
                   label={
-                    <InputBase
-                      value={newHandlerInput}
-                      onChange={(event) =>
-                        setNewHandlerInput(event.target.value.replaceAll(/[^a-zA-Z0-9]/g, ''))
-                      }
-                      autoFocus
-                      disabled={newHandlerLoading}
-                      endAdornment={newHandlerLoading ? <CircularProgress size={16} /> : null}
-                      onBlur={handleCreateNewCommit}
-                      onKeyDown={(event) => {
-                        if (event.key === 'Enter') {
-                          handleCreateNewCommit();
-                        } else if (event.key === 'Escape') {
-                          handleCloseCreateNewHandler();
-                          event.stopPropagation();
+                    <React.Fragment>
+                      <InputBase
+                        ref={createNewInputRef}
+                        value={newHandlerInput}
+                        onChange={(event) =>
+                          setNewHandlerInput(event.target.value.replaceAll(/[^a-zA-Z0-9]/g, ''))
                         }
-                      }}
-                    />
+                        autoFocus
+                        disabled={newHandlerLoading}
+                        endAdornment={newHandlerLoading ? <CircularProgress size={16} /> : null}
+                        onBlur={handleCreateNewCommit}
+                        onKeyDown={(event) => {
+                          if (event.key === 'Enter') {
+                            handleCreateNewCommit();
+                          } else if (event.key === 'Escape') {
+                            handleCloseCreateNewHandler();
+                            event.stopPropagation();
+                          }
+                        }}
+                      />
+                      <Popover
+                        open={open}
+                        anchorEl={anchorEl}
+                        onClose={() => setAnchorEl(null)}
+                        disableAutoFocus
+                        anchorOrigin={{
+                          vertical: 'bottom',
+                          horizontal: 'left',
+                        }}
+                      >
+                        <Alert severity="error" variant="outlined">
+                          {inputError}
+                        </Alert>
+                      </Popover>
+                    </React.Fragment>
                   }
                 />
               ) : null}

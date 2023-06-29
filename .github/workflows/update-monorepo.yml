@@ -8,8 +8,8 @@ jobs:
   update-monorepo:
     runs-on: ubuntu-latest
     permissions:
-      contents: read
-      issues: write
+      contents: write
+      pull-requests: write
     steps:
       - name: Set up Node.js ⚙️
         uses: actions/setup-node@v2

@@ -1,0 +1,48 @@
+name: Update monorepo
+
+on: workflow_dispatch
+
+permissions: {}
+
+jobs:
+  update-monorepo:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      issues: write
+    steps:
+      - name: Set up Node.js ⚙️
+        uses: actions/setup-node@v2
+        with:
+          node-version: '16.x'
+
+      - name: Setup yarn
+        run: npm install -g yarn
+
+      - uses: actions/checkout@v3
+
+      - name: Get latest monorepo commit
+        run: echo "MONOREPO_LATEST_COMMIT=$(git ls-remote https://github.com/mui/material-ui master | awk '{print $1}')" >> $GITHUB_ENV
+
+      - name: upgrade packages
+        run: |
+          yarn upgrade @mui/monorepo@"https://github.com/mui/material-ui.git#$MONOREPO_LATEST_COMMIT"
+          yarn workspace docs upgrade @mui/monorepo@"https://github.com/mui/material-ui.git#$MONOREPO_LATEST_COMMIT"
+
+      - name: Config
+        run: |
+          git config --global user.email "git-bot@mui.com"
+          git config --global user.name "MUI bot"
+
+      - name: Create branch
+        run: |
+          git checkout -b git-bot/monorepo-update
+          git reset --hard origin/master
+          git add .
+          git commit -m "Monorepo update"
+
+      - name: Push changes
+        run: git push -f origin git-bot/monorepo-update
+
+      - name: Create pull request
+        run: gh pr create --repo mui/mui-toolpad --title "Monorepo update" --body "Monorepo update" --base master --head git-bot/monorepo-update

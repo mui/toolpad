@@ -241,6 +241,7 @@ async function exec(
 const dataSource: ServerDataSource<{}, FetchQuery, any> = {
   exec,
   execPrivate,
+  api: {},
 };
 
 export default dataSource;

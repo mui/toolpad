@@ -72,6 +72,10 @@
       "allowedVersions": "< 2.0.0"
     },
     {
+      "groupName": "marked",
+      "matchPackageNames": ["marked"]
+    },
+    {
       "matchDepTypes": ["action"],
       "pinDigests": true
     },

@@ -1,6 +1,6 @@
 name: Update monorepo
 
-on: workflow_dispatch
+on: [workflow_dispatch, pull_request]
 
 permissions: {}
 

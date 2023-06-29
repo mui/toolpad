@@ -10,7 +10,7 @@ import 'perf-cascade/dist/perf-cascade.css';
 function Main() {
   return (
     <QueryClientProvider client={queryClient}>
-      <Toolpad basename="/_toolpad2" />
+      <Toolpad basename="/_toolpad" />
     </QueryClientProvider>
   );
 }

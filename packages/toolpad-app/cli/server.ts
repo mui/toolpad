@@ -163,55 +163,57 @@ async function main() {
       );
     };
 
-    const editorBasename = '/_toolpad2';
-    if (process.env.NODE_ENV === 'development') {
-      const viteApp = await createViteServer({
-        configFile: path.resolve(__dirname, '../../src/toolpad/vite.config.ts'),
-        root: path.resolve(__dirname, '../../src/toolpad'),
-        server: { middlewareMode: true },
-        plugins: [
-          {
-            name: 'toolpad:transform-index-html',
-            transformIndexHtml,
-          },
-        ],
+    if (process.env.TOOLPAD_LEGACY_EDITOR) {
+      // Legacy Next.js
+      const dir = process.env.TOOLPAD_DIR;
+      const dev = !!process.env.TOOLPAD_NEXT_DEV;
+
+      // when using middleware `hostname` and `port` must be provided below
+      editorNextApp = next({ dir, dev, hostname, port });
+      const handle = editorNextApp.getRequestHandler();
+
+      app.use(async (req, res) => {
+        try {
+          invariant(req.url, 'request must have a url');
+          // Be sure to pass `true` as the second argument to `url.parse`.
+          // This tells it to parse the query portion of the URL.
+          const parsedUrl = parse(req.url, true);
+          await handle(req, res, parsedUrl);
+        } catch (err) {
+          console.error('Error occurred handling', req.url, err);
+          res.statusCode = 500;
+          res.end('internal server error');
+        }
       });
-
-      app.use(editorBasename, viteApp.middlewares);
     } else {
-      app.use(
-        editorBasename,
-        express.static(path.resolve(__dirname, '../../dist/editor'), { index: false }),
-        asyncHandler(async (req, res) => {
-          const htmlFilePath = path.resolve(__dirname, '../../dist/editor/index.html');
-          let html = await fs.readFile(htmlFilePath, { encoding: 'utf-8' });
-          html = transformIndexHtml(html);
-          res.setHeader('Content-Type', 'text/html').status(200).end(html);
-        }),
-      );
-    }
+      const editorBasename = '/_toolpad';
+      if (process.env.NODE_ENV === 'development') {
+        const viteApp = await createViteServer({
+          configFile: path.resolve(__dirname, '../../src/toolpad/vite.config.ts'),
+          root: path.resolve(__dirname, '../../src/toolpad'),
+          server: { middlewareMode: true },
+          plugins: [
+            {
+              name: 'toolpad:transform-index-html',
+              transformIndexHtml,
+            },
+          ],
+        });
 
-    // Legacy Next.js
-    const dir = process.env.TOOLPAD_DIR;
-    const dev = !!process.env.TOOLPAD_NEXT_DEV;
-
-    // when using middleware `hostname` and `port` must be provided below
-    editorNextApp = next({ dir, dev, hostname, port });
-    const handle = editorNextApp.getRequestHandler();
-
-    app.use(async (req, res) => {
-      try {
-        invariant(req.url, 'request must have a url');
-        // Be sure to pass `true` as the second argument to `url.parse`.
-        // This tells it to parse the query portion of the URL.
-        const parsedUrl = parse(req.url, true);
-        await handle(req, res, parsedUrl);
-      } catch (err) {
-        console.error('Error occurred handling', req.url, err);
-        res.statusCode = 500;
-        res.end('internal server error');
+        app.use(editorBasename, viteApp.middlewares);
+      } else {
+        app.use(
+          editorBasename,
+          express.static(path.resolve(__dirname, '../../dist/editor'), { index: false }),
+          asyncHandler(async (req, res) => {
+            const htmlFilePath = path.resolve(__dirname, '../../dist/editor/index.html');
+            let html = await fs.readFile(htmlFilePath, { encoding: 'utf-8' });
+            html = transformIndexHtml(html);
+            res.setHeader('Content-Type', 'text/html').status(200).end(html);
+          }),
+        );
       }
-    });
+    }
   }
 
   await listen(httpServer, port);

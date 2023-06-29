@@ -1,5 +1,34 @@
 # Changelog
 
+## 0.1.18
+
+<!-- generated comparing v0.1.17..master -->
+
+_Jun 28, 2023_
+
+A big thanks to the 4 contributors who made this release possible. Here are some highlights ✨:
+
+Allow detecting parameters from types in function files, instead of having to explicitly specify them. Also, a couple of example apps, bug fixes and some behind-the-scenes work!
+
+- &#8203;<!-- 16 -->Isolate marked in renovatebot (#2237) @Janpot
+- &#8203;<!-- 15 -->Fix broken query editor when env vars are defined (#2231) @Janpot
+- &#8203;<!-- 14 -->Increase timeout when running integration tests in dev mode (#2222) @Janpot
+- &#8203;<!-- 13 -->Fix github rest call in triage label action (#2225) @Janpot
+- &#8203;<!-- 12 -->Add needs triage action (#2221) @Janpot
+- &#8203;<!-- 11 -->Reload queries when env changes (#2214) @Janpot
+- &#8203;<!-- 10 -->Example-4: NPM stats (#2151) @prakhargupta1
+- &#8203;<!-- 09 -->Example-1: admin app (#2096) @prakhargupta1
+- &#8203;<!-- 08 -->Upgrade @mui/monorepo (#2212) @Janpot
+- &#8203;<!-- 07 -->Explore banning any types (#2201) @Janpot
+- &#8203;<!-- 06 -->Add error mode to the text component (#2203) @Janpot
+- &#8203;<!-- 05 -->Add no-op serviceworker (#2190) @Janpot
+- &#8203;<!-- 04 -->Extract parameters from ts types in function files (#2133) @Janpot
+- &#8203;<!-- 03 -->[core] Upgrade monorepo (#2232) @bharatkashyap
+- &#8203;<!-- 02 -->[docs] Leading dot @oliviertassinari
+- &#8203;<!-- 01 -->[docs] Fix redirection @oliviertassinari
+
+All contributors of this release in alphabetical order: @bharatkashyap, @Janpot, @oliviertassinari, @prakhargupta1
+
 ## 0.1.17
 
 <!-- generated comparing v0.1.16..master -->

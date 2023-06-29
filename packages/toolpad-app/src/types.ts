@@ -195,7 +195,7 @@ export type ProjectEvents = {
   // a component has been added or removed
   componentsListChanged: {};
   // the function runtime build has finished
-  functionsBuildEnd: {};
+  queriesInvalidated: {};
   // An environment variable has changed
   envChanged: {};
 };

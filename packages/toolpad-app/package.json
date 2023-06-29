@@ -1,6 +1,6 @@
 {
   "name": "@mui/toolpad-app",
-  "version": "0.1.17",
+  "version": "0.1.18",
   "license": "MIT",
   "scripts": {
     "build": "concurrently \"yarn:build:*\" && rimraf ./.next/cache",
@@ -46,15 +46,15 @@
     "@emotion/react": "11.11.1",
     "@emotion/server": "11.11.0",
     "@emotion/styled": "11.11.0",
-    "@googleapis/drive": "5.1.0",
-    "@googleapis/sheets": "4.0.2",
+    "@googleapis/drive": "6.0.0",
+    "@googleapis/sheets": "5.0.0",
     "@mui/icons-material": "5.11.16",
     "@mui/lab": "5.0.0-alpha.134",
     "@mui/material": "5.13.6",
     "@mui/system": "5.13.6",
-    "@mui/toolpad-components": "0.1.17",
-    "@mui/toolpad-core": "0.1.17",
-    "@mui/toolpad-utils": "0.1.17",
+    "@mui/toolpad-components": "0.1.18",
+    "@mui/toolpad-core": "0.1.18",
+    "@mui/toolpad-utils": "0.1.18",
     "@mui/types": "7.2.4",
     "@mui/utils": "5.13.6",
     "@mui/x-data-grid": "6.9.0",
@@ -167,5 +167,5 @@
   "publishConfig": {
     "access": "public"
   },
-  "gitHead": "c8b22003698070cd85b6fc336c05f5645f45da24"
+  "gitHead": "08fb1bad6e60086d1b775f377101b88b3d1a9e5d"
 }

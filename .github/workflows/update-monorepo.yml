@@ -1,6 +1,6 @@
 name: Update monorepo
 
-on: [workflow_dispatch, pull_request]
+on: workflow_dispatch
 
 permissions: {}
 
@@ -37,7 +37,6 @@ jobs:
       - name: Create branch
         run: |
           git checkout -b git-bot/monorepo-update
-          git reset --hard origin/master
           git add .
           git commit -m "Monorepo update"
 

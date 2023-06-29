@@ -865,6 +865,7 @@ async function loadProjectFolder(): Promise<ToolpadProjectFolder> {
 
 export async function loadDomFromDisk(): Promise<appDom.AppDom> {
   const projectFolder = await loadProjectFolder();
+
   return projectFolderToAppDom(projectFolder);
 }
 
@@ -947,6 +948,8 @@ class ToolpadProject {
 
   invalidateQueries: () => void;
 
+  private alertedMissingVars = new Set<string>();
+
   constructor(root: string, options: Partial<ToolpadProjectOptions>) {
     this.root = root;
     this.options = {
@@ -1024,8 +1027,34 @@ class ToolpadProject {
     return getOutputFolder(this.getRoot());
   }
 
+  alertOnMissingVariablesInDom(dom: appDom.AppDom) {
+    const requiredVars = appDom.getRequiredEnvVars(dom);
+    const missingVars = Array.from(requiredVars).filter(
+      (key) => typeof process.env[key] === 'undefined',
+    );
+    const toAlert = missingVars.filter((key) => !this.alertedMissingVars.has(key));
+
+    if (toAlert.length > 0) {
+      const firstThree = toAlert.slice(0, 3);
+      const restCount = toAlert.length - firstThree.length;
+      const missingListMsg = firstThree.map((varName) => chalk.cyan(varName)).join(', ');
+      const restMsg = restCount > 0 ? ` and ${restCount} more` : '';
+
+      // eslint-disable-next-line no-console
+      console.log(
+        `${chalk.yellow(
+          'warn',
+        )}  - Missing required environment variable(s): ${missingListMsg}${restMsg}.`,
+      );
+    }
+
+    // Only alert once per missing variable
+    this.alertedMissingVars = new Set(missingVars);
+  }
+
   async loadDom() {
     const [dom] = await this.loadDomAndFingerprint();
+    this.alertOnMissingVariablesInDom(dom);
     return dom;
   }
 

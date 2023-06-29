@@ -116,6 +116,22 @@ module.exports = {
       },
     },
     {
+      files: [
+        /**
+         * Basically all code that is guaranteed being bundled for the client side and never used on serverside code
+         * can be dev dependencies to reduce the size of the published package
+         */
+        'packages/toolpad-app/src/components/**/*',
+        'packages/toolpad-app/src/toolpad/**/*',
+        'packages/toolpad-app/src/runtime/**/*',
+        'packages/toolpad-app/reactDevtools/**/*',
+      ],
+      excludedFiles: ['*.spec.ts', '*.spec.tsx'],
+      rules: {
+        'import/no-extraneous-dependencies': ['error', { devDependencies: true }],
+      },
+    },
+    {
       // Starting small, we will progressively expand this to more packages.
       files: [
         // 'packages/create-toolpad-app/**/*',

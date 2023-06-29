@@ -64,14 +64,17 @@ async function runApp(cmd: Command, { port, dev = false, dir }: RunOptions) {
     }
   }
 
+  const editorDevMode =
+    process.env.TOOLPAD_NEXT_DEV || process.env.NODE_ENV === 'development' || dev;
+
   const serverPath = path.resolve(__dirname, './server.js');
 
   const cp = execaNode(serverPath, [], {
     cwd: projectDir,
     stdio: 'pipe',
     env: {
-      NODE_ENV: dev ? 'development' : 'production',
-      TOOLPAD_NEXT_DEV: dev ? '1' : '',
+      NODE_ENV: editorDevMode ? 'development' : 'production',
+      TOOLPAD_NEXT_DEV: editorDevMode ? '1' : '',
       TOOLPAD_DIR: toolpadDir,
       TOOLPAD_PROJECT_DIR: projectDir,
       TOOLPAD_PORT: String(port),

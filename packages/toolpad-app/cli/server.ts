@@ -188,6 +188,9 @@ async function main() {
     } else {
       const editorBasename = '/_toolpad';
       if (process.env.NODE_ENV === 'development') {
+        // eslint-disable-next-line no-console
+        console.log(`${chalk.blue('info')}  - Running Toolpad editor in dev mode`);
+
         const viteApp = await createViteServer({
           configFile: path.resolve(__dirname, '../../src/toolpad/vite.config.ts'),
           root: path.resolve(__dirname, '../../src/toolpad'),

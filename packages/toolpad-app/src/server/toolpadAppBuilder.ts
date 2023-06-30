@@ -92,10 +92,10 @@ function toolpadVitePlugin({ root, base }: ToolpadVitePluginParams): Plugin {
   const resolvedCanvasEntryPointId = `\0${CANVAS_ENTRY}`;
 
   const getEntryPoint = (isCanvas: boolean) => `
-    import { init, setComponents } from '@mui/toolpad-app/runtime';
+    import { init, setComponents } from '@mui/toolpad/runtime';
     import { LicenseInfo } from '@mui/x-data-grid-pro';
     import components from ${JSON.stringify(componentsId)};
-    ${isCanvas ? `import AppCanvas from '@mui/toolpad-app/canvas'` : ''}
+    ${isCanvas ? `import AppCanvas from '@mui/toolpad/canvas'` : ''}
     
     LicenseInfo.setLicenseKey(${JSON.stringify(MUI_X_PRO_LICENSE)});
     

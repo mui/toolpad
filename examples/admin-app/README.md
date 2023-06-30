@@ -1,6 +1,6 @@
-# Basic CRUD app
+# Basic CRUD application
 
-<p class="description">An admin application to showcase how CRUD functions work in Toolpad</p>
+<p class="description">An admin application to showcase how CRUD operations work in Toolpad.</p>
 
 {{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/marketing/admin-app.png", "alt": "Admin application", "caption": "A CRUD application"}}
 
@@ -9,7 +9,7 @@
 This app demonstrates following capabilities of Toolpad:
 
 1. How to use [createFunction](https://mui.com/toolpad/reference/api/create-function/) API for anything pro-code.
-2. Using a Form and many other components.
+2. Using a Form and other components.
 3. How to delete or add a row in a data grid.
 4. How to bind query parameters with a component.
 

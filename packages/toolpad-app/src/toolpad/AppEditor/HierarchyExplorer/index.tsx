@@ -149,7 +149,6 @@ export default function HierarchyExplorer({ className }: HierarchyExplorerProps)
   };
 
   const handleSelect = (event: React.SyntheticEvent, nodeIds: string[]) => {
-    debugger;
     if (nodeIds.length <= 0) {
       return;
     }

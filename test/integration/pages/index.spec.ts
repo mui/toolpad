@@ -29,3 +29,20 @@ test('must show a message when a non-existing url is accessed', async ({ page })
 
   await expect(page.getByText('Not found')).toBeVisible();
 });
+
+test('do not find content if you delete page of middle ', async ({ page }) => {
+  const editorModel = new ToolpadEditor(page);
+  editorModel.goto();
+
+  const pageMenuItem = editorModel.getHierarchyItem('pages', 'page1');
+  await pageMenuItem.hover();
+  await pageMenuItem.getByRole('button', { name: 'Open hierarchy menu' }).click();
+  await page.getByRole('menuitem', { name: 'Delete' }).click();
+  await page
+    .getByRole('dialog', { name: 'Confirm' })
+    .getByRole('button', { name: 'Delete' })
+    .click();
+
+  await expect(pageMenuItem).toBeHidden();
+  await expect(page.url().includes('undefined')).toBe(false);
+});

@@ -6,8 +6,10 @@ import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import ArrowRightIcon from '@mui/icons-material/ArrowRight';
 import TreeItem, { TreeItemProps } from '@mui/lab/TreeItem';
 import * as appDom from '../../../appDom';
-import { useDom, useAppState, useAppStateApi } from '../../AppState';
+import { useDom, useDomApi, useAppState, useAppStateApi } from '../../AppState';
+import EditableText from '../../../components/EditableText';
 import { ComponentIcon } from '../PageEditor/ComponentCatalog/ComponentCatalogItem';
+import { useNodeNameValidation } from '../HierarchyExplorer/validation';
 
 function CustomTreeItem(
   props: TreeItemProps & {
@@ -16,7 +18,35 @@ function CustomTreeItem(
     onMouseLeave?: (event: React.MouseEvent<HTMLElement>) => void;
   },
 ) {
+  const domApi = useDomApi();
+  const { dom } = useDom();
+
+  const [domNodeEditable, setDomNodeEditable] = React.useState(false);
   const { label, node, onHover, onMouseLeave, ...other } = props;
+
+  const [nodeNameInput, setNodeNameInput] = React.useState(node.name);
+  const handleNodeNameChange = React.useCallback(
+    (newValue: string) => setNodeNameInput(newValue),
+    [],
+  );
+  const handleStopEditing = React.useCallback(() => {
+    setNodeNameInput(node.name);
+    setDomNodeEditable(false);
+  }, [node.name]);
+
+  const existingNames = React.useMemo(() => appDom.getExistingNamesForNode(dom, node), [dom, node]);
+  const nodeNameError = useNodeNameValidation(nodeNameInput, existingNames, node.type);
+  const isNameValid = !nodeNameError;
+
+  const handleNameSave = React.useCallback(() => {
+    if (isNameValid) {
+      setNodeNameInput(nodeNameInput);
+      domApi.setNodeName(node.id, nodeNameInput);
+    } else {
+      setNodeNameInput(node.name);
+    }
+  }, [isNameValid, domApi, node.id, node.name, nodeNameInput]);
+
   return (
     <TreeItem
       key={node.id}
@@ -27,7 +57,19 @@ function CustomTreeItem(
             kind="builtIn"
             sx={{ marginRight: 1, fontSize: 18, opacity: 0.5 }}
           />
-          <Typography
+          <EditableText
+            value={nodeNameInput}
+            variant="body2"
+            editable={domNodeEditable}
+            onDoubleClick={() => setDomNodeEditable(true)}
+            onChange={handleNodeNameChange}
+            onClose={handleStopEditing}
+            onSave={handleNameSave}
+            error={!isNameValid}
+            helperText={nodeNameError}
+            sx={{ flexGrow: 1 }}
+          />
+          {/* <Typography
             variant="body2"
             sx={{ fontWeight: 'inherit', flexGrow: 1 }}
             noWrap
@@ -39,7 +81,7 @@ function CustomTreeItem(
             }
           >
             {node.name}
-          </Typography>
+          </Typography> */}
         </Box>
       }
       {...other}
@@ -109,6 +151,14 @@ export default function PageStructureExplorer() {
   const appStateApi = useAppStateApi();
   const currentPageId = currentView?.kind === 'page' ? currentView.nodeId : null;
   const currentPageNode = currentPageId ? appDom.getNode(dom, currentPageId, 'page') : null;
+  const selectedDomNodeId = currentView.kind === 'page' ? currentView.selectedNodeId : '';
+
+  const selectedNodeParentId = React.useMemo(() => {
+    if (!selectedDomNodeId) {
+      return null;
+    }
+    return appDom.getParent(dom, appDom.getNode(dom, selectedDomNodeId))?.id;
+  }, [dom, selectedDomNodeId]);
 
   const { children: rootChildren = [] } = React.useMemo(() => {
     if (!currentPageNode) {
@@ -142,13 +192,33 @@ export default function PageStructureExplorer() {
     appStateApi.blurHoverNode();
   }, [appStateApi]);
 
+  const [expandedDomNodeIds, setExpandedDomNodeIds] = React.useState<string[]>([]);
+
+  const handleNodeToggle = React.useCallback(
+    (event: React.SyntheticEvent, nodeIds: string[]) => {
+      setExpandedDomNodeIds((prev) => {
+        const newIds = nodeIds.filter((id) => !prev.includes(id));
+        const retainedIds = prev.filter((id) => nodeIds.includes(id));
+        return [...retainedIds, ...newIds];
+      });
+    },
+    [setExpandedDomNodeIds],
+  );
+
+  const expandedDomNodeIdSet = React.useMemo(() => {
+    return new Set([selectedNodeParentId as string, ...expandedDomNodeIds]);
+  }, [selectedNodeParentId, expandedDomNodeIds]);
+
   return (
     <TreeView
       aria-label="file system navigator"
       defaultCollapseIcon={<ArrowDropDownIcon />}
       defaultExpandIcon={<ArrowRightIcon />}
+      expanded={Array.from(expandedDomNodeIdSet)}
+      selected={selectedDomNodeId as string}
       onNodeSelect={handleNodeSelect}
       onNodeFocus={handleNodeFocus}
+      onNodeToggle={handleNodeToggle}
       sx={{ height: 600, flexGrow: 1, maxWidth: 400, overflowY: 'auto' }}
     >
       {rootChildren.map((childNode) => (

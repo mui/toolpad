@@ -169,7 +169,7 @@ export default async function cli(argv: string[]) {
     },
   } as const;
 
-  await yargs(argv)
+  const parsedArgs = yargs(argv)
     // See https://github.com/yargs/yargs/issues/538
     .scriptName('toolpad')
     .command(
@@ -198,7 +198,10 @@ export default async function cli(argv: string[]) {
     )
     .command('help', 'Show help', {}, async () => {
       // eslint-disable-next-line no-console
-      console.log(await yargs.getHelp());
+      console.log(await parsedArgs.getHelp());
     })
-    .help().argv;
+    .help();
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-expressions
+  parsedArgs.argv;
 }

@@ -1,5 +1,6 @@
 import { createFunction } from '@mui/toolpad/server';
-import rawText from './raw.txt?raw';
+import rawText from './raw.txt';
+import rawSql from './raw.sql';
 
 export async function hello() {
   return { message: 'hello world' };
@@ -125,5 +126,5 @@ export function neverResolving() {
 }
 
 export async function getRawText() {
-  return rawText;
+  return [rawText, rawSql].join(' | ');
 }

@@ -15,18 +15,12 @@ export type LocalParams = {
   readonly body?: Body;
 };
 
-export type LocalPrivateQuery =
-  | {
-      kind: 'debugExec';
-      query: LocalQuery;
-      params: Record<string, any>;
-    }
-  | {
-      kind: 'introspection';
-    }
-  | {
-      kind: 'openEditor';
-    };
+export type LocalPrivateApi = {
+  debugExec(query: LocalQuery, params: Record<string, any>): Promise<any>;
+  introspection(): Promise<IntrospectionResult>;
+  openEditor(fileName: string): Promise<void>;
+  createNew(fileName: string): Promise<void>;
+};
 
 export interface FetchResult extends ExecFetchResult<any> {
   data: any;

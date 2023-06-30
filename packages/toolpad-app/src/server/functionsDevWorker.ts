@@ -149,7 +149,7 @@ export function createWorker(env: Record<string, any>) {
       throw errorFrom(error);
     }
 
-    return JSON.parse(result);
+    return result ? JSON.parse(result) : undefined;
   };
 
   return {

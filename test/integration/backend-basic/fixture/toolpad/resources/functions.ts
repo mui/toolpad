@@ -1,4 +1,5 @@
 import { createFunction } from '@mui/toolpad/server';
+import rawText from './raw.txt?raw';
 
 export async function hello() {
   return { message: 'hello world' };
@@ -121,4 +122,8 @@ export async function bareWithParams(
 
 export function neverResolving() {
   return new Promise(() => {});
+}
+
+export async function getRawText() {
+  return rawText;
 }

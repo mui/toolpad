@@ -22,6 +22,28 @@ import {
 import { Awaitable } from '../utils/types';
 import { format } from '../utils/prettier';
 
+const ESBUILD_RAW_LOADER: esbuild.Plugin = {
+  name: 'raw-loader',
+  setup(build) {
+    build.onResolve({ filter: /\?raw$/ }, async ({ path: importedPath, ...args }) => {
+      const pathWithoutQuery = importedPath.replace(/\?raw$/, '');
+      const resolved = await build.resolve(pathWithoutQuery, args);
+      return {
+        ...resolved,
+        suffix: '?raw',
+        namespace: 'raw-files',
+      };
+    });
+
+    build.onLoad({ filter: /.*/, namespace: 'raw-files' }, async ({ path: loadedPath }) => {
+      return {
+        contents: await fs.readFile(loadedPath, 'utf-8'),
+        loader: 'text',
+      };
+    });
+  },
+};
+
 function createDefaultFunction(): string {
   return format(`
     /**
@@ -190,7 +212,7 @@ export default class FunctionsManager {
     return esbuild.context({
       absWorkingDir: root,
       entryPoints,
-      plugins: [toolpadPlugin],
+      plugins: [toolpadPlugin, ESBUILD_RAW_LOADER],
       write: true,
       bundle: true,
       metafile: true,

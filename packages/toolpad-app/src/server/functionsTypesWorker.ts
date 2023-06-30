@@ -465,7 +465,8 @@ export default async function extractTypes({
         handlers,
       } satisfies FileIntrospectionResult;
     })
-    .filter(Boolean);
+    .filter(Boolean)
+    .sort((a, b) => a.name.localeCompare(b.name));
 
   return { files };
 }

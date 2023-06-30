@@ -7,7 +7,7 @@ import { hasOwnProperty } from '@mui/toolpad-utils/collections';
 import { errorFrom, serializeError } from '@mui/toolpad-utils/errors';
 import { indent } from '@mui/toolpad-utils/strings';
 import chalk from 'chalk';
-import { execQuery, dataSourceFetchPrivate } from './data';
+import { execQuery, dataSourceFetchPrivate, dataSourceExecPrivate } from './data';
 import { getVersionInfo } from './versionInfo';
 import { createComponent, deletePage, openCodeComponentEditor } from './localMode';
 import { loadDom, saveDom, applyDomDiff } from './liveProject';
@@ -150,6 +150,9 @@ export const rpcServer = {
     }),
     deletePage: createMethod<typeof deletePage>(({ params }) => {
       return deletePage(...params);
+    }),
+    dataSourceExecPrivate: createMethod<typeof dataSourceExecPrivate>(({ params }) => {
+      return dataSourceExecPrivate(...params);
     }),
   },
 } as const;

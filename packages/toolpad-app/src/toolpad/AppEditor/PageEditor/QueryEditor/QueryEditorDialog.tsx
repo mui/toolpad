@@ -15,6 +15,7 @@ import {
 import * as React from 'react';
 import { BindableAttrValue } from '@mui/toolpad-core';
 import { useBrowserJsRuntime } from '@mui/toolpad-core/jsBrowserRuntime';
+import invariant from 'invariant';
 import useLatest from '../../../../utils/useLatest';
 import { usePageEditorState } from '../PageEditorProvider';
 import * as appDom from '../../../../appDom';
@@ -30,6 +31,7 @@ import useBoolean from '../../../../utils/useBoolean';
 import { useNodeNameValidation } from '../../HierarchyExplorer/validation';
 import useEvent from '../../../../utils/useEvent';
 import useUnsavedChangesConfirm from '../../../hooks/useUnsavedChangesConfirm';
+import client from '../../../../api';
 
 interface QueryEditorDialogActionsProps {
   saveDisabled?: boolean;
@@ -254,6 +256,14 @@ export default function QueryNodeEditorDialog<Q>({
   const nodeNameError = useNodeNameValidation(input.name, existingNames, 'query');
   const isNameValid = !nodeNameError;
 
+  const execPrivate = React.useCallback(
+    (method: string, args: any[]) => {
+      invariant(dataSourceId, 'dataSourceId must be set');
+      return client.mutation.dataSourceExecPrivate(dataSourceId, method, args);
+    },
+    [dataSourceId],
+  );
+
   return (
     <Dialog fullWidth maxWidth="xl" open={open} onClose={handleCloseWithUnsavedChanges}>
       {dataSourceId && dataSource && queryEditorContext ? (
@@ -311,6 +321,7 @@ export default function QueryNodeEditorDialog<Q>({
                 onCommit={handleCommit}
                 globalScope={pageState}
                 globalScopeMeta={globalScopeMeta}
+                execApi={execPrivate}
               />
             </Box>
             <Stack direction="row" alignItems="center" sx={{ pt: 2, px: 3, gap: 2 }}>

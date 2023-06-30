@@ -74,6 +74,13 @@ export type AppStateAction =
       type: 'DESELECT_NODE';
     }
   | {
+      type: 'HOVER_NODE';
+      nodeId: NodeId;
+    }
+  | {
+      type: 'BLUR_HOVER_NODE';
+    }
+  | {
       type: 'SET_HAS_UNSAVED_CHANGES';
       hasUnsavedChanges: boolean;
     };
@@ -244,6 +251,22 @@ export function appStateReducer(state: AppState, action: AppStateAction): AppSta
       }
       return state;
     }
+    case 'HOVER_NODE': {
+      if (state.currentView.kind === 'page') {
+        return update(state, {
+          currentView: { ...state.currentView, hoveredNodeId: action.nodeId },
+        });
+      }
+      return state;
+    }
+    case 'BLUR_HOVER_NODE': {
+      if (state.currentView.kind === 'page') {
+        return update(state, {
+          currentView: { ...state.currentView, hoveredNodeId: null },
+        });
+      }
+      return state;
+    }
     case 'SET_VIEW':
     case 'UPDATE': {
       if (!action.view) {
@@ -357,6 +380,17 @@ function createAppStateApi(
       dispatch({
         type: 'SELECT_NODE',
         nodeId,
+      });
+    },
+    hoverNode(nodeId: NodeId) {
+      dispatch({
+        type: 'HOVER_NODE',
+        nodeId,
+      });
+    },
+    blurHoverNode() {
+      dispatch({
+        type: 'BLUR_HOVER_NODE',
       });
     },
     deselectNode() {

@@ -12,6 +12,7 @@ export type DomView =
       nodeId?: NodeId;
       view?: PageView;
       selectedNodeId?: NodeId | null;
+      hoveredNodeId?: NodeId | null;
       tab?: PageViewTab;
     }
   | { kind: 'connection'; nodeId: NodeId }

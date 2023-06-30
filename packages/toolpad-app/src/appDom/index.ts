@@ -366,7 +366,6 @@ export function getApp(dom: AppDom): AppNode {
 
 export type NodeChildren<N extends AppDomNode = any> = ChildNodesOf<N>;
 
-// TODO: memoize the result of this function per dom in a WeakMap
 const childrenMemo = new WeakMap<AppDom, Map<NodeId, NodeChildren<any>>>();
 export function getChildNodes<N extends AppDomNode>(dom: AppDom, parent: N): NodeChildren<N> {
   let domChildrenMemo = childrenMemo.get(dom);

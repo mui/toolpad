@@ -46,3 +46,27 @@ spec:
             value:
               $$jsExpression: |
                 `Invalid error: ${invalidError.error?.message}`
+    - component: PageRow
+      name: pageRow3
+      children:
+        - component: Paper
+          name: paper
+          children:
+            - component: PageRow
+              name: pageRow4
+              children:
+                - component: Text
+                  name: text3
+    - component: PageRow
+      name: pageRow5
+      children:
+        - component: List
+          name: list
+          props:
+            renderItem:
+              $$template:
+                - component: PageRow
+                  name: pageRow6
+                  children:
+                    - component: TextField
+                      name: textField

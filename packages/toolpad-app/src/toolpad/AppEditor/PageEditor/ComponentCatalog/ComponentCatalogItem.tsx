@@ -28,7 +28,7 @@ import PlaceIcon from '@mui/icons-material/Place';
 import ViewSidebarIcon from '@mui/icons-material/ViewSidebar';
 import MoodIcon from '@mui/icons-material/Mood';
 import HtmlIcon from '@mui/icons-material/Html';
-import { ButtonBase } from '@mui/material';
+import { ButtonBase, SxProps } from '@mui/material';
 
 const iconMap = new Map<string, React.ComponentType<SvgIconProps>>([
   ['Autocomplete', ManageSearchIcon],
@@ -65,11 +65,12 @@ type ComponentItemKind = 'future' | 'builtIn' | 'create' | 'custom';
 interface ComponentIconProps {
   id: string;
   kind?: ComponentItemKind;
+  sx?: SxProps;
 }
 
-function ComponentIcon({ id: componentId, kind }: ComponentIconProps) {
+export function ComponentIcon({ id: componentId, kind, sx }: ComponentIconProps) {
   const Icon = iconMap.get(kind === 'custom' ? 'CodeComponent' : componentId);
-  return Icon ? <Icon fontSize="medium" opacity={kind === 'future' ? 0.75 : 1} /> : null;
+  return Icon ? <Icon sx={{ fontSize: 24, opacity: kind === 'future' ? 0.75 : 1, ...sx }} /> : null;
 }
 
 interface ComponentCatalogItemProps {

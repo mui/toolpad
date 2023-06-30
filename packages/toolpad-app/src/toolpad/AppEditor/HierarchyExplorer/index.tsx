@@ -193,17 +193,12 @@ export default function HierarchyExplorer({ className }: HierarchyExplorerProps)
       const deletedNode = appDom.getNode(dom, nodeId);
 
       let domViewAfterDelete: DomView | undefined;
-
       if (nodeId === activeNode) {
         const siblings = appDom.getSiblings(dom, deletedNode);
         const firstSiblingOfType = siblings.find((sibling) => sibling.type === deletedNode.type);
         domViewAfterDelete = firstSiblingOfType && getNodeEditorDomView(firstSiblingOfType);
       }
 
-      if (!domViewAfterDelete && activeNode) {
-        const current = appDom.getNode(dom, activeNode);
-        domViewAfterDelete = current && getNodeEditorDomView(current);
-      }
       await client.mutation.deletePage(deletedNode.name);
 
       appStateApi.update(

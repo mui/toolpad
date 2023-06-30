@@ -1,4 +1,4 @@
-import { FiberNode, Hook } from 'react-devtools-inline';
+import type { FiberNode, Hook } from 'react-devtools-inline';
 import { NodeId, RUNTIME_PROP_NODE_ID, RUNTIME_PROP_SLOTS, SlotType } from '@mui/toolpad-core';
 import { NodeFiberHostProps } from '@mui/toolpad-core/runtime';
 import { PageViewState, NodesInfo, NodeInfo, FlowDirection } from '../types';

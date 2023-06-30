@@ -10,7 +10,7 @@ export type Reviver = NonNullable<Parameters<typeof JSON.parse>[1]>;
 /**
  * Like `fs.readFile`, but for JSON files specifically. Will throw on malformed JSON.
  */
-export async function readJsonFile(filePath: string, reviver?: Reviver): Promise<any> {
+export async function readJsonFile(filePath: string, reviver?: Reviver): Promise<unknown> {
   const content = await fs.readFile(filePath, { encoding: 'utf-8' });
   return JSON.parse(content, reviver);
 }

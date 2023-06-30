@@ -1,0 +1,20 @@
+apiVersion: v1
+kind: page
+spec:
+  id: 2910df0
+  title: Page 1
+  content:
+    - component: PageRow
+      name: pageRow
+      children:
+        - component: Button
+          name: button
+          props:
+            content: Hello world
+  queries:
+    - name: query
+      query:
+        kind: rest
+        url: hello
+        headers: []
+        method: GET

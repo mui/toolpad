@@ -10,6 +10,7 @@ import { errorFrom } from '@mui/toolpad-utils/errors';
 import { execaCommand } from 'execa';
 import { satisfies } from 'semver';
 import { readJsonFile } from '@mui/toolpad-utils/fs';
+import invariant from 'invariant';
 import { PackageJson } from './packageType';
 
 type PackageManager = 'npm' | 'pnpm' | 'yarn';
@@ -159,14 +160,19 @@ const scaffoldProject = async (absolutePath: string, installFlag: boolean): Prom
 
 // Run the CLI interaction with Inquirer.js
 const run = async () => {
-  const pj = await readJsonFile(path.resolve(__dirname, `../package.json`));
+  const pkgJson: PackageJson = (await readJsonFile(
+    path.resolve(__dirname, `../package.json`),
+  )) as any;
+
+  invariant(pkgJson.engines?.node, 'Missing node version in package.json');
+
   // check the node version before create
-  if (!satisfies(process.version, pj.engines?.node)) {
+  if (!satisfies(process.version, pkgJson.engines.node)) {
     // eslint-disable-next-line no-console
     console.log(
       `${chalk.red('error')} - Your node version ${
         process.version
-      } is unsupported. Please upgrade it to at least ${pj.engines?.node}`,
+      } is unsupported. Please upgrade it to at least ${pkgJson.engines.node}`,
     );
     process.exit(1);
   }

@@ -1,8 +1,9 @@
 import { ExecFetchResult } from '@mui/toolpad-core';
 import { ServerDataSource } from '../../types';
-import { LocalPrivateQuery, LocalQuery, LocalConnectionParams } from './types';
+import { LocalQuery, LocalConnectionParams, LocalPrivateApi } from './types';
 import { Maybe } from '../../utils/types';
 import { getProject } from '../../server/liveProject';
+import { parseLegacyFunctionId } from './shared';
 
 async function exec(
   connection: Maybe<LocalConnectionParams>,
@@ -13,35 +14,37 @@ async function exec(
   if (!fetchQuery.function) {
     throw new Error('Missing function name');
   }
+  const parsed = parseLegacyFunctionId(fetchQuery.function);
+  if (!parsed.handler) {
+    throw new Error('Missing function name');
+  }
   const { data, error } = await project.functionsManager.exec(
-    'functions.ts',
-    fetchQuery.function,
+    parsed.file,
+    parsed.handler,
     parameters,
   );
   return { data, error };
 }
 
-async function execPrivate(connection: Maybe<LocalConnectionParams>, query: LocalPrivateQuery) {
-  switch (query.kind) {
-    case 'introspection': {
+const dataSource: ServerDataSource<{}, LocalQuery, any, LocalPrivateApi> = {
+  exec,
+  api: {
+    async introspection() {
       const project = await getProject();
       return project.functionsManager.introspect();
-    }
-    case 'debugExec': {
-      return exec(null, query.query, query.params);
-    }
-    case 'openEditor': {
+    },
+    async debugExec(query, params) {
+      return exec(null, query, params);
+    },
+    async openEditor(fileName) {
       const project = await getProject();
-      return project.functionsManager.openQueryEditor();
-    }
-    default:
-      throw new Error(`Unknown private query "${(query as LocalPrivateQuery).kind}"`);
-  }
-}
-
-const dataSource: ServerDataSource<{}, LocalQuery, any> = {
-  exec,
-  execPrivate,
+      return project.functionsManager.openQueryEditor(fileName);
+    },
+    async createNew(fileName) {
+      const project = await getProject();
+      return project.functionsManager.createFunctionFile(fileName);
+    },
+  },
 };
 
 export default dataSource;

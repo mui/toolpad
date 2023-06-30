@@ -44,7 +44,7 @@ export function errorFrom(maybeError: unknown): Error {
     typeof maybeError === 'object' &&
     maybeError &&
     hasOwnProperty(maybeError, 'message') &&
-    typeof maybeError.message! === 'string'
+    typeof maybeError.message === 'string'
   ) {
     return new Error(maybeError.message, { cause: maybeError });
   }

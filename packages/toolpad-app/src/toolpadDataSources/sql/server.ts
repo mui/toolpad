@@ -34,5 +34,6 @@ export function createSqlServerDatasource<P, Q>({
           throw new Error(`Unknown query "${(query as SqlPrivateQuery<P, Q>).kind}"`);
       }
     },
+    api: {},
   };
 }

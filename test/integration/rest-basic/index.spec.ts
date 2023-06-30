@@ -33,7 +33,7 @@ test.use({
   },
 });
 
-test('rest basics', async ({ page, context, localApp }) => {
+test('rest runtime basics', async ({ page, localApp }) => {
   const runtimeModel = new ToolpadRuntime(page);
   await runtimeModel.gotoPage('page1');
   await expect(page.locator('text="query1: query1_value"')).toBeVisible();
@@ -48,11 +48,12 @@ test('rest basics', async ({ page, context, localApp }) => {
   const envFilePath = path.resolve(localApp.dir, './.env');
   await fs.writeFile(envFilePath, 'TEST_VAR=bar');
 
-  // TODO: figure out window focus issues in playwright https://github.com/microsoft/playwright/issues/3570
   await page.reload();
 
   await expect(page.getByText('query4 authorization: bar')).toBeVisible();
+});
 
+test('rest editor basics', async ({ page, context, localApp }) => {
   const editorModel = new ToolpadEditor(page);
   await editorModel.goto();
 
@@ -63,10 +64,18 @@ test('rest basics', async ({ page, context, localApp }) => {
 
   await expect(newQueryEditor).toBeVisible();
 
+  await expect(editorModel.appCanvas.getByText('query4 authorization: foo')).toBeVisible();
+
+  const envFilePath = path.resolve(localApp.dir, './.env');
+  await fs.writeFile(envFilePath, 'TEST_VAR=bar');
+
+  await expect(editorModel.appCanvas.getByText('query4 authorization: bar')).toBeVisible();
+
   // Make sure switching tabs does not close query editor
   const newTab = await context.newPage();
   await newTab.bringToFront();
   await page.bringToFront();
+  await newTab.close();
   await expect(newQueryEditor).toBeVisible();
 
   await newQueryEditor.getByRole('button', { name: 'Save' }).click();
@@ -82,6 +91,13 @@ test('rest basics', async ({ page, context, localApp }) => {
   const networkTab = existingQueryEditor.getByRole('tabpanel', { name: 'Network' });
   await expect(networkTab.getByText('/get?query1_param1=query1_value')).not.toBeEmpty();
 
+  await newQueryEditor.getByRole('tab', { name: 'Headers' }).click();
+
   await existingQueryEditor.getByRole('button', { name: 'Cancel' }).click();
   await expect(existingQueryEditor).not.toBeVisible();
+
+  await editorModel.componentEditor.getByRole('button', { name: 'queryWithEnv' }).click();
+
+  const queryWithEnvQueryEditor = page.getByRole('dialog', { name: 'queryWithEnv' });
+  await queryWithEnvQueryEditor.getByRole('tab', { name: 'Headers' }).click();
 });

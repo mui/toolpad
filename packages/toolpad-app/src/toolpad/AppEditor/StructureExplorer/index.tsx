@@ -149,6 +149,8 @@ export default function PageStructureExplorer() {
   const { dom } = useDom();
   const { currentView } = useAppState();
   const appStateApi = useAppStateApi();
+  const [expandedDomNodeIds, setExpandedDomNodeIds] = React.useState<string[]>([]);
+
   const currentPageId = currentView?.kind === 'page' ? currentView.nodeId : null;
   const currentPageNode = currentPageId ? appDom.getNode(dom, currentPageId, 'page') : null;
   const selectedDomNodeId = currentView.kind === 'page' ? currentView.selectedNodeId : '';
@@ -157,7 +159,11 @@ export default function PageStructureExplorer() {
     if (!selectedDomNodeId) {
       return null;
     }
-    return appDom.getParent(dom, appDom.getNode(dom, selectedDomNodeId))?.id;
+    const selectedNode = appDom.getMaybeNode(dom, selectedDomNodeId);
+    if (selectedNode) {
+      return appDom.getParent(dom, selectedNode)?.id;
+    }
+    return null;
   }, [dom, selectedDomNodeId]);
 
   const { children: rootChildren = [] } = React.useMemo(() => {
@@ -191,8 +197,6 @@ export default function PageStructureExplorer() {
   const handleNodeBlur = React.useCallback(() => {
     appStateApi.blurHoverNode();
   }, [appStateApi]);
-
-  const [expandedDomNodeIds, setExpandedDomNodeIds] = React.useState<string[]>([]);
 
   const handleNodeToggle = React.useCallback(
     (event: React.SyntheticEvent, nodeIds: string[]) => {

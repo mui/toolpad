@@ -376,22 +376,7 @@
         "spec": {
           "type": "object",
           "properties": {
-            "palette.mode": {
-              "type": "string",
-              "enum": [
-                "light",
-                "dark"
-              ],
-              "description": "The MUI theme palette mode."
-            },
-            "palette.primary.main": {
-              "type": "string",
-              "description": "The primary theme color."
-            },
-            "palette.secondary.main": {
-              "type": "string",
-              "description": "The secondary theme color."
-            }
+            "options": {}
           },
           "additionalProperties": false,
           "description": "Defines the shape of this \"theme\" object"

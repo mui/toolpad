@@ -90,14 +90,16 @@ export default function MuiThemeEditor({ value, onChange }: MuiThemeEditorProps)
       <ToggleButtonGroup
         exclusive
         value={value?.palette?.mode}
-        onChange={(event, newMode: PaletteMode) => {
-          onChange({
-            ...value,
-            palette: {
-              ...value?.palette,
-              mode: newMode,
-            },
-          });
+        onChange={(event, newMode: PaletteMode | null) => {
+          if (newMode) {
+            onChange({
+              ...value,
+              palette: {
+                ...value?.palette,
+                mode: newMode,
+              },
+            });
+          }
         }}
         aria-label="Mode"
       >

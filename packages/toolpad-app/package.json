@@ -135,7 +135,7 @@
   "devDependencies": {
     "@types/babel__code-frame": "7.0.3",
     "@types/crypto-js": "4.1.1",
-    "@types/formidable": "2.0.6",
+    "@types/formidable": "3.4.0",
     "@types/glob": "8.1.0",
     "@types/har-format": "1.2.11",
     "@types/invariant": "2.2.35",

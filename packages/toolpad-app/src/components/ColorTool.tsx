@@ -98,10 +98,12 @@ function ColorTool({ sx, label, value, onChange }: ColorToolProps) {
     input: string;
     hue: keyof typeof colors;
     shade: number;
+    isValidColor: boolean;
   }>({
     input: value,
     hue: 'blue',
     shade: 4,
+    isValidColor: true,
   });
 
   const handleChangeColor = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -109,21 +111,22 @@ function ColorTool({ sx, label, value, onChange }: ColorToolProps) {
       target: { value: color },
     } = event;
 
-    setState((oldState) => ({
-      ...oldState,
-      input: color,
-    }));
-
     let isValidColor = false;
 
     if (isRgb(color)) {
       isValidColor = true;
     } else if (isHex(color)) {
       isValidColor = true;
-      if (color.indexOf('#') === -1) {
+      if (!color.startsWith('#')) {
         color = `#${color}`;
       }
     }
+
+    setState((oldState) => ({
+      ...oldState,
+      input: color,
+      isValidColor,
+    }));
 
     if (isValidColor) {
       onChange(color);
@@ -177,7 +180,13 @@ function ColorTool({ sx, label, value, onChange }: ColorToolProps) {
       <Typography component="label" gutterBottom htmlFor={id} variant="h6">
         {label}
       </Typography>
-      <Input id={id} value={intentInput} onChange={handleChangeColor} fullWidth />
+      <Input
+        id={id}
+        value={intentInput}
+        onChange={handleChangeColor}
+        fullWidth
+        error={!state.isValidColor}
+      />
       <Box sx={{ display: 'flex', alignItems: 'center', mt: 2, mb: 2 }}>
         <Typography id={`${id}ShadeSliderLabel`}>Shade:</Typography>
         <Slider

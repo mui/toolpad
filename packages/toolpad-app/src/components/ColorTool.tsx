@@ -176,7 +176,7 @@ function ColorTool({ sx, label, value, onChange }: ColorToolProps) {
   const id = React.useId();
 
   return (
-    <Grid item xs={12} sm={6} md={4} sx={sx}>
+    <Box sx={sx}>
       <Typography component="label" gutterBottom htmlFor={id} variant="h6">
         {label}
       </Typography>
@@ -261,7 +261,7 @@ function ColorTool({ sx, label, value, onChange }: ColorToolProps) {
           </Box>
         ))}
       </Grid>
-    </Grid>
+    </Box>
   );
 }
 

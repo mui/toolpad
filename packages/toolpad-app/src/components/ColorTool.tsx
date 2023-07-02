@@ -10,6 +10,7 @@ import Typography from '@mui/material/Typography';
 import CheckIcon from '@mui/icons-material/Check';
 import Slider from '@mui/material/Slider';
 import invariant from 'invariant';
+import { Stack } from '@mui/material';
 
 const isRgb = (string: string) =>
   /rgb\([0-9]{1,3}\s*,\s*[0-9]{1,3}\s*,\s*[0-9]{1,3}\)/i.test(string);
@@ -200,13 +201,13 @@ function ColorTool({ sx, label, value, onChange }: ColorToolProps) {
         />
         <Typography>{shades[intentShade]}</Typography>
       </Box>
-      <Box sx={{ width: 192 }}>
+      <Box sx={{ width: 192, margin: 'auto' }}>
         {hues.map((hue) => {
           const shade = shades[state.shade];
           const backgroundColor = colors[hue][shade];
 
           return (
-            <Tooltip placement="right" title={hue} key={hue}>
+            <Tooltip placement="right" title={hue} key={hue} disableInteractive>
               <TooltipRadio
                 sx={{ p: 0 }}
                 color="default"
@@ -237,7 +238,7 @@ function ColorTool({ sx, label, value, onChange }: ColorToolProps) {
           );
         })}
       </Box>
-      <Grid container sx={{ mt: 2 }}>
+      <Stack direction="row" sx={{ mt: 2, justifyContent: 'center' }}>
         {(['dark', 'main', 'light'] as const).map((key) => (
           <Box
             sx={{
@@ -260,7 +261,7 @@ function ColorTool({ sx, label, value, onChange }: ColorToolProps) {
             </Typography>
           </Box>
         ))}
-      </Grid>
+      </Stack>
     </Box>
   );
 }

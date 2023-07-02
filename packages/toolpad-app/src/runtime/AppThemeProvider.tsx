@@ -1,8 +1,6 @@
 import * as React from 'react';
-import { createTheme, Theme, PaletteOptions, ThemeProvider } from '@mui/material';
-import * as colors from '@mui/material/colors';
+import { createTheme, Theme, ThemeProvider, ThemeOptions } from '@mui/material';
 import * as appDom from '../appDom';
-import { AppTheme } from '../types';
 
 declare module '@mui/material/styles' {
   interface Theme {
@@ -14,25 +12,8 @@ declare module '@mui/material/styles' {
   }
 }
 
-function createMuiThemeFromToolpadTheme(toolpadTheme: AppTheme = {}): Theme {
-  const palette: PaletteOptions = {};
-  const primary = toolpadTheme['palette.primary.main'];
-  if (primary) {
-    palette.primary = (colors as any)[primary];
-  }
-
-  const secondary = toolpadTheme['palette.secondary.main'];
-  if (secondary) {
-    palette.secondary = (colors as any)[secondary];
-  }
-
-  const mode = toolpadTheme['palette.mode'];
-  if (mode) {
-    palette.mode = mode;
-  }
-
-  return createTheme({
-    palette,
+function createMuiThemeFromToolpadTheme(toolpadTheme: ThemeOptions = {}): Theme {
+  return createTheme(toolpadTheme, {
     typography: {
       h1: {
         fontSize: `3.25rem`,
@@ -72,9 +53,7 @@ export function createToolpadAppTheme(dom: appDom.AppDom): Theme {
   const root = appDom.getApp(dom);
   const { themes = [] } = appDom.getChildNodes(dom, root);
   const themeNode = themes.length > 0 ? themes[0] : null;
-  const toolpadTheme: AppTheme = themeNode?.theme
-    ? appDom.fromConstPropValues(themeNode.theme)
-    : {};
+  const toolpadTheme = themeNode?.theme;
   return createMuiThemeFromToolpadTheme(toolpadTheme);
 }
 

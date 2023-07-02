@@ -2,7 +2,6 @@ import * as React from 'react';
 import { SxProps, rgbToHex, useTheme } from '@mui/material/styles';
 import * as colors from '@mui/material/colors';
 import Box from '@mui/material/Box';
-import Grid from '@mui/material/Grid';
 import Input from '@mui/material/Input';
 import Radio, { RadioProps } from '@mui/material/Radio';
 import Tooltip from '@mui/material/Tooltip';

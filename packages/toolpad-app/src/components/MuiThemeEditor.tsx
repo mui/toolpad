@@ -2,6 +2,7 @@ import * as React from 'react';
 import {
   Box,
   Button,
+  capitalize,
   PaletteColor,
   PaletteMode,
   Popover,
@@ -85,6 +86,26 @@ export interface MuiThemeEditorProps {
 
 export default function MuiThemeEditor({ value, onChange }: MuiThemeEditorProps) {
   const theme = useTheme();
+
+  const colorPicker = (intent: 'primary' | 'secondary') => (
+    <PaletteColorPicker
+      label={capitalize(intent)}
+      value={(value?.palette?.[intent] as PaletteColor)?.main || '#f50057'}
+      onChange={(newMain) => {
+        onChange({
+          ...value,
+          palette: {
+            ...value?.palette,
+            [intent]: {
+              main: newMain,
+              contrastText: theme.palette.getContrastText(newMain),
+            },
+          },
+        });
+      }}
+    />
+  );
+
   return (
     <Stack direction="column" spacing={2}>
       <ToggleButtonGroup
@@ -113,39 +134,9 @@ export default function MuiThemeEditor({ value, onChange }: MuiThemeEditorProps)
         </IconToggleButton>
       </ToggleButtonGroup>
 
-      <PaletteColorPicker
-        label="Primary"
-        value={(value?.palette?.primary as PaletteColor)?.main || '#2196f3'}
-        onChange={(newMain) => {
-          onChange({
-            ...value,
-            palette: {
-              ...value?.palette,
-              primary: {
-                main: newMain,
-                contrastText: theme.palette.getContrastText(newMain),
-              },
-            },
-          });
-        }}
-      />
+      {colorPicker('primary')}
 
-      <PaletteColorPicker
-        label="Secondary"
-        value={(value?.palette?.secondary as PaletteColor)?.main || '#f50057'}
-        onChange={(newMain) => {
-          onChange({
-            ...value,
-            palette: {
-              ...value?.palette,
-              secondary: {
-                main: newMain,
-                contrastText: theme.palette.getContrastText(newMain),
-              },
-            },
-          });
-        }}
-      />
+      {colorPicker('secondary')}
     </Stack>
   );
 }

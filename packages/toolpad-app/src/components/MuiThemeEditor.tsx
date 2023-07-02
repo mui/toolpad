@@ -83,7 +83,7 @@ export default function MuiThemeEditor({ value, onChange }: MuiThemeEditorProps)
 
       <PaletteColorPicker
         label="Secondary"
-        value={(value?.palette?.primary as PaletteColor)?.main || '#f50057'}
+        value={(value?.palette?.secondary as PaletteColor)?.main || '#f50057'}
         onChange={(newMain) => {
           onChange({
             ...value,

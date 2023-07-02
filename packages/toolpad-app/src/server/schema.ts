@@ -290,8 +290,10 @@ export type Page = z.infer<typeof pageSchema>;
 
 export const themeSchema = toolpadObjectSchema(
   'theme',
-  // TODO: Validate MUI theme object
-  z.any(),
+  z.object({
+    // TODO: Validate MUI theme object
+    options: z.any(),
+  }),
 );
 
 export type Theme = z.infer<typeof themeSchema>;

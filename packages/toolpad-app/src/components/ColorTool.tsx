@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { rgbToHex, useTheme } from '@mui/material/styles';
+import { SxProps, rgbToHex, useTheme } from '@mui/material/styles';
 import * as colors from '@mui/material/colors';
 import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
@@ -88,9 +88,10 @@ export interface ColorToolProps {
   label: string;
   value: string;
   onChange: (value: string) => void;
+  sx?: SxProps;
 }
 
-function ColorTool({ label, value, onChange }: ColorToolProps) {
+function ColorTool({ sx, label, value, onChange }: ColorToolProps) {
   const theme = useTheme();
 
   const [state, setState] = React.useState<{
@@ -172,7 +173,7 @@ function ColorTool({ label, value, onChange }: ColorToolProps) {
   const id = React.useId();
 
   return (
-    <Grid item xs={12} sm={6} md={4}>
+    <Grid item xs={12} sm={6} md={4} sx={sx}>
       <Typography component="label" gutterBottom htmlFor={id} variant="h6">
         {label}
       </Typography>

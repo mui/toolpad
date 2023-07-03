@@ -87,10 +87,10 @@ export interface MuiThemeEditorProps {
 export default function MuiThemeEditor({ value, onChange }: MuiThemeEditorProps) {
   const theme = useTheme();
 
-  const colorPicker = (intent: 'primary' | 'secondary') => (
+  const colorPicker = (intent: 'primary' | 'secondary', defaultValue: string) => (
     <PaletteColorPicker
       label={capitalize(intent)}
-      value={(value?.palette?.[intent] as SimplePaletteColorOptions)?.main || '#f50057'}
+      value={(value?.palette?.[intent] as SimplePaletteColorOptions)?.main || defaultValue}
       onChange={(newMain) => {
         onChange({
           ...value,
@@ -134,9 +134,9 @@ export default function MuiThemeEditor({ value, onChange }: MuiThemeEditorProps)
         </IconToggleButton>
       </ToggleButtonGroup>
 
-      {colorPicker('primary')}
+      {colorPicker('primary', '#2196f3')}
 
-      {colorPicker('secondary')}
+      {colorPicker('secondary', '#f50057')}
     </Stack>
   );
 }

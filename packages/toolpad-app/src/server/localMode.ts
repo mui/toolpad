@@ -8,7 +8,7 @@ import { BindableAttrValue, NodeId, PropBindableAttrValue } from '@mui/toolpad-c
 import { fromZodError } from 'zod-validation-error';
 import { glob } from 'glob';
 import * as chokidar from 'chokidar';
-import { debounce } from 'lodash-es';
+import { debounce, throttle } from 'lodash-es';
 import { Emitter } from '@mui/toolpad-utils/events';
 import { errorFrom } from '@mui/toolpad-utils/errors';
 import { filterValues, hasOwnProperty, mapValues } from '@mui/toolpad-utils/collections';
@@ -22,8 +22,6 @@ import {
 } from '@mui/toolpad-utils/fs';
 import config from '../config';
 import * as appDom from '../appDom';
-import * as v7LegacyDom from '../appDom/migrations/types/v7Legacy';
-import { migrateUp } from '../appDom/migrations';
 import insecureHash from '../utils/insecureHash';
 import {
   Page,
@@ -101,19 +99,12 @@ export function getAppOutputFolder(root: string) {
   return path.join(getOutputFolder(root), 'app');
 }
 
-export async function getConfigFilePath(root: string) {
-  const yamlFilePath = path.join(root, './toolpad.yaml');
-  const ymlFilePath = path.join(root, './toolpad.yml');
-
-  if (await fileExists(yamlFilePath)) {
-    return yamlFilePath;
-  }
-
-  if (await fileExists(ymlFilePath)) {
-    return ymlFilePath;
-  }
-
-  return yamlFilePath;
+export async function legacyConfigFileExists(root: string): Promise<boolean> {
+  const [yamlFileExists, ymlFileExists] = await Promise.all([
+    fileExists(path.join(root, './toolpad.yaml')),
+    fileExists(path.join(root, './toolpad.yml')),
+  ]);
+  return yamlFileExists || ymlFileExists;
 }
 
 type ComponentsContent = Record<string, { code: string }>;
@@ -171,6 +162,7 @@ async function loadPagesFromFiles(root: string): Promise<PagesContent> {
         }
 
         const result = pageSchema.safeParse(parsedFile);
+
         if (result.success) {
           return [pageName, result.data];
         }
@@ -256,29 +248,6 @@ class Lock {
   }
 }
 
-const configFileLock = new Lock();
-
-async function loadConfigFileFrom(
-  configFilePath: string,
-): Promise<appDom.AppDom | v7LegacyDom.AppDom | null> {
-  // Using a lock to avoid read during write which may result in reading truncated file content
-  const configContent = await configFileLock.use(() => readMaybeFile(configFilePath));
-
-  if (!configContent) {
-    return null;
-  }
-
-  const parsedConfig = yaml.parse(configContent);
-  invariant(parsedConfig, 'Invalid Toolpad config');
-  return parsedConfig;
-}
-
-async function loadConfigFile(root: string): Promise<appDom.AppDom | v7LegacyDom.AppDom | null> {
-  const configFilePath = await getConfigFilePath(root);
-  const dom = await loadConfigFileFrom(configFilePath);
-  return dom;
-}
-
 const DEFAULT_GENERATED_GITIGNORE_FILE_CONTENT = `.generated
 `;
 
@@ -352,7 +321,7 @@ function mergeThemeIntoAppDom(dom: appDom.AppDom, themeFile: Theme): appDom.AppD
   dom = appDom.addNode(
     dom,
     appDom.createNode(dom, 'theme', {
-      theme: themeFileSpec,
+      theme: themeFileSpec.options,
       attributes: {},
     }),
     app,
@@ -745,7 +714,7 @@ function mergePageIntoDom(dom: appDom.AppDom, pageName: string, pageFile: Page):
   return dom;
 }
 
-function mergPagesIntoDom(dom: appDom.AppDom, pages: PagesContent): appDom.AppDom {
+function mergePagesIntoDom(dom: appDom.AppDom, pages: PagesContent): appDom.AppDom {
   for (const [name, page] of Object.entries(pages)) {
     dom = mergePageIntoDom(dom, name, page);
   }
@@ -773,6 +742,22 @@ function extractPagesFromDom(dom: appDom.AppDom): ExtractedPages {
   return { pages, dom };
 }
 
+function extractThemeFromDom(dom: appDom.AppDom): Theme | null {
+  const rootNode = appDom.getApp(dom);
+  const { themes: themeNodes = [] } = appDom.getChildNodes(dom, rootNode);
+  if (themeNodes.length > 0) {
+    return {
+      apiVersion: API_VERSION,
+      kind: 'theme',
+      spec: {
+        options: themeNodes[0].theme,
+      },
+    };
+  }
+
+  return null;
+}
+
 async function writePagesToFiles(root: string, pages: PagesContent) {
   await Promise.all(
     Object.entries(pages).map(async ([name, page]) => {
@@ -791,48 +776,13 @@ async function writeThemeFile(root: string, theme: Theme | null) {
   }
 }
 
-interface ExtractedComponents {
-  components: ComponentsContent;
-  dom: appDom.AppDom;
-}
-
-function extractComponentsContentFromDom(dom: appDom.AppDom): ExtractedComponents {
-  const rootNode = appDom.getApp(dom);
-  const { codeComponents: codeComponentNodes = [] } = appDom.getChildNodes(dom, rootNode);
-
-  const components: ComponentsContent = {};
-
-  for (const codeComponent of codeComponentNodes) {
-    components[codeComponent.name] = { code: codeComponent.attributes.code };
-    dom = appDom.removeNode(dom, codeComponent.id);
-  }
-
-  return { components, dom };
-}
-
-function extractThemeContentFromDom(dom: appDom.AppDom): Theme | null {
-  const app = appDom.getApp(dom);
-  const { themes = [] } = appDom.getChildNodes(dom, app);
-  if (themes[0]?.theme) {
-    return {
-      apiVersion: API_VERSION,
-      kind: 'theme',
-      spec: {
-        'palette.mode': appDom.fromConstPropValue(themes[0].theme['palette.mode']),
-        'palette.primary.main': appDom.fromConstPropValue(themes[0].theme['palette.primary.main']),
-        'palette.secondary.main': appDom.fromConstPropValue(
-          themes[0].theme['palette.secondary.main'],
-        ),
-      },
-    };
-  }
-  return null;
-}
-
 async function writeDomToDisk(dom: appDom.AppDom): Promise<void> {
   const root = getUserProjectRoot();
   const { pages: pagesContent } = extractPagesFromDom(dom);
-  await Promise.all([writePagesToFiles(root, pagesContent)]);
+  await Promise.all([
+    writePagesToFiles(root, pagesContent),
+    writeThemeFile(root, extractThemeFromDom(dom)),
+  ]);
 }
 
 const DEFAULT_EDITOR = 'code';
@@ -919,19 +869,12 @@ async function writeProjectFolder(
 
 function projectFolderToAppDom(projectFolder: ToolpadProjectFolder): appDom.AppDom {
   let dom = appDom.createDom();
-  dom = mergPagesIntoDom(dom, projectFolder.pages);
+  dom = mergePagesIntoDom(dom, projectFolder.pages);
   dom = mergeComponentsContentIntoDom(dom, projectFolder.components);
   if (projectFolder.theme) {
     dom = mergeThemeIntoAppDom(dom, projectFolder.theme);
   }
   return dom;
-}
-
-function appDomToProjectFolder(dom: appDom.AppDom): ToolpadProjectFolder {
-  const { pages } = extractPagesFromDom(dom);
-  const { components } = extractComponentsContentFromDom(dom);
-  const theme = extractThemeContentFromDom(dom);
-  return { pages, components, theme };
 }
 
 async function loadProjectFolder(): Promise<ToolpadProjectFolder> {
@@ -941,44 +884,21 @@ async function loadProjectFolder(): Promise<ToolpadProjectFolder> {
 
 export async function loadDomFromDisk(): Promise<appDom.AppDom> {
   const projectFolder = await loadProjectFolder();
+
   return projectFolderToAppDom(projectFolder);
 }
 
 async function migrateLegacyProject(root: string) {
-  let dom = await loadConfigFile(root);
-  if (!dom) {
-    return;
-  }
-  const domVersion = dom.version ?? 0;
-  if (domVersion > appDom.CURRENT_APPDOM_VERSION) {
+  const isLegacyProject = await legacyConfigFileExists(root);
+
+  if (isLegacyProject) {
     console.error(
       `${chalk.red(
         'error',
-      )} - This project was created with a newer version of Toolpad, please upgrade your ${chalk.cyan(
-        '@mui/toolpad',
-      )} installation`,
+      )} - This project was created with a deprecated version of Toolpad, please use @mui/toolpad@0.1.17 to migrate this project`,
     );
     process.exit(1);
-  } else if (domVersion < appDom.CURRENT_APPDOM_VERSION) {
-    // eslint-disable-next-line no-console
-    console.log(
-      `${chalk.blue(
-        'info',
-      )}  - This project was created by an older version of Toolpad. Upgrading...`,
-    );
-
-    dom = migrateUp(dom as v7LegacyDom.AppDom);
   }
-
-  const projectFolder = appDomToProjectFolder(dom as appDom.AppDom);
-
-  await writeProjectFolder(root, projectFolder, true);
-
-  const configFilePath = await getConfigFilePath(root);
-  await Promise.all([
-    fs.rm(configFilePath, { recursive: true, force: true }),
-    fs.rm(path.resolve(root, '.toolpad-generated'), { recursive: true, force: true }),
-  ]);
 }
 
 function getDomFilePatterns(root: string) {
@@ -1010,7 +930,7 @@ async function initToolpadFolder(root: string) {
   const projectFolder = await readProjectFolder(root);
   if (Object.keys(projectFolder.pages).length <= 0) {
     projectFolder.pages.page = {
-      apiVersion: 'v1',
+      apiVersion: API_VERSION,
       kind: 'page',
       spec: {
         id: appDom.createId(),
@@ -1045,6 +965,10 @@ class ToolpadProject {
 
   functionsManager: FunctionsManager;
 
+  invalidateQueries: () => void;
+
+  private alertedMissingVars = new Set<string>();
+
   constructor(root: string, options: Partial<ToolpadProjectOptions>) {
     this.root = root;
     this.options = {
@@ -1056,6 +980,16 @@ class ToolpadProject {
     this.functionsManager = new FunctionsManager(this);
 
     this.initWatcher();
+
+    this.invalidateQueries = throttle(
+      () => {
+        this.events.emit('queriesInvalidated', {});
+      },
+      250,
+      {
+        leading: false,
+      },
+    );
   }
 
   private initWatcher() {
@@ -1112,8 +1046,34 @@ class ToolpadProject {
     return getOutputFolder(this.getRoot());
   }
 
+  alertOnMissingVariablesInDom(dom: appDom.AppDom) {
+    const requiredVars = appDom.getRequiredEnvVars(dom);
+    const missingVars = Array.from(requiredVars).filter(
+      (key) => typeof process.env[key] === 'undefined',
+    );
+    const toAlert = missingVars.filter((key) => !this.alertedMissingVars.has(key));
+
+    if (toAlert.length > 0) {
+      const firstThree = toAlert.slice(0, 3);
+      const restCount = toAlert.length - firstThree.length;
+      const missingListMsg = firstThree.map((varName) => chalk.cyan(varName)).join(', ');
+      const restMsg = restCount > 0 ? ` and ${restCount} more` : '';
+
+      // eslint-disable-next-line no-console
+      console.log(
+        `${chalk.yellow(
+          'warn',
+        )}  - Missing required environment variable(s): ${missingListMsg}${restMsg}.`,
+      );
+    }
+
+    // Only alert once per missing variable
+    this.alertedMissingVars = new Set(missingVars);
+  }
+
   async loadDom() {
     const [dom] = await this.loadDomAndFingerprint();
+    this.alertOnMissingVariablesInDom(dom);
     return dom;
   }
 

@@ -4,7 +4,7 @@ import express from 'express';
 import cors from 'cors';
 import invariant from 'invariant';
 import { errorFrom, serializeError, SerializedError } from '@mui/toolpad-utils/errors';
-import { ServerDataSource } from '../types';
+import { Methods, ServerDataSource } from '../types';
 import serverDataSources from '../toolpadDataSources/server';
 import * as appDom from '../appDom';
 import applyTransform from '../toolpadDataSources/applyTransform';
@@ -57,7 +57,7 @@ export async function execQuery<P, Q>(
     const transformEnabled = dataNode.attributes.transformEnabled;
     const transform = dataNode.attributes.transform;
     if (transformEnabled && transform) {
-      const jsServerRuntime = await createServerJsRuntime();
+      const jsServerRuntime = await createServerJsRuntime(process.env);
       result = {
         data: await applyTransform(jsServerRuntime, transform, result.data),
       };
@@ -83,6 +83,26 @@ export async function dataSourceFetchPrivate<P, Q>(
   }
 
   return dataSource.execPrivate(null, query);
+}
+
+export async function dataSourceExecPrivate<P, Q, PQS extends Methods>(
+  dataSourceId: string,
+  method: keyof PQS,
+  args: any[],
+): Promise<any> {
+  const dataSource = serverDataSources[dataSourceId] as
+    | ServerDataSource<P, Q, any, PQS>
+    | undefined;
+
+  if (!dataSource) {
+    throw new Error(`Unknown dataSource "${dataSourceId}"`);
+  }
+
+  if (!dataSource.api) {
+    throw new Error(`No api available on datasource "${dataSourceId}"`);
+  }
+
+  return dataSource.api[method](...args);
 }
 
 function withSerializedError<T extends { error?: unknown }>(

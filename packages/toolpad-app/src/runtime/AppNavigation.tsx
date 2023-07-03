@@ -9,7 +9,7 @@ import {
   ListItemText,
   Toolbar,
 } from '@mui/material';
-import { useNavigate, useLocation, useHref } from 'react-router-dom';
+import { useLocation, useHref, Link } from 'react-router-dom';
 import * as appDom from '../appDom';
 
 const DRAWER_WIDTH = 250; // px
@@ -20,17 +20,9 @@ interface AppNavigationProps {
 }
 
 export default function AppNavigation({ pages, clipped = false }: AppNavigationProps) {
-  const navigate = useNavigate();
   const location = useLocation();
   const { search } = location;
   const href = useHref('');
-
-  const handlePageClick = React.useCallback(
-    (page: appDom.PageNode) => () => {
-      navigate(`pages/${page.id}${search}`);
-    },
-    [navigate, search],
-  );
 
   const activePagePath = location.pathname.replace(href, '');
 
@@ -59,8 +51,12 @@ export default function AppNavigation({ pages, clipped = false }: AppNavigationP
           aria-labelledby={navListSubheaderId}
         >
           {pages.map((page) => (
-            <ListItem key={page.id} onClick={handlePageClick(page)} disablePadding>
-              <ListItemButton selected={activePagePath === `/pages/${page.id}`}>
+            <ListItem key={page.id} disablePadding>
+              <ListItemButton
+                component={Link}
+                to={`pages/${page.id}${search}`}
+                selected={activePagePath === `/pages/${page.id}`}
+              >
                 <ListItemText primary={page.name} sx={{ ml: 2 }} />
               </ListItemButton>
             </ListItem>

@@ -391,6 +391,10 @@ export interface ComponentConfig<P extends object = {}> {
    */
   helperText?: string;
   /**
+   * Configures which properties result in propagating error state to `errorProp`.
+   */
+  errorPropSource?: (keyof P & string)[];
+  /**
    * Designates a property as "the error property". If Toolpad detects an error
    * on any of the inputs, it will forward it to this property.
    */
@@ -450,6 +454,7 @@ export type Serializable =
   | ((...args: Serializable[]) => Serializable);
 
 export interface JsRuntime {
+  getEnv(): Record<string, string | undefined>;
   evaluateExpression(code: string, globalScope: Record<string, unknown>): BindingEvaluationResult;
 }
 

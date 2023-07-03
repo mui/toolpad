@@ -390,28 +390,10 @@
                       ]
                     },
                     "primary": {
-                      "type": "object",
-                      "properties": {
-                        "main": {
-                          "type": "string"
-                        },
-                        "light": {
-                          "type": "string"
-                        },
-                        "dark": {
-                          "type": "string"
-                        },
-                        "contrastText": {
-                          "type": "string"
-                        }
-                      },
-                      "required": [
-                        "main"
-                      ],
-                      "additionalProperties": false
+                      "$ref": "#/definitions/SimplePaletteColorOptions"
                     },
                     "secondary": {
-                      "$ref": "#/properties/Theme/properties/spec/properties/options/properties/palette/properties/primary"
+                      "$ref": "#/definitions/SimplePaletteColorOptions"
                     }
                   },
                   "required": [
@@ -686,6 +668,27 @@
       ],
       "additionalProperties": false,
       "description": "A name/value pair where the value is dynamically bindable to strings."
+    },
+    "SimplePaletteColorOptions": {
+      "type": "object",
+      "properties": {
+        "main": {
+          "type": "string"
+        },
+        "light": {
+          "type": "string"
+        },
+        "dark": {
+          "type": "string"
+        },
+        "contrastText": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "main"
+      ],
+      "additionalProperties": false
     }
   },
   "$schema": "http://json-schema.org/draft-07/schema#"

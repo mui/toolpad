@@ -287,7 +287,7 @@ export const pageSchema = toolpadObjectSchema(
   }),
 );
 
-const colorSchema: z.ZodType<SimplePaletteColorOptions> = z.object({
+const simplePaletteColorOptionsSchema: z.ZodType<SimplePaletteColorOptions> = z.object({
   main: z.string(),
   light: z.string().optional(),
   dark: z.string().optional(),
@@ -298,8 +298,8 @@ const themeOptionsSchema: z.ZodType<ThemeOptions> = z.object({
   // TODO: expand to full MUI theme object
   palette: z.object({
     mode: z.union([z.literal('light'), z.literal('dark')]).optional(),
-    primary: colorSchema,
-    secondary: colorSchema,
+    primary: simplePaletteColorOptionsSchema,
+    secondary: simplePaletteColorOptionsSchema,
   }),
 });
 
@@ -331,5 +331,6 @@ export const META = {
     Template: templateSchema,
     NameStringValuePair: nameStringValuePairSchema,
     BindableNameStringValue: bindableNameStringValueSchema,
+    SimplePaletteColorOptions: simplePaletteColorOptionsSchema,
   },
 };

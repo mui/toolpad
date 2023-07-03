@@ -308,7 +308,9 @@ export type Page = z.infer<typeof pageSchema>;
 export const themeSchema = toolpadObjectSchema(
   'theme',
   z.object({
-    options: themeOptionsSchema,
+    options: themeOptionsSchema
+      .optional()
+      .describe("The ThemeOptions object that gets fed into MUI's createTheme function."),
   }),
 );
 

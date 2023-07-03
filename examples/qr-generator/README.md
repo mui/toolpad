@@ -2,6 +2,8 @@
 
 <p class="description">A basic Toolpad application that can be used to turn any text or URL into a QR code.</p>
 
+{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/marketing/qr-generator.png", "alt": "QR code generator", "caption": "QR code generator"  }}
+
 [Open in CodeSandbox](https://codesandbox.io/p/sandbox/github/mui/mui-toolpad/tree/master/examples/qr-generator)
 
 This app demonstrates following capabilities of Toolpad:

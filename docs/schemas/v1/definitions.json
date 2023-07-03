@@ -424,12 +424,10 @@
               "required": [
                 "palette"
               ],
-              "additionalProperties": false
+              "additionalProperties": false,
+              "description": "The ThemeOptions object that gets fed into MUI's createTheme function."
             }
           },
-          "required": [
-            "options"
-          ],
           "additionalProperties": false,
           "description": "Defines the shape of this \"theme\" object"
         }

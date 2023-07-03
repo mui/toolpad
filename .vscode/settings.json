@@ -7,6 +7,9 @@
     "source.fixAll.eslint": true
   },
   "editor.formatOnSave": true,
+  "files.associations": {
+    "**/docs/public/_redirects": "plaintext"
+  },
   "typescript.tsdk": "node_modules/typescript/lib",
   "cSpell.words": ["Toolpad"]
 }

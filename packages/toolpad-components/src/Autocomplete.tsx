@@ -5,10 +5,10 @@ import {
   TextField,
 } from '@mui/material';
 import { createComponent } from '@mui/toolpad-core';
-import * as _ from 'lodash-es';
 import { SX_PROP_HELPER_TEXT } from './constants.js';
 import {
   FORM_INPUT_ARG_TYPES,
+  FORM_TEXT_INPUT_ARG_TYPES,
   FormInputComponentProps,
   useFormInput,
   withComponentForm,
@@ -159,7 +159,8 @@ export default createComponent(FormWrappedAutocomplete, {
       helperText: 'If true, the autocomplete will be disabled.',
       type: 'boolean',
     },
-    ..._.pick(FORM_INPUT_ARG_TYPES, ['name', 'isRequired', 'minLength', 'maxLength', 'isInvalid']),
+    ...FORM_INPUT_ARG_TYPES,
+    ...FORM_TEXT_INPUT_ARG_TYPES,
     sx: {
       helperText: SX_PROP_HELPER_TEXT,
       type: 'object',

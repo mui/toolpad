@@ -5,9 +5,9 @@ import {
   BoxProps,
 } from '@mui/material';
 import { createComponent } from '@mui/toolpad-core';
-import * as _ from 'lodash-es';
 import {
   FORM_INPUT_ARG_TYPES,
+  FORM_TEXT_INPUT_ARG_TYPES,
   FormInputComponentProps,
   useFormInput,
   withComponentForm,
@@ -106,7 +106,8 @@ export default createComponent(FormWrappedTextField, {
       helperText: 'Whether the input is disabled.',
       type: 'boolean',
     },
-    ..._.pick(FORM_INPUT_ARG_TYPES, ['name', 'isRequired', 'minLength', 'maxLength', 'isInvalid']),
+    ...FORM_INPUT_ARG_TYPES,
+    ...FORM_TEXT_INPUT_ARG_TYPES,
     sx: {
       helperText: SX_PROP_HELPER_TEXT,
       type: 'object',

@@ -2,9 +2,8 @@ import * as React from 'react';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DesktopDatePicker, DesktopDatePickerProps } from '@mui/x-date-pickers/DesktopDatePicker';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
-import { ArgTypeDefinitions, createComponent } from '@mui/toolpad-core';
+import { createComponent } from '@mui/toolpad-core';
 import dayjs from 'dayjs';
-import * as _ from 'lodash-es';
 import {
   FORM_INPUT_ARG_TYPES,
   FormInputComponentProps,
@@ -211,11 +210,7 @@ export default createComponent(FormWrappedDatePicker, {
       helperText: 'The date picker is disabled.',
       type: 'boolean',
     },
-    ...(_.pick(FORM_INPUT_ARG_TYPES, [
-      'name',
-      'isRequired',
-      'isInvalid',
-    ]) as ArgTypeDefinitions<DatePickerProps>),
+    ...FORM_INPUT_ARG_TYPES,
     sx: {
       helperText: SX_PROP_HELPER_TEXT,
       type: 'object',

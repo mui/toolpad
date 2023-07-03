@@ -1,7 +1,6 @@
 import * as React from 'react';
 import { TextFieldProps, MenuItem, TextField } from '@mui/material';
-import { ArgTypeDefinitions, createComponent } from '@mui/toolpad-core';
-import * as _ from 'lodash-es';
+import { createComponent } from '@mui/toolpad-core';
 import {
   FORM_INPUT_ARG_TYPES,
   FormInputComponentProps,
@@ -152,11 +151,7 @@ export default createComponent(FormWrappedSelect, {
       helperText: 'Whether the select is disabled.',
       type: 'boolean',
     },
-    ...(_.pick(FORM_INPUT_ARG_TYPES, [
-      'name',
-      'isRequired',
-      'isInvalid',
-    ]) as ArgTypeDefinitions<SelectProps>),
+    ...FORM_INPUT_ARG_TYPES,
     sx: {
       helperText: SX_PROP_HELPER_TEXT,
       type: 'object',

@@ -1,7 +1,6 @@
 import * as React from 'react';
 import { TextField as MuiTextField, TextFieldProps as MuiTextFieldProps } from '@mui/material';
-import { ArgTypeDefinitions, createComponent } from '@mui/toolpad-core';
-import * as _ from 'lodash-es';
+import { createComponent } from '@mui/toolpad-core';
 import {
   FORM_INPUT_ARG_TYPES,
   FormInputComponentProps,
@@ -111,11 +110,7 @@ export default createComponent(FormWrappedFilePicker, {
       helperText: 'Whether the FilePicker is disabled.',
       type: 'boolean',
     },
-    ...(_.pick(FORM_INPUT_ARG_TYPES, [
-      'name',
-      'isRequired',
-      'isInvalid',
-    ]) as ArgTypeDefinitions<FilePickerProps>),
+    ...FORM_INPUT_ARG_TYPES,
     sx: {
       type: 'object',
     },

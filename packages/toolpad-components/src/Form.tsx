@@ -342,7 +342,7 @@ export function withComponentForm<P extends Record<string, any>>(
 }
 
 export const FORM_INPUT_ARG_TYPES: ArgTypeDefinitions<
-  Pick<FormInputComponentProps, 'name' | 'isRequired' | 'minLength' | 'maxLength' | 'isInvalid'>
+  Pick<FormInputComponentProps, 'name' | 'isRequired' | 'isInvalid'>
 > = {
   name: {
     helperText: 'Name of this input. Used as a reference in form data.',
@@ -354,6 +354,17 @@ export const FORM_INPUT_ARG_TYPES: ArgTypeDefinitions<
     default: false,
     category: 'validation',
   },
+  isInvalid: {
+    helperText: 'Whether the input value is invalid.',
+    type: 'boolean',
+    default: false,
+    category: 'validation',
+  },
+};
+
+export const FORM_TEXT_INPUT_ARG_TYPES: ArgTypeDefinitions<
+  Pick<FormInputComponentProps, 'minLength' | 'maxLength'>
+> = {
   minLength: {
     helperText: 'Minimum value length.',
     type: 'number',
@@ -368,12 +379,6 @@ export const FORM_INPUT_ARG_TYPES: ArgTypeDefinitions<
     minimum: 0,
     maximum: 512,
     default: 0,
-    category: 'validation',
-  },
-  isInvalid: {
-    helperText: 'Whether the input value is invalid.',
-    type: 'boolean',
-    default: false,
     category: 'validation',
   },
 };

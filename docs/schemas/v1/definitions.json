@@ -376,8 +376,60 @@
         "spec": {
           "type": "object",
           "properties": {
-            "options": {}
+            "options": {
+              "type": "object",
+              "properties": {
+                "palette": {
+                  "type": "object",
+                  "properties": {
+                    "mode": {
+                      "type": "string",
+                      "enum": [
+                        "light",
+                        "dark"
+                      ]
+                    },
+                    "primary": {
+                      "type": "object",
+                      "properties": {
+                        "main": {
+                          "type": "string"
+                        },
+                        "light": {
+                          "type": "string"
+                        },
+                        "dark": {
+                          "type": "string"
+                        },
+                        "contrastText": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "main"
+                      ],
+                      "additionalProperties": false
+                    },
+                    "secondary": {
+                      "$ref": "#/properties/Theme/properties/spec/properties/options/properties/palette/properties/primary"
+                    }
+                  },
+                  "required": [
+                    "primary",
+                    "secondary"
+                  ],
+                  "additionalProperties": false
+                }
+              },
+              "required": [
+                "palette"
+              ],
+              "additionalProperties": false
+            }
           },
+          "required": [
+            "options"
+          ],
           "additionalProperties": false,
           "description": "Defines the shape of this \"theme\" object"
         }

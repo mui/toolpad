@@ -1,3 +1,5 @@
+import { SimplePaletteColorOptions, ThemeOptions } from '@mui/material';
+import { satisfies } from 'semver';
 import { z } from 'zod';
 
 export const API_VERSION = 'v1';
@@ -286,13 +288,28 @@ export const pageSchema = toolpadObjectSchema(
   }),
 );
 
+const colorSchema: z.ZodType<SimplePaletteColorOptions> = z.object({
+  main: z.string(),
+  light: z.string().optional(),
+  dark: z.string().optional(),
+  contrastText: z.string().optional(),
+});
+
+const themeOptionsSchema: z.ZodType<ThemeOptions> = z.object({
+  // TODO: expand to full MUI theme object
+  palette: z.object({
+    mode: z.union([z.literal('light'), z.literal('dark')]).optional(),
+    primary: colorSchema,
+    secondary: colorSchema,
+  }),
+});
+
 export type Page = z.infer<typeof pageSchema>;
 
 export const themeSchema = toolpadObjectSchema(
   'theme',
   z.object({
-    // TODO: Validate MUI theme object
-    options: z.any(),
+    options: themeOptionsSchema,
   }),
 );
 

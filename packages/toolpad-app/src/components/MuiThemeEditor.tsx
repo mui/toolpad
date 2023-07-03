@@ -3,9 +3,9 @@ import {
   Box,
   Button,
   capitalize,
-  PaletteColor,
   PaletteMode,
   Popover,
+  SimplePaletteColorOptions,
   Stack,
   styled,
   ThemeOptions,
@@ -90,7 +90,7 @@ export default function MuiThemeEditor({ value, onChange }: MuiThemeEditorProps)
   const colorPicker = (intent: 'primary' | 'secondary') => (
     <PaletteColorPicker
       label={capitalize(intent)}
-      value={(value?.palette?.[intent] as PaletteColor)?.main || '#f50057'}
+      value={(value?.palette?.[intent] as SimplePaletteColorOptions)?.main || '#f50057'}
       onChange={(newMain) => {
         onChange({
           ...value,

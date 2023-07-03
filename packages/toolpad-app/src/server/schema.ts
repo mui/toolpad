@@ -294,14 +294,18 @@ const simplePaletteColorOptionsSchema: z.ZodType<SimplePaletteColorOptions> = z.
   contrastText: z.string().optional(),
 });
 
-const themeOptionsSchema: z.ZodType<ThemeOptions> = z.object({
-  // TODO: expand to full MUI theme object
-  palette: z.object({
-    mode: z.union([z.literal('light'), z.literal('dark')]).optional(),
-    primary: simplePaletteColorOptionsSchema,
-    secondary: simplePaletteColorOptionsSchema,
-  }),
-});
+const themeOptionsSchema: z.ZodType<ThemeOptions> = z
+  .object({
+    // TODO: expand to full MUI theme object
+    palette: z
+      .object({
+        mode: z.union([z.literal('light'), z.literal('dark')]).optional(),
+        primary: simplePaletteColorOptionsSchema,
+        secondary: simplePaletteColorOptionsSchema,
+      })
+      .passthrough(),
+  })
+  .passthrough();
 
 export type Page = z.infer<typeof pageSchema>;
 

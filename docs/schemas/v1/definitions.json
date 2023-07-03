@@ -400,13 +400,13 @@
                     "primary",
                     "secondary"
                   ],
-                  "additionalProperties": false
+                  "additionalProperties": true
                 }
               },
               "required": [
                 "palette"
               ],
-              "additionalProperties": false,
+              "additionalProperties": true,
               "description": "The ThemeOptions object that gets fed into MUI's createTheme function."
             }
           },

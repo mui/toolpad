@@ -1,5 +1,4 @@
 import { SimplePaletteColorOptions, ThemeOptions } from '@mui/material';
-import { satisfies } from 'semver';
 import { z } from 'zod';
 
 export const API_VERSION = 'v1';

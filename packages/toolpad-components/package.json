@@ -44,13 +44,13 @@
     "@mui/material": "5.13.6",
     "@mui/toolpad-core": "0.1.18",
     "@mui/toolpad-utils": "0.1.18",
-    "@mui/x-data-grid-pro": "6.9.0",
-    "@mui/x-date-pickers": "6.9.0",
-    "dayjs": "1.11.8",
+    "@mui/x-data-grid-pro": "6.9.1",
+    "@mui/x-date-pickers": "6.9.1",
+    "dayjs": "1.11.9",
     "lodash-es": "4.17.21",
     "markdown-to-jsx": "7.2.1",
     "react-error-boundary": "4.0.10",
-    "react-hook-form": "7.45.0"
+    "react-hook-form": "7.45.1"
   },
   "devDependencies": {
     "react": "18.2.0"

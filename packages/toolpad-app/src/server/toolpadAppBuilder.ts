@@ -77,6 +77,7 @@ export function postProcessHtml(html: string, { config, dom }: PostProcessHtmlPa
     `<script>window[${JSON.stringify(
       INITIAL_STATE_WINDOW_PROPERTY,
     )}] = ${serializedInitialState}</script>`,
+    `<meta name="toolpad-x-license" content=${JSON.stringify(MUI_X_PRO_LICENSE)} />`,
   ];
 
   return html.replace(`<!-- __TOOLPAD_SCRIPTS__ -->`, () => toolpadScripts.join('\n'));
@@ -93,11 +94,8 @@ function toolpadVitePlugin({ root, base }: ToolpadVitePluginParams): Plugin {
 
   const getEntryPoint = (isCanvas: boolean) => `
     import { init, setComponents } from '@mui/toolpad/runtime';
-    import { LicenseInfo } from '@mui/x-data-grid-pro';
     import components from ${JSON.stringify(componentsId)};
     ${isCanvas ? `import AppCanvas from '@mui/toolpad/canvas'` : ''}
-    
-    LicenseInfo.setLicenseKey(${JSON.stringify(MUI_X_PRO_LICENSE)});
     
     const initialState = window[${JSON.stringify(INITIAL_STATE_WINDOW_PROPERTY)}];
 

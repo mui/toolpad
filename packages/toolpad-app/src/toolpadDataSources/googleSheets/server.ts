@@ -279,6 +279,7 @@ const dataSource: ServerDataSource<
 > = {
   exec,
   execPrivate,
+  api: {},
   createHandler: () => handler,
 };
 

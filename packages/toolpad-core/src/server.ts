@@ -1,3 +1,5 @@
+/// <reference path="./serverModules.d.ts" />
+
 import { TOOLPAD_FUNCTION } from './constants.js';
 import { InferParameterType, PrimitiveValueType, PropValueType } from './types.js';
 

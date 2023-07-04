@@ -339,16 +339,25 @@ function resolveBindables(
   bindings: Partial<Record<string, BindingEvaluationResult>>,
   bindingId: string,
   params?: NestedBindableAttrs,
-): Record<string, unknown> {
+): BindingEvaluationResult<Record<string, unknown>> {
   const result: any = {};
   const resultKey = 'value';
   const flattened = flattenNestedBindables(params);
+
   for (const [path] of flattened) {
-    const resolvedValue = bindings[`${bindingId}${path}`]?.value;
-    _.set(result, `${resultKey}${path}`, resolvedValue);
+    const resolvedBinding = bindings[`${bindingId}${path}`];
+
+    if (resolvedBinding?.error) {
+      return { error: resolvedBinding?.error };
+    }
+    if (resolvedBinding?.loading) {
+      return { loading: true };
+    }
+
+    _.set(result, `${resultKey}${path}`, resolvedBinding?.value);
   }
 
-  return result[resultKey] || {};
+  return { value: result[resultKey] || {} };
 }
 
 interface ParseBindingOptions {
@@ -889,7 +898,13 @@ function RenderedNodeContent({ node, childNodeGroups, Component }: RenderedNodeC
   const nodeId = node.id;
 
   const componentConfig = Component[TOOLPAD_COMPONENT];
-  const { argTypes = {}, errorProp, loadingProp, loadingPropSource } = componentConfig;
+  const {
+    argTypes = {},
+    errorProp,
+    loadingProp,
+    loadingPropSource,
+    errorPropSource,
+  } = componentConfig;
 
   const isLayoutNode =
     appDom.isPage(node) || (appDom.isElement(node) && isPageLayoutComponent(node));
@@ -898,7 +913,8 @@ function RenderedNodeContent({ node, childNodeGroups, Component }: RenderedNodeC
   const liveBindings = scope.bindings;
 
   const boundProps: Record<string, any> = React.useMemo(() => {
-    const loadingPropSourceSet = new Set(loadingPropSource);
+    const loadingPropSourceSet = loadingPropSource ? new Set(loadingPropSource) : null;
+    const errorPropSourceSet = errorPropSource ? new Set(errorPropSource) : null;
     const hookResult: Record<string, any> = {};
 
     // error state we will propagate to the component
@@ -913,10 +929,14 @@ function RenderedNodeContent({ node, childNodeGroups, Component }: RenderedNodeC
       if (binding) {
         hookResult[propName] = binding.value;
 
-        if (binding.loading && loadingPropSourceSet.has(propName)) {
+        if (binding.loading && (!loadingPropSourceSet || loadingPropSourceSet.has(propName))) {
           loading = true;
-        } else {
-          error = error || binding.error;
+        } else if (
+          !error &&
+          binding.error &&
+          (!errorPropSourceSet || errorPropSourceSet.has(propName))
+        ) {
+          error = binding.error;
         }
       }
 
@@ -938,7 +958,7 @@ function RenderedNodeContent({ node, childNodeGroups, Component }: RenderedNodeC
     }
 
     return hookResult;
-  }, [argTypes, errorProp, liveBindings, loadingProp, loadingPropSource, nodeId]);
+  }, [argTypes, errorProp, errorPropSource, liveBindings, loadingProp, loadingPropSource, nodeId]);
 
   const boundLayoutProps: Record<string, any> = React.useMemo(() => {
     const hookResult: Record<string, any> = {};
@@ -1208,24 +1228,36 @@ function QueryNode({ page, node }: QueryNodeProps) {
 
   const configBindings = _.pick(node.attributes, USE_DATA_QUERY_CONFIG_KEYS);
   const options = resolveBindables(bindings, `${node.id}.config`, configBindings);
-  const queryResult = useDataQuery(page, node, params, options);
+
+  const inputError = params.error || options.error;
+  const inputIsLoading = params.loading || options.loading;
+
+  const queryResult = useDataQuery(page, node, params.value, {
+    ...options.value,
+    enabled: !inputIsLoading && !inputError,
+  });
 
   React.useEffect(() => {
-    const { isLoading, error, data, rows, ...result } = queryResult;
+    const { isLoading: queryIsLoading, error: queryError, data, rows, ...result } = queryResult;
+
+    const error = queryError || inputError;
+    const isLoading = queryIsLoading || inputIsLoading;
 
     for (const [key, value] of Object.entries(result)) {
       const bindingId = `${node.id}.${key}`;
       setControlledBinding(bindingId, { value });
     }
 
-    // Here we propagate the error and loading state to the data and rows prop prop
+    // Here we propagate the error and loading state to the data and rows properties
     // TODO: is there a straightforward way for us to generalize this behavior?
     setControlledBinding(`${node.id}.isLoading`, { value: isLoading });
-    setControlledBinding(`${node.id}.error`, { value: error });
+    setControlledBinding(`${node.id}.error`, {
+      value: error ? String(error.message || error) : undefined,
+    });
     const deferredStatus = { loading: isLoading, error };
     setControlledBinding(`${node.id}.data`, { ...deferredStatus, value: data });
     setControlledBinding(`${node.id}.rows`, { ...deferredStatus, value: rows });
-  }, [node.id, queryResult, setControlledBinding]);
+  }, [node.name, node.id, queryResult, setControlledBinding, inputError, inputIsLoading]);
 
   return null;
 }
@@ -1242,7 +1274,7 @@ function MutationNode({ node, page }: MutationNodeProps) {
   const { bindings } = useAssertedContext(RuntimeScopeContext);
 
   const queryId = node.id;
-  const params = resolveBindables(
+  const { value: params } = resolveBindables(
     bindings,
     `${node.id}.params`,
     Object.fromEntries(node.params ?? []),

@@ -2,7 +2,6 @@ import * as React from 'react';
 import Link from '@mui/material/Link';
 import PropTypes from 'prop-types';
 import Box from '@mui/material/Box';
-import Button from '@mui/material/Button';
 import KeyboardArrowRightRounded from '@mui/icons-material/KeyboardArrowRightRounded';
 import Container from '@mui/material/Container';
 import Typography from '@mui/material/Typography';
@@ -17,7 +16,7 @@ export default function CardGrid(props) {
         (theme) => ({
           background: `radial-gradient(140% 150% at 50% 10%, transparent 50%,  ${theme.palette.primary[100]} 90%,  transparent 100%)`,
           ...theme.applyDarkStyles({
-            background: `radial-gradient(140% 150% at 50% 10%, transparent 40%,  ${theme.palette.primary[700]} 90%,  transparent 100%)`,
+            background: `radial-gradient(140% 150% at 50% 10%, transparent 40%,  ${theme.palette.primary[800]} 90%,  transparent 100%)`,
           }),
         }),
       ]}
@@ -70,7 +69,7 @@ export default function CardGrid(props) {
                   {action ? (
                     <Link href={action.href} variant="body2" sx={{ mt: 1 }}>
                       {action.label}
-                      <KeyboardArrowRightRounded />
+                      <KeyboardArrowRightRounded font />
                     </Link>
                   ) : null}
                 </Box>

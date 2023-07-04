@@ -8,7 +8,6 @@ function Marquee({ content }) {
   return (
     <Container
       sx={(theme) => ({
-        mt: 8,
         mx: 0,
         minWidth: '100%',
         py: { xs: 4, sm: 6, md: 12 },

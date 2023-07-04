@@ -52,7 +52,9 @@ export default function Home() {
       <main id="main-content">
         <ToolpadHero />
         <DemoVideo />
+        <Divider />
         <CardGrid content={features} />
+        <Divider />
         <Banner
           action={action}
           category={category}
@@ -61,8 +63,9 @@ export default function Home() {
           href={href}
           label={label}
         />
-        <Divider sx={{ maxWidth: '1200px', m: 'auto' }} />
+        <Divider />
         <UseCases content={useCases} />
+        <Divider />
         <Pricing
           Headline={Headline}
           plans={plans}
@@ -71,6 +74,7 @@ export default function Home() {
           commercialData={commercialData}
           communityData={communityData}
         />
+        <Divider />
         <Marquee content={marquee} />
       </main>
       <AppFooter />

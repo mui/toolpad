@@ -7,17 +7,24 @@ import SignUp from './SignUp';
 function Marquee({ content }) {
   return (
     <Container
-      sx={(theme) => ({
-        mx: 0,
-        minWidth: '100%',
-        py: { xs: 4, sm: 6, md: 12 },
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        background: `linear-gradient(180deg, ${theme.palette.primaryDark[900]} 0%, ${theme.palette.primaryDark[800]})`,
-        borderBottom: '1px solid',
-        borderColor: theme.palette.mode === 'dark' ? 'primaryDark.600' : 'grey.200',
-      })}
+      sx={[
+        (theme) => ({
+          mx: 0,
+          minWidth: '100%',
+          py: { xs: 4, sm: 6, md: 12 },
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          background: `linear-gradient(180deg, ${
+            (theme.vars || theme).palette.primaryDark[900]
+          } 0%, ${(theme.vars || theme).palette.primaryDark[800]})`,
+          borderBottom: '1px solid',
+          borderColor: (theme.vars || theme).palette.grey[200],
+          ...theme.applyDarkStyles({
+            borderColor: (theme.vars || theme).palette.primaryDark[600],
+          }),
+        }),
+      ]}
     >
       <Typography
         color="white"
@@ -45,7 +52,7 @@ function Marquee({ content }) {
         component="label"
         variant="body2"
         color={(theme) => (theme.palette.mode === 'dark' ? '#fff' : `text.secondary`)}
-        sx={{ fontWeight: 'medium', display: 'block', mb: 1, mx: 'auto' }}
+        sx={{ fontWeight: 'medium', display: 'block', mb: 2, mx: 'auto' }}
         htmlFor="email-landing"
       >
         {content.action.label}

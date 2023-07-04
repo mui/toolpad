@@ -34,7 +34,7 @@ function Banner(props) {
         textAlign="center"
         sx={{
           mt: 1,
-          mb: 4,
+          mb: 2,
           mx: 'auto',
           maxWidth: '500px',
         }}
@@ -52,7 +52,6 @@ function Banner(props) {
         href={href}
         variant="contained"
         fullWidth
-        size="large"
         endIcon={<KeyboardArrowRightRounded />}
         sx={{ width: { xs: '100%', sm: 'auto' } }}
       >

@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, { useEffect, useState } from 'react';
 import Box from '@mui/material/Box';
 import Chip from '@mui/material/Chip';
 import Typography from '@mui/material/Typography';
@@ -10,12 +10,36 @@ import GetStartedButtons from 'docs/src/components/home/GetStartedButtons';
 import ROUTES from '../../route';
 import ToolpadHeroContainer from '../../layouts/ToolpadHeroContainer';
 
+function TypingAnimation() {
+  const words = ['APIs', 'scripts', 'SQL'];
+  const [text, setText] = useState('');
+  const [fullText, setFullText] = useState(words[0]);
+  const [index, setIndex] = useState(0);
+
+  const l = words.length;
+  React.useEffect(() => {
+    if (index < fullText.length) {
+      setTimeout(() => {
+        setText(text + fullText[index]);
+        setIndex(index + 1);
+      }, 100);
+    } else {
+      setTimeout(() => {
+        setFullText(words[Math.floor(Math.random() * l)]);
+        setText('');
+        setIndex(0);
+      }, 2000);
+    }
+  }, [index]);
+
+  return <span>{text}</span>;
+}
+
 export default function Hero() {
   return (
     <ToolpadHeroContainer>
       <Box
         sx={{
-          textAlign: { xs: 'center', md: 'center' },
           mt: { xs: '20px', md: '100px' },
         }}
       >
@@ -26,7 +50,6 @@ export default function Hero() {
             (theme) => ({
               display: 'flex',
               alignItems: 'center',
-              justifyContent: { xs: 'center', md: 'center' },
               color: (theme.vars || theme).palette.primary[600],
               ...theme.applyDarkStyles({
                 color: (theme.vars || theme).palette.primary[400],
@@ -40,27 +63,20 @@ export default function Hero() {
           </Box>
           <Chip label="Beta" component="span" color="primary" size="small" variant="outlined" />
         </Typography>
-        <Typography variant="h1" sx={{ my: 2 }}>
-          Low-code
+        <Typography variant="h1" sx={{ my: 1 }}>
+          Turn your <TypingAnimation />
           <br />
-          <GradientText>admin builder</GradientText>
+          <GradientText>into UIs</GradientText>
         </Typography>
-        <Typography color="text.secondary" sx={{ maxWidth: 520, mx: 'auto', mb: 4 }}>
+        <Typography color="text.secondary" sx={{ maxWidth: 520, mb: 2 }}>
           Build scalable and secure internal tools locally. Use your own IDE, drag and drop
           pre-built components or create your own.
         </Typography>
-        <GetStartedButtons
-          sx={{ justifyContent: 'center' }}
-          installation={'npx create-toolpad-app'}
-          to={ROUTES.toolpadQuickstart}
-        />
+        <GetStartedButtons installation={'npx create-toolpad-app'} to={ROUTES.toolpadQuickstart} />
         <Box
           sx={{
-            mx: 'auto',
-            mt: 6,
+            mt: 2,
             display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center',
             gap: 4,
           }}
         >

@@ -235,12 +235,6 @@ export async function deletePage(name: string) {
   await fs.rm(pageFolder, { recursive: true });
 }
 
-export async function renamePage(oldname: string, newname: string) {
-  const root = getUserProjectRoot();
-  const oldpageFolder = getPageFolder(root, oldname);
-  const newpageFolder = getPageFolder(root, newname);
-  await fs.rename(oldpageFolder, newpageFolder);
-}
 class Lock {
   pending: Promise<any> | null = null;
 
@@ -766,17 +760,9 @@ async function writeThemeFile(root: string, theme: Theme | null) {
   }
 }
 
-async function writeDomToDisk(dom: appDom.AppDom, oldDom?: appDom.AppDom): Promise<void> {
+async function writeDomToDisk(dom: appDom.AppDom): Promise<void> {
   const root = getUserProjectRoot();
   const { pages: pagesContent } = extractPagesFromDom(dom);
-  if (oldDom) {
-    const { pages: oldpagesContent } = extractPagesFromDom(oldDom);
-    const pagelist = Object.keys(oldpagesContent);
-    for await (const page of pagelist) {
-      await deletePage(page);
-    }
-  }
-
   await Promise.all([writePagesToFiles(root, pagesContent)]);
 }
 
@@ -1076,8 +1062,7 @@ class ToolpadProject {
     if (config.cmd !== 'dev') {
       throw new Error(`Writing to disk is only possible in toolpad dev mode.`);
     }
-    const oldDom = await this.loadDom();
-    await writeDomToDisk(newDom, oldDom);
+    await writeDomToDisk(newDom);
     const newFingerprint = await calculateDomFingerprint(this.root);
     this.domAndFingerprint = [newDom, newFingerprint];
     this.events.emit('change', { fingerprint: newFingerprint });

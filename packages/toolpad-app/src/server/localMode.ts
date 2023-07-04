@@ -321,7 +321,7 @@ function mergeThemeIntoAppDom(dom: appDom.AppDom, themeFile: Theme): appDom.AppD
   dom = appDom.addNode(
     dom,
     appDom.createNode(dom, 'theme', {
-      theme: themeFileSpec,
+      theme: themeFileSpec.options,
       attributes: {},
     }),
     app,
@@ -742,6 +742,22 @@ function extractPagesFromDom(dom: appDom.AppDom): ExtractedPages {
   return { pages, dom };
 }
 
+function extractThemeFromDom(dom: appDom.AppDom): Theme | null {
+  const rootNode = appDom.getApp(dom);
+  const { themes: themeNodes = [] } = appDom.getChildNodes(dom, rootNode);
+  if (themeNodes.length > 0) {
+    return {
+      apiVersion: API_VERSION,
+      kind: 'theme',
+      spec: {
+        options: themeNodes[0].theme,
+      },
+    };
+  }
+
+  return null;
+}
+
 async function writePagesToFiles(root: string, pages: PagesContent) {
   await Promise.all(
     Object.entries(pages).map(async ([name, page]) => {
@@ -763,7 +779,10 @@ async function writeThemeFile(root: string, theme: Theme | null) {
 async function writeDomToDisk(dom: appDom.AppDom): Promise<void> {
   const root = getUserProjectRoot();
   const { pages: pagesContent } = extractPagesFromDom(dom);
-  await Promise.all([writePagesToFiles(root, pagesContent)]);
+  await Promise.all([
+    writePagesToFiles(root, pagesContent),
+    writeThemeFile(root, extractThemeFromDom(dom)),
+  ]);
 }
 
 const DEFAULT_EDITOR = 'code';
@@ -911,7 +930,7 @@ async function initToolpadFolder(root: string) {
   const projectFolder = await readProjectFolder(root);
   if (Object.keys(projectFolder.pages).length <= 0) {
     projectFolder.pages.page = {
-      apiVersion: 'v1',
+      apiVersion: API_VERSION,
       kind: 'page',
       spec: {
         id: appDom.createId(),

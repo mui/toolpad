@@ -22,12 +22,17 @@ export default function Hero() {
         <Typography
           fontWeight="bold"
           variant="body2"
-          color={(theme) => (theme.palette.mode === 'dark' ? 'primary.400' : 'primary.600')}
-          sx={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: { xs: 'center', md: 'center' },
-          }}
+          sx={[
+            (theme) => ({
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: { xs: 'center', md: 'center' },
+              color: (theme.vars || theme).palette.primary[600],
+              ...theme.applyDarkStyles({
+                color: (theme.vars || theme).palette.primary[400],
+              }),
+            }),
+          ]}
         >
           <IconImage name="product-toolpad" width="28" height="28" sx={{ mr: 1 }} />
           <Box component="span" sx={{ mr: 1 }}>

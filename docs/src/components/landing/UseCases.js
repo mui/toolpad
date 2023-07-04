@@ -1,4 +1,5 @@
 import * as React from 'react';
+import Link from '@mui/material/Link';
 import PropTypes from 'prop-types';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
@@ -8,32 +9,18 @@ import Typography from '@mui/material/Typography';
 import Grid from '@mui/material/Unstable_Grid2';
 import SectionHeadline from 'docs/src/components/typography/SectionHeadline';
 
-const cardMediaStyle = (imageUrl) => ({
-  display: 'block',
-  backgroundRepeat: 'no-repeat',
-  backgroundPosition: 'center',
-  objectFit: 'contain',
-  background: (theme) => `${theme.palette.primaryDark[800]} url(${imageUrl})`,
-  backgroundSize: 'cover',
-  borderRadius: '8px',
-  paddingTop: '55%',
-  overflow: 'auto',
-  boxShadow: (theme) =>
-    theme.palette.mode === 'dark'
-      ? `0 0 8px 2px ${theme.palette.primaryDark[600]}, 0 4px 40px ${theme.palette.primaryDark[500]}`
-      : `0 0 8px 2px ${theme.palette.primary[100]}, 0 4px 40px ${theme.palette.primary[100]}`,
-});
-
 export default function CardGrid(props) {
   const { content } = props;
   return (
     <Box
-      sx={{
-        background: (theme) =>
-          theme.palette.mode === 'dark'
-            ? `radial-gradient(140% 150% at 50% 10%, transparent 40%,  ${theme.palette.primary[700]} 90%,  transparent 100%)`
-            : `radial-gradient(140% 150% at 50% 10%, transparent 50%,  ${theme.palette.primary[100]} 90%,  transparent 100%)`,
-      }}
+      sx={[
+        (theme) => ({
+          background: `radial-gradient(140% 150% at 50% 10%, transparent 50%,  ${theme.palette.primary[100]} 90%,  transparent 100%)`,
+          ...theme.applyDarkStyles({
+            background: `radial-gradient(140% 150% at 50% 10%, transparent 40%,  ${theme.palette.primary[700]} 90%,  transparent 100%)`,
+          }),
+        }),
+      ]}
     >
       <Container sx={{ py: { xs: 8, sm: 12 } }}>
         <SectionHeadline overline={content.overline} title={content.Headline} />
@@ -41,8 +28,31 @@ export default function CardGrid(props) {
           {content.cards.map(({ title, imageUrl, description, action }) => (
             <Grid key={title} xs={3} sm={1}>
               <Box key={title}>
-                <Box sx={cardMediaStyle(imageUrl)} />
-
+                <Box
+                  sx={[
+                    (theme) => ({
+                      display: 'block',
+                      backgroundRepeat: 'no-repeat',
+                      backgroundPosition: 'center',
+                      objectFit: 'contain',
+                      background: `${
+                        (theme.vars || theme).palette.primaryDark[800]
+                      } url(${imageUrl})`,
+                      backgroundSize: 'cover',
+                      borderRadius: '8px',
+                      paddingTop: '55%',
+                      overflow: 'auto',
+                      boxShadow: `0 0 8px 2px ${
+                        (theme.vars || theme).palette.primary[100]
+                      }, 0 4px 40px ${(theme.vars || theme).palette.primary[100]}`,
+                      ...theme.applyDarkStyles({
+                        boxShadow: `0 0 8px 2px ${
+                          (theme.vars || theme).palette.primaryDark[600]
+                        }, 0 4px 40px ${(theme.vars || theme).palette.primaryDark[500]}`,
+                      }),
+                    }),
+                  ]}
+                />
                 <Box
                   mt={2}
                   sx={{
@@ -60,14 +70,10 @@ export default function CardGrid(props) {
                     {description}
                   </Typography>
                   {action ? (
-                    <Button
-                      sx={{ py: 1, width: 'fit-content' }}
-                      variant="contained"
-                      endIcon={<KeyboardArrowRightRounded />}
-                      href={action.href}
-                    >
+                    <Link href={action.href}>
                       {action.label}
-                    </Button>
+                      <KeyboardArrowRightRounded />
+                    </Link>
                   ) : null}
                 </Box>
               </Box>

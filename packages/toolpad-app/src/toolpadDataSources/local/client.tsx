@@ -229,7 +229,7 @@ function QueryEditor({
   }, [inputError]);
 
   const handleCreateNewCommit = React.useCallback(async () => {
-    if (!newHandlerInput || inputError) {
+    if (!newHandlerInput || inputError || newHandlerLoading) {
       handleCloseCreateNewHandler();
       return;
     }
@@ -257,6 +257,7 @@ function QueryEditor({
     inputError,
     introspection,
     newHandlerInput,
+    newHandlerLoading,
     setSelectedHandler,
   ]);
 

@@ -199,6 +199,10 @@ export default class FunctionsManager {
       packages: 'external',
       target: 'es2022',
       tsconfigRaw: JSON.stringify(tsConfig),
+      loader: {
+        '.txt': 'text',
+        '.sql': 'text',
+      },
     });
   }
 

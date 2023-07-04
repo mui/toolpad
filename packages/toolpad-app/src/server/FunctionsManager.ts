@@ -111,12 +111,9 @@ export default class FunctionsManager {
 
   getOutputFileForEntryPoint(entryPoint: string): string | undefined {
     const [outputFile] =
-      Object.entries(this.buildMetafile?.outputs ?? {}).find((entry) => {
-        console.log(entry);
-        console.log(entryPoint);
-        console.log(normalizePath(entryPoint));
-        return entry[1].entryPoint === normalizePath(entryPoint);
-      }) ?? [];
+      Object.entries(this.buildMetafile?.outputs ?? {}).find(
+        (entry) => entry[1].entryPoint === normalizePath(entryPoint),
+      ) ?? [];
 
     return outputFile;
   }

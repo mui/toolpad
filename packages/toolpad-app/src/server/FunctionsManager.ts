@@ -105,6 +105,10 @@ export default class FunctionsManager {
     return path.join(this.getResourcesFolder(), './functions.ts');
   }
 
+  getFunctionFile(fileName: string) {
+    return path.join(this.getResourcesFolder(), `${fileName}`);
+  }
+
   private getFunctionResourcesPattern(): string {
     return path.join(this.getResourcesFolder(), '*.ts');
   }

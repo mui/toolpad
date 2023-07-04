@@ -5,28 +5,19 @@ import {
   Box,
   Button,
   CircularProgress,
-  IconButton,
   InputBase,
   Popover,
   Skeleton,
   Stack,
-  Tooltip,
   Typography,
   generateUtilityClasses,
   styled,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogContentText,
-  DialogTitle,
-  Link,
 } from '@mui/material';
 import { useBrowserJsRuntime } from '@mui/toolpad-core/jsBrowserRuntime';
 import { errorFrom } from '@mui/toolpad-utils/errors';
 import { TreeItem, TreeView, treeItemClasses } from '@mui/lab';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
-import EditIcon from '@mui/icons-material/Edit';
 import useBoolean from '@mui/toolpad-utils/hooks/useBoolean';
 import { useQuery } from '@tanstack/react-query';
 import { ensureSuffix } from '@mui/toolpad-utils/strings';
@@ -39,6 +30,7 @@ import {
 import * as appDom from '../../appDom';
 import SplitPane from '../../components/SplitPane';
 import JsonView from '../../components/JsonView';
+import OpenCodeEditorButton from '../../components/OpenCodeEditor';
 import useQueryPreview from '../useQueryPreview';
 import QueryInputPanel from '../QueryInputPanel';
 import QueryPreview from '../QueryPreview';
@@ -76,25 +68,9 @@ const FileTreeItemRoot = styled(TreeItem)(({ theme }) => ({
 
 interface HandlerFileTreeItemProps {
   file: FileIntrospectionResult;
-  onOpenEditor: (file: string) => Promise<void>;
-  setMissingEditor: (state: boolean) => void;
 }
 
-function HandlerFileTreeItem({ file, onOpenEditor, setMissingEditor }: HandlerFileTreeItemProps) {
-  const handleOpenEditorClick = React.useCallback(
-    (event: React.MouseEvent) => {
-      event.stopPropagation();
-      onOpenEditor(file.name).catch(() => {
-        // TODO: Write docs with instructions on how to install editor
-        // Add a good looking alert box and inline some instructions and link to docs
-        // eslint-disable-next-line no-alert
-        // alert(err.message);
-        setMissingEditor(true);
-      });
-    },
-    [onOpenEditor, file.name, setMissingEditor],
-  );
-
+function HandlerFileTreeItem({ file }: HandlerFileTreeItemProps) {
   return (
     <FileTreeItemRoot
       key={file.name}
@@ -103,15 +79,7 @@ function HandlerFileTreeItem({ file, onOpenEditor, setMissingEditor }: HandlerFi
         <React.Fragment>
           {file.name}
           <FlexFill />
-          <Tooltip title="Open code editor">
-            <IconButton
-              className={fileTreeItemClasses.actionButton}
-              size="small"
-              onClick={handleOpenEditorClick}
-            >
-              <EditIcon fontSize="inherit" />
-            </IconButton>
-          </Tooltip>
+          <OpenCodeEditorButton iconButton filePath={file.name} fileType="query" />
         </React.Fragment>
       }
     >
@@ -187,12 +155,6 @@ function QueryEditor({
     [execApi],
   );
 
-  const [missingEditor, setMissingEditor] = React.useState(false);
-
-  const handleMissingEditorDialogClose = React.useCallback(() => {
-    setMissingEditor(false);
-  }, []);
-
   const {
     preview,
     runPreview: handleRunPreview,
@@ -208,18 +170,6 @@ function QueryEditor({
     input: paramsObject,
     globalScope,
   });
-
-  const handleOpenEditor = React.useCallback(
-    async (fileName: string) => {
-      execApi('openEditor', [fileName]).catch((err) => {
-        // TODO: Write docs with instructions on how to install editor
-        // Add a good looking alert box and inline some instructions and link to docs
-        // eslint-disable-next-line no-alert
-        alert(err.message);
-      });
-    },
-    [execApi],
-  );
 
   const setSelectedHandler = React.useCallback(
     (id: string) => {
@@ -311,162 +261,132 @@ function QueryEditor({
   ]);
 
   return (
-    <React.Fragment>
-      <SplitPane split="vertical" size="50%" allowResize>
-        <QueryInputPanel
-          previewDisabled={!selectedOption}
-          onRunPreview={handleRunPreview}
-          actions={<Button onClick={handleOpenCreateNewHandler}>New handler file</Button>}
-        >
-          <Stack direction="row" sx={{ gap: 2, height: '100%', mx: 3 }}>
-            <Box sx={{ position: 'relative', overflow: 'auto', height: '100%', width: '40%' }}>
-              <TreeView
-                ref={handlerTreeRef}
-                selected={selectedNodeId}
-                onNodeSelect={handleSelectFunction}
-                defaultCollapseIcon={<ExpandMoreIcon />}
-                defaultExpandIcon={<ChevronRightIcon />}
-                expanded={expanded}
-                onNodeToggle={(_event, nodeIds) => setExpanded(nodeIds)}
-              >
-                {isCreateNewHandlerOpen ? (
-                  <TreeItem
-                    nodeId="::create::"
-                    label={
-                      <React.Fragment>
-                        <InputBase
-                          ref={createNewInputRef}
-                          value={newHandlerInput}
-                          onChange={(event) =>
-                            setNewHandlerInput(event.target.value.replaceAll(/[^a-zA-Z0-9]/g, ''))
-                          }
-                          autoFocus
-                          disabled={newHandlerLoading}
-                          endAdornment={newHandlerLoading ? <CircularProgress size={16} /> : null}
-                          onBlur={handleCreateNewCommit}
-                          onKeyDown={(event) => {
-                            if (event.key === 'Enter') {
-                              handleCreateNewCommit();
-                            } else if (event.key === 'Escape') {
-                              handleCloseCreateNewHandler();
-                              event.stopPropagation();
-                            }
-                          }}
-                        />
-                        <Popover
-                          open={open}
-                          anchorEl={anchorEl}
-                          onClose={() => setAnchorEl(null)}
-                          disableAutoFocus
-                          anchorOrigin={{
-                            vertical: 'bottom',
-                            horizontal: 'left',
-                          }}
-                        >
-                          <Alert severity="error" variant="outlined">
-                            {inputError}
-                          </Alert>
-                        </Popover>
-                      </React.Fragment>
-                    }
-                  />
-                ) : null}
-
-                {introspection.data?.files?.map((file) => (
-                  <HandlerFileTreeItem
-                    key={file.name}
-                    file={file}
-                    onOpenEditor={handleOpenEditor}
-                    setMissingEditor={setMissingEditor}
-                  />
-                ))}
-
-                {introspection.isLoading ? (
-                  <React.Fragment>
-                    <TreeItem disabled nodeId="::loading::" label={<Skeleton />} />
-                    <TreeItem disabled nodeId="::loading::" label={<Skeleton />} />
-                    <TreeItem disabled nodeId="::loading::" label={<Skeleton />} />
-                  </React.Fragment>
-                ) : null}
-              </TreeView>
-              {introspection.error ? (
-                <Box
-                  sx={{
-                    position: 'absolute',
-                    inset: '0 0 0 0',
-                    display: 'flex',
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                  }}
-                >
-                  {errorFrom(introspection.error).message}
-                </Box>
-              ) : null}
-            </Box>
-
-            <Stack sx={{ gap: 1, flex: 1, overflow: 'auto' }}>
-              <Typography>Parameters:</Typography>
-              {Object.entries(parameterDefs).map(([name, definiton]) => {
-                const Control = getDefaultControl(definiton, liveBindings);
-                return Control ? (
-                  <BindableEditor
-                    key={name}
-                    liveBinding={liveBindings[name]}
-                    globalScope={globalScope}
-                    globalScopeMeta={globalScopeMeta}
-                    label={name}
-                    propType={definiton}
-                    jsRuntime={jsBrowserRuntime}
-                    renderControl={(renderControlParams) => (
-                      <Control {...renderControlParams} propType={definiton} />
-                    )}
-                    value={paramsObject[name]}
-                    onChange={(newValue) => {
-                      const paramKeys = Object.keys(parameterDefs);
-                      const newParams: BindableAttrEntries = paramKeys.flatMap((key) => {
-                        const paramValue = key === name ? newValue : paramsObject[key];
-                        return paramValue ? [[key, paramValue]] : [];
-                      });
-                      setInput((existing) => ({
-                        ...existing,
-                        params: newParams,
-                      }));
-                    }}
-                  />
-                ) : null;
-              })}
-            </Stack>
-          </Stack>
-        </QueryInputPanel>
-
-        <QueryPreview isLoading={previewIsLoading} error={preview?.error}>
-          <JsonView sx={{ height: '100%' }} copyToClipboard src={preview?.data} />
-        </QueryPreview>
-      </SplitPane>
-
-      <Dialog
-        open={missingEditor}
-        onClose={handleMissingEditorDialogClose}
-        aria-labelledby="alert-dialog-title"
-        aria-describedby="alert-dialog-description"
+    <SplitPane split="vertical" size="50%" allowResize>
+      <QueryInputPanel
+        previewDisabled={!selectedOption}
+        onRunPreview={handleRunPreview}
+        actions={<Button onClick={handleOpenCreateNewHandler}>New handler file</Button>}
       >
-        <DialogTitle id="alert-dialog-title">{'Editor not found'}</DialogTitle>
-        <DialogContent>
-          <DialogContentText id="alert-dialog-description">
-            No editor was detected on your system. If using Visual Studio Code, this may be due to a
-            missing &quot;code&quot; command in your PATH. <br />
-            Check the{' '}
-            <Link href="https://mui.com/toolpad/how-to-guides/editor-path" target="_blank">
-              docs
-            </Link>{' '}
-            for more information.
-          </DialogContentText>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleMissingEditorDialogClose}>Dismiss</Button>
-        </DialogActions>
-      </Dialog>
-    </React.Fragment>
+        <Stack direction="row" sx={{ gap: 2, height: '100%', mx: 3 }}>
+          <Box sx={{ position: 'relative', overflow: 'auto', height: '100%', width: '40%' }}>
+            <TreeView
+              ref={handlerTreeRef}
+              selected={selectedNodeId}
+              onNodeSelect={handleSelectFunction}
+              defaultCollapseIcon={<ExpandMoreIcon />}
+              defaultExpandIcon={<ChevronRightIcon />}
+              expanded={expanded}
+              onNodeToggle={(_event, nodeIds) => setExpanded(nodeIds)}
+            >
+              {isCreateNewHandlerOpen ? (
+                <TreeItem
+                  nodeId="::create::"
+                  label={
+                    <React.Fragment>
+                      <InputBase
+                        ref={createNewInputRef}
+                        value={newHandlerInput}
+                        onChange={(event) =>
+                          setNewHandlerInput(event.target.value.replaceAll(/[^a-zA-Z0-9]/g, ''))
+                        }
+                        autoFocus
+                        disabled={newHandlerLoading}
+                        endAdornment={newHandlerLoading ? <CircularProgress size={16} /> : null}
+                        onBlur={handleCreateNewCommit}
+                        onKeyDown={(event) => {
+                          if (event.key === 'Enter') {
+                            handleCreateNewCommit();
+                          } else if (event.key === 'Escape') {
+                            handleCloseCreateNewHandler();
+                            event.stopPropagation();
+                          }
+                        }}
+                      />
+                      <Popover
+                        open={open}
+                        anchorEl={anchorEl}
+                        onClose={() => setAnchorEl(null)}
+                        disableAutoFocus
+                        anchorOrigin={{
+                          vertical: 'bottom',
+                          horizontal: 'left',
+                        }}
+                      >
+                        <Alert severity="error" variant="outlined">
+                          {inputError}
+                        </Alert>
+                      </Popover>
+                    </React.Fragment>
+                  }
+                />
+              ) : null}
+
+              {introspection.data?.files?.map((file) => (
+                <HandlerFileTreeItem key={file.name} file={file} />
+              ))}
+
+              {introspection.isLoading ? (
+                <React.Fragment>
+                  <TreeItem disabled nodeId="::loading::" label={<Skeleton />} />
+                  <TreeItem disabled nodeId="::loading::" label={<Skeleton />} />
+                  <TreeItem disabled nodeId="::loading::" label={<Skeleton />} />
+                </React.Fragment>
+              ) : null}
+            </TreeView>
+            {introspection.error ? (
+              <Box
+                sx={{
+                  position: 'absolute',
+                  inset: '0 0 0 0',
+                  display: 'flex',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                }}
+              >
+                {errorFrom(introspection.error).message}
+              </Box>
+            ) : null}
+          </Box>
+
+          <Stack sx={{ gap: 1, flex: 1, overflow: 'auto' }}>
+            <Typography>Parameters:</Typography>
+            {Object.entries(parameterDefs).map(([name, definiton]) => {
+              const Control = getDefaultControl(definiton, liveBindings);
+              return Control ? (
+                <BindableEditor
+                  key={name}
+                  liveBinding={liveBindings[name]}
+                  globalScope={globalScope}
+                  globalScopeMeta={globalScopeMeta}
+                  label={name}
+                  propType={definiton}
+                  jsRuntime={jsBrowserRuntime}
+                  renderControl={(renderControlParams) => (
+                    <Control {...renderControlParams} propType={definiton} />
+                  )}
+                  value={paramsObject[name]}
+                  onChange={(newValue) => {
+                    const paramKeys = Object.keys(parameterDefs);
+                    const newParams: BindableAttrEntries = paramKeys.flatMap((key) => {
+                      const paramValue = key === name ? newValue : paramsObject[key];
+                      return paramValue ? [[key, paramValue]] : [];
+                    });
+                    setInput((existing) => ({
+                      ...existing,
+                      params: newParams,
+                    }));
+                  }}
+                />
+              ) : null;
+            })}
+          </Stack>
+        </Stack>
+      </QueryInputPanel>
+
+      <QueryPreview isLoading={previewIsLoading} error={preview?.error}>
+        <JsonView sx={{ height: '100%' }} copyToClipboard src={preview?.data} />
+      </QueryPreview>
+    </SplitPane>
   );
 }
 

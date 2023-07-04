@@ -65,6 +65,13 @@ function getThemeFile(root: string): string {
   return path.join(getToolpadFolder(root), './theme.yml');
 }
 
+function getResourcesFolder(root: string): string {
+  return path.join(getToolpadFolder(root), './resources');
+}
+function getFunctionFilePath(resourcesFolder: string, fileName: string): string {
+  return path.join(resourcesFolder, `${fileName}`);
+}
+
 function getComponentsFolder(root: string): string {
   const toolpadFolder = getToolpadFolder(root);
   return path.join(toolpadFolder, './components');
@@ -781,32 +788,26 @@ export async function findSupportedEditor(): Promise<string | null> {
   }
 }
 
-let supportedEditorPromise: Promise<string | null>;
-
-export async function getSupportedEditor(): Promise<string | null> {
-  if (!supportedEditorPromise) {
-    supportedEditorPromise = findSupportedEditor();
-  }
-  return supportedEditorPromise;
-}
-
-async function openCodeEditor(file: string): Promise<void> {
-  const supportedEditor = await getSupportedEditor();
+export async function openCodeEditor(filePath: string, fileType: string) {
+  const supportedEditor = await findSupportedEditor();
   if (!supportedEditor) {
     throw new Error(`No code editor found`);
   }
-  const userProjectRoot = getUserProjectRoot();
-  const fullPath = path.resolve(userProjectRoot, file);
-  openEditor([fullPath, userProjectRoot], {
+  const root = getUserProjectRoot();
+  let resolvedPath = filePath;
+
+  if (fileType === 'query') {
+    const resourcesFolder = getResourcesFolder(root);
+    resolvedPath = getFunctionFilePath(resourcesFolder, filePath);
+  }
+  if (fileType === 'component') {
+    const componentsFolder = getComponentsFolder(root);
+    resolvedPath = getComponentFilePath(componentsFolder, filePath);
+  }
+  const fullResolvedPath = path.resolve(root, resolvedPath);
+  openEditor([fullResolvedPath, root], {
     editor: process.env.EDITOR ? undefined : DEFAULT_EDITOR,
   });
-}
-
-export async function openCodeComponentEditor(componentName: string): Promise<void> {
-  const root = getUserProjectRoot();
-  const componentsFolder = getComponentsFolder(root);
-  const fullPath = getComponentFilePath(componentsFolder, componentName);
-  await openCodeEditor(fullPath);
 }
 
 export type ProjectFolderEntry = {
@@ -941,6 +942,8 @@ class ToolpadProject {
   options: ToolpadProjectOptions;
 
   private codeComponentsFingerprint: null | string = null;
+
+  openCodeEditor = openCodeEditor;
 
   envManager: EnvManager;
 
@@ -1081,17 +1084,6 @@ class ToolpadProject {
       const dom = await this.loadDom();
       const newDom = appDom.applyDiff(dom, domDiff);
       return this.writeDomToDisk(newDom);
-    });
-  }
-
-  async openCodeEditor(file: string): Promise<void> {
-    const supportedEditor = await getSupportedEditor();
-    if (!supportedEditor) {
-      throw new Error(`No code editor found`);
-    }
-    const fullPath = path.resolve(this.getRoot(), file);
-    openEditor([fullPath, this.getRoot()], {
-      editor: process.env.EDITOR ? undefined : DEFAULT_EDITOR,
     });
   }
 }

@@ -76,10 +76,6 @@ export default defineConfig([
     async onSuccess() {
       // eslint-disable-next-line no-console
       console.log('runtime: build successful');
-<<<<<<< HEAD
-      spawnSync('tsc', ['--emitDeclarationOnly', '--declaration'], { shell: true });
-=======
->>>>>>> origin/master
     },
   },
 ]);

@@ -46,6 +46,8 @@ interface RunOptions {
 async function runApp(cmd: Command, { port, dev = false, dir }: RunOptions) {
   const projectDir = path.resolve(process.cwd(), dir);
 
+  console.log(projectDir);
+
   if (!(await folderExists(projectDir))) {
     console.error(`${chalk.red('error')} - No project found at ${chalk.cyan(`"${projectDir}"`)}`);
     process.exit(1);

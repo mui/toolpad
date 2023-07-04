@@ -11,6 +11,7 @@ import { ExecFetchResult } from '@mui/toolpad-core';
 import EnvManager from './EnvManager';
 import { ProjectEvents, ToolpadProjectOptions } from '../types';
 import { createWorker as createDevWorker } from './functionsDevWorker';
+import { normalizePath } from '../utils/paths';
 
 const DEFAULT_FUNCTIONS_FILE_CONTENT = `// Toolpad queries:
 
@@ -100,7 +101,7 @@ export default class FunctionsManager {
   }
 
   async getFunctionFiles(): Promise<string[]> {
-    const paths = await glob(this.getFunctionResourcesPattern());
+    const paths = await glob(normalizePath(this.getFunctionResourcesPattern()));
     return paths.map((fullPath) => path.relative(this.project.getRoot(), fullPath));
   }
 
@@ -110,9 +111,12 @@ export default class FunctionsManager {
 
   getOutputFileForEntryPoint(entryPoint: string): string | undefined {
     const [outputFile] =
-      Object.entries(this.buildMetafile?.outputs ?? {}).find(
-        (entry) => entry[1].entryPoint === entryPoint,
-      ) ?? [];
+      Object.entries(this.buildMetafile?.outputs ?? {}).find((entry) => {
+        console.log(entry);
+        console.log(entryPoint);
+        console.log(normalizePath(entryPoint));
+        return entry[1].entryPoint === normalizePath(entryPoint);
+      }) ?? [];
 
     return outputFile;
   }

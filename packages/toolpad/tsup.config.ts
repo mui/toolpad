@@ -10,6 +10,6 @@ export default defineConfig({
   async onSuccess() {
     // eslint-disable-next-line no-console
     console.log('build successful');
-    spawnSync('tsc', ['--emitDeclarationOnly', '--declaration']);
+    spawnSync('tsc', ['--emitDeclarationOnly', '--declaration'], { shell: true });
   },
 });

@@ -31,7 +31,7 @@
   },
   "scripts": {
     "prebuild": "rimraf dist",
-    "build": "tsup && tsc --emitDeclarationOnly --declaration",
+    "build": "tsup",
     "dev": "tsup --watch",
     "check-types": "tsup && tsc --noEmit"
   },

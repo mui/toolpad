@@ -843,7 +843,7 @@ export async function findSupportedEditor(): Promise<string | null> {
     return null;
   }
   try {
-    await execa('which', [maybeEditor]);
+    await execa(`${maybeEditor} -v`);
     return maybeEditor;
   } catch (err) {
     return null;

@@ -1,6 +1,0 @@
-apiVersion: v1
-kind: page
-spec:
-  id: ef7MTWD
-  title: page
-  display: shell

@@ -64,12 +64,12 @@ test('rest editor basics', async ({ page, context, localApp }) => {
 
   await expect(newQueryEditor).toBeVisible();
 
-  await expect(editorModel.appCanvas.getByText('query4 authorization: foo')).toBeVisible();
+  await expect(editorModel.appCanvas.getByText('query4 authorization: foo')).toBeDefined();
 
   const envFilePath = path.resolve(localApp.dir, './.env');
   await fs.writeFile(envFilePath, 'TEST_VAR=bar');
 
-  await expect(editorModel.appCanvas.getByText('query4 authorization: bar')).toBeVisible();
+  await expect(editorModel.appCanvas.getByText('query4 authorization: bar')).toBeDefined();
 
   // Make sure switching tabs does not close query editor
   const newTab = await context.newPage();

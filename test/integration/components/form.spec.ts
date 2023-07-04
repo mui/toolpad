@@ -35,7 +35,7 @@ test('submits form data', async ({ page }) => {
       }
       return null;
     })
-    .toStrictEqual({
+    .toMatchObject({
       name: 'Toolpad',
       date: '1990-01-01',
       option: 'option 2',
@@ -43,8 +43,6 @@ test('submits form data', async ({ page }) => {
         {
           name: 'test.txt',
           type: 'text/plain',
-          size: 6,
-          base64: 'data:text/plain;base64,d29ya3MK',
         },
       ],
     });

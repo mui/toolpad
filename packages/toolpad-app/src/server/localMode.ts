@@ -843,7 +843,7 @@ export async function findSupportedEditor(): Promise<string | null> {
     return null;
   }
   try {
-    await execa(`${maybeEditor} -v`);
+    await execa(maybeEditor, ['-v']);
     return maybeEditor;
   } catch (err) {
     return null;
@@ -994,7 +994,7 @@ function getDomFilePatterns(root: string) {
  * Calculates a fingerprint from all files that influence the dom structure
  */
 async function calculateDomFingerprint(root: string): Promise<number> {
-  const files = await glob(getDomFilePatterns(root));
+  const files = await glob(getDomFilePatterns(root), { windowsPathsNoEscape: true });
 
   const mtimes = await Promise.all(
     files.sort().map(async (file) => {

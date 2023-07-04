@@ -101,7 +101,7 @@ export default class FunctionsManager {
   }
 
   async getFunctionFiles(): Promise<string[]> {
-    const paths = await glob(normalizePath(this.getFunctionResourcesPattern()));
+    const paths = await glob(this.getFunctionResourcesPattern(), { windowsPathsNoEscape: true });
     return paths.map((fullPath) => path.relative(this.project.getRoot(), fullPath));
   }
 

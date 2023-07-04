@@ -57,20 +57,18 @@ export default function CardGrid(props) {
                   mt={2}
                   sx={{
                     display: 'flex',
-                    height: 250,
                     flexDirection: 'column',
                     justifyContent: 'space-between',
-                    rowGap: 1,
                   }}
                 >
-                  <Typography component="h3" fontWeight="medium" color="text.primary">
+                  <Typography component="h3" fontWeight="medium" color="text.primary" gutterBottom>
                     {title}
                   </Typography>
-                  <Typography variant="body" color="text.secondary">
+                  <Typography variant="body2" color="text.secondary">
                     {description}
                   </Typography>
                   {action ? (
-                    <Link href={action.href}>
+                    <Link href={action.href} variant="body2" sx={{ mt: 1 }}>
                       {action.label}
                       <KeyboardArrowRightRounded />
                     </Link>

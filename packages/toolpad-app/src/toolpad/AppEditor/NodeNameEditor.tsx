@@ -1,7 +1,7 @@
 import { SxProps, TextField } from '@mui/material';
 import * as React from 'react';
 import * as appDom from '../../appDom';
-import { useDom, useDomApi, useAppStateApi } from '../AppState';
+import { useDom, useDomApi } from '../AppState';
 import { useNodeNameValidation } from './HierarchyExplorer/validation';
 import client from '../../api';
 
@@ -13,7 +13,6 @@ interface NodeNameEditorProps {
 export default function NodeNameEditor({ node, sx }: NodeNameEditorProps) {
   const domApi = useDomApi();
   const { dom } = useDom();
-  const appStateApi = useAppStateApi();
 
   const [nameInput, setNameInput] = React.useState(node.name);
   React.useEffect(() => setNameInput(node.name), [node.name]);

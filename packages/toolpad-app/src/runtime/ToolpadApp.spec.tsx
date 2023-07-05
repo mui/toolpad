@@ -16,7 +16,7 @@ async function loadComponents() {
 const waitFor: typeof waitForOrig = (waiter, options) =>
   waitForOrig(waiter, { timeout: 10000, ...options });
 
-function renderPage(
+async function renderPage(
   initPage: (dom: appDom.AppDom, page: appDom.PageNode) => appDom.AppDom,
   canvasEvents: Emitter<RuntimeEvents> | null = null,
 ) {
@@ -36,15 +36,27 @@ function renderPage(
 
   const state = createRuntimeState({ dom });
 
-  return render(
-    <CanvasEventsContext.Provider value={canvasEvents}>
-      <ToolpadApp loadComponents={loadComponents} state={state} basename="toolpad" />
-    </CanvasEventsContext.Provider>,
+  const rendered = act(() =>
+    render(
+      <CanvasEventsContext.Provider value={canvasEvents}>
+        <ToolpadApp loadComponents={loadComponents} state={state} basename="toolpad" />
+      </CanvasEventsContext.Provider>,
+    ),
   );
+
+  // Flush microtasks caused by react-hook-form
+  // Solution from https://github.com/testing-library/react-testing-library/issues/999#issuecomment-1098053307
+  await act(() =>
+    Promise.resolve()
+      .then(() => {})
+      .then(() => {}),
+  );
+
+  return rendered;
 }
 
 test(`Static Text`, async () => {
-  renderPage((dom, page) => {
+  await renderPage((dom, page) => {
     const text = appDom.createNode(dom, 'element', {
       attributes: { component: 'Text' },
       props: { value: 'Hello World' },
@@ -61,7 +73,7 @@ test(`Static Text`, async () => {
 });
 
 test(`Default Text`, async () => {
-  renderPage((dom, page) => {
+  await renderPage((dom, page) => {
     const text = appDom.createNode(dom, 'element', {
       attributes: { component: 'Text' },
       props: {},
@@ -78,7 +90,7 @@ test(`Default Text`, async () => {
 });
 
 test(`simple databinding`, async () => {
-  renderPage((dom, page) => {
+  await renderPage((dom, page) => {
     const textField = appDom.createNode(dom, 'element', {
       name: 'theTextInput',
       attributes: { component: 'TextField' },
@@ -112,7 +124,7 @@ test(`simple databinding`, async () => {
 });
 
 test(`default Value for binding`, async () => {
-  renderPage((dom, page) => {
+  await renderPage((dom, page) => {
     const select = appDom.createNode(dom, 'element', {
       name: 'theTextInput',
       attributes: { component: 'Select' },
@@ -145,7 +157,7 @@ test(`Databinding errors`, async () => {
     let selfReferencing: appDom.ElementNode;
     let cyclic1: appDom.ElementNode;
     let cyclic2: appDom.ElementNode;
-    renderPage((dom, page) => {
+    await renderPage((dom, page) => {
       nonExisting = appDom.createNode(dom, 'element', {
         attributes: { component: 'Text' },
         props: { value: { $$jsExpression: 'nonExisting.foo' } },

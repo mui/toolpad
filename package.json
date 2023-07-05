@@ -40,7 +40,7 @@
     "test:integration": "rm -rf ./node_modules/.vite && playwright test --config ./test/playwright.config.ts",
     "test": "lerna run test",
     "check-types": "lerna run check-types",
-    "toolpad": "toolpad",
+    "toolpad": "node packages/toolpad/index.cjs",
     "jsonSchemas": "tsx ./scripts/docs/generateJsonSchemas.ts"
   },
   "devDependencies": {

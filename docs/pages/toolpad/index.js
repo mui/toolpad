@@ -73,6 +73,7 @@ export default function Home() {
         />
         <Divider />
         <Marquee content={marquee} />
+        <Divider />
       </main>
       <AppFooter />
     </BrandingCssVarsProvider>

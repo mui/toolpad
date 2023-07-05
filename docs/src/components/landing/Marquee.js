@@ -18,11 +18,6 @@ function Marquee({ content }) {
           background: `linear-gradient(180deg, ${
             (theme.vars || theme).palette.primaryDark[900]
           } 0%, ${(theme.vars || theme).palette.primaryDark[800]})`,
-          borderBottom: '1px solid',
-          borderColor: (theme.vars || theme).palette.grey[200],
-          ...theme.applyDarkStyles({
-            borderColor: (theme.vars || theme).palette.primaryDark[600],
-          }),
         }),
       ]}
     >
@@ -51,7 +46,7 @@ function Marquee({ content }) {
       <Typography
         component="label"
         variant="body2"
-        color={(theme) => (theme.palette.mode === 'dark' ? '#fff' : `text.secondary`)}
+        color="grey.500"
         sx={{ fontWeight: 'medium', display: 'block', mb: 2, mx: 'auto' }}
         htmlFor="email-landing"
       >

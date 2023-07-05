@@ -3766,7 +3766,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/eslint@npm:*, @types/eslint@npm:8.40.2":
+"@types/eslint@npm:*":
   version: 8.40.2
   resolution: "@types/eslint@npm:8.40.2"
   dependencies:
@@ -7441,7 +7441,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"emoji-regex@npm:10.2.1, emoji-regex@npm:^10.2.1":
+"emoji-regex@npm:^10.2.1":
   version: 10.2.1
   resolution: "emoji-regex@npm:10.2.1"
   checksum: 1aa2d16881c56531fdfc03d0b36f5c2b6221cc4097499a5665b88b711dc3fb4d5b8804f0ca6f00c56e5dcf89bac75f0487eee85da1da77df3a33accc6ecbe426
@@ -8122,16 +8122,6 @@ __metadata:
   checksum: c061827b92221df230f32e4c850696c1dcb4c45ebdb39d478ffdfe0a9ad12c113921c8cd2c8aad6d8872439c6e1921fa4a6d545b35c172e79d73bf306eee3b96
   languageName: node
   linkType: hard
-
-"eslint-plugin-material-ui@workspace:packages/eslint-plugin-material-ui":
-  version: 0.0.0-use.local
-  resolution: "eslint-plugin-material-ui@workspace:packages/eslint-plugin-material-ui"
-  dependencies:
-    "@types/eslint": 8.40.2
-    "@typescript-eslint/parser": 5.60.1
-    emoji-regex: 10.2.1
-  languageName: unknown
-  linkType: soft
 
 "eslint-plugin-mocha@npm:10.1.0":
   version: 10.1.0

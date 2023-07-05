@@ -3,6 +3,7 @@ import {
   Box,
   Button,
   capitalize,
+  createTheme,
   PaletteMode,
   Popover,
   SimplePaletteColorOptions,
@@ -87,19 +88,29 @@ export interface MuiThemeEditorProps {
 export default function MuiThemeEditor({ value, onChange }: MuiThemeEditorProps) {
   const theme = useTheme();
 
-  const colorPicker = (intent: 'primary' | 'secondary', defaultValue?: string) => (
+  const defaultTheme = React.useMemo(
+    () => createTheme({ palette: { mode: value?.palette?.mode } }),
+    [value?.palette?.mode],
+  );
+
+  const colorPicker = (intent: 'primary' | 'secondary') => (
     <PaletteColorPicker
       label={capitalize(intent)}
-      value={(value?.palette?.[intent] as SimplePaletteColorOptions)?.main || defaultValue}
+      value={
+        (value?.palette?.[intent] as SimplePaletteColorOptions)?.main ||
+        defaultTheme.palette[intent].main
+      }
       onChange={(newMain) => {
         onChange({
           ...value,
           palette: {
             ...value?.palette,
-            [intent]: {
-              main: newMain,
-              contrastText: theme.palette.getContrastText(newMain),
-            },
+            [intent]: newMain
+              ? {
+                  main: newMain,
+                  contrastText: theme.palette.getContrastText(newMain),
+                }
+              : undefined,
           },
         });
       }}
@@ -110,7 +121,7 @@ export default function MuiThemeEditor({ value, onChange }: MuiThemeEditorProps)
     <Stack direction="column" spacing={2}>
       <ToggleButtonGroup
         exclusive
-        value={value?.palette?.mode}
+        value={value?.palette?.mode || defaultTheme.palette.mode}
         onChange={(event, newMode: PaletteMode | null) => {
           if (newMode) {
             onChange({

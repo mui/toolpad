@@ -1,7 +1,0 @@
-apiVersion: v1
-kind: theme
-spec:
-  options:
-    {
-      palette: { primary: { main: "#009688", contrastText: "#fff" } }
-    }

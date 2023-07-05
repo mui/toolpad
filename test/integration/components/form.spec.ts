@@ -44,7 +44,7 @@ test('submits form data', async ({ page }) => {
       }
       return null;
     })
-    .toMatchObject({
+    .toStrictEqual({
       name: 'Toolpad',
       date: '1990-01-01',
       option: 'option 2',

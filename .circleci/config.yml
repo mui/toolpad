@@ -39,7 +39,7 @@ commands:
           name: Set yarn cache folder
           command: |
             # Keep path in sync with `save_cache` for key "v8-yarn-"
-            yarn config set cache-folder /tmp/yarn-cache
+            yarn config set cacheFolder /tmp/yarn-cache
             # Debug information
             yarn cache dir
             yarn cache list

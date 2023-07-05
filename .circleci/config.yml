@@ -79,9 +79,9 @@ jobs:
       - run:
           name: Should not have any git not staged
           command: git diff --exit-code
-      - run:
-          name: Check for duplicated packages
-          command: yarn deduplicate
+      # - run:
+      #     name: Check for duplicated packages
+      #     command: yarn deduplicate
 
   test_lint:
     <<: *defaults

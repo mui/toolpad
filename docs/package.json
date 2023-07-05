@@ -29,7 +29,6 @@
     "@mui/icons-material": "5.13.7",
     "@mui/markdown": "github:Janpot/material-ui#head=yarn-2&workspace=@mui/markdown",
     "@mui/material": "5.13.7",
-    "@mui/monorepo": "github:Janpot/material-ui#head=yarn-2",
     "@mui/monorepo-docs": "github:Janpot/material-ui#head=yarn-2&workspace=docs",
     "@mui/styles": "5.13.7",
     "@mui/utils": "5.13.7",

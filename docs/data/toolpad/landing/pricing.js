@@ -4,10 +4,10 @@ import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import Tooltip from '@mui/material/Tooltip';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
-import Link from 'docs/src/modules/components/Link';
-import IconImage from 'docs/src/components/icon/IconImage';
+import Link from '@mui/monorepo-docs/src/modules/components/Link';
+import IconImage from '@mui/monorepo-docs/src/components/icon/IconImage';
 import LaunchRounded from '@mui/icons-material/LaunchRounded';
-import GradientText from 'docs/src/components/typography/GradientText';
+import GradientText from '@mui/monorepo-docs/src/components/typography/GradientText';
 
 function ColumnHead({ label, metadata, tooltip, nested = false, href }) {
   const text = (

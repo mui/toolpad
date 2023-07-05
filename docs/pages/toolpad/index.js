@@ -1,12 +1,12 @@
 import * as React from 'react';
 import NoSsr from '@mui/material/NoSsr';
-import Head from 'docs/src/modules/components/Head';
+import Head from '@mui/monorepo-docs/src/modules/components/Head';
 import CssBaseline from '@mui/material/CssBaseline';
 import Divider from '@mui/material/Divider';
-import BrandingCssVarsProvider from 'docs/src/BrandingCssVarsProvider';
-import AppHeader from 'docs/src/layouts/AppHeader';
-import AppFooter from 'docs/src/layouts/AppFooter';
-import AppHeaderBanner from 'docs/src/components/banner/AppHeaderBanner';
+import BrandingCssVarsProvider from '@mui/monorepo-docs/src/BrandingCssVarsProvider';
+import AppHeader from '@mui/monorepo-docs/src/layouts/AppHeader';
+import AppFooter from '@mui/monorepo-docs/src/layouts/AppFooter';
+import AppHeaderBanner from '@mui/monorepo-docs/src/components/banner/AppHeaderBanner';
 import ToolpadHero from '../../src/components/landing/Hero';
 import DemoVideo from '../../src/components/landing/DemoVideo';
 import SignUpToast from '../../src/components/landing/SignUpToast';

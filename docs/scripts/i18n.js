@@ -1,8 +1,8 @@
 /* eslint-disable no-console */
 import path from 'path';
 import fse from 'fs-extra';
-import { pageToTitle } from 'docs/src/modules/utils/helpers';
-import pages from 'docs/src/pages';
+import { pageToTitle } from '@mui/monorepo-docs/src/modules/utils/helpers';
+import pages from '@mui/monorepo-docs/src/pages';
 
 async function run() {
   try {

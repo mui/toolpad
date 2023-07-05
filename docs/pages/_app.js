@@ -1,21 +1,21 @@
-import 'docs/src/modules/components/bootstrap';
+import '@mui/monorepo-docs/src/modules/components/bootstrap';
 // --- Post bootstrap -----
 import * as React from 'react';
 import { loadCSS } from 'fg-loadcss/src/loadCSS';
 import NextHead from 'next/head';
 import PropTypes from 'prop-types';
 import { useRouter } from 'next/router';
-import PageContext from 'docs/src/modules/components/PageContext';
-import GoogleAnalytics from 'docs/src/modules/components/GoogleAnalytics';
-import { ThemeProvider } from 'docs/src/modules/components/ThemeContext';
-import { CodeVariantProvider } from 'docs/src/modules/utils/codeVariant';
-import { CodeCopyProvider } from 'docs/src/modules/utils/CodeCopy';
-import { UserLanguageProvider } from 'docs/src/modules/utils/i18n';
-import DocsStyledEngineProvider from 'docs/src/modules/utils/StyledEngineProvider';
-import { pathnameToLanguage } from 'docs/src/modules/utils/helpers';
-import createEmotionCache from 'docs/src/createEmotionCache';
-import findActivePage from 'docs/src/modules/utils/findActivePage';
-import getProductInfoFromUrl from 'docs/src/modules/utils/getProductInfoFromUrl';
+import PageContext from '@mui/monorepo-docs/src/modules/components/PageContext';
+import GoogleAnalytics from '@mui/monorepo-docs/src/modules/components/GoogleAnalytics';
+import { ThemeProvider } from '@mui/monorepo-docs/src/modules/components/ThemeContext';
+import { CodeVariantProvider } from '@mui/monorepo-docs/src/modules/utils/codeVariant';
+import { CodeCopyProvider } from '@mui/monorepo-docs/src/modules/utils/CodeCopy';
+import { UserLanguageProvider } from '@mui/monorepo-docs/src/modules/utils/i18n';
+import DocsStyledEngineProvider from '@mui/monorepo-docs/src/modules/utils/StyledEngineProvider';
+import { pathnameToLanguage } from '@mui/monorepo-docs/src/modules/utils/helpers';
+import createEmotionCache from '@mui/monorepo-docs/src/createEmotionCache';
+import findActivePage from '@mui/monorepo-docs/src/modules/utils/findActivePage';
+import getProductInfoFromUrl from '@mui/monorepo-docs/src/modules/utils/getProductInfoFromUrl';
 import pages from '../data/pages';
 import toolpadPkgJson from '../../packages/toolpad/package.json';
 

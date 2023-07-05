@@ -5,8 +5,8 @@ import Container from '@mui/material/Container';
 import Paper from '@mui/material/Paper';
 import Typography from '@mui/material/Typography';
 import Grid from '@mui/material/Unstable_Grid2';
-import SectionHeadline from 'docs/src/components/typography/SectionHeadline';
-import IconImage from 'docs/src/components/icon/IconImage';
+import SectionHeadline from '@mui/monorepo-docs/src/components/typography/SectionHeadline';
+import IconImage from '@mui/monorepo-docs/src/components/icon/IconImage';
 import { alpha } from '@mui/material/styles';
 
 const cardRootStyle = (imageUrl) => ({

@@ -15,8 +15,8 @@ import ToggleOnIcon from '@mui/icons-material/ToggleOn';
 import SecurityRoundedIcon from '@mui/icons-material/SecurityRounded';
 import SupportAgentRoundedIcon from '@mui/icons-material/SupportAgentRounded';
 
-// import IconImage from 'docs/src/components/icon/IconImage';
-import SectionHeadline from 'docs/src/components/typography/SectionHeadline';
+// import IconImage from '@mui/monorepo-docs/src/components/icon/IconImage';
+import SectionHeadline from '@mui/monorepo-docs/src/components/typography/SectionHeadline';
 
 function PlanName({ planInfo, centered = false, disableDescription = false }) {
   const { title, description } = planInfo;

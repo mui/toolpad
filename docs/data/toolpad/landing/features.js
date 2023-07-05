@@ -6,7 +6,7 @@ import ViewModuleIcon from '@mui/icons-material/ViewModule';
 import GppGoodIcon from '@mui/icons-material/GppGood';
 import AutoAwesomeIcon from '@mui/icons-material/AutoAwesome';
 import Typography from '@mui/material/Typography';
-import GradientText from 'docs/src/components/typography/GradientText';
+import GradientText from '@mui/monorepo-docs/src/components/typography/GradientText';
 
 const features = {
   overline: 'Features',

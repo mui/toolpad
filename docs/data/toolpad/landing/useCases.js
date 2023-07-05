@@ -1,6 +1,6 @@
 import * as React from 'react';
 import Typography from '@mui/material/Typography';
-import GradientText from 'docs/src/components/typography/GradientText';
+import GradientText from '@mui/monorepo-docs/src/components/typography/GradientText';
 import ROUTES from '../../../src/route';
 
 const useCases = {

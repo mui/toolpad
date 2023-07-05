@@ -18,3 +18,8 @@ Visit the [MUI Toolpad documentation](https://mui.com/toolpad/getting-started/ov
 
 Please follow the [contributing guidelines](https://github.com/mui/material-ui/blob/HEAD/CONTRIBUTING.md).
 on how to get started contributing to MUI.
+
+## How do I help to improve the translations?
+
+Please visit https://translate.mui.com/ where you will be able to select a language and edit the translations.
+Please don't submit pull requests directly.

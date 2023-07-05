@@ -86,7 +86,7 @@ const TooltipRadio = React.forwardRef<HTMLButtonElement, TooltipRadioProps>(func
 
 export interface ColorToolProps {
   label: string;
-  value: string;
+  value?: string;
   onChange: (value: string) => void;
   sx?: SxProps;
 }
@@ -95,7 +95,7 @@ function ColorTool({ sx, label, value, onChange }: ColorToolProps) {
   const theme = useTheme();
 
   const [state, setState] = React.useState<{
-    input: string;
+    input?: string;
     hue: keyof typeof colors;
     shade: number;
     isValidColor: boolean;
@@ -167,11 +167,13 @@ function ColorTool({ sx, label, value, onChange }: ColorToolProps) {
   const intentShade = state.shade;
   const color = value;
 
-  const background = theme.palette.augmentColor({
-    color: {
-      main: color,
-    },
-  });
+  const background = color
+    ? theme.palette.augmentColor({
+        color: {
+          main: color,
+        },
+      })
+    : undefined;
 
   const id = React.useId();
 

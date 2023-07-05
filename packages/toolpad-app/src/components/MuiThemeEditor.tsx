@@ -28,7 +28,7 @@ const IconToggleButton = styled(ToggleButton)({
   },
 });
 
-interface PaletteColorPickerProps extends WithControlledProp<string> {
+interface PaletteColorPickerProps extends WithControlledProp<string | undefined> {
   label: string;
 }
 
@@ -56,7 +56,7 @@ function PaletteColorPicker({ label, value, onChange }: PaletteColorPickerProps)
             ml: 2,
             p: '2px 8px',
             background: value,
-            color: theme.palette.getContrastText(value),
+            color: value ? theme.palette.getContrastText(value) : undefined,
             borderRadius: 1,
           }}
         >
@@ -87,7 +87,7 @@ export interface MuiThemeEditorProps {
 export default function MuiThemeEditor({ value, onChange }: MuiThemeEditorProps) {
   const theme = useTheme();
 
-  const colorPicker = (intent: 'primary' | 'secondary', defaultValue: string) => (
+  const colorPicker = (intent: 'primary' | 'secondary', defaultValue?: string) => (
     <PaletteColorPicker
       label={capitalize(intent)}
       value={(value?.palette?.[intent] as SimplePaletteColorOptions)?.main || defaultValue}
@@ -134,9 +134,9 @@ export default function MuiThemeEditor({ value, onChange }: MuiThemeEditorProps)
         </IconToggleButton>
       </ToggleButtonGroup>
 
-      {colorPicker('primary', '#2196f3')}
+      {colorPicker('primary')}
 
-      {colorPicker('secondary', '#f50057')}
+      {colorPicker('secondary')}
     </Stack>
   );
 }

@@ -785,6 +785,14 @@ async function writeDomToDisk(dom: appDom.AppDom): Promise<void> {
   ]);
 }
 
+async function getResourcesFolder(root: string): Promise<string> {
+  return path.join(getToolpadFolder(root), './resources');
+}
+
+async function getFunctionFilePath(resourcesFolder: string, filePath: string): Promise<string> {
+  return path.join(resourcesFolder, filePath);
+}
+
 const DEFAULT_EDITOR = 'code';
 
 export async function findSupportedEditor(): Promise<string | null> {
@@ -798,6 +806,28 @@ export async function findSupportedEditor(): Promise<string | null> {
   } catch (err) {
     return null;
   }
+}
+
+export async function openCodeEditor(filePath: string, fileType: string) {
+  const supportedEditor = await findSupportedEditor();
+  if (!supportedEditor) {
+    throw new Error(`No code editor found`);
+  }
+  const root = getUserProjectRoot();
+  let resolvedPath = filePath;
+
+  if (fileType === 'query') {
+    const resourcesFolder = await getResourcesFolder(root);
+    resolvedPath = await getFunctionFilePath(resourcesFolder, filePath);
+  }
+  if (fileType === 'component') {
+    const componentsFolder = getComponentsFolder(root);
+    resolvedPath = getComponentFilePath(componentsFolder, filePath);
+  }
+  const fullResolvedPath = path.resolve(root, resolvedPath);
+  openEditor([fullResolvedPath, root], {
+    editor: process.env.EDITOR ? undefined : DEFAULT_EDITOR,
+  });
 }
 
 export type ProjectFolderEntry = {
@@ -881,7 +911,6 @@ function getDomFilePatterns(root: string) {
     path.resolve(root, './toolpad/components/*.*'),
   ];
 }
-
 /**
  * Calculates a fingerprint from all files that influence the dom structure
  */
@@ -1072,27 +1101,6 @@ class ToolpadProject {
       const dom = await this.loadDom();
       const newDom = appDom.applyDiff(dom, domDiff);
       return this.writeDomToDisk(newDom);
-    });
-  }
-
-  async openCodeEditor(filePath: string, fileType: string): Promise<void> {
-    const supportedEditor = await findSupportedEditor();
-    if (!supportedEditor) {
-      throw new Error(`No code editor found`);
-    }
-    const root = this.getRoot();
-    let resolvedPath = filePath;
-
-    if (fileType === 'query') {
-      resolvedPath = this.functionsManager.getFunctionFile(filePath);
-    }
-    if (fileType === 'component') {
-      const componentsFolder = getComponentsFolder(root);
-      resolvedPath = getComponentFilePath(componentsFolder, filePath);
-    }
-    const fullResolvedPath = path.resolve(root, resolvedPath);
-    openEditor([fullResolvedPath, root], {
-      editor: process.env.EDITOR ? undefined : DEFAULT_EDITOR,
     });
   }
 }

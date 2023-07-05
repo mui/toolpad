@@ -60,7 +60,6 @@ interface IToolpadProject {
   getRoot(): string;
   getToolpadFolder(): string;
   getOutputFolder(): string;
-  openCodeEditor(filePath: string, fileType: string): Promise<void>;
   envManager: EnvManager;
   invalidateQueries(): void;
 }
@@ -103,10 +102,6 @@ export default class FunctionsManager {
 
   private getFunctionsFile(): string {
     return path.join(this.getResourcesFolder(), './functions.ts');
-  }
-
-  getFunctionFile(fileName: string) {
-    return path.join(this.getResourcesFolder(), `${fileName}`);
   }
 
   private getFunctionResourcesPattern(): string {

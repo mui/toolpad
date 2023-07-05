@@ -48,6 +48,8 @@ test('submits form data', async ({ page }) => {
         {
           name: 'test.txt',
           type: 'text/plain',
+          size: expect.any(Number),
+          base64: expect.stringMatching(/^data:text\/plain;base64,.+$/),
         },
       ],
       country: 'Portugal',

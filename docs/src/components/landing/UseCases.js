@@ -72,7 +72,7 @@ export default function CardGrid() {
         }),
       ]}
     >
-      <Container sx={{ py: { xs: 8, sm: 12 } }}>
+      <Container sx={{ pt: 8, pb: { xs: 8, sm: 12 } }}>
         <SectionHeadline
           overline="Use cases"
           title={

@@ -7,6 +7,7 @@ import IconImage from 'docs/src/components/icon/IconImage';
 import GradientText from 'docs/src/components/typography/GradientText';
 import DataObjectRoundedIcon from '@mui/icons-material/DataObjectRounded';
 import GetStartedButtons from 'docs/src/components/home/GetStartedButtons';
+import DemoVideo from './DemoVideo';
 import ROUTES from '../../route';
 import ToolpadHeroContainer from '../../layouts/ToolpadHeroContainer';
 
@@ -38,11 +39,7 @@ function TypingAnimation() {
 export default function Hero() {
   return (
     <ToolpadHeroContainer>
-      <Box
-        sx={{
-          mt: { xs: '20px', md: '100px' },
-        }}
-      >
+      <Box>
         <Typography
           fontWeight="bold"
           variant="body2"
@@ -63,7 +60,7 @@ export default function Hero() {
           </Box>
           <Chip label="Beta" component="span" color="primary" size="small" variant="outlined" />
         </Typography>
-        <Typography variant="h1" sx={{ my: 1 }}>
+        <Typography variant="h1" sx={{ my: 1, minWidth: { xs: 'auto', sm: 600 } }}>
           Turn your <TypingAnimation />
           <br />
           <GradientText>into UIs</GradientText>
@@ -94,6 +91,7 @@ export default function Hero() {
           </Box>
         </Box>
       </Box>
+      <DemoVideo />
     </ToolpadHeroContainer>
   );
 }

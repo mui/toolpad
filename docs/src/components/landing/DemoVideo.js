@@ -1,6 +1,5 @@
 import * as React from 'react';
 import Box from '@mui/material/Box';
-import Container from '@mui/material/Container';
 import { styled, alpha } from '@mui/material/styles';
 
 const Video = styled('video')(({ theme }) => [
@@ -57,21 +56,14 @@ export default function DemoVideo() {
         display: 'flex',
         flexDirection: 'row',
         justifyContent: 'center',
-        py: { xs: 4, sm: 8 },
       }}
     >
-      <Container>
-        <VideoContainer>
-          <Video
-            playsInline
-            controls
-            poster="/static/toolpad/marketing/index-hero-video-poster.png"
-          >
-            <source src="/static/toolpad/marketing/index-hero-demo-video.mp4" type="video/mp4" />
-            Your browser does not support the video tag.
-          </Video>
-        </VideoContainer>
-      </Container>
+      <VideoContainer>
+        <Video playsInline controls poster="/static/toolpad/marketing/index-hero-video-poster.png">
+          <source src="/static/toolpad/marketing/index-hero-demo-video.mp4" type="video/mp4" />
+          Your browser does not support the video tag.
+        </Video>
+      </VideoContainer>
     </Box>
   );
 }

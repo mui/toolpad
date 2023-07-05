@@ -52,7 +52,7 @@ export default function CardGrid(props) {
           : null
       }
     >
-      <Container sx={{ py: { xs: 4, sm: 8 } }}>
+      <Container sx={{ pt: { xs: 4, sm: 8 } }}>
         <SectionHeadline overline={content.overline} title={content.Headline} />
         <Grid container spacing={{ xs: 2, sm: 2 }} columns={{ xs: 1, sm: 3 }}>
           {content.cards.map(({ icon, title, wip, imageUrl, description }) => (

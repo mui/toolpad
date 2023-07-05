@@ -26,7 +26,6 @@ function Marquee({ content }) {
         textAlign="center"
         variant="h2"
         sx={{
-          mt: 4,
           mx: 'auto',
         }}
       >

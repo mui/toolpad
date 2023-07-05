@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import Box from '@mui/material/Box';
 import Chip from '@mui/material/Chip';
 import Typography from '@mui/material/Typography';
@@ -31,7 +31,7 @@ function TypingAnimation() {
         setIndex(0);
       }, 2000);
     }
-  }, [index]);
+  });
 
   return <span>{text}</span>;
 }

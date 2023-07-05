@@ -1,5 +1,4 @@
 import * as path from 'path';
-import fs from 'fs';
 import { ToolpadRuntime } from '../../models/ToolpadRuntime';
 import { test, expect } from '../../playwright/localTest';
 

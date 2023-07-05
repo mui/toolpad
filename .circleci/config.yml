@@ -30,7 +30,6 @@ commands:
           command: |
             node --version
             yarn --version
-            cat yarn.lock
       - restore_cache:
           name: Restore yarn cache
           keys:

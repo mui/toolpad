@@ -2033,15 +2033,15 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@mui/markdown@github:mui/material-ui#workspace=@mui/markdown":
+"@mui/markdown@github:Janpot/material-ui#head=yarn-2&workspace=@mui/markdown":
   version: 5.0.0
-  resolution: "@mui/markdown@https://github.com/mui/material-ui.git#workspace=%40mui%2Fmarkdown&commit=d0f060633de6b21653057d04533a1d3c9316512e"
+  resolution: "@mui/markdown@https://github.com/Janpot/material-ui.git#workspace=%40mui%2Fmarkdown&commit=a573c1768e8585974dfe6c2c4e452fafff9bd97c"
   dependencies:
     lodash: ^4.17.21
     marked: ^4.3.0
     marked-highlight: ^2.0.1
     prismjs: ^1.29.0
-  checksum: a91facdb4d19e6ebd3c740ebe51687e51fac85563cd2ccf81c483fadf887c3c6cc54b339bcc1685dd55e962738a2855711f2046812833e2a6dcf845b0cdc6d1b
+  checksum: e8e3a45337077c46796e356524ce30ebe33388fbfc6f077bd2982181e77397a9ea37aebfb0f249cc1ab6c349c9283e0fc31278f9d7b1e19bc84deffa801fa6c3
   languageName: node
   linkType: hard
 
@@ -2112,9 +2112,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@mui/monorepo-docs@github:mui/material-ui#workspace=docs":
+"@mui/monorepo-docs@github:Janpot/material-ui#head=yarn-2&workspace=docs":
   version: 5.0.0
-  resolution: "@mui/monorepo-docs@https://github.com/mui/material-ui.git#workspace=docs&commit=d0f060633de6b21653057d04533a1d3c9316512e"
+  resolution: "@mui/monorepo-docs@https://github.com/Janpot/material-ui.git#workspace=docs&commit=a573c1768e8585974dfe6c2c4e452fafff9bd97c"
   dependencies:
     "@babel/core": ^7.22.5
     "@babel/plugin-transform-object-assign": ^7.22.5
@@ -2132,7 +2132,7 @@ __metadata:
     "@mui/icons-material": ^5.13.7
     "@mui/joy": 5.0.0-alpha.86
     "@mui/lab": 5.0.0-alpha.135
-    "@mui/markdown": ^5.0.0
+    "@mui/markdown": 5.0.0
     "@mui/material": ^5.13.7
     "@mui/material-next": 6.0.0-alpha.91
     "@mui/styled-engine": ^5.13.2
@@ -2214,14 +2214,14 @@ __metadata:
     stylis-plugin-rtl-sc: "npm:stylis-plugin-rtl@^1.1.0"
     webfontloader: ^1.6.28
     webpack-bundle-analyzer: ^4.9.0
-  checksum: 06bec82a5109816fd7d85b427140ff1a79039cb0b9f9d4e170327c544074899a31fc33c701ee2abde269d567001862507f5cd1de93001e1ab1709684b653760c
+  checksum: 03031f44ee29071d8993e11c263b4bcfaf5c290bdf78d9b162a319531202d9811d8311ce3aa34a4c08d026ec9f5a0eb3bd236c46d5696854370131416eb9733c
   languageName: node
   linkType: hard
 
-"@mui/monorepo@github:mui/material-ui":
+"@mui/monorepo@github:Janpot/material-ui#head=yarn-2":
   version: 5.13.7
-  resolution: "@mui/monorepo@https://github.com/mui/material-ui.git#commit=d0f060633de6b21653057d04533a1d3c9316512e"
-  checksum: c072fdd4395cc307d90ff67e61a1ed53ffe4e3a0da01f792314ad679626b89285d65657ea1703d96d68a9b2fbc766a356696f69bcf64e99c5abb5f569f9c218f
+  resolution: "@mui/monorepo@https://github.com/Janpot/material-ui.git#commit=a573c1768e8585974dfe6c2c4e452fafff9bd97c"
+  checksum: 1709a296e937575575ff0fb3a47cbba2e093efb7dd08bcf68b17be5f0039854244b946c854fb0932747f791d4e82b183c7bdcd40e3f2f262704eb065862bbb59
   languageName: node
   linkType: hard
 
@@ -7253,9 +7253,9 @@ __metadata:
     "@babel/preset-typescript": 7.22.5
     "@babel/runtime-corejs2": 7.22.5
     "@mui/icons-material": 5.13.7
-    "@mui/markdown": "github:mui/material-ui#workspace=@mui/markdown"
+    "@mui/markdown": "github:Janpot/material-ui#head=yarn-2&workspace=@mui/markdown"
     "@mui/material": 5.13.7
-    "@mui/monorepo-docs": "github:mui/material-ui#workspace=docs"
+    "@mui/monorepo-docs": "github:Janpot/material-ui#head=yarn-2&workspace=docs"
     "@mui/utils": 5.13.7
     "@types/json-schema": 7.0.12
     "@types/react-is": 18.2.1
@@ -12808,7 +12808,7 @@ __metadata:
   resolution: "mui-toolpad@workspace:."
   dependencies:
     "@jest/globals": 29.5.0
-    "@mui/monorepo": "github:mui/material-ui"
+    "@mui/monorepo": "github:Janpot/material-ui#head=yarn-2"
     "@next/eslint-plugin-next": 13.4.7
     "@playwright/test": 1.35.1
     "@testing-library/jest-dom": 5.16.5

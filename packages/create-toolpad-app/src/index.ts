@@ -132,6 +132,10 @@ const scaffoldProject = async (absolutePath: string, installFlag: boolean): Prom
   console.log(`${chalk.blue('info')} - Initializing package.json file`);
   await fs.writeFile(path.join(absolutePath, 'package.json'), JSON.stringify(packageJson, null, 2));
 
+  if (packageManager === 'yarn') {
+    await fs.writeFile(path.join(absolutePath, 'yarn.lock'), '');
+  }
+
   // eslint-disable-next-line no-console
   console.log(`${chalk.blue('info')} - Initializing .gitignore file`);
   await fs.copyFile(

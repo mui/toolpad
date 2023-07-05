@@ -1,4 +1,4 @@
-import type { MuiPage } from '@mui/monorepo/docs/src/MuiPage';
+import type { MuiPage } from '@mui/monorepo-docs/src/MuiPage';
 import BuildIcon from '@mui/icons-material/Build';
 import CodeIcon from '@mui/icons-material/Code';
 import DescriptionIcon from '@mui/icons-material/Description';

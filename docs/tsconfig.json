@@ -1,5 +1,4 @@
 {
-  "extends": "../tsconfig.json",
   "compilerOptions": {
     "isolatedModules": true,
     /* files are emitted by babel */
@@ -10,7 +9,13 @@
     "types": ["react", "node"],
     "incremental": true,
     "noImplicitAny": true,
-    "jsx": "preserve"
+    "jsx": "preserve",
+    "lib": ["dom", "dom.iterable", "esnext"],
+    "allowJs": true,
+    "strict": false,
+    "forceConsistentCasingInFileNames": true,
+    "module": "esnext",
+    "moduleResolution": "node"
   },
   "include": ["docs-env.d.ts", "pages/**/*", "src/**/*", "data/**/*"],
   "exclude": ["docs/.next", "docs/export"]

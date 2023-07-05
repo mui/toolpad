@@ -45,7 +45,7 @@
   },
   "devDependencies": {
     "@jest/globals": "29.5.0",
-    "@mui/monorepo": "https://github.com/mui/material-ui.git",
+    "@mui/monorepo": "github:Janpot/material-ui#head=yarn-2",
     "@next/eslint-plugin-next": "13.4.7",
     "@playwright/test": "1.35.1",
     "@testing-library/jest-dom": "5.16.5",
@@ -107,5 +107,13 @@
   "engines": {
     "npm": "please-use-yarn",
     "node": ">=16.14.2"
+  },
+  "packageManager": "yarn@3.6.1",
+  "resolutions": {
+    "@mui/markdown": "github:Janpot/material-ui#head=yarn-2&workspace=@mui/markdown",
+    "docs/icons-material": "github:Janpot/material-ui#head=yarn-2&workspace=@mui/icons-material",
+    "docs/base": "github:Janpot/material-ui#head=yarn-2&workspace=@mui/base",
+    "docs/stylis-plugin-rtl": "npm:stylis-plugin-rtl@^2.1.1",
+    "docs/stylis-plugin-rtl-sc": "npm:stylis-plugin-rtl@^2.1.1"
   }
 }

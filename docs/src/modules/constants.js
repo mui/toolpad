@@ -1,1 +1,1 @@
-module.exports = require('@mui/monorepo/docs/src/modules/constants');
+module.exports = require('@mui/monorepo-docs/src/modules/constants');

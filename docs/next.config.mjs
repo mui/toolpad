@@ -6,7 +6,7 @@ const currentDirectory = url.fileURLToPath(new URL('.', import.meta.url));
 
 const require = createRequire(import.meta.url);
 
-const withDocsInfra = require('@mui/monorepo/docs/nextConfigDocsInfra');
+const withDocsInfra = require('@mui/monorepo-docs/nextConfigDocsInfra');
 
 const withTM = require('next-transpile-modules')(['@mui/monorepo'], {
   __unstable_matcher: (matchedPath) => {
@@ -34,13 +34,14 @@ const MONOREPO_PACKAGES = {
   '@mui/styles': path.resolve(MONOREPO_PATH, './packages/mui-styles'),
   '@mui/system': path.resolve(MONOREPO_PATH, './packages/mui-system/src'),
   '@mui/types': path.resolve(MONOREPO_PATH, './packages/mui-types'),
-  '@mui/markdown': path.resolve(MONOREPO_PATH, './packages/markdown'),
+  // '@mui/markdown': path.resolve(MONOREPO_PATH, './packages/markdown'),
   '@mui/utils': path.resolve(MONOREPO_PATH, './packages/mui-utils'),
 };
 
 export default withTM(
   withDocsInfra(
     /** @type {import('next').NextConfig  }} */ ({
+      transpilePackages: ['@mui/material', '@mui/base', '@mui/monorepo-docs'],
       // Avoid conflicts with the other Next.js apps hosted under https://mui.com/
       assetPrefix: process.env.DEPLOY_ENV === 'development' ? undefined : '/toolpad',
       env: {
@@ -57,9 +58,8 @@ export default withTM(
             ...config.resolve,
             alias: {
               ...config.resolve.alias,
-              docs: path.resolve(MONOREPO_PATH, './docs'),
+              docs: '@mui/monorepo-docs',
               [path.resolve(MONOREPO_PATH, './packages/mui-utils/macros/MuiError.macro')]: 'react',
-              ...MONOREPO_PACKAGES,
             },
           },
           module: {
@@ -74,7 +74,7 @@ export default withTM(
                     use: [
                       options.defaultLoaders.babel,
                       {
-                        loader: require.resolve('@mui/monorepo/packages/markdown/loader'),
+                        loader: require.resolve('@mui/markdown/loader'),
                         options: {
                           env: {
                             SOURCE_CODE_REPO: options.config.env.SOURCE_CODE_REPO,

@@ -37,9 +37,7 @@
     "server",
     "browser"
   ],
-  "bin": {
-    "toolpad": "./index.cjs"
-  },
+  "bin": "./index.cjs",
   "dependencies": {
     "@mui/toolpad-app": "0.1.18",
     "@mui/toolpad-core": "0.1.18",

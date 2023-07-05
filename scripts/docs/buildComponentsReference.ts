@@ -25,7 +25,7 @@ async function writePageFile(mdFilePath: string) {
     `/* ${AUTO_GENERATED_WARNING} */
 
 import * as React from 'react';
-import MarkdownDocs from '@mui/monorepo/docs/src/modules/components/MarkdownDocs';
+import MarkdownDocs from '@mui/monorepo-docs/src/modules/components/MarkdownDocs';
 import * as pageProps from '${relativeMdPath}?@mui/markdown';
 
 export default function Page() {

@@ -27,8 +27,10 @@
     "@emotion/server": "11.11.0",
     "@emotion/styled": "11.11.0",
     "@mui/icons-material": "5.13.7",
+    "@mui/markdown": "github:Janpot/material-ui#head=yarn-2&workspace=@mui/markdown",
     "@mui/material": "5.13.7",
-    "@mui/monorepo": "https://github.com/mui/material-ui.git",
+    "@mui/monorepo": "github:Janpot/material-ui#head=yarn-2",
+    "@mui/monorepo-docs": "github:Janpot/material-ui#head=yarn-2&workspace=docs",
     "@mui/styles": "5.13.7",
     "@mui/utils": "5.13.7",
     "@trendmicro/react-interpolate": "0.5.5",
@@ -82,8 +84,6 @@
     "rimraf": "5.0.1",
     "styled-components": "6.0.1",
     "stylis": "4.3.0",
-    "stylis-plugin-rtl": "npm:stylis-plugin-rtl@^2.1.1",
-    "stylis-plugin-rtl-sc": "npm:stylis-plugin-rtl@^2.1.1",
     "webpack-bundle-analyzer": "4.9.0"
   },
   "devDependencies": {
@@ -97,5 +97,8 @@
     "gm": "1.25.0",
     "typescript": "5.1.6",
     "typescript-to-proptypes": "2.2.1"
+  },
+  "installConfig": {
+    "hoistingLimits": "workspaces"
   }
 }

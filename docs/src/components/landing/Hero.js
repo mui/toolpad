@@ -74,18 +74,18 @@ export default function Hero() {
           sx={{
             mt: 2,
             display: 'flex',
-            gap: 4,
+            gap: 3,
           }}
         >
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
             <SvgMuiLogo width={20} />
-            <Typography color="text.primary" fontWeight="medium" variant="body2">
+            <Typography color="text.secondary" fontWeight="medium" variant="body2">
               Powered by MUI
             </Typography>
           </Box>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
             <DataObjectRoundedIcon color="primary" />
-            <Typography color="text.primary" fontWeight="medium" variant="body2">
+            <Typography color="text.secondary" fontWeight="medium" variant="body2">
               Open source
             </Typography>
           </Box>

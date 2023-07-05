@@ -12869,6 +12869,7 @@ __metadata:
     lerna: 7.1.1
     lodash: 4.17.21
     markdownlint-cli2: 0.8.1
+    netlify-plugin-cache-docs: "github:Janpot/material-ui#head=yarn-2&workspace=netlify-plugin-cache-docs"
     prettier: 2.8.8
     pretty-quick: 3.1.3
     react-inspector: 5.1.1
@@ -13025,6 +13026,15 @@ __metadata:
   version: 2.6.2
   resolution: "neo-async@npm:2.6.2"
   checksum: deac9f8d00eda7b2e5cd1b2549e26e10a0faa70adaa6fdadca701cc55f49ee9018e427f424bac0c790b7c7e2d3068db97f3093f1093975f2acb8f8818b936ed9
+  languageName: node
+  linkType: hard
+
+"netlify-plugin-cache-docs@github:Janpot/material-ui#head=yarn-2&workspace=netlify-plugin-cache-docs":
+  version: 5.0.0
+  resolution: "netlify-plugin-cache-docs@https://github.com/Janpot/material-ui.git#workspace=netlify-plugin-cache-docs&commit=d965fc8e5e53b8cba37c88efd55da4dafaa5cc12"
+  dependencies:
+    fs-extra: ^11.1.1
+  checksum: c7520ff236a2c05d07d82ebac82b5be166622be9a30b7525fc769fd4e67c8fa520d00638cd92325686d4b4896e07b4b8db4c7d24da5762aca084277644748ca9
   languageName: node
   linkType: hard
 

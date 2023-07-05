@@ -1,5 +1,38 @@
 # Changelog
 
+## 0.1.19
+
+<!-- generated comparing v0.1.18..master -->
+
+_Jul 5, 2023_
+
+A big thanks to the 7 contributors who made this release possible. Here are some highlights ✨:
+
+Improved theme editor palette, allow multiple function files, support importing .sql and .txt files, link to examples in landing page and enable Autocomplete input in forms.
+
+- &#8203;<!-- 20 -->Fix missing typography variant (#2265) @Janpot
+- &#8203;<!-- 19 -->qrcode-example-folder-change (#2269) @prakhargupta1
+- &#8203;<!-- 18 -->Add some documentation about screenshot sizes (#2268) @Janpot
+- &#8203;<!-- 17 -->Connect Autocomplete to forms and refactor form logic (#2115) @apedroferreira
+- &#8203;<!-- 16 -->Support loading raw text for .txt files and .sql files (#2250) @Janpot
+- &#8203;<!-- 15 -->Lay foundation for new and improved theme editor (#2260) @Janpot
+- &#8203;<!-- 14 -->Use links for the runtime navigation bar (#2247) @Janpot
+- &#8203;<!-- 13 -->On landingpage add buttons to examples (#2196) @prakhargupta1
+- &#8203;<!-- 12 -->Pin dependencies (#2253) @renovate[bot]
+- &#8203;<!-- 11 -->Avoid double submit when function file is created (#2252) @Janpot
+- &#8203;<!-- 10 -->optimized deleting file (#2177) @JerryWu1234
+- &#8203;<!-- 09 -->Move license key logic into the components (#2248) @Janpot
+- &#8203;<!-- 08 -->Export canvas and runtime from @mui/toolpad (#2245) @Janpot
+- &#8203;<!-- 07 -->Move monaco-editor to devDependencies (#2241) @Janpot
+- &#8203;<!-- 06 -->Create update monorepo workflow (#2243) @Janpot
+- &#8203;<!-- 05 -->Allow multiple function files (#2236) @Janpot
+- &#8203;<!-- 04 -->Add a warning when required environment variables are missing (#2228) @Janpot
+- &#8203;<!-- 03 -->Remove legacy file format (#2227) @Janpot
+- &#8203;<!-- 02 -->[core] Remove mention of Crowdin @oliviertassinari
+- &#8203;<!-- 01 -->[fix] disable auto formatting `_redirects` (#2251) @bharatkashyap
+
+All contributors of this release in alphabetical order: @apedroferreira, @bharatkashyap, @Janpot, @JerryWu1234, @oliviertassinari, @prakhargupta1, @renovate[bot]
+
 ## 0.1.18
 
 <!-- generated comparing v0.1.17..master -->

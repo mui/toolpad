@@ -33,6 +33,7 @@ export { default as Container } from './Container.js';
 export { default as Form } from './Form.js';
 
 export { default as Statistic } from './Statistic.js';
+export type { ColorScale } from './Statistic.js';
 
 export { CUSTOM_COLUMN_TYPES, inferColumns, parseColumns } from './DataGrid.js';
 export type { SerializableGridColumn, SerializableGridColumns } from './DataGrid.js';

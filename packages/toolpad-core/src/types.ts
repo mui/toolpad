@@ -196,6 +196,7 @@ export interface ArgControlSpec {
     | 'VerticalAlign'
     | 'event'
     | 'NumberFormat'
+    | 'ColorScale'
     | 'RowIdFieldSelect'; // Row id field specialized select
 }
 

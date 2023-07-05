@@ -12,6 +12,7 @@ import HorizontalAlign from './HorizontalAlign';
 import VerticalAlign from './VerticalAlign';
 import RowIdFieldSelect from './RowIdFieldSelect';
 import NumberFormat from './NumberFormat';
+import ColorScale from './ColorScale';
 import { EditorProps } from '../../types';
 
 const propTypeControls: {
@@ -30,6 +31,7 @@ const propTypeControls: {
   HorizontalAlign,
   VerticalAlign,
   NumberFormat,
+  ColorScale,
 };
 
 function getDefaultControlForType(propType: PropValueType): React.FC<EditorProps<any>> | null {

@@ -22,22 +22,24 @@ interface OpenCodeEditorButtonProps extends ButtonProps {
 
 interface MissingEditorDialogProps {
   open: boolean;
-  setMissingEditor: React.Dispatch<React.SetStateAction<boolean>>;
+  onClose: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-function MissingEditorDialog({ open, setMissingEditor }: MissingEditorDialogProps) {
+function MissingEditorDialog({ open, onClose }: MissingEditorDialogProps) {
   const handleMissingEditorDialogClose = React.useCallback(() => {
-    setMissingEditor(false);
-  }, [setMissingEditor]);
+    onClose(false);
+  }, [onClose]);
+
+  const id = React.useId();
 
   return (
     <Dialog
       open={open}
       onClose={handleMissingEditorDialogClose}
-      aria-labelledby="alert-dialog-title"
+      aria-labelledby={`${id}-title`}
       aria-describedby="alert-dialog-description"
     >
-      <DialogTitle id="alert-dialog-title">{'Editor not found'}</DialogTitle>
+      <DialogTitle id={`${id}-title`}>{'Editor not found'}</DialogTitle>
       <DialogContent>
         <DialogContentText id="alert-dialog-description">
           No editor was detected on your system. If using Visual Studio Code, this may be due to a
@@ -75,7 +77,7 @@ export default function OpenCodeEditorButton({
       {iconButton ? (
         <Tooltip title="Open in code editor">
           <IconButton size="small" onClick={handleClick} {...rest}>
-            <CodeIcon fontSize="small" color="primary" />
+            <CodeIcon fontSize="inherit" color="primary" />
           </IconButton>
         </Tooltip>
       ) : (
@@ -83,7 +85,7 @@ export default function OpenCodeEditorButton({
           Open
         </Button>
       )}
-      <MissingEditorDialog open={missingEditorDialog} setMissingEditor={setMissingEditorDialog} />
+      <MissingEditorDialog open={missingEditorDialog} onClose={setMissingEditorDialog} />
     </React.Fragment>
   );
 }

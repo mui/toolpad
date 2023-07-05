@@ -40,9 +40,6 @@ commands:
           command: |
             # Keep path in sync with `save_cache` for key "v8-yarn-"
             yarn config set cacheFolder /tmp/yarn-cache
-            # Debug information
-            yarn cache dir
-            yarn cache list
       - when:
           condition: << parameters.browsers >>
           steps:

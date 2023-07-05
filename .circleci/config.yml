@@ -45,7 +45,7 @@ commands:
           steps:
             - run:
                 name: Prepare playwright hash
-                command: yarn --json list --pattern playwright > /tmp/playwright_info.json
+                command: yarn info --recursive --dependents | grep playwright > /tmp/playwright_info.json
             - store_artifacts:
                 name: Debug playwright hash
                 path: /tmp/playwright_info.json

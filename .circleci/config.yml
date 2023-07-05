@@ -33,7 +33,7 @@ commands:
       - restore_cache:
           name: Restore yarn cache
           keys:
-            - v11-yarn-{{ checksum "yarn.lock" }}
+            - v12-yarn-{{ checksum "yarn.lock" }}
             - v0-next-{{ checksum "yarn.lock" }}
       - run:
           name: Set yarn cache folder
@@ -61,7 +61,7 @@ commands:
 
       - save_cache:
           name: Save yarn cache
-          key: v11-yarn-{{ checksum "yarn.lock" }}
+          key: v12-yarn-{{ checksum "yarn.lock" }}
           paths:
             # Keep path in sync with "Set yarn cache folder"
             # Can't use environment variables for `save_cache` paths (tested in https://app.circleci.com/pipelines/github/mui/material-ui/37813/workflows/5b1e207f-ac8b-44e7-9ba4-d0f9a01f5c55/jobs/223370)

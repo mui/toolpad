@@ -85,3 +85,11 @@ spec:
           props:
             mode: markdown
             value: "# markdown text"
+    - component: PageRow
+      name: pageRow10
+      children:
+        - component: Text
+          name: text1
+          props:
+            variant: h2
+            value: Hello I'm a h2

@@ -27,6 +27,11 @@ test('submits form data', async ({ page }) => {
   const testFilePath = path.resolve(__dirname, './test.txt');
   await page.getByLabel('file').setInputFiles(testFilePath);
 
+  const countryInput = page.getByLabel('country');
+  await countryInput.clear();
+  await countryInput.type('Por');
+  await page.getByRole('option', { name: 'Portugal' }).click();
+
   await expect
     .poll(async () => {
       const text = await page.getByText('My form data').textContent();
@@ -47,6 +52,7 @@ test('submits form data', async ({ page }) => {
           base64: 'data:text/plain;base64,d29ya3MK',
         },
       ],
+      country: 'Portugal',
     });
 
   await expect(page.getByRole('button', { name: 'Submitted' })).not.toBeVisible();
@@ -71,6 +77,11 @@ test('resets form data', async ({ page }) => {
 
   const testFilePath = path.resolve(__dirname, './test.txt');
   await page.getByLabel('file').setInputFiles(testFilePath);
+
+  const countryInput = page.getByLabel('country');
+  await countryInput.clear();
+  await countryInput.type('Bel');
+  await page.getByRole('option', { name: 'Belgium' }).click();
 
   await page.getByRole('button', { name: 'Reset' }).click();
 
@@ -100,4 +111,5 @@ test('validates form data', async ({ page }) => {
   await expect(page.getByText('date is required.')).toBeVisible();
   await expect(page.getByText('option is invalid.')).toBeVisible();
   await expect(page.getByText('outside must have no more than 3 characters.')).toBeVisible();
+  await expect(page.getByText('country is required.')).toBeVisible();
 });

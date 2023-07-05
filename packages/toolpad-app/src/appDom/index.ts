@@ -11,12 +11,13 @@ import {
   EnvAttrValue,
 } from '@mui/toolpad-core';
 import invariant from 'invariant';
-import { BoxProps } from '@mui/material';
+import { BoxProps, ThemeOptions as MuiThemeOptions } from '@mui/material';
 import { pascalCase, removeDiacritics, uncapitalize } from '@mui/toolpad-utils/strings';
 import { mapProperties, mapValues } from '@mui/toolpad-utils/collections';
-import { ConnectionStatus, AppTheme } from '../types';
+import { ConnectionStatus } from '../types';
 import { omit, update, updateOrCreate } from '../utils/immutability';
 import { ExactEntriesOf, Maybe } from '../utils/types';
+import { envBindingSchema } from '../server/schema';
 
 export const CURRENT_APPDOM_VERSION = 7;
 
@@ -68,7 +69,7 @@ export interface AppNode extends AppDomNodeBase {
 
 export interface ThemeNode extends AppDomNodeBase {
   readonly type: 'theme';
-  readonly theme?: BindableAttrValues<AppTheme>;
+  readonly theme?: MuiThemeOptions;
 }
 
 export interface ConnectionNode<P = unknown> extends AppDomNodeBase {
@@ -1192,4 +1193,28 @@ export function applyDiff(dom: AppDom, diff: DomDiff): AppDom {
   }
 
   return result;
+}
+
+function findEnvBindings(obj: unknown): EnvAttrValue[] {
+  if (Array.isArray(obj)) {
+    return obj.flatMap((item) => findEnvBindings(item));
+  }
+
+  if (obj && typeof obj === 'object') {
+    try {
+      return [envBindingSchema.parse(obj)];
+    } catch {
+      return Object.values(obj).flatMap((value) => findEnvBindings(value));
+    }
+  }
+
+  return [];
+}
+
+export function getRequiredEnvVars(dom: AppDom): Set<string> {
+  const allVars = Object.values(dom.nodes)
+    .flatMap((node) => findEnvBindings(node))
+    .map((binding) => binding.$$env);
+
+  return new Set(allVars);
 }

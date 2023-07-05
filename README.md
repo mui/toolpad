@@ -90,10 +90,6 @@ GitHub allows us to host the Git repository and coordinate contributions.
 
 Netlify allows us to distribute the documentation.
 
-[<img loading="lazy" alt="CrowdIn" src="https://support.crowdin.com/assets/logos/crowdin-logo1-small.png" height="30">](https://crowdin.com/)
-
-CrowdIn allows us to translate the documentation.
-
 [<img loading="lazy" alt="BrowserStack" src="https://www.browserstack.com/images/mail/browserstack-logo-footer.png" height="30">](https://www.browserstack.com/)
 
 BrowserStack allows us to test in real browsers.

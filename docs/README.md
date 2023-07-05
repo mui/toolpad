@@ -19,7 +19,9 @@ Visit the [MUI Toolpad documentation](https://mui.com/toolpad/getting-started/ov
 Please follow the [contributing guidelines](https://github.com/mui/material-ui/blob/HEAD/CONTRIBUTING.md).
 on how to get started contributing to MUI.
 
-## How do I help to improve the translations?
+## Screenshots
 
-Please visit https://translate.mui.com/ where you will be able to select a language and edit the translations.
-Please don't submit pull requests directly.
+For consistency, screenshots of the full browser viewport will always be at 1440x796 DPR:2
+You can check your size with https://whatismyviewport.com/. If all is well it should look like:
+
+![whatismyviewport](./public/static/toolpad/docs/whatismyviewport.png)

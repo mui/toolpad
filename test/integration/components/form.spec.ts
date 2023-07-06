@@ -24,8 +24,11 @@ test('submits form data', async ({ page }) => {
   await page.getByLabel('option').click();
   await page.getByRole('option', { name: 'option 2' }).click();
 
-  const testFilePath = path.resolve(__dirname, './test.txt');
-  await page.getByLabel('file').setInputFiles(testFilePath);
+  await page.getByLabel('file').setInputFiles({
+    name: 'test.txt',
+    mimeType: 'text/plain',
+    buffer: Buffer.from('hello'),
+  });
 
   const countryInput = page.getByLabel('country');
   await countryInput.clear();
@@ -48,8 +51,8 @@ test('submits form data', async ({ page }) => {
         {
           name: 'test.txt',
           type: 'text/plain',
-          size: 6,
-          base64: 'data:text/plain;base64,d29ya3MK',
+          size: 5,
+          base64: 'data:text/plain;base64,aGVsbG8=',
         },
       ],
       country: 'Portugal',
@@ -75,8 +78,11 @@ test('resets form data', async ({ page }) => {
   await page.getByLabel('option').click();
   await page.getByRole('option', { name: 'option 3' }).click();
 
-  const testFilePath = path.resolve(__dirname, './test.txt');
-  await page.getByLabel('file').setInputFiles(testFilePath);
+  await page.getByLabel('file').setInputFiles({
+    name: 'test.txt',
+    mimeType: 'text/plain',
+    buffer: Buffer.from('hello'),
+  });
 
   const countryInput = page.getByLabel('country');
   await countryInput.clear();

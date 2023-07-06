@@ -43,7 +43,7 @@ MUI Toolpad is in its beta stages of development. Feel free to run this applicat
 
 Run:
 
-```sh
+```bash
 npx create-toolpad-app my-app
 # or
 yarn create toolpad-app my-app

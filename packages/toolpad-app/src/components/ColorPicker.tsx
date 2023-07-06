@@ -27,7 +27,7 @@ function ColorPickerIconButton({ label, value, onChange }: ColorPickerIconButton
       <IconButton aria-label="select color" edge="end" onClick={handleClick}>
         <Box
           sx={{
-            background: 'primary.main',
+            background: value,
             width: 24,
             height: 24,
             borderRadius: '50%',
@@ -61,6 +61,7 @@ export interface ColorPickerProps {
 export default function ColorPicker({ label, value, onChange }: ColorPickerProps) {
   return (
     <TextField
+      label={label}
       value={value}
       onChange={(event) => onChange?.(event.target.value)}
       InputProps={{

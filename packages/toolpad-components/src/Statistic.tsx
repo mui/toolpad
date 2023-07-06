@@ -10,12 +10,12 @@ import {
 
 export interface ColorScaleStop {
   value: number;
-  color: string;
+  color?: string;
 }
 
 export interface ColorScale {
-  base: string;
-  stops: ColorScaleStop[];
+  base?: string;
+  stops?: ColorScaleStop[];
 }
 
 interface StatisticProps {
@@ -28,16 +28,17 @@ interface StatisticProps {
 }
 
 function resolveColor(colorScale: ColorScale, value: number) {
-  const { base, stops } = colorScale;
+  const { base, stops = [] } = colorScale;
   let stopValue: number = -Infinity;
   let color = base;
+
   for (const stop of stops) {
     if (stop.value > stopValue && value > stop.value) {
       stopValue = stop.value;
       color = stop.color;
-      break;
     }
   }
+
   return color;
 }
 

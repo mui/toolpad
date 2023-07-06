@@ -6,7 +6,7 @@
 
 Start by opening a terminal and `cd` into a folder you'd like to create your applicarion in. Then run the command
 
-```sh
+```bash
 npx create-toolpad-app my-app
 ```
 
@@ -16,13 +16,13 @@ npx create-toolpad-app my-app
 
 Change the current working directory to the application folder:
 
-```sh
+```bash
 cd my-app
 ```
 
 Then start the development mode
 
-```sh
+```bash
 npm run dev
 ```
 

@@ -223,7 +223,7 @@ Toolpad has access to the environment variables defined in the `.env` file at th
 
   You can even directly use the environment variables when defining custom functions, as you normally would when writing backend code. For example:
 
-  ```sh
+  ```bash
   OPENAI_API_KEY=...
   ```
 

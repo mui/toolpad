@@ -1,6 +1,16 @@
 import * as React from 'react';
 import { createComponent } from '@mui/toolpad-core';
 import { Box, BoxProps } from '@mui/material';
+import {
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  Tooltip,
+  Legend,
+  ResponsiveContainer,
+  CartesianGrid,
+} from 'recharts';
 import { SX_PROP_HELPER_TEXT } from './constants.js';
 
 export const CHART_DATA_SERIES_KINDS = ['line', 'bar', 'pie'];
@@ -20,7 +30,17 @@ interface ChartProps extends BoxProps {
 }
 
 function Chart({ data = [], ...rest }: ChartProps) {
-  return <Box {...rest}>ello</Box>;
+  return (
+    <ResponsiveContainer width="100%" height={400}>
+      <LineChart data={data[0].data}>
+        <CartesianGrid />
+        <XAxis dataKey={data[0].xKey} />
+        <YAxis dataKey={data[0].yKey} />
+        <Tooltip />
+        <Legend />
+      </LineChart>
+    </ResponsiveContainer>
+  );
 }
 
 export default createComponent(Chart, {

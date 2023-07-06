@@ -118,6 +118,7 @@
     "react-is": "18.2.0",
     "react-router-dom": "6.3.0",
     "react-split-pane": "0.1.92",
+    "recharts": "2.7.2",
     "semver": "7.5.3",
     "serialize-javascript": "6.0.1",
     "ses": "0.18.4",

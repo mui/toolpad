@@ -16,6 +16,19 @@ const isRgb = (string: string) =>
 
 const isHex = (string: string) => /^#?([0-9a-f]{3})$|^#?([0-9a-f]){6}$/i.test(string);
 
+export function parseColor(color: string): string | null {
+  if (isRgb(color)) {
+    return color;
+  }
+  if (isHex(color)) {
+    if (!color.startsWith('#')) {
+      return `#${color}`;
+    }
+    return color;
+  }
+  return null;
+}
+
 const hues = [
   'red',
   'pink',
@@ -85,9 +98,9 @@ const TooltipRadio = React.forwardRef<HTMLButtonElement, TooltipRadioProps>(func
 });
 
 export interface ColorToolProps {
-  label: string;
-  value: string;
-  onChange: (value: string) => void;
+  label?: string;
+  value?: string;
+  onChange?: (value?: string) => void;
   sx?: SxProps;
 }
 
@@ -95,15 +108,15 @@ function ColorTool({ sx, label, value, onChange }: ColorToolProps) {
   const theme = useTheme();
 
   const [state, setState] = React.useState<{
-    input: string;
+    input?: string;
     hue: keyof typeof colors;
     shade: number;
-    isValidColor: boolean;
+    valid: boolean;
   }>({
     input: value,
     hue: 'blue',
     shade: 4,
-    isValidColor: true,
+    valid: true,
   });
 
   const handleChangeColor = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -111,25 +124,20 @@ function ColorTool({ sx, label, value, onChange }: ColorToolProps) {
       target: { value: color },
     } = event;
 
-    let isValidColor = false;
-
-    if (isRgb(color)) {
-      isValidColor = true;
-    } else if (isHex(color)) {
-      isValidColor = true;
-      if (!color.startsWith('#')) {
-        color = `#${color}`;
-      }
+    const parsed = parseColor(color);
+    const valid = !!parsed;
+    if (parsed) {
+      color = parsed;
     }
 
     setState((oldState) => ({
       ...oldState,
       input: color,
-      isValidColor,
+      valid,
     }));
 
-    if (isValidColor) {
-      onChange(color);
+    if (valid) {
+      onChange?.(color);
     }
   };
 
@@ -143,7 +151,7 @@ function ColorTool({ sx, label, value, onChange }: ColorToolProps) {
         hue,
         input: color,
       });
-      onChange(color);
+      onChange?.(color);
     }
   };
 
@@ -159,7 +167,7 @@ function ColorTool({ sx, label, value, onChange }: ColorToolProps) {
 
         input: color,
       });
-      onChange(color);
+      onChange?.(color);
     }
   };
 
@@ -167,11 +175,13 @@ function ColorTool({ sx, label, value, onChange }: ColorToolProps) {
   const intentShade = state.shade;
   const color = value;
 
-  const background = theme.palette.augmentColor({
-    color: {
-      main: color,
-    },
-  });
+  const background = color
+    ? theme.palette.augmentColor({
+        color: {
+          main: color,
+        },
+      })
+    : undefined;
 
   const id = React.useId();
 
@@ -185,7 +195,7 @@ function ColorTool({ sx, label, value, onChange }: ColorToolProps) {
         value={intentInput}
         onChange={handleChangeColor}
         fullWidth
-        error={!state.isValidColor}
+        error={!state.valid}
       />
       <Box sx={{ display: 'flex', alignItems: 'center', mt: 2, mb: 2 }}>
         <Typography id={`${id}ShadeSliderLabel`}>Shade:</Typography>
@@ -247,16 +257,16 @@ function ColorTool({ sx, label, value, onChange }: ColorToolProps) {
               justifyContent: 'center',
               alignItems: 'center',
             }}
-            style={{ backgroundColor: background[key] }}
+            style={{ backgroundColor: background?.[key] }}
             key={key}
           >
             <Typography
               variant="caption"
               style={{
-                color: theme.palette.getContrastText(background[key]),
+                color: background ? theme.palette.getContrastText(background[key]) : undefined,
               }}
             >
-              {rgbToHex(background[key])}
+              {background ? rgbToHex(background[key]) : ''}
             </Typography>
           </Box>
         ))}

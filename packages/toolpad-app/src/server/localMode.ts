@@ -187,7 +187,19 @@ async function loadThemeFromFile(root: string): Promise<Theme | null> {
   const themeFilePath = getThemeFile(root);
   const content = await readMaybeFile(themeFilePath);
   if (content) {
-    return themeSchema.parse(yaml.parse(content));
+    const parsedFile = yaml.parse(content);
+    const result = themeSchema.safeParse(parsedFile);
+    if (result.success) {
+      return result.data;
+    }
+
+    console.error(
+      `${chalk.red('error')} - Failed to read theme ${chalk.cyan(themeFilePath)}. ${fromZodError(
+        result.error,
+      )}`,
+    );
+
+    return null;
   }
   return null;
 }

@@ -300,8 +300,8 @@ const themeOptionsSchema: z.ZodType<ThemeOptions> = z
     palette: z
       .object({
         mode: z.union([z.literal('light'), z.literal('dark')]).optional(),
-        primary: simplePaletteColorOptionsSchema,
-        secondary: simplePaletteColorOptionsSchema,
+        primary: simplePaletteColorOptionsSchema.optional(),
+        secondary: simplePaletteColorOptionsSchema.optional(),
       })
       .passthrough(),
   })

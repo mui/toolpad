@@ -1,6 +1,6 @@
 {
   "name": "@mui/toolpad-app",
-  "version": "0.1.18",
+  "version": "0.1.19",
   "license": "MIT",
   "scripts": {
     "build": "concurrently \"yarn:build:*\" && rimraf ./.next/cache",
@@ -52,9 +52,9 @@
     "@mui/lab": "5.0.0-alpha.135",
     "@mui/material": "5.13.7",
     "@mui/system": "5.13.7",
-    "@mui/toolpad-components": "0.1.18",
-    "@mui/toolpad-core": "0.1.18",
-    "@mui/toolpad-utils": "0.1.18",
+    "@mui/toolpad-components": "0.1.19",
+    "@mui/toolpad-core": "0.1.19",
+    "@mui/toolpad-utils": "0.1.19",
     "@mui/types": "7.2.4",
     "@mui/utils": "5.13.7",
     "@mui/x-data-grid": "6.9.1",

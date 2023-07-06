@@ -115,7 +115,7 @@ export function buildGlobalScope(
   }
   return globalScope;
 }
-
+const computationStatuses = new Map<string, { result: null | BindingEvaluationResult }>();
 /**
  * Evaluates the expressions and replace with their result
  */
@@ -133,7 +133,6 @@ export default function evalJsBindings(
     }
   }
 
-  const computationStatuses = new Map<string, { result: null | BindingEvaluationResult }>();
   let currentParentBinding: string | undefined;
   const dependencies: Dependencies = new Map();
 

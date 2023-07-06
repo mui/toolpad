@@ -42,17 +42,27 @@ function ChartDataPropEditor({
   const [popoverAnchorElement, setPopoverAnchorElement] = React.useState<HTMLElement | null>(null);
 
   const handleAddDataSeries = React.useCallback(() => {
-    onChange([
-      ...value,
-      {
-        kind: 'line',
-        label: `dataSeries${value.length + 1}`,
-        data: [],
-        xKey: 'x',
-        yKey: 'y',
-      },
-    ]);
-  }, [onChange, value]);
+    if (node) {
+      const previousData = node.props?.data || [];
+
+      const newDataSeriesLabel = `dataSeries${value.length + 1}`;
+
+      const sameNameDataSeriesLabelsCount = previousData.filter(
+        (data: ChartDataSeries) => data.label === newDataSeriesLabel,
+      ).length;
+
+      onChange([
+        ...value,
+        {
+          kind: 'line',
+          label: `dataSeries${value.length + sameNameDataSeriesLabelsCount + 1}`,
+          data: [],
+          xKey: 'x',
+          yKey: 'y',
+        },
+      ]);
+    }
+  }, [node, onChange, value]);
 
   const handleDataSeriesClick = React.useCallback(
     (index: number) => (event: React.MouseEvent<HTMLElement>) => {
@@ -79,12 +89,15 @@ function ChartDataPropEditor({
   const handleDataSeriesDataChange = React.useCallback(
     (index: number) => (newValue: BindableAttrValue<ChartDataSeries['data']> | null) => {
       if (node) {
-        const previousData = node.props?.data?.value || [];
+        const previousData = node.props?.data || [];
 
         domApi.update((draft) =>
-          appDom.setNodeNamespacedProp(draft, node, 'props', 'data', {
-            type: 'const',
-            value: updateArray(
+          appDom.setNodeNamespacedProp(
+            draft,
+            node,
+            'props',
+            'data',
+            updateArray(
               previousData,
               {
                 ...previousData[index],
@@ -92,7 +105,7 @@ function ChartDataPropEditor({
               },
               index,
             ),
-          }),
+          ),
         );
       }
     },
@@ -164,10 +177,7 @@ function ChartDataPropEditor({
                 label="data"
                 jsRuntime={jsBrowserRuntime}
                 propType={{ type: 'array' }}
-                value={
-                  (node.props?.data?.value && node.props.data.value[dataSeriesEditIndex].data) ??
-                  null
-                }
+                value={(node.props?.data && node.props.data[dataSeriesEditIndex].data) ?? null}
                 onChange={handleDataSeriesDataChange(dataSeriesEditIndex)}
               />
             </Stack>

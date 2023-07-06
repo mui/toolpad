@@ -3,6 +3,7 @@ import {
   Box,
   Button,
   capitalize,
+  createTheme,
   PaletteMode,
   Popover,
   SimplePaletteColorOptions,
@@ -28,7 +29,7 @@ const IconToggleButton = styled(ToggleButton)({
   },
 });
 
-interface PaletteColorPickerProps extends WithControlledProp<string> {
+interface PaletteColorPickerProps extends WithControlledProp<string | undefined> {
   label: string;
 }
 
@@ -56,7 +57,7 @@ function PaletteColorPicker({ label, value, onChange }: PaletteColorPickerProps)
             ml: 2,
             p: '2px 8px',
             background: value,
-            color: theme.palette.getContrastText(value),
+            color: value ? theme.palette.getContrastText(value) : undefined,
             borderRadius: 1,
           }}
         >
@@ -87,19 +88,29 @@ export interface MuiThemeEditorProps {
 export default function MuiThemeEditor({ value, onChange }: MuiThemeEditorProps) {
   const theme = useTheme();
 
-  const colorPicker = (intent: 'primary' | 'secondary', defaultValue: string) => (
+  const defaultTheme = React.useMemo(
+    () => createTheme({ palette: { mode: value?.palette?.mode } }),
+    [value?.palette?.mode],
+  );
+
+  const colorPicker = (intent: 'primary' | 'secondary') => (
     <PaletteColorPicker
       label={capitalize(intent)}
-      value={(value?.palette?.[intent] as SimplePaletteColorOptions)?.main || defaultValue}
+      value={
+        (value?.palette?.[intent] as SimplePaletteColorOptions)?.main ||
+        defaultTheme.palette[intent].main
+      }
       onChange={(newMain) => {
         onChange({
           ...value,
           palette: {
             ...value?.palette,
-            [intent]: {
-              main: newMain,
-              contrastText: theme.palette.getContrastText(newMain),
-            },
+            [intent]: newMain
+              ? {
+                  main: newMain,
+                  contrastText: theme.palette.getContrastText(newMain),
+                }
+              : undefined,
           },
         });
       }}
@@ -110,7 +121,7 @@ export default function MuiThemeEditor({ value, onChange }: MuiThemeEditorProps)
     <Stack direction="column" spacing={2}>
       <ToggleButtonGroup
         exclusive
-        value={value?.palette?.mode}
+        value={value?.palette?.mode || defaultTheme.palette.mode}
         onChange={(event, newMode: PaletteMode | null) => {
           if (newMode) {
             onChange({
@@ -134,9 +145,9 @@ export default function MuiThemeEditor({ value, onChange }: MuiThemeEditorProps)
         </IconToggleButton>
       </ToggleButtonGroup>
 
-      {colorPicker('primary', '#2196f3')}
+      {colorPicker('primary')}
 
-      {colorPicker('secondary', '#f50057')}
+      {colorPicker('secondary')}
     </Stack>
   );
 }

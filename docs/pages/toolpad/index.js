@@ -51,6 +51,8 @@ export default function Home() {
       <main id="main-content">
         <ToolpadHero />
         <Divider />
+        <UseCases content={useCases} />
+        <Divider />
         <CardGrid content={features} />
         <Banner
           action={action}
@@ -60,8 +62,6 @@ export default function Home() {
           href={href}
           label={label}
         />
-        <Divider />
-        <UseCases content={useCases} />
         <Divider />
         <Pricing
           Headline={Headline}

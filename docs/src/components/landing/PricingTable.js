@@ -62,7 +62,7 @@ function Cell({ highlighted = false, ...props }) {
   return (
     <Box
       {...props}
-      sx={{
+      sx={(theme) => ({
         py: 2,
         px: 2,
         display: 'flex',
@@ -74,14 +74,17 @@ function Cell({ highlighted = false, ...props }) {
           // https://github.com/mui/mui-toolpad/pull/809#issuecomment-1221026428
           borderWidth: '0 1px 0 1px',
           borderStyle: 'solid',
-          borderColor: (theme) => (theme.palette.mode === 'dark' ? 'primaryDark.700' : 'grey.100'),
-          bgcolor: (theme) =>
-            theme.palette.mode === 'dark'
-              ? alpha(theme.palette.primaryDark[900], 0.5)
-              : alpha(theme.palette.grey[50], 0.5),
+          borderColor: (theme.vars || theme).palette.grey[100],
+          bgcolor: `${alpha(theme.palette.grey[50], 0.5)}`,
+        }),
+        ...theme.applyDarkStyles({
+          ...(highlighted && {
+            borderColor: (theme.vars || theme).palette.primaryDark[700],
+            bgcolor: `${alpha(theme.palette.primaryDark[900], 0.5)}`,
+          }),
         }),
         ...props.sx,
-      }}
+      })}
     />
   );
 }
@@ -95,12 +98,12 @@ function RowHead({ children, startIcon, ...props }) {
   return (
     <Box
       {...props}
-      sx={{
+      sx={(theme) => ({
         justifyContent: 'flex-start',
         borderRadius: '8px 0 0 8px',
-        bgcolor: (theme) => (theme.palette.mode === 'dark' ? 'primaryDark.900' : 'grey.50'),
+        bgcolor: (theme.vars || theme).palette.grey[50],
         border: '1px solid',
-        borderColor: (theme) => (theme.palette.mode === 'dark' ? 'primaryDark.700' : 'grey.100'),
+        borderColor: (theme.vars || theme).palette.grey[100],
         p: 1,
         transition: 'none',
         typography: 'body2',
@@ -108,7 +111,11 @@ function RowHead({ children, startIcon, ...props }) {
         display: 'flex',
         alignItems: 'center',
         ...props.sx,
-      }}
+        ...theme.applyDarkStyles({
+          bgcolor: (theme.vars || theme).palette.primaryDark[900],
+          borderColor: (theme.vars || theme).palette.primaryDark[700],
+        }),
+      })}
     >
       {startIcon ? <Box sx={{ lineHeight: 0, mr: 1 }}>{startIcon}</Box> : null}
       {children}
@@ -126,18 +133,22 @@ function RowCategory(props) {
   return (
     <Box
       {...props}
-      sx={{
+      sx={(theme) => ({
         typography: 'caption',
         display: 'block',
         fontWeight: 500,
-        bgcolor: (theme) => (theme.palette.mode === 'dark' ? 'primaryDark.900' : 'grey.50'),
         py: 1,
         ml: 1,
         pl: 1.5,
         borderBottom: '1px solid',
-        borderColor: (theme) => (theme.palette.mode === 'dark' ? 'primaryDark.600' : 'grey.200'),
+        bgcolor: (theme.vars || theme).palette.grey[50],
+        borderColor: (theme.vars || theme).palette.grey[200],
         ...props.sx,
-      }}
+        ...theme.applyDarkStyles({
+          bgcolor: (theme.vars || theme).palette.primaryDark[900],
+          borderColor: (theme.vars || theme).palette.primaryDark[600],
+        }),
+      })}
     />
   );
 }
@@ -175,7 +186,7 @@ function StickyHead({ plans, planInfo, container, disableCalculation = false }) 
   }, [container, disableCalculation]);
   return (
     <Box
-      sx={{
+      sx={(theme) => ({
         position: 'fixed',
         zIndex: 1,
         top: 56,
@@ -189,15 +200,13 @@ function StickyHead({ plans, planInfo, container, disableCalculation = false }) 
         py: 1,
         display: { xs: 'none', md: 'block' },
         backdropFilter: 'blur(20px)',
-        boxShadow: (theme) =>
-          `inset 0px -1px 1px ${
-            theme.palette.mode === 'dark' ? theme.palette.primaryDark[700] : theme.palette.grey[100]
-          }`,
-        backgroundColor: (theme) =>
-          theme.palette.mode === 'dark'
-            ? alpha(theme.palette.primaryDark[900], 0.72)
-            : 'rgba(255,255,255,0.72)',
-      }}
+        backgroundColor: 'rgba(255,255,255,0.72)',
+        boxShadow: `inset 0px -1px 1px ${(theme.vars || theme).palette.grey[100]}`,
+        ...theme.applyDarkStyles({
+          backgroundColor: `${alpha(theme.palette.primaryDark[900], 0.7)}`,
+          boxShadow: `inset 0px -1px 1px ${(theme.vars || theme).palette.primaryDark[700]}`,
+        }),
+      })}
     >
       <Container
         sx={{
@@ -251,18 +260,20 @@ function PricingTable({
   function renderRow(key) {
     return (
       <Box
-        sx={{
+        sx={(theme) => ({
           ...gridSx,
           '&:hover': {
-            bgcolor: (theme) =>
-              theme.palette.mode === 'dark'
-                ? alpha(theme.palette.primaryDark[900], 0.3)
-                : alpha(theme.palette.grey[50], 0.4),
+            bgcolor: `${alpha(theme.palette.grey[50], 0.4)}`,
             '@media (hover: none)': {
               bgcolor: 'initial',
             },
           },
-        }}
+          ...theme.applyDarkStyles({
+            '&:hover': {
+              bgcolor: `${alpha(theme.palette.primaryDark[900], 0.3)}`,
+            },
+          }),
+        })}
       >
         {rowHeaders[key]}
         {plans.map((id, index) => (

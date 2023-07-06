@@ -7,12 +7,14 @@ import {
   ListItem,
   ListItemButton,
   ListItemText,
+  MenuItem,
   Popover,
   Stack,
+  TextField,
   Typography,
 } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
-import type { ChartDataSeries } from '@mui/toolpad-components';
+import { CHART_DATA_SERIES_KINDS, type ChartDataSeries } from '@mui/toolpad-components';
 import { useBrowserJsRuntime } from '@mui/toolpad-core/jsBrowserRuntime';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { BindableAttrValue } from '@mui/toolpad-core';
@@ -43,19 +45,13 @@ function ChartDataPropEditor({
 
   const handleAddDataSeries = React.useCallback(() => {
     if (node) {
-      const previousData = node.props?.data || [];
-
       const newDataSeriesLabel = `dataSeries${value.length + 1}`;
-
-      const sameNameDataSeriesLabelsCount = previousData.filter(
-        (data: ChartDataSeries) => data.label === newDataSeriesLabel,
-      ).length;
 
       onChange([
         ...value,
         {
           kind: 'line',
-          label: `dataSeries${value.length + sameNameDataSeriesLabelsCount + 1}`,
+          label: newDataSeriesLabel,
           data: [],
           xKey: 'x',
           yKey: 'y',
@@ -112,6 +108,34 @@ function ChartDataPropEditor({
     [domApi, node],
   );
 
+  const handleDataSeriesTextPropChange = React.useCallback(
+    (index: number, propName: string) => (event: React.ChangeEvent<HTMLInputElement>) => {
+      const newValue = event.target.value;
+
+      if (node) {
+        const previousData = node.props?.data || [];
+
+        domApi.update((draft) =>
+          appDom.setNodeNamespacedProp(
+            draft,
+            node,
+            'props',
+            'data',
+            updateArray(
+              previousData,
+              {
+                ...previousData[index],
+                [propName]: newValue || '',
+              },
+              index,
+            ),
+          ),
+        );
+      }
+    },
+    [domApi, node],
+  );
+
   if (!node) {
     return null;
   }
@@ -127,7 +151,7 @@ function ChartDataPropEditor({
               const { label } = dataSeries;
 
               return (
-                <ListItem key={`${label}-${index}`} disableGutters>
+                <ListItem key={index} disableGutters>
                   <ListItemButton
                     onClick={handleDataSeriesClick(index)}
                     aria-describedby={popoverId}
@@ -170,6 +194,23 @@ function ChartDataPropEditor({
               {editDataSeries.label}
             </Typography>
             <Stack gap={1} py={1}>
+              <TextField
+                select
+                label="kind"
+                value={editDataSeries?.kind}
+                onChange={handleDataSeriesTextPropChange(dataSeriesEditIndex, 'kind')}
+              >
+                {CHART_DATA_SERIES_KINDS.map((kind) => (
+                  <MenuItem key={kind} value={kind}>
+                    {kind}
+                  </MenuItem>
+                ))}
+              </TextField>
+              <TextField
+                label="label"
+                value={editDataSeries?.label}
+                onChange={handleDataSeriesTextPropChange(dataSeriesEditIndex, 'label')}
+              />
               <BindableEditor
                 liveBinding={bindings[`${nodeId}.props.data[${dataSeriesEditIndex}].data`]}
                 globalScope={pageState}
@@ -177,8 +218,18 @@ function ChartDataPropEditor({
                 label="data"
                 jsRuntime={jsBrowserRuntime}
                 propType={{ type: 'array' }}
-                value={(node.props?.data && node.props.data[dataSeriesEditIndex].data) ?? null}
+                value={editDataSeries?.data ?? null}
                 onChange={handleDataSeriesDataChange(dataSeriesEditIndex)}
+              />
+              <TextField
+                label="xKey"
+                value={editDataSeries?.xKey}
+                onChange={handleDataSeriesTextPropChange(dataSeriesEditIndex, 'xKey')}
+              />
+              <TextField
+                label="yKey"
+                value={editDataSeries?.yKey}
+                onChange={handleDataSeriesTextPropChange(dataSeriesEditIndex, 'yKey')}
               />
             </Stack>
           </Box>

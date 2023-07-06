@@ -41,4 +41,4 @@ export {
   parseColumns,
 } from './DataGrid.js';
 export type { SerializableGridColumn, SerializableGridColumns, NumberFormat } from './DataGrid.js';
-export type { ChartDataSeries, ChartData } from './Chart.js';
+export { type ChartDataSeries, type ChartData, CHART_DATA_SERIES_KINDS } from './Chart.js';

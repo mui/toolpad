@@ -3,10 +3,10 @@ import { createComponent } from '@mui/toolpad-core';
 import { Box, BoxProps } from '@mui/material';
 import { SX_PROP_HELPER_TEXT } from './constants.js';
 
-type ChartDataSeriesKind = 'line' | 'bar' | 'pie';
+export const CHART_DATA_SERIES_KINDS = ['line', 'bar', 'pie'];
 
 export interface ChartDataSeries<D = Record<string, unknown>> {
-  kind: ChartDataSeriesKind;
+  kind: (typeof CHART_DATA_SERIES_KINDS)[number];
   label: string;
   data: D[];
   xKey: keyof D;
@@ -36,7 +36,7 @@ export default createComponent(Chart, {
           properties: {
             kind: {
               type: 'string',
-              enum: ['line', 'bar', 'pie'],
+              enum: CHART_DATA_SERIES_KINDS,
             },
             label: {
               type: 'string',

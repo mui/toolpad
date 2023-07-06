@@ -1,3 +1,5 @@
+/// <reference path="./serverModules.d.ts" />
+
 import { TOOLPAD_FUNCTION } from './constants.js';
 import { InferParameterType, PrimitiveValueType, PropValueType } from './types.js';
 
@@ -26,12 +28,15 @@ export interface FunctionResolverParams<
 
 export interface FunctionResolver<
   C extends CreateFunctionConfig<CreateFunctionConfigParameters<C>>,
+  R,
 > {
-  (params: FunctionResolverParams<C>): Promise<unknown>;
+  (params: FunctionResolverParams<C>): Promise<R>;
 }
 
-export interface ToolpadFunction<C extends CreateFunctionConfig<CreateFunctionConfigParameters<C>>>
-  extends FunctionResolver<C> {
+export interface ToolpadFunction<
+  C extends CreateFunctionConfig<CreateFunctionConfigParameters<C>>,
+  R,
+> extends FunctionResolver<C, R> {
   [TOOLPAD_FUNCTION]: C;
 }
 
@@ -57,10 +62,10 @@ export type {
  * override: Config
  * @muidoc function
  */
-export function createFunction<C extends CreateFunctionConfig<CreateFunctionConfigParameters<C>>>(
-  resolver: FunctionResolver<C>,
-  config?: C,
-) {
+export function createFunction<
+  C extends CreateFunctionConfig<CreateFunctionConfigParameters<C>>,
+  R,
+>(resolver: FunctionResolver<C, R>, config?: C) {
   // TODO: Remove post beta
   if (config?.parameters) {
     for (const [name, argType] of Object.entries(config.parameters)) {

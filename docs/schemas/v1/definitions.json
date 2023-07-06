@@ -376,21 +376,34 @@
         "spec": {
           "type": "object",
           "properties": {
-            "palette.mode": {
-              "type": "string",
-              "enum": [
-                "light",
-                "dark"
+            "options": {
+              "type": "object",
+              "properties": {
+                "palette": {
+                  "type": "object",
+                  "properties": {
+                    "mode": {
+                      "type": "string",
+                      "enum": [
+                        "light",
+                        "dark"
+                      ]
+                    },
+                    "primary": {
+                      "$ref": "#/definitions/SimplePaletteColorOptions"
+                    },
+                    "secondary": {
+                      "$ref": "#/definitions/SimplePaletteColorOptions"
+                    }
+                  },
+                  "additionalProperties": true
+                }
+              },
+              "required": [
+                "palette"
               ],
-              "description": "The MUI theme palette mode."
-            },
-            "palette.primary.main": {
-              "type": "string",
-              "description": "The primary theme color."
-            },
-            "palette.secondary.main": {
-              "type": "string",
-              "description": "The secondary theme color."
+              "additionalProperties": true,
+              "description": "The ThemeOptions object that gets fed into MUI's createTheme function."
             }
           },
           "additionalProperties": false,
@@ -411,35 +424,6 @@
   ],
   "additionalProperties": false,
   "definitions": {
-    "Json": {
-      "anyOf": [
-        {
-          "type": "string"
-        },
-        {
-          "type": "number"
-        },
-        {
-          "type": "boolean"
-        },
-        {
-          "type": "null"
-        },
-        {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/Json"
-          }
-        },
-        {
-          "type": "object",
-          "additionalProperties": {
-            "$ref": "#/definitions/Json"
-          }
-        }
-      ],
-      "description": "A JSON compatible value, anything that is serializable to JSON."
-    },
     "JsExpressionBinding": {
       "type": "object",
       "properties": {
@@ -524,7 +508,28 @@
     "BindableProp": {
       "anyOf": [
         {
-          "$ref": "#/definitions/Json"
+          "type": "string"
+        },
+        {
+          "type": "number"
+        },
+        {
+          "type": "boolean"
+        },
+        {
+          "type": "null"
+        },
+        {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/BindableProp"
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/definitions/BindableProp"
+          }
         },
         {
           "$ref": "#/definitions/JsExpressionBinding"
@@ -659,6 +664,27 @@
       ],
       "additionalProperties": false,
       "description": "A name/value pair where the value is dynamically bindable to strings."
+    },
+    "SimplePaletteColorOptions": {
+      "type": "object",
+      "properties": {
+        "main": {
+          "type": "string"
+        },
+        "light": {
+          "type": "string"
+        },
+        "dark": {
+          "type": "string"
+        },
+        "contrastText": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "main"
+      ],
+      "additionalProperties": false
     }
   },
   "$schema": "http://json-schema.org/draft-07/schema#"

@@ -6,52 +6,29 @@ import type { TOOLPAD_COMPONENT } from './constants.js';
 
 export type NodeId = Branded<string, 'NodeId'>;
 
-export type BindingAttrValueFormat = 'stringLiteral' | 'default';
-
 export interface NodeReference {
   $ref: NodeId;
 }
 
-export interface BoundExpressionAttrValue {
-  type: 'boundExpression';
-  value: string;
-  format?: BindingAttrValueFormat;
-}
-
 export interface JsExpressionAttrValue {
-  type: 'jsExpression';
-  value: string;
+  $$jsExpression: string;
 }
 
 export interface EnvAttrValue {
-  type: 'env';
-  value: string;
-}
-
-export interface BindingAttrValue {
-  type: 'binding';
-  value: string;
-}
-
-export interface ConstantAttrValue<V> {
-  type: 'const';
-  value: V;
+  $$env: string;
 }
 
 export interface SecretAttrValue<V> {
-  type: 'secret';
-  value: V;
+  $$secret: V;
 }
 
 export interface JsExpressionAction {
-  type: 'jsExpressionAction';
-  value: string;
+  $$jsExpressionAction: string;
 }
 
 export interface NavigationAction<P = any> {
-  type: 'navigationAction';
-  value: {
-    page: NodeReference;
+  $$navigationAction: {
+    page: string;
     parameters?: BindableAttrValues<P>;
   };
 }
@@ -59,15 +36,11 @@ export interface NavigationAction<P = any> {
 export type BindableAction = JsExpressionAction | NavigationAction;
 
 export type BindableAttrValue<V> =
-  | ConstantAttrValue<V>
-  | BindingAttrValue
+  | V
   | SecretAttrValue<V>
-  | BoundExpressionAttrValue
   | JsExpressionAttrValue
   | EnvAttrValue
   | BindableAction;
-
-export type ConstantAttrValues<P> = { [K in keyof P]: ConstantAttrValue<P[K]> };
 
 export type NestedBindableAttrs =
   | BindableAttrValue<any>
@@ -79,6 +52,8 @@ export type BindableAttrValues<P = Record<string, unknown>> = {
 };
 
 export type BindableAttrEntries = [string, BindableAttrValue<any>][];
+
+export type PropBindableAttrValue<V> = V | JsExpressionAttrValue | EnvAttrValue;
 
 export type SlotType = 'single' | 'multiple' | 'layout';
 
@@ -249,10 +224,33 @@ export interface ParameterTypeLookup {
   event: (...args: any[]) => void;
 }
 
-export type InferParameterType<T extends PropValueType> = ParameterTypeLookup[Exclude<
-  T['type'],
-  undefined
->];
+export type JsonSchemaToTs<T extends JSONSchema7> = T extends {
+  type: 'object';
+  properties?: Record<string, JSONSchema7>;
+}
+  ? {
+      [K in keyof T['properties']]?: JsonSchemaToTs<NonNullable<T['properties']>[K]>;
+    }
+  : T extends { type: 'array'; items?: JSONSchema7 }
+  ? T['items'] extends undefined
+    ? unknown[]
+    : JsonSchemaToTs<NonNullable<T['items']>>[]
+  : T extends { type: 'string' }
+  ? string
+  : T extends { type: 'number' | 'integer' }
+  ? number
+  : T extends { type: 'boolean' }
+  ? boolean
+  : T extends { type: 'null' }
+  ? null
+  : unknown;
+
+export type InferParameterType<T extends PropValueType> = T extends {
+  type: 'object' | 'array';
+  schema: JSONSchema7;
+}
+  ? JsonSchemaToTs<T['schema']>
+  : ParameterTypeLookup[NonNullable<T['type']>];
 
 export type PropValueTypes<K extends string = string> = Partial<{
   [key in K]?: PropValueType;
@@ -380,6 +378,7 @@ export type RuntimeEvents = {
   screenUpdate: {};
   ready: {};
   pageNavigationRequest: { pageNodeId: NodeId };
+  vmUpdated: { vm: ApplicationVm };
 };
 
 export type RuntimeEvent = {
@@ -392,6 +391,10 @@ export interface ComponentConfig<P extends object = {}> {
    * May contain Markdown
    */
   helperText?: string;
+  /**
+   * Configures which properties result in propagating error state to `errorProp`.
+   */
+  errorPropSource?: (keyof P & string)[];
   /**
    * Designates a property as "the error property". If Toolpad detects an error
    * on any of the inputs, it will forward it to this property.
@@ -452,13 +455,24 @@ export type Serializable =
   | ((...args: Serializable[]) => Serializable);
 
 export interface JsRuntime {
+  getEnv(): Record<string, string | undefined>;
   evaluateExpression(code: string, globalScope: Record<string, unknown>): BindingEvaluationResult;
 }
 
-export type LocalScopeParams = Record<string, unknown>;
+export type TemplateRenderer = (
+  scopeKey: string,
+  params: Record<string, unknown>,
+) => React.ReactNode;
 
-export interface TemplateScopeParams {
-  i: number;
+export interface RuntimeScope {
+  id: string;
+  parentScope?: RuntimeScope;
+  bindings: Record<string, BindingEvaluationResult<unknown>>;
+  values: Record<string, unknown>;
+  meta: ScopeMeta;
 }
 
-export type TemplateRenderer = ({ i }: TemplateScopeParams) => React.ReactNode;
+export interface ApplicationVm {
+  scopes: { [id in string]?: RuntimeScope };
+  bindingScopes: { [id in string]?: string };
+}

@@ -13,12 +13,13 @@ import {
   GridColDef,
   GridValueGetterParams,
   useGridApiRef,
-  GridColumnTypesRecord,
   GridRenderCellParams,
   useGridRootProps,
   gridDensityFactorSelector,
   useGridSelector,
   getGridDefaultColumnTypes,
+  GridColTypeDef,
+  LicenseInfo,
 } from '@mui/x-data-grid-pro';
 import * as React from 'react';
 import { useNode, createComponent, useComponents } from '@mui/toolpad-core';
@@ -38,6 +39,17 @@ import { errorFrom } from '@mui/toolpad-utils/errors';
 import { hasImageExtension } from '@mui/toolpad-core/path';
 import { ErrorBoundary, FallbackProps } from 'react-error-boundary';
 import { SX_PROP_HELPER_TEXT } from './constants.js';
+import ErrorOverlay from './components/ErrorOverlay.js';
+
+if (typeof window !== 'undefined') {
+  const licenseKey = window.document.querySelector<HTMLMetaElement>(
+    'meta[name="toolpad-x-license"]',
+  )?.content;
+
+  if (licenseKey) {
+    LicenseInfo.setLicenseKey(licenseKey);
+  }
+}
 
 const DEFAULT_COLUMN_TYPES = getGridDefaultColumnTypes();
 
@@ -241,7 +253,7 @@ function CustomColumn({ params }: CustomColumnProps) {
   );
 }
 
-export const CUSTOM_COLUMN_TYPES: GridColumnTypesRecord = {
+export const CUSTOM_COLUMN_TYPES: Record<string, GridColTypeDef> = {
   json: {
     valueFormatter: ({ value: cellValue }: GridValueFormatterParams) => JSON.stringify(cellValue),
   },
@@ -520,7 +532,9 @@ const DataGridComponent = React.forwardRef(function DataGridComponent(
   );
 
   const apiRef = useGridApiRef();
-  React.useEffect(() => apiRef.current.updateColumns(columns), [apiRef, columns]);
+  React.useEffect(() => {
+    apiRef.current.updateColumns(columns);
+  }, [apiRef, columns]);
 
   // The grid doesn't update when the getRowId or columns properties change, so it needs to be remounted
   // TODO: remove columns from this equation once https://github.com/mui/mui-x/issues/5970 gets resolved
@@ -529,13 +543,18 @@ const DataGridComponent = React.forwardRef(function DataGridComponent(
     [getRowId, columns],
   );
 
-  const error = errorProp ? errorFrom(errorProp) : null;
+  const error: Error | null = errorProp ? errorFrom(errorProp) : null;
 
   return (
-    <div ref={ref} style={{ height: heightProp, minHeight: '100%', width: '100%' }}>
-      {error ? (
-        <div>{error.message}</div>
-      ) : (
+    <div
+      ref={ref}
+      style={{ height: heightProp, minHeight: '100%', width: '100%', position: 'relative' }}
+    >
+      <ErrorOverlay error={error} />
+
+      <div
+        style={{ position: 'absolute', inset: '0 0 0 0', visibility: error ? 'hidden' : 'visible' }}
+      >
         <DataGridPro
           apiRef={apiRef}
           components={{
@@ -552,7 +571,7 @@ const DataGridComponent = React.forwardRef(function DataGridComponent(
           rowSelectionModel={selectionModel}
           {...props}
         />
-      )}
+      </div>
     </div>
   );
 });

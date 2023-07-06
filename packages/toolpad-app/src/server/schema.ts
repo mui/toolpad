@@ -1,3 +1,4 @@
+import { SimplePaletteColorOptions, ThemeOptions } from '@mui/material';
 import { z } from 'zod';
 
 export const API_VERSION = 'v1';
@@ -5,7 +6,7 @@ export const API_VERSION = 'v1';
 function toolpadObjectSchema<K extends string, T extends z.ZodType>(kind: K, spec: T) {
   return z.object({
     apiVersion: z
-      .literal(API_VERSION)
+      .literal('v1')
       .describe(
         `Defines the version of this object. Used in determining compatibility between Toolpad "${kind}" objects.`,
       ),
@@ -15,11 +16,6 @@ function toolpadObjectSchema<K extends string, T extends z.ZodType>(kind: K, spe
 }
 
 const literalSchema = z.union([z.string(), z.number(), z.boolean(), z.null()]);
-type Literal = z.infer<typeof literalSchema>;
-type Json = Literal | { [key: string]: Json } | Json[];
-export const jsonSchema: z.ZodType<Json> = z
-  .lazy(() => z.union([...literalSchema.options, z.array(jsonSchema), z.record(jsonSchema)]))
-  .describe('A JSON compatible value, anything that is serializable to JSON.');
 
 function nameValuePairSchema<V extends z.ZodTypeAny>(valueType: V) {
   return z
@@ -226,14 +222,21 @@ const baseElementSchema = z.object({
 
 type BaseElement = z.infer<typeof baseElementSchema>;
 
-export const bindablePropSchema = z.union([
-  jsonSchema,
-  jsExpressionBindingSchema,
-  envBindingSchema,
-  jsExpressionActionSchema,
-  navigationActionSchema,
-  templateSchema,
-]);
+export const bindablePropSchema: z.ZodType = z.lazy(() =>
+  z.union([
+    ...literalSchema.options,
+    z.array(bindablePropSchema),
+    z.record(
+      z.string().refine((key) => !key.startsWith('$$')),
+      bindablePropSchema,
+    ),
+    jsExpressionBindingSchema,
+    envBindingSchema,
+    jsExpressionActionSchema,
+    navigationActionSchema,
+    templateSchema,
+  ]),
+);
 
 export type BindableProp = z.infer<typeof bindablePropSchema>;
 
@@ -284,17 +287,34 @@ export const pageSchema = toolpadObjectSchema(
   }),
 );
 
+const simplePaletteColorOptionsSchema: z.ZodType<SimplePaletteColorOptions> = z.object({
+  main: z.string(),
+  light: z.string().optional(),
+  dark: z.string().optional(),
+  contrastText: z.string().optional(),
+});
+
+const themeOptionsSchema: z.ZodType<ThemeOptions> = z
+  .object({
+    // TODO: expand to full MUI theme object
+    palette: z
+      .object({
+        mode: z.union([z.literal('light'), z.literal('dark')]).optional(),
+        primary: simplePaletteColorOptionsSchema.optional(),
+        secondary: simplePaletteColorOptionsSchema.optional(),
+      })
+      .passthrough(),
+  })
+  .passthrough();
+
 export type Page = z.infer<typeof pageSchema>;
 
 export const themeSchema = toolpadObjectSchema(
   'theme',
   z.object({
-    'palette.mode': z
-      .union([z.literal('light'), z.literal('dark')])
+    options: themeOptionsSchema
       .optional()
-      .describe('The MUI theme palette mode.'),
-    'palette.primary.main': z.string().optional().describe('The primary theme color.'),
-    'palette.secondary.main': z.string().optional().describe('The secondary theme color.'),
+      .describe("The ThemeOptions object that gets fed into MUI's createTheme function."),
   }),
 );
 
@@ -306,7 +326,6 @@ export const META = {
     Theme: themeSchema,
   },
   definitions: {
-    Json: jsonSchema,
     JsExpressionBinding: jsExpressionBindingSchema,
     EnvBinding: envBindingSchema,
     JsExpressionAction: jsExpressionActionSchema,
@@ -316,5 +335,6 @@ export const META = {
     Template: templateSchema,
     NameStringValuePair: nameStringValuePairSchema,
     BindableNameStringValue: bindableNameStringValueSchema,
+    SimplePaletteColorOptions: simplePaletteColorOptionsSchema,
   },
 };

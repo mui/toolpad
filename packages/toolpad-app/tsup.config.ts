@@ -1,5 +1,20 @@
-import { spawnSync } from 'child_process';
 import { defineConfig } from 'tsup';
+import * as fs from 'fs/promises';
+import path from 'path';
+import type * as esbuild from 'esbuild';
+
+function cleanFolderOnFailure(folder: string): esbuild.Plugin {
+  return {
+    name: 'clean-dist-on-failure',
+    setup(build) {
+      build.onEnd(async (result) => {
+        if (result.errors.length > 0) {
+          await fs.rm(folder, { recursive: true, force: true });
+        }
+      });
+    },
+  };
+}
 
 export default defineConfig([
   {
@@ -8,6 +23,8 @@ export default defineConfig([
       server: './cli/server.ts',
       appServer: './cli/appServer.ts',
       appBuilder: './cli/appBuilder.ts',
+      functionsDevWorker: './src/server/functionsDevWorker.ts',
+      functionsTypesWorker: './src/server/functionsTypesWorker.ts',
     },
     outDir: 'dist/cli',
     silent: true,
@@ -22,8 +39,8 @@ export default defineConfig([
       'latest-version',
       'nanoid',
     ],
-    clean: true,
     sourcemap: true,
+    esbuildPlugins: [cleanFolderOnFailure(path.resolve(__dirname, './dist/cli'))],
     async onSuccess() {
       // eslint-disable-next-line no-console
       console.log('cli: build successful');
@@ -34,10 +51,11 @@ export default defineConfig([
     silent: true,
     outDir: './public/reactDevtools',
     bundle: true,
+    sourcemap: true,
     target: 'es6',
     format: 'iife',
     replaceNodeEnv: true,
-    clean: true,
+    esbuildPlugins: [cleanFolderOnFailure(path.resolve(__dirname, './public/reactDevtools'))],
     async onSuccess() {
       // eslint-disable-next-line no-console
       console.log('reactDevtools: build successful');
@@ -49,15 +67,15 @@ export default defineConfig([
       canvas: './src/canvas/index.tsx',
     },
     format: ['esm', 'cjs'],
-    dts: false,
+    dts: true,
     silent: true,
     outDir: 'dist/runtime',
-    tsconfig: './tsconfig.esbuild.json',
-    clean: true,
+    tsconfig: './tsconfig.runtime.json',
+    sourcemap: true,
+    esbuildPlugins: [cleanFolderOnFailure(path.resolve(__dirname, 'dist/runtime'))],
     async onSuccess() {
       // eslint-disable-next-line no-console
       console.log('runtime: build successful');
-      spawnSync('tsc', ['--emitDeclarationOnly', '--declaration']);
     },
   },
 ]);

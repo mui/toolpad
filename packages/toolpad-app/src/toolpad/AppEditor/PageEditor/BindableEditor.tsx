@@ -6,12 +6,14 @@ import {
   LiveBinding,
   JsRuntime,
   ScopeMeta,
+  EnvAttrValue,
 } from '@mui/toolpad-core';
 import { WithControlledProp } from '../../../utils/types';
 
 /* eslint-disable import/no-cycle */
 import { getDefaultControl } from '../../propertyControls';
 import { BindingEditor } from '../BindingEditor';
+import { getBindingType } from '../../../bindings';
 /* eslint-enable import/no-cycle */
 
 function renderDefaultControl(params: RenderControlParams<any>) {
@@ -54,26 +56,25 @@ export default function BindableEditor<V>({
   envVarNames,
   sx,
 }: BindableEditorProps<V>) {
-  const handlePropConstChange = React.useCallback(
-    (newValue: V) => onChange({ type: 'const', value: newValue }),
-    [onChange],
-  );
+  const handlePropConstChange = React.useCallback((newValue: V) => onChange(newValue), [onChange]);
+
+  const valueBindingType = value && getBindingType(value);
 
   const initConstValue = React.useCallback(() => {
-    if (value?.type === 'const') {
-      return value.value;
+    if (valueBindingType && valueBindingType === 'const') {
+      return value;
     }
 
-    if (value?.type === 'env') {
-      return value.value;
+    if (valueBindingType && valueBindingType === 'env') {
+      return (value as EnvAttrValue).$$env;
     }
 
     return liveBinding?.value;
-  }, [liveBinding, value]);
+  }, [liveBinding, value, valueBindingType]);
 
   const constValue = React.useMemo(initConstValue, [value, initConstValue]);
 
-  const hasBinding = value && value.type !== 'const';
+  const hasBinding = value && valueBindingType !== 'const';
 
   return (
     <Stack direction="row" alignItems="center" justifyContent="space-between" sx={sx}>

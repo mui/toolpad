@@ -7,10 +7,11 @@ import * as archiver from 'archiver';
 import { createWriteStream } from 'fs';
 import { pipeline } from 'stream/promises';
 import { Readable } from 'stream';
+import getPort from 'get-port';
 import { test as base } from './test';
 import { waitForMatch } from '../utils/streams';
 
-interface RunningLocalApp {
+export interface RunningLocalApp {
   url: string;
   dir: string;
   stdout: Readable;
@@ -45,6 +46,8 @@ export async function withApp(
 ) {
   const { cmd = 'start', template, setup, env } = options;
 
+  // Each test runs in its own temporary folder to avoid race conditions when running tests in parallel.
+  // It also avoids mutating the source code of the fixture while running the test.
   const tmpTestDir = await fs.mkdtemp(path.resolve(__dirname, './tmp-'));
 
   try {
@@ -64,12 +67,16 @@ export async function withApp(
       args.push('--dev');
     }
 
+    // Run each test on its own port to avoid race conditions when running tests in parallel.
+    args.push('--port', String(await getPort()));
+
     if (cmd === 'start') {
       const buildArgs = ['build'];
 
       const child = childProcess.spawn('toolpad', buildArgs, {
         cwd: projectDir,
         stdio: 'pipe',
+        shell: !process.env.CI,
         env: {
           ...process.env,
           ...env,
@@ -91,6 +98,7 @@ export async function withApp(
     const child = childProcess.spawn('toolpad', args, {
       cwd: projectDir,
       stdio: 'pipe',
+      shell: !process.env.CI,
       env: {
         ...process.env,
         ...env,

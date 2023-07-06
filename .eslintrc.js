@@ -96,10 +96,53 @@ module.exports = {
       },
     },
     {
-      files: ['packages/toolpad-app/**/*'],
-      excludedFiles: ['**/jest-environment-jsdom.ts', 'tsup.config.ts', '*.spec.ts', '*.spec.tsx'],
+      files: [
+        'packages/create-toolpad-app/**/*',
+        'packages/toolpad/**/*',
+        'packages/toolpad-app/**/*',
+        'packages/toolpad-utils/**/*',
+        'packages/toolpad-core/**/*',
+        'packages/toolpad-components/**/*',
+      ],
+      excludedFiles: [
+        '**/jest-environment-jsdom.ts',
+        'tsup.config.ts',
+        '*.spec.ts',
+        '*.spec.tsx',
+        'jest.config.ts',
+      ],
       rules: {
         'import/no-extraneous-dependencies': ['error'],
+      },
+    },
+    {
+      files: [
+        /**
+         * Basically all code that is guaranteed being bundled for the client side and never used on serverside code
+         * can be dev dependencies to reduce the size of the published package
+         */
+        'packages/toolpad-app/src/components/**/*',
+        'packages/toolpad-app/src/toolpad/**/*',
+        'packages/toolpad-app/src/runtime/**/*',
+        'packages/toolpad-app/reactDevtools/**/*',
+      ],
+      excludedFiles: ['*.spec.ts', '*.spec.tsx'],
+      rules: {
+        'import/no-extraneous-dependencies': ['error', { devDependencies: true }],
+      },
+    },
+    {
+      // Starting small, we will progressively expand this to more packages.
+      files: [
+        // 'packages/create-toolpad-app/**/*',
+        // 'packages/toolpad/**/*',
+        // 'packages/toolpad-app/**/*',
+        'packages/toolpad-utils/**/*',
+        // 'packages/toolpad-core/**/*',
+        // 'packages/toolpad-components/**/*',
+      ],
+      rules: {
+        '@typescript-eslint/no-explicit-any': ['error'],
       },
     },
     {
@@ -116,26 +159,6 @@ module.exports = {
       excludedFiles: ['*.d.ts', '*.spec.ts', '*.spec.tsx'],
       rules: {
         'import/no-cycle': ['error', { ignoreExternal: true }],
-      },
-    },
-    {
-      files: ['packages/toolpad-core/**/*', 'packages/toolpad-components/**/*'],
-      rules: {
-        'no-restricted-imports': [
-          'error',
-          {
-            patterns: [
-              {
-                // Running into issues with @mui/icons-material not being an ESM package, while the
-                // toolpad-core package is. This makes Next.js try to load @mui/icons-material/* as ESM
-                // We'll just avoid importing icons in these packages
-                // Remove restriction after https://github.com/mui/material-ui/pull/30510 gets resolved
-                group: ['@mui/icons-material', '@mui/icons-material/*'],
-                message: "Don't use @mui/icons-material in these packages for now.",
-              },
-            ],
-          },
-        ],
       },
     },
   ],

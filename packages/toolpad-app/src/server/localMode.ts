@@ -789,8 +789,8 @@ async function getResourcesFolder(root: string): Promise<string> {
   return path.join(getToolpadFolder(root), './resources');
 }
 
-async function getFunctionFilePath(resourcesFolder: string, filePath: string): Promise<string> {
-  return path.join(resourcesFolder, filePath);
+async function getFunctionFilePath(resourcesFolder: string, fileName: string): Promise<string> {
+  return path.join(resourcesFolder, fileName);
 }
 
 const DEFAULT_EDITOR = 'code';
@@ -808,21 +808,21 @@ export async function findSupportedEditor(): Promise<string | null> {
   }
 }
 
-export async function openCodeEditor(filePath: string, fileType: string) {
+export async function openCodeEditor(fileName: string, fileType: string) {
   const supportedEditor = await findSupportedEditor();
   if (!supportedEditor) {
     throw new Error(`No code editor found`);
   }
   const root = getUserProjectRoot();
-  let resolvedPath = filePath;
+  let resolvedPath = fileName;
 
   if (fileType === 'query') {
     const resourcesFolder = await getResourcesFolder(root);
-    resolvedPath = await getFunctionFilePath(resourcesFolder, filePath);
+    resolvedPath = await getFunctionFilePath(resourcesFolder, fileName);
   }
   if (fileType === 'component') {
     const componentsFolder = getComponentsFolder(root);
-    resolvedPath = getComponentFilePath(componentsFolder, filePath);
+    resolvedPath = getComponentFilePath(componentsFolder, fileName);
   }
   const fullResolvedPath = path.resolve(root, resolvedPath);
   openEditor([fullResolvedPath, root], {

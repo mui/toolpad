@@ -8,6 +8,7 @@ import markdown from './Markdown';
 import event from './event';
 import GridColumns from './GridColumns';
 import SelectOptions from './SelectOptions';
+// eslint-disable-next-line import/no-cycle
 import ChartData from './ChartData';
 import HorizontalAlign from './HorizontalAlign';
 import VerticalAlign from './VerticalAlign';

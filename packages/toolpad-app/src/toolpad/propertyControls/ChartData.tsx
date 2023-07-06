@@ -21,10 +21,8 @@ import type { EditorProps } from '../../types';
 import PropertyControl from '../../components/PropertyControl';
 import { usePageEditorState } from '../AppEditor/PageEditor/PageEditorProvider';
 import { useDom, useDomApi } from '../AppState';
-
 // eslint-disable-next-line import/no-cycle
 import BindableEditor from '../AppEditor/PageEditor/BindableEditor';
-import { fromBindable, toBindable } from '../../bindings';
 import { updateArray, remove } from '../../utils/immutability';
 
 function ChartDataPropEditor({
@@ -90,7 +88,7 @@ function ChartDataPropEditor({
               previousData,
               {
                 ...previousData[index],
-                data: newValue ? fromBindable(newValue) : [],
+                data: newValue || [],
               },
               index,
             ),
@@ -167,8 +165,7 @@ function ChartDataPropEditor({
                 jsRuntime={jsBrowserRuntime}
                 propType={{ type: 'array' }}
                 value={
-                  (node.props?.data?.value &&
-                    toBindable(node.props.data.value[dataSeriesEditIndex].data)) ??
+                  (node.props?.data?.value && node.props.data.value[dataSeriesEditIndex].data) ??
                   null
                 }
                 onChange={handleDataSeriesDataChange(dataSeriesEditIndex)}

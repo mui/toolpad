@@ -9,11 +9,10 @@ import {
   EnvAttrValue,
 } from '@mui/toolpad-core';
 import { WithControlledProp } from '../../../utils/types';
-
+import { getBindingType } from '../../../bindings';
 /* eslint-disable import/no-cycle */
 import { getDefaultControl } from '../../propertyControls';
 import { BindingEditor } from '../BindingEditor';
-import { getBindingType } from '../../../bindings';
 /* eslint-enable import/no-cycle */
 
 function renderDefaultControl(params: RenderControlParams<any>) {

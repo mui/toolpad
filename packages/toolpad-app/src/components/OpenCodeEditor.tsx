@@ -66,11 +66,15 @@ export default function OpenCodeEditorButton({
 }: OpenCodeEditorButtonProps) {
   const [missingEditorDialog, setMissingEditorDialog] = React.useState(false);
 
-  const handleClick = React.useCallback(() => {
-    client.mutation.openCodeEditor(filePath, fileType).catch(() => {
-      setMissingEditorDialog(true);
-    });
-  }, [filePath, fileType]);
+  const handleClick = React.useCallback(
+    (event: React.SyntheticEvent) => {
+      event.stopPropagation();
+      client.mutation.openCodeEditor(filePath, fileType).catch(() => {
+        setMissingEditorDialog(true);
+      });
+    },
+    [filePath, fileType],
+  );
 
   return (
     <React.Fragment>

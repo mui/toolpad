@@ -11,10 +11,10 @@ import {
   EnvAttrValue,
 } from '@mui/toolpad-core';
 import invariant from 'invariant';
-import { BoxProps } from '@mui/material';
+import { BoxProps, ThemeOptions as MuiThemeOptions } from '@mui/material';
 import { pascalCase, removeDiacritics, uncapitalize } from '@mui/toolpad-utils/strings';
 import { mapProperties, mapValues } from '@mui/toolpad-utils/collections';
-import { ConnectionStatus, AppTheme } from '../types';
+import { ConnectionStatus } from '../types';
 import { omit, update, updateOrCreate } from '../utils/immutability';
 import { ExactEntriesOf, Maybe } from '../utils/types';
 import { envBindingSchema } from '../server/schema';
@@ -69,7 +69,7 @@ export interface AppNode extends AppDomNodeBase {
 
 export interface ThemeNode extends AppDomNodeBase {
   readonly type: 'theme';
-  readonly theme?: BindableAttrValues<AppTheme>;
+  readonly theme?: MuiThemeOptions;
 }
 
 export interface ConnectionNode<P = unknown> extends AppDomNodeBase {

@@ -138,6 +138,15 @@ spec:
               $$jsExpression: >
                 `Loading: ${alwaysLoading.isLoading}; Propagated loading:
                 ${propagatedLoading.isLoading}`
+    - component: PageRow
+      name: pageRow13
+      children:
+        - component: Text
+          name: text6
+          props:
+            value:
+              $$jsExpression: |
+                `Raw text: ${getRawText.data}`
   queries:
     - name: hello
       query:
@@ -214,3 +223,7 @@ spec:
       parameters:
         - name: msg
           value: threw error 1
+    - name: getRawText
+      query:
+        function: functions.ts#getRawText
+        kind: local

@@ -248,6 +248,7 @@ function TextContent({ value, loading, sx, variant }: TextContentProps) {
         whiteSpace: 'pre-wrap',
         overflowWrap: 'break-word',
       }}
+      variant={variant}
       onDoubleClick={() => {
         if (nodeRuntime) {
           const selection = window.getSelection();

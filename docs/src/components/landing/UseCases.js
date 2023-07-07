@@ -1,6 +1,8 @@
 import * as React from 'react';
 import PropTypes from 'prop-types';
 import Box from '@mui/material/Box';
+import Button from '@mui/material/Button';
+import KeyboardArrowRightRounded from '@mui/icons-material/KeyboardArrowRightRounded';
 import Container from '@mui/material/Container';
 import Typography from '@mui/material/Typography';
 import Grid from '@mui/material/Unstable_Grid2';
@@ -36,17 +38,37 @@ export default function CardGrid(props) {
       <Container sx={{ py: { xs: 8, sm: 12 } }}>
         <SectionHeadline overline={content.overline} title={content.Headline} />
         <Grid container columns={{ xs: 1, sm: 3 }} spacing={4}>
-          {content.cards.map(({ title, imageUrl, description }) => (
+          {content.cards.map(({ title, imageUrl, description, action }) => (
             <Grid key={title} xs={3} sm={1}>
               <Box key={title}>
                 <Box sx={cardMediaStyle(imageUrl)} />
-                <Box mt={2}>
-                  <Typography component="h3" fontWeight="medium" color="text.primary" mb={0.5}>
+
+                <Box
+                  mt={2}
+                  sx={{
+                    display: 'flex',
+                    height: 250,
+                    flexDirection: 'column',
+                    justifyContent: 'space-between',
+                    rowGap: 1,
+                  }}
+                >
+                  <Typography component="h3" fontWeight="medium" color="text.primary">
                     {title}
                   </Typography>
                   <Typography variant="body" color="text.secondary">
                     {description}
                   </Typography>
+                  {action ? (
+                    <Button
+                      sx={{ py: 1, width: 'fit-content' }}
+                      variant="contained"
+                      endIcon={<KeyboardArrowRightRounded />}
+                      href={action.href}
+                    >
+                      {action.label}
+                    </Button>
+                  ) : null}
                 </Box>
               </Box>
             </Grid>

@@ -8,7 +8,7 @@ interface ColorPickerIconButtonProps {
   label?: string;
 }
 
-function ColorPickerIconButton({ label, value, onChange }: ColorPickerIconButtonProps) {
+export function ColorPickerIconButton({ label, value, onChange }: ColorPickerIconButtonProps) {
   const [anchorEl, setAnchorEl] = React.useState<HTMLButtonElement | null>(null);
 
   const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {

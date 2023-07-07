@@ -1,10 +1,9 @@
-// TODO: Create a @mui/toolpad-utils package to house utilities like this one?
+export const IMAGE_EXTENSIONS = ['.jpg', '.jpeg', '.png', '.gif', '.svg', '.webp'];
 
-import { IMAGE_EXTENSIONS } from './constants';
-
-export function getExtension(path: string): string {
-  const splitPath = path.split('.');
-  return splitPath[splitPath.length - 1];
+export function getExtension(filePath: string): string {
+  const fileName = filePath.split('/').pop() || '';
+  const dotIndex = fileName.lastIndexOf('.');
+  return dotIndex < 0 ? '' : fileName.substring(dotIndex);
 }
 
 export function hasImageExtension(path: string): boolean {

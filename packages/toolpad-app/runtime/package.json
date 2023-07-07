@@ -1,5 +1,5 @@
 {
   "type": "commonjs",
-  "main": "../dist/runtime/index.js",
-  "types": "../dist/runtime/index.d.ts"
+  "main": "../dist/exports/runtime.js",
+  "types": "../dist/exports/runtime.d.ts"
 }

@@ -43,7 +43,7 @@ function Banner(props) {
             background: `linear-gradient(180deg, ${alpha(theme.palette.primary[900], 0.4)}  50%, 
             ${alpha(theme.palette.primary[800], 0.6)} 100%)
             `,
-            borderColor: 'primaryDark.600',
+            borderColor: (theme.vars || theme).palette.primaryDark[600],
           }),
         })}
       >

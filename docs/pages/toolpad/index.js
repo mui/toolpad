@@ -14,6 +14,7 @@ import CardGrid from '../../src/components/landing/CardGrid';
 import Banner from '../../src/components/landing/Banner';
 import Pricing from '../../src/components/landing/PricingTable';
 import Marquee from '../../src/components/landing/Marquee';
+import CodeBlock from '../../src/components/landing/CodeBlock';
 import features from '../../data/toolpad/landing/features';
 import {
   action,
@@ -50,6 +51,8 @@ export default function Home() {
       <AppHeader gitHubRepository="https://github.com/mui/mui-toolpad" />
       <main id="main-content">
         <ToolpadHero />
+        <Divider />
+        <CodeBlock />
         <Divider />
         <UseCases content={useCases} />
         <Divider />

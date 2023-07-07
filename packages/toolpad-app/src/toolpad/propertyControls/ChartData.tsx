@@ -12,6 +12,7 @@ import {
   Stack,
   TextField,
   Typography,
+  useTheme,
 } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import { CHART_DATA_SERIES_KINDS, type ChartDataSeries } from '@mui/toolpad-components';
@@ -26,6 +27,8 @@ import { useDom, useDomApi } from '../AppState';
 // eslint-disable-next-line import/no-cycle
 import BindableEditor from '../AppEditor/PageEditor/BindableEditor';
 import { updateArray, remove } from '../../utils/immutability';
+import FlexFill from '../../components/FlexFill';
+import ColorTool from '../../components/ColorTool';
 
 function ChartDataPropEditor({
   nodeId,
@@ -38,10 +41,14 @@ function ChartDataPropEditor({
   const { pageState, bindings, globalScopeMeta } = usePageEditorState();
   const jsBrowserRuntime = useBrowserJsRuntime();
 
+  const theme = useTheme();
+
   const node = nodeId ? (appDom.getMaybeNode(dom, nodeId) as appDom.ElementNode) : null;
 
   const [dataSeriesEditIndex, setDataSeriesEditIndex] = React.useState<number | null>(null);
   const [popoverAnchorElement, setPopoverAnchorElement] = React.useState<HTMLElement | null>(null);
+  const [colorPopoverAnchorElement, setColorPopoverAnchorElement] =
+    React.useState<HTMLElement | null>(null);
 
   const handleAddDataSeries = React.useCallback(() => {
     if (node) {
@@ -76,14 +83,25 @@ function ChartDataPropEditor({
   );
 
   const popoverId = React.useId();
+  const colorPopoverId = React.useId();
+
   const isPopoverOpen = Boolean(popoverAnchorElement);
+  const isColorPopoverOpen = Boolean(colorPopoverAnchorElement);
+
+  const handlColorClick = React.useCallback((event: React.MouseEvent<HTMLElement>) => {
+    setColorPopoverAnchorElement(event.currentTarget);
+  }, []);
 
   const handlePopoverClose = React.useCallback(() => {
     setPopoverAnchorElement(null);
   }, []);
 
-  const handleDataSeriesDataChange = React.useCallback(
-    (index: number) => (newValue: BindableAttrValue<ChartDataSeries['data']> | null) => {
+  const handleColorPopoverClose = React.useCallback(() => {
+    setColorPopoverAnchorElement(null);
+  }, []);
+
+  const updateDataSeriesProp = React.useCallback(
+    (index: number, newValue: unknown, propName: string, defaultValue: unknown = '') => {
       if (node) {
         const previousData = node.props?.data || [];
 
@@ -97,7 +115,7 @@ function ChartDataPropEditor({
               previousData,
               {
                 ...previousData[index],
-                data: newValue || [],
+                [propName]: newValue || defaultValue,
               },
               index,
             ),
@@ -108,32 +126,26 @@ function ChartDataPropEditor({
     [domApi, node],
   );
 
-  const handleDataSeriesTextPropChange = React.useCallback(
+  const handleDataSeriesDataChange = React.useCallback(
+    (index: number) => (newValue: BindableAttrValue<ChartDataSeries['data']> | null) => {
+      updateDataSeriesProp(index, newValue, 'data', []);
+    },
+    [updateDataSeriesProp],
+  );
+
+  const handleDataSeriesTextInputPropChange = React.useCallback(
     (index: number, propName: string) => (event: React.ChangeEvent<HTMLInputElement>) => {
       const newValue = event.target.value;
-
-      if (node) {
-        const previousData = node.props?.data || [];
-
-        domApi.update((draft) =>
-          appDom.setNodeNamespacedProp(
-            draft,
-            node,
-            'props',
-            'data',
-            updateArray(
-              previousData,
-              {
-                ...previousData[index],
-                [propName]: newValue || '',
-              },
-              index,
-            ),
-          ),
-        );
-      }
+      updateDataSeriesProp(index, newValue, propName);
     },
-    [domApi, node],
+    [updateDataSeriesProp],
+  );
+
+  const handleDataSeriesColorChange = React.useCallback(
+    (index: number) => (newValue: string | undefined) => {
+      updateDataSeriesProp(index, newValue, 'color');
+    },
+    [updateDataSeriesProp],
   );
 
   if (!node) {
@@ -195,10 +207,15 @@ function ChartDataPropEditor({
             </Typography>
             <Stack gap={1} py={1}>
               <TextField
+                label="label"
+                value={editDataSeries?.label}
+                onChange={handleDataSeriesTextInputPropChange(dataSeriesEditIndex, 'label')}
+              />
+              <TextField
                 select
                 label="kind"
                 value={editDataSeries?.kind}
-                onChange={handleDataSeriesTextPropChange(dataSeriesEditIndex, 'kind')}
+                onChange={handleDataSeriesTextInputPropChange(dataSeriesEditIndex, 'kind')}
               >
                 {CHART_DATA_SERIES_KINDS.map((kind) => (
                   <MenuItem key={kind} value={kind}>
@@ -206,11 +223,6 @@ function ChartDataPropEditor({
                   </MenuItem>
                 ))}
               </TextField>
-              <TextField
-                label="label"
-                value={editDataSeries?.label}
-                onChange={handleDataSeriesTextPropChange(dataSeriesEditIndex, 'label')}
-              />
               <BindableEditor
                 liveBinding={bindings[`${nodeId}.props.data[${dataSeriesEditIndex}].data`]}
                 globalScope={pageState}
@@ -224,13 +236,53 @@ function ChartDataPropEditor({
               <TextField
                 label="xKey"
                 value={editDataSeries?.xKey}
-                onChange={handleDataSeriesTextPropChange(dataSeriesEditIndex, 'xKey')}
+                onChange={handleDataSeriesTextInputPropChange(dataSeriesEditIndex, 'xKey')}
               />
               <TextField
                 label="yKey"
                 value={editDataSeries?.yKey}
-                onChange={handleDataSeriesTextPropChange(dataSeriesEditIndex, 'yKey')}
+                onChange={handleDataSeriesTextInputPropChange(dataSeriesEditIndex, 'yKey')}
               />
+              <Button
+                aria-describedby={colorPopoverId}
+                variant="outlined"
+                color="inherit"
+                fullWidth
+                onClick={handlColorClick}
+              >
+                color
+                <FlexFill />
+                <Box
+                  sx={{
+                    ml: 2,
+                    p: '2px 8px',
+                    background: editDataSeries?.color,
+                    color: editDataSeries?.color
+                      ? theme.palette.getContrastText(editDataSeries.color)
+                      : undefined,
+                    borderRadius: 1,
+                  }}
+                >
+                  {editDataSeries?.color}
+                </Box>
+              </Button>
+              <Popover
+                id={isColorPopoverOpen ? colorPopoverId : undefined}
+                open={isColorPopoverOpen}
+                anchorEl={colorPopoverAnchorElement}
+                onClose={handleColorPopoverClose}
+                anchorOrigin={{
+                  vertical: 'bottom',
+                  horizontal: 'left',
+                }}
+              >
+                <ColorTool
+                  sx={{ m: 2 }}
+                  label="color"
+                  value={editDataSeries?.color}
+                  onChange={handleDataSeriesColorChange(dataSeriesEditIndex)}
+                />
+              </Popover>
             </Stack>
           </Box>
         ) : null}

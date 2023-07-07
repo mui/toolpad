@@ -1,26 +1,28 @@
 import * as React from 'react';
 import { createComponent } from '@mui/toolpad-core';
-import { Box, BoxProps } from '@mui/material';
+import { BoxProps, Container } from '@mui/material';
 import {
   LineChart,
-  Line,
   XAxis,
   YAxis,
   Tooltip,
   Legend,
+  Line,
   ResponsiveContainer,
   CartesianGrid,
 } from 'recharts';
+import { uniq } from 'lodash-es';
 import { SX_PROP_HELPER_TEXT } from './constants.js';
 
 export const CHART_DATA_SERIES_KINDS = ['line', 'bar', 'pie'];
 
-export interface ChartDataSeries<D = Record<string, unknown>> {
+export interface ChartDataSeries<D = Record<string, string | number>> {
   kind: (typeof CHART_DATA_SERIES_KINDS)[number];
   label: string;
   data: D[];
   xKey: keyof D;
   yKey: keyof D;
+  color?: string;
 }
 
 export type ChartData = ChartDataSeries[];
@@ -29,22 +31,53 @@ interface ChartProps extends BoxProps {
   data?: ChartData;
 }
 
-function Chart({ data = [], ...rest }: ChartProps) {
+function Chart({ data = [], sx }: ChartProps) {
+  const xValues = React.useMemo(
+    () =>
+      uniq(
+        data
+          .map((dataSeries) =>
+            dataSeries.data.map((dataSeriesPoint) => dataSeriesPoint[dataSeries.xKey]),
+          )
+          .flat()
+          .sort(),
+      ),
+    [data],
+  );
+
   return (
-    <ResponsiveContainer width="100%" height={400}>
-      <LineChart data={data[0].data}>
-        <CartesianGrid />
-        <XAxis dataKey={data[0].xKey} />
-        <YAxis dataKey={data[0].yKey} />
-        <Tooltip />
-        <Legend />
-      </LineChart>
-    </ResponsiveContainer>
+    <Container sx={sx}>
+      <ResponsiveContainer width="100%" height={400}>
+        <LineChart>
+          <CartesianGrid />
+          <XAxis
+            dataKey="x"
+            type={xValues.find((xValue) => typeof xValue !== 'number') ? 'category' : 'number'}
+            allowDuplicatedCategory={false}
+          />
+          <YAxis />
+          <Tooltip />
+          <Legend />
+          {data.map((dataSeries, index) => (
+            <Line
+              key={index}
+              type="monotone"
+              data={dataSeries.data.map((dataSeriesPoint) => ({
+                x: dataSeriesPoint[dataSeries.xKey],
+                [dataSeries.yKey]: dataSeriesPoint[dataSeries.yKey],
+              }))}
+              dataKey={dataSeries.yKey}
+              name={dataSeries.label}
+              stroke={dataSeries.color}
+            />
+          ))}
+        </LineChart>
+      </ResponsiveContainer>
+    </Container>
   );
 }
 
 export default createComponent(Chart, {
-  layoutDirection: 'both',
   argTypes: {
     data: {
       helperText: 'The data to be displayed.',

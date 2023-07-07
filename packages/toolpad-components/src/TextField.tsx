@@ -11,8 +11,8 @@ import {
   FormInputComponentProps,
   useFormInput,
   withComponentForm,
-} from './Form.js';
-import { SX_PROP_HELPER_TEXT } from './constants.js';
+} from './Form';
+import { SX_PROP_HELPER_TEXT } from './constants';
 
 export type TextFieldProps = Omit<MuiTextFieldProps, 'value' | 'onChange'> & {
   value: string;

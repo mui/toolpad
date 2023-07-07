@@ -27,7 +27,7 @@
     "dev": "dotenv cross-env FORCE_COLOR=1 lerna -- run dev --stream --parallel --ignore docs",
     "docs:dev": "yarn workspace docs dev",
     "docs:build": "yarn workspace docs build",
-    "docs:build:api": "tsx ./scripts/docs/buildApi.ts",
+    "docs:build:api": "tsx --tsconfig ./scripts/tsconfig.json ./scripts/docs/buildApi.ts",
     "docs:export": "yarn workspace docs export",
     "eslint": "eslint . --report-unused-disable-directives --ext .js,.ts,.tsx",
     "jsonlint": "node ./scripts/jsonlint.mjs",

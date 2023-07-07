@@ -1,6 +1,6 @@
 // TODO: Create a @mui/toolpad-utils package to house utilities like this one?
 
-import { IMAGE_EXTENSIONS } from './constants.js';
+import { IMAGE_EXTENSIONS } from './constants';
 
 export function getExtension(path: string): string {
   const splitPath = path.split('.');

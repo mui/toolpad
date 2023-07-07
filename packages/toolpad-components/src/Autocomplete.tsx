@@ -5,14 +5,14 @@ import {
   TextField,
 } from '@mui/material';
 import { createComponent } from '@mui/toolpad-core';
-import { SX_PROP_HELPER_TEXT } from './constants.js';
+import { SX_PROP_HELPER_TEXT } from './constants';
 import {
   FORM_INPUT_ARG_TYPES,
   FORM_TEXT_INPUT_ARG_TYPES,
   FormInputComponentProps,
   useFormInput,
   withComponentForm,
-} from './Form.js';
+} from './Form';
 
 type AutocompleteOption = string | { label?: string; value?: string };
 type AutocompleteValue = string | null;

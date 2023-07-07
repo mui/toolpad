@@ -38,8 +38,8 @@ import { getObjectKey } from '@mui/toolpad-core/objectKey';
 import { errorFrom } from '@mui/toolpad-utils/errors';
 import { hasImageExtension } from '@mui/toolpad-core/path';
 import { ErrorBoundary, FallbackProps } from 'react-error-boundary';
-import { SX_PROP_HELPER_TEXT } from './constants.js';
-import ErrorOverlay from './components/ErrorOverlay.js';
+import { SX_PROP_HELPER_TEXT } from './constants';
+import ErrorOverlay from './components/ErrorOverlay';
 
 if (typeof window !== 'undefined') {
   const licenseKey = window.document.querySelector<HTMLMetaElement>(

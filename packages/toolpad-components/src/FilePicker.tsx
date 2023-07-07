@@ -6,7 +6,7 @@ import {
   FormInputComponentProps,
   useFormInput,
   withComponentForm,
-} from './Form.js';
+} from './Form';
 
 interface FullFile {
   name: string;

@@ -1,7 +1,7 @@
 /// <reference path="./serverModules.d.ts" />
 
-import { TOOLPAD_FUNCTION } from './constants.js';
-import { InferParameterType, PrimitiveValueType, PropValueType } from './types.js';
+import { TOOLPAD_FUNCTION } from './constants';
+import { InferParameterType, PrimitiveValueType, PropValueType } from './types';
 
 /**
  * The runtime configuration for a Toolpad function. Describes the parameters it accepts and their

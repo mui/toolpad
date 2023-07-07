@@ -1,5 +1,5 @@
-import { TOOLPAD_COMPONENT } from './constants.js';
-import { ArgTypeDefinition, ComponentConfig, PropValueType, ToolpadComponent } from './types.js';
+import { TOOLPAD_COMPONENT } from './constants';
+import { ArgTypeDefinition, ComponentConfig, PropValueType, ToolpadComponent } from './types';
 
 type MaybeLegacyArgTypeDefinition = ArgTypeDefinition & { typeDef?: PropValueType };
 

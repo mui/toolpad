@@ -31,15 +31,10 @@
     "./cli": {
       "require": "./dist/cli/index.js"
     },
-    "./runtime": {
-      "types": "./dist/runtime/index.d.ts",
-      "import": "./dist/runtime/index.mjs",
-      "require": "./dist/runtime/index.js"
-    },
-    "./canvas": {
-      "types": "./dist/runtime/canvas.d.ts",
-      "import": "./dist/runtime/canvas.mjs",
-      "require": "./dist/runtime/canvas.js"
+    "./*": {
+      "types": "./dist/exports/*.d.ts",
+      "import": "./dist/exports/*.mjs",
+      "require": "./dist/exports/*.js"
     }
   },
   "dependencies": {

@@ -62,14 +62,11 @@ export default defineConfig([
     },
   },
   {
-    entry: {
-      index: './src/runtime/entrypoint.tsx',
-      canvas: './src/canvas/index.tsx',
-    },
+    entry: ['src/exports/*.ts', 'src/exports/*.tsx'],
     format: ['esm', 'cjs'],
     dts: true,
     silent: true,
-    outDir: 'dist/runtime',
+    outDir: 'dist/exports',
     tsconfig: './tsconfig.runtime.json',
     sourcemap: true,
     esbuildPlugins: [cleanFolderOnFailure(path.resolve(__dirname, 'dist/runtime'))],

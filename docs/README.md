@@ -4,7 +4,7 @@ This is the documentation website of MUI Toolpad.
 
 To start the docs site in development mode, from the project root, run:
 
-```sh
+```bash
 yarn && yarn docs:dev
 ```
 
@@ -20,6 +20,8 @@ Please follow the [contributing guidelines](https://github.com/mui/material-ui/b
 on how to get started contributing to MUI.
 
 ## Screenshots
+
+All Toolpad screenshots and videos in the docs must be made with the Toolpad theme in light mode.
 
 For consistency, screenshots of the full browser viewport will always be at 1440x796 DPR:2
 You can check your size with https://whatismyviewport.com/. If all is well it should look like:

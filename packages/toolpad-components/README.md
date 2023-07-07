@@ -6,7 +6,7 @@ Low-code tool, powered by MUI
 
 Install the package in your project directory with:
 
-```sh
+```bash
 // with npm
 npm install @mui/toolpad-components
 

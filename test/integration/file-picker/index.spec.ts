@@ -10,8 +10,6 @@ test.use({
 });
 
 test('File Picker component', async ({ page }) => {
-  const testFilePath = path.resolve(__dirname, './test.txt');
-
   const editorModel = new ToolpadEditor(page);
   editorModel.goto();
 
@@ -21,7 +19,11 @@ test('File Picker component', async ({ page }) => {
 
   await expect(filePicker).toBeVisible();
 
-  await filePicker.setInputFiles(testFilePath);
+  await filePicker.setInputFiles({
+    name: 'test.txt',
+    mimeType: 'text/plain',
+    buffer: Buffer.from('hello'),
+  });
 
   await expect(editorModel.pageRoot.getByText('test.txt')).toBeVisible();
   await expect(editorModel.pageRoot.getByText('Uploaded')).toBeVisible();

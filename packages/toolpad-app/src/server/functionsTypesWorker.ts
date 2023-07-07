@@ -404,7 +404,9 @@ export interface ExtractTypesParams {
 export default async function extractTypes({
   resourcesFolder,
 }: ExtractTypesParams): Promise<IntrospectionResult> {
-  const entryPoints = await glob(path.join(resourcesFolder, './*.ts'));
+  const entryPoints = await glob(path.join(resourcesFolder, './*.ts'), {
+    windowsPathsNoEscape: true,
+  });
 
   const program = ts.createProgram(entryPoints, tsConfig);
 

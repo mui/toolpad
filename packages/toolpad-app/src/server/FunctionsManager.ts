@@ -14,6 +14,7 @@ import { errorFrom } from '@mui/toolpad-utils/errors';
 import EnvManager from './EnvManager';
 import { ProjectEvents, ToolpadProjectOptions } from '../types';
 import { createWorker as createDevWorker } from './functionsDevWorker';
+import { toPosixPath } from '../utils/paths';
 import {
   tsConfig,
   type ExtractTypesParams,
@@ -123,7 +124,7 @@ export default class FunctionsManager {
   }
 
   private async getFunctionFiles(): Promise<string[]> {
-    const paths = await glob(this.getFunctionResourcesPattern());
+    const paths = await glob(this.getFunctionResourcesPattern(), { windowsPathsNoEscape: true });
     return paths.map((fullPath) => path.relative(this.project.getRoot(), fullPath));
   }
 
@@ -134,7 +135,7 @@ export default class FunctionsManager {
   private getOutputFileForEntryPoint(entryPoint: string): string | undefined {
     const [outputFile] =
       Object.entries(this.buildMetafile?.outputs ?? {}).find(
-        (entry) => entry[1].entryPoint === entryPoint,
+        (entry) => entry[1].entryPoint === toPosixPath(entryPoint),
       ) ?? [];
 
     return outputFile;

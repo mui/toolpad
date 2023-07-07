@@ -9,12 +9,12 @@ import AppFooter from 'docs/src/layouts/AppFooter';
 import AppHeaderBanner from 'docs/src/components/banner/AppHeaderBanner';
 import ToolpadHero from '../../src/components/landing/Hero';
 import SignUpToast from '../../src/components/landing/SignUpToast';
+import DemoVideo from '../../src/components/landing/DemoVideo';
 import UseCases from '../../src/components/landing/UseCases';
 import CardGrid from '../../src/components/landing/CardGrid';
 import Banner from '../../src/components/landing/Banner';
 import Pricing from '../../src/components/landing/PricingTable';
 import Marquee from '../../src/components/landing/Marquee';
-import CodeBlock from '../../src/components/landing/CodeBlock';
 import features from '../../data/toolpad/landing/features';
 import {
   action,
@@ -51,8 +51,7 @@ export default function Home() {
       <AppHeader gitHubRepository="https://github.com/mui/mui-toolpad" />
       <main id="main-content">
         <ToolpadHero />
-        <Divider />
-        <CodeBlock />
+        <DemoVideo />
         <Divider />
         <UseCases content={useCases} />
         <Divider />

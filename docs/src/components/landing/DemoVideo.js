@@ -1,5 +1,6 @@
 import * as React from 'react';
 import Box from '@mui/material/Box';
+import Container from '@mui/material/Container';
 import { styled, alpha } from '@mui/material/styles';
 
 const Video = styled('video')(({ theme }) => [
@@ -17,18 +18,10 @@ const Video = styled('video')(({ theme }) => [
   }),
 ]);
 
-const VIDEO_BREAKPOINT_GAP = 100;
-
 const VideoContainer = styled(Box)(({ theme }) => [
   {
-    maxWidth: 1100,
+    width: '100%',
     height: '100%',
-    width: {
-      xs: 360,
-      sm: theme.breakpoints.values.sm - VIDEO_BREAKPOINT_GAP,
-      md: theme.breakpoints.values.md + VIDEO_BREAKPOINT_GAP,
-      lg: theme.breakpoints.values.lg + VIDEO_BREAKPOINT_GAP,
-    },
     borderRadius: theme.shape.borderRadius,
     padding: 8,
     background: `linear-gradient(230deg, ${theme.palette.primary[50]} 0%, ${alpha(
@@ -51,19 +44,30 @@ const VideoContainer = styled(Box)(({ theme }) => [
 
 export default function DemoVideo() {
   return (
-    <Box
+    <Container
       sx={{
-        display: 'flex',
-        flexDirection: 'row',
-        justifyContent: 'center',
+        py: { xs: 2, sm: 4, md: 6 },
+        scrollMarginTop: 'calc(var(--MuiDocs-header-height) + 32px)',
       }}
     >
-      <VideoContainer>
-        <Video playsInline controls poster="/static/toolpad/marketing/index-hero-video-poster.png">
-          <source src="/static/toolpad/marketing/index-hero-demo-video.mp4" type="video/mp4" />
-          Your browser does not support the video tag.
-        </Video>
-      </VideoContainer>
-    </Box>
+      <Box
+        sx={{
+          display: 'flex',
+          flexDirection: 'row',
+          justifyContent: 'center',
+        }}
+      >
+        <VideoContainer>
+          <Video
+            playsInline
+            controls
+            poster="/static/toolpad/marketing/index-hero-video-poster.png"
+          >
+            <source src="/static/toolpad/marketing/index-hero-demo-video.mp4" type="video/mp4" />
+            Your browser does not support the video tag.
+          </Video>
+        </VideoContainer>
+      </Box>
+    </Container>
   );
 }

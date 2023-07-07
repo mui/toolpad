@@ -7,7 +7,8 @@ import IconImage from 'docs/src/components/icon/IconImage';
 import GradientText from 'docs/src/components/typography/GradientText';
 import KeyRoundedIcon from '@mui/icons-material/KeyRounded';
 import GetStartedButtons from 'docs/src/components/home/GetStartedButtons';
-import DemoVideo from './DemoVideo';
+// import DemoVideo from './DemoVideo';
+import CodeBlock from './CodeBlock';
 import ROUTES from '../../route';
 import ToolpadHeroContainer from '../../layouts/ToolpadHeroContainer';
 
@@ -91,7 +92,27 @@ export default function Hero() {
           </Box>
         </Box>
       </Box>
-      <DemoVideo />
+      {/* <DemoVideo /> */}
+      <Box sx={{ position: 'relative', width: '100%' }}>
+        <CodeBlock />
+        <Box
+          component="img"
+          src="/static/toolpad/marketing/npm-stats.png" // image will be replaced for a better one
+          sx={[
+            (theme) => ({
+              position: 'absolute',
+              bottom: -60,
+              left: 100,
+              maxWidth: 510,
+              maxHeight: 320,
+              borderRadius: 1,
+              border: '1px solid',
+              borderColor: (theme.vars || theme).palette.divider,
+              boxShadow: '0px 2px 16px rgba(0,0,0, 0.5)',
+            }),
+          ]}
+        />
+      </Box>
     </ToolpadHeroContainer>
   );
 }

@@ -13,11 +13,10 @@ export default function HeroContainer({
     <Container
       sx={{
         transition: '0.3s',
-        py: { xs: 4, sm: 16 },
+        pt: { xs: 4, sm: 12 },
+        pb: { xs: 4, sm: 16 },
         display: 'flex',
         justifyContent: 'space-between',
-        // gap: 10,
-        overflow: 'hidden',
         ...sx,
       }}
     >

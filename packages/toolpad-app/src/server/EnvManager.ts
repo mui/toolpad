@@ -33,16 +33,14 @@ export default class EnvManager {
   private loadEnvFile() {
     const envFilePath = this.getEnvFilePath();
     const { parsed = {} } = dotenv.config({ path: envFilePath, override: true });
-    if (Object.keys(parsed).length > 0) {
-      this.values = parsed;
-      // eslint-disable-next-line no-console
-      console.log(
-        `${chalk.blue('info')}  - loaded env file "${envFilePath}" with keys ${truncate(
-          Object.keys(parsed).join(', '),
-          1000,
-        )}`,
-      );
-    }
+    this.values = parsed;
+    // eslint-disable-next-line no-console
+    console.log(
+      `${chalk.blue('info')}  - loaded env file "${envFilePath}" with keys ${truncate(
+        Object.keys(parsed).join(', '),
+        1000,
+      )}`,
+    );
   }
 
   /**

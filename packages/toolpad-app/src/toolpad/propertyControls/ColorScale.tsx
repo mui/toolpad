@@ -9,35 +9,57 @@ import {
   Typography,
   ToggleButton,
   ToggleButtonGroup,
+  ToggleButtonProps,
+  IconButton,
 } from '@mui/material';
-import { ColorScaleStop } from '@mui/toolpad-components/dist/Statistic';
+import { ColorScaleStop } from '@mui/toolpad-components/Statistic';
+import AddIcon from '@mui/icons-material/Add';
+import DeleteIcon from '@mui/icons-material/Delete';
 import { EditorProps } from '../../types';
 import PropertyControl from '../../components/PropertyControl';
 import ColorPicker from '../../components/ColorPicker';
-import FlexFill from '../../components/FlexFill';
 
 const EMPTY_STOPS: ColorScaleStop[] = [];
 
-interface ColorScaleToggleButtonProps {
+interface ColorScaleToggleButtonProps extends ToggleButtonProps {
   label?: string;
-  color?: string;
+  stopColor?: string;
+  onDelete?: (event: React.MouseEvent) => void;
 }
 
-function ColorScaleToggleButton({ label, color }: ColorScaleToggleButtonProps) {
+function ColorScaleToggleButton({
+  label,
+  stopColor,
+  sx,
+  onDelete,
+  ...props
+}: ColorScaleToggleButtonProps) {
   return (
-    <React.Fragment>
+    <ToggleButton
+      sx={{
+        ...sx,
+        px: 1,
+        display: 'flex',
+        flexDirection: 'row',
+        justifyContent: 'end',
+      }}
+      {...props}
+    >
       <Typography>{label}</Typography>
-      <FlexFill />
       <Box
         sx={{
-          background: color,
+          background: stopColor,
           width: 24,
           height: 24,
           borderRadius: '50%',
           boxShadow: 1,
+          ml: 1,
         }}
       />
-    </React.Fragment>
+      <IconButton onClick={onDelete} sx={{ visibility: onDelete ? 'visible' : 'hidden' }}>
+        <DeleteIcon />
+      </IconButton>
+    </ToggleButton>
   );
 }
 
@@ -90,14 +112,19 @@ function ColorScaleEditor({ value, onChange }: ColorScaleEditorProps) {
       .map(({ index }) => index);
   }, [stops]);
 
-  const handleRemoveStop = () => {
-    if (activeStop !== 'base') {
-      onChange({
-        ...value,
-        stops: stops.filter((existingStop, index) => index !== activeStop),
-      });
-      setActiveStop('base');
+  const handleRemoveStop = (toRemoveIndex: number) => (event: React.MouseEvent) => {
+    event.stopPropagation();
+    const orderedIndex = stopsOrder.indexOf(toRemoveIndex);
+    let activeStopAfterRemoval = stopsOrder[orderedIndex + 1] ?? stopsOrder[orderedIndex - 1];
+    if (typeof activeStopAfterRemoval === 'number' && activeStopAfterRemoval > toRemoveIndex) {
+      // account for one removed element in the next render
+      activeStopAfterRemoval -= 1;
     }
+    onChange({
+      ...value,
+      stops: stops.filter((existingStop, index) => index !== toRemoveIndex),
+    });
+    setActiveStop(activeStopAfterRemoval);
   };
   const handleAddStop = () => {
     const lastStop: ColorScaleStop | undefined =
@@ -111,32 +138,46 @@ function ColorScaleEditor({ value, onChange }: ColorScaleEditorProps) {
   };
 
   return (
-    <Stack sx={{ height: 300 }} spacing={1} direction="row">
-      <ToggleButtonGroup
-        orientation="vertical"
-        value={activeStop}
-        exclusive
-        onChange={(event, newValue) => setActiveStop(newValue)}
+    <Stack spacing={1} direction="row">
+      <Box
+        sx={{
+          maxHeight: 300,
+          overflow: 'auto',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: 1,
+          alignItems: 'center',
+        }}
       >
-        <ToggleButton value="base">
-          <ColorScaleToggleButton color={value?.base} />
-        </ToggleButton>
-        {stopsOrder.map((index) => {
-          const stop = stops[index];
-          return (
-            <ToggleButton key={index} value={index}>
-              <ColorScaleToggleButton color={stop.color} label={`> ${stop.value}`} />
-            </ToggleButton>
-          );
-        })}
-      </ToggleButtonGroup>
+        <ToggleButtonGroup
+          orientation="vertical"
+          value={activeStop}
+          exclusive
+          onChange={(event, newValue) => setActiveStop(newValue)}
+        >
+          <ColorScaleToggleButton value="base" stopColor={value?.base} />
+          {stopsOrder.map((index) => {
+            const stop = stops[index];
+            return (
+              <ColorScaleToggleButton
+                key={index}
+                value={index}
+                stopColor={stop.color}
+                label={`> ${stop.value}`}
+                onDelete={handleRemoveStop(index)}
+              />
+            );
+          })}
+        </ToggleButtonGroup>
+        <Button startIcon={<AddIcon />} onClick={handleAddStop}>
+          Add Stop
+        </Button>
+      </Box>
       <Stack direction="column">
         {activeStop === 'base' ? null : (
           <TextField value={colorStopValue} onChange={handleStopValueChange} type="number" />
         )}
         <ColorPicker value={stopColor} onChange={handleStopColorChange} />
-        <Button onClick={handleAddStop}>Add Stop</Button>
-        <Button onClick={handleRemoveStop}>Remove Stop</Button>
       </Stack>
     </Stack>
   );

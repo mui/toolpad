@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { ColorScale } from '@mui/toolpad-components';
+import { ColorScale, ColorScaleStop } from '@mui/toolpad-components';
 import {
   Box,
   Stack,
@@ -12,7 +12,6 @@ import {
   ToggleButtonProps,
   IconButton,
 } from '@mui/material';
-import { ColorScaleStop } from '@mui/toolpad-components/Statistic';
 import AddIcon from '@mui/icons-material/Add';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { EditorProps } from '../../types';

@@ -5,7 +5,7 @@ import Typography from '@mui/material/Typography';
 import SvgMuiLogo from 'docs/src/icons/SvgMuiLogomark';
 import IconImage from 'docs/src/components/icon/IconImage';
 import GradientText from 'docs/src/components/typography/GradientText';
-import DataObjectRoundedIcon from '@mui/icons-material/DataObjectRounded';
+import KeyRoundedIcon from '@mui/icons-material/KeyRounded';
 import GetStartedButtons from 'docs/src/components/home/GetStartedButtons';
 import DemoVideo from './DemoVideo';
 import ROUTES from '../../route';
@@ -74,17 +74,17 @@ export default function Hero() {
           sx={{
             mt: 2,
             display: 'flex',
-            gap: 3,
+            gap: 2,
           }}
         >
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.8 }}>
             <SvgMuiLogo width={20} />
             <Typography color="text.secondary" fontWeight="medium" variant="body2">
-              Powered by MUI
+              Powered by Material UI
             </Typography>
           </Box>
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-            <DataObjectRoundedIcon color="primary" />
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.8 }}>
+            <KeyRoundedIcon color="primary" />
             <Typography color="text.secondary" fontWeight="medium" variant="body2">
               Open source
             </Typography>

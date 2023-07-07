@@ -1,7 +1,7 @@
 import * as React from 'react';
 import Link from '@mui/material/Link';
 import PropTypes from 'prop-types';
-import { styled } from '@mui/material/styles';
+import { styled, alpha } from '@mui/material/styles';
 import Box from '@mui/material/Box';
 import KeyboardArrowRightRounded from '@mui/icons-material/KeyboardArrowRightRounded';
 import Container from '@mui/material/Container';
@@ -10,6 +10,9 @@ import Accordion from '@mui/material/Accordion';
 import AccordionSummary from '@mui/material/AccordionSummary';
 import AccordionDetails from '@mui/material/AccordionDetails';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import HandymanRoundedIcon from '@mui/icons-material/HandymanRounded';
+import AdminPanelSettingsRoundedIcon from '@mui/icons-material/AdminPanelSettingsRounded';
+import DashboardRoundedIcon from '@mui/icons-material/DashboardRounded';
 import SectionHeadline from 'docs/src/components/typography/SectionHeadline';
 import GradientText from 'docs/src/components/typography/GradientText';
 import ROUTES from '../../route';
@@ -37,22 +40,30 @@ const StyledAccordionSummary = styled(AccordionSummary)(({ theme }) => [
     '& h3': {
       marginBottom: 0,
     },
-    '& svg': {
-      opacity: 0.5,
-    },
     '&:hover': {
-      backgroundColor: (theme.vars || theme).palette.grey[100],
-      '& svg': {
-        opacity: 1,
-      },
+      backgroundColor: (theme.vars || theme).palette.grey[50],
     },
   },
   theme.applyDarkStyles({
     '&:hover': {
-      backgroundColor: (theme.vars || theme).palette.primaryDark[800],
+      backgroundColor: `${alpha(theme.palette.primaryDark[700], 0.5)}`,
     },
   }),
 ]);
+
+function AccordionHeader({ title, icon }) {
+  return (
+    <Typography
+      component="h3"
+      fontWeight="semiBold"
+      color="text.primary"
+      sx={{ display: 'flex', alignItems: 'center', gap: 1 }}
+    >
+      {icon}
+      {title}
+    </Typography>
+  );
+}
 
 export default function CardGrid() {
   const [expanded, setExpanded] = React.useState('panel1');
@@ -91,13 +102,14 @@ export default function CardGrid() {
               elevation={0}
             >
               <StyledAccordionSummary
-                expandIcon={<ExpandMoreIcon color="primary" />}
+                expandIcon={<ExpandMoreIcon />}
                 aria-controls="use-cases-content"
                 id="use-case-header"
               >
-                <Typography component="h3" fontWeight="semiBold" color="text.primary" gutterBottom>
-                  Utility apps
-                </Typography>
+                <AccordionHeader
+                  title="Utility apps"
+                  icon={<HandymanRoundedIcon fontSize="small" color="primary" />}
+                />
               </StyledAccordionSummary>
               <AccordionDetails sx={{ p: 0, mb: 2 }}>
                 <Typography variant="body2" color="text.secondary">
@@ -119,13 +131,14 @@ export default function CardGrid() {
               elevation={0}
             >
               <StyledAccordionSummary
-                expandIcon={<ExpandMoreIcon color="primary" />}
+                expandIcon={<ExpandMoreIcon />}
                 aria-controls="use-cases-content"
                 id="use-case-header"
               >
-                <Typography component="h3" fontWeight="semiBold" color="text.primary" gutterBottom>
-                  Admin panel
-                </Typography>
+                <AccordionHeader
+                  title="Admin panel"
+                  icon={<AdminPanelSettingsRoundedIcon fontSize="small" color="primary" />}
+                />
               </StyledAccordionSummary>
               <AccordionDetails sx={{ p: 0, mb: 2 }}>
                 <Typography variant="body2" color="text.secondary">
@@ -147,13 +160,14 @@ export default function CardGrid() {
               elevation={0}
             >
               <StyledAccordionSummary
-                expandIcon={<ExpandMoreIcon color="primary" />}
+                expandIcon={<ExpandMoreIcon />}
                 aria-controls="use-cases-content"
                 id="use-case-header"
               >
-                <Typography component="h3" fontWeight="semiBold" color="text.primary" gutterBottom>
-                  BI dashboard
-                </Typography>
+                <AccordionHeader
+                  title="BI dashboard"
+                  icon={<DashboardRoundedIcon fontSize="small" color="primary" />}
+                />
               </StyledAccordionSummary>
               <AccordionDetails sx={{ p: 0, mb: 2 }}>
                 <Typography variant="body2" color="text.secondary">
@@ -204,6 +218,11 @@ export default function CardGrid() {
     </Box>
   );
 }
+
+AccordionHeader.propTypes = {
+  icon: PropTypes.node.isRequired,
+  title: PropTypes.string.isRequired,
+};
 
 CardGrid.propTypes = {
   content: PropTypes.shape({

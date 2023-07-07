@@ -11,7 +11,6 @@ import {
   ResponsiveContainer,
   CartesianGrid,
 } from 'recharts';
-import { uniq } from 'lodash-es';
 import { SX_PROP_HELPER_TEXT } from './constants.js';
 
 export const CHART_DATA_SERIES_KINDS = ['line', 'bar', 'pie'];
@@ -29,25 +28,23 @@ export type ChartData = ChartDataSeries[];
 
 interface ChartProps extends BoxProps {
   data?: ChartData;
+  height?: number;
 }
 
-function Chart({ data = [], sx }: ChartProps) {
+function Chart({ data = [], height, sx }: ChartProps) {
   const xValues = React.useMemo(
     () =>
-      uniq(
-        data
-          .map((dataSeries) =>
-            dataSeries.data.map((dataSeriesPoint) => dataSeriesPoint[dataSeries.xKey]),
-          )
-          .flat()
-          .sort(),
-      ),
+      data
+        .map((dataSeries) =>
+          dataSeries.data.map((dataSeriesPoint) => dataSeriesPoint[dataSeries.xKey]),
+        )
+        .flat(),
     [data],
   );
 
   return (
     <Container sx={sx}>
-      <ResponsiveContainer width="100%" height={400}>
+      <ResponsiveContainer width="100%" height={height}>
         <LineChart>
           <CartesianGrid />
           <XAxis
@@ -78,6 +75,7 @@ function Chart({ data = [], sx }: ChartProps) {
 }
 
 export default createComponent(Chart, {
+  resizableHeightProp: 'height',
   argTypes: {
     data: {
       helperText: 'The data to be displayed.',
@@ -108,6 +106,11 @@ export default createComponent(Chart, {
         },
       },
       control: { type: 'ChartData' },
+    },
+    height: {
+      type: 'number',
+      default: 400,
+      minimum: 100,
     },
     sx: {
       helperText: SX_PROP_HELPER_TEXT,

@@ -6,7 +6,6 @@ import chalk from 'chalk';
 import { truncate } from '@mui/toolpad-utils/strings';
 import { ProjectEvents, ToolpadProjectOptions } from '../types';
 import { Awaitable } from '../utils/types';
-import { fileExists } from '../../../toolpad-utils/dist/fs';
 
 interface IToolpadProject {
   options: ToolpadProjectOptions;

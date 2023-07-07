@@ -16,6 +16,7 @@ export default function HeroContainer({
         pt: { xs: 4, sm: 12 },
         pb: { xs: 4, sm: 16 },
         display: 'flex',
+        flexDirection: { xs: 'column', sm: 'row' },
         justifyContent: 'space-between',
         ...sx,
       }}

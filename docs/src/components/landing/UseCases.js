@@ -83,7 +83,12 @@ export default function CardGrid() {
         }),
       ]}
     >
-      <Container sx={{ pt: 8, pb: { xs: 8, sm: 12 } }}>
+      <Container
+        sx={{
+          pt: 8,
+          pb: { xs: 8, sm: 12 },
+        }}
+      >
         <SectionHeadline
           overline="Use cases"
           title={
@@ -93,7 +98,14 @@ export default function CardGrid() {
             </Typography>
           }
         />
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+        <Box
+          sx={{
+            display: 'flex',
+            flexDirection: { xs: 'column', sm: 'row' },
+            alignItems: 'center',
+            gap: 8,
+          }}
+        >
           <Box sx={{ display: 'flex', flexDirection: 'column' }}>
             <StyledAccordion
               expanded={expanded === 'panel1'}

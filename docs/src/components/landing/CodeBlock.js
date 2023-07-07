@@ -65,20 +65,28 @@ export default function CodeBlock() {
       sx={(theme) => ({
         borderRadius: 1,
         backgroundColor: (theme.vars || theme).palette.primaryDark[800],
+        border: '1px solid',
+        borderColor: (theme.vars || theme).palette.divider,
         '&:hover': {
           zIndex: 40,
         },
+        ...theme.applyDarkStyles({
+          borderColor: (theme.vars || theme).palette.divider,
+        }),
       })}
     >
       <Box
-        sx={{
+        sx={(theme) => ({
           display: 'flex',
           alignItems: 'center',
           gap: 1,
           p: 1.5,
           borderBottom: '1px solid',
-          borderColor: 'grey.700',
-        }}
+          borderColor: (theme.vars || theme).palette.primaryDark[700],
+          ...theme.applyDarkStyles({
+            borderColor: (theme.vars || theme).palette.primaryDark[700],
+          }),
+        })}
       >
         <WindowCircles />
         <Typography

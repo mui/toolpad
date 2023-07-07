@@ -3,7 +3,8 @@
     "paths": {
       "@mui/toolpad-components": ["../packages/toolpad-components/src/index.tsx"],
       "@mui/toolpad-core": ["../packages/toolpad-core/src/index.tsx"],
-      "@mui/toolpad-utils": ["../packages/toolpad-utils/src/index.tsx"]
+      "@mui/toolpad-utils": ["../packages/toolpad-utils/src/index.tsx"],
+      "@mui/toolpad-utils/*": ["../packages/toolpad-utils/src/*.tsx"]
     },
     "module": "CommonJS",
     "noEmit": true,

@@ -25,6 +25,7 @@ interface StatisticProps {
   label?: string;
   caption?: string;
   colorScale?: ColorScale;
+  fullWidth?: boolean;
 }
 
 function resolveColor(colorScale: ColorScale, value: number) {
@@ -42,7 +43,15 @@ function resolveColor(colorScale: ColorScale, value: number) {
   return color;
 }
 
-function Statistic({ colorScale, loading, value, numberFormat, label, caption }: StatisticProps) {
+function Statistic({
+  fullWidth,
+  colorScale,
+  loading,
+  value,
+  numberFormat,
+  label,
+  caption,
+}: StatisticProps) {
   const format = React.useMemo(() => createFormat(numberFormat), [numberFormat]);
 
   const color = React.useMemo(
@@ -51,7 +60,7 @@ function Statistic({ colorScale, loading, value, numberFormat, label, caption }:
   );
 
   return (
-    <Paper sx={{ p: 2 }}>
+    <Paper sx={{ p: 2, minWidth: 160, width: fullWidth ? '100%' : undefined }}>
       <Typography sx={{ fontSize: 14 }} color="text.secondary" gutterBottom noWrap>
         {label}
       </Typography>
@@ -127,6 +136,10 @@ export default createComponent(Statistic, {
       control: {
         type: 'ColorScale',
       },
+    },
+    fullWidth: {
+      helperText: 'Whether the button should occupy all available horizontal space.',
+      type: 'boolean',
     },
   },
 });

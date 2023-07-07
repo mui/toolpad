@@ -106,7 +106,7 @@ export default function AppCanvas({
     );
 
     const unsetUpdate = setCommandHandler(bridge.canvasCommands, 'update', (newState) => {
-      React.startTransition(() => setState(newState));
+      React.startTransition(() => setState(structuredClone(newState)));
     });
 
     const unsetInvalidateQueries = setCommandHandler(

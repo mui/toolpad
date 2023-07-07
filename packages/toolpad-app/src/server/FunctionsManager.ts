@@ -104,6 +104,11 @@ export default class FunctionsManager {
     return path.join(this.getResourcesFolder(), './functions.ts');
   }
 
+  async getFunctionFilePath(fileName: string): Promise<string> {
+    const resourcesFolder = this.getResourcesFolder();
+    return path.join(resourcesFolder, fileName);
+  }
+
   private getFunctionResourcesPattern(): string {
     return path.join(this.getResourcesFolder(), '*.ts');
   }

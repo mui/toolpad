@@ -797,14 +797,6 @@ async function writeDomToDisk(dom: appDom.AppDom): Promise<void> {
   ]);
 }
 
-async function getResourcesFolder(root: string): Promise<string> {
-  return path.join(getToolpadFolder(root), './resources');
-}
-
-async function getFunctionFilePath(resourcesFolder: string, fileName: string): Promise<string> {
-  return path.join(resourcesFolder, fileName);
-}
-
 const DEFAULT_EDITOR = 'code';
 
 export async function findSupportedEditor(): Promise<string | null> {
@@ -818,28 +810,6 @@ export async function findSupportedEditor(): Promise<string | null> {
   } catch (err) {
     return null;
   }
-}
-
-export async function openCodeEditor(fileName: string, fileType: string) {
-  const supportedEditor = await findSupportedEditor();
-  if (!supportedEditor) {
-    throw new Error(`No code editor found`);
-  }
-  const root = getUserProjectRoot();
-  let resolvedPath = fileName;
-
-  if (fileType === 'query') {
-    const resourcesFolder = await getResourcesFolder(root);
-    resolvedPath = await getFunctionFilePath(resourcesFolder, fileName);
-  }
-  if (fileType === 'component') {
-    const componentsFolder = getComponentsFolder(root);
-    resolvedPath = getComponentFilePath(componentsFolder, fileName);
-  }
-  const fullResolvedPath = path.resolve(root, resolvedPath);
-  openEditor([fullResolvedPath, root], {
-    editor: process.env.EDITOR ? undefined : DEFAULT_EDITOR,
-  });
 }
 
 export type ProjectFolderEntry = {
@@ -1113,6 +1083,27 @@ class ToolpadProject {
       const dom = await this.loadDom();
       const newDom = appDom.applyDiff(dom, domDiff);
       return this.writeDomToDisk(newDom);
+    });
+  }
+
+  async openCodeEditor(fileName: string, fileType: string) {
+    const supportedEditor = await findSupportedEditor();
+    if (!supportedEditor) {
+      throw new Error(`No code editor found`);
+    }
+    const root = this.getRoot();
+    let resolvedPath = fileName;
+
+    if (fileType === 'query') {
+      resolvedPath = await this.functionsManager.getFunctionFilePath(fileName);
+    }
+    if (fileType === 'component') {
+      const componentsFolder = getComponentsFolder(root);
+      resolvedPath = getComponentFilePath(componentsFolder, fileName);
+    }
+    const fullResolvedPath = path.resolve(root, resolvedPath);
+    openEditor([fullResolvedPath, root], {
+      editor: process.env.EDITOR ? undefined : DEFAULT_EDITOR,
     });
   }
 }

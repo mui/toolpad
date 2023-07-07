@@ -9,8 +9,8 @@ import { indent } from '@mui/toolpad-utils/strings';
 import chalk from 'chalk';
 import { execQuery, dataSourceFetchPrivate, dataSourceExecPrivate } from './data';
 import { getVersionInfo } from './versionInfo';
-import { createComponent, deletePage, openCodeEditor } from './localMode';
-import { loadDom, saveDom, applyDomDiff } from './liveProject';
+import { createComponent, deletePage } from './localMode';
+import { loadDom, saveDom, applyDomDiff, openCodeEditor } from './liveProject';
 import { asyncHandler } from '../utils/http';
 
 export interface Method<P extends any[] = any[], R = any> {

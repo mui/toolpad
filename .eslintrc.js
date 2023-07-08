@@ -67,7 +67,7 @@ module.exports = {
       },
       {
         selector: "ImportDeclaration[source.value='react'][specifiers.0.type='ImportSpecifier']",
-        message: "Prefer namespaced import for React `import * as React from 'react'`.",
+        message: "Prefer namespaced import for React. Use `import * as React from 'react'`.",
       },
     ],
     // Turning react/jsx-key back on.

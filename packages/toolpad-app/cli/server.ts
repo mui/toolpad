@@ -1,5 +1,3 @@
-import { parse } from 'url';
-import next from 'next';
 import * as path from 'path';
 import express from 'express';
 import invariant from 'invariant';
@@ -145,7 +143,6 @@ async function main() {
   const projectDir = process.env.TOOLPAD_PROJECT_DIR;
   const hostname = 'localhost';
   const port = Number(process.env.TOOLPAD_PORT);
-  let editorNextApp: ReturnType<typeof next> | undefined;
 
   if (cmd === 'dev') {
     app.use('/api/rpc', createRpcHandler(rpcServer));
@@ -163,59 +160,35 @@ async function main() {
       );
     };
 
-    if (process.env.TOOLPAD_LEGACY_EDITOR) {
-      // Legacy Next.js
-      const dir = process.env.TOOLPAD_DIR;
-      const dev = !!process.env.TOOLPAD_NEXT_DEV;
+    const editorBasename = '/_toolpad';
+    if (process.env.NODE_ENV === 'development') {
+      // eslint-disable-next-line no-console
+      console.log(`${chalk.blue('info')}  - Running Toolpad editor in dev mode`);
 
-      // when using middleware `hostname` and `port` must be provided below
-      editorNextApp = next({ dir, dev, hostname, port });
-      const handle = editorNextApp.getRequestHandler();
-
-      app.use(async (req, res) => {
-        try {
-          invariant(req.url, 'request must have a url');
-          // Be sure to pass `true` as the second argument to `url.parse`.
-          // This tells it to parse the query portion of the URL.
-          const parsedUrl = parse(req.url, true);
-          await handle(req, res, parsedUrl);
-        } catch (err) {
-          console.error('Error occurred handling', req.url, err);
-          res.statusCode = 500;
-          res.end('internal server error');
-        }
+      const viteApp = await createViteServer({
+        configFile: path.resolve(__dirname, '../../src/toolpad/vite.config.ts'),
+        root: path.resolve(__dirname, '../../src/toolpad'),
+        server: { middlewareMode: true },
+        plugins: [
+          {
+            name: 'toolpad:transform-index-html',
+            transformIndexHtml,
+          },
+        ],
       });
+
+      app.use(editorBasename, viteApp.middlewares);
     } else {
-      const editorBasename = '/_toolpad';
-      if (process.env.NODE_ENV === 'development') {
-        // eslint-disable-next-line no-console
-        console.log(`${chalk.blue('info')}  - Running Toolpad editor in dev mode`);
-
-        const viteApp = await createViteServer({
-          configFile: path.resolve(__dirname, '../../src/toolpad/vite.config.ts'),
-          root: path.resolve(__dirname, '../../src/toolpad'),
-          server: { middlewareMode: true },
-          plugins: [
-            {
-              name: 'toolpad:transform-index-html',
-              transformIndexHtml,
-            },
-          ],
-        });
-
-        app.use(editorBasename, viteApp.middlewares);
-      } else {
-        app.use(
-          editorBasename,
-          express.static(path.resolve(__dirname, '../../dist/editor'), { index: false }),
-          asyncHandler(async (req, res) => {
-            const htmlFilePath = path.resolve(__dirname, '../../dist/editor/index.html');
-            let html = await fs.readFile(htmlFilePath, { encoding: 'utf-8' });
-            html = transformIndexHtml(html);
-            res.setHeader('Content-Type', 'text/html').status(200).end(html);
-          }),
-        );
-      }
+      app.use(
+        editorBasename,
+        express.static(path.resolve(__dirname, '../../dist/editor'), { index: false }),
+        asyncHandler(async (req, res) => {
+          const htmlFilePath = path.resolve(__dirname, '../../dist/editor/index.html');
+          let html = await fs.readFile(htmlFilePath, { encoding: 'utf-8' });
+          html = transformIndexHtml(html);
+          res.setHeader('Content-Type', 'text/html').status(200).end(html);
+        }),
+      );
     }
   }
 
@@ -227,8 +200,6 @@ async function main() {
       `http://${hostname}:${port}`,
     )}`,
   );
-
-  await editorNextApp?.prepare();
 
   const wsServer = new WebSocketServer({ noServer: true });
 

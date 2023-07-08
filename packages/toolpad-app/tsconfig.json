@@ -31,8 +31,6 @@
     "incremental": true
   },
   "include": [
-    "next.config.mjs",
-    "next-env.d.ts",
     "sentry.client.config.js",
     "sentry.server.config.js",
     "**/*.ts",

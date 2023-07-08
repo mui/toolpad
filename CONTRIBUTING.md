@@ -95,10 +95,10 @@ yarn install
        "start": "toolpad start --dev"
      },
      "dependencies": {
-       "@mui/toolpad": "portal:<your-local-toolpad-monorepo>/packages/toolpad"
+       "@mui/toolpad": "portal:<your-local-toolpad-monorepo>/packages/toolpad-app"
      },
      "resolutions": {
-       "@mui/toolpad-app": "portal:<your-local-toolpad-monorepo>/packages/toolpad-app",
+       "@mui/toolpad": "portal:<your-local-toolpad-monorepo>/packages/toolpad-app",
        "@mui/toolpad-core": "portal:<your-local-toolpad-monorepo>/packages/toolpad-core",
        "@mui/toolpad-components": "portal:<your-local-toolpad-monorepo>/packages/toolpad-components",
        "@mui/toolpad-utils": "portal:<your-local-toolpad-monorepo>/packages/toolpad-utils"

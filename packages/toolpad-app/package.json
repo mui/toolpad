@@ -1,7 +1,10 @@
 {
-  "name": "@mui/toolpad-app",
+  "name": "@mui/toolpad",
   "version": "0.1.19",
   "license": "MIT",
+  "bin": {
+    "toolpad": "./cli.js"
+  },
   "scripts": {
     "build": "concurrently \"yarn:build:*\" && rimraf ./.next/cache",
     "start": "next start",

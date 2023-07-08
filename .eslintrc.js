@@ -59,6 +59,16 @@ module.exports = {
         message:
           "Please use `condition ? <Jsx /> : null`. Otherwise, there is a chance of rendering '0' instead of '' in some cases. Context: https://stackoverflow.com/q/53048037",
       },
+
+      {
+        selector:
+          "ImportDeclaration[source.value='react'][specifiers.0.type='ImportDefaultSpecifier']",
+        message: "Default React import not allowed. Use `import * as React from 'react'`.",
+      },
+      {
+        selector: "ImportDeclaration[source.value='react'][specifiers.0.type='ImportSpecifier']",
+        message: "Prefer namespaced import for React `import * as React from 'react'`.",
+      },
     ],
     // Turning react/jsx-key back on.
     // https://github.com/airbnb/javascript/blob/5155aa5fc1ea9bb2c6493a06ddbd5c7a05414c86/packages/eslint-config-airbnb/rules/react.js#L94

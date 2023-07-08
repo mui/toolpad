@@ -29,46 +29,10 @@ module.exports = {
       },
     ],
     'no-restricted-syntax': [
-      'error',
-      // From https://github.com/airbnb/javascript/blob/d8cb404da74c302506f91e5928f30cc75109e74d/packages/eslint-config-airbnb-base/rules/style.js#L333
-      {
-        selector: 'ForInStatement',
-        message:
-          'for..in loops iterate over the entire prototype chain, which is virtually never what you want. Use Object.{keys,values,entries}, and iterate over the resulting array.',
-      },
-      // Too opinionated
-      // {
-      //   selector: 'ForOfStatement',
-      //   message:
-      //     'iterators/generators require regenerator-runtime, which is too heavyweight for this guide to allow them. Separately, loops should be avoided in favor of array iterations.',
-      // },
-      {
-        selector: 'LabeledStatement',
-        message:
-          'Labels are a form of GOTO; using them makes code confusing and hard to maintain and understand.',
-      },
-      {
-        selector: 'WithStatement',
-        message:
-          '`with` is disallowed in strict mode because it makes code impossible to predict and optimize.',
-      },
-      // See https://github.com/jsx-eslint/eslint-plugin-react/issues/2073
-      {
-        selector:
-          ":matches(JSXElement, JSXFragment) > JSXExpressionContainer > LogicalExpression[operator='&&']",
-        message:
-          "Please use `condition ? <Jsx /> : null`. Otherwise, there is a chance of rendering '0' instead of '' in some cases. Context: https://stackoverflow.com/q/53048037",
-      },
-
-      {
-        selector:
-          "ImportDeclaration[source.value='react'][specifiers.0.type='ImportDefaultSpecifier']",
-        message: "Default React import not allowed. Use `import * as React from 'react'`.",
-      },
-      {
-        selector: "ImportDeclaration[source.value='react'][specifiers.0.type='ImportSpecifier']",
-        message: "Prefer namespaced import for React. Use `import * as React from 'react'`.",
-      },
+      ...baseline.rules['no-restricted-syntax'].filter((rule) => {
+        // Too opinionated for Toolpad
+        return rule?.selector !== 'ForOfStatement';
+      }),
     ],
     // Turning react/jsx-key back on.
     // https://github.com/airbnb/javascript/blob/5155aa5fc1ea9bb2c6493a06ddbd5c7a05414c86/packages/eslint-config-airbnb/rules/react.js#L94

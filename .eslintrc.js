@@ -62,14 +62,6 @@ module.exports = {
   },
   overrides: [
     {
-      files: ['packages/toolpad-app/**/*'],
-      extends: ['plugin:@next/next/recommended'],
-      rules: {
-        '@next/next/no-html-link-for-pages': ['error', 'packages/toolpad-app/pages/'],
-        '@next/next/no-img-element': 'off',
-      },
-    },
-    {
       files: [
         'packages/create-toolpad-app/**/*',
         'packages/toolpad/**/*',

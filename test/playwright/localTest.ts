@@ -30,7 +30,7 @@ interface WithAppOptions {
   // Template to be used as the starting point of the project folder toolpad is running in
   // This will copied to the temporary folder
   template?: string;
-  // Run toolpad next.js app in local dev mode
+  // Run toolpad editor app in local dev mode
   toolpadDev?: boolean;
   setup?: (ctx: SetupContext) => Promise<void>;
   // Extra environment variables when running Toolpad

@@ -3,7 +3,7 @@ import { Fade, styled } from '@mui/material';
 import { NodeId } from '@mui/toolpad-core';
 import createCache from '@emotion/cache';
 import { CacheProvider } from '@emotion/react';
-import ReactDOM from 'react-dom';
+import * as ReactDOM from 'react-dom';
 import invariant from 'invariant';
 import * as appDom from '../../../appDom';
 import { TOOLPAD_BRIDGE_GLOBAL } from '../../../constants';

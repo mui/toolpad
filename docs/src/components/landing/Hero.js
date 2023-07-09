@@ -16,20 +16,23 @@ function TypingAnimation() {
   const words = ['APIs', 'scripts', 'SQL'];
   const [text, setText] = useState('');
   const [fullText, setFullText] = useState(words[0]);
-  const [index, setIndex] = useState(0);
+  const [letterIndex, setLetterIndex] = useState(0);
+  const [wordIndex, setWordIndex] = useState(0);
 
   const l = words.length;
   React.useEffect(() => {
-    if (index < fullText.length) {
+    if (letterIndex < fullText.length) {
       setTimeout(() => {
-        setText(text + fullText[index]);
-        setIndex(index + 1);
+        setText(text + fullText[letterIndex]);
+        setLetterIndex(letterIndex + 1);
       }, 100);
     } else {
       setTimeout(() => {
-        setFullText(words[Math.floor(Math.random() * l)]);
+        const nextIndex = (wordIndex + 1) % l;
+        setWordIndex(nextIndex);
+        setFullText(words[nextIndex]);
         setText('');
-        setIndex(0);
+        setLetterIndex(0);
       }, 2000);
     }
   });

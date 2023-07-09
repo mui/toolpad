@@ -1,5 +1,3 @@
-import { createFunction } from '@mui/toolpad/server';
-
 let nextId = 1;
 
 function generateId(): number {
@@ -86,82 +84,23 @@ export async function getCustomers() {
   return customers;
 }
 
-const customerSchema = {
-  type: 'object' as const,
-  properties: {
-    name: {
-      type: 'string' as const,
-    },
-    account_creation_date: {
-      type: 'string' as const,
-    },
-    country_of_residence: {
-      type: 'string' as const,
-    },
-    phone_number: {
-      type: 'number' as const,
-    },
-    email: {
-      type: 'string' as const,
-    },
-    address: {
-      type: 'string' as const,
-    },
-    gender: {
-      type: 'string' as const,
-      enum: ['Male', 'Female', 'Other'],
-    },
-  },
-};
+export async function addCustomer(values: Omit<Customer, 'id'>) {
+  const newCustomer = { id: generateId(), ...values };
+  customers.push(newCustomer);
+  return newCustomer;
+}
 
-export const addCustomer = createFunction(
-  async ({ parameters }) => {
-    const newCustomer = {
-      id: generateId(),
-      ...parameters.values,
-    };
-    customers.push(newCustomer);
-    return newCustomer;
-  },
-  {
-    parameters: {
-      values: {
-        type: 'object',
-        schema: customerSchema,
-      },
-    },
-  },
-);
+export async function updateCustomer(id: number, values: Omit<Customer, 'id'>) {
+  const index = customers.findIndex((item) => item.id === id);
 
-export const updateCustomer = createFunction(
-  async ({ parameters }) => {
-    const index = customers.findIndex((item) => item.id === parameters.id);
+  if (customers[index]) {
+    Object.assign(customers[index], values);
+  }
 
-    if (customers[index]) {
-      Object.assign(customers[index], parameters.values);
-    }
+  return customers[index];
+}
 
-    return customers[index];
-  },
-  {
-    parameters: {
-      id: { type: 'number' },
-      values: {
-        type: 'object',
-        schema: customerSchema,
-      },
-    },
-  },
-);
-
-export const deleteCustomer = createFunction(
-  async ({ parameters }) => {
-    const index = customers.findIndex((item) => item.id === parameters.id);
-    customers.splice(index, 1);
-  },
-  {
-    parameters: {
-      id: { type: 'number' },
-    },
-  },
-);
+export async function deleteCustomer(id: number) {
+  const index = customers.findIndex((item) => item.id === id);
+  customers.splice(index, 1);
+}

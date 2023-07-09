@@ -21,9 +21,11 @@ on how to get started contributing to MUI.
 
 ## Screenshots
 
-All Toolpad screenshots and videos in the docs must be made with the Toolpad theme in light mode.
+Some ground rules to ensure and maintain consistency in our documentation screenshots:
 
-For consistency, screenshots of the full browser viewport will always be at 1440x796 DPR:2
-You can check your size with https://whatismyviewport.com/. If all is well it should look like:
+- screenshots of the full browser viewport will always be at 1440x796 DPR:2
+  You can check your size with https://whatismyviewport.com/. If all is well it should look like:
 
-![whatismyviewport](./public/static/toolpad/docs/whatismyviewport.png)
+  ![whatismyviewport](./public/static/toolpad/docs/whatismyviewport.png)
+
+- In order to maintain consistency across all screenshots we will use the same theme for editor and canvas when taking screenshots. As the default dark theme doesn't look that great in combination with the editor theme, we will use the light theme for all screenshots.

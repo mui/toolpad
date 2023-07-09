@@ -128,6 +128,11 @@ jobs:
           command: |
             yarn jsonSchemas
             git diff --exit-code
+      - run:
+          name: '`yarn docs:build:api` changes committed?'
+          command: |
+            yarn docs:build:api
+            git diff --exit-code
 
   test_unit:
     <<: *defaults
@@ -145,11 +150,6 @@ jobs:
       - run:
           name: 'Build packages'
           command: yarn release:build
-      - run:
-          name: '`yarn docs:build:api` changes committed?'
-          command: |
-            yarn docs:build:api
-            git diff --exit-code
       - save_cache:
           name: Save Next.js cache
           key: v0-next-{{ checksum "yarn.lock" }}

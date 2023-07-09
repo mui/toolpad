@@ -274,6 +274,7 @@ export function createViteConfig({
         'react/jsx-dev-runtime',
         'react/jsx-runtime',
         'superjson',
+        'zod',
       ],
     },
     appType: 'custom',

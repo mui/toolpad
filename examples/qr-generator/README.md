@@ -8,9 +8,9 @@
 
 This app demonstrates following capabilities of Toolpad:
 
-1. Using a custom function that uses [createFunction](https://mui.com/toolpad/reference/api/create-function/) API
-2. Importing an external npm package
-3. Using a TextInput and Image component
+1. Using a custom function that takes parameters.
+2. Importing an external npm package.
+3. Using a TextInput and Image component.
 4. Binding a TextInput component with a query parameter.
 
 [Check out the source code](https://github.com/mui/mui-toolpad/tree/master/examples/qr-generator)

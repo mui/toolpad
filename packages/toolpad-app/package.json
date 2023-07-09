@@ -95,7 +95,7 @@
     "mime": "3.0.0",
     "mysql2": "3.4.3",
     "nanoid": "4.0.2",
-    "next": "13.4.7",
+    "next": "13.4.9",
     "node-fetch": "2.6.12",
     "node-fetch-har": "1.0.1",
     "open-editor": "4.0.0",

@@ -92,7 +92,7 @@
     "@types/json-schema": "7.0.12",
     "@types/react-is": "18.2.1",
     "cpy-cli": "5.0.0",
-    "cross-fetch": "3.1.7",
+    "cross-fetch": "3.1.8",
     "gm": "1.25.0",
     "typescript": "5.1.6",
     "typescript-to-proptypes": "2.2.1"

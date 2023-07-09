@@ -150,7 +150,7 @@
     "eslint-plugin-import": "2.27.5",
     "formidable": "3.5.0",
     "get-port": "7.0.0",
-    "monaco-editor": "0.39.0",
+    "monaco-editor": "0.40.0",
     "react-devtools-inline": "4.27.8",
     "react-transition-group": "4.4.5",
     "typescript": "5.1.6",

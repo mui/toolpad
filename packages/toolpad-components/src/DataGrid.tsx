@@ -19,6 +19,7 @@ import {
   useGridSelector,
   getGridDefaultColumnTypes,
   GridColTypeDef,
+  LicenseInfo,
 } from '@mui/x-data-grid-pro';
 import * as React from 'react';
 import { useNode, createComponent, useComponents } from '@mui/toolpad-core';
@@ -33,12 +34,22 @@ import {
   Tooltip,
   Popover,
 } from '@mui/material';
-import { getObjectKey } from '@mui/toolpad-core/objectKey';
+import { getObjectKey } from '@mui/toolpad-utils/objectKey';
 import { errorFrom } from '@mui/toolpad-utils/errors';
-import { hasImageExtension } from '@mui/toolpad-core/path';
+import { hasImageExtension } from '@mui/toolpad-utils/path';
 import { ErrorBoundary, FallbackProps } from 'react-error-boundary';
-import { SX_PROP_HELPER_TEXT } from './constants.js';
-import ErrorOverlay from './components/ErrorOverlay.js';
+import { SX_PROP_HELPER_TEXT } from './constants';
+import ErrorOverlay from './components/ErrorOverlay';
+
+if (typeof window !== 'undefined') {
+  const licenseKey = window.document.querySelector<HTMLMetaElement>(
+    'meta[name="toolpad-x-license"]',
+  )?.content;
+
+  if (licenseKey) {
+    LicenseInfo.setLicenseKey(licenseKey);
+  }
+}
 
 const DEFAULT_COLUMN_TYPES = getGridDefaultColumnTypes();
 

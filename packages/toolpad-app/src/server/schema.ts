@@ -1,3 +1,4 @@
+import { SimplePaletteColorOptions, ThemeOptions } from '@mui/material';
 import { z } from 'zod';
 
 export const API_VERSION = 'v1';
@@ -286,17 +287,34 @@ export const pageSchema = toolpadObjectSchema(
   }),
 );
 
+const simplePaletteColorOptionsSchema: z.ZodType<SimplePaletteColorOptions> = z.object({
+  main: z.string(),
+  light: z.string().optional(),
+  dark: z.string().optional(),
+  contrastText: z.string().optional(),
+});
+
+const themeOptionsSchema: z.ZodType<ThemeOptions> = z
+  .object({
+    // TODO: expand to full MUI theme object
+    palette: z
+      .object({
+        mode: z.union([z.literal('light'), z.literal('dark')]).optional(),
+        primary: simplePaletteColorOptionsSchema.optional(),
+        secondary: simplePaletteColorOptionsSchema.optional(),
+      })
+      .passthrough(),
+  })
+  .passthrough();
+
 export type Page = z.infer<typeof pageSchema>;
 
 export const themeSchema = toolpadObjectSchema(
   'theme',
   z.object({
-    'palette.mode': z
-      .union([z.literal('light'), z.literal('dark')])
+    options: themeOptionsSchema
       .optional()
-      .describe('The MUI theme palette mode.'),
-    'palette.primary.main': z.string().optional().describe('The primary theme color.'),
-    'palette.secondary.main': z.string().optional().describe('The secondary theme color.'),
+      .describe("The ThemeOptions object that gets fed into MUI's createTheme function."),
   }),
 );
 
@@ -317,5 +335,6 @@ export const META = {
     Template: templateSchema,
     NameStringValuePair: nameStringValuePairSchema,
     BindableNameStringValue: bindableNameStringValueSchema,
+    SimplePaletteColorOptions: simplePaletteColorOptionsSchema,
   },
 };

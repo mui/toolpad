@@ -31,7 +31,6 @@ test('bindings', async ({ page }) => {
   await expect(page.getByText('-test2-')).toBeVisible();
 });
 
-
 test('global scope', async ({ page }) => {
   const runtimeModel = new ToolpadRuntime(page);
   await runtimeModel.gotoPage('globalScope');

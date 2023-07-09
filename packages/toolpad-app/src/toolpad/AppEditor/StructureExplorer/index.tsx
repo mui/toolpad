@@ -2,8 +2,8 @@ import * as React from 'react';
 import { NodeId } from '@mui/toolpad-core';
 import { Box, Typography } from '@mui/material';
 import TreeView from '@mui/lab/TreeView';
-import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
-import ArrowRightIcon from '@mui/icons-material/ArrowRight';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import TreeItem, { TreeItemProps } from '@mui/lab/TreeItem';
 import * as appDom from '../../../appDom';
 import { useDom, useDomApi, useAppState, useAppStateApi } from '../../AppState';
@@ -51,7 +51,7 @@ function CustomTreeItem(
     <TreeItem
       key={node.id}
       label={
-        <Box sx={{ display: 'flex', alignItems: 'center', p: 0.5, pr: 0 }}>
+        <Box sx={{ display: 'flex', alignItems: 'center', p: 0.2, pr: 0 }}>
           <ComponentIcon
             id={node.attributes.component}
             kind="builtIn"
@@ -69,19 +69,6 @@ function CustomTreeItem(
             helperText={nodeNameError}
             sx={{ flexGrow: 1 }}
           />
-          {/* <Typography
-            variant="body2"
-            sx={{ fontWeight: 'inherit', flexGrow: 1 }}
-            noWrap
-            onMouseEnter={(event: React.MouseEvent<HTMLElement>) =>
-              onHover ? onHover(event, node.id) : null
-            }
-            onMouseLeave={(event: React.MouseEvent<HTMLElement>) =>
-              onMouseLeave ? onMouseLeave(event) : null
-            }
-          >
-            {node.name}
-          </Typography> */}
         </Box>
       }
       {...other}
@@ -216,8 +203,8 @@ export default function PageStructureExplorer() {
   return (
     <TreeView
       aria-label="file system navigator"
-      defaultCollapseIcon={<ArrowDropDownIcon />}
-      defaultExpandIcon={<ArrowRightIcon />}
+      defaultCollapseIcon={<ExpandMoreIcon sx={{ fontSize: '0.9rem', opacity: 0.5 }} />}
+      defaultExpandIcon={<ChevronRightIcon sx={{ fontSize: '0.9rem', opacity: 0.5 }} />}
       expanded={Array.from(expandedDomNodeIdSet)}
       selected={selectedDomNodeId as string}
       onNodeSelect={handleNodeSelect}

@@ -8,11 +8,11 @@ import {
 } from '@mui/material';
 import * as React from 'react';
 import invariant from 'invariant';
-import * as appDom from '../../../appDom';
-import DialogForm from '../../../components/DialogForm';
-import useEvent from '../../../utils/useEvent';
-import { useAppStateApi, useDom } from '../../AppState';
-import { useNodeNameValidation } from './validation';
+import * as appDom from '../../appDom';
+import DialogForm from '../../components/DialogForm';
+import useEvent from '../../utils/useEvent';
+import { useAppStateApi, useDom } from '../AppState';
+import { useNodeNameValidation } from './HierarchyExplorer/validation';
 
 const DEFAULT_NAME = 'page';
 

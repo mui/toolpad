@@ -2,7 +2,7 @@
 
 <p class="description">An admin application to showcase how CRUD operations work in Toolpad.</p>
 
-<img alt="Building an application on Toolpad " src="docs/public/static/toolpad/marketing/admin-app.png" style="border: 1px solid;" loading="lazy" width="2048" height="1536" />
+<img alt="Building an application on Toolpad " src="../../docs/public/static/toolpad/marketing/admin-app.png" style="border: 1px solid;" loading="lazy" width="2048" height="1536" />
 
 [Open in CodeSandbox](https://codesandbox.io/p/sandbox/github/mui/mui-toolpad/tree/master/examples/admin-app)
 

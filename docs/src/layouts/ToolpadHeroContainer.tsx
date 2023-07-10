@@ -13,8 +13,7 @@ export default function HeroContainer({
     <Container
       sx={{
         transition: '0.3s',
-        pt: { xs: 4, sm: 12 },
-        pb: { xs: 4, sm: 16 },
+        py: { xs: 4, sm: 12 },
         display: 'flex',
         flexDirection: { xs: 'column', sm: 'row' },
         justifyContent: 'space-between',

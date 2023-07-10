@@ -23,7 +23,7 @@ const VideoContainer = styled(Box)(({ theme }) => [
     width: '100%',
     height: '100%',
     borderRadius: theme.shape.borderRadius,
-    padding: 8,
+    padding: 12,
     background: `linear-gradient(230deg, ${theme.palette.primary[50]} 0%, ${alpha(
       theme.palette.primary[100],
       0.2,

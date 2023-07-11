@@ -6,25 +6,20 @@ import HighlightedCode from 'docs/src/modules/components/HighlightedCode';
 import MarkdownElement from 'docs/src/components/markdown/MarkdownElement';
 
 export const componentCode = `
-import { createQuery } from '@mui/toolpad/server';
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient, Prisma } from '@prisma/client';
 
 const prisma = new PrismaClient();
 
-export async function newUser() {
-  return await prisma.user.create({
-    data: {
-      name: 'Alice',
-      email: 'alice@prisma.io',
-      profession: 'teacher',
-    },
-  });
+export async function getUsers() {
+  return prisma.user.findMany();
 }
 
-export async function getUser(profession: string) {
-  return prisma.user.findMany({
-    where: { profession },
-  });
+export async function addUser(user: Prisma.UserCreateInput) {
+  return prisma.user.create({ data: user });
+}
+
+export async function deleteUser(id: number) {
+  return prisma.user.delete({ where: { id } });
 }
 `;
 

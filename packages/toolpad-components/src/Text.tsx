@@ -11,7 +11,7 @@ import {
 import { createComponent, useNode } from '@mui/toolpad-core';
 import ErrorIcon from '@mui/icons-material/Error';
 import { errorFrom } from '@mui/toolpad-utils/errors';
-import { SX_PROP_HELPER_TEXT } from './constants.js';
+import { SX_PROP_HELPER_TEXT } from './constants';
 
 const Markdown = React.lazy(async () => import('markdown-to-jsx'));
 
@@ -248,6 +248,7 @@ function TextContent({ value, loading, sx, variant }: TextContentProps) {
         whiteSpace: 'pre-wrap',
         overflowWrap: 'break-word',
       }}
+      variant={variant}
       onDoubleClick={() => {
         if (nodeRuntime) {
           const selection = window.getSelection();

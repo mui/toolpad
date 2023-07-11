@@ -1,11 +1,11 @@
 import Button from '@mui/material/Button';
-import React from 'react';
-import ReactDOM from 'react-dom/client';
+import * as React from 'react';
+import * as ReactDOM from 'react-dom/client';
 import { ToolpadComponents } from '@mui/toolpad-core';
 import { Emitter } from '@mui/toolpad-utils/events';
 import createCache from '@emotion/cache';
 import { CacheProvider } from '@emotion/react';
-import RuntimeToolpadApp, { ToolpadAppProps } from './index';
+import RuntimeToolpadApp, { ToolpadAppProps } from './ToolpadApp';
 import { RuntimeState } from '../types';
 
 let componentsStore: ToolpadComponents = {};

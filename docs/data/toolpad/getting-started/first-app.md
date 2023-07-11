@@ -31,13 +31,13 @@ Interactive walkthrough of the app building process:
 
 1. Create a new application
 
-   ```sh
+   ```bash
    npx create-toolpad-app dog-app
    ```
 
 1. Start the development server
 
-   ```sh
+   ```bash
    cd dog-app
    npm run dev
    ```

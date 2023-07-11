@@ -29,6 +29,7 @@ import BindableEditor from '../AppEditor/PageEditor/BindableEditor';
 import { updateArray, remove } from '../../utils/immutability';
 import FlexFill from '../../components/FlexFill';
 import ColorTool from '../../components/ColorTool';
+import { createToolpadAppTheme } from '../../runtime/AppThemeProvider';
 
 function ChartDataPropEditor({
   nodeId,
@@ -42,6 +43,7 @@ function ChartDataPropEditor({
   const jsBrowserRuntime = useBrowserJsRuntime();
 
   const theme = useTheme();
+  const appTheme = React.useMemo(() => createToolpadAppTheme(dom), [dom]);
 
   const node = nodeId ? (appDom.getMaybeNode(dom, nodeId) as appDom.ElementNode) : null;
 
@@ -62,10 +64,11 @@ function ChartDataPropEditor({
           data: [],
           xKey: 'x',
           yKey: 'y',
+          color: appTheme.palette.primary.main,
         },
       ]);
     }
-  }, [node, onChange, value]);
+  }, [appTheme, node, onChange, value]);
 
   const handleDataSeriesClick = React.useCallback(
     (index: number) => (event: React.MouseEvent<HTMLElement>) => {

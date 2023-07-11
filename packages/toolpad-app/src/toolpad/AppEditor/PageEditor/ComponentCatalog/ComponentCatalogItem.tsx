@@ -59,7 +59,7 @@ const iconMap = new Map<string, React.ComponentType<SvgIconProps>>([
   ['Drawer', ViewSidebarIcon],
   ['Icon', MoodIcon],
   ['Html', HtmlIcon],
-  ['Statistic', TagIcon],
+  ['Metric', TagIcon],
 ]);
 
 type ComponentItemKind = 'future' | 'builtIn' | 'create' | 'custom';

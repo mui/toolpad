@@ -46,6 +46,10 @@
           "pathname": "/toolpad/reference/components/list"
         },
         {
+          "title": "Metric",
+          "pathname": "/toolpad/reference/components/metric"
+        },
+        {
           "title": "PageColumn",
           "pathname": "/toolpad/reference/components/page-column"
         },
@@ -64,10 +68,6 @@
         {
           "title": "Stack",
           "pathname": "/toolpad/reference/components/stack"
-        },
-        {
-          "title": "Statistic",
-          "pathname": "/toolpad/reference/components/statistic"
         },
         {
           "title": "Tabs",

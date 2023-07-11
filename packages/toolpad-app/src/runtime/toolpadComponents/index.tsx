@@ -48,7 +48,7 @@ export const INTERNAL_COMPONENTS = new Map<string, ToolpadComponentDefinition>([
   ['Paper', { displayName: 'Paper', builtIn: 'Paper' }],
   ['Tabs', { displayName: 'Tabs', builtIn: 'Tabs' }],
   ['Container', { displayName: 'Container', builtIn: 'Container' }],
-  ['Statistic', { displayName: 'Statistic', builtIn: 'Statistic' }],
+  ['Metric', { displayName: 'Metric', builtIn: 'Metric' }],
   [FORM_COMPONENT_ID, { displayName: 'Form', builtIn: 'Form' }],
 ]);
 

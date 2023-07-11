@@ -11,17 +11,3 @@ spec:
           name: button
           props:
             content: page1Button
-    - component: PageRow
-      name: pageRow1
-      children:
-        - component: Statistic
-          name: statistic
-          props:
-            colorScale:
-              stops:
-                [
-                  { value: 100, color: "#009688" },
-                  { value: 510, color: "#e91e63" }
-                ]
-              base: "#4caf50"
-            value: -100

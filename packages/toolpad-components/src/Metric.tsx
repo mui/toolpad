@@ -18,7 +18,7 @@ export interface ColorScale {
   stops?: ColorScaleStop[];
 }
 
-interface StatisticProps {
+interface MetricProps {
   value: number;
   loading?: boolean;
   numberFormat?: NumberFormat;
@@ -43,7 +43,7 @@ function resolveColor(colorScale: ColorScale, value: number) {
   return color;
 }
 
-function Statistic({
+function Metric({
   fullWidth,
   colorScale,
   loading,
@@ -51,7 +51,7 @@ function Statistic({
   numberFormat,
   label,
   caption,
-}: StatisticProps) {
+}: MetricProps) {
   const format = React.useMemo(() => createFormat(numberFormat), [numberFormat]);
 
   const color = React.useMemo(
@@ -78,8 +78,8 @@ function Statistic({
   );
 }
 
-export default createComponent(Statistic, {
-  helperText: 'The Statistic component lets you display values.',
+export default createComponent(Metric, {
+  helperText: 'The Metric component lets you display values.',
   loadingPropSource: ['value'],
   loadingProp: 'loading',
   argTypes: {

@@ -1,10 +1,10 @@
 <!-- This file has been auto-generated using `yarn docs:build:api`. -->
 
-# Statistic
+# Metric
 
-<p class="description">API docs for the Toolpad Statistic component.</p>
+<p class="description">API docs for the Toolpad Metric component.</p>
 
-The Statistic component lets you display values.
+The Metric component lets you display values.
 
 ## Properties
 

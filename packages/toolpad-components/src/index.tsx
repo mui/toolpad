@@ -32,8 +32,8 @@ export { default as Container } from './Container';
 
 export { default as Form } from './Form';
 
-export { default as Statistic } from './Statistic';
-export type { ColorScale, ColorScaleStop } from './Statistic';
+export { default as Metric } from './Metric';
+export type { ColorScale, ColorScaleStop } from './Metric';
 
 export { CUSTOM_COLUMN_TYPES, inferColumns, parseColumns } from './DataGrid';
 export type { SerializableGridColumn, SerializableGridColumns } from './DataGrid';

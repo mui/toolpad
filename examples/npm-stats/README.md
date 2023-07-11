@@ -1,8 +1,8 @@
 # KPI tracker
 
-<p class="description">This BI dashboard shows how to track a KPI from a third party data source.</p>
+<p class="description">This Analytics dashboard shows how to track a KPI from a third party data source.</p>
 
-{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/marketing/npm-stats.png", "alt": "BI dashboard", "caption": "BI dashboard showing download stats of Toolpad NPM package"}}
+{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/marketing/npm-stats.png", "alt": "Analytics dashboard", "caption": "Analytics dashboard showing download stats of Toolpad NPM package"}}
 
 [Open in CodeSandbox](https://codesandbox.io/p/sandbox/github/mui/mui-toolpad/tree/master/examples/npm-stats)
 

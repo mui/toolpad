@@ -1,6 +1,6 @@
 # QR code generator
 
-<p class="description">A basic Toolpad application that can be used to turn any text or URL into a QR code.</p>
+<p class="description">A simple Toolpad application that can be used to turn any text or URL into a QR code.</p>
 
 {{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/marketing/qr-generator.png", "alt": "QR code generator", "caption": "QR code generator"  }}
 

@@ -174,3 +174,4 @@ spec:
                 type: number
                 width: 152
                 headerName: No. of downloads
+  display: standalone

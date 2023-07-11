@@ -18,9 +18,9 @@ import GradientText from 'docs/src/components/typography/GradientText';
 import ROUTES from '../../route';
 
 const USE_CASE_IMAGES = new Map([
-  ['panel1', '/static/toolpad/marketing/qr-generator.png'],
+  ['panel1', '/static/toolpad/marketing/npm-stats.png'],
   ['panel2', '/static/toolpad/marketing/admin-app.png'],
-  ['panel3', '/static/toolpad/marketing/npm-stats.png'],
+  ['panel3', '/static/toolpad/marketing/qr-generator.png'],
 ]);
 
 const StyledAccordion = styled(Accordion)(({ theme }) => [
@@ -119,18 +119,18 @@ export default function CardGrid() {
                 id="use-case-header"
               >
                 <AccordionHeader
-                  title="Utility apps"
-                  icon={<HandymanRoundedIcon fontSize="small" color="primary" />}
+                  title="Analytics dashboard"
+                  icon={<DashboardRoundedIcon fontSize="small" color="primary" />}
                 />
               </StyledAccordionSummary>
               <AccordionDetails sx={{ p: 0, mb: 2 }}>
                 <Typography variant="body2" color="text.secondary">
-                  Provide the stakeholders with simple apps to manage their daily operations. You
-                  can quickly build an app on Toolpad by calling APIs or writing custom functions.
-                  Your app remains secure as the code never leaves your network, and you can
-                  securely deploy it to any service you choose.
+                  Build Analytics dashboards to slice and dice any metric across various dimensions.
+                  Further, use them to monitor KPIs, track business goals, and identify trends and
+                  opportunities. Toolpad allows you to combine data from multiple sources and bind
+                  it by writing JavaScript anywhere.
                 </Typography>
-                <Link href={ROUTES.toolpadUtilityAppExample} variant="body2" sx={{ mt: 1 }}>
+                <Link href={ROUTES.toolpadBIExample} variant="body2" sx={{ mt: 1 }}>
                   View more
                   <KeyboardArrowRightRounded fontSize="small" />
                 </Link>
@@ -177,18 +177,18 @@ export default function CardGrid() {
                 id="use-case-header"
               >
                 <AccordionHeader
-                  title="BI dashboard"
-                  icon={<DashboardRoundedIcon fontSize="small" color="primary" />}
+                  title="Utility apps"
+                  icon={<HandymanRoundedIcon fontSize="small" color="primary" />}
                 />
               </StyledAccordionSummary>
               <AccordionDetails sx={{ p: 0, mb: 2 }}>
                 <Typography variant="body2" color="text.secondary">
-                  Build BI dashboards to slice and dice any metric across various dimensions.
-                  Further, use them to monitor KPIs, track business goals, and identify trends and
-                  opportunities. Toolpad allows you to combine data from multiple sources and bind
-                  it by writing JavaScript anywhere.
+                  Provide the stakeholders with simple apps to manage their daily operations. You
+                  can quickly build an app on Toolpad by calling APIs or writing custom functions.
+                  Your app remains secure as the code never leaves your network, and you can
+                  securely deploy it to any service you choose.
                 </Typography>
-                <Link href={ROUTES.toolpadBIExample} variant="body2" sx={{ mt: 1 }}>
+                <Link href={ROUTES.toolpadUtilityAppExample} variant="body2" sx={{ mt: 1 }}>
                   View more
                   <KeyboardArrowRightRounded fontSize="small" />
                 </Link>

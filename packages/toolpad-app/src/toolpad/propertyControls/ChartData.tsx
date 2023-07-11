@@ -30,6 +30,7 @@ import { updateArray, remove } from '../../utils/immutability';
 import FlexFill from '../../components/FlexFill';
 import ColorTool from '../../components/ColorTool';
 import { createToolpadAppTheme } from '../../runtime/AppThemeProvider';
+import ColorPicker from '../../components/ColorPicker';
 
 function ChartDataPropEditor({
   nodeId,
@@ -246,46 +247,11 @@ function ChartDataPropEditor({
                 value={editDataSeries?.yKey}
                 onChange={handleDataSeriesTextInputPropChange(dataSeriesEditIndex, 'yKey')}
               />
-              <Button
-                aria-describedby={colorPopoverId}
-                variant="outlined"
-                color="inherit"
-                fullWidth
-                onClick={handlColorClick}
-              >
-                color
-                <FlexFill />
-                <Box
-                  sx={{
-                    ml: 2,
-                    p: '2px 8px',
-                    background: editDataSeries?.color,
-                    color: editDataSeries?.color
-                      ? theme.palette.getContrastText(editDataSeries.color)
-                      : undefined,
-                    borderRadius: 1,
-                  }}
-                >
-                  {editDataSeries?.color}
-                </Box>
-              </Button>
-              <Popover
-                id={isColorPopoverOpen ? colorPopoverId : undefined}
-                open={isColorPopoverOpen}
-                anchorEl={colorPopoverAnchorElement}
-                onClose={handleColorPopoverClose}
-                anchorOrigin={{
-                  vertical: 'bottom',
-                  horizontal: 'left',
-                }}
-              >
-                <ColorTool
-                  sx={{ m: 2 }}
-                  label="color"
-                  value={editDataSeries?.color}
-                  onChange={handleDataSeriesColorChange(dataSeriesEditIndex)}
-                />
-              </Popover>
+              <ColorPicker
+                label="color"
+                value={editDataSeries?.color}
+                onChange={handleDataSeriesColorChange(dataSeriesEditIndex)}
+              />
             </Stack>
           </Box>
         ) : null}

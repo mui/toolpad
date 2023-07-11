@@ -100,7 +100,7 @@ export default function Hero() {
         <CodeBlock />
         <Box
           component="img"
-          src="/static/toolpad/marketing/with-prisma.png" // image will be replaced for a better one
+          src="/static/toolpad/marketing/with-prisma-hero.png" // image will be replaced for a better one
           sx={[
             (theme) => ({
               position: 'absolute',

@@ -24,7 +24,7 @@ interface MetricProps {
   numberFormat?: NumberFormat;
   label?: string;
   caption?: string;
-  colorScale?: ColorScale;
+  conditionalFormat?: ColorScale;
   fullWidth?: boolean;
 }
 
@@ -45,7 +45,7 @@ function resolveColor(colorScale: ColorScale, value: number) {
 
 function Metric({
   fullWidth,
-  colorScale,
+  conditionalFormat,
   loading,
   value,
   numberFormat,
@@ -55,8 +55,8 @@ function Metric({
   const format = React.useMemo(() => createFormat(numberFormat), [numberFormat]);
 
   const color = React.useMemo(
-    () => (colorScale ? resolveColor(colorScale, value) : undefined),
-    [colorScale, value],
+    () => (conditionalFormat ? resolveColor(conditionalFormat, value) : undefined),
+    [conditionalFormat, value],
   );
 
   return (
@@ -95,6 +95,7 @@ export default createComponent(Metric, {
     },
     numberFormat: {
       helperText: 'The number format for the value.',
+      label: 'Number format',
       type: 'object',
       schema: NUMBER_FORMAT_SCHEMA,
       control: {
@@ -106,8 +107,9 @@ export default createComponent(Metric, {
       type: 'string',
       default: '',
     },
-    colorScale: {
+    conditionalFormat: {
       helperText: 'The color of the number, dependent on the value.',
+      label: 'Conditional format',
       type: 'object',
       schema: {
         type: 'object',

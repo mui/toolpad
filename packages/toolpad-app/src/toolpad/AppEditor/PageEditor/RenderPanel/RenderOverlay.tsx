@@ -141,7 +141,7 @@ function removeMaybeNode(dom: appDom.AppDom, nodeId: NodeId): appDom.AppDom {
   return dom;
 }
 
-function deleteOrphanedLayoutNodes(
+export function deleteOrphanedLayoutNodes(
   domBeforeChange: appDom.AppDom,
   domAfterChange: appDom.AppDom,
   movedOrDeletedNode: appDom.ElementNode,

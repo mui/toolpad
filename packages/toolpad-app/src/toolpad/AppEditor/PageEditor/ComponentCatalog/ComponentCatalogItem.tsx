@@ -28,6 +28,8 @@ import PlaceIcon from '@mui/icons-material/Place';
 import ViewSidebarIcon from '@mui/icons-material/ViewSidebar';
 import MoodIcon from '@mui/icons-material/Mood';
 import HtmlIcon from '@mui/icons-material/Html';
+import TableRowsIcon from '@mui/icons-material/TableRows';
+import ViewColumnIcon from '@mui/icons-material/ViewColumn';
 import { ButtonBase, SxProps } from '@mui/material';
 
 const iconMap = new Map<string, React.ComponentType<SvgIconProps>>([
@@ -58,6 +60,8 @@ const iconMap = new Map<string, React.ComponentType<SvgIconProps>>([
   ['Drawer', ViewSidebarIcon],
   ['Icon', MoodIcon],
   ['Html', HtmlIcon],
+  ['PageRow', TableRowsIcon],
+  ['PageColumn', ViewColumnIcon],
 ]);
 
 type ComponentItemKind = 'future' | 'builtIn' | 'create' | 'custom';

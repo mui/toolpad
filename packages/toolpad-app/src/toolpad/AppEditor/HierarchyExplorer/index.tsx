@@ -2,14 +2,16 @@ import { TreeView } from '@mui/lab';
 import { Typography, styled, Box, IconButton } from '@mui/material';
 import * as React from 'react';
 import TreeItem, { treeItemClasses, TreeItemProps } from '@mui/lab/TreeItem';
-import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
-import ArrowRightIcon from '@mui/icons-material/ArrowRight';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
+import AddIcon from '@mui/icons-material/Add';
 import { NodeId } from '@mui/toolpad-core';
 import clsx from 'clsx';
 import invariant from 'invariant';
 import * as appDom from '../../../appDom';
 import { useAppStateApi, useDom, useAppState } from '../../AppState';
+import CreatePageNodeDialog from './CreatePageNodeDialog';
 import useLocalStorageState from '../../../utils/useLocalStorageState';
 import NodeMenu from '../NodeMenu';
 import { DomView } from '../../../utils/domView';
@@ -44,6 +46,7 @@ type StyledTreeItemProps = TreeItemProps & {
   onCreate?: React.MouseEventHandler;
   labelIcon?: React.ReactNode;
   labelText: string;
+  createLabelText?: string;
   deleteLabelText?: string;
   duplicateLabelText?: string;
   settingsLabelText?: string;
@@ -54,9 +57,11 @@ function HierarchyTreeItem(props: StyledTreeItemProps) {
   const {
     labelIcon,
     labelText,
+    onCreate,
     onDeleteNode,
     onDuplicateNode,
     onSettingsNode,
+    createLabelText,
     deleteLabelText = 'Delete',
     duplicateLabelText = 'Duplicate',
     settingsLabelText = 'Settings',
@@ -67,11 +72,16 @@ function HierarchyTreeItem(props: StyledTreeItemProps) {
   return (
     <StyledTreeItem
       label={
-        <Box sx={{ display: 'flex', alignItems: 'center', p: 0.2, pr: 0 }}>
+        <Box sx={{ display: 'flex', alignItems: 'center', p: 0.1, pr: 0 }}>
           {labelIcon}
           <Typography variant="body2" sx={{ fontWeight: 'inherit', flexGrow: 1 }} noWrap>
             {labelText}
           </Typography>
+          {onCreate ? (
+            <IconButton aria-label={createLabelText} onClick={onCreate} size="small">
+              <AddIcon fontSize="inherit" />
+            </IconButton>
+          ) : null}
           {toolpadNodeId ? (
             <NodeMenu
               renderButton={({ buttonProps, menuProps }) => (
@@ -80,9 +90,10 @@ function HierarchyTreeItem(props: StyledTreeItemProps) {
                     [classes.treeItemMenuOpen]: menuProps.open,
                   })}
                   aria-label="Open hierarchy menu"
+                  size="small"
                   {...buttonProps}
                 >
-                  <MoreVertIcon sx={{ fontSize: '0.9rem' }} />
+                  <MoreVertIcon fontSize="inherit" />
                 </IconButton>
               )}
               nodeId={toolpadNodeId}
@@ -171,6 +182,13 @@ export default function HierarchyExplorer({ className }: HierarchyExplorerProps)
     }
   };
 
+  const [createPageDialogOpen, setCreatePageDialogOpen] = React.useState(0);
+  const handleCreatePageDialogOpen = React.useCallback((event: React.MouseEvent) => {
+    event.stopPropagation();
+    setCreatePageDialogOpen(Math.random());
+  }, []);
+  const handleCreatepageDialogClose = React.useCallback(() => setCreatePageDialogOpen(0), []);
+
   const handleDeletePage = React.useCallback(
     async (nodeId: NodeId) => {
       const deletedNode = appDom.getNode(dom, nodeId);
@@ -234,22 +252,36 @@ export default function HierarchyExplorer({ className }: HierarchyExplorerProps)
         expanded={expanded}
         onNodeToggle={handleToggle}
         multiSelect
-        defaultCollapseIcon={<ArrowDropDownIcon />}
-        defaultExpandIcon={<ArrowRightIcon />}
+        defaultCollapseIcon={<ExpandMoreIcon sx={{ fontSize: '0.9rem', opacity: 0.5 }} />}
+        defaultExpandIcon={<ChevronRightIcon sx={{ fontSize: '0.9rem', opacity: 0.5 }} />}
       >
-        {pages.map((page) => (
-          <HierarchyTreeItem
-            key={page.id}
-            nodeId={page.id}
-            toolpadNodeId={page.id}
-            aria-level={1}
-            labelText={page.name}
-            onDuplicateNode={handleDuplicateNode}
-            onDeleteNode={handleDeletePage}
-            onSettingsNode={handlePageSettingsNode}
-          />
-        ))}
+        <HierarchyTreeItem
+          nodeId=":pages"
+          aria-level={1}
+          labelText="Pages"
+          createLabelText="Create page"
+          onCreate={handleCreatePageDialogOpen}
+        >
+          {pages.map((page) => (
+            <HierarchyTreeItem
+              key={page.id}
+              nodeId={page.id}
+              toolpadNodeId={page.id}
+              aria-level={2}
+              labelText={page.name}
+              onDuplicateNode={handleDuplicateNode}
+              onDeleteNode={handleDeletePage}
+              onSettingsNode={handlePageSettingsNode}
+            />
+          ))}
+        </HierarchyTreeItem>
       </TreeView>
+
+      <CreatePageNodeDialog
+        key={createPageDialogOpen || undefined}
+        open={!!createPageDialogOpen}
+        onClose={handleCreatepageDialogClose}
+      />
     </HierarchyExplorerRoot>
   );
 }

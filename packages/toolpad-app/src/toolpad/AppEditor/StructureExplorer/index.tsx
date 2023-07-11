@@ -10,6 +10,11 @@ import { useDom, useDomApi, useAppState, useAppStateApi } from '../../AppState';
 import EditableText from '../../../components/EditableText';
 import { ComponentIcon } from '../PageEditor/ComponentCatalog/ComponentCatalogItem';
 import { useNodeNameValidation } from '../HierarchyExplorer/validation';
+import { deleteOrphanedLayoutNodes } from '../PageEditor/RenderPanel/RenderOverlay';
+import {
+  PAGE_ROW_COMPONENT_ID,
+  PAGE_COLUMN_COMPONENT_ID,
+} from '../../../runtime/toolpadComponents';
 
 function CustomTreeItem(
   props: TreeItemProps & {
@@ -50,6 +55,10 @@ function CustomTreeItem(
   return (
     <TreeItem
       key={node.id}
+      onMouseEnter={(event: React.MouseEvent<HTMLLIElement, MouseEvent>) => {
+        onHover?.(event, node.id);
+      }}
+      onMouseLeave={onMouseLeave}
       label={
         <Box sx={{ display: 'flex', alignItems: 'center', p: 0.2, pr: 0 }}>
           <ComponentIcon
@@ -92,6 +101,22 @@ function RecursiveSubTree({
     [dom, root],
   );
 
+  if (
+    (root.attributes.component === PAGE_ROW_COMPONENT_ID ||
+      root.attributes.component === PAGE_COLUMN_COMPONENT_ID) &&
+    children.length === 1
+  ) {
+    return children.map((childNode) => (
+      <RecursiveSubTree
+        key={childNode.id}
+        dom={dom}
+        root={childNode}
+        onHover={onHover}
+        onMouseLeave={onMouseLeave}
+      />
+    ));
+  }
+
   if (children.length) {
     return (
       <CustomTreeItem nodeId={root.id} node={root}>
@@ -127,6 +152,7 @@ function RecursiveSubTree({
       </TreeItem>
     );
   }
+
   return (
     <CustomTreeItem nodeId={root.id} node={root} onHover={onHover} onMouseLeave={onMouseLeave} />
   );
@@ -142,15 +168,15 @@ export default function PageStructureExplorer() {
   const currentPageNode = currentPageId ? appDom.getNode(dom, currentPageId, 'page') : null;
   const selectedDomNodeId = currentView.kind === 'page' ? currentView.selectedNodeId : '';
 
-  const selectedNodeParentId = React.useMemo(() => {
+  const selectedNodeAncestorIds = React.useMemo(() => {
     if (!selectedDomNodeId) {
-      return null;
+      return [];
     }
     const selectedNode = appDom.getMaybeNode(dom, selectedDomNodeId);
     if (selectedNode) {
-      return appDom.getParent(dom, selectedNode)?.id;
+      return appDom.getAncestors(dom, selectedNode).map((node) => node.id);
     }
-    return null;
+    return [];
   }, [dom, selectedDomNodeId]);
 
   const { children: rootChildren = [] } = React.useMemo(() => {
@@ -187,40 +213,74 @@ export default function PageStructureExplorer() {
 
   const handleNodeToggle = React.useCallback(
     (event: React.SyntheticEvent, nodeIds: string[]) => {
-      setExpandedDomNodeIds((prev) => {
-        const newIds = nodeIds.filter((id) => !prev.includes(id));
-        const retainedIds = prev.filter((id) => nodeIds.includes(id));
-        return [...retainedIds, ...newIds];
-      });
+      setExpandedDomNodeIds(nodeIds);
     },
     [setExpandedDomNodeIds],
   );
 
+  const handleNodeDelete = React.useCallback(
+    (event: React.KeyboardEvent<HTMLUListElement>) => {
+      // delete selected node if event.key is Backspace
+      if (event.key === 'Backspace') {
+        appStateApi.update(
+          (draft) => {
+            if (!selectedDomNodeId) {
+              return draft;
+            }
+            const toRemove = appDom.getMaybeNode(dom, selectedDomNodeId);
+            if (toRemove && appDom.isElement(toRemove)) {
+              draft = appDom.removeNode(draft, toRemove.id);
+              draft = deleteOrphanedLayoutNodes(dom, draft, toRemove);
+            }
+            return draft;
+            // return normalizePageRowColumnSizes(draft);
+          },
+          currentView.kind === 'page'
+            ? {
+                ...currentView,
+                selectedNodeId: null,
+              }
+            : currentView,
+        );
+      }
+    },
+    [dom, selectedDomNodeId, currentView, appStateApi],
+  );
+
   const expandedDomNodeIdSet = React.useMemo(() => {
-    return new Set([selectedNodeParentId as string, ...expandedDomNodeIds]);
-  }, [selectedNodeParentId, expandedDomNodeIds]);
+    return new Set([...selectedNodeAncestorIds, ...expandedDomNodeIds]);
+  }, [selectedNodeAncestorIds, expandedDomNodeIds]);
 
   return (
-    <TreeView
-      aria-label="file system navigator"
-      defaultCollapseIcon={<ExpandMoreIcon sx={{ fontSize: '0.9rem', opacity: 0.5 }} />}
-      defaultExpandIcon={<ChevronRightIcon sx={{ fontSize: '0.9rem', opacity: 0.5 }} />}
-      expanded={Array.from(expandedDomNodeIdSet)}
-      selected={selectedDomNodeId as string}
-      onNodeSelect={handleNodeSelect}
-      onNodeFocus={handleNodeFocus}
-      onNodeToggle={handleNodeToggle}
-      sx={{ height: 600, flexGrow: 1, maxWidth: 400, overflowY: 'auto' }}
-    >
-      {rootChildren.map((childNode) => (
-        <RecursiveSubTree
-          key={childNode.id}
-          dom={dom}
-          root={childNode}
-          onHover={handleNodeHover}
-          onMouseLeave={handleNodeBlur}
-        />
-      ))}
-    </TreeView>
+    <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'start', p: 1 }}>
+      <Typography
+        variant="body2"
+        sx={(theme) => ({ flexGrow: 1, fontWeight: theme.typography.fontWeightLight, pb: 0.5 })}
+      >
+        Components
+      </Typography>
+      <TreeView
+        aria-label="components explorer"
+        defaultCollapseIcon={<ExpandMoreIcon sx={{ fontSize: '0.9rem', opacity: 0.5 }} />}
+        defaultExpandIcon={<ChevronRightIcon sx={{ fontSize: '0.9rem', opacity: 0.5 }} />}
+        expanded={Array.from(expandedDomNodeIdSet)}
+        selected={selectedDomNodeId as string}
+        onNodeSelect={handleNodeSelect}
+        onNodeFocus={handleNodeFocus}
+        onNodeToggle={handleNodeToggle}
+        onKeyDown={handleNodeDelete}
+        sx={{ height: 600, flexGrow: 1, maxWidth: 400, overflowY: 'auto' }}
+      >
+        {rootChildren.map((childNode) => (
+          <RecursiveSubTree
+            key={childNode.id}
+            dom={dom}
+            root={childNode}
+            onHover={handleNodeHover}
+            onMouseLeave={handleNodeBlur}
+          />
+        ))}
+      </TreeView>
+    </Box>
   );
 }

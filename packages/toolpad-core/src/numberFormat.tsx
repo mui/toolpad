@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { JSONSchema7 } from 'json-schema';
-import { TextField, MenuItem, SxProps, Stack, styled } from '@mui/material';
+import { TextField, MenuItem, SxProps, Stack, styled, Box } from '@mui/material';
 
 const ACCEPTABLE_CURRENCY_REGEX = /^[a-zA-Z]{3}$/;
 
@@ -78,10 +78,16 @@ export const NUMBER_FORMAT_SCHEMA: JSONSchema7 = {
   ],
 };
 
-export const NUMBER_FORMAT_PRESETS = new Map<string, { options?: Intl.NumberFormatOptions }>([
+interface NumberFormatPreset {
+  label?: string;
+  options?: Intl.NumberFormatOptions;
+}
+
+export const NUMBER_FORMAT_PRESETS = new Map<string, NumberFormatPreset>([
   [
     'bytes',
     {
+      label: 'Bytes',
       options: {
         style: 'unit',
         maximumSignificantDigits: 3,
@@ -94,6 +100,7 @@ export const NUMBER_FORMAT_PRESETS = new Map<string, { options?: Intl.NumberForm
   [
     'percent',
     {
+      label: 'Percent',
       options: {
         style: 'percent',
       },
@@ -189,15 +196,22 @@ export interface NumberFormatEditorProps {
   onChange: (newValue?: NumberFormat) => void;
   disabled?: boolean;
   sx?: SxProps;
+  label?: string;
 }
 
-export function NumberFormatEditor({ disabled, value, onChange, sx }: NumberFormatEditorProps) {
+export function NumberFormatEditor({
+  label,
+  disabled,
+  value,
+  onChange,
+  sx,
+}: NumberFormatEditorProps) {
   return (
     <Stack sx={sx} gap={1}>
       <TextField
         select
         fullWidth
-        label="number format"
+        label={label ?? 'Number format'}
         value={formatNumberOptionValue(value)}
         disabled={disabled}
         onChange={(event) => {
@@ -227,41 +241,43 @@ export function NumberFormatEditor({ disabled, value, onChange, sx }: NumberForm
           onChange(numberFormat);
         }}
       >
-        <MenuItem value="plain">plain</MenuItem>
-        {Array.from(NUMBER_FORMAT_PRESETS.keys(), (type) => (
+        <MenuItem value="plain">Plain</MenuItem>
+        {Array.from(NUMBER_FORMAT_PRESETS, ([type, preset]) => (
           <MenuItem key={type} value={`preset:${type}`}>
-            {type}
+            {preset.label || type}
           </MenuItem>
         ))}
-        <MenuItem value="currency">currency</MenuItem>
+        <MenuItem value="currency">Currency</MenuItem>
         {/* TODO: Add support for <MenuItem value="custom">custom</MenuItem> */}
       </TextField>
 
-      {value?.kind === 'currency' ? (
-        <TextField
-          fullWidth
-          label="currency code"
-          value={value.currency}
-          disabled={disabled}
-          onChange={(event) => {
-            onChange({
-              ...value,
-              kind: 'currency',
-              currency: event.target.value,
-            });
-          }}
-          error={!!value.currency && !ACCEPTABLE_CURRENCY_REGEX.test(value.currency)}
-          helperText={
-            <React.Fragment>
-              ISO 4217 currency code. See the{' '}
-              <a target="_blank" href={CURRENCY_CODES_LIST_HELP_URL} rel="noreferrer">
-                curency code list
-              </a>{' '}
-              for available values.
-            </React.Fragment>
-          }
-        />
-      ) : null}
+      <Box sx={{ ml: 1, pl: 1, borderLeft: 1, borderColor: 'divider' }}>
+        {value?.kind === 'currency' ? (
+          <TextField
+            fullWidth
+            label="currency code"
+            value={value.currency}
+            disabled={disabled}
+            onChange={(event) => {
+              onChange({
+                ...value,
+                kind: 'currency',
+                currency: event.target.value,
+              });
+            }}
+            error={!!value.currency && !ACCEPTABLE_CURRENCY_REGEX.test(value.currency)}
+            helperText={
+              <React.Fragment>
+                ISO 4217 currency code. See the{' '}
+                <a target="_blank" href={CURRENCY_CODES_LIST_HELP_URL} rel="noreferrer">
+                  curency code list
+                </a>{' '}
+                for available values.
+              </React.Fragment>
+            }
+          />
+        ) : null}
+      </Box>
     </Stack>
   );
 }

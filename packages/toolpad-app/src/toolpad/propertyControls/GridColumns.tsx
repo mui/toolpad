@@ -247,42 +247,44 @@ function GridColumnsPropEditor({
                   ))}
                 </TextField>
 
-                {editedColumn.type === 'number' ? (
-                  <NumberFormatEditor
-                    disabled={disabled}
-                    value={editedColumn.numberFormat}
-                    onChange={(numberFormat) =>
-                      handleColumnChange({ ...editedColumn, numberFormat })
-                    }
-                  />
-                ) : null}
+                <Box sx={{ ml: 1, pl: 1, borderLeft: 1, borderColor: 'divider' }}>
+                  {editedColumn.type === 'number' ? (
+                    <NumberFormatEditor
+                      disabled={disabled}
+                      value={editedColumn.numberFormat}
+                      onChange={(numberFormat) =>
+                        handleColumnChange({ ...editedColumn, numberFormat })
+                      }
+                    />
+                  ) : null}
 
-                {editedColumn.type === 'codeComponent' ? (
-                  <TextField
-                    select
-                    required
-                    fullWidth
-                    label="Custom component"
-                    value={editedColumn.codeComponent ?? ''}
-                    disabled={disabled}
-                    error={!editedColumn.codeComponent}
-                    helperText={
-                      editedColumn.codeComponent ? undefined : 'Please select a component'
-                    }
-                    onChange={(event) =>
-                      handleColumnChange({
-                        ...editedColumn,
-                        codeComponent: event.target.value,
-                      })
-                    }
-                  >
-                    {codeComponents.map(({ displayName }) => (
-                      <MenuItem key={displayName} value={displayName}>
-                        {displayName}
-                      </MenuItem>
-                    ))}
-                  </TextField>
-                ) : null}
+                  {editedColumn.type === 'codeComponent' ? (
+                    <TextField
+                      select
+                      required
+                      fullWidth
+                      label="Custom component"
+                      value={editedColumn.codeComponent ?? ''}
+                      disabled={disabled}
+                      error={!editedColumn.codeComponent}
+                      helperText={
+                        editedColumn.codeComponent ? undefined : 'Please select a component'
+                      }
+                      onChange={(event) =>
+                        handleColumnChange({
+                          ...editedColumn,
+                          codeComponent: event.target.value,
+                        })
+                      }
+                    >
+                      {codeComponents.map(({ displayName }) => (
+                        <MenuItem key={displayName} value={displayName}>
+                          {displayName}
+                        </MenuItem>
+                      ))}
+                    </TextField>
+                  ) : null}
+                </Box>
               </Stack>
             </React.Fragment>
           ) : (

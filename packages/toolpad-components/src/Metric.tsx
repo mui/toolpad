@@ -79,7 +79,8 @@ function Metric({
 }
 
 export default createComponent(Metric, {
-  helperText: 'The Metric component lets you display values.',
+  helperText:
+    'The Metric component can be used to display a single numerical value. it supports multiple numerical formats such as bytes, currency, percentage... It also supports conditional formatting to adapt the color based on the numerical value.',
   loadingPropSource: ['value'],
   loadingProp: 'loading',
   argTypes: {

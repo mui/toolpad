@@ -10,6 +10,7 @@ import {
   ListItem,
   Input,
   ListItemProps,
+  Typography,
 } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -21,14 +22,14 @@ import FlexFill from '../../components/FlexFill';
 const EMPTY_STOPS: ColorScaleStop[] = [];
 
 interface ColorScaleListItemProps extends Omit<ListItemProps, 'onChange' | 'value'> {
-  valueHidden?: boolean;
+  valueLabel?: string;
   value?: ColorScaleStop;
   onChange?: (newValue: ColorScaleStop) => void;
   onDelete?: (event: React.MouseEvent) => void;
 }
 
 function ColorScaleListItem({
-  valueHidden,
+  valueLabel,
   value,
   onChange,
   sx,
@@ -37,7 +38,9 @@ function ColorScaleListItem({
 }: ColorScaleListItemProps) {
   return (
     <ListItem {...props} sx={{ ...sx, gap: 1 }}>
-      {valueHidden ? null : (
+      {valueLabel ? (
+        <Typography>{valueLabel}</Typography>
+      ) : (
         <React.Fragment>
           &gt;
           <Input
@@ -129,6 +132,7 @@ function ColorScaleEditor({ value, onChange }: ColorScaleEditorProps) {
           <List sx={{ width: 300 }}>
             <ColorScaleListItem
               valueHidden
+              valueLabel="Base color"
               value={value?.base ? { value: -Infinity, color: value.base } : undefined}
               onChange={({ color }) => onChange({ ...value, base: color })}
             />

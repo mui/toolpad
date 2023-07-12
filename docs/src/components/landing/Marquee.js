@@ -16,7 +16,6 @@ function Marquee({ content }) {
           display: 'flex',
           flexDirection: 'column',
           alignItems: 'center',
-          // background: `linear-gradient(180deg, ${theme.palette.primaryDark[900]} 0%, ${theme.palette.primaryDark[800]})`,
           background: `radial-gradient(140% 150% at 50% 10%, transparent 20%,  ${theme.palette.primary[100]} 90%,  transparent 100%)`,
           borderBottom: '1px solid',
           borderColor: 'grey.200',
@@ -40,13 +39,16 @@ function Marquee({ content }) {
         {content.title}
       </Typography>
       <Typography
-        color="grey.500"
         textAlign="center"
-        sx={{
-          mt: 1,
-          mb: 4,
-          mx: 'auto',
-        }}
+        sx={[
+          {
+            mt: 1,
+            mb: 4,
+            mx: 'auto',
+            color: 'grey.600',
+          },
+          (theme) => theme.applyDarkStyles({ color: 'grey.500' }),
+        ]}
       >
         {content.subtitle}
       </Typography>

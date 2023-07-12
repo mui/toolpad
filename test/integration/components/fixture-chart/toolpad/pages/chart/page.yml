@@ -19,10 +19,10 @@ spec:
                     barChartDataQuery.data
                 xKey: key
                 yKey: count
-                color: '#1976d2'
+                color: "#9c27b0"
               - kind: line
                 label: lineChart
-                data: [{ x: 1, y: 2 }, { x: 3, y: 4 }, { x: 5, y: 1 }]
+                data: [ { x: 1, y: 2 }, { x: 3, y: 4 }, { x: 5, y: 1 } ]
                 xKey: x
                 yKey: y
                 color: '#4caf50'

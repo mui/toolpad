@@ -15,7 +15,7 @@ test('shows chart data', async ({ page }) => {
 
   const barChartColumn = page.locator('path[name="barChart"]');
   await expect(barChartColumn).toHaveCount(6);
-  await expect(barChartColumn.first()).toHaveAttribute('fill', '#1976d2');
+  await expect(barChartColumn.first()).toHaveAttribute('fill', '#9c27b0');
 
   const lineChartLine = page.locator('path[name="lineChart"]');
   await expect(lineChartLine).toHaveCount(1);

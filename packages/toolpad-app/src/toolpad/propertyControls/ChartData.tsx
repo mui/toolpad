@@ -12,7 +12,6 @@ import {
   Stack,
   TextField,
   Typography,
-  useTheme,
 } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import { CHART_DATA_SERIES_KINDS, type ChartDataSeries } from '@mui/toolpad-components';
@@ -27,8 +26,6 @@ import { useDom, useDomApi } from '../AppState';
 // eslint-disable-next-line import/no-cycle
 import BindableEditor from '../AppEditor/PageEditor/BindableEditor';
 import { updateArray, remove } from '../../utils/immutability';
-import FlexFill from '../../components/FlexFill';
-import ColorTool from '../../components/ColorTool';
 import { createToolpadAppTheme } from '../../runtime/AppThemeProvider';
 import ColorPicker from '../../components/ColorPicker';
 
@@ -43,15 +40,12 @@ function ChartDataPropEditor({
   const { pageState, bindings, globalScopeMeta } = usePageEditorState();
   const jsBrowserRuntime = useBrowserJsRuntime();
 
-  const theme = useTheme();
   const appTheme = React.useMemo(() => createToolpadAppTheme(dom), [dom]);
 
   const node = nodeId ? (appDom.getMaybeNode(dom, nodeId) as appDom.ElementNode) : null;
 
   const [dataSeriesEditIndex, setDataSeriesEditIndex] = React.useState<number | null>(null);
   const [popoverAnchorElement, setPopoverAnchorElement] = React.useState<HTMLElement | null>(null);
-  const [colorPopoverAnchorElement, setColorPopoverAnchorElement] =
-    React.useState<HTMLElement | null>(null);
 
   const handleAddDataSeries = React.useCallback(() => {
     if (node) {
@@ -87,21 +81,11 @@ function ChartDataPropEditor({
   );
 
   const popoverId = React.useId();
-  const colorPopoverId = React.useId();
 
   const isPopoverOpen = Boolean(popoverAnchorElement);
-  const isColorPopoverOpen = Boolean(colorPopoverAnchorElement);
-
-  const handlColorClick = React.useCallback((event: React.MouseEvent<HTMLElement>) => {
-    setColorPopoverAnchorElement(event.currentTarget);
-  }, []);
 
   const handlePopoverClose = React.useCallback(() => {
     setPopoverAnchorElement(null);
-  }, []);
-
-  const handleColorPopoverClose = React.useCallback(() => {
-    setColorPopoverAnchorElement(null);
   }, []);
 
   const updateDataSeriesProp = React.useCallback(

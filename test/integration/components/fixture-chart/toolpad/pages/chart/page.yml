@@ -12,25 +12,20 @@ spec:
           name: chart
           props:
             data:
-              - kind: line
-                label: line
-                data:
-                  [
-                    { xCoord: 0, yCoord: 1 },
-                    { xCoord: 1, yCoord: 2 },
-                    { xCoord: 2, yCoord: 1 }
-                  ]
-                xKey: xCoord
-                yKey: yCoord
-                color: "#009688"
               - kind: bar
-                label: boundedBar
+                label: barChart
                 data:
                   $$jsExpression: |
                     barChartDataQuery.data
-                xKey: category
+                xKey: x
                 yKey: count
                 color: "#1976d2"
+              - kind: line
+                label: lineChart
+                data: [ { x: 1, y: 2 }, { x: 3, y: 4 }, { x: 5, y: 1 } ]
+                xKey: x
+                yKey: y
+                color: "#4caf50"
   queries:
     - name: barChartDataQuery
       query:

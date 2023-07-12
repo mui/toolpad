@@ -249,8 +249,11 @@ export default function evalJsBindings(
             Array.isArray(value) ? `[${nestedPropName}]` : `.${nestedPropName}`
           }`;
 
-          const nestedBindingResultValue = results[nestedBindingId]?.value;
-          if (nestedBindingResultValue) {
+          const nestedBindingResult = results[nestedBindingId];
+
+          const nestedBindingResultValue = nestedBindingResult?.value;
+
+          if (nestedBindingResult) {
             bindingResult = updatePath(
               bindingResult,
               `value.${nestedBindingId.replace(bindingId, '')}`,

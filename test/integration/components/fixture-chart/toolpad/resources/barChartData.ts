@@ -4,11 +4,11 @@
 
 export default async function handler() {
   return [
-    { category: 0, count: 4 },
-    { category: 1, count: 2 },
-    { category: 2, count: 5 },
-    { category: 3, count: 3 },
-    { category: 4, count: 2 },
-    { category: 5, count: 4 },
+    { x: 0, count: 4 },
+    { x: 1, count: 2 },
+    { x: 2, count: 5 },
+    { x: 3, count: 3 },
+    { x: 4, count: 2 },
+    { x: 5, count: 4 },
   ];
 }

@@ -22,7 +22,7 @@ export const CHART_DATA_SERIES_KINDS = ['line', 'bar', 'area', 'scatter'];
 export interface ChartDataSeries<D = Record<string, string | number>> {
   kind: (typeof CHART_DATA_SERIES_KINDS)[number];
   label: string;
-  data: D[];
+  data?: D[];
   xKey: keyof D;
   yKey: keyof D;
   color?: string;
@@ -45,7 +45,7 @@ function Chart({ data = [], height, sx }: ChartProps) {
       uniq(
         data
           .map((dataSeries) =>
-            dataSeries.data.map((dataSeriesPoint) => dataSeriesPoint[dataSeries.xKey]),
+            (dataSeries.data || []).map((dataSeriesPoint) => dataSeriesPoint[dataSeries.xKey]),
           )
           .flat()
           .sort((a: number | string, b: number | string) =>
@@ -62,7 +62,7 @@ function Chart({ data = [], height, sx }: ChartProps) {
           return acc;
         }
 
-        const point = dataSeries.data.find(
+        const point = (dataSeries.data || []).find(
           (dataSeriesPoint) => dataSeriesPoint[dataSeries.xKey] === xValue,
         );
 
@@ -81,6 +81,8 @@ function Chart({ data = [], height, sx }: ChartProps) {
     });
   }, [data, xValues]);
 
+  const hasNonNumberXValues = xValues.some((xValue) => typeof xValue !== 'number');
+
   return (
     <Container disableGutters sx={sx}>
       <ResponsiveContainer width="100%" height={height}>
@@ -88,14 +90,19 @@ function Chart({ data = [], height, sx }: ChartProps) {
           <CartesianGrid />
           <XAxis
             dataKey="x"
-            type={xValues.find((xValue) => typeof xValue !== 'number') ? 'category' : 'number'}
+            type={hasNonNumberXValues ? 'category' : 'number'}
             allowDuplicatedCategory={false}
+            domain={
+              hasNonNumberXValues
+                ? undefined
+                : [Math.min(...(xValues as number[])), Math.max(...(xValues as number[]))]
+            }
           />
           <YAxis />
           <Tooltip />
           <Legend />
           {data.map((dataSeries, index) => {
-            if (dataSeries.data.length === 0) {
+            if (!dataSeries.data || dataSeries.data.length === 0) {
               return null;
             }
 

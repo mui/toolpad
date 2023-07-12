@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: theme
+spec:
+  options:
+    palette:
+      primary:
+        main: "#4caf50"
+        contrastText: rgba(0, 0, 0, 0.87)

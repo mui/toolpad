@@ -17,15 +17,15 @@ spec:
                 data:
                   $$jsExpression: |
                     barChartDataQuery.data
-                xKey: x
+                xKey: key
                 yKey: count
-                color: "#1976d2"
+                color: '#1976d2'
               - kind: line
                 label: lineChart
-                data: [ { x: 1, y: 2 }, { x: 3, y: 4 }, { x: 5, y: 1 } ]
+                data: [{ x: 1, y: 2 }, { x: 3, y: 4 }, { x: 5, y: 1 }]
                 xKey: x
                 yKey: y
-                color: "#4caf50"
+                color: '#4caf50'
   queries:
     - name: barChartDataQuery
       query:

@@ -251,13 +251,11 @@ export default function evalJsBindings(
 
           const nestedBindingResult = results[nestedBindingId];
 
-          const nestedBindingResultValue = nestedBindingResult?.value;
-
           if (nestedBindingResult) {
             bindingResult = updatePath(
               bindingResult,
               `value.${nestedBindingId.replace(bindingId, '')}`,
-              nestedBindingResultValue,
+              nestedBindingResult.value,
             );
           } else {
             mergeNestedBindings(

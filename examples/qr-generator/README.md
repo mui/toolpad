@@ -4,7 +4,7 @@
 
 {{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/marketing/qr-generator.png", "alt": "QR code generator", "caption": "QR code generator"  }}
 
-[Open in CodeSandbox](https://codesandbox.io/p/sandbox/github/mui/mui-toolpad/tree/master/examples/qr-generator)
+[![Open in StackBlitz](https://developer.stackblitz.com/img/open_in_stackblitz.svg)](https://stackblitz.com/fork/github/mui/mui-toolpad/tree/master/examples/qr-generator)
 
 This app demonstrates following capabilities of Toolpad:
 

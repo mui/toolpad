@@ -1,6 +1,6 @@
 # Changelog
 
-## 0.0.20
+## 0.1.20
 
 <!-- generated comparing v0.1.19..master -->
 

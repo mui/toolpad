@@ -15,7 +15,7 @@ import {
   Scatter,
 } from 'recharts';
 import { uniq } from 'lodash-es';
-import { SX_PROP_HELPER_TEXT } from './constants.js';
+import { SX_PROP_HELPER_TEXT } from './constants';
 
 export const CHART_DATA_SERIES_KINDS = ['line', 'bar', 'area', 'scatter'];
 

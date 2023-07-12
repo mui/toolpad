@@ -31,7 +31,8 @@ module.exports = {
           {
             name: 'lodash-es',
             importNames: Object.keys(lodash).filter((key) => !ALLOWED_LODASH_METHODS.has(key)),
-            message: 'Please use Bar from /import-bar/baz/ instead.',
+            message:
+              'Avoid kitchensink libraries like lodash-es. We prefer a slightly more verbose, but more universally understood javascript style',
           },
         ],
         patterns: [

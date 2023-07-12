@@ -40,15 +40,19 @@ export default function CardGrid(props) {
     <Box
       sx={
         darker
-          ? {
-              background: (theme) =>
-                theme.palette.mode === 'dark'
-                  ? `radial-gradient(200% 150% at 50% 20%, transparent 30%, ${theme.palette.primaryDark[300]} 100%, ${theme.palette.primaryDark[100]} 0)`
-                  : `linear-gradient(180deg, ${theme.palette.grey[50]} 0%, ${alpha(
-                      theme.palette.grey[100],
-                      0.4,
-                    )} 100%)`,
-            }
+          ? [
+              {
+                background: (theme) =>
+                  `linear-gradient(180deg, ${theme.palette.grey[50]} 0%, ${alpha(
+                    theme.palette.grey[100],
+                    0.4,
+                  )} 100%)`,
+              },
+              (theme) =>
+                theme.applyDarkStyles({
+                  background: `radial-gradient(200% 150% at 50% 20%, transparent 30%, ${theme.palette.primaryDark[300]} 100%, ${theme.palette.primaryDark[100]} 0)`,
+                }),
+            ]
           : null
       }
     >

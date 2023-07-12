@@ -8,7 +8,7 @@
 
 This app demonstrates following capabilities of Toolpad:
 
-1. How to use [createFunction](https://mui.com/toolpad/reference/api/create-function/) API for anything pro-code.
+1. How to use backend functions.
 2. Using a Form and other components.
 3. How to delete or add a row in a data grid.
 4. How to bind query parameters with a component.

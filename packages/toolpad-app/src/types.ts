@@ -1,5 +1,5 @@
 import type * as React from 'react';
-import { NextApiRequest, NextApiResponse } from 'next';
+import * as express from 'express';
 import {
   SlotType,
   RuntimeError,
@@ -11,7 +11,7 @@ import {
 } from '@mui/toolpad-core';
 import { PaletteMode } from '@mui/material';
 import type * as appDom from './appDom';
-import type { Maybe, WithControlledProp } from './utils/types';
+import type { Awaitable, Maybe, WithControlledProp } from './utils/types';
 import type { Rectangle } from './utils/geometry';
 
 declare global {
@@ -81,15 +81,22 @@ export interface ConnectionEditorProps<P> extends WithControlledProp<P | null> {
 }
 export type ConnectionParamsEditor<P = {}> = React.FC<ConnectionEditorProps<P>>;
 
-export interface QueryEditorProps<C, Q> extends WithControlledProp<appDom.QueryNode<Q>> {
+export type Methods = Record<string, (...args: any[]) => Awaitable<any>>;
+
+export interface QueryEditorProps<C, Q, A extends Methods = {}>
+  extends WithControlledProp<appDom.QueryNode<Q>> {
   connectionParams: Maybe<C>;
+  execApi: <K extends keyof A>(
+    query: K,
+    args: Parameters<A[K]>,
+  ) => Promise<Awaited<ReturnType<A[K]>>>;
   globalScope: Record<string, any>;
   globalScopeMeta: ScopeMeta;
   onChange: React.Dispatch<React.SetStateAction<appDom.QueryNode<Q>>>;
   onCommit?: () => void;
 }
 
-export type QueryEditor<C, Q> = React.FC<QueryEditorProps<C, Q>>;
+export type QueryEditor<C, Q, A extends Methods> = React.FC<QueryEditorProps<C, Q, A>>;
 
 export interface ConnectionStatus {
   timestamp: number;
@@ -104,11 +111,11 @@ export interface ExecClientFetchFn<Q, R extends ExecFetchResult> {
   (fetchQuery: Q, params: Record<string, string>, serverFetch: ExecFetchFn<Q, R>): Promise<R>;
 }
 
-export interface ClientDataSource<C = {}, Q = {}> {
+export interface ClientDataSource<C = {}, Q = {}, A extends Methods = {}> {
   displayName: string;
   ConnectionParamsInput?: ConnectionParamsEditor<C>;
   transformQueryBeforeCommit?: (query: Q) => Q;
-  QueryEditor: QueryEditor<C, Q>;
+  QueryEditor: QueryEditor<C, Q, A>;
   getInitialQueryValue: () => Q;
   hasDefault?: boolean;
 }
@@ -117,15 +124,17 @@ export interface RuntimeDataSource<Q = {}, R extends ExecFetchResult = ExecFetch
   exec?: ExecClientFetchFn<Q, R>;
 }
 
-export interface ServerDataSource<P = {}, Q = {}, PQ = {}, D = {}> {
+export interface ServerDataSource<P = {}, Q = {}, PQ = {}, A extends Methods = {}> {
   // Execute a private query on this connection, intended for editors only
   execPrivate?: (connection: Maybe<P>, query: PQ) => Promise<unknown>;
+  // Private api to be used by query editors
+  api: A;
   // Execute a query on this connection, intended for viewers
-  exec: (connection: Maybe<P>, query: Q, params: any) => Promise<ExecFetchResult<D>>;
+  exec: (connection: Maybe<P>, query: Q, params: any) => Promise<ExecFetchResult<any>>;
   createHandler?: () => (
     api: CreateHandlerApi<P>,
-    req: NextApiRequest,
-    res: NextApiResponse,
+    req: express.Request,
+    res: express.Response,
   ) => void;
 }
 
@@ -195,7 +204,7 @@ export type ProjectEvents = {
   // a component has been added or removed
   componentsListChanged: {};
   // the function runtime build has finished
-  functionsBuildEnd: {};
+  queriesInvalidated: {};
   // An environment variable has changed
   envChanged: {};
 };

@@ -21,7 +21,7 @@ spec:
           props:
             value:
               $$jsExpression: |
-                `throws, error.message: ${throws.error.message}`
+                `throws, error.message: ${throws.error}`
     - component: PageRow
       name: pageRow2
       children:
@@ -30,7 +30,16 @@ spec:
           props:
             value:
               $$jsExpression: |
-                `throws, data ${throws.data}`
+                `throws, data ${throws.error ? "had an error" : throws.data}`
+    - component: PageRow
+      name: pageRow12
+      children:
+        - component: Text
+          name: text4
+          props:
+            value:
+              $$jsExpression: |
+                `throws, data ${throwsError1.data}`
     - component: PageRow
       name: pageRow3
       children:
@@ -110,6 +119,34 @@ spec:
             value:
               $$jsExpression: |
                 `global value: ${getGlobal.data}`
+    - component: PageRow
+      name: pageRow11
+      children:
+        - component: Text
+          name: text3
+          props:
+            value:
+              $$jsExpression: |
+                `Propagated error: ${errorInput.error}`
+    - component: PageRow
+      name: pageRow10
+      children:
+        - component: Text
+          name: text2
+          props:
+            value:
+              $$jsExpression: >
+                `Loading: ${alwaysLoading.isLoading}; Propagated loading:
+                ${propagatedLoading.isLoading}`
+    - component: PageRow
+      name: pageRow13
+      children:
+        - component: Text
+          name: text6
+          props:
+            value:
+              $$jsExpression: |
+                `Raw text: ${getRawText.data}`
   queries:
     - name: hello
       query:
@@ -154,4 +191,39 @@ spec:
     - name: getGlobal
       query:
         function: getGlobal
+        kind: local
+    - name: errorInput
+      query:
+        function: echo
+        kind: local
+      parameters:
+        - name: foo
+          value:
+            $$jsExpression: |
+              (() => {
+                throw new Error("KABOOM!")
+              })()
+    - name: alwaysLoading
+      query:
+        function: neverResolving
+        kind: local
+    - name: propagatedLoading
+      query:
+        function: echo
+        kind: local
+      parameters:
+        - name: foo
+          value:
+            $$jsExpression: |
+              alwaysLoading.data
+    - name: throwsError1
+      query:
+        function: throwsMsg
+        kind: local
+      parameters:
+        - name: msg
+          value: threw error 1
+    - name: getRawText
+      query:
+        function: functions.ts#getRawText
         kind: local

@@ -14,6 +14,14 @@ const pages: MuiPage[] = [
       { pathname: '/toolpad/getting-started/overview' },
       { pathname: '/toolpad/getting-started/installation' },
       { pathname: '/toolpad/getting-started/first-app', title: 'Build your first app' },
+      {
+        pathname: '/toolpad/examples',
+        children: [
+          { pathname: '/toolpad/examples/npm-stats', title: 'KPI tracker' },
+          { pathname: '/toolpad/examples/admin-app', title: 'Basic CRUD application' },
+          { pathname: '/toolpad/examples/qr-generator', title: 'QR Code generator' },
+        ],
+      },
       { pathname: '/toolpad/getting-started/roadmap' },
     ],
   },

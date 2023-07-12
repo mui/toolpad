@@ -1,7 +1,7 @@
 import * as vm from 'vm';
 import * as React from 'react';
 import { errorFrom } from '@mui/toolpad-utils/errors';
-import { BindingEvaluationResult, JsRuntime } from './types.js';
+import { BindingEvaluationResult, JsRuntime } from './types';
 
 function evalExpressionInContext(
   expression: string,
@@ -15,17 +15,22 @@ function evalExpressionInContext(
   }
 }
 
-export async function createServerJsRuntime(): Promise<JsRuntime> {
+export function createServerJsRuntime(env?: Record<string, string | undefined>): JsRuntime {
   return {
+    getEnv() {
+      if (env) {
+        return env;
+      }
+      throw new Error(`Env variables are not supported in this context`);
+    },
     evaluateExpression: (code, globalScope) => evalExpressionInContext(code, globalScope),
   };
 }
 
 export function useServerJsRuntime(): JsRuntime {
-  return React.useMemo(
-    () => ({
-      evaluateExpression: (code, globalScope) => evalExpressionInContext(code, globalScope),
-    }),
-    [],
-  );
+  return React.useMemo(() => {
+    // process.env is not available in the browser
+    const processEnv = {};
+    return createServerJsRuntime(processEnv);
+  }, []);
 }

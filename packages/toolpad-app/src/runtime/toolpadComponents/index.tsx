@@ -79,7 +79,7 @@ export function getToolpadComponent(
 }
 
 export function getElementNodeComponentId(elementNode: appDom.ElementNode): string {
-  return elementNode.attributes.component.value;
+  return elementNode.attributes.component;
 }
 
 export function isPageRow(elementNode: appDom.ElementNode): boolean {

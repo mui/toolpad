@@ -4,12 +4,14 @@ import {
   Typography as MuiTypography,
   TypographyProps as MuiTypographyProps,
   Link as MuiLink,
-  LinkProps as MuiLinkProps,
   styled,
   TextareaAutosize,
+  SxProps,
 } from '@mui/material';
 import { createComponent, useNode } from '@mui/toolpad-core';
-import { SX_PROP_HELPER_TEXT } from './constants.js';
+import ErrorIcon from '@mui/icons-material/Error';
+import { errorFrom } from '@mui/toolpad-utils/errors';
+import { SX_PROP_HELPER_TEXT } from './constants';
 
 const Markdown = React.lazy(async () => import('markdown-to-jsx'));
 
@@ -28,18 +30,20 @@ const StyledTextareaAutosize = styled(TextareaAutosize)(({ theme }) => ({
   ),
 }));
 
-type BaseProps = MuiLinkProps | MuiTypographyProps;
-interface TextProps extends Omit<BaseProps, 'children'> {
+interface TextProps {
   mode: 'markdown' | 'link' | 'text';
   value: string;
   markdown: string;
   href?: string;
   loading?: boolean;
+  error?: unknown;
+  sx?: SxProps;
+  variant: MuiTypographyProps['variant'];
 }
 
 const MarkdownContainer = styled('div')(({ theme }) => ({
   display: 'block',
-  maxWidth: '100%',
+  width: '100%',
   '&:empty::before, & > span:empty::before': {
     content: '""',
     display: 'inline-block',
@@ -99,7 +103,101 @@ function parseInput(text: unknown): string {
   return String(text).replaceAll('\n', '');
 }
 
-function Text({ value, markdown, href, loading, mode, sx, ...rest }: TextProps) {
+interface ErrorDisplayProps {
+  error: unknown;
+}
+
+function ErrorDisplay({ error }: ErrorDisplayProps) {
+  const errMessage = errorFrom(error).message;
+  return (
+    <MuiTypography sx={{ display: 'flex', flexDirection: 'row', gap: 1, alignItems: 'center' }}>
+      <ErrorIcon fontSize="small" color="error" />
+      <span>{errMessage}</span>
+    </MuiTypography>
+  );
+}
+
+interface LinkContentProps {
+  value: string;
+  href?: string;
+  loading?: boolean;
+  sx?: SxProps;
+}
+
+function LinkContent({ value, href, loading, sx }: LinkContentProps) {
+  const content = React.useMemo(() => {
+    if (loading) {
+      return <Skeleton variant="text" />;
+    }
+    return value;
+  }, [value, loading]);
+
+  return (
+    <MuiLink
+      href={href}
+      target="_blank"
+      rel="noopener noreferrer"
+      sx={{
+        minWidth: loading || !value ? 150 : undefined,
+        // Same as Typography
+        [`&:empty::before`]: { content: '""', display: 'inline-block' },
+        overflowWrap: 'anywhere',
+        ...sx,
+      }}
+    >
+      {content}
+    </MuiLink>
+  );
+}
+
+interface MarkdownContentProps {
+  value: string;
+  loading?: boolean;
+  sx?: SxProps;
+}
+
+function MarkdownContent({ value, loading, sx }: MarkdownContentProps) {
+  const loadingFallback = <Skeleton variant="text" width={'100%'} />;
+
+  return (
+    <MarkdownContainer sx={sx}>
+      {loading ? (
+        loadingFallback
+      ) : (
+        <React.Suspense fallback={loadingFallback}>
+          <Markdown
+            options={{
+              overrides: {
+                a: {
+                  component: MuiLink,
+                  props: {
+                    target: '_blank',
+                    rel: 'noopener noreferrer',
+                  },
+                },
+                pre: {
+                  component: CodeContainer,
+                },
+              },
+              slugify: () => '',
+            }}
+          >
+            {value}
+          </Markdown>
+        </React.Suspense>
+      )}
+    </MarkdownContainer>
+  );
+}
+
+interface TextContentProps {
+  value: string;
+  loading?: boolean;
+  sx?: SxProps;
+  variant: MuiTypographyProps['variant'];
+}
+
+function TextContent({ value, loading, sx, variant }: TextContentProps) {
   const [contentEditable, setContentEditable] = React.useState<null | {
     selectionStart: number;
     selectionEnd: number;
@@ -111,109 +209,73 @@ function Text({ value, markdown, href, loading, mode, sx, ...rest }: TextProps) 
 
   const nodeRuntime = useNode<TextProps>();
 
-  switch (mode) {
+  return contentEditable ? (
+    <StyledTextareaAutosize
+      value={input}
+      onChange={(event) => {
+        setInput(parseInput(event.target.value));
+      }}
+      onKeyDown={(event) => {
+        if (event.key === 'Enter') {
+          event.preventDefault();
+        }
+      }}
+      autoFocus
+      onFocus={(event) => {
+        event.currentTarget.selectionStart = contentEditable.selectionStart;
+        event.currentTarget.selectionEnd = Math.max(
+          contentEditable.selectionStart,
+          contentEditable.selectionEnd,
+        );
+      }}
+      onBlur={() => {
+        setContentEditable(null);
+        if (nodeRuntime) {
+          nodeRuntime.updateAppDomConstProp('value', input);
+        }
+      }}
+      className={`variant-${variant}`}
+    />
+  ) : (
+    <MuiTypography
+      sx={{
+        ...sx,
+        width: '100%',
+        // This will give it height, even when empty.
+        // REMARK: Does it make sense to put it in MUI core?
+        [`&:empty::before`]: { content: '""', display: 'inline-block' },
+        outline: 'none',
+        whiteSpace: 'pre-wrap',
+        overflowWrap: 'break-word',
+      }}
+      variant={variant}
+      onDoubleClick={() => {
+        if (nodeRuntime) {
+          const selection = window.getSelection();
+          setContentEditable({
+            selectionStart: selection?.anchorOffset || 0,
+            selectionEnd: selection?.focusOffset || 0,
+          });
+        }
+      }}
+    >
+      {loading ? <Skeleton variant="text" /> : input}
+    </MuiTypography>
+  );
+}
+
+function Text(props: TextProps) {
+  if (props.error) {
+    return <ErrorDisplay error={props.error} />;
+  }
+  switch (props.mode) {
     case 'markdown':
-      return loading ? (
-        <Skeleton width={'100%'} sx={{ mx: 1 }} />
-      ) : (
-        <MarkdownContainer>
-          <React.Suspense>
-            <Markdown
-              options={{
-                overrides: {
-                  a: {
-                    component: MuiLink,
-                    props: {
-                      target: '_blank',
-                      rel: 'noopener noreferrer',
-                    },
-                  },
-                  pre: {
-                    component: CodeContainer,
-                  },
-                },
-                slugify: () => '',
-              }}
-            >
-              {value}
-            </Markdown>
-          </React.Suspense>
-        </MarkdownContainer>
-      );
+      return <MarkdownContent {...props} />;
     case 'link':
-      return loading ? (
-        <Skeleton width={150} />
-      ) : (
-        <MuiLink
-          href={href}
-          target="_blank"
-          rel="noopener noreferrer"
-          sx={{
-            minWidth: loading || !value ? 150 : undefined,
-            // Same as Typography
-            [`&:empty::before`]: { content: '""', display: 'inline-block' },
-            overflowWrap: 'anywhere',
-            ...sx,
-          }}
-        >
-          {value}
-        </MuiLink>
-      );
+      return <LinkContent {...props} />;
     case 'text':
     default:
-      return contentEditable ? (
-        <StyledTextareaAutosize
-          value={input}
-          onChange={(event) => {
-            setInput(parseInput(event.target.value));
-          }}
-          onKeyDown={(event) => {
-            if (event.key === 'Enter') {
-              event.preventDefault();
-            }
-          }}
-          autoFocus
-          onFocus={(event) => {
-            event.currentTarget.selectionStart = contentEditable.selectionStart;
-            event.currentTarget.selectionEnd = Math.max(
-              contentEditable.selectionStart,
-              contentEditable.selectionEnd,
-            );
-          }}
-          onBlur={() => {
-            setContentEditable(null);
-            if (nodeRuntime) {
-              nodeRuntime.updateAppDomConstProp('value', input);
-            }
-          }}
-          className={`variant-${rest.variant}`}
-        />
-      ) : (
-        <MuiTypography
-          sx={{
-            ...sx,
-            width: '100%',
-            // This will give it height, even when empty.
-            // REMARK: Does it make sense to put it in MUI core?
-            [`&:empty::before`]: { content: '""', display: 'inline-block' },
-            outline: 'none',
-            whiteSpace: 'pre-wrap',
-            overflowWrap: 'break-word',
-          }}
-          onDoubleClick={() => {
-            if (nodeRuntime) {
-              const selection = window.getSelection();
-              setContentEditable({
-                selectionStart: selection?.anchorOffset || 0,
-                selectionEnd: selection?.focusOffset || 0,
-              });
-            }
-          }}
-          {...rest}
-        >
-          {loading ? <Skeleton /> : input}
-        </MuiTypography>
-      );
+      return <TextContent {...props} />;
   }
 }
 
@@ -223,6 +285,8 @@ export default createComponent(Text, {
   layoutDirection: 'both',
   loadingPropSource: ['value'],
   loadingProp: 'loading',
+  errorPropSource: ['value'],
+  errorProp: 'error',
   argTypes: {
     mode: {
       helperText:

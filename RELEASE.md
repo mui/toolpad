@@ -2,7 +2,7 @@
 
 1. Generate a new version using:
 
-   ```sh
+   ```bash
    yarn release:version
    ```
 
@@ -10,7 +10,7 @@
 
 1. Generate the changelog using:
 
-   ```sh
+   ```bash
    yarn release:changelog
    ```
 
@@ -37,31 +37,19 @@
 
    1. If you are not logged in to `npm` in your CLI, first log in with:
 
-      ```sh
+      ```bash
       npm login
-      ```
-
-   1. Make sure dependencies are up to date
-
-      ```sh
-      yarn
-      ```
-
-   1. Build the release version, make sure you don't have the project running in dev mode somewhere.
-
-      ```sh
-      yarn release:build
       ```
 
    1. Publish to `npm`
 
-      ```sh
+      ```bash
       yarn release:publish
       ```
 
       If you've created a prerelease, then instead use
 
-      ```sh
+      ```bash
       yarn release:publish-canary
       ```
 
@@ -69,7 +57,7 @@
 
 1. Publish the documentation. The documentation must be updated on the `docs-latest` branch.
 
-   ```sh
+   ```bash
    git push upstream master:docs-latest -f
    ```
 
@@ -88,7 +76,7 @@
 
    1. Run
 
-   ```sh
+   ```bash
    yarn create toolpad-app test-app
    cd test-app
    yarn dev

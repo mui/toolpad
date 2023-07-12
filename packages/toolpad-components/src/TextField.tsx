@@ -4,10 +4,15 @@ import {
   TextFieldProps as MuiTextFieldProps,
   BoxProps,
 } from '@mui/material';
-import { createComponent, useNode } from '@mui/toolpad-core';
-import { FieldError, Controller } from 'react-hook-form';
-import { FormContext, useFormInput, withComponentForm } from './Form.js';
-import { SX_PROP_HELPER_TEXT } from './constants.js';
+import { createComponent } from '@mui/toolpad-core';
+import {
+  FORM_INPUT_ARG_TYPES,
+  FORM_TEXT_INPUT_ARG_TYPES,
+  FormInputComponentProps,
+  useFormInput,
+  withComponentForm,
+} from './Form';
+import { SX_PROP_HELPER_TEXT } from './constants';
 
 export type TextFieldProps = Omit<MuiTextFieldProps, 'value' | 'onChange'> & {
   value: string;
@@ -15,12 +20,7 @@ export type TextFieldProps = Omit<MuiTextFieldProps, 'value' | 'onChange'> & {
   defaultValue: string;
   alignItems?: BoxProps['alignItems'];
   justifyContent?: BoxProps['justifyContent'];
-  name: string;
-  isRequired: boolean;
-  minLength: number;
-  maxLength: number;
-  isInvalid: boolean;
-};
+} & Pick<FormInputComponentProps, 'name' | 'isRequired' | 'minLength' | 'maxLength' | 'isInvalid'>;
 
 function TextField({
   defaultValue,
@@ -32,81 +32,34 @@ function TextField({
   isInvalid,
   ...rest
 }: TextFieldProps) {
-  const nodeRuntime = useNode();
-
-  const fieldName = rest.name || nodeRuntime?.nodeName;
-
-  const fallbackName = React.useId();
-  const nodeName = fieldName || fallbackName;
-
-  const { form } = React.useContext(FormContext);
-  const fieldError = nodeName && form?.formState.errors[nodeName];
-
-  const validationProps = React.useMemo(
-    () => ({ isRequired, minLength, maxLength, isInvalid }),
-    [isInvalid, isRequired, maxLength, minLength],
-  );
-
-  const { onFormInputChange } = useFormInput<string>({
-    name: nodeName,
+  const { onFormInputChange, formInputError, renderFormInput } = useFormInput<string>({
+    name: rest.name,
+    label: rest.label as string,
     value,
     onChange,
     emptyValue: '',
     defaultValue,
-    validationProps,
+    validationProps: { isRequired, minLength, maxLength, isInvalid },
   });
 
   const handleChange = React.useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
       const newValue = event.target.value;
-
-      if (form) {
-        onFormInputChange(newValue);
-      } else {
-        onChange(newValue);
-      }
+      onFormInputChange(newValue);
     },
-    [form, onChange, onFormInputChange],
+    [onFormInputChange],
   );
 
-  const textFieldElement = (
+  return renderFormInput(
     <MuiTextField
-      {...rest}
       value={value}
       onChange={handleChange}
-      {...(form && {
-        error: Boolean(fieldError),
-        helperText: (fieldError as FieldError)?.message || '',
+      {...rest}
+      {...(formInputError && {
+        error: Boolean(formInputError),
+        helperText: formInputError.message || '',
       })}
-    />
-  );
-
-  const fieldDisplayName = rest.label || fieldName || 'Field';
-
-  return form && nodeName ? (
-    <Controller
-      name={nodeName}
-      control={form.control}
-      rules={{
-        required: isRequired ? `${fieldDisplayName} is required.` : false,
-        minLength: minLength
-          ? {
-              value: minLength,
-              message: `${fieldDisplayName} must have at least ${minLength} characters.`,
-            }
-          : undefined,
-        maxLength: maxLength
-          ? {
-              value: maxLength,
-              message: `${fieldDisplayName} must have no more than ${maxLength} characters.`,
-            }
-          : undefined,
-        validate: () => !isInvalid || `${fieldDisplayName} is invalid.`,
-      }}
-      render={() => textFieldElement}
-    />
-  ) : (
-    textFieldElement
+    />,
   );
 }
 
@@ -132,10 +85,6 @@ export default createComponent(FormWrappedTextField, {
       helperText: 'A label that describes the content of the text field. e.g. "First name".',
       type: 'string',
     },
-    name: {
-      helperText: 'Name of this element. Used as a reference in form data.',
-      type: 'string',
-    },
     variant: {
       helperText:
         'One of the available MUI TextField [variants](https://mui.com/material-ui/react-button/#basic-button). Possible values are `outlined`, `filled` or `standard`',
@@ -157,34 +106,8 @@ export default createComponent(FormWrappedTextField, {
       helperText: 'Whether the input is disabled.',
       type: 'boolean',
     },
-    isRequired: {
-      helperText: 'Whether the input is required to have a value.',
-      type: 'boolean',
-      default: false,
-      category: 'validation',
-    },
-    minLength: {
-      helperText: 'Minimum value length.',
-      type: 'number',
-      minimum: 0,
-      maximum: 512,
-      default: 0,
-      category: 'validation',
-    },
-    maxLength: {
-      helperText: 'Maximum value length.',
-      type: 'number',
-      minimum: 0,
-      maximum: 512,
-      default: 0,
-      category: 'validation',
-    },
-    isInvalid: {
-      helperText: 'Whether the input value is invalid.',
-      type: 'boolean',
-      default: false,
-      category: 'validation',
-    },
+    ...FORM_INPUT_ARG_TYPES,
+    ...FORM_TEXT_INPUT_ARG_TYPES,
     sx: {
       helperText: SX_PROP_HELPER_TEXT,
       type: 'object',

@@ -5,24 +5,51 @@ import {
   TextField,
 } from '@mui/material';
 import { createComponent } from '@mui/toolpad-core';
-import { SX_PROP_HELPER_TEXT } from './constants.js';
+import { SX_PROP_HELPER_TEXT } from './constants';
+import {
+  FORM_INPUT_ARG_TYPES,
+  FORM_TEXT_INPUT_ARG_TYPES,
+  FormInputComponentProps,
+  useFormInput,
+  withComponentForm,
+} from './Form';
 
 type AutocompleteOption = string | { label?: string; value?: string };
 type AutocompleteValue = string | null;
 
 interface AutocompleteProps
   extends Omit<
-    MuiAutocompleteProps<AutocompleteOption, false, false, false>,
-    'renderInput' | 'value' | 'onChange'
-  > {
+      MuiAutocompleteProps<AutocompleteOption, false, false, false>,
+      'renderInput' | 'value' | 'onChange'
+    >,
+    Pick<FormInputComponentProps, 'name' | 'isRequired' | 'minLength' | 'maxLength' | 'isInvalid'> {
   value: AutocompleteValue;
   onChange: (newValue: AutocompleteValue) => void;
   options: AutocompleteOption[];
   label: string;
 }
 
-function Autocomplete({ options, label, onChange, value, ...rest }: AutocompleteProps) {
+function Autocomplete({
+  options,
+  label,
+  onChange,
+  value,
+  isRequired,
+  minLength,
+  maxLength,
+  isInvalid,
+  ...rest
+}: AutocompleteProps) {
   const [selectedVal, setSelectedVal] = React.useState<AutocompleteOption | null>(null);
+
+  const { onFormInputChange, formInputError, renderFormInput } = useFormInput<string | null>({
+    name: rest.name,
+    label,
+    value,
+    onChange,
+    emptyValue: null,
+    validationProps: { isRequired, minLength, maxLength, isInvalid },
+  });
 
   const getValue = React.useCallback((selection: AutocompleteOption | null): AutocompleteValue => {
     if (!selection) {
@@ -53,25 +80,44 @@ function Autocomplete({ options, label, onChange, value, ...rest }: Autocomplete
   const handleChange = React.useCallback(
     (event: React.SyntheticEvent<Element>, selection: AutocompleteOption | null) => {
       const newValue: AutocompleteValue = getValue(selection);
-      onChange(newValue);
+      onFormInputChange(newValue);
       setSelectedVal(selection);
     },
-    [onChange, getValue],
+    [getValue, onFormInputChange],
   );
-  return (
+
+  React.useEffect(() => {
+    if (!value) {
+      setSelectedVal(null);
+    }
+  }, [value]);
+
+  return renderFormInput(
     <MuiAutocomplete
       onChange={handleChange}
       options={options ?? []}
       isOptionEqualToValue={(option, selectedValue) => getValue(option) === getValue(selectedValue)}
       getOptionLabel={getOptionLabel}
       value={selectedVal}
-      renderInput={(params) => <TextField {...params} label={label} variant="outlined" />}
+      renderInput={(params) => (
+        <TextField
+          {...params}
+          label={label}
+          variant="outlined"
+          {...(formInputError && {
+            error: Boolean(formInputError),
+            helperText: formInputError.message || '',
+          })}
+        />
+      )}
       {...rest}
-    />
+    />,
   );
 }
 
-export default createComponent(Autocomplete, {
+const FormWrappedAutocomplete = withComponentForm(Autocomplete);
+
+export default createComponent(FormWrappedAutocomplete, {
   layoutDirection: 'both',
   loadingProp: 'loading',
   argTypes: {
@@ -113,6 +159,8 @@ export default createComponent(Autocomplete, {
       helperText: 'If true, the autocomplete will be disabled.',
       type: 'boolean',
     },
+    ...FORM_INPUT_ARG_TYPES,
+    ...FORM_TEXT_INPUT_ARG_TYPES,
     sx: {
       helperText: SX_PROP_HELPER_TEXT,
       type: 'object',

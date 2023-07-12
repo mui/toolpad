@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { createComponent, TemplateRenderer } from '@mui/toolpad-core';
 import { Box, List as MuiList, ListItem, SxProps } from '@mui/material';
-import { SX_PROP_HELPER_TEXT } from './constants.js';
+import { SX_PROP_HELPER_TEXT } from './constants';
 
 export type ListProps = {
   itemCount: number;

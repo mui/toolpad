@@ -7,7 +7,7 @@ import { useForm } from 'react-hook-form';
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
 import SyncIcon from '@mui/icons-material/Sync';
-import { getObjectKey } from '@mui/toolpad-core/objectKey';
+import { getObjectKey } from '@mui/toolpad-utils/objectKey';
 import { BindableAttrEntries, BindableAttrValue, ExecFetchResult } from '@mui/toolpad-core';
 import { useBrowserJsRuntime } from '@mui/toolpad-core/jsBrowserRuntime';
 import { serializeError, errorFrom } from '@mui/toolpad-utils/errors';
@@ -214,7 +214,7 @@ export function QueryEditor({
     isLoading: previewIsLoading,
   } = useQueryPreview(
     fetchServerPreview,
-    input.attributes.query.value,
+    input.attributes.query,
     previewParams as Record<string, string>,
   );
 
@@ -229,7 +229,7 @@ export function QueryEditor({
         <QueryInputPanel onRunPreview={handleRunPreview}>
           <Box sx={{ flex: 1, minHeight: 0 }}>
             <MonacoEditor
-              value={input.attributes.query.value.sql}
+              value={input.attributes.query.sql}
               onChange={(newValue) =>
                 setInput((existing) => appDom.setQueryProp(existing, 'sql', newValue))
               }

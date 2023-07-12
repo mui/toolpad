@@ -1,9 +1,13 @@
 import * as React from 'react';
 import { TextFieldProps, MenuItem, TextField } from '@mui/material';
-import { createComponent, useNode } from '@mui/toolpad-core';
-import { FieldError, Controller } from 'react-hook-form';
-import { FormContext, useFormInput, withComponentForm } from './Form.js';
-import { SX_PROP_HELPER_TEXT } from './constants.js';
+import { createComponent } from '@mui/toolpad-core';
+import {
+  FORM_INPUT_ARG_TYPES,
+  FormInputComponentProps,
+  useFormInput,
+  withComponentForm,
+} from './Form';
+import { SX_PROP_HELPER_TEXT } from './constants';
 
 export interface SelectOption {
   value: string;
@@ -15,10 +19,7 @@ export type SelectProps = Omit<TextFieldProps, 'value' | 'onChange'> & {
   onChange: (newValue: string) => void;
   defaultValue: string;
   options: (string | SelectOption)[];
-  name: string;
-  isRequired: boolean;
-  isInvalid: boolean;
-};
+} & Pick<FormInputComponentProps, 'name' | 'isRequired' | 'isInvalid'>;
 
 function Select({
   options,
@@ -31,24 +32,13 @@ function Select({
   isInvalid,
   ...rest
 }: SelectProps) {
-  const nodeRuntime = useNode();
-
-  const fieldName = rest.name || nodeRuntime?.nodeName;
-
-  const fallbackName = React.useId();
-  const nodeName = fieldName || fallbackName;
-
-  const { form } = React.useContext(FormContext);
-  const fieldError = nodeName && form?.formState.errors[nodeName];
-
-  const validationProps = React.useMemo(() => ({ isRequired, isInvalid }), [isInvalid, isRequired]);
-
-  const { onFormInputChange } = useFormInput<string>({
-    name: nodeName,
+  const { onFormInputChange, formInputError, renderFormInput } = useFormInput<string>({
+    name: rest.name,
+    label: rest.label as string,
     value,
     onChange,
     defaultValue,
-    validationProps,
+    validationProps: { isRequired, isInvalid },
   });
 
   const id = React.useId();
@@ -56,14 +46,9 @@ function Select({
   const handleChange = React.useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
       const newValue = event.target.value;
-
-      if (form) {
-        onFormInputChange(newValue);
-      } else {
-        onChange(newValue);
-      }
+      onFormInputChange(newValue);
     },
-    [form, onChange, onFormInputChange],
+    [onFormInputChange],
   );
 
   const renderedOptions = React.useMemo(
@@ -80,7 +65,7 @@ function Select({
     [id, options],
   );
 
-  const selectElement = (
+  return renderFormInput(
     <TextField
       {...rest}
       value={value}
@@ -88,29 +73,13 @@ function Select({
       select
       fullWidth
       sx={{ ...(!fullWidth && !value ? { width: 120 } : {}), ...sx }}
-      {...(form && {
-        error: Boolean(fieldError),
-        helperText: (fieldError as FieldError)?.message || '',
+      {...(formInputError && {
+        error: Boolean(formInputError),
+        helperText: formInputError.message || '',
       })}
     >
       {renderedOptions}
-    </TextField>
-  );
-
-  const fieldDisplayName = rest.label || fieldName || 'Field';
-
-  return form && nodeName ? (
-    <Controller
-      name={nodeName}
-      control={form.control}
-      rules={{
-        required: isRequired ? `${fieldDisplayName} is required.` : false,
-        validate: () => !isInvalid || `${fieldDisplayName} is invalid.`,
-      }}
-      render={() => selectElement}
-    />
-  ) : (
-    selectElement
+    </TextField>,
   );
 }
 
@@ -161,10 +130,6 @@ export default createComponent(FormWrappedSelect, {
       type: 'string',
       default: '',
     },
-    name: {
-      helperText: 'Name of this element. Used as a reference in form data.',
-      type: 'string',
-    },
     variant: {
       helperText:
         'One of the available MUI TextField [variants](https://mui.com/material-ui/react-button/#basic-button). Possible values are `outlined`, `filled` or `standard`',
@@ -186,18 +151,7 @@ export default createComponent(FormWrappedSelect, {
       helperText: 'Whether the select is disabled.',
       type: 'boolean',
     },
-    isRequired: {
-      helperText: 'Whether the select is required to have a value.',
-      type: 'boolean',
-      default: false,
-      category: 'validation',
-    },
-    isInvalid: {
-      helperText: 'Whether the select value is invalid.',
-      type: 'boolean',
-      default: false,
-      category: 'validation',
-    },
+    ...FORM_INPUT_ARG_TYPES,
     sx: {
       helperText: SX_PROP_HELPER_TEXT,
       type: 'object',

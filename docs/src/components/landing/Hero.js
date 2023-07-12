@@ -2,7 +2,7 @@ import * as React from 'react';
 import Box from '@mui/material/Box';
 import Chip from '@mui/material/Chip';
 import Typography from '@mui/material/Typography';
-import SvgMuiLogo from 'docs/src/icons/SvgMuiLogo';
+import SvgMuiLogo from 'docs/src/icons/SvgMuiLogomark';
 import IconImage from 'docs/src/components/icon/IconImage';
 import GradientText from 'docs/src/components/typography/GradientText';
 import DataObjectRoundedIcon from '@mui/icons-material/DataObjectRounded';
@@ -22,12 +22,15 @@ export default function Hero() {
         <Typography
           fontWeight="bold"
           variant="body2"
-          color={(theme) => (theme.palette.mode === 'dark' ? 'primary.400' : 'primary.600')}
-          sx={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: { xs: 'center', md: 'center' },
-          }}
+          sx={[
+            {
+              display: 'flex',
+              alignItems: 'center',
+              color: 'primary.600',
+              justifyContent: { xs: 'center', md: 'center' },
+            },
+            (theme) => theme.applyDarkStyles({ color: 'primary.400' }),
+          ]}
         >
           <IconImage name="product-toolpad" width="28" height="28" sx={{ mr: 1 }} />
           <Box component="span" sx={{ mr: 1 }}>

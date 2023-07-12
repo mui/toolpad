@@ -128,12 +128,17 @@ jobs:
           command: |
             yarn jsonSchemas
             git diff --exit-code
+      - run:
+          name: '`yarn docs:build:api` changes committed?'
+          command: |
+            yarn docs:build:api
+            git diff --exit-code
 
   test_unit:
     <<: *defaults
     resource_class: 'large'
     docker:
-      - image: mcr.microsoft.com/playwright:v1.34.3-focal
+      - image: mcr.microsoft.com/playwright:v1.35.1-focal
         environment:
           NODE_ENV: test
           TOOLPAD_TEST_RETRIES: 1
@@ -145,11 +150,6 @@ jobs:
       - run:
           name: 'Build packages'
           command: yarn release:build
-      - run:
-          name: '`yarn docs:build:api` changes committed?'
-          command: |
-            yarn docs:build:api
-            git diff --exit-code
       - save_cache:
           name: Save Next.js cache
           key: v0-next-{{ checksum "yarn.lock" }}

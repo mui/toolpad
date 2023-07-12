@@ -7,10 +7,12 @@ import local from './local/server';
 
 type ServerDataSources = { [key: string]: ServerDataSource<any, any, any> | undefined };
 
-export default {
+const dataSources: ServerDataSources = {
   rest,
   postgres,
   googleSheets,
   mysql,
   local,
-} satisfies ServerDataSources;
+};
+
+export default dataSources;

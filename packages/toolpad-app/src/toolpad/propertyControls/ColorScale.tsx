@@ -131,7 +131,6 @@ function ColorScaleEditor({ value, onChange }: ColorScaleEditorProps) {
         <Box sx={{ maxHeight: 300, overflow: 'auto' }}>
           <List sx={{ width: 300 }}>
             <ColorScaleListItem
-              valueHidden
               valueLabel="Base color"
               value={value?.base ? { value: -Infinity, color: value.base } : undefined}
               onChange={({ color }) => onChange({ ...value, base: color })}

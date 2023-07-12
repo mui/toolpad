@@ -1,31 +1,5 @@
 const baseline = require('@mui/monorepo/.eslintrc');
 
-function mergeNorestrictedImports(rule1 = {}, rule2 = {}) {
-  return {
-    paths: [...(rule1.paths || []), ...(rule2.paths || [])],
-    patterns: [...(rule1.patterns || []), ...(rule2.patterns || [])],
-  };
-}
-
-const noRestrictedImports = {
-  paths: [
-    {
-      name: '@mui/icons-material',
-      message: 'Use @mui/icons-material/<Icon> instead.',
-    },
-    {
-      name: 'lodash-es',
-      message: 'Import methods specifically, e.g. lodash-es/throttle.',
-    },
-  ],
-  patterns: [
-    {
-      group: ['lodash-es/*', '!lodash-es/throttle'],
-      message: 'Only whitelisted methods allowed',
-    },
-  ],
-};
-
 module.exports = {
   ...baseline,
   extends: [
@@ -43,7 +17,33 @@ module.exports = {
     // TODO move rule into the main repo once it has upgraded
     '@typescript-eslint/return-await': ['off'],
 
-    'no-restricted-imports': ['error', noRestrictedImports],
+    'no-restricted-imports': [
+      'error',
+      {
+        paths: [
+          {
+            name: '@mui/icons-material',
+            message: 'Use @mui/icons-material/<Icon> instead.',
+          },
+          {
+            name: 'lodash-es',
+            message: 'Import methods specifically, e.g. lodash-es/throttle.',
+          },
+        ],
+        patterns: [
+          {
+            group: [
+              'lodash-es/*',
+              // Don't add imports to this list. Only remove them.
+              '!lodash-es/throttle',
+              '!lodash-es/debounce',
+              '!lodash-es/set',
+            ],
+            message: 'Only whitelisted methods allowed',
+          },
+        ],
+      },
+    ],
     'no-restricted-syntax': [
       ...baseline.rules['no-restricted-syntax'].filter((rule) => {
         // Too opinionated for Toolpad
@@ -148,21 +148,6 @@ module.exports = {
       files: ['packages/*/src/**/*{.ts,.tsx,.js}'],
       excludedFiles: ['*.d.ts', '*.spec.ts', '*.spec.tsx'],
       rules: {
-        'no-restricted-imports': [
-          'error',
-          mergeNorestrictedImports(noRestrictedImports, {
-            patterns: [
-              {
-                // Running into issues with @mui/icons-material not being an ESM package, while the
-                // toolpad-core package is. This makes Next.js try to load @mui/icons-material/* as ESM
-                // We'll just avoid importing icons in these packages
-                // Remove restriction after https://github.com/mui/material-ui/pull/30510 gets resolved
-                group: ['@mui/icons-material', '@mui/icons-material/*'],
-                message: "Don't use @mui/icons-material in these packages for now.",
-              },
-            ],
-          }),
-        ],
         'import/no-cycle': ['error', { ignoreExternal: true }],
       },
     },

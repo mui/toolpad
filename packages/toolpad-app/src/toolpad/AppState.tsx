@@ -2,7 +2,8 @@ import * as React from 'react';
 import { NodeId } from '@mui/toolpad-core';
 import { createProvidedContext } from '@mui/toolpad-utils/react';
 import invariant from 'invariant';
-import { debounce, DebouncedFunc } from 'lodash-es';
+import debounce, { DebouncedFunc } from 'lodash-es/debounce';
+
 import { useLocation } from 'react-router-dom';
 import { mapValues } from '@mui/toolpad-utils/collections';
 import * as appDom from '../appDom';

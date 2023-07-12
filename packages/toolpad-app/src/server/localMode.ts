@@ -8,7 +8,8 @@ import { BindableAttrValue, NodeId, PropBindableAttrValue } from '@mui/toolpad-c
 import { fromZodError } from 'zod-validation-error';
 import { glob } from 'glob';
 import * as chokidar from 'chokidar';
-import { debounce, throttle } from 'lodash-es';
+import debounce from 'lodash-es/debounce';
+import throttle from 'lodash-es/throttle';
 import { Emitter } from '@mui/toolpad-utils/events';
 import { errorFrom } from '@mui/toolpad-utils/errors';
 import { filterValues, hasOwnProperty, mapValues } from '@mui/toolpad-utils/collections';

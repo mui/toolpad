@@ -1,6 +1,6 @@
 import * as React from 'react';
 import invariant from 'invariant';
-import { throttle } from 'lodash-es';
+import throttle from 'lodash-es/throttle';
 import { CanvasEventsContext } from '@mui/toolpad-core/runtime';
 import ToolpadApp, { LoadComponents, queryClient } from '../runtime/ToolpadApp';
 import { AppCanvasState } from '../types';

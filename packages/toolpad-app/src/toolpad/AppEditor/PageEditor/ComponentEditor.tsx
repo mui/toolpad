@@ -1,6 +1,8 @@
 import { Stack, styled, Typography, Divider } from '@mui/material';
 import * as React from 'react';
-import * as _ from 'lodash-es';
+// TODO: Remove lodash-es import here
+// eslint-disable-next-line no-restricted-imports
+import groupBy from 'lodash-es/groupBy';
 import {
   ArgTypeDefinition,
   ArgTypeDefinitions,
@@ -98,7 +100,7 @@ function ComponentPropsEditor<P extends object>({
     );
   }, [bindings, node.id]);
 
-  const argTypesByCategory = _.groupBy(
+  const argTypesByCategory: Record<string, ExactEntriesOf<ArgTypeDefinitions<P>>> = groupBy(
     Object.entries(componentConfig.argTypes || {}) as ExactEntriesOf<ArgTypeDefinitions<P>>,
     ([, propTypeDef]) => propTypeDef?.category || 'properties',
   );

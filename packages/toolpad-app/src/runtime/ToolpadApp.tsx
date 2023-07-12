@@ -34,6 +34,8 @@ import {
   JsExpressionAttrValue,
 } from '@mui/toolpad-core';
 import { createProvidedContext, useAssertedContext } from '@mui/toolpad-utils/react';
+import { filterKeys, mapProperties, mapValues } from '@mui/toolpad-utils/collections';
+import setObjectPath from 'lodash-es/set';
 import { QueryClient, QueryClientProvider, useMutation } from '@tanstack/react-query';
 import {
   BrowserRouter,
@@ -52,12 +54,10 @@ import {
   NodeRuntimeWrapper,
   ResetNodeErrorsKeyProvider,
 } from '@mui/toolpad-core/runtime';
-import * as _ from 'lodash-es';
 import ErrorIcon from '@mui/icons-material/Error';
 import { getBrowserRuntime } from '@mui/toolpad-core/jsBrowserRuntime';
 import * as builtIns from '@mui/toolpad-components';
 import { errorFrom } from '@mui/toolpad-utils/errors';
-import { mapProperties, mapValues } from '@mui/toolpad-utils/collections';
 import useBoolean from '@mui/toolpad-utils/hooks/useBoolean';
 import usePageTitle from '@mui/toolpad-utils/hooks/usePageTitle';
 import invariant from 'invariant';
@@ -134,10 +134,10 @@ const INITIAL_FETCH: UseFetch = {
   rows: [],
 };
 
-const USE_DATA_QUERY_CONFIG_KEYS: readonly (keyof UseDataQueryConfig)[] = [
+const USE_DATA_QUERY_CONFIG_KEYS = new Set<string>([
   'enabled',
   'refetchInterval',
-];
+] satisfies (keyof UseDataQueryConfig)[]);
 
 function usePageNavigator(): NavigateToPage {
   const navigate = useNavigate();
@@ -354,7 +354,7 @@ function resolveBindables(
       return { loading: true };
     }
 
-    _.set(result, `${resultKey}${path}`, resolvedBinding?.value);
+    setObjectPath(result, `${resultKey}${path}`, resolvedBinding?.value);
   }
 
   return { value: result[resultKey] || {} };
@@ -562,7 +562,9 @@ function parseBindings(
         });
       }
 
-      const configBindings = _.pick(elm.attributes, USE_DATA_QUERY_CONFIG_KEYS);
+      const configBindings = filterKeys(elm.attributes, (key) =>
+        USE_DATA_QUERY_CONFIG_KEYS.has(key),
+      );
       const nestedBindablePaths = flattenNestedBindables(configBindings);
 
       for (const [nestedPath, paramValue] of nestedBindablePaths) {
@@ -1226,7 +1228,7 @@ function QueryNode({ page, node }: QueryNodeProps) {
     Object.fromEntries(node.params ?? []),
   );
 
-  const configBindings = _.pick(node.attributes, USE_DATA_QUERY_CONFIG_KEYS);
+  const configBindings = filterKeys(node.attributes, (key) => USE_DATA_QUERY_CONFIG_KEYS.has(key));
   const options = resolveBindables(bindings, `${node.id}.config`, configBindings);
 
   const inputError = params.error || options.error;

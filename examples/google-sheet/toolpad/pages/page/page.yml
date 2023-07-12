@@ -4,11 +4,52 @@ spec:
   id: mDJP5kU
   title: Default page
   queries:
-    - name: query
+    - name: fetchSheet
       query:
-        function: sheetsTest
+        function: fetchSheet
         kind: local
+      parameters:
+        - name: spreadsheetId
+          value:
+            $$jsExpression: |
+              select.value
+        - name: range
+          value:
+            $$jsExpression: |
+              textField.value
+    - name: fetchList
+      query:
+        function: functions.ts#fetchList
+        kind: local
+      parameters:
+        - name: spreadsheetId
+          value:
+            $$jsExpression: |
+              select.value
+        - name: range
+          value:
+            $$jsExpression: |
+              textField.value
   content:
+    - component: PageRow
+      name: pageRow1
+      children:
+        - component: Select
+          name: select
+          props:
+            label: Choose Spreadsheet
+            fullWidth: true
+            options:
+              $$jsExpression: |
+                fetchList.data.map((a) => a.id)
+          layout:
+            columnSize: 1
+        - component: TextField
+          name: textField
+          props:
+            defaultValue: Sheet1!A:Z
+            label: Enter range
+            fullWidth: true
     - component: PageRow
       name: pageRow
       children:
@@ -17,45 +58,37 @@ spec:
           props:
             rows:
               $$jsExpression: |
-                query.data
+                fetchSheet.data
             columns:
-              - field: '0'
+              - field: "0"
                 type: string
-              - field: '1'
+              - field: "1"
                 type: string
-              - field: '2'
+              - field: "2"
                 type: string
-              - field: '3'
+              - field: "3"
                 type: string
-              - field: '4'
+              - field: "4"
                 type: string
-              - field: '5'
+              - field: "5"
                 type: string
-              - field: '6'
+              - field: "6"
                 type: string
-              - field: '7'
+              - field: "7"
                 type: string
-              - field: '8'
+              - field: "8"
                 type: string
-              - field: '9'
+              - field: "9"
                 type: string
-              - field: '10'
+              - field: "10"
                 type: string
-              - field: '11'
+              - field: "11"
                 type: string
-              - field: '12'
+              - field: "12"
                 type: string
-              - field: '13'
+              - field: "13"
                 type: string
-              - field: '14'
+              - field: "14"
                 type: string
-              - field: '15'
-                type: string
-              - field: '16'
-                type: string
-              - field: '17'
-                type: string
-              - field: '18'
-                type: string
-              - field: '19'
+              - field: "15"
                 type: string

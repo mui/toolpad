@@ -1,24 +1,30 @@
-import { createFunction } from '@mui/toolpad/server';
-const { sheets } = require('@googleapis/sheets');
+const { google } = require('googleapis');
 const { JWT } = require('google-auth-library');
-const keys = require('../../jwt.keys.json');
 
-export const fetchSheet = createFunction(async function fetchSheet({ parameters }) {
-  const googleAuth = new JWT({
-    email: keys.client_email,
-    key: keys.private_key,
-    scopes: ['https://www.googleapis.com/auth/spreadsheets'],
+const googleAuth = new JWT({
+  email: process.env.client_email,
+  key: process.env.private_key,
+  scopes: ['https://www.googleapis.com/auth/drive'],
+});
+
+export async function fetchList() {
+  const service = google.drive({ version: 'v3', auth: googleAuth });
+  const sheets = await service.files.list({
+    pageSize: 10,
+    fields: 'nextPageToken, files(id, name)',
   });
-  console.log(googleAuth);
 
-  const service = sheets({ version: 'v4', auth: googleAuth });
-  const spreadsheetId = '1dHNfR8dDqJbYWqFkgCa4sffcIgSFaGL-BnHoCm39LGc';
+  return sheets.data.files;
+}
 
-  const res = await service.spreadsheets.values.get({
+export async function fetchSheet(spreadsheetId: string, range: string) {
+  const service2 = google.sheets({ version: 'v4', auth: googleAuth });
+
+  const res = await service2.spreadsheets.values.get({
     spreadsheetId,
-    range: 'Sheet1!A2:T14',
+    range,
   });
 
   const rows = res.data.values;
   return rows;
-});
+}

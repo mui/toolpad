@@ -1,5 +1,37 @@
 # Changelog
 
+## 0.1.20
+
+<!-- generated comparing v0.1.19..master -->
+
+_Jul 12, 2023_
+
+A big thanks to the 5 contributors who made this release possible. Here are some highlights ✨:
+
+Use vite for the Toolpad application instead of Next.js, Windows support, documentation updates.
+
+- &#8203;<!-- 19 -->Remove createFunction from examples (#2298) @Janpot
+- &#8203;<!-- 18 -->Add extra note about aspect ratio of screenshots (#2300) @Janpot
+- &#8203;<!-- 17 -->images aspect ratio 1.8090 (#2299) @prakhargupta1
+- &#8203;<!-- 16 -->Disallow access to DOM globals in bindings (#1991) @Janpot
+- &#8203;<!-- 15 -->Clarify the rules around documentation screenshots (#2296) @Janpot
+- &#8203;<!-- 14 -->Isolate prettier in renovatebot (#2295) @Janpot
+- &#8203;<!-- 13 -->Add eslint rule restricting React import style (#2286) @Janpot
+- &#8203;<!-- 12 -->Provide all exports of @mui/toolpad on @mui/toolpad-app (#2284) @Janpot
+- &#8203;<!-- 11 -->Resolve components from source for docs:build:api (#2280) @Janpot
+- &#8203;<!-- 10 -->Use vite for Toolpad editor (#1999) @Janpot
+- &#8203;<!-- 09 -->Add note about light theme (#2283) @Janpot
+- &#8203;<!-- 08 -->Hardcode prisma db in with-prisma example (#2282) @Janpot
+- &#8203;<!-- 07 -->Add prisma example (#2262) @Janpot
+- &#8203;<!-- 06 -->Update MUI monorepo (#2271) @apedroferreira
+- &#8203;<!-- 05 -->Fix Windows issues (#2181) @apedroferreira
+- &#8203;<!-- 04 -->Allow loading partial theme (#2270) @Janpot
+- &#8203;<!-- 03 -->[core] Polish imports to React (#2285) @oliviertassinari
+- &#8203;<!-- 02 -->[docs] Fix MUI reference (#2276) @oliviertassinari
+- &#8203;<!-- 01 -->[website] use `theme.applyDarkStyles` on marketing website (#2305) @bharatkashyap
+
+All contributors of this release in alphabetical order: @apedroferreira, @bharatkashyap, @Janpot, @oliviertassinari, @prakhargupta1
+
 ## 0.1.19
 
 <!-- generated comparing v0.1.18..master -->

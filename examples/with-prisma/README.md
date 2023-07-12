@@ -4,7 +4,7 @@
 
 {{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/marketing/with-prisma.png", "alt": "Toolpad example with prisma", "caption": "Toolpad example with prisma"  }}
 
-[Open in CodeSandbox](https://codesandbox.io/p/sandbox/github/mui/mui-toolpad/tree/master/examples/with-prisma)
+[![Open in StackBlitz](https://developer.stackblitz.com/img/open_in_stackblitz.svg)](https://stackblitz.com/fork/github/mui/mui-toolpad/tree/master/examples/with-prisma)
 
 This app demonstrates following capabilities of Toolpad:
 

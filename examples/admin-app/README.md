@@ -4,7 +4,7 @@
 
 {{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/marketing/admin-app.png", "alt": "Admin application", "caption": "A CRUD application"}}
 
-[Open in CodeSandbox](https://codesandbox.io/p/sandbox/github/mui/mui-toolpad/tree/master/examples/admin-app)
+[![Open in StackBlitz](https://developer.stackblitz.com/img/open_in_stackblitz.svg)](https://stackblitz.com/fork/github/mui/mui-toolpad/tree/master/examples/admin-app)
 
 This app demonstrates following capabilities of Toolpad:
 

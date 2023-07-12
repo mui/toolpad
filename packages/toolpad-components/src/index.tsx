@@ -34,6 +34,10 @@ export { default as Container } from './Container';
 
 export { default as Form } from './Form';
 
-export { CUSTOM_COLUMN_TYPES, NUMBER_FORMAT_PRESETS, inferColumns, parseColumns } from './DataGrid';
-export type { SerializableGridColumn, SerializableGridColumns, NumberFormat } from './DataGrid';
+export { default as Metric } from './Metric';
+export type { ColorScale, ColorScaleStop } from './Metric';
+
+export { CUSTOM_COLUMN_TYPES, inferColumns, parseColumns } from './DataGrid';
+export type { SerializableGridColumn, SerializableGridColumns } from './DataGrid';
+
 export { type ChartDataSeries, type ChartData, CHART_DATA_SERIES_KINDS } from './Chart';

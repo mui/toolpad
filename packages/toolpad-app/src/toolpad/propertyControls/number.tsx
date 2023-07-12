@@ -46,6 +46,7 @@ function NumberPropEditor({ label, value, onChange, disabled, propType }: Editor
         value={String(inputValue ?? 0)}
         disabled={disabled}
         type="number"
+        inputProps={{ step: 'any' }}
         onChange={handleChange}
         onBlur={handleBlur}
         label={label}

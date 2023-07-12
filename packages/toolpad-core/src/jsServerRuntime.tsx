@@ -1,7 +1,7 @@
 import * as vm from 'vm';
 import * as React from 'react';
 import { errorFrom } from '@mui/toolpad-utils/errors';
-import { BindingEvaluationResult, JsRuntime } from './types.js';
+import { BindingEvaluationResult, JsRuntime } from './types';
 
 function evalExpressionInContext(
   expression: string,
@@ -28,5 +28,9 @@ export function createServerJsRuntime(env?: Record<string, string | undefined>):
 }
 
 export function useServerJsRuntime(): JsRuntime {
-  return React.useMemo(() => createServerJsRuntime(), []);
+  return React.useMemo(() => {
+    // process.env is not available in the browser
+    const processEnv = {};
+    return createServerJsRuntime(processEnv);
+  }, []);
 }

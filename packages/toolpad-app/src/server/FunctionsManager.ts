@@ -1,7 +1,7 @@
 import { Emitter } from '@mui/toolpad-utils/events';
 import * as esbuild from 'esbuild';
 import * as path from 'path';
-import { indent } from '@mui/toolpad-utils/strings';
+import { ensureSuffix, indent } from '@mui/toolpad-utils/strings';
 import * as chokidar from 'chokidar';
 import chalk from 'chalk';
 import { glob } from 'glob';
@@ -14,23 +14,26 @@ import { errorFrom } from '@mui/toolpad-utils/errors';
 import EnvManager from './EnvManager';
 import { ProjectEvents, ToolpadProjectOptions } from '../types';
 import { createWorker as createDevWorker } from './functionsDevWorker';
+import { toPosixPath } from '../utils/paths';
 import {
   tsConfig,
   type ExtractTypesParams,
   type IntrospectionResult,
 } from './functionsTypesWorker';
 import { Awaitable } from '../utils/types';
+import { format } from '../utils/prettier';
 
-const DEFAULT_FUNCTIONS_FILE_CONTENT = `// Toolpad queries:
+function createDefaultFunction(): string {
+  return format(`
+    /**
+     * Toolpad handlers file.
+     */
 
-export async function example() {
-  return [
-    { firstname: 'Nell', lastName: 'Lester' },
-    { firstname: 'Keanu', lastName: 'Walter' },
-    { firstname: 'Daniella', lastName: 'Sweeney' },
-  ];
+    export default async function handler (message: string) {
+      return \`Hello \${message}\`;
+    }
+  `);
 }
-`;
 
 function formatCodeFrame(location: esbuild.Location): string {
   const lineNumberCharacters = Math.ceil(Math.log10(location.line));
@@ -78,8 +81,6 @@ export default class FunctionsManager {
 
   private extractTypesWorker: Piscina;
 
-  private cancelTypeExtraction = new AbortController();
-
   // eslint-disable-next-line class-methods-use-this
   private setInitialized: () => void = () => {
     throw new Error('setInitialized should be initialized');
@@ -119,7 +120,7 @@ export default class FunctionsManager {
   }
 
   private async getFunctionFiles(): Promise<string[]> {
-    const paths = await glob(this.getFunctionResourcesPattern());
+    const paths = await glob(this.getFunctionResourcesPattern(), { windowsPathsNoEscape: true });
     return paths.map((fullPath) => path.relative(this.project.getRoot(), fullPath));
   }
 
@@ -130,27 +131,27 @@ export default class FunctionsManager {
   private getOutputFileForEntryPoint(entryPoint: string): string | undefined {
     const [outputFile] =
       Object.entries(this.buildMetafile?.outputs ?? {}).find(
-        (entry) => entry[1].entryPoint === entryPoint,
+        (entry) => entry[1].entryPoint === toPosixPath(entryPoint),
       ) ?? [];
 
     return outputFile;
+  }
+
+  private async extractTypes() {
+    this.extractedTypes = this.extractTypesWorker
+      .run({ resourcesFolder: this.getResourcesFolder() } satisfies ExtractTypesParams, {})
+      .catch((error) => ({
+        error,
+        files: [],
+      }));
+    return this.extractedTypes;
   }
 
   private async createEsbuildContext() {
     const root = this.project.getRoot();
 
     const onFunctionBuildStart = async () => {
-      // Cancel ongoing type extraction
-      this.cancelTypeExtraction.abort();
-      this.cancelTypeExtraction = new AbortController();
-      this.extractedTypes = this.extractTypesWorker
-        .run({ resourcesFolder: this.getResourcesFolder() } satisfies ExtractTypesParams, {
-          signal: this.cancelTypeExtraction.signal,
-        })
-        .catch((error) => ({
-          error,
-          files: [],
-        }));
+      await this.extractTypes();
     };
 
     const onFunctionsBuildEnd = async (args: esbuild.BuildResult<esbuild.BuildOptions>) => {
@@ -199,6 +200,10 @@ export default class FunctionsManager {
       packages: 'external',
       target: 'es2022',
       tsconfigRaw: JSON.stringify(tsConfig),
+      loader: {
+        '.txt': 'text',
+        '.sql': 'text',
+      },
     });
   }
 
@@ -310,20 +315,18 @@ export default class FunctionsManager {
     return this.extractedTypes;
   }
 
-  async initQueriesFile(): Promise<void> {
-    const queriesFilePath = this.getFunctionsFile();
-    if (!(await fileExists(queriesFilePath))) {
-      // eslint-disable-next-line no-console
-      console.log(`${chalk.blue('info')}  - Initializing Toolpad functions file`);
-      await writeFileRecursive(queriesFilePath, DEFAULT_FUNCTIONS_FILE_CONTENT, {
-        encoding: 'utf-8',
-      });
-    }
+  async openQueryEditor(fileName: string) {
+    const queriesFilePath = path.resolve(this.getResourcesFolder(), fileName);
+    await this.project.openCodeEditor(queriesFilePath);
   }
 
-  async openQueryEditor() {
-    await this.initQueriesFile();
-    const queriesFilePath = this.getFunctionsFile();
-    await this.project.openCodeEditor(queriesFilePath);
+  async createFunctionFile(name: string): Promise<void> {
+    const filePath = path.resolve(this.getResourcesFolder(), ensureSuffix(name, '.ts'));
+    const content = createDefaultFunction();
+    if (await fileExists(filePath)) {
+      throw new Error(`"${name}" already exists`);
+    }
+    await writeFileRecursive(filePath, content, { encoding: 'utf-8' });
+    await this.extractTypes();
   }
 }

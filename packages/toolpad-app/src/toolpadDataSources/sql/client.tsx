@@ -7,7 +7,7 @@ import { useForm } from 'react-hook-form';
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
 import SyncIcon from '@mui/icons-material/Sync';
-import { getObjectKey } from '@mui/toolpad-core/objectKey';
+import { getObjectKey } from '@mui/toolpad-utils/objectKey';
 import { BindableAttrEntries, BindableAttrValue, ExecFetchResult } from '@mui/toolpad-core';
 import { useBrowserJsRuntime } from '@mui/toolpad-core/jsBrowserRuntime';
 import { serializeError, errorFrom } from '@mui/toolpad-utils/errors';

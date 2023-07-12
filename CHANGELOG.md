@@ -1,5 +1,67 @@
 # Changelog
 
+## 0.1.19
+
+<!-- generated comparing v0.1.18..master -->
+
+_Jul 5, 2023_
+
+A big thanks to the 7 contributors who made this release possible. Here are some highlights ✨:
+
+Improved theme editor palette, allow multiple function files, support importing .sql and .txt files, link to examples in landing page and enable Autocomplete input in forms.
+
+- &#8203;<!-- 20 -->Fix missing typography variant (#2265) @Janpot
+- &#8203;<!-- 19 -->qrcode-example-folder-change (#2269) @prakhargupta1
+- &#8203;<!-- 18 -->Add some documentation about screenshot sizes (#2268) @Janpot
+- &#8203;<!-- 17 -->Connect Autocomplete to forms and refactor form logic (#2115) @apedroferreira
+- &#8203;<!-- 16 -->Support loading raw text for .txt files and .sql files (#2250) @Janpot
+- &#8203;<!-- 15 -->Lay foundation for new and improved theme editor (#2260) @Janpot
+- &#8203;<!-- 14 -->Use links for the runtime navigation bar (#2247) @Janpot
+- &#8203;<!-- 13 -->On landingpage add buttons to examples (#2196) @prakhargupta1
+- &#8203;<!-- 12 -->Pin dependencies (#2253) @renovate[bot]
+- &#8203;<!-- 11 -->Avoid double submit when function file is created (#2252) @Janpot
+- &#8203;<!-- 10 -->optimized deleting file (#2177) @JerryWu1234
+- &#8203;<!-- 09 -->Move license key logic into the components (#2248) @Janpot
+- &#8203;<!-- 08 -->Export canvas and runtime from @mui/toolpad (#2245) @Janpot
+- &#8203;<!-- 07 -->Move monaco-editor to devDependencies (#2241) @Janpot
+- &#8203;<!-- 06 -->Create update monorepo workflow (#2243) @Janpot
+- &#8203;<!-- 05 -->Allow multiple function files (#2236) @Janpot
+- &#8203;<!-- 04 -->Add a warning when required environment variables are missing (#2228) @Janpot
+- &#8203;<!-- 03 -->Remove legacy file format (#2227) @Janpot
+- &#8203;<!-- 02 -->[core] Remove mention of Crowdin @oliviertassinari
+- &#8203;<!-- 01 -->[fix] disable auto formatting `_redirects` (#2251) @bharatkashyap
+
+All contributors of this release in alphabetical order: @apedroferreira, @bharatkashyap, @Janpot, @JerryWu1234, @oliviertassinari, @prakhargupta1, @renovate[bot]
+
+## 0.1.18
+
+<!-- generated comparing v0.1.17..master -->
+
+_Jun 28, 2023_
+
+A big thanks to the 4 contributors who made this release possible. Here are some highlights ✨:
+
+Allow detecting parameters from types in function files, instead of having to explicitly specify them. Also, a couple of example apps, bug fixes and some behind-the-scenes work!
+
+- &#8203;<!-- 16 -->Isolate marked in renovatebot (#2237) @Janpot
+- &#8203;<!-- 15 -->Fix broken query editor when env vars are defined (#2231) @Janpot
+- &#8203;<!-- 14 -->Increase timeout when running integration tests in dev mode (#2222) @Janpot
+- &#8203;<!-- 13 -->Fix github rest call in triage label action (#2225) @Janpot
+- &#8203;<!-- 12 -->Add needs triage action (#2221) @Janpot
+- &#8203;<!-- 11 -->Reload queries when env changes (#2214) @Janpot
+- &#8203;<!-- 10 -->Example-4: NPM stats (#2151) @prakhargupta1
+- &#8203;<!-- 09 -->Example-1: admin app (#2096) @prakhargupta1
+- &#8203;<!-- 08 -->Upgrade @mui/monorepo (#2212) @Janpot
+- &#8203;<!-- 07 -->Explore banning any types (#2201) @Janpot
+- &#8203;<!-- 06 -->Add error mode to the text component (#2203) @Janpot
+- &#8203;<!-- 05 -->Add no-op serviceworker (#2190) @Janpot
+- &#8203;<!-- 04 -->Extract parameters from ts types in function files (#2133) @Janpot
+- &#8203;<!-- 03 -->[core] Upgrade monorepo (#2232) @bharatkashyap
+- &#8203;<!-- 02 -->[docs] Leading dot @oliviertassinari
+- &#8203;<!-- 01 -->[docs] Fix redirection @oliviertassinari
+
+All contributors of this release in alphabetical order: @bharatkashyap, @Janpot, @oliviertassinari, @prakhargupta1
+
 ## 0.1.17
 
 <!-- generated comparing v0.1.16..master -->

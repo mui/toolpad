@@ -20,7 +20,7 @@ export type DomView =
 export function getPathnameFromView(view: DomView): string {
   switch (view.kind) {
     case 'page':
-      return `/app/pages/${view.nodeId}`;
+      return view.nodeId ? `/app/pages/${view.nodeId}` : '/app/pages';
     case 'connection':
       return `/app/connections/${view.nodeId}`;
     case 'codeComponent':

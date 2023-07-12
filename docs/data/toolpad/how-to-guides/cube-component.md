@@ -12,7 +12,7 @@ We can use any package available on `npm` to extend our Toolpad application. Thi
 
 1. To get started creating this, add the requisite libraries to your Toolpad app, using
 
-   ```sh
+   ```bash
    yarn add three @react-three/fiber
    ```
 

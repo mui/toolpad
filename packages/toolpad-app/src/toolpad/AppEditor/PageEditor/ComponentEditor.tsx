@@ -2,7 +2,7 @@ import { Stack, styled, Typography, Divider } from '@mui/material';
 import * as React from 'react';
 // TODO: Remove lodash-es import here
 // eslint-disable-next-line no-restricted-imports
-import groupBy from 'lodash-es/groupBy';
+import { groupBy } from 'lodash-es';
 import {
   ArgTypeDefinition,
   ArgTypeDefinitions,

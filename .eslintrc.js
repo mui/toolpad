@@ -1,4 +1,7 @@
 const baseline = require('@mui/monorepo/.eslintrc');
+const lodash = require('lodash');
+
+const ALLOWED_LODASH_METHODS = new Set(['throttle', 'debounce', 'set']);
 
 module.exports = {
   ...baseline,
@@ -27,19 +30,14 @@ module.exports = {
           },
           {
             name: 'lodash-es',
-            message: 'Import methods specifically, e.g. lodash-es/throttle.',
+            importNames: Object.keys(lodash).filter((key) => !ALLOWED_LODASH_METHODS.has(key)),
+            message: 'Please use Bar from /import-bar/baz/ instead.',
           },
         ],
         patterns: [
           {
-            group: [
-              'lodash-es/*',
-              // Don't add imports to this list. Only remove them.
-              '!lodash-es/throttle',
-              '!lodash-es/debounce',
-              '!lodash-es/set',
-            ],
-            message: 'Only whitelisted methods allowed',
+            group: ['lodash-es/*'],
+            message: 'Use `import { debounce } from "lodash-es";` instead.',
           },
         ],
       },

@@ -3,9 +3,9 @@ import { Container, ContainerProps, Box, Stack, BoxProps } from '@mui/material';
 import { LoadingButton } from '@mui/lab';
 import { ArgTypeDefinitions, createComponent, useNode } from '@mui/toolpad-core';
 import { useForm, FieldValues, ValidationMode, FieldError, Controller } from 'react-hook-form';
-// TODO: Remove lodash-es import here
+// TODO: Remove lodash-es
 // eslint-disable-next-line no-restricted-imports
-import isEqual from 'lodash-es/isEqual';
+import { isEqual } from 'lodash-es';
 import { SX_PROP_HELPER_TEXT } from './constants';
 
 export const FormContext = React.createContext<{

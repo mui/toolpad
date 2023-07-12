@@ -1,5 +1,5 @@
 import { BindingEvaluationResult, JsRuntime } from '@mui/toolpad-core';
-import setObjectPath from 'lodash-es/set';
+import { set as setObjectPath } from 'lodash-es';
 import { mapValues } from '@mui/toolpad-utils/collections';
 import { updatePath } from '../utils/immutability';
 

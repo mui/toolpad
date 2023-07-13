@@ -103,7 +103,7 @@ function RowHead({ children, startIcon, ...props }) {
         borderRadius: '8px 0 0 8px',
         bgcolor: (theme.vars || theme).palette.grey[50],
         border: '1px solid',
-        borderColor: (theme.vars || theme).divider,
+        borderColor: (theme.vars || theme).palette.divider,
         p: 1,
         transition: 'none',
         typography: 'body2',

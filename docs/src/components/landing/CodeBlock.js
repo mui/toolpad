@@ -59,8 +59,7 @@ export default function CodeBlock() {
     <Box
       sx={(theme) => ({
         position: 'absolute',
-        bottom: -40,
-        left: -40,
+
         zIndex: 20,
         borderRadius: 1,
         backgroundColor: (theme.vars || theme).palette.primaryDark[800],

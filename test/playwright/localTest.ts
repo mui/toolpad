@@ -76,6 +76,7 @@ export async function withApp(
       const child = childProcess.spawn('toolpad', buildArgs, {
         cwd: projectDir,
         stdio: 'pipe',
+        shell: !process.env.CI,
         env: {
           ...process.env,
           ...env,
@@ -97,6 +98,7 @@ export async function withApp(
     const child = childProcess.spawn('toolpad', args, {
       cwd: projectDir,
       stdio: 'pipe',
+      shell: !process.env.CI,
       env: {
         ...process.env,
         ...env,

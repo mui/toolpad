@@ -187,7 +187,19 @@ async function loadThemeFromFile(root: string): Promise<Theme | null> {
   const themeFilePath = getThemeFile(root);
   const content = await readMaybeFile(themeFilePath);
   if (content) {
-    return themeSchema.parse(yaml.parse(content));
+    const parsedFile = yaml.parse(content);
+    const result = themeSchema.safeParse(parsedFile);
+    if (result.success) {
+      return result.data;
+    }
+
+    console.error(
+      `${chalk.red('error')} - Failed to read theme ${chalk.cyan(themeFilePath)}. ${fromZodError(
+        result.error,
+      )}`,
+    );
+
+    return null;
   }
   return null;
 }
@@ -321,7 +333,7 @@ function mergeThemeIntoAppDom(dom: appDom.AppDom, themeFile: Theme): appDom.AppD
   dom = appDom.addNode(
     dom,
     appDom.createNode(dom, 'theme', {
-      theme: themeFileSpec,
+      theme: themeFileSpec.options,
       attributes: {},
     }),
     app,
@@ -742,6 +754,22 @@ function extractPagesFromDom(dom: appDom.AppDom): ExtractedPages {
   return { pages, dom };
 }
 
+function extractThemeFromDom(dom: appDom.AppDom): Theme | null {
+  const rootNode = appDom.getApp(dom);
+  const { themes: themeNodes = [] } = appDom.getChildNodes(dom, rootNode);
+  if (themeNodes.length > 0) {
+    return {
+      apiVersion: API_VERSION,
+      kind: 'theme',
+      spec: {
+        options: themeNodes[0].theme,
+      },
+    };
+  }
+
+  return null;
+}
+
 async function writePagesToFiles(root: string, pages: PagesContent) {
   await Promise.all(
     Object.entries(pages).map(async ([name, page]) => {
@@ -763,7 +791,10 @@ async function writeThemeFile(root: string, theme: Theme | null) {
 async function writeDomToDisk(dom: appDom.AppDom): Promise<void> {
   const root = getUserProjectRoot();
   const { pages: pagesContent } = extractPagesFromDom(dom);
-  await Promise.all([writePagesToFiles(root, pagesContent)]);
+  await Promise.all([
+    writePagesToFiles(root, pagesContent),
+    writeThemeFile(root, extractThemeFromDom(dom)),
+  ]);
 }
 
 const DEFAULT_EDITOR = 'code';
@@ -774,7 +805,7 @@ export async function findSupportedEditor(): Promise<string | null> {
     return null;
   }
   try {
-    await execa('which', [maybeEditor]);
+    await execa(maybeEditor, ['-v']);
     return maybeEditor;
   } catch (err) {
     return null;
@@ -895,7 +926,7 @@ function getDomFilePatterns(root: string) {
  * Calculates a fingerprint from all files that influence the dom structure
  */
 async function calculateDomFingerprint(root: string): Promise<number> {
-  const files = await glob(getDomFilePatterns(root));
+  const files = await glob(getDomFilePatterns(root), { windowsPathsNoEscape: true });
 
   const mtimes = await Promise.all(
     files.sort().map(async (file) => {
@@ -911,7 +942,7 @@ async function initToolpadFolder(root: string) {
   const projectFolder = await readProjectFolder(root);
   if (Object.keys(projectFolder.pages).length <= 0) {
     projectFolder.pages.page = {
-      apiVersion: 'v1',
+      apiVersion: API_VERSION,
       kind: 'page',
       spec: {
         id: appDom.createId(),

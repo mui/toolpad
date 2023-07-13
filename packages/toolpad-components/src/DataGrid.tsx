@@ -19,6 +19,7 @@ import {
   useGridSelector,
   getGridDefaultColumnTypes,
   GridColTypeDef,
+  LicenseInfo,
 } from '@mui/x-data-grid-pro';
 import * as React from 'react';
 import { useNode, createComponent, useComponents } from '@mui/toolpad-core';
@@ -33,12 +34,23 @@ import {
   Tooltip,
   Popover,
 } from '@mui/material';
-import { getObjectKey } from '@mui/toolpad-core/objectKey';
+import { getObjectKey } from '@mui/toolpad-utils/objectKey';
 import { errorFrom } from '@mui/toolpad-utils/errors';
-import { hasImageExtension } from '@mui/toolpad-core/path';
+import { hasImageExtension } from '@mui/toolpad-utils/path';
 import { ErrorBoundary, FallbackProps } from 'react-error-boundary';
-import { SX_PROP_HELPER_TEXT } from './constants.js';
-import ErrorOverlay from './components/ErrorOverlay.js';
+import { NumberFormat, createStringFormatter } from '@mui/toolpad-core/numberFormat';
+import { SX_PROP_HELPER_TEXT } from './constants';
+import ErrorOverlay from './components/ErrorOverlay';
+
+if (typeof window !== 'undefined') {
+  const licenseKey = window.document.querySelector<HTMLMetaElement>(
+    'meta[name="toolpad-x-license"]',
+  )?.content;
+
+  if (licenseKey) {
+    LicenseInfo.setLicenseKey(licenseKey);
+  }
+}
 
 const DEFAULT_COLUMN_TYPES = getGridDefaultColumnTypes();
 
@@ -271,43 +283,6 @@ export const CUSTOM_COLUMN_TYPES: Record<string, GridColTypeDef> = {
   },
 };
 
-export const NUMBER_FORMAT_PRESETS = new Map<string, { options?: Intl.NumberFormatOptions }>([
-  [
-    'bytes',
-    {
-      options: {
-        style: 'unit',
-        maximumSignificantDigits: 3,
-        notation: 'compact',
-        unit: 'byte',
-        unitDisplay: 'narrow',
-      },
-    },
-  ],
-  [
-    'percent',
-    {
-      options: {
-        style: 'percent',
-      },
-    },
-  ],
-]);
-
-export type NumberFormat =
-  | {
-      kind: 'preset';
-      preset: string;
-    }
-  | {
-      kind: 'currency';
-      currency?: string;
-    }
-  | {
-      kind: 'custom';
-      custom: Intl.NumberFormatOptions;
-    };
-
 export interface SerializableGridColumn
   extends Pick<GridColDef, 'field' | 'type' | 'align' | 'width' | 'headerName'> {
   numberFormat?: NumberFormat;
@@ -330,53 +305,13 @@ export function inferColumns(rows: GridRowsProp): SerializableGridColumns {
   });
 }
 
-function createNumericFormatter(
-  format: (value: number) => string,
-): (params: GridValueFormatterParams<unknown>) => string {
-  return ({ value }) => (typeof value === 'number' ? format(value) : String(value || ''));
-}
-
 export function parseColumns(columns: SerializableGridColumns): GridColDef[] {
   return columns.map((column) => {
     if (column.type === 'number' && column.numberFormat) {
-      switch (column.numberFormat.kind) {
-        case 'preset': {
-          const preset = NUMBER_FORMAT_PRESETS.get(column.numberFormat.preset);
-          const { format } = new Intl.NumberFormat(undefined, preset?.options);
-          return {
-            ...column,
-            valueFormatter: createNumericFormatter((value) => format(value)),
-          };
-        }
-        case 'custom': {
-          const { format } = new Intl.NumberFormat(undefined, column.numberFormat.custom);
-          return {
-            ...column,
-            valueFormatter: createNumericFormatter((value) => format(value)),
-          };
-        }
-        case 'currency': {
-          const userInput = column.numberFormat.currency || 'USD';
-          if (/[a-z]{3}/i.test(userInput)) {
-            const { format } = new Intl.NumberFormat(undefined, {
-              style: 'currency',
-              currency: userInput,
-            });
-            return {
-              ...column,
-              valueFormatter: createNumericFormatter((value) => format(value)),
-            };
-          }
-          const { format } = new Intl.NumberFormat(undefined, {});
-          return {
-            ...column,
-            valueFormatter: createNumericFormatter((value) => `${userInput} ${format(value)}`),
-          };
-        }
-        default: {
-          return column;
-        }
-      }
+      return {
+        ...column,
+        valueFormatter: createStringFormatter(column.numberFormat),
+      };
     }
 
     const customType = column.type ? CUSTOM_COLUMN_TYPES[column.type] : {};

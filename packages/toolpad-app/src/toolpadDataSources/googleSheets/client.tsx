@@ -13,7 +13,7 @@ import * as React from 'react';
 import { inferColumns, parseColumns } from '@mui/toolpad-components';
 import { DataGridPro, GridColDef } from '@mui/x-data-grid-pro';
 import { UseQueryResult } from '@tanstack/react-query';
-import { getObjectKey } from '@mui/toolpad-core/objectKey';
+import { getObjectKey } from '@mui/toolpad-utils/objectKey';
 import { ClientDataSource, ConnectionEditorProps, QueryEditorProps } from '../../types';
 import {
   GoogleSheetsConnectionParams,

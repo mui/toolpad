@@ -46,6 +46,10 @@
           "pathname": "/toolpad/reference/components/list"
         },
         {
+          "title": "Metric",
+          "pathname": "/toolpad/reference/components/metric"
+        },
+        {
           "title": "PageColumn",
           "pathname": "/toolpad/reference/components/page-column"
         },

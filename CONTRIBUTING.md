@@ -17,19 +17,19 @@ This will use the local version of Toolpad as built in the monorepo. This is rec
 
 1. Install dependencies:
 
-   ```sh
+   ```bash
    yarn install
    ```
 
 1. Run the build in watch mode
 
-   ```sh
+   ```bash
    yarn dev
    ```
 
 1. Run Toolpad
 
-   ```sh
+   ```bash
    yarn toolpad dev test/integration/backend-basic/fixture --dev
    ```
 
@@ -53,13 +53,13 @@ If your application has dependencies other than `@mui/toolpad`, you have to temp
 
 1. Run
 
-   ```sh
+   ```bash
    yarn install
    ```
 
 1. Make sure to start the build in watch mode again and the run the app with
 
-   ```sh
+   ```bash
    yarn toolpad dev examples/qr-generator --dev
    ```
 
@@ -72,13 +72,13 @@ In some cases you may want to link local toolpad into a project on your laptop.
 
 1. Install dependencies:
 
-```sh
+```bash
 yarn install
 ```
 
 1. Run the build in watch mode
 
-   ```sh
+   ```bash
    yarn dev
    ```
 
@@ -110,7 +110,7 @@ yarn install
 
    1. In order to use `portal:` dependencies, we will need to use yarn 2. So start by running
 
-      ```sh
+      ```bash
       yarn set version berry
       ```
 
@@ -122,13 +122,13 @@ yarn install
 
    1. then run
 
-      ```sh
+      ```bash
       yarn install
       ```
 
 1. Run start toolpad in dev mode:
 
-   ```sh
+   ```bash
    yarn dev
    ```
 
@@ -140,14 +140,14 @@ The playwright tests can be run in one of two modes:
 
 1. Build the production target, then run the integration tests in production mode:
 
-   ```sh
+   ```bash
    yarn release:build
    yarn test:integration --project chromium
    ```
 
 2. Toolpad in dev watchmode and run the integration tests in dev mode with the `TOOLPAD_NEXT_DEV` environment variable (slower)
 
-   ```sh
+   ```bash
    yarn dev
    TOOLPAD_NEXT_DEV=1 yarn test:integration --project chromium
    ```
@@ -156,19 +156,19 @@ The playwright tests can be run in one of two modes:
 
 1. If you haven't already, install the project dependencies using
 
-   ```sh
+   ```bash
    yarn
    ```
 
 1. To start the documentation application in dev mode run
 
-   ```sh
+   ```bash
    yarn docs:dev
    ```
 
    If all goes well it should print
 
-   ```sh
+   ```bash
    ready - started server on 0.0.0.0:3003, url: http://localhost:3003
    ```
 
@@ -179,13 +179,13 @@ The playwright tests can be run in one of two modes:
 - Check out the PR branch locally with your tool of choice ([GitHub Docs](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/reviewing-changes-in-pull-requests/checking-out-pull-requests-locally?tool=cli))
 - Run to build the project
 
-  ```sh
+  ```bash
   yarn && yarn release:build
   ```
 
 - Run it on your project of choice
 
-  ```sh
+  ```bash
   yarn toolpad dev /path/to/my/toolpad/project
   ```
 
@@ -193,26 +193,26 @@ The playwright tests can be run in one of two modes:
 
 - To run Toolpad on a fixture
 
-  ```sh
+  ```bash
   yarn toolpad dev --dev ./path/to/fixture
   ```
 
 - To run the tests locally in production mode
 
-  ```sh
+  ```bash
   yarn build:release
   yarn test:integration --project chromium
   ```
 
 - To run the tests locally in dev mode
 
-  ```sh
+  ```bash
   yarn dev
   ```
 
   then run
 
-  ```sh
+  ```bash
   TOOLPAD_NEXT_DEV=1 yarn test:integration --project chromium
   ```
 
@@ -254,7 +254,7 @@ Each pull request is built on [CodeSandbox CI](https://codesandbox.io/docs/learn
 
 5. Run
 
-   ```sh
+   ```bash
    yarn --force
    ```
 

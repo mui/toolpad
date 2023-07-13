@@ -24,8 +24,16 @@ test('submits form data', async ({ page }) => {
   await page.getByLabel('option').click();
   await page.getByRole('option', { name: 'option 2' }).click();
 
-  const testFilePath = path.resolve(__dirname, './test.txt');
-  await page.getByLabel('file').setInputFiles(testFilePath);
+  await page.getByLabel('file').setInputFiles({
+    name: 'test.txt',
+    mimeType: 'text/plain',
+    buffer: Buffer.from('hello'),
+  });
+
+  const countryInput = page.getByLabel('country');
+  await countryInput.clear();
+  await countryInput.type('Por');
+  await page.getByRole('option', { name: 'Portugal' }).click();
 
   await expect
     .poll(async () => {
@@ -43,10 +51,11 @@ test('submits form data', async ({ page }) => {
         {
           name: 'test.txt',
           type: 'text/plain',
-          size: 6,
-          base64: 'data:text/plain;base64,d29ya3MK',
+          size: 5,
+          base64: 'data:text/plain;base64,aGVsbG8=',
         },
       ],
+      country: 'Portugal',
     });
 
   await expect(page.getByRole('button', { name: 'Submitted' })).not.toBeVisible();
@@ -69,8 +78,16 @@ test('resets form data', async ({ page }) => {
   await page.getByLabel('option').click();
   await page.getByRole('option', { name: 'option 3' }).click();
 
-  const testFilePath = path.resolve(__dirname, './test.txt');
-  await page.getByLabel('file').setInputFiles(testFilePath);
+  await page.getByLabel('file').setInputFiles({
+    name: 'test.txt',
+    mimeType: 'text/plain',
+    buffer: Buffer.from('hello'),
+  });
+
+  const countryInput = page.getByLabel('country');
+  await countryInput.clear();
+  await countryInput.type('Bel');
+  await page.getByRole('option', { name: 'Belgium' }).click();
 
   await page.getByRole('button', { name: 'Reset' }).click();
 
@@ -100,4 +117,5 @@ test('validates form data', async ({ page }) => {
   await expect(page.getByText('date is required.')).toBeVisible();
   await expect(page.getByText('option is invalid.')).toBeVisible();
   await expect(page.getByText('outside must have no more than 3 characters.')).toBeVisible();
+  await expect(page.getByText('country is required.')).toBeVisible();
 });

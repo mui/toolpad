@@ -22,23 +22,26 @@ function Marquee({ content }) {
       ]}
     >
       <Typography
-        color="white"
         textAlign="center"
         variant="h2"
         sx={{
           mx: 'auto',
+          color: (theme) => theme.palette.primary[800],
         }}
       >
         {content.title}
       </Typography>
       <Typography
-        color="grey.500"
         textAlign="center"
-        sx={{
-          mt: 1,
-          mb: 4,
-          mx: 'auto',
-        }}
+        sx={[
+          {
+            mt: 1,
+            mb: 4,
+            mx: 'auto',
+            color: 'grey.600',
+          },
+          (theme) => theme.applyDarkStyles({ color: 'grey.500' }),
+        ]}
       >
         {content.subtitle}
       </Typography>

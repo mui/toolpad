@@ -133,7 +133,10 @@ function SignUp({ sx }) {
       </Box>
       {form.status === 'failure' ? (
         <FormHelperText
-          sx={{ color: (theme) => (theme.palette.mode === 'dark' ? 'warning.500' : 'warning.800') }}
+          sx={[
+            { color: 'warning.700' },
+            (theme) => theme.applyDarkStyles({ color: 'warning.500' }),
+          ]}
         >
           Oops! something went wrong, please try again later.
         </FormHelperText>

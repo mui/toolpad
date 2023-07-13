@@ -1,6 +1,6 @@
 {
   "name": "@mui/toolpad-app",
-  "version": "0.1.19",
+  "version": "0.1.20",
   "license": "MIT",
   "scripts": {
     "build": "concurrently \"yarn:build:*\" && rimraf ./.next/cache",
@@ -44,19 +44,19 @@
     "@emotion/styled": "11.11.0",
     "@googleapis/drive": "6.0.0",
     "@googleapis/sheets": "5.0.0",
-    "@mui/icons-material": "5.13.7",
-    "@mui/lab": "5.0.0-alpha.135",
-    "@mui/material": "5.13.7",
-    "@mui/system": "5.13.7",
-    "@mui/toolpad-components": "0.1.19",
-    "@mui/toolpad-core": "0.1.19",
-    "@mui/toolpad-utils": "0.1.19",
+    "@mui/icons-material": "5.14.0",
+    "@mui/lab": "5.0.0-alpha.136",
+    "@mui/material": "5.14.0",
+    "@mui/system": "5.14.0",
+    "@mui/toolpad-components": "0.1.20",
+    "@mui/toolpad-core": "0.1.20",
+    "@mui/toolpad-utils": "0.1.20",
     "@mui/types": "7.2.4",
     "@mui/utils": "5.13.7",
-    "@mui/x-data-grid": "6.9.2",
-    "@mui/x-data-grid-pro": "6.9.2",
-    "@mui/x-date-pickers": "6.9.2",
-    "@mui/x-date-pickers-pro": "6.9.2",
+    "@mui/x-data-grid": "6.10.0",
+    "@mui/x-data-grid-pro": "6.10.0",
+    "@mui/x-date-pickers": "6.10.0",
+    "@mui/x-date-pickers-pro": "6.10.0",
     "@next/bundle-analyzer": "13.4.9",
     "@tanstack/react-query": "4.29.19",
     "@tanstack/react-query-devtools": "4.29.19",
@@ -120,8 +120,8 @@
     "superjson": "1.12.4",
     "typescript": "5.1.6",
     "vite": "4.4.2",
-    "whatwg-url": "13.0.0",
     "vm-browserify": "^1.1.2",
+    "whatwg-url": "13.0.0",
     "ws": "8.13.0",
     "yaml": "2.3.1",
     "yaml-diff-patch": "2.0.0",
@@ -164,5 +164,5 @@
   "publishConfig": {
     "access": "public"
   },
-  "gitHead": "08fb1bad6e60086d1b775f377101b88b3d1a9e5d"
+  "gitHead": "8c10fa4108d0f108a49fb20daa15f090fe321be6"
 }

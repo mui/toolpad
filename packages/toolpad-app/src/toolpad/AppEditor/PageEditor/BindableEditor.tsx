@@ -11,6 +11,8 @@ import {
 import { WithControlledProp } from '../../../utils/types';
 import { getBindingType } from '../../../bindings';
 import { getDefaultControl, usePropControlsContext } from '../../propertyControls';
+
+// eslint-disable-next-line import/no-cycle
 import { BindingEditor } from '../BindingEditor';
 
 export interface RenderControlParams<V> extends WithControlledProp<V> {

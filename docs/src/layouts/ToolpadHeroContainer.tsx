@@ -12,8 +12,9 @@ export default function HeroContainer({
   return (
     <Container
       sx={{
+        minHeight: '600px',
         transition: '0.3s',
-        py: { xs: 4, sm: 12 },
+        py: { xs: 4, sm: 8 },
         display: 'flex',
         flexDirection: { xs: 'column', sm: 'row' },
         justifyContent: 'space-between',

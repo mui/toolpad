@@ -25,27 +25,27 @@ export async function deleteUser(id: number) {
 
 function WindowCircles() {
   return (
-    <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+    <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.7 }}>
       <Box
         sx={(theme) => ({
-          height: 10,
-          width: 10,
+          height: 9,
+          width: 9,
           borderRadius: 99,
           backgroundColor: (theme.vars || theme).palette.error[400],
         })}
       />
       <Box
         sx={(theme) => ({
-          height: 10,
-          width: 10,
+          height: 9,
+          width: 9,
           borderRadius: 99,
           backgroundColor: (theme.vars || theme).palette.warning[400],
         })}
       />
       <Box
         sx={(theme) => ({
-          height: 10,
-          width: 10,
+          height: 9,
+          width: 9,
           borderRadius: 99,
           backgroundColor: (theme.vars || theme).palette.success[400],
         })}
@@ -58,6 +58,10 @@ export default function CodeBlock() {
   return (
     <Box
       sx={(theme) => ({
+        position: 'absolute',
+        bottom: -40,
+        left: -40,
+        zIndex: 20,
         borderRadius: 1,
         backgroundColor: (theme.vars || theme).palette.primaryDark[800],
         border: '1px solid',

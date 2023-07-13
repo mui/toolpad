@@ -29,7 +29,7 @@ const VideoContainer = styled(Box)(({ theme }) => [
       0.2,
     )} 150%)`,
     border: '1px solid',
-    borderColor: `${alpha(theme.palette.primary[200], 0.5)}`,
+    borderColor: (theme.vars || theme).palette.primary[100],
     boxShadow: `4px 0 60px ${alpha(theme.palette.primary[100], 0.8)}`,
   },
   theme.applyDarkStyles({
@@ -46,7 +46,7 @@ export default function DemoVideo() {
   return (
     <Container
       sx={{
-        py: { xs: 2, sm: 4, md: 6 },
+        py: { xs: 2, sm: 4, md: 12 },
         scrollMarginTop: 'calc(var(--MuiDocs-header-height) + 32px)',
       }}
     >

@@ -74,12 +74,12 @@ function Cell({ highlighted = false, ...props }) {
           // https://github.com/mui/mui-toolpad/pull/809#issuecomment-1221026428
           borderWidth: '0 1px 0 1px',
           borderStyle: 'solid',
-          borderColor: (theme.vars || theme).palette.grey[100],
+          borderColor: (theme.vars || theme).palette.divider,
           bgcolor: `${alpha(theme.palette.grey[50], 0.5)}`,
         }),
         ...theme.applyDarkStyles({
           ...(highlighted && {
-            borderColor: (theme.vars || theme).palette.primaryDark[700],
+            borderColor: (theme.vars || theme).palette.divider,
             bgcolor: `${alpha(theme.palette.primaryDark[900], 0.5)}`,
           }),
         }),
@@ -103,7 +103,7 @@ function RowHead({ children, startIcon, ...props }) {
         borderRadius: '8px 0 0 8px',
         bgcolor: (theme.vars || theme).palette.grey[50],
         border: '1px solid',
-        borderColor: (theme.vars || theme).palette.grey[100],
+        borderColor: (theme.vars || theme).divider,
         p: 1,
         transition: 'none',
         typography: 'body2',
@@ -113,7 +113,7 @@ function RowHead({ children, startIcon, ...props }) {
         ...props.sx,
         ...theme.applyDarkStyles({
           bgcolor: (theme.vars || theme).palette.primaryDark[900],
-          borderColor: (theme.vars || theme).palette.primaryDark[700],
+          borderColor: (theme.vars || theme).palette.divider,
         }),
       })}
     >
@@ -142,11 +142,11 @@ function RowCategory(props) {
         pl: 1.5,
         borderBottom: '1px solid',
         bgcolor: (theme.vars || theme).palette.grey[50],
-        borderColor: (theme.vars || theme).palette.grey[200],
+        borderColor: (theme.vars || theme).palette.divider,
         ...props.sx,
         ...theme.applyDarkStyles({
           bgcolor: (theme.vars || theme).palette.primaryDark[900],
-          borderColor: (theme.vars || theme).palette.primaryDark[600],
+          borderColor: (theme.vars || theme).palette.divider,
         }),
       })}
     />
@@ -308,7 +308,7 @@ function PricingTable({
           {plans.map((plan) => (
             <Box
               key={plan}
-              sx={{
+              sx={(theme) => ({
                 display: 'flex',
                 flexDirection: 'column',
                 p: 2,
@@ -316,14 +316,16 @@ function PricingTable({
                 ...(planInfo.commercial?.title?.toLowerCase() === plan && {
                   borderWidth: '1px 1px 0 1px',
                   borderStyle: 'solid',
-                  borderColor: (theme) =>
-                    theme.palette.mode === 'dark' ? 'primaryDark.700' : 'grey.100',
-                  bgcolor: (theme) =>
-                    theme.palette.mode === 'dark'
-                      ? alpha(theme.palette.primaryDark[900], 0.5)
-                      : alpha(theme.palette.grey[50], 0.5),
+                  borderColor: (theme.vars || theme).palette.divider,
+                  bgcolor: alpha(theme.palette.grey[50], 0.5),
                 }),
-              }}
+                ...theme.applyDarkStyles({
+                  ...(planInfo.commercial?.title?.toLowerCase() === plan && {
+                    bgcolor: alpha(theme.palette.primaryDark[900], 0.7),
+                    borderColor: (theme.vars || theme).palette.divider,
+                  }),
+                }),
+              })}
             >
               <PlanName planInfo={planInfo[plan]} />
             </Box>

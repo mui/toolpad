@@ -7,7 +7,6 @@ import IconImage from 'docs/src/components/icon/IconImage';
 import GradientText from 'docs/src/components/typography/GradientText';
 import KeyRoundedIcon from '@mui/icons-material/KeyRounded';
 import GetStartedButtons from 'docs/src/components/home/GetStartedButtons';
-// import DemoVideo from './DemoVideo';
 import CodeBlock from './CodeBlock';
 import ROUTES from '../../route';
 import ToolpadHeroContainer from '../../layouts/ToolpadHeroContainer';
@@ -43,7 +42,7 @@ function TypingAnimation() {
 export default function Hero() {
   return (
     <ToolpadHeroContainer>
-      <Box>
+      <Box sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
         <Typography
           fontWeight="bold"
           variant="body2"
@@ -95,26 +94,29 @@ export default function Hero() {
           </Box>
         </Box>
       </Box>
-      {/* <DemoVideo /> */}
       <Box sx={{ position: 'relative', width: '100%' }}>
-        <CodeBlock />
         <Box
-          component="img"
-          src="/static/toolpad/marketing/with-prisma-hero.png" // image will be replaced for a better one
           sx={[
             (theme) => ({
-              position: 'absolute',
-              bottom: -60,
-              left: 100,
-              maxWidth: 510,
-              maxHeight: 320,
+              minWidth: 510,
+              minHeight: 320,
+              height: '100%',
+              width: '100%',
+              backgroundRepeat: 'no-repeat',
+              backgroundPosition: 'center',
+              objectFit: 'contain',
+              background: `${
+                (theme.vars || theme).palette.primaryDark[800]
+              } url(/static/toolpad/marketing/hero.png)`,
+              backgroundSize: 'cover',
               borderRadius: 1,
               border: '1px solid',
               borderColor: (theme.vars || theme).palette.divider,
-              boxShadow: '0px 2px 16px rgba(0,0,0, 0.5)',
+              // boxShadow: '0px 2px 16px rgba(0,0,0, 0.5)',
             }),
           ]}
         />
+        <CodeBlock />
       </Box>
     </ToolpadHeroContainer>
   );

@@ -37,12 +37,14 @@
     "release:changelog": "dotenv -- node ./scripts/releaseChangelog.mjs --repo mui-toolpad",
     "test:build": "lerna run build --scope @mui/toolpad-core --scope @mui/toolpad-components --stream",
     "test:integration": "rimraf ./node_modules/.vite && playwright test --config ./test/playwright.config.ts",
+    "test:argos": "node ./scripts/pushArgos.mjs",
     "test": "lerna run test",
     "check-types": "lerna run check-types",
     "toolpad": "toolpad",
     "jsonSchemas": "tsx ./scripts/docs/generateJsonSchemas.ts"
   },
   "devDependencies": {
+    "@argos-ci/core": "^0.8.0",
     "@jest/globals": "29.6.1",
     "@mui/monorepo": "https://github.com/mui/material-ui.git",
     "@next/eslint-plugin-next": "13.4.9",

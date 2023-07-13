@@ -1,0 +1,79 @@
+apiVersion: v1
+kind: page
+spec:
+  id: f703ps3
+  title: components
+  content:
+    - component: PageRow
+      name: pageRow3
+      children:
+        - component: Button
+          name: button
+          props:
+            content: foo button
+    - component: PageRow
+      name: pageRow4
+      children:
+        - component: Image
+          name: image
+          props:
+            alt: foo image
+    - component: PageRow
+      name: pageRow
+      children:
+        - component: codeComponent.MyComponent
+          name: codeComponent_eb03t9a
+          props:
+            msg: "1"
+    - component: PageRow
+      name: pageRow5
+      children:
+        - component: DataGrid
+          name: dataGrid
+          props:
+            rows:
+              - id: 1
+                foo datagrid column: bar
+            columns:
+              - type: number
+                field: id
+              - type: string
+                field: foo datagrid column
+    - component: PageRow
+      name: pageRow6
+      children:
+        - component: TextField
+          name: textField
+          props:
+            label: foo textfield
+    - component: PageRow
+      name: pageRow7
+      children:
+        - component: Text
+          name: typography1
+          props:
+            value: foo typography
+    - component: PageRow
+      name: pageRow8
+      children:
+        - component: Select
+          name: select
+          props:
+            label: foo select
+    - component: PageRow
+      name: pageRow9
+      children:
+        - component: List
+          name: list
+          props:
+            renderItem:
+              $$template:
+                - component: PageRow
+                  name: pageRow2
+                  children:
+                    - component: Button
+                      name: button1
+                      props:
+                        content:
+                          $$jsExpression: |
+                            `List Button ${i + 1}`

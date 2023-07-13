@@ -9,3 +9,4 @@
 /examples/*/toolpad.yml
 
 /test/integration/*/fixture*/
+/test/visual/*/fixture*/

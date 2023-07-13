@@ -396,10 +396,6 @@
                       "$ref": "#/definitions/SimplePaletteColorOptions"
                     }
                   },
-                  "required": [
-                    "primary",
-                    "secondary"
-                  ],
                   "additionalProperties": true
                 }
               },

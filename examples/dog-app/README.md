@@ -6,4 +6,4 @@ A basic Toolpad app that shows how to call an API and work with data grid and im
 
 To build this app step-by-step, visit the [docs](https://mui.com/toolpad/getting-started/first-app/#building-your-first-application).
 
-[Open in CodeSandbox](https://codesandbox.io/p/sandbox/github/mui/mui-toolpad/tree/master/examples/dog-app)
+[![Open in StackBlitz](https://developer.stackblitz.com/img/open_in_stackblitz.svg)](https://stackblitz.com/fork/github/mui/mui-toolpad/tree/master/examples/dog-app)

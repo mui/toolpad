@@ -187,7 +187,19 @@ async function loadThemeFromFile(root: string): Promise<Theme | null> {
   const themeFilePath = getThemeFile(root);
   const content = await readMaybeFile(themeFilePath);
   if (content) {
-    return themeSchema.parse(yaml.parse(content));
+    const parsedFile = yaml.parse(content);
+    const result = themeSchema.safeParse(parsedFile);
+    if (result.success) {
+      return result.data;
+    }
+
+    console.error(
+      `${chalk.red('error')} - Failed to read theme ${chalk.cyan(themeFilePath)}. ${fromZodError(
+        result.error,
+      )}`,
+    );
+
+    return null;
   }
   return null;
 }
@@ -793,7 +805,7 @@ export async function findSupportedEditor(): Promise<string | null> {
     return null;
   }
   try {
-    await execa('which', [maybeEditor]);
+    await execa(maybeEditor, ['-v']);
     return maybeEditor;
   } catch (err) {
     return null;
@@ -914,7 +926,7 @@ function getDomFilePatterns(root: string) {
  * Calculates a fingerprint from all files that influence the dom structure
  */
 async function calculateDomFingerprint(root: string): Promise<number> {
-  const files = await glob(getDomFilePatterns(root));
+  const files = await glob(getDomFilePatterns(root), { windowsPathsNoEscape: true });
 
   const mtimes = await Promise.all(
     files.sort().map(async (file) => {

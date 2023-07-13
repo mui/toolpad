@@ -4,7 +4,7 @@ import { initProject } from './localMode';
 
 // eslint-disable-next-line no-underscore-dangle
 (globalThis as any).__project__ ??= initProject().catch((err) => {
-  console.error(`${chalk.red('error')} - Failed to intialize Toolpad`);
+  console.error(`${chalk.red('error')} - Failed to initialize Toolpad`);
   console.error(err);
   process.exit(1);
 });

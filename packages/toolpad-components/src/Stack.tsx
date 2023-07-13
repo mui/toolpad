@@ -1,6 +1,6 @@
 import { Stack } from '@mui/material';
 import { createComponent } from '@mui/toolpad-core';
-import { SX_PROP_HELPER_TEXT } from './constants.js';
+import { SX_PROP_HELPER_TEXT } from './constants';
 
 export default createComponent(Stack, {
   argTypes: {

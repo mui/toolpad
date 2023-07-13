@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { LoadingButton as MuiButton, LoadingButtonProps as MuiButtonProps } from '@mui/lab';
 import { createComponent } from '@mui/toolpad-core';
-import { SX_PROP_HELPER_TEXT } from './constants.js';
+import { SX_PROP_HELPER_TEXT } from './constants';
 
 interface ButtonProps extends Omit<MuiButtonProps, 'children'> {
   content: string;
@@ -13,7 +13,7 @@ function Button({ content, ...rest }: ButtonProps) {
 
 export default createComponent(Button, {
   helperText:
-    'The MUI [Button](https://mui.com/material-ui/react-button/) component.\n\nButtons allow users to take actions, and make choices, with a single tap.',
+    'The Material UI [Button](https://mui.com/material-ui/react-button/) component.\n\nButtons allow users to take actions, and make choices, with a single tap.',
   layoutDirection: 'both',
   argTypes: {
     onClick: {
@@ -27,7 +27,7 @@ export default createComponent(Button, {
     },
     variant: {
       helperText:
-        'One of the available MUI Button [variants](https://mui.com/material-ui/react-button/#basic-button). Possible values are `contained`, `outlined` or `text`',
+        'One of the available Material UI Button [variants](https://mui.com/material-ui/react-button/#basic-button). Possible values are `contained`, `outlined` or `text`',
       type: 'string',
       enum: ['contained', 'outlined', 'text'],
       default: 'contained',

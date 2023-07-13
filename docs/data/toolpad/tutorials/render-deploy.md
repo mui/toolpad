@@ -15,7 +15,7 @@
 
 2. If the Toolpad app is not currently a Git repository, we can run
 
-   ```sh
+   ```bash
    git init
    ```
 
@@ -23,7 +23,7 @@
 
 3. We can set the newly created repository on GitHub as the remote for our locally running Toolpad app, using:
 
-   ```sh
+   ```bash
    git remote add origin <REPOSITORY-URL>
    ```
 
@@ -31,7 +31,7 @@
 
 4. Once you are done making changes to your Toolpad app, verify that we are on the `main` branch, commit these changes and push them to GitHub.
 
-   ```sh
+   ```bash
    git add .
    git commit -m "pushing a new version"
    git push origin main
@@ -57,7 +57,7 @@
 
 5. The build and start commands will be set to
 
-   ```sh
+   ```bash
    $ yarn; yarn build
    $ yarn start
    ```

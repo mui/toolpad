@@ -45,6 +45,7 @@
     "jsonSchemas": "tsx ./scripts/docs/generateJsonSchemas.ts"
   },
   "devDependencies": {
+    "@argos-ci/core": "^0.8.0",
     "@jest/globals": "29.6.1",
     "@mui/monorepo": "https://github.com/mui/material-ui.git",
     "@next/eslint-plugin-next": "13.4.9",

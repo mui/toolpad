@@ -61,3 +61,5 @@ test-results
 .toolpad-generated
 
 .yarn-playwright-cache
+
+/test/regressions/screenshots/**

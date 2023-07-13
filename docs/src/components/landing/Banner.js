@@ -22,8 +22,7 @@ function Banner(props) {
       <Stack
         sx={(theme) => ({
           borderRadius: 1,
-          px: 2,
-          py: 3,
+          p: 2,
           background: `linear-gradient(180deg, ${alpha(theme.palette.primary[50], 0.2)}  50%, 
           ${(theme.vars || theme).palette.primary[50]} 100%)
           `,

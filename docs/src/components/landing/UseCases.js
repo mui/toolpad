@@ -199,6 +199,7 @@ export default function CardGrid() {
             sx={[
               (theme) => ({
                 display: 'block',
+                backgroundClip: 'padding-box',
                 minWidth: 510,
                 minHeight: 320,
                 height: 'auto',
@@ -210,17 +211,17 @@ export default function CardGrid() {
                 } url(${USE_CASE_IMAGES.get(expanded)})`,
                 backgroundSize: 'cover',
                 borderRadius: 1,
-                border: '1px solid',
-                borderColor: (theme.vars || theme).palette.divider,
+                border: '8px solid',
+                borderColor: (theme.vars || theme).palette.primary[100],
                 overflow: 'auto',
                 boxShadow: `0 0 8px 2px ${(theme.vars || theme).palette.primary[50]}, 0 4px 10px ${
                   (theme.vars || theme).palette.primary[100]
                 }`,
                 ...theme.applyDarkStyles({
-                  borderColor: (theme.vars || theme).palette.divider,
+                  borderColor: (theme.vars || theme).palette.primary[700],
                   boxShadow: `0 0 8px 2px ${
-                    (theme.vars || theme).palette.primaryDark[600]
-                  }, 0 4px 40px ${(theme.vars || theme).palette.primaryDark[500]}`,
+                    (theme.vars || theme).palette.primaryDark[800]
+                  }, 0 4px 40px ${alpha(theme.palette.primaryDark[900], 0.5)}`,
                 }),
               }),
             ]}

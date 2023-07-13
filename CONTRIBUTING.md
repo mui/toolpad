@@ -218,20 +218,6 @@ The playwright tests can be run in one of two modes:
 
 - Use the `--ui` flag to run the tests interactively
 
-## Visual regression tests
-
-- You can find debugging information and diffs in the `test-results` folder. These are also stored in CI in the circleci artifacts.
-
-- You can update the screenshots if necessary. You must have [docker](https://www.docker.com/products/docker-desktop/) installed.
-
-  ```sh
-  docker compose run --rm playwright
-  yarn && yarn release:build
-  yarn test:integration --project visual --update-snapshots
-  ```
-
-  _Tip: Configure docker for mac to use VirtioFS for improved performance (Docker desktop settings > General > Choose file sharing implementation for your containers)_
-
 ## Using CodeSandbox CI
 
 Each pull request is built on [CodeSandbox CI](https://codesandbox.io/docs/learn/sandboxes/ci). As a result of that we have a published Toolpad package for ever pull request. To use the package from the pull request, take the following steps:

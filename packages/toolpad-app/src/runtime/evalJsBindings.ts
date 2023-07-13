@@ -229,7 +229,7 @@ export default function evalJsBindings(
         if (typeof prop === 'symbol') {
           return Reflect.get(target, prop, receiver);
         }
-        
+
         const scopePath = label ? `${label}.${prop}` : prop;
         const bindingId = bindingIdMap.get(scopePath);
 

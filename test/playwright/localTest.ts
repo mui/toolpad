@@ -8,7 +8,7 @@ import { createWriteStream } from 'fs';
 import { pipeline } from 'stream/promises';
 import { Readable } from 'stream';
 import getPort from 'get-port';
-import { test as base } from './test';
+import { PageScreenshotOptions, test as base } from './test';
 import { waitForMatch } from '../utils/streams';
 
 const PROJECT_ROOT = path.resolve(__dirname, '../../');
@@ -145,7 +145,10 @@ const test = base.extend<
   {
     projectSnapshot: null;
     // Take a screenshot of the app to be used in argos-ci
-    argosScreenshot: (name: string) => Promise<void>;
+    argosScreenshot: (
+      name: string,
+      options?: Omit<PageScreenshotOptions, 'path' | 'type'>,
+    ) => Promise<void>;
   },
   {
     browserCloser: null;
@@ -199,7 +202,7 @@ const test = base.extend<
   ],
   argosScreenshot: [
     async ({ page }, use, testInfo) => {
-      await use(async (name: string) => {
+      await use(async (name, options) => {
         const snapshotPath = testInfo.snapshotPath(`${name}.png`);
         const relative = path.relative(testInfo.project.testDir, snapshotPath);
 
@@ -211,7 +214,7 @@ const test = base.extend<
         const screenshotPath = path.resolve(PROJECT_ROOT, ARGOS_OUTPUT_FOLDER, relative);
         await page.screenshot({
           path: screenshotPath,
-          fullPage: true,
+          ...options,
         });
       });
     },

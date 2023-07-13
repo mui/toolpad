@@ -4,7 +4,7 @@ import {
   JsExpressionAttrValue,
   JsRuntime,
   EnvAttrValue,
-} from './types.js';
+} from './types';
 
 export const TOOLPAD_LOADING_MARKER = '__TOOLPAD_LOADING_MARKER__';
 

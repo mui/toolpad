@@ -4,7 +4,7 @@ export type {
   NodeRuntime,
   NodeErrorProps,
   Components,
-} from './runtime.js';
+} from './runtime';
 export {
   Placeholder,
   Slots,
@@ -16,16 +16,16 @@ export {
   useComponents,
   ComponentsContextProvider,
   useComponent,
-} from './runtime.js';
+} from './runtime';
 
 export type FlowDirection = 'row' | 'column' | 'row-reverse' | 'column-reverse';
 
-export { default as useUrlQueryState } from './useUrlQueryState.js';
+export { default as useUrlQueryState } from './useUrlQueryState';
 
-export * from './constants.js';
+export * from './constants';
 
-export * from './browser.js';
+export * from './browser';
 
-export * from './types.js';
+export * from './types';
 
-export * from './server.js';
+export * from './server';

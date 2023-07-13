@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { LoadingButton as MuiButton, LoadingButtonProps as MuiButtonProps } from '@mui/lab';
 import { createComponent } from '@mui/toolpad-core';
-import { SX_PROP_HELPER_TEXT } from './constants.js';
+import { SX_PROP_HELPER_TEXT } from './constants';
 
 interface ButtonProps extends Omit<MuiButtonProps, 'children'> {
   content: string;

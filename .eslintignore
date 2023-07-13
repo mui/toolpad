@@ -10,3 +10,5 @@
 
 /test/integration/*/fixture*/
 /test/visual/*/fixture*/
+
+/test/regressions/screenshots/**

@@ -13,7 +13,6 @@ import { useDomApi } from '../../AppState';
 import BindableEditor from './BindableEditor';
 import { usePageEditorState } from './PageEditorProvider';
 import { getDefaultControl } from '../../propertyControls';
-import { NON_BINDABLE_CONTROL_TYPES } from '../../../runtime/constants';
 
 function buildScopeMeta(vm: ApplicationVm, bindingScope?: RuntimeScope): ScopeMeta {
   if (bindingScope?.parentScope) {
@@ -69,10 +68,7 @@ export default function NodeAttributeEditor<P extends object>({
   // to make them bindable to other controlled props only
   const isDisabled = !!argType.onChangeProp;
 
-  const isBindable =
-    !isDisabled &&
-    namespace !== 'layout' &&
-    !NON_BINDABLE_CONTROL_TYPES.includes(argType.control?.type as string);
+  const isBindable = !isDisabled && namespace !== 'layout' && argType.control?.bindable !== false;
 
   const jsBrowserRuntime = useBrowserJsRuntime();
 

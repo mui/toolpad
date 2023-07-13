@@ -77,7 +77,7 @@ import evalJsBindings, {
   EvaluatedBinding,
   ParsedBinding,
 } from './evalJsBindings';
-import { HTML_ID_EDITOR_OVERLAY, NON_BINDABLE_CONTROL_TYPES } from './constants';
+import { HTML_ID_EDITOR_OVERLAY } from './constants';
 import { layoutBoxArgTypes } from './toolpadComponents/layoutBox';
 import { execDataSourceQuery, useDataQuery, UseDataQueryConfig, UseFetch } from './useDataQuery';
 import { NavigateToPage } from './CanvasHooksContext';
@@ -471,7 +471,7 @@ function parseBindings(
         if (
           componentId !== PAGE_ROW_COMPONENT_ID &&
           !isResizableHeightProp &&
-          !NON_BINDABLE_CONTROL_TYPES.includes(argType?.control?.type as string)
+          argType?.control?.bindable !== false
         ) {
           scopePath = `${elm.name}.${propName}`;
         }

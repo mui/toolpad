@@ -199,6 +199,7 @@ export interface ArgControlSpec {
     | 'NumberFormat'
     | 'ColorScale'
     | 'RowIdFieldSelect'; // Row id field specialized select
+  bindable?: boolean;
 }
 
 export type PrimitiveValueType =

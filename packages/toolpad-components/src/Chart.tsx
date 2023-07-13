@@ -14,7 +14,6 @@ import {
   Area,
   Scatter,
 } from 'recharts';
-import { uniq } from 'lodash-es';
 import { SX_PROP_HELPER_TEXT } from './constants';
 
 export const CHART_DATA_SERIES_KINDS = ['line', 'bar', 'area', 'scatter'];
@@ -40,20 +39,17 @@ interface ChartProps extends ContainerProps {
 }
 
 function Chart({ data = [], height, sx }: ChartProps) {
-  const xValues = React.useMemo(
-    () =>
-      uniq(
-        data
-          .map((dataSeries) =>
-            (dataSeries.data || []).map((dataSeriesPoint) => dataSeriesPoint[dataSeries.xKey]),
-          )
-          .flat()
-          .sort((a: number | string, b: number | string) =>
-            typeof a === 'number' && typeof b === 'number' ? a - b : 0,
-          ),
-      ),
-    [data],
-  );
+  const xValues = React.useMemo(() => {
+    const allXValues = data.flatMap((dataSeries) =>
+      (dataSeries.data || []).map((dataSeriesPoint) => dataSeriesPoint[dataSeries.xKey]),
+    );
+
+    return allXValues
+      .filter((value, index) => allXValues.indexOf(value) === index)
+      .sort((a: number | string, b: number | string) =>
+        typeof a === 'number' && typeof b === 'number' ? a - b : 0,
+      );
+  }, [data]);
 
   const barChartData = React.useMemo(() => {
     return xValues.map((xValue) => {
@@ -202,7 +198,7 @@ export default createComponent(Chart, {
           },
         },
       },
-      control: { type: 'ChartData' },
+      control: { type: 'ChartData', bindable: false },
     },
     height: {
       type: 'number',

@@ -100,16 +100,6 @@ const PauseButton = styled(IconButton)(({ theme }) => [
   },
 ]);
 
-const Overlay = styled(Box)(({ theme }) => [
-  {
-    position: 'absolute',
-    inset: 0,
-    width: '100%',
-    height: '100%',
-    background: `${alpha(theme.palette.primaryDark[900], 0.4)}`,
-  },
-]);
-
 export default function DemoVideo() {
   const videoRef = useRef();
 
@@ -128,7 +118,6 @@ export default function DemoVideo() {
       <PauseButton type="button" onClick={handlePause}>
         <PauseRoundedIcon sx={{ color: '#FFF', fontSize: 16 }} />
       </PauseButton>
-      <Overlay />
       <Video poster="/static/toolpad/marketing/index-hero-video-poster.png" ref={videoRef}>
         <source src="/static/toolpad/marketing/index-hero-demo-video.mp4" type="video/mp4" />
         Your browser does not support the video tag.

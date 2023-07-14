@@ -15,6 +15,7 @@ import {
   PAGE_ROW_COMPONENT_ID,
   PAGE_COLUMN_COMPONENT_ID,
 } from '../../../runtime/toolpadComponents';
+import { DomView } from '../../../utils/domView';
 
 function CustomTreeItem(
   props: TreeItemProps & {
@@ -164,9 +165,9 @@ export default function PageStructureExplorer() {
   const appStateApi = useAppStateApi();
   const [expandedDomNodeIds, setExpandedDomNodeIds] = React.useState<string[]>([]);
 
-  const currentPageId = currentView?.kind === 'page' ? currentView.nodeId : null;
+  const currentPageId = currentView?.nodeId;
   const currentPageNode = currentPageId ? appDom.getNode(dom, currentPageId, 'page') : null;
-  const selectedDomNodeId = currentView.kind === 'page' ? currentView.selectedNodeId : '';
+  const selectedDomNodeId = (currentView as Extract<DomView, { kind: 'page' }>)?.selectedNodeId;
 
   const selectedNodeAncestorIds = React.useMemo(() => {
     if (!selectedDomNodeId) {
@@ -218,33 +219,35 @@ export default function PageStructureExplorer() {
     [setExpandedDomNodeIds],
   );
 
-  const handleNodeDelete = React.useCallback(
+  const deleteNode = React.useCallback(() => {
+    if (!selectedDomNodeId) {
+      return;
+    }
+    appStateApi.update(
+      (draft) => {
+        const toRemove = appDom.getMaybeNode(dom, selectedDomNodeId);
+        if (toRemove && appDom.isElement(toRemove)) {
+          draft = appDom.removeNode(draft, toRemove.id);
+          draft = deleteOrphanedLayoutNodes(dom, draft, toRemove);
+        }
+        return draft;
+        // return normalizePageRowColumnSizes(draft);
+      },
+      {
+        ...(currentView as Extract<DomView, { kind: 'page' }>),
+        selectedNodeId: null,
+      },
+    );
+  }, [appStateApi, dom, selectedDomNodeId, currentView]);
+
+  const handleKeyDown = React.useCallback(
     (event: React.KeyboardEvent<HTMLUListElement>) => {
       // delete selected node if event.key is Backspace
       if (event.key === 'Backspace') {
-        appStateApi.update(
-          (draft) => {
-            if (!selectedDomNodeId) {
-              return draft;
-            }
-            const toRemove = appDom.getMaybeNode(dom, selectedDomNodeId);
-            if (toRemove && appDom.isElement(toRemove)) {
-              draft = appDom.removeNode(draft, toRemove.id);
-              draft = deleteOrphanedLayoutNodes(dom, draft, toRemove);
-            }
-            return draft;
-            // return normalizePageRowColumnSizes(draft);
-          },
-          currentView.kind === 'page'
-            ? {
-                ...currentView,
-                selectedNodeId: null,
-              }
-            : currentView,
-        );
+        deleteNode();
       }
     },
-    [dom, selectedDomNodeId, currentView, appStateApi],
+    [deleteNode],
   );
 
   const expandedDomNodeIdSet = React.useMemo(() => {
@@ -268,7 +271,7 @@ export default function PageStructureExplorer() {
         onNodeSelect={handleNodeSelect}
         onNodeFocus={handleNodeFocus}
         onNodeToggle={handleNodeToggle}
-        onKeyDown={handleNodeDelete}
+        onKeyDown={handleKeyDown}
         sx={{ height: 600, flexGrow: 1, maxWidth: 400, overflowY: 'auto' }}
       >
         {rootChildren.map((childNode) => (

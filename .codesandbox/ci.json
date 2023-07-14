@@ -3,7 +3,6 @@
   "node": "16",
   "packages": [
     "packages/create-toolpad-app",
-    "packages/toolpad",
     "packages/toolpad-app",
     "packages/toolpad-components",
     "packages/toolpad-core",

@@ -1,4 +1,7 @@
 const baseline = require('@mui/monorepo/.eslintrc');
+const lodash = require('lodash');
+
+const ALLOWED_LODASH_METHODS = new Set(['throttle', 'debounce', 'set']);
 
 module.exports = {
   ...baseline,
@@ -24,6 +27,18 @@ module.exports = {
           {
             name: '@mui/icons-material',
             message: 'Use @mui/icons-material/<Icon> instead.',
+          },
+          {
+            name: 'lodash-es',
+            importNames: Object.keys(lodash).filter((key) => !ALLOWED_LODASH_METHODS.has(key)),
+            message:
+              'Avoid kitchensink libraries like lodash-es. We prefer a slightly more verbose, but more universally understood javascript style',
+          },
+        ],
+        patterns: [
+          {
+            group: ['lodash-es/*'],
+            message: 'Use `import { debounce } from "lodash-es";` instead.',
           },
         ],
       },

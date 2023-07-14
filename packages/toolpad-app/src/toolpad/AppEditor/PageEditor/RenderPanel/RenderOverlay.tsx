@@ -268,6 +268,51 @@ export function deleteOrphanedLayoutNodes(
   return draftDom;
 }
 
+const rowColumnCounts: Record<NodeId, number> = {};
+
+export function normalizePageRowColumnSizes(draftDom: appDom.AppDom, pageNode: appDom.PageNode) {
+  const draftPageNodes = [pageNode, ...appDom.getDescendants(draftDom, pageNode)];
+
+  draftPageNodes.forEach((node: appDom.AppDomNode) => {
+    if (appDom.isElement(node) && isPageRow(node)) {
+      const nodeChildren = appDom.getChildNodes(draftDom, node).children;
+      const childrenCount = nodeChildren?.length || 0;
+
+      const previousRowColumnCount = rowColumnCounts[node.id];
+
+      if (
+        previousRowColumnCount !== undefined &&
+        childrenCount > 0 &&
+        childrenCount &&
+        childrenCount < previousRowColumnCount
+      ) {
+        const layoutColumnSizes = nodeChildren.map((child) => child.layout?.columnSize || 1);
+        const totalLayoutColumnSizes = layoutColumnSizes.reduce((acc, size) => acc + size, 0);
+
+        const normalizedLayoutColumnSizes = layoutColumnSizes.map(
+          (size) => (size * nodeChildren.length) / totalLayoutColumnSizes,
+        );
+
+        nodeChildren.forEach((child, childIndex) => {
+          if (child.layout?.columnSize) {
+            draftDom = appDom.setNodeNamespacedProp(
+              draftDom,
+              child,
+              'layout',
+              'columnSize',
+              normalizedLayoutColumnSizes[childIndex],
+            );
+          }
+        });
+      }
+
+      rowColumnCounts[node.id] = childrenCount;
+    }
+  });
+
+  return draftDom;
+}
+
 interface RenderOverlayProps {
   bridge: ToolpadBridge | null;
 }
@@ -326,47 +371,6 @@ export default function RenderOverlay({ bridge }: RenderOverlayProps) {
     return rects;
   }, [nodesInfo, pageNodes]);
 
-  const previousRowColumnCountsRef = React.useRef<Record<NodeId, number>>({});
-
-  const normalizePageRowColumnSizes = React.useCallback(
-    (draftDom: appDom.AppDom): appDom.AppDom => {
-      const draftPageNodes = [pageNode, ...appDom.getDescendants(draftDom, pageNode)];
-
-      draftPageNodes.forEach((node: appDom.AppDomNode) => {
-        if (appDom.isElement(node) && isPageRow(node)) {
-          const nodeChildren = appDom.getChildNodes(draftDom, node).children;
-          const childrenCount = nodeChildren?.length || 0;
-
-          if (childrenCount > 0 && childrenCount < previousRowColumnCountsRef.current[node.id]) {
-            const layoutColumnSizes = nodeChildren.map((child) => child.layout?.columnSize || 1);
-            const totalLayoutColumnSizes = layoutColumnSizes.reduce((acc, size) => acc + size, 0);
-
-            const normalizedLayoutColumnSizes = layoutColumnSizes.map(
-              (size) => (size * nodeChildren.length) / totalLayoutColumnSizes,
-            );
-
-            nodeChildren.forEach((child, childIndex) => {
-              if (child.layout?.columnSize) {
-                draftDom = appDom.setNodeNamespacedProp(
-                  draftDom,
-                  child,
-                  'layout',
-                  'columnSize',
-                  normalizedLayoutColumnSizes[childIndex],
-                );
-              }
-            });
-          }
-
-          previousRowColumnCountsRef.current[node.id] = childrenCount;
-        }
-      });
-
-      return draftDom;
-    },
-    [pageNode],
-  );
-
   const selectNode = React.useCallback(
     (nodeId: NodeId) => {
       if (selectedNodeId !== nodeId) {
@@ -417,7 +421,7 @@ export default function RenderOverlay({ bridge }: RenderOverlayProps) {
             draft = deleteOrphanedLayoutNodes(dom, draft, toRemove);
           }
 
-          return normalizePageRowColumnSizes(draft);
+          return normalizePageRowColumnSizes(draft, pageNode);
         },
         currentView.kind === 'page'
           ? {
@@ -427,7 +431,7 @@ export default function RenderOverlay({ bridge }: RenderOverlayProps) {
           : currentView,
       );
     },
-    [appStateApi, currentView, dom, normalizePageRowColumnSizes],
+    [appStateApi, currentView, dom, pageNode],
   );
 
   const selectedRect = (selectedNode && !newNode && nodesInfo[selectedNode.id]?.rect) || null;
@@ -462,10 +466,10 @@ export default function RenderOverlay({ bridge }: RenderOverlayProps) {
 
       domApi.update((draft) => {
         draft = appDom.duplicateNode(draft, node);
-        return normalizePageRowColumnSizes(draft);
+        return normalizePageRowColumnSizes(draft, pageNode);
       });
     },
-    [domApi, normalizePageRowColumnSizes],
+    [domApi, pageNode],
   );
 
   const getNodeDraggableHorizontalEdges = React.useCallback(
@@ -1271,7 +1275,7 @@ export default function RenderOverlay({ bridge }: RenderOverlayProps) {
             draft = deleteOrphanedLayoutNodes(dom, draft, draggedNode, dragOverNodeId);
           }
 
-          return normalizePageRowColumnSizes(draft);
+          return normalizePageRowColumnSizes(draft, pageNode);
         },
         currentView.kind === 'page'
           ? { ...omit(currentView, 'tab'), selectedNodeId: newNode?.id || draggedNodeId }
@@ -1301,7 +1305,7 @@ export default function RenderOverlay({ bridge }: RenderOverlayProps) {
       draggedNodeId,
       newNode,
       nodesInfo,
-      normalizePageRowColumnSizes,
+      pageNode,
       selectedNodeId,
     ],
   );
@@ -1529,22 +1533,13 @@ export default function RenderOverlay({ bridge }: RenderOverlayProps) {
             }
           }
 
-          return normalizePageRowColumnSizes(draft);
+          return normalizePageRowColumnSizes(draft, pageNode);
         });
       }
 
       api.dragEnd();
     },
-    [
-      api,
-      dom,
-      domApi,
-      draggedEdge,
-      draggedNode,
-      nodesInfo,
-      normalizePageRowColumnSizes,
-      resizePreviewElement,
-    ],
+    [api, dom, domApi, draggedEdge, draggedNode, nodesInfo, pageNode, resizePreviewElement],
   );
 
   return (

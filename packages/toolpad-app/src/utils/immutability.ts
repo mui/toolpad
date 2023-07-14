@@ -1,3 +1,5 @@
+// TODO: remove these lodash-es imports
+// eslint-disable-next-line no-restricted-imports
 import { setWith, clone } from 'lodash-es';
 
 /**

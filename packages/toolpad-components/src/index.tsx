@@ -12,6 +12,8 @@ export { default as Button } from './Button';
 
 export { default as DataGrid } from './DataGrid';
 
+export { default as Chart } from './Chart';
+
 export { default as TextField } from './TextField';
 
 export { default as Select } from './Select';
@@ -37,3 +39,5 @@ export type { ColorScale, ColorScaleStop } from './Metric';
 
 export { CUSTOM_COLUMN_TYPES, inferColumns, parseColumns } from './DataGrid';
 export type { SerializableGridColumn, SerializableGridColumns } from './DataGrid';
+
+export { type ChartDataSeries, type ChartData, CHART_DATA_SERIES_KINDS } from './Chart';

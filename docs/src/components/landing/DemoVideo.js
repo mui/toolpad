@@ -10,7 +10,7 @@ const VideoContainer = styled(Box)(({ theme }) => [
     position: 'relative',
     width: '100%',
     height: '100%',
-    borderRadius: theme.shape.borderRadius,
+    borderRadius: 16,
     padding: 8,
     paddingBottom: 4,
     background: `linear-gradient(120deg, ${(theme.vars || theme).palette.primary[50]} 0%, ${alpha(
@@ -18,7 +18,7 @@ const VideoContainer = styled(Box)(({ theme }) => [
       0.2,
     )} 150%)`,
     border: '1px solid',
-    borderColor: (theme.vars || theme).palette.primary[100],
+    borderColor: `${alpha(theme.palette.primary[100], 0.6)}`,
     boxShadow: `4px 0 60px ${alpha(theme.palette.primary[100], 0.8)}`,
     overflow: 'hidden',
   },
@@ -26,7 +26,7 @@ const VideoContainer = styled(Box)(({ theme }) => [
     background: `linear-gradient(120deg, ${
       (theme.vars || theme).palette.primaryDark[500]
     } 0%, ${alpha(theme.palette.primaryDark[800], 0.4)} 150%)`,
-    borderColor: `${alpha(theme.palette.primaryDark[300], 0.4)}`,
+    borderColor: `${alpha(theme.palette.primaryDark[300], 0.3)}`,
     boxShadow: `4px 0 60px ${alpha(theme.palette.primary[600], 0.5)}`,
   }),
 ]);
@@ -37,9 +37,9 @@ const Video = styled('video')(({ theme }) => [
     objectFit: 'cover',
     width: '100%',
     height: '100%',
-    borderRadius: 7,
+    borderRadius: 10,
     border: '1px solid',
-    borderColor: (theme.vars || theme).palette.primary[100],
+    borderColor: `${alpha(theme.palette.primary[100], 0.4)}`,
   },
   theme.applyDarkStyles({
     borderColor: (theme.vars || theme).palette.primaryDark[700],

@@ -10,6 +10,7 @@ import AppHeaderBanner from 'docs/src/components/banner/AppHeaderBanner';
 import Hero2 from '../../src/components/landing/Hero2';
 import SignUpToast from '../../src/components/landing/SignUpToast';
 import UseCases from '../../src/components/landing/UseCases';
+import UseCases2 from '../../src/components/landing/UseCases2';
 import CardGrid from '../../src/components/landing/CardGrid';
 import Banner from '../../src/components/landing/Banner';
 import Pricing from '../../src/components/landing/PricingTable';
@@ -51,7 +52,8 @@ export default function Home() {
       <main id="main-content">
         <Hero2 />
         <Divider />
-        <UseCases content={useCases} />
+        {/* <UseCases content={useCases} /> */}
+        <UseCases2 content={useCases} />
         <Divider />
         <CardGrid content={features} />
         <Banner

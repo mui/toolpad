@@ -21,7 +21,7 @@ export const layoutBoxArgTypes: {
     helperText: 'Vertical alignment of the component.',
     type: 'string',
     enum: ['start', 'center', 'end', 'space-between', 'space-around', 'space-evenly'],
-    default: 'center',
+    default: 'start',
     label: 'Vertical alignment',
     control: { type: 'VerticalAlign' },
   },

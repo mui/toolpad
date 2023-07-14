@@ -148,18 +148,26 @@ function ComponentPropsEditor<P extends object>({
             Layout:
           </Typography>
 
-          <div className={classes.control}>
-            <NodeAttributeEditor
-              node={node}
-              namespace="layout"
-              name={hasLayoutHorizontalControls ? 'horizontalAlign' : 'verticalAlign'}
-              argType={
-                hasLayoutHorizontalControls
-                  ? layoutBoxArgTypes.horizontalAlign
-                  : layoutBoxArgTypes.verticalAlign
-              }
-            />
-          </div>
+          {hasLayoutHorizontalControls ? (
+            <div className={classes.control}>
+              <NodeAttributeEditor
+                node={node}
+                namespace="layout"
+                name="horizontalAlign"
+                argType={layoutBoxArgTypes.horizontalAlign}
+              />
+            </div>
+          ) : null}
+          {hasLayoutVerticalControls ? (
+            <div className={classes.control}>
+              <NodeAttributeEditor
+                node={node}
+                namespace="layout"
+                name="verticalAlign"
+                argType={layoutBoxArgTypes.verticalAlign}
+              />
+            </div>
+          ) : null}
 
           <Divider sx={{ mt: 1 }} />
         </React.Fragment>

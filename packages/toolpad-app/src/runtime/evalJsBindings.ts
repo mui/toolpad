@@ -115,11 +115,7 @@ export function buildGlobalScope(
   }
   return globalScope;
 }
-
-const limitExpressLookLoad = new Map<
-  string,
-  Record<string, { result: null | BindingEvaluationResult }>
->();
+const computationStatuses = new Map<string, { result: null | BindingEvaluationResult }>();
 /**
  * Evaluates the expressions and replace with their result
  */
@@ -129,7 +125,7 @@ export default function evalJsBindings(
   globalScope: Record<string, unknown>,
 ): Record<string, EvaluatedBinding> {
   const bindingsMap = new Map(Object.entries(bindings));
-  const computationStatuses = new Map<string, { result: null | BindingEvaluationResult }>();
+
   const bindingIdMap = new Map<string, string>();
   for (const [bindingId, binding] of bindingsMap) {
     if (binding.scopePath) {
@@ -164,9 +160,7 @@ export default function evalJsBindings(
     const expression = binding.expression;
 
     if (expression) {
-      const computed =
-        computationStatuses.get(expression) || limitExpressLookLoad.get(bindingId)?.[expression];
-
+      const computed = computationStatuses.get(expression);
       if (computed) {
         if (computed.result) {
           // From cache
@@ -180,26 +174,9 @@ export default function evalJsBindings(
       computationStatuses.set(expression, { result: null });
       const prevContext = currentParentBinding;
       currentParentBinding = bindingId;
-      let result: BindingEvaluationResult;
-      // const result = jsRuntime.evaluateExpression(expression, proxiedScope);
-      if (bindingId.includes('defaultValue')) {
-        const res = limitExpressLookLoad.get(bindingId);
-        if (res?.[expression]) {
-          result = res?.[expression] as BindingEvaluationResult;
-        } else {
-          result = jsRuntime.evaluateExpression(expression, proxiedScope);
-          const o = {
-            [expression]: { result },
-          };
-          limitExpressLookLoad.set(bindingId, o);
-          return result;
-        }
-      } else {
-        result = jsRuntime.evaluateExpression(expression, proxiedScope);
-        currentParentBinding = prevContext;
-        computationStatuses.set(expression, { result });
-      }
-
+      const result = jsRuntime.evaluateExpression(expression, proxiedScope);
+      currentParentBinding = prevContext;
+      computationStatuses.set(expression, { result });
       // From freshly computed
       return result;
     }

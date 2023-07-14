@@ -15,7 +15,9 @@ function Marquee({ content }) {
           display: 'flex',
           flexDirection: 'column',
           alignItems: 'center',
-          background: `linear-gradient(180deg, ${
+          backgroundRepeat: 'no-repeat',
+          backgroundSize: '100%',
+          backgroundImage: `linear-gradient(180deg, ${
             (theme.vars || theme).palette.primaryDark[900]
           } 0%, ${(theme.vars || theme).palette.primaryDark[800]})`,
         }),
@@ -26,22 +28,19 @@ function Marquee({ content }) {
         variant="h2"
         sx={{
           mx: 'auto',
-          color: (theme) => theme.palette.primary[800],
+          color: 'primary.50',
         }}
       >
         {content.title}
       </Typography>
       <Typography
         textAlign="center"
-        sx={[
-          {
-            mt: 1,
-            mb: 4,
-            mx: 'auto',
-            color: 'grey.600',
-          },
-          (theme) => theme.applyDarkStyles({ color: 'grey.500' }),
-        ]}
+        sx={{
+          mt: 1,
+          mb: 4,
+          mx: 'auto',
+          color: 'grey.500',
+        }}
       >
         {content.subtitle}
       </Typography>

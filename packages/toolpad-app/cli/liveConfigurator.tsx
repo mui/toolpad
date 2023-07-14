@@ -66,6 +66,8 @@ type SerializedProperties<O> = {
 };
 
 function generateComponent(name: string, dataGridFile: DataGridFile) {
+  const hasRowsProperty = (dataGridFile.spec?.rows?.kind ?? 'property') === 'property';
+
   const columnDefs: string[] =
     dataGridFile.spec?.columns?.map((column) => {
       const properties: SerializedProperties<GridColDef> = {
@@ -86,7 +88,11 @@ function generateComponent(name: string, dataGridFile: DataGridFile) {
 
     const columns = ${serializeArray(columnDefs)};
 
-    export default function ToolpadDataGrid({ rows = [] }) {
+    export interface ToolpadDataGridProps {
+      rows: ${hasRowsProperty ? '{ id: string | number }[]' : 'undefined'};
+    }
+
+    export default function ToolpadDataGrid({ rows = [] }: ToolpadDataGridProps) {
       return (
         <Box sx={{ width: '100%', height: 400 }}>
           <DataGridPro rows={rows} columns={columns} /> 
@@ -110,18 +116,6 @@ async function compileComponent(code: string) {
   });
 
   return result.code;
-}
-
-function generateComponentTypes(name: string, dataGridFile: DataGridFile) {
-  const hasRowsProperty = (dataGridFile.spec?.rows?.kind ?? 'property') === 'property';
-  return `
-    import * as React from 'react';
-    type ToolpadDataGridType = React.ComponentType<{
-      rows?: ${hasRowsProperty ? 'unknown[]' : 'never'};
-    }>;
-    declare const ToolpadDataGrid: ToolpadDataGridType;
-    export default ToolpadDataGrid;
-  `;
 }
 
 function generateIndex(entries: string[]) {
@@ -178,7 +172,6 @@ async function generateLib(root: string, { dev = false }: GenerateConfig = {}) {
 
       const generatedComponent = generateComponent(name, dataGridFile);
       const compiledComponent = await compileComponent(generatedComponent);
-      const generatedTypes = generateComponentTypes(name, dataGridFile);
 
       await Promise.all([
         fs.writeFile(path.join(outputDir, `${name}.tsx`), generatedComponent, {
@@ -187,7 +180,6 @@ async function generateLib(root: string, { dev = false }: GenerateConfig = {}) {
         fs.writeFile(path.join(outputDir, `${name}.mjs`), compiledComponent, {
           encoding: 'utf-8',
         }),
-        fs.writeFile(path.join(outputDir, `${name}.d.ts`), generatedTypes, { encoding: 'utf-8' }),
       ]);
     }),
     fs.writeFile(path.join(outputDir, `index.mjs`), generateIndex(entries), { encoding: 'utf-8' }),

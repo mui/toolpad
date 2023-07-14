@@ -12,9 +12,8 @@ import {
 import { ExactEntriesOf } from '../../../utils/types';
 import * as appDom from '../../../appDom';
 import NodeAttributeEditor from './NodeAttributeEditor';
-import { useDom, useAppState } from '../../AppState';
+import { useDom } from '../../AppState';
 import { usePageEditorState } from './PageEditorProvider';
-import PageOptionsPanel from './PageOptionsPanel';
 import ErrorAlert from './ErrorAlert';
 import NodeNameEditor from '../NodeNameEditor';
 import { useToolpadComponent } from '../toolpadComponents';
@@ -221,25 +220,15 @@ function SelectedNodeEditor({ node }: SelectedNodeEditorProps) {
 }
 
 export interface ComponentEditorProps {
+  node: appDom.ElementNode;
   className?: string;
 }
 
-export default function ComponentEditor({ className }: ComponentEditorProps) {
-  const { dom } = useDom();
-  const { currentView } = useAppState();
-  const selectedNodeId = currentView.kind === 'page' ? currentView.selectedNodeId : null;
-
-  const selectedNode = selectedNodeId ? appDom.getMaybeNode(dom, selectedNodeId) : null;
-
+export default function ComponentEditor({ node, className }: ComponentEditorProps) {
   return (
     <PropControlsContextProvider value={propTypeControls}>
       <ComponentEditorRoot className={className} data-testid="component-editor">
-        {selectedNode && appDom.isElement(selectedNode) ? (
-          // Add key to make sure it mounts every time selected node changes
-          <SelectedNodeEditor key={selectedNode.id} node={selectedNode} />
-        ) : (
-          <PageOptionsPanel />
-        )}
+        <SelectedNodeEditor key={node.id} node={node} />
       </ComponentEditorRoot>
     </PropControlsContextProvider>
   );

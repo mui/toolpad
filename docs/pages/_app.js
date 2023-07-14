@@ -16,8 +16,8 @@ import { pathnameToLanguage } from 'docs/src/modules/utils/helpers';
 import createEmotionCache from 'docs/src/createEmotionCache';
 import findActivePage from 'docs/src/modules/utils/findActivePage';
 import getProductInfoFromUrl from 'docs/src/modules/utils/getProductInfoFromUrl';
+import toolpadPkgJson from '@mui/toolpad/package.json';
 import pages from '../data/pages';
-import toolpadPkgJson from '../../packages/toolpad/package.json';
 
 const clientSideEmotionCache = createEmotionCache();
 

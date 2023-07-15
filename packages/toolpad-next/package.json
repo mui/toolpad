@@ -18,15 +18,21 @@
     "dist",
     "cli.js"
   ],
+  "type": "module",
   "exports": {
-    "./package.json": "./package.json"
+    "./package.json": "./package.json",
+    "./runtime": "./dist/runtime/index.js"
   },
   "dependencies": {
+    "@mui/material": "5.14.0",
+    "@mui/toolpad-utils": "0.1.20",
+    "chokidar": "3.5.3",
     "dotenv": "16.3.1",
     "esbuild": "0.18.11",
     "get-port": "7.0.0",
     "glob": "10.3.3",
-    "prettier": "2.8.8",
+    "prettier": "3.0.0",
+    "serialize-javascript": "6.0.1",
     "yaml": "2.3.1",
     "yaml-diff-patch": "2.0.0",
     "yargs": "17.7.2",

@@ -6,6 +6,6 @@ const DEFAULT_OPTIONS = {
   plugins: [parserBabel],
 };
 
-export function format(code: string): string {
+export async function format(code: string): Promise<string> {
   return prettier.format(code, DEFAULT_OPTIONS);
 }

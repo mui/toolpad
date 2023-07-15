@@ -18,27 +18,30 @@ function cleanFolderOnFailure(folder: string): esbuild.Plugin {
 
 export default defineConfig([
   {
-    entry: {
-      index: './cli/index.ts',
-    },
+    entry: ['./src/cli/index.ts'],
     outDir: 'dist/cli',
     silent: true,
-    noExternal: [
-      'open-editor',
-      'execa',
-      'fractional-indexing',
-      'lodash-es',
-      'chalk',
-      'get-port',
-      'pretty-bytes',
-      'latest-version',
-      'nanoid',
-    ],
+    format: ['esm'],
     sourcemap: true,
+    dts: false,
     esbuildPlugins: [cleanFolderOnFailure(path.resolve(__dirname, './dist/cli'))],
     async onSuccess() {
       // eslint-disable-next-line no-console
       console.log('cli: build successful');
+    },
+  },
+  {
+    entry: ['./src/runtime/index.tsx'],
+    outDir: 'dist/runtime',
+    silent: true,
+    format: ['esm'],
+    sourcemap: true,
+    external: ['react', 'react-dom'],
+    dts: true,
+    esbuildPlugins: [cleanFolderOnFailure(path.resolve(__dirname, './dist/runtime'))],
+    async onSuccess() {
+      // eslint-disable-next-line no-console
+      console.log('runtime: build successful');
     },
   },
 ]);

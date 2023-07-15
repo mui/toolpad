@@ -1,40 +1,13 @@
 import { glob } from 'glob';
 import * as path from 'path';
 import * as fs from 'fs/promises';
-import * as z from 'zod';
 import * as yaml from 'yaml';
 import { GridColDef } from '@mui/x-data-grid-pro';
 import * as esbuild from 'esbuild';
 import * as chokidar from 'chokidar';
+import serializeJavascript from 'serialize-javascript';
 import { format } from './prettier';
-
-const dataGridFileSchema = z.object({
-  kind: z.literal('DataGrid'),
-  spec: z
-    .object({
-      rows: z
-        .discriminatedUnion('kind', [
-          z.object({
-            kind: z.literal('property'),
-          }),
-          z.object({
-            kind: z.literal('fetch'),
-            method: z.enum(['GET', 'POST']).optional(),
-            url: z.string().optional(),
-          }),
-        ])
-        .optional(),
-      columns: z
-        .array(
-          z.object({
-            field: z.string(),
-            type: z.enum(['string', 'number', 'date', 'dateTime', 'boolean']).optional(),
-          }),
-        )
-        .optional(),
-    })
-    .optional(),
-});
+import { DataGridFile, ToolpadFile, toolpadFileSchema } from '../shared/schemas';
 
 function isValidJsIdentifier(base: string): boolean {
   return /^[a-zA-Z][a-zA-Z0-9]*$/.test(base);
@@ -50,8 +23,6 @@ function getNameFromPath(filePath: string): string {
   return name;
 }
 
-type DataGridFile = z.infer<typeof dataGridFileSchema>;
-
 function serializeObject(properties: Record<string, string>): string {
   return `{${Object.entries(properties)
     .map((entry) => entry.join(': '))
@@ -65,7 +36,15 @@ type SerializedProperties<O> = {
   [K in keyof O]: string | (undefined extends O[K] ? undefined : never);
 };
 
-function generateComponent(name: string, dataGridFile: DataGridFile) {
+interface GenerateComponentConfig {
+  name: string;
+  dev: boolean;
+}
+
+async function generateDataGridComponent(
+  dataGridFile: DataGridFile,
+  { name, dev }: GenerateComponentConfig,
+) {
   const hasRowsProperty = (dataGridFile.spec?.rows?.kind ?? 'property') === 'property';
 
   const columnDefs: string[] =
@@ -85,6 +64,7 @@ function generateComponent(name: string, dataGridFile: DataGridFile) {
     import * as React from 'react';
     import { DataGridPro } from '@mui/x-data-grid-pro';
     import { Box } from '@mui/material';
+    ${dev ? `import { withDevtool, EditButton } from '@mui/toolpad-next/runtime';` : ''}
 
     const columns = ${serializeArray(columnDefs)};
 
@@ -92,18 +72,41 @@ function generateComponent(name: string, dataGridFile: DataGridFile) {
       rows: ${hasRowsProperty ? '{ id: string | number }[]' : 'undefined'};
     }
 
-    export default function ToolpadDataGrid({ rows = [] }: ToolpadDataGridProps) {
+    function ToolpadDataGrid({ rows = [] }: ToolpadDataGridProps) {
       return (
-        <Box sx={{ width: '100%', height: 400 }}>
-          <DataGridPro rows={rows} columns={columns} /> 
+        <Box sx={{ position: 'relative', width: '100%', height: 400 }}>
+          <DataGridPro rows={rows} columns={columns} />
+          ${
+            dev
+              ? `<EditButton sx={{ position: 'absolute', bottom: 0, right: 0, mb: 2, mr: 2, zIndex: 1 }} />`
+              : ''
+          }
         </Box>
       )
     }
 
     ToolpadDataGrid.displayName = ${JSON.stringify(name)};
+
+    export default ${
+      dev
+        ? `withDevtool(ToolpadDataGrid, ${serializeObject({
+            name: JSON.stringify(name),
+            file: serializeJavascript(dataGridFile),
+          })})`
+        : 'ToolpadDataGrid'
+    };
   `;
 
   return format(code);
+}
+
+async function generateComponent(file: ToolpadFile, config: GenerateComponentConfig) {
+  switch (file.kind) {
+    case 'DataGrid':
+      return generateDataGridComponent(file, config);
+    default:
+      throw new Error(`No implementation yet for ${JSON.stringify(file.kind)}`);
+  }
 }
 
 async function compileComponent(code: string) {
@@ -167,10 +170,10 @@ async function generateLib(root: string, { dev = false }: GenerateConfig = {}) {
     ...entries.map(async (entryPath) => {
       const yamlContent = await fs.readFile(entryPath, 'utf-8');
       const data = yaml.parse(yamlContent);
-      const dataGridFile = dataGridFileSchema.parse(data);
+      const file = toolpadFileSchema.parse(data);
       const name = getNameFromPath(entryPath);
 
-      const generatedComponent = generateComponent(name, dataGridFile);
+      const generatedComponent = await generateComponent(file, { name, dev });
       const compiledComponent = await compileComponent(generatedComponent);
 
       await Promise.all([

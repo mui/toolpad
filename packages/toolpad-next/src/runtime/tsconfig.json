@@ -1,14 +1,13 @@
 {
   "compilerOptions": {
     "target": "esnext",
-    "lib": [],
+    "lib": ["dom", "dom.iterable", "esnext"],
     "allowJs": true,
     "checkJs": true,
     "skipLibCheck": true,
     "strict": true,
     "forceConsistentCasingInFileNames": true,
     "downlevelIteration": true,
-    "noEmit": true,
     "esModuleInterop": true,
     "module": "esnext",
     "moduleResolution": "Bundler",
@@ -17,19 +16,13 @@
     "jsx": "react",
     "noUnusedLocals": true,
     "pretty": true,
-    "preserveWatchOutput": true
+    "preserveWatchOutput": true,
+    "composite": true
   },
-  "include": [],
-  "exclude": ["node_modules"],
+  "include": ["./**/*.ts", "./**/*.tsx"],
   "references": [
     {
-      "path": "./src/cli/tsconfig.json"
-    },
-    {
-      "path": "./src/runtime/tsconfig.json"
-    },
-    {
-      "path": "./src/shared/tsconfig.json"
+      "path": "../shared/tsconfig.json"
     }
   ]
 }

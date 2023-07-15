@@ -1,10 +1,16 @@
 {
   "compilerOptions": {
+    "lib": [],
     "composite": true,
     "skipLibCheck": true,
     "module": "ESNext",
     "moduleResolution": "bundler",
     "allowSyntheticDefaultImports": true
   },
-  "include": ["./**/*.ts", "./**/*.tsx"]
+  "include": ["./**/*.ts", "./**/*.tsx"],
+  "references": [
+    {
+      "path": "../shared/tsconfig.json"
+    }
+  ]
 }

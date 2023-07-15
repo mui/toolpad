@@ -545,7 +545,7 @@ export default createComponent(DataGridComponent, {
           required: ['field'],
         },
       },
-      control: { type: 'GridColumns' },
+      control: { type: 'GridColumns', bindable: false },
     },
     rowIdField: {
       helperText:

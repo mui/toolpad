@@ -9,7 +9,6 @@ import chalk from 'chalk';
 import { folderExists } from '@mui/toolpad-utils/fs';
 import { execaNode } from 'execa';
 import getPort from 'get-port';
-import { liveCommand, generateCommand } from './liveConfigurator';
 
 const DEFAULT_PORT = 3000;
 
@@ -183,22 +182,6 @@ export default async function cli(argv: string[]) {
         ...sharedRunOptions,
       },
       (args) => devCommand(args),
-    )
-    .command(
-      'generate [dir]',
-      'Run Toolpad live configurators',
-      {
-        ...sharedOptions,
-      },
-      (args) => generateCommand(args),
-    )
-    .command(
-      'live [dir]',
-      'Run Toolpad live configurators',
-      {
-        ...sharedOptions,
-      },
-      (args) => liveCommand(args),
     )
     .command(
       'start [dir]',

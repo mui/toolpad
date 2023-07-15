@@ -6,7 +6,7 @@ import * as yaml from 'yaml';
 import { GridColDef } from '@mui/x-data-grid-pro';
 import * as esbuild from 'esbuild';
 import * as chokidar from 'chokidar';
-import { format } from '../src/utils/prettier';
+import { format } from './prettier';
 
 const dataGridFileSchema = z.object({
   kind: z.literal('DataGrid'),
@@ -150,12 +150,12 @@ function getYmlPattern(root: string) {
 }
 
 interface GenerateConfig {
-  dev: boolean;
+  dev?: boolean;
 }
 
 async function generateLib(root: string, { dev = false }: GenerateConfig = {}) {
   // eslint-disable-next-line no-console
-  console.log(`Generating lib at ${JSON.stringify(root)}...`);
+  console.log(`Generating lib at ${JSON.stringify(root)} ${dev ? 'in dev mode' : ''}`);
 
   const toolpadDir = getToolpadDir(root);
   const outputDir = path.join(toolpadDir, '.generated/components');

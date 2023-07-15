@@ -42,6 +42,7 @@
     "test": "lerna run test",
     "check-types": "lerna run check-types",
     "toolpad": "toolpad",
+    "toolpad-next": "node ./packages/toolpad-next/dist/cli/index.js",
     "jsonSchemas": "tsx ./scripts/docs/generateJsonSchemas.ts"
   },
   "devDependencies": {

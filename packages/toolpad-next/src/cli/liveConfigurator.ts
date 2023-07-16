@@ -109,7 +109,7 @@ async function generateComponent(file: ToolpadFile, config: GenerateComponentCon
   }
 }
 
-async function compileComponent(code: string) {
+async function compileTs(code: string) {
   const result = await esbuild.transform(code, {
     loader: 'tsx',
     format: 'esm',
@@ -121,18 +121,13 @@ async function compileComponent(code: string) {
   return result.code;
 }
 
-function generateIndex(entries: string[]) {
-  return entries.map((entryPath) => {
-    const name = getNameFromPath(entryPath);
-    return `export { default as ${name} } from './${name}';`;
-  });
-}
-
-function generateIndexTypes(entries: string[]) {
-  return entries.map((entryPath) => {
-    const name = getNameFromPath(entryPath);
-    return `export { default as ${name} } from './${name}';`;
-  });
+async function generateIndex(entries: string[]): Promise<string> {
+  return entries
+    .map((entryPath) => {
+      const name = getNameFromPath(entryPath);
+      return `export { default as ${name} } from './${name}';`;
+    })
+    .join('\n');
 }
 
 export interface Config {
@@ -165,6 +160,8 @@ async function generateLib(root: string, { dev = false }: GenerateConfig = {}) {
   const ymlPattern = getYmlPattern(root);
   const entries = await glob(ymlPattern);
 
+  const indexContentPromise = generateIndex(entries);
+
   await fs.mkdir(outputDir, { recursive: true });
   await Promise.all([
     ...entries.map(async (entryPath) => {
@@ -173,21 +170,34 @@ async function generateLib(root: string, { dev = false }: GenerateConfig = {}) {
       const file = toolpadFileSchema.parse(data);
       const name = getNameFromPath(entryPath);
 
-      const generatedComponent = await generateComponent(file, { name, dev });
-      const compiledComponent = await compileComponent(generatedComponent);
+      const generatedComponentPromise = generateComponent(file, { name, dev });
 
       await Promise.all([
-        fs.writeFile(path.join(outputDir, `${name}.tsx`), generatedComponent, {
-          encoding: 'utf-8',
+        generatedComponentPromise.then(async (generatedComponent) => {
+          await fs.writeFile(path.join(outputDir, `${name}.tsx`), generatedComponent, {
+            encoding: 'utf-8',
+          });
         }),
-        fs.writeFile(path.join(outputDir, `${name}.mjs`), compiledComponent, {
-          encoding: 'utf-8',
+
+        generatedComponentPromise.then(async (generatedComponent) => {
+          const compiledComponent = await compileTs(generatedComponent);
+          await fs.writeFile(path.join(outputDir, `${name}.mjs`), compiledComponent, {
+            encoding: 'utf-8',
+          });
         }),
       ]);
     }),
-    fs.writeFile(path.join(outputDir, `index.mjs`), generateIndex(entries), { encoding: 'utf-8' }),
-    fs.writeFile(path.join(outputDir, `index.d.ts`), generateIndexTypes(entries), {
-      encoding: 'utf-8',
+
+    indexContentPromise.then(async (indexContent) => {
+      await fs.writeFile(path.join(outputDir, `index.ts`), indexContent, { encoding: 'utf-8' });
+    }),
+
+    indexContentPromise.then(async (indexContent) => {
+      const compiledIndexContent = await compileTs(indexContent);
+
+      await fs.writeFile(path.join(outputDir, `index.mjs`), compiledIndexContent, {
+        encoding: 'utf-8',
+      });
     }),
   ]);
 

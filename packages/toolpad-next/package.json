@@ -24,6 +24,8 @@
     "./runtime": "./dist/runtime/index.js"
   },
   "dependencies": {
+    "@mui/icons-material": "5.14.0",
+    "@mui/lab": "5.0.0-alpha.136",
     "@mui/material": "5.14.0",
     "@mui/toolpad-utils": "0.1.20",
     "chokidar": "3.5.3",

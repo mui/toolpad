@@ -1,10 +1,10 @@
 import * as React from 'react';
-import { Emitter } from '@mui/toolpad-utils/events';
+import { Emitter } from '../events';
 
 // storage events only work across windows, we'll use an event emitter to announce within the window
 const emitter = new Emitter<Record<string, null>>();
 // local cache, needed for getSnapshot
-const cache = new Map<string, any>();
+const cache = new Map<string, string>();
 
 function subscribe(area: Storage, key: string, cb: () => void): () => void {
   const onKeyChange = () => {
@@ -25,73 +25,71 @@ function subscribe(area: Storage, key: string, cb: () => void): () => void {
   };
 }
 
-function getSnapshot<T = unknown>(area: Storage, key: string): T | undefined {
-  try {
-    let value = cache.get(key);
-    if (!value) {
-      const item = area.getItem(key);
-      value = item ? JSON.parse(item) : undefined;
+function getSnapshot(area: Storage, key: string): string | null {
+  let value = cache.get(key) ?? null;
+  if (!value) {
+    const item = area.getItem(key);
+    value = item;
+    if (value === null) {
+      cache.delete(key);
+    } else {
       cache.set(key, value);
     }
-    return value;
-  } catch (error) {
-    console.error(error);
-    return undefined;
   }
+  return value;
 }
 
-function setValue<T = unknown>(key: string, value: T) {
-  try {
-    if (typeof window !== 'undefined') {
+function setValue(area: Storage, key: string, value: string | null) {
+  if (typeof window !== 'undefined') {
+    if (value === null) {
+      cache.delete(key);
+      area.removeItem(key);
+    } else {
       cache.set(key, value);
-      window.localStorage.setItem(key, JSON.stringify(value));
-      emitter.emit(key, null);
+      area.setItem(key, String(value));
     }
-  } catch (error) {
-    console.error(error);
+    emitter.emit(key, null);
   }
 }
 
 /**
- * Sync state to local storage so that it persists through a page refresh. Usage is
- * similar to useState except we pass in a local storage key so that we can default
+ * Sync state to local/session storage so that it persists through a page refresh. Usage is
+ * similar to useState except we pass in a storage key so that we can default
  * to that value on page load instead of the specified initial value.
  *
- * Since the local storage API isn't available in server-rendering environments, we
+ * Since the storage API isn't available in server-rendering environments, we
  * return initialValue during SSR and hydration.
  *
  * Things this hook does different from existing solutions:
  * - SSR-capable: it shows initial value during SSR and hydration, but immediately
  *   initializes when clientside mounted.
- * - Sync state across tabs: When another tab changes the value in local storage, the
+ * - Sync state across tabs: When another tab changes the value in the storage area, the
  *   current tab follows suit.
  */
-export default function useLocalStorageState<V>(
+export default function useStorageState(
+  area: Storage,
   key: string,
-  initialValue: V,
-): [V, React.Dispatch<React.SetStateAction<V>>] {
-  const subscribeKey = React.useCallback(
-    (cb: () => void) => subscribe(window.localStorage, key, cb),
-    [key],
-  );
+  initialValue: string | null = null,
+): [string | null, React.Dispatch<React.SetStateAction<string | null>>] {
+  const subscribeKey = React.useCallback((cb: () => void) => subscribe(area, key, cb), [area, key]);
   const getKeySnapshot = React.useCallback(
-    () => getSnapshot<V>(window.localStorage, key) ?? initialValue,
-    [initialValue, key],
+    () => getSnapshot(area, key) ?? initialValue,
+    [area, initialValue, key],
   );
   const getKeyServerSnapshot = React.useCallback(() => initialValue, [initialValue]);
 
-  const storedValue: V = React.useSyncExternalStore(
+  const storedValue = React.useSyncExternalStore(
     subscribeKey,
     getKeySnapshot,
     getKeyServerSnapshot,
   );
 
   const setStoredValue = React.useCallback(
-    (value: React.SetStateAction<V>) => {
+    (value: React.SetStateAction<string | null>) => {
       const valueToStore = value instanceof Function ? value(storedValue) : value;
-      setValue(key, valueToStore);
+      setValue(area, key, valueToStore);
     },
-    [key, storedValue],
+    [area, key, storedValue],
   );
 
   return [storedValue, setStoredValue];

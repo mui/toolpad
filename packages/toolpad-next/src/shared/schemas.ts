@@ -1,5 +1,9 @@
 import * as z from 'zod';
 
+export const COLUMN_TYPES = ['string', 'number', 'boolean', 'date', 'datetime'] as const;
+
+export type ColumnType = (typeof COLUMN_TYPES)[number];
+
 export const dataGridFileSchema = z.object({
   kind: z.literal('DataGrid'),
   spec: z
@@ -20,7 +24,7 @@ export const dataGridFileSchema = z.object({
         .array(
           z.object({
             field: z.string(),
-            type: z.enum(['string', 'number', 'date', 'dateTime', 'boolean']).optional(),
+            type: z.enum(COLUMN_TYPES).optional(),
           }),
         )
         .optional(),

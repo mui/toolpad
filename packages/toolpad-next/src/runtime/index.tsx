@@ -55,9 +55,10 @@ function DevtoolOverlay({ name, file }: DevtoolOverlayProps) {
   const height = '50vh';
 
   React.useEffect(() => {
-    document.body.style.paddingBottom = height;
+    const originalMarginBottom = document.body.style.marginBottom;
+    document.body.style.marginBottom = height;
     return () => {
-      document.body.style.paddingBottom = 'unset';
+      document.body.style.marginBottom = originalMarginBottom;
     };
   }, [height]);
 

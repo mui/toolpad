@@ -18,6 +18,7 @@ function cleanFolderOnFailure(folder: string): esbuild.Plugin {
 
 if (process.env.CI && !process.env.TOOLPAD_MUI_X_LICENSE_KEY) {
   console.error(`Building on CI requires a MUI X license key.`);
+  process.exit(1);
 }
 
 export default defineConfig([
@@ -44,7 +45,7 @@ export default defineConfig([
       'nanoid',
     ],
     env: {
-      TOOLPAD_MUI_X_LICENSE_KEY: process.env.TOOLPAD_MUI_X_LICENSE_KEY!,
+      TOOLPAD_MUI_X_LICENSE_KEY: process.env.TOOLPAD_MUI_X_LICENSE_KEY || '<unlicensed>',
     },
     sourcemap: true,
     esbuildPlugins: [cleanFolderOnFailure(path.resolve(__dirname, './dist/cli'))],

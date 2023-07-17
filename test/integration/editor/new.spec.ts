@@ -91,9 +91,9 @@ test('can rename page', async ({ page, localApp }) => {
   await valueInput.click();
   await page.keyboard.type('test1');
   await valueInput.blur();
-  const text1 = editorModel.appCanvas.getByText('text-foo');
+  const text2 = editorModel.appCanvas.getByText('text-foo');
   const test1 = path.resolve(localApp.dir, './toolpad/pages/page4test1');
   await expect.poll(async () => folderExists(pageFolder)).toBe(false);
   await expect.poll(async () => folderExists(test1)).toBe(true);
-  await expect(text).toEqual(test1);
+  await expect(text).toEqual(text2);
 });

@@ -1,10 +1,17 @@
 import * as React from 'react';
-import { Box, IconButton, ThemeProvider, Typography } from '@mui/material';
+import { Box, CircularProgress, IconButton, ThemeProvider, Typography } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
+import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
 import { ToolpadFile } from '../shared/schemas';
 import DataGridFileEditor from './DataGridFileEditor';
 import theme from './theme';
-import { ConnectionStatus, useServer } from './server';
+import { useServer } from './server';
+
+const CONNECTION_STATUS_DISPLAY = {
+  connecting: { label: 'Connecting', color: 'info.main' },
+  connected: { label: 'Connected', color: 'success.main' },
+  disconnected: { label: 'Disconnected', color: 'error.main' },
+};
 
 interface FileEditorProps {
   name: string;
@@ -18,28 +25,6 @@ function FileEditor({ name, value, onChange }: FileEditorProps) {
       return <DataGridFileEditor name={name} value={value} onChange={onChange} />;
     default:
       return <Typography>Unknown file: {value.kind}</Typography>;
-  }
-}
-
-function getConnectionStatusMessage(status: ConnectionStatus) {
-  switch (status) {
-    case 'connected':
-      return 'Connected';
-    case 'disconnected':
-      return 'Disconnected';
-    default:
-      return 'Unknown';
-  }
-}
-
-function getConnectionStatusIndicatorColor(status: ConnectionStatus) {
-  switch (status) {
-    case 'connected':
-      return 'success.main';
-    case 'disconnected':
-      return 'error.main';
-    default:
-      return 'info.main';
   }
 }
 
@@ -102,25 +87,56 @@ export default function DevtoolOverlay({ name, file, onClose }: DevtoolOverlayPr
               gap: 1,
             }}
           >
-            <Typography>Status:</Typography>
             <Box
               sx={{
-                display: 'inline-block',
-                borderRadius: '50%',
-                width: 16,
-                height: 16,
-                backgroundColor: getConnectionStatusIndicatorColor(connectionStatus),
+                display: 'flex',
+                alignItems: 'center',
+                width: 170,
+                gap: 1,
               }}
-            />
-            <Typography>{getConnectionStatusMessage(connectionStatus)}</Typography>
-
+            >
+              <Typography>Status:</Typography>
+              <Box
+                sx={{
+                  display: 'inline-block',
+                  borderRadius: '50%',
+                  width: 16,
+                  height: 16,
+                  backgroundColor: CONNECTION_STATUS_DISPLAY[connectionStatus].color,
+                }}
+              />
+              <Typography>{CONNECTION_STATUS_DISPLAY[connectionStatus].label}</Typography>
+            </Box>
             <IconButton size="small" onClick={onClose}>
               <CloseIcon fontSize="inherit" />
             </IconButton>
           </Box>
         </Box>
         <Box sx={{ flex: 1, overflow: 'hidden', position: 'relative' }}>
-          <FileEditor name={name} value={inputValue} onChange={setInputValue} />
+          {connectionStatus === 'connected' ? (
+            <FileEditor name={name} value={inputValue} onChange={setInputValue} />
+          ) : (
+            <Box
+              sx={{
+                position: 'absolute',
+                inset: '0 0 0 0',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                backgroundColor: 'rgba(255, 255, 255, 0.7)',
+                gap: 1,
+              }}
+            >
+              {connectionStatus === 'disconnected' ? (
+                <React.Fragment>
+                  <ErrorOutlineIcon color="error" />
+                  Connection lost
+                </React.Fragment>
+              ) : (
+                <CircularProgress />
+              )}
+            </Box>
+          )}
         </Box>
       </Box>
     </ThemeProvider>

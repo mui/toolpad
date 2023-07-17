@@ -4,7 +4,7 @@ import { DevRpcServer } from '../shared/types';
 import RpcClient from '../shared/RpcClient';
 import { ToolpadFile } from '../shared/schemas';
 
-export type ConnectionStatus = 'unknown' | 'connected' | 'disconnected';
+export type ConnectionStatus = 'connecting' | 'connected' | 'disconnected';
 
 type ServerContextValue = {
   connectionStatus: ConnectionStatus;
@@ -23,7 +23,7 @@ interface ServerProviderProps {
 
 export function ServerProvider({ wsUrl, children }: ServerProviderProps) {
   const [client, setClient] = React.useState<RpcClient<DevRpcServer> | null>(null);
-  const [connectionStatus, setConnectionStatus] = React.useState<ConnectionStatus>('unknown');
+  const [connectionStatus, setConnectionStatus] = React.useState<ConnectionStatus>('connecting');
 
   React.useEffect(() => {
     const ws = new WebSocket(wsUrl);
@@ -34,7 +34,7 @@ export function ServerProvider({ wsUrl, children }: ServerProviderProps) {
     });
 
     ws.addEventListener('close', () => {
-      setConnectionStatus('disconnected');
+      setConnectionStatus((status) => (status === 'connected' ? 'disconnected' : status));
     });
 
     return () => {

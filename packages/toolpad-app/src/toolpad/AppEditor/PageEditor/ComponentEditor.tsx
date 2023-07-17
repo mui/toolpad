@@ -27,41 +27,6 @@ import {
 import ElementContext from '../ElementContext';
 import MarkdownTooltip from '../../../components/MarkdownTooltip';
 
-import { PropControlsContextProvider, PropTypeControls } from '../../propertyControls';
-import string from '../../propertyControls/string';
-import boolean from '../../propertyControls/boolean';
-import number from '../../propertyControls/number';
-import select from '../../propertyControls/select';
-import json from '../../propertyControls/json';
-import markdown from '../../propertyControls/Markdown';
-import event from '../../propertyControls/event';
-import GridColumns from '../../propertyControls/GridColumns';
-import SelectOptions from '../../propertyControls/SelectOptions';
-import ChartData from '../../propertyControls/ChartData';
-import RowIdFieldSelect from '../../propertyControls/RowIdFieldSelect';
-import HorizontalAlign from '../../propertyControls/HorizontalAlign';
-import VerticalAlign from '../../propertyControls/VerticalAlign';
-import NumberFormat from '../../propertyControls/NumberFormat';
-import ColorScale from '../../propertyControls/ColorScale';
-
-const propTypeControls: PropTypeControls = {
-  string,
-  boolean,
-  number,
-  select,
-  json,
-  markdown,
-  event,
-  GridColumns,
-  SelectOptions,
-  ChartData,
-  RowIdFieldSelect,
-  HorizontalAlign,
-  VerticalAlign,
-  NumberFormat,
-  ColorScale,
-};
-
 const classes = {
   control: 'Toolpad_Control',
   sectionHeading: 'Toolpad_ControlsSectionHeading',
@@ -226,10 +191,8 @@ export interface ComponentEditorProps {
 
 export default function ComponentEditor({ node, className }: ComponentEditorProps) {
   return (
-    <PropControlsContextProvider value={propTypeControls}>
-      <ComponentEditorRoot className={className} data-testid="component-editor">
-        <SelectedNodeEditor key={node.id} node={node} />
-      </ComponentEditorRoot>
-    </PropControlsContextProvider>
+    <ComponentEditorRoot className={className} data-testid="component-editor">
+      <SelectedNodeEditor key={node.id} node={node} />
+    </ComponentEditorRoot>
   );
 }

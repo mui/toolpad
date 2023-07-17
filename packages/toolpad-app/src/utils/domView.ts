@@ -37,7 +37,7 @@ export function getViewFromPathname(pathname: string): DomView | null {
       kind: 'page',
       nodeId: pageRouteMatch.params.nodeId as NodeId,
       selectedNodeId: null,
-      tab: 'component',
+      tab: 'page',
     };
   }
 

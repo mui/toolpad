@@ -8,6 +8,41 @@ import { useAppState, useAppStateApi, useDom } from '../../AppState';
 import { PageViewTab } from '../../../utils/domView';
 import * as appDom from '../../../appDom';
 
+import { PropControlsContextProvider, PropTypeControls } from '../../propertyControls';
+import string from '../../propertyControls/string';
+import boolean from '../../propertyControls/boolean';
+import number from '../../propertyControls/number';
+import select from '../../propertyControls/select';
+import json from '../../propertyControls/json';
+import markdown from '../../propertyControls/Markdown';
+import eventControl from '../../propertyControls/event';
+import GridColumns from '../../propertyControls/GridColumns';
+import SelectOptions from '../../propertyControls/SelectOptions';
+import ChartData from '../../propertyControls/ChartData';
+import RowIdFieldSelect from '../../propertyControls/RowIdFieldSelect';
+import HorizontalAlign from '../../propertyControls/HorizontalAlign';
+import VerticalAlign from '../../propertyControls/VerticalAlign';
+import NumberFormat from '../../propertyControls/NumberFormat';
+import ColorScale from '../../propertyControls/ColorScale';
+
+const propTypeControls: PropTypeControls = {
+  string,
+  boolean,
+  number,
+  select,
+  json,
+  markdown,
+  event: eventControl,
+  GridColumns,
+  SelectOptions,
+  ChartData,
+  RowIdFieldSelect,
+  HorizontalAlign,
+  VerticalAlign,
+  NumberFormat,
+  ColorScale,
+};
+
 const classes = {
   panel: 'Toolpad_Panel',
 };
@@ -41,29 +76,31 @@ export default function ComponentPanel({ className }: ComponentPanelProps) {
     appStateApi.setTab(newValue);
 
   return (
-    <ComponentPanelRoot className={className}>
-      <TabContext value={currentTab || 'page'}>
-        <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
-          <TabList onChange={handleChange} aria-label="Component options">
-            <Tab label="Page" value="page" />
-            <Tab label="Component" value="component" />
-            <Tab label="Theme" value="theme" />
-          </TabList>
-        </Box>
-        <TabPanel value="page" className={classes.panel}>
-          <PageOptionsPanel />
-        </TabPanel>
-        <TabPanel value="component" className={classes.panel}>
-          {selectedNode && appDom.isElement(selectedNode) ? (
-            <ComponentEditor node={selectedNode} />
-          ) : (
-            <Typography variant="body1">No component selected.</Typography>
-          )}
-        </TabPanel>
-        <TabPanel value="theme" className={classes.panel}>
-          <ThemeEditor />
-        </TabPanel>
-      </TabContext>
-    </ComponentPanelRoot>
+    <PropControlsContextProvider value={propTypeControls}>
+      <ComponentPanelRoot className={className}>
+        <TabContext value={currentTab || 'page'}>
+          <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
+            <TabList onChange={handleChange} aria-label="Component options">
+              <Tab label="Page" value="page" />
+              <Tab label="Component" value="component" />
+              <Tab label="Theme" value="theme" />
+            </TabList>
+          </Box>
+          <TabPanel value="page" className={classes.panel}>
+            <PageOptionsPanel />
+          </TabPanel>
+          <TabPanel value="component" className={classes.panel}>
+            {selectedNode && appDom.isElement(selectedNode) ? (
+              <ComponentEditor node={selectedNode} />
+            ) : (
+              <Typography variant="body1">No component selected.</Typography>
+            )}
+          </TabPanel>
+          <TabPanel value="theme" className={classes.panel}>
+            <ThemeEditor />
+          </TabPanel>
+        </TabContext>
+      </ComponentPanelRoot>
+    </PropControlsContextProvider>
   );
 }

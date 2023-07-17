@@ -20,10 +20,12 @@ import SearchIcon from '@mui/icons-material/Search';
 import AddIcon from '@mui/icons-material/Add';
 import { ColumnType, DataGridFile } from '../shared/schemas';
 
-const COLUMNTYPE_OPTIONS: {
+interface ColumnTypeOption {
   value: ColumnType;
   label: string;
-}[] = [
+}
+
+const COLUMN_TYPE_OPTIONS: ColumnTypeOption[] = [
   {
     value: 'string',
     label: 'String',
@@ -121,7 +123,7 @@ function ColumnsEditor({ value, onChange }: ColumnsEditorProps) {
                 )
               }
             >
-              {COLUMNTYPE_OPTIONS.map((option) => (
+              {COLUMN_TYPE_OPTIONS.map((option) => (
                 <MenuItem key={option.value} value={option.value}>
                   {option.label}
                 </MenuItem>

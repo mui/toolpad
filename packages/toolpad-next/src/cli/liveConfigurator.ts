@@ -2,12 +2,14 @@ import { glob } from 'glob';
 import * as path from 'path';
 import * as fs from 'fs/promises';
 import * as yaml from 'yaml';
-import { GridColDef } from '@mui/x-data-grid-pro';
 import * as esbuild from 'esbuild';
 import * as chokidar from 'chokidar';
-import serializeJavascript from 'serialize-javascript';
-import { format } from './prettier';
-import { DataGridFile, ToolpadFile, toolpadFileSchema } from '../shared/schemas';
+import { WebSocketServer } from 'ws';
+import getPort from 'get-port';
+import { toolpadFileSchema } from '../shared/schemas';
+import RpcServer from '../shared/RpcServer';
+import { generateComponent, generateIndex } from './codeGeneration';
+import { DevRpcServer } from '../shared/types';
 
 function isValidJsIdentifier(base: string): boolean {
   return /^[a-zA-Z][a-zA-Z0-9]*$/.test(base);
@@ -23,92 +25,6 @@ function getNameFromPath(filePath: string): string {
   return name;
 }
 
-function serializeObject(properties: Record<string, string>): string {
-  return `{${Object.entries(properties)
-    .map((entry) => entry.join(': '))
-    .join(', ')}}`;
-}
-function serializeArray(items: string[]): string {
-  return `[${items.join(', ')}]`;
-}
-
-type SerializedProperties<O> = {
-  [K in keyof O]: string | (undefined extends O[K] ? undefined : never);
-};
-
-interface GenerateComponentConfig {
-  name: string;
-  dev: boolean;
-}
-
-async function generateDataGridComponent(
-  dataGridFile: DataGridFile,
-  { name, dev }: GenerateComponentConfig,
-) {
-  const hasRowsProperty = (dataGridFile.spec?.rows?.kind ?? 'property') === 'property';
-
-  const columnDefs: string[] =
-    dataGridFile.spec?.columns?.map((column) => {
-      const properties: SerializedProperties<GridColDef> = {
-        field: JSON.stringify(column.field),
-      };
-
-      if (column.type) {
-        properties.type = JSON.stringify(column.type);
-      }
-
-      return serializeObject(properties);
-    }) || [];
-
-  const code = `
-    import * as React from 'react';
-    import { DataGridPro } from '@mui/x-data-grid-pro';
-    import { Box } from '@mui/material';
-    ${dev ? `import { withDevtool, EditButton } from '@mui/toolpad-next/runtime';` : ''}
-
-    const columns = ${serializeArray(columnDefs)};
-
-    export interface ToolpadDataGridProps {
-      rows: ${hasRowsProperty ? '{ id: string | number }[]' : 'undefined'};
-    }
-
-    function ToolpadDataGrid({ rows = [] }: ToolpadDataGridProps) {
-      return (
-        <Box sx={{ position: 'relative', width: '100%', height: 400 }}>
-          <DataGridPro rows={rows} columns={columns} />
-          ${
-            dev
-              ? `<EditButton sx={{ position: 'absolute', bottom: 0, right: 0, mb: 2, mr: 2, zIndex: 1 }} />`
-              : ''
-          }
-        </Box>
-      )
-    }
-
-    ToolpadDataGrid.displayName = ${JSON.stringify(name)};
-
-    export default ${
-      dev
-        ? `withDevtool(ToolpadDataGrid, ${serializeObject({
-            name: JSON.stringify(name),
-            file: serializeJavascript(dataGridFile),
-          })})`
-        : 'ToolpadDataGrid'
-    };
-  `;
-
-  return format(code);
-}
-
-async function generateComponent(file: ToolpadFile, config: GenerateComponentConfig) {
-  switch (file.kind) {
-    case 'DataGrid':
-      return generateDataGridComponent(file, config);
-    default:
-      throw new Error(`No implementation yet for ${JSON.stringify(file.kind)}`);
-  }
-}
-
 async function compileTs(code: string) {
   const result = await esbuild.transform(code, {
     loader: 'tsx',
@@ -119,15 +35,6 @@ async function compileTs(code: string) {
   });
 
   return result.code;
-}
-
-async function generateIndex(entries: string[]): Promise<string> {
-  return entries
-    .map((entryPath) => {
-      const name = getNameFromPath(entryPath);
-      return `export { default as ${name} } from './${name}';`;
-    })
-    .join('\n');
 }
 
 export interface Config {
@@ -147,11 +54,12 @@ function getYmlPattern(root: string) {
   return path.join(toolpadDir, '*.yml');
 }
 
-interface GenerateConfig {
+interface GenerateLibConfig {
   dev?: boolean;
+  wsUrl?: string;
 }
 
-async function generateLib(root: string, { dev = false }: GenerateConfig = {}) {
+async function generateLib(root: string, { dev = false, wsUrl }: GenerateLibConfig = {}) {
   // eslint-disable-next-line no-console
   console.log(`Generating lib at ${JSON.stringify(root)} ${dev ? 'in dev mode' : ''}`);
 
@@ -170,7 +78,7 @@ async function generateLib(root: string, { dev = false }: GenerateConfig = {}) {
       const file = toolpadFileSchema.parse(data);
       const name = getNameFromPath(entryPath);
 
-      const generatedComponentPromise = generateComponent(file, { name, dev });
+      const generatedComponentPromise = generateComponent(file, { name, dev, wsUrl });
 
       await Promise.all([
         generatedComponentPromise.then(async (generatedComponent) => {
@@ -212,8 +120,26 @@ export async function generateCommand({ dir }: Config) {
 
 export async function liveCommand({ dir }: Config) {
   const root = resolveRoot(dir);
-  const config: GenerateConfig = {
+
+  const port = await getPort();
+
+  const wss = new WebSocketServer({ port });
+
+  wss.on('connection', (ws) => {
+    ws.on('error', console.error);
+  });
+
+  const rpcServer = new RpcServer<DevRpcServer>(wss);
+
+  rpcServer.register('saveFile', async (name, file) => {
+    console.log(`Saving file ${name}`);
+  });
+
+  const wsUrl = `ws://localhost:${port}`;
+
+  const config: GenerateLibConfig = {
     dev: true,
+    wsUrl,
   };
 
   await generateLib(root, config);

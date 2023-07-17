@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: page
+spec:
+  id: K7SkHHH
+  title: page2
+  content:
+    - component: PageRow
+      name: pageRow1
+      children:
+        - component: Text
+          name: t333
+          props:
+            value: text-foo
+  display: shell

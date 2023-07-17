@@ -82,15 +82,18 @@ test('can rename page', async ({ page, localApp }) => {
 
   await editorModel.goto();
 
-  await editorModel.createPage('someOtherPage');
-
-  const pageFolder = path.resolve(localApp.dir, './toolpad/pages/someOtherPage');
+  await editorModel.goToPageById('K7SkHHH');
+  await editorModel.waitForOverlay();
+  const pageFolder = path.resolve(localApp.dir, './toolpad/pages/page4');
+  const text = editorModel.appCanvas.getByText('text-foo');
   await expect.poll(async () => folderExists(pageFolder)).toBe(true);
   const valueInput = await page.getByLabel('Node name');
   await valueInput.click();
   await page.keyboard.type('test1');
   await valueInput.blur();
-  const test1 = path.resolve(localApp.dir, './toolpad/pages/someOtherPagetest1');
+  const text1 = editorModel.appCanvas.getByText('text-foo');
+  const test1 = path.resolve(localApp.dir, './toolpad/pages/page4test1');
   await expect.poll(async () => folderExists(pageFolder)).toBe(false);
   await expect.poll(async () => folderExists(test1)).toBe(true);
+  await expect(text).toEqual(test1);
 });

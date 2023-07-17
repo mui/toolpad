@@ -1,153 +1,45 @@
 import * as React from 'react';
-import { Box, IconButton, Theme, ThemeProvider, Typography, createTheme } from '@mui/material';
+import { Box, IconButton, ThemeProvider, Typography } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import { ToolpadFile } from '../shared/schemas';
 import DataGridFileEditor from './DataGridFileEditor';
-
-const THEME: Theme = createTheme({
-  components: {
-    MuiList: {
-      defaultProps: {
-        dense: true,
-      },
-      styleOverrides: {
-        root: {
-          padding: 0,
-        },
-      },
-    },
-    MuiListItem: {
-      defaultProps: {
-        dense: true,
-      },
-    },
-    MuiListItemButton: {
-      defaultProps: {
-        dense: true,
-      },
-    },
-    MuiIconButton: {
-      defaultProps: {
-        size: 'small',
-      },
-    },
-    MuiIcon: {
-      defaultProps: {
-        fontSize: 'small',
-      },
-    },
-    MuiSelect: {
-      defaultProps: {
-        size: 'small',
-      },
-    },
-    MuiToggleButtonGroup: {
-      defaultProps: {
-        size: 'small',
-      },
-    },
-    MuiTextField: {
-      defaultProps: {
-        size: 'small',
-        margin: 'dense',
-      },
-    },
-    MuiCheckbox: {
-      defaultProps: {
-        size: 'small',
-      },
-    },
-    MuiFormControl: {
-      defaultProps: {
-        size: 'small',
-        margin: 'dense',
-      },
-    },
-    MuiFormHelperText: {
-      defaultProps: {
-        margin: 'dense',
-      },
-    },
-    MuiMenuItem: {
-      defaultProps: {
-        dense: true,
-      },
-    },
-    MuiAutocomplete: {
-      defaultProps: {
-        size: 'small',
-      },
-    },
-    MuiSvgIcon: {
-      defaultProps: {
-        fontSize: 'small',
-      },
-    },
-    MuiTabs: {
-      styleOverrides: {
-        root: {
-          minHeight: 0,
-        },
-      },
-    },
-    MuiTab: {
-      styleOverrides: {
-        root: {
-          padding: 8,
-          minHeight: 0,
-        },
-      },
-    },
-    MuiToolbar: {
-      defaultProps: {
-        variant: 'dense',
-      },
-    },
-    MuiFilledInput: {
-      defaultProps: {
-        margin: 'dense',
-      },
-    },
-    MuiInputBase: {
-      defaultProps: {
-        margin: 'dense',
-      },
-    },
-    MuiInputLabel: {
-      defaultProps: {
-        margin: 'dense',
-      },
-    },
-    MuiOutlinedInput: {
-      defaultProps: {
-        size: 'small',
-        margin: 'dense',
-      },
-    },
-    MuiFab: {
-      defaultProps: {
-        size: 'small',
-      },
-    },
-    MuiTable: {
-      defaultProps: {
-        size: 'small',
-      },
-    },
-  },
-});
+import theme from './theme';
+import { ConnectionStatus, useServer } from './server';
 
 interface FileEditorProps {
+  name: string;
   value: ToolpadFile;
   onChange: (value: ToolpadFile) => void;
 }
 
-function FileEditor({ value, onChange }: FileEditorProps) {
+function FileEditor({ name, value, onChange }: FileEditorProps) {
   switch (value.kind) {
     case 'DataGrid':
-      return <DataGridFileEditor value={value} onChange={onChange} />;
+      return <DataGridFileEditor name={name} value={value} onChange={onChange} />;
     default:
       return <Typography>Unknown file: {value.kind}</Typography>;
+  }
+}
+
+function getConnectionStatusMessage(status: ConnectionStatus) {
+  switch (status) {
+    case 'connected':
+      return 'Connected';
+    case 'disconnected':
+      return 'Disconnected';
+    default:
+      return 'Unknown';
+  }
+}
+
+function getConnectionStatusIndicatorColor(status: ConnectionStatus) {
+  switch (status) {
+    case 'connected':
+      return 'success.main';
+    case 'disconnected':
+      return 'error.main';
+    default:
+      return 'info.main';
   }
 }
 
@@ -170,8 +62,10 @@ export default function DevtoolOverlay({ name, file, onClose }: DevtoolOverlayPr
     };
   }, [height]);
 
+  const { connectionStatus } = useServer();
+
   return (
-    <ThemeProvider theme={THEME}>
+    <ThemeProvider theme={theme}>
       <Box
         sx={{
           position: 'fixed',
@@ -215,10 +109,10 @@ export default function DevtoolOverlay({ name, file, onClose }: DevtoolOverlayPr
                 borderRadius: '50%',
                 width: 16,
                 height: 16,
-                backgroundColor: 'success.main',
+                backgroundColor: getConnectionStatusIndicatorColor(connectionStatus),
               }}
             />
-            <Typography>Connected</Typography>
+            <Typography>{getConnectionStatusMessage(connectionStatus)}</Typography>
 
             <IconButton size="small" onClick={onClose}>
               <CloseIcon fontSize="inherit" />
@@ -226,7 +120,7 @@ export default function DevtoolOverlay({ name, file, onClose }: DevtoolOverlayPr
           </Box>
         </Box>
         <Box sx={{ flex: 1, overflow: 'hidden', position: 'relative' }}>
-          <FileEditor value={inputValue} onChange={setInputValue} />
+          <FileEditor name={name} value={inputValue} onChange={setInputValue} />
         </Box>
       </Box>
     </ThemeProvider>

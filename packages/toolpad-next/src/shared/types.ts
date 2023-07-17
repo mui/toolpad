@@ -7,7 +7,5 @@ export interface WithDevtoolParams {
 }
 
 export type DevRpcServer = {
-  methods: {
-    saveFile: (name: string, file: ToolpadFile) => Promise<void>;
-  };
+  saveFile: (name: string, file: ToolpadFile) => Promise<void>;
 };

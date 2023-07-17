@@ -1,9 +1,9 @@
-kind: 'DataGrid'
+kind: DataGrid
 spec:
   columns:
-    - field: 'a'
-      type: 'number'
-    - field: 'b'
-      type: 'string'
-    - field: 'f'
-      type: 'string'
+    - field: a
+      type: number
+    - field: b
+      type: string
+    - field: f
+      type: string

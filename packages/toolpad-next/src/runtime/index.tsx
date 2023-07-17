@@ -2,54 +2,9 @@ import * as React from 'react';
 import useStorageState from '@mui/toolpad-utils/hooks/useStorageState';
 import { Button, ButtonProps } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
-import { DevRpcServer, WithDevtoolParams } from '../shared/types';
-import RpcClient from '../shared/RpcClient';
+import { WithDevtoolParams } from '../shared/types';
 import DevtoolOverlay from './DevtoolOverlay';
-
-type ConnectionStatus = 'unknown' | 'connected' | 'disconnected';
-
-const ServerContext = React.createContext<{
-  connectionStatus: ConnectionStatus;
-  client: RpcClient<DevRpcServer>;
-} | null>(null);
-
-interface ServerProviderProps {
-  wsUrl: string;
-  children?: React.ReactNode;
-}
-
-function ServerProvider({ wsUrl, children }: ServerProviderProps) {
-  const [ws, setWs] = React.useState<WebSocket | null>(null);
-  const [connectionStatus, setConnectionStatus] = React.useState<ConnectionStatus>('unknown');
-
-  React.useEffect(() => {
-    const newWs = new WebSocket(wsUrl);
-    setWs(newWs);
-
-    newWs.addEventListener('open', () => {
-      setConnectionStatus('connected');
-    });
-
-    newWs.addEventListener('close', () => {
-      setConnectionStatus('disconnected');
-    });
-
-    return () => {
-      newWs.close();
-    };
-  }, [wsUrl]);
-
-  const context = React.useMemo(() => {
-    return ws
-      ? {
-          connectionStatus,
-          client: new RpcClient<DevRpcServer>(ws),
-        }
-      : null;
-  }, [ws, connectionStatus]);
-
-  return <ServerContext.Provider value={context}>{children}</ServerContext.Provider>;
-}
+import { ServerProvider } from './server';
 
 const useCurrentlyEditedComponentId =
   typeof window === 'undefined'

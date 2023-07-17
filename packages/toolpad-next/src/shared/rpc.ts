@@ -48,20 +48,14 @@ export type RpcResponse = z.infer<typeof rpcResponseSchema>;
 export const rpcMessageSchema = z.union([
   z.object({
     request: rpcRequestSchema,
-    response: z.undefined(),
+    response: z.undefined().optional(),
   }),
   z.object({
-    request: z.undefined(),
+    request: z.undefined().optional(),
     response: rpcResponseSchema,
   }),
 ]);
 
+export type RpcMessage = z.infer<typeof rpcMessageSchema>;
+
 export type Methods = Record<string, (...args: any[]) => any>;
-
-export type Events = Record<string, object>;
-
-export type RpcServerDefinition = {
-  methods?: Methods;
-  // TODO: not implemented yet
-  events?: Events;
-};

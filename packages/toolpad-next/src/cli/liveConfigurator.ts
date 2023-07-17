@@ -132,7 +132,14 @@ export async function liveCommand({ dir }: Config) {
   const rpcServer = new RpcServer<DevRpcServer>(wss);
 
   rpcServer.register('saveFile', async (name, file) => {
-    console.log(`Saving file ${name}`);
+    // Validate content before saving
+    toolpadFileSchema.parse(file);
+
+    const toolpadDir = getToolpadDir(root);
+    const filePath = path.join(toolpadDir, `${name}.yml`);
+
+    const content = yaml.stringify(file);
+    await fs.writeFile(filePath, content, { encoding: 'utf-8' });
   });
 
   const wsUrl = `ws://localhost:${port}`;

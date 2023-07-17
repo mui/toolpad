@@ -12,13 +12,16 @@ import {
   Stack,
   Tab,
   TextField,
+  Tooltip,
   Typography,
   styled,
 } from '@mui/material';
 import { TabContext, TabList, TabPanel as MuiTabPanel } from '@mui/lab';
 import SearchIcon from '@mui/icons-material/Search';
+import SaveIcon from '@mui/icons-material/Save';
 import AddIcon from '@mui/icons-material/Add';
 import { ColumnType, DataGridFile } from '../shared/schemas';
+import { useServer } from './server';
 
 interface ColumnTypeOption {
   value: ColumnType;
@@ -137,22 +140,44 @@ function ColumnsEditor({ value, onChange }: ColumnsEditorProps) {
 }
 
 interface DataGridFileEditorProps {
+  name: string;
   value: DataGridFile;
   onChange: (value: DataGridFile) => void;
 }
 
-export default function DataGridFileEditor({ value, onChange }: DataGridFileEditorProps) {
+export default function DataGridFileEditor({ name, value, onChange }: DataGridFileEditorProps) {
   const [activeTab, setActiveTab] = React.useState('columns');
+
+  const server = useServer();
 
   return (
     <Box sx={{ width: '100%', height: '100%', display: 'flex', flexDirection: 'column' }}>
       <TabContext value={activeTab}>
-        <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
+        <Box
+          sx={{
+            borderBottom: 1,
+            borderColor: 'divider',
+            display: 'flex',
+            flexDirection: 'row',
+            justifyContent: 'space-between',
+            alignItems: 'end',
+          }}
+        >
           <TabList onChange={(_event, newValue) => setActiveTab(newValue)}>
             <Tab label="data" value="data" />
             <Tab label="Columns" value="columns" />
             <Tab label="Source code" value="source" />
           </TabList>
+          <Tooltip title="Commit changes">
+            <IconButton
+              sx={{ m: 0.5 }}
+              onClick={() => {
+                server.saveFile(name, value);
+              }}
+            >
+              <SaveIcon />
+            </IconButton>
+          </Tooltip>
         </Box>
 
         <TabPanel value="data">Data panel</TabPanel>

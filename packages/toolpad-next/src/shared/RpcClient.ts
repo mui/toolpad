@@ -1,7 +1,7 @@
 import * as superjson from 'superjson';
-import { RequestId, RpcRequest, RpcServerDefinition, rpcMessageSchema } from './rpc';
+import { Methods, RequestId, RpcRequest, rpcResponseSchema } from './rpc';
 
-export default class RpcClient<S extends RpcServerDefinition> {
+export default class RpcClient<M extends Methods> {
   private nextId = 0;
 
   private ws: WebSocket;
@@ -15,46 +15,41 @@ export default class RpcClient<S extends RpcServerDefinition> {
     this.ws = ws;
 
     this.ws.addEventListener('message', (event) => {
-      const message = rpcMessageSchema.parse(superjson.parse(event.data));
+      const message = rpcResponseSchema.parse(superjson.parse(event.data));
 
-      if (message.response) {
-        const { id, result, error } = message.response;
+      const { id, result, error } = message;
 
-        const pending = this.pendingRequests.get(id);
+      const pending = this.pendingRequests.get(id);
 
-        if (!pending) {
-          // Timed out
-          return;
-        }
+      if (!pending) {
+        // Timed out
+        return;
+      }
 
-        clearTimeout(pending.timeout);
-        this.pendingRequests.delete(id);
+      clearTimeout(pending.timeout);
+      this.pendingRequests.delete(id);
 
-        if (error) {
-          pending.reject(
-            Object.assign(
-              new Error(
-                `${error.code ? `${error.code}: ` : ''}${error.message || 'Unknown error'}`,
-                {
-                  cause: error,
-                },
-              ),
-              {
-                code: error.code,
-              },
-            ),
-          );
-        } else {
-          pending.resolve(result);
-        }
+      if (error) {
+        pending.reject(
+          Object.assign(
+            new Error(`${error.code ? `${error.code}: ` : ''}${error.message || 'Unknown error'}`, {
+              cause: error,
+            }),
+            {
+              code: error.code,
+            },
+          ),
+        );
+      } else {
+        pending.resolve(result);
       }
     });
   }
 
   async call(
-    method: keyof S['methods'] & string,
-    params: Parameters<S['methods'][typeof method]>,
-  ): Promise<Awaited<ReturnType<S['methods'][typeof method]>>> {
+    method: keyof M & string,
+    params: Parameters<M[typeof method]>,
+  ): Promise<Awaited<ReturnType<M[typeof method]>>> {
     return new Promise<any>((resolve, reject) => {
       const id = this.nextId;
       this.nextId += 1;
@@ -62,7 +57,7 @@ export default class RpcClient<S extends RpcServerDefinition> {
       const message = superjson.stringify({
         jsonrpc: '2.0',
         method,
-        params: [superjson.stringify(params)],
+        params,
         id,
       } satisfies RpcRequest);
 

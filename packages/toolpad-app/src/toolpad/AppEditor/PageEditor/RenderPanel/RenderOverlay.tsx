@@ -325,47 +325,6 @@ export default function RenderOverlay({ bridge }: RenderOverlayProps) {
     return rects;
   }, [nodesInfo, pageNodes]);
 
-  const previousRowColumnCountsRef = React.useRef<Record<NodeId, number>>({});
-
-  const normalizePageRowColumnSizes = React.useCallback(
-    (draftDom: appDom.AppDom): appDom.AppDom => {
-      const draftPageNodes = [pageNode, ...appDom.getDescendants(draftDom, pageNode)];
-
-      draftPageNodes.forEach((node: appDom.AppDomNode) => {
-        if (appDom.isElement(node) && isPageRow(node)) {
-          const nodeChildren = appDom.getChildNodes(draftDom, node).children;
-          const childrenCount = nodeChildren?.length || 0;
-
-          if (childrenCount > 0 && childrenCount < previousRowColumnCountsRef.current[node.id]) {
-            const layoutColumnSizes = nodeChildren.map((child) => child.layout?.columnSize || 1);
-            const totalLayoutColumnSizes = layoutColumnSizes.reduce((acc, size) => acc + size, 0);
-
-            const normalizedLayoutColumnSizes = layoutColumnSizes.map(
-              (size) => (size * nodeChildren.length) / totalLayoutColumnSizes,
-            );
-
-            nodeChildren.forEach((child, childIndex) => {
-              if (child.layout?.columnSize) {
-                draftDom = appDom.setNodeNamespacedProp(
-                  draftDom,
-                  child,
-                  'layout',
-                  'columnSize',
-                  normalizedLayoutColumnSizes[childIndex],
-                );
-              }
-            });
-          }
-
-          previousRowColumnCountsRef.current[node.id] = childrenCount;
-        }
-      });
-
-      return draftDom;
-    },
-    [pageNode],
-  );
-
   const selectNode = React.useCallback(
     (nodeId: NodeId) => {
       if (selectedNodeId !== nodeId) {
@@ -416,7 +375,7 @@ export default function RenderOverlay({ bridge }: RenderOverlayProps) {
             draft = deleteOrphanedLayoutNodes(dom, draft, toRemove);
           }
 
-          return normalizePageRowColumnSizes(draft);
+          return draft;
         },
         currentView.kind === 'page'
           ? {
@@ -426,7 +385,7 @@ export default function RenderOverlay({ bridge }: RenderOverlayProps) {
           : currentView,
       );
     },
-    [appStateApi, currentView, dom, normalizePageRowColumnSizes],
+    [appStateApi, currentView, dom],
   );
 
   const selectedRect = (selectedNode && !newNode && nodesInfo[selectedNode.id]?.rect) || null;
@@ -459,12 +418,9 @@ export default function RenderOverlay({ bridge }: RenderOverlayProps) {
     (node: appDom.ElementNode) => (event: React.MouseEvent) => {
       event.stopPropagation();
 
-      domApi.update((draft) => {
-        draft = appDom.duplicateNode(draft, node);
-        return normalizePageRowColumnSizes(draft);
-      });
+      domApi.update((draft) => appDom.duplicateNode(draft, node));
     },
-    [domApi, normalizePageRowColumnSizes],
+    [domApi],
   );
 
   const getNodeDraggableHorizontalEdges = React.useCallback(
@@ -1270,7 +1226,7 @@ export default function RenderOverlay({ bridge }: RenderOverlayProps) {
             draft = deleteOrphanedLayoutNodes(dom, draft, draggedNode, dragOverNodeId);
           }
 
-          return normalizePageRowColumnSizes(draft);
+          return draft;
         },
         currentView.kind === 'page'
           ? { ...omit(currentView, 'tab'), selectedNodeId: newNode?.id || draggedNodeId }
@@ -1300,7 +1256,6 @@ export default function RenderOverlay({ bridge }: RenderOverlayProps) {
       draggedNodeId,
       newNode,
       nodesInfo,
-      normalizePageRowColumnSizes,
       selectedNodeId,
     ],
   );
@@ -1436,22 +1391,11 @@ export default function RenderOverlay({ bridge }: RenderOverlayProps) {
       const draggedNodeInfo = nodesInfo[draggedNode.id];
       const draggedNodeRect = draggedNodeInfo?.rect;
 
-      const parent = appDom.getParent(dom, draggedNode);
-
       const resizePreviewRect = resizePreviewElement?.getBoundingClientRect();
 
       if (draggedNodeRect && resizePreviewRect) {
         domApi.update((draft) => {
           if (draggedEdge === RECTANGLE_EDGE_LEFT || draggedEdge === RECTANGLE_EDGE_RIGHT) {
-            const parentChildren = parent ? appDom.getChildNodes(draft, parent).children : [];
-            const totalLayoutColumnSizes = parentChildren.reduce(
-              (acc, child) => acc + (nodesInfo[child.id]?.rect?.width || 0),
-              0,
-            );
-
-            const normalizeColumnSize = (size: number) =>
-              Math.max(0, size * parentChildren.length) / totalLayoutColumnSizes;
-
             if (draggedEdge === RECTANGLE_EDGE_LEFT) {
               const previousSibling = appDom.getSiblingBeforeNode(draft, draggedNode, 'children');
 
@@ -1460,10 +1404,16 @@ export default function RenderOverlay({ bridge }: RenderOverlayProps) {
                 const previousSiblingRect = previousSiblingInfo?.rect;
 
                 if (previousSiblingRect) {
-                  const updatedDraggedNodeColumnSize = normalizeColumnSize(resizePreviewRect.width);
-                  const updatedPreviousSiblingColumnSize = normalizeColumnSize(
-                    previousSiblingRect.width - (resizePreviewRect.width - draggedNodeRect.width),
-                  );
+                  const totalResizedColumnsSize =
+                    (draggedNode.layout?.columnSize || 1) +
+                    (previousSibling.layout?.columnSize || 1);
+                  const totalResizedColumnsWidth =
+                    draggedNodeRect.width + previousSiblingRect.width;
+
+                  const updatedDraggedNodeColumnSize =
+                    (resizePreviewRect.width / totalResizedColumnsWidth) * totalResizedColumnsSize;
+                  const updatedPreviousSiblingColumnSize =
+                    totalResizedColumnsSize - updatedDraggedNodeColumnSize;
 
                   draft = appDom.setNodeNamespacedProp(
                     draft,
@@ -1490,10 +1440,14 @@ export default function RenderOverlay({ bridge }: RenderOverlayProps) {
                 const nextSiblingRect = nextSiblingInfo?.rect;
 
                 if (nextSiblingRect) {
-                  const updatedDraggedNodeColumnSize = normalizeColumnSize(resizePreviewRect.width);
-                  const updatedNextSiblingColumnSize = normalizeColumnSize(
-                    nextSiblingRect.width - (resizePreviewRect.width - draggedNodeRect.width),
-                  );
+                  const totalResizedColumnsSize =
+                    (draggedNode.layout?.columnSize || 1) + (nextSibling.layout?.columnSize || 1);
+                  const totalResizedColumnsWidth = draggedNodeRect.width + nextSiblingRect.width;
+
+                  const updatedDraggedNodeColumnSize =
+                    (resizePreviewRect.width / totalResizedColumnsWidth) * totalResizedColumnsSize;
+                  const updatedNextSiblingColumnSize =
+                    totalResizedColumnsSize - updatedDraggedNodeColumnSize;
 
                   draft = appDom.setNodeNamespacedProp(
                     draft,
@@ -1528,22 +1482,13 @@ export default function RenderOverlay({ bridge }: RenderOverlayProps) {
             }
           }
 
-          return normalizePageRowColumnSizes(draft);
+          return draft;
         });
       }
 
       api.dragEnd();
     },
-    [
-      api,
-      dom,
-      domApi,
-      draggedEdge,
-      draggedNode,
-      nodesInfo,
-      normalizePageRowColumnSizes,
-      resizePreviewElement,
-    ],
+    [api, domApi, draggedEdge, draggedNode, nodesInfo, resizePreviewElement],
   );
 
   return (

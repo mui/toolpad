@@ -28,7 +28,8 @@ export type BuildEnvVars = Record<
   // The current Toolpad version
   | 'TOOLPAD_VERSION'
   // The current Toolpad build number
-  | 'TOOLPAD_BUILD',
+  | 'TOOLPAD_BUILD'
+  | 'TOOLPAD_MUI_X_LICENSE_KEY',
   string
 >;
 

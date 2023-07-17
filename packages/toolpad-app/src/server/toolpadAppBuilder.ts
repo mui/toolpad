@@ -4,7 +4,7 @@ import * as path from 'path';
 import { Server } from 'http';
 import serializeJavascript from 'serialize-javascript';
 import { indent } from '@mui/toolpad-utils/strings';
-import { MUI_X_PRO_LICENSE, RUNTIME_CONFIG_WINDOW_PROPERTY } from '../constants';
+import { RUNTIME_CONFIG_WINDOW_PROPERTY } from '../constants';
 import { getComponents, getAppOutputFolder } from './localMode';
 import { RuntimeConfig } from '../config';
 import * as appDom from '../appDom';
@@ -77,7 +77,9 @@ export function postProcessHtml(html: string, { config, dom }: PostProcessHtmlPa
     `<script>window[${JSON.stringify(
       INITIAL_STATE_WINDOW_PROPERTY,
     )}] = ${serializedInitialState}</script>`,
-    `<meta name="toolpad-x-license" content=${JSON.stringify(MUI_X_PRO_LICENSE)} />`,
+    `<meta name="toolpad-x-license" content=${JSON.stringify(
+      process.env.TOOLPAD_MUI_X_LICENSE_KEY,
+    )} />`,
   ];
 
   return html.replace(`<!-- __TOOLPAD_SCRIPTS__ -->`, () => toolpadScripts.join('\n'));

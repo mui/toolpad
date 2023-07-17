@@ -9,6 +9,7 @@ import Typography from '@mui/material/Typography';
 import HandymanRoundedIcon from '@mui/icons-material/HandymanRounded';
 import AdminPanelSettingsRoundedIcon from '@mui/icons-material/AdminPanelSettingsRounded';
 import DashboardRoundedIcon from '@mui/icons-material/DashboardRounded';
+import LibraryAddRoundedIcon from '@mui/icons-material/LibraryAddRounded';
 import SectionHeadline from 'docs/src/components/typography/SectionHeadline';
 import GradientText from 'docs/src/components/typography/GradientText';
 import Grid from '@mui/material/Unstable_Grid2';
@@ -28,7 +29,7 @@ const ImageContainer = styled(Box)(({ theme }) => [
     )} 150%)`,
     border: '1px solid',
     borderColor: `${alpha(theme.palette.primary[100], 0.6)}`,
-    boxShadow: `0 4px 12px ${alpha(theme.palette.primary[100], 0.5)}`,
+    boxShadow: `0 4px 12px ${alpha(theme.palette.grey[100], 0.5)}`,
     overflow: 'hidden',
   },
   theme.applyDarkStyles({
@@ -36,7 +37,7 @@ const ImageContainer = styled(Box)(({ theme }) => [
       (theme.vars || theme).palette.primaryDark[500]
     } 0%, ${alpha(theme.palette.primaryDark[800], 0.4)} 150%)`,
     borderColor: `${alpha(theme.palette.primaryDark[300], 0.3)}`,
-    boxShadow: `4px 0 60px ${alpha(theme.palette.primary[600], 0.5)}`,
+    boxShadow: `4px 0 60px ${alpha(theme.palette.primaryDark[600], 0.5)}`,
   }),
 ]);
 
@@ -153,19 +154,25 @@ export default function CardGrid() {
                   flexDirection: 'column',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  background: 'rgba(255, 255, 255, 0.4)',
+                  background: `linear-gradient(120deg, ${alpha(
+                    theme.palette.primary[50],
+                    0.2,
+                  )} 0%, ${alpha(theme.palette.common.white, 0.2)} 150%)`,
                   backdropFilter: 'blur(12px)',
                   borderRadius: '16px',
                   border: '1px solid',
-                  borderStyle: 'dashed',
-                  borderColor: `${alpha(theme.palette.primary[300], 0.6)}`,
+                  borderColor: (theme.vars || theme).palette.divider,
                   ...theme.applyDarkStyles({
-                    background: `${alpha(theme.palette.primary[900], 0.3)}`,
-                    borderColor: `${alpha(theme.palette.primaryDark[400], 0.6)}`,
+                    background: `linear-gradient(120deg, ${alpha(
+                      theme.palette.primary[900],
+                      0.2,
+                    )} 0%, ${alpha(theme.palette.primary[800], 0.2)} 150%)`,
+                    borderColor: (theme.vars || theme).palette.divider,
                   }),
                 }),
               ]}
             >
+              <LibraryAddRoundedIcon color="primary" sx={{ mb: 2 }} />
               <Typography
                 component="h3"
                 variant="body"
@@ -174,10 +181,10 @@ export default function CardGrid() {
                 gutterBottom
                 sx={{ display: 'flex', alignItems: 'center', gap: 1 }}
               >
-                Build much more
+                Build much more!
               </Typography>
               <Typography variant="body" color="text.secondary" textAlign="center">
-                Learn how to build these and other apps using Toolpad!
+                Learn how to build these and many other apps using Toolpad!
               </Typography>
               <Link href={ROUTES.toolpadUtilityAppExample} variant="body" sx={{ mt: 1 }}>
                 View more examples

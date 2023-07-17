@@ -143,9 +143,15 @@ interface DataGridFileEditorProps {
   name: string;
   value: DataGridFile;
   onChange: (value: DataGridFile) => void;
+  onClose?: () => void;
 }
 
-export default function DataGridFileEditor({ name, value, onChange }: DataGridFileEditorProps) {
+export default function DataGridFileEditor({
+  name,
+  value,
+  onChange,
+  onClose,
+}: DataGridFileEditorProps) {
   const [activeTab, setActiveTab] = React.useState('columns');
 
   const server = useServer();
@@ -172,7 +178,7 @@ export default function DataGridFileEditor({ name, value, onChange }: DataGridFi
             <IconButton
               sx={{ m: 0.5 }}
               onClick={() => {
-                server.saveFile(name, value);
+                server.saveFile(name, value).then(() => onClose());
               }}
             >
               <SaveIcon />

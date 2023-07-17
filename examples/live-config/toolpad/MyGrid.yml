@@ -4,6 +4,6 @@ spec:
     - field: a
       type: number
     - field: b
-      type: string
+      type: boolean
     - field: f
       type: string

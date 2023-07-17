@@ -17,12 +17,13 @@ interface FileEditorProps {
   name: string;
   value: ToolpadFile;
   onChange: (value: ToolpadFile) => void;
+  onClose?: () => void;
 }
 
-function FileEditor({ name, value, onChange }: FileEditorProps) {
+function FileEditor({ name, value, onChange, onClose }: FileEditorProps) {
   switch (value.kind) {
     case 'DataGrid':
-      return <DataGridFileEditor name={name} value={value} onChange={onChange} />;
+      return <DataGridFileEditor name={name} value={value} onChange={onChange} onClose={onClose} />;
     default:
       return <Typography>Unknown file: {value.kind}</Typography>;
   }
@@ -114,7 +115,7 @@ export default function DevtoolOverlay({ name, file, onClose }: DevtoolOverlayPr
         </Box>
         <Box sx={{ flex: 1, overflow: 'hidden', position: 'relative' }}>
           {connectionStatus === 'connected' ? (
-            <FileEditor name={name} value={inputValue} onChange={setInputValue} />
+            <FileEditor name={name} value={inputValue} onChange={setInputValue} onClose={onClose} />
           ) : (
             <Box
               sx={{

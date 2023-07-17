@@ -2,6 +2,7 @@ import * as path from 'path';
 import { test, expect } from '../../playwright/localTest';
 import { ToolpadEditor } from '../../models/ToolpadEditor';
 import clickCenter from '../../utils/clickCenter';
+import { folderExists } from '../../../packages/toolpad-utils/src/fs';
 
 test.use({
   localAppConfig: {
@@ -114,4 +115,24 @@ test('code editor auto-complete', async ({ page }) => {
 
   await page.keyboard.type('textF');
   await expect(page.getByRole('option', { name: 'textField' })).toBeVisible();
+});
+
+test('can rename page', async ({ page, localApp }) => {
+  const editorModel = new ToolpadEditor(page);
+  await editorModel.goto();
+  await editorModel.waitForOverlay();
+  await editorModel.goToPage('page4');
+  await editorModel.waitForOverlay();
+  const text = editorModel.appCanvas.getByText('text-foo');
+  const pageFolder = path.resolve(localApp.dir, './toolpad/pages/page4');
+  await expect.poll(async () => folderExists(pageFolder)).toBe(true);
+  const valueInput = await page.getByLabel('Node name');
+  await valueInput.click();
+  await page.keyboard.type('test1');
+  await valueInput.blur();
+  const text2 = editorModel.appCanvas.getByText('text-foo');
+  const test1 = path.resolve(localApp.dir, './toolpad/pages/page4test1');
+  await expect.poll(async () => folderExists(pageFolder)).toBe(false);
+  await expect.poll(async () => folderExists(test1)).toBe(true);
+  await expect(text).toEqual(text2);
 });

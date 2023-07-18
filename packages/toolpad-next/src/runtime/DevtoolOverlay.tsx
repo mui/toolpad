@@ -6,6 +6,7 @@ import { ToolpadFile } from '../shared/schemas';
 import DataGridFileEditor from './DataGridFileEditor';
 import theme from './theme';
 import { useServer } from './server';
+import { GeneratedFile, generateComponent } from '../shared/codeGeneration';
 
 const CONNECTION_STATUS_DISPLAY = {
   connecting: { label: 'Connecting', color: 'info.main' },
@@ -18,12 +19,21 @@ interface FileEditorProps {
   value: ToolpadFile;
   onChange: (value: ToolpadFile) => void;
   onClose?: () => void;
+  source?: string;
 }
 
-function FileEditor({ name, value, onChange, onClose }: FileEditorProps) {
+function FileEditor({ name, value, onChange, onClose, source }: FileEditorProps) {
   switch (value.kind) {
     case 'DataGrid':
-      return <DataGridFileEditor name={name} value={value} onChange={onChange} onClose={onClose} />;
+      return (
+        <DataGridFileEditor
+          name={name}
+          value={value}
+          onChange={onChange}
+          onClose={onClose}
+          source={source}
+        />
+      );
     default:
       return <Typography>Unknown file: {value.kind}</Typography>;
   }
@@ -49,6 +59,20 @@ export default function DevtoolOverlay({ name, file, onClose }: DevtoolOverlayPr
   }, [height]);
 
   const { connectionStatus } = useServer();
+
+  const [generatedFile, setGeneratedFile] = React.useState<GeneratedFile | null>(null);
+
+  React.useEffect(() => {
+    generateComponent(file, { dev: false, name }).then(
+      (result) => {
+        setGeneratedFile(result);
+      },
+      (error) => {
+        console.error(error);
+        setGeneratedFile(null);
+      },
+    );
+  }, [file, name]);
 
   return (
     <ThemeProvider theme={theme}>
@@ -115,7 +139,13 @@ export default function DevtoolOverlay({ name, file, onClose }: DevtoolOverlayPr
         </Box>
         <Box sx={{ flex: 1, overflow: 'hidden', position: 'relative' }}>
           {connectionStatus === 'connected' ? (
-            <FileEditor name={name} value={inputValue} onChange={setInputValue} onClose={onClose} />
+            <FileEditor
+              name={name}
+              value={inputValue}
+              onChange={setInputValue}
+              onClose={onClose}
+              source={generatedFile?.code}
+            />
           ) : (
             <Box
               sx={{

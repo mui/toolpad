@@ -15,6 +15,7 @@ import {
   Tooltip,
   Typography,
   styled,
+  Container,
 } from '@mui/material';
 import { TabContext, TabList, TabPanel as MuiTabPanel } from '@mui/lab';
 import SearchIcon from '@mui/icons-material/Search';
@@ -144,6 +145,7 @@ interface DataGridFileEditorProps {
   value: DataGridFile;
   onChange: (value: DataGridFile) => void;
   onClose?: () => void;
+  source?: string;
 }
 
 export default function DataGridFileEditor({
@@ -151,6 +153,7 @@ export default function DataGridFileEditor({
   value,
   onChange,
   onClose,
+  source,
 }: DataGridFileEditorProps) {
   const [activeTab, setActiveTab] = React.useState('columns');
 
@@ -178,7 +181,7 @@ export default function DataGridFileEditor({
             <IconButton
               sx={{ m: 0.5 }}
               onClick={() => {
-                server.saveFile(name, value).then(() => onClose());
+                server.saveFile(name, value).then(() => onClose?.());
               }}
             >
               <SaveIcon />
@@ -201,7 +204,11 @@ export default function DataGridFileEditor({
             }
           />
         </TabPanel>
-        <TabPanel value="source">Source</TabPanel>
+        <TabPanel value="source">
+          <Container sx={{ width: '100%', height: '100%', overflow: 'auto', px: 4 }}>
+            <pre>{source}</pre>
+          </Container>
+        </TabPanel>
       </TabContext>
     </Box>
   );

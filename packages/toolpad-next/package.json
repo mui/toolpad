@@ -34,7 +34,6 @@
     "get-port": "7.0.0",
     "glob": "10.3.3",
     "prettier": "3.0.0",
-    "serialize-javascript": "6.0.1",
     "superjson": "1.13.1",
     "ws": "8.13.0",
     "yaml": "2.3.1",

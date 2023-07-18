@@ -1,9 +1,12 @@
 import * as path from 'path';
-import { GridColDef } from '@mui/x-data-grid-pro';
-import serializeJavascript from 'serialize-javascript';
+import type { GridColDef } from '@mui/x-data-grid-pro';
 import { format } from './prettier';
-import { DataGridFile, ToolpadFile } from '../shared/schemas';
-import { WithDevtoolParams } from '../shared/types';
+import { DataGridFile, ToolpadFile } from './schemas';
+import { WithDevtoolParams } from './types';
+
+export type GeneratedFile = {
+  code: string;
+};
 
 function isValidJsIdentifier(base: string): boolean {
   return /^[a-zA-Z][a-zA-Z0-9]*$/.test(base);
@@ -35,13 +38,13 @@ type SerializedProperties<O> = {
 interface GenerateComponentConfig {
   name: string;
   dev: boolean;
-  wsUrl: string;
+  wsUrl?: string;
 }
 
 export async function generateDataGridComponent(
   dataGridFile: DataGridFile,
   { name, dev, wsUrl }: GenerateComponentConfig,
-) {
+): Promise<GeneratedFile> {
   const hasRowsProperty = (dataGridFile.spec?.rows?.kind ?? 'property') === 'property';
 
   const columnDefs: string[] =
@@ -63,6 +66,37 @@ export async function generateDataGridComponent(
     import { Box } from '@mui/material';
     ${dev ? `import { withDevtool, EditButton } from '@mui/toolpad-next/runtime';` : ''}
 
+    class ErrorBoundary extends React.Component {
+      constructor(props) {
+        super(props);
+        this.state = { error: null };
+      }
+    
+      static getDerivedStateFromError(error) {
+        return { error };
+      }
+    
+      render() {
+        if (this.state.error) {
+          return (
+            <Box
+              sx={{
+                position: "absolute",
+                inset: "0 0 0 0",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              {this.state.error.message}
+            </Box>
+          );
+        }
+    
+        return this.props.children;
+      }
+    }
+
     const columns = ${serializeArray(columnDefs)};
 
     export interface ToolpadDataGridProps {
@@ -72,7 +106,9 @@ export async function generateDataGridComponent(
     function ToolpadDataGrid({ rows = [] }: ToolpadDataGridProps) {
       return (
         <Box sx={{ position: 'relative', width: '100%', height: 400 }}>
-          <DataGridPro rows={rows} columns={columns} />
+          <ErrorBoundary>
+            <DataGridPro rows={rows} columns={columns} />
+          </ErrorBoundary>
           ${
             dev
               ? `<EditButton sx={{ position: 'absolute', bottom: 0, right: 0, mb: 2, mr: 2, zIndex: 1 }} />`
@@ -86,7 +122,7 @@ export async function generateDataGridComponent(
 
     export default ${
       dev
-        ? `withDevtool(ToolpadDataGrid, ${serializeJavascript({
+        ? `withDevtool(ToolpadDataGrid, ${JSON.stringify({
             name,
             file: dataGridFile,
             wsUrl,
@@ -95,10 +131,13 @@ export async function generateDataGridComponent(
     };
   `;
 
-  return format(code);
+  return { code: await format(code) };
 }
 
-export async function generateComponent(file: ToolpadFile, config: GenerateComponentConfig) {
+export async function generateComponent(
+  file: ToolpadFile,
+  config: GenerateComponentConfig,
+): Promise<GeneratedFile> {
   switch (file.kind) {
     case 'DataGrid':
       return generateDataGridComponent(file, config);
@@ -107,11 +146,13 @@ export async function generateComponent(file: ToolpadFile, config: GenerateCompo
   }
 }
 
-export async function generateIndex(entries: string[]): Promise<string> {
-  return entries
+export async function generateIndex(entries: string[]): Promise<GeneratedFile> {
+  const code = entries
     .map((entryPath) => {
       const name = getNameFromPath(entryPath);
       return `export { default as ${name} } from './${name}';`;
     })
     .join('\n');
+
+  return { code };
 }

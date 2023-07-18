@@ -8,7 +8,7 @@ import { WebSocketServer } from 'ws';
 import getPort from 'get-port';
 import { toolpadFileSchema } from '../shared/schemas';
 import RpcServer from '../shared/RpcServer';
-import { generateComponent, generateIndex } from './codeGeneration';
+import { generateComponent, generateIndex } from '../shared/codeGeneration';
 import { DevRpcServer } from '../shared/types';
 
 function isValidJsIdentifier(base: string): boolean {
@@ -81,14 +81,14 @@ async function generateLib(root: string, { dev = false, wsUrl }: GenerateLibConf
       const generatedComponentPromise = generateComponent(file, { name, dev, wsUrl });
 
       await Promise.all([
-        generatedComponentPromise.then(async (generatedComponent) => {
-          await fs.writeFile(path.join(outputDir, `${name}.tsx`), generatedComponent, {
+        generatedComponentPromise.then(async ({ code }) => {
+          await fs.writeFile(path.join(outputDir, `${name}.tsx`), code, {
             encoding: 'utf-8',
           });
         }),
 
-        generatedComponentPromise.then(async (generatedComponent) => {
-          const compiledComponent = await compileTs(generatedComponent);
+        generatedComponentPromise.then(async ({ code }) => {
+          const compiledComponent = await compileTs(code);
           await fs.writeFile(path.join(outputDir, `${name}.mjs`), compiledComponent, {
             encoding: 'utf-8',
           });
@@ -96,12 +96,12 @@ async function generateLib(root: string, { dev = false, wsUrl }: GenerateLibConf
       ]);
     }),
 
-    indexContentPromise.then(async (indexContent) => {
-      await fs.writeFile(path.join(outputDir, `index.ts`), indexContent, { encoding: 'utf-8' });
+    indexContentPromise.then(async ({ code }) => {
+      await fs.writeFile(path.join(outputDir, `index.ts`), code, { encoding: 'utf-8' });
     }),
 
-    indexContentPromise.then(async (indexContent) => {
-      const compiledIndexContent = await compileTs(indexContent);
+    indexContentPromise.then(async ({ code }) => {
+      const compiledIndexContent = await compileTs(code);
 
       await fs.writeFile(path.join(outputDir, `index.mjs`), compiledIndexContent, {
         encoding: 'utf-8',

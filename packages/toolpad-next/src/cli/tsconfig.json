@@ -7,7 +7,7 @@
     "moduleResolution": "bundler",
     "allowSyntheticDefaultImports": true
   },
-  "include": ["./**/*.ts", "./**/*.tsx"],
+  "include": ["./**/*.ts", "./**/*.tsx", "../shared/codeGeneration.ts", "../shared/prettier.ts"],
   "references": [
     {
       "path": "../shared/tsconfig.json"

@@ -22,7 +22,7 @@ function VerticalAlignPropEditor({
   return (
     <PropertyControl propType={propType}>
       <Box>
-        <Typography variant="body2">{label}:</Typography>
+        {label ? <Typography variant="body2">{label}:</Typography> : null}
         <ToggleButtonGroup
           exclusive
           disabled={disabled}

@@ -252,10 +252,15 @@ export default function PageStructureExplorer() {
   }, [selectedNodeAncestorIds, expandedDomNodeIds]);
 
   return (
-    <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'start', p: 1 }}>
+    <React.Fragment>
       <Typography
         variant="body2"
-        sx={(theme) => ({ flexGrow: 1, fontWeight: theme.typography.fontWeightLight, pb: 0.5 })}
+        sx={(theme) => ({
+          flexGrow: 1,
+          fontWeight: theme.typography.fontWeightLight,
+          mx: 1,
+          my: 0.5,
+        })}
       >
         Components
       </Typography>
@@ -269,7 +274,13 @@ export default function PageStructureExplorer() {
         onNodeFocus={handleNodeFocus}
         onNodeToggle={handleNodeToggle}
         onKeyDown={handleKeyDown}
-        sx={{ height: 600, flexGrow: 1, maxWidth: 400, overflowY: 'auto' }}
+        sx={{
+          flexGrow: 1,
+          maxHeight: 450,
+          maxWidth: 400,
+          overflowY: 'auto',
+          scrollbarGutter: 'stable',
+        }}
       >
         {rootChildren.map((childNode) => (
           <RecursiveSubTree
@@ -281,6 +292,6 @@ export default function PageStructureExplorer() {
           />
         ))}
       </TreeView>
-    </Box>
+    </React.Fragment>
   );
 }

@@ -26,17 +26,17 @@ export default function NodeNameEditor({ node, sx }: NodeNameEditorProps) {
   const nodeNameError = useNodeNameValidation(nameInput, existingNames, node.type);
   const isNameValid = !nodeNameError;
 
-  const handleNameCommit = React.useCallback(async () => {
-    const oldname = dom.nodes[node.id];
+  const handleNameCommit = React.useCallback(() => {
     if (isNameValid) {
-      if (nameInput !== oldname.name) {
-        domApi.setNodeName(node.id, nameInput);
-      }
+      domApi.setNodeName(node.id, nameInput);
     } else {
       setNameInput(node.name);
     }
+    const oldname = dom.nodes[node.id];
     if (isNameValid && oldname.type === 'page' && nameInput !== oldname.name) {
-      await client.mutation.deletePage(oldname.name);
+      setTimeout(async () => {
+        await client.mutation.deletePage(oldname.name);
+      }, 300);
     }
   }, [isNameValid, domApi, node.id, node.name, nameInput, dom]);
 

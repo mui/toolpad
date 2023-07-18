@@ -6,7 +6,7 @@ import {
   RuntimeScope,
   ScopeMeta,
 } from '@mui/toolpad-core';
-import { Alert, Box } from '@mui/material';
+import { Alert, Box, SxProps } from '@mui/material';
 import { useBrowserJsRuntime } from '@mui/toolpad-core/jsBrowserRuntime';
 import * as appDom from '../../../appDom';
 import { useDomApi } from '../../AppState';
@@ -30,6 +30,7 @@ export interface NodeAttributeEditorProps<P extends object, K extends keyof P = 
   name: string;
   argType: ArgTypeDefinition<P, K>;
   props?: P;
+  sx?: SxProps;
 }
 
 export default function NodeAttributeEditor<P extends object>({
@@ -38,6 +39,7 @@ export default function NodeAttributeEditor<P extends object>({
   name,
   argType,
   props,
+  sx,
 }: NodeAttributeEditorProps<P>) {
   const domApi = useDomApi();
 
@@ -78,7 +80,7 @@ export default function NodeAttributeEditor<P extends object>({
       liveBinding={liveBinding}
       globalScope={bindingScope?.values ?? {}}
       globalScopeMeta={scopeMeta}
-      label={argType.label || name}
+      label={argType.control?.hideLabel ? '' : argType.label || name}
       bindable={isBindable}
       disabled={isDisabled}
       propType={argType}
@@ -90,6 +92,7 @@ export default function NodeAttributeEditor<P extends object>({
       )}
       value={propValue}
       onChange={handlePropChange}
+      sx={sx}
     />
   ) : (
     <Alert severity="warning">

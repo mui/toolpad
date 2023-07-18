@@ -42,14 +42,12 @@ const StyledTreeItem = styled(TreeItem)({
 type StyledTreeItemProps = TreeItemProps & {
   onDeleteNode?: (nodeId: NodeId) => void;
   onDuplicateNode?: (nodeId: NodeId) => void;
-  onSettingsNode?: (nodeId: NodeId) => void;
   onCreate?: React.MouseEventHandler;
   labelIcon?: React.ReactNode;
   labelText: string;
   createLabelText?: string;
   deleteLabelText?: string;
   duplicateLabelText?: string;
-  settingsLabelText?: string;
   toolpadNodeId?: NodeId;
 };
 
@@ -60,11 +58,9 @@ function HierarchyTreeItem(props: StyledTreeItemProps) {
     onCreate,
     onDeleteNode,
     onDuplicateNode,
-    onSettingsNode,
     createLabelText,
     deleteLabelText = 'Delete',
     duplicateLabelText = 'Duplicate',
-    settingsLabelText = 'Settings',
     toolpadNodeId,
     ...other
   } = props;
@@ -100,8 +96,6 @@ function HierarchyTreeItem(props: StyledTreeItemProps) {
               duplicateLabelText={duplicateLabelText}
               onDeleteNode={onDeleteNode}
               onDuplicateNode={onDuplicateNode}
-              onSettingsNode={onSettingsNode}
-              settingsLabelText={settingsLabelText}
             />
           ) : null}
         </Box>
@@ -231,17 +225,6 @@ export default function HierarchyExplorer({ className }: HierarchyExplorerProps)
     [appStateApi, dom],
   );
 
-  const handlePageSettingsNode = React.useCallback(
-    (nodeId: NodeId) => {
-      const node = appDom.getNode(dom, nodeId);
-
-      if (appDom.isPage(node)) {
-        appStateApi.setView({ kind: 'page', nodeId: node.id, selectedNodeId: null });
-      }
-    },
-    [appStateApi, dom],
-  );
-
   return (
     <HierarchyExplorerRoot data-testid="hierarchy-explorer" className={className}>
       <TreeView
@@ -270,7 +253,6 @@ export default function HierarchyExplorer({ className }: HierarchyExplorerProps)
               labelText={page.name}
               onDuplicateNode={handleDuplicateNode}
               onDeleteNode={handleDeletePage}
-              onSettingsNode={handlePageSettingsNode}
             />
           ))}
         </HierarchyTreeItem>

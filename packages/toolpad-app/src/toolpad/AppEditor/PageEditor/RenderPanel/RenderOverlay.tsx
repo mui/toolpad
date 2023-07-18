@@ -17,6 +17,7 @@ import {
   usePageEditorState,
 } from '../PageEditorProvider';
 import {
+  isPageLayoutComponent,
   isPageRow,
   isPageColumn,
   PAGE_ROW_COMPONENT_ID,
@@ -44,9 +45,6 @@ import { NodeInfo } from '../../../../types';
 import NodeDropArea from './NodeDropArea';
 import type { ToolpadBridge } from '../../../../canvas/ToolpadBridge';
 import { PinholeOverlay } from '../../../../PinholeOverlay';
-import deleteNode from '../../utils/deleteNode';
-import normalizePageRowColumnSizes from '../../utils/normalizePageRowColumnSizes';
-import deleteOrphanedLayoutNodes from '../../utils/deleteOrphanedLayoutNodes';
 
 const VERTICAL_RESIZE_SNAP_UNITS = 2; // px
 

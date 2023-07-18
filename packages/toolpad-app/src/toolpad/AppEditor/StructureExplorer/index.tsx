@@ -10,12 +10,12 @@ import { useDom, useDomApi, useAppState, useAppStateApi } from '../../AppState';
 import EditableText from '../../../components/EditableText';
 import { ComponentIcon } from '../PageEditor/ComponentCatalog/ComponentCatalogItem';
 import { useNodeNameValidation } from '../HierarchyExplorer/validation';
+import { deleteOrphanedLayoutNodes } from '../PageEditor/RenderPanel/RenderOverlay';
 import {
   PAGE_ROW_COMPONENT_ID,
   PAGE_COLUMN_COMPONENT_ID,
 } from '../../../runtime/toolpadComponents';
 import { DomView } from '../../../utils/domView';
-import deleteNode from '../utils/deleteNode';
 
 function CustomTreeItem(
   props: TreeItemProps & {
@@ -219,21 +219,35 @@ export default function PageStructureExplorer() {
     [setExpandedDomNodeIds],
   );
 
-  const handleDeleteNode = React.useCallback(() => {
+  const deleteNode = React.useCallback(() => {
     if (!selectedDomNodeId) {
       return;
     }
-    deleteNode(selectedDomNodeId, currentPageNode, currentView, appStateApi, dom);
-  }, [appStateApi, dom, selectedDomNodeId, currentView, currentPageNode]);
+    appStateApi.update(
+      (draft) => {
+        const toRemove = appDom.getMaybeNode(dom, selectedDomNodeId);
+        if (toRemove && appDom.isElement(toRemove)) {
+          draft = appDom.removeNode(draft, toRemove.id);
+          draft = deleteOrphanedLayoutNodes(dom, draft, toRemove);
+        }
+        return draft;
+        // return normalizePageRowColumnSizes(draft);
+      },
+      {
+        ...(currentView as Extract<DomView, { kind: 'page' }>),
+        selectedNodeId: null,
+      },
+    );
+  }, [appStateApi, dom, selectedDomNodeId, currentView]);
 
   const handleKeyDown = React.useCallback(
     (event: React.KeyboardEvent<HTMLUListElement>) => {
       // delete selected node if event.key is Backspace
       if (event.key === 'Backspace') {
-        handleDeleteNode();
+        deleteNode();
       }
     },
-    [handleDeleteNode],
+    [deleteNode],
   );
 
   const expandedDomNodeIdSet = React.useMemo(() => {

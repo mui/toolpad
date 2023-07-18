@@ -1184,7 +1184,7 @@ interface PageRootProps {
 
 function PageRoot({ children }: PageRootProps) {
   return (
-    <Container>
+    <Container sx={{ bgcolor: '#f7f7f7' }}>
       <Stack
         data-testid="page-root"
         direction="column"

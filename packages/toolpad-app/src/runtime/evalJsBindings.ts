@@ -1,5 +1,5 @@
 import { BindingEvaluationResult, JsRuntime } from '@mui/toolpad-core';
-import { set } from 'lodash-es';
+import { set as setObjectPath } from 'lodash-es';
 import { mapValues } from '@mui/toolpad-utils/collections';
 import { updatePath } from '../utils/immutability';
 
@@ -110,7 +110,7 @@ export function buildGlobalScope(
   for (const binding of Object.values(bindings)) {
     if (binding.scopePath) {
       const value = binding.result?.value;
-      set(globalScope, binding.scopePath, value);
+      setObjectPath(globalScope, binding.scopePath, value);
     }
   }
   return globalScope;
@@ -249,12 +249,13 @@ export default function evalJsBindings(
             Array.isArray(value) ? `[${nestedPropName}]` : `.${nestedPropName}`
           }`;
 
-          const nestedBindingResultValue = results[nestedBindingId]?.value;
-          if (nestedBindingResultValue) {
+          const nestedBindingResult = results[nestedBindingId];
+
+          if (nestedBindingResult) {
             bindingResult = updatePath(
               bindingResult,
               `value.${nestedBindingId.replace(bindingId, '')}`,
-              nestedBindingResultValue,
+              nestedBindingResult.value,
             );
           } else {
             mergeNestedBindings(

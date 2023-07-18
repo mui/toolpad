@@ -8,6 +8,7 @@
       "@mui/toolpad-core/jsRuntime": ["../toolpad-core/dist/jsRuntime"],
       "@mui/toolpad-core/jsBrowserRuntime": ["../toolpad-core/dist/jsBrowserRuntime"],
       "@mui/toolpad-core/jsServerRuntime": ["../toolpad-core/dist/jsServerRuntime"],
+      "@mui/toolpad-core/numberFormat": ["../toolpad-core/dist/numberFormat"],
       "@mui/toolpad-utils/*": ["../toolpad-utils/dist/*"]
     },
     "target": "esnext",
@@ -21,18 +22,16 @@
     "noEmit": true,
     "esModuleInterop": true,
     "module": "esnext",
-    "moduleResolution": "node",
+    "moduleResolution": "Bundler",
     "resolveJsonModule": true,
     "isolatedModules": true,
-    "jsx": "preserve",
+    "jsx": "react",
     "noUnusedLocals": true,
     "pretty": true,
     "preserveWatchOutput": true,
     "incremental": true
   },
   "include": [
-    "next.config.mjs",
-    "next-env.d.ts",
     "sentry.client.config.js",
     "sentry.server.config.js",
     "**/*.ts",

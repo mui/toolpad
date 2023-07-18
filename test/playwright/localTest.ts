@@ -8,8 +8,13 @@ import { createWriteStream } from 'fs';
 import { pipeline } from 'stream/promises';
 import { Readable } from 'stream';
 import getPort from 'get-port';
-import { test as base } from './test';
+import { PageScreenshotOptions, test as base } from './test';
 import { waitForMatch } from '../utils/streams';
+
+const PROJECT_ROOT = path.resolve(__dirname, '../../');
+
+// https://github.com/mui/material-ui/blob/bc35128302b5bd61fa35f89d371aeed91e6a5748/scripts/pushArgos.mjs#L7
+const ARGOS_OUTPUT_FOLDER = 'test/regressions/screenshots/chrome';
 
 export interface RunningLocalApp {
   url: string;
@@ -30,7 +35,7 @@ interface WithAppOptions {
   // Template to be used as the starting point of the project folder toolpad is running in
   // This will copied to the temporary folder
   template?: string;
-  // Run toolpad next.js app in local dev mode
+  // Run toolpad editor app in local dev mode
   toolpadDev?: boolean;
   setup?: (ctx: SetupContext) => Promise<void>;
   // Extra environment variables when running Toolpad
@@ -139,6 +144,11 @@ export async function withApp(
 const test = base.extend<
   {
     projectSnapshot: null;
+    // Take a screenshot of the app to be used in argos-ci
+    argosScreenshot: (
+      name: string,
+      options?: Omit<PageScreenshotOptions, 'path' | 'type'>,
+    ) => Promise<void>;
   },
   {
     browserCloser: null;
@@ -187,6 +197,26 @@ const test = base.extend<
 
         await pipeline(archive, output);
       }
+    },
+    { scope: 'test', auto: true },
+  ],
+  argosScreenshot: [
+    async ({ page }, use, testInfo) => {
+      await use(async (name, options) => {
+        const snapshotPath = testInfo.snapshotPath(`${name}.png`);
+        const relative = path.relative(testInfo.project.testDir, snapshotPath);
+
+        invariant(
+          !relative.startsWith('..'),
+          "Can't store a screenshot outside of the argos directory",
+        );
+
+        const screenshotPath = path.resolve(PROJECT_ROOT, ARGOS_OUTPUT_FOLDER, relative);
+        await page.screenshot({
+          path: screenshotPath,
+          ...options,
+        });
+      });
     },
     { scope: 'test', auto: true },
   ],

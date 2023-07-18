@@ -1,0 +1,33 @@
+apiVersion: v1
+kind: page
+spec:
+  id: 5w03xpv
+  title: chart
+  display: shell
+  content:
+    - component: PageRow
+      name: pageRow
+      children:
+        - component: Chart
+          name: chart
+          props:
+            data:
+              - kind: bar
+                label: barChart
+                data:
+                  $$jsExpression: |
+                    barChartDataQuery.data
+                xKey: key
+                yKey: count
+                color: "#9c27b0"
+              - kind: line
+                label: lineChart
+                data: [ { x: 1, y: 2 }, { x: 3, y: 4 }, { x: 5, y: 1 } ]
+                xKey: x
+                yKey: y
+                color: '#4caf50'
+  queries:
+    - name: barChartDataQuery
+      query:
+        function: barChartData.ts#default
+        kind: local

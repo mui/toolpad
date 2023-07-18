@@ -12,8 +12,7 @@ import * as appDom from '../../../appDom';
 import { useDomApi } from '../../AppState';
 import BindableEditor from './BindableEditor';
 import { usePageEditorState } from './PageEditorProvider';
-import { getDefaultControl } from '../../propertyControls';
-import { NON_BINDABLE_CONTROL_TYPES } from '../../../runtime/constants';
+import { getDefaultControl, usePropControlsContext } from '../../propertyControls';
 
 function buildScopeMeta(vm: ApplicationVm, bindingScope?: RuntimeScope): ScopeMeta {
   if (bindingScope?.parentScope) {
@@ -63,16 +62,14 @@ export default function NodeAttributeEditor<P extends object>({
 
   const scopeMeta = React.useMemo(() => buildScopeMeta(vm, bindingScope), [vm, bindingScope]);
 
-  const Control = getDefaultControl(argType, props);
+  const propTypeControls = usePropControlsContext();
+  const Control = getDefaultControl(propTypeControls, argType, props);
 
   // NOTE: Doesn't make much sense to bind controlled props. In the future we might opt
   // to make them bindable to other controlled props only
   const isDisabled = !!argType.onChangeProp;
 
-  const isBindable =
-    !isDisabled &&
-    namespace !== 'layout' &&
-    !NON_BINDABLE_CONTROL_TYPES.includes(argType.control?.type as string);
+  const isBindable = !isDisabled && namespace !== 'layout' && argType.control?.bindable !== false;
 
   const jsBrowserRuntime = useBrowserJsRuntime();
 

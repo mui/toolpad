@@ -165,7 +165,7 @@ export default async function cli(argv: string[]) {
     },
     dev: {
       type: 'boolean',
-      describe: 'Run the Toolpad editor Next.js app in development mode',
+      describe: 'Run the Toolpad editor app in development mode',
       demandOption: false,
       default: false,
       hidden: true,

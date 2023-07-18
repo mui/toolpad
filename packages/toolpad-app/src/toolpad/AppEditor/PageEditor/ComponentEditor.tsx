@@ -1,6 +1,8 @@
 import { Stack, styled, Typography, Divider } from '@mui/material';
 import * as React from 'react';
-import * as _ from 'lodash-es';
+// TODO: Remove lodash-es import here
+// eslint-disable-next-line no-restricted-imports
+import { groupBy } from 'lodash-es';
 import {
   ArgTypeDefinition,
   ArgTypeDefinitions,
@@ -25,6 +27,41 @@ import {
 } from '../../../runtime/toolpadComponents/layoutBox';
 import ElementContext from '../ElementContext';
 import MarkdownTooltip from '../../../components/MarkdownTooltip';
+
+import { PropControlsContextProvider, PropTypeControls } from '../../propertyControls';
+import string from '../../propertyControls/string';
+import boolean from '../../propertyControls/boolean';
+import number from '../../propertyControls/number';
+import select from '../../propertyControls/select';
+import json from '../../propertyControls/json';
+import markdown from '../../propertyControls/Markdown';
+import event from '../../propertyControls/event';
+import GridColumns from '../../propertyControls/GridColumns';
+import SelectOptions from '../../propertyControls/SelectOptions';
+import ChartData from '../../propertyControls/ChartData';
+import RowIdFieldSelect from '../../propertyControls/RowIdFieldSelect';
+import HorizontalAlign from '../../propertyControls/HorizontalAlign';
+import VerticalAlign from '../../propertyControls/VerticalAlign';
+import NumberFormat from '../../propertyControls/NumberFormat';
+import ColorScale from '../../propertyControls/ColorScale';
+
+const propTypeControls: PropTypeControls = {
+  string,
+  boolean,
+  number,
+  select,
+  json,
+  markdown,
+  event,
+  GridColumns,
+  SelectOptions,
+  ChartData,
+  RowIdFieldSelect,
+  HorizontalAlign,
+  VerticalAlign,
+  NumberFormat,
+  ColorScale,
+};
 
 const classes = {
   control: 'Toolpad_Control',
@@ -98,7 +135,7 @@ function ComponentPropsEditor<P extends object>({
     );
   }, [bindings, node.id]);
 
-  const argTypesByCategory = _.groupBy(
+  const argTypesByCategory: Record<string, ExactEntriesOf<ArgTypeDefinitions<P>>> = groupBy(
     Object.entries(componentConfig.argTypes || {}) as ExactEntriesOf<ArgTypeDefinitions<P>>,
     ([, propTypeDef]) => propTypeDef?.category || 'properties',
   );
@@ -195,13 +232,15 @@ export default function ComponentEditor({ className }: ComponentEditorProps) {
   const selectedNode = selectedNodeId ? appDom.getMaybeNode(dom, selectedNodeId) : null;
 
   return (
-    <ComponentEditorRoot className={className} data-testid="component-editor">
-      {selectedNode && appDom.isElement(selectedNode) ? (
-        // Add key to make sure it mounts every time selected node changes
-        <SelectedNodeEditor key={selectedNode.id} node={selectedNode} />
-      ) : (
-        <PageOptionsPanel />
-      )}
-    </ComponentEditorRoot>
+    <PropControlsContextProvider value={propTypeControls}>
+      <ComponentEditorRoot className={className} data-testid="component-editor">
+        {selectedNode && appDom.isElement(selectedNode) ? (
+          // Add key to make sure it mounts every time selected node changes
+          <SelectedNodeEditor key={selectedNode.id} node={selectedNode} />
+        ) : (
+          <PageOptionsPanel />
+        )}
+      </ComponentEditorRoot>
+    </PropControlsContextProvider>
   );
 }

@@ -138,7 +138,7 @@ jobs:
     <<: *defaults
     resource_class: 'large'
     docker:
-      - image: mcr.microsoft.com/playwright:v1.35.1-focal
+      - image: mcr.microsoft.com/playwright:v1.36.1-focal
         environment:
           NODE_ENV: test
           TOOLPAD_TEST_RETRIES: 1
@@ -163,6 +163,9 @@ jobs:
           environment:
             HTTPBIN_BASEURL: 'http://localhost/'
           command: yarn test:integration
+      - run:
+          name: Upload screenshots to Argos CI
+          command: yarn test:argos
       - store_artifacts:
           path: test-results
           destination: playwright-test-results

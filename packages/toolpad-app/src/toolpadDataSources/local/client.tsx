@@ -35,7 +35,7 @@ import useQueryPreview from '../useQueryPreview';
 import QueryInputPanel from '../QueryInputPanel';
 import QueryPreview from '../QueryPreview';
 import BindableEditor from '../../toolpad/AppEditor/PageEditor/BindableEditor';
-import { getDefaultControl } from '../../toolpad/propertyControls';
+import { getDefaultControl, usePropControlsContext } from '../../toolpad/propertyControls';
 import { parseFunctionId, parseLegacyFunctionId, serializeFunctionId } from './shared';
 import FlexFill from '../../components/FlexFill';
 import { FileIntrospectionResult } from '../../server/functionsTypesWorker';
@@ -111,6 +111,8 @@ function QueryEditor({
     queryFn: () => execApi('introspection', []),
     retry: false,
   });
+
+  const propTypeControls = usePropControlsContext();
 
   const { file: selectedFile = undefined, handler: selectedFunction = undefined } = input.attributes
     .query.function
@@ -352,7 +354,7 @@ function QueryEditor({
           <Stack sx={{ gap: 1, flex: 1, overflow: 'auto' }}>
             <Typography>Parameters:</Typography>
             {Object.entries(parameterDefs).map(([name, definiton]) => {
-              const Control = getDefaultControl(definiton, liveBindings);
+              const Control = getDefaultControl(propTypeControls, definiton, liveBindings);
               return Control ? (
                 <BindableEditor
                   key={name}

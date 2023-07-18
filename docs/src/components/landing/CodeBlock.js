@@ -10,16 +10,20 @@ import { PrismaClient, Prisma } from '@prisma/client';
 
 const prisma = new PrismaClient();
 
-export async function getUsers() {
-  return prisma.user.findMany();
+export async function getCustomers() {
+  return prisma.customer.findMany();
 }
 
-export async function addUser(user: Prisma.UserCreateInput) {
-  return prisma.user.create({ data: user });
+export async function addCustomer(customer: Prisma.CustomerCreateInput) {
+  return prisma.customer.create({ data: customer });
 }
 
-export async function deleteUser(id: number) {
-  return prisma.user.delete({ where: { id } });
+export async function updateCustomer(id: number) {
+  return prisma.customer.update({ where: { id } });
+}
+
+export async function deleteCustomer(id: number) {
+  return prisma.customer.delete({ where: { id } });
 }
 `;
 
@@ -63,6 +67,7 @@ export default function CodeBlock() {
         minWidth: 640,
         minHeight: 440,
         zIndex: 20,
+        ml: -2,
         bottom: '50%',
         transform: 'translateY(50%) rotateY(0deg)',
         left: 0,

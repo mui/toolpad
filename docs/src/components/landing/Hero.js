@@ -114,6 +114,7 @@ export default function Hero() {
               minHeight: 320,
               height: '100%',
               width: '100%',
+              ml: -2,
               background: `${
                 (theme.vars || theme).palette.primaryDark[800]
               } url(/static/toolpad/marketing/hero.png)`,

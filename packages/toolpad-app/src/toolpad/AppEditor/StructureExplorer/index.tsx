@@ -10,7 +10,6 @@ import { useDom, useDomApi, useAppState, useAppStateApi } from '../../AppState';
 import EditableText from '../../../components/EditableText';
 import { ComponentIcon } from '../PageEditor/ComponentCatalog/ComponentCatalogItem';
 import { useNodeNameValidation } from '../HierarchyExplorer/validation';
-import { deleteOrphanedLayoutNodes } from '../PageEditor/RenderPanel/RenderOverlay';
 import {
   PAGE_ROW_COMPONENT_ID,
   PAGE_COLUMN_COMPONENT_ID,
@@ -228,10 +227,8 @@ export default function PageStructureExplorer() {
         const toRemove = appDom.getMaybeNode(dom, selectedDomNodeId);
         if (toRemove && appDom.isElement(toRemove)) {
           draft = appDom.removeNode(draft, toRemove.id);
-          draft = deleteOrphanedLayoutNodes(dom, draft, toRemove);
         }
         return draft;
-        // return normalizePageRowColumnSizes(draft);
       },
       {
         ...(currentView as Extract<DomView, { kind: 'page' }>),

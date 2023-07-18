@@ -13,7 +13,7 @@ const PinholeOverlayRoot = styled('div')({
     right: 0,
     bottom: 0,
     background: '#000',
-    opacity: 0.03,
+    opacity: 0,
   },
 });
 

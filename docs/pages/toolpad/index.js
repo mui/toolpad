@@ -7,9 +7,10 @@ import BrandingCssVarsProvider from 'docs/src/BrandingCssVarsProvider';
 import AppHeader from 'docs/src/layouts/AppHeader';
 import AppFooter from 'docs/src/layouts/AppFooter';
 import AppHeaderBanner from 'docs/src/components/banner/AppHeaderBanner';
-import Hero2 from '../../src/components/landing/Hero2';
+import Hero from '../../src/components/landing/Hero';
+import DemoVideo from '../../src/components/landing/DemoVideo';
 import SignUpToast from '../../src/components/landing/SignUpToast';
-import UseCases from '../../src/components/landing/UseCases';
+// import UseCases from '../../src/components/landing/UseCases';
 import UseCases2 from '../../src/components/landing/UseCases2';
 import CardGrid from '../../src/components/landing/CardGrid';
 import Banner from '../../src/components/landing/Banner';
@@ -50,7 +51,10 @@ export default function Home() {
       <AppHeaderBanner />
       <AppHeader gitHubRepository="https://github.com/mui/mui-toolpad" />
       <main id="main-content">
-        <Hero2 />
+        <Hero />
+        {/* <Hero2 /> */}
+        <Divider />
+        <DemoVideo />
         <Divider />
         {/* <UseCases content={useCases} /> */}
         <UseCases2 content={useCases} />

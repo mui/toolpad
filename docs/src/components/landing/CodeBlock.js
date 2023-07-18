@@ -57,17 +57,22 @@ function WindowCircles() {
 export default function CodeBlock() {
   return (
     <Box
+      className="code-block"
       sx={(theme) => ({
         position: 'absolute',
-
+        minWidth: 640,
+        minHeight: 440,
         zIndex: 20,
+        bottom: '50%',
+        transform: 'translateY(50%) rotateY(0deg)',
+        left: 0,
         borderRadius: 1,
         backgroundColor: (theme.vars || theme).palette.primaryDark[800],
         border: '1px solid',
-        borderColor: (theme.vars || theme).palette.divider,
-        '&:hover': {
-          zIndex: 40,
-        },
+        borderColor: (theme.vars || theme).palette.primaryDark[700],
+        boxShadow: '0px 2px 16px rgba(0,0,0, 0.5)',
+        backfaceVisibility: 'hidden',
+        transition: 'all 0.8s ease',
         ...theme.applyDarkStyles({
           borderColor: (theme.vars || theme).palette.divider,
         }),
@@ -91,7 +96,7 @@ export default function CodeBlock() {
           color="grey.200"
           sx={{
             fontFamily: 'monospace',
-            fontSize: 12,
+            fontSize: 8,
             display: 'flex',
             alignItems: 'center',
             gap: 0.5,

@@ -12,7 +12,7 @@ import ROUTES from '../../route';
 import ToolpadHeroContainer from '../../layouts/ToolpadHeroContainer';
 
 function TypingAnimation() {
-  const words = ['APIs', 'scripts', 'SQL'];
+  const words = ['APIs', 'scripts', 'SQL', 'code'];
   const [text, setText] = useState('');
   const [fullText, setFullText] = useState(words[0]);
   const [letterIndex, setLetterIndex] = useState(0);
@@ -94,17 +94,26 @@ export default function Hero() {
           </Box>
         </Box>
       </Box>
-      <Box sx={{ position: 'relative', width: '100%' }}>
+      <Box
+        sx={{
+          position: 'relative',
+          width: '100%',
+          '&:hover .hero-image': {
+            transform: 'rotateY(0deg)',
+          },
+          '&:hover .code-block': {
+            transform: 'translateY(50%) rotateY(180deg)',
+          },
+        }}
+      >
         <Box
+          className="hero-image"
           sx={[
             (theme) => ({
-              minWidth: 510,
+              minWidth: 640,
               minHeight: 320,
               height: '100%',
               width: '100%',
-              backgroundRepeat: 'no-repeat',
-              backgroundPosition: 'center',
-              objectFit: 'contain',
               background: `${
                 (theme.vars || theme).palette.primaryDark[800]
               } url(/static/toolpad/marketing/hero.png)`,
@@ -112,8 +121,19 @@ export default function Hero() {
               borderRadius: 1,
               border: '1px solid',
               borderColor: (theme.vars || theme).palette.divider,
-              // boxShadow: '0px 2px 16px rgba(0,0,0, 0.5)',
+              borderTopColor: (theme.vars || theme).palette.primaryDark[800],
+              backgroundRepeat: 'no-repeat',
+              boxShadow: '0px 2px 16px rgba(0,0,0, 0.5)',
+              backfaceVisibility: 'hidden',
+              transition: 'all 0.8s ease',
+              perspective: 1000,
+              transform: 'rotateY(180deg)',
             }),
+            (theme) =>
+              theme.applyDarkStyles({
+                borderColor: (theme.vars || theme).palette.divider,
+                backgroundRepeat: 'no-repeat',
+              }),
           ]}
         />
         <CodeBlock />

@@ -136,6 +136,140 @@ function getDropAreaParentProp(dropAreaId: string): string | null {
   return dropAreaId.split(':')[1] || null;
 }
 
+function removeMaybeNode(dom: appDom.AppDom, nodeId: NodeId): appDom.AppDom {
+  if (appDom.getMaybeNode(dom, nodeId)) {
+    return appDom.removeNode(dom, nodeId);
+  }
+  return dom;
+}
+
+export function deleteOrphanedLayoutNodes(
+  domBeforeChange: appDom.AppDom,
+  domAfterChange: appDom.AppDom,
+  movedOrDeletedNode: appDom.ElementNode,
+  moveTargetNodeId: NodeId | null = null,
+): appDom.AppDom {
+  let draftDom = domAfterChange;
+  let orphanedLayoutNodeIds: NodeId[] = [];
+
+  const movedOrDeletedNodeParentProp = movedOrDeletedNode.parentProp;
+
+  const parent = appDom.getParent(domBeforeChange, movedOrDeletedNode);
+  const parentParent = parent && appDom.getParent(domBeforeChange, parent);
+  const parentParentParent = parentParent && appDom.getParent(domBeforeChange, parentParent);
+
+  const parentChildren =
+    parent && movedOrDeletedNodeParentProp
+      ? (appDom.getChildNodes(domBeforeChange, parent) as appDom.NodeChildren<appDom.ElementNode>)[
+          movedOrDeletedNodeParentProp
+        ]
+      : [];
+
+  const isOnlyLayoutContainerChild =
+    parent &&
+    appDom.isElement(parent) &&
+    isPageLayoutComponent(parent) &&
+    parentChildren.length === 1;
+
+  const isParentOnlyLayoutContainerChild =
+    parentParent &&
+    parent.parentProp &&
+    appDom.isElement(parentParent) &&
+    isPageLayoutComponent(parentParent) &&
+    appDom.getChildNodes(domBeforeChange, parentParent)[parent.parentProp].length === 1;
+
+  const isSecondLastLayoutContainerChild =
+    parent &&
+    appDom.isElement(parent) &&
+    isPageLayoutComponent(parent) &&
+    parentChildren.length === 2;
+
+  const hasNoLayoutContainerSiblings =
+    parentChildren.filter(
+      (child) => child.id !== movedOrDeletedNode.id && (isPageRow(child) || isPageColumn(child)),
+    ).length === 0;
+
+  if (isSecondLastLayoutContainerChild && hasNoLayoutContainerSiblings) {
+    if (parent.parentIndex && parentParent && appDom.isElement(parentParent)) {
+      const lastContainerChild = parentChildren.filter(
+        (child) => child.id !== movedOrDeletedNode.id,
+      )[0];
+
+      if (lastContainerChild.parentProp) {
+        if (
+          parentParent.parentIndex &&
+          parentParentParent &&
+          appDom.isElement(parentParentParent) &&
+          isPageLayoutComponent(parentParentParent) &&
+          isParentOnlyLayoutContainerChild &&
+          moveTargetNodeId !== parentParent.id &&
+          moveTargetNodeId !== lastContainerChild.id
+        ) {
+          if (
+            moveTargetNodeId !== parent.id &&
+            moveTargetNodeId !== lastContainerChild.id &&
+            isPageLayoutComponent(parentParent)
+          ) {
+            draftDom = appDom.moveNode(
+              draftDom,
+              lastContainerChild,
+              parentParent,
+              lastContainerChild.parentProp,
+              parent.parentIndex,
+            );
+
+            if (isPageColumn(parent)) {
+              draftDom = appDom.setNodeNamespacedProp(
+                draftDom,
+                lastContainerChild,
+                'layout',
+                'columnSize',
+                parent.layout?.columnSize || 1,
+              );
+            }
+
+            orphanedLayoutNodeIds = [...orphanedLayoutNodeIds, parent.id];
+          }
+
+          draftDom = appDom.moveNode(
+            draftDom,
+            lastContainerChild,
+            parentParentParent,
+            lastContainerChild.parentProp,
+            parentParent.parentIndex,
+          );
+
+          if (isPageColumn(parentParent)) {
+            draftDom = appDom.setNodeNamespacedProp(
+              draftDom,
+              lastContainerChild,
+              'layout',
+              'columnSize',
+              parentParent.layout?.columnSize || 1,
+            );
+          }
+
+          orphanedLayoutNodeIds = [...orphanedLayoutNodeIds, parentParent.id];
+        }
+      }
+    }
+  }
+
+  if (isOnlyLayoutContainerChild) {
+    if (isParentOnlyLayoutContainerChild && moveTargetNodeId !== parentParent.id) {
+      orphanedLayoutNodeIds = [...orphanedLayoutNodeIds, parentParent.id];
+    }
+
+    orphanedLayoutNodeIds = [...orphanedLayoutNodeIds, parent.id];
+  }
+
+  orphanedLayoutNodeIds.forEach((nodeId) => {
+    draftDom = removeMaybeNode(draftDom, nodeId);
+  });
+
+  return draftDom;
+}
+
 interface RenderOverlayProps {
   bridge: ToolpadBridge | null;
 }
@@ -194,6 +328,47 @@ export default function RenderOverlay({ bridge }: RenderOverlayProps) {
     return rects;
   }, [nodesInfo, pageNodes]);
 
+  const previousRowColumnCountsRef = React.useRef<Record<NodeId, number>>({});
+
+  const normalizePageRowColumnSizes = React.useCallback(
+    (draftDom: appDom.AppDom): appDom.AppDom => {
+      const draftPageNodes = [pageNode, ...appDom.getDescendants(draftDom, pageNode)];
+
+      draftPageNodes.forEach((node: appDom.AppDomNode) => {
+        if (appDom.isElement(node) && isPageRow(node)) {
+          const nodeChildren = appDom.getChildNodes(draftDom, node).children;
+          const childrenCount = nodeChildren?.length || 0;
+
+          if (childrenCount > 0 && childrenCount < previousRowColumnCountsRef.current[node.id]) {
+            const layoutColumnSizes = nodeChildren.map((child) => child.layout?.columnSize || 1);
+            const totalLayoutColumnSizes = layoutColumnSizes.reduce((acc, size) => acc + size, 0);
+
+            const normalizedLayoutColumnSizes = layoutColumnSizes.map(
+              (size) => (size * nodeChildren.length) / totalLayoutColumnSizes,
+            );
+
+            nodeChildren.forEach((child, childIndex) => {
+              if (child.layout?.columnSize) {
+                draftDom = appDom.setNodeNamespacedProp(
+                  draftDom,
+                  child,
+                  'layout',
+                  'columnSize',
+                  normalizedLayoutColumnSizes[childIndex],
+                );
+              }
+            });
+          }
+
+          previousRowColumnCountsRef.current[node.id] = childrenCount;
+        }
+      });
+
+      return draftDom;
+    },
+    [pageNode],
+  );
+
   const selectNode = React.useCallback(
     (nodeId: NodeId) => {
       if (selectedNodeId !== nodeId) {
@@ -234,9 +409,27 @@ export default function RenderOverlay({ bridge }: RenderOverlayProps) {
       if (event) {
         event.stopPropagation();
       }
-      deleteNode(nodeId, pageNode, currentView, appStateApi, dom);
+
+      appStateApi.update(
+        (draft) => {
+          const toRemove = appDom.getNode(draft, nodeId);
+
+          if (appDom.isElement(toRemove)) {
+            draft = removeMaybeNode(draft, toRemove.id);
+            draft = deleteOrphanedLayoutNodes(dom, draft, toRemove);
+          }
+
+          return normalizePageRowColumnSizes(draft);
+        },
+        currentView.kind === 'page'
+          ? {
+              ...currentView,
+              selectedNodeId: null,
+            }
+          : currentView,
+      );
     },
-    [appStateApi, currentView, dom, pageNode],
+    [appStateApi, currentView, dom, normalizePageRowColumnSizes],
   );
 
   const selectedRect = (selectedNode && !newNode && nodesInfo[selectedNode.id]?.rect) || null;
@@ -271,10 +464,10 @@ export default function RenderOverlay({ bridge }: RenderOverlayProps) {
 
       domApi.update((draft) => {
         draft = appDom.duplicateNode(draft, node);
-        return normalizePageRowColumnSizes(draft, pageNode);
+        return normalizePageRowColumnSizes(draft);
       });
     },
-    [domApi, pageNode],
+    [domApi, normalizePageRowColumnSizes],
   );
 
   const getNodeDraggableHorizontalEdges = React.useCallback(
@@ -1080,7 +1273,7 @@ export default function RenderOverlay({ bridge }: RenderOverlayProps) {
             draft = deleteOrphanedLayoutNodes(dom, draft, draggedNode, dragOverNodeId);
           }
 
-          return normalizePageRowColumnSizes(draft, pageNode);
+          return normalizePageRowColumnSizes(draft);
         },
         currentView.kind === 'page'
           ? { ...omit(currentView, 'tab'), selectedNodeId: newNode?.id || draggedNodeId }
@@ -1110,7 +1303,7 @@ export default function RenderOverlay({ bridge }: RenderOverlayProps) {
       draggedNodeId,
       newNode,
       nodesInfo,
-      pageNode,
+      normalizePageRowColumnSizes,
       selectedNodeId,
     ],
   );
@@ -1338,13 +1531,22 @@ export default function RenderOverlay({ bridge }: RenderOverlayProps) {
             }
           }
 
-          return normalizePageRowColumnSizes(draft, pageNode);
+          return normalizePageRowColumnSizes(draft);
         });
       }
 
       api.dragEnd();
     },
-    [api, dom, domApi, draggedEdge, draggedNode, nodesInfo, pageNode, resizePreviewElement],
+    [
+      api,
+      dom,
+      domApi,
+      draggedEdge,
+      draggedNode,
+      nodesInfo,
+      normalizePageRowColumnSizes,
+      resizePreviewElement,
+    ],
   );
 
   return (

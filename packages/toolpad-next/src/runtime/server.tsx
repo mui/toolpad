@@ -34,7 +34,7 @@ export function ServerProvider({ wsUrl, children }: ServerProviderProps) {
     });
 
     ws.addEventListener('close', () => {
-      setConnectionStatus((status) => (status === 'connected' ? 'disconnected' : status));
+      setConnectionStatus('disconnected');
     });
 
     return () => {

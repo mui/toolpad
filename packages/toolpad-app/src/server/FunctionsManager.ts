@@ -8,6 +8,7 @@ import { glob } from 'glob';
 import * as fs from 'fs/promises';
 import { writeFileRecursive, fileExists } from '@mui/toolpad-utils/fs';
 import invariant from 'invariant';
+// @ts-expect-error https://github.com/piscinajs/piscina/issues/362#issuecomment-1616811661
 import Piscina from 'piscina';
 import { ExecFetchResult } from '@mui/toolpad-core';
 import { errorFrom } from '@mui/toolpad-utils/errors';
@@ -140,7 +141,7 @@ export default class FunctionsManager {
   private async extractTypes() {
     this.extractedTypes = this.extractTypesWorker
       .run({ resourcesFolder: this.getResourcesFolder() } satisfies ExtractTypesParams, {})
-      .catch((error) => ({
+      .catch((error: unknown) => ({
         error,
         files: [],
       }));

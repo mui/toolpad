@@ -116,7 +116,7 @@ export default function DevtoolOverlay({ name, file, onClose }: DevtoolOverlayPr
               sx={{
                 display: 'flex',
                 alignItems: 'center',
-                width: 170,
+                minWidth: 190,
                 gap: 1,
               }}
             >

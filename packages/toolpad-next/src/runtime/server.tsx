@@ -29,15 +29,21 @@ export function ServerProvider({ wsUrl, children }: ServerProviderProps) {
     const ws = new WebSocket(wsUrl);
     setClient(new RpcClient<DevRpcServer>(ws));
 
-    ws.addEventListener('open', () => {
+    const handleOpen = () => {
       setConnectionStatus('connected');
-    });
+    };
 
-    ws.addEventListener('close', () => {
+    const handleClose = () => {
       setConnectionStatus('disconnected');
-    });
+    };
+
+    ws.addEventListener('open', handleOpen);
+
+    ws.addEventListener('close', handleClose);
 
     return () => {
+      ws.removeEventListener('open', handleOpen);
+      ws.removeEventListener('close', handleClose);
       ws.close();
     };
   }, [wsUrl]);

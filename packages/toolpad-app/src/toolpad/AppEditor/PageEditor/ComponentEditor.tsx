@@ -12,9 +12,8 @@ import {
 import { ExactEntriesOf } from '../../../utils/types';
 import * as appDom from '../../../appDom';
 import NodeAttributeEditor from './NodeAttributeEditor';
-import { useDom, useAppState } from '../../AppState';
+import { useDom } from '../../AppState';
 import { usePageEditorState } from './PageEditorProvider';
-import PageOptionsPanel from './PageOptionsPanel';
 import ErrorAlert from './ErrorAlert';
 import NodeNameEditor from '../NodeNameEditor';
 import { useToolpadComponent } from '../toolpadComponents';
@@ -27,41 +26,6 @@ import {
 } from '../../../runtime/toolpadComponents/layoutBox';
 import ElementContext from '../ElementContext';
 import MarkdownTooltip from '../../../components/MarkdownTooltip';
-
-import { PropControlsContextProvider, PropTypeControls } from '../../propertyControls';
-import string from '../../propertyControls/string';
-import boolean from '../../propertyControls/boolean';
-import number from '../../propertyControls/number';
-import select from '../../propertyControls/select';
-import json from '../../propertyControls/json';
-import markdown from '../../propertyControls/Markdown';
-import event from '../../propertyControls/event';
-import GridColumns from '../../propertyControls/GridColumns';
-import SelectOptions from '../../propertyControls/SelectOptions';
-import ChartData from '../../propertyControls/ChartData';
-import RowIdFieldSelect from '../../propertyControls/RowIdFieldSelect';
-import HorizontalAlign from '../../propertyControls/HorizontalAlign';
-import VerticalAlign from '../../propertyControls/VerticalAlign';
-import NumberFormat from '../../propertyControls/NumberFormat';
-import ColorScale from '../../propertyControls/ColorScale';
-
-const propTypeControls: PropTypeControls = {
-  string,
-  boolean,
-  number,
-  select,
-  json,
-  markdown,
-  event,
-  GridColumns,
-  SelectOptions,
-  ChartData,
-  RowIdFieldSelect,
-  HorizontalAlign,
-  VerticalAlign,
-  NumberFormat,
-  ColorScale,
-};
 
 const classes = {
   control: 'Toolpad_Control',
@@ -231,26 +195,14 @@ function SelectedNodeEditor({ node }: SelectedNodeEditorProps) {
 }
 
 export interface ComponentEditorProps {
+  node: appDom.ElementNode;
   className?: string;
 }
 
-export default function ComponentEditor({ className }: ComponentEditorProps) {
-  const { dom } = useDom();
-  const { currentView } = useAppState();
-  const selectedNodeId = currentView.kind === 'page' ? currentView.selectedNodeId : null;
-
-  const selectedNode = selectedNodeId ? appDom.getMaybeNode(dom, selectedNodeId) : null;
-
+export default function ComponentEditor({ node, className }: ComponentEditorProps) {
   return (
-    <PropControlsContextProvider value={propTypeControls}>
-      <ComponentEditorRoot className={className} data-testid="component-editor">
-        {selectedNode && appDom.isElement(selectedNode) ? (
-          // Add key to make sure it mounts every time selected node changes
-          <SelectedNodeEditor key={selectedNode.id} node={selectedNode} />
-        ) : (
-          <PageOptionsPanel />
-        )}
-      </ComponentEditorRoot>
-    </PropControlsContextProvider>
+    <ComponentEditorRoot className={className} data-testid="component-editor">
+      <SelectedNodeEditor key={node.id} node={node} />
+    </ComponentEditorRoot>
   );
 }

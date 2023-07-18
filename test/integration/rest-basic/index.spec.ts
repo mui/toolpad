@@ -57,7 +57,7 @@ test('rest editor basics', async ({ page, context, localApp }) => {
   const editorModel = new ToolpadEditor(page);
   await editorModel.goto();
 
-  await editorModel.componentEditor.getByRole('button', { name: 'Add query' }).click();
+  await editorModel.pageEditor.getByRole('button', { name: 'Add query' }).click();
   await page.getByRole('button', { name: 'HTTP request' }).click();
 
   const newQueryEditor = page.getByRole('dialog', { name: 'query' });
@@ -81,7 +81,7 @@ test('rest editor basics', async ({ page, context, localApp }) => {
   await newQueryEditor.getByRole('button', { name: 'Save' }).click();
   await expect(newQueryEditor).not.toBeVisible();
 
-  await editorModel.componentEditor.getByRole('button', { name: 'query1' }).click();
+  await editorModel.pageEditor.getByRole('button', { name: 'query1' }).click();
 
   const existingQueryEditor = page.getByRole('dialog', { name: 'query1' });
 
@@ -96,7 +96,7 @@ test('rest editor basics', async ({ page, context, localApp }) => {
   await existingQueryEditor.getByRole('button', { name: 'Cancel' }).click();
   await expect(existingQueryEditor).not.toBeVisible();
 
-  await editorModel.componentEditor.getByRole('button', { name: 'queryWithEnv' }).click();
+  await editorModel.pageEditor.getByRole('button', { name: 'queryWithEnv' }).click();
 
   const queryWithEnvQueryEditor = page.getByRole('dialog', { name: 'queryWithEnv' });
   await queryWithEnvQueryEditor.getByRole('tab', { name: 'Headers' }).click();

@@ -467,7 +467,7 @@ export default function AppProvider({ children }: DomContextProps) {
     kind: 'page',
     nodeId: firstPage?.id,
     selectedNodeId: null,
-    tab: 'component',
+    tab: 'page',
   };
 
   const [state, dispatch] = React.useReducer(appStateReducer, {

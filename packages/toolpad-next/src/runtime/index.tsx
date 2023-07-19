@@ -35,7 +35,7 @@ export function EditButton(props: ButtonProps) {
   );
 }
 
-export function withDevtool<P extends React.JSX.IntrinsicAttributes>(
+export function withDevtool<P extends object>(
   Component: React.ComponentType<P>,
   { name, file, wsUrl }: WithDevtoolParams,
 ): React.ComponentType<P> {

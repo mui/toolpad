@@ -214,6 +214,7 @@ const test = base.extend<
         const screenshotPath = path.resolve(PROJECT_ROOT, ARGOS_OUTPUT_FOLDER, relative);
         await page.screenshot({
           path: screenshotPath,
+          animations: 'disabled',
           ...options,
         });
       });

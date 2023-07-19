@@ -24,10 +24,10 @@ spec:
             label: Toolbar
             options:
               - label: Show
-                value: "0"
+                value: '0'
               - label: Hide
-                value: "1"
-            defaultValue: "0"
+                value: '1'
+            defaultValue: '0'
     - component: PageRow
       name: pageRow
       children:
@@ -42,11 +42,11 @@ spec:
               - type: string
                 field: ID
               - type: link
-                field: Avatar
-                width: 147
-              - type: link
                 field: Profile
                 width: 254
+              - type: link
+                field: Avatar
+                width: 147
               - type: string
                 field: Name
                 width: 169

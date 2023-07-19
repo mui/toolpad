@@ -4,6 +4,8 @@ import IconButton from '@mui/material/IconButton';
 import PlayArrowRoundedIcon from '@mui/icons-material/PlayArrowRounded';
 import PauseRoundedIcon from '@mui/icons-material/PauseRounded';
 import FullScreenRoundedIcon from '@mui/icons-material/FullscreenRounded';
+import VolumeOffRoundedIcon from '@mui/icons-material/VolumeOffRounded';
+import VolumeUpRoundedIcon from '@mui/icons-material/VolumeUpRounded';
 import { styled, alpha } from '@mui/material/styles';
 
 const VideoContainer = styled(Box)(({ theme }) => [
@@ -88,8 +90,6 @@ const PauseButton = styled(IconButton)(({ theme }) => [
     borderRadius: 99,
     width: 64,
     height: 64,
-    // bottom: 16,
-    // left: 16,
     border: 'none',
     boxShadow: `0 4px 8px ${alpha(theme.palette.primary[900], 0.4)}`,
     transition: theme.transitions.create(['scale', 'box-shadow', 'opacity'], {
@@ -107,37 +107,50 @@ const PauseButton = styled(IconButton)(({ theme }) => [
   },
 ]);
 
+const videoContolButton = (theme) => ({
+  position: 'absolute',
+  background: `linear-gradient(120deg, ${(theme.vars || theme).palette.primary[900]} 0%, ${
+    (theme.vars || theme).palette.primary[700]
+  } 150%)`,
+  borderRadius: 99,
+  width: 48,
+  height: 48,
+  border: 'none',
+  boxShadow: `0 4px 8px ${alpha(theme.palette.primary[900], 0.4)}`,
+  transition: theme.transitions.create(['scale', 'box-shadow', 'opacity'], {
+    duration: theme.transitions.duration.shortest,
+  }),
+  opacity: 1,
+  zIndex: 10,
+  '&:hover': {
+    scale: '1.05',
+    background: `linear-gradient(120deg, ${(theme.vars || theme).palette.primary[800]} 0%, ${
+      (theme.vars || theme).palette.primary[600]
+    } 150%)`,
+    boxShadow: `0 8px 10px ${alpha(theme.palette.primary[900], 0.6)}`,
+  },
+});
+
 const FullScreenButton = styled(IconButton)(({ theme }) => [
   {
-    position: 'absolute',
-    background: `linear-gradient(120deg, ${(theme.vars || theme).palette.primary[900]} 0%, ${
-      (theme.vars || theme).palette.primary[700]
-    } 150%)`,
-    borderRadius: 99,
-    width: 48,
-    height: 48,
+    ...videoContolButton(theme),
     bottom: 16,
     right: 16,
-    border: 'none',
-    boxShadow: `0 4px 8px ${alpha(theme.palette.primary[900], 0.4)}`,
-    transition: theme.transitions.create(['scale', 'box-shadow', 'opacity'], {
-      duration: theme.transitions.duration.shortest,
-    }),
-    opacity: 1,
-    zIndex: 10,
-    '&:hover': {
-      scale: '1.05',
-      background: `linear-gradient(120deg, ${(theme.vars || theme).palette.primary[800]} 0%, ${
-        (theme.vars || theme).palette.primary[600]
-      } 150%)`,
-      boxShadow: `0 8px 10px ${alpha(theme.palette.primary[900], 0.6)}`,
-    },
+  },
+]);
+
+const MuteButton = styled(IconButton)(({ theme }) => [
+  {
+    ...videoContolButton(theme),
+    bottom: 16,
+    right: 80,
   },
 ]);
 
 export default function DemoVideo() {
   const videoRef = React.useRef();
   const [isPaused, setIsPaused] = React.useState(true);
+  const [isMuted, setIsMuted] = React.useState(false);
 
   const handlePlay = () => {
     videoRef.current.play();
@@ -149,6 +162,11 @@ export default function DemoVideo() {
   };
   const handleFullScreen = () => {
     videoRef.current.requestFullscreen();
+  };
+
+  const handleMuteToggle = () => {
+    videoRef.current.muted = !videoRef.current.muted;
+    setIsMuted(videoRef.current.muted);
   };
 
   return (
@@ -168,6 +186,14 @@ export default function DemoVideo() {
       <FullScreenButton type="button" onClick={handleFullScreen} color="primary">
         <FullScreenRoundedIcon sx={{ color: '#FFF', fontSize: 24 }} />
       </FullScreenButton>
+
+      <MuteButton type="button" onClick={handleMuteToggle} color="primary">
+        {isMuted ? (
+          <VolumeOffRoundedIcon sx={{ color: '#FFF', fontSize: 24 }} />
+        ) : (
+          <VolumeUpRoundedIcon sx={{ color: '#FFF', fontSize: 24 }} />
+        )}
+      </MuteButton>
 
       <Video poster="/static/toolpad/marketing/index-hero-video-poster.png" ref={videoRef}>
         <source src="/static/toolpad/marketing/index-hero-demo-video.mp4" type="video/mp4" />

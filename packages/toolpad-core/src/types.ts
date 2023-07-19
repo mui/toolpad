@@ -200,6 +200,7 @@ export interface ArgControlSpec {
     | 'ColorScale'
     | 'RowIdFieldSelect'; // Row id field specialized select
   bindable?: boolean;
+  hideLabel?: boolean;
 }
 
 export type PrimitiveValueType =

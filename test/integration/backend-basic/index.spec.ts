@@ -74,7 +74,7 @@ test('function editor parameters update', async ({ page, localApp }) => {
   const editorModel = new ToolpadEditor(page);
   await editorModel.goToPageById(BASIC_TESTS_PAGE_ID);
 
-  await editorModel.componentEditor.getByRole('button', { name: 'withParams' }).click();
+  await editorModel.pageEditor.getByRole('button', { name: 'withParams' }).click();
 
   const queryEditor = page.getByRole('dialog', { name: 'withParams' });
   await expect(queryEditor).toBeVisible();
@@ -145,7 +145,7 @@ test('function editor extracted parameters', async ({ page, localApp }) => {
   const editorModel = new ToolpadEditor(page);
   await editorModel.goToPageById(EXTRACTED_TYPES_PAGE_ID);
 
-  await editorModel.componentEditor.getByRole('button', { name: 'bareWithParams' }).click();
+  await editorModel.pageEditor.getByRole('button', { name: 'bareWithParams' }).click();
   const queryEditor = page.getByRole('dialog', { name: 'bareWithParams' });
 
   await queryEditor.getByRole('button', { name: 'Preview', exact: true }).click();

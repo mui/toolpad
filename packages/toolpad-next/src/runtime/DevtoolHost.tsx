@@ -68,6 +68,9 @@ export interface DevtoolHostProps {
   children?: React.ReactNode;
 }
 
+/**
+ * Pure presentational component that defines the surface we use to render the devtools in
+ */
 export default function DevtoolHost({ children }: DevtoolHostProps) {
   const rootRef = React.useRef<HTMLDivElement>(null);
   const [height, setHeight] = React.useState(() => window.innerHeight / 2);

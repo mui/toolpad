@@ -4,7 +4,7 @@ import getPort from 'get-port';
 /**
  * A convenience wrapper around node.js createServer + listen for testing purposes.
  * - starts a http server using `handler` on a free port
- * - returns the port and stopServer method for cleanup.
+ * - returns the port and a close method for cleanup.
  */
 export async function startServer(handler?: http.RequestListener) {
   const server = http.createServer(handler);
@@ -17,7 +17,7 @@ export async function startServer(handler?: http.RequestListener) {
   });
   return {
     port,
-    async stopServer() {
+    async close() {
       await new Promise<void>((resolve, reject) => {
         if (app) {
           app.close((err) => {

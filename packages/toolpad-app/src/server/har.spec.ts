@@ -5,7 +5,7 @@ import { startServer } from '../utils/tests';
 
 describe('har', () => {
   test('headers in array form', async () => {
-    const { port, stopServer } = await startServer(async (req, res) => {
+    const { port, close } = await startServer(async (req, res) => {
       res.write(
         JSON.stringify({
           body: await streamToString(req),
@@ -40,7 +40,7 @@ describe('har', () => {
         }),
       );
     } finally {
-      await stopServer();
+      await close();
     }
   });
 });

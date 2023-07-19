@@ -33,7 +33,12 @@ export default function GithubStars() {
   }, [fetchStars]);
 
   return (
-    <ButtonGroup variant="outlined" disableElevation aria-label="split button" sx={{ mt: 2 }}>
+    <ButtonGroup
+      variant="outlined"
+      disableElevation
+      aria-label="split button"
+      sx={{ mt: 2, justifyContent: { xs: 'center', sm: 'start' } }}
+    >
       <Tooltip title="GitHub repository">
         <Button
           size="small"

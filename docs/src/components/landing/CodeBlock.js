@@ -1,4 +1,5 @@
 import * as React from 'react';
+import PropTypes from 'prop-types';
 import { TypeScript } from '@mui/docs';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
@@ -58,28 +59,28 @@ function WindowCircles() {
   );
 }
 
-export default function CodeBlock() {
+export default function CodeBlock({ appMode }) {
   return (
     <Box
-      className="code-block"
+      className="MuiToolpadHero-codeBlock"
       sx={(theme) => ({
-        position: 'absolute',
-        minWidth: 640,
-        minHeight: 440,
+        gridRowStart: 1,
+        gridRowEnd: 2,
+        position: { xs: 'relative', sm: 'absolute', md: 'relative' },
+        bottom: { xs: 'unset', sm: 0, md: 'unset' },
         zIndex: 20,
-        ml: -2,
-        bottom: '50%',
-        transform: 'translateY(50%) rotateY(0deg)',
-        left: 0,
         borderRadius: 1,
         backgroundColor: (theme.vars || theme).palette.primaryDark[800],
         border: '1px solid',
         borderColor: (theme.vars || theme).palette.primaryDark[700],
-        boxShadow: '0px 2px 16px rgba(0,0,0, 0.5)',
         backfaceVisibility: 'hidden',
-        transition: 'all 0.8s ease',
+        transition: 'all 0.6s ease',
+        transform: appMode
+          ? { xs: 'rotateY(180deg)', sm: 'unset', md: 'rotateY(180deg)' }
+          : 'unset',
         ...theme.applyDarkStyles({
           borderColor: (theme.vars || theme).palette.divider,
+          boxShadow: '0px 2px 16px rgba(0,0,0, 0.5)',
         }),
       })}
     >
@@ -101,14 +102,14 @@ export default function CodeBlock() {
           color="grey.200"
           sx={{
             fontFamily: 'monospace',
-            fontSize: 8,
+            fontSize: 10,
             display: 'flex',
             alignItems: 'center',
             gap: 0.5,
           }}
         >
           <TypeScript fontSize="small" sx={{ color: 'primary.300', borderRadius: 2 }} />
-          function.ts
+          toolpad/resources/functions.ts
         </Typography>
       </Box>
       <HighlightedCode
@@ -116,8 +117,18 @@ export default function CodeBlock() {
         component={MarkdownElement}
         code={componentCode}
         language="jsx"
-        sx={{ p: 1.5 }}
+        sx={{
+          p: 1.5,
+          fontSize: (theme) => ({
+            xs: theme.typography.pxToRem(7),
+            md: theme.typography.pxToRem(12),
+          }),
+        }}
       />
     </Box>
   );
 }
+
+CodeBlock.propTypes = {
+  appMode: PropTypes.bool,
+};

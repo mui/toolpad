@@ -200,7 +200,7 @@ export default function CardGrid() {
 
 ContentCard.propTypes = {
   description: PropTypes.string.isRequired,
-  href: PropTypes.object.isRequired,
+  href: PropTypes.string.isRequired,
   icon: PropTypes.node.isRequired,
   title: PropTypes.string.isRequired,
 };

@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import * as React from 'react';
 import Box from '@mui/material/Box';
 import IconButton from '@mui/material/IconButton';
 import PlayArrowRoundedIcon from '@mui/icons-material/PlayArrowRounded';
@@ -21,6 +21,9 @@ const VideoContainer = styled(Box)(({ theme }) => [
     borderColor: `${alpha(theme.palette.primary[100], 0.6)}`,
     boxShadow: `4px 0 60px ${alpha(theme.palette.primary[100], 0.8)}`,
     overflow: 'hidden',
+    '&:hover .MuiToolpadHero-pauseButton, &:focus .MuiToolpadHero-pauseButton': {
+      opacity: 1,
+    },
   },
   theme.applyDarkStyles({
     background: `linear-gradient(120deg, ${
@@ -76,19 +79,22 @@ const PlayButton = styled(IconButton)(({ theme }) => [
 const PauseButton = styled(IconButton)(({ theme }) => [
   {
     position: 'absolute',
+    transform: 'translate(-50%,-50%)',
+    inset: '50%',
     background: `linear-gradient(120deg, ${(theme.vars || theme).palette.primary[900]} 0%, ${
       (theme.vars || theme).palette.primary[700]
     } 150%)`,
     borderRadius: 99,
-    width: 32,
-    height: 32,
-    bottom: 16,
-    left: 16,
+    width: 64,
+    height: 64,
+    // bottom: 16,
+    // left: 16,
     border: 'none',
     boxShadow: `0 4px 8px ${alpha(theme.palette.primary[900], 0.4)}`,
-    transition: theme.transitions.create(['scale', 'box-shadow'], {
+    transition: theme.transitions.create(['scale', 'box-shadow', 'opacity'], {
       duration: theme.transitions.duration.shortest,
     }),
+    opacity: 0,
     zIndex: 10,
     '&:hover': {
       scale: '1.05',
@@ -101,23 +107,32 @@ const PauseButton = styled(IconButton)(({ theme }) => [
 ]);
 
 export default function DemoVideo() {
-  const videoRef = useRef();
+  const videoRef = React.useRef();
+  const [isPaused, setIsPaused] = React.useState(true);
 
   const handlePlay = () => {
     videoRef.current.play();
+    setIsPaused(videoRef.current.paused);
   };
   const handlePause = () => {
     videoRef.current.pause();
+    setIsPaused(videoRef.current.paused);
   };
 
   return (
     <VideoContainer>
-      <PlayButton type="button" onClick={handlePlay} color="primary">
-        <PlayArrowRoundedIcon sx={{ color: '#FFF' }} />
-      </PlayButton>
-      <PauseButton type="button" onClick={handlePause}>
-        <PauseRoundedIcon sx={{ color: '#FFF', fontSize: 16 }} />
-      </PauseButton>
+      {isPaused ? (
+        <PlayButton type="button" onClick={handlePlay} color="primary">
+          <PlayArrowRoundedIcon sx={{ color: '#FFF' }} />
+        </PlayButton>
+      ) : null}
+
+      {!isPaused ? (
+        <PauseButton className="MuiToolpadHero-pauseButton" type="button" onClick={handlePause}>
+          <PauseRoundedIcon sx={{ color: '#FFF', fontSize: 16 }} />
+        </PauseButton>
+      ) : null}
+
       <Video poster="/static/toolpad/marketing/index-hero-video-poster.png" ref={videoRef}>
         <source src="/static/toolpad/marketing/index-hero-demo-video.mp4" type="video/mp4" />
         Your browser does not support the video tag.

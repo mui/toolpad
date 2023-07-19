@@ -60,3 +60,4 @@ spec:
     - name: getUsers
       query:
         function: getUsers
+        kind: local

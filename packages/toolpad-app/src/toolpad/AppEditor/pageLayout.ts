@@ -164,7 +164,7 @@ export function normalizePageRowColumnSizes(
   return dom;
 }
 
-export function removeElementNode(dom: appDom.AppDom, node: appDom.ElementNode): appDom.AppDom {
+export function removePageLayoutNode(dom: appDom.AppDom, node: appDom.ElementNode): appDom.AppDom {
   const pageNode = appDom.getPageAncestor(dom, node);
 
   let updatedDom = dom;

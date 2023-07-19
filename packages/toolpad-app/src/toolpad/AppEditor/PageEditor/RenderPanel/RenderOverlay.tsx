@@ -47,8 +47,8 @@ import { PinholeOverlay } from '../../../../PinholeOverlay';
 import {
   deleteOrphanedLayoutNodes,
   normalizePageRowColumnSizes,
-  removeElementNode,
-} from '../../removeElementNode';
+  removePageLayoutNode,
+} from '../../pageLayout';
 
 const VERTICAL_RESIZE_SNAP_UNITS = 2; // px
 
@@ -241,7 +241,7 @@ export default function RenderOverlay({ bridge }: RenderOverlayProps) {
           const toRemove = appDom.getNode(draft, nodeId);
 
           if (appDom.isElement(toRemove)) {
-            draft = removeElementNode(draft, toRemove);
+            draft = removePageLayoutNode(draft, toRemove);
           }
 
           return draft;
@@ -812,7 +812,7 @@ export default function RenderOverlay({ bridge }: RenderOverlayProps) {
         return;
       }
 
-      const dragOverNode = appDom.getNode(dom, dragOverNodeId);
+      let dragOverNode = appDom.getNode(dom, dragOverNodeId) as appDom.ElementNode;
 
       if (!appDom.isElement(dragOverNode) && !appDom.isPage(dragOverNode)) {
         return;
@@ -968,6 +968,7 @@ export default function RenderOverlay({ bridge }: RenderOverlayProps) {
                     'columnSize',
                     1,
                   );
+                  dragOverNode = appDom.getNode(draft, dragOverNodeId) as appDom.ElementNode;
 
                   draft = appDom.addNode(
                     draft,
@@ -980,12 +981,7 @@ export default function RenderOverlay({ bridge }: RenderOverlayProps) {
 
                   // Move existing element inside column right away if drag over zone is bottom
                   if (dragOverZone === DROP_ZONE_BOTTOM) {
-                    draft = appDom.moveNode(
-                      draft,
-                      appDom.getMaybeNode(draft, dragOverNodeId),
-                      parent,
-                      dragOverNodeParentProp,
-                    );
+                    draft = appDom.moveNode(draft, dragOverNode, parent, dragOverNodeParentProp);
                   }
                 }
 

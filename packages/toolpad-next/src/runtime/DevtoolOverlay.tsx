@@ -7,6 +7,7 @@ import DataGridFileEditor from './DataGridFileEditor';
 import theme from './theme';
 import { useServer } from './server';
 import { GeneratedFile, generateComponent } from '../shared/codeGeneration';
+import DevtoolHost from './DevtoolHost';
 
 const CONNECTION_STATUS_DISPLAY = {
   connecting: { label: 'Connecting', color: 'info.main' },
@@ -39,53 +40,6 @@ function FileEditor({ name, value, onChange, onClose, source }: FileEditorProps)
   }
 }
 
-interface ResizeHandleProps {
-  onResize?: (height: number) => void;
-  onCommitResize?: (height: number) => void;
-}
-
-function ResizeHandle({ onResize, onCommitResize }: ResizeHandleProps) {
-  const prevSize = React.useRef<number | null>(null);
-  React.useEffect(() => {
-    const handleMouseMove = (event: MouseEvent) => {
-      if (prevSize.current !== null) {
-        onResize?.(event.clientY - prevSize.current);
-        prevSize.current = event.clientY;
-      }
-    };
-    const handleMouseUp = (event: MouseEvent) => {
-      if (prevSize.current !== null) {
-        onCommitResize?.(event.clientY - prevSize.current);
-        prevSize.current = null;
-        document.body.style.userSelect = '';
-      }
-    };
-    document.addEventListener('mousemove', handleMouseMove);
-    document.addEventListener('mouseup', handleMouseUp);
-    return () => {
-      document.removeEventListener('mousemove', handleMouseMove);
-      document.removeEventListener('mouseup', handleMouseUp);
-    };
-
-    return () => {};
-  }, [onResize, onCommitResize]);
-  return (
-    <Box
-      sx={{
-        my: '-4px',
-        width: '100%',
-        height: '9px',
-        background: 'divider',
-        cursor: 'ns-resize',
-      }}
-      onMouseDown={(event) => {
-        prevSize.current = event.clientY;
-        document.body.style.userSelect = 'none';
-      }}
-    />
-  );
-}
-
 export interface DevtoolOverlayProps {
   name: string;
   file: ToolpadFile;
@@ -94,21 +48,8 @@ export interface DevtoolOverlayProps {
 
 export default function DevtoolOverlay({ name, file, onClose }: DevtoolOverlayProps) {
   const rootRef = React.useRef<HTMLDivElement>(null);
-  const [height, setHeight] = React.useState(() => window.innerHeight / 2);
-
-  const handleResize = (y: number) => {
-    setHeight(height - y);
-  };
 
   const [inputValue, setInputValue] = React.useState(file);
-
-  React.useEffect(() => {
-    const originalMarginBottom = document.body.style.marginBottom;
-    document.body.style.marginBottom = `${height}px`;
-    return () => {
-      document.body.style.marginBottom = originalMarginBottom;
-    };
-  }, [height]);
 
   const { connectionStatus } = useServer();
 
@@ -128,102 +69,97 @@ export default function DevtoolOverlay({ name, file, onClose }: DevtoolOverlayPr
 
   return (
     <ThemeProvider theme={theme}>
-      <Box
-        ref={rootRef}
-        sx={{
-          position: 'fixed',
-          bottom: 0,
-          left: 0,
-          right: 0,
-          height,
-          background: 'white',
-          borderTop: 1,
-          borderColor: 'divider',
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'stretch',
-        }}
-      >
-        <ResizeHandle onResize={handleResize} />
+      <DevtoolHost>
         <Box
+          ref={rootRef}
           sx={{
+            width: '100%',
+            height: '100%',
             display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            borderBottom: 1,
-            borderColor: 'divider',
-            pl: 2,
+            flexDirection: 'column',
+            alignItems: 'stretch',
           }}
         >
-          <Typography>
-            {name} ({file.kind})
-          </Typography>
           <Box
             sx={{
               display: 'flex',
-              flexDirection: 'row',
               alignItems: 'center',
-              gap: 1,
+              justifyContent: 'space-between',
+              borderBottom: 1,
+              borderColor: 'divider',
+              pl: 2,
             }}
           >
+            <Typography>
+              {name} ({file.kind})
+            </Typography>
             <Box
               sx={{
                 display: 'flex',
+                flexDirection: 'row',
                 alignItems: 'center',
-                minWidth: 190,
                 gap: 1,
               }}
             >
-              <Typography>Status:</Typography>
               <Box
                 sx={{
-                  display: 'inline-block',
-                  borderRadius: '50%',
-                  width: 16,
-                  height: 16,
-                  backgroundColor: CONNECTION_STATUS_DISPLAY[connectionStatus].color,
+                  display: 'flex',
+                  alignItems: 'center',
+                  minWidth: 190,
+                  gap: 1,
                 }}
-              />
-              <Typography>{CONNECTION_STATUS_DISPLAY[connectionStatus].label}</Typography>
+              >
+                <Typography>Status:</Typography>
+                <Box
+                  sx={{
+                    display: 'inline-block',
+                    borderRadius: '50%',
+                    width: 16,
+                    height: 16,
+                    backgroundColor: CONNECTION_STATUS_DISPLAY[connectionStatus].color,
+                  }}
+                />
+                <Typography>{CONNECTION_STATUS_DISPLAY[connectionStatus].label}</Typography>
+              </Box>
+              <IconButton size="small" onClick={onClose}>
+                <CloseIcon fontSize="inherit" />
+              </IconButton>
             </Box>
-            <IconButton size="small" onClick={onClose}>
-              <CloseIcon fontSize="inherit" />
-            </IconButton>
+          </Box>
+          <Box sx={{ flex: 1, overflow: 'hidden', position: 'relative' }}>
+            {connectionStatus === 'connected' ? (
+              <FileEditor
+                name={name}
+                value={inputValue}
+                onChange={setInputValue}
+                onClose={onClose}
+                source={generatedFile?.code}
+              />
+            ) : (
+              <Box
+                sx={{
+                  position: 'absolute',
+                  inset: '0 0 0 0',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  backgroundColor: 'rgba(255, 255, 255, 0.7)',
+                  gap: 1,
+                }}
+              >
+                {connectionStatus === 'disconnected' ? (
+                  <React.Fragment>
+                    <ErrorOutlineIcon color="error" />
+                    Connection lost
+                  </React.Fragment>
+                ) : (
+                  <CircularProgress />
+                )}
+              </Box>
+            )}
           </Box>
         </Box>
-        <Box sx={{ flex: 1, overflow: 'hidden', position: 'relative' }}>
-          {connectionStatus === 'connected' ? (
-            <FileEditor
-              name={name}
-              value={inputValue}
-              onChange={setInputValue}
-              onClose={onClose}
-              source={generatedFile?.code}
-            />
-          ) : (
-            <Box
-              sx={{
-                position: 'absolute',
-                inset: '0 0 0 0',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                backgroundColor: 'rgba(255, 255, 255, 0.7)',
-                gap: 1,
-              }}
-            >
-              {connectionStatus === 'disconnected' ? (
-                <React.Fragment>
-                  <ErrorOutlineIcon color="error" />
-                  Connection lost
-                </React.Fragment>
-              ) : (
-                <CircularProgress />
-              )}
-            </Box>
-          )}
-        </Box>
-      </Box>
+      </DevtoolHost>
     </ThemeProvider>
   );
 }

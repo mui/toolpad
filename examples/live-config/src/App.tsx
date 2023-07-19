@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Container, Typography } from '@mui/material';
+import { Container, Typography, Box } from '@mui/material';
 import { MyGrid } from '../toolpad/.generated/components';
 
 const ROWS = [
@@ -11,7 +11,9 @@ export default function App() {
   return (
     <Container>
       <Typography variant="h5">Live Config</Typography>
-      <MyGrid rows={ROWS} />
+      <Box sx={{ position: 'relative', width: '100%', height: 400 }}>
+        <MyGrid rows={ROWS} />
+      </Box>
     </Container>
   );
 }

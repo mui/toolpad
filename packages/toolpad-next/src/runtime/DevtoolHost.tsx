@@ -93,7 +93,6 @@ export default function DevtoolHost({ children }: DevtoolHostProps) {
           borderTop: 1,
           borderColor: 'divider',
           backgroundColor: 'background.paper',
-          zIndex: 10000000,
           display: 'flex',
           flexDirection: 'column',
           alignItems: 'stretch',
@@ -104,4 +103,30 @@ export default function DevtoolHost({ children }: DevtoolHostProps) {
       </Box>
     </ThemeProvider>
   );
+}
+
+class ErrorBoundary extends React.Component<{ children?: React.ReactNode }> {
+  state: { error: Error | null } = { error: null };
+
+  static getDerivedStateFromError(error: any) {
+    return { error };
+  }
+
+  render() {
+    return this.state.error ? (
+      <Box
+        sx={{
+          width: '100%',
+          height: '100%',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+        }}
+      >
+        {String(this.state.error?.message || this.state.error)}
+      </Box>
+    ) : (
+      this.props.children
+    );
+  }
 }

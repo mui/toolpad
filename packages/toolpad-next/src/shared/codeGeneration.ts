@@ -66,34 +66,29 @@ export async function generateDataGridComponent(
     import { Box } from '@mui/material';
     ${dev ? `import { withDevtool, EditButton } from '@mui/toolpad-next/runtime';` : ''}
 
-    class ErrorBoundary extends React.Component {
-      constructor(props) {
-        super(props);
-        this.state = { error: null };
-      }
+    class ErrorBoundary extends React.Component<{ children?: React.ReactNode }> {
+      state: { error: Error | null } = { error: null };
     
-      static getDerivedStateFromError(error) {
+      static getDerivedStateFromError(error: any) {
         return { error };
       }
     
       render() {
-        if (this.state.error) {
-          return (
-            <Box
-              sx={{
-                position: "absolute",
-                inset: "0 0 0 0",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-              }}
-            >
-              {this.state.error.message}
-            </Box>
-          );
-        }
-    
-        return this.props.children;
+        return this.state.error ? (
+          <Box
+            sx={{
+              width: '100%',
+              height: '100%',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}
+          >
+            {String(this.state.error?.message || this.state.error)}
+          </Box>
+        ) : (
+          this.props.children
+        );
       }
     }
 

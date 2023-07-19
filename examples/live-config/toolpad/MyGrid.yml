@@ -2,7 +2,7 @@ kind: DataGrid
 spec:
   columns:
     - field: a
-      type: number
+      type: date
     - field: b
       type: boolean
     - field: f

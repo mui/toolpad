@@ -42,11 +42,11 @@ spec:
               - type: string
                 field: ID
               - type: link
-                field: Profile
-                width: 254
-              - type: link
                 field: Avatar
                 width: 147
+              - type: link
+                field: Profile
+                width: 254
               - type: string
                 field: Name
                 width: 169

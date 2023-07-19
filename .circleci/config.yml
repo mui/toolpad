@@ -142,7 +142,6 @@ jobs:
         environment:
           NODE_ENV: test
           TOOLPAD_TEST_RETRIES: 1
-      - image: kennethreitz/httpbin:latest
 
     steps:
       - checkout

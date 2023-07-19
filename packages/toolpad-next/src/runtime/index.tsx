@@ -65,5 +65,5 @@ export function withDevtool<P extends object>(
         )}
       </CurrentComponentIdContext.Provider>
     );
-  } satisfies React.ComponentType<P>;
+  };
 }

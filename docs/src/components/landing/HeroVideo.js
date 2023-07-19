@@ -1,22 +1,20 @@
 import * as React from 'react';
-import Box from '@mui/material/Box';
+import Container from '@mui/material/Container';
 import DemoVideo from './DemoVideo';
 
 export default function HeroVideo() {
   return (
-    <Box
+    <Container
       id="hero-container-right-area"
       aria-hidden="true"
-      sx={[
-        {
-          display: 'flex',
-          alignItems: 'center',
-          p: 4,
-          minWidth: '50vw',
-        },
-      ]}
+      sx={{
+        py: { xs: 4, sm: 8 },
+        display: 'flex',
+        alignItems: 'center',
+        minWidth: '50vw',
+      }}
     >
       <DemoVideo />
-    </Box>
+    </Container>
   );
 }

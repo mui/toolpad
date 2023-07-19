@@ -28,37 +28,6 @@ export async function deleteCustomer(id: number) {
 }
 `;
 
-function WindowCircles() {
-  return (
-    <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.7 }}>
-      <Box
-        sx={(theme) => ({
-          height: 9,
-          width: 9,
-          borderRadius: 99,
-          backgroundColor: (theme.vars || theme).palette.error[400],
-        })}
-      />
-      <Box
-        sx={(theme) => ({
-          height: 9,
-          width: 9,
-          borderRadius: 99,
-          backgroundColor: (theme.vars || theme).palette.warning[400],
-        })}
-      />
-      <Box
-        sx={(theme) => ({
-          height: 9,
-          width: 9,
-          borderRadius: 99,
-          backgroundColor: (theme.vars || theme).palette.success[400],
-        })}
-      />
-    </Box>
-  );
-}
-
 export default function CodeBlock({ appMode }) {
   return (
     <Box
@@ -97,18 +66,17 @@ export default function CodeBlock({ appMode }) {
           }),
         })}
       >
-        <WindowCircles />
         <Typography
-          color="grey.200"
+          color="grey.400"
           sx={{
-            fontFamily: 'monospace',
-            fontSize: 10,
+            fontFamily: 'Menlo',
+            fontSize: 12,
             display: 'flex',
             alignItems: 'center',
             gap: 0.5,
           }}
         >
-          <TypeScript fontSize="small" sx={{ color: 'primary.300', borderRadius: 2 }} />
+          <TypeScript fontSize="small" sx={{ color: 'primary.300', borderRadius: 2 }} />/
           toolpad/resources/functions.ts
         </Typography>
       </Box>

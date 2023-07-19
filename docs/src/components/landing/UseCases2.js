@@ -24,12 +24,12 @@ const ImageContainer = styled(Box)(({ theme }) => [
     padding: 8,
     paddingBottom: 4,
     background: `linear-gradient(120deg, ${(theme.vars || theme).palette.primary[50]} 0%, ${alpha(
-      theme.palette.primary[100],
-      0.2,
+      theme.palette.primary[50],
+      0.5,
     )} 150%)`,
     border: '1px solid',
     borderColor: `${alpha(theme.palette.primary[100], 0.6)}`,
-    boxShadow: `0 4px 12px ${alpha(theme.palette.grey[100], 0.5)}`,
+    boxShadow: `0 4px 8px ${alpha(theme.palette.grey[100], 0.5)}`,
     overflow: 'hidden',
   },
   theme.applyDarkStyles({
@@ -37,7 +37,7 @@ const ImageContainer = styled(Box)(({ theme }) => [
       (theme.vars || theme).palette.primaryDark[500]
     } 0%, ${alpha(theme.palette.primaryDark[800], 0.4)} 150%)`,
     borderColor: `${alpha(theme.palette.primaryDark[300], 0.3)}`,
-    boxShadow: `4px 0 60px ${alpha(theme.palette.primaryDark[600], 0.5)}`,
+    boxShadow: `0 4px 8px ${alpha(theme.palette.primaryDark[600], 0.5)}`,
   }),
 ]);
 
@@ -61,10 +61,10 @@ function ContentCard({ icon, title, description, href }) {
     <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5, mt: 2 }}>
       <Typography
         component="h3"
-        variant="h6"
-        fontWeight="semiBold"
+        variant="subtitle1"
+        fontWeight="bold"
         color="text.primary"
-        sx={{ display: 'flex', alignItems: 'center', gap: 1 }}
+        sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}
       >
         {icon}
         {title}
@@ -72,7 +72,7 @@ function ContentCard({ icon, title, description, href }) {
       <Typography variant="body" color="text.secondary">
         {description}
       </Typography>
-      <Link href={href} variant="body" sx={{ mt: 1 }}>
+      <Link href={href} variant="body2" sx={{ mt: 0.5 }}>
         View more
         <KeyboardArrowRightRounded fontSize="small" />
       </Link>
@@ -175,8 +175,8 @@ export default function CardGrid() {
               <LibraryAddRoundedIcon color="primary" sx={{ mb: 2 }} />
               <Typography
                 component="h3"
-                variant="body"
-                fontWeight="semiBold"
+                variant="subtitle1"
+                fontWeight="bold"
                 color="text.primary"
                 gutterBottom
                 sx={{ display: 'flex', alignItems: 'center', gap: 1 }}

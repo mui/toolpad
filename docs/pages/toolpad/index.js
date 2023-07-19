@@ -52,7 +52,6 @@ export default function Home() {
       <AppHeader gitHubRepository="https://github.com/mui/mui-toolpad" />
       <main id="main-content">
         <Hero />
-        <Divider />
         <HeroVideo />
         <Divider />
         <UseCases2 content={useCases} />

@@ -161,6 +161,7 @@ export default function Hero() {
           sx={{
             mt: 2,
             display: 'flex',
+            alignItems: 'center',
             justifyContent: { xs: 'space-around', sm: 'start' },
             gap: 2,
           }}

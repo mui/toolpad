@@ -47,14 +47,16 @@ export default function GithubStars() {
           target="_blank"
           component={'a'}
           sx={{
+            color: theme.palette.grey[600],
             borderColor: theme.palette.grey[400],
             ...theme.applyDarkStyles({
               borderColor: theme.palette.primaryDark[500],
             }),
           }}
           rel="noopener nofollow"
+          startIcon={<GitHubIcon sx={{ color: theme.palette.grey[600] }} />}
         >
-          <GitHubIcon sx={{ color: theme.palette.grey[600] }} />
+          Star
         </Button>
       </Tooltip>
       <Tooltip title="Stargazers">

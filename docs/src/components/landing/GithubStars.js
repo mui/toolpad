@@ -3,7 +3,7 @@ import { useTheme } from '@mui/material/styles';
 import Button from '@mui/material/Button';
 import ButtonGroup from '@mui/material/ButtonGroup';
 import Tooltip from '@mui/material/Tooltip';
-import StarIcon from '@mui/icons-material/Star';
+import StarRateRoundedIcon from '@mui/icons-material/StarRateRounded';
 import GitHubIcon from '@mui/icons-material/GitHub';
 
 export default function GithubStars() {
@@ -37,7 +37,7 @@ export default function GithubStars() {
       variant="outlined"
       disableElevation
       aria-label="split button"
-      sx={{ mt: 2, justifyContent: { xs: 'center', sm: 'start' } }}
+      sx={{ justifyContent: { xs: 'center', sm: 'start' } }}
     >
       <Tooltip title="GitHub repository">
         <Button
@@ -47,14 +47,17 @@ export default function GithubStars() {
           target="_blank"
           component={'a'}
           sx={{
-            color: theme.palette.grey[600],
-            borderColor: theme.palette.grey[400],
+            color: theme.palette.grey[900],
+            borderColor: theme.palette.grey[200],
+            borderTopLeftRadius: '8px',
+            borderBottomLeftRadius: '8px',
             ...theme.applyDarkStyles({
-              borderColor: theme.palette.primaryDark[500],
+              color: theme.palette.primary[50],
+              borderColor: theme.palette.primaryDark[600],
             }),
           }}
           rel="noopener nofollow"
-          startIcon={<GitHubIcon sx={{ color: theme.palette.grey[600] }} />}
+          startIcon={<GitHubIcon />}
         >
           Star
         </Button>
@@ -66,15 +69,18 @@ export default function GithubStars() {
           sx={{
             borderTopLeftRadius: 0,
             borderBottomLeftRadius: 0,
-            borderColor: theme.palette.grey[400],
+            borderTopRightRadius: '8px',
+            borderBottomRightRadius: '8px',
+            borderColor: theme.palette.grey[200],
             ...theme.applyDarkStyles({
-              borderColor: theme.palette.primaryDark[500],
+              borderColor: theme.palette.primaryDark[600],
+              color: theme.palette.primary[200],
             }),
           }}
           href="https://github.com/mui/mui-toolpad/stargazers"
           target="_blank"
           rel="noopener nofollow"
-          startIcon={<StarIcon fontSize="small" sx={{ mt: -0.25 }} />}
+          startIcon={<StarRateRoundedIcon fontSize="small" sx={{ mt: -0.25 }} />}
         >
           {fetching ? '...' : stars}
         </Button>

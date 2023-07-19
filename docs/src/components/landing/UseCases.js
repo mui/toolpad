@@ -23,12 +23,12 @@ const ImageContainer = styled(Box)(({ theme }) => [
     borderRadius: 16,
     padding: 8,
     paddingBottom: 4,
-    background: `linear-gradient(120deg, ${(theme.vars || theme).palette.primary[50]} 0%, ${alpha(
+    background: `linear-gradient(120deg, ${(theme.vars || theme).palette.grey[50]} 0%, ${alpha(
       theme.palette.primary[50],
       0.5,
     )} 150%)`,
     border: '1px solid',
-    borderColor: `${alpha(theme.palette.primary[100], 0.6)}`,
+    borderColor: (theme.vars || theme).palette.grey[100],
     boxShadow: `0 4px 8px ${alpha(theme.palette.grey[100], 0.5)}`,
     overflow: 'hidden',
   },
@@ -49,7 +49,7 @@ const Img = styled('img')(({ theme }) => [
     height: '100%',
     borderRadius: 10,
     border: '1px solid',
-    borderColor: `${alpha(theme.palette.primary[100], 0.6)}`,
+    borderColor: (theme.vars || theme).palette.grey[100],
   },
   theme.applyDarkStyles({
     borderColor: (theme.vars || theme).palette.primaryDark[700],

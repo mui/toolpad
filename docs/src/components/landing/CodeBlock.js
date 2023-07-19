@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import { TypeScript } from '@mui/docs';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
+import { alpha } from '@mui/material/styles';
 import HighlightedCode from 'docs/src/modules/components/HighlightedCode';
 import MarkdownElement from 'docs/src/components/markdown/MarkdownElement';
 
@@ -43,13 +44,13 @@ export default function CodeBlock({ appMode }) {
         border: '1px solid',
         borderColor: (theme.vars || theme).palette.primaryDark[700],
         backfaceVisibility: 'hidden',
-        transition: 'all 0.6s ease',
+        transition: 'all 0.3s ease',
         transform: appMode
           ? { xs: 'rotateY(180deg)', sm: 'unset', md: 'rotateY(180deg)' }
           : 'unset',
         ...theme.applyDarkStyles({
           borderColor: (theme.vars || theme).palette.divider,
-          boxShadow: '0px 2px 16px rgba(0,0,0, 0.5)',
+          boxShadow: `0 4px 8px ${alpha(theme.palette.primaryDark[900], 0.8)}`,
         }),
       })}
     >

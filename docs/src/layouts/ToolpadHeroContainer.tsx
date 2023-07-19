@@ -19,7 +19,6 @@ export default function HeroContainer({
         justifyContent: 'space-between',
         py: { xs: 4, sm: 8 },
         minHeight: '600px',
-        overflow: 'hidden',
         transition: '0.3s',
         ...sx,
       }}

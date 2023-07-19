@@ -1,12 +1,10 @@
 import fetch from 'node-fetch';
 import { listen } from '@mui/toolpad-utils/http';
-import getPort from 'get-port';
 import { createHarLog, withHarInstrumentation } from './har';
 import { streamToString } from '../utils/streams';
 
 describe('har', () => {
   test('headers in array form', async () => {
-    const port = await getPort();
     const { stopServer } = await listen(async (req, res) => {
       res.write(
         JSON.stringify({
@@ -16,7 +14,7 @@ describe('har', () => {
         }),
       );
       res.end();
-    }, port);
+    });
 
     try {
       const har = createHarLog();

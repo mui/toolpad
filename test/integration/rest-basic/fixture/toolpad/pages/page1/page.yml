@@ -5,6 +5,14 @@ spec:
   title: Page 1
   content:
     - component: PageRow
+      name: pageRow5
+      children:
+        - component: Text
+          name: text2
+          props:
+            variant: h1
+            value: RUN yarn rest:test:start
+    - component: PageRow
       name: pageRow
       children:
         - component: Text
@@ -54,7 +62,7 @@ spec:
     - name: query1
       query:
         kind: rest
-        url: https://httpbin.org/get
+        url: http://localhost:8080/get
         searchParams:
           - name: query1_param1
             value:
@@ -71,7 +79,7 @@ spec:
       mode: mutation
       query:
         kind: rest
-        url: https://httpbin.org/post
+        url: http://localhost:8080/post
         headers: []
         body:
           kind: raw
@@ -87,7 +95,7 @@ spec:
     - name: queryWithTransform
       query:
         kind: rest
-        url: https://httpbin.org/get
+        url: http://localhost:8080/get
         searchParams: []
         headers: []
         method: GET
@@ -102,4 +110,4 @@ spec:
               $$env: TEST_VAR
         method: GET
         searchParams: []
-        url: https://httpbin.org/get
+        url: http://localhost:8080/get

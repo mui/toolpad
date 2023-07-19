@@ -6,10 +6,9 @@ import { WithDevtoolParams } from '../shared/types';
 import DevtoolOverlay from './DevtoolOverlay';
 import { ServerProvider } from './server';
 
-const useCurrentlyEditedComponentId =
-  typeof window === 'undefined'
-    ? () => [null, () => {}] as [string | null, React.Dispatch<React.SetStateAction<string | null>>]
-    : () => useStorageState(window.sessionStorage, 'currently-edited-component-id', null);
+function useCurrentlyEditedComponentId() {
+  return useStorageState('session', 'currently-edited-component-id', null);
+}
 
 const CurrentComponentIdContext = React.createContext<string | null>(null);
 

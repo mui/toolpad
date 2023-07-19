@@ -21,6 +21,7 @@ import { TabContext, TabList, TabPanel as MuiTabPanel } from '@mui/lab';
 import SearchIcon from '@mui/icons-material/Search';
 import SaveIcon from '@mui/icons-material/Save';
 import AddIcon from '@mui/icons-material/Add';
+import useStorageState from '@mui/toolpad-utils/hooks/useStorageState';
 import { ColumnType, DataGridFile } from '../shared/schemas';
 import { useServer } from './server';
 
@@ -155,7 +156,7 @@ export default function DataGridFileEditor({
   onClose,
   source,
 }: DataGridFileEditorProps) {
-  const [activeTab, setActiveTab] = React.useState('columns');
+  const [activeTab, setActiveTab] = useStorageState('session', `activeTab`, 'data');
 
   const server = useServer();
 
@@ -189,7 +190,12 @@ export default function DataGridFileEditor({
           </Tooltip>
         </Box>
 
-        <TabPanel value="data">Data panel</TabPanel>
+        <TabPanel value="data">
+          <Stack direction="row">
+            <Box sx={{ flex: 1 }}>left</Box>
+            <Box sx={{ flex: 1 }}>right</Box>
+          </Stack>
+        </TabPanel>
         <TabPanel value="columns">
           <ColumnsEditor
             value={value.spec?.columns ?? []}

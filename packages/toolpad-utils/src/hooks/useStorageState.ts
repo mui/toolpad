@@ -52,6 +52,16 @@ function setValue(area: Storage, key: string, value: string | null) {
   }
 }
 
+type UseStorageStateHookResult<T> = [T, React.Dispatch<React.SetStateAction<T>>];
+
+function useStorageStateServer(
+  kind: 'session' | 'local',
+  key: string,
+  initialValue: string | null = null,
+): UseStorageStateHookResult<string | null> {
+  return [initialValue, () => {}];
+}
+
 /**
  * Sync state to local/session storage so that it persists through a page refresh. Usage is
  * similar to useState except we pass in a storage key so that we can default
@@ -66,11 +76,12 @@ function setValue(area: Storage, key: string, value: string | null) {
  * - Sync state across tabs: When another tab changes the value in the storage area, the
  *   current tab follows suit.
  */
-export default function useStorageState(
-  area: Storage,
+function useStorageStateBrowser(
+  kind: 'session' | 'local',
   key: string,
   initialValue: string | null = null,
-): [string | null, React.Dispatch<React.SetStateAction<string | null>>] {
+): UseStorageStateHookResult<string | null> {
+  const area = kind === 'session' ? window.sessionStorage : window.localStorage;
   const subscribeKey = React.useCallback((cb: () => void) => subscribe(area, key, cb), [area, key]);
   const getKeySnapshot = React.useCallback(
     () => getSnapshot(area, key) ?? initialValue,
@@ -94,3 +105,5 @@ export default function useStorageState(
 
   return [storedValue, setStoredValue];
 }
+
+export default typeof window === 'undefined' ? useStorageStateServer : useStorageStateBrowser;

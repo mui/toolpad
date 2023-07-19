@@ -4,7 +4,7 @@ import { APP_PAGE_ROUTE, APP_CONNECTION_ROUTE, APP_CODE_COMPONENT_ROUTE } from '
 
 export type PageView = { kind: 'query'; nodeId: NodeId } | { kind: 'pageParameters' };
 
-export type PageViewTab = 'component' | 'theme';
+export type PageViewTab = 'page' | 'component' | 'theme';
 
 export type DomView =
   | {
@@ -37,7 +37,7 @@ export function getViewFromPathname(pathname: string): DomView | null {
       kind: 'page',
       nodeId: pageRouteMatch.params.nodeId as NodeId,
       selectedNodeId: null,
-      tab: 'component',
+      tab: 'page',
     };
   }
 

@@ -8,10 +8,9 @@ We can write a custom function to connect to any database that we need to. We ca
 
 ### Custom function
 
-Inside `/resources/functions.ts`, we can create a custom function using Toolpad's `createFunction` API:
+Inside `/resources/functions.ts`, we can create a custom function:
 
 ```ts
-import { createFunction } from '@mui/toolpad/server';
 import mysql from 'mysql2/promise';
 import fs from 'fs';
 
@@ -26,32 +25,26 @@ async connectionFn () {
    return connection;
 }
 
-export const getData = createFunction(async function getData() {
-   const query = `SELECT * FROM table WHERE order_id=${parameters.order_id}`;
+export async function getData(order_id: number) {
+   const query = `SELECT * FROM table WHERE order_id=${order_id}`;
    const connection = await connectionFn();
    const [rows] = await connection.execute(sql);
    connection.end();
    return rows;
-}, {
-   parameters: {
-      order_id: {
-         type: 'number'
-      }
-   }
-});
+};
 
 ```
 
 If our queries don't rely on parameters, we may even use a `.sql` file stored in the file system so that we can keep them organised:
 
 ```ts
-export const getData = createFunction(async function getData() {
+export async function getData() {
   const query = fs.readFileSync('./toolpad/resources/getData.sql');
   const connection = await connectionFn();
   const [rows] = await connection.execute(sql);
   connection.end();
   return rows;
-});
+}
 ```
 
 Keep in mind that we can run any SQL query on our database through these custom functions.
@@ -61,7 +54,6 @@ Keep in mind that we can run any SQL query on our database through these custom 
 Instead of connecting directly, we may want to create an SSH tunnel to connect to our database. We can modify our function a bit to make this happen:
 
 ```ts
-import { createFunction } from '@mui/toolpad/server';
 import mysql from 'mysql2/promise';
 import SSH2Promise from 'ssh2-promise';
 import fs from 'fs';

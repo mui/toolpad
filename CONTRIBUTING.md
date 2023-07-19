@@ -200,7 +200,7 @@ The playwright tests can be run in one of two modes:
 - To run the tests locally in production mode
 
   ```bash
-  yarn build:release
+  yarn release:build
   yarn test:integration --project chromium
   ```
 

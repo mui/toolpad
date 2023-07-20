@@ -232,7 +232,15 @@ export default function Hero() {
             transform: { xs: 'scale(0.95)', sm: 'unset' },
           }}
         >
-          <HeroModeSwitch checked={heroAppMode} onChange={handleModeChange} />
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, justifyContent: 'center' }}>
+            <Typography variant="caption" color="text.secondary">
+              Code
+            </Typography>
+            <HeroModeSwitch checked={heroAppMode} onChange={handleModeChange} />
+            <Typography variant="caption" color="text.secondary">
+              UI
+            </Typography>
+          </Box>
         </Box>
       </Box>
     </ToolpadHeroContainer>

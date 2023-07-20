@@ -12,18 +12,9 @@ import HeroVideo from '../../src/components/landing/HeroVideo';
 import SignUpToast from '../../src/components/landing/SignUpToast';
 import UseCases from '../../src/components/landing/UseCases';
 import CardGrid from '../../src/components/landing/CardGrid';
-import Banner from '../../src/components/landing/Banner';
 import Pricing from '../../src/components/landing/PricingTable';
 import Marquee from '../../src/components/landing/Marquee';
 import features from '../../data/toolpad/landing/features';
-import {
-  action,
-  category,
-  title,
-  description,
-  href,
-  label,
-} from '../../data/toolpad/landing/upvote';
 import useCases from '../../data/toolpad/landing/useCases';
 import marquee from '../../data/toolpad/landing/marquee';
 import {
@@ -56,14 +47,6 @@ export default function Home() {
         <UseCases content={useCases} />
         <Divider />
         <CardGrid content={features} />
-        <Banner
-          action={action}
-          category={category}
-          title={title}
-          description={description}
-          href={href}
-          label={label}
-        />
         <Divider />
         <Pricing
           Headline={Headline}

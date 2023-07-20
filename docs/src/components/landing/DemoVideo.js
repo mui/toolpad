@@ -109,40 +109,43 @@ const PauseButton = styled(IconButton)(({ theme }) => [
 
 const videoContolButton = (theme) => ({
   position: 'absolute',
-  background: `linear-gradient(120deg, ${(theme.vars || theme).palette.primary[900]} 0%, ${
-    (theme.vars || theme).palette.primary[700]
-  } 150%)`,
+  width: 40,
+  height: 40,
+  background: (theme.vars || theme).palette.primary[50],
   borderRadius: 99,
-  width: 48,
-  height: 48,
-  border: 'none',
-  boxShadow: `0 4px 8px ${alpha(theme.palette.primary[900], 0.4)}`,
+  border: '1px solid',
+  borderColor: (theme.vars || theme).palette.primary[200],
+  boxShadow: `0 4px 6px ${alpha(theme.palette.grey[400], 0.2)}`,
   transition: theme.transitions.create(['scale', 'box-shadow', 'opacity'], {
     duration: theme.transitions.duration.shortest,
   }),
   opacity: 1,
   zIndex: 10,
   '&:hover': {
-    scale: '1.05',
-    background: `linear-gradient(120deg, ${(theme.vars || theme).palette.primary[800]} 0%, ${
-      (theme.vars || theme).palette.primary[600]
+    scale: '1.03',
+    borderColor: (theme.vars || theme).palette.primary[300],
+    boxShadow: `0 4px 8px ${alpha(theme.palette.grey[500], 0.4)}`,
+    background: `linear-gradient(120deg, ${(theme.vars || theme).palette.primary[50]} 0%, ${
+      (theme.vars || theme).palette.primary[100]
     } 150%)`,
-    boxShadow: `0 8px 10px ${alpha(theme.palette.primary[900], 0.6)}`,
   },
+  ...theme.applyDarkStyles({
+    borderColor: (theme.vars || theme).palette.primary[200],
+  }),
 });
 
 const FullScreenButton = styled(IconButton)(({ theme }) => [
   {
     ...videoContolButton(theme),
-    bottom: 16,
-    right: 16,
+    bottom: 28,
+    right: 28,
   },
 ]);
 
 const MuteButton = styled(IconButton)(({ theme }) => [
   {
     ...videoContolButton(theme),
-    bottom: 16,
+    bottom: 28,
     right: 80,
   },
 ]);
@@ -184,14 +187,14 @@ export default function DemoVideo() {
       ) : null}
 
       <FullScreenButton type="button" onClick={handleFullScreen} color="primary">
-        <FullScreenRoundedIcon sx={{ color: '#FFF', fontSize: 24 }} />
+        <FullScreenRoundedIcon color="primary" sx={{ fontSize: 24 }} />
       </FullScreenButton>
 
       <MuteButton type="button" onClick={handleMuteToggle} color="primary">
         {isMuted ? (
-          <VolumeOffRoundedIcon sx={{ color: '#FFF', fontSize: 24 }} />
+          <VolumeOffRoundedIcon color="primary" sx={{ fontSize: 24 }} />
         ) : (
-          <VolumeUpRoundedIcon sx={{ color: '#FFF', fontSize: 24 }} />
+          <VolumeUpRoundedIcon color="primary" sx={{ fontSize: 24 }} />
         )}
       </MuteButton>
 

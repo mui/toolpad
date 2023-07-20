@@ -1,13 +1,15 @@
 import * as React from 'react';
 import PropTypes from 'prop-types';
+import { alpha } from '@mui/material/styles';
 import Box from '@mui/material/Box';
-import Container from '@mui/material/Container';
 import Paper from '@mui/material/Paper';
 import Typography from '@mui/material/Typography';
 import Grid from '@mui/material/Unstable_Grid2';
 import SectionHeadline from 'docs/src/components/typography/SectionHeadline';
+import Section from 'docs/src/layouts/Section';
 import IconImage from 'docs/src/components/icon/IconImage';
-import { alpha } from '@mui/material/styles';
+import Banner from './Banner';
+import ROUTES from '../../route';
 
 const cardRootStyle = (imageUrl) => ({
   px: imageUrl ? 0 : 2,
@@ -56,9 +58,9 @@ export default function CardGrid(props) {
           : null
       }
     >
-      <Container sx={{ pt: { xs: 4, sm: 8 } }}>
+      <Section>
         <SectionHeadline overline={content.overline} title={content.Headline} />
-        <Grid container spacing={{ xs: 2, sm: 2 }} columns={{ xs: 1, sm: 3 }}>
+        <Grid container spacing={2} columns={{ xs: 1, sm: 3 }}>
           {content.cards.map(({ icon, title, wip, imageUrl, description }) => (
             <Grid key={title} xs={2} sm={1}>
               <Paper variant="outlined" sx={cardRootStyle(imageUrl)}>
@@ -94,7 +96,15 @@ export default function CardGrid(props) {
             </Grid>
           ))}
         </Grid>
-      </Container>
+        <Banner
+          action="Upvote"
+          category="ToolpadLanding"
+          label="Upvote"
+          title="Upvote the features you want to get prioritized 👍"
+          description="Want to request a feature? Head over to our repo and if not already listed, feel free to open an issue explaining the use case.'"
+          href={ROUTES.toolpadUpvote}
+        />
+      </Section>
     </Box>
   );
 }

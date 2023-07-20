@@ -64,7 +64,7 @@ function ContentCard({ icon, title, description, href }) {
         variant="subtitle1"
         fontWeight="bold"
         color="text.primary"
-        sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}
+        sx={{ display: 'flex', alignItems: 'center', gap: 1 }}
       >
         {icon}
         {title}

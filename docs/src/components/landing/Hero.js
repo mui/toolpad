@@ -150,6 +150,7 @@ export default function Hero() {
             sx={[
               (theme) => ({
                 pb: 0.15,
+                ml: 0.5,
                 background: alpha(theme.palette.primary[50], 0.5),
                 borderColor: (theme.vars || theme).palette.primary[100],
                 ...theme.applyDarkStyles({

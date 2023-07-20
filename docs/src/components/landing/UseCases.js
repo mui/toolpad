@@ -9,7 +9,7 @@ import Typography from '@mui/material/Typography';
 import HandymanRoundedIcon from '@mui/icons-material/HandymanRounded';
 import AdminPanelSettingsRoundedIcon from '@mui/icons-material/AdminPanelSettingsRounded';
 import DashboardRoundedIcon from '@mui/icons-material/DashboardRounded';
-import LibraryAddRoundedIcon from '@mui/icons-material/LibraryAddRounded';
+import AutoAwesomeRoundedIcon from '@mui/icons-material/AutoAwesomeRounded';
 import SectionHeadline from 'docs/src/components/typography/SectionHeadline';
 import GradientText from 'docs/src/components/typography/GradientText';
 import Grid from '@mui/material/Unstable_Grid2';
@@ -172,7 +172,7 @@ export default function CardGrid() {
                 }),
               ]}
             >
-              <LibraryAddRoundedIcon color="primary" sx={{ mb: 2 }} />
+              <AutoAwesomeRoundedIcon color="warning" sx={{ mb: 2 }} />
               <Typography
                 component="h3"
                 variant="subtitle1"

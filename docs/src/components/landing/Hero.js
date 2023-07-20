@@ -71,10 +71,11 @@ const Img = styled('img')(({ theme }) => [
 
 function TypingAnimation() {
   const words = ['APIs', 'scripts', 'SQL'];
-  const [text, setText] = React.useState('');
-  const [fullText, setFullText] = React.useState(words[0]);
-  const [letterIndex, setLetterIndex] = React.useState(0);
-  const [wordIndex, setWordIndex] = React.useState(0);
+  const initIndex = 0;
+  const [text, setText] = React.useState(words[initIndex]);
+  const [wordIndex, setWordIndex] = React.useState(initIndex);
+  const [fullText, setFullText] = React.useState(words[initIndex]);
+  const [letterIndex, setLetterIndex] = React.useState(fullText.length);
 
   const l = words.length;
   React.useEffect(() => {

@@ -31,7 +31,7 @@ export type ColumnDefinitionsSpec = z.infer<typeof columnDefinitionsSchema>;
 export const dataGridSpecSchema = z.object({
   rows: rowsSpecSchema.optional(),
   columns: columnDefinitionsSchema.optional(),
-  idSelector: z.string().optional(),
+  rowIdSelector: z.string().optional(),
 });
 
 export type DataGridSpec = z.infer<typeof dataGridSpecSchema>;

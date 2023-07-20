@@ -151,7 +151,22 @@ export async function generateDataGridComponent(
       return (
         <Box sx={{ position: 'relative', width: '100%', height: 400 }}>
           <ErrorBoundary>
-            {error ? <ErrorOverlay error={error} /> : <DataGridPro rows={rows} columns={columns} />}
+            {error ? (
+              <ErrorOverlay error={error} />
+            ) : (
+              <DataGridPro
+                rows={rows}
+                columns={columns}
+                ${
+                  dataGridFile.spec.rowIdSelector
+                    ? `getRowId={(row) => ${jsonPointer.toExpression(
+                        'row',
+                        dataGridFile.spec.rowIdSelector || '/',
+                      )}}`
+                    : ''
+                }
+              />
+            )}
           </ErrorBoundary>
           ${
             dev

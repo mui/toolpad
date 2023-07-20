@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { Box, Button, MenuItem, Stack, TextField, Typography } from '@mui/material';
-import { RowsSpec } from '../../shared/schemas';
+import { DataGridSpec, RowsSpec } from '../../shared/schemas';
 import * as jsonPath from '../../shared/jsonPointer';
 import JsonPointerInput from '../JsonPointerInput';
 
@@ -19,20 +19,25 @@ const FETCH_METHOD_OPTIONS = ['GET', 'POST'] as const;
 
 type PropertySpec = Extract<RowsSpec, { kind: 'property' }>;
 
+interface RenderRowIdSelectorInput {
+  (params?: { target?: unknown }): React.ReactNode;
+}
+
 interface PropertyEditorProps {
-  providerSelector: React.ReactNode;
+  providerSelectorInput: React.ReactNode;
+  renderRowIdSelectorInput: RenderRowIdSelectorInput;
   // eslint-disable-next-line react/no-unused-prop-types
   value: PropertySpec;
   // eslint-disable-next-line react/no-unused-prop-types
   onChange: (value: PropertySpec) => void;
 }
 
-function PropertyEditor({ providerSelector }: PropertyEditorProps) {
+function PropertyEditor({ providerSelectorInput, renderRowIdSelectorInput }: PropertyEditorProps) {
   return (
     <Stack sx={{ width: '100%', height: '100%' }} direction="row">
       <Box sx={{ flex: 1, p: 2 }}>
-        {providerSelector}
-
+        {providerSelectorInput}
+        {renderRowIdSelectorInput()}
         <Typography>
           Pass the data through a <code>rows</code> property on your component.
           {/* TODO: show example */}
@@ -47,8 +52,8 @@ type FetchSpec = Extract<RowsSpec, { kind: 'fetch' }>;
 
 interface FetchResult {
   status: number;
-  body: unknown;
-  result: unknown;
+  data: unknown;
+  transformed: unknown;
 }
 
 async function executeFetch(spec: FetchSpec): Promise<FetchResult> {
@@ -62,19 +67,25 @@ async function executeFetch(spec: FetchSpec): Promise<FetchResult> {
 
   return {
     status: response.status,
-    body: data,
-    result: spec.selector ? jsonPath.resolve(data, spec.selector) : data,
+    data,
+    transformed: spec.selector ? jsonPath.resolve(data, spec.selector) : data,
   };
 }
 
 interface FetchEditorProps {
-  providerSelector: React.ReactNode;
+  providerSelectorInput: React.ReactNode;
+  renderRowIdSelectorInput: RenderRowIdSelectorInput;
   value: FetchSpec;
   onChange: (value: FetchSpec) => void;
 }
 
-function FetchEditor({ providerSelector, value, onChange }: FetchEditorProps) {
-  const [testResult, setTestResult] = React.useState<{
+function FetchEditor({
+  providerSelectorInput,
+  renderRowIdSelectorInput,
+  value,
+  onChange,
+}: FetchEditorProps) {
+  const [testOutput, setTestResult] = React.useState<{
     result?: FetchResult;
     error?: Error;
   } | null>(null);
@@ -89,7 +100,7 @@ function FetchEditor({ providerSelector, value, onChange }: FetchEditorProps) {
   return (
     <Stack sx={{ width: '100%', height: '100%' }} direction="row">
       <Box sx={{ flex: 1, height: '100%', p: 2 }}>
-        {providerSelector}
+        {providerSelectorInput}
 
         <React.Fragment>
           <Stack direction="row" sx={{ gap: 1 }}>
@@ -120,28 +131,29 @@ function FetchEditor({ providerSelector, value, onChange }: FetchEditorProps) {
             <Button onClick={runTest}>Test</Button>
           </Stack>
           <JsonPointerInput
-            label="Selector"
-            target={testResult?.result?.body}
+            label="Rows Selector"
+            target={testOutput?.result?.data}
             fullWidth
             value={value.selector || '/'}
             onChange={(newValue) => onChange({ ...value, selector: newValue })}
             helperText={
               <React.Fragment>
                 Valid <a href="https://datatracker.ietf.org/doc/html/rfc6901">JSON Pointer</a> that
-                references a nested property in the returned data.
+                references a (nested) property in the returned data that represents the rows.
               </React.Fragment>
             }
           />
+          {renderRowIdSelectorInput({ target: (testOutput?.result?.transformed as any)?.[0] })}
         </React.Fragment>
       </Box>
       <Box sx={{ flex: 1, height: '100%', overflow: 'auto', px: 4 }}>
-        {testResult?.error ? (
-          testResult.error.message
+        {testOutput?.error ? (
+          testOutput.error.message
         ) : (
           <pre>
-            {typeof testResult?.result?.result === 'undefined'
+            {typeof testOutput?.result?.transformed === 'undefined'
               ? 'undefined'
-              : JSON.stringify(testResult.result.result, null, 2)}
+              : JSON.stringify(testOutput.result.transformed, null, 2)}
           </pre>
         )}
       </Box>
@@ -149,13 +161,14 @@ function FetchEditor({ providerSelector, value, onChange }: FetchEditorProps) {
   );
 }
 
-export interface RowsEditorProps {
+export interface RowsSpecEditorProps {
+  renderRowIdSelectorInput: RenderRowIdSelectorInput;
   value: RowsSpec;
   onChange: (value: RowsSpec) => void;
 }
 
-export default function RowsEditor({ value, onChange }: RowsEditorProps) {
-  const providerSelector = (
+export function RowsSpecEditor({ value, onChange, renderRowIdSelectorInput }: RowsSpecEditorProps) {
+  const providerSelectorInput = (
     <TextField
       select
       value={value.kind ?? 'property'}
@@ -176,11 +189,53 @@ export default function RowsEditor({ value, onChange }: RowsEditorProps) {
   switch (value.kind) {
     case 'property':
       return (
-        <PropertyEditor providerSelector={providerSelector} value={value} onChange={onChange} />
+        <PropertyEditor
+          providerSelectorInput={providerSelectorInput}
+          renderRowIdSelectorInput={renderRowIdSelectorInput}
+          value={value}
+          onChange={onChange}
+        />
       );
     case 'fetch':
-      return <FetchEditor providerSelector={providerSelector} value={value} onChange={onChange} />;
+      return (
+        <FetchEditor
+          providerSelectorInput={providerSelectorInput}
+          renderRowIdSelectorInput={renderRowIdSelectorInput}
+          value={value}
+          onChange={onChange}
+        />
+      );
     default:
       return null;
   }
+}
+
+export interface RowsEditorProps {
+  value: DataGridSpec;
+  onChange: (value: DataGridSpec) => void;
+}
+
+export default function RowsEditor({ value, onChange }: RowsEditorProps) {
+  const renderRowIdSelectorInput: RenderRowIdSelectorInput = ({ target } = {}) => (
+    <JsonPointerInput
+      label="Row ID selector"
+      value={value.rowIdSelector || '/'}
+      onChange={(newValue) => onChange({ ...value, rowIdSelector: newValue })}
+      target={target}
+      helperText={
+        <React.Fragment>
+          Valid <a href="https://datatracker.ietf.org/doc/html/rfc6901">JSON Pointer</a> that
+          references a (nested) property in the rows, to be used as a unique identifier.
+        </React.Fragment>
+      }
+    />
+  );
+
+  return (
+    <RowsSpecEditor
+      renderRowIdSelectorInput={renderRowIdSelectorInput}
+      value={value.rows || { kind: 'property' }}
+      onChange={(rows) => onChange({ ...value, rows })}
+    />
+  );
 }

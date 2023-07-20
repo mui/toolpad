@@ -3,7 +3,7 @@ import { Box, IconButton, Stack, Tab, Tooltip, styled, Container } from '@mui/ma
 import { TabContext, TabList, TabPanel as MuiTabPanel } from '@mui/lab';
 import SaveIcon from '@mui/icons-material/Save';
 import useStorageState from '@mui/toolpad-utils/hooks/useStorageState';
-import { DataGridFile } from '../../shared/schemas';
+import { DataGridFile, DataGridSpec } from '../../shared/schemas';
 import { useServer } from '../server';
 import ColumnsEditor from './ColumnsEditor';
 import RowsEditor from './RowsEditor';
@@ -28,6 +28,15 @@ export default function DataGridFileEditor({
   const [activeTab, setActiveTab] = useStorageState('session', `activeTab`, 'data');
 
   const server = useServer();
+
+  const handleSpecChange = React.useCallback(
+    (newSpec: DataGridSpec) =>
+      onChange({
+        ...value,
+        spec: newSpec,
+      }),
+    [onChange, value],
+  );
 
   return (
     <Box sx={{ width: '100%', height: '100%', display: 'flex', flexDirection: 'column' }}>
@@ -64,29 +73,10 @@ export default function DataGridFileEditor({
           <Stack direction="row">Width / Height</Stack>
         </TabPanel>
         <TabPanel value="rows">
-          <RowsEditor
-            value={value.spec?.rows ?? { kind: 'property' }}
-            onChange={(newRows) =>
-              onChange({
-                ...value,
-                spec: {
-                  ...value.spec,
-                  rows: newRows,
-                },
-              })
-            }
-          />
+          <RowsEditor value={value.spec || {}} onChange={handleSpecChange} />
         </TabPanel>
         <TabPanel value="columns">
-          <ColumnsEditor
-            value={value.spec ?? {}}
-            onChange={(newSpec) =>
-              onChange({
-                ...value,
-                spec: newSpec,
-              })
-            }
-          />
+          <ColumnsEditor value={value.spec ?? {}} onChange={handleSpecChange} />
         </TabPanel>
         <TabPanel value="source">
           <Container sx={{ width: '100%', height: '100%', overflow: 'auto', px: 4 }}>

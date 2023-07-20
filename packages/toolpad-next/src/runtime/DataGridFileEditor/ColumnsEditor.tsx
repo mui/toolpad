@@ -137,11 +137,6 @@ export interface ColumnsEditorProps {
 export default function ColumnsEditor({ value, onChange }: ColumnsEditorProps) {
   return (
     <Box sx={{ width: '100%', height: '100%' }}>
-      <TextField
-        label="Id selector"
-        value={value.idSelector}
-        onChange={(event) => onChange({ ...value, idSelector: event.target.value })}
-      />
       <ColumnsDefinitionsEditor
         value={value.columns || []}
         onChange={(columns) => onChange({ ...value, columns })}

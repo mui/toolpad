@@ -36,10 +36,6 @@ const dataSource: ServerDataSource<{}, LocalQuery, any, LocalPrivateApi> = {
     async debugExec(query, params) {
       return exec(null, query, params);
     },
-    async openEditor(fileName) {
-      const project = await getProject();
-      return project.functionsManager.openQueryEditor(fileName);
-    },
     async createNew(fileName) {
       const project = await getProject();
       return project.functionsManager.createFunctionFile(fileName);

@@ -101,7 +101,7 @@ export default function CardGrid(props) {
           category="ToolpadLanding"
           label="Upvote"
           title="Upvote the features you want to get prioritized 👍"
-          description="Want to request a feature? Head over to our repo and if not already listed, feel free to open an issue explaining the use case.'"
+          description="Want to request a feature? Head over to our repo and if not already listed, feel free to open an issue explaining the use case."
           href={ROUTES.toolpadUpvote}
         />
       </Section>

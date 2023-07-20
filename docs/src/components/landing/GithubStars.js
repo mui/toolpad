@@ -52,7 +52,7 @@ export default function GithubStars() {
       }}
       startIcon={<GitHubIcon />}
     >
-      Star
+      Stars
       <Box
         sx={{
           display: 'flex',

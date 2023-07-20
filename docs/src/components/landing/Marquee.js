@@ -44,15 +44,6 @@ function Marquee({ content }) {
       >
         {content.subtitle}
       </Typography>
-      <Typography
-        component="label"
-        variant="body2"
-        color="grey.500"
-        sx={{ fontWeight: 'medium', display: 'block', mb: 2, mx: 'auto' }}
-        htmlFor="email-landing"
-      >
-        {content.action.label}
-      </Typography>
       <SignUp
         sx={{
           '& > div': {
@@ -71,7 +62,6 @@ Marquee.propTypes = {
   content: PropTypes.shape({
     action: PropTypes.shape({
       href: PropTypes.string.isRequired,
-      label: PropTypes.string.isRequired,
     }).isRequired,
     subtitle: PropTypes.string.isRequired,
     title: PropTypes.string.isRequired,

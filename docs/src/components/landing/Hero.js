@@ -154,7 +154,7 @@ export default function Hero() {
             display: 'flex',
             alignItems: 'center',
             justifyContent: { xs: 'space-around', sm: 'start' },
-            gap: 4,
+            gap: 2,
           }}
         >
           <GithubStars />

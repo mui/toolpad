@@ -1,7 +1,6 @@
 import * as React from 'react';
 import PropTypes from 'prop-types';
 import Stack from '@mui/material/Stack';
-import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Link from 'docs/src/modules/components/Link';
 import Typography from '@mui/material/Typography';
@@ -39,14 +38,14 @@ function Banner(props) {
         }),
       })}
     >
-      <Box>
+      <div>
         <Typography fontWeight="bold" sx={{ mb: 0.5 }}>
           {title}
         </Typography>
         <Typography variant="body2" color="text.secondary">
           {description}
         </Typography>
-      </Box>
+      </div>
       <Button
         component={Link}
         noLinkStyle

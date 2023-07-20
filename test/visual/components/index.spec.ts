@@ -33,3 +33,32 @@ test('rendering components in the app editor', async ({ page, argosScreenshot })
   await clickCenter(page, image);
   await argosScreenshot('with-selection');
 });
+
+test('showing grid while resizing elements', async ({ page, argosScreenshot }) => {
+  const editorModel = new ToolpadEditor(page);
+  await editorModel.goto();
+
+  await editorModel.waitForOverlay();
+
+  const image = editorModel.appCanvas.locator('img').first();
+
+  await clickCenter(page, image);
+
+  const imageBoundingBox = await image.boundingBox();
+
+  await page.mouse.move(
+    imageBoundingBox!.x + imageBoundingBox!.width - 5,
+    imageBoundingBox!.y + imageBoundingBox!.height / 2,
+    { steps: 10 },
+  );
+
+  await page.mouse.down();
+
+  await page.mouse.move(
+    imageBoundingBox!.x + imageBoundingBox!.width / 2,
+    imageBoundingBox!.y + imageBoundingBox!.height / 2,
+    { steps: 10 },
+  );
+
+  await argosScreenshot('resize-grid');
+});

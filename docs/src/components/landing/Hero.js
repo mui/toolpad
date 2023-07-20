@@ -127,7 +127,7 @@ export default function Hero() {
             MUI Toolpad
           </Box>
           <Chip
-            label="Announcing beta"
+            label="Introducing the Beta version"
             component="a"
             href={ROUTES.toolpadBetaBlog}
             color="primary"
@@ -136,6 +136,18 @@ export default function Hero() {
             clickable
             onDelete={() => {}}
             deleteIcon={<ChevronRightIcon />}
+            sx={[
+              (theme) => ({
+                pb: 0.15,
+                background: alpha(theme.palette.primary[50], 0.5),
+                borderColor: (theme.vars || theme).palette.primary[100],
+                ...theme.applyDarkStyles({
+                  color: (theme.vars || theme).palette.primary[200],
+                  borderColor: (theme.vars || theme).palette.primary[800],
+                  background: alpha(theme.palette.primary[800], 0.3),
+                }),
+              }),
+            ]}
           />
         </Typography>
         <Typography variant="h1" sx={{ my: 1, minWidth: { xs: 'auto', sm: 600 } }}>

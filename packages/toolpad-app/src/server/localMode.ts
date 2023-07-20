@@ -812,34 +812,6 @@ export async function findSupportedEditor(): Promise<string | null> {
   }
 }
 
-let supportedEditorPromise: Promise<string | null>;
-
-export async function getSupportedEditor(): Promise<string | null> {
-  if (!supportedEditorPromise) {
-    supportedEditorPromise = findSupportedEditor();
-  }
-  return supportedEditorPromise;
-}
-
-async function openCodeEditor(file: string): Promise<void> {
-  const supportedEditor = await getSupportedEditor();
-  if (!supportedEditor) {
-    throw new Error(`No code editor found`);
-  }
-  const userProjectRoot = getUserProjectRoot();
-  const fullPath = path.resolve(userProjectRoot, file);
-  openEditor([fullPath, userProjectRoot], {
-    editor: process.env.EDITOR ? undefined : DEFAULT_EDITOR,
-  });
-}
-
-export async function openCodeComponentEditor(componentName: string): Promise<void> {
-  const root = getUserProjectRoot();
-  const componentsFolder = getComponentsFolder(root);
-  const fullPath = getComponentFilePath(componentsFolder, componentName);
-  await openCodeEditor(fullPath);
-}
-
 export type ProjectFolderEntry = {
   name: string;
   kind: 'query';
@@ -921,7 +893,6 @@ function getDomFilePatterns(root: string) {
     path.resolve(root, './toolpad/components/*.*'),
   ];
 }
-
 /**
  * Calculates a fingerprint from all files that influence the dom structure
  */
@@ -1115,13 +1086,23 @@ class ToolpadProject {
     });
   }
 
-  async openCodeEditor(file: string): Promise<void> {
-    const supportedEditor = await getSupportedEditor();
+  async openCodeEditor(fileName: string, fileType: string) {
+    const supportedEditor = await findSupportedEditor();
     if (!supportedEditor) {
       throw new Error(`No code editor found`);
     }
-    const fullPath = path.resolve(this.getRoot(), file);
-    openEditor([fullPath, this.getRoot()], {
+    const root = this.getRoot();
+    let resolvedPath = fileName;
+
+    if (fileType === 'query') {
+      resolvedPath = await this.functionsManager.getFunctionFilePath(fileName);
+    }
+    if (fileType === 'component') {
+      const componentsFolder = getComponentsFolder(root);
+      resolvedPath = getComponentFilePath(componentsFolder, fileName);
+    }
+    const fullResolvedPath = path.resolve(root, resolvedPath);
+    openEditor([fullResolvedPath, root], {
       editor: process.env.EDITOR ? undefined : DEFAULT_EDITOR,
     });
   }

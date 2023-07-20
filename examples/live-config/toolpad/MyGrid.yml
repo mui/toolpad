@@ -1,9 +1,14 @@
 kind: DataGrid
 spec:
+  rows:
+    kind: fetch
+    url: https://datausa.io/api/data?drilldowns=Nation&measures=Population
+    selector: /data
   columns:
     - field: a
-      type: date
+      type: number
     - field: b
       type: boolean
     - field: f
       type: string
+  rowIdSelector: /ID Year

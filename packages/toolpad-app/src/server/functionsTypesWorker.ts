@@ -401,6 +401,8 @@ export interface ExtractTypesParams {
   resourcesFolder: string;
 }
 
+let createFunctionWarningShown = false;
+
 export default async function extractTypes({
   resourcesFolder,
 }: ExtractTypesParams): Promise<IntrospectionResult> {
@@ -413,7 +415,6 @@ export default async function extractTypes({
   const checker = program.getTypeChecker();
 
   const usingCreateFunction = [];
-  let createFunctionWarningShown = false;
 
   const files: FileIntrospectionResult[] = entryPoints
     .map((entrypoint) => {

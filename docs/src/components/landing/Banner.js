@@ -39,7 +39,7 @@ function Banner(props) {
       })}
     >
       <div>
-        <Typography fontWeight="bold" sx={{ mb: 0.5 }}>
+        <Typography fontWeight="bold" gutterBottom>
           {title}
         </Typography>
         <Typography variant="body2" color="text.secondary">

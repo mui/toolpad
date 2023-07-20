@@ -142,7 +142,6 @@ jobs:
         environment:
           NODE_ENV: test
           TOOLPAD_TEST_RETRIES: 1
-      - image: kennethreitz/httpbin:latest
 
     steps:
       - checkout
@@ -160,8 +159,6 @@ jobs:
           command: yarn test
       - run:
           name: Tests real browser
-          environment:
-            HTTPBIN_BASEURL: 'http://localhost/'
           command: yarn test:integration
       - run:
           name: Upload screenshots to Argos CI

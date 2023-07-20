@@ -53,11 +53,13 @@
     "access": "public"
   },
   "dependencies": {
+    "invariant": "2.2.4",
     "react-is": "18.2.0",
     "yaml": "2.3.1",
     "yaml-diff-patch": "2.0.0"
   },
   "devDependencies": {
+    "@types/invariant": "2.2.35",
     "@types/react-is": "18.2.1"
   },
   "gitHead": "8c10fa4108d0f108a49fb20daa15f090fe321be6"

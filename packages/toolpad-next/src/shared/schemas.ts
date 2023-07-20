@@ -18,13 +18,15 @@ export const rowsSpecSchema = z.discriminatedUnion('kind', [
 
 export type RowsSpec = z.infer<typeof rowsSpecSchema>;
 
-export const columnDefinitionsSchema = z.array(
-  z.object({
-    field: z.string(),
-    type: z.enum(COLUMN_TYPES).optional(),
-    valueSelector: z.string().optional(),
-  }),
-);
+export const columnDefinitionSchema = z.object({
+  field: z.string(),
+  type: z.enum(COLUMN_TYPES).optional(),
+  valueSelector: z.string().optional(),
+});
+
+export type ColumnDefinitionSpec = z.infer<typeof columnDefinitionSchema>;
+
+export const columnDefinitionsSchema = z.array(columnDefinitionSchema);
 
 export type ColumnDefinitionsSpec = z.infer<typeof columnDefinitionsSchema>;
 

@@ -11,11 +11,15 @@ import {
   OutlinedInput,
   Stack,
   TextField,
-  Typography,
 } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import AddIcon from '@mui/icons-material/Add';
-import { ColumnType, ColumnDefinitionsSpec, DataGridSpec } from '../../shared/schemas';
+import {
+  ColumnType,
+  ColumnDefinitionsSpec,
+  DataGridSpec,
+  ColumnDefinitionSpec,
+} from '../../shared/schemas';
 
 interface ColumnTypeOption {
   value: ColumnType;
@@ -45,18 +49,43 @@ const COLUMN_TYPE_OPTIONS: ColumnTypeOption[] = [
   },
 ];
 
+interface ColumnDefinitionEditorProps {
+  value: ColumnDefinitionSpec;
+  onChange: (value: ColumnDefinitionSpec) => void;
+}
+
+function ColumnDefinitionEditor({ value, onChange }: ColumnDefinitionEditorProps) {
+  return (
+    <React.Fragment>
+      <TextField
+        label="Field"
+        value={value.field}
+        onChange={(event) => onChange({ ...value, field: event.target.value })}
+      />
+      <TextField
+        select
+        value={value.type ?? 'string'}
+        onChange={(event) => onChange({ ...value, type: event.target.value as ColumnType })}
+      >
+        {COLUMN_TYPE_OPTIONS.map((option) => (
+          <MenuItem key={option.value} value={option.value}>
+            {option.label}
+          </MenuItem>
+        ))}
+      </TextField>
+    </React.Fragment>
+  );
+}
+
 export interface ColumnsDefinitionsEditorProps {
   value: ColumnDefinitionsSpec;
   onChange: (value: ColumnDefinitionsSpec) => void;
 }
 
 export function ColumnsDefinitionsEditor({ value, onChange }: ColumnsDefinitionsEditorProps) {
-  const [activeField, setActiveField] = React.useState(value[0]?.field);
+  const [activeIndex, setActiveIndex] = React.useState<number>(0);
 
-  const activeColumn = React.useMemo(
-    () => value.find((column) => column.field === activeField),
-    [activeField, value],
-  );
+  const activeColumn = React.useMemo(() => value[activeIndex], [activeIndex, value]);
 
   return (
     <Stack direction="row" sx={{ width: '100%', height: '100%' }}>
@@ -84,13 +113,10 @@ export function ColumnsDefinitionsEditor({ value, onChange }: ColumnsDefinitions
         </Box>
         <Box sx={{ overflow: 'auto' }}>
           <List>
-            {value.map((column) => {
+            {value.map((column, i) => {
               return (
                 <ListItem key={column.field} disablePadding>
-                  <ListItemButton
-                    selected={activeField === column.field}
-                    onClick={() => setActiveField(column.field)}
-                  >
+                  <ListItemButton selected={activeIndex === i} onClick={() => setActiveIndex(i)}>
                     <ListItemText secondary={column.type}>{column.field}</ListItemText>{' '}
                   </ListItemButton>
                 </ListItem>
@@ -99,32 +125,16 @@ export function ColumnsDefinitionsEditor({ value, onChange }: ColumnsDefinitions
           </List>
         </Box>
       </Stack>
-      <Box sx={{ p: 2 }}>
+      <Stack sx={{ p: 2 }}>
         {activeColumn ? (
-          <React.Fragment>
-            <Typography>Field: {activeColumn.field}</Typography>
-            <TextField
-              select
-              value={activeColumn.type ?? 'string'}
-              onChange={(event) =>
-                onChange(
-                  value.map((column) =>
-                    column.field === activeField
-                      ? { ...column, type: event.target.value as ColumnType }
-                      : column,
-                  ),
-                )
-              }
-            >
-              {COLUMN_TYPE_OPTIONS.map((option) => (
-                <MenuItem key={option.value} value={option.value}>
-                  {option.label}
-                </MenuItem>
-              ))}
-            </TextField>
-          </React.Fragment>
+          <ColumnDefinitionEditor
+            value={activeColumn}
+            onChange={(newColumn) => {
+              onChange(value.map((column, i) => (i === activeIndex ? newColumn : column)));
+            }}
+          />
         ) : null}
-      </Box>
+      </Stack>
     </Stack>
   );
 }

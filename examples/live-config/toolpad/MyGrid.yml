@@ -5,10 +5,10 @@ spec:
     url: https://datausa.io/api/data?drilldowns=Nation&measures=Population
     selector: /data
   columns:
-    - field: a
-      type: number
-    - field: b
-      type: boolean
-    - field: f
+    - field: Nation
       type: string
+    - field: Year
+      type: string
+    - field: Population
+      type: number
   rowIdSelector: /ID Year

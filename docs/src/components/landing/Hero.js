@@ -143,7 +143,7 @@ export default function Hero() {
                 borderColor: (theme.vars || theme).palette.primary[100],
                 ...theme.applyDarkStyles({
                   color: (theme.vars || theme).palette.primary[200],
-                  borderColor: (theme.vars || theme).palette.primary[800],
+                  borderColor: (theme.vars || theme).palette.primary[700],
                   background: alpha(theme.palette.primary[800], 0.3),
                 }),
               }),

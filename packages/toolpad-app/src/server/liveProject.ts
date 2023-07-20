@@ -32,3 +32,8 @@ export async function applyDomDiff(diff: appDom.DomDiff): Promise<{ fingerprint:
   const project = await getProject();
   return project.applyDomDiff(diff);
 }
+
+export async function openCodeEditor(fileName: string, fileType: string): Promise<void> {
+  const project = await getProject();
+  return project.openCodeEditor(fileName, fileType);
+}

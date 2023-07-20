@@ -94,6 +94,10 @@ const pages: MuiPage[] = [
         pathname: '/toolpad/how-to-guides/basic-auth',
         title: 'Enable basic auth',
       },
+      {
+        pathname: '/toolpad/how-to-guides/editor-path',
+        title: 'Troubleshoot missing editor',
+      },
     ],
   },
   {

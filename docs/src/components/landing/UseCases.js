@@ -72,7 +72,7 @@ function ContentCard({ icon, title, description, href }) {
       <Typography variant="body" color="text.secondary">
         {description}
       </Typography>
-      <Link href={href} variant="body2" sx={{ mt: 0.5 }}>
+      <Link href={href} variant="body" sx={{ mt: 0.5 }}>
         View more
         <KeyboardArrowRightRounded fontSize="small" />
       </Link>

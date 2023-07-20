@@ -79,14 +79,11 @@ export default function DataGridFileEditor({
         </TabPanel>
         <TabPanel value="columns">
           <ColumnsEditor
-            value={value.spec?.columns ?? []}
-            onChange={(newColumns) =>
+            value={value.spec ?? {}}
+            onChange={(newSpec) =>
               onChange({
                 ...value,
-                spec: {
-                  ...value.spec,
-                  columns: newColumns,
-                },
+                spec: newSpec,
               })
             }
           />

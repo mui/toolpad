@@ -1,6 +1,8 @@
 import * as React from 'react';
 import { Box, Button, MenuItem, Stack, TextField, Typography } from '@mui/material';
 import { RowsSpec } from '../../shared/schemas';
+import * as jsonPath from '../../shared/jsonPointer';
+import JsonPointerInput from '../JsonPointerInput';
 
 const DATA_KIND_OPTIONS = [
   {
@@ -43,27 +45,13 @@ function PropertyEditor({ providerSelector }: PropertyEditorProps) {
 
 type FetchSpec = Extract<RowsSpec, { kind: 'fetch' }>;
 
-function applySelector(data: any, selector: string): any {
-  if (!selector) {
-    return data;
-  }
-
-  const parts = selector.split('.');
-
-  let result = data;
-
-  for (const part of parts) {
-    if (typeof result !== 'object' || result === null) {
-      return undefined;
-    }
-
-    result = result[part];
-  }
-
-  return result;
+interface FetchResult {
+  status: number;
+  body: unknown;
+  result: unknown;
 }
 
-async function executeFetch(spec: FetchSpec) {
+async function executeFetch(spec: FetchSpec): Promise<FetchResult> {
   const response = await fetch(spec.url || '', { method: spec.method });
 
   if (!response.ok) {
@@ -72,7 +60,11 @@ async function executeFetch(spec: FetchSpec) {
 
   const data = await response.json();
 
-  return spec.selector ? applySelector(data, spec.selector) : data;
+  return {
+    status: response.status,
+    body: data,
+    result: spec.selector ? jsonPath.resolve(data, spec.selector) : data,
+  };
 }
 
 interface FetchEditorProps {
@@ -82,13 +74,14 @@ interface FetchEditorProps {
 }
 
 function FetchEditor({ providerSelector, value, onChange }: FetchEditorProps) {
-  const [testResult, setTestResult] = React.useState<{ data?: unknown; error?: Error } | null>(
-    null,
-  );
+  const [testResult, setTestResult] = React.useState<{
+    result?: FetchResult;
+    error?: Error;
+  } | null>(null);
 
   const runTest = () => {
     executeFetch(value).then(
-      (data) => setTestResult({ data }),
+      (result) => setTestResult({ result }),
       (error) => setTestResult({ error }),
     );
   };
@@ -126,11 +119,18 @@ function FetchEditor({ providerSelector, value, onChange }: FetchEditorProps) {
             />
             <Button onClick={runTest}>Test</Button>
           </Stack>
-          <TextField
+          <JsonPointerInput
             label="Selector"
+            target={testResult?.result?.body}
             fullWidth
-            value={value.selector || ''}
-            onChange={(event) => onChange({ ...value, selector: event.target.value })}
+            value={value.selector || '/'}
+            onChange={(newValue) => onChange({ ...value, selector: newValue })}
+            helperText={
+              <React.Fragment>
+                Valid <a href="https://datatracker.ietf.org/doc/html/rfc6901">JSON Pointer</a> that
+                references a nested property in the returned data.
+              </React.Fragment>
+            }
           />
         </React.Fragment>
       </Box>
@@ -139,9 +139,9 @@ function FetchEditor({ providerSelector, value, onChange }: FetchEditorProps) {
           testResult.error.message
         ) : (
           <pre>
-            {typeof testResult?.data === 'undefined'
+            {typeof testResult?.result?.result === 'undefined'
               ? 'undefined'
-              : JSON.stringify(testResult?.data, null, 2)}
+              : JSON.stringify(testResult.result.result, null, 2)}
           </pre>
         )}
       </Box>
@@ -160,11 +160,10 @@ export default function RowsEditor({ value, onChange }: RowsEditorProps) {
       select
       value={value.kind ?? 'property'}
       label="Data Provider"
-      onChange={(event) =>
-        onChange({
-          kind: event.target.value as RowsSpec['kind'],
-        })
-      }
+      onChange={(event) => {
+        const newKind = event.target.value as RowsSpec['kind'];
+        onChange({ kind: newKind });
+      }}
     >
       {DATA_KIND_OPTIONS.map((option) => (
         <MenuItem key={option.value} value={option.value}>

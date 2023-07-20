@@ -18,23 +18,27 @@ export const rowsSpecSchema = z.discriminatedUnion('kind', [
 
 export type RowsSpec = z.infer<typeof rowsSpecSchema>;
 
-export const columnsSpecSchema = z.array(
+export const columnDefinitionsSchema = z.array(
   z.object({
     field: z.string(),
     type: z.enum(COLUMN_TYPES).optional(),
+    valueSelector: z.string().optional(),
   }),
 );
 
-export type ColumnsSpec = z.infer<typeof columnsSpecSchema>;
+export type ColumnDefinitionsSpec = z.infer<typeof columnDefinitionsSchema>;
+
+export const dataGridSpecSchema = z.object({
+  rows: rowsSpecSchema.optional(),
+  columns: columnDefinitionsSchema.optional(),
+  idSelector: z.string().optional(),
+});
+
+export type DataGridSpec = z.infer<typeof dataGridSpecSchema>;
 
 export const dataGridFileSchema = z.object({
   kind: z.literal('DataGrid'),
-  spec: z
-    .object({
-      rows: rowsSpecSchema.optional(),
-      columns: columnsSpecSchema.optional(),
-    })
-    .optional(),
+  spec: dataGridSpecSchema.optional(),
 });
 
 export type DataGridFile = z.infer<typeof dataGridFileSchema>;

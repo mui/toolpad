@@ -3,19 +3,20 @@ import type { GridColDef } from '@mui/x-data-grid-pro';
 import { format } from './prettier';
 import { DataGridFile, ToolpadFile } from './schemas';
 import { WithDevtoolParams } from './types';
+import * as jsonPointer from './jsonPointer';
 
 export type GeneratedFile = {
   code: string;
 };
 
-function isValidJsIdentifier(base: string): boolean {
+function isValidFileNAme(base: string): boolean {
   return /^[a-zA-Z][a-zA-Z0-9]*$/.test(base);
 }
 
-function getNameFromPath(filePath: string): string {
+export function getNameFromPath(filePath: string): string {
   const name = path.basename(filePath, '.yml');
 
-  if (!isValidJsIdentifier(name)) {
+  if (!isValidFileNAme(name)) {
     throw new Error(`Invalid file name ${JSON.stringify(name)}`);
   }
 
@@ -39,15 +40,6 @@ interface GenerateComponentConfig {
   name: string;
   dev: boolean;
   wsUrl?: string;
-}
-
-function transformSelector(selector: string): string {
-  return selector
-    ? selector
-        .split('.')
-        .map((part) => `[${JSON.stringify(part)}]`)
-        .join('')
-    : '';
 }
 
 export async function generateDataGridComponent(
@@ -89,7 +81,7 @@ export async function generateDataGridComponent(
       
         const data = await response.json();
 
-        return data${transformSelector(dataGridFile.spec.rows.selector)};
+        return ${jsonPointer.toExpression('data', dataGridFile.spec.rows.selector || '/')};
       }
     `
         : ''

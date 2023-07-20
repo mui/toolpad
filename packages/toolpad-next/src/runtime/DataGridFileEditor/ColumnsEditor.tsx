@@ -15,7 +15,7 @@ import {
 } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import AddIcon from '@mui/icons-material/Add';
-import { ColumnType, ColumnsSpec } from '../../shared/schemas';
+import { ColumnType, ColumnDefinitionsSpec, DataGridSpec } from '../../shared/schemas';
 
 interface ColumnTypeOption {
   value: ColumnType;
@@ -45,12 +45,12 @@ const COLUMN_TYPE_OPTIONS: ColumnTypeOption[] = [
   },
 ];
 
-export interface ColumnsEditorProps {
-  value: ColumnsSpec;
-  onChange: (value: ColumnsSpec) => void;
+export interface ColumnsDefinitionsEditorProps {
+  value: ColumnDefinitionsSpec;
+  onChange: (value: ColumnDefinitionsSpec) => void;
 }
 
-export default function ColumnsEditor({ value, onChange }: ColumnsEditorProps) {
+export function ColumnsDefinitionsEditor({ value, onChange }: ColumnsDefinitionsEditorProps) {
   const [activeField, setActiveField] = React.useState(value[0]?.field);
 
   const activeColumn = React.useMemo(
@@ -126,5 +126,26 @@ export default function ColumnsEditor({ value, onChange }: ColumnsEditorProps) {
         ) : null}
       </Box>
     </Stack>
+  );
+}
+
+export interface ColumnsEditorProps {
+  value: DataGridSpec;
+  onChange: (value: DataGridSpec) => void;
+}
+
+export default function ColumnsEditor({ value, onChange }: ColumnsEditorProps) {
+  return (
+    <Box sx={{ width: '100%', height: '100%' }}>
+      <TextField
+        label="Id selector"
+        value={value.idSelector}
+        onChange={(event) => onChange({ ...value, idSelector: event.target.value })}
+      />
+      <ColumnsDefinitionsEditor
+        value={value.columns || []}
+        onChange={(columns) => onChange({ ...value, columns })}
+      />
+    </Box>
   );
 }

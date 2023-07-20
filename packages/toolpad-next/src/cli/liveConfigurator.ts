@@ -8,22 +8,8 @@ import { WebSocketServer } from 'ws';
 import getPort from 'get-port';
 import { toolpadFileSchema } from '../shared/schemas';
 import RpcServer from '../shared/RpcServer';
-import { generateComponent, generateIndex } from '../shared/codeGeneration';
+import { getNameFromPath, generateComponent, generateIndex } from '../shared/codeGeneration';
 import { DevRpcServer } from '../shared/types';
-
-function isValidJsIdentifier(base: string): boolean {
-  return /^[a-zA-Z][a-zA-Z0-9]*$/.test(base);
-}
-
-function getNameFromPath(filePath: string): string {
-  const name = path.basename(filePath, '.yml');
-
-  if (!isValidJsIdentifier(name)) {
-    throw new Error(`Invalid file name ${JSON.stringify(name)}`);
-  }
-
-  return name;
-}
 
 async function compileTs(code: string) {
   const result = await esbuild.transform(code, {

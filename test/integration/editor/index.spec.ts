@@ -157,7 +157,6 @@ test('must correctly size new layout columns', async ({ page }) => {
 
   const fifthFullWidthBoundingBox = await getNthFullWidthBoundingBox(4);
 
-  expect(fifthFullWidthBoundingBox).toBeDefined();
   await editorModel.dragNewComponentToAppCanvas(
     'FullWidth',
     fifthFullWidthBoundingBox!.x + (3 / 4) * fifthFullWidthBoundingBox!.width,

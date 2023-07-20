@@ -1,4 +1,5 @@
 const ROUTES = {
+  toolpadRepo: 'https://github.com/mui/mui-toolpad',
   toolpadQuickstart: '/toolpad/getting-started/first-app/',
   toolpadDocs: '/toolpad/getting-started/installation/',
   toolpadUpvote: 'https://github.com/mui/mui-toolpad/labels/waiting%20for%20%F0%9F%91%8D',

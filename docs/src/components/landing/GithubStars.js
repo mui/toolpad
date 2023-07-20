@@ -1,10 +1,10 @@
 import * as React from 'react';
 import { useTheme } from '@mui/material/styles';
+import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
-import ButtonGroup from '@mui/material/ButtonGroup';
-import Tooltip from '@mui/material/Tooltip';
 import StarRateRoundedIcon from '@mui/icons-material/StarRateRounded';
 import GitHubIcon from '@mui/icons-material/GitHub';
+import ROUTES from '../../route';
 
 export default function GithubStars() {
   const [fetching, setFetching] = React.useState(true);
@@ -33,54 +33,40 @@ export default function GithubStars() {
   }, [fetchStars]);
 
   return (
-    <ButtonGroup
-      variant="outlined"
-      disableElevation
+    <Button
+      component="a"
+      href={ROUTES.toolpadRepo}
+      target="_blank"
+      rel="noopener nofollow"
       aria-label="split button"
-      sx={{ justifyContent: { xs: 'center', sm: 'start' } }}
+      size="small"
+      variant="outlined"
+      sx={{
+        color: theme.palette.grey[900],
+        borderColor: theme.palette.grey[200],
+        ...theme.applyDarkStyles({
+          color: theme.palette.primary[50],
+          background: theme.palette.primaryDark[700],
+          borderColor: theme.palette.primaryDark[600],
+        }),
+      }}
+      startIcon={<GitHubIcon />}
     >
-      <Button
-        size="small"
-        component="a"
+      GitHub stars:
+      <Box
         sx={{
-          color: theme.palette.grey[900],
-          borderColor: theme.palette.grey[200],
-          borderTopLeftRadius: '8px',
-          borderBottomLeftRadius: '8px',
-          pointerEvents: 'none',
-          cursor: 'default',
+          display: 'flex',
+          alignItem: 'center',
+          ml: 0.5,
+          color: theme.palette.primary[500],
           ...theme.applyDarkStyles({
-            color: theme.palette.primary[50],
-            borderColor: theme.palette.primaryDark[600],
+            color: theme.palette.primary[200],
           }),
         }}
-        startIcon={<GitHubIcon />}
       >
-        Star
-      </Button>
-      <Tooltip title="Open the GitHub repo">
-        <Button
-          size="small"
-          aria-label="GitHub repository"
-          sx={{
-            borderTopLeftRadius: 0,
-            borderBottomLeftRadius: 0,
-            borderTopRightRadius: '8px',
-            borderBottomRightRadius: '8px',
-            borderColor: theme.palette.grey[200],
-            ...theme.applyDarkStyles({
-              borderColor: theme.palette.primaryDark[600],
-              color: theme.palette.primary[200],
-            }),
-          }}
-          href="https://github.com/mui/mui-toolpad"
-          target="_blank"
-          rel="noopener nofollow"
-          startIcon={<StarRateRoundedIcon fontSize="small" sx={{ mt: -0.25 }} />}
-        >
-          {fetching ? '...' : stars}
-        </Button>
-      </Tooltip>
-    </ButtonGroup>
+        <StarRateRoundedIcon fontSize="small" />
+        {fetching ? '...' : stars}
+      </Box>
+    </Button>
   );
 }

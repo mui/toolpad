@@ -58,7 +58,7 @@ export default function GithubStars() {
       >
         Star
       </Button>
-      <Tooltip title="Star on GitHub">
+      <Tooltip title="Open the GitHub repo">
         <Button
           size="small"
           aria-label="GitHub repository"

@@ -54,7 +54,7 @@ test('can move elements in page', async ({ page }) => {
   await expect(secondTextFieldLocator).toHaveAttribute('value', 'textField1');
 });
 
-test.only('can delete elements from page', async ({ page }) => {
+test('can delete elements from page', async ({ page }) => {
   const editorModel = new ToolpadEditor(page);
 
   await editorModel.goto();

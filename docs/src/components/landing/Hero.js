@@ -153,7 +153,7 @@ export default function Hero() {
           <GradientText>into UIs</GradientText>
         </Typography>
         <Typography color="text.secondary" sx={{ maxWidth: 520, mb: 2, textWrap: 'balance' }}>
-          Build scalable and secure internal tools locally. Use your own IDE, <br /> drag and drop
+          Build scalable and secure internal tools locally. Use your own IDE, drag and drop
           pre-built components or create your own.
         </Typography>
         <GetStartedButtons installation={'npx create-toolpad-app'} to={ROUTES.toolpadQuickstart} />

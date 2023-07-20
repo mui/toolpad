@@ -80,9 +80,8 @@ const OverlayRoot = styled('div')({
   [`&.${overlayClasses.resizeVertical}`]: {
     cursor: 'ns-resize',
   },
-  [`.${overlayClasses.hudOverlay}`]: {
-    position: 'absolute',
-    inset: '0 0 0 0',
+  [`&.${overlayClasses.hudOverlay}`]: {
+    pointerEvents: 'none !important',
   },
 });
 
@@ -1560,6 +1559,7 @@ export default function RenderOverlay({ bridge }: RenderOverlayProps) {
           draggedEdge === RECTANGLE_EDGE_LEFT || draggedEdge === RECTANGLE_EDGE_RIGHT,
         [overlayClasses.resizeVertical]:
           draggedEdge === RECTANGLE_EDGE_TOP || draggedEdge === RECTANGLE_EDGE_BOTTOM,
+        [overlayClasses.hudOverlay]: selectedRect,
       })}
       // Need this to be able to capture key events
       tabIndex={0}

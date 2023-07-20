@@ -9,7 +9,7 @@ import getPort from 'get-port';
 import { toolpadFileSchema } from '../shared/schemas';
 import RpcServer from '../shared/RpcServer';
 import { getNameFromPath, generateComponent, generateIndex } from '../shared/codeGeneration';
-import { DevRpcServer } from '../shared/types';
+import { DevRpcMethods } from '../shared/types';
 
 async function compileTs(code: string) {
   const result = await esbuild.transform(code, {
@@ -115,7 +115,7 @@ export async function liveCommand({ dir }: Config) {
     ws.on('error', console.error);
   });
 
-  const rpcServer = new RpcServer<DevRpcServer>(wss);
+  const rpcServer = new RpcServer<DevRpcMethods>(wss);
 
   rpcServer.register('saveFile', async (name, file) => {
     // Validate content before saving

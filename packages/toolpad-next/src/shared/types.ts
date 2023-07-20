@@ -6,6 +6,6 @@ export interface WithDevtoolParams {
   wsUrl: string;
 }
 
-export type DevRpcServer = {
+export type DevRpcMethods = {
   saveFile: (name: string, file: ToolpadFile) => Promise<void>;
 };

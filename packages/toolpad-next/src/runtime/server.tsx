@@ -1,6 +1,6 @@
 import * as React from 'react';
 import invariant from 'invariant';
-import { DevRpcServer } from '../shared/types';
+import { DevRpcMethods } from '../shared/types';
 import RpcClient from '../shared/RpcClient';
 import { ToolpadFile } from '../shared/schemas';
 
@@ -22,12 +22,12 @@ interface ServerProviderProps {
 }
 
 export function ServerProvider({ wsUrl, children }: ServerProviderProps) {
-  const [client, setClient] = React.useState<RpcClient<DevRpcServer> | null>(null);
+  const [client, setClient] = React.useState<RpcClient<DevRpcMethods> | null>(null);
   const [connectionStatus, setConnectionStatus] = React.useState<ConnectionStatus>('connecting');
 
   React.useEffect(() => {
     const ws = new WebSocket(wsUrl);
-    setClient(new RpcClient<DevRpcServer>(ws));
+    setClient(new RpcClient<DevRpcMethods>(ws));
 
     const handleOpen = () => {
       setConnectionStatus('connected');

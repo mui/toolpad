@@ -79,8 +79,8 @@ const videoMainControls = (theme) => ({
 
 const videoSecondaryControls = (theme) => ({
   position: 'absolute',
-  width: 40,
-  height: 40,
+  width: 34,
+  height: 34,
   background: (theme.vars || theme).palette.primary[50],
   borderRadius: 99,
   border: '1px solid',
@@ -129,7 +129,7 @@ const MuteButton = styled(IconButton)(({ theme }) => [
   {
     ...videoSecondaryControls(theme),
     bottom: 28,
-    right: 80,
+    right: 72,
   },
 ]);
 

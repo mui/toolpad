@@ -1,9 +1,9 @@
 import ROUTES from '../../../src/route';
 
 const marquee = {
-  title: 'Get early access',
+  title: 'Stay updated!',
   subtitle:
-    'Sign up to get news and updates about the Toolpad development ahead of the official release',
+    'Subscribe to Toolpad newsletter and stay in the loop by receiving product roundups and success stories from our beta users',
   action: {
     href: ROUTES.toolpadQuickstart,
   },

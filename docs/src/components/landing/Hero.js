@@ -6,6 +6,7 @@ import Switch from '@mui/material/Switch';
 import Typography from '@mui/material/Typography';
 import SvgMuiLogo from 'docs/src/icons/SvgMuiLogomark';
 import IconImage from 'docs/src/components/icon/IconImage';
+import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import GradientText from 'docs/src/components/typography/GradientText';
 import GetStartedButtons from 'docs/src/components/home/GetStartedButtons';
 import GithubStars from './GithubStars';
@@ -125,7 +126,17 @@ export default function Hero() {
           <Box component="span" sx={{ mr: 1 }}>
             MUI Toolpad
           </Box>
-          <Chip label="Beta" component="span" color="primary" size="small" variant="outlined" />
+          <Chip
+            label="Announcing beta"
+            component="a"
+            href={ROUTES.toolpadBetaBlog}
+            color="primary"
+            size="small"
+            variant="outlined"
+            clickable
+            onDelete={() => {}}
+            deleteIcon={<ChevronRightIcon />}
+          />
         </Typography>
         <Typography variant="h1" sx={{ my: 1, minWidth: { xs: 'auto', sm: 600 } }}>
           Turn your <TypingAnimation />

@@ -6,6 +6,7 @@ const ROUTES = {
   toolpadAdminExample: '/toolpad/examples/admin-app/',
   toolpadBIExample: '/toolpad/examples/npm-stats/',
   toolpadMoreExamples: 'https://github.com/mui/mui-toolpad/tree/master/examples',
+  toolpadBetaBlog: 'https://mui.com/blog/2023-toolpad-beta-announcement/',
   // https://docs.netlify.com/site-deploys/overview/#deploy-contexts
   TOOLPAD_SIGN_UP_URL:
     process.env.DEPLOY_ENV !== 'production'

@@ -36,20 +36,24 @@ type SerializedProperties<O> = {
   [K in keyof O]: string | (undefined extends O[K] ? undefined : never);
 };
 
-interface GenerateComponentConfig {
-  name: string;
-  dev: boolean;
-  wsUrl?: string;
-}
+export type GenerateComponentConfig =
+  | {
+      dev?: false;
+    }
+  | {
+      dev: true;
+      wsUrl: string;
+    };
 
 export async function generateDataGridComponent(
-  dataGridFile: DataGridFile,
-  { name, dev, wsUrl }: GenerateComponentConfig,
+  name: string,
+  file: DataGridFile,
+  config: GenerateComponentConfig,
 ): Promise<GeneratedFile> {
-  const hasRowsProperty = (dataGridFile.spec?.rows?.kind ?? 'property') === 'property';
+  const hasRowsProperty = (file.spec?.rows?.kind ?? 'property') === 'property';
 
   const columnDefs: string[] =
-    dataGridFile.spec?.columns?.map((column) => {
+    file.spec?.columns?.map((column) => {
       const properties: SerializedProperties<GridColDef> = {
         field: JSON.stringify(column.field),
       };
@@ -65,14 +69,14 @@ export async function generateDataGridComponent(
     import * as React from 'react';
     import { DataGridPro } from '@mui/x-data-grid-pro';
     import { Box } from '@mui/material';
-    ${dev ? `import { withDevtool, EditButton } from '@mui/toolpad-next/runtime';` : ''}
+    ${config.dev ? `import { withDevtool, EditButton } from '@mui/toolpad-next/runtime';` : ''}
 
     ${
-      dataGridFile.spec.rows.kind === 'fetch'
+      file.spec.rows.kind === 'fetch'
         ? `
       async function executeFetch() {
-        const response = await fetch(${JSON.stringify(dataGridFile.spec.rows.url || '')}, { 
-          method: ${JSON.stringify(dataGridFile.spec.rows.method || 'GET')} 
+        const response = await fetch(${JSON.stringify(file.spec.rows.url || '')}, { 
+          method: ${JSON.stringify(file.spec.rows.method || 'GET')} 
         });
       
         if (!response.ok) {
@@ -81,7 +85,7 @@ export async function generateDataGridComponent(
       
         const data = await response.json();
 
-        return ${jsonPointer.toExpression('data', dataGridFile.spec.rows.selector || '/')};
+        return ${jsonPointer.toExpression('data', file.spec.rows.selector || '/')};
       }
     `
         : ''
@@ -131,11 +135,11 @@ export async function generateDataGridComponent(
     }
 
     function ToolpadDataGrid({ 
-      ${dataGridFile.spec.rows.kind === 'property' ? 'rows = [], error' : ''}
+      ${file.spec.rows.kind === 'property' ? 'rows = [], error' : ''}
     }: ToolpadDataGridProps) {
 
       ${
-        dataGridFile.spec.rows.kind === 'fetch'
+        file.spec.rows.kind === 'fetch'
           ? `
         const [rows, setRows] = React.useState([]);
         const [error, setError] = React.useState()
@@ -158,10 +162,10 @@ export async function generateDataGridComponent(
                 rows={rows}
                 columns={columns}
                 ${
-                  dataGridFile.spec.rowIdSelector
+                  file.spec.rowIdSelector
                     ? `getRowId={(row) => ${jsonPointer.toExpression(
                         'row',
-                        dataGridFile.spec.rowIdSelector || '/',
+                        file.spec.rowIdSelector || '/',
                       )}}`
                     : ''
                 }
@@ -169,7 +173,7 @@ export async function generateDataGridComponent(
             )}
           </ErrorBoundary>
           ${
-            dev
+            config.dev
               ? `<EditButton sx={{ position: 'absolute', bottom: 0, right: 0, mb: 2, mr: 2, zIndex: 1 }} />`
               : ''
           }
@@ -180,11 +184,11 @@ export async function generateDataGridComponent(
     ToolpadDataGrid.displayName = ${JSON.stringify(name)};
 
     export default ${
-      dev
+      config.dev
         ? `withDevtool(ToolpadDataGrid, ${JSON.stringify({
             name,
-            file: dataGridFile,
-            wsUrl,
+            file,
+            wsUrl: config.wsUrl,
           } satisfies WithDevtoolParams)})`
         : 'ToolpadDataGrid'
     };
@@ -194,12 +198,13 @@ export async function generateDataGridComponent(
 }
 
 export async function generateComponent(
+  name: string,
   file: ToolpadFile,
   config: GenerateComponentConfig,
 ): Promise<GeneratedFile> {
   switch (file.kind) {
     case 'DataGrid':
-      return generateDataGridComponent(file, config);
+      return generateDataGridComponent(name, file, config);
     default:
       throw new Error(`No implementation yet for ${JSON.stringify(file.kind)}`);
   }

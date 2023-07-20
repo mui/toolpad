@@ -8,7 +8,12 @@ import { WebSocketServer } from 'ws';
 import getPort from 'get-port';
 import { toolpadFileSchema } from '../shared/schemas';
 import RpcServer from '../shared/RpcServer';
-import { getNameFromPath, generateComponent, generateIndex } from '../shared/codeGeneration';
+import {
+  getNameFromPath,
+  generateComponent,
+  generateIndex,
+  GenerateComponentConfig,
+} from '../shared/codeGeneration';
 import { DevRpcMethods } from '../shared/types';
 
 async function compileTs(code: string) {
@@ -40,14 +45,9 @@ function getYmlPattern(root: string) {
   return path.join(toolpadDir, '*.yml');
 }
 
-interface GenerateLibConfig {
-  dev?: boolean;
-  wsUrl?: string;
-}
-
-async function generateLib(root: string, { dev = false, wsUrl }: GenerateLibConfig = {}) {
+async function generateLib(root: string, config: GenerateComponentConfig = {}) {
   // eslint-disable-next-line no-console
-  console.log(`Generating lib at ${JSON.stringify(root)} ${dev ? 'in dev mode' : ''}`);
+  console.log(`Generating lib at ${JSON.stringify(root)} ${config.dev ? 'in dev mode' : ''}`);
 
   const toolpadDir = getToolpadDir(root);
   const outputDir = path.join(toolpadDir, '.generated/components');
@@ -64,7 +64,7 @@ async function generateLib(root: string, { dev = false, wsUrl }: GenerateLibConf
       const file = toolpadFileSchema.parse(data);
       const name = getNameFromPath(entryPath);
 
-      const generatedComponentPromise = generateComponent(file, { name, dev, wsUrl });
+      const generatedComponentPromise = generateComponent(name, file, config);
 
       await Promise.all([
         generatedComponentPromise.then(async ({ code }) => {
@@ -130,7 +130,7 @@ export async function liveCommand({ dir }: Config) {
 
   const wsUrl = `ws://localhost:${port}`;
 
-  const config: GenerateLibConfig = {
+  const config: GenerateComponentConfig = {
     dev: true,
     wsUrl,
   };

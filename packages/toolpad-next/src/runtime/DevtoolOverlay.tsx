@@ -56,7 +56,7 @@ export default function DevtoolOverlay({ name, file, onClose }: DevtoolOverlayPr
   const [generatedFile, setGeneratedFile] = React.useState<GeneratedFile | null>(null);
 
   React.useEffect(() => {
-    generateComponent(file, { dev: false, name }).then(
+    generateComponent(name, file, { dev: false }).then(
       (result) => {
         setGeneratedFile(result);
       },

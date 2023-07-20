@@ -39,33 +39,29 @@ export default function GithubStars() {
       aria-label="split button"
       sx={{ justifyContent: { xs: 'center', sm: 'start' } }}
     >
-      <Tooltip title="GitHub repository">
+      <Button
+        size="small"
+        component="a"
+        sx={{
+          color: theme.palette.grey[900],
+          borderColor: theme.palette.grey[200],
+          borderTopLeftRadius: '8px',
+          borderBottomLeftRadius: '8px',
+          pointerEvents: 'none',
+          cursor: 'default',
+          ...theme.applyDarkStyles({
+            color: theme.palette.primary[50],
+            borderColor: theme.palette.primaryDark[600],
+          }),
+        }}
+        startIcon={<GitHubIcon />}
+      >
+        Star
+      </Button>
+      <Tooltip title="Star on GitHub">
         <Button
           size="small"
           aria-label="GitHub repository"
-          href="https://github.com/mui/mui-toolpad"
-          target="_blank"
-          component={'a'}
-          sx={{
-            color: theme.palette.grey[900],
-            borderColor: theme.palette.grey[200],
-            borderTopLeftRadius: '8px',
-            borderBottomLeftRadius: '8px',
-            ...theme.applyDarkStyles({
-              color: theme.palette.primary[50],
-              borderColor: theme.palette.primaryDark[600],
-            }),
-          }}
-          rel="noopener nofollow"
-          startIcon={<GitHubIcon />}
-        >
-          Star
-        </Button>
-      </Tooltip>
-      <Tooltip title="Stargazers">
-        <Button
-          size="small"
-          aria-label="GitHub stars"
           sx={{
             borderTopLeftRadius: 0,
             borderBottomLeftRadius: 0,
@@ -77,7 +73,7 @@ export default function GithubStars() {
               color: theme.palette.primary[200],
             }),
           }}
-          href="https://github.com/mui/mui-toolpad/stargazers"
+          href="https://github.com/mui/mui-toolpad"
           target="_blank"
           rel="noopener nofollow"
           startIcon={<StarRateRoundedIcon fontSize="small" sx={{ mt: -0.25 }} />}

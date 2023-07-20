@@ -5,7 +5,6 @@ import Chip from '@mui/material/Chip';
 import Switch from '@mui/material/Switch';
 import Typography from '@mui/material/Typography';
 import SvgMuiLogo from 'docs/src/icons/SvgMuiLogomark';
-import KeyRoundedIcon from '@mui/icons-material/KeyRounded';
 import IconImage from 'docs/src/components/icon/IconImage';
 import GradientText from 'docs/src/components/typography/GradientText';
 import GetStartedButtons from 'docs/src/components/home/GetStartedButtons';
@@ -144,7 +143,7 @@ export default function Hero() {
             display: 'flex',
             alignItems: 'center',
             justifyContent: { xs: 'space-around', sm: 'start' },
-            gap: 2,
+            gap: 4,
           }}
         >
           <GithubStars />
@@ -152,12 +151,6 @@ export default function Hero() {
             <SvgMuiLogo width={20} />
             <Typography color="text.secondary" fontWeight="medium" variant="body2">
               Powered by Material UI
-            </Typography>
-          </Box>
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.8 }}>
-            <KeyRoundedIcon color="primary" />
-            <Typography color="text.secondary" fontWeight="medium" variant="body2">
-              Open source
             </Typography>
           </Box>
         </Box>

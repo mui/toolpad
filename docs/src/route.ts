@@ -5,6 +5,7 @@ const ROUTES = {
   toolpadUtilityAppExample: '/toolpad/examples/qr-generator/',
   toolpadAdminExample: '/toolpad/examples/admin-app/',
   toolpadBIExample: '/toolpad/examples/npm-stats/',
+  toolpadMoreExamples: 'https://github.com/mui/mui-toolpad/tree/master/examples',
   // https://docs.netlify.com/site-deploys/overview/#deploy-contexts
   TOOLPAD_SIGN_UP_URL:
     process.env.DEPLOY_ENV !== 'production'

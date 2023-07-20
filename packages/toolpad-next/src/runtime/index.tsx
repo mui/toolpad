@@ -1,22 +1,24 @@
 import * as React from 'react';
 import useStorageState from '@mui/toolpad-utils/hooks/useStorageState';
-import { Button, ButtonProps } from '@mui/material';
+import { Box, Button, ButtonProps } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
+import invariant from 'invariant';
 import { WithDevtoolParams } from '../shared/types';
 import DevtoolOverlay from './DevtoolOverlay';
 import { ServerProvider } from './server';
+import { ComponentInfo, CurrentComponentContext } from './CurrentComponentContext';
 
 function useCurrentlyEditedComponentId() {
   return useStorageState('session', 'currently-edited-component-id', null);
 }
 
-const CurrentComponentIdContext = React.createContext<string | null>(null);
-
 const nextId = 1;
 
 export function EditButton(props: ButtonProps) {
   const [currentEditedComponentId, setCurrentlyEditedComponentId] = useCurrentlyEditedComponentId();
-  const currentComponentId = React.useContext(CurrentComponentIdContext);
+  const componentInfo = React.useContext(CurrentComponentContext);
+
+  invariant(componentInfo, `EditButton must be used inside a Component`);
 
   if (currentEditedComponentId) {
     return null;
@@ -26,7 +28,8 @@ export function EditButton(props: ButtonProps) {
     <Button
       {...props}
       variant="contained"
-      onClick={() => setCurrentlyEditedComponentId(currentComponentId)}
+      color="secondary"
+      onClick={() => setCurrentlyEditedComponentId(componentInfo.id)}
       startIcon={<EditIcon />}
     >
       Edit
@@ -42,17 +45,32 @@ export function withDevtool<P extends object>(
     const [currentlyEditedComponentId, setCurrentlyEditedComponentId] =
       useCurrentlyEditedComponentId();
 
-    const [editedComponentId] = React.useState(() => {
+    const [id] = React.useState(() => {
       return `component-${nextId}`;
     });
 
-    const editing = currentlyEditedComponentId === editedComponentId;
+    const editing = currentlyEditedComponentId === id;
+
+    const componentInfo: ComponentInfo = React.useMemo(() => {
+      return { id, name, file, props };
+    }, [id, props]);
 
     return (
-      <CurrentComponentIdContext.Provider value={editedComponentId}>
+      <CurrentComponentContext.Provider value={componentInfo}>
         {editing ? (
           <ServerProvider wsUrl={wsUrl}>
-            <Component {...props} />
+            <Box
+              sx={{
+                display: 'contents',
+                '> *': {
+                  outlineColor: (theme) => theme.palette.secondary.main,
+                  outlineStyle: 'solid',
+                  outlineWidth: 3,
+                },
+              }}
+            >
+              <Component {...props} />
+            </Box>
             <DevtoolOverlay
               name={name}
               file={file}
@@ -62,7 +80,7 @@ export function withDevtool<P extends object>(
         ) : (
           <Component {...props} />
         )}
-      </CurrentComponentIdContext.Provider>
+      </CurrentComponentContext.Provider>
     );
   };
 }

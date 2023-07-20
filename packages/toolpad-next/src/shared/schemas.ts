@@ -4,30 +4,34 @@ export const COLUMN_TYPES = ['string', 'number', 'boolean', 'date', 'datetime'] 
 
 export type ColumnType = (typeof COLUMN_TYPES)[number];
 
+export const rowsSpecSchema = z.discriminatedUnion('kind', [
+  z.object({
+    kind: z.literal('property'),
+  }),
+  z.object({
+    kind: z.literal('fetch'),
+    method: z.enum(['GET', 'POST']).optional(),
+    url: z.string().optional(),
+  }),
+]);
+
+export type RowsSpec = z.infer<typeof rowsSpecSchema>;
+
+export const columnsSpecSchema = z.array(
+  z.object({
+    field: z.string(),
+    type: z.enum(COLUMN_TYPES).optional(),
+  }),
+);
+
+export type ColumnsSpec = z.infer<typeof columnsSpecSchema>;
+
 export const dataGridFileSchema = z.object({
   kind: z.literal('DataGrid'),
   spec: z
     .object({
-      rows: z
-        .discriminatedUnion('kind', [
-          z.object({
-            kind: z.literal('property'),
-          }),
-          z.object({
-            kind: z.literal('fetch'),
-            method: z.enum(['GET', 'POST']).optional(),
-            url: z.string().optional(),
-          }),
-        ])
-        .optional(),
-      columns: z
-        .array(
-          z.object({
-            field: z.string(),
-            type: z.enum(COLUMN_TYPES).optional(),
-          }),
-        )
-        .optional(),
+      rows: rowsSpecSchema.optional(),
+      columns: columnsSpecSchema.optional(),
     })
     .optional(),
 });

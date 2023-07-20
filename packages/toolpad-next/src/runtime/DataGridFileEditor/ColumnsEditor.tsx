@@ -10,20 +10,12 @@ import {
   MenuItem,
   OutlinedInput,
   Stack,
-  Tab,
   TextField,
-  Tooltip,
   Typography,
-  styled,
-  Container,
 } from '@mui/material';
-import { TabContext, TabList, TabPanel as MuiTabPanel } from '@mui/lab';
 import SearchIcon from '@mui/icons-material/Search';
-import SaveIcon from '@mui/icons-material/Save';
 import AddIcon from '@mui/icons-material/Add';
-import useStorageState from '@mui/toolpad-utils/hooks/useStorageState';
-import { ColumnType, DataGridFile } from '../shared/schemas';
-import { useServer } from './server';
+import { ColumnType, ColumnsSpec } from '../../shared/schemas';
 
 interface ColumnTypeOption {
   value: ColumnType;
@@ -53,16 +45,12 @@ const COLUMN_TYPE_OPTIONS: ColumnTypeOption[] = [
   },
 ];
 
-const TabPanel = styled(MuiTabPanel)({ padding: 0, flex: 1, minHeight: 0 });
-
-type DataGridColumnsSpec = NonNullable<NonNullable<DataGridFile['spec']>['columns']>;
-
-interface ColumnsEditorProps {
-  value: DataGridColumnsSpec;
-  onChange: (value: DataGridColumnsSpec) => void;
+export interface ColumnsEditorProps {
+  value: ColumnsSpec;
+  onChange: (value: ColumnsSpec) => void;
 }
 
-function ColumnsEditor({ value, onChange }: ColumnsEditorProps) {
+export default function ColumnsEditor({ value, onChange }: ColumnsEditorProps) {
   const [activeField, setActiveField] = React.useState(value[0]?.field);
 
   const activeColumn = React.useMemo(
@@ -138,84 +126,5 @@ function ColumnsEditor({ value, onChange }: ColumnsEditorProps) {
         ) : null}
       </Box>
     </Stack>
-  );
-}
-
-interface DataGridFileEditorProps {
-  name: string;
-  value: DataGridFile;
-  onChange: (value: DataGridFile) => void;
-  onClose?: () => void;
-  source?: string;
-}
-
-export default function DataGridFileEditor({
-  name,
-  value,
-  onChange,
-  onClose,
-  source,
-}: DataGridFileEditorProps) {
-  const [activeTab, setActiveTab] = useStorageState('session', `activeTab`, 'data');
-
-  const server = useServer();
-
-  return (
-    <Box sx={{ width: '100%', height: '100%', display: 'flex', flexDirection: 'column' }}>
-      <TabContext value={activeTab}>
-        <Box
-          sx={{
-            borderBottom: 1,
-            borderColor: 'divider',
-            display: 'flex',
-            flexDirection: 'row',
-            justifyContent: 'space-between',
-            alignItems: 'end',
-          }}
-        >
-          <TabList onChange={(_event, newValue) => setActiveTab(newValue)}>
-            <Tab label="data" value="data" />
-            <Tab label="Columns" value="columns" />
-            <Tab label="Source code" value="source" />
-          </TabList>
-          <Tooltip title="Commit changes">
-            <IconButton
-              sx={{ m: 0.5 }}
-              onClick={() => {
-                server.saveFile(name, value).then(() => onClose?.());
-              }}
-            >
-              <SaveIcon />
-            </IconButton>
-          </Tooltip>
-        </Box>
-
-        <TabPanel value="data">
-          <Stack direction="row">
-            <Box sx={{ flex: 1 }}>left</Box>
-            <Box sx={{ flex: 1 }}>right</Box>
-          </Stack>
-        </TabPanel>
-        <TabPanel value="columns">
-          <ColumnsEditor
-            value={value.spec?.columns ?? []}
-            onChange={(newColumns) =>
-              onChange({
-                ...value,
-                spec: {
-                  ...value.spec,
-                  columns: newColumns,
-                },
-              })
-            }
-          />
-        </TabPanel>
-        <TabPanel value="source">
-          <Container sx={{ width: '100%', height: '100%', overflow: 'auto', px: 4 }}>
-            <pre>{source}</pre>
-          </Container>
-        </TabPanel>
-      </TabContext>
-    </Box>
   );
 }

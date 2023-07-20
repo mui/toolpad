@@ -33,6 +33,7 @@
     "esbuild": "0.18.11",
     "get-port": "7.0.0",
     "glob": "10.3.3",
+    "invariant": "2.2.4",
     "prettier": "3.0.0",
     "superjson": "1.13.1",
     "ws": "8.13.0",

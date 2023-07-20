@@ -15,6 +15,8 @@ test('rendering components in the app runtime', async ({ page, argosScreenshot }
   const runtimeModel = new ToolpadRuntime(page);
   await runtimeModel.gotoPage('components');
 
+  await runtimeModel.waitForPageReady();
+
   await argosScreenshot('components', { fullPage: true });
 });
 

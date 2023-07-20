@@ -52,62 +52,32 @@ const Video = styled('video')(({ theme }) => [
   }),
 ]);
 
-const PlayButton = styled(IconButton)(({ theme }) => [
-  {
-    position: 'absolute',
-    transform: 'translate(-50%,-50%)',
-    background: `linear-gradient(120deg, ${(theme.vars || theme).palette.primary[400]} 0%, ${
-      (theme.vars || theme).palette.primary[800]
-    } 150%)`,
-    borderRadius: 99,
-    width: 64,
-    height: 64,
-    inset: '50%',
-    border: 'none',
-    boxShadow: `0 8px 20px ${alpha(theme.palette.primary[900], 0.5)}`,
-    transition: theme.transitions.create(['scale', 'box-shadow'], {
-      duration: theme.transitions.duration.shortest,
-    }),
-    zIndex: 10,
-    '&:hover': {
-      scale: '1.05',
-      background: `linear-gradient(120deg, ${(theme.vars || theme).palette.primary[500]} 0%, ${
-        (theme.vars || theme).palette.primary[800]
-      } 150%)`,
-      boxShadow: `0 12px 20px ${alpha(theme.palette.primary[900], 0.8)}`,
-    },
-  },
-]);
-
-const PauseButton = styled(IconButton)(({ theme }) => [
-  {
-    position: 'absolute',
-    transform: 'translate(-50%,-50%)',
-    inset: '50%',
-    background: `linear-gradient(120deg, ${(theme.vars || theme).palette.primary[900]} 0%, ${
+const videoMainControls = (theme) => ({
+  position: 'absolute',
+  transform: 'translate(-50%,-50%)',
+  background: `linear-gradient(120deg, ${(theme.vars || theme).palette.primary[400]} 0%, ${
+    (theme.vars || theme).palette.primary[600]
+  } 150%)`,
+  borderRadius: 99,
+  width: 58,
+  height: 58,
+  inset: '50%',
+  border: 'none',
+  boxShadow: `0 4px 8px ${alpha(theme.palette.primary[900], 0.5)}`,
+  transition: theme.transitions.create(['scale', 'box-shadow'], {
+    duration: theme.transitions.duration.shortest,
+  }),
+  zIndex: 10,
+  '&:hover': {
+    scale: '1.02',
+    background: `linear-gradient(120deg, ${(theme.vars || theme).palette.primary[500]} 0%, ${
       (theme.vars || theme).palette.primary[700]
     } 150%)`,
-    borderRadius: 99,
-    width: 64,
-    height: 64,
-    border: 'none',
-    boxShadow: `0 4px 8px ${alpha(theme.palette.primary[900], 0.4)}`,
-    transition: theme.transitions.create(['scale', 'box-shadow', 'opacity'], {
-      duration: theme.transitions.duration.shortest,
-    }),
-    opacity: 0,
-    zIndex: 10,
-    '&:hover': {
-      scale: '1.05',
-      background: `linear-gradient(120deg, ${(theme.vars || theme).palette.primary[800]} 0%, ${
-        (theme.vars || theme).palette.primary[600]
-      } 150%)`,
-      boxShadow: `0 8px 10px ${alpha(theme.palette.primary[900], 0.6)}`,
-    },
+    boxShadow: `0 8px 16px ${alpha(theme.palette.primary[900], 0.5)}`,
   },
-]);
+});
 
-const videoContolButton = (theme) => ({
+const videoSecondaryControls = (theme) => ({
   position: 'absolute',
   width: 40,
   height: 40,
@@ -134,9 +104,22 @@ const videoContolButton = (theme) => ({
   }),
 });
 
+const PlayButton = styled(IconButton)(({ theme }) => [
+  {
+    ...videoMainControls(theme),
+  },
+]);
+
+const PauseButton = styled(IconButton)(({ theme }) => [
+  {
+    ...videoMainControls(theme),
+    opacity: 0,
+  },
+]);
+
 const FullScreenButton = styled(IconButton)(({ theme }) => [
   {
-    ...videoContolButton(theme),
+    ...videoSecondaryControls(theme),
     bottom: 28,
     right: 28,
   },
@@ -144,7 +127,7 @@ const FullScreenButton = styled(IconButton)(({ theme }) => [
 
 const MuteButton = styled(IconButton)(({ theme }) => [
   {
-    ...videoContolButton(theme),
+    ...videoSecondaryControls(theme),
     bottom: 28,
     right: 80,
   },

@@ -64,7 +64,7 @@ export default function CardGrid(props) {
           {content.cards.map(({ icon, title, wip, imageUrl, description }) => (
             <Grid key={title} xs={2} sm={1}>
               <Paper variant="outlined" sx={cardRootStyle(imageUrl)}>
-                {imageUrl ? <Box sx={cardMediaStyle(imageUrl)} /> : null}
+                {imageUrl && <Box sx={cardMediaStyle(imageUrl)} />}
                 <Box sx={cardContentRootStyle(imageUrl)}>
                   <Box
                     sx={{
@@ -86,7 +86,7 @@ export default function CardGrid(props) {
                         {title}
                       </Typography>
                     </Box>
-                    {wip ? <IconImage name="time" title="Work in progress" /> : null}
+                    {wip && <IconImage name="time" title="Work in progress" />}
                   </Box>
                   <Typography variant="body2" color="text.secondary">
                     {description}

@@ -106,6 +106,17 @@ export default function Hero() {
     setHeroAppMode(event.target.checked);
   }, []);
 
+  const [pauseHeroAnimation, setPauseHeroAnimation] = React.useState(false);
+
+  React.useEffect(() => {
+    const loop = setInterval(() => {
+      if (!pauseHeroAnimation) {
+        setHeroAppMode((prev) => !prev);
+      }
+    }, 2000);
+    return () => clearInterval(loop);
+  }, [pauseHeroAnimation]);
+
   return (
     <ToolpadHeroContainer>
       <Box sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
@@ -185,6 +196,8 @@ export default function Hero() {
           gridTemplateColumns: { xs: '1fr', md: '1fr 1fr' },
           rowGap: 1,
         }}
+        onMouseEnter={() => setPauseHeroAnimation(true)}
+        onMouseLeave={() => setPauseHeroAnimation(false)}
       >
         <Box
           className="MuiToolpadHero-image"

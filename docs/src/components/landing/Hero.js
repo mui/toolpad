@@ -92,7 +92,7 @@ function TypingAnimation() {
         setFullText(words[nextIndex]);
         setText('');
         setLetterIndex(0);
-      }, 2000);
+      }, 1200);
     }
     return () => clearTimeout(timer);
   });
@@ -116,6 +116,7 @@ export default function Hero() {
             (theme) => ({
               display: 'flex',
               alignItems: 'center',
+              gap: 0.5,
               color: (theme.vars || theme).palette.primary[600],
               ...theme.applyDarkStyles({
                 color: (theme.vars || theme).palette.primary[400],
@@ -123,10 +124,8 @@ export default function Hero() {
             }),
           ]}
         >
-          <IconImage name="product-toolpad" width="28" height="28" sx={{ mr: 1 }} />
-          <Box component="span" sx={{ mr: 1 }}>
-            MUI Toolpad
-          </Box>
+          <IconImage width={28} height={28} name="product-toolpad" />
+          <Box component="span">MUI Toolpad</Box>
           <Chip
             label="Introducing the Beta version"
             component="a"

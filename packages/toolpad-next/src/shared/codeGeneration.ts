@@ -185,11 +185,16 @@ export async function generateDataGridComponent(
 
     export default ${
       config.dev
-        ? `withDevtool(ToolpadDataGrid, ${JSON.stringify({
-            name,
-            file,
-            wsUrl: config.wsUrl,
-          } satisfies WithDevtoolParams)})`
+        ? `withDevtool(ToolpadDataGrid, ${serializeObject({
+            name: JSON.stringify(name),
+            file: JSON.stringify(file),
+            wsUrl: JSON.stringify(config.wsUrl),
+            dependencies: serializeArray([
+              serializeArray([JSON.stringify('react'), 'React']),
+              serializeArray([JSON.stringify('@mui/x-data-grid-pro'), '{ DataGridPro }']),
+              serializeArray([JSON.stringify('@mui/material'), '{ Box }']),
+            ]),
+          } satisfies Record<keyof WithDevtoolParams, string>)})`
         : 'ToolpadDataGrid'
     };
   `;

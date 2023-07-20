@@ -39,7 +39,7 @@ export function EditButton(props: ButtonProps) {
 
 export function withDevtool<P extends object>(
   Component: React.ComponentType<P>,
-  { name, file, wsUrl }: WithDevtoolParams,
+  { name, file, wsUrl, dependencies }: WithDevtoolParams,
 ): React.ComponentType<P> {
   return function ComponentWithDevtool(props) {
     const [currentlyEditedComponentId, setCurrentlyEditedComponentId] =
@@ -55,6 +55,14 @@ export function withDevtool<P extends object>(
       return { id, name, file, props };
     }, [id, props]);
 
+    const [RenderedComponent, setRenderedComponent] = React.useState<React.ComponentType<P>>(
+      () => Component,
+    );
+
+    const handleComponentUpdate = React.useCallback((NewComponent: React.ComponentType<any>) => {
+      setRenderedComponent(() => NewComponent);
+    }, []);
+
     return (
       <CurrentComponentContext.Provider value={componentInfo}>
         {editing ? (
@@ -69,16 +77,18 @@ export function withDevtool<P extends object>(
                 },
               }}
             >
-              <Component {...props} />
+              <RenderedComponent {...props} />
             </Box>
             <DevtoolOverlay
               name={name}
               file={file}
+              dependencies={dependencies}
               onClose={() => setCurrentlyEditedComponentId(null)}
+              onComponentUpdate={handleComponentUpdate}
             />
           </ServerProvider>
         ) : (
-          <Component {...props} />
+          <RenderedComponent {...props} />
         )}
       </CurrentComponentContext.Provider>
     );

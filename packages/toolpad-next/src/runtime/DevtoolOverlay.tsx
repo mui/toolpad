@@ -1,7 +1,9 @@
 import * as React from 'react';
+import * as sucrase from 'sucrase';
 import { Box, CircularProgress, IconButton, ThemeProvider, Typography } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
+import invariant from 'invariant';
 import { ToolpadFile } from '../shared/schemas';
 import DataGridFileEditor from './DataGridFileEditor';
 import theme from './theme';
@@ -43,10 +45,18 @@ function FileEditor({ name, value, onChange, onClose, source }: FileEditorProps)
 export interface DevtoolOverlayProps {
   name: string;
   file: ToolpadFile;
+  dependencies: [string, unknown][];
   onClose?: () => void;
+  onComponentUpdate?: (Component: React.ComponentType) => void;
 }
 
-export default function DevtoolOverlay({ name, file, onClose }: DevtoolOverlayProps) {
+export default function DevtoolOverlay({
+  name,
+  file,
+  onComponentUpdate,
+  onClose,
+  dependencies,
+}: DevtoolOverlayProps) {
   const rootRef = React.useRef<HTMLDivElement>(null);
 
   const [inputValue, setInputValue] = React.useState(file);
@@ -56,16 +66,36 @@ export default function DevtoolOverlay({ name, file, onClose }: DevtoolOverlayPr
   const [generatedFile, setGeneratedFile] = React.useState<GeneratedFile | null>(null);
 
   React.useEffect(() => {
-    generateComponent(name, file, { dev: false }).then(
-      (result) => {
+    generateComponent(name, inputValue, { dev: false })
+      .then((result) => {
+        const compiled = sucrase.transform(result.code, {
+          transforms: ['imports', 'typescript', 'jsx'],
+        });
+        const fn = new Function('module', 'exports', 'require', compiled.code);
+        const exports: any = {};
+        const module = { exports };
+        const dependencyRegistry = new Map(dependencies);
+        const require = (moduleId: string) => {
+          const mod = dependencyRegistry.get(moduleId);
+          if (mod) {
+            return mod;
+          }
+          throw new Error(`Module "${moduleId}" not found`);
+        };
+        fn(module, exports, require);
+        const NewComponent = module.exports.default as React.ComponentType;
+        invariant(
+          typeof NewComponent === 'function',
+          `Compilation must result in a function as default export`,
+        );
+        onComponentUpdate?.(NewComponent);
         setGeneratedFile(result);
-      },
-      (error) => {
+      })
+      .catch((error) => {
         console.error(error);
         setGeneratedFile(null);
-      },
-    );
-  }, [file, name]);
+      });
+  }, [inputValue, name, dependencies, onComponentUpdate]);
 
   return (
     <ThemeProvider theme={theme}>

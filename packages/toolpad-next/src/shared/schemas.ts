@@ -12,6 +12,7 @@ export const rowsSpecSchema = z.discriminatedUnion('kind', [
     kind: z.literal('fetch'),
     method: z.enum(['GET', 'POST']).optional(),
     url: z.string().optional(),
+    selector: z.string().optional(),
   }),
 ]);
 

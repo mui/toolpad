@@ -82,7 +82,6 @@ export default function DevtoolHost({ children }: DevtoolHostProps) {
   return (
     <Portal>
       <ThemeProvider theme={theme}>
-        <GlobalStyles styles={{ body: { marginBottom: `${height}px` } }} />
         <Box
           ref={rootRef}
           className="mui-fixed"
@@ -100,6 +99,7 @@ export default function DevtoolHost({ children }: DevtoolHostProps) {
             alignItems: 'stretch',
           }}
         >
+          <GlobalStyles styles={{ body: { marginBottom: `${height}px` } }} />
           <ResizeHandle onResize={handleResize} />
           <Box
             sx={{

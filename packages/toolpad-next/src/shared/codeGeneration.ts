@@ -41,6 +41,15 @@ interface GenerateComponentConfig {
   wsUrl?: string;
 }
 
+function transformSelector(selector: string): string {
+  return selector
+    ? selector
+        .split('.')
+        .map((part) => `[${JSON.stringify(part)}]`)
+        .join('')
+    : '';
+}
+
 export async function generateDataGridComponent(
   dataGridFile: DataGridFile,
   { name, dev, wsUrl }: GenerateComponentConfig,
@@ -66,6 +75,47 @@ export async function generateDataGridComponent(
     import { Box } from '@mui/material';
     ${dev ? `import { withDevtool, EditButton } from '@mui/toolpad-next/runtime';` : ''}
 
+    ${
+      dataGridFile.spec.rows.kind === 'fetch'
+        ? `
+      async function executeFetch() {
+        const response = await fetch(${JSON.stringify(dataGridFile.spec.rows.url || '')}, { 
+          method: ${JSON.stringify(dataGridFile.spec.rows.method || 'GET')} 
+        });
+      
+        if (!response.ok) {
+          throw new Error(\`Request failed with status \${response.status}\`);
+        }
+      
+        const data = await response.json();
+
+        return data${transformSelector(dataGridFile.spec.rows.selector)};
+      }
+    `
+        : ''
+    }
+
+    interface ErrorOverlayProps {
+      error: Error;
+    }
+
+    function ErrorOverlay({ error }: ErrorOverlayProps) {
+      return (
+        <Box
+          sx={{
+            width: '100%',
+            height: '100%',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            padding: 2,
+          }}
+        >
+          {String(error.message || error)}
+        </Box>
+      )
+    }
+
     class ErrorBoundary extends React.Component<{ children?: React.ReactNode }> {
       state: { error: Error | null } = { error: null };
     
@@ -75,17 +125,7 @@ export async function generateDataGridComponent(
     
       render() {
         return this.state.error ? (
-          <Box
-            sx={{
-              width: '100%',
-              height: '100%',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-            }}
-          >
-            {String(this.state.error?.message || this.state.error)}
-          </Box>
+          <ErrorOverlay error={this.state.error} />
         ) : (
           this.props.children
         );
@@ -98,11 +138,28 @@ export async function generateDataGridComponent(
       rows: ${hasRowsProperty ? '{ id: string | number }[]' : 'undefined'};
     }
 
-    function ToolpadDataGrid({ rows = [] }: ToolpadDataGridProps) {
+    function ToolpadDataGrid({ 
+      ${dataGridFile.spec.rows.kind === 'property' ? 'rows = [], error' : ''}
+    }: ToolpadDataGridProps) {
+
+      ${
+        dataGridFile.spec.rows.kind === 'fetch'
+          ? `
+        const [rows, setRows] = React.useState([]);
+        const [error, setError] = React.useState()
+
+        React.useEffect(() => {
+          executeFetch().then(setRows, setError);
+        }, [])
+      `
+          : ''
+      }
+
+
       return (
         <Box sx={{ position: 'relative', width: '100%', height: 400 }}>
           <ErrorBoundary>
-            <DataGridPro rows={rows} columns={columns} />
+            {error ? <ErrorOverlay error={error} /> : <DataGridPro rows={rows} columns={columns} />}
           </ErrorBoundary>
           ${
             dev

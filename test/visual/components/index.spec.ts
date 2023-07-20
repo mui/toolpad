@@ -40,23 +40,25 @@ test('showing grid while resizing elements', async ({ page, argosScreenshot }) =
 
   await editorModel.waitForOverlay();
 
-  const image = editorModel.appCanvas.locator('img').first();
+  await editorModel.goToPage('rows');
 
-  await clickCenter(page, image);
+  const firstText = editorModel.appCanvas.getByText('text').first();
 
-  const imageBoundingBox = await image.boundingBox();
+  await clickCenter(page, firstText);
+
+  const firstTextBoundingBox = await firstText.boundingBox();
 
   await page.mouse.move(
-    imageBoundingBox!.x + imageBoundingBox!.width - 5,
-    imageBoundingBox!.y + imageBoundingBox!.height / 2,
+    firstTextBoundingBox!.x + firstTextBoundingBox!.width - 5,
+    firstTextBoundingBox!.y + firstTextBoundingBox!.height / 2,
     { steps: 10 },
   );
 
   await page.mouse.down();
 
   await page.mouse.move(
-    imageBoundingBox!.x + imageBoundingBox!.width / 2,
-    imageBoundingBox!.y + imageBoundingBox!.height / 2,
+    firstTextBoundingBox!.x + firstTextBoundingBox!.width / 2,
+    firstTextBoundingBox!.y + firstTextBoundingBox!.height / 2,
     { steps: 10 },
   );
 

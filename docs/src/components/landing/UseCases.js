@@ -9,7 +9,7 @@ import Typography from '@mui/material/Typography';
 import HandymanRoundedIcon from '@mui/icons-material/HandymanRounded';
 import AdminPanelSettingsRoundedIcon from '@mui/icons-material/AdminPanelSettingsRounded';
 import DashboardRoundedIcon from '@mui/icons-material/DashboardRounded';
-import LibraryAddRoundedIcon from '@mui/icons-material/LibraryAddRounded';
+import AutoAwesomeRoundedIcon from '@mui/icons-material/AutoAwesomeRounded';
 import SectionHeadline from 'docs/src/components/typography/SectionHeadline';
 import GradientText from 'docs/src/components/typography/GradientText';
 import Grid from '@mui/material/Unstable_Grid2';
@@ -23,13 +23,13 @@ const ImageContainer = styled(Box)(({ theme }) => [
     borderRadius: 16,
     padding: 8,
     paddingBottom: 4,
-    background: `linear-gradient(120deg, ${(theme.vars || theme).palette.primary[50]} 0%, ${alpha(
-      theme.palette.primary[100],
-      0.2,
+    background: `linear-gradient(120deg, ${(theme.vars || theme).palette.grey[50]} 0%, ${alpha(
+      theme.palette.primary[50],
+      0.5,
     )} 150%)`,
     border: '1px solid',
-    borderColor: `${alpha(theme.palette.primary[100], 0.6)}`,
-    boxShadow: `0 4px 12px ${alpha(theme.palette.grey[100], 0.5)}`,
+    borderColor: (theme.vars || theme).palette.grey[100],
+    boxShadow: `0 4px 8px ${alpha(theme.palette.grey[100], 0.5)}`,
     overflow: 'hidden',
   },
   theme.applyDarkStyles({
@@ -37,7 +37,7 @@ const ImageContainer = styled(Box)(({ theme }) => [
       (theme.vars || theme).palette.primaryDark[500]
     } 0%, ${alpha(theme.palette.primaryDark[800], 0.4)} 150%)`,
     borderColor: `${alpha(theme.palette.primaryDark[300], 0.3)}`,
-    boxShadow: `4px 0 60px ${alpha(theme.palette.primaryDark[600], 0.5)}`,
+    boxShadow: `0 4px 8px ${alpha(theme.palette.primaryDark[600], 0.5)}`,
   }),
 ]);
 
@@ -49,7 +49,7 @@ const Img = styled('img')(({ theme }) => [
     height: '100%',
     borderRadius: 10,
     border: '1px solid',
-    borderColor: `${alpha(theme.palette.primary[100], 0.6)}`,
+    borderColor: (theme.vars || theme).palette.grey[100],
   },
   theme.applyDarkStyles({
     borderColor: (theme.vars || theme).palette.primaryDark[700],
@@ -61,8 +61,8 @@ function ContentCard({ icon, title, description, href }) {
     <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5, mt: 2 }}>
       <Typography
         component="h3"
-        variant="h6"
-        fontWeight="semiBold"
+        variant="subtitle1"
+        fontWeight="bold"
         color="text.primary"
         sx={{ display: 'flex', alignItems: 'center', gap: 1 }}
       >
@@ -72,7 +72,7 @@ function ContentCard({ icon, title, description, href }) {
       <Typography variant="body" color="text.secondary">
         {description}
       </Typography>
-      <Link href={href} variant="body" sx={{ mt: 1 }}>
+      <Link href={href} variant="body" sx={{ mt: 0.5 }}>
         View more
         <KeyboardArrowRightRounded fontSize="small" />
       </Link>
@@ -172,11 +172,11 @@ export default function CardGrid() {
                 }),
               ]}
             >
-              <LibraryAddRoundedIcon color="primary" sx={{ mb: 2 }} />
+              <AutoAwesomeRoundedIcon color="warning" sx={{ mb: 2 }} />
               <Typography
                 component="h3"
-                variant="body"
-                fontWeight="semiBold"
+                variant="subtitle1"
+                fontWeight="bold"
                 color="text.primary"
                 gutterBottom
                 sx={{ display: 'flex', alignItems: 'center', gap: 1 }}

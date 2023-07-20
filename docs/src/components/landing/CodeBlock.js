@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import { TypeScript } from '@mui/docs';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
+import { alpha } from '@mui/material/styles';
 import HighlightedCode from 'docs/src/modules/components/HighlightedCode';
 import MarkdownElement from 'docs/src/components/markdown/MarkdownElement';
 
@@ -28,37 +29,6 @@ export async function deleteCustomer(id: number) {
 }
 `;
 
-function WindowCircles() {
-  return (
-    <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.7 }}>
-      <Box
-        sx={(theme) => ({
-          height: 9,
-          width: 9,
-          borderRadius: 99,
-          backgroundColor: (theme.vars || theme).palette.error[400],
-        })}
-      />
-      <Box
-        sx={(theme) => ({
-          height: 9,
-          width: 9,
-          borderRadius: 99,
-          backgroundColor: (theme.vars || theme).palette.warning[400],
-        })}
-      />
-      <Box
-        sx={(theme) => ({
-          height: 9,
-          width: 9,
-          borderRadius: 99,
-          backgroundColor: (theme.vars || theme).palette.success[400],
-        })}
-      />
-    </Box>
-  );
-}
-
 export default function CodeBlock({ appMode }) {
   return (
     <Box
@@ -74,13 +44,13 @@ export default function CodeBlock({ appMode }) {
         border: '1px solid',
         borderColor: (theme.vars || theme).palette.primaryDark[700],
         backfaceVisibility: 'hidden',
-        transition: 'all 0.6s ease',
+        transition: 'all 0.3s ease',
         transform: appMode
           ? { xs: 'rotateY(180deg)', sm: 'unset', md: 'rotateY(180deg)' }
           : 'unset',
         ...theme.applyDarkStyles({
           borderColor: (theme.vars || theme).palette.divider,
-          boxShadow: '0px 2px 16px rgba(0,0,0, 0.5)',
+          boxShadow: `0 4px 8px ${alpha(theme.palette.primaryDark[900], 0.8)}`,
         }),
       })}
     >
@@ -97,18 +67,17 @@ export default function CodeBlock({ appMode }) {
           }),
         })}
       >
-        <WindowCircles />
         <Typography
-          color="grey.200"
+          color="grey.400"
           sx={{
-            fontFamily: 'monospace',
-            fontSize: 10,
+            fontFamily: 'Menlo',
+            fontSize: 12,
             display: 'flex',
             alignItems: 'center',
             gap: 0.5,
           }}
         >
-          <TypeScript fontSize="small" sx={{ color: 'primary.300', borderRadius: 2 }} />
+          <TypeScript fontSize="small" sx={{ color: 'primary.300', borderRadius: 2 }} />/
           toolpad/resources/functions.ts
         </Typography>
       </Box>

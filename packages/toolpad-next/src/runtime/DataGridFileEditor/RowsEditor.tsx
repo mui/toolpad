@@ -21,7 +21,7 @@ export interface RowsEditorProps {
 export default function RowsEditor({ value, onChange }: RowsEditorProps) {
   return (
     <Stack direction="row">
-      <Box sx={{ flex: 1 }}>
+      <Box sx={{ flex: 1, p: 2 }}>
         <TextField
           select
           value={value.kind ?? 'property'}

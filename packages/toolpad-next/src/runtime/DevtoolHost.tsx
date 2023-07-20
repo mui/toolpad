@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Box, ThemeProvider, GlobalStyles } from '@mui/material';
+import { Box, ThemeProvider, GlobalStyles, Portal } from '@mui/material';
 import theme from './theme';
 
 interface ResizeHandleProps {
@@ -80,27 +80,40 @@ export default function DevtoolHost({ children }: DevtoolHostProps) {
   };
 
   return (
-    <ThemeProvider theme={theme}>
-      <GlobalStyles styles={{ body: { marginBottom: `${height}px` } }} />
-      <Box
-        ref={rootRef}
-        sx={{
-          position: 'fixed',
-          bottom: 0,
-          left: 0,
-          right: 0,
-          height,
-          borderTop: 1,
-          borderColor: 'divider',
-          backgroundColor: 'background.paper',
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'stretch',
-        }}
-      >
-        <ResizeHandle onResize={handleResize} />
-        <Box sx={{ flex: 1, minHeight: 0 }}>{children}</Box>
-      </Box>
-    </ThemeProvider>
+    <Portal>
+      <ThemeProvider theme={theme}>
+        <GlobalStyles styles={{ body: { marginBottom: `${height}px` } }} />
+        <Box
+          ref={rootRef}
+          className="mui-fixed"
+          sx={{
+            position: 'fixed',
+            bottom: 0,
+            left: 0,
+            right: 0,
+            height,
+            borderTop: 1,
+            borderColor: 'divider',
+            backgroundColor: 'background.paper',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'stretch',
+          }}
+        >
+          <ResizeHandle onResize={handleResize} />
+          <Box
+            sx={{
+              flex: 1,
+              minHeight: 0,
+              marginRight: '-1px',
+              borderRight: 1,
+              borderColor: 'divider',
+            }}
+          >
+            {children}
+          </Box>
+        </Box>
+      </ThemeProvider>
+    </Portal>
   );
 }

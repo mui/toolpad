@@ -65,7 +65,7 @@ export function withDevtool<P extends object>(
                 '> *': {
                   outlineColor: (theme) => theme.palette.secondary.main,
                   outlineStyle: 'solid',
-                  outlineWidth: 3,
+                  outlineWidth: 2,
                 },
               }}
             >

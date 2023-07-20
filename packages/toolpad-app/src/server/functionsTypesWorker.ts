@@ -412,6 +412,8 @@ export default async function extractTypes({
 
   const checker = program.getTypeChecker();
 
+  const usingCreateFunction = [];
+
   const files: FileIntrospectionResult[] = entryPoints
     .map((entrypoint) => {
       const sourceFile = program.getSourceFile(entrypoint);
@@ -445,6 +447,9 @@ export default async function extractTypes({
           }
 
           const isCreateFunction = isToolpadCreateFunction(exportType);
+          if (isCreateFunction) {
+            usingCreateFunction.push(symbol.name);
+          }
           return {
             name: symbol.name,
             isCreateFunction,
@@ -469,6 +474,16 @@ export default async function extractTypes({
     })
     .filter(Boolean)
     .sort((a, b) => a.name.localeCompare(b.name));
+
+  console.warn(
+    `${chalk.yellow('warn')} - ${chalk.bold(
+      usingCreateFunction.length,
+    )} function are using the deprecated ${chalk.red(
+      'createFunction',
+    )} API. This will be removed from Toolpad in a future release. Please see ${chalk.underline(
+      chalk.blue('https://mui.com/toolpad/reference/api/create-function/'),
+    )} for migration information and updates.`,
+  );
 
   return { files };
 }

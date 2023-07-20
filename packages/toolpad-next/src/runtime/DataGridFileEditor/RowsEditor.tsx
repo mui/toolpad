@@ -64,11 +64,7 @@ function applySelector(data: any, selector: string): any {
 }
 
 async function executeFetch(spec: FetchSpec) {
-  if (!spec.url) {
-    throw new Error(`Url required`);
-  }
-
-  const response = await fetch(spec.url, { method: spec.method });
+  const response = await fetch(spec.url || '', { method: spec.method });
 
   if (!response.ok) {
     throw new Error(`Request failed with status ${response.status}`);

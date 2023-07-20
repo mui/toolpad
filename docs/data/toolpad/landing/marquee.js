@@ -3,7 +3,7 @@ import ROUTES from '../../../src/route';
 const marquee = {
   title: 'Stay updated!',
   subtitle:
-    'Subscribe to Toolpad newsletter and stay in the loop by receiving product roundups and success stories from our beta users.',
+    'Subscribe to the Toolpad newsletter and stay in the loop by receiving product updates & success stories from  beta users.',
   action: {
     href: ROUTES.toolpadQuickstart,
   },

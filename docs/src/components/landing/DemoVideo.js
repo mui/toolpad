@@ -40,7 +40,6 @@ const VideoContainer = styled(Box)(({ theme }) => [
 const Video = styled('video')(({ theme }) => [
   {
     overflow: 'hidden',
-    objectFit: 'cover',
     width: '100%',
     height: '100%',
     borderRadius: 10,

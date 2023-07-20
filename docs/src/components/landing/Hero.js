@@ -91,7 +91,7 @@ function TypingAnimation() {
         setFullText(words[nextIndex]);
         setText('');
         setLetterIndex(0);
-      }, 2000);
+      }, 1200);
     }
     return () => clearTimeout(timer);
   });

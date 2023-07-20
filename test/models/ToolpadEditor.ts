@@ -153,16 +153,16 @@ export class ToolpadEditor {
     return this.page.getByTestId('component-catalog').getByRole('button', { name });
   }
 
-  async dragNewComponentToAppCanvas(componentName: string) {
+  async dragNewComponentToAppCanvas(componentName: string, targetX?: number, targetY?: number) {
     const style = await this.page.addStyleTag({ content: `* { transition: none !important; }` });
 
     await this.componentCatalog.hover();
 
     const targetBoundingBox = await this.pageRoot.boundingBox();
-    await expect(targetBoundingBox).toBeDefined();
+    expect(targetBoundingBox).toBeDefined();
 
-    const moveTargetX = targetBoundingBox!.x + targetBoundingBox!.width / 2;
-    const moveTargetY = targetBoundingBox!.y + targetBoundingBox!.height / 2;
+    const moveTargetX = targetX || targetBoundingBox!.x + targetBoundingBox!.width / 2;
+    const moveTargetY = targetY || targetBoundingBox!.y + targetBoundingBox!.height / 2;
 
     const sourceLocator = this.getComponentCatalogItem(componentName);
     await expect(sourceLocator).toBeVisible();

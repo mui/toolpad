@@ -12,20 +12,20 @@ import { PrismaClient, Prisma } from '@prisma/client';
 
 const prisma = new PrismaClient();
 
-export async function getCustomers() {
-  return prisma.customer.findMany();
+export async function getUsers() {
+  return prisma.user.findMany();
 }
 
-export async function addCustomer(customer: Prisma.CustomerCreateInput) {
-  return prisma.customer.create({ data: customer });
+export async function addUser(user: Prisma.UserCreateInput) {
+  return prisma.user.create({ data: user });
 }
 
-export async function updateCustomer(id: number) {
-  return prisma.customer.update({ where: { id } });
+export async function updateUser(id: number) {
+  return prisma.user.update({ where: { id } });
 }
 
-export async function deleteCustomer(id: number) {
-  return prisma.customer.delete({ where: { id } });
+export async function deleteUser(id: number) {
+  return prisma.customer.user({ where: { id } });
 }
 `;
 

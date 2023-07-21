@@ -8,6 +8,7 @@ services:
     buildCommand: yarn && yarn build
     startCommand: yarn start
     pullRequestPreviewsEnabled: true
+    plan: standard
     envVars:
       - key: NODE_VERSION
         value: 16

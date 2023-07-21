@@ -30,7 +30,7 @@ const features = {
       title: 'Use your IDE',
       wip: false,
       description:
-        'Build low-code with pro-code extensibility. Use your IDE for bringing data to the canvas.',
+        'Build low-code with pro-code extensibility. Use your IDE to write code and bring data to the canvas.',
     },
     {
       icon: <LinkIcon fontSize="small" color="primary" />,

@@ -115,3 +115,20 @@ test('code editor auto-complete', async ({ page }) => {
   await page.keyboard.type('textF');
   await expect(page.getByRole('option', { name: 'textField' })).toBeVisible();
 });
+
+test('cancel the status of active when click the white space', async ({ page }) => {
+  const editorModel = new ToolpadEditor(page);
+
+  await editorModel.goToPageById('K7SkzhT');
+
+  await editorModel.waitForOverlay();
+
+  const text = editorModel.appCanvas.getByText('text-foo');
+
+  await clickCenter(page, text);
+  await expect(editorModel.appCanvas.getByTestId('node-hud-tag')).toBeVisible();
+  const element = await editorModel.appCanvas.locator('.Toolpad_HudOverlay');
+  await clickCenter(page, element);
+  const hudButton1 = await editorModel.appCanvas.getByTestId('node-hud-tag');
+  await expect(hudButton1).toBeHidden();
+});

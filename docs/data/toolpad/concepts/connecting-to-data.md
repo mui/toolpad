@@ -123,7 +123,7 @@ To be really useful, you need to connect these queries with data present on your
 
 - ### Custom Functions
 
-  All function arguments will be available in the query editor to bind state to. Make sure to annotate them correctly with their typescript types. Toolpad uses this information to present you with correctly type databinding controls. For example:
+  All function arguments will be available in the query editor to bind state to. Make sure to annotate them correctly with their typescript types. Toolpad uses this information to present you with correctly typed databinding controls. For example:
 
   ```jsx
   export async function getAnimals(
@@ -142,7 +142,7 @@ To be really useful, you need to connect these queries with data present on your
 {{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/concepts/connecting-to-data/custom-function-params.png", "alt": "Controls for custom function parameters", "caption": "Controls for custom function parameters", "indent": 1, "zoom": false, "width": 639}}
 
 :::info
-Toolpad also provides a `createFunction` API to be able to define your parameters when creating custom functions. This API is now deprecated:
+Toolpad also provides a `createFunction` API to be able to define your parameters when creating custom functions:
 
 ```jsx
 import { createFunction } from '@mui/toolpad/server';
@@ -165,7 +165,7 @@ export const example = createFunction(
 
 This will make the `value` property available in the query editor. You can pass a value, or bind this to the page state:
 
-See the `createFunction` [reference](/toolpad/reference/api/create-function/) section for complete details on this API
+This API is now deprecated, and will be removed from a future version of Toolpad. Find more details in the `createFunction` [reference](/toolpad/reference/api/create-function/) section.
 :::
 
 ## Mode
@@ -232,33 +232,24 @@ Toolpad has access to the environment variables defined in the `.env` file at th
   ```ts
   import { Configuration, OpenAIApi } from 'openai';
 
-  export const askGPT = createFunction(
-    async function open4({ parameters }) {
-      const configuration = new Configuration({
-        apiKey: process.env.OPENAI_API_KEY,
-      });
+  export async function askGPT(messages: string[]) {
+    const configuration = new Configuration({
+      apiKey: process.env.OPENAI_API_KEY,
+    });
 
-      const openai = new OpenAIApi(configuration);
-      const completion = await openai.createChatCompletion({
-        model: 'gpt-3.5-turbo',
-        messages: parameters.messages,
-      });
+    const openai = new OpenAIApi(configuration);
+    const completion = await openai.createChatCompletion({
+      model: 'gpt-3.5-turbo',
+      messages: messages,
+    });
 
-      const response = completion.data?.choices[0].message ?? {
-        role: 'assistant',
-        content: 'No response',
-      };
+    const response = completion.data?.choices[0].message ?? {
+      role: 'assistant',
+      content: 'No response',
+    };
 
-      return response;
-    },
-    {
-      parameters: {
-        messages: {
-          type: 'array',
-        },
-      },
-    },
-  );
+    return response;
+  }
   ```
 
   You can then use this function on your page:

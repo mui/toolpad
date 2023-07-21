@@ -401,6 +401,8 @@ export interface ExtractTypesParams {
   resourcesFolder: string;
 }
 
+let createFunctionWarningShown = false;
+
 export default async function extractTypes({
   resourcesFolder,
 }: ExtractTypesParams): Promise<IntrospectionResult> {
@@ -411,6 +413,8 @@ export default async function extractTypes({
   const program = ts.createProgram(entryPoints, tsConfig);
 
   const checker = program.getTypeChecker();
+
+  const usingCreateFunction = [];
 
   const files: FileIntrospectionResult[] = entryPoints
     .map((entrypoint) => {
@@ -445,6 +449,9 @@ export default async function extractTypes({
           }
 
           const isCreateFunction = isToolpadCreateFunction(exportType);
+          if (isCreateFunction) {
+            usingCreateFunction.push(symbol.name);
+          }
           return {
             name: symbol.name,
             isCreateFunction,
@@ -469,6 +476,19 @@ export default async function extractTypes({
     })
     .filter(Boolean)
     .sort((a, b) => a.name.localeCompare(b.name));
+
+  if (usingCreateFunction.length > 0 && !createFunctionWarningShown) {
+    console.warn(
+      `${chalk.yellow('warn')} - ${chalk.bold(usingCreateFunction.length)} function${
+        usingCreateFunction.length === 1 ? ' is' : 's are'
+      } using the deprecated ${chalk.red(
+        'createFunction',
+      )} API. This will be removed from Toolpad in a future release. Please see ${chalk.underline(
+        chalk.blue('https://mui.com/toolpad/reference/api/create-function/'),
+      )} for migration information and updates.`,
+    );
+    createFunctionWarningShown = true;
+  }
 
   return { files };
 }

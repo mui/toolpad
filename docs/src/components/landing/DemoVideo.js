@@ -29,10 +29,11 @@ const VideoContainer = styled(Box)(({ theme }) => [
     },
   },
   theme.applyDarkStyles({
-    background: `linear-gradient(120deg, ${
-      (theme.vars || theme).palette.primaryDark[500]
-    } 0%, ${alpha(theme.palette.primaryDark[800], 0.4)} 150%)`,
-    borderColor: `${alpha(theme.palette.primaryDark[300], 0.3)}`,
+    background: `linear-gradient(120deg, ${alpha(theme.palette.primary[700], 0.5)} 0%, ${alpha(
+      theme.palette.primary[800],
+      0.4,
+    )} 150%)`,
+    borderColor: `${alpha(theme.palette.primary[300], 0.3)}`,
     boxShadow: `4px 0 40px ${alpha(theme.palette.primary[600], 0.5)}`,
   }),
 ]);
@@ -47,7 +48,7 @@ const Video = styled('video')(({ theme }) => [
     borderColor: `${alpha(theme.palette.primary[100], 0.6)}`,
   },
   theme.applyDarkStyles({
-    borderColor: (theme.vars || theme).palette.primaryDark[700],
+    borderColor: `${alpha(theme.palette.primary[700], 0.5)}`,
   }),
 ]);
 

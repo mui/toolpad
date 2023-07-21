@@ -122,7 +122,7 @@ export default function Hero() {
       if (isLargerThanMd || isSmallerThanSm) {
         setFrameIndex((prev) => (prev + 1) % 6);
       }
-    }, 3000);
+    }, 4000);
     return () => clearInterval(loop);
   }, [pauseHeroAnimation, frameIndex, isLargerThanMd, isSmallerThanSm]);
 
@@ -161,7 +161,7 @@ export default function Hero() {
             sx={[
               (theme) => ({
                 pb: 0.15,
-                ml: 0.5,
+                ml: 0.8,
                 background: alpha(theme.palette.primary[50], 0.5),
                 borderColor: (theme.vars || theme).palette.primary[100],
                 ...theme.applyDarkStyles({

@@ -4,6 +4,8 @@
 
 {{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/marketing/npm-stats.png", "alt": "Analytics dashboard", "caption": "Analytics dashboard showing download stats of Toolpad NPM package"}}
 
+[Open live demo](https://npm-stats.onrender.com/prod/pages/evZC-gp)
+
 [![Open in StackBlitz](https://developer.stackblitz.com/img/open_in_stackblitz.svg)](https://stackblitz.com/fork/github/mui/mui-toolpad/tree/master/examples/npm-stats)
 
 This app demonstrates following capabilities of Toolpad:

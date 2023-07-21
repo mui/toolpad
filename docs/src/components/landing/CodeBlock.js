@@ -2,12 +2,16 @@ import * as React from 'react';
 import PropTypes from 'prop-types';
 import { TypeScript } from '@mui/docs';
 import Box from '@mui/material/Box';
+import Tab from '@mui/material/Tab';
+import TabContext from '@mui/lab/TabContext';
+import TabList from '@mui/lab/TabList';
+import TabPanel from '@mui/lab/TabPanel';
 import Typography from '@mui/material/Typography';
 import { alpha } from '@mui/material/styles';
 import HighlightedCode from 'docs/src/modules/components/HighlightedCode';
 import MarkdownElement from 'docs/src/components/markdown/MarkdownElement';
 
-export const componentCode = [
+export const code = [
   `  
 import { PrismaClient, Prisma } from '@prisma/client';
 
@@ -28,6 +32,7 @@ export async function updateUser(id: number) {
 export async function deleteUser(id: number) {
   return prisma.customer.user({ where: { id } });
 }`,
+
   `
 import Stripe from "stripe";
 import path from "path";
@@ -73,6 +78,7 @@ export async function downloadPDF(limit: number = 100) {
   } while (listInvoices.has_more);
 }
 `,
+
   `
 import mysql from 'mysql2/promise';  
 import SSH2Promise from 'ssh2-promise';
@@ -137,9 +143,24 @@ async function connectionFn(multiple = false) {
 }`,
 ];
 
-const filenames = ['users.ts', 'stripeInvoices.ts', 'orders.ts'];
+export const filenames = ['users.ts', 'stripeInvoice.tsx', 'orders.ts'];
 
-export default function CodeBlock({ appMode, fileIndex }) {
+function a11yProps(index) {
+  return {
+    id: `simple-tab-${index}`,
+    'aria-controls': `simple-tabpanel-${index}`,
+  };
+}
+
+export default function CodeBlock({ appMode, fileIndex, setFrameIndex, allowTabNavigation }) {
+  const handleTabChange = React.useCallback(
+    (event, newValue) => {
+      if (allowTabNavigation) {
+        setFrameIndex(newValue * 2);
+      }
+    },
+    [allowTabNavigation, setFrameIndex],
+  );
   return (
     <Box
       className="MuiToolpadHero-codeBlock"
@@ -147,16 +168,14 @@ export default function CodeBlock({ appMode, fileIndex }) {
         gridRowStart: 1,
         gridRowEnd: 2,
         minWidth: { xs: 'unset', sm: '50%', md: '200%', lg: 560 },
-        maxHeight: { xs: 240, sm: 420 },
-        overflowY: 'scroll',
+        maxHeight: { xs: 240, sm: 315, md: 420 },
+        overflowY: 'auto',
         overflowX: 'inherit',
         position: { xs: 'relative', sm: 'absolute', md: 'relative' },
         bottom: { xs: 'unset', sm: 0, md: 'unset' },
         zIndex: 20,
         borderRadius: 1,
         backgroundColor: (theme.vars || theme).palette.primaryDark[800],
-        border: '1px solid',
-        borderColor: (theme.vars || theme).palette.primaryDark[700],
         backfaceVisibility: 'hidden',
         transition: 'all 0.3s ease',
         transform: appMode
@@ -168,51 +187,104 @@ export default function CodeBlock({ appMode, fileIndex }) {
         }),
       })}
     >
-      <Box
-        sx={(theme) => ({
-          display: 'flex',
-          alignItems: 'center',
-          gap: 1,
-          p: 1.5,
-          borderBottom: '1px solid',
-          borderColor: (theme.vars || theme).palette.primaryDark[700],
-          ...theme.applyDarkStyles({
-            borderColor: (theme.vars || theme).palette.primaryDark[700],
-          }),
-        })}
-      >
-        <Typography
-          color="grey.400"
-          sx={{
-            fontFamily: 'Menlo',
-            fontSize: 12,
+      <TabContext value={fileIndex.toString()}>
+        <Box
+          sx={(theme) => ({
             display: 'flex',
             alignItems: 'center',
-            gap: 0.5,
-          }}
+            gap: 1,
+            p: 0,
+            ml: 0.5,
+            borderBottom: '1px solid',
+            backgroundColor: (theme.vars || theme).palette.primaryDark[700],
+            position: 'sticky',
+            top: 0,
+            zIndex: 100,
+            borderColor: (theme.vars || theme).palette.primaryDark[700],
+            ...theme.applyDarkStyles({
+              borderColor: (theme.vars || theme).palette.primaryDark[700],
+            }),
+          })}
         >
-          <TypeScript fontSize="small" sx={{ color: 'primary.300', borderRadius: 2 }} />/
-          {`toolpad/resources/${filenames[fileIndex]}`}
-        </Typography>
-      </Box>
-      <HighlightedCode
-        copyButtonHidden
-        component={MarkdownElement}
-        code={componentCode[fileIndex]}
-        language="jsx"
-        sx={{
-          p: 1.5,
-          fontSize: (theme) => ({
-            xs: theme.typography.pxToRem(8.5),
-            md: theme.typography.pxToRem(12),
-          }),
-        }}
-      />
+          <Typography
+            color="grey.400"
+            sx={{
+              fontFamily: 'Menlo',
+              fontSize: 10,
+              display: 'flex',
+              alignItems: 'center',
+              gap: 0.5,
+              ml: 0.5,
+            }}
+          >
+            <TypeScript fontSize="small" sx={{ color: 'primary.300', borderRadius: 2 }} />/
+            {`toolpad/resources/`}
+          </Typography>
+
+          <TabList
+            aria-label="tabs"
+            onChange={handleTabChange}
+            variant="scrollable"
+            scrollButtons="auto"
+            sx={{
+              position: 'sticky',
+              '& .MuiTabs-indicator': {
+                display: allowTabNavigation ? 'block' : 'none',
+              },
+            }}
+          >
+            {filenames.map((file, index) => (
+              <Tab
+                wrapped
+                label={file}
+                value={index.toString()}
+                key={index}
+                sx={{
+                  pointerEvents: allowTabNavigation ? 'auto' : 'none',
+                  cursor: allowTabNavigation ? 'pointer' : 'default',
+                  borderBottom: allowTabNavigation ? 'none' : '1px solid',
+                  borderColor:
+                    index === fileIndex && !allowTabNavigation ? 'primary.300' : 'transparent',
+                }}
+                {...a11yProps(index)}
+              />
+            ))}
+          </TabList>
+        </Box>
+        {filenames.map((file, index) => (
+          <TabPanel
+            value={index.toString()}
+            key={index}
+            sx={{
+              m: 0,
+              p: 0,
+              // https://github.com/mui/material-ui/blob/master/docs/src/modules/components/MarkdownElement.js#L23
+              backgroundColor: '#0F1924',
+            }}
+          >
+            <HighlightedCode
+              copyButtonHidden
+              component={MarkdownElement}
+              code={code[index]}
+              language="tsx"
+              sx={{
+                p: 1.5,
+                fontSize: (theme) => ({
+                  xs: theme.typography.pxToRem(8.5),
+                  md: theme.typography.pxToRem(12),
+                }),
+              }}
+            />
+          </TabPanel>
+        ))}
+      </TabContext>
     </Box>
   );
 }
 
 CodeBlock.propTypes = {
+  allowTabNavigation: PropTypes.bool,
   appMode: PropTypes.bool,
   fileIndex: PropTypes.number,
+  setFrameIndex: PropTypes.func,
 };

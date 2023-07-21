@@ -119,18 +119,26 @@ export default function Hero() {
       if (!pauseHeroAnimation) {
         setHeroAppMode((prev) => !prev);
       }
-      if (isLargerThanMd || isSmallerThanSm) {
+      if ((isLargerThanMd || isSmallerThanSm) && !pauseHeroAnimation) {
         setFrameIndex((prev) => (prev + 1) % 6);
       }
-    }, 4000);
+    }, 3000);
     return () => clearInterval(loop);
   }, [pauseHeroAnimation, frameIndex, isLargerThanMd, isSmallerThanSm]);
 
   const fileIndex = Math.floor(frameIndex / 2);
+  const allowTabNavigation = !isLargerThanMd && !isSmallerThanSm;
 
   return (
     <ToolpadHeroContainer>
-      <Box sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+      <Box
+        sx={{
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'center',
+          maxWidth: { md: 500, lg: 600, xl: 'unset' },
+        }}
+      >
         <Typography
           fontWeight="bold"
           variant="body2"
@@ -257,7 +265,12 @@ export default function Hero() {
             height="1592"
           />
         </Box>
-        <CodeBlock appMode={heroAppMode} fileIndex={fileIndex} />
+        <CodeBlock
+          appMode={heroAppMode}
+          fileIndex={fileIndex}
+          setFrameIndex={setFrameIndex}
+          allowTabNavigation={allowTabNavigation}
+        />
         <Box
           sx={{
             display: { xs: 'grid', sm: 'none', md: 'grid' },

@@ -44,6 +44,7 @@ import { OverlayGrid, OverlayGridHandle } from './OverlayGrid';
 import { NodeInfo } from '../../../../types';
 import NodeDropArea from './NodeDropArea';
 import type { ToolpadBridge } from '../../../../canvas/ToolpadBridge';
+import { PinholeOverlay } from '../../../../PinholeOverlay';
 
 const VERTICAL_RESIZE_SNAP_UNITS = 2; // px
 
@@ -60,14 +61,9 @@ const overlayClasses = {
 };
 
 const OverlayRoot = styled('div')({
+  pointerEvents: 'none',
   width: '100%',
   height: '100%',
-  pointerEvents: 'initial',
-  position: 'absolute',
-  top: 0,
-  left: 0,
-  bottom: 0,
-  right: 0,
   '&:focus': {
     outline: 'none',
   },
@@ -80,8 +76,9 @@ const OverlayRoot = styled('div')({
   [`&.${overlayClasses.resizeVertical}`]: {
     cursor: 'ns-resize',
   },
-  [`&.${overlayClasses.hudOverlay}`]: {
-    pointerEvents: 'none !important',
+  [`.${overlayClasses.hudOverlay}`]: {
+    position: 'absolute',
+    inset: '0 0 0 0',
   },
 });
 
@@ -1559,7 +1556,6 @@ export default function RenderOverlay({ bridge }: RenderOverlayProps) {
           draggedEdge === RECTANGLE_EDGE_LEFT || draggedEdge === RECTANGLE_EDGE_RIGHT,
         [overlayClasses.resizeVertical]:
           draggedEdge === RECTANGLE_EDGE_TOP || draggedEdge === RECTANGLE_EDGE_BOTTOM,
-        [overlayClasses.hudOverlay]: selectedRect,
       })}
       // Need this to be able to capture key events
       tabIndex={0}
@@ -1657,6 +1653,7 @@ export default function RenderOverlay({ bridge }: RenderOverlayProps) {
             This allows interactivity on the selected element only, while maintaining
             a reliable click target for the rest of the page 
       */}
+      <PinholeOverlay className={overlayClasses.hudOverlay} pinhole={selectedRect} />
       {draggedEdge ? <OverlayGrid ref={overlayGridRef} /> : null}
     </OverlayRoot>
   );

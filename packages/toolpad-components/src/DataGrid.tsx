@@ -460,12 +460,8 @@ const DataGridComponent = React.forwardRef(function DataGridComponent(
     apiRef.current.updateColumns(columns);
   }, [apiRef, columns]);
 
-  // The grid doesn't update when the getRowId or columns properties change, so it needs to be remounted
-  // TODO: remove columns from this equation once https://github.com/mui/mui-x/issues/5970 gets resolved
-  const gridKey = React.useMemo(
-    () => [getObjectKey(getRowId), getObjectKey(columns)].join('::'),
-    [getRowId, columns],
-  );
+  // The grid doesn't update when the getRowId property changes, so it needs to be remounted
+  const gridKey = React.useMemo(() => getObjectKey(getRowId), [getRowId]);
 
   const error: Error | null = errorProp ? errorFrom(errorProp) : null;
 
@@ -481,9 +477,9 @@ const DataGridComponent = React.forwardRef(function DataGridComponent(
       >
         <DataGridPro
           apiRef={apiRef}
-          components={{
-            Toolbar: hideToolbar ? null : GridToolbar,
-            LoadingOverlay: SkeletonLoadingOverlay,
+          slots={{
+            toolbar: hideToolbar ? null : GridToolbar,
+            loadingOverlay: SkeletonLoadingOverlay,
           }}
           onColumnResize={handleResize}
           onColumnOrderChange={handleColumnOrderChange}

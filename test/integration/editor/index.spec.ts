@@ -44,7 +44,7 @@ test('can move elements in page', async ({ page }) => {
   const moveTargetX = secondTextFieldBoundingBox!.x + secondTextFieldBoundingBox!.width;
   const moveTargetY = secondTextFieldBoundingBox!.y + secondTextFieldBoundingBox!.height / 2;
 
-  await editorModel.dragToAppCanvas(
+  await editorModel.dragTo(
     editorModel.appCanvas.getByTestId('node-hud-tag'),
     moveTargetX,
     moveTargetY,
@@ -127,7 +127,7 @@ test('must correctly size new layout columns', async ({ page }) => {
 
   // Drag new element to same row as existing element
 
-  await editorModel.dragNewComponentToAppCanvas(
+  await editorModel.dragNewComponentTo(
     'FullWidth',
     firstFullWidthBoundingBox1!.x + (3 / 4) * firstFullWidthBoundingBox1!.width,
     firstFullWidthBoundingBox1!.y + firstFullWidthBoundingBox1!.height / 2,
@@ -140,7 +140,7 @@ test('must correctly size new layout columns', async ({ page }) => {
 
   // Drag new element to same row as existing same-width elements
 
-  await editorModel.dragNewComponentToAppCanvas(
+  await editorModel.dragNewComponentTo(
     'FullWidth',
     secondFullWidthBoundingBox2!.x + (3 / 4) * secondFullWidthBoundingBox2!.width,
     secondFullWidthBoundingBox2!.y + secondFullWidthBoundingBox2!.height / 2,
@@ -157,7 +157,7 @@ test('must correctly size new layout columns', async ({ page }) => {
 
   const fifthFullWidthBoundingBox = await getNthFullWidthBoundingBox(4);
 
-  await editorModel.dragNewComponentToAppCanvas(
+  await editorModel.dragNewComponentTo(
     'FullWidth',
     fifthFullWidthBoundingBox!.x + (3 / 4) * fifthFullWidthBoundingBox!.width,
     fifthFullWidthBoundingBox!.y + fifthFullWidthBoundingBox!.height / 2,

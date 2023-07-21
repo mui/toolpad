@@ -127,23 +127,14 @@ export class ToolpadEditor {
     await setTimeout(100);
   }
 
-  async dragToAppCanvas(sourceLocator: Locator, moveTargetX: number, moveTargetY: number) {
+  async dragTo(sourceLocator: Locator, moveTargetX: number, moveTargetY: number) {
     const sourceBoundingBox = await sourceLocator.boundingBox();
-    const targetBoundingBox = await this.pageRoot.boundingBox();
-
-    expect(sourceBoundingBox).toBeDefined();
-    expect(targetBoundingBox).toBeDefined();
 
     await this.page.mouse.move(
       sourceBoundingBox!.x + sourceBoundingBox!.width / 2,
       sourceBoundingBox!.y + sourceBoundingBox!.height / 2,
       { steps: 10 },
     );
-
-    await expect(sourceLocator).toBeVisible();
-
-    const appCanvasFrame = this.page.frame('data-toolpad-canvas');
-    expect(appCanvasFrame).toBeDefined();
 
     await this.page.mouse.down();
 
@@ -156,11 +147,7 @@ export class ToolpadEditor {
     return this.page.getByTestId('component-catalog').getByRole('button', { name });
   }
 
-  async dragNewComponentToAppCanvas(
-    componentName: string,
-    moveTargetX?: number,
-    moveTargetY?: number,
-  ) {
+  async dragNewComponentTo(componentName: string, moveTargetX?: number, moveTargetY?: number) {
     const style = await this.page.addStyleTag({ content: `* { transition: none !important; }` });
 
     await this.componentCatalog.hover();
@@ -176,7 +163,7 @@ export class ToolpadEditor {
     const sourceLocator = this.getComponentCatalogItem(componentName);
     await expect(sourceLocator).toBeVisible();
 
-    await this.dragToAppCanvas(sourceLocator, moveTargetX, moveTargetY);
+    await this.dragTo(sourceLocator, moveTargetX, moveTargetY);
 
     await style.evaluate((elm) => elm.parentNode?.removeChild(elm));
   }

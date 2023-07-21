@@ -53,7 +53,7 @@ export default createComponent(MyInspector, {
   await editorModel.componentCatalog.hover();
   await expect(editorModel.getComponentCatalogItem('MyInspector')).toBeVisible();
 
-  await editorModel.dragNewComponentToAppCanvas('MyInspector');
+  await editorModel.dragNewComponentTo('MyInspector');
 
   await editorModel.componentEditor.getByRole('button', { name: 'data' }).click();
 

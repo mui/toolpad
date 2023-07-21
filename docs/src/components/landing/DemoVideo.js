@@ -64,7 +64,7 @@ const videoMainControls = (theme) => ({
   inset: '50%',
   border: 'none',
   boxShadow: `0 4px 8px ${alpha(theme.palette.primary[900], 0.5)}`,
-  transition: theme.transitions.create(['scale', 'box-shadow'], {
+  transition: theme.transitions.create(['scale', 'box-shadow', 'opacity'], {
     duration: theme.transitions.duration.shortest,
   }),
   zIndex: 10,

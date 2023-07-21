@@ -1,12 +1,10 @@
 import * as React from 'react';
 import PropTypes from 'prop-types';
-import { TypeScript } from '@mui/docs';
 import Box from '@mui/material/Box';
 import Tab from '@mui/material/Tab';
 import TabContext from '@mui/lab/TabContext';
 import TabList from '@mui/lab/TabList';
 import TabPanel from '@mui/lab/TabPanel';
-import Typography from '@mui/material/Typography';
 import { alpha } from '@mui/material/styles';
 import HighlightedCode from 'docs/src/modules/components/HighlightedCode';
 import MarkdownElement from 'docs/src/components/markdown/MarkdownElement';

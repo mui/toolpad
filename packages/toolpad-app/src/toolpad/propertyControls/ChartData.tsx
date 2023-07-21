@@ -1,5 +1,6 @@
 import * as React from 'react';
 import {
+  Autocomplete,
   Box,
   Button,
   IconButton,
@@ -7,6 +8,7 @@ import {
   ListItem,
   ListItemButton,
   ListItemText,
+  ListItemIcon,
   MenuItem,
   Popover,
   Stack,
@@ -18,6 +20,10 @@ import { CHART_DATA_SERIES_KINDS, type ChartDataSeries } from '@mui/toolpad-comp
 import { useBrowserJsRuntime } from '@mui/toolpad-core/jsBrowserRuntime';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { BindableAttrValue } from '@mui/toolpad-core';
+import ScatterPlotIcon from '@mui/icons-material/ScatterPlot';
+import BarChartIcon from '@mui/icons-material/BarChart';
+import ShowChartIcon from '@mui/icons-material/ShowChart';
+import LegendToggleIcon from '@mui/icons-material/LegendToggle';
 import * as appDom from '../../appDom';
 import type { EditorProps } from '../../types';
 import PropertyControl from '../../components/PropertyControl';
@@ -27,6 +33,16 @@ import BindableEditor from '../AppEditor/PageEditor/BindableEditor';
 import { updateArray, remove } from '../../utils/immutability';
 import { createToolpadAppTheme } from '../../runtime/AppThemeProvider';
 import ColorPicker from '../../components/ColorPicker';
+
+const CHART_KIND_OPTIONS: {
+  kind: (typeof CHART_DATA_SERIES_KINDS)[number];
+  icon: React.ComponentType;
+}[] = [
+  { kind: 'line', icon: ShowChartIcon },
+  { kind: 'bar', icon: BarChartIcon },
+  { kind: 'area', icon: LegendToggleIcon },
+  { kind: 'scatter', icon: ScatterPlotIcon },
+];
 
 function ChartDataPropEditor({
   nodeId,
@@ -128,11 +144,30 @@ function ChartDataPropEditor({
     [updateDataSeriesProp],
   );
 
+  const handleDataSeriesAutocompletePropChange = React.useCallback(
+    (index: number, propName: string) => (event: React.SyntheticEvent, newValue: string) => {
+      updateDataSeriesProp(index, newValue, propName);
+    },
+    [updateDataSeriesProp],
+  );
+
   const handleDataSeriesColorChange = React.useCallback(
     (index: number) => (newValue: string | undefined) => {
       updateDataSeriesProp(index, newValue, 'color');
     },
     [updateDataSeriesProp],
+  );
+
+  const dataSeriesKeySuggestions = React.useMemo(
+    () =>
+      value.map((dataSeries) => {
+        const allKeys = (dataSeries.data || []).flatMap((dataSeriesPoint) =>
+          Object.keys(dataSeriesPoint),
+        );
+
+        return allKeys.filter((key, index) => allKeys.indexOf(key) === index);
+      }),
+    [value],
   );
 
   if (!node) {
@@ -204,9 +239,12 @@ function ChartDataPropEditor({
                 value={editDataSeries?.kind}
                 onChange={handleDataSeriesTextInputPropChange(dataSeriesEditIndex, 'kind')}
               >
-                {CHART_DATA_SERIES_KINDS.map((kind) => (
-                  <MenuItem key={kind} value={kind}>
-                    {kind}
+                {CHART_KIND_OPTIONS.map((option) => (
+                  <MenuItem key={option.kind} value={option.kind}>
+                    <Stack direction="row" alignItems="center">
+                      <option.icon />
+                      <ListItemText sx={{ ml: 1 }}>{option.kind}</ListItemText>
+                    </Stack>
                   </MenuItem>
                 ))}
               </TextField>
@@ -220,15 +258,19 @@ function ChartDataPropEditor({
                 value={editDataSeries?.data ?? null}
                 onChange={handleDataSeriesDataChange(dataSeriesEditIndex)}
               />
-              <TextField
-                label="xKey"
+              <Autocomplete
+                freeSolo
+                options={dataSeriesKeySuggestions[dataSeriesEditIndex]}
                 value={editDataSeries?.xKey}
-                onChange={handleDataSeriesTextInputPropChange(dataSeriesEditIndex, 'xKey')}
+                onInputChange={handleDataSeriesAutocompletePropChange(dataSeriesEditIndex, 'xKey')}
+                renderInput={(params) => <TextField {...params} label="xKey" />}
               />
-              <TextField
-                label="yKey"
+              <Autocomplete
+                freeSolo
+                options={dataSeriesKeySuggestions[dataSeriesEditIndex]}
                 value={editDataSeries?.yKey}
-                onChange={handleDataSeriesTextInputPropChange(dataSeriesEditIndex, 'yKey')}
+                onInputChange={handleDataSeriesAutocompletePropChange(dataSeriesEditIndex, 'yKey')}
+                renderInput={(params) => <TextField {...params} label="yKey" />}
               />
               <ColorPicker
                 label="color"

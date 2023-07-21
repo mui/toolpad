@@ -104,10 +104,16 @@ function Chart({ data = [], height, sx }: ChartProps) {
 
             const key = `${dataSeries.label}-${index}`;
 
-            const normalizedData = dataSeries.data.map((dataSeriesPoint) => ({
-              x: dataSeriesPoint[dataSeries.xKey],
-              [dataSeries.yKey]: dataSeriesPoint[dataSeries.yKey],
-            }));
+            const normalizedData = dataSeries.data
+              .map((dataSeriesPoint) => ({
+                x: dataSeriesPoint[dataSeries.xKey],
+                [dataSeries.yKey]: dataSeriesPoint[dataSeries.yKey],
+              }))
+              .sort((a, b) =>
+                typeof a[dataSeries.xKey] === 'number' && typeof b[dataSeries.xKey] === 'number'
+                  ? (a[dataSeries.xKey] as number) - (b[dataSeries.xKey] as number)
+                  : 0,
+              );
 
             switch (dataSeries.kind) {
               case 'bar':

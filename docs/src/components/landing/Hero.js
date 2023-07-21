@@ -1,9 +1,11 @@
 import * as React from 'react';
+import PropTypes from 'prop-types';
 import { styled, alpha } from '@mui/material/styles';
 import Box from '@mui/material/Box';
 import Chip from '@mui/material/Chip';
 import Switch from '@mui/material/Switch';
 import Typography from '@mui/material/Typography';
+import useMediaQuery from '@mui/material/useMediaQuery';
 import SvgMuiLogo from 'docs/src/icons/SvgMuiLogomark';
 import IconImage from 'docs/src/components/icon/IconImage';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
@@ -69,15 +71,14 @@ const Img = styled('img')(({ theme }) => [
   }),
 ]);
 
-function TypingAnimation() {
-  const words = ['APIs', 'scripts', 'SQL'];
-  const initIndex = 0;
-  const [text, setText] = React.useState(words[initIndex]);
-  const [wordIndex, setWordIndex] = React.useState(initIndex);
-  const [fullText, setFullText] = React.useState(words[initIndex]);
-  const [letterIndex, setLetterIndex] = React.useState(fullText.length);
+const words = ['APIs', 'scripts', 'SQL'];
 
-  const l = words.length;
+function TypingAnimation({ wordIndex, setWordIndex }) {
+  const [text, setText] = React.useState(words[wordIndex]);
+  const [fullText, setFullText] = React.useState(words[wordIndex]);
+  const [letterIndex, setLetterIndex] = React.useState(fullText.length);
+  const count = React.useRef(0);
+
   React.useEffect(() => {
     let timer;
     if (letterIndex < fullText.length) {
@@ -87,24 +88,29 @@ function TypingAnimation() {
       }, 100);
     } else {
       timer = setTimeout(() => {
-        const nextIndex = (wordIndex + 1) % l;
+        const nextIndex = (wordIndex + 1) % words.length;
         setWordIndex(nextIndex);
         setFullText(words[nextIndex]);
         setText('');
         setLetterIndex(0);
-      }, 1200);
+        count.current += 1;
+      }, 6000 - (count.current ? 100 * fullText.length : 0));
     }
     return () => clearTimeout(timer);
-  });
+  }, [letterIndex, wordIndex, fullText, text, setWordIndex]);
 
   return <span>{text}</span>;
 }
 
 export default function Hero() {
-  const [heroAppMode, setHeroAppMode] = React.useState(true);
+  const [heroAppMode, setHeroAppMode] = React.useState(false);
+  const isLargerThanMd = useMediaQuery((theme) => theme.breakpoints.up('md'));
+  const isSmallerThanSm = useMediaQuery((theme) => theme.breakpoints.down('sm'));
   const handleModeChange = React.useCallback((event) => {
     setHeroAppMode(event.target.checked);
   }, []);
+  const [wordIndex, setWordIndex] = React.useState(0);
+  const [frameIndex, setFrameIndex] = React.useState(0);
 
   const [pauseHeroAnimation, setPauseHeroAnimation] = React.useState(false);
 
@@ -113,9 +119,14 @@ export default function Hero() {
       if (!pauseHeroAnimation) {
         setHeroAppMode((prev) => !prev);
       }
-    }, 2000);
+      if (isLargerThanMd || isSmallerThanSm) {
+        setFrameIndex((prev) => (prev + 1) % 6);
+      }
+    }, 3000);
     return () => clearInterval(loop);
-  }, [pauseHeroAnimation]);
+  }, [pauseHeroAnimation, frameIndex, isLargerThanMd, isSmallerThanSm]);
+
+  const fileIndex = Math.floor(frameIndex / 2);
 
   return (
     <ToolpadHeroContainer>
@@ -163,13 +174,13 @@ export default function Hero() {
           />
         </Typography>
         <Typography variant="h1" sx={{ my: 1, minWidth: { xs: 'auto', sm: 600 } }}>
-          Turn your <TypingAnimation />
+          Turn your <TypingAnimation wordIndex={wordIndex} setWordIndex={setWordIndex} />
           <br />
           <GradientText>into UIs</GradientText>
         </Typography>
         <Typography color="text.secondary" sx={{ maxWidth: 520, mb: 2, textWrap: 'balance' }}>
-          Build scalable and secure internal tools locally. Use your own IDE, drag and drop
-          pre-built components or create your own.
+          Build scalable and secure internal tools locally. Drag and drop to build UI, then connect
+          to data sources with your own code.
         </Typography>
         <GetStartedButtons installation={'npx create-toolpad-app'} to={ROUTES.toolpadQuickstart} />
         <Box
@@ -208,7 +219,11 @@ export default function Hero() {
               gridRowStart: 1,
               gridRowEnd: 2,
               gridColumnStart: { xs: 'unset', sm: 1, md: 'unset' },
-              width: '100%',
+              width: { xs: 'auto', sm: '100%' },
+              justifySelf: { xs: 'center', sm: 'unset' },
+              '& > img': {
+                objectFit: { xs: 'contain', sm: 'unset' },
+              },
               height: '100%',
               borderRadius: '16px',
               padding: '8px',
@@ -236,13 +251,19 @@ export default function Hero() {
               }),
           ]}
         >
-          <Img src="/static/toolpad/marketing/hero.png" width="2880" height="1592" />
+          <Img
+            src={`/static/toolpad/marketing/hero-${fileIndex + 1}.png`}
+            width="2880"
+            height="1592"
+          />
         </Box>
-        <CodeBlock appMode={heroAppMode} />
+        <CodeBlock appMode={heroAppMode} fileIndex={fileIndex} />
         <Box
           sx={{
             display: { xs: 'grid', sm: 'none', md: 'grid' },
             gridRowStart: 2,
+            gridColumnStart: 1,
+            gridColumnEnd: 3,
             transform: { xs: 'scale(0.95)', sm: 'unset' },
           }}
         >
@@ -260,3 +281,8 @@ export default function Hero() {
     </ToolpadHeroContainer>
   );
 }
+
+TypingAnimation.propTypes = {
+  setWordIndex: PropTypes.func,
+  wordIndex: PropTypes.number,
+};

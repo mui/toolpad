@@ -82,7 +82,7 @@ export default function ComponentPanel({ className }: ComponentPanelProps) {
           <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
             <TabList onChange={handleChange} aria-label="Component options">
               <Tab label="Page" value="page" />
-              <Tab label="Component" value="component" />
+              <Tab label="Component" value="component" disabled={!selectedNode} />
               <Tab label="Theme" value="theme" />
             </TabList>
           </Box>

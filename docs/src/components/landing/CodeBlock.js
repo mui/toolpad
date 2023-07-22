@@ -145,21 +145,38 @@ async function connectionFn(multiple = false) {
 
 export const filenames = ['users.ts', 'stripeInvoice.tsx', 'orders.ts'];
 
-function a11yProps(index) {
-  return {
-    id: `simple-tab-${index}`,
-    'aria-controls': `simple-tabpanel-${index}`,
-  };
-}
+export default function CodeBlock({ appMode, fileIndex, setFrameIndex }) {
+  const tabsRef = React.useRef(null);
+  const [indicatorLeft, setIndicatorLeft] = React.useState(0);
+  const updateIndicatorState = React.useCallback(() => {
+    const tabs = tabsRef.current;
+    if (tabs) {
+      let leftShift = 0;
+      Array.from(
+        tabs.children?.[1]?.children?.[0]?.children ??
+          tabs.children?.[2]?.children?.[0]?.children ??
+          [],
+      )?.some((tab, index) => {
+        if (tab) {
+          if (index < fileIndex) {
+            leftShift += tab.getBoundingClientRect().width;
+          }
+          if (index === fileIndex) {
+            return true;
+          }
+          return false;
+        }
+        return false;
+      });
+      setIndicatorLeft(leftShift);
+    }
+  }, [fileIndex]);
 
-export default function CodeBlock({ appMode, fileIndex, setFrameIndex, allowTabNavigation }) {
   const handleTabChange = React.useCallback(
     (event, newValue) => {
-      if (allowTabNavigation) {
-        setFrameIndex(newValue * 2);
-      }
+      setFrameIndex(newValue * 2);
     },
-    [allowTabNavigation, setFrameIndex],
+    [setFrameIndex],
   );
   return (
     <Box
@@ -222,32 +239,22 @@ export default function CodeBlock({ appMode, fileIndex, setFrameIndex, allowTabN
           </Typography>
 
           <TabList
-            aria-label="tabs"
+            aria-label="Toolpad code tabs"
             onChange={handleTabChange}
+            ref={tabsRef}
+            action={() => {
+              updateIndicatorState();
+            }}
             variant="scrollable"
             scrollButtons="auto"
-            sx={{
-              position: 'sticky',
-              '& .MuiTabs-indicator': {
-                display: allowTabNavigation ? 'block' : 'none',
+            TabIndicatorProps={{
+              sx: {
+                left: `${indicatorLeft}px!important`,
               },
             }}
           >
             {filenames.map((file, index) => (
-              <Tab
-                wrapped
-                label={file}
-                value={index.toString()}
-                key={index}
-                sx={{
-                  pointerEvents: allowTabNavigation ? 'auto' : 'none',
-                  cursor: allowTabNavigation ? 'pointer' : 'default',
-                  borderBottom: allowTabNavigation ? 'none' : '1px solid',
-                  borderColor:
-                    index === fileIndex && !allowTabNavigation ? 'primary.300' : 'transparent',
-                }}
-                {...a11yProps(index)}
-              />
+              <Tab label={file} value={index.toString()} key={index} />
             ))}
           </TabList>
         </Box>
@@ -283,7 +290,6 @@ export default function CodeBlock({ appMode, fileIndex, setFrameIndex, allowTabN
 }
 
 CodeBlock.propTypes = {
-  allowTabNavigation: PropTypes.bool,
   appMode: PropTypes.bool,
   fileIndex: PropTypes.number,
   setFrameIndex: PropTypes.func,

@@ -99,16 +99,9 @@ export async function updateOrder(order_id: number,
   'utf8');
     
   const connection = await connectionFn(true);
-  const [, rows] = await connection.query(sql);
+  const [, rows] = await connection.execute(sql, { order_id, contacted_status });
   connection.end();
-  return rows;
-  
-  const sql = await fs.readFile('./getOrders.sql', 
-  'utf8');
-      
-  const [, rows] = await connection.query(sql);
-  connection.end();
-  return rows;
+  return rows;    
               
 }
 

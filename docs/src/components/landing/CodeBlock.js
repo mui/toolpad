@@ -138,24 +138,21 @@ export const filenames = ['users.ts', 'stripeInvoice.tsx', 'orders.ts'];
 
 export default function CodeBlock({ appMode, fileIndex, setFrameIndex }) {
   const tabsRef = React.useRef(null);
+  const tabRef = React.useRef(null);
   const [indicatorLeft, setIndicatorLeft] = React.useState(0);
   const updateIndicatorState = React.useCallback(() => {
     const tabs = tabsRef.current;
-    if (tabs) {
+    const tab = tabRef.current;
+    if (tabs && tab) {
       let leftShift = 0;
-      Array.from(
-        tabs.children?.[1]?.children?.[0]?.children ??
-          tabs.children?.[2]?.children?.[0]?.children ??
-          [],
-      )?.some((tab, index) => {
-        if (tab) {
+      Array.from(tabRef.current.parentNode?.children ?? [])?.some((child, index) => {
+        if (child) {
           if (index < fileIndex) {
-            leftShift += tab.getBoundingClientRect().width;
+            leftShift += child.getBoundingClientRect().width;
           }
           if (index === fileIndex) {
             return true;
           }
-          return false;
         }
         return false;
       });
@@ -237,6 +234,7 @@ export default function CodeBlock({ appMode, fileIndex, setFrameIndex }) {
                 wrapped
                 label={file}
                 value={index.toString()}
+                ref={tabRef}
                 key={index}
                 sx={{
                   minHeight: 0,

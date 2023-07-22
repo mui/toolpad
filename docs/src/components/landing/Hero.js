@@ -73,6 +73,10 @@ const Img = styled('img')(({ theme }) => [
 
 const words = ['APIs', 'scripts', 'SQL'];
 
+const LETTER_DELAY = 100;
+const FRAME_DELAY = 3000;
+const FRAMES = 6;
+
 function TypingAnimation({ wordIndex, setWordIndex }) {
   const [text, setText] = React.useState(words[wordIndex]);
   const [fullText, setFullText] = React.useState(words[wordIndex]);
@@ -85,7 +89,7 @@ function TypingAnimation({ wordIndex, setWordIndex }) {
       timer = setTimeout(() => {
         setText(text + fullText[letterIndex]);
         setLetterIndex(letterIndex + 1);
-      }, 100);
+      }, LETTER_DELAY);
     } else {
       timer = setTimeout(() => {
         const nextIndex = (wordIndex + 1) % words.length;
@@ -94,7 +98,7 @@ function TypingAnimation({ wordIndex, setWordIndex }) {
         setText('');
         setLetterIndex(0);
         count.current += 1;
-      }, 6000 - (count.current ? 100 * fullText.length : 0));
+      }, 2 * FRAME_DELAY - (count.current ? LETTER_DELAY * fullText.length : 0));
     }
     return () => clearTimeout(timer);
   }, [letterIndex, wordIndex, fullText, text, setWordIndex]);
@@ -120,14 +124,13 @@ export default function Hero() {
         setHeroAppMode((prev) => !prev);
       }
       if ((isLargerThanMd || isSmallerThanSm) && !pauseHeroAnimation) {
-        setFrameIndex((prev) => (prev + 1) % 6);
+        setFrameIndex((prev) => (prev + 1) % FRAMES);
       }
-    }, 3000);
+    }, FRAME_DELAY);
     return () => clearInterval(loop);
   }, [pauseHeroAnimation, frameIndex, isLargerThanMd, isSmallerThanSm]);
 
-  const fileIndex = Math.floor(frameIndex / 2);
-  const allowTabNavigation = !isLargerThanMd && !isSmallerThanSm;
+  const fileIndex = React.useMemo(() => Math.floor(frameIndex / 2), [frameIndex]);
 
   return (
     <ToolpadHeroContainer>
@@ -265,12 +268,7 @@ export default function Hero() {
             height="1592"
           />
         </Box>
-        <CodeBlock
-          appMode={heroAppMode}
-          fileIndex={fileIndex}
-          setFrameIndex={setFrameIndex}
-          allowTabNavigation={allowTabNavigation}
-        />
+        <CodeBlock appMode={heroAppMode} fileIndex={fileIndex} setFrameIndex={setFrameIndex} />
         <Box
           sx={{
             display: { xs: 'grid', sm: 'none', md: 'grid' },

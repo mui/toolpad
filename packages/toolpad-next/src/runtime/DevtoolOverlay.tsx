@@ -66,7 +66,7 @@ export default function DevtoolOverlay({
   const [generatedFile, setGeneratedFile] = React.useState<GeneratedFile | null>(null);
 
   React.useEffect(() => {
-    generateComponent(name, inputValue, { dev: false })
+    generateComponent(name, inputValue, { dev: false, probes: true })
       .then((result) => {
         const compiled = sucrase.transform(result.code, {
           transforms: ['imports', 'typescript', 'jsx'],

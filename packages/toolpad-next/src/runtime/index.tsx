@@ -7,6 +7,11 @@ import { WithDevtoolParams } from '../shared/types';
 import DevtoolOverlay from './DevtoolOverlay';
 import { ServerProvider } from './server';
 import { ComponentInfo, CurrentComponentContext } from './CurrentComponentContext';
+import { ProbeProvider, useProbeTarget } from './probes';
+
+export { useProbeTarget };
+
+export { TOOLPAD_INTERNAL } from './constants';
 
 function useCurrentlyEditedComponentId() {
   return useStorageState('session', 'currently-edited-component-id', null);
@@ -67,25 +72,27 @@ export function withDevtool<P extends object>(
       <CurrentComponentContext.Provider value={componentInfo}>
         {editing ? (
           <ServerProvider wsUrl={wsUrl}>
-            <Box
-              sx={{
-                display: 'contents',
-                '> *': {
-                  outlineColor: (theme) => theme.palette.secondary.main,
-                  outlineStyle: 'solid',
-                  outlineWidth: 2,
-                },
-              }}
-            >
-              <RenderedComponent {...props} />
-            </Box>
-            <DevtoolOverlay
-              name={name}
-              file={file}
-              dependencies={dependencies}
-              onClose={() => setCurrentlyEditedComponentId(null)}
-              onComponentUpdate={handleComponentUpdate}
-            />
+            <ProbeProvider>
+              <Box
+                sx={{
+                  display: 'contents',
+                  '> *': {
+                    outlineColor: (theme) => theme.palette.secondary.main,
+                    outlineStyle: 'solid',
+                    outlineWidth: 2,
+                  },
+                }}
+              >
+                <RenderedComponent {...props} />
+              </Box>
+              <DevtoolOverlay
+                name={name}
+                file={file}
+                dependencies={dependencies}
+                onClose={() => setCurrentlyEditedComponentId(null)}
+                onComponentUpdate={handleComponentUpdate}
+              />
+            </ProbeProvider>
           </ServerProvider>
         ) : (
           <RenderedComponent {...props} />

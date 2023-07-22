@@ -1,8 +1,9 @@
 import * as React from 'react';
-import { Box, Button, MenuItem, Stack, TextField, Typography } from '@mui/material';
+import { Box, MenuItem, Stack, TextField, Typography } from '@mui/material';
 import { DataGridSpec, RowsSpec } from '../../shared/schemas';
-import * as jsonPath from '../../shared/jsonPointer';
 import JsonPointerInput from '../JsonPointerInput';
+import { useProbe } from '../probes';
+import { TOOLPAD_INTERNAL } from '../constants';
 
 const DATA_KIND_OPTIONS = [
   {
@@ -50,28 +51,6 @@ function PropertyEditor({ providerSelectorInput, renderRowIdSelectorInput }: Pro
 
 type FetchSpec = Extract<RowsSpec, { kind: 'fetch' }>;
 
-interface FetchResult {
-  status: number;
-  data: unknown;
-  transformed: unknown;
-}
-
-async function executeFetch(spec: FetchSpec): Promise<FetchResult> {
-  const response = await fetch(spec.url || '', { method: spec.method });
-
-  if (!response.ok) {
-    throw new Error(`Request failed with status ${response.status}`);
-  }
-
-  const data = await response.json();
-
-  return {
-    status: response.status,
-    data,
-    transformed: spec.selector ? jsonPath.resolve(data, spec.selector) : data,
-  };
-}
-
 interface FetchEditorProps {
   providerSelectorInput: React.ReactNode;
   renderRowIdSelectorInput: RenderRowIdSelectorInput;
@@ -85,21 +64,12 @@ function FetchEditor({
   value,
   onChange,
 }: FetchEditorProps) {
-  const [testOutput, setTestResult] = React.useState<{
-    result?: FetchResult;
-    error?: Error;
-  } | null>(null);
-
-  const runTest = () => {
-    executeFetch(value).then(
-      (result) => setTestResult({ result }),
-      (error) => setTestResult({ error }),
-    );
-  };
+  const liveRows = useProbe('rows');
+  const rawData = (liveRows as any)?.[TOOLPAD_INTERNAL]?.rawData;
 
   return (
     <Stack sx={{ width: '100%', height: '100%' }} direction="row">
-      <Box sx={{ flex: 1, height: '100%', p: 2 }}>
+      <Box sx={{ flex: 1, height: '100%', p: 2, overflow: 'auto' }}>
         {providerSelectorInput}
 
         <React.Fragment>
@@ -128,11 +98,10 @@ function FetchEditor({
               value={value.url || '/'}
               onChange={(event) => onChange({ ...value, url: event.target.value })}
             />
-            <Button onClick={runTest}>Test</Button>
           </Stack>
           <JsonPointerInput
             label="Rows Selector"
-            target={testOutput?.result?.data}
+            target={rawData}
             fullWidth
             value={value.selector || '/'}
             onChange={(newValue) => onChange({ ...value, selector: newValue })}
@@ -143,19 +112,15 @@ function FetchEditor({
               </React.Fragment>
             }
           />
-          {renderRowIdSelectorInput({ target: (testOutput?.result?.transformed as any)?.[0] })}
+          {renderRowIdSelectorInput({ target: (liveRows as any)?.[0] })}
         </React.Fragment>
       </Box>
       <Box sx={{ flex: 1, height: '100%', overflow: 'auto', px: 4 }}>
-        {testOutput?.error ? (
-          testOutput.error.message
-        ) : (
+        {
           <pre>
-            {typeof testOutput?.result?.transformed === 'undefined'
-              ? 'undefined'
-              : JSON.stringify(testOutput.result.transformed, null, 2)}
+            {typeof liveRows === 'undefined' ? 'undefined' : JSON.stringify(liveRows, null, 2)}
           </pre>
-        )}
+        }
       </Box>
     </Stack>
   );

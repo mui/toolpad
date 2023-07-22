@@ -36,14 +36,17 @@ type SerializedProperties<O> = {
   [K in keyof O]: string | (undefined extends O[K] ? undefined : never);
 };
 
-export type GenerateComponentConfig =
+export type GenerateComponentConfig = {
+  probes?: boolean;
+} & (
   | {
       dev?: false;
     }
   | {
       dev: true;
       wsUrl: string;
-    };
+    }
+);
 
 export async function generateDataGridComponent(
   name: string,
@@ -69,7 +72,7 @@ export async function generateDataGridComponent(
     import * as React from 'react';
     import { DataGridPro } from '@mui/x-data-grid-pro';
     import { Box } from '@mui/material';
-    ${config.dev ? `import { withDevtool, EditButton } from '@mui/toolpad-next/runtime';` : ''}
+    ${config.dev || config.probes ? `import * as _runtime from '@mui/toolpad-next/runtime';` : ''}
 
     ${
       file.spec.rows.kind === 'fetch'
@@ -85,7 +88,19 @@ export async function generateDataGridComponent(
       
         const data = await response.json();
 
-        return ${jsonPointer.toExpression('data', file.spec.rows.selector || '/')};
+        const result = ${jsonPointer.toExpression('data', file.spec.rows.selector || '/')};
+
+        ${
+          config.probes
+            ? `
+                result[_runtime.TOOLPAD_INTERNAL] = {
+                  rawData: data
+                }
+              `
+            : ''
+        }
+
+        return result
       }
     `
         : ''
@@ -151,6 +166,8 @@ export async function generateDataGridComponent(
           : ''
       }
 
+      ${config.probes ? `_runtime.useProbeTarget('rows', rows);` : ''}
+
 
       return (
         <Box sx={{ position: 'relative', width: '100%', height: 400 }}>
@@ -174,7 +191,7 @@ export async function generateDataGridComponent(
           </ErrorBoundary>
           ${
             config.dev
-              ? `<EditButton sx={{ position: 'absolute', bottom: 0, right: 0, mb: 2, mr: 2, zIndex: 1 }} />`
+              ? `<_runtime.EditButton sx={{ position: 'absolute', bottom: 0, right: 0, mb: 2, mr: 2, zIndex: 1 }} />`
               : ''
           }
         </Box>
@@ -185,7 +202,7 @@ export async function generateDataGridComponent(
 
     export default ${
       config.dev
-        ? `withDevtool(ToolpadDataGrid, ${serializeObject({
+        ? `_runtime.withDevtool(ToolpadDataGrid, ${serializeObject({
             name: JSON.stringify(name),
             file: JSON.stringify(file),
             wsUrl: JSON.stringify(config.wsUrl),
@@ -193,6 +210,7 @@ export async function generateDataGridComponent(
               serializeArray([JSON.stringify('react'), 'React']),
               serializeArray([JSON.stringify('@mui/x-data-grid-pro'), '{ DataGridPro }']),
               serializeArray([JSON.stringify('@mui/material'), '{ Box }']),
+              serializeArray([JSON.stringify('@mui/toolpad-next/runtime'), '_runtime']),
             ]),
           } satisfies Record<keyof WithDevtoolParams, string>)})`
         : 'ToolpadDataGrid'

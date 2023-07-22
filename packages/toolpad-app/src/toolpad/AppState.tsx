@@ -240,7 +240,7 @@ export function appStateReducer(state: AppState, action: AppStateAction): AppSta
     case 'DESELECT_NODE': {
       if (state.currentView.kind === 'page') {
         return update(state, {
-          currentView: { ...state.currentView, selectedNodeId: null },
+          currentView: { ...state.currentView, selectedNodeId: null, tab: 'page' },
         });
       }
       return state;

@@ -1,12 +1,10 @@
 import * as React from 'react';
 import PropTypes from 'prop-types';
-import { TypeScript } from '@mui/docs';
 import Box from '@mui/material/Box';
 import Tab from '@mui/material/Tab';
 import TabContext from '@mui/lab/TabContext';
 import TabList from '@mui/lab/TabList';
 import TabPanel from '@mui/lab/TabPanel';
-import Typography from '@mui/material/Typography';
 import { alpha } from '@mui/material/styles';
 import HighlightedCode from 'docs/src/modules/components/HighlightedCode';
 import MarkdownElement from 'docs/src/components/markdown/MarkdownElement';
@@ -192,7 +190,9 @@ export default function CodeBlock({ appMode, fileIndex, setFrameIndex }) {
         bottom: { xs: 'unset', sm: 0, md: 'unset' },
         zIndex: 20,
         borderRadius: 1,
-        backgroundColor: (theme.vars || theme).palette.primaryDark[800],
+        border: '1px solid',
+        borderColor: (theme.vars || theme).palette.divider,
+        backgroundColor: '#0F1924',
         backfaceVisibility: 'hidden',
         transition: 'all 0.3s ease',
         transform: appMode
@@ -202,6 +202,9 @@ export default function CodeBlock({ appMode, fileIndex, setFrameIndex }) {
           borderColor: (theme.vars || theme).palette.divider,
           boxShadow: `0 4px 8px ${alpha(theme.palette.primaryDark[900], 0.8)}`,
         }),
+        '& pre': {
+          backgroundColor: '#0F1924',
+        },
       })}
     >
       <TabContext value={fileIndex.toString()}>
@@ -210,10 +213,8 @@ export default function CodeBlock({ appMode, fileIndex, setFrameIndex }) {
             display: 'flex',
             alignItems: 'center',
             gap: 1,
-            p: 0,
-            ml: 0.5,
             borderBottom: '1px solid',
-            backgroundColor: (theme.vars || theme).palette.primaryDark[700],
+            backgroundColor: (theme.vars || theme).palette.primaryDark[800],
             position: 'sticky',
             top: 0,
             zIndex: 100,
@@ -223,21 +224,6 @@ export default function CodeBlock({ appMode, fileIndex, setFrameIndex }) {
             }),
           })}
         >
-          <Typography
-            color="grey.400"
-            sx={{
-              fontFamily: 'Menlo',
-              fontSize: 10,
-              display: 'flex',
-              alignItems: 'center',
-              gap: 0.5,
-              ml: 0.5,
-            }}
-          >
-            <TypeScript fontSize="small" sx={{ color: 'primary.300', borderRadius: 2 }} />/
-            {`toolpad/resources/`}
-          </Typography>
-
           <TabList
             aria-label="Toolpad code tabs"
             onChange={handleTabChange}
@@ -254,7 +240,16 @@ export default function CodeBlock({ appMode, fileIndex, setFrameIndex }) {
             }}
           >
             {filenames.map((file, index) => (
-              <Tab label={file} value={index.toString()} key={index} />
+              <Tab
+                wrapped
+                label={file}
+                value={index.toString()}
+                key={index}
+                sx={{
+                  minHeight: 0,
+                  padding: '12px 14px',
+                }}
+              />
             ))}
           </TabList>
         </Box>
@@ -265,8 +260,6 @@ export default function CodeBlock({ appMode, fileIndex, setFrameIndex }) {
             sx={{
               m: 0,
               p: 0,
-              // https://github.com/mui/material-ui/blob/master/docs/src/modules/components/MarkdownElement.js#L23
-              backgroundColor: '#0F1924',
             }}
           >
             <HighlightedCode

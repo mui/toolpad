@@ -230,10 +230,11 @@ export default function Hero() {
               gridRowStart: 1,
               gridRowEnd: 2,
               gridColumnStart: { xs: 'unset', sm: 1, md: 'unset' },
-              width: { xs: 'auto', sm: '100%' },
+              width: '100%',
               justifySelf: { xs: 'center', sm: 'unset' },
               '& > img': {
-                objectFit: { xs: 'contain', sm: 'unset' },
+                objectFit: { xs: 'cover', sm: 'unset' },
+                objectPosition: { xs: 'top', sm: 'unset' },
               },
               height: '100%',
               borderRadius: '16px',

@@ -4,8 +4,8 @@ import invariant from 'invariant';
 /**
  * A Promise wrapper for server.listen
  */
-export async function listen(handler: http.RequestListener, port?: number) {
-  const server = http.createServer(handler);
+export async function listen(handler: http.RequestListener | http.Server, port?: number) {
+  const server = typeof handler === 'function' ? http.createServer(handler) : handler;
   let app: http.Server | undefined;
   await new Promise((resolve, reject) => {
     app = server.listen(port);
@@ -18,7 +18,7 @@ export async function listen(handler: http.RequestListener, port?: number) {
 
   return {
     port: address.port,
-    async stopServer() {
+    async close() {
       await new Promise<void>((resolve, reject) => {
         if (app) {
           app.close((err) => {

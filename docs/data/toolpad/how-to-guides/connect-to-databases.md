@@ -13,7 +13,6 @@ Inside `/resources/functions.ts`, we can create a custom function:
 
 ```ts
 import mysql from 'mysql2/promise';
-import fs from 'fs';
 
 async function createConnection() {
   const connection = await mysql.createConnection({
@@ -41,8 +40,12 @@ export async function getData(order_id: number) {
 If our queries don't rely on parameters, we may even use a `.sql` file stored in the file system so that we can keep them organised:
 
 ```ts
+import * as fs from 'fs/promise';
+
 export async function getData() {
-  const query = await fs.readFile('./toolpad/resources/getData.sql', 'utf8');
+  const query = await fs.readFile('./toolpad/resources/getData.sql', {
+    encoding: 'utf8',
+  });
   const connection = await createConnection();
   const [rows] = await connection.execute(query);
   await connection.end();

@@ -37,7 +37,9 @@
     "**/*.ts",
     "**/*.tsx",
     "typings/**/*.d.ts",
-    "scripts/*.mts"
+    "scripts/*.mts",
+    "../toolpad-utils/src/hooks/useDebounced.ts",
+    "../toolpad-utils/src/hooks/useDebouncedHandler.ts"
   ],
   "exclude": ["node_modules", "./scripts", "./public"]
 }

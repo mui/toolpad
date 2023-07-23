@@ -8,7 +8,6 @@ import DevtoolOverlay from './DevtoolOverlay';
 import { ServerProvider } from './server';
 import { ComponentInfo, CurrentComponentContext } from './CurrentComponentContext';
 import { ProbeProvider, useProbeTarget } from './probes';
-import { ToolpadFile } from '../shared/schemas';
 
 export { useProbeTarget };
 

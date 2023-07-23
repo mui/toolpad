@@ -24,7 +24,8 @@ pnpm create toolpad-app
 </codeblock>
 
 :::info
-This will run the `create-toolpad-app` CLI which initializes a directory (`./my-toolpad-app` by default) with a Toolpad application.
+This will run the `create-toolpad-app` CLI which asks for the folder in which you wish to initialise your Toolpad application.
+By default, it will use `./my-toolpad-app`.
 :::
 
 ## Run the Toolpad editor

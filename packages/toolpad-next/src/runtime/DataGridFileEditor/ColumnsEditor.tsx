@@ -10,69 +10,97 @@ import {
   MenuItem,
   OutlinedInput,
   Stack,
+  Autocomplete,
   TextField,
+  Button,
 } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import AddIcon from '@mui/icons-material/Add';
+import DeleteIcon from '@mui/icons-material/Delete';
 import {
   ColumnType,
   ColumnDefinitionsSpec,
   DataGridSpec,
   ColumnDefinitionSpec,
 } from '../../shared/schemas';
+import JsonPointerInput from '../JsonPointerInput';
+import { useProbe } from '../probes';
+import * as jsonPointer from '../../shared/jsonPointer';
 
 interface ColumnTypeOption {
-  value: ColumnType;
   label: string;
 }
 
-const COLUMN_TYPE_OPTIONS: ColumnTypeOption[] = [
-  {
-    value: 'string',
-    label: 'String',
-  },
-  {
-    value: 'number',
-    label: 'Number',
-  },
-  {
-    value: 'boolean',
-    label: 'Boolean',
-  },
-  {
-    value: 'date',
-    label: 'Date',
-  },
-  {
-    value: 'datetime',
-    label: 'DateTime',
-  },
-];
+const COLUMN_TYPE_OPTIONS: Record<ColumnType, ColumnTypeOption> = {
+  string: { label: 'String' },
+  number: { label: 'Number' },
+  boolean: { label: 'Boolean' },
+  date: { label: 'Date' },
+  datetime: { label: 'DateTime' },
+};
 
-interface ColumnDefinitionEditorProps {
-  value: ColumnDefinitionSpec;
-  onChange: (value: ColumnDefinitionSpec) => void;
+function getTypeLabel(type?: ColumnType) {
+  return type ? COLUMN_TYPE_OPTIONS[type].label : COLUMN_TYPE_OPTIONS.string.label;
 }
 
-function ColumnDefinitionEditor({ value, onChange }: ColumnDefinitionEditorProps) {
+interface ColumnDefinitionEditorProps {
+  columns: ColumnDefinitionsSpec;
+  value: ColumnDefinitionSpec;
+  onChange: (value: ColumnDefinitionSpec) => void;
+  onDelete: () => void;
+}
+
+function ColumnDefinitionEditor({
+  columns,
+  value,
+  onChange,
+  onDelete,
+}: ColumnDefinitionEditorProps) {
+  const rows = useProbe('rows');
+
+  const fieldSuggestions = React.useMemo(() => {
+    const availableKeys = Object.keys((rows as any)?.[0] ?? {});
+    const definedKeys = new Set(columns.map((column) => column.field));
+    return availableKeys.filter((key) => !definedKeys.has(key));
+  }, [columns, rows]);
+
   return (
     <React.Fragment>
-      <TextField
-        label="Field"
+      <Autocomplete
+        freeSolo
+        disableClearable
+        options={fieldSuggestions}
         value={value.field}
-        onChange={(event) => onChange({ ...value, field: event.target.value })}
+        onChange={(event, newValue) => onChange({ ...value, field: newValue })}
+        renderInput={(params) => <TextField {...params} label="Field" />}
+      />
+      <JsonPointerInput
+        label="Value Selector"
+        target={(rows as any)?.[0]}
+        value={value.valueSelector || jsonPointer.encode([value.field])}
+        onChange={(valueSelector) => onChange({ ...value, valueSelector })}
+        helperText={
+          <React.Fragment>
+            Valid <a href="https://datatracker.ietf.org/doc/html/rfc6901">JSON Pointer</a> that
+            references a (nested) property in the returned row.
+          </React.Fragment>
+        }
       />
       <TextField
+        label="Type"
         select
         value={value.type ?? 'string'}
         onChange={(event) => onChange({ ...value, type: event.target.value as ColumnType })}
       >
-        {COLUMN_TYPE_OPTIONS.map((option) => (
-          <MenuItem key={option.value} value={option.value}>
-            {option.label}
+        {Object.keys(COLUMN_TYPE_OPTIONS).map((type) => (
+          <MenuItem key={type} value={type}>
+            {getTypeLabel(type as ColumnType)}
           </MenuItem>
         ))}
       </TextField>
+      <Button color="error" startIcon={<DeleteIcon />} onClick={() => onDelete?.()}>
+        Remove column
+      </Button>
     </React.Fragment>
   );
 }
@@ -107,7 +135,12 @@ export function ColumnsDefinitionsEditor({ value, onChange }: ColumnsDefinitions
               </InputAdornment>
             }
           />
-          <IconButton onClick={() => onChange([...value, { field: 'new' }])}>
+          <IconButton
+            onClick={() => {
+              onChange([...value, { field: 'new' }]);
+              setActiveIndex(value.length);
+            }}
+          >
             <AddIcon />
           </IconButton>
         </Box>
@@ -117,7 +150,9 @@ export function ColumnsDefinitionsEditor({ value, onChange }: ColumnsDefinitions
               return (
                 <ListItem key={column.field} disablePadding>
                   <ListItemButton selected={activeIndex === i} onClick={() => setActiveIndex(i)}>
-                    <ListItemText secondary={column.type}>{column.field}</ListItemText>{' '}
+                    <ListItemText secondary={getTypeLabel(column.type)}>
+                      {column.field}
+                    </ListItemText>
                   </ListItemButton>
                 </ListItem>
               );
@@ -128,9 +163,14 @@ export function ColumnsDefinitionsEditor({ value, onChange }: ColumnsDefinitions
       <Stack sx={{ p: 2 }}>
         {activeColumn ? (
           <ColumnDefinitionEditor
+            columns={value}
             value={activeColumn}
             onChange={(newColumn) => {
               onChange(value.map((column, i) => (i === activeIndex ? newColumn : column)));
+            }}
+            onDelete={() => {
+              onChange(value.filter((_, i) => i !== activeIndex));
+              setActiveIndex(0);
             }}
           />
         ) : null}

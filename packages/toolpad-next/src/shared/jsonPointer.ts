@@ -48,9 +48,9 @@ export function resolve(object: unknown, pointer: string | DecodedPath): unknown
     throw new Error(`Cannot get value from non-object at "${pointer}"`);
   }
 
-  return segments.reduce((result, segment, i) => {
+  return segments.reduce((result: unknown, segment, i) => {
     if (result && typeof result === 'object') {
-      return result[segment];
+      return (result as Record<PropertyKey, unknown>)[segment];
     }
     const currentPointer = encode(segments.slice(0, i));
     throw new Error(`Cannot get value from non-object at "${currentPointer}"`);
@@ -82,7 +82,10 @@ function* generatePointerSuggestions(obj: unknown, prefix: DecodedPath): Generat
       }
     } else {
       for (const key of Object.keys(obj)) {
-        yield* generatePointerSuggestions(obj[key], [...prefix, key]);
+        yield* generatePointerSuggestions((obj as Record<PropertyKey, unknown>)[key], [
+          ...prefix,
+          key,
+        ]);
       }
     }
   }

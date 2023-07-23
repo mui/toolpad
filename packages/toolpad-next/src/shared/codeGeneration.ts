@@ -65,6 +65,14 @@ export async function generateDataGridComponent(
         properties.type = JSON.stringify(column.type);
       }
 
+      const defaultValueSelector = jsonPointer.encode([column.field]);
+      if (column.valueSelector && column.valueSelector !== defaultValueSelector) {
+        properties.valueGetter = `({ row }) => ${jsonPointer.toExpression(
+          'row',
+          column.valueSelector,
+        )}`;
+      }
+
       return serializeObject(properties);
     }) || [];
 
@@ -150,19 +158,25 @@ export async function generateDataGridComponent(
     }
 
     function ToolpadDataGrid({ 
-      ${!file.spec?.rows?.kind || file.spec?.rows?.kind === 'property' ? 'rows = [], error' : ''}
+      ${
+        !file.spec?.rows?.kind || file.spec?.rows?.kind === 'property'
+          ? 'rows = [], loading = false, error'
+          : ''
+      }
     }: ToolpadDataGridProps) {
 
       ${
         file.spec?.rows?.kind === 'fetch'
           ? `
-        const [rows, setRows] = React.useState([]);
-        const [error, setError] = React.useState()
+              const [rows, setRows] = React.useState([]);
+              const [error, setError] = React.useState()
+              const [loading, setLoading] = React.useState(false)
 
-        React.useEffect(() => {
-          executeFetch().then(setRows, setError);
-        }, [])
-      `
+              React.useEffect(() => {
+                setLoading(true)
+                executeFetch().then(setRows, setError).finally(() => setLoading(false));
+              }, [])
+            `
           : ''
       }
 

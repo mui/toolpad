@@ -75,7 +75,7 @@ export async function generateDataGridComponent(
     ${config.target === 'prod' ? '' : `import * as _runtime from '@mui/toolpad-next/runtime';`}
 
     ${
-      file.spec.rows.kind === 'fetch'
+      file.spec?.rows?.kind === 'fetch'
         ? `
       async function executeFetch() {
         const response = await fetch(${JSON.stringify(file.spec.rows.url || '')}, { 
@@ -150,11 +150,11 @@ export async function generateDataGridComponent(
     }
 
     function ToolpadDataGrid({ 
-      ${file.spec.rows.kind === 'property' ? 'rows = [], error' : ''}
+      ${!file.spec?.rows?.kind || file.spec?.rows?.kind === 'property' ? 'rows = [], error' : ''}
     }: ToolpadDataGridProps) {
 
       ${
-        file.spec.rows.kind === 'fetch'
+        file.spec?.rows?.kind === 'fetch'
           ? `
         const [rows, setRows] = React.useState([]);
         const [error, setError] = React.useState()
@@ -179,7 +179,7 @@ export async function generateDataGridComponent(
                 rows={rows}
                 columns={columns}
                 ${
-                  file.spec.rowIdSelector
+                  file.spec?.rowIdSelector
                     ? `getRowId={(row) => ${jsonPointer.toExpression(
                         'row',
                         file.spec.rowIdSelector || '/',

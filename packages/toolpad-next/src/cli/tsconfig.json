@@ -5,7 +5,8 @@
     "skipLibCheck": true,
     "module": "ESNext",
     "moduleResolution": "bundler",
-    "allowSyntheticDefaultImports": true
+    "allowSyntheticDefaultImports": true,
+    "strict": true
   },
   "include": ["./**/*.ts", "./**/*.tsx", "../shared/codeGeneration.ts", "../shared/prettier.ts"],
   "references": [

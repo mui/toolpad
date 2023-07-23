@@ -71,7 +71,7 @@ function useStorageStateServer(
   key: string,
   initializer: string | null | Initializer<string | null> = null,
 ): UseStorageStateHookResult<string | null> | UseStorageStateHookResult<string> {
-  const initialValue = typeof initializer === 'function' ? initializer() : initializer;
+  const [initialValue] = React.useState(initializer);
   return [initialValue, () => {}];
 }
 
@@ -104,7 +104,7 @@ function useStorageStateBrowser(
   key: string,
   initializer: string | null | Initializer<string | null> = null,
 ): UseStorageStateHookResult<string | null> | UseStorageStateHookResult<string> {
-  const initialValue = typeof initializer === 'function' ? initializer() : initializer;
+  const [initialValue] = React.useState(initializer);
   const area = kind === 'session' ? window.sessionStorage : window.localStorage;
   const subscribeKey = React.useCallback((cb: () => void) => subscribe(area, key, cb), [area, key]);
   const getKeySnapshot = React.useCallback(

@@ -129,7 +129,7 @@ function FetchEditor({
             label="Rows Selector"
             target={rawData}
             fullWidth
-            value={input.selector || '/'}
+            value={input.selector || ''}
             onChange={(newValue) => setInput({ ...input, selector: newValue })}
             helperText={
               <React.Fragment>
@@ -210,7 +210,7 @@ export default function RowsEditor({ value, onChange }: RowsEditorProps) {
   const renderRowIdSelectorInput: RenderRowIdSelectorInput = ({ target } = {}) => (
     <JsonPointerInput
       label="Row ID selector"
-      value={value.rowIdSelector || '/'}
+      value={value.rowIdSelector || ''}
       onChange={(newValue) => onChange({ ...value, rowIdSelector: newValue })}
       target={target}
       helperText={

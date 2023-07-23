@@ -96,7 +96,7 @@ export async function generateDataGridComponent(
       
         const data = await response.json();
 
-        const result = ${jsonPointer.toExpression('data', file.spec.rows.selector || '/')};
+        const result = ${jsonPointer.toExpression('data', file.spec.rows.selector || '')};
 
         ${
           config.target === 'prod'
@@ -196,7 +196,7 @@ export async function generateDataGridComponent(
                   file.spec?.rowIdSelector
                     ? `getRowId={(row) => ${jsonPointer.toExpression(
                         'row',
-                        file.spec.rowIdSelector || '/',
+                        file.spec.rowIdSelector || '',
                       )}}`
                     : ''
                 }

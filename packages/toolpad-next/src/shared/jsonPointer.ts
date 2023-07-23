@@ -1,10 +1,13 @@
 import { isValidJsIdentifier } from '@mui/toolpad-utils/strings';
 // Basic implementation of https://datatracker.ietf.org/doc/html/rfc6901
 
-type DecodedPath = (string | number)[];
+export type DecodedPath = (string | number)[];
 
 function decodeSegment(segment: string): string | number {
   const decodedSegment = segment.replaceAll(/~0/g, '/').replaceAll(/~1/g, '~');
+  if (!decodedSegment) {
+    return decodedSegment;
+  }
   const asNumber = Number(decodedSegment);
   return Number.isNaN(asNumber) ? decodedSegment : asNumber;
 }
@@ -17,25 +20,18 @@ function encodeSegment(segment: string | number): string {
  * Decodes a JSON pointer into an array of segments.
  */
 export function decode(pointer: string): DecodedPath {
-  if (!pointer.startsWith('/')) {
+  const [first, ...parts] = pointer.split('/');
+  if (first !== '') {
     throw new Error(`Invalid JSON pointer "${pointer}"`);
   }
-
-  if (pointer === '/') {
-    return [];
-  }
-
-  return pointer
-    .slice(1)
-    .split('/')
-    .map((segment) => decodeSegment(segment));
+  return parts.map((segment) => decodeSegment(segment));
 }
 
 /**
  * Encodes an array of segments into a JSON pointer.
  */
 export function encode(segments: DecodedPath): string {
-  return `/${segments.map((segment) => encodeSegment(segment)).join('/')}`;
+  return ['', ...segments.map((segment) => encodeSegment(segment))].join('/');
 }
 
 /**

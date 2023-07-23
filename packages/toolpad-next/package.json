@@ -24,13 +24,13 @@
     "./runtime": "./dist/runtime/index.js"
   },
   "dependencies": {
-    "@mui/icons-material": "5.14.0",
-    "@mui/lab": "5.0.0-alpha.136",
-    "@mui/material": "5.14.0",
+    "@mui/icons-material": "5.14.1",
+    "@mui/lab": "5.0.0-alpha.137",
+    "@mui/material": "5.14.1",
     "@mui/toolpad-utils": "0.1.20",
     "chokidar": "3.5.3",
     "dotenv": "16.3.1",
-    "esbuild": "0.18.11",
+    "esbuild": "0.18.16",
     "get-port": "7.0.0",
     "glob": "10.3.3",
     "invariant": "2.2.4",

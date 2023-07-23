@@ -164,3 +164,10 @@ export function prependLines(text: string, prefix: string): string {
 export function indent(text: string, length = 2): string {
   return prependLines(text, ' '.repeat(length));
 }
+
+/**
+ * Returns true if the string is a valid javascript identifier
+ */
+export function isValidJsIdentifier(base: string): boolean {
+  return /^[a-zA-Z_][a-zA-Z0-9_]*$/.test(base);
+}

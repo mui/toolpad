@@ -27,7 +27,7 @@ test.beforeAll(async ({ localApp }) => {
 });
 
 test.afterAll(async () => {
-  testServer?.stopServer();
+  testServer?.close();
 });
 
 test('rest runtime basics', async ({ page, localApp }) => {

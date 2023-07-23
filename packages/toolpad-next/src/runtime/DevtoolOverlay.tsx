@@ -1,9 +1,17 @@
 import * as React from 'react';
 import * as sucrase from 'sucrase';
-import { Box, CircularProgress, IconButton, ThemeProvider, Typography } from '@mui/material';
+import {
+  Box,
+  CircularProgress,
+  IconButton,
+  ThemeProvider,
+  Tooltip,
+  Typography,
+} from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
 import invariant from 'invariant';
+import SaveIcon from '@mui/icons-material/Save';
 import { ToolpadFile } from '../shared/schemas';
 import DataGridFileEditor from './DataGridFileEditor';
 import theme from './theme';
@@ -18,23 +26,21 @@ const CONNECTION_STATUS_DISPLAY = {
 };
 
 interface FileEditorProps {
-  name: string;
   value: ToolpadFile;
   onChange: (value: ToolpadFile) => void;
-  onClose?: () => void;
   source?: string;
+  commitButton: React.ReactNode;
 }
 
-function FileEditor({ name, value, onChange, onClose, source }: FileEditorProps) {
+function FileEditor({ commitButton, value, onChange, source }: FileEditorProps) {
   switch (value.kind) {
     case 'DataGrid':
       return (
         <DataGridFileEditor
-          name={name}
           value={value}
           onChange={onChange}
-          onClose={onClose}
           source={source}
+          commitButton={commitButton}
         />
       );
     default:
@@ -47,6 +53,7 @@ export interface DevtoolOverlayProps {
   file: ToolpadFile;
   dependencies: [string, unknown][];
   onClose?: () => void;
+  onCommitted?: () => void;
   onComponentUpdate?: (Component: React.ComponentType) => void;
 }
 
@@ -55,6 +62,7 @@ export default function DevtoolOverlay({
   file,
   onComponentUpdate,
   onClose,
+  onCommitted,
   dependencies,
 }: DevtoolOverlayProps) {
   const rootRef = React.useRef<HTMLDivElement>(null);
@@ -66,7 +74,7 @@ export default function DevtoolOverlay({
   const [source, setSource] = React.useState<GeneratedFile | null>(null);
 
   React.useEffect(() => {
-    generateComponent(name, inputValue, { dev: false, probes: false })
+    generateComponent(name, inputValue, { target: 'prod' })
       .then((result) => {
         setSource(result);
       })
@@ -77,7 +85,7 @@ export default function DevtoolOverlay({
   }, [inputValue, name, dependencies, onComponentUpdate]);
 
   React.useEffect(() => {
-    generateComponent(name, inputValue, { dev: false, probes: true })
+    generateComponent(name, inputValue, { target: 'preview' })
       .then((result) => {
         const compiled = sucrase.transform(result.code, {
           transforms: ['imports', 'typescript', 'jsx'],
@@ -105,6 +113,21 @@ export default function DevtoolOverlay({
         console.error(error);
       });
   }, [inputValue, name, dependencies, onComponentUpdate]);
+
+  const server = useServer();
+
+  const commitButton = (
+    <Tooltip title="Commit changes">
+      <IconButton
+        sx={{ m: 0.5 }}
+        onClick={() => {
+          server.saveFile(name, inputValue).then(() => onCommitted?.());
+        }}
+      >
+        <SaveIcon />
+      </IconButton>
+    </Tooltip>
+  );
 
   return (
     <ThemeProvider theme={theme}>
@@ -168,11 +191,10 @@ export default function DevtoolOverlay({
           <Box sx={{ flex: 1, overflow: 'hidden', position: 'relative' }}>
             {connectionStatus === 'connected' ? (
               <FileEditor
-                name={name}
                 value={inputValue}
                 onChange={setInputValue}
-                onClose={onClose}
                 source={source?.code}
+                commitButton={commitButton}
               />
             ) : (
               <Box

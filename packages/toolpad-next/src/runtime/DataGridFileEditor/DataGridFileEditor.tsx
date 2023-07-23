@@ -1,33 +1,27 @@
 import * as React from 'react';
-import { Box, IconButton, Stack, Tab, Tooltip, styled, Container } from '@mui/material';
+import { Box, Stack, Tab, styled, Container } from '@mui/material';
 import { TabContext, TabList, TabPanel as MuiTabPanel } from '@mui/lab';
-import SaveIcon from '@mui/icons-material/Save';
 import useStorageState from '@mui/toolpad-utils/hooks/useStorageState';
 import { DataGridFile, DataGridSpec } from '../../shared/schemas';
-import { useServer } from '../server';
 import ColumnsEditor from './ColumnsEditor';
 import RowsEditor from './RowsEditor';
 
 const TabPanel = styled(MuiTabPanel)({ padding: 0, flex: 1, minHeight: 0 });
 
 interface DataGridFileEditorProps {
-  name: string;
   value: DataGridFile;
   onChange: (value: DataGridFile) => void;
-  onClose?: () => void;
   source?: string;
+  commitButton: React.ReactNode;
 }
 
 export default function DataGridFileEditor({
-  name,
   value,
   onChange,
-  onClose,
   source,
+  commitButton,
 }: DataGridFileEditorProps) {
   const [activeTab, setActiveTab] = useStorageState('session', `activeTab`, 'data');
-
-  const server = useServer();
 
   const handleSpecChange = React.useCallback(
     (newSpec: DataGridSpec) => {
@@ -60,16 +54,7 @@ export default function DataGridFileEditor({
             <Tab label="Columns" value="columns" />
             <Tab label="Source" value="source" />
           </TabList>
-          <Tooltip title="Commit changes">
-            <IconButton
-              sx={{ m: 0.5 }}
-              onClick={() => {
-                server.saveFile(name, value).then(() => onClose?.());
-              }}
-            >
-              <SaveIcon />
-            </IconButton>
-          </Tooltip>
+          {commitButton}
         </Box>
 
         <TabPanel value="general">

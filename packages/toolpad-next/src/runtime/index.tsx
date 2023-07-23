@@ -8,6 +8,7 @@ import DevtoolOverlay from './DevtoolOverlay';
 import { ServerProvider } from './server';
 import { ComponentInfo, CurrentComponentContext } from './CurrentComponentContext';
 import { ProbeProvider, useProbeTarget } from './probes';
+import { ToolpadFile } from '../shared/schemas';
 
 export { useProbeTarget };
 
@@ -89,7 +90,15 @@ export function withDevtool<P extends object>(
                 name={name}
                 file={file}
                 dependencies={dependencies}
-                onClose={() => setCurrentlyEditedComponentId(null)}
+                onClose={() => {
+                  setCurrentlyEditedComponentId(null);
+                  // Reset component
+                  setRenderedComponent(() => Component);
+                }}
+                onCommitted={() => {
+                  setCurrentlyEditedComponentId(null);
+                  // Leave component, let the hot reloader do its job to avoid flickering
+                }}
                 onComponentUpdate={handleComponentUpdate}
               />
             </ProbeProvider>

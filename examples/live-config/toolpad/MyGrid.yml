@@ -2,9 +2,9 @@ kind: DataGrid
 spec:
   rows:
     kind: fetch
+    method: GET
     url: https://datausa.io/api/data?drilldowns=Nation&measures=Population
     selector: /data
-    method: GET
   columns:
     - field: Nation
       type: string

@@ -14,6 +14,7 @@ import { inferColumns, parseColumns } from '@mui/toolpad-components';
 import { DataGridPro, GridColDef } from '@mui/x-data-grid-pro';
 import { UseQueryResult } from '@tanstack/react-query';
 import { getObjectKey } from '@mui/toolpad-utils/objectKey';
+import useDebounced from '@mui/toolpad-utils/hooks/useDebounced';
 import { ClientDataSource, ConnectionEditorProps, QueryEditorProps } from '../../types';
 import {
   GoogleSheetsConnectionParams,
@@ -26,7 +27,6 @@ import {
   GoogleSheetsPrivateQuery,
   GoogleSheetsResult,
 } from './types';
-import useDebounced from '../../utils/useDebounced';
 import { usePrivateQuery } from '../context';
 import QueryInputPanel from '../QueryInputPanel';
 import SplitPane from '../../components/SplitPane';

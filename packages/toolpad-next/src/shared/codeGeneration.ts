@@ -36,17 +36,17 @@ type SerializedProperties<O> = {
   [K in keyof O]: string | (undefined extends O[K] ? undefined : never);
 };
 
-export type GenerateComponentConfig = {
-  probes?: boolean;
-} & (
+export type GenerateComponentConfig =
   | {
-      dev?: false;
+      target?: 'prod';
     }
   | {
-      dev: true;
+      target: 'preview';
+    }
+  | {
+      target?: 'dev';
       wsUrl: string;
-    }
-);
+    };
 
 export async function generateDataGridComponent(
   name: string,
@@ -72,7 +72,7 @@ export async function generateDataGridComponent(
     import * as React from 'react';
     import { DataGridPro } from '@mui/x-data-grid-pro';
     import { Box } from '@mui/material';
-    ${config.dev || config.probes ? `import * as _runtime from '@mui/toolpad-next/runtime';` : ''}
+    ${config.target === 'prod' ? '' : `import * as _runtime from '@mui/toolpad-next/runtime';`}
 
     ${
       file.spec.rows.kind === 'fetch'
@@ -91,13 +91,13 @@ export async function generateDataGridComponent(
         const result = ${jsonPointer.toExpression('data', file.spec.rows.selector || '/')};
 
         ${
-          config.probes
-            ? `
+          config.target === 'prod'
+            ? ''
+            : `
                 result[_runtime.TOOLPAD_INTERNAL] = {
                   rawData: data
                 }
               `
-            : ''
         }
 
         return result
@@ -166,7 +166,7 @@ export async function generateDataGridComponent(
           : ''
       }
 
-      ${config.probes ? `_runtime.useProbeTarget('rows', rows);` : ''}
+      ${config.target === 'prod' ? '' : `_runtime.useProbeTarget('rows', rows);`}
 
 
       return (
@@ -190,7 +190,7 @@ export async function generateDataGridComponent(
             )}
           </ErrorBoundary>
           ${
-            config.dev
+            config.target === 'dev'
               ? `<_runtime.EditButton sx={{ position: 'absolute', bottom: 0, right: 0, mb: 2, mr: 2, zIndex: 1 }} />`
               : ''
           }
@@ -201,7 +201,7 @@ export async function generateDataGridComponent(
     ToolpadDataGrid.displayName = ${JSON.stringify(name)};
 
     export default ${
-      config.dev
+      config.target === 'dev'
         ? `_runtime.withDevtool(ToolpadDataGrid, ${serializeObject({
             name: JSON.stringify(name),
             file: JSON.stringify(file),

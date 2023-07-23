@@ -47,7 +47,7 @@ function getYmlPattern(root: string) {
 
 async function generateLib(root: string, config: GenerateComponentConfig = {}) {
   // eslint-disable-next-line no-console
-  console.log(`Generating lib at ${JSON.stringify(root)} ${config.dev ? 'in dev mode' : ''}`);
+  console.log(`Generating lib at ${JSON.stringify(root)} in "${config.target}" mode`);
 
   const toolpadDir = getToolpadDir(root);
   const outputDir = path.join(toolpadDir, '.generated/components');
@@ -131,7 +131,7 @@ export async function liveCommand({ dir }: Config) {
   const wsUrl = `ws://localhost:${port}`;
 
   const config: GenerateComponentConfig = {
-    dev: true,
+    target: 'dev',
     wsUrl,
   };
 

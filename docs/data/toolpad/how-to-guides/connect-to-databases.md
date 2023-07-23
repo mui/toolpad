@@ -40,7 +40,7 @@ export async function getData(order_id: number) {
 If our queries don't rely on parameters, we may even use a `.sql` file stored in the file system so that we can keep them organised:
 
 ```ts
-import * as fs from 'fs/promise';
+import * as fs from 'fs/promises';
 
 export async function getData() {
   const query = await fs.readFile('./toolpad/resources/getData.sql', {

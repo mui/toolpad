@@ -63,7 +63,18 @@ export default function DevtoolOverlay({
 
   const { connectionStatus } = useServer();
 
-  const [generatedFile, setGeneratedFile] = React.useState<GeneratedFile | null>(null);
+  const [source, setSource] = React.useState<GeneratedFile | null>(null);
+
+  React.useEffect(() => {
+    generateComponent(name, inputValue, { dev: false, probes: false })
+      .then((result) => {
+        setSource(result);
+      })
+      .catch((error) => {
+        console.error(error);
+        setSource(null);
+      });
+  }, [inputValue, name, dependencies, onComponentUpdate]);
 
   React.useEffect(() => {
     generateComponent(name, inputValue, { dev: false, probes: true })
@@ -89,11 +100,9 @@ export default function DevtoolOverlay({
           `Compilation must result in a function as default export`,
         );
         onComponentUpdate?.(NewComponent);
-        setGeneratedFile(result);
       })
       .catch((error) => {
         console.error(error);
-        setGeneratedFile(null);
       });
   }, [inputValue, name, dependencies, onComponentUpdate]);
 
@@ -163,7 +172,7 @@ export default function DevtoolOverlay({
                 value={inputValue}
                 onChange={setInputValue}
                 onClose={onClose}
-                source={generatedFile?.code}
+                source={source?.code}
               />
             ) : (
               <Box

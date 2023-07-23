@@ -90,8 +90,6 @@ function FetchEditor({
 }: FetchEditorProps) {
   const [input, setInput] = useDebouncedInput(valueProp, onChangeProp, 300);
 
-  console.log('input', input);
-
   const liveRows = useProbe('rows');
   const rawData = (liveRows as any)?.[TOOLPAD_INTERNAL]?.rawData;
 

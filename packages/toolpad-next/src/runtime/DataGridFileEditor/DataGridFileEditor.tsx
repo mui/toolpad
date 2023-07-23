@@ -30,11 +30,14 @@ export default function DataGridFileEditor({
   const server = useServer();
 
   const handleSpecChange = React.useCallback(
-    (newSpec: DataGridSpec) =>
-      onChange({
-        ...value,
-        spec: newSpec,
-      }),
+    (newSpec: DataGridSpec) => {
+      if (value.spec !== newSpec) {
+        onChange({
+          ...value,
+          spec: newSpec,
+        });
+      }
+    },
     [onChange, value],
   );
 

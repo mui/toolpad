@@ -1,5 +1,6 @@
 import * as React from 'react';
 import { Box, MenuItem, Stack, TextField, Typography } from '@mui/material';
+import useDebouncedHandler from '@mui/toolpad-utils/hooks/useDebouncedHandler';
 import { DataGridSpec, RowsSpec } from '../../shared/schemas';
 import JsonPointerInput from '../JsonPointerInput';
 import { useProbe } from '../probes';
@@ -49,6 +50,29 @@ function PropertyEditor({ providerSelectorInput, renderRowIdSelectorInput }: Pro
   );
 }
 
+function useDebouncedInput<T>(
+  value: T,
+  onChange: (value: T) => void,
+  delay: number,
+): [T, (newValue: T) => void] {
+  const [input, setInput] = React.useState(value);
+  React.useEffect(() => {
+    setInput(value);
+  }, [value]);
+
+  const debouncedOnChange = useDebouncedHandler(onChange, delay);
+
+  const handleInputChange = React.useCallback(
+    (newValue: T) => {
+      setInput(newValue);
+      debouncedOnChange(newValue);
+    },
+    [debouncedOnChange],
+  );
+
+  return [input, handleInputChange];
+}
+
 type FetchSpec = Extract<RowsSpec, { kind: 'fetch' }>;
 
 interface FetchEditorProps {
@@ -61,9 +85,13 @@ interface FetchEditorProps {
 function FetchEditor({
   providerSelectorInput,
   renderRowIdSelectorInput,
-  value,
-  onChange,
+  value: valueProp,
+  onChange: onChangeProp,
 }: FetchEditorProps) {
+  const [input, setInput] = useDebouncedInput(valueProp, onChangeProp, 300);
+
+  console.log('input', input);
+
   const liveRows = useProbe('rows');
   const rawData = (liveRows as any)?.[TOOLPAD_INTERNAL]?.rawData;
 
@@ -77,11 +105,11 @@ function FetchEditor({
             <TextField
               select
               sx={{ width: '110px' }}
-              value={value.method ?? 'GET'}
+              value={input.method ?? 'GET'}
               label="Method"
               onChange={(event) =>
-                onChange({
-                  ...value,
+                setInput({
+                  ...input,
                   method: event.target.value as (typeof FETCH_METHOD_OPTIONS)[number],
                 })
               }
@@ -95,16 +123,16 @@ function FetchEditor({
             <TextField
               label="URL"
               fullWidth
-              value={value.url || '/'}
-              onChange={(event) => onChange({ ...value, url: event.target.value })}
+              value={input.url || '/'}
+              onChange={(event) => setInput({ ...input, url: event.target.value })}
             />
           </Stack>
           <JsonPointerInput
             label="Rows Selector"
             target={rawData}
             fullWidth
-            value={value.selector || '/'}
-            onChange={(newValue) => onChange({ ...value, selector: newValue })}
+            value={input.selector || '/'}
+            onChange={(newValue) => setInput({ ...input, selector: newValue })}
             helperText={
               <React.Fragment>
                 Valid <a href="https://datatracker.ietf.org/doc/html/rfc6901">JSON Pointer</a> that

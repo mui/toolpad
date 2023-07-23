@@ -24,10 +24,13 @@ export default class EnvManager {
 
   constructor(project: IToolpadProject) {
     this.project = project;
+  }
 
+  async start() {
     this.loadEnvFile();
-
-    this.initWatcher();
+    if (this.project.options.dev) {
+      this.initWatcher();
+    }
   }
 
   private loadEnvFile() {

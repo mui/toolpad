@@ -95,7 +95,6 @@ export default class FunctionsManager {
     this.extractTypesWorker = new Piscina({
       filename: path.join(__dirname, 'functionsTypesWorker.js'),
     });
-    this.startDev();
   }
 
   private getResourcesFolder(): string {
@@ -240,24 +239,25 @@ export default class FunctionsManager {
     this.project.invalidateQueries();
   }
 
-  async startDev() {
-    await this.migrateLegacy();
+  async start() {
+    if (this.project.options.dev) {
+      await this.migrateLegacy();
 
-    await this.startWatchingFunctionFiles();
+      await this.startWatchingFunctionFiles();
+
+      this.project.events.subscribe('envChanged', async () => {
+        await this.createRuntimeWorkerWithEnv();
+      });
+    } else {
+      await this.build();
+    }
 
     await this.createRuntimeWorkerWithEnv();
-    this.project.events.subscribe('envChanged', async () => {
-      await this.createRuntimeWorkerWithEnv();
-    });
   }
 
   async build() {
     const ctx = await this.createEsbuildContext();
     await ctx.rebuild();
-  }
-
-  async startProd() {
-    await this.createRuntimeWorkerWithEnv();
   }
 
   async exec(

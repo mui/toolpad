@@ -1054,6 +1054,10 @@ class ToolpadProject {
     this.alertedMissingVars = new Set(missingVars);
   }
 
+  async start() {
+    await Promise.all([this.envManager.start(), this.functionsManager.start()]);
+  }
+
   async loadDom() {
     const [dom] = await this.loadDomAndFingerprint();
     this.alertOnMissingVariablesInDom(dom);
@@ -1115,5 +1119,9 @@ export async function initProject() {
 
   await initToolpadFolder(root);
 
-  return new ToolpadProject(root, { dev: config.cmd === 'dev' });
+  const project = new ToolpadProject(root, { dev: config.cmd === 'dev' });
+
+  await project.start();
+
+  return project;
 }

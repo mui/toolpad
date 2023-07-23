@@ -18,7 +18,7 @@ function cleanFolderOnFailure(folder: string): esbuild.Plugin {
 
 export default defineConfig([
   {
-    entry: ['./src/cli/index.ts'],
+    entry: ['./src/cli/index.ts', './src/cli/prepare.ts'],
     outDir: 'dist/cli',
     silent: true,
     format: ['esm'],

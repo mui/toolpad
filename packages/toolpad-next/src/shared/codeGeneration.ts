@@ -38,13 +38,13 @@ type SerializedProperties<O> = {
 
 export type GenerateComponentConfig =
   | {
-      target?: 'prod';
+      target: 'prod';
     }
   | {
       target: 'preview';
     }
   | {
-      target?: 'dev';
+      target: 'dev';
       wsUrl: string;
     };
 

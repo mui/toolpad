@@ -2,7 +2,7 @@
 
 import 'dotenv/config';
 import yargs from 'yargs';
-import { liveCommand, generateCommand } from './liveConfigurator';
+import { devCommand, generateCommand } from './liveConfigurator';
 
 const sharedOptions = {
   dir: {
@@ -21,7 +21,7 @@ const parsedArgs = yargs(process.argv.slice(2))
     {
       ...sharedOptions,
     },
-    (args) => liveCommand(args),
+    (args) => devCommand(args),
   )
   .command(
     'generate [dir]',

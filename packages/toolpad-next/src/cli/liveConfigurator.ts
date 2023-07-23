@@ -45,7 +45,7 @@ function getYmlPattern(root: string) {
   return path.join(toolpadDir, '*.yml');
 }
 
-async function generateLib(root: string, config: GenerateComponentConfig = {}) {
+async function generateLib(root: string, config: GenerateComponentConfig = { target: 'prod' }) {
   // eslint-disable-next-line no-console
   console.log(`Generating lib at ${JSON.stringify(root)} in "${config.target}" mode`);
 
@@ -104,7 +104,7 @@ export async function generateCommand({ dir }: Config) {
   await generateLib(root);
 }
 
-export async function liveCommand({ dir }: Config) {
+export async function devCommand({ dir }: Config) {
   const root = resolveRoot(dir);
 
   const port = await getPort();

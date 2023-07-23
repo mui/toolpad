@@ -18,7 +18,7 @@ export async function listen(handler: http.RequestListener, port?: number) {
 
   return {
     port: address.port,
-    async stopServer() {
+    async close() {
       await new Promise<void>((resolve, reject) => {
         if (app) {
           app.close((err) => {

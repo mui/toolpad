@@ -36,10 +36,10 @@ import {
 } from '@mui/toolpad-core';
 import { createProvidedContext } from '@mui/toolpad-utils/react';
 import { TabContext, TabList } from '@mui/lab';
+import useDebounced from '@mui/toolpad-utils/src/hooks/useDebounced';
 import { JsExpressionEditor } from './PageEditor/JsExpressionEditor';
 import JsonView from '../../components/JsonView';
 import useLatest from '../../utils/useLatest';
-import useDebounced from '../../utils/useDebounced';
 import { useEvaluateLiveBinding } from './useEvaluateLiveBinding';
 import GlobalScopeExplorer from './GlobalScopeExplorer';
 import { WithControlledProp, Maybe } from '../../utils/types';

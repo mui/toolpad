@@ -52,23 +52,26 @@ function setValue(area: Storage, key: string, value: string | null) {
   }
 }
 
+type Initializer<T> = () => T;
+
 type UseStorageStateHookResult<T> = [T, React.Dispatch<React.SetStateAction<T>>];
 
 function useStorageStateServer(
   kind: 'session' | 'local',
   key: string,
-  initialValue: string,
+  initializer: string | Initializer<string>,
 ): UseStorageStateHookResult<string>;
 function useStorageStateServer(
   kind: 'session' | 'local',
   key: string,
-  initialValue?: string | null,
+  initializer?: string | null | Initializer<string | null>,
 ): UseStorageStateHookResult<string | null>;
 function useStorageStateServer(
   kind: 'session' | 'local',
   key: string,
-  initialValue: string | null = null,
+  initializer: string | null | Initializer<string | null> = null,
 ): UseStorageStateHookResult<string | null> | UseStorageStateHookResult<string> {
+  const [initialValue] = React.useState(initializer);
   return [initialValue, () => {}];
 }
 
@@ -89,18 +92,19 @@ function useStorageStateServer(
 function useStorageStateBrowser(
   kind: 'session' | 'local',
   key: string,
-  initialValue: string,
+  initializer: string | Initializer<string>,
 ): UseStorageStateHookResult<string>;
 function useStorageStateBrowser(
   kind: 'session' | 'local',
   key: string,
-  initialValue?: string | null,
+  initializer?: string | null | Initializer<string | null>,
 ): UseStorageStateHookResult<string | null>;
 function useStorageStateBrowser(
   kind: 'session' | 'local',
   key: string,
-  initialValue: string | null = null,
+  initializer: string | null | Initializer<string | null> = null,
 ): UseStorageStateHookResult<string | null> | UseStorageStateHookResult<string> {
+  const [initialValue] = React.useState(initializer);
   const area = kind === 'session' ? window.sessionStorage : window.localStorage;
   const subscribeKey = React.useCallback((cb: () => void) => subscribe(area, key, cb), [area, key]);
   const getKeySnapshot = React.useCallback(

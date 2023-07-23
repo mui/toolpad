@@ -192,9 +192,6 @@ export default function CodeBlock({ appMode, fileIndex, setFrameIndex }) {
           borderColor: (theme.vars || theme).palette.divider,
           boxShadow: `0 4px 8px ${alpha(theme.palette.primaryDark[900], 0.8)}`,
         }),
-        '& pre': {
-          backgroundColor: '#0F1924',
-        },
       })}
     >
       <TabContext value={fileIndex.toString()}>
@@ -228,6 +225,7 @@ export default function CodeBlock({ appMode, fileIndex, setFrameIndex }) {
                 left: `${indicatorLeft}px!important`,
               },
             }}
+            sx={{ minHeight: 'auto' }}
           >
             {filenames.map((file, index) => (
               <Tab
@@ -251,6 +249,9 @@ export default function CodeBlock({ appMode, fileIndex, setFrameIndex }) {
             sx={{
               m: 0,
               p: 0,
+              '& pre': {
+                backgroundColor: '#0F1924',
+              },
             }}
           >
             <HighlightedCode

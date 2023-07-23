@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Box, ThemeProvider, GlobalStyles, Portal } from '@mui/material';
+import { ScopedCssBaseline, Box, ThemeProvider, GlobalStyles, Portal } from '@mui/material';
 import theme from './theme';
 
 interface ResizeHandleProps {
@@ -82,37 +82,39 @@ export default function DevtoolHost({ children }: DevtoolHostProps) {
   return (
     <Portal>
       <ThemeProvider theme={theme}>
-        <Box
-          ref={rootRef}
-          className="mui-fixed"
-          sx={{
-            position: 'fixed',
-            bottom: 0,
-            left: 0,
-            right: 0,
-            height,
-            borderTop: 1,
-            borderColor: 'divider',
-            backgroundColor: 'background.paper',
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'stretch',
-          }}
-        >
-          <GlobalStyles styles={{ body: { marginBottom: `${height}px` } }} />
-          <ResizeHandle onResize={handleResize} />
+        <ScopedCssBaseline>
           <Box
+            ref={rootRef}
+            className="mui-fixed"
             sx={{
-              flex: 1,
-              minHeight: 0,
-              marginRight: '-1px',
-              borderRight: 1,
+              position: 'fixed',
+              bottom: 0,
+              left: 0,
+              right: 0,
+              height,
+              borderTop: 1,
               borderColor: 'divider',
+              backgroundColor: 'background.paper',
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'stretch',
             }}
           >
-            {children}
+            <GlobalStyles styles={{ body: { marginBottom: `${height}px` } }} />
+            <ResizeHandle onResize={handleResize} />
+            <Box
+              sx={{
+                flex: 1,
+                minHeight: 0,
+                marginRight: '-1px',
+                borderRight: 1,
+                borderColor: 'divider',
+              }}
+            >
+              {children}
+            </Box>
           </Box>
-        </Box>
+        </ScopedCssBaseline>
       </ThemeProvider>
     </Portal>
   );

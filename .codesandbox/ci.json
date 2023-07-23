@@ -6,6 +6,7 @@
     "packages/toolpad-app",
     "packages/toolpad-components",
     "packages/toolpad-core",
+    "packages/toolpad-next",
     "packages/toolpad-utils"
   ],
   "silent": true

@@ -22,6 +22,7 @@ async function createConnection() {
     user: process.env.MYSQL_USERNAME,
     password: process.env.MYSQL_PASSWORD,
     database: process.env.MYSQL_DATABASE,
+    namedPlaceholders: true,
   });
   return connection;
 }
@@ -78,6 +79,7 @@ async function createConnection() {
     user: process.env.MYSQL_USERNAME,
     password: process.env.MYSQL_PASSWORD,
     database: process.env.MYSQL_DATABASE,
+    namedPlaceholders: true,
   });
 
   return connection;

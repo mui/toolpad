@@ -36,7 +36,7 @@ import {
 } from '@mui/toolpad-core';
 import { createProvidedContext } from '@mui/toolpad-utils/react';
 import { TabContext, TabList } from '@mui/lab';
-import useDebounced from '@mui/toolpad-utils/src/hooks/useDebounced';
+import useDebounced from '@mui/toolpad-utils/hooks/useDebounced';
 import { JsExpressionEditor } from './PageEditor/JsExpressionEditor';
 import JsonView from '../../components/JsonView';
 import useLatest from '../../utils/useLatest';

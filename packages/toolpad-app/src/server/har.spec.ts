@@ -5,7 +5,7 @@ import { streamToString } from '../utils/streams';
 
 describe('har', () => {
   test('headers in array form', async () => {
-    const { port, stopServer } = await listen(async (req, res) => {
+    const { port, close } = await listen(async (req, res) => {
       res.write(
         JSON.stringify({
           body: await streamToString(req),
@@ -40,7 +40,7 @@ describe('har', () => {
         }),
       );
     } finally {
-      await stopServer();
+      await close();
     }
   });
 });

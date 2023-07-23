@@ -3,7 +3,7 @@ import { Emitter } from '@mui/toolpad-utils/events';
 import invariant from 'invariant';
 
 interface ProbeContextValue {
-  notify: (key: string, value: unknown) => void;
+  update: (key: string, value: unknown) => void;
   subscribe: (key: string, callback: () => void) => () => void;
   getSnapshot: (key: string) => unknown;
 }
@@ -19,7 +19,7 @@ export function ProbeProvider({ children }: ProbeProviderProps) {
     const values = new Map<string, unknown>();
     const emitter = new Emitter<Record<string, null>>();
     return {
-      notify: (key: string, value: unknown) => {
+      update: (key: string, value: unknown) => {
         values.set(key, value);
         emitter.emit(key, null);
       },
@@ -36,9 +36,10 @@ export function ProbeProvider({ children }: ProbeProviderProps) {
 
 export function useProbeTarget(key: string, value: unknown) {
   const probeContext = React.useContext(ProbeContext);
-  invariant(probeContext, 'useProbeTarget must be used inside a ProbeProvider');
   React.useEffect(() => {
-    probeContext.notify(key, value);
+    if (probeContext) {
+      probeContext.update(key, value);
+    }
   }, [probeContext, key, value]);
 }
 

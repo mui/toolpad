@@ -1,19 +1,63 @@
-# @mui/toolpad
+# @mui/toolpad-next
 
-Low-code tool, powered by MUI
+POC for the live configurators direction
 
-## Installation
+1. Set up project
 
-Install the package in your project directory with:
+   ```sh
+   curl https://codeload.github.com/mui/material-ui/tar.gz/master | tar -xz --strip=2 material-ui-master/examples/material-vite-ts
+   cd material-vite-ts
+   yarn
+   ```
 
-```bash
-// with npm
-npm install @mui/toolpad
+1. Add dependencies
 
-// with yarn
-yarn add @mui/toolpad
-```
+   ```sh
+   yarn add @mui/x-data-grid-pro https://pkg.csb.dev/mui/mui-toolpad/commit/56864b72/@mui/toolpad-next
+   ```
 
-## Documentation
+1. Add scripts in `package.json`
 
-[The documentation](./docs)
+   ```json
+     "scripts": {
+       "toolpad-next": "toolpad-next"
+     }
+   ```
+
+1. Create component
+
+   ```sh
+   mkdir -p ./toolpad
+   echo "kind: 'DataGrid'" > ./toolpad/MyGrid.yml
+   ```
+
+1. Start live configurators
+
+   ```sh
+   yarn toolpad-next dev
+   ```
+
+1. Import component inn `./src/App.tsx`:
+
+   ```tsx
+   import MyGrid from '../toolpad/.generated/MyGrid';
+
+   // ...
+           <Typography variant="h4" component="h1" gutterBottom>
+             Material UI Vite.js example in TypeScript
+           </Typography>
+
+           <MyGrid />
+
+           <ProTip />
+           <Copyright />
+   // ...
+   ```
+
+1. Start project
+
+   ```sh
+   yarn dev
+   ```
+
+1. Open browser. See live grid with edit button

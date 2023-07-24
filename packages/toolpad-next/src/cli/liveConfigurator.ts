@@ -50,7 +50,7 @@ async function generateLib(root: string, config: GenerateComponentConfig = { tar
   console.log(`Generating lib at ${JSON.stringify(root)} in "${config.target}" mode`);
 
   const toolpadDir = getToolpadDir(root);
-  const outputDir = path.join(toolpadDir, '.generated/components');
+  const outputDir = path.join(toolpadDir, '.generated');
   const ymlPattern = getYmlPattern(root);
   const entries = await glob(ymlPattern);
 

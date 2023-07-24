@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { Container, Typography, Box } from '@mui/material';
-import { MyGrid } from '../toolpad/.generated/components';
+import { MyGrid } from '../toolpad/.generated';
 
 const ROWS = [
   { id: 1, a: 123, b: 'foo' },

@@ -191,6 +191,7 @@ export async function generateDataGridComponent(
             ) : (
               <DataGridPro
                 rows={rows}
+                loading={loading}
                 columns={columns}
                 ${
                   file.spec?.rowIdSelector

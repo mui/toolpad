@@ -17,7 +17,7 @@ function useCurrentlyEditedComponentId() {
   return useStorageState('session', 'currently-edited-component-id', null);
 }
 
-const nextId = 1;
+let nextId = 1;
 
 export function EditButton(props: ButtonProps) {
   const [currentEditedComponentId, setCurrentlyEditedComponentId] = useCurrentlyEditedComponentId();
@@ -51,7 +51,9 @@ export function withDevtool<P extends object>(
       useCurrentlyEditedComponentId();
 
     const [id] = React.useState(() => {
-      return `component-${nextId}`;
+      const newId = `component-${nextId}`;
+      nextId += 1;
+      return newId;
     });
 
     const editing = currentlyEditedComponentId === id;

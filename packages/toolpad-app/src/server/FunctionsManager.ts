@@ -258,6 +258,12 @@ export default class FunctionsManager {
   async build() {
     const ctx = await this.createEsbuildContext();
     await ctx.rebuild();
+    await this.initPromise;
+    await ctx.dispose();
+  }
+
+  async dispose() {
+    await Promise.all([this.devWorker.terminate(), this.extractTypesWorker.destroy()]);
   }
 
   async exec(

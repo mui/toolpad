@@ -52,7 +52,7 @@ import EnvManager from './EnvManager';
 import FunctionsManager from './FunctionsManager';
 
 export function getUserProjectRoot(): string {
-  const { projectDir } = config;
+  const projectDir = process.env.TOOLPAD_PROJECT_DIR;
   invariant(projectDir, 'Toolpad in local mode must have a project directory defined');
   return projectDir;
 }
@@ -962,8 +962,6 @@ class ToolpadProject {
     this.envManager = new EnvManager(this);
     this.functionsManager = new FunctionsManager(this);
 
-    this.initWatcher();
-
     this.invalidateQueries = throttle(
       () => {
         this.events.emit('queriesInvalidated', {});
@@ -1055,7 +1053,18 @@ class ToolpadProject {
   }
 
   async start() {
+    if (this.options.dev) {
+      await this.initWatcher();
+    }
     await Promise.all([this.envManager.start(), this.functionsManager.start()]);
+  }
+
+  async build() {
+    await Promise.all([this.envManager.build(), this.functionsManager.build()]);
+  }
+
+  async dispose() {
+    await Promise.all([this.envManager.dispose(), this.functionsManager.dispose()]);
   }
 
   async loadDom() {
@@ -1124,4 +1133,14 @@ export async function initProject() {
   await project.start();
 
   return project;
+}
+
+export async function buildProject() {
+  const root = getUserProjectRoot();
+
+  const project = new ToolpadProject(root, { dev: config.cmd === 'dev' });
+
+  // await project.build();
+
+  await project.dispose();
 }

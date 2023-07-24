@@ -33,6 +33,16 @@ export default class EnvManager {
     }
   }
 
+  // eslint-disable-next-line class-methods-use-this
+  async build() {
+    // Dummy method
+  }
+
+  // eslint-disable-next-line class-methods-use-this
+  async dispose() {
+    // Dummy method
+  }
+
   private loadEnvFile() {
     const envFilePath = this.getEnvFilePath();
     const { parsed = {} } = dotenv.config({ path: envFilePath, override: true });

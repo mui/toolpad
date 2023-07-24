@@ -3,7 +3,7 @@
 <p class="description">This analytics dashboard shows how to track a KPI from a third-party data source.</p>
 
 <a href="https://npm-stats.onrender.com/prod/pages/evZC-gp" target="_blank">
-  <img src="/static/toolpad/docs/examples/npm-stats.png" alt="" width="2880" height="1592">
+  <img src="https://github.com/mui/mui-toolpad/blob/master/docs/public/static/toolpad/marketing/npm-stats.png" alt="" width="2880" height="1592">
 </a>
 
 ## How to use
@@ -23,6 +23,12 @@ Install it and run:
 npm install
 npm run dev
 ```
+
+or
+
+[![Render Badge]](https://npm-stats.onrender.com/prod/pages/evZC-gp)
+
+[Render Badge]: https://img.shields.io/badge/live-demo-purple?style=for-the-badge&color=%234350e9&link=https%3A%2F%2Fnpm-stats.onrender.com%2Fprod%2Fpages%2FevZC-gp
 
 or
 

@@ -51,6 +51,7 @@ export function withDevtool<P extends object>(
       useCurrentlyEditedComponentId();
 
     const [id] = React.useState(() => {
+      // Using this over React.useId() as this is more stable across page reloads
       const newId = `component-${nextId}`;
       nextId += 1;
       return newId;

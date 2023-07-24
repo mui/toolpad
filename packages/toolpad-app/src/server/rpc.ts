@@ -11,7 +11,7 @@ import { execQuery, dataSourceFetchPrivate, dataSourceExecPrivate } from './data
 import { getVersionInfo } from './versionInfo';
 import { createComponent, deletePage } from './localMode';
 import { loadDom, saveDom, applyDomDiff, openCodeEditor } from './liveProject';
-import { asyncHandler } from '../utils/http';
+import { asyncHandler } from '../utils/express';
 
 export interface Method<P extends any[] = any[], R = any> {
   (...params: P): Promise<R>;

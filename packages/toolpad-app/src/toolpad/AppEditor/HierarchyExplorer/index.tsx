@@ -2,8 +2,8 @@ import { TreeView } from '@mui/lab';
 import { Typography, styled, Box, IconButton } from '@mui/material';
 import * as React from 'react';
 import TreeItem, { treeItemClasses, TreeItemProps } from '@mui/lab/TreeItem';
-import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
-import ArrowRightIcon from '@mui/icons-material/ArrowRight';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import AddIcon from '@mui/icons-material/Add';
 import { NodeId } from '@mui/toolpad-core';
@@ -68,14 +68,14 @@ function HierarchyTreeItem(props: StyledTreeItemProps) {
   return (
     <StyledTreeItem
       label={
-        <Box sx={{ display: 'flex', alignItems: 'center', p: 0.5, pr: 0 }}>
+        <Box sx={{ display: 'flex', alignItems: 'center', p: 0.1, pr: 0 }}>
           {labelIcon}
           <Typography variant="body2" sx={{ fontWeight: 'inherit', flexGrow: 1 }} noWrap>
             {labelText}
           </Typography>
           {onCreate ? (
-            <IconButton aria-label={createLabelText} onClick={onCreate}>
-              <AddIcon />
+            <IconButton aria-label={createLabelText} onClick={onCreate} size="small">
+              <AddIcon fontSize="inherit" />
             </IconButton>
           ) : null}
           {toolpadNodeId ? (
@@ -86,9 +86,10 @@ function HierarchyTreeItem(props: StyledTreeItemProps) {
                     [classes.treeItemMenuOpen]: menuProps.open,
                   })}
                   aria-label="Open hierarchy menu"
+                  size="small"
                   {...buttonProps}
                 >
-                  <MoreVertIcon />
+                  <MoreVertIcon fontSize="inherit" />
                 </IconButton>
               )}
               nodeId={toolpadNodeId}
@@ -234,8 +235,8 @@ export default function HierarchyExplorer({ className }: HierarchyExplorerProps)
         expanded={expanded}
         onNodeToggle={handleToggle}
         multiSelect
-        defaultCollapseIcon={<ArrowDropDownIcon />}
-        defaultExpandIcon={<ArrowRightIcon />}
+        defaultCollapseIcon={<ExpandMoreIcon sx={{ fontSize: '0.9rem', opacity: 0.5 }} />}
+        defaultExpandIcon={<ChevronRightIcon sx={{ fontSize: '0.9rem', opacity: 0.5 }} />}
       >
         <HierarchyTreeItem
           nodeId=":pages"

@@ -9,7 +9,7 @@ import serverDataSources from '../toolpadDataSources/server';
 import * as appDom from '../appDom';
 import applyTransform from '../toolpadDataSources/applyTransform';
 import { loadDom, saveDom } from './liveProject';
-import { asyncHandler } from '../utils/http';
+import { asyncHandler } from '../utils/express';
 
 export async function getConnectionParams<P = unknown>(
   connectionId: string | null,

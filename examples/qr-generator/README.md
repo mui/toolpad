@@ -6,6 +6,12 @@
   <img src="https://mui.com/static/toolpad/docs/examples/qr-generator.png" alt="QR generator" style="aspect-ratio: 1.8" width="100%">
 </a>
 
+## Check out the live app
+
+<p></p>
+
+[![Open in StackBlitz](https://developer.stackblitz.com/img/open_in_stackblitz.svg)](https://stackblitz.com/fork/github/mui/mui-toolpad/tree/master/examples/qr-generator)
+
 ## How to use
 
 Download the example [or clone the repo](https://github.com/mui/mui-toolpad):
@@ -23,10 +29,6 @@ Install it and run:
 npm install
 npm run dev
 ```
-
-or
-
-[![Open in StackBlitz](https://developer.stackblitz.com/img/open_in_stackblitz.svg)](https://stackblitz.com/fork/github/mui/mui-toolpad/tree/master/examples/qr-generator)
 
 ## What's inside
 

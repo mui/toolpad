@@ -6,7 +6,13 @@
   <img src="https://mui.com/static/toolpad/docs/examples/basic-crud-app.png" alt="Basic CRUD app" style="aspect-ratio: 1.8" width="100%">
 </a>
 
-## How to use
+## Check out the live app
+
+<p></p>
+
+[![Open in StackBlitz](https://developer.stackblitz.com/img/open_in_stackblitz.svg)](https://stackblitz.com/fork/github/mui/mui-toolpad/tree/master/examples/basic-crud-app)
+
+## How to run
 
 Download the example [or clone the repo](https://github.com/mui/mui-toolpad):
 
@@ -23,10 +29,6 @@ Install it and run:
 npm install
 npm run dev
 ```
-
-or
-
-[![Open in StackBlitz](https://developer.stackblitz.com/img/open_in_stackblitz.svg)](https://stackblitz.com/fork/github/mui/mui-toolpad/tree/master/examples/basic-crud-app)
 
 ## What's inside
 

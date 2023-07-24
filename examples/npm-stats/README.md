@@ -6,7 +6,17 @@
   <img src="https://mui.com/static/toolpad/docs/examples/npm-stats.png" alt="npm stats app" style="aspect-ratio: 1.8" width="100%">
 </a>
 
-## How to use
+## Check out the live apps
+
+<p></p>
+
+[![Render Badge]](https://npm-stats.onrender.com/prod/pages/evZC-gp)
+
+[Render Badge]: https://img.shields.io/badge/Render-purple?style=for-the-badge&color=%234350e9&link=https%3A%2F%2Fnpm-stats.onrender.com%2Fprod%2Fpages%2FevZC-gp
+
+[![Open in StackBlitz](https://developer.stackblitz.com/img/open_in_stackblitz.svg)](https://stackblitz.com/fork/github/mui/mui-toolpad/tree/master/examples/npm-stats)
+
+## How to run
 
 Download the example [or clone the repo](https://github.com/mui/mui-toolpad):
 
@@ -23,16 +33,6 @@ Install it and run:
 npm install
 npm run dev
 ```
-
-or
-
-[![Render Badge]](https://npm-stats.onrender.com/prod/pages/evZC-gp)
-
-[Render Badge]: https://img.shields.io/badge/live-demo-purple?style=for-the-badge&color=%234350e9&link=https%3A%2F%2Fnpm-stats.onrender.com%2Fprod%2Fpages%2FevZC-gp
-
-or
-
-[![Open in StackBlitz](https://developer.stackblitz.com/img/open_in_stackblitz.svg)](https://stackblitz.com/fork/github/mui/mui-toolpad/tree/master/examples/npm-stats)
 
 ## What's inside
 

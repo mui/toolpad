@@ -54,9 +54,10 @@ async function generateLib(root: string, config: GenerateComponentConfig = { tar
   const ymlPattern = getYmlPattern(root);
   const entries = await glob(ymlPattern);
 
+  await fs.mkdir(outputDir, { recursive: true });
+
   const indexContentPromise = generateIndex(entries);
 
-  await fs.mkdir(outputDir, { recursive: true });
   await Promise.all([
     ...entries.map(async (entryPath) => {
       const yamlContent = await fs.readFile(entryPath, 'utf-8');

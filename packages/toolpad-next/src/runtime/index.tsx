@@ -71,6 +71,12 @@ export function withDevtool<P extends object>(
       setRenderedComponent(() => NewComponent);
     }, []);
 
+    React.useEffect(() => {
+      if (!editing) {
+        setRenderedComponent(() => Component);
+      }
+    }, [editing]);
+
     return (
       <CurrentComponentContext.Provider value={componentInfo}>
         {editing ? (
@@ -94,12 +100,9 @@ export function withDevtool<P extends object>(
                 dependencies={dependencies}
                 onClose={() => {
                   setCurrentlyEditedComponentId(null);
-                  // Reset component
-                  setRenderedComponent(() => Component);
                 }}
                 onCommitted={() => {
                   setCurrentlyEditedComponentId(null);
-                  // Leave component, let the hot reloader do its job to avoid flickering
                 }}
                 onComponentUpdate={handleComponentUpdate}
               />

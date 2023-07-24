@@ -3,10 +3,16 @@ import { Container, ContainerProps, Box, Stack, BoxProps } from '@mui/material';
 import { LoadingButton } from '@mui/lab';
 import { ArgTypeDefinitions, createComponent, useNode } from '@mui/toolpad-core';
 import { useForm, FieldValues, ValidationMode, FieldError, Controller } from 'react-hook-form';
-// TODO: Remove lodash-es
-// eslint-disable-next-line no-restricted-imports
-import { isEqual } from 'lodash-es';
 import { SX_PROP_HELPER_TEXT } from './constants';
+
+function isEqual(props: ValidationProps, previouProps: ValidationProps) {
+  return Object.keys(props).some((key) => {
+    if (props[key as PropList] !== previouProps[key as PropList]) {
+      return false;
+    }
+    return true;
+  });
+}
 
 export const FormContext = React.createContext<{
   form: ReturnType<typeof useForm> | null;
@@ -180,6 +186,10 @@ export interface FormInputComponentProps {
   isInvalid: boolean;
 }
 
+type PropList = 'isRequired' | 'minLength' | 'maxLength' | 'isInvalid';
+
+type ValidationProps = Partial<Pick<FormInputComponentProps, PropList>>;
+
 interface UseFormInputInput<V> {
   name: string;
   label?: string;
@@ -187,9 +197,7 @@ interface UseFormInputInput<V> {
   onChange: (newValue: V) => void;
   emptyValue?: V;
   defaultValue?: V;
-  validationProps: Partial<
-    Pick<FormInputComponentProps, 'isRequired' | 'minLength' | 'maxLength' | 'isInvalid'>
-  >;
+  validationProps: ValidationProps;
 }
 
 interface UseFormInputPayload<V> {

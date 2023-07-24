@@ -32,8 +32,8 @@ export default function Hero() {
             (theme) => theme.applyDarkStyles({ color: 'primary.400' }),
           ]}
         >
-          <IconImage name="product-toolpad" width="28" height="28" sx={{ mr: 1 }} />
-          <Box component="span" sx={{ mr: 1 }}>
+          <IconImage name="product-toolpad" width={28} height={28} />
+          <Box component="span" sx={{ ml: 1, mr: 1 }}>
             MUI Toolpad
           </Box>
           <Chip label="Beta" component="span" color="primary" size="small" variant="outlined" />

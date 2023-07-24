@@ -276,6 +276,7 @@ export default function RenderOverlay({ bridge }: RenderOverlayProps) {
   const { dom } = useDom();
   const { currentView } = useAppState();
   const selectedNodeId = currentView.kind === 'page' ? currentView.selectedNodeId : null;
+  const hoveredNodeId = currentView.kind === 'page' ? currentView.hoveredNodeId : null;
 
   const domApi = useDomApi();
   const appStateApi = useAppStateApi();
@@ -1586,6 +1587,7 @@ export default function RenderOverlay({ bridge }: RenderOverlayProps) {
         const isPageColumnChild = parent ? appDom.isElement(parent) && isPageColumn(parent) : false;
 
         const isSelected = selectedNode && !newNode ? selectedNode.id === node.id : false;
+        const isHovered = hoveredNodeId === node.id;
 
         const isHorizontallyResizable = isSelected && (isPageRowChild || isPageColumnChild);
         const isVerticallyResizable =
@@ -1625,6 +1627,7 @@ export default function RenderOverlay({ bridge }: RenderOverlayProps) {
                 onDelete={handleNodeDelete(node.id)}
                 isResizing={isResizingNode}
                 resizePreviewElementRef={resizePreviewElementRef}
+                isHovered={isHovered}
                 isHoverable={!isResizing && !isDraggingOver}
                 isOutlineVisible={isDraggingOver}
               />

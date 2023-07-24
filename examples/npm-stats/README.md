@@ -3,7 +3,7 @@
 <p class="description">This analytics dashboard shows how to track a KPI from a third-party data source.</p>
 
 <a href="https://npm-stats.onrender.com/prod/pages/evZC-gp" target="_blank">
-  <img src="https://github.com/mui/mui-toolpad/blob/master/docs/public/static/toolpad/marketing/npm-stats.png" alt="" width="2880" height="1592">
+  <img src="https://mui.com/static/toolpad/docs/examples/npm-stats.png" alt="npm stats app" style="aspect-ratio: 1.8" width="100%>
 </a>
 
 ## How to use

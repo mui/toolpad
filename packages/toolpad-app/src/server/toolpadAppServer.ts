@@ -6,7 +6,7 @@ import config from '../config';
 import { postProcessHtml } from './toolpadAppBuilder';
 import { loadDom } from './liveProject';
 import { getAppOutputFolder } from './localMode';
-import { asyncHandler } from '../utils/http';
+import { asyncHandler } from '../utils/express';
 import { createDataHandler } from './data';
 import { basicAuthUnauthorized, checkBasicAuthHeader } from './basicAuth';
 

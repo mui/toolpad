@@ -6,7 +6,7 @@
   <img src="https://mui.com/static/toolpad/docs/examples/npm-stats.png" alt="npm stats app" style="aspect-ratio: 1.8" width="100%">
 </a>
 
-## Check out the live apps
+## Check out the live app
 
 <p></p>
 

@@ -10,23 +10,20 @@ Then run the command:
 <codeblock storageKey="package-manager">
 
 ```bash npm
-npx create-toolpad-app@latest
+npx create-toolpad-app@latest my-toolpad-app
 ```
 
 ```bash yarn
-yarn create toolpad-app
+yarn create toolpad-app my-toolpad-app
 ```
 
 ```bash pnpm
-pnpm create toolpad-app
+pnpm create toolpad-app my-toolpad-app
 ```
 
 </codeblock>
 
-:::info
-This will run the `create-toolpad-app` CLI which asks for the folder in which you wish to initialise your Toolpad application.
-By default, it will use `./my-toolpad-app`.
-:::
+This will run the `create-toolpad-app` CLI which initializes the directory `./my-toolpad-app` with a Toolpad application.
 
 ## Run the Toolpad editor
 

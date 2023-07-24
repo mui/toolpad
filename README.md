@@ -44,11 +44,11 @@ MUI Toolpad is in its beta stages of development. Feel free to run this applicat
 Run:
 
 ```bash
-npx create-toolpad-app@latest
+npx create-toolpad-app@latest my-toolpad-app
 # or
-yarn create toolpad-app
+yarn create toolpad-app my-toolpad-app
 # or
-pnpm create toolpad-app
+pnpm create toolpad-app my-toolpad-app
 ```
 
 ## Documentation

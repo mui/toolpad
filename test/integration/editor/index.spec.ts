@@ -116,19 +116,18 @@ test('code editor auto-complete', async ({ page }) => {
   await expect(page.getByRole('option', { name: 'textField' })).toBeVisible();
 });
 
-test('cancel the status of active when click the white space', async ({ page }) => {
+test('must deselect selected element when clicking outside of it', async ({ page }) => {
   const editorModel = new ToolpadEditor(page);
 
   await editorModel.goToPageById('K7SkzhT');
 
   await editorModel.waitForOverlay();
-
-  const text = editorModel.appCanvas.getByText('text-foo');
-
-  await clickCenter(page, text);
-  await expect(editorModel.appCanvas.getByTestId('node-hud-tag')).toBeVisible();
-  const element = await editorModel.appCanvas.locator('.Toolpad_HudOverlay');
-  await clickCenter(page, element);
-  const hudButton1 = await editorModel.appCanvas.getByTestId('node-hud-tag');
-  await expect(hudButton1).toBeHidden();
+  const nodeHudTag = editorModel.appCanvas.getByTestId('node-hud-tag');
+  const input = editorModel.appCanvas.locator('input:nth-child(1)');
+  const boundingBox = await input.boundingBox();
+  await clickCenter(page, input);
+  await expect(nodeHudTag).toBeVisible();
+  await page.mouse.click(boundingBox!.x + 50, boundingBox!.y + 50);
+  // const hudButton1 = await editorModel.appCanvas.getByTestId('node-hud-tag');
+  await expect(nodeHudTag).toBeHidden();
 });

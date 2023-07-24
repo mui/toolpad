@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "toolpad dev",
     "build": "toolpad build",
-    "start": "toolpad start"
+    "start": "NODE_OPTIONS='--max-old-space-size=396' toolpad start"
   },
   "dependencies": {
     "@mui/toolpad": "0.1.20",

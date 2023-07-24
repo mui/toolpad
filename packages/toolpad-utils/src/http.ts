@@ -1,23 +1,24 @@
 import * as http from 'http';
-import getPort from 'get-port';
+import invariant from 'invariant';
 
 /**
- * A convenience wrapper around node.js createServer + listen for testing purposes.
- * - starts a http server using `handler` on a free port
- * - returns the port and stopServer method for cleanup.
+ * A Promise wrapper for server.listen
  */
-export async function startServer(handler?: http.RequestListener) {
-  const server = http.createServer(handler);
-  const port = await getPort();
+export async function listen(handler: http.RequestListener | http.Server, port?: number) {
+  const server = typeof handler === 'function' ? http.createServer(handler) : handler;
   let app: http.Server | undefined;
   await new Promise((resolve, reject) => {
     app = server.listen(port);
     app.once('listening', resolve);
     app.once('error', reject);
   });
+
+  const address = app?.address();
+  invariant(address && typeof address === 'object', 'expected address to be an AddressInfo object');
+
   return {
-    port,
-    async stopServer() {
+    port: address.port,
+    async close() {
       await new Promise<void>((resolve, reject) => {
         if (app) {
           app.close((err) => {

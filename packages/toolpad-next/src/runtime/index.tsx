@@ -25,7 +25,7 @@ export function EditButton(props: ButtonProps) {
 
   invariant(componentInfo, `EditButton must be used inside a Component`);
 
-  if (currentEditedComponentId) {
+  if (currentEditedComponentId === componentInfo.id) {
     return null;
   }
 

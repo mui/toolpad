@@ -35,11 +35,13 @@ interface PropertyEditorProps {
 }
 
 function PropertyEditor({ providerSelectorInput, renderRowIdSelectorInput }: PropertyEditorProps) {
+  const liveRows = useProbe('rows');
+
   return (
     <Stack sx={{ width: '100%', height: '100%' }} direction="row">
       <Box sx={{ flex: 1, p: 2 }}>
         {providerSelectorInput}
-        {renderRowIdSelectorInput()}
+        {renderRowIdSelectorInput({ target: (liveRows as any)?.[0] })}
         <Typography>
           Pass the data through a <code>rows</code> property on your component.
           {/* TODO: show example */}

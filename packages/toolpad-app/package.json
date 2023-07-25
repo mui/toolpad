@@ -1,6 +1,6 @@
 {
   "name": "@mui/toolpad",
-  "version": "0.1.20",
+  "version": "0.1.21",
   "license": "MIT",
   "bin": {
     "toolpad": "./cli.js"
@@ -46,11 +46,11 @@
     "@googleapis/sheets": "5.0.1",
     "@mui/icons-material": "5.14.1",
     "@mui/lab": "5.0.0-alpha.137",
-    "@mui/material": "5.14.1",
+    "@mui/material": "5.14.2",
     "@mui/system": "5.14.1",
-    "@mui/toolpad-components": "0.1.20",
-    "@mui/toolpad-core": "0.1.20",
-    "@mui/toolpad-utils": "0.1.20",
+    "@mui/toolpad-components": "0.1.21",
+    "@mui/toolpad-core": "0.1.21",
+    "@mui/toolpad-utils": "0.1.21",
     "@mui/types": "7.2.4",
     "@mui/utils": "5.14.1",
     "@mui/x-data-grid": "6.10.1",
@@ -164,5 +164,5 @@
   "publishConfig": {
     "access": "public"
   },
-  "gitHead": "8c10fa4108d0f108a49fb20daa15f090fe321be6"
+  "gitHead": "eac467924907df4cbc078dd3b4385315a2f92b08"
 }

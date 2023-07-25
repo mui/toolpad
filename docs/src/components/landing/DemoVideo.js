@@ -1,77 +1,190 @@
 import * as React from 'react';
 import Box from '@mui/material/Box';
-import Container from '@mui/material/Container';
+import IconButton from '@mui/material/IconButton';
+import PlayArrowRoundedIcon from '@mui/icons-material/PlayArrowRounded';
+import PauseRoundedIcon from '@mui/icons-material/PauseRounded';
+import FullScreenRoundedIcon from '@mui/icons-material/FullscreenRounded';
+import VolumeOffRoundedIcon from '@mui/icons-material/VolumeOffRounded';
+import VolumeUpRoundedIcon from '@mui/icons-material/VolumeUpRounded';
 import { styled, alpha } from '@mui/material/styles';
+
+const VideoContainer = styled(Box)(({ theme }) => [
+  {
+    position: 'relative',
+    width: '100%',
+    height: '100%',
+    borderRadius: 16,
+    padding: 12,
+    paddingBottom: 4,
+    background: `linear-gradient(120deg, ${(theme.vars || theme).palette.primary[50]} 0%, ${alpha(
+      theme.palette.primary[100],
+      0.2,
+    )} 150%)`,
+    border: '1px solid',
+    borderColor: `${alpha(theme.palette.primary[100], 0.6)}`,
+    boxShadow: `4px 0 40px ${alpha(theme.palette.primary[100], 0.8)}`,
+    overflow: 'hidden',
+    '&:hover .MuiToolpadHero-pauseButton, &:focus .MuiToolpadHero-pauseButton': {
+      opacity: 1,
+    },
+  },
+  theme.applyDarkStyles({
+    background: `linear-gradient(120deg, ${alpha(theme.palette.primary[700], 0.5)} 0%, ${alpha(
+      theme.palette.primary[800],
+      0.4,
+    )} 150%)`,
+    borderColor: `${alpha(theme.palette.primary[300], 0.3)}`,
+    boxShadow: `4px 0 40px ${alpha(theme.palette.primary[600], 0.5)}`,
+  }),
+]);
 
 const Video = styled('video')(({ theme }) => [
   {
     overflow: 'hidden',
-    objectFit: 'cover',
     width: '100%',
     height: '100%',
-    borderRadius: '5px',
+    borderRadius: 10,
     border: '1px solid',
-    borderColor: theme.palette.primary[100],
+    borderColor: `${alpha(theme.palette.primary[100], 0.6)}`,
   },
   theme.applyDarkStyles({
-    borderColor: theme.palette.primaryDark[700],
+    borderColor: `${alpha(theme.palette.primary[700], 0.5)}`,
   }),
 ]);
 
-const VIDEO_BREAKPOINT_GAP = 100;
-
-const VideoContainer = styled(Box)(({ theme }) => [
-  {
-    maxWidth: 1100,
-    height: '100%',
-    width: {
-      xs: 360,
-      sm: theme.breakpoints.values.sm - VIDEO_BREAKPOINT_GAP,
-      md: theme.breakpoints.values.md + VIDEO_BREAKPOINT_GAP,
-      lg: theme.breakpoints.values.lg + VIDEO_BREAKPOINT_GAP,
-    },
-    borderRadius: theme.shape.borderRadius,
-    padding: 16,
-    background: `linear-gradient(230deg, ${theme.palette.primary[50]} 0%, ${alpha(
-      theme.palette.primary[100],
-      0.4,
-    )} 150%)`,
-    border: '1px solid',
-    borderColor: `${alpha(theme.palette.primary[200], 0.5)}`,
-    boxShadow: `4px 0 60px ${alpha(theme.palette.primary[100], 0.8)}`,
-  },
-  theme.applyDarkStyles({
-    background: `linear-gradient(230deg, ${theme.palette.primaryDark[600]} 0%, ${alpha(
-      theme.palette.primaryDark[700],
-      0.4,
-    )} 150%)`,
-    borderColor: `${alpha(theme.palette.primaryDark[300], 0.5)}`,
-    boxShadow: `4px 0 60px ${alpha(theme.palette.primaryDark[300], 0.5)}`,
+const videoMainControls = (theme) => ({
+  position: 'absolute',
+  transform: 'translate(-50%,-50%)',
+  background: `linear-gradient(120deg, ${(theme.vars || theme).palette.primary[400]} 0%, ${
+    (theme.vars || theme).palette.primary[600]
+  } 150%)`,
+  borderRadius: 99,
+  width: 58,
+  height: 58,
+  inset: '50%',
+  border: 'none',
+  boxShadow: `0 4px 8px ${alpha(theme.palette.primary[900], 0.5)}`,
+  transition: theme.transitions.create(['scale', 'box-shadow', 'opacity'], {
+    duration: theme.transitions.duration.shortest,
   }),
+  zIndex: 10,
+  '&:hover': {
+    scale: '1.02',
+    background: `linear-gradient(120deg, ${(theme.vars || theme).palette.primary[500]} 0%, ${
+      (theme.vars || theme).palette.primary[700]
+    } 150%)`,
+    boxShadow: `0 8px 16px ${alpha(theme.palette.primary[900], 0.5)}`,
+  },
+});
+
+const videoSecondaryControls = (theme) => ({
+  position: 'absolute',
+  width: 34,
+  height: 34,
+  background: (theme.vars || theme).palette.primary[50],
+  borderRadius: 99,
+  border: '1px solid',
+  borderColor: (theme.vars || theme).palette.primary[200],
+  boxShadow: `0 4px 6px ${alpha(theme.palette.grey[400], 0.2)}`,
+  transition: theme.transitions.create(['scale', 'box-shadow', 'opacity'], {
+    duration: theme.transitions.duration.shortest,
+  }),
+  opacity: 1,
+  zIndex: 10,
+  '&:hover': {
+    scale: '1.03',
+    borderColor: (theme.vars || theme).palette.primary[300],
+    boxShadow: `0 4px 8px ${alpha(theme.palette.grey[500], 0.4)}`,
+    background: `linear-gradient(120deg, ${(theme.vars || theme).palette.primary[50]} 0%, ${
+      (theme.vars || theme).palette.primary[100]
+    } 150%)`,
+  },
+  ...theme.applyDarkStyles({
+    borderColor: (theme.vars || theme).palette.primary[200],
+  }),
+});
+
+const PlayButton = styled(IconButton)(({ theme }) => [
+  {
+    ...videoMainControls(theme),
+  },
+]);
+
+const PauseButton = styled(IconButton)(({ theme }) => [
+  {
+    ...videoMainControls(theme),
+    opacity: 0,
+  },
+]);
+
+const FullScreenButton = styled(IconButton)(({ theme }) => [
+  {
+    ...videoSecondaryControls(theme),
+    bottom: 28,
+    right: 28,
+  },
+]);
+
+const MuteButton = styled(IconButton)(({ theme }) => [
+  {
+    ...videoSecondaryControls(theme),
+    bottom: 28,
+    right: 72,
+  },
 ]);
 
 export default function DemoVideo() {
+  const videoRef = React.useRef();
+  const [isPaused, setIsPaused] = React.useState(true);
+  const [isMuted, setIsMuted] = React.useState(false);
+
+  const handlePlay = () => {
+    videoRef.current.play();
+    setIsPaused(videoRef.current.paused);
+  };
+  const handlePause = () => {
+    videoRef.current.pause();
+    setIsPaused(videoRef.current.paused);
+  };
+  const handleFullScreen = () => {
+    videoRef.current.requestFullscreen();
+  };
+
+  const handleMuteToggle = () => {
+    videoRef.current.muted = !videoRef.current.muted;
+    setIsMuted(videoRef.current.muted);
+  };
+
   return (
-    <Box
-      sx={{
-        display: 'flex',
-        flexDirection: 'row',
-        justifyContent: 'center',
-        py: { xs: 4, sm: 8 },
-      }}
-    >
-      <Container>
-        <VideoContainer>
-          <Video
-            playsInline
-            controls
-            poster="/static/toolpad/marketing/index-hero-video-poster.png"
-          >
-            <source src="/static/toolpad/marketing/index-hero-demo-video.mp4" type="video/mp4" />
-            Your browser does not support the video tag.
-          </Video>
-        </VideoContainer>
-      </Container>
-    </Box>
+    <VideoContainer>
+      {isPaused ? (
+        <PlayButton type="button" onClick={handlePlay} color="primary">
+          <PlayArrowRoundedIcon sx={{ color: '#FFF' }} />
+        </PlayButton>
+      ) : null}
+
+      {!isPaused ? (
+        <PauseButton className="MuiToolpadHero-pauseButton" type="button" onClick={handlePause}>
+          <PauseRoundedIcon sx={{ color: '#FFF' }} />
+        </PauseButton>
+      ) : null}
+
+      <FullScreenButton type="button" onClick={handleFullScreen} color="primary">
+        <FullScreenRoundedIcon color="primary" sx={{ fontSize: 24 }} />
+      </FullScreenButton>
+
+      <MuteButton type="button" onClick={handleMuteToggle} color="primary">
+        {isMuted ? (
+          <VolumeOffRoundedIcon color="primary" sx={{ fontSize: 24 }} />
+        ) : (
+          <VolumeUpRoundedIcon color="primary" sx={{ fontSize: 24 }} />
+        )}
+      </MuteButton>
+
+      <Video poster="/static/toolpad/marketing/index-hero-video-poster.png" ref={videoRef}>
+        <source src="/static/toolpad/marketing/index-hero-demo-video.mp4" type="video/mp4" />
+        Your browser does not support the video tag.
+      </Video>
+    </VideoContainer>
   );
 }

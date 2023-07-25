@@ -195,7 +195,10 @@ export default function Hero() {
           Build scalable and secure internal tools locally. Drag and drop to build UI, then connect
           to data sources with your own code.
         </Typography>
-        <GetStartedButtons installation={'npx create-toolpad-app'} to={ROUTES.toolpadQuickstart} />
+        <GetStartedButtons
+          installation={'npx create-toolpad-app@latest'}
+          to={ROUTES.toolpadQuickstart}
+        />
         <Box
           sx={{
             mt: 2,

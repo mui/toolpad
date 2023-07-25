@@ -4,10 +4,10 @@ export async function withTemporaryEdits<T = void>(
   filePath: string,
   doWork: () => Promise<T>,
 ): Promise<T> {
-  const envOriginal = await fs.readFile(filePath, 'utf-8');
+  const originalContent = await fs.readFile(filePath);
   try {
     return await doWork();
   } finally {
-    await fs.writeFile(filePath, envOriginal);
+    await fs.writeFile(filePath, originalContent);
   }
 }

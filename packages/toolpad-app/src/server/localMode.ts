@@ -1140,7 +1140,7 @@ export async function buildProject() {
 
   const project = new ToolpadProject(root, { dev: config.cmd === 'dev' });
 
-  // await project.build();
+  await project.build();
 
   await project.dispose();
 }

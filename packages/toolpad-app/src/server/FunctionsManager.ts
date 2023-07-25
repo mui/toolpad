@@ -67,7 +67,7 @@ export default class FunctionsManager {
 
   private buildErrors: esbuild.Message[] = [];
 
-  private devWorker: ReturnType<typeof createDevWorker>;
+  private devWorker: ReturnType<typeof createDevWorker> | undefined;
 
   private extractedTypes: Awaitable<IntrospectionResult> | undefined;
 
@@ -75,7 +75,9 @@ export default class FunctionsManager {
 
   constructor(project: IToolpadProject) {
     this.project = project;
-    this.devWorker = createDevWorker(process.env);
+    if (this.project.options.dev) {
+      this.devWorker = createDevWorker(process.env);
+    }
     if (this.project.options.dev) {
       this.extractTypesWorker = new Piscina({
         filename: path.join(__dirname, 'functionsTypesWorker.js'),
@@ -213,12 +215,14 @@ export default class FunctionsManager {
   }
 
   private async createRuntimeWorkerWithEnv() {
-    const oldWorker = this.devWorker;
-    this.devWorker = createDevWorker(process.env);
+    if (this.project.options.dev) {
+      const oldWorker = this.devWorker;
+      this.devWorker = createDevWorker(process.env);
 
-    await oldWorker.terminate();
+      await oldWorker?.terminate();
 
-    this.project.invalidateQueries();
+      this.project.invalidateQueries();
+    }
   }
 
   async start() {
@@ -250,7 +254,7 @@ export default class FunctionsManager {
   }
 
   async dispose() {
-    await Promise.all([this.devWorker.terminate(), this.extractTypesWorker.destroy()]);
+    await Promise.all([this.devWorker?.terminate(), this.extractTypesWorker.destroy()]);
   }
 
   async exec(
@@ -258,6 +262,8 @@ export default class FunctionsManager {
     name: string,
     parameters: Record<string, unknown>,
   ): Promise<ExecFetchResult<unknown>> {
+    invariant(this.devWorker, 'this.devWorker should have been initialized');
+
     const resourcesFolder = this.getResourcesFolder();
     const fullPath = path.resolve(resourcesFolder, fileName);
     const entryPoint = path.relative(this.project.getRoot(), fullPath);

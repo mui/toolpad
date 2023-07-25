@@ -71,6 +71,19 @@ function randomBetween(seed: number, min: number, max: number): () => number {
   return () => min + (max - min) * random();
 }
 
+function isValidDate(inputString: string) {
+  // Check if the input string contains only digits (simple numeric string)
+  if (/^\d+$/.test(inputString)) {
+    return false;
+  }
+
+  try {
+    return !Number.isNaN(Date.parse(inputString));
+  } catch (error) {
+    return false;
+  }
+}
+
 const SkeletonCell = styled(Box)(({ theme }) => ({
   display: 'flex',
   flexDirection: 'row',
@@ -155,6 +168,9 @@ function inferColumnType(value: unknown): string {
 
         return 'link';
       } catch (error) {
+        if (isValidDate(value)) {
+          return 'date';
+        }
         return valueType;
       }
     case 'object':
@@ -215,7 +231,12 @@ function ImageCell({ field, id, value: src }: GridRenderCellParams<any, any, any
 }
 
 function dateValueGetter({ value }: GridValueGetterParams<any, any>) {
-  return typeof value === 'number' ? new Date(value) : value;
+  try {
+    const date = new Date(value);
+    return date;
+  } catch (err) {
+    return value;
+  }
 }
 
 function ComponentErrorFallback({ error }: FallbackProps) {

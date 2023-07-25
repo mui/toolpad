@@ -245,6 +245,7 @@ export default class FunctionsManager {
       throw errorFrom(types.error);
     }
 
+    await fs.mkdir(this.getFunctionsOutputFolder(), { recursive: true });
     await fs.writeFile(this.getIntrospectJsonPath(), JSON.stringify(types, null, 2), 'utf-8');
   }
 

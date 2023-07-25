@@ -17,7 +17,7 @@ By the end, you should be able to:
 
 ## Prerequisites
 
-Make sure to [install Node](https://nodejs.org/en) on your system.
+Make sure to [install Node.js](https://nodejs.org/en) on your system.
 
 ## Building your first application
 

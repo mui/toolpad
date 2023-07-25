@@ -8,7 +8,7 @@
     "start": "NODE_OPTIONS='--max-old-space-size=396' toolpad start"
   },
   "dependencies": {
-    "@mui/toolpad": "0.1.21",
+    "@mui/toolpad": "https://pkg.csb.dev/mui/mui-toolpad/commit/336da8cb/@mui/toolpad",
     "recharts": "2.7.2"
   }
 }

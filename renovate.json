@@ -99,6 +99,7 @@
       "groupName": "Update @mui/toolpad in examples",
       "matchPackageNames": ["@mui/toolpad"],
       "matchFiles": ["examples/*/package.json"],
+      "schedule": ["at any time"],
       "automerge": true
     }
   ],

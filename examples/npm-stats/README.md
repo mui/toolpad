@@ -8,13 +8,7 @@
 
 ## Check out the live app
 
-<p></p>
-
-[![Render Badge]](https://npm-stats.onrender.com/prod/pages/evZC-gp)
-
-[Render Badge]: https://img.shields.io/badge/Render-purple?style=for-the-badge&color=%234350e9&link=https%3A%2F%2Fnpm-stats.onrender.com%2Fprod%2Fpages%2FevZC-gp
-
-[![Open in StackBlitz](https://developer.stackblitz.com/img/open_in_stackblitz.svg)](https://stackblitz.com/fork/github/mui/mui-toolpad/tree/master/examples/npm-stats)
+https://npm-stats.onrender.com/prod/pages/evZC-gp
 
 ## How to run
 
@@ -33,6 +27,10 @@ Install it and run:
 npm install
 npm run dev
 ```
+
+or:
+
+[![Open in StackBlitz](https://developer.stackblitz.com/img/open_in_stackblitz.svg)](https://stackblitz.com/fork/github/mui/mui-toolpad/tree/master/examples/npm-stats)
 
 ## What's inside
 

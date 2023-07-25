@@ -113,6 +113,7 @@
     "addLabels": ["priority: important"]
   },
   "lockFileMaintenance": {
-    "enabled": true
+    "enabled": true,
+    "schedule": "before 6:00am on the first day of the month"
   }
 }

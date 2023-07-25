@@ -49,27 +49,18 @@ function SignUp({ sx }) {
     return (
       <Alert
         severity="success"
-        sx={[
-          {
-            maxWidth: { sm: 540 },
-            mx: { xs: 0, sm: 'auto' },
-            bgcolor: 'success.50',
-          },
-          (theme) =>
-            theme.applyDarkStyles({
-              bgcolor: 'primaryDark.700',
-            }),
-        ]}
+        sx={{
+          maxWidth: { sm: 540 },
+          mx: { xs: 0, sm: 'auto' },
+          bgcolor: 'primaryDark.700',
+        }}
         iconMapping={{
           success: (
             <CheckCircleRoundedIcon
               fontSize="small"
-              sx={[
-                {
-                  color: 'success.700',
-                },
-                (theme) => theme.applyDarkStyles({ color: 'success.600' }),
-              ]}
+              sx={{
+                color: 'success.600',
+              }}
             />
           ),
         }}
@@ -102,44 +93,31 @@ function SignUp({ sx }) {
           value={form.email}
           onChange={(event) => setForm({ email: event.target.value, status: 'initial' })}
           sx={[
-            {
+            (theme) => ({
               mr: { xs: 0, sm: 1 },
               mb: { xs: 1, sm: 0 },
               minWidth: { xs: 220, sm: 360 },
               width: { xs: '100%', sm: 'auto' },
-              bgcolor: '#fff',
-              boxShadow: '0 1px 2px 0 rgba(0 0 0 / 0.08)',
+              color: (theme.vars || theme).palette.grey[300],
+              bgcolor: (theme.vars || theme).palette.primaryDark[900],
+              boxShadow: '0 1px 2px 0 rgba(0 0 0 / 1)',
               borderRadius: 1,
               border: '1px solid',
-              borderColor: 'grey.300',
+              borderColor: (theme.vars || theme).palette.primaryDark[500],
               px: 1,
               py: 0.5,
               // height: 48,
               typography: 'body2',
               '&:hover': {
-                borderColor: 'grey.400',
-                boxShadow: '0 1px 2px 0 rgba(0 0 0 / 0.2)',
+                borderColor: (theme.vars || theme).palette.primaryDark[400],
+                boxShadow: '0 1px 4px 0 rgba(0 0 0 / 1)',
               },
               [`&.${inputBaseClasses.focused}`]: {
-                borderColor: (theme) => theme.palette.primary[500],
+                borderColor: (theme.vars || theme).palette.primaryDark[300],
                 outline: '3px solid',
-                outlineColor: (theme) => theme.palette.primary[100],
+                outlineColor: (theme.vars || theme).palette.primaryDark[500],
               },
-            },
-            (theme) =>
-              theme.applyDarkStyles({
-                bgcolor: theme.palette.primaryDark[900],
-                boxShadow: '0 1px 2px 0 rgba(0 0 0 / 1)',
-                borderColor: theme.palette.primaryDark[500],
-                '&:hover': {
-                  borderColor: theme.palette.primaryDark[300],
-                  boxShadow: '0 1px 2px 0 rgba(0 0 0 / 1)',
-                },
-                [`&.${inputBaseClasses.focused}`]: {
-                  borderColor: theme.palette.primary[300],
-                  outlineColor: theme.palette.primary[500],
-                },
-              }),
+            }),
           ]}
         />
         <Button

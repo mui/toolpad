@@ -109,7 +109,11 @@ export default function CardGrid() {
         <Grid container spacing={5} sx={{ mt: { xs: 1, sm: 4 } }}>
           <Grid xs={12} md={6}>
             <ImageContainer>
-              <Img src="/static/toolpad/marketing/admin-app.png" width="2880" height="1592" />
+              <Img
+                src="/static/toolpad/docs/examples/basic-crud-app.png"
+                width="2880"
+                height="1592"
+              />
             </ImageContainer>
             <ContentCard
               icon={<AdminPanelSettingsRoundedIcon fontSize="small" color="primary" />}
@@ -120,7 +124,7 @@ export default function CardGrid() {
           </Grid>
           <Grid xs={12} md={6}>
             <ImageContainer>
-              <Img src="/static/toolpad/marketing/npm-stats.png" width="2880" height="1592" />
+              <Img src="/static/toolpad/docs/examples/npm-stats.png" width="2880" height="1592" />
             </ImageContainer>
             <ContentCard
               icon={<DashboardRoundedIcon fontSize="small" color="primary" />}
@@ -132,7 +136,11 @@ export default function CardGrid() {
           </Grid>
           <Grid xs={12} md={6}>
             <ImageContainer>
-              <Img src="/static/toolpad/marketing/qr-generator.png" width="2880" height="1592" />
+              <Img
+                src="/static/toolpad/docs/examples/qr-generator.png"
+                width="2880"
+                height="1592"
+              />
             </ImageContainer>
             <ContentCard
               icon={<HandymanRoundedIcon fontSize="small" color="primary" />}

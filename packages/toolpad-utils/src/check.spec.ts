@@ -1,5 +1,5 @@
 import { describe, test, expect } from '@jest/globals';
-import { isArray, isMap, isObject, isSet, isPureObject } from './check';
+import { isArray, isMap, isObject, isSet } from './check';
 
 describe('check type of data', () => {
   test('isArray', () => {

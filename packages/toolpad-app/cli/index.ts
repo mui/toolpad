@@ -30,6 +30,11 @@ function runApp(cmd: 'dev' | 'start', { dir, ...args }: Omit<RunOptions, 'cmd'>)
     },
   });
 
+  process.on('SIGTERM', () => worker.terminate());
+  process.on('SIGINT', () => worker.terminate());
+  process.on('SIGBREAK', () => worker.terminate());
+  process.on('SIGHUP', () => worker.terminate());
+
   worker.on('error', (err) => {
     console.error(err);
   });

@@ -20,6 +20,8 @@ interface IToolpadProject {
 export default class EnvManager {
   private project: IToolpadProject;
 
+  private originalEnv: Record<string, string | undefined> = { ...process.env };
+
   private values: Awaitable<Record<string, string>> = {};
 
   constructor(project: IToolpadProject) {
@@ -30,8 +32,16 @@ export default class EnvManager {
     this.initWatcher();
   }
 
+  private resetEnv() {
+    Object.keys(process.env).forEach((key) => {
+      delete process.env[key];
+    });
+    Object.assign(process.env, this.originalEnv);
+  }
+
   private loadEnvFile() {
     const envFilePath = this.getEnvFilePath();
+    this.resetEnv();
     const { parsed = {} } = dotenv.config({ path: envFilePath, override: true });
     this.values = parsed;
     // eslint-disable-next-line no-console

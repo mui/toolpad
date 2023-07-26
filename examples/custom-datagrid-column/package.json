@@ -8,6 +8,6 @@
     "start": "toolpad start"
   },
   "dependencies": {
-    "@mui/toolpad": "0.1.21"
+    "@mui/toolpad": "https://pkg.csb.dev/mui/mui-toolpad/commit/336da8cb/@mui/toolpad"
   }
 }

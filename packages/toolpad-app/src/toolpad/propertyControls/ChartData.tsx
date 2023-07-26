@@ -9,7 +9,6 @@ import {
   ListItemButton,
   ListItemText,
   MenuItem,
-  PaletteColor,
   Popover,
   Stack,
   TextField,

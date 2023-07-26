@@ -152,7 +152,7 @@ The playwright tests can be run in one of two modes:
    TOOLPAD_NEXT_DEV=1 yarn test:integration --project chromium
    ```
 
-- Use the `--ui` flag to run the tests interactively
+Use the `--ui` flag to run the tests interactively
 
 ## Building and running the documentation
 

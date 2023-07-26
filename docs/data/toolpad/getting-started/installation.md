@@ -4,7 +4,7 @@
 
 ## Create a Toolpad app
 
-Start by opening a terminal and `cd` into a folder you'd like to create your applicarion in.
+Start by opening a terminal and `cd` into a folder you'd like to create your application in.
 Then run the command:
 
 <codeblock storageKey="package-manager">

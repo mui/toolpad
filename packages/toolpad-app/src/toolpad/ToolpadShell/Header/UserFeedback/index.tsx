@@ -88,7 +88,7 @@ function getUpgradeMessage(packageManager: PackageManager | null): string {
     case 'yarn':
       return `yarn add ${pkgName}`;
     case 'pnpm':
-      return `pnpm install ${pkgName}`;
+      return `pnpm add ${pkgName}`;
     default:
       return `npm install ${pkgName}`;
   }

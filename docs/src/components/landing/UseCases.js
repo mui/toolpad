@@ -1,5 +1,5 @@
 import * as React from 'react';
-import Link from '@mui/material/Link';
+import Link from 'docs/src/modules/components/Link';
 import PropTypes from 'prop-types';
 import { styled, alpha } from '@mui/material/styles';
 import Box from '@mui/material/Box';
@@ -15,10 +15,11 @@ import GradientText from 'docs/src/components/typography/GradientText';
 import Grid from '@mui/material/Unstable_Grid2';
 import ROUTES from '../../route';
 
-const ImageContainer = styled(Box)(({ theme }) => [
+const ImageContainer = styled(Link)(({ theme }) => [
   {
     position: 'relative',
     width: '100%',
+    display: 'block',
     height: 'auto',
     borderRadius: 16,
     padding: 8,
@@ -108,7 +109,19 @@ export default function CardGrid() {
         />
         <Grid container spacing={5} sx={{ mt: { xs: 1, sm: 4 } }}>
           <Grid xs={12} md={6}>
-            <ImageContainer>
+            <ImageContainer noLinkStyle href="/toolpad/examples/npm-stats/">
+              <Img src="/static/toolpad/docs/examples/npm-stats.png" width="2880" height="1592" />
+            </ImageContainer>
+            <ContentCard
+              icon={<DashboardRoundedIcon fontSize="small" color="primary" />}
+              title="Analytics dashboard"
+              description="Build Analytics dashboards to slice and dice any metric across various dimensions. Further, use them to monitor KPIs, track business goals, and identify trends and opportunities. Toolpad allows you to combine data from multiple sources and bind
+                it by writing JavaScript anywhere."
+              href="/toolpad/examples/npm-stats/"
+            />
+          </Grid>
+          <Grid xs={12} md={6}>
+            <ImageContainer noLinkStyle href="/toolpad/examples/basic-crud-app/">
               <Img
                 src="/static/toolpad/docs/examples/basic-crud-app.png"
                 width="2880"
@@ -119,23 +132,11 @@ export default function CardGrid() {
               icon={<AdminPanelSettingsRoundedIcon fontSize="small" color="primary" />}
               title="Admin panel"
               description="Enable your teams to quickly view and manage customer orders, queries, and refunds by creating admin apps that gather data from third-party APIs providers like Stripe, Twilio, Zendesk, etc. Toolpad allows end users to create, read, update, or delete records."
-              href={ROUTES.toolpadAdminExample}
+              href="/toolpad/examples/basic-crud-app/"
             />
           </Grid>
           <Grid xs={12} md={6}>
-            <ImageContainer>
-              <Img src="/static/toolpad/docs/examples/npm-stats.png" width="2880" height="1592" />
-            </ImageContainer>
-            <ContentCard
-              icon={<DashboardRoundedIcon fontSize="small" color="primary" />}
-              title="Analytics dashboard"
-              description="Build Analytics dashboards to slice and dice any metric across various dimensions. Further, use them to monitor KPIs, track business goals, and identify trends and opportunities. Toolpad allows you to combine data from multiple sources and bind
-                it by writing JavaScript anywhere."
-              href={ROUTES.toolpadBIExample}
-            />
-          </Grid>
-          <Grid xs={12} md={6}>
-            <ImageContainer>
+            <ImageContainer noLinkStyle href="/toolpad/examples/qr-generator/">
               <Img
                 src="/static/toolpad/docs/examples/qr-generator.png"
                 width="2880"
@@ -148,7 +149,7 @@ export default function CardGrid() {
               description="Provide the stakeholders with simple apps to manage their daily operations. You can quickly build an app on Toolpad by calling APIs or writing custom functions.
                 Your app remains secure as the code never leaves your network, and you can
                 securely deploy it to any service you choose."
-              href={ROUTES.toolpadUtilityAppExample}
+              href="/toolpad/examples/qr-generator/"
             />
           </Grid>
           <Grid xs={12} md={6}>

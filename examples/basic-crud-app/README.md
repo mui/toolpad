@@ -8,9 +8,7 @@
 
 ## Check out the live app
 
-<p></p>
-
-[![Open in StackBlitz](https://developer.stackblitz.com/img/open_in_stackblitz.svg)](https://stackblitz.com/fork/github/mui/mui-toolpad/tree/master/examples/basic-crud-app)
+Not available yet. You can open [in dev mode with StackBlitz](https://stackblitz.com/fork/github/mui/mui-toolpad/tree/master/examples/basic-crud-app) in the meantime.
 
 ## How to run
 
@@ -29,6 +27,10 @@ Install it and run:
 npm install
 npm run dev
 ```
+
+or:
+
+[![Open in StackBlitz](https://developer.stackblitz.com/img/open_in_stackblitz.svg)](https://stackblitz.com/fork/github/mui/mui-toolpad/tree/master/examples/basic-crud-app)
 
 ## What's inside
 

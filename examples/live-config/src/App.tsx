@@ -11,7 +11,7 @@ export default function App() {
   return (
     <Container>
       <Typography variant="h5">Live Config</Typography>
-      <Box sx={{ position: 'relative', width: '100%', height: 400 }}>
+      <Box sx={{ position: 'relative', width: '100%', height: 700 }}>
         <MyGrid rows={ROWS} />
       </Box>
     </Container>

@@ -184,7 +184,12 @@ export async function generateDataGridComponent(
 
 
       return (
-        <Box sx={{ position: 'relative', width: '100%', height: 400 }}>
+        <Box sx={{ 
+          position: 'relative', 
+          width: '100%',
+          ${file.spec?.heightMode === 'container' ? 'height: "100%"' : ''}
+          ${file.spec?.heightMode === 'fixed' ? `height: ${file.spec?.height ?? 400}` : ''}
+        }}>
           <ErrorBoundary>
             {error ? (
               <ErrorOverlay error={error} />
@@ -193,6 +198,7 @@ export async function generateDataGridComponent(
                 rows={rows}
                 loading={loading}
                 columns={columns}
+                ${file.spec?.heightMode === 'auto' ? 'autoHeight' : ''}
                 ${
                   file.spec?.rowIdSelector
                     ? `getRowId={(row) => ${jsonPointer.toExpression(

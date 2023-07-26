@@ -31,6 +31,8 @@ export const columnDefinitionsSchema = z.array(columnDefinitionSchema);
 export type ColumnDefinitionsSpec = z.infer<typeof columnDefinitionsSchema>;
 
 export const dataGridSpecSchema = z.object({
+  heightMode: z.enum(['auto', 'container', 'fixed']).optional(),
+  height: z.number().optional(),
   rows: rowsSpecSchema.optional(),
   columns: columnDefinitionsSchema.optional(),
   rowIdSelector: z.string().optional(),

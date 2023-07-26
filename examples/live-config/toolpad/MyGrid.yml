@@ -13,3 +13,5 @@ spec:
     - field: Population
       type: number
   rowIdSelector: /ID Year
+  height: 500
+  heightMode: container

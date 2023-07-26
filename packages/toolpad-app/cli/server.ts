@@ -254,7 +254,6 @@ export async function main({
 }
 
 invariant(!!process.env.TOOLPAD_EXTERNAL_URL, 'TOOLPAD_EXTERNAL_URL must be set');
-invariant(!!process.env.TOOLPAD_RUNTIME_CONFIG, 'A runtime config must be defined');
 invariant(
   process.env.TOOLPAD_CMD === 'dev' || process.env.TOOLPAD_CMD === 'start',
   'TOOLPAD_PROJECT_DIR must be set',

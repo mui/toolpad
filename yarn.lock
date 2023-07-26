@@ -2108,6 +2108,11 @@
   resolved "https://registry.yarnpkg.com/@mui/core-downloads-tracker/-/core-downloads-tracker-5.14.1.tgz#af156cb3e15b202f5c09f66e7d8b71ca86aef525"
   integrity sha512-mIa1WmDmNr1LoupV1Rbxt9bTFKMbIn10RHG1bnZ/FJCkAYpuU/D4n+R+ttiycgcZNngU++zyh/OQeJblzbQPzg==
 
+"@mui/core-downloads-tracker@^5.14.2":
+  version "5.14.2"
+  resolved "https://registry.yarnpkg.com/@mui/core-downloads-tracker/-/core-downloads-tracker-5.14.2.tgz#d8fcacdb1d37e621fce33ea808180fa5a590f908"
+  integrity sha512-x+c/MgDL1t/IIy5lDbMlrDouFG5DYZbl3DP4dbbuhlpPFBnE9glYwmJEee/orVHQpOPwLxCAIWQs+2DKSaBVWQ==
+
 "@mui/icons-material@5.14.1":
   version "5.14.1"
   resolved "https://registry.yarnpkg.com/@mui/icons-material/-/icons-material-5.14.1.tgz#2f145c15047a0c7f01353ce620cb88276dadba9e"
@@ -2137,6 +2142,24 @@
     "@babel/runtime" "^7.22.6"
     "@mui/base" "5.0.0-beta.8"
     "@mui/core-downloads-tracker" "^5.14.1"
+    "@mui/system" "^5.14.1"
+    "@mui/types" "^7.2.4"
+    "@mui/utils" "^5.14.1"
+    "@types/react-transition-group" "^4.4.6"
+    clsx "^1.2.1"
+    csstype "^3.1.2"
+    prop-types "^15.8.1"
+    react-is "^18.2.0"
+    react-transition-group "^4.4.5"
+
+"@mui/material@5.14.2":
+  version "5.14.2"
+  resolved "https://registry.yarnpkg.com/@mui/material/-/material-5.14.2.tgz#13b113489a61021145d62e0383912ca487a46375"
+  integrity sha512-TgNR4/YRL11RifsnMWNhITNCkGJYVz20SCvVJBBoU5Y/KhUNSSJxjDpEB8VrnY+sUsV0NigLCkHZJglfsiS3Pw==
+  dependencies:
+    "@babel/runtime" "^7.22.6"
+    "@mui/base" "5.0.0-beta.8"
+    "@mui/core-downloads-tracker" "^5.14.2"
     "@mui/system" "^5.14.1"
     "@mui/types" "^7.2.4"
     "@mui/utils" "^5.14.1"
@@ -2224,6 +2247,15 @@
     clsx "^1.2.1"
     csstype "^3.1.2"
     prop-types "^15.8.1"
+
+"@mui/toolpad-utils@0.1.20":
+  version "0.1.20"
+  resolved "https://registry.yarnpkg.com/@mui/toolpad-utils/-/toolpad-utils-0.1.20.tgz#9c84dd6a55ac50ce74c8495b5c5a43b84001c1a3"
+  integrity sha512-w7sldA4+Pgty7B+i92Cmdljfvy/z/wpwgLZD6W+RmzCs0DedsLuycgx3HckOFTqEr43xvO5nNHoANYUJPoTogw==
+  dependencies:
+    react-is "18.2.0"
+    yaml "2.3.1"
+    yaml-diff-patch "2.0.0"
 
 "@mui/types@7.2.4", "@mui/types@^7.2.4":
   version "7.2.4"

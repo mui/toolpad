@@ -30,9 +30,9 @@ import { useToolpadComponents } from '../AppEditor/toolpadComponents';
 import { ToolpadComponentDefinition } from '../../runtime/toolpadComponents';
 import { useDom } from '../AppState';
 import PropertyControl from '../../components/PropertyControl';
-
 // TODO: this import suggests leaky abstraction
 import { usePageEditorState } from '../AppEditor/PageEditor/PageEditorProvider';
+import { omit } from '../../utils/immutability';
 
 type GridAlignment = SerializableGridColumn['align'];
 
@@ -219,11 +219,18 @@ function GridColumnsPropEditor({
                 <TextField
                   label="width"
                   type="number"
-                  value={editedColumn.width}
+                  value={editedColumn.width || ''}
                   disabled={disabled}
-                  onChange={(event) =>
-                    handleColumnChange({ ...editedColumn, width: Number(event.target.value) })
-                  }
+                  onChange={(event) => {
+                    handleColumnChange(
+                      event.target.value
+                        ? {
+                            ...editedColumn,
+                            width: Number(event.target.value),
+                          }
+                        : omit(editedColumn, 'width'),
+                    );
+                  }}
                 />
 
                 <TextField

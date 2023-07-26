@@ -1,8 +1,7 @@
 import {
-  DataGridProProps,
-  DataGridPro,
+  DataGridProps,
+  DataGrid,
   GridToolbar,
-  GridColumnResizeParams,
   GridRowsProp,
   GridColumnOrderChangeParams,
   useGridApiContext,
@@ -19,8 +18,7 @@ import {
   useGridSelector,
   getGridDefaultColumnTypes,
   GridColTypeDef,
-  LicenseInfo,
-} from '@mui/x-data-grid-pro';
+} from '@mui/x-data-grid';
 import * as React from 'react';
 import { useNode, createComponent, useComponents } from '@mui/toolpad-core';
 import {
@@ -41,16 +39,6 @@ import { ErrorBoundary, FallbackProps } from 'react-error-boundary';
 import { NumberFormat, createStringFormatter } from '@mui/toolpad-core/numberFormat';
 import { SX_PROP_HELPER_TEXT } from './constants';
 import ErrorOverlay from './components/ErrorOverlay';
-
-if (typeof window !== 'undefined') {
-  const licenseKey = window.document.querySelector<HTMLMetaElement>(
-    'meta[name="toolpad-x-license"]',
-  )?.content;
-
-  if (licenseKey) {
-    LicenseInfo.setLicenseKey(licenseKey);
-  }
-}
 
 const DEFAULT_COLUMN_TYPES = getGridDefaultColumnTypes();
 
@@ -328,7 +316,7 @@ interface Selection {
   id?: any;
 }
 
-interface ToolpadDataGridProps extends Omit<DataGridProProps, 'columns' | 'rows' | 'error'> {
+interface ToolpadDataGridps extends Omit<DataGridProps, 'columns' | 'rows' | 'error'> {
   rows?: GridRowsProp;
   columns?: SerializableGridColumns;
   height?: number;
@@ -350,27 +338,10 @@ const DataGridComponent = React.forwardRef(function DataGridComponent(
     onSelectionChange,
     hideToolbar,
     ...props
-  }: ToolpadDataGridProps,
+  }: ToolpadDataGridps,
   ref: React.ForwardedRef<HTMLDivElement>,
 ) {
-  const nodeRuntime = useNode<ToolpadDataGridProps>();
-
-  const handleResize = React.useMemo(
-    () =>
-      debounce((params: GridColumnResizeParams) => {
-        if (!nodeRuntime) {
-          return;
-        }
-
-        nodeRuntime.updateAppDomConstProp('columns', (columns) =>
-          columns?.map((column) =>
-            column.field === params.colDef.field ? { ...column, width: params.width } : column,
-          ),
-        );
-      }, 500),
-    [nodeRuntime],
-  );
-  React.useEffect(() => handleResize.clear(), [handleResize]);
+  const nodeRuntime = useNode<ToolpadDataGridps>();
 
   const handleColumnOrderChange = React.useMemo(
     () =>
@@ -475,13 +446,12 @@ const DataGridComponent = React.forwardRef(function DataGridComponent(
       <div
         style={{ position: 'absolute', inset: '0 0 0 0', visibility: error ? 'hidden' : 'visible' }}
       >
-        <DataGridPro
+        <DataGrid
           apiRef={apiRef}
           slots={{
             toolbar: hideToolbar ? null : GridToolbar,
             loadingOverlay: SkeletonLoadingOverlay,
           }}
-          onColumnResize={handleResize}
           onColumnOrderChange={handleColumnOrderChange}
           rows={rows}
           columns={columns}

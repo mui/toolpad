@@ -1,5 +1,5 @@
 import { PropValueType } from '@mui/toolpad-core';
-import { GridColDef } from '@mui/x-data-grid-pro';
+import { GridColDef } from '@mui/x-data-grid';
 import * as React from 'react';
 import { EditorProps } from '../../types';
 import { usePageEditorState } from '../AppEditor/PageEditor/PageEditorProvider';

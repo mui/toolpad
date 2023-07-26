@@ -2209,20 +2209,6 @@
     prop-types "^15.8.1"
     react-is "^18.2.0"
 
-"@mui/x-data-grid-pro@6.10.1":
-  version "6.10.1"
-  resolved "https://registry.yarnpkg.com/@mui/x-data-grid-pro/-/x-data-grid-pro-6.10.1.tgz#602ed86d03a86003504549a1b1881340eb3bd0d5"
-  integrity sha512-ynwy/IZQHAZSua+tDdJzhMEiOev+iMWcJ/1Y+q0qGco1PtBhsMRM/d671KQyJxvVy+nOtH21eYA0XtrxjE4+kw==
-  dependencies:
-    "@babel/runtime" "^7.22.6"
-    "@mui/utils" "^5.13.7"
-    "@mui/x-data-grid" "6.10.1"
-    "@mui/x-license-pro" "6.10.0"
-    "@types/format-util" "^1.0.2"
-    clsx "^1.2.1"
-    prop-types "^15.8.1"
-    reselect "^4.1.8"
-
 "@mui/x-data-grid@6.10.1":
   version "6.10.1"
   resolved "https://registry.yarnpkg.com/@mui/x-data-grid/-/x-data-grid-6.10.1.tgz#cd79bd326cffff0bb368b8230fd690574e95ab32"
@@ -3090,11 +3076,6 @@
     "@types/express-serve-static-core" "^4.17.33"
     "@types/qs" "*"
     "@types/serve-static" "*"
-
-"@types/format-util@^1.0.2":
-  version "1.0.2"
-  resolved "https://registry.yarnpkg.com/@types/format-util/-/format-util-1.0.2.tgz#7d19feb1caf59b6ea99c83dfe795ffa3f06b87d7"
-  integrity sha512-9SrLCpgzWo2yHHhiMOX0WwgDh37nSbDbWUsRc1ss++o8O97E3tB6SJiyUQM21UeUsKvZNuhDCmkRaINZ4uJAfg==
 
 "@types/formidable@3.4.0":
   version "3.4.0"

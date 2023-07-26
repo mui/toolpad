@@ -1,7 +1,7 @@
 import { LoadingButton } from '@mui/lab';
 import { Box, Button, Skeleton, Stack, TextField, Toolbar, Typography } from '@mui/material';
 import { inferColumns, parseColumns } from '@mui/toolpad-components';
-import { DataGridPro, GridColDef } from '@mui/x-data-grid-pro';
+import { DataGrid, GridColDef } from '@mui/x-data-grid';
 import * as React from 'react';
 import { useForm } from 'react-hook-form';
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
@@ -272,7 +272,7 @@ export function QueryEditor({
           </Box>
         ) : (
           <React.Fragment>
-            <DataGridPro
+            <DataGrid
               sx={{ border: 'none', flex: 1 }}
               columns={columns}
               key={previewGridKey}

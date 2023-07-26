@@ -9,6 +9,7 @@ import {
   ListItemButton,
   ListItemText,
   MenuItem,
+  PaletteColor,
   Popover,
   Stack,
   TextField,
@@ -61,7 +62,9 @@ function ChartDataPropEditor({
   const [popoverAnchorElement, setPopoverAnchorElement] = React.useState<HTMLElement | null>(null);
 
   const handleAddDataSeries = React.useCallback(() => {
-    const newDataSeriesLabel = `dataSeries${value.length + 1}`;
+    const newDataSeriesCount = value.length + 1;
+
+    const newDataSeriesLabel = `dataSeries${newDataSeriesCount}`;
 
     onChange([
       ...value,
@@ -69,7 +72,10 @@ function ChartDataPropEditor({
         label: newDataSeriesLabel,
         kind: 'line',
         data: [],
-        color: appTheme.palette.primary.main,
+        color:
+          newDataSeriesCount % 2 === 0
+            ? appTheme.palette.secondary.main
+            : appTheme.palette.primary.main,
       },
     ]);
   }, [appTheme, onChange, value]);

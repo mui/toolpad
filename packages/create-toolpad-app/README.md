@@ -1,6 +1,7 @@
 # Create Toolpad App
 
-The simplest method to start with Toolpad is by using `create-toolpad-app`. This CLI tool enables you to quickly start building a new Toolpad application, with everything already set up.
+The simplest method to start with Toolpad is by using `create-toolpad-app`.
+This CLI tool enables you to quickly start building a new Toolpad application, with everything already set up.
 
 ## Interactive
 

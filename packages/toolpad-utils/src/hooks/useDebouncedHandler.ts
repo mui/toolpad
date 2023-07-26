@@ -1,16 +1,16 @@
 import * as React from 'react';
 
-interface Handler<P extends any[]> {
+interface Handler<P extends unknown[]> {
   (...params: P): void;
 }
 
-interface DelayedInvocation<P extends any[]> {
+interface DelayedInvocation<P extends unknown[]> {
   startTime: number;
   timeout: NodeJS.Timeout;
   params: P;
 }
 
-function clear<P extends any[]>(
+function clear<P extends unknown[]>(
   delayedInvocation: React.MutableRefObject<DelayedInvocation<P> | null>,
 ) {
   if (delayedInvocation.current) {
@@ -19,7 +19,11 @@ function clear<P extends any[]>(
   }
 }
 
-function defer<P extends any[]>(fn: React.MutableRefObject<Handler<P>>, params: P, delay: number) {
+function defer<P extends unknown[]>(
+  fn: React.MutableRefObject<Handler<P>>,
+  params: P,
+  delay: number,
+) {
   const timeout = setTimeout(() => {
     fn.current(...params);
   }, delay);
@@ -34,7 +38,7 @@ function defer<P extends any[]>(fn: React.MutableRefObject<Handler<P>>, params: 
  * This implementation adds on the lodash implementation in that it handles updates to the
  * delay value.
  */
-export default function useDebouncedHandler<P extends any[]>(
+export default function useDebouncedHandler<P extends unknown[]>(
   fn: Handler<P>,
   delay: number,
 ): Handler<P> {

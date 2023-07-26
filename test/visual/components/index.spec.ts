@@ -36,11 +36,9 @@ test('rendering components in the app editor', async ({ page, argosScreenshot })
 
 test('showing grid while resizing elements', async ({ page, argosScreenshot }) => {
   const editorModel = new ToolpadEditor(page);
-  await editorModel.goto();
+  await editorModel.goToPageById('5YDOftB');
 
   await editorModel.waitForOverlay();
-
-  await editorModel.goToPage('rows');
 
   const firstText = editorModel.appCanvas.getByText('text').first();
 

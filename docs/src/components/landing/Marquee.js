@@ -9,59 +9,40 @@ function Marquee({ content }) {
     <Container
       sx={[
         (theme) => ({
-          mt: 4,
           mx: 0,
           minWidth: '100%',
           py: { xs: 4, sm: 6, md: 12 },
           display: 'flex',
           flexDirection: 'column',
           alignItems: 'center',
-          background: `radial-gradient(140% 150% at 50% 10%, transparent 20%,  ${theme.palette.primary[100]} 90%,  transparent 100%)`,
-          borderBottom: '1px solid',
-          borderColor: 'grey.200',
+          backgroundRepeat: 'no-repeat',
+          backgroundSize: '100%',
+          backgroundImage: `linear-gradient(180deg, ${
+            (theme.vars || theme).palette.primaryDark[900]
+          } 0%, ${(theme.vars || theme).palette.primaryDark[800]})`,
         }),
-        (theme) =>
-          theme.applyDarkStyles({
-            borderColor: 'primaryDark.600',
-            background: `linear-gradient(180deg, ${theme.palette.primaryDark[900]} 0%, ${theme.palette.primaryDark[800]})`,
-          }),
       ]}
     >
       <Typography
         textAlign="center"
         variant="h2"
         sx={{
-          mt: 4,
           mx: 'auto',
-          color: (theme) => theme.palette.primary[800],
+          color: 'primary.50',
         }}
       >
         {content.title}
       </Typography>
       <Typography
         textAlign="center"
-        sx={[
-          {
-            mt: 1,
-            mb: 4,
-            mx: 'auto',
-            color: 'grey.600',
-          },
-          (theme) => theme.applyDarkStyles({ color: 'grey.500' }),
-        ]}
+        sx={{
+          mt: 1,
+          mb: 4,
+          mx: 'auto',
+          color: 'grey.500',
+        }}
       >
         {content.subtitle}
-      </Typography>
-      <Typography
-        component="label"
-        variant="body2"
-        sx={[
-          { fontWeight: 'medium', display: 'block', mb: 1, mx: 'auto', color: `text.secondary` },
-          (theme) => theme.applyDarkStyles({ color: '#fff' }),
-        ]}
-        htmlFor="email-landing"
-      >
-        {content.action.label}
       </Typography>
       <SignUp
         sx={{
@@ -81,7 +62,6 @@ Marquee.propTypes = {
   content: PropTypes.shape({
     action: PropTypes.shape({
       href: PropTypes.string.isRequired,
-      label: PropTypes.string.isRequired,
     }).isRequired,
     subtitle: PropTypes.string.isRequired,
     title: PropTypes.string.isRequired,

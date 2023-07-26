@@ -14,20 +14,20 @@ import { WebSocket, WebSocketServer } from 'ws';
 import { listen } from '@mui/toolpad-utils/http';
 import { asyncHandler } from '../src/utils/express';
 import { createProdHandler } from '../src/server/toolpadAppServer';
-import { getUserProjectRoot } from '../src/server/localMode';
 import { getProject } from '../src/server/liveProject';
 import { Command as AppDevServerCommand, Event as AppDevServerEvent } from './appServer';
 import { createRpcHandler, rpcServer } from '../src/server/rpc';
 import { createDataHandler, createDataSourcesHandler } from '../src/server/data';
 import { RUNTIME_CONFIG_WINDOW_PROPERTY } from '../src/constants';
-import config from '../src/config';
+import { RuntimeConfig } from '../src/config';
 
 interface CreateDevHandlerParams {
   root: string;
   base: string;
+  runtimeConfig: RuntimeConfig;
 }
 
-async function createDevHandler({ root, base }: CreateDevHandlerParams) {
+async function createDevHandler({ root, base, runtimeConfig }: CreateDevHandlerParams) {
   const router = express.Router();
 
   const appServerPath = path.resolve(__dirname, './appServer.js');
@@ -39,7 +39,7 @@ async function createDevHandler({ root, base }: CreateDevHandlerParams) {
     stdio: 'inherit',
     env: {
       NODE_ENV: 'development',
-      TOOLPAD_PROJECT_DIR: root,
+      TOOLPAD_RUNTIME_CONFIG: JSON.stringify(runtimeConfig),
       TOOLPAD_PORT: String(devPort),
       TOOLPAD_BASE: base,
       FORCE_COLOR: '1',
@@ -93,6 +93,7 @@ interface ServerConfig {
   hostname: string;
   port: number;
   devMode: boolean;
+  externalUrl: string;
 }
 
 export async function main({
@@ -103,8 +104,15 @@ export async function main({
   hostname,
   port,
   devMode,
+  externalUrl,
 }: ServerConfig) {
   const { default: chalk } = await import('chalk');
+
+  const runtimeConfig: RuntimeConfig = {
+    cmd,
+    projectDir,
+    externalUrl,
+  };
 
   const app = express();
   const httpServer = createServer(app);
@@ -141,7 +149,8 @@ export async function main({
     case 'dev': {
       const previewBase = '/preview';
       const devHandler = await createDevHandler({
-        root: getUserProjectRoot(),
+        runtimeConfig,
+        root: projectDir,
         base: previewBase,
       });
       app.use(previewBase, devHandler);
@@ -149,7 +158,7 @@ export async function main({
     }
     case 'start': {
       const prodHandler = await createProdHandler({
-        root: getUserProjectRoot(),
+        root: projectDir,
       });
       app.use('/prod', prodHandler);
       break;
@@ -163,7 +172,7 @@ export async function main({
     app.use('/api/dataSources', createDataSourcesHandler());
 
     const transformIndexHtml = (html: string) => {
-      const serializedConfig = serializeJavascript(config, { isJSON: true });
+      const serializedConfig = serializeJavascript(runtimeConfig, { isJSON: true });
       return html.replace(
         '<!-- __TOOLPAD_SCRIPTS__ -->',
         `
@@ -244,6 +253,8 @@ export async function main({
   });
 }
 
+invariant(!!process.env.TOOLPAD_EXTERNAL_URL, 'TOOLPAD_EXTERNAL_URL must be set');
+invariant(!!process.env.TOOLPAD_RUNTIME_CONFIG, 'A runtime config must be defined');
 invariant(
   process.env.TOOLPAD_CMD === 'dev' || process.env.TOOLPAD_CMD === 'start',
   'TOOLPAD_PROJECT_DIR must be set',
@@ -258,6 +269,7 @@ main({
   hostname: 'localhost',
   port: Number(process.env.TOOLPAD_PORT),
   devMode: process.env.TOOLPAD_NEXT_DEV === '1',
+  externalUrl: process.env.TOOLPAD_EXTERNAL_URL,
 }).catch((err) => {
   console.error(err);
   process.exit(1);

@@ -1,3 +1,5 @@
+import invariant from 'invariant';
+import * as z from 'zod';
 import { RUNTIME_CONFIG_WINDOW_PROPERTY } from './constants';
 
 /**
@@ -32,13 +34,15 @@ export type BuildEnvVars = Record<
   string
 >;
 
+export const runtimeConfigSchema = z.object({
+  externalUrl: z.string(),
+  projectDir: z.string(),
+  cmd: z.union([z.literal('dev'), z.literal('start')]),
+});
+
 // These are set at runtime and passed to the browser.
 // Do not add secrets
-export interface RuntimeConfig {
-  externalUrl: string;
-  projectDir?: string;
-  cmd: 'dev' | 'start';
-}
+export type RuntimeConfig = z.infer<typeof runtimeConfigSchema>;
 
 declare global {
   interface Window {
@@ -57,15 +61,18 @@ function getBrowsersideRuntimeConfig(): RuntimeConfig {
 
 const runtimeConfig: RuntimeConfig =
   typeof window === 'undefined'
-    ? {
-        externalUrl:
-          process.env.TOOLPAD_EXTERNAL_URL || `http://localhost:${process.env.PORT || 3000}`,
-        projectDir: process.env.TOOLPAD_PROJECT_DIR,
-        cmd:
-          process.env.TOOLPAD_CMD === 'dev' || process.env.TOOLPAD_CMD === 'start'
-            ? process.env.TOOLPAD_CMD
-            : 'dev',
-      }
+    ? (() => {
+        invariant(process.env.TOOLPAD_PROJECT_DIR, 'A project root must be defined');
+        return {
+          externalUrl:
+            process.env.TOOLPAD_EXTERNAL_URL || `http://localhost:${process.env.PORT || 3000}`,
+          projectDir: process.env.TOOLPAD_PROJECT_DIR,
+          cmd:
+            process.env.TOOLPAD_CMD === 'dev' || process.env.TOOLPAD_CMD === 'start'
+              ? process.env.TOOLPAD_CMD
+              : 'dev',
+        };
+      })()
     : getBrowsersideRuntimeConfig();
 
 export default runtimeConfig;

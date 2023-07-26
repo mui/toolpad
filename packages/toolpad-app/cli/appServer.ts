@@ -6,10 +6,17 @@ import {
   createViteConfig,
   resolvedComponentsId,
 } from '../src/server/toolpadAppBuilder';
-import config from '../src/config';
+import { RuntimeConfig, runtimeConfigSchema } from '../src/config';
 import { loadDomFromDisk } from '../src/server/localMode';
 
-function devServerPlugin(): Plugin {
+console.log(`vite dev server ${process.pid}`);
+
+invariant(
+  process.env.NODE_ENV === 'development',
+  'The dev server must be started with NODE_ENV=development',
+);
+
+function devServerPlugin(config: RuntimeConfig): Plugin {
   return {
     name: 'toolpad-dev-server',
 
@@ -40,17 +47,17 @@ function devServerPlugin(): Plugin {
 }
 
 export interface ToolpadAppDevServerParams {
-  root: string;
+  config: RuntimeConfig;
   base: string;
 }
 
-export async function createDevServer({ root, base }: ToolpadAppDevServerParams) {
+export async function createDevServer({ config, base }: ToolpadAppDevServerParams) {
   const devServer = await createServer(
     createViteConfig({
       dev: true,
-      root,
+      root: config.projectDir,
       base,
-      plugins: [devServerPlugin()],
+      plugins: [devServerPlugin(config)],
     }),
   );
 
@@ -65,22 +72,16 @@ export type Event = {
   kind: 'ready';
 };
 
-async function main() {
-  invariant(
-    process.env.NODE_ENV === 'development',
-    'The dev server must be started with NODE_ENV=development',
-  );
-  invariant(!!process.env.TOOLPAD_PROJECT_DIR, 'A project root must be defined');
-  invariant(!!process.env.TOOLPAD_PORT, 'A port must be defined');
-  invariant(!!process.env.TOOLPAD_BASE, 'A base path must be defined');
-  invariant(process.send, 'Process must be spawned with an IPC channel');
+export interface MainParams {
+  base: string;
+  port: number;
+  config: RuntimeConfig;
+}
 
-  const app = await createDevServer({
-    root: process.env.TOOLPAD_PROJECT_DIR,
-    base: process.env.TOOLPAD_BASE,
-  });
+export async function main({ base, config, port }: MainParams) {
+  const app = await createDevServer({ config, base });
 
-  await app.listen(Number(process.env.TOOLPAD_PORT));
+  await app.listen(port);
 
   process.on('message', (msg: Command) => {
     if (msg.kind === 'reload-components') {
@@ -91,10 +92,19 @@ async function main() {
     }
   });
 
+  invariant(process.send, 'Process must be spawned with an IPC channel');
   process.send({ kind: 'ready' } satisfies Event);
 }
 
-main().catch((err) => {
+invariant(!!process.env.TOOLPAD_RUNTIME_CONFIG, 'A runtime config must be defined');
+invariant(!!process.env.TOOLPAD_PORT, 'A port must be defined');
+invariant(!!process.env.TOOLPAD_BASE, 'A base path must be defined');
+
+main({
+  config: runtimeConfigSchema.parse(JSON.parse(process.env.TOOLPAD_RUNTIME_CONFIG)),
+  base: process.env.TOOLPAD_BASE,
+  port: Number(process.env.TOOLPAD_PORT),
+}).catch((err) => {
   console.error(err);
   process.exit(1);
 });

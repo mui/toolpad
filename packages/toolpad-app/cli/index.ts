@@ -75,6 +75,7 @@ async function runApp(cmd: Command, { port, dev = false, dir }: RunOptions) {
     env: {
       NODE_ENV: editorDevMode ? 'development' : 'production',
       TOOLPAD_NEXT_DEV: editorDevMode ? '1' : '',
+      TOOLPAD_EXTERNAL_URL: process.env.TOOLPAD_EXTERNAL_URL || `http://localhost:${port}`,
       TOOLPAD_DIR: toolpadDir,
       TOOLPAD_PROJECT_DIR: projectDir,
       TOOLPAD_PORT: String(port),

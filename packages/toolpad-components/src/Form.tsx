@@ -3,16 +3,8 @@ import { Container, ContainerProps, Box, Stack, BoxProps } from '@mui/material';
 import { LoadingButton } from '@mui/lab';
 import { ArgTypeDefinitions, createComponent, useNode } from '@mui/toolpad-core';
 import { useForm, FieldValues, ValidationMode, FieldError, Controller } from 'react-hook-form';
+import { isReferEqual } from '@mui/toolpad-utils/collections';
 import { SX_PROP_HELPER_TEXT } from './constants';
-
-function isEqual(props: ValidationProps, previouProps: ValidationProps) {
-  return Object.keys(props).some((key) => {
-    if (props[key as PropList] !== previouProps[key as PropList]) {
-      return false;
-    }
-    return true;
-  });
-}
 
 export const FormContext = React.createContext<{
   form: ReturnType<typeof useForm> | null;
@@ -178,17 +170,18 @@ export default createComponent(Form, {
   },
 });
 
-export interface FormInputComponentProps {
+export interface FormInputComponentProps extends FormInputValidationProps {
   name: string;
+}
+
+export interface FormInputValidationProps {
   isRequired: boolean;
   minLength: number;
   maxLength: number;
   isInvalid: boolean;
 }
 
-type PropList = 'isRequired' | 'minLength' | 'maxLength' | 'isInvalid';
-
-type ValidationProps = Partial<Pick<FormInputComponentProps, PropList>>;
+type ValidationProps = Partial<FormInputValidationProps>;
 
 interface UseFormInputInput<V> {
   name: string;
@@ -267,7 +260,7 @@ export function useFormInput<V>({
   React.useEffect(() => {
     if (
       form &&
-      !isEqual(validationProps, previousManualValidationPropsRef.current) &&
+      !isReferEqual(validationProps, previousManualValidationPropsRef.current) &&
       form.formState.dirtyFields[formInputName]
     ) {
       form.trigger(formInputName);

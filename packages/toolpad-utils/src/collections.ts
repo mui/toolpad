@@ -1,3 +1,5 @@
+import { isArray, isObject, isSet, isMap } from './check';
+
 export function asArray<T>(maybeArray: T | T[]): T[] {
   return Array.isArray(maybeArray) ? maybeArray : [maybeArray];
 }
@@ -92,4 +94,67 @@ export function filterKeys<U>(
   filter: (old: string) => boolean,
 ): Record<string, U> {
   return mapProperties(obj, ([key, value]) => (filter(key) ? [key, value] : null));
+}
+
+/**
+ * Check if two values are equal - that is,
+ */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export function isReferEqual(obj: any, objToCompare: any): boolean {
+  if (obj === objToCompare) {
+    return true;
+  }
+  const isObjectA = isObject(obj);
+  const isObjectB = isObject(objToCompare);
+  if (isObjectA && isObjectB) {
+    try {
+      const isArrayA = isArray(obj);
+      const isArrayB = isArray(objToCompare);
+      const isSetA = isSet(obj);
+      const isSetB = isSet(objToCompare);
+      const isMapA = isMap(obj);
+      const isMapB = isMap(objToCompare);
+
+      if (isSetA && isSetB) {
+        return obj.size === objToCompare.size && isReferEqual([...obj], [...objToCompare]);
+      }
+
+      if (isMapA && isMapB) {
+        return obj.size === objToCompare.size && isReferEqual([...obj], [...objToCompare]);
+      }
+
+      if (isArrayA && isArrayB) {
+        return (
+          obj.length === objToCompare.length &&
+          obj.every((e: string, i: number) => {
+            return isReferEqual(e, objToCompare[i]);
+          })
+        );
+      }
+
+      if (obj instanceof Date && objToCompare instanceof Date) {
+        return obj.getTime() === objToCompare.getTime();
+      }
+
+      if (!isArrayA && !isArrayB) {
+        const keysA = Object.keys(obj);
+        const keysB = Object.keys(objToCompare);
+        return (
+          keysA.length === keysB.length &&
+          keysA.every((key: string) => {
+            return isReferEqual(obj[key], objToCompare[key]);
+          })
+        );
+      }
+      /* istanbul ignore next */
+      return false;
+    } catch (e) {
+      /* istanbul ignore next */
+      return false;
+    }
+  } else if (!isObjectA && !isObjectB) {
+    return String(obj) === String(objToCompare);
+  } else {
+    return false;
+  }
 }

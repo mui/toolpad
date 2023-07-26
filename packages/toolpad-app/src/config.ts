@@ -37,7 +37,7 @@ export type BuildEnvVars = Record<
 export const runtimeConfigSchema = z.object({
   externalUrl: z.string(),
   projectDir: z.string(),
-  cmd: z.union([z.literal('dev'), z.literal('start')]),
+  cmd: z.union([z.literal('dev'), z.literal('start'), z.literal('build')]),
 });
 
 // These are set at runtime and passed to the browser.

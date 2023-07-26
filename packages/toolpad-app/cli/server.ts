@@ -12,6 +12,7 @@ import * as fs from 'fs/promises';
 import serializeJavascript from 'serialize-javascript';
 import { WebSocket, WebSocketServer } from 'ws';
 import { listen } from '@mui/toolpad-utils/http';
+import { parentPort, workerData } from 'worker_threads';
 import { asyncHandler } from '../src/utils/express';
 import { createProdHandler } from '../src/server/toolpadAppServer';
 import { getProject } from '../src/server/liveProject';
@@ -85,12 +86,11 @@ interface HealthCheck {
   memoryUsagePretty: Record<keyof NodeJS.MemoryUsage, string>;
 }
 
-interface ServerConfig {
-  cmd: 'dev' | 'start';
+export interface ServerConfig {
+  cmd: 'dev' | 'start' | 'build';
   gitSha1: string | null;
   circleBuildNum: string | null;
   projectDir: string;
-  hostname: string;
   port: number;
   devMode: boolean;
   externalUrl: string;
@@ -101,7 +101,6 @@ export async function main({
   gitSha1,
   circleBuildNum,
   projectDir,
-  hostname,
   port,
   devMode,
   externalUrl,
@@ -217,12 +216,8 @@ export async function main({
 
   await listen(httpServer, port);
 
-  // eslint-disable-next-line no-console
-  console.log(
-    `${chalk.green('ready')} - toolpad project ${chalk.cyan(projectDir)} ready on ${chalk.cyan(
-      `http://${hostname}:${port}`,
-    )}`,
-  );
+  invariant(parentPort, 'parentPort must be defined');
+  parentPort.postMessage({ kind: 'ready', port });
 
   const wsServer = new WebSocketServer({ noServer: true });
 
@@ -253,23 +248,7 @@ export async function main({
   });
 }
 
-invariant(!!process.env.TOOLPAD_EXTERNAL_URL, 'TOOLPAD_EXTERNAL_URL must be set');
-invariant(
-  process.env.TOOLPAD_CMD === 'dev' || process.env.TOOLPAD_CMD === 'start',
-  'TOOLPAD_PROJECT_DIR must be set',
-);
-invariant(process.env.TOOLPAD_PROJECT_DIR, 'TOOLPAD_PROJECT_DIR must be set');
-
-main({
-  cmd: process.env.TOOLPAD_CMD,
-  gitSha1: process.env.GIT_SHA1 || null,
-  circleBuildNum: process.env.CIRCLE_BUILD_NUM || null,
-  projectDir: process.env.TOOLPAD_PROJECT_DIR,
-  hostname: 'localhost',
-  port: Number(process.env.TOOLPAD_PORT),
-  devMode: process.env.TOOLPAD_NEXT_DEV === '1',
-  externalUrl: process.env.TOOLPAD_EXTERNAL_URL,
-}).catch((err) => {
+main(workerData).catch((err) => {
   console.error(err);
   process.exit(1);
 });

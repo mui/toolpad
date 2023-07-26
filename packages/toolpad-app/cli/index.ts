@@ -1,33 +1,15 @@
 import 'dotenv/config';
 import yargs from 'yargs';
 import path from 'path';
-import invariant from 'invariant';
-import { Readable } from 'stream';
-import * as readline from 'readline';
 import openBrowser from 'react-dev-utils/openBrowser';
 import chalk from 'chalk';
 import { folderExists } from '@mui/toolpad-utils/fs';
 import { execaNode } from 'execa';
 import getPort from 'get-port';
+import { Worker } from 'worker_threads';
+import { ServerConfig } from './server';
 
 const DEFAULT_PORT = 3000;
-
-async function waitForMatch(input: Readable, regex: RegExp): Promise<RegExpExecArray | null> {
-  return new Promise((resolve, reject) => {
-    const rl = readline.createInterface({ input });
-
-    rl.on('line', (line) => {
-      const match = regex.exec(line);
-      if (match) {
-        rl.close();
-        input.resume();
-        resolve(match);
-      }
-    });
-    rl.on('error', (err) => reject(err));
-    rl.on('end', () => resolve(null));
-  });
-}
 
 function* getPreferredPorts(port: number = DEFAULT_PORT): Iterable<number> {
   while (true) {
@@ -51,8 +33,6 @@ async function runApp(cmd: Command, { port, dev = false, dir }: RunOptions) {
     process.exit(1);
   }
 
-  const toolpadDir = path.resolve(__dirname, '../..'); // from ./dist/server
-
   if (!port) {
     port = cmd === 'dev' ? await getPort({ port: getPreferredPorts(DEFAULT_PORT) }) : DEFAULT_PORT;
   } else {
@@ -65,38 +45,47 @@ async function runApp(cmd: Command, { port, dev = false, dir }: RunOptions) {
   }
 
   const editorDevMode =
-    process.env.TOOLPAD_NEXT_DEV || process.env.NODE_ENV === 'development' || dev;
+    !!process.env.TOOLPAD_NEXT_DEV || process.env.NODE_ENV === 'development' || dev;
 
   const serverPath = path.resolve(__dirname, './server.js');
 
-  const cp = execaNode(serverPath, [], {
-    cwd: projectDir,
-    stdio: 'pipe',
+  const externalUrl = process.env.TOOLPAD_EXTERNAL_URL || `http://localhost:${port}`;
+
+  const worker = new Worker(serverPath, {
+    workerData: {
+      cmd,
+      gitSha1: process.env.GIT_SHA1 || null,
+      circleBuildNum: process.env.CIRCLE_BUILD_NUM || null,
+      projectDir,
+      port,
+      devMode: editorDevMode,
+      externalUrl,
+    } satisfies ServerConfig,
     env: {
-      NODE_ENV: editorDevMode ? 'development' : 'production',
-      TOOLPAD_NEXT_DEV: editorDevMode ? '1' : '',
-      TOOLPAD_EXTERNAL_URL: process.env.TOOLPAD_EXTERNAL_URL || `http://localhost:${port}`,
-      TOOLPAD_DIR: toolpadDir,
+      ...process.env,
+      // TODO: eliminate the need for TOOLPAD_PROJECT_DIR and remove the worker altogether
       TOOLPAD_PROJECT_DIR: projectDir,
-      TOOLPAD_PORT: String(port),
-      TOOLPAD_CMD: cmd,
-      FORCE_COLOR: '1',
     },
   });
 
-  invariant(cp.stdout, 'child process must be started with "stdio: \'pipe\'"');
-  invariant(cp.stderr, 'child process must be started with "stdio: \'pipe\'"');
+  const serverPort = await new Promise<void>((resolve) => {
+    worker.on('message', (msg: any) => {
+      if (msg.kind === 'ready') {
+        resolve(msg.port);
+      }
+    });
+  });
 
-  process.stdin.pipe(cp.stdin!);
-  cp.stdout.pipe(process.stdout);
-  cp.stderr.pipe(process.stderr);
+  const toolpadBaseUrl = `http://localhost:${serverPort}/`;
+
+  // eslint-disable-next-line no-console
+  console.log(
+    `${chalk.green('ready')} - toolpad project ${chalk.cyan(projectDir)} ready on ${chalk.cyan(
+      toolpadBaseUrl,
+    )}`,
+  );
 
   if (cmd === 'dev') {
-    // Poll stdout for "http://localhost:3000" first
-    const match = await waitForMatch(cp.stdout, /http:\/\/localhost:(\d+)/);
-    const detectedPort = match ? Number(match[1]) : null;
-    invariant(detectedPort, 'Could not find port in stdout');
-    const toolpadBaseUrl = `http://localhost:${detectedPort}/`;
     try {
       openBrowser(toolpadBaseUrl);
     } catch (err: any) {
@@ -104,7 +93,7 @@ async function runApp(cmd: Command, { port, dev = false, dir }: RunOptions) {
     }
   }
 
-  cp.on('exit', (code) => {
+  worker.on('exit', (code) => {
     if (code) {
       process.exit(code);
     }

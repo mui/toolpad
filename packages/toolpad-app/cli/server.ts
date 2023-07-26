@@ -12,7 +12,10 @@ import * as fs from 'fs/promises';
 import serializeJavascript from 'serialize-javascript';
 import { WebSocket, WebSocketServer } from 'ws';
 import { listen } from '@mui/toolpad-utils/http';
-import { parentPort, workerData } from 'worker_threads';
+import { workerData } from 'worker_threads';
+import openBrowser from 'react-dev-utils/openBrowser';
+import { folderExists } from '@mui/toolpad-utils/fs';
+import chalk from 'chalk';
 import { asyncHandler } from '../src/utils/express';
 import { createProdHandler } from '../src/server/toolpadAppServer';
 import { getProject } from '../src/server/liveProject';
@@ -21,6 +24,15 @@ import { createRpcHandler, rpcServer } from '../src/server/rpc';
 import { createDataHandler, createDataSourcesHandler } from '../src/server/data';
 import { RUNTIME_CONFIG_WINDOW_PROPERTY } from '../src/constants';
 import { RuntimeConfig } from '../src/config';
+
+const DEFAULT_PORT = 3000;
+
+function* getPreferredPorts(port: number = DEFAULT_PORT): Iterable<number> {
+  while (true) {
+    yield port;
+    port += 1;
+  }
+}
 
 interface CreateDevHandlerParams {
   root: string;
@@ -105,8 +117,6 @@ export async function main({
   devMode,
   externalUrl,
 }: ServerConfig) {
-  const { default: chalk } = await import('chalk');
-
   const runtimeConfig: RuntimeConfig = {
     cmd,
     projectDir,
@@ -214,10 +224,7 @@ export async function main({
     }
   }
 
-  await listen(httpServer, port);
-
-  invariant(parentPort, 'parentPort must be defined');
-  parentPort.postMessage({ kind: 'ready', port });
+  const runningServer = await listen(httpServer, port);
 
   const wsServer = new WebSocketServer({ noServer: true });
 
@@ -246,9 +253,69 @@ export async function main({
       });
     }
   });
+
+  return runningServer.port;
 }
 
-main(workerData).catch((err) => {
+export type Command = 'dev' | 'start' | 'build';
+export interface RunAppOptions {
+  cmd: Command;
+  port?: number;
+  dev?: boolean;
+  projectDir: string;
+}
+
+async function runApp({ cmd, port, dev = false, projectDir }: RunAppOptions) {
+  if (!(await folderExists(projectDir))) {
+    console.error(`${chalk.red('error')} - No project found at ${chalk.cyan(`"${projectDir}"`)}`);
+    process.exit(1);
+  }
+
+  if (!port) {
+    port = cmd === 'dev' ? await getPort({ port: getPreferredPorts(DEFAULT_PORT) }) : DEFAULT_PORT;
+  } else {
+    // if port is specified but is not available, exit
+    const availablePort = await getPort({ port });
+    if (availablePort !== port) {
+      console.error(`${chalk.red('error')} - Port ${port} is not available. Aborted.`);
+      process.exit(1);
+    }
+  }
+
+  const editorDevMode =
+    !!process.env.TOOLPAD_NEXT_DEV || process.env.NODE_ENV === 'development' || dev;
+
+  const externalUrl = process.env.TOOLPAD_EXTERNAL_URL || `http://localhost:${port}`;
+
+  const serverPort = await main({
+    cmd,
+    gitSha1: process.env.GIT_SHA1 || null,
+    circleBuildNum: process.env.CIRCLE_BUILD_NUM || null,
+    projectDir,
+    port,
+    devMode: editorDevMode,
+    externalUrl,
+  });
+
+  const toolpadBaseUrl = `http://localhost:${serverPort}/`;
+
+  // eslint-disable-next-line no-console
+  console.log(
+    `${chalk.green('ready')} - toolpad project ${chalk.cyan(projectDir)} ready on ${chalk.cyan(
+      toolpadBaseUrl,
+    )}`,
+  );
+
+  if (cmd === 'dev') {
+    try {
+      openBrowser(toolpadBaseUrl);
+    } catch (err: any) {
+      console.error(`${chalk.red('error')} - Failed to open browser: ${err.message}`);
+    }
+  }
+}
+
+runApp(workerData).catch((err) => {
   console.error(err);
   process.exit(1);
 });

@@ -30,9 +30,9 @@ export default function Home() {
   return (
     <BrandingCssVarsProvider>
       <Head
-        title="MUI Toolpad: Low-code, admin builder"
+        title="MUI Toolpad: Low-code admin builder"
         description="Build apps with MUI components, connect to data sources, APIs and build your internal tools 10x faster. Open-source and powered by MUI."
-        card="http://deploy-preview-2380--mui-toolpad-docs.netlify.app/static/toolpad/marketing/social-preview.jpg"
+        card="/static/toolpad/marketing/social-preview.jpg"
       />
       <NoSsr>
         <SignUpToast />

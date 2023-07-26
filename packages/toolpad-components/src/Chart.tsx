@@ -22,8 +22,8 @@ export interface ChartDataSeries<D = Record<string, string | number>> {
   kind: (typeof CHART_DATA_SERIES_KINDS)[number];
   label: string;
   data?: D[];
-  xKey: keyof D;
-  yKey: keyof D;
+  xKey?: keyof D;
+  yKey?: keyof D;
   color?: string;
 }
 
@@ -39,27 +39,31 @@ interface ChartProps extends ContainerProps {
 }
 
 function Chart({ data = [], height, sx }: ChartProps) {
-  const xValues = React.useMemo(() => {
-    const allXValues = data.flatMap((dataSeries) =>
-      (dataSeries.data || []).map((dataSeriesPoint) => dataSeriesPoint[dataSeries.xKey]),
-    );
-
-    return allXValues
-      .filter((value, index) => allXValues.indexOf(value) === index)
-      .sort((a: number | string, b: number | string) =>
-        typeof a === 'number' && typeof b === 'number' ? a - b : 0,
-      );
-  }, [data]);
+  const xValues = React.useMemo(
+    () =>
+      data
+        .flatMap((dataSeries) => {
+          if (!dataSeries.xKey || !dataSeries.data) {
+            return [];
+          }
+          return dataSeries.data.map((dataSeriesPoint) => dataSeriesPoint[dataSeries.xKey!]);
+        })
+        .filter((value, index, array) => array.indexOf(value) === index)
+        .sort((a: number | string, b: number | string) =>
+          typeof a === 'number' && typeof b === 'number' ? a - b : 0,
+        ),
+    [data],
+  );
 
   const barChartData = React.useMemo(() => {
     return xValues.map((xValue) => {
       const yValues = data.reduce((acc, dataSeries, index) => {
-        if (dataSeries.kind !== 'bar') {
+        if (dataSeries.kind !== 'bar' || !dataSeries.xKey || !dataSeries.yKey) {
           return acc;
         }
 
         const point = (dataSeries.data || []).find(
-          (dataSeriesPoint) => dataSeriesPoint[dataSeries.xKey] === xValue,
+          (dataSeriesPoint) => dataSeriesPoint[dataSeries.xKey!] === xValue,
         );
 
         return {
@@ -98,7 +102,12 @@ function Chart({ data = [], height, sx }: ChartProps) {
           <Tooltip />
           <Legend />
           {data.map((dataSeries, index) => {
-            if (!dataSeries.data || dataSeries.data.length === 0) {
+            if (
+              !dataSeries.data ||
+              dataSeries.data.length === 0 ||
+              !dataSeries.xKey ||
+              !dataSeries.yKey
+            ) {
               return null;
             }
 
@@ -106,12 +115,12 @@ function Chart({ data = [], height, sx }: ChartProps) {
 
             const normalizedData = dataSeries.data
               .map((dataSeriesPoint) => ({
-                x: dataSeriesPoint[dataSeries.xKey],
-                [dataSeries.yKey]: dataSeriesPoint[dataSeries.yKey],
+                x: dataSeriesPoint[dataSeries.xKey!],
+                [dataSeries.yKey!]: dataSeriesPoint[dataSeries.yKey!],
               }))
               .sort((a, b) =>
-                typeof a[dataSeries.xKey] === 'number' && typeof b[dataSeries.xKey] === 'number'
-                  ? (a[dataSeries.xKey] as number) - (b[dataSeries.xKey] as number)
+                typeof a[dataSeries.xKey!] === 'number' && typeof b[dataSeries.xKey!] === 'number'
+                  ? (a[dataSeries.xKey!] as number) - (b[dataSeries.xKey!] as number)
                   : 0,
               );
 
@@ -192,11 +201,9 @@ export default createComponent(Chart, {
             },
             xKey: {
               type: 'string',
-              default: 'x',
             },
             yKey: {
               type: 'string',
-              default: 'y',
             },
             color: {
               type: 'string',

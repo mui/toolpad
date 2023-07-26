@@ -186,19 +186,22 @@ export default function Hero() {
             ]}
           />
         </Typography>
-        <Typography variant="h1" sx={{ my: 1, minWidth: { xs: 'auto', sm: 600 } }}>
+        <Typography variant="h1" sx={{ my: 2, minWidth: { xs: 'auto', sm: 600 } }}>
           Turn your <TypingAnimation wordIndex={wordIndex} setWordIndex={setWordIndex} />
           <br />
           <GradientText>into UIs</GradientText>
         </Typography>
-        <Typography color="text.secondary" sx={{ maxWidth: 520, mb: 2, textWrap: 'balance' }}>
+        <Typography color="text.secondary" sx={{ maxWidth: 520, mb: 3, textWrap: 'balance' }}>
           Build scalable and secure internal tools locally. Drag and drop to build UI, then connect
           to data sources with your own code.
         </Typography>
-        <GetStartedButtons installation={'npx create-toolpad-app'} to={ROUTES.toolpadQuickstart} />
+        <GetStartedButtons
+          installation={'npx create-toolpad-app@latest'}
+          to={ROUTES.toolpadQuickstart}
+        />
         <Box
           sx={{
-            mt: 2,
+            mt: 4,
             display: 'flex',
             alignItems: 'center',
             justifyContent: { xs: 'space-around', sm: 'start' },

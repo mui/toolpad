@@ -5,6 +5,7 @@ import { test, expect } from '../../playwright/localTest';
 import { ToolpadRuntime } from '../../models/ToolpadRuntime';
 import { ToolpadEditor } from '../../models/ToolpadEditor';
 import { startTestServer } from './testServer';
+import { withTemporaryEdits } from '../../utils/fs';
 
 test.use({
   localAppConfig: {
@@ -43,11 +44,12 @@ test('rest runtime basics', async ({ page, localApp }) => {
   await expect(page.getByText('query4 authorization: foo')).toBeVisible();
 
   const envFilePath = path.resolve(localApp.dir, './.env');
-  await fs.writeFile(envFilePath, 'TEST_VAR=bar');
-
-  await page.reload();
-
-  await expect(page.getByText('query4 authorization: bar')).toBeVisible();
+  await withTemporaryEdits(envFilePath, async () => {
+    await expect(page.getByText('query4 authorization: foo')).toBeVisible();
+    await fs.writeFile(envFilePath, 'TEST_VAR=bar');
+    await page.reload();
+    await expect(page.getByText('query4 authorization: bar')).toBeVisible();
+  });
 });
 
 test('rest editor basics', async ({ page, context, localApp }) => {
@@ -61,12 +63,12 @@ test('rest editor basics', async ({ page, context, localApp }) => {
 
   await expect(newQueryEditor).toBeVisible();
 
-  await expect(editorModel.appCanvas.getByText('query4 authorization: foo')).toBeVisible();
-
   const envFilePath = path.resolve(localApp.dir, './.env');
-  await fs.writeFile(envFilePath, 'TEST_VAR=bar');
-
-  await expect(editorModel.appCanvas.getByText('query4 authorization: bar')).toBeVisible();
+  await withTemporaryEdits(envFilePath, async () => {
+    await expect(editorModel.appCanvas.getByText('query4 authorization: foo')).toBeVisible();
+    await fs.writeFile(envFilePath, 'TEST_VAR=bar');
+    await expect(editorModel.appCanvas.getByText('query4 authorization: bar')).toBeVisible();
+  });
 
   // Make sure switching tabs does not close query editor
   const newTab = await context.newPage();

@@ -30,8 +30,8 @@ function runApp(cmd: 'dev' | 'start', { dir, ...args }: Omit<RunOptions, 'cmd'>)
     },
   });
 
-  worker.once('exit', (code) => {
-    process.exit(code);
+  worker.on('error', (err) => {
+    console.error(err);
   });
 }
 

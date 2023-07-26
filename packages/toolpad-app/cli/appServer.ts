@@ -9,8 +9,6 @@ import {
 import { RuntimeConfig, runtimeConfigSchema } from '../src/config';
 import { loadDomFromDisk } from '../src/server/localMode';
 
-console.log(`vite dev server ${process.pid}`);
-
 invariant(
   process.env.NODE_ENV === 'development',
   'The dev server must be started with NODE_ENV=development',

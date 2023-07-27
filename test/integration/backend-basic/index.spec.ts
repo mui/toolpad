@@ -1,5 +1,4 @@
 import * as path from 'path';
-import * as fs from 'fs/promises';
 import { fileReplace } from '../../../packages/toolpad-utils/src/fs';
 import { test, expect } from '../../playwright/localTest';
 import { ToolpadRuntime } from '../../models/ToolpadRuntime';
@@ -7,6 +6,7 @@ import { ToolpadEditor } from '../../models/ToolpadEditor';
 import { waitForMatch } from '../../utils/streams';
 import { expectBasicPageContent } from './shared';
 import { setPageHidden } from '../../utils/page';
+import { withTemporaryEdits } from '../../utils/fs';
 
 const BASIC_TESTS_PAGE_ID = '5q1xd0t';
 const EXTRACTED_TYPES_PAGE_ID = 'dt1T4rY';
@@ -31,18 +31,6 @@ test.use({
     },
   },
 });
-
-async function withTemporaryEdits<T = void>(
-  filePath: string,
-  doWork: () => Promise<T>,
-): Promise<T> {
-  const envOriginal = await fs.readFile(filePath, 'utf-8');
-  try {
-    return await doWork();
-  } finally {
-    await fs.writeFile(filePath, envOriginal);
-  }
-}
 
 test('functions basics', async ({ page }) => {
   const runtimeModel = new ToolpadRuntime(page);
@@ -74,7 +62,7 @@ test('function editor parameters update', async ({ page, localApp }) => {
   const editorModel = new ToolpadEditor(page);
   await editorModel.goToPageById(BASIC_TESTS_PAGE_ID);
 
-  await editorModel.componentEditor.getByRole('button', { name: 'withParams' }).click();
+  await editorModel.pageEditor.getByRole('button', { name: 'withParams' }).click();
 
   const queryEditor = page.getByRole('dialog', { name: 'withParams' });
   await expect(queryEditor).toBeVisible();
@@ -145,7 +133,7 @@ test('function editor extracted parameters', async ({ page, localApp }) => {
   const editorModel = new ToolpadEditor(page);
   await editorModel.goToPageById(EXTRACTED_TYPES_PAGE_ID);
 
-  await editorModel.componentEditor.getByRole('button', { name: 'bareWithParams' }).click();
+  await editorModel.pageEditor.getByRole('button', { name: 'bareWithParams' }).click();
   const queryEditor = page.getByRole('dialog', { name: 'bareWithParams' });
 
   await queryEditor.getByRole('button', { name: 'Preview', exact: true }).click();

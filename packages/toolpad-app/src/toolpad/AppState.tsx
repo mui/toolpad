@@ -6,11 +6,11 @@ import { debounce, DebouncedFunc } from 'lodash-es';
 
 import { useLocation } from 'react-router-dom';
 import { mapValues } from '@mui/toolpad-utils/collections';
+import useDebouncedHandler from '@mui/toolpad-utils/hooks/useDebouncedHandler';
 import * as appDom from '../appDom';
 import { omit, update } from '../utils/immutability';
 import client from '../api';
 import useShortcut from '../utils/useShortcut';
-import useDebouncedHandler from '../utils/useDebouncedHandler';
 import insecureHash from '../utils/insecureHash';
 import useEvent from '../utils/useEvent';
 import { NodeHashes } from '../types';
@@ -247,7 +247,23 @@ export function appStateReducer(state: AppState, action: AppStateAction): AppSta
     case 'DESELECT_NODE': {
       if (state.currentView.kind === 'page') {
         return update(state, {
-          currentView: { ...state.currentView, selectedNodeId: null },
+          currentView: { ...state.currentView, selectedNodeId: null, tab: 'page' },
+        });
+      }
+      return state;
+    }
+    case 'HOVER_NODE': {
+      if (state.currentView.kind === 'page') {
+        return update(state, {
+          currentView: { ...state.currentView, hoveredNodeId: action.nodeId },
+        });
+      }
+      return state;
+    }
+    case 'BLUR_HOVER_NODE': {
+      if (state.currentView.kind === 'page') {
+        return update(state, {
+          currentView: { ...state.currentView, hoveredNodeId: null },
         });
       }
       return state;
@@ -501,7 +517,7 @@ export default function AppProvider({ children }: DomContextProps) {
     kind: 'page',
     nodeId: firstPage?.id,
     selectedNodeId: null,
-    tab: 'component',
+    tab: 'page',
   };
 
   const [state, dispatch] = React.useReducer(appStateReducer, {

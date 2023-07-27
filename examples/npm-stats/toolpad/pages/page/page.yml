@@ -83,7 +83,7 @@ spec:
         - component: Text
           name: text
           props:
-            value: NPM stats
+            value: npm stats
             variant: h3
     - component: PageRow
       name: pageRow

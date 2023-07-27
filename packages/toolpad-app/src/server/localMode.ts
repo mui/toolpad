@@ -52,7 +52,7 @@ import EnvManager from './EnvManager';
 import FunctionsManager from './FunctionsManager';
 
 export function getUserProjectRoot(): string {
-  const { projectDir } = config;
+  const projectDir = process.env.TOOLPAD_PROJECT_DIR;
   invariant(projectDir, 'Toolpad in local mode must have a project directory defined');
   return projectDir;
 }
@@ -812,34 +812,6 @@ export async function findSupportedEditor(): Promise<string | null> {
   }
 }
 
-let supportedEditorPromise: Promise<string | null>;
-
-export async function getSupportedEditor(): Promise<string | null> {
-  if (!supportedEditorPromise) {
-    supportedEditorPromise = findSupportedEditor();
-  }
-  return supportedEditorPromise;
-}
-
-async function openCodeEditor(file: string): Promise<void> {
-  const supportedEditor = await getSupportedEditor();
-  if (!supportedEditor) {
-    throw new Error(`No code editor found`);
-  }
-  const userProjectRoot = getUserProjectRoot();
-  const fullPath = path.resolve(userProjectRoot, file);
-  openEditor([fullPath, userProjectRoot], {
-    editor: process.env.EDITOR ? undefined : DEFAULT_EDITOR,
-  });
-}
-
-export async function openCodeComponentEditor(componentName: string): Promise<void> {
-  const root = getUserProjectRoot();
-  const componentsFolder = getComponentsFolder(root);
-  const fullPath = getComponentFilePath(componentsFolder, componentName);
-  await openCodeEditor(fullPath);
-}
-
 export type ProjectFolderEntry = {
   name: string;
   kind: 'query';
@@ -921,7 +893,6 @@ function getDomFilePatterns(root: string) {
     path.resolve(root, './toolpad/components/*.*'),
   ];
 }
-
 /**
  * Calculates a fingerprint from all files that influence the dom structure
  */
@@ -990,8 +961,6 @@ class ToolpadProject {
 
     this.envManager = new EnvManager(this);
     this.functionsManager = new FunctionsManager(this);
-
-    this.initWatcher();
 
     this.invalidateQueries = throttle(
       () => {
@@ -1083,6 +1052,21 @@ class ToolpadProject {
     this.alertedMissingVars = new Set(missingVars);
   }
 
+  async start() {
+    if (this.options.dev) {
+      await this.initWatcher();
+    }
+    await Promise.all([this.envManager.start(), this.functionsManager.start()]);
+  }
+
+  async build() {
+    await Promise.all([this.envManager.build(), this.functionsManager.build()]);
+  }
+
+  async dispose() {
+    await Promise.all([this.envManager.dispose(), this.functionsManager.dispose()]);
+  }
+
   async loadDom() {
     const [dom] = await this.loadDomAndFingerprint();
     this.alertOnMissingVariablesInDom(dom);
@@ -1115,13 +1099,23 @@ class ToolpadProject {
     });
   }
 
-  async openCodeEditor(file: string): Promise<void> {
-    const supportedEditor = await getSupportedEditor();
+  async openCodeEditor(fileName: string, fileType: string) {
+    const supportedEditor = await findSupportedEditor();
     if (!supportedEditor) {
       throw new Error(`No code editor found`);
     }
-    const fullPath = path.resolve(this.getRoot(), file);
-    openEditor([fullPath, this.getRoot()], {
+    const root = this.getRoot();
+    let resolvedPath = fileName;
+
+    if (fileType === 'query') {
+      resolvedPath = await this.functionsManager.getFunctionFilePath(fileName);
+    }
+    if (fileType === 'component') {
+      const componentsFolder = getComponentsFolder(root);
+      resolvedPath = getComponentFilePath(componentsFolder, fileName);
+    }
+    const fullResolvedPath = path.resolve(root, resolvedPath);
+    openEditor([fullResolvedPath, root], {
       editor: process.env.EDITOR ? undefined : DEFAULT_EDITOR,
     });
   }
@@ -1134,5 +1128,19 @@ export async function initProject() {
 
   await initToolpadFolder(root);
 
-  return new ToolpadProject(root, { dev: config.cmd === 'dev' });
+  const project = new ToolpadProject(root, { dev: config.cmd === 'dev' });
+
+  await project.start();
+
+  return project;
+}
+
+export async function buildProject() {
+  const root = getUserProjectRoot();
+
+  const project = new ToolpadProject(root, { dev: config.cmd === 'dev' });
+
+  await project.build();
+
+  await project.dispose();
 }

@@ -59,8 +59,13 @@ async function createDevHandler({ root, base, runtimeConfig }: CreateDevHandlerP
     },
   });
 
-  cp.once('exit', () => {
-    console.error(`App dev server failed`);
+  cp.once('error', (err) => {
+    console.error(`App dev server failed`, err);
+    process.exit(1);
+  });
+
+  cp.once('exit', (code) => {
+    console.error(`App dev server failed ${code}`);
     process.exit(1);
   });
 

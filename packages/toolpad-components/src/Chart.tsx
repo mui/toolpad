@@ -14,6 +14,7 @@ import {
   Area,
   Scatter,
 } from 'recharts';
+import CircularProgress from '@mui/material/CircularProgress';
 import { SX_PROP_HELPER_TEXT } from './constants';
 
 export const CHART_DATA_SERIES_KINDS = ['line', 'bar', 'area', 'scatter'];
@@ -35,10 +36,11 @@ function getBarChartDataSeriesNormalizedYKey(dataSeries: ChartDataSeries, index:
 
 interface ChartProps extends ContainerProps {
   data?: ChartData;
+  loading?: boolean;
   height?: number;
 }
 
-function Chart({ data = [], height, sx }: ChartProps) {
+function Chart({ data = [], loading, height, sx }: ChartProps) {
   const xValues = React.useMemo(() => {
     const allXValues = data.flatMap((dataSeries) =>
       (dataSeries.data || []).map((dataSeriesPoint) => dataSeriesPoint[dataSeries.xKey]),
@@ -80,7 +82,7 @@ function Chart({ data = [], height, sx }: ChartProps) {
   const hasNonNumberXValues = xValues.some((xValue) => typeof xValue !== 'number');
 
   return (
-    <Container disableGutters sx={sx}>
+    <Container disableGutters sx={{ ...sx, position: 'relative' }}>
       <ResponsiveContainer width="100%" height={height}>
         <ComposedChart data={barChartData} margin={{ top: 20, right: 60 }}>
           <CartesianGrid />
@@ -151,17 +153,32 @@ function Chart({ data = [], height, sx }: ChartProps) {
                     dataKey={dataSeries.yKey}
                     name={dataSeries.label}
                     stroke={dataSeries.color}
+                    activeDot={{ r: 8 }}
                   />
                 );
             }
           })}
         </ComposedChart>
       </ResponsiveContainer>
+      {!data && loading ? (
+        <div
+          style={{
+            position: 'absolute',
+            inset: '0 0 0 0',
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+          }}
+        >
+          <CircularProgress />
+        </div>
+      ) : null}
     </Container>
   );
 }
 
 export default createComponent(Chart, {
+  loadingProp: 'loading',
   resizableHeightProp: 'height',
   argTypes: {
     data: {

@@ -3,7 +3,6 @@ import yargs from 'yargs';
 import path from 'path';
 import chalk from 'chalk';
 import { execaNode } from 'execa';
-import { Worker } from 'worker_threads';
 import { RunAppOptions } from './server';
 
 export type Command = 'dev' | 'start' | 'build';

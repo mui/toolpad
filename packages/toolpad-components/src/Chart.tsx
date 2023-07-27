@@ -86,7 +86,7 @@ function Chart({ data = [], height, sx }: ChartProps) {
   return (
     <Container disableGutters sx={sx}>
       <ResponsiveContainer width="100%" height={height}>
-        <ComposedChart data={barChartData} margin={{ top: 20, right: 60 }}>
+        <ComposedChart data={barChartData} margin={{ top: 20, right: 80 }}>
           <CartesianGrid />
           <XAxis
             dataKey="x"
@@ -98,7 +98,7 @@ function Chart({ data = [], height, sx }: ChartProps) {
                 : [Math.min(...(xValues as number[])), Math.max(...(xValues as number[]))]
             }
           />
-          <YAxis />
+          <YAxis width={80} />
           <Tooltip />
           <Legend />
           {data.map((dataSeries, index) => {

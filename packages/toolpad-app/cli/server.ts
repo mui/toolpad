@@ -12,7 +12,6 @@ import * as fs from 'fs/promises';
 import serializeJavascript from 'serialize-javascript';
 import { WebSocket, WebSocketServer } from 'ws';
 import { listen } from '@mui/toolpad-utils/http';
-import { workerData } from 'worker_threads';
 import openBrowser from 'react-dev-utils/openBrowser';
 import { folderExists } from '@mui/toolpad-utils/fs';
 import chalk from 'chalk';
@@ -57,11 +56,6 @@ async function createDevHandler({ root, base, runtimeConfig }: CreateDevHandlerP
       TOOLPAD_BASE: base,
       FORCE_COLOR: '1',
     },
-  });
-
-  cp.once('error', (err) => {
-    console.error(`App dev server failed`, err);
-    process.exit(1);
   });
 
   cp.once('exit', (code) => {
@@ -320,7 +314,9 @@ async function runApp({ cmd, port, dev = false, projectDir }: RunAppOptions) {
   }
 }
 
-runApp(workerData).catch((err) => {
+invariant(process.env.RUN_OPTIONS, 'RUN_OPTIONS must be defined');
+
+runApp(JSON.parse(process.env.RUN_OPTIONS)).catch((err) => {
   console.error(err);
   process.exit(1);
 });

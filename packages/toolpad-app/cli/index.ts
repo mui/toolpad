@@ -17,25 +17,21 @@ function runApp(cmd: 'dev' | 'start', { dir, ...args }: Omit<RunOptions, 'cmd'>)
   const projectDir = path.resolve(process.cwd(), dir);
   const serverPath = path.resolve(__dirname, './server.js');
 
-  const worker = new Worker(serverPath, {
-    workerData: {
-      ...args,
-      projectDir,
-      cmd,
-    } satisfies RunAppOptions,
+  const cp = execaNode(serverPath, [], {
+    stdio: 'inherit',
     env: {
       ...process.env,
       // TODO: eliminate the need for TOOLPAD_PROJECT_DIR and remove the worker altogether
       TOOLPAD_PROJECT_DIR: projectDir,
+      RUN_OPTIONS: JSON.stringify({
+        ...args,
+        projectDir,
+        cmd,
+      } satisfies RunAppOptions),
     },
   });
 
-  process.on('SIGTERM', () => worker.terminate());
-  process.on('SIGINT', () => worker.terminate());
-  process.on('SIGBREAK', () => worker.terminate());
-  process.on('SIGHUP', () => worker.terminate());
-
-  worker.on('error', (err) => {
+  cp.on('error', (err: Error) => {
     console.error(err);
   });
 }

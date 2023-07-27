@@ -18,6 +18,7 @@ import AddIcon from '@mui/icons-material/Add';
 import { CHART_DATA_SERIES_KINDS, type ChartDataSeries } from '@mui/toolpad-components';
 import { useBrowserJsRuntime } from '@mui/toolpad-core/jsBrowserRuntime';
 import DeleteIcon from '@mui/icons-material/Delete';
+import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import { BindableAttrValue } from '@mui/toolpad-core';
 import ScatterPlotIcon from '@mui/icons-material/ScatterPlot';
 import BarChartIcon from '@mui/icons-material/BarChart';
@@ -85,6 +86,13 @@ function ChartDataPropEditor({
       setPopoverAnchorElement(event.currentTarget);
     },
     [],
+  );
+
+  const handleDuplicateDataSeries = React.useCallback(
+    (index: number) => () => {
+      onChange([...value.slice(0, index + 1), value[index], ...value.slice(index + 1)]);
+    },
+    [onChange, value],
   );
 
   const handleRemoveDataSeries = React.useCallback(
@@ -230,6 +238,12 @@ function ChartDataPropEditor({
                   >
                     <ListItemText primary={label} />
                   </ListItemButton>
+                  <IconButton
+                    aria-label="Duplicate data series"
+                    onClick={handleDuplicateDataSeries(index)}
+                  >
+                    <ContentCopyIcon />
+                  </IconButton>
                   <IconButton
                     aria-label="Delete data series"
                     onClick={handleRemoveDataSeries(index)}

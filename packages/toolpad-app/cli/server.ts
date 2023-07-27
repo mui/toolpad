@@ -53,6 +53,7 @@ async function createDevHandler({ root, base, runtimeConfig }: CreateDevHandlerP
       NODE_ENV: 'development',
       TOOLPAD_RUNTIME_CONFIG: JSON.stringify(runtimeConfig),
       TOOLPAD_PORT: String(devPort),
+      TOOLPAD_PROJECT_DIR: root,
       TOOLPAD_BASE: base,
       FORCE_COLOR: '1',
     },

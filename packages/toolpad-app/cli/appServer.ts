@@ -46,10 +46,11 @@ function devServerPlugin(config: RuntimeConfig): Plugin {
 
 export interface ToolpadAppDevServerParams {
   config: RuntimeConfig;
+  root: string;
   base: string;
 }
 
-export async function createDevServer({ config, base }: ToolpadAppDevServerParams) {
+export async function createDevServer({ config, root, base }: ToolpadAppDevServerParams) {
   const devServer = await createServer(
     createViteConfig({
       dev: true,
@@ -72,12 +73,13 @@ export type Event = {
 
 export interface MainParams {
   base: string;
+  root: string;
   port: number;
   config: RuntimeConfig;
 }
 
-export async function main({ base, config, port }: MainParams) {
-  const app = await createDevServer({ config, base });
+export async function main({ base, config, root, port }: MainParams) {
+  const app = await createDevServer({ config, root, base });
 
   await app.listen(port);
 
@@ -94,6 +96,7 @@ export async function main({ base, config, port }: MainParams) {
   process.send({ kind: 'ready' } satisfies Event);
 }
 
+invariant(!!process.env.TOOLPAD_PROJECT_DIR, 'A project root must be defined');
 invariant(!!process.env.TOOLPAD_RUNTIME_CONFIG, 'A runtime config must be defined');
 invariant(!!process.env.TOOLPAD_PORT, 'A port must be defined');
 invariant(!!process.env.TOOLPAD_BASE, 'A base path must be defined');
@@ -101,6 +104,7 @@ invariant(!!process.env.TOOLPAD_BASE, 'A base path must be defined');
 main({
   config: runtimeConfigSchema.parse(JSON.parse(process.env.TOOLPAD_RUNTIME_CONFIG)),
   base: process.env.TOOLPAD_BASE,
+  root: process.env.TOOLPAD_PROJECT_DIR,
   port: Number(process.env.TOOLPAD_PORT),
 }).catch((err) => {
   console.error(err);

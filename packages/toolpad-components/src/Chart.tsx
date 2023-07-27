@@ -85,7 +85,7 @@ function Chart({ data = [], loading, height, sx }: ChartProps) {
     <Container disableGutters sx={{ ...sx, position: 'relative' }}>
       <ResponsiveContainer width="100%" height={height}>
         <ComposedChart data={barChartData} margin={{ top: 20, right: 60 }}>
-          <CartesianGrid />
+          <CartesianGrid strokeDasharray="3 3" />
           <XAxis
             dataKey="x"
             type={hasNonNumberXValues ? 'category' : 'number'}
@@ -153,7 +153,6 @@ function Chart({ data = [], loading, height, sx }: ChartProps) {
                     dataKey={dataSeries.yKey}
                     name={dataSeries.label}
                     stroke={dataSeries.color}
-                    activeDot={{ r: 8 }}
                   />
                 );
             }
@@ -219,7 +218,7 @@ export default createComponent(Chart, {
     },
     height: {
       type: 'number',
-      default: 400,
+      default: 300,
       minimum: 100,
     },
     sx: {

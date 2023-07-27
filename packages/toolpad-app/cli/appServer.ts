@@ -54,7 +54,7 @@ export async function createDevServer({ config, root, base }: ToolpadAppDevServe
   const devServer = await createServer(
     createViteConfig({
       dev: true,
-      root: config.projectDir,
+      root,
       base,
       plugins: [devServerPlugin(config)],
     }),

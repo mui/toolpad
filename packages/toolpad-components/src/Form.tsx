@@ -3,7 +3,7 @@ import { Container, ContainerProps, Box, Stack, BoxProps } from '@mui/material';
 import { LoadingButton } from '@mui/lab';
 import { ArgTypeDefinitions, createComponent, useNode } from '@mui/toolpad-core';
 import { useForm, FieldValues, ValidationMode, FieldError, Controller } from 'react-hook-form';
-import { isReferEqual } from '@mui/toolpad-utils/collections';
+import { isDeepEqual } from '@mui/toolpad-utils/collections';
 import { SX_PROP_HELPER_TEXT } from './constants';
 
 export const FormContext = React.createContext<{
@@ -181,8 +181,6 @@ export interface FormInputValidationProps {
   isInvalid: boolean;
 }
 
-type ValidationProps = Partial<FormInputValidationProps>;
-
 interface UseFormInputInput<V> {
   name: string;
   label?: string;
@@ -190,7 +188,7 @@ interface UseFormInputInput<V> {
   onChange: (newValue: V) => void;
   emptyValue?: V;
   defaultValue?: V;
-  validationProps: ValidationProps;
+  validationProps: Partial<FormInputValidationProps>;
 }
 
 interface UseFormInputPayload<V> {
@@ -260,7 +258,7 @@ export function useFormInput<V>({
   React.useEffect(() => {
     if (
       form &&
-      !isReferEqual(validationProps, previousManualValidationPropsRef.current) &&
+      !isDeepEqual(validationProps, previousManualValidationPropsRef.current) &&
       form.formState.dirtyFields[formInputName]
     ) {
       form.trigger(formInputName);

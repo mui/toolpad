@@ -1,4 +1,23 @@
-import { isArray, isObject, isSet, isMap } from './check';
+/**
+ * Quick object check - this is primarily used to tell
+ * objects from primitive values when we know the value
+ * is a JSON-compliant type.
+ */
+export function isObject<T>(obj: T): boolean {
+  return obj !== null && typeof obj === 'object';
+}
+
+export function isSet<T>(obj: T): boolean {
+  return obj instanceof Set;
+}
+
+export function isMap<T>(obj: T): boolean {
+  return obj instanceof Map;
+}
+
+export function isArray<T>(obj: T): boolean {
+  return Array.isArray(obj);
+}
 
 export function asArray<T>(maybeArray: T | T[]): T[] {
   return Array.isArray(maybeArray) ? maybeArray : [maybeArray];
@@ -97,10 +116,11 @@ export function filterKeys<U>(
 }
 
 /**
- * Check if two values are equal - that is,
+ * check if two objects are deeply equal and support  Set, Map, Date, Array, Object
  */
+// Reference code https://github.com/vuejs/vue/blob/49b6bd4264c25ea41408f066a1835f38bf6fe9f1/src/shared/util.ts#L297
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export function isReferEqual(obj: any, objToCompare: any): boolean {
+export function isDeepEqual(obj: any, objToCompare: any): boolean {
   if (obj === objToCompare) {
     return true;
   }
@@ -116,18 +136,18 @@ export function isReferEqual(obj: any, objToCompare: any): boolean {
       const isMapB = isMap(objToCompare);
 
       if (isSetA && isSetB) {
-        return obj.size === objToCompare.size && isReferEqual([...obj], [...objToCompare]);
+        return obj.size === objToCompare.size && isDeepEqual([...obj], [...objToCompare]);
       }
 
       if (isMapA && isMapB) {
-        return obj.size === objToCompare.size && isReferEqual([...obj], [...objToCompare]);
+        return obj.size === objToCompare.size && isDeepEqual([...obj], [...objToCompare]);
       }
 
       if (isArrayA && isArrayB) {
         return (
           obj.length === objToCompare.length &&
           obj.every((e: string, i: number) => {
-            return isReferEqual(e, objToCompare[i]);
+            return isDeepEqual(e, objToCompare[i]);
           })
         );
       }
@@ -142,18 +162,16 @@ export function isReferEqual(obj: any, objToCompare: any): boolean {
         return (
           keysA.length === keysB.length &&
           keysA.every((key: string) => {
-            return isReferEqual(obj[key], objToCompare[key]);
+            return isDeepEqual(obj[key], objToCompare[key]);
           })
         );
       }
-      /* istanbul ignore next */
       return false;
     } catch (e) {
-      /* istanbul ignore next */
       return false;
     }
   } else if (!isObjectA && !isObjectB) {
-    return String(obj) === String(objToCompare);
+    return obj === objToCompare;
   } else {
     return false;
   }

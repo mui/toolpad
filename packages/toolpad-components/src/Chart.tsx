@@ -159,7 +159,7 @@ function Chart({ data = [], loading, height, sx }: ChartProps) {
           })}
         </ComposedChart>
       </ResponsiveContainer>
-      {!data && loading ? (
+      {loading ? (
         <div
           style={{
             position: 'absolute',
@@ -178,6 +178,7 @@ function Chart({ data = [], loading, height, sx }: ChartProps) {
 
 export default createComponent(Chart, {
   loadingProp: 'loading',
+  loadingPropSource: ['data'],
   resizableHeightProp: 'height',
   argTypes: {
     data: {

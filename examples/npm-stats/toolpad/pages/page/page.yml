@@ -152,8 +152,8 @@ spec:
                     downloadsRange.data.downloads
                 xKey: day
                 yKey: downloads
-                color: "#87bc45"
-            height: 346
+                color: '#87bc45'
+            height: 300
     - component: PageRow
       name: pageRow4
       children:
@@ -171,11 +171,11 @@ spec:
               $$jsExpression: |
                 Object.entries(versionLastWeek.data.downloads)
             columns:
-              - field: "0"
+              - field: '0'
                 type: string
                 headerName: Version
                 width: 160
-              - field: "1"
+              - field: '1'
                 type: number
                 width: 152
                 headerName: No. of downloads

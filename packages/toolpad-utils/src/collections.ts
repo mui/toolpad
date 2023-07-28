@@ -98,8 +98,7 @@ export function filterKeys<U>(
  * check if two objects are deeply equal and support  Set, Map, Date, Array, Object
  */
 // Reference code https://github.com/vuejs/vue/blob/49b6bd4264c25ea41408f066a1835f38bf6fe9f1/src/shared/util.ts#L297
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export function isDeepEqual(obj: any, objToCompare: any): boolean {
+export function isDeepEqual(obj: unknown, objToCompare: unknown): boolean {
   const isObject = <T>(object: T) => {
     return object != null && typeof object === 'object';
   };
@@ -134,12 +133,15 @@ export function isDeepEqual(obj: any, objToCompare: any): boolean {
       }
 
       if (!isArrayA && !isArrayB) {
-        const keysA = Object.keys(obj);
-        const keysB = Object.keys(objToCompare);
+        const keysA = Object.keys(obj as Object);
+        const keysB = Object.keys(objToCompare as Object);
         return (
           keysA.length === keysB.length &&
           keysA.every((key: string) => {
-            return isDeepEqual(obj[key], objToCompare[key]);
+            return isDeepEqual(
+              (obj as Record<string, unknown>)[key],
+              (objToCompare as Record<string, unknown>)[key],
+            );
           })
         );
       }

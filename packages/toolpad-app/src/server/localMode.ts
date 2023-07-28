@@ -20,6 +20,7 @@ import {
   updateYamlFile,
   fileExists,
 } from '@mui/toolpad-utils/fs';
+import { isMainThread } from 'worker_threads';
 import * as appDom from '../appDom';
 import insecureHash from '../utils/insecureHash';
 import {
@@ -1146,12 +1147,27 @@ class ToolpadProject {
 
 export type { ToolpadProject };
 
+declare global {
+  // eslint-disable-next-line
+  var __toolpadProject: ToolpadProject | undefined;
+}
+
 export async function initProject(cmd: 'dev' | 'start' | 'build', root: string) {
+  invariant(
+    isMainThread,
+    'initProject must be called from the main thread. Otherwise it will add the file watchers in multiple processes.',
+  );
+
+  // eslint-disable-next-line no-underscore-dangle
+  invariant(!global.__toolpadProject, 'A project is already running');
+
   await migrateLegacyProject(root);
 
   await initToolpadFolder(root);
 
   const project = new ToolpadProject(root, { cmd, dev: cmd === 'dev' });
+  // eslint-disable-next-line no-underscore-dangle
+  globalThis.__toolpadProject = project;
 
   await project.start();
 

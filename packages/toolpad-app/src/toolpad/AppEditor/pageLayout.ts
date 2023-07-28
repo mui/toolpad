@@ -43,53 +43,46 @@ export function deleteOrphanedLayoutNodes(
     isPageLayoutComponent(parent) &&
     parentChildren.length === 2;
 
-  const hasNoLayoutContainerSiblings =
-    parentChildren.filter(
-      (child) => child.id !== movedOrDeletedNode.id && (isPageRow(child) || isPageColumn(child)),
-    ).length === 0;
-
-  if (isSecondLastLayoutContainerChild && hasNoLayoutContainerSiblings) {
+  if (isSecondLastLayoutContainerChild) {
     if (parent.parentIndex && parentParent && appDom.isElement(parentParent)) {
       const lastContainerChild = parentChildren.filter(
         (child) => child.id !== movedOrDeletedNode.id,
       )[0];
 
-      if (lastContainerChild.parentProp) {
+      if (
+        lastContainerChild.parentProp &&
+        parentParent.parentIndex &&
+        moveTargetNodeId !== parentParent.id &&
+        moveTargetNodeId !== lastContainerChild.id
+      ) {
+        if (moveTargetNodeId !== parent.id && isPageLayoutComponent(parentParent)) {
+          updatedDom = appDom.moveNode(
+            updatedDom,
+            lastContainerChild,
+            parentParent,
+            lastContainerChild.parentProp,
+            parent.parentIndex,
+          );
+
+          if (isPageColumn(parent)) {
+            updatedDom = appDom.setNodeNamespacedProp(
+              updatedDom,
+              lastContainerChild,
+              'layout',
+              'columnSize',
+              parent.layout?.columnSize || 1,
+            );
+          }
+
+          orphanedLayoutNodeIds = [...orphanedLayoutNodeIds, parent.id];
+        }
+
         if (
-          parentParent.parentIndex &&
           parentParentParent &&
           appDom.isElement(parentParentParent) &&
           isPageLayoutComponent(parentParentParent) &&
-          isParentOnlyLayoutContainerChild &&
-          moveTargetNodeId !== parentParent.id &&
-          moveTargetNodeId !== lastContainerChild.id
+          isParentOnlyLayoutContainerChild
         ) {
-          if (
-            moveTargetNodeId !== parent.id &&
-            moveTargetNodeId !== lastContainerChild.id &&
-            isPageLayoutComponent(parentParent)
-          ) {
-            updatedDom = appDom.moveNode(
-              updatedDom,
-              lastContainerChild,
-              parentParent,
-              lastContainerChild.parentProp,
-              parent.parentIndex,
-            );
-
-            if (isPageColumn(parent)) {
-              updatedDom = appDom.setNodeNamespacedProp(
-                updatedDom,
-                lastContainerChild,
-                'layout',
-                'columnSize',
-                parent.layout?.columnSize || 1,
-              );
-            }
-
-            orphanedLayoutNodeIds = [...orphanedLayoutNodeIds, parent.id];
-          }
-
           updatedDom = appDom.moveNode(
             updatedDom,
             lastContainerChild,

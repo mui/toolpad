@@ -849,7 +849,6 @@ export default function RenderOverlay({ bridge }: RenderOverlayProps) {
           const originalParent = parent;
           const originalParentInfo = parent && nodesInfo[parent.id];
 
-          const isOriginalParentPage = originalParent ? appDom.isPage(originalParent) : false;
           const isOriginalParentRow =
             originalParent && appDom.isElement(originalParent) ? isPageRow(originalParent) : false;
           const isOriginalParentColumn =
@@ -871,27 +870,13 @@ export default function RenderOverlay({ bridge }: RenderOverlayProps) {
                 ? appDom.getNewFirstParentIndexInNode(draft, dragOverNode, dragOverSlotParentProp)
                 : appDom.getNewLastParentIndexInNode(draft, dragOverNode, dragOverSlotParentProp);
 
-            if (!isPageRow(draggedNode)) {
-              const rowContainer = appDom.createElement(draft, PAGE_ROW_COMPONENT_ID, {});
-              draft = appDom.addNode(
-                draft,
-                rowContainer,
-                dragOverNode,
-                dragOverSlotParentProp,
-                newParentIndex,
-              );
-              parent = rowContainer;
-
-              draft = addOrMoveNode(draft, draggedNode, rowContainer, 'children');
-            } else {
-              draft = addOrMoveNode(
-                draft,
-                draggedNode,
-                dragOverNode,
-                dragOverSlotParentProp,
-                newParentIndex,
-              );
-            }
+            draft = addOrMoveNode(
+              draft,
+              draggedNode,
+              dragOverNode,
+              dragOverSlotParentProp,
+              newParentIndex,
+            );
           }
 
           if (
@@ -929,27 +914,13 @@ export default function RenderOverlay({ bridge }: RenderOverlayProps) {
                       );
 
                 if (isDraggingOverRow && !isPageRow(draggedNode)) {
-                  if (isOriginalParentPage) {
-                    const rowContainer = appDom.createElement(draft, PAGE_ROW_COMPONENT_ID, {});
-                    draft = appDom.addNode(
-                      draft,
-                      rowContainer,
-                      parent,
-                      dragOverNodeParentProp,
-                      newParentIndex,
-                    );
-                    parent = rowContainer;
-
-                    draft = addOrMoveNode(draft, draggedNode, parent, dragOverNodeParentProp);
-                  } else {
-                    draft = addOrMoveNode(
-                      draft,
-                      draggedNode,
-                      parent,
-                      dragOverNodeParentProp,
-                      newParentIndex,
-                    );
-                  }
+                  draft = addOrMoveNode(
+                    draft,
+                    draggedNode,
+                    parent,
+                    dragOverNodeParentProp,
+                    newParentIndex,
+                  );
                 }
 
                 if (isOriginalParentRow) {

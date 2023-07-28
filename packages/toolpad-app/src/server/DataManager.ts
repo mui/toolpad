@@ -11,6 +11,7 @@ import applyTransform from '../toolpadDataSources/applyTransform';
 import { asyncHandler } from '../utils/express';
 import type FunctionsManager from './FunctionsManager';
 import type EnvManager from './EnvManager';
+import type { RuntimeConfig } from '../config';
 
 function withSerializedError<T extends { error?: unknown }>(
   withError: T,
@@ -28,6 +29,7 @@ interface IToolpadProject {
   saveDom(dom: appDom.AppDom): Promise<{ fingerprint: number }>;
   functionsManager: FunctionsManager;
   envManager: EnvManager;
+  getRuntimeConfig: () => RuntimeConfig;
 }
 
 /**

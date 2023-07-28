@@ -38,7 +38,7 @@ export type BuildEnvVars = Record<
 export interface RuntimeConfig {
   externalUrl: string;
   projectDir?: string;
-  cmd: 'dev' | 'start';
+  cmd: 'dev' | 'start' | 'build';
 }
 
 declare global {

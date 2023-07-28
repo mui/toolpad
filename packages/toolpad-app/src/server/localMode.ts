@@ -918,7 +918,7 @@ function getCodeComponentsFingerprint(dom: appDom.AppDom) {
 }
 
 class ToolpadProject {
-  root: string;
+  private root: string;
 
   events = new Emitter<ProjectEvents>();
 

@@ -23,7 +23,7 @@ export interface ToolpadAppHandlerParams {
 export async function createProdHandler(project: ToolpadProject) {
   const router = express.Router();
 
-  router.use(express.static(getAppOutputFolder(project.root), { index: false }));
+  router.use(express.static(getAppOutputFolder(project.getRoot()), { index: false }));
 
   // Allow static assets, block everything else
   router.use((req, res, next) => {
@@ -40,7 +40,7 @@ export async function createProdHandler(project: ToolpadProject) {
     asyncHandler(async (req, res) => {
       const dom = await project.loadDom();
 
-      const htmlFilePath = path.resolve(getAppOutputFolder(project.root), './index.html');
+      const htmlFilePath = path.resolve(getAppOutputFolder(project.getRoot()), './index.html');
       let html = await fs.readFile(htmlFilePath, { encoding: 'utf-8' });
 
       html = postProcessHtml(html, { config, dom });

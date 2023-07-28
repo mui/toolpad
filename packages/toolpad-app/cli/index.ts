@@ -3,7 +3,7 @@ import yargs from 'yargs';
 import path from 'path';
 import chalk from 'chalk';
 import { execaNode } from 'execa';
-import { RunAppOptions } from './server';
+import { runApp } from './server';
 
 export type Command = 'dev' | 'start' | 'build';
 export interface RunOptions {
@@ -12,33 +12,20 @@ export interface RunOptions {
   dev?: boolean;
 }
 
-function runApp(cmd: 'dev' | 'start', { dir, ...args }: Omit<RunOptions, 'cmd'>) {
+async function runCommand(cmd: 'dev' | 'start', { dir, ...args }: Omit<RunOptions, 'cmd'>) {
   const projectDir = path.resolve(process.cwd(), dir);
-  const serverPath = path.resolve(__dirname, './server.js');
 
-  const cp = execaNode(serverPath, [], {
-    stdio: 'inherit',
-    env: {
-      ...process.env,
-      // TODO: eliminate the need for TOOLPAD_PROJECT_DIR and remove the worker altogether
-      TOOLPAD_PROJECT_DIR: projectDir,
-      RUN_OPTIONS: JSON.stringify({
-        ...args,
-        projectDir,
-        cmd,
-      } satisfies RunAppOptions),
-    },
-  });
-
-  cp.on('error', (err: Error) => {
-    console.error(err);
+  await runApp({
+    ...args,
+    projectDir,
+    cmd,
   });
 }
 
 async function devCommand(args: RunOptions) {
   // eslint-disable-next-line no-console
   console.log(`${chalk.blue('info')}  - starting Toolpad application in dev mode...`);
-  await runApp('dev', args);
+  await runCommand('dev', args);
 }
 
 interface BuildOptions {
@@ -69,7 +56,7 @@ async function buildCommand({ dir }: BuildOptions) {
 async function startCommand(args: RunOptions) {
   // eslint-disable-next-line no-console
   console.log(`${chalk.blue('info')}  - Starting Toolpad application...`);
-  await runApp('start', args);
+  await runCommand('start', args);
 }
 
 export default async function cli(argv: string[]) {

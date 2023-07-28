@@ -312,10 +312,3 @@ export async function runApp({ cmd, port, dev = false, projectDir }: RunAppOptio
     }
   }
 }
-
-invariant(process.env.RUN_OPTIONS, 'RUN_OPTIONS must be defined');
-
-runApp(JSON.parse(process.env.RUN_OPTIONS)).catch((err) => {
-  console.error(err);
-  process.exit(1);
-});

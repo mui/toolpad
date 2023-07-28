@@ -100,25 +100,23 @@ export function filterKeys<U>(
 // Reference code https://github.com/vuejs/vue/blob/49b6bd4264c25ea41408f066a1835f38bf6fe9f1/src/shared/util.ts#L297
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function isDeepEqual(obj: any, objToCompare: any): boolean {
+  const isObject = <T>(object: T) => {
+    return object != null && typeof object === 'object';
+  };
+
   if (obj === objToCompare) {
     return true;
   }
-  const isObjectA = obj !== null && typeof obj === 'object';
-  const isObjectB = objToCompare !== null && typeof objToCompare === 'object';
-  if (isObjectA && isObjectB) {
-    try {
-      const isArrayA = Array.isArray(obj);
-      const isArrayB = Array.isArray(objToCompare);
-      const isSetA = obj instanceof Set;
-      const isSetB = objToCompare instanceof Set;
-      const isMapA = obj instanceof Map;
-      const isMapB = objToCompare instanceof Map;
 
-      if (isSetA && isSetB) {
+  const isArrayA = Array.isArray(obj);
+  const isArrayB = Array.isArray(objToCompare);
+  if (isObject(obj) && isObject(objToCompare)) {
+    try {
+      if (obj instanceof Set && objToCompare instanceof Set) {
         return obj.size === objToCompare.size && isDeepEqual([...obj], [...objToCompare]);
       }
 
-      if (isMapA && isMapB) {
+      if (obj instanceof Map && objToCompare instanceof Map) {
         return obj.size === objToCompare.size && isDeepEqual([...obj], [...objToCompare]);
       }
 
@@ -149,7 +147,7 @@ export function isDeepEqual(obj: any, objToCompare: any): boolean {
     } catch (e) {
       return false;
     }
-  } else if (!isObjectA && !isObjectB) {
+  } else if (!isObject(obj) && !isObject(objToCompare)) {
     return obj === objToCompare;
   } else {
     return false;

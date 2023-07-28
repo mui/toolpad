@@ -52,6 +52,7 @@ import FunctionsManager from './FunctionsManager';
 import { VersionInfo, checkVersion } from './versionInfo';
 import { VERSION_CHECK_INTERVAL } from '../constants';
 import DataManager from './DataManager';
+import type { RuntimeConfig } from '../config';
 
 function getToolpadFolder(root: string): string {
   return path.join(root, './toolpad');
@@ -941,6 +942,7 @@ class ToolpadProject {
   constructor(root: string, options: Partial<ToolpadProjectOptions>) {
     this.root = root;
     this.options = {
+      cmd: 'start',
       dev: false,
       ...options,
     };
@@ -1131,6 +1133,15 @@ class ToolpadProject {
     const pageFolder = getPageFolder(this.root, name);
     await fs.rm(pageFolder, { force: true, recursive: true });
   }
+
+  getRuntimeConfig(): RuntimeConfig {
+    return {
+      externalUrl:
+        process.env.TOOLPAD_EXTERNAL_URL || `http://localhost:${process.env.PORT || 3000}`,
+      projectDir: this.getRoot(),
+      cmd: this.options.dev ? 'dev' : 'start',
+    };
+  }
 }
 
 export type { ToolpadProject };
@@ -1140,7 +1151,7 @@ export async function initProject(cmd: 'dev' | 'start' | 'build', root: string) 
 
   await initToolpadFolder(root);
 
-  const project = new ToolpadProject(root, { dev: cmd === 'dev' });
+  const project = new ToolpadProject(root, { cmd, dev: cmd === 'dev' });
 
   await project.start();
 
@@ -1148,7 +1159,7 @@ export async function initProject(cmd: 'dev' | 'start' | 'build', root: string) 
 }
 
 export async function buildProject(root: string) {
-  const project = new ToolpadProject(root, { dev: false });
+  const project = new ToolpadProject(root, { cmd: 'build', dev: false });
 
   await project.build();
 

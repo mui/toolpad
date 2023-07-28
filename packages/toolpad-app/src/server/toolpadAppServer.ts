@@ -2,7 +2,6 @@ import * as path from 'path';
 import * as fs from 'fs/promises';
 import * as express from 'express';
 import { Server } from 'http';
-import config from '../config';
 import { postProcessHtml } from './toolpadAppBuilder';
 import { ToolpadProject, getAppOutputFolder } from './localMode';
 import { asyncHandler } from '../utils/express';
@@ -42,7 +41,7 @@ export async function createProdHandler(project: ToolpadProject) {
       const htmlFilePath = path.resolve(getAppOutputFolder(project.getRoot()), './index.html');
       let html = await fs.readFile(htmlFilePath, { encoding: 'utf-8' });
 
-      html = postProcessHtml(html, { config, dom });
+      html = postProcessHtml(html, { config: project.getRuntimeConfig(), dom });
 
       res.setHeader('Content-Type', 'text/html; charset=utf-8').status(200).end(html);
     }),

@@ -132,7 +132,8 @@ async function readData(res: Response, fetchQuery: FetchQuery): Promise<any> {
   throw new Error(`Unsupported response type "${fetchQuery.response.kind}"`);
 }
 
-export async function execBase(
+async function execBase(
+  project: IToolpadProject,
   connection: Maybe<RestConnectionParams>,
   fetchQuery: FetchQuery,
   params: Record<string, string>,
@@ -147,7 +148,7 @@ export async function execBase(
     parameters: params,
   };
 
-  const urlvalue = fetchQuery.url || getDefaultUrl(connection);
+  const urlvalue = fetchQuery.url || getDefaultUrl(project.getRuntimeConfig(), connection);
 
   const resolvedUrl = resolveBindable(jsRuntime, urlvalue, queryScope);
   const resolvedSearchParams = resolveBindableEntries(
@@ -213,20 +214,18 @@ export async function execBase(
   return { data, untransformedData, error, har };
 }
 
-async function exec(
-  connection: Maybe<RestConnectionParams>,
-  fetchQuery: FetchQuery,
-  params: Record<string, string>,
-): Promise<ExecFetchResult<any>> {
-  const { data, error } = await execBase(connection, fetchQuery, params);
-  return { data, error };
-}
-
 export default function createDatasource(
   project: IToolpadProject,
 ): ServerDataSource<{}, FetchQuery, any> {
   return {
-    exec,
+    async exec(
+      connection: Maybe<RestConnectionParams>,
+      fetchQuery: FetchQuery,
+      params: Record<string, string>,
+    ): Promise<ExecFetchResult<any>> {
+      const { data, error } = await execBase(project, connection, fetchQuery, params);
+      return { data, error };
+    },
 
     async execPrivate(connection: Maybe<RestConnectionParams>, query: FetchPrivateQuery) {
       switch (query.kind) {
@@ -237,7 +236,7 @@ export default function createDatasource(
           return { envVarNames };
         }
         case 'debugExec':
-          return execBase(connection, query.query, query.params);
+          return execBase(project, connection, query.query, query.params);
         default:
           throw new Error(`Unknown private query "${(query as FetchPrivateQuery).kind}"`);
       }

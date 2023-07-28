@@ -1,5 +1,4 @@
 import invariant from 'invariant';
-import * as z from 'zod';
 import { RUNTIME_CONFIG_WINDOW_PROPERTY } from './constants';
 
 /**
@@ -34,15 +33,13 @@ export type BuildEnvVars = Record<
   string
 >;
 
-export const runtimeConfigSchema = z.object({
-  externalUrl: z.string(),
-  projectDir: z.string(),
-  cmd: z.union([z.literal('dev'), z.literal('start'), z.literal('build')]),
-});
-
 // These are set at runtime and passed to the browser.
 // Do not add secrets
-export type RuntimeConfig = z.infer<typeof runtimeConfigSchema>;
+export interface RuntimeConfig {
+  externalUrl: string;
+  projectDir?: string;
+  cmd: 'dev' | 'start';
+}
 
 declare global {
   interface Window {
@@ -51,6 +48,10 @@ declare global {
 }
 
 function getBrowsersideRuntimeConfig(): RuntimeConfig {
+  invariant(
+    typeof window !== 'undefined',
+    'The runtime config is not available on the server. Use project.getRuntimeConfig()',
+  );
   // These are being initialized in ./pages/_document.tsx
   const maybeRuntimeConfig = window[RUNTIME_CONFIG_WINDOW_PROPERTY];
   if (!maybeRuntimeConfig) {
@@ -59,20 +60,4 @@ function getBrowsersideRuntimeConfig(): RuntimeConfig {
   return maybeRuntimeConfig;
 }
 
-const runtimeConfig: RuntimeConfig =
-  typeof window === 'undefined'
-    ? (() => {
-        invariant(process.env.TOOLPAD_PROJECT_DIR, 'A project root must be defined');
-        return {
-          externalUrl:
-            process.env.TOOLPAD_EXTERNAL_URL || `http://localhost:${process.env.PORT || 3000}`,
-          projectDir: process.env.TOOLPAD_PROJECT_DIR,
-          cmd:
-            process.env.TOOLPAD_CMD === 'dev' || process.env.TOOLPAD_CMD === 'start'
-              ? process.env.TOOLPAD_CMD
-              : 'dev',
-        };
-      })()
-    : getBrowsersideRuntimeConfig();
-
-export default runtimeConfig;
+export default getBrowsersideRuntimeConfig();

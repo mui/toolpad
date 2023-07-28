@@ -6,7 +6,7 @@ import {
   createViteConfig,
   resolvedComponentsId,
 } from '../src/server/toolpadAppBuilder';
-import { RuntimeConfig, runtimeConfigSchema } from '../src/config';
+import type { RuntimeConfig } from '../src/config';
 import { loadDomFromDisk } from '../src/server/localMode';
 
 invariant(
@@ -102,7 +102,7 @@ invariant(!!process.env.TOOLPAD_PORT, 'A port must be defined');
 invariant(!!process.env.TOOLPAD_BASE, 'A base path must be defined');
 
 main({
-  config: runtimeConfigSchema.parse(JSON.parse(process.env.TOOLPAD_RUNTIME_CONFIG)),
+  config: JSON.parse(process.env.TOOLPAD_RUNTIME_CONFIG) as RuntimeConfig,
   base: process.env.TOOLPAD_BASE,
   root: process.env.TOOLPAD_PROJECT_DIR,
   port: Number(process.env.TOOLPAD_PORT),

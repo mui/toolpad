@@ -1,5 +1,3 @@
-import sharedConfig from '../config';
-
 type BasicAuthConfig =
   | {
       basicAuthUser: string;
@@ -19,7 +17,7 @@ export type ServerConfig = {
   basicAuthPassword?: string;
 } & BasicAuthConfig;
 
-function readConfig(): ServerConfig & typeof sharedConfig {
+function readConfig(): ServerConfig {
   if (typeof window !== 'undefined') {
     throw new Error(`Serverside config can't be loaded on the client side`);
   }
@@ -41,7 +39,6 @@ function readConfig(): ServerConfig & typeof sharedConfig {
   }
 
   return {
-    ...sharedConfig,
     ...basicAuthConfig,
     databaseUrl: process.env.TOOLPAD_DATABASE_URL,
     googleSheetsClientId: process.env.TOOLPAD_DATASOURCE_GOOGLESHEETS_CLIENT_ID,

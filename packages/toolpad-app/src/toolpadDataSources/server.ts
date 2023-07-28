@@ -6,10 +6,12 @@ import googleSheets from './googleSheets/server';
 import local from './local/server';
 import type FunctionsManager from '../server/FunctionsManager';
 import type EnvManager from '../server/EnvManager';
+import type { RuntimeConfig } from '../config';
 
 export interface IToolpadProject {
   functionsManager: FunctionsManager;
   envManager: EnvManager;
+  getRuntimeConfig: () => RuntimeConfig;
 }
 
 type ServerDataSources = {

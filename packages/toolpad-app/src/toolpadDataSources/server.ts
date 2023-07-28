@@ -4,8 +4,20 @@ import mysql from './mysql/server';
 import rest from './rest/server';
 import googleSheets from './googleSheets/server';
 import local from './local/server';
+import type FunctionsManager from '../server/FunctionsManager';
+import type EnvManager from '../server/EnvManager';
 
-type ServerDataSources = { [key: string]: ServerDataSource<any, any, any> | undefined };
+export interface IToolpadProject {
+  functionsManager: FunctionsManager;
+  envManager: EnvManager;
+}
+
+type ServerDataSources = {
+  [key: string]:
+    | ServerDataSource<any, any, any>
+    | ((project: IToolpadProject) => ServerDataSource<any, any, any>)
+    | undefined;
+};
 
 const dataSources: ServerDataSources = {
   rest,

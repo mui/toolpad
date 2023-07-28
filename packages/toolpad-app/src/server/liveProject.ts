@@ -1,7 +1,9 @@
 import chalk from 'chalk';
-import * as appDom from '../appDom';
+import type { ExecFetchResult, NodeId } from '@mui/toolpad-core';
 import { initProject } from './localMode';
-import { VersionInfo } from './versionInfo';
+import type * as appDom from '../appDom';
+import type { VersionInfo } from './versionInfo';
+import type { Methods } from '../types';
 
 // eslint-disable-next-line no-underscore-dangle
 (globalThis as any).__project__ ??= initProject().catch((err) => {
@@ -52,4 +54,30 @@ export async function createComponent(name: string) {
 export async function deletePage(name: string) {
   const project = await getProject();
   return project.deletePage(name);
+}
+
+export async function execQuery<P, Q>(
+  dataNode: appDom.QueryNode<Q>,
+  params: Q,
+): Promise<ExecFetchResult<any>> {
+  const project = await getProject();
+  return project.dataManager.execQuery<P, Q>(dataNode, params);
+}
+
+export async function dataSourceFetchPrivate<P, Q>(
+  dataSourceId: string,
+  connectionId: NodeId | null,
+  query: Q,
+): Promise<any> {
+  const project = await getProject();
+  return project.dataManager.dataSourceFetchPrivate<P, Q>(dataSourceId, connectionId, query);
+}
+
+export async function dataSourceExecPrivate<P, Q, PQS extends Methods>(
+  dataSourceId: string,
+  method: keyof PQS,
+  args: any[],
+): Promise<any> {
+  const project = await getProject();
+  return project.dataManager.dataSourceExecPrivate<P, Q, PQS>(dataSourceId, method, args);
 }

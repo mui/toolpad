@@ -20,7 +20,6 @@ import { createProdHandler } from '../src/server/toolpadAppServer';
 import { getProject } from '../src/server/liveProject';
 import { Command as AppDevServerCommand, Event as AppDevServerEvent } from './appServer';
 import { createRpcHandler, rpcServer } from '../src/server/rpc';
-import { createDataHandler, createDataSourcesHandler } from '../src/server/data';
 import { RUNTIME_CONFIG_WINDOW_PROPERTY } from '../src/constants';
 import { RuntimeConfig } from '../src/config';
 
@@ -76,7 +75,7 @@ async function createDevHandler({ root, base, runtimeConfig }: CreateDevHandlerP
     cp.send({ kind: 'reload-components' } satisfies AppDevServerCommand);
   });
 
-  router.use('/api/data', createDataHandler(project));
+  router.use('/api/data', project.dataManager.createDataHandler(project));
   router.use(
     createProxyMiddleware({
       logLevel: 'silent',
@@ -178,7 +177,7 @@ export async function main({
 
   if (cmd === 'dev') {
     app.use('/api/rpc', createRpcHandler(rpcServer));
-    app.use('/api/dataSources', createDataSourcesHandler(project));
+    app.use('/api/dataSources', project.dataManager.createDataSourcesHandler());
 
     const transformIndexHtml = (html: string) => {
       const serializedConfig = serializeJavascript(runtimeConfig, { isJSON: true });

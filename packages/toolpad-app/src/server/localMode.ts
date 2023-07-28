@@ -52,6 +52,7 @@ import EnvManager from './EnvManager';
 import FunctionsManager from './FunctionsManager';
 import { VersionInfo, checkVersion } from './versionInfo';
 import { VERSION_CHECK_INTERVAL } from '../constants';
+import DataManager from './DataManager';
 
 function getUserProjectRoot(): string {
   const projectDir = process.env.TOOLPAD_PROJECT_DIR;
@@ -934,6 +935,8 @@ class ToolpadProject {
 
   functionsManager: FunctionsManager;
 
+  dataManager: DataManager;
+
   invalidateQueries: () => void;
 
   private alertedMissingVars = new Set<string>();
@@ -951,6 +954,7 @@ class ToolpadProject {
 
     this.envManager = new EnvManager(this);
     this.functionsManager = new FunctionsManager(this);
+    this.dataManager = new DataManager(this);
 
     this.invalidateQueries = throttle(
       () => {

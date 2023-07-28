@@ -7,7 +7,6 @@ import { hasOwnProperty } from '@mui/toolpad-utils/collections';
 import { errorFrom, serializeError } from '@mui/toolpad-utils/errors';
 import { indent } from '@mui/toolpad-utils/strings';
 import chalk from 'chalk';
-import { execQuery, dataSourceFetchPrivate, dataSourceExecPrivate } from './data';
 import {
   loadDom,
   saveDom,
@@ -16,6 +15,9 @@ import {
   getVersionInfo,
   createComponent,
   deletePage,
+  execQuery,
+  dataSourceFetchPrivate,
+  dataSourceExecPrivate,
 } from './liveProject';
 import { asyncHandler } from '../utils/express';
 

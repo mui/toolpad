@@ -6,7 +6,6 @@ import config from '../config';
 import { postProcessHtml } from './toolpadAppBuilder';
 import { ToolpadProject, getAppOutputFolder } from './localMode';
 import { asyncHandler } from '../utils/express';
-import { createDataHandler } from './data';
 import { basicAuthUnauthorized, checkBasicAuthHeader } from './basicAuth';
 
 export interface CreateViteConfigParams {
@@ -34,7 +33,7 @@ export async function createProdHandler(project: ToolpadProject) {
     basicAuthUnauthorized(res);
   });
 
-  router.use('/api/data', createDataHandler(project));
+  router.use('/api/data', project.dataManager.createDataHandler(project));
 
   router.use(
     asyncHandler(async (req, res) => {

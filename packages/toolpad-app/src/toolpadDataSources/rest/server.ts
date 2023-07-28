@@ -22,12 +22,11 @@ import {
   UrlEncodedBody,
 } from './types';
 import { Maybe } from '../../utils/types';
-import { getProject } from '../../server/liveProject';
 import applyTransform from '../applyTransform';
 import { HTTP_NO_BODY, getAuthenticationHeaders, getDefaultUrl, parseBaseUrl } from './shared';
+import type { IToolpadProject } from '../server';
 
-async function loadEnvFile() {
-  const project = await getProject();
+async function loadEnvFile(project: IToolpadProject) {
   return project.envManager.getDeclaredValues();
 }
 
@@ -214,21 +213,6 @@ export async function execBase(
   return { data, untransformedData, error, har };
 }
 
-async function execPrivate(connection: Maybe<RestConnectionParams>, query: FetchPrivateQuery) {
-  switch (query.kind) {
-    case 'introspection': {
-      const env = await loadEnvFile();
-      const envVarNames = Object.keys(env);
-
-      return { envVarNames };
-    }
-    case 'debugExec':
-      return execBase(connection, query.query, query.params);
-    default:
-      throw new Error(`Unknown private query "${(query as FetchPrivateQuery).kind}"`);
-  }
-}
-
 async function exec(
   connection: Maybe<RestConnectionParams>,
   fetchQuery: FetchQuery,
@@ -238,10 +222,27 @@ async function exec(
   return { data, error };
 }
 
-const dataSource: ServerDataSource<{}, FetchQuery, any> = {
-  exec,
-  execPrivate,
-  api: {},
-};
+export default function createDatasource(
+  project: IToolpadProject,
+): ServerDataSource<{}, FetchQuery, any> {
+  return {
+    exec,
 
-export default dataSource;
+    async execPrivate(connection: Maybe<RestConnectionParams>, query: FetchPrivateQuery) {
+      switch (query.kind) {
+        case 'introspection': {
+          const env = await loadEnvFile(project);
+          const envVarNames = Object.keys(env);
+
+          return { envVarNames };
+        }
+        case 'debugExec':
+          return execBase(connection, query.query, query.params);
+        default:
+          throw new Error(`Unknown private query "${(query as FetchPrivateQuery).kind}"`);
+      }
+    },
+
+    api: {},
+  };
+}

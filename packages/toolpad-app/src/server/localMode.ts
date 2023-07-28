@@ -20,7 +20,6 @@ import {
   updateYamlFile,
   fileExists,
 } from '@mui/toolpad-utils/fs';
-import config from '../config';
 import * as appDom from '../appDom';
 import insecureHash from '../utils/insecureHash';
 import {
@@ -1065,7 +1064,7 @@ class ToolpadProject {
   }
 
   async writeDomToDisk(newDom: appDom.AppDom) {
-    if (config.cmd !== 'dev') {
+    if (!this.options.dev) {
       throw new Error(`Writing to disk is only possible in toolpad dev mode.`);
     }
 
@@ -1136,12 +1135,12 @@ class ToolpadProject {
 
 export type { ToolpadProject };
 
-export async function initProject(root: string) {
+export async function initProject(cmd: 'dev' | 'start' | 'build', root: string) {
   await migrateLegacyProject(root);
 
   await initToolpadFolder(root);
 
-  const project = new ToolpadProject(root, { dev: config.cmd === 'dev' });
+  const project = new ToolpadProject(root, { dev: cmd === 'dev' });
 
   await project.start();
 
@@ -1149,7 +1148,7 @@ export async function initProject(root: string) {
 }
 
 export async function buildProject(root: string) {
-  const project = new ToolpadProject(root, { dev: config.cmd === 'dev' });
+  const project = new ToolpadProject(root, { dev: false });
 
   await project.build();
 

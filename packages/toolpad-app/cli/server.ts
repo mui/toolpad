@@ -21,7 +21,7 @@ import { ToolpadProject, initProject } from '../src/server/localMode';
 import { Command as AppDevServerCommand, Event as AppDevServerEvent } from './appServer';
 import { createRpcHandler, createRpcServer } from '../src/server/rpc';
 import { RUNTIME_CONFIG_WINDOW_PROPERTY } from '../src/constants';
-import { RuntimeConfig } from '../src/config';
+import type { RuntimeConfig } from '../src/config';
 
 const DEFAULT_PORT = 3000;
 
@@ -123,7 +123,7 @@ async function main({
     externalUrl,
   };
 
-  const project = await initProject(projectDir);
+  const project = await initProject(cmd, projectDir);
 
   const app = express();
   const httpServer = createServer(app);

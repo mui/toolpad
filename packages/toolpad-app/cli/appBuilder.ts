@@ -11,7 +11,7 @@ async function main() {
 
   const projectDir = process.env.TOOLPAD_PROJECT_DIR;
 
-  await buildProject();
+  await buildProject(projectDir);
 
   await buildApp({ root: projectDir, base: '/prod' });
 }

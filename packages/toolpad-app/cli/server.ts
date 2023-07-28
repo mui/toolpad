@@ -17,9 +17,9 @@ import { folderExists } from '@mui/toolpad-utils/fs';
 import chalk from 'chalk';
 import { asyncHandler } from '../src/utils/express';
 import { createProdHandler } from '../src/server/toolpadAppServer';
-import { getProject } from '../src/server/liveProject';
+import { ToolpadProject, initProject } from '../src/server/localMode';
 import { Command as AppDevServerCommand, Event as AppDevServerEvent } from './appServer';
-import { createRpcHandler, rpcServer } from '../src/server/rpc';
+import { createRpcHandler, createRpcServer } from '../src/server/rpc';
 import { RUNTIME_CONFIG_WINDOW_PROPERTY } from '../src/constants';
 import { RuntimeConfig } from '../src/config';
 
@@ -33,26 +33,27 @@ function* getPreferredPorts(port: number = DEFAULT_PORT): Iterable<number> {
 }
 
 interface CreateDevHandlerParams {
-  root: string;
   base: string;
   runtimeConfig: RuntimeConfig;
 }
 
-async function createDevHandler({ root, base, runtimeConfig }: CreateDevHandlerParams) {
+async function createDevHandler(
+  project: ToolpadProject,
+  { base, runtimeConfig }: CreateDevHandlerParams,
+) {
   const router = express.Router();
 
   const appServerPath = path.resolve(__dirname, './appServer.js');
   const devPort = await getPort();
-  const project = await getProject();
 
   const cp = execaNode(appServerPath, [], {
-    cwd: root,
+    cwd: project.getRoot(),
     stdio: 'inherit',
     env: {
       NODE_ENV: 'development',
       TOOLPAD_RUNTIME_CONFIG: JSON.stringify(runtimeConfig),
       TOOLPAD_PORT: String(devPort),
-      TOOLPAD_PROJECT_DIR: root,
+      TOOLPAD_PROJECT_DIR: project.getRoot(),
       TOOLPAD_BASE: base,
       FORCE_COLOR: '1',
     },
@@ -107,7 +108,7 @@ export interface ServerConfig {
   externalUrl: string;
 }
 
-export async function main({
+async function main({
   cmd,
   gitSha1,
   circleBuildNum,
@@ -122,7 +123,7 @@ export async function main({
     externalUrl,
   };
 
-  const project = await getProject();
+  const project = await initProject(projectDir);
 
   const app = express();
   const httpServer = createServer(app);
@@ -158,9 +159,8 @@ export async function main({
   switch (cmd) {
     case 'dev': {
       const previewBase = '/preview';
-      const devHandler = await createDevHandler({
+      const devHandler = await createDevHandler(project, {
         runtimeConfig,
-        root: projectDir,
         base: previewBase,
       });
       app.use(previewBase, devHandler);
@@ -176,6 +176,7 @@ export async function main({
   }
 
   if (cmd === 'dev') {
+    const rpcServer = createRpcServer(project);
     app.use('/api/rpc', createRpcHandler(rpcServer));
     app.use('/api/dataSources', project.dataManager.createDataSourcesHandler());
 
@@ -262,7 +263,7 @@ export interface RunAppOptions {
   projectDir: string;
 }
 
-async function runApp({ cmd, port, dev = false, projectDir }: RunAppOptions) {
+export async function runApp({ cmd, port, dev = false, projectDir }: RunAppOptions) {
   if (!(await folderExists(projectDir))) {
     console.error(`${chalk.red('error')} - No project found at ${chalk.cyan(`"${projectDir}"`)}`);
     process.exit(1);

@@ -54,12 +54,6 @@ import { VersionInfo, checkVersion } from './versionInfo';
 import { VERSION_CHECK_INTERVAL } from '../constants';
 import DataManager from './DataManager';
 
-function getUserProjectRoot(): string {
-  const projectDir = process.env.TOOLPAD_PROJECT_DIR;
-  invariant(projectDir, 'Toolpad in local mode must have a project directory defined');
-  return projectDir;
-}
-
 function getToolpadFolder(root: string): string {
   return path.join(root, './toolpad');
 }
@@ -1142,9 +1136,7 @@ class ToolpadProject {
 
 export type { ToolpadProject };
 
-export async function initProject() {
-  const root = getUserProjectRoot();
-
+export async function initProject(root: string) {
   await migrateLegacyProject(root);
 
   await initToolpadFolder(root);
@@ -1156,9 +1148,7 @@ export async function initProject() {
   return project;
 }
 
-export async function buildProject() {
-  const root = getUserProjectRoot();
-
+export async function buildProject(root: string) {
   const project = new ToolpadProject(root, { dev: config.cmd === 'dev' });
 
   await project.build();

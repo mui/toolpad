@@ -1,24 +1,3 @@
-/**
- * Quick object check - this is primarily used to tell
- * objects from primitive values when we know the value
- * is a JSON-compliant type.
- */
-export function isObject<T>(obj: T): boolean {
-  return obj !== null && typeof obj === 'object';
-}
-
-export function isSet<T>(obj: T): boolean {
-  return obj instanceof Set;
-}
-
-export function isMap<T>(obj: T): boolean {
-  return obj instanceof Map;
-}
-
-export function isArray<T>(obj: T): boolean {
-  return Array.isArray(obj);
-}
-
 export function asArray<T>(maybeArray: T | T[]): T[] {
   return Array.isArray(maybeArray) ? maybeArray : [maybeArray];
 }
@@ -124,16 +103,16 @@ export function isDeepEqual(obj: any, objToCompare: any): boolean {
   if (obj === objToCompare) {
     return true;
   }
-  const isObjectA = isObject(obj);
-  const isObjectB = isObject(objToCompare);
+  const isObjectA = obj !== null && typeof obj === 'object';
+  const isObjectB = objToCompare !== null && typeof objToCompare === 'object';
   if (isObjectA && isObjectB) {
     try {
-      const isArrayA = isArray(obj);
-      const isArrayB = isArray(objToCompare);
-      const isSetA = isSet(obj);
-      const isSetB = isSet(objToCompare);
-      const isMapA = isMap(obj);
-      const isMapB = isMap(objToCompare);
+      const isArrayA = Array.isArray(obj);
+      const isArrayB = Array.isArray(objToCompare);
+      const isSetA = obj instanceof Set;
+      const isSetB = objToCompare instanceof Set;
+      const isMapA = obj instanceof Map;
+      const isMapB = objToCompare instanceof Map;
 
       if (isSetA && isSetB) {
         return obj.size === objToCompare.size && isDeepEqual([...obj], [...objToCompare]);

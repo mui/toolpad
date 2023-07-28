@@ -14,7 +14,7 @@ invariant(
   'The dev server must be started with NODE_ENV=development',
 );
 
-function devServerPlugin(config: RuntimeConfig): Plugin {
+function devServerPlugin(root: string, config: RuntimeConfig): Plugin {
   return {
     name: 'toolpad-dev-server',
 
@@ -26,7 +26,7 @@ function devServerPlugin(config: RuntimeConfig): Plugin {
           const canvas = url.searchParams.get('toolpad-display') === 'canvas';
 
           try {
-            const dom = await loadDomFromDisk();
+            const dom = await loadDomFromDisk(root);
 
             const template = getHtmlContent({ canvas });
 
@@ -56,7 +56,7 @@ export async function createDevServer({ config, root, base }: ToolpadAppDevServe
       dev: true,
       root,
       base,
-      plugins: [devServerPlugin(config)],
+      plugins: [devServerPlugin(root, config)],
     }),
   );
 

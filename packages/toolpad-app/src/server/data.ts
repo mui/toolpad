@@ -8,13 +8,14 @@ import { Methods, ServerDataSource } from '../types';
 import serverDataSources from '../toolpadDataSources/server';
 import * as appDom from '../appDom';
 import applyTransform from '../toolpadDataSources/applyTransform';
-import { loadDom, saveDom } from './liveProject';
 import { asyncHandler } from '../utils/express';
+import { ToolpadProject } from './localMode';
 
-export async function getConnectionParams<P = unknown>(
+async function getConnectionParams<P = unknown>(
+  project: ToolpadProject,
   connectionId: string | null,
 ): Promise<P | null> {
-  const dom = await loadDom();
+  const dom = await project.loadDom();
   const node = appDom.getNode(
     dom,
     connectionId as NodeId,
@@ -23,8 +24,12 @@ export async function getConnectionParams<P = unknown>(
   return node.attributes.params.$$secret;
 }
 
-export async function setConnectionParams<P>(connectionId: NodeId, params: P): Promise<void> {
-  let dom = await loadDom();
+async function setConnectionParams<P>(
+  project: ToolpadProject,
+  connectionId: NodeId,
+  params: P,
+): Promise<void> {
+  let dom = await project.loadDom();
   const existing = appDom.getNode(dom, connectionId, 'connection');
 
   dom = appDom.setNodeNamespacedProp(
@@ -35,7 +40,7 @@ export async function setConnectionParams<P>(connectionId: NodeId, params: P): P
     appDom.createSecret(params),
   );
 
-  await saveDom(dom);
+  await project.saveDom(dom);
 }
 
 export async function execQuery<P, Q>(
@@ -114,7 +119,7 @@ function withSerializedError<T extends { error?: unknown }>(
     : withoutError;
 }
 
-export function createDataHandler() {
+export function createDataHandler(project: ToolpadProject) {
   const router = express.Router();
 
   router.use(
@@ -135,7 +140,7 @@ export function createDataHandler() {
 
       invariant(typeof queryName === 'string', 'queryName url variable required');
 
-      const dom = await loadDom();
+      const dom = await project.loadDom();
 
       const page = appDom.getPageByName(dom, pageName);
 
@@ -167,7 +172,7 @@ export function createDataHandler() {
   return router;
 }
 
-export function createDataSourcesHandler() {
+export function createDataSourcesHandler(project: ToolpadProject) {
   const router = express.Router();
 
   const handlerMap = new Map<String, Function | null | undefined>();
@@ -196,8 +201,10 @@ export function createDataSourcesHandler() {
       if (typeof handler === 'function') {
         return handler(
           {
-            getConnectionParams,
-            setConnectionParams,
+            getConnectionParams: (connectionId: string | null) =>
+              getConnectionParams(project, connectionId),
+            setConnectionParams: <P>(connectionId: NodeId, params: P) =>
+              setConnectionParams(project, connectionId, params),
           },
           req,
           res,

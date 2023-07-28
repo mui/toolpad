@@ -76,7 +76,7 @@ async function createDevHandler({ root, base, runtimeConfig }: CreateDevHandlerP
     cp.send({ kind: 'reload-components' } satisfies AppDevServerCommand);
   });
 
-  router.use('/api/data', createDataHandler());
+  router.use('/api/data', createDataHandler(project));
   router.use(
     createProxyMiddleware({
       logLevel: 'silent',
@@ -123,6 +123,8 @@ export async function main({
     externalUrl,
   };
 
+  const project = await getProject();
+
   const app = express();
   const httpServer = createServer(app);
 
@@ -166,9 +168,7 @@ export async function main({
       break;
     }
     case 'start': {
-      const prodHandler = await createProdHandler({
-        root: projectDir,
-      });
+      const prodHandler = await createProdHandler(project);
       app.use('/prod', prodHandler);
       break;
     }
@@ -178,7 +178,7 @@ export async function main({
 
   if (cmd === 'dev') {
     app.use('/api/rpc', createRpcHandler(rpcServer));
-    app.use('/api/dataSources', createDataSourcesHandler());
+    app.use('/api/dataSources', createDataSourcesHandler(project));
 
     const transformIndexHtml = (html: string) => {
       const serializedConfig = serializeJavascript(runtimeConfig, { isJSON: true });
@@ -227,8 +227,6 @@ export async function main({
   const runningServer = await listen(httpServer, port);
 
   const wsServer = new WebSocketServer({ noServer: true });
-
-  const project = await getProject();
 
   project.events.on('*', (event, payload) => {
     wsServer.clients.forEach((client) => {

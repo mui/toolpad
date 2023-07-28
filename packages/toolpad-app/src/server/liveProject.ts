@@ -1,6 +1,7 @@
 import chalk from 'chalk';
 import * as appDom from '../appDom';
 import { initProject } from './localMode';
+import { VersionInfo } from './versionInfo';
 
 // eslint-disable-next-line no-underscore-dangle
 (globalThis as any).__project__ ??= initProject().catch((err) => {
@@ -36,4 +37,19 @@ export async function applyDomDiff(diff: appDom.DomDiff): Promise<{ fingerprint:
 export async function openCodeEditor(fileName: string, fileType: string): Promise<void> {
   const project = await getProject();
   return project.openCodeEditor(fileName, fileType);
+}
+
+export async function getVersionInfo(): Promise<VersionInfo> {
+  const project = await getProject();
+  return project.getVersionInfo();
+}
+
+export async function createComponent(name: string) {
+  const project = await getProject();
+  return project.createComponent(name);
+}
+
+export async function deletePage(name: string) {
+  const project = await getProject();
+  return project.deletePage(name);
 }

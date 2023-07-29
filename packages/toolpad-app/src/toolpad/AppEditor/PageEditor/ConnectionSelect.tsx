@@ -83,7 +83,7 @@ export default function ConnectionSelect({
     <TextField
       sx={sx}
       select
-      fullWidth
+      // fullWidth
       value={selection}
       label="Connection"
       onChange={handleSelectionChange}
@@ -94,13 +94,13 @@ export default function ConnectionSelect({
           ? config.displayName
           : `<unknown datasource "${option.dataSourceId}">`;
 
-        const connectionLabel = option.connectionId
-          ? appDom.getMaybeNode(dom, option.connectionId)?.name
-          : '<default>';
+        // const connectionLabel = option.connectionId
+        //   ? appDom.getMaybeNode(dom, option.connectionId)?.name
+        //   : '<default>';
         return (
           <MenuItem key={index} value={index}>
             {dataSourceLabel}
-            {config?.ConnectionParamsInput ? ` | ${connectionLabel}` : ''}
+            {/* {config?.ConnectionParamsInput ? ` | ${connectionLabel}` : ''} */}
           </MenuItem>
         );
       })}

@@ -1,4 +1,4 @@
-import { Box, Button, Stack, Tooltip } from '@mui/material';
+import { Box, Button, Stack, Tooltip, CircularProgress, styled } from '@mui/material';
 import CloudDoneIcon from '@mui/icons-material/CloudDone';
 import SyncIcon from '@mui/icons-material/Sync';
 import SyncProblemIcon from '@mui/icons-material/SyncProblem';
@@ -8,7 +8,44 @@ import { useLocation } from 'react-router-dom';
 import { DomLoader, useDomLoader } from '../AppState';
 import ToolpadShell from '../ToolpadShell';
 import PagePanel from './PagePanel';
+import { PageEditorProvider } from './PageEditor/PageEditorProvider';
 import { getViewFromPathname } from '../../utils/domView';
+import { PropControlsContextProvider, PropTypeControls } from '../propertyControls';
+import string from '../propertyControls/string';
+import boolean from '../propertyControls/boolean';
+import number from '../propertyControls/number';
+import select from '../propertyControls/select';
+import json from '../propertyControls/json';
+import markdown from '../propertyControls/Markdown';
+import eventControl from '../propertyControls/event';
+import GridColumns from '../propertyControls/GridColumns';
+import SelectOptions from '../propertyControls/SelectOptions';
+import ChartData from '../propertyControls/ChartData';
+import RowIdFieldSelect from '../propertyControls/RowIdFieldSelect';
+import HorizontalAlign from '../propertyControls/HorizontalAlign';
+import VerticalAlign from '../propertyControls/VerticalAlign';
+import NumberFormat from '../propertyControls/NumberFormat';
+import ColorScale from '../propertyControls/ColorScale';
+
+const PAGE_PANEL_WIDTH = 250;
+
+const propTypeControls: PropTypeControls = {
+  string,
+  boolean,
+  number,
+  select,
+  json,
+  markdown,
+  event: eventControl,
+  GridColumns,
+  SelectOptions,
+  ChartData,
+  RowIdFieldSelect,
+  HorizontalAlign,
+  VerticalAlign,
+  NumberFormat,
+  ColorScale,
+};
 
 function getSaveState(domLoader: DomLoader): React.ReactNode {
   if (domLoader.saveDomError) {
@@ -41,6 +78,21 @@ export interface ToolpadShellProps {
   children: React.ReactNode;
 }
 
+const Centered = styled('div')({
+  height: '100%',
+  display: 'flex',
+  justifyContent: 'center',
+  alignItems: 'center',
+});
+
+function FullPageLoader() {
+  return (
+    <Centered>
+      <CircularProgress />
+    </Centered>
+  );
+}
+
 export default function AppEditorShell({ children, ...props }: ToolpadShellProps) {
   const domLoader = useDomLoader();
 
@@ -70,31 +122,39 @@ export default function AppEditorShell({ children, ...props }: ToolpadShellProps
       status={getSaveState(domLoader)}
       {...props}
     >
-      <Box
-        sx={{
-          display: 'flex',
-          flexDirection: 'row',
-          overflow: 'hidden',
-          height: '100%',
-        }}
-      >
-        <PagePanel
-          sx={{
-            width: 250,
-            borderRight: 1,
-            borderColor: 'divider',
-          }}
-        />
-        <Box
-          sx={{
-            flex: 1,
-            overflow: 'hidden',
-            position: 'relative',
-          }}
-        >
-          {children}
-        </Box>
-      </Box>
+      {currentPageId ? (
+        <PageEditorProvider key={currentPageId} nodeId={currentPageId}>
+          <PropControlsContextProvider value={propTypeControls}>
+            <Box
+              sx={{
+                display: 'flex',
+                flexDirection: 'row',
+                overflow: 'hidden',
+                height: '100%',
+              }}
+            >
+              <PagePanel
+                sx={{
+                  width: PAGE_PANEL_WIDTH,
+                  borderRight: 1,
+                  borderColor: 'divider',
+                }}
+              />
+              <Box
+                sx={{
+                  flex: 1,
+                  overflow: 'hidden',
+                  position: 'relative',
+                }}
+              >
+                {children}
+              </Box>
+            </Box>
+          </PropControlsContextProvider>
+        </PageEditorProvider>
+      ) : (
+        <FullPageLoader />
+      )}
     </ToolpadShell>
   );
 }

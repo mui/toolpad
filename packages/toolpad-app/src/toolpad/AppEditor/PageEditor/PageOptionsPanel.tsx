@@ -2,7 +2,8 @@ import { Stack, Typography, Divider, MenuItem, TextField } from '@mui/material';
 import * as React from 'react';
 import { useDom, useDomApi } from '../../AppState';
 import { usePageEditorState } from './PageEditorProvider';
-import QueryEditor from './QueryEditor';
+// import QueryEditor from './QueryEditor';
+// import QueryEditor from './QueryEditor2';
 import UrlQueryEditor from './UrlQueryEditor';
 import NodeNameEditor from '../NodeNameEditor';
 import * as appDom from '../../../appDom';
@@ -57,7 +58,8 @@ export default function PageOptionsPanel() {
       <Divider variant="middle" sx={{ alignSelf: 'stretch' }} />
       <Typography variant="overline">Page State:</Typography>
       <UrlQueryEditor pageNodeId={pageNodeId} />
-      <QueryEditor />
+      {/* <QueryEditor /> */}
+      {/* <QueryEditor /> */}
     </Stack>
   );
 }

@@ -2,6 +2,7 @@ import { MenuItem, Menu, ListItemIcon, ListItemText, ButtonProps, MenuProps } fr
 import * as React from 'react';
 import DeleteIcon from '@mui/icons-material/Delete';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
+import RenameIcon from '@mui/icons-material/DriveFileRenameOutlineOutlined';
 import { NodeId } from '@mui/toolpad-core';
 import * as appDom from '../../appDom';
 import { useDom } from '../AppState';
@@ -14,8 +15,10 @@ export interface NodeMenuProps {
   renderButton: (params: { buttonProps: ButtonProps; menuProps: MenuProps }) => React.ReactNode;
   deleteLabelText?: string;
   duplicateLabelText?: string;
+  renameLabelText?: string;
   onDeleteNode?: (nodeId: NodeId) => void;
   onDuplicateNode?: (nodeId: NodeId) => void;
+  onRenameNode?: () => void;
 }
 
 export default function NodeMenu({
@@ -23,8 +26,10 @@ export default function NodeMenu({
   renderButton,
   deleteLabelText,
   duplicateLabelText,
+  renameLabelText,
   onDeleteNode,
   onDuplicateNode,
+  onRenameNode,
 }: NodeMenuProps) {
   const { dom } = useDom();
 
@@ -62,6 +67,14 @@ export default function NodeMenu({
     [onDuplicateNode, nodeId, onMenuClose],
   );
 
+  const handleRenameClick = React.useCallback(
+    (event: React.MouseEvent) => {
+      onMenuClose(event);
+      onRenameNode?.();
+    },
+    [onRenameNode, onMenuClose],
+  );
+
   return (
     <React.Fragment>
       {renderButton({
@@ -81,6 +94,14 @@ export default function NodeMenu({
           </ListItemIcon>
           <ListItemText>{duplicateLabelText}</ListItemText>
         </MenuItem>
+        {onRenameNode ? (
+          <MenuItem onClick={handleRenameClick}>
+            <ListItemIcon>
+              <RenameIcon />
+            </ListItemIcon>
+            <ListItemText>{renameLabelText}</ListItemText>
+          </MenuItem>
+        ) : null}
         <MenuItem onClick={handleDeleteNodeDialogOpen}>
           <ListItemIcon>
             <DeleteIcon />

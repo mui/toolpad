@@ -268,22 +268,6 @@ export function appStateReducer(state: AppState, action: AppStateAction): AppSta
       }
       return state;
     }
-    case 'HOVER_NODE': {
-      if (state.currentView.kind === 'page') {
-        return update(state, {
-          currentView: { ...state.currentView, hoveredNodeId: action.nodeId },
-        });
-      }
-      return state;
-    }
-    case 'BLUR_HOVER_NODE': {
-      if (state.currentView.kind === 'page') {
-        return update(state, {
-          currentView: { ...state.currentView, hoveredNodeId: null },
-        });
-      }
-      return state;
-    }
     case 'SET_VIEW':
     case 'UPDATE': {
       if (!action.view) {

@@ -5,7 +5,6 @@ import useDebouncedHandler from '@mui/toolpad-utils/hooks/useDebouncedHandler';
 import SplitPane from '../../../components/SplitPane';
 import RenderPanel from './RenderPanel';
 import ComponentPanel from './ComponentPanel';
-import { PageEditorProvider } from './PageEditorProvider';
 import { useDom } from '../../AppState';
 import * as appDom from '../../../appDom';
 import ComponentCatalog from './ComponentCatalog';
@@ -47,22 +46,36 @@ function PageEditorContent({ node }: PageEditorContentProps) {
   );
 
   return (
-    <PageEditorProvider key={node.id} nodeId={node.id}>
-      <SplitPane
-        allowResize
-        split="vertical"
-        size={splitDefaultSize}
-        defaultSize={splitDefaultSize}
-        onChange={handleSplitChange}
-        primary="second"
-      >
-        <PageEditorRoot>
-          <ComponentCatalog />
-          <RenderPanel className={classes.renderPanel} />
-        </PageEditorRoot>
-        <ComponentPanel />
-      </SplitPane>
-    </PageEditorProvider>
+    <SplitPane
+      allowResize
+      split="vertical"
+      size={splitDefaultSize}
+      defaultSize={splitDefaultSize}
+      onChange={handleSplitChange}
+      primary="second"
+      sx={{
+        '& .Resizer.vertical': {
+          width: '3px',
+          border: 0,
+          margin: 0,
+          zIndex: 0,
+          transition: (theme) => theme.transitions.create('all', { duration: 100 }),
+        },
+        '& .Resizer.vertical:hover': {
+          border: 0,
+          margin: 0,
+        },
+        '& .Pane2': {
+          zIndex: 0,
+        },
+      }}
+    >
+      <PageEditorRoot>
+        <ComponentCatalog />
+        <RenderPanel className={classes.renderPanel} />
+      </PageEditorRoot>
+      <ComponentPanel />
+    </SplitPane>
   );
 }
 

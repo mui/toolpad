@@ -14,8 +14,8 @@ import * as appDom from '../../../appDom';
 import NodeAttributeEditor from './NodeAttributeEditor';
 import { useDom } from '../../AppState';
 import { usePageEditorState } from './PageEditorProvider';
-import ErrorAlert from './ErrorAlert';
-import NodeNameEditor from '../NodeNameEditor';
+// import ErrorAlert from './ErrorAlert';
+// import NodeNameEditor from '../NodeNameEditor';
 import { useToolpadComponent } from '../toolpadComponents';
 import { getElementNodeComponentId } from '../../../runtime/toolpadComponents';
 import {
@@ -170,7 +170,7 @@ function SelectedNodeEditor({ node }: SelectedNodeEditorProps) {
   const { dom } = useDom();
   const { bindings, viewState } = usePageEditorState();
 
-  const nodeError = viewState.nodes[node.id]?.error;
+  // const nodeError = viewState.nodes[node.id]?.error;
   const componentConfig = viewState.nodes[node.id]?.componentConfig || { argTypes: {} };
 
   const component = useToolpadComponent(dom, getElementNodeComponentId(node));
@@ -179,12 +179,12 @@ function SelectedNodeEditor({ node }: SelectedNodeEditorProps) {
 
   return (
     <ElementContext.Provider value={node}>
-      <Stack direction="column" gap={1}>
+      <Stack direction="column" gap={0}>
         <MarkdownTooltip placement="left" title={componentConfig.helperText ?? displayName}>
-          <Typography variant="subtitle1">Component: {displayName}</Typography>
+          <Typography variant="body1">{node.name}</Typography>
         </MarkdownTooltip>
-        <NodeNameEditor node={node} />
-        {nodeError ? <ErrorAlert error={nodeError} /> : null}
+        {/* {/* <NodeNameEditor node={node} />
+        {nodeError ? <ErrorAlert error={nodeError} /> : null} */}
         <Divider sx={{ mt: 1 }} />
         {node ? (
           <ComponentPropsEditor bindings={bindings} componentConfig={componentConfig} node={node} />

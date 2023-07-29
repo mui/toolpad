@@ -21,7 +21,15 @@ import {
 } from '@mui/material';
 import { useBrowserJsRuntime } from '@mui/toolpad-core/jsBrowserRuntime';
 import { errorFrom } from '@mui/toolpad-utils/errors';
-import { TabPanel, TreeItem, TabContext, TabList, TreeView, treeItemClasses } from '@mui/lab';
+import {
+  LoadingButton,
+  TabPanel,
+  TreeItem,
+  TabContext,
+  TabList,
+  TreeView,
+  treeItemClasses,
+} from '@mui/lab';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import useBoolean from '@mui/toolpad-utils/hooks/useBoolean';
@@ -186,16 +194,10 @@ const StyledInput = styled(InputBase)(({ theme }) => ({
 
 const FunctionButton = styled(ButtonBase)(({ theme }) => ({
   fontSize: 12,
-  marginLeft: theme.spacing(1),
-  width: '50%',
-  textAlign: 'left',
+  width: '100%',
   fontFamily: theme.typography.fontFamilyCode,
   paddingBottom: 0,
-  color: theme.palette.mode === 'light' ? '#586069' : '#8b949e',
   fontWeight: 'normal',
-  '& span': {
-    width: '100%',
-  },
   '& svg': {
     width: 12,
     height: 12,
@@ -237,14 +239,15 @@ function FunctionAutocomplete({
       <Box sx={{ mt: 2, fontSize: 12 }}>
         <FunctionButton disableRipple aria-describedby={id} onClick={handleClick}>
           <span>{fileName}</span>
-          <ExpandMoreIcon />
+          <ExpandMoreIcon sx={{ ml: 1 }} />
         </FunctionButton>
         <Box
           key={selected}
           sx={{
-            ml: 2,
+            ml: 3,
             mt: 0.5,
             p: 0.5,
+            textAlign: 'center',
             fontWeight: 600,
             fontSize: 11,
             fontFamily: (theme) => theme.typography.fontFamilyCode,
@@ -343,6 +346,27 @@ function FunctionAutocomplete({
   ) : null;
 }
 
+interface ResolvedPreviewProps {
+  preview: any;
+}
+
+function ResolvedPreview({ preview }: ResolvedPreviewProps): React.ReactElement | null {
+  if (!preview) {
+    return (
+      <Alert severity="info" sx={{ mx: 1, p: 1, fontSize: 11, width: 'fit-content' }}>
+        <Box sx={{ mb: 1 }}>
+          No request has been sent yet. <br />
+          Click <span style={{ fontWeight: 'bold' }}>Preview</span> to preview the response here.
+        </Box>
+      </Alert>
+    );
+  }
+
+  const { data } = preview;
+
+  return <JsonView sx={{ height: '100%' }} src={data} copyToClipboard />;
+}
+
 function QueryEditor({
   globalScope,
   globalScopeMeta,
@@ -396,8 +420,9 @@ function QueryEditor({
   );
 
   const fetchServerPreview = React.useCallback(
-    async (query: LocalQuery, params: Record<string, string>) =>
-      execApi('debugExec', [query, params]),
+    async (query: LocalQuery, params: Record<string, string>) => {
+      return execApi('debugExec', [query, params]);
+    },
     [execApi],
   );
 
@@ -508,13 +533,13 @@ function QueryEditor({
   ]);
 
   return (
-    <SplitPane split="vertical" size="40%" primary="first" allowResize>
+    <SplitPane split="vertical" size="60%" primary="first" allowResize sx={{ maxWidth: '80%' }}>
       {/* <QueryInputPanel
         previewDisabled={!selectedOption}
         onRunPreview={handleRunPreview}
         actions={<Button onClick={handleOpenCreateNewHandler}>New handler file</Button>}
       > */}
-      <Box display={'grid'} gridTemplateColumns={'50% 50%'} height={'100%'} columnGap={1}>
+      <Box display={'grid'} gridTemplateColumns={'60% auto auto'} height={'100%'} columnGap={1}>
         {/* <Stack direction="row" sx={{ gap: 2, height: '100%', mx: 3 }}> */}
         {/* <Box sx={{ position: 'relative', overflow: 'auto', height: '100%', width: '40%' }}> */}
         {/* <TreeView
@@ -603,14 +628,29 @@ function QueryEditor({
             </TabList>
             {introspection.data?.files?.map((file) => (
               <TabPanel key={file.name} value={file.name} sx={{ p: 0 }}> */}
-        {introspection.data?.files?.map((file) => (
-          <FunctionAutocomplete
-            key={file.name}
-            fileName={file.name}
-            options={file.handlers.map((handler) => handler.name)}
-            selected={selectedFunction || ''}
-          />
-        ))}
+        <Stack
+          display="grid"
+          gridTemplateColumns={'2fr 1fr'}
+          sx={{ borderRight: (theme) => `1px solid ${theme.palette.grey[300]}` }}
+        >
+          {introspection.data?.files?.map((file) => (
+            <FunctionAutocomplete
+              key={file.name}
+              fileName={file.name}
+              options={file.handlers.map((handler) => handler.name)}
+              selected={selectedFunction || ''}
+            />
+          ))}
+
+          <LoadingButton
+            loading={previewIsLoading}
+            onClick={handleRunPreview}
+            variant="contained"
+            sx={{ alignSelf: 'start', justifySelf: 'flex-start', width: '75%', mt: 2.5, mx: 0 }}
+          >
+            Preview
+          </LoadingButton>
+        </Stack>
 
         {/* </TabPanel>
             ))}
@@ -631,8 +671,8 @@ function QueryEditor({
         ) : null}
         {/* </Box> */}
 
-        <Stack sx={{ gap: 1, flex: 1, overflow: 'auto' }}>
-          <Typography>Parameters:</Typography>
+        <Stack sx={{ gap: 1, mt: 2 }}>
+          <Typography fontSize={12}>Parameters:</Typography>
           {Object.entries(parameterDefs).map(([name, definiton]) => {
             const Control = getDefaultControl(propTypeControls, definiton, liveBindings);
             return Control ? (
@@ -668,7 +708,7 @@ function QueryEditor({
       {/* </QueryInputPanel> */}
 
       <QueryPreview isLoading={previewIsLoading} error={preview?.error}>
-        <JsonView sx={{ height: '100%' }} copyToClipboard src={preview?.data} />
+        <ResolvedPreview preview={preview} />
       </QueryPreview>
     </SplitPane>
   );

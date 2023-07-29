@@ -122,7 +122,11 @@ function RawBodyEditor({
           <TextField
             select
             label="content-type"
-            sx={{ width: 200 }}
+            sx={{
+              '& .MuiInputLabel-root': { fontSize: 12 },
+              '& .MuiInputBase-root': { fontSize: 12 },
+              width: 200,
+            }}
             value={value?.contentType}
             onChange={handleContentTypeChange}
             disabled={disabled}
@@ -241,11 +245,17 @@ export default function BodyEditor({
       <BodyEditorToolbar>
         <TextField
           label="body"
-          sx={{ width: 200 }}
+          // sx={{ width: 200 }}
           select
           value={activeTab}
           onChange={handleTabChange}
           disabled={disabled}
+          sx={{
+            '& .MuiInputLabel-root': { fontSize: 12 },
+            ' & .MuiInputBase-root': { fontSize: 12 },
+            width: 200,
+          }}
+          inputProps={{ sx: { fontSize: 12 } }}
         >
           <MenuItem value="raw">raw</MenuItem>
           <MenuItem value="urlEncoded">x-www-form-urlencoded</MenuItem>

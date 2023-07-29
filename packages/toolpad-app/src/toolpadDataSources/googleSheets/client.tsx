@@ -268,6 +268,7 @@ function ConnectionParamsInput({
 
 const dataSource: ClientDataSource<GoogleSheetsConnectionParams, GoogleSheetsApiQuery> = {
   displayName: 'Google Sheets',
+  isEnabled: false,
   ConnectionParamsInput,
   QueryEditor,
   getInitialQueryValue,

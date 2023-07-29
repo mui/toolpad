@@ -12,6 +12,7 @@ function MySQLConnectionParamsInput({
 
 const dataSource: ClientDataSource<SqlConnectionParams, SqlQuery> = {
   displayName: 'MySQL',
+  isEnabled: false,
   ConnectionParamsInput: MySQLConnectionParamsInput,
   QueryEditor,
   getInitialQueryValue,

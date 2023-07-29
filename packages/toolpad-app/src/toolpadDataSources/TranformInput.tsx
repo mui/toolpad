@@ -35,9 +35,13 @@ export default function TransformInput({
       <Stack>
         <FormControlLabel
           label="Transform response"
+          sx={{
+            '& .MuiFormControlLabel-label': { fontSize: 12 },
+          }}
           control={
             <Checkbox
               checked={enabled}
+              sx={{ p: 0.25, pl: 1 }}
               onChange={handleTransformEnabledChange}
               inputProps={{ 'aria-label': 'controlled' }}
             />

@@ -12,11 +12,12 @@ import CloseIcon from '@mui/icons-material/Close';
 import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
 import invariant from 'invariant';
 import SaveIcon from '@mui/icons-material/Save';
+import * as path from 'path-browserify';
 import { ToolpadFile } from '../shared/schemas';
 import DataGridFileEditor from './DataGridFileEditor';
 import theme from './theme';
 import { useServer } from './server';
-import { GeneratedFile, generateComponent } from '../shared/codeGeneration';
+import { CodeGenerationResult, generateComponent } from '../shared/codeGeneration';
 import DevtoolHost from './DevtoolHost';
 
 const CONNECTION_STATUS_DISPLAY = {
@@ -28,7 +29,7 @@ const CONNECTION_STATUS_DISPLAY = {
 interface FileEditorProps {
   value: ToolpadFile;
   onChange: (value: ToolpadFile) => void;
-  source?: string;
+  source?: CodeGenerationResult;
   commitButton: React.ReactNode;
 }
 
@@ -46,6 +47,73 @@ function FileEditor({ commitButton, value, onChange, source }: FileEditorProps) 
     default:
       return <Typography>Unknown file: {value.kind}</Typography>;
   }
+}
+
+interface ModuleInstance {
+  exports: unknown;
+}
+
+async function evaluate(
+  files: Map<string, { code: string }>,
+  entry: string,
+  dependencies = new Map<string, ModuleInstance>(),
+) {
+  const cache = new Map<string, ModuleInstance>(dependencies);
+  const extensions = ['.js', '.jsx', '.ts', '.tsx'];
+
+  const resolveId = (importee: string, importer: string) => {
+    if (importee.startsWith('.') || importee.startsWith('/')) {
+      const resolved = path.resolve(path.dirname(importer), importee);
+      if (files.has(resolved)) {
+        return path.resolve(path.dirname(importer), importee);
+      }
+
+      for (const ext of extensions) {
+        const resolvedWithExt = resolved + ext;
+        if (files.has(resolvedWithExt)) {
+          return resolvedWithExt;
+        }
+      }
+    } else if (dependencies.has(importee)) {
+      return importee;
+    }
+
+    throw new Error(`Could not resolve "${importee}" from "${importer}"`);
+  };
+
+  const createRequire = (importer: string) => (importee: string) => {
+    const resolved = resolveId(importee, importer);
+
+    const cached = cache.get(resolved);
+
+    if (cached) {
+      return cached.exports;
+    }
+
+    const mod = files.get(resolved);
+
+    if (!mod) {
+      throw new Error(`Can't find a module for "${importee}"`);
+    }
+
+    const compiled = sucrase.transform(mod.code, {
+      transforms: ['imports', 'typescript', 'jsx'],
+    });
+
+    const fn = new Function('module', 'exports', 'require', compiled.code);
+    const exports: unknown = {};
+    const module = { exports };
+    const require = createRequire(resolved);
+    fn(module, exports, require);
+
+    cache.set(resolved, module);
+
+    return module.exports;
+  };
+
+  const requireEntry = createRequire('/');
+
+  return requireEntry(entry);
 }
 
 export interface DevtoolOverlayProps {
@@ -71,7 +139,7 @@ export default function DevtoolOverlay({
 
   const { connectionStatus } = useServer();
 
-  const [source, setSource] = React.useState<GeneratedFile | null>(null);
+  const [source, setSource] = React.useState<CodeGenerationResult | undefined>(undefined);
 
   React.useEffect(() => {
     generateComponent(name, inputValue, { target: 'prod' })
@@ -80,29 +148,20 @@ export default function DevtoolOverlay({
       })
       .catch((error) => {
         console.error(error);
-        setSource(null);
+        setSource(undefined);
       });
   }, [inputValue, name, dependencies, onComponentUpdate]);
 
   React.useEffect(() => {
     generateComponent(name, inputValue, { target: 'preview' })
-      .then((result) => {
-        const compiled = sucrase.transform(result.code, {
-          transforms: ['imports', 'typescript', 'jsx'],
-        });
-        const fn = new Function('module', 'exports', 'require', compiled.code);
-        const exports: any = {};
-        const module = { exports };
-        const dependencyRegistry = new Map(dependencies);
-        const require = (moduleId: string) => {
-          const mod = dependencyRegistry.get(moduleId);
-          if (mod) {
-            return mod;
-          }
-          throw new Error(`Module "${moduleId}" not found`);
-        };
-        fn(module, exports, require);
-        const NewComponent = module.exports.default as React.ComponentType;
+      .then(async (result) => {
+        const moduleExports = await evaluate(
+          new Map(result.files),
+          `/${name}/index.tsx`,
+          new Map(dependencies.map(([k, v]) => [k, { exports: v }])),
+        );
+
+        const NewComponent = (moduleExports as any)?.default as React.ComponentType;
         invariant(
           typeof NewComponent === 'function',
           `Compilation must result in a function as default export`,
@@ -193,7 +252,7 @@ export default function DevtoolOverlay({
               <FileEditor
                 value={inputValue}
                 onChange={setInputValue}
-                source={source?.code}
+                source={source}
                 commitButton={commitButton}
               />
             ) : (

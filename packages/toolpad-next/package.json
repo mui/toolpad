@@ -26,14 +26,15 @@
   "dependencies": {
     "@mui/icons-material": "5.14.1",
     "@mui/lab": "5.0.0-alpha.137",
-    "@mui/material": "5.14.1",
-    "@mui/toolpad-utils": "0.1.20",
+    "@mui/material": "5.14.2",
+    "@mui/toolpad-utils": "0.1.21",
     "chokidar": "3.5.3",
     "dotenv": "16.3.1",
     "esbuild": "0.18.16",
     "get-port": "7.0.0",
     "glob": "10.3.3",
     "invariant": "2.2.4",
+    "path-browserify": "1.0.1",
     "prettier": "3.0.0",
     "sucrase": "3.34.0",
     "superjson": "1.13.1",
@@ -47,6 +48,7 @@
   "devDependencies": {
     "@types/glob": "8.1.0",
     "@types/invariant": "2.2.35",
+    "@types/path-browserify": "1.0.0",
     "@types/prettier": "2.7.3",
     "@types/ws": "8.5.5",
     "typescript": "5.1.6"

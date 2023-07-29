@@ -13,6 +13,7 @@ import {
   generateComponent,
   generateIndex,
   GenerateComponentConfig,
+  CodeFiles,
 } from '../shared/codeGeneration';
 import { DevRpcMethods } from '../shared/types';
 
@@ -45,6 +46,24 @@ function getYmlPattern(root: string) {
   return path.join(toolpadDir, '*.yml');
 }
 
+async function writeAndCompile(files: CodeFiles) {
+  await Promise.all(
+    files.map(async ([filePath, { code }]) => {
+      await fs.mkdir(path.dirname(filePath), { recursive: true });
+
+      await Promise.all([
+        fs.writeFile(filePath, code, { encoding: 'utf-8' }),
+
+        compileTs(code).then(async (compiledComponent) => {
+          await fs.writeFile(filePath.replace(/\.[^.]+$/, '.mjs'), compiledComponent, {
+            encoding: 'utf-8',
+          });
+        }),
+      ]);
+    }),
+  );
+}
+
 async function generateLib(root: string, config: GenerateComponentConfig = { target: 'prod' }) {
   // eslint-disable-next-line no-console
   console.log(`Generating lib at ${JSON.stringify(root)} in "${config.target}" mode`);
@@ -54,9 +73,9 @@ async function generateLib(root: string, config: GenerateComponentConfig = { tar
   const ymlPattern = getYmlPattern(root);
   const entries = await glob(ymlPattern);
 
-  await fs.mkdir(outputDir, { recursive: true });
+  await fs.rm(outputDir, { recursive: true });
 
-  const indexContentPromise = generateIndex(entries);
+  await fs.mkdir(outputDir, { recursive: true });
 
   await Promise.all([
     ...entries.map(async (entryPath) => {
@@ -65,35 +84,17 @@ async function generateLib(root: string, config: GenerateComponentConfig = { tar
       const file = toolpadFileSchema.parse(data);
       const name = getNameFromPath(entryPath);
 
-      const generatedComponentPromise = generateComponent(name, file, config);
-
-      await Promise.all([
-        generatedComponentPromise.then(async ({ code }) => {
-          await fs.writeFile(path.join(outputDir, `${name}.tsx`), code, {
-            encoding: 'utf-8',
-          });
-        }),
-
-        generatedComponentPromise.then(async ({ code }) => {
-          const compiledComponent = await compileTs(code);
-          await fs.writeFile(path.join(outputDir, `${name}.mjs`), compiledComponent, {
-            encoding: 'utf-8',
-          });
-        }),
-      ]);
-    }),
-
-    indexContentPromise.then(async ({ code }) => {
-      await fs.writeFile(path.join(outputDir, `index.ts`), code, { encoding: 'utf-8' });
-    }),
-
-    indexContentPromise.then(async ({ code }) => {
-      const compiledIndexContent = await compileTs(code);
-
-      await fs.writeFile(path.join(outputDir, `index.mjs`), compiledIndexContent, {
-        encoding: 'utf-8',
+      const { files } = await generateComponent(name, file, {
+        ...config,
+        outDir: outputDir,
       });
+
+      await writeAndCompile(files);
     }),
+
+    generateIndex(entries, {
+      outDir: outputDir,
+    }).then(async ({ files }) => writeAndCompile(files)),
   ]);
 
   console.error(`Generation completed!`);

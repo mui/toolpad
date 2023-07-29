@@ -1,13 +1,15 @@
-import * as path from 'path';
+import path from 'path-browserify';
 import type { GridColDef } from '@mui/x-data-grid-pro';
 import { format } from './prettier';
 import { DataGridFile, ToolpadFile } from './schemas';
 import { WithDevtoolParams } from './types';
 import * as jsonPointer from './jsonPointer';
 
-export type GeneratedFile = {
-  code: string;
-};
+export type CodeFiles = [string, { code: string }][];
+
+export interface CodeGenerationResult {
+  files: CodeFiles;
+}
 
 function isValidFileNAme(base: string): boolean {
   return /^[a-zA-Z][a-zA-Z0-9]*$/.test(base);
@@ -36,7 +38,9 @@ type SerializedProperties<O> = {
   [K in keyof O]: string | (undefined extends O[K] ? undefined : never);
 };
 
-export type GenerateComponentConfig =
+export type GenerateComponentConfig = {
+  outDir?: string;
+} & (
   | {
       target: 'prod';
     }
@@ -46,13 +50,16 @@ export type GenerateComponentConfig =
   | {
       target: 'dev';
       wsUrl: string;
-    };
+    }
+);
 
 export async function generateDataGridComponent(
   name: string,
   file: DataGridFile,
   config: GenerateComponentConfig,
-): Promise<GeneratedFile> {
+): Promise<CodeGenerationResult> {
+  const { outDir = '/' } = config;
+
   const hasRowsProperty = (file.spec?.rows?.kind ?? 'property') === 'property';
 
   const columnDefs: string[] =
@@ -238,14 +245,18 @@ export async function generateDataGridComponent(
     };
   `;
 
-  return { code: await format(code) };
+  const fileName = path.join(outDir, name, 'index.tsx');
+
+  const files: CodeFiles = [[fileName, { code: await format(code) }]];
+
+  return { files };
 }
 
 export async function generateComponent(
   name: string,
   file: ToolpadFile,
   config: GenerateComponentConfig,
-): Promise<GeneratedFile> {
+): Promise<CodeGenerationResult> {
   switch (file.kind) {
     case 'DataGrid':
       return generateDataGridComponent(name, file, config);
@@ -254,7 +265,16 @@ export async function generateComponent(
   }
 }
 
-export async function generateIndex(entries: string[]): Promise<GeneratedFile> {
+export interface GenerateIndexConfig {
+  outDir?: string;
+}
+
+export async function generateIndex(
+  entries: string[],
+  config: GenerateIndexConfig,
+): Promise<CodeGenerationResult> {
+  const { outDir = '/' } = config;
+
   const code = entries
     .map((entryPath) => {
       const name = getNameFromPath(entryPath);
@@ -262,5 +282,9 @@ export async function generateIndex(entries: string[]): Promise<GeneratedFile> {
     })
     .join('\n');
 
-  return { code };
+  const fileName = path.join(outDir, 'index.ts');
+
+  const files: CodeFiles = [[fileName, { code: await format(code) }]];
+
+  return { files };
 }

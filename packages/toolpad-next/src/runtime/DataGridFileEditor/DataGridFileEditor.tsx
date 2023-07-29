@@ -11,12 +11,14 @@ import {
   FormLabel,
   Radio,
   RadioGroup,
+  Typography,
 } from '@mui/material';
 import { TabContext, TabList, TabPanel as MuiTabPanel } from '@mui/lab';
 import useStorageState from '@mui/toolpad-utils/hooks/useStorageState';
 import { DataGridFile, DataGridSpec } from '../../shared/schemas';
 import ColumnsEditor from './ColumnsEditor';
 import RowsEditor from './RowsEditor';
+import { CodeGenerationResult } from '../../shared/codeGeneration';
 
 function NumberField({ value, onChange, onBlur, ...props }: TextFieldProps) {
   const [input, setInput] = React.useState(value);
@@ -57,7 +59,7 @@ const TabPanel = styled(MuiTabPanel)({ padding: 0, flex: 1, minHeight: 0 });
 interface DataGridFileEditorProps {
   value: DataGridFile;
   onChange: (value: DataGridFile) => void;
-  source?: string;
+  source?: CodeGenerationResult;
   commitButton: React.ReactNode;
 }
 
@@ -152,7 +154,14 @@ export default function DataGridFileEditor({
         </TabPanel>
         <TabPanel value="source">
           <Container sx={{ width: '100%', height: '100%', overflow: 'auto', px: 4 }}>
-            <pre>{source}</pre>
+            {source
+              ? source.files.map(([path, { code }]) => (
+                  <Box key={path}>
+                    <Typography variant="h6">{path}</Typography>
+                    <pre>{code}</pre>
+                  </Box>
+                ))
+              : null}
           </Container>
         </TabPanel>
       </TabContext>

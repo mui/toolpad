@@ -5,17 +5,17 @@ import TreeView from '@mui/lab/TreeView';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import TreeItem, { TreeItemProps } from '@mui/lab/TreeItem';
-import SplitPane from '../../../components/SplitPane';
-import * as appDom from '../../../appDom';
-import { useDom, useDomApi, useAppState, useAppStateApi } from '../../AppState';
-import EditableText from '../../../components/EditableText';
-import { ComponentIcon } from '../PageEditor/ComponentCatalog/ComponentCatalogItem';
-import { useNodeNameValidation } from '../HierarchyExplorer/validation';
+import SplitPane from '../../../../components/SplitPane';
+import * as appDom from '../../../../appDom';
+import { useDom, useDomApi, useAppState, useAppStateApi } from '../../../AppState';
+import EditableText from '../../../../components/EditableText';
+import { ComponentIcon } from '../ComponentCatalog/ComponentCatalogItem';
+import { useNodeNameValidation } from '../../HierarchyExplorer/validation';
 import {
   PAGE_ROW_COMPONENT_ID,
   PAGE_COLUMN_COMPONENT_ID,
-} from '../../../runtime/toolpadComponents';
-import { DomView } from '../../../utils/domView';
+} from '../../../../runtime/toolpadComponents';
+import { DomView } from '../../../../utils/domView';
 import { QueriesExplorer } from '../QueriesExplorer';
 
 function CustomTreeItem(
@@ -160,7 +160,7 @@ function RecursiveSubTree({
   );
 }
 
-export default function PageStructureExplorer() {
+function ComponentsExplorer() {
   const { dom } = useDom();
   const { currentView } = useAppState();
   const appStateApi = useAppStateApi();
@@ -254,49 +254,55 @@ export default function PageStructureExplorer() {
   }, [selectedNodeAncestorIds, expandedDomNodeIds]);
 
   return (
+    <React.Fragment>
+      <Typography
+        variant="body2"
+        sx={(theme) => ({
+          flexGrow: 1,
+          fontWeight: theme.typography.fontWeightLight,
+          mx: 1,
+          my: 0.5,
+        })}
+      >
+        Components
+      </Typography>
+      <TreeView
+        aria-label="components explorer"
+        defaultCollapseIcon={<ExpandMoreIcon sx={{ fontSize: '0.9rem', opacity: 0.5 }} />}
+        defaultExpandIcon={<ChevronRightIcon sx={{ fontSize: '0.9rem', opacity: 0.5 }} />}
+        expanded={Array.from(expandedDomNodeIdSet)}
+        selected={selectedDomNodeId as string}
+        onNodeSelect={handleNodeSelect}
+        onNodeFocus={handleNodeFocus}
+        onNodeToggle={handleNodeToggle}
+        onKeyDown={handleKeyDown}
+        sx={{
+          flexGrow: 1,
+          maxHeight: 450,
+          maxWidth: 400,
+          overflowY: 'auto',
+          scrollbarGutter: 'stable',
+        }}
+      >
+        {rootChildren.map((childNode) => (
+          <RecursiveSubTree
+            key={childNode.id}
+            dom={dom}
+            root={childNode}
+            onHover={handleNodeHover}
+            onMouseLeave={handleNodeBlur}
+          />
+        ))}
+      </TreeView>
+    </React.Fragment>
+  );
+}
+
+export default function StructureExplorer() {
+  return (
     <SplitPane split="horizontal" defaultSize={200} minSize={100} maxSize={400}>
-      <React.Fragment>
-        <Typography
-          variant="body2"
-          sx={(theme) => ({
-            flexGrow: 1,
-            fontWeight: theme.typography.fontWeightLight,
-            mx: 1,
-            my: 0.5,
-          })}
-        >
-          Components
-        </Typography>
-        <TreeView
-          aria-label="components explorer"
-          defaultCollapseIcon={<ExpandMoreIcon sx={{ fontSize: '0.9rem', opacity: 0.5 }} />}
-          defaultExpandIcon={<ChevronRightIcon sx={{ fontSize: '0.9rem', opacity: 0.5 }} />}
-          expanded={Array.from(expandedDomNodeIdSet)}
-          selected={selectedDomNodeId as string}
-          onNodeSelect={handleNodeSelect}
-          onNodeFocus={handleNodeFocus}
-          onNodeToggle={handleNodeToggle}
-          onKeyDown={handleKeyDown}
-          sx={{
-            flexGrow: 1,
-            maxHeight: 450,
-            maxWidth: 400,
-            overflowY: 'auto',
-            scrollbarGutter: 'stable',
-          }}
-        >
-          {rootChildren.map((childNode) => (
-            <RecursiveSubTree
-              key={childNode.id}
-              dom={dom}
-              root={childNode}
-              onHover={handleNodeHover}
-              onMouseLeave={handleNodeBlur}
-            />
-          ))}
-        </TreeView>
-      </React.Fragment>
       <QueriesExplorer />
+      <ComponentsExplorer />
     </SplitPane>
   );
 }

@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { styled, SxProps, Box, Divider, Typography } from '@mui/material';
 import PagesHierarchyExplorer from './HierarchyExplorer';
-import PageStructureExplorer from './StructureExplorer';
+import PageStructureExplorer from './PageEditor/StructureExplorer';
 import SplitPane from '../../components/SplitPane';
 import { useDom } from '../AppState';
 import AppOptions from '../AppOptions';

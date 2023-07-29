@@ -18,19 +18,21 @@ export default function QueryInputPanel({
   previewDisabled,
 }: QueryInputPanelProps) {
   return (
-    <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
-      <Toolbar>
-        <LoadingButton
-          startIcon={<PlayArrowIcon />}
-          onClick={onRunPreview}
-          disabled={previewDisabled}
-        >
-          Preview
-        </LoadingButton>
-        <FlexFill />
-        {actions}
-      </Toolbar>
+    <Box sx={{ height: '100%', display: 'flex', flexDirection: 'row' }}>
+      {/* <Toolbar> */}
+
+      {/* <FlexFill /> */}
+      {actions}
+      {/* </Toolbar> */}
       <Box sx={{ flex: 1, overflow: 'hidden' }}>{children}</Box>
+      <LoadingButton
+        startIcon={<PlayArrowIcon />}
+        onClick={onRunPreview}
+        disabled={previewDisabled}
+        variant="outlined"
+      >
+        Preview
+      </LoadingButton>
     </Box>
   );
 }

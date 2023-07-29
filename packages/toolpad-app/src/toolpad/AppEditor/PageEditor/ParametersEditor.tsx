@@ -53,7 +53,14 @@ export default function ParametersEditor({
   }, [value]);
 
   return (
-    <Box sx={sx} display="grid" gridTemplateColumns="1fr 2fr auto" alignItems="center" gap={1}>
+    <Box
+      sx={sx}
+      display="grid"
+      gridTemplateColumns="1fr 2fr auto"
+      alignItems="center"
+      columnGap={1}
+      rowGap={0}
+    >
       {label ? <Box gridColumn="span 3">{label}:</Box> : null}
       {value.map(([field, fieldValue], index) => {
         const liveBinding: LiveBinding | undefined = liveValue[index]?.[1];
@@ -69,6 +76,8 @@ export default function ParametersEditor({
                   value.map((entry, i) => (i === index ? [event.target.value, entry[1]] : entry)),
                 )
               }
+              sx={{ '& .MuiInputLabel-root': { fontSize: 12 } }}
+              inputProps={{ sx: { fontSize: 12 } }}
               error={!isValidFieldName[index]}
               disabled={disabled}
             />
@@ -87,8 +96,12 @@ export default function ParametersEditor({
               envVarNames={envVarNames}
             />
 
-            <IconButton aria-label="Delete property" onClick={handleRemove(index)}>
-              <DeleteIcon />
+            <IconButton
+              aria-label="Delete property"
+              onClick={handleRemove(index)}
+              sx={{ ml: -0.5 }}
+            >
+              <DeleteIcon fontSize="inherit" />
             </IconButton>
           </React.Fragment>
         );
@@ -102,6 +115,8 @@ export default function ParametersEditor({
           onChange={(event) => {
             onChange([...value, [event.target.value, null]]);
           }}
+          sx={{ '& .MuiInputLabel-root': { fontSize: 12 } }}
+          inputProps={{ sx: { fontSize: 12 } }}
           autoFocus={autoFocus}
           disabled={disabled}
         />

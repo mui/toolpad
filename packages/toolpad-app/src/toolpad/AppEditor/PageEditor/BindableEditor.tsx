@@ -83,7 +83,17 @@ export default function BindableEditor<V>({
   const hasBinding = value && valueBindingType !== 'const';
 
   return (
-    <Stack direction="row" alignItems="center" justifyContent="space-between" sx={sx}>
+    <Stack
+      direction="row"
+      alignItems="center"
+      justifyContent="space-between"
+      sx={{
+        '& .MuiInputBase-root': { fontSize: 12 },
+        '& .MuiFormLabel-root': { fontSize: 12 },
+        '& .MuiTypography-root': { fontSize: 12 },
+        ...sx,
+      }}
+    >
       <React.Fragment>
         {renderControl({
           label,

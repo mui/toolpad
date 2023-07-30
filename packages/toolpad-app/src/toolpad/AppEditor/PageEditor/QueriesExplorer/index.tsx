@@ -288,7 +288,7 @@ export function QueriesExplorer() {
        * delete the node and remove the tab, don't change the view
        */
       if (tabs.current.size === 1 || nodeId !== currentQueryId) {
-        if (currentQueryId) {
+        if (currentQueryId && currentQueryId !== nodeId) {
           viewOptions.view = { kind: 'query', nodeId: currentQueryId };
         }
         onComplete?.(viewOptions, nodeId);

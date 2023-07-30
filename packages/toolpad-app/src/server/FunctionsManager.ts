@@ -1,11 +1,11 @@
+import * as path from 'path';
+import * as fs from 'fs/promises';
 import { Emitter } from '@mui/toolpad-utils/events';
 import * as esbuild from 'esbuild';
-import * as path from 'path';
 import { ensureSuffix, indent } from '@mui/toolpad-utils/strings';
 import * as chokidar from 'chokidar';
 import chalk from 'chalk';
 import { glob } from 'glob';
-import * as fs from 'fs/promises';
 import { writeFileRecursive, fileExists, readJsonFile } from '@mui/toolpad-utils/fs';
 import invariant from 'invariant';
 // @ts-expect-error https://github.com/piscinajs/piscina/issues/362#issuecomment-1616811661

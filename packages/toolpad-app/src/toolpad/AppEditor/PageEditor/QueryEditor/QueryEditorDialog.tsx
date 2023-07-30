@@ -318,7 +318,7 @@ export default function QueryNodeEditorDialog<Q>({
                 connectionParams={connectionParams}
                 value={input}
                 onChange={setInput}
-                onCommit={handleCommit}
+                onSave={handleCommit}
                 globalScope={pageState}
                 globalScopeMeta={globalScopeMeta}
                 execApi={execPrivate}

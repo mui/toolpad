@@ -1,8 +1,7 @@
 import * as React from 'react';
-import { Box, Toolbar } from '@mui/material';
+import { Box } from '@mui/material';
 import { LoadingButton } from '@mui/lab';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
-import FlexFill from '../components/FlexFill';
 
 export interface QueryInputPanelProps {
   children: React.ReactNode;

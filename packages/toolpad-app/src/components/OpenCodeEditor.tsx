@@ -13,10 +13,11 @@ import {
 } from '@mui/material';
 import CodeIcon from '@mui/icons-material/Code';
 import client from '../api';
+import { FileTypes } from '../toolpadDataSources/local/types';
 
 interface OpenCodeEditorButtonProps extends ButtonProps {
   filePath: string;
-  fileType: string;
+  fileType: FileTypes;
   iconButton?: boolean;
 }
 
@@ -79,9 +80,9 @@ export default function OpenCodeEditorButton({
   return (
     <React.Fragment>
       {iconButton ? (
-        <Tooltip title="Open in code editor">
-          <IconButton size="small" onClick={handleClick} {...rest}>
-            <CodeIcon fontSize="inherit" color="primary" />
+        <Tooltip title="Open in editor" placement="right">
+          <IconButton size="small" onClick={handleClick} {...rest} color="inherit">
+            <CodeIcon fontSize="inherit" color="inherit" />
           </IconButton>
         </Tooltip>
       ) : (

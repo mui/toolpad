@@ -1,6 +1,7 @@
 import chalk from 'chalk';
 import * as appDom from '../appDom';
 import { initProject } from './localMode';
+import { FileTypes } from '../toolpadDataSources/local/types';
 
 // eslint-disable-next-line no-underscore-dangle
 (globalThis as any).__project__ ??= initProject().catch((err) => {
@@ -33,7 +34,7 @@ export async function applyDomDiff(diff: appDom.DomDiff): Promise<{ fingerprint:
   return project.applyDomDiff(diff);
 }
 
-export async function openCodeEditor(fileName: string, fileType: string): Promise<void> {
+export async function openCodeEditor(fileName: string, fileType: FileTypes): Promise<void> {
   const project = await getProject();
   return project.openCodeEditor(fileName, fileType);
 }

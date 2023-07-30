@@ -7,40 +7,25 @@ import {
   autocompleteClasses,
   Box,
   Button,
-  CircularProgress,
+  Chip,
   InputBase,
-  Popover,
-  Skeleton,
-  TextField,
+  ListSubheader,
   Stack,
-  Tab,
   Typography,
-  generateUtilityClasses,
   styled,
-  useTheme,
+  alpha,
 } from '@mui/material';
 import { useBrowserJsRuntime } from '@mui/toolpad-core/jsBrowserRuntime';
 import { errorFrom } from '@mui/toolpad-utils/errors';
-import {
-  LoadingButton,
-  TabPanel,
-  TreeItem,
-  TabContext,
-  TabList,
-  TreeView,
-  treeItemClasses,
-} from '@mui/lab';
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import ChevronRightIcon from '@mui/icons-material/ChevronRight';
+import { LoadingButton, treeItemClasses } from '@mui/lab';
+import AddOutlinedIcon from '@mui/icons-material/AddOutlined';
+import DataObjectOutlinedIcon from '@mui/icons-material/DataObjectOutlined';
+import DoneIcon from '@mui/icons-material/Done';
 import useBoolean from '@mui/toolpad-utils/hooks/useBoolean';
 import { useQuery } from '@tanstack/react-query';
 import { ensureSuffix } from '@mui/toolpad-utils/strings';
 import Popper from '@mui/material/Popper';
 import ClickAwayListener from '@mui/material/ClickAwayListener';
-import SettingsIcon from '@mui/icons-material/Settings';
-import CloseIcon from '@mui/icons-material/Close';
-import DoneIcon from '@mui/icons-material/Done';
-import ButtonBase from '@mui/material/ButtonBase';
 import { ClientDataSource, QueryEditorProps } from '../../types';
 import { LocalPrivateApi, LocalQuery, LocalConnectionParams } from './types';
 import {
@@ -52,70 +37,12 @@ import SplitPane from '../../components/SplitPane';
 import JsonView from '../../components/JsonView';
 import OpenCodeEditorButton from '../../components/OpenCodeEditor';
 import useQueryPreview from '../useQueryPreview';
-// import QueryInputPanel from '../QueryInputPanel';
 import QueryPreview from '../QueryPreview';
 import BindableEditor from '../../toolpad/AppEditor/PageEditor/BindableEditor';
+import EditableText from '../../components/EditableText';
 import { getDefaultControl, usePropControlsContext } from '../../toolpad/propertyControls';
 import { parseFunctionId, parseLegacyFunctionId, serializeFunctionId } from './shared';
-import FlexFill from '../../components/FlexFill';
 import { FileIntrospectionResult } from '../../server/functionsTypesWorker';
-
-const fileTreeItemClasses = generateUtilityClasses('FileTreeItem', ['actionButton', 'handlerItem']);
-
-const FileTreeItemRoot = styled(TreeItem)(({ theme }) => ({
-  [`& .${treeItemClasses.label}`]: {
-    display: 'flex',
-    flexDirection: 'row',
-    alignItems: 'center',
-    padding: 2,
-    paddingRight: 0,
-
-    [`&:hover .${fileTreeItemClasses.actionButton}`]: {
-      visibility: 'visible',
-    },
-  },
-
-  [`& .${fileTreeItemClasses.actionButton}`]: {
-    visibility: 'hidden',
-  },
-
-  [`& .${fileTreeItemClasses.handlerItem} .${treeItemClasses.label}`]: {
-    fontSize: '0.8em',
-    padding: 0,
-    fontFamily: theme.typography.fontFamilyCode,
-  },
-}));
-
-interface HandlerFileTreeItemProps {
-  file: FileIntrospectionResult;
-}
-
-function HandlerFileTreeItem({ file }: HandlerFileTreeItemProps) {
-  return (
-    <FileTreeItemRoot
-      key={file.name}
-      nodeId={serializeFunctionId({ file: file.name })}
-      label={
-        <React.Fragment>
-          {file.name}
-          <FlexFill />
-          <OpenCodeEditorButton iconButton filePath={file.name} fileType="query" />
-        </React.Fragment>
-      }
-    >
-      {file.handlers.map((handler) => {
-        return (
-          <TreeItem
-            className={fileTreeItemClasses.handlerItem}
-            key={handler.name}
-            nodeId={serializeFunctionId({ file: file.name, handler: handler.name })}
-            label={handler.name}
-          />
-        );
-      })}
-    </FileTreeItemRoot>
-  );
-}
 
 const EMPTY_PARAMS: BindableAttrEntries = [];
 
@@ -129,24 +56,24 @@ const StyledAutocompletePopper = styled('div')(({ theme }) => ({
   [`& .${autocompleteClasses.paper}`]: {
     boxShadow: 'none',
     margin: 0,
+    borderRadius: 0,
     color: 'inherit',
-    fontSize: 13,
+    fontSize: 12,
   },
   [`& .${autocompleteClasses.listbox}`]: {
-    backgroundColor: theme.palette.mode === 'light' ? '#fff' : '#1c2128',
+    backgroundColor:
+      theme.palette.mode === 'light'
+        ? theme.palette.background.paper
+        : theme.palette.primaryDark[900],
     padding: 0,
     [`& .${autocompleteClasses.option}`]: {
       minHeight: 'auto',
       alignItems: 'flex-start',
       padding: 8,
-      borderBottom: `1px solid  ${theme.palette.mode === 'light' ? ' #eaecef' : '#30363d'}`,
-      '&[aria-selected="true"]': {
-        backgroundColor: 'transparent',
+      borderBottom: `1px solid  ${theme.palette.divider}`,
+      [`&.${autocompleteClasses.focused}:not([aria-selected="true"])`]: {
+        backgroundColor: theme.palette.action.hover,
       },
-      [`&.${autocompleteClasses.focused}, &.${autocompleteClasses.focused}[aria-selected="true"]`]:
-        {
-          backgroundColor: theme.palette.action.hover,
-        },
     },
   },
   [`&.${autocompleteClasses.popperDisablePortal}`]: {
@@ -160,103 +87,130 @@ function PopperComponent(props: PopperComponentProps) {
 }
 
 const StyledPopper = styled(Popper)(({ theme }) => ({
-  border: `1px solid ${theme.palette.mode === 'light' ? '#e1e4e8' : '#30363d'}`,
+  border: `1px solid ${theme.palette.divider}`,
   boxShadow: `0 8px 24px ${
-    theme.palette.mode === 'light' ? 'rgba(149, 157, 165, 0.2)' : 'rgb(1, 4, 9)'
+    theme.palette.mode === 'light'
+      ? alpha(theme.palette.grey[800], 0.5)
+      : alpha(theme.palette.grey[700], 0.2)
   }`,
   borderRadius: 6,
   width: 300,
   zIndex: theme.zIndex.modal,
-  fontSize: 13,
-  color: theme.palette.mode === 'light' ? '#24292e' : '#c9d1d9',
-  backgroundColor: theme.palette.mode === 'light' ? '#fff' : '#1c2128',
+  fontSize: 12,
+  color: theme.palette.mode === 'light' ? theme.palette.common.black : theme.palette.grey[500],
+  backgroundColor: theme.palette.background.paper,
 }));
 
 const StyledInput = styled(InputBase)(({ theme }) => ({
   padding: 10,
   width: '100%',
-  borderBottom: `1px solid ${theme.palette.mode === 'light' ? '#eaecef' : '#30363d'}`,
+  border: `1px solid ${theme.palette.divider}`,
   '& input': {
     borderRadius: 4,
-    backgroundColor: theme.palette.mode === 'light' ? '#fff' : '#0d1117',
+    backgroundColor: theme.palette.background.paper,
     padding: 8,
     transition: theme.transitions.create(['border-color', 'box-shadow']),
-    border: `1px solid ${theme.palette.mode === 'light' ? '#eaecef' : '#30363d'}`,
-    fontSize: 14,
+    border: `1px solid ${theme.palette.divider}`,
+    fontSize: 12,
+    color: theme.palette.mode === 'light' ? theme.palette.common.black : theme.palette.grey[500],
     '&:focus': {
       boxShadow: `0px 0px 0px 3px ${
-        theme.palette.mode === 'light' ? 'rgba(3, 102, 214, 0.3)' : 'rgb(12, 45, 107)'
+        theme.palette.mode === 'light' ? theme.palette.primary[100] : theme.palette.primaryDark[600]
       }`,
-      borderColor: theme.palette.mode === 'light' ? '#0366d6' : '#388bfd',
+      borderColor:
+        theme.palette.mode === 'light'
+          ? theme.palette.primary.main
+          : theme.palette.primaryDark.main,
     },
   },
 }));
 
-const FunctionButton = styled(ButtonBase)(({ theme }) => ({
+const FunctionButton = styled(Chip)(({ theme }) => ({
   fontSize: 12,
   width: '100%',
   fontFamily: theme.typography.fontFamilyCode,
-  paddingBottom: 0,
+  marginTop: theme.spacing(1),
   fontWeight: 'normal',
+  color: theme.palette.primary.main,
+  transition: theme.transitions.create('color', { duration: theme.transitions.duration.shorter }),
+  '&:active': {
+    boxShadow: 'none',
+  },
+  '&:focus': {
+    backgroundColor:
+      theme.palette.mode === 'light' ? theme.palette.primary[100] : theme.palette.primaryDark[600],
+  },
   '& svg': {
     width: 12,
     height: 12,
   },
 }));
 
+const StyledListSubheader = styled(ListSubheader)(({ theme }) => ({
+  lineHeight: 2.5,
+  fontSize: 13,
+  fontFamily: theme.typography.fontFamilyCode,
+  backgroundColor:
+    theme.palette.mode === 'light' ? theme.palette.grey[200] : alpha(theme.palette.grey[900], 0.5),
+  borderRadius: 0,
+  borderBottom: `1px solid ${theme.palette.divider}`,
+  color: theme.palette.mode === 'light' ? theme.palette.grey[700] : theme.palette.grey[500],
+}));
+
+interface FunctionAutocompleteProps {
+  selectedFunctionFileName?: string;
+  files: FileIntrospectionResult[];
+  selectedFunctionName: string;
+  onCreateNew: () => void;
+  onSelect: (functionName: string) => void;
+}
+
 function FunctionAutocomplete({
-  fileName,
-  options,
-  selected,
-}: {
-  fileName: string;
-  options: string[];
-  selected: string;
-}) {
+  files,
+  selectedFunctionName,
+  onCreateNew,
+  onSelect,
+}: FunctionAutocompleteProps) {
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
-  const [value, setValue] = React.useState<string>(selected);
-  const [pendingValue, setPendingValue] = React.useState<string>('');
-  // const theme = useTheme();
+  const [value, setValue] = React.useState<string>(selectedFunctionName);
 
   const handleClick = (event: React.MouseEvent<HTMLElement>) => {
-    setPendingValue(selected);
+    setValue(selectedFunctionName);
     setAnchorEl(event.currentTarget);
   };
 
-  const handleClose = () => {
-    setValue(pendingValue);
-    if (anchorEl) {
-      anchorEl.focus();
-    }
+  const handleClose = React.useCallback(() => {
     setAnchorEl(null);
-  };
+  }, []);
+
+  const [options, functionNameFileNameMap] = React.useMemo(() => {
+    const functions: string[] = [];
+    const nameMap = new Map<string, string>();
+    files.forEach((file) => {
+      file.handlers.forEach((fn) => {
+        functions.push(fn.name);
+        nameMap.set(fn.name, file.name);
+      });
+    });
+    return [functions, nameMap];
+  }, [files]);
 
   const open = Boolean(anchorEl);
-  const id = open ? 'github-label' : undefined;
+  const id = open ? 'function-selector' : undefined;
 
-  return options.length > 0 ? (
+  const handleCreateNew = React.useCallback(() => {
+    onCreateNew();
+  }, [onCreateNew]);
+
+  return files.length > 0 ? (
     <React.Fragment>
-      <Box sx={{ mt: 2, fontSize: 12 }}>
-        <FunctionButton disableRipple aria-describedby={id} onClick={handleClick}>
-          <span>{fileName}</span>
-          <ExpandMoreIcon sx={{ ml: 1 }} />
-        </FunctionButton>
-        <Box
-          key={selected}
-          sx={{
-            ml: 3,
-            mt: 0.5,
-            p: 0.5,
-            textAlign: 'center',
-            fontWeight: 600,
-            fontSize: 11,
-            fontFamily: (theme) => theme.typography.fontFamilyCode,
-            color: (theme) => theme.palette.primary.main,
-          }}
-        >
-          {selected}
-        </Box>
-      </Box>
+      <FunctionButton
+        aria-describedby={id}
+        clickable
+        icon={<DataObjectOutlinedIcon fontSize="inherit" color="inherit" />}
+        onClick={handleClick}
+        label={value || 'Select function'}
+      />
       <StyledPopper id={id} open={open} anchorEl={anchorEl} placement="bottom-start">
         <ClickAwayListener onClickAway={handleClose}>
           <div>
@@ -267,7 +221,7 @@ function FunctionAutocomplete({
                 fontWeight: 'bold',
               }}
             >
-              Search handler functions
+              Search for functions
             </Box>
             <Autocomplete
               open
@@ -276,7 +230,7 @@ function FunctionAutocomplete({
                   handleClose();
                 }
               }}
-              value={pendingValue}
+              value={value}
               onChange={(event, newValue, reason) => {
                 if (
                   event.type === 'keydown' &&
@@ -285,18 +239,59 @@ function FunctionAutocomplete({
                 ) {
                   return;
                 }
-                setPendingValue(newValue ?? '');
+                setValue(newValue ?? '');
+
+                if (newValue) {
+                  const selectedFile = functionNameFileNameMap.get(newValue);
+                  if (selectedFile) {
+                    onSelect(serializeFunctionId({ file: selectedFile, handler: newValue }));
+                  }
+                }
+
+                handleClose();
               }}
               PopperComponent={PopperComponent}
               renderTags={() => null}
-              noOptionsText="No handlers"
-              renderOption={(props, option, { selected: selectedValue }) => (
+              noOptionsText="No functions"
+              groupBy={(option) => functionNameFileNameMap.get(option) ?? ''}
+              renderGroup={(params) => [
+                <StyledListSubheader key={params.key}>
+                  <Stack direction="row" justifyContent={'space-between'}>
+                    {params.group}
+                    <OpenCodeEditorButton
+                      filePath={params.group}
+                      fileType="query"
+                      iconButton
+                      disableRipple
+                      sx={{
+                        transition: (theme) => theme.transitions.create('color', { duration: 200 }),
+                        '&:hover': {
+                          color: (theme) =>
+                            theme.palette.mode === 'light'
+                              ? theme.palette.grey[800]
+                              : theme.palette.grey[300],
+                        },
+                      }}
+                    />
+                  </Stack>
+                </StyledListSubheader>,
+                params.children,
+              ]}
+              renderOption={(props, option, { selected }) => (
                 <li {...props}>
                   <Box
                     component={DoneIcon}
-                    sx={{ width: 17, height: 17, mr: '5px', ml: '-2px' }}
+                    sx={{
+                      width: 17,
+                      height: 17,
+                      ml: 1,
+                      mr: -1,
+                      mt: 0,
+                      opacity: 0.75,
+                      color: selected ? 'primary.main' : 'text.primary',
+                    }}
                     style={{
-                      visibility: selectedValue ? 'visible' : 'hidden',
+                      visibility: selected ? 'visible' : 'hidden',
                     }}
                   />
                   <Box
@@ -312,6 +307,8 @@ function FunctionAutocomplete({
                   <Box
                     sx={{
                       flexGrow: 1,
+                      color: selected ? 'primary.main' : 'text.primary',
+                      fontFamily: (theme) => theme.typography.fontFamilyCode,
                     }}
                   >
                     {option}
@@ -319,26 +316,44 @@ function FunctionAutocomplete({
                 </li>
               )}
               options={options.sort((a, b) => {
-                // Display the selected handler first.
-                if (selected === a) {
+                // Display the selected function first.
+                if (value === a) {
                   return -1;
                 }
-                if (selected === b) {
+                if (value === b) {
                   return 1;
                 }
-                const ai = selected.charCodeAt(0);
-                const bi = selected.charCodeAt(0);
-                return ai - bi;
+
+                // Then display the functions in the same file.
+                const fa = functionNameFileNameMap.get(a);
+                const fb = functionNameFileNameMap.get(b);
+
+                // Display the file with the selected function first.
+                const sf = functionNameFileNameMap.get(value);
+
+                if (sf === fa) {
+                  return -1;
+                }
+                if (sf === fb) {
+                  return 1;
+                }
+                return fa?.localeCompare(fb ?? '') ?? 0;
               })}
-              // options={options}
               renderInput={(params) => (
                 <StyledInput
                   ref={params.InputProps.ref}
                   inputProps={params.inputProps}
-                  placeholder="Filter handlers"
+                  placeholder="Filter functions"
                 />
               )}
             />
+            <Button
+              sx={{ m: 1, mb: 0.5 }}
+              startIcon={<AddOutlinedIcon fontSize="inherit" />}
+              onClick={handleCreateNew}
+            >
+              New file
+            </Button>
           </div>
         </ClickAwayListener>
       </StyledPopper>
@@ -386,13 +401,6 @@ function QueryEditor({
     .query.function
     ? parseLegacyFunctionId(input.attributes.query.function)
     : {};
-
-  const selectedNodeId: string | undefined = selectedFile
-    ? serializeFunctionId({
-        file: selectedFile,
-        handler: selectedFunction,
-      })
-    : undefined;
 
   const selectedOption = React.useMemo(() => {
     return introspection.data?.files
@@ -452,7 +460,7 @@ function QueryEditor({
   );
 
   const handleSelectFunction = React.useCallback(
-    (_event: React.SyntheticEvent, nodeId: string) => {
+    (nodeId: string) => {
       const parsed = parseFunctionId(nodeId);
       if (parsed.handler) {
         setSelectedHandler(nodeId);
@@ -461,201 +469,69 @@ function QueryEditor({
     [setSelectedHandler],
   );
 
-  const handlerTreeRef = React.useRef<HTMLDivElement>(null);
+  const proposedFileName = React.useMemo(() => {
+    const existingNames = new Set(introspection.data?.files.map((file) => file.name) || []);
+    const baseName = 'functions';
+    let counter = 2;
 
-  React.useEffect(() => {
-    handlerTreeRef.current?.querySelector(`.${treeItemClasses.selected}`)?.scrollIntoView();
-  }, []);
-
-  const [newHandlerInput, setNewHandlerInput] = React.useState('');
-  const [newHandlerLoading, setNewHandlerLoading] = React.useState(false);
-
-  const {
-    value: isCreateNewHandlerOpen,
-    setTrue: handleOpenCreateNewHandler,
-    setFalse: handleCloseCreateNewHandlerDialog,
-  } = useBoolean(false);
-
-  const handleCloseCreateNewHandler = React.useCallback(() => {
-    setNewHandlerInput('');
-    handleCloseCreateNewHandlerDialog();
-  }, [handleCloseCreateNewHandlerDialog]);
-
-  const [expanded, setExpanded] = React.useState<string[]>(selectedFile ? [selectedFile] : []);
-
-  const [anchorEl, setAnchorEl] = React.useState<HTMLButtonElement | null>(null);
-  const createNewInputRef = React.useRef(null);
-  const open = !!anchorEl;
-
-  const inputError: string | null = React.useMemo(() => {
-    const alreadyExists = introspection.data?.files.some(
-      (file) => file.name === newHandlerInput || file.name === ensureSuffix(newHandlerInput, '.ts'),
-    );
-
-    return alreadyExists ? 'File already exists' : null;
-  }, [introspection.data?.files, newHandlerInput]);
-
-  React.useEffect(() => {
-    setAnchorEl(inputError ? createNewInputRef.current : null);
-  }, [inputError]);
-
-  const handleCreateNewCommit = React.useCallback(async () => {
-    if (!newHandlerInput || inputError || newHandlerLoading) {
-      handleCloseCreateNewHandler();
-      return;
+    while (existingNames.has(`${baseName}${counter}.ts`)) {
+      counter += 1;
     }
 
-    const fileName = ensureSuffix(newHandlerInput, '.ts');
+    return `${baseName}${counter}.ts`;
+  }, [introspection.data?.files]);
 
-    setNewHandlerLoading(true);
+  const handleCreateNewCommit = React.useCallback(async () => {
     try {
-      await execApi('createNew', [fileName]);
+      await execApi('createNewAndOpen', [proposedFileName, 'query']);
       await introspection.refetch();
     } catch (error) {
       // eslint-disable-next-line no-alert
       window.alert(errorFrom(error).message);
-    } finally {
-      setNewHandlerLoading(false);
     }
 
-    const newNodeId = serializeFunctionId({ file: fileName, handler: 'default' });
+    const newNodeId = serializeFunctionId({ file: proposedFileName, handler: 'default' });
     setSelectedHandler(newNodeId);
-    setExpanded([fileName]);
-    handleCloseCreateNewHandler();
-  }, [
-    execApi,
-    handleCloseCreateNewHandler,
-    inputError,
-    introspection,
-    newHandlerInput,
-    newHandlerLoading,
-    setSelectedHandler,
-  ]);
+  }, [execApi, introspection, proposedFileName, setSelectedHandler]);
 
   return (
-    <SplitPane split="vertical" size="60%" primary="first" allowResize sx={{ maxWidth: '80%' }}>
-      {/* <QueryInputPanel
-        previewDisabled={!selectedOption}
-        onRunPreview={handleRunPreview}
-        actions={<Button onClick={handleOpenCreateNewHandler}>New handler file</Button>}
-      > */}
+    <SplitPane
+      split="vertical"
+      size="60%"
+      primary="first"
+      allowResize
+      sx={{ maxWidth: '80%', minHeight: '20vh' }}
+    >
       <Box display={'grid'} gridTemplateColumns={'60% auto auto'} height={'100%'} columnGap={1}>
-        {/* <Stack direction="row" sx={{ gap: 2, height: '100%', mx: 3 }}> */}
-        {/* <Box sx={{ position: 'relative', overflow: 'auto', height: '100%', width: '40%' }}> */}
-        {/* <TreeView
-          ref={handlerTreeRef}
-          selected={selectedNodeId}
-          onNodeSelect={handleSelectFunction}
-          defaultCollapseIcon={<ExpandMoreIcon />}
-          defaultExpandIcon={<ChevronRightIcon />}
-          expanded={expanded}
-          onNodeToggle={(_event, nodeIds) => setExpanded(nodeIds)}
-        >
-          {isCreateNewHandlerOpen ? (
-            <TreeItem
-              nodeId="::create::"
-              label={
-                <React.Fragment>
-                  <InputBase
-                    ref={createNewInputRef}
-                    value={newHandlerInput}
-                    onChange={(event) =>
-                      setNewHandlerInput(event.target.value.replaceAll(/[^a-zA-Z0-9]/g, ''))
-                    }
-                    autoFocus
-                    disabled={newHandlerLoading}
-                    endAdornment={newHandlerLoading ? <CircularProgress size={16} /> : null}
-                    onBlur={handleCreateNewCommit}
-                    onKeyDown={(event) => {
-                      if (event.key === 'Enter') {
-                        handleCreateNewCommit();
-                      } else if (event.key === 'Escape') {
-                        handleCloseCreateNewHandler();
-                        event.stopPropagation();
-                      }
-                    }}
-                  />
-                  <Popover
-                    open={open}
-                    anchorEl={anchorEl}
-                    onClose={() => setAnchorEl(null)}
-                    disableAutoFocus
-                    anchorOrigin={{
-                      vertical: 'bottom',
-                      horizontal: 'left',
-                    }}
-                  >
-                    <Alert severity="error" variant="outlined">
-                      {inputError}
-                    </Alert>
-                  </Popover>
-                </React.Fragment>
-              }
-            />
-          ) : null}
-
-          {introspection.data?.files?.map((file) => (
-            <HandlerFileTreeItem key={file.name} file={file} />
-          ))}
-
-          {introspection.isLoading ? (
-            <React.Fragment>
-              <TreeItem disabled nodeId="::loading::" label={<Skeleton />} />
-              <TreeItem disabled nodeId="::loading::" label={<Skeleton />} />
-              <TreeItem disabled nodeId="::loading::" label={<Skeleton />} />
-            </React.Fragment>
-          ) : null}
-        </TreeView> */}
-        {/* <TabContext value={selectedFile}>
-          <div>
-            <TabList
-              sx={{
-                '& button': { fontSize: 12, fontWeight: 'normal' },
-              }}
-            >
-              {introspection.data?.files?.map((file) => (
-                <Tab
-                  key={file.name}
-                  label={file.name}
-                  value={file.name}
-                  sx={{
-                    fontSize: 10,
-
-                    borderBottom: (theme) => `1px solid ${theme.palette.grey[400]}`,
-                  }}
-                />
-              ))}
-            </TabList>
-            {introspection.data?.files?.map((file) => (
-              <TabPanel key={file.name} value={file.name} sx={{ p: 0 }}> */}
         <Stack
-          display="grid"
-          gridTemplateColumns={'2fr 1fr'}
-          sx={{ borderRight: (theme) => `1px solid ${theme.palette.grey[300]}` }}
+          display="flex"
+          flexDirection={'row'}
+          sx={{
+            borderRight: (theme) => `1px solid ${theme.palette.divider}`,
+            alignItems: 'flex-start',
+            mt: 2,
+            mx: 2,
+          }}
         >
-          {introspection.data?.files?.map((file) => (
-            <FunctionAutocomplete
-              key={file.name}
-              fileName={file.name}
-              options={file.handlers.map((handler) => handler.name)}
-              selected={selectedFunction || ''}
-            />
-          ))}
+          <FunctionAutocomplete
+            selectedFunctionFileName={selectedFile || ''}
+            files={introspection.data?.files || []}
+            selectedFunctionName={selectedFunction || ''}
+            onCreateNew={handleCreateNewCommit}
+            onSelect={handleSelectFunction}
+          />
 
           <LoadingButton
             loading={previewIsLoading}
             onClick={handleRunPreview}
             variant="contained"
-            sx={{ alignSelf: 'start', justifySelf: 'flex-start', width: '75%', mt: 2.5, mx: 0 }}
+            disabled={!selectedFunction}
+            sx={{ width: '80%', mx: 2.5, mt: 1 }}
           >
             Preview
           </LoadingButton>
         </Stack>
 
-        {/* </TabPanel>
-            ))}
-          </div>
-        </TabContext> */}
         {introspection.error ? (
           <Box
             sx={{
@@ -669,10 +545,17 @@ function QueryEditor({
             {errorFrom(introspection.error).message}
           </Box>
         ) : null}
-        {/* </Box> */}
 
         <Stack sx={{ gap: 1, mt: 2 }}>
-          <Typography fontSize={12}>Parameters:</Typography>
+          <Typography
+            fontSize={12}
+            sx={{
+              color: (theme) =>
+                theme.palette.mode === 'dark' ? theme.palette.grey[500] : 'default',
+            }}
+          >
+            Parameters:
+          </Typography>
           {Object.entries(parameterDefs).map(([name, definiton]) => {
             const Control = getDefaultControl(propTypeControls, definiton, liveBindings);
             return Control ? (
@@ -703,9 +586,7 @@ function QueryEditor({
             ) : null;
           })}
         </Stack>
-        {/* </Stack> */}
       </Box>
-      {/* </QueryInputPanel> */}
 
       <QueryPreview isLoading={previewIsLoading} error={preview?.error}>
         <ResolvedPreview preview={preview} />

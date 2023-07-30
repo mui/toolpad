@@ -45,7 +45,7 @@ import {
   FetchQuery,
   ResponseType as AppDomRestResponseType,
 } from '../toolpadDataSources/rest/types';
-import { LocalQuery } from '../toolpadDataSources/local/types';
+import { LocalQuery, FileTypes } from '../toolpadDataSources/local/types';
 import { ProjectEvents, ToolpadProjectOptions } from '../types';
 import { Awaitable } from '../utils/types';
 import EnvManager from './EnvManager';
@@ -1099,7 +1099,7 @@ class ToolpadProject {
     });
   }
 
-  async openCodeEditor(fileName: string, fileType: string) {
+  async openCodeEditor(fileName: string, fileType: FileTypes) {
     const supportedEditor = await findSupportedEditor();
     if (!supportedEditor) {
       throw new Error(`No code editor found`);

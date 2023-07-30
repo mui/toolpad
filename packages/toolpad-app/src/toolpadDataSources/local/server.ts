@@ -40,6 +40,11 @@ const dataSource: ServerDataSource<{}, LocalQuery, any, LocalPrivateApi> = {
       const project = await getProject();
       return project.functionsManager.createFunctionFile(fileName);
     },
+    async createNewAndOpen(fileName, fileType) {
+      const project = await getProject();
+      await project.functionsManager.createFunctionFile(fileName);
+      return project.openCodeEditor(fileName, fileType);
+    },
   },
 };
 

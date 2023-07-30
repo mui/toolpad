@@ -1,6 +1,8 @@
 import { BindableAttrValue, ExecFetchResult, PrimitiveValueType } from '@mui/toolpad-core';
 import type { IntrospectionResult } from '../../server/functionsTypesWorker';
 
+export type FileTypes = 'query' | 'component' | 'page' | 'theme';
+
 export interface LocalConnectionParams {}
 
 export interface LocalQuery {
@@ -19,6 +21,7 @@ export type LocalPrivateApi = {
   debugExec(query: LocalQuery, params: Record<string, any>): Promise<any>;
   introspection(): Promise<IntrospectionResult>;
   createNew(fileName: string): Promise<void>;
+  createNewAndOpen(fileName: string, fileType: FileTypes): Promise<void>;
 };
 
 export interface FetchResult extends ExecFetchResult<any> {

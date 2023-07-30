@@ -17,6 +17,7 @@ import {
 } from '../../../../runtime/toolpadComponents';
 import { DomView } from '../../../../utils/domView';
 import { QueriesExplorer } from '../QueriesExplorer';
+import { removePageLayoutNode } from '../../pageLayout';
 
 function CustomTreeItem(
   props: TreeItemProps & {
@@ -228,7 +229,7 @@ function ComponentsExplorer() {
       (draft) => {
         const toRemove = appDom.getMaybeNode(dom, selectedDomNodeId);
         if (toRemove && appDom.isElement(toRemove)) {
-          draft = appDom.removeNode(draft, toRemove.id);
+          draft = removePageLayoutNode(draft, toRemove);
         }
         return draft;
       },

@@ -1,5 +1,5 @@
-import { expect, FrameLocator, Locator, Page } from '@playwright/test';
 import { setTimeout } from 'timers/promises';
+import { expect, FrameLocator, Locator, Page } from '@playwright/test';
 import { gotoIfNotCurrent } from './shared';
 
 class CreatePageDialog {
@@ -127,23 +127,14 @@ export class ToolpadEditor {
     await setTimeout(100);
   }
 
-  async dragToAppCanvas(sourceLocator: Locator, moveTargetX: number, moveTargetY: number) {
+  async dragTo(sourceLocator: Locator, moveTargetX: number, moveTargetY: number) {
     const sourceBoundingBox = await sourceLocator.boundingBox();
-    const targetBoundingBox = await this.pageRoot.boundingBox();
-
-    expect(sourceBoundingBox).toBeDefined();
-    expect(targetBoundingBox).toBeDefined();
 
     await this.page.mouse.move(
       sourceBoundingBox!.x + sourceBoundingBox!.width / 2,
       sourceBoundingBox!.y + sourceBoundingBox!.height / 2,
       { steps: 10 },
     );
-
-    await expect(sourceLocator).toBeVisible();
-
-    const appCanvasFrame = this.page.frame('data-toolpad-canvas');
-    expect(appCanvasFrame).toBeDefined();
 
     await this.page.mouse.down();
 
@@ -156,21 +147,23 @@ export class ToolpadEditor {
     return this.page.getByTestId('component-catalog').getByRole('button', { name });
   }
 
-  async dragNewComponentToAppCanvas(componentName: string) {
+  async dragNewComponentTo(componentName: string, moveTargetX?: number, moveTargetY?: number) {
     const style = await this.page.addStyleTag({ content: `* { transition: none !important; }` });
 
     await this.componentCatalog.hover();
 
-    const targetBoundingBox = await this.pageRoot.boundingBox();
-    await expect(targetBoundingBox).toBeDefined();
-
-    const moveTargetX = targetBoundingBox!.x + targetBoundingBox!.width / 2;
-    const moveTargetY = targetBoundingBox!.y + targetBoundingBox!.height / 2;
+    const pageRootBoundingBox = await this.pageRoot.boundingBox();
+    if (!moveTargetX) {
+      moveTargetX = pageRootBoundingBox!.x + pageRootBoundingBox!.width / 2;
+    }
+    if (!moveTargetY) {
+      moveTargetY = pageRootBoundingBox!.y + pageRootBoundingBox!.height / 2;
+    }
 
     const sourceLocator = this.getComponentCatalogItem(componentName);
     await expect(sourceLocator).toBeVisible();
 
-    await this.dragToAppCanvas(sourceLocator, moveTargetX, moveTargetY);
+    await this.dragTo(sourceLocator, moveTargetX, moveTargetY);
 
     await style.evaluate((elm) => elm.parentNode?.removeChild(elm));
   }

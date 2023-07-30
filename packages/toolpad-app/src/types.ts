@@ -93,7 +93,7 @@ export interface QueryEditorProps<C, Q, A extends Methods = {}>
   globalScope: Record<string, any>;
   globalScopeMeta: ScopeMeta;
   onChange: React.Dispatch<React.SetStateAction<appDom.QueryNode<Q>>>;
-  onCommit?: () => void;
+  onSave: (newNode: appDom.QueryNode<Q>) => void;
 }
 
 export type QueryEditor<C, Q, A extends Methods> = React.FC<QueryEditorProps<C, Q, A>>;

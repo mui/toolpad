@@ -17,13 +17,11 @@ import {
 } from '@mui/material';
 import { useBrowserJsRuntime } from '@mui/toolpad-core/jsBrowserRuntime';
 import { errorFrom } from '@mui/toolpad-utils/errors';
-import { LoadingButton, treeItemClasses } from '@mui/lab';
+import { LoadingButton } from '@mui/lab';
 import AddOutlinedIcon from '@mui/icons-material/AddOutlined';
 import DataObjectOutlinedIcon from '@mui/icons-material/DataObjectOutlined';
 import DoneIcon from '@mui/icons-material/Done';
-import useBoolean from '@mui/toolpad-utils/hooks/useBoolean';
 import { useQuery } from '@tanstack/react-query';
-import { ensureSuffix } from '@mui/toolpad-utils/strings';
 import Popper from '@mui/material/Popper';
 import ClickAwayListener from '@mui/material/ClickAwayListener';
 import { ClientDataSource, QueryEditorProps } from '../../types';
@@ -39,7 +37,6 @@ import OpenCodeEditorButton from '../../components/OpenCodeEditor';
 import useQueryPreview from '../useQueryPreview';
 import QueryPreview from '../QueryPreview';
 import BindableEditor from '../../toolpad/AppEditor/PageEditor/BindableEditor';
-import EditableText from '../../components/EditableText';
 import { getDefaultControl, usePropControlsContext } from '../../toolpad/propertyControls';
 import { parseFunctionId, parseLegacyFunctionId, serializeFunctionId } from './shared';
 import { FileIntrospectionResult } from '../../server/functionsTypesWorker';
@@ -388,6 +385,7 @@ function QueryEditor({
   value: input,
   onChange: setInput,
   execApi,
+  onSave,
 }: QueryEditorProps<LocalConnectionParams, LocalQuery, LocalPrivateApi>) {
   const introspection = useQuery({
     queryKey: ['introspection'],
@@ -493,6 +491,10 @@ function QueryEditor({
     const newNodeId = serializeFunctionId({ file: proposedFileName, handler: 'default' });
     setSelectedHandler(newNodeId);
   }, [execApi, introspection, proposedFileName, setSelectedHandler]);
+
+  React.useEffect(() => {
+    onSave(input);
+  }, [input, onSave]);
 
   return (
     <SplitPane

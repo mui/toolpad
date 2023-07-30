@@ -1,75 +1,18 @@
 import * as React from 'react';
-// import invariant from 'invariant';
-import {
-  // Stack,
-  Box,
-  Chip,
-  Paper,
-  // Button,
-  // Dialog,
-  // DialogTitle,
-  // DialogContent,
-  // DialogActions,
-  Tab,
-} from '@mui/material';
+
+import { Box, Chip, Paper, Tab } from '@mui/material';
 import { NodeId } from '@mui/toolpad-core';
 import { TabList, TabContext, TabPanel } from '@mui/lab';
 import ClearOutlinedIcon from '@mui/icons-material/ClearOutlined';
 
-// import * as appDom from '../../../../../appDom';
-// import dataSources from '../../../../../toolpadDataSources/client';
-// import { useDom, useAppStateApi } from '../../../../AppState';
-import { useAppStateApi } from '../../../../AppState';
+import * as appDom from '../../../../../appDom';
+
+import { useDom, useAppStateApi, useDomApi } from '../../../../AppState';
 import QueryIcon from '../../../QueryIcon';
 import QueryEditorPanel from './QueryEditor2Dialog';
 import { DomView } from '../../../../../utils/domView';
 import { QueryMeta, PanelState } from '../types';
 import { COMPONENT_CATALOG_WIDTH_COLLAPSED } from '../../ComponentCatalog/ComponentCatalog';
-
-// interface DataSourceSelectorProps<Q> {
-//   open: boolean;
-//   onClose: () => void;
-//   onCreated: (newNode: appDom.QueryNode<Q>) => void;
-// }
-
-// function ConnectionSelectorDialog<Q>({ open, onCreated, onClose }: DataSourceSelectorProps<Q>) {
-//   const { dom } = useDom();
-
-//   const handleCreateClick = React.useCallback(
-//     (dataSourceId: string) => () => {
-//       const dataSource = dataSources[dataSourceId];
-//       invariant(dataSource, `Selected non-existing dataSource "${dataSourceId}"`);
-
-//       const queryNode = appDom.createNode(dom, 'query', {
-//         attributes: {
-//           query: dataSource.getInitialQueryValue(),
-//           connectionId: null,
-//           dataSource: dataSourceId,
-//         },
-//       });
-
-//       onCreated(queryNode);
-//     },
-//     [dom, onCreated],
-//   );
-
-//   return (
-//     <Dialog open={open} onClose={onClose} scroll="body">
-//       <DialogTitle>Create Query</DialogTitle>
-//       <DialogContent>
-//         <Stack direction="row" gap={1}>
-//           <Button onClick={handleCreateClick('local')}>Local function</Button>
-//           <Button onClick={handleCreateClick('rest')}>Fetch</Button>
-//         </Stack>
-//       </DialogContent>
-//       <DialogActions>
-//         <Button color="inherit" variant="text" onClick={onClose}>
-//           Cancel
-//         </Button>
-//       </DialogActions>
-//     </Dialog>
-//   );
-// }
 
 type QueryEditorProps = {
   tabs: React.MutableRefObject<Map<NodeId, QueryMeta>>;
@@ -89,6 +32,8 @@ export default function QueryEditor({
   panelState,
   handleTabRemove,
 }: QueryEditorProps) {
+  const { dom } = useDom();
+  const domApi = useDomApi();
   const appStateApi = useAppStateApi();
 
   const onRemove = React.useCallback(
@@ -107,6 +52,21 @@ export default function QueryEditor({
       });
     },
     [appStateApi, currentPageId],
+  );
+
+  const handleSave = React.useCallback(
+    (node: appDom.QueryNode) => {
+      if (!currentPageId) {
+        return;
+      }
+      const page = appDom.getNode(dom, currentPageId, 'page');
+      if (appDom.nodeExists(dom, node.id)) {
+        domApi.saveNode(node);
+      } else {
+        appStateApi.update((draft) => appDom.addNode(draft, node, page, 'queries'));
+      }
+    },
+    [dom, domApi, appStateApi, currentPageId],
   );
 
   return panelState?.node?.id ? (
@@ -178,7 +138,7 @@ export default function QueryEditor({
               value={queryId as string}
               sx={{ p: 0, overflow: 'scroll', minHeight: '26vh', maxHeight: '26vh' }}
             >
-              <QueryEditorPanel nodeId={currentQueryId as NodeId} />
+              <QueryEditorPanel nodeId={currentQueryId as NodeId} onSave={handleSave} />
             </TabPanel>
           ))}
         </TabContext>

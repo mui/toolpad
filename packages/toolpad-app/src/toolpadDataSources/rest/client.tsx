@@ -258,6 +258,7 @@ function QueryEditor({
   connectionParams: rawConnectionParams,
   value: input,
   onChange: setInput,
+  onSave,
 }: QueryEditorProps<RestConnectionParams, FetchQuery>) {
   const isBrowserSide = input.attributes.query.browser;
 
@@ -383,6 +384,10 @@ function QueryEditor({
 
   const [activeTab, setActiveTab] = React.useState('urlQuery');
 
+  React.useEffect(() => {
+    onSave(input);
+  }, [input, onSave]);
+
   const fetchPrivate = useFetchPrivate<FetchPrivateQuery, FetchResult>();
   const fetchPreview = React.useCallback(
     (query: FetchQuery, params: Record<string, string>) =>
@@ -416,15 +421,12 @@ function QueryEditor({
   );
 
   return (
-    // {/* // <SplitPane split="vertical" size="50%" allowResize> */}
     <SplitPane split="vertical" size="55%" primary="first" allowResize sx={{ minHeight: '20vh' }}>
-      {/* <QueryInputPanel onRunPreview={handleRunPreview}> */}
       <Box display={'grid'} gridTemplateColumns={'70% 30%'} height={'100%'} columnGap={1}>
         <Stack
           gap={0}
           sx={{ pl: 2, pr: 0, pt: 1, borderRight: (theme) => `1px solid ${theme.palette.divider}` }}
         >
-          {/* <Typography>Query</Typography> */}
           <Box sx={{ display: 'grid', gridTemplateColumns: 'auto 1fr 0.3fr', gap: 1 }}>
             <TextField
               select
@@ -545,7 +547,6 @@ function QueryEditor({
             </TabContext>
           </Box>
         </Stack>
-        {/* </QueryInputPanel> */}
 
         <Box
           sx={{
@@ -575,7 +576,6 @@ function QueryEditor({
           />
         </Box>
       </Box>
-      {/* </SplitPane> */}
       <SplitPane
         split="horizontal"
         size="15%"

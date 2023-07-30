@@ -1,29 +1,10 @@
 import path from 'path-browserify';
 import type { GridColDef } from '@mui/x-data-grid-pro';
-import { format } from './prettier';
-import { DataGridFile, ToolpadFile } from './schemas';
-import { WithDevtoolParams } from './types';
-import * as jsonPointer from './jsonPointer';
-
-export type CodeFiles = [string, { code: string }][];
-
-export interface CodeGenerationResult {
-  files: CodeFiles;
-}
-
-function isValidFileNAme(base: string): boolean {
-  return /^[a-zA-Z][a-zA-Z0-9]*$/.test(base);
-}
-
-export function getNameFromPath(filePath: string): string {
-  const name = path.basename(filePath, '.yml');
-
-  if (!isValidFileNAme(name)) {
-    throw new Error(`Invalid file name ${JSON.stringify(name)}`);
-  }
-
-  return name;
-}
+import { format } from '../prettier';
+import { DataGridFile } from '../schemas';
+import { WithDevtoolParams } from '../types';
+import * as jsonPointer from '../jsonPointer';
+import type { CodeFiles, CodeGenerationResult, GenerateComponentConfig } from '../codeGeneration';
 
 function serializeObject(properties: Record<string, string>): string {
   return `{${Object.entries(properties)
@@ -38,22 +19,7 @@ type SerializedProperties<O> = {
   [K in keyof O]: string | (undefined extends O[K] ? undefined : never);
 };
 
-export type GenerateComponentConfig = {
-  outDir?: string;
-} & (
-  | {
-      target: 'prod';
-    }
-  | {
-      target: 'preview';
-    }
-  | {
-      target: 'dev';
-      wsUrl: string;
-    }
-);
-
-export async function generateDataGridComponent(
+export default async function generateDataGridComponent(
   name: string,
   file: DataGridFile,
   config: GenerateComponentConfig,
@@ -246,43 +212,6 @@ export async function generateDataGridComponent(
   `;
 
   const fileName = path.join(outDir, name, 'index.tsx');
-
-  const files: CodeFiles = [[fileName, { code: await format(code) }]];
-
-  return { files };
-}
-
-export async function generateComponent(
-  name: string,
-  file: ToolpadFile,
-  config: GenerateComponentConfig,
-): Promise<CodeGenerationResult> {
-  switch (file.kind) {
-    case 'DataGrid':
-      return generateDataGridComponent(name, file, config);
-    default:
-      throw new Error(`No implementation yet for ${JSON.stringify(file.kind)}`);
-  }
-}
-
-export interface GenerateIndexConfig {
-  outDir?: string;
-}
-
-export async function generateIndex(
-  entries: string[],
-  config: GenerateIndexConfig,
-): Promise<CodeGenerationResult> {
-  const { outDir = '/' } = config;
-
-  const code = entries
-    .map((entryPath) => {
-      const name = getNameFromPath(entryPath);
-      return `export { default as ${name} } from './${name}';`;
-    })
-    .join('\n');
-
-  const fileName = path.join(outDir, 'index.ts');
 
   const files: CodeFiles = [[fileName, { code: await format(code) }]];
 

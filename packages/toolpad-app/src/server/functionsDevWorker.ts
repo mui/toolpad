@@ -127,7 +127,9 @@ if (!isMainThread && parentPort) {
     (async () => {
       try {
         const result = await handleMessage(msg);
-        msg.port.postMessage({ result: JSON.stringify(result, getCircularReplacer()) });
+        msg.port.postMessage({
+          result: JSON.stringify(result, getCircularReplacer()),
+        });
       } catch (rawError) {
         msg.port.postMessage({ error: serializeError(errorFrom(rawError)) });
       }

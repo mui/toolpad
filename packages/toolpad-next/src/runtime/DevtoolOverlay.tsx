@@ -119,7 +119,7 @@ async function evaluate(
 export interface DevtoolOverlayProps {
   name: string;
   file: ToolpadFile;
-  dependencies: [string, unknown][];
+  dependencies: [string, () => Promise<unknown>][];
   onClose?: () => void;
   onCommitted?: () => void;
   onComponentUpdate?: (Component: React.ComponentType) => void;
@@ -155,10 +155,16 @@ export default function DevtoolOverlay({
   React.useEffect(() => {
     generateComponent(name, inputValue, { target: 'preview' })
       .then(async (result) => {
+        const resolvedDependencies = await Promise.all(
+          dependencies.map(
+            async ([k, v]) => [k, { exports: await v() }] satisfies [string, unknown],
+          ),
+        );
+
         const moduleExports = await evaluate(
           new Map(result.files),
           `/${name}/index.tsx`,
-          new Map(dependencies.map(([k, v]) => [k, { exports: v }])),
+          new Map(resolvedDependencies),
         );
 
         const NewComponent = (moduleExports as any)?.default as React.ComponentType;

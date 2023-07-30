@@ -5,25 +5,35 @@ import { DataGridFile } from '../schemas';
 import { WithDevtoolParams } from '../types';
 import * as jsonPointer from '../jsonPointer';
 import type { CodeFiles, CodeGenerationResult, GenerateComponentConfig } from '../codeGeneration';
-
-function serializeObject(properties: Record<string, string>): string {
-  return `{${Object.entries(properties)
-    .map((entry) => entry.join(': '))
-    .join(', ')}}`;
-}
-function serializeArray(items: string[]): string {
-  return `[${items.join(', ')}]`;
-}
-
-type SerializedProperties<O> = {
-  [K in keyof O]: string | (undefined extends O[K] ? undefined : never);
-};
+import { serializeObject, serializeArray, SerializedProperties } from './utils';
+import { Scope } from './Scope';
+import Imports from './Imports';
 
 export default async function generateDataGridComponent(
   name: string,
   file: DataGridFile,
   config: GenerateComponentConfig,
 ): Promise<CodeGenerationResult> {
+  const globalScope = new Scope();
+  const imports = new Imports(globalScope);
+
+  imports.addImport('react', '*', 'React');
+  imports.addImport('@mui/x-data-grid-pro', 'DataGridPro', 'DataGridPro');
+  imports.addImport('@mui/material', 'Box', 'Box');
+  if (config.target !== 'prod') {
+    imports.addImport('@mui/toolpad-next/runtime', '*', '_runtime');
+  }
+
+  if (file.spec?.rows?.kind === 'fetch') {
+    globalScope.allocate('executeFetch');
+  }
+  globalScope.allocate('columns');
+  globalScope.allocate('ErrorOverlay');
+  globalScope.allocate('ErrorOverlayProps');
+
+  const componentName = globalScope.allocateSuggestion(name);
+  const componentPropsName = globalScope.allocateSuggestion(`${name}Props`);
+
   const { outDir = '/' } = config;
 
   const hasRowsProperty = (file.spec?.rows?.kind ?? 'property') === 'property';
@@ -50,10 +60,7 @@ export default async function generateDataGridComponent(
     }) || [];
 
   const code = `
-    import * as React from 'react';
-    import { DataGridPro } from '@mui/x-data-grid-pro';
-    import { Box } from '@mui/material';
-    ${config.target === 'prod' ? '' : `import * as _runtime from '@mui/toolpad-next/runtime';`}
+    ${imports.print()}
 
     ${
       file.spec?.rows?.kind === 'fetch'
@@ -126,17 +133,17 @@ export default async function generateDataGridComponent(
 
     const columns = ${serializeArray(columnDefs)};
 
-    export interface ToolpadDataGridProps {
+    export interface ${componentPropsName} {
       rows: ${hasRowsProperty ? '{ id: string | number }[]' : 'undefined'};
     }
 
-    function ToolpadDataGrid({ 
+    function ${componentName}({ 
       ${
         !file.spec?.rows?.kind || file.spec?.rows?.kind === 'property'
           ? 'rows = [], loading = false, error'
           : ''
       }
-    }: ToolpadDataGridProps) {
+    }: ${componentPropsName}) {
 
       ${
         file.spec?.rows?.kind === 'fetch'
@@ -192,22 +199,17 @@ export default async function generateDataGridComponent(
       )
     }
 
-    ToolpadDataGrid.displayName = ${JSON.stringify(name)};
+    ${componentName}.displayName = ${JSON.stringify(name)};
 
     export default ${
       config.target === 'dev'
-        ? `_runtime.withDevtool(ToolpadDataGrid, ${serializeObject({
+        ? `_runtime.withDevtool(${componentName}, ${serializeObject({
             name: JSON.stringify(name),
             file: JSON.stringify(file),
             wsUrl: JSON.stringify(config.wsUrl),
-            dependencies: serializeArray([
-              serializeArray([JSON.stringify('react'), 'React']),
-              serializeArray([JSON.stringify('@mui/x-data-grid-pro'), '{ DataGridPro }']),
-              serializeArray([JSON.stringify('@mui/material'), '{ Box }']),
-              serializeArray([JSON.stringify('@mui/toolpad-next/runtime'), '_runtime']),
-            ]),
+            dependencies: imports.printDynamicImports(),
           } satisfies Record<keyof WithDevtoolParams, string>)})`
-        : 'ToolpadDataGrid'
+        : componentName
     };
   `;
 

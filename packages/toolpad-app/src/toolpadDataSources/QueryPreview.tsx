@@ -13,7 +13,7 @@ export default function QueryPreview({ children, error, isLoading }: QueryPrevie
   return (
     <Box
       data-testid="query-preview"
-      sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}
+      sx={{ height: '100%', display: 'flex', flexDirection: 'column', pt: 1 }}
     >
       {isLoading ? <LinearProgress /> : null}
       <Box sx={{ flex: 1, minHeight: 0, overflow: 'auto' }}>

@@ -50,14 +50,18 @@ export default function Devtools({ sx, log, onLogClear, har, onHarClear }: Devto
 
   const buttonStyles = React.useCallback(
     (theme: Theme) => ({
-      color: theme.palette.grey[400],
+      color:
+        theme.palette.mode === 'dark' ? theme.palette.primaryDark[400] : theme.palette.grey[400],
       fontSize: 12,
+      ml: 1,
+      mt: 0,
       transition: theme.transitions.create('color', {
         duration: theme.transitions.duration.shorter,
       }),
       '&:hover': {
-        color: theme.palette.grey[500],
-        backgroundColor: theme.palette.grey[100],
+        color:
+          theme.palette.mode === 'dark' ? theme.palette.primaryDark[300] : theme.palette.grey[500],
+        backgroundColor: theme.palette.mode === 'dark' ? 'inherit' : theme.palette.grey[100],
       },
     }),
     [],

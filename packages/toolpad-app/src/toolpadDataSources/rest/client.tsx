@@ -550,12 +550,21 @@ function QueryEditor({
         <Box
           sx={{
             p: 0.25,
-            pt: 0,
+            mt: 1,
+            ml: 1,
             height: '100%',
             borderRight: (theme) => `1px solid ${theme.palette.divider}`,
           }}
         >
-          <Typography fontSize={12}>Parameters</Typography>
+          <Typography
+            fontSize={12}
+            sx={{
+              color: (theme) =>
+                theme.palette.mode === 'dark' ? theme.palette.grey[500] : 'default',
+            }}
+          >
+            Parameters
+          </Typography>
           <ParametersEditor
             value={paramsEntries}
             onChange={handleParamsChange}

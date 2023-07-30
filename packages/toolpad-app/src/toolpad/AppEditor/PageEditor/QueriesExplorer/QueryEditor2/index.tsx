@@ -140,14 +140,20 @@ export default function QueryEditor({
                         ml: -1,
                         '&:hover': { color: 'inherit' },
                         '& .MuiChip-deleteIcon': {
-                          color: (theme) => theme.palette.grey[500],
+                          color: (theme) =>
+                            theme.palette.mode === 'dark'
+                              ? theme.palette.primaryDark[300]
+                              : theme.palette.grey[500],
                           fontSize: 12,
                           transition: (theme) =>
                             theme.transitions.create('color', {
                               duration: theme.transitions.duration.shorter,
                             }),
                           '&:hover': {
-                            color: (theme) => theme.palette.grey[700],
+                            color: (theme) =>
+                              theme.palette.mode === 'dark'
+                                ? theme.palette.primaryDark[500]
+                                : theme.palette.grey[700],
                           },
                         },
                       }}

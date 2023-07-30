@@ -269,12 +269,16 @@ export default function QueryEditorPanel<Q>({ nodeId }: QueryNodeEditorProps) {
           <Tab
             value="config"
             label="Config"
-            sx={{ borderBottom: (theme) => `1px solid ${theme.palette.grey[300]}` }}
+            sx={{
+              borderBottom: (theme) => `1px solid ${theme.palette.divider}`,
+            }}
           />
           <Tab
             value="settings"
             label="Settings"
-            sx={{ borderBottom: (theme) => `1px solid ${theme.palette.grey[300]}` }}
+            sx={{
+              borderBottom: (theme) => `1px solid ${theme.palette.divider}`,
+            }}
           />
         </TabList>
         <TabPanel value="config" sx={{ p: 0 }}>

@@ -239,7 +239,14 @@ export function QueryEditor({
         </QueryInputPanel>
 
         <Box sx={{ p: 2, height: '100%', overflow: 'auto' }}>
-          <Typography>Parameters</Typography>
+          <Typography
+            sx={{
+              color: (theme) =>
+                theme.palette.mode === 'dark' ? theme.palette.grey[500] : 'default',
+            }}
+          >
+            Parameters
+          </Typography>
           <ParametersEditor
             value={paramsEntries}
             onChange={handleParamsChange}

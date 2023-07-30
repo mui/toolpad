@@ -1,9 +1,9 @@
 import 'dotenv/config';
-import yargs from 'yargs';
 import path from 'path';
-import invariant from 'invariant';
 import { Readable } from 'stream';
 import * as readline from 'readline';
+import invariant from 'invariant';
+import yargs from 'yargs';
 import openBrowser from 'react-dev-utils/openBrowser';
 import chalk from 'chalk';
 import { folderExists } from '@mui/toolpad-utils/fs';

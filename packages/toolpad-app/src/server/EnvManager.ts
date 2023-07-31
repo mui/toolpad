@@ -26,10 +26,23 @@ export default class EnvManager {
 
   constructor(project: IToolpadProject) {
     this.project = project;
+  }
 
+  async start() {
     this.loadEnvFile();
+    if (this.project.options.dev) {
+      this.initWatcher();
+    }
+  }
 
-    this.initWatcher();
+  // eslint-disable-next-line class-methods-use-this
+  async build() {
+    // Dummy method
+  }
+
+  // eslint-disable-next-line class-methods-use-this
+  async dispose() {
+    // Dummy method
   }
 
   private resetEnv() {

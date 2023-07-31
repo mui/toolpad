@@ -15,3 +15,32 @@ spec:
           name: textField2
           props:
             label: textField2
+    - component: PageRow
+      name: pageRow1
+      children:
+        - component: Button
+          name: button
+        - component: Button
+          name: button1
+        - component: PageColumn
+          name: pageColumn
+          layout:
+            columnSize: 1
+          children:
+            - component: Button
+              name: button2
+              layout:
+                columnSize: 1
+            - component: PageRow
+              name: pageRow2
+              props:
+                justifyContent: start
+              children:
+                - component: Button
+                  name: button3
+                  props:
+                    content: last in column
+                - component: Button
+                  name: button4
+                  props:
+                    content: last in row

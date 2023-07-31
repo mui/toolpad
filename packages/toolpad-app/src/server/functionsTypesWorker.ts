@@ -1,11 +1,12 @@
-import invariant from 'invariant';
 import * as path from 'path';
+import invariant from 'invariant';
 import * as ts from 'typescript';
 import { glob } from 'glob';
 import chalk from 'chalk';
 import { JSONSchema7, JSONSchema7TypeName, JSONSchema7Type } from 'json-schema';
 import { asArray } from '@mui/toolpad-utils/collections';
 import { PrimitiveValueType } from '@mui/toolpad-core';
+import { tsConfig } from './functionsShared';
 
 export interface ReturnTypeIntrospectionResult {
   schema: JSONSchema7 | null;
@@ -382,20 +383,6 @@ function getReturnType(callSignatures: readonly ts.Signature[], checker: ts.Type
     schema,
   };
 }
-
-export const tsConfig: ts.CompilerOptions = {
-  noEmit: true,
-  target: ts.ScriptTarget.ESNext,
-  lib: ['lib.esnext.d.ts'],
-  types: ['node'],
-  // NOTE: strictNullChecks is essential for the type extraction to work properly. When we decide
-  // to support user-defined tsconfig.json, we must make sure this option is enabled.
-  strictNullChecks: true,
-  module: ts.ModuleKind.CommonJS,
-  moduleResolution: ts.ModuleResolutionKind.Bundler,
-  esModuleInterop: true,
-  allowSyntheticDefaultImports: true,
-};
 
 export interface ExtractTypesParams {
   resourcesFolder: string;

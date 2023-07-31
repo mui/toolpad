@@ -10,3 +10,10 @@ spec:
       children:
         - component: TextField
           name: textField
+    - component: PageRow
+      name: pageRow1
+      children:
+        - component: Text
+          name: text
+          props:
+            value: text-foo

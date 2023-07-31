@@ -282,8 +282,8 @@ export default function PageStructureExplorer() {
         onKeyDown={handleKeyDown}
         sx={{
           flexGrow: 1,
-          maxHeight: 450,
           maxWidth: 400,
+          maxHeight: '85%',
           overflowY: 'auto',
           scrollbarGutter: 'stable',
         }}

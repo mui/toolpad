@@ -268,10 +268,10 @@ export default function PageStructureExplorer() {
           my: 0.5,
         })}
       >
-        Components
+        Page hierarchy
       </Typography>
       <TreeView
-        aria-label="components explorer"
+        aria-label="page hierarchy explorer"
         defaultCollapseIcon={<ExpandMoreIcon sx={{ fontSize: '0.9rem', opacity: 0.5 }} />}
         defaultExpandIcon={<ChevronRightIcon sx={{ fontSize: '0.9rem', opacity: 0.5 }} />}
         expanded={Array.from(expandedDomNodeIdSet)}

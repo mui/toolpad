@@ -204,6 +204,6 @@ test('must deselect selected element when clicking outside of it', async ({ page
   const boundingBox = await input.boundingBox();
   await clickCenter(page, input);
   await expect(nodeHudTag).toBeVisible();
-  await page.mouse.click(boundingBox!.x + 50, boundingBox!.y + 50);
+  await page.mouse.click(boundingBox!.x + 150, boundingBox!.y + 150);
   await expect(nodeHudTag).toBeHidden();
 });

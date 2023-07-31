@@ -1,5 +1,6 @@
 import * as path from 'path';
 import * as fs from 'fs/promises';
+import { isMainThread } from 'worker_threads';
 import * as yaml from 'yaml';
 import invariant from 'invariant';
 import openEditor from 'open-editor';
@@ -20,7 +21,6 @@ import {
   updateYamlFile,
   fileExists,
 } from '@mui/toolpad-utils/fs';
-import { isMainThread } from 'worker_threads';
 import * as appDom from '../appDom';
 import insecureHash from '../utils/insecureHash';
 import {

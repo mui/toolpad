@@ -120,7 +120,7 @@ function RecursiveSubTree({
 
   if (children.length) {
     return (
-      <CustomTreeItem nodeId={root.id} node={root}>
+      <CustomTreeItem nodeId={root.id} node={root} onHover={onHover} onMouseLeave={onMouseLeave}>
         {children.map((childNode) => (
           <RecursiveSubTree
             key={childNode.id}
@@ -135,7 +135,12 @@ function RecursiveSubTree({
   }
   if (renderItem.length) {
     return (
-      <TreeItem nodeId={root.id} label={<Typography variant="body2">{root.name}</Typography>}>
+      <CustomTreeItem
+        nodeId={root.id}
+        node={root}
+        label={<Typography variant="body2">{root.name}</Typography>}
+        onHover={onHover}
+      >
         <TreeItem
           nodeId={`${root.id}-renderItem`}
           label={<Typography variant="body2">renderItem</Typography>}
@@ -150,7 +155,7 @@ function RecursiveSubTree({
             />
           ))}
         </TreeItem>
-      </TreeItem>
+      </CustomTreeItem>
     );
   }
 

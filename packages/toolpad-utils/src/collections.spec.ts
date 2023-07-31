@@ -15,7 +15,7 @@ describe('isDeepEqual', () => {
   test('isDeepEqual array', () => {
     expect(isDeepEqual([1, 2, 3], [1, 2, 3])).toBe(true);
     expect(isDeepEqual([1, 2, 3], [1, 2, 4])).toBe(false);
-    expect(isDeepEqual([1, 2, 3], new Set([1, 2, 3]))).toBe(false);
+    expect(isDeepEqual([1, 2, 3] as unknown, new Set([1, 2, 3]))).toBe(false);
   });
   test('isDeepEqual object', () => {
     expect(

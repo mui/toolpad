@@ -98,8 +98,8 @@ export function filterKeys<U>(
  * check if two objects are deeply equal and support  Set, Map, Date, Array, Object
  */
 // Reference code https://github.com/vuejs/vue/blob/49b6bd4264c25ea41408f066a1835f38bf6fe9f1/src/shared/util.ts#L297
-export function isDeepEqual(obj: unknown, objToCompare: unknown): boolean {
-  const isObject = <T>(object: T) => {
+export function isDeepEqual<T = unknown>(obj: T, objToCompare: T): boolean {
+  const isObject = <U>(object: U) => {
     return object != null && typeof object === 'object';
   };
 

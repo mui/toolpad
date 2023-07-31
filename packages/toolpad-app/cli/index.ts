@@ -1,6 +1,6 @@
 import 'dotenv/config';
-import yargs from 'yargs';
 import path from 'path';
+import yargs from 'yargs';
 import chalk from 'chalk';
 import { execaNode } from 'execa';
 import { runApp } from './server';

@@ -1,6 +1,6 @@
-import * as yaml from 'yaml';
 import * as path from 'path';
 import * as fs from 'fs/promises';
+import * as yaml from 'yaml';
 import invariant from 'invariant';
 import openEditor from 'open-editor';
 import chalk from 'chalk';

@@ -1,7 +1,7 @@
 import * as path from 'path';
 import * as fs from 'fs/promises';
-import * as express from 'express';
 import { Server } from 'http';
+import * as express from 'express';
 import { postProcessHtml } from './toolpadAppBuilder';
 import { ToolpadProject, getAppOutputFolder } from './localMode';
 import { asyncHandler } from '../utils/express';

@@ -1,5 +1,6 @@
 import * as React from 'react';
 import {
+  Autocomplete,
   Box,
   Button,
   IconButton,
@@ -17,7 +18,13 @@ import AddIcon from '@mui/icons-material/Add';
 import { CHART_DATA_SERIES_KINDS, type ChartDataSeries } from '@mui/toolpad-components';
 import { useBrowserJsRuntime } from '@mui/toolpad-core/jsBrowserRuntime';
 import DeleteIcon from '@mui/icons-material/Delete';
+import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import { BindableAttrValue } from '@mui/toolpad-core';
+import ScatterPlotIcon from '@mui/icons-material/ScatterPlot';
+import BarChartIcon from '@mui/icons-material/BarChart';
+import ShowChartIcon from '@mui/icons-material/ShowChart';
+import LegendToggleIcon from '@mui/icons-material/LegendToggle';
+import { evaluateBindable } from '@mui/toolpad-core/jsRuntime';
 import * as appDom from '../../appDom';
 import type { EditorProps } from '../../types';
 import PropertyControl from '../../components/PropertyControl';
@@ -27,6 +34,16 @@ import BindableEditor from '../AppEditor/PageEditor/BindableEditor';
 import { updateArray, remove } from '../../utils/immutability';
 import { createToolpadAppTheme } from '../../runtime/AppThemeProvider';
 import ColorPicker from '../../components/ColorPicker';
+
+const CHART_KIND_OPTIONS: {
+  kind: (typeof CHART_DATA_SERIES_KINDS)[number];
+  icon: React.ComponentType;
+}[] = [
+  { kind: 'line', icon: ShowChartIcon },
+  { kind: 'bar', icon: BarChartIcon },
+  { kind: 'area', icon: LegendToggleIcon },
+  { kind: 'scatter', icon: ScatterPlotIcon },
+];
 
 function ChartDataPropEditor({
   nodeId,
@@ -41,28 +58,27 @@ function ChartDataPropEditor({
 
   const appTheme = React.useMemo(() => createToolpadAppTheme(dom), [dom]);
 
-  const node = nodeId ? (appDom.getMaybeNode(dom, nodeId) as appDom.ElementNode) : null;
-
   const [dataSeriesEditIndex, setDataSeriesEditIndex] = React.useState<number | null>(null);
   const [popoverAnchorElement, setPopoverAnchorElement] = React.useState<HTMLElement | null>(null);
 
   const handleAddDataSeries = React.useCallback(() => {
-    if (node) {
-      const newDataSeriesLabel = `dataSeries${value.length + 1}`;
+    const newDataSeriesCount = value.length + 1;
 
-      onChange([
-        ...value,
-        {
-          kind: 'line',
-          label: newDataSeriesLabel,
-          data: [],
-          xKey: 'x',
-          yKey: 'y',
-          color: appTheme.palette.primary.main,
-        },
-      ]);
-    }
-  }, [appTheme, node, onChange, value]);
+    const newDataSeriesLabel = `dataSeries${newDataSeriesCount}`;
+
+    onChange([
+      ...value,
+      {
+        label: newDataSeriesLabel,
+        kind: 'line',
+        data: [],
+        color:
+          newDataSeriesCount % 2 === 0
+            ? appTheme.palette.secondary.main
+            : appTheme.palette.primary.main,
+      },
+    ]);
+  }, [appTheme, onChange, value]);
 
   const handleDataSeriesClick = React.useCallback(
     (index: number) => (event: React.MouseEvent<HTMLElement>) => {
@@ -70,6 +86,13 @@ function ChartDataPropEditor({
       setPopoverAnchorElement(event.currentTarget);
     },
     [],
+  );
+
+  const handleDuplicateDataSeries = React.useCallback(
+    (index: number) => () => {
+      onChange([...value.slice(0, index + 1), value[index], ...value.slice(index + 1)]);
+    },
+    [onChange, value],
   );
 
   const handleRemoveDataSeries = React.useCallback(
@@ -88,56 +111,114 @@ function ChartDataPropEditor({
   }, []);
 
   const updateDataSeriesProp = React.useCallback(
-    (index: number, newValue: unknown, propName: string, defaultValue: unknown = '') => {
-      if (node) {
-        const previousData = node.props?.data || [];
+    (
+      draft: appDom.AppDom,
+      index: number,
+      newValue: unknown,
+      propName: string,
+      defaultValue: unknown = '',
+    ): appDom.AppDom => {
+      const draftNode = nodeId ? (appDom.getMaybeNode(draft, nodeId) as appDom.ElementNode) : null;
 
-        domApi.update((draft) =>
-          appDom.setNodeNamespacedProp(
-            draft,
-            node,
-            'props',
-            'data',
-            updateArray(
-              previousData,
-              {
-                ...previousData[index],
-                [propName]: newValue || defaultValue,
-              },
-              index,
-            ),
+      if (draftNode) {
+        const previousData = draftNode.props?.data || [];
+
+        return appDom.setNodeNamespacedProp(
+          draft,
+          draftNode,
+          'props',
+          'data',
+          updateArray(
+            previousData,
+            {
+              ...previousData[index],
+              [propName]: newValue || defaultValue,
+            },
+            index,
           ),
         );
       }
+
+      return draft;
     },
-    [domApi, node],
+    [nodeId],
   );
 
   const handleDataSeriesDataChange = React.useCallback(
     (index: number) => (newValue: BindableAttrValue<ChartDataSeries['data']> | null) => {
-      updateDataSeriesProp(index, newValue, 'data', []);
+      const previousDataSeries = value[index];
+
+      domApi.update((draft) => {
+        draft = updateDataSeriesProp(draft, index, newValue, 'data', []);
+
+        if (!previousDataSeries.xKey || !previousDataSeries.yKey) {
+          const newDataResult = (evaluateBindable(jsBrowserRuntime, newValue, pageState).value ||
+            []) as NonNullable<ChartDataSeries['data']>;
+
+          let inferredXKey;
+
+          const keySuggestions = newDataResult
+            .flatMap((dataSeriesPoint) => Object.keys(dataSeriesPoint))
+            .filter((key, pointIndex, array) => array.indexOf(key) === pointIndex);
+
+          if (!previousDataSeries.xKey) {
+            inferredXKey =
+              keySuggestions.find((key) =>
+                newDataResult.every((dataSeriesPoint) => typeof dataSeriesPoint[key] === 'string'),
+              ) || keySuggestions[0];
+
+            draft = updateDataSeriesProp(draft, index, inferredXKey, 'xKey');
+          }
+
+          if (!previousDataSeries.yKey) {
+            const xKey = previousDataSeries.xKey || inferredXKey;
+            const inferredYKey =
+              xKey && xKey === keySuggestions[0] ? keySuggestions[1] : keySuggestions[0];
+
+            draft = updateDataSeriesProp(draft, index, inferredYKey, 'yKey');
+          }
+        }
+
+        return draft;
+      });
     },
-    [updateDataSeriesProp],
+    [domApi, jsBrowserRuntime, pageState, updateDataSeriesProp, value],
   );
 
   const handleDataSeriesTextInputPropChange = React.useCallback(
     (index: number, propName: string) => (event: React.ChangeEvent<HTMLInputElement>) => {
       const newValue = event.target.value;
-      updateDataSeriesProp(index, newValue, propName);
+      domApi.update((draft) => updateDataSeriesProp(draft, index, newValue, propName));
     },
-    [updateDataSeriesProp],
+    [domApi, updateDataSeriesProp],
+  );
+
+  const handleDataSeriesAutocompletePropChange = React.useCallback(
+    (index: number, propName: string) => (event: React.SyntheticEvent, newValue: string) => {
+      domApi.update((draft) => updateDataSeriesProp(draft, index, newValue, propName));
+    },
+    [domApi, updateDataSeriesProp],
   );
 
   const handleDataSeriesColorChange = React.useCallback(
     (index: number) => (newValue: string | undefined) => {
-      updateDataSeriesProp(index, newValue, 'color');
+      domApi.update((draft) => updateDataSeriesProp(draft, index, newValue, 'color'));
     },
-    [updateDataSeriesProp],
+    [domApi, updateDataSeriesProp],
   );
 
-  if (!node) {
-    return null;
-  }
+  const dataSeriesKeySuggestions = React.useMemo(
+    () =>
+      value.map((dataSeries) => {
+        const dataResult = (evaluateBindable(jsBrowserRuntime, dataSeries.data, pageState).value ||
+          []) as NonNullable<ChartDataSeries['data']>;
+
+        return dataResult
+          .flatMap((dataSeriesPoint) => Object.keys(dataSeriesPoint))
+          .filter((key, index, array) => array.indexOf(key) === index);
+      }),
+    [jsBrowserRuntime, pageState, value],
+  );
 
   const editDataSeries = dataSeriesEditIndex !== null ? value[dataSeriesEditIndex] : null;
 
@@ -157,6 +238,12 @@ function ChartDataPropEditor({
                   >
                     <ListItemText primary={label} />
                   </ListItemButton>
+                  <IconButton
+                    aria-label="Duplicate data series"
+                    onClick={handleDuplicateDataSeries(index)}
+                  >
+                    <ContentCopyIcon />
+                  </IconButton>
                   <IconButton
                     aria-label="Delete data series"
                     onClick={handleRemoveDataSeries(index)}
@@ -204,9 +291,12 @@ function ChartDataPropEditor({
                 value={editDataSeries?.kind}
                 onChange={handleDataSeriesTextInputPropChange(dataSeriesEditIndex, 'kind')}
               >
-                {CHART_DATA_SERIES_KINDS.map((kind) => (
-                  <MenuItem key={kind} value={kind}>
-                    {kind}
+                {CHART_KIND_OPTIONS.map((option) => (
+                  <MenuItem key={option.kind} value={option.kind}>
+                    <Stack direction="row" alignItems="center">
+                      <option.icon />
+                      <ListItemText sx={{ ml: 1 }}>{option.kind}</ListItemText>
+                    </Stack>
                   </MenuItem>
                 ))}
               </TextField>
@@ -220,15 +310,19 @@ function ChartDataPropEditor({
                 value={editDataSeries?.data ?? null}
                 onChange={handleDataSeriesDataChange(dataSeriesEditIndex)}
               />
-              <TextField
-                label="xKey"
-                value={editDataSeries?.xKey}
-                onChange={handleDataSeriesTextInputPropChange(dataSeriesEditIndex, 'xKey')}
+              <Autocomplete
+                freeSolo
+                options={dataSeriesKeySuggestions[dataSeriesEditIndex]}
+                value={editDataSeries?.xKey || ''}
+                onInputChange={handleDataSeriesAutocompletePropChange(dataSeriesEditIndex, 'xKey')}
+                renderInput={(params) => <TextField {...params} label="xKey" />}
               />
-              <TextField
-                label="yKey"
-                value={editDataSeries?.yKey}
-                onChange={handleDataSeriesTextInputPropChange(dataSeriesEditIndex, 'yKey')}
+              <Autocomplete
+                freeSolo
+                options={dataSeriesKeySuggestions[dataSeriesEditIndex]}
+                value={editDataSeries?.yKey || ''}
+                onInputChange={handleDataSeriesAutocompletePropChange(dataSeriesEditIndex, 'yKey')}
+                renderInput={(params) => <TextField {...params} label="yKey" />}
               />
               <ColorPicker
                 label="color"

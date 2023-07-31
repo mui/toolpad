@@ -4,6 +4,9 @@
 
 You can create two kinds of **queries** in Toolpad to bring data to your page.
 
+1. HTTP request
+2. Custom functions
+
 :::info
 Toolpad uses `react-query` internally to run queries. Look into [its documentation](https://tanstack.com/query/latest/docs/react/guides/queries) for more details on query objects.
 :::

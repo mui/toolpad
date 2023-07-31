@@ -60,35 +60,35 @@ spec:
               $$jsExpression: |
                 fetchSheet.data
             columns:
-              - field: "0"
+              - field: name
                 type: string
-              - field: "1"
+              - field: price
                 type: string
-              - field: "2"
+              - field: volume
                 type: string
-              - field: "3"
+              - field: priceopen
                 type: string
-              - field: "4"
+              - field: high
                 type: string
-              - field: "5"
+              - field: low
                 type: string
-              - field: "6"
+              - field: marketcap
                 type: string
-              - field: "7"
+              - field: tradetime
                 type: string
-              - field: "8"
+              - field: datadelay
                 type: string
-              - field: "9"
+              - field: eps
                 type: string
-              - field: "10"
+              - field: high52
                 type: string
-              - field: "11"
+              - field: low52
                 type: string
-              - field: "12"
+              - field: change
                 type: string
-              - field: "13"
+              - field: closeyest
                 type: string
-              - field: "14"
+              - field: shares
                 type: string
-              - field: "15"
+              - field: currency
                 type: string

@@ -25,6 +25,6 @@ export async function fetchSheet(spreadsheetId: string, range: string) {
     range,
   });
 
-  const rows = res.data.values;
-  return rows;
+  const [header, ...rows] = res.data.values;
+  return rows.map((row) => Object.fromEntries(header.map((key, i) => [key, row[i]])));
 }

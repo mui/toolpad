@@ -5,6 +5,14 @@ spec:
   title: Default page
   content:
     - component: PageRow
+      name: pageRow2
+      children:
+        - component: Text
+          name: text2
+          props:
+            value: Hacker news client
+            variant: h2
+    - component: PageRow
       name: pageRow
       children:
         - component: List
@@ -35,9 +43,10 @@ spec:
                           props:
                             value:
                               $$jsExpression: >
-                                `${stories.data[i].score} points | by
+                                `${stories.data[i].score} by
                                 ${stories.data[i].by} |
                                 ${stories.data[i].descendants} comments`
+            disablePadding: true
   queries:
     - name: stories
       query:

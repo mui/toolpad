@@ -8,8 +8,7 @@
   "workspaces": {
     "packages": [
       "packages/*",
-      "docs",
-      "examples/hacker-news-client"
+      "docs"
     ],
     "nohoist": [
       "docs",

@@ -1,14 +1,14 @@
 import * as path from 'path';
+import { IncomingMessage, createServer } from 'http';
+import * as fs from 'fs/promises';
 import express from 'express';
 import invariant from 'invariant';
-import { IncomingMessage, createServer } from 'http';
 import { execaNode } from 'execa';
 import getPort from 'get-port';
 import { createProxyMiddleware } from 'http-proxy-middleware';
 import { mapValues } from '@mui/toolpad-utils/collections';
 import prettyBytes from 'pretty-bytes';
 import { createServer as createViteServer } from 'vite';
-import * as fs from 'fs/promises';
 import serializeJavascript from 'serialize-javascript';
 import { WebSocket, WebSocketServer } from 'ws';
 import { listen } from '@mui/toolpad-utils/http';
@@ -85,9 +85,26 @@ interface HealthCheck {
   memoryUsagePretty: Record<keyof NodeJS.MemoryUsage, string>;
 }
 
-async function main() {
+interface ServerConfig {
+  cmd: 'dev' | 'start';
+  gitSha1: string | null;
+  circleBuildNum: string | null;
+  projectDir: string;
+  hostname: string;
+  port: number;
+  devMode: boolean;
+}
+
+export async function main({
+  cmd,
+  gitSha1,
+  circleBuildNum,
+  projectDir,
+  hostname,
+  port,
+  devMode,
+}: ServerConfig) {
   const { default: chalk } = await import('chalk');
-  const cmd = process.env.TOOLPAD_CMD;
 
   const app = express();
   const httpServer = createServer(app);
@@ -110,8 +127,8 @@ async function main() {
   app.get('/health-check', (req, res) => {
     const memoryUsage = process.memoryUsage();
     res.json({
-      gitSha1: process.env.GIT_SHA1 || null,
-      circleBuildNum: process.env.CIRCLE_BUILD_NUM || null,
+      gitSha1,
+      circleBuildNum,
       memoryUsage,
       memoryUsagePretty: mapValues(memoryUsage, (usage) => prettyBytes(usage)),
     } satisfies HealthCheck);
@@ -141,10 +158,6 @@ async function main() {
       throw new Error(`Unknown toolpad command ${cmd}`);
   }
 
-  const projectDir = process.env.TOOLPAD_PROJECT_DIR;
-  const hostname = 'localhost';
-  const port = Number(process.env.TOOLPAD_PORT);
-
   if (cmd === 'dev') {
     app.use('/api/rpc', createRpcHandler(rpcServer));
     app.use('/api/dataSources', createDataSourcesHandler());
@@ -162,7 +175,7 @@ async function main() {
     };
 
     const editorBasename = '/_toolpad';
-    if (process.env.NODE_ENV === 'development') {
+    if (devMode) {
       // eslint-disable-next-line no-console
       console.log(`${chalk.blue('info')}  - Running Toolpad editor in dev mode`);
 
@@ -231,7 +244,21 @@ async function main() {
   });
 }
 
-main().catch((err) => {
+invariant(
+  process.env.TOOLPAD_CMD === 'dev' || process.env.TOOLPAD_CMD === 'start',
+  'TOOLPAD_PROJECT_DIR must be set',
+);
+invariant(process.env.TOOLPAD_PROJECT_DIR, 'TOOLPAD_PROJECT_DIR must be set');
+
+main({
+  cmd: process.env.TOOLPAD_CMD,
+  gitSha1: process.env.GIT_SHA1 || null,
+  circleBuildNum: process.env.CIRCLE_BUILD_NUM || null,
+  projectDir: process.env.TOOLPAD_PROJECT_DIR,
+  hostname: 'localhost',
+  port: Number(process.env.TOOLPAD_PORT),
+  devMode: process.env.TOOLPAD_NEXT_DEV === '1',
+}).catch((err) => {
   console.error(err);
   process.exit(1);
 });

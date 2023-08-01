@@ -1,6 +1,6 @@
+import * as path from 'path';
 import latestVersion from 'latest-version';
 import * as semver from 'semver';
-import * as path from 'path';
 import { fileExists } from '@mui/toolpad-utils/fs';
 import pkg from '../../package.json';
 import { VERSION_CHECK_INTERVAL } from '../constants';

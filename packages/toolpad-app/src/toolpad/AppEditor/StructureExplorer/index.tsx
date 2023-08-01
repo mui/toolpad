@@ -15,6 +15,7 @@ import {
   PAGE_COLUMN_COMPONENT_ID,
 } from '../../../runtime/toolpadComponents';
 import { DomView } from '../../../utils/domView';
+import { removePageLayoutNode } from '../pageLayout';
 
 function CustomTreeItem(
   props: TreeItemProps & {
@@ -226,7 +227,7 @@ export default function PageStructureExplorer() {
       (draft) => {
         const toRemove = appDom.getMaybeNode(dom, selectedDomNodeId);
         if (toRemove && appDom.isElement(toRemove)) {
-          draft = appDom.removeNode(draft, toRemove.id);
+          draft = removePageLayoutNode(draft, toRemove);
         }
         return draft;
       },

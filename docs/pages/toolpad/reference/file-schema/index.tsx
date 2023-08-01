@@ -1,7 +1,7 @@
-import * as React from 'react';
-import { GetStaticProps } from 'next';
 import * as path from 'path';
 import * as fs from 'fs/promises';
+import * as React from 'react';
+import { GetStaticProps } from 'next';
 import SchemaReference, {
   SchemaReferenceProps,
 } from '../../../../src/modules/components/SchemaReference';

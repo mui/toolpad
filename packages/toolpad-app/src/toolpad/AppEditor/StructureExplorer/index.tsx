@@ -142,6 +142,7 @@ function RecursiveSubTree({
         node={root}
         label={<Typography variant="body2">{root.name}</Typography>}
         onHover={onHover}
+        onMouseLeave={onMouseLeave}
       >
         <TreeItem
           nodeId={`${root.id}-renderItem`}

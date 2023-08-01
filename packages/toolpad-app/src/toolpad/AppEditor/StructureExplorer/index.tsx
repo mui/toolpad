@@ -56,12 +56,14 @@ function CustomTreeItem(
   return (
     <TreeItem
       key={node.id}
-      onMouseEnter={(event: React.MouseEvent<HTMLLIElement, MouseEvent>) => {
-        onHover?.(event, node.id);
-      }}
-      onMouseLeave={onMouseLeave}
       label={
-        <Box sx={{ display: 'flex', alignItems: 'center', p: 0.2, pr: 0 }}>
+        <Box
+          sx={{ display: 'flex', alignItems: 'center', p: 0.2, pr: 0 }}
+          onMouseEnter={(event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+            onHover?.(event, node.id);
+          }}
+          onMouseLeave={onMouseLeave}
+        >
           <ComponentIcon
             id={node.attributes.component}
             kind="builtIn"

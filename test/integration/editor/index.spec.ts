@@ -200,7 +200,7 @@ test('must deselect selected element when clicking outside of it', async ({ page
 
   await editorModel.waitForOverlay();
   const nodeHudTag = editorModel.appCanvas.getByTestId('node-hud-tag');
-  const input = editorModel.appCanvas.locator('input:nth-child(1)');
+  const input = editorModel.appCanvas.locator('input').nth(0);
   const boundingBox = await input.boundingBox();
   await clickCenter(page, input);
   await expect(nodeHudTag).toBeVisible();

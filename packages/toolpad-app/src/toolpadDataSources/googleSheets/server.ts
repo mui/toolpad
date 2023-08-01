@@ -1,9 +1,9 @@
-import { NextApiRequest, NextApiResponse } from 'next';
 import { drive_v3 } from '@googleapis/drive';
 import { sheets_v4 } from '@googleapis/sheets';
 import { OAuth2Client } from 'google-auth-library';
 import { match } from 'path-to-regexp';
 import { asArray } from '@mui/toolpad-utils/collections';
+import * as express from 'express';
 import { ServerDataSource, CreateHandlerApi } from '../../types';
 import config from '../../server/config';
 import {
@@ -207,19 +207,19 @@ async function execPrivate(
 
 async function handler(
   api: CreateHandlerApi<GoogleSheetsConnectionParams>,
-  req: NextApiRequest,
-  res: NextApiResponse,
-): Promise<NextApiResponse | void> {
+  req: express.Request,
+  res: express.Response,
+): Promise<express.Response | void> {
   const client = createOAuthClient();
   try {
     const pathname = `/${asArray(req.query.path)
-      .map((segment = '') => encodeURIComponent(segment))
+      .map((segment = '') => encodeURIComponent(String(segment)))
       .join('/')}`;
     const matchAuthLogin = match('/auth/login', { decode: decodeURIComponent });
     const matchAuthCallback = match('/auth/callback', { decode: decodeURIComponent });
 
     const [state] = asArray(req.query.state);
-    if (!state) {
+    if (typeof state !== 'string') {
       return res.status(400).send(`Missing query parameter "state"`);
     }
     const { connectionId } = JSON.parse(decodeURIComponent(state));
@@ -246,10 +246,10 @@ async function handler(
     if (matchAuthCallback(pathname)) {
       const [oAuthError] = asArray(req.query.error);
       if (oAuthError) {
-        throw new Error(oAuthError);
+        throw new Error(String(oAuthError));
       }
       const [code] = asArray(req.query.code);
-      if (!code) {
+      if (typeof code !== 'string') {
         return res.status(400).send(`Missing query parameter "code"`);
       }
       const { tokens, res: getTokenResponse } = await client.getToken(code);
@@ -279,6 +279,7 @@ const dataSource: ServerDataSource<
 > = {
   exec,
   execPrivate,
+  api: {},
   createHandler: () => handler,
 };
 

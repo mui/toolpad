@@ -1,4 +1,7 @@
 const baseline = require('@mui/monorepo/.eslintrc');
+const lodash = require('lodash');
+
+const ALLOWED_LODASH_METHODS = new Set(['throttle', 'debounce', 'set']);
 
 module.exports = {
   ...baseline,
@@ -25,40 +28,26 @@ module.exports = {
             name: '@mui/icons-material',
             message: 'Use @mui/icons-material/<Icon> instead.',
           },
+          {
+            name: 'lodash-es',
+            importNames: Object.keys(lodash).filter((key) => !ALLOWED_LODASH_METHODS.has(key)),
+            message:
+              'Avoid kitchensink libraries like lodash-es. We prefer a slightly more verbose, but more universally understood javascript style',
+          },
+        ],
+        patterns: [
+          {
+            group: ['lodash-es/*'],
+            message: 'Use `import { debounce } from "lodash-es";` instead.',
+          },
         ],
       },
     ],
     'no-restricted-syntax': [
-      'error',
-      // From https://github.com/airbnb/javascript/blob/d8cb404da74c302506f91e5928f30cc75109e74d/packages/eslint-config-airbnb-base/rules/style.js#L333
-      {
-        selector: 'ForInStatement',
-        message:
-          'for..in loops iterate over the entire prototype chain, which is virtually never what you want. Use Object.{keys,values,entries}, and iterate over the resulting array.',
-      },
-      // Too opinionated
-      // {
-      //   selector: 'ForOfStatement',
-      //   message:
-      //     'iterators/generators require regenerator-runtime, which is too heavyweight for this guide to allow them. Separately, loops should be avoided in favor of array iterations.',
-      // },
-      {
-        selector: 'LabeledStatement',
-        message:
-          'Labels are a form of GOTO; using them makes code confusing and hard to maintain and understand.',
-      },
-      {
-        selector: 'WithStatement',
-        message:
-          '`with` is disallowed in strict mode because it makes code impossible to predict and optimize.',
-      },
-      // See https://github.com/jsx-eslint/eslint-plugin-react/issues/2073
-      {
-        selector:
-          ":matches(JSXElement, JSXFragment) > JSXExpressionContainer > LogicalExpression[operator='&&']",
-        message:
-          "Please use `condition ? <Jsx /> : null`. Otherwise, there is a chance of rendering '0' instead of '' in some cases. Context: https://stackoverflow.com/q/53048037",
-      },
+      ...baseline.rules['no-restricted-syntax'].filter((rule) => {
+        // Too opinionated for Toolpad
+        return rule?.selector !== 'ForOfStatement';
+      }),
     ],
     // Turning react/jsx-key back on.
     // https://github.com/airbnb/javascript/blob/5155aa5fc1ea9bb2c6493a06ddbd5c7a05414c86/packages/eslint-config-airbnb/rules/react.js#L94
@@ -88,14 +77,6 @@ module.exports = {
   },
   overrides: [
     {
-      files: ['packages/toolpad-app/**/*'],
-      extends: ['plugin:@next/next/recommended'],
-      rules: {
-        '@next/next/no-html-link-for-pages': ['error', 'packages/toolpad-app/pages/'],
-        '@next/next/no-img-element': 'off',
-      },
-    },
-    {
       files: [
         'packages/create-toolpad-app/**/*',
         'packages/toolpad/**/*',
@@ -113,6 +94,36 @@ module.exports = {
       ],
       rules: {
         'import/no-extraneous-dependencies': ['error'],
+      },
+    },
+    {
+      files: [
+        /**
+         * Basically all code that is guaranteed being bundled for the client side and never used on serverside code
+         * can be dev dependencies to reduce the size of the published package
+         */
+        'packages/toolpad-app/src/components/**/*',
+        'packages/toolpad-app/src/toolpad/**/*',
+        'packages/toolpad-app/src/runtime/**/*',
+        'packages/toolpad-app/reactDevtools/**/*',
+      ],
+      excludedFiles: ['*.spec.ts', '*.spec.tsx'],
+      rules: {
+        'import/no-extraneous-dependencies': ['error', { devDependencies: true }],
+      },
+    },
+    {
+      // Starting small, we will progressively expand this to more packages.
+      files: [
+        // 'packages/create-toolpad-app/**/*',
+        // 'packages/toolpad/**/*',
+        // 'packages/toolpad-app/**/*',
+        'packages/toolpad-utils/**/*',
+        // 'packages/toolpad-core/**/*',
+        // 'packages/toolpad-components/**/*',
+      ],
+      rules: {
+        '@typescript-eslint/no-explicit-any': ['error'],
       },
     },
     {

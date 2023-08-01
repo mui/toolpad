@@ -6,16 +6,14 @@ import {
   LiveBinding,
   JsRuntime,
   ScopeMeta,
+  EnvAttrValue,
 } from '@mui/toolpad-core';
 import { WithControlledProp } from '../../../utils/types';
-import { getDefaultControl } from '../../propertyControls';
+import { getBindingType } from '../../../bindings';
+import { getDefaultControl, usePropControlsContext } from '../../propertyControls';
+
 // eslint-disable-next-line import/no-cycle
 import { BindingEditor } from '../BindingEditor';
-
-function renderDefaultControl(params: RenderControlParams<any>) {
-  const Control = getDefaultControl(params.propType);
-  return Control ? <Control {...params} /> : null;
-}
 
 export interface RenderControlParams<V> extends WithControlledProp<V> {
   label: string;
@@ -42,7 +40,7 @@ export default function BindableEditor<V>({
   bindable = true,
   disabled,
   propType,
-  renderControl = renderDefaultControl,
+  renderControl: renderControlProp,
   value,
   jsRuntime,
   onChange,
@@ -52,26 +50,37 @@ export default function BindableEditor<V>({
   envVarNames,
   sx,
 }: BindableEditorProps<V>) {
-  const handlePropConstChange = React.useCallback(
-    (newValue: V) => onChange({ type: 'const', value: newValue }),
-    [onChange],
+  const propTypeControls = usePropControlsContext();
+
+  const renderDefaultControl = React.useCallback(
+    (params: RenderControlParams<any>) => {
+      const Control = getDefaultControl(propTypeControls, params.propType);
+      return Control ? <Control {...params} /> : null;
+    },
+    [propTypeControls],
   );
 
+  const renderControl = renderControlProp || renderDefaultControl;
+
+  const handlePropConstChange = React.useCallback((newValue: V) => onChange(newValue), [onChange]);
+
+  const valueBindingType = value && getBindingType(value);
+
   const initConstValue = React.useCallback(() => {
-    if (value?.type === 'const') {
-      return value.value;
+    if (valueBindingType && valueBindingType === 'const') {
+      return value;
     }
 
-    if (value?.type === 'env') {
-      return value.value;
+    if (valueBindingType && valueBindingType === 'env') {
+      return (value as EnvAttrValue).$$env;
     }
 
     return liveBinding?.value;
-  }, [liveBinding, value]);
+  }, [liveBinding, value, valueBindingType]);
 
   const constValue = React.useMemo(initConstValue, [value, initConstValue]);
 
-  const hasBinding = value && value.type !== 'const';
+  const hasBinding = value && valueBindingType !== 'const';
 
   return (
     <Stack direction="row" alignItems="center" justifyContent="space-between" sx={sx}>

@@ -1,22 +1,26 @@
-import { parse } from 'url';
-import next from 'next';
 import * as path from 'path';
+import { IncomingMessage, createServer } from 'http';
+import * as fs from 'fs/promises';
 import express from 'express';
 import invariant from 'invariant';
-import { IncomingMessage, createServer } from 'http';
 import { execaNode } from 'execa';
 import getPort from 'get-port';
 import { createProxyMiddleware } from 'http-proxy-middleware';
 import { mapValues } from '@mui/toolpad-utils/collections';
 import prettyBytes from 'pretty-bytes';
+import { createServer as createViteServer } from 'vite';
+import serializeJavascript from 'serialize-javascript';
 import { WebSocket, WebSocketServer } from 'ws';
+import { listen } from '@mui/toolpad-utils/http';
+import { asyncHandler } from '../src/utils/express';
 import { createProdHandler } from '../src/server/toolpadAppServer';
 import { getUserProjectRoot } from '../src/server/localMode';
-import { listen } from '../src/utils/http';
 import { getProject } from '../src/server/liveProject';
 import { Command as AppDevServerCommand, Event as AppDevServerEvent } from './appServer';
 import { createRpcHandler, rpcServer } from '../src/server/rpc';
 import { createDataHandler, createDataSourcesHandler } from '../src/server/data';
+import { RUNTIME_CONFIG_WINDOW_PROPERTY } from '../src/constants';
+import config from '../src/config';
 
 interface CreateDevHandlerParams {
   root: string;
@@ -81,9 +85,26 @@ interface HealthCheck {
   memoryUsagePretty: Record<keyof NodeJS.MemoryUsage, string>;
 }
 
-async function main() {
+interface ServerConfig {
+  cmd: 'dev' | 'start';
+  gitSha1: string | null;
+  circleBuildNum: string | null;
+  projectDir: string;
+  hostname: string;
+  port: number;
+  devMode: boolean;
+}
+
+export async function main({
+  cmd,
+  gitSha1,
+  circleBuildNum,
+  projectDir,
+  hostname,
+  port,
+  devMode,
+}: ServerConfig) {
   const { default: chalk } = await import('chalk');
-  const cmd = process.env.TOOLPAD_CMD;
 
   const app = express();
   const httpServer = createServer(app);
@@ -106,8 +127,8 @@ async function main() {
   app.get('/health-check', (req, res) => {
     const memoryUsage = process.memoryUsage();
     res.json({
-      gitSha1: process.env.GIT_SHA1 || null,
-      circleBuildNum: process.env.CIRCLE_BUILD_NUM || null,
+      gitSha1,
+      circleBuildNum,
       memoryUsage,
       memoryUsagePretty: mapValues(memoryUsage, (usage) => prettyBytes(usage)),
     } satisfies HealthCheck);
@@ -137,35 +158,52 @@ async function main() {
       throw new Error(`Unknown toolpad command ${cmd}`);
   }
 
-  const projectDir = process.env.TOOLPAD_PROJECT_DIR;
-  const hostname = 'localhost';
-  const port = Number(process.env.TOOLPAD_PORT);
-  let editorNextApp: ReturnType<typeof next> | undefined;
-
   if (cmd === 'dev') {
     app.use('/api/rpc', createRpcHandler(rpcServer));
     app.use('/api/dataSources', createDataSourcesHandler());
 
-    const dir = process.env.TOOLPAD_DIR;
-    const dev = !!process.env.TOOLPAD_NEXT_DEV;
+    const transformIndexHtml = (html: string) => {
+      const serializedConfig = serializeJavascript(config, { isJSON: true });
+      return html.replace(
+        '<!-- __TOOLPAD_SCRIPTS__ -->',
+        `
+          <script>
+            window[${JSON.stringify(RUNTIME_CONFIG_WINDOW_PROPERTY)}] = ${serializedConfig}
+          </script>
+        `,
+      );
+    };
 
-    // when using middleware `hostname` and `port` must be provided below
-    editorNextApp = next({ dir, dev, hostname, port });
-    const handle = editorNextApp.getRequestHandler();
+    const editorBasename = '/_toolpad';
+    if (devMode) {
+      // eslint-disable-next-line no-console
+      console.log(`${chalk.blue('info')}  - Running Toolpad editor in dev mode`);
 
-    app.use(async (req, res) => {
-      try {
-        invariant(req.url, 'request must have a url');
-        // Be sure to pass `true` as the second argument to `url.parse`.
-        // This tells it to parse the query portion of the URL.
-        const parsedUrl = parse(req.url, true);
-        await handle(req, res, parsedUrl);
-      } catch (err) {
-        console.error('Error occurred handling', req.url, err);
-        res.statusCode = 500;
-        res.end('internal server error');
-      }
-    });
+      const viteApp = await createViteServer({
+        configFile: path.resolve(__dirname, '../../src/toolpad/vite.config.ts'),
+        root: path.resolve(__dirname, '../../src/toolpad'),
+        server: { middlewareMode: true },
+        plugins: [
+          {
+            name: 'toolpad:transform-index-html',
+            transformIndexHtml,
+          },
+        ],
+      });
+
+      app.use(editorBasename, viteApp.middlewares);
+    } else {
+      app.use(
+        editorBasename,
+        express.static(path.resolve(__dirname, '../../dist/editor'), { index: false }),
+        asyncHandler(async (req, res) => {
+          const htmlFilePath = path.resolve(__dirname, '../../dist/editor/index.html');
+          let html = await fs.readFile(htmlFilePath, { encoding: 'utf-8' });
+          html = transformIndexHtml(html);
+          res.setHeader('Content-Type', 'text/html').status(200).end(html);
+        }),
+      );
+    }
   }
 
   await listen(httpServer, port);
@@ -176,8 +214,6 @@ async function main() {
       `http://${hostname}:${port}`,
     )}`,
   );
-
-  await editorNextApp?.prepare();
 
   const wsServer = new WebSocketServer({ noServer: true });
 
@@ -208,7 +244,21 @@ async function main() {
   });
 }
 
-main().catch((err) => {
+invariant(
+  process.env.TOOLPAD_CMD === 'dev' || process.env.TOOLPAD_CMD === 'start',
+  'TOOLPAD_PROJECT_DIR must be set',
+);
+invariant(process.env.TOOLPAD_PROJECT_DIR, 'TOOLPAD_PROJECT_DIR must be set');
+
+main({
+  cmd: process.env.TOOLPAD_CMD,
+  gitSha1: process.env.GIT_SHA1 || null,
+  circleBuildNum: process.env.CIRCLE_BUILD_NUM || null,
+  projectDir: process.env.TOOLPAD_PROJECT_DIR,
+  hostname: 'localhost',
+  port: Number(process.env.TOOLPAD_PORT),
+  devMode: process.env.TOOLPAD_NEXT_DEV === '1',
+}).catch((err) => {
   console.error(err);
   process.exit(1);
 });

@@ -41,20 +41,23 @@ export default function NewsletterToast() {
         <Card
           variant="outlined"
           role="alert"
-          sx={{
-            p: 1,
-            position: 'absolute',
-            left: '50%',
-            transform: 'translate(-50%)',
-            opacity: hidden ? 0 : 1,
-            transition: '0.5s',
-            display: 'flex',
-            alignItems: 'center',
-            boxShadow: (theme) =>
-              theme.palette.mode === 'dark'
-                ? '0px 4px 20px rgba(0, 0, 0, 0.6)'
-                : '0px 4px 20px rgba(61, 71, 82, 0.25)',
-          }}
+          sx={[
+            {
+              p: 1,
+              position: 'absolute',
+              left: '50%',
+              transform: 'translate(-50%)',
+              opacity: hidden ? 0 : 1,
+              transition: '0.5s',
+              display: 'flex',
+              alignItems: 'center',
+              boxShadow: '0px 4px 20px rgba(61, 71, 82, 0.25)',
+            },
+            (theme) =>
+              theme.applyDarkStyles({
+                boxShadow: '0px 4px 20px rgba(0, 0, 0, 0.6)',
+              }),
+          ]}
         >
           <MarkEmailReadTwoTone color="success" sx={{ mx: 0.5 }} />
           <div>

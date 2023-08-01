@@ -11,9 +11,14 @@ export interface QueryPreviewProps {
 
 export default function QueryPreview({ children, error, isLoading }: QueryPreviewProps) {
   return (
-    <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
+    <Box
+      data-testid="query-preview"
+      sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}
+    >
       {isLoading ? <LinearProgress /> : null}
-      <Box sx={{ flex: 1, minHeight: 0 }}>{error ? <ErrorAlert error={error} /> : children}</Box>
+      <Box sx={{ flex: 1, minHeight: 0, overflow: 'auto' }}>
+        {error ? <ErrorAlert error={error} /> : children}
+      </Box>
     </Box>
   );
 }

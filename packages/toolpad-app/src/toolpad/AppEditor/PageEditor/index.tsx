@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { styled } from '@mui/material';
 import { NodeId } from '@mui/toolpad-core';
+import useDebouncedHandler from '@mui/toolpad-utils/hooks/useDebouncedHandler';
 import SplitPane from '../../../components/SplitPane';
 import RenderPanel from './RenderPanel';
 import ComponentPanel from './ComponentPanel';
@@ -11,7 +12,6 @@ import ComponentCatalog from './ComponentCatalog';
 import NotFoundEditor from '../NotFoundEditor';
 import usePageTitle from '../../../utils/usePageTitle';
 import useLocalStorageState from '../../../utils/useLocalStorageState';
-import useDebouncedHandler from '../../../utils/useDebouncedHandler';
 import useUndoRedo from '../../hooks/useUndoRedo';
 
 const classes = {
@@ -34,14 +34,17 @@ interface PageEditorContentProps {
 }
 
 function PageEditorContent({ node }: PageEditorContentProps) {
-  usePageTitle(`${node.attributes.title.value} | Toolpad editor`);
+  usePageTitle(`${node.attributes.title} | Toolpad editor`);
 
   const [splitDefaultSize, setSplitDefaultSize] = useLocalStorageState<number>(
     `editor/component-panel-split`,
     300,
   );
 
-  const handleSplitChange = useDebouncedHandler((newSize) => setSplitDefaultSize(newSize), 100);
+  const handleSplitChange = useDebouncedHandler(
+    (newSize: number) => setSplitDefaultSize(newSize),
+    100,
+  );
 
   return (
     <PageEditorProvider key={node.id} nodeId={node.id}>

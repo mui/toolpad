@@ -1,13 +1,15 @@
 import * as React from 'react';
 import PropTypes from 'prop-types';
+import { alpha } from '@mui/material/styles';
 import Box from '@mui/material/Box';
-import Container from '@mui/material/Container';
 import Paper from '@mui/material/Paper';
 import Typography from '@mui/material/Typography';
 import Grid from '@mui/material/Unstable_Grid2';
 import SectionHeadline from 'docs/src/components/typography/SectionHeadline';
+import Section from 'docs/src/layouts/Section';
 import IconImage from 'docs/src/components/icon/IconImage';
-import { alpha } from '@mui/material/styles';
+import Banner from './Banner';
+import ROUTES from '../../route';
 
 const cardRootStyle = (imageUrl) => ({
   px: imageUrl ? 0 : 2,
@@ -40,25 +42,29 @@ export default function CardGrid(props) {
     <Box
       sx={
         darker
-          ? {
-              background: (theme) =>
-                theme.palette.mode === 'dark'
-                  ? `radial-gradient(200% 150% at 50% 20%, transparent 30%, ${theme.palette.primaryDark[300]} 100%, ${theme.palette.primaryDark[100]} 0)`
-                  : `linear-gradient(180deg, ${theme.palette.grey[50]} 0%, ${alpha(
-                      theme.palette.grey[100],
-                      0.4,
-                    )} 100%)`,
-            }
+          ? [
+              {
+                background: (theme) =>
+                  `linear-gradient(180deg, ${theme.palette.grey[50]} 0%, ${alpha(
+                    theme.palette.grey[100],
+                    0.4,
+                  )} 100%)`,
+              },
+              (theme) =>
+                theme.applyDarkStyles({
+                  background: `radial-gradient(200% 150% at 50% 20%, transparent 30%, ${theme.palette.primaryDark[300]} 100%, ${theme.palette.primaryDark[100]} 0)`,
+                }),
+            ]
           : null
       }
     >
-      <Container sx={{ py: { xs: 4, sm: 8 } }}>
+      <Section>
         <SectionHeadline overline={content.overline} title={content.Headline} />
-        <Grid container spacing={{ xs: 2, sm: 2, md: 3 }} columns={{ xs: 1, sm: 2 }}>
+        <Grid container spacing={2} columns={{ xs: 1, sm: 3 }}>
           {content.cards.map(({ icon, title, wip, imageUrl, description }) => (
             <Grid key={title} xs={2} sm={1}>
               <Paper variant="outlined" sx={cardRootStyle(imageUrl)}>
-                {imageUrl ? <Box sx={cardMediaStyle(imageUrl)} /> : null}
+                {imageUrl && <Box sx={cardMediaStyle(imageUrl)} />}
                 <Box sx={cardContentRootStyle(imageUrl)}>
                   <Box
                     sx={{
@@ -75,12 +81,12 @@ export default function CardGrid(props) {
                         component="h3"
                         color="text.primary"
                         variant="body2"
-                        sx={{ ml: imageUrl ? 0 : 1 }}
+                        sx={{ ml: imageUrl ? 0 : 0.8 }}
                       >
                         {title}
                       </Typography>
                     </Box>
-                    {wip ? <IconImage name="time" title="Work in progress" /> : null}
+                    {wip && <IconImage name="time" title="Work in progress" />}
                   </Box>
                   <Typography variant="body2" color="text.secondary">
                     {description}
@@ -90,7 +96,15 @@ export default function CardGrid(props) {
             </Grid>
           ))}
         </Grid>
-      </Container>
+        <Banner
+          action="Upvote"
+          category="ToolpadLanding"
+          label="Upvote"
+          title="Upvote the features you want to get prioritized 👍"
+          description="Want to request a feature? Head over to our repo and if not already listed, feel free to open an issue explaining the use case."
+          href={ROUTES.toolpadUpvote}
+        />
+      </Section>
     </Box>
   );
 }

@@ -28,6 +28,7 @@
 /toolpad/data-binding/binding-state/ /toolpad/concepts/managing-state/ 301
 /toolpad/data-binding/event-handling/ /toolpad/concepts/managing-state/#event-handling 301
 /toolpad/deployment/ /toolpad/concepts/deployment/ 301
+/toolpad/examples/admin-app/ /toolpad/examples/basic-crud-app/ 301
 
 # Create separate namespace on https://mui.com
 

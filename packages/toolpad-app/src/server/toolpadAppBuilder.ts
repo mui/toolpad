@@ -1,7 +1,7 @@
-import { InlineConfig, Plugin, build } from 'vite';
-import react from '@vitejs/plugin-react';
 import * as path from 'path';
 import { Server } from 'http';
+import { InlineConfig, Plugin, build } from 'vite';
+import react from '@vitejs/plugin-react';
 import serializeJavascript from 'serialize-javascript';
 import { indent } from '@mui/toolpad-utils/strings';
 import { MUI_X_PRO_LICENSE, RUNTIME_CONFIG_WINDOW_PROPERTY } from '../constants';
@@ -77,6 +77,7 @@ export function postProcessHtml(html: string, { config, dom }: PostProcessHtmlPa
     `<script>window[${JSON.stringify(
       INITIAL_STATE_WINDOW_PROPERTY,
     )}] = ${serializedInitialState}</script>`,
+    `<meta name="toolpad-x-license" content=${JSON.stringify(MUI_X_PRO_LICENSE)} />`,
   ];
 
   return html.replace(`<!-- __TOOLPAD_SCRIPTS__ -->`, () => toolpadScripts.join('\n'));
@@ -92,12 +93,9 @@ function toolpadVitePlugin({ root, base }: ToolpadVitePluginParams): Plugin {
   const resolvedCanvasEntryPointId = `\0${CANVAS_ENTRY}`;
 
   const getEntryPoint = (isCanvas: boolean) => `
-    import { init, setComponents } from '@mui/toolpad-app/runtime';
-    import { LicenseInfo } from '@mui/x-data-grid-pro';
+    import { init, setComponents } from '@mui/toolpad/runtime';
     import components from ${JSON.stringify(componentsId)};
-    ${isCanvas ? `import AppCanvas from '@mui/toolpad-app/canvas'` : ''}
-    
-    LicenseInfo.setLicenseKey(${JSON.stringify(MUI_X_PRO_LICENSE)});
+    ${isCanvas ? `import AppCanvas from '@mui/toolpad/canvas'` : ''}
     
     const initialState = window[${JSON.stringify(INITIAL_STATE_WINDOW_PROPERTY)}];
 
@@ -235,44 +233,49 @@ export function createViteConfig({
     },
     optimizeDeps: {
       include: [
-        'react',
-        'react/jsx-runtime',
-        'react/jsx-dev-runtime',
-        'react-dom/client',
-        'react-error-boundary',
-        '@mui/x-data-grid-pro',
+        '@emotion/cache',
+        '@emotion/react',
+        '@mui/icons-material/ArrowDropDownRounded',
+        '@mui/icons-material/DarkMode',
+        '@mui/icons-material/Edit',
+        '@mui/icons-material/Error',
+        '@mui/icons-material/HelpOutlined',
+        '@mui/icons-material/LightMode',
+        '@mui/icons-material/OpenInNew',
+        '@mui/icons-material/SettingsBrightnessOutlined',
+        '@mui/lab',
+        '@mui/material',
         '@mui/material/Button',
         '@mui/material/colors',
-        '@mui/icons-material/Error',
-        '@mui/icons-material/Edit',
-        '@mui/icons-material/HelpOutlined',
-        '@mui/icons-material/OpenInNew',
-        '@mui/icons-material/LightMode',
-        '@mui/icons-material/DarkMode',
-        '@mui/icons-material/SettingsBrightnessOutlined',
-        '@mui/icons-material/ArrowDropDownRounded',
         '@mui/material/styles',
-        '@mui/utils',
         '@mui/material/useMediaQuery',
-        '@mui/lab',
-        '@mui/x-date-pickers/LocalizationProvider',
-        '@mui/x-date-pickers/DesktopDatePicker',
+        '@mui/utils',
+        '@mui/x-data-grid-pro',
         '@mui/x-date-pickers/AdapterDayjs',
-        '@mui/material',
+        '@mui/x-date-pickers/DesktopDatePicker',
+        '@mui/x-date-pickers/LocalizationProvider',
         '@tanstack/react-query',
-        'invariant',
-        'lodash-es',
-        'react-router-dom',
-        'fractional-indexing',
-        'nanoid/non-secure',
-        'superjson',
         '@tanstack/react-query-devtools/build/lib/index.prod.js',
-        'react-is',
-        'markdown-to-jsx',
         'dayjs',
         'dayjs/locale/en',
-        'dayjs/locale/nl',
         'dayjs/locale/fr',
+        'dayjs/locale/nl',
+        'fractional-indexing',
+        'invariant',
+        'lodash-es',
+        'markdown-to-jsx',
+        'nanoid/non-secure',
+        'react',
+        'react-dom/client',
+        'react-error-boundary',
+        'react-hook-form',
+        'react-is',
+        'react-router-dom',
+        'react/jsx-dev-runtime',
+        'react/jsx-runtime',
+        'recharts',
+        'superjson',
+        'zod',
       ],
     },
     appType: 'custom',

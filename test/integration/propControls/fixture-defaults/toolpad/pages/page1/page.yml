@@ -1,0 +1,28 @@
+apiVersion: v1
+kind: page
+spec:
+  id: 2a73ucu
+  title: page1
+  content:
+    - component: PageRow
+      name: pageRow2
+      children:
+        - component: Select
+          name: select
+          props:
+            options:
+              - aaaa
+              - dsfsdfsd
+    - component: PageRow
+      name: pageRow1
+      children:
+        - component: DataGrid
+          name: dataGrid
+          props:
+            rows:
+              $$jsExpression: "}"
+    - component: PageRow
+      name: pageRow
+      children:
+        - component: Button
+          name: button

@@ -17,19 +17,19 @@ This will use the local version of Toolpad as built in the monorepo. This is rec
 
 1. Install dependencies:
 
-   ```sh
+   ```bash
    yarn install
    ```
 
 1. Run the build in watch mode
 
-   ```sh
+   ```bash
    yarn dev
    ```
 
 1. Run Toolpad
 
-   ```sh
+   ```bash
    yarn toolpad dev test/integration/backend-basic/fixture --dev
    ```
 
@@ -49,15 +49,17 @@ If your application has dependencies other than `@mui/toolpad`, you have to temp
    },
    ```
 
+   You may also temporarily remove/rename the `dev`/`build` commands in `examples/qr-generator/package.json` to avoid them getting picked up automatically by `lerna`.
+
 1. Run
 
-   ```sh
+   ```bash
    yarn install
    ```
 
 1. Make sure to start the build in watch mode again and the run the app with
 
-   ```sh
+   ```bash
    yarn toolpad dev examples/qr-generator --dev
    ```
 
@@ -70,13 +72,13 @@ In some cases you may want to link local toolpad into a project on your laptop.
 
 1. Install dependencies:
 
-```sh
+```bash
 yarn install
 ```
 
 1. Run the build in watch mode
 
-   ```sh
+   ```bash
    yarn dev
    ```
 
@@ -93,10 +95,10 @@ yarn install
        "start": "toolpad start --dev"
      },
      "dependencies": {
-       "@mui/toolpad": "portal:<your-local-toolpad-monorepo>/packages/toolpad"
+       "@mui/toolpad": "portal:<your-local-toolpad-monorepo>/packages/toolpad-app"
      },
      "resolutions": {
-       "@mui/toolpad-app": "portal:<your-local-toolpad-monorepo>/packages/toolpad-app",
+       "@mui/toolpad": "portal:<your-local-toolpad-monorepo>/packages/toolpad-app",
        "@mui/toolpad-core": "portal:<your-local-toolpad-monorepo>/packages/toolpad-core",
        "@mui/toolpad-components": "portal:<your-local-toolpad-monorepo>/packages/toolpad-components",
        "@mui/toolpad-utils": "portal:<your-local-toolpad-monorepo>/packages/toolpad-utils"
@@ -108,7 +110,7 @@ yarn install
 
    1. In order to use `portal:` dependencies, we will need to use yarn 2. So start by running
 
-      ```sh
+      ```bash
       yarn set version berry
       ```
 
@@ -120,35 +122,55 @@ yarn install
 
    1. then run
 
-      ```sh
+      ```bash
       yarn install
       ```
 
 1. Run start toolpad in dev mode:
 
-   ```sh
+   ```bash
    yarn dev
    ```
 
 </details>
 
+## Running integration tests
+
+The playwright tests can be run in one of two modes:
+
+1. Build the production target, then run the integration tests in production mode:
+
+   ```bash
+   yarn release:build
+   yarn test:integration --project chromium
+   ```
+
+2. Toolpad in dev watchmode and run the integration tests in dev mode with the `TOOLPAD_NEXT_DEV` environment variable (slower)
+
+   ```bash
+   yarn dev
+   TOOLPAD_NEXT_DEV=1 yarn test:integration --project chromium
+   ```
+
+Use the `--ui` flag to run the tests interactively.
+
 ## Building and running the documentation
 
 1. If you haven't already, install the project dependencies using
 
-   ```sh
+   ```bash
    yarn
    ```
 
 1. To start the documentation application in dev mode run
 
-   ```sh
+   ```bash
    yarn docs:dev
    ```
 
    If all goes well it should print
 
-   ```sh
+   ```bash
    ready - started server on 0.0.0.0:3003, url: http://localhost:3003
    ```
 
@@ -159,44 +181,43 @@ yarn install
 - Check out the PR branch locally with your tool of choice ([GitHub Docs](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/reviewing-changes-in-pull-requests/checking-out-pull-requests-locally?tool=cli))
 - Run to build the project
 
-  ```sh
+  ```bash
   yarn && yarn release:build
   ```
 
 - Run it on your project of choice
 
-  ```sh
+  ```bash
   yarn toolpad dev /path/to/my/toolpad/project
   ```
 
-## Integration tests
+## Using CodeSandbox CI
 
-- To run Toolpad on a fixture
+Each pull request is built on [CodeSandbox CI](https://codesandbox.io/docs/learn/sandboxes/ci). As a result of that we have a published Toolpad package for ever pull request. To use the package from the pull request, take the following steps:
 
-  ```sh
-  yarn toolpad dev --dev ./path/to/fixture
-  ```
+1. In the GitHub PR checks, locate the ci/codesandbox check and make sure it has successfully finished building. Click on "details" to open the CodeSandbox CI user interface.
 
-- To run the tests locally in production mode
+2. In the codesandbox UI, on the right panel, locate and expand the "Packages (6)" section.
 
-  ```sh
-  yarn build:release
-  yarn test:integration --project chromium
-  ```
+3. Right click the link named `@mui/toolpad` and copy the address
 
-- To run the tests locally in dev mode
+   ![Copy CodeSandbox CI package link](contributing/codesandbox-ci-package-link.png)
 
-  ```sh
-  yarn dev
-  ```
+4. In your `package.json`, for the `@mui/toolpad` dependency, replace the version with aforementioned link. e.g.
 
-  then run
+   ```json
+   "dependencies": {
+      "@mui/toolpad": "https://pkg.csb.dev/mui/mui-toolpad/commit/<commit>/@mui/toolpad"
+   }
+   ```
 
-  ```sh
-  TOOLPAD_NEXT_DEV=1 yarn test:integration --project chromium
-  ```
+5. Run
 
-- Use the `--ui` flag to run the tests interactively
+   ```bash
+   yarn --force
+   ```
+
+You'll now be able to explore your project with the Toolpad version from the GitHub PR.
 
 ## Sending a pull request
 

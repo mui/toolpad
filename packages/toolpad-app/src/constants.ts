@@ -15,17 +15,6 @@ export const DOCUMENTATION_INSTALLATION_URL =
 export const ROADMAP_URL = 'https://github.com/orgs/mui/projects/9';
 export const SCHEDULE_DEMO_URL = 'https://calendly.com/prakhar-mui/toolpad';
 
-export const PRODUCTION_DATASOURCES = new Set([
-  'rest',
-  'function',
-  'googleSheets',
-  'postgres',
-  'mysql',
-  'local',
-]);
-
 export const TOOLPAD_BRIDGE_GLOBAL = '__TOOLPAD_BRIDGE__';
-
-export const NON_BINDABLE_CONTROL_TYPES = ['GridColumns'];
 
 export const VERSION_CHECK_INTERVAL = 1000 * 60 * 10;

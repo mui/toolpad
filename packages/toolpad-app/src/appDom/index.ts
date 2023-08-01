@@ -3,21 +3,23 @@ import { generateKeyBetween } from 'fractional-indexing';
 import {
   NodeId,
   NodeReference,
-  ConstantAttrValue,
   BindableAttrValue,
   BindableAttrValues,
   SecretAttrValue,
   BindableAttrEntries,
+  JsExpressionAttrValue,
+  EnvAttrValue,
 } from '@mui/toolpad-core';
 import invariant from 'invariant';
-import { BoxProps } from '@mui/material';
+import { BoxProps, ThemeOptions as MuiThemeOptions } from '@mui/material';
 import { pascalCase, removeDiacritics, uncapitalize } from '@mui/toolpad-utils/strings';
 import { mapProperties, mapValues } from '@mui/toolpad-utils/collections';
-import { ConnectionStatus, AppTheme } from '../types';
+import { ConnectionStatus } from '../types';
 import { omit, update, updateOrCreate } from '../utils/immutability';
 import { ExactEntriesOf, Maybe } from '../utils/types';
+import { envBindingSchema } from '../server/schema';
 
-export const CURRENT_APPDOM_VERSION = 6;
+export const CURRENT_APPDOM_VERSION = 7;
 
 export const RESERVED_NODE_PROPERTIES = [
   'id',
@@ -50,7 +52,7 @@ type AppDomNodeType =
   | 'query'
   | 'mutation';
 
-interface AppDomNodeBase {
+export interface AppDomNodeBase {
   readonly id: NodeId;
   readonly type: AppDomNodeType;
   readonly name: string;
@@ -67,15 +69,15 @@ export interface AppNode extends AppDomNodeBase {
 
 export interface ThemeNode extends AppDomNodeBase {
   readonly type: 'theme';
-  readonly theme?: BindableAttrValues<AppTheme>;
+  readonly theme?: MuiThemeOptions;
 }
 
 export interface ConnectionNode<P = unknown> extends AppDomNodeBase {
   readonly type: 'connection';
   readonly attributes: {
-    readonly dataSource: ConstantAttrValue<string>;
+    readonly dataSource: string;
     readonly params: SecretAttrValue<P | null>;
-    readonly status: ConstantAttrValue<ConnectionStatus | null>;
+    readonly status: ConnectionStatus | null;
   };
 }
 
@@ -84,31 +86,31 @@ export type PageDisplayMode = 'standalone' | 'shell';
 export interface PageNode extends AppDomNodeBase {
   readonly type: 'page';
   readonly attributes: {
-    readonly title: ConstantAttrValue<string>;
-    readonly parameters?: ConstantAttrValue<[string, string][]>;
-    readonly module?: ConstantAttrValue<string>;
-    readonly display?: ConstantAttrValue<PageDisplayMode>;
+    readonly title: string;
+    readonly parameters?: [string, string][];
+    readonly module?: string;
+    readonly display?: PageDisplayMode;
   };
 }
 
 export interface ElementNode<P = any> extends AppDomNodeBase {
   readonly type: 'element';
   readonly attributes: {
-    readonly component: ConstantAttrValue<string>;
+    readonly component: string;
   };
   readonly props?: BindableAttrValues<P>;
   readonly layout?: {
-    readonly horizontalAlign?: ConstantAttrValue<BoxProps['justifyContent']>;
-    readonly verticalAlign?: ConstantAttrValue<BoxProps['alignItems']>;
-    readonly columnSize?: ConstantAttrValue<number>;
+    readonly horizontalAlign?: BoxProps['justifyContent'];
+    readonly verticalAlign?: BoxProps['alignItems'];
+    readonly columnSize?: number;
   };
 }
 
 export interface CodeComponentNode extends AppDomNodeBase {
   readonly type: 'codeComponent';
   readonly attributes: {
-    readonly code: ConstantAttrValue<string>;
-    readonly isNew?: ConstantAttrValue<boolean>;
+    readonly code: string;
+    readonly isNew?: boolean;
   };
 }
 
@@ -124,18 +126,18 @@ export interface QueryNode<Q = any> extends AppDomNodeBase {
   readonly type: 'query';
   readonly params?: BindableAttrEntries;
   readonly attributes: {
-    readonly mode?: ConstantAttrValue<FetchMode>;
-    readonly dataSource?: ConstantAttrValue<string>;
-    readonly connectionId: ConstantAttrValue<NodeReference | null>;
-    readonly query: ConstantAttrValue<Q>;
-    readonly transform?: ConstantAttrValue<string>;
-    readonly transformEnabled?: ConstantAttrValue<boolean>;
+    readonly mode?: FetchMode;
+    readonly dataSource?: string;
+    readonly connectionId: NodeReference | null;
+    readonly query: Q;
+    readonly transform?: string;
+    readonly transformEnabled?: boolean;
     /** @deprecated Not necessary to be user-facing, we will expose staleTime instead if necessary */
-    readonly refetchOnWindowFocus?: ConstantAttrValue<boolean>;
+    readonly refetchOnWindowFocus?: boolean;
     /** @deprecated Not necessary to be user-facing, we will expose staleTime instead if necessary */
-    readonly refetchOnReconnect?: ConstantAttrValue<boolean>;
-    readonly refetchInterval?: ConstantAttrValue<number>;
-    readonly cacheTime?: ConstantAttrValue<number>;
+    readonly refetchOnReconnect?: boolean;
+    readonly refetchInterval?: number;
+    readonly cacheTime?: number;
     readonly enabled?: BindableAttrValue<boolean>;
   };
 }
@@ -147,9 +149,9 @@ export interface MutationNode<Q = any> extends AppDomNodeBase {
   readonly type: 'mutation';
   readonly params?: BindableAttrValues;
   readonly attributes: {
-    readonly dataSource?: ConstantAttrValue<string>;
-    readonly connectionId: ConstantAttrValue<NodeReference | null>;
-    readonly query: ConstantAttrValue<Q>;
+    readonly dataSource?: string;
+    readonly connectionId: NodeReference | null;
+    readonly query: Q;
   };
 }
 
@@ -238,12 +240,8 @@ export function createId(): NodeId {
   return nanoid(7) as NodeId;
 }
 
-export function createConst<V>(value: V): ConstantAttrValue<V> {
-  return { type: 'const', value };
-}
-
 export function createSecret<V>(value: V): SecretAttrValue<V> {
-  return { type: 'secret', value };
+  return { $$secret: value };
 }
 
 export function getMaybeNode<T extends AppDomNodeType>(
@@ -369,7 +367,6 @@ export function getApp(dom: AppDom): AppNode {
 
 export type NodeChildren<N extends AppDomNode = any> = ChildNodesOf<N>;
 
-// TODO: memoize the result of this function per dom in a WeakMap
 const childrenMemo = new WeakMap<AppDom, Map<NodeId, NodeChildren<any>>>();
 export function getChildNodes<N extends AppDomNode>(dom: AppDom, parent: N): NodeChildren<N> {
   let domChildrenMemo = childrenMemo.get(dom);
@@ -547,7 +544,7 @@ export function createElement<P>(
     name: name || uncapitalize(component),
     props,
     attributes: {
-      component: createConst(component),
+      component,
     },
     layout,
   });
@@ -612,7 +609,7 @@ export function getPageAncestor(dom: AppDom, node: AppDomNode): PageNode | null 
  */
 export function getComponentTypeNodes(dom: AppDom, componentId: string): readonly AppDomNode[] {
   return Object.values(dom.nodes).filter(
-    (node) => isElement(node) && node.attributes.component.value === componentId,
+    (node) => isElement(node) && node.attributes.component === componentId,
   );
 }
 
@@ -735,13 +732,8 @@ export function setQueryProp<Q, K extends keyof Q>(
   prop: K,
   value: Q[K],
 ): QueryNode<Q> {
-  const original = node.attributes.query.value;
-  return setNamespacedProp(
-    node,
-    'attributes',
-    'query',
-    createConst<Q>({ ...original, [prop]: value }),
-  );
+  const original = node.attributes.query;
+  return setNamespacedProp(node, 'attributes', 'query', { ...original, [prop]: value });
 }
 
 export function setNodeNamespacedProp<
@@ -863,8 +855,11 @@ export function removeNode(dom: AppDom, nodeId: NodeId) {
   });
 }
 
-export function toConstPropValue<T = any>(value: T): ConstantAttrValue<T> {
-  return { type: 'const', value };
+export function removeMaybeNode(dom: AppDom, nodeId: NodeId): AppDom {
+  if (getMaybeNode(dom, nodeId)) {
+    return removeNode(dom, nodeId);
+  }
+  return dom;
 }
 
 export function fromConstPropValue(prop: undefined): undefined;
@@ -874,10 +869,10 @@ export function fromConstPropValue<T>(prop?: BindableAttrValue<T | undefined>): 
   if (!prop) {
     return undefined;
   }
-  if (prop.type !== 'const') {
+  if ((prop as JsExpressionAttrValue).$$jsExpression || (prop as EnvAttrValue).$$env) {
     throw new Error(`trying to unbox a non-constant prop value`);
   }
-  return prop.value;
+  return prop as T;
 }
 
 export function fromConstPropValues<P>(props: BindableAttrValues<P>): Partial<P> {
@@ -1081,7 +1076,7 @@ function createRenderTreeNode(node: AppDomNode): RenderTreeNode | null {
   }
 
   if (isQuery(node) || isMutation(node)) {
-    if (node.attributes.query.value) {
+    if (node.attributes.query) {
       node = setNamespacedProp(node, 'attributes', 'query', null);
     }
   }
@@ -1129,8 +1124,8 @@ export function createDefaultDom(): AppDom {
   const newPageNode = createNode(dom, 'page', {
     name: 'Page 1',
     attributes: {
-      title: createConst('Page 1'),
-      display: createConst('shell'),
+      title: 'Page 1',
+      display: 'shell',
     },
   });
 
@@ -1148,4 +1143,84 @@ export function getPageByName(dom: AppDom, name: string): PageNode | null {
 export function getQueryByName(dom: AppDom, page: PageNode, name: string): QueryNode | null {
   const { queries = [] } = getChildNodes(dom, page);
   return queries.find((query) => query.name === name) ?? null;
+}
+
+/**
+ * Represents the changes between two doms in terms of added/deleted nodes.
+ */
+export interface DomDiff {
+  set: AppDomNode[];
+  unset: NodeId[];
+}
+
+/**
+ * Compare two doms and return a diff of the changes.
+ */
+export function createDiff(from: AppDom, to: AppDom): DomDiff {
+  const result: DomDiff = {
+    set: [],
+    unset: [],
+  };
+
+  const allIds = new Set<NodeId>([
+    ...(Object.keys(from.nodes) as NodeId[]),
+    ...(Object.keys(to.nodes) as NodeId[]),
+  ]);
+
+  for (const id of allIds) {
+    if (to.nodes[id] && to.nodes[id] !== from.nodes[id]) {
+      result.set.push(to.nodes[id]);
+    } else if (!to.nodes[id] && from.nodes[id]) {
+      result.unset.push(id);
+    }
+  }
+
+  return result;
+}
+
+/**
+ * Apply a diff to a dom and return the new dom.
+ */
+export function applyDiff(dom: AppDom, diff: DomDiff): AppDom {
+  let result = dom;
+
+  for (const node of diff.set) {
+    result = update(result, {
+      nodes: update(result.nodes, {
+        [node.id]: node,
+      }),
+    });
+  }
+
+  for (const id of diff.unset) {
+    result = update(result, {
+      nodes: omit(result.nodes, id),
+    });
+  }
+
+  return result;
+}
+
+function findEnvBindings(obj: unknown): EnvAttrValue[] {
+  if (Array.isArray(obj)) {
+    return obj.flatMap((item) => findEnvBindings(item));
+  }
+
+  if (obj && typeof obj === 'object') {
+    try {
+      return [envBindingSchema.parse(obj)];
+    } catch {
+      return Object.values(obj).flatMap((value) => findEnvBindings(value));
+    }
+  }
+
+  return [];
+}
+
+export function getRequiredEnvVars(dom: AppDom): Set<string> {
+  const allVars = Object.values(dom.nodes)
+    .flatMap((node) => findEnvBindings(node))
+    .map((binding) => binding.$$env);
+
+  return new Set(allVars);
 }

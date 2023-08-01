@@ -1,0 +1,70 @@
+apiVersion: v1
+kind: page
+spec:
+  id: mQq12pH
+  title: globalScope
+  display: shell
+  content:
+    - component: PageRow
+      name: pageRow5
+      children:
+        - component: Text
+          name: text5
+          props:
+            variant: h2
+            value: "Bindings: global scope access"
+    - component: PageRow
+      name: pageRow
+      children:
+        - component: Text
+          name: text
+          props:
+            value:
+              $$jsExpression: |
+                `Allows ecmascript globals |test1 ${
+                  typeof Array !== "undefined" ? "ok" : "nok"
+                }|`
+    - component: PageRow
+      name: pageRow1
+      children:
+        - component: Text
+          name: text1
+          props:
+            value:
+              $$jsExpression: |
+                `Disallows DOM globals |test2 ${
+                  typeof document === "undefined" ? "ok" : "nok"
+                }|`
+    - component: PageRow
+      name: pageRow2
+      children:
+        - component: Text
+          name: text2
+          props:
+            value:
+              $$jsExpression: |
+                `Supports globalThis |test3 ${
+                  typeof globalThis !== "undefined" ? "ok" : "nok"
+                }|`
+    - component: PageRow
+      name: pageRow3
+      children:
+        - component: Text
+          name: text3
+          props:
+            value:
+              $$jsExpression: |
+                `Disallows localStorage globals |test4 ${
+                  typeof localStorage === "undefined" ? "ok" : "nok"
+                }|`
+    - component: PageRow
+      name: pageRow4
+      children:
+        - component: Text
+          name: text4
+          props:
+            value:
+              $$jsExpression: |
+                `Disallows globalThis.localStorage |test5 ${
+                  typeof globalThis.localStorage === "undefined" ? "ok" : "nok"
+                }|`

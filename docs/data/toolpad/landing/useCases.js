@@ -11,25 +11,37 @@ const useCases = {
   ),
   cards: [
     {
-      title: 'Monitoring dashboard',
+      title: 'Utility apps',
       wip: false,
-      imageUrl: '/static/toolpad/marketing/index-monitoring-dashboard.svg',
+      imageUrl: '/static/toolpad/marketing/qr-generator.png',
       description:
-        'Quickly provide the latest numbers and status reports that fuel data-driven decisions. Build and share your dashboard by combining data from multiple sources with dependable deployment mechanism when needed.',
+        'Provide the stakeholders with simple apps to manage their daily operations. You can quickly build an app on Toolpad by calling APIs or writing custom functions. Your app remains secure as the code never leaves your network, and you can securely deploy it to any service you choose.',
+      action: {
+        href: '/toolpad/examples/qr-generator/',
+        label: 'View example',
+      },
     },
     {
       title: 'Admin panel',
       wip: false,
-      imageUrl: '/static/toolpad/marketing/index-admin-panel.svg',
+      imageUrl: '/static/toolpad/marketing/admin-app.png',
       description:
-        'Enable your teams to quickly view and manage customer orders, queries, and refunds by creating apps powered by native Toolpad integrations and third party APIs from providers like Stripe, Twilio, etc. Toolpad allows end users to create, read, update or delete records.',
+        'Enable your teams to quickly view and manage customer orders, queries, and refunds by creating admin apps that gather data from third-party APIs providers like Stripe, Twilio, Zendesk, etc. Toolpad allows end users to create, read, update, or delete records.',
+      action: {
+        href: '/toolpad/examples/basic-crud-app/',
+        label: 'View example',
+      },
     },
     {
-      title: 'Custom CMS',
+      title: 'BI dashboard',
       wip: false,
-      imageUrl: '/static/toolpad/marketing/index-custom-cms.svg',
+      imageUrl: '/static/toolpad/marketing/npm-stats.png',
       description:
-        'Enable your operations teams to efficiently manage day to day chores using task specific content management apps. Built with MUI components, apps are fast, manageable and scalable. Toolpad allows you to bind data the pro-code way by writing JavaScript anywhere. ',
+        'Build BI dashboards to slice and dice any metric across various dimensions. Further, use them to monitor KPIs, track business goals, and identify trends and opportunities. Toolpad allows you to combine data from multiple sources and bind it by writing JavaScript anywhere.',
+      action: {
+        href: '/toolpad/examples/npm-stats/',
+        label: 'View example',
+      },
     },
   ],
 };

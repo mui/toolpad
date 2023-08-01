@@ -53,6 +53,16 @@ spec:
                       props:
                         name: file
                         label: file
+                    - component: Autocomplete
+                      name: autocomplete
+                      props:
+                        options:
+                          - Portugal
+                          - Belgium
+                          - India
+                        label: country
+                        name: country
+                        isRequired: true
     - component: PageRow
       name: pageRow2
       children:

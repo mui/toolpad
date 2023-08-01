@@ -1,3 +1,7 @@
+// TODO: remove these lodash-es imports
+// eslint-disable-next-line no-restricted-imports
+import { setWith, clone } from 'lodash-es';
+
 /**
  * Applies changes to an object in an immutable way. The `dest` object will adopt the properties of
  * the `src` object. Object identity is preserved if the operation results in a no-op.
@@ -22,10 +26,31 @@ export function updateOrCreate<T>(dest: T | null | undefined, src: NonNullable<T
 }
 
 /**
+ * Updates an object's property value for a given path in an immutable way.
+ */
+export function updatePath<P extends object, V>(obj: P, path: string, value: V): P {
+  return setWith(clone(obj), path, value, clone);
+}
+
+/**
  * Inserts a value in an immutable array.
  */
 export function insert<T>(array: readonly T[], value: T, index: number): T[] {
   return [...array.slice(0, index), value, ...array.slice(index)];
+}
+
+/**
+ * Updates a value in an immutable array.
+ */
+export function updateArray<T>(array: readonly T[], value: T, index: number): T[] {
+  return [...array.slice(0, index), value, ...array.slice(index + 1)];
+}
+
+/**
+ * Removes a value in an immutable array.
+ */
+export function remove<T>(array: readonly T[], index: number): T[] {
+  return [...array.slice(0, index), ...array.slice(index + 1)];
 }
 
 /**

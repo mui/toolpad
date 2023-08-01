@@ -1,8 +1,8 @@
 import { Box, Skeleton, SxProps, styled } from '@mui/material';
 import * as React from 'react';
 import { createComponent } from '@mui/toolpad-core';
-import { SX_PROP_HELPER_TEXT } from './constants.js';
-import ErrorOverlay from './components/ErrorOverlay.js';
+import { SX_PROP_HELPER_TEXT } from './constants';
+import ErrorOverlay from './components/ErrorOverlay';
 
 export interface ImageProps {
   src: string;

@@ -16,13 +16,13 @@ export interface SerializedError extends PlainObject {
   code?: unknown;
 }
 
-export function serializeError(error: Error & { code?: unknown }): SerializedError {
+export function serializeError(error: Error): SerializedError {
   const { message, name, stack, code } = error;
   return { message, name, stack, code };
 }
 
 /**
- * Creates a javascript `Error` from an unkown value if it's not already an error.
+ * Creates a javascript `Error` from an unknown value if it's not already an error.
  * Does a best effort at inferring a message. Intended to be used typically in `catch`
  * blocks, as there is no way to enforce only `Error` objects being thrown.
  *
@@ -31,7 +31,7 @@ export function serializeError(error: Error & { code?: unknown }): SerializedErr
  *   // ...
  * } catch (rawError) {
  *   const error = errorFrom(rawError);
- *   console.assert(error instancof Error);
+ *   console.assert(error instanceof Error);
  * }
  * ```
  */
@@ -44,7 +44,7 @@ export function errorFrom(maybeError: unknown): Error {
     typeof maybeError === 'object' &&
     maybeError &&
     hasOwnProperty(maybeError, 'message') &&
-    typeof maybeError.message! === 'string'
+    typeof maybeError.message === 'string'
   ) {
     return new Error(maybeError.message, { cause: maybeError });
   }
@@ -53,6 +53,6 @@ export function errorFrom(maybeError: unknown): Error {
     return new Error(maybeError, { cause: maybeError });
   }
 
-  const message = truncate(JSON.stringify(maybeError), 500);
+  const message = truncate(String(JSON.stringify(maybeError)), 500);
   return new Error(message, { cause: maybeError });
 }

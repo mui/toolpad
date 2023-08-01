@@ -277,7 +277,10 @@ function JsonSchemaPropertiesDisplay({ schema, idPrefix, open }: JsonSchemaPrope
   }
 
   if (schema.additionalProperties) {
-    properties.push(['*', schema.additionalProperties]);
+    properties.push([
+      '*',
+      typeof schema.additionalProperties === 'boolean' ? {} : schema.additionalProperties,
+    ]);
   }
 
   return properties.length > 0 ? (
@@ -396,7 +399,10 @@ function JsonSchemaNameValueDisplay({
   schema,
   idPrefix = '',
 }: JsonSchemaNameValueDisplayProps) {
-  invariant(typeof schema === 'object', `Expected an object but got ${typeof schema}`);
+  invariant(
+    typeof schema === 'object',
+    `Expected an object at "${name}" but got "${typeof schema}"`,
+  );
 
   const properties: [string, JSONSchema7Definition][] = [];
 
@@ -405,7 +411,10 @@ function JsonSchemaNameValueDisplay({
   }
 
   if (schema.additionalProperties) {
-    properties.push(['*', schema.additionalProperties]);
+    properties.push([
+      '*',
+      typeof schema.additionalProperties === 'boolean' ? {} : schema.additionalProperties,
+    ]);
   }
 
   const tooltipContext = React.useContext(TooltipContext);

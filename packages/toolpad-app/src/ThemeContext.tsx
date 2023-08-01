@@ -3,7 +3,7 @@ import { PaletteMode, ScopedCssBaseline } from '@mui/material';
 import { ThemeProvider as MuiThemeProvider, createTheme } from '@mui/material/styles';
 import { deepmerge } from '@mui/utils';
 import useMediaQuery from '@mui/material/useMediaQuery';
-import { getDesignTokens, getThemedComponents } from './theme';
+import { getDesignTokens, getMetaThemeColor, getThemedComponents } from './theme';
 import useLocalStorageState from './utils/useLocalStorageState';
 
 interface ThemeProviderProps {
@@ -45,6 +45,17 @@ export function ThemeProvider({ children }: ThemeProviderProps) {
     nextTheme = deepmerge(nextTheme, getThemedComponents(nextTheme));
 
     return nextTheme;
+  }, [paletteMode]);
+
+  React.useMemo(() => {
+    let meta: HTMLMetaElement | null = document.querySelector("meta[name='theme-color']");
+    if (!meta) {
+      meta = document.createElement('meta');
+      meta.name = 'theme-color';
+      document.head.appendChild(meta);
+    }
+    meta.setAttribute('content', getMetaThemeColor(paletteMode));
+    meta.setAttribute('media', `(prefers-color-scheme: ${paletteMode})`);
   }, [paletteMode]);
 
   return (

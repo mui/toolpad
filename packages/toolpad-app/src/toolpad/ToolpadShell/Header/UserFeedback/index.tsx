@@ -88,7 +88,7 @@ function getUpgradeMessage(packageManager: PackageManager | null): string {
     case 'yarn':
       return `yarn add ${pkgName}`;
     case 'pnpm':
-      return `pnpm install ${pkgName}`;
+      return `pnpm add ${pkgName}`;
     default:
       return `npm install ${pkgName}`;
   }
@@ -97,8 +97,8 @@ function getUpgradeMessage(packageManager: PackageManager | null): string {
 function UserFeedback() {
   const { buttonProps, menuProps } = useMenu();
 
-  invariant(process.env.TOOLPAD_VERSION, 'Missing process.env.TOOLPAD_VERSION');
-  invariant(process.env.TOOLPAD_BUILD, 'Missing process.env.TOOLPAD_BUILD');
+  invariant(process.env.TOOLPAD_VERSION, 'Missing env var TOOLPAD_VERSION');
+  invariant(process.env.TOOLPAD_BUILD, 'Missing env var TOOLPAD_BUILD');
 
   const { data: versionInfo } = client.useQuery('getVersionInfo', [], {
     staleTime: VERSION_CHECK_INTERVAL,

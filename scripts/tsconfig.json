@@ -1,9 +1,19 @@
 {
   "compilerOptions": {
+    "paths": {
+      "@mui/toolpad-components": ["../packages/toolpad-components/src/index.tsx"],
+      "@mui/toolpad-core": ["../packages/toolpad-core/src/index.tsx"],
+      "@mui/toolpad-core/numberFormat": ["../packages/toolpad-core/src/numberFormat.tsx"],
+      "@mui/toolpad-utils/*": [
+        "../packages/toolpad-utils/src/*.tsx",
+        "../packages/toolpad-utils/src/*.ts"
+      ]
+    },
     "module": "CommonJS",
     "noEmit": true,
     "esModuleInterop": true,
     "moduleResolution": "node",
-    "allowImportingTsExtensions": true
+    "allowImportingTsExtensions": true,
+    "jsx": "react"
   }
 }

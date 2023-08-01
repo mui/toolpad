@@ -60,9 +60,9 @@ function ConnectionSelectorDialog<Q>({ open, onCreated, onClose }: DataSourceSel
 
       const queryNode = appDom.createNode(dom, 'query', {
         attributes: {
-          query: appDom.createConst(dataSource.getInitialQueryValue()),
-          connectionId: appDom.createConst(null),
-          dataSource: appDom.createConst(dataSourceId),
+          query: dataSource.getInitialQueryValue(),
+          connectionId: null,
+          dataSource: dataSourceId,
         },
       });
 
@@ -218,9 +218,9 @@ export default function QueryEditor() {
 
       const node = appDom.createNode(dom, 'query', {
         attributes: {
-          query: appDom.createConst(dataSource.getInitialQueryValue()),
-          connectionId: appDom.createConst(null),
-          dataSource: appDom.createConst(dataSourceId),
+          query: dataSource.getInitialQueryValue(),
+          connectionId: null,
+          dataSource: dataSourceId,
         },
       });
 

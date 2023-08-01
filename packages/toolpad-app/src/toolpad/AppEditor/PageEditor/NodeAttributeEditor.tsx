@@ -6,14 +6,13 @@ import {
   RuntimeScope,
   ScopeMeta,
 } from '@mui/toolpad-core';
-import { Alert, Box } from '@mui/material';
+import { Alert, Box, SxProps } from '@mui/material';
 import { useBrowserJsRuntime } from '@mui/toolpad-core/jsBrowserRuntime';
 import * as appDom from '../../../appDom';
 import { useDomApi } from '../../AppState';
 import BindableEditor from './BindableEditor';
 import { usePageEditorState } from './PageEditorProvider';
-import { getDefaultControl } from '../../propertyControls';
-import { NON_BINDABLE_CONTROL_TYPES } from '../../../runtime/constants';
+import { getDefaultControl, usePropControlsContext } from '../../propertyControls';
 
 function buildScopeMeta(vm: ApplicationVm, bindingScope?: RuntimeScope): ScopeMeta {
   if (bindingScope?.parentScope) {
@@ -31,6 +30,7 @@ export interface NodeAttributeEditorProps<P extends object, K extends keyof P = 
   name: string;
   argType: ArgTypeDefinition<P, K>;
   props?: P;
+  sx?: SxProps;
 }
 
 export default function NodeAttributeEditor<P extends object>({
@@ -39,6 +39,7 @@ export default function NodeAttributeEditor<P extends object>({
   name,
   argType,
   props,
+  sx,
 }: NodeAttributeEditorProps<P>) {
   const domApi = useDomApi();
 
@@ -63,16 +64,14 @@ export default function NodeAttributeEditor<P extends object>({
 
   const scopeMeta = React.useMemo(() => buildScopeMeta(vm, bindingScope), [vm, bindingScope]);
 
-  const Control = getDefaultControl(argType, props);
+  const propTypeControls = usePropControlsContext();
+  const Control = getDefaultControl(propTypeControls, argType, props);
 
   // NOTE: Doesn't make much sense to bind controlled props. In the future we might opt
   // to make them bindable to other controlled props only
   const isDisabled = !!argType.onChangeProp;
 
-  const isBindable =
-    !isDisabled &&
-    namespace !== 'layout' &&
-    !NON_BINDABLE_CONTROL_TYPES.includes(argType.control?.type as string);
+  const isBindable = !isDisabled && namespace !== 'layout' && argType.control?.bindable !== false;
 
   const jsBrowserRuntime = useBrowserJsRuntime();
 
@@ -81,7 +80,7 @@ export default function NodeAttributeEditor<P extends object>({
       liveBinding={liveBinding}
       globalScope={bindingScope?.values ?? {}}
       globalScopeMeta={scopeMeta}
-      label={argType.label || name}
+      label={argType.control?.hideLabel ? '' : argType.label || name}
       bindable={isBindable}
       disabled={isDisabled}
       propType={argType}
@@ -93,6 +92,7 @@ export default function NodeAttributeEditor<P extends object>({
       )}
       value={propValue}
       onChange={handlePropChange}
+      sx={sx}
     />
   ) : (
     <Alert severity="warning">

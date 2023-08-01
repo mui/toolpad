@@ -1,14 +1,14 @@
-import * as yaml from 'yaml';
 import * as path from 'path';
 import * as fs from 'fs/promises';
+import * as yaml from 'yaml';
 import invariant from 'invariant';
 import openEditor from 'open-editor';
 import chalk from 'chalk';
-import { BindableAttrValue, NodeId } from '@mui/toolpad-core';
+import { BindableAttrValue, NodeId, PropBindableAttrValue } from '@mui/toolpad-core';
 import { fromZodError } from 'zod-validation-error';
 import { glob } from 'glob';
 import * as chokidar from 'chokidar';
-import { debounce } from 'lodash-es';
+import { debounce, throttle } from 'lodash-es';
 import { Emitter } from '@mui/toolpad-utils/events';
 import { errorFrom } from '@mui/toolpad-utils/errors';
 import { filterValues, hasOwnProperty, mapValues } from '@mui/toolpad-utils/collections';
@@ -22,13 +22,11 @@ import {
 } from '@mui/toolpad-utils/fs';
 import config from '../config';
 import * as appDom from '../appDom';
-import { migrateUp } from '../appDom/migrations';
 import insecureHash from '../utils/insecureHash';
 import {
   Page,
   Query,
   ElementType,
-  NavigationAction,
   pageSchema,
   Template,
   BindableProp,
@@ -54,7 +52,7 @@ import EnvManager from './EnvManager';
 import FunctionsManager from './FunctionsManager';
 
 export function getUserProjectRoot(): string {
-  const { projectDir } = config;
+  const projectDir = process.env.TOOLPAD_PROJECT_DIR;
   invariant(projectDir, 'Toolpad in local mode must have a project directory defined');
   return projectDir;
 }
@@ -101,19 +99,12 @@ export function getAppOutputFolder(root: string) {
   return path.join(getOutputFolder(root), 'app');
 }
 
-export async function getConfigFilePath(root: string) {
-  const yamlFilePath = path.join(root, './toolpad.yaml');
-  const ymlFilePath = path.join(root, './toolpad.yml');
-
-  if (await fileExists(yamlFilePath)) {
-    return yamlFilePath;
-  }
-
-  if (await fileExists(ymlFilePath)) {
-    return ymlFilePath;
-  }
-
-  return yamlFilePath;
+export async function legacyConfigFileExists(root: string): Promise<boolean> {
+  const [yamlFileExists, ymlFileExists] = await Promise.all([
+    fileExists(path.join(root, './toolpad.yaml')),
+    fileExists(path.join(root, './toolpad.yml')),
+  ]);
+  return yamlFileExists || ymlFileExists;
 }
 
 type ComponentsContent = Record<string, { code: string }>;
@@ -157,7 +148,7 @@ async function loadPagesFromFiles(root: string): Promise<PagesContent> {
         if (!content) {
           return null;
         }
-        let parsedFile: string | undefined;
+        let parsedFile: Page | undefined;
         try {
           parsedFile = yaml.parse(content);
         } catch (rawError) {
@@ -171,6 +162,7 @@ async function loadPagesFromFiles(root: string): Promise<PagesContent> {
         }
 
         const result = pageSchema.safeParse(parsedFile);
+
         if (result.success) {
           return [pageName, result.data];
         }
@@ -195,7 +187,19 @@ async function loadThemeFromFile(root: string): Promise<Theme | null> {
   const themeFilePath = getThemeFile(root);
   const content = await readMaybeFile(themeFilePath);
   if (content) {
-    return themeSchema.parse(yaml.parse(content));
+    const parsedFile = yaml.parse(content);
+    const result = themeSchema.safeParse(parsedFile);
+    if (result.success) {
+      return result.data;
+    }
+
+    console.error(
+      `${chalk.red('error')} - Failed to read theme ${chalk.cyan(themeFilePath)}. ${fromZodError(
+        result.error,
+      )}`,
+    );
+
+    return null;
   }
   return null;
 }
@@ -256,27 +260,6 @@ class Lock {
   }
 }
 
-const configFileLock = new Lock();
-
-async function loadConfigFileFrom(configFilePath: string): Promise<appDom.AppDom | null> {
-  // Using a lock to avoid read during write which may result in reading truncated file content
-  const configContent = await configFileLock.use(() => readMaybeFile(configFilePath));
-
-  if (!configContent) {
-    return null;
-  }
-
-  const parsedConfig = yaml.parse(configContent);
-  invariant(parsedConfig, 'Invalid Toolpad config');
-  return parsedConfig;
-}
-
-async function loadConfigFile(root: string): Promise<appDom.AppDom | null> {
-  const configFilePath = await getConfigFilePath(root);
-  const dom = await loadConfigFileFrom(configFilePath);
-  return dom;
-}
-
 const DEFAULT_GENERATED_GITIGNORE_FILE_CONTENT = `.generated
 `;
 
@@ -325,13 +308,13 @@ function mergeComponentsContentIntoDom(
           codeComponentNode,
           'attributes',
           'code',
-          appDom.createConst(content.code),
+          content.code,
         );
       } else {
         const newNode = appDom.createNode(dom, 'codeComponent', {
           name,
           attributes: {
-            code: appDom.createConst(content.code),
+            code: content.code,
           },
         });
         dom = appDom.addNode(dom, newNode, rootNode, 'codeComponents');
@@ -350,96 +333,13 @@ function mergeThemeIntoAppDom(dom: appDom.AppDom, themeFile: Theme): appDom.AppD
   dom = appDom.addNode(
     dom,
     appDom.createNode(dom, 'theme', {
-      theme: {
-        'palette.mode': appDom.toConstPropValue(themeFileSpec['palette.mode']),
-        'palette.primary.main': appDom.toConstPropValue(themeFileSpec['palette.primary.main']),
-        'palette.secondary.main': appDom.toConstPropValue(themeFileSpec['palette.secondary.main']),
-      },
+      theme: themeFileSpec.options,
       attributes: {},
     }),
     app,
     'themes',
   );
   return dom;
-}
-
-function toBindable<V>(
-  value: V | { $$jsExpression: string } | { $$env: string },
-): BindableAttrValue<V> {
-  if (value && typeof value === 'object' && typeof (value as any).$$jsExpression === 'string') {
-    return { type: 'jsExpression', value: (value as any).$$jsExpression };
-  }
-  if (value && typeof value === 'object' && typeof (value as any).$$env === 'string') {
-    return { type: 'env', value: (value as any).$$env };
-  }
-  return { type: 'const', value: value as V };
-}
-
-function fromBindable<V>(bindable: BindableAttrValue<V>) {
-  switch (bindable.type) {
-    case 'const':
-      return bindable.value;
-    case 'jsExpression':
-      return { $$jsExpression: bindable.value };
-    case 'env':
-      return { $$env: bindable.value };
-    default:
-      throw new Error(`Unsupported bindable "${bindable.type}"`);
-  }
-}
-
-function toBindableProp<V>(
-  value: V | { $$jsExpression: string } | { $$env: string },
-): BindableAttrValue<V> {
-  if (value && typeof value === 'object') {
-    if (typeof (value as any).$$jsExpression === 'string') {
-      return { type: 'jsExpression', value: (value as any).$$jsExpression };
-    }
-    if (typeof (value as any).$$env === 'string') {
-      return { type: 'env', value: (value as any).$$env };
-    }
-    if (typeof (value as any).$$jsExpressionAction === 'string') {
-      return { type: 'jsExpressionAction', value: (value as any).$$jsExpressionAction };
-    }
-    if (typeof (value as any).$$navigationAction === 'object') {
-      const action = value as any as NavigationAction;
-      return {
-        type: 'navigationAction',
-        value: {
-          page: { $ref: action.$$navigationAction.page as NodeId },
-          parameters: mapValues(
-            action.$$navigationAction.parameters,
-            (param) => param && toBindable(param),
-          ),
-        },
-      };
-    }
-  }
-  return { type: 'const', value: value as V };
-}
-
-function fromBindableProp<V>(bindable: BindableAttrValue<V>) {
-  switch (bindable.type) {
-    case 'const':
-      return bindable.value;
-    case 'jsExpression':
-      return { $$jsExpression: bindable.value };
-    case 'env':
-      return { $$env: bindable.value };
-    case 'jsExpressionAction':
-      return { $$jsExpressionAction: bindable.value };
-    case 'navigationAction':
-      return {
-        $$navigationAction: {
-          page: bindable.value.page.$ref,
-          parameters:
-            bindable.value.parameters &&
-            mapValues(bindable.value.parameters, (param) => param && fromBindable(param)),
-        },
-      };
-    default:
-      throw new Error(`Unsupported bindable "${bindable.type}"`);
-  }
 }
 
 function stringOnly(maybeString: unknown): string | undefined {
@@ -492,8 +392,8 @@ function createPageFileQueryFromDomQuery(
           case 'raw': {
             body = {
               kind: 'raw',
-              content: fromBindable(query.body.content),
-              contentType: query.body.contentType.value,
+              content: query.body.content as PropBindableAttrValue<string>,
+              contentType: query.body.contentType,
             };
             break;
           }
@@ -502,7 +402,7 @@ function createPageFileQueryFromDomQuery(
               kind: 'urlEncoded',
               content: query.body.content.map(([name, value]) => ({
                 name,
-                value: fromBindable(value),
+                value: value as PropBindableAttrValue<string>,
               })),
             };
             break;
@@ -539,12 +439,15 @@ function createPageFileQueryFromDomQuery(
 
       return {
         kind: 'rest',
-        url: query.url ? fromBindable(query.url) : undefined,
+        url: query.url as PropBindableAttrValue<string>,
         searchParams: query.searchParams?.map(([name, value]) => ({
           name,
-          value: fromBindable(value),
+          value: value as PropBindableAttrValue<string>,
         })),
-        headers: query.headers.map(([name, value]) => ({ name, value: fromBindable(value) })),
+        headers: query.headers.map(([name, value]) => ({
+          name,
+          value: value as PropBindableAttrValue<string>,
+        })),
         body,
         method: query.method,
         response,
@@ -586,13 +489,13 @@ function expandFromDom<N extends appDom.AppDomNode>(
       kind: 'page',
       spec: {
         id: node.id,
-        title: node.attributes.title?.value,
+        title: node.attributes.title,
         parameters: undefinedWhenEmpty(
-          node.attributes.parameters?.value.map(([name, value]) => ({ name, value })) ?? [],
+          node.attributes.parameters?.map(([name, value]) => ({ name, value })) ?? [],
         ),
         content: undefinedWhenEmpty(expandChildren(children.children || [], dom)),
         queries: undefinedWhenEmpty(expandChildren(children.queries || [], dom)),
-        display: node.attributes.display?.value,
+        display: node.attributes.display,
       },
     } satisfies Page;
   }
@@ -600,28 +503,24 @@ function expandFromDom<N extends appDom.AppDomNode>(
   if (appDom.isQuery(node)) {
     return {
       name: node.name,
-      enabled: node.attributes.enabled ? fromBindable(node.attributes.enabled) : undefined,
-      mode: node.attributes.mode?.value,
+      enabled: node.attributes.enabled as PropBindableAttrValue<boolean>,
+      mode: node.attributes.mode,
       query: node.attributes.dataSource
         ? createPageFileQueryFromDomQuery(
-            node.attributes.dataSource.value,
-            node.attributes.query?.value as FetchQuery | LocalQuery | undefined,
+            node.attributes.dataSource,
+            node.attributes.query as FetchQuery | LocalQuery | undefined,
           )
         : undefined,
-      parameters: undefinedWhenEmpty(
-        node.params?.map(([name, value]) => ({ name, value: fromBindable(value) })),
-      ),
-      cacheTime: node.attributes.cacheTime?.value,
-      refetchInterval: node.attributes.refetchInterval?.value,
-      transform: node.attributes.transform?.value,
-      transformEnabled: node.attributes.transformEnabled?.value,
+      parameters: undefinedWhenEmpty(node.params?.map(([name, value]) => ({ name, value }))),
+      cacheTime: node.attributes.cacheTime,
+      refetchInterval: node.attributes.refetchInterval,
+      transform: node.attributes.transform,
+      transformEnabled: node.attributes.transformEnabled,
     } satisfies Query;
   }
 
   if (appDom.isElement(node)) {
     const { children, ...templates } = appDom.getChildNodes(dom, node);
-
-    const plainProps = mapValues(node.props || {}, (prop) => prop && fromBindableProp(prop));
 
     const templateProps = mapValues(templates, (subtree) =>
       subtree
@@ -632,14 +531,14 @@ function expandFromDom<N extends appDom.AppDomNode>(
     );
 
     return {
-      component: node.attributes.component.value,
+      component: node.attributes.component,
       name: node.name,
       layout: undefinedWhenEmpty({
-        columnSize: node.layout?.columnSize?.value,
-        horizontalAlign: stringOnly(node.layout?.horizontalAlign?.value),
-        verticalAlign: stringOnly(node.layout?.verticalAlign?.value),
+        columnSize: node.layout?.columnSize,
+        horizontalAlign: stringOnly(node.layout?.horizontalAlign),
+        verticalAlign: stringOnly(node.layout?.verticalAlign),
       }),
-      props: undefinedWhenEmpty({ ...plainProps, ...templateProps }),
+      props: undefinedWhenEmpty({ ...node.props, ...templateProps }),
       children: undefinedWhenEmpty(expandChildren(children || [], dom)),
     } satisfies ElementType;
   }
@@ -668,15 +567,7 @@ function mergeElementIntoDom(
 
   const templateProps = filterValues(elm.props ?? {}, isTemplate) as Record<string, Template>;
 
-  const elmNode = appDom.createElement(
-    dom,
-    elm.component,
-    mapValues(plainProps, (propValue) => toBindableProp(propValue)),
-    mapValues(elm.layout ?? {}, (propValue) =>
-      propValue ? appDom.createConst(propValue) : undefined,
-    ),
-    elm.name,
-  );
+  const elmNode = appDom.createElement(dom, elm.component, plainProps, elm.layout ?? {}, elm.name);
 
   dom = appDom.addNode(dom, elmNode, parent, parentProp as any);
 
@@ -709,8 +600,8 @@ function createDomQueryFromPageFileQuery(query: QueryConfig): FetchQuery | Local
           case 'raw': {
             body = {
               kind: 'raw',
-              content: toBindable<string>(query.body.content),
-              contentType: appDom.createConst(query.body.contentType),
+              content: query.body.content,
+              contentType: query.body.contentType,
             };
             break;
           }
@@ -719,7 +610,7 @@ function createDomQueryFromPageFileQuery(query: QueryConfig): FetchQuery | Local
               kind: 'urlEncoded',
               content: query.body.content.map(({ name, value }) => [
                 name,
-                toBindable<string>(value),
+                value as PropBindableAttrValue<string>,
               ]),
             };
             break;
@@ -755,14 +646,13 @@ function createDomQueryFromPageFileQuery(query: QueryConfig): FetchQuery | Local
       }
 
       return {
-        url: query.url ? toBindable(query.url) : undefined,
-        headers: query.headers?.map(({ name, value }) => [name, toBindable<string>(value)]) || [],
+        url: query.url || undefined,
+        headers: query.headers?.map(({ name, value }) => [name, value]) || [],
         method: query.method || 'GET',
         browser: false,
         transform: query.transform,
         transformEnabled: query.transformEnabled,
-        searchParams:
-          query.searchParams?.map(({ name, value }) => [name, toBindable<string>(value)]) || [],
+        searchParams: query.searchParams?.map(({ name, value }) => [name, value]) || [],
         body,
         response,
       } satisfies FetchQuery;
@@ -777,11 +667,9 @@ function createPageDomFromPageFile(pageName: string, pageFile: Page): appDom.App
   let fragment = appDom.createFragmentInternal(pageFileSpec.id as NodeId, 'page', {
     name: pageName,
     attributes: {
-      title: appDom.createConst(pageFileSpec.title || ''),
-      parameters: appDom.createConst(
-        pageFileSpec.parameters?.map(({ name, value }) => [name, value]) || [],
-      ),
-      display: pageFileSpec.display ? appDom.createConst(pageFileSpec.display) : undefined,
+      title: pageFileSpec.title || '',
+      parameters: pageFileSpec.parameters?.map(({ name, value }) => [name, value]) || [],
+      display: pageFileSpec.display || undefined,
     },
   });
 
@@ -794,29 +682,19 @@ function createPageDomFromPageFile(pageName: string, pageFile: Page): appDom.App
         const queryNode = appDom.createNode(fragment, 'query', {
           name: query.name,
           attributes: {
-            connectionId: appDom.createConst(null),
-            dataSource:
-              typeof query.query?.kind === 'string'
-                ? appDom.createConst(query.query.kind)
-                : undefined,
-            query: appDom.createConst(createDomQueryFromPageFileQuery(query.query)),
-            cacheTime:
-              typeof query.cacheTime === 'number' ? appDom.createConst(query.cacheTime) : undefined,
-            enabled: query.enabled ? toBindable(query.enabled) : undefined,
-            mode: typeof query.mode === 'string' ? appDom.createConst(query.mode) : undefined,
-            transform:
-              typeof query.transform === 'string' ? appDom.createConst(query.transform) : undefined,
+            connectionId: null,
+            dataSource: typeof query.query?.kind === 'string' ? query.query.kind : undefined,
+            query: createDomQueryFromPageFileQuery(query.query),
+            cacheTime: typeof query.cacheTime === 'number' ? query.cacheTime : undefined,
+            enabled: query.enabled ?? undefined,
+            mode: typeof query.mode === 'string' ? query.mode : undefined,
+            transform: typeof query.transform === 'string' ? query.transform : undefined,
             refetchInterval:
-              typeof query.refetchInterval === 'number'
-                ? appDom.createConst(query.refetchInterval)
-                : undefined,
-            transformEnabled: query.transformEnabled
-              ? appDom.createConst(query.transformEnabled)
-              : undefined,
+              typeof query.refetchInterval === 'number' ? query.refetchInterval : undefined,
+            transformEnabled: query.transformEnabled ?? undefined,
           },
           params: query.parameters?.map(
-            ({ name, value }) =>
-              [name, toBindable(value)] satisfies [string, BindableAttrValue<any>],
+            ({ name, value }) => [name, value] satisfies [string, BindableAttrValue<any>],
           ),
         });
         fragment = appDom.addNode(fragment, queryNode, pageNode, 'queries');
@@ -848,7 +726,7 @@ function mergePageIntoDom(dom: appDom.AppDom, pageName: string, pageFile: Page):
   return dom;
 }
 
-function mergPagesIntoDom(dom: appDom.AppDom, pages: PagesContent): appDom.AppDom {
+function mergePagesIntoDom(dom: appDom.AppDom, pages: PagesContent): appDom.AppDom {
   for (const [name, page] of Object.entries(pages)) {
     dom = mergePageIntoDom(dom, name, page);
   }
@@ -876,6 +754,22 @@ function extractPagesFromDom(dom: appDom.AppDom): ExtractedPages {
   return { pages, dom };
 }
 
+function extractThemeFromDom(dom: appDom.AppDom): Theme | null {
+  const rootNode = appDom.getApp(dom);
+  const { themes: themeNodes = [] } = appDom.getChildNodes(dom, rootNode);
+  if (themeNodes.length > 0) {
+    return {
+      apiVersion: API_VERSION,
+      kind: 'theme',
+      spec: {
+        options: themeNodes[0].theme,
+      },
+    };
+  }
+
+  return null;
+}
+
 async function writePagesToFiles(root: string, pages: PagesContent) {
   await Promise.all(
     Object.entries(pages).map(async ([name, page]) => {
@@ -894,48 +788,13 @@ async function writeThemeFile(root: string, theme: Theme | null) {
   }
 }
 
-interface ExtractedComponents {
-  components: ComponentsContent;
-  dom: appDom.AppDom;
-}
-
-function extractComponentsContentFromDom(dom: appDom.AppDom): ExtractedComponents {
-  const rootNode = appDom.getApp(dom);
-  const { codeComponents: codeComponentNodes = [] } = appDom.getChildNodes(dom, rootNode);
-
-  const components: ComponentsContent = {};
-
-  for (const codeComponent of codeComponentNodes) {
-    components[codeComponent.name] = { code: codeComponent.attributes.code.value };
-    dom = appDom.removeNode(dom, codeComponent.id);
-  }
-
-  return { components, dom };
-}
-
-function extractThemeContentFromDom(dom: appDom.AppDom): Theme | null {
-  const app = appDom.getApp(dom);
-  const { themes = [] } = appDom.getChildNodes(dom, app);
-  if (themes[0]?.theme) {
-    return {
-      apiVersion: API_VERSION,
-      kind: 'theme',
-      spec: {
-        'palette.mode': appDom.fromConstPropValue(themes[0].theme['palette.mode']),
-        'palette.primary.main': appDom.fromConstPropValue(themes[0].theme['palette.primary.main']),
-        'palette.secondary.main': appDom.fromConstPropValue(
-          themes[0].theme['palette.secondary.main'],
-        ),
-      },
-    };
-  }
-  return null;
-}
-
 async function writeDomToDisk(dom: appDom.AppDom): Promise<void> {
   const root = getUserProjectRoot();
   const { pages: pagesContent } = extractPagesFromDom(dom);
-  await Promise.all([writePagesToFiles(root, pagesContent)]);
+  await Promise.all([
+    writePagesToFiles(root, pagesContent),
+    writeThemeFile(root, extractThemeFromDom(dom)),
+  ]);
 }
 
 const DEFAULT_EDITOR = 'code';
@@ -946,39 +805,11 @@ export async function findSupportedEditor(): Promise<string | null> {
     return null;
   }
   try {
-    await execa('which', [maybeEditor]);
+    await execa(maybeEditor, ['-v']);
     return maybeEditor;
   } catch (err) {
     return null;
   }
-}
-
-let supportedEditorPromise: Promise<string | null>;
-
-export async function getSupportedEditor(): Promise<string | null> {
-  if (!supportedEditorPromise) {
-    supportedEditorPromise = findSupportedEditor();
-  }
-  return supportedEditorPromise;
-}
-
-async function openCodeEditor(file: string): Promise<void> {
-  const supportedEditor = await getSupportedEditor();
-  if (!supportedEditor) {
-    throw new Error(`No code editor found`);
-  }
-  const userProjectRoot = getUserProjectRoot();
-  const fullPath = path.resolve(userProjectRoot, file);
-  openEditor([fullPath, userProjectRoot], {
-    editor: process.env.EDITOR ? undefined : DEFAULT_EDITOR,
-  });
-}
-
-export async function openCodeComponentEditor(componentName: string): Promise<void> {
-  const root = getUserProjectRoot();
-  const componentsFolder = getComponentsFolder(root);
-  const fullPath = getComponentFilePath(componentsFolder, componentName);
-  await openCodeEditor(fullPath);
 }
 
 export type ProjectFolderEntry = {
@@ -1022,19 +853,12 @@ async function writeProjectFolder(
 
 function projectFolderToAppDom(projectFolder: ToolpadProjectFolder): appDom.AppDom {
   let dom = appDom.createDom();
-  dom = mergPagesIntoDom(dom, projectFolder.pages);
+  dom = mergePagesIntoDom(dom, projectFolder.pages);
   dom = mergeComponentsContentIntoDom(dom, projectFolder.components);
   if (projectFolder.theme) {
     dom = mergeThemeIntoAppDom(dom, projectFolder.theme);
   }
   return dom;
-}
-
-function appDomToProjectFolder(dom: appDom.AppDom): ToolpadProjectFolder {
-  const { pages } = extractPagesFromDom(dom);
-  const { components } = extractComponentsContentFromDom(dom);
-  const theme = extractThemeContentFromDom(dom);
-  return { pages, components, theme };
 }
 
 async function loadProjectFolder(): Promise<ToolpadProjectFolder> {
@@ -1044,44 +868,21 @@ async function loadProjectFolder(): Promise<ToolpadProjectFolder> {
 
 export async function loadDomFromDisk(): Promise<appDom.AppDom> {
   const projectFolder = await loadProjectFolder();
+
   return projectFolderToAppDom(projectFolder);
 }
 
 async function migrateLegacyProject(root: string) {
-  let dom = await loadConfigFile(root);
-  if (!dom) {
-    return;
-  }
-  const domVersion = dom.version ?? 0;
-  if (domVersion > appDom.CURRENT_APPDOM_VERSION) {
+  const isLegacyProject = await legacyConfigFileExists(root);
+
+  if (isLegacyProject) {
     console.error(
       `${chalk.red(
         'error',
-      )} - This project was created with a newer version of Toolpad, please upgrade your ${chalk.cyan(
-        '@mui/toolpad',
-      )} installation`,
+      )} - This project was created with a deprecated version of Toolpad, please use @mui/toolpad@0.1.17 to migrate this project`,
     );
     process.exit(1);
-  } else if (domVersion < appDom.CURRENT_APPDOM_VERSION) {
-    // eslint-disable-next-line no-console
-    console.log(
-      `${chalk.blue(
-        'info',
-      )}  - This project was created by an older version of Toolpad. Upgrading...`,
-    );
-
-    dom = migrateUp(dom);
   }
-
-  const projectFolder = appDomToProjectFolder(dom);
-
-  await writeProjectFolder(root, projectFolder, true);
-
-  const configFilePath = await getConfigFilePath(root);
-  await Promise.all([
-    fs.rm(configFilePath, { recursive: true, force: true }),
-    fs.rm(path.resolve(root, '.toolpad-generated'), { recursive: true, force: true }),
-  ]);
 }
 
 function getDomFilePatterns(root: string) {
@@ -1092,12 +893,11 @@ function getDomFilePatterns(root: string) {
     path.resolve(root, './toolpad/components/*.*'),
   ];
 }
-
 /**
  * Calculates a fingerprint from all files that influence the dom structure
  */
 async function calculateDomFingerprint(root: string): Promise<number> {
-  const files = await glob(getDomFilePatterns(root));
+  const files = await glob(getDomFilePatterns(root), { windowsPathsNoEscape: true });
 
   const mtimes = await Promise.all(
     files.sort().map(async (file) => {
@@ -1113,7 +913,7 @@ async function initToolpadFolder(root: string) {
   const projectFolder = await readProjectFolder(root);
   if (Object.keys(projectFolder.pages).length <= 0) {
     projectFolder.pages.page = {
-      apiVersion: 'v1',
+      apiVersion: API_VERSION,
       kind: 'page',
       spec: {
         id: appDom.createId(),
@@ -1148,6 +948,10 @@ class ToolpadProject {
 
   functionsManager: FunctionsManager;
 
+  invalidateQueries: () => void;
+
+  private alertedMissingVars = new Set<string>();
+
   constructor(root: string, options: Partial<ToolpadProjectOptions>) {
     this.root = root;
     this.options = {
@@ -1158,7 +962,15 @@ class ToolpadProject {
     this.envManager = new EnvManager(this);
     this.functionsManager = new FunctionsManager(this);
 
-    this.initWatcher();
+    this.invalidateQueries = throttle(
+      () => {
+        this.events.emit('queriesInvalidated', {});
+      },
+      250,
+      {
+        leading: false,
+      },
+    );
   }
 
   private initWatcher() {
@@ -1215,32 +1027,95 @@ class ToolpadProject {
     return getOutputFolder(this.getRoot());
   }
 
+  alertOnMissingVariablesInDom(dom: appDom.AppDom) {
+    const requiredVars = appDom.getRequiredEnvVars(dom);
+    const missingVars = Array.from(requiredVars).filter(
+      (key) => typeof process.env[key] === 'undefined',
+    );
+    const toAlert = missingVars.filter((key) => !this.alertedMissingVars.has(key));
+
+    if (toAlert.length > 0) {
+      const firstThree = toAlert.slice(0, 3);
+      const restCount = toAlert.length - firstThree.length;
+      const missingListMsg = firstThree.map((varName) => chalk.cyan(varName)).join(', ');
+      const restMsg = restCount > 0 ? ` and ${restCount} more` : '';
+
+      // eslint-disable-next-line no-console
+      console.log(
+        `${chalk.yellow(
+          'warn',
+        )}  - Missing required environment variable(s): ${missingListMsg}${restMsg}.`,
+      );
+    }
+
+    // Only alert once per missing variable
+    this.alertedMissingVars = new Set(missingVars);
+  }
+
+  async start() {
+    if (this.options.dev) {
+      await this.initWatcher();
+    }
+    await Promise.all([this.envManager.start(), this.functionsManager.start()]);
+  }
+
+  async build() {
+    await Promise.all([this.envManager.build(), this.functionsManager.build()]);
+  }
+
+  async dispose() {
+    await Promise.all([this.envManager.dispose(), this.functionsManager.dispose()]);
+  }
+
   async loadDom() {
     const [dom] = await this.loadDomAndFingerprint();
+    this.alertOnMissingVariablesInDom(dom);
     return dom;
   }
 
-  async saveDom(newDom: appDom.AppDom) {
+  async writeDomToDisk(newDom: appDom.AppDom) {
     if (config.cmd !== 'dev') {
       throw new Error(`Writing to disk is only possible in toolpad dev mode.`);
     }
 
+    await writeDomToDisk(newDom);
+    const newFingerprint = await calculateDomFingerprint(this.root);
+    this.domAndFingerprint = [newDom, newFingerprint];
+    this.events.emit('change', { fingerprint: newFingerprint });
+    return { fingerprint: newFingerprint };
+  }
+
+  async saveDom(newDom: appDom.AppDom) {
     return this.domAndFingerprintLock.use(async () => {
-      await writeDomToDisk(newDom);
-      const newFingerprint = await calculateDomFingerprint(this.root);
-      this.domAndFingerprint = [newDom, newFingerprint];
-      this.events.emit('change', { fingerprint: newFingerprint });
-      return { fingerprint: newFingerprint };
+      return this.writeDomToDisk(newDom);
     });
   }
 
-  async openCodeEditor(file: string): Promise<void> {
-    const supportedEditor = await getSupportedEditor();
+  async applyDomDiff(domDiff: appDom.DomDiff) {
+    return this.domAndFingerprintLock.use(async () => {
+      const dom = await this.loadDom();
+      const newDom = appDom.applyDiff(dom, domDiff);
+      return this.writeDomToDisk(newDom);
+    });
+  }
+
+  async openCodeEditor(fileName: string, fileType: string) {
+    const supportedEditor = await findSupportedEditor();
     if (!supportedEditor) {
       throw new Error(`No code editor found`);
     }
-    const fullPath = path.resolve(this.getRoot(), file);
-    openEditor([fullPath, this.getRoot()], {
+    const root = this.getRoot();
+    let resolvedPath = fileName;
+
+    if (fileType === 'query') {
+      resolvedPath = await this.functionsManager.getFunctionFilePath(fileName);
+    }
+    if (fileType === 'component') {
+      const componentsFolder = getComponentsFolder(root);
+      resolvedPath = getComponentFilePath(componentsFolder, fileName);
+    }
+    const fullResolvedPath = path.resolve(root, resolvedPath);
+    openEditor([fullResolvedPath, root], {
       editor: process.env.EDITOR ? undefined : DEFAULT_EDITOR,
     });
   }
@@ -1253,5 +1128,19 @@ export async function initProject() {
 
   await initToolpadFolder(root);
 
-  return new ToolpadProject(root, { dev: config.cmd === 'dev' });
+  const project = new ToolpadProject(root, { dev: config.cmd === 'dev' });
+
+  await project.start();
+
+  return project;
+}
+
+export async function buildProject() {
+  const root = getUserProjectRoot();
+
+  const project = new ToolpadProject(root, { dev: config.cmd === 'dev' });
+
+  await project.build();
+
+  await project.dispose();
 }

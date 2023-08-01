@@ -1,10 +1,12 @@
 import * as React from 'react';
 import { Container, ContainerProps, Box, Stack, BoxProps } from '@mui/material';
 import { LoadingButton } from '@mui/lab';
-import { createComponent } from '@mui/toolpad-core';
-import { useForm, FieldValues, ValidationMode } from 'react-hook-form';
-import * as _ from 'lodash-es';
-import { SX_PROP_HELPER_TEXT } from './constants.js';
+import { ArgTypeDefinitions, createComponent, useNode } from '@mui/toolpad-core';
+import { useForm, FieldValues, ValidationMode, FieldError, Controller } from 'react-hook-form';
+// TODO: Remove lodash-es
+// eslint-disable-next-line no-restricted-imports
+import { isEqual } from 'lodash-es';
+import { SX_PROP_HELPER_TEXT } from './constants';
 
 export const FormContext = React.createContext<{
   form: ReturnType<typeof useForm> | null;
@@ -125,117 +127,6 @@ function Form({
   );
 }
 
-interface UseFormInputInput<V> {
-  name: string;
-  value?: V;
-  onChange: (newValue: V) => void;
-  emptyValue?: V;
-  defaultValue?: V;
-  validationProps: Record<string, unknown>;
-}
-
-interface UseFormInputPayload<V> {
-  onFormInputChange: (newValue: V) => void;
-}
-
-export function useFormInput<V>({
-  name,
-  value,
-  onChange,
-  emptyValue,
-  defaultValue,
-  validationProps,
-}: UseFormInputInput<V>): UseFormInputPayload<V> {
-  const { form, fieldValues } = React.useContext(FormContext);
-
-  const handleFormInputChange = React.useCallback(
-    (newValue: V) => {
-      if (form) {
-        form.setValue(name, newValue, {
-          shouldValidate: true,
-          shouldDirty: true,
-          shouldTouch: true,
-        });
-        onChange(newValue);
-      }
-    },
-    [form, name, onChange],
-  );
-
-  const previousDefaultValueRef = React.useRef(defaultValue);
-  React.useEffect(() => {
-    if (form && defaultValue !== previousDefaultValueRef.current) {
-      onChange(defaultValue as V);
-      form.setValue(name, defaultValue);
-      previousDefaultValueRef.current = defaultValue;
-    }
-  }, [form, name, onChange, defaultValue]);
-
-  const isInitialForm = Object.keys(fieldValues).length === 0;
-
-  React.useEffect(() => {
-    if (form) {
-      if (!fieldValues[name] && defaultValue && isInitialForm) {
-        onChange((defaultValue || emptyValue) as V);
-        form.setValue(name, defaultValue || emptyValue);
-      } else if (value !== fieldValues[name]) {
-        onChange(fieldValues[name] || emptyValue);
-      }
-    }
-  }, [defaultValue, emptyValue, fieldValues, form, isInitialForm, name, onChange, value]);
-
-  const previousNodeNameRef = React.useRef<typeof name>(name);
-  React.useEffect(() => {
-    const previousNodeName = previousNodeNameRef.current;
-
-    if (form && previousNodeName !== name) {
-      form.unregister(previousNodeName);
-      previousNodeNameRef.current = name;
-    }
-  }, [form, name]);
-
-  const previousManualValidationPropsRef = React.useRef(validationProps);
-  React.useEffect(() => {
-    if (
-      form &&
-      !_.isEqual(validationProps, previousManualValidationPropsRef.current) &&
-      form.formState.dirtyFields[name]
-    ) {
-      form.trigger(name);
-      previousManualValidationPropsRef.current = validationProps;
-    }
-  }, [form, name, validationProps]);
-
-  return {
-    onFormInputChange: handleFormInputChange,
-  };
-}
-
-export function withComponentForm<P extends Record<string, any>>(
-  InputComponent: React.ComponentType<P>,
-) {
-  return function ComponentWithForm(props: P) {
-    const { form } = React.useContext(FormContext);
-
-    const [componentFormValue, setComponentFormValue] = React.useState({});
-
-    const inputElement = <InputComponent {...props} />;
-
-    return form ? (
-      inputElement
-    ) : (
-      <Form
-        value={componentFormValue}
-        onChange={setComponentFormValue}
-        mode="onBlur"
-        hasChrome={false}
-      >
-        {inputElement}
-      </Form>
-    );
-  };
-}
-
 export default createComponent(Form, {
   argTypes: {
     children: {
@@ -243,7 +134,7 @@ export default createComponent(Form, {
       control: { type: 'layoutSlot' },
     },
     value: {
-      helperText: 'The value that is controlled by this text input.',
+      helperText: 'The value that is controlled by this form.',
       type: 'object',
       default: {},
       onChangeProp: 'onChange',
@@ -280,3 +171,216 @@ export default createComponent(Form, {
     },
   },
 });
+
+export interface FormInputComponentProps {
+  name: string;
+  isRequired: boolean;
+  minLength: number;
+  maxLength: number;
+  isInvalid: boolean;
+}
+
+interface UseFormInputInput<V> {
+  name: string;
+  label?: string;
+  value?: V;
+  onChange: (newValue: V) => void;
+  emptyValue?: V;
+  defaultValue?: V;
+  validationProps: Partial<
+    Pick<FormInputComponentProps, 'isRequired' | 'minLength' | 'maxLength' | 'isInvalid'>
+  >;
+}
+
+interface UseFormInputPayload<V> {
+  onFormInputChange: (newValue: V) => void;
+  formInputError?: FieldError;
+  renderFormInput: (element: JSX.Element) => JSX.Element;
+}
+
+export function useFormInput<V>({
+  name,
+  label,
+  value,
+  onChange,
+  emptyValue,
+  defaultValue,
+  validationProps,
+}: UseFormInputInput<V>): UseFormInputPayload<V> {
+  const { isRequired, minLength, maxLength, isInvalid } = validationProps;
+
+  const { form, fieldValues } = React.useContext(FormContext);
+
+  const nodeRuntime = useNode();
+  const fieldName = name || nodeRuntime?.nodeName;
+  const fallbackName = React.useId();
+
+  const formInputName = fieldName || fallbackName;
+
+  const formInputDisplayName = label || name || 'Field';
+
+  const formInputError = formInputName
+    ? (form?.formState.errors[formInputName] as FieldError)
+    : undefined;
+
+  const previousDefaultValueRef = React.useRef(defaultValue);
+  React.useEffect(() => {
+    if (form && defaultValue !== previousDefaultValueRef.current) {
+      onChange(defaultValue as V);
+      form.setValue(formInputName, defaultValue);
+      previousDefaultValueRef.current = defaultValue;
+    }
+  }, [form, onChange, defaultValue, formInputName]);
+
+  const isInitialForm = Object.keys(fieldValues).length === 0;
+
+  React.useEffect(() => {
+    if (form) {
+      if (!fieldValues[formInputName] && defaultValue && isInitialForm) {
+        onChange((defaultValue || emptyValue) as V);
+        form.setValue(formInputName, defaultValue || emptyValue);
+      } else if (value !== fieldValues[formInputName]) {
+        onChange(fieldValues[formInputName] || emptyValue);
+      }
+    }
+  }, [defaultValue, emptyValue, fieldValues, form, isInitialForm, formInputName, onChange, value]);
+
+  const previousFormInputNameRef = React.useRef<typeof formInputName>(formInputName);
+  React.useEffect(() => {
+    const previousFormInputName = previousFormInputNameRef.current;
+
+    if (form && previousFormInputName !== formInputName) {
+      form.unregister(previousFormInputName);
+      previousFormInputNameRef.current = formInputName;
+    }
+  }, [form, formInputName]);
+
+  const previousManualValidationPropsRef = React.useRef(validationProps);
+  React.useEffect(() => {
+    if (
+      form &&
+      !isEqual(validationProps, previousManualValidationPropsRef.current) &&
+      form.formState.dirtyFields[formInputName]
+    ) {
+      form.trigger(formInputName);
+      previousManualValidationPropsRef.current = validationProps;
+    }
+  }, [form, formInputName, validationProps]);
+
+  const handleFormInputChange = React.useCallback(
+    (newValue: V) => {
+      if (form) {
+        form.setValue(formInputName, newValue, {
+          shouldValidate: true,
+          shouldDirty: true,
+          shouldTouch: true,
+        });
+      }
+      onChange(newValue);
+    },
+    [form, formInputName, onChange],
+  );
+
+  const renderFormInput = React.useCallback(
+    (element: JSX.Element) =>
+      form ? (
+        <Controller
+          name={formInputName}
+          control={form.control}
+          rules={{
+            required: isRequired ? `${formInputDisplayName} is required.` : false,
+            ...(minLength && {
+              minLength: {
+                value: minLength,
+                message: `${formInputDisplayName} must have at least ${minLength} characters.`,
+              },
+            }),
+            ...(maxLength && {
+              maxLength: {
+                value: maxLength,
+                message: `${formInputDisplayName} must have no more than ${maxLength} characters.`,
+              },
+            }),
+            validate: () => !isInvalid || `${formInputDisplayName} is invalid.`,
+          }}
+          render={() => element}
+        />
+      ) : (
+        element
+      ),
+    [form, formInputDisplayName, formInputName, isInvalid, isRequired, maxLength, minLength],
+  );
+
+  return {
+    onFormInputChange: handleFormInputChange,
+    formInputError,
+    renderFormInput,
+  };
+}
+
+export function withComponentForm<P extends Record<string, any>>(
+  InputComponent: React.ComponentType<P>,
+) {
+  return function ComponentWithForm(props: P) {
+    const { form } = React.useContext(FormContext);
+
+    const [componentFormValue, setComponentFormValue] = React.useState({});
+
+    const inputElement = <InputComponent {...props} />;
+
+    return form ? (
+      inputElement
+    ) : (
+      <Form
+        value={componentFormValue}
+        onChange={setComponentFormValue}
+        mode="onBlur"
+        hasChrome={false}
+      >
+        {inputElement}
+      </Form>
+    );
+  };
+}
+
+export const FORM_INPUT_ARG_TYPES: ArgTypeDefinitions<
+  Pick<FormInputComponentProps, 'name' | 'isRequired' | 'isInvalid'>
+> = {
+  name: {
+    helperText: 'Name of this input. Used as a reference in form data.',
+    type: 'string',
+  },
+  isRequired: {
+    helperText: 'Whether the input is required to have a value.',
+    type: 'boolean',
+    default: false,
+    category: 'validation',
+  },
+  isInvalid: {
+    helperText: 'Whether the input value is invalid.',
+    type: 'boolean',
+    default: false,
+    category: 'validation',
+  },
+};
+
+export const FORM_TEXT_INPUT_ARG_TYPES: ArgTypeDefinitions<
+  Pick<FormInputComponentProps, 'minLength' | 'maxLength'>
+> = {
+  minLength: {
+    helperText: 'Minimum value length.',
+    type: 'number',
+    minimum: 0,
+    maximum: 512,
+    default: 0,
+    category: 'validation',
+  },
+  maxLength: {
+    helperText: 'Maximum value length.',
+    type: 'number',
+    minimum: 0,
+    maximum: 512,
+    default: 0,
+    category: 'validation',
+  },
+};

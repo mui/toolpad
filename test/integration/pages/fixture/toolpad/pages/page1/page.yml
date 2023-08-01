@@ -1,0 +1,23 @@
+apiVersion: v1
+kind: page
+spec:
+  id: vo1091s
+  title: Page 1
+  content:
+    - component: PageRow
+      name: pageRow
+      children:
+        - component: Button
+          name: button
+          props:
+            content: page1Button
+    - component: PageRow
+      name: pageRow1
+      children:
+        - component: Metric
+          name: metric
+          props:
+            conditionalFormat:
+              stops:
+                - value: 10
+              base: "#e91e63"

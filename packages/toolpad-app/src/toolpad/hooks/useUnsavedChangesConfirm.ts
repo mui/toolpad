@@ -1,4 +1,4 @@
-import React from 'react';
+import * as React from 'react';
 
 type OnCloseType = (...args: unknown[]) => void | Promise<void>;
 

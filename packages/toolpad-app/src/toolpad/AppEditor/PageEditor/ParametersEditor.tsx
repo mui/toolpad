@@ -81,13 +81,7 @@ export default function ParametersEditor({
               propType={{ type: 'string' }}
               value={fieldValue}
               onChange={(newBinding) =>
-                onChange(
-                  value.map((entry, i) =>
-                    i === index
-                      ? [entry[0], newBinding || { type: 'const', value: undefined }]
-                      : entry,
-                  ),
-                )
+                onChange(value.map((entry, i) => (i === index ? [entry[0], newBinding] : entry)))
               }
               disabled={disabled}
               envVarNames={envVarNames}
@@ -106,7 +100,7 @@ export default function ParametersEditor({
           label={fieldLabel}
           value=""
           onChange={(event) => {
-            onChange([...value, [event.target.value, { type: 'const', value: null }]]);
+            onChange([...value, [event.target.value, null]]);
           }}
           autoFocus={autoFocus}
           disabled={disabled}

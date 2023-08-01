@@ -31,6 +31,10 @@ async function waitForComponents(page: Page, frame: Page | FrameLocator = page) 
 
   const markdown = frame.getByText('markdown text');
   await markdown.waitFor({ state: 'visible' });
+
+  const h2 = frame.getByText("Hello I'm a h2");
+  await expect(h2).toBeVisible();
+  await expect(h2).toHaveClass(/\bMuiTypography-h2\b/);
 }
 
 test.use({

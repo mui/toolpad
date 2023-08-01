@@ -5,9 +5,9 @@ spec:
   title: page2
   parameters:
     - name: abc
-      value: "123"
+      value: '123'
     - name: def
-      value: "456"
+      value: '456'
   display: shell
   content:
     - component: PageRow

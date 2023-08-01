@@ -1,9 +1,9 @@
 import 'dotenv/config';
-import yargs from 'yargs';
 import path from 'path';
-import invariant from 'invariant';
 import { Readable } from 'stream';
 import * as readline from 'readline';
+import invariant from 'invariant';
+import yargs from 'yargs';
 import openBrowser from 'react-dev-utils/openBrowser';
 import chalk from 'chalk';
 import { folderExists } from '@mui/toolpad-utils/fs';
@@ -64,14 +64,17 @@ async function runApp(cmd: Command, { port, dev = false, dir }: RunOptions) {
     }
   }
 
+  const editorDevMode =
+    process.env.TOOLPAD_NEXT_DEV || process.env.NODE_ENV === 'development' || dev;
+
   const serverPath = path.resolve(__dirname, './server.js');
 
   const cp = execaNode(serverPath, [], {
     cwd: projectDir,
     stdio: 'pipe',
     env: {
-      NODE_ENV: process.env.NODE_ENV,
-      TOOLPAD_NEXT_DEV: dev ? '1' : '',
+      NODE_ENV: editorDevMode ? 'development' : 'production',
+      TOOLPAD_NEXT_DEV: editorDevMode ? '1' : '',
       TOOLPAD_DIR: toolpadDir,
       TOOLPAD_PROJECT_DIR: projectDir,
       TOOLPAD_PORT: String(port),
@@ -162,14 +165,14 @@ export default async function cli(argv: string[]) {
     },
     dev: {
       type: 'boolean',
-      describe: 'Run the Toolpad editor Next.js app in development mode',
+      describe: 'Run the Toolpad editor app in development mode',
       demandOption: false,
       default: false,
       hidden: true,
     },
   } as const;
 
-  await yargs(argv)
+  const parsedArgs = yargs(argv)
     // See https://github.com/yargs/yargs/issues/538
     .scriptName('toolpad')
     .command(
@@ -198,7 +201,10 @@ export default async function cli(argv: string[]) {
     )
     .command('help', 'Show help', {}, async () => {
       // eslint-disable-next-line no-console
-      console.log(await yargs.getHelp());
+      console.log(await parsedArgs.getHelp());
     })
-    .help().argv;
+    .help();
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-expressions
+  parsedArgs.argv;
 }

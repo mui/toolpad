@@ -27,7 +27,7 @@ export default function PageOptionsPanel() {
           page,
           'attributes',
           'display',
-          appDom.createConst(event.target.value as appDom.PageDisplayMode),
+          event.target.value as appDom.PageDisplayMode,
         ),
       );
     },
@@ -35,31 +35,29 @@ export default function PageOptionsPanel() {
   );
 
   return (
-    <div>
-      <Stack spacing={1} alignItems="start">
-        <Typography variant="subtitle1">Page:</Typography>
-        <NodeNameEditor node={page} />
-        <TextField
-          select
-          defaultValue="shell"
-          value={page.attributes.display?.value}
-          onChange={handleDisplayModeChange}
-          label="Display mode"
-          fullWidth
-        >
-          {PAGE_DISPLAY_OPTIONS.map((option) => {
-            return (
-              <MenuItem key={option.value} value={option.value}>
-                {option.label}
-              </MenuItem>
-            );
-          })}
-        </TextField>
-        <Divider variant="middle" sx={{ alignSelf: 'stretch' }} />
-        <Typography variant="overline">Page State:</Typography>
-        <UrlQueryEditor pageNodeId={pageNodeId} />
-        <QueryEditor />
-      </Stack>
-    </div>
+    <Stack spacing={1} alignItems="start" data-testid="page-editor">
+      <Typography variant="subtitle1">Page:</Typography>
+      <NodeNameEditor node={page} />
+      <TextField
+        select
+        defaultValue="shell"
+        value={page.attributes.display}
+        onChange={handleDisplayModeChange}
+        label="Display mode"
+        fullWidth
+      >
+        {PAGE_DISPLAY_OPTIONS.map((option) => {
+          return (
+            <MenuItem key={option.value} value={option.value}>
+              {option.label}
+            </MenuItem>
+          );
+        })}
+      </TextField>
+      <Divider variant="middle" sx={{ alignSelf: 'stretch' }} />
+      <Typography variant="overline">Page State:</Typography>
+      <UrlQueryEditor pageNodeId={pageNodeId} />
+      <QueryEditor />
+    </Stack>
   );
 }

@@ -14,6 +14,14 @@ const pages: MuiPage[] = [
       { pathname: '/toolpad/getting-started/overview' },
       { pathname: '/toolpad/getting-started/installation' },
       { pathname: '/toolpad/getting-started/first-app', title: 'Build your first app' },
+      {
+        pathname: '/toolpad/examples',
+        children: [
+          { pathname: '/toolpad/examples/npm-stats', title: 'npm stats' },
+          { pathname: '/toolpad/examples/basic-crud-app', title: 'Basic CRUD application' },
+          { pathname: '/toolpad/examples/qr-generator', title: 'QR Code generator' },
+        ],
+      },
       { pathname: '/toolpad/getting-started/roadmap' },
     ],
   },
@@ -85,6 +93,10 @@ const pages: MuiPage[] = [
       {
         pathname: '/toolpad/how-to-guides/basic-auth',
         title: 'Enable basic auth',
+      },
+      {
+        pathname: '/toolpad/how-to-guides/editor-path',
+        title: 'Troubleshoot missing editor',
       },
     ],
   },

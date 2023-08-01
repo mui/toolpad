@@ -13,7 +13,8 @@ import * as React from 'react';
 import { inferColumns, parseColumns } from '@mui/toolpad-components';
 import { DataGridPro, GridColDef } from '@mui/x-data-grid-pro';
 import { UseQueryResult } from '@tanstack/react-query';
-import { getObjectKey } from '@mui/toolpad-core/objectKey';
+import { getObjectKey } from '@mui/toolpad-utils/objectKey';
+import useDebounced from '@mui/toolpad-utils/hooks/useDebounced';
 import { ClientDataSource, ConnectionEditorProps, QueryEditorProps } from '../../types';
 import {
   GoogleSheetsConnectionParams,
@@ -26,7 +27,6 @@ import {
   GoogleSheetsPrivateQuery,
   GoogleSheetsResult,
 } from './types';
-import useDebounced from '../../utils/useDebounced';
 import { usePrivateQuery } from '../context';
 import QueryInputPanel from '../QueryInputPanel';
 import SplitPane from '../../components/SplitPane';
@@ -54,19 +54,19 @@ function QueryEditor({
   });
 
   const fetchedFile: UseQueryResult<GoogleDriveFile> = usePrivateQuery(
-    input.attributes.query.value.spreadsheetId
+    input.attributes.query.spreadsheetId
       ? {
           type: 'FILE_GET',
-          spreadsheetId: input.attributes.query.value.spreadsheetId,
+          spreadsheetId: input.attributes.query.spreadsheetId,
         }
       : null,
   );
 
   const fetchedSpreadsheet: UseQueryResult<GoogleSpreadsheet> = usePrivateQuery(
-    input.attributes.query.value.spreadsheetId
+    input.attributes.query.spreadsheetId
       ? {
           type: 'FETCH_SPREADSHEET',
-          spreadsheetId: input.attributes.query.value.spreadsheetId,
+          spreadsheetId: input.attributes.query.spreadsheetId,
         }
       : null,
   );
@@ -74,7 +74,7 @@ function QueryEditor({
   const selectedSheet = React.useMemo(
     () =>
       fetchedSpreadsheet.data?.sheets?.find(
-        (sheet) => sheet.properties?.title === input.attributes.query.value.sheetName,
+        (sheet) => sheet.properties?.title === input.attributes.query.sheetName,
       ) ?? null,
     [fetchedSpreadsheet, input],
   );
@@ -132,7 +132,7 @@ function QueryEditor({
     preview,
     runPreview: handleRunPreview,
     isLoading: previewIsLoading,
-  } = useQueryPreview(fetchServerPreview, input.attributes.query.value, {});
+  } = useQueryPreview(fetchServerPreview, input.attributes.query, {});
 
   const rawRows: any[] = preview?.data || EMPTY_ROWS;
   const columns: GridColDef[] = React.useMemo(() => parseColumns(inferColumns(rawRows)), [rawRows]);
@@ -184,15 +184,15 @@ function QueryEditor({
           <TextField
             label="Range"
             helperText={`In the form of A1:Z999`}
-            value={input.attributes.query.value.ranges}
-            disabled={!input.attributes.query.value.sheetName}
+            value={input.attributes.query.ranges}
+            disabled={!input.attributes.query.sheetName}
             onChange={handleRangeChange}
           />
           <FormControlLabel
             label="First row contains column headers"
             control={
               <Checkbox
-                checked={input.attributes.query.value.headerRow}
+                checked={input.attributes.query.headerRow}
                 onChange={handleTransformChange}
                 inputProps={{ 'aria-label': 'controlled' }}
               />

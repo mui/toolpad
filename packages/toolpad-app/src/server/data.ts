@@ -4,12 +4,12 @@ import express from 'express';
 import cors from 'cors';
 import invariant from 'invariant';
 import { errorFrom, serializeError, SerializedError } from '@mui/toolpad-utils/errors';
-import { ServerDataSource } from '../types';
+import { Methods, ServerDataSource } from '../types';
 import serverDataSources from '../toolpadDataSources/server';
 import * as appDom from '../appDom';
 import applyTransform from '../toolpadDataSources/applyTransform';
 import { loadDom, saveDom } from './liveProject';
-import { asyncHandler } from '../utils/http';
+import { asyncHandler } from '../utils/express';
 
 export async function getConnectionParams<P = unknown>(
   connectionId: string | null,
@@ -20,7 +20,7 @@ export async function getConnectionParams<P = unknown>(
     connectionId as NodeId,
     'connection',
   ) as appDom.ConnectionNode<P>;
-  return node.attributes.params.value;
+  return node.attributes.params.$$secret;
 }
 
 export async function setConnectionParams<P>(connectionId: NodeId, params: P): Promise<void> {
@@ -42,21 +42,22 @@ export async function execQuery<P, Q>(
   dataNode: appDom.QueryNode<Q>,
   params: Q,
 ): Promise<ExecFetchResult<any>> {
-  const dataSource: ServerDataSource<P, Q, any> | undefined =
-    dataNode.attributes.dataSource && serverDataSources[dataNode.attributes.dataSource.value];
+  const dataSource: ServerDataSource<P, Q, any> | undefined = dataNode.attributes.dataSource
+    ? serverDataSources[dataNode.attributes.dataSource]
+    : undefined;
   if (!dataSource) {
     throw new Error(
-      `Unknown datasource "${dataNode.attributes.dataSource?.value}" for query "${dataNode.id}"`,
+      `Unknown datasource "${dataNode.attributes.dataSource}" for query "${dataNode.id}"`,
     );
   }
 
-  let result = await dataSource.exec(null, dataNode.attributes.query.value, params);
+  let result = await dataSource.exec(null, dataNode.attributes.query, params);
 
   if (appDom.isQuery(dataNode)) {
-    const transformEnabled = dataNode.attributes.transformEnabled?.value;
-    const transform = dataNode.attributes.transform?.value;
+    const transformEnabled = dataNode.attributes.transformEnabled;
+    const transform = dataNode.attributes.transform;
     if (transformEnabled && transform) {
-      const jsServerRuntime = await createServerJsRuntime();
+      const jsServerRuntime = await createServerJsRuntime(process.env);
       result = {
         data: await applyTransform(jsServerRuntime, transform, result.data),
       };
@@ -82,6 +83,26 @@ export async function dataSourceFetchPrivate<P, Q>(
   }
 
   return dataSource.execPrivate(null, query);
+}
+
+export async function dataSourceExecPrivate<P, Q, PQS extends Methods>(
+  dataSourceId: string,
+  method: keyof PQS,
+  args: any[],
+): Promise<any> {
+  const dataSource = serverDataSources[dataSourceId] as
+    | ServerDataSource<P, Q, any, PQS>
+    | undefined;
+
+  if (!dataSource) {
+    throw new Error(`Unknown dataSource "${dataSourceId}"`);
+  }
+
+  if (!dataSource.api) {
+    throw new Error(`No api available on datasource "${dataSourceId}"`);
+  }
+
+  return dataSource.api[method](...args);
 }
 
 function withSerializedError<T extends { error?: unknown }>(

@@ -26,6 +26,7 @@ function stopPropagationHandler(event: React.SyntheticEvent) {
 
 const nodeHudClasses = {
   selected: 'NodeHud_Selected',
+  hovered: 'NodeHud_Hovered',
   selectionHint: 'NodeHud_SelectionHint',
 };
 
@@ -41,7 +42,7 @@ const NodeHudWrapper = styled('div', {
   userSelect: 'none',
   outline: `1px dotted ${isOutlineVisible ? theme.palette.primary[500] : 'transparent'}`,
   zIndex: 80,
-  '&:hover': {
+  [`&:hover, &.${nodeHudClasses.hovered}`]: {
     outline: `2px dashed ${isHoverable ? theme.palette.primary[500] : 'transparent'}`,
   },
   [`.${nodeHudClasses.selected}`]: {
@@ -150,6 +151,7 @@ interface NodeHudProps {
   onDuplicate?: (event: React.MouseEvent) => void;
   isOutlineVisible?: boolean;
   isHoverable?: boolean;
+  isHovered?: boolean;
 }
 
 export default function NodeHud({
@@ -167,6 +169,7 @@ export default function NodeHud({
   onDuplicate,
   isOutlineVisible = false,
   isHoverable = true,
+  isHovered = false,
 }: NodeHudProps) {
   const hintPosition = rect.y > HUD_HEIGHT ? HINT_POSITION_TOP : HINT_POSITION_BOTTOM;
 
@@ -205,6 +208,7 @@ export default function NodeHud({
               }
             : {}),
         }}
+        className={isHovered ? nodeHudClasses.hovered : ''}
         isOutlineVisible={isOutlineVisible}
         isHoverable={isHoverable}
       >

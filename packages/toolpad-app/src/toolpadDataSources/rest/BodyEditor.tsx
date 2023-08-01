@@ -22,7 +22,6 @@ import {
 } from '../../toolpad/AppEditor/useEvaluateLiveBinding';
 import BindableEditor from '../../toolpad/AppEditor/PageEditor/BindableEditor';
 import lazyComponent from '../../utils/lazyComponent';
-import * as appDom from '../../appDom';
 import TabPanel from '../../components/TabPanel';
 import ParametersEditor from '../../toolpad/AppEditor/PageEditor/ParametersEditor';
 import { HTTP_NO_BODY } from './shared';
@@ -84,22 +83,22 @@ function RawBodyEditor({
     () =>
       valueProp ?? {
         kind: 'raw',
-        contentType: appDom.createConst('text/plain'),
-        content: appDom.createConst(''),
+        contentType: 'text/plain',
+        content: '',
       },
     [valueProp],
   );
 
   const handleContentTypeChange = React.useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
-      onChange({ ...value, contentType: appDom.createConst(event.target.value) });
+      onChange({ ...value, contentType: event.target.value });
     },
     [onChange, value],
   );
 
   const handleValueChange = React.useCallback(
     (newContent: BindableAttrValue<string> | null) => {
-      onChange({ ...value, content: newContent || appDom.createConst('') });
+      onChange({ ...value, content: newContent || '' });
     },
     [onChange, value],
   );
@@ -114,7 +113,7 @@ function RawBodyEditor({
     globalScope,
   });
 
-  const { language = 'plaintext' } = RAW_CONTENT_TYPES.get(value.contentType.value) ?? {};
+  const { language = 'plaintext' } = RAW_CONTENT_TYPES.get(value.contentType) ?? {};
 
   return (
     <React.Fragment>
@@ -124,7 +123,7 @@ function RawBodyEditor({
             select
             label="content-type"
             sx={{ width: 200 }}
-            value={value?.contentType.value}
+            value={value?.contentType}
             onChange={handleContentTypeChange}
             disabled={disabled}
           >
@@ -173,7 +172,7 @@ function UrlEncodedBodyEditor({
     () =>
       valueProp ?? {
         kind: 'urlEncoded',
-        contentType: appDom.createConst('text/plain'),
+        contentType: 'text/plain',
         content: [],
       },
     [valueProp],

@@ -1,4 +1,4 @@
-import { BindableAttrValue, ConstantAttrValue, ExecFetchResult } from '@mui/toolpad-core';
+import { BindableAttrValue, ExecFetchResult } from '@mui/toolpad-core';
 import { Har } from 'har-format';
 import { Maybe } from '../../utils/types';
 
@@ -34,7 +34,7 @@ export interface RestConnectionParams {
 export type RawBody = {
   kind: 'raw';
   content: BindableAttrValue<string>;
-  contentType: ConstantAttrValue<string>;
+  contentType: string;
 };
 
 export type UrlEncodedBody = {

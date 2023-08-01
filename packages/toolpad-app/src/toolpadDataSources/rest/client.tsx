@@ -251,13 +251,13 @@ function QueryEditor({
   value: input,
   onChange: setInput,
 }: QueryEditorProps<RestConnectionParams, FetchQuery>) {
-  const isBrowserSide = input.attributes.query.value.browser;
+  const isBrowserSide = input.attributes.query.browser;
 
   const connectionParams = isBrowserSide ? null : rawConnectionParams;
   const baseUrl = isBrowserSide ? null : connectionParams?.baseUrl ?? null;
 
   const urlValue: BindableAttrValue<string> =
-    input.attributes.query.value.url || getDefaultUrl(connectionParams);
+    input.attributes.query.url || getDefaultUrl(connectionParams);
 
   const introspection = usePrivateQuery<FetchPrivateQuery, IntrospectionResult>(
     {
@@ -276,9 +276,7 @@ function QueryEditor({
 
   const handleUrlChange = React.useCallback(
     (newUrl: BindableAttrValue<string> | null) => {
-      setInput((existing) =>
-        appDom.setQueryProp(existing, 'url', newUrl || appDom.createConst('')),
-      );
+      setInput((existing) => appDom.setQueryProp(existing, 'url', newUrl || ''));
     },
     [setInput],
   );
@@ -365,13 +363,13 @@ function QueryEditor({
 
   const liveSearchParams = useEvaluateLiveBindingEntries({
     jsRuntime: jsServerRuntime,
-    input: input.attributes.query.value.searchParams || [],
+    input: input.attributes.query.searchParams || [],
     globalScope: queryScope,
   });
 
   const liveHeaders = useEvaluateLiveBindingEntries({
     jsRuntime: jsServerRuntime,
-    input: input.attributes.query.value.headers || [],
+    input: input.attributes.query.headers || [],
     globalScope: queryScope,
   });
 
@@ -391,7 +389,7 @@ function QueryEditor({
     isLoading: previewIsLoading,
   } = useQueryPreview(
     fetchPreview,
-    input.attributes.query.value,
+    input.attributes.query,
     previewParams as Record<string, string>,
     {
       onPreview(result) {
@@ -418,7 +416,7 @@ function QueryEditor({
             <Box sx={{ display: 'flex', flexDirection: 'row', gap: 1 }}>
               <TextField
                 select
-                value={input.attributes.query.value.method || 'GET'}
+                value={input.attributes.query.method || 'GET'}
                 onChange={handleMethodChange}
               >
                 {HTTP_METHODS.map((method) => (
@@ -453,7 +451,7 @@ function QueryEditor({
                 </Box>
                 <TabPanel disableGutters value="urlQuery">
                   <ParametersEditor
-                    value={input.attributes.query.value.searchParams ?? []}
+                    value={input.attributes.query.searchParams ?? []}
                     onChange={handleSearchParamsChange}
                     globalScope={queryScope}
                     globalScopeMeta={QUERY_SCOPE_META}
@@ -463,16 +461,16 @@ function QueryEditor({
                 </TabPanel>
                 <TabPanel disableGutters value="body">
                   <BodyEditor
-                    value={input.attributes.query.value.body}
+                    value={input.attributes.query.body}
                     onChange={handleBodyChange}
                     globalScope={queryScope}
                     globalScopeMeta={QUERY_SCOPE_META}
-                    method={input.attributes.query.value.method || 'GET'}
+                    method={input.attributes.query.method || 'GET'}
                   />
                 </TabPanel>
                 <TabPanel disableGutters value="headers">
                   <ParametersEditor
-                    value={input.attributes.query.value.headers ?? []}
+                    value={input.attributes.query.headers ?? []}
                     onChange={handleHeadersChange}
                     globalScope={queryScope}
                     globalScopeMeta={QUERY_SCOPE_META}
@@ -486,7 +484,7 @@ function QueryEditor({
                     select
                     label="response type"
                     sx={{ width: 200, mt: 1 }}
-                    value={input.attributes.query.value.response?.kind || 'json'}
+                    value={input.attributes.query.response?.kind || 'json'}
                     onChange={handleResponseTypeChange}
                   >
                     <MenuItem value="raw">raw</MenuItem>
@@ -501,9 +499,9 @@ function QueryEditor({
                 </TabPanel>
                 <TabPanel disableGutters value="transform">
                   <TransformInput
-                    value={input.attributes.query.value.transform ?? 'return data;'}
+                    value={input.attributes.query.transform ?? 'return data;'}
                     onChange={handleTransformChange}
-                    enabled={input.attributes.query.value.transformEnabled ?? false}
+                    enabled={input.attributes.query.transformEnabled ?? false}
                     onEnabledChange={handleTransformEnabledChange}
                     globalScope={{ data: preview?.untransformedData }}
                     loading={false}

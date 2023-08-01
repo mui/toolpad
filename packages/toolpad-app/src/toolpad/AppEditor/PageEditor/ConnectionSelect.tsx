@@ -44,7 +44,7 @@ export default function ConnectionSelect({
     }
 
     for (const connection of connections) {
-      const connectionDataSourceId = connection.attributes.dataSource.value;
+      const connectionDataSourceId = connection.attributes.dataSource;
       if (!dataSource || filteredSources.has(connectionDataSourceId)) {
         const connectionDataSource = dataSources[connectionDataSourceId];
         if (connectionDataSource) {

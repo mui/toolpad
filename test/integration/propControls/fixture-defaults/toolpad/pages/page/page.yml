@@ -1,0 +1,22 @@
+apiVersion: v1
+kind: page
+spec:
+  id: ug63zn6
+  title: page
+  content:
+    - component: PageRow
+      name: pageRow6
+      children:
+        - component: TextField
+          name: inputOne
+          props:
+            defaultValue:
+              $$jsExpression: |
+                inputTwo.value
+    - component: PageRow
+      name: pageRow1
+      children:
+        - component: TextField
+          name: inputTwo
+          props:
+            defaultValue: defaultTwo

@@ -88,7 +88,7 @@ jobs:
       - install_js
       - run:
           name: Should not have any git not staged
-          command: git diff --exit-code
+          command: git add -A && git diff --exit-code --staged
       - run:
           name: Check for duplicated packages
           command: yarn deduplicate
@@ -127,17 +127,21 @@ jobs:
           name: '`yarn jsonSchemas` changes committed?'
           command: |
             yarn jsonSchemas
-            git diff --exit-code
+            git add -A && git diff --exit-code --staged
+      - run:
+          name: '`yarn docs:build:api` changes committed?'
+          command: |
+            yarn docs:build:api
+            git add -A && git diff --exit-code --staged
 
   test_unit:
     <<: *defaults
     resource_class: 'large'
     docker:
-      - image: mcr.microsoft.com/playwright:v1.34.3-focal
+      - image: mcr.microsoft.com/playwright:v1.36.2-focal
         environment:
           NODE_ENV: test
           TOOLPAD_TEST_RETRIES: 1
-      - image: kennethreitz/httpbin:latest
 
     steps:
       - checkout
@@ -145,11 +149,6 @@ jobs:
       - run:
           name: 'Build packages'
           command: yarn release:build
-      - run:
-          name: '`yarn docs:build:api` changes committed?'
-          command: |
-            yarn docs:build:api
-            git diff --exit-code
       - save_cache:
           name: Save Next.js cache
           key: v0-next-{{ checksum "yarn.lock" }}
@@ -160,9 +159,10 @@ jobs:
           command: yarn test
       - run:
           name: Tests real browser
-          environment:
-            HTTPBIN_BASEURL: 'http://localhost/'
           command: yarn test:integration
+      - run:
+          name: Upload screenshots to Argos CI
+          command: yarn test:argos
       - store_artifacts:
           path: test-results
           destination: playwright-test-results

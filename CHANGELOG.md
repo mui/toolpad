@@ -1,5 +1,202 @@
 # Changelog
 
+## 0.1.21
+
+<!-- generated comparing v0.1.20..master -->
+
+_Jul 25, 2023_
+
+A big thanks to the 6 contributors who made this release possible. Here are some highlights ✨:
+
+New Chart and Metric components, a page structure explorer to view components hierarchy and a new Page panel to contain page level state!
+
+- &#8203;<!-- 31 -->Move more APIs to utils package (#2352) @Janpot
+- &#8203;<!-- 30 -->Add page tab suggestions/improvements (#2342) @apedroferreira
+- &#8203;<!-- 29 -->Add visual regression test for resize grid (#2337) @apedroferreira
+- &#8203;<!-- 28 -->try with a lower memory limit @oliviertassinari
+- &#8203;<!-- 27 -->add example live @oliviertassinari
+- &#8203;<!-- 26 -->Fix the datagrid remounting when columns change (#2327) @Janpot
+- &#8203;<!-- 25 -->Fix: Improve missing editor scenario (#2238) @bharatkashyap
+- &#8203;<!-- 24 -->Update with-prisma README.md (#2336) @prakhargupta1
+- &#8203;<!-- 23 -->Upgrade monorepo (#2333) @bharatkashyap
+- &#8203;<!-- 22 -->Remove httpbin from rest tests to try and fix flakyness (#2330) @Janpot
+- &#8203;<!-- 21 -->Update CONTRIBUTING.md (#2328) @bharatkashyap
+- &#8203;<!-- 20 -->Fix some flakyness in the visual regression testing (#2329) @Janpot
+- &#8203;<!-- 19 -->Add Page tab to right-side panel (#2311) @apedroferreira
+- &#8203;<!-- 18 -->Default vertical alignment to top instead of center (#2312) @apedroferreira
+- &#8203;<!-- 17 -->Chart component (#2081) @apedroferreira
+- &#8203;<!-- 16 -->Remove Next.js (#2288) @Janpot
+- &#8203;<!-- 15 -->Remove packages/toolpad (#2287) @Janpot
+- &#8203;<!-- 14 -->Codify lodash usage in eslint (#1270) @Janpot
+- &#8203;<!-- 13 -->Add some visual regression tests (#1959) @Janpot
+- &#8203;<!-- 12 -->Add Metric component (#2202) @Janpot
+- &#8203;<!-- 11 -->Switch to stackblitz links for examples (#2307) @Janpot
+- &#8203;<!-- 10 -->[docs] Add link to live demo to KPI example (#2341) @prakhargupta1
+- &#8203;<!-- 09 -->[docs] Fix npx folder confusion (#2346) @oliviertassinari
+- &#8203;<!-- 08 -->[docs] Fix fs usage example @oliviertassinari
+- &#8203;<!-- 07 -->[docs] Fix fs usage example @oliviertassinari
+- &#8203;<!-- 06 -->[docs] Fix Connecting to databases page (#2345) @oliviertassinari
+- &#8203;<!-- 05 -->[docs] [cli] Add `createFunction` deprecation notices (#2334) @bharatkashyap
+- &#8203;<!-- 04 -->[feat] Add page structure explorer (#2246) @bharatkashyap
+- &#8203;<!-- 03 -->[test] Fail the CI when new unexpected files are created (#2332) @oliviertassinari
+- &#8203;<!-- 02 -->[website] Toolpad landing page design upgrade (#2266) @danilo-leal
+- &#8203;<!-- 01 -->[website] Fix CLS on hero icon (#2344) @oliviertassinari
+
+All contributors of this release in alphabetical order: @apedroferreira, @bharatkashyap, @danilo-leal, @Janpot, @oliviertassinari, @prakhargupta1
+
+✨ Done in 2.82s.
+
+## 0.1.20
+
+<!-- generated comparing v0.1.19..master -->
+
+_Jul 12, 2023_
+
+A big thanks to the 5 contributors who made this release possible. Here are some highlights ✨:
+
+Use vite for the Toolpad application instead of Next.js, Windows support, documentation updates.
+
+- &#8203;<!-- 19 -->Remove createFunction from examples (#2298) @Janpot
+- &#8203;<!-- 18 -->Add extra note about aspect ratio of screenshots (#2300) @Janpot
+- &#8203;<!-- 17 -->images aspect ratio 1.8090 (#2299) @prakhargupta1
+- &#8203;<!-- 16 -->Disallow access to DOM globals in bindings (#1991) @Janpot
+- &#8203;<!-- 15 -->Clarify the rules around documentation screenshots (#2296) @Janpot
+- &#8203;<!-- 14 -->Isolate prettier in renovatebot (#2295) @Janpot
+- &#8203;<!-- 13 -->Add eslint rule restricting React import style (#2286) @Janpot
+- &#8203;<!-- 12 -->Provide all exports of @mui/toolpad on @mui/toolpad-app (#2284) @Janpot
+- &#8203;<!-- 11 -->Resolve components from source for docs:build:api (#2280) @Janpot
+- &#8203;<!-- 10 -->Use vite for Toolpad editor (#1999) @Janpot
+- &#8203;<!-- 09 -->Add note about light theme (#2283) @Janpot
+- &#8203;<!-- 08 -->Hardcode prisma db in with-prisma example (#2282) @Janpot
+- &#8203;<!-- 07 -->Add prisma example (#2262) @Janpot
+- &#8203;<!-- 06 -->Update MUI monorepo (#2271) @apedroferreira
+- &#8203;<!-- 05 -->Fix Windows issues (#2181) @apedroferreira
+- &#8203;<!-- 04 -->Allow loading partial theme (#2270) @Janpot
+- &#8203;<!-- 03 -->[core] Polish imports to React (#2285) @oliviertassinari
+- &#8203;<!-- 02 -->[docs] Fix MUI reference (#2276) @oliviertassinari
+- &#8203;<!-- 01 -->[website] use `theme.applyDarkStyles` on marketing website (#2305) @bharatkashyap
+
+All contributors of this release in alphabetical order: @apedroferreira, @bharatkashyap, @Janpot, @oliviertassinari, @prakhargupta1
+
+## 0.1.19
+
+<!-- generated comparing v0.1.18..master -->
+
+_Jul 5, 2023_
+
+A big thanks to the 7 contributors who made this release possible. Here are some highlights ✨:
+
+Improved theme editor palette, allow multiple function files, support importing .sql and .txt files, link to examples in landing page and enable Autocomplete input in forms.
+
+- &#8203;<!-- 20 -->Fix missing typography variant (#2265) @Janpot
+- &#8203;<!-- 19 -->qrcode-example-folder-change (#2269) @prakhargupta1
+- &#8203;<!-- 18 -->Add some documentation about screenshot sizes (#2268) @Janpot
+- &#8203;<!-- 17 -->Connect Autocomplete to forms and refactor form logic (#2115) @apedroferreira
+- &#8203;<!-- 16 -->Support loading raw text for .txt files and .sql files (#2250) @Janpot
+- &#8203;<!-- 15 -->Lay foundation for new and improved theme editor (#2260) @Janpot
+- &#8203;<!-- 14 -->Use links for the runtime navigation bar (#2247) @Janpot
+- &#8203;<!-- 13 -->On landingpage add buttons to examples (#2196) @prakhargupta1
+- &#8203;<!-- 12 -->Pin dependencies (#2253) @renovate[bot]
+- &#8203;<!-- 11 -->Avoid double submit when function file is created (#2252) @Janpot
+- &#8203;<!-- 10 -->optimized deleting file (#2177) @JerryWu1234
+- &#8203;<!-- 09 -->Move license key logic into the components (#2248) @Janpot
+- &#8203;<!-- 08 -->Export canvas and runtime from @mui/toolpad (#2245) @Janpot
+- &#8203;<!-- 07 -->Move monaco-editor to devDependencies (#2241) @Janpot
+- &#8203;<!-- 06 -->Create update monorepo workflow (#2243) @Janpot
+- &#8203;<!-- 05 -->Allow multiple function files (#2236) @Janpot
+- &#8203;<!-- 04 -->Add a warning when required environment variables are missing (#2228) @Janpot
+- &#8203;<!-- 03 -->Remove legacy file format (#2227) @Janpot
+- &#8203;<!-- 02 -->[core] Remove mention of Crowdin @oliviertassinari
+- &#8203;<!-- 01 -->[fix] disable auto formatting `_redirects` (#2251) @bharatkashyap
+
+All contributors of this release in alphabetical order: @apedroferreira, @bharatkashyap, @Janpot, @JerryWu1234, @oliviertassinari, @prakhargupta1, @renovate[bot]
+
+## 0.1.18
+
+<!-- generated comparing v0.1.17..master -->
+
+_Jun 28, 2023_
+
+A big thanks to the 4 contributors who made this release possible. Here are some highlights ✨:
+
+Allow detecting parameters from types in function files, instead of having to explicitly specify them. Also, a couple of example apps, bug fixes and some behind-the-scenes work!
+
+- &#8203;<!-- 16 -->Isolate marked in renovatebot (#2237) @Janpot
+- &#8203;<!-- 15 -->Fix broken query editor when env vars are defined (#2231) @Janpot
+- &#8203;<!-- 14 -->Increase timeout when running integration tests in dev mode (#2222) @Janpot
+- &#8203;<!-- 13 -->Fix github rest call in triage label action (#2225) @Janpot
+- &#8203;<!-- 12 -->Add needs triage action (#2221) @Janpot
+- &#8203;<!-- 11 -->Reload queries when env changes (#2214) @Janpot
+- &#8203;<!-- 10 -->Example-4: NPM stats (#2151) @prakhargupta1
+- &#8203;<!-- 09 -->Example-1: admin app (#2096) @prakhargupta1
+- &#8203;<!-- 08 -->Upgrade @mui/monorepo (#2212) @Janpot
+- &#8203;<!-- 07 -->Explore banning any types (#2201) @Janpot
+- &#8203;<!-- 06 -->Add error mode to the text component (#2203) @Janpot
+- &#8203;<!-- 05 -->Add no-op serviceworker (#2190) @Janpot
+- &#8203;<!-- 04 -->Extract parameters from ts types in function files (#2133) @Janpot
+- &#8203;<!-- 03 -->[core] Upgrade monorepo (#2232) @bharatkashyap
+- &#8203;<!-- 02 -->[docs] Leading dot @oliviertassinari
+- &#8203;<!-- 01 -->[docs] Fix redirection @oliviertassinari
+
+All contributors of this release in alphabetical order: @bharatkashyap, @Janpot, @oliviertassinari, @prakhargupta1
+
+## 0.1.17
+
+<!-- generated comparing v0.1.16..master -->
+
+_Jun 22, 2023_
+
+A big thanks to the 3 contributors who made this release possible. Here are some highlights ✨:
+
+Improve error propagation in queries, add product walkthrough video.
+
+- &#8203;<!-- 13 -->Fix wrong environment variable in contributing guide (#2199) @Janpot
+- &#8203;<!-- 12 -->Add contributor guide for running integration tests (#2192) @Janpot
+- &#8203;<!-- 11 -->Disable a query as long as its input is still loading (#2197) @Janpot
+- &#8203;<!-- 10 -->Add contributing docs for codesandbox CI (#2198) @Janpot
+- &#8203;<!-- 09 -->Remove renovate docs dependencies group (#2191) @Janpot
+- &#8203;<!-- 08 -->Added product walkthrough video (#2175) @prakhargupta1
+- &#8203;<!-- 07 -->Update contributing guide for local development (#2176) @Janpot
+- &#8203;<!-- 06 -->Simplify next.config.js (#1944) @Janpot
+- &#8203;<!-- 05 -->Update monorepo dependency (#2172) @apedroferreira
+- &#8203;<!-- 04 -->Add QRcode example to docs and add dogApp (#1445) @prakhargupta1
+- &#8203;<!-- 03 -->Allow nested bindings (#2114) @apedroferreira
+- &#8203;<!-- 02 -->Remove pino for rpc logging (#1839) @Janpot
+- &#8203;<!-- 01 -->[docs] Pass productId to the pagecontext (#2178) @Janpot
+
+All contributors of this release in alphabetical order: @apedroferreira, @Janpot, @prakhargupta1
+
+## 0.1.16
+
+<!-- generated comparing v0.1.15..master -->
+
+_Jun 14, 2023_
+
+A big thanks to the 3 contributors who made this release possible. Here are some highlights ✨:
+
+Editor performance improvements, fix autocomplete for page parameters, better type inference for createFunction.
+
+- &#8203;<!-- 18 -->Fix invalid serializations in queries (#2163) @Janpot
+- &#8203;<!-- 17 -->Send dom diffs to the server to avoid overly large payloads (#2167) @Janpot
+- &#8203;<!-- 16 -->Fix create-toolpad-app missing gitignore file (#2169) @Janpot
+- &#8203;<!-- 15 -->Increase amount of playwright workers (#2160) @Janpot
+- &#8203;<!-- 14 -->Fix passing double dollars in the inlined DOM (#2165) @Janpot
+- &#8203;<!-- 13 -->Avoid too many binding evaluations in the runtime (#2142) @Janpot
+- &#8203;<!-- 12 -->Fix autocomplete for page parameters (#2156) @Janpot
+- &#8203;<!-- 11 -->Fix broken import in cli (#2155) @Janpot
+- &#8203;<!-- 10 -->Show error when Toolpad is started on a non-existing folder (#2144) @Janpot
+- &#8203;<!-- 09 -->Consolidate fs utils into single file (#2140) @Janpot
+- &#8203;<!-- 08 -->Infer the createFunction parameters type for objects from the schema (#2137) @Janpot
+- &#8203;<!-- 07 -->Improve contributing guidelines for starting the application (#2149) @Janpot
+- &#8203;<!-- 06 -->Replace ts-node with tsx (#2146) @Janpot
+- &#8203;<!-- 05 -->Enable sourcemaps for the runtime builds (#2143) @Janpot
+- &#8203;<!-- 04 -->[core] Remove @mui/x-data-grid-generator dependency (#2154) @oliviertassinari
+- &#8203;<!-- 03 -->[docs] Fix missing leading / @oliviertassinari
+- &#8203;<!-- 02 -->[docs] Fix 301 redirection link @oliviertassinari
+- &#8203;<!-- 01 -->[docs] Move the label from "Alpha" to "Beta" (#2024) @bharatkashyap
+
+All contributors of this release in alphabetical order: @bharatkashyap, @Janpot, @oliviertassinari
+
 ## 0.1.15
 
 <!-- generated comparing v0.1.14..master -->

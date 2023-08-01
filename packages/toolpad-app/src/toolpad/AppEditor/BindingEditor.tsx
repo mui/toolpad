@@ -36,11 +36,10 @@ import {
 } from '@mui/toolpad-core';
 import { createProvidedContext } from '@mui/toolpad-utils/react';
 import { TabContext, TabList } from '@mui/lab';
-import { mapValues } from '@mui/toolpad-utils/collections';
+import useDebounced from '@mui/toolpad-utils/hooks/useDebounced';
 import { JsExpressionEditor } from './PageEditor/JsExpressionEditor';
 import JsonView from '../../components/JsonView';
 import useLatest from '../../utils/useLatest';
-import useDebounced from '../../utils/useDebounced';
 import { useEvaluateLiveBinding } from './useEvaluateLiveBinding';
 import GlobalScopeExplorer from './GlobalScopeExplorer';
 import { WithControlledProp, Maybe } from '../../utils/types';
@@ -53,6 +52,8 @@ import TabPanel from '../../components/TabPanel';
 
 import { useDom } from '../AppState';
 import * as appDom from '../../appDom';
+import { getBindingType, getBindingValue } from '../../bindings';
+
 // eslint-disable-next-line import/no-cycle
 import BindableEditor from './PageEditor/BindableEditor';
 
@@ -93,7 +94,7 @@ function JsExpressionBindingEditor({
   onChange,
 }: JsExpressionBindingEditorProps) {
   const handleChange = React.useCallback(
-    (newValue: string) => onChange({ type: 'jsExpression', value: newValue }),
+    (newValue: string) => onChange({ $$jsExpression: newValue }),
     [onChange],
   );
 
@@ -101,7 +102,7 @@ function JsExpressionBindingEditor({
     <JsExpressionEditor
       globalScope={globalScope}
       globalScopeMeta={globalScopeMeta}
-      value={value?.type === 'jsExpression' ? value.value : ''}
+      value={value?.$$jsExpression || ''}
       onChange={handleChange}
       autoFocus
     />
@@ -139,8 +140,7 @@ export function EnvBindingEditor({ value, onChange }: EnvBindingEditorProps) {
   const handleInputChange = React.useCallback(
     (event: React.SyntheticEvent, newValue: string | null) => {
       onChange({
-        type: 'env',
-        value: newValue || '',
+        $$env: newValue || '',
       });
     },
     [onChange],
@@ -152,7 +152,7 @@ export function EnvBindingEditor({ value, onChange }: EnvBindingEditorProps) {
       <Autocomplete
         freeSolo
         options={envVarNames}
-        value={value?.value || ''}
+        value={value?.$$env || ''}
         onInputChange={handleInputChange}
         renderInput={(params) => (
           <TextField
@@ -161,7 +161,7 @@ export function EnvBindingEditor({ value, onChange }: EnvBindingEditorProps) {
             sx={{ my: 3 }}
             label="Environment variable name"
             helperText={
-              value?.value && !envVarNames.includes(value.value)
+              value?.$$env && !envVarNames.includes(value.$$env)
                 ? 'Warning: This variable is not in your env file!'
                 : ''
             }
@@ -173,7 +173,11 @@ export function EnvBindingEditor({ value, onChange }: EnvBindingEditorProps) {
 }
 
 function getValueBindingTab(value: Maybe<BindableAttrValue<any>>) {
-  return value?.type || 'jsExpression';
+  if (value?.$$env) {
+    return 'env';
+  }
+
+  return 'jsExpression';
 }
 
 export interface ValueBindingEditorProps
@@ -221,7 +225,11 @@ export function ValueBindingEditor({ value, onChange }: ValueBindingEditorProps)
         <JsExpressionBindingEditor
           globalScope={globalScope}
           globalScopeMeta={globalScopeMeta}
-          value={value?.type === 'jsExpression' ? value : null}
+          value={
+            (value as JsExpressionAttrValue)?.$$jsExpression
+              ? (value as JsExpressionAttrValue)
+              : null
+          }
           onChange={onChange}
         />
 
@@ -245,7 +253,10 @@ export function ValueBindingEditor({ value, onChange }: ValueBindingEditorProps)
         </Box>
       </TabPanel>
       <TabPanel value="env" disableGutters>
-        <EnvBindingEditor value={value?.type === 'env' ? value : null} onChange={onChange} />
+        <EnvBindingEditor
+          value={(value as EnvAttrValue)?.$$env ? (value as EnvAttrValue) : null}
+          onChange={onChange}
+        />
       </TabPanel>
     </TabContext>
   ) : (
@@ -259,7 +270,7 @@ export interface JsExpressionActionEditorProps
 function JsExpressionActionEditor({ value, onChange }: JsExpressionActionEditorProps) {
   const { globalScope, globalScopeMeta } = useBindingEditorContext();
   const handleCodeChange = React.useCallback(
-    (newValue: string) => onChange({ type: 'jsExpressionAction', value: newValue }),
+    (newValue: string) => onChange({ $$jsExpressionAction: newValue }),
     [onChange],
   );
 
@@ -282,7 +293,7 @@ function JsExpressionActionEditor({ value, onChange }: JsExpressionActionEditorP
           sx={{ flex: 1 }}
           globalScope={globalScope}
           globalScopeMeta={globalScopeMeta}
-          value={value?.value || ''}
+          value={value?.$$jsExpressionAction || ''}
           onChange={handleCodeChange}
           functionBody
           topLevelAwait
@@ -334,11 +345,9 @@ function NavigationActionEditor({ value, onChange }: NavigationActionEditorProps
   const { pages = [] } = appDom.getChildNodes(dom, root);
 
   const getDefaultActionParameters = React.useCallback((page: appDom.PageNode) => {
-    const defaultPageParameters = page.attributes.parameters?.value || [];
+    const defaultPageParameters = page.attributes.parameters || [];
 
-    return mapValues(Object.fromEntries(defaultPageParameters), (pageParameterValue) =>
-      appDom.createConst(pageParameterValue),
-    );
+    return Object.fromEntries(defaultPageParameters);
   }, []);
 
   const handlePageChange = React.useCallback(
@@ -349,9 +358,8 @@ function NavigationActionEditor({ value, onChange }: NavigationActionEditorProps
       const defaultActionParameters = appDom.isPage(page) ? getDefaultActionParameters(page) : {};
 
       onChange({
-        type: 'navigationAction',
-        value: {
-          page: appDom.ref(pageId),
+        $$navigationAction: {
+          page: pageId,
           parameters: defaultActionParameters,
         },
       });
@@ -359,22 +367,20 @@ function NavigationActionEditor({ value, onChange }: NavigationActionEditorProps
     [dom, getDefaultActionParameters, onChange],
   );
 
-  const actionPageRef = value?.value?.page || null;
+  const actionPageId = value?.$$navigationAction?.page || null;
   const actionParameters = React.useMemo(
-    () => value?.value.parameters || {},
-    [value?.value.parameters],
+    () => value?.$$navigationAction.parameters || {},
+    [value?.$$navigationAction.parameters],
   );
 
-  const actionPageId = actionPageRef ? appDom.deref(actionPageRef) : null;
   const actionPage = pages.find((availablePage) => availablePage.id === actionPageId);
 
   const handleActionParameterChange = React.useCallback(
     (actionParameterName: string) => (newValue: BindableAttrValue<string> | null) => {
-      if (actionPageRef) {
+      if (actionPageId) {
         onChange({
-          type: 'navigationAction',
-          value: {
-            page: actionPageRef,
+          $$navigationAction: {
+            page: actionPageId,
             parameters: {
               ...actionParameters,
               ...(newValue ? { [actionParameterName]: newValue } : {}),
@@ -383,7 +389,7 @@ function NavigationActionEditor({ value, onChange }: NavigationActionEditorProps
         });
       }
     },
-    [actionPageRef, actionParameters, onChange],
+    [actionPageId, actionParameters, onChange],
   );
 
   const hasPagesAvailable = pages.length > 0;
@@ -435,7 +441,11 @@ function NavigationActionEditor({ value, onChange }: NavigationActionEditorProps
 type BindableType = BindableAttrValue<any>['type'];
 
 function getActionTab(value: Maybe<BindableAttrValue<any>>) {
-  return value?.type || 'jsExpressionAction';
+  if (value?.$$navigationAction) {
+    return 'navigationAction';
+  }
+
+  return 'jsExpressionAction';
 }
 
 export interface ActionEditorProps extends WithControlledProp<BindableAttrValue<any> | null> {}
@@ -459,13 +469,13 @@ function ActionEditor({ value, onChange }: ActionEditorProps) {
         </Box>
         <TabPanel value="jsExpressionAction" disableGutters>
           <JsExpressionActionEditor
-            value={value?.type === 'jsExpressionAction' ? value : null}
+            value={value?.$$jsExpressionAction ? value : null}
             onChange={onChange}
           />
         </TabPanel>
         <TabPanel value="navigationAction" disableGutters>
           <NavigationActionEditor
-            value={value?.type === 'navigationAction' ? value : null}
+            value={value?.$$navigationAction ? value : null}
             onChange={onChange}
           />
         </TabPanel>
@@ -498,10 +508,9 @@ export function BindingEditorDialog<V>({
   const handleSave = React.useCallback(() => {
     let newValue = input;
 
-    if (input?.type === 'jsExpression') {
+    if ((input as JsExpressionAttrValue)?.$$jsExpression) {
       newValue = {
-        ...input,
-        value: tryFormatExpression(input.value),
+        $$jsExpression: tryFormatExpression((input as JsExpressionAttrValue).$$jsExpression),
       };
     }
 
@@ -510,7 +519,9 @@ export function BindingEditorDialog<V>({
   }, [onChange, input]);
 
   const hasUnsavedChanges = input
-    ? input.type !== committedInput.current?.type || input.value !== committedInput.current?.value
+    ? getBindingType(input) !==
+        (committedInput.current && getBindingType(committedInput.current)) ||
+      getBindingValue(input) !== (committedInput.current && getBindingValue(committedInput.current))
     : false;
 
   const { handleCloseWithUnsavedChanges } = useUnsavedChangesConfirm({
@@ -551,7 +562,11 @@ export function BindingEditorDialog<V>({
           <ActionEditor value={input} onChange={(newValue) => setInput(newValue)} />
         ) : (
           <ValueBindingEditor
-            value={input?.type === 'jsExpression' || input?.type === 'env' ? input : null}
+            value={
+              (input as JsExpressionAttrValue)?.$$jsExpression || (input as EnvAttrValue)?.$$env
+                ? (input as JsExpressionAttrValue | EnvAttrValue)
+                : null
+            }
             onChange={(newValue) => setInput(newValue)}
           />
         )}
@@ -560,7 +575,7 @@ export function BindingEditorDialog<V>({
         <Button color="inherit" variant="text" onClick={onClose}>
           {hasUnsavedChanges ? 'Cancel' : 'Close'}
         </Button>
-        <Button color="inherit" disabled={!value?.value} onClick={handleRemove}>
+        <Button color="inherit" disabled={!value} onClick={handleRemove}>
           Remove binding
         </Button>
         <Button disabled={!hasUnsavedChanges} color="primary" onClick={handleCommit}>
@@ -604,7 +619,7 @@ export function BindingEditor<V>({
   const handleOpen = React.useCallback(() => setOpen(true), []);
   const handleClose = React.useCallback(() => setOpen(false), []);
 
-  const hasBinding: boolean = !!value && value.type !== 'const';
+  const hasBinding: boolean = !!value && getBindingType(value) !== 'const';
 
   const error: string | undefined = liveBinding?.error?.message;
 

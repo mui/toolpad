@@ -1,7 +1,7 @@
 import * as fs from 'fs/promises';
 import * as path from 'path';
-import * as yaml from 'yaml';
 import { Dirent } from 'fs';
+import * as yaml from 'yaml';
 import { yamlOverwrite } from 'yaml-diff-patch';
 import { errorFrom } from './errors';
 
@@ -10,7 +10,7 @@ export type Reviver = NonNullable<Parameters<typeof JSON.parse>[1]>;
 /**
  * Like `fs.readFile`, but for JSON files specifically. Will throw on malformed JSON.
  */
-export async function readJsonFile(filePath: string, reviver?: Reviver): Promise<any> {
+export async function readJsonFile(filePath: string, reviver?: Reviver): Promise<unknown> {
   const content = await fs.readFile(filePath, { encoding: 'utf-8' });
   return JSON.parse(content, reviver);
 }

@@ -5,10 +5,28 @@ import { createRequire } from 'node:module';
 import * as fs from 'fs/promises';
 import * as vm from 'vm';
 import * as url from 'url';
-import { TOOLPAD_FUNCTION } from '@mui/toolpad-core';
 import fetch, { Headers, Request, Response } from 'node-fetch';
-import { errorFrom } from '@mui/toolpad-utils/errors';
+import { errorFrom, serializeError } from '@mui/toolpad-utils/errors';
 import invariant from 'invariant';
+
+function getCircularReplacer() {
+  const ancestors: object[] = [];
+  return function replacer(this: object, key: string, value: unknown) {
+    if (typeof value !== 'object' || value === null) {
+      return value;
+    }
+    // `this` is the object that value is contained in,
+    // i.e., its direct parent.
+    while (ancestors.length > 0 && ancestors.at(-1) !== this) {
+      ancestors.pop();
+    }
+    if (ancestors.includes(value)) {
+      return '[Circular]';
+    }
+    ancestors.push(value);
+    return value;
+  };
+}
 
 type IntrospectedFiles = Map<string, { file: string }>;
 
@@ -21,7 +39,7 @@ interface ExecuteMessage {
   kind: 'execute';
   filePath: string;
   name: string;
-  parameters: Record<string, unknown>;
+  parameters: unknown[];
 }
 
 type WorkerMessage = IntrospectMessage | ExecuteMessage;
@@ -39,11 +57,11 @@ function loadModule(fullPath: string, content: string) {
   const moduleRequire = createRequire(url.pathToFileURL(fullPath));
   const moduleObject: ModuleObject = { exports: {} };
 
-  vm.runInThisContext(`
-    ((require, exports, module) => {
-      ${content}
-    })
-  `)(moduleRequire, moduleObject.exports, moduleObject);
+  vm.runInThisContext(`((require, exports, module) => {\n${content}\n})`)(
+    moduleRequire,
+    moduleObject.exports,
+    moduleObject,
+  );
 
   return moduleObject;
 }
@@ -79,40 +97,14 @@ async function execute(msg: ExecuteMessage) {
     throw new Error(`Function "${msg.name}" not found`);
   }
 
-  const data = await fn({ parameters: msg.parameters });
-  return { data };
-}
-
-async function introspect(msg: IntrospectMessage) {
-  const resolvedFiles = await Promise.all(
-    Array.from(msg.files.entries()).map(async ([entry, { file }]) => {
-      const resolvers = await resolveFunctions(file).catch(() => ({}));
-      return Object.entries(resolvers).map(([name, value]) => {
-        const fnConfig = (value as any)[TOOLPAD_FUNCTION];
-        return {
-          name,
-          file: path.basename(entry),
-          parameters: fnConfig?.parameters ?? {},
-        };
-      });
-    }),
-  );
-
-  const functions = Object.fromEntries(
-    resolvedFiles.flatMap((resolvedFunctions) =>
-      resolvedFunctions.map((resolver) => [resolver.name, resolver]),
-    ),
-  );
-
-  return { functions };
+  const result = await fn(...msg.parameters);
+  return result;
 }
 
 async function handleMessage(msg: WorkerMessage) {
   switch (msg.kind) {
     case 'execute':
       return execute(msg);
-    case 'introspect':
-      return introspect(msg);
     default:
       throw new Error(`Unknown kind "${(msg as any).kind}"`);
   }
@@ -135,9 +127,9 @@ if (!isMainThread && parentPort) {
     (async () => {
       try {
         const result = await handleMessage(msg);
-        msg.port.postMessage(result);
+        msg.port.postMessage({ result: JSON.stringify(result, getCircularReplacer()) });
       } catch (rawError) {
-        msg.port.postMessage({ error: errorFrom(rawError) });
+        msg.port.postMessage({ error: serializeError(errorFrom(rawError)) });
       }
     })();
   });
@@ -151,23 +143,21 @@ export function createWorker(env: Record<string, any>) {
   const runOnWorker = async (msg: WorkerMessage) => {
     const { port1, port2 } = new MessageChannel();
     worker.postMessage({ port: port1, ...msg } satisfies TransferredMessage, [port1]);
-    const [value] = await once(port2, 'message');
-    return value;
+    const [{ error, result }] = await once(port2, 'message');
+
+    if (error) {
+      throw errorFrom(error);
+    }
+
+    return result ? JSON.parse(result) : undefined;
   };
 
   return {
-    async introspect(files: IntrospectedFiles) {
-      return runOnWorker({
-        kind: 'introspect',
-        files,
-      });
+    async terminate() {
+      return worker.terminate();
     },
 
-    async execute(
-      filePath: string,
-      name: string,
-      parameters: Record<string, unknown>,
-    ): Promise<any> {
+    async execute(filePath: string, name: string, parameters: unknown[]): Promise<any> {
       return runOnWorker({
         kind: 'execute',
         filePath,
@@ -177,3 +167,8 @@ export function createWorker(env: Record<string, any>) {
     },
   };
 }
+
+process.on('unhandledRejection', (error) => {
+  console.error(error);
+  process.exit(1);
+});

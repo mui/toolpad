@@ -5,12 +5,13 @@ import * as z from 'zod';
 import { fromZodError } from 'zod-validation-error';
 import { hasOwnProperty } from '@mui/toolpad-utils/collections';
 import { errorFrom, serializeError } from '@mui/toolpad-utils/errors';
-import { execQuery, dataSourceFetchPrivate } from './data';
+import { indent } from '@mui/toolpad-utils/strings';
+import chalk from 'chalk';
+import { execQuery, dataSourceFetchPrivate, dataSourceExecPrivate } from './data';
 import { getVersionInfo } from './versionInfo';
-import logger from './logs/logger';
-import { createComponent, deletePage, openCodeComponentEditor } from './localMode';
-import { loadDom, saveDom } from './liveProject';
-import { asyncHandler } from '../utils/http';
+import { createComponent, deletePage } from './localMode';
+import { loadDom, saveDom, applyDomDiff, openCodeEditor } from './liveProject';
+import { asyncHandler } from '../utils/express';
 
 export interface Method<P extends any[] = any[], R = any> {
   (...params: P): Promise<R>;
@@ -89,16 +90,17 @@ export function createRpcHandler(definition: Definition): express.RequestHandler
 
       res.json(responseData);
 
-      const logLevel = error ? 'warn' : 'trace';
-      logger[logLevel](
-        {
-          key: 'rpc',
-          type,
-          name,
-          error,
-        },
-        'Handled RPC request',
-      );
+      if (error) {
+        // eslint-disable-next-line no-console
+        console.log(`${chalk.red('error')} - RPC error`);
+        if (error.stack) {
+          // eslint-disable-next-line no-console
+          console.log(indent(error.stack, 2));
+        } else {
+          // eslint-disable-next-line no-console
+          console.log(indent(`${error.name}: ${error.message}`, 2));
+        }
+      }
     }),
   );
   return router;
@@ -137,14 +139,20 @@ export const rpcServer = {
     saveDom: createMethod<typeof saveDom>(({ params }) => {
       return saveDom(...params);
     }),
-    openCodeComponentEditor: createMethod<typeof openCodeComponentEditor>(({ params }) => {
-      return openCodeComponentEditor(...params);
+    applyDomDiff: createMethod<typeof applyDomDiff>(({ params }) => {
+      return applyDomDiff(...params);
+    }),
+    openCodeEditor: createMethod<typeof openCodeEditor>(({ params }) => {
+      return openCodeEditor(...params);
     }),
     createComponent: createMethod<typeof createComponent>(({ params }) => {
       return createComponent(...params);
     }),
     deletePage: createMethod<typeof deletePage>(({ params }) => {
       return deletePage(...params);
+    }),
+    dataSourceExecPrivate: createMethod<typeof dataSourceExecPrivate>(({ params }) => {
+      return dataSourceExecPrivate(...params);
     }),
   },
 } as const;

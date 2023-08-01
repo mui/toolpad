@@ -1,56 +1,5 @@
 import * as React from 'react';
-import { Emitter } from '@mui/toolpad-utils/events';
-
-// storage events only work across windows, we'll use an event emitter to announce within the window
-const emitter = new Emitter<Record<string, undefined>>();
-// local cache, needed for getSnapshot
-const cache = new Map<string, any>();
-
-function subscribe(key: string, cb: () => void): () => void {
-  const onKeyChange = () => {
-    // invalidate local cache
-    cache.delete(key);
-    cb();
-  };
-  const storageHandler = (event: StorageEvent) => {
-    if (event.storageArea === window.localStorage && event.key === key) {
-      onKeyChange();
-    }
-  };
-  window.addEventListener('storage', storageHandler);
-  emitter.on(key, onKeyChange);
-  return () => {
-    window.removeEventListener('storage', storageHandler);
-    emitter.off(key, onKeyChange);
-  };
-}
-
-function getSnapshot<T = unknown>(key: string): T | undefined {
-  try {
-    let value = cache.get(key);
-    if (!value) {
-      const item = window.localStorage.getItem(key);
-      value = item ? JSON.parse(item) : undefined;
-      cache.set(key, value);
-    }
-    return value;
-  } catch (error) {
-    console.error(error);
-    return undefined;
-  }
-}
-
-function setValue<T = unknown>(key: string, value: T) {
-  try {
-    if (typeof window !== 'undefined') {
-      cache.set(key, value);
-      window.localStorage.setItem(key, JSON.stringify(value));
-      emitter.emit(key);
-    }
-  } catch (error) {
-    console.error(error);
-  }
-}
+import useStorageState from '@mui/toolpad-utils/hooks/useStorageState';
 
 /**
  * Sync state to local storage so that it persists through a page refresh. Usage is
@@ -70,26 +19,16 @@ export default function useLocalStorageState<V>(
   key: string,
   initialValue: V,
 ): [V, React.Dispatch<React.SetStateAction<V>>] {
-  const subscribeKey = React.useCallback((cb: () => void) => subscribe(key, cb), [key]);
-  const getKeySnapshot = React.useCallback(
-    () => getSnapshot<V>(key) ?? initialValue,
-    [initialValue, key],
-  );
-  const getKeyServerSnapshot = React.useCallback(() => initialValue, [initialValue]);
+  const [input, setInput] = useStorageState('local', key, () => JSON.stringify(initialValue));
 
-  const storedValue: V = React.useSyncExternalStore(
-    subscribeKey,
-    getKeySnapshot,
-    getKeyServerSnapshot,
+  const value: V = React.useMemo(() => JSON.parse(input), [input]);
+  const handleChange: React.Dispatch<React.SetStateAction<V>> = React.useCallback(
+    (newValue) =>
+      setInput(
+        JSON.stringify(typeof newValue === 'function' ? (newValue as Function)(value) : newValue),
+      ),
+    [setInput, value],
   );
 
-  const setStoredValue = React.useCallback(
-    (value: React.SetStateAction<V>) => {
-      const valueToStore = value instanceof Function ? value(storedValue) : value;
-      setValue(key, valueToStore);
-    },
-    [key, storedValue],
-  );
-
-  return [storedValue, setStoredValue];
+  return [value, handleChange];
 }

@@ -39,6 +39,7 @@ export const INTERNAL_COMPONENTS = new Map<string, ToolpadComponentDefinition>([
   ],
   ['Image', { displayName: 'Image', builtIn: 'Image' }],
   ['DataGrid', { displayName: 'Data Grid', builtIn: 'DataGrid' }],
+  ['Chart', { displayName: 'Chart', builtIn: 'Chart' }],
   ['TextField', { displayName: 'Text Field', builtIn: 'TextField' }],
   ['DatePicker', { displayName: 'Date Picker', builtIn: 'DatePicker' }],
   ['FilePicker', { displayName: 'File Picker', builtIn: 'FilePicker' }],
@@ -48,6 +49,7 @@ export const INTERNAL_COMPONENTS = new Map<string, ToolpadComponentDefinition>([
   ['Paper', { displayName: 'Paper', builtIn: 'Paper' }],
   ['Tabs', { displayName: 'Tabs', builtIn: 'Tabs' }],
   ['Container', { displayName: 'Container', builtIn: 'Container' }],
+  ['Metric', { displayName: 'Metric', builtIn: 'Metric' }],
   [FORM_COMPONENT_ID, { displayName: 'Form', builtIn: 'Form' }],
 ]);
 
@@ -79,7 +81,7 @@ export function getToolpadComponent(
 }
 
 export function getElementNodeComponentId(elementNode: appDom.ElementNode): string {
-  return elementNode.attributes.component.value;
+  return elementNode.attributes.component;
 }
 
 export function isPageRow(elementNode: appDom.ElementNode): boolean {

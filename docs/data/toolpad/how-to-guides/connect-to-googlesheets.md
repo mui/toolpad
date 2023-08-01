@@ -2,7 +2,7 @@
 
 <p class="description">Quickly fetch data from Google sheets to build a Toolpad app </p>
 
-We can write a custom function to read or write data from a Google sheet. We'll use [google-auth-library](https://www.npmjs.com/package/google-auth-library) and [googleapis](https://www.npmjs.com/package/googleapis) packages for this.
+You can write a custom function to read or write data from a Google sheet. We'll use [google-auth-library](https://www.npmjs.com/package/google-auth-library) and [googleapis](https://www.npmjs.com/package/googleapis) packages for this.
 
 There are many ways to authenticate Google APIs as mentioned in google-auth-library. We'll use JWT tokens as we are creating a server based application.
 
@@ -10,10 +10,10 @@ There are many ways to authenticate Google APIs as mentioned in google-auth-libr
 
 ### Pre requisites
 
-1. You are required to create a service account from Google dev console.
-2. Download the keys file to your local. It is a JSON file that contains secrets and need to be handeled cautiously.
-3. From the JSON file we'll use client_email and private_key to in .env file to setup authentcation.
-4. Share the Google sheet you want to show with client_email account.
+1. You are required to create a [service account](https://cloud.google.com/iam/docs/service-account-overview) from Google dev console.
+2. Download the keys file to your local environment. It is a JSON file that contains secrets that need to be handled cautiously.
+3. Use `client_email` and `private_key` from the JSON file you downloaded in an `.env` file to set up authentication.
+4. Share the Google sheet you want to show with the service account with the same `client_email`.
 
 ### Custom function
 
@@ -54,4 +54,4 @@ export async function fetchSheet(spreadsheetId: string, range: string) {
 
 Create a corresponding `fetchList` query. When you'll run the above function, you should be able to see data in your Toolpad app. You can bind it to a datagrid in your application.
 
-**Note**: The process remains same if you want to connect to any other Google service like Docs, Analytics, Youtube API etc.
+**Note**: The process remains the same if you want to connect to any other Google service such as Docs, Analytics, Youtube API, etc.

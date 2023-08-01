@@ -76,11 +76,15 @@ export default class FunctionsManager {
   constructor(project: IToolpadProject) {
     this.project = project;
     this.devWorker = createDevWorker(process.env);
-    if (this.project.options.dev) {
+    if (this.shouldExtractTypes()) {
       this.extractTypesWorker = new Piscina({
         filename: path.join(__dirname, 'functionsTypesWorker.js'),
       });
     }
+  }
+
+  shouldExtractTypes(): boolean {
+    return this.project.options.cmd !== 'start';
   }
 
   private getResourcesFolder(): string {
@@ -131,7 +135,7 @@ export default class FunctionsManager {
   }
 
   private async extractTypes() {
-    invariant(this.project.options.dev, 'extractTypes() can only be used in dev mode');
+    invariant(this.shouldExtractTypes(), 'extractTypes() can not be used in prod mode');
     invariant(this.extractTypesWorker, 'this.extractTypesWorker should have been initialized');
     const extractedTypes: Promise<IntrospectionResult> = this.extractTypesWorker
       .run({ resourcesFolder: this.getResourcesFolder() } satisfies ExtractTypesParams, {})
@@ -146,9 +150,7 @@ export default class FunctionsManager {
     const root = this.project.getRoot();
 
     const onFunctionBuildStart = async () => {
-      if (this.project.options.dev) {
-        this.extractedTypes = undefined;
-      }
+      this.extractedTypes = undefined;
     };
 
     const onFunctionsBuildEnd = async (args: esbuild.BuildResult<esbuild.BuildOptions>) => {
@@ -297,7 +299,7 @@ export default class FunctionsManager {
 
   async introspect(): Promise<IntrospectionResult> {
     if (!this.extractedTypes) {
-      if (this.project.options.dev) {
+      if (this.shouldExtractTypes()) {
         this.extractedTypes = this.extractTypes();
       } else {
         this.extractedTypes = readJsonFile(

@@ -158,9 +158,10 @@ function AppWrapper(props) {
       activePageParents,
       pages,
       productIdentifier,
-      productId: 'toolpad',
+      productId,
+      productCategoryId,
     };
-  }, [router.pathname]);
+  }, [router.pathname, productId, productCategoryId]);
 
   return (
     <React.Fragment>

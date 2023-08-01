@@ -1,53 +1,66 @@
 import * as path from 'path';
+import { IncomingMessage, createServer } from 'http';
+import * as fs from 'fs/promises';
 import express from 'express';
 import invariant from 'invariant';
-import { IncomingMessage, createServer } from 'http';
 import { execaNode } from 'execa';
 import getPort from 'get-port';
 import { createProxyMiddleware } from 'http-proxy-middleware';
 import { mapValues } from '@mui/toolpad-utils/collections';
 import prettyBytes from 'pretty-bytes';
 import { createServer as createViteServer } from 'vite';
-import * as fs from 'fs/promises';
 import serializeJavascript from 'serialize-javascript';
 import { WebSocket, WebSocketServer } from 'ws';
 import { listen } from '@mui/toolpad-utils/http';
+import openBrowser from 'react-dev-utils/openBrowser';
+import { folderExists } from '@mui/toolpad-utils/fs';
+import chalk from 'chalk';
 import { asyncHandler } from '../src/utils/express';
 import { createProdHandler } from '../src/server/toolpadAppServer';
-import { getUserProjectRoot } from '../src/server/localMode';
-import { getProject } from '../src/server/liveProject';
+import { ToolpadProject, initProject } from '../src/server/localMode';
 import { Command as AppDevServerCommand, Event as AppDevServerEvent } from './appServer';
-import { createRpcHandler, rpcServer } from '../src/server/rpc';
-import { createDataHandler, createDataSourcesHandler } from '../src/server/data';
+import { createRpcHandler, createRpcServer } from '../src/server/rpc';
 import { RUNTIME_CONFIG_WINDOW_PROPERTY } from '../src/constants';
-import config from '../src/config';
+import type { RuntimeConfig } from '../src/config';
 
-interface CreateDevHandlerParams {
-  root: string;
-  base: string;
+const DEFAULT_PORT = 3000;
+
+function* getPreferredPorts(port: number = DEFAULT_PORT): Iterable<number> {
+  while (true) {
+    yield port;
+    port += 1;
+  }
 }
 
-async function createDevHandler({ root, base }: CreateDevHandlerParams) {
+interface CreateDevHandlerParams {
+  base: string;
+  runtimeConfig: RuntimeConfig;
+}
+
+async function createDevHandler(
+  project: ToolpadProject,
+  { base, runtimeConfig }: CreateDevHandlerParams,
+) {
   const router = express.Router();
 
   const appServerPath = path.resolve(__dirname, './appServer.js');
   const devPort = await getPort();
-  const project = await getProject();
 
   const cp = execaNode(appServerPath, [], {
-    cwd: root,
+    cwd: project.getRoot(),
     stdio: 'inherit',
     env: {
       NODE_ENV: 'development',
-      TOOLPAD_PROJECT_DIR: root,
+      TOOLPAD_RUNTIME_CONFIG: JSON.stringify(runtimeConfig),
       TOOLPAD_PORT: String(devPort),
+      TOOLPAD_PROJECT_DIR: project.getRoot(),
       TOOLPAD_BASE: base,
       FORCE_COLOR: '1',
     },
   });
 
-  cp.once('exit', () => {
-    console.error(`App dev server failed`);
+  cp.once('exit', (code) => {
+    console.error(`App dev server failed ${code}`);
     process.exit(1);
   });
 
@@ -63,7 +76,7 @@ async function createDevHandler({ root, base }: CreateDevHandlerParams) {
     cp.send({ kind: 'reload-components' } satisfies AppDevServerCommand);
   });
 
-  router.use('/api/data', createDataHandler());
+  router.use('/api/data', project.dataManager.createDataHandler(project));
   router.use(
     createProxyMiddleware({
       logLevel: 'silent',
@@ -85,26 +98,32 @@ interface HealthCheck {
   memoryUsagePretty: Record<keyof NodeJS.MemoryUsage, string>;
 }
 
-interface ServerConfig {
-  cmd: 'dev' | 'start';
+export interface ServerConfig {
+  cmd: 'dev' | 'start' | 'build';
   gitSha1: string | null;
   circleBuildNum: string | null;
   projectDir: string;
-  hostname: string;
   port: number;
   devMode: boolean;
+  externalUrl: string;
 }
 
-export async function main({
+async function main({
   cmd,
   gitSha1,
   circleBuildNum,
   projectDir,
-  hostname,
   port,
   devMode,
+  externalUrl,
 }: ServerConfig) {
-  const { default: chalk } = await import('chalk');
+  const runtimeConfig: RuntimeConfig = {
+    cmd,
+    projectDir,
+    externalUrl,
+  };
+
+  const project = await initProject(cmd, projectDir);
 
   const app = express();
   const httpServer = createServer(app);
@@ -140,17 +159,15 @@ export async function main({
   switch (cmd) {
     case 'dev': {
       const previewBase = '/preview';
-      const devHandler = await createDevHandler({
-        root: getUserProjectRoot(),
+      const devHandler = await createDevHandler(project, {
+        runtimeConfig,
         base: previewBase,
       });
       app.use(previewBase, devHandler);
       break;
     }
     case 'start': {
-      const prodHandler = await createProdHandler({
-        root: getUserProjectRoot(),
-      });
+      const prodHandler = await createProdHandler(project);
       app.use('/prod', prodHandler);
       break;
     }
@@ -159,11 +176,12 @@ export async function main({
   }
 
   if (cmd === 'dev') {
+    const rpcServer = createRpcServer(project);
     app.use('/api/rpc', createRpcHandler(rpcServer));
-    app.use('/api/dataSources', createDataSourcesHandler());
+    app.use('/api/dataSources', project.dataManager.createDataSourcesHandler());
 
     const transformIndexHtml = (html: string) => {
-      const serializedConfig = serializeJavascript(config, { isJSON: true });
+      const serializedConfig = serializeJavascript(runtimeConfig, { isJSON: true });
       return html.replace(
         '<!-- __TOOLPAD_SCRIPTS__ -->',
         `
@@ -206,18 +224,9 @@ export async function main({
     }
   }
 
-  await listen(httpServer, port);
-
-  // eslint-disable-next-line no-console
-  console.log(
-    `${chalk.green('ready')} - toolpad project ${chalk.cyan(projectDir)} ready on ${chalk.cyan(
-      `http://${hostname}:${port}`,
-    )}`,
-  );
+  const runningServer = await listen(httpServer, port);
 
   const wsServer = new WebSocketServer({ noServer: true });
-
-  const project = await getProject();
 
   project.events.on('*', (event, payload) => {
     wsServer.clients.forEach((client) => {
@@ -242,23 +251,64 @@ export async function main({
       });
     }
   });
+
+  return runningServer.port;
 }
 
-invariant(
-  process.env.TOOLPAD_CMD === 'dev' || process.env.TOOLPAD_CMD === 'start',
-  'TOOLPAD_PROJECT_DIR must be set',
-);
-invariant(process.env.TOOLPAD_PROJECT_DIR, 'TOOLPAD_PROJECT_DIR must be set');
+export type Command = 'dev' | 'start' | 'build';
+export interface RunAppOptions {
+  cmd: Command;
+  port?: number;
+  dev?: boolean;
+  projectDir: string;
+}
 
-main({
-  cmd: process.env.TOOLPAD_CMD,
-  gitSha1: process.env.GIT_SHA1 || null,
-  circleBuildNum: process.env.CIRCLE_BUILD_NUM || null,
-  projectDir: process.env.TOOLPAD_PROJECT_DIR,
-  hostname: 'localhost',
-  port: Number(process.env.TOOLPAD_PORT),
-  devMode: process.env.TOOLPAD_NEXT_DEV === '1',
-}).catch((err) => {
-  console.error(err);
-  process.exit(1);
-});
+export async function runApp({ cmd, port, dev = false, projectDir }: RunAppOptions) {
+  if (!(await folderExists(projectDir))) {
+    console.error(`${chalk.red('error')} - No project found at ${chalk.cyan(`"${projectDir}"`)}`);
+    process.exit(1);
+  }
+
+  if (!port) {
+    port = cmd === 'dev' ? await getPort({ port: getPreferredPorts(DEFAULT_PORT) }) : DEFAULT_PORT;
+  } else {
+    // if port is specified but is not available, exit
+    const availablePort = await getPort({ port });
+    if (availablePort !== port) {
+      console.error(`${chalk.red('error')} - Port ${port} is not available. Aborted.`);
+      process.exit(1);
+    }
+  }
+
+  const editorDevMode =
+    !!process.env.TOOLPAD_NEXT_DEV || process.env.NODE_ENV === 'development' || dev;
+
+  const externalUrl = process.env.TOOLPAD_EXTERNAL_URL || `http://localhost:${port}`;
+
+  const serverPort = await main({
+    cmd,
+    gitSha1: process.env.GIT_SHA1 || null,
+    circleBuildNum: process.env.CIRCLE_BUILD_NUM || null,
+    projectDir,
+    port,
+    devMode: editorDevMode,
+    externalUrl,
+  });
+
+  const toolpadBaseUrl = `http://localhost:${serverPort}/`;
+
+  // eslint-disable-next-line no-console
+  console.log(
+    `${chalk.green('ready')} - toolpad project ${chalk.cyan(projectDir)} ready on ${chalk.cyan(
+      toolpadBaseUrl,
+    )}`,
+  );
+
+  if (cmd === 'dev') {
+    try {
+      openBrowser(toolpadBaseUrl);
+    } catch (err: any) {
+      console.error(`${chalk.red('error')} - Failed to open browser: ${err.message}`);
+    }
+  }
+}

@@ -1,5 +1,5 @@
-import { expect, FrameLocator, Locator, Page } from '@playwright/test';
 import { setTimeout } from 'timers/promises';
+import { expect, FrameLocator, Locator, Page } from '@playwright/test';
 import { gotoIfNotCurrent } from './shared';
 
 class CreatePageDialog {

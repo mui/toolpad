@@ -1,10 +1,10 @@
 import * as fs from 'fs/promises';
-import { jest } from '@jest/globals';
 import * as path from 'path';
 import * as url from 'url';
-import { execa, ExecaChildProcess } from 'execa';
 import readline from 'readline';
 import { Readable } from 'stream';
+import { execa, ExecaChildProcess } from 'execa';
+import { jest } from '@jest/globals';
 import { once } from 'events';
 
 jest.setTimeout(60000);

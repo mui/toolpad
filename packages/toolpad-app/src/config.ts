@@ -1,3 +1,4 @@
+import invariant from 'invariant';
 import { RUNTIME_CONFIG_WINDOW_PROPERTY } from './constants';
 
 /**
@@ -37,7 +38,7 @@ export type BuildEnvVars = Record<
 export interface RuntimeConfig {
   externalUrl: string;
   projectDir?: string;
-  cmd: 'dev' | 'start';
+  cmd: 'dev' | 'start' | 'build';
 }
 
 declare global {
@@ -47,6 +48,10 @@ declare global {
 }
 
 function getBrowsersideRuntimeConfig(): RuntimeConfig {
+  invariant(
+    typeof window !== 'undefined',
+    'The runtime config is not available on the server. Use project.getRuntimeConfig()',
+  );
   // These are being initialized in ./pages/_document.tsx
   const maybeRuntimeConfig = window[RUNTIME_CONFIG_WINDOW_PROPERTY];
   if (!maybeRuntimeConfig) {
@@ -55,17 +60,4 @@ function getBrowsersideRuntimeConfig(): RuntimeConfig {
   return maybeRuntimeConfig;
 }
 
-const runtimeConfig: RuntimeConfig =
-  typeof window === 'undefined'
-    ? {
-        externalUrl:
-          process.env.TOOLPAD_EXTERNAL_URL || `http://localhost:${process.env.PORT || 3000}`,
-        projectDir: process.env.TOOLPAD_PROJECT_DIR,
-        cmd:
-          process.env.TOOLPAD_CMD === 'dev' || process.env.TOOLPAD_CMD === 'start'
-            ? process.env.TOOLPAD_CMD
-            : 'dev',
-      }
-    : getBrowsersideRuntimeConfig();
-
-export default runtimeConfig;
+export default getBrowsersideRuntimeConfig();

@@ -1003,7 +1003,11 @@ class ToolpadProject {
       });
     }, 100);
 
-    chokidar.watch(getDomFilePatterns(this.root)).on('all', () => {
+    const watchOptions: chokidar.WatchOptions = {
+      usePolling: true,
+    };
+
+    chokidar.watch(getDomFilePatterns(this.root), watchOptions).on('all', () => {
       updateDomFromExternal();
     });
   }

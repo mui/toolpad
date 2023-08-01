@@ -3,6 +3,11 @@ kind: page
 spec:
   id: sR_fqKE
   title: Default page
+  queries:
+    - name: stories
+      query:
+        function: getStories
+        kind: local
   content:
     - component: PageRow
       name: pageRow2
@@ -10,7 +15,7 @@ spec:
         - component: Text
           name: text2
           props:
-            value: Hacker news client
+            value: Hacker news reader
             variant: h2
     - component: PageRow
       name: pageRow
@@ -47,8 +52,3 @@ spec:
                                 ${stories.data[i].by} |
                                 ${stories.data[i].descendants} comments`
             disablePadding: true
-  queries:
-    - name: stories
-      query:
-        function: getStories
-        kind: local

@@ -201,13 +201,18 @@ test('must deselect selected element when clicking outside of it', async ({ page
   await editorModel.goToPageById('K7SkzhT');
 
   await editorModel.waitForOverlay();
-  const nodeHudTag = editorModel.appCanvas.getByTestId('node-hud-tag');
-  const input = editorModel.appCanvas.locator('input').nth(0);
-  const boundingBox = await input.boundingBox();
-  await clickCenter(page, input);
-  await expect(nodeHudTag).toBeVisible();
-  await page.mouse.click(boundingBox!.x + 150, boundingBox!.y + 150);
-  await expect(nodeHudTag).toBeHidden();
+
+  const textField = editorModel.appCanvas.locator('input');
+  const textFieldNodeHudTag = editorModel.appCanvas
+    .getByTestId('node-hud-tag')
+    .filter({ hasText: 'textField' });
+
+  await clickCenter(page, textField);
+  await expect(textFieldNodeHudTag).toBeVisible();
+
+  const textFieldBoundingBox = await textField.boundingBox();
+  await page.mouse.click(textFieldBoundingBox!.x + 150, textFieldBoundingBox!.y + 150);
+  await expect(textFieldNodeHudTag).toBeHidden();
 });
 test('can rename page', async ({ page, localApp }) => {
   const editorModel = new ToolpadEditor(page);

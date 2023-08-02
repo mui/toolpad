@@ -1,12 +1,12 @@
 import * as path from 'path';
 import * as fs from 'fs/promises';
 import childProcess from 'child_process';
-import { once } from 'events';
-import invariant from 'invariant';
-import * as archiver from 'archiver';
 import { createWriteStream } from 'fs';
 import { pipeline } from 'stream/promises';
 import { Readable } from 'stream';
+import { once } from 'events';
+import invariant from 'invariant';
+import * as archiver from 'archiver';
 import getPort from 'get-port';
 import { PageScreenshotOptions, test as base } from './test';
 import { waitForMatch } from '../utils/streams';
@@ -137,7 +137,7 @@ export async function withApp(
       child.kill();
     }
   } finally {
-    await fs.rm(tmpTestDir, { recursive: true });
+    await fs.rm(tmpTestDir, { recursive: true, maxRetries: 3, retryDelay: 1000 });
   }
 }
 

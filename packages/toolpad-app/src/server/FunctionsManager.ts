@@ -1,11 +1,11 @@
+import * as path from 'path';
+import * as fs from 'fs/promises';
 import { Emitter } from '@mui/toolpad-utils/events';
 import * as esbuild from 'esbuild';
-import * as path from 'path';
 import { ensureSuffix, indent } from '@mui/toolpad-utils/strings';
 import * as chokidar from 'chokidar';
 import chalk from 'chalk';
 import { glob } from 'glob';
-import * as fs from 'fs/promises';
 import { writeFileRecursive, fileExists, readJsonFile } from '@mui/toolpad-utils/fs';
 import invariant from 'invariant';
 // @ts-expect-error https://github.com/piscinajs/piscina/issues/362#issuecomment-1616811661
@@ -76,11 +76,15 @@ export default class FunctionsManager {
   constructor(project: IToolpadProject) {
     this.project = project;
     this.devWorker = createDevWorker(process.env);
-    if (this.project.options.dev) {
+    if (this.shouldExtractTypes()) {
       this.extractTypesWorker = new Piscina({
         filename: path.join(__dirname, 'functionsTypesWorker.js'),
       });
     }
+  }
+
+  shouldExtractTypes(): boolean {
+    return this.project.options.cmd !== 'start';
   }
 
   private getResourcesFolder(): string {
@@ -131,7 +135,7 @@ export default class FunctionsManager {
   }
 
   private async extractTypes() {
-    invariant(this.project.options.dev, 'extractTypes() can only be used in dev mode');
+    invariant(this.shouldExtractTypes(), 'extractTypes() can not be used in prod mode');
     invariant(this.extractTypesWorker, 'this.extractTypesWorker should have been initialized');
     const extractedTypes: Promise<IntrospectionResult> = this.extractTypesWorker
       .run({ resourcesFolder: this.getResourcesFolder() } satisfies ExtractTypesParams, {})
@@ -146,9 +150,7 @@ export default class FunctionsManager {
     const root = this.project.getRoot();
 
     const onFunctionBuildStart = async () => {
-      if (this.project.options.dev) {
-        this.extractedTypes = undefined;
-      }
+      this.extractedTypes = undefined;
     };
 
     const onFunctionsBuildEnd = async (args: esbuild.BuildResult<esbuild.BuildOptions>) => {
@@ -297,7 +299,7 @@ export default class FunctionsManager {
 
   async introspect(): Promise<IntrospectionResult> {
     if (!this.extractedTypes) {
-      if (this.project.options.dev) {
+      if (this.shouldExtractTypes()) {
         this.extractedTypes = this.extractTypes();
       } else {
         this.extractedTypes = readJsonFile(

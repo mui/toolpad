@@ -1,6 +1,6 @@
-import { describe, test, beforeEach, afterEach, expect } from '@jest/globals';
 import * as fs from 'fs/promises';
 import * as path from 'path';
+import { describe, test, beforeEach, afterEach, expect } from '@jest/globals';
 import { fileReplace, fileReplaceAll } from './fs';
 
 describe('fileReplace', () => {

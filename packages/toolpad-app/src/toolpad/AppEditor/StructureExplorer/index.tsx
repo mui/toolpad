@@ -20,15 +20,14 @@ import { removePageLayoutNode } from '../pageLayout';
 function CustomTreeItem(
   props: TreeItemProps & {
     node: appDom.ElementNode;
-    onHover?: (event: React.MouseEvent<HTMLElement>, nodeId: NodeId) => void;
-    onMouseLeave?: (event: React.MouseEvent<HTMLElement>) => void;
   },
 ) {
   const domApi = useDomApi();
   const { dom } = useDom();
+  const appStateApi = useAppStateApi();
 
   const [domNodeEditable, setDomNodeEditable] = React.useState(false);
-  const { label, node, onHover, onMouseLeave, ...other } = props;
+  const { label, node, ...other } = props;
 
   const [nodeNameInput, setNodeNameInput] = React.useState(node.name);
   const handleNodeNameChange = React.useCallback(
@@ -53,6 +52,17 @@ function CustomTreeItem(
     }
   }, [isNameValid, domApi, node.id, node.name, nodeNameInput]);
 
+  const handleNodeHover = React.useCallback(
+    (event: React.MouseEvent, nodeId: NodeId) => {
+      appStateApi.hoverNode(nodeId as NodeId);
+    },
+    [appStateApi],
+  );
+
+  const handleNodeBlur = React.useCallback(() => {
+    appStateApi.blurHoverNode();
+  }, [appStateApi]);
+
   return (
     <TreeItem
       key={node.id}
@@ -60,9 +70,9 @@ function CustomTreeItem(
         <Box
           sx={{ display: 'flex', alignItems: 'center', p: 0.2, pr: 0 }}
           onMouseEnter={(event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
-            onHover?.(event, node.id);
+            handleNodeHover?.(event, node.id);
           }}
-          onMouseLeave={onMouseLeave}
+          onMouseLeave={handleNodeBlur}
         >
           <ComponentIcon
             id={node.attributes.component}
@@ -88,17 +98,7 @@ function CustomTreeItem(
   );
 }
 
-function RecursiveSubTree({
-  dom,
-  root,
-  onHover,
-  onMouseLeave,
-}: {
-  dom: appDom.AppDom;
-  root: appDom.ElementNode;
-  onHover?: (event: React.MouseEvent<HTMLElement>, nodeId: NodeId) => void;
-  onMouseLeave?: (event: React.MouseEvent<HTMLElement>) => void;
-}) {
+function RecursiveSubTree({ dom, root }: { dom: appDom.AppDom; root: appDom.ElementNode }) {
   const { children = [], renderItem = [] } = React.useMemo(
     () => appDom.getChildNodes(dom, root),
     [dom, root],
@@ -110,27 +110,15 @@ function RecursiveSubTree({
     children.length === 1
   ) {
     return children.map((childNode) => (
-      <RecursiveSubTree
-        key={childNode.id}
-        dom={dom}
-        root={childNode}
-        onHover={onHover}
-        onMouseLeave={onMouseLeave}
-      />
+      <RecursiveSubTree key={childNode.id} dom={dom} root={childNode} />
     ));
   }
 
   if (children.length > 0) {
     return (
-      <CustomTreeItem nodeId={root.id} node={root} onHover={onHover} onMouseLeave={onMouseLeave}>
+      <CustomTreeItem nodeId={root.id} node={root}>
         {children.map((childNode) => (
-          <RecursiveSubTree
-            key={childNode.id}
-            dom={dom}
-            root={childNode}
-            onHover={onHover}
-            onMouseLeave={onMouseLeave}
-          />
+          <RecursiveSubTree key={childNode.id} dom={dom} root={childNode} />
         ))}
       </CustomTreeItem>
     );
@@ -141,30 +129,20 @@ function RecursiveSubTree({
         nodeId={root.id}
         node={root}
         label={<Typography variant="body2">{root.name}</Typography>}
-        onHover={onHover}
-        onMouseLeave={onMouseLeave}
       >
         <TreeItem
           nodeId={`${root.id}-renderItem`}
           label={<Typography variant="body2">renderItem</Typography>}
         >
           {renderItem.map((childNode) => (
-            <RecursiveSubTree
-              key={childNode.id}
-              dom={dom}
-              root={childNode}
-              onHover={onHover}
-              onMouseLeave={onMouseLeave}
-            />
+            <RecursiveSubTree key={childNode.id} dom={dom} root={childNode} />
           ))}
         </TreeItem>
       </CustomTreeItem>
     );
   }
 
-  return (
-    <CustomTreeItem nodeId={root.id} node={root} onHover={onHover} onMouseLeave={onMouseLeave} />
-  );
+  return <CustomTreeItem nodeId={root.id} node={root} />;
 }
 
 export default function PageStructureExplorer() {
@@ -208,17 +186,6 @@ export default function PageStructureExplorer() {
     },
     [appStateApi],
   );
-
-  const handleNodeHover = React.useCallback(
-    (event: React.MouseEvent, nodeId: NodeId) => {
-      appStateApi.hoverNode(nodeId as NodeId);
-    },
-    [appStateApi],
-  );
-
-  const handleNodeBlur = React.useCallback(() => {
-    appStateApi.blurHoverNode();
-  }, [appStateApi]);
 
   const handleNodeToggle = React.useCallback(
     (event: React.SyntheticEvent, nodeIds: string[]) => {
@@ -292,13 +259,7 @@ export default function PageStructureExplorer() {
         }}
       >
         {rootChildren.map((childNode) => (
-          <RecursiveSubTree
-            key={childNode.id}
-            dom={dom}
-            root={childNode}
-            onHover={handleNodeHover}
-            onMouseLeave={handleNodeBlur}
-          />
+          <RecursiveSubTree key={childNode.id} dom={dom} root={childNode} />
         ))}
       </TreeView>
     </React.Fragment>

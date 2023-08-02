@@ -1,5 +1,83 @@
 # Changelog
 
+## 0.1.21
+
+<!-- generated comparing v0.1.20..master -->
+
+_Jul 25, 2023_
+
+A big thanks to the 6 contributors who made this release possible. Here are some highlights ✨:
+
+New Chart and Metric components, a page structure explorer to view components hierarchy and a new Page panel to contain page level state!
+
+- &#8203;<!-- 31 -->Move more APIs to utils package (#2352) @Janpot
+- &#8203;<!-- 30 -->Add page tab suggestions/improvements (#2342) @apedroferreira
+- &#8203;<!-- 29 -->Add visual regression test for resize grid (#2337) @apedroferreira
+- &#8203;<!-- 28 -->try with a lower memory limit @oliviertassinari
+- &#8203;<!-- 27 -->add example live @oliviertassinari
+- &#8203;<!-- 26 -->Fix the datagrid remounting when columns change (#2327) @Janpot
+- &#8203;<!-- 25 -->Fix: Improve missing editor scenario (#2238) @bharatkashyap
+- &#8203;<!-- 24 -->Update with-prisma README.md (#2336) @prakhargupta1
+- &#8203;<!-- 23 -->Upgrade monorepo (#2333) @bharatkashyap
+- &#8203;<!-- 22 -->Remove httpbin from rest tests to try and fix flakyness (#2330) @Janpot
+- &#8203;<!-- 21 -->Update CONTRIBUTING.md (#2328) @bharatkashyap
+- &#8203;<!-- 20 -->Fix some flakyness in the visual regression testing (#2329) @Janpot
+- &#8203;<!-- 19 -->Add Page tab to right-side panel (#2311) @apedroferreira
+- &#8203;<!-- 18 -->Default vertical alignment to top instead of center (#2312) @apedroferreira
+- &#8203;<!-- 17 -->Chart component (#2081) @apedroferreira
+- &#8203;<!-- 16 -->Remove Next.js (#2288) @Janpot
+- &#8203;<!-- 15 -->Remove packages/toolpad (#2287) @Janpot
+- &#8203;<!-- 14 -->Codify lodash usage in eslint (#1270) @Janpot
+- &#8203;<!-- 13 -->Add some visual regression tests (#1959) @Janpot
+- &#8203;<!-- 12 -->Add Metric component (#2202) @Janpot
+- &#8203;<!-- 11 -->Switch to stackblitz links for examples (#2307) @Janpot
+- &#8203;<!-- 10 -->[docs] Add link to live demo to KPI example (#2341) @prakhargupta1
+- &#8203;<!-- 09 -->[docs] Fix npx folder confusion (#2346) @oliviertassinari
+- &#8203;<!-- 08 -->[docs] Fix fs usage example @oliviertassinari
+- &#8203;<!-- 07 -->[docs] Fix fs usage example @oliviertassinari
+- &#8203;<!-- 06 -->[docs] Fix Connecting to databases page (#2345) @oliviertassinari
+- &#8203;<!-- 05 -->[docs] [cli] Add `createFunction` deprecation notices (#2334) @bharatkashyap
+- &#8203;<!-- 04 -->[feat] Add page structure explorer (#2246) @bharatkashyap
+- &#8203;<!-- 03 -->[test] Fail the CI when new unexpected files are created (#2332) @oliviertassinari
+- &#8203;<!-- 02 -->[website] Toolpad landing page design upgrade (#2266) @danilo-leal
+- &#8203;<!-- 01 -->[website] Fix CLS on hero icon (#2344) @oliviertassinari
+
+All contributors of this release in alphabetical order: @apedroferreira, @bharatkashyap, @danilo-leal, @Janpot, @oliviertassinari, @prakhargupta1
+
+✨ Done in 2.82s.
+
+## 0.1.20
+
+<!-- generated comparing v0.1.19..master -->
+
+_Jul 12, 2023_
+
+A big thanks to the 5 contributors who made this release possible. Here are some highlights ✨:
+
+Use vite for the Toolpad application instead of Next.js, Windows support, documentation updates.
+
+- &#8203;<!-- 19 -->Remove createFunction from examples (#2298) @Janpot
+- &#8203;<!-- 18 -->Add extra note about aspect ratio of screenshots (#2300) @Janpot
+- &#8203;<!-- 17 -->images aspect ratio 1.8090 (#2299) @prakhargupta1
+- &#8203;<!-- 16 -->Disallow access to DOM globals in bindings (#1991) @Janpot
+- &#8203;<!-- 15 -->Clarify the rules around documentation screenshots (#2296) @Janpot
+- &#8203;<!-- 14 -->Isolate prettier in renovatebot (#2295) @Janpot
+- &#8203;<!-- 13 -->Add eslint rule restricting React import style (#2286) @Janpot
+- &#8203;<!-- 12 -->Provide all exports of @mui/toolpad on @mui/toolpad-app (#2284) @Janpot
+- &#8203;<!-- 11 -->Resolve components from source for docs:build:api (#2280) @Janpot
+- &#8203;<!-- 10 -->Use vite for Toolpad editor (#1999) @Janpot
+- &#8203;<!-- 09 -->Add note about light theme (#2283) @Janpot
+- &#8203;<!-- 08 -->Hardcode prisma db in with-prisma example (#2282) @Janpot
+- &#8203;<!-- 07 -->Add prisma example (#2262) @Janpot
+- &#8203;<!-- 06 -->Update MUI monorepo (#2271) @apedroferreira
+- &#8203;<!-- 05 -->Fix Windows issues (#2181) @apedroferreira
+- &#8203;<!-- 04 -->Allow loading partial theme (#2270) @Janpot
+- &#8203;<!-- 03 -->[core] Polish imports to React (#2285) @oliviertassinari
+- &#8203;<!-- 02 -->[docs] Fix MUI reference (#2276) @oliviertassinari
+- &#8203;<!-- 01 -->[website] use `theme.applyDarkStyles` on marketing website (#2305) @bharatkashyap
+
+All contributors of this release in alphabetical order: @apedroferreira, @bharatkashyap, @Janpot, @oliviertassinari, @prakhargupta1
+
 ## 0.1.19
 
 <!-- generated comparing v0.1.18..master -->

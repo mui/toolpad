@@ -1,5 +1,5 @@
-import prettier from 'prettier';
 import * as fs from 'fs/promises';
+import prettier from 'prettier';
 
 export function escapeCell(value: string): string {
   return value

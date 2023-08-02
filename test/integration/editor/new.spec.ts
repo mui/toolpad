@@ -24,7 +24,7 @@ test('can place new components from catalog', async ({ page }) => {
 
   // Drag in a first component
 
-  await editorModel.dragNewComponentToAppCanvas(TEXT_FIELD_COMPONENT_DISPLAY_NAME);
+  await editorModel.dragNewComponentTo(TEXT_FIELD_COMPONENT_DISPLAY_NAME);
 
   await expect(canvasInputLocator).toHaveCount(1);
   await expect(canvasInputLocator).toBeVisible();
@@ -32,7 +32,7 @@ test('can place new components from catalog', async ({ page }) => {
 
   // Drag in a second component
 
-  await editorModel.dragNewComponentToAppCanvas(TEXT_FIELD_COMPONENT_DISPLAY_NAME);
+  await editorModel.dragNewComponentTo(TEXT_FIELD_COMPONENT_DISPLAY_NAME);
 
   await expect(canvasInputLocator).toHaveCount(2);
 });
@@ -58,7 +58,6 @@ test('can create/delete page', async ({ page, localApp }) => {
   const pageFile = path.resolve(pageFolder, './page.yml');
 
   await expect(pageMenuItem).toBeVisible();
-
   await expect.poll(async () => folderExists(pageFolder)).toBe(true);
   await expect.poll(async () => fileExists(pageFile)).toBe(true);
 

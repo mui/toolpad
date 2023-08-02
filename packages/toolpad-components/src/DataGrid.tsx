@@ -38,6 +38,7 @@ import { getObjectKey } from '@mui/toolpad-utils/objectKey';
 import { errorFrom } from '@mui/toolpad-utils/errors';
 import { hasImageExtension } from '@mui/toolpad-utils/path';
 import { ErrorBoundary, FallbackProps } from 'react-error-boundary';
+import { NumberFormat, createStringFormatter } from '@mui/toolpad-core/numberFormat';
 import { SX_PROP_HELPER_TEXT } from './constants';
 import ErrorOverlay from './components/ErrorOverlay';
 
@@ -282,43 +283,6 @@ export const CUSTOM_COLUMN_TYPES: Record<string, GridColTypeDef> = {
   },
 };
 
-export const NUMBER_FORMAT_PRESETS = new Map<string, { options?: Intl.NumberFormatOptions }>([
-  [
-    'bytes',
-    {
-      options: {
-        style: 'unit',
-        maximumSignificantDigits: 3,
-        notation: 'compact',
-        unit: 'byte',
-        unitDisplay: 'narrow',
-      },
-    },
-  ],
-  [
-    'percent',
-    {
-      options: {
-        style: 'percent',
-      },
-    },
-  ],
-]);
-
-export type NumberFormat =
-  | {
-      kind: 'preset';
-      preset: string;
-    }
-  | {
-      kind: 'currency';
-      currency?: string;
-    }
-  | {
-      kind: 'custom';
-      custom: Intl.NumberFormatOptions;
-    };
-
 export interface SerializableGridColumn
   extends Pick<GridColDef, 'field' | 'type' | 'align' | 'width' | 'headerName'> {
   numberFormat?: NumberFormat;
@@ -341,53 +305,13 @@ export function inferColumns(rows: GridRowsProp): SerializableGridColumns {
   });
 }
 
-function createNumericFormatter(
-  format: (value: number) => string,
-): (params: GridValueFormatterParams<unknown>) => string {
-  return ({ value }) => (typeof value === 'number' ? format(value) : String(value || ''));
-}
-
 export function parseColumns(columns: SerializableGridColumns): GridColDef[] {
   return columns.map((column) => {
     if (column.type === 'number' && column.numberFormat) {
-      switch (column.numberFormat.kind) {
-        case 'preset': {
-          const preset = NUMBER_FORMAT_PRESETS.get(column.numberFormat.preset);
-          const { format } = new Intl.NumberFormat(undefined, preset?.options);
-          return {
-            ...column,
-            valueFormatter: createNumericFormatter((value) => format(value)),
-          };
-        }
-        case 'custom': {
-          const { format } = new Intl.NumberFormat(undefined, column.numberFormat.custom);
-          return {
-            ...column,
-            valueFormatter: createNumericFormatter((value) => format(value)),
-          };
-        }
-        case 'currency': {
-          const userInput = column.numberFormat.currency || 'USD';
-          if (/[a-z]{3}/i.test(userInput)) {
-            const { format } = new Intl.NumberFormat(undefined, {
-              style: 'currency',
-              currency: userInput,
-            });
-            return {
-              ...column,
-              valueFormatter: createNumericFormatter((value) => format(value)),
-            };
-          }
-          const { format } = new Intl.NumberFormat(undefined, {});
-          return {
-            ...column,
-            valueFormatter: createNumericFormatter((value) => `${userInput} ${format(value)}`),
-          };
-        }
-        default: {
-          return column;
-        }
-      }
+      return {
+        ...column,
+        valueFormatter: createStringFormatter(column.numberFormat),
+      };
     }
 
     const customType = column.type ? CUSTOM_COLUMN_TYPES[column.type] : {};
@@ -536,12 +460,8 @@ const DataGridComponent = React.forwardRef(function DataGridComponent(
     apiRef.current.updateColumns(columns);
   }, [apiRef, columns]);
 
-  // The grid doesn't update when the getRowId or columns properties change, so it needs to be remounted
-  // TODO: remove columns from this equation once https://github.com/mui/mui-x/issues/5970 gets resolved
-  const gridKey = React.useMemo(
-    () => [getObjectKey(getRowId), getObjectKey(columns)].join('::'),
-    [getRowId, columns],
-  );
+  // The grid doesn't update when the getRowId property changes, so it needs to be remounted
+  const gridKey = React.useMemo(() => getObjectKey(getRowId), [getRowId]);
 
   const error: Error | null = errorProp ? errorFrom(errorProp) : null;
 
@@ -557,9 +477,9 @@ const DataGridComponent = React.forwardRef(function DataGridComponent(
       >
         <DataGridPro
           apiRef={apiRef}
-          components={{
-            Toolbar: hideToolbar ? null : GridToolbar,
-            LoadingOverlay: SkeletonLoadingOverlay,
+          slots={{
+            toolbar: hideToolbar ? null : GridToolbar,
+            loadingOverlay: SkeletonLoadingOverlay,
           }}
           onColumnResize={handleResize}
           onColumnOrderChange={handleColumnOrderChange}
@@ -621,7 +541,7 @@ export default createComponent(DataGridComponent, {
           required: ['field'],
         },
       },
-      control: { type: 'GridColumns' },
+      control: { type: 'GridColumns', bindable: false },
     },
     rowIdField: {
       helperText:

@@ -45,6 +45,8 @@ type MaybeLegacyParametersDefinition = PropValueType & {
 };
 
 /**
+ * @deprecated Directly export a function instead. This will be removed in a future release.
+ * See: https://mui.com/toolpad/reference/api/create-function/
  * Use this to define a function that will load the data for a Toolpad query.
  * You can define parameters for the function in the configuration object.
  * These parameters will be available in the Toolpad editor when creating a query and can be bound to page state.

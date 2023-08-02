@@ -5,10 +5,10 @@
   "scripts": {
     "dev": "toolpad dev",
     "build": "toolpad build",
-    "start": "toolpad start"
+    "start": "NODE_OPTIONS='--max-old-space-size=396' toolpad start"
   },
   "dependencies": {
-    "@mui/toolpad": "0.1.19",
+    "@mui/toolpad": "0.1.21",
     "recharts": "2.7.2"
   }
 }

@@ -1,6 +1,8 @@
 import * as React from 'react';
 import { styled, SxProps, Box, Divider, Typography } from '@mui/material';
-import HierarchyExplorer from './HierarchyExplorer';
+import PagesHierarchyExplorer from './HierarchyExplorer';
+import PageStructureExplorer from './StructureExplorer';
+import SplitPane from '../../components/SplitPane';
 import { useDom } from '../AppState';
 import AppOptions from '../AppOptions';
 import config from '../../config';
@@ -36,7 +38,10 @@ export default function PagePanel({ className, sx }: ComponentPanelProps) {
         <AppOptions dom={dom} />
       </Box>
       <Divider />
-      <HierarchyExplorer />
+      <SplitPane sx={{ flex: 1 }} split="horizontal" defaultSize={200} minSize={100} maxSize={400}>
+        <PagesHierarchyExplorer />
+        <PageStructureExplorer />
+      </SplitPane>
     </PagePanelRoot>
   );
 }

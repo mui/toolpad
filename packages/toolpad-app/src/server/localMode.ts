@@ -1,6 +1,7 @@
-import * as yaml from 'yaml';
 import * as path from 'path';
 import * as fs from 'fs/promises';
+import { isMainThread } from 'worker_threads';
+import * as yaml from 'yaml';
 import invariant from 'invariant';
 import openEditor from 'open-editor';
 import chalk from 'chalk';
@@ -20,7 +21,6 @@ import {
   updateYamlFile,
   fileExists,
 } from '@mui/toolpad-utils/fs';
-import config from '../config';
 import * as appDom from '../appDom';
 import insecureHash from '../utils/insecureHash';
 import {
@@ -50,12 +50,10 @@ import { ProjectEvents, ToolpadProjectOptions } from '../types';
 import { Awaitable } from '../utils/types';
 import EnvManager from './EnvManager';
 import FunctionsManager from './FunctionsManager';
-
-export function getUserProjectRoot(): string {
-  const { projectDir } = config;
-  invariant(projectDir, 'Toolpad in local mode must have a project directory defined');
-  return projectDir;
-}
+import { VersionInfo, checkVersion } from './versionInfo';
+import { VERSION_CHECK_INTERVAL } from '../constants';
+import DataManager from './DataManager';
+import type { RuntimeConfig } from '../config';
 
 function getToolpadFolder(root: string): string {
   return path.join(root, './toolpad');
@@ -231,20 +229,6 @@ function createDefaultCodeComponent(name: string): string {
       },
     });    
   `);
-}
-
-export async function createComponent(name: string) {
-  const root = getUserProjectRoot();
-  const componentsFolder = getComponentsFolder(root);
-  const filePath = getComponentFilePath(componentsFolder, name);
-  const content = createDefaultCodeComponent(name);
-  await writeFileRecursive(filePath, content, { encoding: 'utf-8' });
-}
-
-export async function deletePage(name: string) {
-  const root = getUserProjectRoot();
-  const pageFolder = getPageFolder(root, name);
-  await fs.rm(pageFolder, { force: true, recursive: true });
 }
 
 class Lock {
@@ -788,8 +772,7 @@ async function writeThemeFile(root: string, theme: Theme | null) {
   }
 }
 
-async function writeDomToDisk(dom: appDom.AppDom): Promise<void> {
-  const root = getUserProjectRoot();
+async function writeDomToDisk(root: string, dom: appDom.AppDom): Promise<void> {
   const { pages: pagesContent } = extractPagesFromDom(dom);
   await Promise.all([
     writePagesToFiles(root, pagesContent),
@@ -810,34 +793,6 @@ export async function findSupportedEditor(): Promise<string | null> {
   } catch (err) {
     return null;
   }
-}
-
-let supportedEditorPromise: Promise<string | null>;
-
-export async function getSupportedEditor(): Promise<string | null> {
-  if (!supportedEditorPromise) {
-    supportedEditorPromise = findSupportedEditor();
-  }
-  return supportedEditorPromise;
-}
-
-async function openCodeEditor(file: string): Promise<void> {
-  const supportedEditor = await getSupportedEditor();
-  if (!supportedEditor) {
-    throw new Error(`No code editor found`);
-  }
-  const userProjectRoot = getUserProjectRoot();
-  const fullPath = path.resolve(userProjectRoot, file);
-  openEditor([fullPath, userProjectRoot], {
-    editor: process.env.EDITOR ? undefined : DEFAULT_EDITOR,
-  });
-}
-
-export async function openCodeComponentEditor(componentName: string): Promise<void> {
-  const root = getUserProjectRoot();
-  const componentsFolder = getComponentsFolder(root);
-  const fullPath = getComponentFilePath(componentsFolder, componentName);
-  await openCodeEditor(fullPath);
 }
 
 export type ProjectFolderEntry = {
@@ -889,13 +844,12 @@ function projectFolderToAppDom(projectFolder: ToolpadProjectFolder): appDom.AppD
   return dom;
 }
 
-async function loadProjectFolder(): Promise<ToolpadProjectFolder> {
-  const root = getUserProjectRoot();
+async function loadProjectFolder(root: string): Promise<ToolpadProjectFolder> {
   return readProjectFolder(root);
 }
 
-export async function loadDomFromDisk(): Promise<appDom.AppDom> {
-  const projectFolder = await loadProjectFolder();
+export async function loadDomFromDisk(root: string): Promise<appDom.AppDom> {
+  const projectFolder = await loadProjectFolder(root);
 
   return projectFolderToAppDom(projectFolder);
 }
@@ -921,7 +875,6 @@ function getDomFilePatterns(root: string) {
     path.resolve(root, './toolpad/components/*.*'),
   ];
 }
-
 /**
  * Calculates a fingerprint from all files that influence the dom structure
  */
@@ -961,7 +914,7 @@ function getCodeComponentsFingerprint(dom: appDom.AppDom) {
 }
 
 class ToolpadProject {
-  root: string;
+  private root: string;
 
   events = new Emitter<ProjectEvents>();
 
@@ -977,21 +930,27 @@ class ToolpadProject {
 
   functionsManager: FunctionsManager;
 
+  dataManager: DataManager;
+
   invalidateQueries: () => void;
 
   private alertedMissingVars = new Set<string>();
 
+  private lastVersionCheck = 0;
+
+  private pendingVersionCheck: Promise<VersionInfo> | undefined;
+
   constructor(root: string, options: Partial<ToolpadProjectOptions>) {
     this.root = root;
     this.options = {
+      cmd: 'start',
       dev: false,
       ...options,
     };
 
     this.envManager = new EnvManager(this);
     this.functionsManager = new FunctionsManager(this);
-
-    this.initWatcher();
+    this.dataManager = new DataManager(this);
 
     this.invalidateQueries = throttle(
       () => {
@@ -1017,7 +976,7 @@ class ToolpadProject {
           // eslint-disable-next-line no-console
           console.log(`${chalk.magenta('event')} - Project changed on disk, updating...`);
           this.domAndFingerprint = await Promise.all([
-            loadDomFromDisk(),
+            loadDomFromDisk(this.root),
             calculateDomFingerprint(this.root),
           ]);
           this.events.emit('change', { fingerprint });
@@ -1034,14 +993,21 @@ class ToolpadProject {
       });
     }, 100);
 
-    chokidar.watch(getDomFilePatterns(this.root)).on('all', () => {
+    const watchOptions: chokidar.WatchOptions = {
+      usePolling: true,
+    };
+
+    chokidar.watch(getDomFilePatterns(this.root), watchOptions).on('all', () => {
       updateDomFromExternal();
     });
   }
 
   private async loadDomAndFingerprint() {
     if (!this.domAndFingerprint) {
-      this.domAndFingerprint = Promise.all([loadDomFromDisk(), calculateDomFingerprint(this.root)]);
+      this.domAndFingerprint = Promise.all([
+        loadDomFromDisk(this.root),
+        calculateDomFingerprint(this.root),
+      ]);
     }
     return this.domAndFingerprint;
   }
@@ -1083,6 +1049,21 @@ class ToolpadProject {
     this.alertedMissingVars = new Set(missingVars);
   }
 
+  async start() {
+    if (this.options.dev) {
+      await this.initWatcher();
+    }
+    await Promise.all([this.envManager.start(), this.functionsManager.start()]);
+  }
+
+  async build() {
+    await Promise.all([this.envManager.build(), this.functionsManager.build()]);
+  }
+
+  async dispose() {
+    await Promise.all([this.envManager.dispose(), this.functionsManager.dispose()]);
+  }
+
   async loadDom() {
     const [dom] = await this.loadDomAndFingerprint();
     this.alertOnMissingVariablesInDom(dom);
@@ -1090,11 +1071,11 @@ class ToolpadProject {
   }
 
   async writeDomToDisk(newDom: appDom.AppDom) {
-    if (config.cmd !== 'dev') {
+    if (!this.options.dev) {
       throw new Error(`Writing to disk is only possible in toolpad dev mode.`);
     }
 
-    await writeDomToDisk(newDom);
+    await writeDomToDisk(this.root, newDom);
     const newFingerprint = await calculateDomFingerprint(this.root);
     this.domAndFingerprint = [newDom, newFingerprint];
     this.events.emit('change', { fingerprint: newFingerprint });
@@ -1115,24 +1096,92 @@ class ToolpadProject {
     });
   }
 
-  async openCodeEditor(file: string): Promise<void> {
-    const supportedEditor = await getSupportedEditor();
+  async openCodeEditor(fileName: string, fileType: string) {
+    const supportedEditor = await findSupportedEditor();
     if (!supportedEditor) {
       throw new Error(`No code editor found`);
     }
-    const fullPath = path.resolve(this.getRoot(), file);
-    openEditor([fullPath, this.getRoot()], {
+    const root = this.getRoot();
+    let resolvedPath = fileName;
+
+    if (fileType === 'query') {
+      resolvedPath = await this.functionsManager.getFunctionFilePath(fileName);
+    }
+    if (fileType === 'component') {
+      const componentsFolder = getComponentsFolder(root);
+      resolvedPath = getComponentFilePath(componentsFolder, fileName);
+    }
+    const fullResolvedPath = path.resolve(root, resolvedPath);
+    openEditor([fullResolvedPath, root], {
       editor: process.env.EDITOR ? undefined : DEFAULT_EDITOR,
     });
   }
+
+  async getVersionInfo(): Promise<VersionInfo> {
+    const now = Date.now();
+    if (!this.pendingVersionCheck || this.lastVersionCheck + VERSION_CHECK_INTERVAL <= now) {
+      this.lastVersionCheck = now;
+      this.pendingVersionCheck = checkVersion(this.root);
+    }
+
+    return this.pendingVersionCheck;
+  }
+
+  async createComponent(name: string) {
+    const componentsFolder = getComponentsFolder(this.root);
+    const filePath = getComponentFilePath(componentsFolder, name);
+    const content = createDefaultCodeComponent(name);
+    await writeFileRecursive(filePath, content, { encoding: 'utf-8' });
+  }
+
+  async deletePage(name: string) {
+    const pageFolder = getPageFolder(this.root, name);
+    await fs.rm(pageFolder, { force: true, recursive: true });
+  }
+
+  getRuntimeConfig(): RuntimeConfig {
+    return {
+      externalUrl:
+        process.env.TOOLPAD_EXTERNAL_URL || `http://localhost:${process.env.PORT || 3000}`,
+      projectDir: this.getRoot(),
+      cmd: this.options.dev ? 'dev' : 'start',
+    };
+  }
 }
 
-export async function initProject() {
-  const root = getUserProjectRoot();
+export type { ToolpadProject };
+
+declare global {
+  // eslint-disable-next-line
+  var __toolpadProject: ToolpadProject | undefined;
+}
+
+export async function initProject(cmd: 'dev' | 'start' | 'build', root: string) {
+  invariant(
+    isMainThread,
+    'initProject must be called from the main thread. Otherwise it will add the file watchers in multiple processes.',
+  );
+
+  // eslint-disable-next-line no-underscore-dangle
+  invariant(!global.__toolpadProject, 'A project is already running');
 
   await migrateLegacyProject(root);
 
   await initToolpadFolder(root);
 
-  return new ToolpadProject(root, { dev: config.cmd === 'dev' });
+  const project = new ToolpadProject(root, { cmd, dev: cmd === 'dev' });
+  // eslint-disable-next-line no-underscore-dangle
+  globalThis.__toolpadProject = project;
+
+  await project.start();
+
+  return project;
+}
+
+export async function buildProject(root: string) {
+  const project = new ToolpadProject(root, { cmd: 'build', dev: false });
+
+  await project.build();
+
+  await project.dispose();
 }

@@ -1,34 +1,19 @@
 import { ArgTypeDefinition, ArgControlSpec, PropValueType } from '@mui/toolpad-core';
+import { createProvidedContext } from '@mui/toolpad-utils/react';
 import string from './string';
 import boolean from './boolean';
 import number from './number';
 import select from './select';
 import json from './json';
-import markdown from './Markdown';
 import event from './event';
-import GridColumns from './GridColumns';
-import SelectOptions from './SelectOptions';
-import HorizontalAlign from './HorizontalAlign';
-import VerticalAlign from './VerticalAlign';
-import RowIdFieldSelect from './RowIdFieldSelect';
 import { EditorProps } from '../../types';
 
-const propTypeControls: {
+export type PropTypeControls = {
   [key in ArgControlSpec['type']]?: React.FC<EditorProps<any>>;
-} = {
-  string,
-  boolean,
-  number,
-  select,
-  json,
-  markdown,
-  event,
-  GridColumns,
-  SelectOptions,
-  RowIdFieldSelect,
-  HorizontalAlign,
-  VerticalAlign,
 };
+
+export const [usePropControlsContext, PropControlsContextProvider] =
+  createProvidedContext<PropTypeControls>('PropControls');
 
 function getDefaultControlForType(propType: PropValueType): React.FC<EditorProps<any>> | null {
   switch (propType.type) {
@@ -57,6 +42,7 @@ const modePropTypeMap = new Map<string, ArgControlSpec['type']>([
 ]);
 
 export function getDefaultControl<P extends { [key in string]?: unknown }>(
+  controls: PropTypeControls,
   argType: ArgTypeDefinition<P>,
   liveProps?: P,
 ): React.FC<EditorProps<any>> | null {
@@ -69,14 +55,12 @@ export function getDefaultControl<P extends { [key in string]?: unknown }>(
           if (!mappedControlFromMode) {
             return null;
           }
-          return propTypeControls[mappedControlFromMode] ?? null;
+          return controls[mappedControlFromMode] ?? null;
         }
       }
     }
-    return propTypeControls[argType.control.type] ?? getDefaultControlForType(argType);
+    return controls[argType.control.type] ?? getDefaultControlForType(argType);
   }
 
   return getDefaultControlForType(argType);
 }
-
-export default propTypeControls;

@@ -1,6 +1,8 @@
 import { Stack, styled, Typography, Divider } from '@mui/material';
 import * as React from 'react';
-import * as _ from 'lodash-es';
+// TODO: Remove lodash-es import here
+// eslint-disable-next-line no-restricted-imports
+import { groupBy } from 'lodash-es';
 import {
   ArgTypeDefinition,
   ArgTypeDefinitions,
@@ -10,9 +12,8 @@ import {
 import { ExactEntriesOf } from '../../../utils/types';
 import * as appDom from '../../../appDom';
 import NodeAttributeEditor from './NodeAttributeEditor';
-import { useDom, useAppState } from '../../AppState';
+import { useDom } from '../../AppState';
 import { usePageEditorState } from './PageEditorProvider';
-import PageOptionsPanel from './PageOptionsPanel';
 import ErrorAlert from './ErrorAlert';
 import NodeNameEditor from '../NodeNameEditor';
 import { useToolpadComponent } from '../toolpadComponents';
@@ -98,7 +99,7 @@ function ComponentPropsEditor<P extends object>({
     );
   }, [bindings, node.id]);
 
-  const argTypesByCategory = _.groupBy(
+  const argTypesByCategory: Record<string, ExactEntriesOf<ArgTypeDefinitions<P>>> = groupBy(
     Object.entries(componentConfig.argTypes || {}) as ExactEntriesOf<ArgTypeDefinitions<P>>,
     ([, propTypeDef]) => propTypeDef?.category || 'properties',
   );
@@ -112,16 +113,26 @@ function ComponentPropsEditor<P extends object>({
           </Typography>
 
           <div className={classes.control}>
-            <NodeAttributeEditor
-              node={node}
-              namespace="layout"
-              name={hasLayoutHorizontalControls ? 'horizontalAlign' : 'verticalAlign'}
-              argType={
-                hasLayoutHorizontalControls
-                  ? layoutBoxArgTypes.horizontalAlign
-                  : layoutBoxArgTypes.verticalAlign
-              }
-            />
+            <Typography variant="body2">Alignment:</Typography>
+            <Stack direction="row">
+              {hasLayoutHorizontalControls ? (
+                <NodeAttributeEditor
+                  node={node}
+                  namespace="layout"
+                  name="horizontalAlign"
+                  argType={layoutBoxArgTypes.horizontalAlign}
+                  sx={{ maxWidth: 110 }}
+                />
+              ) : null}
+              {hasLayoutVerticalControls ? (
+                <NodeAttributeEditor
+                  node={node}
+                  namespace="layout"
+                  name="verticalAlign"
+                  argType={layoutBoxArgTypes.verticalAlign}
+                />
+              ) : null}
+            </Stack>
           </div>
 
           <Divider sx={{ mt: 1 }} />
@@ -184,24 +195,14 @@ function SelectedNodeEditor({ node }: SelectedNodeEditorProps) {
 }
 
 export interface ComponentEditorProps {
+  node: appDom.ElementNode;
   className?: string;
 }
 
-export default function ComponentEditor({ className }: ComponentEditorProps) {
-  const { dom } = useDom();
-  const { currentView } = useAppState();
-  const selectedNodeId = currentView.kind === 'page' ? currentView.selectedNodeId : null;
-
-  const selectedNode = selectedNodeId ? appDom.getMaybeNode(dom, selectedNodeId) : null;
-
+export default function ComponentEditor({ node, className }: ComponentEditorProps) {
   return (
     <ComponentEditorRoot className={className} data-testid="component-editor">
-      {selectedNode && appDom.isElement(selectedNode) ? (
-        // Add key to make sure it mounts every time selected node changes
-        <SelectedNodeEditor key={selectedNode.id} node={selectedNode} />
-      ) : (
-        <PageOptionsPanel />
-      )}
+      <SelectedNodeEditor key={node.id} node={node} />
     </ComponentEditorRoot>
   );
 }

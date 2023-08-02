@@ -1,6 +1,7 @@
 // TODO: remove these lodash-es imports
 // eslint-disable-next-line no-restricted-imports
-import { setWith, clone } from 'lodash-es';
+import { setWith } from 'lodash-es';
+import { isDeepClone } from '@mui/toolpad-utils/collections';
 
 /**
  * Applies changes to an object in an immutable way. The `dest` object will adopt the properties of
@@ -29,7 +30,7 @@ export function updateOrCreate<T>(dest: T | null | undefined, src: NonNullable<T
  * Updates an object's property value for a given path in an immutable way.
  */
 export function updatePath<P extends object, V>(obj: P, path: string, value: V): P {
-  return setWith(clone(obj), path, value, clone);
+  return setWith(isDeepClone(obj), path, value, isDeepClone);
 }
 
 /**

@@ -155,3 +155,30 @@ export function isDeepEqual<T = unknown>(obj: T, objToCompare: T): boolean {
     return false;
   }
 }
+
+/**
+ * deep clone an object
+ */
+export function isDeepClone<T>(val: T) {
+  if (Object.prototype.toString.call(val) === '[object Object]') {
+    const res: Record<string, unknown> = {};
+    for (const key of Object.keys(val as T as Object)) {
+      res[key] = isDeepClone(val[key as keyof T]);
+    }
+    return res as T;
+  }
+
+  if (Array.isArray(val)) {
+    return val.slice() as T;
+  }
+
+  if (val instanceof Set) {
+    return new Set([...val]) as T;
+  }
+
+  if (val instanceof Map) {
+    return new Map([...val]) as T;
+  }
+
+  return val as T;
+}

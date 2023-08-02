@@ -1,5 +1,5 @@
 import { describe, test, expect } from '@jest/globals';
-import { asArray, isDeepEqual } from './collections';
+import { asArray, isDeepEqual, isDeepClone } from './collections';
 
 describe('asArray', () => {
   test.each([
@@ -77,5 +77,31 @@ describe('isDeepEqual', () => {
         ]),
       ),
     ).toBe(false);
+  });
+  test('isDeepClone', () => {
+    const obj = isDeepClone({
+      a: 1,
+      b: new Set([1, 2, 3]),
+      s: '2',
+      z: undefined,
+      c: [1, 2, 3],
+      m: new Map([
+        [1, 'one'],
+        [2, 'two'],
+        [3, 'three'],
+      ]),
+    });
+    expect(obj).toEqual({
+      a: 1,
+      b: new Set([1, 2, 3]),
+      s: '2',
+      z: undefined,
+      c: [1, 2, 3],
+      m: new Map([
+        [1, 'one'],
+        [2, 'two'],
+        [3, 'three'],
+      ]),
+    });
   });
 });

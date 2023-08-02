@@ -120,7 +120,7 @@ function RecursiveSubTree({
     ));
   }
 
-  if (children.length) {
+  if (children.length > 0) {
     return (
       <CustomTreeItem nodeId={root.id} node={root} onHover={onHover} onMouseLeave={onMouseLeave}>
         {children.map((childNode) => (
@@ -135,7 +135,7 @@ function RecursiveSubTree({
       </CustomTreeItem>
     );
   }
-  if (renderItem.length) {
+  if (renderItem.length > 0) {
     return (
       <CustomTreeItem
         nodeId={root.id}

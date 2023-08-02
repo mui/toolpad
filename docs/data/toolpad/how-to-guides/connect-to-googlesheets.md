@@ -1,4 +1,4 @@
-# Connecting to Google sheets
+# Google sheets
 
 <p class="description">Quickly fetch data from Google sheets to build a Toolpad app </p>
 

@@ -3,13 +3,10 @@ import latestVersion from 'latest-version';
 import * as semver from 'semver';
 import { fileExists } from '@mui/toolpad-utils/fs';
 import pkg from '../../package.json';
-import { VERSION_CHECK_INTERVAL } from '../constants';
-import { getUserProjectRoot } from './localMode';
 
 export type PackageManager = 'npm' | 'yarn' | 'pnpm';
 
-async function detectPackageManager() {
-  const root = getUserProjectRoot();
+async function detectPackageManager(root: string) {
   const [hasYarnLock, hasPackageLock, hasPnpmLock] = await Promise.all([
     fileExists(path.resolve(root, './yarn.lock')),
     fileExists(path.resolve(root, './package-lock.lock')),
@@ -38,26 +35,13 @@ export interface VersionInfo {
   packageManager: PackageManager | null;
 }
 
-async function checkVersion(): Promise<VersionInfo> {
+export async function checkVersion(root: string): Promise<VersionInfo> {
   const pkgName = '@mui/toolpad';
   const [latest, packageManager] = await Promise.all([
     latestVersion(pkgName),
-    detectPackageManager(),
+    detectPackageManager(root),
   ]);
   const current = pkg.version;
   const updateAvailable = semver.compare(latest, current) > 0;
   return { current, latest, updateAvailable, packageManager };
-}
-
-let lastCheck = 0;
-let pendingCheck: Promise<VersionInfo> | undefined;
-
-export async function getVersionInfo(): Promise<VersionInfo> {
-  const now = Date.now();
-  if (!pendingCheck || lastCheck + VERSION_CHECK_INTERVAL <= now) {
-    lastCheck = now;
-    pendingCheck = checkVersion();
-  }
-
-  return pendingCheck;
 }

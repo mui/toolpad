@@ -8,6 +8,7 @@ import {
 } from '../src/server/toolpadAppBuilder';
 import type { RuntimeConfig } from '../src/config';
 import { loadDomFromDisk } from '../src/server/localMode';
+import * as appDom from '../src/appDom';
 
 invariant(
   process.env.NODE_ENV === 'development',
@@ -48,47 +49,63 @@ export interface ToolpadAppDevServerParams {
   config: RuntimeConfig;
   root: string;
   base: string;
+  dom: appDom.AppDom;
 }
 
-export async function createDevServer({ config, root, base }: ToolpadAppDevServerParams) {
-  const devServer = await createServer(
-    createViteConfig({
-      dev: true,
-      root,
-      base,
-      plugins: [devServerPlugin(root, config)],
-    }),
-  );
+export async function createDevServer({ config, root, base, dom }: ToolpadAppDevServerParams) {
+  const { viteConfig, updateDom } = createViteConfig({
+    dev: true,
+    root,
+    base,
+    dom,
+    plugins: [devServerPlugin(root, config)],
+  });
+  const devServer = await createServer(viteConfig);
 
-  return devServer;
+  return { devServer, updateDom };
 }
 
-export type Command = {
-  kind: 'reload-components';
-};
+export type Command =
+  | {
+      kind: 'reload-components';
+    }
+  | {
+      kind: 'change-dom';
+      dom: appDom.AppDom;
+    };
 
 export type Event = {
   kind: 'ready';
 };
 
-export interface MainParams {
+export interface ServerConfig {
   base: string;
   root: string;
   port: number;
   config: RuntimeConfig;
+  initialDom: appDom.AppDom;
 }
 
-export async function main({ base, config, root, port }: MainParams) {
-  const app = await createDevServer({ config, root, base });
+export async function main({ base, config, root, port, initialDom }: ServerConfig) {
+  const { devServer, updateDom } = await createDevServer({ config, root, base, dom: initialDom });
 
-  await app.listen(port);
+  await devServer.listen(port);
 
   process.on('message', (msg: Command) => {
-    if (msg.kind === 'reload-components') {
-      const mod = app.moduleGraph.getModuleById(resolvedComponentsId);
-      if (mod) {
-        app.reloadModule(mod);
+    switch (msg.kind) {
+      case 'reload-components': {
+        const mod = devServer.moduleGraph.getModuleById(resolvedComponentsId);
+        if (mod) {
+          devServer.reloadModule(mod);
+        }
+        break;
       }
+      case 'change-dom': {
+        updateDom(msg.dom);
+        break;
+      }
+      default:
+        throw new Error(`Unknown command ${msg}`);
     }
   });
 
@@ -96,17 +113,9 @@ export async function main({ base, config, root, port }: MainParams) {
   process.send({ kind: 'ready' } satisfies Event);
 }
 
-invariant(!!process.env.TOOLPAD_PROJECT_DIR, 'A project root must be defined');
-invariant(!!process.env.TOOLPAD_RUNTIME_CONFIG, 'A runtime config must be defined');
-invariant(!!process.env.TOOLPAD_PORT, 'A port must be defined');
-invariant(!!process.env.TOOLPAD_BASE, 'A base path must be defined');
+invariant(!!process.env.SERVER_CONFIG, 'A server config must be defined');
 
-main({
-  config: JSON.parse(process.env.TOOLPAD_RUNTIME_CONFIG) as RuntimeConfig,
-  base: process.env.TOOLPAD_BASE,
-  root: process.env.TOOLPAD_PROJECT_DIR,
-  port: Number(process.env.TOOLPAD_PORT),
-}).catch((err) => {
+main(JSON.parse(process.env.SERVER_CONFIG)).catch((err) => {
   console.error(err);
   process.exit(1);
 });

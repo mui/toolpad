@@ -18,7 +18,11 @@ import chalk from 'chalk';
 import { asyncHandler } from '../src/utils/express';
 import { createProdHandler } from '../src/server/toolpadAppServer';
 import { ToolpadProject, initProject } from '../src/server/localMode';
-import { Command as AppDevServerCommand, Event as AppDevServerEvent } from './appServer';
+import {
+  Command as AppDevServerCommand,
+  Event as AppDevServerEvent,
+  ServerConfig as AppServerConfig,
+} from './appServer';
 import { createRpcHandler, createRpcServer } from '../src/server/rpc';
 import { RUNTIME_CONFIG_WINDOW_PROPERTY } from '../src/constants';
 import type { RuntimeConfig } from '../src/config';
@@ -46,15 +50,20 @@ async function createDevHandler(
   const appServerPath = path.resolve(__dirname, './appServer.js');
   const devPort = await getPort();
 
+  const initialDom = await project.loadDom();
+
   const cp = execaNode(appServerPath, [], {
     cwd: project.getRoot(),
     stdio: 'inherit',
     env: {
       NODE_ENV: 'development',
-      TOOLPAD_RUNTIME_CONFIG: JSON.stringify(runtimeConfig),
-      TOOLPAD_PORT: String(devPort),
-      TOOLPAD_PROJECT_DIR: project.getRoot(),
-      TOOLPAD_BASE: base,
+      SERVER_CONFIG: JSON.stringify({
+        root: project.getRoot(),
+        base,
+        port: devPort,
+        config: runtimeConfig,
+        initialDom,
+      } satisfies AppServerConfig),
       FORCE_COLOR: '1',
     },
   });
@@ -74,6 +83,11 @@ async function createDevHandler(
 
   project.events.on('componentsListChanged', () => {
     cp.send({ kind: 'reload-components' } satisfies AppDevServerCommand);
+  });
+
+  project.events.on('change', async () => {
+    const newDom = await project.loadDom();
+    cp.send({ kind: 'change-dom', dom: newDom } satisfies AppDevServerCommand);
   });
 
   router.use('/api/data', project.dataManager.createDataHandler(project));
@@ -124,6 +138,8 @@ async function main({
   };
 
   const project = await initProject(cmd, projectDir);
+
+  await project.start();
 
   const app = express();
   const httpServer = createServer(app);

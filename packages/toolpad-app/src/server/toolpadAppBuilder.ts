@@ -9,6 +9,8 @@ import { getComponents, getAppOutputFolder } from './localMode';
 import type { RuntimeConfig } from '../config';
 import * as appDom from '../appDom';
 import createRuntimeState from '../runtime/createRuntimeState';
+import virtualFsPlugin, { replaceFiles } from './viteVirtualFsPlugin';
+import { generateCode } from './codeGeneration';
 
 const MAIN_ENTRY = '/main.tsx';
 const CANVAS_ENTRY = '/canvas.tsx';
@@ -192,6 +194,12 @@ export interface CreateViteConfigParams {
   root: string;
   base: string;
   plugins?: Plugin[];
+  dom: appDom.AppDom;
+}
+
+export interface CreateViteConfigResult {
+  viteConfig: InlineConfig;
+  updateDom: (newDom: appDom.AppDom) => void;
 }
 
 export function createViteConfig({
@@ -199,93 +207,113 @@ export function createViteConfig({
   dev,
   base,
   plugins = [],
-}: CreateViteConfigParams): InlineConfig {
+  dom,
+}: CreateViteConfigParams): CreateViteConfigResult {
   const mode = dev ? 'development' : 'production';
+
+  const codegen = generateCode(dom);
+  const generatedFsPlugin = virtualFsPlugin(codegen.files, 'codegen-fs');
+
   return {
-    configFile: false,
-    mode,
-    build: {
-      outDir: getAppOutputFolder(root),
-      chunkSizeWarningLimit: Infinity,
-      rollupOptions: {
-        onwarn(warning, warn) {
-          if (warning.code === 'MODULE_LEVEL_DIRECTIVE') {
-            return;
-          }
-          warn(warning);
+    viteConfig: {
+      configFile: false,
+      mode,
+      build: {
+        outDir: getAppOutputFolder(root),
+        chunkSizeWarningLimit: Infinity,
+        rollupOptions: {
+          onwarn(warning, warn) {
+            if (warning.code === 'MODULE_LEVEL_DIRECTIVE') {
+              return;
+            }
+            warn(warning);
+          },
         },
       },
-    },
-    envFile: false,
-    resolve: {
-      alias: [
-        {
-          // FIXME(https://github.com/mui/material-ui/issues/35233)
-          find: /^@mui\/icons-material\/([^/]*)/,
-          replacement: '@mui/icons-material/esm/$1',
+      envFile: false,
+      resolve: {
+        alias: [
+          {
+            // FIXME(https://github.com/mui/material-ui/issues/35233)
+            find: /^@mui\/icons-material\/([^/]*)/,
+            replacement: '@mui/icons-material/esm/$1',
+          },
+          ...(process.env.EXPERIMENTAL_CODE_GENERATION
+            ? [
+                {
+                  find: MAIN_ENTRY,
+                  replacement: 'virtual:codegen-fs:/index.tsx',
+                },
+              ]
+            : []),
+        ],
+      },
+      server: {
+        fs: {
+          allow: [root, path.resolve(__dirname, '../../../../')],
         },
-      ],
-    },
-    server: {
-      fs: {
-        allow: [root, path.resolve(__dirname, '../../../../')],
+      },
+      optimizeDeps: {
+        include: [
+          '@emotion/cache',
+          '@emotion/react',
+          '@mui/icons-material/ArrowDropDownRounded',
+          '@mui/icons-material/DarkMode',
+          '@mui/icons-material/Edit',
+          '@mui/icons-material/Error',
+          '@mui/icons-material/HelpOutlined',
+          '@mui/icons-material/LightMode',
+          '@mui/icons-material/OpenInNew',
+          '@mui/icons-material/SettingsBrightnessOutlined',
+          '@mui/lab',
+          '@mui/material',
+          '@mui/material/Button',
+          '@mui/material/colors',
+          '@mui/material/styles',
+          '@mui/material/useMediaQuery',
+          '@mui/utils',
+          '@mui/x-data-grid-pro',
+          '@mui/x-date-pickers/AdapterDayjs',
+          '@mui/x-date-pickers/DesktopDatePicker',
+          '@mui/x-date-pickers/LocalizationProvider',
+          '@tanstack/react-query',
+          '@tanstack/react-query-devtools/build/lib/index.prod.js',
+          'dayjs',
+          'dayjs/locale/en',
+          'dayjs/locale/fr',
+          'dayjs/locale/nl',
+          'fractional-indexing',
+          'invariant',
+          'lodash-es',
+          'markdown-to-jsx',
+          'nanoid/non-secure',
+          'react',
+          'react-dom/client',
+          'react-error-boundary',
+          'react-hook-form',
+          'react-is',
+          'react-router-dom',
+          'react/jsx-dev-runtime',
+          'react/jsx-runtime',
+          'recharts',
+          'superjson',
+          'zod',
+        ],
+      },
+      appType: 'custom',
+      logLevel: 'info',
+      root,
+      plugins: [generatedFsPlugin, react(), toolpadVitePlugin({ root, base }), ...plugins],
+      base,
+      define: {
+        'process.env.NODE_ENV': `'${mode}'`,
+        'process.env.BASE_URL': `'${base}'`,
       },
     },
-    optimizeDeps: {
-      include: [
-        '@emotion/cache',
-        '@emotion/react',
-        '@mui/icons-material/ArrowDropDownRounded',
-        '@mui/icons-material/DarkMode',
-        '@mui/icons-material/Edit',
-        '@mui/icons-material/Error',
-        '@mui/icons-material/HelpOutlined',
-        '@mui/icons-material/LightMode',
-        '@mui/icons-material/OpenInNew',
-        '@mui/icons-material/SettingsBrightnessOutlined',
-        '@mui/lab',
-        '@mui/material',
-        '@mui/material/Button',
-        '@mui/material/colors',
-        '@mui/material/styles',
-        '@mui/material/useMediaQuery',
-        '@mui/utils',
-        '@mui/x-data-grid-pro',
-        '@mui/x-date-pickers/AdapterDayjs',
-        '@mui/x-date-pickers/DesktopDatePicker',
-        '@mui/x-date-pickers/LocalizationProvider',
-        '@tanstack/react-query',
-        '@tanstack/react-query-devtools/build/lib/index.prod.js',
-        'dayjs',
-        'dayjs/locale/en',
-        'dayjs/locale/fr',
-        'dayjs/locale/nl',
-        'fractional-indexing',
-        'invariant',
-        'lodash-es',
-        'markdown-to-jsx',
-        'nanoid/non-secure',
-        'react',
-        'react-dom/client',
-        'react-error-boundary',
-        'react-hook-form',
-        'react-is',
-        'react-router-dom',
-        'react/jsx-dev-runtime',
-        'react/jsx-runtime',
-        'recharts',
-        'superjson',
-        'zod',
-      ],
-    },
-    appType: 'custom',
-    logLevel: 'info',
-    root,
-    plugins: [react(), toolpadVitePlugin({ root, base }), ...plugins],
-    base,
-    define: {
-      'process.env.NODE_ENV': `'${mode}'`,
-      'process.env.BASE_URL': `'${base}'`,
+
+    updateDom: (newDom: appDom.AppDom) => {
+      const newCode = generateCode(newDom);
+      replaceFiles(generatedFsPlugin, newCode.files);
     },
   };
 }
@@ -293,8 +321,10 @@ export function createViteConfig({
 export interface ToolpadBuilderParams {
   root: string;
   base: string;
+  dom: appDom.AppDom;
 }
 
-export async function buildApp({ root, base }: ToolpadBuilderParams) {
-  await build(createViteConfig({ dev: false, root, base }));
+export async function buildApp({ root, base, dom }: ToolpadBuilderParams) {
+  const { viteConfig } = createViteConfig({ dev: false, root, base, dom });
+  await build(viteConfig);
 }

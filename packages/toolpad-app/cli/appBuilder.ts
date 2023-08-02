@@ -1,6 +1,6 @@
 import invariant from 'invariant';
 import { buildApp } from '../src/server/toolpadAppBuilder';
-import { buildProject } from '../src/server/localMode';
+import { initProject } from '../src/server/localMode';
 
 async function main() {
   invariant(
@@ -11,9 +11,15 @@ async function main() {
 
   const projectDir = process.env.TOOLPAD_PROJECT_DIR;
 
-  await buildProject(projectDir);
+  const project = await initProject('build', projectDir);
 
-  await buildApp({ root: projectDir, base: '/prod' });
+  const dom = await project.loadDom();
+
+  await project.build();
+
+  await buildApp({ root: projectDir, base: '/prod', dom });
+
+  await project.dispose();
 }
 
 main().catch((err) => {

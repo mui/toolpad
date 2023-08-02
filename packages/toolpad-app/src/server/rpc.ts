@@ -7,11 +7,8 @@ import { hasOwnProperty } from '@mui/toolpad-utils/collections';
 import { errorFrom, serializeError } from '@mui/toolpad-utils/errors';
 import { indent } from '@mui/toolpad-utils/strings';
 import chalk from 'chalk';
-import { execQuery, dataSourceFetchPrivate, dataSourceExecPrivate } from './data';
-import { getVersionInfo } from './versionInfo';
-import { createComponent, deletePage } from './localMode';
-import { loadDom, saveDom, applyDomDiff, openCodeEditor } from './liveProject';
 import { asyncHandler } from '../utils/express';
+import type { ToolpadProject } from './localMode';
 
 export interface Method<P extends any[] = any[], R = any> {
   (...params: P): Promise<R>;
@@ -120,41 +117,47 @@ function createMethod<F extends Method>(handler: MethodResolver<F>): MethodResol
   return handler;
 }
 
-export const rpcServer = {
-  query: {
-    dataSourceFetchPrivate: createMethod<typeof dataSourceFetchPrivate>(({ params }) => {
-      return dataSourceFetchPrivate(...params);
-    }),
-    execQuery: createMethod<typeof execQuery>(({ params }) => {
-      return execQuery(...params);
-    }),
-    loadDom: createMethod<typeof loadDom>(({ params }) => {
-      return loadDom(...params);
-    }),
-    getVersionInfo: createMethod<typeof getVersionInfo>(({ params }) => {
-      return getVersionInfo(...params);
-    }),
-  },
-  mutation: {
-    saveDom: createMethod<typeof saveDom>(({ params }) => {
-      return saveDom(...params);
-    }),
-    applyDomDiff: createMethod<typeof applyDomDiff>(({ params }) => {
-      return applyDomDiff(...params);
-    }),
-    openCodeEditor: createMethod<typeof openCodeEditor>(({ params }) => {
-      return openCodeEditor(...params);
-    }),
-    createComponent: createMethod<typeof createComponent>(({ params }) => {
-      return createComponent(...params);
-    }),
-    deletePage: createMethod<typeof deletePage>(({ params }) => {
-      return deletePage(...params);
-    }),
-    dataSourceExecPrivate: createMethod<typeof dataSourceExecPrivate>(({ params }) => {
-      return dataSourceExecPrivate(...params);
-    }),
-  },
-} as const;
+export function createRpcServer(project: ToolpadProject) {
+  return {
+    query: {
+      dataSourceFetchPrivate: createMethod<typeof project.dataManager.dataSourceFetchPrivate>(
+        ({ params }) => {
+          return project.dataManager.dataSourceFetchPrivate(...params);
+        },
+      ),
+      execQuery: createMethod<typeof project.dataManager.execQuery>(({ params }) => {
+        return project.dataManager.execQuery(...params);
+      }),
+      loadDom: createMethod<typeof project.loadDom>(({ params }) => {
+        return project.loadDom(...params);
+      }),
+      getVersionInfo: createMethod<typeof project.getVersionInfo>(({ params }) => {
+        return project.getVersionInfo(...params);
+      }),
+    },
+    mutation: {
+      saveDom: createMethod<typeof project.saveDom>(({ params }) => {
+        return project.saveDom(...params);
+      }),
+      applyDomDiff: createMethod<typeof project.applyDomDiff>(({ params }) => {
+        return project.applyDomDiff(...params);
+      }),
+      openCodeEditor: createMethod<typeof project.openCodeEditor>(({ params }) => {
+        return project.openCodeEditor(...params);
+      }),
+      createComponent: createMethod<typeof project.createComponent>(({ params }) => {
+        return project.createComponent(...params);
+      }),
+      deletePage: createMethod<typeof project.deletePage>(({ params }) => {
+        return project.deletePage(...params);
+      }),
+      dataSourceExecPrivate: createMethod<typeof project.dataManager.dataSourceExecPrivate>(
+        ({ params }) => {
+          return project.dataManager.dataSourceExecPrivate(...params);
+        },
+      ),
+    },
+  } as const;
+}
 
-export type ServerDefinition = MethodsOf<typeof rpcServer>;
+export type ServerDefinition = MethodsOf<ReturnType<typeof createRpcServer>>;

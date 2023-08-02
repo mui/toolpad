@@ -5,6 +5,7 @@ import { ToolpadComponents } from '@mui/toolpad-core';
 import { Emitter } from '@mui/toolpad-utils/events';
 import createCache from '@emotion/cache';
 import { CacheProvider } from '@emotion/react';
+import { Box } from '@mui/material';
 import RuntimeToolpadApp, { ToolpadAppProps } from './ToolpadApp';
 import { RuntimeState } from '../types';
 
@@ -49,6 +50,7 @@ function Root({ ToolpadApp, initialState, base }: RootProps) {
         {/* For some reason this helps with https://github.com/vitejs/vite/issues/12423 */}
         <Button sx={{ display: 'none' }} />
         <ToolpadApp basename={base} state={initialState} loadComponents={loadComponents} />
+        <Box data-testid="page-ready-marker" sx={{ display: 'none' }} />
       </CacheProvider>
     </React.StrictMode>
   );

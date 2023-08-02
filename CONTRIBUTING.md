@@ -95,10 +95,10 @@ yarn install
        "start": "toolpad start --dev"
      },
      "dependencies": {
-       "@mui/toolpad": "portal:<your-local-toolpad-monorepo>/packages/toolpad"
+       "@mui/toolpad": "portal:<your-local-toolpad-monorepo>/packages/toolpad-app"
      },
      "resolutions": {
-       "@mui/toolpad-app": "portal:<your-local-toolpad-monorepo>/packages/toolpad-app",
+       "@mui/toolpad": "portal:<your-local-toolpad-monorepo>/packages/toolpad-app",
        "@mui/toolpad-core": "portal:<your-local-toolpad-monorepo>/packages/toolpad-core",
        "@mui/toolpad-components": "portal:<your-local-toolpad-monorepo>/packages/toolpad-components",
        "@mui/toolpad-utils": "portal:<your-local-toolpad-monorepo>/packages/toolpad-utils"
@@ -152,6 +152,8 @@ The playwright tests can be run in one of two modes:
    TOOLPAD_NEXT_DEV=1 yarn test:integration --project chromium
    ```
 
+Use the `--ui` flag to run the tests interactively.
+
 ## Building and running the documentation
 
 1. If you haven't already, install the project dependencies using
@@ -188,35 +190,6 @@ The playwright tests can be run in one of two modes:
   ```bash
   yarn toolpad dev /path/to/my/toolpad/project
   ```
-
-## Integration tests
-
-- To run Toolpad on a fixture
-
-  ```bash
-  yarn toolpad dev --dev ./path/to/fixture
-  ```
-
-- To run the tests locally in production mode
-
-  ```bash
-  yarn build:release
-  yarn test:integration --project chromium
-  ```
-
-- To run the tests locally in dev mode
-
-  ```bash
-  yarn dev
-  ```
-
-  then run
-
-  ```bash
-  TOOLPAD_NEXT_DEV=1 yarn test:integration --project chromium
-  ```
-
-- Use the `--ui` flag to run the tests interactively
 
 ## Using CodeSandbox CI
 

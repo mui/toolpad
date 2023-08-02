@@ -367,7 +367,6 @@ export function getApp(dom: AppDom): AppNode {
 
 export type NodeChildren<N extends AppDomNode = any> = ChildNodesOf<N>;
 
-// TODO: memoize the result of this function per dom in a WeakMap
 const childrenMemo = new WeakMap<AppDom, Map<NodeId, NodeChildren<any>>>();
 export function getChildNodes<N extends AppDomNode>(dom: AppDom, parent: N): NodeChildren<N> {
   let domChildrenMemo = childrenMemo.get(dom);
@@ -854,6 +853,13 @@ export function removeNode(dom: AppDom, nodeId: NodeId) {
   return update(dom, {
     nodes: omit(dom.nodes, node.id, ...descendantIds),
   });
+}
+
+export function removeMaybeNode(dom: AppDom, nodeId: NodeId): AppDom {
+  if (getMaybeNode(dom, nodeId)) {
+    return removeNode(dom, nodeId);
+  }
+  return dom;
 }
 
 export function fromConstPropValue(prop: undefined): undefined;

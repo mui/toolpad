@@ -19,6 +19,7 @@ import useEvent from '../../../utils/useEvent';
 import { useNodeNameValidation } from './validation';
 import client from '../../../api';
 import useLatest from '../../../utils/useLatest';
+import OpenCodeEditorButton from '../../../components/OpenCodeEditor';
 
 const DEFAULT_NAME = 'MyComponent';
 
@@ -109,21 +110,10 @@ export default function CreateCodeComponentDialog({
             onClose={handleSnackbarClose}
             message={`Component "${lastSnackbarState.name}" created`}
             anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+            autoHideDuration={3000}
             action={
               <React.Fragment>
-                <Button
-                  size="small"
-                  onClick={() => {
-                    client.mutation.openCodeComponentEditor(name).catch((err) => {
-                      // TODO: Write docs with instructions on how to install editor
-                      // Add a good looking alert box and inline some instructions and link to docs
-                      // eslint-disable-next-line no-alert
-                      alert(err.message);
-                    });
-                  }}
-                >
-                  Open
-                </Button>
+                <OpenCodeEditorButton filePath={name} variant="text" fileType="component" />
                 <IconButton
                   size="small"
                   aria-label="close"

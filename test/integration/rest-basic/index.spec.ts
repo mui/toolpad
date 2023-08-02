@@ -4,33 +4,31 @@ import { fileReplaceAll } from '../../../packages/toolpad-utils/src/fs';
 import { test, expect } from '../../playwright/localTest';
 import { ToolpadRuntime } from '../../models/ToolpadRuntime';
 import { ToolpadEditor } from '../../models/ToolpadEditor';
-
-// We can run our own httpbin instance if necessary:
-//    $ docker run -p 8080:80 kennethreitz/httpbin
-// Then run the tests with:
-//    $ HTTPBIN_BASEURL=http://localhost:8080/ yarn test:integration
-const customHttbinBaseUrl = process.env.HTTPBIN_BASEURL;
-
-if (customHttbinBaseUrl) {
-  // eslint-disable-next-line no-console
-  console.log(`Running tests with custom httpbin service: ${customHttbinBaseUrl}`);
-}
-
-const HTTPBIN_SOURCE_URL = 'https://httpbin.org/';
-const HTTPBIN_TARGET_URL = customHttbinBaseUrl || HTTPBIN_SOURCE_URL;
+import { startTestServer } from './testServer';
+import { withTemporaryEdits } from '../../utils/fs';
 
 test.use({
   localAppConfig: {
     template: path.resolve(__dirname, './fixture'),
-    async setup({ dir }) {
-      const configFilePath = path.resolve(dir, './toolpad/pages/page1/page.yml');
-      await fileReplaceAll(configFilePath, HTTPBIN_SOURCE_URL, HTTPBIN_TARGET_URL);
-    },
     cmd: 'dev',
     env: {
       TEST_VAR: 'foo',
     },
   },
+});
+
+let testServer: Awaited<ReturnType<typeof startTestServer>> | undefined;
+
+test.beforeAll(async ({ localApp }) => {
+  testServer = await startTestServer();
+
+  const targetUrl = `http://localhost:${testServer.port}/`;
+  const configFilePath = path.resolve(localApp.dir, './toolpad/pages/page1/page.yml');
+  await fileReplaceAll(configFilePath, `http://localhost:8080/`, targetUrl);
+});
+
+test.afterAll(async () => {
+  testServer?.close();
 });
 
 test('rest runtime basics', async ({ page, localApp }) => {
@@ -46,30 +44,31 @@ test('rest runtime basics', async ({ page, localApp }) => {
   await expect(page.getByText('query4 authorization: foo')).toBeVisible();
 
   const envFilePath = path.resolve(localApp.dir, './.env');
-  await fs.writeFile(envFilePath, 'TEST_VAR=bar');
-
-  await page.reload();
-
-  await expect(page.getByText('query4 authorization: bar')).toBeVisible();
+  await withTemporaryEdits(envFilePath, async () => {
+    await expect(page.getByText('query4 authorization: foo')).toBeVisible();
+    await fs.writeFile(envFilePath, 'TEST_VAR=bar');
+    await page.reload();
+    await expect(page.getByText('query4 authorization: bar')).toBeVisible();
+  });
 });
 
 test('rest editor basics', async ({ page, context, localApp }) => {
   const editorModel = new ToolpadEditor(page);
   await editorModel.goto();
 
-  await editorModel.componentEditor.getByRole('button', { name: 'Add query' }).click();
+  await editorModel.pageEditor.getByRole('button', { name: 'Add query' }).click();
   await page.getByRole('button', { name: 'HTTP request' }).click();
 
   const newQueryEditor = page.getByRole('dialog', { name: 'query' });
 
   await expect(newQueryEditor).toBeVisible();
 
-  await expect(editorModel.appCanvas.getByText('query4 authorization: foo')).toBeVisible();
-
   const envFilePath = path.resolve(localApp.dir, './.env');
-  await fs.writeFile(envFilePath, 'TEST_VAR=bar');
-
-  await expect(editorModel.appCanvas.getByText('query4 authorization: bar')).toBeVisible();
+  await withTemporaryEdits(envFilePath, async () => {
+    await expect(editorModel.appCanvas.getByText('query4 authorization: foo')).toBeVisible();
+    await fs.writeFile(envFilePath, 'TEST_VAR=bar');
+    await expect(editorModel.appCanvas.getByText('query4 authorization: bar')).toBeVisible();
+  });
 
   // Make sure switching tabs does not close query editor
   const newTab = await context.newPage();
@@ -81,7 +80,7 @@ test('rest editor basics', async ({ page, context, localApp }) => {
   await newQueryEditor.getByRole('button', { name: 'Save' }).click();
   await expect(newQueryEditor).not.toBeVisible();
 
-  await editorModel.componentEditor.getByRole('button', { name: 'query1' }).click();
+  await editorModel.pageEditor.getByRole('button', { name: 'query1' }).click();
 
   const existingQueryEditor = page.getByRole('dialog', { name: 'query1' });
 
@@ -96,7 +95,7 @@ test('rest editor basics', async ({ page, context, localApp }) => {
   await existingQueryEditor.getByRole('button', { name: 'Cancel' }).click();
   await expect(existingQueryEditor).not.toBeVisible();
 
-  await editorModel.componentEditor.getByRole('button', { name: 'queryWithEnv' }).click();
+  await editorModel.pageEditor.getByRole('button', { name: 'queryWithEnv' }).click();
 
   const queryWithEnvQueryEditor = page.getByRole('dialog', { name: 'queryWithEnv' });
   await queryWithEnvQueryEditor.getByRole('tab', { name: 'Headers' }).click();

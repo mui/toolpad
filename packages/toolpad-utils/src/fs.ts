@@ -1,7 +1,7 @@
 import * as fs from 'fs/promises';
 import * as path from 'path';
-import * as yaml from 'yaml';
 import { Dirent } from 'fs';
+import * as yaml from 'yaml';
 import { yamlOverwrite } from 'yaml-diff-patch';
 import { errorFrom } from './errors';
 

@@ -6,6 +6,7 @@
 
 - [Autocomplete](/toolpad/reference/components/autocomplete/)
 - [Button](/toolpad/reference/components/button/)
+- [Chart](/toolpad/reference/components/chart/)
 - [Container](/toolpad/reference/components/container/)
 - [DataGrid](/toolpad/reference/components/data-grid/)
 - [DatePicker](/toolpad/reference/components/date-picker/)
@@ -13,6 +14,7 @@
 - [Form](/toolpad/reference/components/form/)
 - [Image](/toolpad/reference/components/image/)
 - [List](/toolpad/reference/components/list/)
+- [Metric](/toolpad/reference/components/metric/)
 - [PageColumn](/toolpad/reference/components/page-column/)
 - [PageRow](/toolpad/reference/components/page-row/)
 - [Paper](/toolpad/reference/components/paper/)

@@ -1,5 +1,0 @@
-{
-  "type": "commonjs",
-  "main": "../dist/canvas.cjs",
-  "types": "../dist/canvas.d.ts"
-}

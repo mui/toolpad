@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: page
+spec:
+  id: 5YDOftB
+  title: rows
+  display: shell
+  content:
+    - component: PageRow
+      name: pageRow
+      children:
+        - component: Text
+          name: text
+        - component: Text
+          name: text1

@@ -34,6 +34,8 @@ import {
   JsExpressionAttrValue,
 } from '@mui/toolpad-core';
 import { createProvidedContext, useAssertedContext } from '@mui/toolpad-utils/react';
+import { mapProperties, mapValues } from '@mui/toolpad-utils/collections';
+import { set as setObjectPath } from 'lodash-es';
 import { QueryClient, QueryClientProvider, useMutation } from '@tanstack/react-query';
 import {
   BrowserRouter,
@@ -52,12 +54,10 @@ import {
   NodeRuntimeWrapper,
   ResetNodeErrorsKeyProvider,
 } from '@mui/toolpad-core/runtime';
-import * as _ from 'lodash-es';
 import ErrorIcon from '@mui/icons-material/Error';
 import { getBrowserRuntime } from '@mui/toolpad-core/jsBrowserRuntime';
 import * as builtIns from '@mui/toolpad-components';
 import { errorFrom } from '@mui/toolpad-utils/errors';
-import { mapProperties, mapValues } from '@mui/toolpad-utils/collections';
 import useBoolean from '@mui/toolpad-utils/hooks/useBoolean';
 import usePageTitle from '@mui/toolpad-utils/hooks/usePageTitle';
 import invariant from 'invariant';
@@ -77,9 +77,9 @@ import evalJsBindings, {
   EvaluatedBinding,
   ParsedBinding,
 } from './evalJsBindings';
-import { HTML_ID_EDITOR_OVERLAY, NON_BINDABLE_CONTROL_TYPES } from './constants';
+import { HTML_ID_EDITOR_OVERLAY } from './constants';
 import { layoutBoxArgTypes } from './toolpadComponents/layoutBox';
-import { execDataSourceQuery, useDataQuery, UseDataQueryConfig, UseFetch } from './useDataQuery';
+import { execDataSourceQuery, useDataQuery, UseFetch } from './useDataQuery';
 import { NavigateToPage } from './CanvasHooksContext';
 import AppNavigation from './AppNavigation';
 import PreviewHeader from './PreviewHeader';
@@ -133,11 +133,6 @@ const INITIAL_FETCH: UseFetch = {
   data: null,
   rows: [],
 };
-
-const USE_DATA_QUERY_CONFIG_KEYS: readonly (keyof UseDataQueryConfig)[] = [
-  'enabled',
-  'refetchInterval',
-];
 
 function usePageNavigator(): NavigateToPage {
   const navigate = useNavigate();
@@ -354,7 +349,7 @@ function resolveBindables(
       return { loading: true };
     }
 
-    _.set(result, `${resultKey}${path}`, resolvedBinding?.value);
+    setObjectPath(result, `${resultKey}${path}`, resolvedBinding?.value);
   }
 
   return { value: result[resultKey] || {} };
@@ -428,6 +423,10 @@ function getScopeElements(
   return result;
 }
 
+function getQueryConfigBindings({ enabled, refetchInterval }: appDom.QueryNode['attributes']) {
+  return { enabled, refetchInterval };
+}
+
 function parseBindings(
   dom: appDom.AppDom,
   rootNode: appDom.ElementNode | appDom.PageNode | appDom.ElementNode[],
@@ -471,7 +470,7 @@ function parseBindings(
         if (
           componentId !== PAGE_ROW_COMPONENT_ID &&
           !isResizableHeightProp &&
-          !NON_BINDABLE_CONTROL_TYPES.includes(argType?.control?.type as string)
+          argType?.control?.bindable !== false
         ) {
           scopePath = `${elm.name}.${propName}`;
         }
@@ -562,7 +561,7 @@ function parseBindings(
         });
       }
 
-      const configBindings = _.pick(elm.attributes, USE_DATA_QUERY_CONFIG_KEYS);
+      const configBindings = getQueryConfigBindings(elm.attributes);
       const nestedBindablePaths = flattenNestedBindables(configBindings);
 
       for (const [nestedPath, paramValue] of nestedBindablePaths) {
@@ -1226,7 +1225,7 @@ function QueryNode({ page, node }: QueryNodeProps) {
     Object.fromEntries(node.params ?? []),
   );
 
-  const configBindings = _.pick(node.attributes, USE_DATA_QUERY_CONFIG_KEYS);
+  const configBindings = getQueryConfigBindings(node.attributes);
   const options = resolveBindables(bindings, `${node.id}.config`, configBindings);
 
   const inputError = params.error || options.error;

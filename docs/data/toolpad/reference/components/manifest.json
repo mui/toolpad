@@ -18,6 +18,10 @@
           "pathname": "/toolpad/reference/components/button"
         },
         {
+          "title": "Chart",
+          "pathname": "/toolpad/reference/components/chart"
+        },
+        {
           "title": "Container",
           "pathname": "/toolpad/reference/components/container"
         },
@@ -44,6 +48,10 @@
         {
           "title": "List",
           "pathname": "/toolpad/reference/components/list"
+        },
+        {
+          "title": "Metric",
+          "pathname": "/toolpad/reference/components/metric"
         },
         {
           "title": "PageColumn",

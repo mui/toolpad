@@ -10,7 +10,7 @@ There are many ways to authenticate Google APIs as mentioned in google-auth-libr
 
 ### Pre requisites
 
-1. You are required to create a [service account](https://cloud.google.com/iam/docs/service-account-overview) from Google dev console.
+1. You are required to create a [service account](https://cloud.google.com/iam/docs/service-accounts-create) from Google dev console.
 2. Download the keys file to your local environment. It is a JSON file that contains secrets that need to be handled cautiously.
 3. Use `client_email` and `private_key` from the JSON file you downloaded in an `.env` file to set up authentication.
 4. Share the Google sheet you want to show with the service account with the same `client_email`.

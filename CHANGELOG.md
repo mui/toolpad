@@ -1,5 +1,36 @@
 # Changelog
 
+## 0.1.22
+
+<!-- generated comparing v0.1.21..master -->
+
+_Aug 2, 2023_
+
+A big thanks to the 6 contributors who made this release possible. Here are some highlights ✨:
+
+Documentation improvements, fix Windows issues with the tests, Fix bugs in page renaming logic, improve memory footprint of Toolpad in production.
+
+- &#8203;<!-- 18 -->Improve docs (#2394) @prakhargupta1
+- &#8203;<!-- 17 -->Fix Windows EBUSY error when removing files during tests (#2401) @apedroferreira
+- &#8203;<!-- 16 -->it will delete old page while adding new page (#2171) @JerryWu1234
+- &#8203;<!-- 15 -->Avoid running the server in a separate process (#2381) @Janpot
+- &#8203;<!-- 14 -->Chart component improvements (#2343) @apedroferreira
+- &#8203;<!-- 13 -->Refactor deleting nodes (#2322) @apedroferreira
+- &#8203;<!-- 12 -->Remove redundant integration tests section from contribution docs (#2383) @apedroferreira
+- &#8203;<!-- 11 -->Upgrade monorepo (#2382) @apedroferreira
+- &#8203;<!-- 10 -->Decrease memory usage of functions in production mode (#2354) @Janpot
+- &#8203;<!-- 09 -->Fix examples order in home page (#2375) @prakhargupta1
+- &#8203;<!-- 08 -->Fix rest tests flakyness around env reloading (#2363) @Janpot
+- &#8203;<!-- 07 -->Automerge Toolpad updates in the examples (#2364) @Janpot
+- &#8203;<!-- 06 -->[core] Fix pnpm install instruction @oliviertassinari
+- &#8203;<!-- 05 -->[docs] Get ready for next docs-infra change @oliviertassinari
+- &#8203;<!-- 04 -->[docs] Improve the docs (#2366) @oliviertassinari
+- &#8203;<!-- 03 -->[docs] Fine for production (#2356) @oliviertassinari
+- &#8203;<!-- 02 -->[website] Add a social preview (#2380) @bharatkashyap
+- &#8203;<!-- 01 -->[website] Update image paths on landing page (#2359) @bharatkashyap
+
+All contributors of this release in alphabetical order: @apedroferreira, @bharatkashyap, @Janpot, @JerryWu1234, @oliviertassinari, @prakhargupta1
+
 ## 0.1.21
 
 <!-- generated comparing v0.1.20..master -->

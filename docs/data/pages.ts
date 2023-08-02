@@ -35,19 +35,19 @@ const pages: MuiPage[] = [
       },
       {
         pathname: '/toolpad/concepts/connecting-to-data',
-        title: 'Connecting to data',
+        title: 'Queries',
         children: [
           {
             pathname: '/toolpad/concepts/queries',
-            title: 'Queries',
+            title: 'Overview',
           },
           {
             pathname: '/toolpad/concepts/http-requests',
-            title: '- HTTP Requests',
+            title: 'HTTP requests',
           },
           {
             pathname: '/toolpad/concepts/custom-functions',
-            title: '- Custom Functions',
+            title: 'Custom functions',
           },
         ],
       },

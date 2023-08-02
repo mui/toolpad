@@ -1,7 +1,9 @@
 import * as path from 'path';
+import * as fs from 'fs/promises';
 import { test, expect, Locator } from '../../playwright/localTest';
 import { ToolpadEditor } from '../../models/ToolpadEditor';
 import clickCenter from '../../utils/clickCenter';
+import { folderExists } from '../../../packages/toolpad-utils/src/fs';
 
 test.use({
   localAppConfig: {
@@ -206,4 +208,39 @@ test('must deselect selected element when clicking outside of it', async ({ page
   await expect(nodeHudTag).toBeVisible();
   await page.mouse.click(boundingBox!.x + 150, boundingBox!.y + 150);
   await expect(nodeHudTag).toBeHidden();
+});
+test('can rename page', async ({ page, localApp }) => {
+  const editorModel = new ToolpadEditor(page);
+  await editorModel.goto();
+  await editorModel.waitForOverlay();
+  await editorModel.goToPage('page4');
+  await editorModel.waitForOverlay();
+  const text = editorModel.appCanvas.getByText('text-foo');
+  const oldPageFolder = path.resolve(localApp.dir, './toolpad/pages/page4');
+  await expect.poll(async () => folderExists(oldPageFolder)).toBe(true);
+  const valueInput = await page.getByLabel('Node name');
+  await valueInput.click();
+  await page.keyboard.type('test1');
+  await valueInput.blur();
+  const text2 = editorModel.appCanvas.getByText('text-foo');
+  const newPageFolder = path.resolve(localApp.dir, './toolpad/pages/page4test1');
+  await expect.poll(async () => folderExists(oldPageFolder)).toBe(false);
+  await expect.poll(async () => folderExists(newPageFolder)).toBe(true);
+  await expect(text).toEqual(text2);
+  await fs.rename(newPageFolder, oldPageFolder);
+});
+
+test('can react to pages renamed on disk', async ({ page, localApp }) => {
+  const editorModel = new ToolpadEditor(page);
+  await editorModel.goto();
+  await editorModel.waitForOverlay();
+
+  const oldPageFolder = path.resolve(localApp.dir, './toolpad/pages/page4');
+  const newPageFolder = path.resolve(localApp.dir, './toolpad/pages/helloworld');
+
+  await fs.rename(oldPageFolder, newPageFolder);
+
+  await editorModel.goToPage('helloworld');
+  await editorModel.waitForOverlay();
+  await expect(editorModel.appCanvas.getByText('text-foo')).toBeVisible();
 });

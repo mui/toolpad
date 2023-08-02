@@ -6,10 +6,15 @@ import {
   createViteConfig,
   resolvedComponentsId,
 } from '../src/server/toolpadAppBuilder';
-import config from '../src/config';
+import type { RuntimeConfig } from '../src/config';
 import { loadDomFromDisk } from '../src/server/localMode';
 
-function devServerPlugin(): Plugin {
+invariant(
+  process.env.NODE_ENV === 'development',
+  'The dev server must be started with NODE_ENV=development',
+);
+
+function devServerPlugin(root: string, config: RuntimeConfig): Plugin {
   return {
     name: 'toolpad-dev-server',
 
@@ -21,7 +26,7 @@ function devServerPlugin(): Plugin {
           const canvas = url.searchParams.get('toolpad-display') === 'canvas';
 
           try {
-            const dom = await loadDomFromDisk();
+            const dom = await loadDomFromDisk(root);
 
             const template = getHtmlContent({ canvas });
 
@@ -40,17 +45,18 @@ function devServerPlugin(): Plugin {
 }
 
 export interface ToolpadAppDevServerParams {
+  config: RuntimeConfig;
   root: string;
   base: string;
 }
 
-export async function createDevServer({ root, base }: ToolpadAppDevServerParams) {
+export async function createDevServer({ config, root, base }: ToolpadAppDevServerParams) {
   const devServer = await createServer(
     createViteConfig({
       dev: true,
       root,
       base,
-      plugins: [devServerPlugin()],
+      plugins: [devServerPlugin(root, config)],
     }),
   );
 
@@ -65,22 +71,17 @@ export type Event = {
   kind: 'ready';
 };
 
-async function main() {
-  invariant(
-    process.env.NODE_ENV === 'development',
-    'The dev server must be started with NODE_ENV=development',
-  );
-  invariant(!!process.env.TOOLPAD_PROJECT_DIR, 'A project root must be defined');
-  invariant(!!process.env.TOOLPAD_PORT, 'A port must be defined');
-  invariant(!!process.env.TOOLPAD_BASE, 'A base path must be defined');
-  invariant(process.send, 'Process must be spawned with an IPC channel');
+export interface MainParams {
+  base: string;
+  root: string;
+  port: number;
+  config: RuntimeConfig;
+}
 
-  const app = await createDevServer({
-    root: process.env.TOOLPAD_PROJECT_DIR,
-    base: process.env.TOOLPAD_BASE,
-  });
+export async function main({ base, config, root, port }: MainParams) {
+  const app = await createDevServer({ config, root, base });
 
-  await app.listen(Number(process.env.TOOLPAD_PORT));
+  await app.listen(port);
 
   process.on('message', (msg: Command) => {
     if (msg.kind === 'reload-components') {
@@ -91,10 +92,21 @@ async function main() {
     }
   });
 
+  invariant(process.send, 'Process must be spawned with an IPC channel');
   process.send({ kind: 'ready' } satisfies Event);
 }
 
-main().catch((err) => {
+invariant(!!process.env.TOOLPAD_PROJECT_DIR, 'A project root must be defined');
+invariant(!!process.env.TOOLPAD_RUNTIME_CONFIG, 'A runtime config must be defined');
+invariant(!!process.env.TOOLPAD_PORT, 'A port must be defined');
+invariant(!!process.env.TOOLPAD_BASE, 'A base path must be defined');
+
+main({
+  config: JSON.parse(process.env.TOOLPAD_RUNTIME_CONFIG) as RuntimeConfig,
+  base: process.env.TOOLPAD_BASE,
+  root: process.env.TOOLPAD_PROJECT_DIR,
+  port: Number(process.env.TOOLPAD_PORT),
+}).catch((err) => {
   console.error(err);
   process.exit(1);
 });

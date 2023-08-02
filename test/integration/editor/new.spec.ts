@@ -58,7 +58,6 @@ test('can create/delete page', async ({ page, localApp }) => {
   const pageFile = path.resolve(pageFolder, './page.yml');
 
   await expect(pageMenuItem).toBeVisible();
-
   await expect.poll(async () => folderExists(pageFolder)).toBe(true);
   await expect.poll(async () => fileExists(pageFile)).toBe(true);
 

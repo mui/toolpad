@@ -2,12 +2,9 @@ import * as path from 'path';
 import * as fs from 'fs/promises';
 import { Server } from 'http';
 import * as express from 'express';
-import config from '../config';
 import { postProcessHtml } from './toolpadAppBuilder';
-import { loadDom } from './liveProject';
-import { getAppOutputFolder } from './localMode';
+import { ToolpadProject, getAppOutputFolder } from './localMode';
 import { asyncHandler } from '../utils/express';
-import { createDataHandler } from './data';
 import { basicAuthUnauthorized, checkBasicAuthHeader } from './basicAuth';
 
 export interface CreateViteConfigParams {
@@ -21,10 +18,10 @@ export interface ToolpadAppHandlerParams {
   root: string;
 }
 
-export async function createProdHandler({ root }: ToolpadAppHandlerParams) {
+export async function createProdHandler(project: ToolpadProject) {
   const router = express.Router();
 
-  router.use(express.static(getAppOutputFolder(root), { index: false }));
+  router.use(express.static(getAppOutputFolder(project.getRoot()), { index: false }));
 
   // Allow static assets, block everything else
   router.use((req, res, next) => {
@@ -35,16 +32,16 @@ export async function createProdHandler({ root }: ToolpadAppHandlerParams) {
     basicAuthUnauthorized(res);
   });
 
-  router.use('/api/data', createDataHandler());
+  router.use('/api/data', project.dataManager.createDataHandler(project));
 
   router.use(
     asyncHandler(async (req, res) => {
-      const dom = await loadDom();
+      const dom = await project.loadDom();
 
-      const htmlFilePath = path.resolve(getAppOutputFolder(root), './index.html');
+      const htmlFilePath = path.resolve(getAppOutputFolder(project.getRoot()), './index.html');
       let html = await fs.readFile(htmlFilePath, { encoding: 'utf-8' });
 
-      html = postProcessHtml(html, { config, dom });
+      html = postProcessHtml(html, { config: project.getRuntimeConfig(), dom });
 
       res.setHeader('Content-Type', 'text/html; charset=utf-8').status(200).end(html);
     }),

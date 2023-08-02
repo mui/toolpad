@@ -3,7 +3,9 @@ import { Container, ContainerProps, Box, Stack, BoxProps } from '@mui/material';
 import { LoadingButton } from '@mui/lab';
 import { ArgTypeDefinitions, createComponent, useNode } from '@mui/toolpad-core';
 import { useForm, FieldValues, ValidationMode, FieldError, Controller } from 'react-hook-form';
-import * as _ from 'lodash-es';
+// TODO: Remove lodash-es
+// eslint-disable-next-line no-restricted-imports
+import { isEqual } from 'lodash-es';
 import { SX_PROP_HELPER_TEXT } from './constants';
 
 export const FormContext = React.createContext<{
@@ -257,7 +259,7 @@ export function useFormInput<V>({
   React.useEffect(() => {
     if (
       form &&
-      !_.isEqual(validationProps, previousManualValidationPropsRef.current) &&
+      !isEqual(validationProps, previousManualValidationPropsRef.current) &&
       form.formState.dirtyFields[formInputName]
     ) {
       form.trigger(formInputName);

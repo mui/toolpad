@@ -1,11 +1,12 @@
-import invariant from 'invariant';
 import * as path from 'path';
+import invariant from 'invariant';
 import * as ts from 'typescript';
 import { glob } from 'glob';
 import chalk from 'chalk';
 import { JSONSchema7, JSONSchema7TypeName, JSONSchema7Type } from 'json-schema';
 import { asArray } from '@mui/toolpad-utils/collections';
 import { PrimitiveValueType } from '@mui/toolpad-core';
+import { tsConfig } from './functionsShared';
 
 export interface ReturnTypeIntrospectionResult {
   schema: JSONSchema7 | null;
@@ -383,23 +384,11 @@ function getReturnType(callSignatures: readonly ts.Signature[], checker: ts.Type
   };
 }
 
-export const tsConfig: ts.CompilerOptions = {
-  noEmit: true,
-  target: ts.ScriptTarget.ESNext,
-  lib: ['lib.esnext.d.ts'],
-  types: ['node'],
-  // NOTE: strictNullChecks is essential for the type extraction to work properly. When we decide
-  // to support user-defined tsconfig.json, we must make sure this option is enabled.
-  strictNullChecks: true,
-  module: ts.ModuleKind.CommonJS,
-  moduleResolution: ts.ModuleResolutionKind.Bundler,
-  esModuleInterop: true,
-  allowSyntheticDefaultImports: true,
-};
-
 export interface ExtractTypesParams {
   resourcesFolder: string;
 }
+
+let createFunctionWarningShown = false;
 
 export default async function extractTypes({
   resourcesFolder,
@@ -411,6 +400,8 @@ export default async function extractTypes({
   const program = ts.createProgram(entryPoints, tsConfig);
 
   const checker = program.getTypeChecker();
+
+  const usingCreateFunction = [];
 
   const files: FileIntrospectionResult[] = entryPoints
     .map((entrypoint) => {
@@ -445,6 +436,9 @@ export default async function extractTypes({
           }
 
           const isCreateFunction = isToolpadCreateFunction(exportType);
+          if (isCreateFunction) {
+            usingCreateFunction.push(symbol.name);
+          }
           return {
             name: symbol.name,
             isCreateFunction,
@@ -469,6 +463,19 @@ export default async function extractTypes({
     })
     .filter(Boolean)
     .sort((a, b) => a.name.localeCompare(b.name));
+
+  if (usingCreateFunction.length > 0 && !createFunctionWarningShown) {
+    console.warn(
+      `${chalk.yellow('warn')} - ${chalk.bold(usingCreateFunction.length)} function${
+        usingCreateFunction.length === 1 ? ' is' : 's are'
+      } using the deprecated ${chalk.red(
+        'createFunction',
+      )} API. This will be removed from Toolpad in a future release. Please see ${chalk.underline(
+        chalk.blue('https://mui.com/toolpad/reference/api/create-function/'),
+      )} for migration information and updates.`,
+    );
+    createFunctionWarningShown = true;
+  }
 
   return { files };
 }

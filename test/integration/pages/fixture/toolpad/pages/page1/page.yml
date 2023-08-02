@@ -11,3 +11,13 @@ spec:
           name: button
           props:
             content: page1Button
+    - component: PageRow
+      name: pageRow1
+      children:
+        - component: Metric
+          name: metric
+          props:
+            conditionalFormat:
+              stops:
+                - value: 10
+              base: "#e91e63"

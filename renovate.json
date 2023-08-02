@@ -94,6 +94,13 @@
     {
       "groupName": "GitHub Actions",
       "matchManagers": ["github-actions"]
+    },
+    {
+      "groupName": "Update @mui/toolpad in examples",
+      "matchPackageNames": ["@mui/toolpad"],
+      "matchFiles": ["examples/*/package.json"],
+      "schedule": ["at any time"],
+      "automerge": true
     }
   ],
   "postUpdateOptions": ["yarnDedupeHighest"],
@@ -105,5 +112,9 @@
   "vulnerabilityAlerts": {
     "schedule": ["at any time"],
     "addLabels": ["priority: important"]
+  },
+  "lockFileMaintenance": {
+    "enabled": true,
+    "schedule": "before 6:00am on the first day of the month"
   }
 }

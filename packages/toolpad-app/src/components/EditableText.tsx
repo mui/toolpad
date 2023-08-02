@@ -18,6 +18,7 @@ interface EditableTextProps {
   onChange?: (newValue: string) => void;
   onSave?: (newValue: string) => void;
   onClose?: () => void;
+  onDoubleClick?: () => void;
   size?: 'small' | 'medium';
   sx?: SxProps;
   value?: string;
@@ -34,6 +35,7 @@ const EditableText = React.forwardRef<HTMLInputElement, EditableTextProps>(
       error,
       onChange,
       onClose,
+      onDoubleClick,
       onSave,
       size,
       sx,
@@ -113,9 +115,10 @@ const EditableText = React.forwardRef<HTMLInputElement, EditableTextProps>(
         error={error}
         helperText={helperText}
         ref={ref}
+        onDoubleClick={onDoubleClick}
         inputRef={appTitleInput}
         inputProps={{
-          tabIndex: editable ? 0 : -1,
+          // tabIndex: editable ? 0 : -1,
           'aria-readonly': !editable,
           sx: (theme: Theme) => ({
             // Handle overflow
@@ -123,7 +126,8 @@ const EditableText = React.forwardRef<HTMLInputElement, EditableTextProps>(
             overflow: 'hidden',
             whiteSpace: 'nowrap',
             fontSize: theme.typography[typographyVariant].fontSize,
-            height: `1.1em`,
+            height: theme.typography.pxToRem(8),
+            cursor: 'pointer',
           }),
         }}
         onKeyUp={handleInput}

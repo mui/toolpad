@@ -5,12 +5,10 @@ import {
   Box,
   Button,
   CircularProgress,
-  IconButton,
   InputBase,
   Popover,
   Skeleton,
   Stack,
-  Tooltip,
   Typography,
   generateUtilityClasses,
   styled,
@@ -20,7 +18,6 @@ import { errorFrom } from '@mui/toolpad-utils/errors';
 import { TreeItem, TreeView, treeItemClasses } from '@mui/lab';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
-import EditIcon from '@mui/icons-material/Edit';
 import useBoolean from '@mui/toolpad-utils/hooks/useBoolean';
 import { useQuery } from '@tanstack/react-query';
 import { ensureSuffix } from '@mui/toolpad-utils/strings';
@@ -33,11 +30,12 @@ import {
 import * as appDom from '../../appDom';
 import SplitPane from '../../components/SplitPane';
 import JsonView from '../../components/JsonView';
+import OpenCodeEditorButton from '../../components/OpenCodeEditor';
 import useQueryPreview from '../useQueryPreview';
 import QueryInputPanel from '../QueryInputPanel';
 import QueryPreview from '../QueryPreview';
 import BindableEditor from '../../toolpad/AppEditor/PageEditor/BindableEditor';
-import { getDefaultControl } from '../../toolpad/propertyControls';
+import { getDefaultControl, usePropControlsContext } from '../../toolpad/propertyControls';
 import { parseFunctionId, parseLegacyFunctionId, serializeFunctionId } from './shared';
 import FlexFill from '../../components/FlexFill';
 import { FileIntrospectionResult } from '../../server/functionsTypesWorker';
@@ -70,23 +68,9 @@ const FileTreeItemRoot = styled(TreeItem)(({ theme }) => ({
 
 interface HandlerFileTreeItemProps {
   file: FileIntrospectionResult;
-  onOpenEditor: (file: string) => Promise<void>;
 }
 
-function HandlerFileTreeItem({ file, onOpenEditor }: HandlerFileTreeItemProps) {
-  const handleOpenEditorClick = React.useCallback(
-    (event: React.MouseEvent) => {
-      event.stopPropagation();
-      onOpenEditor(file.name).catch((err) => {
-        // TODO: Write docs with instructions on how to install editor
-        // Add a good looking alert box and inline some instructions and link to docs
-        // eslint-disable-next-line no-alert
-        alert(err.message);
-      });
-    },
-    [onOpenEditor, file.name],
-  );
-
+function HandlerFileTreeItem({ file }: HandlerFileTreeItemProps) {
   return (
     <FileTreeItemRoot
       key={file.name}
@@ -95,15 +79,7 @@ function HandlerFileTreeItem({ file, onOpenEditor }: HandlerFileTreeItemProps) {
         <React.Fragment>
           {file.name}
           <FlexFill />
-          <Tooltip title="Open code editor">
-            <IconButton
-              className={fileTreeItemClasses.actionButton}
-              size="small"
-              onClick={handleOpenEditorClick}
-            >
-              <EditIcon fontSize="inherit" />
-            </IconButton>
-          </Tooltip>
+          <OpenCodeEditorButton iconButton filePath={file.name} fileType="query" />
         </React.Fragment>
       }
     >
@@ -135,6 +111,8 @@ function QueryEditor({
     queryFn: () => execApi('introspection', []),
     retry: false,
   });
+
+  const propTypeControls = usePropControlsContext();
 
   const { file: selectedFile = undefined, handler: selectedFunction = undefined } = input.attributes
     .query.function
@@ -194,18 +172,6 @@ function QueryEditor({
     input: paramsObject,
     globalScope,
   });
-
-  const handleOpenEditor = React.useCallback(
-    async (fileName: string) => {
-      execApi('openEditor', [fileName]).catch((err) => {
-        // TODO: Write docs with instructions on how to install editor
-        // Add a good looking alert box and inline some instructions and link to docs
-        // eslint-disable-next-line no-alert
-        alert(err.message);
-      });
-    },
-    [execApi],
-  );
 
   const setSelectedHandler = React.useCallback(
     (id: string) => {
@@ -359,7 +325,7 @@ function QueryEditor({
               ) : null}
 
               {introspection.data?.files?.map((file) => (
-                <HandlerFileTreeItem key={file.name} file={file} onOpenEditor={handleOpenEditor} />
+                <HandlerFileTreeItem key={file.name} file={file} />
               ))}
 
               {introspection.isLoading ? (
@@ -388,7 +354,7 @@ function QueryEditor({
           <Stack sx={{ gap: 1, flex: 1, overflow: 'auto' }}>
             <Typography>Parameters:</Typography>
             {Object.entries(parameterDefs).map(([name, definiton]) => {
-              const Control = getDefaultControl(definiton, liveBindings);
+              const Control = getDefaultControl(propTypeControls, definiton, liveBindings);
               return Control ? (
                 <BindableEditor
                   key={name}

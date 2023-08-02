@@ -34,7 +34,10 @@ export class ToolpadRuntime {
     await this.page.goto(`${this.getPrefix()}/pages/${pageId}`);
   }
 
-  async waitForNavigation() {
-    await this.page.waitForURL((url) => url.pathname.startsWith(`${this.getPrefix()}/pages`));
+  async waitForPageReady() {
+    await this.page.waitForTimeout(1000);
+    await this.page.waitForSelector('[data-testid="page-ready-marker"]', {
+      state: 'attached',
+    });
   }
 }

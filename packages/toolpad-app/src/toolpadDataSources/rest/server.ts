@@ -22,12 +22,11 @@ import {
   UrlEncodedBody,
 } from './types';
 import { Maybe } from '../../utils/types';
-import { getProject } from '../../server/liveProject';
 import applyTransform from '../applyTransform';
 import { HTTP_NO_BODY, getAuthenticationHeaders, getDefaultUrl, parseBaseUrl } from './shared';
+import type { IToolpadProject } from '../server';
 
-async function loadEnvFile() {
-  const project = await getProject();
+async function loadEnvFile(project: IToolpadProject) {
   return project.envManager.getDeclaredValues();
 }
 
@@ -133,7 +132,8 @@ async function readData(res: Response, fetchQuery: FetchQuery): Promise<any> {
   throw new Error(`Unsupported response type "${fetchQuery.response.kind}"`);
 }
 
-export async function execBase(
+async function execBase(
+  project: IToolpadProject,
   connection: Maybe<RestConnectionParams>,
   fetchQuery: FetchQuery,
   params: Record<string, string>,
@@ -148,7 +148,7 @@ export async function execBase(
     parameters: params,
   };
 
-  const urlvalue = fetchQuery.url || getDefaultUrl(connection);
+  const urlvalue = fetchQuery.url || getDefaultUrl(project.getRuntimeConfig(), connection);
 
   const resolvedUrl = resolveBindable(jsRuntime, urlvalue, queryScope);
   const resolvedSearchParams = resolveBindableEntries(
@@ -214,34 +214,34 @@ export async function execBase(
   return { data, untransformedData, error, har };
 }
 
-async function execPrivate(connection: Maybe<RestConnectionParams>, query: FetchPrivateQuery) {
-  switch (query.kind) {
-    case 'introspection': {
-      const env = await loadEnvFile();
-      const envVarNames = Object.keys(env);
+export default function createDatasource(
+  project: IToolpadProject,
+): ServerDataSource<{}, FetchQuery, any> {
+  return {
+    async exec(
+      connection: Maybe<RestConnectionParams>,
+      fetchQuery: FetchQuery,
+      params: Record<string, string>,
+    ): Promise<ExecFetchResult<any>> {
+      const { data, error } = await execBase(project, connection, fetchQuery, params);
+      return { data, error };
+    },
 
-      return { envVarNames };
-    }
-    case 'debugExec':
-      return execBase(connection, query.query, query.params);
-    default:
-      throw new Error(`Unknown private query "${(query as FetchPrivateQuery).kind}"`);
-  }
+    async execPrivate(connection: Maybe<RestConnectionParams>, query: FetchPrivateQuery) {
+      switch (query.kind) {
+        case 'introspection': {
+          const env = await loadEnvFile(project);
+          const envVarNames = Object.keys(env);
+
+          return { envVarNames };
+        }
+        case 'debugExec':
+          return execBase(project, connection, query.query, query.params);
+        default:
+          throw new Error(`Unknown private query "${(query as FetchPrivateQuery).kind}"`);
+      }
+    },
+
+    api: {},
+  };
 }
-
-async function exec(
-  connection: Maybe<RestConnectionParams>,
-  fetchQuery: FetchQuery,
-  params: Record<string, string>,
-): Promise<ExecFetchResult<any>> {
-  const { data, error } = await execBase(connection, fetchQuery, params);
-  return { data, error };
-}
-
-const dataSource: ServerDataSource<{}, FetchQuery, any> = {
-  exec,
-  execPrivate,
-  api: {},
-};
-
-export default dataSource;

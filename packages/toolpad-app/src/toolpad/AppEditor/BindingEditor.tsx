@@ -36,10 +36,10 @@ import {
 } from '@mui/toolpad-core';
 import { createProvidedContext } from '@mui/toolpad-utils/react';
 import { TabContext, TabList } from '@mui/lab';
+import useDebounced from '@mui/toolpad-utils/hooks/useDebounced';
 import { JsExpressionEditor } from './PageEditor/JsExpressionEditor';
 import JsonView from '../../components/JsonView';
 import useLatest from '../../utils/useLatest';
-import useDebounced from '../../utils/useDebounced';
 import { useEvaluateLiveBinding } from './useEvaluateLiveBinding';
 import GlobalScopeExplorer from './GlobalScopeExplorer';
 import { WithControlledProp, Maybe } from '../../utils/types';
@@ -52,9 +52,10 @@ import TabPanel from '../../components/TabPanel';
 
 import { useDom } from '../AppState';
 import * as appDom from '../../appDom';
+import { getBindingType, getBindingValue } from '../../bindings';
+
 // eslint-disable-next-line import/no-cycle
 import BindableEditor from './PageEditor/BindableEditor';
-import { getBindingType, getBindingValue } from '../../bindings';
 
 interface BindingEditorContext {
   label: string;

@@ -3,9 +3,11 @@ import * as path from 'path';
 import * as url from 'url';
 import readline from 'readline';
 import { Readable } from 'stream';
+import { text } from 'stream/consumers';
 import { execa, ExecaChildProcess } from 'execa';
 import { jest } from '@jest/globals';
 import { once } from 'events';
+import fetch from 'node-fetch';
 
 jest.setTimeout(60000);
 
@@ -38,9 +40,11 @@ test('create-toolpad-app can bootstrap a Toolpad app', async () => {
   testDir = await fs.mkdtemp(path.resolve(currentDirectory, './test-app-'));
   cp = execa(cliPath, [path.basename(testDir)], {
     cwd: currentDirectory,
+    stdio: 'pipe',
   });
-  const result = await cp;
-  expect(result.stdout).toMatch('Run the following to get started');
+  cp.stdout!.pipe(process.stdout);
+  const stdout = await text(cp.stdout!);
+  expect(stdout).toMatch('Run the following to get started');
   const packageJsonContent = await fs.readFile(path.resolve(testDir, './package.json'), {
     encoding: 'utf-8',
   });

@@ -36,6 +36,7 @@
     "execa": "7.2.0",
     "inquirer": "9.2.9",
     "invariant": "2.2.4",
+    "node-fetch": "3.3.2",
     "semver": "7.5.4",
     "yargs": "17.7.2"
   },

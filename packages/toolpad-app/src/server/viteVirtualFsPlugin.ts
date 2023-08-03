@@ -1,6 +1,6 @@
+import { posix as path } from 'path';
 import invariant from 'invariant';
 import { Plugin, ViteDevServer, transformWithEsbuild } from 'vite';
-import { posix as path } from 'path';
 
 const API_PROPERTY = Symbol('virtual-fs-api');
 

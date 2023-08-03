@@ -199,7 +199,7 @@ export interface CreateViteConfigParams {
 
 export interface CreateViteConfigResult {
   viteConfig: InlineConfig;
-  updateDom: (newDom: appDom.AppDom) => void;
+  replaceDom: (newDom: appDom.AppDom) => void;
 }
 
 export function createViteConfig({
@@ -318,7 +318,7 @@ export function createViteConfig({
       },
     },
 
-    updateDom: (newDom: appDom.AppDom) => {
+    replaceDom: (newDom: appDom.AppDom) => {
       const newCode = generateCode(newDom);
       replaceFiles(generatedFsPlugin, newCode.files);
     },

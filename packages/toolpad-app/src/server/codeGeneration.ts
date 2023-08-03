@@ -1,6 +1,6 @@
+import { posix as path } from 'path';
 import { deepmerge } from '@mui/utils';
 import serializeJavascript from 'serialize-javascript';
-import { posix as path } from 'path';
 import * as appDom from '../appDom';
 import { RUNTIME_CONFIG_WINDOW_PROPERTY } from '../constants';
 import { pathToNodeImportSpecifier } from '../utils/paths';

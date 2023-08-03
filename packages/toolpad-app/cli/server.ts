@@ -69,6 +69,7 @@ async function createDevHandler(
       initialDom,
     } satisfies AppViteServerConfig,
     env: {
+      ...process.env,
       NODE_ENV: 'development',
     },
   });

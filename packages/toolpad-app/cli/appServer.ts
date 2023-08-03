@@ -1,3 +1,4 @@
+import { parentPort, workerData } from 'worker_threads';
 import invariant from 'invariant';
 import { createServer, Plugin } from 'vite';
 import {
@@ -7,8 +8,27 @@ import {
   resolvedComponentsId,
 } from '../src/server/toolpadAppBuilder';
 import type { RuntimeConfig } from '../src/config';
-import { loadDomFromDisk } from '../src/server/localMode';
-import * as appDom from '../src/appDom';
+import type * as appDom from '../src/appDom';
+import type { ComponentEntry } from '../src/server/localMode';
+import { createWorkerRpcClient } from '../src/server/workerRpc';
+
+export type Command =
+  | {
+      kind: 'reload-components';
+    }
+  | {
+      kind: 'replace-dom';
+      dom: appDom.AppDom;
+    };
+
+export type Event = {
+  kind: 'ready';
+};
+
+const { loadDom, getComponents } = createWorkerRpcClient<{
+  loadDom: () => Promise<appDom.AppDom>;
+  getComponents: () => Promise<ComponentEntry[]>;
+}>();
 
 invariant(
   process.env.NODE_ENV === 'development',
@@ -27,7 +47,7 @@ function devServerPlugin(root: string, config: RuntimeConfig): Plugin {
           const canvas = url.searchParams.get('toolpad-display') === 'canvas';
 
           try {
-            const dom = await loadDomFromDisk(root);
+            const dom = await loadDom();
 
             const template = getHtmlContent({ canvas });
 
@@ -46,39 +66,36 @@ function devServerPlugin(root: string, config: RuntimeConfig): Plugin {
 }
 
 export interface ToolpadAppDevServerParams {
+  outDir: string;
   config: RuntimeConfig;
   root: string;
   base: string;
   dom: appDom.AppDom;
 }
 
-export async function createDevServer({ config, root, base, dom }: ToolpadAppDevServerParams) {
-  const { viteConfig, updateDom } = createViteConfig({
+export async function createDevServer({
+  outDir,
+  config,
+  root,
+  base,
+  dom,
+}: ToolpadAppDevServerParams) {
+  const { viteConfig, replaceDom } = createViteConfig({
+    outDir,
     dev: true,
     root,
     base,
     dom,
+    getComponents,
     plugins: [devServerPlugin(root, config)],
   });
   const devServer = await createServer(viteConfig);
 
-  return { devServer, updateDom };
+  return { devServer, replaceDom };
 }
 
-export type Command =
-  | {
-      kind: 'reload-components';
-    }
-  | {
-      kind: 'change-dom';
-      dom: appDom.AppDom;
-    };
-
-export type Event = {
-  kind: 'ready';
-};
-
-export interface ServerConfig {
+export interface AppViteServerConfig {
+  outDir: string;
   base: string;
   root: string;
   port: number;
@@ -86,12 +103,20 @@ export interface ServerConfig {
   initialDom: appDom.AppDom;
 }
 
-export async function main({ base, config, root, port, initialDom }: ServerConfig) {
-  const { devServer, updateDom } = await createDevServer({ config, root, base, dom: initialDom });
+export async function main({ outDir, base, config, root, port, initialDom }: AppViteServerConfig) {
+  const { devServer, replaceDom } = await createDevServer({
+    outDir,
+    config,
+    root,
+    base,
+    dom: initialDom,
+  });
 
   await devServer.listen(port);
 
-  process.on('message', (msg: Command) => {
+  invariant(parentPort, 'parentPort must be defined');
+
+  parentPort.on('message', (msg: Command) => {
     switch (msg.kind) {
       case 'reload-components': {
         const mod = devServer.moduleGraph.getModuleById(resolvedComponentsId);
@@ -100,8 +125,8 @@ export async function main({ base, config, root, port, initialDom }: ServerConfi
         }
         break;
       }
-      case 'change-dom': {
-        updateDom(msg.dom);
+      case 'replace-dom': {
+        replaceDom(msg.dom);
         break;
       }
       default:
@@ -109,13 +134,10 @@ export async function main({ base, config, root, port, initialDom }: ServerConfi
     }
   });
 
-  invariant(process.send, 'Process must be spawned with an IPC channel');
-  process.send({ kind: 'ready' } satisfies Event);
+  parentPort.postMessage({ kind: 'ready' } satisfies Event);
 }
 
-invariant(!!process.env.SERVER_CONFIG, 'A server config must be defined');
-
-main(JSON.parse(process.env.SERVER_CONFIG)).catch((err) => {
+main(workerData).catch((err) => {
   console.error(err);
   process.exit(1);
 });

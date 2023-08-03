@@ -855,6 +855,13 @@ export function removeNode(dom: AppDom, nodeId: NodeId) {
   });
 }
 
+export function removeMaybeNode(dom: AppDom, nodeId: NodeId): AppDom {
+  if (getMaybeNode(dom, nodeId)) {
+    return removeNode(dom, nodeId);
+  }
+  return dom;
+}
+
 export function fromConstPropValue(prop: undefined): undefined;
 export function fromConstPropValue<T>(prop: BindableAttrValue<T>): T;
 export function fromConstPropValue<T>(prop?: BindableAttrValue<T | undefined>): T | undefined;

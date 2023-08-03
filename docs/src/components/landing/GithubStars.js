@@ -58,7 +58,7 @@ export default function GithubStars() {
           display: 'flex',
           alignItem: 'center',
           ml: 0.5,
-          color: theme.palette.primary[500],
+          color: theme.palette.primary[700],
           ...theme.applyDarkStyles({
             color: theme.palette.primary[200],
           }),

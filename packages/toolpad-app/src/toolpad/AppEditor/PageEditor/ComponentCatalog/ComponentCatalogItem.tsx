@@ -81,7 +81,7 @@ export function ComponentIcon({ id: componentId, kind, sx }: ComponentIconProps)
 
 interface ComponentCatalogItemProps {
   draggable?: boolean;
-  onDragStart?: (event: React.DragEvent<HTMLDivElement>) => void;
+  onDragStart?: (event: React.DragEvent<HTMLButtonElement>) => void;
   onClick?: () => void;
   builtIn?: string;
   id: string;

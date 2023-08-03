@@ -1,12 +1,12 @@
+import * as path from 'path';
+import * as fs from 'fs/promises';
 import { Emitter } from '@mui/toolpad-utils/events';
 import * as esbuild from 'esbuild';
-import * as path from 'path';
 import { ensureSuffix, indent } from '@mui/toolpad-utils/strings';
 import * as chokidar from 'chokidar';
 import chalk from 'chalk';
 import { glob } from 'glob';
-import * as fs from 'fs/promises';
-import { writeFileRecursive, fileExists } from '@mui/toolpad-utils/fs';
+import { writeFileRecursive, fileExists, readJsonFile } from '@mui/toolpad-utils/fs';
 import invariant from 'invariant';
 // @ts-expect-error https://github.com/piscinajs/piscina/issues/362#issuecomment-1616811661
 import Piscina from 'piscina';
@@ -15,14 +15,10 @@ import { errorFrom } from '@mui/toolpad-utils/errors';
 import EnvManager from './EnvManager';
 import { ProjectEvents, ToolpadProjectOptions } from '../types';
 import { createWorker as createDevWorker } from './functionsDevWorker';
-import { toPosixPath } from '../utils/paths';
-import {
-  tsConfig,
-  type ExtractTypesParams,
-  type IntrospectionResult,
-} from './functionsTypesWorker';
+import type { ExtractTypesParams, IntrospectionResult } from './functionsTypesWorker';
 import { Awaitable } from '../utils/types';
 import { format } from '../utils/prettier';
+import { tsConfig } from './functionsShared';
 
 function createDefaultFunction(): string {
   return format(`
@@ -69,33 +65,26 @@ interface IToolpadProject {
 export default class FunctionsManager {
   private project: IToolpadProject;
 
-  private buildMetafile: esbuild.Metafile | undefined;
-
   private buildErrors: esbuild.Message[] = [];
 
   private devWorker: ReturnType<typeof createDevWorker>;
 
-  private initPromise: Promise<void>;
-
   private extractedTypes: Awaitable<IntrospectionResult> | undefined;
 
-  private extractTypesWorker: Piscina;
-
-  // eslint-disable-next-line class-methods-use-this
-  private setInitialized: () => void = () => {
-    throw new Error('setInitialized should be initialized');
-  };
+  private extractTypesWorker: Piscina | undefined;
 
   constructor(project: IToolpadProject) {
     this.project = project;
-    this.initPromise = new Promise((resolve) => {
-      this.setInitialized = resolve;
-    });
     this.devWorker = createDevWorker(process.env);
-    this.extractTypesWorker = new Piscina({
-      filename: path.join(__dirname, 'functionsTypesWorker.js'),
-    });
-    this.startDev();
+    if (this.shouldExtractTypes()) {
+      this.extractTypesWorker = new Piscina({
+        filename: path.join(__dirname, 'functionsTypesWorker.js'),
+      });
+    }
+  }
+
+  shouldExtractTypes(): boolean {
+    return this.project.options.cmd !== 'start';
   }
 
   private getResourcesFolder(): string {
@@ -133,30 +122,35 @@ export default class FunctionsManager {
     return this.buildErrors.filter((error) => error.location?.file === entryPoint);
   }
 
-  private getOutputFileForEntryPoint(entryPoint: string): string | undefined {
-    const [outputFile] =
-      Object.entries(this.buildMetafile?.outputs ?? {}).find(
-        (entry) => entry[1].entryPoint === toPosixPath(entryPoint),
-      ) ?? [];
+  private getOutputFile(fileName: string): string | undefined {
+    return path.resolve(this.getFunctionsOutputFolder(), `${path.basename(fileName, '.ts')}.js`);
+  }
 
-    return outputFile;
+  private getFunctionsOutputFolder(): string {
+    return path.resolve(this.project.getOutputFolder(), 'functions');
+  }
+
+  private getIntrospectJsonPath(): string {
+    return path.resolve(this.getFunctionsOutputFolder(), 'introspect.json');
   }
 
   private async extractTypes() {
-    this.extractedTypes = this.extractTypesWorker
+    invariant(this.shouldExtractTypes(), 'extractTypes() can not be used in prod mode');
+    invariant(this.extractTypesWorker, 'this.extractTypesWorker should have been initialized');
+    const extractedTypes: Promise<IntrospectionResult> = this.extractTypesWorker
       .run({ resourcesFolder: this.getResourcesFolder() } satisfies ExtractTypesParams, {})
       .catch((error: unknown) => ({
         error,
         files: [],
       }));
-    return this.extractedTypes;
+    return extractedTypes;
   }
 
   private async createEsbuildContext() {
     const root = this.project.getRoot();
 
     const onFunctionBuildStart = async () => {
-      await this.extractTypes();
+      this.extractedTypes = undefined;
     };
 
     const onFunctionsBuildEnd = async (args: esbuild.BuildResult<esbuild.BuildOptions>) => {
@@ -168,20 +162,9 @@ export default class FunctionsManager {
         } warning(s)`,
       );
 
-      invariant(
-        this.extractedTypes,
-        'this.extractedTypes should have been initialized during build.onStart',
-      );
-
-      await this.extractedTypes;
-
       this.buildErrors = args.errors;
 
-      this.buildMetafile = args.metafile;
-
       this.project.invalidateQueries();
-
-      this.setInitialized();
     };
 
     const toolpadPlugin: esbuild.Plugin = {
@@ -200,7 +183,7 @@ export default class FunctionsManager {
       write: true,
       bundle: true,
       metafile: true,
-      outdir: path.resolve(this.project.getOutputFolder(), 'functions'),
+      outdir: this.getFunctionsOutputFolder(),
       platform: 'node',
       packages: 'external',
       target: 'es2022',
@@ -240,24 +223,36 @@ export default class FunctionsManager {
     this.project.invalidateQueries();
   }
 
-  async startDev() {
-    await this.migrateLegacy();
+  async start() {
+    if (this.project.options.dev) {
+      await this.migrateLegacy();
 
-    await this.startWatchingFunctionFiles();
+      await this.startWatchingFunctionFiles();
+
+      this.project.events.subscribe('envChanged', async () => {
+        await this.createRuntimeWorkerWithEnv();
+      });
+    }
 
     await this.createRuntimeWorkerWithEnv();
-    this.project.events.subscribe('envChanged', async () => {
-      await this.createRuntimeWorkerWithEnv();
-    });
   }
 
   async build() {
     const ctx = await this.createEsbuildContext();
     await ctx.rebuild();
+    await ctx.dispose();
+
+    const types = await this.extractTypes();
+    if (types.error) {
+      throw errorFrom(types.error);
+    }
+
+    await fs.mkdir(this.getFunctionsOutputFolder(), { recursive: true });
+    await fs.writeFile(this.getIntrospectJsonPath(), JSON.stringify(types, null, 2), 'utf-8');
   }
 
-  async startProd() {
-    await this.createRuntimeWorkerWithEnv();
+  async dispose() {
+    await Promise.all([this.devWorker.terminate(), this.extractTypesWorker.destroy()]);
   }
 
   async exec(
@@ -265,13 +260,6 @@ export default class FunctionsManager {
     name: string,
     parameters: Record<string, unknown>,
   ): Promise<ExecFetchResult<unknown>> {
-    await this.initPromise;
-
-    invariant(
-      this.extractedTypes,
-      'this.extractedTypes should have been initialized during build.onStart',
-    );
-
     const resourcesFolder = this.getResourcesFolder();
     const fullPath = path.resolve(resourcesFolder, fileName);
     const entryPoint = path.relative(this.project.getRoot(), fullPath);
@@ -282,12 +270,12 @@ export default class FunctionsManager {
       throw formatError(buildErrors[0]);
     }
 
-    const outputFilePath = this.getOutputFileForEntryPoint(entryPoint);
+    const outputFilePath = this.getOutputFile(fileName);
     if (!outputFilePath) {
       throw new Error(`No build found for "${fileName}"`);
     }
 
-    const extractedTypes = await this.extractedTypes;
+    const extractedTypes = await this.introspect();
 
     if (extractedTypes.error) {
       throw errorFrom(extractedTypes.error);
@@ -310,12 +298,15 @@ export default class FunctionsManager {
   }
 
   async introspect(): Promise<IntrospectionResult> {
-    await this.initPromise;
-
-    invariant(
-      this.extractedTypes,
-      'this.extractedTypes should have been initialized before initPromise resolves',
-    );
+    if (!this.extractedTypes) {
+      if (this.shouldExtractTypes()) {
+        this.extractedTypes = this.extractTypes();
+      } else {
+        this.extractedTypes = readJsonFile(
+          this.getIntrospectJsonPath(),
+        ) as Promise<IntrospectionResult>;
+      }
+    }
 
     return this.extractedTypes;
   }
@@ -327,6 +318,6 @@ export default class FunctionsManager {
       throw new Error(`"${name}" already exists`);
     }
     await writeFileRecursive(filePath, content, { encoding: 'utf-8' });
-    await this.extractTypes();
+    this.extractedTypes = undefined;
   }
 }

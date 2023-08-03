@@ -67,18 +67,17 @@ export interface ToolpadAppDevServerParams {
 }
 
 export async function createDevServer({ outDir, config, root, base }: ToolpadAppDevServerParams) {
-  const devServer = await createServer(
-    createViteConfig({
-      outDir,
-      dev: true,
-      root,
-      base,
-      plugins: [devServerPlugin(root, config)],
-      getComponents,
-    }),
-  );
+  const { viteConfig } = createViteConfig({
+    outDir,
+    dev: true,
+    root,
+    base,
+    plugins: [devServerPlugin(root, config)],
+    getComponents,
+  });
+  const devServer = await createServer(viteConfig);
 
-  return devServer;
+  return { devServer };
 }
 
 export interface AppViteServerConfig {
@@ -90,18 +89,23 @@ export interface AppViteServerConfig {
 }
 
 export async function main({ outDir, base, config, root, port }: AppViteServerConfig) {
-  const app = await createDevServer({ outDir, config, root, base });
+  const { devServer } = await createDevServer({ outDir, config, root, base });
 
-  await app.listen(port);
+  await devServer.listen(port);
 
   invariant(parentPort, 'parentPort must be defined');
 
   parentPort.on('message', (msg: Command) => {
-    if (msg.kind === 'reload-components') {
-      const mod = app.moduleGraph.getModuleById(resolvedComponentsId);
-      if (mod) {
-        app.reloadModule(mod);
+    switch (msg.kind) {
+      case 'reload-components': {
+        const mod = devServer.moduleGraph.getModuleById(resolvedComponentsId);
+        if (mod) {
+          devServer.reloadModule(mod);
+        }
+        break;
       }
+      default:
+        throw new Error(`Unknown command ${msg}`);
     }
   });
 

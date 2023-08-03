@@ -139,6 +139,8 @@ async function main({
 
   const project = await initProject(cmd, projectDir);
 
+  await project.start();
+
   const app = express();
   const httpServer = createServer(app);
 

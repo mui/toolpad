@@ -2,7 +2,7 @@ import { BindableAttrValue } from '@mui/toolpad-core';
 import { ensureSuffix } from '@mui/toolpad-utils/strings';
 import { Maybe } from '../../utils/types';
 import { Authentication, RestConnectionParams } from './types';
-import { MOVIES_API_DEMO_URL } from '../demo';
+import type { RuntimeConfig } from '../../config';
 
 export const HTTP_NO_BODY = new Set(['GET', 'HEAD']);
 
@@ -36,8 +36,13 @@ export function parseBaseUrl(baseUrl: string): URL {
   return parsedBase;
 }
 
-export function getDefaultUrl(connection?: RestConnectionParams | null): BindableAttrValue<string> {
+export function getDefaultUrl(
+  config: RuntimeConfig,
+  connection?: RestConnectionParams | null,
+): BindableAttrValue<string> {
   const baseUrl = connection?.baseUrl;
 
-  return baseUrl ? '' : MOVIES_API_DEMO_URL;
+  return baseUrl
+    ? ''
+    : new URL('/static/movies.json', config.externalUrl || window.location.href).href;
 }

@@ -54,6 +54,7 @@ import { createHarLog, mergeHar } from '../../utils/har';
 import useFetchPrivate from '../useFetchPrivate';
 import QueryPreview from '../QueryPreview';
 import { usePrivateQuery } from '../context';
+import config from '../../config';
 
 const HTTP_METHODS = ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'HEAD'];
 
@@ -266,7 +267,7 @@ function QueryEditor({
   const baseUrl = isBrowserSide ? null : connectionParams?.baseUrl ?? null;
 
   const urlValue: BindableAttrValue<string> =
-    input.attributes.query.url || getDefaultUrl(connectionParams);
+    input.attributes.query.url || getDefaultUrl(config, connectionParams);
 
   const introspection = usePrivateQuery<FetchPrivateQuery, IntrospectionResult>(
     {

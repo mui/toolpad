@@ -7,7 +7,6 @@ import * as vm from 'vm';
 import * as url from 'url';
 import fetch, { Headers, Request, Response } from 'node-fetch';
 import { errorFrom, serializeError } from '@mui/toolpad-utils/errors';
-import invariant from 'invariant';
 
 function getCircularReplacer() {
   const ancestors: object[] = [];
@@ -138,8 +137,6 @@ if (!isMainThread && parentPort) {
 }
 
 export function createWorker(env: Record<string, any>) {
-  invariant(isMainThread, 'createWorker() must be called from the main thread');
-
   const worker = new Worker(path.join(__dirname, 'functionsDevWorker.js'), { env });
 
   const runOnWorker = async (msg: WorkerMessage) => {

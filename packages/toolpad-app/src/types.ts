@@ -211,5 +211,6 @@ export type ProjectEvents = {
 };
 
 export interface ToolpadProjectOptions {
+  cmd: 'dev' | 'start' | 'build';
   dev: boolean;
 }

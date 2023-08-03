@@ -86,18 +86,6 @@ export function createRpcHandler(definition: Definition): express.RequestHandler
         : { result: superjson.stringify(rawResult) };
 
       res.json(responseData);
-
-      if (error) {
-        // eslint-disable-next-line no-console
-        console.log(`${chalk.red('error')} - RPC error`);
-        if (error.stack) {
-          // eslint-disable-next-line no-console
-          console.log(indent(error.stack, 2));
-        } else {
-          // eslint-disable-next-line no-console
-          console.log(indent(`${error.name}: ${error.message}`, 2));
-        }
-      }
     }),
   );
   return router;

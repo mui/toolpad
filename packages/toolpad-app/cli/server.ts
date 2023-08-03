@@ -15,11 +15,9 @@ import { listen } from '@mui/toolpad-utils/http';
 import openBrowser from 'react-dev-utils/openBrowser';
 import { folderExists } from '@mui/toolpad-utils/fs';
 import chalk from 'chalk';
-import { errorFrom } from '@mui/toolpad-utils/errors';
 import { asyncHandler } from '../src/utils/express';
 import { createProdHandler } from '../src/server/toolpadAppServer';
 import {
-  ComponentEntry,
   ToolpadProject,
   getAppOutputFolder,
   getComponents,
@@ -29,12 +27,11 @@ import {
   Command as AppDevServerCommand,
   Event as AppDevServerEvent,
   AppViteServerConfig,
-  MsgResponse,
 } from './appServer';
 import { createRpcHandler, createRpcServer } from '../src/server/rpc';
 import { RUNTIME_CONFIG_WINDOW_PROPERTY } from '../src/constants';
 import type { RuntimeConfig } from '../src/config';
-import * as appDom from '../src/appDom';
+import { createWorkerRpcServer } from '../src/server/workerRpc';
 
 const DEFAULT_PORT = 3000;
 
@@ -82,24 +79,13 @@ async function createDevHandler(
       if (msg.kind === 'ready') {
         resolve();
       }
-      if (msg.kind === 'get-dom') {
-        try {
-          const dom = await project.loadDom();
-          msg.port.postMessage({ result: dom } satisfies MsgResponse<appDom.AppDom>);
-        } catch (error) {
-          msg.port.postMessage({ error: errorFrom(error) } satisfies MsgResponse<appDom.AppDom>);
-        }
-      }
-      if (msg.kind === 'get-components') {
-        try {
-          const dom = await getComponents(project.getRoot());
-          msg.port.postMessage({ result: dom } satisfies MsgResponse<ComponentEntry[]>);
-        } catch (error) {
-          msg.port.postMessage({ error: errorFrom(error) } satisfies MsgResponse<ComponentEntry[]>);
-        }
-      }
     });
   }).catch((err) => err);
+
+  createWorkerRpcServer(worker, {
+    loadDom: async () => project.loadDom(),
+    getComponents: async () => getComponents(project.getRoot()),
+  });
 
   project.events.on('componentsListChanged', () => {
     worker.postMessage({ kind: 'reload-components' } satisfies AppDevServerCommand);

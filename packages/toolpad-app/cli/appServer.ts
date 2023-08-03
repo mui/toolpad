@@ -1,4 +1,4 @@
-import { parentPort, workerData, MessageChannel, MessagePort } from 'worker_threads';
+import { parentPort, workerData, MessagePort } from 'worker_threads';
 import invariant from 'invariant';
 import { createServer, Plugin } from 'vite';
 import {
@@ -10,6 +10,7 @@ import {
 import type { RuntimeConfig } from '../src/config';
 import type * as appDom from '../src/appDom';
 import type { ComponentEntry } from '../src/server/localMode';
+import { createWorkerRpcClient } from '../src/server/workerRpc';
 
 export type Command = {
   kind: 'reload-components';
@@ -38,35 +39,10 @@ export type MsgResponse<R = unknown> =
       result: R;
     };
 
-async function getDom(): Promise<appDom.AppDom> {
-  return new Promise((resolve, reject) => {
-    invariant(parentPort, 'parentPort must be defined');
-    const { port1, port2 } = new MessageChannel();
-    port1.on('message', (msg: MsgResponse<appDom.AppDom>) => {
-      if (msg.error) {
-        reject(msg.error);
-      } else {
-        resolve(msg.result);
-      }
-    });
-    parentPort.postMessage({ kind: 'get-dom', port: port2 } satisfies Event, [port2]);
-  });
-}
-
-async function getComponents(): Promise<ComponentEntry[]> {
-  return new Promise((resolve, reject) => {
-    invariant(parentPort, 'parentPort must be defined');
-    const { port1, port2 } = new MessageChannel();
-    port1.on('message', (msg: MsgResponse<ComponentEntry[]>) => {
-      if (msg.error) {
-        reject(msg.error);
-      } else {
-        resolve(msg.result);
-      }
-    });
-    parentPort.postMessage({ kind: 'get-components', port: port2 } satisfies Event, [port2]);
-  });
-}
+const { loadDom, getComponents } = createWorkerRpcClient<{
+  loadDom: () => Promise<appDom.AppDom>;
+  getComponents: () => Promise<ComponentEntry[]>;
+}>();
 
 invariant(
   process.env.NODE_ENV === 'development',
@@ -85,7 +61,7 @@ function devServerPlugin(root: string, config: RuntimeConfig): Plugin {
           const canvas = url.searchParams.get('toolpad-display') === 'canvas';
 
           try {
-            const dom = await getDom();
+            const dom = await loadDom();
 
             const template = getHtmlContent({ canvas });
 

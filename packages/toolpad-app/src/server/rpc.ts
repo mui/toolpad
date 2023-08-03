@@ -5,8 +5,6 @@ import * as z from 'zod';
 import { fromZodError } from 'zod-validation-error';
 import { hasOwnProperty } from '@mui/toolpad-utils/collections';
 import { errorFrom, serializeError } from '@mui/toolpad-utils/errors';
-import { indent } from '@mui/toolpad-utils/strings';
-import chalk from 'chalk';
 import { asyncHandler } from '../utils/express';
 import type { ToolpadProject } from './localMode';
 

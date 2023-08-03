@@ -481,7 +481,7 @@ function QueryEditor({
 
   const handleCreateNewCommit = React.useCallback(async () => {
     try {
-      await execApi('createNewAndOpen', [proposedFileName, 'query']);
+      await execApi('createNew', [proposedFileName]);
       await introspection.refetch();
     } catch (error) {
       // eslint-disable-next-line no-alert

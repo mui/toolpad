@@ -21,7 +21,6 @@ export type LocalPrivateApi = {
   debugExec(query: LocalQuery, params: Record<string, any>): Promise<any>;
   introspection(): Promise<IntrospectionResult>;
   createNew(fileName: string): Promise<void>;
-  createNewAndOpen(fileName: string, fileType: FileTypes): Promise<void>;
 };
 
 export interface FetchResult extends ExecFetchResult<any> {

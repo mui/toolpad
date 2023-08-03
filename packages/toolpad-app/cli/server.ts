@@ -15,10 +15,15 @@ import { listen } from '@mui/toolpad-utils/http';
 import openBrowser from 'react-dev-utils/openBrowser';
 import { folderExists } from '@mui/toolpad-utils/fs';
 import chalk from 'chalk';
+import { Worker } from 'worker_threads';
 import { asyncHandler } from '../src/utils/express';
 import { createProdHandler } from '../src/server/toolpadAppServer';
 import { ToolpadProject, initProject } from '../src/server/localMode';
-import { Command as AppDevServerCommand, Event as AppDevServerEvent } from './appServer';
+import {
+  Command as AppDevServerCommand,
+  Event as AppDevServerEvent,
+  AppViteServerConfig,
+} from './appServer';
 import { createRpcHandler, createRpcServer } from '../src/server/rpc';
 import { RUNTIME_CONFIG_WINDOW_PROPERTY } from '../src/constants';
 import type { RuntimeConfig } from '../src/config';
@@ -46,38 +51,41 @@ async function createDevHandler(
   const appServerPath = path.resolve(__dirname, './appServer.js');
   const devPort = await getPort();
 
-  const cp = execaNode(appServerPath, [], {
-    cwd: project.getRoot(),
-    stdio: 'inherit',
+  const worker = new Worker(appServerPath, {
+    workerData: {
+      base,
+      config: runtimeConfig,
+      root: project.getRoot(),
+      port: devPort,
+    } satisfies AppViteServerConfig,
     env: {
       NODE_ENV: 'development',
-      TOOLPAD_RUNTIME_CONFIG: JSON.stringify(runtimeConfig),
-      TOOLPAD_PORT: String(devPort),
-      TOOLPAD_PROJECT_DIR: project.getRoot(),
-      TOOLPAD_BASE: base,
-      FORCE_COLOR: '1',
     },
   });
 
-  cp.once('exit', (code) => {
+  worker.once('exit', (code) => {
     console.error(`App dev server failed ${code}`);
     process.exit(1);
   });
 
-  await new Promise<void>((resolve) => {
-    cp.on('message', (msg: AppDevServerEvent) => {
+  const readyPromise: Promise<Error | void> = new Promise<void>((resolve) => {
+    worker.on('message', (msg: AppDevServerEvent) => {
       if (msg.kind === 'ready') {
         resolve();
       }
     });
-  });
+  }).catch((err) => err);
 
   project.events.on('componentsListChanged', () => {
-    cp.send({ kind: 'reload-components' } satisfies AppDevServerCommand);
+    worker.postMessage({ kind: 'reload-components' } satisfies AppDevServerCommand);
   });
 
   router.use('/api/data', project.dataManager.createDataHandler(project));
   router.use(
+    (req, res, next) => {
+      // Stall the request until the dev server is ready
+      readyPromise.then(next, next);
+    },
     createProxyMiddleware({
       logLevel: 'silent',
       ws: true,

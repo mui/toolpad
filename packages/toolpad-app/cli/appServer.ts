@@ -1,5 +1,6 @@
 import invariant from 'invariant';
 import { createServer, Plugin } from 'vite';
+import { parentPort, workerData } from 'worker_threads';
 import {
   getHtmlContent,
   postProcessHtml,
@@ -71,19 +72,21 @@ export type Event = {
   kind: 'ready';
 };
 
-export interface MainParams {
+export interface AppViteServerConfig {
   base: string;
   root: string;
   port: number;
   config: RuntimeConfig;
 }
 
-export async function main({ base, config, root, port }: MainParams) {
+export async function main({ base, config, root, port }: AppViteServerConfig) {
   const app = await createDevServer({ config, root, base });
 
   await app.listen(port);
 
-  process.on('message', (msg: Command) => {
+  invariant(parentPort, 'parentPort must be defined');
+
+  parentPort?.on('message', (msg: Command) => {
     if (msg.kind === 'reload-components') {
       const mod = app.moduleGraph.getModuleById(resolvedComponentsId);
       if (mod) {
@@ -92,21 +95,10 @@ export async function main({ base, config, root, port }: MainParams) {
     }
   });
 
-  invariant(process.send, 'Process must be spawned with an IPC channel');
-  process.send({ kind: 'ready' } satisfies Event);
+  parentPort.postMessage({ kind: 'ready' } satisfies Event);
 }
 
-invariant(!!process.env.TOOLPAD_PROJECT_DIR, 'A project root must be defined');
-invariant(!!process.env.TOOLPAD_RUNTIME_CONFIG, 'A runtime config must be defined');
-invariant(!!process.env.TOOLPAD_PORT, 'A port must be defined');
-invariant(!!process.env.TOOLPAD_BASE, 'A base path must be defined');
-
-main({
-  config: JSON.parse(process.env.TOOLPAD_RUNTIME_CONFIG) as RuntimeConfig,
-  base: process.env.TOOLPAD_BASE,
-  root: process.env.TOOLPAD_PROJECT_DIR,
-  port: Number(process.env.TOOLPAD_PORT),
-}).catch((err) => {
+main(workerData).catch((err) => {
   console.error(err);
   process.exit(1);
 });

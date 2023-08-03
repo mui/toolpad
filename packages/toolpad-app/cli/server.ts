@@ -3,7 +3,6 @@ import { IncomingMessage, createServer } from 'http';
 import * as fs from 'fs/promises';
 import express from 'express';
 import invariant from 'invariant';
-import { execaNode } from 'execa';
 import getPort from 'get-port';
 import { createProxyMiddleware } from 'http-proxy-middleware';
 import { mapValues } from '@mui/toolpad-utils/collections';

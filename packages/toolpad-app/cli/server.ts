@@ -280,8 +280,7 @@ export async function runApp({ cmd, port, dev = false, projectDir }: RunAppOptio
     }
   }
 
-  const editorDevMode =
-    !!process.env.TOOLPAD_NEXT_DEV || process.env.NODE_ENV === 'development' || dev;
+  const editorDevMode = !!process.env.TOOLPAD_NEXT_DEV || dev;
 
   const externalUrl = process.env.TOOLPAD_EXTERNAL_URL || `http://localhost:${port}`;
 

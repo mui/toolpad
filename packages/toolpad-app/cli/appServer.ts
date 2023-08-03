@@ -1,3 +1,4 @@
+import { parentPort, workerData, MessagePort } from 'worker_threads';
 import invariant from 'invariant';
 import { createServer, Plugin } from 'vite';
 import {
@@ -7,7 +8,41 @@ import {
   resolvedComponentsId,
 } from '../src/server/toolpadAppBuilder';
 import type { RuntimeConfig } from '../src/config';
-import { loadDomFromDisk } from '../src/server/localMode';
+import type * as appDom from '../src/appDom';
+import type { ComponentEntry } from '../src/server/localMode';
+import { createWorkerRpcClient } from '../src/server/workerRpc';
+
+export type Command = {
+  kind: 'reload-components';
+};
+
+export type Event =
+  | {
+      kind: 'ready';
+    }
+  | {
+      kind: 'get-dom';
+      port: MessagePort;
+    }
+  | {
+      kind: 'get-components';
+      port: MessagePort;
+    };
+
+export type MsgResponse<R = unknown> =
+  | {
+      error: Error;
+      result?: undefined;
+    }
+  | {
+      error?: undefined;
+      result: R;
+    };
+
+const { loadDom, getComponents } = createWorkerRpcClient<{
+  loadDom: () => Promise<appDom.AppDom>;
+  getComponents: () => Promise<ComponentEntry[]>;
+}>();
 
 invariant(
   process.env.NODE_ENV === 'development',
@@ -26,7 +61,7 @@ function devServerPlugin(root: string, config: RuntimeConfig): Plugin {
           const canvas = url.searchParams.get('toolpad-display') === 'canvas';
 
           try {
-            const dom = await loadDomFromDisk(root);
+            const dom = await loadDom();
 
             const template = getHtmlContent({ canvas });
 
@@ -45,45 +80,43 @@ function devServerPlugin(root: string, config: RuntimeConfig): Plugin {
 }
 
 export interface ToolpadAppDevServerParams {
+  outDir: string;
   config: RuntimeConfig;
   root: string;
   base: string;
 }
 
-export async function createDevServer({ config, root, base }: ToolpadAppDevServerParams) {
+export async function createDevServer({ outDir, config, root, base }: ToolpadAppDevServerParams) {
   const devServer = await createServer(
     createViteConfig({
+      outDir,
       dev: true,
       root,
       base,
       plugins: [devServerPlugin(root, config)],
+      getComponents,
     }),
   );
 
   return devServer;
 }
 
-export type Command = {
-  kind: 'reload-components';
-};
-
-export type Event = {
-  kind: 'ready';
-};
-
-export interface MainParams {
+export interface AppViteServerConfig {
+  outDir: string;
   base: string;
   root: string;
   port: number;
   config: RuntimeConfig;
 }
 
-export async function main({ base, config, root, port }: MainParams) {
-  const app = await createDevServer({ config, root, base });
+export async function main({ outDir, base, config, root, port }: AppViteServerConfig) {
+  const app = await createDevServer({ outDir, config, root, base });
 
   await app.listen(port);
 
-  process.on('message', (msg: Command) => {
+  invariant(parentPort, 'parentPort must be defined');
+
+  parentPort.on('message', (msg: Command) => {
     if (msg.kind === 'reload-components') {
       const mod = app.moduleGraph.getModuleById(resolvedComponentsId);
       if (mod) {
@@ -92,21 +125,10 @@ export async function main({ base, config, root, port }: MainParams) {
     }
   });
 
-  invariant(process.send, 'Process must be spawned with an IPC channel');
-  process.send({ kind: 'ready' } satisfies Event);
+  parentPort.postMessage({ kind: 'ready' } satisfies Event);
 }
 
-invariant(!!process.env.TOOLPAD_PROJECT_DIR, 'A project root must be defined');
-invariant(!!process.env.TOOLPAD_RUNTIME_CONFIG, 'A runtime config must be defined');
-invariant(!!process.env.TOOLPAD_PORT, 'A port must be defined');
-invariant(!!process.env.TOOLPAD_BASE, 'A base path must be defined');
-
-main({
-  config: JSON.parse(process.env.TOOLPAD_RUNTIME_CONFIG) as RuntimeConfig,
-  base: process.env.TOOLPAD_BASE,
-  root: process.env.TOOLPAD_PROJECT_DIR,
-  port: Number(process.env.TOOLPAD_PORT),
-}).catch((err) => {
+main(workerData).catch((err) => {
   console.error(err);
   process.exit(1);
 });

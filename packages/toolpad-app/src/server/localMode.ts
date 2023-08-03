@@ -55,6 +55,11 @@ import { VERSION_CHECK_INTERVAL } from '../constants';
 import DataManager from './DataManager';
 import type { RuntimeConfig } from '../config';
 
+invariant(
+  isMainThread,
+  'localMode should be used only in the main thread. Use message passing to get data from the main thread.',
+);
+
 function getToolpadFolder(root: string): string {
   return path.join(root, './toolpad');
 }
@@ -107,7 +112,12 @@ export async function legacyConfigFileExists(root: string): Promise<boolean> {
 
 type ComponentsContent = Record<string, { code: string }>;
 
-export async function getComponents(root: string) {
+export interface ComponentEntry {
+  name: string;
+  path: string;
+}
+
+export async function getComponents(root: string): Promise<ComponentEntry[]> {
   const componentsFolder = getComponentsFolder(root);
   const entries = (await readMaybeDir(componentsFolder)) || [];
   const result = entries.map((entry) => {
@@ -1157,11 +1167,6 @@ declare global {
 }
 
 export async function initProject(cmd: 'dev' | 'start' | 'build', root: string) {
-  invariant(
-    isMainThread,
-    'initProject must be called from the main thread. Otherwise it will add the file watchers in multiple processes.',
-  );
-
   // eslint-disable-next-line no-underscore-dangle
   invariant(!global.__toolpadProject, 'A project is already running');
 

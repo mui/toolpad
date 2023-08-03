@@ -60,35 +60,8 @@ spec:
               $$jsExpression: |
                 fetchSheet.data
             columns:
-              - field: name
+              - field: Month
                 type: string
-              - field: price
+              - field: Number of days
                 type: string
-              - field: volume
-                type: string
-              - field: priceopen
-                type: string
-              - field: high
-                type: string
-              - field: low
-                type: string
-              - field: marketcap
-                type: string
-              - field: tradetime
-                type: string
-              - field: datadelay
-                type: string
-              - field: eps
-                type: string
-              - field: high52
-                type: string
-              - field: low52
-                type: string
-              - field: change
-                type: string
-              - field: closeyest
-                type: string
-              - field: shares
-                type: string
-              - field: currency
-                type: string
+            height: 622

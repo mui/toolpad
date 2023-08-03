@@ -71,17 +71,15 @@ function randomBetween(seed: number, min: number, max: number): () => number {
   return () => min + (max - min) * random();
 }
 
-function isValidDate(inputString: string) {
-  // Check if the input string contains only digits (simple numeric string)
-  if (/^\d+$/.test(inputString)) {
-    return false;
+function isNumeric(input: string) {
+  if (/^\d+$/.test(input)) {
+    return true;
   }
+  return false;
+}
 
-  try {
-    return !Number.isNaN(Date.parse(inputString));
-  } catch (error) {
-    return false;
-  }
+function isValidDate(input: string) {
+  return !Number.isNaN(Date.parse(input));
 }
 
 const SkeletonCell = styled(Box)(({ theme }) => ({
@@ -168,6 +166,9 @@ function inferColumnType(value: unknown): string {
 
         return 'link';
       } catch (error) {
+        if (isNumeric(value)) {
+          return 'number';
+        }
         if (isValidDate(value)) {
           return 'date';
         }
@@ -231,12 +232,12 @@ function ImageCell({ field, id, value: src }: GridRenderCellParams<any, any, any
 }
 
 function dateValueGetter({ value }: GridValueGetterParams<any, any>) {
-  try {
-    const date = new Date(value);
-    return date;
-  } catch (err) {
+  if (value === null || value === undefined || value === '') {
     return value;
   }
+  // It's fine if this turns out to be an invalid date, the user wanted a date column, if the data can't be parsed as a date
+  // it should just show as such
+  return new Date(value);
 }
 
 function ComponentErrorFallback({ error }: FallbackProps) {

@@ -15,17 +15,26 @@ import openBrowser from 'react-dev-utils/openBrowser';
 import { folderExists } from '@mui/toolpad-utils/fs';
 import chalk from 'chalk';
 import { Worker } from 'worker_threads';
+import { errorFrom } from '@mui/toolpad-utils/errors';
 import { asyncHandler } from '../src/utils/express';
 import { createProdHandler } from '../src/server/toolpadAppServer';
-import { ToolpadProject, initProject } from '../src/server/localMode';
+import {
+  ComponentEntry,
+  ToolpadProject,
+  getAppOutputFolder,
+  getComponents,
+  initProject,
+} from '../src/server/localMode';
 import {
   Command as AppDevServerCommand,
   Event as AppDevServerEvent,
   AppViteServerConfig,
+  MsgResponse,
 } from './appServer';
 import { createRpcHandler, createRpcServer } from '../src/server/rpc';
 import { RUNTIME_CONFIG_WINDOW_PROPERTY } from '../src/constants';
 import type { RuntimeConfig } from '../src/config';
+import * as appDom from '../src/appDom';
 
 const DEFAULT_PORT = 3000;
 
@@ -52,6 +61,7 @@ async function createDevHandler(
 
   const worker = new Worker(appServerPath, {
     workerData: {
+      outDir: getAppOutputFolder(project.getRoot()),
       base,
       config: runtimeConfig,
       root: project.getRoot(),
@@ -68,9 +78,25 @@ async function createDevHandler(
   });
 
   const readyPromise: Promise<Error | void> = new Promise<void>((resolve) => {
-    worker.on('message', (msg: AppDevServerEvent) => {
+    worker.on('message', async (msg: AppDevServerEvent) => {
       if (msg.kind === 'ready') {
         resolve();
+      }
+      if (msg.kind === 'get-dom') {
+        try {
+          const dom = await project.loadDom();
+          msg.port.postMessage({ result: dom } satisfies MsgResponse<appDom.AppDom>);
+        } catch (error) {
+          msg.port.postMessage({ error: errorFrom(error) } satisfies MsgResponse<appDom.AppDom>);
+        }
+      }
+      if (msg.kind === 'get-components') {
+        try {
+          const dom = await getComponents(project.getRoot());
+          msg.port.postMessage({ result: dom } satisfies MsgResponse<ComponentEntry[]>);
+        } catch (error) {
+          msg.port.postMessage({ error: errorFrom(error) } satisfies MsgResponse<ComponentEntry[]>);
+        }
       }
     });
   }).catch((err) => err);

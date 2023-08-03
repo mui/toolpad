@@ -1,6 +1,6 @@
 import invariant from 'invariant';
 import { createServer, Plugin } from 'vite';
-import { parentPort, workerData } from 'worker_threads';
+import { parentPort, workerData, MessageChannel, MessagePort } from 'worker_threads';
 import {
   getHtmlContent,
   postProcessHtml,
@@ -8,7 +8,65 @@ import {
   resolvedComponentsId,
 } from '../src/server/toolpadAppBuilder';
 import type { RuntimeConfig } from '../src/config';
-import { loadDomFromDisk } from '../src/server/localMode';
+import type * as appDom from '../src/appDom';
+import type { ComponentEntry } from '../src/server/localMode';
+
+export type Command = {
+  kind: 'reload-components';
+};
+
+export type Event =
+  | {
+      kind: 'ready';
+    }
+  | {
+      kind: 'get-dom';
+      port: MessagePort;
+    }
+  | {
+      kind: 'get-components';
+      port: MessagePort;
+    };
+
+export type MsgResponse<R = unknown> =
+  | {
+      error: Error;
+      result?: undefined;
+    }
+  | {
+      error?: undefined;
+      result: R;
+    };
+
+async function getDom(): Promise<appDom.AppDom> {
+  return new Promise((resolve, reject) => {
+    invariant(parentPort, 'parentPort must be defined');
+    const { port1, port2 } = new MessageChannel();
+    port1.on('message', (msg: MsgResponse<appDom.AppDom>) => {
+      if (msg.error) {
+        reject(msg.error);
+      } else {
+        resolve(msg.result);
+      }
+    });
+    parentPort.postMessage({ kind: 'get-dom', port: port2 } satisfies Event, [port2]);
+  });
+}
+
+async function getComponents(): Promise<ComponentEntry[]> {
+  return new Promise((resolve, reject) => {
+    invariant(parentPort, 'parentPort must be defined');
+    const { port1, port2 } = new MessageChannel();
+    port1.on('message', (msg: MsgResponse<ComponentEntry[]>) => {
+      if (msg.error) {
+        reject(msg.error);
+      } else {
+        resolve(msg.result);
+      }
+    });
+    parentPort.postMessage({ kind: 'get-components', port: port2 } satisfies Event, [port2]);
+  });
+}
 
 invariant(
   process.env.NODE_ENV === 'development',
@@ -27,7 +85,7 @@ function devServerPlugin(root: string, config: RuntimeConfig): Plugin {
           const canvas = url.searchParams.get('toolpad-display') === 'canvas';
 
           try {
-            const dom = await loadDomFromDisk(root);
+            const dom = await getDom();
 
             const template = getHtmlContent({ canvas });
 
@@ -46,47 +104,43 @@ function devServerPlugin(root: string, config: RuntimeConfig): Plugin {
 }
 
 export interface ToolpadAppDevServerParams {
+  outDir: string;
   config: RuntimeConfig;
   root: string;
   base: string;
 }
 
-export async function createDevServer({ config, root, base }: ToolpadAppDevServerParams) {
+export async function createDevServer({ outDir, config, root, base }: ToolpadAppDevServerParams) {
   const devServer = await createServer(
     createViteConfig({
+      outDir,
       dev: true,
       root,
       base,
       plugins: [devServerPlugin(root, config)],
+      getComponents,
     }),
   );
 
   return devServer;
 }
 
-export type Command = {
-  kind: 'reload-components';
-};
-
-export type Event = {
-  kind: 'ready';
-};
-
 export interface AppViteServerConfig {
+  outDir: string;
   base: string;
   root: string;
   port: number;
   config: RuntimeConfig;
 }
 
-export async function main({ base, config, root, port }: AppViteServerConfig) {
-  const app = await createDevServer({ config, root, base });
+export async function main({ outDir, base, config, root, port }: AppViteServerConfig) {
+  const app = await createDevServer({ outDir, config, root, base });
 
   await app.listen(port);
 
   invariant(parentPort, 'parentPort must be defined');
 
-  parentPort?.on('message', (msg: Command) => {
+  parentPort.on('message', (msg: Command) => {
     if (msg.kind === 'reload-components') {
       const mod = app.moduleGraph.getModuleById(resolvedComponentsId);
       if (mod) {

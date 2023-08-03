@@ -1,6 +1,7 @@
 import * as path from 'path';
 import { IncomingMessage, createServer } from 'http';
 import * as fs from 'fs/promises';
+import { Worker } from 'worker_threads';
 import express from 'express';
 import invariant from 'invariant';
 import getPort from 'get-port';
@@ -14,7 +15,6 @@ import { listen } from '@mui/toolpad-utils/http';
 import openBrowser from 'react-dev-utils/openBrowser';
 import { folderExists } from '@mui/toolpad-utils/fs';
 import chalk from 'chalk';
-import { Worker } from 'worker_threads';
 import { errorFrom } from '@mui/toolpad-utils/errors';
 import { asyncHandler } from '../src/utils/express';
 import { createProdHandler } from '../src/server/toolpadAppServer';

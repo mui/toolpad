@@ -1,6 +1,6 @@
+import { parentPort, workerData, MessageChannel, MessagePort } from 'worker_threads';
 import invariant from 'invariant';
 import { createServer, Plugin } from 'vite';
-import { parentPort, workerData, MessageChannel, MessagePort } from 'worker_threads';
 import {
   getHtmlContent,
   postProcessHtml,

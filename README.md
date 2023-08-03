@@ -39,8 +39,6 @@ MUI Toolpad is in its beta stages of development. Feel free to run this applicat
 
 ## Quick setup locally
 
-**NOTE: MUI Toolpad is in preview, do not run this in production.**
-
 Run:
 
 ```bash

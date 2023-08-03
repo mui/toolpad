@@ -9,8 +9,8 @@ import { alpha } from '@mui/material/styles';
 import HighlightedCode from 'docs/src/modules/components/HighlightedCode';
 import MarkdownElement from 'docs/src/components/markdown/MarkdownElement';
 
-export const code = [
-  `  
+const code = [
+  `
 import { PrismaClient, Prisma } from '@prisma/client';
 
 const prisma = new PrismaClient();
@@ -32,16 +32,16 @@ export async function deleteUser(id: number) {
 }`,
 
   `
-import Stripe from "stripe";
-import path from "path";
-import fs from "fs";
-import { exec } from "child_process";
+import Stripe from 'stripe';
+import path from 'path';
+import fs from 'fs';
+import { exec } from 'child_process';
 
-const stripe = new Stripe(...)
+const stripe = new Stripe(...);
 
 export async function downloadPDF(limit: number = 100) {
   let startingAfter;
-  let listInvoices;  
+  let listInvoices;
   do {
     listInvoices = await stripe.invoices.list({
       starting_after: startingAfter,
@@ -78,35 +78,38 @@ export async function downloadPDF(limit: number = 100) {
 `,
 
   `
-import mysql from 'mysql2/promise';  
+import mysql from 'mysql2/promise';
 import SSH2Promise from 'ssh2-promise';
 import * as fs from 'fs/promises';
 
 export async function getOrders() {
-  const sql = await fs.readFile('./getOrders.sql',
-  'utf8');
+  const sql = await fs.readFile('./getOrders.sql', {
+    encoding: 'utf8',
+  });
 
   const connection = await connectionFn(true);
   const [, rows] = await connection.query(sql);
-  connection.end();
+  await connection.end();
   return rows;
 }
 
 export async function updateOrder(order_id: number,
-  contacted_status: string) {    
-  
-  const sql = await fs.readFile('./updateOrder.sql',
-  'utf8');
-    
+  contacted_status: string) {
+
+  const sql = await fs.readFile('./updateOrder.sql', {
+    encoding: 'utf8',
+  });
+
   const connection = await connectionFn(true);
-  const [, rows] = await connection.execute(sql, { order_id, contacted_status });
-  connection.end();
-  return rows;    
-              
+  const [, rows] = await connection.execute(sql, {
+    order_id,
+    contacted_status,
+  });
+  await connection.end();
+  return rows;
 }
 
-async function connectionFn(multiple = false) {    
-
+async function connectionFn(multiple = false) {
   const ssh = new SSH2Promise({
     host: process.env.BASTION_HOST,
     port: 22,
@@ -115,26 +118,25 @@ async function connectionFn(multiple = false) {
   });
 
   const tunnel = await ssh.addTunnel({
-    remoteAddr: process.env.STORE_HOST,
+    remoteAddr: process.env.MYSQL_HOST,
     remotePort: 3306,
   });
 
   const connection = await mysql.createConnection({
     host: 'localhost',
     port: tunnel.localPort,
-    user: process.env.STORE_USERNAME,
-    password: process.env.STORE_PASSWORD,
-    database: process.env.STORE_DATABASE,
+    user: process.env.MYSQL_USERNAME,
+    password: process.env.MYSQL_PASSWORD,
+    database: process.env.MYSQL_DATABASE,
     multipleStatements: multiple,
     namedPlaceholders: true,
   });
 
   return connection;
-}
 }`,
 ];
 
-export const filenames = ['users.ts', 'stripeInvoice.tsx', 'orders.ts'];
+const filenames = ['users.ts', 'stripeInvoice.tsx', 'orders.ts'];
 
 export default function CodeBlock({ appMode, fileIndex, setFrameIndex }) {
   const tabsRef = React.useRef(null);

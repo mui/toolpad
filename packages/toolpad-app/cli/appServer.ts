@@ -1,4 +1,4 @@
-import { parentPort, workerData, MessagePort } from 'worker_threads';
+import { parentPort, workerData } from 'worker_threads';
 import invariant from 'invariant';
 import { createServer, Plugin } from 'vite';
 import {
@@ -16,33 +16,13 @@ export type Command = {
   kind: 'reload-components';
 };
 
-export type Event =
-  | {
-      kind: 'ready';
-    }
-  | {
-      kind: 'get-dom';
-      port: MessagePort;
-    }
-  | {
-      kind: 'get-components';
-      port: MessagePort;
-    };
-
-export type MsgResponse<R = unknown> =
-  | {
-      error: Error;
-      result?: undefined;
-    }
-  | {
-      error?: undefined;
-      result: R;
-    };
-
-const { loadDom, getComponents } = createWorkerRpcClient<{
+export type WorkerRpc = {
+  notifyReady: () => Promise<void>;
   loadDom: () => Promise<appDom.AppDom>;
   getComponents: () => Promise<ComponentEntry[]>;
-}>();
+};
+
+const { notifyReady, loadDom, getComponents } = createWorkerRpcClient<WorkerRpc>();
 
 invariant(
   process.env.NODE_ENV === 'development',
@@ -125,7 +105,7 @@ export async function main({ outDir, base, config, root, port }: AppViteServerCo
     }
   });
 
-  parentPort.postMessage({ kind: 'ready' } satisfies Event);
+  await notifyReady();
 }
 
 main(workerData).catch((err) => {

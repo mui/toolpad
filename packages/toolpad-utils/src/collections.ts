@@ -182,3 +182,44 @@ export function isDeepClone<T>(val: T) {
 
   return val as T;
 }
+
+type PrimitiveType = number | string | boolean;
+
+type PathToFields<T, Type = PrimitiveType> = T extends PrimitiveType
+  ? ''
+  : {
+      [K in Extract<keyof T, string>]: Dot<K, PathToFields<T[K], Type>>;
+    }[Extract<keyof T, string>];
+
+type Dot<T extends string, U extends string> = '' extends U ? T : `${T}.${U}`;
+
+type GetPropertyType<T, K extends string> = K extends keyof T
+  ? T[K]
+  : K extends `${infer Property}.${infer SubField}`
+  ? Property extends keyof T
+    ? GetPropertyType<NonNullable<T[Property]>, SubField>
+    : never
+  : never;
+
+/**
+ * set object by path
+ *
+ * */
+export function setObjectPath<
+  T extends Record<string, unknown>,
+  P extends PathToFields<T>,
+  V extends GetPropertyType<T, P>,
+>(obj: T, path: P, value: V) {
+  const chunks = path.split('.');
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  chunks.reduce<Record<string, any>>((acc, chunk, index) => {
+    acc[chunk] ??= {};
+
+    if (index === chunks.length - 1) {
+      acc[chunk] = value;
+    }
+
+    return acc[chunk];
+  }, obj);
+}

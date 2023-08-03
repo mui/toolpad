@@ -1,5 +1,5 @@
 import { describe, test, expect } from '@jest/globals';
-import { asArray, isDeepEqual, isDeepClone } from './collections';
+import { asArray, isDeepEqual, isDeepClone, setObjectPath } from './collections';
 
 describe('asArray', () => {
   test.each([
@@ -103,5 +103,10 @@ describe('isDeepEqual', () => {
         [3, 'three'],
       ]),
     });
+  });
+  test('setObjectPath', () => {
+    const data = { a: 1 };
+    setObjectPath(data, 'a', 2);
+    expect(data).toEqual({ a: 2 });
   });
 });

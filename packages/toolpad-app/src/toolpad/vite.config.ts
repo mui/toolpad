@@ -1,7 +1,7 @@
-import { defineConfig } from 'vite';
-import react from '@vitejs/plugin-react';
 import * as path from 'path';
 import * as fs from 'fs';
+import { defineConfig } from 'vite';
+import react from '@vitejs/plugin-react';
 
 const pkgJsonContent = fs.readFileSync(path.resolve(__dirname, '../../package.json'), {
   encoding: 'utf-8',

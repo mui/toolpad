@@ -1,12 +1,11 @@
+import * as path from 'path';
 import { InlineConfig, Plugin, build } from 'vite';
 import react from '@vitejs/plugin-react';
-import * as path from 'path';
-import { Server } from 'http';
 import serializeJavascript from 'serialize-javascript';
 import { indent } from '@mui/toolpad-utils/strings';
 import { MUI_X_PRO_LICENSE, RUNTIME_CONFIG_WINDOW_PROPERTY } from '../constants';
-import { getComponents, getAppOutputFolder } from './localMode';
-import { RuntimeConfig } from '../config';
+import type { ComponentEntry } from './localMode';
+import type { RuntimeConfig } from '../config';
 import * as appDom from '../appDom';
 import createRuntimeState from '../runtime/createRuntimeState';
 
@@ -86,9 +85,10 @@ export function postProcessHtml(html: string, { config, dom }: PostProcessHtmlPa
 interface ToolpadVitePluginParams {
   root: string;
   base: string;
+  getComponents: (root: string) => Promise<ComponentEntry[]>;
 }
 
-function toolpadVitePlugin({ root, base }: ToolpadVitePluginParams): Plugin {
+function toolpadVitePlugin({ root, base, getComponents }: ToolpadVitePluginParams): Plugin {
   const resolvedRuntimeEntryPointId = `\0${MAIN_ENTRY}`;
   const resolvedCanvasEntryPointId = `\0${CANVAS_ENTRY}`;
 
@@ -186,26 +186,28 @@ function toolpadVitePlugin({ root, base }: ToolpadVitePluginParams): Plugin {
 }
 
 export interface CreateViteConfigParams {
-  middlewareMode?: boolean;
-  server?: Server;
-  dev: boolean;
+  outDir: string;
   root: string;
+  dev: boolean;
   base: string;
   plugins?: Plugin[];
+  getComponents: (root: string) => Promise<ComponentEntry[]>;
 }
 
 export function createViteConfig({
+  outDir,
   root,
   dev,
   base,
   plugins = [],
+  getComponents,
 }: CreateViteConfigParams): InlineConfig {
   const mode = dev ? 'development' : 'production';
   return {
     configFile: false,
     mode,
     build: {
-      outDir: getAppOutputFolder(root),
+      outDir,
       chunkSizeWarningLimit: Infinity,
       rollupOptions: {
         onwarn(warning, warn) {
@@ -281,7 +283,7 @@ export function createViteConfig({
     appType: 'custom',
     logLevel: 'info',
     root,
-    plugins: [react(), toolpadVitePlugin({ root, base }), ...plugins],
+    plugins: [react(), toolpadVitePlugin({ root, base, getComponents }), ...plugins],
     base,
     define: {
       'process.env.NODE_ENV': `'${mode}'`,
@@ -291,10 +293,12 @@ export function createViteConfig({
 }
 
 export interface ToolpadBuilderParams {
+  outDir: string;
+  getComponents: (root: string) => Promise<ComponentEntry[]>;
   root: string;
   base: string;
 }
 
-export async function buildApp({ root, base }: ToolpadBuilderParams) {
-  await build(createViteConfig({ dev: false, root, base }));
+export async function buildApp({ root, base, getComponents, outDir }: ToolpadBuilderParams) {
+  await build(createViteConfig({ dev: false, root, base, getComponents, outDir }));
 }

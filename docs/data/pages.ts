@@ -35,7 +35,21 @@ const pages: MuiPage[] = [
       },
       {
         pathname: '/toolpad/concepts/connecting-to-data',
-        title: 'Connecting to data',
+        title: 'Queries',
+        children: [
+          {
+            pathname: '/toolpad/concepts/queries',
+            title: 'Overview',
+          },
+          {
+            pathname: '/toolpad/concepts/http-requests',
+            title: 'HTTP requests',
+          },
+          {
+            pathname: '/toolpad/concepts/custom-functions',
+            title: 'Custom functions',
+          },
+        ],
       },
       {
         pathname: '/toolpad/concepts/managing-state',
@@ -61,7 +75,18 @@ const pages: MuiPage[] = [
     icon: BuildIcon,
     children: [
       {
-        pathname: '/toolpad/how-to-guides/connect-to-databases',
+        pathname: '/toolpad/how-to-guides/connect-to-datasource',
+        title: 'Connect to datasource',
+        children: [
+          {
+            pathname: '/toolpad/how-to-guides/connect-to-databases',
+            title: 'MySQL',
+          },
+          {
+            pathname: '/toolpad/how-to-guides/connect-to-googlesheets',
+            title: 'Google sheets',
+          },
+        ],
       },
       {
         pathname: '/toolpad/how-to-guides/custom-components',

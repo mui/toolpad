@@ -54,7 +54,6 @@ packages/toolpad-app/public/runtime
 packages/toolpad-app/public/reactDevtools
 packages/toolpad-app/public/runtime
 packages/toolpad-app/public/typings.json
-
 examples/*/yarn.lock
 
 test-results

@@ -72,10 +72,7 @@ function randomBetween(seed: number, min: number, max: number): () => number {
 }
 
 function isNumeric(input: string) {
-  if (/^\d+$/.test(input)) {
-    return true;
-  }
-  return false;
+  return input ? !Number.isNaN(Number(input)) : false;
 }
 
 function isValidDate(input: string) {

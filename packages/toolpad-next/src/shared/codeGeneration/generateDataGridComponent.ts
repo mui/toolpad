@@ -8,12 +8,15 @@ import type { CodeFiles, CodeGenerationResult, GenerateComponentOptions } from '
 import { serializeObject, serializeArray, SerializedProperties } from './utils';
 import { Scope } from './Scope';
 import Imports from './Imports';
+import { getComponentNameFromInputFile } from '../paths';
 
 export default async function generateDataGridComponent(
-  name: string,
+  filePath: string,
   file: DataGridFile,
   options: GenerateComponentOptions,
 ): Promise<CodeGenerationResult> {
+  const name = getComponentNameFromInputFile(filePath);
+
   const globalScope = new Scope();
   const imports = new Imports(globalScope);
 
@@ -34,7 +37,7 @@ export default async function generateDataGridComponent(
   const componentName = globalScope.allocateSuggestion(name);
   const componentPropsName = globalScope.allocateSuggestion(`${name}Props`);
 
-  const outDir = options.config.outDir || '/';
+  const { outDir = '/' } = options;
 
   const hasRowsProperty = (file.spec?.rows?.kind ?? 'property') === 'property';
 
@@ -204,7 +207,7 @@ export default async function generateDataGridComponent(
     export default ${
       options.target === 'dev'
         ? `_runtime.withDevtool(${componentName}, ${serializeObject({
-            name: JSON.stringify(name),
+            filePath: JSON.stringify(filePath),
             file: JSON.stringify(file),
             wsUrl: JSON.stringify(options.wsUrl),
             dependencies: imports.printDynamicImports(),

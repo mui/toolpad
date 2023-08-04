@@ -7,9 +7,10 @@ import { WithDevtoolParams } from '../shared/types';
 import DevtoolOverlay from './DevtoolOverlay';
 import { ServerProvider } from './server';
 import { ComponentInfo, CurrentComponentContext } from './CurrentComponentContext';
-import { ProbeProvider, useProbeTarget } from './probes';
+import { ProbeProvider, useProbeTarget, useProbes } from './probes';
+import { getComponentNameFromInputFile } from '../shared/paths';
 
-export { useProbeTarget };
+export { useProbeTarget, useProbes };
 
 export { TOOLPAD_INTERNAL } from './constants';
 
@@ -44,8 +45,10 @@ export function EditButton(props: ButtonProps) {
 
 export function withDevtool<P extends object>(
   Component: React.ComponentType<P>,
-  { name, file, wsUrl, dependencies }: WithDevtoolParams,
+  { filePath, file, wsUrl, dependencies }: WithDevtoolParams,
 ): React.ComponentType<P> {
+  const name = getComponentNameFromInputFile(filePath);
+
   return function ComponentWithDevtool(props) {
     const [currentlyEditedComponentId, setCurrentlyEditedComponentId] =
       useCurrentlyEditedComponentId();
@@ -95,7 +98,7 @@ export function withDevtool<P extends object>(
                 <RenderedComponent {...props} />
               </Box>
               <DevtoolOverlay
-                name={name}
+                filePath={filePath}
                 file={file}
                 dependencies={dependencies}
                 onClose={() => {

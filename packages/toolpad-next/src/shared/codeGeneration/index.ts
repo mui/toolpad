@@ -2,7 +2,7 @@ import path from 'path-browserify';
 import { format } from '../prettier';
 import { ToolpadFile } from '../schemas';
 import generateDataGridComponent from './generateDataGridComponent';
-import { Config } from '../types';
+import { getComponentNameFromInputFile } from '../paths';
 
 export type CodeFiles = [string, { code: string }][];
 
@@ -10,23 +10,7 @@ export interface CodeGenerationResult {
   files: CodeFiles;
 }
 
-function isValidFileNAme(base: string): boolean {
-  return /^[a-zA-Z][a-zA-Z0-9]*$/.test(base);
-}
-
-export function getNameFromPath(filePath: string): string {
-  const name = path.basename(filePath, '.yml');
-
-  if (!isValidFileNAme(name)) {
-    throw new Error(`Invalid file name ${JSON.stringify(name)}`);
-  }
-
-  return name;
-}
-
-export type GenerateComponentOptions = {
-  config: Config;
-} & (
+export type BaseGenerateComponentOptions =
   | {
       target: 'prod';
     }
@@ -36,17 +20,20 @@ export type GenerateComponentOptions = {
   | {
       target: 'dev';
       wsUrl: string;
-    }
-);
+    };
+
+export type GenerateComponentOptions = BaseGenerateComponentOptions & {
+  outDir: string;
+};
 
 export async function generateComponent(
-  name: string,
+  filePath: string,
   file: ToolpadFile,
   config: GenerateComponentOptions,
 ): Promise<CodeGenerationResult> {
   switch (file.kind) {
     case 'DataGrid':
-      return generateDataGridComponent(name, file, config);
+      return generateDataGridComponent(filePath, file, config);
     default:
       throw new Error(`No implementation yet for ${JSON.stringify(file.kind)}`);
   }
@@ -64,7 +51,7 @@ export async function generateIndex(
 
   const code = entries
     .map((entryPath) => {
-      const name = getNameFromPath(entryPath);
+      const name = getComponentNameFromInputFile(entryPath);
       return `export { default as ${name} } from './${name}';`;
     })
     .join('\n');

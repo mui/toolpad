@@ -19,6 +19,7 @@ import theme from './theme';
 import { useServer } from './server';
 import { CodeGenerationResult, generateComponent } from '../shared/codeGeneration';
 import DevtoolHost from './DevtoolHost';
+import { getComponentNameFromInputFile, getOutputPathForInputFile } from '../shared/paths';
 
 const CONNECTION_STATUS_DISPLAY = {
   connecting: { label: 'Connecting', color: 'info.main' },
@@ -117,16 +118,16 @@ async function evaluate(
 }
 
 export interface DevtoolOverlayProps {
-  name: string;
+  filePath: string;
   file: ToolpadFile;
-  dependencies: [string, () => Promise<unknown>][];
+  dependencies: readonly [string, () => Promise<unknown>][];
   onClose?: () => void;
   onCommitted?: () => void;
   onComponentUpdate?: (Component: React.ComponentType) => void;
 }
 
 export default function DevtoolOverlay({
-  name,
+  filePath,
   file,
   onComponentUpdate,
   onClose,
@@ -134,6 +135,7 @@ export default function DevtoolOverlay({
   dependencies,
 }: DevtoolOverlayProps) {
   const rootRef = React.useRef<HTMLDivElement>(null);
+  const name = getComponentNameFromInputFile(filePath);
 
   const [inputValue, setInputValue] = React.useState(file);
 
@@ -142,7 +144,8 @@ export default function DevtoolOverlay({
   const [source, setSource] = React.useState<CodeGenerationResult | undefined>(undefined);
 
   React.useEffect(() => {
-    generateComponent(name, inputValue, { target: 'prod' })
+    const outDir = '/';
+    generateComponent(filePath, inputValue, { target: 'prod', outDir })
       .then((result) => {
         setSource(result);
       })
@@ -150,10 +153,11 @@ export default function DevtoolOverlay({
         console.error(error);
         setSource(undefined);
       });
-  }, [inputValue, name, dependencies, onComponentUpdate]);
+  }, [inputValue, filePath, dependencies, onComponentUpdate]);
 
   React.useEffect(() => {
-    generateComponent(name, inputValue, { target: 'preview' })
+    const outDir = '/';
+    generateComponent(filePath, inputValue, { target: 'preview', outDir })
       .then(async (result) => {
         const resolvedDependencies = await Promise.all(
           dependencies.map(
@@ -161,9 +165,11 @@ export default function DevtoolOverlay({
           ),
         );
 
+        const outputPath = getOutputPathForInputFile(filePath, outDir);
+
         const moduleExports = await evaluate(
           new Map(result.files),
-          `/${name}/index.tsx`,
+          outputPath,
           new Map(resolvedDependencies),
         );
 
@@ -177,7 +183,7 @@ export default function DevtoolOverlay({
       .catch((error) => {
         console.error(error);
       });
-  }, [inputValue, name, dependencies, onComponentUpdate]);
+  }, [inputValue, filePath, dependencies, onComponentUpdate]);
 
   const server = useServer();
 

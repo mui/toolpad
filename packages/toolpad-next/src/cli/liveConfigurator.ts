@@ -9,13 +9,13 @@ import getPort from 'get-port';
 import { toolpadFileSchema } from '../shared/schemas';
 import RpcServer from '../shared/RpcServer';
 import {
-  getNameFromPath,
   generateComponent,
   generateIndex,
   GenerateComponentOptions,
   CodeFiles,
+  BaseGenerateComponentOptions,
 } from '../shared/codeGeneration';
-import { DevRpcMethods } from '../shared/types';
+import { Config, DevRpcMethods } from '../shared/types';
 import { loadConfig } from './config';
 
 async function compileTs(code: string) {
@@ -56,8 +56,7 @@ async function writeAndCompile(files: CodeFiles) {
   );
 }
 
-async function generateLib(generateOptions: GenerateComponentOptions) {
-  const { config } = generateOptions;
+async function generateLib(config: Config, generateOptions: BaseGenerateComponentOptions) {
   const { outDir } = config;
 
   // eslint-disable-next-line no-console
@@ -75,9 +74,12 @@ async function generateLib(generateOptions: GenerateComponentOptions) {
       const yamlContent = await fs.readFile(entryPath, 'utf-8');
       const data = yaml.parse(yamlContent);
       const file = toolpadFileSchema.parse(data);
-      const name = getNameFromPath(entryPath);
+      const filePath = path.relative(config.rootDir, entryPath);
 
-      const { files } = await generateComponent(name, file, generateOptions);
+      const { files } = await generateComponent(filePath, file, {
+        ...generateOptions,
+        outDir,
+      });
 
       await writeAndCompile(files);
     }),
@@ -90,7 +92,7 @@ async function generateLib(generateOptions: GenerateComponentOptions) {
 
 export async function generateCommand({ dir }: CommandArgs) {
   const config = await loadConfig(dir);
-  await generateLib({ config, target: 'prod' });
+  await generateLib(config, { target: 'prod' });
 }
 
 export async function devCommand({ dir }: CommandArgs) {
@@ -113,15 +115,13 @@ export async function devCommand({ dir }: CommandArgs) {
     await fs.writeFile(filePath, yaml.stringify(content), { encoding: 'utf-8' });
   });
 
-  const wsUrl = `ws://localhost:${port}`;
-
   const options: GenerateComponentOptions = {
-    config,
+    outDir: config.outDir,
     target: 'dev',
-    wsUrl,
+    wsUrl: `ws://localhost:${port}`,
   };
 
-  await generateLib(options);
+  await generateLib(config, options);
 
   const ymlPattern = getComponentsYmlPattern(config.rootDir);
 
@@ -131,7 +131,7 @@ export async function devCommand({ dir }: CommandArgs) {
     })
     .on('all', async () => {
       try {
-        await generateLib(options);
+        await generateLib(config, options);
       } catch (error) {
         console.error(`Generation failed`);
         console.error(error);

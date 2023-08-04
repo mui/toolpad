@@ -1,10 +1,10 @@
 import { ToolpadFile } from './schemas';
 
 export interface WithDevtoolParams {
-  name: string;
-  file: ToolpadFile;
-  wsUrl: string;
-  dependencies: [string, () => Promise<unknown>][];
+  readonly filePath: string;
+  readonly file: ToolpadFile;
+  readonly dependencies: readonly [string, () => Promise<unknown>][];
+  readonly wsUrl: string;
 }
 
 export type DevRpcMethods = {

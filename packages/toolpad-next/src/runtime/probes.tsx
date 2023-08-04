@@ -53,3 +53,7 @@ export function useProbe(key: string) {
   const getSnapshot = React.useCallback(() => probeContext.getSnapshot(key), [key, probeContext]);
   return React.useSyncExternalStore(subscribe, getSnapshot);
 }
+
+export function useProbes() {
+  return React.useContext(ProbeContext);
+}

@@ -3,4 +3,6 @@
 import 'dotenv/config';
 import { generateCommand } from './liveConfigurator';
 
-generateCommand({ dir: '.' });
+generateCommand({ dir: '.' }).catch((err) => {
+  console.error(err);
+});

@@ -15,6 +15,7 @@ interface GenerateCodeConfig {
 interface AppContext {
   themeFilePath: string;
   indexFilePath: string;
+  getPageFilePath(pageNode: appDom.PageNode): string;
 }
 
 interface ModuleContextConstructorParams {
@@ -35,25 +36,49 @@ class ModuleContext {
 
 function generateIndexFile(ctx: ModuleContext, dom: appDom.AppDom): string {
   const { pages = [] } = appDom.getChildNodes(dom, appDom.getApp(dom));
-  const defaultPage = pages[0];
+  const defaultPage: appDom.PageNode | undefined = pages[0];
 
   const themeImportSpecifier = pathToNodeImportSpecifier(
     path.relative(path.dirname(ctx.filePath), ctx.appContext.themeFilePath),
   );
 
+  const getPageComponentName = (page: appDom.PageNode) => `Page_${page.name}`;
+
+  const defaultPageUrl = defaultPage ? `/pages/${defaultPage.id}` : null;
+
   const code = `
     import * as React from 'react';
     import * as ReactDOM from 'react-dom/client';
     import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
-    import { ThemeProvider, CssBaseline } from '@mui/material';
-    import theme from ${JSON.stringify(themeImportSpecifier)}
+    import { ThemeProvider, CssBaseline, Container, Typography } from '@mui/material';
+    import theme from ${JSON.stringify(themeImportSpecifier)};
+    ${pages
+      .map((page) => {
+        const pageImportSpecifier = pathToNodeImportSpecifier(
+          path.relative(path.dirname(ctx.filePath), ctx.appContext.getPageFilePath(page)),
+        );
+        return `import ${getPageComponentName(page)} from ${JSON.stringify(pageImportSpecifier)};`;
+      })
+      .join('\n')}
 
     const config = window[${JSON.stringify(RUNTIME_CONFIG_WINDOW_PROPERTY)}];
 
     const base = process.env.BASE_URL;
 
-    function Page({ name }) {
-      return <div>Page {name}</div>;
+    function PageNotFound() {
+      return (
+        <Container
+          sx={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            flexDirection: 'column',
+          }}
+        >
+          <Typography variant="h1">Not found</Typography>
+          <Typography>The page doesn&apos;t exist in this application.</Typography>
+        </Container>
+      );
     }
 
     function App() {
@@ -64,19 +89,21 @@ function generateIndexFile(ctx: ModuleContext, dom: appDom.AppDom): string {
             <Routes>
               ${pages.map((page) => {
                 const pageUrlPath = `/pages/${page.id}`;
-                return `<Route path=${JSON.stringify(
-                  pageUrlPath,
-                )} element={<Page name=${JSON.stringify(page.name)} />} />`;
+                const pageElement = `<${getPageComponentName(page)} />`;
+                return `<Route path=${JSON.stringify(pageUrlPath)} element={${pageElement}} />`;
               })}
               ${pages.map((page) => {
                 const pageUrlPath = `/pages/${page.name}`;
-                return `<Route path=${JSON.stringify(
-                  pageUrlPath,
-                )} element={<Navigate to=${JSON.stringify(`/pages/${page.id}`)} />} />`;
+                const pageRedirectUrlPath = `/pages/${page.id}`;
+                const pageElement = `<Navigate to=${JSON.stringify(pageRedirectUrlPath)} />`;
+                return `<Route path=${JSON.stringify(pageUrlPath)} element={${pageElement}} />`;
               })}
-              <Route path="/" element={<Navigate to=${JSON.stringify(
-                `/pages/${defaultPage.id}`,
-              )} />} />
+              ${
+                defaultPageUrl
+                  ? `<Route path="/" element={<Navigate to=${JSON.stringify(defaultPageUrl)} />} />`
+                  : ''
+              }
+              <Route path="*" element={<PageNotFound />} />
             </Routes>
             <pre>{${JSON.stringify(JSON.stringify(dom, null, 2))}}</pre>
           </BrowserRouter>
@@ -144,10 +171,19 @@ export function generateCode(
   config: GenerateCodeConfig = {},
 ): { files: Map<string, string> } {
   const { outDir = '/' } = config;
+
+  const getPageFilePath = (pageNode: appDom.PageNode) =>
+    path.join(outDir, `./pages/${pageNode.name}.tsx`);
+
   const appContext: AppContext = {
     indexFilePath: path.join(outDir, INDEX_FILE_PATH),
     themeFilePath: path.join(outDir, THEME_FILE_PATH),
+    getPageFilePath,
   };
+
+  const root = appDom.getApp(dom);
+  const { pages = [] } = appDom.getChildNodes(dom, root);
+
   return {
     files: new Map([
       [
@@ -164,6 +200,18 @@ export function generateCode(
           dom,
         ),
       ],
+      ...pages.map((page) => {
+        return [
+          getPageFilePath(page),
+          `
+            import * as React from 'react';
+
+            export default function Page () {
+              return <div>{${JSON.stringify(page.name)}}</div>
+            }
+          `,
+        ] as [string, string];
+      }),
     ]),
   };
 }

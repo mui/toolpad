@@ -105,8 +105,9 @@ describe('isDeepEqual', () => {
     });
   });
   test('setObjectPath', () => {
-    const data = { a: 1 };
-    setObjectPath(data, 'a', 2);
-    expect(data).toEqual({ a: 2 });
+    const data = { a: 1, b: 2, c: [1, 2, 3] };
+    setObjectPath(data, 'a.b', 1);
+    setObjectPath(data, 'c[1]', 1);
+    expect(data).toEqual({ a: { b: 1 }, b: 2, c: [1, 1, 3] });
   });
 });

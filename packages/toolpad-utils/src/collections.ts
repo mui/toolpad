@@ -1,3 +1,5 @@
+import type { AnyObject, Set, StringToPath } from './types';
+
 export function asArray<T>(maybeArray: T | T[]): T[] {
   return Array.isArray(maybeArray) ? maybeArray : [maybeArray];
 }
@@ -183,43 +185,41 @@ export function isDeepClone<T>(val: T) {
   return val as T;
 }
 
-type PrimitiveType = number | string | boolean;
-
-type PathToFields<T, Type = PrimitiveType> = T extends PrimitiveType
-  ? ''
-  : {
-      [K in Extract<keyof T, string>]: Dot<K, PathToFields<T[K], Type>>;
-    }[Extract<keyof T, string>];
-
-type Dot<T extends string, U extends string> = '' extends U ? T : `${T}.${U}`;
-
-type GetPropertyType<T, K extends string> = K extends keyof T
-  ? T[K]
-  : K extends `${infer Property}.${infer SubField}`
-  ? Property extends keyof T
-    ? GetPropertyType<NonNullable<T[Property]>, SubField>
-    : never
-  : never;
-
 /**
  * set object by path
- *
+ * reference https://ayubbegimkulov.com/ts-get-set-part-2/
  * */
-export function setObjectPath<
-  T extends Record<string, unknown>,
-  P extends PathToFields<T>,
-  V extends GetPropertyType<T, P>,
->(obj: T, path: P, value: V) {
-  const chunks = path.split('.');
+export function setObjectPath<Obj extends AnyObject, Path extends string, Value>(
+  object: Obj,
+  stringPath: Path,
+  value: Value,
+): Set<Obj, Path, Value> {
+  const stringToPath = <T extends string>(path: T) =>
+    path.replaceAll('[', '.').replaceAll(']', '').split('.').filter(Boolean) as StringToPath<T>;
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  chunks.reduce<Record<string, any>>((acc, chunk, index) => {
-    acc[chunk] ??= {};
+  let index = 0;
+  const path = stringToPath(stringPath);
+  const lastIndex = path.length - 1;
 
-    if (index === chunks.length - 1) {
-      acc[chunk] = value;
+  let currentObject: AnyObject = object;
+
+  while (index <= lastIndex) {
+    const key = path[index]!;
+
+    let newValue: unknown = value;
+
+    if (index !== lastIndex) {
+      const objValue = object[key]!;
+      if (typeof objValue === 'object' && objValue !== null) {
+        newValue = objValue;
+      } else {
+        newValue = !Number.isNaN(+path[index + 1]!) ? [] : {};
+      }
     }
+    (currentObject as AnyObject)[key] = newValue;
+    currentObject = currentObject[key];
+    index += 1;
+  }
 
-    return acc[chunk];
-  }, obj);
+  return object as Set<Obj, Path, Value>;
 }

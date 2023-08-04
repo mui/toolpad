@@ -34,8 +34,7 @@ import {
   JsExpressionAttrValue,
 } from '@mui/toolpad-core';
 import { createProvidedContext, useAssertedContext } from '@mui/toolpad-utils/react';
-import { mapProperties, mapValues } from '@mui/toolpad-utils/collections';
-import { set as setObjectPath } from 'lodash-es';
+import { mapProperties, mapValues, setObjectPath } from '@mui/toolpad-utils/collections';
 import { QueryClient, QueryClientProvider, useMutation } from '@tanstack/react-query';
 import {
   BrowserRouter,

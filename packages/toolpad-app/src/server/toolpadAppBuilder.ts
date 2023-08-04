@@ -9,7 +9,7 @@ import type { RuntimeConfig } from '../config';
 import * as appDom from '../appDom';
 import createRuntimeState from '../runtime/createRuntimeState';
 import virtualFsPlugin, { replaceFiles } from './viteVirtualFsPlugin';
-import { generateCode } from './codeGeneration';
+import { generateAppCode } from './codegen';
 
 const MAIN_ENTRY = '/main.tsx';
 const CANVAS_ENTRY = '/canvas.tsx';
@@ -213,7 +213,7 @@ export function createViteConfig({
 }: CreateViteConfigParams): CreateViteConfigResult {
   const mode = dev ? 'development' : 'production';
 
-  const codegen = generateCode(dom);
+  const codegen = generateAppCode(dom);
   const generatedFsPlugin = virtualFsPlugin(codegen.files, 'codegen-fs');
 
   return {
@@ -319,7 +319,7 @@ export function createViteConfig({
     },
 
     replaceDom: (newDom: appDom.AppDom) => {
-      const newCode = generateCode(newDom);
+      const newCode = generateAppCode(newDom);
       replaceFiles(generatedFsPlugin, newCode.files);
     },
   };

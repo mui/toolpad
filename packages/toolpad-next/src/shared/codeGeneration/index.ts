@@ -2,6 +2,7 @@ import path from 'path-browserify';
 import { format } from '../prettier';
 import { ToolpadFile } from '../schemas';
 import generateDataGridComponent from './generateDataGridComponent';
+import { Config } from '../types';
 
 export type CodeFiles = [string, { code: string }][];
 
@@ -23,8 +24,8 @@ export function getNameFromPath(filePath: string): string {
   return name;
 }
 
-export type GenerateComponentConfig = {
-  outDir?: string;
+export type GenerateComponentOptions = {
+  config: Config;
 } & (
   | {
       target: 'prod';
@@ -41,7 +42,7 @@ export type GenerateComponentConfig = {
 export async function generateComponent(
   name: string,
   file: ToolpadFile,
-  config: GenerateComponentConfig,
+  config: GenerateComponentOptions,
 ): Promise<CodeGenerationResult> {
   switch (file.kind) {
     case 'DataGrid':

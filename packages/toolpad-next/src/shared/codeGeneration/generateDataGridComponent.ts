@@ -4,7 +4,7 @@ import { format } from '../prettier';
 import { DataGridFile } from '../schemas';
 import { WithDevtoolParams } from '../types';
 import * as jsonPointer from '../jsonPointer';
-import type { CodeFiles, CodeGenerationResult, GenerateComponentConfig } from '../codeGeneration';
+import type { CodeFiles, CodeGenerationResult, GenerateComponentOptions } from '.';
 import { serializeObject, serializeArray, SerializedProperties } from './utils';
 import { Scope } from './Scope';
 import Imports from './Imports';
@@ -12,7 +12,7 @@ import Imports from './Imports';
 export default async function generateDataGridComponent(
   name: string,
   file: DataGridFile,
-  config: GenerateComponentConfig,
+  options: GenerateComponentOptions,
 ): Promise<CodeGenerationResult> {
   const globalScope = new Scope();
   const imports = new Imports(globalScope);
@@ -20,7 +20,7 @@ export default async function generateDataGridComponent(
   imports.addImport('react', '*', 'React');
   imports.addImport('@mui/x-data-grid-pro', 'DataGridPro', 'DataGridPro');
   imports.addImport('@mui/material', 'Box', 'Box');
-  if (config.target !== 'prod') {
+  if (options.target !== 'prod') {
     imports.addImport('@mui/toolpad-next/runtime', '*', '_runtime');
   }
 
@@ -34,7 +34,7 @@ export default async function generateDataGridComponent(
   const componentName = globalScope.allocateSuggestion(name);
   const componentPropsName = globalScope.allocateSuggestion(`${name}Props`);
 
-  const { outDir = '/' } = config;
+  const outDir = options.config.outDir || '/';
 
   const hasRowsProperty = (file.spec?.rows?.kind ?? 'property') === 'property';
 
@@ -79,7 +79,7 @@ export default async function generateDataGridComponent(
         const result = ${jsonPointer.toExpression('data', file.spec.rows.selector || '')};
 
         ${
-          config.target === 'prod'
+          options.target === 'prod'
             ? ''
             : `
                 result[_runtime.TOOLPAD_INTERNAL] = {
@@ -160,7 +160,7 @@ export default async function generateDataGridComponent(
           : ''
       }
 
-      ${config.target === 'prod' ? '' : `_runtime.useProbeTarget('rows', rows);`}
+      ${options.target === 'prod' ? '' : `_runtime.useProbeTarget('rows', rows);`}
 
 
       return (
@@ -191,7 +191,7 @@ export default async function generateDataGridComponent(
             )}
           </ErrorBoundary>
           ${
-            config.target === 'dev'
+            options.target === 'dev'
               ? `<_runtime.EditButton sx={{ position: 'absolute', bottom: 0, right: 0, mb: 2, mr: 2, zIndex: 1 }} />`
               : ''
           }
@@ -202,11 +202,11 @@ export default async function generateDataGridComponent(
     ${componentName}.displayName = ${JSON.stringify(name)};
 
     export default ${
-      config.target === 'dev'
+      options.target === 'dev'
         ? `_runtime.withDevtool(${componentName}, ${serializeObject({
             name: JSON.stringify(name),
             file: JSON.stringify(file),
-            wsUrl: JSON.stringify(config.wsUrl),
+            wsUrl: JSON.stringify(options.wsUrl),
             dependencies: imports.printDynamicImports(),
           } satisfies Record<keyof WithDevtoolParams, string>)})`
         : componentName

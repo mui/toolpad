@@ -10,3 +10,8 @@ export interface WithDevtoolParams {
 export type DevRpcMethods = {
   saveFile: (name: string, file: ToolpadFile) => Promise<void>;
 };
+
+export interface Config {
+  readonly rootDir: string;
+  readonly outDir: string;
+}

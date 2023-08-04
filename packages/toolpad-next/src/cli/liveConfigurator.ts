@@ -1,6 +1,6 @@
-import { glob } from 'glob';
 import * as path from 'path';
 import * as fs from 'fs/promises';
+import { glob } from 'glob';
 import * as yaml from 'yaml';
 import * as esbuild from 'esbuild';
 import * as chokidar from 'chokidar';
@@ -12,10 +12,11 @@ import {
   getNameFromPath,
   generateComponent,
   generateIndex,
-  GenerateComponentConfig,
+  GenerateComponentOptions,
   CodeFiles,
 } from '../shared/codeGeneration';
 import { DevRpcMethods } from '../shared/types';
+import { loadConfig } from './config';
 
 async function compileTs(code: string) {
   const result = await esbuild.transform(code, {
@@ -29,21 +30,12 @@ async function compileTs(code: string) {
   return result.code;
 }
 
-export interface Config {
+interface CommandArgs {
   dir: string;
 }
 
-function resolveRoot(input: string) {
-  return path.resolve(process.cwd(), input);
-}
-
-function getToolpadDir(root: string) {
-  return path.join(root, 'toolpad');
-}
-
-function getYmlPattern(root: string) {
-  const toolpadDir = getToolpadDir(root);
-  return path.join(toolpadDir, '*.yml');
+function getComponentsYmlPattern(rootDir: string) {
+  return path.join(rootDir, '*.yml');
 }
 
 async function writeAndCompile(files: CodeFiles) {
@@ -64,18 +56,19 @@ async function writeAndCompile(files: CodeFiles) {
   );
 }
 
-async function generateLib(root: string, config: GenerateComponentConfig = { target: 'prod' }) {
-  // eslint-disable-next-line no-console
-  console.log(`Generating lib at ${JSON.stringify(root)} in "${config.target}" mode`);
+async function generateLib(generateOptions: GenerateComponentOptions) {
+  const { config } = generateOptions;
+  const { outDir } = config;
 
-  const toolpadDir = getToolpadDir(root);
-  const outputDir = path.join(toolpadDir, '.generated');
-  const ymlPattern = getYmlPattern(root);
+  // eslint-disable-next-line no-console
+  console.log(`Generating lib at ${outDir} in "${generateOptions.target}" mode`);
+
+  const ymlPattern = getComponentsYmlPattern(config.rootDir);
   const entries = await glob(ymlPattern);
 
-  await fs.rm(outputDir, { recursive: true });
+  await fs.rm(outDir, { recursive: true });
 
-  await fs.mkdir(outputDir, { recursive: true });
+  await fs.mkdir(outDir, { recursive: true });
 
   await Promise.all([
     ...entries.map(async (entryPath) => {
@@ -84,30 +77,24 @@ async function generateLib(root: string, config: GenerateComponentConfig = { tar
       const file = toolpadFileSchema.parse(data);
       const name = getNameFromPath(entryPath);
 
-      const { files } = await generateComponent(name, file, {
-        ...config,
-        outDir: outputDir,
-      });
+      const { files } = await generateComponent(name, file, generateOptions);
 
       await writeAndCompile(files);
     }),
 
-    generateIndex(entries, {
-      outDir: outputDir,
-    }).then(async ({ files }) => writeAndCompile(files)),
+    generateIndex(entries, { outDir }).then(async ({ files }) => writeAndCompile(files)),
   ]);
 
   console.error(`Generation completed!`);
 }
 
-export async function generateCommand({ dir }: Config) {
-  const root = resolveRoot(dir);
-
-  await generateLib(root);
+export async function generateCommand({ dir }: CommandArgs) {
+  const config = await loadConfig(dir);
+  await generateLib({ config, target: 'prod' });
 }
 
-export async function devCommand({ dir }: Config) {
-  const root = resolveRoot(dir);
+export async function devCommand({ dir }: CommandArgs) {
+  const config = await loadConfig(dir);
 
   const port = await getPort();
 
@@ -119,27 +106,24 @@ export async function devCommand({ dir }: Config) {
 
   const rpcServer = new RpcServer<DevRpcMethods>(wss);
 
-  rpcServer.register('saveFile', async (name, file) => {
+  rpcServer.register('saveFile', async (name, content) => {
     // Validate content before saving
-    toolpadFileSchema.parse(file);
-
-    const toolpadDir = getToolpadDir(root);
-    const filePath = path.join(toolpadDir, `${name}.yml`);
-
-    const content = yaml.stringify(file);
-    await fs.writeFile(filePath, content, { encoding: 'utf-8' });
+    toolpadFileSchema.parse(content);
+    const filePath = path.join(config.rootDir, `${name}.yml`);
+    await fs.writeFile(filePath, yaml.stringify(content), { encoding: 'utf-8' });
   });
 
   const wsUrl = `ws://localhost:${port}`;
 
-  const config: GenerateComponentConfig = {
+  const options: GenerateComponentOptions = {
+    config,
     target: 'dev',
     wsUrl,
   };
 
-  await generateLib(root, config);
+  await generateLib(options);
 
-  const ymlPattern = getYmlPattern(root);
+  const ymlPattern = getComponentsYmlPattern(config.rootDir);
 
   chokidar
     .watch(ymlPattern, {
@@ -147,7 +131,7 @@ export async function devCommand({ dir }: Config) {
     })
     .on('all', async () => {
       try {
-        await generateLib(root, config);
+        await generateLib(options);
       } catch (error) {
         console.error(`Generation failed`);
         console.error(error);

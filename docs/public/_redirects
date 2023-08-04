@@ -8,17 +8,17 @@
 
 /toolpad/getting-started/setup/ /toolpad/getting-started/overview/ 301
 /toolpad/getting-started/tutorial/ /toolpad/getting-started/overview/ 301
-/toolpad/data-fetching/rest/ /toolpad/connecting-to-datasources/fetch/ 301
-/toolpad/data-fetching/google-sheets/ /toolpad/connecting-to-datasources/google-sheets/ 301
+/toolpad/data-fetching/rest/ /toolpad/concepts/http-requests/ 301
+/toolpad/data-fetching/google-sheets/ /toolpad/how-to-guides/connect-to-googlesheets/ 301
 
 # 2023
 
 /toolpad/getting-started/quickstart/ /toolpad/getting-started/first-app/ 301
 /toolpad/schema-reference/ /toolpad/reference/file-schema/ 301
 /toolpad/getting-started/configuration/ /toolpad/how-to-guides/basic-auth/ 301
-/toolpad/connecting-to-datasources/queries/ /toolpad/concepts/connecting-to-data/ 301
-/toolpad/connecting-to-datasources/http-requests/ /toolpad/concepts/connecting-to-data/#http-requests 301
-/toolpad/connecting-to-datasources/custom-functions/ /toolpad/concepts/connecting-to-data/#custom-functions 301
+/toolpad/connecting-to-datasources/queries/ /toolpad/concepts/queries/ 301
+/toolpad/connecting-to-datasources/http-requests/ /toolpad/concepts/http-requests/ 301
+/toolpad/connecting-to-datasources/custom-functions/ /toolpad/concepts/custom-functions/ 301
 /toolpad/building-ui/component-library/ /toolpad/concepts/building-ui/#component-library 301
 /toolpad/building-ui/canvas-and-inspector/ /toolpad/concepts/building-ui/#inspector 301
 /toolpad/building-ui/custom-components/ /toolpad/concepts/custom-components/ 301
@@ -29,6 +29,8 @@
 /toolpad/data-binding/event-handling/ /toolpad/concepts/managing-state/#event-handling 301
 /toolpad/deployment/ /toolpad/concepts/deployment/ 301
 /toolpad/examples/admin-app/ /toolpad/examples/basic-crud-app/ 301
+/toolpad/concepts/connecting-to-data/ /toolpad/concepts/queries/ 301
+/toolpad/how-to-guides/connect-to-datasource/ /toolpad/how-to-guides/connect-to-databases/ 301
 
 # Create separate namespace on https://mui.com
 

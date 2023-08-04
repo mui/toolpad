@@ -1,9 +1,9 @@
 import * as path from 'path';
 import { IncomingMessage, createServer } from 'http';
 import * as fs from 'fs/promises';
+import { Worker } from 'worker_threads';
 import express from 'express';
 import invariant from 'invariant';
-import { execaNode } from 'execa';
 import getPort from 'get-port';
 import { createProxyMiddleware } from 'http-proxy-middleware';
 import { mapValues } from '@mui/toolpad-utils/collections';
@@ -17,11 +17,21 @@ import { folderExists } from '@mui/toolpad-utils/fs';
 import chalk from 'chalk';
 import { asyncHandler } from '../src/utils/express';
 import { createProdHandler } from '../src/server/toolpadAppServer';
-import { ToolpadProject, initProject } from '../src/server/localMode';
-import { Command as AppDevServerCommand, Event as AppDevServerEvent } from './appServer';
+import {
+  ToolpadProject,
+  getAppOutputFolder,
+  getComponents,
+  initProject,
+} from '../src/server/localMode';
+import {
+  Command as AppDevServerCommand,
+  Event as AppDevServerEvent,
+  AppViteServerConfig,
+} from './appServer';
 import { createRpcHandler, createRpcServer } from '../src/server/rpc';
 import { RUNTIME_CONFIG_WINDOW_PROPERTY } from '../src/constants';
 import type { RuntimeConfig } from '../src/config';
+import { createWorkerRpcServer } from '../src/server/workerRpc';
 
 const DEFAULT_PORT = 3000;
 
@@ -46,38 +56,47 @@ async function createDevHandler(
   const appServerPath = path.resolve(__dirname, './appServer.js');
   const devPort = await getPort();
 
-  const cp = execaNode(appServerPath, [], {
-    cwd: project.getRoot(),
-    stdio: 'inherit',
+  const worker = new Worker(appServerPath, {
+    workerData: {
+      outDir: getAppOutputFolder(project.getRoot()),
+      base,
+      config: runtimeConfig,
+      root: project.getRoot(),
+      port: devPort,
+    } satisfies AppViteServerConfig,
     env: {
       NODE_ENV: 'development',
-      TOOLPAD_RUNTIME_CONFIG: JSON.stringify(runtimeConfig),
-      TOOLPAD_PORT: String(devPort),
-      TOOLPAD_PROJECT_DIR: project.getRoot(),
-      TOOLPAD_BASE: base,
-      FORCE_COLOR: '1',
     },
   });
 
-  cp.once('exit', (code) => {
+  worker.once('exit', (code) => {
     console.error(`App dev server failed ${code}`);
     process.exit(1);
   });
 
-  await new Promise<void>((resolve) => {
-    cp.on('message', (msg: AppDevServerEvent) => {
+  const readyPromise: Promise<Error | void> = new Promise<void>((resolve) => {
+    worker.on('message', async (msg: AppDevServerEvent) => {
       if (msg.kind === 'ready') {
         resolve();
       }
     });
+  }).catch((err) => err);
+
+  createWorkerRpcServer(worker, {
+    loadDom: async () => project.loadDom(),
+    getComponents: async () => getComponents(project.getRoot()),
   });
 
   project.events.on('componentsListChanged', () => {
-    cp.send({ kind: 'reload-components' } satisfies AppDevServerCommand);
+    worker.postMessage({ kind: 'reload-components' } satisfies AppDevServerCommand);
   });
 
   router.use('/api/data', project.dataManager.createDataHandler(project));
   router.use(
+    (req, res, next) => {
+      // Stall the request until the dev server is ready
+      readyPromise.then(next, next);
+    },
     createProxyMiddleware({
       logLevel: 'silent',
       ws: true,
@@ -280,8 +299,7 @@ export async function runApp({ cmd, port, dev = false, projectDir }: RunAppOptio
     }
   }
 
-  const editorDevMode =
-    !!process.env.TOOLPAD_NEXT_DEV || process.env.NODE_ENV === 'development' || dev;
+  const editorDevMode = !!process.env.TOOLPAD_NEXT_DEV || dev;
 
   const externalUrl = process.env.TOOLPAD_EXTERNAL_URL || `http://localhost:${port}`;
 

@@ -20,7 +20,6 @@ export default defineConfig([
   {
     entry: {
       index: './cli/index.ts',
-      server: './cli/server.ts',
       appServer: './cli/appServer.ts',
       appBuilder: './cli/appBuilder.ts',
       functionsDevWorker: './src/server/functionsDevWorker.ts',

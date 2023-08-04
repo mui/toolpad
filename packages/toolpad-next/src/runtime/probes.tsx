@@ -1,6 +1,25 @@
 import * as React from 'react';
 import { Emitter } from '@mui/toolpad-utils/events';
-import invariant from 'invariant';
+
+const values = new Map<string, unknown>();
+const emitter = new Emitter<Record<string, null>>();
+
+export function reset() {
+  values.clear();
+}
+
+export function update(key: string, value: unknown) {
+  values.set(key, value);
+  emitter.emit(key, null);
+}
+
+export function subscribe(key: string, callback: () => void) {
+  return emitter.subscribe(key, callback);
+}
+
+export function getSnapshot(key: string) {
+  return values.get(key);
+}
 
 interface ProbeContextValue {
   update: (key: string, value: unknown) => void;
@@ -14,44 +33,17 @@ export interface ProbeProviderProps {
   children?: React.ReactNode;
 }
 
-export function ProbeProvider({ children }: ProbeProviderProps) {
-  const contextValue = React.useMemo(() => {
-    const values = new Map<string, unknown>();
-    const emitter = new Emitter<Record<string, null>>();
-    return {
-      update: (key: string, value: unknown) => {
-        values.set(key, value);
-        emitter.emit(key, null);
-      },
-      subscribe: (key: string, callback: () => void) => {
-        return emitter.subscribe(key, callback);
-      },
-      getSnapshot: (key: string) => {
-        return values.get(key);
-      },
-    };
-  }, []);
-  return <ProbeContext.Provider value={contextValue}>{children}</ProbeContext.Provider>;
-}
-
 export function useProbeTarget(key: string, value: unknown) {
   const probeContext = React.useContext(ProbeContext);
   React.useEffect(() => {
-    if (probeContext) {
-      probeContext.update(key, value);
-    }
+    update(key, value);
   }, [probeContext, key, value]);
 }
 
 export function useProbe(key: string) {
-  const probeContext = React.useContext(ProbeContext);
-  invariant(probeContext, 'useProbe must be used inside a ProbeProvider');
-  const subscribe = React.useCallback(
-    (cb: () => void) => probeContext.subscribe(key, cb),
-    [key, probeContext],
-  );
-  const getSnapshot = React.useCallback(() => probeContext.getSnapshot(key), [key, probeContext]);
-  return React.useSyncExternalStore(subscribe, getSnapshot);
+  const subscribeKey = React.useCallback((cb: () => void) => subscribe(key, cb), [key]);
+  const getKeySnapshot = React.useCallback(() => getSnapshot(key), [key]);
+  return React.useSyncExternalStore(subscribeKey, getKeySnapshot);
 }
 
 export function useProbes() {

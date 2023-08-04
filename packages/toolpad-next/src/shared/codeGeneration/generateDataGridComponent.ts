@@ -81,15 +81,7 @@ export default async function generateDataGridComponent(
 
         const result = ${jsonPointer.toExpression('data', file.spec.rows.selector || '')};
 
-        ${
-          options.target === 'prod'
-            ? ''
-            : `
-                result[_runtime.TOOLPAD_INTERNAL] = {
-                  rawData: data
-                }
-              `
-        }
+        ${options.target === 'prod' ? '' : `_runtime.probes.update('fetch.rawData', data);`}
 
         return result
       }
@@ -163,7 +155,7 @@ export default async function generateDataGridComponent(
           : ''
       }
 
-      ${options.target === 'prod' ? '' : `_runtime.useProbeTarget('rows', rows);`}
+      ${options.target === 'prod' ? '' : `_runtime.probes.useProbeTarget('rows', rows);`}
 
 
       return (

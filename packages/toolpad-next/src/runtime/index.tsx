@@ -7,15 +7,26 @@ import { WithDevtoolParams } from '../shared/types';
 import DevtoolOverlay from './DevtoolOverlay';
 import { ServerProvider } from './server';
 import { ComponentInfo, CurrentComponentContext } from './CurrentComponentContext';
-import { ProbeProvider, useProbeTarget, useProbes } from './probes';
+import * as probes from './probes';
 import { getComponentNameFromInputFile } from '../shared/paths';
 
-export { useProbeTarget, useProbes };
-
-export { TOOLPAD_INTERNAL } from './constants';
+export { probes };
 
 function useCurrentlyEditedComponentId() {
-  return useStorageState('session', 'currently-edited-component-id', null);
+  const [currentEditedComponentId, setCurrentlyEditedComponentId] = useStorageState(
+    'session',
+    'currently-edited-component-id',
+    null,
+  );
+  const handleEditedComponentIdChange: React.Dispatch<React.SetStateAction<string | null>> =
+    React.useCallback(
+      (value) => {
+        probes.reset();
+        setCurrentlyEditedComponentId(value);
+      },
+      [setCurrentlyEditedComponentId],
+    );
+  return [currentEditedComponentId, handleEditedComponentIdChange] as const;
 }
 
 let nextId = 1;
@@ -84,32 +95,30 @@ export function withDevtool<P extends object>(
       <CurrentComponentContext.Provider value={componentInfo}>
         {editing ? (
           <ServerProvider wsUrl={wsUrl}>
-            <ProbeProvider>
-              <Box
-                sx={{
-                  display: 'contents',
-                  '> *': {
-                    outlineColor: (theme) => theme.palette.secondary.main,
-                    outlineStyle: 'solid',
-                    outlineWidth: 2,
-                  },
-                }}
-              >
-                <RenderedComponent {...props} />
-              </Box>
-              <DevtoolOverlay
-                filePath={filePath}
-                file={file}
-                dependencies={dependencies}
-                onClose={() => {
-                  setCurrentlyEditedComponentId(null);
-                }}
-                onCommitted={() => {
-                  setCurrentlyEditedComponentId(null);
-                }}
-                onComponentUpdate={handleComponentUpdate}
-              />
-            </ProbeProvider>
+            <Box
+              sx={{
+                display: 'contents',
+                '> *': {
+                  outlineColor: (theme) => theme.palette.secondary.main,
+                  outlineStyle: 'solid',
+                  outlineWidth: 2,
+                },
+              }}
+            >
+              <RenderedComponent {...props} />
+            </Box>
+            <DevtoolOverlay
+              filePath={filePath}
+              file={file}
+              dependencies={dependencies}
+              onClose={() => {
+                setCurrentlyEditedComponentId(null);
+              }}
+              onCommitted={() => {
+                setCurrentlyEditedComponentId(null);
+              }}
+              onComponentUpdate={handleComponentUpdate}
+            />
           </ServerProvider>
         ) : (
           <RenderedComponent {...props} />

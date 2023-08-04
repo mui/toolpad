@@ -1,1 +1,0 @@
-export const TOOLPAD_INTERNAL = Symbol('TOOLPAD_INTERNAL');

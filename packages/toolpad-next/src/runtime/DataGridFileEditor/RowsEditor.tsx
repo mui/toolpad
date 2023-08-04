@@ -4,7 +4,6 @@ import useDebouncedHandler from '@mui/toolpad-utils/hooks/useDebouncedHandler';
 import { DataGridSpec, RowsSpec } from '../../shared/schemas';
 import JsonPointerInput from '../JsonPointerInput';
 import { useProbe } from '../probes';
-import { TOOLPAD_INTERNAL } from '../constants';
 
 const DATA_KIND_OPTIONS = [
   {
@@ -93,7 +92,7 @@ function FetchEditor({
   const [input, setInput] = useDebouncedInput(valueProp, onChangeProp, 300);
 
   const liveRows = useProbe('rows');
-  const rawData = (liveRows as any)?.[TOOLPAD_INTERNAL]?.rawData;
+  const rawData = useProbe('fetch.rawData');
 
   return (
     <Stack sx={{ width: '100%', height: '100%' }} direction="row">

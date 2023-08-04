@@ -68,17 +68,28 @@ export function toExpression(name: string, pointer: string | DecodedPath): strin
     .join('')}`;
 }
 
-function* generatePointerSuggestions(obj: unknown, prefix: DecodedPath): Generator<DecodedPath> {
-  yield prefix;
+export interface GenerateSuggestionsOptions {
+  max?: number;
+  filter?: (value: unknown) => boolean;
+}
+
+function* generatePointerSuggestions(
+  obj: unknown,
+  options: GenerateSuggestionsOptions,
+  prefix: DecodedPath,
+): Generator<DecodedPath> {
+  if (!options.filter || (options.filter && options.filter(obj))) {
+    yield prefix;
+  }
 
   if (obj && typeof obj === 'object') {
     if (Array.isArray(obj)) {
       for (let i = 0; i < obj.length; i += 1) {
-        yield* generatePointerSuggestions(obj[i], [...prefix, i]);
+        yield* generatePointerSuggestions(obj[i], options, [...prefix, i]);
       }
     } else {
       for (const key of Object.keys(obj)) {
-        yield* generatePointerSuggestions((obj as Record<PropertyKey, unknown>)[key], [
+        yield* generatePointerSuggestions((obj as Record<PropertyKey, unknown>)[key], options, [
           ...prefix,
           key,
         ]);
@@ -103,9 +114,12 @@ export interface Suggestion {
   depth: number;
 }
 
-export function generateSuggestions(obj: unknown, max: number = 1000): Suggestion[] {
-  const pointers = generatePointerSuggestions(obj, []);
-  return Array.from(take(pointers, max), (pointer) => ({
+export function generateSuggestions(
+  obj: unknown,
+  options: GenerateSuggestionsOptions = {},
+): Suggestion[] {
+  const pointers = generatePointerSuggestions(obj, options, []);
+  return Array.from(take(pointers, options.max ?? 1000), (pointer) => ({
     pointer: encode(pointer),
     depth: pointer.length,
   }));

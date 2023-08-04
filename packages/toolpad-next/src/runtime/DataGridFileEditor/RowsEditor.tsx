@@ -74,6 +74,14 @@ function useDebouncedInput<T>(
   return [input, handleInputChange];
 }
 
+function rowSelectorFilter(value: unknown): boolean {
+  return Array.isArray(value) && (value.length <= 0 || (value[0] && typeof value[0] === 'object'));
+}
+
+function rowIdSelectorFilter(value: unknown): boolean {
+  return typeof value === 'string' || typeof value === 'number';
+}
+
 type FetchSpec = Extract<RowsSpec, { kind: 'fetch' }>;
 
 interface FetchEditorProps {
@@ -129,6 +137,7 @@ function FetchEditor({
           <JsonPointerInput
             label="Rows Selector"
             target={rawData}
+            filter={rowSelectorFilter}
             fullWidth
             value={input.selector || ''}
             onChange={(newValue) => setInput({ ...input, selector: newValue })}
@@ -212,6 +221,7 @@ export default function RowsEditor({ value, onChange }: RowsEditorProps) {
     <JsonPointerInput
       label="Row ID selector"
       value={value.rowIdSelector || ''}
+      filter={rowIdSelectorFilter}
       onChange={(newValue) => onChange({ ...value, rowIdSelector: newValue })}
       target={target}
       helperText={

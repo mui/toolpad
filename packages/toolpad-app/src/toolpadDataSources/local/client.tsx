@@ -189,15 +189,35 @@ function FunctionAutocomplete({
         nameMap.set(fn.name, file.name);
       });
     });
-    return [functions, nameMap];
-  }, [files]);
+    const sortedOptions = functions.sort((a, b) => {
+      // Display the selected function first.
+      if (value === a) {
+        return -1;
+      }
+      if (value === b) {
+        return 1;
+      }
+
+      // Then display the functions in the same file.
+      const fa = nameMap.get(a);
+      const fb = nameMap.get(b);
+
+      // Display the file with the selected function first.
+      const sf = nameMap.get(value);
+
+      if (sf === fa) {
+        return -1;
+      }
+      if (sf === fb) {
+        return 1;
+      }
+      return fa?.localeCompare(fb ?? '') ?? 0;
+    });
+    return [sortedOptions, nameMap];
+  }, [files, value]);
 
   const open = Boolean(anchorEl);
   const id = open ? 'function-selector' : undefined;
-
-  const handleCreateNew = React.useCallback(() => {
-    onCreateNew();
-  }, [onCreateNew]);
 
   return files.length > 0 ? (
     <React.Fragment>
@@ -312,30 +332,7 @@ function FunctionAutocomplete({
                   </Box>
                 </li>
               )}
-              options={options.sort((a, b) => {
-                // Display the selected function first.
-                if (value === a) {
-                  return -1;
-                }
-                if (value === b) {
-                  return 1;
-                }
-
-                // Then display the functions in the same file.
-                const fa = functionNameFileNameMap.get(a);
-                const fb = functionNameFileNameMap.get(b);
-
-                // Display the file with the selected function first.
-                const sf = functionNameFileNameMap.get(value);
-
-                if (sf === fa) {
-                  return -1;
-                }
-                if (sf === fb) {
-                  return 1;
-                }
-                return fa?.localeCompare(fb ?? '') ?? 0;
-              })}
+              options={options}
               renderInput={(params) => (
                 <StyledInput
                   ref={params.InputProps.ref}
@@ -347,7 +344,7 @@ function FunctionAutocomplete({
             <Button
               sx={{ m: 1, mb: 0.5 }}
               startIcon={<AddOutlinedIcon fontSize="inherit" />}
-              onClick={handleCreateNew}
+              onClick={onCreateNew}
             >
               New file
             </Button>
@@ -479,7 +476,7 @@ function QueryEditor({
     return `${baseName}${counter}.ts`;
   }, [introspection.data?.files]);
 
-  const handleCreateNewCommit = React.useCallback(async () => {
+  const handleCreateNewFile = React.useCallback(async () => {
     try {
       await execApi('createNew', [proposedFileName]);
       await introspection.refetch();
@@ -519,7 +516,7 @@ function QueryEditor({
             selectedFunctionFileName={selectedFile || ''}
             files={introspection.data?.files || []}
             selectedFunctionName={selectedFunction || ''}
-            onCreateNew={handleCreateNewCommit}
+            onCreateNew={handleCreateNewFile}
             onSelect={handleSelectFunction}
           />
 

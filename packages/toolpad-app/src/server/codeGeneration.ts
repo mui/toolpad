@@ -172,13 +172,11 @@ export function generateCode(
 ): { files: Map<string, string> } {
   const { outDir = '/' } = config;
 
-  const getPageFilePath = (pageNode: appDom.PageNode) =>
-    path.join(outDir, `./pages/${pageNode.name}.tsx`);
-
   const appContext: AppContext = {
     indexFilePath: path.join(outDir, INDEX_FILE_PATH),
     themeFilePath: path.join(outDir, THEME_FILE_PATH),
-    getPageFilePath,
+    getPageFilePath: (pageNode: appDom.PageNode) =>
+      path.join(outDir, `./pages/${pageNode.name}.tsx`),
   };
 
   const root = appDom.getApp(dom);
@@ -200,18 +198,16 @@ export function generateCode(
           dom,
         ),
       ],
-      ...pages.map((page) => {
-        return [
-          getPageFilePath(page),
-          `
+      ...pages.map<[string, string]>((page) => [
+        appContext.getPageFilePath(page),
+        `
             import * as React from 'react';
 
             export default function Page () {
               return <div>{${JSON.stringify(page.name)}}</div>
             }
           `,
-        ] as [string, string];
-      }),
+      ]),
     ]),
   };
 }

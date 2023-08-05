@@ -82,7 +82,7 @@ async function evaluate(
     throw new Error(`Could not resolve "${importee}" from "${importer}"`);
   };
 
-  const createRequire = (importer: string) => (importee: string) => {
+  const createRequireFn = (importer: string) => (importee: string) => {
     const resolved = resolveId(importee, importer);
 
     const cached = cache.get(resolved);
@@ -102,17 +102,17 @@ async function evaluate(
     });
 
     const fn = new Function('module', 'exports', 'require', compiled.code);
-    const exports: unknown = {};
-    const module = { exports };
-    const require = createRequire(resolved);
-    fn(module, exports, require);
+    const exportsObj: unknown = {};
+    const moduleObj = { exports: exportsObj };
+    const requireFn = createRequireFn(resolved);
+    fn(moduleObj, exportsObj, requireFn);
 
-    cache.set(resolved, module);
+    cache.set(resolved, moduleObj);
 
-    return module.exports;
+    return moduleObj.exports;
   };
 
-  const requireEntry = createRequire('/');
+  const requireEntry = createRequireFn('/');
 
   return requireEntry(entry);
 }

@@ -1157,6 +1157,8 @@ async function generateDataGridComponent(filePath, file, options) {
     return serializeObject(properties);
   }) || [];
   const code = `
+    'use client';
+
     ${imports.print()}
 
     ${file.spec?.rows?.kind === "fetch" ? `

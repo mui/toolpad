@@ -63,6 +63,8 @@ export default async function generateDataGridComponent(
     }) || [];
 
   const code = `
+    'use client';
+
     ${imports.print()}
 
     ${

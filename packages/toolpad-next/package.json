@@ -3,10 +3,10 @@
   "version": "0.1.22",
   "license": "MIT",
   "bin": {
-    "toolpad-next": "./dist/cli/index.mjs"
+    "toolpad-next": "./dist/cli/index.js"
   },
   "scripts": {
-    "prepare": "node ./dist/cli/prepare.mjs",
+    "prepare": "node ./dist/cli/prepare.js",
     "lint": "prettier --check .",
     "fix": "prettier --write .",
     "build": "tsup",
@@ -19,22 +19,23 @@
     "runtime",
     "cli.js"
   ],
+  "type": "module",
   "exports": {
     "./package.json": "./package.json",
     ".": {
       "import": {
-        "types": "./dist/cli/index.d.mts",
-        "default": "./dist/cli/index.mjs"
+        "types": "./dist/cli/index.d.ts",
+        "default": "./dist/cli/index.js"
       }
     },
     "./runtime": {
       "require": {
-        "types": "./runtime/index.d.ts",
-        "default": "./runtime/index.js"
+        "types": "./dist/runtime/index.d.cts",
+        "default": "./dist/runtime/index.cjs"
       },
       "import": {
-        "types": "./runtime/index.d.mts",
-        "default": "./runtime/index.mjs"
+        "types": "./dist/runtime/index.d.ts",
+        "default": "./dist/runtime/index.js"
       }
     }
   },

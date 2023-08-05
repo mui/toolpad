@@ -194,6 +194,10 @@ export interface CreateViteConfigParams {
   getComponents: (root: string) => Promise<ComponentEntry[]>;
 }
 
+export interface CreateViteConfigResult {
+  viteConfig: InlineConfig;
+}
+
 export function createViteConfig({
   outDir,
   root,
@@ -201,93 +205,96 @@ export function createViteConfig({
   base,
   plugins = [],
   getComponents,
-}: CreateViteConfigParams): InlineConfig {
+}: CreateViteConfigParams): CreateViteConfigResult {
   const mode = dev ? 'development' : 'production';
+
   return {
-    configFile: false,
-    mode,
-    build: {
-      outDir,
-      chunkSizeWarningLimit: Infinity,
-      rollupOptions: {
-        onwarn(warning, warn) {
-          if (warning.code === 'MODULE_LEVEL_DIRECTIVE') {
-            return;
-          }
-          warn(warning);
+    viteConfig: {
+      configFile: false,
+      mode,
+      build: {
+        outDir,
+        chunkSizeWarningLimit: Infinity,
+        rollupOptions: {
+          onwarn(warning, warn) {
+            if (warning.code === 'MODULE_LEVEL_DIRECTIVE') {
+              return;
+            }
+            warn(warning);
+          },
         },
       },
-    },
-    envFile: false,
-    resolve: {
-      alias: [
-        {
-          // FIXME(https://github.com/mui/material-ui/issues/35233)
-          find: /^@mui\/icons-material\/([^/]*)/,
-          replacement: '@mui/icons-material/esm/$1',
-        },
-      ],
-    },
-    server: {
-      fs: {
-        allow: [root, path.resolve(__dirname, '../../../../')],
+      envFile: false,
+      resolve: {
+        alias: [
+          {
+            // FIXME(https://github.com/mui/material-ui/issues/35233)
+            find: /^@mui\/icons-material\/([^/]*)/,
+            replacement: '@mui/icons-material/esm/$1',
+          },
+        ],
       },
-    },
-    optimizeDeps: {
-      include: [
-        '@emotion/cache',
-        '@emotion/react',
-        '@mui/icons-material/ArrowDropDownRounded',
-        '@mui/icons-material/DarkMode',
-        '@mui/icons-material/Edit',
-        '@mui/icons-material/Error',
-        '@mui/icons-material/HelpOutlined',
-        '@mui/icons-material/LightMode',
-        '@mui/icons-material/OpenInNew',
-        '@mui/icons-material/SettingsBrightnessOutlined',
-        '@mui/lab',
-        '@mui/material',
-        '@mui/material/Button',
-        '@mui/material/colors',
-        '@mui/material/styles',
-        '@mui/material/useMediaQuery',
-        '@mui/utils',
-        '@mui/x-data-grid-pro',
-        '@mui/x-date-pickers/AdapterDayjs',
-        '@mui/x-date-pickers/DesktopDatePicker',
-        '@mui/x-date-pickers/LocalizationProvider',
-        '@tanstack/react-query',
-        '@tanstack/react-query-devtools/build/lib/index.prod.js',
-        'dayjs',
-        'dayjs/locale/en',
-        'dayjs/locale/fr',
-        'dayjs/locale/nl',
-        'fractional-indexing',
-        'invariant',
-        'lodash-es',
-        'markdown-to-jsx',
-        'nanoid/non-secure',
-        'react',
-        'react-dom/client',
-        'react-error-boundary',
-        'react-hook-form',
-        'react-is',
-        'react-router-dom',
-        'react/jsx-dev-runtime',
-        'react/jsx-runtime',
-        'recharts',
-        'superjson',
-        'zod',
-      ],
-    },
-    appType: 'custom',
-    logLevel: 'info',
-    root,
-    plugins: [react(), toolpadVitePlugin({ root, base, getComponents }), ...plugins],
-    base,
-    define: {
-      'process.env.NODE_ENV': `'${mode}'`,
-      'process.env.BASE_URL': `'${base}'`,
+      server: {
+        fs: {
+          allow: [root, path.resolve(__dirname, '../../../../')],
+        },
+      },
+      optimizeDeps: {
+        include: [
+          '@emotion/cache',
+          '@emotion/react',
+          '@mui/icons-material/ArrowDropDownRounded',
+          '@mui/icons-material/DarkMode',
+          '@mui/icons-material/Edit',
+          '@mui/icons-material/Error',
+          '@mui/icons-material/HelpOutlined',
+          '@mui/icons-material/LightMode',
+          '@mui/icons-material/OpenInNew',
+          '@mui/icons-material/SettingsBrightnessOutlined',
+          '@mui/lab',
+          '@mui/material',
+          '@mui/material/Button',
+          '@mui/material/colors',
+          '@mui/material/styles',
+          '@mui/material/useMediaQuery',
+          '@mui/utils',
+          '@mui/x-data-grid-pro',
+          '@mui/x-date-pickers/AdapterDayjs',
+          '@mui/x-date-pickers/DesktopDatePicker',
+          '@mui/x-date-pickers/LocalizationProvider',
+          '@tanstack/react-query',
+          '@tanstack/react-query-devtools/build/lib/index.prod.js',
+          'dayjs',
+          'dayjs/locale/en',
+          'dayjs/locale/fr',
+          'dayjs/locale/nl',
+          'fractional-indexing',
+          'invariant',
+          'lodash-es',
+          'markdown-to-jsx',
+          'nanoid/non-secure',
+          'react',
+          'react-dom/client',
+          'react-error-boundary',
+          'react-hook-form',
+          'react-is',
+          'react-router-dom',
+          'react/jsx-dev-runtime',
+          'react/jsx-runtime',
+          'recharts',
+          'superjson',
+          'zod',
+        ],
+      },
+      appType: 'custom',
+      logLevel: 'info',
+      root,
+      plugins: [react(), toolpadVitePlugin({ root, base, getComponents }), ...plugins],
+      base,
+      define: {
+        'process.env.NODE_ENV': `'${mode}'`,
+        'process.env.BASE_URL': `'${base}'`,
+      },
     },
   };
 }
@@ -300,5 +307,6 @@ export interface ToolpadBuilderParams {
 }
 
 export async function buildApp({ root, base, getComponents, outDir }: ToolpadBuilderParams) {
-  await build(createViteConfig({ dev: false, root, base, getComponents, outDir }));
+  const { viteConfig } = createViteConfig({ dev: false, root, base, outDir, getComponents });
+  await build(viteConfig);
 }

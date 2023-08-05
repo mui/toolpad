@@ -65,7 +65,7 @@ async function generateLib(config: Config, generateOptions: BaseGenerateComponen
   const ymlPattern = getComponentsYmlPattern(config.rootDir);
   const entries = await glob(ymlPattern);
 
-  await fs.rm(outDir, { recursive: true });
+  await fs.rm(outDir, { force: true, recursive: true });
 
   await fs.mkdir(outDir, { recursive: true });
 

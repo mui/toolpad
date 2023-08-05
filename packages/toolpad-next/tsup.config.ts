@@ -37,7 +37,6 @@ export default defineConfig([
     format: ['esm', 'cjs'],
     sourcemap: true,
     external: ['react', 'react-dom'],
-    noExternal: ['@mui/icons-material'],
     dts: true,
     treeshake: true,
     esbuildPlugins: [cleanFolderOnFailure(path.resolve(__dirname, './dist/runtime'))],

@@ -1,6 +1,6 @@
 {
   "name": "@mui/toolpad-next",
-  "version": "0.1.20",
+  "version": "0.1.22",
   "license": "MIT",
   "bin": {
     "toolpad-next": "./dist/cli/index.js"
@@ -27,7 +27,7 @@
     "@mui/icons-material": "5.14.1",
     "@mui/lab": "5.0.0-alpha.137",
     "@mui/material": "5.14.2",
-    "@mui/toolpad-utils": "0.1.21",
+    "@mui/toolpad-utils": "0.1.22",
     "chokidar": "3.5.3",
     "dotenv": "16.3.1",
     "esbuild": "0.18.16",

@@ -4,7 +4,7 @@ POC for the live configurators direction
 
 1. Set up project
 
-   ```sh
+   ```bash
    curl https://codeload.github.com/mui/material-ui/tar.gz/master | tar -xz --strip=2 material-ui-master/examples/material-vite-ts
    cd material-vite-ts
    yarn
@@ -12,7 +12,7 @@ POC for the live configurators direction
 
 1. Add dependencies
 
-   ```sh
+   ```bash
    yarn add @mui/x-data-grid-pro https://pkg.csb.dev/mui/mui-toolpad/commit/817b15a5/@mui/toolpad-next
    ```
 
@@ -26,14 +26,14 @@ POC for the live configurators direction
 
 1. Create component
 
-   ```sh
+   ```bash
    mkdir -p ./toolpad
    echo "kind: 'DataGrid'" > ./toolpad/MyGrid.yml
    ```
 
 1. Start live configurators
 
-   ```sh
+   ```bash
    yarn toolpad-next dev
    ```
 
@@ -56,7 +56,7 @@ POC for the live configurators direction
 
 1. Start project
 
-   ```sh
+   ```bash
    yarn dev
    ```
 

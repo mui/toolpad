@@ -2380,16 +2380,6 @@
     csstype "^3.1.2"
     prop-types "^15.8.1"
 
-"@mui/toolpad-utils@0.1.21":
-  version "0.1.21"
-  resolved "https://registry.yarnpkg.com/@mui/toolpad-utils/-/toolpad-utils-0.1.21.tgz#4e4b46f9c0c3c3de39571b81149eb672be02dbc8"
-  integrity sha512-kKItqqYVKGqh3+7j9gEtISBrpEjHs0l0od2fIk8XuWJPjIjPlRSDXlIocUy2kcEIqlF1xdOHIY/vGsQHrS0fvg==
-  dependencies:
-    invariant "2.2.4"
-    react-is "18.2.0"
-    yaml "2.3.1"
-    yaml-diff-patch "2.0.0"
-
 "@mui/types@7.2.4", "@mui/types@^7.2.4":
   version "7.2.4"
   resolved "https://registry.yarnpkg.com/@mui/types/-/types-7.2.4.tgz#b6fade19323b754c5c6de679a38f068fd50b9328"

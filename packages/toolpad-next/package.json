@@ -18,7 +18,6 @@
     "dist",
     "cli.js"
   ],
-  "type": "module",
   "exports": {
     "./package.json": "./package.json",
     ".": {

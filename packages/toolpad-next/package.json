@@ -16,7 +16,6 @@
   },
   "files": [
     "dist",
-    "runtime",
     "cli.js"
   ],
   "type": "module",

@@ -3,7 +3,7 @@
   "version": "0.1.22",
   "license": "MIT",
   "bin": {
-    "toolpad-next": "./dist/cli/index.js"
+    "toolpad-next": "./dist/cli/index.mjs"
   },
   "scripts": {
     "prepare": "node ./dist/cli/prepare.js",
@@ -18,23 +18,22 @@
     "dist",
     "cli.js"
   ],
-  "type": "module",
   "exports": {
     "./package.json": "./package.json",
     ".": {
       "import": {
-        "types": "./dist/cli/index.d.ts",
-        "default": "./dist/cli/index.js"
+        "types": "./dist/cli/index.d.mts",
+        "default": "./dist/cli/index.mjs"
       }
     },
     "./runtime": {
       "require": {
-        "types": "./dist/runtime/index.d.cts",
-        "default": "./dist/runtime/index.cjs"
+        "types": "./runtime/index.d.ts",
+        "default": "./runtime/index.js"
       },
       "import": {
-        "types": "./dist/runtime/index.d.ts",
-        "default": "./dist/runtime/index.js"
+        "types": "./runtime/index.d.mts",
+        "default": "./runtime/index.mjs"
       }
     }
   },

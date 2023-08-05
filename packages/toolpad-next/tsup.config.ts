@@ -20,6 +20,7 @@ export default defineConfig([
   {
     entry: ['./src/cli/index.ts', './src/cli/prepare.ts'],
     outDir: 'dist/cli',
+    publicDir: 'src/cli/public',
     silent: true,
     format: ['esm'],
     sourcemap: true,
@@ -32,11 +33,13 @@ export default defineConfig([
   },
   {
     entry: ['./src/runtime/index.tsx'],
-    outDir: 'dist/runtime',
+    outDir: 'runtime',
+    publicDir: 'src/runtime/public',
     silent: true,
     format: ['esm', 'cjs'],
     sourcemap: true,
     external: ['react', 'react-dom'],
+    noExternal: ['@mui/toolpad-utils'],
     dts: true,
     treeshake: true,
     esbuildPlugins: [cleanFolderOnFailure(path.resolve(__dirname, './dist/runtime'))],

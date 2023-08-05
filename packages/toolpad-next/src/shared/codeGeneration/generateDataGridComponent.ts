@@ -129,7 +129,7 @@ export default async function generateDataGridComponent(
     const columns = ${serializeArray(columnDefs)};
 
     export interface ${componentPropsName} {
-      rows: ${hasRowsProperty ? '{ id: string | number }[]' : 'undefined'};
+      ${hasRowsProperty ? 'rows: { id: string | number }[];' : ''}
     }
 
     function ${componentName}({ 

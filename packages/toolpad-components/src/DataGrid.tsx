@@ -19,8 +19,11 @@ import {
   useGridSelector,
   getGridDefaultColumnTypes,
   GridColTypeDef,
-  LicenseInfo,
 } from '@mui/x-data-grid-pro';
+import {
+  Unstable_LicenseInfoProvider as LicenseInfoProvider,
+  Unstable_LicenseInfoProviderProps as LicenseInfoProviderProps,
+} from '@mui/x-license-pro';
 import * as React from 'react';
 import { useNode, createComponent, useComponents } from '@mui/toolpad-core';
 import {
@@ -42,15 +45,11 @@ import { NumberFormat, createStringFormatter } from '@mui/toolpad-core/numberFor
 import { SX_PROP_HELPER_TEXT } from './constants';
 import ErrorOverlay from './components/ErrorOverlay';
 
-if (typeof window !== 'undefined') {
-  const licenseKey = window.document.querySelector<HTMLMetaElement>(
-    'meta[name="toolpad-x-license"]',
-  )?.content;
+type MuiLicenseInfo = LicenseInfoProviderProps['info'];
 
-  if (licenseKey) {
-    LicenseInfo.setLicenseKey(licenseKey);
-  }
-}
+const LICENSE_INFO: MuiLicenseInfo = {
+  key: process.env.TOOLPAD_BUNDLED_MUI_X_LICENSE,
+};
 
 const DEFAULT_COLUMN_TYPES = getGridDefaultColumnTypes();
 
@@ -466,33 +465,39 @@ const DataGridComponent = React.forwardRef(function DataGridComponent(
   const error: Error | null = errorProp ? errorFrom(errorProp) : null;
 
   return (
-    <div
-      ref={ref}
-      style={{ height: heightProp, minHeight: '100%', width: '100%', position: 'relative' }}
-    >
-      <ErrorOverlay error={error} />
-
+    <LicenseInfoProvider info={LICENSE_INFO}>
       <div
-        style={{ position: 'absolute', inset: '0 0 0 0', visibility: error ? 'hidden' : 'visible' }}
+        ref={ref}
+        style={{ height: heightProp, minHeight: '100%', width: '100%', position: 'relative' }}
       >
-        <DataGridPro
-          apiRef={apiRef}
-          slots={{
-            toolbar: hideToolbar ? null : GridToolbar,
-            loadingOverlay: SkeletonLoadingOverlay,
+        <ErrorOverlay error={error} />
+
+        <div
+          style={{
+            position: 'absolute',
+            inset: '0 0 0 0',
+            visibility: error ? 'hidden' : 'visible',
           }}
-          onColumnResize={handleResize}
-          onColumnOrderChange={handleColumnOrderChange}
-          rows={rows}
-          columns={columns}
-          key={gridKey}
-          getRowId={getRowId}
-          onRowSelectionModelChange={onSelectionModelChange}
-          rowSelectionModel={selectionModel}
-          {...props}
-        />
+        >
+          <DataGridPro
+            apiRef={apiRef}
+            slots={{
+              toolbar: hideToolbar ? null : GridToolbar,
+              loadingOverlay: SkeletonLoadingOverlay,
+            }}
+            onColumnResize={handleResize}
+            onColumnOrderChange={handleColumnOrderChange}
+            rows={rows}
+            columns={columns}
+            key={gridKey}
+            getRowId={getRowId}
+            onRowSelectionModelChange={onSelectionModelChange}
+            rowSelectionModel={selectionModel}
+            {...props}
+          />
+        </div>
       </div>
-    </div>
+    </LicenseInfoProvider>
   );
 });
 

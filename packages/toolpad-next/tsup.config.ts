@@ -32,7 +32,7 @@ export default defineConfig([
   },
   {
     entry: ['./src/runtime/index.tsx'],
-    outDir: 'runtime',
+    outDir: 'dist/runtime',
     silent: true,
     format: ['esm', 'cjs'],
     sourcemap: true,

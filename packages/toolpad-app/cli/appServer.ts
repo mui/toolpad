@@ -21,14 +21,13 @@ export type Command =
       dom: appDom.AppDom;
     };
 
-export type Event = {
-  kind: 'ready';
-};
-
-const { loadDom, getComponents } = createWorkerRpcClient<{
+export type WorkerRpc = {
+  notifyReady: () => Promise<void>;
   loadDom: () => Promise<appDom.AppDom>;
   getComponents: () => Promise<ComponentEntry[]>;
-}>();
+};
+
+const { notifyReady, loadDom, getComponents } = createWorkerRpcClient<WorkerRpc>();
 
 invariant(
   process.env.NODE_ENV === 'development',
@@ -85,9 +84,9 @@ export async function createDevServer({
     dev: true,
     root,
     base,
-    dom,
-    getComponents,
     plugins: [devServerPlugin(root, config)],
+    getComponents,
+    dom,
   });
   const devServer = await createServer(viteConfig);
 
@@ -134,7 +133,7 @@ export async function main({ outDir, base, config, root, port, initialDom }: App
     }
   });
 
-  parentPort.postMessage({ kind: 'ready' } satisfies Event);
+  await notifyReady();
 }
 
 main(workerData).catch((err) => {

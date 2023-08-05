@@ -6,7 +6,7 @@
     "toolpad-next": "./dist/cli/index.mjs"
   },
   "scripts": {
-    "prepare": "node ./dist/cli/prepare.js",
+    "prepare": "node ./dist/cli/prepare.mjs",
     "lint": "prettier --check .",
     "fix": "prettier --write .",
     "build": "tsup",

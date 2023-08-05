@@ -44,7 +44,7 @@ declare const toolpadFileSchema: z.ZodUnion<[z.ZodObject<{
         }>, "many">>;
         rowIdSelector: z.ZodOptional<z.ZodString>;
     }, "strip", z.ZodTypeAny, {
-        heightMode?: "container" | "auto" | "fixed" | undefined;
+        heightMode?: "auto" | "container" | "fixed" | undefined;
         height?: number | undefined;
         rows?: {
             kind: "property";
@@ -61,7 +61,7 @@ declare const toolpadFileSchema: z.ZodUnion<[z.ZodObject<{
         }[] | undefined;
         rowIdSelector?: string | undefined;
     }, {
-        heightMode?: "container" | "auto" | "fixed" | undefined;
+        heightMode?: "auto" | "container" | "fixed" | undefined;
         height?: number | undefined;
         rows?: {
             kind: "property";
@@ -81,7 +81,7 @@ declare const toolpadFileSchema: z.ZodUnion<[z.ZodObject<{
 }, "strip", z.ZodTypeAny, {
     kind: "DataGrid";
     spec?: {
-        heightMode?: "container" | "auto" | "fixed" | undefined;
+        heightMode?: "auto" | "container" | "fixed" | undefined;
         height?: number | undefined;
         rows?: {
             kind: "property";
@@ -101,7 +101,7 @@ declare const toolpadFileSchema: z.ZodUnion<[z.ZodObject<{
 }, {
     kind: "DataGrid";
     spec?: {
-        heightMode?: "container" | "auto" | "fixed" | undefined;
+        heightMode?: "auto" | "container" | "fixed" | undefined;
         height?: number | undefined;
         rows?: {
             kind: "property";

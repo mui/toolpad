@@ -21,8 +21,22 @@
   "type": "module",
   "exports": {
     "./package.json": "./package.json",
-    ".": "./dist/cli/index.js",
-    "./runtime": "./dist/runtime/index.js"
+    ".": {
+      "import": {
+        "types": "./dist/cli/index.d.ts",
+        "default": "./dist/cli/index.js"
+      }
+    },
+    "./runtime": {
+      "require": {
+        "types": "./dist/runtime/index.d.cts",
+        "default": "./dist/runtime/index.cjs"
+      },
+      "import": {
+        "types": "./dist/runtime/index.d.ts",
+        "default": "./dist/runtime/index.js"
+      }
+    }
   },
   "dependencies": {
     "@mui/icons-material": "5.14.1",

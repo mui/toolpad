@@ -38,6 +38,7 @@ export default defineConfig([
     sourcemap: true,
     external: ['react', 'react-dom'],
     dts: true,
+    treeshake: true,
     esbuildPlugins: [cleanFolderOnFailure(path.resolve(__dirname, './dist/runtime'))],
     async onSuccess() {
       // eslint-disable-next-line no-console

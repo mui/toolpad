@@ -23,11 +23,7 @@ import {
   getComponents,
   initProject,
 } from '../src/server/localMode';
-import {
-  Command as AppDevServerCommand,
-  Event as AppDevServerEvent,
-  AppViteServerConfig,
-} from './appServer';
+import type { Command as AppDevServerCommand, AppViteServerConfig, WorkerRpc } from './appServer';
 import { createRpcHandler, createRpcServer } from '../src/server/rpc';
 import { RUNTIME_CONFIG_WINDOW_PROPERTY } from '../src/constants';
 import type { RuntimeConfig } from '../src/config';
@@ -65,6 +61,7 @@ async function createDevHandler(
       port: devPort,
     } satisfies AppViteServerConfig,
     env: {
+      ...process.env,
       NODE_ENV: 'development',
     },
   });
@@ -74,15 +71,13 @@ async function createDevHandler(
     process.exit(1);
   });
 
-  const readyPromise: Promise<Error | void> = new Promise<void>((resolve) => {
-    worker.on('message', async (msg: AppDevServerEvent) => {
-      if (msg.kind === 'ready') {
-        resolve();
-      }
-    });
-  }).catch((err) => err);
+  let resolveReadyPromise: () => void | undefined;
+  const readyPromise = new Promise<void>((resolve) => {
+    resolveReadyPromise = resolve;
+  });
 
-  createWorkerRpcServer(worker, {
+  createWorkerRpcServer<WorkerRpc>(worker, {
+    notifyReady: async () => resolveReadyPromise?.(),
     loadDom: async () => project.loadDom(),
     getComponents: async () => getComponents(project.getRoot()),
   });
@@ -143,6 +138,8 @@ async function main({
   };
 
   const project = await initProject(cmd, projectDir);
+
+  await project.start();
 
   const app = express();
   const httpServer = createServer(app);

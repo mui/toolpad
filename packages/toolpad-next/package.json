@@ -16,6 +16,7 @@
   },
   "files": [
     "dist",
+    "runtime",
     "cli.js"
   ],
   "exports": {

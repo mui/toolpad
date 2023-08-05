@@ -4,7 +4,7 @@ import { fileExists } from '@mui/toolpad-utils/fs';
 import { Config } from '../shared/types';
 
 export async function resolveConfig(projectDir: string): Promise<string | undefined> {
-  const configPath = path.join(projectDir, './toolpad.config.mjs');
+  const configPath = path.resolve(projectDir, './toolpad.config.mjs');
   const exists = await fileExists(configPath);
   return exists ? configPath : undefined;
 }
@@ -19,7 +19,7 @@ function createConfigSchema(projectDir: string) {
 
 export async function loadConfigFromFile(configFilePath: string): Promise<Config> {
   const { default: configInput } = await import(configFilePath);
-  const configSchema = createConfigSchema(configFilePath);
+  const configSchema = createConfigSchema(path.dirname(configFilePath));
   const config = configSchema.parse(configInput);
   return config;
 }

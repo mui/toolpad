@@ -4,6 +4,8 @@ import 'dotenv/config';
 import yargs from 'yargs';
 import { devCommand, generateCommand } from './liveConfigurator';
 
+export type { Config } from '../shared/types';
+
 const sharedOptions = {
   dir: {
     type: 'string',

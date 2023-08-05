@@ -23,7 +23,7 @@ export default defineConfig([
     silent: true,
     format: ['esm'],
     sourcemap: true,
-    dts: false,
+    dts: true,
     esbuildPlugins: [cleanFolderOnFailure(path.resolve(__dirname, './dist/cli'))],
     async onSuccess() {
       // eslint-disable-next-line no-console
@@ -34,7 +34,7 @@ export default defineConfig([
     entry: ['./src/runtime/index.tsx'],
     outDir: 'dist/runtime',
     silent: true,
-    format: ['esm'],
+    format: ['esm', 'cjs'],
     sourcemap: true,
     external: ['react', 'react-dom'],
     dts: true,

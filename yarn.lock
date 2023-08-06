@@ -2190,20 +2190,6 @@
   resolved "https://registry.yarnpkg.com/@ljharb/through/-/through-2.3.9.tgz#85f221eb82f9d555e180e87d6e50fb154af85408"
   integrity sha512-yN599ZBuMPPK4tdoToLlvgJB4CLK8fGl7ntfy0Wn7U6ttNvHYurd81bfUiK/6sMkiIwm65R6ck4L6+Y3DfVbNQ==
 
-"@mui/base@5.0.0-beta.8":
-  version "5.0.0-beta.8"
-  resolved "https://registry.yarnpkg.com/@mui/base/-/base-5.0.0-beta.8.tgz#a0a9531ae9147be92d17e4f0e3b9accc57916841"
-  integrity sha512-b4vVjMZx5KzzEMf4arXKoeV5ZegAMOoPwoy1vfUBwhvXc2QtaaAyBp50U7OA2L06Leubc1A+lEp3eqwZoFn87g==
-  dependencies:
-    "@babel/runtime" "^7.22.6"
-    "@emotion/is-prop-valid" "^1.2.1"
-    "@mui/types" "^7.2.4"
-    "@mui/utils" "^5.14.1"
-    "@popperjs/core" "^2.11.8"
-    clsx "^1.2.1"
-    prop-types "^15.8.1"
-    react-is "^18.2.0"
-
 "@mui/base@5.0.0-beta.9":
   version "5.0.0-beta.9"
   resolved "https://registry.yarnpkg.com/@mui/base/-/base-5.0.0-beta.9.tgz#e88d7052aa6d97c1e57d5ce2a4e2edf898db90ec"
@@ -2218,22 +2204,10 @@
     prop-types "^15.8.1"
     react-is "^18.2.0"
 
-"@mui/core-downloads-tracker@^5.14.2":
-  version "5.14.2"
-  resolved "https://registry.yarnpkg.com/@mui/core-downloads-tracker/-/core-downloads-tracker-5.14.2.tgz#d8fcacdb1d37e621fce33ea808180fa5a590f908"
-  integrity sha512-x+c/MgDL1t/IIy5lDbMlrDouFG5DYZbl3DP4dbbuhlpPFBnE9glYwmJEee/orVHQpOPwLxCAIWQs+2DKSaBVWQ==
-
 "@mui/core-downloads-tracker@^5.14.3":
   version "5.14.3"
   resolved "https://registry.yarnpkg.com/@mui/core-downloads-tracker/-/core-downloads-tracker-5.14.3.tgz#474689f4d691993376e8a1ca07e08d4545275082"
   integrity sha512-QxvrcDqphZoXRjsAmCaQylmWjC/8/qKWwIde1MJMna5YIst3R9O0qhKRPu36/OE2d8AeTbCVjRcRvNqhhW8jyg==
-
-"@mui/icons-material@5.14.1":
-  version "5.14.1"
-  resolved "https://registry.yarnpkg.com/@mui/icons-material/-/icons-material-5.14.1.tgz#2f145c15047a0c7f01353ce620cb88276dadba9e"
-  integrity sha512-xV/f26muQqtWzerzOIdGPrXoxp/OKaE2G2Wp9gnmG47mHua5Slup/tMc3fA4ZYUreGGrK6+tT81TEvt1Wsng8Q==
-  dependencies:
-    "@babel/runtime" "^7.22.6"
 
 "@mui/icons-material@5.14.3":
   version "5.14.3"
@@ -2241,20 +2215,6 @@
   integrity sha512-XkxWPhageu1OPUm2LWjo5XqeQ0t2xfGe8EiLkRW9oz2LHMMZmijvCxulhgquUVTF1DnoSh+3KoDLSsoAFtVNVw==
   dependencies:
     "@babel/runtime" "^7.22.6"
-
-"@mui/lab@5.0.0-alpha.137":
-  version "5.0.0-alpha.137"
-  resolved "https://registry.yarnpkg.com/@mui/lab/-/lab-5.0.0-alpha.137.tgz#b8d2d4e63367929534c9ae6395df90316d454ac9"
-  integrity sha512-bHfcfti9/GnB657QpTdlK1fc9gjkP3SC+NrXyb9NCr0rT5Cq7TEkBGXyY5wGUSCyHR3CrMvchkIsfG5sH/NJ9A==
-  dependencies:
-    "@babel/runtime" "^7.22.6"
-    "@mui/base" "5.0.0-beta.8"
-    "@mui/system" "^5.14.1"
-    "@mui/types" "^7.2.4"
-    "@mui/utils" "^5.14.1"
-    clsx "^1.2.1"
-    prop-types "^15.8.1"
-    react-is "^18.2.0"
 
 "@mui/lab@5.0.0-alpha.138":
   version "5.0.0-alpha.138"
@@ -2269,24 +2229,6 @@
     clsx "^2.0.0"
     prop-types "^15.8.1"
     react-is "^18.2.0"
-
-"@mui/material@5.14.2":
-  version "5.14.2"
-  resolved "https://registry.yarnpkg.com/@mui/material/-/material-5.14.2.tgz#13b113489a61021145d62e0383912ca487a46375"
-  integrity sha512-TgNR4/YRL11RifsnMWNhITNCkGJYVz20SCvVJBBoU5Y/KhUNSSJxjDpEB8VrnY+sUsV0NigLCkHZJglfsiS3Pw==
-  dependencies:
-    "@babel/runtime" "^7.22.6"
-    "@mui/base" "5.0.0-beta.8"
-    "@mui/core-downloads-tracker" "^5.14.2"
-    "@mui/system" "^5.14.1"
-    "@mui/types" "^7.2.4"
-    "@mui/utils" "^5.14.1"
-    "@types/react-transition-group" "^4.4.6"
-    clsx "^1.2.1"
-    csstype "^3.1.2"
-    prop-types "^15.8.1"
-    react-is "^18.2.0"
-    react-transition-group "^4.4.5"
 
 "@mui/material@5.14.3", "@mui/material@latest":
   version "5.14.3"
@@ -2363,20 +2305,6 @@
     "@mui/types" "^7.2.4"
     "@mui/utils" "^5.14.3"
     clsx "^2.0.0"
-    csstype "^3.1.2"
-    prop-types "^15.8.1"
-
-"@mui/system@^5.14.1":
-  version "5.14.1"
-  resolved "https://registry.yarnpkg.com/@mui/system/-/system-5.14.1.tgz#ec8ae69f63963b5916dad4bca2f8a86a001a2392"
-  integrity sha512-u+xlsU34Jdkgx1CxmBnIC4Y08uPdVX5iEd3S/1dggDFtOGp+Lj8xmKRJAQ8PJOOJLOh8pDwaZx4AwXikL4l1QA==
-  dependencies:
-    "@babel/runtime" "^7.22.6"
-    "@mui/private-theming" "^5.13.7"
-    "@mui/styled-engine" "^5.13.2"
-    "@mui/types" "^7.2.4"
-    "@mui/utils" "^5.14.1"
-    clsx "^1.2.1"
     csstype "^3.1.2"
     prop-types "^15.8.1"
 

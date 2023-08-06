@@ -39,9 +39,9 @@
     }
   },
   "dependencies": {
-    "@mui/icons-material": "5.14.1",
-    "@mui/lab": "5.0.0-alpha.137",
-    "@mui/material": "5.14.2",
+    "@mui/icons-material": "5.14.3",
+    "@mui/lab": "5.0.0-alpha.138",
+    "@mui/material": "5.14.3",
     "@mui/toolpad-utils": "0.1.22",
     "chokidar": "3.5.3",
     "dotenv": "16.3.1",

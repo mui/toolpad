@@ -17,7 +17,7 @@ const MONOREPO_PACKAGES = {
   '@mui/codemod': path.resolve(MONOREPO_PATH, './packages/mui-codemod/src'),
   '@mui/docs': path.resolve(MONOREPO_PATH, './packages/mui-docs/src'),
   '@mui/envinfo': path.resolve(MONOREPO_PATH, './packages/mui-envinfo'),
-  '@mui/icons-material': path.resolve(MONOREPO_PATH, './packages/mui-icons-material/lib'),
+  '@mui/icons-material': path.resolve(MONOREPO_PATH, './packages/mui-icons-material/lib/esm'),
   '@mui/joy': path.resolve(MONOREPO_PATH, './packages/mui-joy/src'),
   '@mui/lab': path.resolve(MONOREPO_PATH, './packages/mui-lab/src'),
   '@mui/material': path.resolve(MONOREPO_PATH, './packages/mui-material/src'),
@@ -30,6 +30,8 @@ const MONOREPO_PACKAGES = {
   '@mui/types': path.resolve(MONOREPO_PATH, './packages/mui-types'),
   '@mui/markdown': path.resolve(MONOREPO_PATH, './packages/markdown'),
   '@mui/utils': path.resolve(MONOREPO_PATH, './packages/mui-utils'),
+  react: path.resolve(currentDirectory, './node_modules/react'),
+  'react-dom': path.resolve(currentDirectory, './node_modules/react-dom'),
 };
 
 export default withDocsInfra(

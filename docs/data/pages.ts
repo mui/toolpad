@@ -4,6 +4,7 @@ import CodeIcon from '@mui/icons-material/Code';
 import DescriptionIcon from '@mui/icons-material/Description';
 import SchoolIcon from '@mui/icons-material/School';
 import VisibilityIcon from '@mui/icons-material/Visibility';
+import FormatShapesIcon from '@mui/icons-material/FormatShapes';
 import componentsManifest from './toolpad/reference/components/manifest.json';
 
 const pages: MuiPage[] = [
@@ -175,6 +176,11 @@ const pages: MuiPage[] = [
         ],
       },
     ],
+  },
+  {
+    pathname: '/toolpad/live-config',
+    title: 'Live config',
+    icon: FormatShapesIcon,
   },
 ];
 

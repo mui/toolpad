@@ -98,7 +98,7 @@ export default function DevtoolHost({ children }: DevtoolHostProps) {
               display: 'flex',
               flexDirection: 'column',
               alignItems: 'stretch',
-              zIndex: 1,
+              zIndex: 1300,
             }}
           >
             <GlobalStyles styles={{ body: { marginBottom: `${height}px` } }} />

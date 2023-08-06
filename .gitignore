@@ -64,4 +64,4 @@ test-results
 /test/regressions/screenshots/**
 
 
-docs/toolpad/.generated
+docs/src/.generated

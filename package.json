@@ -42,7 +42,7 @@
     "test": "lerna run test",
     "check-types": "lerna run check-types",
     "toolpad": "toolpad",
-    "toolpad-next": "node --enable-source-maps ./packages/toolpad-next/dist/cli/index.mjs",
+    "toolpad-next": "node --enable-source-maps ./packages/toolpad-next/cli.js",
     "jsonSchemas": "tsx ./scripts/docs/generateJsonSchemas.ts",
     "test:rest:start": "tsx ./scripts/restTestServer.ts"
   },

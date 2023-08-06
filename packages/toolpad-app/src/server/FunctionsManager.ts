@@ -8,7 +8,6 @@ import chalk from 'chalk';
 import { glob } from 'glob';
 import { writeFileRecursive, fileExists, readJsonFile } from '@mui/toolpad-utils/fs';
 import invariant from 'invariant';
-// @ts-expect-error https://github.com/piscinajs/piscina/issues/362#issuecomment-1616811661
 import Piscina from 'piscina';
 import { ExecFetchResult } from '@mui/toolpad-core';
 import { errorFrom } from '@mui/toolpad-utils/errors';
@@ -252,7 +251,7 @@ export default class FunctionsManager {
   }
 
   async dispose() {
-    await Promise.all([this.devWorker.terminate(), this.extractTypesWorker.destroy()]);
+    await Promise.all([this.devWorker.terminate(), this.extractTypesWorker?.destroy()]);
   }
 
   async exec(

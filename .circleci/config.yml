@@ -1,6 +1,7 @@
 version: 2.1
 orbs:
   aws-s3: circleci/aws-s3@3.1.1
+  win: circleci/windows@5.0 # The Windows orb gives you everything you need to start using the Windows executor.
 
 defaults: &defaults
   working_directory: /tmp/mui-toolpad

@@ -7,6 +7,8 @@ import { ToolpadEditor } from '../../models/ToolpadEditor';
 import { startTestServer } from './testServer';
 import { withTemporaryEdits } from '../../utils/fs';
 
+let testServer: Awaited<ReturnType<typeof startTestServer>> | undefined;
+
 test.use({
   localAppConfig: {
     template: path.resolve(__dirname, './fixture'),
@@ -14,17 +16,13 @@ test.use({
     env: {
       TEST_VAR: 'foo',
     },
+    async setup(ctx) {
+      testServer = await startTestServer();
+      const targetUrl = `http://localhost:${testServer.port}/`;
+      const configFilePath = path.resolve(ctx.dir, './toolpad/pages/page1/page.yml');
+      await fileReplaceAll(configFilePath, `http://localhost:8080/`, targetUrl);
+    },
   },
-});
-
-let testServer: Awaited<ReturnType<typeof startTestServer>> | undefined;
-
-test.beforeAll(async ({ localApp }) => {
-  testServer = await startTestServer();
-
-  const targetUrl = `http://localhost:${testServer.port}/`;
-  const configFilePath = path.resolve(localApp.dir, './toolpad/pages/page1/page.yml');
-  await fileReplaceAll(configFilePath, `http://localhost:8080/`, targetUrl);
 });
 
 test.afterAll(async () => {

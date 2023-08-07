@@ -5,11 +5,6 @@ orbs:
 defaults: &defaults
   working_directory: /tmp/mui-toolpad
   resource_class: medium
-  parameters:
-    browsers:
-      type: boolean
-      default: true
-      description: 'Set to true if you intend to use any browser (e.g. with playwright).'
   docker:
     - image: cimg/node:16.14.2
 # CircleCI has disabled the cache across forks for security reasons.
@@ -90,8 +85,7 @@ jobs:
     <<: *defaults
     steps:
       - checkout
-      - install_js:
-          browsers: << parameters.browsers >>
+      - install_js
       - run:
           name: Should not have any git not staged
           command: git add -A && git diff --exit-code --staged
@@ -213,4 +207,3 @@ workflows:
       - test_windows:
           requires:
             - checkout
-          browsers: true

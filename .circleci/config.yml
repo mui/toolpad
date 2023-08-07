@@ -167,6 +167,29 @@ jobs:
           path: test-results
           destination: playwright-test-results
 
+  test_windows:
+    executor: win/default
+    environment:
+      NODE_ENV: test
+      TOOLPAD_TEST_RETRIES: 1
+    parameters:
+      browsers: true
+
+    steps:
+      - checkout
+      - install_js
+      - run:
+          name: 'Build packages'
+          command: yarn release:build
+      - save_cache:
+          name: Save Next.js cache
+          key: v0-next-{{ checksum "yarn.lock" }}
+          paths:
+            - packages/toolpad-app/.next/cache
+      - run:
+          name: Tests real browser
+          command: yarn test:integration --grep backend-basic --project chromium
+
 workflows:
   pipeline:
     jobs:

@@ -11,6 +11,8 @@ import getPort from 'get-port';
 import { PageScreenshotOptions, test as base } from './test';
 import { waitForMatch } from '../utils/streams';
 
+const CLI_CMD = path.resolve(__dirname, '../../packages/toolpad-app/cli.js');
+
 const PROJECT_ROOT = path.resolve(__dirname, '../../');
 
 // https://github.com/mui/material-ui/blob/bc35128302b5bd61fa35f89d371aeed91e6a5748/scripts/pushArgos.mjs#L7
@@ -78,7 +80,7 @@ export async function withApp(
     if (cmd === 'start') {
       const buildArgs = ['build'];
 
-      const child = childProcess.spawn('toolpad', buildArgs, {
+      const child = childProcess.spawn(CLI_CMD, buildArgs, {
         cwd: projectDir,
         stdio: 'pipe',
         shell: !process.env.CI,
@@ -100,7 +102,7 @@ export async function withApp(
       }
     }
 
-    const child = childProcess.spawn('toolpad', args, {
+    const child = childProcess.spawn(CLI_CMD, args, {
       cwd: projectDir,
       stdio: 'pipe',
       shell: !process.env.CI,

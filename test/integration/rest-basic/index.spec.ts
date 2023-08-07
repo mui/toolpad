@@ -53,6 +53,7 @@ test('rest runtime basics', async ({ page, localApp }) => {
 test('rest editor basics', async ({ page, context, localApp }) => {
   const editorModel = new ToolpadEditor(page);
   await editorModel.goto();
+  await editorModel.waitForOverlay();
 
   await editorModel.pageEditor.getByRole('button', { name: 'Add query' }).click();
   await page.getByRole('button', { name: 'HTTP request' }).click();

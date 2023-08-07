@@ -86,6 +86,11 @@
       "matchManagers": ["github-actions"]
     },
     {
+      "groupName": "monaco-editor",
+      "matchPackageNames": ["monaco-editor"],
+      "description": "We're having trouble upgading monaco-editor to >0.40."
+    },
+    {
       "groupName": "Update @mui/toolpad in examples",
       "matchPackageNames": ["@mui/toolpad"],
       "matchFiles": ["examples/*/package.json"],

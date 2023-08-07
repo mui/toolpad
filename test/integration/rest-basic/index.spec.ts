@@ -19,8 +19,8 @@ test.use({
     async setup(ctx) {
       testServer = await startTestServer();
       const targetUrl = `http://localhost:${testServer.port}/`;
-      const configFilePath = path.resolve(ctx.dir, './toolpad/pages/page1/page.yml');
-      await fileReplaceAll(configFilePath, `http://localhost:8080/`, targetUrl);
+      const pageFilePath = path.resolve(ctx.dir, './toolpad/pages/page1/page.yml');
+      await fileReplaceAll(pageFilePath, `http://localhost:8080/`, targetUrl);
     },
   },
 });

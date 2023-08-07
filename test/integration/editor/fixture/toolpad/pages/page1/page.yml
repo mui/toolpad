@@ -44,3 +44,10 @@ spec:
                   name: button4
                   props:
                     content: last in row
+  queries:
+    - name: query
+      query:
+        kind: rest
+        url: http://localhost:3000/static/movies.js
+        headers: []
+        method: GET

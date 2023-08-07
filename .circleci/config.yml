@@ -145,6 +145,9 @@ jobs:
           TOOLPAD_TEST_RETRIES: 1
 
     steps:
+      - run:
+          name: 'Install Node.js'
+          command: nvm install 16 && nvm use 16
       - checkout
       - install_js
       - run:

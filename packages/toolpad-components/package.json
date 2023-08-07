@@ -46,11 +46,12 @@
     "@mui/toolpad-utils": "0.1.22",
     "@mui/x-data-grid-pro": "6.11.0",
     "@mui/x-date-pickers": "6.11.0",
+    "@mui/x-license-pro": "6.10.2",
     "dayjs": "1.11.9",
     "lodash-es": "4.17.21",
-    "markdown-to-jsx": "7.2.1",
+    "markdown-to-jsx": "7.3.2",
     "react-error-boundary": "4.0.10",
-    "react-hook-form": "7.45.2",
+    "react-hook-form": "7.45.4",
     "recharts": "2.7.2"
   },
   "devDependencies": {

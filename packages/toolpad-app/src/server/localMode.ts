@@ -879,8 +879,6 @@ async function migrateLegacyProject(root: string) {
 
 function getDomFilePatterns(root: string) {
   return [
-    path.resolve(root, './toolpad.yml'),
-    path.resolve(root, './toolpad.yml'),
     path.resolve(root, './toolpad/pages/*/page.yml'),
     path.resolve(root, './toolpad/components/*.*'),
   ];
@@ -1004,6 +1002,8 @@ class ToolpadProject {
     }, 100);
 
     const watchOptions: chokidar.WatchOptions = {
+      // This is needed to correctly pick up page folder renames
+      // Remove this once https://github.com/paulmillr/chokidar/issues/1285 gets resolved
       usePolling: true,
     };
 
@@ -1178,15 +1178,5 @@ export async function initProject(cmd: 'dev' | 'start' | 'build', root: string) 
   // eslint-disable-next-line no-underscore-dangle
   globalThis.__toolpadProject = project;
 
-  await project.start();
-
   return project;
-}
-
-export async function buildProject(root: string) {
-  const project = new ToolpadProject(root, { cmd: 'build', dev: false });
-
-  await project.build();
-
-  await project.dispose();
 }

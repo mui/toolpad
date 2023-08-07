@@ -172,8 +172,6 @@ jobs:
     environment:
       NODE_ENV: test
       TOOLPAD_TEST_RETRIES: 1
-    parameters:
-      browsers: true
 
     steps:
       - checkout
@@ -206,3 +204,7 @@ workflows:
       - test_unit:
           requires:
             - checkout
+      - test_windows:
+          requires:
+            - checkout
+          browsers: true

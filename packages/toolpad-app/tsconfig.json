@@ -1,7 +1,6 @@
 {
   "compilerOptions": {
     "paths": {
-      "@monaco-get-worker": ["./src/components/monaco/getWorkerNext"],
       // TODO: remove when typescript module resolution supports package exports. (v5.0 with moduleResolution: 'bundler')
       "@mui/toolpad-core": ["../toolpad-core/dist"],
       "@mui/toolpad-core/runtime": ["../toolpad-core/dist/runtime"],

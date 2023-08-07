@@ -37,7 +37,6 @@ If you want to listen on a specific port you can change the start script to:
 ```
 
 :::info
-Detailed, step-by-step instructions are available in the tutorial section for deploying a Toolpad app to the following services:
-
-- [Render](/toolpad/tutorials/render-deploy/)
-  :::
+  Detailed, step-by-step instructions are available for the following services:
+  - [Render](/toolpad/how-to-guides/render-deploy/)
+:::

@@ -37,6 +37,7 @@ If you want to listen on a specific port you can change the start script to:
 ```
 
 :::info
-  Detailed, step-by-step instructions are available for the following services:
-  - [Render](/toolpad/how-to-guides/render-deploy/)
-:::
+Detailed, step-by-step instructions are available for the following services:
+
+- [Render](/toolpad/how-to-guides/render-deploy/)
+  :::

@@ -69,7 +69,7 @@ export async function withApp(
       await setup({ dir: projectDir });
     }
 
-    const args: string[] = [cmd];
+    const args: string[] = [CLI_CMD, cmd];
     if (options.toolpadDev) {
       args.push('--dev');
     }
@@ -78,9 +78,9 @@ export async function withApp(
     args.push('--port', String(await getPort()));
 
     if (cmd === 'start') {
-      const buildArgs = ['build'];
+      const buildArgs = [CLI_CMD, 'build'];
 
-      const child = childProcess.spawn(CLI_CMD, buildArgs, {
+      const child = childProcess.spawn('node', buildArgs, {
         cwd: projectDir,
         stdio: 'pipe',
         shell: !process.env.CI,
@@ -102,7 +102,7 @@ export async function withApp(
       }
     }
 
-    const child = childProcess.spawn(CLI_CMD, args, {
+    const child = childProcess.spawn('node', args, {
       cwd: projectDir,
       stdio: 'pipe',
       shell: !process.env.CI,

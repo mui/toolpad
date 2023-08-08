@@ -44,6 +44,10 @@ test('can create new component', async ({ page }) => {
 
   await editorModel.createPage('somePage');
   await editorModel.createComponent('someComponent');
+  await editorModel.componentCatalog.hover();
+  await expect(editorModel.componentCatalog.getByText('someComponent')).toBeVisible();
+  await editorModel.dragNewComponentTo('someComponent');
+  await expect(editorModel.appCanvas.getByText('Hello world!')).toBeVisible();
 });
 
 test('can create/delete page', async ({ page, localApp }) => {

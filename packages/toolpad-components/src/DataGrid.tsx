@@ -460,7 +460,10 @@ const DataGridComponent = React.forwardRef(function DataGridComponent(
   }, [apiRef, columns]);
 
   // The grid doesn't update when the getRowId property changes, so it needs to be remounted
-  const gridKey = React.useMemo(() => getObjectKey(getRowId), [getRowId]);
+  const gridKey = React.useMemo(
+    () => [getObjectKey(getRowId), getObjectKey(columns)].join('::'),
+    [getRowId, columns],
+  );
 
   const error: Error | null = errorProp ? errorFrom(errorProp) : null;
 

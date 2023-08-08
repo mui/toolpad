@@ -181,6 +181,10 @@ jobs:
             nvm install 16.14.2
             nvm use 16.14.2
             npm -g install yarn
+      - run:
+          name: 'Install browsers'
+          command: |
+            npx playwright install
       - checkout
       - install_js
       - run:

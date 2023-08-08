@@ -21,8 +21,6 @@ jobs:
               repo: context.repo.repo,
             });
 
-            console.log(JSON.stringify(labels, null, 2))
-
             if (labels.length <= 0) {
               await github.rest.issues.addLabels({
                 issue_number: context.issue.number,

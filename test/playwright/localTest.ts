@@ -139,7 +139,7 @@ export async function withApp(
       child.kill();
     }
   } finally {
-    await fs.rm(tmpTestDir, { recursive: true, maxRetries: 3, retryDelay: 1000 });
+    await fs.rm(tmpTestDir, { recursive: true });
   }
 }
 

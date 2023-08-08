@@ -4,6 +4,8 @@
 
 <p class="description">API docs for the Toolpad Autocomplete component.</p>
 
+A text input with autocomplete suggestions.
+
 ## Properties
 
 | Name                                      | Type                                   | Default                                     | Description                                                                                                                                                                                                                                                                          |

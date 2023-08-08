@@ -4,6 +4,8 @@
 
 <p class="description">API docs for the Toolpad Tabs component.</p>
 
+A tabs component.
+
 ## Properties
 
 | Name                                        | Type                                  | Default                                                                                                                                                | Description                              |

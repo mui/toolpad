@@ -4,6 +4,8 @@
 
 <p class="description">API docs for the Toolpad Container component.</p>
 
+A container component.
+
 ## Properties
 
 | Name                                    | Type                                   | Default                                                              | Description                                                                                                                                                                                                                                                                          |

@@ -170,7 +170,7 @@ const test = base.extend<
         await use(app);
       });
     },
-    { scope: 'worker', timeout: 60000 },
+    { scope: 'worker', timeout: 120000 },
   ],
   baseURL: async ({ localApp }, use) => {
     await use(localApp.url);

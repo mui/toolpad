@@ -15,10 +15,16 @@ export interface RunOptions {
 async function runCommand(cmd: 'dev' | 'start', { dir, ...args }: Omit<RunOptions, 'cmd'>) {
   const projectDir = path.resolve(process.cwd(), dir);
 
-  await runApp({
+  const app = await runApp({
     ...args,
     projectDir,
     cmd,
+  });
+
+  process.on('SIGINT', () => {
+    app.dispose().then(() => {
+      process.exit(0);
+    });
   });
 }
 

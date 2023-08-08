@@ -34,6 +34,5 @@ test('shows chart loading and errors', async ({ page }) => {
   await runtimeModel.gotoPage('loadingAndError');
 
   await expect(page.getByText('BOOM!', { exact: true })).toBeVisible();
-
   await expect(page.getByRole('progressbar')).toBeVisible();
 });

@@ -4,7 +4,9 @@
 
 ## Pre-requisites
 
-Make sure to add the following scripts to your `package.json`
+- This guide assumes that you have copied your project folder to the server, and all subsequent commands are run inside it.
+
+- Make sure to add the following scripts to your `package.json`
 
 ```json
  "scripts": {
@@ -14,21 +16,55 @@ Make sure to add the following scripts to your `package.json`
  }
 ```
 
-## Build steps
+## Install step
+
+Install needed depdencies via:
+
+<codeblock storageKey="toolpad-deploy-package-manager">
+
+```bash npm
+npm install
+```
+
+```bash yarn
+yarn
+```
+
+</codeblock>
+
+## Build step
 
 This command will create an optimized production build for the Toolpad app and will output the generated files:
 
-```bash
+<codeblock storageKey="toolpad-deploy-package-manager">
+
+```bash npm
+npm run build
+```
+
+```bash yarn
 yarn build
 ```
+
+</codeblock>
+
+## Start step
 
 Once the build has been made, you can deploy it to any service of your choice!
 
 To serve the app once built, run:
 
-```bash
+<codeblock storageKey="toolpad-deploy-package-manager">
+
+```bash npm
+npm run start
+```
+
+```bash yarn
 yarn start
 ```
+
+</codeblock>
 
 If you want to listen on a specific port you can change the start script to:
 
@@ -36,8 +72,8 @@ If you want to listen on a specific port you can change the start script to:
   "start": "toolpad start -p 1234"
 ```
 
-:::info
+## Detailed guides
+
 Detailed, step-by-step instructions are available for the following services:
 
 - [Render](/toolpad/how-to-guides/render-deploy/)
-  :::

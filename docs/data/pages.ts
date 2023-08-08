@@ -2,7 +2,6 @@ import type { MuiPage } from '@mui/monorepo/docs/src/MuiPage';
 import BuildIcon from '@mui/icons-material/Build';
 import CodeIcon from '@mui/icons-material/Code';
 import DescriptionIcon from '@mui/icons-material/Description';
-import SchoolIcon from '@mui/icons-material/School';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import componentsManifest from './toolpad/reference/components/manifest.json';
 
@@ -89,6 +88,15 @@ const pages: MuiPage[] = [
         ],
       },
       {
+        pathname: '/toolpad/how-to-guides/deployment',
+        children: [
+          {
+            pathname: '/toolpad/how-to-guides/render-deploy',
+            title: 'Deploy your app to Render',
+          },
+        ],
+      },
+      {
         pathname: '/toolpad/how-to-guides/custom-components',
         title: 'Create custom components',
         children: [
@@ -122,17 +130,6 @@ const pages: MuiPage[] = [
       {
         pathname: '/toolpad/how-to-guides/editor-path',
         title: 'Troubleshoot missing editor',
-      },
-    ],
-  },
-  {
-    pathname: '/toolpad/tutorials',
-    title: 'Tutorials',
-    icon: SchoolIcon,
-    children: [
-      {
-        pathname: '/toolpad/tutorials/render-deploy',
-        title: 'Deploy your app to Render',
       },
     ],
   },

@@ -36,7 +36,7 @@ yarn
 
 This command will create an optimized production build for the Toolpad app and will output the generated files:
 
-<codeblock storageKey="toolpad-deploy-package-manager">
+<codeblock storageKey="toolpad-deploy-build">
 
 ```bash npm
 npm run build
@@ -54,7 +54,7 @@ Once the build has been made, you can deploy it to any service of your choice!
 
 To serve the app once built, run:
 
-<codeblock storageKey="toolpad-deploy-package-manager">
+<codeblock storageKey="toolpad-deploy-start">
 
 ```bash npm
 npm run start

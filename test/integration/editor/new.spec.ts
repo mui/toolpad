@@ -24,7 +24,7 @@ test('can place new components from catalog', async ({ page }) => {
 
   // Drag in a first component
 
-  await editorModel.dragNewComponentTo(TEXT_FIELD_COMPONENT_DISPLAY_NAME);
+  await editorModel.dragNewComponentToCanvas(TEXT_FIELD_COMPONENT_DISPLAY_NAME);
 
   await expect(canvasInputLocator).toHaveCount(1);
   await expect(canvasInputLocator).toBeVisible();
@@ -32,12 +32,12 @@ test('can place new components from catalog', async ({ page }) => {
 
   // Drag in a second component
 
-  await editorModel.dragNewComponentTo(TEXT_FIELD_COMPONENT_DISPLAY_NAME);
+  await editorModel.dragNewComponentToCanvas(TEXT_FIELD_COMPONENT_DISPLAY_NAME);
 
   await expect(canvasInputLocator).toHaveCount(2);
 });
 
-test('can create new component', async ({ page }) => {
+test('can create and place new component', async ({ page }) => {
   const editorModel = new ToolpadEditor(page);
 
   await editorModel.goto();
@@ -46,7 +46,7 @@ test('can create new component', async ({ page }) => {
   await editorModel.createComponent('someComponent');
   await editorModel.componentCatalog.hover();
   await expect(editorModel.componentCatalog.getByText('someComponent')).toBeVisible();
-  await editorModel.dragNewComponentTo('someComponent');
+  await editorModel.dragNewComponentToCanvas('someComponent');
   await expect(editorModel.appCanvas.getByText('Hello world!')).toBeVisible();
 });
 

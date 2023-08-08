@@ -129,7 +129,7 @@ test('must correctly size new layout columns', async ({ page }) => {
 
   // Drag new element to same row as existing element
 
-  await editorModel.dragNewComponentTo(
+  await editorModel.dragNewComponentToCanvas(
     'FullWidth',
     firstFullWidthBoundingBox1!.x + (3 / 4) * firstFullWidthBoundingBox1!.width,
     firstFullWidthBoundingBox1!.y + firstFullWidthBoundingBox1!.height / 2,
@@ -142,7 +142,7 @@ test('must correctly size new layout columns', async ({ page }) => {
 
   // Drag new element to same row as existing same-width elements
 
-  await editorModel.dragNewComponentTo(
+  await editorModel.dragNewComponentToCanvas(
     'FullWidth',
     secondFullWidthBoundingBox2!.x + (3 / 4) * secondFullWidthBoundingBox2!.width,
     secondFullWidthBoundingBox2!.y + secondFullWidthBoundingBox2!.height / 2,
@@ -159,7 +159,7 @@ test('must correctly size new layout columns', async ({ page }) => {
 
   const fifthFullWidthBoundingBox = await getNthFullWidthBoundingBox(4);
 
-  await editorModel.dragNewComponentTo(
+  await editorModel.dragNewComponentToCanvas(
     'FullWidth',
     fifthFullWidthBoundingBox!.x + (3 / 4) * fifthFullWidthBoundingBox!.width,
     fifthFullWidthBoundingBox!.y + fifthFullWidthBoundingBox!.height / 2,

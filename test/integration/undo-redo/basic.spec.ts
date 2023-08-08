@@ -55,6 +55,8 @@ test('test batching text input actions into single undo entry', async ({ page })
 
   await page.keyboard.type('some value');
 
+  await expect(input).toHaveValue('some value');
+
   // Wait for undo stack to be updated
   await page.waitForTimeout(500);
 

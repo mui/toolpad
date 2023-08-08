@@ -4,6 +4,8 @@
 
 <p class="description">API docs for the Toolpad List component.</p>
 
+The Material UI [List](https://mui.com/material-ui/react-list/) component.
+
 ## Properties
 
 | Name                                          | Type                                    | Default                             | Description                                                                                                                                                                                                                                                                          |

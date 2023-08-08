@@ -4,6 +4,8 @@
 
 <p class="description">API docs for the Toolpad Text component.</p>
 
+The Material UI [Typography](https://mui.com/material-ui/react-typography/) component.
+
 The Text component lets you display text. Text can be rendered in multiple forms: plain, as a link, or as markdown.
 
 ## Properties

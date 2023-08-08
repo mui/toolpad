@@ -4,6 +4,8 @@
 
 <p class="description">API docs for the Toolpad TextField component.</p>
 
+The Material UI [Text Field](https://mui.com/material-ui/react-text-field/) component.
+
 The TextField component lets you input a text value.
 
 ## Properties

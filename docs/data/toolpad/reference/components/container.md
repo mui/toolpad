@@ -4,6 +4,8 @@
 
 <p class="description">API docs for the Toolpad Container component.</p>
 
+The Material UI [Container](https://mui.com/material-ui/react-container/) component.
+
 ## Properties
 
 | Name                                    | Type                                   | Default                                                              | Description                                                                                                                                                                                                                                                                          |

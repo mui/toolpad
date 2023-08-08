@@ -1,5 +1,8 @@
 name: Label new issues with "needs triage"
 on:
+  label:
+    types:
+      - deleted
   issues:
     types:
       - opened

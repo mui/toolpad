@@ -1,5 +1,4 @@
 import * as React from 'react';
-import { createComponent } from '@mui/toolpad-core';
 import { Container, ContainerProps } from '@mui/material';
 import {
   XAxis,
@@ -14,6 +13,7 @@ import {
   Area,
   Scatter,
 } from 'recharts';
+import createBuiltin from './createBuiltin';
 import { SX_PROP_HELPER_TEXT } from './constants';
 
 export const CHART_DATA_SERIES_KINDS = ['line', 'bar', 'area', 'scatter'];
@@ -176,7 +176,8 @@ function Chart({ data = [], height, sx }: ChartProps) {
   );
 }
 
-export default createComponent(Chart, {
+export default createBuiltin(Chart, {
+  helperText: 'A chart component.',
   resizableHeightProp: 'height',
   argTypes: {
     data: {
@@ -214,6 +215,7 @@ export default createComponent(Chart, {
       control: { type: 'ChartData', bindable: false },
     },
     height: {
+      helperText: 'The height of the chart.',
       type: 'number',
       default: 400,
       minimum: 100,

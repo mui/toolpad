@@ -4,7 +4,7 @@ import {
   TextFieldProps as MuiTextFieldProps,
   BoxProps,
 } from '@mui/material';
-import { createComponent } from '@mui/toolpad-core';
+import createBuiltin from './createBuiltin';
 import {
   FORM_INPUT_ARG_TYPES,
   FORM_TEXT_INPUT_ARG_TYPES,
@@ -65,7 +65,7 @@ function TextField({
 
 const FormWrappedTextField = withComponentForm(TextField);
 
-export default createComponent(FormWrappedTextField, {
+export default createBuiltin(FormWrappedTextField, {
   helperText: 'The TextField component lets you input a text value.',
   layoutDirection: 'both',
   argTypes: {

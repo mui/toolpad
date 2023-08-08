@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { TextFieldProps, MenuItem, TextField } from '@mui/material';
-import { createComponent } from '@mui/toolpad-core';
+import createBuiltin from './createBuiltin';
 import {
   FORM_INPUT_ARG_TYPES,
   FormInputComponentProps,
@@ -85,7 +85,7 @@ function Select({
 
 const FormWrappedSelect = withComponentForm(Select);
 
-export default createComponent(FormWrappedSelect, {
+export default createBuiltin(FormWrappedSelect, {
   helperText: 'The Select component lets you select a value from a set of options.',
   layoutDirection: 'both',
   loadingPropSource: ['value', 'options'],

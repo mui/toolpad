@@ -22,7 +22,7 @@ test('test basic undo and redo', async ({ page }) => {
   await expect(canvasInputLocator).toHaveCount(2);
 
   // Add 3rd text field
-  await editorModel.dragNewComponentTo('Text Field');
+  await editorModel.dragNewComponentToCanvas('Text Field');
 
   // Ensure that we added 3rd text field
   await expect(canvasInputLocator).toHaveCount(3);

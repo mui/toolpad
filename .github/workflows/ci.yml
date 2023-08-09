@@ -32,7 +32,7 @@ jobs:
       - run: yarn release:build
       - run: npx playwright install
 
-      - name: Run tests
+      - name: Run smoke test
         run: yarn test:integration --grep backend-basic --project chromium
         env:
           TOOLPAD_TEST_RETRIES: 1

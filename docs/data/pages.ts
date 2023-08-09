@@ -1,14 +1,9 @@
 import type { MuiPage } from '@mui/monorepo/docs/src/MuiPage';
-import BuildIcon from '@mui/icons-material/Build';
-import CodeIcon from '@mui/icons-material/Code';
-import DescriptionIcon from '@mui/icons-material/Description';
-import VisibilityIcon from '@mui/icons-material/Visibility';
 import componentsManifest from './toolpad/reference/components/manifest.json';
 
 const pages: MuiPage[] = [
   {
     pathname: '/toolpad/getting-started',
-    icon: DescriptionIcon,
     children: [
       { pathname: '/toolpad/getting-started/overview' },
       { pathname: '/toolpad/getting-started/installation' },
@@ -26,7 +21,6 @@ const pages: MuiPage[] = [
   },
   {
     pathname: '/toolpad/concepts',
-    icon: VisibilityIcon,
     children: [
       {
         pathname: '/toolpad/concepts/building-ui',
@@ -71,7 +65,6 @@ const pages: MuiPage[] = [
   {
     pathname: '/toolpad/how-to-guides',
     title: 'How-to guides',
-    icon: BuildIcon,
     children: [
       {
         pathname: '/toolpad/how-to-guides/connect-to-datasource',
@@ -136,7 +129,6 @@ const pages: MuiPage[] = [
   {
     pathname: '/toolpad/reference-group',
     title: 'Reference',
-    icon: CodeIcon,
     children: [
       {
         pathname: '/toolpad/reference/file-schema',

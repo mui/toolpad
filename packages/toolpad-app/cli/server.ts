@@ -120,24 +120,23 @@ export interface ServerConfig {
   port: number;
   devMode: boolean;
   externalUrl: string;
+  project: ToolpadProject;
 }
 
-async function main({
+async function startServer({
   cmd,
   gitSha1,
   circleBuildNum,
-  projectDir,
   port,
   devMode,
   externalUrl,
+  project,
 }: ServerConfig) {
   const runtimeConfig: RuntimeConfig = {
     cmd,
-    projectDir,
+    projectDir: project.getRoot(),
     externalUrl,
   };
-
-  const project = await initProject(cmd, projectDir);
 
   await project.start();
 
@@ -268,7 +267,7 @@ async function main({
     }
   });
 
-  return runningServer.port;
+  return runningServer;
 }
 
 export type Command = 'dev' | 'start' | 'build';
@@ -277,6 +276,10 @@ export interface RunAppOptions {
   port?: number;
   dev?: boolean;
   projectDir: string;
+}
+
+export interface RunAppResult {
+  dispose(): Promise<void>;
 }
 
 export async function runApp({ cmd, port, dev = false, projectDir }: RunAppOptions) {
@@ -300,8 +303,11 @@ export async function runApp({ cmd, port, dev = false, projectDir }: RunAppOptio
 
   const externalUrl = process.env.TOOLPAD_EXTERNAL_URL || `http://localhost:${port}`;
 
-  const serverPort = await main({
+  const project = await initProject(cmd, projectDir);
+
+  const server = await startServer({
     cmd,
+    project,
     gitSha1: process.env.GIT_SHA1 || null,
     circleBuildNum: process.env.CIRCLE_BUILD_NUM || null,
     projectDir,
@@ -310,7 +316,7 @@ export async function runApp({ cmd, port, dev = false, projectDir }: RunAppOptio
     externalUrl,
   });
 
-  const toolpadBaseUrl = `http://localhost:${serverPort}/`;
+  const toolpadBaseUrl = `http://localhost:${server.port}/`;
 
   // eslint-disable-next-line no-console
   console.log(
@@ -326,4 +332,10 @@ export async function runApp({ cmd, port, dev = false, projectDir }: RunAppOptio
       console.error(`${chalk.red('error')} - Failed to open browser: ${err.message}`);
     }
   }
+
+  return {
+    async dispose() {
+      await Promise.allSettled([project.dispose(), server.close()]);
+    },
+  };
 }

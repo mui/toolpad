@@ -1,15 +1,9 @@
 import type { MuiPage } from '@mui/monorepo/docs/src/MuiPage';
-import BuildIcon from '@mui/icons-material/Build';
-import CodeIcon from '@mui/icons-material/Code';
-import DescriptionIcon from '@mui/icons-material/Description';
-import SchoolIcon from '@mui/icons-material/School';
-import VisibilityIcon from '@mui/icons-material/Visibility';
 import componentsManifest from './toolpad/reference/components/manifest.json';
 
 const pages: MuiPage[] = [
   {
     pathname: '/toolpad/getting-started',
-    icon: DescriptionIcon,
     children: [
       { pathname: '/toolpad/getting-started/overview' },
       { pathname: '/toolpad/getting-started/installation' },
@@ -27,7 +21,6 @@ const pages: MuiPage[] = [
   },
   {
     pathname: '/toolpad/concepts',
-    icon: VisibilityIcon,
     children: [
       {
         pathname: '/toolpad/concepts/building-ui',
@@ -72,7 +65,6 @@ const pages: MuiPage[] = [
   {
     pathname: '/toolpad/how-to-guides',
     title: 'How-to guides',
-    icon: BuildIcon,
     children: [
       {
         pathname: '/toolpad/how-to-guides/connect-to-datasource',
@@ -85,6 +77,15 @@ const pages: MuiPage[] = [
           {
             pathname: '/toolpad/how-to-guides/connect-to-googlesheets',
             title: 'Google sheets',
+          },
+        ],
+      },
+      {
+        pathname: '/toolpad/how-to-guides/deployment',
+        children: [
+          {
+            pathname: '/toolpad/how-to-guides/render-deploy',
+            title: 'Deploy your app to Render',
           },
         ],
       },
@@ -126,20 +127,8 @@ const pages: MuiPage[] = [
     ],
   },
   {
-    pathname: '/toolpad/tutorials',
-    title: 'Tutorials',
-    icon: SchoolIcon,
-    children: [
-      {
-        pathname: '/toolpad/tutorials/render-deploy',
-        title: 'Deploy your app to Render',
-      },
-    ],
-  },
-  {
     pathname: '/toolpad/reference-group',
     title: 'Reference',
-    icon: CodeIcon,
     children: [
       {
         pathname: '/toolpad/reference/file-schema',

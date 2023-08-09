@@ -190,15 +190,15 @@ const test = base.extend<
     async ({ localApp }, use, testInfo) => {
       await use(null);
 
-      if (testInfo.status !== 'passed' && testInfo.status !== 'skipped') {
-        await fs.mkdir(testInfo.outputDir, { recursive: true });
-        const output = createWriteStream(path.resolve(testInfo.outputDir, './projectSnapshot.zip'));
-        const archive = archiver.create('zip');
-        archive.directory(localApp.dir, '/project');
-        archive.finalize();
+      // if (testInfo.status !== 'passed' && testInfo.status !== 'skipped') {
+      await fs.mkdir(testInfo.outputDir, { recursive: true });
+      const output = createWriteStream(path.resolve(testInfo.outputDir, './projectSnapshot.zip'));
+      const archive = archiver.create('zip');
+      archive.directory(localApp.dir, '/project');
+      archive.finalize();
 
-        await pipeline(archive, output);
-      }
+      await pipeline(archive, output);
+      // }
     },
     { scope: 'test', auto: true },
   ],

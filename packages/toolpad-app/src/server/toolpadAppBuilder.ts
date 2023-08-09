@@ -285,7 +285,7 @@ export function createViteConfig({
           'superjson',
           'zod',
         ],
-        exclude: ['@mui_toolpad_runtime', '@mui_toolpad_canvas'],
+        exclude: ['@mui/toolpad/runtime', '@mui/toolpad/canvas'],
       },
       appType: 'custom',
       logLevel: 'info',

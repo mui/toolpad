@@ -79,6 +79,7 @@ export default class EnvManager {
     }
 
     const envFileWatcher = chokidar.watch([this.getEnvFilePath()], {
+      usePolling: true,
       ignoreInitial: true,
     });
 

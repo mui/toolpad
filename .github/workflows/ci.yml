@@ -1,0 +1,34 @@
+name: CI
+
+on:
+  push:
+    branches-ignore:
+      # Renovate branches are always Pull Requests.
+      # We don't need to run CI twice (push+pull_request)
+      - 'renovate/**'
+  pull_request:
+    paths-ignore:
+      # should sync with ci-check.yml as a workaround to bypass github checks
+      - 'docs/**'
+      - 'examples/**'
+
+permissions: {}
+
+jobs:
+  test-dev:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [macos-latest, windows-latest, ubuntu-latest]
+    steps:
+      - run: echo "${{ github.actor }}"
+      - uses: actions/checkout@c85c95e3d7251135ab7dc9ce3241c5835cc595a9 # v3.5.3
+      - name: Use Node.js 18.x
+        uses: actions/setup-node@e33196f7422957bea03ed53f6fbb155025ffc7b8 # v3.7.0
+        with:
+          node-version: 18
+          cache: 'yarn' # https://github.com/actions/setup-node/blob/main/docs/advanced-usage.md#caching-packages-dependencies
+      - run: yarn install
+      - run: yarn release:build
+      - run: npx playwright install
+      - run: yarn test:integration --grep backend-basic --project chromium

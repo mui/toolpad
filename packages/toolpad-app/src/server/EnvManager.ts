@@ -42,7 +42,6 @@ export default class EnvManager {
     // Dummy method
   }
 
-  // eslint-disable-next-line class-methods-use-this
   async dispose() {
     await this.watcher?.close();
   }

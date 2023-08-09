@@ -37,4 +37,4 @@ jobs:
         if: always()
         with:
           name: ${{ matrix.os }}-test-results
-          path: test-results
+          path: test-results/*

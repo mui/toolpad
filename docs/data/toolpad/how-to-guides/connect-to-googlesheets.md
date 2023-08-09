@@ -4,7 +4,7 @@
 
 You can write a custom function to read or write data from a Google sheet. We'll use [google-auth-library](https://www.npmjs.com/package/google-auth-library) and [googleapis](https://www.npmjs.com/package/googleapis) packages for this.
 
-There are many ways to authenticate Google APIs as mentioned in google-auth-library. We'll use JWT tokens as we are creating a server based application.
+There are many ways to authenticate Google APIs as mentioned in `google-auth-library`. We'll use JWTs (JSON Web Tokens) as we are creating a server based application.
 
 <video controls width="100%" height="auto" style="contain" alt="google-sheet-app">
   <source src="/static/toolpad/docs/examples/google-sheet.mp4" type="video/mp4">
@@ -59,4 +59,6 @@ export async function fetchSheet(spreadsheetId: string, range: string) {
 
 Create a corresponding `fetchList` query. When you'll run the above function, you should be able to see data in your Toolpad app. You can bind it to a datagrid in your application.
 
-**Note**: The process remains the same if you want to connect to any other Google service such as Docs, Analytics, Youtube API, etc.
+:::info
+The process remains the same if you want to connect to any other Google service such as Docs, Analytics, Youtube API etc.
+:::

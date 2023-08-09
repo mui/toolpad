@@ -34,6 +34,7 @@ jobs:
       - run: yarn test:integration --grep backend-basic --project chromium
 
       - uses: actions/upload-artifact@v3
+        if: always()
         with:
           name: test-results
           path: test-results

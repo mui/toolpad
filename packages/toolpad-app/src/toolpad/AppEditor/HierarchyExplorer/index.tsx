@@ -230,7 +230,7 @@ export default function HierarchyExplorer({ className }: HierarchyExplorerProps)
     <HierarchyExplorerRoot
       sx={{
         height: '100%',
-        overflowY: 'auto',
+        overflow: 'auto',
       }}
       data-testid="hierarchy-explorer"
       className={className}

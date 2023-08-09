@@ -31,7 +31,11 @@ jobs:
       - run: yarn install
       - run: yarn release:build
       - run: npx playwright install
-      - run: yarn test:integration --grep backend-basic --project chromium
+
+      - name: Run tests
+        run: yarn test:integration --grep backend-basic --project chromium
+        env:
+          TOOLPAD_TEST_RETRIES: 1
 
       - uses: actions/upload-artifact@v3
         if: always()

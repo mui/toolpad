@@ -139,7 +139,7 @@ spec:
                 `Total downloads: ${totalRange.data.downloads}`
             variant: body1
     - component: PageRow
-      name: pageRow7
+      name: pageRow2
       children:
         - component: Chart
           name: downloadsChart

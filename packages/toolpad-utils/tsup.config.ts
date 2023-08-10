@@ -1,8 +1,8 @@
-import { defineConfig } from 'tsup';
 import * as fs from 'fs/promises';
 import path from 'path';
-import type * as esbuild from 'esbuild';
 import { spawnSync } from 'child_process';
+import type * as esbuild from 'esbuild';
+import { defineConfig } from 'tsup';
 
 function cleanFolderOnFailure(folder: string): esbuild.Plugin {
   return {

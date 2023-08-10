@@ -68,19 +68,9 @@
       ]
     },
     {
-      "groupName": "react-router",
-      "matchPackageNames": ["react-router", "react-router-dom"],
-      "allowedVersions": "< 6.4.0"
-    },
-    {
       "groupName": "core-js",
       "matchPackageNames": ["core-js"],
       "allowedVersions": "< 2.0.0"
-    },
-    {
-      "groupName": "marked",
-      "matchPackageNames": ["marked"],
-      "description": "marked requires node.js >18, but we're not ready yet to move CI away from 16"
     },
     {
       "groupName": "prettier",
@@ -94,6 +84,11 @@
     {
       "groupName": "GitHub Actions",
       "matchManagers": ["github-actions"]
+    },
+    {
+      "groupName": "monaco-editor",
+      "matchPackageNames": ["monaco-editor"],
+      "description": "We're having trouble upgading monaco-editor to >0.40."
     },
     {
       "groupName": "Update @mui/toolpad in examples",

@@ -227,7 +227,14 @@ export default function HierarchyExplorer({ className }: HierarchyExplorerProps)
   );
 
   return (
-    <HierarchyExplorerRoot data-testid="hierarchy-explorer" className={className}>
+    <HierarchyExplorerRoot
+      sx={{
+        height: '100%',
+        overflow: 'auto',
+      }}
+      data-testid="hierarchy-explorer"
+      className={className}
+    >
       <TreeView
         aria-label="hierarchy explorer"
         selected={activeNode ? [activeNode] : []}

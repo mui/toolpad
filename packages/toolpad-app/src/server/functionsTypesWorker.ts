@@ -1,5 +1,5 @@
-import invariant from 'invariant';
 import * as path from 'path';
+import invariant from 'invariant';
 import * as ts from 'typescript';
 import { glob } from 'glob';
 import chalk from 'chalk';

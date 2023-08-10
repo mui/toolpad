@@ -1,15 +1,17 @@
 import * as path from 'path';
 import * as fs from 'fs/promises';
 import childProcess from 'child_process';
-import { once } from 'events';
-import invariant from 'invariant';
-import * as archiver from 'archiver';
 import { createWriteStream } from 'fs';
 import { pipeline } from 'stream/promises';
 import { Readable } from 'stream';
+import { once } from 'events';
+import invariant from 'invariant';
+import * as archiver from 'archiver';
 import getPort from 'get-port';
 import { PageScreenshotOptions, test as base } from './test';
 import { waitForMatch } from '../utils/streams';
+
+const CLI_CMD = path.resolve(__dirname, '../../packages/toolpad-app/cli.js');
 
 const PROJECT_ROOT = path.resolve(__dirname, '../../');
 
@@ -67,7 +69,7 @@ export async function withApp(
       await setup({ dir: projectDir });
     }
 
-    const args: string[] = [cmd];
+    const args: string[] = [CLI_CMD, cmd];
     if (options.toolpadDev) {
       args.push('--dev');
     }
@@ -76,9 +78,9 @@ export async function withApp(
     args.push('--port', String(await getPort()));
 
     if (cmd === 'start') {
-      const buildArgs = ['build'];
+      const buildArgs = [CLI_CMD, 'build'];
 
-      const child = childProcess.spawn('toolpad', buildArgs, {
+      const child = childProcess.spawn('node', buildArgs, {
         cwd: projectDir,
         stdio: 'pipe',
         shell: !process.env.CI,
@@ -100,7 +102,7 @@ export async function withApp(
       }
     }
 
-    const child = childProcess.spawn('toolpad', args, {
+    const child = childProcess.spawn('node', args, {
       cwd: projectDir,
       stdio: 'pipe',
       shell: !process.env.CI,
@@ -137,7 +139,7 @@ export async function withApp(
       child.kill();
     }
   } finally {
-    await fs.rm(tmpTestDir, { recursive: true });
+    await fs.rm(tmpTestDir, { recursive: true, maxRetries: 3, retryDelay: 1000 });
   }
 }
 
@@ -168,7 +170,7 @@ const test = base.extend<
         await use(app);
       });
     },
-    { scope: 'worker' },
+    { scope: 'worker', timeout: 60000 },
   ],
   baseURL: async ({ localApp }, use) => {
     await use(localApp.url);

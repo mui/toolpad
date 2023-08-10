@@ -1,0 +1,124 @@
+apiVersion: v1
+kind: page
+spec:
+  id: WduAwgm
+  title: Default page
+  content:
+    - component: PageRow
+      name: pageRow
+      children:
+        - component: PageColumn
+          name: pageColumn
+          layout:
+            columnSize: 1
+          children:
+            - component: PageRow
+              name: pageRow1
+              props:
+                justifyContent: start
+              children:
+                - component: PageColumn
+                  name: pageColumn1
+                  layout:
+                    columnSize: 1
+                  children:
+                    - component: Text
+                      name: text1
+                      props:
+                        value: Enter org
+                    - component: Text
+                      name: text
+                      layout:
+                        columnSize: 1
+                      props:
+                        value: Enter repository
+                - component: PageColumn
+                  name: pageColumn2
+                  layout:
+                    columnSize: 1
+                  children:
+                    - component: TextField
+                      name: org
+                      props:
+                        defaultValue: mui
+                    - component: TextField
+                      name: repo
+                      layout:
+                        columnSize: 1
+                        horizontalAlign: start
+                        verticalAlign: center
+                      props:
+                        defaultValue: mui-toolpad
+        - component: Metric
+          name: metric1
+          layout:
+            columnSize: 1
+          props:
+            value:
+              $$jsExpression: |
+                queryStargazers.data.repository.stargazerCount
+            label: Stargazers Count
+            fullWidth: true
+    - component: PageRow
+      name: pageRow3
+      children:
+        - component: Text
+          name: text2
+          props:
+            value: ⭐️ ⭐️ ⭐️ Most recent 100 Stargazers ⭐️ ⭐️ ⭐️
+            variant: h6
+          layout:
+            horizontalAlign: center
+            verticalAlign: center
+    - component: PageRow
+      name: pageRow2
+      children:
+        - component: DataGrid
+          name: dataGrid
+          props:
+            rows:
+              $$jsExpression: |
+                queryStargazers.data.repository.stargazers.nodes
+            columns:
+              - field: login
+                type: string
+                width: 110
+              - field: name
+                type: string
+              - field: email
+                type: string
+                width: 66
+              - field: location
+                type: json
+              - field: company
+                type: json
+                width: 121
+              - field: isGitHubStar
+                type: boolean
+              - field: updatedAt
+                type: string
+                width: 117
+              - field: createdAt
+                type: string
+                width: 130
+              - field: bio
+                type: string
+                width: 98
+              - field: followers
+                type: json
+                width: 148
+            height: 572
+  queries:
+    - name: queryStargazers
+      query:
+        function: function.ts#queryStargazers
+        kind: local
+      parameters:
+        - name: owner
+          value:
+            $$jsExpression: |
+              org.value
+        - name: repository
+          value:
+            $$jsExpression: |
+              repo.value

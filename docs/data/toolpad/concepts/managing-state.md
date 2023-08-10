@@ -1,6 +1,6 @@
 # Managing State
 
-<p class="description">You can use bindings to make your components reactive to data on the page</p>
+<p class="description">You can use bindings to make your components reactive to data on the page.</p>
 
 ## Binding
 

@@ -1,6 +1,6 @@
 # Overview
 
-<p class="description">A general, high-level description of Toolpad and its capabilites</p>
+<p class="description">A general, high-level description of Toolpad and its capabilites.</p>
 
 ## Introduction
 

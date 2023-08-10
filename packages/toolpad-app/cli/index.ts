@@ -21,7 +21,7 @@ async function runCommand(cmd: 'dev' | 'start', { dir, ...args }: Omit<RunOption
     cmd,
   });
 
-  process.on('SIGINT', () => {
+  process.once('SIGINT', () => {
     app.dispose().then(() => {
       process.exit(0);
     });

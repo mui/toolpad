@@ -9,6 +9,7 @@ import { ThemeProvider } from '../ThemeContext';
 
 const Centered = styled('div')({
   height: '100%',
+  width: '100%',
   display: 'flex',
   justifyContent: 'center',
   alignItems: 'center',
@@ -28,8 +29,8 @@ interface FullPageErrorProps {
 
 function FullPageError({ error }: FullPageErrorProps) {
   return (
-    <Centered>
-      <ErrorAlert error={error} />
+    <Centered sx={{ p: 4 }}>
+      <ErrorAlert sx={{ width: '100%' }} error={error} />
     </Centered>
   );
 }

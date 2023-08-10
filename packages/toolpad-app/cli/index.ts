@@ -22,7 +22,7 @@ async function runCommand(cmd: 'dev' | 'start', { dir, ...args }: Omit<RunOption
   });
 
   process.on('SIGINT', () => {
-    app.dispose().finally(() => {
+    app.dispose().then(() => {
       process.exit(0);
     });
   });

@@ -1,5 +1,43 @@
 # Changelog
 
+## 0.1.23
+
+<!-- generated comparing v0.1.22..master -->
+
+_Aug 10, 2023_
+
+A big thanks to the 8 contributors who made this release possible. Here are some highlights ✨:
+
+Chart component improvements, add scrolling to pages in app sidebar, Windows fixes, UI fixes, test and app cleanup improvements.
+
+- &#8203;<!-- 25 -->Fix cycle of SIGINT disposal event (#2472) @apedroferreira
+- &#8203;<!-- 24 -->Clean up env watcher and build contexts on process exit (#2461) @Janpot
+- &#8203;<!-- 23 -->Fix full page error overflow (#2460) @Janpot
+- &#8203;<!-- 22 -->Fix app not starting in Windows (10) (#2442) @apedroferreira
+- &#8203;<!-- 21 -->Remove ses (#2462) @Janpot
+- &#8203;<!-- 20 -->Chart improvements from npm stats example update (#2400) @apedroferreira
+- &#8203;<!-- 19 -->add scroll (#2459) @JerryWu1234
+- &#8203;<!-- 18 -->Bring back grid remount to update columns (#2450) @Janpot
+- &#8203;<!-- 17 -->Gracefully shut down Toolpad editor (#2443) @Janpot
+- &#8203;<!-- 16 -->Fix new components not showing up when component folder doesn't exist (#2454) @Janpot
+- &#8203;<!-- 15 -->Improve undo/redo test flakyness (#2455) @Janpot
+- &#8203;<!-- 14 -->Improve setup time of tests (#2452) @Janpot
+- &#8203;<!-- 13 -->Improve prisma example (#2441) @prakhargupta1
+- &#8203;<!-- 12 -->Update ensure triage label workflow (#2444) @DanailH
+- &#8203;<!-- 11 -->Remove some Next.js leftovers around monaco-editor (#2437) @Janpot
+- &#8203;<!-- 10 -->Improve rest test flakyness (#2438) @Janpot
+- &#8203;<!-- 09 -->Remove logging of RPC errors (#2410) @Janpot
+- &#8203;<!-- 08 -->Scope MUI X license to builtin components only (#2427) @Janpot
+- &#8203;<!-- 07 -->Clean up worker communication with devserver (#2418) @Janpot
+- &#8203;<!-- 06 -->Add note about why we need usePolling (#2426) @Janpot
+- &#8203;<!-- 05 -->Adjust timeout and import node-fetch in create-toolpad-app test (#2414) (#2419) @Kirera-Wainaina
+- &#8203;<!-- 04 -->Increase localApp fixture timeout (#2416) @Janpot
+- &#8203;<!-- 03 -->[docs] Follow Docs-infra default design (#2458) @oliviertassinari
+- &#8203;<!-- 02 -->[docs] Improve deployment instructions (#2440) @bharatkashyap
+- &#8203;<!-- 01 -->[docs] Fix 404s (#2424) @bharatkashyap
+
+All contributors of this release in alphabetical order: @apedroferreira, @bharatkashyap, @DanailH, @Janpot, @JerryWu1234, @Kirera-Wainaina, @oliviertassinari, @prakhargupta1
+
 ## 0.1.22
 
 <!-- generated comparing v0.1.21..master -->

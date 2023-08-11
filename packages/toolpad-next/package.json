@@ -1,6 +1,6 @@
 {
   "name": "@mui/toolpad-next",
-  "version": "0.1.22",
+  "version": "0.1.23",
   "license": "MIT",
   "bin": {
     "toolpad-next": "./cli.js"
@@ -40,8 +40,8 @@
   },
   "dependencies": {
     "@mui/icons-material": "5.14.3",
-    "@mui/lab": "5.0.0-alpha.138",
-    "@mui/toolpad-utils": "0.1.22",
+    "@mui/lab": "5.0.0-alpha.139",
+    "@mui/toolpad-utils": "0.1.23",
     "chokidar": "3.5.3",
     "dotenv": "16.3.1",
     "esbuild": "0.18.16",
@@ -62,8 +62,8 @@
   "peerDependencies": {
     "@emotion/react": "^11.9.0",
     "@emotion/styled": "^11.8.1",
-    "@mui/material": "^5.4.1",
-    "@mui/system": "^5.4.1",
+    "@mui/material": "^5.4.4",
+    "@mui/system": "^5.4.4",
     "react": "^17.0.0 || ^18.0.0",
     "react-dom": "^17.0.0 || ^18.0.0"
   },

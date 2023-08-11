@@ -7,6 +7,13 @@ interface PageTitleEditorProps {
   node: PageNode;
 }
 
+function validateInput(input: string) {
+  if (!input) {
+    return 'Input required';
+  }
+  return null;
+}
+
 export default function PageTitleEditor({ node }: PageTitleEditorProps) {
   const domApi = useDomApi();
   const [pageTitleInput, setPageTitleInput] = React.useState(node.attributes.title);
@@ -30,13 +37,6 @@ export default function PageTitleEditor({ node }: PageTitleEditorProps) {
     },
     [handleCommit],
   );
-
-  const validateInput = (input: string) => {
-    if (!input) {
-      return 'Input required';
-    }
-    return null;
-  };
 
   return (
     <TextField

@@ -1,6 +1,6 @@
 # Create a number component
 
-<p class="description">You can extend Toolpad with custom code components </p>
+<p class="description">You can extend Toolpad with custom code components.</p>
 
 We can create a custom component to display a large number value along with a smaller label, like so:
 

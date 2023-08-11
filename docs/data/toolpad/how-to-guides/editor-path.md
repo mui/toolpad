@@ -1,6 +1,6 @@
 # Troubleshoot missing editor
 
-<p class="description">How to troubleshoot a missing editor error on Toolpad</p>
+<p class="description">How to troubleshoot a missing editor error on Toolpad.</p>
 
 ## When using Visual Studio Code
 

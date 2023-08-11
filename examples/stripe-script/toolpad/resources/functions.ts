@@ -1,7 +1,7 @@
 import fs from 'fs';
 import { exec } from 'child_process';
-import Stripe from 'stripe';
 import path from 'path';
+import Stripe from 'stripe';
 
 const initStripe = () => {
   if (!process.env.STRIPE_TOKEN) {
@@ -22,6 +22,7 @@ export async function listInvoices(limit: number = 100, starting_after?: string)
     limit,
     starting_after,
   });
+
   return JSON.stringify(list.data);
 }
 
@@ -29,8 +30,8 @@ export async function downloadPDFs(limit: number = 100, starting_after?: string)
   const stripe = initStripe();
 
   const list = await stripe.invoices.list({
-    starting_after,
     limit,
+    starting_after,
   });
 
   list.data?.forEach((invoice) => {

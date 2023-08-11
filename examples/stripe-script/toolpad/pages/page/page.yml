@@ -191,7 +191,7 @@ spec:
         kind: local
       parameters:
         - name: limit
-          value: 1
+          value: 10
     - name: listInvoices
       query:
         function: functions.ts#listInvoices

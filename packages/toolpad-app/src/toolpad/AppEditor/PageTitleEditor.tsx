@@ -1,8 +1,7 @@
 import { TextField } from '@mui/material';
 import * as React from 'react';
-import { AppDom, PageNode } from '../../appDom';
+import { AppDom, PageNode, setNodeNamespacedProp } from '../../appDom';
 import { useDomApi } from '../AppState';
-import { update } from '../../utils/immutability';
 
 interface PageTitleEditorProps {
   node: PageNode;
@@ -11,7 +10,6 @@ interface PageTitleEditorProps {
 export default function PageTitleEditor({ node }: PageTitleEditorProps) {
   const domApi = useDomApi();
   const [pageTitleInput, setPageTitleInput] = React.useState(node.attributes.title);
-  const [isValid, setIsValid] = React.useState(true);
 
   const handlePageTitleChange = React.useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => setPageTitleInput(event.target.value),
@@ -19,20 +17,10 @@ export default function PageTitleEditor({ node }: PageTitleEditorProps) {
   );
 
   const handleCommit = React.useCallback(() => {
-    if (!isValid) {
-      return;
-    }
-    domApi.update((appDom: AppDom) => {
-      return update(appDom, {
-        nodes: update(appDom.nodes, {
-          [node.id]: {
-            ...node,
-            attributes: { ...node.attributes, title: pageTitleInput },
-          },
-        }),
-      });
-    });
-  }, [domApi, node, pageTitleInput, isValid]);
+    domApi.update((appDom: AppDom) =>
+      setNodeNamespacedProp(appDom, node, 'attributes', 'title', pageTitleInput),
+    );
+  }, [node, pageTitleInput, domApi]);
 
   const handleKeyPress = React.useCallback(
     (event: React.KeyboardEvent<HTMLDivElement>) => {
@@ -43,13 +31,12 @@ export default function PageTitleEditor({ node }: PageTitleEditorProps) {
     [handleCommit],
   );
 
-  React.useEffect(() => {
-    if (!pageTitleInput) {
-      setIsValid(false);
-      return;
+  const validateInput = (input: string) => {
+    if (!input) {
+      return 'Input required';
     }
-    setIsValid(true);
-  }, [pageTitleInput]);
+    return null;
+  };
 
   return (
     <TextField
@@ -59,8 +46,8 @@ export default function PageTitleEditor({ node }: PageTitleEditorProps) {
       onChange={handlePageTitleChange}
       onBlur={handleCommit}
       onKeyDown={handleKeyPress}
-      error={!isValid}
-      helperText={!isValid && 'Title cannot be empty'}
+      error={!pageTitleInput}
+      helperText={validateInput(pageTitleInput)}
     />
   );
 }

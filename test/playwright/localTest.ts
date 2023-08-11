@@ -11,6 +11,8 @@ import getPort from 'get-port';
 import { PageScreenshotOptions, test as base } from './test';
 import { waitForMatch } from '../utils/streams';
 
+const CLI_CMD = path.resolve(__dirname, '../../packages/toolpad-app/cli.js');
+
 const PROJECT_ROOT = path.resolve(__dirname, '../../');
 
 // https://github.com/mui/material-ui/blob/bc35128302b5bd61fa35f89d371aeed91e6a5748/scripts/pushArgos.mjs#L7
@@ -67,7 +69,7 @@ export async function withApp(
       await setup({ dir: projectDir });
     }
 
-    const args: string[] = [cmd];
+    const args: string[] = [CLI_CMD, cmd];
     if (options.toolpadDev) {
       args.push('--dev');
     }
@@ -76,9 +78,9 @@ export async function withApp(
     args.push('--port', String(await getPort()));
 
     if (cmd === 'start') {
-      const buildArgs = ['build'];
+      const buildArgs = [CLI_CMD, 'build'];
 
-      const child = childProcess.spawn('toolpad', buildArgs, {
+      const child = childProcess.spawn('node', buildArgs, {
         cwd: projectDir,
         stdio: 'pipe',
         shell: !process.env.CI,
@@ -100,7 +102,7 @@ export async function withApp(
       }
     }
 
-    const child = childProcess.spawn('toolpad', args, {
+    const child = childProcess.spawn('node', args, {
       cwd: projectDir,
       stdio: 'pipe',
       shell: !process.env.CI,
@@ -168,7 +170,7 @@ const test = base.extend<
         await use(app);
       });
     },
-    { scope: 'worker' },
+    { scope: 'worker', timeout: 60000 },
   ],
   baseURL: async ({ localApp }, use) => {
     await use(localApp.url);

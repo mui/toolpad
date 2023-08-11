@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Alert, AlertTitle, IconButton, Collapse, Box } from '@mui/material';
+import { Alert, AlertTitle, IconButton, Collapse, Box, SxProps } from '@mui/material';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { indent } from '@mui/toolpad-utils/strings';
@@ -7,6 +7,7 @@ import Pre from '../../../components/Pre';
 
 export interface ErrorAlertProps {
   error: unknown;
+  sx?: SxProps;
 }
 
 function formatStack(maybeError: unknown): string | null {
@@ -27,7 +28,7 @@ function formatStack(maybeError: unknown): string | null {
   return thisStack || causeStack ? [thisStack, causeStack].filter(Boolean).join('\n') : null;
 }
 
-export default function ErrorAlert({ error }: ErrorAlertProps) {
+export default function ErrorAlert({ error, sx }: ErrorAlertProps) {
   const message: string =
     typeof (error as any)?.message === 'string' ? (error as any).message : String(error);
   const stack: string | null = formatStack(error);
@@ -36,7 +37,7 @@ export default function ErrorAlert({ error }: ErrorAlertProps) {
   const toggleExpanded = React.useCallback(() => setExpanded((actual) => !actual), []);
 
   return (
-    <Alert severity="error" sx={{ position: 'relative', m: 1 }}>
+    <Alert severity="error" sx={{ ...sx, position: 'relative' }}>
       {stack ? (
         <IconButton
           color="inherit"

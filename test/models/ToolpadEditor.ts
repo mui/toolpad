@@ -147,7 +147,11 @@ export class ToolpadEditor {
     return this.page.getByTestId('component-catalog').getByRole('button', { name });
   }
 
-  async dragNewComponentTo(componentName: string, moveTargetX?: number, moveTargetY?: number) {
+  async dragNewComponentToCanvas(
+    componentName: string,
+    moveTargetX?: number,
+    moveTargetY?: number,
+  ) {
     const style = await this.page.addStyleTag({ content: `* { transition: none !important; }` });
 
     await this.componentCatalog.hover();

@@ -47,7 +47,7 @@ async function createDevHandler(
   project: ToolpadProject,
   { base, runtimeConfig }: CreateDevHandlerParams,
 ) {
-  const router = express.Router();
+  const handler = express.Router();
 
   const appServerPath = path.resolve(__dirname, './appServer.js');
   const devPort = await getPort();
@@ -86,8 +86,8 @@ async function createDevHandler(
     worker.postMessage({ kind: 'reload-components' } satisfies AppDevServerCommand);
   });
 
-  router.use('/api/data', project.dataManager.createDataHandler(project));
-  router.use(
+  handler.use('/api/data', project.dataManager.createDataHandler(project));
+  handler.use(
     (req, res, next) => {
       // Stall the request until the dev server is ready
       readyPromise.then(next, next);
@@ -102,7 +102,12 @@ async function createDevHandler(
     }),
   );
 
-  return router;
+  return {
+    handler,
+    async dispose() {
+      worker.postMessage({ kind: 'exit' } satisfies AppDevServerCommand);
+    },
+  };
 }
 
 interface HealthCheck {
@@ -110,6 +115,11 @@ interface HealthCheck {
   circleBuildNum: string | null;
   memoryUsage: NodeJS.MemoryUsage;
   memoryUsagePretty: Record<keyof NodeJS.MemoryUsage, string>;
+}
+
+interface AppHandler {
+  handler: express.Handler;
+  dispose?: () => Promise<void>;
 }
 
 export interface ServerConfig {
@@ -120,24 +130,23 @@ export interface ServerConfig {
   port: number;
   devMode: boolean;
   externalUrl: string;
+  project: ToolpadProject;
 }
 
-async function main({
+async function startServer({
   cmd,
   gitSha1,
   circleBuildNum,
-  projectDir,
   port,
   devMode,
   externalUrl,
+  project,
 }: ServerConfig) {
   const runtimeConfig: RuntimeConfig = {
     cmd,
-    projectDir,
+    projectDir: project.getRoot(),
     externalUrl,
   };
-
-  const project = await initProject(cmd, projectDir);
 
   await project.start();
 
@@ -172,19 +181,21 @@ async function main({
   const publicPath = path.resolve(__dirname, '../../public');
   app.use(express.static(publicPath, { index: false }));
 
+  let appHandler: AppHandler | undefined;
+
   switch (cmd) {
     case 'dev': {
       const previewBase = '/preview';
-      const devHandler = await createDevHandler(project, {
+      appHandler = await createDevHandler(project, {
         runtimeConfig,
         base: previewBase,
       });
-      app.use(previewBase, devHandler);
+      app.use(previewBase, appHandler.handler);
       break;
     }
     case 'start': {
-      const prodHandler = await createProdHandler(project);
-      app.use('/prod', prodHandler);
+      appHandler = await createProdHandler(project);
+      app.use('/prod', appHandler.handler);
       break;
     }
     default:
@@ -268,7 +279,12 @@ async function main({
     }
   });
 
-  return runningServer.port;
+  return {
+    port: runningServer.port,
+    async dispose() {
+      await Promise.allSettled([runningServer.close(), appHandler?.dispose?.()]);
+    },
+  };
 }
 
 export type Command = 'dev' | 'start' | 'build';
@@ -277,6 +293,10 @@ export interface RunAppOptions {
   port?: number;
   dev?: boolean;
   projectDir: string;
+}
+
+export interface RunAppResult {
+  dispose(): Promise<void>;
 }
 
 export async function runApp({ cmd, port, dev = false, projectDir }: RunAppOptions) {
@@ -300,8 +320,11 @@ export async function runApp({ cmd, port, dev = false, projectDir }: RunAppOptio
 
   const externalUrl = process.env.TOOLPAD_EXTERNAL_URL || `http://localhost:${port}`;
 
-  const serverPort = await main({
+  const project = await initProject(cmd, projectDir);
+
+  const server = await startServer({
     cmd,
+    project,
     gitSha1: process.env.GIT_SHA1 || null,
     circleBuildNum: process.env.CIRCLE_BUILD_NUM || null,
     projectDir,
@@ -310,7 +333,7 @@ export async function runApp({ cmd, port, dev = false, projectDir }: RunAppOptio
     externalUrl,
   });
 
-  const toolpadBaseUrl = `http://localhost:${serverPort}/`;
+  const toolpadBaseUrl = `http://localhost:${server.port}/`;
 
   // eslint-disable-next-line no-console
   console.log(
@@ -326,4 +349,10 @@ export async function runApp({ cmd, port, dev = false, projectDir }: RunAppOptio
       console.error(`${chalk.red('error')} - Failed to open browser: ${err.message}`);
     }
   }
+
+  return {
+    async dispose() {
+      await Promise.allSettled([project.dispose(), server.dispose()]);
+    },
+  };
 }

@@ -1,6 +1,6 @@
 # Embed a Toolpad page
 
-<p class="description">Toolpad pages can be embedded anywhere you want to use them</p>
+<p class="description">Toolpad pages can be embedded anywhere you want to use them.</p>
 
 ## Using an `iframe`
 
@@ -11,7 +11,7 @@
 2. Deploy the Toolpad application
 
    :::info
-   See the tutorial on [deploying to Render](/toolpad/tutorials/render-deploy/) for more details
+   See the tutorial on [deploying to Render](/toolpad/how-to-guides/render-deploy/) for more details
    :::
 
 3. Use an `iframe` with `src` set to the URL of the page you wish to embed. For example,

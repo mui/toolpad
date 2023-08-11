@@ -1,16 +1,9 @@
 import type { MuiPage } from '@mui/monorepo/docs/src/MuiPage';
-import BuildIcon from '@mui/icons-material/Build';
-import CodeIcon from '@mui/icons-material/Code';
-import DescriptionIcon from '@mui/icons-material/Description';
-import SchoolIcon from '@mui/icons-material/School';
-import VisibilityIcon from '@mui/icons-material/Visibility';
-import FormatShapesIcon from '@mui/icons-material/FormatShapes';
 import componentsManifest from './toolpad/reference/components/manifest.json';
 
 const pages: MuiPage[] = [
   {
     pathname: '/toolpad/getting-started',
-    icon: DescriptionIcon,
     children: [
       { pathname: '/toolpad/getting-started/overview' },
       { pathname: '/toolpad/getting-started/installation' },
@@ -28,14 +21,13 @@ const pages: MuiPage[] = [
   },
   {
     pathname: '/toolpad/concepts',
-    icon: VisibilityIcon,
     children: [
       {
         pathname: '/toolpad/concepts/building-ui',
         title: 'Building UI',
       },
       {
-        pathname: '/toolpad/concepts/connecting-to-data',
+        pathname: '/toolpad/concepts/queries-',
         title: 'Queries',
         children: [
           {
@@ -73,11 +65,10 @@ const pages: MuiPage[] = [
   {
     pathname: '/toolpad/how-to-guides',
     title: 'How-to guides',
-    icon: BuildIcon,
     children: [
       {
         pathname: '/toolpad/how-to-guides/connect-to-datasource',
-        title: 'Connect to datasource',
+        subheader: 'Connect to datasource',
         children: [
           {
             pathname: '/toolpad/how-to-guides/connect-to-databases',
@@ -85,13 +76,23 @@ const pages: MuiPage[] = [
           },
           {
             pathname: '/toolpad/how-to-guides/connect-to-googlesheets',
-            title: 'Google sheets',
+            title: 'Google Sheets',
+          },
+        ],
+      },
+      {
+        pathname: '/toolpad/how-to-guides/deployment',
+        subheader: 'Deployment',
+        children: [
+          {
+            pathname: '/toolpad/how-to-guides/render-deploy',
+            title: 'Deploy your app to Render',
           },
         ],
       },
       {
         pathname: '/toolpad/how-to-guides/custom-components',
-        title: 'Create custom components',
+        subheader: 'Create custom components',
         children: [
           {
             pathname: '/toolpad/how-to-guides/number-display',
@@ -127,20 +128,8 @@ const pages: MuiPage[] = [
     ],
   },
   {
-    pathname: '/toolpad/tutorials',
-    title: 'Tutorials',
-    icon: SchoolIcon,
-    children: [
-      {
-        pathname: '/toolpad/tutorials/render-deploy',
-        title: 'Deploy your app to Render',
-      },
-    ],
-  },
-  {
     pathname: '/toolpad/reference-group',
     title: 'Reference',
-    icon: CodeIcon,
     children: [
       {
         pathname: '/toolpad/reference/file-schema',
@@ -180,7 +169,6 @@ const pages: MuiPage[] = [
   {
     pathname: '/toolpad/live-config',
     title: 'Live config',
-    icon: FormatShapesIcon,
   },
 ];
 

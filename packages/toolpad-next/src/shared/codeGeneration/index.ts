@@ -19,11 +19,11 @@ export type BaseGenerateComponentOptions =
     }
   | {
       target: 'dev';
-      wsUrl: string;
     };
 
 export type GenerateComponentOptions = BaseGenerateComponentOptions & {
   outDir: string;
+  wsUrl?: string;
 };
 
 export async function generateComponent(

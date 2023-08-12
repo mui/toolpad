@@ -1,68 +1,67 @@
 import * as React from 'react';
 import invariant from 'invariant';
-import { DevRpcMethods } from '../shared/types';
+import { Emitter } from '@mui/toolpad-utils/events';
+import { Backend, ConnectionStatus, DevRpcMethods } from '../shared/types';
 import RpcClient from '../shared/RpcClient';
 import { ToolpadFile } from '../shared/schemas';
 
-export type ConnectionStatus = 'connecting' | 'connected' | 'disconnected';
+export class CliBackend extends Emitter<{ connectionStatusChange: null }> implements Backend {
+  private ws: WebSocket;
 
-type ServerContextValue = {
-  connectionStatus: ConnectionStatus;
-  saveFile: (name: string, file: ToolpadFile) => Promise<void>;
-};
+  private rpcClient: RpcClient<DevRpcMethods>;
 
-export const ServerContext = React.createContext<{
-  connectionStatus: ConnectionStatus;
-  saveFile: (name: string, file: ToolpadFile) => Promise<void>;
-} | null>(null);
+  private connectionStatus: ConnectionStatus = 'connecting';
 
-interface ServerProviderProps {
-  wsUrl: string;
+  constructor(wsUrl: string) {
+    super();
+    this.ws = new WebSocket(wsUrl);
+
+    this.ws.addEventListener('open', () => {
+      this.connectionStatus = 'connected';
+      this.emit('connectionStatusChange', null);
+    });
+    this.ws.addEventListener('close', () => {
+      this.connectionStatus = 'disconnected';
+      this.emit('connectionStatusChange', null);
+    });
+
+    this.rpcClient = new RpcClient<DevRpcMethods>(this.ws);
+  }
+
+  getConnectionStatus() {
+    return this.connectionStatus;
+  }
+
+  async saveFile(name: string, file: ToolpadFile) {
+    return this.rpcClient.call('saveFile', [name, file]);
+  }
+}
+
+export class NoopBackend extends Emitter<{ connectionStatusChange: null }> implements Backend {
+  // eslint-disable-next-line class-methods-use-this
+  getConnectionStatus(): ConnectionStatus {
+    return 'connected';
+  }
+
+  // eslint-disable-next-line class-methods-use-this
+  async saveFile() {
+    throw new Error('Not implemented');
+  }
+}
+
+export const BackendContext = React.createContext<Backend | null>(null);
+
+export interface ServerProviderProps {
+  backend: Backend;
   children?: React.ReactNode;
 }
 
-export function ServerProvider({ wsUrl, children }: ServerProviderProps) {
-  const [client, setClient] = React.useState<RpcClient<DevRpcMethods> | null>(null);
-  const [connectionStatus, setConnectionStatus] = React.useState<ConnectionStatus>('connecting');
-
-  React.useEffect(() => {
-    const ws = new WebSocket(wsUrl);
-    setClient(new RpcClient<DevRpcMethods>(ws));
-
-    const handleOpen = () => {
-      setConnectionStatus('connected');
-    };
-
-    const handleClose = () => {
-      setConnectionStatus('disconnected');
-    };
-
-    ws.addEventListener('open', handleOpen);
-
-    ws.addEventListener('close', handleClose);
-
-    return () => {
-      ws.removeEventListener('open', handleOpen);
-      ws.removeEventListener('close', handleClose);
-      ws.close();
-    };
-  }, [wsUrl]);
-
-  const context: ServerContextValue = React.useMemo(() => {
-    return {
-      connectionStatus,
-      saveFile(name, file) {
-        invariant(client, 'client must be initialized');
-        return client.call('saveFile', [name, file]);
-      },
-    };
-  }, [client, connectionStatus]);
-
-  return <ServerContext.Provider value={context}>{children}</ServerContext.Provider>;
+export function BackendProvider({ backend, children }: ServerProviderProps) {
+  return <BackendContext.Provider value={backend}>{children}</BackendContext.Provider>;
 }
 
-export function useServer() {
-  const server = React.useContext(ServerContext);
-  invariant(server, 'useServer must be used inside a ServerProvider');
+export function useBacked() {
+  const server = React.useContext(BackendContext);
+  invariant(server, 'useBackend must be used inside a BackendProvider');
   return server;
 }

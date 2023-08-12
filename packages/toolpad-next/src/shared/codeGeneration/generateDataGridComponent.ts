@@ -203,8 +203,11 @@ export default async function generateDataGridComponent(
         ? `_runtime.withDevtool(${componentName}, ${serializeObject({
             filePath: JSON.stringify(filePath),
             file: JSON.stringify(file),
-            wsUrl: JSON.stringify(options.wsUrl),
+            wsUrl: JSON.stringify(options.wsUrl) || 'undefined',
             dependencies: imports.printDynamicImports(),
+            backend: options.wsUrl
+              ? `new _runtime.CliBackend(${JSON.stringify(options.wsUrl)})`
+              : 'new _runtime.NoopBackend()',
           } satisfies Record<keyof WithDevtoolParams, string>)})`
         : componentName
     };

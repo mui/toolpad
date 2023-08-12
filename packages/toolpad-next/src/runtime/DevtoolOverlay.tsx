@@ -13,7 +13,7 @@ import SaveIcon from '@mui/icons-material/Save';
 import { ToolpadFile } from '../shared/schemas';
 import DataGridFileEditor from './DataGridFileEditor';
 import theme from './theme';
-import { useServer } from './server';
+import { useBacked } from './server';
 import { CodeGenerationResult, generateComponent } from '../shared/codeGeneration';
 import DevtoolHost from './DevtoolHost';
 import { getComponentNameFromInputFile } from '../shared/paths';
@@ -47,6 +47,14 @@ function FileEditor({ commitButton, value, onChange, source }: FileEditorProps) 
   }
 }
 
+function useConnectionStatus() {
+  const backend = useBacked();
+  return React.useSyncExternalStore(
+    (cb) => backend.subscribe('connectionStatusChange', cb),
+    () => backend.getConnectionStatus(),
+  );
+}
+
 export interface DevtoolOverlayProps {
   filePath: string;
   value: ToolpadFile;
@@ -54,14 +62,12 @@ export interface DevtoolOverlayProps {
   onCommit: () => void;
   dependencies: readonly [string, () => Promise<unknown>][];
   onClose?: () => void;
-  onComponentUpdate?: (Component: React.ComponentType) => void;
 }
 
 export default function DevtoolOverlay({
   filePath,
   value,
   onChange,
-  onComponentUpdate,
   onClose,
   onCommit,
   dependencies,
@@ -69,7 +75,7 @@ export default function DevtoolOverlay({
   const rootRef = React.useRef<HTMLDivElement>(null);
   const name = getComponentNameFromInputFile(filePath);
 
-  const { connectionStatus } = useServer();
+  const connectionStatus = useConnectionStatus();
 
   const [source, setSource] = React.useState<CodeGenerationResult | undefined>(undefined);
 
@@ -83,7 +89,7 @@ export default function DevtoolOverlay({
         console.error(error);
         setSource(undefined);
       });
-  }, [value, filePath, dependencies, onComponentUpdate]);
+  }, [value, filePath, dependencies]);
 
   const commitButton = (
     <Tooltip title="Commit changes">

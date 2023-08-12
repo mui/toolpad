@@ -5,14 +5,17 @@ import EditIcon from '@mui/icons-material/Edit';
 import invariant from 'invariant';
 import { WithDevtoolParams } from '../shared/types';
 import DevtoolOverlay from './DevtoolOverlay';
-import { ServerProvider, useServer } from './server';
+import { BackendProvider, useBacked, CliBackend, NoopBackend } from './server';
 import { ComponentInfo, CurrentComponentContext } from './CurrentComponentContext';
 import * as probes from './probes';
 import { getComponentNameFromInputFile, getOutputPathForInputFile } from '../shared/paths';
 import { generateComponent } from '../shared/codeGeneration';
 import { evaluate } from './vm';
+import { ToolpadFile } from '../shared/schemas';
 
 export { probes };
+
+export { CliBackend, NoopBackend };
 
 function useCurrentlyEditedComponentId() {
   const [currentEditedComponentId, setCurrentlyEditedComponentId] = useStorageState(
@@ -48,7 +51,9 @@ export function EditButton(props: ButtonProps) {
       {...props}
       variant="contained"
       color="secondary"
-      onClick={() => setCurrentlyEditedComponentId(componentInfo.id)}
+      onClick={() => {
+        setCurrentlyEditedComponentId(componentInfo.id);
+      }}
       startIcon={<EditIcon />}
     >
       Edit
@@ -62,6 +67,54 @@ function DefaultComponent() {
       <EditButton />
     </Box>
   );
+}
+
+interface UseLiveComponentParams {
+  filePath: string;
+  file: ToolpadFile;
+  dependencies: readonly [string, () => Promise<unknown>][];
+  target: 'prod' | 'preview' | 'dev';
+}
+
+export function useLiveComponent<P>({
+  filePath,
+  file,
+  dependencies,
+  target,
+}: UseLiveComponentParams) {
+  const [Component, setComponent] = React.useState<React.ComponentType<P> | null>(null);
+
+  React.useEffect(() => {
+    const outDir = '/';
+    generateComponent(filePath, file, { target, outDir })
+      .then(async (result) => {
+        const resolvedDependencies = await Promise.all(
+          dependencies.map(
+            async ([k, v]) => [k, { exports: await v() }] satisfies [string, unknown],
+          ),
+        );
+
+        const outputPath = getOutputPathForInputFile(filePath, outDir);
+
+        const moduleExports = await evaluate(
+          new Map(result.files),
+          outputPath,
+          new Map(resolvedDependencies),
+        );
+
+        const NewComponent = (moduleExports as any)?.default as React.ComponentType<P>;
+        invariant(
+          typeof NewComponent === 'function',
+          `Compilation must result in a function as default export`,
+        );
+        setComponent(() => NewComponent);
+      })
+      .catch((error) => {
+        console.error(error);
+      });
+  }, [filePath, dependencies, file, target]);
+
+  return { Component };
 }
 
 interface EditableComponentProps<P> {
@@ -85,45 +138,16 @@ export function EditableComponent<P extends object>({
   const [fileInput, setFileInput] = React.useState(file);
   React.useEffect(() => setFileInput(file), [file]);
 
-  const [RenderedComponent, setRenderedComponent] = React.useState<React.ComponentType<P>>(
-    () => InitialComponent,
-  );
+  const { Component: LiveComponent } = useLiveComponent<P>({
+    target: 'preview',
+    filePath,
+    file: fileInput,
+    dependencies,
+  });
 
-  const handleComponentUpdate = React.useCallback((NewComponent: React.ComponentType<any>) => {
-    setRenderedComponent(() => NewComponent);
-  }, []);
+  const RenderedComponent = LiveComponent || InitialComponent;
 
-  React.useEffect(() => {
-    const outDir = '/';
-    generateComponent(filePath, fileInput, { target: 'preview', outDir })
-      .then(async (result) => {
-        const resolvedDependencies = await Promise.all(
-          dependencies.map(
-            async ([k, v]) => [k, { exports: await v() }] satisfies [string, unknown],
-          ),
-        );
-
-        const outputPath = getOutputPathForInputFile(filePath, outDir);
-
-        const moduleExports = await evaluate(
-          new Map(result.files),
-          outputPath,
-          new Map(resolvedDependencies),
-        );
-
-        const NewComponent = (moduleExports as any)?.default as React.ComponentType<P>;
-        invariant(
-          typeof NewComponent === 'function',
-          `Compilation must result in a function as default export`,
-        );
-        setRenderedComponent(() => NewComponent);
-      })
-      .catch((error) => {
-        console.error(error);
-      });
-  }, [filePath, dependencies, fileInput]);
-
-  const server = useServer();
+  const server = useBacked();
 
   const handleCommit = React.useCallback(() => {
     server.saveFile(name, fileInput).then(() => onClose?.());
@@ -150,7 +174,6 @@ export function EditableComponent<P extends object>({
         dependencies={dependencies}
         onClose={onClose}
         onCommit={handleCommit}
-        onComponentUpdate={handleComponentUpdate}
       />
     </React.Fragment>
   ) : (
@@ -162,7 +185,7 @@ export function withDevtool<P extends object>(
   Component: React.ComponentType<P>,
   config: WithDevtoolParams,
 ): React.ComponentType<P> {
-  const { filePath, file, wsUrl } = config;
+  const { filePath, file, backend } = config;
   const name = getComponentNameFromInputFile(filePath);
 
   return function ComponentWithDevtool(props) {
@@ -184,7 +207,7 @@ export function withDevtool<P extends object>(
 
     return (
       <CurrentComponentContext.Provider value={componentInfo}>
-        <ServerProvider wsUrl={wsUrl}>
+        <BackendProvider backend={backend}>
           <EditableComponent
             config={config}
             InitialComponent={Component}
@@ -194,7 +217,7 @@ export function withDevtool<P extends object>(
             }}
             props={props}
           />
-        </ServerProvider>
+        </BackendProvider>
       </CurrentComponentContext.Provider>
     );
   };

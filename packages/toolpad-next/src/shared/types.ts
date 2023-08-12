@@ -1,10 +1,19 @@
 import { ToolpadFile } from './schemas';
 
+export type ConnectionStatus = 'connecting' | 'connected' | 'disconnected';
+
+export interface Backend {
+  subscribe: (event: 'connectionStatusChange', callback: () => void) => () => void;
+  getConnectionStatus: () => ConnectionStatus;
+  saveFile: (name: string, file: ToolpadFile) => Promise<void>;
+}
+
 export interface WithDevtoolParams {
   readonly filePath: string;
   readonly file: ToolpadFile;
   readonly dependencies: readonly [string, () => Promise<unknown>][];
   readonly wsUrl: string;
+  readonly backend: Backend;
 }
 
 export type DevRpcMethods = {

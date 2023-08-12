@@ -5,10 +5,12 @@ import EditIcon from '@mui/icons-material/Edit';
 import invariant from 'invariant';
 import { WithDevtoolParams } from '../shared/types';
 import DevtoolOverlay from './DevtoolOverlay';
-import { ServerProvider } from './server';
+import { ServerProvider, useServer } from './server';
 import { ComponentInfo, CurrentComponentContext } from './CurrentComponentContext';
 import * as probes from './probes';
-import { getComponentNameFromInputFile } from '../shared/paths';
+import { getComponentNameFromInputFile, getOutputPathForInputFile } from '../shared/paths';
+import { generateComponent } from '../shared/codeGeneration';
+import { evaluate } from './vm';
 
 export { probes };
 
@@ -54,10 +56,113 @@ export function EditButton(props: ButtonProps) {
   );
 }
 
+function DefaultComponent() {
+  return (
+    <Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
+      <EditButton />
+    </Box>
+  );
+}
+
+interface EditableComponentProps<P> {
+  InitialComponent?: React.ComponentType<P>;
+  config: WithDevtoolParams;
+  open?: boolean;
+  onClose?: () => void;
+  props: P;
+}
+
+export function EditableComponent<P extends object>({
+  InitialComponent = DefaultComponent,
+  config,
+  open,
+  onClose,
+  props,
+}: EditableComponentProps<P>) {
+  const { filePath, file, dependencies } = config;
+  const name = getComponentNameFromInputFile(filePath);
+
+  const [fileInput, setFileInput] = React.useState(file);
+  React.useEffect(() => setFileInput(file), [file]);
+
+  const [RenderedComponent, setRenderedComponent] = React.useState<React.ComponentType<P>>(
+    () => InitialComponent,
+  );
+
+  const handleComponentUpdate = React.useCallback((NewComponent: React.ComponentType<any>) => {
+    setRenderedComponent(() => NewComponent);
+  }, []);
+
+  React.useEffect(() => {
+    const outDir = '/';
+    generateComponent(filePath, fileInput, { target: 'preview', outDir })
+      .then(async (result) => {
+        const resolvedDependencies = await Promise.all(
+          dependencies.map(
+            async ([k, v]) => [k, { exports: await v() }] satisfies [string, unknown],
+          ),
+        );
+
+        const outputPath = getOutputPathForInputFile(filePath, outDir);
+
+        const moduleExports = await evaluate(
+          new Map(result.files),
+          outputPath,
+          new Map(resolvedDependencies),
+        );
+
+        const NewComponent = (moduleExports as any)?.default as React.ComponentType<P>;
+        invariant(
+          typeof NewComponent === 'function',
+          `Compilation must result in a function as default export`,
+        );
+        setRenderedComponent(() => NewComponent);
+      })
+      .catch((error) => {
+        console.error(error);
+      });
+  }, [filePath, dependencies, fileInput]);
+
+  const server = useServer();
+
+  const handleCommit = React.useCallback(() => {
+    server.saveFile(name, fileInput).then(() => onClose?.());
+  }, [name, onClose, fileInput, server]);
+
+  return open ? (
+    <React.Fragment>
+      <Box
+        sx={{
+          display: 'contents',
+          '> *': {
+            outlineColor: (theme) => theme.palette.secondary.main,
+            outlineStyle: 'solid',
+            outlineWidth: 2,
+          },
+        }}
+      >
+        <RenderedComponent {...props} />
+      </Box>
+      <DevtoolOverlay
+        filePath={filePath}
+        value={fileInput}
+        onChange={setFileInput}
+        dependencies={dependencies}
+        onClose={onClose}
+        onCommit={handleCommit}
+        onComponentUpdate={handleComponentUpdate}
+      />
+    </React.Fragment>
+  ) : (
+    <InitialComponent {...props} />
+  );
+}
+
 export function withDevtool<P extends object>(
   Component: React.ComponentType<P>,
-  { filePath, file, wsUrl, dependencies }: WithDevtoolParams,
+  config: WithDevtoolParams,
 ): React.ComponentType<P> {
+  const { filePath, file, wsUrl } = config;
   const name = getComponentNameFromInputFile(filePath);
 
   return function ComponentWithDevtool(props) {
@@ -77,52 +182,19 @@ export function withDevtool<P extends object>(
       return { id, name, file, props };
     }, [id, props]);
 
-    const [RenderedComponent, setRenderedComponent] = React.useState<React.ComponentType<P>>(
-      () => Component,
-    );
-
-    const handleComponentUpdate = React.useCallback((NewComponent: React.ComponentType<any>) => {
-      setRenderedComponent(() => NewComponent);
-    }, []);
-
-    React.useEffect(() => {
-      if (!editing) {
-        setRenderedComponent(() => Component);
-      }
-    }, [editing]);
-
     return (
       <CurrentComponentContext.Provider value={componentInfo}>
-        {editing ? (
-          <ServerProvider wsUrl={wsUrl}>
-            <Box
-              sx={{
-                display: 'contents',
-                '> *': {
-                  outlineColor: (theme) => theme.palette.secondary.main,
-                  outlineStyle: 'solid',
-                  outlineWidth: 2,
-                },
-              }}
-            >
-              <RenderedComponent {...props} />
-            </Box>
-            <DevtoolOverlay
-              filePath={filePath}
-              file={file}
-              dependencies={dependencies}
-              onClose={() => {
-                setCurrentlyEditedComponentId(null);
-              }}
-              onCommitted={() => {
-                setCurrentlyEditedComponentId(null);
-              }}
-              onComponentUpdate={handleComponentUpdate}
-            />
-          </ServerProvider>
-        ) : (
-          <RenderedComponent {...props} />
-        )}
+        <ServerProvider wsUrl={wsUrl}>
+          <EditableComponent
+            config={config}
+            InitialComponent={Component}
+            open={editing}
+            onClose={() => {
+              setCurrentlyEditedComponentId(null);
+            }}
+            props={props}
+          />
+        </ServerProvider>
       </CurrentComponentContext.Provider>
     );
   };

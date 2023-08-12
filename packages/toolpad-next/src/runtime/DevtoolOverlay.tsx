@@ -1,5 +1,4 @@
 import * as React from 'react';
-import * as sucrase from 'sucrase';
 import {
   Box,
   CircularProgress,
@@ -10,16 +9,14 @@ import {
 } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
-import invariant from 'invariant';
 import SaveIcon from '@mui/icons-material/Save';
-import * as path from 'path-browserify';
 import { ToolpadFile } from '../shared/schemas';
 import DataGridFileEditor from './DataGridFileEditor';
 import theme from './theme';
 import { useServer } from './server';
 import { CodeGenerationResult, generateComponent } from '../shared/codeGeneration';
 import DevtoolHost from './DevtoolHost';
-import { getComponentNameFromInputFile, getOutputPathForInputFile } from '../shared/paths';
+import { getComponentNameFromInputFile } from '../shared/paths';
 
 const CONNECTION_STATUS_DISPLAY = {
   connecting: { label: 'Connecting', color: 'info.main' },
@@ -50,94 +47,27 @@ function FileEditor({ commitButton, value, onChange, source }: FileEditorProps) 
   }
 }
 
-interface ModuleInstance {
-  exports: unknown;
-}
-
-async function evaluate(
-  files: Map<string, { code: string }>,
-  entry: string,
-  dependencies = new Map<string, ModuleInstance>(),
-) {
-  const cache = new Map<string, ModuleInstance>(dependencies);
-  const extensions = ['.js', '.jsx', '.ts', '.tsx'];
-
-  const resolveId = (importee: string, importer: string) => {
-    if (importee.startsWith('.') || importee.startsWith('/')) {
-      const resolved = path.resolve(path.dirname(importer), importee);
-      if (files.has(resolved)) {
-        return path.resolve(path.dirname(importer), importee);
-      }
-
-      for (const ext of extensions) {
-        const resolvedWithExt = resolved + ext;
-        if (files.has(resolvedWithExt)) {
-          return resolvedWithExt;
-        }
-      }
-    } else if (dependencies.has(importee)) {
-      return importee;
-    }
-
-    throw new Error(`Could not resolve "${importee}" from "${importer}"`);
-  };
-
-  const createRequireFn = (importer: string) => (importee: string) => {
-    const resolved = resolveId(importee, importer);
-
-    const cached = cache.get(resolved);
-
-    if (cached) {
-      return cached.exports;
-    }
-
-    const mod = files.get(resolved);
-
-    if (!mod) {
-      throw new Error(`Can't find a module for "${importee}"`);
-    }
-
-    const compiled = sucrase.transform(mod.code, {
-      transforms: ['imports', 'typescript', 'jsx'],
-    });
-
-    const fn = new Function('module', 'exports', 'require', compiled.code);
-    const exportsObj: unknown = {};
-    const moduleObj = { exports: exportsObj };
-    const requireFn = createRequireFn(resolved);
-    fn(moduleObj, exportsObj, requireFn);
-
-    cache.set(resolved, moduleObj);
-
-    return moduleObj.exports;
-  };
-
-  const requireEntry = createRequireFn('/');
-
-  return requireEntry(entry);
-}
-
 export interface DevtoolOverlayProps {
   filePath: string;
-  file: ToolpadFile;
+  value: ToolpadFile;
+  onChange: (value: ToolpadFile) => void;
+  onCommit: () => void;
   dependencies: readonly [string, () => Promise<unknown>][];
   onClose?: () => void;
-  onCommitted?: () => void;
   onComponentUpdate?: (Component: React.ComponentType) => void;
 }
 
 export default function DevtoolOverlay({
   filePath,
-  file,
+  value,
+  onChange,
   onComponentUpdate,
   onClose,
-  onCommitted,
+  onCommit,
   dependencies,
 }: DevtoolOverlayProps) {
   const rootRef = React.useRef<HTMLDivElement>(null);
   const name = getComponentNameFromInputFile(filePath);
-
-  const [inputValue, setInputValue] = React.useState(file);
 
   const { connectionStatus } = useServer();
 
@@ -145,7 +75,7 @@ export default function DevtoolOverlay({
 
   React.useEffect(() => {
     const outDir = '/';
-    generateComponent(filePath, inputValue, { target: 'prod', outDir })
+    generateComponent(filePath, value, { target: 'prod', outDir })
       .then((result) => {
         setSource(result);
       })
@@ -153,48 +83,11 @@ export default function DevtoolOverlay({
         console.error(error);
         setSource(undefined);
       });
-  }, [inputValue, filePath, dependencies, onComponentUpdate]);
-
-  React.useEffect(() => {
-    const outDir = '/';
-    generateComponent(filePath, inputValue, { target: 'preview', outDir })
-      .then(async (result) => {
-        const resolvedDependencies = await Promise.all(
-          dependencies.map(
-            async ([k, v]) => [k, { exports: await v() }] satisfies [string, unknown],
-          ),
-        );
-
-        const outputPath = getOutputPathForInputFile(filePath, outDir);
-
-        const moduleExports = await evaluate(
-          new Map(result.files),
-          outputPath,
-          new Map(resolvedDependencies),
-        );
-
-        const NewComponent = (moduleExports as any)?.default as React.ComponentType;
-        invariant(
-          typeof NewComponent === 'function',
-          `Compilation must result in a function as default export`,
-        );
-        onComponentUpdate?.(NewComponent);
-      })
-      .catch((error) => {
-        console.error(error);
-      });
-  }, [inputValue, filePath, dependencies, onComponentUpdate]);
-
-  const server = useServer();
+  }, [value, filePath, dependencies, onComponentUpdate]);
 
   const commitButton = (
     <Tooltip title="Commit changes">
-      <IconButton
-        sx={{ m: 0.5 }}
-        onClick={() => {
-          server.saveFile(name, inputValue).then(() => onCommitted?.());
-        }}
-      >
+      <IconButton sx={{ m: 0.5 }} onClick={onCommit}>
         <SaveIcon />
       </IconButton>
     </Tooltip>
@@ -224,7 +117,7 @@ export default function DevtoolOverlay({
             }}
           >
             <Typography>
-              {name} ({file.kind})
+              {name} ({value.kind})
             </Typography>
             <Box
               sx={{
@@ -262,8 +155,8 @@ export default function DevtoolOverlay({
           <Box sx={{ flex: 1, overflow: 'hidden', position: 'relative' }}>
             {connectionStatus === 'connected' ? (
               <FileEditor
-                value={inputValue}
-                onChange={setInputValue}
+                value={value}
+                onChange={onChange}
                 source={source}
                 commitButton={commitButton}
               />

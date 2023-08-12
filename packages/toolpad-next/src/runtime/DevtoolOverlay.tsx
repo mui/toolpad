@@ -13,7 +13,7 @@ import SaveIcon from '@mui/icons-material/Save';
 import { ToolpadFile } from '../shared/schemas';
 import DataGridFileEditor from './DataGridFileEditor';
 import theme from './theme';
-import { useBacked } from './server';
+import { useBacked } from './backend';
 import { CodeGenerationResult, generateComponent } from '../shared/codeGeneration';
 import DevtoolHost from './DevtoolHost';
 import { getComponentNameFromInputFile } from '../shared/paths';

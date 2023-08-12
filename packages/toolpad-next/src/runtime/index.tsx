@@ -5,7 +5,7 @@ import EditIcon from '@mui/icons-material/Edit';
 import invariant from 'invariant';
 import { WithDevtoolParams } from '../shared/types';
 import DevtoolOverlay from './DevtoolOverlay';
-import { BackendProvider, useBacked, CliBackend, NoopBackend } from './server';
+import { BackendProvider, useBacked, CliBackend, NoopBackend } from './backend';
 import { ComponentInfo, CurrentComponentContext } from './CurrentComponentContext';
 import * as probes from './probes';
 import { getComponentNameFromInputFile, getOutputPathForInputFile } from '../shared/paths';

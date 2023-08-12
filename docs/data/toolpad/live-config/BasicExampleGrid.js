@@ -10,7 +10,31 @@ const DEFINITION = {
   filePath: '/MyGrid.yml',
   file: {
     kind: 'DataGrid',
-    spec: {},
+    spec: {
+      rows: {
+        kind: 'fetch',
+        method: 'GET',
+        url: 'https://datausa.io/api/data?drilldowns=Nation&measures=Population',
+        selector: '/data',
+      },
+      columns: [
+        {
+          field: 'Nation',
+          type: 'string',
+        },
+        {
+          field: 'Year',
+          type: 'string',
+        },
+        {
+          field: 'Population',
+          type: 'number',
+        },
+      ],
+      rowIdSelector: '/ID Year',
+      height: 400,
+      heightMode: 'fixed',
+    },
   },
   dependencies: [
     ['react', () => import('react')],
@@ -18,11 +42,6 @@ const DEFINITION = {
     ['@mui/material', () => import('@mui/material')],
     ['@mui/toolpad-next/runtime', () => import('@mui/toolpad-next/runtime')],
   ],
-  backend: {
-    getConnectionStatus: () => 'connected',
-    subscribe: () => () => {},
-    saveFile: () => {},
-  },
 };
 
 export default function BasicExampleGrid() {

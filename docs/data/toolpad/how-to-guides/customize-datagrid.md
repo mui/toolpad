@@ -1,8 +1,8 @@
 # Customize data grids
 
-<p class="description">Toolpad is built to allow extensibility as a first-class citizen. </p>
+<p class="description">Toolpad is built to allow extensibility as a first-class citizen.</p>
 
-## Default behaviour
+## Default behavior
 
 By default, you can connect any JSON data to a Toolpad data grid and it will attempt to guess each column's type display it appropriately:
 

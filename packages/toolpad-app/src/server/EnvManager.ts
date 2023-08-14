@@ -24,6 +24,8 @@ export default class EnvManager {
 
   private values: Awaitable<Record<string, string>> = {};
 
+  private watcher: chokidar.FSWatcher | undefined;
+
   constructor(project: IToolpadProject) {
     this.project = project;
   }
@@ -40,9 +42,8 @@ export default class EnvManager {
     // Dummy method
   }
 
-  // eslint-disable-next-line class-methods-use-this
   async dispose() {
-    // Dummy method
+    await this.watcher?.close();
   }
 
   private resetEnv() {
@@ -78,7 +79,7 @@ export default class EnvManager {
       return;
     }
 
-    const envFileWatcher = chokidar.watch([this.getEnvFilePath()], {
+    this.watcher = chokidar.watch([this.getEnvFilePath()], {
       usePolling: true,
       ignoreInitial: true,
     });
@@ -90,9 +91,9 @@ export default class EnvManager {
       this.project.invalidateQueries();
     };
 
-    envFileWatcher.on('add', handleChange);
-    envFileWatcher.on('unlink', handleChange);
-    envFileWatcher.on('change', handleChange);
+    this.watcher.on('add', handleChange);
+    this.watcher.on('unlink', handleChange);
+    this.watcher.on('change', handleChange);
   }
 
   async getDeclaredValues(): Promise<Record<string, string>> {

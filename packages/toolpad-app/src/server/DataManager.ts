@@ -1,4 +1,5 @@
 import { NodeId, ExecFetchResult } from '@mui/toolpad-core';
+import { withContext, createServerContext } from '@mui/toolpad-core/server';
 import { createServerJsRuntime } from '@mui/toolpad-core/jsServerRuntime';
 import express from 'express';
 import cors from 'cors';
@@ -181,7 +182,10 @@ export default class DataManager {
         }
 
         try {
-          const result = await this.execQuery(dataNode, req.body);
+          const ctx = createServerContext(req);
+          const result = await withContext(ctx, async () => {
+            return this.execQuery(dataNode, req.body);
+          });
           res.json(withSerializedError(result));
         } catch (error) {
           res.json(withSerializedError({ error }));

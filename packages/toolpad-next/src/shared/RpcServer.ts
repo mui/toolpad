@@ -8,10 +8,7 @@ export interface RpcServerPort {
 }
 
 export default class RpcServer<M extends Methods> {
-  constructor(
-    private port: RpcServerPort,
-    methods: M,
-  ) {
+  constructor(private port: RpcServerPort, methods: M) {
     const handlers = new Map<keyof M, (...params: any[]) => any>(Object.entries(methods));
 
     this.port.addEventListener('message', async ({ data }) => {

@@ -33,7 +33,6 @@ test('shows chart loading and errors', async ({ page }) => {
   const runtimeModel = new ToolpadRuntime(page);
   await runtimeModel.gotoPage('loadingAndError');
 
-  const lineChartLine = page.locator('path[name="lineChart"]');
   await expect(page.getByText('BOOM!', { exact: true })).toBeVisible();
-  await expect(lineChartLine).toHaveCount(0);
+  await expect(page.getByLabel('loading')).toBeVisible();
 });

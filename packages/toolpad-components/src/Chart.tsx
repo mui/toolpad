@@ -192,6 +192,7 @@ function Chart({ data = [], loading, error, height, sx }: ChartProps) {
           variant="rectangular"
           width="100%"
           height={height}
+          aria-label="loading"
         />
       ) : null}
     </Container>

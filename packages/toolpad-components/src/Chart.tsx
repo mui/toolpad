@@ -92,7 +92,7 @@ function Chart({ data = [], loading, error, height, sx }: ChartProps) {
   const isDataVisible = !loading && !displayError;
 
   return (
-    <Container disableGutters sx={{ ...sx, position: 'relative' }}>
+    <Container disableGutters sx={{ ...sx, position: 'relative' }} aria-busy={loading}>
       <ResponsiveContainer width="100%" height={height}>
         <ComposedChart data={barChartData} margin={{ top: 20, right: 80 }}>
           {isDataVisible ? (
@@ -192,7 +192,6 @@ function Chart({ data = [], loading, error, height, sx }: ChartProps) {
           variant="rectangular"
           width="100%"
           height={height}
-          aria-label="loading"
         />
       ) : null}
     </Container>

@@ -8,7 +8,7 @@ import { WebSocketServer } from 'ws';
 import getPort from 'get-port';
 import { toolpadFileSchema } from '../shared/schemas';
 import { RpcServerPort } from '../shared/RpcServer';
-import { Backend } from '../shared/Backend';
+import { Backend } from '../shared/backend';
 import {
   generateComponent,
   generateIndex,

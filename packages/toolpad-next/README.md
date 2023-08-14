@@ -37,7 +37,7 @@ POC for the live configurators direction
    yarn toolpad-next dev
    ```
 
-1. Import component inn `./src/App.tsx`:
+1. Import component in `./src/App.tsx`:
 
    ```tsx
    import MyGrid from '../toolpad/.generated/MyGrid';

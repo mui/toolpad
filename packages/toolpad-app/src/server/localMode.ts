@@ -880,6 +880,7 @@ async function migrateLegacyProject(root: string) {
 function getDomFilePatterns(root: string) {
   return [
     path.resolve(root, './toolpad/pages/*/page.yml'),
+    path.resolve(root, './toolpad/components'),
     path.resolve(root, './toolpad/components/*.*'),
   ];
 }

@@ -17,6 +17,9 @@ export type Command =
       kind: 'reload-components';
     }
   | {
+      kind: 'exit'
+    }
+  | {
       kind: 'replace-dom';
       dom: appDom.AppDom;
     };
@@ -115,13 +118,17 @@ export async function main({ outDir, base, config, root, port, initialDom }: App
 
   invariant(parentPort, 'parentPort must be defined');
 
-  parentPort.on('message', (msg: Command) => {
+  parentPort.on('message', async (msg: Command) => {
     switch (msg.kind) {
       case 'reload-components': {
         const mod = devServer.moduleGraph.getModuleById(resolvedComponentsId);
         if (mod) {
           devServer.reloadModule(mod);
         }
+        break;
+      }
+      case 'exit': {
+        await devServer.close();
         break;
       }
       case 'replace-dom': {

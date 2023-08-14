@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { createComponent } from '@mui/toolpad-core';
-import { Container, ContainerProps } from '@mui/material';
+import { CircularProgress, Container, ContainerProps } from '@mui/material';
 import {
   XAxis,
   YAxis,
@@ -14,6 +14,8 @@ import {
   Area,
   Scatter,
 } from 'recharts';
+import { errorFrom } from '@mui/toolpad-utils/errors';
+import ErrorOverlay from './components/ErrorOverlay';
 import { SX_PROP_HELPER_TEXT } from './constants';
 
 export const CHART_DATA_SERIES_KINDS = ['line', 'bar', 'area', 'scatter'];
@@ -35,10 +37,12 @@ function getBarChartDataSeriesNormalizedYKey(dataSeries: ChartDataSeries, index:
 
 interface ChartProps extends ContainerProps {
   data?: ChartData;
+  loading?: boolean;
+  error?: Error | string;
   height?: number;
 }
 
-function Chart({ data = [], height, sx }: ChartProps) {
+function Chart({ data = [], loading, error, height, sx }: ChartProps) {
   const xValues = React.useMemo(
     () =>
       data
@@ -83,11 +87,13 @@ function Chart({ data = [], height, sx }: ChartProps) {
 
   const hasNonNumberXValues = xValues.some((xValue) => typeof xValue !== 'number');
 
+  const displayError = error ? errorFrom(error) : null;
+
   return (
-    <Container disableGutters sx={sx}>
+    <Container disableGutters sx={{ ...sx, position: 'relative' }}>
       <ResponsiveContainer width="100%" height={height}>
         <ComposedChart data={barChartData} margin={{ top: 20, right: 80 }}>
-          <CartesianGrid />
+          <CartesianGrid strokeDasharray="3 3" />
           <XAxis
             dataKey="x"
             type={hasNonNumberXValues ? 'category' : 'number'}
@@ -172,11 +178,28 @@ function Chart({ data = [], height, sx }: ChartProps) {
           })}
         </ComposedChart>
       </ResponsiveContainer>
+      {loading ? (
+        <div
+          style={{
+            position: 'absolute',
+            inset: '0 0 0 0',
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+          }}
+        >
+          <CircularProgress />
+        </div>
+      ) : null}
+      <ErrorOverlay error={displayError} />
     </Container>
   );
 }
 
 export default createComponent(Chart, {
+  loadingProp: 'loading',
+  loadingPropSource: ['data'],
+  errorProp: 'error',
   resizableHeightProp: 'height',
   argTypes: {
     data: {
@@ -215,7 +238,7 @@ export default createComponent(Chart, {
     },
     height: {
       type: 'number',
-      default: 400,
+      default: 300,
       minimum: 100,
     },
     sx: {

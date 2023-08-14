@@ -3,7 +3,7 @@ import { InlineConfig, Plugin, build } from 'vite';
 import react from '@vitejs/plugin-react';
 import serializeJavascript from 'serialize-javascript';
 import { indent } from '@mui/toolpad-utils/strings';
-import { MUI_X_PRO_LICENSE, RUNTIME_CONFIG_WINDOW_PROPERTY } from '../constants';
+import { RUNTIME_CONFIG_WINDOW_PROPERTY } from '../constants';
 import type { ComponentEntry } from './localMode';
 import type { RuntimeConfig } from '../config';
 import * as appDom from '../appDom';
@@ -78,7 +78,6 @@ export function postProcessHtml(html: string, { config, dom }: PostProcessHtmlPa
     `<script>window[${JSON.stringify(
       INITIAL_STATE_WINDOW_PROPERTY,
     )}] = ${serializedInitialState}</script>`,
-    `<meta name="toolpad-x-license" content=${JSON.stringify(MUI_X_PRO_LICENSE)} />`,
   ];
 
   return html.replace(`<!-- __TOOLPAD_SCRIPTS__ -->`, () => toolpadScripts.join('\n'));
@@ -259,6 +258,7 @@ export function createViteConfig({
         include: [
           '@emotion/cache',
           '@emotion/react',
+          '@mui/icons-material',
           '@mui/icons-material/ArrowDropDownRounded',
           '@mui/icons-material/DarkMode',
           '@mui/icons-material/Edit',
@@ -269,6 +269,7 @@ export function createViteConfig({
           '@mui/icons-material/SettingsBrightnessOutlined',
           '@mui/lab',
           '@mui/material',
+          '@mui/material/CircularProgress',
           '@mui/material/Button',
           '@mui/material/colors',
           '@mui/material/styles',
@@ -278,6 +279,7 @@ export function createViteConfig({
           '@mui/x-date-pickers/AdapterDayjs',
           '@mui/x-date-pickers/DesktopDatePicker',
           '@mui/x-date-pickers/LocalizationProvider',
+          '@mui/x-license-pro',
           '@tanstack/react-query',
           '@tanstack/react-query-devtools/build/lib/index.prod.js',
           'dayjs',
@@ -300,6 +302,12 @@ export function createViteConfig({
           'recharts',
           'superjson',
           'zod',
+        ],
+        exclude: [
+          '@mui/toolpad-core',
+          '@mui/toolpad/browser',
+          '@mui/toolpad/runtime',
+          '@mui/toolpad/canvas',
         ],
       },
       appType: 'custom',

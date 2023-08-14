@@ -22,7 +22,7 @@ test('test basic undo and redo', async ({ page }) => {
   await expect(canvasInputLocator).toHaveCount(2);
 
   // Add 3rd text field
-  await editorModel.dragNewComponentTo('Text Field');
+  await editorModel.dragNewComponentToCanvas('Text Field');
 
   // Ensure that we added 3rd text field
   await expect(canvasInputLocator).toHaveCount(3);
@@ -54,6 +54,8 @@ test('test batching text input actions into single undo entry', async ({ page })
   await defaultValueInput.click();
 
   await page.keyboard.type('some value');
+
+  await expect(input).toHaveValue('some value');
 
   // Wait for undo stack to be updated
   await page.waitForTimeout(500);

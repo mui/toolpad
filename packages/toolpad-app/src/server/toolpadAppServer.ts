@@ -19,12 +19,12 @@ export interface ToolpadAppHandlerParams {
 }
 
 export async function createProdHandler(project: ToolpadProject) {
-  const router = express.Router();
+  const handler = express.Router();
 
-  router.use(express.static(getAppOutputFolder(project.getRoot()), { index: false }));
+  handler.use(express.static(getAppOutputFolder(project.getRoot()), { index: false }));
 
   // Allow static assets, block everything else
-  router.use((req, res, next) => {
+  handler.use((req, res, next) => {
     if (checkBasicAuthHeader(req.headers.authorization ?? null)) {
       next();
       return;
@@ -32,9 +32,9 @@ export async function createProdHandler(project: ToolpadProject) {
     basicAuthUnauthorized(res);
   });
 
-  router.use('/api/data', project.dataManager.createDataHandler(project));
+  handler.use('/api/data', project.dataManager.createDataHandler(project));
 
-  router.use(
+  handler.use(
     asyncHandler(async (req, res) => {
       const dom = await project.loadDom();
 
@@ -47,5 +47,5 @@ export async function createProdHandler(project: ToolpadProject) {
     }),
   );
 
-  return router;
+  return { handler };
 }

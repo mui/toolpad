@@ -1,6 +1,6 @@
 # Building UI
 
-<p class="description">Toolpad allows you to build your frontends fast so you can concentrate on writing logic</p>
+<p class="description">Toolpad allows you to build your frontends fast so you can concentrate on writing logic.</p>
 
 ## Component Library
 

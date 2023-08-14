@@ -1,0 +1,4 @@
+{
+  "main": "../dist/runtime/index.cjs",
+  "types": "../dist/runtime/index.d.cjs"
+}

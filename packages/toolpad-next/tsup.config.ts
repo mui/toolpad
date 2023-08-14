@@ -1,6 +1,6 @@
 import * as fs from 'fs/promises';
 import path from 'path';
-import { defineConfig } from 'tsup';
+import { defineConfig, Options } from 'tsup';
 import type * as esbuild from 'esbuild';
 
 function cleanFolderOnFailure(folder: string): esbuild.Plugin {

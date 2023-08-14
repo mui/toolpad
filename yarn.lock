@@ -2364,7 +2364,7 @@
   version "5.14.4"
   resolved "https://github.com/mui/material-ui.git#6b99bc55253b21b856cd7a0df1888a3377525236"
 
-"@mui/private-theming@^5.14.5":
+"@mui/private-theming@^5.14.4", "@mui/private-theming@^5.14.5":
   version "5.14.5"
   resolved "https://registry.yarnpkg.com/@mui/private-theming/-/private-theming-5.14.5.tgz#834e1569c31e2644665f98d902def79014053017"
   integrity sha512-cC4C5RrpXpDaaZyH9QwmPhRLgz+f2SYbOty3cPkk4qPSOSfif2ZEcDD9HTENKDDd9deB+xkPKzzZhi8cxIx8Ig==

@@ -10,7 +10,8 @@
     "types": ["react", "node"],
     "incremental": true,
     "noImplicitAny": true,
-    "jsx": "preserve"
+    "jsx": "preserve",
+    "moduleResolution": "bundler"
   },
   "include": ["docs-env.d.ts", "pages/**/*", "src/**/*", "data/**/*"],
   "exclude": ["docs/.next", "docs/export"]

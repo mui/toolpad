@@ -10,21 +10,19 @@ export interface CodeGenerationResult {
   files: CodeFiles;
 }
 
-export type BaseGenerateComponentOptions =
-  | {
-      target: 'prod';
-    }
-  | {
-      target: 'preview';
-    }
-  | {
-      target: 'dev';
-    };
-
-export type GenerateComponentOptions = BaseGenerateComponentOptions & {
+export interface GenerateComponentOptions {
   outDir: string;
-  wsUrl?: string;
-};
+  target: 'prod' | 'preview' | 'dev';
+  backend?:
+    | {
+        kind: 'cli';
+        wsUrl: string;
+      }
+    | {
+        kind: 'browser';
+        port: string;
+      };
+}
 
 export async function generateComponent(
   filePath: string,

@@ -1,5 +1,7 @@
 kind: DataGrid
 spec:
+  heightMode: fixed
+  height: 300
   rows:
     kind: fetch
     method: GET
@@ -13,5 +15,3 @@ spec:
     - field: Population
       type: number
   rowIdSelector: /ID Year
-  height: 500
-  heightMode: container

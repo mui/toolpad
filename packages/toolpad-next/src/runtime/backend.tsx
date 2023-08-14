@@ -1,11 +1,29 @@
 import * as React from 'react';
 import invariant from 'invariant';
 import { Emitter } from '@mui/toolpad-utils/events';
-import { Backend, ConnectionStatus, DevRpcMethods } from '../shared/types';
-import RpcClient from '../shared/RpcClient';
+import { BackendClient, ConnectionStatus, DevRpcMethods } from '../shared/types';
+import RpcClient, { RpcClientPort } from '../shared/RpcClient';
 import { ToolpadFile } from '../shared/schemas';
 
-export class CliBackend extends Emitter<{ connectionStatusChange: null }> implements Backend {
+export class NoopBackendClient
+  extends Emitter<{ connectionStatusChange: null }>
+  implements BackendClient
+{
+  // eslint-disable-next-line class-methods-use-this
+  getConnectionStatus(): ConnectionStatus {
+    return 'connected';
+  }
+
+  // eslint-disable-next-line class-methods-use-this
+  async saveFile() {
+    throw new Error('Not implemented');
+  }
+}
+
+export class CliBackendClient
+  extends Emitter<{ connectionStatusChange: null }>
+  implements BackendClient
+{
   private ws: WebSocket;
 
   private rpcClient: RpcClient<DevRpcMethods>;
@@ -25,7 +43,12 @@ export class CliBackend extends Emitter<{ connectionStatusChange: null }> implem
       this.emit('connectionStatusChange', null);
     });
 
-    this.rpcClient = new RpcClient<DevRpcMethods>(this.ws);
+    const wsPort: RpcClientPort = {
+      addEventListener: this.ws.addEventListener.bind(this.ws),
+      postMessage: this.ws.send.bind(this.ws),
+    };
+
+    this.rpcClient = new RpcClient<DevRpcMethods>(wsPort);
   }
 
   getConnectionStatus() {
@@ -37,22 +60,32 @@ export class CliBackend extends Emitter<{ connectionStatusChange: null }> implem
   }
 }
 
-export class NoopBackend extends Emitter<{ connectionStatusChange: null }> implements Backend {
+export class BrowserBackendClient
+  extends Emitter<{ connectionStatusChange: null }>
+  implements BackendClient
+{
+  private rpcClient: RpcClient<DevRpcMethods>;
+
+  constructor(port: RpcClientPort) {
+    super();
+
+    this.rpcClient = new RpcClient<DevRpcMethods>(port);
+  }
+
   // eslint-disable-next-line class-methods-use-this
   getConnectionStatus(): ConnectionStatus {
     return 'connected';
   }
 
-  // eslint-disable-next-line class-methods-use-this
-  async saveFile() {
-    throw new Error('Not implemented');
+  async saveFile(name: string, file: ToolpadFile) {
+    return this.rpcClient.call('saveFile', [name, file]);
   }
 }
 
-export const BackendContext = React.createContext<Backend | null>(null);
+export const BackendContext = React.createContext<BackendClient | null>(null);
 
 export interface ServerProviderProps {
-  backend: Backend;
+  backend: BackendClient;
   children?: React.ReactNode;
 }
 

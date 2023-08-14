@@ -203,11 +203,21 @@ export default async function generateDataGridComponent(
         ? `_runtime.withDevtool(${componentName}, ${serializeObject({
             filePath: JSON.stringify(filePath),
             file: JSON.stringify(file),
-            wsUrl: JSON.stringify(options.wsUrl) || 'undefined',
             dependencies: imports.printDynamicImports(),
-            backend: options.wsUrl
-              ? `new _runtime.CliBackend(${JSON.stringify(options.wsUrl)})`
-              : 'new _runtime.NoopBackend()',
+            backend: (() => {
+              switch (options.backend?.kind) {
+                case 'cli': {
+                  const wsUrl = options.backend.wsUrl;
+                  return `new _runtime.CliBackendClient(${JSON.stringify(wsUrl)})`;
+                }
+                case 'browser': {
+                  const port = options.backend.port;
+                  return `new _runtime.BrowserBackendClient(window[${JSON.stringify(port)}])`;
+                }
+                default:
+                  return 'new _runtime.NoopBackendClient()';
+              }
+            })(),
           } satisfies Record<keyof WithDevtoolParams, string>)})`
         : componentName
     };

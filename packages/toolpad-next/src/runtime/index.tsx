@@ -5,17 +5,22 @@ import EditIcon from '@mui/icons-material/Edit';
 import invariant from 'invariant';
 import { WithDevtoolParams } from '../shared/types';
 import DevtoolOverlay from './DevtoolOverlay';
-import { BackendProvider, useBacked, CliBackend, NoopBackend } from './backend';
+import {
+  BackendProvider,
+  useBacked,
+  CliBackendClient,
+  NoopBackendClient,
+  BrowserBackendClient,
+} from './backend';
 import { ComponentInfo, CurrentComponentContext } from './CurrentComponentContext';
 import * as probes from './probes';
 import { getComponentNameFromInputFile, getOutputPathForInputFile } from '../shared/paths';
-import { generateComponent } from '../shared/codeGeneration';
+import { Backend } from '../shared/backend';
+import { GenerateComponentOptions, generateComponent } from '../shared/codeGeneration';
 import { evaluate } from './vm';
 import { ToolpadFile } from '../shared/schemas';
 
-export { probes };
-
-export { CliBackend, NoopBackend };
+export { probes, CliBackendClient, NoopBackendClient, BrowserBackendClient, Backend };
 
 function useCurrentlyEditedComponentId() {
   const [currentEditedComponentId, setCurrentlyEditedComponentId] = useStorageState(
@@ -74,6 +79,7 @@ interface UseLiveComponentParams {
   file: ToolpadFile;
   dependencies: readonly [string, () => Promise<unknown>][];
   target: 'prod' | 'preview' | 'dev';
+  backend?: GenerateComponentOptions['backend'];
 }
 
 export function useLiveComponent<P>({
@@ -81,12 +87,13 @@ export function useLiveComponent<P>({
   file,
   dependencies,
   target,
+  backend,
 }: UseLiveComponentParams) {
   const [Component, setComponent] = React.useState<React.ComponentType<P> | null>(null);
 
   React.useEffect(() => {
     const outDir = '/';
-    generateComponent(filePath, file, { target, outDir })
+    generateComponent(filePath, file, { target, outDir, backend })
       .then(async (result) => {
         const resolvedDependencies = await Promise.all(
           dependencies.map(
@@ -112,7 +119,7 @@ export function useLiveComponent<P>({
       .catch((error) => {
         console.error(error);
       });
-  }, [filePath, dependencies, file, target]);
+  }, [filePath, dependencies, file, target, backend]);
 
   return { Component };
 }

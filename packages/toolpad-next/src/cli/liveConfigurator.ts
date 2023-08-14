@@ -7,13 +7,13 @@ import * as chokidar from 'chokidar';
 import { WebSocketServer } from 'ws';
 import getPort from 'get-port';
 import { toolpadFileSchema } from '../shared/schemas';
-import RpcServer from '../shared/RpcServer';
+import { RpcServerPort } from '../shared/RpcServer';
+import { Backend } from '../shared/Backend';
 import {
   generateComponent,
   generateIndex,
   GenerateComponentOptions,
   CodeFiles,
-  BaseGenerateComponentOptions,
 } from '../shared/codeGeneration';
 import { Config, DevRpcMethods } from '../shared/types';
 import { loadConfig } from './config';
@@ -56,7 +56,7 @@ async function writeAndCompile(files: CodeFiles) {
   );
 }
 
-async function generateLib(config: Config, generateOptions: BaseGenerateComponentOptions) {
+async function generateLib(config: Config, generateOptions: GenerateComponentOptions) {
   const { outDir } = config;
 
   // eslint-disable-next-line no-console
@@ -92,7 +92,7 @@ async function generateLib(config: Config, generateOptions: BaseGenerateComponen
 
 export async function generateCommand({ dir }: CommandArgs) {
   const config = await loadConfig(dir);
-  await generateLib(config, { target: 'prod' });
+  await generateLib(config, { target: 'prod', outDir: config.outDir });
 }
 
 export async function devCommand({ dir }: CommandArgs) {
@@ -106,19 +106,32 @@ export async function devCommand({ dir }: CommandArgs) {
     ws.on('error', console.error);
   });
 
-  const rpcServer = new RpcServer<DevRpcMethods>(wss);
+  const methods: DevRpcMethods = {
+    async saveFile(name, content) {
+      // Validate content before saving
+      toolpadFileSchema.parse(content);
+      const filePath = path.join(config.rootDir, `${name}.yml`);
+      await fs.writeFile(filePath, yaml.stringify(content), { encoding: 'utf-8' });
+    },
+  };
 
-  rpcServer.register('saveFile', async (name, content) => {
-    // Validate content before saving
-    toolpadFileSchema.parse(content);
-    const filePath = path.join(config.rootDir, `${name}.yml`);
-    await fs.writeFile(filePath, yaml.stringify(content), { encoding: 'utf-8' });
+  wss.on('connection', (ws) => {
+    const rpcPort: RpcServerPort = {
+      addEventListener(event, listener) {
+        ws.on(event, (rawData) => listener({ data: rawData.toString() }));
+      },
+      postMessage: ws.send.bind(ws),
+    };
+    return new Backend(rpcPort, methods);
   });
 
   const options: GenerateComponentOptions = {
     outDir: config.outDir,
     target: 'dev',
-    wsUrl: `ws://localhost:${port}`,
+    backend: {
+      kind: 'cli',
+      wsUrl: `ws://localhost:${port}`,
+    },
   };
 
   await generateLib(config, options);

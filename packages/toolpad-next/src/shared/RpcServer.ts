@@ -1,61 +1,60 @@
-import { WebSocketServer } from 'ws';
 import superjson from 'superjson';
+import { errorFrom } from '@mui/toolpad-utils/errors';
 import { Methods, RpcResponse, rpcRequestSchema } from './rpc';
 
+export interface RpcServerPort {
+  addEventListener(event: 'message', listener: (event: { data: string }) => void): void;
+  postMessage(data: string): void;
+}
+
 export default class RpcServer<M extends Methods> {
-  private wss: WebSocketServer;
+  constructor(
+    private port: RpcServerPort,
+    methods: M,
+  ) {
+    const handlers = new Map<keyof M, (...params: any[]) => any>(Object.entries(methods));
 
-  private handlers = new Map<keyof M, (...params: any[]) => any>();
+    this.port.addEventListener('message', async ({ data }) => {
+      const sendError = (id: string | number | null, code: number, message: string) => {
+        this.port.postMessage(
+          superjson.stringify({
+            jsonrpc: '2.0',
+            error: { code, message },
+            id,
+          } satisfies RpcResponse),
+        );
+      };
 
-  constructor(wss: WebSocketServer) {
-    this.wss = wss;
+      const messageObject = superjson.parse(data.toString());
+      const parsed = rpcRequestSchema.safeParse(messageObject);
 
-    this.wss.on('connection', (ws) => {
-      ws.on('message', async (data) => {
-        const sendError = (id: string | number | null, code: number, message: string) => {
-          ws.send(
-            superjson.stringify({
-              jsonrpc: '2.0',
-              error: { code, message },
-              id,
-            } satisfies RpcResponse),
-          );
-        };
+      if (!parsed.success) {
+        sendError(null, -32700, 'Invalid RPC message');
+        return;
+      }
 
-        const messageObject = superjson.parse(data.toString());
-        const parsed = rpcRequestSchema.safeParse(messageObject);
+      const { id, method, params } = parsed.data;
+      const handler = handlers.get(method);
 
-        if (!parsed.success) {
-          sendError(null, -32700, 'Invalid RPC message');
-          return;
-        }
+      if (!handler) {
+        sendError(id, -32601, 'Method not found');
+        return;
+      }
 
-        const { id, method, params } = parsed.data;
-        const handler = this.handlers.get(method);
+      try {
+        const result = await handler(...params);
 
-        if (!handler) {
-          sendError(id, -32601, 'Method not found');
-          return;
-        }
-
-        try {
-          const result = await handler(...params);
-
-          ws.send(
-            superjson.stringify({
-              jsonrpc: '2.0',
-              result,
-              id,
-            } satisfies RpcResponse),
-          );
-        } catch (error) {
-          sendError(id, error.code || -32000, error.message);
-        }
-      });
+        port.postMessage(
+          superjson.stringify({
+            jsonrpc: '2.0',
+            result,
+            id,
+          } satisfies RpcResponse),
+        );
+      } catch (rawError) {
+        const error = errorFrom(rawError);
+        sendError(id, Number(error.code || -32000), error.message);
+      }
     });
-  }
-
-  register(method: keyof M, handler: M[typeof method]) {
-    this.handlers.set(method, handler);
   }
 }

@@ -1,20 +1,21 @@
 import * as superjson from 'superjson';
 import { Methods, RequestId, RpcRequest, rpcResponseSchema } from './rpc';
 
+export interface RpcClientPort {
+  addEventListener(event: 'message', listener: (event: { data: string }) => void): void;
+  postMessage(data: string): void;
+}
+
 export default class RpcClient<M extends Methods> {
   private nextId = 0;
-
-  private ws: WebSocket;
 
   private pendingRequests = new Map<
     RequestId,
     { timeout: NodeJS.Timeout; resolve: (result: any) => void; reject: (error: Error) => void }
   >();
 
-  constructor(ws: WebSocket) {
-    this.ws = ws;
-
-    this.ws.addEventListener('message', (event) => {
+  constructor(private port: RpcClientPort) {
+    this.port.addEventListener('message', (event) => {
       const message = rpcResponseSchema.parse(superjson.parse(event.data));
 
       const { id, result, error } = message;
@@ -68,7 +69,7 @@ export default class RpcClient<M extends Methods> {
 
       this.pendingRequests.set(id, { timeout, resolve, reject });
 
-      this.ws.send(message);
+      this.port.postMessage(message);
     });
   }
 }

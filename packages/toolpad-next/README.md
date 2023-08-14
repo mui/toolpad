@@ -13,7 +13,7 @@ POC for the live configurators direction
 1. Add dependencies
 
    ```bash
-   yarn add @mui/x-data-grid-pro https://pkg.csb.dev/mui/mui-toolpad/commit/817b15a5/@mui/toolpad-next
+   yarn add @mui/x-data-grid https://pkg.csb.dev/mui/mui-toolpad/commit/817b15a5/@mui/toolpad-next
    ```
 
 1. Add scripts in `package.json`

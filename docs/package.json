@@ -32,7 +32,7 @@
     "@mui/styles": "5.14.4",
     "@mui/toolpad-next": "0.1.23",
     "@mui/utils": "5.14.4",
-    "@mui/x-data-grid-pro": "6.11.0",
+    "@mui/x-data-grid": "6.11.1",
     "@trendmicro/react-interpolate": "0.5.5",
     "@types/lodash": "4.14.197",
     "@types/react-dom": "18.2.7",

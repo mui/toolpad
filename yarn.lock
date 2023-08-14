@@ -2403,20 +2403,6 @@
     prop-types "^15.8.1"
     react-is "^18.2.0"
 
-"@mui/x-data-grid-pro@6.11.0", "@mui/x-data-grid-pro@latest":
-  version "6.11.0"
-  resolved "https://registry.yarnpkg.com/@mui/x-data-grid-pro/-/x-data-grid-pro-6.11.0.tgz#7e4fb53d4b74ec090c933a7462d9d67f0a714378"
-  integrity sha512-jZfuEr3x6sk33MdQXXJcluzUWd4S8H3e7vlw5y7tq4Ocwo5sAx9KpmHOonnbBbE3TnnaVKxr6wQttzchctFVBA==
-  dependencies:
-    "@babel/runtime" "^7.22.6"
-    "@mui/utils" "^5.14.1"
-    "@mui/x-data-grid" "6.11.0"
-    "@mui/x-license-pro" "6.10.2"
-    "@types/format-util" "^1.0.2"
-    clsx "^1.2.1"
-    prop-types "^15.8.1"
-    reselect "^4.1.8"
-
 "@mui/x-data-grid-pro@6.11.1":
   version "6.11.1"
   resolved "https://registry.yarnpkg.com/@mui/x-data-grid-pro/-/x-data-grid-pro-6.11.1.tgz#21808197c58597847c02fdead01dbd177c84044b"
@@ -2431,7 +2417,7 @@
     prop-types "^15.8.1"
     reselect "^4.1.8"
 
-"@mui/x-data-grid@6.11.1":
+"@mui/x-data-grid@6.11.1", "@mui/x-data-grid@latest":
   version "6.11.1"
   resolved "https://registry.yarnpkg.com/@mui/x-data-grid/-/x-data-grid-6.11.1.tgz#60b172a50acd9ecec0a264d0604a34422ce3f80c"
   integrity sha512-qFyuf6R/JOG46Y62scwH0C7s+xVqfRFU/gv4rUWS9m+EYsabAXTx/g+Mq2t+ZGdaaGZlrpKDavr2PwitbpTMaw==
@@ -11507,7 +11493,7 @@ postcss@8.4.14:
     picocolors "^1.0.0"
     source-map-js "^1.0.2"
 
-postcss@8.4.27, postcss@^8.4.23, postcss@^8.4.27:
+postcss@8.4.27, postcss@^8.4.23, postcss@^8.4.26, postcss@^8.4.27:
   version "8.4.27"
   resolved "https://registry.yarnpkg.com/postcss/-/postcss-8.4.27.tgz#234d7e4b72e34ba5a92c29636734349e0d9c3057"
   integrity sha512-gY/ACJtJPSmUFPDCHtX78+01fHa64FaU4zaaWfuh1MhGJISufJAH4cun6k/8fwsHYeK4UQmENQK+tRLCFJE8JQ==
@@ -12429,7 +12415,7 @@ rimraf@^4.4.1:
   dependencies:
     glob "^9.2.0"
 
-rollup@^3.2.5, rollup@^3.27.1:
+rollup@^3.2.5, rollup@^3.25.2, rollup@^3.27.1:
   version "3.28.0"
   resolved "https://registry.yarnpkg.com/rollup/-/rollup-3.28.0.tgz#a3c70004b01934760c0cb8df717c7a1d932389a2"
   integrity sha512-d7zhvo1OUY2SXSM6pfNjgD5+d0Nz87CUp4mt8l/GgVP3oBsPwzNvSzyu1me6BSG9JIgWNTVcafIXBIyM8yQ3yw==

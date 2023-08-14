@@ -54,7 +54,7 @@ export default function BasicExampleGrid() {
       file,
       dependencies: [
         ['react', () => import('react')],
-        ['@mui/x-data-grid-pro', () => import('@mui/x-data-grid-pro')],
+        ['@mui/x-data-grid', () => import('@mui/x-data-grid')],
         ['@mui/material', () => import('@mui/material')],
         ['@mui/toolpad-next/runtime', () => import('@mui/toolpad-next/runtime')],
       ],

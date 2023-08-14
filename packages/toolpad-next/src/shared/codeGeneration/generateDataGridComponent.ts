@@ -1,5 +1,5 @@
 import path from 'path-browserify';
-import type { GridColDef } from '@mui/x-data-grid-pro';
+import type { GridColDef } from '@mui/x-data-grid';
 import { format } from '../prettier';
 import { DataGridFile } from '../schemas';
 import { WithDevtoolParams } from '../types';
@@ -21,7 +21,7 @@ export default async function generateDataGridComponent(
   const imports = new Imports(globalScope);
 
   imports.addImport('react', '*', 'React');
-  imports.addImport('@mui/x-data-grid-pro', 'DataGridPro', 'DataGridPro');
+  imports.addImport('@mui/x-data-grid', 'DataGrid', 'DataGrid');
   imports.addImport('@mui/material', 'Box', 'Box');
   if (options.target !== 'prod') {
     imports.addImport('@mui/toolpad-next/runtime', '*', '_runtime');
@@ -171,7 +171,7 @@ export default async function generateDataGridComponent(
             {error ? (
               <ErrorOverlay error={error} />
             ) : (
-              <DataGridPro
+              <DataGrid
                 rows={rows}
                 loading={loading}
                 columns={columns}

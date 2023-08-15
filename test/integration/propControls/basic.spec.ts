@@ -54,7 +54,7 @@ test('can control component prop values in properties control panel', async ({ p
   await inputByLabel.waitFor({ state: 'visible' });
 });
 
-test.only('can toggle boolean prop that is true by default', async ({ page }) => {
+test('can toggle boolean prop that is true by default', async ({ page }) => {
   const editorModel = new ToolpadEditor(page);
 
   await editorModel.goto();

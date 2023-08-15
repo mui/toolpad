@@ -61,9 +61,9 @@ test.only('can toggle boolean prop that is true by default', async ({ page }) =>
 
   await editorModel.waitForOverlay();
 
-  const autoCompleteLocator = editorModel.appCanvas.getByLabel('search', { exact: true });
+  const autocomplete = editorModel.appCanvas.getByLabel('search', { exact: true });
 
-  await clickCenter(page, autoCompleteLocator);
+  await clickCenter(page, autocomplete);
 
   await editorModel.componentEditor
     .locator('h6:has-text("Autocomplete")')

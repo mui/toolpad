@@ -129,7 +129,7 @@ test('must correctly size new layout columns', async ({ page }) => {
 
   // Drag new element to same row as existing element
 
-  await editorModel.dragNewComponentTo(
+  await editorModel.dragNewComponentToCanvas(
     'FullWidth',
     firstFullWidthBoundingBox1!.x + (3 / 4) * firstFullWidthBoundingBox1!.width,
     firstFullWidthBoundingBox1!.y + firstFullWidthBoundingBox1!.height / 2,
@@ -142,7 +142,7 @@ test('must correctly size new layout columns', async ({ page }) => {
 
   // Drag new element to same row as existing same-width elements
 
-  await editorModel.dragNewComponentTo(
+  await editorModel.dragNewComponentToCanvas(
     'FullWidth',
     secondFullWidthBoundingBox2!.x + (3 / 4) * secondFullWidthBoundingBox2!.width,
     secondFullWidthBoundingBox2!.y + secondFullWidthBoundingBox2!.height / 2,
@@ -159,7 +159,7 @@ test('must correctly size new layout columns', async ({ page }) => {
 
   const fifthFullWidthBoundingBox = await getNthFullWidthBoundingBox(4);
 
-  await editorModel.dragNewComponentTo(
+  await editorModel.dragNewComponentToCanvas(
     'FullWidth',
     fifthFullWidthBoundingBox!.x + (3 / 4) * fifthFullWidthBoundingBox!.width,
     fifthFullWidthBoundingBox!.y + fifthFullWidthBoundingBox!.height / 2,
@@ -195,6 +195,25 @@ test('code editor auto-complete', async ({ page }) => {
   await expect(page.getByRole('option', { name: 'textField' })).toBeVisible();
 });
 
+test('must deselect selected element when clicking outside of it', async ({ page }) => {
+  const editorModel = new ToolpadEditor(page);
+
+  await editorModel.goToPageById('K7SkzhT');
+
+  await editorModel.waitForOverlay();
+
+  const textField = editorModel.appCanvas.locator('input');
+  const textFieldNodeHudTag = editorModel.appCanvas
+    .getByTestId('node-hud-tag')
+    .filter({ hasText: 'textField' });
+
+  await clickCenter(page, textField);
+  await expect(textFieldNodeHudTag).toBeVisible();
+
+  const textFieldBoundingBox = await textField.boundingBox();
+  await page.mouse.click(textFieldBoundingBox!.x + 150, textFieldBoundingBox!.y + 150);
+  await expect(textFieldNodeHudTag).toBeHidden();
+});
 test('can rename page', async ({ page, localApp }) => {
   const editorModel = new ToolpadEditor(page);
   await editorModel.goto();

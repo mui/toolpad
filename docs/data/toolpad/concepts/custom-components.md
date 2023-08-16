@@ -1,6 +1,6 @@
 # Custom components
 
-<p class="description">You can bring your own custom components inside the Toolpad editor</p>
+<p class="description">You can bring your own custom components inside the Toolpad editor.</p>
 
 ## `createComponent`
 

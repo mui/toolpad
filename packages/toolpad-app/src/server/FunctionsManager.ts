@@ -72,6 +72,8 @@ export default class FunctionsManager {
 
   private extractTypesWorker: Piscina | undefined;
 
+  private buildCtx: esbuild.BuildContext | undefined;
+
   constructor(project: IToolpadProject) {
     this.project = project;
     this.devWorker = createDevWorker(process.env);
@@ -195,17 +197,15 @@ export default class FunctionsManager {
   }
 
   private async startWatchingFunctionFiles() {
-    let ctx: esbuild.BuildContext | undefined;
-
     // Make sure we pick up added/removed function files
     const resourcesWatcher = chokidar.watch([this.getFunctionResourcesPattern()], {
       ignoreInitial: true,
     });
 
     const reinitializeWatcher = async () => {
-      await ctx?.dispose();
-      ctx = await this.createEsbuildContext();
-      await ctx.watch();
+      await this.buildCtx?.dispose();
+      this.buildCtx = await this.createEsbuildContext();
+      await this.buildCtx.watch();
     };
 
     reinitializeWatcher();
@@ -250,8 +250,17 @@ export default class FunctionsManager {
     await fs.writeFile(this.getIntrospectJsonPath(), JSON.stringify(types, null, 2), 'utf-8');
   }
 
+  private async disposeBuildcontext() {
+    this.buildCtx?.dispose();
+    this.buildCtx = undefined;
+  }
+
   async dispose() {
-    await Promise.all([this.devWorker.terminate(), this.extractTypesWorker?.destroy()]);
+    await Promise.all([
+      this.disposeBuildcontext(),
+      this.devWorker.terminate(),
+      this.extractTypesWorker?.destroy(),
+    ]);
   }
 
   async exec(

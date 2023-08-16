@@ -1,6 +1,6 @@
 # HTTP Requests
 
-<p class="description">These offer a fast way to load external data from REST APIs, via a configurable interface..</p>
+<p class="description">These offer a fast way to load external data from REST APIs, via a configurable interface.</p>
 
 {{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/concepts/connecting-to-data/query-1.png", "alt": "Add HTTP request", "caption": "Adding a query via the HTTP Request editor" }}
 

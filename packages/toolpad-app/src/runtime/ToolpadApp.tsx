@@ -98,7 +98,7 @@ const Pre = styled('pre')(({ theme }) => ({
   fontFamily: theme.fontFamilyMonospaced,
 }));
 
-const PREVIEW_PAGE_ROUTE = '/preview/pages/:nodeId';
+const PREVIEW_PAGE_ROUTE = '/preview/pages/:pageName';
 
 export const internalComponents: ToolpadComponents = Object.fromEntries(
   [...INTERNAL_COMPONENTS].map(([name]) => {
@@ -1419,7 +1419,7 @@ function RenderedPages({ pages, defaultPage }: RenderedPagesProps) {
       {pages.map((page) => (
         <React.Fragment key={page.id}>
           <Route
-            path={`/pages/${page.id}`}
+            path={`/pages/${page.name}`}
             element={
               <RenderedPage
                 nodeId={page.id}
@@ -1434,8 +1434,8 @@ function RenderedPages({ pages, defaultPage }: RenderedPagesProps) {
       {pages.map((page) => (
         <React.Fragment key={page.id}>
           <Route
-            path={`/pages/${page.name}`}
-            element={<Navigate to={`/pages/${page.id}`} replace />}
+            path={`/pages/${page.id}`}
+            element={<Navigate to={`/pages/${page.name}`} replace />}
           />
         </React.Fragment>
       ))}
@@ -1493,9 +1493,10 @@ function ToolpadAppLayout({ dom, hasShell: hasShellProp = true }: ToolpadAppLayo
   const urlParams = React.useMemo(() => new URLSearchParams(search), [search]);
 
   const pageMatch = matchPath(PREVIEW_PAGE_ROUTE, `/preview${pathname}`);
-  const pageId = pageMatch?.params.nodeId;
+  const pageName = pageMatch?.params.pageName;
 
   const defaultPage = pages[0];
+  const pageId = appDom.getNodeIdByName(dom, pageName as string);
   const page = pageId ? appDom.getMaybeNode(dom, pageId as NodeId, 'page') : defaultPage;
 
   const displayMode = urlParams.get('toolpad-display') || page?.attributes.display;
@@ -1506,7 +1507,7 @@ function ToolpadAppLayout({ dom, hasShell: hasShellProp = true }: ToolpadAppLayo
 
   return (
     <React.Fragment>
-      {showPreviewHeader ? <PreviewHeader pageId={pageId} /> : null}
+      {showPreviewHeader ? <PreviewHeader pageId={pageId as NodeId} /> : null}
       <Box sx={{ flex: 1, display: 'flex' }}>
         {hasShell && pages.length > 0 ? (
           <AppNavigation pages={pages} clipped={showPreviewHeader} />

@@ -54,8 +54,8 @@ export default function AppNavigation({ pages, clipped = false }: AppNavigationP
             <ListItem key={page.id} disablePadding>
               <ListItemButton
                 component={Link}
-                to={`pages/${page.id}${search}`}
-                selected={activePagePath === `/pages/${page.id}`}
+                to={`pages/${page.name}${search}`}
+                selected={activePagePath === `/pages/${page.name}`}
               >
                 <ListItemText primary={page.name} sx={{ ml: 2 }} />
               </ListItemButton>

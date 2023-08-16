@@ -1,10 +1,10 @@
 # Create a number component
 
-<p class="description">You can extend Toolpad with custom code components </p>
+<p class="description">You can extend Toolpad with custom code components.</p>
 
 We can create a custom component to display a large number value along with a smaller label, like so:
 
-{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/how-to-guides/custom-components/number/component.png", "alt": "Number component", "caption": "The number component" }}
+{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/how-to-guides/custom-components/number/component.png", "alt": "Number component", "caption": "The number component"}}
 
 ## Creating the component
 

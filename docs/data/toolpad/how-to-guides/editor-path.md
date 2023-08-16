@@ -1,12 +1,12 @@
 # Troubleshoot missing editor
 
-<p class="description">How to troubleshoot a missing editor error on Toolpad</p>
+<p class="description">How to troubleshoot a missing editor error on Toolpad.</p>
 
 ## When using Visual Studio Code
 
 1. When clicking on the "Open editor" button on the query editor, you might run into the following error
 
-{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/how-to-guides/editor-path/missing-editor.png", "alt": "Missing editor error", "caption": "Missing editor error" }}
+{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/how-to-guides/editor-path/missing-editor.png", "alt": "Missing editor error", "caption": "Missing editor error"}}
 
 2. This is most likely caused by a missing `code` command in your system `PATH`.
 

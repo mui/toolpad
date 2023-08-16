@@ -7,7 +7,7 @@ import * as vm from 'vm';
 import * as url from 'url';
 import fetch, { Headers, Request, Response } from 'node-fetch';
 import { errorFrom, serializeError } from '@mui/toolpad-utils/errors';
-import invariant from 'invariant';
+import { ServerContext, getContext, withContext } from '@mui/toolpad-core/server';
 
 function getCircularReplacer() {
   const ancestors: object[] = [];
@@ -40,6 +40,7 @@ interface ExecuteMessage {
   filePath: string;
   name: string;
   parameters: unknown[];
+  ctx: ServerContext;
 }
 
 type WorkerMessage = IntrospectMessage | ExecuteMessage;
@@ -97,7 +98,10 @@ async function execute(msg: ExecuteMessage) {
     throw new Error(`Function "${msg.name}" not found`);
   }
 
-  const result = await fn(...msg.parameters);
+  const result = await withContext(msg.ctx, async () => {
+    return fn(...msg.parameters);
+  });
+
   return result;
 }
 
@@ -136,8 +140,6 @@ if (!isMainThread && parentPort) {
 }
 
 export function createWorker(env: Record<string, any>) {
-  invariant(isMainThread, 'createWorker() must be called from the main thread');
-
   const worker = new Worker(path.join(__dirname, 'functionsDevWorker.js'), { env });
 
   const runOnWorker = async (msg: WorkerMessage) => {
@@ -158,11 +160,13 @@ export function createWorker(env: Record<string, any>) {
     },
 
     async execute(filePath: string, name: string, parameters: unknown[]): Promise<any> {
+      const ctx = getContext();
       return runOnWorker({
         kind: 'execute',
         filePath,
         name,
         parameters,
+        ctx,
       });
     },
   };

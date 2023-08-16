@@ -19,4 +19,5 @@ export async function expectBasicPageContent(page: Page) {
   await expect(
     page.getByText("Raw text: Hello, I'm raw text! | SELECT NOW()", { exact: true }),
   ).toBeVisible();
+  await expect(page.getByText('my custom cookie: foo-bar-baz', { exact: true })).toBeVisible();
 }

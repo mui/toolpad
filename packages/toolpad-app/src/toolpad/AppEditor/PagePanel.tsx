@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { styled, SxProps, Box, Divider, Typography } from '@mui/material';
-import PagesHierarchyExplorer from './HierarchyExplorer';
-import PageStructureExplorer from './StructureExplorer';
+import PagesExplorer from './PagesExplorer';
+import PageHierarchyExplorer from './HierarchyExplorer';
 import SplitPane from '../../components/SplitPane';
 import { useDom } from '../AppState';
 import AppOptions from '../AppOptions';
@@ -39,8 +39,8 @@ export default function PagePanel({ className, sx }: ComponentPanelProps) {
       </Box>
       <Divider />
       <SplitPane sx={{ flex: 1 }} split="horizontal" defaultSize={200} minSize={100} maxSize={400}>
-        <PagesHierarchyExplorer />
-        <PageStructureExplorer />
+        <PagesExplorer />
+        <PageHierarchyExplorer />
       </SplitPane>
     </PagePanelRoot>
   );

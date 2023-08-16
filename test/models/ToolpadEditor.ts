@@ -1,5 +1,5 @@
-import { expect, FrameLocator, Locator, Page } from '@playwright/test';
 import { setTimeout } from 'timers/promises';
+import { expect, FrameLocator, Locator, Page } from '@playwright/test';
 import { gotoIfNotCurrent } from './shared';
 
 class CreatePageDialog {
@@ -89,7 +89,7 @@ export class ToolpadEditor {
     this.pageRoot = this.appCanvas.getByTestId('page-root');
     this.pageOverlay = this.appCanvas.getByTestId('page-overlay');
 
-    this.explorer = page.getByTestId('hierarchy-explorer');
+    this.explorer = page.getByTestId('pages-explorer');
     this.confirmationDialog = page.getByRole('dialog').filter({ hasText: 'Confirm' });
   }
 
@@ -147,7 +147,11 @@ export class ToolpadEditor {
     return this.page.getByTestId('component-catalog').getByRole('button', { name });
   }
 
-  async dragNewComponentTo(componentName: string, moveTargetX?: number, moveTargetY?: number) {
+  async dragNewComponentToCanvas(
+    componentName: string,
+    moveTargetX?: number,
+    moveTargetY?: number,
+  ) {
     const style = await this.page.addStyleTag({ content: `* { transition: none !important; }` });
 
     await this.componentCatalog.hover();
@@ -168,7 +172,7 @@ export class ToolpadEditor {
     await style.evaluate((elm) => elm.parentNode?.removeChild(elm));
   }
 
-  getHierarchyItem(group: string, name: string): Locator {
+  getPageItem(group: string, name: string): Locator {
     return this.explorer
       .getByRole('treeitem')
       .filter({ hasText: group })
@@ -176,10 +180,10 @@ export class ToolpadEditor {
       .filter({ hasText: name });
   }
 
-  async openHierarchyMenu(group: string, name: string) {
-    const hierarchyItem = this.getHierarchyItem(group, name);
-    const menuButton = hierarchyItem.getByRole('button', { name: 'Open hierarchy menu' });
-    await hierarchyItem.hover();
+  async openPageExplorerMenu(group: string, name: string) {
+    const pageItem = this.getPageItem(group, name);
+    const menuButton = pageItem.getByRole('button', { name: 'Open page explorer menu' });
+    await pageItem.hover();
     await menuButton.click();
   }
 }

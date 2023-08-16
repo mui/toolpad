@@ -1,5 +1,8 @@
 /// <reference path="./serverModules.d.ts" />
 
+import { AsyncLocalStorage } from 'node:async_hooks';
+import { IncomingMessage } from 'node:http';
+import * as cookie from 'cookie';
 import { TOOLPAD_FUNCTION } from './constants';
 import { InferParameterType, PrimitiveValueType, PropValueType } from './types';
 
@@ -85,3 +88,28 @@ export function createFunction<
  * createQuery is deprecated. Use createFunction instead.
  */
 export const createQuery = createFunction;
+
+export interface ServerContext {
+  cookies: Record<string, string>;
+}
+
+const asyncLocalStorage = new AsyncLocalStorage<ServerContext>();
+
+export function getContext(): ServerContext {
+  const ctx = asyncLocalStorage.getStore();
+  if (!ctx) {
+    throw new Error('getContext() must be called from within a Toolpad function.');
+  }
+  return ctx;
+}
+
+export function createServerContext(req: IncomingMessage): ServerContext {
+  const cookies = cookie.parse(req.headers.cookie || '');
+  return {
+    cookies,
+  };
+}
+
+export function withContext<R = void>(ctx: ServerContext, doWork: () => Promise<R>): Promise<R> {
+  return asyncLocalStorage.run(ctx, doWork);
+}

@@ -1,6 +1,6 @@
 # Create a 3D cube component
 
-<p class="description">You can extend Toolpad with custom code components, including from external packages </p>
+<p class="description">You can extend Toolpad with custom code components, including from external packages.</p>
 
 We can use any package available on `npm` to extend our Toolpad application. This guide will render a cube using [`@react-three/fiber`](https://www.npmjs.com/package/@react-three/fiber):
 

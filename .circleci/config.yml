@@ -1,6 +1,6 @@
 version: 2.1
 orbs:
-  aws-s3: circleci/aws-s3@3.1.1
+  aws-s3: circleci/aws-s3@4.0.0
 
 defaults: &defaults
   working_directory: /tmp/mui-toolpad
@@ -138,7 +138,7 @@ jobs:
     <<: *defaults
     resource_class: 'large'
     docker:
-      - image: mcr.microsoft.com/playwright:v1.36.1-focal
+      - image: mcr.microsoft.com/playwright:v1.37.0-focal
         environment:
           NODE_ENV: test
           TOOLPAD_TEST_RETRIES: 1

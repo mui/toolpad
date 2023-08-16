@@ -1,6 +1,6 @@
-import { defineConfig } from 'tsup';
 import * as fs from 'fs/promises';
 import path from 'path';
+import { defineConfig } from 'tsup';
 import type * as esbuild from 'esbuild';
 
 function cleanFolderOnFailure(folder: string): esbuild.Plugin {
@@ -20,7 +20,6 @@ export default defineConfig([
   {
     entry: {
       index: './cli/index.ts',
-      server: './cli/server.ts',
       appServer: './cli/appServer.ts',
       appBuilder: './cli/appBuilder.ts',
       functionsDevWorker: './src/server/functionsDevWorker.ts',

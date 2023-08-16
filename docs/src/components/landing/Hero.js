@@ -199,9 +199,9 @@ export default function Hero() {
         <GetStartedButtons
           primaryLabel={'Get started'}
           primaryUrl={ROUTES.toolpadQuickstart}
-          primaryUrlTarget="_blank"
           secondaryLabel={'Book a demo'}
           secondaryUrl={ROUTES.toolpadDemoBooking}
+          secondarUrlTarget="_blank"
           altInstallation={'npx create-toolpad-app@latest'}
         />
         <Box

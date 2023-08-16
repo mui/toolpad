@@ -44,7 +44,7 @@ function PageEditorContent({ node }: PageEditorContentProps) {
           </PageEditorRoot>
         </Panel>
         <PanelResizeHandle />
-        <Panel>
+        <Panel defaultSize={25}>
           <ComponentPanel />
         </Panel>
       </PanelGroup>

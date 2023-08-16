@@ -10,7 +10,8 @@ import SvgMuiLogo from 'docs/src/icons/SvgMuiLogomark';
 import IconImage from 'docs/src/components/icon/IconImage';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import GradientText from 'docs/src/components/typography/GradientText';
-import GetStartedButtons from './GetStartedButtons';
+// import GetStartedButtons from './GetStartedButtons';
+import GetStartedButtons from 'docs/src/components/home/GetStartedButtons';
 import GithubStars from './GithubStars';
 import CodeBlock from './CodeBlock';
 import ROUTES from '../../route';
@@ -198,9 +199,10 @@ export default function Hero() {
         <GetStartedButtons
           primaryLabel={'Get started'}
           primaryUrl={ROUTES.toolpadQuickstart}
+          primaryUrlTarget="_blank"
           secondaryLabel={'Book a demo'}
           secondaryUrl={ROUTES.toolpadDemoBooking}
-          installation={'npx create-toolpad-app@latest'}
+          altInstallation={'npx create-toolpad-app@latest'}
         />
         <Box
           sx={{

@@ -6,6 +6,7 @@ import QueryEditor from './QueryEditor';
 import UrlQueryEditor from './UrlQueryEditor';
 import NodeNameEditor from '../NodeNameEditor';
 import * as appDom from '../../../appDom';
+import PageTitleEditor from '../PageTitleEditor';
 
 const PAGE_DISPLAY_OPTIONS: { value: appDom.PageDisplayMode; label: string }[] = [
   { value: 'shell', label: 'App shell' },
@@ -38,6 +39,7 @@ export default function PageOptionsPanel() {
     <Stack spacing={1} alignItems="start" data-testid="page-editor">
       <Typography variant="subtitle1">Page:</Typography>
       <NodeNameEditor node={page} />
+      <PageTitleEditor node={page} />
       <TextField
         select
         defaultValue="shell"

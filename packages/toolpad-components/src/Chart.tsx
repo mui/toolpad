@@ -14,6 +14,7 @@ import {
   Area,
   Scatter,
 } from 'recharts';
+import { ChartContainer } from '@mui/x-charts/ChartContainer';
 import { errorFrom } from '@mui/toolpad-utils/errors';
 import ErrorOverlay from './components/ErrorOverlay';
 import { SX_PROP_HELPER_TEXT } from './constants';
@@ -194,6 +195,7 @@ function Chart({ data = [], loading, error, height, sx }: ChartProps) {
           height={height}
         />
       ) : null}
+      <ChartContainer series={[]} width={500} height={400} />
     </Container>
   );
 }

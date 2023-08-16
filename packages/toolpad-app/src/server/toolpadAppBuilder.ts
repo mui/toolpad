@@ -259,6 +259,7 @@ export function createViteConfig({
           '@mui/material/styles',
           '@mui/material/useMediaQuery',
           '@mui/utils',
+          '@mui/x-charts/ChartContainer',
           '@mui/x-data-grid-pro',
           '@mui/x-date-pickers/AdapterDayjs',
           '@mui/x-date-pickers/DesktopDatePicker',

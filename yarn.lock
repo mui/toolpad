@@ -2261,6 +2261,18 @@
     prop-types "^15.8.1"
     react-is "^18.2.0"
 
+"@mui/x-charts@6.0.0-alpha.7":
+  version "6.0.0-alpha.7"
+  resolved "https://registry.yarnpkg.com/@mui/x-charts/-/x-charts-6.0.0-alpha.7.tgz#ddd9fdc3b8765703ce6599431b02aa44f39cc4af"
+  integrity sha512-duZkx4ug+yWzZN4lmY31TngUhoGt8nFoKl8hFMNzIFZCB+u6Z5bbsa0xW5TXL+xNihXhE5lPIJu9SeW1Uv2jqQ==
+  dependencies:
+    "@babel/runtime" "^7.22.6"
+    clsx "^2.0.0"
+    d3-color "^3.1.0"
+    d3-scale "^4.0.2"
+    d3-shape "^3.2.0"
+    prop-types "^15.8.1"
+
 "@mui/x-data-grid-pro@6.11.1":
   version "6.11.1"
   resolved "https://registry.yarnpkg.com/@mui/x-data-grid-pro/-/x-data-grid-pro-6.11.1.tgz#21808197c58597847c02fdead01dbd177c84044b"
@@ -5578,7 +5590,7 @@ csstype@3.1.2, csstype@^3.0.2, csstype@^3.1.2:
   dependencies:
     internmap "1 - 2"
 
-"d3-color@1 - 3":
+"d3-color@1 - 3", d3-color@^3.1.0:
   version "3.1.0"
   resolved "https://registry.yarnpkg.com/d3-color/-/d3-color-3.1.0.tgz#395b2833dfac71507f12ac2f7af23bf819de24e2"
   integrity sha512-zg/chbXyeBtMQ1LbD/WSoW2DpC3I0mpmPdW+ynRTj/x2DAWYrIY7qeZIHidozwV24m4iavr15lNwIwLxRmOxhA==
@@ -5616,7 +5628,7 @@ d3-scale@^4.0.2:
     d3-time "2.1.1 - 3"
     d3-time-format "2 - 4"
 
-d3-shape@^3.1.0:
+d3-shape@^3.1.0, d3-shape@^3.2.0:
   version "3.2.0"
   resolved "https://registry.yarnpkg.com/d3-shape/-/d3-shape-3.2.0.tgz#a1a839cbd9ba45f28674c69d7f855bcf91dfc6a5"
   integrity sha512-SaLBuwGm3MOViRq2ABk3eLoxwZELpH6zhl3FbAoJ7Vm1gofKx6El1Ib5z23NUEhF9AsGl7y+dzLe5Cw2AArGTA==

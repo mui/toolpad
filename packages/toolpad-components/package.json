@@ -44,6 +44,7 @@
     "@mui/material": "5.14.5",
     "@mui/toolpad-core": "0.1.23",
     "@mui/toolpad-utils": "0.1.23",
+    "@mui/x-charts": "6.0.0-alpha.7",
     "@mui/x-data-grid-pro": "6.11.1",
     "@mui/x-date-pickers": "6.11.1",
     "@mui/x-license-pro": "6.10.2",

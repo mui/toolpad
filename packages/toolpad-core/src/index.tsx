@@ -27,5 +27,3 @@ export * from './constants';
 export * from './browser';
 
 export * from './types';
-
-export * from './server';

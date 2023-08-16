@@ -139,3 +139,18 @@ export async function askGPT(messages: string[]) {
 You can then use this function on your page:
 
 {{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/concepts/connecting-to-data/ask-gpt.gif", "alt": "Custom function with secret", "caption": "Using a custom function with environment variables", "indent": 1 }}
+
+## Request context
+
+When you run Toolpad in an authenticated context it may be useful to be able to access authentication information in backend functions. For this purpose we offer the `getContext` API which allows you to inspect the cookies of the request that initiated the backend function.
+
+```jsx
+import { getContext } from '@mui/toolpad/server';
+import { parseAuth } from '../../src/lib/auth';
+
+export async function myBackendFunction() {
+  const ctx = getContext();
+  const user = await parseAuth(ctx.cookie.authentication);
+  return user?.id;
+}
+```

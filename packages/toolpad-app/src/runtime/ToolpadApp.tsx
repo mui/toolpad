@@ -363,7 +363,7 @@ function parseBinding(
   bindable: BindableAttrValue<any>,
   { scopePath }: ParseBindingOptions = {},
 ): ParsedBinding | EvaluatedBinding {
-  const bindingType = bindable && getBindingType(bindable);
+  const bindingType = getBindingType(bindable);
 
   if (bindingType === 'const') {
     return {
@@ -458,7 +458,7 @@ function parseBindings(
         const propValue: BindableAttrValue<any> = elm.props?.[propName];
 
         const binding: BindableAttrValue<any> =
-          propValue || (argType ? getArgTypeDefaultValue(argType) : undefined);
+          propValue ?? (argType ? getArgTypeDefaultValue(argType) : undefined);
 
         const bindingId = `${elm.id}.props.${propName}`;
 
@@ -511,9 +511,7 @@ function parseBindings(
         };
 
         const propBindingValue = propValue && getBindingValue(propValue);
-        if (propBindingValue) {
-          parseNestedBindings(propBindingValue, bindingId);
-        }
+        parseNestedBindings(propBindingValue, bindingId);
       }
 
       if (componentId !== PAGE_ROW_COMPONENT_ID) {
@@ -527,7 +525,7 @@ function parseBindings(
       if (!isPageLayoutComponent(elm)) {
         for (const [propName, argType] of Object.entries(layoutBoxArgTypes)) {
           const binding =
-            elm.layout?.[propName as keyof typeof layoutBoxArgTypes] ||
+            elm.layout?.[propName as keyof typeof layoutBoxArgTypes] ??
             (argType ? getArgTypeDefaultValue(argType) : undefined);
           const bindingId = `${elm.id}.layout.${propName}`;
           parsedBindingsMap.set(bindingId, parseBinding(binding, {}));
@@ -578,7 +576,7 @@ function parseBindings(
           const bindingId = `${elm.id}.params.${paramName}`;
           const scopePath = `${elm.name}.params.${paramName}`;
 
-          const bindingType = bindable && getBindingType(bindable);
+          const bindingType = getBindingType(bindable);
           if (bindingType === 'const') {
             parsedBindingsMap.set(bindingId, {
               scopePath,

@@ -405,6 +405,8 @@ export default function RenderOverlay({ bridge }: RenderOverlayProps) {
       dragOverNodeParentProp &&
       dragOverParentFreeSlots[dragOverNodeParentProp];
 
+    const isDraggingOverPageChild = dragOverParent ? appDom.isPage(dragOverParent) : false;
+
     const isDraggingOverPageRowChild =
       dragOverParent && appDom.isElement(dragOverParent) ? isPageRow(dragOverParent) : false;
     const isDraggingOverPageColumnChild =
@@ -417,7 +419,9 @@ export default function RenderOverlay({ bridge }: RenderOverlayProps) {
       : false;
 
     const hasChildHorizontalDropZones =
-      !isDraggingOverVerticalContainerChild || isDraggingOverPageColumnChild;
+      !isDraggingOverVerticalContainerChild ||
+      isDraggingOverPageChild ||
+      isDraggingOverPageColumnChild;
     const hasChildVerticalDropZones =
       !isDraggingOverHorizontalContainerChild || isDraggingOverPageRowChild;
 
@@ -458,8 +462,6 @@ export default function RenderOverlay({ bridge }: RenderOverlayProps) {
       }
 
       if (isDraggingOverHorizontalContainer) {
-        const isDraggingOverPageChild = dragOverParent ? appDom.isPage(dragOverParent) : false;
-
         return [
           DROP_ZONE_TOP,
           DROP_ZONE_BOTTOM,
@@ -704,17 +706,12 @@ export default function RenderOverlay({ bridge }: RenderOverlayProps) {
         const edgeDetectionMargin = 10; // px
 
         // Detect center in layout containers
-        if (
-          isDraggingOverElement &&
-          !isDraggingOverEmptyContainer &&
-          activeDropNodeInfo &&
-          activeDropSlot
-        ) {
+        if (isDraggingOverElement && !isDraggingOverEmptyContainer && activeDropNodeInfo) {
           const isDraggingOverPageChild = activeDropNodeParent
             ? appDom.isPage(activeDropNodeParent)
             : false;
 
-          if (isHorizontalFlow(activeDropSlot.flowDirection)) {
+          if (!activeDropSlot || isHorizontalFlow(activeDropSlot.flowDirection)) {
             if (
               isDraggingOverPageChild &&
               activeDropNodeRect &&
@@ -731,11 +728,11 @@ export default function RenderOverlay({ bridge }: RenderOverlayProps) {
               activeDropZone = DROP_ZONE_TOP;
             } else if (activeDropAreaRect.height - relativeY <= edgeDetectionMargin) {
               activeDropZone = DROP_ZONE_BOTTOM;
-            } else {
+            } else if (activeDropSlot) {
               activeDropZone = DROP_ZONE_CENTER;
             }
           }
-          if (isVerticalFlow(activeDropSlot.flowDirection)) {
+          if (activeDropSlot && isVerticalFlow(activeDropSlot.flowDirection)) {
             if (relativeX <= edgeDetectionMargin) {
               activeDropZone = DROP_ZONE_LEFT;
             } else if (activeDropAreaRect.width - relativeX <= edgeDetectionMargin) {
@@ -848,6 +845,8 @@ export default function RenderOverlay({ bridge }: RenderOverlayProps) {
 
           const originalParent = parent;
           const originalParentInfo = parent && nodesInfo[parent.id];
+
+          const isOriginalParentPage = originalParent ? appDom.isPage(originalParent) : false;
 
           const isOriginalParentRow =
             originalParent && appDom.isElement(originalParent) ? isPageRow(originalParent) : false;
@@ -998,7 +997,7 @@ export default function RenderOverlay({ bridge }: RenderOverlayProps) {
 
             if ([DROP_ZONE_RIGHT, DROP_ZONE_LEFT].includes(dragOverZone)) {
               if (!isDraggingOverHorizontalContainer) {
-                if (isOriginalParentColumn) {
+                if (isOriginalParentPage || isOriginalParentColumn) {
                   const rowContainer = appDom.createElement(draft, PAGE_ROW_COMPONENT_ID, {
                     justifyContent: originalParentInfo?.props.alignItems || 'start',
                   });

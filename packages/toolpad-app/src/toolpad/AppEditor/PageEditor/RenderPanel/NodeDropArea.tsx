@@ -303,6 +303,8 @@ export default function NodeDropArea({
   const highlightedZoneOverlayClass =
     highlightedZone && getHighlightedZoneOverlayClass(highlightedZone);
 
+  const isPageChildElement = isPageChild && appDom.isElement(node) && !isPageRow(node);
+
   const isHorizontalContainerChild = dropAreaNodeParentSlot
     ? isHorizontalFlow(dropAreaNodeParentSlot.flowDirection)
     : false;
@@ -336,7 +338,14 @@ export default function NodeDropArea({
 
   const isHighlightingCenter = highlightedZone === DROP_ZONE_CENTER;
 
-  const highlightRect = isHighlightingCenter && isEmptySlot && slotRect ? slotRect : dropAreaRect;
+  const highlightRect =
+    isHighlightingCenter && isEmptySlot && slotRect
+      ? slotRect
+      : {
+          ...dropAreaRect,
+          x: isPageChildElement ? pageRect.x : dropAreaRect.x,
+          width: 
+        };
 
   return (
     <React.Fragment>

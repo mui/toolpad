@@ -3,7 +3,7 @@
 <p class="description">Provide backend function that loads data on the page.</p>
 
 :::warning
-The `createFunction` API is deprecated and will be removed from Toolpad `v0.1.23` onwards. You can now use functions directly without needing to wrap them inside `createFunction` - See [custom functions](/toolpad/concepts/custom-functions/) for examples.
+The `createFunction` API is deprecated and will be removed in a future version. You can now use functions directly without needing to wrap them inside `createFunction` - See [custom functions](/toolpad/concepts/custom-functions/) for examples.
 :::
 
 ## Import

@@ -1,5 +1,30 @@
 # Changelog
 
+## 0.1.24
+
+<!-- generated comparing v0.1.23..master -->
+
+_Aug 17, 2023_
+
+A big thanks to the 6 contributors who made this release possible. Here are some highlights ✨:
+
+Add support for reading cookies in custom functions, allow editing page title from the page editor UI and other miscellaneous fixes!
+
+- &#8203;<!-- 14 -->Fix falsy prop updates (#2495) @apedroferreira
+- &#8203;<!-- 13 -->Chart adjustments (#2493) @apedroferreira
+- &#8203;<!-- 12 -->Support reading cookies in backend functions (#2491) @Janpot
+- &#8203;<!-- 11 -->Fix issues with vite deps optimizer (#2490) @Janpot
+- &#8203;<!-- 10 -->fix background color style (#2326) @JerryWu1234
+- &#8203;<!-- 09 -->Update npm stats example to use new chart component (#2385) @apedroferreira
+- &#8203;<!-- 08 -->Update monorepo (#2475) @apedroferreira
+- &#8203;<!-- 07 -->[core] Upgrade monorepo (#2496) @bharatkashyap
+- &#8203;<!-- 06 -->[core] Fix confusing component nomenclature (#2479) @bharatkashyap
+- &#8203;<!-- 05 -->[core] Set GitHub Action top level permission @oliviertassinari
+- &#8203;<!-- 04 -->[core] Remove dead code html meta (#2476) @oliviertassinari
+- &#8203;<!-- 03 -->[docs] Cleanup (#2497) @bharatkashyap
+- &#8203;<!-- 02 -->[docs] Fix 301 reports in ahrefs @oliviertassinari
+- &#8203;<!-- 01 -->[Enhancement] Edit page title from page editor (#2480) @Kirera-Wainaina
+
 ## 0.1.23
 
 <!-- generated comparing v0.1.22..master -->

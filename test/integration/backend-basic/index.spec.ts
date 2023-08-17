@@ -32,7 +32,11 @@ test.use({
   },
 });
 
-test('functions basics', async ({ page }) => {
+test('functions basics', async ({ page, context }) => {
+  await context.addCookies([
+    { name: 'MY_TOOLPAD_COOKIE', value: 'foo-bar-baz', domain: 'localhost', path: '/' },
+  ]);
+
   const runtimeModel = new ToolpadRuntime(page);
   await runtimeModel.gotoPage('basic');
 

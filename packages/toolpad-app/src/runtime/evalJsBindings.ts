@@ -277,9 +277,7 @@ export default function evalJsBindings(
       }
     };
 
-    if (bindingResult.value) {
-      mergeNestedBindings(bindingResult.value, bindingId);
-    }
+    mergeNestedBindings(bindingResult.value, bindingId);
 
     return {
       scopePath,

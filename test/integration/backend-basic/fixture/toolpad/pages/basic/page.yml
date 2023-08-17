@@ -147,6 +147,15 @@ spec:
             value:
               $$jsExpression: |
                 `Raw text: ${getRawText.data}`
+    - component: PageRow
+      name: pageRow14
+      children:
+        - component: Text
+          name: text7
+          props:
+            value:
+              $$jsExpression: |
+                `my custom cookie: ${context.data.cookies.MY_TOOLPAD_COOKIE}`
   queries:
     - name: hello
       query:
@@ -226,4 +235,8 @@ spec:
     - name: getRawText
       query:
         function: functions.ts#getRawText
+        kind: local
+    - name: context
+      query:
+        function: functions.ts#inspectContext
         kind: local

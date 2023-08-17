@@ -27,7 +27,7 @@ const pages: MuiPage[] = [
         title: 'Building UI',
       },
       {
-        pathname: '/toolpad/concepts/connecting-to-data',
+        pathname: '/toolpad/concepts/queries-',
         title: 'Queries',
         children: [
           {
@@ -68,7 +68,7 @@ const pages: MuiPage[] = [
     children: [
       {
         pathname: '/toolpad/how-to-guides/connect-to-datasource',
-        title: 'Connect to datasource',
+        subheader: 'Connect to datasource',
         children: [
           {
             pathname: '/toolpad/how-to-guides/connect-to-databases',
@@ -76,12 +76,13 @@ const pages: MuiPage[] = [
           },
           {
             pathname: '/toolpad/how-to-guides/connect-to-googlesheets',
-            title: 'Google sheets',
+            title: 'Google Sheets',
           },
         ],
       },
       {
         pathname: '/toolpad/how-to-guides/deployment',
+        subheader: 'Deployment',
         children: [
           {
             pathname: '/toolpad/how-to-guides/render-deploy',
@@ -91,7 +92,7 @@ const pages: MuiPage[] = [
       },
       {
         pathname: '/toolpad/how-to-guides/custom-components',
-        title: 'Create custom components',
+        subheader: 'Create custom components',
         children: [
           {
             pathname: '/toolpad/how-to-guides/number-display',

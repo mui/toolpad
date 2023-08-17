@@ -5,6 +5,7 @@ import * as z from 'zod';
 import { fromZodError } from 'zod-validation-error';
 import { hasOwnProperty } from '@mui/toolpad-utils/collections';
 import { errorFrom, serializeError } from '@mui/toolpad-utils/errors';
+import { withContext, createServerContext } from '@mui/toolpad-core/server';
 import { asyncHandler } from '../utils/express';
 import type { ToolpadProject } from './localMode';
 
@@ -74,7 +75,10 @@ export function createRpcHandler(definition: Definition): express.RequestHandler
       let rawResult;
       let error: Error | null = null;
       try {
-        rawResult = await method({ params, req, res });
+        const ctx = createServerContext(req);
+        rawResult = await withContext(ctx, async () => {
+          return method({ params, req, res });
+        });
       } catch (rawError) {
         error = errorFrom(rawError);
       }

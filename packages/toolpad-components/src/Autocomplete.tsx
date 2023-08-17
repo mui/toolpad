@@ -38,6 +38,7 @@ function Autocomplete({
   minLength,
   maxLength,
   isInvalid,
+  sx,
   ...rest
 }: AutocompleteProps) {
   const [selectedVal, setSelectedVal] = React.useState<AutocompleteOption | null>(null);
@@ -110,6 +111,7 @@ function Autocomplete({
           })}
         />
       )}
+      sx={{ ...(!rest.fullWidth && !value ? { width: 120 } : {}), ...sx }}
       {...rest}
     />,
   );

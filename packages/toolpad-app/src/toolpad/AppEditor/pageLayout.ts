@@ -44,7 +44,7 @@ export function deleteOrphanedLayoutNodes(
     parentChildren.length === 2;
 
   if (isSecondLastLayoutContainerChild) {
-    if (parent.parentIndex && parentParent && appDom.isElement(parentParent)) {
+    if (parent.parentIndex && parentParent) {
       const lastContainerChild = parentChildren.filter(
         (child) => child.id !== movedOrDeletedNode.id,
       )[0];
@@ -55,12 +55,19 @@ export function deleteOrphanedLayoutNodes(
         moveTargetNodeId !== parentParent.id &&
         moveTargetNodeId !== lastContainerChild.id
       ) {
-        if (moveTargetNodeId !== parent.id && isPageLayoutComponent(parentParent)) {
+        if (
+          moveTargetNodeId !== parent.id &&
+          (appDom.isPage(parentParent) ||
+            (appDom.isElement(parentParent) && isPageLayoutComponent(parentParent)))
+        ) {
           updatedDom = appDom.moveNode(
             updatedDom,
             lastContainerChild,
             parentParent,
-            lastContainerChild.parentProp,
+            (lastContainerChild.parentProp || 'children') as appDom.ParentPropOf<
+              appDom.ElementNode<any>,
+              appDom.PageNode | appDom.ElementNode<any>
+            >,
             parent.parentIndex,
           );
 

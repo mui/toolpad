@@ -80,33 +80,27 @@ spec:
               $$jsExpression: |
                 queryStargazers.data.repository.stargazers.nodes
             columns:
-              - field: login
-                type: string
-                width: 110
               - field: name
+                type: string
+                width: 147
+              - field: company
                 type: string
               - field: email
                 type: string
-                width: 66
+                width: 92
               - field: location
-                type: json
-              - field: company
-                type: json
-                width: 121
-              - field: isGitHubStar
-                type: boolean
-              - field: updatedAt
                 type: string
-                width: 117
-              - field: createdAt
-                type: string
-                width: 130
               - field: bio
                 type: string
-                width: 98
-              - field: followers
+              - field: url
+                type: link
+                width: 179
+              - field: followersCount
                 type: json
-                width: 148
+                width: 141
+              - field: createdAt
+                type: string
+                width: 207
             height: 572
   queries:
     - name: queryStargazers

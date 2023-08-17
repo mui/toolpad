@@ -1033,8 +1033,11 @@ export default function RenderOverlay({ bridge }: RenderOverlayProps) {
                   newParentIndex,
                 );
 
-                // Only move existing element inside column in the end if drag over zone is left
-                if (isOriginalParentColumn && dragOverZone === DROP_ZONE_LEFT) {
+                // Only move existing element inside page/column in the end if drag over zone is left
+                if (
+                  (isOriginalParentPage || isOriginalParentColumn) &&
+                  dragOverZone === DROP_ZONE_LEFT
+                ) {
                   draft = appDom.moveNode(draft, dragOverNode, parent, dragOverNodeParentProp);
                 }
               }

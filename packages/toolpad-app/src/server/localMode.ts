@@ -722,11 +722,22 @@ function mergePageIntoDom(dom: appDom.AppDom, pageName: string, pageFile: Page):
 }
 
 function optimizePageElement(element: ElementType): ElementType {
-  const isLayoutElement =
-    element.component === PAGE_ROW_COMPONENT_ID || element.component === PAGE_COLUMN_COMPONENT_ID;
+  const isLayoutElement = (possibleLayoutElement: ElementType): boolean =>
+    possibleLayoutElement.component === PAGE_ROW_COMPONENT_ID ||
+    possibleLayoutElement.component === PAGE_COLUMN_COMPONENT_ID;
 
-  if (isLayoutElement && element.children?.length === 1) {
-    return optimizePageElement(element.children[0]);
+  if (isLayoutElement(element) && element.children?.length === 1) {
+    const onlyChild = element.children[0];
+
+    if (!isLayoutElement(onlyChild)) {
+      return optimizePageElement({
+        ...onlyChild,
+        layout: {
+          ...onlyChild.layout,
+          columnSize: 1,
+        },
+      });
+    }
   }
 
   return {

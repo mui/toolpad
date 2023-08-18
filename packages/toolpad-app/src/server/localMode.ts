@@ -54,6 +54,7 @@ import { VersionInfo, checkVersion } from './versionInfo';
 import { VERSION_CHECK_INTERVAL } from '../constants';
 import DataManager from './DataManager';
 import type { RuntimeConfig } from '../config';
+import { PAGE_COLUMN_COMPONENT_ID, PAGE_ROW_COMPONENT_ID } from '../runtime/toolpadComponents';
 
 invariant(
   isMainThread,
@@ -720,9 +721,33 @@ function mergePageIntoDom(dom: appDom.AppDom, pageName: string, pageFile: Page):
   return dom;
 }
 
+function optimizePageElement(element: ElementType): ElementType {
+  const isLayoutElement =
+    element.component === PAGE_ROW_COMPONENT_ID || element.component === PAGE_COLUMN_COMPONENT_ID;
+
+  if (isLayoutElement && element.children?.length === 1) {
+    return optimizePageElement(element.children[0]);
+  }
+
+  return {
+    ...element,
+    children: (element.children ?? []).map(optimizePageElement),
+  };
+}
+
+function optimizePage(page: Page): Page {
+  return {
+    ...page,
+    spec: {
+      ...page.spec,
+      content: page.spec.content?.map(optimizePageElement),
+    },
+  };
+}
+
 function mergePagesIntoDom(dom: appDom.AppDom, pages: PagesContent): appDom.AppDom {
   for (const [name, page] of Object.entries(pages)) {
-    dom = mergePageIntoDom(dom, name, page);
+    dom = mergePageIntoDom(dom, name, optimizePage(page));
   }
   return dom;
 }
@@ -768,7 +793,7 @@ async function writePagesToFiles(root: string, pages: PagesContent) {
   await Promise.all(
     Object.entries(pages).map(async ([name, page]) => {
       const pageFileName = getPageFile(root, name);
-      await updateYamlFile(pageFileName, page);
+      await updateYamlFile(pageFileName, optimizePage(page));
     }),
   );
 }

@@ -77,30 +77,32 @@ spec:
           name: dataGrid
           props:
             rows:
-              $$jsExpression: |
-                queryStargazers.data.repository.stargazers.nodes
+              $$jsExpression: >
+                queryStargazers.data.repository.stargazers.nodes.map((node) =>
+                ({
+                  ...node,
+                  followers: node.followersCount.totalCount,
+                }))
             columns:
               - field: name
                 type: string
-                width: 147
-              - field: company
-                type: string
               - field: email
                 type: string
-                width: 92
+              - field: company
+                type: json
               - field: location
-                type: string
+                type: json
               - field: bio
                 type: string
+                width: 215
               - field: url
                 type: link
-                width: 179
-              - field: followersCount
-                type: json
-                width: 141
+                width: 136
+              - field: followers
+                type: number
+                width: 86
               - field: createdAt
                 type: string
-                width: 207
             height: 572
   queries:
     - name: queryStargazers

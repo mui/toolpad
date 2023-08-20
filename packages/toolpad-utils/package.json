@@ -1,6 +1,6 @@
 {
   "name": "@mui/toolpad-utils",
-  "version": "0.1.23",
+  "version": "0.1.24",
   "description": "Build MUI apps quickly",
   "author": "MUI Toolpad team",
   "homepage": "https://github.com/mui/mui-toolpad#readme",
@@ -63,5 +63,5 @@
     "@types/invariant": "2.2.35",
     "@types/react-is": "18.2.1"
   },
-  "gitHead": "927af37171a21f04c69e5cc5c5e8745bdf584137"
+  "gitHead": "02f3e1819b3da86f142dd47fc6b2226cea867fa8"
 }

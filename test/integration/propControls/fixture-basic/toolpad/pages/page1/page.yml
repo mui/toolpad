@@ -15,3 +15,11 @@ spec:
           name: textField2
           props:
             label: textField2
+    - component: PageRow
+      name: pageRow1
+      children:
+        - component: Autocomplete
+          name: autocomplete
+          props:
+            label: search
+            fullWidth: true

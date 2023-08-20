@@ -30,7 +30,7 @@
     "@mui/material": "5.14.5",
     "@mui/monorepo": "https://github.com/mui/material-ui.git",
     "@mui/styles": "5.14.5",
-    "@mui/toolpad-next": "0.1.23",
+    "@mui/toolpad-next": "0.1.24",
     "@mui/utils": "5.14.5",
     "@mui/x-data-grid": "6.11.1",
     "@trendmicro/react-interpolate": "0.5.5",

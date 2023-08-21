@@ -3,7 +3,7 @@ productId: toolpad
 title: Toolpad examples
 ---
 
-# More examples
+# Overview
 
 <p class="description">Browse our collection of Toolpad examples that help you familiarise with Toolpad concepts.</p>
 

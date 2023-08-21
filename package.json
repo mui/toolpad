@@ -42,7 +42,8 @@
     "check-types": "lerna run check-types",
     "toolpad": "toolpad",
     "jsonSchemas": "tsx ./scripts/docs/generateJsonSchemas.ts",
-    "test:rest:start": "tsx ./scripts/restTestServer.ts"
+    "test:rest:start": "tsx ./scripts/restTestServer.ts",
+    "postinstall": "lerna run build --scope @mui/toolpad-core --scope @mui/toolpad-components --stream"
   },
   "devDependencies": {
     "@argos-ci/core": "^0.9.0",

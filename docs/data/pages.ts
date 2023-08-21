@@ -11,10 +11,10 @@ const pages: MuiPage[] = [
       {
         pathname: '/toolpad/examples',
         children: [
-          { pathname: '/toolpad/examples/npm-stats', title: 'NPM stats' },
+          { pathname: '/toolpad/examples/overview', title: 'Overview' },
+          { pathname: '/toolpad/examples/npm-stats', title: 'npm stats' },
           { pathname: '/toolpad/examples/basic-crud-app', title: 'Basic CRUD application' },
           { pathname: '/toolpad/examples/qr-generator', title: 'QR Code generator' },
-          { pathname: '/toolpad/examples/more-examples', title: 'More examples' },
         ],
       },
       { pathname: '/toolpad/getting-started/roadmap' },

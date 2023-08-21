@@ -11,6 +11,29 @@ import { alpha } from '@mui/material/styles';
 function layouts() {
   return [
     {
+      title: 'npm stats',
+      description:
+        'This analytics dashboard shows how to track a KPI from a third-party data source.',
+      src: '/static/toolpad/docs/examples/npm-stats.png',
+      href: 'https://mui.com/toolpad/examples/npm-stats/',
+      source: 'https://github.com/mui/mui-toolpad/tree/master/examples/npm-stats',
+    },
+    {
+      title: 'Basic CRUD application',
+      description: 'An admin application to showcase how CRUD operations work in Toolpad.',
+      src: '/static/toolpad/docs/examples/basic-crud-app.png',
+      href: 'https://mui.com/toolpad/examples/basic-crud-app/',
+      source: 'https://github.com/mui/mui-toolpad/tree/master/examples/basic-crud-app',
+    },
+    {
+      title: 'QR Code generator',
+      description:
+        'A basic Toolpad application that can be used to turn any text or URL into a QR code.',
+      src: '/static/toolpad/docs/examples/qr-generator.png',
+      href: 'https://mui.com/toolpad/examples/qr-generator/',
+      source: 'https://github.com/mui/mui-toolpad/tree/master/examples/qr-generator',
+    },
+    {
       title: 'With Prisma',
       description: 'A basic Toolpad application that demonstrates how to integrate with prisma.',
       src: '/static/toolpad/marketing/with-prisma-hero.png',

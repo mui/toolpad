@@ -1,23 +1,35 @@
 import { createComponent } from '@mui/toolpad-core';
 import * as React from 'react';
-import { FormControlLabel, FormGroup, Checkbox as MuiCheckbox, TextField } from '@mui/material';
+import {
+  FormControlLabel,
+  FormGroup,
+  Checkbox as MuiCheckbox,
+  TextField,
+  TextFieldProps,
+} from '@mui/material';
 import type { CheckboxProps } from '@mui/material/Checkbox';
+import { pink } from '@mui/material/colors';
 import type { FormControlLabelProps } from '@mui/material/FormControlLabel';
 import { SX_PROP_HELPER_TEXT } from './constants';
 import { FormInputComponentProps, useFormInput, withComponentForm } from './Form';
 
-export type FormControlLabelOptions = Omit<FormControlLabelProps, 'control'> &
-  CheckboxProps &
+export type FormControlLabelOptions = { onChange: (newValue: string) => void } & Omit<
+  FormControlLabelProps,
+  'control'
+> &
+  Omit<CheckboxProps, 'onChange'> &
   Pick<FormInputComponentProps, 'name' | 'isRequired' | 'isInvalid'>;
 
-function Checkbox({ disableRipple, ...rest }: FormControlLabelOptions) {
-  const { onFormInputChange, renderFormInput, formInputError } = useFormInput<boolean | null>({
-    name: rest.name,
-    label: rest.label,
+function Checkbox({ ...rest }: FormControlLabelOptions) {
+  rest.checked = rest.checked ?? false;
+  const { onFormInputChange, renderFormInput, formInputError } = useFormInput<boolean>({
+    name: 'Checkbox',
+    label: 'Checkbox',
     onChange: rest.onChange,
     validationProps: { isRequired: rest.isRequired, isInvalid: rest.isInvalid },
-    ...rest,
   });
+
+  console.log(rest);
 
   const handleChange = React.useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -29,29 +41,27 @@ function Checkbox({ disableRipple, ...rest }: FormControlLabelOptions) {
 
   const renderedOptions = React.useMemo(
     () => (
-      <FormGroup>
-        <FormControlLabel control={<MuiCheckbox disableRipple />} {...rest} />
-      </FormGroup>
+      <FormControlLabel
+        label={rest.label}
+        checked={rest.checked}
+        control={
+          <MuiCheckbox
+            disableRipple
+            onChange={handleChange}
+            sx={{
+              color: pink[800],
+              '&.Mui-checked': {
+                color: pink[600],
+              },
+            }}
+          />
+        }
+      />
     ),
     [rest],
   );
 
-  return renderFormInput(
-    <TextField
-      {...rest}
-      value={rest.checked}
-      onChange={handleChange}
-      select
-      fullWidth
-      sx={{ ...(!rest.fullWidth && !rest.checked ? { width: 120 } : {}), ...rest.sx }}
-      {...(formInputError && {
-        error: Boolean(formInputError),
-        helperText: formInputError.message || '',
-      })}
-    >
-      {renderedOptions}
-    </TextField>,
-  );
+  return renderFormInput(renderedOptions);
 }
 
 const FormWrappedCheckbox = withComponentForm(Checkbox);
@@ -59,10 +69,6 @@ export default createComponent(FormWrappedCheckbox, {
   layoutDirection: 'both',
   loadingProp: 'checked',
   argTypes: {
-    onChange: {
-      helperText: 'Add logic to be executed when the user clicks the button.',
-      type: 'event',
-    },
     label: {
       helperText: 'A text or an element to be used in an enclosing label element.',
       type: 'string',
@@ -70,7 +76,14 @@ export default createComponent(FormWrappedCheckbox, {
     },
     checked: {
       helperText: 'If true, the component is checked.',
+      onChangeProp: 'onChange',
       type: 'boolean',
+      defaultValueProp: 'defaultValue',
+    },
+    defaultValue: {
+      helperText: 'A default value.',
+      type: 'boolean',
+      default: false,
     },
     color: {
       helperText:
@@ -97,10 +110,6 @@ export default createComponent(FormWrappedCheckbox, {
       helperText: 'If true, the input element is required.',
       type: 'boolean',
       default: false,
-    },
-    fullWidth: {
-      helperText: 'Whether the select should occupy all available horizontal space.',
-      type: 'boolean',
     },
     size: {
       helperText: 'The size of the component. small is equivalent to the dense checkbox styling.',

@@ -1,22 +1,61 @@
 import { createComponent } from '@mui/toolpad-core';
 import * as React from 'react';
-import FormGroup from '@mui/material/FormGroup';
-import FormControlLabel from '@mui/material/FormControlLabel';
-import MuiCheckbox from '@mui/material/Checkbox';
+import { FormControlLabel, FormGroup, Checkbox as MuiCheckbox, TextField } from '@mui/material';
 import type { CheckboxProps } from '@mui/material/Checkbox';
 import type { FormControlLabelProps } from '@mui/material/FormControlLabel';
 import { SX_PROP_HELPER_TEXT } from './constants';
+import { FormInputComponentProps, useFormInput, withComponentForm } from './Form';
 
-export type FormControlLabelOptions = Omit<FormControlLabelProps, 'control'> & CheckboxProps;
+export type FormControlLabelOptions = Omit<FormControlLabelProps, 'control'> &
+  CheckboxProps &
+  Pick<FormInputComponentProps, 'name' | 'isRequired' | 'isInvalid'>;
 
 function Checkbox({ disableRipple, ...rest }: FormControlLabelOptions) {
-  return (
-    <FormGroup>
-      <FormControlLabel control={<MuiCheckbox disableRipple />} {...rest} />
-    </FormGroup>
+  const { onFormInputChange, renderFormInput, formInputError } = useFormInput<boolean | null>({
+    name: rest.name,
+    label: rest.label,
+    onChange: rest.onChange,
+    validationProps: { isRequired: rest.isRequired, isInvalid: rest.isInvalid },
+    ...rest,
+  });
+
+  const handleChange = React.useCallback(
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      const newValue = event.target.checked;
+      onFormInputChange(newValue);
+    },
+    [onFormInputChange],
+  );
+
+  const renderedOptions = React.useMemo(
+    () => (
+      <FormGroup>
+        <FormControlLabel control={<MuiCheckbox disableRipple />} {...rest} />
+      </FormGroup>
+    ),
+    [rest],
+  );
+
+  return renderFormInput(
+    <TextField
+      {...rest}
+      value={rest.checked}
+      onChange={handleChange}
+      select
+      fullWidth
+      sx={{ ...(!rest.fullWidth && !rest.checked ? { width: 120 } : {}), ...rest.sx }}
+      {...(formInputError && {
+        error: Boolean(formInputError),
+        helperText: formInputError.message || '',
+      })}
+    >
+      {renderedOptions}
+    </TextField>,
   );
 }
-export default createComponent(Checkbox, {
+
+const FormWrappedCheckbox = withComponentForm(Checkbox);
+export default createComponent(FormWrappedCheckbox, {
   layoutDirection: 'both',
   loadingProp: 'checked',
   argTypes: {
@@ -58,6 +97,10 @@ export default createComponent(Checkbox, {
       helperText: 'If true, the input element is required.',
       type: 'boolean',
       default: false,
+    },
+    fullWidth: {
+      helperText: 'Whether the select should occupy all available horizontal space.',
+      type: 'boolean',
     },
     size: {
       helperText: 'The size of the component. small is equivalent to the dense checkbox styling.',

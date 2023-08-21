@@ -5,7 +5,7 @@ import ArrowRightIcon from '@mui/icons-material/ArrowRight';
 import ArrowDropDownSharpIcon from '@mui/icons-material/ArrowDropDownSharp';
 import invariant from 'invariant';
 import ComponentCatalogItem from './ComponentCatalogItem';
-import CreateCodeComponentNodeDialog from '../../HierarchyExplorer/CreateCodeComponentNodeDialog';
+import CreateCodeComponentNodeDialog from '../../PagesExplorer/CreateCodeComponentNodeDialog';
 import * as appDom from '../../../../appDom';
 import { useDom } from '../../../AppState';
 import { usePageEditorApi } from '../PageEditorProvider';

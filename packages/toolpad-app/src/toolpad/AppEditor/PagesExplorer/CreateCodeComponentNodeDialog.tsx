@@ -112,7 +112,13 @@ export default function CreateCodeComponentDialog({
             anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
             action={
               <React.Fragment>
-                <OpenCodeEditorButton filePath={name} variant="text" fileType="component" />
+                <OpenCodeEditorButton
+                  filePath={name}
+                  variant="text"
+                  fileType="component"
+                  color="primary"
+                  onSuccess={handleSnackbarClose}
+                />
                 <IconButton
                   size="small"
                   aria-label="close"

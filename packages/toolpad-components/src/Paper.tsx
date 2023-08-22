@@ -12,7 +12,7 @@ function Paper({ children, sx, ...rest }: MuiPaperProps) {
 }
 
 export default createBuiltin(Paper, {
-  helperText: 'A paper component.',
+  helperText: 'The MUI [Paper](https://mui.com/material-ui/react-paper/) component.',
   layoutDirection: 'vertical',
   argTypes: {
     elevation: {

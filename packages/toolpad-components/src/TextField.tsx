@@ -66,7 +66,8 @@ function TextField({
 const FormWrappedTextField = withComponentForm(TextField);
 
 export default createBuiltin(FormWrappedTextField, {
-  helperText: 'The TextField component lets you input a text value.',
+  helperText:
+    'The MUI [TextField](https://mui.com/material-ui/react-text-field/) component lets you input a text value.',
   layoutDirection: 'both',
   argTypes: {
     value: {

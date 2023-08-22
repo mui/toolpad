@@ -4,7 +4,7 @@
 
 <p class="description">API docs for the Toolpad Paper component.</p>
 
-A paper component.
+The MUI [Paper](https://mui.com/material-ui/react-paper/) component.
 
 ## Properties
 

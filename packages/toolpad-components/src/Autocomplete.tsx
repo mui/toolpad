@@ -120,7 +120,8 @@ function Autocomplete({
 const FormWrappedAutocomplete = withComponentForm(Autocomplete);
 
 export default createBuiltin(FormWrappedAutocomplete, {
-  helperText: 'A text input with autocomplete suggestions.',
+  helperText:
+    'A text input with autocomplete suggestions. Uses the MUI [Autocomplete](https://mui.com/material-ui/react-autocomplete/) under the hood',
   layoutDirection: 'both',
   loadingProp: 'loading',
   argTypes: {

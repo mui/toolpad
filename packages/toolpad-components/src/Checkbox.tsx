@@ -34,7 +34,6 @@ function Checkbox({ disableRipple, ...rest }: FormControlLabelOptions) {
     validationProps: { isRequired: rest.isRequired, isInvalid: rest.isInvalid },
   });
 
-  console.log(rest);
   const handleChange = React.useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
       const newValue = event.target.checked;

@@ -1,7 +1,8 @@
 import * as React from 'react';
-import { createComponent, TemplateRenderer } from '@mui/toolpad-core';
+import { TemplateRenderer } from '@mui/toolpad-core';
 import { Box, List as MuiList, ListItem, SxProps } from '@mui/material';
 import { SX_PROP_HELPER_TEXT } from './constants';
+import createBuiltin from './createBuiltin';
 
 export type ListProps = {
   itemCount: number;
@@ -22,7 +23,8 @@ function List({ itemCount, renderItem, disablePadding = false, sx }: ListProps) 
   );
 }
 
-export default createComponent(List, {
+export default createBuiltin(List, {
+  helperText: 'A list component.',
   argTypes: {
     itemCount: {
       helperText: 'Number of items to render.',
@@ -30,6 +32,7 @@ export default createComponent(List, {
       default: 3,
     },
     renderItem: {
+      helperText: 'List item template to render.',
       type: 'template',
       control: { type: 'layoutSlot' },
     },

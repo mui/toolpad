@@ -4,33 +4,35 @@ import {
   FormControlLabel,
   FormGroup,
   Checkbox as MuiCheckbox,
-  TextField,
-  TextFieldProps,
+  FormHelperText,
+  FormControl,
 } from '@mui/material';
 import type { CheckboxProps } from '@mui/material/Checkbox';
-import { pink } from '@mui/material/colors';
 import type { FormControlLabelProps } from '@mui/material/FormControlLabel';
 import { SX_PROP_HELPER_TEXT } from './constants';
-import { FormInputComponentProps, useFormInput, withComponentForm } from './Form';
+import {
+  FormInputComponentProps,
+  useFormInput,
+  withComponentForm,
+  FORM_INPUT_ARG_TYPES,
+} from './Form';
 
-export type FormControlLabelOptions = { onChange: (newValue: string) => void } & Omit<
-  FormControlLabelProps,
-  'control'
-> &
+export type FormControlLabelOptions = {
+  onChange: (newValue: boolean) => void;
+  defaultValue: string;
+  fullWidth: boolean;
+} & Omit<FormControlLabelProps, 'control' | 'onChange'> &
   Omit<CheckboxProps, 'onChange'> &
   Pick<FormInputComponentProps, 'name' | 'isRequired' | 'isInvalid'>;
 
-function Checkbox({ ...rest }: FormControlLabelOptions) {
+function Checkbox({ disableRipple, ...rest }: FormControlLabelOptions) {
   rest.checked = rest.checked ?? false;
   const { onFormInputChange, renderFormInput, formInputError } = useFormInput<boolean>({
-    name: 'Checkbox',
-    label: 'Checkbox',
+    name: rest.name,
+    label: rest.label as string,
     onChange: rest.onChange,
     validationProps: { isRequired: rest.isRequired, isInvalid: rest.isInvalid },
   });
-
-  console.log(rest);
-
   const handleChange = React.useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
       const newValue = event.target.checked;
@@ -41,24 +43,32 @@ function Checkbox({ ...rest }: FormControlLabelOptions) {
 
   const renderedOptions = React.useMemo(
     () => (
-      <FormControlLabel
-        label={rest.label}
-        checked={rest.checked}
-        control={
-          <MuiCheckbox
-            disableRipple
-            onChange={handleChange}
-            sx={{
-              color: pink[800],
-              '&.Mui-checked': {
-                color: pink[600],
-              },
-            }}
+      <FormControl error={Boolean(formInputError)} fullWidth={rest.fullWidth}>
+        <FormGroup>
+          <FormControlLabel
+            label={rest.label}
+            disableTypography={rest.disableTypography}
+            checked={rest.checked}
+            labelPlacement={rest.labelPlacement}
+            componentsProps={rest.componentsProps}
+            control={
+              <MuiCheckbox
+                required={rest.isRequired}
+                size={rest.size}
+                disableRipple
+                onChange={handleChange}
+                defaultChecked={rest.defaultChecked}
+                disabled={rest.disabled}
+                color={rest.color}
+                sx={rest.sx}
+              />
+            }
           />
-        }
-      />
+        </FormGroup>
+        <FormHelperText>{formInputError?.message || ''}</FormHelperText>
+      </FormControl>
     ),
-    [rest],
+    [rest, handleChange, formInputError],
   );
 
   return renderFormInput(renderedOptions);
@@ -78,12 +88,6 @@ export default createComponent(FormWrappedCheckbox, {
       helperText: 'If true, the component is checked.',
       onChangeProp: 'onChange',
       type: 'boolean',
-      defaultValueProp: 'defaultValue',
-    },
-    defaultValue: {
-      helperText: 'A default value.',
-      type: 'boolean',
-      default: false,
     },
     color: {
       helperText:
@@ -106,11 +110,6 @@ export default createComponent(FormWrappedCheckbox, {
       type: 'boolean',
       default: false,
     },
-    required: {
-      helperText: 'If true, the input element is required.',
-      type: 'boolean',
-      default: false,
-    },
     size: {
       helperText: 'The size of the component. small is equivalent to the dense checkbox styling.',
       type: 'string',
@@ -126,6 +125,10 @@ export default createComponent(FormWrappedCheckbox, {
         'If true, the label is rendered as it is passed without an additional typography node.',
       type: 'boolean',
     },
+    fullWidth: {
+      helperText: 'Whether the select should occupy all available horizontal space.',
+      type: 'boolean',
+    },
     componentsProps: {
       helperText: 'The props used for each slot inside.',
       type: 'object',
@@ -136,5 +139,6 @@ export default createComponent(FormWrappedCheckbox, {
       enum: ['bottom', 'end', 'start', 'top'],
       default: 'end',
     },
+    ...FORM_INPUT_ARG_TYPES,
   },
 });

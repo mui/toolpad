@@ -2,27 +2,26 @@ import * as React from 'react';
 import { createComponent } from '@mui/toolpad-core';
 import { Container, ContainerProps, Skeleton } from '@mui/material';
 import {
-  XAxis,
-  YAxis,
-  Tooltip,
-  Legend,
-  Line,
-  ResponsiveContainer,
-  CartesianGrid,
-  ComposedChart,
-  Bar,
-  Area,
-  Scatter,
-} from 'recharts';
-import { ChartContainer } from '@mui/x-charts/ChartContainer';
+  ChartContainer,
+  BarPlot,
+  LinePlot,
+  ScatterPlot,
+  ChartsXAxis,
+  ChartsYAxis,
+  BarSeriesType,
+  LineSeriesType,
+  ScatterSeriesType,
+} from '@mui/x-charts';
 import { errorFrom } from '@mui/toolpad-utils/errors';
 import ErrorOverlay from './components/ErrorOverlay';
 import { SX_PROP_HELPER_TEXT } from './constants';
 
-export const CHART_DATA_SERIES_KINDS = ['line', 'bar', 'area', 'scatter'];
+type ChartDataSeriesKind = 'line' | 'bar' | 'area' | 'scatter';
+
+export const CHART_DATA_SERIES_KINDS: ChartDataSeriesKind[] = ['line', 'bar', 'area', 'scatter'];
 
 export interface ChartDataSeries<D = Record<string, string | number>> {
-  kind: (typeof CHART_DATA_SERIES_KINDS)[number];
+  kind: ChartDataSeriesKind;
   label: string;
   data?: D[];
   xKey?: keyof D;
@@ -32,15 +31,22 @@ export interface ChartDataSeries<D = Record<string, string | number>> {
 
 export type ChartData = ChartDataSeries[];
 
-function getBarChartDataSeriesNormalizedYKey(dataSeries: ChartDataSeries, index: number): string {
-  return `${dataSeries.label}-${dataSeries.yKey}-${index}`;
+function getChartType(kind: ChartDataSeriesKind): 'line' | 'bar' | 'scatter' {
+  switch (kind) {
+    case 'bar':
+      return 'bar';
+    case 'scatter':
+      return 'scatter';
+    default:
+      return 'line';
+  }
 }
 
 interface ChartProps extends ContainerProps {
   data?: ChartData;
   loading?: boolean;
   error?: Error | string;
-  height?: number;
+  height: number;
 }
 
 function Chart({ data = [], loading, error, height, sx }: ChartProps) {
@@ -60,132 +66,64 @@ function Chart({ data = [], loading, error, height, sx }: ChartProps) {
     [data],
   );
 
-  const barChartData = React.useMemo(() => {
-    return xValues.map((xValue) => {
-      const yValues = data.reduce((acc, dataSeries, index) => {
-        if (dataSeries.kind !== 'bar' || !dataSeries.xKey || !dataSeries.yKey) {
-          return acc;
+  const chartSeries: (BarSeriesType | LineSeriesType | ScatterSeriesType)[] = React.useMemo(
+    () =>
+      data.map((dataSeries) => {
+        let yValues: (number | string)[] = [];
+        if (dataSeries.data && dataSeries.xKey && dataSeries.yKey) {
+          yValues = xValues.map((xValue) => {
+            const point = (dataSeries.data || []).find(
+              (dataSeriesPoint) => dataSeriesPoint[dataSeries.xKey!] === xValue,
+            );
+
+            return point ? point[dataSeries.yKey!] : 0;
+          });
         }
 
-        const point = (dataSeries.data || []).find(
-          (dataSeriesPoint) => dataSeriesPoint[dataSeries.xKey!] === xValue,
-        );
+        const chartType = getChartType(dataSeries.kind);
+
+        const baseProps = {
+          type: chartType,
+          xAxisKey: dataSeries.xKey,
+          yAxisKey: dataSeries.yKey,
+          label: dataSeries.label,
+          color: dataSeries.color,
+        };
+
+        if (chartType === 'scatter') {
+          return {
+            ...baseProps,
+            data: yValues.map((y, index) => ({
+              x: xValues[index],
+              y,
+              id: `${dataSeries.yKey}-${index}`,
+            })),
+          } as ScatterSeriesType;
+        }
+        if (chartType === 'line') {
+          return {
+            ...baseProps,
+            data: yValues,
+            area: dataSeries.kind === 'area',
+          } as LineSeriesType;
+        }
 
         return {
-          ...acc,
-          [getBarChartDataSeriesNormalizedYKey(dataSeries, index)]: point
-            ? point[dataSeries.yKey]
-            : 0,
-        };
-      }, {});
-
-      return {
-        x: xValue,
-        ...yValues,
-      };
-    });
-  }, [data, xValues]);
+          ...baseProps,
+          data: yValues,
+        } as BarSeriesType;
+      }),
+    [data, xValues],
+  );
 
   const hasNonNumberXValues = xValues.some((xValue) => typeof xValue !== 'number');
 
   const displayError = error ? errorFrom(error) : null;
 
-  const isDataVisible = !loading && !displayError;
+  const isDataVisible = !loading && !displayError && chartSeries.length > 0;
 
   return (
     <Container disableGutters sx={{ ...sx, position: 'relative' }} aria-busy={loading}>
-      <ResponsiveContainer width="100%" height={height}>
-        <ComposedChart data={barChartData} margin={{ top: 20, right: 80 }}>
-          {isDataVisible ? (
-            <React.Fragment>
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis
-                dataKey="x"
-                type={hasNonNumberXValues ? 'category' : 'number'}
-                allowDuplicatedCategory={false}
-                domain={
-                  hasNonNumberXValues
-                    ? undefined
-                    : [Math.min(...(xValues as number[])), Math.max(...(xValues as number[]))]
-                }
-              />
-              <YAxis width={80} />
-              <Tooltip />
-              <Legend />
-              {data.map((dataSeries, index) => {
-                if (
-                  !dataSeries.data ||
-                  dataSeries.data.length === 0 ||
-                  !dataSeries.xKey ||
-                  !dataSeries.yKey
-                ) {
-                  return null;
-                }
-
-                const key = `${dataSeries.label}-${index}`;
-
-                const normalizedData = dataSeries.data
-                  .map((dataSeriesPoint) => ({
-                    x: dataSeriesPoint[dataSeries.xKey!],
-                    [dataSeries.yKey!]: dataSeriesPoint[dataSeries.yKey!],
-                  }))
-                  .sort((a, b) =>
-                    typeof a[dataSeries.xKey!] === 'number' &&
-                    typeof b[dataSeries.xKey!] === 'number'
-                      ? (a[dataSeries.xKey!] as number) - (b[dataSeries.xKey!] as number)
-                      : 0,
-                  );
-
-                switch (dataSeries.kind) {
-                  case 'bar':
-                    return (
-                      <Bar
-                        key={key}
-                        dataKey={getBarChartDataSeriesNormalizedYKey(dataSeries, index)}
-                        name={dataSeries.label}
-                        barSize={20}
-                        fill={dataSeries.color}
-                      />
-                    );
-                  case 'area':
-                    return (
-                      <Area
-                        key={key}
-                        type="monotone"
-                        data={normalizedData}
-                        dataKey={dataSeries.yKey}
-                        name={dataSeries.label}
-                        stroke={dataSeries.color}
-                        fill={dataSeries.color}
-                      />
-                    );
-                  case 'scatter':
-                    return (
-                      <Scatter
-                        key={key}
-                        data={normalizedData}
-                        dataKey={dataSeries.yKey}
-                        name={dataSeries.label}
-                        fill={dataSeries.color}
-                      />
-                    );
-                  default:
-                    return (
-                      <Line
-                        key={key}
-                        type="monotone"
-                        data={normalizedData}
-                        dataKey={dataSeries.yKey}
-                        name={dataSeries.label}
-                        stroke={dataSeries.color}
-                      />
-                    );
-                }
-              })}
-            </React.Fragment>
-          ) : null}
-        </ComposedChart>
-      </ResponsiveContainer>
       <ErrorOverlay error={displayError} />
       {loading && !error ? (
         <Skeleton
@@ -195,7 +133,52 @@ function Chart({ data = [], loading, error, height, sx }: ChartProps) {
           height={height}
         />
       ) : null}
-      <ChartContainer series={[]} width={500} height={400} />
+      <ChartContainer
+        series={chartSeries}
+        height={height}
+        width={500}
+        xAxis={[
+          {
+            id: chartSeries[0].xAxisKey || 'x',
+            data: xValues,
+            scaleType: 'band',
+            min: hasNonNumberXValues ? undefined : Math.min(...(xValues as number[])),
+            max: hasNonNumberXValues ? undefined : Math.max(...(xValues as number[])),
+          },
+        ]}
+        yAxis={chartSeries.map((dataSeries) => ({
+          id: dataSeries.yAxisKey,
+          scaleType: 'linear',
+        }))}
+      >
+        {isDataVisible ? (
+          <React.Fragment>
+            {chartSeries.some((dataSeries) => dataSeries.type === 'line') ? <LinePlot /> : null}
+            {chartSeries.some((dataSeries) => dataSeries.type === 'bar') ? <BarPlot /> : null}
+            {chartSeries.some((dataSeries) => dataSeries.type === 'scatter') ? (
+              <ScatterPlot />
+            ) : null}
+            <ChartsXAxis label={chartSeries[0].xAxisKey} position="bottom" axisId="x" />
+            {chartSeries
+              // Filter by unique yAxisKey
+              .filter(
+                (dataSeries, index, array) =>
+                  dataSeries.yAxisKey &&
+                  array.findIndex(
+                    (otherDataSeries) => otherDataSeries.yAxisKey === dataSeries.yAxisKey,
+                  ) === index,
+              )
+              .map(({ yAxisKey }) => (
+                <ChartsYAxis
+                  key={yAxisKey}
+                  label={yAxisKey}
+                  position="left"
+                  axisId={yAxisKey as string}
+                />
+              ))}
+          </React.Fragment>
+        ) : null}
+      </ChartContainer>
     </Container>
   );
 }

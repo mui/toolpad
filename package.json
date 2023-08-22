@@ -95,16 +95,16 @@
     "yarn-deduplicate": "6.0.2"
   },
   "dependencies": {
-    "archiver": "5.3.1",
+    "archiver": "5.3.2",
     "cross-env": "7.0.3",
-    "dotenv-cli": "7.2.1",
+    "dotenv-cli": "7.3.0",
     "inquirer": "9.2.10",
     "lodash": "4.17.21",
     "semver": "7.5.4",
     "tsup": "7.2.0",
     "tsx": "3.12.7",
     "yargs": "17.7.2",
-    "zod": "3.21.4",
+    "zod": "3.22.2",
     "zod-to-json-schema": "3.21.4"
   },
   "engines": {

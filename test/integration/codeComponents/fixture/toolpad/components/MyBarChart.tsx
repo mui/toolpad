@@ -3,7 +3,6 @@ import { createComponent } from '@mui/toolpad/browser';
 import {
   BarChart,
   Bar,
-  Cell,
   XAxis,
   YAxis,
   CartesianGrid,

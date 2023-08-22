@@ -1,17 +1,20 @@
 import * as React from 'react';
 import { createComponent } from '@mui/toolpad-core';
-import { Container, ContainerProps, Skeleton } from '@mui/material';
+import { ContainerProps, Paper, Skeleton, Typography } from '@mui/material';
 import {
-  ChartContainer,
   BarPlot,
   LinePlot,
   ScatterPlot,
-  ChartsXAxis,
-  ChartsYAxis,
   BarSeriesType,
   LineSeriesType,
   ScatterSeriesType,
 } from '@mui/x-charts';
+import { ChartContainer } from '@mui/x-charts/ChartContainer';
+import { ChartsXAxis } from '@mui/x-charts/ChartsXAxis';
+import { ChartsYAxis } from '@mui/x-charts/ChartsYAxis';
+import { ChartsLegend } from '@mui/x-charts/ChartsLegend';
+import { ChartsTooltip } from '@mui/x-charts/ChartsTooltip';
+import { ChartsAxisHighlight } from '@mui/x-charts/ChartsAxisHighlight';
 import { errorFrom } from '@mui/toolpad-utils/errors';
 import ErrorOverlay from './components/ErrorOverlay';
 import { SX_PROP_HELPER_TEXT } from './constants';
@@ -68,51 +71,50 @@ function Chart({ data = [], loading, error, height, sx }: ChartProps) {
 
   const chartSeries: (BarSeriesType | LineSeriesType | ScatterSeriesType)[] = React.useMemo(
     () =>
-      data.map((dataSeries) => {
-        let yValues: (number | string)[] = [];
-        if (dataSeries.data && dataSeries.xKey && dataSeries.yKey) {
-          yValues = xValues.map((xValue) => {
+      data
+        .filter((dataSeries) => dataSeries.xKey && dataSeries.yKey)
+        .map((dataSeries) => {
+          const yValues = xValues.map((xValue) => {
             const point = (dataSeries.data || []).find(
               (dataSeriesPoint) => dataSeriesPoint[dataSeries.xKey!] === xValue,
             );
 
             return point ? point[dataSeries.yKey!] : 0;
           });
-        }
 
-        const chartType = getChartType(dataSeries.kind);
+          const chartType = getChartType(dataSeries.kind);
 
-        const baseProps = {
-          type: chartType,
-          xAxisKey: dataSeries.xKey,
-          yAxisKey: dataSeries.yKey,
-          label: dataSeries.label,
-          color: dataSeries.color,
-        };
+          const baseProps = {
+            type: chartType,
+            xAxisKey: dataSeries.xKey,
+            yAxisKey: dataSeries.yKey,
+            label: dataSeries.label,
+            color: dataSeries.color,
+          };
 
-        if (chartType === 'scatter') {
-          return {
-            ...baseProps,
-            data: yValues.map((y, index) => ({
-              x: xValues[index],
-              y,
-              id: `${dataSeries.yKey}-${index}`,
-            })),
-          } as ScatterSeriesType;
-        }
-        if (chartType === 'line') {
+          if (chartType === 'scatter') {
+            return {
+              ...baseProps,
+              data: yValues.map((y, index) => ({
+                x: xValues[index],
+                y,
+                id: `${dataSeries.yKey}-${index}`,
+              })),
+            } as ScatterSeriesType;
+          }
+          if (chartType === 'line') {
+            return {
+              ...baseProps,
+              data: yValues,
+              area: dataSeries.kind === 'area',
+            } as LineSeriesType;
+          }
+
           return {
             ...baseProps,
             data: yValues,
-            area: dataSeries.kind === 'area',
-          } as LineSeriesType;
-        }
-
-        return {
-          ...baseProps,
-          data: yValues,
-        } as BarSeriesType;
-      }),
+          } as BarSeriesType;
+        }),
     [data, xValues],
   );
 
@@ -121,9 +123,12 @@ function Chart({ data = [], loading, error, height, sx }: ChartProps) {
   const displayError = error ? errorFrom(error) : null;
 
   const isDataVisible = !loading && !displayError && chartSeries.length > 0;
+  const isEmpty =
+    (!loading && !displayError && chartSeries.length <= 0) ||
+    !chartSeries.find((dataSeries) => (dataSeries.data ?? []).length > 0);
 
   return (
-    <Container disableGutters sx={{ ...sx, position: 'relative' }} aria-busy={loading}>
+    <Paper sx={{ ...sx, position: 'relative', width: '100%' }} aria-busy={loading}>
       <ErrorOverlay error={displayError} />
       {loading && !error ? (
         <Skeleton
@@ -133,13 +138,26 @@ function Chart({ data = [], loading, error, height, sx }: ChartProps) {
           height={height}
         />
       ) : null}
+      {isEmpty ? (
+        <Typography
+          sx={{
+            flex: 1,
+            position: 'absolute',
+            top: '50%',
+            left: '50%',
+            transform: 'translateX(-50%) translateY(-50%)',
+          }}
+        >
+          No data to show.
+        </Typography>
+      ) : null}
       <ChartContainer
         series={chartSeries}
         height={height}
-        width={500}
+        width={1000}
         xAxis={[
           {
-            id: chartSeries[0].xAxisKey || 'x',
+            id: chartSeries[0]?.xAxisKey || 'x',
             data: xValues,
             scaleType: 'band',
             min: hasNonNumberXValues ? undefined : Math.min(...(xValues as number[])),
@@ -147,7 +165,7 @@ function Chart({ data = [], loading, error, height, sx }: ChartProps) {
           },
         ]}
         yAxis={chartSeries.map((dataSeries) => ({
-          id: dataSeries.yAxisKey,
+          id: dataSeries?.yAxisKey,
           scaleType: 'linear',
         }))}
       >
@@ -176,10 +194,13 @@ function Chart({ data = [], loading, error, height, sx }: ChartProps) {
                   axisId={yAxisKey as string}
                 />
               ))}
+            <ChartsLegend />
+            <ChartsTooltip />
+            <ChartsAxisHighlight />
           </React.Fragment>
         ) : null}
       </ChartContainer>
-    </Container>
+    </Paper>
   );
 }
 

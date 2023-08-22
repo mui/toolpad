@@ -44,7 +44,7 @@
     "@mui/material": "5.14.5",
     "@mui/toolpad-core": "0.1.23",
     "@mui/toolpad-utils": "0.1.23",
-    "@mui/x-charts": "6.0.0-alpha.7",
+    "@mui/x-charts": "https://pkg.csb.dev/mui/mui-x/commit/290ecadb/@mui/x-charts",
     "@mui/x-data-grid-pro": "6.11.1",
     "@mui/x-date-pickers": "6.11.1",
     "@mui/x-license-pro": "6.10.2",
@@ -52,8 +52,7 @@
     "lodash-es": "4.17.21",
     "markdown-to-jsx": "7.3.2",
     "react-error-boundary": "4.0.11",
-    "react-hook-form": "7.45.4",
-    "recharts": "2.7.3"
+    "react-hook-form": "7.45.4"
   },
   "devDependencies": {
     "react": "18.2.0"

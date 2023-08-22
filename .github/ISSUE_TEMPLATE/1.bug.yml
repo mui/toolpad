@@ -51,4 +51,13 @@ body:
   - type: textarea
     attributes:
       label: Your environment 🌎
-      description: The version of your MUI Toolpad intance
+      description: Run `npx @mui/envinfo` and post the results. If you encounter issues with TypeScript please include the used tsconfig.
+      value: |
+        <details>
+          <summary><code>npx @mui/envinfo</code></summary>
+
+        ```
+          Don't forget to mention which browser you used.
+          Output from `npx @mui/envinfo` goes here.
+        ```
+        </details>

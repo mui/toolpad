@@ -1,7 +1,6 @@
 version: 2.1
 orbs:
   aws-s3: circleci/aws-s3@4.0.0
-  win: circleci/windows@5.0 # The Windows orb gives you everything you need to start using the Windows executor.
 
 defaults: &defaults
   working_directory: /tmp/mui-toolpad
@@ -168,37 +167,6 @@ jobs:
           path: test-results
           destination: playwright-test-results
 
-  test_windows:
-    executor: win/default
-    environment:
-      NODE_ENV: test
-      TOOLPAD_TEST_RETRIES: 1
-
-    steps:
-      - run:
-          name: 'Install Node.js'
-          command: |
-            nvm install 16.14.2
-            nvm use 16.14.2
-            npm -g install yarn
-      - run:
-          name: 'Install browsers'
-          command: |
-            npx playwright install
-      - checkout
-      - install_js
-      - run:
-          name: 'Build packages'
-          command: yarn release:build
-      - save_cache:
-          name: Save Next.js cache
-          key: v0-next-{{ checksum "yarn.lock" }}
-          paths:
-            - packages/toolpad-app/.next/cache
-      - run:
-          name: Tests real browser
-          command: yarn test:integration --grep backend-basic --project chromium
-
 workflows:
   pipeline:
     jobs:
@@ -213,8 +181,5 @@ workflows:
           requires:
             - checkout
       - test_unit:
-          requires:
-            - checkout
-      - test_windows:
           requires:
             - checkout

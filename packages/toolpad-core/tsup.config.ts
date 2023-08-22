@@ -25,8 +25,8 @@ export default defineConfig({
   sourcemap: true,
   esbuildPlugins: [cleanFolderOnFailure(path.resolve(__dirname, 'dist'))],
   async onSuccess() {
+    spawnSync('tsc', ['--emitDeclarationOnly', '--declaration'], { shell: true });
     // eslint-disable-next-line no-console
     console.log('build successful');
-    spawnSync('tsc', ['--emitDeclarationOnly', '--declaration'], { shell: true });
   },
 });

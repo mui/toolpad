@@ -1,5 +1,6 @@
 import * as fs from 'fs/promises';
 import path from 'path';
+import { spawnSync } from 'child_process';
 import { defineConfig } from 'tsup';
 import type * as esbuild from 'esbuild';
 
@@ -63,13 +64,14 @@ export default defineConfig([
   {
     entry: ['src/exports/*.ts', 'src/exports/*.tsx'],
     format: ['esm', 'cjs'],
-    dts: true,
+    dts: false,
     silent: true,
     outDir: 'dist/exports',
     tsconfig: './tsconfig.runtime.json',
     sourcemap: true,
     esbuildPlugins: [cleanFolderOnFailure(path.resolve(__dirname, 'dist/runtime'))],
     async onSuccess() {
+      spawnSync('tsc', ['--emitDeclarationOnly', '--declaration'], { shell: true });
       // eslint-disable-next-line no-console
       console.log('runtime: build successful');
     },

@@ -1,104 +1,92 @@
-import { TreeView } from '@mui/lab';
-import { Typography, styled, Box, IconButton } from '@mui/material';
 import * as React from 'react';
-import TreeItem, { treeItemClasses, TreeItemProps } from '@mui/lab/TreeItem';
+import { NodeId } from '@mui/toolpad-core';
+import { Box, Typography } from '@mui/material';
+import TreeView from '@mui/lab/TreeView';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
-import MoreVertIcon from '@mui/icons-material/MoreVert';
-import AddIcon from '@mui/icons-material/Add';
-import { NodeId } from '@mui/toolpad-core';
-import clsx from 'clsx';
-import invariant from 'invariant';
+import TreeItem, { TreeItemProps } from '@mui/lab/TreeItem';
 import * as appDom from '../../../appDom';
-import { useAppStateApi, useDom, useAppState } from '../../AppState';
-import CreatePageNodeDialog from './CreatePageNodeDialog';
-import useLocalStorageState from '../../../utils/useLocalStorageState';
-import NodeMenu from '../NodeMenu';
+import { useDom, useDomApi, useAppState, useAppStateApi } from '../../AppState';
+import EditableText from '../../../components/EditableText';
+import { ComponentIcon } from '../PageEditor/ComponentCatalog/ComponentCatalogItem';
+import { useNodeNameValidation } from '../PagesExplorer/validation';
 import { DomView } from '../../../utils/domView';
-import client from '../../../api';
+import { removePageLayoutNode } from '../pageLayout';
 
-const HierarchyExplorerRoot = styled('div')({
-  overflow: 'auto',
-  width: '100%',
-});
-
-const classes = {
-  treeItemMenuButton: 'Toolpad__HierarchyTreeItem',
-  treeItemMenuOpen: 'Toolpad__HierarchyTreeItemMenuOpen',
-};
-
-const StyledTreeItem = styled(TreeItem)({
-  [`& .${classes.treeItemMenuButton}`]: {
-    visibility: 'hidden',
+function CustomTreeItem(
+  props: TreeItemProps & {
+    node: appDom.ElementNode;
   },
-  [`
-    & .${treeItemClasses.content}:hover .${classes.treeItemMenuButton},
-    & .${classes.treeItemMenuOpen}
-  `]: {
-    visibility: 'visible',
-  },
-});
+) {
+  const domApi = useDomApi();
+  const { dom } = useDom();
+  const appStateApi = useAppStateApi();
 
-type StyledTreeItemProps = TreeItemProps & {
-  onDeleteNode?: (nodeId: NodeId) => void;
-  onDuplicateNode?: (nodeId: NodeId) => void;
-  onCreate?: React.MouseEventHandler;
-  labelIcon?: React.ReactNode;
-  labelText: string;
-  createLabelText?: string;
-  deleteLabelText?: string;
-  duplicateLabelText?: string;
-  toolpadNodeId?: NodeId;
-};
+  const [domNodeEditable, setDomNodeEditable] = React.useState(false);
+  const { label, node, ...other } = props;
 
-function HierarchyTreeItem(props: StyledTreeItemProps) {
-  const {
-    labelIcon,
-    labelText,
-    onCreate,
-    onDeleteNode,
-    onDuplicateNode,
-    createLabelText,
-    deleteLabelText = 'Delete',
-    duplicateLabelText = 'Duplicate',
-    toolpadNodeId,
-    ...other
-  } = props;
+  const [nodeNameInput, setNodeNameInput] = React.useState(node.name);
+  const handleNodeNameChange = React.useCallback(
+    (newValue: string) => setNodeNameInput(newValue),
+    [],
+  );
+  const handleStopEditing = React.useCallback(() => {
+    setNodeNameInput(node.name);
+    setDomNodeEditable(false);
+  }, [node.name]);
+
+  const existingNames = React.useMemo(() => appDom.getExistingNamesForNode(dom, node), [dom, node]);
+  const nodeNameError = useNodeNameValidation(nodeNameInput, existingNames, node.type);
+  const isNameValid = !nodeNameError;
+
+  const handleNameSave = React.useCallback(() => {
+    if (isNameValid) {
+      setNodeNameInput(nodeNameInput);
+      domApi.setNodeName(node.id, nodeNameInput);
+    } else {
+      setNodeNameInput(node.name);
+    }
+  }, [isNameValid, domApi, node.id, node.name, nodeNameInput]);
+
+  const handleNodeHover = React.useCallback(
+    (event: React.MouseEvent, nodeId: NodeId) => {
+      appStateApi.hoverNode(nodeId as NodeId);
+    },
+    [appStateApi],
+  );
+
+  const handleNodeBlur = React.useCallback(() => {
+    appStateApi.blurHoverNode();
+  }, [appStateApi]);
 
   return (
-    <StyledTreeItem
+    <TreeItem
+      key={node.id}
       label={
-        <Box sx={{ display: 'flex', alignItems: 'center', p: 0.1, pr: 0 }}>
-          {labelIcon}
-          <Typography variant="body2" sx={{ fontWeight: 'inherit', flexGrow: 1 }} noWrap>
-            {labelText}
-          </Typography>
-          {onCreate ? (
-            <IconButton aria-label={createLabelText} onClick={onCreate} size="small">
-              <AddIcon fontSize="inherit" />
-            </IconButton>
-          ) : null}
-          {toolpadNodeId ? (
-            <NodeMenu
-              renderButton={({ buttonProps, menuProps }) => (
-                <IconButton
-                  className={clsx(classes.treeItemMenuButton, {
-                    [classes.treeItemMenuOpen]: menuProps.open,
-                  })}
-                  aria-label="Open hierarchy menu"
-                  size="small"
-                  {...buttonProps}
-                >
-                  <MoreVertIcon fontSize="inherit" />
-                </IconButton>
-              )}
-              nodeId={toolpadNodeId}
-              deleteLabelText={deleteLabelText}
-              duplicateLabelText={duplicateLabelText}
-              onDeleteNode={onDeleteNode}
-              onDuplicateNode={onDuplicateNode}
-            />
-          ) : null}
+        <Box
+          sx={{ display: 'flex', alignItems: 'center', p: 0.2, pr: 0 }}
+          onMouseEnter={(event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+            handleNodeHover?.(event, node.id);
+          }}
+          onMouseLeave={handleNodeBlur}
+        >
+          <ComponentIcon
+            id={node.attributes.component}
+            kind="builtIn"
+            sx={{ marginRight: 1, fontSize: 18, opacity: 0.5 }}
+          />
+          <EditableText
+            value={nodeNameInput}
+            variant="body2"
+            editable={domNodeEditable}
+            onDoubleClick={() => setDomNodeEditable(true)}
+            onChange={handleNodeNameChange}
+            onClose={handleStopEditing}
+            onSave={handleNameSave}
+            error={!isNameValid}
+            helperText={nodeNameError}
+            sx={{ flexGrow: 1 }}
+          />
         </Box>
       }
       {...other}
@@ -106,164 +94,160 @@ function HierarchyTreeItem(props: StyledTreeItemProps) {
   );
 }
 
-function getNodeEditorDomView(node: appDom.AppDomNode): DomView | undefined {
-  switch (node.type) {
-    case 'page':
-      return { kind: 'page', nodeId: node.id };
-    case 'connection':
-      return { kind: 'connection', nodeId: node.id };
-    case 'codeComponent':
-      return { kind: 'codeComponent', nodeId: node.id };
-    default:
-      return undefined;
+function RecursiveSubTree({ dom, root }: { dom: appDom.AppDom; root: appDom.ElementNode }) {
+  const { children = [], renderItem = [] } = React.useMemo(
+    () => appDom.getChildNodes(dom, root),
+    [dom, root],
+  );
+
+  if (children.length > 0) {
+    return (
+      <CustomTreeItem nodeId={root.id} node={root}>
+        {children.map((childNode) => (
+          <RecursiveSubTree key={childNode.id} dom={dom} root={childNode} />
+        ))}
+      </CustomTreeItem>
+    );
   }
+  if (renderItem.length > 0) {
+    return (
+      <CustomTreeItem
+        nodeId={root.id}
+        node={root}
+        label={<Typography variant="body2">{root.name}</Typography>}
+      >
+        <TreeItem
+          nodeId={`${root.id}-renderItem`}
+          label={<Typography variant="body2">renderItem</Typography>}
+        >
+          {renderItem.map((childNode) => (
+            <RecursiveSubTree key={childNode.id} dom={dom} root={childNode} />
+          ))}
+        </TreeItem>
+      </CustomTreeItem>
+    );
+  }
+
+  return <CustomTreeItem nodeId={root.id} node={root} />;
 }
 
-export interface HierarchyExplorerProps {
-  className?: string;
-}
-
-export default function HierarchyExplorer({ className }: HierarchyExplorerProps) {
+export default function HierarchyExplorer() {
   const { dom } = useDom();
   const { currentView } = useAppState();
-
   const appStateApi = useAppStateApi();
+  const [expandedDomNodeIds, setExpandedDomNodeIds] = React.useState<string[]>([]);
 
-  const app = appDom.getApp(dom);
-  const { pages = [] } = appDom.getChildNodes(dom, app);
+  const currentPageId = currentView?.nodeId;
+  const currentPageNode = currentPageId ? appDom.getNode(dom, currentPageId, 'page') : null;
+  const selectedDomNodeId = (currentView as Extract<DomView, { kind: 'page' }>)?.selectedNodeId;
 
-  const [expanded, setExpanded] = useLocalStorageState<string[]>(
-    `editor/${app.id}/hierarchy-expansion`,
-    [':connections', ':pages', ':codeComponents'],
+  const selectedNodeAncestorIds = React.useMemo(() => {
+    if (!selectedDomNodeId) {
+      return [];
+    }
+    const selectedNode = appDom.getMaybeNode(dom, selectedDomNodeId);
+    if (selectedNode) {
+      return appDom.getAncestors(dom, selectedNode).map((node) => node.id);
+    }
+    return [];
+  }, [dom, selectedDomNodeId]);
+
+  const { children: rootChildren = [] } = React.useMemo(() => {
+    if (!currentPageNode) {
+      return { children: [] };
+    }
+    return appDom.getChildNodes(dom, currentPageNode);
+  }, [dom, currentPageNode]);
+
+  const handleNodeSelect = React.useCallback(
+    (event: React.SyntheticEvent, nodeId: string) => {
+      appStateApi.selectNode(nodeId as NodeId);
+    },
+    [appStateApi],
   );
 
-  const activeNode = currentView.nodeId || null;
+  const handleNodeFocus = React.useCallback(
+    (event: React.SyntheticEvent, nodeId: string) => {
+      appStateApi.hoverNode(nodeId as NodeId);
+    },
+    [appStateApi],
+  );
 
-  const handleToggle = (event: React.SyntheticEvent, nodeIds: string[]) => {
-    setExpanded(nodeIds as NodeId[]);
-  };
+  const handleNodeToggle = React.useCallback(
+    (event: React.SyntheticEvent, nodeIds: string[]) => {
+      setExpandedDomNodeIds(nodeIds);
+    },
+    [setExpandedDomNodeIds],
+  );
 
-  const handleSelect = (event: React.SyntheticEvent, nodeIds: string[]) => {
-    if (nodeIds.length <= 0) {
+  const deleteNode = React.useCallback(() => {
+    if (!selectedDomNodeId) {
       return;
     }
+    appStateApi.update(
+      (draft) => {
+        const toRemove = appDom.getMaybeNode(dom, selectedDomNodeId);
+        if (toRemove && appDom.isElement(toRemove)) {
+          draft = removePageLayoutNode(draft, toRemove);
+        }
+        return draft;
+      },
+      {
+        ...(currentView as Extract<DomView, { kind: 'page' }>),
+        selectedNodeId: null,
+      },
+    );
+  }, [appStateApi, dom, selectedDomNodeId, currentView]);
 
-    const rawNodeId = nodeIds[0];
-    if (rawNodeId.startsWith(':')) {
-      return;
-    }
-
-    const selectedNodeId: NodeId = rawNodeId as NodeId;
-    const node = appDom.getNode(dom, selectedNodeId);
-    if (appDom.isElement(node)) {
-      // TODO: sort out in-page selection
-      const page = appDom.getPageAncestor(dom, node);
-      if (page) {
-        appStateApi.setView({ kind: 'page', nodeId: page.id });
+  const handleKeyDown = React.useCallback(
+    (event: React.KeyboardEvent<HTMLUListElement>) => {
+      // delete selected node if event.key is Backspace
+      if (event.key === 'Backspace') {
+        deleteNode();
       }
-    }
-
-    if (appDom.isPage(node)) {
-      appStateApi.setView({ kind: 'page', nodeId: node.id });
-    }
-
-    if (appDom.isCodeComponent(node)) {
-      appStateApi.setView({ kind: 'codeComponent', nodeId: node.id });
-    }
-
-    if (appDom.isConnection(node)) {
-      appStateApi.setView({ kind: 'connection', nodeId: node.id });
-    }
-  };
-
-  const [createPageDialogOpen, setCreatePageDialogOpen] = React.useState(0);
-  const handleCreatePageDialogOpen = React.useCallback((event: React.MouseEvent) => {
-    event.stopPropagation();
-    setCreatePageDialogOpen(Math.random());
-  }, []);
-  const handleCreatepageDialogClose = React.useCallback(() => setCreatePageDialogOpen(0), []);
-
-  const handleDeletePage = React.useCallback(
-    async (nodeId: NodeId) => {
-      const deletedNode = appDom.getNode(dom, nodeId);
-
-      let domViewAfterDelete: DomView | undefined;
-      if (nodeId === activeNode) {
-        const siblings = appDom.getSiblings(dom, deletedNode);
-        const firstSiblingOfType = siblings.find((sibling) => sibling.type === deletedNode.type);
-        domViewAfterDelete = firstSiblingOfType && getNodeEditorDomView(firstSiblingOfType);
-      }
-
-      await client.mutation.deletePage(deletedNode.name);
-
-      appStateApi.update(
-        (draft) => appDom.removeNode(draft, nodeId),
-        domViewAfterDelete || { kind: 'page' },
-      );
     },
-    [activeNode, appStateApi, dom],
+    [deleteNode],
   );
 
-  const handleDuplicateNode = React.useCallback(
-    (nodeId: NodeId) => {
-      const node = appDom.getNode(dom, nodeId);
-
-      invariant(
-        node.parentId && node.parentProp,
-        'Duplication should never be called on nodes that are not placed in the dom',
-      );
-
-      const fragment = appDom.cloneFragment(dom, nodeId);
-
-      const newNode = appDom.getNode(fragment, fragment.root);
-      const editorDomView = getNodeEditorDomView(newNode);
-
-      appStateApi.update(
-        (draft) => appDom.addFragment(draft, fragment, node.parentId!, node.parentProp!),
-        editorDomView || { kind: 'page' },
-      );
-    },
-    [appStateApi, dom],
-  );
+  const expandedDomNodeIdSet = React.useMemo(() => {
+    return new Set([...selectedNodeAncestorIds, ...expandedDomNodeIds]);
+  }, [selectedNodeAncestorIds, expandedDomNodeIds]);
 
   return (
-    <HierarchyExplorerRoot data-testid="hierarchy-explorer" className={className}>
+    <React.Fragment>
+      <Typography
+        variant="body2"
+        sx={(theme) => ({
+          flexGrow: 1,
+          fontWeight: theme.typography.fontWeightLight,
+          mx: 1,
+          my: 0.5,
+        })}
+      >
+        Page hierarchy
+      </Typography>
       <TreeView
-        aria-label="hierarchy explorer"
-        selected={activeNode ? [activeNode] : []}
-        onNodeSelect={handleSelect}
-        expanded={expanded}
-        onNodeToggle={handleToggle}
-        multiSelect
+        aria-label="page hierarchy explorer"
         defaultCollapseIcon={<ExpandMoreIcon sx={{ fontSize: '0.9rem', opacity: 0.5 }} />}
         defaultExpandIcon={<ChevronRightIcon sx={{ fontSize: '0.9rem', opacity: 0.5 }} />}
+        expanded={Array.from(expandedDomNodeIdSet)}
+        selected={selectedDomNodeId as string}
+        onNodeSelect={handleNodeSelect}
+        onNodeFocus={handleNodeFocus}
+        onNodeToggle={handleNodeToggle}
+        onKeyDown={handleKeyDown}
+        sx={{
+          flexGrow: 1,
+          maxWidth: 400,
+          maxHeight: '85%',
+          overflowY: 'auto',
+          scrollbarGutter: 'stable',
+        }}
       >
-        <HierarchyTreeItem
-          nodeId=":pages"
-          aria-level={1}
-          labelText="Pages"
-          createLabelText="Create page"
-          onCreate={handleCreatePageDialogOpen}
-        >
-          {pages.map((page) => (
-            <HierarchyTreeItem
-              key={page.id}
-              nodeId={page.id}
-              toolpadNodeId={page.id}
-              aria-level={2}
-              labelText={page.name}
-              onDuplicateNode={handleDuplicateNode}
-              onDeleteNode={handleDeletePage}
-            />
-          ))}
-        </HierarchyTreeItem>
+        {rootChildren.map((childNode) => (
+          <RecursiveSubTree key={childNode.id} dom={dom} root={childNode} />
+        ))}
       </TreeView>
-
-      <CreatePageNodeDialog
-        key={createPageDialogOpen || undefined}
-        open={!!createPageDialogOpen}
-        onClose={handleCreatepageDialogClose}
-      />
-    </HierarchyExplorerRoot>
+    </React.Fragment>
   );
 }

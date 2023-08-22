@@ -91,7 +91,7 @@ spec:
         - component: PageColumn
           name: pageColumn
           layout:
-            columnSize: 1.5092592592592593
+            columnSize: 1
           children:
             - component: PageRow
               name: pageRow3
@@ -101,7 +101,7 @@ spec:
                 - component: TextField
                   name: textField
                   layout:
-                    columnSize: 1.5161290322580645
+                    columnSize: 1.519495690426327
                   props:
                     defaultValue: '@mui/toolpad'
                     label: package
@@ -109,7 +109,7 @@ spec:
                 - component: DatePicker
                   name: datePicker
                   layout:
-                    columnSize: 0.7352885584677419
+                    columnSize: 0.7369213121310025
                   props:
                     defaultValue:
                       $$jsExpression: |
@@ -121,7 +121,7 @@ spec:
                 - component: DatePicker
                   name: datePicker1
                   layout:
-                    columnSize: 0.7419354838709677
+                    columnSize: 0.7435829974426705
                   props:
                     label: until
                     fullWidth: true
@@ -141,14 +141,19 @@ spec:
     - component: PageRow
       name: pageRow2
       children:
-        - component: codeComponent.LineChart
-          name: codeComponent_LineChart
+        - component: Chart
+          name: downloadsChart
           props:
             data:
-              $$jsExpression: |
-                downloadsRange.data.downloads
-            series:
-              - downloads
+              - kind: line
+                label: downloads
+                data:
+                  $$jsExpression: |
+                    downloadsRange.data.downloads
+                xKey: day
+                yKey: downloads
+                color: '#87bc45'
+            height: 300
     - component: PageRow
       name: pageRow4
       children:

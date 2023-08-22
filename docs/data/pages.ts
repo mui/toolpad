@@ -1,14 +1,9 @@
 import type { MuiPage } from '@mui/monorepo/docs/src/MuiPage';
-import BuildIcon from '@mui/icons-material/Build';
-import CodeIcon from '@mui/icons-material/Code';
-import DescriptionIcon from '@mui/icons-material/Description';
-import VisibilityIcon from '@mui/icons-material/Visibility';
 import componentsManifest from './toolpad/reference/components/manifest.json';
 
 const pages: MuiPage[] = [
   {
     pathname: '/toolpad/getting-started',
-    icon: DescriptionIcon,
     children: [
       { pathname: '/toolpad/getting-started/overview' },
       { pathname: '/toolpad/getting-started/installation' },
@@ -26,14 +21,13 @@ const pages: MuiPage[] = [
   },
   {
     pathname: '/toolpad/concepts',
-    icon: VisibilityIcon,
     children: [
       {
         pathname: '/toolpad/concepts/building-ui',
         title: 'Building UI',
       },
       {
-        pathname: '/toolpad/concepts/connecting-to-data',
+        pathname: '/toolpad/concepts/queries-',
         title: 'Queries',
         children: [
           {
@@ -71,11 +65,10 @@ const pages: MuiPage[] = [
   {
     pathname: '/toolpad/how-to-guides',
     title: 'How-to guides',
-    icon: BuildIcon,
     children: [
       {
         pathname: '/toolpad/how-to-guides/connect-to-datasource',
-        title: 'Connect to datasource',
+        subheader: 'Connect to datasource',
         children: [
           {
             pathname: '/toolpad/how-to-guides/connect-to-databases',
@@ -83,12 +76,13 @@ const pages: MuiPage[] = [
           },
           {
             pathname: '/toolpad/how-to-guides/connect-to-googlesheets',
-            title: 'Google sheets',
+            title: 'Google Sheets',
           },
         ],
       },
       {
         pathname: '/toolpad/how-to-guides/deployment',
+        subheader: 'Deployment',
         children: [
           {
             pathname: '/toolpad/how-to-guides/render-deploy',
@@ -98,7 +92,7 @@ const pages: MuiPage[] = [
       },
       {
         pathname: '/toolpad/how-to-guides/custom-components',
-        title: 'Create custom components',
+        subheader: 'Create custom components',
         children: [
           {
             pathname: '/toolpad/how-to-guides/number-display',
@@ -110,33 +104,37 @@ const pages: MuiPage[] = [
           },
         ],
       },
-
       {
-        pathname: '/toolpad/how-to-guides/customize-datagrid',
-        title: 'Customize data grids',
-      },
-      {
-        pathname: '/toolpad/how-to-guides/delete-datagrid-row',
-        title: 'Delete a data grid row',
-      },
-      {
-        pathname: '/toolpad/how-to-guides/embed-pages',
-        title: 'Embed a Toolpad page',
-      },
-      {
-        pathname: '/toolpad/how-to-guides/basic-auth',
-        title: 'Enable basic auth',
-      },
-      {
-        pathname: '/toolpad/how-to-guides/editor-path',
-        title: 'Troubleshoot missing editor',
+        pathname: '/toolpad/how-to-guides/misc',
+        subheader: 'Miscellaneous',
+        children: [
+          {
+            pathname: '/toolpad/how-to-guides/customize-datagrid',
+            title: 'Customize data grids',
+          },
+          {
+            pathname: '/toolpad/how-to-guides/delete-datagrid-row',
+            title: 'Delete a data grid row',
+          },
+          {
+            pathname: '/toolpad/how-to-guides/embed-pages',
+            title: 'Embed a Toolpad page',
+          },
+          {
+            pathname: '/toolpad/how-to-guides/basic-auth',
+            title: 'Enable basic auth',
+          },
+          {
+            pathname: '/toolpad/how-to-guides/editor-path',
+            title: 'Troubleshoot missing editor',
+          },
+        ],
       },
     ],
   },
   {
     pathname: '/toolpad/reference-group',
     title: 'Reference',
-    icon: CodeIcon,
     children: [
       {
         pathname: '/toolpad/reference/file-schema',

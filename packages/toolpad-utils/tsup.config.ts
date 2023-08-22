@@ -1,10 +1,11 @@
 import * as fs from 'fs/promises';
 import path from 'path';
 import { spawnSync } from 'child_process';
-import type * as esbuild from 'esbuild';
-import { defineConfig } from 'tsup';
+import { defineConfig, Options } from 'tsup';
 
-function cleanFolderOnFailure(folder: string): esbuild.Plugin {
+type EsbuildPlugin = NonNullable<Options['esbuildPlugins']>[number];
+
+function cleanFolderOnFailure(folder: string): EsbuildPlugin {
   return {
     name: 'clean-dist-on-failure',
     setup(build) {

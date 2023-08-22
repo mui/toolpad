@@ -14,7 +14,7 @@ test('duplication', async ({ page }) => {
   await editorModel.goto();
 
   {
-    await editorModel.openHierarchyMenu('pages', 'page1');
+    await editorModel.openPageExplorerMenu('pages', 'page1');
     const duplicateMenuItem = page.getByRole('menuitem', { name: 'Duplicate' });
     await duplicateMenuItem.click();
 
@@ -23,12 +23,12 @@ test('duplication', async ({ page }) => {
     const button = editorModel.appCanvas.getByRole('button', { name: 'hello world' });
     await expect(button).toBeVisible();
 
-    await editorModel.openHierarchyMenu('pages', 'page2');
+    await editorModel.openPageExplorerMenu('pages', 'page2');
     const deleteMenuItem = page.getByRole('menuitem', { name: 'Delete' });
     await deleteMenuItem.click();
     const deleteButton = editorModel.confirmationDialog.getByRole('button', { name: 'Delete' });
     await deleteButton.click();
 
-    await expect(editorModel.getHierarchyItem('pages', 'page2')).toBeHidden();
+    await expect(editorModel.getPageItem('pages', 'page2')).toBeHidden();
   }
 });

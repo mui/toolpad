@@ -6,7 +6,7 @@ import chalk from 'chalk';
 import { JSONSchema7, JSONSchema7TypeName, JSONSchema7Type } from 'json-schema';
 import { asArray } from '@mui/toolpad-utils/collections';
 import { PrimitiveValueType } from '@mui/toolpad-core';
-import { tsConfig } from './functionsShared';
+import { compilerOptions } from './functionsShared';
 
 export interface ReturnTypeIntrospectionResult {
   schema: JSONSchema7 | null;
@@ -397,7 +397,7 @@ export default async function extractTypes({
     windowsPathsNoEscape: true,
   });
 
-  const program = ts.createProgram(entryPoints, tsConfig);
+  const program = ts.createProgram(entryPoints, compilerOptions);
 
   const checker = program.getTypeChecker();
 

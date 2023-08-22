@@ -38,6 +38,7 @@ function Autocomplete({
   minLength,
   maxLength,
   isInvalid,
+  sx,
   ...rest
 }: AutocompleteProps) {
   const [selectedVal, setSelectedVal] = React.useState<AutocompleteOption | null>(null);
@@ -110,6 +111,7 @@ function Autocomplete({
           })}
         />
       )}
+      sx={{ ...(!rest.fullWidth && !value ? { width: 120 } : {}), ...sx }}
       {...rest}
     />,
   );
@@ -143,7 +145,6 @@ export default createComponent(FormWrappedAutocomplete, {
     fullWidth: {
       helperText: 'If true, the autocomplete will take up the full width of its container.',
       type: 'boolean',
-      default: true,
     },
     size: {
       helperText: 'The size of the autocomplete. One of `small`, `medium`, or `large`.',

@@ -110,7 +110,6 @@ export default function CreateCodeComponentDialog({
             onClose={handleSnackbarClose}
             message={`Component "${lastSnackbarState.name}" created`}
             anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
-            autoHideDuration={3000}
             action={
               <React.Fragment>
                 <OpenCodeEditorButton filePath={name} variant="text" fileType="component" />

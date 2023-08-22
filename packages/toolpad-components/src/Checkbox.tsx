@@ -33,6 +33,8 @@ function Checkbox({ disableRipple, ...rest }: FormControlLabelOptions) {
     onChange: rest.onChange,
     validationProps: { isRequired: rest.isRequired, isInvalid: rest.isInvalid },
   });
+
+  console.log(rest);
   const handleChange = React.useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
       const newValue = event.target.checked;
@@ -93,7 +95,7 @@ export default createComponent(FormWrappedCheckbox, {
       helperText:
         'The color of the component. It supports both default and custom theme colors, which can be added as shown in the palette customization guide.',
       type: 'string',
-      enum: ['default', 'primary', 'secondary', 'error', 'info', 'success', 'warning', 'string'],
+      enum: ['default', 'primary', 'secondary', 'error', 'info', 'success', 'warning'],
       default: 'primary',
     },
     defaultChecked: {

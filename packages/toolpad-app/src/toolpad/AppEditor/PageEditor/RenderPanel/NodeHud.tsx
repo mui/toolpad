@@ -35,26 +35,32 @@ const NodeHudWrapper = styled('div', {
 })<{
   isOutlineVisible: boolean;
   isHoverable: boolean;
-}>(({ isOutlineVisible, isHoverable, theme }) => ({
-  // capture mouse events
-  pointerEvents: 'initial',
-  position: 'absolute',
-  userSelect: 'none',
-  outline: `1px dotted ${isOutlineVisible ? theme.palette.primary[500] : 'transparent'}`,
-  zIndex: 80,
-  [`&:hover, &.${nodeHudClasses.hovered}`]: {
-    outline: `2px dashed ${isHoverable ? theme.palette.primary[500] : 'transparent'}`,
-  },
-  [`.${nodeHudClasses.selected}`]: {
+}>(({ isOutlineVisible, isHoverable, theme }) => {
+  const defaultOutline = `1px dotted ${
+    isOutlineVisible ? theme.palette.primary[500] : 'transparent'
+  }`;
+
+  return {
+    // capture mouse events
+    pointerEvents: 'initial',
     position: 'absolute',
-    height: '100%',
-    width: '100%',
-    outline: `2px solid ${theme.palette.primary[500]}`,
-    left: 0,
-    top: 0,
+    userSelect: 'none',
+    outline: defaultOutline,
     zIndex: 80,
-  },
-}));
+    [`&:hover, &.${nodeHudClasses.hovered}`]: {
+      outline: `2px dashed ${isHoverable ? theme.palette.primary[500] : defaultOutline}`,
+    },
+    [`.${nodeHudClasses.selected}`]: {
+      position: 'absolute',
+      height: '100%',
+      width: '100%',
+      outline: `2px solid ${theme.palette.primary[500]}`,
+      left: 0,
+      top: 0,
+      zIndex: 80,
+    },
+  };
+});
 
 const SelectionHintWrapper = styled('div', {
   shouldForwardProp: (prop) => prop !== 'hintPosition',

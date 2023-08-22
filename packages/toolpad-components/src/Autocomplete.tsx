@@ -145,7 +145,6 @@ export default createComponent(FormWrappedAutocomplete, {
     fullWidth: {
       helperText: 'If true, the autocomplete will take up the full width of its container.',
       type: 'boolean',
-      default: true,
     },
     size: {
       helperText: 'The size of the autocomplete. One of `small`, `medium`, or `large`.',

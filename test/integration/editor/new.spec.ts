@@ -57,7 +57,7 @@ test('can create/delete page', async ({ page, localApp }) => {
 
   await editorModel.createPage('someOtherPage');
 
-  const pageMenuItem = editorModel.getHierarchyItem('pages', 'someOtherPage');
+  const pageMenuItem = editorModel.getPageItem('pages', 'someOtherPage');
   const pageFolder = path.resolve(localApp.dir, './toolpad/pages/someOtherPage');
   const pageFile = path.resolve(pageFolder, './page.yml');
 
@@ -67,7 +67,7 @@ test('can create/delete page', async ({ page, localApp }) => {
 
   await pageMenuItem.hover();
 
-  await pageMenuItem.getByRole('button', { name: 'Open hierarchy menu' }).click();
+  await pageMenuItem.getByRole('button', { name: 'Open page explorer menu' }).click();
 
   await page.getByRole('menuitem', { name: 'Delete' }).click();
 

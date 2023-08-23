@@ -24,7 +24,10 @@
     "public",
     "scripts",
     "dist",
-    "cli.js"
+    "cli.js",
+    "browser",
+    "server",
+    "runtime"
   ],
   "exports": {
     "./package.json": "./package.json",

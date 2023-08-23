@@ -1,12 +1,12 @@
 import * as React from 'react';
 import { Skeleton, Typography, Paper } from '@mui/material';
-import { createComponent } from '@mui/toolpad-core';
 import {
   NumberFormat,
   createFormat,
   NUMBER_FORMAT_SCHEMA,
   FormattedNumber,
 } from '@mui/toolpad-core/numberFormat';
+import createBuiltin from './createBuiltin';
 
 export interface ColorScaleStop {
   value: number;
@@ -78,7 +78,7 @@ function Metric({
   );
 }
 
-export default createComponent(Metric, {
+export default createBuiltin(Metric, {
   helperText:
     'The Metric component can be used to display a single numerical value. it supports multiple numerical formats such as bytes, currency, percentage... It also supports conditional formatting to adapt the color based on the numerical value.',
   loadingPropSource: ['value'],

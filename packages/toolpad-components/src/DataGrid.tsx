@@ -25,7 +25,7 @@ import {
   Unstable_LicenseInfoProviderProps as LicenseInfoProviderProps,
 } from '@mui/x-license-pro';
 import * as React from 'react';
-import { useNode, createComponent, useComponents } from '@mui/toolpad-core';
+import { useNode, useComponents } from '@mui/toolpad-core';
 import {
   Box,
   debounce,
@@ -42,6 +42,7 @@ import { errorFrom } from '@mui/toolpad-utils/errors';
 import { hasImageExtension } from '@mui/toolpad-utils/path';
 import { ErrorBoundary, FallbackProps } from 'react-error-boundary';
 import { NumberFormat, createStringFormatter } from '@mui/toolpad-core/numberFormat';
+import createBuiltin from './createBuiltin';
 import { SX_PROP_HELPER_TEXT } from './constants';
 import ErrorOverlay from './components/ErrorOverlay';
 
@@ -504,7 +505,7 @@ const DataGridComponent = React.forwardRef(function DataGridComponent(
   );
 });
 
-export default createComponent(DataGridComponent, {
+export default createBuiltin(DataGridComponent, {
   helperText:
     'The MUI X [Data Grid](https://mui.com/x/react-data-grid/) component.\n\nThe datagrid lets users display tabular data in a flexible grid.',
   errorProp: 'error',
@@ -573,6 +574,7 @@ export default createComponent(DataGridComponent, {
       default: 'compact',
     },
     height: {
+      helperText: 'The height of the datagrid.',
       type: 'number',
       default: 350,
       minimum: 100,

@@ -1,18 +1,18 @@
 {
   "compilerOptions": {
-    "jsx": "react",
-    "incremental": false,
-    "allowSyntheticDefaultImports": true,
+    "incremental": true,
+    "noEmit": false,
+    "rootDir": "src",
+    "outDir": "dist/exports",
+    "module": "esnext",
     "moduleResolution": "Bundler",
     "strict": true,
-    "module": "esnext",
-    "skipLibCheck": true,
     "downlevelIteration": true,
-    "target": "esnext",
-    "resolveJsonModule": true,
-    "isolatedModules": true,
-    "outDir": "dist/exports",
+    "skipLibCheck": true,
+    "esModuleInterop": true,
+    "resolveJsonModule": false,
+    "jsx": "react",
     "lib": ["dom", "dom.iterable", "esnext"]
   },
-  "include": ["./src/runtime/**/*", "./src/canvas/**/*", "typings/**/*.d.ts"]
+  "include": ["./src/runtime/**/*", "./src/canvas/**/*", "typings/**/*"]
 }

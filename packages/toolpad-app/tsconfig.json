@@ -22,7 +22,7 @@
     "esModuleInterop": true,
     "module": "esnext",
     "moduleResolution": "Bundler",
-    "resolveJsonModule": true,
+    "resolveJsonModule": false,
     "isolatedModules": true,
     "jsx": "react",
     "noUnusedLocals": true,

@@ -53,7 +53,7 @@ export default defineConfig([
   {
     entry: ['src/exports/*.ts', 'src/exports/*.tsx'],
     format: ['esm', 'cjs'],
-    dts: true,
+    dts: false,
     silent: true,
     outDir: 'dist/exports',
     tsconfig: './tsconfig.exports.json',
@@ -62,7 +62,10 @@ export default defineConfig([
     async onSuccess() {
       // eslint-disable-next-line no-console
       console.log('exports: build successful, generating types');
-      await execP('tsc --emitDeclarationOnly --declaration -p ./tsconfig.exports.json');
+      const { stdout } = await execP(
+        'tsc --emitDeclarationOnly --declaration -p ./tsconfig.exports.json',
+      );
+      console.error(stdout);
       // eslint-disable-next-line no-console
       console.log('exports: type generation successful');
     },

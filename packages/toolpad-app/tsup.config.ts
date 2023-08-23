@@ -1,10 +1,6 @@
-import { exec } from 'child_process';
-import { promisify } from 'util';
 import path from 'path';
 import { defineConfig } from 'tsup';
-import { cleanFolderOnFailure } from '../toolpad-utils/src/tsup';
-
-const execP = promisify(exec);
+import { cleanFolderOnFailure, generateTypes } from '../toolpad-utils/src/tsup';
 
 export default defineConfig([
   {
@@ -60,14 +56,7 @@ export default defineConfig([
     sourcemap: true,
     esbuildPlugins: [cleanFolderOnFailure(path.resolve(__dirname, 'dist/exports'))],
     async onSuccess() {
-      // eslint-disable-next-line no-console
-      console.log('exports: build successful, generating types');
-      const { stdout } = await execP(
-        'tsc --emitDeclarationOnly --declaration -p ./tsconfig.exports.json',
-      );
-      console.error(stdout);
-      // eslint-disable-next-line no-console
-      console.log('exports: type generation successful');
+      await generateTypes('./tsconfig.exports.json');
     },
   },
 ]);

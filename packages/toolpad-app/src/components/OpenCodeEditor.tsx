@@ -10,13 +10,16 @@ import {
   DialogActions,
   Tooltip,
   ButtonProps,
+  CircularProgress,
 } from '@mui/material';
 import CodeIcon from '@mui/icons-material/Code';
+import { LoadingButton } from '@mui/lab';
 import client from '../api';
 
 interface OpenCodeEditorButtonProps extends ButtonProps {
   filePath: string;
   fileType: string;
+  onSuccess?: () => void;
   iconButton?: boolean;
 }
 
@@ -62,32 +65,44 @@ export default function OpenCodeEditorButton({
   filePath,
   fileType,
   iconButton,
+  onSuccess,
   ...rest
 }: OpenCodeEditorButtonProps) {
   const [missingEditorDialog, setMissingEditorDialog] = React.useState(false);
+  const [busy, setBusy] = React.useState(false);
 
   const handleClick = React.useCallback(
-    (event: React.SyntheticEvent) => {
+    async (event: React.SyntheticEvent) => {
       event.stopPropagation();
-      client.mutation.openCodeEditor(filePath, fileType).catch(() => {
+      setBusy(true);
+      try {
+        await client.mutation.openCodeEditor(filePath, fileType);
+        onSuccess?.();
+      } catch {
         setMissingEditorDialog(true);
-      });
+      } finally {
+        setBusy(false);
+      }
     },
-    [filePath, fileType],
+    [filePath, fileType, onSuccess],
   );
 
   return (
     <React.Fragment>
       {iconButton ? (
         <Tooltip title="Open in code editor">
-          <IconButton size="small" onClick={handleClick} {...rest}>
-            <CodeIcon fontSize="inherit" color="primary" />
+          <IconButton disabled={busy} size="small" onClick={handleClick} {...rest}>
+            {busy ? (
+              <CircularProgress color="inherit" size={16} />
+            ) : (
+              <CodeIcon fontSize="inherit" color="primary" />
+            )}
           </IconButton>
         </Tooltip>
       ) : (
-        <Button onClick={handleClick} {...rest}>
+        <LoadingButton disabled={busy} onClick={handleClick} loading={busy} {...rest}>
           Open
-        </Button>
+        </LoadingButton>
       )}
       <MissingEditorDialog open={missingEditorDialog} onClose={setMissingEditorDialog} />
     </React.Fragment>

@@ -9,7 +9,7 @@ import {
   ListItemText,
   Toolbar,
 } from '@mui/material';
-import { Link, useMatch, useSearchParams } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 
 const TOOLPAD_DISPLAY_MODE_URL_PARAM = 'toolpad-display';
 
@@ -74,6 +74,7 @@ function AppNavigation({ activePage, pages, clipped = false, search }: AppNaviga
 }
 
 export interface ToolpadAppLayoutProps {
+  activePage?: string;
   pages?: NavigationEntry[];
   hasShell?: boolean;
   children?: React.ReactNode;
@@ -81,6 +82,7 @@ export interface ToolpadAppLayoutProps {
 }
 
 export function AppLayout({
+  activePage,
   pages = [],
   hasShell: hasShellProp = true,
   children,
@@ -98,8 +100,7 @@ export function AppLayout({
     return urlParams.size > 0 ? `?${urlParams.toString()}` : '';
   }, [urlParams]);
 
-  const match = useMatch('/pages/:slug');
-  const navEntry = pages.find((page) => page.slug === match?.params.slug);
+  const navEntry = pages.find((page) => page.slug === activePage);
 
   const displayMode = urlParams.get(TOOLPAD_DISPLAY_MODE_URL_PARAM);
 
@@ -109,7 +110,7 @@ export function AppLayout({
     <Box sx={{ flex: 1, display: 'flex' }}>
       {hasShell ? (
         <AppNavigation
-          activePage={match?.params.slug}
+          activePage={activePage}
           pages={pages}
           clipped={clipped}
           search={retainedSearch}

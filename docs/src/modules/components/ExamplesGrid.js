@@ -94,7 +94,7 @@ function Templates() {
             <CardMedia
               component="a"
               image={layout.src}
-              title={layout.title}
+              title={layout.description}
               href={layout.href}
               rel="nofollow"
               sx={(theme) => ({

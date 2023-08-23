@@ -139,6 +139,12 @@ export default function DemoVideo() {
   const [isMuted, setIsMuted] = React.useState(false);
 
   const handlePlay = () => {
+    if (typeof window !== 'undefined' && window.gtag) {
+      window.gtag('event', 'toolpad_video_start', {
+        event_label: 'Toolpad Demo Video Start',
+        event_category: 'toolpad_landing',
+      });
+    }
     videoRef.current.play();
     setIsPaused(videoRef.current.paused);
   };

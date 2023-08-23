@@ -6,11 +6,12 @@
     "moduleResolution": "Bundler",
     "strict": true,
     "module": "esnext",
-    "noEmit": true,
+    "skipLibCheck": true,
     "downlevelIteration": true,
     "target": "esnext",
     "resolveJsonModule": true,
     "isolatedModules": true,
+    "outDir": "dist/exports",
     "lib": ["dom", "dom.iterable", "esnext"]
   },
   "include": ["./src/runtime/**/*", "./src/canvas/**/*", "typings/**/*.d.ts"]

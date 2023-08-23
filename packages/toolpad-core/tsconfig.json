@@ -1,6 +1,9 @@
 {
   "extends": "../../tsconfig.json",
   "compilerOptions": {
+    "paths": {
+      "@mui/toolpad-utils/*": ["../toolpad-utils/dist/*"]
+    },
     "module": "esnext",
     "moduleResolution": "bundler",
     "alwaysStrict": true,

@@ -1,21 +1,10 @@
-import * as fs from 'fs/promises';
+import { exec } from 'child_process';
+import { promisify } from 'util';
 import path from 'path';
-import { defineConfig, Options } from 'tsup';
+import { defineConfig } from 'tsup';
+import { cleanFolderOnFailure } from '../toolpad-utils/src/tsup';
 
-type EsbuildPlugin = NonNullable<Options['esbuildPlugins']>[number];
-
-function cleanFolderOnFailure(folder: string): EsbuildPlugin {
-  return {
-    name: 'clean-dist-on-failure',
-    setup(build) {
-      build.onEnd(async (result) => {
-        if (result.errors.length > 0) {
-          await fs.rm(folder, { recursive: true, force: true });
-        }
-      });
-    },
-  };
-}
+const execP = promisify(exec);
 
 export default defineConfig([
   {
@@ -67,12 +56,15 @@ export default defineConfig([
     dts: true,
     silent: true,
     outDir: 'dist/exports',
-    tsconfig: './tsconfig.runtime.json',
+    tsconfig: './tsconfig.exports.json',
     sourcemap: true,
-    esbuildPlugins: [cleanFolderOnFailure(path.resolve(__dirname, 'dist/runtime'))],
+    esbuildPlugins: [cleanFolderOnFailure(path.resolve(__dirname, 'dist/exports'))],
     async onSuccess() {
       // eslint-disable-next-line no-console
-      console.log('runtime: build successful');
+      console.log('exports: build successful, generating types');
+      await execP('tsc --emitDeclarationOnly --declaration -p ./tsconfig.exports.json');
+      // eslint-disable-next-line no-console
+      console.log('exports: type generation successful');
     },
   },
 ]);

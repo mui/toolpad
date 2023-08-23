@@ -12,7 +12,7 @@ jobs:
       issues: write
     steps:
       - name: Set up Node.js ⚙️
-        uses: actions/setup-node@e33196f7422957bea03ed53f6fbb155025ffc7b8 # v3
+        uses: actions/setup-node@5e21ff4d9bc1a8cf6de233a3057d20ec6b3fb69d # v3
         with:
           node-version: '16.x'
 

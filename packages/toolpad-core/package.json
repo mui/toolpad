@@ -43,7 +43,7 @@
   "dependencies": {
     "@mui/material": "5.14.5",
     "@mui/toolpad-utils": "0.1.24",
-    "@tanstack/react-query": "4.32.6",
+    "@tanstack/react-query": "4.33.0",
     "@types/json-schema": "^7.0.12",
     "cookie": "0.5.0",
     "invariant": "2.2.4",

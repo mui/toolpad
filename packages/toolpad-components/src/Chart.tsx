@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { createComponent } from '@mui/toolpad-core';
-import { ContainerProps, Paper, Skeleton, Typography } from '@mui/material';
+import { ContainerProps, Container, Skeleton } from '@mui/material';
 import {
   BarPlot,
   LinePlot,
@@ -8,6 +8,7 @@ import {
   BarSeriesType,
   LineSeriesType,
   ScatterSeriesType,
+  ScaleName,
 } from '@mui/x-charts';
 import { ChartContainer } from '@mui/x-charts/ChartContainer';
 import { ChartsXAxis } from '@mui/x-charts/ChartsXAxis';
@@ -122,13 +123,26 @@ function Chart({ data = [], loading, error, height, sx }: ChartProps) {
 
   const displayError = error ? errorFrom(error) : null;
 
-  const isDataVisible = !loading && !displayError && chartSeries.length > 0;
+  const isDataVisible = !loading && !displayError;
+
   const isEmpty =
     (!loading && !displayError && chartSeries.length <= 0) ||
     !chartSeries.find((dataSeries) => (dataSeries.data ?? []).length > 0);
 
+  const hasBarCharts = chartSeries.some((dataSeries) => dataSeries.type === 'bar');
+
+  const hasXOnlyIntegers = xValues.every((x) => Number.isInteger(x));
+
+  let xScaleType: ScaleName = 'linear';
+  if (hasXOnlyIntegers) {
+    xScaleType = 'point';
+  }
+  if (hasBarCharts) {
+    xScaleType = 'band';
+  }
+
   return (
-    <Paper sx={{ ...sx, position: 'relative', width: '100%' }} aria-busy={loading}>
+    <Container disableGutters sx={{ ...sx, position: 'relative' }} aria-busy={loading}>
       <ErrorOverlay error={displayError} />
       {loading && !error ? (
         <Skeleton
@@ -138,46 +152,42 @@ function Chart({ data = [], loading, error, height, sx }: ChartProps) {
           height={height}
         />
       ) : null}
-      {isEmpty ? (
-        <Typography
+      {isDataVisible ? (
+        <ChartContainer
+          series={chartSeries}
+          height={height}
+          width={1000}
+          xAxis={[
+            {
+              id: 'x',
+              data: xValues,
+              scaleType: xScaleType,
+              min: hasNonNumberXValues ? undefined : Math.min(...(xValues as number[])),
+              max: hasNonNumberXValues ? undefined : Math.max(...(xValues as number[])),
+            },
+          ]}
+          yAxis={
+            isEmpty
+              ? [
+                  {
+                    id: 'y',
+                    scaleType: 'linear',
+                  },
+                ]
+              : chartSeries.map((dataSeries) => ({
+                  id: dataSeries?.yAxisKey || 'y',
+                  scaleType: 'linear',
+                }))
+          }
           sx={{
-            flex: 1,
-            position: 'absolute',
-            top: '50%',
-            left: '50%',
-            transform: 'translateX(-50%) translateY(-50%)',
+            '--ChartsLegend-rootSpacing': '25px',
           }}
         >
-          No data to show.
-        </Typography>
-      ) : null}
-      <ChartContainer
-        series={chartSeries}
-        height={height}
-        width={1000}
-        xAxis={[
-          {
-            id: chartSeries[0]?.xAxisKey || 'x',
-            data: xValues,
-            scaleType: 'band',
-            min: hasNonNumberXValues ? undefined : Math.min(...(xValues as number[])),
-            max: hasNonNumberXValues ? undefined : Math.max(...(xValues as number[])),
-          },
-        ]}
-        yAxis={chartSeries.map((dataSeries) => ({
-          id: dataSeries?.yAxisKey,
-          scaleType: 'linear',
-        }))}
-      >
-        {isDataVisible ? (
-          <React.Fragment>
-            {chartSeries.some((dataSeries) => dataSeries.type === 'line') ? <LinePlot /> : null}
-            {chartSeries.some((dataSeries) => dataSeries.type === 'bar') ? <BarPlot /> : null}
-            {chartSeries.some((dataSeries) => dataSeries.type === 'scatter') ? (
-              <ScatterPlot />
-            ) : null}
-            <ChartsXAxis label={chartSeries[0].xAxisKey} position="bottom" axisId="x" />
-            {chartSeries
+          <ChartsXAxis label={chartSeries[0]?.xAxisKey} position="bottom" axisId="x" />
+          {isEmpty ? (
+            <ChartsYAxis key="y" position="left" axisId="y" disableTicks tickFontSize={0} />
+          ) : (
+            chartSeries
               // Filter by unique yAxisKey
               .filter(
                 (dataSeries, index, array) =>
@@ -193,14 +203,17 @@ function Chart({ data = [], loading, error, height, sx }: ChartProps) {
                   position="left"
                   axisId={yAxisKey as string}
                 />
-              ))}
-            <ChartsLegend />
-            <ChartsTooltip />
-            <ChartsAxisHighlight />
-          </React.Fragment>
-        ) : null}
-      </ChartContainer>
-    </Paper>
+              ))
+          )}
+          {chartSeries.some((dataSeries) => dataSeries.type === 'line') ? <LinePlot /> : null}
+          {hasBarCharts ? <BarPlot /> : null}
+          {chartSeries.some((dataSeries) => dataSeries.type === 'scatter') ? <ScatterPlot /> : null}
+          <ChartsLegend />
+          <ChartsTooltip />
+          <ChartsAxisHighlight x={hasBarCharts ? 'band' : 'line'} />
+        </ChartContainer>
+      ) : null}
+    </Container>
   );
 }
 

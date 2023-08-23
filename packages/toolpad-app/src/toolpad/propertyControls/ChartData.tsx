@@ -236,7 +236,12 @@ function ChartDataPropEditor({
                     onClick={handleDataSeriesClick(index)}
                     aria-describedby={popoverId}
                   >
-                    <ListItemText primary={label} />
+                    <ListItemText
+                      primary={label}
+                      primaryTypographyProps={{
+                        style: { overflow: 'hidden', textOverflow: 'ellipsis' },
+                      }}
+                    />
                   </ListItemButton>
                   <IconButton
                     aria-label="Duplicate data series"

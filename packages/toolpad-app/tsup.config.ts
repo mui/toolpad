@@ -1,6 +1,5 @@
 import * as fs from 'fs/promises';
 import path from 'path';
-import { spawnSync } from 'child_process';
 import { defineConfig, Options } from 'tsup';
 
 type EsbuildPlugin = NonNullable<Options['esbuildPlugins']>[number];
@@ -18,7 +17,7 @@ function cleanFolderOnFailure(folder: string): EsbuildPlugin {
   };
 }
 
-export default defineConfig([
+export default defineConfig((options) => [
   {
     entry: {
       index: './cli/index.ts',
@@ -29,6 +28,7 @@ export default defineConfig([
     },
     outDir: 'dist/cli',
     silent: true,
+    clean: !options.watch,
     noExternal: [
       'open-editor',
       'execa',
@@ -50,6 +50,7 @@ export default defineConfig([
   {
     entry: ['./reactDevtools/bootstrap.ts'],
     silent: true,
+    clean: !options.watch,
     outDir: './public/reactDevtools',
     bundle: true,
     sourcemap: true,
@@ -65,14 +66,14 @@ export default defineConfig([
   {
     entry: ['src/exports/*.ts', 'src/exports/*.tsx'],
     format: ['esm', 'cjs'],
-    dts: false,
+    dts: true,
     silent: true,
+    clean: !options.watch,
     outDir: 'dist/exports',
     tsconfig: './tsconfig.runtime.json',
     sourcemap: true,
     esbuildPlugins: [cleanFolderOnFailure(path.resolve(__dirname, 'dist/runtime'))],
     async onSuccess() {
-      spawnSync('tsc', ['--emitDeclarationOnly', '--declaration'], { shell: true });
       // eslint-disable-next-line no-console
       console.log('runtime: build successful');
     },

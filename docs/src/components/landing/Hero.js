@@ -201,7 +201,7 @@ export default function Hero() {
           primaryUrl={ROUTES.toolpadQuickstart}
           secondaryLabel={'Book a demo'}
           secondaryUrl={ROUTES.toolpadDemoBooking}
-          secondarUrlTarget="_blank"
+          secondaryUrlTarget="_blank"
           altInstallation={'npx create-toolpad-app@latest'}
         />
         <Box

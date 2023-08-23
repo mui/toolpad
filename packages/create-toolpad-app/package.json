@@ -21,7 +21,6 @@
     "dist"
   ],
   "scripts": {
-    "prebuild": "rimraf ./dist",
     "build": "tsup",
     "dev": "tsup --watch",
     "check-types": "tsc --noEmit",

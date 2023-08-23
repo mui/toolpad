@@ -2,9 +2,9 @@
 
 <p class="description">You can bring your own custom components inside the Toolpad editor.</p>
 
-## `createComponent`
+The steps below explain how to create and use a custom component in Toolpad.
 
-Creating a custom component in Toolpad is a quick process:
+## Create component
 
 1. Start by clicking on Create in the custom component section of the Component library.
 2. Name your component.
@@ -15,9 +15,9 @@ Creating a custom component in Toolpad is a quick process:
   Your browser does not support the video tag.
 </video>
 
-Toolpad exposes a `createComponent` API to bring in custom components to the Toolpad component library.
+## Add component code
 
-For example, in `toolpad/components/HelloWorld.tsx`:
+Toolpad exposes a `createComponent` API to bring in custom components to the Toolpad component library. For example, in `toolpad/components/HelloWorld.tsx`:
 
 ```jsx
 import * as React from 'react';

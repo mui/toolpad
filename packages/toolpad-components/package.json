@@ -1,6 +1,6 @@
 {
   "name": "@mui/toolpad-components",
-  "version": "0.1.24",
+  "version": "0.1.25",
   "description": "Build MUI apps quickly",
   "author": "MUI Toolpad team",
   "homepage": "https://github.com/mui/mui-toolpad#readme",
@@ -42,8 +42,8 @@
     "@mui/icons-material": "5.14.3",
     "@mui/lab": "5.0.0-alpha.140",
     "@mui/material": "5.14.5",
-    "@mui/toolpad-core": "0.1.24",
-    "@mui/toolpad-utils": "0.1.24",
+    "@mui/toolpad-core": "0.1.25",
+    "@mui/toolpad-utils": "0.1.25",
     "@mui/x-data-grid-pro": "6.11.2",
     "@mui/x-date-pickers": "6.11.2",
     "@mui/x-license-pro": "6.10.2",

@@ -40,7 +40,7 @@
     "prebuild": "rimraf dist",
     "build": "tsup",
     "dev": "tsup --watch",
-    "check-types": "tsup && tsc --noEmit",
+    "check-types": "tsc --noEmit",
     "test": "jest"
   },
   "bugs": {

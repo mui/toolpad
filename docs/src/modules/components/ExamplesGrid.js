@@ -97,7 +97,6 @@ function Templates() {
               title={layout.title}
               href={layout.href}
               rel="nofollow"
-              target="_blank"
               sx={(theme) => ({
                 height: 0,
                 pt: '65%',
@@ -121,8 +120,8 @@ function Templates() {
               </Typography>
             </CardContent>
             <CardActions sx={{ p: 0, ml: -1 }}>
-              <Button component="a" href={layout.source} size="small">
-                {'sourceCode'}
+              <Button component="a" href={layout.source} size="small" target="_blank">
+                {'Source code'}
               </Button>
             </CardActions>
           </Card>

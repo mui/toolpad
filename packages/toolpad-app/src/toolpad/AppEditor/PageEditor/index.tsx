@@ -1,8 +1,7 @@
 import * as React from 'react';
 import { styled } from '@mui/material';
 import { NodeId } from '@mui/toolpad-core';
-import useDebouncedHandler from '@mui/toolpad-utils/hooks/useDebouncedHandler';
-import SplitPane from '../../../components/SplitPane';
+import { Panel, PanelGroup, PanelResizeHandle } from '../../../components/resizablePanels';
 import RenderPanel from './RenderPanel';
 import ComponentPanel from './ComponentPanel';
 import { PageEditorProvider } from './PageEditorProvider';
@@ -11,7 +10,6 @@ import * as appDom from '../../../appDom';
 import ComponentCatalog from './ComponentCatalog';
 import NotFoundEditor from '../NotFoundEditor';
 import usePageTitle from '../../../utils/usePageTitle';
-import useLocalStorageState from '../../../utils/useLocalStorageState';
 import useUndoRedo from '../../hooks/useUndoRedo';
 
 const classes = {
@@ -36,32 +34,20 @@ interface PageEditorContentProps {
 function PageEditorContent({ node }: PageEditorContentProps) {
   usePageTitle(`${node.attributes.title} | Toolpad editor`);
 
-  const [splitDefaultSize, setSplitDefaultSize] = useLocalStorageState<number>(
-    `editor/component-panel-split`,
-    300,
-  );
-
-  const handleSplitChange = useDebouncedHandler(
-    (newSize: number) => setSplitDefaultSize(newSize),
-    100,
-  );
-
   return (
     <PageEditorProvider key={node.id} nodeId={node.id}>
-      <SplitPane
-        allowResize
-        split="vertical"
-        size={splitDefaultSize}
-        defaultSize={splitDefaultSize}
-        onChange={handleSplitChange}
-        primary="second"
-      >
-        <PageEditorRoot>
-          <ComponentCatalog />
-          <RenderPanel className={classes.renderPanel} />
-        </PageEditorRoot>
-        <ComponentPanel />
-      </SplitPane>
+      <PanelGroup autoSaveId="editor/component-panel-split" direction="horizontal">
+        <Panel defaultSize={75} minSize={50} maxSize={80}>
+          <PageEditorRoot>
+            <ComponentCatalog />
+            <RenderPanel className={classes.renderPanel} />
+          </PageEditorRoot>
+        </Panel>
+        <PanelResizeHandle />
+        <Panel defaultSize={25} maxSize={50} minSize={20}>
+          <ComponentPanel />
+        </Panel>
+      </PanelGroup>
     </PageEditorProvider>
   );
 }

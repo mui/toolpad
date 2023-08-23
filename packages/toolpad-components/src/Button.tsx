@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { LoadingButton as MuiButton, LoadingButtonProps as MuiButtonProps } from '@mui/lab';
-import { createComponent } from '@mui/toolpad-core';
+import createBuiltin from './createBuiltin';
 import { SX_PROP_HELPER_TEXT } from './constants';
 
 interface ButtonProps extends Omit<MuiButtonProps, 'children'> {
@@ -11,7 +11,7 @@ function Button({ content, ...rest }: ButtonProps) {
   return <MuiButton {...rest}>{content}</MuiButton>;
 }
 
-export default createComponent(Button, {
+export default createBuiltin(Button, {
   helperText:
     'The Material UI [Button](https://mui.com/material-ui/react-button/) component.\n\nButtons allow users to take actions, and make choices, with a single tap.',
   layoutDirection: 'both',

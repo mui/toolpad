@@ -1,4 +1,4 @@
-import { createFunction } from '@mui/toolpad/server';
+import { createFunction, getContext } from '@mui/toolpad/server';
 import rawText from './raw.txt';
 import rawSql from './raw.sql';
 
@@ -127,4 +127,8 @@ export function neverResolving() {
 
 export async function getRawText() {
   return [rawText, rawSql].join(' | ');
+}
+
+export async function inspectContext() {
+  return getContext();
 }

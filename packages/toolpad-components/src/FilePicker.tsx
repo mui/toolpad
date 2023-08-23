@@ -1,12 +1,13 @@
 import * as React from 'react';
 import { TextField as MuiTextField, TextFieldProps as MuiTextFieldProps } from '@mui/material';
-import { createComponent } from '@mui/toolpad-core';
+import createBuiltin from './createBuiltin';
 import {
   FORM_INPUT_ARG_TYPES,
   FormInputComponentProps,
   useFormInput,
   withComponentForm,
 } from './Form';
+import { SX_PROP_HELPER_TEXT } from './constants';
 
 interface FullFile {
   name: string;
@@ -89,13 +90,23 @@ function FilePicker({
 
 const FormWrappedFilePicker = withComponentForm(FilePicker);
 
-export default createComponent(FormWrappedFilePicker, {
+export default createBuiltin(FormWrappedFilePicker, {
   helperText: 'File Picker component.\nIt allows users to take select and read files.',
   argTypes: {
     value: {
+      helperText: 'The value that is controlled by this FilePicker.',
       type: 'object',
       visible: false,
       onChangeProp: 'onChange',
+      schema: {
+        type: 'object',
+        properties: {
+          name: { type: 'string' },
+          type: { type: 'string' },
+          size: { type: 'number' },
+          base64: { type: 'string' },
+        },
+      },
     },
     label: {
       helperText: 'A label that describes the content of the FilePicker. e.g. "Profile Image".',
@@ -112,6 +123,7 @@ export default createComponent(FormWrappedFilePicker, {
     },
     ...FORM_INPUT_ARG_TYPES,
     sx: {
+      helperText: SX_PROP_HELPER_TEXT,
       type: 'object',
     },
   },

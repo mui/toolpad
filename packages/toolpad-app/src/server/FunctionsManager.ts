@@ -17,7 +17,7 @@ import { createWorker as createDevWorker } from './functionsDevWorker';
 import type { ExtractTypesParams, IntrospectionResult } from './functionsTypesWorker';
 import { Awaitable } from '../utils/types';
 import { format } from '../utils/prettier';
-import { tsConfig } from './functionsShared';
+import { compilerOptions } from './functionsShared';
 
 function createDefaultFunction(): string {
   return format(`
@@ -188,7 +188,7 @@ export default class FunctionsManager {
       platform: 'node',
       packages: 'external',
       target: 'es2022',
-      tsconfigRaw: JSON.stringify(tsConfig),
+      tsconfigRaw: JSON.stringify({ compilerOptions }),
       loader: {
         '.txt': 'text',
         '.sql': 'text',

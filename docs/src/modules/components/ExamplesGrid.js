@@ -121,7 +121,7 @@ function Templates() {
             </CardContent>
             <CardActions sx={{ p: 0, ml: -1 }}>
               <Button component="a" href={layout.source} size="small" target="_blank">
-                {'Source code'}
+                Source code
               </Button>
             </CardActions>
           </Card>

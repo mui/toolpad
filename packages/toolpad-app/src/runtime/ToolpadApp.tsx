@@ -45,7 +45,7 @@ import {
   Navigate,
   Location as RouterLocation,
   useNavigate,
-  matchPath,
+  useMatch,
 } from 'react-router-dom';
 import { ErrorBoundary, FallbackProps } from 'react-error-boundary';
 import {
@@ -81,9 +81,9 @@ import { HTML_ID_EDITOR_OVERLAY } from './constants';
 import { layoutBoxArgTypes } from './toolpadComponents/layoutBox';
 import { execDataSourceQuery, useDataQuery, UseFetch } from './useDataQuery';
 import { NavigateToPage } from './CanvasHooksContext';
-import AppNavigation from './AppNavigation';
 import PreviewHeader from './PreviewHeader';
 import useEvent from '../utils/useEvent';
+import { AppLayout } from './AppLayout';
 
 const browserJsRuntime = getBrowserRuntime();
 
@@ -97,8 +97,6 @@ const Pre = styled('pre')(({ theme }) => ({
   margin: 0,
   fontFamily: theme.fontFamilyMonospaced,
 }));
-
-const PREVIEW_PAGE_ROUTE = '/preview/pages/:nodeId';
 
 export const internalComponents: ToolpadComponents = Object.fromEntries(
   [...INTERNAL_COMPONENTS].map(([name]) => {
@@ -262,6 +260,8 @@ const RuntimeScopeContext = React.createContext<RuntimeScope | undefined>(undefi
 const [useDomContext, DomContextProvider] = createProvidedContext<appDom.AppDom>('Dom');
 const [useEvaluateScopeExpression, EvaluateScopeExpressionProvider] =
   createProvidedContext<(expr: string) => any>('EvaluateScopeExpression');
+
+export { DomContextProvider, ComponentsContextProvider };
 
 interface SetBindingContextValue {
   setBinding: (id: string, result: BindingEvaluationResult, scopeId?: string) => void;
@@ -628,10 +628,6 @@ function parseBindings(
 function useElmToolpadComponent(elm: appDom.ElementNode): ToolpadComponent {
   const componentId = getElementNodeComponentId(elm);
   return useComponent(componentId);
-}
-
-interface RenderedNodeProps {
-  nodeId: NodeId;
 }
 
 function RenderedNode({ nodeId }: RenderedNodeProps) {
@@ -1342,7 +1338,11 @@ function FetchNode({ node, page }: FetchNodeProps) {
   }
 }
 
-function RenderedPage({ nodeId }: RenderedNodeProps) {
+export interface RenderedNodeProps {
+  nodeId: NodeId;
+}
+
+export function RenderedPage({ nodeId }: RenderedNodeProps) {
   const dom = useDomContext();
   const page = appDom.getNode(dom, nodeId, 'page');
   const { children = [], queries = [] } = appDom.getChildNodes(dom, page);
@@ -1409,10 +1409,11 @@ function PageNotFound() {
 
 interface RenderedPagesProps {
   pages: appDom.PageNode[];
-  defaultPage: appDom.PageNode;
 }
 
-function RenderedPages({ pages, defaultPage }: RenderedPagesProps) {
+function RenderedPages({ pages }: RenderedPagesProps) {
+  const defaultPage = pages[0];
+
   const defaultPageNavigation = <Navigate to={`/pages/${defaultPage.id}`} replace />;
   return (
     <Routes>
@@ -1484,35 +1485,31 @@ export interface ToolpadAppLayoutProps {
   hasShell?: boolean;
 }
 
-function ToolpadAppLayout({ dom, hasShell: hasShellProp = true }: ToolpadAppLayoutProps) {
+function ToolpadAppLayout({ dom, hasShell = true }: ToolpadAppLayoutProps) {
   const root = appDom.getApp(dom);
   const { pages = [] } = appDom.getChildNodes(dom, root);
 
-  const location = useLocation();
-  const { pathname, search } = location;
-  const urlParams = React.useMemo(() => new URLSearchParams(search), [search]);
-
-  const pageMatch = matchPath(PREVIEW_PAGE_ROUTE, `/preview${pathname}`);
+  const pageMatch = useMatch('/pages/:nodeId');
   const pageId = pageMatch?.params.nodeId;
 
-  const defaultPage = pages[0];
-  const page = pageId ? appDom.getMaybeNode(dom, pageId as NodeId, 'page') : defaultPage;
-
-  const displayMode = urlParams.get('toolpad-display') || page?.attributes.display;
-
-  const hasShell = hasShellProp && displayMode !== 'standalone';
-
   const showPreviewHeader = isPreview && !isRenderedInCanvas;
+
+  const navEntries = React.useMemo(
+    () =>
+      pages.map((page) => ({
+        slug: page.id,
+        displayName: page.name,
+        hasShell: page?.attributes.display !== 'standalone',
+      })),
+    [pages],
+  );
 
   return (
     <React.Fragment>
       {showPreviewHeader ? <PreviewHeader pageId={pageId} /> : null}
-      <Box sx={{ flex: 1, display: 'flex' }}>
-        {hasShell && pages.length > 0 ? (
-          <AppNavigation pages={pages} clipped={showPreviewHeader} />
-        ) : null}
-        <RenderedPages pages={pages} defaultPage={defaultPage} />
-      </Box>
+      <AppLayout pages={navEntries} hasShell={hasShell} clipped={showPreviewHeader}>
+        <RenderedPages pages={pages} />
+      </AppLayout>
     </React.Fragment>
   );
 }

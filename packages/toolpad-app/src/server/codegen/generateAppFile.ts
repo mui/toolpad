@@ -1,4 +1,5 @@
 import { posix as path } from 'path';
+import serializeJavascript from 'serialize-javascript';
 import * as appDom from '../../appDom';
 import { RUNTIME_CONFIG_WINDOW_PROPERTY } from '../../constants';
 import { pathToNodeImportSpecifier } from '../../utils/paths';
@@ -16,11 +17,14 @@ export default function generateAppFile(ctx: ModuleContext, dom: appDom.AppDom):
 
   const defaultPageUrl = defaultPage ? `/pages/${defaultPage.id}` : null;
 
+  const navigationEntries = pages.map(({ id, name }) => ({ slug: id, displayName: name }));
+
   const code = `
     import * as React from 'react';
     import * as ReactDOM from 'react-dom/client';
     import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
     import { ThemeProvider, CssBaseline, Container, Typography } from '@mui/material';
+    import { AppLayout } from '@mui/toolpad/runtime';
     import theme from ${JSON.stringify(themeImportSpecifier)};
     ${pages
       .map((page) => {
@@ -51,31 +55,36 @@ export default function generateAppFile(ctx: ModuleContext, dom: appDom.AppDom):
       );
     }
 
+    const navigationEntries = ${serializeJavascript(navigationEntries, { isJSON: true })}
+
     function App() {
       return (
         <ThemeProvider theme={theme}>
           <CssBaseline enableColorScheme />
           <BrowserRouter basename={base}>
-            <Routes>
-              ${pages.map((page) => {
-                const pageUrlPath = `/pages/${page.id}`;
-                const pageElement = `<${getPageComponentName(page)} />`;
-                return `<Route path=${JSON.stringify(pageUrlPath)} element={${pageElement}} />`;
-              })}
-              ${pages.map((page) => {
-                const pageUrlPath = `/pages/${page.name}`;
-                const pageRedirectUrlPath = `/pages/${page.id}`;
-                const pageElement = `<Navigate to=${JSON.stringify(pageRedirectUrlPath)} />`;
-                return `<Route path=${JSON.stringify(pageUrlPath)} element={${pageElement}} />`;
-              })}
-              ${
-                defaultPageUrl
-                  ? `<Route path="/" element={<Navigate to=${JSON.stringify(defaultPageUrl)} />} />`
-                  : ''
-              }
-              <Route path="*" element={<PageNotFound />} />
-            </Routes>
-            <pre>{${JSON.stringify(JSON.stringify(dom, null, 2))}}</pre>
+            <AppLayout pages={navigationEntries}>
+              <Routes>
+                ${pages.map((page) => {
+                  const pageUrlPath = `/pages/${page.id}`;
+                  const pageElement = `<${getPageComponentName(page)} />`;
+                  return `<Route path=${JSON.stringify(pageUrlPath)} element={${pageElement}} />`;
+                })}
+                ${pages.map((page) => {
+                  const pageUrlPath = `/pages/${page.name}`;
+                  const pageRedirectUrlPath = `/pages/${page.id}`;
+                  const pageElement = `<Navigate to=${JSON.stringify(pageRedirectUrlPath)} />`;
+                  return `<Route path=${JSON.stringify(pageUrlPath)} element={${pageElement}} />`;
+                })}
+                ${
+                  defaultPageUrl
+                    ? `<Route path="/" element={<Navigate to=${JSON.stringify(
+                        defaultPageUrl,
+                      )} />} />`
+                    : ''
+                }
+                <Route path="*" element={<PageNotFound />} />
+              </Routes>
+            </AppLayout>
           </BrowserRouter>
         </ThemeProvider>
       );

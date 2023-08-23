@@ -14,6 +14,7 @@ interface GenerateCodeConfig {
 interface AppContext {
   themeFilePath: string;
   indexFilePath: string;
+  domFilePath: string;
   getPageFilePath(pageNode: appDom.PageNode): string;
 }
 
@@ -42,6 +43,7 @@ export function generateAppCode(
   const appContext: AppContext = {
     indexFilePath: path.join(outDir, INDEX_FILE_PATH),
     themeFilePath: path.join(outDir, THEME_FILE_PATH),
+    domFilePath: path.join(outDir, './dom.json'),
     getPageFilePath: (pageNode: appDom.PageNode) =>
       path.join(outDir, `./pages/${pageNode.name}.tsx`),
   };
@@ -62,11 +64,12 @@ export function generateAppCode(
           dom,
         ),
       ],
+      [appContext.domFilePath, JSON.stringify(dom, null, 2)],
       ...pages.map<[string, string]>((page) => {
         const pageFilePath = appContext.getPageFilePath(page);
         return [
           pageFilePath,
-          generatePageFile(new ModuleContext({ appContext, filePath: pageFilePath }), page),
+          generatePageFile(new ModuleContext({ appContext, filePath: pageFilePath }), dom, page.id),
         ];
       }),
     ]),

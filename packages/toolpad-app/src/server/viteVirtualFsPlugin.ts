@@ -1,6 +1,6 @@
 import { posix as path } from 'path';
 import invariant from 'invariant';
-import { Plugin, ViteDevServer, transformWithEsbuild } from 'vite';
+import { ESBuildTransformResult, Plugin, ViteDevServer, transformWithEsbuild } from 'vite';
 
 const API_PROPERTY = Symbol('virtual-fs-api');
 
@@ -16,7 +16,8 @@ export default function virtualFsPlugin(
 ): VirtualFsPlugin {
   const prefix = `virtual:${userIdentifier}:`;
   const resolvedPrefix = `\0${prefix}`;
-  const extensions = ['.js', '.jsx', '.ts', '.tsx', '.json'];
+  const transformExtensions = new Set(['.js', '.jsx', '.ts', '.tsx']);
+  const resolveExtensions = new Set(['.js', '.jsx', '.ts', '.tsx', '.json']);
   let serverInstance: ViteDevServer | undefined;
   let files = initialFiles;
   return {
@@ -36,7 +37,7 @@ export default function virtualFsPlugin(
           return `${resolvedPrefix}${entryPath}`;
         }
 
-        for (const extension of extensions) {
+        for (const extension of resolveExtensions) {
           const entryPathWithExtension = `${entryPath}${extension}`;
           if (files.has(entryPathWithExtension)) {
             return `${resolvedPrefix}${entryPathWithExtension}`;
@@ -55,8 +56,13 @@ export default function virtualFsPlugin(
         const virtualPath = id.slice(resolvedPrefix.length);
         const content = files.get(virtualPath);
         invariant(content, `File ${virtualPath} not found under virtual fs "${userIdentifier}"`);
-        const transformed = await transformWithEsbuild(content, virtualPath);
-        return transformed;
+        let result: string | ESBuildTransformResult = content;
+
+        if (transformExtensions.has(path.extname(virtualPath))) {
+          result = await transformWithEsbuild(content, virtualPath);
+        }
+
+        return result;
       }
       return null;
     },

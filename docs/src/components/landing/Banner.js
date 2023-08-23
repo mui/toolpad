@@ -53,6 +53,7 @@ function Banner(props) {
         data-ga-event-label={label}
         data-ga-event-action={action}
         href={href}
+        target="_blank"
         variant="contained"
         fullWidth
         endIcon={<KeyboardArrowRightRounded />}

@@ -4,6 +4,8 @@
 
 <p class="description">API docs for the Toolpad Autocomplete component.</p>
 
+A text input with autocomplete suggestions. Uses the MUI [Autocomplete](https://mui.com/material-ui/react-autocomplete/) under the hood
+
 ## Properties
 
 | Name                                      | Type                                   | Default                                     | Description                                                                                                                                                                                                                                                                          |

@@ -4,9 +4,11 @@
 
 <p class="description">API docs for the Toolpad PageRow component.</p>
 
+A page row component.
+
 ## Properties
 
-| Name                                    | Type                                   | Default                             | Description |
-| :-------------------------------------- | :------------------------------------- | :---------------------------------- | :---------- |
-| <span class="prop-name">gap</span>      | <span class="prop-type">number</span>  | <span class="prop-default">1</span> |             |
-| <span class="prop-name">children</span> | <span class="prop-type">element</span> |                                     |             |
+| Name                                    | Type                                   | Default                             | Description                   |
+| :-------------------------------------- | :------------------------------------- | :---------------------------------- | :---------------------------- |
+| <span class="prop-name">gap</span>      | <span class="prop-type">number</span>  | <span class="prop-default">1</span> | The gap between children.     |
+| <span class="prop-name">children</span> | <span class="prop-type">element</span> |                                     | The content of the component. |

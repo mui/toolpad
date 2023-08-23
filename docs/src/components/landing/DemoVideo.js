@@ -140,18 +140,20 @@ export default function DemoVideo() {
 
   const handlePlay = () => {
     if (typeof window !== 'undefined' && window.gtag) {
-      window.gtag('event', 'toolpad_video_start', {
-        event_label: 'Toolpad Demo Video Start',
+      window.gtag('event', 'toolpad_video', {
+        event_label: 'Video Start',
         event_category: 'toolpad_landing',
       });
     }
     videoRef.current.play();
     setIsPaused(videoRef.current.paused);
   };
+
   const handlePause = () => {
     videoRef.current.pause();
     setIsPaused(videoRef.current.paused);
   };
+
   const handleFullScreen = () => {
     videoRef.current.requestFullscreen();
   };
@@ -159,6 +161,44 @@ export default function DemoVideo() {
   const handleMuteToggle = () => {
     videoRef.current.muted = !videoRef.current.muted;
     setIsMuted(videoRef.current.muted);
+  };
+
+  const milestonesComplete = React.useRef(new Set([]));
+
+  const handleTimeUpdate = () => {
+    if (typeof window === 'undefined' || !window.gtag || !videoRef.current) {
+      return;
+    }
+    const videoElement = videoRef.current;
+
+    const videoProgress = (videoElement.currentTime / videoElement.duration) * 100;
+
+    if (videoProgress >= 25 && videoProgress < 50 && !milestonesComplete.current.has(25)) {
+      window.gtag('event', 'toolpad_video', {
+        event_category: 'toolpad_landing',
+        event_label: `25% Complete`,
+      });
+      milestonesComplete.current.add(25);
+    } else if (videoProgress >= 50 && videoProgress < 75 && !milestonesComplete.current.has(50)) {
+      window.gtag('event', 'toolpad_video', {
+        event_category: 'toolpad_landing',
+        event_label: `50% Complete`,
+      });
+      milestonesComplete.current.add(50);
+    } else if (videoProgress >= 75 && videoProgress < 100 && !milestonesComplete.current.has(75)) {
+      window.gtag('event', 'toolpad_video', {
+        event_category: 'toolpad_landing',
+        event_label: `75% Complete`,
+      });
+      milestonesComplete.current.add(75);
+    } else if (videoProgress === 100 && !milestonesComplete.current.has(100)) {
+      window.gtag('event', 'toolpad_video', {
+        event_category: 'toolpad_landing',
+        event_label: `100% Complete`,
+      });
+      milestonesComplete.current.add(100);
+      milestonesComplete.current.clear();
+    }
   };
 
   return (
@@ -187,7 +227,11 @@ export default function DemoVideo() {
         )}
       </MuteButton>
 
-      <Video poster="/static/toolpad/marketing/index-hero-video-poster.png" ref={videoRef}>
+      <Video
+        poster="/static/toolpad/marketing/index-hero-video-poster.png"
+        ref={videoRef}
+        onTimeUpdate={handleTimeUpdate}
+      >
         <source src="/static/toolpad/marketing/index-hero-demo-video.mp4" type="video/mp4" />
         Your browser does not support the video tag.
       </Video>

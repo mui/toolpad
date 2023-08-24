@@ -1,5 +1,31 @@
 # Changelog
 
+## 0.1.25
+
+<!-- generated comparing v0.1.24..master -->
+
+_Aug 23, 2023_
+
+A big thanks to the 4 contributors who made this release possible. Here are some highlights ✨:
+
+Add GraphQL example app, add descriptions to component docs, improve resizable panels, improve custom component creation UX, simplify page layouts.
+
+- &#8203;<!-- 13 -->Stall package updates for dependencies that require node 18 (#2533) @Janpot
+- &#8203;<!-- 12 -->Add more examples page (#2447) @prakhargupta1
+- &#8203;<!-- 11 -->React resizable panels (#2398) @Janpot
+- &#8203;<!-- 10 -->Make module exports compatible with node module resolution in typescript (#2522) @Janpot
+- &#8203;<!-- 09 -->Require a helperText for builtin components and argTypes (#2456) @Janpot
+- &#8203;<!-- 08 -->Fix esbuild warning (#2521) @Janpot
+- &#8203;<!-- 07 -->Improve open code editor snackbar (#2520) @Janpot
+- &#8203;<!-- 06 -->Add graphQL example (#2471) @prakhargupta1
+- &#8203;<!-- 05 -->Update bug template to ask for specific environment (#2513) @Janpot
+- &#8203;<!-- 04 -->Add an explanation on why we use structuredClone in the canvas (#2514) @Janpot
+- &#8203;<!-- 03 -->Avoid single child layout containers (#2388) @apedroferreira
+- &#8203;<!-- 02 -->[docs] Add 'Miscellaneous' section to How-to guides (#2524) @bharatkashyap
+- &#8203;<!-- 01 -->[website] Fix typo (#2530) @bharatkashyap
+
+All contributors of this release in alphabetical order: @apedroferreira, @bharatkashyap, @Janpot, @prakhargupta1
+
 ## 0.1.24
 
 <!-- generated comparing v0.1.23..master -->

@@ -1489,8 +1489,8 @@ function ToolpadAppLayout({ dom, hasShell = true }: ToolpadAppLayoutProps) {
   const root = appDom.getApp(dom);
   const { pages = [] } = appDom.getChildNodes(dom, root);
 
-  const pageMatch = useMatch('/pages/:nodeId');
-  const pageId = pageMatch?.params.nodeId;
+  const pageMatch = useMatch('/pages/:slug');
+  const pageId = pageMatch?.params.slug;
 
   const showPreviewHeader = isPreview && !isRenderedInCanvas;
 
@@ -1507,7 +1507,12 @@ function ToolpadAppLayout({ dom, hasShell = true }: ToolpadAppLayoutProps) {
   return (
     <React.Fragment>
       {showPreviewHeader ? <PreviewHeader pageId={pageId} /> : null}
-      <AppLayout pages={navEntries} hasShell={hasShell} clipped={showPreviewHeader}>
+      <AppLayout
+        activePage={pageMatch?.params.slug}
+        pages={navEntries}
+        hasShell={hasShell}
+        clipped={showPreviewHeader}
+      >
         <RenderedPages pages={pages} />
       </AppLayout>
     </React.Fragment>

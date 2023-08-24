@@ -46,29 +46,27 @@ function AppNavigation({ activePage, pages, clipped = false, search }: AppNaviga
       }}
     >
       {clipped ? <Toolbar variant="dense" /> : null}
-      <Box>
-        <List
-          component="nav"
-          subheader={
-            <ListSubheader id={navListSubheaderId} sx={{ px: 4 }}>
-              Pages
-            </ListSubheader>
-          }
-          aria-labelledby={navListSubheaderId}
-        >
-          {pages.map((page) => (
-            <ListItem key={page.slug} disablePadding>
-              <ListItemButton
-                component={Link}
-                to={`pages/${page.slug}${search}`}
-                selected={activePage === page.slug}
-              >
-                <ListItemText primary={page.displayName} sx={{ ml: 2 }} />
-              </ListItemButton>
-            </ListItem>
-          ))}
-        </List>
-      </Box>
+      <List
+        component="nav"
+        subheader={
+          <ListSubheader id={navListSubheaderId} sx={{ px: 4 }}>
+            Pages
+          </ListSubheader>
+        }
+        aria-labelledby={navListSubheaderId}
+      >
+        {pages.map((page) => (
+          <ListItem key={page.slug} disablePadding>
+            <ListItemButton
+              component={Link}
+              to={`pages/${page.slug}${search}`}
+              selected={activePage === page.slug}
+            >
+              <ListItemText primary={page.displayName} sx={{ ml: 2 }} />
+            </ListItemButton>
+          </ListItem>
+        ))}
+      </List>
     </Drawer>
   );
 }

@@ -77,18 +77,16 @@ export default function GlobalScopeExplorer({ meta, value, sx }: GlobalScopeExpl
             }
             return (
               <React.Fragment key={key}>
-                <Box>
-                  <Typography sx={{ mx: 1, my: 0.5 }}>{group.displayName}</Typography>
-                  <Divider />
-                  <Box sx={{ m: 1 }}>
-                    {group.items.map((item) => {
-                      return (
-                        <React.Fragment key={item.key}>
-                          <ObjectInspector expandLevel={0} name={item.key} data={item.value} />
-                        </React.Fragment>
-                      );
-                    })}
-                  </Box>
+                <Typography sx={{ mx: 1, my: 0.5 }}>{group.displayName}</Typography>
+                <Divider />
+                <Box sx={{ m: 1 }}>
+                  {group.items.map((item) => {
+                    return (
+                      <React.Fragment key={item.key}>
+                        <ObjectInspector expandLevel={0} name={item.key} data={item.value} />
+                      </React.Fragment>
+                    );
+                  })}
                 </Box>
                 <Divider />
               </React.Fragment>

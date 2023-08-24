@@ -322,18 +322,16 @@ function NavigationActionParameterEditor({
   });
 
   return (
-    <div>
-      <BindableEditor<string>
-        liveBinding={liveBinding}
-        jsRuntime={jsRuntime}
-        globalScope={globalScope}
-        globalScopeMeta={globalScopeMeta}
-        label={label}
-        propType={{ type: 'string' }}
-        value={value || null}
-        onChange={onChange}
-      />
-    </div>
+    <BindableEditor<string>
+      liveBinding={liveBinding}
+      jsRuntime={jsRuntime}
+      globalScope={globalScope}
+      globalScopeMeta={globalScopeMeta}
+      label={label}
+      propType={{ type: 'string' }}
+      value={value || null}
+      onChange={onChange}
+    />
   );
 }
 

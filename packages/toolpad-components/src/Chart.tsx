@@ -4,6 +4,7 @@ import { ContainerProps, Container, Skeleton } from '@mui/material';
 import {
   BarPlot,
   LinePlot,
+  AreaPlot,
   ScatterPlot,
   BarSeriesType,
   LineSeriesType,
@@ -64,9 +65,12 @@ function Chart({ data = [], loading, error, height, sx }: ChartProps) {
           return dataSeries.data.map((dataSeriesPoint) => dataSeriesPoint[dataSeries.xKey!]);
         })
         .filter((value, index, array) => array.indexOf(value) === index)
-        .sort((a: number | string, b: number | string) =>
-          typeof a === 'number' && typeof b === 'number' ? a - b : 0,
-        ),
+        .sort((a: number | string, b: number | string) => {
+          if (typeof a === 'number' && typeof b === 'number') {
+            return (a as number) - (b as number);
+          }
+          return 0;
+        }),
     [data],
   );
 
@@ -87,7 +91,7 @@ function Chart({ data = [], loading, error, height, sx }: ChartProps) {
 
           const baseProps = {
             type: chartType,
-            xAxisKey: dataSeries.xKey,
+            xAxisKey: 'x',
             yAxisKey: dataSeries.yKey,
             label: dataSeries.label,
             color: dataSeries.color,
@@ -119,18 +123,13 @@ function Chart({ data = [], loading, error, height, sx }: ChartProps) {
     [data, xValues],
   );
 
-  const hasNonNumberXValues = xValues.some((xValue) => typeof xValue !== 'number');
-
   const displayError = error ? errorFrom(error) : null;
 
   const isDataVisible = !loading && !displayError;
 
-  const isEmpty =
-    (!loading && !displayError && chartSeries.length <= 0) ||
-    !chartSeries.find((dataSeries) => (dataSeries.data ?? []).length > 0);
+  const hasBarCharts = data.some((dataSeries) => dataSeries.kind === 'bar');
 
-  const hasBarCharts = chartSeries.some((dataSeries) => dataSeries.type === 'bar');
-
+  const hasNonCategoryXValues = xValues.some((xValue) => typeof xValue === 'number');
   const hasXOnlyIntegers = xValues.every((x) => Number.isInteger(x));
 
   let xScaleType: ScaleName = 'linear';
@@ -141,8 +140,14 @@ function Chart({ data = [], loading, error, height, sx }: ChartProps) {
     xScaleType = 'band';
   }
 
+  const firstDataSeries = chartSeries[0];
+
   return (
-    <Container disableGutters sx={{ ...sx, position: 'relative' }} aria-busy={loading}>
+    <Container
+      disableGutters
+      sx={{ ...sx, minHeight: height, position: 'relative' }}
+      aria-busy={loading}
+    >
       <ErrorOverlay error={displayError} />
       {loading && !error ? (
         <Skeleton
@@ -154,60 +159,45 @@ function Chart({ data = [], loading, error, height, sx }: ChartProps) {
       ) : null}
       {isDataVisible ? (
         <ChartContainer
-          series={chartSeries}
-          height={height}
+          series={chartSeries.slice().reverse()}
+          height={300}
           width={1000}
           xAxis={[
             {
               id: 'x',
               data: xValues,
               scaleType: xScaleType,
-              min: hasNonNumberXValues ? undefined : Math.min(...(xValues as number[])),
-              max: hasNonNumberXValues ? undefined : Math.max(...(xValues as number[])),
+              min: hasNonCategoryXValues ? Math.min(...(xValues as number[])) : undefined,
+              max: hasNonCategoryXValues ? Math.max(...(xValues as number[])) : undefined,
             },
           ]}
           yAxis={
-            isEmpty
-              ? [
+            firstDataSeries
+              ? chartSeries.map((dataSeries) => ({
+                  id: dataSeries?.yAxisKey || 'y',
+                  scaleType: 'linear',
+                }))
+              : [
                   {
                     id: 'y',
                     scaleType: 'linear',
                   },
                 ]
-              : chartSeries.map((dataSeries) => ({
-                  id: dataSeries?.yAxisKey || 'y',
-                  scaleType: 'linear',
-                }))
           }
           sx={{
             '--ChartsLegend-rootSpacing': '25px',
           }}
         >
-          <ChartsXAxis label={chartSeries[0]?.xAxisKey} position="bottom" axisId="x" />
-          {isEmpty ? (
-            <ChartsYAxis key="y" position="left" axisId="y" disableTicks tickFontSize={0} />
-          ) : (
-            chartSeries
-              // Filter by unique yAxisKey
-              .filter(
-                (dataSeries, index, array) =>
-                  dataSeries.yAxisKey &&
-                  array.findIndex(
-                    (otherDataSeries) => otherDataSeries.yAxisKey === dataSeries.yAxisKey,
-                  ) === index,
-              )
-              .map(({ yAxisKey }) => (
-                <ChartsYAxis
-                  key={yAxisKey}
-                  label={yAxisKey}
-                  position="left"
-                  axisId={yAxisKey as string}
-                />
-              ))
-          )}
-          {chartSeries.some((dataSeries) => dataSeries.type === 'line') ? <LinePlot /> : null}
+          <ChartsXAxis position="bottom" axisId="x" />
+          <ChartsYAxis
+            key={firstDataSeries?.yAxisKey || 'y'}
+            position="left"
+            axisId={firstDataSeries?.yAxisKey || 'y'}
+          />
+          {data.some((dataSeries) => dataSeries.kind === 'area') ? <AreaPlot /> : null}
           {hasBarCharts ? <BarPlot /> : null}
-          {chartSeries.some((dataSeries) => dataSeries.type === 'scatter') ? <ScatterPlot /> : null}
+          {data.some((dataSeries) => dataSeries.kind === 'line') ? <LinePlot /> : null}
+          {data.some((dataSeries) => dataSeries.kind === 'scatter') ? <ScatterPlot /> : null}
           <ChartsLegend />
           <ChartsTooltip />
           <ChartsAxisHighlight x={hasBarCharts ? 'band' : 'line'} />

@@ -25,6 +25,7 @@ import BarChartIcon from '@mui/icons-material/BarChart';
 import ShowChartIcon from '@mui/icons-material/ShowChart';
 import LegendToggleIcon from '@mui/icons-material/LegendToggle';
 import { evaluateBindable } from '@mui/toolpad-core/jsRuntime';
+import { blueberryTwilightPalette } from '@mui/x-charts/colorPalettes';
 import * as appDom from '../../appDom';
 import type { EditorProps } from '../../types';
 import PropertyControl from '../../components/PropertyControl';
@@ -66,19 +67,28 @@ function ChartDataPropEditor({
 
     const newDataSeriesLabel = `dataSeries${newDataSeriesCount}`;
 
+    const palette = blueberryTwilightPalette(appTheme.palette.mode);
+
     onChange([
       ...value,
       {
         label: newDataSeriesLabel,
         kind: 'line',
         data: [],
-        color:
-          newDataSeriesCount % 2 === 0
-            ? appTheme.palette.secondary.main
-            : appTheme.palette.primary.main,
+        color: palette[(newDataSeriesCount - 1) % palette.length],
       },
     ]);
   }, [appTheme, onChange, value]);
+
+  const previousDataSeriesCountRef = React.useRef(value.length);
+  React.useEffect(() => {
+    if (previousDataSeriesCountRef.current === 0 && value.length === 1) {
+      setDataSeriesEditIndex(0);
+      setPopoverAnchorElement(document.getElementById('data-series-button-1'));
+    }
+
+    previousDataSeriesCountRef.current = value.length;
+  }, [value.length]);
 
   const handleDataSeriesClick = React.useCallback(
     (index: number) => (event: React.MouseEvent<HTMLElement>) => {
@@ -233,6 +243,7 @@ function ChartDataPropEditor({
               return (
                 <ListItem key={index} disableGutters>
                   <ListItemButton
+                    id={`data-series-button-${index + 1}`}
                     onClick={handleDataSeriesClick(index)}
                     aria-describedby={popoverId}
                   >

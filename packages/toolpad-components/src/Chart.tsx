@@ -50,8 +50,8 @@ function getChartType(kind: ChartDataSeriesKind): 'line' | 'bar' | 'scatter' {
   }
 }
 
-function hasOnlyIntegers(array: unknown[]): boolean {
-  return array.every((item) => Number.isInteger(item));
+function hasOnlyNumbers(array: unknown[]): boolean {
+  return array.every((item) => typeof item === 'number');
 }
 
 interface ChartProps extends ContainerProps {
@@ -131,8 +131,6 @@ function Chart({ data = [], loading, error, height, sx }: ChartProps) {
     [data, xValues],
   );
 
-  console.log(chartSeries);
-
   const displayError = error ? errorFrom(error) : null;
 
   const isDataVisible = !loading && !displayError;
@@ -140,7 +138,7 @@ function Chart({ data = [], loading, error, height, sx }: ChartProps) {
   const hasBarCharts = data.some((dataSeries) => dataSeries.kind === 'bar');
 
   const hasNonCategoryXValues = xValues.some((xValue) => typeof xValue === 'number');
-  const hasXOnlyIntegers = hasOnlyIntegers(xValues);
+  const hasXOnlyIntegers = hasOnlyNumbers(xValues);
 
   let xScaleType: ScaleName = 'linear';
   if (hasXOnlyIntegers) {
@@ -203,14 +201,34 @@ function Chart({ data = [], loading, error, height, sx }: ChartProps) {
             position="left"
             axisId={firstDataSeries?.yAxisKey || 'y'}
           />
-          {hasXOnlyIntegers &&
-          data.some((dataSeries) => dataSeries.data && hasOnlyIntegers(dataSeries.data)) ? (
+          {hasXOnlyIntegers ? (
             <React.Fragment>
-              {data.some((dataSeries) => dataSeries.kind === 'area') ? <AreaPlot /> : null}
-              {data.some((dataSeries) => dataSeries.kind === 'line') ? <LinePlot /> : null}
-              {data.some((dataSeries) => dataSeries.kind === 'scatter') ? <ScatterPlot /> : null}
-              {data.some(
-                (dataSeries) => dataSeries.kind === 'line' || dataSeries.kind === 'area',
+              {chartSeries.some(
+                (dataSeries) =>
+                  dataSeries.data &&
+                  hasOnlyNumbers(dataSeries.data) &&
+                  dataSeries.type === 'line' &&
+                  dataSeries.area,
+              ) ? (
+                <AreaPlot />
+              ) : null}
+              {chartSeries.some(
+                (dataSeries) =>
+                  dataSeries.data && hasOnlyNumbers(dataSeries.data) && dataSeries.type === 'line',
+              ) ? (
+                <LinePlot />
+              ) : null}
+              {chartSeries.some(
+                (dataSeries) =>
+                  dataSeries.data &&
+                  hasOnlyNumbers(dataSeries.data) &&
+                  dataSeries.type === 'scatter',
+              ) ? (
+                <ScatterPlot />
+              ) : null}
+              {chartSeries.some(
+                (dataSeries) =>
+                  dataSeries.data && hasOnlyNumbers(dataSeries.data) && dataSeries.type === 'line',
               ) ? (
                 <MarkPlot />
               ) : null}

@@ -25,11 +25,6 @@ commands:
         description: 'Set to true if you intend to use any browser (e.g. with playwright).'
 
     steps:
-      - run:
-          name: Install pnpm package manager
-          command: |
-            corepack enable
-            corepack prepare pnpm@latest-8 --activate
       - restore_cache:
           name: Restore pnpm Package Cache
           keys:
@@ -37,6 +32,11 @@ commands:
       - when:
           condition: << parameters.browsers >>
           steps:
+            - run:
+                name: Install pnpm package manager
+                command: |
+                  corepack enable
+                  corepack prepare pnpm@latest-8 --activate
             - run:
                 name: Prepare playwright hash
                 command: pnpm list --json --filter playwright > /tmp/playwright_info.json

@@ -1,5 +1,10 @@
 import { NodeId } from '@mui/toolpad-core';
-import { isPageColumn, isPageLayoutComponent, isPageRow } from '../../runtime/toolpadComponents';
+import {
+  getElementNodeComponentId,
+  isPageColumn,
+  isPageLayoutComponent,
+  isPageRow,
+} from '../../runtime/toolpadComponents';
 import * as appDom from '../../appDom';
 
 export function deleteOrphanedLayoutNodes(
@@ -43,53 +48,56 @@ export function deleteOrphanedLayoutNodes(
     isPageLayoutComponent(parent) &&
     parentChildren.length === 2;
 
-  const hasNoLayoutContainerSiblings =
-    parentChildren.filter(
-      (child) => child.id !== movedOrDeletedNode.id && (isPageRow(child) || isPageColumn(child)),
-    ).length === 0;
-
-  if (isSecondLastLayoutContainerChild && hasNoLayoutContainerSiblings) {
-    if (parent.parentIndex && parentParent && appDom.isElement(parentParent)) {
+  if (isSecondLastLayoutContainerChild) {
+    if (parent.parentIndex && parentParent) {
       const lastContainerChild = parentChildren.filter(
         (child) => child.id !== movedOrDeletedNode.id,
       )[0];
 
-      if (lastContainerChild.parentProp) {
+      if (
+        lastContainerChild.parentProp &&
+        parentParent.parentIndex &&
+        moveTargetNodeId !== parentParent.id &&
+        moveTargetNodeId !== lastContainerChild.id
+      ) {
         if (
-          parentParent.parentIndex &&
+          moveTargetNodeId !== parent.id &&
+          (appDom.isPage(parentParent) ||
+            (appDom.isElement(parentParent) &&
+              isPageLayoutComponent(parentParent) &&
+              getElementNodeComponentId(lastContainerChild) !==
+                getElementNodeComponentId(parentParent)))
+        ) {
+          updatedDom = appDom.moveNode(
+            updatedDom,
+            lastContainerChild,
+            parentParent,
+            (lastContainerChild.parentProp || 'children') as appDom.ParentPropOf<
+              appDom.ElementNode<any>,
+              appDom.PageNode | appDom.ElementNode<any>
+            >,
+            parent.parentIndex,
+          );
+
+          if (isPageColumn(parent)) {
+            updatedDom = appDom.setNodeNamespacedProp(
+              updatedDom,
+              lastContainerChild,
+              'layout',
+              'columnSize',
+              parent.layout?.columnSize || 1,
+            );
+          }
+
+          orphanedLayoutNodeIds = [...orphanedLayoutNodeIds, parent.id];
+        }
+
+        if (
           parentParentParent &&
           appDom.isElement(parentParentParent) &&
           isPageLayoutComponent(parentParentParent) &&
-          isParentOnlyLayoutContainerChild &&
-          moveTargetNodeId !== parentParent.id &&
-          moveTargetNodeId !== lastContainerChild.id
+          isParentOnlyLayoutContainerChild
         ) {
-          if (
-            moveTargetNodeId !== parent.id &&
-            moveTargetNodeId !== lastContainerChild.id &&
-            isPageLayoutComponent(parentParent)
-          ) {
-            updatedDom = appDom.moveNode(
-              updatedDom,
-              lastContainerChild,
-              parentParent,
-              lastContainerChild.parentProp,
-              parent.parentIndex,
-            );
-
-            if (isPageColumn(parent)) {
-              updatedDom = appDom.setNodeNamespacedProp(
-                updatedDom,
-                lastContainerChild,
-                'layout',
-                'columnSize',
-                parent.layout?.columnSize || 1,
-              );
-            }
-
-            orphanedLayoutNodeIds = [...orphanedLayoutNodeIds, parent.id];
-          }
-
           updatedDom = appDom.moveNode(
             updatedDom,
             lastContainerChild,

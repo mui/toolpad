@@ -1,9 +1,10 @@
 import * as fs from 'fs/promises';
 import path from 'path';
-import { defineConfig } from 'tsup';
-import type * as esbuild from 'esbuild';
+import { defineConfig, Options } from 'tsup';
 
-function cleanFolderOnFailure(folder: string): esbuild.Plugin {
+type EsbuildPlugin = NonNullable<Options['esbuildPlugins']>[number];
+
+function cleanFolderOnFailure(folder: string): EsbuildPlugin {
   return {
     name: 'clean-dist-on-failure',
     setup(build) {
@@ -16,7 +17,7 @@ function cleanFolderOnFailure(folder: string): esbuild.Plugin {
   };
 }
 
-export default defineConfig([
+export default defineConfig((options) => [
   {
     entry: {
       index: './cli/index.ts',
@@ -27,6 +28,7 @@ export default defineConfig([
     },
     outDir: 'dist/cli',
     silent: true,
+    clean: !options.watch,
     noExternal: [
       'open-editor',
       'execa',
@@ -48,6 +50,7 @@ export default defineConfig([
   {
     entry: ['./reactDevtools/bootstrap.ts'],
     silent: true,
+    clean: !options.watch,
     outDir: './public/reactDevtools',
     bundle: true,
     sourcemap: true,
@@ -65,6 +68,7 @@ export default defineConfig([
     format: ['esm', 'cjs'],
     dts: true,
     silent: true,
+    clean: !options.watch,
     outDir: 'dist/exports',
     tsconfig: './tsconfig.runtime.json',
     sourcemap: true,

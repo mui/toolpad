@@ -4,7 +4,7 @@ import {
   AutocompleteProps as MuiAutocompleteProps,
   TextField,
 } from '@mui/material';
-import { createComponent } from '@mui/toolpad-core';
+import createBuiltin from './createBuiltin';
 import { SX_PROP_HELPER_TEXT } from './constants';
 import {
   FORM_INPUT_ARG_TYPES,
@@ -119,7 +119,9 @@ function Autocomplete({
 
 const FormWrappedAutocomplete = withComponentForm(Autocomplete);
 
-export default createComponent(FormWrappedAutocomplete, {
+export default createBuiltin(FormWrappedAutocomplete, {
+  helperText:
+    'A text input with autocomplete suggestions. Uses the MUI [Autocomplete](https://mui.com/material-ui/react-autocomplete/) under the hood',
   layoutDirection: 'both',
   loadingProp: 'loading',
   argTypes: {
@@ -145,7 +147,6 @@ export default createComponent(FormWrappedAutocomplete, {
     fullWidth: {
       helperText: 'If true, the autocomplete will take up the full width of its container.',
       type: 'boolean',
-      default: true,
     },
     size: {
       helperText: 'The size of the autocomplete. One of `small`, `medium`, or `large`.',

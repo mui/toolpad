@@ -139,7 +139,8 @@ jobs:
 
     steps:
       - checkout
-      - install_js
+      - install_js:
+          browsers: true
       - run:
           name: 'Build packages'
           command: pnpm release:build

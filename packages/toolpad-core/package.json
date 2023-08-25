@@ -41,7 +41,7 @@
   },
   "dependencies": {
     "@mui/material": "5.14.6",
-    "@mui/toolpad-utils": "0.1.25",
+    "@mui/toolpad-utils": "workspace:*",
     "@tanstack/react-query": "4.33.0",
     "@types/json-schema": "^7.0.12",
     "cookie": "0.5.0",
@@ -52,6 +52,7 @@
   },
   "devDependencies": {
     "@types/cookie": "0.5.1",
+    "@types/react": "18.2.20",
     "@types/react-is": "18.2.1",
     "concurrently": "8.2.0"
   },

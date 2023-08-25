@@ -166,7 +166,7 @@ export function useNode<P = {}>(): NodeRuntime<P> | null {
           value,
         });
       },
-    };
+    } satisfies NodeRuntime<P>;
   }, [canvasEvents, nodeId, nodeName]);
 }
 

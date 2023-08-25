@@ -41,8 +41,8 @@
     "@mui/icons-material": "5.14.6",
     "@mui/lab": "5.0.0-alpha.141",
     "@mui/material": "5.14.6",
-    "@mui/toolpad-core": "0.1.25",
-    "@mui/toolpad-utils": "0.1.25",
+    "@mui/toolpad-core": "workspace:*",
+    "@mui/toolpad-utils": "workspace:*",
     "@mui/x-data-grid-pro": "6.11.2",
     "@mui/x-date-pickers": "6.11.2",
     "@mui/x-license-pro": "6.10.2",
@@ -53,14 +53,15 @@
     "react-hook-form": "7.45.4",
     "recharts": "2.7.3"
   },
-  "devDependencies": {
-    "react": "18.2.0"
-  },
   "peerDependencies": {
     "react": "^18.0.0"
   },
   "publishConfig": {
     "access": "public"
   },
-  "gitHead": "206e4443c1d99f68f0e033dab68ecdade1c25cc6"
+  "gitHead": "206e4443c1d99f68f0e033dab68ecdade1c25cc6",
+  "devDependencies": {
+    "@types/lodash-es": "4.17.8",
+    "@types/react": "18.2.20"
+  }
 }

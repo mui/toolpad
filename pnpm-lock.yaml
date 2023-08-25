@@ -425,7 +425,7 @@ importers:
   packages/create-toolpad-app:
     dependencies:
       '@mui/toolpad-utils':
-        specifier: 0.1.25
+        specifier: workspace:*
         version: link:../toolpad-utils
       chalk:
         specifier: 5.3.0
@@ -499,13 +499,13 @@ importers:
         specifier: 5.14.6
         version: 5.14.6(@emotion/react@11.11.1)(@emotion/styled@11.11.0)(@types/react@18.2.20)(react@18.2.0)
       '@mui/toolpad-components':
-        specifier: 0.1.25
+        specifier: workspace:*
         version: link:../toolpad-components
       '@mui/toolpad-core':
-        specifier: 0.1.25
+        specifier: workspace:*
         version: link:../toolpad-core
       '@mui/toolpad-utils':
-        specifier: 0.1.25
+        specifier: workspace:*
         version: link:../toolpad-utils
       '@mui/types':
         specifier: 7.2.4
@@ -819,18 +819,18 @@ importers:
     dependencies:
       '@mui/icons-material':
         specifier: 5.14.6
-        version: 5.14.6(@mui/material@5.14.6)(react@18.2.0)
+        version: 5.14.6(@mui/material@5.14.6)(@types/react@18.2.20)(react@18.2.0)
       '@mui/lab':
         specifier: 5.0.0-alpha.141
-        version: 5.0.0-alpha.141(@mui/material@5.14.6)(react-dom@18.2.0)(react@18.2.0)
+        version: 5.0.0-alpha.141(@mui/material@5.14.6)(@types/react@18.2.20)(react-dom@18.2.0)(react@18.2.0)
       '@mui/material':
         specifier: 5.14.6
         version: 5.14.6(@emotion/react@11.11.1)(@emotion/styled@11.11.0)(@types/react@18.2.20)(react-dom@18.2.0)(react@18.2.0)
       '@mui/toolpad-core':
-        specifier: 0.1.25
+        specifier: workspace:*
         version: link:../toolpad-core
       '@mui/toolpad-utils':
-        specifier: 0.1.25
+        specifier: workspace:*
         version: link:../toolpad-utils
       '@mui/x-data-grid-pro':
         specifier: 6.11.2
@@ -850,6 +850,9 @@ importers:
       markdown-to-jsx:
         specifier: 7.3.2
         version: 7.3.2(react@18.2.0)
+      react:
+        specifier: ^18.0.0
+        version: 18.2.0
       react-error-boundary:
         specifier: 4.0.11
         version: 4.0.11(react@18.2.0)
@@ -860,9 +863,12 @@ importers:
         specifier: 2.7.3
         version: 2.7.3(prop-types@15.8.1)(react-dom@18.2.0)(react@18.2.0)
     devDependencies:
-      react:
-        specifier: 18.2.0
-        version: 18.2.0
+      '@types/lodash-es':
+        specifier: 4.17.8
+        version: 4.17.8
+      '@types/react':
+        specifier: 18.2.20
+        version: 18.2.20
 
   packages/toolpad-core:
     dependencies:
@@ -870,7 +876,7 @@ importers:
         specifier: 5.14.6
         version: 5.14.6(@emotion/react@11.11.1)(@emotion/styled@11.11.0)(@types/react@18.2.20)(react-dom@18.2.0)(react@18.2.0)
       '@mui/toolpad-utils':
-        specifier: 0.1.25
+        specifier: workspace:*
         version: link:../toolpad-utils
       '@tanstack/react-query':
         specifier: 4.33.0
@@ -900,6 +906,9 @@ importers:
       '@types/cookie':
         specifier: 0.5.1
         version: 0.5.1
+      '@types/react':
+        specifier: 18.2.20
+        version: 18.2.20
       '@types/react-is':
         specifier: 18.2.1
         version: 18.2.1
@@ -3866,7 +3875,7 @@ packages:
         optional: true
     dependencies:
       '@babel/runtime': 7.22.11
-      '@mui/material': 5.14.6(@emotion/react@11.11.1)(@emotion/styled@11.11.0)(@types/react@18.2.20)(react-dom@18.2.0)(react@18.2.0)
+      '@mui/material': 5.14.6(@types/react@18.2.20)(react-dom@18.2.0)(react@18.2.0)
       '@types/react': 18.2.20
       react: 18.2.0
     dev: false
@@ -3883,7 +3892,7 @@ packages:
         optional: true
     dependencies:
       '@babel/runtime': 7.22.11
-      '@mui/material': 5.14.6(react-dom@18.2.0)(react@18.2.0)
+      '@mui/material': 5.14.6(@emotion/react@11.11.1)(@emotion/styled@11.11.0)(react-dom@18.2.0)(react@18.2.0)
       react: 18.2.0
     dev: false
 
@@ -3921,7 +3930,7 @@ packages:
       react-is: 18.2.0
     dev: false
 
-  /@mui/lab@5.0.0-alpha.141(@mui/material@5.14.6)(react-dom@18.2.0)(react@18.2.0):
+  /@mui/lab@5.0.0-alpha.141(@mui/material@5.14.6)(@types/react@18.2.20)(react-dom@18.2.0)(react@18.2.0):
     resolution: {integrity: sha512-PsW55xX2ieNLldca2hLxL1SYtZgRQv++lj1W/Jyi5Z2MHuFDcdqI7yKGrOzyIWw7ctQrmHa1FTShBiCa2wkEoQ==}
     engines: {node: '>=12.0.0'}
     peerDependencies:
@@ -3941,10 +3950,11 @@ packages:
     dependencies:
       '@babel/runtime': 7.22.11
       '@mui/base': 5.0.0-beta.12(@types/react@18.2.20)(react-dom@18.2.0)(react@18.2.0)
-      '@mui/material': 5.14.6(react-dom@18.2.0)(react@18.2.0)
+      '@mui/material': 5.14.6(@types/react@18.2.20)(react-dom@18.2.0)(react@18.2.0)
       '@mui/system': 5.14.6(@emotion/react@11.11.1)(@emotion/styled@11.11.0)(@types/react@18.2.20)(react@18.2.0)
       '@mui/types': 7.2.4(@types/react@18.2.20)
       '@mui/utils': 5.14.6(react@18.2.0)
+      '@types/react': 18.2.20
       clsx: 2.0.0
       prop-types: 15.8.1
       react: 18.2.0
@@ -4023,7 +4033,7 @@ packages:
       react-transition-group: 4.4.5(react-dom@18.2.0)(react@18.2.0)
     dev: false
 
-  /@mui/material@5.14.6(react-dom@18.2.0)(react@18.2.0):
+  /@mui/material@5.14.6(@types/react@18.2.20)(react-dom@18.2.0)(react@18.2.0):
     resolution: {integrity: sha512-C3UgGrmtvcGkQkm0ONBU7bTdapTjQc2Se3b2354xMmU7lgSgW7VM6EP9wIH5XqqoJ60m9l/s9kbTWX0Y+EaWvA==}
     engines: {node: '>=12.0.0'}
     peerDependencies:
@@ -4046,6 +4056,7 @@ packages:
       '@mui/system': 5.14.6(@emotion/react@11.11.1)(@emotion/styled@11.11.0)(@types/react@18.2.20)(react@18.2.0)
       '@mui/types': 7.2.4(@types/react@18.2.20)
       '@mui/utils': 5.14.6(react@18.2.0)
+      '@types/react': 18.2.20
       '@types/react-transition-group': 4.4.6
       clsx: 2.0.0
       csstype: 3.1.2
@@ -4219,7 +4230,7 @@ packages:
       react-dom: ^17.0.0 || ^18.0.0
     dependencies:
       '@babel/runtime': 7.22.11
-      '@mui/material': 5.14.6(react-dom@18.2.0)(react@18.2.0)
+      '@mui/material': 5.14.6(@types/react@18.2.20)(react-dom@18.2.0)(react@18.2.0)
       '@mui/system': 5.14.6(@emotion/react@11.11.1)(@emotion/styled@11.11.0)(@types/react@18.2.20)(react@18.2.0)
       '@mui/utils': 5.14.6(react@18.2.0)
       '@mui/x-data-grid': 6.11.2(@mui/material@5.14.6)(@mui/system@5.14.6)(react-dom@18.2.0)(react@18.2.0)
@@ -4401,7 +4412,7 @@ packages:
     dependencies:
       '@babel/runtime': 7.22.11
       '@mui/base': 5.0.0-beta.12(@types/react@18.2.20)(react-dom@18.2.0)(react@18.2.0)
-      '@mui/material': 5.14.6(react-dom@18.2.0)(react@18.2.0)
+      '@mui/material': 5.14.6(@types/react@18.2.20)(react-dom@18.2.0)(react@18.2.0)
       '@mui/system': 5.14.6(@emotion/react@11.11.1)(@emotion/styled@11.11.0)(@types/react@18.2.20)(react@18.2.0)
       '@mui/utils': 5.14.6(react@18.2.0)
       '@types/react-transition-group': 4.4.6

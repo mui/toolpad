@@ -173,31 +173,19 @@ export default function DemoVideo() {
 
     const videoProgress = (videoElement.currentTime / videoElement.duration) * 100;
 
-    if (videoProgress >= 25 && videoProgress < 50 && !milestonesComplete.current.has(25)) {
-      window.gtag('event', 'toolpad_video', {
-        event_category: 'toolpad_landing',
-        event_label: `25% Complete`,
-      });
-      milestonesComplete.current.add(25);
-    } else if (videoProgress >= 50 && videoProgress < 75 && !milestonesComplete.current.has(50)) {
-      window.gtag('event', 'toolpad_video', {
-        event_category: 'toolpad_landing',
-        event_label: `50% Complete`,
-      });
-      milestonesComplete.current.add(50);
-    } else if (videoProgress >= 75 && videoProgress < 100 && !milestonesComplete.current.has(75)) {
-      window.gtag('event', 'toolpad_video', {
-        event_category: 'toolpad_landing',
-        event_label: `75% Complete`,
-      });
-      milestonesComplete.current.add(75);
-    } else if (videoProgress === 100 && !milestonesComplete.current.has(100)) {
-      window.gtag('event', 'toolpad_video', {
-        event_category: 'toolpad_landing',
-        event_label: `100% Complete`,
-      });
-      milestonesComplete.current.add(100);
-      milestonesComplete.current.clear();
+    const milestones = [25, 50, 75, 100];
+
+    for (const milestone of milestones) {
+      if (videoProgress >= milestone && !milestonesComplete.current.has(milestone)) {
+        window.gtag('event', 'toolpad_video', {
+          event_category: 'toolpad_landing',
+          event_label: `${milestone} Complete`,
+        });
+        milestonesComplete.current.add(milestone);
+        if (milestone === 100) {
+          milestonesComplete.current.clear();
+        }
+      }
     }
   };
 

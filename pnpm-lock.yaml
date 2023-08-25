@@ -228,6 +228,9 @@ importers:
       '@mui/styles':
         specifier: 5.14.6
         version: 5.14.6(react@18.2.0)
+      '@mui/toolpad':
+        specifier: workspace:*
+        version: link:../packages/toolpad-app
       '@mui/utils':
         specifier: 5.14.6
         version: 5.14.6(react@18.2.0)

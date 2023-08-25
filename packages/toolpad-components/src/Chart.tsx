@@ -205,30 +205,31 @@ function Chart({ data = [], loading, error, height, sx }: ChartProps) {
             <React.Fragment>
               {chartSeries.some(
                 (dataSeries) =>
+                  dataSeries.type === 'line' &&
                   dataSeries.data &&
                   hasOnlyNumbers(dataSeries.data) &&
-                  dataSeries.type === 'line' &&
                   dataSeries.area,
               ) ? (
                 <AreaPlot />
               ) : null}
               {chartSeries.some(
                 (dataSeries) =>
-                  dataSeries.data && hasOnlyNumbers(dataSeries.data) && dataSeries.type === 'line',
+                  dataSeries.type === 'line' && dataSeries.data && hasOnlyNumbers(dataSeries.data),
               ) ? (
                 <LinePlot />
               ) : null}
               {chartSeries.some(
                 (dataSeries) =>
+                  dataSeries.type === 'scatter' &&
                   dataSeries.data &&
-                  hasOnlyNumbers(dataSeries.data) &&
-                  dataSeries.type === 'scatter',
+                  hasOnlyNumbers(dataSeries.data.map((point) => point.x)) &&
+                  hasOnlyNumbers(dataSeries.data.map((point) => point.y)),
               ) ? (
                 <ScatterPlot />
               ) : null}
               {chartSeries.some(
                 (dataSeries) =>
-                  dataSeries.data && hasOnlyNumbers(dataSeries.data) && dataSeries.type === 'line',
+                  dataSeries.type === 'line' && dataSeries.data && hasOnlyNumbers(dataSeries.data),
               ) ? (
                 <MarkPlot />
               ) : null}

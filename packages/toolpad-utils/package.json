@@ -59,6 +59,7 @@
   },
   "devDependencies": {
     "@types/invariant": "2.2.35",
+    "@types/react": "18.2.20",
     "@types/react-is": "18.2.1"
   },
   "gitHead": "206e4443c1d99f68f0e033dab68ecdade1c25cc6"

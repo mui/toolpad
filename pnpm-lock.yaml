@@ -1,4 +1,4 @@
-lockfileVersion: '6.0'
+lockfileVersion: '6.1'
 
 settings:
   autoInstallPeers: true
@@ -50,7 +50,7 @@ importers:
         version: 29.6.2
       '@mui/monorepo':
         specifier: https://github.com/mui/material-ui.git
-        version: github.com/mui/material-ui/f8e0c436c957d3adaff8bde8ddfb7122f63b7059
+        version: github.com/mui/material-ui/c812b73b5b8a698e797e357cfed3eb0c79c7ef81
       '@next/eslint-plugin-next':
         specifier: 13.4.19
         version: 13.4.19
@@ -224,7 +224,7 @@ importers:
         version: 5.14.6(@emotion/react@11.11.1)(@emotion/styled@11.11.0)(react-dom@18.2.0)(react@18.2.0)
       '@mui/monorepo':
         specifier: https://github.com/mui/material-ui.git
-        version: github.com/mui/material-ui/f8e0c436c957d3adaff8bde8ddfb7122f63b7059
+        version: github.com/mui/material-ui/c812b73b5b8a698e797e357cfed3eb0c79c7ef81
       '@mui/styles':
         specifier: 5.14.6
         version: 5.14.6(react@18.2.0)
@@ -16237,7 +16237,7 @@ packages:
     resolution: {integrity: sha512-wvWkphh5WQsJbVk1tbx1l1Ly4yg+XecD+Mq280uBGt9wa5BKSWf4Mhp6GmrkPixhMxmabYY7RbzlwVP32pbGCg==}
     dev: false
 
-  github.com/mui/material-ui/f8e0c436c957d3adaff8bde8ddfb7122f63b7059:
-    resolution: {tarball: https://codeload.github.com/mui/material-ui/tar.gz/f8e0c436c957d3adaff8bde8ddfb7122f63b7059}
+  github.com/mui/material-ui/c812b73b5b8a698e797e357cfed3eb0c79c7ef81:
+    resolution: {tarball: https://codeload.github.com/mui/material-ui/tar.gz/c812b73b5b8a698e797e357cfed3eb0c79c7ef81}
     name: '@mui/monorepo'
     version: 5.14.6

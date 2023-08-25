@@ -1,41 +1,14 @@
-# https://render.com/docs/preview-environments
-previewsEnabled: true
 previewsExpireAfterDays: 3
 
 services:
   - type: web
-    name: toolpad
+    name: npm-stats
     env: node
-    buildCommand: yarn --frozen-lockfile --prod=false && yarn release:build
+    rootDir: examples/npm-stats
+    buildCommand: yarn && yarn build
     startCommand: yarn start
-    healthCheckPath: /health-check
-    plan: starter plus
+    pullRequestPreviewsEnabled: true
+    plan: standard
     envVars:
       - key: NODE_VERSION
-        value: '18.10.0'
-      - key: TOOLPAD_ENABLE_CREATE_BY_DOM
-        value: null
-        previewValue: '1'
-      - key: TOOLPAD_DATABASE_URL
-        fromDatabase:
-          name: toolpad-db
-          property: connectionString
-      - fromGroup: toolpad-settings
-      - fromGroup: toolpad-basic-auth
-    buildFilter:
-      ignoredPaths:
-        - docs/**
-        - '**/*.spec.ts'
-
-databases:
-  - name: toolpad-db
-    ipAllowList: []
-    plan: starter
-
-envVarGroups:
-  - name: toolpad-settings
-    envVars:
-      - key: TOOLPAD_BASIC_AUTH_USER
-        sync: false
-      - key: TOOLPAD_BASIC_AUTH_PASSWORD
-        sync: false
+        value: 16

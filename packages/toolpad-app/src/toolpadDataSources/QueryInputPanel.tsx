@@ -1,54 +1,36 @@
 import * as React from 'react';
-import { Alert, Box, Toolbar, Link } from '@mui/material';
+import { Box, Toolbar } from '@mui/material';
 import { LoadingButton } from '@mui/lab';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
-import { useParams } from 'react-router-dom';
 import FlexFill from '../components/FlexFill';
-import { DOCUMENTATION_INSTALLATION_URL } from '../constants';
-import config from '../config';
-import { addUTMParamsToUrl, DEMO_CAMPAIGN_NAME, sendSelfHostClickEvent } from '../utils/ga';
 
 export interface QueryInputPanelProps {
   children: React.ReactNode;
   actions?: React.ReactNode;
+  previewDisabled?: boolean;
   onRunPreview: () => void;
 }
 
-export default function QueryInputPanel({ children, onRunPreview, actions }: QueryInputPanelProps) {
-  const { appId } = useParams();
-
-  const handleSelfHostLinkClick = React.useCallback(() => {
-    sendSelfHostClickEvent(appId, 'queryPanel');
-  }, [appId]);
-
+export default function QueryInputPanel({
+  children,
+  onRunPreview,
+  actions,
+  previewDisabled,
+}: QueryInputPanelProps) {
   return (
-    <Box sx={{ height: '100%', overflow: 'auto', display: 'flex', flexDirection: 'column' }}>
-      {config.isDemo ? (
-        <Alert severity="info" sx={{ ml: 1, mr: 1, mt: 1 }}>
-          Can only run queries in browser in demo mode.
-          <br />
-          <Link
-            href={addUTMParamsToUrl(DOCUMENTATION_INSTALLATION_URL, {
-              source: 'query_panel',
-              medium: 'organic_toolpad',
-              campaign: DEMO_CAMPAIGN_NAME,
-            })}
-            target="_blank"
-            onClick={handleSelfHostLinkClick}
-          >
-            Try self-hosting
-          </Link>{' '}
-          for full functionality.
-        </Alert>
-      ) : null}
+    <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
       <Toolbar>
-        <LoadingButton startIcon={<PlayArrowIcon />} onClick={onRunPreview}>
+        <LoadingButton
+          startIcon={<PlayArrowIcon />}
+          onClick={onRunPreview}
+          disabled={previewDisabled}
+        >
           Preview
         </LoadingButton>
         <FlexFill />
         {actions}
       </Toolbar>
-      {children}
+      <Box sx={{ flex: 1, overflow: 'hidden' }}>{children}</Box>
     </Box>
   );
 }

@@ -1,0 +1,63 @@
+apiVersion: v1
+kind: page
+spec:
+  id: 331kqzd
+  title: Page 1
+  content:
+    - component: PageRow
+      name: pageRow2
+      children:
+        - component: Text
+          name: typography
+          layout:
+            columnSize: 1.754745224836836
+            horizontalAlign: center
+          props:
+            value: Admin Panel
+            variant: h4
+        - component: Select
+          name: select
+          layout:
+            columnSize: 0.24525477516316388
+            horizontalAlign: end
+          props:
+            label: Toolbar
+            options:
+              - label: Show
+                value: "0"
+              - label: Hide
+                value: "1"
+            defaultValue: "0"
+    - component: PageRow
+      name: pageRow
+      children:
+        - component: DataGrid
+          name: dataGrid
+          props:
+            rows:
+              $$jsExpression: |
+                getUsers.data
+            height: 618
+            columns:
+              - type: string
+                field: ID
+              - type: link
+                field: Profile
+                width: 254
+              - type: link
+                field: Avatar
+                width: 147
+              - type: string
+                field: Name
+                width: 169
+              - type: string
+                field: Designation
+                width: 126
+            hideToolbar:
+              $$jsExpression: |
+                Boolean(parseInt(select.value))
+  queries:
+    - name: getUsers
+      query:
+        function: getUsers
+        kind: local

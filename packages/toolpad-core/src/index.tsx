@@ -5,20 +5,25 @@ export type {
   NodeErrorProps,
   Components,
 } from './runtime';
-export { Placeholder, Slots, useNode, ComponentsContext } from './runtime.js';
+export {
+  Placeholder,
+  Slots,
+  useNode,
+  ComponentsContext,
+  isToolpadComponent,
+  getArgTypeDefaultValue,
+  createToolpadComponentThatThrows,
+  useComponents,
+  ComponentsContextProvider,
+  useComponent,
+} from './runtime';
 
 export type FlowDirection = 'row' | 'column' | 'row-reverse' | 'column-reverse';
 
-export { default as useUrlQueryState } from './useUrlQueryState.js';
+export { default as useUrlQueryState } from './useUrlQueryState';
 
-export * from './constants.js';
+export * from './constants';
 
-export { default as createComponent } from './createComponent.js';
-export * from './createComponent.js';
+export * from './browser';
 
-export * from './types.js';
-
-export * from './componentsContext.js';
-
-export { default as createQuery } from './createQuery.js';
-export * from './createQuery.js';
+export * from './types';

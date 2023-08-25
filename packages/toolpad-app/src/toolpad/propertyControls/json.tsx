@@ -8,10 +8,11 @@ import {
   Skeleton,
 } from '@mui/material';
 import * as React from 'react';
-import * as JSON5 from 'json5';
+import JSON5 from 'json5';
 import type { EditorProps } from '../../types';
 import useShortcut from '../../utils/useShortcut';
 import lazyComponent from '../../utils/lazyComponent';
+import PropertyControl from '../../components/PropertyControl';
 
 const JsonEditor = lazyComponent(() => import('../../components/JsonEditor'), {
   noSsr: true,
@@ -42,16 +43,39 @@ function JsonPropEditor({ label, propType, value, onChange, disabled }: EditorPr
     onChange(newValue);
   }, [onChange, input]);
 
-  const schemaUri =
-    propType.type === 'object' || propType.type === 'array' ? propType.schema : undefined;
+  const [schemaUri, setSchemaUri] = React.useState<string | undefined>(undefined);
+
+  React.useEffect(() => {
+    if (propType.type !== 'object' && propType.type !== 'array') {
+      return () => {};
+    }
+
+    if (!propType.schema) {
+      return () => {};
+    }
+
+    const blob = new Blob([JSON.stringify(propType.schema, null, 2)], {
+      type: 'application/json',
+    });
+
+    const uri = URL.createObjectURL(blob);
+
+    setSchemaUri(uri);
+
+    return () => {
+      URL.revokeObjectURL(uri);
+    };
+  }, [propType]);
 
   useShortcut({ key: 's', metaKey: true, disabled: !dialogOpen }, handleSave);
 
   return (
     <React.Fragment>
-      <Button variant="outlined" color="inherit" fullWidth onClick={() => setDialogOpen(true)}>
-        {label}
-      </Button>
+      <PropertyControl propType={propType}>
+        <Button variant="outlined" color="inherit" fullWidth onClick={() => setDialogOpen(true)}>
+          {label}
+        </Button>
+      </PropertyControl>
       <Dialog fullWidth open={dialogOpen} onClose={() => setDialogOpen(false)}>
         <DialogTitle>Edit JSON</DialogTitle>
         <DialogContent>

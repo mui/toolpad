@@ -2,6 +2,7 @@ import { TextField } from '@mui/material';
 import { NumberValueType } from '@mui/toolpad-core';
 import * as React from 'react';
 import type { EditorProps } from '../../types';
+import PropertyControl from '../../components/PropertyControl';
 
 function NumberPropEditor({ label, value, onChange, disabled, propType }: EditorProps<number>) {
   const { minimum, maximum } = propType as NumberValueType;
@@ -39,15 +40,18 @@ function NumberPropEditor({ label, value, onChange, disabled, propType }: Editor
   );
 
   return (
-    <TextField
-      fullWidth
-      value={String(inputValue ?? 0)}
-      disabled={disabled}
-      type="number"
-      onChange={handleChange}
-      onBlur={handleBlur}
-      label={label}
-    />
+    <PropertyControl propType={propType}>
+      <TextField
+        fullWidth
+        value={String(inputValue ?? 0)}
+        disabled={disabled}
+        type="number"
+        inputProps={{ step: 'any' }}
+        onChange={handleChange}
+        onBlur={handleBlur}
+        label={label}
+      />
+    </PropertyControl>
   );
 }
 

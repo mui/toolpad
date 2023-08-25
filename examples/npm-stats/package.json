@@ -1,0 +1,14 @@
+{
+  "name": "npm-stats",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "toolpad dev",
+    "build": "toolpad build",
+    "start": "NODE_OPTIONS='--max-old-space-size=396' toolpad start"
+  },
+  "dependencies": {
+    "@mui/toolpad": "0.1.24",
+    "recharts": "2.7.3"
+  }
+}

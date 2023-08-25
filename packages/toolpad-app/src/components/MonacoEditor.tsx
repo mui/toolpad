@@ -1,3 +1,5 @@
+/// <reference types="vite/client" />
+
 /**
  * NOTE: This file can't SSR (use lazyComponent to load it)
  */
@@ -7,7 +9,7 @@ import * as React from 'react';
 import * as monaco from 'monaco-editor';
 import { styled, SxProps } from '@mui/material';
 import clsx from 'clsx';
-import cuid from 'cuid';
+import { nanoid } from 'nanoid/non-secure';
 import invariant from 'invariant';
 import {
   conf as jsonBasicConf,
@@ -22,6 +24,12 @@ import {
   language as mdBasicLanguage,
 } from 'monaco-editor/esm/vs/basic-languages/markdown/markdown';
 import { useTheme, Theme, lighten, rgbToHex } from '@mui/material/styles';
+import CssWorker from 'monaco-editor/esm/vs/language/css/css.worker?worker';
+import EditorWorker from 'monaco-editor/esm/vs/editor/editor.worker?worker';
+import HtmlWorker from 'monaco-editor/esm/vs/language/html/html.worker?worker';
+import JsonWorker from 'monaco-editor/esm/vs/language/json/json.worker?worker';
+import TsWorker from 'monaco-editor/esm/vs/language/typescript/ts.worker?worker';
+
 import { getDesignTokens } from '../theme';
 
 export interface ExtraLib {
@@ -93,23 +101,23 @@ monaco.editor.defineTheme('vs-toolpad-light', {
 });
 
 window.MonacoEnvironment = {
-  async getWorker(_, label) {
+  getWorker: async (_, label) => {
+    // { type: 'module' } is supported in firefox but behind feature flag:
+    // you have to enable it manually via about:config and set dom.workers.modules.enabled to true.
     if (label === 'typescript') {
-      return new Worker(
-        new URL(`monaco-editor/esm/vs/language/typescript/ts.worker`, import.meta.url),
-      );
+      return new TsWorker();
     }
     if (label === 'json') {
-      return new Worker(new URL(`monaco-editor/esm/vs/language/json/json.worker`, import.meta.url));
+      return new JsonWorker();
     }
     if (label === 'html') {
-      return new Worker(new URL(`monaco-editor/esm/vs/language/html/html.worker`, import.meta.url));
+      return new HtmlWorker();
     }
     if (label === 'css') {
-      return new Worker(new URL(`monaco-editor/esm/vs/language/css/css.worker`, import.meta.url));
+      return new CssWorker();
     }
     if (label === 'editorWorkerService') {
-      return new Worker(new URL('monaco-editor/esm/vs/editor/editor.worker', import.meta.url));
+      return new EditorWorker();
     }
     throw new Error(`Failed to resolve worker with label "${label}"`);
   },
@@ -164,6 +172,7 @@ const TYPESCRIPT_DEFAULT_COMPILER_OPTIONS: monaco.languages.typescript.CompilerO
   allowJs: true,
   lib: ['es2020'],
   typeRoots: ['node_modules/@types'],
+  strictNullChecks: true,
 };
 
 monaco.languages.typescript.typescriptDefaults.setCompilerOptions(
@@ -369,7 +378,7 @@ export default React.forwardRef<MonacoEditorHandle, MonacoEditorProps>(function 
         }
       }
     } else {
-      const pathUri = monaco.Uri.parse(`./scripts/${cuid()}${getExtension(language)}`);
+      const pathUri = monaco.Uri.parse(`/scripts/${nanoid(7)}${getExtension(language)}`);
       const model = monaco.editor.createModel(value || '', language, pathUri);
 
       instance = monaco.editor.create(rootRef.current, {

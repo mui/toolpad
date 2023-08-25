@@ -1,13 +1,11 @@
 import { TextField, MenuItem, SxProps } from '@mui/material';
 import * as React from 'react';
 import { NodeId } from '@mui/toolpad-core';
+import { asArray } from '@mui/toolpad-utils/collections';
 import * as appDom from '../../../appDom';
 import { Maybe, WithControlledProp } from '../../../utils/types';
 import { useDom } from '../../AppState';
 import dataSources from '../../../toolpadDataSources/client';
-import { asArray } from '../../../utils/collections';
-import envConfig from '../../../config';
-import { DEMO_DATASOURCES } from '../../../constants';
 
 export type ConnectionOption = {
   connectionId: NodeId | null;
@@ -35,7 +33,7 @@ export default function ConnectionSelect({
     const result: ConnectionOption[] = [];
 
     for (const [dataSourceId, config] of Object.entries(dataSources)) {
-      if (config?.hasDefault || (envConfig.isDemo && DEMO_DATASOURCES.has(dataSourceId))) {
+      if (config?.hasDefault) {
         if (!dataSource || filteredSources.has(dataSourceId)) {
           result.push({
             dataSourceId,
@@ -46,7 +44,7 @@ export default function ConnectionSelect({
     }
 
     for (const connection of connections) {
-      const connectionDataSourceId = connection.attributes.dataSource.value;
+      const connectionDataSourceId = connection.attributes.dataSource;
       if (!dataSource || filteredSources.has(connectionDataSourceId)) {
         const connectionDataSource = dataSources[connectionDataSourceId];
         if (connectionDataSource) {

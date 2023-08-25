@@ -18,10 +18,5 @@
     "types": ["node"],
     "paths": {}
   },
-  "ts-node": {
-    "transpileOnly": true
-    // https://github.com/TypeStrong/ts-node/issues/1915
-    //  "swc": true
-  },
-  "include": ["./test"]
+  "include": ["./test", "packages/toolpad-utils/src/http.ts"]
 }

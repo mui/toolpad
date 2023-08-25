@@ -1,7 +1,7 @@
 import '../utils/fetchPolyfill';
 import { ConsoleMessage, test as base } from '@playwright/test';
 import { createRpcClient, RpcClient } from '../../packages/toolpad-app/src/rpcClient';
-import type { ServerDefinition } from '../../packages/toolpad-app/pages/api/rpc';
+import type { ServerDefinition } from '../../packages/toolpad-app/src/server/rpc';
 
 export * from '@playwright/test';
 
@@ -19,12 +19,16 @@ interface ConsoleEntry {
 const IGNORED_ERRORS = [
   /JavaScript Error: "downloadable font: download failed \(font-family: "Roboto" style:normal/,
   /JavaScript Error: "Image corrupt or truncated./,
+  /net::ERR_INTERNET_DISCONNECTED/,
+  // TODO: Comes up in firefox on CI sometimes
+  /InvalidStateError: An attempt was made to use an object that is not, or is no longer, usable/,
+  /Failed to load resource: the server responded with a status of 504 \(Outdated Optimize Dep\)/,
 ];
 
 export type Options = { ignoreConsoleErrors: RegExp[] };
 
 export const test = base.extend<Options & { api: RpcClient<ServerDefinition> }>({
-  ignoreConsoleErrors: [],
+  ignoreConsoleErrors: [[], { option: true }],
 
   page: async ({ page, ignoreConsoleErrors }, use) => {
     const entryPromises: Promise<ConsoleEntry>[] = [];

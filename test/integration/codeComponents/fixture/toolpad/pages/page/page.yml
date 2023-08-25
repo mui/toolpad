@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: page
+spec:
+  id: 5h03vdu
+  title: page
+  display: shell
+  content:
+    - component: PageRow
+      name: pageRow
+      children:
+        - component: codeComponent.MyBarChart
+          name: codeComponent_MyBarChart

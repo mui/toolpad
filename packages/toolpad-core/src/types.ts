@@ -1,50 +1,34 @@
 import type * as React from 'react';
-import type { TOOLPAD_COMPONENT } from './constants.js';
-import type { Branded } from './utils/types.js';
+import type { Branded } from '@mui/toolpad-utils/types';
+import type { SerializedError } from '@mui/toolpad-utils/errors';
+import { JSONSchema7 } from 'json-schema';
+import type { TOOLPAD_COMPONENT } from './constants';
 
 export type NodeId = Branded<string, 'NodeId'>;
 
-export type BindingAttrValueFormat = 'stringLiteral' | 'default';
-
 export interface NodeReference {
-  $$ref: NodeId;
-}
-
-export interface BoundExpressionAttrValue {
-  type: 'boundExpression';
-  value: string;
-  format?: BindingAttrValueFormat;
+  $ref: NodeId;
 }
 
 export interface JsExpressionAttrValue {
-  type: 'jsExpression';
-  value: string;
+  $$jsExpression: string;
 }
 
-export interface BindingAttrValue {
-  type: 'binding';
-  value: string;
-}
-
-export interface ConstantAttrValue<V> {
-  type: 'const';
-  value: V;
+export interface EnvAttrValue {
+  $$env: string;
 }
 
 export interface SecretAttrValue<V> {
-  type: 'secret';
-  value: V;
+  $$secret: V;
 }
 
 export interface JsExpressionAction {
-  type: 'jsExpressionAction';
-  value: string;
+  $$jsExpressionAction: string;
 }
 
 export interface NavigationAction<P = any> {
-  type: 'navigationAction';
-  value: {
-    page: NodeReference;
+  $$navigationAction: {
+    page: string;
     parameters?: BindableAttrValues<P>;
   };
 }
@@ -52,14 +36,11 @@ export interface NavigationAction<P = any> {
 export type BindableAction = JsExpressionAction | NavigationAction;
 
 export type BindableAttrValue<V> =
-  | ConstantAttrValue<V>
-  | BindingAttrValue
+  | V
   | SecretAttrValue<V>
-  | BoundExpressionAttrValue
   | JsExpressionAttrValue
+  | EnvAttrValue
   | BindableAction;
-
-export type ConstantAttrValues<P> = { [K in keyof P]: ConstantAttrValue<P[K]> };
 
 export type NestedBindableAttrs =
   | BindableAttrValue<any>
@@ -72,55 +53,121 @@ export type BindableAttrValues<P = Record<string, unknown>> = {
 
 export type BindableAttrEntries = [string, BindableAttrValue<any>][];
 
+export type PropBindableAttrValue<V> = V | JsExpressionAttrValue | EnvAttrValue;
+
 export type SlotType = 'single' | 'multiple' | 'layout';
 
 export interface ValueTypeBase {
-  type: 'string' | 'boolean' | 'number' | 'object' | 'array' | 'element' | 'template' | 'event';
+  /**
+   * Specifies the type of the value.
+   */
+  type?: 'string' | 'boolean' | 'number' | 'object' | 'array' | 'element' | 'template' | 'event';
+  /**
+   * A default value for the property.
+   */
   default?: unknown;
+  /**
+   * A short explanatory text that'll be shown in the editor UI when this property is referenced.
+   * May contain Markdown.
+   */
+  helperText?: string;
+}
+
+export interface AnyValueType extends ValueTypeBase {
+  type?: undefined;
+  default?: any;
 }
 
 export interface StringValueType extends ValueTypeBase {
+  /**
+   * the property is a string.
+   */
   type: 'string';
+  /**
+   * The different possible values for the property.
+   */
   enum?: string[];
   default?: string;
 }
 
 export interface NumberValueType extends ValueTypeBase {
+  /**
+   * the property is a number.
+   */
   type: 'number';
+  /**
+   * A minimum value for the property.
+   */
   minimum?: number;
+  /**
+   * A maximum value for the property.
+   */
   maximum?: number;
   default?: number;
 }
 
 export interface BooleanValueType extends ValueTypeBase {
+  /**
+   * the property is a boolean.
+   */
   type: 'boolean';
   default?: boolean;
 }
 
 export interface ObjectValueType extends ValueTypeBase {
+  /**
+   * the property is an object.
+   */
   type: 'object';
-  schema?: string;
+  /**
+   * A JSON schema describing the object.
+   */
+  schema?: JSONSchema7;
   default?: any;
 }
 
 export interface ArrayValueType extends ValueTypeBase {
+  /**
+   * the property is an array.
+   */
   type: 'array';
-  schema?: string;
+  /**
+   * A JSON schema describing the array.
+   */
+  schema?: JSONSchema7;
   default?: any[];
 }
 
 export interface ElementValueType extends ValueTypeBase {
+  /**
+   * the property is a React.ReactNode.
+   */
   type: 'element';
 }
 
 export interface TemplateValueType extends ValueTypeBase {
+  /**
+   * the property is a render function.
+   */
   type: 'template';
 }
 
 export interface EventValueType extends ValueTypeBase {
+  /**
+   * the property is an event handler.
+   */
   type: 'event';
+  /**
+   * Description of the handler's arguments.
+   */
   arguments?: {
+    /**
+     * The argument's name.
+     */
     name: string;
+    /**
+     * The argument's type.
+     */
     tsType: string;
   }[];
 }
@@ -145,13 +192,18 @@ export interface ArgControlSpec {
     | 'markdown' // Markdown editor
     | 'GridColumns' // GridColumns specialized editor
     | 'SelectOptions' // SelectOptions specialized editor
+    | 'ChartData' // Chart data series specialized editor
     | 'HorizontalAlign'
     | 'VerticalAlign'
     | 'event'
+    | 'NumberFormat'
+    | 'ColorScale'
     | 'RowIdFieldSelect'; // Row id field specialized select
+  bindable?: boolean;
+  hideLabel?: boolean;
 }
 
-type PrimitiveValueType =
+export type PrimitiveValueType =
   | StringValueType
   | NumberValueType
   | BooleanValueType
@@ -159,29 +211,63 @@ type PrimitiveValueType =
   | ArrayValueType;
 
 export type PropValueType =
+  | AnyValueType
   | PrimitiveValueType
   | ElementValueType
   | TemplateValueType
   | EventValueType;
 
+export interface ParameterTypeLookup {
+  number: number;
+  string: string;
+  boolean: boolean;
+  array: unknown[];
+  object: Record<string, unknown>;
+  element: React.ReactNode;
+  template: () => React.ReactNode;
+  event: (...args: any[]) => void;
+}
+
+export type JsonSchemaToTs<T extends JSONSchema7> = T extends {
+  type: 'object';
+  properties?: Record<string, JSONSchema7>;
+}
+  ? {
+      [K in keyof T['properties']]?: JsonSchemaToTs<NonNullable<T['properties']>[K]>;
+    }
+  : T extends { type: 'array'; items?: JSONSchema7 }
+  ? T['items'] extends undefined
+    ? unknown[]
+    : JsonSchemaToTs<NonNullable<T['items']>>[]
+  : T extends { type: 'string' }
+  ? string
+  : T extends { type: 'number' | 'integer' }
+  ? number
+  : T extends { type: 'boolean' }
+  ? boolean
+  : T extends { type: 'null' }
+  ? null
+  : unknown;
+
+export type InferParameterType<T extends PropValueType> = T extends {
+  type: 'object' | 'array';
+  schema: JSONSchema7;
+}
+  ? JsonSchemaToTs<T['schema']>
+  : ParameterTypeLookup[NonNullable<T['type']>];
+
 export type PropValueTypes<K extends string = string> = Partial<{
   [key in K]?: PropValueType;
 }>;
 
-export interface ArgTypeDefinition<P extends object = {}, V = P[keyof P]> {
-  /**
-   * A short explanatory text that'll be shown in the editor UI when this property is referenced.
-   * May contain Markdown.
-   */
-  helperText?: string;
+export type ArgTypeDefinition<
+  P extends object = {},
+  K extends keyof P = keyof P,
+> = PropValueType & {
   /**
    * To be used instead of the property name for UI purposes in the editor.
    */
   label?: string;
-  /**
-   * Describes the type of the values this property can accept.
-   */
-  typeDef: PropValueType;
   /**
    * The control to be used to manipulate values for this property from the editor.
    */
@@ -192,23 +278,23 @@ export interface ArgTypeDefinition<P extends object = {}, V = P[keyof P]> {
   description?: string;
   /**
    * A default value for the property.
-   * @deprecated Use `typeDef.default` instead.
+   * @deprecated Use `default` instead.
    */
-  defaultValue?: V;
+  defaultValue?: P[K];
   /**
    * The property that will supply the default value.
    */
-  defaultValueProp?: V;
+  defaultValueProp?: keyof P & string;
   /**
    * The property that is used to control this property.
    */
-  onChangeProp?: string;
+  onChangeProp?: keyof P & string;
   /**
    * Provides a way to manipulate the value from the onChange event before it is assigned to state.
    * @param {...any} params params for the function assigned to [onChangeProp]
    * @returns {any} a value for the controlled prop
    */
-  onChangeHandler?: (...params: any[]) => V;
+  onChangeHandler?: (...params: any[]) => P[K];
   /**
    * For compound components, this property is used to control the visibility of this property based on the selected value of another property.
    * If this property is not defined, the property will be visible at all times.
@@ -216,15 +302,19 @@ export interface ArgTypeDefinition<P extends object = {}, V = P[keyof P]> {
    * @returns {boolean} a boolean value indicating whether the property should be visible or not
    */
   visible?: ((props: P) => boolean) | boolean;
-}
+  /**
+   * Name of category that this property belongs to.
+   */
+  category?: string;
+  tsType?: string;
+};
 
 export type ArgTypeDefinitions<P extends object = {}> = {
-  [K in keyof P & string]?: ArgTypeDefinition<P, P[K]>;
+  [K in keyof P & string]?: ArgTypeDefinition<P, K>;
 };
 
 export interface ComponentDefinition<P extends object = {}> {
-  // props: PropDefinitions<P>;
-  argTypes: ArgTypeDefinitions<P>;
+  argTypes?: ArgTypeDefinitions<P>;
 }
 
 export interface LiveBindingError {
@@ -252,6 +342,10 @@ export type BindingEvaluationResult<T = unknown> = {
 
 export type LiveBinding = BindingEvaluationResult;
 
+export interface ScopeMetaPropField {
+  tsType?: string;
+}
+
 export type ScopeMetaField = {
   description?: string;
   deprecated?: boolean | string;
@@ -263,6 +357,7 @@ export type ScopeMetaField = {
   | {
       kind: 'element';
       componentId: string;
+      props?: Record<string, ScopeMetaPropField>;
     }
   | {
       kind: 'query' | 'local';
@@ -287,6 +382,7 @@ export type RuntimeEvents = {
   screenUpdate: {};
   ready: {};
   pageNavigationRequest: { pageNodeId: NodeId };
+  vmUpdated: { vm: ApplicationVm };
 };
 
 export type RuntimeEvent = {
@@ -300,6 +396,10 @@ export interface ComponentConfig<P extends object = {}> {
    */
   helperText?: string;
   /**
+   * Configures which properties result in propagating error state to `errorProp`.
+   */
+  errorPropSource?: (keyof P & string)[];
+  /**
    * Designates a property as "the error property". If Toolpad detects an error
    * on any of the inputs, it will forward it to this property.
    */
@@ -310,7 +410,7 @@ export interface ComponentConfig<P extends object = {}> {
   loadingPropSource?: (keyof P & string)[];
   /**
    * Designates a property as "the loading property". If Toolpad detects any of the
-   * inputs is still loading it will set this property to true
+   * inputs is still loading it will set this property to `true`
    */
   loadingProp?: keyof P & string;
   /**
@@ -343,15 +443,6 @@ export interface RuntimeError {
 
 export type FlowDirection = 'row' | 'column' | 'row-reverse' | 'column-reverse';
 
-export type PlainObject = Record<string, unknown>;
-
-export interface SerializedError extends PlainObject {
-  message: string;
-  name: string;
-  stack?: string;
-  code?: unknown;
-}
-
 export type ExecFetchResult<T = any> = {
   data?: T;
   error?: SerializedError;
@@ -368,13 +459,24 @@ export type Serializable =
   | ((...args: Serializable[]) => Serializable);
 
 export interface JsRuntime {
+  getEnv(): Record<string, string | undefined>;
   evaluateExpression(code: string, globalScope: Record<string, unknown>): BindingEvaluationResult;
 }
 
-export type LocalScopeParams = Record<string, unknown>;
+export type TemplateRenderer = (
+  scopeKey: string,
+  params: Record<string, unknown>,
+) => React.ReactNode;
 
-export interface TemplateScopeParams {
-  i: number;
+export interface RuntimeScope {
+  id: string;
+  parentScope?: RuntimeScope;
+  bindings: Record<string, BindingEvaluationResult<unknown>>;
+  values: Record<string, unknown>;
+  meta: ScopeMeta;
 }
 
-export type TemplateRenderer = ({ i }: TemplateScopeParams) => React.ReactNode;
+export interface ApplicationVm {
+  scopes: { [id in string]?: RuntimeScope };
+  bindingScopes: { [id in string]?: string };
+}

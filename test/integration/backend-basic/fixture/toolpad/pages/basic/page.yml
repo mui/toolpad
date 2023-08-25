@@ -1,0 +1,242 @@
+apiVersion: v1
+kind: page
+spec:
+  id: 5q1xd0t
+  title: Page 1
+  content:
+    - component: PageRow
+      name: pageRow
+      children:
+        - component: Text
+          name: typography
+          props:
+            value:
+              $$jsExpression: |
+                `hello, message: ${hello.data.message}`
+    - component: PageRow
+      name: pageRow1
+      children:
+        - component: Text
+          name: typography1
+          props:
+            value:
+              $$jsExpression: |
+                `throws, error.message: ${throws.error}`
+    - component: PageRow
+      name: pageRow2
+      children:
+        - component: Text
+          name: typography2
+          props:
+            value:
+              $$jsExpression: |
+                `throws, data ${throws.error ? "had an error" : throws.data}`
+    - component: PageRow
+      name: pageRow12
+      children:
+        - component: Text
+          name: text4
+          props:
+            value:
+              $$jsExpression: |
+                `throws, data ${throwsError1.data}`
+    - component: PageRow
+      name: pageRow3
+      children:
+        - component: DataGrid
+          name: dataGrid
+          props:
+            rows:
+              $$jsExpression: |
+                throws.data
+    - component: PageRow
+      name: pageRow4
+      children:
+        - component: Text
+          name: typography3
+          props:
+            value:
+              $$jsExpression: |
+                `echo, parameter: ${echo.data.params.foo}`
+    - component: PageRow
+      name: pageRow6
+      children:
+        - component: Text
+          name: typography4
+          props:
+            value:
+              $$jsExpression: |
+                `echo, secret: ${echo.data.secrets.bar}`
+        - component: Text
+          name: typography5
+          props:
+            value:
+              $$jsExpression: |
+                `echo, secret not in .env: ${echo.data.secrets.baz}`
+    - component: PageRow
+      name: pageRow5
+      children:
+        - component: Text
+          name: text5
+          props:
+            value:
+              $$jsExpression: |
+                edited.data
+    - component: PageRow
+      name: pageRow8
+      children:
+        - component: Button
+          name: button
+          props:
+            variant: outlined
+            size: medium
+            content: Run Manual Query
+            onClick:
+              $$jsExpressionAction: manualQuery.call()
+    - component: PageRow
+      name: pageRow9
+      children:
+        - component: Text
+          name: text1
+          props:
+            value:
+              $$jsExpression: |
+                `destination: ${manualQuery.data?.parameters?.foo}`
+    - component: PageRow
+      name: pageRow7
+      children:
+        - component: Button
+          name: button1
+          props:
+            content: increment
+            onClick:
+              $$jsExpressionAction: |-
+                await increment.call()
+                getGlobal.refetch()
+        - component: Text
+          name: text
+          props:
+            value:
+              $$jsExpression: |
+                `global value: ${getGlobal.data}`
+    - component: PageRow
+      name: pageRow11
+      children:
+        - component: Text
+          name: text3
+          props:
+            value:
+              $$jsExpression: |
+                `Propagated error: ${errorInput.error}`
+    - component: PageRow
+      name: pageRow10
+      children:
+        - component: Text
+          name: text2
+          props:
+            value:
+              $$jsExpression: >
+                `Loading: ${alwaysLoading.isLoading}; Propagated loading:
+                ${propagatedLoading.isLoading}`
+    - component: PageRow
+      name: pageRow13
+      children:
+        - component: Text
+          name: text6
+          props:
+            value:
+              $$jsExpression: |
+                `Raw text: ${getRawText.data}`
+    - component: PageRow
+      name: pageRow14
+      children:
+        - component: Text
+          name: text7
+          props:
+            value:
+              $$jsExpression: |
+                `my custom cookie: ${context.data.cookies.MY_TOOLPAD_COOKIE}`
+  queries:
+    - name: hello
+      query:
+        function: hello
+        kind: local
+    - name: throws
+      query:
+        function: throws
+        kind: local
+    - name: echo
+      query:
+        function: echo
+        kind: local
+      parameters:
+        - name: foo
+          value:
+            $$jsExpression: |
+              "bound foo parameter"
+    - name: edited
+      query:
+        function: edited
+        kind: local
+    - name: withParams
+      query:
+        function: withParams
+        kind: local
+    - name: manualQuery
+      mode: mutation
+      query:
+        function: manualQueryWithParams
+        kind: local
+      parameters:
+        - name: foo
+          value:
+            $$jsExpression: |
+              "checksum"
+    - name: increment
+      mode: mutation
+      query:
+        function: increment
+        kind: local
+    - name: getGlobal
+      query:
+        function: getGlobal
+        kind: local
+    - name: errorInput
+      query:
+        function: echo
+        kind: local
+      parameters:
+        - name: foo
+          value:
+            $$jsExpression: |
+              (() => {
+                throw new Error("KABOOM!")
+              })()
+    - name: alwaysLoading
+      query:
+        function: neverResolving
+        kind: local
+    - name: propagatedLoading
+      query:
+        function: echo
+        kind: local
+      parameters:
+        - name: foo
+          value:
+            $$jsExpression: |
+              alwaysLoading.data
+    - name: throwsError1
+      query:
+        function: throwsMsg
+        kind: local
+      parameters:
+        - name: msg
+          value: threw error 1
+    - name: getRawText
+      query:
+        function: functions.ts#getRawText
+        kind: local
+    - name: context
+      query:
+        function: functions.ts#inspectContext
+        kind: local

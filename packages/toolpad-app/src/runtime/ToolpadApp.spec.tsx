@@ -1,27 +1,36 @@
+/**
+ * @jest-environment jsdom
+ */
+
 import * as React from 'react';
 import { render, waitFor as waitForOrig, screen, fireEvent, act } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { LiveBindings, RuntimeEvents } from '@mui/toolpad-core';
+import { CanvasEventsContext } from '@mui/toolpad-core/runtime';
+import { Emitter } from '@mui/toolpad-utils/events';
+import { jest } from '@jest/globals';
 import ToolpadApp from './ToolpadApp';
 import * as appDom from '../appDom';
-import createRuntimeState from '../createRuntimeState';
-import { bridge } from '../canvas/ToolpadBridge';
-import { BridgeContext } from '../canvas/BridgeContext';
+import createRuntimeState from './createRuntimeState';
+
+async function loadComponents() {
+  return {};
+}
 
 // More sensible default for these tests
 const waitFor: typeof waitForOrig = (waiter, options) =>
   waitForOrig(waiter, { timeout: 10000, ...options });
 
-function renderPage(initPage: (dom: appDom.AppDom, page: appDom.PageNode) => appDom.AppDom) {
-  const appId = '12345';
-  const version = 'preview';
-
+function renderPage(
+  initPage: (dom: appDom.AppDom, page: appDom.PageNode) => appDom.AppDom,
+  canvasEvents: Emitter<RuntimeEvents> | null = null,
+) {
   let dom = appDom.createDom();
   const root = appDom.getNode(dom, dom.root, 'app');
   const page = appDom.createNode(dom, 'page', {
     name: 'Page',
     attributes: {
-      title: appDom.createConst(''),
+      title: '',
     },
   });
   dom = appDom.addNode(dom, page, root, 'pages');
@@ -30,21 +39,20 @@ function renderPage(initPage: (dom: appDom.AppDom, page: appDom.PageNode) => app
 
   window.history.replaceState({}, 'Test page', `/toolpad/pages/${page.id}`);
 
-  const state = createRuntimeState({ appId, dom });
+  const state = createRuntimeState({ dom });
 
   return render(
-    <BridgeContext.Provider value={bridge}>
-      {' '}
-      <ToolpadApp state={state} version={version} basename="toolpad" />
-    </BridgeContext.Provider>,
+    <CanvasEventsContext.Provider value={canvasEvents}>
+      <ToolpadApp loadComponents={loadComponents} state={state} basename="toolpad" />
+    </CanvasEventsContext.Provider>,
   );
 }
 
 test(`Static Text`, async () => {
   renderPage((dom, page) => {
     const text = appDom.createNode(dom, 'element', {
-      attributes: { component: appDom.createConst('Text') },
-      props: { value: appDom.createConst('Hello World') },
+      attributes: { component: 'Text' },
+      props: { value: 'Hello World' },
     });
     dom = appDom.addNode(dom, text, page, 'children');
 
@@ -60,7 +68,7 @@ test(`Static Text`, async () => {
 test(`Default Text`, async () => {
   renderPage((dom, page) => {
     const text = appDom.createNode(dom, 'element', {
-      attributes: { component: appDom.createConst('Text') },
+      attributes: { component: 'Text' },
       props: {},
     });
     dom = appDom.addNode(dom, text, page, 'children');
@@ -70,7 +78,7 @@ test(`Default Text`, async () => {
 
   await waitFor(() => screen.getByTestId('page-root'));
 
-  const text = screen.getByText('', { selector: 'p' });
+  const text = screen.getByText('text', { selector: 'p' });
   expect(text).toHaveClass('MuiTypography-root');
 });
 
@@ -78,17 +86,17 @@ test(`simple databinding`, async () => {
   renderPage((dom, page) => {
     const textField = appDom.createNode(dom, 'element', {
       name: 'theTextInput',
-      attributes: { component: appDom.createConst('TextField') },
+      attributes: { component: 'TextField' },
       props: {
-        label: appDom.createConst('The Input'),
-        defaultValue: appDom.createConst('Default Text'),
+        label: 'The Input',
+        defaultValue: 'Default Text',
       },
     });
     dom = appDom.addNode(dom, textField, page, 'children');
 
     const text = appDom.createNode(dom, 'element', {
-      attributes: { component: appDom.createConst('Text') },
-      props: { value: { type: 'jsExpression', value: 'theTextInput.value' } },
+      attributes: { component: 'Text' },
+      props: { value: { $$jsExpression: 'theTextInput.value' } },
     });
     dom = appDom.addNode(dom, text, page, 'children');
 
@@ -100,7 +108,7 @@ test(`simple databinding`, async () => {
   const text = screen.getByText('Default Text');
   const textField = screen.getByLabelText('The Input');
 
-  act(() => {
+  await act(async () => {
     textField.focus();
     fireEvent.change(textField, { target: { value: 'Hello Everybody' } });
   });
@@ -112,10 +120,10 @@ test(`default Value for binding`, async () => {
   renderPage((dom, page) => {
     const select = appDom.createNode(dom, 'element', {
       name: 'theTextInput',
-      attributes: { component: appDom.createConst('Select') },
+      attributes: { component: 'Select' },
       props: {
-        label: appDom.createConst('The select'),
-        options: { type: 'jsExpression', value: 'undefined' },
+        label: 'The select',
+        options: { $$jsExpression: 'undefined' },
       },
     });
     dom = appDom.addNode(dom, select, page, 'children');
@@ -128,13 +136,14 @@ test(`default Value for binding`, async () => {
 });
 
 test(`Databinding errors`, async () => {
-  const consoleErrorMock = jest.spyOn(console, 'error').mockImplementation();
+  const canvasEvents = new Emitter<RuntimeEvents>();
+  const consoleErrorMock = jest.spyOn(console, 'error').mockImplementation(() => {});
   let bindings: LiveBindings | undefined;
 
   const bindingsUpdateHandler = (event: RuntimeEvents['pageBindingsUpdated']) => {
     bindings = event.bindings;
   };
-  bridge.canvasEvents.on('pageBindingsUpdated', bindingsUpdateHandler);
+  canvasEvents.on('pageBindingsUpdated', bindingsUpdateHandler);
 
   try {
     let nonExisting: appDom.ElementNode;
@@ -143,34 +152,34 @@ test(`Databinding errors`, async () => {
     let cyclic2: appDom.ElementNode;
     renderPage((dom, page) => {
       nonExisting = appDom.createNode(dom, 'element', {
-        attributes: { component: appDom.createConst('Text') },
-        props: { value: { type: 'jsExpression', value: 'nonExisting.foo' } },
+        attributes: { component: 'Text' },
+        props: { value: { $$jsExpression: 'nonExisting.foo' } },
       });
       dom = appDom.addNode(dom, nonExisting, page, 'children');
 
       selfReferencing = appDom.createNode(dom, 'element', {
         name: 'selfReferencing',
-        attributes: { component: appDom.createConst('Text') },
-        props: { value: { type: 'jsExpression', value: 'selfReferencing.value' } },
+        attributes: { component: 'Text' },
+        props: { value: { $$jsExpression: 'selfReferencing.value' } },
       });
       dom = appDom.addNode(dom, selfReferencing, page, 'children');
 
       cyclic1 = appDom.createNode(dom, 'element', {
         name: 'cyclic1',
-        attributes: { component: appDom.createConst('Text') },
-        props: { value: { type: 'jsExpression', value: 'cyclic2.value' } },
+        attributes: { component: 'Text' },
+        props: { value: { $$jsExpression: 'cyclic2.value' } },
       });
       dom = appDom.addNode(dom, cyclic1, page, 'children');
 
       cyclic2 = appDom.createNode(dom, 'element', {
         name: 'cyclic2',
-        attributes: { component: appDom.createConst('Text') },
-        props: { value: { type: 'jsExpression', value: 'cyclic1.value' } },
+        attributes: { component: 'Text' },
+        props: { value: { $$jsExpression: 'cyclic1.value' } },
       });
       dom = appDom.addNode(dom, cyclic2, page, 'children');
 
       return dom;
-    });
+    }, canvasEvents);
 
     await waitFor(() => screen.getByTestId('page-root'));
     await waitFor(() => expect(bindings).toBeDefined());
@@ -202,7 +211,7 @@ test(`Databinding errors`, async () => {
 
     expect(consoleErrorMock).toHaveBeenCalled();
   } finally {
-    bridge.canvasEvents.off('pageBindingsUpdated', bindingsUpdateHandler);
+    canvasEvents.off('pageBindingsUpdated', bindingsUpdateHandler);
     consoleErrorMock.mockRestore();
   }
 });

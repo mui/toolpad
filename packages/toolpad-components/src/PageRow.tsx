@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { Box } from '@mui/material';
-import { createComponent } from '@mui/toolpad-core';
+import createBuiltin from './createBuiltin';
 
 export interface PageRowProps {
   layoutColumnSizes?: number[];
@@ -28,13 +28,18 @@ function PageRow({ layoutColumnSizes = [], gap, children }: PageRowProps) {
   );
 }
 
-export default createComponent(PageRow, {
+export default createBuiltin(PageRow, {
+  helperText: 'A page row component.',
   argTypes: {
     gap: {
-      typeDef: { type: 'number', default: 1, minimum: 1 },
+      helperText: 'The gap between children.',
+      type: 'number',
+      default: 1,
+      minimum: 1,
     },
     children: {
-      typeDef: { type: 'element' },
+      helperText: 'The content of the component.',
+      type: 'element',
       control: { type: 'slots' },
     },
   },

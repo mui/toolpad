@@ -2,12 +2,9 @@ import * as fs from 'fs/promises';
 import * as path from 'path';
 import * as url from 'url';
 import { createRequire } from 'module';
-import globCb from 'glob';
-import { promisify } from 'util';
+import { glob } from 'glob';
 
 const require = createRequire(import.meta.url);
-
-const glob = promisify(globCb);
 
 const currentDirectory = url.fileURLToPath(new URL('.', import.meta.url));
 
@@ -20,7 +17,6 @@ const LIBS = [
   { name: '@mui/x-date-pickers-pro' },
   { name: '@mui/x-data-grid' },
   { name: '@mui/x-data-grid-pro' },
-  { name: '@mui/x-data-grid-generator' },
   { name: 'dayjs' },
   // TODO: we need to analyze imports of the definition files and include those libs automatically
   { name: 'csstype' },
@@ -41,7 +37,7 @@ async function main() {
       LIBS.map(async ({ name }) => {
         const files: { filename: string; moduleId: string }[] = [];
         const resolvedPkg = require.resolve(`${name}/package.json`);
-        const pkgJson = await import(resolvedPkg, { assert: { type: 'json' } });
+        const pkgJson = JSON.parse(await fs.readFile(resolvedPkg, { encoding: 'utf-8' }));
         const pkgDir = path.dirname(resolvedPkg);
 
         const dtsFiles = await glob('**/*.d.ts', {

@@ -2,7 +2,8 @@ import { SxProps, TextField } from '@mui/material';
 import * as React from 'react';
 import * as appDom from '../../appDom';
 import { useDom, useDomApi } from '../AppState';
-import { useNodeNameValidation } from './HierarchyExplorer/validation';
+import { useNodeNameValidation } from './PagesExplorer/validation';
+import client from '../../api';
 
 interface NodeNameEditorProps {
   node: appDom.AppDomNode;
@@ -31,7 +32,13 @@ export default function NodeNameEditor({ node, sx }: NodeNameEditorProps) {
     } else {
       setNameInput(node.name);
     }
-  }, [isNameValid, domApi, node.id, node.name, nameInput]);
+    const oldname = dom.nodes[node.id];
+    if (isNameValid && oldname.type === 'page' && nameInput !== oldname.name) {
+      setTimeout(async () => {
+        await client.mutation.deletePage(oldname.name);
+      }, 300);
+    }
+  }, [isNameValid, domApi, node.id, node.name, nameInput, dom]);
 
   const handleKeyPress = React.useCallback(
     (event: React.KeyboardEvent<HTMLDivElement>) => {
@@ -46,7 +53,7 @@ export default function NodeNameEditor({ node, sx }: NodeNameEditorProps) {
     <TextField
       sx={sx}
       fullWidth
-      label="name"
+      label="Node name"
       error={!isNameValid}
       helperText={nodeNameError}
       value={nameInput}

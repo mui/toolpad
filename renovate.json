@@ -38,12 +38,20 @@
     {
       "groupName": "node",
       "matchPackageNames": ["cimg/node", "node"],
-      "allowedVersions": "<=16"
+      "allowedVersions": "16.14.2"
+    },
+    {
+      "description": "Ignore nodejs in engines",
+      "matchPackageNames": ["node"],
+      "matchManagers": ["npm"],
+      "matchDepTypes": ["engines"],
+      "enabled": false
     },
     {
       "groupName": "react-inspector",
       "matchPackageNames": ["react-inspector"],
-      "allowedVersions": "< 6.0.0"
+      "allowedVersions": "< 6.0.0",
+      "description": "Breaking changes in the types. https://github.com/storybookjs/react-inspector/issues/162"
     },
     {
       "groupName": "node-fetch",
@@ -51,14 +59,14 @@
       "allowedVersions": "< 3.0.0"
     },
     {
-      "groupName": "react-router",
-      "matchPackageNames": ["react-router", "react-router-dom"],
-      "allowedVersions": "< 6.4.0"
-    },
-    {
       "groupName": "core-js",
       "matchPackageNames": ["core-js"],
       "allowedVersions": "< 2.0.0"
+    },
+    {
+      "groupName": "prettier",
+      "matchPackageNames": ["prettier", "pretty-quick"],
+      "description": "prettier made breaking changes in v3, pretty-quick needs to catch up before we can upgrade. https://github.com/azz/pretty-quick/issues/164"
     },
     {
       "matchDepTypes": ["action"],
@@ -67,6 +75,23 @@
     {
       "groupName": "GitHub Actions",
       "matchManagers": ["github-actions"]
+    },
+    {
+      "groupName": "monaco-editor",
+      "matchPackageNames": ["monaco-editor"],
+      "description": "We're having trouble upgrading monaco-editor to >0.40."
+    },
+    {
+      "groupName": "requires-node-18",
+      "matchPackageNames": ["execa"],
+      "description": "Stalling updates until we break compatibility with Node 16"
+    },
+    {
+      "groupName": "Update @mui/toolpad in examples",
+      "matchPackageNames": ["@mui/toolpad"],
+      "matchFiles": ["examples/*/package.json"],
+      "schedule": ["at any time"],
+      "automerge": true
     }
   ],
   "postUpdateOptions": ["yarnDedupeHighest"],
@@ -79,20 +104,8 @@
     "schedule": ["at any time"],
     "addLabels": ["priority: important"]
   },
-  "regexManagers": [
-    {
-      "fileMatch": ["^render.yml$"],
-      "matchStringsStrategy": "combination",
-      "matchStrings": ["- key: NODE_VERSION", "value: '(?<currentValue>.*)"],
-      "depNameTemplate": "node",
-      "datasourceTemplate": "docker"
-    },
-    {
-      "fileMatch": ["^.circleci/config.yml$"],
-      "matchStrings": ["mcr.microsoft.com/playwright:(?<currentValue>.*)"],
-      "packageNameTemplate": "mcr.microsoft.com/playwright",
-      "depNameTemplate": "playwright",
-      "datasourceTemplate": "docker"
-    }
-  ]
+  "lockFileMaintenance": {
+    "enabled": true,
+    "schedule": "before 6:00am on the first day of the month"
+  }
 }

@@ -1,29 +1,67 @@
 import * as path from 'path';
+import * as fs from 'fs/promises';
+import { ToolpadRuntime } from '../../models/ToolpadRuntime';
+import { expect, test } from '../../playwright/localTest';
 import { ToolpadEditor } from '../../models/ToolpadEditor';
-import { test, expect } from '../../playwright/test';
-import { readJsonFile } from '../../utils/fs';
-import generateId from '../../utils/generateId';
 
-test('components', async ({ page, api }) => {
-  const dom = await readJsonFile(path.resolve(__dirname, './dom.json'));
+test.use({
+  localAppConfig: {
+    template: path.resolve(__dirname, './fixture'),
+    cmd: 'dev',
+  },
+});
 
-  const app = await api.mutation.createApp(`App ${generateId()}`, {
-    from: { kind: 'dom', dom },
-  });
+test('custom components can use external libraries', async ({ page }) => {
+  const runtimeModel = new ToolpadRuntime(page);
+  await runtimeModel.gotoPage('page');
 
+  const test1 = page.getByText('Page D');
+  await expect(test1).toBeVisible();
+});
+
+test('can create new custom components', async ({ page, localApp }) => {
   const editorModel = new ToolpadEditor(page);
-  await editorModel.goto(app.id);
 
-  await editorModel.hierarchyItem('components', 'myCOmponent').click();
+  await editorModel.goto();
 
-  await page.getByTestId('codecomponent editor').click();
-  await page.keyboard.press('Control+A');
-  await page.keyboard.press('Backspace');
-  await page.keyboard.type('export default () => "hello everybody!!!"');
+  await editorModel.pageRoot.waitFor();
 
-  const output = page
-    .frameLocator('[title="Code component sandbox"]')
-    .getByText('hello everybody!!!');
+  const newComponentPath = path.resolve(localApp.dir, './toolpad/components/MyInspector.tsx');
+  await fs.writeFile(
+    newComponentPath,
+    `import * as React from 'react';
+import { createComponent } from '@mui/toolpad/browser';
+import { Inspector } from 'react-inspector';
 
-  await expect(output).toBeVisible();
+interface MyInspectorProps {
+  data: any;
+}
+
+function MyInspector({ data }: MyInspectorProps) {
+  return <Inspector data={data} />;
+}
+
+export default createComponent(MyInspector, {
+  argTypes: {
+    data: { type: 'object' },
+  },
+});
+    `,
+    { encoding: 'utf-8' },
+  );
+
+  await editorModel.componentCatalog.hover();
+  await expect(editorModel.getComponentCatalogItem('MyInspector')).toBeVisible();
+
+  await editorModel.dragNewComponentToCanvas('MyInspector');
+
+  await editorModel.componentEditor.getByRole('button', { name: 'data' }).click();
+
+  const jsonEditorDialog = page.getByRole('dialog', { name: 'edit json' });
+  const jsonEditor = jsonEditorDialog.locator('.monaco-editor');
+  await jsonEditor.click();
+  await page.keyboard.type('{ "content": "Hello everyone!" }');
+  await jsonEditorDialog.getByRole('button', { name: 'save' }).click();
+
+  await expect(editorModel.appCanvas.getByText('Hello everyone!')).toBeVisible();
 });

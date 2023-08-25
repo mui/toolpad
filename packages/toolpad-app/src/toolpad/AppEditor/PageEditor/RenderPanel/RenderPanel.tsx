@@ -9,6 +9,7 @@ import RenderOverlay from './RenderOverlay';
 import { NodeHashes } from '../../../../types';
 import useEvent from '../../../../utils/useEvent';
 import type { ToolpadBridge } from '../../../../canvas/ToolpadBridge';
+import { getBindingType } from '../../../../bindings';
 
 const classes = {
   view: 'Toolpad_View',
@@ -33,7 +34,7 @@ export default function RenderPanel({ className }: RenderPanelProps) {
   const domApi = useDomApi();
   const appStateApi = useAppStateApi();
   const pageEditorApi = usePageEditorApi();
-  const { appId, nodeId: pageNodeId } = usePageEditorState();
+  const { nodeId: pageNodeId } = usePageEditorState();
 
   const [bridge, setBridge] = React.useState<ToolpadBridge | null>(null);
 
@@ -51,18 +52,15 @@ export default function RenderPanel({ className }: RenderPanelProps) {
         }
 
         const actual = node.props?.[event.prop];
-        if (actual && actual.type !== 'const') {
+        if (actual && getBindingType(actual) !== 'const') {
           console.warn(`Can't update a non-const prop "${event.prop}" on node "${node.id}"`);
           return draft;
         }
 
         const newValue: unknown =
-          typeof event.value === 'function' ? event.value(actual?.value) : event.value;
+          typeof event.value === 'function' ? event.value(actual) : event.value;
 
-        draft = appDom.setNodeNamespacedProp(draft, node, 'props', event.prop, {
-          type: 'const',
-          value: newValue,
-        });
+        draft = appDom.setNodeNamespacedProp(draft, node, 'props', event.prop, newValue);
 
         return draft;
       });
@@ -74,6 +72,10 @@ export default function RenderPanel({ className }: RenderPanelProps) {
 
     initializedBridge.canvasEvents.on('pageBindingsUpdated', (event) => {
       pageEditorApi.pageBindingsUpdate(event.bindings);
+    });
+
+    initializedBridge.canvasEvents.on('vmUpdated', (event) => {
+      pageEditorApi.vmUpdate(event.vm);
     });
 
     initializedBridge.canvasEvents.on('screenUpdate', () => {
@@ -91,7 +93,6 @@ export default function RenderPanel({ className }: RenderPanelProps) {
   return (
     <RenderPanelRoot className={className}>
       <EditorCanvasHost
-        appId={appId}
         className={classes.view}
         dom={dom}
         savedNodes={savedNodes}

@@ -1,6 +1,7 @@
 import { BindingEvaluationResult, JsRuntime } from '@mui/toolpad-core';
-import { set } from 'lodash-es';
-import { mapValues } from '../utils/collections';
+import { set as setObjectPath } from 'lodash-es';
+import { mapValues } from '@mui/toolpad-utils/collections';
+import { updatePath } from '../utils/immutability';
 
 /**
  * Represents the state of a binding. It both describes which place it takes in the gobal scope
@@ -109,7 +110,7 @@ export function buildGlobalScope(
   for (const binding of Object.values(bindings)) {
     if (binding.scopePath) {
       const value = binding.result?.value;
-      set(globalScope, binding.scopePath, value);
+      setObjectPath(globalScope, binding.scopePath, value);
     }
   }
   return globalScope;
@@ -239,13 +240,52 @@ export default function evalJsBindings(
   return mapValues(bindings, (binding, bindingId) => {
     const { scopePath } = binding;
 
+    let bindingResult = results[bindingId];
+
+    let nestedBindingsLoading: boolean | undefined;
+    let nestedBindingsError: Error | undefined;
+
+    const mergeNestedBindings = (value: unknown, parentBindingId: string) => {
+      if (value && typeof value === 'object') {
+        for (const nestedPropName of Object.keys(value)) {
+          const nestedBindingId = `${parentBindingId}${
+            Array.isArray(value) ? `[${nestedPropName}]` : `.${nestedPropName}`
+          }`;
+
+          const nestedBindingResult = results[nestedBindingId];
+
+          if (nestedBindingResult) {
+            if (!nestedBindingsError) {
+              nestedBindingsError = bubbleError(flatDependencies, results, nestedBindingId);
+            }
+            if (!nestedBindingsLoading) {
+              nestedBindingsLoading = bubbleLoading(flatDependencies, results, nestedBindingId);
+            }
+
+            bindingResult = updatePath(
+              bindingResult,
+              `value.${nestedBindingId.replace(bindingId, '')}`,
+              nestedBindingResult.value,
+            );
+          } else {
+            mergeNestedBindings(
+              (value as Record<string, unknown>)[nestedPropName],
+              nestedBindingId,
+            );
+          }
+        }
+      }
+    };
+
+    mergeNestedBindings(bindingResult.value, bindingId);
+
     return {
       scopePath,
       dependencies: Array.from(flatDependencies.get(bindingId) ?? []),
       result: {
-        ...results[bindingId],
-        error: bubbleError(flatDependencies, results, bindingId),
-        loading: bubbleLoading(flatDependencies, results, bindingId),
+        ...bindingResult,
+        error: nestedBindingsError || bubbleError(flatDependencies, results, bindingId),
+        loading: nestedBindingsLoading || bubbleLoading(flatDependencies, results, bindingId),
       },
     };
   });

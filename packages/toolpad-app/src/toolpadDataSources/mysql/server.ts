@@ -1,5 +1,5 @@
 import { createConnection, OkPacket, ResultSetHeader } from 'mysql2/promise';
-import { errorFrom } from '../../utils/errors';
+import { errorFrom } from '@mui/toolpad-utils/errors';
 import { Maybe } from '../../utils/types';
 import { SqlConnectionParams, SqlQuery, SqlResult } from '../sql/types';
 import { createSqlServerDatasource } from '../sql/server';
@@ -18,7 +18,7 @@ function prepareQuery(sql: string, params: Record<string, string>) {
       const trimmedMatch = match.trim().replaceAll(/[']+/g, '');
       if (trimmedMatch[0] === '$') {
         const varName = trimmedMatch.slice(1);
-        if (params[varName]) {
+        if (typeof params[varName] !== 'undefined') {
           substitutions.push(params[varName]);
         }
         return '?';

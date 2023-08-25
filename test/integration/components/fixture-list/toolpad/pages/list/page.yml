@@ -1,0 +1,55 @@
+apiVersion: v1
+kind: page
+spec:
+  id: 5w03xpv
+  title: list
+  content:
+    - component: PageRow
+      name: pageRow2
+      children:
+        - component: TextField
+          name: globalTextField
+          props:
+            label: global
+        - component: Text
+          name: globalText
+          props:
+            value: <placeholder>
+    - component: PageRow
+      name: pageRow
+      children:
+        - component: List
+          name: list
+          props:
+            itemCount: 2
+            renderItem:
+              $$template:
+                - component: PageRow
+                  name: pageRow1
+                  children:
+                    - component: TextField
+                      name: textField
+                      props:
+                        label:
+                          $$jsExpression: |
+                            `textField${i}`
+                    - component: Text
+                      name: text
+                      props:
+                        value:
+                          $$jsExpression: |
+                            `${globalTextField.value}:${textField.value}`
+                    - component: Button
+                      name: button
+                      props:
+                        content:
+                          $$jsExpression: |
+                            `set${i}`
+                        onClick:
+                          $$jsExpressionAction: |
+                            text1.value = `set local ${globalTextField.value}:${text.value}`
+                            globalText.value = `set global ${globalTextField.value}:${text.value}`
+                    - component: Text
+                      name: text1
+                      props:
+                        value: <placeholder>

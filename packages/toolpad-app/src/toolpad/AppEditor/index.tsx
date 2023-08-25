@@ -1,12 +1,9 @@
 import * as React from 'react';
 import { styled } from '@mui/material';
-import { useParams, useNavigate, useLocation } from 'react-router-dom';
-import { JsRuntimeProvider } from '@mui/toolpad-core/jsServerRuntime';
+import { useNavigate, useLocation } from 'react-router-dom';
 import PageEditor from './PageEditor';
 import DomProvider, { useAppState } from '../AppState';
-import ConnectionEditor from './ConnectionEditor';
 import AppEditorShell from './AppEditorShell';
-import CodeComponentEditor from './CodeComponentEditor';
 import NoPageFound from './NoPageFound';
 import { getPathnameFromView } from '../../utils/domView';
 
@@ -38,61 +35,41 @@ const EditorRoot = styled('div')(({ theme }) => ({
   },
 }));
 
-interface FileEditorProps {
-  appId: string;
-}
-
-function FileEditor({ appId }: FileEditorProps) {
+function FileEditor() {
   const { currentView } = useAppState();
 
   const location = useLocation();
   const navigate = useNavigate();
 
   React.useEffect(() => {
-    const newPathname = getPathnameFromView(appId, currentView);
+    const newPathname = getPathnameFromView(currentView);
     if (newPathname !== location.pathname) {
       navigate({ pathname: newPathname }, { replace: true });
     }
-  }, [appId, currentView, location.pathname, navigate]);
+  }, [currentView, location.pathname, navigate]);
 
   const currentViewContent = React.useMemo(() => {
     switch (currentView.kind) {
-      case 'page':
-        return <PageEditor appId={appId} nodeId={currentView.nodeId} />;
-      case 'connection':
-        return <ConnectionEditor appId={appId} nodeId={currentView.nodeId} />;
-      case 'codeComponent':
-        return <CodeComponentEditor appId={appId} nodeId={currentView.nodeId} />;
+      case 'page': {
+        if (currentView.nodeId) {
+          return <PageEditor nodeId={currentView.nodeId} />;
+        }
+        return <NoPageFound />;
+      }
       default:
-        return <NoPageFound appId={appId} />;
+        return <NoPageFound />;
     }
-  }, [appId, currentView.kind, currentView.nodeId]);
+  }, [currentView.kind, currentView.nodeId]);
 
-  return <AppEditorShell appId={appId}>{currentViewContent}</AppEditorShell>;
-}
-
-export interface EditorContentProps {
-  appId: string;
-}
-
-export function EditorContent({ appId }: EditorContentProps) {
-  return (
-    <JsRuntimeProvider>
-      <DomProvider appId={appId}>
-        <EditorRoot>
-          <FileEditor appId={appId} />
-        </EditorRoot>
-      </DomProvider>
-    </JsRuntimeProvider>
-  );
+  return <AppEditorShell>{currentViewContent}</AppEditorShell>;
 }
 
 export default function Editor() {
-  const { appId } = useParams();
-
-  if (!appId) {
-    throw new Error(`Missing queryParam "appId"`);
-  }
-
-  return <EditorContent appId={appId} />;
+  return (
+    <DomProvider>
+      <EditorRoot>
+        <FileEditor />
+      </EditorRoot>
+    </DomProvider>
+  );
 }

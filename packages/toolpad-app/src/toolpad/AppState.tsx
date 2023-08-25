@@ -1,24 +1,27 @@
 import * as React from 'react';
 import { NodeId } from '@mui/toolpad-core';
-import { createProvidedContext } from '@mui/toolpad-core/utils/react';
+import { createProvidedContext } from '@mui/toolpad-utils/react';
 import invariant from 'invariant';
 import { debounce, DebouncedFunc } from 'lodash-es';
+
 import { useLocation } from 'react-router-dom';
+import { mapValues } from '@mui/toolpad-utils/collections';
+import useDebouncedHandler from '@mui/toolpad-utils/hooks/useDebouncedHandler';
 import * as appDom from '../appDom';
-import { update } from '../utils/immutability';
+import { omit, update } from '../utils/immutability';
 import client from '../api';
 import useShortcut from '../utils/useShortcut';
-import useDebouncedHandler from '../utils/useDebouncedHandler';
-import { mapValues } from '../utils/collections';
 import insecureHash from '../utils/insecureHash';
 import useEvent from '../utils/useEvent';
 import { NodeHashes } from '../types';
 import { hasFieldFocus } from '../utils/fields';
 import { DomView, getViewFromPathname, PageViewTab } from '../utils/domView';
-import config from '../config';
+import { projectEvents } from '../projectEvents';
+
+projectEvents.on('externalChange', () => client.invalidateQueries('loadDom', []));
 
 export function getNodeHashes(dom: appDom.AppDom): NodeHashes {
-  return mapValues(dom.nodes, (node) => insecureHash(JSON.stringify(node)));
+  return mapValues(dom.nodes, (node) => insecureHash(JSON.stringify(omit(node, 'id'))));
 }
 
 export type DomAction = {
@@ -70,6 +73,13 @@ export type AppStateAction =
     }
   | {
       type: 'DESELECT_NODE';
+    }
+  | {
+      type: 'HOVER_NODE';
+      nodeId: NodeId;
+    }
+  | {
+      type: 'BLUR_HOVER_NODE';
     }
   | {
       type: 'SET_HAS_UNSAVED_CHANGES';
@@ -134,7 +144,7 @@ export function domLoaderReducer(state: DomLoader, action: AppStateAction): DomL
         return state;
       }
 
-      return update(state, { dom: action.dom });
+      return update(state, { dom: action.dom, savedDom: action.dom });
     }
     default:
       return state;
@@ -237,7 +247,23 @@ export function appStateReducer(state: AppState, action: AppStateAction): AppSta
     case 'DESELECT_NODE': {
       if (state.currentView.kind === 'page') {
         return update(state, {
-          currentView: { ...state.currentView, selectedNodeId: null },
+          currentView: { ...state.currentView, selectedNodeId: null, tab: 'page' },
+        });
+      }
+      return state;
+    }
+    case 'HOVER_NODE': {
+      if (state.currentView.kind === 'page') {
+        return update(state, {
+          currentView: { ...state.currentView, hoveredNodeId: action.nodeId },
+        });
+      }
+      return state;
+    }
+    case 'BLUR_HOVER_NODE': {
+      if (state.currentView.kind === 'page') {
+        return update(state, {
+          currentView: { ...state.currentView, hoveredNodeId: null },
         });
       }
       return state;
@@ -357,6 +383,17 @@ function createAppStateApi(
         nodeId,
       });
     },
+    hoverNode(nodeId: NodeId) {
+      dispatch({
+        type: 'HOVER_NODE',
+        nodeId,
+      });
+    },
+    blurHoverNode() {
+      dispatch({
+        type: 'BLUR_HOVER_NODE',
+      });
+    },
     deselectNode() {
       dispatch({
         type: 'DESELECT_NODE',
@@ -446,12 +483,11 @@ function isCancellableAction(action: AppStateAction): boolean {
 }
 
 export interface DomContextProps {
-  appId: string;
   children?: React.ReactNode;
 }
 
-export default function AppProvider({ appId, children }: DomContextProps) {
-  const { data: dom } = client.useQuery('loadDom', [appId], { suspense: true });
+export default function AppProvider({ children }: DomContextProps) {
+  const { data: dom } = client.useQuery('loadDom', [], { suspense: true });
 
   invariant(dom, 'Suspense should load the dom');
 
@@ -465,7 +501,7 @@ export default function AppProvider({ appId, children }: DomContextProps) {
     kind: 'page',
     nodeId: firstPage?.id,
     selectedNodeId: null,
-    tab: 'component',
+    tab: 'page',
   };
 
   const [state, dispatch] = React.useReducer(appStateReducer, {
@@ -533,6 +569,8 @@ export default function AppProvider({ appId, children }: DomContextProps) {
     [dispatchWithHistory, scheduleTextInputHistoryUpdate],
   );
 
+  const fingerprint = React.useRef<number | undefined>();
+
   const handleSave = React.useCallback(() => {
     if (!state.dom || state.savingDom || state.savedDom === state.dom) {
       return;
@@ -540,17 +578,19 @@ export default function AppProvider({ appId, children }: DomContextProps) {
 
     const domToSave = state.dom;
     dispatch({ type: 'DOM_SAVING' });
+    const domDiff = appDom.createDiff(state.savedDom, domToSave);
     client.mutation
-      .saveDom(appId, domToSave)
-      .then(() => {
+      .applyDomDiff(domDiff)
+      .then(({ fingerprint: newFingerPrint }) => {
+        fingerprint.current = newFingerPrint;
         dispatch({ type: 'DOM_SAVED', savedDom: domToSave });
       })
       .catch((err) => {
         dispatch({ type: 'DOM_SAVING_ERROR', error: err.message });
       });
-  }, [appId, state]);
+  }, [state]);
 
-  const debouncedHandleSave = useDebouncedHandler(handleSave, 1000);
+  const debouncedHandleSave = useDebouncedHandler(handleSave, 100);
 
   React.useEffect(() => {
     debouncedHandleSave();
@@ -573,40 +613,6 @@ export default function AppProvider({ appId, children }: DomContextProps) {
   }, [state.hasUnsavedChanges, state.unsavedDomChanges]);
 
   useShortcut({ key: 's', metaKey: true }, handleSave);
-
-  // Quick and dirty polling for dom updates
-  const fingerprint = React.useRef<number | undefined>();
-  React.useEffect(() => {
-    if (!config.localMode) {
-      return () => {};
-    }
-
-    let active = true;
-
-    (async () => {
-      while (active) {
-        try {
-          const currentFingerprint = fingerprint.current;
-          // eslint-disable-next-line no-await-in-loop
-          const newFingerPrint = await client.query.getDomFingerprint();
-          if (currentFingerprint && currentFingerprint !== newFingerPrint) {
-            client.invalidateQueries('loadDom', [appId]);
-          }
-          fingerprint.current = newFingerPrint;
-          // eslint-disable-next-line no-await-in-loop
-          await new Promise((resolve) => {
-            setTimeout(resolve, 1000);
-          });
-        } catch (err) {
-          console.error(err);
-        }
-      }
-    })();
-
-    return () => {
-      active = false;
-    };
-  }, [appId]);
 
   return (
     <AppStateProvider value={state}>

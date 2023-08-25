@@ -1,99 +1,65 @@
 {
   "name": "@mui/toolpad-core",
-  "version": "0.0.40",
+  "version": "0.1.25",
   "description": "Build MUI apps quickly",
   "author": "MUI Toolpad team",
   "homepage": "https://github.com/mui/mui-toolpad#readme",
   "license": "MIT",
-  "main": "dist/cjs/index.js",
-  "module": "dist/esm/index.js",
-  "types": "dist/esm/index.d.ts",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
   "type": "module",
   "exports": {
     "./package.json": "./package.json",
     ".": {
-      "types": "./dist/esm/index.d.ts",
-      "import": "./dist/esm/index.js",
-      "require": "./dist/cjs/index.js"
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
     },
-    "./constants": {
-      "types": "./dist/esm/constants.d.ts",
-      "import": "./dist/esm/constants.js",
-      "require": "./dist/cjs/constants.js"
-    },
-    "./path": {
-      "types": "./dist/esm/path.d.ts",
-      "import": "./dist/esm/path.js",
-      "require": "./dist/cjs/path.js"
-    },
-    "./runtime": {
-      "types": "./dist/esm/runtime.d.ts",
-      "import": "./dist/esm/runtime.js",
-      "require": "./dist/cjs/runtime.js"
-    },
-    "./jsRuntime": {
-      "types": "./dist/esm/jsRuntime.d.ts",
-      "import": "./dist/esm/jsRuntime.js",
-      "require": "./dist/cjs/jsRuntime.js"
-    },
-    "./jsServerRuntime": {
-      "types": "./dist/esm/jsServerRuntime.d.ts",
-      "import": "./dist/esm/jsServerRuntime.js",
-      "require": "./dist/cjs/jsServerRuntime.js"
-    },
-    "./jsBrowserRuntime": {
-      "types": "./dist/esm/jsBrowserRuntime.d.ts",
-      "import": "./dist/esm/jsBrowserRuntime.js",
-      "require": "./dist/cjs/jsBrowserRuntime.js"
-    },
-    "./objectKey": {
-      "types": "./dist/esm/objectKey.d.ts",
-      "import": "./dist/esm/objectKey.js",
-      "require": "./dist/cjs/objectKey.js"
-    },
-    "./utils/*": {
-      "types": "./dist/esm/utils/*.d.ts",
-      "import": "./dist/esm/utils/*.js",
-      "require": "./dist/cjs/utils/*.js"
+    "./*": {
+      "types": "./dist/*.d.ts",
+      "import": "./dist/*.js",
+      "require": "./dist/*.cjs"
     }
   },
   "files": [
-    "dist"
+    "dist",
+    "server",
+    "browser"
   ],
   "repository": {
     "type": "git",
     "url": "git+https://github.com/mui/mui-toolpad.git"
   },
   "scripts": {
-    "prebuild": "rimraf dist",
-    "cjsify": "mkdir -p ./dist/cjs && echo \"{ \\\"type\\\":\\\"commonjs\\\" }\" > ./dist/cjs/package.json",
-    "build": "concurrently \"yarn:build:*\" && yarn cjsify",
-    "build:esm": "tsc --outDir dist/esm --module esnext",
-    "build:cjs": "tsc --outDir dist/cjs --module commonjs",
-    "dev": "concurrently \"yarn:dev:*\" yarn:cjsify",
-    "dev:esm": "yarn build:esm --pretty --watch --preserveWatchOutput",
-    "dev:cjs": "yarn build:cjs --pretty --watch --preserveWatchOutput",
-    "dev13": "yarn dev",
-    "test": "echo \"Error: run tests from root\" && exit 1",
-    "check-types": "yarn build"
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "check-types": "tsup && tsc --noEmit"
   },
   "bugs": {
     "url": "https://github.com/mui/mui-toolpad/issues"
   },
   "dependencies": {
-    "@tanstack/react-query": "^4.24.9",
-    "mitt": "^3.0.0",
-    "quickjs-emscripten": "^0.21.2",
-    "react-error-boundary": "^3.1.4"
+    "@mui/material": "5.14.6",
+    "@mui/toolpad-utils": "0.1.25",
+    "@tanstack/react-query": "4.33.0",
+    "@types/json-schema": "^7.0.12",
+    "cookie": "0.5.0",
+    "invariant": "2.2.4",
+    "quickjs-emscripten": "0.23.0",
+    "react-error-boundary": "4.0.11",
+    "react-is": "18.2.0"
   },
   "devDependencies": {
-    "concurrently": "^7.6.0",
-    "react": "^18.2.0"
+    "@types/cookie": "0.5.1",
+    "@types/react-is": "18.2.1",
+    "concurrently": "8.2.0"
   },
   "peerDependencies": {
     "react": "^18.0.0"
   },
   "publishConfig": {
     "access": "public"
-  }
+  },
+  "gitHead": "206e4443c1d99f68f0e033dab68ecdade1c25cc6"
 }

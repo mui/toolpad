@@ -17,6 +17,7 @@ import RadioButtonCheckedIcon from '@mui/icons-material/RadioButtonChecked';
 import DateRangeIcon from '@mui/icons-material/DateRange';
 import CheckBoxIcon from '@mui/icons-material/CheckBox';
 import DashboardCustomizeSharpIcon from '@mui/icons-material/DashboardCustomizeSharp';
+import ManageSearchIcon from '@mui/icons-material/ManageSearch';
 import AddIcon from '@mui/icons-material/Add';
 import UploadFileIcon from '@mui/icons-material/UploadFile';
 import NotesIcon from '@mui/icons-material/Notes';
@@ -27,8 +28,13 @@ import PlaceIcon from '@mui/icons-material/Place';
 import ViewSidebarIcon from '@mui/icons-material/ViewSidebar';
 import MoodIcon from '@mui/icons-material/Mood';
 import HtmlIcon from '@mui/icons-material/Html';
+import TableRowsIcon from '@mui/icons-material/TableRows';
+import ViewColumnIcon from '@mui/icons-material/ViewColumn';
+import TagIcon from '@mui/icons-material/Tag';
+import { ButtonBase, SxProps } from '@mui/material';
 
 const iconMap = new Map<string, React.ComponentType<SvgIconProps>>([
+  ['Autocomplete', ManageSearchIcon],
   ['Text', NotesIcon],
   ['Button', SmartButtonIcon],
   ['Image', ImageIcon],
@@ -55,6 +61,9 @@ const iconMap = new Map<string, React.ComponentType<SvgIconProps>>([
   ['Drawer', ViewSidebarIcon],
   ['Icon', MoodIcon],
   ['Html', HtmlIcon],
+  ['PageRow', TableRowsIcon],
+  ['PageColumn', ViewColumnIcon],
+  ['Metric', TagIcon],
 ]);
 
 type ComponentItemKind = 'future' | 'builtIn' | 'create' | 'custom';
@@ -62,16 +71,17 @@ type ComponentItemKind = 'future' | 'builtIn' | 'create' | 'custom';
 interface ComponentIconProps {
   id: string;
   kind?: ComponentItemKind;
+  sx?: SxProps;
 }
 
-function ComponentIcon({ id: componentId, kind }: ComponentIconProps) {
+export function ComponentIcon({ id: componentId, kind, sx }: ComponentIconProps) {
   const Icon = iconMap.get(kind === 'custom' ? 'CodeComponent' : componentId);
-  return Icon ? <Icon fontSize="medium" opacity={kind === 'future' ? 0.75 : 1} /> : null;
+  return Icon ? <Icon sx={{ fontSize: 24, opacity: kind === 'future' ? 0.75 : 1, ...sx }} /> : null;
 }
 
 interface ComponentCatalogItemProps {
   draggable?: boolean;
-  onDragStart?: (event: React.DragEvent<HTMLDivElement>) => void;
+  onDragStart?: (event: React.DragEvent<HTMLButtonElement>) => void;
   onClick?: () => void;
   builtIn?: string;
   id: string;
@@ -94,6 +104,7 @@ function ComponentCatalogItem({
       onClick={onClick}
       draggable={draggable}
       onDragStart={onDragStart}
+      component={ButtonBase}
       sx={{
         display: 'flex',
         flexDirection: 'column',
@@ -107,6 +118,9 @@ function ComponentCatalogItem({
         borderColor: 'divider',
         borderStyle: kind === 'create' ? 'dashed' : 'solid',
         color: 'text.secondary',
+        backgroundColor: 'paper',
+        // https://stackoverflow.com/q/22922761
+        transform: 'translate(0, 0)',
         '&:hover': {
           backgroundColor: 'action.hover',
         },

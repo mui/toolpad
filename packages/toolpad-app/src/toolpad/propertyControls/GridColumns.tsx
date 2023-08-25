@@ -20,19 +20,19 @@ import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import RefreshIcon from '@mui/icons-material/Refresh';
 import {
   inferColumns,
-  NumberFormat,
-  NUMBER_FORMAT_PRESETS,
   SerializableGridColumn,
   SerializableGridColumns,
 } from '@mui/toolpad-components';
+import { generateUniqueString } from '@mui/toolpad-utils/strings';
+import { NumberFormatEditor } from '@mui/toolpad-core/numberFormat';
 import type { EditorProps } from '../../types';
 import { useToolpadComponents } from '../AppEditor/toolpadComponents';
-import { ToolpadComponentDefinition } from '../../toolpadComponents';
+import { ToolpadComponentDefinition } from '../../runtime/toolpadComponents';
 import { useDom } from '../AppState';
+import PropertyControl from '../../components/PropertyControl';
 
 // TODO: this import suggests leaky abstraction
 import { usePageEditorState } from '../AppEditor/PageEditor/PageEditorProvider';
-import { generateUniqueString } from '../../utils/strings';
 
 type GridAlignment = SerializableGridColumn['align'];
 
@@ -48,23 +48,8 @@ const COLUMN_TYPES: string[] = [
 ];
 const ALIGNMENTS: GridAlignment[] = ['left', 'right', 'center'];
 
-function formatNumberOptionValue(numberFormat: NumberFormat | undefined) {
-  if (!numberFormat) {
-    return 'plain';
-  }
-  switch (numberFormat.kind) {
-    case 'preset':
-      return `preset:${numberFormat.preset}`;
-    case 'custom':
-      return 'custom';
-    case 'currency':
-      return 'currency';
-    default:
-      return 'plain';
-  }
-}
-
 function GridColumnsPropEditor({
+  propType,
   label,
   nodeId,
   value = [],
@@ -75,12 +60,10 @@ function GridColumnsPropEditor({
   const [editedIndex, setEditedIndex] = React.useState<number | null>(null);
   const { dom } = useDom();
   const toolpadComponents = useToolpadComponents(dom);
-  const codeComponents = React.useMemo(() => {
-    const entries = Object.entries(toolpadComponents);
-
-    return entries
-      .map(([, definition]) => definition)
-      .filter((definition) => definition && !definition.builtIn) as ToolpadComponentDefinition[];
+  const codeComponents: ToolpadComponentDefinition[] = React.useMemo(() => {
+    return Object.values(toolpadComponents)
+      .filter(Boolean)
+      .filter((definition) => !definition.builtIn);
   }, [toolpadComponents]);
 
   const editedColumn = typeof editedIndex === 'number' ? value[editedIndex] : null;
@@ -169,9 +152,11 @@ function GridColumnsPropEditor({
 
   return (
     <React.Fragment>
-      <Button aria-describedby={popoverId} onClick={handlePopoverClick}>
-        {label}
-      </Button>
+      <PropertyControl propType={propType}>
+        <Button aria-describedby={popoverId} onClick={handlePopoverClick}>
+          {label}
+        </Button>
+      </PropertyControl>
       <Popover
         id={popoverId}
         open={open}
@@ -201,6 +186,7 @@ function GridColumnsPropEditor({
                     handleColumnChange({ ...editedColumn, field: event.target.value })
                   }
                 />
+
                 <TextField
                   label="header"
                   value={editedColumn.headerName}
@@ -209,91 +195,6 @@ function GridColumnsPropEditor({
                     handleColumnChange({ ...editedColumn, headerName: event.target.value })
                   }
                 />
-                <TextField
-                  select
-                  fullWidth
-                  label="type"
-                  value={editedColumn.type ?? ''}
-                  disabled={disabled}
-                  onChange={(event) =>
-                    handleColumnChange({
-                      ...editedColumn,
-                      type: event.target.value,
-                      numberFormat: undefined,
-                    })
-                  }
-                >
-                  {COLUMN_TYPES.map((type) => (
-                    <MenuItem key={type} value={type}>
-                      {type}
-                    </MenuItem>
-                  ))}
-                </TextField>
-                {editedColumn.type === 'number' ? (
-                  <React.Fragment>
-                    <TextField
-                      select
-                      fullWidth
-                      label="number format"
-                      value={formatNumberOptionValue(editedColumn.numberFormat)}
-                      disabled={disabled}
-                      onChange={(event) => {
-                        let numberFormat: NumberFormat | undefined;
-
-                        if (event.target.value === 'currency') {
-                          numberFormat = {
-                            kind: 'currency',
-                            currency: 'USD',
-                          };
-                        } else if (event.target.value === 'custom') {
-                          numberFormat = {
-                            kind: 'custom',
-                            custom: {},
-                          };
-                        } else if (event.target.value) {
-                          const [prefix, id] = event.target.value.split(':');
-
-                          if (prefix === 'preset') {
-                            numberFormat = {
-                              kind: 'preset',
-                              preset: id,
-                            };
-                          }
-                        }
-
-                        handleColumnChange({ ...editedColumn, numberFormat });
-                      }}
-                    >
-                      <MenuItem value="plain">plain</MenuItem>
-                      {Array.from(NUMBER_FORMAT_PRESETS.keys(), (type) => (
-                        <MenuItem key={type} value={`preset:${type}`}>
-                          {type}
-                        </MenuItem>
-                      ))}
-                      <MenuItem value="currency">currency</MenuItem>
-                      <MenuItem value="custom">custom</MenuItem>
-                    </TextField>
-
-                    {editedColumn.numberFormat?.kind === 'currency' ? (
-                      <TextField
-                        fullWidth
-                        label="currency code"
-                        value={editedColumn.numberFormat.currency}
-                        disabled={disabled}
-                        onChange={(event) => {
-                          handleColumnChange({
-                            ...editedColumn,
-                            numberFormat: {
-                              ...editedColumn.numberFormat,
-                              kind: 'currency',
-                              currency: event.target.value,
-                            },
-                          });
-                        }}
-                      />
-                    ) : null}
-                  </React.Fragment>
-                ) : null}
 
                 <TextField
                   select
@@ -314,6 +215,7 @@ function GridColumnsPropEditor({
                     </MenuItem>
                   ))}
                 </TextField>
+
                 <TextField
                   label="width"
                   type="number"
@@ -323,27 +225,66 @@ function GridColumnsPropEditor({
                     handleColumnChange({ ...editedColumn, width: Number(event.target.value) })
                   }
                 />
-                {editedColumn.type === 'codeComponent' ? (
-                  <TextField
-                    select
-                    fullWidth
-                    label="Custom component"
-                    value={editedColumn.codeComponent ?? ''}
-                    disabled={disabled}
-                    onChange={(event) =>
-                      handleColumnChange({
-                        ...editedColumn,
-                        codeComponent: event.target.value,
-                      })
-                    }
-                  >
-                    {codeComponents.map(({ displayName, codeComponentId }) => (
-                      <MenuItem key={displayName} value={codeComponentId}>
-                        {displayName}
-                      </MenuItem>
-                    ))}
-                  </TextField>
-                ) : null}
+
+                <TextField
+                  select
+                  fullWidth
+                  label="type"
+                  value={editedColumn.type ?? ''}
+                  disabled={disabled}
+                  onChange={(event) =>
+                    handleColumnChange({
+                      ...editedColumn,
+                      type: event.target.value,
+                      numberFormat: undefined,
+                    })
+                  }
+                >
+                  {COLUMN_TYPES.map((type) => (
+                    <MenuItem key={type} value={type}>
+                      {type}
+                    </MenuItem>
+                  ))}
+                </TextField>
+
+                <Box sx={{ ml: 1, pl: 1, borderLeft: 1, borderColor: 'divider' }}>
+                  {editedColumn.type === 'number' ? (
+                    <NumberFormatEditor
+                      disabled={disabled}
+                      value={editedColumn.numberFormat}
+                      onChange={(numberFormat) =>
+                        handleColumnChange({ ...editedColumn, numberFormat })
+                      }
+                    />
+                  ) : null}
+
+                  {editedColumn.type === 'codeComponent' ? (
+                    <TextField
+                      select
+                      required
+                      fullWidth
+                      label="Custom component"
+                      value={editedColumn.codeComponent ?? ''}
+                      disabled={disabled}
+                      error={!editedColumn.codeComponent}
+                      helperText={
+                        editedColumn.codeComponent ? undefined : 'Please select a component'
+                      }
+                      onChange={(event) =>
+                        handleColumnChange({
+                          ...editedColumn,
+                          codeComponent: event.target.value,
+                        })
+                      }
+                    >
+                      {codeComponents.map(({ displayName }) => (
+                        <MenuItem key={displayName} value={displayName}>
+                          {displayName}
+                        </MenuItem>
+                      ))}
+                    </TextField>
+                  ) : null}
+                </Box>
               </Stack>
             </React.Fragment>
           ) : (

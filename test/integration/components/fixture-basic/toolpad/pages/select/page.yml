@@ -1,0 +1,18 @@
+apiVersion: v1
+kind: page
+spec:
+  id: ly03uc8
+  title: select
+  content:
+    - component: PageRow
+      name: pageRow
+      children:
+        - component: Select
+          name: selectOptions
+          props:
+            label: select with options
+            options:
+              $$jsExpression: >
+                ["one", 2, { value: 3, label: "three" }, { value: 4 }, {
+                noValue: "foo" }]
+            fullWidth: true

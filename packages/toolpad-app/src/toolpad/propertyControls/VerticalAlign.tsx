@@ -4,8 +4,10 @@ import AlignverticalTopIcon from '@mui/icons-material/AlignVerticalTop';
 import AlignVerticalCenterIcon from '@mui/icons-material/AlignVerticalCenter';
 import AlignVerticalBottomIcon from '@mui/icons-material/AlignVerticalBottom';
 import type { EditorProps } from '../../types';
+import PropertyControl from '../../components/PropertyControl';
 
 function VerticalAlignPropEditor({
+  propType,
   label,
   value = 'start',
   onChange,
@@ -18,26 +20,28 @@ function VerticalAlignPropEditor({
   };
 
   return (
-    <Box>
-      <Typography variant="body2">{label}:</Typography>
-      <ToggleButtonGroup
-        exclusive
-        disabled={disabled}
-        value={value}
-        onChange={VerticalAlign}
-        aria-label="VerticalAlign"
-      >
-        <ToggleButton value="start" aria-label="start">
-          <AlignverticalTopIcon />
-        </ToggleButton>
-        <ToggleButton value="center" aria-label="center">
-          <AlignVerticalCenterIcon />
-        </ToggleButton>
-        <ToggleButton value="end" aria-label="end">
-          <AlignVerticalBottomIcon />
-        </ToggleButton>
-      </ToggleButtonGroup>
-    </Box>
+    <PropertyControl propType={propType}>
+      <Box>
+        {label ? <Typography variant="body2">{label}:</Typography> : null}
+        <ToggleButtonGroup
+          exclusive
+          disabled={disabled}
+          value={value}
+          onChange={VerticalAlign}
+          aria-label="VerticalAlign"
+        >
+          <ToggleButton value="start" aria-label="start">
+            <AlignverticalTopIcon />
+          </ToggleButton>
+          <ToggleButton value="center" aria-label="center">
+            <AlignVerticalCenterIcon />
+          </ToggleButton>
+          <ToggleButton value="end" aria-label="end">
+            <AlignVerticalBottomIcon />
+          </ToggleButton>
+        </ToggleButtonGroup>
+      </Box>
+    </PropertyControl>
   );
 }
 

@@ -1,0 +1,65 @@
+{
+  "name": "@mui/toolpad-utils",
+  "version": "0.1.25",
+  "description": "Build MUI apps quickly",
+  "author": "MUI Toolpad team",
+  "homepage": "https://github.com/mui/mui-toolpad#readme",
+  "license": "MIT",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "type": "module",
+  "exports": {
+    "./package.json": "./package.json",
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    },
+    "./*": {
+      "types": "./dist/*.d.ts",
+      "import": "./dist/*.js",
+      "require": "./dist/*.cjs"
+    },
+    "./hooks/*": {
+      "types": "./dist/hooks/*.d.ts",
+      "import": "./dist/hooks/*.js",
+      "require": "./dist/hooks/*.cjs"
+    }
+  },
+  "files": [
+    "dist",
+    "server",
+    "browser"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mui/mui-toolpad.git"
+  },
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "check-types": "tsup && tsc --noEmit",
+    "test": "jest"
+  },
+  "bugs": {
+    "url": "https://github.com/mui/mui-toolpad/issues"
+  },
+  "peerDependencies": {
+    "react": "^18.0.0"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "dependencies": {
+    "invariant": "2.2.4",
+    "react-is": "18.2.0",
+    "yaml": "2.3.1",
+    "yaml-diff-patch": "2.0.0"
+  },
+  "devDependencies": {
+    "@types/invariant": "2.2.35",
+    "@types/react-is": "18.2.1"
+  },
+  "gitHead": "206e4443c1d99f68f0e033dab68ecdade1c25cc6"
+}

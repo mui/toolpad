@@ -1,8 +1,12 @@
-import { BindableAttrValue, CreateQueryConfig, ExecFetchResult } from '@mui/toolpad-core';
+import { BindableAttrValue, ExecFetchResult, PrimitiveValueType } from '@mui/toolpad-core';
+import type { IntrospectionResult } from '../../server/functionsTypesWorker';
 
 export interface LocalConnectionParams {}
 
 export interface LocalQuery {
+  /**
+   * name of the handler to execute.
+   */
   function?: string;
 }
 
@@ -11,23 +15,20 @@ export type LocalParams = {
   readonly body?: Body;
 };
 
-export type LocalPrivateQuery =
-  | {
-      kind: 'debugExec';
-      query: LocalQuery;
-      params: Record<string, any>;
-    }
-  | {
-      kind: 'introspection';
-    }
-  | {
-      kind: 'openEditor';
-    };
+export type LocalPrivateApi = {
+  debugExec(query: LocalQuery, params: Record<string, any>): Promise<any>;
+  introspection(): Promise<IntrospectionResult>;
+  createNew(fileName: string): Promise<void>;
+};
 
 export interface FetchResult extends ExecFetchResult<any> {
   data: any;
 }
 
-export type IntrospectionResult = {
-  functions: Record<string, CreateQueryConfig<unknown>>;
-};
+export interface IntrospectedFunction {
+  name: string;
+  file: string;
+  parameters: Record<string, PrimitiveValueType>;
+}
+
+export type { IntrospectionResult };

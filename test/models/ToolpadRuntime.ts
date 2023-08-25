@@ -1,23 +1,43 @@
 import { Page } from '@playwright/test';
 import { gotoIfNotCurrent } from './shared';
 
+export interface ToolpadRuntimeOptions {
+  prod: boolean;
+}
+
 export class ToolpadRuntime {
   readonly page: Page;
 
-  constructor(page: Page) {
+  readonly options: ToolpadRuntimeOptions;
+
+  constructor(page: Page, options: Partial<ToolpadRuntimeOptions> = {}) {
     this.page = page;
+    this.options = {
+      prod: false,
+      ...options,
+    };
   }
 
-  async goto(appId: string) {
-    await gotoIfNotCurrent(this.page, `/app/${appId}/preview/pages`);
+  getPrefix() {
+    return this.options.prod ? '/prod' : '/preview';
   }
 
-  async gotoPage(appId: string, pageName: string) {
-    await this.goto(appId);
-    await this.page.getByRole('link', { name: pageName }).click();
+  async goto() {
+    await gotoIfNotCurrent(this.page, this.getPrefix());
+  }
+
+  async gotoPage(pageName: string) {
+    await gotoIfNotCurrent(this.page, `${this.getPrefix()}/pages/${pageName}`);
   }
 
   async gotoPageById(appId: string, pageId: string) {
-    await this.page.goto(`/app/${appId}/preview/pages/${pageId}`);
+    await this.page.goto(`${this.getPrefix()}/pages/${pageId}`);
+  }
+
+  async waitForPageReady() {
+    await this.page.waitForTimeout(1000);
+    await this.page.waitForSelector('[data-testid="page-ready-marker"]', {
+      state: 'attached',
+    });
   }
 }

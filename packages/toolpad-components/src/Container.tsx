@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { Container as MUIContainer, ContainerProps } from '@mui/material';
-import { createComponent } from '@mui/toolpad-core';
+import createBuiltin from './createBuiltin';
 import { SX_PROP_HELPER_TEXT } from './constants';
 
 interface Props extends ContainerProps {
@@ -15,19 +15,23 @@ function Container({ children, visible, sx, ...props }: Props) {
   ) : null;
 }
 
-export default createComponent(Container, {
+export default createBuiltin(Container, {
+  helperText: 'The MUI [Container](https://mui.com/material-ui/react-container/).',
   argTypes: {
     children: {
-      typeDef: { type: 'element' },
+      type: 'element',
       control: { type: 'layoutSlot' },
+      helperText: 'The content of the component.',
     },
     visible: {
-      typeDef: { type: 'boolean', default: true },
+      type: 'boolean',
+      default: true,
       helperText: 'Control whether container element is visible.',
     },
     sx: {
       helperText: SX_PROP_HELPER_TEXT,
-      typeDef: { type: 'object', default: { padding: 1, border: 'solid 1px' } },
+      type: 'object',
+      default: { padding: 1, border: 'solid 1px' },
     },
   },
 });

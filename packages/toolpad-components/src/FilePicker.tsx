@@ -1,6 +1,13 @@
 import * as React from 'react';
 import { TextField as MuiTextField, TextFieldProps as MuiTextFieldProps } from '@mui/material';
-import { createComponent } from '@mui/toolpad-core';
+import createBuiltin from './createBuiltin';
+import {
+  FORM_INPUT_ARG_TYPES,
+  FormInputComponentProps,
+  useFormInput,
+  withComponentForm,
+} from './Form';
+import { SX_PROP_HELPER_TEXT } from './constants';
 
 interface FullFile {
   name: string;
@@ -9,10 +16,11 @@ interface FullFile {
   base64: null | string;
 }
 
-export type Props = MuiTextFieldProps & {
+export type FilePickerProps = MuiTextFieldProps & {
   multiple: boolean;
+  value: FullFile[];
   onChange: (files: FullFile[]) => void;
-};
+} & Pick<FormInputComponentProps, 'name' | 'isRequired' | 'isInvalid'>;
 
 const readFile = async (file: Blob): Promise<string> => {
   return new Promise((resolve, reject) => {
@@ -31,7 +39,22 @@ const readFile = async (file: Blob): Promise<string> => {
   });
 };
 
-function FilePicker({ multiple, onChange, ...props }: Props) {
+function FilePicker({
+  multiple,
+  value,
+  onChange,
+  isRequired,
+  isInvalid,
+  ...rest
+}: FilePickerProps) {
+  const { onFormInputChange, formInputError, renderFormInput } = useFormInput<FullFile[]>({
+    name: rest.name,
+    label: rest.label as string,
+    value,
+    onChange,
+    validationProps: { isRequired, isInvalid },
+  });
+
   const handleChange = async (changeEvent: React.ChangeEvent<HTMLInputElement>) => {
     const filesPromises = Array.from(changeEvent.target.files || []).map(async (file) => {
       const fullFile: FullFile = {
@@ -46,43 +69,62 @@ function FilePicker({ multiple, onChange, ...props }: Props) {
 
     const files = await Promise.all(filesPromises);
 
-    onChange(files);
+    onFormInputChange(files);
   };
 
-  return (
+  return renderFormInput(
     <MuiTextField
-      {...props}
+      {...rest}
       type="file"
       value={undefined}
-      inputProps={{ multiple }}
       onChange={handleChange}
+      inputProps={{ multiple }}
       InputLabelProps={{ shrink: true }}
-    />
+      {...(formInputError && {
+        error: Boolean(formInputError),
+        helperText: formInputError.message || '',
+      })}
+    />,
   );
 }
 
-export default createComponent(FilePicker, {
-  helperText: 'File picker component.\nIt allows users to take select and read files.',
+const FormWrappedFilePicker = withComponentForm(FilePicker);
+
+export default createBuiltin(FormWrappedFilePicker, {
+  helperText: 'File Picker component.\nIt allows users to take select and read files.',
   argTypes: {
     value: {
-      typeDef: { type: 'object' },
+      helperText: 'The value that is controlled by this FilePicker.',
+      type: 'object',
       visible: false,
       onChangeProp: 'onChange',
+      schema: {
+        type: 'object',
+        properties: {
+          name: { type: 'string' },
+          type: { type: 'string' },
+          size: { type: 'number' },
+          base64: { type: 'string' },
+        },
+      },
     },
     label: {
       helperText: 'A label that describes the content of the FilePicker. e.g. "Profile Image".',
-      typeDef: { type: 'string' },
+      type: 'string',
     },
     multiple: {
       helperText: 'Whether the FilePicker should accept multiple files.',
-      typeDef: { type: 'boolean', default: true },
+      type: 'boolean',
+      default: true,
     },
     disabled: {
       helperText: 'Whether the FilePicker is disabled.',
-      typeDef: { type: 'boolean' },
+      type: 'boolean',
     },
+    ...FORM_INPUT_ARG_TYPES,
     sx: {
-      typeDef: { type: 'object' },
+      helperText: SX_PROP_HELPER_TEXT,
+      type: 'object',
     },
   },
 });

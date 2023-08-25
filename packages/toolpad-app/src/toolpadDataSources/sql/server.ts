@@ -1,4 +1,4 @@
-import { serializeError, errorFrom } from '../../utils/errors';
+import { serializeError, errorFrom } from '@mui/toolpad-utils/errors';
 import { ServerDataSource } from '../../types';
 import { SqlServerProps, SqlPrivateQuery, SqlConnectionStatus } from './types';
 
@@ -34,5 +34,6 @@ export function createSqlServerDatasource<P, Q>({
           throw new Error(`Unknown query "${(query as SqlPrivateQuery<P, Q>).kind}"`);
       }
     },
+    api: {},
   };
 }

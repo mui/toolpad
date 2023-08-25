@@ -15,6 +15,7 @@ import {
 import * as React from 'react';
 import { BindableAttrValue } from '@mui/toolpad-core';
 import { useBrowserJsRuntime } from '@mui/toolpad-core/jsBrowserRuntime';
+import invariant from 'invariant';
 import useLatest from '../../../../utils/useLatest';
 import { usePageEditorState } from '../PageEditorProvider';
 import * as appDom from '../../../../appDom';
@@ -27,9 +28,10 @@ import ConnectionSelect, { ConnectionOption } from '../ConnectionSelect';
 import BindableEditor from '../BindableEditor';
 import { ConfirmDialog } from '../../../../components/SystemDialogs';
 import useBoolean from '../../../../utils/useBoolean';
-import { useNodeNameValidation } from '../../HierarchyExplorer/validation';
+import { useNodeNameValidation } from '../../PagesExplorer/validation';
 import useEvent from '../../../../utils/useEvent';
 import useUnsavedChangesConfirm from '../../../hooks/useUnsavedChangesConfirm';
+import client from '../../../../api';
 
 interface QueryEditorDialogActionsProps {
   saveDisabled?: boolean;
@@ -105,7 +107,6 @@ export default function QueryNodeEditorDialog<Q>({
   onSave,
   isDraft,
 }: QueryNodeEditorProps<Q>) {
-  const { appId } = usePageEditorState();
   const { dom } = useDom();
 
   // To keep it around during closing animation
@@ -124,15 +125,15 @@ export default function QueryNodeEditorDialog<Q>({
     }
   }, [open, reset]);
 
-  const connectionId = input.attributes.connectionId.value
-    ? appDom.deref(input.attributes.connectionId.value)
+  const connectionId = input.attributes.connectionId
+    ? appDom.deref(input.attributes.connectionId)
     : null;
 
   const connection = connectionId ? appDom.getMaybeNode(dom, connectionId, 'connection') : null;
-  const dataSourceId = input.attributes.dataSource?.value || null;
+  const dataSourceId = input.attributes.dataSource || null;
   const dataSource = (dataSourceId && dataSources[dataSourceId]) || null;
 
-  const connectionParams = connection?.attributes.params.value;
+  const connectionParams = connection?.attributes.params;
 
   const handleCommit = React.useCallback(() => {
     let toCommit: appDom.QueryNode<Q> = input;
@@ -141,9 +142,7 @@ export default function QueryNodeEditorDialog<Q>({
         ...input,
         attributes: {
           ...input.attributes,
-          query: appDom.createConst(
-            dataSource.transformQueryBeforeCommit(input.attributes.query.value),
-          ),
+          query: dataSource.transformQueryBeforeCommit(input.attributes.query),
         },
       };
     }
@@ -158,8 +157,8 @@ export default function QueryNodeEditorDialog<Q>({
         setInput((existing) =>
           update(existing, {
             attributes: update(existing.attributes, {
-              connectionId: appDom.createConst(appDom.ref(newConnectionOption.connectionId)),
-              dataSource: appDom.createConst(newConnectionOption.dataSourceId),
+              connectionId: appDom.ref(newConnectionOption.connectionId),
+              dataSource: newConnectionOption.dataSourceId,
             }),
           }),
         );
@@ -181,7 +180,7 @@ export default function QueryNodeEditorDialog<Q>({
     setInput((existing) =>
       update(existing, {
         attributes: update(existing.attributes, {
-          mode: appDom.createConst(event.target.value as appDom.FetchMode),
+          mode: event.target.value as appDom.FetchMode,
         }),
       }),
     );
@@ -191,7 +190,7 @@ export default function QueryNodeEditorDialog<Q>({
     setInput((existing) =>
       update(existing, {
         attributes: update(existing.attributes, {
-          enabled: newValue || undefined,
+          enabled: newValue ?? undefined,
         }),
       }),
     );
@@ -207,7 +206,7 @@ export default function QueryNodeEditorDialog<Q>({
             Number.isNaN(interval) || interval <= 0
               ? omit(existing.attributes, 'refetchInterval')
               : update(existing.attributes, {
-                  refetchInterval: appDom.createConst(interval * 1000),
+                  refetchInterval: interval * 1000,
                 }),
         }),
       );
@@ -235,8 +234,8 @@ export default function QueryNodeEditorDialog<Q>({
   }, [handleCommit, onClose]);
 
   const queryEditorContext = React.useMemo(
-    () => (dataSourceId ? { appId, dataSourceId, connectionId } : null),
-    [appId, dataSourceId, connectionId],
+    () => (dataSourceId ? { dataSourceId, connectionId } : null),
+    [dataSourceId, connectionId],
   );
 
   const jsBrowserRuntime = useBrowserJsRuntime();
@@ -247,7 +246,7 @@ export default function QueryNodeEditorDialog<Q>({
     globalScope: pageState,
   });
 
-  const mode = input.attributes.mode?.value || 'query';
+  const mode = input.attributes.mode || 'query';
 
   const existingNames = React.useMemo(
     () => appDom.getExistingNamesForNode(dom, input),
@@ -256,6 +255,14 @@ export default function QueryNodeEditorDialog<Q>({
 
   const nodeNameError = useNodeNameValidation(input.name, existingNames, 'query');
   const isNameValid = !nodeNameError;
+
+  const execPrivate = React.useCallback(
+    (method: string, args: any[]) => {
+      invariant(dataSourceId, 'dataSourceId must be set');
+      return client.mutation.dataSourceExecPrivate(dataSourceId, method, args);
+    },
+    [dataSourceId],
+  );
 
   return (
     <Dialog fullWidth maxWidth="xl" open={open} onClose={handleCloseWithUnsavedChanges}>
@@ -280,8 +287,8 @@ export default function QueryNodeEditorDialog<Q>({
                 value={
                   input.attributes.dataSource
                     ? {
-                        connectionId: appDom.deref(input.attributes.connectionId.value) || null,
-                        dataSourceId: input.attributes.dataSource.value,
+                        connectionId: appDom.deref(input.attributes.connectionId) || null,
+                        dataSourceId: input.attributes.dataSource,
                       }
                     : null
                 }
@@ -314,6 +321,7 @@ export default function QueryNodeEditorDialog<Q>({
                 onCommit={handleCommit}
                 globalScope={pageState}
                 globalScopeMeta={globalScopeMeta}
+                execApi={execPrivate}
               />
             </Box>
             <Stack direction="row" alignItems="center" sx={{ pt: 2, px: 3, gap: 2 }}>
@@ -323,14 +331,14 @@ export default function QueryNodeEditorDialog<Q>({
                 </MenuItem>
                 <MenuItem value="mutation">Only fetch on manual action</MenuItem>
               </TextField>
-              <BindableEditor
+              <BindableEditor<boolean>
                 liveBinding={liveEnabled}
                 globalScope={pageState}
                 globalScopeMeta={globalScopeMeta}
                 jsRuntime={jsBrowserRuntime}
                 label="Enabled"
                 propType={{ type: 'boolean' }}
-                value={input.attributes.enabled ?? appDom.createConst(true)}
+                value={input.attributes.enabled ?? true}
                 onChange={handleEnabledChange}
                 disabled={mode !== 'query'}
               />
@@ -341,7 +349,7 @@ export default function QueryNodeEditorDialog<Q>({
                 sx={{ maxWidth: 300 }}
                 type="number"
                 label="Refetch interval"
-                value={refetchIntervalInSeconds(input.attributes.refetchInterval?.value) ?? ''}
+                value={refetchIntervalInSeconds(input.attributes.refetchInterval) ?? ''}
                 onChange={handleRefetchIntervalChange}
                 disabled={mode !== 'query'}
               />

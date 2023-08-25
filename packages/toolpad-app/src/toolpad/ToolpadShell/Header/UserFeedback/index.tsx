@@ -1,21 +1,59 @@
 import * as React from 'react';
-import { Chip, Divider, ListItemText, IconButton, Menu, MenuItem, Tooltip } from '@mui/material';
+import {
+  Chip,
+  Divider,
+  ListItemText,
+  IconButton,
+  Menu,
+  MenuItem,
+  Tooltip,
+  Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
+  Box,
+} from '@mui/material';
 import HelpOutlinedIcon from '@mui/icons-material/HelpOutlined';
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
+import invariant from 'invariant';
 import useMenu from '../../../../utils/useMenu';
 import {
   TOOLPAD_TARGET_CLOUD,
   TOOLPAD_TARGET_CE,
   TOOLPAD_TARGET_PRO,
   DOCUMENTATION_URL,
-  DOCUMENTATION_INSTALLATION_URL,
+  VERSION_CHECK_INTERVAL,
 } from '../../../../constants';
 import client from '../../../../api';
+import useBoolean from '../../../../utils/useBoolean';
+import type { PackageManager } from '../../../../server/versionInfo';
 
 const REPORT_BUG_URL =
   'https://github.com/mui/mui-toolpad/issues/new?assignees=&labels=status%3A+needs+triage&template=1.bug.yml';
 const FEATURE_REQUEST_URL = 'https://github.com/mui/mui-toolpad/issues';
-const CURRENT_RELEASE_VERSION = `v${process.env.TOOLPAD_VERSION}`;
+
+interface SnippetProps {
+  children: string;
+}
+
+function CliCommandSnippet({ children }: SnippetProps) {
+  return (
+    <Box
+      component="pre"
+      sx={{
+        p: 1,
+        backgroundColor: 'background.paper',
+        borderRadius: 1,
+        border: 1,
+        borderColor: 'divider',
+      }}
+    >
+      {children}
+    </Box>
+  );
+}
 
 interface FeedbackMenuItemLinkProps {
   href: string;
@@ -44,16 +82,54 @@ function getReadableTarget(): string {
   }
 }
 
+function getUpgradeMessage(packageManager: PackageManager | null): string {
+  const pkgName = '@mui/toolpad';
+  switch (packageManager) {
+    case 'yarn':
+      return `yarn add ${pkgName}`;
+    case 'pnpm':
+      return `pnpm add ${pkgName}`;
+    default:
+      return `npm install ${pkgName}`;
+  }
+}
+
 function UserFeedback() {
   const { buttonProps, menuProps } = useMenu();
 
-  const { data: latestRelease } = client.useQuery('getLatestToolpadRelease', [], {
-    staleTime: 1000 * 60 * 10,
-    enabled: process.env.TOOLPAD_TARGET !== TOOLPAD_TARGET_CLOUD,
+  invariant(process.env.TOOLPAD_VERSION, 'Missing env var TOOLPAD_VERSION');
+  invariant(process.env.TOOLPAD_BUILD, 'Missing env var TOOLPAD_BUILD');
+
+  const { data: versionInfo } = client.useQuery('getVersionInfo', [], {
+    staleTime: VERSION_CHECK_INTERVAL,
   });
+
+  const {
+    value: updateDialogOpen,
+    setFalse: handleUpdateDialogClose,
+    setTrue: handleUpdateDialogOpen,
+  } = useBoolean(false);
+
+  const updateAvailable = !!versionInfo?.updateAvailable;
 
   return (
     <React.Fragment>
+      <Dialog open={updateDialogOpen} onClose={handleUpdateDialogClose} maxWidth="xs">
+        <DialogTitle>Update Toolpad</DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            A new Toolpad version is available. To upgrade to the latest version, run:
+            <CliCommandSnippet>
+              {getUpgradeMessage(versionInfo?.packageManager ?? null)}
+            </CliCommandSnippet>
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleUpdateDialogClose} autoFocus>
+            Close
+          </Button>
+        </DialogActions>
+      </Dialog>
       <Tooltip title="Help and resources">
         <IconButton {...buttonProps} color="primary">
           <HelpOutlinedIcon />
@@ -67,19 +143,17 @@ function UserFeedback() {
         </FeedbackMenuItemLink>
         <Divider />
         <MenuItem disabled>{getReadableTarget()}</MenuItem>
-        {latestRelease && latestRelease.tag !== CURRENT_RELEASE_VERSION ? (
-          <MenuItem
-            component="a"
-            target="_blank"
-            href={DOCUMENTATION_INSTALLATION_URL}
-            sx={{ justifyContent: 'space-between' }}
-          >
-            Version {process.env.TOOLPAD_VERSION}
+
+        <MenuItem
+          disabled={!updateAvailable}
+          onClick={handleUpdateDialogOpen}
+          sx={{ justifyContent: 'space-between' }}
+        >
+          Version {process.env.TOOLPAD_VERSION}
+          {updateAvailable ? (
             <Chip size="small" color="error" variant="outlined" label="Update" clickable />
-          </MenuItem>
-        ) : (
-          <MenuItem disabled>Version {process.env.TOOLPAD_VERSION}</MenuItem>
-        )}
+          ) : null}
+        </MenuItem>
         <MenuItem disabled>Build {process.env.TOOLPAD_BUILD}</MenuItem>
       </Menu>
     </React.Fragment>

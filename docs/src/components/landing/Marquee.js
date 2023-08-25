@@ -1,57 +1,59 @@
 import * as React from 'react';
 import PropTypes from 'prop-types';
 import Container from '@mui/material/Container';
-import Button from '@mui/material/Button';
-import Link from 'docs/src/modules/components/Link';
 import Typography from '@mui/material/Typography';
-import KeyboardArrowRightRounded from '@mui/icons-material/KeyboardArrowRightRounded';
+import SignUp from './SignUp';
 
 function Marquee({ content }) {
   return (
     <Container
-      sx={(theme) => ({
-        py: { xs: 4, sm: 6, md: 8 },
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        borderImage: `conic-gradient(${theme.palette.primaryDark[700]} 0deg 360deg) fill 1/ /0 50vw`,
-      })}
+      sx={[
+        (theme) => ({
+          mx: 0,
+          minWidth: '100%',
+          py: { xs: 4, sm: 6, md: 12 },
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          backgroundRepeat: 'no-repeat',
+          backgroundSize: '100%',
+          backgroundImage: `linear-gradient(180deg, ${
+            (theme.vars || theme).palette.primaryDark[900]
+          } 0%, ${(theme.vars || theme).palette.primaryDark[800]})`,
+        }),
+      ]}
     >
       <Typography
-        color="grey.50"
         textAlign="center"
         variant="h2"
         sx={{
-          mt: 4,
           mx: 'auto',
+          color: 'primary.50',
         }}
       >
         {content.title}
       </Typography>
       <Typography
-        color="grey.500"
         textAlign="center"
         sx={{
-          my: 2,
+          mt: 1,
+          mb: 4,
           mx: 'auto',
+          color: 'grey.500',
         }}
       >
         {content.subtitle}
       </Typography>
-      <Button
-        component={Link}
-        href={content.action.href}
-        data-ga-event-category="ToolpadLanding"
-        data-ga-event-label={content.action.label}
-        data-ga-event-action="SelfHost"
-        noLinkStyle
-        size="large"
-        variant="contained"
-        endIcon={<KeyboardArrowRightRounded />}
-        sx={{ width: { xs: '100%', sm: 'auto' } }}
-      >
-        {content.action.label}
-      </Button>
+      <SignUp
+        sx={{
+          '& > div': {
+            display: 'flex',
+            flexDirection: { xs: 'column', sm: 'row' },
+            justifyContent: 'center',
+            maxWidth: 'initial',
+          },
+        }}
+      />
     </Container>
   );
 }
@@ -60,7 +62,6 @@ Marquee.propTypes = {
   content: PropTypes.shape({
     action: PropTypes.shape({
       href: PropTypes.string.isRequired,
-      label: PropTypes.string.isRequired,
     }).isRequired,
     subtitle: PropTypes.string.isRequired,
     title: PropTypes.string.isRequired,

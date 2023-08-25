@@ -136,10 +136,12 @@ export function getRelativeOuterRect(containerElm: Element, childElm: Element): 
   const { x, y, width, height } = getRelativeBoundingRect(containerElm, childElm);
   const styles = window.getComputedStyle(childElm);
 
-  let offsetLeft = parseFloat(styles.marginLeft);
-  let offsetRight = parseFloat(styles.marginRight);
-  let offsetTop = parseFloat(styles.marginTop);
-  let offsetBottom = parseFloat(styles.marginBottom);
+  const parseMarginStyle = (style: string): number => (style === 'auto' ? 0 : parseFloat(style));
+
+  let offsetLeft = parseMarginStyle(styles.marginLeft);
+  let offsetRight = parseMarginStyle(styles.marginRight);
+  let offsetTop = parseMarginStyle(styles.marginTop);
+  let offsetBottom = parseMarginStyle(styles.marginBottom);
 
   if (styles.boxSizing === 'content-box') {
     offsetLeft += parseFloat(styles.paddingLeft) + parseFloat(styles.borderLeftWidth);

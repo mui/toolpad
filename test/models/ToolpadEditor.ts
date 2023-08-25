@@ -1,3 +1,4 @@
+import { setTimeout } from 'timers/promises';
 import { expect, FrameLocator, Locator, Page } from '@playwright/test';
 import { gotoIfNotCurrent } from './shared';
 
@@ -53,7 +54,11 @@ export class ToolpadEditor {
 
   readonly componentCatalog: Locator;
 
+  readonly pageEditor: Locator;
+
   readonly componentEditor: Locator;
+
+  readonly themeEditor: Locator;
 
   readonly appCanvas: FrameLocator;
 
@@ -71,74 +76,65 @@ export class ToolpadEditor {
     this.createPageBtn = page.locator('[aria-label="Create page"]');
     this.createPageDialog = new CreatePageDialog(page);
 
-    this.createComponentBtn = page.locator('[aria-label="Create component"]');
-    this.createComponentDialog = new CreateComponentDialog(page);
-
     this.componentCatalog = page.getByTestId('component-catalog');
+
+    this.pageEditor = page.getByTestId('page-editor');
     this.componentEditor = page.getByTestId('component-editor');
+    this.themeEditor = page.getByTestId('theme-editor');
+
+    this.createComponentBtn = this.componentCatalog.getByRole('button', { name: 'Create' });
+    this.createComponentDialog = new CreateComponentDialog(page);
 
     this.appCanvas = page.frameLocator('[name=data-toolpad-canvas]');
     this.pageRoot = this.appCanvas.getByTestId('page-root');
     this.pageOverlay = this.appCanvas.getByTestId('page-overlay');
 
-    this.explorer = page.getByTestId('hierarchy-explorer');
+    this.explorer = page.getByTestId('pages-explorer');
     this.confirmationDialog = page.getByRole('dialog').filter({ hasText: 'Confirm' });
   }
 
-  async goto(appId: string) {
-    await gotoIfNotCurrent(this.page, `/_toolpad/app/${appId}`);
+  async goto() {
+    await gotoIfNotCurrent(this.page, `/_toolpad/app`);
   }
 
   async createPage(name: string) {
     await this.createPageBtn.click();
     await this.createPageDialog.nameInput.fill(name);
-    await Promise.all([this.createPageDialog.createButton.click(), this.page.waitForNavigation()]);
+    const { href: currentUrl } = new URL(this.page.url());
+    await this.createPageDialog.createButton.click();
+    await this.page.waitForURL((url) => url.href !== currentUrl);
   }
 
   async goToPage(name: string) {
     await this.explorer.getByText(name).click();
-    this.page.waitForNavigation();
+  }
+
+  async goToPageById(id: string) {
+    await gotoIfNotCurrent(this.page, `/_toolpad/app/pages/${id}`);
   }
 
   async createComponent(name: string) {
+    await this.componentCatalog.hover();
     await this.createComponentBtn.click();
     await this.createComponentDialog.nameInput.fill(name);
-    await Promise.all([
-      this.createComponentDialog.createButton.click(),
-      this.page.waitForNavigation(),
-    ]);
+    await this.createComponentDialog.createButton.click();
   }
 
-  waitForOverlay() {
-    return expect(this.pageOverlay).toBeVisible();
+  async waitForOverlay() {
+    await this.pageOverlay.waitFor({ state: 'visible' });
+    // Some tests seem to be flaky around this waitFor and perform better with a short timeout
+    // Not sure yet where the race condition is happening
+    await setTimeout(100);
   }
 
-  async dragToAppCanvas(
-    sourceSelector: string,
-    isSourceInCanvas: boolean,
-    moveTargetX: number,
-    moveTargetY: number,
-  ) {
-    const sourceLocator = isSourceInCanvas
-      ? this.appCanvas.locator(sourceSelector)
-      : this.page.locator(sourceSelector);
-
+  async dragTo(sourceLocator: Locator, moveTargetX: number, moveTargetY: number) {
     const sourceBoundingBox = await sourceLocator.boundingBox();
-    const targetBoundingBox = await this.pageRoot.boundingBox();
-
-    expect(sourceBoundingBox).toBeDefined();
-    expect(targetBoundingBox).toBeDefined();
 
     await this.page.mouse.move(
       sourceBoundingBox!.x + sourceBoundingBox!.width / 2,
       sourceBoundingBox!.y + sourceBoundingBox!.height / 2,
       { steps: 10 },
     );
-
-    await expect(sourceLocator).toBeVisible();
-
-    const appCanvasFrame = this.page.frame('data-toolpad-canvas');
-    expect(appCanvasFrame).toBeDefined();
 
     await this.page.mouse.down();
 
@@ -147,24 +143,36 @@ export class ToolpadEditor {
     await this.page.mouse.up();
   }
 
-  async dragNewComponentToAppCanvas(componentName: string) {
-    await this.componentCatalog.hover();
-
-    // Account for opening transition
-    await this.page.waitForTimeout(200);
-
-    const sourceSelector = `data-testid=component-catalog >> div:has-text("${componentName}")[draggable]`;
-
-    const targetBoundingBox = await this.pageRoot.boundingBox();
-    expect(targetBoundingBox).toBeDefined();
-
-    const moveTargetX = targetBoundingBox!.x + targetBoundingBox!.width / 2;
-    const moveTargetY = targetBoundingBox!.y + targetBoundingBox!.height / 2;
-
-    this.dragToAppCanvas(sourceSelector, false, moveTargetX, moveTargetY);
+  getComponentCatalogItem(name: string): Locator {
+    return this.page.getByTestId('component-catalog').getByRole('button', { name });
   }
 
-  hierarchyItem(group: string, name: string): Locator {
+  async dragNewComponentToCanvas(
+    componentName: string,
+    moveTargetX?: number,
+    moveTargetY?: number,
+  ) {
+    const style = await this.page.addStyleTag({ content: `* { transition: none !important; }` });
+
+    await this.componentCatalog.hover();
+
+    const pageRootBoundingBox = await this.pageRoot.boundingBox();
+    if (!moveTargetX) {
+      moveTargetX = pageRootBoundingBox!.x + pageRootBoundingBox!.width / 2;
+    }
+    if (!moveTargetY) {
+      moveTargetY = pageRootBoundingBox!.y + pageRootBoundingBox!.height / 2;
+    }
+
+    const sourceLocator = this.getComponentCatalogItem(componentName);
+    await expect(sourceLocator).toBeVisible();
+
+    await this.dragTo(sourceLocator, moveTargetX, moveTargetY);
+
+    await style.evaluate((elm) => elm.parentNode?.removeChild(elm));
+  }
+
+  getPageItem(group: string, name: string): Locator {
     return this.explorer
       .getByRole('treeitem')
       .filter({ hasText: group })
@@ -172,10 +180,10 @@ export class ToolpadEditor {
       .filter({ hasText: name });
   }
 
-  async openHierarchyMenu(group: string, name: string) {
-    const hierarchyItem = this.hierarchyItem(group, name);
-    const menuButton = hierarchyItem.getByRole('button', { name: 'Open hierarchy menu' });
-    await hierarchyItem.hover();
+  async openPageExplorerMenu(group: string, name: string) {
+    const pageItem = this.getPageItem(group, name);
+    const menuButton = pageItem.getByRole('button', { name: 'Open page explorer menu' });
+    await pageItem.hover();
     await menuButton.click();
   }
 }

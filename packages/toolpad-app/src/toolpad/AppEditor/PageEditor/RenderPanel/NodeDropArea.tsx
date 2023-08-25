@@ -23,7 +23,7 @@ import {
   DropZone,
   usePageEditorState,
 } from '../PageEditorProvider';
-import { isPageRow } from '../../../../toolpadComponents';
+import { isPageRow } from '../../../../runtime/toolpadComponents';
 
 const dropAreaHighlightClasses = {
   highlightedTop: 'DropArea_HighlightedTop',
@@ -176,6 +176,8 @@ export default function NodeDropArea({
 
   const isPageNode = appDom.isPage(node);
   const isPageChild = dropAreaNodeParent ? appDom.isPage(dropAreaNodeParent) : false;
+
+  const isPageChildElement = isPageChild && appDom.isElement(node) && !isPageRow(node);
   const isPageRowChild = dropAreaNodeParent
     ? appDom.isElement(dropAreaNodeParent) && isPageRow(dropAreaNodeParent)
     : false;
@@ -198,13 +200,16 @@ export default function NodeDropArea({
     if (isPageNode && parentProp && !isEmptySlot) {
       return null;
     }
+
+    const pageAwareParentProp = isPageChild ? 'children' : parentProp;
+
     if (dragOverZone === DROP_ZONE_TOP) {
       // Is dragging over page top and is slot
       if (
         dropAreaNodeParent &&
         dropAreaNodeParent.id === dragOverNodeId &&
         appDom.isPage(dropAreaNodeParent) &&
-        parentProp
+        pageAwareParentProp
       ) {
         const pageFirstChild = appDom.getNodeFirstChild(dom, dropAreaNodeParent, 'children');
 
@@ -248,11 +253,12 @@ export default function NodeDropArea({
       if (
         dropAreaNodeParent &&
         dropAreaNodeParent.id === dragOverNodeId &&
-        parentProp === dragOverSlotParentProp
+        pageAwareParentProp === dragOverSlotParentProp
       ) {
         const parentLastChild =
-          parentProp && (appDom.isPage(dropAreaNodeParent) || appDom.isElement(dropAreaNodeParent))
-            ? appDom.getNodeLastChild(dom, dropAreaNodeParent, parentProp)
+          pageAwareParentProp &&
+          (appDom.isPage(dropAreaNodeParent) || appDom.isElement(dropAreaNodeParent))
+            ? appDom.getNodeLastChild(dom, dropAreaNodeParent, pageAwareParentProp)
             : null;
 
         const isParentLastChild = parentLastChild ? node.id === parentLastChild.id : false;
@@ -260,7 +266,7 @@ export default function NodeDropArea({
         const parentSlots = dropAreaNodeParentInfo?.slots || null;
 
         const parentFlowDirection =
-          parentSlots && parentProp && parentSlots[parentProp]?.flowDirection;
+          parentSlots && pageAwareParentProp && parentSlots[pageAwareParentProp]?.flowDirection;
 
         return parentFlowDirection && isParentLastChild
           ? getChildNodeHighlightedZone(parentFlowDirection)
@@ -268,13 +274,20 @@ export default function NodeDropArea({
       }
 
       // Is dragging over slot center
-      if (node.id === dragOverNodeId && parentProp && parentProp === dragOverSlotParentProp) {
+      if (
+        node.id === dragOverNodeId &&
+        pageAwareParentProp &&
+        pageAwareParentProp === dragOverSlotParentProp
+      ) {
         if (isPageNode) {
           return DROP_ZONE_CENTER;
         }
 
         const nodeChildren =
-          (parentProp && appDom.isElement(node) && dropAreaNodeChildNodes[parentProp]) || [];
+          (pageAwareParentProp &&
+            appDom.isElement(node) &&
+            dropAreaNodeChildNodes[pageAwareParentProp]) ||
+          [];
         return nodeChildren.length === 0 ? DROP_ZONE_CENTER : null;
       }
     }
@@ -336,7 +349,21 @@ export default function NodeDropArea({
 
   const isHighlightingCenter = highlightedZone === DROP_ZONE_CENTER;
 
-  const highlightRect = isHighlightingCenter && isEmptySlot && slotRect ? slotRect : dropAreaRect;
+  const highlightRect =
+    isHighlightingCenter && isEmptySlot && slotRect
+      ? slotRect
+      : {
+          ...dropAreaRect,
+          x: isPageChildElement ? dropAreaNodeRect.x : dropAreaRect.x,
+          width: isPageChildElement ? dropAreaNodeRect.width : dropAreaRect.width,
+        };
+
+  const highlightRelativeRect = {
+    x: isPageChildElement ? 0 : highlightRelativeX,
+    y: highlightRelativeY,
+    width: highlightWidth,
+    height: highlightHeight,
+  };
 
   return (
     <React.Fragment>
@@ -349,12 +376,7 @@ export default function NodeDropArea({
               }
             : {},
         )}
-        highlightRelativeRect={{
-          x: highlightRelativeX,
-          y: highlightRelativeY,
-          width: highlightWidth,
-          height: highlightHeight,
-        }}
+        highlightRelativeRect={highlightRelativeRect}
       />
       {isEmptySlot && slotRect ? (
         <EmptySlot style={absolutePositionCss(slotRect)}>

@@ -1,0 +1,12 @@
+{
+  "buildCommand": "release:build",
+  "node": "16",
+  "packages": [
+    "packages/create-toolpad-app",
+    "packages/toolpad-app",
+    "packages/toolpad-components",
+    "packages/toolpad-core",
+    "packages/toolpad-utils"
+  ],
+  "silent": true
+}

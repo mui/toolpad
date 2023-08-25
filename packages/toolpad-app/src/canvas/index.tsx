@@ -2,18 +2,13 @@ import * as React from 'react';
 import invariant from 'invariant';
 import { throttle } from 'lodash-es';
 import { CanvasEventsContext } from '@mui/toolpad-core/runtime';
-import { ToolpadComponent } from '@mui/toolpad-core';
-import ToolpadApp from '../runtime';
-import { NodeHashes, RuntimeState } from '../types';
+import ToolpadApp, { LoadComponents, queryClient } from '../runtime/ToolpadApp';
+import { AppCanvasState } from '../types';
 import getPageViewState from './getPageViewState';
 import { rectContainsPoint } from '../utils/geometry';
 import { CanvasHooks, CanvasHooksContext } from '../runtime/CanvasHooksContext';
 import { bridge, setCommandHandler } from './ToolpadBridge';
 import { BridgeContext } from './BridgeContext';
-
-export interface AppCanvasState extends RuntimeState {
-  savedNodes: NodeHashes;
-}
 
 const handleScreenUpdate = throttle(
   () => {
@@ -26,10 +21,14 @@ const handleScreenUpdate = throttle(
 export interface AppCanvasProps {
   initialState?: AppCanvasState | null;
   basename: string;
-  catalog?: Record<string, ToolpadComponent>;
+  loadComponents: LoadComponents;
 }
 
-export default function AppCanvas({ catalog, basename, initialState = null }: AppCanvasProps) {
+export default function AppCanvas({
+  loadComponents,
+  basename,
+  initialState = null,
+}: AppCanvasProps) {
   const [state, setState] = React.useState<AppCanvasState | null>(initialState);
 
   const appRootRef = React.useRef<HTMLDivElement>();
@@ -107,8 +106,25 @@ export default function AppCanvas({ catalog, basename, initialState = null }: Ap
     );
 
     const unsetUpdate = setCommandHandler(bridge.canvasCommands, 'update', (newState) => {
-      React.startTransition(() => setState(newState));
+      // `update` will be called from the parent window. Since the canvas runs in an iframe, it's
+      // running in another javascript realm than the one this object was constructed in. This makes
+      // the MUI core `deepMerge` function fail. The `deepMerge` function uses `isPlainObject` which checks
+      // whether the object constructor property is the global `Object`.
+      // See https://github.com/mui/material-ui/blob/b935d3e8f48b5d54f6cd08154fe2f7aa035ab576/packages/mui-utils/src/deepmerge.ts#L2.
+      // Since different realms have different globals, this function erroneously marks it as not being a plain object.
+      // For now we've use structuredClone to make the `update` method behave as if it was built using
+      // `window.postMessage`, which we should probably move towards anyways at some point. structuredClone
+      // clones the object as if it was passed using `postMessage` and corrects the `constructor` property.
+      React.startTransition(() => setState(structuredClone(newState)));
     });
+
+    const unsetInvalidateQueries = setCommandHandler(
+      bridge.canvasCommands,
+      'invalidateQueries',
+      () => {
+        queryClient.invalidateQueries();
+      },
+    );
 
     bridge.canvasEvents.emit('ready', {});
 
@@ -116,6 +132,7 @@ export default function AppCanvas({ catalog, basename, initialState = null }: Ap
       unsetGetPageViewState();
       unsetGetViewCoordinates();
       unsetUpdate();
+      unsetInvalidateQueries();
     };
   }, []);
 
@@ -123,9 +140,6 @@ export default function AppCanvas({ catalog, basename, initialState = null }: Ap
   const editorHooks: CanvasHooks = React.useMemo(() => {
     return {
       savedNodes,
-      navigateToPage(pageNodeId) {
-        bridge.canvasEvents.emit('pageNavigationRequest', { pageNodeId });
-      },
     };
   }, [savedNodes]);
 
@@ -135,9 +149,8 @@ export default function AppCanvas({ catalog, basename, initialState = null }: Ap
         <CanvasEventsContext.Provider value={bridge.canvasEvents}>
           <ToolpadApp
             rootRef={onAppRoot}
-            catalog={catalog}
-            hidePreviewBanner
-            version="preview"
+            loadComponents={loadComponents}
+            hasShell={false}
             basename={basename}
             state={state}
           />

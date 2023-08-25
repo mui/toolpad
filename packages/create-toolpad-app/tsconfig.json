@@ -1,0 +1,19 @@
+{
+  "compilerOptions": {
+    "target": "es2020",
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "lib": ["esnext"],
+    "isolatedModules": true,
+    "strict": true,
+    "resolveJsonModule": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "noEmit": false,
+    "outDir": "./dist",
+    "pretty": true,
+    "rootDir": "src",
+    "preserveWatchOutput": true
+  },
+  "include": ["src/**/*.ts", "src/**/*.tsx"]
+}

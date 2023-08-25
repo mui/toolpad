@@ -1,14 +1,15 @@
+import { CircularProgress, Box, styled, CssBaseline } from '@mui/material';
 import * as React from 'react';
-import { BrowserRouter, Routes, Route, Navigate, useParams } from 'react-router-dom';
-import { Box, CircularProgress, styled } from '@mui/material';
 import { ErrorBoundary, FallbackProps } from 'react-error-boundary';
-import AppEditor from './AppEditor';
-import Apps from './Apps';
-import ErrorAlert from './AppEditor/PageEditor/ErrorAlert';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import NoSsr from '../components/NoSsr';
+import AppEditor from './AppEditor';
+import ErrorAlert from './AppEditor/PageEditor/ErrorAlert';
+import { ThemeProvider } from '../ThemeContext';
 
 const Centered = styled('div')({
   height: '100%',
+  width: '100%',
   display: 'flex',
   justifyContent: 'center',
   alignItems: 'center',
@@ -28,25 +29,9 @@ interface FullPageErrorProps {
 
 function FullPageError({ error }: FullPageErrorProps) {
   return (
-    <Centered>
-      <ErrorAlert error={error} />
+    <Centered sx={{ p: 4 }}>
+      <ErrorAlert sx={{ width: '100%' }} error={error} />
     </Centered>
-  );
-}
-
-function LegacyEditorUrlRedirect() {
-  const { '*': editorRoute } = useParams();
-  return <Navigate to={`../${editorRoute}`} />;
-}
-
-function AppWorkspace() {
-  return (
-    <Routes>
-      <Route>
-        <Route path="editor/*" element={<LegacyEditorUrlRedirect />} />
-        <Route path="*" element={<AppEditor />} />
-      </Route>
-    </Routes>
   );
 }
 
@@ -54,27 +39,29 @@ function ErrorFallback({ error }: FallbackProps) {
   return <FullPageError error={error} />;
 }
 
-export interface EditorProps {
+export interface ToolpadProps {
   basename: string;
 }
 
-export default function Toolpad({ basename }: EditorProps) {
+export default function Toolpad({ basename }: ToolpadProps) {
   return (
     <NoSsr>
-      {/* Container that allows children to size to it with height: 100% */}
-      <Box sx={{ height: '1px', minHeight: '100vh' }}>
-        <ErrorBoundary fallbackRender={ErrorFallback}>
-          <React.Suspense fallback={<FullPageLoader />}>
-            <BrowserRouter basename={basename}>
-              <Routes>
-                <Route path="/" element={<Navigate to="apps" replace />} />
-                <Route path="/apps" element={<Apps />} />
-                <Route path="/app/:appId/*" element={<AppWorkspace />} />
-              </Routes>
-            </BrowserRouter>
-          </React.Suspense>
-        </ErrorBoundary>
-      </Box>
+      <ThemeProvider>
+        {/* CssBaseline kickstart an elegant, consistent, and simple baseline to build upon. */}
+        <CssBaseline />
+        {/* Container that allows children to size to it with height: 100% */}
+        <Box sx={{ height: '1px', minHeight: '100vh' }}>
+          <ErrorBoundary fallbackRender={ErrorFallback}>
+            <React.Suspense fallback={<FullPageLoader />}>
+              <BrowserRouter basename={basename}>
+                <Routes>
+                  <Route path="/*" element={<AppEditor />} />
+                </Routes>
+              </BrowserRouter>
+            </React.Suspense>
+          </ErrorBoundary>
+        </Box>
+      </ThemeProvider>
     </NoSsr>
   );
 }

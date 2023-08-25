@@ -1,43 +1,45 @@
 import { Stack } from '@mui/material';
-import { createComponent } from '@mui/toolpad-core';
+import createBuiltin from './createBuiltin';
 import { SX_PROP_HELPER_TEXT } from './constants';
 
-export default createComponent(Stack, {
+export default createBuiltin(Stack, {
+  helperText: 'The MUI [Stack](https://mui.com/material-ui/react-stack/) component.',
   argTypes: {
     direction: {
-      typeDef: {
-        type: 'string',
-        enum: ['row', 'row-reverse', 'column', 'column-reverse'],
-        default: 'row',
-      },
+      helperText: 'The flex layout direction.',
+      type: 'string',
+      enum: ['row', 'row-reverse', 'column', 'column-reverse'],
+      default: 'row',
     },
     alignItems: {
-      typeDef: {
-        type: 'string',
-        enum: ['start', 'center', 'end', 'stretch', 'baseline'],
-        default: 'start',
-      },
+      helperText: 'The flex layout align items.',
+      type: 'string',
+      enum: ['start', 'center', 'end', 'stretch', 'baseline'],
+      default: 'start',
     },
     justifyContent: {
-      typeDef: {
-        type: 'string',
-        enum: ['start', 'center', 'end', 'space-between', 'space-around', 'space-evenly'],
-        default: 'start',
-      },
+      helperText: 'The flex layout justify content.',
+      type: 'string',
+      enum: ['start', 'center', 'end', 'space-between', 'space-around', 'space-evenly'],
+      default: 'start',
     },
     gap: {
-      typeDef: { type: 'number', default: 2 },
+      helperText: 'The gap between children.',
+      type: 'number',
+      default: 2,
     },
     margin: {
-      typeDef: { type: 'number' },
+      helperText: 'The margin around the component.',
+      type: 'number',
     },
     children: {
-      typeDef: { type: 'element' },
+      helperText: 'The content of the component.',
+      type: 'element',
       control: { type: 'slots' },
     },
     sx: {
       helperText: SX_PROP_HELPER_TEXT,
-      typeDef: { type: 'object' },
+      type: 'object',
     },
   },
 });

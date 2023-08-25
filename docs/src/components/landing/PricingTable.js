@@ -9,6 +9,12 @@ import Tabs from '@mui/material/Tabs';
 import Tab from '@mui/material/Tab';
 import Divider from '@mui/material/Divider';
 import Typography from '@mui/material/Typography';
+import GiteRoundedIcon from '@mui/icons-material/GiteRounded';
+import AppShortcutRoundedIcon from '@mui/icons-material/AppShortcutRounded';
+import ToggleOnIcon from '@mui/icons-material/ToggleOn';
+import SecurityRoundedIcon from '@mui/icons-material/SecurityRounded';
+import SupportAgentRoundedIcon from '@mui/icons-material/SupportAgentRounded';
+
 // import IconImage from 'docs/src/components/icon/IconImage';
 import SectionHeadline from 'docs/src/components/typography/SectionHeadline';
 
@@ -52,11 +58,11 @@ PlanName.propTypes = {
   }),
 };
 
-function Cell({ highlighted = false, ...props }) {
+function Cell({ highlighted = false, sx, ...props }) {
   return (
     <Box
       {...props}
-      sx={{
+      sx={(theme) => ({
         py: 2,
         px: 2,
         display: 'flex',
@@ -66,16 +72,19 @@ function Cell({ highlighted = false, ...props }) {
         ...(highlighted && {
           // Remove borders since there are only two plans
           // https://github.com/mui/mui-toolpad/pull/809#issuecomment-1221026428
-          borderWidth: '0 0 0 0',
+          borderWidth: '0 1px 0 1px',
           borderStyle: 'solid',
-          borderColor: (theme) => (theme.palette.mode === 'dark' ? 'primaryDark.700' : 'grey.100'),
-          bgcolor: (theme) =>
-            theme.palette.mode === 'dark'
-              ? alpha(theme.palette.primaryDark[900], 0.5)
-              : alpha(theme.palette.grey[50], 0.5),
+          borderColor: (theme.vars || theme).palette.divider,
+          bgcolor: `${alpha(theme.palette.grey[50], 0.5)}`,
+        }),
+        ...theme.applyDarkStyles({
+          ...(highlighted && {
+            borderColor: (theme.vars || theme).palette.divider,
+            bgcolor: `${alpha(theme.palette.primaryDark[900], 0.5)}`,
+          }),
         }),
         ...props.sx,
-      }}
+      })}
     />
   );
 }
@@ -89,10 +98,12 @@ function RowHead({ children, startIcon, ...props }) {
   return (
     <Box
       {...props}
-      sx={{
+      sx={(theme) => ({
         justifyContent: 'flex-start',
-        borderRadius: 1,
-        bgcolor: (theme) => (theme.palette.mode === 'dark' ? 'primaryDark.900' : 'grey.50'),
+        borderRadius: '8px 0 0 8px',
+        bgcolor: (theme.vars || theme).palette.grey[50],
+        border: '1px solid',
+        borderColor: (theme.vars || theme).palette.divider,
         p: 1,
         transition: 'none',
         typography: 'body2',
@@ -100,7 +111,11 @@ function RowHead({ children, startIcon, ...props }) {
         display: 'flex',
         alignItems: 'center',
         ...props.sx,
-      }}
+        ...theme.applyDarkStyles({
+          bgcolor: (theme.vars || theme).palette.primaryDark[900],
+          borderColor: (theme.vars || theme).palette.divider,
+        }),
+      })}
     >
       {startIcon ? <Box sx={{ lineHeight: 0, mr: 1 }}>{startIcon}</Box> : null}
       {children}
@@ -118,18 +133,22 @@ function RowCategory(props) {
   return (
     <Box
       {...props}
-      sx={{
+      sx={(theme) => ({
         typography: 'caption',
         display: 'block',
         fontWeight: 500,
-        bgcolor: (theme) => (theme.palette.mode === 'dark' ? 'primaryDark.900' : 'grey.50'),
         py: 1,
         ml: 1,
         pl: 1.5,
         borderBottom: '1px solid',
-        borderColor: (theme) => (theme.palette.mode === 'dark' ? 'primaryDark.600' : 'grey.200'),
+        bgcolor: (theme.vars || theme).palette.grey[50],
+        borderColor: (theme.vars || theme).palette.divider,
         ...props.sx,
-      }}
+        ...theme.applyDarkStyles({
+          bgcolor: (theme.vars || theme).palette.primaryDark[900],
+          borderColor: (theme.vars || theme).palette.divider,
+        }),
+      })}
     />
   );
 }
@@ -167,7 +186,7 @@ function StickyHead({ plans, planInfo, container, disableCalculation = false }) 
   }, [container, disableCalculation]);
   return (
     <Box
-      sx={{
+      sx={(theme) => ({
         position: 'fixed',
         zIndex: 1,
         top: 56,
@@ -181,15 +200,13 @@ function StickyHead({ plans, planInfo, container, disableCalculation = false }) 
         py: 1,
         display: { xs: 'none', md: 'block' },
         backdropFilter: 'blur(20px)',
-        boxShadow: (theme) =>
-          `inset 0px -1px 1px ${
-            theme.palette.mode === 'dark' ? theme.palette.primaryDark[700] : theme.palette.grey[100]
-          }`,
-        backgroundColor: (theme) =>
-          theme.palette.mode === 'dark'
-            ? alpha(theme.palette.primaryDark[900], 0.72)
-            : 'rgba(255,255,255,0.72)',
-      }}
+        backgroundColor: 'rgba(255,255,255,0.72)',
+        boxShadow: `inset 0px -1px 1px ${(theme.vars || theme).palette.grey[100]}`,
+        ...theme.applyDarkStyles({
+          backgroundColor: `${alpha(theme.palette.primaryDark[900], 0.7)}`,
+          boxShadow: `inset 0px -1px 1px ${(theme.vars || theme).palette.primaryDark[700]}`,
+        }),
+      })}
     >
       <Container
         sx={{
@@ -239,21 +256,24 @@ function PricingTable({
       columnHeaderHidden ? '0px' : '240px'
     }, 1fr))`,
   };
+
   function renderRow(key) {
     return (
       <Box
-        sx={{
+        sx={(theme) => ({
           ...gridSx,
           '&:hover': {
-            bgcolor: (theme) =>
-              theme.palette.mode === 'dark'
-                ? alpha(theme.palette.primaryDark[900], 0.3)
-                : alpha(theme.palette.grey[50], 0.4),
+            bgcolor: `${alpha(theme.palette.grey[50], 0.4)}`,
             '@media (hover: none)': {
               bgcolor: 'initial',
             },
           },
-        }}
+          ...theme.applyDarkStyles({
+            '&:hover': {
+              bgcolor: `${alpha(theme.palette.primaryDark[900], 0.3)}`,
+            },
+          }),
+        })}
       >
         {rowHeaders[key]}
         {plans.map((id, index) => (
@@ -286,45 +306,61 @@ function PricingTable({
         <Box sx={gridSx}>
           <Typography />
           {plans.map((plan) => (
-            <Box key={plan} sx={{ display: 'flex', flexDirection: 'column', p: 2 }}>
+            <Box
+              key={plan}
+              sx={(theme) => ({
+                display: 'flex',
+                flexDirection: 'column',
+                p: 2,
+                borderRadius: '12px 12px 0 0',
+                ...(planInfo.commercial?.title?.toLowerCase() === plan && {
+                  borderWidth: '1px 1px 0 1px',
+                  borderStyle: 'solid',
+                  borderColor: (theme.vars || theme).palette.divider,
+                  bgcolor: alpha(theme.palette.grey[50], 0.5),
+                }),
+                ...theme.applyDarkStyles({
+                  ...(planInfo.commercial?.title?.toLowerCase() === plan && {
+                    bgcolor: alpha(theme.palette.primaryDark[900], 0.7),
+                    borderColor: (theme.vars || theme).palette.divider,
+                  }),
+                }),
+              })}
+            >
               <PlanName planInfo={planInfo[plan]} />
             </Box>
           ))}
         </Box>
       ) : null}
-      <RowHead>Hosting</RowHead>
+      <RowHead startIcon={<GiteRoundedIcon fontSize="small" color="primary" />}>Hosting</RowHead>
       {renderRow('Self-hosting')}
       {divider}
       {renderRow('Cloud hosting')}
-      <RowHead>Apps</RowHead>
+      <RowHead startIcon={<AppShortcutRoundedIcon fontSize="small" color="primary" />}>
+        Apps
+      </RowHead>
       {renderRow('Apps')}
       {divider}
       {renderRow('Data sources')}
       {divider}
       {renderRow('Export to code')}
       {divider}
-      {renderRow('Plugging API')}
-      {divider}
-      {renderRow('Built-in version control')}
-      {divider}
-      {renderRow('Git version control')}
+      {renderRow('Plugin API')}
       {divider}
       {renderRow('Staging environments')}
       {divider}
       {renderRow('White label')}
       {divider}
       {renderRow('Custom themes')}
-      <RowHead>Components</RowHead>
+      <RowHead startIcon={<ToggleOnIcon fontSize="small" color="primary" />}>Components</RowHead>
       {renderRow('Components')}
       {divider}
       {renderRow('Custom components')}
       {divider}
       {renderRow('Premium components')}
-      <RowHead>Users</RowHead>
-      {renderRow('Real-time commenting')}
-      {divider}
-      {renderRow('Multiple organizations')}
-      <RowHead>Security</RowHead>
+      <RowHead startIcon={<SecurityRoundedIcon fontSize="small" color="primary" />}>
+        Security
+      </RowHead>
       {renderRow('OAuth2/OpenID SSO')}
       {divider}
       {renderRow('SSO enforcement')}
@@ -334,7 +370,9 @@ function PricingTable({
       {renderRow('Granular permissions')}
       {divider}
       {renderRow('Audit logs')}
-      <RowHead>Support</RowHead>
+      <RowHead startIcon={<SupportAgentRoundedIcon fontSize="small" color="primary" />}>
+        Support
+      </RowHead>
       {renderRow('Support level')}
       {divider}
     </Box>
@@ -379,23 +417,33 @@ function PricingList({ plans, planInfo, rowHeaders, commercialData, communityDat
         value={selectedIndex}
         variant="fullWidth"
         onChange={(_event, value) => setSelectedPlan(plans[value])}
-        sx={{
-          mb: 2,
-          position: 'sticky',
-          top: 55,
-          bgcolor: 'background.paper',
-          zIndex: 1,
-          mx: { xs: -2, sm: -3 },
-          borderTop: '1px solid',
-          borderColor: 'divider',
-          '& .MuiTab-root': {
-            borderBottom: '1px solid',
+        sx={[
+          {
+            mb: 2,
+            position: 'sticky',
+            top: 55,
+            bgcolor: 'background.paper',
+            zIndex: 1,
+            mx: { xs: -2, sm: -3 },
+            borderTop: '1px solid',
             borderColor: 'divider',
-            '&.Mui-selected': {
-              bgcolor: (theme) => (theme.palette.mode === 'dark' ? 'primaryDark.700' : 'grey.50'),
+            '& .MuiTab-root': {
+              borderBottom: '1px solid',
+              borderColor: 'divider',
+              '&.Mui-selected': {
+                bgcolor: 'grey.50',
+              },
             },
           },
-        }}
+          (theme) =>
+            theme.applyDarkStyles({
+              '& .MuiTab-root': {
+                '&.Mui-selected': {
+                  bgcolor: 'primaryDark.700',
+                },
+              },
+            }),
+        ]}
       >
         {plans.map((plan, index) => (
           <Tab
@@ -446,9 +494,18 @@ export default function Pricing({
 }) {
   return (
     <React.Fragment>
-      <Container sx={{ py: { xs: 4, sm: 6, md: 8 } }}>
+      <Container
+        sx={{
+          mt: 4,
+          pt: { xs: 4, sm: 6, md: 8 },
+        }}
+      >
         <SectionHeadline overline="Plans" title={Headline} />
-        <Typography variant="body2" sx={{ marginTop: { md: -2 }, marginBottom: { xs: 2, md: 0 } }}>
+        <Typography
+          variant="body2"
+          color="text.secondary"
+          sx={{ marginTop: { md: -2 }, marginBottom: { xs: 2, md: 0 }, maxWidth: 450 }}
+        >
           With the intention to have affordable plans for all kind of business needs, we will
           announce our exact pricing later this year.
         </Typography>

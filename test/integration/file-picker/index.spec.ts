@@ -1,21 +1,17 @@
 import * as path from 'path';
 import { ToolpadEditor } from '../../models/ToolpadEditor';
-import { test, expect } from '../../playwright/test';
-import { readJsonFile } from '../../utils/fs';
-import generateId from '../../utils/generateId';
+import { test, expect } from '../../playwright/localTest';
 
-test('File picker component', async ({ page, api }) => {
-  const dom = await readJsonFile(path.resolve(__dirname, './dom.json'));
-  const testFilePath = path.resolve(__dirname, './test.txt');
+test.use({
+  localAppConfig: {
+    template: path.resolve(__dirname, './fixture'),
+    cmd: 'dev',
+  },
+});
 
-  const app = await api.mutation.createApp(`App ${generateId()}`, {
-    from: { kind: 'dom', dom },
-  });
-
-  await page.pause();
-
+test('File Picker component', async ({ page }) => {
   const editorModel = new ToolpadEditor(page);
-  editorModel.goto(app.id);
+  editorModel.goto();
 
   await editorModel.waitForOverlay();
 
@@ -23,7 +19,11 @@ test('File picker component', async ({ page, api }) => {
 
   await expect(filePicker).toBeVisible();
 
-  await filePicker.setInputFiles(testFilePath);
+  await filePicker.setInputFiles({
+    name: 'test.txt',
+    mimeType: 'text/plain',
+    buffer: Buffer.from('hello'),
+  });
 
   await expect(editorModel.pageRoot.getByText('test.txt')).toBeVisible();
   await expect(editorModel.pageRoot.getByText('Uploaded')).toBeVisible();

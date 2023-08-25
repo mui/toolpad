@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { styled } from '@mui/material';
 import { NodeId } from '@mui/toolpad-core';
-import SplitPane from '../../../components/SplitPane';
+import { Panel, PanelGroup, PanelResizeHandle } from '../../../components/resizablePanels';
 import RenderPanel from './RenderPanel';
 import ComponentPanel from './ComponentPanel';
 import { PageEditorProvider } from './PageEditorProvider';
@@ -10,8 +10,6 @@ import * as appDom from '../../../appDom';
 import ComponentCatalog from './ComponentCatalog';
 import NotFoundEditor from '../NotFoundEditor';
 import usePageTitle from '../../../utils/usePageTitle';
-import useLocalStorageState from '../../../utils/useLocalStorageState';
-import useDebouncedHandler from '../../../utils/useDebouncedHandler';
 import useUndoRedo from '../../hooks/useUndoRedo';
 
 const classes = {
@@ -30,53 +28,42 @@ const PageEditorRoot = styled('div')({
 });
 
 interface PageEditorContentProps {
-  appId: string;
   node: appDom.PageNode;
 }
 
-function PageEditorContent({ appId, node }: PageEditorContentProps) {
-  usePageTitle(`${node.attributes.title.value} | Toolpad editor`);
-
-  const [splitDefaultSize, setSplitDefaultSize] = useLocalStorageState<number>(
-    `editor/${appId}/component-panel-split`,
-    300,
-  );
-
-  const handleSplitChange = useDebouncedHandler((newSize) => setSplitDefaultSize(newSize), 100);
+function PageEditorContent({ node }: PageEditorContentProps) {
+  usePageTitle(`${node.attributes.title} | Toolpad editor`);
 
   return (
-    <PageEditorProvider key={node.id} appId={appId} nodeId={node.id}>
-      <SplitPane
-        allowResize
-        split="vertical"
-        size={splitDefaultSize}
-        defaultSize={splitDefaultSize}
-        onChange={handleSplitChange}
-        primary="second"
-      >
-        <PageEditorRoot>
-          <ComponentCatalog />
-          <RenderPanel className={classes.renderPanel} />
-        </PageEditorRoot>
-        <ComponentPanel />
-      </SplitPane>
+    <PageEditorProvider key={node.id} nodeId={node.id}>
+      <PanelGroup autoSaveId="editor/component-panel-split" direction="horizontal">
+        <Panel defaultSize={75} minSize={50} maxSize={80}>
+          <PageEditorRoot>
+            <ComponentCatalog />
+            <RenderPanel className={classes.renderPanel} />
+          </PageEditorRoot>
+        </Panel>
+        <PanelResizeHandle />
+        <Panel defaultSize={25} maxSize={50} minSize={20}>
+          <ComponentPanel />
+        </Panel>
+      </PanelGroup>
     </PageEditorProvider>
   );
 }
 
 interface PageEditorProps {
-  appId: string;
   nodeId?: NodeId;
 }
 
-export default function PageEditor({ appId, nodeId }: PageEditorProps) {
+export default function PageEditor({ nodeId }: PageEditorProps) {
   const { dom } = useDom();
   const pageNode = appDom.getMaybeNode(dom, nodeId as NodeId, 'page');
 
   useUndoRedo();
 
   return pageNode ? (
-    <PageEditorContent appId={appId} node={pageNode} />
+    <PageEditorContent node={pageNode} />
   ) : (
     <NotFoundEditor message={`Non-existing Page "${nodeId}"`} />
   );

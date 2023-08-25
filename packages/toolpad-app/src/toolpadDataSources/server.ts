@@ -1,27 +1,32 @@
-import * as _ from 'lodash-es';
 import { ServerDataSource } from '../types';
-import functionSrc from './function/server';
 import postgres from './postgres/server';
 import mysql from './mysql/server';
 import rest from './rest/server';
 import googleSheets from './googleSheets/server';
 import local from './local/server';
+import type FunctionsManager from '../server/FunctionsManager';
+import type EnvManager from '../server/EnvManager';
+import type { RuntimeConfig } from '../config';
 
-import config from '../server/config';
-import { DEMO_DATASOURCES, PRODUCTION_DATASOURCES } from '../constants';
+export interface IToolpadProject {
+  functionsManager: FunctionsManager;
+  envManager: EnvManager;
+  getRuntimeConfig: () => RuntimeConfig;
+}
 
-type ServerDataSources = { [key: string]: ServerDataSource<any, any, any> | undefined };
+type ServerDataSources = {
+  [key: string]:
+    | ServerDataSource<any, any, any>
+    | ((project: IToolpadProject) => ServerDataSource<any, any, any>)
+    | undefined;
+};
 
-const serverDataSources: ServerDataSources = _.pick(
-  {
-    rest,
-    function: functionSrc,
-    postgres,
-    googleSheets,
-    mysql,
-    ...(config.localMode ? { local } : {}),
-  },
-  [...(config.isDemo ? DEMO_DATASOURCES : PRODUCTION_DATASOURCES)],
-);
+const dataSources: ServerDataSources = {
+  rest,
+  postgres,
+  googleSheets,
+  mysql,
+  local,
+};
 
-export default serverDataSources;
+export default dataSources;

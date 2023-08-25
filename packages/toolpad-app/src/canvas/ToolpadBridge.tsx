@@ -1,12 +1,11 @@
+import { Emitter } from '@mui/toolpad-utils/events';
 import type { RuntimeEvents } from '@mui/toolpad-core';
-import mitt, { Emitter } from 'mitt';
-import type { AppCanvasState } from '.';
 import { TOOLPAD_BRIDGE_GLOBAL } from '../constants';
-import type { PageViewState } from '../types';
+import type { AppCanvasState, PageViewState } from '../types';
 
 declare global {
   interface Window {
-    [TOOLPAD_BRIDGE_GLOBAL]?: ToolpadBridge;
+    [TOOLPAD_BRIDGE_GLOBAL]?: ToolpadBridge | ((bridge: ToolpadBridge) => void);
   }
 }
 
@@ -67,6 +66,7 @@ export interface ToolpadBridge {
     getViewCoordinates(clientX: number, clientY: number): { x: number; y: number } | null;
     getPageViewState(): PageViewState;
     isReady(): boolean;
+    invalidateQueries(): void;
   }>;
 }
 
@@ -82,9 +82,9 @@ if (
 
 let canvasIsReady = false;
 export const bridge: ToolpadBridge = {
-  editorEvents: mitt(),
+  editorEvents: new Emitter(),
   editorCommands: createCommands(),
-  canvasEvents: mitt(),
+  canvasEvents: new Emitter(),
   canvasCommands: createCommands({
     isReady: () => canvasIsReady,
   }),
@@ -95,5 +95,8 @@ bridge.canvasEvents.on('ready', () => {
 });
 
 if (typeof window !== 'undefined') {
+  if (typeof window[TOOLPAD_BRIDGE_GLOBAL] === 'function') {
+    window[TOOLPAD_BRIDGE_GLOBAL](bridge);
+  }
   window[TOOLPAD_BRIDGE_GLOBAL] = bridge;
 }

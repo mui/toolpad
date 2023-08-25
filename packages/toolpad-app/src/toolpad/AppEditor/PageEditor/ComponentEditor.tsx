@@ -1,5 +1,8 @@
 import { Stack, styled, Typography, Divider } from '@mui/material';
 import * as React from 'react';
+// TODO: Remove lodash-es import here
+// eslint-disable-next-line no-restricted-imports
+import { groupBy } from 'lodash-es';
 import {
   ArgTypeDefinition,
   ArgTypeDefinitions,
@@ -9,19 +12,18 @@ import {
 import { ExactEntriesOf } from '../../../utils/types';
 import * as appDom from '../../../appDom';
 import NodeAttributeEditor from './NodeAttributeEditor';
-import { useDom, useAppState } from '../../AppState';
+import { useDom } from '../../AppState';
 import { usePageEditorState } from './PageEditorProvider';
-import PageOptionsPanel from './PageOptionsPanel';
 import ErrorAlert from './ErrorAlert';
 import NodeNameEditor from '../NodeNameEditor';
 import { useToolpadComponent } from '../toolpadComponents';
-import { getElementNodeComponentId } from '../../../toolpadComponents';
+import { getElementNodeComponentId } from '../../../runtime/toolpadComponents';
 import {
   layoutBoxArgTypes,
   LAYOUT_DIRECTION_BOTH,
   LAYOUT_DIRECTION_HORIZONTAL,
   LAYOUT_DIRECTION_VERTICAL,
-} from '../../../toolpadComponents/layoutBox';
+} from '../../../runtime/toolpadComponents/layoutBox';
 import ElementContext from '../ElementContext';
 import MarkdownTooltip from '../../../components/MarkdownTooltip';
 
@@ -45,7 +47,7 @@ function shouldRenderControl<P extends object>(
   props: P,
   componentConfig: ComponentConfig<P>,
 ) {
-  if (propTypeDef.typeDef.type === 'element' || propTypeDef.typeDef.type === 'template') {
+  if (propTypeDef.type === 'element' || propTypeDef.type === 'template') {
     return (
       propTypeDef.control?.type !== 'slot' &&
       propTypeDef.control?.type !== 'slots' &&
@@ -97,6 +99,11 @@ function ComponentPropsEditor<P extends object>({
     );
   }, [bindings, node.id]);
 
+  const argTypesByCategory: Record<string, ExactEntriesOf<ArgTypeDefinitions<P>>> = groupBy(
+    Object.entries(componentConfig.argTypes || {}) as ExactEntriesOf<ArgTypeDefinitions<P>>,
+    ([, propTypeDef]) => propTypeDef?.category || 'properties',
+  );
+
   return (
     <React.Fragment>
       {hasLayoutControls ? (
@@ -106,39 +113,51 @@ function ComponentPropsEditor<P extends object>({
           </Typography>
 
           <div className={classes.control}>
-            <NodeAttributeEditor
-              node={node}
-              namespace="layout"
-              name={hasLayoutHorizontalControls ? 'horizontalAlign' : 'verticalAlign'}
-              argType={
-                hasLayoutHorizontalControls
-                  ? layoutBoxArgTypes.horizontalAlign
-                  : layoutBoxArgTypes.verticalAlign
-              }
-            />
+            <Typography variant="body2">Alignment:</Typography>
+            <Stack direction="row">
+              {hasLayoutHorizontalControls ? (
+                <NodeAttributeEditor
+                  node={node}
+                  namespace="layout"
+                  name="horizontalAlign"
+                  argType={layoutBoxArgTypes.horizontalAlign}
+                  sx={{ maxWidth: 110 }}
+                />
+              ) : null}
+              {hasLayoutVerticalControls ? (
+                <NodeAttributeEditor
+                  node={node}
+                  namespace="layout"
+                  name="verticalAlign"
+                  argType={layoutBoxArgTypes.verticalAlign}
+                />
+              ) : null}
+            </Stack>
           </div>
 
           <Divider sx={{ mt: 1 }} />
         </React.Fragment>
       ) : null}
-      <Typography variant="overline" className={classes.sectionHeading}>
-        Properties:
-      </Typography>
-      {(
-        Object.entries(componentConfig.argTypes || {}) as ExactEntriesOf<ArgTypeDefinitions<P>>
-      ).map(([propName, propTypeDef]) =>
-        propTypeDef && shouldRenderControl(propTypeDef, propName, props, componentConfig) ? (
-          <div key={propName} className={classes.control}>
-            <NodeAttributeEditor
-              node={node}
-              namespace="props"
-              props={props}
-              name={propName}
-              argType={propTypeDef}
-            />
-          </div>
-        ) : null,
-      )}
+      {Object.entries(argTypesByCategory).map(([category, argTypeEntries]) => (
+        <React.Fragment key={category}>
+          <Typography variant="overline" className={classes.sectionHeading}>
+            {category}:
+          </Typography>
+          {argTypeEntries.map(([propName, propTypeDef]) =>
+            propTypeDef && shouldRenderControl(propTypeDef, propName, props, componentConfig) ? (
+              <div key={propName} className={classes.control}>
+                <NodeAttributeEditor
+                  node={node}
+                  namespace="props"
+                  props={props}
+                  name={propName}
+                  argType={propTypeDef}
+                />
+              </div>
+            ) : null,
+          )}
+        </React.Fragment>
+      ))}
     </React.Fragment>
   );
 }
@@ -164,9 +183,6 @@ function SelectedNodeEditor({ node }: SelectedNodeEditorProps) {
         <MarkdownTooltip placement="left" title={componentConfig.helperText ?? displayName}>
           <Typography variant="subtitle1">Component: {displayName}</Typography>
         </MarkdownTooltip>
-        <Typography variant="subtitle2" sx={{ mb: 1 }}>
-          ID: {node.id}
-        </Typography>
         <NodeNameEditor node={node} />
         {nodeError ? <ErrorAlert error={nodeError} /> : null}
         <Divider sx={{ mt: 1 }} />
@@ -179,24 +195,14 @@ function SelectedNodeEditor({ node }: SelectedNodeEditorProps) {
 }
 
 export interface ComponentEditorProps {
+  node: appDom.ElementNode;
   className?: string;
 }
 
-export default function ComponentEditor({ className }: ComponentEditorProps) {
-  const { dom } = useDom();
-  const { currentView } = useAppState();
-  const selectedNodeId = currentView.kind === 'page' ? currentView.selectedNodeId : null;
-
-  const selectedNode = selectedNodeId ? appDom.getMaybeNode(dom, selectedNodeId) : null;
-
+export default function ComponentEditor({ node, className }: ComponentEditorProps) {
   return (
     <ComponentEditorRoot className={className} data-testid="component-editor">
-      {selectedNode && appDom.isElement(selectedNode) ? (
-        // Add key to make sure it mounts every time selected node changes
-        <SelectedNodeEditor key={selectedNode.id} node={selectedNode} />
-      ) : (
-        <PageOptionsPanel />
-      )}
+      <SelectedNodeEditor key={node.id} node={node} />
     </ComponentEditorRoot>
   );
 }

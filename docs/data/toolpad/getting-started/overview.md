@@ -1,27 +1,32 @@
 # Overview
 
-<p class="description">Toolpad is a low-code UI builder for creating apps with MUI's suite of component libraries.</p>
-
-{{"component": "components/landing/Banner.js", "action": "tryDemo", "category": "ToolpadDocs", "description": "Check out Toolpad's interactive demo. No sign-up required!", "href": "https://demo.toolpad.io", "label": "Try Demo", "docs": true }}
+<p class="description">A general, high-level description of Toolpad and its capabilites.</p>
 
 ## Introduction
 
-Toolpad is a self-hosted low-code internal tools builder designed to extend MUI's suite of React components.
-It's designed for developers of all trades who want to save time building internal applications.
+Toolpad is a self-hosted, low-code internal tool builder. It is open-sourced, and powered by MUI's components.
+Toolpad is designed for any developer who wants to create internal apps faster.
 Drag and drop pre-built UI components, connect your data sources, release your app, and you're done!
 
-<img src="/static/toolpad/docs/overview/main.png" alt="Editor screenshot" width="1511px" />
+{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/getting-started/overview/main.png", "alt": "Editor screenshot", "caption": "The Toolpad editor"  }}
 
-## Advantages of Toolpad
+## Key features
+
+- **Open-source**: Toolpad is open-sourced, which means the code is free for you to observe and inspect, forever!
+
+- **Low-code**: Toolpad intends to let you get started with a front-end much faster, by way of a drag-and-drop editor, so that you can focus on backend code.
+
+- **Self-hosted:** Toolpad runs on your machine - which allows you to exert complete control and connect to your data without worries.
+
+## Advantages
 
 - **Build faster than ever before:** measure your development time in minutes rather than hours or days—simply drag and drop the components you need.
 - **Extensible with code:** build low-code with pro-code extensibility. You can write JavaScript anywhere in Toolpad as soon as you feel limited by the built-in features.
-- **Connect to any data source:** Toolpad lets you work with HTTP endpoints, Google Sheets, or PostgreSQL for backend functionality.
+- **Connect your data:** Toolpad lets you return data right from serverside functions which can be automatically connected to components on the page.
 
-## Toolpad terminology
+## Terminology
 
-- **Navigation**: where you can return to the homepage, or preview or deploy your app.
-- **Explorer**: where you can define and manage pages, connection configurations, custom component definitions, and more.
-- **Component library**: where you can find components to drag and drop onto the Canvas.
-- **Canvas**: where you build the UI for your application.
-- **Inspector**: where you can inspect and modify properties of selected elements in the canvas.
+- **Explorer:** This is where you can define and manage pages and other project objects.
+- **Component library:** This is where you can find components to drag and drop onto the canvas.
+- **Canvas:** This is where you build the UI for your application.
+- **Inspector:** This is where you can inspect and modify properties of the component selected in the canvas.

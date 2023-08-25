@@ -1,16 +1,16 @@
 {
   "compilerOptions": {
     "paths": {
-      // TODO: remove when typescript module resolution supports package exports. (v5.0 with module: 'bundler' ?)
-      "@mui/toolpad-core": ["../toolpad-core/dist/esm"],
-      "@mui/toolpad-core/runtime": ["../toolpad-core/dist/esm/runtime"],
-      "@mui/toolpad-core/jsRuntime": ["../toolpad-core/dist/esm/jsRuntime"],
-      "@mui/toolpad-core/jsBrowserRuntime": ["../toolpad-core/dist/esm/jsBrowserRuntime"],
-      "@mui/toolpad-core/jsServerRuntime": ["../toolpad-core/dist/esm/jsServerRuntime"],
-      "@mui/toolpad-core/objectKey": ["../toolpad-core/dist/esm/objectKey"],
-      "@mui/toolpad-core/utils/*": ["../toolpad-core/dist/esm/utils/*"]
+      // TODO: remove when typescript module resolution supports package exports. (v5.0 with moduleResolution: 'bundler')
+      "@mui/toolpad-core": ["../toolpad-core/dist"],
+      "@mui/toolpad-core/runtime": ["../toolpad-core/dist/runtime"],
+      "@mui/toolpad-core/jsRuntime": ["../toolpad-core/dist/jsRuntime"],
+      "@mui/toolpad-core/jsBrowserRuntime": ["../toolpad-core/dist/jsBrowserRuntime"],
+      "@mui/toolpad-core/jsServerRuntime": ["../toolpad-core/dist/jsServerRuntime"],
+      "@mui/toolpad-core/numberFormat": ["../toolpad-core/dist/numberFormat"],
+      "@mui/toolpad-utils/*": ["../toolpad-utils/dist/*"]
     },
-    "target": "es5",
+    "target": "esnext",
     "lib": ["dom", "dom.iterable", "esnext"],
     "allowJs": true,
     "checkJs": true,
@@ -21,16 +21,16 @@
     "noEmit": true,
     "esModuleInterop": true,
     "module": "esnext",
-    "moduleResolution": "node",
+    "moduleResolution": "Bundler",
     "resolveJsonModule": true,
     "isolatedModules": true,
-    "jsx": "preserve",
-    "incremental": true,
-    "noUnusedLocals": true
+    "jsx": "react",
+    "noUnusedLocals": true,
+    "pretty": true,
+    "preserveWatchOutput": true,
+    "incremental": true
   },
   "include": [
-    "next.config.mjs",
-    "next-env.d.ts",
     "sentry.client.config.js",
     "sentry.server.config.js",
     "**/*.ts",

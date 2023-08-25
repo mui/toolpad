@@ -3,7 +3,7 @@ import * as React from 'react';
 import { NodeHashes } from '../types';
 
 export interface NavigateToPage {
-  (pageNodeId: NodeId): void;
+  (pageNodeId: NodeId, pageParameters?: Record<string, string>): void;
 }
 
 /**
@@ -11,7 +11,6 @@ export interface NavigateToPage {
  */
 export interface CanvasHooks {
   savedNodes?: NodeHashes;
-  navigateToPage?: NavigateToPage;
 }
 
 export const CanvasHooksContext = React.createContext<CanvasHooks>({});

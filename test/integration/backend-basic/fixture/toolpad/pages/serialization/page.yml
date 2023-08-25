@@ -1,0 +1,48 @@
+apiVersion: v1
+kind: page
+spec:
+  id: Tysc6w5
+  title: serialization
+  display: shell
+  queries:
+    - name: circularData
+      query:
+        function: circularData
+        kind: local
+    - name: nonCircularData
+      query:
+        function: nonCircularData
+        kind: local
+    - name: invalidError
+      query:
+        function: invalidError
+        kind: local
+  content:
+    - component: PageRow
+      name: pageRow
+      children:
+        - component: Text
+          name: text
+          props:
+            value:
+              $$jsExpression: |
+                `Circlular property: ${circularData.data.a}`
+    - component: PageRow
+      name: pageRow1
+      children:
+        - component: Text
+          name: text1
+          props:
+            value:
+              $$jsExpression: >
+                `Non-circular:
+                ${nonCircularData.data.a1.b}:${nonCircularData.data.a2.b}`
+    - component: PageRow
+      name: pageRow2
+      children:
+        - component: Text
+          name: text2
+          props:
+            value:
+              $$jsExpression: |
+                `Invalid error: ${invalidError.error?.message}`

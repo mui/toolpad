@@ -1,4 +1,4 @@
-import { NodeId, LiveBindings, ScopeMeta } from '@mui/toolpad-core';
+import { NodeId, LiveBindings, ScopeMeta, ApplicationVm } from '@mui/toolpad-core';
 import * as React from 'react';
 import * as appDom from '../../../appDom';
 import { PageViewState } from '../../../types';
@@ -18,7 +18,6 @@ export type DropZone =
   | typeof DROP_ZONE_CENTER;
 
 export interface PageEditorState {
-  readonly appId: string;
   readonly type: 'page';
   readonly nodeId: NodeId;
   readonly newNode: appDom.ElementNode | null;
@@ -32,6 +31,7 @@ export interface PageEditorState {
   readonly pageState: Record<string, unknown>;
   readonly globalScopeMeta: ScopeMeta;
   readonly bindings: LiveBindings;
+  readonly vm: ApplicationVm;
 }
 
 export type PageEditorAction =
@@ -77,11 +77,14 @@ export type PageEditorAction =
   | {
       type: 'PAGE_BINDINGS_UPDATE';
       bindings: LiveBindings;
+    }
+  | {
+      type: 'VM_UPDATE';
+      vm: ApplicationVm;
     };
 
-export function createPageEditorState(appId: string, nodeId: NodeId): PageEditorState {
+export function createPageEditorState(nodeId: NodeId): PageEditorState {
   return {
-    appId,
     type: 'page',
     nodeId,
     newNode: null,
@@ -95,6 +98,10 @@ export function createPageEditorState(appId: string, nodeId: NodeId): PageEditor
     pageState: {},
     globalScopeMeta: {},
     bindings: {},
+    vm: {
+      scopes: {},
+      bindingScopes: {},
+    },
   };
 }
 
@@ -166,6 +173,10 @@ export function pageEditorReducer(
         bindings,
       });
     }
+    case 'VM_UPDATE': {
+      const { vm } = action;
+      return update(state, { vm });
+    }
     default:
       return state;
   }
@@ -222,6 +233,12 @@ function createPageEditorApi(dispatch: React.Dispatch<PageEditorAction>) {
         bindings,
       });
     },
+    vmUpdate(vm: ApplicationVm) {
+      dispatch({
+        type: 'VM_UPDATE',
+        vm,
+      });
+    },
   };
 }
 
@@ -238,7 +255,6 @@ export function usePageEditorState() {
 }
 
 export interface PageEditorProviderProps {
-  appId: string;
   children?: React.ReactNode;
   nodeId: NodeId;
 }
@@ -249,14 +265,14 @@ const PageEditorApiContext = React.createContext<PageEditorApi>(
   createPageEditorApi(() => undefined),
 );
 
-export function PageEditorProvider({ appId, children, nodeId }: PageEditorProviderProps) {
-  const initialState = createPageEditorState(appId, nodeId);
+export function PageEditorProvider({ children, nodeId }: PageEditorProviderProps) {
+  const initialState = createPageEditorState(nodeId);
   const [state, dispatch] = React.useReducer(pageEditorReducer, initialState);
   const api = React.useMemo(() => createPageEditorApi(dispatch), []);
 
   React.useEffect(() => {
-    api.replace(createPageEditorState(appId, nodeId));
-  }, [appId, api, nodeId]);
+    api.replace(createPageEditorState(nodeId));
+  }, [api, nodeId]);
 
   return (
     <PageEditorContext.Provider value={state}>

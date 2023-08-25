@@ -1,7 +1,8 @@
-import { Box, Skeleton, SxProps } from '@mui/material';
+import { Box, Skeleton, SxProps, styled } from '@mui/material';
 import * as React from 'react';
-import { createComponent } from '@mui/toolpad-core';
+import createBuiltin from './createBuiltin';
 import { SX_PROP_HELPER_TEXT } from './constants';
+import ErrorOverlay from './components/ErrorOverlay';
 
 export interface ImageProps {
   src: string;
@@ -10,10 +11,26 @@ export interface ImageProps {
   width: number;
   height: number;
   loading?: boolean;
+  error?: string;
   fit: 'contain' | 'cover' | 'fill' | 'none' | 'scale-down';
 }
 
-function Image({ sx: sxProp, src, width, height, alt, loading: loadingProp, fit }: ImageProps) {
+const Img = styled('img')({
+  width: '100%',
+  height: '100%',
+  position: 'absolute',
+});
+
+function Image({
+  sx: sxProp,
+  src,
+  width,
+  height,
+  alt,
+  loading: loadingProp,
+  error: errorProp,
+  fit,
+}: ImageProps) {
   const sx: SxProps = React.useMemo(
     () => ({
       ...sxProp,
@@ -27,69 +44,85 @@ function Image({ sx: sxProp, src, width, height, alt, loading: loadingProp, fit 
     [sxProp, width, height],
   );
 
-  const [imgLoading, setImgLoading] = React.useState(true);
-  const handleLoad = React.useCallback(() => setImgLoading(false), []);
+  const [imgError, setImgError] = React.useState<Error | null>(null);
+  const [imgLoading, setImgLoading] = React.useState(false);
+
+  const handleLoad = React.useCallback(() => {
+    setImgLoading(false);
+  }, []);
+
+  const handleError = React.useCallback(() => {
+    setImgError(new Error(`Failed to load image "${src}"`));
+    setImgLoading(false);
+  }, [src]);
+
+  React.useEffect(() => {
+    setImgLoading(true);
+    setImgError(null);
+  }, [src]);
 
   const loading = loadingProp || imgLoading;
-
+  const error = errorProp || imgError;
   return (
-    <Box sx={{ maxWidth: '100%', ...sx }}>
-      {loading ? <Skeleton variant="rectangular" width={width} height={height} /> : null}
-      <Box
-        component="img"
+    <Box sx={{ maxWidth: '100%', position: 'relative', ...sx }}>
+      <ErrorOverlay error={error} />
+      {loading && !error ? <Skeleton variant="rectangular" width={width} height={height} /> : null}
+      <Img
         src={src}
         alt={alt}
         sx={{
-          width: '100%',
-          height: '100%',
           objectFit: fit,
-          position: 'absolute',
-          visibility: loading ? 'hidden' : 'visible',
+          visibility: loading || error ? 'hidden' : 'visible',
         }}
         onLoad={handleLoad}
+        onError={handleError}
       />
     </Box>
   );
 }
 
-export default createComponent(Image, {
+export default createBuiltin(Image, {
   helperText: 'The Image component lets you display images.',
   layoutDirection: 'both',
   loadingPropSource: ['src'],
   loadingProp: 'loading',
+  errorProp: 'error',
   argTypes: {
     src: {
       helperText: 'The url of the image. Must resolve to an image file.',
-      typeDef: { type: 'string' },
+      type: 'string',
     },
     alt: {
       helperText:
         "The `alt` attribute holds a text description of the image. screen readers read this description out to their users so they know what the image means. Alt text is also displayed on the page if the image can't be loaded for some reason: for example, network errors, content blocking, or linkrot.",
-      typeDef: { type: 'string', default: '' },
+      type: 'string',
+      default: '',
     },
     fit: {
       helperText:
         'Defines how the image should [resize](https://developer.mozilla.org/en-US/docs/Web/CSS/object-fit) to its container.',
-      typeDef: {
-        type: 'string',
-        enum: ['contain', 'cover', 'fill', 'none', 'scale-down'],
-        default: 'contain',
-      },
+      type: 'string',
+      enum: ['contain', 'cover', 'fill', 'none', 'scale-down'],
+      default: 'contain',
     },
     width: {
       helperText: 'The image width in pixels',
-      typeDef: { type: 'number', default: 400 },
+      type: 'number',
+      default: 400,
     },
     height: {
-      typeDef: { type: 'number', default: 300 },
+      helperText: 'The image height in pixels',
+      type: 'number',
+      default: 300,
     },
     loading: {
       helperText: 'Displays a loading animation indicating the image is still loading',
-      typeDef: { type: 'boolean', default: false },
+      type: 'boolean',
+      default: false,
     },
     sx: {
       helperText: SX_PROP_HELPER_TEXT,
-      typeDef: { type: 'object' },
+      type: 'object',
     },
   },
 });

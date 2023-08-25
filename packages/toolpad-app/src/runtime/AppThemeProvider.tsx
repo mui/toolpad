@@ -1,62 +1,66 @@
 import * as React from 'react';
-import { createTheme, ThemeOptions, PaletteOptions, ThemeProvider } from '@mui/material';
-import * as colors from '@mui/material/colors';
+import { createTheme, Theme, ThemeProvider, ThemeOptions } from '@mui/material';
+import { deepmerge } from '@mui/utils';
 import * as appDom from '../appDom';
-import { AppTheme } from '../types';
 
-export function createToolpadTheme(toolpadTheme: AppTheme = {}): ThemeOptions {
-  const palette: PaletteOptions = {};
-  const primary = toolpadTheme['palette.primary.main'];
-  if (primary) {
-    palette.primary = (colors as any)[primary];
+declare module '@mui/material/styles' {
+  interface Theme {
+    fontFamilyMonospaced: string;
   }
-
-  const secondary = toolpadTheme['palette.secondary.main'];
-  if (secondary) {
-    palette.secondary = (colors as any)[secondary];
+  // allow configuration using `createTheme`
+  interface ThemeOptions {
+    fontFamilyMonospaced?: string;
   }
+}
 
-  const mode = toolpadTheme['palette.mode'];
-  if (mode) {
-    palette.mode = mode;
-  }
+function createMuiThemeFromToolpadTheme(toolpadTheme: ThemeOptions = {}): Theme {
+  return createTheme(
+    deepmerge(
+      {
+        typography: {
+          h1: {
+            fontSize: `3.25rem`,
+            fontWeight: 800,
+          },
 
-  const theme = createTheme();
+          h2: {
+            fontSize: `2.25rem`,
+            fontWeight: 700,
+          },
 
-  return createTheme(theme, {
-    typography: {
-      h1: {
-        fontSize: `3.25rem`,
-        fontWeight: 800,
+          h3: {
+            fontSize: `1.75rem`,
+            fontWeight: 700,
+          },
+
+          h4: {
+            fontSize: `1.5rem`,
+            fontWeight: 700,
+          },
+
+          h5: {
+            fontSize: `1.25rem`,
+            fontWeight: 700,
+          },
+
+          h6: {
+            fontSize: `1.15rem`,
+            fontWeight: 700,
+          },
+        },
+        fontFamilyMonospaced: 'Consolas, Menlo, Monaco, "Andale Mono", "Ubuntu Mono", monospace',
       },
+      toolpadTheme,
+    ),
+  );
+}
 
-      h2: {
-        fontSize: `2.25rem`,
-        fontWeight: 700,
-      },
-
-      h3: {
-        fontSize: `1.75rem`,
-        fontWeight: 700,
-      },
-
-      h4: {
-        fontSize: `1.5rem`,
-        fontWeight: 700,
-      },
-
-      h5: {
-        fontSize: `1.25rem`,
-        fontWeight: 700,
-      },
-
-      h6: {
-        fontSize: `1.15rem`,
-        fontWeight: 700,
-      },
-    },
-    palette,
-  });
+export function createToolpadAppTheme(dom: appDom.AppDom): Theme {
+  const root = appDom.getApp(dom);
+  const { themes = [] } = appDom.getChildNodes(dom, root);
+  const themeNode = themes.length > 0 ? themes[0] : null;
+  const toolpadTheme = themeNode?.theme;
+  return createMuiThemeFromToolpadTheme(toolpadTheme);
 }
 
 export interface ThemeProviderProps {
@@ -65,15 +69,6 @@ export interface ThemeProviderProps {
 }
 
 export default function AppThemeProvider({ dom, children }: ThemeProviderProps) {
-  const theme = React.useMemo(() => {
-    const root = appDom.getApp(dom);
-    const { themes = [] } = appDom.getChildNodes(dom, root);
-    const themeNode = themes.length > 0 ? themes[0] : null;
-    const toolpadTheme: AppTheme = themeNode?.theme
-      ? appDom.fromConstPropValues(themeNode.theme)
-      : {};
-    return createToolpadTheme(toolpadTheme);
-  }, [dom]);
-
+  const theme = React.useMemo(() => createToolpadAppTheme(dom), [dom]);
   return <ThemeProvider theme={theme}>{children}</ThemeProvider>;
 }

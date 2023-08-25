@@ -1,0 +1,25 @@
+apiVersion: v1
+kind: page
+spec:
+  id: y4d19z0
+  title: Page 1
+  content:
+    - component: PageRow
+      name: pageRow
+      children:
+        - component: TextField
+          name: textField1
+          props:
+            label: textField1
+        - component: TextField
+          name: textField2
+          props:
+            label: textField2
+    - component: PageRow
+      name: pageRow1
+      children:
+        - component: Autocomplete
+          name: autocomplete
+          props:
+            label: search
+            fullWidth: true

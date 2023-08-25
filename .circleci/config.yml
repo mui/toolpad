@@ -1,12 +1,12 @@
 version: 2.1
 orbs:
-  aws-s3: circleci/aws-s3@3.1.1
+  aws-s3: circleci/aws-s3@4.0.0
 
 defaults: &defaults
   working_directory: /tmp/mui-toolpad
   resource_class: medium
   docker:
-    - image: cimg/node:18.10.0
+    - image: cimg/node:16.14.2
 # CircleCI has disabled the cache across forks for security reasons.
 # Following their official statement, it was a quick solution, they
 # are working on providing this feature back with appropriate security measures.
@@ -33,7 +33,7 @@ commands:
       - restore_cache:
           name: Restore yarn cache
           keys:
-            - v9-yarn-{{ checksum "yarn.lock" }}
+            - v11-yarn-{{ checksum "yarn.lock" }}
             - v0-next-{{ checksum "yarn.lock" }}
       - run:
           name: Set yarn cache folder
@@ -62,23 +62,13 @@ commands:
           environment:
             PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: <<# parameters.browsers >>0<</ parameters.browsers >><<^ parameters.browsers >>1<</ parameters.browsers >>
 
-      - run:
-          name: Generate prisma client
-          command: yarn prisma generate
       - save_cache:
           name: Save yarn cache
-          key: v9-yarn-{{ checksum "yarn.lock" }}
+          key: v11-yarn-{{ checksum "yarn.lock" }}
           paths:
             # Keep path in sync with "Set yarn cache folder"
             # Can't use environment variables for `save_cache` paths (tested in https://app.circleci.com/pipelines/github/mui/material-ui/37813/workflows/5b1e207f-ac8b-44e7-9ba4-d0f9a01f5c55/jobs/223370)
             - /tmp/yarn-cache
-            # monorepo node_modules folders ("paths" doesn't support globbing, see https://circleci.com/docs/caching#saving-cache)
-            - node_modules
-            - docs/node_modules
-            - packages/eslint-plugin-material-ui/node_modules
-            - packages/toolpad-app/node_modules
-            - packages/toolpad-components/node_modules
-            - packages/toolpad-core/node_modules
       - when:
           condition: << parameters.browsers >>
           steps:
@@ -93,22 +83,12 @@ commands:
 jobs:
   checkout:
     <<: *defaults
-    docker:
-      - image: cimg/node:18.10.0
-        environment:
-          TOOLPAD_SHADOW_DATABASE_URL: postgresql://postgres@localhost/circle_test
-      - image: cimg/postgres:14.5
-        environment:
-          POSTGRES_USER: postgres
     steps:
       - checkout
       - install_js
       - run:
           name: Should not have any git not staged
-          command: git diff --exit-code
-      - run:
-          name: should not have any prisma schema drift
-          command: yarn workspace @mui/toolpad-app prisma-detect-drift
+          command: git add -A && git diff --exit-code --staged
       - run:
           name: Check for duplicated packages
           command: yarn deduplicate
@@ -137,13 +117,35 @@ jobs:
           command: yarn check-types
   test_static:
     <<: *defaults
-    resource_class: medium+
     steps:
       - checkout
       - install_js
       - run:
           name: '`yarn prettier` changes committed?'
           command: yarn prettier --check
+      - run:
+          name: '`yarn jsonSchemas` changes committed?'
+          command: |
+            yarn jsonSchemas
+            git add -A && git diff --exit-code --staged
+      - run:
+          name: '`yarn docs:build:api` changes committed?'
+          command: |
+            yarn docs:build:api
+            git add -A && git diff --exit-code --staged
+
+  test_unit:
+    <<: *defaults
+    resource_class: 'large'
+    docker:
+      - image: mcr.microsoft.com/playwright:v1.37.1-focal
+        environment:
+          NODE_ENV: test
+          TOOLPAD_TEST_RETRIES: 1
+
+    steps:
+      - checkout
+      - install_js
       - run:
           name: 'Build packages'
           command: yarn release:build
@@ -152,63 +154,20 @@ jobs:
           key: v0-next-{{ checksum "yarn.lock" }}
           paths:
             - packages/toolpad-app/.next/cache
-
-  test_unit:
-    <<: *defaults
-    steps:
-      - checkout
-      - install_js
       - run:
           name: Tests fake browser
           command: yarn test
-
-  docker:
-    working_directory: /tmp/mui-toolpad
-    resource_class: medium
-    machine: true
-    environment:
-      - DOCKER_BUILDKIT: '1'
-    steps:
-      - checkout
-
-      # build the application image
-      - run: |
-          docker build \
-            --progress plain \
-            -t muicom/toolpad:$CIRCLE_SHA1 \
-            --build-arg GIT_SHA1=$CIRCLE_SHA1 \
-            --build-arg CIRCLE_BUILD_NUM=$CIRCLE_BUILD_NUM \
-            -f ./docker/images/toolpad/Dockerfile \
-            .
-
-      - install_js
-
-      # test the image
       - run:
-          command: |
-            # See https://circleci.com/docs/2.0/env-vars/#setting-an-environment-variable-in-a-shell-command
-            TAG=$CIRCLE_SHA1 docker-compose -f ./docker-compose.test.yml up -d
-            yarn workspace @mui/toolpad-app waitForApp --url=http://172.17.0.1:3000/
-            docker-compose -f ./docker-compose.test.yml run -it --rm playwright yarn test:integration --forbid-only
-            docker-compose -f ./docker-compose.test.yml logs toolpad
-            docker-compose -f ./docker-compose.test.yml down
-
-      # push the image
-      - when:
-          condition:
-            equal: [master, << pipeline.git.branch >>]
-          steps:
-            # login docker hub
-            - run: |
-                echo "$DOCKER_PASS" | docker login --username $DOCKER_USER --password-stdin
-
-            - run: |
-                docker push muicom/toolpad:$CIRCLE_SHA1
-                docker tag muicom/toolpad:$CIRCLE_SHA1 muicom/toolpad:alpha
-                docker push muicom/toolpad:alpha
+          name: Tests real browser
+          command: yarn test:integration
+      - run:
+          name: Upload screenshots to Argos CI
+          command: yarn test:argos
+      - store_artifacts:
+          path: test-results
+          destination: playwright-test-results
 
 workflows:
-  version: 2
   pipeline:
     jobs:
       - checkout
@@ -224,4 +183,3 @@ workflows:
       - test_unit:
           requires:
             - checkout
-      - docker

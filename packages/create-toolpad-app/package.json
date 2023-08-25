@@ -1,0 +1,46 @@
+{
+  "name": "create-toolpad-app",
+  "version": "0.1.25",
+  "keywords": [
+    "react",
+    "toolpad",
+    "mui"
+  ],
+  "description": "Create Toolpad apps with one command",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/mui/mui-toolpad",
+    "directory": "packages/create-toolpad-app"
+  },
+  "author": "Toolpad Team",
+  "license": "MIT",
+  "bin": {
+    "create-toolpad-app": "./dist/index.js"
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "check-types": "tsc --noEmit",
+    "test": "cross-env NODE_OPTIONS=--experimental-vm-modules jest --detectOpenHandles --forceExit"
+  },
+  "engines": {
+    "node": ">=16.14.2"
+  },
+  "dependencies": {
+    "@mui/toolpad-utils": "0.1.25",
+    "chalk": "5.3.0",
+    "execa": "7.2.0",
+    "inquirer": "9.2.10",
+    "invariant": "2.2.4",
+    "semver": "7.5.4",
+    "yargs": "17.7.2"
+  },
+  "devDependencies": {
+    "@types/inquirer": "9.0.3",
+    "node-fetch": "2.6.13"
+  },
+  "gitHead": "206e4443c1d99f68f0e033dab68ecdade1c25cc6"
+}

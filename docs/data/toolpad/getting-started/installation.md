@@ -2,26 +2,53 @@
 
 <p class="description">Setup Toolpad to run on your own machine.</p>
 
-## With Docker
+## Create a Toolpad app
 
-### Prerequisites
+Start by opening a terminal and `cd` into a folder you'd like to create your application in.
+Then run the command:
 
-- A Docker and Docker Compose installation. Follow [official instructions](https://www.docker.com/get-started/) to get started.
+<codeblock storageKey="package-manager">
 
-### Steps
+```bash npm
+npx create-toolpad-app@latest my-toolpad-app
+```
 
-1. Download our basic Docker Compose configuration:
+```bash yarn
+yarn create toolpad-app my-toolpad-app
+```
 
-   ```sh
-   curl -LO https://raw.githubusercontent.com/mui/mui-toolpad/master/docker/compose/docker-compose.yml
-   ```
+```bash pnpm
+pnpm create toolpad-app my-toolpad-app
+```
 
-   This file contains a basic configuration, setting up a database and the Toolpad application server. You can use it as a starting point or for local development.
+</codeblock>
 
-1. Run the docker compose services with:
+This will run the `create-toolpad-app` CLI which initializes the directory `./my-toolpad-app` with a Toolpad application.
 
-   ```sh
-   docker-compose -f docker-compose.yml up -d
-   ```
+## Run the Toolpad editor
 
-1. Build and deploy applications on http://localhost:3000/.
+Change the current working directory to the application folder:
+
+```bash
+cd my-toolpad-app
+```
+
+Then start the development mode
+
+<codeblock storageKey="package-manager">
+
+```bash npm
+npm run dev
+```
+
+```bash yarn
+yarn dev
+```
+
+```bash pnpm
+pnpm run dev
+```
+
+</codeblock>
+
+This starts the development server on port `3000` or the first available port after that and opens the browser to the Toolpad editor.

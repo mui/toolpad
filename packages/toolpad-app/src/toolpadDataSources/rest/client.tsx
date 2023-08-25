@@ -12,20 +12,13 @@ import {
   Typography,
   Alert,
   styled,
-  Checkbox,
-  FormControlLabel,
-  FormGroup,
 } from '@mui/material';
 import { Controller, useForm } from 'react-hook-form';
 import { TabContext, TabList } from '@mui/lab';
 import { useBrowserJsRuntime } from '@mui/toolpad-core/jsBrowserRuntime';
 import { useServerJsRuntime } from '@mui/toolpad-core/jsServerRuntime';
-import {
-  ClientDataSource,
-  ConnectionEditorProps,
-  ExecFetchFn,
-  QueryEditorProps,
-} from '../../types';
+import { Panel, PanelGroup, PanelResizeHandle } from '../../components/resizablePanels';
+import { ClientDataSource, ConnectionEditorProps, QueryEditorProps } from '../../types';
 import {
   FetchPrivateQuery,
   FetchQuery,
@@ -33,6 +26,7 @@ import {
   RestConnectionParams,
   Body,
   ResponseType,
+  IntrospectionResult,
 } from './types';
 import { getAuthenticationHeaders, getDefaultUrl, parseBaseUrl } from './shared';
 import BindableEditor, {
@@ -50,25 +44,20 @@ import * as appDom from '../../appDom';
 import ParametersEditor from '../../toolpad/AppEditor/PageEditor/ParametersEditor';
 import BodyEditor from './BodyEditor';
 import TabPanel from '../../components/TabPanel';
-import SplitPane from '../../components/SplitPane';
 import JsonView from '../../components/JsonView';
 import useQueryPreview from '../useQueryPreview';
 import TransformInput from '../TranformInput';
 import Devtools from '../../components/Devtools';
 import { createHarLog, mergeHar } from '../../utils/har';
-import config from '../../config';
 import QueryInputPanel from '../QueryInputPanel';
 import useFetchPrivate from '../useFetchPrivate';
-import { clientExec } from './runtime';
 import QueryPreview from '../QueryPreview';
+import { usePrivateQuery } from '../context';
+import config from '../../config';
 
 const HTTP_METHODS = ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'HEAD'];
 
 const QUERY_SCOPE_META: ScopeMeta = {
-  query: {
-    deprecated: 'Use parameters variable instead',
-    description: 'Parameters that can be bound to app scope variables',
-  },
   parameters: {
     description: 'Parameters that can be bound to app scope variables',
   },
@@ -263,13 +252,21 @@ function QueryEditor({
   value: input,
   onChange: setInput,
 }: QueryEditorProps<RestConnectionParams, FetchQuery>) {
-  const isBrowserSide = input.attributes.query.value.browser;
+  const isBrowserSide = input.attributes.query.browser;
 
   const connectionParams = isBrowserSide ? null : rawConnectionParams;
   const baseUrl = isBrowserSide ? null : connectionParams?.baseUrl ?? null;
 
   const urlValue: BindableAttrValue<string> =
-    input.attributes.query.value.url || getDefaultUrl(connectionParams);
+    input.attributes.query.url || getDefaultUrl(config, connectionParams);
+
+  const introspection = usePrivateQuery<FetchPrivateQuery, IntrospectionResult>(
+    {
+      kind: 'introspection',
+    },
+    { retry: false },
+  );
+  const envVarNames = React.useMemo(() => introspection?.data?.envVarNames || [], [introspection]);
 
   const handleParamsChange = React.useCallback(
     (newParams: [string, BindableAttrValue<string>][]) => {
@@ -280,9 +277,7 @@ function QueryEditor({
 
   const handleUrlChange = React.useCallback(
     (newUrl: BindableAttrValue<string> | null) => {
-      setInput((existing) =>
-        appDom.setQueryProp(existing, 'url', newUrl || appDom.createConst('')),
-      );
+      setInput((existing) => appDom.setQueryProp(existing, 'url', newUrl || ''));
     },
     [setInput],
   );
@@ -290,13 +285,6 @@ function QueryEditor({
   const handleMethodChange = React.useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
       setInput((existing) => appDom.setQueryProp(existing, 'method', event.target.value));
-    },
-    [setInput],
-  );
-
-  const handleRunInBrowserChange = React.useCallback(
-    (event: React.ChangeEvent<HTMLInputElement>) => {
-      setInput((existing) => appDom.setQueryProp(existing, 'browser', event.target.checked));
     },
     [setInput],
   );
@@ -363,8 +351,6 @@ function QueryEditor({
 
   const queryScope = React.useMemo(
     () => ({
-      // TODO mark query as @deprecated remove after v1
-      query: previewParams,
       parameters: previewParams,
     }),
     [previewParams],
@@ -378,27 +364,24 @@ function QueryEditor({
 
   const liveSearchParams = useEvaluateLiveBindingEntries({
     jsRuntime: jsServerRuntime,
-    input: input.attributes.query.value.searchParams || [],
+    input: input.attributes.query.searchParams || [],
     globalScope: queryScope,
   });
 
   const liveHeaders = useEvaluateLiveBindingEntries({
     jsRuntime: jsServerRuntime,
-    input: input.attributes.query.value.headers || [],
+    input: input.attributes.query.headers || [],
     globalScope: queryScope,
   });
 
   const [activeTab, setActiveTab] = React.useState('urlQuery');
 
   const fetchPrivate = useFetchPrivate<FetchPrivateQuery, FetchResult>();
-  const fetchServerPreview = React.useCallback(
+  const fetchPreview = React.useCallback(
     (query: FetchQuery, params: Record<string, string>) =>
       fetchPrivate({ kind: 'debugExec', query, params }),
     [fetchPrivate],
   );
-
-  const fetchPreview: ExecFetchFn<FetchQuery, FetchResult> = (query, params) =>
-    clientExec(query, params, fetchServerPreview);
 
   const [previewHar, setPreviewHar] = React.useState(() => createHarLog());
   const {
@@ -407,7 +390,7 @@ function QueryEditor({
     isLoading: previewIsLoading,
   } = useQueryPreview(
     fetchPreview,
-    input.attributes.query.value,
+    input.attributes.query,
     previewParams as Record<string, string>,
     {
       onPreview(result) {
@@ -426,156 +409,157 @@ function QueryEditor({
   );
 
   return (
-    <SplitPane split="vertical" size="50%" allowResize>
-      <SplitPane split="horizontal" size={85} primary="second" allowResize>
-        <QueryInputPanel
-          onRunPreview={handleRunPreview}
-          actions={
-            <FormGroup>
-              <FormControlLabel
-                control={
-                  <Checkbox
-                    checked={isBrowserSide}
-                    onChange={handleRunInBrowserChange}
-                    disabled={config.isDemo}
-                  />
-                }
-                label="Run in the browser"
-              />
-            </FormGroup>
-          }
-        >
-          <Stack gap={2} sx={{ px: 3, pt: 1 }}>
-            <Typography>Query</Typography>
-            <Box sx={{ display: 'flex', flexDirection: 'row', gap: 1 }}>
-              <TextField
-                select
-                value={input.attributes.query.value.method || 'GET'}
-                onChange={handleMethodChange}
-              >
-                {HTTP_METHODS.map((method) => (
-                  <MenuItem key={method} value={method}>
-                    {method}
-                  </MenuItem>
-                ))}
-              </TextField>
-              <BindableEditor
-                liveBinding={liveUrl}
-                globalScope={queryScope}
-                globalScopeMeta={QUERY_SCOPE_META}
-                sx={{ flex: 1 }}
-                jsRuntime={jsServerRuntime}
-                label="url"
-                propType={{ type: 'string' }}
-                renderControl={(props) => <UrlControl baseUrl={baseUrl} {...props} />}
-                value={urlValue}
-                onChange={handleUrlChange}
-              />
-            </Box>
-            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
-              <TabContext value={activeTab}>
-                <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
-                  <TabList onChange={handleActiveTabChange} aria-label="Fetch options active tab">
-                    <Tab label="URL query" value="urlQuery" />
-                    <Tab label="Body" value="body" />
-                    <Tab label="Headers" value="headers" />
-                    <Tab label="Response" value="response" />
-                    <Tab label="Transform" value="transform" />
-                  </TabList>
-                </Box>
-                <TabPanel disableGutters value="urlQuery">
-                  <ParametersEditor
-                    value={input.attributes.query.value.searchParams ?? []}
-                    onChange={handleSearchParamsChange}
-                    globalScope={queryScope}
-                    globalScopeMeta={QUERY_SCOPE_META}
-                    liveValue={liveSearchParams}
-                    jsRuntime={jsServerRuntime}
-                  />
-                </TabPanel>
-                <TabPanel disableGutters value="body">
-                  <BodyEditor
-                    value={input.attributes.query.value.body}
-                    onChange={handleBodyChange}
-                    globalScope={queryScope}
-                    globalScopeMeta={QUERY_SCOPE_META}
-                    method={input.attributes.query.value.method || 'GET'}
-                  />
-                </TabPanel>
-                <TabPanel disableGutters value="headers">
-                  <ParametersEditor
-                    value={input.attributes.query.value.headers ?? []}
-                    onChange={handleHeadersChange}
-                    globalScope={queryScope}
-                    globalScopeMeta={QUERY_SCOPE_META}
-                    liveValue={liveHeaders}
-                    jsRuntime={jsServerRuntime}
-                  />
-                </TabPanel>
-                <TabPanel disableGutters value="response">
+    <PanelGroup direction="vertical">
+      <Panel defaultSize={70}>
+        <PanelGroup direction="horizontal">
+          <Panel defaultSize={60} minSize={40}>
+            <QueryInputPanel onRunPreview={handleRunPreview}>
+              <Stack gap={2} sx={{ px: 3, pt: 1 }}>
+                <Typography>Query</Typography>
+                <Box sx={{ display: 'flex', flexDirection: 'row', gap: 1 }}>
                   <TextField
                     select
-                    label="response type"
-                    sx={{ width: 200, mt: 1 }}
-                    value={input.attributes.query.value.response?.kind || 'json'}
-                    onChange={handleResponseTypeChange}
+                    value={input.attributes.query.method || 'GET'}
+                    onChange={handleMethodChange}
                   >
-                    <MenuItem value="raw">raw</MenuItem>
-                    <MenuItem value="json">JSON</MenuItem>
-                    <MenuItem value="csv" disabled>
-                      🚧 CSV
-                    </MenuItem>
-                    <MenuItem value="xml" disabled>
-                      🚧 XML
-                    </MenuItem>
+                    {HTTP_METHODS.map((method) => (
+                      <MenuItem key={method} value={method}>
+                        {method}
+                      </MenuItem>
+                    ))}
                   </TextField>
-                </TabPanel>
-                <TabPanel disableGutters value="transform">
-                  <TransformInput
-                    value={input.attributes.query.value.transform ?? 'return data;'}
-                    onChange={handleTransformChange}
-                    enabled={input.attributes.query.value.transformEnabled ?? false}
-                    onEnabledChange={handleTransformEnabledChange}
-                    globalScope={{ data: preview?.untransformedData }}
-                    loading={false}
+                  <BindableEditor<string>
+                    liveBinding={liveUrl}
+                    globalScope={queryScope}
+                    globalScopeMeta={QUERY_SCOPE_META}
+                    sx={{ flex: 1 }}
+                    jsRuntime={jsServerRuntime}
+                    label="url"
+                    propType={{ type: 'string' }}
+                    renderControl={(props) => <UrlControl baseUrl={baseUrl} {...props} />}
+                    value={urlValue}
+                    onChange={handleUrlChange}
                   />
-                </TabPanel>
-              </TabContext>
+                </Box>
+                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+                  <TabContext value={activeTab}>
+                    <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
+                      <TabList
+                        onChange={handleActiveTabChange}
+                        aria-label="Fetch options active tab"
+                      >
+                        <Tab label="URL query" value="urlQuery" />
+                        <Tab label="Body" value="body" />
+                        <Tab label="Headers" value="headers" />
+                        <Tab label="Response" value="response" />
+                        <Tab label="Transform" value="transform" />
+                      </TabList>
+                    </Box>
+                    <TabPanel disableGutters value="urlQuery">
+                      <ParametersEditor
+                        value={input.attributes.query.searchParams ?? []}
+                        onChange={handleSearchParamsChange}
+                        globalScope={queryScope}
+                        globalScopeMeta={QUERY_SCOPE_META}
+                        liveValue={liveSearchParams}
+                        jsRuntime={jsServerRuntime}
+                      />
+                    </TabPanel>
+                    <TabPanel disableGutters value="body">
+                      <BodyEditor
+                        value={input.attributes.query.body}
+                        onChange={handleBodyChange}
+                        globalScope={queryScope}
+                        globalScopeMeta={QUERY_SCOPE_META}
+                        method={input.attributes.query.method || 'GET'}
+                      />
+                    </TabPanel>
+                    <TabPanel disableGutters value="headers">
+                      <ParametersEditor
+                        value={input.attributes.query.headers ?? []}
+                        onChange={handleHeadersChange}
+                        globalScope={queryScope}
+                        globalScopeMeta={QUERY_SCOPE_META}
+                        liveValue={liveHeaders}
+                        jsRuntime={jsServerRuntime}
+                        envVarNames={envVarNames}
+                      />
+                    </TabPanel>
+                    <TabPanel disableGutters value="response">
+                      <TextField
+                        select
+                        label="response type"
+                        sx={{ width: 200, mt: 1 }}
+                        value={input.attributes.query.response?.kind || 'json'}
+                        onChange={handleResponseTypeChange}
+                      >
+                        <MenuItem value="raw">raw</MenuItem>
+                        <MenuItem value="json">JSON</MenuItem>
+                        <MenuItem value="csv" disabled>
+                          🚧 CSV
+                        </MenuItem>
+                        <MenuItem value="xml" disabled>
+                          🚧 XML
+                        </MenuItem>
+                      </TextField>
+                    </TabPanel>
+                    <TabPanel disableGutters value="transform">
+                      <TransformInput
+                        value={input.attributes.query.transform ?? 'return data;'}
+                        onChange={handleTransformChange}
+                        enabled={input.attributes.query.transformEnabled ?? false}
+                        onEnabledChange={handleTransformEnabledChange}
+                        globalScope={{ data: preview?.untransformedData }}
+                        loading={false}
+                      />
+                    </TabPanel>
+                  </TabContext>
+                </Box>
+              </Stack>
+            </QueryInputPanel>
+          </Panel>
+
+          <PanelResizeHandle />
+
+          <Panel>
+            <Box sx={{ p: 2, height: '100%', overflow: 'auto' }}>
+              <Typography>Parameters</Typography>
+              <ParametersEditor
+                value={paramsEntries}
+                onChange={handleParamsChange}
+                globalScope={globalScope}
+                globalScopeMeta={globalScopeMeta}
+                liveValue={paramsEditorLiveValue}
+                jsRuntime={jsBrowserRuntime}
+              />
             </Box>
-          </Stack>
-        </QueryInputPanel>
+          </Panel>
+        </PanelGroup>
+      </Panel>
 
-        <Box sx={{ p: 2, height: '100%', overflow: 'auto' }}>
-          <Typography>Parameters</Typography>
-          <ParametersEditor
-            value={paramsEntries}
-            onChange={handleParamsChange}
-            globalScope={globalScope}
-            globalScopeMeta={globalScopeMeta}
-            liveValue={paramsEditorLiveValue}
-            jsRuntime={jsBrowserRuntime}
-          />
-        </Box>
-      </SplitPane>
+      <PanelResizeHandle />
 
-      <SplitPane
-        split="horizontal"
-        size="30%"
-        minSize={30}
-        primary="second"
-        allowResize
-        pane1Style={{ overflow: 'auto' }}
-      >
-        <QueryPreview isLoading={previewIsLoading} error={preview?.error}>
-          <ResolvedPreview preview={preview} onShowTransform={() => setActiveTab('transform')} />
-        </QueryPreview>
-        <Devtools
-          sx={{ width: '100%', height: '100%' }}
-          har={previewHar}
-          onHarClear={handleHarClear}
-        />
-      </SplitPane>
-    </SplitPane>
+      <Panel defaultSize={30} maxSize={50} minSize={20}>
+        <PanelGroup direction="horizontal">
+          <Panel defaultSize={60}>
+            <QueryPreview isLoading={previewIsLoading} error={preview?.error}>
+              <ResolvedPreview
+                preview={preview}
+                onShowTransform={() => setActiveTab('transform')}
+              />
+            </QueryPreview>
+          </Panel>
+          <PanelResizeHandle />
+          <Panel>
+            <Devtools
+              sx={{ width: '100%', height: '100%' }}
+              har={previewHar}
+              onHarClear={handleHarClear}
+            />
+          </Panel>
+        </PanelGroup>
+      </Panel>
+    </PanelGroup>
   );
 }
 
@@ -583,7 +567,7 @@ function getInitialQueryValue(): FetchQuery {
   return {
     method: 'GET',
     headers: [],
-    browser: config.isDemo,
+    browser: false,
   };
 }
 

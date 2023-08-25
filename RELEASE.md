@@ -2,7 +2,7 @@
 
 1. Generate a new version using:
 
-   ```sh
+   ```bash
    yarn release:version
    ```
 
@@ -10,7 +10,7 @@
 
 1. Generate the changelog using:
 
-   ```sh
+   ```bash
    yarn release:changelog
    ```
 
@@ -31,39 +31,55 @@
 
 1. Prepend the changelog to [`CHANGELOG.md`](./CHANGELOG.md).
 
-1. Open a PR with the proposed changes.
+1. Open a PR to the `master` branch with the proposed changes. Add the "release" label.
 
-1. Review/merge the PR — once the PR is merged to `master` a Docker image is built for the commit, tagged with the commit SHA and then pushed to Docker Hub, just like for any other commit in `master`.
+1. Publish the package to `npm`
 
-1. Wait for the Docker build to finish. (You can find the job in the [CircleCI pipelines](https://app.circleci.com/pipelines/github/mui/mui-toolpad?branch=master)). Note that you can always verify the built docker image by running it as
+   1. If you are not logged in to `npm` in your CLI, first log in with:
 
-   ```sh
-   TAG=<git-sha> docker-compose -f docker/compose/docker-compose.yml up
-   ```
+      ```bash
+      npm login
+      ```
 
-   Where `<git-sha>` is the commit on master that you want to test.
+   1. Publish to `npm`
 
-1. Release the Docker image using (requires GitHub authentication token):
+      ```bash
+      yarn release:publish
+      ```
 
-   ```sh
-   # add --prerelease if necessary
-   yarn release:docker
-   ```
+      If you've created a prerelease, then instead use
 
-   This command runs a GitHub action that retags the Docker image of the release commit in `master` to the version being released and also to "latest", and pushes those new tags. During the release, no new Docker images are created.
+      ```bash
+      yarn release:publish-canary
+      ```
+
+1. Merge the changes.
 
 1. Publish the documentation. The documentation must be updated on the `docs-latest` branch.
 
-   ```sh
+   ```bash
    git push upstream master:docs-latest -f
    ```
 
    You can follow the deployment process on the [Netlify Dashboard](https://app.netlify.com/sites/mui-toolpad-docs/deploys?filter=docs-latest). Once deployed, it will be accessible at https://mui-toolpad-docs.netlify.app/.
 
 1. [Create a new GitHub release](https://github.com/mui/mui-toolpad/releases/new).
+
    1. Use `<version number>` to **Choose a tag** (when you enter new version GH UI will pop a suggestion `Create new tag: *** on publish`)
    1. Use `<commit of merged PR>` as the **target**
    1. Use the cleaned changelog as the content of **Describe this release**
    1. Use `<version number>` as the **Release title**
    1. Mark as prerelease if necessary.
    1. **Publish release**
+
+1. Smoke test the release:
+
+   1. Run
+
+   ```bash
+   yarn create toolpad-app test-app
+   cd test-app
+   yarn dev
+   ```
+
+   And verify the editor works

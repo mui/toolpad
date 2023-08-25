@@ -2,12 +2,9 @@ import { NodeId } from '@mui/toolpad-core';
 import { matchPath } from 'react-router-dom';
 import { APP_PAGE_ROUTE, APP_CONNECTION_ROUTE, APP_CODE_COMPONENT_ROUTE } from '../routes';
 
-export type PageView =
-  | { kind: 'query'; nodeId: NodeId }
-  | { kind: 'pageModule' }
-  | { kind: 'pageParameters' };
+export type PageView = { kind: 'query'; nodeId: NodeId } | { kind: 'pageParameters' };
 
-export type PageViewTab = 'component' | 'theme';
+export type PageViewTab = 'page' | 'component' | 'theme';
 
 export type DomView =
   | {
@@ -15,19 +12,20 @@ export type DomView =
       nodeId?: NodeId;
       view?: PageView;
       selectedNodeId?: NodeId | null;
+      hoveredNodeId?: NodeId | null;
       tab?: PageViewTab;
     }
   | { kind: 'connection'; nodeId: NodeId }
   | { kind: 'codeComponent'; nodeId: NodeId };
 
-export function getPathnameFromView(appId: string, view: DomView): string {
+export function getPathnameFromView(view: DomView): string {
   switch (view.kind) {
     case 'page':
-      return `/app/${appId}/pages/${view.nodeId}`;
+      return view.nodeId ? `/app/pages/${view.nodeId}` : '/app/pages';
     case 'connection':
-      return `/app/${appId}/connections/${view.nodeId}`;
+      return `/app/connections/${view.nodeId}`;
     case 'codeComponent':
-      return `/app/${appId}/codeComponents/${view.nodeId}`;
+      return `/app/codeComponents/${view.nodeId}`;
     default:
       throw new Error(`Unknown view "${(view as DomView).kind}".`);
   }
@@ -40,7 +38,7 @@ export function getViewFromPathname(pathname: string): DomView | null {
       kind: 'page',
       nodeId: pageRouteMatch.params.nodeId as NodeId,
       selectedNodeId: null,
-      tab: 'component',
+      tab: 'page',
     };
   }
 

@@ -1,49 +1,101 @@
 import * as path from 'path';
-import { test, expect } from '../../playwright/test';
+import * as fs from 'fs/promises';
+import { fileReplaceAll } from '../../../packages/toolpad-utils/src/fs';
+import { test, expect } from '../../playwright/localTest';
 import { ToolpadRuntime } from '../../models/ToolpadRuntime';
-import { readJsonFile } from '../../utils/fs';
 import { ToolpadEditor } from '../../models/ToolpadEditor';
-import generateId from '../../utils/generateId';
+import { startTestServer } from './testServer';
+import { withTemporaryEdits } from '../../utils/fs';
 
-// We can run our own httpbin instance if necessary:
-//    $ docker run -p 80:80 kennethreitz/httpbin
-const customHttbinBaseUrl = process.env.HTTPBIN_BASEURL;
+let testServer: Awaited<ReturnType<typeof startTestServer>> | undefined;
 
-if (customHttbinBaseUrl) {
-  // eslint-disable-next-line no-console
-  console.log(`Running tests with custom httpbin service: ${customHttbinBaseUrl}`);
-}
+test.use({
+  localAppConfig: {
+    template: path.resolve(__dirname, './fixture'),
+    cmd: 'dev',
+    env: {
+      TEST_VAR: 'foo',
+    },
+    async setup(ctx) {
+      testServer = await startTestServer();
+      const targetUrl = `http://localhost:${testServer.port}/`;
+      const pageFilePath = path.resolve(ctx.dir, './toolpad/pages/page1/page.yml');
+      await fileReplaceAll(pageFilePath, `http://localhost:8080/`, targetUrl);
+    },
+  },
+});
 
-const HTTPBIN_SOURCE_URL = 'https://httpbin.org/';
-const HTTPBIN_TARGET_URL = customHttbinBaseUrl || HTTPBIN_SOURCE_URL;
+test.afterAll(async () => {
+  testServer?.close();
+});
 
-test('rest basics', async ({ page, api }) => {
-  const dom = await readJsonFile(path.resolve(__dirname, './restDom.json'), (key, value) => {
-    if (typeof value === 'string') {
-      return value.replaceAll(HTTPBIN_SOURCE_URL, HTTPBIN_TARGET_URL);
-    }
-    return value;
-  });
-
-  const app = await api.mutation.createApp(`App ${generateId()}`, {
-    from: { kind: 'dom', dom },
-  });
-
+test('rest runtime basics', async ({ page, localApp }) => {
   const runtimeModel = new ToolpadRuntime(page);
-  await runtimeModel.gotoPage(app.id, 'page1');
+  await runtimeModel.gotoPage('page1');
   await expect(page.locator('text="query1: query1_value"')).toBeVisible();
   await expect(page.locator('text="query2: undefined"')).toBeVisible();
   await page.locator('button:has-text("fetch query2")').click();
   await expect(page.locator('text="query2: query2_value"')).toBeVisible();
-  await expect(page.locator('text="browserQuery: browserQuery_value"')).toBeVisible();
-  await expect(page.locator('text="browserQuery: browserQuery_value"')).toBeVisible();
 
+  await expect(page.getByText('query3: Transformed')).toBeVisible();
+
+  await expect(page.getByText('query4 authorization: foo')).toBeVisible();
+
+  const envFilePath = path.resolve(localApp.dir, './.env');
+  await withTemporaryEdits(envFilePath, async () => {
+    await expect(page.getByText('query4 authorization: foo')).toBeVisible();
+    await fs.writeFile(envFilePath, 'TEST_VAR=bar');
+    await page.reload();
+    await expect(page.getByText('query4 authorization: bar')).toBeVisible();
+  });
+});
+
+test('rest editor basics', async ({ page, context, localApp }) => {
   const editorModel = new ToolpadEditor(page);
-  await editorModel.goto(app.id);
+  await editorModel.goto();
+  await editorModel.waitForOverlay();
 
-  await editorModel.componentEditor.getByRole('button', { name: 'browserQuery' }).click();
-  const queryEditor = page.getByRole('dialog', { name: 'browserQuery' });
-  await queryEditor.getByRole('button', { name: 'Preview' }).click();
-  const networkTab = queryEditor.getByRole('tabpanel', { name: 'Network' });
-  await expect(networkTab.getByText('/get?browserQuery_param1=browserQuery_value')).not.toBeEmpty();
+  await editorModel.pageEditor.getByRole('button', { name: 'Add query' }).click();
+  await page.getByRole('button', { name: 'HTTP request' }).click();
+
+  const newQueryEditor = page.getByRole('dialog', { name: 'query' });
+
+  await expect(newQueryEditor).toBeVisible();
+
+  const envFilePath = path.resolve(localApp.dir, './.env');
+  await withTemporaryEdits(envFilePath, async () => {
+    await expect(editorModel.appCanvas.getByText('query4 authorization: foo')).toBeVisible();
+    await fs.writeFile(envFilePath, 'TEST_VAR=bar');
+    await expect(editorModel.appCanvas.getByText('query4 authorization: bar')).toBeVisible();
+  });
+
+  // Make sure switching tabs does not close query editor
+  const newTab = await context.newPage();
+  await newTab.bringToFront();
+  await page.bringToFront();
+  await newTab.close();
+  await expect(newQueryEditor).toBeVisible();
+
+  await newQueryEditor.getByRole('button', { name: 'Save' }).click();
+  await expect(newQueryEditor).not.toBeVisible();
+
+  await editorModel.pageEditor.getByRole('button', { name: 'query1' }).click();
+
+  const existingQueryEditor = page.getByRole('dialog', { name: 'query1' });
+
+  await expect(existingQueryEditor).toBeVisible();
+
+  await existingQueryEditor.getByRole('button', { name: 'Preview' }).click();
+  const networkTab = existingQueryEditor.getByRole('tabpanel', { name: 'Network' });
+  await expect(networkTab.getByText('/get?query1_param1=query1_value')).not.toBeEmpty();
+
+  await newQueryEditor.getByRole('tab', { name: 'Headers' }).click();
+
+  await existingQueryEditor.getByRole('button', { name: 'Cancel' }).click();
+  await expect(existingQueryEditor).not.toBeVisible();
+
+  await editorModel.pageEditor.getByRole('button', { name: 'queryWithEnv' }).click();
+
+  const queryWithEnvQueryEditor = page.getByRole('dialog', { name: 'queryWithEnv' });
+  await queryWithEnvQueryEditor.getByRole('tab', { name: 'Headers' }).click();
 });

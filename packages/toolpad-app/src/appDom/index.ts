@@ -1,23 +1,24 @@
+import { nanoid } from 'nanoid/non-secure';
 import { generateKeyBetween } from 'fractional-indexing';
-import cuid from 'cuid';
 import {
   NodeId,
   NodeReference,
-  ConstantAttrValue,
   BindableAttrValue,
   BindableAttrValues,
   SecretAttrValue,
   BindableAttrEntries,
+  EnvAttrValue,
 } from '@mui/toolpad-core';
 import invariant from 'invariant';
-import { BoxProps } from '@mui/material';
-import { ConnectionStatus, AppTheme } from '../types';
+import { BoxProps, ThemeOptions as MuiThemeOptions } from '@mui/material';
+import { pascalCase, removeDiacritics, uncapitalize } from '@mui/toolpad-utils/strings';
+import { mapProperties, mapValues, hasOwnProperty } from '@mui/toolpad-utils/collections';
+import { ConnectionStatus } from '../types';
 import { omit, update, updateOrCreate } from '../utils/immutability';
-import { camelCase, removeDiacritics } from '../utils/strings';
 import { ExactEntriesOf, Maybe } from '../utils/types';
-import { mapProperties, mapValues } from '../utils/collections';
+import { envBindingSchema } from '../server/schema';
 
-export const CURRENT_APPDOM_VERSION = 5;
+export const CURRENT_APPDOM_VERSION = 7;
 
 export const RESERVED_NODE_PROPERTIES = [
   'id',
@@ -50,7 +51,7 @@ type AppDomNodeType =
   | 'query'
   | 'mutation';
 
-interface AppDomNodeBase {
+export interface AppDomNodeBase {
   readonly id: NodeId;
   readonly type: AppDomNodeType;
   readonly name: string;
@@ -67,44 +68,48 @@ export interface AppNode extends AppDomNodeBase {
 
 export interface ThemeNode extends AppDomNodeBase {
   readonly type: 'theme';
-  readonly theme?: BindableAttrValues<AppTheme>;
+  readonly theme?: MuiThemeOptions;
 }
 
 export interface ConnectionNode<P = unknown> extends AppDomNodeBase {
   readonly type: 'connection';
   readonly attributes: {
-    readonly dataSource: ConstantAttrValue<string>;
+    readonly dataSource: string;
     readonly params: SecretAttrValue<P | null>;
-    readonly status: ConstantAttrValue<ConnectionStatus | null>;
+    readonly status: ConnectionStatus | null;
   };
 }
+
+export type PageDisplayMode = 'standalone' | 'shell';
 
 export interface PageNode extends AppDomNodeBase {
   readonly type: 'page';
   readonly attributes: {
-    readonly title: ConstantAttrValue<string>;
-    readonly parameters?: ConstantAttrValue<[string, string][]>;
-    readonly module?: ConstantAttrValue<string>;
+    readonly title: string;
+    readonly parameters?: [string, string][];
+    readonly module?: string;
+    readonly display?: PageDisplayMode;
   };
 }
 
 export interface ElementNode<P = any> extends AppDomNodeBase {
   readonly type: 'element';
   readonly attributes: {
-    readonly component: ConstantAttrValue<string>;
+    readonly component: string;
   };
   readonly props?: BindableAttrValues<P>;
   readonly layout?: {
-    readonly horizontalAlign?: ConstantAttrValue<BoxProps['justifyContent']>;
-    readonly verticalAlign?: ConstantAttrValue<BoxProps['alignItems']>;
-    readonly columnSize?: ConstantAttrValue<number>;
+    readonly horizontalAlign?: BoxProps['justifyContent'];
+    readonly verticalAlign?: BoxProps['alignItems'];
+    readonly columnSize?: number;
   };
 }
 
 export interface CodeComponentNode extends AppDomNodeBase {
   readonly type: 'codeComponent';
   readonly attributes: {
-    readonly code: ConstantAttrValue<string>;
+    readonly code: string;
+    readonly isNew?: boolean;
   };
 }
 
@@ -120,18 +125,18 @@ export interface QueryNode<Q = any> extends AppDomNodeBase {
   readonly type: 'query';
   readonly params?: BindableAttrEntries;
   readonly attributes: {
-    readonly mode?: ConstantAttrValue<FetchMode>;
-    readonly dataSource?: ConstantAttrValue<string>;
-    readonly connectionId: ConstantAttrValue<NodeReference | null>;
-    readonly query: ConstantAttrValue<Q>;
-    readonly transform?: ConstantAttrValue<string>;
-    readonly transformEnabled?: ConstantAttrValue<boolean>;
+    readonly mode?: FetchMode;
+    readonly dataSource?: string;
+    readonly connectionId: NodeReference | null;
+    readonly query: Q;
+    readonly transform?: string;
+    readonly transformEnabled?: boolean;
     /** @deprecated Not necessary to be user-facing, we will expose staleTime instead if necessary */
-    readonly refetchOnWindowFocus?: ConstantAttrValue<boolean>;
+    readonly refetchOnWindowFocus?: boolean;
     /** @deprecated Not necessary to be user-facing, we will expose staleTime instead if necessary */
-    readonly refetchOnReconnect?: ConstantAttrValue<boolean>;
-    readonly refetchInterval?: ConstantAttrValue<number>;
-    readonly cacheTime?: ConstantAttrValue<number>;
+    readonly refetchOnReconnect?: boolean;
+    readonly refetchInterval?: number;
+    readonly cacheTime?: number;
     readonly enabled?: BindableAttrValue<boolean>;
   };
 }
@@ -143,9 +148,9 @@ export interface MutationNode<Q = any> extends AppDomNodeBase {
   readonly type: 'mutation';
   readonly params?: BindableAttrValues;
   readonly attributes: {
-    readonly dataSource?: ConstantAttrValue<string>;
-    readonly connectionId: ConstantAttrValue<NodeReference | null>;
-    readonly query: ConstantAttrValue<Q>;
+    readonly dataSource?: string;
+    readonly connectionId: NodeReference | null;
+    readonly query: Q;
   };
 }
 
@@ -230,16 +235,12 @@ function assertIsType<T extends AppDomNode>(node: AppDomNode, type: T['type']): 
   invariant(isType(node, type), `Expected node type "${type}" but got "${node.type}"`);
 }
 
-function createId(): NodeId {
-  return cuid.slug() as NodeId;
-}
-
-export function createConst<V>(value: V): ConstantAttrValue<V> {
-  return { type: 'const', value };
+export function createId(): NodeId {
+  return nanoid(7) as NodeId;
 }
 
 export function createSecret<V>(value: V): SecretAttrValue<V> {
-  return { type: 'secret', value };
+  return { $$secret: value };
 }
 
 export function getMaybeNode<T extends AppDomNodeType>(
@@ -353,15 +354,18 @@ export function assertIsMutation<P>(node: AppDomNode): asserts node is MutationN
   assertIsType<MutationNode>(node, 'mutation');
 }
 
+export function getRoot(dom: AppDom): AppDomNode {
+  return getNode(dom, dom.root);
+}
+
 export function getApp(dom: AppDom): AppNode {
-  const rootNode = getNode(dom, dom.root);
-  assertIsApp(rootNode);
-  return rootNode;
+  const app = getRoot(dom);
+  assertIsApp(app);
+  return app;
 }
 
 export type NodeChildren<N extends AppDomNode = any> = ChildNodesOf<N>;
 
-// TODO: memoize the result of this function per dom in a WeakMap
 const childrenMemo = new WeakMap<AppDom, Map<NodeId, NodeChildren<any>>>();
 export function getChildNodes<N extends AppDomNode>(dom: AppDom, parent: N): NodeChildren<N> {
   let domChildrenMemo = childrenMemo.get(dom);
@@ -439,7 +443,8 @@ function slugifyNodeName(nameCandidate: string, fallback: string): string {
   // try to replace accents with relevant ascii
   slug = removeDiacritics(slug);
   // replace spaces with camelcase
-  slug = camelCase(...slug.split(/\s+/));
+  const [first, ...rest] = slug.split(/\s+/);
+  slug = first + pascalCase(...rest);
   // replace disallowed characters for js identifiers
   slug = slug.replace(/[^a-zA-Z0-9]+/g, '_');
   // remove leading digits
@@ -495,18 +500,33 @@ export function createNode<T extends AppDomNodeType>(
   });
 }
 
-export function createDom(): AppDom {
-  const rootId = createId();
+export function createFragmentInternal<T extends AppDomNodeType>(
+  id: NodeId,
+  type: T,
+  init: AppDomNodeInitOfType<T> & { name: string },
+): AppDom {
   return {
     nodes: {
-      [rootId]: createNodeInternal(rootId, 'app', {
-        name: 'Application',
-        attributes: {},
-      }),
+      [id]: createNodeInternal(id, type, init),
     },
-    root: rootId,
+    root: id,
     version: CURRENT_APPDOM_VERSION,
   };
+}
+
+export function createFragment<T extends AppDomNodeType>(
+  type: T,
+  init: AppDomNodeInitOfType<T> & { name: string },
+): AppDom {
+  const rootId = createId();
+  return createFragmentInternal(rootId, type, init);
+}
+
+export function createDom(): AppDom {
+  return createFragment('app', {
+    name: 'Application',
+    attributes: {},
+  });
 }
 
 /**
@@ -520,10 +540,10 @@ export function createElement<P>(
   name?: string,
 ): ElementNode {
   return createNode(dom, 'element', {
-    name: name || component,
+    name: name || uncapitalize(component),
     props,
     attributes: {
-      component: createConst(component),
+      component,
     },
     layout,
   });
@@ -581,6 +601,15 @@ export function getPageAncestor(dom: AppDom, node: AppDomNode): PageNode | null 
     return getPageAncestor(dom, parent);
   }
   return null;
+}
+
+/**
+ * Returns all nodes with a given component type
+ */
+export function getComponentTypeNodes(dom: AppDom, componentId: string): readonly AppDomNode[] {
+  return Object.values(dom.nodes).filter(
+    (node) => isElement(node) && node.attributes.component === componentId,
+  );
 }
 
 /**
@@ -702,13 +731,8 @@ export function setQueryProp<Q, K extends keyof Q>(
   prop: K,
   value: Q[K],
 ): QueryNode<Q> {
-  const original = node.attributes.query.value;
-  return setNamespacedProp(
-    node,
-    'attributes',
-    'query',
-    createConst<Q>({ ...original, [prop]: value }),
-  );
+  const original = node.attributes.query;
+  return setNamespacedProp(node, 'attributes', 'query', { ...original, [prop]: value });
 }
 
 export function setNodeNamespacedProp<
@@ -720,23 +744,14 @@ export function setNodeNamespacedProp<
   node: Node,
   namespace: Namespace,
   prop: Prop,
-  value: NonNullable<Node[Namespace]>[Prop] | null,
+  value: NonNullable<Node[Namespace]>[Prop],
 ): AppDom {
-  if (value) {
-    return update(dom, {
-      nodes: update(dom.nodes, {
-        [node.id]: update(dom.nodes[node.id], {
-          [namespace]: updateOrCreate((dom.nodes[node.id] as Node)[namespace], {
-            [prop]: value,
-          } as any) as Partial<Node[Namespace]>,
-        } as Partial<Node>),
-      }),
-    });
-  }
   return update(dom, {
     nodes: update(dom.nodes, {
-      [node.id]: update(node, {
-        [namespace]: omit(node[namespace]!, prop) as Partial<Node[Namespace]>,
+      [node.id]: update(dom.nodes[node.id], {
+        [namespace]: updateOrCreate((dom.nodes[node.id] as Node)[namespace], {
+          [prop]: value,
+        } as any) as Partial<Node[Namespace]>,
       } as Partial<Node>),
     }),
   });
@@ -830,8 +845,11 @@ export function removeNode(dom: AppDom, nodeId: NodeId) {
   });
 }
 
-export function toConstPropValue<T = any>(value: T): ConstantAttrValue<T> {
-  return { type: 'const', value };
+export function removeMaybeNode(dom: AppDom, nodeId: NodeId): AppDom {
+  if (getMaybeNode(dom, nodeId)) {
+    return removeNode(dom, nodeId);
+  }
+  return dom;
 }
 
 export function fromConstPropValue(prop: undefined): undefined;
@@ -841,10 +859,10 @@ export function fromConstPropValue<T>(prop?: BindableAttrValue<T | undefined>): 
   if (!prop) {
     return undefined;
   }
-  if (prop.type !== 'const') {
+  if (hasOwnProperty(prop, '$$jsExpression') || hasOwnProperty(prop, '$$env')) {
     throw new Error(`trying to unbox a non-constant prop value`);
   }
-  return prop.value;
+  return prop as T;
 }
 
 export function fromConstPropValues<P>(props: BindableAttrValues<P>): Partial<P> {
@@ -1048,13 +1066,7 @@ function createRenderTreeNode(node: AppDomNode): RenderTreeNode | null {
   }
 
   if (isQuery(node) || isMutation(node)) {
-    // This is hacky, should we delegate this check to the datasources?
-    const isBrowserSideRestQuery: boolean =
-      (node.attributes.dataSource?.value === 'rest' ||
-        node.attributes.dataSource?.value === 'function') &&
-      !!(node.attributes.query.value as any).browser;
-
-    if (node.attributes.query.value && !isBrowserSideRestQuery) {
+    if (node.attributes.query) {
       node = setNamespacedProp(node, 'attributes', 'query', null);
     }
   }
@@ -1081,7 +1093,7 @@ export function ref(nodeId: NodeId): NodeReference;
 export function ref(nodeId: null | undefined): null;
 export function ref(nodeId: Maybe<NodeId>): NodeReference | null;
 export function ref(nodeId: Maybe<NodeId>): NodeReference | null {
-  return nodeId ? { $$ref: nodeId } : null;
+  return nodeId ? { $ref: nodeId } : null;
 }
 
 export function deref(nodeRef: NodeReference): NodeId;
@@ -1089,7 +1101,7 @@ export function deref(nodeRef: null | undefined): null;
 export function deref(nodeRef: Maybe<NodeReference>): NodeId | null;
 export function deref(nodeRef: Maybe<NodeReference>): NodeId | null {
   if (nodeRef) {
-    return nodeRef.$$ref;
+    return nodeRef.$ref;
   }
   return null;
 }
@@ -1102,11 +1114,103 @@ export function createDefaultDom(): AppDom {
   const newPageNode = createNode(dom, 'page', {
     name: 'Page 1',
     attributes: {
-      title: createConst('Page 1'),
+      title: 'Page 1',
+      display: 'shell',
     },
   });
 
   dom = addNode(dom, newPageNode, appNode, 'pages');
 
   return dom;
+}
+
+export function getPageByName(dom: AppDom, name: string): PageNode | null {
+  const rootNode = getApp(dom);
+  const { pages = [] } = getChildNodes(dom, rootNode);
+  return pages.find((page) => page.name === name) ?? null;
+}
+
+export function getQueryByName(dom: AppDom, page: PageNode, name: string): QueryNode | null {
+  const { queries = [] } = getChildNodes(dom, page);
+  return queries.find((query) => query.name === name) ?? null;
+}
+
+/**
+ * Represents the changes between two doms in terms of added/deleted nodes.
+ */
+export interface DomDiff {
+  set: AppDomNode[];
+  unset: NodeId[];
+}
+
+/**
+ * Compare two doms and return a diff of the changes.
+ */
+export function createDiff(from: AppDom, to: AppDom): DomDiff {
+  const result: DomDiff = {
+    set: [],
+    unset: [],
+  };
+
+  const allIds = new Set<NodeId>([
+    ...(Object.keys(from.nodes) as NodeId[]),
+    ...(Object.keys(to.nodes) as NodeId[]),
+  ]);
+
+  for (const id of allIds) {
+    if (to.nodes[id] && to.nodes[id] !== from.nodes[id]) {
+      result.set.push(to.nodes[id]);
+    } else if (!to.nodes[id] && from.nodes[id]) {
+      result.unset.push(id);
+    }
+  }
+
+  return result;
+}
+
+/**
+ * Apply a diff to a dom and return the new dom.
+ */
+export function applyDiff(dom: AppDom, diff: DomDiff): AppDom {
+  let result = dom;
+
+  for (const node of diff.set) {
+    result = update(result, {
+      nodes: update(result.nodes, {
+        [node.id]: node,
+      }),
+    });
+  }
+
+  for (const id of diff.unset) {
+    result = update(result, {
+      nodes: omit(result.nodes, id),
+    });
+  }
+
+  return result;
+}
+
+function findEnvBindings(obj: unknown): EnvAttrValue[] {
+  if (Array.isArray(obj)) {
+    return obj.flatMap((item) => findEnvBindings(item));
+  }
+
+  if (obj && typeof obj === 'object') {
+    try {
+      return [envBindingSchema.parse(obj)];
+    } catch {
+      return Object.values(obj).flatMap((value) => findEnvBindings(value));
+    }
+  }
+
+  return [];
+}
+
+export function getRequiredEnvVars(dom: AppDom): Set<string> {
+  const allVars = Object.values(dom.nodes)
+    .flatMap((node) => findEnvBindings(node))
+    .map((binding) => binding.$$env);
+
+  return new Set(allVars);
 }

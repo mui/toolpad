@@ -1,0 +1,156 @@
+# Custom Functions
+
+<p class="description">These offer a fast way to bring your exisitng functions to a Toolpad page.</p>
+
+The most powerful way of bringing data into Toolpad is through using your own code. You can define functions inside `toolpad/resources` and use them when creating a query of this type.
+
+{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/concepts/connecting-to-data/custom-function.png", "alt": "Add custom function", "caption": "Adding a custom function query" }}
+
+You can configure the following options here:
+
+## Function editor
+
+- ### Function
+
+  This corresponds to a function that you create on your file system, inside the `toolpad/resources` folder. For example, in `toolpad/resources/functions.ts`
+
+  ```jsx
+  export async function example() {
+    return {
+      message: 'hello world',
+    };
+  }
+  ```
+
+{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/concepts/connecting-to-data/custom-function-example.gif", "alt": "Select custom function in the query", "caption": "Adding a custom function to the query", "indent": 1 }}
+
+<ul>
+<li style="list-style-type: none">
+Toolpad custom functions run fully server-side in Node. For example, if you change the content of the above example to:
+
+```jsx
+export async function example() {
+  return {
+    message: process.versions,
+  };
+}
+```
+
+You get the following response:
+
+</li>
+</ul>
+
+{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/concepts/connecting-to-data/query-8.png", "alt": "Server-side values", "caption": "Using server-side values in custom functions", "indent": 1 }}
+
+<ul>
+
+<li style="list-style-type: none">
+
+> You can import and use any Node module in your custom functions.
+
+</li>
+</ul>
+
+## Parameters
+
+To be really useful, you need to connect these queries with data present on your page. You can do so by creating **parameters.**
+
+All function arguments will be available in the query editor to bind state to. Make sure to annotate them correctly with their typescript types. Toolpad uses this information to present you with correctly typed databinding controls. For example:
+
+```jsx
+export async function getAnimals(
+  species: 'cat' | 'dog' | 'rabbit',
+  name: string,
+  minAge: number,
+) {
+  return db.queryAnimals({
+    species,
+    name,
+    age: { min: minAge },
+  });
+}
+```
+
+{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/concepts/connecting-to-data/custom-function-params.png", "alt": "Controls for custom function parameters", "caption": "Controls for custom function parameters", "indent": 1, "zoom": false, "width": 639}}
+
+:::info
+Toolpad also provides a `createFunction` API to be able to define your parameters when creating custom functions:
+
+```jsx
+import { createFunction } from '@mui/toolpad/server';
+
+export const example = createFunction(
+  async ({ parameters }) => {
+    return {
+      message: `3 x ${parameters.value} = ${parameters.value * 3}`,
+    };
+  },
+  {
+    parameters: {
+      value: {
+        type: 'number',
+      },
+    },
+  },
+);
+```
+
+This will make the `value` property available in the query editor. You can pass a value, or bind this to the page state:
+
+This API is now deprecated, and will be removed from a future version of Toolpad. Find more details in the `createFunction` [reference](/toolpad/reference/api/create-function/) section.
+:::
+
+## Secrets handling
+
+Toolpad has access to the environment variables defined in the `.env` file at the root of the project.
+
+You can even directly use the environment variables when defining custom functions, as you normally would when writing backend code. For example:
+
+```bash
+OPENAI_API_KEY=...
+```
+
+And you can then use them in a custom function like so:
+
+```ts
+import { Configuration, OpenAIApi } from 'openai';
+
+export async function askGPT(messages: string[]) {
+  const configuration = new Configuration({
+    apiKey: process.env.OPENAI_API_KEY,
+  });
+
+  const openai = new OpenAIApi(configuration);
+  const completion = await openai.createChatCompletion({
+    model: 'gpt-3.5-turbo',
+    messages: messages,
+  });
+
+  const response = completion.data?.choices[0].message ?? {
+    role: 'assistant',
+    content: 'No response',
+  };
+
+  return response;
+}
+```
+
+You can then use this function on your page:
+
+{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/concepts/connecting-to-data/ask-gpt.gif", "alt": "Custom function with secret", "caption": "Using a custom function with environment variables", "indent": 1 }}
+
+## Request context
+
+When you run Toolpad in an authenticated context it may be useful to be able to access authentication information in backend functions. For this purpose we offer the `getContext` API which allows you to inspect the cookies of the request that initiated the backend function.
+
+```jsx
+import { getContext } from '@mui/toolpad/server';
+import { parseAuth } from '../../src/lib/auth';
+
+export async function myBackendFunction() {
+  const ctx = getContext();
+  const user = await parseAuth(ctx.cookie.authentication);
+  return user?.id;
+}
+```

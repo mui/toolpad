@@ -9,7 +9,7 @@ export function createHarLog(): Har {
       version: '0.0',
       creator: {
         name: 'Toolpad',
-        version: process.env.TOOLPAD_VERSION,
+        version: process.env.TOOLPAD_VERSION || '',
       },
       entries: [],
     },

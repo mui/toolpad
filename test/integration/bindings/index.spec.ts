@@ -1,8 +1,6 @@
 import * as path from 'path';
 import { ToolpadRuntime } from '../../models/ToolpadRuntime';
-import { expect, test } from '../../playwright/test';
-import { readJsonFile } from '../../utils/fs';
-import generateId from '../../utils/generateId';
+import { expect, test } from '../../playwright/localTest';
 
 test.use({
   ignoreConsoleErrors: [
@@ -13,15 +11,16 @@ test.use({
   ],
 });
 
-test('bindings', async ({ page, api }) => {
-  const dom = await readJsonFile(path.resolve(__dirname, './dom.json'));
+test.use({
+  localAppConfig: {
+    template: path.resolve(__dirname, './fixture'),
+    cmd: 'dev',
+  },
+});
 
-  const app = await api.mutation.createApp(`App ${generateId()}`, {
-    from: { kind: 'dom', dom },
-  });
-
+test('bindings', async ({ page }) => {
   const runtimeModel = new ToolpadRuntime(page);
-  await runtimeModel.gotoPage(app.id, 'bindings');
+  await runtimeModel.gotoPage('bindings');
 
   const test1 = page.getByText('-test1-');
   await expect(test1).toBeVisible();
@@ -30,4 +29,26 @@ test('bindings', async ({ page, api }) => {
   );
   expect(color).toBe('rgb(25, 118, 210)');
   await expect(page.getByText('-test2-')).toBeVisible();
+});
+
+test('global scope', async ({ page }) => {
+  const runtimeModel = new ToolpadRuntime(page);
+  await runtimeModel.gotoPage('globalScope');
+
+  await expect(page.getByText('|test1 ok|')).toBeVisible();
+  await expect(page.getByText('|test2 ok|')).toBeVisible();
+  await expect(page.getByText('|test3 ok|')).toBeVisible();
+  await expect(page.getByText('|test4 ok|')).toBeVisible();
+  await expect(page.getByText('|test5 ok|')).toBeVisible();
+});
+
+test('encoding', async ({ page }) => {
+  const runtimeModel = new ToolpadRuntime(page);
+  await runtimeModel.gotoPage('encoding');
+
+  const test1 = page.getByText('Can pass utf-8: "€"');
+  await expect(test1).toBeVisible();
+
+  const test2 = page.getByText('Can pass double dollars: "$$"');
+  await expect(test2).toBeVisible();
 });

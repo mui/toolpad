@@ -1,12 +1,9 @@
 import { Grid, Typography, Button } from '@mui/material';
 import * as React from 'react';
 import useBoolean from '../../utils/useBoolean';
-import CreatePageNodeDialog from './HierarchyExplorer/CreatePageNodeDialog';
+import CreatePageNodeDialog from './PagesExplorer/CreatePageNodeDialog';
 
-export interface NoPageFoundProps {
-  appId: string;
-}
-export default function NoPageFound({ appId }: NoPageFoundProps) {
+export default function NoPageFound() {
   const {
     value: createPageDialogOpen,
     setTrue: handleCreatePageDialogOpen,
@@ -30,11 +27,7 @@ export default function NoPageFound({ appId }: NoPageFoundProps) {
           Create new
         </Button>
       </Grid>
-      <CreatePageNodeDialog
-        appId={appId}
-        open={!!createPageDialogOpen}
-        onClose={handleCreatepageDialogClose}
-      />
+      <CreatePageNodeDialog open={!!createPageDialogOpen} onClose={handleCreatepageDialogClose} />
     </Grid>
   );
 }

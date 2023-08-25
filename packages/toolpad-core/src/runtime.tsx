@@ -1,9 +1,13 @@
 import * as React from 'react';
 import { ErrorBoundary, FallbackProps } from 'react-error-boundary';
-import mitt, { Emitter } from 'mitt';
-import { RuntimeEvents, ToolpadComponents } from './types.js';
-import { RUNTIME_PROP_NODE_ID, RUNTIME_PROP_SLOTS } from './constants.js';
-import type { SlotType, ComponentConfig, RuntimeEvent, RuntimeError } from './types.js';
+import { Emitter } from '@mui/toolpad-utils/events';
+import * as ReactIs from 'react-is';
+import { hasOwnProperty } from '@mui/toolpad-utils/collections';
+import { createProvidedContext } from '@mui/toolpad-utils/react';
+import { RuntimeEvents, ToolpadComponents, ToolpadComponent, ArgTypeDefinition } from './types';
+import { RUNTIME_PROP_NODE_ID, RUNTIME_PROP_SLOTS, TOOLPAD_COMPONENT } from './constants';
+import type { SlotType, ComponentConfig, RuntimeEvent, RuntimeError } from './types';
+import { createComponent } from './browser';
 
 const ResetNodeErrorsKeyContext = React.createContext(0);
 
@@ -19,8 +23,14 @@ declare global {
   }
 }
 
-export const NodeRuntimeContext = React.createContext<string | null>(null);
-export const CanvasEventsContext = React.createContext<Emitter<RuntimeEvents>>(mitt());
+export const NodeRuntimeContext = React.createContext<{
+  nodeId: string | null;
+  nodeName: string | null;
+}>({
+  nodeId: null,
+  nodeName: null,
+});
+export const CanvasEventsContext = React.createContext<Emitter<RuntimeEvents> | null>(null);
 
 // NOTE: These props aren't used, they are only there to transfer information from the
 // React elements to the fibers.
@@ -82,12 +92,14 @@ function NodeFiberHost({ children }: NodeFiberHostProps) {
 export interface NodeRuntimeWrapperProps {
   children: React.ReactElement;
   nodeId: string;
+  nodeName: string;
   componentConfig: ComponentConfig<any>;
   NodeError: React.ComponentType<NodeErrorProps>;
 }
 
 export function NodeRuntimeWrapper({
   nodeId,
+  nodeName,
   componentConfig,
   children,
   NodeError,
@@ -109,9 +121,11 @@ export function NodeRuntimeWrapper({
     [NodeError, componentConfig, nodeId],
   );
 
+  const nodeRuntimeValue = React.useMemo(() => ({ nodeId, nodeName }), [nodeId, nodeName]);
+
   return (
     <ErrorBoundary resetKeys={[resetNodeErrorsKey]} fallbackRender={ErrorFallback}>
-      <NodeRuntimeContext.Provider value={nodeId}>
+      <NodeRuntimeContext.Provider value={nodeRuntimeValue}>
         <NodeFiberHost
           {...{
             [RUNTIME_PROP_NODE_ID]: nodeId,
@@ -126,6 +140,8 @@ export function NodeRuntimeWrapper({
 }
 
 export interface NodeRuntime<P> {
+  nodeId: string | null;
+  nodeName: string | null;
   updateAppDomConstProp: <K extends keyof P & string>(
     key: K,
     value: React.SetStateAction<P[K]>,
@@ -133,14 +149,16 @@ export interface NodeRuntime<P> {
 }
 
 export function useNode<P = {}>(): NodeRuntime<P> | null {
-  const nodeId = React.useContext(NodeRuntimeContext);
+  const { nodeId, nodeName } = React.useContext(NodeRuntimeContext);
   const canvasEvents = React.useContext(CanvasEventsContext);
 
   return React.useMemo(() => {
-    if (!nodeId) {
+    if (!nodeId || !canvasEvents) {
       return null;
     }
     return {
+      nodeId,
+      nodeName,
       updateAppDomConstProp: (prop, value) => {
         canvasEvents.emit('propUpdated', {
           nodeId,
@@ -149,7 +167,7 @@ export function useNode<P = {}>(): NodeRuntime<P> | null {
         });
       },
     };
-  }, [canvasEvents, nodeId]);
+  }, [canvasEvents, nodeId, nodeName]);
 }
 
 export interface PlaceholderProps {
@@ -159,7 +177,7 @@ export interface PlaceholderProps {
 }
 
 export function Placeholder({ prop, children, hasLayout = false }: PlaceholderProps) {
-  const nodeId = React.useContext(NodeRuntimeContext);
+  const { nodeId } = React.useContext(NodeRuntimeContext);
   if (!nodeId) {
     return <React.Fragment>{children}</React.Fragment>;
   }
@@ -183,7 +201,7 @@ export interface SlotsProps {
 }
 
 export function Slots({ prop, children }: SlotsProps) {
-  const nodeId = React.useContext(NodeRuntimeContext);
+  const { nodeId } = React.useContext(NodeRuntimeContext);
   if (!nodeId) {
     return <React.Fragment>{children}</React.Fragment>;
   }
@@ -201,4 +219,45 @@ export function Slots({ prop, children }: SlotsProps) {
   ) : (
     <Placeholder prop={prop} />
   );
+}
+
+export function isToolpadComponent(
+  maybeComponent: unknown,
+): maybeComponent is ToolpadComponent<any> {
+  if (
+    !ReactIs.isValidElementType(maybeComponent) ||
+    typeof maybeComponent === 'string' ||
+    !hasOwnProperty(maybeComponent, TOOLPAD_COMPONENT)
+  ) {
+    return false;
+  }
+
+  return true;
+}
+
+export function getArgTypeDefaultValue<P extends object, K extends keyof P>(
+  argType: ArgTypeDefinition<P, K>,
+): P[K] | undefined {
+  return argType.default ?? argType.defaultValue ?? undefined;
+}
+
+export function createToolpadComponentThatThrows(error: Error) {
+  return createComponent(() => {
+    throw error;
+  });
+}
+
+const [useComponents, ComponentsContextProvider] =
+  createProvidedContext<ToolpadComponents>('Components');
+
+export { useComponents, ComponentsContextProvider };
+
+export function useComponent(id: string) {
+  const components = useComponents();
+  return React.useMemo(() => {
+    return (
+      components?.[id] ??
+      createToolpadComponentThatThrows(new Error(`Can't find component for "${id}"`))
+    );
+  }, [components, id]);
 }

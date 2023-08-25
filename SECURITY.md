@@ -5,7 +5,7 @@
 The versions of the project that are currently supported with security updates.
 
 | Version | Supported          |
-| ------- | ------------------ |
+| :------ | :----------------- |
 | <=1.0   | :white_check_mark: |
 
 ## Reporting a vulnerability

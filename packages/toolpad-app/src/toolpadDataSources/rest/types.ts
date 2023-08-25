@@ -1,4 +1,4 @@
-import { BindableAttrValue, ConstantAttrValue, ExecFetchResult } from '@mui/toolpad-core';
+import { BindableAttrValue, ExecFetchResult } from '@mui/toolpad-core';
 import { Har } from 'har-format';
 import { Maybe } from '../../utils/types';
 
@@ -34,7 +34,7 @@ export interface RestConnectionParams {
 export type RawBody = {
   kind: 'raw';
   content: BindableAttrValue<string>;
-  contentType: ConstantAttrValue<string>;
+  contentType: string;
 };
 
 export type UrlEncodedBody = {
@@ -110,14 +110,20 @@ export type FetchParams = {
   readonly body?: Body;
 };
 
-export type FetchPrivateQuery = {
-  kind: 'debugExec';
-  query: FetchQuery;
-  params: Record<string, any>;
-};
+export type FetchPrivateQuery =
+  | {
+      kind: 'debugExec';
+      query: FetchQuery;
+      params: Record<string, any>;
+    }
+  | { kind: 'introspection' };
 
 export interface FetchResult extends ExecFetchResult<any> {
   data: any;
   untransformedData: any;
   har?: Har;
 }
+
+export type IntrospectionResult = {
+  envVarNames: string[];
+};

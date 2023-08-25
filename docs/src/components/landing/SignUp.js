@@ -52,14 +52,14 @@ function SignUp({ sx }) {
         sx={{
           maxWidth: { sm: 540 },
           mx: { xs: 0, sm: 'auto' },
-          bgcolor: (theme) => (theme.palette.mode === 'dark' ? 'primaryDark.700' : 'success.50'),
+          bgcolor: 'primaryDark.700',
         }}
         iconMapping={{
           success: (
             <CheckCircleRoundedIcon
               fontSize="small"
               sx={{
-                color: (theme) => (theme.palette.mode === 'dark' ? 'success.600' : 'success.700'),
+                color: 'success.600',
               }}
             />
           ),
@@ -92,51 +92,39 @@ function SignUp({ sx }) {
           inputProps={{ required: true }}
           value={form.email}
           onChange={(event) => setForm({ email: event.target.value, status: 'initial' })}
-          sx={{
-            mr: { xs: 0, sm: 1 },
-            mb: { xs: 1, sm: 0 },
-            minWidth: { xs: 220, sm: 360 },
-            width: { xs: '100%', sm: 'auto' },
-            bgcolor: (theme) =>
-              theme.palette.mode === 'dark' ? theme.palette.primaryDark[900] : '#fff',
-            boxShadow: (theme) =>
-              theme.palette.mode === 'dark'
-                ? '0 1px 2px 0 rgba(0 0 0 / 1)'
-                : '0 1px 2px 0 rgba(0 0 0 / 0.1)',
-            borderRadius: 1,
-            border: '1px solid',
-            borderColor: (theme) =>
-              theme.palette.mode === 'dark' ? theme.palette.primaryDark[500] : 'grey.400',
-            px: 1,
-            py: 0.5,
-            height: 50,
-            typography: 'body2',
-            '&:hover': {
-              borderColor: (theme) =>
-                theme.palette.mode === 'dark' ? theme.palette.primaryDark[300] : 'grey.400',
-              boxShadow: (theme) =>
-                theme.palette.mode === 'dark'
-                  ? '0 1px 2px 0 rgba(0 0 0 / 1)'
-                  : '0 1px 2px 0 rgba(0 0 0 / 0.2)',
-            },
-            [`&.${inputBaseClasses.focused}`]: {
-              borderColor: (theme) =>
-                theme.palette.mode === 'dark'
-                  ? theme.palette.primaryDark[300]
-                  : theme.palette.primary[500],
-              outline: '3px solid',
-              outlineColor: (theme) =>
-                theme.palette.mode === 'dark'
-                  ? theme.palette.primaryDark[500]
-                  : theme.palette.primary[300],
-            },
-          }}
+          sx={[
+            (theme) => ({
+              mr: { xs: 0, sm: 1 },
+              mb: { xs: 1, sm: 0 },
+              minWidth: { xs: 220, sm: 360 },
+              width: { xs: '100%', sm: 'auto' },
+              color: (theme.vars || theme).palette.grey[300],
+              bgcolor: (theme.vars || theme).palette.primaryDark[900],
+              boxShadow: '0 1px 2px 0 rgba(0 0 0 / 1)',
+              borderRadius: 1,
+              border: '1px solid',
+              borderColor: (theme.vars || theme).palette.primaryDark[500],
+              px: 1,
+              py: 0.5,
+              // height: 48,
+              typography: 'body2',
+              '&:hover': {
+                borderColor: (theme.vars || theme).palette.primaryDark[400],
+                boxShadow: '0 1px 4px 0 rgba(0 0 0 / 1)',
+              },
+              [`&.${inputBaseClasses.focused}`]: {
+                borderColor: (theme.vars || theme).palette.primaryDark[300],
+                outline: '3px solid',
+                outlineColor: (theme.vars || theme).palette.primaryDark[500],
+              },
+            }),
+          ]}
         />
         <Button
           disabled={form.status === 'loading'}
           type="submit"
-          size="large"
-          variant="outlined"
+          size="medium"
+          variant="contained"
           endIcon={<KeyboardArrowRightRounded />}
           sx={{ width: { xs: '100%', sm: 'auto' } }}
         >
@@ -145,7 +133,10 @@ function SignUp({ sx }) {
       </Box>
       {form.status === 'failure' ? (
         <FormHelperText
-          sx={{ color: (theme) => (theme.palette.mode === 'dark' ? 'warning.500' : 'warning.800') }}
+          sx={[
+            { color: 'warning.700' },
+            (theme) => theme.applyDarkStyles({ color: 'warning.500' }),
+          ]}
         >
           Oops! something went wrong, please try again later.
         </FormHelperText>

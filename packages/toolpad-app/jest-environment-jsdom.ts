@@ -1,7 +1,7 @@
 import { TextDecoder, TextEncoder } from 'util';
 import fetch, { Headers, Request, Response } from 'node-fetch';
 import JsdomEnvironment from 'jest-environment-jsdom';
-import { RuntimeConfig } from './src/config';
+import type { RuntimeConfig } from './src/config';
 import { RUNTIME_CONFIG_WINDOW_PROPERTY } from './src/constants';
 
 function setRuntimeConfig(win: Window, config: RuntimeConfig) {
@@ -14,8 +14,8 @@ export default class CustomJsdomEnvironment extends JsdomEnvironment {
 
     setRuntimeConfig(this.global, {
       externalUrl: 'http://localhost:3000',
-      isDemo: false,
-      localMode: false,
+      cmd: 'dev',
+      projectDir: '.',
     });
 
     if (!this.global.TextDecoder) {

@@ -4,65 +4,114 @@ import {
   TextFieldProps as MuiTextFieldProps,
   BoxProps,
 } from '@mui/material';
-import { createComponent } from '@mui/toolpad-core';
+import createBuiltin from './createBuiltin';
+import {
+  FORM_INPUT_ARG_TYPES,
+  FORM_TEXT_INPUT_ARG_TYPES,
+  FormInputComponentProps,
+  useFormInput,
+  withComponentForm,
+} from './Form';
 import { SX_PROP_HELPER_TEXT } from './constants';
 
 export type TextFieldProps = Omit<MuiTextFieldProps, 'value' | 'onChange'> & {
   value: string;
   onChange: (newValue: string) => void;
+  defaultValue: string;
   alignItems?: BoxProps['alignItems'];
   justifyContent?: BoxProps['justifyContent'];
-};
+} & Pick<FormInputComponentProps, 'name' | 'isRequired' | 'minLength' | 'maxLength' | 'isInvalid'>;
 
-function TextField({ defaultValue, onChange, ...props }: TextFieldProps) {
+function TextField({
+  defaultValue,
+  onChange,
+  value,
+  isRequired,
+  minLength,
+  maxLength,
+  isInvalid,
+  ...rest
+}: TextFieldProps) {
+  const { onFormInputChange, formInputError, renderFormInput } = useFormInput<string>({
+    name: rest.name,
+    label: rest.label as string,
+    value,
+    onChange,
+    emptyValue: '',
+    defaultValue,
+    validationProps: { isRequired, minLength, maxLength, isInvalid },
+  });
+
   const handleChange = React.useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
-      onChange(event.target.value);
+      const newValue = event.target.value;
+      onFormInputChange(newValue);
     },
-    [onChange],
+    [onFormInputChange],
   );
 
-  return <MuiTextField {...props} onChange={handleChange} />;
+  return renderFormInput(
+    <MuiTextField
+      value={value}
+      onChange={handleChange}
+      {...rest}
+      {...(formInputError && {
+        error: Boolean(formInputError),
+        helperText: formInputError.message || '',
+      })}
+    />,
+  );
 }
 
-export default createComponent(TextField, {
-  helperText: 'The TextField component lets you input a text value.',
+const FormWrappedTextField = withComponentForm(TextField);
+
+export default createBuiltin(FormWrappedTextField, {
+  helperText:
+    'The MUI [TextField](https://mui.com/material-ui/react-text-field/) component lets you input a text value.',
   layoutDirection: 'both',
   argTypes: {
     value: {
       helperText: 'The value that is controlled by this text input.',
-      typeDef: { type: 'string', default: '' },
+      type: 'string',
+      default: '',
       onChangeProp: 'onChange',
       defaultValueProp: 'defaultValue',
     },
     defaultValue: {
-      helperText: 'A default value for when the inoput is still empty.',
-      typeDef: { type: 'string', default: '' },
+      helperText: 'A default value for when the input is still empty.',
+      type: 'string',
+      default: '',
     },
     label: {
       helperText: 'A label that describes the content of the text field. e.g. "First name".',
-      typeDef: { type: 'string' },
+      type: 'string',
     },
     variant: {
       helperText:
         'One of the available MUI TextField [variants](https://mui.com/material-ui/react-button/#basic-button). Possible values are `outlined`, `filled` or `standard`',
-      typeDef: { type: 'string', enum: ['outlined', 'filled', 'standard'], default: 'outlined' },
+      type: 'string',
+      enum: ['outlined', 'filled', 'standard'],
+      default: 'outlined',
     },
     size: {
       helperText: 'The size of the input. One of `small`, or `medium`.',
-      typeDef: { type: 'string', enum: ['small', 'medium'], default: 'small' },
+      type: 'string',
+      enum: ['small', 'medium'],
+      default: 'small',
     },
     fullWidth: {
       helperText: 'Whether the input should occupy all available horizontal space.',
-      typeDef: { type: 'boolean' },
+      type: 'boolean',
     },
     disabled: {
       helperText: 'Whether the input is disabled.',
-      typeDef: { type: 'boolean' },
+      type: 'boolean',
     },
+    ...FORM_INPUT_ARG_TYPES,
+    ...FORM_TEXT_INPUT_ARG_TYPES,
     sx: {
       helperText: SX_PROP_HELPER_TEXT,
-      typeDef: { type: 'object' },
+      type: 'object',
     },
   },
 });

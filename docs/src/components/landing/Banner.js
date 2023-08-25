@@ -1,89 +1,72 @@
 import * as React from 'react';
 import PropTypes from 'prop-types';
-import { alpha } from '@mui/material/styles';
-import Box from '@mui/material/Box';
-import Container from '@mui/material/Container';
-import Typography from '@mui/material/Typography';
 import Stack from '@mui/material/Stack';
 import Button from '@mui/material/Button';
 import Link from 'docs/src/modules/components/Link';
+import Typography from '@mui/material/Typography';
 import KeyboardArrowRightRounded from '@mui/icons-material/KeyboardArrowRightRounded';
+import { alpha } from '@mui/material/styles';
 
-export default function Banner(props) {
-  const { title, description, href, label, category, action, docs } = props;
+function Banner(props) {
+  const { title, description, href, label, category, action } = props;
   return (
-    <Box>
-      <Container
+    <Stack
+      sx={(theme) => ({
+        mt: 2,
+        p: 2,
+        borderRadius: 1,
+        background: `linear-gradient(180deg, ${alpha(theme.palette.primary[50], 0.2)}  50%, 
+          ${(theme.vars || theme).palette.primary[50]} 100%)
+          `,
+        border: '1px solid',
+        borderColor: 'grey.100',
+        display: 'flex',
+        flexDirection: {
+          xs: 'column',
+          sm: 'row',
+        },
+        justifyContent: 'space-between',
+        alignItems: {
+          xs: 'flex-start',
+          sm: 'center',
+        },
+        ...theme.applyDarkStyles({
+          background: `linear-gradient(180deg, ${alpha(theme.palette.primary[900], 0.4)}  50%, 
+            ${alpha(theme.palette.primary[800], 0.6)} 100%)
+            `,
+          borderColor: (theme.vars || theme).palette.primaryDark[600],
+        }),
+      })}
+    >
+      <div>
+        <Typography fontWeight="bold" gutterBottom>
+          {title}
+        </Typography>
+        <Typography variant="body2" color="text.secondary">
+          {description}
+        </Typography>
+      </div>
+      <Button
+        component={Link}
+        noLinkStyle
+        data-ga-event-category={category}
+        data-ga-event-label={label}
+        data-ga-event-action={action}
+        href={href}
+        variant="contained"
+        fullWidth
+        endIcon={<KeyboardArrowRightRounded />}
         sx={{
-          pt: 0,
-          pb: { xs: 2, sm: 8, md: docs ? 1 : 16 },
-          px: docs ? { xs: 0, sm: 0, md: 0 } : 'default',
-          display: 'flex',
-          flexDirection: 'row',
-          justifyContent: 'center',
+          py: 1,
+          flexShrink: 0,
+          ml: { xs: 0, sm: 2 },
+          mt: { xs: 3, sm: 0 },
+          width: { xs: '100%', sm: 'fit-content' },
         }}
       >
-        <Stack
-          sx={{
-            borderRadius: 1,
-            px: 2,
-            py: docs ? 2.5 : 2,
-            bgcolor: (theme) =>
-              theme.palette.mode === 'dark'
-                ? alpha(theme.palette.primaryDark[900], 0.5)
-                : 'primary.50',
-            border: '1px solid',
-            borderColor: (theme) =>
-              theme.palette.mode === 'dark' ? 'primaryDark.500' : 'primary.100',
-            display: 'flex',
-            flexDirection: {
-              xs: 'column',
-              sm: 'row',
-            },
-            width: '100%',
-            justifyContent: 'space-between',
-            alignItems: { xs: 'flex-start', sm: 'center' },
-          }}
-        >
-          <div>
-            <Typography fontWeight="bold" sx={{ mb: 0.5 }}>
-              {title}
-            </Typography>
-            <Typography
-              variant={docs ? 'body1' : 'body2'}
-              color="text.secondary"
-              sx={{ maxWidth: 700 }}
-            >
-              {description}
-            </Typography>
-          </div>
-          <Button
-            component={Link}
-            noLinkStyle
-            data-ga-event-category={category}
-            data-ga-event-label={label}
-            data-ga-event-action={action}
-            target="_blank"
-            rel="noopener"
-            href={href}
-            variant="contained"
-            fullWidth
-            endIcon={<KeyboardArrowRightRounded />}
-            sx={{
-              py: 1,
-              px: {
-                md: 2,
-              },
-              ml: { xs: 0, sm: 2 },
-              mt: { xs: 3, sm: 0 },
-              width: { xs: '100%', sm: '50%', md: 'auto' },
-            }}
-          >
-            {label}
-          </Button>
-        </Stack>
-      </Container>
-    </Box>
+        {label}
+      </Button>
+    </Stack>
   );
 }
 
@@ -91,8 +74,9 @@ Banner.propTypes = {
   action: PropTypes.string.isRequired,
   category: PropTypes.string.isRequired,
   description: PropTypes.string.isRequired,
-  docs: PropTypes.bool,
   href: PropTypes.string.isRequired,
   label: PropTypes.string.isRequired,
   title: PropTypes.string,
 };
+
+export default Banner;

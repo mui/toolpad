@@ -1,31 +1,43 @@
 import * as React from 'react';
-import { Alert, AlertTitle, IconButton, Collapse, Box } from '@mui/material';
+import { Alert, AlertTitle, IconButton, Collapse, Box, SxProps } from '@mui/material';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import { indent } from '@mui/toolpad-utils/strings';
 import Pre from '../../../components/Pre';
-
-/**
- * Remove the error message from the stack trace
- */
-function stackTraceOnly(stack: string, message: string): string {
-  return stack.split(message)[1]?.trim() || '';
-}
 
 export interface ErrorAlertProps {
   error: unknown;
+  sx?: SxProps;
 }
 
-export default function ErrorAlert({ error }: ErrorAlertProps) {
+function formatStack(maybeError: unknown): string | null {
+  if (!maybeError) {
+    return null;
+  }
+  let causeStack: string | null | undefined;
+  if ((maybeError as any)?.cause) {
+    causeStack = formatStack((maybeError as any).cause);
+    if (causeStack) {
+      causeStack = `cause:\n${indent(causeStack, 2)}`;
+    }
+  }
+  let thisStack: string | undefined;
+  if (typeof (maybeError as any)?.stack === 'string') {
+    thisStack = (maybeError as any).stack;
+  }
+  return thisStack || causeStack ? [thisStack, causeStack].filter(Boolean).join('\n') : null;
+}
+
+export default function ErrorAlert({ error, sx }: ErrorAlertProps) {
   const message: string =
     typeof (error as any)?.message === 'string' ? (error as any).message : String(error);
-  const stack: string | null =
-    typeof (error as any)?.stack === 'string' ? (error as any).stack : null;
+  const stack: string | null = formatStack(error);
 
   const [expanded, setExpanded] = React.useState(false);
   const toggleExpanded = React.useCallback(() => setExpanded((actual) => !actual), []);
 
   return (
-    <Alert severity="error" sx={{ position: 'relative' }}>
+    <Alert severity="error" sx={{ ...sx, position: 'relative' }}>
       {stack ? (
         <IconButton
           color="inherit"
@@ -45,7 +57,7 @@ export default function ErrorAlert({ error }: ErrorAlertProps) {
       {stack ? (
         <Collapse in={expanded}>
           <Box sx={{ overflow: 'auto' }}>
-            <Pre>{stackTraceOnly(stack, message)}</Pre>
+            <Pre>{stack}</Pre>
           </Box>
         </Collapse>
       ) : null}

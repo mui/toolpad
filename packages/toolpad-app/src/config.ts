@@ -1,3 +1,4 @@
+import invariant from 'invariant';
 import { RUNTIME_CONFIG_WINDOW_PROPERTY } from './constants';
 
 /**
@@ -35,28 +36,9 @@ export type BuildEnvVars = Record<
 // These are set at runtime and passed to the browser.
 // Do not add secrets
 export interface RuntimeConfig {
-  // Enable input field for seeding a dom in the app creation dialog
-  // (For testing purposes)
-  enableCreateByDom?: boolean;
-  // Enable demo mode
-  isDemo: boolean;
-  // Google Analytics measurement ID
-  gaId?: string;
-  // Sentry DSN
-  sentryDsn?: string;
-  // Google reCAPTCHA site keys
-  recaptchaV2SiteKey?: string;
-  recaptchaV3SiteKey?: string;
   externalUrl: string;
-  localMode: boolean;
   projectDir?: string;
-  cmd?: 'dev' | 'start';
-}
-
-declare global {
-  namespace NodeJS {
-    interface ProcessEnv extends BuildEnvVars {}
-  }
+  cmd: 'dev' | 'start' | 'build';
 }
 
 declare global {
@@ -66,6 +48,10 @@ declare global {
 }
 
 function getBrowsersideRuntimeConfig(): RuntimeConfig {
+  invariant(
+    typeof window !== 'undefined',
+    'The runtime config is not available on the server. Use project.getRuntimeConfig()',
+  );
   // These are being initialized in ./pages/_document.tsx
   const maybeRuntimeConfig = window[RUNTIME_CONFIG_WINDOW_PROPERTY];
   if (!maybeRuntimeConfig) {
@@ -74,25 +60,4 @@ function getBrowsersideRuntimeConfig(): RuntimeConfig {
   return maybeRuntimeConfig;
 }
 
-const runtimeConfig: RuntimeConfig =
-  typeof window === 'undefined'
-    ? {
-        // Define runtime config here
-        enableCreateByDom: !!process.env.TOOLPAD_ENABLE_CREATE_BY_DOM,
-        isDemo: !!process.env.TOOLPAD_DEMO,
-        gaId: process.env.TOOLPAD_GA_ID,
-        sentryDsn: process.env.TOOLPAD_SENTRY_DSN,
-        recaptchaV2SiteKey: process.env.TOOLPAD_RECAPTCHA_V2_SITE_KEY,
-        recaptchaV3SiteKey: process.env.TOOLPAD_RECAPTCHA_V3_SITE_KEY,
-        externalUrl:
-          process.env.TOOLPAD_EXTERNAL_URL || `http://localhost:${process.env.PORT || 3000}`,
-        localMode: !!process.env.TOOLPAD_LOCAL_MODE,
-        projectDir: process.env.TOOLPAD_PROJECT_DIR,
-        cmd:
-          process.env.TOOLPAD_CMD === 'dev' || process.env.TOOLPAD_CMD === 'start'
-            ? process.env.TOOLPAD_CMD
-            : undefined,
-      }
-    : getBrowsersideRuntimeConfig();
-
-export default runtimeConfig;
+export default getBrowsersideRuntimeConfig();

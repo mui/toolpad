@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { Tabs as MUITabs, Tab } from '@mui/material';
-import { createComponent } from '@mui/toolpad-core';
+import createBuiltin from './createBuiltin';
 
 interface TabProps {
   title: string;
@@ -29,7 +29,8 @@ function Tabs({ value, onChange, tabs, defaultValue }: TabsProps) {
   );
 }
 
-export default createComponent(Tabs, {
+export default createBuiltin(Tabs, {
+  helperText: 'The MUI [Tabs](https://mui.com/material-ui/react-tabs/) component.',
   layoutDirection: 'horizontal',
   argTypes: {
     value: {

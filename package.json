@@ -50,7 +50,7 @@
     "@mui/monorepo": "https://github.com/mui/material-ui.git",
     "@next/eslint-plugin-next": "13.4.19",
     "@playwright/test": "1.37.1",
-    "@testing-library/jest-dom": "5.17.0",
+    "@testing-library/jest-dom": "6.1.1",
     "@testing-library/react": "14.0.0",
     "@types/archiver": "5.3.2",
     "@types/gtag.js": "0.0.13",

@@ -1,6 +1,7 @@
 import * as React from 'react';
-import { createComponent } from '@mui/toolpad-core';
+
 import { Container, ContainerProps, Skeleton } from '@mui/material';
+
 import {
   XAxis,
   YAxis,
@@ -15,6 +16,7 @@ import {
   Scatter,
 } from 'recharts';
 import { errorFrom } from '@mui/toolpad-utils/errors';
+import createBuiltin from './createBuiltin';
 import ErrorOverlay from './components/ErrorOverlay';
 import { SX_PROP_HELPER_TEXT } from './constants';
 
@@ -198,7 +200,8 @@ function Chart({ data = [], loading, error, height, sx }: ChartProps) {
   );
 }
 
-export default createComponent(Chart, {
+export default createBuiltin(Chart, {
+  helperText: 'A chart component.',
   loadingProp: 'loading',
   loadingPropSource: ['data'],
   errorProp: 'error',
@@ -239,6 +242,7 @@ export default createComponent(Chart, {
       control: { type: 'ChartData', bindable: false },
     },
     height: {
+      helperText: 'The height of the chart.',
       type: 'number',
       default: 300,
       minimum: 100,

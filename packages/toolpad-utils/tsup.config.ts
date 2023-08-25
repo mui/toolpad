@@ -18,7 +18,7 @@ function cleanFolderOnFailure(folder: string): EsbuildPlugin {
   };
 }
 
-export default defineConfig({
+export default defineConfig((options) => ({
   entry: [
     'src/*{.ts,.tsx}',
     'src/hooks/*{.ts,.tsx}',
@@ -27,6 +27,7 @@ export default defineConfig({
   format: ['esm', 'cjs'],
   dts: false,
   silent: true,
+  clean: !options.watch,
   sourcemap: true,
   esbuildPlugins: [cleanFolderOnFailure(path.resolve(__dirname, 'dist'))],
   async onSuccess() {
@@ -34,4 +35,4 @@ export default defineConfig({
     console.log('build successful');
     spawnSync('tsc', ['--emitDeclarationOnly', '--declaration'], { shell: true });
   },
-});
+}));

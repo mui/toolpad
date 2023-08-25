@@ -3,9 +3,6 @@ import { Container, ContainerProps, Box, Stack, BoxProps } from '@mui/material';
 import { LoadingButton } from '@mui/lab';
 import { useNode } from '@mui/toolpad-core';
 import { useForm, FieldValues, ValidationMode, FieldError, Controller } from 'react-hook-form';
-// TODO: Remove lodash-es
-// eslint-disable-next-line no-restricted-imports
-import { isEqual } from 'lodash-es';
 import { SX_PROP_HELPER_TEXT } from './constants';
 import createBuiltin, { BuiltinArgTypeDefinitions } from './createBuiltin';
 
@@ -19,7 +16,7 @@ export const FormContext = React.createContext<{
 
 interface FormProps extends ContainerProps {
   value: FieldValues;
-  onChange: (newValue: FieldValues) => void;
+  onChange?: (newValue: FieldValues) => void;
   onSubmit?: (data?: FieldValues) => unknown | Promise<unknown>;
   formControlsAlign?: BoxProps['justifyContent'];
   formControlsFullWidth?: boolean;
@@ -57,12 +54,12 @@ function Form({
 
   // Set initial form values
   React.useEffect(() => {
-    onChange(form.getValues());
+    onChange?.(form.getValues());
   }, [form, onChange]);
 
   React.useEffect(() => {
     const formSubscription = form.watch((newValue) => {
-      onChange(newValue);
+      onChange?.(newValue);
     });
     return () => formSubscription.unsubscribe();
   }, [form, onChange]);
@@ -188,7 +185,7 @@ interface UseFormInputInput<V> {
   name: string;
   label?: string;
   value?: V;
-  onChange: (newValue: V) => void;
+  onChange?: (newValue: V) => void;
   emptyValue?: V;
   defaultValue?: V;
   validationProps: Partial<
@@ -230,7 +227,7 @@ export function useFormInput<V>({
   const previousDefaultValueRef = React.useRef(defaultValue);
   React.useEffect(() => {
     if (form && defaultValue !== previousDefaultValueRef.current) {
-      onChange(defaultValue as V);
+      onChange?.(defaultValue as V);
       form.setValue(formInputName, defaultValue);
       previousDefaultValueRef.current = defaultValue;
     }
@@ -241,10 +238,10 @@ export function useFormInput<V>({
   React.useEffect(() => {
     if (form) {
       if (!fieldValues[formInputName] && defaultValue && isInitialForm) {
-        onChange((defaultValue || emptyValue) as V);
+        onChange?.((defaultValue || emptyValue) as V);
         form.setValue(formInputName, defaultValue || emptyValue);
       } else if (value !== fieldValues[formInputName]) {
-        onChange(fieldValues[formInputName] || emptyValue);
+        onChange?.(fieldValues[formInputName] || emptyValue);
       }
     }
   }, [defaultValue, emptyValue, fieldValues, form, isInitialForm, formInputName, onChange, value]);
@@ -263,7 +260,12 @@ export function useFormInput<V>({
   React.useEffect(() => {
     if (
       form &&
-      !isEqual(validationProps, previousManualValidationPropsRef.current) &&
+      !(
+        validationProps.isInvalid === previousManualValidationPropsRef.current.isInvalid &&
+        validationProps.isRequired === previousManualValidationPropsRef.current.isRequired &&
+        validationProps.minLength === previousManualValidationPropsRef.current.minLength &&
+        validationProps.maxLength === previousManualValidationPropsRef.current.maxLength
+      ) &&
       form.formState.dirtyFields[formInputName]
     ) {
       form.trigger(formInputName);
@@ -280,7 +282,7 @@ export function useFormInput<V>({
           shouldTouch: true,
         });
       }
-      onChange(newValue);
+      onChange?.(newValue);
     },
     [form, formInputName, onChange],
   );

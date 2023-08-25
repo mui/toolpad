@@ -6,13 +6,14 @@ import {
   ThemeProvider,
   Tooltip,
   Typography,
+  useTheme,
 } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
 import SaveIcon from '@mui/icons-material/Save';
 import { ToolpadFile } from '../shared/schemas';
 import DataGridFileEditor from './DataGridFileEditor';
-import theme from './theme';
+import { getTheme } from './theme';
 import { useBacked } from './backend';
 import { CodeGenerationResult, generateComponent } from '../shared/codeGeneration';
 import DevtoolHost from './DevtoolHost';
@@ -98,6 +99,9 @@ export default function DevtoolOverlay({
       </IconButton>
     </Tooltip>
   );
+
+  const muiTheme = useTheme();
+  const theme = getTheme(muiTheme.palette.mode);
 
   return (
     <ThemeProvider theme={theme}>

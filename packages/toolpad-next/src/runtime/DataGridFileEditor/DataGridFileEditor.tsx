@@ -69,7 +69,7 @@ export default function DataGridFileEditor({
   source,
   commitButton,
 }: DataGridFileEditorProps) {
-  const [activeTab, setActiveTab] = useStorageState('session', `activeTab`, 'data');
+  const [activeTab, setActiveTab] = useStorageState('session', 'activeTab', 'general');
 
   const handleSpecChange = React.useCallback(
     (newSpec: DataGridSpec) => {

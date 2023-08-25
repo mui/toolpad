@@ -25,7 +25,7 @@
     "prettier:all": "prettier --write . --ignore-path .eslintignore",
     "deduplicate": "node scripts/deduplicate.mjs",
     "dev": "dotenv cross-env FORCE_COLOR=1 lerna -- run dev --stream --parallel --ignore docs",
-    "docs:dev": "lerna run --stream --scope docs --scope @mui/toolpad-next --scope @mui/toolpad-utils dev",
+    "docs:dev": "lerna run --stream --parallel --scope docs --scope @mui/toolpad-next --scope @mui/toolpad-utils dev",
     "docs:build": "lerna run --stream --scope docs --scope @mui/toolpad-next --scope @mui/toolpad-utils build",
     "docs:build:api": "tsx --tsconfig ./scripts/tsconfig.json ./scripts/docs/buildApi.ts",
     "docs:export": "yarn workspace docs export",

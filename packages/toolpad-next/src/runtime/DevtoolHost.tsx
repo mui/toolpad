@@ -1,6 +1,5 @@
 import * as React from 'react';
-import { ScopedCssBaseline, Box, ThemeProvider, GlobalStyles, Portal } from '@mui/material';
-import theme from './theme';
+import { ScopedCssBaseline, Box, GlobalStyles, Portal } from '@mui/material';
 
 interface ResizeHandleProps {
   onResize?: (height: number) => void;
@@ -81,42 +80,40 @@ export default function DevtoolHost({ children }: DevtoolHostProps) {
 
   return (
     <Portal>
-      <ThemeProvider theme={theme}>
-        <ScopedCssBaseline>
+      <ScopedCssBaseline>
+        <Box
+          ref={rootRef}
+          className="mui-fixed"
+          sx={{
+            position: 'fixed',
+            bottom: 0,
+            left: 0,
+            right: 0,
+            height,
+            borderTop: 1,
+            borderColor: 'divider',
+            backgroundColor: 'background.paper',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'stretch',
+            zIndex: 1300,
+          }}
+        >
+          <GlobalStyles styles={{ body: { marginBottom: `${height}px` } }} />
+          <ResizeHandle onResize={handleResize} />
           <Box
-            ref={rootRef}
-            className="mui-fixed"
             sx={{
-              position: 'fixed',
-              bottom: 0,
-              left: 0,
-              right: 0,
-              height,
-              borderTop: 1,
+              flex: 1,
+              minHeight: 0,
+              marginRight: '-1px',
+              borderRight: 1,
               borderColor: 'divider',
-              backgroundColor: 'background.paper',
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'stretch',
-              zIndex: 1300,
             }}
           >
-            <GlobalStyles styles={{ body: { marginBottom: `${height}px` } }} />
-            <ResizeHandle onResize={handleResize} />
-            <Box
-              sx={{
-                flex: 1,
-                minHeight: 0,
-                marginRight: '-1px',
-                borderRight: 1,
-                borderColor: 'divider',
-              }}
-            >
-              {children}
-            </Box>
+            {children}
           </Box>
-        </ScopedCssBaseline>
-      </ThemeProvider>
+        </Box>
+      </ScopedCssBaseline>
     </Portal>
   );
 }

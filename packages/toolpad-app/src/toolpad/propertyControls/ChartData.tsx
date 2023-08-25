@@ -59,6 +59,8 @@ function ChartDataPropEditor({
 
   const appTheme = React.useMemo(() => createToolpadAppTheme(dom), [dom]);
 
+  const defaultPalette = blueberryTwilightPalette(appTheme.palette.mode);
+
   const [dataSeriesEditIndex, setDataSeriesEditIndex] = React.useState<number | null>(null);
   const [popoverAnchorElement, setPopoverAnchorElement] = React.useState<HTMLElement | null>(null);
 
@@ -67,18 +69,16 @@ function ChartDataPropEditor({
 
     const newDataSeriesLabel = `dataSeries${newDataSeriesCount}`;
 
-    const palette = blueberryTwilightPalette(appTheme.palette.mode);
-
     onChange([
       ...value,
       {
         label: newDataSeriesLabel,
         kind: 'line',
         data: [],
-        color: palette[(newDataSeriesCount - 1) % palette.length],
+        color: defaultPalette[(newDataSeriesCount - 1) % defaultPalette.length],
       },
     ]);
-  }, [appTheme, onChange, value]);
+  }, [defaultPalette, onChange, value]);
 
   const previousDataSeriesCountRef = React.useRef(value.length);
   React.useEffect(() => {
@@ -100,9 +100,13 @@ function ChartDataPropEditor({
 
   const handleDuplicateDataSeries = React.useCallback(
     (index: number) => () => {
-      onChange([...value.slice(0, index + 1), value[index], ...value.slice(index + 1)]);
+      onChange([
+        ...value.slice(0, index + 1),
+        { ...value[index], color: defaultPalette[(index + 1) % defaultPalette.length] },
+        ...value.slice(index + 1),
+      ]);
     },
-    [onChange, value],
+    [defaultPalette, onChange, value],
   );
 
   const handleRemoveDataSeries = React.useCallback(

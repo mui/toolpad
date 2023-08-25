@@ -6,16 +6,17 @@ import {
   LinePlot,
   AreaPlot,
   ScatterPlot,
+  MarkPlot,
   BarSeriesType,
   LineSeriesType,
   ScatterSeriesType,
   ScaleName,
 } from '@mui/x-charts';
-import { ChartContainer } from '@mui/x-charts/ChartContainer';
+import { ResponsiveChartContainer } from '@mui/x-charts/ResponsiveChartContainer';
 import { ChartsXAxis } from '@mui/x-charts/ChartsXAxis';
 import { ChartsYAxis } from '@mui/x-charts/ChartsYAxis';
 import { ChartsLegend } from '@mui/x-charts/ChartsLegend';
-import { ChartsTooltip } from '@mui/x-charts/ChartsTooltip';
+// import { ChartsTooltip } from '@mui/x-charts/ChartsTooltip';
 import { ChartsAxisHighlight } from '@mui/x-charts/ChartsAxisHighlight';
 import { errorFrom } from '@mui/toolpad-utils/errors';
 import ErrorOverlay from './components/ErrorOverlay';
@@ -47,6 +48,10 @@ function getChartType(kind: ChartDataSeriesKind): 'line' | 'bar' | 'scatter' {
   }
 }
 
+function hasOnlyIntegers(array: unknown[]): boolean {
+  return array.every((item) => Number.isInteger(item));
+}
+
 interface ChartProps extends ContainerProps {
   data?: ChartData;
   loading?: boolean;
@@ -64,7 +69,7 @@ function Chart({ data = [], loading, error, height, sx }: ChartProps) {
           }
           return dataSeries.data.map((dataSeriesPoint) => dataSeriesPoint[dataSeries.xKey!]);
         })
-        .filter((value, index, array) => array.indexOf(value) === index)
+        .filter((value, index, array) => value && array.indexOf(value) === index)
         .sort((a: number | string, b: number | string) => {
           if (typeof a === 'number' && typeof b === 'number') {
             return (a as number) - (b as number);
@@ -119,7 +124,8 @@ function Chart({ data = [], loading, error, height, sx }: ChartProps) {
             ...baseProps,
             data: yValues,
           } as BarSeriesType;
-        }),
+        })
+        .filter((dataSeries) => dataSeries.data && dataSeries.data.length > 0),
     [data, xValues],
   );
 
@@ -130,7 +136,7 @@ function Chart({ data = [], loading, error, height, sx }: ChartProps) {
   const hasBarCharts = data.some((dataSeries) => dataSeries.kind === 'bar');
 
   const hasNonCategoryXValues = xValues.some((xValue) => typeof xValue === 'number');
-  const hasXOnlyIntegers = xValues.every((x) => Number.isInteger(x));
+  const hasXOnlyIntegers = hasOnlyIntegers(xValues);
 
   let xScaleType: ScaleName = 'linear';
   if (hasXOnlyIntegers) {
@@ -158,10 +164,9 @@ function Chart({ data = [], loading, error, height, sx }: ChartProps) {
         />
       ) : null}
       {isDataVisible ? (
-        <ChartContainer
-          series={chartSeries.slice().reverse()}
-          height={300}
-          width={1000}
+        <ResponsiveChartContainer
+          series={chartSeries}
+          height={height}
           xAxis={[
             {
               id: 'x',
@@ -194,14 +199,24 @@ function Chart({ data = [], loading, error, height, sx }: ChartProps) {
             position="left"
             axisId={firstDataSeries?.yAxisKey || 'y'}
           />
-          {data.some((dataSeries) => dataSeries.kind === 'area') ? <AreaPlot /> : null}
+          {hasXOnlyIntegers &&
+          data.some((dataSeries) => dataSeries.data && hasOnlyIntegers(dataSeries.data)) ? (
+            <React.Fragment>
+              {data.some((dataSeries) => dataSeries.kind === 'area') ? <AreaPlot /> : null}
+              {data.some((dataSeries) => dataSeries.kind === 'line') ? <LinePlot /> : null}
+              {data.some((dataSeries) => dataSeries.kind === 'scatter') ? <ScatterPlot /> : null}
+              {data.some(
+                (dataSeries) => dataSeries.kind === 'line' || dataSeries.kind === 'area',
+              ) ? (
+                <MarkPlot />
+              ) : null}
+            </React.Fragment>
+          ) : null}
           {hasBarCharts ? <BarPlot /> : null}
-          {data.some((dataSeries) => dataSeries.kind === 'line') ? <LinePlot /> : null}
-          {data.some((dataSeries) => dataSeries.kind === 'scatter') ? <ScatterPlot /> : null}
           <ChartsLegend />
-          <ChartsTooltip />
+          {/* <ChartsTooltip /> */}
           <ChartsAxisHighlight x={hasBarCharts ? 'band' : 'line'} />
-        </ChartContainer>
+        </ResponsiveChartContainer>
       ) : null}
     </Container>
   );

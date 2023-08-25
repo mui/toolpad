@@ -1,10 +1,11 @@
 import { spawnSync } from 'child_process';
 import * as fs from 'fs/promises';
 import path from 'path';
-import { defineConfig } from 'tsup';
-import type * as esbuild from 'esbuild';
+import { defineConfig, Options } from 'tsup';
 
-function cleanFolderOnFailure(folder: string): esbuild.Plugin {
+type EsbuildPlugin = NonNullable<Options['esbuildPlugins']>[number];
+
+function cleanFolderOnFailure(folder: string): EsbuildPlugin {
   return {
     name: 'clean-dist-on-failure',
     setup(build) {
@@ -25,8 +26,8 @@ export default defineConfig({
   sourcemap: true,
   esbuildPlugins: [cleanFolderOnFailure(path.resolve(__dirname, 'dist'))],
   async onSuccess() {
+    spawnSync('tsc', ['--emitDeclarationOnly', '--declaration'], { shell: true });
     // eslint-disable-next-line no-console
     console.log('build successful');
-    spawnSync('tsc', ['--emitDeclarationOnly', '--declaration'], { shell: true });
   },
 });

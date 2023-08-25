@@ -11,6 +11,7 @@ const pages: MuiPage[] = [
       {
         pathname: '/toolpad/examples',
         children: [
+          { pathname: '/toolpad/examples/overview', title: 'Overview' },
           { pathname: '/toolpad/examples/npm-stats', title: 'npm stats' },
           { pathname: '/toolpad/examples/basic-crud-app', title: 'Basic CRUD application' },
           { pathname: '/toolpad/examples/qr-generator', title: 'QR Code generator' },
@@ -104,26 +105,31 @@ const pages: MuiPage[] = [
           },
         ],
       },
-
       {
-        pathname: '/toolpad/how-to-guides/customize-datagrid',
-        title: 'Customize data grids',
-      },
-      {
-        pathname: '/toolpad/how-to-guides/delete-datagrid-row',
-        title: 'Delete a data grid row',
-      },
-      {
-        pathname: '/toolpad/how-to-guides/embed-pages',
-        title: 'Embed a Toolpad page',
-      },
-      {
-        pathname: '/toolpad/how-to-guides/basic-auth',
-        title: 'Enable basic auth',
-      },
-      {
-        pathname: '/toolpad/how-to-guides/editor-path',
-        title: 'Troubleshoot missing editor',
+        pathname: '/toolpad/how-to-guides/misc',
+        subheader: 'Miscellaneous',
+        children: [
+          {
+            pathname: '/toolpad/how-to-guides/customize-datagrid',
+            title: 'Customize data grids',
+          },
+          {
+            pathname: '/toolpad/how-to-guides/delete-datagrid-row',
+            title: 'Delete a data grid row',
+          },
+          {
+            pathname: '/toolpad/how-to-guides/embed-pages',
+            title: 'Embed a Toolpad page',
+          },
+          {
+            pathname: '/toolpad/how-to-guides/basic-auth',
+            title: 'Enable basic auth',
+          },
+          {
+            pathname: '/toolpad/how-to-guides/editor-path',
+            title: 'Troubleshoot missing editor',
+          },
+        ],
       },
     ],
   },

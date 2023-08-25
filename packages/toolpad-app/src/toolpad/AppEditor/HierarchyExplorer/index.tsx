@@ -10,10 +10,6 @@ import { useDom, useDomApi, useAppState, useAppStateApi } from '../../AppState';
 import EditableText from '../../../components/EditableText';
 import { ComponentIcon } from '../PageEditor/ComponentCatalog/ComponentCatalogItem';
 import { useNodeNameValidation } from '../PagesExplorer/validation';
-import {
-  PAGE_ROW_COMPONENT_ID,
-  PAGE_COLUMN_COMPONENT_ID,
-} from '../../../runtime/toolpadComponents';
 import { DomView } from '../../../utils/domView';
 import { removePageLayoutNode } from '../pageLayout';
 
@@ -103,16 +99,6 @@ function RecursiveSubTree({ dom, root }: { dom: appDom.AppDom; root: appDom.Elem
     () => appDom.getChildNodes(dom, root),
     [dom, root],
   );
-
-  if (
-    (root.attributes.component === PAGE_ROW_COMPONENT_ID ||
-      root.attributes.component === PAGE_COLUMN_COMPONENT_ID) &&
-    children.length === 1
-  ) {
-    return children.map((childNode) => (
-      <RecursiveSubTree key={childNode.id} dom={dom} root={childNode} />
-    ));
-  }
 
   if (children.length > 0) {
     return (

@@ -1,6 +1,6 @@
 {
   "name": "create-toolpad-app",
-  "version": "0.1.24",
+  "version": "0.1.25",
   "keywords": [
     "react",
     "toolpad",
@@ -21,7 +21,6 @@
     "dist"
   ],
   "scripts": {
-    "prebuild": "rimraf ./dist",
     "build": "tsup",
     "dev": "tsup --watch",
     "check-types": "tsc --noEmit",
@@ -31,7 +30,7 @@
     "node": ">=16.14.2"
   },
   "dependencies": {
-    "@mui/toolpad-utils": "0.1.24",
+    "@mui/toolpad-utils": "0.1.25",
     "chalk": "5.3.0",
     "execa": "7.2.0",
     "inquirer": "9.2.10",
@@ -41,7 +40,7 @@
   },
   "devDependencies": {
     "@types/inquirer": "9.0.3",
-    "node-fetch": "2.6.12"
+    "node-fetch": "2.6.13"
   },
-  "gitHead": "02f3e1819b3da86f142dd47fc6b2226cea867fa8"
+  "gitHead": "206e4443c1d99f68f0e033dab68ecdade1c25cc6"
 }

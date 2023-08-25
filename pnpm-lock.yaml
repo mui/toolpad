@@ -911,6 +911,9 @@ importers:
       react-is:
         specifier: 18.2.0
         version: 18.2.0
+      vm-browserify:
+        specifier: ^1.1.2
+        version: 1.1.2
     devDependencies:
       '@types/cookie':
         specifier: 0.5.1
@@ -952,6 +955,18 @@ importers:
       '@types/react-is':
         specifier: 18.2.1
         version: 18.2.1
+
+  test:
+    devDependencies:
+      '@mui/toolpad':
+        specifier: workspace:*
+        version: link:../packages/toolpad-app
+      react:
+        specifier: 18.2.0
+        version: 18.2.0
+      react-dom:
+        specifier: 18.2.0
+        version: 18.2.0(react@18.2.0)
 
 packages:
 

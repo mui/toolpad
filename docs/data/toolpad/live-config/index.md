@@ -4,17 +4,19 @@
 
 ## Live configurators
 
-### Live editable components in your application
+The live configurators concept enhances the MUI X components workflow. It renders a playground for your data components right inside your application. Any change you make will immediately be persisted in your project. Toolpad produces performant and production ready code as if you write it by hand.
 
-Import our generated components and edit them in our browser devtool. Get immediate feedback and avoid reading documentation altogether.
+- **Live editable components in your application**
 
-### Generates production ready code
+  Import our generated components and edit them in our browser devtool. Get immediate feedback and see your changes automatically saved in your project folder.
 
-Don't compromise on performance, our generators produce the same optimized code that you would have hand-written.
+- **Eject any time you want**
 
-### Eject any time you want
+  There is no lock-in, you can eject at any time you like. Toolpad will produce readable code for your component. Use it as your starting point for more complex use-cases.
 
-You can eject any time you like and get readable code for your component. Use it as your starting point for more complex use-cases.
+- **Generates production ready code**
+
+  Don't compromise on performance, our generators produce the same optimized code that you would have hand-written. If the result satisfies your use-case
 
 ## Demo
 
@@ -24,15 +26,15 @@ Click the edit button to open the live configurator. Hit save when you're done a
 
 ## installation
 
-To try this out in your own project
+To try this out in your project, follow these steps:
 
-1. Add dependencies
+1. Add the required dependencies
 
    ```bash
    yarn add @mui/x-data-grid https://pkg.csb.dev/mui/mui-toolpad/commit/817b15a5/@mui/toolpad-next
    ```
 
-1. Add scripts in `package.json`
+1. Add the following scripts in your `package.json`
 
    ```json
      "scripts": {
@@ -40,7 +42,7 @@ To try this out in your own project
      }
    ```
 
-1. Create a component
+1. Create a new `toolpad-next` component
 
    ```bash
    mkdir -p ./toolpad

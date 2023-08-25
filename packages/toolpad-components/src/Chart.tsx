@@ -91,7 +91,7 @@ function Chart({ data = [], loading, error, height, sx }: ChartProps) {
               (dataSeriesPoint) => dataSeriesPoint[dataSeries.xKey!] === xValue,
             );
 
-            return point ? point[dataSeries.yKey!] : 0;
+            return (point && point[dataSeries.yKey!]) || 0;
           });
 
           const chartType = getChartType(dataSeries.kind);
@@ -130,6 +130,8 @@ function Chart({ data = [], loading, error, height, sx }: ChartProps) {
         .filter((dataSeries) => dataSeries.data && dataSeries.data.length > 0),
     [data, xValues],
   );
+
+  console.log(chartSeries);
 
   const displayError = error ? errorFrom(error) : null;
 

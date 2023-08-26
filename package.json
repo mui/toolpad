@@ -95,7 +95,7 @@
     "yarn-deduplicate": "6.0.2"
   },
   "dependencies": {
-    "archiver": "5.3.2",
+    "archiver": "6.0.0",
     "cross-env": "7.0.3",
     "dotenv-cli": "7.3.0",
     "inquirer": "9.2.10",

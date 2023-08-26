@@ -93,3 +93,18 @@ export function filterKeys<U>(
 ): Record<string, U> {
   return mapProperties(obj, ([key, value]) => (filter(key) ? [key, value] : null));
 }
+
+/**
+ * Compares the properties of two objects. Returns `true` if all properties are strictly equal, `false`
+ * otherwise.
+ * Pass a subset of properties to only compare those.
+ */
+export function equalProperties<P extends object>(obj1: P, obj2: P, subset?: (keyof P)[]): boolean {
+  const keysToCheck = new Set<PropertyKey>(subset ?? [...Object.keys(obj1), ...Object.keys(obj2)]);
+  for (const key of keysToCheck) {
+    if (obj1[key as keyof P] !== obj2[key as keyof P]) {
+      return false;
+    }
+  }
+  return true;
+}

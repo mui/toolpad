@@ -1,6 +1,4 @@
 version: 2.1
-orbs:
-  aws-s3: circleci/aws-s3@4.0.0
 
 defaults: &defaults
   working_directory: /tmp/mui-toolpad

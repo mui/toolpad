@@ -11,6 +11,10 @@ const errorCodesPath = path.resolve(
 );
 const missingError = process.env.MUI_EXTRACT_ERROR_CODES === 'true' ? 'write' : 'annotate';
 
+const muiErrorMacro = require.resolve(
+  './node_modules/@mui/monorepo/packages/mui-utils/macros/MuiError.macro',
+);
+
 module.exports = {
   presets: [
     // backport of https://github.com/zeit/next.js/pull/9511
@@ -24,6 +28,7 @@ module.exports = {
           errorCodesPath,
           missingError,
         },
+        resolvePath: (source, basedir) => muiErrorMacro,
       },
     ],
     'babel-plugin-optimize-clsx',

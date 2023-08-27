@@ -96,7 +96,7 @@
     "mime": "3.0.0",
     "mysql2": "3.6.0",
     "nanoid": "4.0.2",
-    "node-fetch": "2.6.13",
+    "node-fetch": "2.7.0",
     "node-fetch-har": "1.0.1",
     "open-editor": "4.1.0",
     "path-to-regexp": "6.2.1",

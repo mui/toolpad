@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Box, ToggleButton, ToggleButtonGroup, Typography } from '@mui/material';
+import { ToggleButton, ToggleButtonGroup, Typography } from '@mui/material';
 import AlignHorizontalLeftIcon from '@mui/icons-material/AlignHorizontalLeft';
 import AlignHorizontalCenterIcon from '@mui/icons-material/AlignHorizontalCenter';
 import AlignHorizontalRightIcon from '@mui/icons-material/AlignHorizontalRight';
@@ -24,7 +24,7 @@ function HorizontalAlignPropEditor({
 
   return (
     <PropertyControl propType={propType}>
-      <Box>
+      <div>
         {label ? <Typography variant="body2">{label}:</Typography> : null}
         <ToggleButtonGroup
           exclusive
@@ -43,7 +43,7 @@ function HorizontalAlignPropEditor({
             <AlignHorizontalRightIcon />
           </ToggleButton>
         </ToggleButtonGroup>
-      </Box>
+      </div>
     </PropertyControl>
   );
 }

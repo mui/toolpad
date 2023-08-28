@@ -1,6 +1,6 @@
 import { Box, Skeleton, SxProps, styled } from '@mui/material';
 import * as React from 'react';
-import { createComponent } from '@mui/toolpad-core';
+import createBuiltin from './createBuiltin';
 import { SX_PROP_HELPER_TEXT } from './constants';
 import ErrorOverlay from './components/ErrorOverlay';
 
@@ -81,7 +81,7 @@ function Image({
   );
 }
 
-export default createComponent(Image, {
+export default createBuiltin(Image, {
   helperText: 'The Image component lets you display images.',
   layoutDirection: 'both',
   loadingPropSource: ['src'],
@@ -111,6 +111,7 @@ export default createComponent(Image, {
       default: 400,
     },
     height: {
+      helperText: 'The image height in pixels',
       type: 'number',
       default: 300,
     },

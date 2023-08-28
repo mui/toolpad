@@ -1,6 +1,6 @@
 # Delete a data grid row
 
-<p class="description">You can add a delete functionality to the data grid in minutes  </p>
+<p class="description">You can add a delete functionality to the data grid in minutes.</p>
 
 We can add a delete button to a data grid connected to any REST API, like so:
 

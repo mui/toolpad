@@ -1,8 +1,8 @@
 import * as React from 'react';
 import { styled, SxProps, Box, Divider, Typography } from '@mui/material';
-import PagesHierarchyExplorer from './HierarchyExplorer';
-import PageStructureExplorer from './StructureExplorer';
-import SplitPane from '../../components/SplitPane';
+import { Panel, PanelGroup, PanelResizeHandle } from '../../components/resizablePanels';
+import PagesExplorer from './PagesExplorer';
+import PageHierarchyExplorer from './HierarchyExplorer';
 import { useDom } from '../AppState';
 import AppOptions from '../AppOptions';
 import config from '../../config';
@@ -38,10 +38,16 @@ export default function PagePanel({ className, sx }: ComponentPanelProps) {
         <AppOptions dom={dom} />
       </Box>
       <Divider />
-      <SplitPane sx={{ flex: 1 }} split="horizontal" defaultSize={200} minSize={100} maxSize={400}>
-        <PagesHierarchyExplorer />
-        <PageStructureExplorer />
-      </SplitPane>
+
+      <PanelGroup autoSaveId="toolpad-page-panel" direction="vertical">
+        <Panel minSize={10} defaultSize={30} maxSize={75}>
+          <PagesExplorer />
+        </Panel>
+        <PanelResizeHandle />
+        <Panel minSize={25} maxSize={90}>
+          <PageHierarchyExplorer />
+        </Panel>
+      </PanelGroup>
     </PagePanelRoot>
   );
 }

@@ -1,8 +1,15 @@
-name: Label new issues with "needs triage"
+name: Ensure triage label is present
+
 on:
+  label:
+    types:
+      - deleted
   issues:
     types:
       - opened
+
+permissions: {}
+
 jobs:
   label_issues:
     runs-on: ubuntu-latest

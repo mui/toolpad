@@ -19,10 +19,13 @@ import {
   useGridSelector,
   getGridDefaultColumnTypes,
   GridColTypeDef,
-  LicenseInfo,
 } from '@mui/x-data-grid-pro';
+import {
+  Unstable_LicenseInfoProvider as LicenseInfoProvider,
+  Unstable_LicenseInfoProviderProps as LicenseInfoProviderProps,
+} from '@mui/x-license-pro';
 import * as React from 'react';
-import { useNode, createComponent, useComponents } from '@mui/toolpad-core';
+import { useNode, useComponents } from '@mui/toolpad-core';
 import {
   Box,
   debounce,
@@ -39,18 +42,15 @@ import { errorFrom } from '@mui/toolpad-utils/errors';
 import { hasImageExtension } from '@mui/toolpad-utils/path';
 import { ErrorBoundary, FallbackProps } from 'react-error-boundary';
 import { NumberFormat, createStringFormatter } from '@mui/toolpad-core/numberFormat';
+import createBuiltin from './createBuiltin';
 import { SX_PROP_HELPER_TEXT } from './constants';
 import ErrorOverlay from './components/ErrorOverlay';
 
-if (typeof window !== 'undefined') {
-  const licenseKey = window.document.querySelector<HTMLMetaElement>(
-    'meta[name="toolpad-x-license"]',
-  )?.content;
+type MuiLicenseInfo = LicenseInfoProviderProps['info'];
 
-  if (licenseKey) {
-    LicenseInfo.setLicenseKey(licenseKey);
-  }
-}
+const LICENSE_INFO: MuiLicenseInfo = {
+  key: process.env.TOOLPAD_BUNDLED_MUI_X_LICENSE,
+};
 
 const DEFAULT_COLUMN_TYPES = getGridDefaultColumnTypes();
 
@@ -461,42 +461,51 @@ const DataGridComponent = React.forwardRef(function DataGridComponent(
   }, [apiRef, columns]);
 
   // The grid doesn't update when the getRowId property changes, so it needs to be remounted
-  const gridKey = React.useMemo(() => getObjectKey(getRowId), [getRowId]);
+  const gridKey = React.useMemo(
+    () => [getObjectKey(getRowId), getObjectKey(columns)].join('::'),
+    [getRowId, columns],
+  );
 
   const error: Error | null = errorProp ? errorFrom(errorProp) : null;
 
   return (
-    <div
-      ref={ref}
-      style={{ height: heightProp, minHeight: '100%', width: '100%', position: 'relative' }}
-    >
-      <ErrorOverlay error={error} />
-
+    <LicenseInfoProvider info={LICENSE_INFO}>
       <div
-        style={{ position: 'absolute', inset: '0 0 0 0', visibility: error ? 'hidden' : 'visible' }}
+        ref={ref}
+        style={{ height: heightProp, minHeight: '100%', width: '100%', position: 'relative' }}
       >
-        <DataGridPro
-          apiRef={apiRef}
-          slots={{
-            toolbar: hideToolbar ? null : GridToolbar,
-            loadingOverlay: SkeletonLoadingOverlay,
+        <ErrorOverlay error={error} />
+
+        <div
+          style={{
+            position: 'absolute',
+            inset: '0 0 0 0',
+            visibility: error ? 'hidden' : 'visible',
           }}
-          onColumnResize={handleResize}
-          onColumnOrderChange={handleColumnOrderChange}
-          rows={rows}
-          columns={columns}
-          key={gridKey}
-          getRowId={getRowId}
-          onRowSelectionModelChange={onSelectionModelChange}
-          rowSelectionModel={selectionModel}
-          {...props}
-        />
+        >
+          <DataGridPro
+            apiRef={apiRef}
+            slots={{
+              toolbar: hideToolbar ? null : GridToolbar,
+              loadingOverlay: SkeletonLoadingOverlay,
+            }}
+            onColumnResize={handleResize}
+            onColumnOrderChange={handleColumnOrderChange}
+            rows={rows}
+            columns={columns}
+            key={gridKey}
+            getRowId={getRowId}
+            onRowSelectionModelChange={onSelectionModelChange}
+            rowSelectionModel={selectionModel}
+            {...props}
+          />
+        </div>
       </div>
-    </div>
+    </LicenseInfoProvider>
   );
 });
 
-export default createComponent(DataGridComponent, {
+export default createBuiltin(DataGridComponent, {
   helperText:
     'The MUI X [Data Grid](https://mui.com/x/react-data-grid/) component.\n\nThe datagrid lets users display tabular data in a flexible grid.',
   errorProp: 'error',
@@ -565,6 +574,7 @@ export default createComponent(DataGridComponent, {
       default: 'compact',
     },
     height: {
+      helperText: 'The height of the datagrid.',
       type: 'number',
       default: 350,
       minimum: 100,

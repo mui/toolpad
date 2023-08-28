@@ -1,10 +1,5 @@
-import {
-  BindableAttrValue,
-  EnvAttrValue,
-  JsExpressionAction,
-  JsExpressionAttrValue,
-} from '@mui/toolpad-core';
-import { NavigationAction } from './server/schema';
+import { BindableAttrValue } from '@mui/toolpad-core';
+import { hasOwnProperty } from '@mui/toolpad-utils/collections';
 
 type BindingType =
   | 'const'
@@ -15,17 +10,19 @@ type BindingType =
   | 'secret';
 
 export function getBindingType<V>(binding: BindableAttrValue<V>): BindingType {
-  if ((binding as JsExpressionAttrValue).$$jsExpression) {
-    return 'jsExpression';
-  }
-  if ((binding as EnvAttrValue).$$env) {
-    return 'env';
-  }
-  if ((binding as JsExpressionAction).$$jsExpressionAction) {
-    return 'jsExpressionAction';
-  }
-  if ((binding as NavigationAction).$$navigationAction) {
-    return 'navigationAction';
+  if (binding && typeof binding === 'object') {
+    if (hasOwnProperty(binding, '$$jsExpression')) {
+      return 'jsExpression';
+    }
+    if (hasOwnProperty(binding, '$$env')) {
+      return 'env';
+    }
+    if (hasOwnProperty(binding, '$$jsExpressionAction')) {
+      return 'jsExpressionAction';
+    }
+    if (hasOwnProperty(binding, '$$navigationAction')) {
+      return 'navigationAction';
+    }
   }
   return 'const';
 }
@@ -37,17 +34,22 @@ export function getBindingValue<V>(binding: BindableAttrValue<V>):
       page: string;
       parameters?: Record<string, unknown>;
     } {
-  if ((binding as JsExpressionAttrValue).$$jsExpression) {
-    return (binding as JsExpressionAttrValue).$$jsExpression;
-  }
-  if ((binding as EnvAttrValue).$$env) {
-    return (binding as EnvAttrValue).$$env;
-  }
-  if ((binding as JsExpressionAction).$$jsExpressionAction) {
-    return (binding as JsExpressionAction).$$jsExpressionAction;
-  }
-  if ((binding as NavigationAction).$$navigationAction) {
-    return (binding as NavigationAction).$$navigationAction;
+  if (binding && typeof binding === 'object') {
+    if (hasOwnProperty(binding, '$$jsExpression')) {
+      return binding.$$jsExpression as string;
+    }
+    if (hasOwnProperty(binding, '$$env')) {
+      return binding.$$env as string;
+    }
+    if (hasOwnProperty(binding, '$$jsExpressionAction')) {
+      return binding.$$jsExpressionAction as string;
+    }
+    if (hasOwnProperty(binding, '$$navigationAction')) {
+      return binding.$$navigationAction as {
+        page: string;
+        parameters?: Record<string, unknown>;
+      };
+    }
   }
   return binding as V;
 }

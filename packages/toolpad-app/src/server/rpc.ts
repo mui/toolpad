@@ -5,8 +5,7 @@ import * as z from 'zod';
 import { fromZodError } from 'zod-validation-error';
 import { hasOwnProperty } from '@mui/toolpad-utils/collections';
 import { errorFrom, serializeError } from '@mui/toolpad-utils/errors';
-import { indent } from '@mui/toolpad-utils/strings';
-import chalk from 'chalk';
+import { withContext, createServerContext } from '@mui/toolpad-core/server';
 import { asyncHandler } from '../utils/express';
 import type { ToolpadProject } from './localMode';
 
@@ -76,7 +75,10 @@ export function createRpcHandler(definition: Definition): express.RequestHandler
       let rawResult;
       let error: Error | null = null;
       try {
-        rawResult = await method({ params, req, res });
+        const ctx = createServerContext(req);
+        rawResult = await withContext(ctx, async () => {
+          return method({ params, req, res });
+        });
       } catch (rawError) {
         error = errorFrom(rawError);
       }
@@ -86,18 +88,6 @@ export function createRpcHandler(definition: Definition): express.RequestHandler
         : { result: superjson.stringify(rawResult) };
 
       res.json(responseData);
-
-      if (error) {
-        // eslint-disable-next-line no-console
-        console.log(`${chalk.red('error')} - RPC error`);
-        if (error.stack) {
-          // eslint-disable-next-line no-console
-          console.log(indent(error.stack, 2));
-        } else {
-          // eslint-disable-next-line no-console
-          console.log(indent(`${error.name}: ${error.message}`, 2));
-        }
-      }
     }),
   );
   return router;

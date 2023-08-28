@@ -2,8 +2,8 @@ import * as React from 'react';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DesktopDatePicker, DesktopDatePickerProps } from '@mui/x-date-pickers/DesktopDatePicker';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
-import { createComponent } from '@mui/toolpad-core';
 import dayjs from 'dayjs';
+import createBuiltin from './createBuiltin';
 import {
   FORM_INPUT_ARG_TYPES,
   FormInputComponentProps,
@@ -158,7 +158,7 @@ function DatePicker({
 
 const FormWrappedDatePicker = withComponentForm(DatePicker);
 
-export default createComponent(FormWrappedDatePicker, {
+export default createBuiltin(FormWrappedDatePicker, {
   helperText:
     'The MUI X [Date Picker](https://mui.com/x/react-date-pickers/date-picker/) component.\n\nThe date picker lets the user select a date.',
   argTypes: {

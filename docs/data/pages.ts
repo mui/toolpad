@@ -96,8 +96,8 @@ const pages: MuiPage[] = [
         subheader: 'Create custom components',
         children: [
           {
-            pathname: '/toolpad/how-to-guides/number-display',
-            title: 'Number component',
+            pathname: '/toolpad/how-to-guides/map-display',
+            title: 'Map component',
           },
           {
             pathname: '/toolpad/how-to-guides/cube-component',

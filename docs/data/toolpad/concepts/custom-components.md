@@ -6,9 +6,9 @@ The steps below explain how to create and use a custom component in Toolpad.
 
 ## Create component
 
-1. Start by clicking on Create in the custom component section of the Component library.
+1. Click **Create** in the custom component section of the Component library.
 2. Name your component.
-3. Open the snackbar prompt, it will open up the code editor. In case it doesn't open, check [troubleshoot missing editor.](https://mui.com/toolpad/how-to-guides/editor-path/)
+3. Open the snackbar prompt. It will open your code editor. In case it doesn't open, check [troubleshoot missing editor.](https://mui.com/toolpad/how-to-guides/editor-path/)
 
 <video controls width="auto" height="100%" style="contain" alt="custom-component-creation">
   <source src="/static/toolpad/docs/concepts/custom-components/custom-component-creation.mp4" type="video/mp4">

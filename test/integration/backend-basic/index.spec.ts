@@ -62,7 +62,7 @@ test('function editor reload', async ({ page, localApp }) => {
   });
 });
 
-test('function editor parameters update', async ({ page, localApp }) => {
+test('function editor parameters update', async ({ page, localApp, argosScreenshot }) => {
   const editorModel = new ToolpadEditor(page);
   await editorModel.goToPageById(BASIC_TESTS_PAGE_ID);
 
@@ -72,6 +72,8 @@ test('function editor parameters update', async ({ page, localApp }) => {
   await expect(queryEditor).toBeVisible();
   await expect(queryEditor.getByLabel('foo', { exact: true })).toBeVisible();
   await expect(queryEditor.getByLabel('bar', { exact: true })).not.toBeVisible();
+
+  await argosScreenshot('function-editor');
 
   await setPageHidden(page, true); // simulate page hidden
 

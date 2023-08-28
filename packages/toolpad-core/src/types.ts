@@ -198,7 +198,8 @@ export interface ArgControlSpec {
     | 'event'
     | 'NumberFormat'
     | 'ColorScale'
-    | 'RowIdFieldSelect'; // Row id field specialized select
+    | 'RowIdFieldSelect' // Row id field specialized select
+    | 'DataProviderSelector'; // Row id field specialized select
   bindable?: boolean;
   hideLabel?: boolean;
 }

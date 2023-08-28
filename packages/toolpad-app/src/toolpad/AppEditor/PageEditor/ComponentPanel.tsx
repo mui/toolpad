@@ -24,6 +24,7 @@ import HorizontalAlign from '../../propertyControls/HorizontalAlign';
 import VerticalAlign from '../../propertyControls/VerticalAlign';
 import NumberFormat from '../../propertyControls/NumberFormat';
 import ColorScale from '../../propertyControls/ColorScale';
+import DataProviderSelector from '../../propertyControls/DataProviderSelector';
 
 const propTypeControls: PropTypeControls = {
   string,
@@ -41,6 +42,7 @@ const propTypeControls: PropTypeControls = {
   VerticalAlign,
   NumberFormat,
   ColorScale,
+  DataProviderSelector,
 };
 
 const classes = {

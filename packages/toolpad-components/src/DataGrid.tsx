@@ -19,6 +19,7 @@ import {
   useGridSelector,
   getGridDefaultColumnTypes,
   GridColTypeDef,
+  GridPaginationModel,
 } from '@mui/x-data-grid-pro';
 import {
   Unstable_LicenseInfoProvider as LicenseInfoProvider,
@@ -329,6 +330,7 @@ interface Selection {
 }
 
 interface ToolpadDataGridProps extends Omit<DataGridProProps, 'columns' | 'rows' | 'error'> {
+  dataSource?: string;
   rows?: GridRowsProp;
   columns?: SerializableGridColumns;
   height?: number;
@@ -529,6 +531,11 @@ export default createBuiltin(DataGridComponent, {
           required: ['id'],
         },
       },
+    },
+    dataSource: {
+      helperText: 'The backend data provider that will supply the rows to this grid',
+      type: 'string',
+      control: { type: 'DataProviderSelector', bindable: false },
     },
     columns: {
       helperText: 'The columns to be displayed.',

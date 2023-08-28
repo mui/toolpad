@@ -113,3 +113,46 @@ export function createServerContext(req: IncomingMessage): ServerContext {
 export function withContext<R = void>(ctx: ServerContext, doWork: () => Promise<R>): Promise<R> {
   return asyncLocalStorage.run(ctx, doWork);
 }
+
+export const TOOLPAD_DATA_PROVIDER_MARKER = Symbol.for('TOOLPAD_DATA_PROVIDER_MARKER');
+
+export interface IndexPaginationModel {
+  start?: number;
+  pageSize: number;
+}
+
+export interface CursorPaginationModel {
+  cursor?: string;
+  pageSize: number;
+}
+
+export type PaginationMode = 'index' | 'cursor';
+
+export interface GetRecordsParams<R, P extends PaginationMode> {
+  paginationModel: P extends 'cursor' ? CursorPaginationModel : IndexPaginationModel;
+  // filterModel: FilterModel;
+  // sortModel: SortModel;
+}
+
+export interface GetRecordsResult<R> {
+  records: R[];
+}
+
+export interface ToolpadDataProviderInput<R, P extends PaginationMode = 'index'> {
+  paginationMode?: P;
+  getRecords: (params: GetRecordsParams<R, P>) => Promise<GetRecordsResult<R>>;
+  // updateRecord?: (id: string, record: R) => Promise<void>;
+  // deleteRecord?: (id: string) => Promise<void>;
+  // createRecord?: (record: R) => Promise<void>;
+}
+
+export interface ToolpadDataProvider<R, P extends PaginationMode = 'index'>
+  extends ToolpadDataProviderInput<R, P> {
+  [TOOLPAD_DATA_PROVIDER_MARKER]: true;
+}
+
+export function createDataProvider<R, P extends PaginationMode = 'index'>(
+  input: ToolpadDataProviderInput<R, P>,
+): ToolpadDataProvider<R, P> {
+  return Object.assign(input, { [TOOLPAD_DATA_PROVIDER_MARKER]: true as const });
+}

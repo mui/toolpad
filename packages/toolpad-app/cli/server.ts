@@ -23,11 +23,7 @@ import {
   getComponents,
   initProject,
 } from '../src/server/localMode';
-import {
-  Command as AppDevServerCommand,
-  Event as AppDevServerEvent,
-  AppViteServerConfig,
-} from './appServer';
+import type { Command as AppDevServerCommand, AppViteServerConfig, WorkerRpc } from './appServer';
 import { createRpcHandler, createRpcServer } from '../src/server/rpc';
 import { RUNTIME_CONFIG_WINDOW_PROPERTY } from '../src/constants';
 import type { RuntimeConfig } from '../src/config';
@@ -51,7 +47,7 @@ async function createDevHandler(
   project: ToolpadProject,
   { base, runtimeConfig }: CreateDevHandlerParams,
 ) {
-  const router = express.Router();
+  const handler = express.Router();
 
   const appServerPath = path.resolve(__dirname, './appServer.js');
   const devPort = await getPort();
@@ -65,6 +61,7 @@ async function createDevHandler(
       port: devPort,
     } satisfies AppViteServerConfig,
     env: {
+      ...process.env,
       NODE_ENV: 'development',
     },
   });
@@ -74,15 +71,13 @@ async function createDevHandler(
     process.exit(1);
   });
 
-  const readyPromise: Promise<Error | void> = new Promise<void>((resolve) => {
-    worker.on('message', async (msg: AppDevServerEvent) => {
-      if (msg.kind === 'ready') {
-        resolve();
-      }
-    });
-  }).catch((err) => err);
+  let resolveReadyPromise: () => void | undefined;
+  const readyPromise = new Promise<void>((resolve) => {
+    resolveReadyPromise = resolve;
+  });
 
-  createWorkerRpcServer(worker, {
+  createWorkerRpcServer<WorkerRpc>(worker, {
+    notifyReady: async () => resolveReadyPromise?.(),
     loadDom: async () => project.loadDom(),
     getComponents: async () => getComponents(project.getRoot()),
   });
@@ -91,8 +86,8 @@ async function createDevHandler(
     worker.postMessage({ kind: 'reload-components' } satisfies AppDevServerCommand);
   });
 
-  router.use('/api/data', project.dataManager.createDataHandler(project));
-  router.use(
+  handler.use('/api/data', project.dataManager.createDataHandler(project));
+  handler.use(
     (req, res, next) => {
       // Stall the request until the dev server is ready
       readyPromise.then(next, next);
@@ -107,7 +102,12 @@ async function createDevHandler(
     }),
   );
 
-  return router;
+  return {
+    handler,
+    async dispose() {
+      worker.postMessage({ kind: 'exit' } satisfies AppDevServerCommand);
+    },
+  };
 }
 
 interface HealthCheck {
@@ -115,6 +115,11 @@ interface HealthCheck {
   circleBuildNum: string | null;
   memoryUsage: NodeJS.MemoryUsage;
   memoryUsagePretty: Record<keyof NodeJS.MemoryUsage, string>;
+}
+
+interface AppHandler {
+  handler: express.Handler;
+  dispose?: () => Promise<void>;
 }
 
 export interface ServerConfig {
@@ -125,24 +130,25 @@ export interface ServerConfig {
   port: number;
   devMode: boolean;
   externalUrl: string;
+  project: ToolpadProject;
 }
 
-async function main({
+async function startServer({
   cmd,
   gitSha1,
   circleBuildNum,
-  projectDir,
   port,
   devMode,
   externalUrl,
+  project,
 }: ServerConfig) {
   const runtimeConfig: RuntimeConfig = {
     cmd,
-    projectDir,
+    projectDir: project.getRoot(),
     externalUrl,
   };
 
-  const project = await initProject(cmd, projectDir);
+  await project.start();
 
   const app = express();
   const httpServer = createServer(app);
@@ -175,19 +181,21 @@ async function main({
   const publicPath = path.resolve(__dirname, '../../public');
   app.use(express.static(publicPath, { index: false }));
 
+  let appHandler: AppHandler | undefined;
+
   switch (cmd) {
     case 'dev': {
       const previewBase = '/preview';
-      const devHandler = await createDevHandler(project, {
+      appHandler = await createDevHandler(project, {
         runtimeConfig,
         base: previewBase,
       });
-      app.use(previewBase, devHandler);
+      app.use(previewBase, appHandler.handler);
       break;
     }
     case 'start': {
-      const prodHandler = await createProdHandler(project);
-      app.use('/prod', prodHandler);
+      appHandler = await createProdHandler(project);
+      app.use('/prod', appHandler.handler);
       break;
     }
     default:
@@ -271,7 +279,12 @@ async function main({
     }
   });
 
-  return runningServer.port;
+  return {
+    port: runningServer.port,
+    async dispose() {
+      await Promise.allSettled([runningServer.close(), appHandler?.dispose?.()]);
+    },
+  };
 }
 
 export type Command = 'dev' | 'start' | 'build';
@@ -280,6 +293,10 @@ export interface RunAppOptions {
   port?: number;
   dev?: boolean;
   projectDir: string;
+}
+
+export interface RunAppResult {
+  dispose(): Promise<void>;
 }
 
 export async function runApp({ cmd, port, dev = false, projectDir }: RunAppOptions) {
@@ -303,8 +320,11 @@ export async function runApp({ cmd, port, dev = false, projectDir }: RunAppOptio
 
   const externalUrl = process.env.TOOLPAD_EXTERNAL_URL || `http://localhost:${port}`;
 
-  const serverPort = await main({
+  const project = await initProject(cmd, projectDir);
+
+  const server = await startServer({
     cmd,
+    project,
     gitSha1: process.env.GIT_SHA1 || null,
     circleBuildNum: process.env.CIRCLE_BUILD_NUM || null,
     projectDir,
@@ -313,7 +333,7 @@ export async function runApp({ cmd, port, dev = false, projectDir }: RunAppOptio
     externalUrl,
   });
 
-  const toolpadBaseUrl = `http://localhost:${serverPort}/`;
+  const toolpadBaseUrl = `http://localhost:${server.port}/`;
 
   // eslint-disable-next-line no-console
   console.log(
@@ -329,4 +349,10 @@ export async function runApp({ cmd, port, dev = false, projectDir }: RunAppOptio
       console.error(`${chalk.red('error')} - Failed to open browser: ${err.message}`);
     }
   }
+
+  return {
+    async dispose() {
+      await Promise.allSettled([project.dispose(), server.dispose()]);
+    },
+  };
 }

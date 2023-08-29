@@ -1,6 +1,6 @@
 {
   "name": "@mui/toolpad-utils",
-  "version": "0.1.22",
+  "version": "0.1.25",
   "description": "Build MUI apps quickly",
   "author": "MUI Toolpad team",
   "homepage": "https://github.com/mui/mui-toolpad#readme",
@@ -37,7 +37,6 @@
     "url": "git+https://github.com/mui/mui-toolpad.git"
   },
   "scripts": {
-    "prebuild": "rimraf dist",
     "build": "tsup",
     "dev": "tsup --watch",
     "check-types": "tsup && tsc --noEmit",
@@ -62,5 +61,5 @@
     "@types/invariant": "2.2.35",
     "@types/react-is": "18.2.1"
   },
-  "gitHead": "c4bbeaeaf5c34b43fa52b31955b2c34f07700bc3"
+  "gitHead": "206e4443c1d99f68f0e033dab68ecdade1c25cc6"
 }

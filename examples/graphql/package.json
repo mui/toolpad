@@ -1,0 +1,16 @@
+{
+  "name": "graphql",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "toolpad dev",
+    "build": "toolpad build",
+    "start": "toolpad start"
+  },
+  "dependencies": {
+    "@mui/toolpad": "0.1.25",
+    "graphql": "16.7.1",
+    "graphql-request": "6.1.0",
+    "graphql-tag": "2.12.6"
+  }
+}

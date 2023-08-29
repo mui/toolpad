@@ -8,7 +8,6 @@ import chalk from 'chalk';
 import { glob } from 'glob';
 import { writeFileRecursive, fileExists, readJsonFile } from '@mui/toolpad-utils/fs';
 import invariant from 'invariant';
-// @ts-expect-error https://github.com/piscinajs/piscina/issues/362#issuecomment-1616811661
 import Piscina from 'piscina';
 import { ExecFetchResult } from '@mui/toolpad-core';
 import { errorFrom } from '@mui/toolpad-utils/errors';
@@ -18,7 +17,7 @@ import { createWorker as createDevWorker } from './functionsDevWorker';
 import type { ExtractTypesParams, IntrospectionResult } from './functionsTypesWorker';
 import { Awaitable } from '../utils/types';
 import { format } from '../utils/prettier';
-import { tsConfig } from './functionsShared';
+import { compilerOptions } from './functionsShared';
 
 function createDefaultFunction(): string {
   return format(`
@@ -72,6 +71,8 @@ export default class FunctionsManager {
   private extractedTypes: Awaitable<IntrospectionResult> | undefined;
 
   private extractTypesWorker: Piscina | undefined;
+
+  private buildCtx: esbuild.BuildContext | undefined;
 
   constructor(project: IToolpadProject) {
     this.project = project;
@@ -187,7 +188,7 @@ export default class FunctionsManager {
       platform: 'node',
       packages: 'external',
       target: 'es2022',
-      tsconfigRaw: JSON.stringify(tsConfig),
+      tsconfigRaw: JSON.stringify({ compilerOptions }),
       loader: {
         '.txt': 'text',
         '.sql': 'text',
@@ -196,17 +197,15 @@ export default class FunctionsManager {
   }
 
   private async startWatchingFunctionFiles() {
-    let ctx: esbuild.BuildContext | undefined;
-
     // Make sure we pick up added/removed function files
     const resourcesWatcher = chokidar.watch([this.getFunctionResourcesPattern()], {
       ignoreInitial: true,
     });
 
     const reinitializeWatcher = async () => {
-      await ctx?.dispose();
-      ctx = await this.createEsbuildContext();
-      await ctx.watch();
+      await this.buildCtx?.dispose();
+      this.buildCtx = await this.createEsbuildContext();
+      await this.buildCtx.watch();
     };
 
     reinitializeWatcher();
@@ -251,8 +250,17 @@ export default class FunctionsManager {
     await fs.writeFile(this.getIntrospectJsonPath(), JSON.stringify(types, null, 2), 'utf-8');
   }
 
+  private async disposeBuildcontext() {
+    this.buildCtx?.dispose();
+    this.buildCtx = undefined;
+  }
+
   async dispose() {
-    await Promise.all([this.devWorker.terminate(), this.extractTypesWorker.destroy()]);
+    await Promise.all([
+      this.disposeBuildcontext(),
+      this.devWorker.terminate(),
+      this.extractTypesWorker?.destroy(),
+    ]);
   }
 
   async exec(

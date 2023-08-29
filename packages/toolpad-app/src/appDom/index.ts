@@ -7,13 +7,12 @@ import {
   BindableAttrValues,
   SecretAttrValue,
   BindableAttrEntries,
-  JsExpressionAttrValue,
   EnvAttrValue,
 } from '@mui/toolpad-core';
 import invariant from 'invariant';
 import { BoxProps, ThemeOptions as MuiThemeOptions } from '@mui/material';
 import { pascalCase, removeDiacritics, uncapitalize } from '@mui/toolpad-utils/strings';
-import { mapProperties, mapValues } from '@mui/toolpad-utils/collections';
+import { mapProperties, mapValues, hasOwnProperty } from '@mui/toolpad-utils/collections';
 import { ConnectionStatus } from '../types';
 import { omit, update, updateOrCreate } from '../utils/immutability';
 import { ExactEntriesOf, Maybe } from '../utils/types';
@@ -745,23 +744,14 @@ export function setNodeNamespacedProp<
   node: Node,
   namespace: Namespace,
   prop: Prop,
-  value: NonNullable<Node[Namespace]>[Prop] | null,
+  value: NonNullable<Node[Namespace]>[Prop],
 ): AppDom {
-  if (value) {
-    return update(dom, {
-      nodes: update(dom.nodes, {
-        [node.id]: update(dom.nodes[node.id], {
-          [namespace]: updateOrCreate((dom.nodes[node.id] as Node)[namespace], {
-            [prop]: value,
-          } as any) as Partial<Node[Namespace]>,
-        } as Partial<Node>),
-      }),
-    });
-  }
   return update(dom, {
     nodes: update(dom.nodes, {
-      [node.id]: update(node, {
-        [namespace]: omit(node[namespace]!, prop) as Partial<Node[Namespace]>,
+      [node.id]: update(dom.nodes[node.id], {
+        [namespace]: updateOrCreate((dom.nodes[node.id] as Node)[namespace], {
+          [prop]: value,
+        } as any) as Partial<Node[Namespace]>,
       } as Partial<Node>),
     }),
   });
@@ -869,7 +859,7 @@ export function fromConstPropValue<T>(prop?: BindableAttrValue<T | undefined>): 
   if (!prop) {
     return undefined;
   }
-  if ((prop as JsExpressionAttrValue).$$jsExpression || (prop as EnvAttrValue).$$env) {
+  if (hasOwnProperty(prop, '$$jsExpression') || hasOwnProperty(prop, '$$env')) {
     throw new Error(`trying to unbox a non-constant prop value`);
   }
   return prop as T;

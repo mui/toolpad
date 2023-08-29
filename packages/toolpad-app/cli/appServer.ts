@@ -1,4 +1,4 @@
-import { parentPort, workerData, MessagePort } from 'worker_threads';
+import { parentPort, workerData } from 'worker_threads';
 import invariant from 'invariant';
 import { createServer, Plugin } from 'vite';
 import {
@@ -12,37 +12,15 @@ import type * as appDom from '../src/appDom';
 import type { ComponentEntry } from '../src/server/localMode';
 import { createWorkerRpcClient } from '../src/server/workerRpc';
 
-export type Command = {
-  kind: 'reload-components';
-};
+export type Command = { kind: 'reload-components' } | { kind: 'exit' };
 
-export type Event =
-  | {
-      kind: 'ready';
-    }
-  | {
-      kind: 'get-dom';
-      port: MessagePort;
-    }
-  | {
-      kind: 'get-components';
-      port: MessagePort;
-    };
-
-export type MsgResponse<R = unknown> =
-  | {
-      error: Error;
-      result?: undefined;
-    }
-  | {
-      error?: undefined;
-      result: R;
-    };
-
-const { loadDom, getComponents } = createWorkerRpcClient<{
+export type WorkerRpc = {
+  notifyReady: () => Promise<void>;
   loadDom: () => Promise<appDom.AppDom>;
   getComponents: () => Promise<ComponentEntry[]>;
-}>();
+};
+
+const { notifyReady, loadDom, getComponents } = createWorkerRpcClient<WorkerRpc>();
 
 invariant(
   process.env.NODE_ENV === 'development',
@@ -87,18 +65,17 @@ export interface ToolpadAppDevServerParams {
 }
 
 export async function createDevServer({ outDir, config, root, base }: ToolpadAppDevServerParams) {
-  const devServer = await createServer(
-    createViteConfig({
-      outDir,
-      dev: true,
-      root,
-      base,
-      plugins: [devServerPlugin(root, config)],
-      getComponents,
-    }),
-  );
+  const { viteConfig } = createViteConfig({
+    outDir,
+    dev: true,
+    root,
+    base,
+    plugins: [devServerPlugin(root, config)],
+    getComponents,
+  });
+  const devServer = await createServer(viteConfig);
 
-  return devServer;
+  return { devServer };
 }
 
 export interface AppViteServerConfig {
@@ -110,22 +87,31 @@ export interface AppViteServerConfig {
 }
 
 export async function main({ outDir, base, config, root, port }: AppViteServerConfig) {
-  const app = await createDevServer({ outDir, config, root, base });
+  const { devServer } = await createDevServer({ outDir, config, root, base });
 
-  await app.listen(port);
+  await devServer.listen(port);
 
   invariant(parentPort, 'parentPort must be defined');
 
-  parentPort.on('message', (msg: Command) => {
-    if (msg.kind === 'reload-components') {
-      const mod = app.moduleGraph.getModuleById(resolvedComponentsId);
-      if (mod) {
-        app.reloadModule(mod);
+  parentPort.on('message', async (msg: Command) => {
+    switch (msg.kind) {
+      case 'reload-components': {
+        const mod = devServer.moduleGraph.getModuleById(resolvedComponentsId);
+        if (mod) {
+          devServer.reloadModule(mod);
+        }
+        break;
       }
+      case 'exit': {
+        await devServer.close();
+        break;
+      }
+      default:
+        throw new Error(`Unknown command ${msg}`);
     }
   });
 
-  parentPort.postMessage({ kind: 'ready' } satisfies Event);
+  await notifyReady();
 }
 
 main(workerData).catch((err) => {

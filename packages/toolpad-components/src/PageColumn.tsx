@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { Box } from '@mui/material';
-import { createComponent } from '@mui/toolpad-core';
+import createBuiltin from './createBuiltin';
 
 export interface PageColumnProps {
   gap?: number;
@@ -23,13 +23,16 @@ function PageColumn({ gap, children }: PageColumnProps) {
   );
 }
 
-export default createComponent(PageColumn, {
+export default createBuiltin(PageColumn, {
+  helperText: 'A page column component.',
   argTypes: {
     gap: {
+      helperText: 'The gap between children.',
       type: 'number',
       default: 1,
     },
     children: {
+      helperText: 'The content of the component.',
       type: 'element',
       control: { type: 'slots' },
     },

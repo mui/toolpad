@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { Paper as MuiPaper, PaperProps as MuiPaperProps } from '@mui/material';
-import { createComponent } from '@mui/toolpad-core';
+import createBuiltin from './createBuiltin';
 import { SX_PROP_HELPER_TEXT } from './constants';
 
 function Paper({ children, sx, ...rest }: MuiPaperProps) {
@@ -11,7 +11,8 @@ function Paper({ children, sx, ...rest }: MuiPaperProps) {
   );
 }
 
-export default createComponent(Paper, {
+export default createBuiltin(Paper, {
+  helperText: 'The MUI [Paper](https://mui.com/material-ui/react-paper/) component.',
   layoutDirection: 'vertical',
   argTypes: {
     elevation: {
@@ -22,6 +23,7 @@ export default createComponent(Paper, {
       default: 1,
     },
     children: {
+      helperText: 'The content of the component.',
       type: 'element',
       control: { type: 'layoutSlot' },
     },

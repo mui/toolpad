@@ -66,20 +66,20 @@ function useImmediateTextField<V extends TextFieldVariants = TextFieldVariants>(
   const createInputState = React.useCallback(
     (rawInput: unknown): ImmediateInputState => {
       const input = String(rawInput);
-      let error = null;
+      let inputError = null;
       if (required && !input) {
-        error = 'Input required';
+        inputError = 'Input required';
       } else if (validate) {
-        error = validate(input);
+        inputError = validate(input);
       }
-      return { input, error };
+      return { input, error: inputError };
     },
-    [validate],
+    [validate, required],
   );
   const [state, setState] = React.useState<ImmediateInputState>(createInputState(value));
   React.useEffect(() => {
     setState(createInputState(value));
-  }, [value]);
+  }, [value, createInputState]);
 
   return {
     ...props,

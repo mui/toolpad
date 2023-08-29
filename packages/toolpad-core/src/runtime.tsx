@@ -6,7 +6,14 @@ import { hasOwnProperty } from '@mui/toolpad-utils/collections';
 import { createProvidedContext } from '@mui/toolpad-utils/react';
 import { RuntimeEvents, ToolpadComponents, ToolpadComponent, ArgTypeDefinition } from './types';
 import { RUNTIME_PROP_NODE_ID, RUNTIME_PROP_SLOTS, TOOLPAD_COMPONENT } from './constants';
-import type { SlotType, ComponentConfig, RuntimeEvent, RuntimeError } from './types';
+import type {
+  SlotType,
+  ComponentConfig,
+  RuntimeEvent,
+  RuntimeError,
+  PaginationMode,
+  ToolpadDataProviderBase,
+} from './types';
 import { createComponent } from './browser';
 
 const ResetNodeErrorsKeyContext = React.createContext(0);
@@ -261,3 +268,19 @@ export function useComponent(id: string) {
     );
   }, [components, id]);
 }
+
+export interface ToolpadDataProviderIntrospection {
+  paginationMode: PaginationMode;
+}
+
+export interface UseDataProviderHookResult<R, P extends PaginationMode> {
+  isLoading: boolean;
+  error?: unknown;
+  dataProvider?: ToolpadDataProviderBase<R, P>;
+}
+
+export interface UseDataProviderHook {
+  <R, P extends PaginationMode>(id: string | null): UseDataProviderHookResult<R, P>;
+}
+
+export const UseDataProviderContext = React.createContext<UseDataProviderHook | null>(null);

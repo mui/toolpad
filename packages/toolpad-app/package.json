@@ -112,6 +112,7 @@
     "react-hook-form": "7.45.4",
     "react-inspector": "5.1.1",
     "react-is": "18.2.0",
+    "react-query": "3.39.3",
     "react-resizable-panels": "0.0.53",
     "react-router-dom": "6.15.0",
     "recharts": "2.7.3",

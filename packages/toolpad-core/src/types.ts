@@ -481,3 +481,33 @@ export interface ApplicationVm {
   scopes: { [id in string]?: RuntimeScope };
   bindingScopes: { [id in string]?: string };
 }
+
+export interface IndexPaginationModel {
+  start?: number;
+  pageSize: number;
+}
+
+export interface CursorPaginationModel {
+  cursor?: string;
+  pageSize: number;
+}
+
+export type PaginationMode = 'index' | 'cursor';
+
+export interface GetRecordsParams<R, P extends PaginationMode> {
+  paginationModel: P extends 'cursor' ? CursorPaginationModel : IndexPaginationModel;
+  // filterModel: FilterModel;
+  // sortModel: SortModel;
+}
+
+export interface GetRecordsResult<R> {
+  records: R[];
+}
+
+export interface ToolpadDataProviderBase<R, P extends PaginationMode = 'index'> {
+  paginationMode?: P;
+  getRecords: (params: GetRecordsParams<R, P>) => Promise<GetRecordsResult<R>>;
+  // updateRecord?: (id: string, record: R) => Promise<void>;
+  // deleteRecord?: (id: string) => Promise<void>;
+  // createRecord?: (record: R) => Promise<void>;
+}

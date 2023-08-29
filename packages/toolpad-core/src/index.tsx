@@ -16,6 +16,7 @@ export {
   useComponents,
   ComponentsContextProvider,
   useComponent,
+  UseDataProviderContext,
 } from './runtime';
 
 export type FlowDirection = 'row' | 'column' | 'row-reverse' | 'column-reverse';

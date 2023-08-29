@@ -19,14 +19,13 @@ import {
   useGridSelector,
   getGridDefaultColumnTypes,
   GridColTypeDef,
-  GridPaginationModel,
 } from '@mui/x-data-grid-pro';
 import {
   Unstable_LicenseInfoProvider as LicenseInfoProvider,
   Unstable_LicenseInfoProviderProps as LicenseInfoProviderProps,
 } from '@mui/x-license-pro';
 import * as React from 'react';
-import { useNode, useComponents } from '@mui/toolpad-core';
+import { useNode, useComponents, UseDataProviderContext } from '@mui/toolpad-core';
 import {
   Box,
   debounce,
@@ -43,6 +42,7 @@ import { errorFrom } from '@mui/toolpad-utils/errors';
 import { hasImageExtension } from '@mui/toolpad-utils/path';
 import { ErrorBoundary, FallbackProps } from 'react-error-boundary';
 import { NumberFormat, createStringFormatter } from '@mui/toolpad-core/numberFormat';
+import { useNonNullableContext } from '@mui/toolpad-utils/react';
 import createBuiltin from './createBuiltin';
 import { SX_PROP_HELPER_TEXT } from './constants';
 import ErrorOverlay from './components/ErrorOverlay';
@@ -330,7 +330,7 @@ interface Selection {
 }
 
 interface ToolpadDataGridProps extends Omit<DataGridProProps, 'columns' | 'rows' | 'error'> {
-  dataSource?: string;
+  dataProvider?: string;
   rows?: GridRowsProp;
   columns?: SerializableGridColumns;
   height?: number;
@@ -351,10 +351,13 @@ const DataGridComponent = React.forwardRef(function DataGridComponent(
     selection,
     onSelectionChange,
     hideToolbar,
+    dataProvider,
     ...props
   }: ToolpadDataGridProps,
   ref: React.ForwardedRef<HTMLDivElement>,
 ) {
+  const useDataProvider = useNonNullableContext(UseDataProviderContext);
+  console.log(useDataProvider(dataProvider || null));
   const nodeRuntime = useNode<ToolpadDataGridProps>();
 
   const handleResize = React.useMemo(
@@ -532,7 +535,7 @@ export default createBuiltin(DataGridComponent, {
         },
       },
     },
-    dataSource: {
+    dataProvider: {
       helperText: 'The backend data provider that will supply the rows to this grid',
       type: 'string',
       control: { type: 'DataProviderSelector', bindable: false },

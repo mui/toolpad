@@ -4,7 +4,13 @@ import { AsyncLocalStorage } from 'node:async_hooks';
 import { IncomingMessage } from 'node:http';
 import * as cookie from 'cookie';
 import { TOOLPAD_FUNCTION } from './constants';
-import { InferParameterType, PrimitiveValueType, PropValueType } from './types';
+import {
+  InferParameterType,
+  PaginationMode,
+  PrimitiveValueType,
+  PropValueType,
+  ToolpadDataProviderBase,
+} from './types';
 
 /**
  * The runtime configuration for a Toolpad function. Describes the parameters it accepts and their
@@ -116,43 +122,13 @@ export function withContext<R = void>(ctx: ServerContext, doWork: () => Promise<
 
 export const TOOLPAD_DATA_PROVIDER_MARKER = Symbol.for('TOOLPAD_DATA_PROVIDER_MARKER');
 
-export interface IndexPaginationModel {
-  start?: number;
-  pageSize: number;
-}
-
-export interface CursorPaginationModel {
-  cursor?: string;
-  pageSize: number;
-}
-
-export type PaginationMode = 'index' | 'cursor';
-
-export interface GetRecordsParams<R, P extends PaginationMode> {
-  paginationModel: P extends 'cursor' ? CursorPaginationModel : IndexPaginationModel;
-  // filterModel: FilterModel;
-  // sortModel: SortModel;
-}
-
-export interface GetRecordsResult<R> {
-  records: R[];
-}
-
-export interface ToolpadDataProviderInput<R, P extends PaginationMode = 'index'> {
-  paginationMode?: P;
-  getRecords: (params: GetRecordsParams<R, P>) => Promise<GetRecordsResult<R>>;
-  // updateRecord?: (id: string, record: R) => Promise<void>;
-  // deleteRecord?: (id: string) => Promise<void>;
-  // createRecord?: (record: R) => Promise<void>;
-}
-
 export interface ToolpadDataProvider<R, P extends PaginationMode = 'index'>
-  extends ToolpadDataProviderInput<R, P> {
+  extends ToolpadDataProviderBase<R, P> {
   [TOOLPAD_DATA_PROVIDER_MARKER]: true;
 }
 
 export function createDataProvider<R, P extends PaginationMode = 'index'>(
-  input: ToolpadDataProviderInput<R, P>,
+  input: ToolpadDataProviderBase<R, P>,
 ): ToolpadDataProvider<R, P> {
   return Object.assign(input, { [TOOLPAD_DATA_PROVIDER_MARKER]: true as const });
 }

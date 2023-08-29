@@ -1,45 +1,56 @@
-import { PropValueType } from '@mui/toolpad-core';
-import { GridColDef } from '@mui/x-data-grid-pro';
 import * as React from 'react';
-import { EditorProps } from '../../types';
-import { usePageEditorState } from '../AppEditor/PageEditor/PageEditorProvider';
-import SelectControl from './select';
-import client from '../../api';
 import { Autocomplete, TextField } from '@mui/material';
+import { errorFrom } from '@mui/toolpad-utils/errors';
+import { EditorProps } from '../../types';
+import client from '../../api';
 
-function DataProviderSelector({ propType, value, onChange }: EditorProps<string>) {
-  const { data: introspection, isLoading } = client.useQuery('introspect', []);
+function DataProviderSelector({ value, onChange }: EditorProps<string>) {
+  const { data: introspection, isLoading, error } = client.useQuery('introspect', []);
 
-  console.log(introspection);
-
-  const options =
-    introspection?.files.flatMap((file) =>
-      file.dataProviders?.map((dataProvider) => ({ file, dataProvider })),
-    ) ?? [];
+  const options = React.useMemo(() => {
+    return (
+      introspection?.files.flatMap((file) =>
+        file.dataProviders
+          ?.filter((dataProvider) => dataProvider.name === 'default')
+          .map((dataProvider) => ({
+            file,
+            dataProvider,
+            displayName: file.name.replace(/\.[^.]+$/, ''),
+          })),
+      ) ?? []
+    );
+  }, [introspection]);
 
   const autocompleteValue = React.useMemo(() => {
     if (!value) {
       return null;
     }
     const [fileName, providerName] = value.split(':');
-    console.log(fileName, providerName);
     return (
       options.find(
         (option) => option.file.name === fileName && option.dataProvider.name === providerName,
       ) ?? null
     );
   }, [value, options]);
-  console.log(value, options, autocompleteValue);
+
+  const errorMessage = error ? errorFrom(error).message : undefined;
 
   return (
     <Autocomplete
       options={options}
-      groupBy={(option) => option.file.name}
-      getOptionLabel={(option) => option.dataProvider.name}
-      renderInput={(params) => <TextField {...params} label="Data Provider" />}
+      getOptionLabel={(option) => option.displayName}
+      renderInput={(params) => (
+        <TextField
+          {...params}
+          label="Data Provider"
+          error={!!errorMessage}
+          helperText={errorMessage}
+        />
+      )}
       value={autocompleteValue}
-      onChange={(event, value) => {
-        onChange(value ? `${value.file.name}:${value.dataProvider.name}` : undefined);
+      loading={isLoading}
+      onChange={(event, newValue) => {
+        onChange(newValue ? `${newValue.file.name}:${newValue.dataProvider.name}` : undefined);
       }}
     />
   );

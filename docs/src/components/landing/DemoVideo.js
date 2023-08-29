@@ -179,7 +179,7 @@ export default function DemoVideo() {
       if (videoProgress >= milestone && !milestonesComplete.current.has(milestone)) {
         window.gtag('event', 'toolpad_video', {
           event_category: 'toolpad_landing',
-          event_label: `${milestone}% Complete`,
+          event_label: `video_progress_${milestone}`,
         });
         milestonesComplete.current.add(milestone);
         if (milestone === 100) {

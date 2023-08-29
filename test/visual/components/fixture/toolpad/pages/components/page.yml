@@ -24,7 +24,7 @@ spec:
         - component: codeComponent.MyComponent
           name: codeComponent_eb03t9a
           props:
-            msg: "1"
+            msg: '1'
     - component: PageRow
       name: pageRow5
       children:
@@ -60,6 +60,9 @@ spec:
           name: select
           props:
             label: foo select
+        - component: Checkbox
+          name: checkbox
+          children: []
     - component: PageRow
       name: pageRow9
       children:

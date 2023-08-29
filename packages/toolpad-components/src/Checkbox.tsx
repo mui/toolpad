@@ -89,6 +89,7 @@ export default createComponent(FormWrappedCheckbox, {
       helperText: 'If true, the component is checked.',
       onChangeProp: 'onChange',
       type: 'boolean',
+      defaultValueProp: 'defaultChecked',
     },
     color: {
       helperText:

@@ -11,4 +11,4 @@ title: Toolpad examples
 
 This collection includes apps that showcase connecting to APIs, adding custom components, adding secrets, working with ORMs and more.
 
-{{"component": "docs/src/modules/components/ExamplesGrid.js"}}
+{{"component": "modules/components/ExamplesGrid.js"}}

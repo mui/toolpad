@@ -36,7 +36,7 @@ import {
 import { createProvidedContext, useAssertedContext } from '@mui/toolpad-utils/react';
 import { mapProperties, mapValues } from '@mui/toolpad-utils/collections';
 import { set as setObjectPath } from 'lodash-es';
-import { QueryClient, QueryClientProvider, useMutation } from '@tanstack/react-query';
+import { QueryClientProvider } from '@tanstack/react-query';
 import {
   BrowserRouter,
   Routes,
@@ -79,11 +79,12 @@ import evalJsBindings, {
 } from './evalJsBindings';
 import { HTML_ID_EDITOR_OVERLAY } from './constants';
 import { layoutBoxArgTypes } from './toolpadComponents/layoutBox';
-import { execDataSourceQuery, useDataQuery, UseFetch } from './useDataQuery';
+import { useDataQuery, UseFetch } from './useDataQuery';
 import { NavigateToPage } from './CanvasHooksContext';
 import PreviewHeader from './PreviewHeader';
 import useEvent from '../utils/useEvent';
 import { AppLayout } from './AppLayout';
+import api, { queryClient } from './api';
 
 const browserJsRuntime = getBrowserRuntime();
 
@@ -1266,7 +1267,6 @@ function MutationNode({ node, page }: MutationNodeProps) {
 
   const { bindings } = useAssertedContext(RuntimeScopeContext);
 
-  const queryId = node.id;
   const { value: params } = resolveBindables(
     bindings,
     `${node.id}.params`,
@@ -1275,22 +1275,16 @@ function MutationNode({ node, page }: MutationNodeProps) {
 
   const {
     isLoading,
-    data: responseData = EMPTY_OBJECT,
+    data: responseData,
     error: fetchError,
     mutateAsync,
-  } = useMutation(
-    async (overrides: any = {}) =>
-      execDataSourceQuery({
-        pageName: page.name,
-        queryName: node.name,
-        params: { ...params, ...overrides },
-      }),
-    {
-      mutationKey: [queryId, params],
-    },
-  );
+  } = api.useMutation('execQuery');
 
-  const { data, error: apiError } = responseData;
+  const call = useEvent(async (overrides: any = {}) => {
+    await mutateAsync([page.name, node.name, { ...params, ...overrides }]);
+  });
+
+  const { data, error: apiError } = responseData || EMPTY_OBJECT;
 
   const error = apiError || fetchError;
 
@@ -1302,13 +1296,13 @@ function MutationNode({ node, page }: MutationNodeProps) {
       error,
       data,
       rows: Array.isArray(data) ? data : EMPTY_ARRAY,
-      call: mutateAsync,
-      fetch: mutateAsync,
+      call,
+      fetch: call,
       refetch: () => {
         throw new Error(`refetch is not supported in manual queries`);
       },
     }),
-    [isLoading, error, mutateAsync, data],
+    [isLoading, error, data, call],
   );
 
   React.useEffect(() => {
@@ -1470,15 +1464,6 @@ function AppError({ error }: FallbackProps) {
     </FullPageCentered>
   );
 }
-
-export const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: {
-      retry: false,
-      staleTime: 60 * 1000,
-    },
-  },
-});
 
 export interface ToolpadAppLayoutProps {
   dom: appDom.RenderTree;

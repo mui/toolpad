@@ -7,7 +7,6 @@ import { hasOwnProperty } from '@mui/toolpad-utils/collections';
 import { errorFrom, serializeError } from '@mui/toolpad-utils/errors';
 import { withContext, createServerContext } from '@mui/toolpad-core/server';
 import { asyncHandler } from '../utils/express';
-import type { ToolpadProject } from './localMode';
 
 export interface Method<P extends any[] = any[], R = any> {
   (...params: P): Promise<R>;
@@ -99,55 +98,10 @@ interface ResolverInput<P> {
   res: ServerResponse;
 }
 
-interface MethodResolver<F extends Method> {
+export interface MethodResolver<F extends Method> {
   (input: ResolverInput<Parameters<F>>): ReturnType<F>;
 }
 
-function createMethod<F extends Method>(handler: MethodResolver<F>): MethodResolver<F> {
+export function createMethod<F extends Method>(handler: MethodResolver<F>): MethodResolver<F> {
   return handler;
 }
-
-export function createRpcServer(project: ToolpadProject) {
-  return {
-    query: {
-      dataSourceFetchPrivate: createMethod<typeof project.dataManager.dataSourceFetchPrivate>(
-        ({ params }) => {
-          return project.dataManager.dataSourceFetchPrivate(...params);
-        },
-      ),
-      execQuery: createMethod<typeof project.dataManager.execQuery>(({ params }) => {
-        return project.dataManager.execQuery(...params);
-      }),
-      loadDom: createMethod<typeof project.loadDom>(({ params }) => {
-        return project.loadDom(...params);
-      }),
-      getVersionInfo: createMethod<typeof project.getVersionInfo>(({ params }) => {
-        return project.getVersionInfo(...params);
-      }),
-    },
-    mutation: {
-      saveDom: createMethod<typeof project.saveDom>(({ params }) => {
-        return project.saveDom(...params);
-      }),
-      applyDomDiff: createMethod<typeof project.applyDomDiff>(({ params }) => {
-        return project.applyDomDiff(...params);
-      }),
-      openCodeEditor: createMethod<typeof project.openCodeEditor>(({ params }) => {
-        return project.openCodeEditor(...params);
-      }),
-      createComponent: createMethod<typeof project.createComponent>(({ params }) => {
-        return project.createComponent(...params);
-      }),
-      deletePage: createMethod<typeof project.deletePage>(({ params }) => {
-        return project.deletePage(...params);
-      }),
-      dataSourceExecPrivate: createMethod<typeof project.dataManager.dataSourceExecPrivate>(
-        ({ params }) => {
-          return project.dataManager.dataSourceExecPrivate(...params);
-        },
-      ),
-    },
-  } as const;
-}
-
-export type ServerDefinition = MethodsOf<ReturnType<typeof createRpcServer>>;

@@ -14,7 +14,9 @@ spec:
             value:
               $$jsExpression: |
                 `Can pass utf-8: "€"`
+          children: []
         - component: Text
-          name: text
+          name: text1
           props:
             value: 'Can pass double dollars: "$$"'
+          children: []

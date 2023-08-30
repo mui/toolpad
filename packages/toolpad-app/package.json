@@ -66,6 +66,7 @@
     "@types/node": "20.5.1",
     "@types/react-dev-utils": "9.0.11",
     "@vitejs/plugin-react": "4.0.4",
+    "@webcontainer/env": "1.1.0",
     "abort-controller": "3.0.0",
     "arg": "5.0.2",
     "basic-auth": "2.0.1",

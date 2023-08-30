@@ -36,7 +36,7 @@ import {
 import { createProvidedContext, useAssertedContext } from '@mui/toolpad-utils/react';
 import { mapProperties, mapValues } from '@mui/toolpad-utils/collections';
 import { set as setObjectPath } from 'lodash-es';
-import { QueryClientProvider } from '@tanstack/react-query';
+import { QueryClientProvider, useMutation } from '@tanstack/react-query';
 import {
   BrowserRouter,
   Routes,
@@ -1275,14 +1275,17 @@ function MutationNode({ node, page }: MutationNodeProps) {
 
   const {
     isLoading,
-    data: responseData,
+    data: responseData = EMPTY_OBJECT,
     error: fetchError,
     mutateAsync,
-  } = api.useMutation('execQuery');
-
-  const call = useEvent(async (overrides: any = {}) => {
-    await mutateAsync([page.name, node.name, { ...params, ...overrides }]);
-  });
+  } = useMutation(
+    async (overrides: any = {}) => {
+      await api.mutation.execQuery(page.name, node.name, { ...params, ...overrides });
+    },
+    {
+      mutationKey: [node.name, params],
+    },
+  );
 
   const { data, error: apiError } = responseData || EMPTY_OBJECT;
 
@@ -1296,13 +1299,13 @@ function MutationNode({ node, page }: MutationNodeProps) {
       error,
       data,
       rows: Array.isArray(data) ? data : EMPTY_ARRAY,
-      call,
-      fetch: call,
+      call: mutateAsync,
+      fetch: mutateAsync,
       refetch: () => {
         throw new Error(`refetch is not supported in manual queries`);
       },
     }),
-    [isLoading, error, data, call],
+    [isLoading, error, data, mutateAsync],
   );
 
   React.useEffect(() => {

@@ -9,7 +9,7 @@ spec:
       name: pageRow
       children:
         - component: Chart
-          name: chart1
+          name: chart
           props:
             data:
               - label: dataSeries1
@@ -17,9 +17,9 @@ spec:
                 data:
                   $$jsExpression: |
                     alwaysLoading.data
-                color: "#1976d2"
-                xKey: ""
-                yKey: ""
+                color: '#1976d2'
+                xKey: ''
+                yKey: ''
           children: []
         - component: Chart
           name: chart1
@@ -30,9 +30,9 @@ spec:
                 data:
                   $$jsExpression: |
                     error.data
-                color: "#1976d2"
-                xKey: ""
-                yKey: ""
+                color: '#1976d2'
+                xKey: ''
+                yKey: ''
           children: []
   queries:
     - name: alwaysLoading

@@ -9,6 +9,7 @@ import fetch, { Headers, Request, Response } from 'node-fetch';
 import { errorFrom, serializeError } from '@mui/toolpad-utils/errors';
 import { ServerContext, getServerContext, withContext } from '@mui/toolpad-core/serverRuntime';
 import invariant from 'invariant';
+import { isWebContainer } from '@webcontainer/env';
 
 function getCircularReplacer() {
   const ancestors: object[] = [];
@@ -98,9 +99,9 @@ async function execute(msg: ExecuteMessage) {
   if (typeof fn !== 'function') {
     throw new Error(`Function "${msg.name}" not found`);
   }
-  if (!msg.ctx && process.env.IS_STACKBLITZ) {
+  if (!msg.ctx && isWebContainer()) {
     console.warn(
-      'Bypassing server context in StackBlitz, see https://github.com/stackblitz/core/issues/2711',
+      'Bypassing server context in web containers, see https://github.com/stackblitz/core/issues/2711',
     );
     return fn(...msg.parameters);
   }

@@ -203,6 +203,13 @@ function Chart({ data = [], loading, error, height, sx }: ChartProps) {
           />
           {hasXOnlyIntegers ? (
             <React.Fragment>
+              {hasBarCharts ? <BarPlot /> : null}
+              {chartSeries.some(
+                (dataSeries) =>
+                  dataSeries.type === 'line' && dataSeries.data && hasOnlyNumbers(dataSeries.data),
+              ) ? (
+                <LinePlot />
+              ) : null}
               {chartSeries.some(
                 (dataSeries) =>
                   dataSeries.type === 'line' &&
@@ -211,12 +218,6 @@ function Chart({ data = [], loading, error, height, sx }: ChartProps) {
                   dataSeries.area,
               ) ? (
                 <AreaPlot />
-              ) : null}
-              {chartSeries.some(
-                (dataSeries) =>
-                  dataSeries.type === 'line' && dataSeries.data && hasOnlyNumbers(dataSeries.data),
-              ) ? (
-                <LinePlot />
               ) : null}
               {chartSeries.some(
                 (dataSeries) =>
@@ -235,7 +236,6 @@ function Chart({ data = [], loading, error, height, sx }: ChartProps) {
               ) : null}
             </React.Fragment>
           ) : null}
-          {hasBarCharts ? <BarPlot /> : null}
           <ChartsLegend />
           {/* <ChartsTooltip /> */}
           <ChartsAxisHighlight x={hasBarCharts ? 'band' : 'line'} />

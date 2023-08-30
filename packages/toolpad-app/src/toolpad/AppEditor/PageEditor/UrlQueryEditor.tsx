@@ -6,6 +6,7 @@ import {
   DialogTitle,
   Typography,
   Link,
+  Divider,
 } from '@mui/material';
 import * as React from 'react';
 import AddIcon from '@mui/icons-material/Add';
@@ -31,13 +32,13 @@ function UrlQueryString({ input }: UrlQueryStringProps) {
   }, [input]);
 
   return (
-    <Typography
-      sx={{
-        marginTop: '20px',
-      }}
-    >
-      <code>{queryString}</code>
-    </Typography>
+    <React.Fragment>
+      <Divider variant="middle" sx={{ alignSelf: 'stretch', marginTop: '20px' }} />
+      <Typography variant="overline">Usage Preview:</Typography>
+      <Typography>
+        <code>{queryString}</code>
+      </Typography>
+    </React.Fragment>
   );
 }
 

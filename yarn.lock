@@ -2399,11 +2399,12 @@
     prop-types "^15.8.1"
     react-is "^18.2.0"
 
-"@mui/x-charts@https://pkg.csb.dev/mui/mui-x/commit/290ecadb/@mui/x-charts":
-  version "6.0.0-alpha.7"
-  resolved "https://pkg.csb.dev/mui/mui-x/commit/290ecadb/@mui/x-charts#a8d8839725318dddf12b471fb300b7a7c42e1ee0"
+"@mui/x-charts@6.0.0-alpha.8":
+  version "6.0.0-alpha.8"
+  resolved "https://registry.yarnpkg.com/@mui/x-charts/-/x-charts-6.0.0-alpha.8.tgz#94c414aaf242d34d56ca9fd290b1734214df1b11"
+  integrity sha512-9CKo0sdSaLvi/DBCD3IAX9C9P2ntN0evTghyTGcdWVm0VdT68CzpN8cm/f9J1c4z0fstOMjwJq8CfRPUyL9F8A==
   dependencies:
-    "@babel/runtime" "^7.22.6"
+    "@babel/runtime" "^7.22.11"
     clsx "^2.0.0"
     d3-color "^3.1.0"
     d3-scale "^4.0.2"

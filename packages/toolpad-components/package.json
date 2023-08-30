@@ -43,7 +43,7 @@
     "@mui/material": "5.14.6",
     "@mui/toolpad-core": "0.1.25",
     "@mui/toolpad-utils": "0.1.25",
-    "@mui/x-charts": "https://pkg.csb.dev/mui/mui-x/commit/290ecadb/@mui/x-charts",
+    "@mui/x-charts": "6.0.0-alpha.8",
     "@mui/x-data-grid-pro": "6.12.0",
     "@mui/x-date-pickers": "6.12.0",
     "@mui/x-license-pro": "6.10.2",

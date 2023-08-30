@@ -18,7 +18,7 @@ import type {
   MethodsGroup,
 } from './server/rpc';
 
-function createFetcher(endpoint: string, type: 'query' | 'mutation'): MethodsOfGroup<any> {
+function createFetcher(endpoint: string | URL, type: 'query' | 'mutation'): MethodsOfGroup<any> {
   return new Proxy(
     {},
     {
@@ -63,7 +63,7 @@ export interface RpcClient<D extends MethodsOf<any>> {
   mutation: D['mutation'];
 }
 
-export function createRpcClient<D extends MethodsOf<any>>(endpoint: string): RpcClient<D> {
+export function createRpcClient<D extends MethodsOf<any>>(endpoint: string | URL): RpcClient<D> {
   const query = createFetcher(endpoint, 'query');
   const mutation = createFetcher(endpoint, 'mutation');
   return { query, mutation };
@@ -112,7 +112,7 @@ export interface ApiClient<D extends Definition> extends RpcPiClient<D> {
 
 export function createRpcApi<D extends MethodsOf<any>>(
   queryClient: QueryClient,
-  endpoint: string,
+  endpoint: string | URL,
 ): ApiClient<D> {
   const { query, mutation } = createRpcClient<D>(endpoint);
 

@@ -16,5 +16,5 @@ export const queryClient = new QueryClient({
 
 export default createRpcApi<ServerDefinition>(
   queryClient,
-  `${process.env.BASE_URL}/api/runtime-rpc`,
+  new URL(`${process.env.BASE_URL}/api/runtime-rpc`, window.location.href),
 );

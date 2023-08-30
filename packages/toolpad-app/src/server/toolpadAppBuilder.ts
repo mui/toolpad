@@ -1,6 +1,7 @@
 import * as path from 'path';
 import { InlineConfig, Plugin, build } from 'vite';
 import react from '@vitejs/plugin-react';
+import { viteCommonjs } from '@originjs/vite-plugin-commonjs';
 import serializeJavascript from 'serialize-javascript';
 import { indent } from '@mui/toolpad-utils/strings';
 import { RUNTIME_CONFIG_WINDOW_PROPERTY } from '../constants';
@@ -304,7 +305,12 @@ export function createViteConfig({
       appType: 'custom',
       logLevel: 'info',
       root,
-      plugins: [react(), toolpadVitePlugin({ root, base, getComponents }), ...plugins],
+      plugins: [
+        react(),
+        viteCommonjs(),
+        toolpadVitePlugin({ root, base, getComponents }),
+        ...plugins,
+      ],
       base,
       define: {
         'process.env.NODE_ENV': `'${mode}'`,

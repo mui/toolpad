@@ -17,7 +17,7 @@ import { ResponsiveChartContainer } from '@mui/x-charts/ResponsiveChartContainer
 import { ChartsXAxis } from '@mui/x-charts/ChartsXAxis';
 import { ChartsYAxis } from '@mui/x-charts/ChartsYAxis';
 import { ChartsLegend } from '@mui/x-charts/ChartsLegend';
-// import { ChartsTooltip } from '@mui/x-charts/ChartsTooltip';
+import { ChartsTooltip } from '@mui/x-charts/ChartsTooltip';
 import { ChartsAxisHighlight } from '@mui/x-charts/ChartsAxisHighlight';
 import { errorFrom } from '@mui/toolpad-utils/errors';
 import createBuiltin from './createBuiltin';
@@ -237,7 +237,7 @@ function Chart({ data = [], loading, error, height, sx }: ChartProps) {
           ) : null}
           {hasBarCharts ? <BarPlot /> : null}
           <ChartsLegend />
-          {/* <ChartsTooltip /> */}
+          <ChartsTooltip />
           <ChartsAxisHighlight x={hasBarCharts ? 'band' : 'line'} />
         </ResponsiveChartContainer>
       ) : null}

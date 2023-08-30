@@ -241,7 +241,6 @@ function TextContent({ value, loading, sx, variant }: TextContentProps) {
     <MuiTypography
       sx={{
         ...sx,
-        width: 'auto',
         // This will give it height, even when empty.
         // REMARK: Does it make sense to put it in MUI core?
         [`&:empty::before`]: { content: '""', display: 'inline-block' },

@@ -25,21 +25,10 @@ interface UrlQueryStringProps {
 }
 
 function UrlQueryString({ input }: UrlQueryStringProps) {
-  const [queryString, setQueryString] = React.useState('');
-
-  const createQueryString = React.useCallback(() => {
-    return input?.reduce(
-      (accumulator, fieldAndValue: string[], currentIndex: number) => {
-        const [field, value] = fieldAndValue;
-        return `${accumulator}${currentIndex > 0 ? '&' : ''}${field}=${value}`;
-      },
-      input.length ? '?' : '',
-    );
+  const queryString = React.useMemo(() => {
+    const search = new URLSearchParams(input).toString();
+    return search.length ? search : '';
   }, [input]);
-
-  React.useEffect(() => {
-    setQueryString(createQueryString() as string);
-  }, [createQueryString, input]);
 
   return (
     <Typography

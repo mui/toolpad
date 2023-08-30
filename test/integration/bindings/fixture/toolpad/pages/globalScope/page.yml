@@ -5,66 +5,75 @@ spec:
   title: globalScope
   display: shell
   content:
-    - component: PageRow
-      name: pageRow5
-      children:
-        - component: Text
-          name: text5
-          props:
-            variant: h2
-            value: "Bindings: global scope access"
-    - component: PageRow
-      name: pageRow
-      children:
-        - component: Text
-          name: text
-          props:
-            value:
-              $$jsExpression: |
-                `Allows ecmascript globals |test1 ${
-                  typeof Array !== "undefined" ? "ok" : "nok"
-                }|`
-    - component: PageRow
-      name: pageRow1
-      children:
-        - component: Text
-          name: text1
-          props:
-            value:
-              $$jsExpression: |
-                `Disallows DOM globals |test2 ${
-                  typeof document === "undefined" ? "ok" : "nok"
-                }|`
-    - component: PageRow
-      name: pageRow2
-      children:
-        - component: Text
-          name: text2
-          props:
-            value:
-              $$jsExpression: |
-                `Supports globalThis |test3 ${
-                  typeof globalThis !== "undefined" ? "ok" : "nok"
-                }|`
-    - component: PageRow
-      name: pageRow3
-      children:
-        - component: Text
-          name: text3
-          props:
-            value:
-              $$jsExpression: |
-                `Disallows localStorage globals |test4 ${
-                  typeof localStorage === "undefined" ? "ok" : "nok"
-                }|`
-    - component: PageRow
-      name: pageRow4
-      children:
-        - component: Text
-          name: text4
-          props:
-            value:
-              $$jsExpression: |
-                `Disallows globalThis.localStorage |test5 ${
-                  typeof globalThis.localStorage === "undefined" ? "ok" : "nok"
-                }|`
+    - component: Text
+      name: text5
+      children: []
+      layout:
+        columnSize: 1
+      props:
+        variant: h2
+        value: "Bindings: global scope access"
+    - component: Text
+      name: text
+      children: []
+      layout:
+        columnSize: 1
+      props:
+        value:
+          $$jsExpression: |
+            `Allows ecmascript globals |test1 ${
+              typeof Array !== "undefined" ? "ok" : "nok"
+            }|`
+    - component: Text
+      name: text1
+      children: []
+      layout:
+        columnSize: 1
+      props:
+        value:
+          $$jsExpression: |
+            `Disallows DOM globals |test2 ${
+              typeof document === "undefined" ? "ok" : "nok"
+            }|`
+    - component: Text
+      name: text2
+      children: []
+      layout:
+        columnSize: 1
+      props:
+        value:
+          $$jsExpression: |
+            `Supports globalThis |test3 ${
+              typeof globalThis !== "undefined" ? "ok" : "nok"
+            }|`
+    - component: Text
+      name: text3
+      children: []
+      layout:
+        columnSize: 1
+      props:
+        value:
+          $$jsExpression: |
+            `Disallows localStorage globals |test4 ${
+              typeof localStorage === "undefined" ? "ok" : "nok"
+            }|`
+    - component: Text
+      name: text4
+      children: []
+      layout:
+        columnSize: 1
+      props:
+        value:
+          $$jsExpression: |
+            `Disallows globalThis.localStorage |test5 ${
+              typeof globalThis.localStorage === "undefined" ? "ok" : "nok"
+            }|`
+    - component: Text
+      name: text6
+      children: []
+      props:
+        value:
+          $$jsExpression: |
+            `Allows Intl |test6 ${
+              typeof Intl?.NumberFormat !== "undefined" ? "ok" : "nok"
+            }|`

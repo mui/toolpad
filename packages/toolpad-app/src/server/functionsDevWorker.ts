@@ -106,7 +106,9 @@ async function execute(msg: ExecuteMessage) {
   }
 
   invariant(msg.ctx, 'Server context is required');
-  const result = await withContext(msg.ctx, async () => fn(...msg.parameters));
+  const result = await withContext(msg.ctx, async () => {
+    return fn(...msg.parameters);
+  });
 
   return result;
 }

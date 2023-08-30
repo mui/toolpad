@@ -278,11 +278,9 @@ export const CUSTOM_COLUMN_TYPES: Record<string, GridColTypeDef> = {
     valueFormatter: ({ value: cellValue }: GridValueFormatterParams) => JSON.stringify(cellValue),
   },
   date: {
-    extendType: 'date',
     valueGetter: dateValueGetter,
   },
   dateTime: {
-    extendType: 'date',
     valueGetter: dateValueGetter,
   },
   link: {

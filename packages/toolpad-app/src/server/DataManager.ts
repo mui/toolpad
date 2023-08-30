@@ -124,7 +124,12 @@ export default class DataManager {
       throw new Error(`Invalid node type for data request`);
     }
 
-    return this.execDataNodeQuery(dataNode, params);
+    try {
+      const result = await this.execDataNodeQuery(dataNode, params);
+      return withSerializedError(result);
+    } catch (error) {
+      return withSerializedError({ error });
+    }
   }
 
   async dataSourceFetchPrivate<P, Q>(
@@ -185,15 +190,11 @@ export default class DataManager {
         invariant(typeof pageName === 'string', 'pageName url param required');
         invariant(typeof queryName === 'string', 'queryName url variable required');
 
-        try {
-          const ctx = createServerContext(req);
-          const result = await withContext(ctx, async () => {
-            return this.execQuery(pageName, queryName, req.body);
-          });
-          res.json(withSerializedError(result));
-        } catch (error) {
-          res.json(withSerializedError({ error }));
-        }
+        const ctx = createServerContext(req);
+        const result = await withContext(ctx, async () => {
+          return this.execQuery(pageName, queryName, req.body);
+        });
+        res.json(result);
       }),
     );
 

@@ -1,7 +1,8 @@
 import { UseQueryResult } from '@tanstack/react-query';
 import { NodeId } from '@mui/toolpad-core';
 import { createProvidedContext } from '@mui/toolpad-utils/react';
-import client, { UseQueryFnOptions } from '../api';
+import client from '../api';
+import { UseQueryFnOptions } from '../rpcClient';
 
 export interface ConnectionContext {
   dataSourceId: string;

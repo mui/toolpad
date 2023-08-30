@@ -78,7 +78,7 @@ export const NUMBER_FORMAT_SCHEMA: JSONSchema7 = {
   ],
 };
 
-interface NumberFormatPreset {
+export interface NumberFormatPreset {
   label?: string;
   options?: Intl.NumberFormatOptions;
 }
@@ -125,30 +125,25 @@ export function createFormat(numberFormat?: NumberFormat): Intl.NumberFormat {
   switch (numberFormat.kind) {
     case 'preset': {
       const preset = NUMBER_FORMAT_PRESETS.get(numberFormat.preset);
-      return Intl.NumberFormat(undefined, preset?.options);
+      return new Intl.NumberFormat(undefined, preset?.options);
     }
     case 'custom': {
-      return Intl.NumberFormat(undefined, numberFormat.custom);
+      return new Intl.NumberFormat(undefined, numberFormat.custom);
     }
     case 'currency': {
       const userInput = numberFormat.currency || 'USD';
-      return Intl.NumberFormat(undefined, {
+      return new Intl.NumberFormat(undefined, {
         style: 'currency',
         currency: ACCEPTABLE_CURRENCY_REGEX.test(userInput) ? userInput : 'USD',
       });
     }
     default: {
-      return Intl.NumberFormat();
+      return new Intl.NumberFormat();
     }
   }
 }
 
-export function createStringFormatter(numberFormat?: NumberFormat): NumberFormatter {
-  const format = createFormat(numberFormat);
-  return ({ value }) => format.format(Number(value));
-}
-
-interface FormattedNumberProps {
+export interface FormattedNumberProps {
   format?: Intl.NumberFormat;
   children: number | string;
 }
@@ -181,7 +176,7 @@ function formatNumberOptionValue(numberFormat: NumberFormat | undefined) {
   }
   switch (numberFormat.kind) {
     case 'preset':
-      return `preset:${numberFormat.preset}`;
+      return ['preset', numberFormat.preset].join(':');
     case 'custom':
       return 'custom';
     case 'currency':

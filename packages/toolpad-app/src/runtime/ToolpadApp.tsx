@@ -1280,7 +1280,7 @@ function MutationNode({ node, page }: MutationNodeProps) {
     mutateAsync,
   } = useMutation(
     async (overrides: any = {}) => {
-      await api.mutation.execQuery(page.name, node.name, { ...params, ...overrides });
+      return api.mutation.execQuery(page.name, node.name, { ...params, ...overrides });
     },
     {
       mutationKey: [node.name, params],
@@ -1292,21 +1292,23 @@ function MutationNode({ node, page }: MutationNodeProps) {
   const error = apiError || fetchError;
 
   // Stabilize the mutation and prepare for inclusion in global scope
-  const mutationResult: UseFetch = React.useMemo(
-    () => ({
+  const mutationResult: UseFetch = React.useMemo(() => {
+    const call = async (overrides: any = {}) => {
+      await mutateAsync(overrides);
+    };
+    return {
       isLoading,
       isFetching: isLoading,
       error,
       data,
       rows: Array.isArray(data) ? data : EMPTY_ARRAY,
-      call: mutateAsync,
-      fetch: mutateAsync,
+      call,
+      fetch: call,
       refetch: () => {
         throw new Error(`refetch is not supported in manual queries`);
       },
-    }),
-    [isLoading, error, data, mutateAsync],
-  );
+    };
+  }, [isLoading, error, data, mutateAsync]);
 
   React.useEffect(() => {
     for (const [key, value] of Object.entries(mutationResult)) {

@@ -6,14 +6,14 @@ The steps below explain how to create and use a custom component in Toolpad.
 
 ## Create component
 
-1. Open the Component LIbrary by hovering over it with your mouse.
+1. Open the Component Library by hovering over it with your mouse.
 1. Click **Create** in the custom component section.
 1. Supply a name for your component in the dialog that opens. Click **Create** to initialize a new component.
-1. In the snackbar that appears, click the **Open** button. Your code editor will open with the newly created component. 
+1. In the snackbar that appears, click the **Open** button. Your code editor will open with the newly created component.
 
-::info
-In case it doesn't open, check [troubleshoot missing editor].(https://mui.com/toolpad/how-to-guides/editor-path/)
-::
+:::info
+In case it doesn't open, check [troubleshoot missing editor](https://mui.com/toolpad/how-to-guides/editor-path/).
+:::
 
 <video controls width="auto" height="100%" style="contain" alt="custom-component-creation">
   <source src="/static/toolpad/docs/concepts/custom-components/custom-component-creation.mp4" type="video/mp4">
@@ -22,7 +22,7 @@ In case it doesn't open, check [troubleshoot missing editor].(https://mui.com/to
 
 ## Add component code
 
-Toolpad exposes a `createComponent` API to bring in custom components to the Toolpad component library. For example, in `toolpad/components/HelloWorld.tsx`:
+Toolpad exposes a [`createComponent`](https://mui.com/toolpad/reference/api/create-component/) function. This is used to signal to Toolpad which are the components that can be imported and how it should interpret the properties.
 
 ```jsx
 import * as React from 'react';
@@ -61,7 +61,7 @@ To use a custom component, drag it from the Component Library into the canvas. T
 :::info
 You can look at more detailed guides of creating custom components in the how-to guides section:
 
-- [Number](/toolpad/how-to-guides/number-display/)
+- [Map](/toolpad/how-to-guides/map-display/)
 - [Cube](/toolpad/how-to-guides/cube-component/)
   :::
 

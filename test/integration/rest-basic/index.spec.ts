@@ -62,7 +62,11 @@ test('rest editor basics', async ({ page, context, localApp, argosScreenshot }) 
 
   await expect(newQueryEditor).toBeVisible();
 
-  await argosScreenshot('function-editor');
+  const urlInput = newQueryEditor.getByLabel('url', { exact: true });
+  await urlInput.click();
+  await urlInput.fill('http://foo.bar');
+
+  await argosScreenshot('rest-editor');
 
   const envFilePath = path.resolve(localApp.dir, './.env');
   await withTemporaryEdits(envFilePath, async () => {

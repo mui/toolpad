@@ -18,7 +18,7 @@
     "dev:typings": "yarn build:typings",
     "waitForApp": "tsx ./scripts/waitForApp.mts",
     "check-types": "tsup && tsc --noEmit",
-    "test": "cross-env NODE_OPTIONS=--experimental-vm-modules jest"
+    "test": "jest"
   },
   "files": [
     "public",

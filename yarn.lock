@@ -4013,6 +4013,11 @@
     "@webassemblyjs/ast" "1.11.5"
     "@xtuc/long" "4.2.2"
 
+"@webcontainer/env@1.1.0":
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/@webcontainer/env/-/env-1.1.0.tgz#807cb96a46cabe84d2ca8b43beaecbedbc22271f"
+  integrity sha512-DreJFHUui8vq1N3nQGU3HwK5UI4hVNW7VQfhAOmeQbBVnpKtGhoNobjDNF8LzlN7ssmFI9Uhkc9Au4mtKvPK6Q==
+
 "@xtuc/ieee754@^1.2.0":
   version "1.2.0"
   resolved "https://registry.yarnpkg.com/@xtuc/ieee754/-/ieee754-1.2.0.tgz#eef014a3145ae477a1cbc00cd1e552336dceb790"

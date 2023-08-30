@@ -5,6 +5,7 @@ import {
   DialogContent,
   DialogTitle,
   Typography,
+  Link,
 } from '@mui/material';
 import * as React from 'react';
 import AddIcon from '@mui/icons-material/Add';
@@ -17,6 +18,38 @@ import useUnsavedChangesConfirm from '../../hooks/useUnsavedChangesConfirm';
 
 export interface UrlQueryEditorProps {
   pageNodeId: NodeId;
+}
+
+interface UrlQueryStringProps {
+  input: [string, string][] | undefined;
+}
+
+function UrlQueryString({ input }: UrlQueryStringProps) {
+  const [queryString, setQueryString] = React.useState('');
+
+  const createQueryString = React.useCallback(() => {
+    return input?.reduce(
+      (accumulator, fieldAndValue: string[], currentIndex: number) => {
+        const [field, value] = fieldAndValue;
+        return `${accumulator}${currentIndex > 0 ? '&' : ''}${field}=${value}`;
+      },
+      input.length ? '?' : '',
+    );
+  }, [input]);
+
+  React.useEffect(() => {
+    setQueryString(createQueryString() as string);
+  }, [createQueryString, input]);
+
+  return (
+    <Typography
+      sx={{
+        marginTop: '20px',
+      }}
+    >
+      <code>{queryString}</code>
+    </Typography>
+  );
 }
 
 export default function UrlQueryEditor({ pageNodeId }: UrlQueryEditorProps) {
@@ -83,10 +116,14 @@ export default function UrlQueryEditor({ pageNodeId }: UrlQueryEditorProps) {
         <DialogTitle>Edit page parameters</DialogTitle>
         <DialogContent>
           <Typography>
-            The parameters you define below will be made available in bindings under the{' '}
-            <code>page.parameters</code> global variable. You can set these parameters in the url
-            with query variables (<code>?param=value</code>).
+            Page parameters allow you to pass external data into the Toolpad page state via the URL
+            query. Read more in the{' '}
+            <Link href="https://mui.com/toolpad/concepts/managing-state/#page-parameters">
+              docs
+            </Link>
+            .
           </Typography>
+          <UrlQueryString input={input} />
           <MapEntriesEditor
             sx={{ my: 3 }}
             fieldLabel="Parameter"

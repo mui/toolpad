@@ -225,7 +225,7 @@ function ChartDataPropEditor({
   return (
     <React.Fragment>
       <PropertyControl propType={propType}>
-        <Box>
+        <div>
           <List sx={{ mb: 1 }}>
             {value.map((dataSeries, index) => {
               const { label } = dataSeries;
@@ -262,7 +262,7 @@ function ChartDataPropEditor({
           >
             Add data series
           </Button>
-        </Box>
+        </div>
       </PropertyControl>
       <Popover
         id={popoverId}

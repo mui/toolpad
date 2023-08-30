@@ -322,18 +322,16 @@ function NavigationActionParameterEditor({
   });
 
   return (
-    <Box>
-      <BindableEditor<string>
-        liveBinding={liveBinding}
-        jsRuntime={jsRuntime}
-        globalScope={globalScope}
-        globalScopeMeta={globalScopeMeta}
-        label={label}
-        propType={{ type: 'string' }}
-        value={value || null}
-        onChange={onChange}
-      />
-    </Box>
+    <BindableEditor<string>
+      liveBinding={liveBinding}
+      jsRuntime={jsRuntime}
+      globalScope={globalScope}
+      globalScopeMeta={globalScopeMeta}
+      label={label}
+      propType={{ type: 'string' }}
+      value={value || null}
+      onChange={onChange}
+    />
   );
 }
 
@@ -459,28 +457,26 @@ function ActionEditor({ value, onChange }: ActionEditorProps) {
   };
 
   return (
-    <Box>
-      <TabContext value={activeTab}>
-        <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
-          <TabList onChange={handleTabChange} aria-label="Choose action kind ">
-            <Tab label="JS expression" value="jsExpressionAction" />
-            <Tab label="Navigation" value="navigationAction" />
-          </TabList>
-        </Box>
-        <TabPanel value="jsExpressionAction" disableGutters>
-          <JsExpressionActionEditor
-            value={value?.$$jsExpressionAction ? value : null}
-            onChange={onChange}
-          />
-        </TabPanel>
-        <TabPanel value="navigationAction" disableGutters>
-          <NavigationActionEditor
-            value={value?.$$navigationAction ? value : null}
-            onChange={onChange}
-          />
-        </TabPanel>
-      </TabContext>
-    </Box>
+    <TabContext value={activeTab}>
+      <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
+        <TabList onChange={handleTabChange} aria-label="Choose action kind ">
+          <Tab label="JS expression" value="jsExpressionAction" />
+          <Tab label="Navigation" value="navigationAction" />
+        </TabList>
+      </Box>
+      <TabPanel value="jsExpressionAction" disableGutters>
+        <JsExpressionActionEditor
+          value={value?.$$jsExpressionAction ? value : null}
+          onChange={onChange}
+        />
+      </TabPanel>
+      <TabPanel value="navigationAction" disableGutters>
+        <NavigationActionEditor
+          value={value?.$$navigationAction ? value : null}
+          onChange={onChange}
+        />
+      </TabPanel>
+    </TabContext>
   );
 }
 

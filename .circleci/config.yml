@@ -1,6 +1,4 @@
 version: 2.1
-orbs:
-  aws-s3: circleci/aws-s3@4.0.0
 
 defaults: &defaults
   working_directory: /tmp/mui-toolpad
@@ -21,7 +19,7 @@ commands:
     parameters:
       browsers:
         type: boolean
-        default: true
+        default: false
         description: 'Set to true if you intend to use any browser (e.g. with playwright).'
 
     steps:
@@ -145,7 +143,8 @@ jobs:
 
     steps:
       - checkout
-      - install_js
+      - install_js:
+          browsers: true
       - run:
           name: 'Build packages'
           command: yarn release:build

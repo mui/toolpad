@@ -7,7 +7,9 @@ import * as vm from 'vm';
 import * as url from 'url';
 import fetch, { Headers, Request, Response } from 'node-fetch';
 import { errorFrom, serializeError } from '@mui/toolpad-utils/errors';
-import { ServerContext, getContext, withContext } from '@mui/toolpad-core/server';
+import { ServerContext, getServerContext, withContext } from '@mui/toolpad-core/serverRuntime';
+import invariant from 'invariant';
+import { isWebContainer } from '@webcontainer/env';
 
 function getCircularReplacer() {
   const ancestors: object[] = [];
@@ -40,7 +42,7 @@ interface ExecuteMessage {
   filePath: string;
   name: string;
   parameters: unknown[];
-  ctx: ServerContext;
+  ctx?: ServerContext;
 }
 
 type WorkerMessage = IntrospectMessage | ExecuteMessage;
@@ -97,7 +99,14 @@ async function execute(msg: ExecuteMessage) {
   if (typeof fn !== 'function') {
     throw new Error(`Function "${msg.name}" not found`);
   }
+  if (!msg.ctx && isWebContainer()) {
+    console.warn(
+      'Bypassing server context in web containers, see https://github.com/stackblitz/core/issues/2711',
+    );
+    return fn(...msg.parameters);
+  }
 
+  invariant(msg.ctx, 'Server context is required');
   const result = await withContext(msg.ctx, async () => {
     return fn(...msg.parameters);
   });
@@ -160,7 +169,7 @@ export function createWorker(env: Record<string, any>) {
     },
 
     async execute(filePath: string, name: string, parameters: unknown[]): Promise<any> {
-      const ctx = getContext();
+      const ctx = getServerContext();
       return runOnWorker({
         kind: 'execute',
         filePath,

@@ -12,28 +12,28 @@ const DEFAULT_DATE_STYLE: DateStyle = 'short';
 const DEFAULT_TIME_STYLE: TimeStyle = 'short';
 
 export const DATE_STYLES = new Map<DateStyle, DateFormatPreset>([
-  ['full', { label: 'Full' }],
-  ['long', { label: 'Long' }],
-  ['medium', { label: 'Medium' }],
   ['short', { label: 'Short' }],
+  ['medium', { label: 'Medium' }],
+  ['long', { label: 'Long' }],
+  ['full', { label: 'Full' }],
 ]);
 
 export const TIME_STYLES = new Map<TimeStyle, DateFormatPreset>([
-  ['full', { label: 'Full' }],
-  ['long', { label: 'Long' }],
-  ['medium', { label: 'Medium' }],
   ['short', { label: 'Short' }],
+  ['medium', { label: 'Medium' }],
+  ['long', { label: 'Long' }],
+  ['full', { label: 'Full' }],
 ]);
 
 const DATE_FORMATS = new Map<DateStyle, Intl.DateTimeFormat>(
-  (['full', 'long', 'medium', 'short'] as const).map((dateStyle) => [
+  (['short', 'medium', 'long', 'full'] as const).map((dateStyle) => [
     dateStyle,
     new Intl.DateTimeFormat(undefined, { dateStyle }),
   ]),
 );
 
 const TIME_FORMATS = new Map<DateStyle, Intl.DateTimeFormat>(
-  (['full', 'long', 'medium', 'short'] as const).map((timeStyle) => [
+  (['short', 'medium', 'long', 'full'] as const).map((timeStyle) => [
     timeStyle,
     new Intl.DateTimeFormat(undefined, { timeStyle }),
   ]),

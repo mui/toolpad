@@ -3,94 +3,51 @@ import * as React from 'react';
 
 export interface DateFormatPreset {
   label?: string;
-  options?: Intl.DateTimeFormatOptions;
 }
 
-const DEFAULT_DATE_FORMAT = 'short';
-const DEFAULT_TIME_FORMAT = 'short';
+export type DateStyle = Intl.DateTimeFormatOptions['dateStyle'];
+export type TimeStyle = Intl.DateTimeFormatOptions['timeStyle'];
 
-export const DATE_FORMAT_PRESETS = new Map<string, DateFormatPreset>([
-  [
-    'full',
-    {
-      label: 'Full',
-      options: {
-        dateStyle: 'full',
-      },
-    },
-  ],
-  [
-    'long',
-    {
-      label: 'Long',
-      options: {
-        dateStyle: 'long',
-      },
-    },
-  ],
-  [
-    'medium',
-    {
-      label: 'Medium',
-      options: {
-        dateStyle: 'medium',
-      },
-    },
-  ],
-  [
-    'short',
-    {
-      label: 'Short',
-      options: {
-        dateStyle: 'short',
-      },
-    },
-  ],
+const DEFAULT_DATE_STYLE: DateStyle = 'short';
+const DEFAULT_TIME_STYLE: TimeStyle = 'short';
+
+export const DATE_STYLES = new Map<DateStyle, DateFormatPreset>([
+  ['full', { label: 'Full' }],
+  ['long', { label: 'Long' }],
+  ['medium', { label: 'Medium' }],
+  ['short', { label: 'Short' }],
 ]);
 
-export const TIME_FORMAT_PRESETS = new Map<string, DateFormatPreset>([
-  [
-    'full',
-    {
-      label: 'Full',
-      options: {
-        timeStyle: 'full',
-      },
-    },
-  ],
-  [
-    'long',
-    {
-      label: 'Long',
-      options: {
-        timeStyle: 'long',
-      },
-    },
-  ],
-  [
-    'medium',
-    {
-      label: 'Medium',
-      options: {
-        timeStyle: 'medium',
-      },
-    },
-  ],
-  [
-    'short',
-    {
-      label: 'Short',
-      options: {
-        timeStyle: 'short',
-      },
-    },
-  ],
+export const TIME_STYLES = new Map<TimeStyle, DateFormatPreset>([
+  ['full', { label: 'Full' }],
+  ['long', { label: 'Long' }],
+  ['medium', { label: 'Medium' }],
+  ['short', { label: 'Short' }],
 ]);
+
+const DATE_FORMATS = new Map<DateStyle, Intl.DateTimeFormat>(
+  (['full', 'long', 'medium', 'short'] as const).map((dateStyle) => [
+    dateStyle,
+    new Intl.DateTimeFormat(undefined, { dateStyle }),
+  ]),
+);
+
+const TIME_FORMATS = new Map<DateStyle, Intl.DateTimeFormat>(
+  (['full', 'long', 'medium', 'short'] as const).map((timeStyle) => [
+    timeStyle,
+    new Intl.DateTimeFormat(undefined, { timeStyle }),
+  ]),
+);
+
+const DEMO_DATE = new Date();
+DEMO_DATE.setHours(13);
+DEMO_DATE.setMinutes(28);
+DEMO_DATE.setSeconds(54);
 
 export interface DateFormat {
-  kind: 'preset';
-  datePreset?: string;
-  timePreset?: string;
+  kind: 'shorthand';
+  dateStyle?: DateStyle;
+  timeStyle?: TimeStyle;
 }
 
 export function createFormat(dateFormat?: DateFormat) {
@@ -98,14 +55,9 @@ export function createFormat(dateFormat?: DateFormat) {
     return new Intl.DateTimeFormat(undefined, {});
   }
   switch (dateFormat.kind) {
-    case 'preset': {
-      const datePreset = dateFormat.datePreset
-        ? DATE_FORMAT_PRESETS.get(dateFormat.datePreset)
-        : undefined;
-      const timePreset = dateFormat.timePreset
-        ? TIME_FORMAT_PRESETS.get(dateFormat.timePreset)
-        : undefined;
-      return new Intl.DateTimeFormat(undefined, { ...datePreset?.options, ...timePreset?.options });
+    case 'shorthand': {
+      const { dateStyle, timeStyle } = dateFormat;
+      return new Intl.DateTimeFormat(undefined, { dateStyle, timeStyle });
     }
     default: {
       return new Intl.DateTimeFormat();
@@ -135,30 +87,6 @@ export function FormattedDate({ children, format = DEFAULT_FORMAT }: FormattedDa
   );
 }
 
-function formatDateOptionValue(dateFormat: DateFormat | undefined) {
-  if (!dateFormat) {
-    return `preset:${DEFAULT_DATE_FORMAT}`;
-  }
-  switch (dateFormat.kind) {
-    case 'preset':
-      return ['preset', dateFormat.datePreset ?? DEFAULT_DATE_FORMAT].join(':');
-    default:
-      return `preset:${DEFAULT_DATE_FORMAT}`;
-  }
-}
-
-function formatTimeOptionValue(dateFormat: DateFormat | undefined) {
-  if (!dateFormat) {
-    return `preset:${DEFAULT_TIME_FORMAT}`;
-  }
-  switch (dateFormat.kind) {
-    case 'preset':
-      return ['preset', dateFormat.timePreset ?? DEFAULT_TIME_FORMAT].join(':');
-    default:
-      return `preset:${DEFAULT_TIME_FORMAT}`;
-  }
-}
-
 export interface DateFormatEditorProps {
   value?: DateFormat;
   onChange: (newValue?: DateFormat) => void;
@@ -182,31 +110,25 @@ export function DateFormatEditor({
         select
         fullWidth
         label={label ?? 'Date format'}
-        value={formatDateOptionValue(value)}
+        value={value?.dateStyle || DEFAULT_DATE_STYLE}
         disabled={disabled}
         onChange={(event) => {
           let dateFormat: DateFormat | undefined;
 
           if (event.target.value) {
-            const [prefix, datePreset] = event.target.value.split(':');
-
-            if (prefix === 'preset') {
-              dateFormat = {
-                kind: 'preset',
-                datePreset,
-                timePreset: disableTimeFormat
-                  ? undefined
-                  : value?.timePreset || DEFAULT_TIME_FORMAT,
-              };
-            }
+            dateFormat = {
+              kind: 'shorthand',
+              dateStyle: event.target.value as DateStyle,
+              timeStyle: disableTimeFormat ? undefined : value?.timeStyle || DEFAULT_TIME_STYLE,
+            };
           }
 
           onChange(dateFormat);
         }}
       >
-        {Array.from(DATE_FORMAT_PRESETS, ([type, preset]) => (
-          <MenuItem key={type} value={`preset:${type}`}>
-            {preset.label || type}
+        {Array.from(DATE_STYLES, ([type, preset]) => (
+          <MenuItem key={type} value={type}>
+            {DATE_FORMATS.get(type)?.format(DEMO_DATE) || preset.label || type}
           </MenuItem>
         ))}
       </TextField>
@@ -215,29 +137,25 @@ export function DateFormatEditor({
           select
           fullWidth
           label={label ?? 'Time format'}
-          value={formatTimeOptionValue(value)}
+          value={value?.timeStyle || DEFAULT_TIME_STYLE}
           disabled={disabled}
           onChange={(event) => {
             let dateFormat: DateFormat | undefined;
 
             if (event.target.value) {
-              const [prefix, timePreset] = event.target.value.split(':');
-
-              if (prefix === 'preset') {
-                dateFormat = {
-                  kind: 'preset',
-                  datePreset: value?.datePreset || DEFAULT_DATE_FORMAT,
-                  timePreset,
-                };
-              }
+              dateFormat = {
+                kind: 'shorthand',
+                dateStyle: value?.dateStyle || DEFAULT_DATE_STYLE,
+                timeStyle: event.target.value as TimeStyle,
+              };
             }
 
             onChange(dateFormat);
           }}
         >
-          {Array.from(TIME_FORMAT_PRESETS, ([type, preset]) => (
-            <MenuItem key={type} value={`preset:${type}`}>
-              {preset.label || type}
+          {Array.from(TIME_STYLES, ([type, preset]) => (
+            <MenuItem key={type} value={type}>
+              {TIME_FORMATS.get(type)?.format(DEMO_DATE) || preset.label || type}
             </MenuItem>
           ))}
         </TextField>

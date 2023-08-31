@@ -44,7 +44,6 @@ export default function PageOptionsPanel() {
         arrow
         placement="left-start"
         title={
-          <React.Fragment>
             <Typography variant="inherit">
               Control how the navigation panel is rendered in the final application. Read more in
               the{' '}
@@ -57,7 +56,6 @@ export default function PageOptionsPanel() {
               </Link>
               .
             </Typography>
-          </React.Fragment>
         }
       >
         <TextField

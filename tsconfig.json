@@ -15,8 +15,7 @@
     "noUnusedLocals": false,
     "jsx": "react",
     "noImplicitAny": true,
-    "types": ["node"],
-    "paths": {}
+    "types": ["node"]
   },
   "include": ["./test", "packages/toolpad-utils/src/http.ts"]
 }

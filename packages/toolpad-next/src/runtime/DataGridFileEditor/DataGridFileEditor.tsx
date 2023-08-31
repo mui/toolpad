@@ -109,7 +109,7 @@ export default function DataGridFileEditor({
 
         <TabPanel value="general">
           <Container>
-            <Box>
+            <div>
               <FormControl>
                 <FormLabel>Data Grid Height</FormLabel>
                 <RadioGroup
@@ -130,8 +130,8 @@ export default function DataGridFileEditor({
                   <FormControlLabel value="fixed" control={<Radio />} label="Fixed height" />
                 </RadioGroup>
               </FormControl>
-            </Box>
-            <Box>
+            </div>
+            <div>
               <NumberField
                 label="height"
                 value={value.spec?.height ?? 400}
@@ -143,7 +143,7 @@ export default function DataGridFileEditor({
                   });
                 }}
               />
-            </Box>
+            </div>
           </Container>
         </TabPanel>
         <TabPanel value="rows">

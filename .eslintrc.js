@@ -5,6 +5,13 @@ const ALLOWED_LODASH_METHODS = new Set(['throttle', 'debounce', 'set']);
 
 module.exports = {
   ...baseline,
+  settings: {
+    'import/resolver': {
+      typescript: {
+        project: ['tsconfig.json', 'packages/*/tsconfig.json', 'docs/tsconfig.json'],
+      },
+    },
+  },
   extends: [
     ...baseline.extends,
     // Motivation: https://github.com/shian15810/eslint-plugin-typescript-enum#motivations

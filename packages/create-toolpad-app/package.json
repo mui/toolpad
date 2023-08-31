@@ -42,5 +42,5 @@
     "@types/inquirer": "9.0.3",
     "node-fetch": "2.7.0"
   },
-  "gitHead": "206e4443c1d99f68f0e033dab68ecdade1c25cc6"
+  "gitHead": "49cfb445013990e146a1d030f61a5ccf0b8d6029"
 }

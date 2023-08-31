@@ -8,7 +8,7 @@
     "start": "NODE_OPTIONS='--max-old-space-size=396' toolpad start"
   },
   "dependencies": {
-    "@mui/toolpad": "0.1.24",
+    "@mui/toolpad": "0.1.25",
     "recharts": "2.7.3"
   }
 }

@@ -2,10 +2,8 @@ import * as React from 'react';
 import { Container, ContainerProps, Box, Stack, BoxProps } from '@mui/material';
 import { LoadingButton } from '@mui/lab';
 import { useNode } from '@mui/toolpad-core';
+import { equalProperties } from '@mui/toolpad-utils/collections';
 import { useForm, FieldValues, ValidationMode, FieldError, Controller } from 'react-hook-form';
-// TODO: Remove lodash-es
-// eslint-disable-next-line no-restricted-imports
-import { isEqual } from 'lodash-es';
 import { SX_PROP_HELPER_TEXT } from './constants';
 import createBuiltin, { BuiltinArgTypeDefinitions } from './createBuiltin';
 
@@ -263,7 +261,7 @@ export function useFormInput<V>({
   React.useEffect(() => {
     if (
       form &&
-      !isEqual(validationProps, previousManualValidationPropsRef.current) &&
+      !equalProperties(validationProps, previousManualValidationPropsRef.current) &&
       form.formState.dirtyFields[formInputName]
     ) {
       form.trigger(formInputName);

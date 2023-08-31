@@ -144,7 +144,8 @@ export function JsExpressionEditor({
                 insertText: `${globalVariable}.${property}`,
                 kind: monaco.languages.CompletionItemKind.Variable,
                 documentation: '',
-                sortText: `${globalVariable}.${property}`,
+                // To give it precedence over other default typescript completions:
+                sortText: `\0\0${globalVariable}.${property}`,
                 range,
               } satisfies monaco.languages.CompletionItem;
             });

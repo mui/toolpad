@@ -292,6 +292,7 @@ export function createViteConfig({
           'react-router-dom',
           'react/jsx-dev-runtime',
           'react/jsx-runtime',
+          'recharts',
           'superjson',
           'zod',
         ],

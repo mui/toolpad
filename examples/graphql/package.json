@@ -9,7 +9,7 @@
   },
   "dependencies": {
     "@mui/toolpad": "0.1.26",
-    "graphql": "16.7.1",
+    "graphql": "16.8.0",
     "graphql-request": "6.1.0",
     "graphql-tag": "2.12.6"
   }

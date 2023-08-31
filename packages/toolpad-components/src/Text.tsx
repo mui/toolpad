@@ -45,7 +45,7 @@ interface TextProps {
 const MarkdownContainer = styled('div')(({ theme }) => ({
   display: 'block',
   width: '100%',
-  overflowWrap: 'break-word',
+  overflowWrap: 'anywhere',
   '&:empty::before, & > span:empty::before': {
     content: '""',
     display: 'inline-block',
@@ -248,7 +248,7 @@ function TextContent({ value, loading, sx, variant }: TextContentProps) {
         [`&:empty::before`]: { content: '""', display: 'inline-block' },
         outline: 'none',
         whiteSpace: 'pre-wrap',
-        overflowWrap: 'break-word',
+        overflowWrap: 'anywhere',
       }}
       variant={variant}
       onDoubleClick={() => {

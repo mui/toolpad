@@ -31,7 +31,7 @@ To try this out in your project, follow these steps:
 1. Add the required dependencies
 
    ```bash
-   yarn add @mui/x-data-grid https://pkg.csb.dev/mui/mui-toolpad/commit/817b15a5/@mui/toolpad-next
+   yarn add @mui/x-data-grid https://pkg.csb.dev/mui/mui-toolpad/commit/bbc149b8/@mui/toolpad-next
    ```
 
 1. Add the following scripts in your `package.json`

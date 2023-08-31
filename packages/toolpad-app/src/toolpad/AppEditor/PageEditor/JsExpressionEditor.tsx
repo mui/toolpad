@@ -2,6 +2,8 @@ import * as React from 'react';
 import jsonToTs from 'json-to-ts';
 import { Skeleton, styled, SxProps } from '@mui/material';
 import { ScopeMeta } from '@mui/toolpad-core';
+import * as monaco from 'monaco-editor';
+import { truncate } from '@mui/toolpad-utils/strings';
 import { WithControlledProp } from '../../../utils/types';
 import lazyComponent from '../../../utils/lazyComponent';
 import ElementContext from '../ElementContext';
@@ -118,6 +120,44 @@ export function JsExpressionEditor({
     return [{ content, filePath: 'global.d.ts' }];
   }, [globalScope, globalScopeMeta, nodeName]);
 
+  const completionProvider = React.useMemo<monaco.languages.CompletionItemProvider>(() => {
+    return {
+      provideCompletionItems(model, position) {
+        const word = model.getWordUntilPosition(position);
+        const range = {
+          startLineNumber: position.lineNumber,
+          endLineNumber: position.lineNumber,
+          startColumn: word.startColumn,
+          endColumn: word.endColumn,
+        };
+
+        const suggestions = Object.entries(globalScope).flatMap(
+          ([globalVariable, globalObject]) => {
+            if (typeof globalObject !== 'object' || !globalObject) {
+              return [];
+            }
+
+            return Object.entries(globalObject).map(([property, propValue]) => {
+              return {
+                label: `${globalVariable}.${property}`,
+                detail: truncate(JSON.stringify(propValue) || 'undefined', 40),
+                insertText: `${globalVariable}.${property}`,
+                kind: monaco.languages.CompletionItemKind.Variable,
+                documentation: '',
+                sortText: `${globalVariable}.${property}`,
+                range,
+              } satisfies monaco.languages.CompletionItem;
+            });
+          },
+        );
+
+        return {
+          suggestions,
+        };
+      },
+    };
+  }, [globalScope]);
+
   return (
     <JsExpressionEditorRoot sx={sx}>
       <TypescriptEditor
@@ -130,6 +170,7 @@ export function JsExpressionEditor({
         onFocus={onFocus}
         onBlur={onBlur}
         autoFocus={autoFocus}
+        completionProvider={completionProvider}
       />
     </JsExpressionEditorRoot>
   );

@@ -242,6 +242,7 @@ interface MonacoEditorBaseProps {
   options?: EditorOptions;
   className?: string;
   'data-testid'?: string;
+  completionProvider?: monaco.languages.CompletionItemProvider;
 }
 
 export type MonacoEditorProps = MonacoEditorBaseProps &
@@ -287,6 +288,7 @@ export default React.forwardRef<MonacoEditorHandle, MonacoEditorProps>(function 
     disabled,
     options,
     autoFocus,
+    completionProvider,
     ...props
   },
   ref,
@@ -297,6 +299,26 @@ export default React.forwardRef<MonacoEditorHandle, MonacoEditorProps>(function 
   const monacoTheme = theme.palette.mode === 'dark' ? 'vs-toolpad-dark' : 'vs-toolpad-light';
 
   const [isFocused, setIsFocused] = React.useState(false);
+
+  React.useEffect(() => {
+    if (!completionProvider) {
+      return () => undefined;
+    }
+
+    const disposable = monaco.languages.registerCompletionItemProvider(language, {
+      ...completionProvider,
+      provideCompletionItems(model, position, context, token) {
+        const instanceModel = instanceRef.current?.getModel();
+        // Cheating here, we're binding this completion provider to a single model
+        if (instanceModel === model) {
+          return completionProvider.provideCompletionItems(model, position, context, token);
+        }
+        return null;
+      },
+    });
+
+    return () => disposable.dispose();
+  }, [completionProvider, language]);
 
   React.useEffect(() => {
     /**

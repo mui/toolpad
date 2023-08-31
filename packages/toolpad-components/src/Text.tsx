@@ -45,6 +45,7 @@ interface TextProps {
 const MarkdownContainer = styled('div')(({ theme }) => ({
   display: 'block',
   width: '100%',
+  overflowWrap: 'break-word',
   '&:empty::before, & > span:empty::before': {
     content: '""',
     display: 'inline-block',

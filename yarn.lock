@@ -3218,9 +3218,9 @@
   integrity sha512-BG7fQKZ689HIoc5h+6D2Dgq1fABRa0RbBWKBd9SP/MVRVXROflpm5fhwyATX5duFmbStzyzyycPB8qUYKDH3NA==
 
 "@types/d3-array@^3.0.3":
-  version "3.0.4"
-  resolved "https://registry.yarnpkg.com/@types/d3-array/-/d3-array-3.0.4.tgz#44eebe40be57476cad6a0cd6a85b0f57d54185a2"
-  integrity sha512-nwvEkG9vYOc0Ic7G7kwgviY4AQlTfYGIZ0fqB7CQHXGyYM6nO7kJh5EguSNA3jfh4rq7Sb7eMVq8isuvg2/miQ==
+  version "3.0.7"
+  resolved "https://registry.yarnpkg.com/@types/d3-array/-/d3-array-3.0.7.tgz#b128a0c0b0d9481d3281df47de0955730db384a1"
+  integrity sha512-4/Q0FckQ8TBjsB0VdGFemJOG8BLXUB2KKlL0VmZ+eOYeOnTb/wDRQqYWpBmQ6IlvWkXwkYiot+n9Px2aTJ7zGQ==
 
 "@types/d3-color@*":
   version "3.1.0"
@@ -3245,16 +3245,16 @@
   integrity sha512-0g/A+mZXgFkQxN3HniRDbXMN79K3CdTpLsevj+PXiTcb2hVyvkZUBg37StmgCQkaD84cUJ4uaDAWq7UJOQy2Tg==
 
 "@types/d3-scale@^4.0.2":
-  version "4.0.3"
-  resolved "https://registry.yarnpkg.com/@types/d3-scale/-/d3-scale-4.0.3.tgz#7a5780e934e52b6f63ad9c24b105e33dd58102b5"
-  integrity sha512-PATBiMCpvHJSMtZAMEhc2WyL+hnzarKzI6wAHYjhsonjWJYGq5BXTzQjv4l8m2jO183/4wZ90rKvSeT7o72xNQ==
+  version "4.0.4"
+  resolved "https://registry.yarnpkg.com/@types/d3-scale/-/d3-scale-4.0.4.tgz#3c5e2263eea5a3670cd91043b9f4d150a94c43f1"
+  integrity sha512-eq1ZeTj0yr72L8MQk6N6heP603ubnywSDRfNpi5enouR112HzGLS6RIvExCzZTraFF4HdzNpJMwA/zGiMoHUUw==
   dependencies:
     "@types/d3-time" "*"
 
 "@types/d3-shape@^3.1.0":
-  version "3.1.1"
-  resolved "https://registry.yarnpkg.com/@types/d3-shape/-/d3-shape-3.1.1.tgz#15cc497751dac31192d7aef4e67a8d2c62354b95"
-  integrity sha512-6Uh86YFF7LGg4PQkuO2oG6EMBRLuW9cbavUW46zkIO5kuS2PfTqo2o9SkgtQzguBHbLgNnU90UNsITpsX1My+A==
+  version "3.1.2"
+  resolved "https://registry.yarnpkg.com/@types/d3-shape/-/d3-shape-3.1.2.tgz#a3d421d8b0bc0c6c67cb3f4b4471ddc133cb0117"
+  integrity sha512-NN4CXr3qeOUNyK5WasVUV8NCSAx/CRVcwcb0BuuS1PiTqwIm6ABi1SyasLZ/vsVCFDArF+W4QiGzSry1eKYQ7w==
   dependencies:
     "@types/d3-path" "*"
 
@@ -5791,10 +5791,17 @@ csstype@3.1.2, csstype@^3.0.2, csstype@^3.1.2:
   resolved "https://registry.yarnpkg.com/csstype/-/csstype-3.1.2.tgz#1d4bf9d572f11c14031f0436e1c10bc1f571f50b"
   integrity sha512-I7K1Uu0MBPzaFKg4nI5Q7Vs2t+3gWWW648spaF+Rg7pI9ds18Ugn+lvg4SHczUdKlHI5LWBXyqfS8+DufyBsgQ==
 
-"d3-array@2 - 3", "d3-array@2.10.0 - 3", d3-array@^3.1.6:
+"d3-array@2 - 3", "d3-array@2.10.0 - 3":
   version "3.2.3"
   resolved "https://registry.yarnpkg.com/d3-array/-/d3-array-3.2.3.tgz#39f1f4954e4a09ff69ac597c2d61906b04e84740"
   integrity sha512-JRHwbQQ84XuAESWhvIPaUV4/1UYTBOLiOPGWqgFDHZS1D5QN9c57FbH3QpEnQMYiOXNzKUQyGTZf+EVO7RT5TQ==
+  dependencies:
+    internmap "1 - 2"
+
+d3-array@^3.1.6:
+  version "3.2.4"
+  resolved "https://registry.yarnpkg.com/d3-array/-/d3-array-3.2.4.tgz#15fec33b237f97ac5d7c986dc77da273a8ed0bb5"
+  integrity sha512-tdQAmyA18i4J7wprpYq8ClcxZy3SC31QMeByyCFyRt7BVHdREQZ5lpzoe5mFEYZUWe+oq8HBvk9JjpibyEV4Jg==
   dependencies:
     internmap "1 - 2"
 
@@ -7227,10 +7234,10 @@ fast-diff@^1.1.2:
   resolved "https://registry.yarnpkg.com/fast-diff/-/fast-diff-1.2.0.tgz#73ee11982d86caaf7959828d519cfe927fac5f03"
   integrity sha512-xJuoT5+L99XlZ8twedaRf6Ax2TgQVxvgZOYoPKqZufmJib0tL2tegPBOZb1pVNgIhlqDlA0eO0c3wBvQcmzx4w==
 
-fast-equals@^4.0.3:
-  version "4.0.3"
-  resolved "https://registry.yarnpkg.com/fast-equals/-/fast-equals-4.0.3.tgz#72884cc805ec3c6679b99875f6b7654f39f0e8c7"
-  integrity sha512-G3BSX9cfKttjr+2o1O22tYMLq0DPluZnYtq1rXumE1SpL/F/SLIfHx08WYQoWSIpeMYf8sRbJ8++71+v6Pnxfg==
+fast-equals@^5.0.0:
+  version "5.0.1"
+  resolved "https://registry.yarnpkg.com/fast-equals/-/fast-equals-5.0.1.tgz#a4eefe3c5d1c0d021aeed0bc10ba5e0c12ee405d"
+  integrity sha512-WF1Wi8PwwSY7/6Kx0vKXtw8RwuSGoM1bvDaJbu7MxDlR1vovZjIAKrnzyrThgAjm6JDTu0fVgWXDlMGspodfoQ==
 
 fast-glob@3.2.7:
   version "3.2.7"
@@ -12190,11 +12197,11 @@ react-simple-code-editor@0.13.1:
   integrity sha512-XYeVwRZwgyKtjNIYcAEgg2FaQcCZwhbarnkJIV20U2wkCU9q/CPFBo8nRXrK4GXUz3AvbqZFsZRrpUTkqqEYyQ==
 
 react-smooth@^2.0.2:
-  version "2.0.2"
-  resolved "https://registry.yarnpkg.com/react-smooth/-/react-smooth-2.0.2.tgz#0ef24213628cb13bf4305194a050e1db4302a3a1"
-  integrity sha512-pgqSp1q8rAGtF1bXQE0m3CHGLNfZZh5oA5o1tsPLXRHnKtkujMIJ8Ws5nO1mTySZf1c4vgwlEk+pHi3Ln6eYLw==
+  version "2.0.3"
+  resolved "https://registry.yarnpkg.com/react-smooth/-/react-smooth-2.0.3.tgz#2845fa8f22914f2e4445856d5688fb8a7d72f3ae"
+  integrity sha512-yl4y3XiMorss7ayF5QnBiSprig0+qFHui8uh7Hgg46QX5O+aRMRKlfGGNGLHno35JkQSvSYY8eCWkBfHfrSHfg==
   dependencies:
-    fast-equals "^4.0.3"
+    fast-equals "^5.0.0"
     react-transition-group "2.9.0"
 
 react-transition-group@2.9.0:
@@ -14146,9 +14153,9 @@ vary@^1, vary@~1.1.2:
   integrity sha512-BNGbWLfd0eUPabhkXUVm0j8uuvREyTh5ovRa/dyow/BqAbZJyC+5fU+IzQOzmAKzYqYRAISoRhdQr3eIZ/PXqg==
 
 victory-vendor@^36.6.8:
-  version "36.6.8"
-  resolved "https://registry.yarnpkg.com/victory-vendor/-/victory-vendor-36.6.8.tgz#5a1c555ca99a39fdb66a6c959c8426eb834893a2"
-  integrity sha512-H3kyQ+2zgjMPvbPqAl7Vwm2FD5dU7/4bCTQakFQnpIsfDljeOMDojRsrmJfwh4oAlNnWhpAf+mbAoLh8u7dwyQ==
+  version "36.6.11"
+  resolved "https://registry.yarnpkg.com/victory-vendor/-/victory-vendor-36.6.11.tgz#acae770717c2dae541a54929c304ecab5ab6ac2a"
+  integrity sha512-nT8kCiJp8dQh8g991J/R5w5eE2KnO8EAIP0xocWlh9l2okngMWglOPoMZzJvek8Q1KUc4XE/mJxTZnvOB1sTYg==
   dependencies:
     "@types/d3-array" "^3.0.3"
     "@types/d3-ease" "^3.0.0"

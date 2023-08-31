@@ -2321,8 +2321,8 @@
     react-transition-group "^4.4.5"
 
 "@mui/monorepo@https://github.com/mui/material-ui.git":
-  version "5.14.6"
-  resolved "https://github.com/mui/material-ui.git#d8e06a7bbca87b81e9da1380d927ad607e1cdad6"
+  version "5.14.7"
+  resolved "https://github.com/mui/material-ui.git#7376822b345fcd1ba106e88da7f926b25b2703b0"
 
 "@mui/private-theming@^5.14.7":
   version "5.14.7"

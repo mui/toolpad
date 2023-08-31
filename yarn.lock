@@ -12360,21 +12360,6 @@ recharts@2.7.3:
     reduce-css-calc "^2.1.8"
     victory-vendor "^36.6.8"
 
-recharts@2.8.0:
-  version "2.8.0"
-  resolved "https://registry.yarnpkg.com/recharts/-/recharts-2.8.0.tgz#90c95136e2cb6930224c94a51adce607701284fc"
-  integrity sha512-nciXqQDh3aW8abhwUlA4EBOBusRHLNiKHfpRZiG/yjups1x+auHb2zWPuEcTn/IMiN47vVMMuF8Sr+vcQJtsmw==
-  dependencies:
-    classnames "^2.2.5"
-    eventemitter3 "^4.0.1"
-    lodash "^4.17.19"
-    react-is "^16.10.2"
-    react-resize-detector "^8.0.4"
-    react-smooth "^2.0.2"
-    recharts-scale "^0.4.4"
-    reduce-css-calc "^2.1.8"
-    victory-vendor "^36.6.8"
-
 recursive-readdir@^2.2.2:
   version "2.2.3"
   resolved "https://registry.yarnpkg.com/recursive-readdir/-/recursive-readdir-2.2.3.tgz#e726f328c0d69153bcabd5c322d3195252379372"

@@ -207,7 +207,7 @@ function Chart({ data = [], loading, error, height, sx }: ChartProps) {
                   },
                 ]
           }
-          margin={{ left: 80 }}
+          margin={{ left: 80, top: 60 }}
           sx={{
             '.MuiMarkElement-root': {
               scale: '0.8',
@@ -221,13 +221,13 @@ function Chart({ data = [], loading, error, height, sx }: ChartProps) {
             axisId={firstDataSeries?.yAxisKey || 'y'}
           />
           {hasBarCharts ? <BarPlot /> : null}
+          {hasAreaCharts ? <AreaPlot /> : null}
           {hasLineCharts ? (
             <React.Fragment>
               <LinePlot />
               <MarkPlot />
             </React.Fragment>
           ) : null}
-          {hasAreaCharts ? <AreaPlot /> : null}
           {hasScatterCharts ? <ScatterPlot /> : null}
           <ChartsLegend />
           <ChartsTooltip />

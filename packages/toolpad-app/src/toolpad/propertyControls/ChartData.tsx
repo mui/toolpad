@@ -227,9 +227,11 @@ function ChartDataPropEditor({
         const dataResult = (evaluateBindable(jsBrowserRuntime, dataSeries.data, pageState).value ||
           []) as NonNullable<ChartDataSeries['data']>;
 
-        return dataResult
-          .flatMap((dataSeriesPoint) => Object.keys(dataSeriesPoint))
-          .filter((key, index, array) => array.indexOf(key) === index);
+        return Array.isArray(dataResult)
+          ? dataResult
+              .flatMap((dataSeriesPoint) => Object.keys(dataSeriesPoint))
+              .filter((key, index, array) => array.indexOf(key) === index)
+          : [];
       }),
     [jsBrowserRuntime, pageState, value],
   );

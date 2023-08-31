@@ -17,7 +17,7 @@ import { ResponsiveChartContainer } from '@mui/x-charts/ResponsiveChartContainer
 import { ChartsXAxis } from '@mui/x-charts/ChartsXAxis';
 import { ChartsYAxis } from '@mui/x-charts/ChartsYAxis';
 import { ChartsLegend } from '@mui/x-charts/ChartsLegend';
-// import { ChartsTooltip } from '@mui/x-charts/ChartsTooltip';
+import { ChartsTooltip } from '@mui/x-charts/ChartsTooltip';
 import { ChartsAxisHighlight } from '@mui/x-charts/ChartsAxisHighlight';
 import { errorFrom } from '@mui/toolpad-utils/errors';
 import createBuiltin from './createBuiltin';
@@ -39,6 +39,10 @@ export interface ChartDataSeries<D = Record<string, string | number>> {
 
 export type ChartData = ChartDataSeries[];
 
+function hasOnlyNumbers(array: unknown[]): boolean {
+  return array.every((item) => typeof item === 'number');
+}
+
 function getChartType(kind: ChartDataSeriesKind): 'line' | 'bar' | 'scatter' {
   switch (kind) {
     case 'bar':
@@ -48,10 +52,6 @@ function getChartType(kind: ChartDataSeriesKind): 'line' | 'bar' | 'scatter' {
     default:
       return 'line';
   }
-}
-
-function hasOnlyNumbers(array: unknown[]): boolean {
-  return array.every((item) => typeof item === 'number');
 }
 
 interface ChartProps extends ContainerProps {
@@ -71,7 +71,7 @@ function Chart({ data = [], loading, error, height, sx }: ChartProps) {
           }
           return dataSeries.data.map((dataSeriesPoint) => dataSeriesPoint[dataSeries.xKey!]);
         })
-        .filter((value, index, array) => value && array.indexOf(value) === index)
+        .filter((value, index, array) => array.indexOf(value) === index)
         .sort((a: number | string, b: number | string) => {
           if (typeof a === 'number' && typeof b === 'number') {
             return (a as number) - (b as number);
@@ -135,15 +135,31 @@ function Chart({ data = [], loading, error, height, sx }: ChartProps) {
 
   const isDataVisible = !loading && !displayError;
 
-  const hasBarCharts = data.some((dataSeries) => dataSeries.kind === 'bar');
+  const hasBarCharts = chartSeries.some(
+    (dataSeries) => dataSeries.type === 'bar' && dataSeries.data && hasOnlyNumbers(dataSeries.data),
+  );
+  const hasLineCharts = chartSeries.some(
+    (dataSeries) =>
+      dataSeries.type === 'line' && dataSeries.data && hasOnlyNumbers(dataSeries.data),
+  );
+  const hasAreaCharts = chartSeries.some(
+    (dataSeries) =>
+      dataSeries.type === 'line' &&
+      dataSeries.data &&
+      hasOnlyNumbers(dataSeries.data) &&
+      dataSeries.area,
+  );
+  const hasScatterCharts = chartSeries.some(
+    (dataSeries) =>
+      dataSeries.type === 'scatter' &&
+      dataSeries.data &&
+      hasOnlyNumbers(dataSeries.data.map((point) => point.x)) &&
+      hasOnlyNumbers(dataSeries.data.map((point) => point.y)),
+  );
 
-  const hasNonCategoryXValues = xValues.some((xValue) => typeof xValue === 'number');
-  const hasXOnlyIntegers = hasOnlyNumbers(xValues);
+  const hasOnlyNumberXValues = hasOnlyNumbers(xValues);
 
-  let xScaleType: ScaleName = 'linear';
-  if (hasXOnlyIntegers) {
-    xScaleType = 'point';
-  }
+  let xScaleType: ScaleName = 'point';
   if (hasBarCharts) {
     xScaleType = 'band';
   }
@@ -174,8 +190,8 @@ function Chart({ data = [], loading, error, height, sx }: ChartProps) {
               id: 'x',
               data: xValues,
               scaleType: xScaleType,
-              min: hasNonCategoryXValues ? Math.min(...(xValues as number[])) : undefined,
-              max: hasNonCategoryXValues ? Math.max(...(xValues as number[])) : undefined,
+              min: hasOnlyNumberXValues ? Math.min(...(xValues as number[])) : undefined,
+              max: hasOnlyNumberXValues ? Math.max(...(xValues as number[])) : undefined,
             },
           ]}
           yAxis={
@@ -191,8 +207,11 @@ function Chart({ data = [], loading, error, height, sx }: ChartProps) {
                   },
                 ]
           }
+          margin={{ left: 80 }}
           sx={{
-            '--ChartsLegend-rootSpacing': '25px',
+            '.MuiMarkElement-root': {
+              scale: '0.8',
+            },
           }}
         >
           <ChartsXAxis position="bottom" axisId="x" />
@@ -201,43 +220,17 @@ function Chart({ data = [], loading, error, height, sx }: ChartProps) {
             position="left"
             axisId={firstDataSeries?.yAxisKey || 'y'}
           />
-          {hasXOnlyIntegers ? (
+          {hasBarCharts ? <BarPlot /> : null}
+          {hasLineCharts ? (
             <React.Fragment>
-              {hasBarCharts ? <BarPlot /> : null}
-              {chartSeries.some(
-                (dataSeries) =>
-                  dataSeries.type === 'line' && dataSeries.data && hasOnlyNumbers(dataSeries.data),
-              ) ? (
-                <LinePlot />
-              ) : null}
-              {chartSeries.some(
-                (dataSeries) =>
-                  dataSeries.type === 'line' &&
-                  dataSeries.data &&
-                  hasOnlyNumbers(dataSeries.data) &&
-                  dataSeries.area,
-              ) ? (
-                <AreaPlot />
-              ) : null}
-              {chartSeries.some(
-                (dataSeries) =>
-                  dataSeries.type === 'scatter' &&
-                  dataSeries.data &&
-                  hasOnlyNumbers(dataSeries.data.map((point) => point.x)) &&
-                  hasOnlyNumbers(dataSeries.data.map((point) => point.y)),
-              ) ? (
-                <ScatterPlot />
-              ) : null}
-              {chartSeries.some(
-                (dataSeries) =>
-                  dataSeries.type === 'line' && dataSeries.data && hasOnlyNumbers(dataSeries.data),
-              ) ? (
-                <MarkPlot />
-              ) : null}
+              <LinePlot />
+              <MarkPlot />
             </React.Fragment>
           ) : null}
+          {hasAreaCharts ? <AreaPlot /> : null}
+          {hasScatterCharts ? <ScatterPlot /> : null}
           <ChartsLegend />
-          {/* <ChartsTooltip /> */}
+          <ChartsTooltip />
           <ChartsAxisHighlight x={hasBarCharts ? 'band' : 'line'} />
         </ResponsiveChartContainer>
       ) : null}

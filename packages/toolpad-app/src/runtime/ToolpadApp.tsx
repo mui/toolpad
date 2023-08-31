@@ -32,6 +32,7 @@ import {
   RuntimeScope,
   ApplicationVm,
   JsExpressionAttrValue,
+  ComponentConfig,
 } from '@mui/toolpad-core';
 import { createProvidedContext, useAssertedContext } from '@mui/toolpad-utils/react';
 import { mapProperties, mapValues } from '@mui/toolpad-utils/collections';
@@ -427,6 +428,17 @@ function getQueryConfigBindings({ enabled, refetchInterval }: appDom.QueryNode['
   return { enabled, refetchInterval };
 }
 
+function isBindableProp(componentConfig: ComponentConfig<any>, propName: string) {
+  const isResizableHeightProp = propName === componentConfig.resizableHeightProp;
+  const argType = componentConfig.argTypes?.[propName];
+  return (
+    !isResizableHeightProp &&
+    argType?.control?.bindable !== false &&
+    argType?.type !== 'template' &&
+    argType?.type !== 'event'
+  );
+}
+
 function parseBindings(
   dom: appDom.AppDom,
   rootNode: appDom.ElementNode | appDom.PageNode | appDom.ElementNode[],
@@ -444,34 +456,28 @@ function parseBindings(
       const componentId = getComponentId(elm);
       const Component = components[componentId];
 
-      const componentConfig = Component?.[TOOLPAD_COMPONENT];
+      const componentConfig: ComponentConfig<any> = Component?.[TOOLPAD_COMPONENT] ?? {};
 
-      const { argTypes = {} } = componentConfig ?? {};
+      const { argTypes = {} } = componentConfig;
 
       const propsMeta: Record<string, ScopeMetaPropField> = {};
 
       for (const [propName, argType] of Object.entries(argTypes)) {
-        const initializerId = argType?.defaultValueProp
+        invariant(argType, `Missing argType for prop "${propName}"`);
+
+        const initializerId = argType.defaultValueProp
           ? `${elm.id}.props.${argType.defaultValueProp}`
           : undefined;
 
         const propValue: BindableAttrValue<any> = elm.props?.[propName];
 
-        const binding: BindableAttrValue<any> =
-          propValue ?? (argType ? getArgTypeDefaultValue(argType) : undefined);
+        const binding: BindableAttrValue<any> = propValue ?? getArgTypeDefaultValue(argType);
 
         const bindingId = `${elm.id}.props.${propName}`;
 
         let scopePath: string | undefined;
 
-        const isResizableHeightProp =
-          componentConfig?.resizableHeightProp && propName === componentConfig?.resizableHeightProp;
-
-        if (
-          componentId !== PAGE_ROW_COMPONENT_ID &&
-          !isResizableHeightProp &&
-          argType?.control?.bindable !== false
-        ) {
+        if (componentId !== PAGE_ROW_COMPONENT_ID && isBindableProp(componentConfig, propName)) {
           scopePath = `${elm.name}.${propName}`;
         }
 

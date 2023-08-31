@@ -73,7 +73,9 @@ test('function editor parameters update', async ({ page, localApp, argosScreensh
   await expect(queryEditor.getByLabel('foo', { exact: true })).toBeVisible();
   await expect(queryEditor.getByLabel('bar', { exact: true })).not.toBeVisible();
 
-  await argosScreenshot('function-editor');
+  await argosScreenshot('function-editor', {
+    clip: (await queryEditor.boundingBox()) || undefined,
+  });
 
   await setPageHidden(page, true); // simulate page hidden
 

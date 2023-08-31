@@ -64,6 +64,12 @@ function layouts() {
       src: '/static/toolpad/marketing/custom-datagrid-column.png',
       source: 'https://github.com/mui/mui-toolpad/tree/master/examples/custom-datagrid-column',
     },
+    {
+      title: 'GraphQL app',
+      description: 'An app that shows latest 100 stargazers info for any GitHub repository.',
+      src: '/static/toolpad/marketing/graphql.png',
+      source: 'https://github.com/mui/mui-toolpad/tree/master/examples/graphql',
+    },
   ];
 }
 

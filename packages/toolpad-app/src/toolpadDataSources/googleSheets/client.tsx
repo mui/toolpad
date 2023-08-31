@@ -140,7 +140,7 @@ function QueryEditor({
   const previewGridKey = React.useMemo(() => getObjectKey(columns), [columns]);
 
   return (
-    <PanelGroup autoSaveId="toolpad-google-sheets-panel" direction="vertical">
+    <PanelGroup autoSaveId="toolpad-google-sheets-panel" direction="horizontal">
       <Panel defaultSize={50}>
         <QueryInputPanel onRunPreview={handleRunPreview}>
           <Stack direction="column" gap={2} sx={{ px: 3, pt: 1 }}>

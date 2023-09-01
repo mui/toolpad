@@ -24,7 +24,7 @@ spec:
       layout:
         columnSize: 1
       props:
-        msg: "1"
+        msg: '1'
     - component: DataGrid
       name: dataGrid
       children: []
@@ -77,3 +77,6 @@ spec:
                     content:
                       $$jsExpression: |
                         `List Button ${i + 1}`
+    - component: Checkbox
+      name: checkbox
+      children: []

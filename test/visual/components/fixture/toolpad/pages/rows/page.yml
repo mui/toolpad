@@ -10,5 +10,7 @@ spec:
       children:
         - component: Text
           name: text
+          children: []
         - component: Text
           name: text1
+          children: []

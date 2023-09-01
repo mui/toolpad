@@ -5,6 +5,7 @@ import express from 'express';
 import cors from 'cors';
 import invariant from 'invariant';
 import { errorFrom, serializeError, SerializedError } from '@mui/toolpad-utils/errors';
+import { ToolpadDataProviderIntrospection } from '@mui/toolpad-core/runtime';
 import { Methods, ServerDataSource, ToolpadProjectOptions } from '../types';
 import serverDataSources from '../toolpadDataSources/server';
 import * as appDom from '../appDom';
@@ -13,6 +14,7 @@ import { asyncHandler } from '../utils/express';
 import type FunctionsManager from './FunctionsManager';
 import type EnvManager from './EnvManager';
 import type { RuntimeConfig } from '../config';
+import { DataProviderIntrospectionResult } from './functionsTypesWorker';
 
 function withSerializedError<T extends { error?: unknown }>(
   withError: T,
@@ -236,5 +238,11 @@ export default class DataManager {
     );
 
     return router;
+  }
+
+  async dataProviderIntrospect(id: string): Promise<ToolpadDataProviderIntrospection> {
+    return {
+      paginationMode: 'index',
+    };
   }
 }

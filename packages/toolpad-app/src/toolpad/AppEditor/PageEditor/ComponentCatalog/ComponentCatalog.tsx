@@ -1,7 +1,17 @@
 import * as React from 'react';
-import { Box, Collapse, darken, IconButton, Link, styled, Typography } from '@mui/material';
+import {
+  Box,
+  Collapse,
+  darken,
+  IconButton,
+  Link,
+  styled,
+  Tooltip,
+  Typography,
+} from '@mui/material';
 import ArrowLeftIcon from '@mui/icons-material/ArrowLeft';
 import ArrowRightIcon from '@mui/icons-material/ArrowRight';
+import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
 import ArrowDropDownSharpIcon from '@mui/icons-material/ArrowDropDownSharp';
 import invariant from 'invariant';
 import ComponentCatalogItem from './ComponentCatalogItem';
@@ -156,7 +166,28 @@ export default function ComponentCatalog({ className }: ComponentCatalogProps) {
                 flexDirection={'row'}
                 justifyContent="space-between"
               >
-                <Typography variant="overline">Custom Components</Typography>
+                <Box display="flex" alignItems="center">
+                  <Typography mr={0.5} variant="overline">
+                    Custom Components
+                  </Typography>
+                  <Tooltip
+                    title={
+                      <Typography variant="inherit">
+                        Expand Toolpad with your own React components.{' '}
+                        <Link
+                          href="https://mui.com/toolpad/concepts/custom-components"
+                          target="_blank"
+                          rel="noopener"
+                        >
+                          Click{' '}
+                        </Link>
+                        to read more.
+                      </Typography>
+                    }
+                  >
+                    <HelpOutlineIcon />
+                  </Tooltip>
+                </Box>
                 <IconButton
                   aria-label="Expand custom components"
                   sx={{

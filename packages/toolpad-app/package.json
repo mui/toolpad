@@ -159,7 +159,6 @@
     "monaco-editor": "0.40.0",
     "react-devtools-inline": "4.28.0",
     "react-transition-group": "4.4.5",
-    "typescript": "5.2.2",
     "webpack": "5.88.2"
   },
   "typings": "./index.d.ts",

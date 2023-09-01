@@ -493,7 +493,7 @@ export default async function extractTypes({
           .filter((diagnostic) => diagnostic.category === ts.DiagnosticCategory.Warning)
           .map((diagnostic) => ({ message: formatDiagnostic(diagnostic) })),
         handlers,
-        dataProviders: dataProviders,
+        dataProviders,
       } satisfies FileIntrospectionResult;
     })
     .filter(Boolean)

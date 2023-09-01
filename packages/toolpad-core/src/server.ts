@@ -1,7 +1,13 @@
 /// <reference path="./serverModules.d.ts" />
 
 import { TOOLPAD_FUNCTION } from './constants';
-import { InferParameterType, PrimitiveValueType, PropValueType } from './types';
+import {
+  InferParameterType,
+  PaginationMode,
+  PrimitiveValueType,
+  PropValueType,
+  ToolpadDataProviderBase,
+} from './types';
 import { ServerContext, getServerContext } from './serverRuntime';
 
 /**
@@ -95,4 +101,17 @@ export function getContext(): ServerContext {
     throw new Error('getContext() must be called from within a Toolpad function.');
   }
   return ctx;
+}
+
+export const TOOLPAD_DATA_PROVIDER_MARKER = Symbol.for('TOOLPAD_DATA_PROVIDER_MARKER');
+
+export interface ToolpadDataProvider<R, P extends PaginationMode = 'index'>
+  extends ToolpadDataProviderBase<R, P> {
+  [TOOLPAD_DATA_PROVIDER_MARKER]: true;
+}
+
+export function createDataProvider<R, P extends PaginationMode = 'index'>(
+  input: ToolpadDataProviderBase<R, P>,
+): ToolpadDataProvider<R, P> {
+  return Object.assign(input, { [TOOLPAD_DATA_PROVIDER_MARKER]: true as const });
 }

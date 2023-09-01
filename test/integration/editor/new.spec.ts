@@ -47,7 +47,7 @@ test('can create and place new component', async ({ page }) => {
   await editorModel.componentCatalog.hover();
   await expect(editorModel.componentCatalog.getByText('someComponent')).toBeVisible();
   await editorModel.dragNewComponentToCanvas('someComponent');
-  await editorModel.explorer.hover();
+  await editorModel.componentEditor.hover();
   await expect(editorModel.appCanvas.getByText('Hello world!')).toBeVisible();
 });
 

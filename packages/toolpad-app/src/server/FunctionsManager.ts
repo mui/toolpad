@@ -7,6 +7,7 @@ import * as chokidar from 'chokidar';
 import chalk from 'chalk';
 import { glob } from 'glob';
 import { writeFileRecursive, fileExists, readJsonFile } from '@mui/toolpad-utils/fs';
+import { replaceRecursive, getCircularReplacer } from '@mui/toolpad-utils/json';
 import invariant from 'invariant';
 import Piscina from 'piscina';
 import { ExecFetchResult } from '@mui/toolpad-core';
@@ -21,6 +22,10 @@ import type { ExtractTypesParams, IntrospectionResult } from './functionsTypesWo
 import { Awaitable } from '../utils/types';
 import { format } from '../utils/prettier';
 import { compilerOptions } from './functionsShared';
+
+function removeCircularReferences(obj: any): any {
+  return replaceRecursive(obj, getCircularReplacer());
+}
 
 interface ModuleObject {
   exports: Record<string, unknown>;
@@ -343,7 +348,7 @@ export default class FunctionsManager {
 
     const data = await executeFn(outputFilePath, name, executeParams);
 
-    return { data };
+    return { data: removeCircularReferences(data) };
   }
 
   async introspect(): Promise<IntrospectionResult> {

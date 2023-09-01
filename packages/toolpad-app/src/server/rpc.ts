@@ -8,31 +8,6 @@ import { errorFrom, serializeError } from '@mui/toolpad-utils/errors';
 import { withContext, createServerContext } from '@mui/toolpad-core/serverRuntime';
 import { asyncHandler } from '../utils/express';
 
-type Replacer = (this: object, key: string, value: unknown) => unknown;
-
-function getCircularReplacer(): Replacer {
-  const ancestors: object[] = [];
-  return function replacer(key, value) {
-    if (typeof value !== 'object' || value === null) {
-      return value;
-    }
-    // `this` is the object that value is contained in,
-    // i.e., its direct parent.
-    while (ancestors.length > 0 && ancestors.at(-1) !== this) {
-      ancestors.pop();
-    }
-    if (ancestors.includes(value)) {
-      return '[Circular]';
-    }
-    ancestors.push(value);
-    return value;
-  };
-}
-
-function superJsonStringify(object: any, replacer?: Replacer): string {
-  return JSON.stringify(superjson.serialize(object), replacer);
-}
-
 export interface Method<P extends any[] = any[], R = any> {
   (...params: P): Promise<R>;
 }
@@ -109,7 +84,7 @@ export function createRpcHandler(definition: Definition): express.RequestHandler
 
       const responseData: RpcResponse = error
         ? { error: serializeError(error) }
-        : { result: superJsonStringify(rawResult, getCircularReplacer()) };
+        : { result: superjson.stringify(rawResult) };
 
       res.json(responseData);
     }),

@@ -264,8 +264,8 @@ function QueryEditor({
   ]);
 
   return (
-    <PanelGroup direction="vertical">
-      <Panel defaultSize={40} maxSize={70} minSize={20}>
+    <PanelGroup direction="horizontal">
+      <Panel defaultSize={50} minSize={20}>
         <QueryInputPanel
           previewDisabled={!selectedOption}
           onRunPreview={handleRunPreview}
@@ -388,7 +388,7 @@ function QueryEditor({
         </QueryInputPanel>
       </Panel>
       <PanelResizeHandle />
-      <Panel defaultSize={60} maxSize={80} minSize={30}>
+      <Panel defaultSize={50} minSize={20}>
         <QueryPreview isLoading={previewIsLoading} error={preview?.error}>
           <JsonView sx={{ height: '100%' }} copyToClipboard src={preview?.data} />
         </QueryPreview>

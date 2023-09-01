@@ -21,12 +21,6 @@ Make sure to [install Node.js](https://nodejs.org/en) on your system.
 
 ## Building your first application
 
-Interactive walkthrough of the app building process:
-
-<iframe id="toolpad-first-app" src="https://demo.arcade.software/MDlpNzHbuXwvPh4MK9ff?embed" frameborder="0" loading="lazy" webkitallowfullscreen mozallowfullscreen allowfullscreen title="Default page | Toolpad editor" style="width: 100%; height: min(60vw, 500px); border-radius: 0.75rem"></iframe>
-
-## Detailed steps
-
 ### Create a new app
 
 1. Create a new application

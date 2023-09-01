@@ -14,7 +14,6 @@ import { asyncHandler } from '../utils/express';
 import type FunctionsManager from './FunctionsManager';
 import type EnvManager from './EnvManager';
 import type { RuntimeConfig } from '../config';
-import { DataProviderIntrospectionResult } from './functionsTypesWorker';
 
 function withSerializedError<T extends { error?: unknown }>(
   withError: T,
@@ -240,7 +239,11 @@ export default class DataManager {
     return router;
   }
 
-  async dataProviderIntrospect(id: string): Promise<ToolpadDataProviderIntrospection> {
+  async dataProviderIntrospect(
+    file: string,
+    exportName: string = 'default',
+  ): Promise<ToolpadDataProviderIntrospection> {
+    const provider = this.project.functionsManager.getDataProvider(file, exportName);
     return {
       paginationMode: 'index',
     };

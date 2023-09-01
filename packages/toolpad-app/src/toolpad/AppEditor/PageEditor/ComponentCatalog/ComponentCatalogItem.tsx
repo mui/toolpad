@@ -82,7 +82,7 @@ export function ComponentIcon({ id: componentId, kind, sx }: ComponentIconProps)
   const { dom } = useDom();
   const { codeComponents: array } = appDom.getChildNodes(dom, appDom.getApp(dom));
   const name = componentId.split('.')?.[1];
-  const iconName = array.find((node) => node.name === name)?.attributes.icon;
+  const iconName = array?.find((node) => node.name === name)?.attributes.icon;
   if (componentId.startsWith('codeComponent') && iconName) {
     const Icon = iconList[iconName as keyof typeof iconList];
     return Icon ? (

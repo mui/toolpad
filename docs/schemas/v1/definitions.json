@@ -399,9 +399,6 @@
                   "additionalProperties": true
                 }
               },
-              "required": [
-                "palette"
-              ],
               "additionalProperties": true,
               "description": "The ThemeOptions object that gets fed into MUI's createTheme function."
             }

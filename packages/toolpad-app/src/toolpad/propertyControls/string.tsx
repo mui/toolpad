@@ -6,9 +6,9 @@ import PropertyControl from '../../components/PropertyControl';
 function StringPropEditor({ propType, label, value, onChange, disabled }: EditorProps<string>) {
   const handleChange = React.useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
-      onChange(event.target.value || undefined);
+      onChange(event.target.value === propType.default ? undefined : event.target.value);
     },
-    [onChange],
+    [onChange, propType.default],
   );
 
   return (

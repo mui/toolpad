@@ -110,6 +110,7 @@ export interface CodeComponentNode extends AppDomNodeBase {
   readonly attributes: {
     readonly code: string;
     readonly isNew?: boolean;
+    readonly icon?: string;
   };
 }
 

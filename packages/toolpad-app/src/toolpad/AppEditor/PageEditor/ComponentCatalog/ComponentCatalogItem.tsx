@@ -31,7 +31,11 @@ import HtmlIcon from '@mui/icons-material/Html';
 import TableRowsIcon from '@mui/icons-material/TableRows';
 import ViewColumnIcon from '@mui/icons-material/ViewColumn';
 import TagIcon from '@mui/icons-material/Tag';
+// eslint-disable-next-line no-restricted-imports
+import * as iconList from '@mui/icons-material';
 import { ButtonBase, SxProps } from '@mui/material';
+import { useDom } from '../../../AppState';
+import * as appDom from '../../../../appDom';
 
 const iconMap = new Map<string, React.ComponentType<SvgIconProps>>([
   ['Autocomplete', ManageSearchIcon],
@@ -75,6 +79,16 @@ interface ComponentIconProps {
 }
 
 export function ComponentIcon({ id: componentId, kind, sx }: ComponentIconProps) {
+  const { dom } = useDom();
+  const { codeComponents: array } = appDom.getChildNodes(dom, appDom.getApp(dom));
+  const name = componentId.split('.')?.[1];
+  const iconName = array.find((node) => node.name === name)?.attributes.icon;
+  if (componentId.startsWith('codeComponent') && iconName) {
+    const Icon = iconList[iconName as keyof typeof iconList];
+    return Icon ? (
+      <Icon sx={{ fontSize: 24, opacity: kind === 'future' ? 0.75 : 1, ...sx }} />
+    ) : null;
+  }
   const Icon = iconMap.get(kind === 'custom' ? 'CodeComponent' : componentId);
   return Icon ? <Icon sx={{ fontSize: 24, opacity: kind === 'future' ? 0.75 : 1, ...sx }} /> : null;
 }

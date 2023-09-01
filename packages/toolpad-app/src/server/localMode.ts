@@ -213,7 +213,7 @@ async function loadThemeFromFile(root: string): Promise<Theme | null> {
   return null;
 }
 
-function createDefaultCodeComponent(name: string): string {
+function createDefaultCodeComponent(name: string, iconName?: string): string {
   const componentId = name.replace(/\s/g, '');
   const propTypeId = `${componentId}Props`;
   return format(`
@@ -238,7 +238,8 @@ function createDefaultCodeComponent(name: string): string {
           default: "Hello world!"
         },
       },
-    });    
+    });
+    export const iconName = "${iconName}"
   `);
 }
 
@@ -286,6 +287,7 @@ function mergeComponentsContentIntoDom(
   dom: appDom.AppDom,
   componentsContent: ComponentsContent,
 ): appDom.AppDom {
+  const re = /export\s*const\s*iconName\s*=\s*['|"](.*?)['|"];/;
   const rootNode = appDom.getApp(dom);
   const { codeComponents: codeComponentNodes = [] } = appDom.getChildNodes(dom, rootNode);
   const names = new Set([
@@ -310,6 +312,7 @@ function mergeComponentsContentIntoDom(
           name,
           attributes: {
             code: content.code,
+            icon: re.exec(content.code)?.[1],
           },
         });
         dom = appDom.addNode(dom, newNode, rootNode, 'codeComponents');
@@ -1174,10 +1177,10 @@ class ToolpadProject {
     return this.pendingVersionCheck;
   }
 
-  async createComponent(name: string) {
+  async createComponent(name: string, icon?: string) {
     const componentsFolder = getComponentsFolder(this.root);
     const filePath = getComponentFilePath(componentsFolder, name);
-    const content = createDefaultCodeComponent(name);
+    const content = createDefaultCodeComponent(name, icon);
     await writeFileRecursive(filePath, content, { encoding: 'utf-8' });
   }
 

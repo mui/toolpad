@@ -12,7 +12,9 @@ function GridColumnsPropEditor({
 }: EditorProps<NumberFormat>) {
   return (
     <PropertyControl propType={propType}>
-      <NumberFormatEditor label={label} disabled={disabled} value={value} onChange={onChange} />
+      <span>
+        <NumberFormatEditor label={label} disabled={disabled} value={value} onChange={onChange} />
+      </span>
     </PropertyControl>
   );
 }

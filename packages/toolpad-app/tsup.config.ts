@@ -23,7 +23,6 @@ export default defineConfig((options) => [
       index: './cli/index.ts',
       appServer: './cli/appServer.ts',
       appBuilder: './cli/appBuilder.ts',
-      functionsDevWorker: './src/server/functionsDevWorker.ts',
       functionsTypesWorker: './src/server/functionsTypesWorker.ts',
     },
     outDir: 'dist/cli',

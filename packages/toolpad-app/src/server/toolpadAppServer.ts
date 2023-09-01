@@ -6,6 +6,8 @@ import { postProcessHtml } from './toolpadAppBuilder';
 import { ToolpadProject, getAppOutputFolder } from './localMode';
 import { asyncHandler } from '../utils/express';
 import { basicAuthUnauthorized, checkBasicAuthHeader } from './basicAuth';
+import { createRpcRuntimeServer } from './rpcRuntimeServer';
+import { createRpcHandler } from './rpc';
 
 export interface CreateViteConfigParams {
   server?: Server;
@@ -32,7 +34,10 @@ export async function createProdHandler(project: ToolpadProject) {
     basicAuthUnauthorized(res);
   });
 
-  handler.use('/api/data', project.dataManager.createDataHandler(project));
+  handler.use('/api/data', project.dataManager.createDataHandler());
+
+  const runtimeRpcServer = createRpcRuntimeServer(project);
+  handler.use('/api/runtime-rpc', createRpcHandler(runtimeRpcServer));
 
   handler.use(
     asyncHandler(async (req, res) => {

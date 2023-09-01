@@ -17,9 +17,9 @@
     "typescript:transpile:dev": "cross-env BABEL_ENV=development babel-node --extensions \".tsx,.ts,.js\" scripts/formattedTSDemos --watch"
   },
   "dependencies": {
-    "@babel/core": "7.22.10",
+    "@babel/core": "7.22.11",
     "@babel/plugin-transform-object-assign": "7.22.5",
-    "@babel/runtime-corejs2": "7.22.10",
+    "@babel/runtime-corejs2": "7.22.11",
     "@date-io/date-fns-jalali": "2.17.0",
     "@docsearch/react": "3.5.2",
     "@emotion/cache": "11.11.0",
@@ -65,12 +65,12 @@
     "marked": "7.0.5",
     "next": "13.4.19",
     "nprogress": "0.2.0",
-    "postcss": "8.4.28",
+    "postcss": "8.4.29",
     "prismjs": "1.29.0",
     "prop-types": "15.8.1",
     "raw-loader": "4.0.2",
     "react": "18.2.0",
-    "react-docgen": "6.0.3",
+    "react-docgen": "6.0.4",
     "react-dom": "18.2.0",
     "react-hook-form": "7.45.4",
     "react-is": "18.2.0",
@@ -85,7 +85,7 @@
     "stylis": "4.3.0",
     "stylis-plugin-rtl": "npm:stylis-plugin-rtl@^2.1.1",
     "stylis-plugin-rtl-sc": "npm:stylis-plugin-rtl@^2.1.1",
-    "webpack-bundle-analyzer": "4.9.0"
+    "webpack-bundle-analyzer": "4.9.1"
   },
   "devDependencies": {
     "@babel/plugin-transform-react-constant-elements": "7.22.5",

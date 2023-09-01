@@ -1,4 +1,4 @@
-# Display Mode
+# Display mode
 
 <p class="description">Toolpad apps allow for a display mode configurable per-page.</p>
 

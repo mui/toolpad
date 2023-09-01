@@ -25,7 +25,7 @@ export type FormControlLabelOptions = {
   Omit<CheckboxProps, 'onChange'> &
   Pick<FormInputComponentProps, 'name' | 'isRequired' | 'isInvalid'>;
 
-function Checkbox({ disableRipple, ...rest }: FormControlLabelOptions) {
+function Checkbox({ ...rest }: FormControlLabelOptions) {
   rest.checked = rest.checked ?? false;
   const { onFormInputChange, renderFormInput, formInputError } = useFormInput<boolean>({
     name: rest.name,
@@ -48,7 +48,6 @@ function Checkbox({ disableRipple, ...rest }: FormControlLabelOptions) {
         <FormGroup>
           <FormControlLabel
             label={rest.label}
-            disableTypography={rest.disableTypography}
             checked={rest.checked}
             labelPlacement={rest.labelPlacement}
             componentsProps={rest.componentsProps}
@@ -56,7 +55,6 @@ function Checkbox({ disableRipple, ...rest }: FormControlLabelOptions) {
               <MuiCheckbox
                 required={rest.isRequired}
                 size={rest.size}
-                disableRipple
                 onChange={handleChange}
                 defaultChecked={rest.defaultChecked}
                 disabled={rest.disabled}
@@ -107,11 +105,6 @@ export default createComponent(FormWrappedCheckbox, {
       type: 'boolean',
       default: false,
     },
-    disableRipple: {
-      helperText: 'If true, the ripple effect is disabled.',
-      type: 'boolean',
-      default: false,
-    },
     size: {
       helperText: 'The size of the component. small is equivalent to the dense checkbox styling.',
       type: 'string',
@@ -121,11 +114,6 @@ export default createComponent(FormWrappedCheckbox, {
     sx: {
       helperText: SX_PROP_HELPER_TEXT,
       type: 'object',
-    },
-    disableTypography: {
-      helperText:
-        'If true, the label is rendered as it is passed without an additional typography node.',
-      type: 'boolean',
     },
     fullWidth: {
       helperText: 'Whether the select should occupy all available horizontal space.',

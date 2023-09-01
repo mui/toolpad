@@ -23,6 +23,3 @@ spec:
         sx:
           $$jsExpression: "{"
         value: -test2-
-    - component: Metric
-      name: metric
-      children: []

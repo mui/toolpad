@@ -303,7 +303,8 @@ const themeOptionsSchema: z.ZodType<ThemeOptions> = z
         primary: simplePaletteColorOptionsSchema.optional(),
         secondary: simplePaletteColorOptionsSchema.optional(),
       })
-      .passthrough(),
+      .passthrough()
+      .optional(),
   })
   .passthrough();
 

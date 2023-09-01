@@ -1,16 +1,8 @@
 /// <reference path="./serverModules.d.ts" />
 
-import { AsyncLocalStorage } from 'node:async_hooks';
-import { IncomingMessage } from 'node:http';
-import * as cookie from 'cookie';
 import { TOOLPAD_FUNCTION } from './constants';
-import {
-  InferParameterType,
-  PaginationMode,
-  PrimitiveValueType,
-  PropValueType,
-  ToolpadDataProviderBase,
-} from './types';
+import { InferParameterType, PrimitiveValueType, PropValueType } from './types';
+import { ServerContext, getServerContext } from './serverRuntime';
 
 /**
  * The runtime configuration for a Toolpad function. Describes the parameters it accepts and their
@@ -95,40 +87,12 @@ export function createFunction<
  */
 export const createQuery = createFunction;
 
-export interface ServerContext {
-  cookies: Record<string, string>;
-}
-
-const asyncLocalStorage = new AsyncLocalStorage<ServerContext>();
+export type { ServerContext };
 
 export function getContext(): ServerContext {
-  const ctx = asyncLocalStorage.getStore();
+  const ctx = getServerContext();
   if (!ctx) {
     throw new Error('getContext() must be called from within a Toolpad function.');
   }
   return ctx;
-}
-
-export function createServerContext(req: IncomingMessage): ServerContext {
-  const cookies = cookie.parse(req.headers.cookie || '');
-  return {
-    cookies,
-  };
-}
-
-export function withContext<R = void>(ctx: ServerContext, doWork: () => Promise<R>): Promise<R> {
-  return asyncLocalStorage.run(ctx, doWork);
-}
-
-export const TOOLPAD_DATA_PROVIDER_MARKER = Symbol.for('TOOLPAD_DATA_PROVIDER_MARKER');
-
-export interface ToolpadDataProvider<R, P extends PaginationMode = 'index'>
-  extends ToolpadDataProviderBase<R, P> {
-  [TOOLPAD_DATA_PROVIDER_MARKER]: true;
-}
-
-export function createDataProvider<R, P extends PaginationMode = 'index'>(
-  input: ToolpadDataProviderBase<R, P>,
-): ToolpadDataProvider<R, P> {
-  return Object.assign(input, { [TOOLPAD_DATA_PROVIDER_MARKER]: true as const });
 }

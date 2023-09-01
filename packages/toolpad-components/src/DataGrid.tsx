@@ -72,6 +72,14 @@ function randomBetween(seed: number, min: number, max: number): () => number {
   return () => min + (max - min) * random();
 }
 
+function isNumeric(input: string) {
+  return input ? !Number.isNaN(Number(input)) : false;
+}
+
+function isValidDate(input: string) {
+  return !Number.isNaN(Date.parse(input));
+}
+
 const SkeletonCell = styled(Box)(({ theme }) => ({
   display: 'flex',
   flexDirection: 'row',
@@ -156,6 +164,12 @@ function inferColumnType(value: unknown): string {
 
         return 'link';
       } catch (error) {
+        if (isNumeric(value)) {
+          return 'number';
+        }
+        if (isValidDate(value)) {
+          return 'date';
+        }
         return valueType;
       }
     case 'object':
@@ -216,7 +230,12 @@ function ImageCell({ field, id, value: src }: GridRenderCellParams<any, any, any
 }
 
 function dateValueGetter({ value }: GridValueGetterParams<any, any>) {
-  return typeof value === 'number' ? new Date(value) : value;
+  if (value === null || value === undefined || value === '') {
+    return value;
+  }
+  // It's fine if this turns out to be an invalid date, the user wanted a date column, if the data can't be parsed as a date
+  // it should just show as such
+  return new Date(value);
 }
 
 function ComponentErrorFallback({ error }: FallbackProps) {
@@ -260,11 +279,9 @@ export const CUSTOM_COLUMN_TYPES: Record<string, GridColTypeDef> = {
     valueFormatter: ({ value: cellValue }: GridValueFormatterParams) => JSON.stringify(cellValue),
   },
   date: {
-    extendType: 'date',
     valueGetter: dateValueGetter,
   },
   dateTime: {
-    extendType: 'date',
     valueGetter: dateValueGetter,
   },
   link: {

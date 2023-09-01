@@ -1,5 +1,5 @@
 import { TabContext, TabList, TabPanel } from '@mui/lab';
-import { Tab, Box, styled, Typography } from '@mui/material';
+import { Tab, Box, styled, Typography, Link } from '@mui/material';
 import * as React from 'react';
 import PageOptionsPanel from './PageOptionsPanel';
 import ComponentEditor from './ComponentEditor';
@@ -47,6 +47,7 @@ const propTypeControls: PropTypeControls = {
 
 const classes = {
   panel: 'Toolpad_Panel',
+  themesDocsLink: 'Toolpad_ThemesDocsLink',
 };
 
 const ComponentPanelRoot = styled('div')(({ theme }) => ({
@@ -57,6 +58,9 @@ const ComponentPanelRoot = styled('div')(({ theme }) => ({
     flex: 1,
     padding: theme.spacing(2),
     overflow: 'auto',
+  },
+  [`& .${classes.themesDocsLink}`]: {
+    marginBottom: theme.spacing(1),
   },
 }));
 
@@ -99,6 +103,13 @@ export default function ComponentPanel({ className }: ComponentPanelProps) {
             )}
           </TabPanel>
           <TabPanel value="theme" className={classes.panel}>
+            <Typography className={classes.themesDocsLink} variant="body2">
+              Customize the app with a MUI theme. Read more about theming in the{' '}
+              <Link href="https://mui.com/toolpad/concepts/theming" target="_blank" rel="noopener">
+                docs
+              </Link>
+              .
+            </Typography>
             <ThemeEditor />
           </TabPanel>
         </TabContext>

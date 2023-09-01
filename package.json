@@ -75,7 +75,7 @@
     "eslint-plugin-react": "7.33.2",
     "eslint-plugin-react-hooks": "4.6.0",
     "eslint-plugin-typescript-enum": "2.1.0",
-    "execa": "7.2.0",
+    "execa": "8.0.1",
     "express": "4.18.2",
     "format-util": "1.0.5",
     "globby": "13.2.2",

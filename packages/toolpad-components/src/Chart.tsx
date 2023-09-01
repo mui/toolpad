@@ -55,7 +55,7 @@ function getChartType(kind: ChartDataSeriesKind): 'line' | 'bar' | 'scatter' {
 }
 
 interface ChartProps extends ContainerProps {
-  data?: ChartData | null;
+  data?: ChartData;
   loading?: boolean;
   error?: Error | string;
   height: number;
@@ -64,7 +64,7 @@ interface ChartProps extends ContainerProps {
 function Chart({ data = [], loading, error, height, sx }: ChartProps) {
   const xValues = React.useMemo(
     () =>
-      (data ?? [])
+      data
         .flatMap((dataSeries) => {
           if (!dataSeries.xKey || !dataSeries.data) {
             return [];
@@ -83,7 +83,7 @@ function Chart({ data = [], loading, error, height, sx }: ChartProps) {
 
   const chartSeries: (BarSeriesType | LineSeriesType | ScatterSeriesType)[] = React.useMemo(
     () =>
-      (data ?? [])
+      data
         .filter((dataSeries) => dataSeries.xKey && dataSeries.yKey)
         .map((dataSeries) => {
           const yValues = xValues.map((xValue) => {

@@ -1,6 +1,6 @@
 import * as React from 'react';
 
-import { Container, ContainerProps, Skeleton } from '@mui/material';
+import { Container, ContainerProps, CircularProgress } from '@mui/material';
 
 import {
   BarPlot,
@@ -174,12 +174,17 @@ function Chart({ data = [], loading, error, height, sx }: ChartProps) {
     >
       <ErrorOverlay error={displayError} />
       {loading && !error ? (
-        <Skeleton
-          sx={{ position: 'absolute', inset: '0 0 0 0' }}
-          variant="rectangular"
-          width="100%"
-          height={height}
-        />
+        <div
+          style={{
+            position: 'absolute',
+            inset: '0 0 0 0',
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+          }}
+        >
+          <CircularProgress />
+        </div>
       ) : null}
       {isDataVisible ? (
         <ResponsiveChartContainer

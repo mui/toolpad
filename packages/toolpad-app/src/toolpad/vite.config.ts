@@ -13,6 +13,7 @@ const TOOLPAD_BUILD = process.env.GIT_SHA1?.slice(0, 7) || 'dev';
 // https://vitejs.dev/config/
 export default defineConfig({
   base: '/_toolpad/',
+  // @TODO: remove viteCommonjs plugin once https://github.com/mui/mui-x/pull/9826 is fixed
   plugins: [react(), viteCommonjs()],
   build: {
     outDir: path.resolve(__dirname, '../../dist/editor'),

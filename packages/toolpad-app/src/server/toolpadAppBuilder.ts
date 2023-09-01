@@ -308,7 +308,7 @@ export function createViteConfig({
       root,
       plugins: [
         react(),
-        // TODO, remove once https://github.com/mui/mui-x/pull/9826 is fixed
+        // @TODO: remove viteCommonjs plugin once https://github.com/mui/mui-x/pull/9826 is fixed
         viteCommonjs(),
         toolpadVitePlugin({ root, base, getComponents }),
         ...plugins,

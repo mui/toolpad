@@ -13,7 +13,7 @@ import { ExecFetchResult } from '@mui/toolpad-core';
 import { errorFrom } from '@mui/toolpad-utils/errors';
 import EnvManager from './EnvManager';
 import { ProjectEvents, ToolpadProjectOptions } from '../types';
-import { createWorker as createDevWorker } from './functionsDevWorker';
+import { executeFn } from './functionsDevWorker';
 import type { ExtractTypesParams, IntrospectionResult } from './functionsTypesWorker';
 import { Awaitable } from '../utils/types';
 import { format } from '../utils/prettier';
@@ -66,8 +66,6 @@ export default class FunctionsManager {
 
   private buildErrors: esbuild.Message[] = [];
 
-  private devWorker: ReturnType<typeof createDevWorker>;
-
   private extractedTypes: Awaitable<IntrospectionResult> | undefined;
 
   private extractTypesWorker: Piscina | undefined;
@@ -76,7 +74,6 @@ export default class FunctionsManager {
 
   constructor(project: IToolpadProject) {
     this.project = project;
-    this.devWorker = createDevWorker(process.env);
     if (this.shouldExtractTypes()) {
       this.extractTypesWorker = new Piscina({
         filename: path.join(__dirname, 'functionsTypesWorker.js'),
@@ -213,15 +210,6 @@ export default class FunctionsManager {
     resourcesWatcher.on('unlink', reinitializeWatcher);
   }
 
-  private async createRuntimeWorkerWithEnv() {
-    const oldWorker = this.devWorker;
-    this.devWorker = createDevWorker(process.env);
-
-    await oldWorker.terminate();
-
-    this.project.invalidateQueries();
-  }
-
   async start() {
     if (this.project.options.dev) {
       await this.migrateLegacy();
@@ -229,11 +217,9 @@ export default class FunctionsManager {
       await this.startWatchingFunctionFiles();
 
       this.project.events.subscribe('envChanged', async () => {
-        await this.createRuntimeWorkerWithEnv();
+        await this.project.invalidateQueries();
       });
     }
-
-    await this.createRuntimeWorkerWithEnv();
   }
 
   async build() {
@@ -256,11 +242,7 @@ export default class FunctionsManager {
   }
 
   async dispose() {
-    await Promise.all([
-      this.disposeBuildcontext(),
-      this.devWorker.terminate(),
-      this.extractTypesWorker?.destroy(),
-    ]);
+    await Promise.all([this.disposeBuildcontext(), this.extractTypesWorker?.destroy()]);
   }
 
   async exec(
@@ -300,7 +282,7 @@ export default class FunctionsManager {
       ? [{ parameters }]
       : handler.parameters.map(([parameterName]) => parameters[parameterName]);
 
-    const data = await this.devWorker.execute(outputFilePath, name, executeParams);
+    const data = await executeFn(outputFilePath, name, executeParams);
 
     return { data };
   }

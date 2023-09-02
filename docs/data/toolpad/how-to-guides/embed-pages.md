@@ -23,4 +23,4 @@
 
    we can embed a Toolpad page, like so:
 
-    <iframe src="https://tools-public.mui.com/prod/pages/fn03hvq" loading="lazy" style="display: block; margin: auto"></iframe>
+    <iframe src="https://tools-public.mui.com/prod/pages/fn03hvq?toolpad-display=standalone" loading="lazy" style="display: block; margin: auto"></iframe>

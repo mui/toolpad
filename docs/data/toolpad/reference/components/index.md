@@ -7,6 +7,7 @@
 - [Autocomplete](/toolpad/reference/components/autocomplete/)
 - [Button](/toolpad/reference/components/button/)
 - [Chart](/toolpad/reference/components/chart/)
+- [Checkbox](/toolpad/reference/components/checkbox/)
 - [Container](/toolpad/reference/components/container/)
 - [DataGrid](/toolpad/reference/components/data-grid/)
 - [DatePicker](/toolpad/reference/components/date-picker/)

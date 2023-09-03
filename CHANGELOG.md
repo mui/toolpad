@@ -1,5 +1,40 @@
 # Changelog
 
+## 0.1.26
+
+<!-- generated comparing v0.1.25..master -->
+
+_Aug 31, 2023_
+
+A big thanks to the 8 contributors who made this release possible. Here are some highlights ✨:
+
+Improve date columns on the grid, Support `Intl` in bindings.
+
+- &#8203;<!-- 22 -->Add visual regression tests for text component (#2593) @Janpot
+- &#8203;<!-- 21 -->Auto-create a theme when the user starts editing (#2594) @Janpot
+- &#8203;<!-- 20 -->Show page parameters in url form and add link to docs (#2577) @Kirera-Wainaina
+- &#8203;<!-- 19 -->[Toolpad Editor] Add tooltip to display more dropdown (#2590) @rohanprasadofficial
+- &#8203;<!-- 18 -->Stabilize query editor screenshots (#2584) @Janpot
+- &#8203;<!-- 17 -->[Toolpad Editor] Add themes docs link to theme panel (#2583) @rohanprasadofficial
+- &#8203;<!-- 16 -->Bypass server context for stackblitz (#2579) @Janpot
+- &#8203;<!-- 15 -->Improve columns editor UX (#2570) @Janpot
+- &#8203;<!-- 14 -->Allow using Intl in bindings (#2586) @Janpot
+- &#8203;<!-- 13 -->Stabilize visual regression test (#2574) @Janpot
+- &#8203;<!-- 12 -->fix 2467_AutoComplete (#2540) @JerryWu1234
+- &#8203;<!-- 11 -->Allow theme files to not specify a palette (#2556) @Janpot
+- &#8203;<!-- 10 -->Auto parse date strings on data grids (#2371) @bharatkashyap
+- &#8203;<!-- 09 -->Fix query editor panels orientation (#2557) @Janpot
+- &#8203;<!-- 08 -->Remove lodash from @mui/components (#2545) @Janpot
+- &#8203;<!-- 07 -->Update monorepo (#2544) @apedroferreira
+- &#8203;<!-- 06 -->Refactor Toolpad App Navigation (#2535) @Janpot
+- &#8203;<!-- 05 -->[core] Remove dead code (#2580) @oliviertassinari
+- &#8203;<!-- 04 -->[core] Remove S3 orb from circleci config (#2547) @Janpot
+- &#8203;<!-- 03 -->[docs] add graphQL to overview page and add 2 readme docs (#2576) @prakhargupta1
+- &#8203;<!-- 02 -->[Docs] Add initial steps of creating a custom component (#2534) @prakhargupta1
+- &#8203;<!-- 01 -->[website] Add GA4 events (#2532) @bharatkashyap
+
+All contributors of this release in alphabetical order: @apedroferreira, @bharatkashyap, @Janpot, @JerryWu1234, @Kirera-Wainaina, @oliviertassinari, @prakhargupta1, @rohanprasadofficial
+
 ## 0.1.25
 
 <!-- generated comparing v0.1.24..master -->
@@ -369,7 +404,7 @@ Add new reference documentation, add new QR-code example.
 - &#8203;<!-- 10 -->Add 404 page to application runtime (#2077) @Janpot
 - &#8203;<!-- 09 -->Avoid component catalog opening while hovering the snackbar (#2079) @Janpot
 - &#8203;<!-- 08 -->Fix broken documentation links (#2076) @Janpot
-- &#8203;<!-- 07 -->Add new example for QR code generator (#2067) @Janpot
+- &#8203;<!-- 07 -->Add new example for QR Code generator (#2067) @Janpot
 - &#8203;<!-- 06 -->Avoid restarting vite devserver when env file changes (#2069) @Janpot
 - &#8203;<!-- 05 -->Reference documentation (#2001) @Janpot
 - &#8203;<!-- 04 -->Fix websocket connection in codesandbox (#2068) @Janpot

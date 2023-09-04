@@ -36,6 +36,7 @@ import {
   Typography,
   Tooltip,
   Popover,
+  Container,
 } from '@mui/material';
 import { getObjectKey } from '@mui/toolpad-utils/objectKey';
 import { errorFrom } from '@mui/toolpad-utils/errors';
@@ -366,6 +367,7 @@ const DataGridComponent = React.forwardRef(function DataGridComponent(
     selection,
     onSelectionChange,
     hideToolbar,
+    sx,
     ...props
   }: ToolpadDataGridProps,
   ref: React.ForwardedRef<HTMLDivElement>,
@@ -487,37 +489,34 @@ const DataGridComponent = React.forwardRef(function DataGridComponent(
 
   return (
     <LicenseInfoProvider info={LICENSE_INFO}>
-      <div
+      <Container
         ref={ref}
-        style={{ height: heightProp, minHeight: '100%', width: '100%', position: 'relative' }}
+        disableGutters
+        sx={{ ...sx, minHeight: heightProp, position: 'relative' }}
       >
         <ErrorOverlay error={error} />
-
-        <div
-          style={{
-            position: 'absolute',
-            inset: '0 0 0 0',
+        <DataGridPro
+          apiRef={apiRef}
+          slots={{
+            toolbar: hideToolbar ? null : GridToolbar,
+            loadingOverlay: SkeletonLoadingOverlay,
+          }}
+          onColumnResize={handleResize}
+          onColumnOrderChange={handleColumnOrderChange}
+          rows={rows}
+          columns={columns}
+          key={gridKey}
+          getRowId={getRowId}
+          onRowSelectionModelChange={onSelectionModelChange}
+          rowSelectionModel={selectionModel}
+          {...props}
+          sx={{
+            height: heightProp,
+            minHeight: '100%',
             visibility: error ? 'hidden' : 'visible',
           }}
-        >
-          <DataGridPro
-            apiRef={apiRef}
-            slots={{
-              toolbar: hideToolbar ? null : GridToolbar,
-              loadingOverlay: SkeletonLoadingOverlay,
-            }}
-            onColumnResize={handleResize}
-            onColumnOrderChange={handleColumnOrderChange}
-            rows={rows}
-            columns={columns}
-            key={gridKey}
-            getRowId={getRowId}
-            onRowSelectionModelChange={onSelectionModelChange}
-            rowSelectionModel={selectionModel}
-            {...props}
-          />
-        </div>
-      </div>
+        />
+      </Container>
     </LicenseInfoProvider>
   );
 });

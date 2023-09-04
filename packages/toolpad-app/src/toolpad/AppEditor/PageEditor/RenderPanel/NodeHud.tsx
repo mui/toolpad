@@ -12,13 +12,18 @@ import {
   RECTANGLE_EDGE_LEFT,
   RECTANGLE_EDGE_RIGHT,
 } from '../../../../utils/geometry';
+import { usePageEditorState } from '../PageEditorProvider';
 
 const HINT_POSITION_TOP = 'top';
 const HINT_POSITION_BOTTOM = 'bottom';
+const HINT_POSITION_BOTTOM_INNER = 'bottomInner';
 
 const HUD_HEIGHT = 30; // px
 
-type HintPosition = typeof HINT_POSITION_TOP | typeof HINT_POSITION_BOTTOM;
+type HintPosition =
+  | typeof HINT_POSITION_TOP
+  | typeof HINT_POSITION_BOTTOM
+  | typeof HINT_POSITION_BOTTOM_INNER;
 
 function stopPropagationHandler(event: React.SyntheticEvent) {
   event.stopPropagation();
@@ -84,7 +89,11 @@ const SelectionHintWrapper = styled('div', {
     zIndex: 1000,
     ...(hintPosition === HINT_POSITION_TOP
       ? { top: 0, transform: 'translate(0, -100%)' }
-      : { bottom: 0, transform: 'translate(0, 100%)' }),
+      : {
+          bottom: 0,
+          transform:
+            hintPosition === HINT_POSITION_BOTTOM_INNER ? 'translate(0, 0)' : 'translate(0, 100%)',
+        }),
   },
 }));
 
@@ -177,7 +186,19 @@ export default function NodeHud({
   isHoverable = true,
   isHovered = false,
 }: NodeHudProps) {
-  const hintPosition = rect.y > HUD_HEIGHT ? HINT_POSITION_TOP : HINT_POSITION_BOTTOM;
+  const { nodeId: pageNodeId, viewState } = usePageEditorState();
+
+  const { nodes: nodesInfo } = viewState;
+
+  const pageNodeRect = nodesInfo[pageNodeId]?.rect;
+
+  let hintPosition: HintPosition = HINT_POSITION_BOTTOM;
+  if (rect.y > HUD_HEIGHT) {
+    hintPosition = HINT_POSITION_TOP;
+  }
+  if (pageNodeRect && rect.y + rect.height + HUD_HEIGHT >= pageNodeRect.height) {
+    hintPosition = HINT_POSITION_BOTTOM_INNER;
+  }
 
   const interactiveNodeClipPath = React.useMemo(
     () =>

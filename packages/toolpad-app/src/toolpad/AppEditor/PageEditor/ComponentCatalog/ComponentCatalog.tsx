@@ -170,9 +170,8 @@ export default function ComponentCatalog({ className }: ComponentCatalogProps) {
                           target="_blank"
                           rel="noopener"
                         >
-                          Click{' '}
+                          Learn more{' '}
                         </Link>
-                        to read more.
                       </Typography>
                     }
                   />

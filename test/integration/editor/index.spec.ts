@@ -89,7 +89,11 @@ test('can delete elements from page', async ({ page }) => {
 
   // Delete element by pressing key
 
+  // Wait for the page to settle after the previous action. It seems that
+  await page.waitForTimeout(200);
+
   await clickCenter(page, firstTextFieldLocator);
+
   await page.keyboard.press('Backspace');
 
   await expect(canvasInputLocator).toHaveCount(0);
@@ -107,6 +111,9 @@ test('can delete elements from page', async ({ page }) => {
   const lastButtonInColumnLocator = editorModel.appCanvas.getByRole('button', {
     name: 'last in column',
   });
+
+  // Wait for the page to settle after the previous action. It seems that
+  await page.waitForTimeout(200);
 
   await removeElementByClick(lastButtonInColumnLocator);
 

@@ -13,11 +13,14 @@ test.use({
 
 test('rendering components in the app runtime', async ({ page, argosScreenshot }) => {
   const runtimeModel = new ToolpadRuntime(page);
+
   await runtimeModel.gotoPage('components');
-
   await runtimeModel.waitForPageReady();
-
   await argosScreenshot('components', { fullPage: true });
+
+  await runtimeModel.gotoPage('text');
+  await runtimeModel.waitForPageReady();
+  await argosScreenshot('text', { fullPage: true });
 });
 
 test('rendering components in the app editor', async ({ page, argosScreenshot }) => {
@@ -40,23 +43,23 @@ test('showing grid while resizing elements', async ({ page, argosScreenshot }) =
 
   await editorModel.waitForOverlay();
 
-  const firstText = editorModel.appCanvas.getByText('text').first();
+  const firstInput = editorModel.appCanvas.locator('input').first();
 
-  await clickCenter(page, firstText);
+  await clickCenter(page, firstInput);
 
-  const firstTextBoundingBox = await firstText.boundingBox();
+  const firstInputBoundingBox = await firstInput.boundingBox();
 
   await page.mouse.move(
-    firstTextBoundingBox!.x + firstTextBoundingBox!.width - 5,
-    firstTextBoundingBox!.y + firstTextBoundingBox!.height / 2,
+    firstInputBoundingBox!.x + firstInputBoundingBox!.width - 5,
+    firstInputBoundingBox!.y + firstInputBoundingBox!.height / 2,
     { steps: 10 },
   );
 
   await page.mouse.down();
 
   await page.mouse.move(
-    firstTextBoundingBox!.x + firstTextBoundingBox!.width / 2,
-    firstTextBoundingBox!.y + firstTextBoundingBox!.height / 2,
+    firstInputBoundingBox!.x + firstInputBoundingBox!.width / 2,
+    firstInputBoundingBox!.y + firstInputBoundingBox!.height / 2,
     { steps: 10 },
   );
 

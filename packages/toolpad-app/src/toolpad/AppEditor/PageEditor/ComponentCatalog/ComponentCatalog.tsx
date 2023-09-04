@@ -171,7 +171,7 @@ export default function ComponentCatalog({ className }: ComponentCatalogProps) {
                           rel="noopener"
                         >
                           Learn more
-                        </Link>
+                        </Link>.
                       </Typography>
                     }
                   />

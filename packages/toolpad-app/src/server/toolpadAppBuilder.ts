@@ -229,7 +229,7 @@ export function createViteConfig({
         alias: [
           {
             // FIXME(https://github.com/mui/material-ui/issues/35233)
-            find: /^@mui\/icons-material\/([^/]*)/,
+            find: /^@mui\/icons-material\/(?!esm\/)([^/]*)/,
             replacement: '@mui/icons-material/esm/$1',
           },
         ],

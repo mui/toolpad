@@ -5,14 +5,29 @@ spec:
   title: globalScope
   display: shell
   content:
+    - component: Button
+      name: button
+      children: []
+      props:
+        onClick:
+          $$jsExpressionAction: console.log('hello')
+    - component: List
+      name: list
+      children: []
+      props:
+        itemCount: 1
+        renderItem:
+          $$template:
+            - component: Text
+              name: text8
     - component: Text
       name: text5
       children: []
       layout:
         columnSize: 1
       props:
-        variant: h2
         value: "Bindings: global scope access"
+        variant: h2
     - component: Text
       name: text
       children: []
@@ -49,31 +64,49 @@ spec:
     - component: Text
       name: text3
       children: []
-      layout:
-        columnSize: 1
       props:
         value:
           $$jsExpression: |
             `Disallows localStorage globals |test4 ${
               typeof localStorage === "undefined" ? "ok" : "nok"
             }|`
-    - component: Text
-      name: text4
-      children: []
       layout:
         columnSize: 1
+    - component: Text
+      name: text4
       props:
         value:
           $$jsExpression: |
             `Disallows globalThis.localStorage |test5 ${
               typeof globalThis.localStorage === "undefined" ? "ok" : "nok"
             }|`
+      children: []
+      layout:
+        columnSize: 1
     - component: Text
       name: text6
-      children: []
       props:
         value:
           $$jsExpression: |
             `Allows Intl |test6 ${
               typeof Intl?.NumberFormat !== "undefined" ? "ok" : "nok"
             }|`
+      children: []
+    - component: Text
+      name: text7
+      props:
+        value:
+          $$jsExpression: >
+            `Disallows binding to event handlers |test7 ${
+              Object.prototype.hasOwnProperty.call(button, "onClick") ? "nok" : "ok"
+            }|`
+      children: []
+    - component: Text
+      name: text9
+      props:
+        value:
+          $$jsExpression: >
+            `Disallows binding to list templates |test8 ${
+              Object.prototype.hasOwnProperty.call(list, "renderItem") ? "nok" : "ok"
+            }|`
+      children: []

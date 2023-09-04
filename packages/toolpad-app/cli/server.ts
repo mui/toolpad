@@ -24,10 +24,12 @@ import {
   initProject,
 } from '../src/server/localMode';
 import type { Command as AppDevServerCommand, AppViteServerConfig, WorkerRpc } from './appServer';
-import { createRpcHandler, createRpcServer } from '../src/server/rpc';
+import { createRpcHandler } from '../src/server/rpc';
 import { RUNTIME_CONFIG_WINDOW_PROPERTY } from '../src/constants';
 import type { RuntimeConfig } from '../src/config';
 import { createWorkerRpcServer } from '../src/server/workerRpc';
+import { createRpcServer } from '../src/server/rpcServer';
+import { createRpcRuntimeServer } from '../src/server/rpcRuntimeServer';
 
 const DEFAULT_PORT = 3000;
 
@@ -86,7 +88,9 @@ async function createDevHandler(
     worker.postMessage({ kind: 'reload-components' } satisfies AppDevServerCommand);
   });
 
-  handler.use('/api/data', project.dataManager.createDataHandler(project));
+  handler.use('/api/data', project.dataManager.createDataHandler());
+  const runtimeRpcServer = createRpcRuntimeServer(project);
+  handler.use('/api/runtime-rpc', createRpcHandler(runtimeRpcServer));
   handler.use(
     (req, res, next) => {
       // Stall the request until the dev server is ready

@@ -404,7 +404,7 @@ Add new reference documentation, add new QR-code example.
 - &#8203;<!-- 10 -->Add 404 page to application runtime (#2077) @Janpot
 - &#8203;<!-- 09 -->Avoid component catalog opening while hovering the snackbar (#2079) @Janpot
 - &#8203;<!-- 08 -->Fix broken documentation links (#2076) @Janpot
-- &#8203;<!-- 07 -->Add new example for QR code generator (#2067) @Janpot
+- &#8203;<!-- 07 -->Add new example for QR Code generator (#2067) @Janpot
 - &#8203;<!-- 06 -->Avoid restarting vite devserver when env file changes (#2069) @Janpot
 - &#8203;<!-- 05 -->Reference documentation (#2001) @Janpot
 - &#8203;<!-- 04 -->Fix websocket connection in codesandbox (#2068) @Janpot

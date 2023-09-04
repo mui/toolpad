@@ -313,7 +313,7 @@ export default createBuiltin(Text, {
     },
     variant: {
       helperText:
-        'The MUI typography [variant](https://mui.com/material-ui/customization/typography/#variants) that is used to display the text.',
+        'The Material UI typography [variant](https://mui.com/material-ui/customization/typography/#variants) that is used to display the text.',
       type: 'string',
       enum: ['h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'subtitle1', 'subtitle2', 'body1', 'body2'],
       default: 'body1',

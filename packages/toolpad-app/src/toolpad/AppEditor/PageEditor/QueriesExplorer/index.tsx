@@ -17,7 +17,7 @@ import NodeMenu from '../../NodeMenu';
 import EditableText from '../../../../components/EditableText';
 import { QueryMeta, PanelState } from './types';
 import QueryEditor from './QueryEditor2';
-import { useNodeNameValidation } from '../../HierarchyExplorer/validation';
+import { useNodeNameValidation } from '../../PagesExplorer/validation';
 
 const classes = {
   treeItemMenuButton: 'Toolpad__QueryListItem',

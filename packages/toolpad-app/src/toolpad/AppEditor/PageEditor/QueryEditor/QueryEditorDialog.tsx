@@ -28,7 +28,7 @@ import ConnectionSelect, { ConnectionOption } from '../ConnectionSelect';
 import BindableEditor from '../BindableEditor';
 import { ConfirmDialog } from '../../../../components/SystemDialogs';
 import useBoolean from '../../../../utils/useBoolean';
-import { useNodeNameValidation } from '../../HierarchyExplorer/validation';
+import { useNodeNameValidation } from '../../PagesExplorer/validation';
 import useEvent from '../../../../utils/useEvent';
 import useUnsavedChangesConfirm from '../../../hooks/useUnsavedChangesConfirm';
 import client from '../../../../api';

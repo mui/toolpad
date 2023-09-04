@@ -5,7 +5,7 @@
 ## Import
 
 ```jsx
-import { createComponent } from '@mui/toolpad/server';
+import { createComponent } from '@mui/toolpad/browser';
 ```
 
 ## Description

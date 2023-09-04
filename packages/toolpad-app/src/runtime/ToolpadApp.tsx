@@ -32,11 +32,12 @@ import {
   RuntimeScope,
   ApplicationVm,
   JsExpressionAttrValue,
+  ComponentConfig,
 } from '@mui/toolpad-core';
 import { createProvidedContext, useAssertedContext } from '@mui/toolpad-utils/react';
 import { mapProperties, mapValues } from '@mui/toolpad-utils/collections';
 import { set as setObjectPath } from 'lodash-es';
-import { QueryClient, QueryClientProvider, useMutation } from '@tanstack/react-query';
+import { QueryClientProvider, useMutation } from '@tanstack/react-query';
 import {
   BrowserRouter,
   Routes,
@@ -45,7 +46,7 @@ import {
   Navigate,
   Location as RouterLocation,
   useNavigate,
-  matchPath,
+  useMatch,
 } from 'react-router-dom';
 import { ErrorBoundary, FallbackProps } from 'react-error-boundary';
 import {
@@ -79,11 +80,12 @@ import evalJsBindings, {
 } from './evalJsBindings';
 import { HTML_ID_EDITOR_OVERLAY } from './constants';
 import { layoutBoxArgTypes } from './toolpadComponents/layoutBox';
-import { execDataSourceQuery, useDataQuery, UseFetch } from './useDataQuery';
+import { useDataQuery, UseFetch } from './useDataQuery';
 import { NavigateToPage } from './CanvasHooksContext';
-import AppNavigation from './AppNavigation';
 import PreviewHeader from './PreviewHeader';
 import useEvent from '../utils/useEvent';
+import { AppLayout } from './AppLayout';
+import api, { queryClient } from './api';
 
 const browserJsRuntime = getBrowserRuntime();
 
@@ -97,8 +99,6 @@ const Pre = styled('pre')(({ theme }) => ({
   margin: 0,
   fontFamily: theme.fontFamilyMonospaced,
 }));
-
-const PREVIEW_PAGE_ROUTE = '/preview/pages/:nodeId';
 
 export const internalComponents: ToolpadComponents = Object.fromEntries(
   [...INTERNAL_COMPONENTS].map(([name]) => {
@@ -263,6 +263,8 @@ const [useDomContext, DomContextProvider] = createProvidedContext<appDom.AppDom>
 const [useEvaluateScopeExpression, EvaluateScopeExpressionProvider] =
   createProvidedContext<(expr: string) => any>('EvaluateScopeExpression');
 
+export { DomContextProvider, ComponentsContextProvider };
+
 interface SetBindingContextValue {
   setBinding: (id: string, result: BindingEvaluationResult, scopeId?: string) => void;
   setControlledBinding: (id: string, result: BindingEvaluationResult, scopeId?: string) => void;
@@ -363,7 +365,7 @@ function parseBinding(
   bindable: BindableAttrValue<any>,
   { scopePath }: ParseBindingOptions = {},
 ): ParsedBinding | EvaluatedBinding {
-  const bindingType = bindable && getBindingType(bindable);
+  const bindingType = getBindingType(bindable);
 
   if (bindingType === 'const') {
     return {
@@ -427,6 +429,17 @@ function getQueryConfigBindings({ enabled, refetchInterval }: appDom.QueryNode['
   return { enabled, refetchInterval };
 }
 
+function isBindableProp(componentConfig: ComponentConfig<any>, propName: string) {
+  const isResizableHeightProp = propName === componentConfig.resizableHeightProp;
+  const argType = componentConfig.argTypes?.[propName];
+  return (
+    !isResizableHeightProp &&
+    argType?.control?.bindable !== false &&
+    argType?.type !== 'template' &&
+    argType?.type !== 'event'
+  );
+}
+
 function parseBindings(
   dom: appDom.AppDom,
   rootNode: appDom.ElementNode | appDom.PageNode | appDom.ElementNode[],
@@ -444,34 +457,28 @@ function parseBindings(
       const componentId = getComponentId(elm);
       const Component = components[componentId];
 
-      const componentConfig = Component?.[TOOLPAD_COMPONENT];
+      const componentConfig: ComponentConfig<any> = Component?.[TOOLPAD_COMPONENT] ?? {};
 
-      const { argTypes = {} } = componentConfig ?? {};
+      const { argTypes = {} } = componentConfig;
 
       const propsMeta: Record<string, ScopeMetaPropField> = {};
 
       for (const [propName, argType] of Object.entries(argTypes)) {
-        const initializerId = argType?.defaultValueProp
+        invariant(argType, `Missing argType for prop "${propName}"`);
+
+        const initializerId = argType.defaultValueProp
           ? `${elm.id}.props.${argType.defaultValueProp}`
           : undefined;
 
         const propValue: BindableAttrValue<any> = elm.props?.[propName];
 
-        const binding: BindableAttrValue<any> =
-          propValue || (argType ? getArgTypeDefaultValue(argType) : undefined);
+        const binding: BindableAttrValue<any> = propValue ?? getArgTypeDefaultValue(argType);
 
         const bindingId = `${elm.id}.props.${propName}`;
 
         let scopePath: string | undefined;
 
-        const isResizableHeightProp =
-          componentConfig?.resizableHeightProp && propName === componentConfig?.resizableHeightProp;
-
-        if (
-          componentId !== PAGE_ROW_COMPONENT_ID &&
-          !isResizableHeightProp &&
-          argType?.control?.bindable !== false
-        ) {
+        if (componentId !== PAGE_ROW_COMPONENT_ID && isBindableProp(componentConfig, propName)) {
           scopePath = `${elm.name}.${propName}`;
         }
 
@@ -511,9 +518,7 @@ function parseBindings(
         };
 
         const propBindingValue = propValue && getBindingValue(propValue);
-        if (propBindingValue) {
-          parseNestedBindings(propBindingValue, bindingId);
-        }
+        parseNestedBindings(propBindingValue, bindingId);
       }
 
       if (componentId !== PAGE_ROW_COMPONENT_ID) {
@@ -527,7 +532,7 @@ function parseBindings(
       if (!isPageLayoutComponent(elm)) {
         for (const [propName, argType] of Object.entries(layoutBoxArgTypes)) {
           const binding =
-            elm.layout?.[propName as keyof typeof layoutBoxArgTypes] ||
+            elm.layout?.[propName as keyof typeof layoutBoxArgTypes] ??
             (argType ? getArgTypeDefaultValue(argType) : undefined);
           const bindingId = `${elm.id}.layout.${propName}`;
           parsedBindingsMap.set(bindingId, parseBinding(binding, {}));
@@ -578,7 +583,7 @@ function parseBindings(
           const bindingId = `${elm.id}.params.${paramName}`;
           const scopePath = `${elm.name}.params.${paramName}`;
 
-          const bindingType = bindable && getBindingType(bindable);
+          const bindingType = getBindingType(bindable);
           if (bindingType === 'const') {
             parsedBindingsMap.set(bindingId, {
               scopePath,
@@ -630,10 +635,6 @@ function parseBindings(
 function useElmToolpadComponent(elm: appDom.ElementNode): ToolpadComponent {
   const componentId = getElementNodeComponentId(elm);
   return useComponent(componentId);
-}
-
-interface RenderedNodeProps {
-  nodeId: NodeId;
 }
 
 function RenderedNode({ nodeId }: RenderedNodeProps) {
@@ -1272,7 +1273,6 @@ function MutationNode({ node, page }: MutationNodeProps) {
 
   const { bindings } = useAssertedContext(RuntimeScopeContext);
 
-  const queryId = node.id;
   const { value: params } = resolveBindables(
     bindings,
     `${node.id}.params`,
@@ -1285,37 +1285,36 @@ function MutationNode({ node, page }: MutationNodeProps) {
     error: fetchError,
     mutateAsync,
   } = useMutation(
-    async (overrides: any = {}) =>
-      execDataSourceQuery({
-        pageName: page.name,
-        queryName: node.name,
-        params: { ...params, ...overrides },
-      }),
+    async (overrides: any = {}) => {
+      return api.mutation.execQuery(page.name, node.name, { ...params, ...overrides });
+    },
     {
-      mutationKey: [queryId, params],
+      mutationKey: [node.name, params],
     },
   );
 
-  const { data, error: apiError } = responseData;
+  const { data, error: apiError } = responseData || EMPTY_OBJECT;
 
   const error = apiError || fetchError;
 
   // Stabilize the mutation and prepare for inclusion in global scope
-  const mutationResult: UseFetch = React.useMemo(
-    () => ({
+  const mutationResult: UseFetch = React.useMemo(() => {
+    const call = async (overrides: any = {}) => {
+      await mutateAsync(overrides);
+    };
+    return {
       isLoading,
       isFetching: isLoading,
       error,
       data,
       rows: Array.isArray(data) ? data : EMPTY_ARRAY,
-      call: mutateAsync,
-      fetch: mutateAsync,
+      call,
+      fetch: call,
       refetch: () => {
         throw new Error(`refetch is not supported in manual queries`);
       },
-    }),
-    [isLoading, error, mutateAsync, data],
-  );
+    };
+  }, [isLoading, error, data, mutateAsync]);
 
   React.useEffect(() => {
     for (const [key, value] of Object.entries(mutationResult)) {
@@ -1344,7 +1343,11 @@ function FetchNode({ node, page }: FetchNodeProps) {
   }
 }
 
-function RenderedPage({ nodeId }: RenderedNodeProps) {
+export interface RenderedNodeProps {
+  nodeId: NodeId;
+}
+
+export function RenderedPage({ nodeId }: RenderedNodeProps) {
   const dom = useDomContext();
   const page = appDom.getNode(dom, nodeId, 'page');
   const { children = [], queries = [] } = appDom.getChildNodes(dom, page);
@@ -1411,10 +1414,11 @@ function PageNotFound() {
 
 interface RenderedPagesProps {
   pages: appDom.PageNode[];
-  defaultPage: appDom.PageNode;
 }
 
-function RenderedPages({ pages, defaultPage }: RenderedPagesProps) {
+function RenderedPages({ pages }: RenderedPagesProps) {
+  const defaultPage = pages[0];
+
   const defaultPageNavigation = <Navigate to={`/pages/${defaultPage.id}`} replace />;
   return (
     <Routes>
@@ -1472,49 +1476,41 @@ function AppError({ error }: FallbackProps) {
   );
 }
 
-export const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: {
-      retry: false,
-      staleTime: 60 * 1000,
-    },
-  },
-});
-
 export interface ToolpadAppLayoutProps {
   dom: appDom.RenderTree;
   hasShell?: boolean;
 }
 
-function ToolpadAppLayout({ dom, hasShell: hasShellProp = true }: ToolpadAppLayoutProps) {
+function ToolpadAppLayout({ dom, hasShell = true }: ToolpadAppLayoutProps) {
   const root = appDom.getApp(dom);
   const { pages = [] } = appDom.getChildNodes(dom, root);
 
-  const location = useLocation();
-  const { pathname, search } = location;
-  const urlParams = React.useMemo(() => new URLSearchParams(search), [search]);
-
-  const pageMatch = matchPath(PREVIEW_PAGE_ROUTE, `/preview${pathname}`);
-  const pageId = pageMatch?.params.nodeId;
-
-  const defaultPage = pages[0];
-  const page = pageId ? appDom.getMaybeNode(dom, pageId as NodeId, 'page') : defaultPage;
-
-  const displayMode = urlParams.get('toolpad-display') || page?.attributes.display;
-
-  const hasShell = hasShellProp && displayMode !== 'standalone';
+  const pageMatch = useMatch('/pages/:slug');
+  const pageId = pageMatch?.params.slug;
 
   const showPreviewHeader = isPreview && !isRenderedInCanvas;
+
+  const navEntries = React.useMemo(
+    () =>
+      pages.map((page) => ({
+        slug: page.id,
+        displayName: page.name,
+        hasShell: page?.attributes.display !== 'standalone',
+      })),
+    [pages],
+  );
 
   return (
     <React.Fragment>
       {showPreviewHeader ? <PreviewHeader pageId={pageId} /> : null}
-      <Box sx={{ flex: 1, display: 'flex' }}>
-        {hasShell && pages.length > 0 ? (
-          <AppNavigation pages={pages} clipped={showPreviewHeader} />
-        ) : null}
-        <RenderedPages pages={pages} defaultPage={defaultPage} />
-      </Box>
+      <AppLayout
+        activePage={pageMatch?.params.slug}
+        pages={navEntries}
+        hasShell={hasShell}
+        clipped={showPreviewHeader}
+      >
+        <RenderedPages pages={pages} />
+      </AppLayout>
     </React.Fragment>
   );
 }

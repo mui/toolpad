@@ -40,6 +40,9 @@ test('global scope', async ({ page }) => {
   await expect(page.getByText('|test3 ok|')).toBeVisible();
   await expect(page.getByText('|test4 ok|')).toBeVisible();
   await expect(page.getByText('|test5 ok|')).toBeVisible();
+  await expect(page.getByText('|test6 ok|')).toBeVisible();
+  await expect(page.getByText('|test7 ok|')).toBeVisible();
+  await expect(page.getByText('|test8 ok|')).toBeVisible();
 });
 
 test('encoding', async ({ page }) => {

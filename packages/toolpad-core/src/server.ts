@@ -2,6 +2,7 @@
 
 import { TOOLPAD_FUNCTION } from './constants';
 import { InferParameterType, PrimitiveValueType, PropValueType } from './types';
+import { ServerContext, getServerContext } from './serverRuntime';
 
 /**
  * The runtime configuration for a Toolpad function. Describes the parameters it accepts and their
@@ -85,3 +86,13 @@ export function createFunction<
  * createQuery is deprecated. Use createFunction instead.
  */
 export const createQuery = createFunction;
+
+export type { ServerContext };
+
+export function getContext(): ServerContext {
+  const ctx = getServerContext();
+  if (!ctx) {
+    throw new Error('getContext() must be called from within a Toolpad function.');
+  }
+  return ctx;
+}

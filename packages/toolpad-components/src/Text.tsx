@@ -8,9 +8,10 @@ import {
   TextareaAutosize,
   SxProps,
 } from '@mui/material';
-import { createComponent, useNode } from '@mui/toolpad-core';
+import { useNode } from '@mui/toolpad-core';
 import ErrorIcon from '@mui/icons-material/Error';
 import { errorFrom } from '@mui/toolpad-utils/errors';
+import createBuiltin from './createBuiltin';
 import { SX_PROP_HELPER_TEXT } from './constants';
 
 const Markdown = React.lazy(async () => import('markdown-to-jsx'));
@@ -44,6 +45,7 @@ interface TextProps {
 const MarkdownContainer = styled('div')(({ theme }) => ({
   display: 'block',
   width: '100%',
+  overflowWrap: 'anywhere',
   '&:empty::before, & > span:empty::before': {
     content: '""',
     display: 'inline-block',
@@ -246,7 +248,7 @@ function TextContent({ value, loading, sx, variant }: TextContentProps) {
         [`&:empty::before`]: { content: '""', display: 'inline-block' },
         outline: 'none',
         whiteSpace: 'pre-wrap',
-        overflowWrap: 'break-word',
+        overflowWrap: 'anywhere',
       }}
       variant={variant}
       onDoubleClick={() => {
@@ -279,9 +281,9 @@ function Text(props: TextProps) {
   }
 }
 
-export default createComponent(Text, {
+export default createBuiltin(Text, {
   helperText:
-    'The Text component lets you display text. Text can be rendered in multiple forms: plain, as a link, or as markdown.',
+    "The Text component lets you display text. Text can be rendered in multiple forms: plain, as a link, or as markdown. It's rendered using MUI [Typography](https://mui.com/material-ui/react-typography/).",
   layoutDirection: 'both',
   loadingPropSource: ['value'],
   loadingProp: 'loading',
@@ -307,16 +309,16 @@ export default createComponent(Text, {
       helperText: 'The url that is being linked.',
       type: 'string',
       default: 'about:blank',
-      visible: ({ mode }) => mode === 'link',
+      visible: ({ mode }: TextProps) => mode === 'link',
     },
     variant: {
       helperText:
-        'The MUI typography [variant](https://mui.com/material-ui/customization/typography/#variants) that is used to display the text.',
+        'The Material UI typography [variant](https://mui.com/material-ui/customization/typography/#variants) that is used to display the text.',
       type: 'string',
       enum: ['h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'subtitle1', 'subtitle2', 'body1', 'body2'],
       default: 'body1',
       label: 'Variant',
-      visible: ({ mode }) => mode === 'text',
+      visible: ({ mode }: TextProps) => mode === 'text',
     },
     loading: {
       helperText:
@@ -327,7 +329,7 @@ export default createComponent(Text, {
     sx: {
       helperText: SX_PROP_HELPER_TEXT,
       type: 'object',
-      visible: ({ mode }) => mode !== 'markdown',
+      visible: ({ mode }: TextProps) => mode !== 'markdown',
     },
   },
 });

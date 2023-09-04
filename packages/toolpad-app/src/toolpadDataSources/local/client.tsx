@@ -24,6 +24,8 @@ import DoneIcon from '@mui/icons-material/Done';
 import { useQuery } from '@tanstack/react-query';
 import Popper from '@mui/material/Popper';
 import ClickAwayListener from '@mui/material/ClickAwayListener';
+// import { ensureSuffix } from '@mui/toolpad-utils/strings';
+import { Panel, PanelGroup, PanelResizeHandle } from '../../components/resizablePanels';
 import { ClientDataSource, QueryEditorProps } from '../../types';
 import { LocalPrivateApi, LocalQuery, LocalConnectionParams } from './types';
 import {
@@ -31,7 +33,6 @@ import {
   useEvaluateLiveBindings,
 } from '../../toolpad/AppEditor/useEvaluateLiveBinding';
 import * as appDom from '../../appDom';
-import SplitPane from '../../components/SplitPane';
 import JsonView from '../../components/JsonView';
 import OpenCodeEditorButton from '../../components/OpenCodeEditor';
 import useQueryPreview from '../useQueryPreview';
@@ -494,103 +495,101 @@ function QueryEditor({
   }, [input, onSave]);
 
   return (
-    <SplitPane
-      split="vertical"
-      size="60%"
-      primary="first"
-      allowResize
-      sx={{ maxWidth: '80%', minHeight: '20vh' }}
-    >
-      <Box display={'grid'} gridTemplateColumns={'60% auto auto'} height={'100%'} columnGap={1}>
-        <Stack
-          display="flex"
-          flexDirection={'row'}
-          sx={{
-            borderRight: (theme) => `1px solid ${theme.palette.divider}`,
-            alignItems: 'flex-start',
-            mt: 2,
-            mx: 2,
-          }}
-        >
-          <FunctionAutocomplete
-            selectedFunctionFileName={selectedFile || ''}
-            files={introspection.data?.files || []}
-            selectedFunctionName={selectedFunction || ''}
-            onCreateNew={handleCreateNewFile}
-            onSelect={handleSelectFunction}
-          />
-
-          <LoadingButton
-            loading={previewIsLoading}
-            onClick={handleRunPreview}
-            variant="contained"
-            disabled={!selectedFunction}
-            sx={{ width: '80%', mx: 2.5, mt: 1 }}
-          >
-            Preview
-          </LoadingButton>
-        </Stack>
-
-        {introspection.error ? (
-          <Box
+    <PanelGroup direction="horizontal">
+      <Panel defaultSize={50} minSize={20}>
+        <Box display={'grid'} gridTemplateColumns={'60% auto auto'} height={'100%'} columnGap={1}>
+          <Stack
+            display="flex"
+            flexDirection={'row'}
             sx={{
-              position: 'absolute',
-              inset: '0 0 0 0',
-              display: 'flex',
-              justifyContent: 'center',
-              alignItems: 'center',
+              borderRight: (theme) => `1px solid ${theme.palette.divider}`,
+              alignItems: 'flex-start',
+              mt: 2,
+              mx: 2,
             }}
           >
-            {errorFrom(introspection.error).message}
-          </Box>
-        ) : null}
+            <FunctionAutocomplete
+              selectedFunctionFileName={selectedFile || ''}
+              files={introspection.data?.files || []}
+              selectedFunctionName={selectedFunction || ''}
+              onCreateNew={handleCreateNewFile}
+              onSelect={handleSelectFunction}
+            />
 
-        <Stack sx={{ gap: 1, mt: 2 }}>
-          <Typography
-            fontSize={12}
-            sx={{
-              color: (theme) =>
-                theme.palette.mode === 'dark' ? theme.palette.grey[500] : 'default',
-            }}
-          >
-            Parameters:
-          </Typography>
-          {Object.entries(parameterDefs).map(([name, definiton]) => {
-            const Control = getDefaultControl(propTypeControls, definiton, liveBindings);
-            return Control ? (
-              <BindableEditor
-                key={name}
-                liveBinding={liveBindings[name]}
-                globalScope={globalScope}
-                globalScopeMeta={globalScopeMeta}
-                label={name}
-                propType={definiton}
-                jsRuntime={jsBrowserRuntime}
-                renderControl={(renderControlParams) => (
-                  <Control {...renderControlParams} propType={definiton} />
-                )}
-                value={paramsObject[name]}
-                onChange={(newValue) => {
-                  const paramKeys = Object.keys(parameterDefs);
-                  const newParams: BindableAttrEntries = paramKeys.flatMap((key) => {
-                    const paramValue = key === name ? newValue : paramsObject[key];
-                    return paramValue ? [[key, paramValue]] : [];
-                  });
-                  setInput((existing) => ({
-                    ...existing,
-                    params: newParams,
-                  }));
-                }}
-              />
-            ) : null;
-          })}
-        </Stack>
-      </Box>
+            <LoadingButton
+              loading={previewIsLoading}
+              onClick={handleRunPreview}
+              variant="contained"
+              disabled={!selectedFunction}
+              sx={{ width: '80%', mx: 2.5, mt: 1 }}
+            >
+              Preview
+            </LoadingButton>
+          </Stack>
 
-      <QueryPreview isLoading={previewIsLoading} error={preview?.error}>
-        <ResolvedPreview preview={preview} />
-      </QueryPreview>
-    </SplitPane>
+          {introspection.error ? (
+            <Box
+              sx={{
+                position: 'absolute',
+                inset: '0 0 0 0',
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+              }}
+            >
+              {errorFrom(introspection.error).message}
+            </Box>
+          ) : null}
+
+          <Stack sx={{ gap: 1, mt: 2 }}>
+            <Typography
+              fontSize={12}
+              sx={{
+                color: (theme) =>
+                  theme.palette.mode === 'dark' ? theme.palette.grey[500] : 'default',
+              }}
+            >
+              Parameters:
+            </Typography>
+            {Object.entries(parameterDefs).map(([name, definiton]) => {
+              const Control = getDefaultControl(propTypeControls, definiton, liveBindings);
+              return Control ? (
+                <BindableEditor
+                  key={name}
+                  liveBinding={liveBindings[name]}
+                  globalScope={globalScope}
+                  globalScopeMeta={globalScopeMeta}
+                  label={name}
+                  propType={definiton}
+                  jsRuntime={jsBrowserRuntime}
+                  renderControl={(renderControlParams) => (
+                    <Control {...renderControlParams} propType={definiton} />
+                  )}
+                  value={paramsObject[name]}
+                  onChange={(newValue) => {
+                    const paramKeys = Object.keys(parameterDefs);
+                    const newParams: BindableAttrEntries = paramKeys.flatMap((key) => {
+                      const paramValue = key === name ? newValue : paramsObject[key];
+                      return paramValue ? [[key, paramValue]] : [];
+                    });
+                    setInput((existing) => ({
+                      ...existing,
+                      params: newParams,
+                    }));
+                  }}
+                />
+              ) : null;
+            })}
+          </Stack>
+        </Box>
+      </Panel>
+      <PanelResizeHandle />
+      <Panel defaultSize={50} minSize={20}>
+        <QueryPreview isLoading={previewIsLoading} error={preview?.error}>
+          <ResolvedPreview preview={preview} />
+        </QueryPreview>
+      </Panel>
+    </PanelGroup>
   );
 }
 

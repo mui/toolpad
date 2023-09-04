@@ -1,6 +1,7 @@
 import * as React from 'react';
-import { createComponent } from '@mui/toolpad-core';
-import { Container, ContainerProps } from '@mui/material';
+
+import { Container, ContainerProps, Skeleton } from '@mui/material';
+
 import {
   XAxis,
   YAxis,
@@ -14,6 +15,9 @@ import {
   Area,
   Scatter,
 } from 'recharts';
+import { errorFrom } from '@mui/toolpad-utils/errors';
+import createBuiltin from './createBuiltin';
+import ErrorOverlay from './components/ErrorOverlay';
 import { SX_PROP_HELPER_TEXT } from './constants';
 
 export const CHART_DATA_SERIES_KINDS = ['line', 'bar', 'area', 'scatter'];
@@ -35,10 +39,12 @@ function getBarChartDataSeriesNormalizedYKey(dataSeries: ChartDataSeries, index:
 
 interface ChartProps extends ContainerProps {
   data?: ChartData;
+  loading?: boolean;
+  error?: Error | string;
   height?: number;
 }
 
-function Chart({ data = [], height, sx }: ChartProps) {
+function Chart({ data = [], loading, error, height, sx }: ChartProps) {
   const xValues = React.useMemo(
     () =>
       data
@@ -83,100 +89,122 @@ function Chart({ data = [], height, sx }: ChartProps) {
 
   const hasNonNumberXValues = xValues.some((xValue) => typeof xValue !== 'number');
 
+  const displayError = error ? errorFrom(error) : null;
+
+  const isDataVisible = !loading && !displayError;
+
   return (
-    <Container disableGutters sx={sx}>
+    <Container disableGutters sx={{ ...sx, position: 'relative' }} aria-busy={loading}>
       <ResponsiveContainer width="100%" height={height}>
         <ComposedChart data={barChartData} margin={{ top: 20, right: 80 }}>
-          <CartesianGrid />
-          <XAxis
-            dataKey="x"
-            type={hasNonNumberXValues ? 'category' : 'number'}
-            allowDuplicatedCategory={false}
-            domain={
-              hasNonNumberXValues
-                ? undefined
-                : [Math.min(...(xValues as number[])), Math.max(...(xValues as number[]))]
-            }
-          />
-          <YAxis width={80} />
-          <Tooltip />
-          <Legend />
-          {data.map((dataSeries, index) => {
-            if (
-              !dataSeries.data ||
-              dataSeries.data.length === 0 ||
-              !dataSeries.xKey ||
-              !dataSeries.yKey
-            ) {
-              return null;
-            }
+          {isDataVisible ? (
+            <React.Fragment>
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis
+                dataKey="x"
+                type={hasNonNumberXValues ? 'category' : 'number'}
+                allowDuplicatedCategory={false}
+                domain={
+                  hasNonNumberXValues
+                    ? undefined
+                    : [Math.min(...(xValues as number[])), Math.max(...(xValues as number[]))]
+                }
+              />
+              <YAxis width={80} />
+              <Tooltip />
+              <Legend />
+              {data.map((dataSeries, index) => {
+                if (
+                  !dataSeries.data ||
+                  dataSeries.data.length === 0 ||
+                  !dataSeries.xKey ||
+                  !dataSeries.yKey
+                ) {
+                  return null;
+                }
 
-            const key = `${dataSeries.label}-${index}`;
+                const key = `${dataSeries.label}-${index}`;
 
-            const normalizedData = dataSeries.data
-              .map((dataSeriesPoint) => ({
-                x: dataSeriesPoint[dataSeries.xKey!],
-                [dataSeries.yKey!]: dataSeriesPoint[dataSeries.yKey!],
-              }))
-              .sort((a, b) =>
-                typeof a[dataSeries.xKey!] === 'number' && typeof b[dataSeries.xKey!] === 'number'
-                  ? (a[dataSeries.xKey!] as number) - (b[dataSeries.xKey!] as number)
-                  : 0,
-              );
+                const normalizedData = dataSeries.data
+                  .map((dataSeriesPoint) => ({
+                    x: dataSeriesPoint[dataSeries.xKey!],
+                    [dataSeries.yKey!]: dataSeriesPoint[dataSeries.yKey!],
+                  }))
+                  .sort((a, b) =>
+                    typeof a[dataSeries.xKey!] === 'number' &&
+                    typeof b[dataSeries.xKey!] === 'number'
+                      ? (a[dataSeries.xKey!] as number) - (b[dataSeries.xKey!] as number)
+                      : 0,
+                  );
 
-            switch (dataSeries.kind) {
-              case 'bar':
-                return (
-                  <Bar
-                    key={key}
-                    dataKey={getBarChartDataSeriesNormalizedYKey(dataSeries, index)}
-                    name={dataSeries.label}
-                    barSize={20}
-                    fill={dataSeries.color}
-                  />
-                );
-              case 'area':
-                return (
-                  <Area
-                    key={key}
-                    type="monotone"
-                    data={normalizedData}
-                    dataKey={dataSeries.yKey}
-                    name={dataSeries.label}
-                    stroke={dataSeries.color}
-                    fill={dataSeries.color}
-                  />
-                );
-              case 'scatter':
-                return (
-                  <Scatter
-                    key={key}
-                    data={normalizedData}
-                    dataKey={dataSeries.yKey}
-                    name={dataSeries.label}
-                    fill={dataSeries.color}
-                  />
-                );
-              default:
-                return (
-                  <Line
-                    key={key}
-                    type="monotone"
-                    data={normalizedData}
-                    dataKey={dataSeries.yKey}
-                    name={dataSeries.label}
-                    stroke={dataSeries.color}
-                  />
-                );
-            }
-          })}
+                switch (dataSeries.kind) {
+                  case 'bar':
+                    return (
+                      <Bar
+                        key={key}
+                        dataKey={getBarChartDataSeriesNormalizedYKey(dataSeries, index)}
+                        name={dataSeries.label}
+                        barSize={20}
+                        fill={dataSeries.color}
+                      />
+                    );
+                  case 'area':
+                    return (
+                      <Area
+                        key={key}
+                        type="monotone"
+                        data={normalizedData}
+                        dataKey={dataSeries.yKey}
+                        name={dataSeries.label}
+                        stroke={dataSeries.color}
+                        fill={dataSeries.color}
+                      />
+                    );
+                  case 'scatter':
+                    return (
+                      <Scatter
+                        key={key}
+                        data={normalizedData}
+                        dataKey={dataSeries.yKey}
+                        name={dataSeries.label}
+                        fill={dataSeries.color}
+                      />
+                    );
+                  default:
+                    return (
+                      <Line
+                        key={key}
+                        type="monotone"
+                        data={normalizedData}
+                        dataKey={dataSeries.yKey}
+                        name={dataSeries.label}
+                        stroke={dataSeries.color}
+                      />
+                    );
+                }
+              })}
+            </React.Fragment>
+          ) : null}
         </ComposedChart>
       </ResponsiveContainer>
+      <ErrorOverlay error={displayError} />
+      {loading && !error ? (
+        <Skeleton
+          sx={{ position: 'absolute', inset: '0 0 0 0' }}
+          variant="rectangular"
+          width="100%"
+          height={height}
+        />
+      ) : null}
     </Container>
   );
 }
 
-export default createComponent(Chart, {
+export default createBuiltin(Chart, {
+  helperText: 'A chart component.',
+  loadingProp: 'loading',
+  loadingPropSource: ['data'],
+  errorProp: 'error',
   resizableHeightProp: 'height',
   argTypes: {
     data: {
@@ -214,8 +242,9 @@ export default createComponent(Chart, {
       control: { type: 'ChartData', bindable: false },
     },
     height: {
+      helperText: 'The height of the chart.',
       type: 'number',
-      default: 400,
+      default: 300,
       minimum: 100,
     },
     sx: {

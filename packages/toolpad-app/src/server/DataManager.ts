@@ -1,4 +1,5 @@
 import { NodeId, ExecFetchResult } from '@mui/toolpad-core';
+import { withContext, createServerContext } from '@mui/toolpad-core/serverRuntime';
 import { createServerJsRuntime } from '@mui/toolpad-core/jsServerRuntime';
 import express from 'express';
 import cors from 'cors';
@@ -75,7 +76,10 @@ export default class DataManager {
     await this.project.saveDom(dom);
   }
 
-  async execQuery<P, Q>(dataNode: appDom.QueryNode<Q>, params: Q): Promise<ExecFetchResult<any>> {
+  async execDataNodeQuery<P, Q>(
+    dataNode: appDom.QueryNode<Q>,
+    params: Q,
+  ): Promise<ExecFetchResult<any>> {
     const dataSource: ServerDataSource<P, Q, any> | undefined = dataNode.attributes.dataSource
       ? this.dataSources.get(dataNode.attributes.dataSource)
       : undefined;
@@ -99,6 +103,33 @@ export default class DataManager {
     }
 
     return result;
+  }
+
+  async execQuery(pageName: string, queryName: string, params: any): Promise<ExecFetchResult<any>> {
+    const dom = await this.project.loadDom();
+
+    const page = appDom.getPageByName(dom, pageName);
+
+    if (!page) {
+      throw new Error(`Unknown page "${pageName}"`);
+    }
+
+    const dataNode = appDom.getQueryByName(dom, page, queryName);
+
+    if (!dataNode) {
+      throw new Error(`Unknown query "${queryName}"`);
+    }
+
+    if (!appDom.isQuery(dataNode)) {
+      throw new Error(`Invalid node type for data request`);
+    }
+
+    try {
+      const result = await this.execDataNodeQuery(dataNode, params);
+      return withSerializedError(result);
+    } catch (error) {
+      return withSerializedError({ error });
+    }
   }
 
   async dataSourceFetchPrivate<P, Q>(
@@ -139,7 +170,7 @@ export default class DataManager {
     return dataSource.api[method](...args);
   }
 
-  createDataHandler(project: IToolpadProject) {
+  createDataHandler() {
     const router = express.Router();
 
     router.use(
@@ -157,35 +188,13 @@ export default class DataManager {
         const { pageName, queryName } = req.params;
 
         invariant(typeof pageName === 'string', 'pageName url param required');
-
         invariant(typeof queryName === 'string', 'queryName url variable required');
 
-        const dom = await project.loadDom();
-
-        const page = appDom.getPageByName(dom, pageName);
-
-        if (!page) {
-          res.status(404).end();
-          return;
-        }
-
-        const dataNode = appDom.getQueryByName(dom, page, queryName);
-
-        if (!dataNode) {
-          res.status(404).end();
-          return;
-        }
-
-        if (!appDom.isQuery(dataNode)) {
-          throw new Error(`Invalid node type for data request`);
-        }
-
-        try {
-          const result = await this.execQuery(dataNode, req.body);
-          res.json(withSerializedError(result));
-        } catch (error) {
-          res.json(withSerializedError({ error }));
-        }
+        const ctx = createServerContext(req);
+        const result = await withContext(ctx, async () => {
+          return this.execQuery(pageName, queryName, req.body);
+        });
+        res.json(result);
       }),
     );
 

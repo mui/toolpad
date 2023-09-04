@@ -17,7 +17,7 @@ export default function QueryPreview({ children, error, isLoading }: QueryPrevie
     >
       {isLoading ? <LinearProgress /> : null}
       <Box sx={{ flex: 1, minHeight: 0, overflow: 'auto' }}>
-        {error ? <ErrorAlert error={error} /> : children}
+        {error ? <ErrorAlert sx={{ m: 2 }} error={error} /> : children}
       </Box>
     </Box>
   );

@@ -1,4 +1,4 @@
-# QR code generator
+# QR Code generator
 
 <p class="description">A basic Toolpad application that can be used to turn any text or URL into a QR code.</p>
 

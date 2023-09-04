@@ -242,6 +242,9 @@ export default function evalJsBindings(
 
     let bindingResult = results[bindingId];
 
+    let nestedBindingsLoading: boolean | undefined;
+    let nestedBindingsError: Error | undefined;
+
     const mergeNestedBindings = (value: unknown, parentBindingId: string) => {
       if (value && typeof value === 'object') {
         for (const nestedPropName of Object.keys(value)) {
@@ -252,6 +255,13 @@ export default function evalJsBindings(
           const nestedBindingResult = results[nestedBindingId];
 
           if (nestedBindingResult) {
+            if (!nestedBindingsError) {
+              nestedBindingsError = bubbleError(flatDependencies, results, nestedBindingId);
+            }
+            if (!nestedBindingsLoading) {
+              nestedBindingsLoading = bubbleLoading(flatDependencies, results, nestedBindingId);
+            }
+
             bindingResult = updatePath(
               bindingResult,
               `value.${nestedBindingId.replace(bindingId, '')}`,
@@ -267,17 +277,15 @@ export default function evalJsBindings(
       }
     };
 
-    if (bindingResult.value) {
-      mergeNestedBindings(bindingResult.value, bindingId);
-    }
+    mergeNestedBindings(bindingResult.value, bindingId);
 
     return {
       scopePath,
       dependencies: Array.from(flatDependencies.get(bindingId) ?? []),
       result: {
         ...bindingResult,
-        error: bubbleError(flatDependencies, results, bindingId),
-        loading: bubbleLoading(flatDependencies, results, bindingId),
+        error: nestedBindingsError || bubbleError(flatDependencies, results, bindingId),
+        loading: nestedBindingsLoading || bubbleLoading(flatDependencies, results, bindingId),
       },
     };
   });

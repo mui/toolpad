@@ -1,0 +1,18 @@
+{
+  "name": "stripe-script",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "toolpad dev",
+    "build": "toolpad build",
+    "start": "toolpad start"
+  },
+  "dependencies": {
+    "@mui/toolpad": "^0.1.26",
+    "child_process": "^1.0.2",
+    "fs": "^0.0.1-security",
+    "path": "^0.12.7",
+    "stripe": "^13.4.0",
+    "url": "^0.11.1"
+  }
+}

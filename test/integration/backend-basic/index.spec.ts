@@ -32,7 +32,11 @@ test.use({
   },
 });
 
-test('functions basics', async ({ page }) => {
+test('functions basics', async ({ page, context }) => {
+  await context.addCookies([
+    { name: 'MY_TOOLPAD_COOKIE', value: 'foo-bar-baz', domain: 'localhost', path: '/' },
+  ]);
+
   const runtimeModel = new ToolpadRuntime(page);
   await runtimeModel.gotoPage('basic');
 
@@ -58,7 +62,7 @@ test('function editor reload', async ({ page, localApp }) => {
   });
 });
 
-test('function editor parameters update', async ({ page, localApp }) => {
+test('function editor parameters update', async ({ page, localApp, argosScreenshot }) => {
   const editorModel = new ToolpadEditor(page);
   await editorModel.goToPageById(BASIC_TESTS_PAGE_ID);
 
@@ -68,6 +72,10 @@ test('function editor parameters update', async ({ page, localApp }) => {
   await expect(queryEditor).toBeVisible();
   await expect(queryEditor.getByLabel('foo', { exact: true })).toBeVisible();
   await expect(queryEditor.getByLabel('bar', { exact: true })).not.toBeVisible();
+
+  await argosScreenshot('function-editor', {
+    clip: (await queryEditor.boundingBox()) || undefined,
+  });
 
   await setPageHidden(page, true); // simulate page hidden
 

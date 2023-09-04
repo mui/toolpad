@@ -10,8 +10,11 @@ import ClearOutlinedIcon from '@mui/icons-material/ClearOutlined';
 import BugReportIcon from '@mui/icons-material/BugReport';
 import Console, { LogEntry } from './Console';
 import lazyComponent from '../utils/lazyComponent';
+import CenteredSpinner from './CenteredSpinner';
 
-const HarViewer = lazyComponent(() => import('./HarViewer'), {});
+const HarViewer = lazyComponent(() => import('./HarViewer'), {
+  fallback: <CenteredSpinner />,
+});
 
 const DebuggerTabPanel = styled(TabPanel)({ padding: 0, flex: 1, minHeight: 0 });
 

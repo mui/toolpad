@@ -1,5 +1,14 @@
 import { LoadingButton } from '@mui/lab';
-import { Box, Button, Skeleton, Stack, TextField, Toolbar, Typography } from '@mui/material';
+import {
+  Box,
+  Button,
+  Divider,
+  Skeleton,
+  Stack,
+  TextField,
+  Toolbar,
+  Typography,
+} from '@mui/material';
 import { inferColumns, parseColumns } from '@mui/toolpad-components';
 import { DataGridPro, GridColDef } from '@mui/x-data-grid-pro';
 import * as React from 'react';
@@ -11,7 +20,7 @@ import { getObjectKey } from '@mui/toolpad-utils/objectKey';
 import { BindableAttrEntries, BindableAttrValue, ExecFetchResult } from '@mui/toolpad-core';
 import { useBrowserJsRuntime } from '@mui/toolpad-core/jsBrowserRuntime';
 import { serializeError, errorFrom } from '@mui/toolpad-utils/errors';
-import SplitPane from '../../components/SplitPane';
+import { Panel, PanelGroup, PanelResizeHandle } from '../../components/resizablePanels';
 import ParametersEditor from '../../toolpad/AppEditor/PageEditor/ParametersEditor';
 import { useEvaluateLiveBindingEntries } from '../../toolpad/AppEditor/useEvaluateLiveBinding';
 import { QueryEditorProps } from '../../types';
@@ -224,77 +233,84 @@ export function QueryEditor({
   const previewGridKey = React.useMemo(() => getObjectKey(columns), [columns]);
 
   return (
-    <SplitPane split="vertical" size="50%" allowResize>
-      <SplitPane split="horizontal" size={85} primary="second" allowResize>
-        <QueryInputPanel onRunPreview={handleRunPreview}>
-          <Box sx={{ flex: 1, minHeight: 0 }}>
-            <MonacoEditor
-              value={input.attributes.query.sql}
-              onChange={(newValue) =>
-                setInput((existing) => appDom.setQueryProp(existing, 'sql', newValue))
-              }
-              language="sql"
+    <PanelGroup autoSaveId="toolpad-sql-panel" direction="horizontal">
+      <Panel defaultSize={50}>
+        <PanelGroup direction="vertical">
+          <Panel defaultSize={85}>
+            <QueryInputPanel onRunPreview={handleRunPreview}>
+              <Box sx={{ flex: 1, minHeight: 0 }}>
+                <MonacoEditor
+                  value={input.attributes.query.sql}
+                  onChange={(newValue) =>
+                    setInput((existing) => appDom.setQueryProp(existing, 'sql', newValue))
+                  }
+                  language="sql"
+                />
+              </Box>
+            </QueryInputPanel>
+          </Panel>
+          <PanelResizeHandle>
+            <Divider
+              orientation="vertical"
+              sx={{
+                borderRightWidth: 'medium',
+              }}
             />
-          </Box>
-        </QueryInputPanel>
-
-        <Box sx={{ p: 2, height: '100%', overflow: 'auto' }}>
-          <Typography
-            sx={{
-              color: (theme) =>
-                theme.palette.mode === 'dark' ? theme.palette.grey[500] : 'default',
-            }}
-          >
-            Parameters
-          </Typography>
-          <ParametersEditor
-            value={paramsEntries}
-            onChange={handleParamsChange}
-            globalScope={globalScope}
-            globalScopeMeta={globalScopeMeta}
-            liveValue={paramsEditorLiveValue}
-            jsRuntime={jsBrowserRuntime}
-          />
+          </PanelResizeHandle>
+          <Panel defaultSize={15}>
+            <Box sx={{ p: 2, height: '100%', overflow: 'auto' }}>
+              <Typography>Parameters</Typography>
+              <ParametersEditor
+                value={paramsEntries}
+                onChange={handleParamsChange}
+                globalScope={globalScope}
+                globalScopeMeta={globalScopeMeta}
+                liveValue={paramsEditorLiveValue}
+                jsRuntime={jsBrowserRuntime}
+              />
+            </Box>
+          </Panel>
+        </PanelGroup>
+      </Panel>
+      <Panel defaultSize={50}>
+        <Box
+          sx={{
+            height: '100%',
+            overflow: 'auto',
+            display: 'flex',
+            flexDirection: 'column',
+          }}
+        >
+          {preview?.error ? (
+            <Box
+              sx={{
+                display: 'flex',
+                flex: 1,
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}
+            >
+              <Typography color="error">{preview?.error?.message}</Typography>
+            </Box>
+          ) : (
+            <React.Fragment>
+              <DataGridPro
+                sx={{ border: 'none', flex: 1 }}
+                columns={columns}
+                key={previewGridKey}
+                rows={rows}
+                loading={previewIsLoading}
+              />
+              {preview?.info ? (
+                <Typography variant="body2" sx={{ m: 1 }}>
+                  {preview.info}
+                </Typography>
+              ) : null}
+            </React.Fragment>
+          )}
         </Box>
-      </SplitPane>
-
-      <Box
-        sx={{
-          height: '100%',
-          overflow: 'auto',
-          display: 'flex',
-          flexDirection: 'column',
-        }}
-      >
-        {preview?.error ? (
-          <Box
-            sx={{
-              display: 'flex',
-              flex: 1,
-              alignItems: 'center',
-              justifyContent: 'center',
-            }}
-          >
-            <Typography color="error">{preview?.error?.message}</Typography>
-          </Box>
-        ) : (
-          <React.Fragment>
-            <DataGridPro
-              sx={{ border: 'none', flex: 1 }}
-              columns={columns}
-              key={previewGridKey}
-              rows={rows}
-              loading={previewIsLoading}
-            />
-            {preview?.info ? (
-              <Typography variant="body2" sx={{ m: 1 }}>
-                {preview.info}
-              </Typography>
-            ) : null}
-          </React.Fragment>
-        )}
-      </Box>
-    </SplitPane>
+      </Panel>
+    </PanelGroup>
   );
 }
 

@@ -195,8 +195,7 @@ export default function NodeHud({
   let hintPosition: HintPosition = HINT_POSITION_BOTTOM;
   if (rect.y > HUD_HEIGHT) {
     hintPosition = HINT_POSITION_TOP;
-  }
-  if (pageNodeRect && rect.y + rect.height + HUD_HEIGHT >= pageNodeRect.height) {
+  } else if (pageNodeRect && rect.y + rect.height + HUD_HEIGHT >= pageNodeRect.height) {
     hintPosition = HINT_POSITION_BOTTOM_INNER;
   }
 

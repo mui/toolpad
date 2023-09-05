@@ -31,58 +31,6 @@ interface ModuleObject {
   exports: Record<string, unknown>;
 }
 
-const fileContents = new Map<string, string>();
-const moduleCache = new Map<string, ModuleObject>();
-
-const fnContext = vm.createContext({ process, console, fetch, Headers, Request, Response }, {});
-
-function loadModule(fullPath: string, content: string) {
-  const moduleRequire = createRequire(url.pathToFileURL(fullPath));
-  const moduleObject: ModuleObject = { exports: {} };
-
-  vm.runInContext(`((require, exports, module) => {\n${content}\n})`, fnContext)(
-    moduleRequire,
-    moduleObject.exports,
-    moduleObject,
-  );
-
-  return moduleObject;
-}
-
-async function resolveFunctions(filePath: string): Promise<Record<string, Function>> {
-  const fullPath = path.resolve(filePath);
-  const content = await fs.readFile(fullPath, 'utf-8');
-
-  if (content !== fileContents.get(fullPath)) {
-    moduleCache.delete(fullPath);
-    fileContents.set(fullPath, content);
-  }
-
-  let cachedModule = moduleCache.get(fullPath);
-
-  if (!cachedModule) {
-    cachedModule = loadModule(fullPath, content);
-    moduleCache.set(fullPath, cachedModule);
-  }
-
-  return Object.fromEntries(
-    Object.entries(cachedModule.exports).flatMap(([key, value]) =>
-      typeof value === 'function' ? [[key, value]] : [],
-    ),
-  );
-}
-
-export async function executeFn(filePath: string, name: string, parameters: any) {
-  const fns = await resolveFunctions(filePath);
-
-  const fn = fns[name];
-  if (typeof fn !== 'function') {
-    throw new Error(`Function "${name}" not found`);
-  }
-
-  return fn(...parameters);
-}
-
 function createDefaultFunction(): string {
   return format(`
     /**
@@ -125,6 +73,10 @@ interface IToolpadProject {
   invalidateQueries(): void;
 }
 
+function createContext() {
+  return vm.createContext({ process, console, fetch, Headers, Request, Response }, {});
+}
+
 export default class FunctionsManager {
   private project: IToolpadProject;
 
@@ -135,6 +87,12 @@ export default class FunctionsManager {
   private extractTypesWorker: Piscina | undefined;
 
   private buildCtx: esbuild.BuildContext | undefined;
+
+  private fileContents = new Map<string, string>();
+
+  private moduleCache = new Map<string, ModuleObject>();
+
+  private fnContext = createContext();
 
   constructor(project: IToolpadProject) {
     this.project = project;
@@ -196,6 +154,53 @@ export default class FunctionsManager {
     return path.resolve(this.getFunctionsOutputFolder(), 'introspect.json');
   }
 
+  loadModule(fullPath: string, content: string) {
+    const moduleRequire = createRequire(url.pathToFileURL(fullPath));
+    const moduleObject: ModuleObject = { exports: {} };
+
+    vm.runInContext(`((require, exports, module) => {\n${content}\n})`, this.fnContext)(
+      moduleRequire,
+      moduleObject.exports,
+      moduleObject,
+    );
+
+    return moduleObject;
+  }
+
+  async resolveFunctions(filePath: string): Promise<Record<string, Function>> {
+    const fullPath = path.resolve(filePath);
+    const content = await fs.readFile(fullPath, 'utf-8');
+
+    if (content !== this.fileContents.get(fullPath)) {
+      this.moduleCache.delete(fullPath);
+      this.fileContents.set(fullPath, content);
+    }
+
+    let cachedModule = this.moduleCache.get(fullPath);
+
+    if (!cachedModule) {
+      cachedModule = this.loadModule(fullPath, content);
+      this.moduleCache.set(fullPath, cachedModule);
+    }
+
+    return Object.fromEntries(
+      Object.entries(cachedModule.exports).flatMap(([key, value]) =>
+        typeof value === 'function' ? [[key, value]] : [],
+      ),
+    );
+  }
+
+  async executeFn(filePath: string, name: string, parameters: any) {
+    const fns = await this.resolveFunctions(filePath);
+
+    const fn = fns[name];
+    if (typeof fn !== 'function') {
+      throw new Error(`Function "${name}" not found`);
+    }
+
+    return fn(...parameters);
+  }
+
   private async extractTypes() {
     invariant(this.shouldExtractTypes(), 'extractTypes() can not be used in prod mode');
     invariant(this.extractTypesWorker, 'this.extractTypesWorker should have been initialized');
@@ -227,6 +232,9 @@ export default class FunctionsManager {
       this.buildErrors = args.errors;
 
       this.project.invalidateQueries();
+
+      // Reset context
+      this.fnContext = createContext();
     };
 
     const toolpadPlugin: esbuild.Plugin = {
@@ -346,7 +354,7 @@ export default class FunctionsManager {
       ? [{ parameters }]
       : handler.parameters.map(([parameterName]) => parameters[parameterName]);
 
-    const data = await executeFn(outputFilePath, name, executeParams);
+    const data = await this.executeFn(outputFilePath, name, executeParams);
 
     return { data: removeCircularReferences(data) };
   }

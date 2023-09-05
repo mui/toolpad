@@ -26,7 +26,7 @@ MUI Toolpad aims to reduce the overhead associated with frontend development by 
 - Lets you maintain a **single source of truth** for all business logic
 - **Less boilerplate** so you can focus on the important parts of the app
 
-## Low-code app builders market overview
+## Admin builders market overview
 
 The main problem with the tools currently in the Node.js and TypeScript ecosystem is that they require a major tradeoff between flexibility and speed. For a back office application developer, the backend and the database schema is an area of comfort. What’s relatively challenging is building the UI and having a reasonable UX that can show the required data in a readable and editable format. And that’s where all the admin builders come into the picture. If we closely look at the market, we can divide them into the following categories:
 

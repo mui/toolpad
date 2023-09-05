@@ -10,8 +10,6 @@
 
 https://basic-crud-app-production.up.railway.app/prod/
 
-You can also open it [in dev mode with StackBlitz](https://stackblitz.com/fork/github/mui/mui-toolpad/tree/master/examples/basic-crud-app).
-
 ## How to run
 
 Download the example [or clone the repo](https://github.com/mui/mui-toolpad):

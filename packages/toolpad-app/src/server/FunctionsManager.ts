@@ -73,8 +73,34 @@ interface IToolpadProject {
   invalidateQueries(): void;
 }
 
-function createContext() {
-  return vm.createContext({ process, console, fetch, Headers, Request, Response }, {});
+function createSandbox() {
+  const ctx: { [key: string]: unknown } = {
+    process: { env: { ...process.env } },
+    console,
+    fetch,
+    Headers,
+    Request,
+    Response,
+    atob,
+    Blob,
+    btoa,
+    clearInterval,
+    clearTimeout,
+    Crypto,
+    crypto,
+    File,
+    FormData,
+    ReadableStream,
+    setInterval,
+    setTimeout,
+    TextDecoder,
+    TextEncoder,
+    TransformStream,
+    URL,
+    URLSearchParams,
+  };
+  ctx.self = ctx;
+  return vm.createContext(ctx, {});
 }
 
 export default class FunctionsManager {
@@ -92,7 +118,7 @@ export default class FunctionsManager {
 
   private moduleCache = new Map<string, ModuleObject>();
 
-  private fnContext = createContext();
+  private fnSandbox = createSandbox();
 
   constructor(project: IToolpadProject) {
     this.project = project;
@@ -158,7 +184,7 @@ export default class FunctionsManager {
     const moduleRequire = createRequire(url.pathToFileURL(fullPath));
     const moduleObject: ModuleObject = { exports: {} };
 
-    vm.runInContext(`((require, exports, module) => {\n${content}\n})`, this.fnContext)(
+    vm.runInContext(`((require, exports, module) => {\n${content}\n})`, this.fnSandbox)(
       moduleRequire,
       moduleObject.exports,
       moduleObject,
@@ -234,7 +260,7 @@ export default class FunctionsManager {
       this.project.invalidateQueries();
 
       // Reset context
-      this.fnContext = createContext();
+      this.fnSandbox = createSandbox();
     };
 
     const toolpadPlugin: esbuild.Plugin = {

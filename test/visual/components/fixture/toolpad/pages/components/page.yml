@@ -84,6 +84,27 @@ spec:
       name: text
       children: []
       props:
+        value: start-text
+      layout:
+        horizontalAlign: start
+    - component: Text
+      name: text1
+      children: []
+      layout:
+        horizontalAlign: center
+      props:
+        value: center-text
+    - component: Text
+      name: text2
+      children: []
+      layout:
+        horizontalAlign: end
+      props:
+        value: end-text
+    - component: Text
+      name: text
+      children: []
+      props:
         mode: markdown
         loading: false
         value: start-markdown-text

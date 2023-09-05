@@ -3,7 +3,7 @@ import { Tooltip, TooltipProps } from '@mui/material';
 import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
 
 export interface HelpTooltipIconProps extends Omit<TooltipProps, 'title' | 'children'> {
-  helpText: string | React.ReactNode;
+  helpText: React.ReactNode;
 }
 
 export default function HelpTooltipIcon({ helpText, ...props }: HelpTooltipIconProps) {

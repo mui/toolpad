@@ -1,5 +1,43 @@
 # Changelog
 
+## 0.1.27
+
+<!-- generated comparing v0.1.26..master -->
+
+_Sep 6, 2023_
+
+A big thanks to the 8 contributors who made this release possible. Here are some highlights ✨:
+
+Add support for setting cookies inside custom functions, add a Checkbox component and link docs to more places inside the app!
+
+- &#8203;<!-- 25 -->Fix stackblitz issues with setCookie (#2641) @Janpot
+- &#8203;<!-- 24 -->Support setCookie API (#2630) @Janpot
+- &#8203;<!-- 23 -->Replace @mui/lab with @mui/x-tree-view (#2639) @Janpot
+- &#8203;<!-- 22 -->Fix TreeView types after core update (#2634) @Janpot
+- &#8203;<!-- 21 -->[Toolpad Editor] Add tooltip to custom component subtitle (#2612) @rohanprasadofficial
+- &#8203;<!-- 20 -->[Toolpad Editor] Fix Markdown text alignment issue (#2591) @rohanprasadofficial
+- &#8203;<!-- 19 -->[Toolpad Editor] Fix : text component alignment rendering (#2587) @rohanprasadofficial
+- &#8203;<!-- 18 -->fix add a new property placeholder (#2622) @JerryWu1234
+- &#8203;<!-- 17 -->Improve visual test for resizing columns (#2610) @apedroferreira
+- &#8203;<!-- 16 -->Disallow binding to event handlers and list templates (#2600) @Janpot
+- &#8203;<!-- 15 -->Exclude esm folder from icons alias (#2606) @Janpot
+- &#8203;<!-- 14 -->add checkbox (#2494) @JerryWu1234
+- &#8203;<!-- 13 -->Fix typo in the code snippet of createComponent API (#2605) @Janpot
+- &#8203;<!-- 12 -->Lock file maintenance (#2604) @renovate[bot]
+- &#8203;<!-- 11 -->Lock file maintenance (#2603) @renovate[bot]
+- &#8203;<!-- 10 -->[core] Finish migration to GA4 @oliviertassinari
+- &#8203;<!-- 09 -->[docs] Add live apps link to the homepage examples (#2633) @prakhargupta1
+- &#8203;<!-- 08 -->[docs] Rename Examples group (#2628) @bharatkashyap
+- &#8203;<!-- 07 -->[docs] Open docs link in a new page @oliviertassinari
+- &#8203;<!-- 06 -->[docs] Fix references @oliviertassinari
+- &#8203;<!-- 05 -->[docs] Fix shell layout @oliviertassinari
+- &#8203;<!-- 04 -->[docs] Clean-up examples (#2611) @oliviertassinari
+- &#8203;<!-- 03 -->[docs] Official URL (#2609) @oliviertassinari
+- &#8203;<!-- 02 -->[refactor] Move Toolpad runtime to the RPC mechanism (#2582) @Janpot
+- &#8203;<!-- 01 -->[website] Fix `NpmCopyButton` placement (#2640) @bharatkashyap
+
+All contributors of this release in alphabetical order: @apedroferreira, @bharatkashyap, @Janpot, @JerryWu1234, @oliviertassinari, @prakhargupta1, @renovate[bot], @rohanprasadofficial
+
 ## 0.1.26
 
 <!-- generated comparing v0.1.25..master -->

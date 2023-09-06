@@ -8,7 +8,7 @@
 
 ## Check out the live app
 
-Not available yet. You can open [in dev mode with StackBlitz](https://stackblitz.com/fork/github/mui/mui-toolpad/tree/master/examples/qr-generator) in the meantime.
+[Open example](https://mui-toolpad-qr-generator-production.up.railway.app/prod/)
 
 ## How to use
 

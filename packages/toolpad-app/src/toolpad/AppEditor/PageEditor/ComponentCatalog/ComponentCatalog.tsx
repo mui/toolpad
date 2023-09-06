@@ -11,6 +11,7 @@ import { useDom } from '../../../AppState';
 import { usePageEditorApi } from '../PageEditorProvider';
 import { useToolpadComponents } from '../../toolpadComponents';
 import useLocalStorageState from '../../../../utils/useLocalStorageState';
+import HelpTooltipIcon from '../../../../components/HelpTooltipIcon';
 
 interface FutureComponentSpec {
   url: string;
@@ -27,7 +28,6 @@ const FUTURE_COMPONENTS = new Map<string, FutureComponentSpec>([
   ['Slider', { url: 'https://github.com/mui/mui-toolpad/issues/746', displayName: 'Slider' }],
   ['Switch', { url: 'https://github.com/mui/mui-toolpad/issues/745', displayName: 'Switch' }],
   ['Radio', { url: 'https://github.com/mui/mui-toolpad/issues/744', displayName: 'Radio' }],
-  ['Checkbox', { url: 'https://github.com/mui/mui-toolpad/issues/742', displayName: 'Checkbox' }],
 ]);
 
 const WIDTH_COLLAPSED = 40;
@@ -157,7 +157,26 @@ export default function ComponentCatalog({ className }: ComponentCatalogProps) {
                 flexDirection={'row'}
                 justifyContent="space-between"
               >
-                <Typography variant="overline">Custom Components</Typography>
+                <Box display="flex" alignItems="center">
+                  <Typography mr={0.5} variant="overline">
+                    Custom Components
+                  </Typography>
+                  <HelpTooltipIcon
+                    helpText={
+                      <Typography variant="inherit">
+                        Expand Toolpad with your own React components.{' '}
+                        <Link
+                          href="https://mui.com/toolpad/concepts/custom-components"
+                          target="_blank"
+                          rel="noopener"
+                        >
+                          Learn more
+                        </Link>
+                        .
+                      </Typography>
+                    }
+                  />
+                </Box>
                 <IconButton
                   aria-label="Expand custom components"
                   sx={{

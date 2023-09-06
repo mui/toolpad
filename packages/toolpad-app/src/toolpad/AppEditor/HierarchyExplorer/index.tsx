@@ -13,11 +13,12 @@ import { useNodeNameValidation } from '../PagesExplorer/validation';
 import { DomView } from '../../../utils/domView';
 import { removePageLayoutNode } from '../pageLayout';
 
-function CustomTreeItem(
-  props: TreeItemProps & {
-    node: appDom.ElementNode;
-  },
-) {
+export interface CustomTreeItemProps extends TreeItemProps {
+  ref?: React.RefObject<HTMLLIElement>;
+  node: appDom.ElementNode;
+}
+
+function CustomTreeItem(props: CustomTreeItemProps) {
   const domApi = useDomApi();
   const { dom } = useDom();
   const appStateApi = useAppStateApi();

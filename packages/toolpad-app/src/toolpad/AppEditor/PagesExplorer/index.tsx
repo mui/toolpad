@@ -39,7 +39,8 @@ const StyledTreeItem = styled(TreeItem)({
   },
 });
 
-type StyledTreeItemProps = TreeItemProps & {
+interface StyledTreeItemProps extends TreeItemProps {
+  ref?: React.RefObject<HTMLLIElement>;
   onDeleteNode?: (nodeId: NodeId) => void;
   onDuplicateNode?: (nodeId: NodeId) => void;
   onCreate?: React.MouseEventHandler;
@@ -49,7 +50,7 @@ type StyledTreeItemProps = TreeItemProps & {
   deleteLabelText?: string;
   duplicateLabelText?: string;
   toolpadNodeId?: NodeId;
-};
+}
 
 function PagesExplorerTreeItem(props: StyledTreeItemProps) {
   const {

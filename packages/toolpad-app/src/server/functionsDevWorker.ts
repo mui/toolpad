@@ -12,13 +12,6 @@ import { ServerContext, getServerContext, withContext } from '@mui/toolpad-core/
 import { isWebContainer } from '@webcontainer/env';
 import SuperJSON from 'superjson';
 
-type IntrospectedFiles = Map<string, { file: string }>;
-
-interface IntrospectMessage {
-  kind: 'introspect';
-  files: IntrospectedFiles;
-}
-
 interface ExecuteMessage {
   kind: 'execute';
   filePath: string;
@@ -27,7 +20,17 @@ interface ExecuteMessage {
   cookies?: Record<string, string>;
 }
 
-type WorkerMessage = IntrospectMessage | ExecuteMessage;
+interface ExecuteResponse {
+  result: string;
+  newCookies: [string, string][];
+}
+
+type WorkerMessage = ExecuteMessage;
+
+interface RunOnWorker {
+  (msg: ExecuteMessage): Promise<ExecuteResponse>;
+  (msg: WorkerMessage): Promise<unknown>;
+}
 
 type TransferredMessage = WorkerMessage & { port: MessagePort };
 
@@ -74,38 +77,37 @@ async function resolveFunctions(filePath: string): Promise<Record<string, Functi
   );
 }
 
-async function execute(msg: ExecuteMessage) {
+async function execute(msg: ExecuteMessage): Promise<ExecuteResponse> {
   const fns = await resolveFunctions(msg.filePath);
 
   const fn = fns[msg.name];
   if (typeof fn !== 'function') {
     throw new Error(`Function "${msg.name}" not found`);
   }
-  if (isWebContainer()) {
-    console.warn(
-      'Bypassing server context in web containers, see https://github.com/stackblitz/core/issues/2711',
-    );
-    return fn(...msg.parameters);
-  }
 
-  const newCookies = new Map<string, string>();
   let functionFinished = false;
-  const setCookie = (name: string, value: string) => {
-    if (functionFinished) {
-      throw new Error(`setCookie can't be called after the function has finished executing.`);
-    }
-    newCookies.set(name, value);
-  };
-  const ctx: ServerContext = {
-    cookies: msg.cookies || {},
-    setCookie,
-  };
-  try {
-    const result = await withContext(ctx, async () => {
-      return fn(...msg.parameters);
-    });
 
-    return { result, newCookies: Array.from(newCookies.entries()) };
+  try {
+    const newCookies = new Map<string, string>();
+
+    const ctx: ServerContext = {
+      cookies: msg.cookies || {},
+      setCookie(name: string, value: string) {
+        if (functionFinished) {
+          throw new Error(`setCookie can't be called after the function has finished executing.`);
+        }
+        newCookies.set(name, value);
+      },
+    };
+
+    const rawResult = isWebContainer()
+      ? await fn(...msg.parameters)
+      : await withContext(ctx, async () => fn(...msg.parameters));
+
+    const withoutCircularRefs = replaceRecursive(rawResult, getCircularReplacer());
+    const serializedResult = SuperJSON.stringify(withoutCircularRefs);
+
+    return { result: serializedResult, newCookies: Array.from(newCookies.entries()) };
   } finally {
     functionFinished = true;
   }
@@ -136,10 +138,8 @@ if (!isMainThread && parentPort) {
   parentPort.on('message', (msg: TransferredMessage) => {
     (async () => {
       try {
-        const rawResult = await handleMessage(msg);
-        const withoutCircularRefs = replaceRecursive(rawResult, getCircularReplacer());
-        const serializedResult = SuperJSON.serialize(withoutCircularRefs);
-        msg.port.postMessage({ result: serializedResult });
+        const result = await handleMessage(msg);
+        msg.port.postMessage({ result });
       } catch (rawError) {
         msg.port.postMessage({ error: serializeError(errorFrom(rawError)) });
       }
@@ -150,16 +150,15 @@ if (!isMainThread && parentPort) {
 export function createWorker(env: Record<string, any>) {
   const worker = new Worker(path.join(__dirname, 'functionsDevWorker.js'), { env });
 
-  const runOnWorker = async (msg: WorkerMessage) => {
+  const runOnWorker: RunOnWorker = async (msg: WorkerMessage) => {
     const { port1, port2 } = new MessageChannel();
     worker.postMessage({ port: port1, ...msg } satisfies TransferredMessage, [port1]);
-    const [{ error, result: serializedResult }] = await once(port2, 'message');
+    const [{ error, result }] = await once(port2, 'message');
 
     if (error) {
       throw errorFrom(error);
     }
 
-    const result = SuperJSON.deserialize(serializedResult);
     return result;
   };
 
@@ -170,7 +169,8 @@ export function createWorker(env: Record<string, any>) {
 
     async execute(filePath: string, name: string, parameters: unknown[]): Promise<any> {
       const ctx = getServerContext();
-      const { result, newCookies } = await runOnWorker({
+
+      const { result: serializedResult, newCookies } = await runOnWorker({
         kind: 'execute',
         filePath,
         name,
@@ -183,6 +183,8 @@ export function createWorker(env: Record<string, any>) {
           ctx.setCookie(cookieName, cookieValue);
         }
       }
+
+      const result = SuperJSON.parse(serializedResult);
 
       return result;
     },

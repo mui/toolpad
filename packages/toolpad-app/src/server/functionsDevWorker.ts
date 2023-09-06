@@ -7,28 +7,11 @@ import * as vm from 'vm';
 import * as url from 'url';
 import fetch, { Headers, Request, Response } from 'node-fetch';
 import { errorFrom, serializeError } from '@mui/toolpad-utils/errors';
+import { getCircularReplacer, replaceRecursive } from '@mui/toolpad-utils/json';
 import { ServerContext, getServerContext, withContext } from '@mui/toolpad-core/serverRuntime';
 import invariant from 'invariant';
 import { isWebContainer } from '@webcontainer/env';
-
-function getCircularReplacer() {
-  const ancestors: object[] = [];
-  return function replacer(this: object, key: string, value: unknown) {
-    if (typeof value !== 'object' || value === null) {
-      return value;
-    }
-    // `this` is the object that value is contained in,
-    // i.e., its direct parent.
-    while (ancestors.length > 0 && ancestors.at(-1) !== this) {
-      ancestors.pop();
-    }
-    if (ancestors.includes(value)) {
-      return '[Circular]';
-    }
-    ancestors.push(value);
-    return value;
-  };
-}
+import SuperJSON from 'superjson';
 
 type IntrospectedFiles = Map<string, { file: string }>;
 
@@ -139,8 +122,10 @@ if (!isMainThread && parentPort) {
   parentPort.on('message', (msg: TransferredMessage) => {
     (async () => {
       try {
-        const result = await handleMessage(msg);
-        msg.port.postMessage({ result: JSON.stringify(result, getCircularReplacer()) });
+        const rawResult = await handleMessage(msg);
+        const withoutCircularRefs = replaceRecursive(rawResult, getCircularReplacer());
+        const serializedResult = SuperJSON.serialize(withoutCircularRefs);
+        msg.port.postMessage({ result: serializedResult });
       } catch (rawError) {
         msg.port.postMessage({ error: serializeError(errorFrom(rawError)) });
       }
@@ -154,13 +139,14 @@ export function createWorker(env: Record<string, any>) {
   const runOnWorker = async (msg: WorkerMessage) => {
     const { port1, port2 } = new MessageChannel();
     worker.postMessage({ port: port1, ...msg } satisfies TransferredMessage, [port1]);
-    const [{ error, result }] = await once(port2, 'message');
+    const [{ error, result: serializedResult }] = await once(port2, 'message');
 
     if (error) {
       throw errorFrom(error);
     }
 
-    return result ? JSON.parse(result) : undefined;
+    const result = SuperJSON.deserialize(serializedResult);
+    return result;
   };
 
   return {

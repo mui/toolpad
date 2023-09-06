@@ -3,6 +3,13 @@ import { UseDataProviderHook } from '@mui/toolpad-core/runtime';
 import { useQuery } from '@tanstack/react-query';
 
 export const useDataProvider: UseDataProviderHook = (id) => {
-  const { isLoading, error, data: introspection } = useQuery('dataProviderIntrospect', [id]);
+  const {
+    isLoading,
+    error,
+    data: introspection,
+  } = useQuery({
+    queryKey: ['dataProviderIntrospect', id],
+    enabled: !!id,
+  });
   return { isLoading, error };
 };

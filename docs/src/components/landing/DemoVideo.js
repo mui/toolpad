@@ -139,13 +139,21 @@ export default function DemoVideo() {
   const [isMuted, setIsMuted] = React.useState(false);
 
   const handlePlay = () => {
+    if (typeof window !== 'undefined' && window.gtag) {
+      window.gtag('event', 'toolpad_video', {
+        event_label: 'Video Start',
+        event_category: 'toolpad_landing',
+      });
+    }
     videoRef.current.play();
     setIsPaused(videoRef.current.paused);
   };
+
   const handlePause = () => {
     videoRef.current.pause();
     setIsPaused(videoRef.current.paused);
   };
+
   const handleFullScreen = () => {
     videoRef.current.requestFullscreen();
   };
@@ -153,6 +161,32 @@ export default function DemoVideo() {
   const handleMuteToggle = () => {
     videoRef.current.muted = !videoRef.current.muted;
     setIsMuted(videoRef.current.muted);
+  };
+
+  const milestonesComplete = React.useRef(new Set([]));
+
+  const handleTimeUpdate = () => {
+    if (typeof window === 'undefined' || !window.gtag || !videoRef.current) {
+      return;
+    }
+    const videoElement = videoRef.current;
+
+    const videoProgress = (videoElement.currentTime / videoElement.duration) * 100;
+
+    const milestones = [25, 50, 75, 100];
+
+    for (const milestone of milestones) {
+      if (videoProgress >= milestone && !milestonesComplete.current.has(milestone)) {
+        window.gtag('event', 'toolpad_video', {
+          event_category: 'toolpad_landing',
+          event_label: `video_progress_${milestone}`,
+        });
+        milestonesComplete.current.add(milestone);
+        if (milestone === 100) {
+          milestonesComplete.current.clear();
+        }
+      }
+    }
   };
 
   return (
@@ -181,7 +215,11 @@ export default function DemoVideo() {
         )}
       </MuteButton>
 
-      <Video poster="/static/toolpad/marketing/index-hero-video-poster.png" ref={videoRef}>
+      <Video
+        poster="/static/toolpad/marketing/index-hero-video-poster.png"
+        ref={videoRef}
+        onTimeUpdate={handleTimeUpdate}
+      >
         <source src="/static/toolpad/marketing/index-hero-demo-video.mp4" type="video/mp4" />
         Your browser does not support the video tag.
       </Video>

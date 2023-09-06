@@ -53,3 +53,31 @@ test('can control component prop values in properties control panel', async ({ p
 
   await inputByLabel.waitFor({ state: 'visible' });
 });
+
+test('can toggle boolean prop that is true by default', async ({ page }) => {
+  const editorModel = new ToolpadEditor(page);
+
+  await editorModel.goto();
+
+  await editorModel.waitForOverlay();
+
+  const autocomplete = editorModel.appCanvas.getByLabel('search', { exact: true });
+
+  await clickCenter(page, autocomplete);
+
+  await editorModel.componentEditor
+    .locator('h6:has-text("Autocomplete")')
+    .waitFor({ state: 'visible' });
+
+  const fullWidthControlInput = editorModel.componentEditor.getByLabel('fullWidth', {
+    exact: true,
+  });
+
+  await expect(fullWidthControlInput).toBeChecked();
+  await fullWidthControlInput.click();
+  await expect(fullWidthControlInput).not.toBeChecked();
+  const labelControlInput = editorModel.componentEditor.getByLabel('label', { exact: true });
+  await labelControlInput.click();
+  await labelControlInput.fill('');
+  await expect(labelControlInput).toHaveValue('');
+});

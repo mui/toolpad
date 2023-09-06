@@ -1,8 +1,15 @@
-name: Label new issues with "needs triage"
+name: Ensure triage label is present
+
 on:
+  label:
+    types:
+      - deleted
   issues:
     types:
       - opened
+
+permissions: {}
+
 jobs:
   label_issues:
     runs-on: ubuntu-latest
@@ -17,8 +24,6 @@ jobs:
               owner: context.repo.owner,
               repo: context.repo.repo,
             });
-
-            console.log(JSON.stringify(labels, null, 2))
 
             if (labels.length <= 0) {
               await github.rest.issues.addLabels({

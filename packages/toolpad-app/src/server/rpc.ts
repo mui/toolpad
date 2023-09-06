@@ -5,12 +5,7 @@ import * as z from 'zod';
 import { fromZodError } from 'zod-validation-error';
 import { hasOwnProperty } from '@mui/toolpad-utils/collections';
 import { errorFrom, serializeError } from '@mui/toolpad-utils/errors';
-import { indent } from '@mui/toolpad-utils/strings';
-import chalk from 'chalk';
-import { execQuery, dataSourceFetchPrivate, dataSourceExecPrivate } from './data';
-import { getVersionInfo } from './versionInfo';
-import { createComponent, deletePage } from './localMode';
-import { loadDom, saveDom, applyDomDiff, openCodeEditor } from './liveProject';
+import { withContext, createServerContext } from '@mui/toolpad-core/serverRuntime';
 import { asyncHandler } from '../utils/express';
 
 export interface Method<P extends any[] = any[], R = any> {
@@ -79,7 +74,10 @@ export function createRpcHandler(definition: Definition): express.RequestHandler
       let rawResult;
       let error: Error | null = null;
       try {
-        rawResult = await method({ params, req, res });
+        const ctx = createServerContext(req);
+        rawResult = await withContext(ctx, async () => {
+          return method({ params, req, res });
+        });
       } catch (rawError) {
         error = errorFrom(rawError);
       }
@@ -89,18 +87,6 @@ export function createRpcHandler(definition: Definition): express.RequestHandler
         : { result: superjson.stringify(rawResult) };
 
       res.json(responseData);
-
-      if (error) {
-        // eslint-disable-next-line no-console
-        console.log(`${chalk.red('error')} - RPC error`);
-        if (error.stack) {
-          // eslint-disable-next-line no-console
-          console.log(indent(error.stack, 2));
-        } else {
-          // eslint-disable-next-line no-console
-          console.log(indent(`${error.name}: ${error.message}`, 2));
-        }
-      }
     }),
   );
   return router;
@@ -112,49 +98,10 @@ interface ResolverInput<P> {
   res: ServerResponse;
 }
 
-interface MethodResolver<F extends Method> {
+export interface MethodResolver<F extends Method> {
   (input: ResolverInput<Parameters<F>>): ReturnType<F>;
 }
 
-function createMethod<F extends Method>(handler: MethodResolver<F>): MethodResolver<F> {
+export function createMethod<F extends Method>(handler: MethodResolver<F>): MethodResolver<F> {
   return handler;
 }
-
-export const rpcServer = {
-  query: {
-    dataSourceFetchPrivate: createMethod<typeof dataSourceFetchPrivate>(({ params }) => {
-      return dataSourceFetchPrivate(...params);
-    }),
-    execQuery: createMethod<typeof execQuery>(({ params }) => {
-      return execQuery(...params);
-    }),
-    loadDom: createMethod<typeof loadDom>(({ params }) => {
-      return loadDom(...params);
-    }),
-    getVersionInfo: createMethod<typeof getVersionInfo>(({ params }) => {
-      return getVersionInfo(...params);
-    }),
-  },
-  mutation: {
-    saveDom: createMethod<typeof saveDom>(({ params }) => {
-      return saveDom(...params);
-    }),
-    applyDomDiff: createMethod<typeof applyDomDiff>(({ params }) => {
-      return applyDomDiff(...params);
-    }),
-    openCodeEditor: createMethod<typeof openCodeEditor>(({ params }) => {
-      return openCodeEditor(...params);
-    }),
-    createComponent: createMethod<typeof createComponent>(({ params }) => {
-      return createComponent(...params);
-    }),
-    deletePage: createMethod<typeof deletePage>(({ params }) => {
-      return deletePage(...params);
-    }),
-    dataSourceExecPrivate: createMethod<typeof dataSourceExecPrivate>(({ params }) => {
-      return dataSourceExecPrivate(...params);
-    }),
-  },
-} as const;
-
-export type ServerDefinition = MethodsOf<typeof rpcServer>;

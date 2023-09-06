@@ -2,7 +2,8 @@ import * as React from 'react';
 import invariant from 'invariant';
 import { throttle } from 'lodash-es';
 import { CanvasEventsContext } from '@mui/toolpad-core/runtime';
-import ToolpadApp, { LoadComponents, queryClient } from '../runtime/ToolpadApp';
+import ToolpadApp, { LoadComponents } from '../runtime/ToolpadApp';
+import { queryClient } from '../runtime/api';
 import { AppCanvasState } from '../types';
 import getPageViewState from './getPageViewState';
 import { rectContainsPoint } from '../utils/geometry';
@@ -106,6 +107,15 @@ export default function AppCanvas({
     );
 
     const unsetUpdate = setCommandHandler(bridge.canvasCommands, 'update', (newState) => {
+      // `update` will be called from the parent window. Since the canvas runs in an iframe, it's
+      // running in another javascript realm than the one this object was constructed in. This makes
+      // the MUI core `deepMerge` function fail. The `deepMerge` function uses `isPlainObject` which checks
+      // whether the object constructor property is the global `Object`.
+      // See https://github.com/mui/material-ui/blob/b935d3e8f48b5d54f6cd08154fe2f7aa035ab576/packages/mui-utils/src/deepmerge.ts#L2.
+      // Since different realms have different globals, this function erroneously marks it as not being a plain object.
+      // For now we've use structuredClone to make the `update` method behave as if it was built using
+      // `window.postMessage`, which we should probably move towards anyways at some point. structuredClone
+      // clones the object as if it was passed using `postMessage` and corrects the `constructor` property.
       React.startTransition(() => setState(structuredClone(newState)));
     });
 

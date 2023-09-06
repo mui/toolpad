@@ -1,3 +1,4 @@
+import { parentPort, workerData } from 'worker_threads';
 import invariant from 'invariant';
 import { createServer, Plugin } from 'vite';
 import {
@@ -6,10 +7,27 @@ import {
   createViteConfig,
   resolvedComponentsId,
 } from '../src/server/toolpadAppBuilder';
-import config from '../src/config';
-import { loadDomFromDisk } from '../src/server/localMode';
+import type { RuntimeConfig } from '../src/config';
+import type * as appDom from '../src/appDom';
+import type { ComponentEntry } from '../src/server/localMode';
+import { createWorkerRpcClient } from '../src/server/workerRpc';
 
-function devServerPlugin(): Plugin {
+export type Command = { kind: 'reload-components' } | { kind: 'exit' };
+
+export type WorkerRpc = {
+  notifyReady: () => Promise<void>;
+  loadDom: () => Promise<appDom.AppDom>;
+  getComponents: () => Promise<ComponentEntry[]>;
+};
+
+const { notifyReady, loadDom, getComponents } = createWorkerRpcClient<WorkerRpc>();
+
+invariant(
+  process.env.NODE_ENV === 'development',
+  'The dev server must be started with NODE_ENV=development',
+);
+
+function devServerPlugin(root: string, config: RuntimeConfig): Plugin {
   return {
     name: 'toolpad-dev-server',
 
@@ -21,7 +39,7 @@ function devServerPlugin(): Plugin {
           const canvas = url.searchParams.get('toolpad-display') === 'canvas';
 
           try {
-            const dom = await loadDomFromDisk();
+            const dom = await loadDom();
 
             const template = getHtmlContent({ canvas });
 
@@ -40,61 +58,63 @@ function devServerPlugin(): Plugin {
 }
 
 export interface ToolpadAppDevServerParams {
+  outDir: string;
+  config: RuntimeConfig;
   root: string;
   base: string;
 }
 
-export async function createDevServer({ root, base }: ToolpadAppDevServerParams) {
-  const devServer = await createServer(
-    createViteConfig({
-      dev: true,
-      root,
-      base,
-      plugins: [devServerPlugin()],
-    }),
-  );
+export async function createDevServer({ outDir, config, root, base }: ToolpadAppDevServerParams) {
+  const { viteConfig } = createViteConfig({
+    outDir,
+    dev: true,
+    root,
+    base,
+    plugins: [devServerPlugin(root, config)],
+    getComponents,
+  });
+  const devServer = await createServer(viteConfig);
 
-  return devServer;
+  return { devServer };
 }
 
-export type Command = {
-  kind: 'reload-components';
-};
+export interface AppViteServerConfig {
+  outDir: string;
+  base: string;
+  root: string;
+  port: number;
+  config: RuntimeConfig;
+}
 
-export type Event = {
-  kind: 'ready';
-};
+export async function main({ outDir, base, config, root, port }: AppViteServerConfig) {
+  const { devServer } = await createDevServer({ outDir, config, root, base });
 
-async function main() {
-  invariant(
-    process.env.NODE_ENV === 'development',
-    'The dev server must be started with NODE_ENV=development',
-  );
-  invariant(!!process.env.TOOLPAD_PROJECT_DIR, 'A project root must be defined');
-  invariant(!!process.env.TOOLPAD_PORT, 'A port must be defined');
-  invariant(!!process.env.TOOLPAD_BASE, 'A base path must be defined');
-  invariant(process.send, 'Process must be spawned with an IPC channel');
+  await devServer.listen(port);
 
-  const app = await createDevServer({
-    root: process.env.TOOLPAD_PROJECT_DIR,
-    base: process.env.TOOLPAD_BASE,
-  });
+  invariant(parentPort, 'parentPort must be defined');
 
-  await app.listen(Number(process.env.TOOLPAD_PORT));
-
-  process.on('message', (msg: Command) => {
-    if (msg.kind === 'reload-components') {
-      const mod = app.moduleGraph.getModuleById(resolvedComponentsId);
-      if (mod) {
-        app.reloadModule(mod);
+  parentPort.on('message', async (msg: Command) => {
+    switch (msg.kind) {
+      case 'reload-components': {
+        const mod = devServer.moduleGraph.getModuleById(resolvedComponentsId);
+        if (mod) {
+          devServer.reloadModule(mod);
+        }
+        break;
       }
+      case 'exit': {
+        await devServer.close();
+        break;
+      }
+      default:
+        throw new Error(`Unknown command ${msg}`);
     }
   });
 
-  process.send({ kind: 'ready' } satisfies Event);
+  await notifyReady();
 }
 
-main().catch((err) => {
+main(workerData).catch((err) => {
   console.error(err);
   process.exit(1);
 });

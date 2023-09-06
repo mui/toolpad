@@ -17,6 +17,7 @@ import { Controller, useForm } from 'react-hook-form';
 import { TabContext, TabList } from '@mui/lab';
 import { useBrowserJsRuntime } from '@mui/toolpad-core/jsBrowserRuntime';
 import { useServerJsRuntime } from '@mui/toolpad-core/jsServerRuntime';
+import { Panel, PanelGroup, PanelResizeHandle } from '../../components/resizablePanels';
 import { ClientDataSource, ConnectionEditorProps, QueryEditorProps } from '../../types';
 import {
   FetchPrivateQuery,
@@ -43,7 +44,6 @@ import * as appDom from '../../appDom';
 import ParametersEditor from '../../toolpad/AppEditor/PageEditor/ParametersEditor';
 import BodyEditor from './BodyEditor';
 import TabPanel from '../../components/TabPanel';
-import SplitPane from '../../components/SplitPane';
 import JsonView from '../../components/JsonView';
 import useQueryPreview from '../useQueryPreview';
 import TransformInput from '../TranformInput';
@@ -53,6 +53,7 @@ import QueryInputPanel from '../QueryInputPanel';
 import useFetchPrivate from '../useFetchPrivate';
 import QueryPreview from '../QueryPreview';
 import { usePrivateQuery } from '../context';
+import config from '../../config';
 
 const HTTP_METHODS = ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'HEAD'];
 
@@ -257,7 +258,7 @@ function QueryEditor({
   const baseUrl = isBrowserSide ? null : connectionParams?.baseUrl ?? null;
 
   const urlValue: BindableAttrValue<string> =
-    input.attributes.query.url || getDefaultUrl(connectionParams);
+    input.attributes.query.url || getDefaultUrl(config, connectionParams);
 
   const introspection = usePrivateQuery<FetchPrivateQuery, IntrospectionResult>(
     {
@@ -408,141 +409,157 @@ function QueryEditor({
   );
 
   return (
-    <SplitPane split="vertical" size="50%" allowResize>
-      <SplitPane split="horizontal" size={85} primary="second" allowResize>
-        <QueryInputPanel onRunPreview={handleRunPreview}>
-          <Stack gap={2} sx={{ px: 3, pt: 1 }}>
-            <Typography>Query</Typography>
-            <Box sx={{ display: 'flex', flexDirection: 'row', gap: 1 }}>
-              <TextField
-                select
-                value={input.attributes.query.method || 'GET'}
-                onChange={handleMethodChange}
-              >
-                {HTTP_METHODS.map((method) => (
-                  <MenuItem key={method} value={method}>
-                    {method}
-                  </MenuItem>
-                ))}
-              </TextField>
-              <BindableEditor<string>
-                liveBinding={liveUrl}
-                globalScope={queryScope}
-                globalScopeMeta={QUERY_SCOPE_META}
-                sx={{ flex: 1 }}
-                jsRuntime={jsServerRuntime}
-                label="url"
-                propType={{ type: 'string' }}
-                renderControl={(props) => <UrlControl baseUrl={baseUrl} {...props} />}
-                value={urlValue}
-                onChange={handleUrlChange}
-              />
-            </Box>
-            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
-              <TabContext value={activeTab}>
-                <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
-                  <TabList onChange={handleActiveTabChange} aria-label="Fetch options active tab">
-                    <Tab label="URL query" value="urlQuery" />
-                    <Tab label="Body" value="body" />
-                    <Tab label="Headers" value="headers" />
-                    <Tab label="Response" value="response" />
-                    <Tab label="Transform" value="transform" />
-                  </TabList>
-                </Box>
-                <TabPanel disableGutters value="urlQuery">
-                  <ParametersEditor
-                    value={input.attributes.query.searchParams ?? []}
-                    onChange={handleSearchParamsChange}
-                    globalScope={queryScope}
-                    globalScopeMeta={QUERY_SCOPE_META}
-                    liveValue={liveSearchParams}
-                    jsRuntime={jsServerRuntime}
-                  />
-                </TabPanel>
-                <TabPanel disableGutters value="body">
-                  <BodyEditor
-                    value={input.attributes.query.body}
-                    onChange={handleBodyChange}
-                    globalScope={queryScope}
-                    globalScopeMeta={QUERY_SCOPE_META}
-                    method={input.attributes.query.method || 'GET'}
-                  />
-                </TabPanel>
-                <TabPanel disableGutters value="headers">
-                  <ParametersEditor
-                    value={input.attributes.query.headers ?? []}
-                    onChange={handleHeadersChange}
-                    globalScope={queryScope}
-                    globalScopeMeta={QUERY_SCOPE_META}
-                    liveValue={liveHeaders}
-                    jsRuntime={jsServerRuntime}
-                    envVarNames={envVarNames}
-                  />
-                </TabPanel>
-                <TabPanel disableGutters value="response">
+    <PanelGroup direction="horizontal">
+      <Panel defaultSize={50} minSize={20}>
+        <PanelGroup direction="vertical">
+          <Panel defaultSize={60} minSize={40}>
+            <QueryInputPanel onRunPreview={handleRunPreview}>
+              <Stack gap={2} sx={{ px: 3, pt: 1 }}>
+                <Typography>Query</Typography>
+                <Box sx={{ display: 'flex', flexDirection: 'row', gap: 1 }}>
                   <TextField
                     select
-                    label="response type"
-                    sx={{ width: 200, mt: 1 }}
-                    value={input.attributes.query.response?.kind || 'json'}
-                    onChange={handleResponseTypeChange}
+                    value={input.attributes.query.method || 'GET'}
+                    onChange={handleMethodChange}
                   >
-                    <MenuItem value="raw">raw</MenuItem>
-                    <MenuItem value="json">JSON</MenuItem>
-                    <MenuItem value="csv" disabled>
-                      🚧 CSV
-                    </MenuItem>
-                    <MenuItem value="xml" disabled>
-                      🚧 XML
-                    </MenuItem>
+                    {HTTP_METHODS.map((method) => (
+                      <MenuItem key={method} value={method}>
+                        {method}
+                      </MenuItem>
+                    ))}
                   </TextField>
-                </TabPanel>
-                <TabPanel disableGutters value="transform">
-                  <TransformInput
-                    value={input.attributes.query.transform ?? 'return data;'}
-                    onChange={handleTransformChange}
-                    enabled={input.attributes.query.transformEnabled ?? false}
-                    onEnabledChange={handleTransformEnabledChange}
-                    globalScope={{ data: preview?.untransformedData }}
-                    loading={false}
+                  <BindableEditor<string>
+                    liveBinding={liveUrl}
+                    globalScope={queryScope}
+                    globalScopeMeta={QUERY_SCOPE_META}
+                    sx={{ flex: 1 }}
+                    jsRuntime={jsServerRuntime}
+                    label="url"
+                    propType={{ type: 'string' }}
+                    renderControl={(props) => <UrlControl baseUrl={baseUrl} {...props} />}
+                    value={urlValue}
+                    onChange={handleUrlChange}
                   />
-                </TabPanel>
-              </TabContext>
+                </Box>
+                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+                  <TabContext value={activeTab}>
+                    <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
+                      <TabList
+                        onChange={handleActiveTabChange}
+                        aria-label="Fetch options active tab"
+                      >
+                        <Tab label="URL query" value="urlQuery" />
+                        <Tab label="Body" value="body" />
+                        <Tab label="Headers" value="headers" />
+                        <Tab label="Response" value="response" />
+                        <Tab label="Transform" value="transform" />
+                      </TabList>
+                    </Box>
+                    <TabPanel disableGutters value="urlQuery">
+                      <ParametersEditor
+                        value={input.attributes.query.searchParams ?? []}
+                        onChange={handleSearchParamsChange}
+                        globalScope={queryScope}
+                        globalScopeMeta={QUERY_SCOPE_META}
+                        liveValue={liveSearchParams}
+                        jsRuntime={jsServerRuntime}
+                      />
+                    </TabPanel>
+                    <TabPanel disableGutters value="body">
+                      <BodyEditor
+                        value={input.attributes.query.body}
+                        onChange={handleBodyChange}
+                        globalScope={queryScope}
+                        globalScopeMeta={QUERY_SCOPE_META}
+                        method={input.attributes.query.method || 'GET'}
+                      />
+                    </TabPanel>
+                    <TabPanel disableGutters value="headers">
+                      <ParametersEditor
+                        value={input.attributes.query.headers ?? []}
+                        onChange={handleHeadersChange}
+                        globalScope={queryScope}
+                        globalScopeMeta={QUERY_SCOPE_META}
+                        liveValue={liveHeaders}
+                        jsRuntime={jsServerRuntime}
+                        envVarNames={envVarNames}
+                      />
+                    </TabPanel>
+                    <TabPanel disableGutters value="response">
+                      <TextField
+                        select
+                        label="response type"
+                        sx={{ width: 200, mt: 1 }}
+                        value={input.attributes.query.response?.kind || 'json'}
+                        onChange={handleResponseTypeChange}
+                      >
+                        <MenuItem value="raw">raw</MenuItem>
+                        <MenuItem value="json">JSON</MenuItem>
+                        <MenuItem value="csv" disabled>
+                          🚧 CSV
+                        </MenuItem>
+                        <MenuItem value="xml" disabled>
+                          🚧 XML
+                        </MenuItem>
+                      </TextField>
+                    </TabPanel>
+                    <TabPanel disableGutters value="transform">
+                      <TransformInput
+                        value={input.attributes.query.transform ?? 'return data;'}
+                        onChange={handleTransformChange}
+                        enabled={input.attributes.query.transformEnabled ?? false}
+                        onEnabledChange={handleTransformEnabledChange}
+                        globalScope={{ data: preview?.untransformedData }}
+                        loading={false}
+                      />
+                    </TabPanel>
+                  </TabContext>
+                </Box>
+              </Stack>
+            </QueryInputPanel>
+          </Panel>
+
+          <PanelResizeHandle />
+
+          <Panel>
+            <Box sx={{ p: 2, height: '100%', overflow: 'auto' }}>
+              <Typography>Parameters</Typography>
+              <ParametersEditor
+                value={paramsEntries}
+                onChange={handleParamsChange}
+                globalScope={globalScope}
+                globalScopeMeta={globalScopeMeta}
+                liveValue={paramsEditorLiveValue}
+                jsRuntime={jsBrowserRuntime}
+              />
             </Box>
-          </Stack>
-        </QueryInputPanel>
+          </Panel>
+        </PanelGroup>
+      </Panel>
 
-        <Box sx={{ p: 2, height: '100%', overflow: 'auto' }}>
-          <Typography>Parameters</Typography>
-          <ParametersEditor
-            value={paramsEntries}
-            onChange={handleParamsChange}
-            globalScope={globalScope}
-            globalScopeMeta={globalScopeMeta}
-            liveValue={paramsEditorLiveValue}
-            jsRuntime={jsBrowserRuntime}
-          />
-        </Box>
-      </SplitPane>
+      <PanelResizeHandle />
 
-      <SplitPane
-        split="horizontal"
-        size="30%"
-        minSize={30}
-        primary="second"
-        allowResize
-        pane1Style={{ overflow: 'auto' }}
-      >
-        <QueryPreview isLoading={previewIsLoading} error={preview?.error}>
-          <ResolvedPreview preview={preview} onShowTransform={() => setActiveTab('transform')} />
-        </QueryPreview>
-        <Devtools
-          sx={{ width: '100%', height: '100%' }}
-          har={previewHar}
-          onHarClear={handleHarClear}
-        />
-      </SplitPane>
-    </SplitPane>
+      <Panel defaultSize={50} minSize={20}>
+        <PanelGroup direction="vertical">
+          <Panel defaultSize={60}>
+            <QueryPreview isLoading={previewIsLoading} error={preview?.error}>
+              <ResolvedPreview
+                preview={preview}
+                onShowTransform={() => setActiveTab('transform')}
+              />
+            </QueryPreview>
+          </Panel>
+          <PanelResizeHandle />
+          <Panel>
+            <Devtools
+              sx={{ width: '100%', height: '100%' }}
+              har={previewHar}
+              onHarClear={handleHarClear}
+            />
+          </Panel>
+        </PanelGroup>
+      </Panel>
+    </PanelGroup>
   );
 }
 

@@ -159,7 +159,7 @@ export async function myBackendFunction() {
 
 ### Write cookies with `context.setCookie`
 
-You can also use the context to set a cookie, which can subsequently used in other backend functions called from your Toolpad application. Example:
+You can also use the context to set a cookie, which can subsequently be used in other backend functions called from your Toolpad application. Example:
 
 ```jsx
 import { getContext } from '@mui/toolpad/server';

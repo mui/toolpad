@@ -2203,7 +2203,6 @@
 
 "@mui/monorepo@https://github.com/mui/material-ui.git":
   version "5.14.7"
-  uid a71e6a07b80a230c302e687f6034b29eac3347f0
   resolved "https://github.com/mui/material-ui.git#a71e6a07b80a230c302e687f6034b29eac3347f0"
 
 "@mui/private-theming@^5.14.7", "@mui/private-theming@^5.14.8":
@@ -2267,7 +2266,7 @@
   resolved "https://registry.yarnpkg.com/@mui/types/-/types-7.2.4.tgz#b6fade19323b754c5c6de679a38f068fd50b9328"
   integrity sha512-LBcwa8rN84bKF+f5sDyku42w1NTxaPgPyYKODsh01U1fVstTClbUoSA96oyRBnSNyEiAVjKm6Gwx9vjR+xyqHA==
 
-"@mui/utils@5.14.8", "@mui/utils@^5.13.7", "@mui/utils@^5.14.7", "@mui/utils@^5.14.8":
+"@mui/utils@5.14.8", "@mui/utils@^5.13.7", "@mui/utils@^5.14.3", "@mui/utils@^5.14.7", "@mui/utils@^5.14.8":
   version "5.14.8"
   resolved "https://registry.yarnpkg.com/@mui/utils/-/utils-5.14.8.tgz#e1737d5fcd54aa413d6b1aaea3ea670af2919402"
   integrity sha512-1Ls2FfyY2yVSz9NEqedh3J8JAbbZAnUWkOWLE2f4/Hc4T5UWHMfzBLLrCqExfqyfyU+uXYJPGeNIsky6f8Gh5Q==
@@ -2336,9 +2335,20 @@
     "@babel/runtime" "^7.22.6"
     "@mui/utils" "^5.13.7"
 
+"@mui/x-tree-view@6.0.0-alpha.1":
+  version "6.0.0-alpha.1"
+  resolved "https://registry.yarnpkg.com/@mui/x-tree-view/-/x-tree-view-6.0.0-alpha.1.tgz#fe499f8c43c01d28aca95cfb17491746ffcc3080"
+  integrity sha512-JUG3HmBrmGEALbCFg1b+i7h726e1dWYZs4db3syO1j+Q++E3nbvE4Lehp5yGTFm+8esH0Tny50tuJaa4WX6VSA==
+  dependencies:
+    "@babel/runtime" "^7.22.6"
+    "@mui/utils" "^5.14.3"
+    "@types/react-transition-group" "^4.4.6"
+    clsx "^2.0.0"
+    prop-types "^15.8.1"
+    react-transition-group "^4.4.5"
+
 "@mui/x-tree-view@https://pkg.csb.dev/mui/mui-x/commit/1f23b33d/@mui/x-tree-view":
   version "6.0.0-alpha.0"
-  uid "93cbc61c818ed2d6c40554cdbada969f7dcbaab1"
   resolved "https://pkg.csb.dev/mui/mui-x/commit/1f23b33d/@mui/x-tree-view#93cbc61c818ed2d6c40554cdbada969f7dcbaab1"
   dependencies:
     "@babel/runtime" "^7.22.6"

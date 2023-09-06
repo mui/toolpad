@@ -15,7 +15,7 @@ import {
 } from '@mui/material';
 import { useBrowserJsRuntime } from '@mui/toolpad-core/jsBrowserRuntime';
 import { errorFrom } from '@mui/toolpad-utils/errors';
-import { TreeItem, TreeView, treeItemClasses } from '@mui/lab';
+import { TreeView, treeItemClasses, TreeItem } from '@mui/x-tree-view';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import useBoolean from '@mui/toolpad-utils/hooks/useBoolean';

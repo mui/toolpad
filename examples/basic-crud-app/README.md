@@ -8,7 +8,7 @@
 
 ## Check out the live app
 
-https://basic-crud-app-production.up.railway.app/prod/
+[Open example](https://basic-crud-app-production.up.railway.app/prod/)
 
 ## How to run
 

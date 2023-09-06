@@ -8,7 +8,7 @@
 
 ## Check out the live app
 
-https://mui-toolpad-qr-generator-production.up.railway.app/prod/
+[Open example](https://mui-toolpad-qr-generator-production.up.railway.app/prod/)
 
 ## How to use
 

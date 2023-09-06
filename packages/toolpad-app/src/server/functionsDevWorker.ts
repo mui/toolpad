@@ -98,12 +98,6 @@ async function execute(msg: ExecuteMessage) {
   if (typeof fn !== 'function') {
     throw new Error(`Function "${msg.name}" not found`);
   }
-  if (isWebContainer()) {
-    console.warn(
-      'Bypassing server context in web containers, see https://github.com/stackblitz/core/issues/2711',
-    );
-    return fn(...msg.parameters);
-  }
 
   const newCookies = new Map<string, string>();
   let functionFinished = false;
@@ -118,9 +112,16 @@ async function execute(msg: ExecuteMessage) {
     setCookie,
   };
   try {
-    const result = await withContext(ctx, async () => {
-      return fn(...msg.parameters);
-    });
+    const shouldBypassContext = isWebContainer();
+    if (shouldBypassContext) {
+      console.warn(
+        'Bypassing server context in web containers, see https://github.com/stackblitz/core/issues/2711',
+      );
+    }
+
+    const result = shouldBypassContext
+      ? await fn(...msg.parameters)
+      : await withContext(ctx, async () => fn(...msg.parameters));
 
     return { result, newCookies: Array.from(newCookies.entries()) };
   } finally {

@@ -144,6 +144,8 @@ You can then use this function on your page:
 
 When you run Toolpad in an authenticated context it may be useful to be able to access authentication information in backend functions. For this purpose we offer the `getContext` API which allows you to inspect the cookies of the request that initiated the backend function.
 
+### Access cookies with `context.cookies`
+
 ```jsx
 import { getContext } from '@mui/toolpad/server';
 import { parseAuth } from '../../src/lib/auth';
@@ -152,5 +154,28 @@ export async function myBackendFunction() {
   const ctx = getContext();
   const user = await parseAuth(ctx.cookie.authentication);
   return user?.id;
+}
+```
+
+### Write cookies with `context.setCookie`
+
+You can also use the context to set a cookie, which can subsequently be used in other backend functions called from your Toolpad application. Example:
+
+```jsx
+import { getContext } from '@mui/toolpad/server';
+import * as api from './myApi';
+
+const MY_COOKIE_NAME = 'MY_AUTH_TOKEN';
+
+export async function login(user: string, password: string) {
+  const token = await api.login(user, password);
+  const { setCookie } = getContext();
+  setCookie(MY_COOKIE_NAME, token);
+}
+
+export async function getData() {
+  const { cookies } = getContext();
+  const token = cookies[MY_COOKIE_NAME];
+  return api.getData(token);
 }
 ```

@@ -167,6 +167,10 @@ const pages: MuiPage[] = [
                 title: 'createComponent',
                 pathname: '/toolpad/reference/api/create-component',
               },
+              {
+                title: 'getContext',
+                pathname: '/toolpad/reference/api/get-context',
+              },
             ],
           },
         ],

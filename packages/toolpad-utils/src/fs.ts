@@ -50,12 +50,16 @@ export async function writeFileRecursive(
   await fs.writeFile(filePath, content, options);
 }
 
-export async function updateYamlFile(filePath: string, content: object) {
+export async function updateYamlFile(
+  filePath: string,
+  content: object,
+  callback?: (content: string) => string,
+) {
   const oldContent = await readMaybeFile(filePath);
   const newContent = oldContent ? yamlOverwrite(oldContent, content) : yaml.stringify(content);
 
   if (newContent !== oldContent) {
-    await writeFileRecursive(filePath, newContent);
+    await writeFileRecursive(filePath, callback ? callback(newContent) : newContent);
   }
 }
 

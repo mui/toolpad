@@ -39,7 +39,7 @@ import {
   themeSchema,
   API_VERSION,
 } from './schema';
-import { format } from '../utils/prettier';
+import { format, formatYaml } from '../utils/prettier';
 import {
   Body as AppDomFetchBody,
   FetchQuery,
@@ -804,7 +804,7 @@ async function writePagesToFiles(root: string, pages: PagesContent) {
   await Promise.all(
     Object.entries(pages).map(async ([name, page]) => {
       const pageFileName = getPageFile(root, name);
-      await updateYamlFile(pageFileName, optimizePage(page));
+      await updateYamlFile(pageFileName, optimizePage(page), (content) => formatYaml(content));
     }),
   );
 }
@@ -812,7 +812,7 @@ async function writePagesToFiles(root: string, pages: PagesContent) {
 async function writeThemeFile(root: string, theme: Theme | null) {
   const themeFilePath = getThemeFile(root);
   if (theme) {
-    await updateYamlFile(themeFilePath, theme);
+    await updateYamlFile(themeFilePath, theme, (content) => formatYaml(content));
   } else {
     await fs.rm(themeFilePath, { recursive: true, force: true });
   }

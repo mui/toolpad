@@ -154,3 +154,24 @@ export async function myBackendFunction() {
   return user?.id;
 }
 ```
+
+You can also use the context to set a cookie, which can subsequently used in other backend functions called from your Toolpad application. Example:
+
+```jsx
+import { getContext } from '@mui/toolpad/server';
+import * as api from './myApi';
+
+const MY_COOKIE_NAME = 'MY_AUTH_TOKEN';
+
+export async function login(user: string, password: string) {
+  const token = await api.login(user, password);
+  const { setCookie } = getContext();
+  setCookie(MY_COOKIE_NAME, token);
+}
+
+export async function getData() {
+  const { cookies } = getContext();
+  const token = cookies[MY_COOKIE_NAME];
+  return api.getData(token);
+}
+```

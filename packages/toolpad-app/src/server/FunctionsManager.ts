@@ -328,4 +328,9 @@ export default class FunctionsManager {
     await writeFileRecursive(filePath, content, { encoding: 'utf-8' });
     this.extractedTypes = undefined;
   }
+
+  async getDataProvider(
+    file: string,
+    exportName: string = 'default',
+  ): Promise<ToolpadDataProviderBase> {}
 }

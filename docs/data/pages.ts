@@ -10,6 +10,7 @@ const pages: MuiPage[] = [
       { pathname: '/toolpad/getting-started/first-app', title: 'Build your first app' },
       {
         pathname: '/toolpad/examples-group',
+        title: 'Examples',
         children: [
           { pathname: '/toolpad/examples', title: 'Overview' },
           { pathname: '/toolpad/examples/npm-stats', title: 'npm stats' },

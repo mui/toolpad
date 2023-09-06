@@ -9,7 +9,6 @@ import fetch, { Headers, Request, Response } from 'node-fetch';
 import { errorFrom, serializeError } from '@mui/toolpad-utils/errors';
 import { getCircularReplacer, replaceRecursive } from '@mui/toolpad-utils/json';
 import { ServerContext, getServerContext, withContext } from '@mui/toolpad-core/serverRuntime';
-import invariant from 'invariant';
 import { isWebContainer } from '@webcontainer/env';
 import SuperJSON from 'superjson';
 
@@ -25,7 +24,7 @@ interface ExecuteMessage {
   filePath: string;
   name: string;
   parameters: unknown[];
-  ctx?: ServerContext;
+  cookies?: Record<string, string>;
 }
 
 type WorkerMessage = IntrospectMessage | ExecuteMessage;
@@ -82,19 +81,34 @@ async function execute(msg: ExecuteMessage) {
   if (typeof fn !== 'function') {
     throw new Error(`Function "${msg.name}" not found`);
   }
-  if (!msg.ctx && isWebContainer()) {
+  if (isWebContainer()) {
     console.warn(
       'Bypassing server context in web containers, see https://github.com/stackblitz/core/issues/2711',
     );
     return fn(...msg.parameters);
   }
 
-  invariant(msg.ctx, 'Server context is required');
-  const result = await withContext(msg.ctx, async () => {
-    return fn(...msg.parameters);
-  });
+  const newCookies = new Map<string, string>();
+  let functionFinished = false;
+  const setCookie = (name: string, value: string) => {
+    if (functionFinished) {
+      throw new Error(`setCookie can't be called after the function has finished executing.`);
+    }
+    newCookies.set(name, value);
+  };
+  const ctx: ServerContext = {
+    cookies: msg.cookies || {},
+    setCookie,
+  };
+  try {
+    const result = await withContext(ctx, async () => {
+      return fn(...msg.parameters);
+    });
 
-  return result;
+    return { result, newCookies: Array.from(newCookies.entries()) };
+  } finally {
+    functionFinished = true;
+  }
 }
 
 async function handleMessage(msg: WorkerMessage) {
@@ -156,13 +170,21 @@ export function createWorker(env: Record<string, any>) {
 
     async execute(filePath: string, name: string, parameters: unknown[]): Promise<any> {
       const ctx = getServerContext();
-      return runOnWorker({
+      const { result, newCookies } = await runOnWorker({
         kind: 'execute',
         filePath,
         name,
         parameters,
-        ctx,
+        cookies: ctx?.cookies,
       });
+
+      if (ctx) {
+        for (const [cookieName, cookieValue] of newCookies) {
+          ctx.setCookie(cookieName, cookieValue);
+        }
+      }
+
+      return result;
     },
   };
 }

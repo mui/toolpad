@@ -8,7 +8,7 @@
 
 ## Check out the live app
 
-https://npm-stats.onrender.com/prod/pages/evZC-gp
+[Open example](https://npm-stats.onrender.com/prod/pages/evZC-gp)
 
 ## How to run
 

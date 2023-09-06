@@ -95,6 +95,19 @@ export const createQuery = createFunction;
 
 export type { ServerContext };
 
+/**
+ * Interact with the server context of a Toolpad application.
+ * This function is only callable from within a Toolpad function.
+ *
+ * Demos:
+ *
+ * - [Custom Functions](https://mui.com/toolpad/concepts/custom-functions/#request-context/)
+ *
+ * API:
+ *
+ * - [getContext API](https://mui.com/toolpad/reference/api/get-context)
+ *
+ */
 export function getContext(): ServerContext {
   const ctx = getServerContext();
   if (!ctx) {

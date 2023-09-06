@@ -192,7 +192,7 @@ function QueryEditor({
     [setSelectedHandler],
   );
 
-  const handlerTreeRef = React.useRef<HTMLDivElement>(null);
+  const handlerTreeRef = React.useRef<HTMLUListElement>(null);
 
   React.useEffect(() => {
     handlerTreeRef.current?.querySelector(`.${treeItemClasses.selected}`)?.scrollIntoView();

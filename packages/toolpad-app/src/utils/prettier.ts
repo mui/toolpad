@@ -1,16 +1,10 @@
 import * as prettier from 'prettier';
 import parserBabel from 'prettier/parser-babel';
 
-const PRETTIERNAME = 'prettier.config.js';
-
 const DEFAULT_OPTIONS = {
   parser: 'babel-ts',
   plugins: [parserBabel],
 };
-
-function readConfig() {
-  return prettier.resolveConfig.sync(PRETTIERNAME);
-}
 
 /**
  * Formats a javascript source with `prettier`.
@@ -53,14 +47,4 @@ export function tryFormatExpression(code: string): string {
   } catch (err) {
     return code;
   }
-}
-
-/**
- * Formats a yaml source with `prettier`.
- */
-export function formatYaml(code: string): string {
-  return prettier.format(code, {
-    parser: 'yaml',
-    ...readConfig(),
-  });
 }

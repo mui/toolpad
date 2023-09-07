@@ -55,11 +55,13 @@
     "invariant": "2.2.4",
     "react-is": "18.2.0",
     "yaml": "2.3.2",
-    "yaml-diff-patch": "2.0.0"
+    "yaml-diff-patch": "2.0.0",
+    "prettier": "2.8.8"
   },
   "devDependencies": {
     "@types/invariant": "2.2.35",
-    "@types/react-is": "18.2.1"
+    "@types/react-is": "18.2.1",
+    "@types/prettier": "2.7.3"
   },
   "gitHead": "49cfb445013990e146a1d030f61a5ccf0b8d6029"
 }

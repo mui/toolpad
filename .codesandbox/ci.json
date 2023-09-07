@@ -1,6 +1,6 @@
 {
   "buildCommand": "release:build",
-  "node": "16",
+  "node": "18",
   "packages": [
     "packages/create-toolpad-app",
     "packages/toolpad-app",

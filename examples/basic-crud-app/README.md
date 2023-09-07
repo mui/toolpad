@@ -8,7 +8,7 @@
 
 ## Check out the live app
 
-Not available yet. You can open [in dev mode with StackBlitz](https://stackblitz.com/fork/github/mui/mui-toolpad/tree/master/examples/basic-crud-app) in the meantime.
+[Open example](https://basic-crud-app-production.up.railway.app/prod/)
 
 ## How to run
 

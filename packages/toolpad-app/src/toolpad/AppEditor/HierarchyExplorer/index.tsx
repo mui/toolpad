@@ -1,10 +1,9 @@
 import * as React from 'react';
 import { NodeId } from '@mui/toolpad-core';
 import { Box, Typography } from '@mui/material';
-import TreeView from '@mui/lab/TreeView';
+import { TreeView, TreeItem, TreeItemProps } from '@mui/x-tree-view';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
-import TreeItem, { TreeItemProps } from '@mui/lab/TreeItem';
 import * as appDom from '../../../appDom';
 import { useDom, useDomApi, useAppState, useAppStateApi } from '../../AppState';
 import EditableText from '../../../components/EditableText';
@@ -13,11 +12,12 @@ import { useNodeNameValidation } from '../PagesExplorer/validation';
 import { DomView } from '../../../utils/domView';
 import { removePageLayoutNode } from '../pageLayout';
 
-function CustomTreeItem(
-  props: TreeItemProps & {
-    node: appDom.ElementNode;
-  },
-) {
+export interface CustomTreeItemProps extends TreeItemProps {
+  ref?: React.RefObject<HTMLLIElement>;
+  node: appDom.ElementNode;
+}
+
+function CustomTreeItem(props: CustomTreeItemProps) {
   const domApi = useDomApi();
   const { dom } = useDom();
   const appStateApi = useAppStateApi();

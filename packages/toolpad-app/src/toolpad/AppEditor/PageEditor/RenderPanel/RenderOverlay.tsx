@@ -1034,7 +1034,7 @@ export default function RenderOverlay({ bridge }: RenderOverlayProps) {
 
                   // Move existing element inside right away if drag over zone is right
                   if (dragOverZone === DROP_ZONE_RIGHT) {
-                    draft = appDom.moveNode(draft, dragOverNode, parent, dragOverNodeParentProp);
+                    draft = appDom.moveNode(draft, dragOverNode, parent, 'children');
                   }
                 }
 
@@ -1051,7 +1051,9 @@ export default function RenderOverlay({ bridge }: RenderOverlayProps) {
                   draft,
                   draggedNode,
                   parent,
-                  dragOverNodeParentProp,
+                  isOriginalParentLayout || isOriginalParentColumn
+                    ? 'children'
+                    : dragOverNodeParentProp,
                   newParentIndex,
                 );
 
@@ -1060,7 +1062,7 @@ export default function RenderOverlay({ bridge }: RenderOverlayProps) {
                   (isOriginalParentLayout || isOriginalParentColumn) &&
                   dragOverZone === DROP_ZONE_LEFT
                 ) {
-                  draft = appDom.moveNode(draft, dragOverNode, parent, dragOverNodeParentProp);
+                  draft = appDom.moveNode(draft, dragOverNode, parent, 'children');
                 }
               }
 

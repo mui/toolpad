@@ -196,14 +196,23 @@ export default function Hero() {
           Build scalable and secure internal tools locally. Drag and drop to build UI, then connect
           to data sources with your own code.
         </Typography>
-        <GetStartedButtons
-          primaryLabel={'Get started'}
-          primaryUrl={ROUTES.toolpadQuickstart}
-          secondaryLabel={'Book a demo'}
-          secondaryUrl={ROUTES.toolpadDemoBooking}
-          secondaryUrlTarget="_blank"
-          altInstallation={'npx create-toolpad-app@latest'}
-        />
+        <Box
+          sx={{
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: { xs: 'center', md: 'flex-start' },
+          }}
+        >
+          <GetStartedButtons
+            primaryLabel={'Get started'}
+            primaryUrl={ROUTES.toolpadQuickstart}
+            secondaryLabel={'Book a demo'}
+            secondaryUrl={ROUTES.toolpadDemoBooking}
+            secondaryUrlTarget="_blank"
+            altInstallation={'npx create-toolpad-app@latest'}
+            sx={{ width: '100%' }}
+          />
+        </Box>
         <Box
           sx={{
             mt: 4,

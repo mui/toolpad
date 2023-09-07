@@ -15,7 +15,7 @@ test.use({
 test('can move elements in page', async ({ page }) => {
   const editorModel = new ToolpadEditor(page);
 
-  await editorModel.goto();
+  await editorModel.goToPageById('y4d19z0');
 
   await editorModel.waitForOverlay();
 
@@ -59,7 +59,7 @@ test('can move elements in page', async ({ page }) => {
 test('can delete elements from page', async ({ page }) => {
   const editorModel = new ToolpadEditor(page);
 
-  await editorModel.goto();
+  await editorModel.goToPageById('y4d19z0');
 
   await editorModel.waitForOverlay();
 
@@ -255,7 +255,7 @@ test('must deselect selected element when clicking outside of it', async ({ page
 });
 test('can rename page', async ({ page, localApp }) => {
   const editorModel = new ToolpadEditor(page);
-  await editorModel.goto();
+  await editorModel.goToPageById('y4d19z0');
   await editorModel.waitForOverlay();
   await editorModel.goToPage('page4');
   await editorModel.waitForOverlay();
@@ -276,7 +276,7 @@ test('can rename page', async ({ page, localApp }) => {
 
 test('can react to pages renamed on disk', async ({ page, localApp }) => {
   const editorModel = new ToolpadEditor(page);
-  await editorModel.goto();
+  await editorModel.goToPageById('y4d19z0');
   await editorModel.waitForOverlay();
 
   const oldPageFolder = path.resolve(localApp.dir, './toolpad/pages/page4');

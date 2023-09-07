@@ -100,7 +100,15 @@ async function execute(msg: ExecuteMessage): Promise<ExecuteResponse> {
       },
     };
 
-    const rawResult = isWebContainer()
+    const shouldBypassContext = isWebContainer();
+
+    if (shouldBypassContext) {
+      console.warn(
+        'Bypassing server context in web containers, see https://github.com/stackblitz/core/issues/2711',
+      );
+    }
+
+    const rawResult = shouldBypassContext
       ? await fn(...msg.parameters)
       : await withContext(ctx, async () => fn(...msg.parameters));
 

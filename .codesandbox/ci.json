@@ -1,5 +1,5 @@
 {
-  "installCommand": "codesandbox:install",
+  "installCommand": "--ignore-engines codesandbox:install",
   "buildCommand": "release:build",
   "node": "18",
   "packages": [

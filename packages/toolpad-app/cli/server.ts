@@ -15,7 +15,7 @@ import { listen } from '@mui/toolpad-utils/http';
 import openBrowser from 'react-dev-utils/openBrowser';
 import { folderExists } from '@mui/toolpad-utils/fs';
 import chalk from 'chalk';
-import { serveRpc } from '@mui/toolpad-utils/rpc';
+import { serveRpc } from '@mui/toolpad-utils/workerRpc';
 import { asyncHandler } from '../src/utils/express';
 import { createProdHandler } from '../src/server/toolpadAppServer';
 import {
@@ -63,7 +63,7 @@ async function createDevHandler(
       config: runtimeConfig,
       root: project.getRoot(),
       port: devPort,
-      rpcPort: rpcChannel.port1,
+      mainThreadRpcPort: rpcChannel.port1,
     } satisfies AppViteServerConfig,
     transferList: [rpcChannel.port1],
     env: {

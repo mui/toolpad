@@ -1,7 +1,7 @@
 import { parentPort, workerData, MessagePort } from 'worker_threads';
 import invariant from 'invariant';
 import { createServer, Plugin } from 'vite';
-import { createRpcClient } from '@mui/toolpad-utils/rpc';
+import { createRpcClient } from '@mui/toolpad-utils/workerRpc';
 import {
   getHtmlContent,
   postProcessHtml,
@@ -20,7 +20,9 @@ export type WorkerRpc = {
   getComponents: () => Promise<ComponentEntry[]>;
 };
 
-const { notifyReady, loadDom, getComponents } = createRpcClient<WorkerRpc>(workerData.rpcPort);
+const { notifyReady, loadDom, getComponents } = createRpcClient<WorkerRpc>(
+  workerData.mainThreadRpcPort,
+);
 
 invariant(
   process.env.NODE_ENV === 'development',
@@ -84,7 +86,7 @@ export interface AppViteServerConfig {
   root: string;
   port: number;
   config: RuntimeConfig;
-  rpcPort: MessagePort;
+  mainThreadRpcPort: MessagePort;
 }
 
 export async function main({ outDir, base, config, root, port }: AppViteServerConfig) {

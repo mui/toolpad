@@ -197,7 +197,7 @@ export default function HierarchyExplorer() {
         selectedNodeId: null,
       },
     );
-  }, [appStateApi, dom, selectedDomNodeId, currentView]);
+  }, [selectedDomNodeId, appStateApi, currentView, dom]);
 
   const handleKeyDown = React.useCallback(
     (event: React.KeyboardEvent<HTMLUListElement>) => {

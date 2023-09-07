@@ -1,38 +1,16 @@
-import { once } from 'node:events';
-import { Worker, MessageChannel, MessagePort, isMainThread, parentPort } from 'worker_threads';
+import { Worker, MessageChannel, isMainThread, parentPort } from 'worker_threads';
 import * as path from 'path';
 import { createRequire } from 'node:module';
 import * as fs from 'fs/promises';
 import * as vm from 'vm';
 import * as url from 'url';
 import fetch, { Headers, Request, Response } from 'node-fetch';
-import { errorFrom, serializeError } from '@mui/toolpad-utils/errors';
 import { getCircularReplacer, replaceRecursive } from '@mui/toolpad-utils/json';
 import { ServerContext, getServerContext, withContext } from '@mui/toolpad-core/serverRuntime';
 import { isWebContainer } from '@webcontainer/env';
 import SuperJSON from 'superjson';
-
-interface ExecuteMessage {
-  kind: 'execute';
-  filePath: string;
-  name: string;
-  parameters: unknown[];
-  cookies?: Record<string, string>;
-}
-
-interface ExecuteResponse {
-  result: string;
-  newCookies: [string, string][];
-}
-
-type WorkerMessage = ExecuteMessage;
-
-interface RunOnWorker {
-  (msg: ExecuteMessage): Promise<ExecuteResponse>;
-  (msg: WorkerMessage): Promise<unknown>;
-}
-
-type TransferredMessage = WorkerMessage & { port: MessagePort };
+import { createRpcClient, serveRpc } from '@mui/toolpad-utils/workerRpc';
+import { workerData } from 'node:worker_threads';
 
 interface ModuleObject {
   exports: Record<string, unknown>;
@@ -77,7 +55,19 @@ async function resolveFunctions(filePath: string): Promise<Record<string, Functi
   );
 }
 
-async function execute(msg: ExecuteMessage): Promise<ExecuteResponse> {
+interface ExecuteParams {
+  filePath: string;
+  name: string;
+  parameters: unknown[];
+  cookies?: Record<string, string>;
+}
+
+interface ExecuteResult {
+  result: string;
+  newCookies: [string, string][];
+}
+
+async function execute(msg: ExecuteParams): Promise<ExecuteResult> {
   const fns = await resolveFunctions(msg.filePath);
 
   const fn = fns[msg.name];
@@ -121,14 +111,9 @@ async function execute(msg: ExecuteMessage): Promise<ExecuteResponse> {
   }
 }
 
-async function handleMessage(msg: WorkerMessage) {
-  switch (msg.kind) {
-    case 'execute':
-      return execute(msg);
-    default:
-      throw new Error(`Unknown kind "${(msg as any).kind}"`);
-  }
-}
+type WorkerRpcServer = {
+  execute: typeof execute;
+};
 
 if (!isMainThread && parentPort) {
   // Polyfill fetch() in the Node.js environment
@@ -143,32 +128,22 @@ if (!isMainThread && parentPort) {
     global.Response = Response;
   }
 
-  parentPort.on('message', (msg: TransferredMessage) => {
-    (async () => {
-      try {
-        const result = await handleMessage(msg);
-        msg.port.postMessage({ result });
-      } catch (rawError) {
-        msg.port.postMessage({ error: serializeError(errorFrom(rawError)) });
-      }
-    })();
+  serveRpc<WorkerRpcServer>(workerData.workerRpcPort, {
+    execute,
   });
 }
 
 export function createWorker(env: Record<string, any>) {
-  const worker = new Worker(path.join(__dirname, 'functionsDevWorker.js'), { env });
+  const workerRpcChannel = new MessageChannel();
+  const worker = new Worker(path.join(__dirname, 'functionsDevWorker.js'), {
+    env,
+    workerData: {
+      workerRpcPort: workerRpcChannel.port1,
+    },
+    transferList: [workerRpcChannel.port1],
+  });
 
-  const runOnWorker: RunOnWorker = async (msg: WorkerMessage) => {
-    const { port1, port2 } = new MessageChannel();
-    worker.postMessage({ port: port1, ...msg } satisfies TransferredMessage, [port1]);
-    const [{ error, result }] = await once(port2, 'message');
-
-    if (error) {
-      throw errorFrom(error);
-    }
-
-    return result;
-  };
+  const client = createRpcClient(workerRpcChannel.port2);
 
   return {
     async terminate() {
@@ -178,7 +153,7 @@ export function createWorker(env: Record<string, any>) {
     async execute(filePath: string, name: string, parameters: unknown[]): Promise<any> {
       const ctx = getServerContext();
 
-      const { result: serializedResult, newCookies } = await runOnWorker({
+      const { result: serializedResult, newCookies } = await client.execute({
         kind: 'execute',
         filePath,
         name,

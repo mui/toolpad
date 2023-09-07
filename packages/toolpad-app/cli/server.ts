@@ -54,7 +54,7 @@ async function createDevHandler(
   const appServerPath = path.resolve(__dirname, './appServer.js');
   const devPort = await getPort();
 
-  const rpcChannel = new MessageChannel();
+  const mainThreadRpcChannel = new MessageChannel();
 
   const worker = new Worker(appServerPath, {
     workerData: {
@@ -63,9 +63,9 @@ async function createDevHandler(
       config: runtimeConfig,
       root: project.getRoot(),
       port: devPort,
-      mainThreadRpcPort: rpcChannel.port1,
+      mainThreadRpcPort: mainThreadRpcChannel.port1,
     } satisfies AppViteServerConfig,
-    transferList: [rpcChannel.port1],
+    transferList: [mainThreadRpcChannel.port1],
     env: {
       ...process.env,
       NODE_ENV: 'development',
@@ -82,7 +82,7 @@ async function createDevHandler(
     resolveReadyPromise = resolve;
   });
 
-  serveRpc<WorkerRpc>(rpcChannel.port2, {
+  serveRpc<WorkerRpc>(mainThreadRpcChannel.port2, {
     notifyReady: async () => resolveReadyPromise?.(),
     loadDom: async () => project.loadDom(),
     getComponents: async () => getComponents(project.getRoot()),

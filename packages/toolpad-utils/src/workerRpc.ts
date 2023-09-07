@@ -1,7 +1,40 @@
 import { MessagePort, MessageChannel } from 'worker_threads';
 import { Awaitable } from './types';
+import { errorFrom, serializeError } from './errors';
 
-export type Methods = Record<string, (...args: unknown[]) => Awaitable<unknown>>;
+/**
+ * Helpers that are intended to set up rpc between a Node.js worker thread and the main thread.
+ * Create the worker and pass a port in the workerData.
+ *
+ * On the main thread:
+ *
+ *     const rpcChannel = new MessageChannel()
+ *     const worker = new Worker('./myWorker.js', {
+ *       workerData: { rpcPort: rpcChannel.port1 },
+ *       transferList: [rpcChannel.port1]
+ *     })
+ *
+ *     // Depending of the direction of communication, either
+ *     const client = createRpcClient(rpcChannel.port2)
+ *     // or
+ *     serveRpc(rpcChannel.port2, {
+ *       myMethod
+ *     })
+ *
+ * On the worker thread:
+ *
+ *     // Depending of the direction of communication, either
+ *     const client = createRpcClient(workerData.rpcPort)
+ *     // or
+ *     serveRpc(workerData.rpcPort, {
+ *       myMethod
+ *     })
+ *
+ * Use multiple channels for bidirectional communication.
+ */
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export type Methods = Record<string, (...args: any[]) => Awaitable<any>>;
 
 type MessageRequest = {
   method: string;
@@ -68,8 +101,8 @@ export function serveRpc<M extends Methods>(port: MessagePort, methods: M) {
       try {
         const result = await method(...msg.args);
         msg.port.postMessage({ result } satisfies MsgResponse);
-      } catch (error) {
-        msg.port.postMessage({ error } satisfies MsgResponse);
+      } catch (rawError) {
+        msg.port.postMessage({ error: serializeError(errorFrom(rawError)) } satisfies MsgResponse);
       }
     } else {
       msg.port.postMessage({

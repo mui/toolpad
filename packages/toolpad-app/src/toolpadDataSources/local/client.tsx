@@ -15,7 +15,7 @@ import {
 } from '@mui/material';
 import { useBrowserJsRuntime } from '@mui/toolpad-core/jsBrowserRuntime';
 import { errorFrom } from '@mui/toolpad-utils/errors';
-import { TreeItem, TreeView, treeItemClasses } from '@mui/lab';
+import { TreeView, treeItemClasses, TreeItem } from '@mui/x-tree-view';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import useBoolean from '@mui/toolpad-utils/hooks/useBoolean';
@@ -192,7 +192,7 @@ function QueryEditor({
     [setSelectedHandler],
   );
 
-  const handlerTreeRef = React.useRef<HTMLDivElement>(null);
+  const handlerTreeRef = React.useRef<HTMLUListElement>(null);
 
   React.useEffect(() => {
     handlerTreeRef.current?.querySelector(`.${treeItemClasses.selected}`)?.scrollIntoView();
@@ -264,8 +264,8 @@ function QueryEditor({
   ]);
 
   return (
-    <PanelGroup direction="vertical">
-      <Panel defaultSize={40} maxSize={70} minSize={20}>
+    <PanelGroup direction="horizontal">
+      <Panel defaultSize={50} minSize={20}>
         <QueryInputPanel
           previewDisabled={!selectedOption}
           onRunPreview={handleRunPreview}
@@ -388,7 +388,7 @@ function QueryEditor({
         </QueryInputPanel>
       </Panel>
       <PanelResizeHandle />
-      <Panel defaultSize={60} maxSize={80} minSize={30}>
+      <Panel defaultSize={50} minSize={20}>
         <QueryPreview isLoading={previewIsLoading} error={preview?.error}>
           <JsonView sx={{ height: '100%' }} copyToClipboard src={preview?.data} />
         </QueryPreview>

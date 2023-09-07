@@ -48,7 +48,11 @@ function MissingEditorDialog({ open, onClose }: MissingEditorDialogProps) {
           No editor was detected on your system. If using Visual Studio Code, this may be due to a
           missing &quot;code&quot; command in your PATH. <br />
           Check the{' '}
-          <Link href="https://mui.com/toolpad/how-to-guides/editor-path" target="_blank">
+          <Link
+            href="https://mui.com/toolpad/how-to-guides/editor-path/"
+            target="_blank"
+            rel="noopener"
+          >
             docs
           </Link>{' '}
           for more information.

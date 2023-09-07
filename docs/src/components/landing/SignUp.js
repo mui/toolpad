@@ -35,11 +35,9 @@ function SignUp({ sx }) {
         }),
       });
       setForm((current) => ({ ...current, status: 'sent' }));
-      window.ga('send', {
-        hitType: 'event',
-        eventCategory: 'ToolpadLanding',
-        eventAction: 'SignUp',
-        eventLabel: 'Sign Up',
+      window.gtag('event', 'toolpad_newsletter_signup', {
+        event_label: 'Toolpad Newsletter Sign Up',
+        event_category: 'toolpad_landing',
       });
     } catch (error) {
       setForm((current) => ({ ...current, status: 'failure' }));

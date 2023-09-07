@@ -1,6 +1,6 @@
 {
   "name": "@mui/toolpad-components",
-  "version": "0.1.25",
+  "version": "0.1.27",
   "description": "Build MUI apps quickly",
   "author": "MUI Toolpad team",
   "homepage": "https://github.com/mui/mui-toolpad#readme",
@@ -38,19 +38,19 @@
     "url": "https://github.com/mui/mui-toolpad/issues"
   },
   "dependencies": {
-    "@mui/icons-material": "5.14.6",
-    "@mui/lab": "5.0.0-alpha.141",
-    "@mui/material": "5.14.6",
+    "@mui/icons-material": "5.14.8",
+    "@mui/lab": "5.0.0-alpha.143",
+    "@mui/material": "5.14.8",
     "@mui/toolpad-core": "workspace:*",
     "@mui/toolpad-utils": "workspace:*",
-    "@mui/x-data-grid-pro": "6.12.0",
-    "@mui/x-date-pickers": "6.12.0",
+    "@mui/x-data-grid-pro": "6.12.1",
+    "@mui/x-date-pickers": "6.12.1",
     "@mui/x-license-pro": "6.10.2",
     "dayjs": "1.11.9",
     "markdown-to-jsx": "7.3.2",
     "react-error-boundary": "4.0.11",
     "react-hook-form": "7.45.4",
-    "recharts": "2.7.3"
+    "recharts": "2.8.0"
   },
   "peerDependencies": {
     "react": "^18.0.0"
@@ -58,7 +58,7 @@
   "publishConfig": {
     "access": "public"
   },
-  "gitHead": "206e4443c1d99f68f0e033dab68ecdade1c25cc6",
+  "gitHead": "342439583072ebcaaa3b3587517804e4fdfb9dcf",
   "devDependencies": {
     "@types/lodash-es": "4.17.8",
     "@types/react": "18.2.20"

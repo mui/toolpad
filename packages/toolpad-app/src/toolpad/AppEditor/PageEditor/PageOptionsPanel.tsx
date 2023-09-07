@@ -1,4 +1,4 @@
-import { Stack, Typography, Divider, MenuItem, TextField } from '@mui/material';
+import { Stack, Typography, Divider, MenuItem, TextField, Tooltip, Link } from '@mui/material';
 import * as React from 'react';
 import { useDom, useDomApi } from '../../AppState';
 import { usePageEditorState } from './PageEditorProvider';
@@ -40,22 +40,40 @@ export default function PageOptionsPanel() {
       <Typography variant="subtitle1">Page:</Typography>
       <NodeNameEditor node={page} />
       <PageTitleEditor node={page} />
-      <TextField
-        select
-        defaultValue="shell"
-        value={page.attributes.display}
-        onChange={handleDisplayModeChange}
-        label="Display mode"
-        fullWidth
+      <Tooltip
+        arrow
+        placement="left-start"
+        title={
+          <Typography variant="inherit">
+            Control how the navigation panel is rendered in the final application. Read more in the{' '}
+            <Link
+              href="https://mui.com/toolpad/concepts/display-mode/"
+              target="_blank"
+              rel="noopener"
+            >
+              docs
+            </Link>
+            .
+          </Typography>
+        }
       >
-        {PAGE_DISPLAY_OPTIONS.map((option) => {
-          return (
-            <MenuItem key={option.value} value={option.value}>
-              {option.label}
-            </MenuItem>
-          );
-        })}
-      </TextField>
+        <TextField
+          select
+          defaultValue="shell"
+          value={page.attributes.display}
+          onChange={handleDisplayModeChange}
+          label="Display mode"
+          fullWidth
+        >
+          {PAGE_DISPLAY_OPTIONS.map((option) => {
+            return (
+              <MenuItem key={option.value} value={option.value}>
+                {option.label}
+              </MenuItem>
+            );
+          })}
+        </TextField>
+      </Tooltip>
       <Divider variant="middle" sx={{ alignSelf: 'stretch' }} />
       <Typography variant="overline">Page State:</Typography>
       <UrlQueryEditor pageNodeId={pageNodeId} />

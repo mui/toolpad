@@ -24,6 +24,7 @@ export default defineConfig({
   dts: false,
   silent: true,
   sourcemap: true,
+  splitting: true,
   esbuildPlugins: [cleanFolderOnFailure(path.resolve(__dirname, 'dist'))],
   async onSuccess() {
     spawnSync('tsc', ['--emitDeclarationOnly', '--declaration'], { shell: true });

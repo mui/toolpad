@@ -19,6 +19,7 @@
     "toolpad": "./dist/index.js"
   },
   "scripts": {
+    "codesandbox:install": "yarn install --ignore-engines",
     "markdownlint": "markdownlint-cli2 \"**/*.md\"",
     "prettier": "pretty-quick --ignore-path .eslintignore",
     "prettier:all": "prettier --write . --ignore-path .eslintignore",

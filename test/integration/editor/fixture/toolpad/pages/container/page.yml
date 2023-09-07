@@ -7,4 +7,3 @@ spec:
   content:
     - component: Paper
       name: paper
-      children: []

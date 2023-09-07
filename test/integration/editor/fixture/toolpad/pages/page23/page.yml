@@ -7,12 +7,10 @@ spec:
   content:
     - component: TextField
       name: textField
-      children: []
       layout:
         columnSize: 1
     - component: Text
       name: text
-      children: []
       layout:
         columnSize: 1
       props:

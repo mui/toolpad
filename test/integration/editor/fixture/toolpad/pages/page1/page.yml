@@ -11,21 +11,17 @@ spec:
           name: textField1
           props:
             label: textField1
-          children: []
         - component: TextField
           name: textField2
           props:
             label: textField2
-          children: []
     - component: PageRow
       name: pageRow1
       children:
         - component: Button
           name: button
-          children: []
         - component: Button
           name: button1
-          children: []
         - component: PageColumn
           name: pageColumn
           layout:
@@ -35,7 +31,6 @@ spec:
               name: button2
               layout:
                 columnSize: 1
-              children: []
             - component: PageRow
               name: pageRow2
               props:
@@ -45,9 +40,7 @@ spec:
                   name: button3
                   props:
                     content: last in column
-                  children: []
                 - component: Button
                   name: button4
                   props:
                     content: last in row
-                  children: []

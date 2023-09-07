@@ -6,7 +6,6 @@ spec:
   content:
     - component: Text
       name: t333
-      children: []
       layout:
         columnSize: 1
       props:

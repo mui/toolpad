@@ -7,7 +7,6 @@ spec:
   content:
     - component: codeComponent.FullWidth
       name: codeComponent_FullWidth
-      children: []
       layout:
         columnSize: 1
     - component: PageRow
@@ -17,9 +16,7 @@ spec:
           name: codeComponent_FullWidth1
           layout:
             columnSize: 0.3234265734265733
-          children: []
         - component: codeComponent.FullWidth
           name: codeComponent_FullWidth2
           layout:
             columnSize: 1.6765734265734267
-          children: []

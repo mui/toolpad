@@ -1019,7 +1019,9 @@ export default function RenderOverlay({ bridge }: RenderOverlayProps) {
 
             if ([DROP_ZONE_RIGHT, DROP_ZONE_LEFT].includes(dragOverZone)) {
               if (isOriginalParentLayout || !isDraggingOverHorizontalContainer) {
-                if (isOriginalParentLayout || isOriginalParentColumn) {
+                const hasNewPageRow = isOriginalParentLayout || isOriginalParentColumn;
+
+                if (hasNewPageRow) {
                   const rowContainer = appDom.createElement(draft, PAGE_ROW_COMPONENT_ID, {
                     justifyContent: originalParentInfo?.props.alignItems || 'start',
                   });
@@ -1051,17 +1053,12 @@ export default function RenderOverlay({ bridge }: RenderOverlayProps) {
                   draft,
                   draggedNode,
                   parent,
-                  isOriginalParentLayout || isOriginalParentColumn
-                    ? 'children'
-                    : dragOverNodeParentProp,
+                  hasNewPageRow ? 'children' : dragOverNodeParentProp,
                   newParentIndex,
                 );
 
                 // Only move existing element inside page/column in the end if drag over zone is left
-                if (
-                  (isOriginalParentLayout || isOriginalParentColumn) &&
-                  dragOverZone === DROP_ZONE_LEFT
-                ) {
+                if (hasNewPageRow && dragOverZone === DROP_ZONE_LEFT) {
                   draft = appDom.moveNode(draft, dragOverNode, parent, 'children');
                 }
               }

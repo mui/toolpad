@@ -8,14 +8,8 @@ Toolpad is primarily designed as an application framework for internal tool deve
 
 - Having to keep up with the fast evolving landscape of libraries, frameworks and best practices.
 - Lots of glue code is required to get backend data to the browser and hooked up to data displaying components.
-- As backends evolve, the internal applications need to evolve with them with minimal amount of maintenance required. 
+- As backends evolve, the internal applications need to evolve with them with minimal amount of maintenance required.
 - These applications typically don't undergo the same quality assurance processes as the external application.
-- ...?
-
-- it is not focused on frontend
-- it is difficult to keep up with the fast evolving landscape of frameworks, libraries and best practices
-- lots of glue code is required to display the data
-- it serves multiple stakeholders with varying needs
 
 Like any application, there are multiple points of failure that can lead to a sub-optimal user experience for end users (generally operations, finance, marketing teams). Since these don't go through rigorous quality assurance, failure chances are usually higher.
 
@@ -81,8 +75,7 @@ Toolpad ensures you have full control over your development lifecycle. Toolpad s
 
 ### Deployment
 
-You can build your app and deploy it like any other Node.js app, to any hosting provider of your choice (AWS, Render, Railway, Heroku etc.). Toolpad does not lock you in to its own cloud hosting. 
-
+You can build your app and deploy it like any other Node.js app, to any hosting provider of your choice (AWS, Render, Railway, Heroku etc.). Toolpad does not lock you in to its own cloud hosting.
 
 ### Collaboration and Sharing
 
@@ -97,4 +90,3 @@ The open-source nature of Toolpad also means that it is constantly being updated
 ## Conclusion
 
 Toolpad is a platform to build internal tools that are used for tasks like running marketing campaigns, data analysis, monitoring fraud, updating user data, and more. These tools often prioritise function over form.
-

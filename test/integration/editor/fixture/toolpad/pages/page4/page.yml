@@ -4,11 +4,11 @@ spec:
   id: K7SkHHH
   title: page2
   content:
-    - component: PageRow
-      name: pageRow1
-      children:
-        - component: Text
-          name: t333
-          props:
-            value: text-foo
+    - component: Text
+      name: t333
+      children: []
+      layout:
+        columnSize: 1
+      props:
+        value: text-foo
   display: shell

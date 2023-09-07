@@ -120,6 +120,38 @@ test('can delete elements from page', async ({ page }) => {
   await expect(canvasButtonLocator).toHaveCount(3);
 });
 
+test('can build component layout inside layout slots', async ({ page }) => {
+  const editorModel = new ToolpadEditor(page);
+
+  await editorModel.goToPageById('UTdiEYQ');
+
+  await editorModel.waitForOverlay();
+
+  const canvasInputLocator = editorModel.appCanvas.locator('input');
+
+  const dropAreaBoundingBox = await editorModel.appCanvas
+    .getByText('Drop component here')
+    .boundingBox();
+
+  await editorModel.dragNewComponentToCanvas(
+    'Text Field',
+    dropAreaBoundingBox!.x + dropAreaBoundingBox!.width / 2,
+    dropAreaBoundingBox!.y + dropAreaBoundingBox!.height / 2,
+  );
+
+  await expect(canvasInputLocator).toBeVisible();
+
+  const firstInputBoundingBox = await canvasInputLocator.boundingBox();
+
+  await editorModel.dragNewComponentToCanvas(
+    'Text Field',
+    firstInputBoundingBox!.x + firstInputBoundingBox!.width / 2,
+    firstInputBoundingBox!.y + firstInputBoundingBox!.height / 2,
+  );
+
+  await expect(canvasInputLocator).toHaveCount(2);
+});
+
 test('must correctly size new layout columns', async ({ page }) => {
   const editorModel = new ToolpadEditor(page);
 

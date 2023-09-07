@@ -1,4 +1,5 @@
 {
+  "installCommand": "npm install -g pnpm && pnpm install",
   "buildCommand": "release:build",
   "node": "16",
   "packages": [

@@ -1110,14 +1110,14 @@ function RenderedNodeContent({ node, childNodeGroups, Component }: RenderedNodeC
         const value = hookResult[propName];
 
         let wrappedValue = value;
-        if (argType.control?.type === 'slots') {
-          wrappedValue = <Slots prop={propName}>{value}</Slots>;
-        } else if (argType.control?.type === 'slot' || argType.control?.type === 'layoutSlot') {
+        if (argType.control?.type === 'slots' || argType.control?.type === 'layoutSlot') {
           wrappedValue = (
-            <Placeholder prop={propName} hasLayout={argType.control?.type === 'layoutSlot'}>
+            <Slots prop={propName} hasLayout={argType.control?.type === 'layoutSlot'}>
               {value}
-            </Placeholder>
+            </Slots>
           );
+        } else if (argType.control?.type === 'slot') {
+          wrappedValue = <Placeholder prop={propName}>{value}</Placeholder>;
         }
 
         if (isTemplate) {

@@ -38,7 +38,7 @@
     {
       "groupName": "node",
       "matchPackageNames": ["cimg/node", "node"],
-      "allowedVersions": "16.14.2"
+      "allowedVersions": "18.17.1"
     },
     {
       "description": "Ignore nodejs in engines",

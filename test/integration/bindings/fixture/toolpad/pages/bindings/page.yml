@@ -6,7 +6,6 @@ spec:
   content:
     - component: Text
       name: text
-      children: []
       layout:
         columnSize: 1
       props:
@@ -16,10 +15,9 @@ spec:
             { color: "primary.main", p: 2 }
     - component: Text
       name: text1
-      children: []
       layout:
         columnSize: 1
       props:
         sx:
-          $$jsExpression: "{"
+          $$jsExpression: '{'
         value: -test2-

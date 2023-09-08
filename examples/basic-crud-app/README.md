@@ -2,7 +2,7 @@
 
 <p class="description">An admin application to showcase how CRUD operations work in Toolpad.</p>
 
-<a href="https://stackblitz.com/fork/github/mui/mui-toolpad/tree/master/examples/basic-crud-app" target="_blank">
+<a href="https://basic-crud-app-production.up.railway.app/prod/" target="_blank">
   <img src="https://mui.com/static/toolpad/docs/examples/basic-crud-app.png" alt="Basic CRUD app" style="aspect-ratio: 1.8" width="100%">
 </a>
 

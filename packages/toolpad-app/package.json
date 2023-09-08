@@ -6,8 +6,8 @@
     "toolpad": "./cli.js"
   },
   "scripts": {
-    "build": "concurrently \"yarn:build:*\"",
-    "dev": "concurrently \"yarn:dev:*\"",
+    "build": "concurrently \"pnpm:build:*\"",
+    "dev": "concurrently \"pnpm:dev:*\"",
     "cli": "./cli.js",
     "lint": "prettier --check .",
     "fix": "prettier --write .",
@@ -15,7 +15,7 @@
     "build:editor": "vite build ./src/toolpad",
     "build:typings": "tsx ./scripts/typings.mts",
     "dev:cli": "tsup --watch",
-    "dev:typings": "yarn build:typings",
+    "dev:typings": "pnpm build:typings",
     "waitForApp": "tsx ./scripts/waitForApp.mts",
     "check-types": "tsup && tsc --noEmit",
     "test": "jest"

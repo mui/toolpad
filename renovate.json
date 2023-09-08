@@ -54,6 +54,11 @@
       "description": "Breaking changes in the types. https://github.com/storybookjs/react-inspector/issues/162"
     },
     {
+      "groupName": "node-fetch",
+      "matchPackageNames": ["node-fetch"],
+      "allowedVersions": "< 3.0.0"
+    },
+    {
       "groupName": "core-js",
       "matchPackageNames": ["core-js"],
       "allowedVersions": "< 2.0.0"

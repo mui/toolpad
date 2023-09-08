@@ -57,7 +57,7 @@ spec:
             value:
               $$jsExpression: >
                 `query4 authorization:
-                ${queryWithEnv?.data.headers.Authorization}`
+                ${queryWithEnv?.data.headers.authorization}`
   queries:
     - name: query1
       query:

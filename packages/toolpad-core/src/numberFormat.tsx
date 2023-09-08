@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { JSONSchema7 } from 'json-schema';
+import type { JSONSchema7 } from 'json-schema';
 import { TextField, MenuItem, SxProps, Stack, styled, Box } from '@mui/material';
 
 const ACCEPTABLE_CURRENCY_REGEX = /^[a-zA-Z]{3}$/;

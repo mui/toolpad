@@ -455,6 +455,15 @@ importers:
       '@types/inquirer':
         specifier: 9.0.3
         version: 9.0.3
+      '@types/invariant':
+        specifier: 2.2.35
+        version: 2.2.35
+      '@types/semver':
+        specifier: ^7.5.0
+        version: 7.5.0
+      '@types/yargs':
+        specifier: ^17.0.24
+        version: 17.0.24
       node-fetch:
         specifier: 2.7.0
         version: 2.7.0
@@ -543,6 +552,9 @@ importers:
       '@types/cors':
         specifier: 2.8.13
         version: 2.8.13
+      '@types/json-schema':
+        specifier: ^7.0.12
+        version: 7.0.12
       '@types/node':
         specifier: 20.5.9
         version: 20.5.9
@@ -4009,8 +4021,8 @@ packages:
     dependencies:
       '@babel/runtime': 7.22.11
       '@emotion/cache': 11.11.0
-      '@emotion/react': 11.11.1(@types/react@18.2.20)(react@18.2.0)
-      '@emotion/styled': 11.11.0(@emotion/react@11.11.1)(react@18.2.0)
+      '@emotion/react': 11.11.1(@types/react@18.2.21)(react@18.2.0)
+      '@emotion/styled': 11.11.0(@emotion/react@11.11.1)(@types/react@18.2.21)(react@18.2.0)
       csstype: 3.1.2
       prop-types: 15.8.1
       react: 18.2.0

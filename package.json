@@ -19,7 +19,6 @@
     "toolpad": "./dist/index.js"
   },
   "scripts": {
-    "codesandbox:install": "yarn config set ignore-engines true && yarn install",
     "markdownlint": "markdownlint-cli2 \"**/*.md\"",
     "prettier": "pretty-quick --ignore-path .eslintignore",
     "prettier:all": "prettier --write . --ignore-path .eslintignore",
@@ -110,6 +109,6 @@
   },
   "engines": {
     "npm": "please-use-yarn",
-    "node": ">=18.17.1"
+    "node": ">=18"
   }
 }

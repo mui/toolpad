@@ -28,7 +28,7 @@
     "test": "cross-env NODE_OPTIONS=--experimental-vm-modules jest --detectOpenHandles --forceExit"
   },
   "engines": {
-    "node": ">=18.17.1"
+    "node": ">=18"
   },
   "dependencies": {
     "@mui/toolpad-utils": "0.1.24",

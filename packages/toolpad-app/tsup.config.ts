@@ -39,6 +39,7 @@ export default defineConfig((options) => [
       'pretty-bytes',
       'latest-version',
       'nanoid',
+      'node-fetch',
     ],
     sourcemap: true,
     esbuildPlugins: [cleanFolderOnFailure(path.resolve(__dirname, './dist/cli'))],

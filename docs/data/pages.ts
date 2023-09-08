@@ -11,6 +11,7 @@ const pages: MuiPage[] = [
       { pathname: '/toolpad/getting-started/first-app', title: 'Build your first app' },
       {
         pathname: '/toolpad/examples-group',
+        title: 'Examples',
         children: [
           { pathname: '/toolpad/examples', title: 'Overview' },
           { pathname: '/toolpad/examples/npm-stats', title: 'npm stats' },
@@ -166,6 +167,10 @@ const pages: MuiPage[] = [
               {
                 title: 'createComponent',
                 pathname: '/toolpad/reference/api/create-component',
+              },
+              {
+                title: 'getContext',
+                pathname: '/toolpad/reference/api/get-context',
               },
             ],
           },

@@ -28,7 +28,8 @@ module.exports = {
           errorCodesPath,
           missingError,
         },
-        resolvePath: (source, basedir) => muiErrorMacro,
+        // TODO: Figure out dependency resolution for macros so this hack isn't needed.
+        resolvePath: () => muiErrorMacro,
       },
     ],
     'babel-plugin-optimize-clsx',

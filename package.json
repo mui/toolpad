@@ -19,6 +19,7 @@
     "toolpad": "./dist/index.js"
   },
   "scripts": {
+    "codesandbox:install": "npm install -g pnpm && pnpm install",
     "preinstall": "npx only-allow pnpm",
     "markdownlint": "markdownlint-cli2 \"**/*.md\"",
     "prettier": "pretty-quick --ignore-path .eslintignore",

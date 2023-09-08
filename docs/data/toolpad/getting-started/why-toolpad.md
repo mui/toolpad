@@ -13,12 +13,12 @@ Toolpad is primarily designed as an application framework for internal tool deve
 
 ## TLDR
 
-- **Integrates well with your existing code**. You can reuse your database models, client libraries, secrets, bespoke components
-- Integrates well with your **development lifecycle.** Your project lives on your own file system. You can use your own IDE, version control system, deployment target, CLI tools
-- Comes with a **Drag and drop builder** to simplify UI building
-- Sets **Healthy UI constraints** that prevent common pitfalls and anti-patterns
-- Lets you maintain a **single source of truth** for all business logic
-- **Less boilerplate** so you can focus on the important parts of the app
+- Integrates well with your existing code. You can reuse your database models, client libraries, secrets, bespoke components
+- Integrates well with your development lifecycle. Your project lives on your own file system. You can use your own IDE, version control system, deployment target, CLI tools
+- Comes with a Drag and drop builder to simplify UI building
+- Sets Healthy UI constraints that prevent common pitfalls and anti-patterns
+- Lets you maintain a single source of truth for all business logic
+- Less boilerplate so you can focus on the important parts of the app
 
 ## Market overview
 

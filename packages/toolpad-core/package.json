@@ -1,6 +1,6 @@
 {
   "name": "@mui/toolpad-core",
-  "version": "0.1.26",
+  "version": "0.1.27",
   "description": "Build MUI apps quickly",
   "author": "MUI Toolpad team",
   "homepage": "https://github.com/mui/mui-toolpad#readme",
@@ -40,8 +40,8 @@
     "url": "https://github.com/mui/mui-toolpad/issues"
   },
   "dependencies": {
-    "@mui/material": "5.14.7",
-    "@mui/toolpad-utils": "0.1.26",
+    "@mui/material": "5.14.8",
+    "@mui/toolpad-utils": "0.1.27",
     "@tanstack/react-query": "4.33.0",
     "@types/json-schema": "^7.0.12",
     "cookie": "0.5.0",
@@ -61,5 +61,5 @@
   "publishConfig": {
     "access": "public"
   },
-  "gitHead": "49cfb445013990e146a1d030f61a5ccf0b8d6029"
+  "gitHead": "342439583072ebcaaa3b3587517804e4fdfb9dcf"
 }

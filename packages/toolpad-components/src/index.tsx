@@ -32,6 +32,8 @@ export { default as Tabs } from './Tabs';
 
 export { default as Container } from './Container';
 
+export { default as Checkbox } from './Checkbox';
+
 export { default as Form } from './Form';
 
 export { default as Metric } from './Metric';

@@ -1,51 +1,15 @@
-import { once } from 'node:events';
-import { Worker, MessageChannel, MessagePort, isMainThread, parentPort } from 'worker_threads';
+import { Worker, MessageChannel, isMainThread, parentPort } from 'worker_threads';
 import * as path from 'path';
 import { createRequire } from 'node:module';
 import * as fs from 'fs/promises';
 import * as vm from 'vm';
 import * as url from 'url';
-import { errorFrom, serializeError } from '@mui/toolpad-utils/errors';
+import { getCircularReplacer, replaceRecursive } from '@mui/toolpad-utils/json';
 import { ServerContext, getServerContext, withContext } from '@mui/toolpad-core/serverRuntime';
 import { isWebContainer } from '@webcontainer/env';
-
-function getCircularReplacer() {
-  const ancestors: object[] = [];
-  return function replacer(this: object, key: string, value: unknown) {
-    if (typeof value !== 'object' || value === null) {
-      return value;
-    }
-    // `this` is the object that value is contained in,
-    // i.e., its direct parent.
-    while (ancestors.length > 0 && ancestors.at(-1) !== this) {
-      ancestors.pop();
-    }
-    if (ancestors.includes(value)) {
-      return '[Circular]';
-    }
-    ancestors.push(value);
-    return value;
-  };
-}
-
-type IntrospectedFiles = Map<string, { file: string }>;
-
-interface IntrospectMessage {
-  kind: 'introspect';
-  files: IntrospectedFiles;
-}
-
-interface ExecuteMessage {
-  kind: 'execute';
-  filePath: string;
-  name: string;
-  parameters: unknown[];
-  cookies?: Record<string, string>;
-}
-
-type WorkerMessage = IntrospectMessage | ExecuteMessage;
-
-type TransferredMessage = WorkerMessage & { port: MessagePort };
+import SuperJSON from 'superjson';
+import { createRpcClient, serveRpc } from '@mui/toolpad-utils/workerRpc';
+import { workerData } from 'node:worker_threads';
 
 interface ModuleObject {
   exports: Record<string, unknown>;
@@ -90,7 +54,19 @@ async function resolveFunctions(filePath: string): Promise<Record<string, Functi
   );
 }
 
-async function execute(msg: ExecuteMessage) {
+interface ExecuteParams {
+  filePath: string;
+  name: string;
+  parameters: unknown[];
+  cookies?: Record<string, string>;
+}
+
+interface ExecuteResult {
+  result: string;
+  newCookies: [string, string][];
+}
+
+async function execute(msg: ExecuteParams): Promise<ExecuteResult> {
   const fns = await resolveFunctions(msg.filePath);
 
   const fn = fns[msg.name];
@@ -98,72 +74,63 @@ async function execute(msg: ExecuteMessage) {
     throw new Error(`Function "${msg.name}" not found`);
   }
 
-  const newCookies = new Map<string, string>();
   let functionFinished = false;
-  const setCookie = (name: string, value: string) => {
-    if (functionFinished) {
-      throw new Error(`setCookie can't be called after the function has finished executing.`);
-    }
-    newCookies.set(name, value);
-  };
-  const ctx: ServerContext = {
-    cookies: msg.cookies || {},
-    setCookie,
-  };
+
   try {
+    const newCookies = new Map<string, string>();
+
+    const ctx: ServerContext = {
+      cookies: msg.cookies || {},
+      setCookie(name: string, value: string) {
+        if (functionFinished) {
+          throw new Error(`setCookie can't be called after the function has finished executing.`);
+        }
+        newCookies.set(name, value);
+      },
+    };
+
     const shouldBypassContext = isWebContainer();
+
     if (shouldBypassContext) {
       console.warn(
         'Bypassing server context in web containers, see https://github.com/stackblitz/core/issues/2711',
       );
     }
 
-    const result = shouldBypassContext
+    const rawResult = shouldBypassContext
       ? await fn(...msg.parameters)
       : await withContext(ctx, async () => fn(...msg.parameters));
 
-    return { result, newCookies: Array.from(newCookies.entries()) };
+    const withoutCircularRefs = replaceRecursive(rawResult, getCircularReplacer());
+    const serializedResult = SuperJSON.stringify(withoutCircularRefs);
+
+    return { result: serializedResult, newCookies: Array.from(newCookies.entries()) };
   } finally {
     functionFinished = true;
   }
 }
 
-async function handleMessage(msg: WorkerMessage) {
-  switch (msg.kind) {
-    case 'execute':
-      return execute(msg);
-    default:
-      throw new Error(`Unknown kind "${(msg as any).kind}"`);
-  }
-}
+type WorkerRpcServer = {
+  execute: typeof execute;
+};
 
 if (!isMainThread && parentPort) {
-  parentPort.on('message', (msg: TransferredMessage) => {
-    (async () => {
-      try {
-        const result = await handleMessage(msg);
-        msg.port.postMessage({ result: JSON.stringify(result, getCircularReplacer()) });
-      } catch (rawError) {
-        msg.port.postMessage({ error: serializeError(errorFrom(rawError)) });
-      }
-    })();
+  serveRpc<WorkerRpcServer>(workerData.workerRpcPort, {
+    execute,
   });
 }
 
 export function createWorker(env: Record<string, any>) {
-  const worker = new Worker(path.join(__dirname, 'functionsDevWorker.js'), { env });
+  const workerRpcChannel = new MessageChannel();
+  const worker = new Worker(path.join(__dirname, 'functionsDevWorker.js'), {
+    env,
+    workerData: {
+      workerRpcPort: workerRpcChannel.port1,
+    },
+    transferList: [workerRpcChannel.port1],
+  });
 
-  const runOnWorker = async (msg: WorkerMessage) => {
-    const { port1, port2 } = new MessageChannel();
-    worker.postMessage({ port: port1, ...msg } satisfies TransferredMessage, [port1]);
-    const [{ error, result }] = await once(port2, 'message');
-
-    if (error) {
-      throw errorFrom(error);
-    }
-
-    return result ? JSON.parse(result) : undefined;
-  };
+  const client = createRpcClient(workerRpcChannel.port2);
 
   return {
     async terminate() {
@@ -172,7 +139,8 @@ export function createWorker(env: Record<string, any>) {
 
     async execute(filePath: string, name: string, parameters: unknown[]): Promise<any> {
       const ctx = getServerContext();
-      const { result, newCookies } = await runOnWorker({
+
+      const { result: serializedResult, newCookies } = await client.execute({
         kind: 'execute',
         filePath,
         name,
@@ -185,6 +153,8 @@ export function createWorker(env: Record<string, any>) {
           ctx.setCookie(cookieName, cookieValue);
         }
       }
+
+      const result = SuperJSON.parse(serializedResult);
 
       return result;
     },

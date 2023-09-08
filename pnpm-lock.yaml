@@ -458,6 +458,9 @@ importers:
       '@types/invariant':
         specifier: 2.2.35
         version: 2.2.35
+      '@types/node-fetch':
+        specifier: 2.6.4
+        version: 2.6.4
       '@types/semver':
         specifier: ^7.5.0
         version: 7.5.0
@@ -467,6 +470,12 @@ importers:
       node-fetch:
         specifier: 2.7.0
         version: 2.7.0
+
+  packages/create-toolpad-app/tests/test-app-TWFjKz:
+    dependencies:
+      '@mui/toolpad':
+        specifier: workspace:^
+        version: link:../../../toolpad-app
 
   packages/eslint-plugin-material-ui:
     dependencies:

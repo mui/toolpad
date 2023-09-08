@@ -4,16 +4,16 @@
 
 ## Adding a global theme
 
+<video controls width="auto" height="100%" style="contain" alt="custom-component-creation">
+  <source src="/static/toolpad/docs/concepts/theming/theme-1.mp4" type="video/mp4">
+  Your browser does not support the video tag.
+</video>
+
 1. In order to use a custom theme, go to the **Theme** tab in the inspector panel and click on **Add theme**:
-
-{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/concepts/theming/theme-1.png", "alt": "Add theme", "caption": "Adding a theme via the Theme tab", "indent": 1 }}
-
 2. In the theme options you can:
 
    - change your UI to light or dark mode.
    - set primary and secondary colors for your UI, from a predefined list of colors.
-
-{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/concepts/theming/theme-2.png", "alt": "Add theme", "caption": "Adding a theme via the Theme tab", "indent": 2 }}
 
 3. The theme used in a project is configured by an auto-generated `theme.yml` file inside the `toolpad` folder.
 

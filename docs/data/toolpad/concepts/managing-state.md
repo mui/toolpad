@@ -50,22 +50,15 @@ You may also bind the page parameter values to the page state of the source page
 
 Page parameters allow you to pass external data into the Toolpad page state via the URL query parameters.
 
+<video controls width="auto" height="100%" style="contain" alt="custom-component-creation">
+  <source src="/static/toolpad/docs/concepts/managing-state/page-parameter-1.mp4" type="video/mp4">
+  Your browser does not support the video tag.
+</video>
+
 ### Setting parameters
 
-You can set page parameters through the option to do so available in the **Inspector** when no component is selected.
-
-{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/concepts/managing-state/page-parameters.png", "alt": "Page parameters", "caption": "Page parameters" }}
-
-In the editor, you can add multiple parameters along with a default value for each:
-
-{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/concepts/managing-state/add-page-params.png", "alt": "Page parameters", "caption": "Page parameters", "zoom": false }}
+You can set page parameters through the option to do so available in the **Inspector** when no component is selected. You can add multiple parameters along with a default value for each.
 
 ### Using parameters
 
-The parameters that you add are made available in the **scope** for data binding under the `page.parameters` global variable.
-
-{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/concepts/managing-state/binding-page-params.png", "alt": "Using page parameters", "caption": "Using page parameters in bindings" }}
-
-The value that the parameter assumes at runtime is the value that is passed in through a URL query parameter.
-
-{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/concepts/managing-state/page-parameters-showcase.png", "alt": "Page parameters on runtime", "caption": "Runtime value passed in through a URL query parameter ", "aspectRatio": 2.7 }}
+The parameters that you add are made available in the **scope** for data binding under the `page.parameters` global variable. The value that the parameter assumes at runtime is the value that is passed in through a URL query parameter.

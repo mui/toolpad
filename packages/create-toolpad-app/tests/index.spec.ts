@@ -6,6 +6,7 @@ import { Readable } from 'stream';
 import { execa, ExecaChildProcess } from 'execa';
 import { jest } from '@jest/globals';
 import { once } from 'events';
+import fetch from 'node-fetch';
 
 jest.setTimeout(process.env.CI ? 60000 : 600000);
 

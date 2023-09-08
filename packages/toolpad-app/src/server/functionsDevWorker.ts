@@ -5,6 +5,7 @@ import { createRequire } from 'node:module';
 import * as fs from 'fs/promises';
 import * as vm from 'vm';
 import * as url from 'url';
+import fetch, { Headers, Request, Response } from 'node-fetch';
 import { errorFrom, serializeError } from '@mui/toolpad-utils/errors';
 import { ServerContext, getServerContext, withContext } from '@mui/toolpad-core/serverRuntime';
 import { isWebContainer } from '@webcontainer/env';
@@ -138,6 +139,18 @@ async function handleMessage(msg: WorkerMessage) {
 }
 
 if (!isMainThread && parentPort) {
+  // Polyfill fetch() in the Node.js environment
+  if (!global.fetch) {
+    // @ts-expect-error
+    global.fetch = fetch;
+    // @ts-expect-error
+    global.Headers = Headers;
+    // @ts-expect-error
+    global.Request = Request;
+    // @ts-expect-error
+    global.Response = Response;
+  }
+
   parentPort.on('message', (msg: TransferredMessage) => {
     (async () => {
       try {

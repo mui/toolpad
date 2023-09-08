@@ -1,3 +1,4 @@
+import '../utils/fetchPolyfill';
 import { ConsoleMessage, test as base } from '@playwright/test';
 import { createRpcClient, RpcClient } from '../../packages/toolpad-app/src/rpcClient';
 import type { ServerDefinition } from '../../packages/toolpad-app/src/server/rpc';

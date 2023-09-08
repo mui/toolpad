@@ -1,6 +1,6 @@
 # Why Toolpad?
 
-<p class="description">This doc explains our motivation for building Toolpad, where it differs from other tools and how it could be useful to you.</p>
+<p class="description">Explains our motivation for building Toolpad, where it differs from other tools and how it could be useful to you.</p>
 
 ## Introduction
 

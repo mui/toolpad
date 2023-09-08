@@ -179,7 +179,7 @@ const pages: MuiPage[] = [
   },
   {
     pathname: '/toolpad/live-config',
-    title: 'Live config',
+    title: 'Live configuration',
   },
 ];
 

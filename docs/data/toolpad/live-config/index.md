@@ -24,7 +24,7 @@ Click the edit button to open the live configurator. Hit save when you're done a
 
 {{"demo": "BasicExampleGrid.js", "hideToolbar": true}}
 
-## installation
+## Installation
 
 To try this out in your project, follow these steps:
 

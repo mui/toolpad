@@ -2,7 +2,6 @@
 
 <p class="description">Update your datagrid configuration straight in your application</p>
 
-## Live configurators
 
 The live configurators concept enhances the MUI X components workflow. It renders a playground for your data components right inside your application. Any change you make will immediately be persisted in your project. Toolpad produces performant and production ready code as if you write it by hand.
 

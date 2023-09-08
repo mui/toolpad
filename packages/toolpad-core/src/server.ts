@@ -1,10 +1,8 @@
 /// <reference path="./serverModules.d.ts" />
 
-import { AsyncLocalStorage } from 'node:async_hooks';
-import { IncomingMessage } from 'node:http';
-import * as cookie from 'cookie';
 import { TOOLPAD_FUNCTION } from './constants';
 import { InferParameterType, PrimitiveValueType, PropValueType } from './types';
+import { ServerContext, getServerContext } from './serverRuntime';
 
 /**
  * The runtime configuration for a Toolpad function. Describes the parameters it accepts and their
@@ -89,27 +87,25 @@ export function createFunction<
  */
 export const createQuery = createFunction;
 
-export interface ServerContext {
-  cookies: Record<string, string>;
-}
+export type { ServerContext };
 
-const asyncLocalStorage = new AsyncLocalStorage<ServerContext>();
-
+/**
+ * Interact with the server context of a Toolpad application.
+ * This function is only callable from within a Toolpad function.
+ *
+ * Demos:
+ *
+ * - [Custom Functions](https://mui.com/toolpad/concepts/custom-functions/#request-context/)
+ *
+ * API:
+ *
+ * - [getContext API](https://mui.com/toolpad/reference/api/get-context)
+ *
+ */
 export function getContext(): ServerContext {
-  const ctx = asyncLocalStorage.getStore();
+  const ctx = getServerContext();
   if (!ctx) {
     throw new Error('getContext() must be called from within a Toolpad function.');
   }
   return ctx;
-}
-
-export function createServerContext(req: IncomingMessage): ServerContext {
-  const cookies = cookie.parse(req.headers.cookie || '');
-  return {
-    cookies,
-  };
-}
-
-export function withContext<R = void>(ctx: ServerContext, doWork: () => Promise<R>): Promise<R> {
-  return asyncLocalStorage.run(ctx, doWork);
 }

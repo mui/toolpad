@@ -1,5 +1,104 @@
 # Changelog
 
+## 0.1.27
+
+<!-- generated comparing v0.1.26..master -->
+
+_Sep 6, 2023_
+
+A big thanks to the 8 contributors who made this release possible. Here are some highlights ✨:
+
+Add support for setting cookies inside custom functions, add a Checkbox component and link docs to more places inside the app!
+
+- &#8203;<!-- 25 -->Fix stackblitz issues with setCookie (#2641) @Janpot
+- &#8203;<!-- 24 -->Support setCookie API (#2630) @Janpot
+- &#8203;<!-- 23 -->Replace @mui/lab with @mui/x-tree-view (#2639) @Janpot
+- &#8203;<!-- 22 -->Fix TreeView types after core update (#2634) @Janpot
+- &#8203;<!-- 21 -->[Toolpad Editor] Add tooltip to custom component subtitle (#2612) @rohanprasadofficial
+- &#8203;<!-- 20 -->[Toolpad Editor] Fix Markdown text alignment issue (#2591) @rohanprasadofficial
+- &#8203;<!-- 19 -->[Toolpad Editor] Fix : text component alignment rendering (#2587) @rohanprasadofficial
+- &#8203;<!-- 18 -->fix add a new property placeholder (#2622) @JerryWu1234
+- &#8203;<!-- 17 -->Improve visual test for resizing columns (#2610) @apedroferreira
+- &#8203;<!-- 16 -->Disallow binding to event handlers and list templates (#2600) @Janpot
+- &#8203;<!-- 15 -->Exclude esm folder from icons alias (#2606) @Janpot
+- &#8203;<!-- 14 -->add checkbox (#2494) @JerryWu1234
+- &#8203;<!-- 13 -->Fix typo in the code snippet of createComponent API (#2605) @Janpot
+- &#8203;<!-- 12 -->Lock file maintenance (#2604) @renovate[bot]
+- &#8203;<!-- 11 -->Lock file maintenance (#2603) @renovate[bot]
+- &#8203;<!-- 10 -->[core] Finish migration to GA4 @oliviertassinari
+- &#8203;<!-- 09 -->[docs] Add live apps link to the homepage examples (#2633) @prakhargupta1
+- &#8203;<!-- 08 -->[docs] Rename Examples group (#2628) @bharatkashyap
+- &#8203;<!-- 07 -->[docs] Open docs link in a new page @oliviertassinari
+- &#8203;<!-- 06 -->[docs] Fix references @oliviertassinari
+- &#8203;<!-- 05 -->[docs] Fix shell layout @oliviertassinari
+- &#8203;<!-- 04 -->[docs] Clean-up examples (#2611) @oliviertassinari
+- &#8203;<!-- 03 -->[docs] Official URL (#2609) @oliviertassinari
+- &#8203;<!-- 02 -->[refactor] Move Toolpad runtime to the RPC mechanism (#2582) @Janpot
+- &#8203;<!-- 01 -->[website] Fix `NpmCopyButton` placement (#2640) @bharatkashyap
+
+All contributors of this release in alphabetical order: @apedroferreira, @bharatkashyap, @Janpot, @JerryWu1234, @oliviertassinari, @prakhargupta1, @renovate[bot], @rohanprasadofficial
+
+## 0.1.26
+
+<!-- generated comparing v0.1.25..master -->
+
+_Aug 31, 2023_
+
+A big thanks to the 8 contributors who made this release possible. Here are some highlights ✨:
+
+Improve date columns on the grid, Support `Intl` in bindings.
+
+- &#8203;<!-- 22 -->Add visual regression tests for text component (#2593) @Janpot
+- &#8203;<!-- 21 -->Auto-create a theme when the user starts editing (#2594) @Janpot
+- &#8203;<!-- 20 -->Show page parameters in url form and add link to docs (#2577) @Kirera-Wainaina
+- &#8203;<!-- 19 -->[Toolpad Editor] Add tooltip to display more dropdown (#2590) @rohanprasadofficial
+- &#8203;<!-- 18 -->Stabilize query editor screenshots (#2584) @Janpot
+- &#8203;<!-- 17 -->[Toolpad Editor] Add themes docs link to theme panel (#2583) @rohanprasadofficial
+- &#8203;<!-- 16 -->Bypass server context for stackblitz (#2579) @Janpot
+- &#8203;<!-- 15 -->Improve columns editor UX (#2570) @Janpot
+- &#8203;<!-- 14 -->Allow using Intl in bindings (#2586) @Janpot
+- &#8203;<!-- 13 -->Stabilize visual regression test (#2574) @Janpot
+- &#8203;<!-- 12 -->fix 2467_AutoComplete (#2540) @JerryWu1234
+- &#8203;<!-- 11 -->Allow theme files to not specify a palette (#2556) @Janpot
+- &#8203;<!-- 10 -->Auto parse date strings on data grids (#2371) @bharatkashyap
+- &#8203;<!-- 09 -->Fix query editor panels orientation (#2557) @Janpot
+- &#8203;<!-- 08 -->Remove lodash from @mui/components (#2545) @Janpot
+- &#8203;<!-- 07 -->Update monorepo (#2544) @apedroferreira
+- &#8203;<!-- 06 -->Refactor Toolpad App Navigation (#2535) @Janpot
+- &#8203;<!-- 05 -->[core] Remove dead code (#2580) @oliviertassinari
+- &#8203;<!-- 04 -->[core] Remove S3 orb from circleci config (#2547) @Janpot
+- &#8203;<!-- 03 -->[docs] add graphQL to overview page and add 2 readme docs (#2576) @prakhargupta1
+- &#8203;<!-- 02 -->[Docs] Add initial steps of creating a custom component (#2534) @prakhargupta1
+- &#8203;<!-- 01 -->[website] Add GA4 events (#2532) @bharatkashyap
+
+All contributors of this release in alphabetical order: @apedroferreira, @bharatkashyap, @Janpot, @JerryWu1234, @Kirera-Wainaina, @oliviertassinari, @prakhargupta1, @rohanprasadofficial
+
+## 0.1.25
+
+<!-- generated comparing v0.1.24..master -->
+
+_Aug 23, 2023_
+
+A big thanks to the 4 contributors who made this release possible. Here are some highlights ✨:
+
+Add GraphQL example app, add descriptions to component docs, improve resizable panels, improve custom component creation UX, simplify page layouts.
+
+- &#8203;<!-- 13 -->Stall package updates for dependencies that require node 18 (#2533) @Janpot
+- &#8203;<!-- 12 -->Add more examples page (#2447) @prakhargupta1
+- &#8203;<!-- 11 -->React resizable panels (#2398) @Janpot
+- &#8203;<!-- 10 -->Make module exports compatible with node module resolution in typescript (#2522) @Janpot
+- &#8203;<!-- 09 -->Require a helperText for builtin components and argTypes (#2456) @Janpot
+- &#8203;<!-- 08 -->Fix esbuild warning (#2521) @Janpot
+- &#8203;<!-- 07 -->Improve open code editor snackbar (#2520) @Janpot
+- &#8203;<!-- 06 -->Add graphQL example (#2471) @prakhargupta1
+- &#8203;<!-- 05 -->Update bug template to ask for specific environment (#2513) @Janpot
+- &#8203;<!-- 04 -->Add an explanation on why we use structuredClone in the canvas (#2514) @Janpot
+- &#8203;<!-- 03 -->Avoid single child layout containers (#2388) @apedroferreira
+- &#8203;<!-- 02 -->[docs] Add 'Miscellaneous' section to How-to guides (#2524) @bharatkashyap
+- &#8203;<!-- 01 -->[website] Fix typo (#2530) @bharatkashyap
+
+All contributors of this release in alphabetical order: @apedroferreira, @bharatkashyap, @Janpot, @prakhargupta1
+
 ## 0.1.24
 
 <!-- generated comparing v0.1.23..master -->
@@ -343,7 +442,7 @@ Add new reference documentation, add new QR-code example.
 - &#8203;<!-- 10 -->Add 404 page to application runtime (#2077) @Janpot
 - &#8203;<!-- 09 -->Avoid component catalog opening while hovering the snackbar (#2079) @Janpot
 - &#8203;<!-- 08 -->Fix broken documentation links (#2076) @Janpot
-- &#8203;<!-- 07 -->Add new example for QR code generator (#2067) @Janpot
+- &#8203;<!-- 07 -->Add new example for QR Code generator (#2067) @Janpot
 - &#8203;<!-- 06 -->Avoid restarting vite devserver when env file changes (#2069) @Janpot
 - &#8203;<!-- 05 -->Reference documentation (#2001) @Janpot
 - &#8203;<!-- 04 -->Fix websocket connection in codesandbox (#2068) @Janpot

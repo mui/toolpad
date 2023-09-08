@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Box, ToggleButton, ToggleButtonGroup, Typography } from '@mui/material';
+import { ToggleButton, ToggleButtonGroup, Typography } from '@mui/material';
 import AlignverticalTopIcon from '@mui/icons-material/AlignVerticalTop';
 import AlignVerticalCenterIcon from '@mui/icons-material/AlignVerticalCenter';
 import AlignVerticalBottomIcon from '@mui/icons-material/AlignVerticalBottom';
@@ -21,7 +21,7 @@ function VerticalAlignPropEditor({
 
   return (
     <PropertyControl propType={propType}>
-      <Box>
+      <div>
         {label ? <Typography variant="body2">{label}:</Typography> : null}
         <ToggleButtonGroup
           exclusive
@@ -40,7 +40,7 @@ function VerticalAlignPropEditor({
             <AlignVerticalBottomIcon />
           </ToggleButton>
         </ToggleButtonGroup>
-      </Box>
+      </div>
     </PropertyControl>
   );
 }

@@ -20,4 +20,10 @@ export async function expectBasicPageContent(page: Page) {
     page.getByText("Raw text: Hello, I'm raw text! | SELECT NOW()", { exact: true }),
   ).toBeVisible();
   await expect(page.getByText('my custom cookie: foo-bar-baz', { exact: true })).toBeVisible();
+
+  await page.getByRole('button', { name: 'set cookie' }).click();
+
+  await expect(
+    page.getByText('my custom cookie: hello everybody!!!', { exact: true }),
+  ).toBeVisible();
 }

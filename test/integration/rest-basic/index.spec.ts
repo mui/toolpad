@@ -50,7 +50,7 @@ test('rest runtime basics', async ({ page, localApp }) => {
   });
 });
 
-test('rest editor basics', async ({ page, context, localApp }) => {
+test('rest editor basics', async ({ page, context, localApp, argosScreenshot }) => {
   const editorModel = new ToolpadEditor(page);
   await editorModel.goto();
   await editorModel.waitForOverlay();
@@ -61,6 +61,14 @@ test('rest editor basics', async ({ page, context, localApp }) => {
   const newQueryEditor = page.getByRole('dialog', { name: 'query' });
 
   await expect(newQueryEditor).toBeVisible();
+
+  const urlInput = newQueryEditor.getByLabel('url', { exact: true });
+  await urlInput.click();
+  await urlInput.fill('http://foo.bar');
+
+  await argosScreenshot('rest-editor', {
+    clip: (await newQueryEditor.boundingBox()) || undefined,
+  });
 
   const envFilePath = path.resolve(localApp.dir, './.env');
   await withTemporaryEdits(envFilePath, async () => {

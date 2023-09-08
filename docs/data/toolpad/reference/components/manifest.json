@@ -22,6 +22,10 @@
           "pathname": "/toolpad/reference/components/chart"
         },
         {
+          "title": "Checkbox",
+          "pathname": "/toolpad/reference/components/checkbox"
+        },
+        {
           "title": "Container",
           "pathname": "/toolpad/reference/components/container"
         },

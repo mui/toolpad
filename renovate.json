@@ -59,15 +59,6 @@
       "allowedVersions": "< 3.0.0"
     },
     {
-      "groupName": "Next.js",
-      "matchPackageNames": [
-        "next",
-        "@next/eslint-plugin-next",
-        "@next/bundle-analyzer",
-        "eslint-config-next"
-      ]
-    },
-    {
       "groupName": "core-js",
       "matchPackageNames": ["core-js"],
       "allowedVersions": "< 2.0.0"
@@ -88,7 +79,12 @@
     {
       "groupName": "monaco-editor",
       "matchPackageNames": ["monaco-editor"],
-      "description": "We're having trouble upgading monaco-editor to >0.40."
+      "description": "We're having trouble upgrading monaco-editor to >0.40."
+    },
+    {
+      "groupName": "requires-node-18",
+      "matchPackageNames": ["execa"],
+      "description": "Stalling updates until we break compatibility with Node 16"
     },
     {
       "groupName": "Update @mui/toolpad in examples",

@@ -1,6 +1,6 @@
 {
   "name": "@mui/toolpad-utils",
-  "version": "0.1.24",
+  "version": "0.1.27",
   "description": "Build MUI apps quickly",
   "author": "MUI Toolpad team",
   "homepage": "https://github.com/mui/mui-toolpad#readme",
@@ -37,7 +37,6 @@
     "url": "git+https://github.com/mui/mui-toolpad.git"
   },
   "scripts": {
-    "prebuild": "rimraf dist",
     "build": "tsup",
     "dev": "tsup --watch",
     "check-types": "tsup && tsc --noEmit",
@@ -55,12 +54,12 @@
   "dependencies": {
     "invariant": "2.2.4",
     "react-is": "18.2.0",
-    "yaml": "2.3.1",
+    "yaml": "2.3.2",
     "yaml-diff-patch": "2.0.0"
   },
   "devDependencies": {
     "@types/invariant": "2.2.35",
     "@types/react-is": "18.2.1"
   },
-  "gitHead": "02f3e1819b3da86f142dd47fc6b2226cea867fa8"
+  "gitHead": "342439583072ebcaaa3b3587517804e4fdfb9dcf"
 }

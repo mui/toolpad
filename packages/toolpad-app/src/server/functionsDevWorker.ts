@@ -6,7 +6,8 @@ import * as fs from 'fs/promises';
 import * as vm from 'vm';
 import * as url from 'url';
 import { errorFrom, serializeError } from '@mui/toolpad-utils/errors';
-import { ServerContext, getContext, withContext } from '@mui/toolpad-core/server';
+import { ServerContext, getServerContext, withContext } from '@mui/toolpad-core/serverRuntime';
+import { isWebContainer } from '@webcontainer/env';
 
 function getCircularReplacer() {
   const ancestors: object[] = [];
@@ -39,7 +40,7 @@ interface ExecuteMessage {
   filePath: string;
   name: string;
   parameters: unknown[];
-  ctx: ServerContext;
+  cookies?: Record<string, string>;
 }
 
 type WorkerMessage = IntrospectMessage | ExecuteMessage;
@@ -97,11 +98,34 @@ async function execute(msg: ExecuteMessage) {
     throw new Error(`Function "${msg.name}" not found`);
   }
 
-  const result = await withContext(msg.ctx, async () => {
-    return fn(...msg.parameters);
-  });
+  const newCookies = new Map<string, string>();
+  let functionFinished = false;
+  const setCookie = (name: string, value: string) => {
+    if (functionFinished) {
+      throw new Error(`setCookie can't be called after the function has finished executing.`);
+    }
+    newCookies.set(name, value);
+  };
+  const ctx: ServerContext = {
+    cookies: msg.cookies || {},
+    setCookie,
+  };
+  try {
+    const shouldBypassContext = isWebContainer();
+    if (shouldBypassContext) {
+      console.warn(
+        'Bypassing server context in web containers, see https://github.com/stackblitz/core/issues/2711',
+      );
+    }
 
-  return result;
+    const result = shouldBypassContext
+      ? await fn(...msg.parameters)
+      : await withContext(ctx, async () => fn(...msg.parameters));
+
+    return { result, newCookies: Array.from(newCookies.entries()) };
+  } finally {
+    functionFinished = true;
+  }
 }
 
 async function handleMessage(msg: WorkerMessage) {
@@ -147,14 +171,22 @@ export function createWorker(env: Record<string, any>) {
     },
 
     async execute(filePath: string, name: string, parameters: unknown[]): Promise<any> {
-      const ctx = getContext();
-      return runOnWorker({
+      const ctx = getServerContext();
+      const { result, newCookies } = await runOnWorker({
         kind: 'execute',
         filePath,
         name,
         parameters,
-        ctx,
+        cookies: ctx?.cookies,
       });
+
+      if (ctx) {
+        for (const [cookieName, cookieValue] of newCookies) {
+          ctx.setCookie(cookieName, cookieValue);
+        }
+      }
+
+      return result;
     },
   };
 }

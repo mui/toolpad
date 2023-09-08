@@ -471,12 +471,6 @@ importers:
         specifier: 2.7.0
         version: 2.7.0
 
-  packages/create-toolpad-app/tests/test-app-TWFjKz:
-    dependencies:
-      '@mui/toolpad':
-        specifier: workspace:^
-        version: link:../../../toolpad-app
-
   packages/eslint-plugin-material-ui:
     dependencies:
       emoji-regex:

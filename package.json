@@ -20,7 +20,7 @@
   },
   "scripts": {
     "preinstall": "npx only-allow pnpm",
-    "install:codesandbox": "npm install -g pnpm && PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1 pnpm install --no-frozen-lockfile",
+    "install:codesandbox": "pnpm add -g pnpm && PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1 pnpm install --no-frozen-lockfile",
     "markdownlint": "markdownlint-cli2 \"**/*.md\"",
     "prettier": "pretty-quick --ignore-path .eslintignore",
     "prettier:all": "prettier --write . --ignore-path .eslintignore",
@@ -49,7 +49,7 @@
   "devDependencies": {
     "@argos-ci/core": "^0.9.0",
     "@jest/globals": "29.6.4",
-    "@mui/monorepo": "https://github.com/mui/material-ui.git",
+    "@mui/monorepo": "github:mui/material-ui",
     "@next/eslint-plugin-next": "13.4.19",
     "@playwright/test": "1.37.1",
     "@testing-library/jest-dom": "6.1.2",

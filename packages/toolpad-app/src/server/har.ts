@@ -1,10 +1,6 @@
 import { withHar as withHarOriginal } from 'node-fetch-har';
 import fetch, { Request } from 'node-fetch';
 
-fetch('', {
-  compress: true,
-});
-
 const withHarInstrumentation: typeof withHarOriginal = function withHar(fetchFn, options) {
   const withHarFetch = withHarOriginal(fetchFn, options);
 

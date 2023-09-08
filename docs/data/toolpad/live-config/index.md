@@ -22,7 +22,7 @@ The live configurators concept enhances the MUI X components workflow. It render
 
 Click the edit button to open the live configurator. Hit save when you're done and see the page update.
 
-{{"demo": "BasicExampleGrid.js"}}
+{{ "demo": "BasicExampleGrid.js", "hideToolbar": true }}
 
 ## installation
 

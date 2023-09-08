@@ -12,7 +12,7 @@
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "@mui/material": "latest",
-    "@mui/toolpad-next": "0.1.26",
+    "@mui/toolpad-next": "0.1.27",
     "@mui/x-data-grid": "latest"
   },
   "devDependencies": {

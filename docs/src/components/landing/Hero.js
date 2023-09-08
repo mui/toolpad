@@ -10,7 +10,6 @@ import SvgMuiLogo from 'docs/src/icons/SvgMuiLogomark';
 import IconImage from 'docs/src/components/icon/IconImage';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import GradientText from 'docs/src/components/typography/GradientText';
-// import GetStartedButtons from './GetStartedButtons';
 import GetStartedButtons from 'docs/src/components/home/GetStartedButtons';
 import GithubStars from './GithubStars';
 import CodeBlock from './CodeBlock';

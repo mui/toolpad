@@ -1,10 +1,10 @@
 {
   "extends": "../tsconfig.json",
   "compilerOptions": {
-    "paths": {
-      "docs/*": ["../node_modules/@mui/monorepo/docs/*"],
-      "@mui/toolpad-next/runtime": ["../packages/toolpad-next/src/runtime/index.tsx"]
-    },
+    // "paths": {
+    //   "docs/*": ["./node_modules/@mui/monorepo/docs/*"],
+    //   "@mui/toolpad-next/runtime": ["../packages/toolpad-next/src/runtime/index.tsx"]
+    // },
     "isolatedModules": true,
     /* files are emitted by babel */
     "noEmit": true,

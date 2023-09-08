@@ -11,4 +11,9 @@ export type Branded<A, B> = A & Brand<B>;
 export type Expand<T> = T extends infer O ? { [K in keyof O]: O[K] } : never;
 export type ExpandNested<T> = T extends infer O ? { [K in keyof O]: Expand<O[K]> } : never;
 
+/**
+ * The inverse of Awaited.
+ */
+export type Awaitable<T> = T | Promise<T> | PromiseLike<T>;
+
 export {};

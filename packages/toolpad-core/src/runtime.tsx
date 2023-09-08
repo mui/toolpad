@@ -173,10 +173,9 @@ export function useNode<P = {}>(): NodeRuntime<P> | null {
 export interface PlaceholderProps {
   prop: string;
   children?: React.ReactNode;
-  hasLayout?: boolean;
 }
 
-export function Placeholder({ prop, children, hasLayout = false }: PlaceholderProps) {
+export function Placeholder({ prop, children }: PlaceholderProps) {
   const { nodeId } = React.useContext(NodeRuntimeContext);
   if (!nodeId) {
     return <React.Fragment>{children}</React.Fragment>;
@@ -189,7 +188,7 @@ export function Placeholder({ prop, children, hasLayout = false }: PlaceholderPr
       parentId={nodeId}
       {...{
         [RUNTIME_PROP_SLOTS]: prop,
-        slotType: hasLayout ? 'layout' : 'single',
+        slotType: 'single',
       }}
     />
   );
@@ -198,9 +197,10 @@ export function Placeholder({ prop, children, hasLayout = false }: PlaceholderPr
 export interface SlotsProps {
   prop: string;
   children?: React.ReactNode;
+  hasLayout?: boolean;
 }
 
-export function Slots({ prop, children }: SlotsProps) {
+export function Slots({ prop, children, hasLayout = false }: SlotsProps) {
   const { nodeId } = React.useContext(NodeRuntimeContext);
   if (!nodeId) {
     return <React.Fragment>{children}</React.Fragment>;
@@ -211,7 +211,7 @@ export function Slots({ prop, children }: SlotsProps) {
       parentId={nodeId}
       {...{
         [RUNTIME_PROP_SLOTS]: prop,
-        slotType: 'multiple',
+        slotType: hasLayout ? 'layout' : 'multiple',
       }}
     >
       {children}

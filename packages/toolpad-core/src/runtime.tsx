@@ -39,7 +39,6 @@ interface SlotsWrapperProps {
   children?: React.ReactNode;
   // eslint-disable-next-line react/no-unused-prop-types
   [RUNTIME_PROP_SLOTS]: string;
-  // eslint-disable-next-line react/no-unused-prop-types
   slotType: SlotType;
   // eslint-disable-next-line react/no-unused-prop-types
   parentId: string;

@@ -9,9 +9,10 @@ const pages: MuiPage[] = [
       { pathname: '/toolpad/getting-started/installation' },
       { pathname: '/toolpad/getting-started/first-app', title: 'Build your first app' },
       {
-        pathname: '/toolpad/examples',
+        pathname: '/toolpad/examples-group',
+        title: 'Examples',
         children: [
-          { pathname: '/toolpad/examples/overview', title: 'Overview' },
+          { pathname: '/toolpad/examples', title: 'Overview' },
           { pathname: '/toolpad/examples/npm-stats', title: 'npm stats' },
           { pathname: '/toolpad/examples/basic-crud-app', title: 'Basic CRUD application' },
           { pathname: '/toolpad/examples/qr-generator', title: 'QR Code generator' },
@@ -165,6 +166,10 @@ const pages: MuiPage[] = [
               {
                 title: 'createComponent',
                 pathname: '/toolpad/reference/api/create-component',
+              },
+              {
+                title: 'getContext',
+                pathname: '/toolpad/reference/api/get-context',
               },
             ],
           },

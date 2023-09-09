@@ -6,28 +6,24 @@ spec:
   content:
     - component: Button
       name: button
-      children: []
       layout:
         columnSize: 1
       props:
         content: foo button
     - component: Image
       name: image
-      children: []
-      layout:
-        columnSize: 1
       props:
         alt: foo image
+      layout:
+        columnSize: 1
     - component: codeComponent.MyComponent
       name: codeComponent_eb03t9a
-      children: []
       layout:
         columnSize: 1
       props:
         msg: '1'
     - component: DataGrid
       name: dataGrid
-      children: []
       layout:
         columnSize: 1
       props:
@@ -41,28 +37,24 @@ spec:
             field: foo datagrid column
     - component: TextField
       name: textField
-      children: []
       layout:
         columnSize: 1
       props:
         label: foo textfield
     - component: Text
       name: typography1
-      children: []
       layout:
         columnSize: 1
       props:
         value: foo typography
     - component: Select
       name: select
-      children: []
       layout:
         columnSize: 1
       props:
         label: foo select
     - component: List
       name: list
-      children: []
       layout:
         columnSize: 1
       props:
@@ -79,4 +71,44 @@ spec:
                         `List Button ${i + 1}`
     - component: Checkbox
       name: checkbox
+    - component: Text
+      name: text
+      props:
+        value: start-text
+      layout:
+        horizontalAlign: start
+    - component: Text
+      name: text1
+      layout:
+        horizontalAlign: center
+      props:
+        value: center-text
+    - component: Text
+      name: text2
+      layout:
+        horizontalAlign: end
+      props:
+        value: end-text
+    - component: Text
+      name: text
       children: []
+      props:
+        mode: markdown
+        loading: false
+        value: start-markdown-text
+    - component: Text
+      name: text1
+      children: []
+      layout:
+        horizontalAlign: center
+      props:
+        value: center-markdown-text
+        mode: markdown
+    - component: Text
+      name: text2
+      children: []
+      layout:
+        horizontalAlign: end
+      props:
+        mode: markdown
+        value: end-markdown-text

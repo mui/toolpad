@@ -745,7 +745,7 @@ function optimizePageElement(element: ElementType): ElementType {
 
   return {
     ...element,
-    children: (element.children ?? []).map(optimizePageElement),
+    children: element.children && element.children.map(optimizePageElement),
   };
 }
 

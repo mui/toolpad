@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: page
+spec:
+  id: UTdiEYQ
+  title: container
+  display: shell
+  content:
+    - component: Paper
+      name: paper

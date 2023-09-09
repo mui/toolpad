@@ -103,6 +103,10 @@ export default createBuiltin(FormWrappedTextField, {
       helperText: 'Whether the input should occupy all available horizontal space.',
       type: 'boolean',
     },
+    placeholder: {
+      helperText: 'The short hint displayed in the `input` before the user enters a value.',
+      type: 'string',
+    },
     disabled: {
       helperText: 'Whether the input is disabled.',
       type: 'boolean',

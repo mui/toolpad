@@ -190,7 +190,7 @@ export default class DataManager {
         invariant(typeof pageName === 'string', 'pageName url param required');
         invariant(typeof queryName === 'string', 'queryName url variable required');
 
-        const ctx = createServerContext(req);
+        const ctx = createServerContext(req, res);
         const result = await withContext(ctx, async () => {
           return this.execQuery(pageName, queryName, req.body);
         });

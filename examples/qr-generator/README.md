@@ -2,7 +2,7 @@
 
 <p class="description">A basic Toolpad application that can be used to turn any text or URL into a QR code.</p>
 
-<a href="https://stackblitz.com/fork/github/mui/mui-toolpad/tree/master/examples/qr-generator" target="_blank">
+<a href="https://mui-toolpad-qr-generator-production.up.railway.app/prod/" target="_blank">
   <img src="https://mui.com/static/toolpad/docs/examples/qr-generator.png" alt="QR generator" style="aspect-ratio: 1.8" width="100%">
 </a>
 

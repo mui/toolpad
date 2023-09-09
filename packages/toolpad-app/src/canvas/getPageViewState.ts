@@ -107,7 +107,7 @@ export function getNodesViewInfo(rootElm: HTMLElement): {
 
           if (childContainerElm && nodeSlots) {
             const rect =
-              slotType === 'single' || slotType === 'layout'
+              slotType === 'single'
                 ? getRelativeBoundingRect(rootElm, firstChildElm)
                 : getRelativeBoundingRect(rootElm, childContainerElm);
 

@@ -9,13 +9,12 @@ import { errorFrom } from './errors';
 /**
  * Formats a yaml source with `prettier`.
  */
-const PRETTIERNAME = 'prettier.config.js';
 
-export function formatYaml(code: string): string {
-  const readConfig = prettier.resolveConfig.sync(PRETTIERNAME);
+export async function formatYaml(code: string, filePath: string): Promise<string> {
+  const readConfig = await prettier.resolveConfig(filePath);
   return prettier.format(code, {
-    parser: 'yaml',
     ...readConfig,
+    parser: 'yaml',
   });
 }
 
@@ -66,10 +65,11 @@ export async function writeFileRecursive(
 
 export async function updateYamlFile(filePath: string, content: object) {
   const oldContent = await readMaybeFile(filePath);
-  const newContent = oldContent ? yamlOverwrite(oldContent, content) : yaml.stringify(content);
 
+  let newContent = oldContent ? yamlOverwrite(oldContent, content) : yaml.stringify(content);
+  newContent = await formatYaml(newContent!, filePath);
   if (newContent !== oldContent) {
-    await writeFileRecursive(filePath, formatYaml(newContent));
+    await writeFileRecursive(filePath, newContent);
   }
 }
 

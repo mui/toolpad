@@ -9,8 +9,7 @@ import { errorFrom } from './errors';
 /**
  * Formats a yaml source with `prettier`.
  */
-
-export async function formatYaml(code: string, filePath: string): Promise<string> {
+async function formatYaml(code: string, filePath: string): Promise<string> {
   const readConfig = await prettier.resolveConfig(filePath);
   return prettier.format(code, {
     ...readConfig,
@@ -67,7 +66,7 @@ export async function updateYamlFile(filePath: string, content: object) {
   const oldContent = await readMaybeFile(filePath);
 
   let newContent = oldContent ? yamlOverwrite(oldContent, content) : yaml.stringify(content);
-  newContent = await formatYaml(newContent!, filePath);
+  newContent = await formatYaml(newContent, filePath);
   if (newContent !== oldContent) {
     await writeFileRecursive(filePath, newContent);
   }

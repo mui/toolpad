@@ -13,7 +13,6 @@ import AutoAwesomeRoundedIcon from '@mui/icons-material/AutoAwesomeRounded';
 import SectionHeadline from 'docs/src/components/typography/SectionHeadline';
 import GradientText from 'docs/src/components/typography/GradientText';
 import Grid from '@mui/material/Unstable_Grid2';
-import ROUTES from '../../route';
 
 const ImageContainer = styled(Link)(({ theme }) => [
   {
@@ -34,9 +33,8 @@ const ImageContainer = styled(Link)(({ theme }) => [
     overflow: 'hidden',
   },
   theme.applyDarkStyles({
-    background: `linear-gradient(120deg, ${
-      (theme.vars || theme).palette.primaryDark[500]
-    } 0%, ${alpha(theme.palette.primaryDark[800], 0.4)} 150%)`,
+    background: `linear-gradient(120deg, ${(theme.vars || theme).palette.primaryDark[500]
+      } 0%, ${alpha(theme.palette.primaryDark[800], 0.4)} 150%)`,
     borderColor: `${alpha(theme.palette.primaryDark[300], 0.3)}`,
     boxShadow: `0 4px 8px ${alpha(theme.palette.primaryDark[600], 0.5)}`,
   }),

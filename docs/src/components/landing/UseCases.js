@@ -195,7 +195,7 @@ export default function CardGrid() {
               <Typography variant="body" color="text.secondary" textAlign="center">
                 Learn how to build these and many other apps using Toolpad!
               </Typography>
-              <Link href={ROUTES.toolpadMoreExamples} variant="body" sx={{ mt: 1 }}>
+              <Link href="/toolpad/examples/" variant="body" sx={{ mt: 1 }}>
                 View more examples
                 <KeyboardArrowRightRounded fontSize="small" />
               </Link>

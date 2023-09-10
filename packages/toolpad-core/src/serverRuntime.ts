@@ -3,7 +3,13 @@ import { IncomingMessage, ServerResponse } from 'node:http';
 import * as cookie from 'cookie';
 
 export interface ServerContext {
+  /**
+   * A dictionary mapping cookie name to cookie value.
+   */
   cookies: Record<string, string>;
+  /**
+   * Use to set a cookie `name` with `value`.
+   */
   setCookie: (name: string, value: string) => void;
 }
 

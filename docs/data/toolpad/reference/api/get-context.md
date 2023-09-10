@@ -29,7 +29,7 @@ No parameters
 
 a `ServerContext` containing information on the context the backend function was called under.
 
-## types
+## Types
 
 ### ServerContext
 
@@ -40,7 +40,7 @@ This described a certain context under which a backend function was called.
 | Name        | Type                                    | Description                                       |
 | :---------- | :-------------------------------------- | :------------------------------------------------ |
 | `cookies`   | `Record<string, string>`                | A dictionary mapping cookie name to cookie value. |
-| `setCookie` | `(name: string, value: string) => void` | Use to set a cookie `name` with `value`           |
+| `setCookie` | `(name: string, value: string) => void` | Use to set a cookie `name` with `value`.          |
 
 ## Usage
 

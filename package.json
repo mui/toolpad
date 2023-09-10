@@ -95,10 +95,10 @@
     "yarn-deduplicate": "6.0.2"
   },
   "dependencies": {
-    "archiver": "6.0.0",
+    "archiver": "6.0.1",
     "cross-env": "7.0.3",
     "dotenv-cli": "7.3.0",
-    "inquirer": "9.2.10",
+    "inquirer": "9.2.11",
     "lodash": "4.17.21",
     "semver": "7.5.4",
     "tsup": "7.2.0",

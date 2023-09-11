@@ -3,7 +3,19 @@ import * as path from 'path';
 import { Dirent } from 'fs';
 import * as yaml from 'yaml';
 import { yamlOverwrite } from 'yaml-diff-patch';
+import * as prettier from 'prettier';
 import { errorFrom } from './errors';
+
+/**
+ * Formats a yaml source with `prettier`.
+ */
+async function formatYaml(code: string, filePath: string): Promise<string> {
+  const readConfig = await prettier.resolveConfig(filePath);
+  return prettier.format(code, {
+    ...readConfig,
+    parser: 'yaml',
+  });
+}
 
 export type Reviver = NonNullable<Parameters<typeof JSON.parse>[1]>;
 
@@ -52,8 +64,9 @@ export async function writeFileRecursive(
 
 export async function updateYamlFile(filePath: string, content: object) {
   const oldContent = await readMaybeFile(filePath);
-  const newContent = oldContent ? yamlOverwrite(oldContent, content) : yaml.stringify(content);
 
+  let newContent = oldContent ? yamlOverwrite(oldContent, content) : yaml.stringify(content);
+  newContent = await formatYaml(newContent, filePath);
   if (newContent !== oldContent) {
     await writeFileRecursive(filePath, newContent);
   }

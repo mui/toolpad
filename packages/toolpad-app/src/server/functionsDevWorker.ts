@@ -11,6 +11,7 @@ import { isWebContainer } from '@webcontainer/env';
 import SuperJSON from 'superjson';
 import { createRpcClient, serveRpc } from '@mui/toolpad-utils/workerRpc';
 import { workerData } from 'node:worker_threads';
+import { ToolpadDataProviderIntrospection } from '@mui/toolpad-core/runtime';
 
 interface ModuleObject {
   exports: Record<string, unknown>;
@@ -111,8 +112,22 @@ async function execute(msg: ExecuteParams): Promise<ExecuteResult> {
   }
 }
 
+export interface IntrospectDataProviderParams {
+  filePath: string;
+  name: string;
+}
+
+async function introspectDataProvider(
+  msg: IntrospectDataProviderParams,
+): Promise<ToolpadDataProviderIntrospection> {
+  return {
+    paginationMode: 'index',
+  };
+}
+
 type WorkerRpcServer = {
   execute: typeof execute;
+  introspectDataProvider: typeof introspectDataProvider;
 };
 
 if (!isMainThread && parentPort) {
@@ -130,6 +145,7 @@ if (!isMainThread && parentPort) {
 
   serveRpc<WorkerRpcServer>(workerData.workerRpcPort, {
     execute,
+    introspectDataProvider,
   });
 }
 
@@ -154,7 +170,6 @@ export function createWorker(env: Record<string, any>) {
       const ctx = getServerContext();
 
       const { result: serializedResult, newCookies } = await client.execute({
-        kind: 'execute',
         filePath,
         name,
         parameters,
@@ -170,6 +185,20 @@ export function createWorker(env: Record<string, any>) {
       const result = SuperJSON.parse(serializedResult);
 
       return result;
+    },
+
+    async intropectDataProvider(
+      filePath: string,
+      name: string,
+    ): Promise<ToolpadDataProviderIntrospection> {
+      const { result: serializedResult } = await client.introspectDataProvider({
+        filePath,
+        name,
+      });
+
+      const result = SuperJSON.parse(serializedResult);
+
+      return result as ToolpadDataProviderIntrospection;
     },
   };
 }

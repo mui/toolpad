@@ -11,6 +11,7 @@ import invariant from 'invariant';
 import Piscina from 'piscina';
 import { ExecFetchResult } from '@mui/toolpad-core';
 import { errorFrom } from '@mui/toolpad-utils/errors';
+import { ToolpadDataProviderIntrospection } from '@mui/toolpad-core/runtime';
 import EnvManager from './EnvManager';
 import { ProjectEvents, ToolpadProjectOptions } from '../types';
 import { createWorker as createDevWorker } from './functionsDevWorker';
@@ -327,5 +328,12 @@ export default class FunctionsManager {
     }
     await writeFileRecursive(filePath, content, { encoding: 'utf-8' });
     this.extractedTypes = undefined;
+  }
+
+  async introspectDataProvider(
+    fileName: string,
+    exportName: string = 'default',
+  ): Promise<ToolpadDataProviderIntrospection> {
+    return this.devWorker.intropectDataProvider(fileName, exportName);
   }
 }

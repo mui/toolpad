@@ -4,7 +4,13 @@ import type { ToolpadProject } from './localMode';
 // Methods exposed to the Toolpad editor
 export function createRpcRuntimeServer(project: ToolpadProject) {
   return {
-    query: {},
+    query: {
+      introspectDataProvider: createMethod<typeof project.functionsManager.introspectDataProvider>(
+        ({ params }) => {
+          return project.functionsManager.introspectDataProvider(...params);
+        },
+      ),
+    },
     mutation: {
       execQuery: createMethod<typeof project.dataManager.execQuery>(({ params }) => {
         return project.dataManager.execQuery(...params);

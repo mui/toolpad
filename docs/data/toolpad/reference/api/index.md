@@ -6,3 +6,4 @@
 
 - [createComponent](/toolpad/reference/api/create-component/)
 - [createFunction](/toolpad/reference/api/create-function/)
+- [getContext](/toolpad/reference/api/get-context/)

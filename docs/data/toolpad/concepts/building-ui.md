@@ -15,7 +15,7 @@ In order to access a list of built in components, hover over the **Component lib
 
 The list of built-in components available in Toolpad can be found [here](/toolpad/reference/components/) and we are always adding more. To make it easier for us to understand what should be added next, please help by [upvoting](https://github.com/mui/mui-toolpad/labels/waiting%20for%20%F0%9F%91%8D) components.
 
-## Handling components
+## Using components
 
 1. Open the component library and drag a component over the canvas.
 2. The canvas will highlight the location where the component can be dropped. Release the mouse to drop it.
@@ -26,13 +26,11 @@ The list of built-in components available in Toolpad can be found [here](/toolpa
 
 {{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/concepts/building-ui/canvas-8.png", "alt": "Resize component", "caption": "Resizing components along columns", "zoom": false }}
 
-## Basic anatomy of Toolpad
-
 Each component has a set of properties that you can tweak from the link button in the **inspector panel** on the right. The **page hierarchy explorer** on the bottom-left can be used for viewing page structure, component selection and renaming.
 
 {{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/concepts/building-ui/canvas-1.png", "alt": "Toolpad panels", "caption": "Inspector panel and page hierarchy explorer" }}
 
-We'll talk about binding dynamic values to these properties in the [managing state](/toolpad/concepts/managing-state/) section.
+Binding dynamic values to these properties is explained in the [managing state](/toolpad/concepts/managing-state/) section.
 
 ### Canvas grid
 

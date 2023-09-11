@@ -47,7 +47,7 @@ You get the following response:
 </li>
 </ul>
 
-## Parameters
+### Parameters
 
 To be really useful, you need to connect these queries with data present on your page. You can do so by creating **parameters.**
 

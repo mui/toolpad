@@ -2,9 +2,12 @@
 
 <p class="description">These offer a fast way to bring your exisitng functions to a Toolpad page.</p>
 
-The most powerful way of bringing data into Toolpad is through using your own code. You can define functions inside `toolpad/resources` and use them when creating a query of this type.
+The most powerful way of bringing data into Toolpad is through using your own code. You can define functions inside `toolpad/resources` and use them when creating a query of this type. Let's see how you can use this feature to read data from a locally running postgresDB.
 
-{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/concepts/connecting-to-data/custom-function.png", "alt": "Add custom function", "caption": "Adding a custom function query" }}
+<video controls width="auto" height="100%" style="contain" alt="custom-function">
+  <source src="/static/toolpad/docs/concepts/connecting-to-data/pg-function.mp4" type="video/mp4">
+  Your browser does not support the video tag.
+</video>
 
 You can configure the following options here:
 

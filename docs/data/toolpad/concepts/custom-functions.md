@@ -9,23 +9,17 @@ The most powerful way of bringing data into Toolpad is through using your own co
   Your browser does not support the video tag.
 </video>
 
-You can configure the following options here:
-
 ## Function editor
 
 - ### Function
 
-  This corresponds to a function that you create on your file system, inside the `toolpad/resources` folder. For example, in `toolpad/resources/functions.ts`
+  This corresponds to a function that you create on your file system, inside the `toolpad/resources` folder. For example, the default function in `toolpad/resources/functions.ts` looks like:
 
   ```jsx
-  export async function example() {
-    return {
-      message: 'hello world',
-    };
+  export default async function handler(message: string) {
+    return `Hello ${message}`;
   }
   ```
-
-{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/concepts/connecting-to-data/custom-function-example.gif", "alt": "Select custom function in the query", "caption": "Adding a custom function to the query", "indent": 1 }}
 
 <ul>
 <li style="list-style-type: none">
@@ -33,9 +27,7 @@ Toolpad custom functions run fully server-side in Node. For example, if you chan
 
 ```jsx
 export async function example() {
-  return {
-    message: process.versions,
-  };
+  return process.versions;
 }
 ```
 

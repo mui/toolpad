@@ -48,12 +48,6 @@
       "enabled": false
     },
     {
-      "groupName": "react-inspector",
-      "matchPackageNames": ["react-inspector"],
-      "allowedVersions": "< 6.0.0",
-      "description": "Breaking changes in the types. https://github.com/storybookjs/react-inspector/issues/162"
-    },
-    {
       "groupName": "node-fetch",
       "matchPackageNames": ["node-fetch"],
       "allowedVersions": "< 3.0.0"

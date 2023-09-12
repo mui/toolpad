@@ -3,7 +3,6 @@ import { ToolpadEditor } from '../../models/ToolpadEditor';
 import { ToolpadRuntime } from '../../models/ToolpadRuntime';
 import { test } from '../../playwright/localTest';
 import clickCenter from '../../utils/clickCenter';
-import { BoundingBox } from '../../types/BoundingBox';
 
 test.use({
   localAppConfig: {
@@ -79,21 +78,23 @@ test('showing drag-and-drop previews', async ({ page, argosScreenshot }) => {
     clip: appCanvasBoundingBox || undefined,
   };
 
+  type BoundingBox = Pick<DOMRect, 'x' | 'y' | 'width' | 'height'>;
+
   const getDropPreviewLeftCoordinates = (boundingBox: BoundingBox): [number, number] => [
-    boundingBox!.x + (1 / 3) * boundingBox!.width,
-    boundingBox!.y + boundingBox!.height / 2,
+    boundingBox.x + boundingBox!.width / 3,
+    boundingBox.y + boundingBox!.height / 2,
   ];
   const getDropPreviewTopCoordinates = (boundingBox: BoundingBox): [number, number] => [
-    boundingBox!.x + boundingBox!.width / 2,
-    boundingBox!.y + (1 / 3) * boundingBox!.height,
+    boundingBox.x + boundingBox!.width / 2,
+    boundingBox.y + boundingBox!.height / 3,
   ];
   const getDropPreviewRightCoordinates = (boundingBox: BoundingBox): [number, number] => [
-    boundingBox!.x + (2 / 3) * boundingBox!.width,
-    boundingBox!.y + (2 / 3) * boundingBox!.height,
+    boundingBox.x + (2 / 3) * boundingBox!.width,
+    boundingBox.y + (2 / 3) * boundingBox!.height,
   ];
   const getDropPreviewBottomCoordinates = (boundingBox: BoundingBox): [number, number] => [
-    boundingBox!.x + boundingBox!.width / 2,
-    boundingBox!.y + (2 / 3) * boundingBox!.height,
+    boundingBox.x + boundingBox!.width / 2,
+    boundingBox.y + (2 / 3) * boundingBox!.height,
   ];
 
   const inputBoundingBox = await editorModel.appCanvas.locator('input').boundingBox();

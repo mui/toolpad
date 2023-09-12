@@ -9,14 +9,14 @@ Toolpad is primarily designed as an application framework for internal tool deve
 - Having to keep up with the fast evolving landscape of libraries, frameworks and best practices.
 - Lots of glue code is required to get backend data to the browser and hooked up to data displaying components.
 - As backends evolve, the internal applications need to evolve with them with minimal amount of maintenance required.
-- Lesser focus on quality assurance, usually lead to higher chances of failure.
+- Lesser focus on quality assurance usually leads to higher chances of failure.
 
-## TLDR
+## TL;DR
 
 - Integrates well with your existing code. You can reuse your database models, client libraries, secrets, bespoke components
 - Integrates well with your development lifecycle. Your project lives on your own file system. You can use your own IDE, version control system, deployment target, CLI tools
-- Comes with a Drag and drop builder to simplify UI building
-- Sets Healthy UI constraints that prevent common pitfalls and anti-patterns
+- Comes with a drag-and-drop builder to simplify UI building
+- Sets healthy UI constraints that prevent common pitfalls and anti-patterns
 - Lets you maintain a single source of truth for all business logic
 - Less boilerplate so you can focus on the important parts of the app
 
@@ -42,13 +42,13 @@ Internal tools have access to highly sensitive data, data that every organizatio
 
 ## Toolpad
 
-We think addressing above mentioned problems can lead to a better developer experience. Let' see how Toolpad solves these:
+We think addressing the above mentioned problems can lead to a better developer experience. Toolpad solves them in the following ways:
 
-### Front end UI
+### Front-end UI
 
-Toolpad works as a drag-and-drop UI builder and uses MUI's own Material UI components. Material UI has almost every component required for internal use cases; currently, Toolpad supports 16 of them and work on supporting more is continuously ongoing.
+Toolpad works as a drag-and-drop UI builder and uses MUI's own Material UI components. Material UI has almost every component required for internal use cases. Currently, Toolpad supports 16 of them and work on supporting more is continuously ongoing.
 
-For more components, Toolpad supports adding any number of custom components. You can create your own by writing React code. Drag-and-drop builder helps you assemble a quick UI and gives you a head start for the next steps. It ensures **speed and customization**.
+For additional use-cases, Toolpad supports adding any number of custom components. You can create your own by writing React code. The drag-and-drop builder helps you assemble a quick UI and gives you a head start for the next steps. It ensures **speed and customization**.
 
 ### Connecting to data
 
@@ -84,4 +84,4 @@ The open-source nature of Toolpad also means that it is constantly being updated
 
 ## Conclusion
 
-Toolpad is a platform to build internal tools that are used for tasks like running marketing campaigns, data analysis, monitoring fraud, updating user data, and more. It aims to reduce the overhead associated with frontend development by providing visual editors and reducing the amount of boilerplate required to bring data on the page. With basic frontend knowledge you can build an app in just one sitting.
+Toolpad is a platform to build internal tools that are used for tasks like running marketing campaigns, data analysis, monitoring fraud, updating user data, and more. It aims to reduce the overhead associated with frontend development by providing visual editors and reducing the amount of boilerplate required to bring data on the page. With a drag-and-drop UI, you can build an internal tool for your business logic in just one sitting.

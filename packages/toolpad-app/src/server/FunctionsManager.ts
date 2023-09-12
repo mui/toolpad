@@ -19,7 +19,7 @@ import { Awaitable } from '../utils/types';
 import { format } from '../utils/prettier';
 import { compilerOptions } from './functionsShared';
 
-async function createDefaultFunction(filePath: string): string {
+async function createDefaultFunction(filePath: string) {
   const result = await format(
     `
     /**

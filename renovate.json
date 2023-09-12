@@ -82,11 +82,6 @@
       "description": "We're having trouble upgrading monaco-editor to >0.40."
     },
     {
-      "groupName": "requires-node-18",
-      "matchPackageNames": ["execa"],
-      "description": "Stalling updates until we break compatibility with Node 16"
-    },
-    {
       "groupName": "Update @mui/toolpad in examples",
       "matchPackageNames": ["@mui/toolpad"],
       "matchFiles": ["examples/*/package.json"],

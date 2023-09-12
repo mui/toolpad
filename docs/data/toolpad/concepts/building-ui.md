@@ -19,14 +19,14 @@ The list of built-in components available in Toolpad can be found [here](/toolpa
 
 1. Open the component library and drag a component over the canvas.
 2. The canvas will highlight the location where the component can be dropped. Release the mouse to drop it.
-3. To select a component in canvas, click either from the canvas or the page heirarchy explorer. An overlay indicates the selected component.
-4. To reposition a component, click on the drag handler present in the overlay, drag and drop it at its new location. The canvas will highlight available drop locations with a blue indicator.
-5. To delete a component, click the bin icon in the overlay to remove it from the canvas. You can also press the <kbd class="key">Backspace</kbd> key.
+3. To select a component, click on it either in the canvas or in the page hierarchy explorer. An overlay indicates the selected component.
+4. To move a component, drag it from the drag handler present in the overlay and drop it at its new location. The canvas will highlight available drop locations with a blue indicator.
+5. To delete a component, click the bin icon in the overlay. You can also press the <kbd class="key">Backspace</kbd> key while the component is selected.
 6. Components can be horizontally resized within the grid boundaries:
 
 {{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/concepts/building-ui/canvas-8.png", "alt": "Resize component", "caption": "Resizing components along columns", "zoom": false }}
 
-Each component has a set of properties that you can tweak from the link button in the **inspector panel** on the right. The **page hierarchy explorer** on the bottom-left can be used for viewing page structure, component selection and renaming.
+Each component has a set of properties that you can tweak from the link button in the **inspector panel** on the right. The **page hierarchy explorer** on the bottom-left can be used to view the page structure, and select or rename components.
 
 {{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/concepts/building-ui/canvas-1.png", "alt": "Toolpad panels", "caption": "Inspector panel and page hierarchy explorer" }}
 

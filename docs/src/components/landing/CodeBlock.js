@@ -225,6 +225,7 @@ export default function CodeBlock({ appMode, fileIndex, setFrameIndex }) {
             TabIndicatorProps={{
               sx: {
                 left: `${indicatorLeft}px!important`,
+                backgroundColor: 'primary.400',
               },
             }}
             sx={{ minHeight: 'auto' }}
@@ -236,10 +237,20 @@ export default function CodeBlock({ appMode, fileIndex, setFrameIndex }) {
                 value={index.toString()}
                 ref={tabRef}
                 key={index}
-                sx={{
+                sx={(theme) => ({
                   minHeight: 0,
                   padding: '12px 14px',
-                }}
+                  color: (theme.vars || theme).palette.grey[500],
+                  '&.Mui-selected': {
+                    color: (theme.vars || theme).palette.primary[300],
+                  },
+                  '&:hover': {
+                    color: (theme.vars || theme).palette.grey[300],
+                    '&.Mui-selected': {
+                      color: (theme.vars || theme).palette.primary[300],
+                    },
+                  },
+                })}
               />
             ))}
           </TabList>

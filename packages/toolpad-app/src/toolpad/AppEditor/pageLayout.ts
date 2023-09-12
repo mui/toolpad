@@ -64,7 +64,6 @@ export function deleteOrphanedLayoutNodes(
           moveTargetNodeId !== parent.id &&
           (appDom.isPage(parentParent) ||
             (appDom.isElement(parentParent) &&
-              isPageLayoutComponent(parentParent) &&
               getElementNodeComponentId(lastContainerChild) !==
                 getElementNodeComponentId(parentParent)))
         ) {

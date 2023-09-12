@@ -11,4 +11,4 @@ services:
     plan: standard
     envVars:
       - key: NODE_VERSION
-        value: 16
+        value: 18

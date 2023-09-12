@@ -12,8 +12,6 @@ const MAX_RETRIES = 30;
 const HEALTH_CHECK_URL = `/health-check`;
 
 async function main() {
-  const { default: fetch } = await import('node-fetch');
-
   const checkedUrl = new URL(HEALTH_CHECK_URL, args['--url'] || DEFAULT_URL);
   for (let i = 1; i <= MAX_RETRIES; i += 1) {
     try {

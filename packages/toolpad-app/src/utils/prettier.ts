@@ -9,8 +9,12 @@ const DEFAULT_OPTIONS = {
 /**
  * Formats a javascript source with `prettier`.
  */
-export function format(code: string): string {
-  return prettier.format(code, DEFAULT_OPTIONS);
+export async function format(code: string, filePath: string): Promise<string> {
+  const readConfig = await prettier.resolveConfig(filePath);
+  return prettier.format(code, {
+    ...readConfig,
+    ...DEFAULT_OPTIONS,
+  });
 }
 
 /**
@@ -30,9 +34,9 @@ export function formatExpression(code: string): string {
 /**
  * Formats a javascript source with `prettier`, if it's valid.
  */
-export function tryFormat(code: string): string {
+export async function tryFormat(code: string, filePath: string): string {
   try {
-    return format(code);
+    return await format(code, filePath);
   } catch (err) {
     return code;
   }

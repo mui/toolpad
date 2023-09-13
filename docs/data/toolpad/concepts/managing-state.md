@@ -61,4 +61,6 @@ You can set page parameters from the Page tab in the **Inspector panel** on righ
 
 ### Using parameters
 
-The parameters that you add are made available in the **scope** for data binding under the `page.parameters` global variable. The value that the parameter assumes at runtime is the value that is passed in through a URL query parameter.
+The parameters that you've added are available in the global scope for data bindings under the `page.parameters` variable. The value that the parameter assumes at runtime is the value that is passed through a URL query parameter.
+
+For example: if you define a page parameter `foo` and access the page with `?foo=123`, then the value of `page.parameters.foo` in the bindings will be `"123"`.

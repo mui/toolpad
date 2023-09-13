@@ -9,7 +9,7 @@
   Your browser does not support the video tag.
 </video>
 
-1. In order to use a custom theme, go to the **Theme** tab in the inspector panel and click on **Add theme**:
+1. To change the application theme, go to the **Theme** tab in the inspector panel.
 2. In the theme options you can:
 
    - change your UI to light or dark mode.

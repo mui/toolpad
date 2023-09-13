@@ -5,7 +5,6 @@ import express from 'express';
 import cors from 'cors';
 import invariant from 'invariant';
 import { errorFrom, serializeError, SerializedError } from '@mui/toolpad-utils/errors';
-import { ToolpadDataProviderIntrospection } from '@mui/toolpad-core/runtime';
 import { Methods, ServerDataSource, ToolpadProjectOptions } from '../types';
 import serverDataSources from '../toolpadDataSources/server';
 import * as appDom from '../appDom';
@@ -237,15 +236,5 @@ export default class DataManager {
     );
 
     return router;
-  }
-
-  async dataProviderIntrospect(
-    file: string,
-    exportName: string = 'default',
-  ): Promise<ToolpadDataProviderIntrospection> {
-    const provider = this.project.functionsManager.getDataProvider(file, exportName);
-    return {
-      paginationMode: 'index',
-    };
   }
 }

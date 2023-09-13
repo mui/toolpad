@@ -10,6 +10,11 @@ export function createRpcRuntimeServer(project: ToolpadProject) {
           return project.functionsManager.introspectDataProvider(...params);
         },
       ),
+      getDataProviderRecords: createMethod<typeof project.functionsManager.getDataProviderRecords>(
+        ({ params }) => {
+          return project.functionsManager.getDataProviderRecords(...params);
+        },
+      ),
     },
     mutation: {
       execQuery: createMethod<typeof project.dataManager.execQuery>(({ params }) => {

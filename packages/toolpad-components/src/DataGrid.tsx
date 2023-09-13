@@ -347,7 +347,7 @@ interface Selection {
 }
 
 interface ToolpadDataGridProps extends Omit<DataGridProProps, 'columns' | 'rows' | 'error'> {
-  dataProvider?: string;
+  dataProviderId?: string;
   rows?: GridRowsProp;
   columns?: SerializableGridColumns;
   height?: number;
@@ -368,13 +368,16 @@ const DataGridComponent = React.forwardRef(function DataGridComponent(
     selection,
     onSelectionChange,
     hideToolbar,
-    dataProvider,
+    dataProviderId,
     ...props
   }: ToolpadDataGridProps,
   ref: React.ForwardedRef<HTMLDivElement>,
 ) {
   const useDataProvider = useNonNullableContext(UseDataProviderContext);
-  console.log(useDataProvider(dataProvider || null));
+  const { dataProvider } = useDataProvider(dataProviderId || null);
+
+  console.log(dataProvider);
+
   const nodeRuntime = useNode<ToolpadDataGridProps>();
 
   const handleResize = React.useMemo(

@@ -12,6 +12,10 @@ import SuperJSON from 'superjson';
 import { createRpcClient, serveRpc } from '@mui/toolpad-utils/workerRpc';
 import { workerData } from 'node:worker_threads';
 import { ToolpadDataProviderIntrospection } from '@mui/toolpad-core/runtime';
+import { TOOLPAD_DATA_PROVIDER_MARKER, ToolpadDataProvider } from '@mui/toolpad-core/server';
+import * as z from 'zod';
+import { fromZodError } from 'zod-validation-error';
+import { GetRecordsParams, GetRecordsResult } from '@mui/toolpad-core';
 
 interface ModuleObject {
   exports: Record<string, unknown>;
@@ -33,7 +37,7 @@ function loadModule(fullPath: string, content: string) {
   return moduleObject;
 }
 
-async function resolveFunctions(filePath: string): Promise<Record<string, Function>> {
+async function resolveExports(filePath: string): Promise<Map<string, unknown>> {
   const fullPath = path.resolve(filePath);
   const content = await fs.readFile(fullPath, 'utf-8');
 
@@ -49,11 +53,7 @@ async function resolveFunctions(filePath: string): Promise<Record<string, Functi
     moduleCache.set(fullPath, cachedModule);
   }
 
-  return Object.fromEntries(
-    Object.entries(cachedModule.exports).flatMap(([key, value]) =>
-      typeof value === 'function' ? [[key, value]] : [],
-    ),
-  );
+  return new Map(Object.entries(cachedModule.exports));
 }
 
 interface ExecuteParams {
@@ -69,9 +69,9 @@ interface ExecuteResult {
 }
 
 async function execute(msg: ExecuteParams): Promise<ExecuteResult> {
-  const fns = await resolveFunctions(msg.filePath);
+  const exports = await resolveExports(msg.filePath);
 
-  const fn = fns[msg.name];
+  const fn = exports.get(msg.name);
   if (typeof fn !== 'function') {
     throw new Error(`Function "${msg.name}" not found`);
   }
@@ -112,22 +112,57 @@ async function execute(msg: ExecuteParams): Promise<ExecuteResult> {
   }
 }
 
-export interface IntrospectDataProviderParams {
-  filePath: string;
-  name: string;
+const dataProviderSchema: z.ZodType<ToolpadDataProvider<any, any>> = z.object({
+  paginationMode: z.enum(['index', 'cursor']).optional().default('index'),
+  getRecords: z.function(z.tuple([z.any()]), z.any()),
+  [TOOLPAD_DATA_PROVIDER_MARKER]: z.literal(true),
+});
+
+async function loadDataProvider(
+  filePath: string,
+  name: string,
+): Promise<ToolpadDataProvider<any, any>> {
+  const exports = await resolveExports(filePath);
+  const dataProviderExport = exports.get(name);
+
+  if (!dataProviderExport || typeof dataProviderExport !== 'object') {
+    throw new Error(`DataProvider "${name}" not found`);
+  }
+
+  const parsed = dataProviderSchema.safeParse(dataProviderExport);
+
+  if (parsed.success) {
+    return parsed.data;
+  }
+
+  throw fromZodError(parsed.error);
 }
 
 async function introspectDataProvider(
-  msg: IntrospectDataProviderParams,
+  filePath: string,
+  name: string,
 ): Promise<ToolpadDataProviderIntrospection> {
+  const dataProvider = await loadDataProvider(filePath, name);
+
   return {
-    paginationMode: 'index',
+    paginationMode: dataProvider.paginationMode,
   };
+}
+
+async function getDataProviderRecords(
+  filePath: string,
+  name: string,
+  params: GetRecordsParams<any, any>,
+): Promise<GetRecordsResult<any>> {
+  const dataProvider = await loadDataProvider(filePath, name);
+
+  return dataProvider.getRecords(params);
 }
 
 type WorkerRpcServer = {
   execute: typeof execute;
   introspectDataProvider: typeof introspectDataProvider;
+  getDataProviderRecords: typeof getDataProviderRecords;
 };
 
 if (!isMainThread && parentPort) {
@@ -146,6 +181,7 @@ if (!isMainThread && parentPort) {
   serveRpc<WorkerRpcServer>(workerData.workerRpcPort, {
     execute,
     introspectDataProvider,
+    getDataProviderRecords,
   });
 }
 
@@ -159,7 +195,7 @@ export function createWorker(env: Record<string, any>) {
     transferList: [workerRpcChannel.port1],
   });
 
-  const client = createRpcClient(workerRpcChannel.port2);
+  const client = createRpcClient<WorkerRpcServer>(workerRpcChannel.port2);
 
   return {
     async terminate() {
@@ -191,14 +227,15 @@ export function createWorker(env: Record<string, any>) {
       filePath: string,
       name: string,
     ): Promise<ToolpadDataProviderIntrospection> {
-      const { result: serializedResult } = await client.introspectDataProvider({
-        filePath,
-        name,
-      });
+      return client.introspectDataProvider(filePath, name);
+    },
 
-      const result = SuperJSON.parse(serializedResult);
-
-      return result as ToolpadDataProviderIntrospection;
+    async getDataProviderRecords(
+      filePath: string,
+      name: string,
+      params: GetRecordsParams<any, any>,
+    ): Promise<GetRecordsResult<any>> {
+      return client.getDataProviderRecords(filePath, name, params);
     },
   };
 }

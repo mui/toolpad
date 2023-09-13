@@ -9,7 +9,7 @@ import { glob } from 'glob';
 import { writeFileRecursive, fileExists, readJsonFile } from '@mui/toolpad-utils/fs';
 import invariant from 'invariant';
 import Piscina from 'piscina';
-import { ExecFetchResult } from '@mui/toolpad-core';
+import { ExecFetchResult, GetRecordsParams, GetRecordsResult } from '@mui/toolpad-core';
 import { errorFrom } from '@mui/toolpad-utils/errors';
 import { ToolpadDataProviderIntrospection } from '@mui/toolpad-core/runtime';
 import EnvManager from './EnvManager';
@@ -122,10 +122,6 @@ export default class FunctionsManager {
 
   private getBuildErrorsForFile(entryPoint: string) {
     return this.buildErrors.filter((error) => error.location?.file === entryPoint);
-  }
-
-  private getOutputFile(fileName: string): string | undefined {
-    return path.resolve(this.getFunctionsOutputFolder(), `${path.basename(fileName, '.ts')}.js`);
   }
 
   private getFunctionsOutputFolder(): string {
@@ -264,11 +260,7 @@ export default class FunctionsManager {
     ]);
   }
 
-  async exec(
-    fileName: string,
-    name: string,
-    parameters: Record<string, unknown>,
-  ): Promise<ExecFetchResult<unknown>> {
+  async getBuiltOutputFilePath(fileName: string): Promise<string> {
     const resourcesFolder = this.getResourcesFolder();
     const fullPath = path.resolve(resourcesFolder, fileName);
     const entryPoint = path.relative(this.project.getRoot(), fullPath);
@@ -279,11 +271,20 @@ export default class FunctionsManager {
       throw formatError(buildErrors[0]);
     }
 
-    const outputFilePath = this.getOutputFile(fileName);
-    if (!outputFilePath) {
-      throw new Error(`No build found for "${fileName}"`);
-    }
+    const outputFilePath = path.resolve(
+      this.getFunctionsOutputFolder(),
+      `${path.basename(fileName, '.ts')}.js`,
+    );
 
+    return outputFilePath;
+  }
+
+  async exec(
+    fileName: string,
+    name: string,
+    parameters: Record<string, unknown>,
+  ): Promise<ExecFetchResult<unknown>> {
+    const outputFilePath = await this.getBuiltOutputFilePath(fileName);
     const extractedTypes = await this.introspect();
 
     if (extractedTypes.error) {
@@ -334,6 +335,16 @@ export default class FunctionsManager {
     fileName: string,
     exportName: string = 'default',
   ): Promise<ToolpadDataProviderIntrospection> {
-    return this.devWorker.intropectDataProvider(fileName, exportName);
+    const fullPath = await this.getBuiltOutputFilePath(fileName);
+    return this.devWorker.intropectDataProvider(fullPath, exportName);
+  }
+
+  async getDataProviderRecords(
+    fileName: string,
+    exportName: string,
+    params: GetRecordsParams<any, any>,
+  ): Promise<GetRecordsResult<any>> {
+    const fullPath = await this.getBuiltOutputFilePath(fileName);
+    return this.devWorker.getDataProviderRecords(fullPath, exportName, params);
   }
 }

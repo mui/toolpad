@@ -2,6 +2,7 @@ import * as React from 'react';
 import { UseDataProviderHook } from '@mui/toolpad-core/runtime';
 import { useQuery } from '@tanstack/react-query';
 import invariant from 'invariant';
+import { ToolpadDataProviderBase } from '@mui/toolpad-core';
 import api from './api';
 
 export const useDataProvider: UseDataProviderHook = (id) => {
@@ -18,6 +19,20 @@ export const useDataProvider: UseDataProviderHook = (id) => {
       return api.query.introspectDataProvider(filePath, name);
     },
   });
-  console.log(introspection);
-  return { isLoading, error };
+
+  const dataProvider: ToolpadDataProviderBase<any, any> | undefined = React.useMemo(() => {
+    if (!introspection) {
+      return undefined;
+    }
+    return {
+      paginationMode: introspection.paginationMode,
+      getRecords: async (...args) => {
+        invariant(id, 'id is required');
+        const [filePath, name] = id.split(':');
+        return api.query.getDataProviderRecords(filePath, name, ...args);
+      },
+    };
+  }, [id, introspection]);
+
+  return { isLoading, error, dataProvider };
 };

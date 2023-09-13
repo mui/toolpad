@@ -20,9 +20,9 @@ export const useDataProvider: UseDataProviderHook = (id) => {
     },
   });
 
-  const dataProvider: ToolpadDataProviderBase<any, any> | undefined = React.useMemo(() => {
+  const dataProvider: ToolpadDataProviderBase<any, any> | null = React.useMemo(() => {
     if (!introspection) {
-      return undefined;
+      return null;
     }
     return {
       paginationMode: introspection.paginationMode,

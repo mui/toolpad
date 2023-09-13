@@ -19,13 +19,19 @@ import {
   useGridSelector,
   getGridDefaultColumnTypes,
   GridColTypeDef,
+  GridPaginationModel,
 } from '@mui/x-data-grid-pro';
 import {
   Unstable_LicenseInfoProvider as LicenseInfoProvider,
   Unstable_LicenseInfoProviderProps as LicenseInfoProviderProps,
 } from '@mui/x-license-pro';
 import * as React from 'react';
-import { useNode, useComponents, UseDataProviderContext } from '@mui/toolpad-core';
+import {
+  useNode,
+  useComponents,
+  UseDataProviderContext,
+  ToolpadDataProviderBase,
+} from '@mui/toolpad-core';
 import {
   Box,
   debounce,
@@ -43,6 +49,8 @@ import { hasImageExtension } from '@mui/toolpad-utils/path';
 import { ErrorBoundary, FallbackProps } from 'react-error-boundary';
 import { NumberFormat, createStringFormatter } from '@mui/toolpad-core/numberFormat';
 import { useNonNullableContext } from '@mui/toolpad-utils/react';
+import { useQuery } from '@tanstack/react-query';
+import invariant from 'invariant';
 import createBuiltin from './createBuiltin';
 import { SX_PROP_HELPER_TEXT } from './constants';
 import ErrorOverlay from './components/ErrorOverlay';
@@ -358,6 +366,57 @@ interface ToolpadDataGridProps extends Omit<DataGridProProps, 'columns' | 'rows'
   hideToolbar?: boolean;
 }
 
+function useDataProviderDataGridProps(
+  dataProvider: ToolpadDataProviderBase<any, any> | null,
+): DataGridProProps | {} {
+  const [paginationModel, setPaginationModel] = React.useState<GridPaginationModel>({
+    page: 0,
+    pageSize: 100,
+  });
+
+  const { data, isLoading, error } = useQuery({
+    enabled: !!dataProvider,
+    queryKey: [dataProvider, paginationModel],
+    queryFn: async () => {
+      invariant(dataProvider, 'dataProvider must be defined');
+      return dataProvider.getRecords({
+        paginationModel: {
+          start: paginationModel.page * paginationModel.pageSize,
+          pageSize: paginationModel.pageSize,
+        },
+      });
+    },
+  });
+
+  const rowCount =
+    data?.totalCount ??
+    (data?.hasNextPage ? (paginationModel.page + 1) * paginationModel.pageSize + 1 : undefined) ??
+    undefined;
+
+  const [latestRowCount, setLatestRowCount] = React.useState(rowCount ?? 0);
+  React.useEffect(() => {
+    if (rowCount !== undefined) {
+      setLatestRowCount(rowCount);
+    }
+  }, [rowCount]);
+
+  if (!dataProvider) {
+    return {};
+  }
+
+  return {
+    loading: isLoading,
+    paginationMode: 'server',
+    pagination: true,
+    paginationModel,
+    rowCount: latestRowCount,
+    onPaginationModelChange(model) {
+      setPaginationModel(model);
+    },
+    rows: data?.records ?? [],
+  };
+}
+
 const DataGridComponent = React.forwardRef(function DataGridComponent(
   {
     columns: columnsProp,
@@ -376,7 +435,7 @@ const DataGridComponent = React.forwardRef(function DataGridComponent(
   const useDataProvider = useNonNullableContext(UseDataProviderContext);
   const { dataProvider } = useDataProvider(dataProviderId || null);
 
-  console.log(dataProvider);
+  const dataProviderProps = useDataProviderDataGridProps(dataProvider);
 
   const nodeRuntime = useNode<ToolpadDataGridProps>();
 
@@ -523,6 +582,7 @@ const DataGridComponent = React.forwardRef(function DataGridComponent(
             onRowSelectionModelChange={onSelectionModelChange}
             rowSelectionModel={selectionModel}
             {...props}
+            {...dataProviderProps}
           />
         </div>
       </div>
@@ -555,7 +615,7 @@ export default createBuiltin(DataGridComponent, {
         },
       },
     },
-    dataProvider: {
+    dataProviderId: {
       helperText: 'The backend data provider that will supply the rows to this grid',
       type: 'string',
       control: { type: 'DataProviderSelector', bindable: false },

@@ -502,11 +502,14 @@ export interface GetRecordsParams<R, P extends PaginationMode> {
 
 export interface GetRecordsResult<R> {
   records: R[];
+  hasNextPage?: boolean;
+  totalCount?: number;
 }
 
 export interface ToolpadDataProviderBase<R, P extends PaginationMode = 'index'> {
   paginationMode?: P;
   getRecords: (params: GetRecordsParams<R, P>) => Promise<GetRecordsResult<R>>;
+  getRecordCount?: () => Promise<number>;
   // updateRecord?: (id: string, record: R) => Promise<void>;
   // deleteRecord?: (id: string) => Promise<void>;
   // createRecord?: (record: R) => Promise<void>;

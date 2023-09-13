@@ -276,7 +276,7 @@ export interface ToolpadDataProviderIntrospection {
 export interface UseDataProviderHookResult<R, P extends PaginationMode> {
   isLoading: boolean;
   error?: unknown;
-  dataProvider?: ToolpadDataProviderBase<R, P>;
+  dataProvider: ToolpadDataProviderBase<R, P> | null;
 }
 
 export interface UseDataProviderHook {

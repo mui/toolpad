@@ -32,17 +32,6 @@ export function formatExpression(code: string): string {
 }
 
 /**
- * Formats a javascript source with `prettier`, if it's valid.
- */
-export async function tryFormat(code: string, filePath: string) {
-  try {
-    return await format(code, filePath);
-  } catch (err) {
-    return code;
-  }
-}
-
-/**
  * Formats a javascript expression with `prettier`, if it's valid.
  */
 export function tryFormatExpression(code: string): string {

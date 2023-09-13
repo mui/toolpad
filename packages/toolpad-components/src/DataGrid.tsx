@@ -366,9 +366,13 @@ interface ToolpadDataGridProps extends Omit<DataGridProProps, 'columns' | 'rows'
   hideToolbar?: boolean;
 }
 
+type DataProviderDataGridProps = (DataGridProProps | { columns?: GridColDef[] }) & {
+  error?: unknown;
+};
+
 function useDataProviderDataGridProps(
   dataProvider: ToolpadDataProviderBase<any, any> | null,
-): DataGridProProps | {} {
+): DataProviderDataGridProps | null {
   const [paginationModel, setPaginationModel] = React.useState<GridPaginationModel>({
     page: 0,
     pageSize: 100,
@@ -401,7 +405,7 @@ function useDataProviderDataGridProps(
   }, [rowCount]);
 
   if (!dataProvider) {
-    return {};
+    return null;
   }
 
   return {
@@ -551,7 +555,12 @@ const DataGridComponent = React.forwardRef(function DataGridComponent(
     [getRowId, columns],
   );
 
-  const error: Error | null = errorProp ? errorFrom(errorProp) : null;
+  let error: Error | null = null;
+  if (dataProviderProps?.error) {
+    error = errorFrom(dataProviderProps.error);
+  } else if (errorProp) {
+    error = errorFrom(errorProp);
+  }
 
   return (
     <LicenseInfoProvider info={LICENSE_INFO}>

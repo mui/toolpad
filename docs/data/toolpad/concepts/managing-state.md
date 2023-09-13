@@ -57,7 +57,7 @@ Page parameters allow you to pass external data into the Toolpad page state via 
 
 ### Setting parameters
 
-You can set page parameters through the option to do so available in the **Inspector** when no component is selected. You can add multiple parameters along with a default value for each.
+You can set page parameters from the Page tab in the **Inspector panel** on right. You can add multiple parameters along with a default value for each.
 
 ### Using parameters
 

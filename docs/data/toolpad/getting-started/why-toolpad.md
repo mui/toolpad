@@ -55,7 +55,7 @@ For additional use-cases, Toolpad supports adding any number of custom component
 Toolpad supports connecting to data in two ways:
 
 - REST APIs can be easily linked to Toolpad through _HTTP queries_. This is the most common way of getting data to Toolpad.
-- _Custom functions_ where you can write code in your own IDE to connect to any data source. You can reuse your existing scripts, business logic, database models, client libraries, and secrets files. These allow you to have a single, shared codebase for internal or external applications meaning **no duplication or fragmentation**.
+- _Custom functions_ where you can write code in your own IDE to connect to any data source. You can reuse your existing scripts, business logic, database models, client libraries, and secrets. These allow you to have a single, shared codebase for internal or external applications meaning **no duplication or fragmentation**.
 
 ### Development Lifecycle
 
@@ -65,7 +65,7 @@ Like any Node.js app, you can self-host a Toolpad app to your own server or any 
 
 ### Collaboration and Sharing
 
-A Toolpad app is a set of files that can be simply added to a GitHub/GitLab repo and maintained collaboratively. We didn't want to reinvent the wheel when it comes to collaboration for engineers. Having a private code repository is one of the essential practices to ensure **safety** of user data.
+The Toolpad application configuration is stored in yaml files that can be checked into git or any version control tool of your choice and maintained collaboratively. We didn't want to reinvent the wheel when it comes to collaboration for engineers. Having a private code repository is one of the essential practices to ensure **safety** of user data.
 
 <!---
 ### Consistent Design

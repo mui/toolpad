@@ -11,11 +11,12 @@ spec:
         dataProviderId: myIndexData.ts:default
         columns:
           - field: name
-        height: 442.0000305175781
+        height: 242
     - component: DataGrid
       name: dataGrid1
       props:
         dataProviderId: myCursorData.ts:default
         columns:
           - field: name
+        height: 244
   display: shell

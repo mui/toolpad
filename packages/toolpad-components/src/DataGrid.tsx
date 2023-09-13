@@ -30,8 +30,6 @@ import {
   useNode,
   useComponents,
   UseDataProviderContext,
-  ToolpadDataProviderBase,
-  PaginationMode,
   CursorPaginationModel,
   IndexPaginationModel,
 } from '@mui/toolpad-core';
@@ -374,21 +372,25 @@ type DataProviderDataGridProps = (DataGridProProps | { columns?: GridColDef[] })
 };
 
 function useDataProviderDataGridProps(
-  dataProvider: ToolpadDataProviderBase<any, PaginationMode> | null,
+  dataProviderId: string | null | undefined,
 ): DataProviderDataGridProps | null {
+  const useDataProvider = useNonNullableContext(UseDataProviderContext);
+  const { dataProvider } = useDataProvider(dataProviderId || null);
+
   const [paginationModel, setPaginationModel] = React.useState<GridPaginationModel>({
     page: 0,
     pageSize: 100,
   });
 
+  const { page, pageSize } = paginationModel;
+
   const mapPageToNextCursor = React.useRef(new Map<number, string>());
 
-  const { data, isFetching, error } = useQuery({
+  const { data, isFetching, isPreviousData, isLoading, error } = useQuery({
     enabled: !!dataProvider,
-    queryKey: [dataProvider, paginationModel],
+    queryKey: ['toolpadDataProvider', dataProviderId, page, pageSize],
     keepPreviousData: true,
     queryFn: async () => {
-      const { page, pageSize } = paginationModel;
       invariant(dataProvider, 'dataProvider must be defined');
       let dataProviderPaginationModel: IndexPaginationModel | CursorPaginationModel;
       if (dataProvider.paginationMode === 'cursor') {
@@ -416,8 +418,16 @@ function useDataProviderDataGridProps(
         paginationModel: dataProviderPaginationModel,
       });
 
-      if (typeof result.cursor === 'string') {
-        mapPageToNextCursor.current.set(page, result.cursor);
+      if (dataProvider.paginationMode === 'cursor') {
+        if (typeof result.cursor === 'undefined') {
+          throw new Error(
+            `No cursor returned for page ${page}. Return \`null\` to signal the end of the data.`,
+          );
+        }
+
+        if (typeof result.cursor === 'string') {
+          mapPageToNextCursor.current.set(page, result.cursor);
+        }
       }
 
       return result;
@@ -434,7 +444,7 @@ function useDataProviderDataGridProps(
   }
 
   return {
-    loading: isFetching,
+    loading: isLoading || (isPreviousData && isFetching),
     paginationMode: 'server',
     pagination: true,
     paginationModel,
@@ -462,10 +472,7 @@ const DataGridComponent = React.forwardRef(function DataGridComponent(
   }: ToolpadDataGridProps,
   ref: React.ForwardedRef<HTMLDivElement>,
 ) {
-  const useDataProvider = useNonNullableContext(UseDataProviderContext);
-  const { dataProvider } = useDataProvider(dataProviderId || null);
-
-  const dataProviderProps = useDataProviderDataGridProps(dataProvider);
+  const dataProviderProps = useDataProviderDataGridProps(dataProviderId);
 
   const nodeRuntime = useNode<ToolpadDataGridProps>();
 

@@ -483,12 +483,12 @@ export interface ApplicationVm {
 }
 
 export interface IndexPaginationModel {
-  start?: number;
+  start: number;
   pageSize: number;
 }
 
 export interface CursorPaginationModel {
-  cursor?: string;
+  cursor: string | null;
   pageSize: number;
 }
 
@@ -501,16 +501,17 @@ export interface GetRecordsParams<R, P extends PaginationMode> {
   // sortModel: SortModel;
 }
 
-export interface GetRecordsResult<R> {
+export interface GetRecordsResult<R, P extends PaginationMode> {
   records: R[];
   hasNextPage?: boolean;
   totalCount?: number;
+  cursor?: P extends 'cursor' ? string | null : undefined;
 }
 
 export interface ToolpadDataProviderBase<R, P extends PaginationMode = 'index'> {
   paginationMode?: P;
-  getRecords: (params: GetRecordsParams<R, P>) => Promise<GetRecordsResult<R>>;
-  getRecordCount?: () => Promise<number>;
+  getRecords: (params: GetRecordsParams<R, P>) => Promise<GetRecordsResult<R, P>>;
+  // getTotalCount?: () => Promise<number>;
   // updateRecord?: (id: string, record: R) => Promise<void>;
   // deleteRecord?: (id: string) => Promise<void>;
   // createRecord?: (record: R) => Promise<void>;

@@ -31,6 +31,9 @@ import {
   useComponents,
   UseDataProviderContext,
   ToolpadDataProviderBase,
+  PaginationMode,
+  CursorPaginationModel,
+  IndexPaginationModel,
 } from '@mui/toolpad-core';
 import {
   Box,
@@ -371,49 +374,71 @@ type DataProviderDataGridProps = (DataGridProProps | { columns?: GridColDef[] })
 };
 
 function useDataProviderDataGridProps(
-  dataProvider: ToolpadDataProviderBase<any, any> | null,
+  dataProvider: ToolpadDataProviderBase<any, PaginationMode> | null,
 ): DataProviderDataGridProps | null {
   const [paginationModel, setPaginationModel] = React.useState<GridPaginationModel>({
     page: 0,
     pageSize: 100,
   });
 
-  const { data, isLoading, error } = useQuery({
+  const mapPageToNextCursor = React.useRef(new Map<number, string>());
+
+  const { data, isFetching, error } = useQuery({
     enabled: !!dataProvider,
     queryKey: [dataProvider, paginationModel],
+    keepPreviousData: true,
     queryFn: async () => {
+      const { page, pageSize } = paginationModel;
       invariant(dataProvider, 'dataProvider must be defined');
-      return dataProvider.getRecords({
-        paginationModel: {
-          start: paginationModel.page * paginationModel.pageSize,
-          pageSize: paginationModel.pageSize,
-        },
+      let dataProviderPaginationModel: IndexPaginationModel | CursorPaginationModel;
+      if (dataProvider.paginationMode === 'cursor') {
+        // cursor based pagination
+        let cursor: string | null = null;
+        if (page !== 0) {
+          cursor = mapPageToNextCursor.current.get(page - 1) ?? null;
+          if (cursor === null) {
+            throw new Error(`No cursor found for page ${page - 1}`);
+          }
+        }
+        dataProviderPaginationModel = {
+          cursor,
+          pageSize,
+        } satisfies CursorPaginationModel;
+      } else {
+        // index based pagination
+        dataProviderPaginationModel = {
+          start: page * pageSize,
+          pageSize,
+        } satisfies IndexPaginationModel;
+      }
+
+      const result = await dataProvider.getRecords({
+        paginationModel: dataProviderPaginationModel,
       });
+
+      if (typeof result.cursor === 'string') {
+        mapPageToNextCursor.current.set(page, result.cursor);
+      }
+
+      return result;
     },
   });
 
   const rowCount =
     data?.totalCount ??
     (data?.hasNextPage ? (paginationModel.page + 1) * paginationModel.pageSize + 1 : undefined) ??
-    undefined;
-
-  const [latestRowCount, setLatestRowCount] = React.useState(rowCount ?? 0);
-  React.useEffect(() => {
-    if (rowCount !== undefined) {
-      setLatestRowCount(rowCount);
-    }
-  }, [rowCount]);
+    0;
 
   if (!dataProvider) {
     return null;
   }
 
   return {
-    loading: isLoading,
+    loading: isFetching,
     paginationMode: 'server',
     pagination: true,
     paginationModel,
-    rowCount: latestRowCount,
+    rowCount,
     onPaginationModelChange(model) {
       setPaginationModel(model);
     },

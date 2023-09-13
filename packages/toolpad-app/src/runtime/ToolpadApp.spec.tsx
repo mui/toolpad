@@ -13,9 +13,7 @@ import ToolpadApp from './ToolpadApp';
 import * as appDom from '../appDom';
 import createRuntimeState from './createRuntimeState';
 
-async function loadComponents() {
-  return {};
-}
+const COMPONENTS = {};
 
 // More sensible default for these tests
 const waitFor: typeof waitForOrig = (waiter, options) =>
@@ -43,7 +41,7 @@ function renderPage(
 
   return render(
     <CanvasEventsContext.Provider value={canvasEvents}>
-      <ToolpadApp loadComponents={loadComponents} state={state} basename="toolpad" />
+      <ToolpadApp extraComponents={COMPONENTS} state={state} basename="toolpad" />
     </CanvasEventsContext.Provider>,
   );
 }

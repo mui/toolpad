@@ -1,6 +1,6 @@
 import { createDataProvider } from '@mui/toolpad-core/server';
 
-const DATA = Array.from({ length: 1_000 }, (_, id) => ({ id, name: `Item ${id}` }));
+const DATA = Array.from({ length: 1_000 }, (_, id) => ({ id, name: `Cursor item ${id}` }));
 
 export default createDataProvider({
   paginationMode: 'cursor',

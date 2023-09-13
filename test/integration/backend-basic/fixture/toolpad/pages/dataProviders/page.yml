@@ -11,6 +11,7 @@ spec:
         dataProviderId: myIndexData.ts:default
         columns:
           - field: name
+            width: 135
         height: 242
     - component: DataGrid
       name: dataGrid1
@@ -18,5 +19,6 @@ spec:
         dataProviderId: myCursorData.ts:default
         columns:
           - field: name
+            width: 133
         height: 244
   display: shell

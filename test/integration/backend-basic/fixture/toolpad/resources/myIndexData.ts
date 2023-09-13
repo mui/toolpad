@@ -1,6 +1,6 @@
 import { createDataProvider } from '@mui/toolpad-core/server';
 
-const DATA = Array.from({ length: 100_000 }, (_, id) => ({ id, name: `Item ${id}` }));
+const DATA = Array.from({ length: 100_000 }, (_, id) => ({ id, name: `Index item ${id}` }));
 
 export default createDataProvider({
   async getRecords({ paginationModel: { start = 0, pageSize } }) {

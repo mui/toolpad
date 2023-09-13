@@ -270,7 +270,7 @@ export default function Hero() {
                 sm: 'unset',
                 md: `rotateY(${heroAppMode ? '0' : '180'}deg)`,
               },
-              boxShadow: `0 0 16px ${alpha(theme.palette.grey[100], 0.9)}`,
+              boxShadow: `0 4px 8px ${alpha(theme.palette.grey[100], 0.9)}`,
             }),
             (theme) =>
               theme.applyDarkStyles({
@@ -278,7 +278,7 @@ export default function Hero() {
                   (theme.vars || theme).palette.primaryDark[500]
                 } 0%, ${alpha(theme.palette.primaryDark[800], 0.4)} 150%)`,
                 borderColor: `${alpha(theme.palette.primaryDark[300], 0.3)}`,
-                boxShadow: `0 4px 8px ${alpha(theme.palette.primaryDark[600], 0.5)}`,
+                boxShadow: `0 4px 8px ${alpha(theme.palette.common.black, 0.8)}`,
               }),
           ]}
         >

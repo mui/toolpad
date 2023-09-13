@@ -213,33 +213,37 @@ async function loadThemeFromFile(root: string): Promise<Theme | null> {
   return null;
 }
 
-function createDefaultCodeComponent(name: string): string {
+async function createDefaultCodeComponent(name: string, filePath: string): Promise<string> {
   const componentId = name.replace(/\s/g, '');
   const propTypeId = `${componentId}Props`;
-  return format(`
-    import * as React from 'react';
-    import { Typography } from '@mui/material';
-    import { createComponent } from '@mui/toolpad/browser';
-    
-    export interface ${propTypeId} {
-      msg: string;
-    }
-    
-    function ${componentId}({ msg }: ${propTypeId}) {
-      return (
-        <Typography>{msg}</Typography>
-      );
-    }
+  const result = await format(
+    `
+  import * as React from 'react';
+  import { Typography } from '@mui/material';
+  import { createComponent } from '@mui/toolpad/browser';
+  
+  export interface ${propTypeId} {
+    msg: string;
+  }
+  
+  function ${componentId}({ msg }: ${propTypeId}) {
+    return (
+      <Typography>{msg}</Typography>
+    );
+  }
 
-    export default createComponent(${componentId}, {
-      argTypes: {
-        msg: {
-          type: "string",
-          default: "Hello world!"
-        },
+  export default createComponent(${componentId}, {
+    argTypes: {
+      msg: {
+        type: "string",
+        default: "Hello world!"
       },
-    });    
-  `);
+    },
+  });    
+`,
+    filePath,
+  );
+  return result;
 }
 
 class Lock {
@@ -742,7 +746,7 @@ function optimizePageElement(element: ElementType): ElementType {
 
   return {
     ...element,
-    children: (element.children ?? []).map(optimizePageElement),
+    children: element.children && element.children.map(optimizePageElement),
   };
 }
 
@@ -1177,7 +1181,7 @@ class ToolpadProject {
   async createComponent(name: string) {
     const componentsFolder = getComponentsFolder(this.root);
     const filePath = getComponentFilePath(componentsFolder, name);
-    const content = createDefaultCodeComponent(name);
+    const content = await createDefaultCodeComponent(name, filePath);
     await writeFileRecursive(filePath, content, { encoding: 'utf-8' });
   }
 

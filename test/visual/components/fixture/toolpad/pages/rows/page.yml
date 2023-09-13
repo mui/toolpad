@@ -12,14 +12,12 @@ spec:
           {
               component: TextField,
               name: textField,
-              props: { fullWidth: true },
-              children: []
+              props: { fullWidth: true }
             },
           {
               component: TextField,
               name: textField1,
-              props: { fullWidth: true },
-              children: []
+              props: { fullWidth: true }
             }
         ]
       props:

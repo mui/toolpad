@@ -38,7 +38,7 @@
     {
       "groupName": "node",
       "matchPackageNames": ["cimg/node", "node"],
-      "allowedVersions": "16.14.2"
+      "allowedVersions": "18.17.1"
     },
     {
       "description": "Ignore nodejs in engines",
@@ -46,12 +46,6 @@
       "matchManagers": ["npm"],
       "matchDepTypes": ["engines"],
       "enabled": false
-    },
-    {
-      "groupName": "react-inspector",
-      "matchPackageNames": ["react-inspector"],
-      "allowedVersions": "< 6.0.0",
-      "description": "Breaking changes in the types. https://github.com/storybookjs/react-inspector/issues/162"
     },
     {
       "groupName": "node-fetch",
@@ -75,11 +69,6 @@
     {
       "groupName": "GitHub Actions",
       "matchManagers": ["github-actions"]
-    },
-    {
-      "groupName": "monaco-editor",
-      "matchPackageNames": ["monaco-editor"],
-      "description": "We're having trouble upgrading monaco-editor to >0.40."
     },
     {
       "groupName": "requires-node-18",

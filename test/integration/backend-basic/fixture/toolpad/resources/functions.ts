@@ -132,3 +132,8 @@ export async function getRawText() {
 export async function inspectContext() {
   return getContext();
 }
+
+export async function setCustomCookie() {
+  const context = getContext();
+  context.setCookie('MY_TOOLPAD_COOKIE', 'hello everybody!!!');
+}

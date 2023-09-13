@@ -8,7 +8,7 @@ _Sep 13, 2023_
 
 A big thanks to the 5 contributors who made this release possible. Here are some highlights ✨:
 
-Support date formats in DataGrid, upgrade to Node 18, fix container components, respect user's prettier config when formatting files.
+Support date and time formats in DataGrid, upgrade to Node 18, fix container components, respect user's prettier config when formatting files.
 
 - &#8203;<!-- 21 -->Simplify component loading (#2667) @Janpot
 - &#8203;<!-- 20 -->Fix gap and direction in layout slots (#2653) @apedroferreira

@@ -1536,7 +1536,6 @@ export default function ToolpadApp({
     () => ({ ...internalComponents, ...extraComponents }),
     [extraComponents],
   );
-  console.log('components', extraComponents, components);
 
   const [resetNodeErrorsKey, setResetNodeErrorsKey] = React.useState(0);
 

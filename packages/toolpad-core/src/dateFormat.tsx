@@ -39,6 +39,7 @@ const TIME_FORMATS = new Map<DateStyle, Intl.DateTimeFormat>(
   ]),
 );
 
+// Constructing a demo date whether the time is 12h or 24h.
 const DEMO_DATE = new Date();
 DEMO_DATE.setHours(13);
 DEMO_DATE.setMinutes(28);

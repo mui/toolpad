@@ -494,6 +494,7 @@ export interface CursorPaginationModel {
 
 export type PaginationMode = 'index' | 'cursor';
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export interface GetRecordsParams<R, P extends PaginationMode> {
   paginationModel: P extends 'cursor' ? CursorPaginationModel : IndexPaginationModel;
   // filterModel: FilterModel;

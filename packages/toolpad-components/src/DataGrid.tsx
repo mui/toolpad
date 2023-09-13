@@ -414,6 +414,7 @@ function useDataProviderDataGridProps(
       setPaginationModel(model);
     },
     rows: data?.records ?? [],
+    error,
   };
 }
 

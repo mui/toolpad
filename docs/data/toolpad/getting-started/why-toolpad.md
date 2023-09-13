@@ -61,7 +61,7 @@ Toolpad supports connecting to data in two ways:
 
 Toolpad ensures you have **full control** over your development lifecycle. Toolpad supports a local-first way of application development. Your project lives on your own file system. You can use your own IDE, version control system, deployment target, and CLI tools.
 
-You can build your app and deploy it like any other Node.js app, to any hosting provider of your choice (AWS, Render, Railway, Heroku etc.). Toolpad does not lock you in to its own cloud hosting.
+Like any Node.js app, you can self-host a Toolpad app to your own server or any hosting provider of your choice (AWS, Render, Railway, Heroku etc.). Toolpad does not lock you in to its own cloud hosting.
 
 ### Collaboration and Sharing
 

@@ -108,7 +108,11 @@ export default function UrlQueryEditor({ pageNodeId }: UrlQueryEditorProps) {
           <Typography>
             Page parameters allow you to pass external data into the Toolpad page state via the URL
             query. Read more in the{' '}
-            <Link href="https://mui.com/toolpad/concepts/managing-state/#page-parameters">
+            <Link
+              href="https://mui.com/toolpad/concepts/managing-state/#page-parameters"
+              target="_blank"
+              rel="noopener"
+            >
               docs
             </Link>
             .

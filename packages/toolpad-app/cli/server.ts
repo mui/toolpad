@@ -1,7 +1,7 @@
 import * as path from 'path';
 import { IncomingMessage, createServer } from 'http';
 import * as fs from 'fs/promises';
-import { Worker } from 'worker_threads';
+import { Worker, MessageChannel } from 'worker_threads';
 import express from 'express';
 import invariant from 'invariant';
 import getPort from 'get-port';
@@ -15,6 +15,7 @@ import { listen } from '@mui/toolpad-utils/http';
 import openBrowser from 'react-dev-utils/openBrowser';
 import { folderExists } from '@mui/toolpad-utils/fs';
 import chalk from 'chalk';
+import { serveRpc } from '@mui/toolpad-utils/workerRpc';
 import { asyncHandler } from '../src/utils/express';
 import { createProdHandler } from '../src/server/toolpadAppServer';
 import {
@@ -24,10 +25,11 @@ import {
   initProject,
 } from '../src/server/localMode';
 import type { Command as AppDevServerCommand, AppViteServerConfig, WorkerRpc } from './appServer';
-import { createRpcHandler, createRpcServer } from '../src/server/rpc';
+import { createRpcHandler } from '../src/server/rpc';
 import { RUNTIME_CONFIG_WINDOW_PROPERTY } from '../src/constants';
 import type { RuntimeConfig } from '../src/config';
-import { createWorkerRpcServer } from '../src/server/workerRpc';
+import { createRpcServer } from '../src/server/rpcServer';
+import { createRpcRuntimeServer } from '../src/server/rpcRuntimeServer';
 
 const DEFAULT_PORT = 3000;
 
@@ -52,6 +54,8 @@ async function createDevHandler(
   const appServerPath = path.resolve(__dirname, './appServer.js');
   const devPort = await getPort();
 
+  const mainThreadRpcChannel = new MessageChannel();
+
   const worker = new Worker(appServerPath, {
     workerData: {
       outDir: getAppOutputFolder(project.getRoot()),
@@ -59,7 +63,9 @@ async function createDevHandler(
       config: runtimeConfig,
       root: project.getRoot(),
       port: devPort,
+      mainThreadRpcPort: mainThreadRpcChannel.port1,
     } satisfies AppViteServerConfig,
+    transferList: [mainThreadRpcChannel.port1],
     env: {
       ...process.env,
       NODE_ENV: 'development',
@@ -76,7 +82,7 @@ async function createDevHandler(
     resolveReadyPromise = resolve;
   });
 
-  createWorkerRpcServer<WorkerRpc>(worker, {
+  serveRpc<WorkerRpc>(mainThreadRpcChannel.port2, {
     notifyReady: async () => resolveReadyPromise?.(),
     loadDom: async () => project.loadDom(),
     getComponents: async () => getComponents(project.getRoot()),
@@ -86,7 +92,9 @@ async function createDevHandler(
     worker.postMessage({ kind: 'reload-components' } satisfies AppDevServerCommand);
   });
 
-  handler.use('/api/data', project.dataManager.createDataHandler(project));
+  handler.use('/api/data', project.dataManager.createDataHandler());
+  const runtimeRpcServer = createRpcRuntimeServer(project);
+  handler.use('/api/runtime-rpc', createRpcHandler(runtimeRpcServer));
   handler.use(
     (req, res, next) => {
       // Stall the request until the dev server is ready

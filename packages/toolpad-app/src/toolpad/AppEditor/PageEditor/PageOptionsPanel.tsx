@@ -47,7 +47,7 @@ export default function PageOptionsPanel() {
           <Typography variant="inherit">
             Control how the navigation panel is rendered in the final application. Read more in the{' '}
             <Link
-              href="https://mui.com/toolpad/concepts/display-mode"
+              href="https://mui.com/toolpad/concepts/display-mode/"
               target="_blank"
               rel="noopener"
             >

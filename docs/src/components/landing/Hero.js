@@ -196,14 +196,23 @@ export default function Hero() {
           Build scalable and secure internal tools locally. Drag and drop to build UI, then connect
           to data sources with your own code.
         </Typography>
-        <GetStartedButtons
-          primaryLabel={'Get started'}
-          primaryUrl={ROUTES.toolpadQuickstart}
-          secondaryLabel={'Book a demo'}
-          secondaryUrl={ROUTES.toolpadDemoBooking}
-          secondaryUrlTarget="_blank"
-          altInstallation={'npx create-toolpad-app@latest'}
-        />
+        <Box
+          sx={{
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: { xs: 'center', md: 'flex-start' },
+          }}
+        >
+          <GetStartedButtons
+            primaryLabel={'Get started'}
+            primaryUrl={ROUTES.toolpadQuickstart}
+            secondaryLabel={'Book a demo'}
+            secondaryUrl={ROUTES.toolpadDemoBooking}
+            secondaryUrlTarget="_blank"
+            altInstallation={'npx create-toolpad-app@latest'}
+            sx={{ width: '100%' }}
+          />
+        </Box>
         <Box
           sx={{
             mt: 4,
@@ -261,7 +270,7 @@ export default function Hero() {
                 sm: 'unset',
                 md: `rotateY(${heroAppMode ? '0' : '180'}deg)`,
               },
-              boxShadow: `0 0 16px ${alpha(theme.palette.grey[100], 0.9)}`,
+              boxShadow: `0 4px 8px ${alpha(theme.palette.grey[100], 0.9)}`,
             }),
             (theme) =>
               theme.applyDarkStyles({
@@ -269,7 +278,7 @@ export default function Hero() {
                   (theme.vars || theme).palette.primaryDark[500]
                 } 0%, ${alpha(theme.palette.primaryDark[800], 0.4)} 150%)`,
                 borderColor: `${alpha(theme.palette.primaryDark[300], 0.3)}`,
-                boxShadow: `0 4px 8px ${alpha(theme.palette.primaryDark[600], 0.5)}`,
+                boxShadow: `0 4px 8px ${alpha(theme.palette.common.black, 0.8)}`,
               }),
           ]}
         >

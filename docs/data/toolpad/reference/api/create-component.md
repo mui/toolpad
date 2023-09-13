@@ -5,7 +5,7 @@
 ## Import
 
 ```jsx
-import { createComponent } from '@mui/toolpad/server';
+import { createComponent } from '@mui/toolpad/browser';
 ```
 
 ## Description
@@ -26,7 +26,7 @@ export default createComponent(MyComponent, config);
 
 A React component that will be available in the drag and drop editor with the defined `argTypes` as its properties.
 
-## types
+## Types
 
 ### ComponentConfig
 
@@ -36,14 +36,14 @@ Describes the custom component.
 
 | Name                   | Type                                   | Description                                                                                                                                              |
 | :--------------------- | :------------------------------------- | :------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `helperText?`          | `string`                               | A short explanatory text that'll be shown in the editor UI when this component is referenced. May contain Markdown                                       |
+| `helperText?`          | `string`                               | A short explanatory text that'll be shown in the editor UI when this component is referenced. May contain Markdown.                                      |
 | `errorProp?`           | `string`                               | Designates a property as "the error property". If Toolpad detects an error on any of the inputs, it will forward it to this property.                    |
 | `errorPropSource?`     | `string[]`                             | Configures which properties result in propagating error state to `errorProp`.                                                                            |
-| `loadingProp?`         | `string`                               | Designates a property as "the loading property". If Toolpad detects any of the inputs is still loading it will set this property to `true`               |
+| `loadingProp?`         | `string`                               | Designates a property as "the loading property". If Toolpad detects any of the inputs is still loading it will set this property to `true`.              |
 | `loadingPropSource?`   | `string[]`                             | Configures which properties result in propagating loading state to `loadingProp`.                                                                        |
 | `layoutDirection?`     | `'vertical' \| 'horizontal' \| 'both'` | Enables controlling the alignment of the component container box.                                                                                        |
 | `resizableHeightProp?` | `string`                               | Designates a property as "the resizable height property". If Toolpad detects any vertical resizing of the component it will forward it to this property. |
-| `argTypes?`            | `{ [name: string]: ArgumentType }`     | Describes the individual properties for this component. See [ArgumentType](#argumenttype)                                                                |
+| `argTypes?`            | `{ [name: string]: ArgumentType }`     | Describes the individual properties for this component. See [ArgumentType](#argumenttype).                                                               |
 
 ### ArgumentType
 
@@ -62,9 +62,9 @@ Argument types describe the type and constraints of custom component properties.
 | `onChangeProp?`     | `string`                                                                                         | The property that is used to control this property.                                                                                                                                                                    |
 | `onChangeHandler?`  | `(...params: any[]) => any`                                                                      | Provides a way to manipulate the value from the onChange event before it is assigned to state.                                                                                                                         |
 | `visible?`          | `boolean`                                                                                        | For compound components, this property is used to control the visibility of this property based on the selected value of another property. If this property is not defined, the property will be visible at all times. |
-| `enum?`             | `string[]`                                                                                       | For the `'string'` type only. Defines a set of valid values for the property                                                                                                                                           |
-| `minimum?`          | `number`                                                                                         | For the `'number'` type only. Defines the minimum allowed value of the property                                                                                                                                        |
-| `maximum?`          | `number`                                                                                         | For the `'number'` type only. Defines the maximum allowed value of the property                                                                                                                                        |
+| `enum?`             | `string[]`                                                                                       | For the `'string'` type only. Defines a set of valid values for the property.                                                                                                                                          |
+| `minimum?`          | `number`                                                                                         | For the `'number'` type only. Defines the minimum allowed value of the property.                                                                                                                                       |
+| `maximum?`          | `number`                                                                                         | For the `'number'` type only. Defines the maximum allowed value of the property.                                                                                                                                       |
 
 ## Usage
 

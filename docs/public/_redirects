@@ -32,6 +32,8 @@
 /toolpad/concepts/connecting-to-data/ /toolpad/concepts/queries/ 301
 /toolpad/how-to-guides/connect-to-datasource/ /toolpad/how-to-guides/connect-to-databases/ 301
 /toolpad/tutorials/render-deploy/ /toolpad/how-to-guides/render-deploy/ 301
+/toolpad/examples/overview/ /toolpad/examples/ 301
+/toolpad/how-to-guides/number-display/ /toolpad/how-to-guides/map-display/ 301
 
 # Create separate namespace on https://mui.com
 

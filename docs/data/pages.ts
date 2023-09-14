@@ -51,6 +51,10 @@ const pages: MuiPage[] = [
         title: 'Managing state',
       },
       {
+        pathname: '/toolpad/concepts/file-structure',
+        title: 'File structure',
+      },
+      {
         pathname: '/toolpad/concepts/deployment',
       },
       {
@@ -166,6 +170,10 @@ const pages: MuiPage[] = [
               {
                 title: 'createComponent',
                 pathname: '/toolpad/reference/api/create-component',
+              },
+              {
+                title: 'getContext',
+                pathname: '/toolpad/reference/api/get-context',
               },
             ],
           },

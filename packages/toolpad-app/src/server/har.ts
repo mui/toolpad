@@ -4,7 +4,7 @@ import fetch, { Request } from 'node-fetch';
 const withHarInstrumentation: typeof withHarOriginal = function withHar(fetchFn, options) {
   const withHarFetch = withHarOriginal(fetchFn, options);
 
-  const patchedfetch = (...args: Parameters<typeof fetch>): ReturnType<typeof fetch> => {
+  const patchedFetch = (...args: Parameters<typeof fetch>): ReturnType<typeof fetch> => {
     // node-fetch-har doesn't deal well with certain ways of passing parameters e.g. passing headers as [string, string][]
     // We're normalizing them here to a format that we know it can handle correctly:
     const req = new Request(...args);
@@ -20,9 +20,9 @@ const withHarInstrumentation: typeof withHarOriginal = function withHar(fetchFn,
     });
   };
 
-  patchedfetch.isRedirect = fetch.isRedirect;
+  patchedFetch.isRedirect = fetch.isRedirect;
 
-  return patchedfetch;
+  return patchedFetch;
 };
 
 export { createHarLog } from '../utils/har';

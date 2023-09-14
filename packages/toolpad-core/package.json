@@ -52,11 +52,18 @@
   },
   "devDependencies": {
     "@types/cookie": "0.5.2",
+    "@types/react": "18.2.20",
     "@types/react-is": "18.2.1",
     "concurrently": "8.2.1"
   },
   "peerDependencies": {
+    "vm-browserify": "^1.1.2",
     "react": "^18.0.0"
+  },
+  "peerDependenciesMeta": {
+    "vm-browserify": {
+      "optional": true
+    }
   },
   "publishConfig": {
     "access": "public"

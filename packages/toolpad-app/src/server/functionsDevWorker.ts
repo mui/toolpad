@@ -14,7 +14,7 @@ import { ToolpadDataProviderIntrospection } from '@mui/toolpad-core/runtime';
 import { TOOLPAD_DATA_PROVIDER_MARKER, ToolpadDataProvider } from '@mui/toolpad-core/server';
 import * as z from 'zod';
 import { fromZodError } from 'zod-validation-error';
-import { GetRecordsParams, GetRecordsResult } from '@mui/toolpad-core';
+import { GetRecordsParams, GetRecordsResult, PaginationMode } from '@mui/toolpad-core';
 
 interface ModuleObject {
   exports: Record<string, unknown>;
@@ -148,11 +148,11 @@ async function introspectDataProvider(
   };
 }
 
-async function getDataProviderRecords(
+async function getDataProviderRecords<R, P extends PaginationMode>(
   filePath: string,
   name: string,
-  params: GetRecordsParams<any, any>,
-): Promise<GetRecordsResult<any>> {
+  params: GetRecordsParams<R, P>,
+): Promise<GetRecordsResult<R, P>> {
   const dataProvider = await loadDataProvider(filePath, name);
 
   return dataProvider.getRecords(params);
@@ -217,11 +217,11 @@ export function createWorker(env: Record<string, any>) {
       return client.introspectDataProvider(filePath, name);
     },
 
-    async getDataProviderRecords(
+    async getDataProviderRecords<R, P extends PaginationMode>(
       filePath: string,
       name: string,
-      params: GetRecordsParams<any, any>,
-    ): Promise<GetRecordsResult<any>> {
+      params: GetRecordsParams<R, P>,
+    ): Promise<GetRecordsResult<R, P>> {
       return client.getDataProviderRecords(filePath, name, params);
     },
   };

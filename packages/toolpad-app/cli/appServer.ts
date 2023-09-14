@@ -66,7 +66,7 @@ export interface ToolpadAppDevServerParams {
   base: string;
 }
 
-export async function createDevServer({ outDir, config, root, base }: ToolpadAppDevServerParams) {
+async function createDevServer({ outDir, config, root, base }: ToolpadAppDevServerParams) {
   const { viteConfig } = createViteConfig({
     outDir,
     dev: true,

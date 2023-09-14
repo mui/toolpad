@@ -1,16 +1,14 @@
-# Button component
+# Button
 
 <p class="description">Guide to configure a button component in Toolpad.</p>
 
-Buttons allow users to take actions, make choices with a single tap.
+Buttons allow users to take actions, make choices with a single tap. Detailed documentation of the component properties is available in the reference section for [button](/toolpad/reference/components/button/#properties).
 
 {{"component": "modules/components/button.js"}}
 
 ## Variations
 
 {{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/components/button/variations.png", "alt": "Variations of button in Toolpad", "caption": "Variations of button in Toolpad", "indent": 1}}
-
-Detailed documentation on the above properties is available in the reference section for [button](/toolpad/reference/components/button/#properties).
 
 ## Usage
 

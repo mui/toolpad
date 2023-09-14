@@ -90,23 +90,20 @@ spec:
       props:
         value: end-text
     - component: Text
-      name: text
-      children: []
+      name: text3
       props:
         mode: markdown
         loading: false
         value: start-markdown-text
     - component: Text
-      name: text1
-      children: []
+      name: text4
       layout:
         horizontalAlign: center
       props:
         value: center-markdown-text
         mode: markdown
     - component: Text
-      name: text2
-      children: []
+      name: text5
       layout:
         horizontalAlign: end
       props:

@@ -29,14 +29,15 @@ const ImageContainer = styled(Link)(({ theme }) => [
     )} 150%)`,
     border: '1px solid',
     borderColor: (theme.vars || theme).palette.grey[100],
-    boxShadow: `0 4px 8px ${alpha(theme.palette.grey[100], 0.5)}`,
+    boxShadow: `0 2px 4px ${alpha(theme.palette.grey[100], 0.8)}`,
     overflow: 'hidden',
   },
   theme.applyDarkStyles({
-    background: `linear-gradient(120deg, ${(theme.vars || theme).palette.primaryDark[500]
-      } 0%, ${alpha(theme.palette.primaryDark[800], 0.4)} 150%)`,
+    background: `linear-gradient(120deg, ${
+      (theme.vars || theme).palette.primaryDark[500]
+    } 0%, ${alpha(theme.palette.primaryDark[800], 0.4)} 150%)`,
     borderColor: `${alpha(theme.palette.primaryDark[300], 0.3)}`,
-    boxShadow: `0 4px 8px ${alpha(theme.palette.primaryDark[600], 0.5)}`,
+    boxShadow: `0 2px 4px ${alpha(theme.palette.common.black, 0.8)}`,
   }),
 ]);
 

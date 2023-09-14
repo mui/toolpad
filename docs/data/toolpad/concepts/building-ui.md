@@ -17,6 +17,12 @@ Toolpad has many [built-in components](/toolpad/reference/components/) and we ar
 
 ## Using components
 
+Each component has a set of properties that you can tweak in the **inspector panel** on the right. To view the page structure, and select or rename components, use the **page hierarchy explorer** on the bottom-left.
+
+{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/concepts/building-ui/canvas-1.png", "alt": "Toolpad panels", "caption": "Inspector panel and page hierarchy explorer" }}
+
+Below are the step-by-step instructions on adding, moving, deleting and resizing a component in Toolpad:
+
 1. Open the component library and drag a component over the canvas.
 2. The canvas will highlight the location where the component can be dropped. Release the mouse to drop it.
 3. To select a component, click on it either in the canvas or in the page hierarchy explorer. An overlay indicates the selected component.
@@ -25,10 +31,6 @@ Toolpad has many [built-in components](/toolpad/reference/components/) and we ar
 6. Components can be horizontally resized within the grid boundaries:
 
 {{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/concepts/building-ui/canvas-8.png", "alt": "Resize component", "caption": "Resizing components along columns", "zoom": false }}
-
-Each component has a set of properties that you can tweak in the **inspector panel** on the right. To view the page structure, and select or rename components, use the **page hierarchy explorer** on the bottom-left.
-
-{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/concepts/building-ui/canvas-1.png", "alt": "Toolpad panels", "caption": "Inspector panel and page hierarchy explorer" }}
 
 Binding dynamic values to these properties is explained in the [managing state](/toolpad/concepts/managing-state/) section.
 

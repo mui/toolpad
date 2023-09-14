@@ -67,21 +67,6 @@ Like any Node.js app, you can self-host a Toolpad app to your own server or any 
 
 The Toolpad application configuration is stored in yaml files that can be checked into git or any version control tool of your choice and maintained collaboratively. We didn't want to reinvent the wheel when it comes to collaboration for engineers. Having a private code repository is one of the essential practices to ensure **safety** of user data.
 
-<!---
-### Consistent Design
-
-Maintaining a consistent design language throughout a web application is crucial for a seamless user experience. Toolpad helps you achieve this by providing pre-built components that follow Material Design guidelines.
-
-Toolpad also supports adding a theme to a page which can help with a UI that matches your brand guidelines. The components have individual overrides as well, in case you wish to customize them further.
-
-
-### Open-Source
-
-MUI Toolpad is an open-source project, which follows an open-core model. It means that the core is going to remain free to use forever. In the future, we may add add paid features to support advanced use cases. However, we will not attempt to monetise the project via artificial constraints on usage, such as limits on the number of connections, components or queries.
-
-The open-source nature of Toolpad also means that it is constantly being updated and improved by the MUI team and the community.
--->
-
 ## Conclusion
 
 Toolpad is a platform to build internal tools that are used for tasks like running marketing campaigns, data analysis, monitoring fraud, updating user data, and more. It aims to reduce the overhead associated with frontend development by providing visual editors and reducing the amount of boilerplate required to bring data on the page. With a drag-and-drop UI, you can build an internal tool for your business logic in just one sitting.

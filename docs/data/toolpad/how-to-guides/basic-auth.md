@@ -4,6 +4,8 @@
 
 You can integrate [basic auth](https://developer.mozilla.org/en-US/docs/Web/HTTP/Authentication#basic_authentication_scheme) into your Toolpad applications using a simple environment variable configuration
 
+{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/how-to-guides/basic-auth/basic-auth.png", "alt": "Basic auth", "caption": "Basic auth in Toolpad", "indent": 1}}
+
 ## Environment variables
 
 Toolpad supports the following environment variables to configure applications:

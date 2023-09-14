@@ -1,5 +1,39 @@
 # Changelog
 
+## 0.1.28
+
+<!-- generated comparing v0.1.27..master -->
+
+_Sep 13, 2023_
+
+A big thanks to the 5 contributors who made this release possible. Here are some highlights ✨:
+
+Support date and time formats in DataGrid, upgrade to Node 18, fix container components, respect user's prettier config when formatting files.
+
+- &#8203;<!-- 21 -->Simplify component loading (#2667) @Janpot
+- &#8203;<!-- 20 -->Fix gap and direction in layout slots (#2653) @apedroferreira
+- &#8203;<!-- 19 -->Support date/dateTime formatting (#2589) @Janpot
+- &#8203;<!-- 18 -->Remove monaco-editor special case in renovatebot (#2663) @Janpot
+- &#8203;<!-- 17 -->format component and function (#2665) @JerryWu1234
+- &#8203;<!-- 16 -->Upgrade react-inspector (#2647) @Janpot
+- &#8203;<!-- 15 -->Remove fetch polyfills for node 18 (#2651) @Janpot
+- &#8203;<!-- 14 -->respect the user's prettier config when writing yml files (#2638) @JerryWu1234
+- &#8203;<!-- 13 -->Allow execa update (#2654) @Janpot
+- &#8203;<!-- 12 -->Fix container components (#2635) @apedroferreira
+- &#8203;<!-- 11 -->Upgrade to Node 18 (#2505) @apedroferreira
+- &#8203;<!-- 10 -->[docs] Simpler package readme @oliviertassinari
+- &#8203;<!-- 09 -->[docs] Fix /toolpad/reference/api/get-context/ 404 (#2656) @oliviertassinari
+- &#8203;<!-- 08 -->[docs] Fix description @oliviertassinari
+- &#8203;<!-- 07 -->[docs] Fix 404 link @oliviertassinari
+- &#8203;<!-- 06 -->[docs] Sync prism with docs-infra (#2652) @oliviertassinari
+- &#8203;<!-- 05 -->[examples] Migrate to railsway (#2646) @oliviertassinari
+- &#8203;<!-- 04 -->[refactor] Refactor worker rpc (#2645) @Janpot
+- &#8203;<!-- 03 -->[website] Tweak a few elements on the landing page (#2666) @danilo-leal
+- &#8203;<!-- 02 -->[website] Remove dead code @oliviertassinari
+- &#8203;<!-- 01 -->[website] Fix redirection @oliviertassinari
+
+All contributors of this release in alphabetical order: @apedroferreira, @danilo-leal, @Janpot, @JerryWu1234, @oliviertassinari
+
 ## 0.1.27
 
 <!-- generated comparing v0.1.26..master -->

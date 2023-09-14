@@ -114,7 +114,9 @@ export function getNodesViewInfo(rootElm: HTMLElement): {
             const display = window.getComputedStyle(childContainerElm).display;
 
             let flowDirection = 'row';
-            if (display === 'grid') {
+            if (slotType === 'layout') {
+              flowDirection = 'column';
+            } else if (display === 'grid') {
               const gridAutoFlow = window.getComputedStyle(childContainerElm).gridAutoFlow;
               flowDirection = gridAutoFlow === 'row' ? 'column' : 'row';
             } else if (display === 'flex') {

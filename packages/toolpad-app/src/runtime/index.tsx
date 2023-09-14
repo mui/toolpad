@@ -43,13 +43,12 @@ export interface RootProps {
 
 function Root({ ToolpadApp, initialState, base }: RootProps) {
   const components = useComponents();
-  const loadComponents = React.useMemo(() => async () => components, [components]);
   return (
     <React.StrictMode>
       <CacheProvider value={cache}>
         {/* For some reason this helps with https://github.com/vitejs/vite/issues/12423 */}
         <Button sx={{ display: 'none' }} />
-        <ToolpadApp basename={base} state={initialState} loadComponents={loadComponents} />
+        <ToolpadApp basename={base} state={initialState} extraComponents={components} />
         <Box data-testid="page-ready-marker" sx={{ display: 'none' }} />
       </CacheProvider>
     </React.StrictMode>

@@ -18,7 +18,7 @@ permissions: {}
 
 jobs:
   test-dev:
-    if: ${{ github.event.ref == 'refs/heads/master'|| contains(github.event.pull_request.labels.*.name, 'bug') }}
+    if: ${{ github.event.ref == 'refs/heads/master'|| contains(github.event.pull_request.labels.*.name, 'OS testing') }}
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:

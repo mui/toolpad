@@ -618,8 +618,6 @@ export function BindingEditor<V>({
   envVarNames,
 }: BindingEditorProps<V>) {
   const [open, setOpen] = React.useState(false);
-  // const { data } = client.useQuery('getPrettierConfig', []);
-  // console.log(data, '.>>>>');
   const handleOpen = React.useCallback(() => setOpen(true), []);
   const handleClose = React.useCallback(() => setOpen(false), []);
 

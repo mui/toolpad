@@ -31,7 +31,7 @@
     "@mui/monorepo": "https://github.com/mui/material-ui.git",
     "@mui/styles": "5.14.9",
     "@mui/utils": "5.14.9",
-    "@mui/toolpad": "workspace:*",
+    "@mui/toolpad": "0.1.28",
     "@trendmicro/react-interpolate": "0.5.5",
     "@types/lodash": "4.14.198",
     "@types/react-dom": "18.2.7",

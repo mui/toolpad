@@ -42,8 +42,8 @@
     "@types/inquirer": "9.0.3",
     "@types/invariant": "2.2.35",
     "@types/node-fetch": "2.6.4",
-    "@types/semver": "^7.5.0",
-    "@types/yargs": "^17.0.24",
+    "@types/semver": "7.5.0",
+    "@types/yargs": "17.0.24",
     "node-fetch": "2.7.0"
   },
   "gitHead": "60bec54459ba0f3334c62f12e6e6c2c10a08fd21"

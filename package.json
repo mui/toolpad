@@ -45,7 +45,7 @@
     "test:rest:start": "tsx ./scripts/restTestServer.ts"
   },
   "devDependencies": {
-    "@argos-ci/core": "^0.11.0",
+    "@argos-ci/core": "0.11.0",
     "@jest/globals": "29.6.4",
     "@mui/monorepo": "https://github.com/mui/material-ui.git",
     "@next/eslint-plugin-next": "13.4.19",

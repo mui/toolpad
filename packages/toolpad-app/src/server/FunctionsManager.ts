@@ -9,7 +9,12 @@ import { glob } from 'glob';
 import { writeFileRecursive, fileExists, readJsonFile } from '@mui/toolpad-utils/fs';
 import invariant from 'invariant';
 import Piscina from 'piscina';
-import { ExecFetchResult, GetRecordsParams, GetRecordsResult } from '@mui/toolpad-core';
+import {
+  ExecFetchResult,
+  GetRecordsParams,
+  GetRecordsResult,
+  PaginationMode,
+} from '@mui/toolpad-core';
 import { errorFrom } from '@mui/toolpad-utils/errors';
 import { ToolpadDataProviderIntrospection } from '@mui/toolpad-core/runtime';
 import EnvManager from './EnvManager';
@@ -343,11 +348,11 @@ export default class FunctionsManager {
     return this.devWorker.intropectDataProvider(fullPath, exportName);
   }
 
-  async getDataProviderRecords(
+  async getDataProviderRecords<R, P extends PaginationMode>(
     fileName: string,
     exportName: string,
-    params: GetRecordsParams<any, any>,
-  ): Promise<GetRecordsResult<any>> {
+    params: GetRecordsParams<R, P>,
+  ): Promise<GetRecordsResult<R, P>> {
     const fullPath = await this.getBuiltOutputFilePath(fileName);
     return this.devWorker.getDataProviderRecords(fullPath, exportName, params);
   }

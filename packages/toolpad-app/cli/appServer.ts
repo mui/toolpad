@@ -2,6 +2,7 @@ import { parentPort, workerData, MessagePort } from 'worker_threads';
 import invariant from 'invariant';
 import { createServer, Plugin } from 'vite';
 import { createRpcClient } from '@mui/toolpad-utils/workerRpc';
+import { ToolpadDataProviderIntrospection } from '@mui/toolpad-core/runtime';
 import {
   getHtmlContent,
   postProcessHtml,
@@ -11,6 +12,7 @@ import {
 import type { RuntimeConfig } from '../src/config';
 import type * as appDom from '../src/appDom';
 import type { ComponentEntry } from '../src/server/localMode';
+import createRuntimeState from '../src/runtime/createRuntimeState';
 
 export type Command = { kind: 'reload-components' } | { kind: 'exit' };
 
@@ -18,9 +20,10 @@ export type WorkerRpc = {
   notifyReady: () => Promise<void>;
   loadDom: () => Promise<appDom.AppDom>;
   getComponents: () => Promise<ComponentEntry[]>;
+  getDataProviders: () => Promise<Record<string, ToolpadDataProviderIntrospection>>;
 };
 
-const { notifyReady, loadDom, getComponents } = createRpcClient<WorkerRpc>(
+const { notifyReady, loadDom, getComponents, getDataProviders } = createRpcClient<WorkerRpc>(
   workerData.mainThreadRpcPort,
 );
 
@@ -41,13 +44,16 @@ function devServerPlugin(root: string, config: RuntimeConfig): Plugin {
           const canvas = url.searchParams.get('toolpad-display') === 'canvas';
 
           try {
-            const dom = await loadDom();
+            const [dom, dataProviders] = await Promise.all([loadDom(), getDataProviders()]);
 
             const template = getHtmlContent({ canvas });
 
             let html = await viteServer.transformIndexHtml(req.url, template);
 
-            html = postProcessHtml(html, { config, dom });
+            html = postProcessHtml(html, {
+              config,
+              initialState: createRuntimeState({ dom, dataProviders }),
+            });
 
             res.setHeader('content-type', 'text/html; charset=utf-8').end(html);
           } catch (e) {

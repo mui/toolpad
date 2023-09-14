@@ -6,8 +6,7 @@ import { indent } from '@mui/toolpad-utils/strings';
 import { RUNTIME_CONFIG_WINDOW_PROPERTY } from '../constants';
 import type { ComponentEntry } from './localMode';
 import type { RuntimeConfig } from '../config';
-import * as appDom from '../appDom';
-import createRuntimeState from '../runtime/createRuntimeState';
+import { RuntimeState } from '../types';
 
 const MAIN_ENTRY = '/main.tsx';
 const CANVAS_ENTRY = '/canvas.tsx';
@@ -61,12 +60,14 @@ export function getHtmlContent({ canvas }: GetHtmlContentParams) {
 
 export interface PostProcessHtmlParams {
   config: RuntimeConfig;
-  dom: appDom.AppDom;
+  initialState: RuntimeState;
 }
 
-export function postProcessHtml(html: string, { config, dom }: PostProcessHtmlParams): string {
+export function postProcessHtml(
+  html: string,
+  { config, initialState }: PostProcessHtmlParams,
+): string {
   const serializedConfig = serializeJavascript(config, { ignoreFunction: true });
-  const initialState = createRuntimeState({ dom });
   const serializedInitialState = serializeJavascript(initialState, { isJSON: true });
 
   const toolpadScripts = [

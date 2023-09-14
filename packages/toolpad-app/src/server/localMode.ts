@@ -21,6 +21,7 @@ import {
   updateYamlFile,
   fileExists,
 } from '@mui/toolpad-utils/fs';
+import { ToolpadDataProviderIntrospection } from '@mui/toolpad-core/runtime';
 import * as appDom from '../appDom';
 import insecureHash from '../utils/insecureHash';
 import {
@@ -1119,6 +1120,10 @@ class ToolpadProject {
     const [dom] = await this.loadDomAndFingerprint();
     this.alertOnMissingVariablesInDom(dom);
     return dom;
+  }
+
+  async getDataProviders(): Promise<Record<string, ToolpadDataProviderIntrospection>> {
+    return {};
   }
 
   async writeDomToDisk(newDom: appDom.AppDom) {

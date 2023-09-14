@@ -8,6 +8,7 @@ import { asyncHandler } from '../utils/express';
 import { basicAuthUnauthorized, checkBasicAuthHeader } from './basicAuth';
 import { createRpcRuntimeServer } from './rpcRuntimeServer';
 import { createRpcHandler } from './rpc';
+import createRuntimeState from '../runtime/createRuntimeState';
 
 export interface CreateViteConfigParams {
   server?: Server;
@@ -41,12 +42,21 @@ export async function createProdHandler(project: ToolpadProject) {
 
   handler.use(
     asyncHandler(async (req, res) => {
-      const dom = await project.loadDom();
+      const [dom, dataProviders] = await Promise.all([
+        project.loadDom(),
+        project.getDataProviders(),
+      ]);
 
       const htmlFilePath = path.resolve(getAppOutputFolder(project.getRoot()), './index.html');
       let html = await fs.readFile(htmlFilePath, { encoding: 'utf-8' });
 
-      html = postProcessHtml(html, { config: project.getRuntimeConfig(), dom });
+      html = postProcessHtml(html, {
+        config: project.getRuntimeConfig(),
+        initialState: createRuntimeState({
+          dom,
+          dataProviders,
+        }),
+      });
 
       res.setHeader('Content-Type', 'text/html; charset=utf-8').status(200).end(html);
     }),

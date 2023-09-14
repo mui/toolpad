@@ -6,10 +6,11 @@ import EditorCanvasHost from '../EditorCanvasHost';
 import { getNodeHashes, useDom, useAppStateApi, useDomLoader, useDomApi } from '../../../AppState';
 import { usePageEditorApi, usePageEditorState } from '../PageEditorProvider';
 import RenderOverlay from './RenderOverlay';
-import { NodeHashes } from '../../../../types';
+import { NodeHashes, RuntimeState } from '../../../../types';
 import useEvent from '../../../../utils/useEvent';
 import type { ToolpadBridge } from '../../../../canvas/ToolpadBridge';
 import { getBindingType } from '../../../../bindings';
+import createRuntimeState from '../../../../runtime/createRuntimeState';
 
 const classes = {
   view: 'Toolpad_View',
@@ -24,13 +25,17 @@ const RenderPanelRoot = styled('div')({
   },
 });
 
+function useRuntimeState(): RuntimeState {
+  const { dom } = useDom();
+  return React.useMemo(() => createRuntimeState({ dom, dataProviders: {} }), [dom]);
+}
+
 export interface RenderPanelProps {
   className?: string;
 }
 
 export default function RenderPanel({ className }: RenderPanelProps) {
   const domLoader = useDomLoader();
-  const { dom } = useDom();
   const domApi = useDomApi();
   const appStateApi = useAppStateApi();
   const pageEditorApi = usePageEditorApi();
@@ -90,11 +95,13 @@ export default function RenderPanel({ className }: RenderPanelProps) {
     setBridge(initializedBridge);
   });
 
+  const runtimeState = useRuntimeState();
+
   return (
     <RenderPanelRoot className={className}>
       <EditorCanvasHost
         className={classes.view}
-        dom={dom}
+        runtimeState={runtimeState}
         savedNodes={savedNodes}
         pageNodeId={pageNodeId}
         overlay={<RenderOverlay bridge={bridge} />}

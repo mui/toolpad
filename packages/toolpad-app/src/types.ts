@@ -10,6 +10,7 @@ import {
   ScopeMeta,
 } from '@mui/toolpad-core';
 import { PaletteMode } from '@mui/material';
+import { ToolpadDataProviderIntrospection } from '@mui/toolpad-core/runtime';
 import type * as appDom from './appDom';
 import type { Awaitable, Maybe, WithControlledProp } from './utils/types';
 import type { Rectangle } from './utils/geometry';
@@ -190,6 +191,7 @@ export type NodeHashes = Record<NodeId, number | undefined>;
 export interface RuntimeState {
   // We start out with just the rendertree. The ultimate goal will be to move things out of this tree
   dom: appDom.RenderTree;
+  dataProviders: Record<string, ToolpadDataProviderIntrospection>;
 }
 
 export interface AppCanvasState extends RuntimeState {

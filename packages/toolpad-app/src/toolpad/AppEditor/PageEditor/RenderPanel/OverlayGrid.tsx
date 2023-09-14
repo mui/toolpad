@@ -2,7 +2,7 @@ import * as React from 'react';
 import { Grid, styled } from '@mui/material';
 import invariant from 'invariant';
 import { usePageEditorState } from '../PageEditorProvider';
-import { useDom } from '../../../AppState';
+import { useAppState } from '../../../AppState';
 import { createToolpadAppTheme } from '../../../../runtime/AppThemeProvider';
 import { absolutePositionCss } from '../../../../utils/geometry';
 
@@ -38,7 +38,7 @@ export const OverlayGrid = React.forwardRef<OverlayGridHandle>(function OverlayG
 ) {
   const gridRef = React.useRef<HTMLDivElement | null>(null);
 
-  const { dom } = useDom();
+  const { dom } = useAppState();
   const { viewState, nodeId: pageNodeId } = usePageEditorState();
 
   const { nodes: nodesInfo } = viewState;

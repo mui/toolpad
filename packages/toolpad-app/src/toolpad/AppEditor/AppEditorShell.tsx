@@ -5,13 +5,13 @@ import SyncProblemIcon from '@mui/icons-material/SyncProblem';
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 import * as React from 'react';
 import { useLocation } from 'react-router-dom';
-import { DomLoader, useDomLoader } from '../AppState';
+import { AppState, useAppState } from '../AppState';
 import ToolpadShell from '../ToolpadShell';
 import PagePanel from './PagePanel';
 import { getViewFromPathname } from '../../utils/domView';
 
-function getSaveState(domLoader: DomLoader): React.ReactNode {
-  if (domLoader.saveDomError) {
+function getSaveState(appState: AppState): React.ReactNode {
+  if (appState.saveDomError) {
     return (
       <Tooltip title="Error while saving">
         <SyncProblemIcon color="primary" />
@@ -19,7 +19,7 @@ function getSaveState(domLoader: DomLoader): React.ReactNode {
     );
   }
 
-  const isSaving = domLoader.unsavedDomChanges > 0;
+  const isSaving = appState.unsavedDomChanges > 0;
 
   if (isSaving) {
     return (
@@ -42,7 +42,7 @@ export interface ToolpadShellProps {
 }
 
 export default function AppEditorShell({ children, ...props }: ToolpadShellProps) {
-  const domLoader = useDomLoader();
+  const appState = useAppState();
 
   const location = useLocation();
 
@@ -67,7 +67,7 @@ export default function AppEditorShell({ children, ...props }: ToolpadShellProps
           </Button>
         </Stack>
       }
-      status={getSaveState(domLoader)}
+      status={getSaveState(appState)}
       {...props}
     >
       <Box

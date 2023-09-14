@@ -54,6 +54,8 @@ import { useDom } from '../AppState';
 import * as appDom from '../../appDom';
 import { getBindingType, getBindingValue } from '../../bindings';
 
+import client from '../../api';
+
 // eslint-disable-next-line import/no-cycle
 import BindableEditor from './PageEditor/BindableEditor';
 
@@ -492,6 +494,7 @@ export function BindingEditorDialog<V>({
   open,
   onClose,
 }: BindingEditorDialogProps<V>) {
+  const { data } = client.useQuery('getPrettierConfig', []);
   const { propType, label } = useBindingEditorContext();
 
   const [input, setInput] = React.useState(value);
@@ -501,18 +504,22 @@ export function BindingEditorDialog<V>({
 
   const committedInput = React.useRef<BindableAttrValue<V> | null>(input);
 
-  const handleSave = React.useCallback(() => {
+  const handleSave = React.useCallback(async () => {
     let newValue = input;
 
     if ((input as JsExpressionAttrValue)?.$$jsExpression) {
+      const jsExpression = await tryFormatExpression(
+        (input as JsExpressionAttrValue).$$jsExpression,
+        data!,
+      );
       newValue = {
-        $$jsExpression: tryFormatExpression((input as JsExpressionAttrValue).$$jsExpression),
+        $$jsExpression: jsExpression,
       };
     }
 
     committedInput.current = newValue;
     onChange(newValue);
-  }, [onChange, input]);
+  }, [onChange, input, data]);
 
   const hasUnsavedChanges = input
     ? getBindingType(input) !==
@@ -611,7 +618,8 @@ export function BindingEditor<V>({
   envVarNames,
 }: BindingEditorProps<V>) {
   const [open, setOpen] = React.useState(false);
-
+  // const { data } = client.useQuery('getPrettierConfig', []);
+  // console.log(data, '.>>>>');
   const handleOpen = React.useCallback(() => setOpen(true), []);
   const handleClose = React.useCallback(() => setOpen(false), []);
 

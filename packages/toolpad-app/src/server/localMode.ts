@@ -39,7 +39,7 @@ import {
   themeSchema,
   API_VERSION,
 } from './schema';
-import { format } from '../utils/prettier';
+import { format, resolvePrettierConfig } from '../utils/prettier';
 import {
   Body as AppDomFetchBody,
   FetchQuery,
@@ -1188,6 +1188,12 @@ class ToolpadProject {
   async deletePage(name: string) {
     const pageFolder = getPageFolder(this.root, name);
     await fs.rm(pageFolder, { force: true, recursive: true });
+  }
+
+  async getPrettierConfig() {
+    const root = this.getRoot();
+    const config = await resolvePrettierConfig(root);
+    return config;
   }
 
   getRuntimeConfig(): RuntimeConfig {

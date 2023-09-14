@@ -1039,15 +1039,7 @@ export function duplicateNode(
   return addFragment(dom, fragment, parent.id, parentProp);
 }
 
-const RENDERTREE_NODES = [
-  'app',
-  'page',
-  'element',
-  'query',
-  'mutation',
-  'theme',
-  'codeComponent',
-] as const;
+const RENDERTREE_NODES = ['app', 'page', 'element', 'query', 'mutation', 'theme'] as const;
 
 export type RenderTreeNodeType = (typeof RENDERTREE_NODES)[number];
 export type RenderTreeNode = { [K in RenderTreeNodeType]: AppDomNodeOfType<K> }[RenderTreeNodeType];

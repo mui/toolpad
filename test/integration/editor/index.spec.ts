@@ -145,11 +145,19 @@ test('can build component layout inside layout slots', async ({ page }) => {
 
   await editorModel.dragNewComponentToCanvas(
     'Text Field',
+    dropAreaBoundingBox!.x + dropAreaBoundingBox!.width / 2,
+    firstInputBoundingBox!.y + (2 / 3) * firstInputBoundingBox!.height,
+  );
+
+  await expect(canvasInputLocator).toHaveCount(2);
+
+  await editorModel.dragNewComponentToCanvas(
+    'Text Field',
     firstInputBoundingBox!.x + firstInputBoundingBox!.width / 2,
     firstInputBoundingBox!.y + firstInputBoundingBox!.height / 2,
   );
 
-  await expect(canvasInputLocator).toHaveCount(2);
+  await expect(canvasInputLocator).toHaveCount(3);
 });
 
 test('must correctly size new layout columns', async ({ page }) => {

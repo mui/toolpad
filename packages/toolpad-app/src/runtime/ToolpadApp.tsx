@@ -100,7 +100,7 @@ const Pre = styled('pre')(({ theme }) => ({
   fontFamily: theme.fontFamilyMonospaced,
 }));
 
-export const internalComponents: ToolpadComponents = Object.fromEntries(
+const internalComponents: ToolpadComponents = Object.fromEntries(
   [...INTERNAL_COMPONENTS].map(([name]) => {
     let builtIn = (builtIns as any)[name];
 
@@ -1108,14 +1108,14 @@ function RenderedNodeContent({ node, childNodeGroups, Component }: RenderedNodeC
         const value = hookResult[propName];
 
         let wrappedValue = value;
-        if (argType.control?.type === 'slots') {
-          wrappedValue = <Slots prop={propName}>{value}</Slots>;
-        } else if (argType.control?.type === 'slot' || argType.control?.type === 'layoutSlot') {
+        if (argType.control?.type === 'slots' || argType.control?.type === 'layoutSlot') {
           wrappedValue = (
-            <Placeholder prop={propName} hasLayout={argType.control?.type === 'layoutSlot'}>
+            <Slots prop={propName} hasLayout={argType.control?.type === 'layoutSlot'}>
               {value}
-            </Placeholder>
+            </Slots>
           );
+        } else if (argType.control?.type === 'slot') {
+          wrappedValue = <Placeholder prop={propName}>{value}</Placeholder>;
         }
 
         if (isTemplate) {
@@ -1515,13 +1515,9 @@ function ToolpadAppLayout({ dom, hasShell = true }: ToolpadAppLayoutProps) {
   );
 }
 
-export interface LoadComponents {
-  (state: RuntimeState): Promise<ToolpadComponents>;
-}
-
 export interface ToolpadAppProps {
   rootRef?: React.Ref<HTMLDivElement>;
-  loadComponents: LoadComponents;
+  extraComponents: ToolpadComponents;
   hasShell?: boolean;
   basename: string;
   state: RuntimeState;
@@ -1529,14 +1525,17 @@ export interface ToolpadAppProps {
 
 export default function ToolpadApp({
   rootRef,
-  loadComponents,
+  extraComponents,
   basename,
   hasShell = true,
   state,
 }: ToolpadAppProps) {
   const { dom } = state;
 
-  const [components, setComponents] = React.useState<ToolpadComponents | null>(null);
+  const components = React.useMemo(
+    () => ({ ...internalComponents, ...extraComponents }),
+    [extraComponents],
+  );
 
   const [resetNodeErrorsKey, setResetNodeErrorsKey] = React.useState(0);
 
@@ -1548,36 +1547,26 @@ export default function ToolpadApp({
     (window as any).toggleDevtools = () => toggleDevtools();
   }, [toggleDevtools]);
 
-  React.useEffect(() => {
-    loadComponents(state).then((codeComponents) =>
-      setComponents({ ...codeComponents, ...internalComponents }),
-    );
-  }, [loadComponents, state]);
-
   return (
     <AppThemeProvider dom={dom}>
       <CssBaseline enableColorScheme />
       <AppRoot ref={rootRef}>
-        {components ? (
-          <ComponentsContextProvider value={components}>
-            <DomContextProvider value={dom}>
-              <ErrorBoundary FallbackComponent={AppError}>
-                <ResetNodeErrorsKeyProvider value={resetNodeErrorsKey}>
-                  <React.Suspense fallback={<AppLoading />}>
-                    <QueryClientProvider client={queryClient}>
-                      <BrowserRouter basename={basename}>
-                        <ToolpadAppLayout dom={dom} hasShell={hasShell} />
-                      </BrowserRouter>
-                      {showDevtools ? <ReactQueryDevtoolsProduction initialIsOpen={false} /> : null}
-                    </QueryClientProvider>
-                  </React.Suspense>
-                </ResetNodeErrorsKeyProvider>
-              </ErrorBoundary>
-            </DomContextProvider>
-          </ComponentsContextProvider>
-        ) : (
-          <AppLoading />
-        )}
+        <ComponentsContextProvider value={components}>
+          <DomContextProvider value={dom}>
+            <ErrorBoundary FallbackComponent={AppError}>
+              <ResetNodeErrorsKeyProvider value={resetNodeErrorsKey}>
+                <React.Suspense fallback={<AppLoading />}>
+                  <QueryClientProvider client={queryClient}>
+                    <BrowserRouter basename={basename}>
+                      <ToolpadAppLayout dom={dom} hasShell={hasShell} />
+                    </BrowserRouter>
+                    {showDevtools ? <ReactQueryDevtoolsProduction initialIsOpen={false} /> : null}
+                  </QueryClientProvider>
+                </React.Suspense>
+              </ResetNodeErrorsKeyProvider>
+            </ErrorBoundary>
+          </DomContextProvider>
+        </ComponentsContextProvider>
         <EditorOverlay id={HTML_ID_EDITOR_OVERLAY} />
       </AppRoot>
     </AppThemeProvider>

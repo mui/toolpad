@@ -70,7 +70,7 @@
 
 7. Select **Create Web Service** to trigger the deployment. We will be redirected to the streaming logs of the in-progress deployment.
 
-8. Render.com uses `14.7.0` as the default Node version. Toolpad requires version `16.17.1` as the minimum Node version. We can change the default by setting a `NODE_VERSION` environment variable for our deployment:
+8. Render.com uses `14.7.0` as the default Node version. Toolpad requires version `18.17.1` as the minimum Node version. We can change the default by setting a `NODE_VERSION` environment variable for our deployment:
 
 {{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/tutorials/deploy-render/node-version.png", "alt": "Set NODE_VERSION ", "caption": "Overriding the default Node version", "indent": 1, "aspectRatio": 3 }}
 

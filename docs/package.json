@@ -29,7 +29,6 @@
     "@mui/icons-material": "5.14.9",
     "@mui/material": "5.14.9",
     "@mui/monorepo": "https://github.com/mui/material-ui.git",
-    "@mui/styles": "5.14.9",
     "@mui/utils": "5.14.9",
     "@trendmicro/react-interpolate": "0.5.5",
     "@types/lodash": "4.14.198",

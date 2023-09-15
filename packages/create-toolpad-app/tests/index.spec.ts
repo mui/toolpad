@@ -41,6 +41,7 @@ test('create-toolpad-app can bootstrap a Toolpad app', async () => {
     cwd: currentDirectory,
   });
   cp.stdout?.pipe(process.stdout);
+  cp.stderr?.pipe(process.stdout);
   const result = await cp;
   expect(result.stdout).toMatch('Run the following to get started');
   const packageJsonContent = await fs.readFile(path.resolve(testDir, './package.json'), {

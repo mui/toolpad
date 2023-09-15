@@ -42,10 +42,7 @@ export async function createProdHandler(project: ToolpadProject) {
 
   handler.use(
     asyncHandler(async (req, res) => {
-      const [dom, dataProviders] = await Promise.all([
-        project.loadDom(),
-        project.getDataProviders(),
-      ]);
+      const dom = await project.loadDom();
 
       const htmlFilePath = path.resolve(project.getAppOutputFolder(), './index.html');
       let html = await fs.readFile(htmlFilePath, { encoding: 'utf-8' });
@@ -54,7 +51,6 @@ export async function createProdHandler(project: ToolpadProject) {
         config: project.getRuntimeConfig(),
         initialState: createRuntimeState({
           dom,
-          dataProviders,
         }),
       });
 

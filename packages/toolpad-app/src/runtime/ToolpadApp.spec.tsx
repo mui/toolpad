@@ -37,7 +37,7 @@ function renderPage(
 
   window.history.replaceState({}, 'Test page', `/toolpad/pages/${page.id}`);
 
-  const state = createRuntimeState({ dom, dataProviders: {} });
+  const state = createRuntimeState({ dom });
 
   return render(
     <CanvasEventsContext.Provider value={canvasEvents}>

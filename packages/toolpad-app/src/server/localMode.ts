@@ -21,7 +21,6 @@ import {
   updateYamlFile,
   fileExists,
 } from '@mui/toolpad-utils/fs';
-import { ToolpadDataProviderIntrospection } from '@mui/toolpad-core/runtime';
 import * as appDom from '../appDom';
 import insecureHash from '../utils/insecureHash';
 import {
@@ -1029,8 +1028,8 @@ class ToolpadProject {
             loadDomFromDisk(this.root),
             calculateDomFingerprint(this.root),
           ]);
-          this.events.emit('change', { fingerprint });
-          this.events.emit('externalChange', { fingerprint });
+          this.events.emit('change', {});
+          this.events.emit('externalChange', {});
 
           const newCodeComponentsFingerprint = getCodeComponentsFingerprint(dom);
           if (this.codeComponentsFingerprint !== newCodeComponentsFingerprint) {
@@ -1130,10 +1129,6 @@ class ToolpadProject {
     return getComponents(this.getRoot());
   }
 
-  async getDataProviders(): Promise<Record<string, ToolpadDataProviderIntrospection>> {
-    return {};
-  }
-
   async writeDomToDisk(newDom: appDom.AppDom) {
     if (!this.options.dev) {
       throw new Error(`Writing to disk is only possible in toolpad dev mode.`);
@@ -1143,17 +1138,16 @@ class ToolpadProject {
     const newFingerprint = await calculateDomFingerprint(this.root);
     this.domAndFingerprint = [newDom, newFingerprint];
     this.events.emit('change', { fingerprint: newFingerprint });
-    return { fingerprint: newFingerprint };
   }
 
   async saveDom(newDom: appDom.AppDom) {
-    return this.domAndFingerprintLock.use(async () => {
+    await this.domAndFingerprintLock.use(async () => {
       return this.writeDomToDisk(newDom);
     });
   }
 
   async applyDomDiff(domDiff: appDom.DomDiff) {
-    return this.domAndFingerprintLock.use(async () => {
+    await this.domAndFingerprintLock.use(async () => {
       const dom = await this.loadDom();
       const newDom = appDom.applyDiff(dom, domDiff);
       return this.writeDomToDisk(newDom);

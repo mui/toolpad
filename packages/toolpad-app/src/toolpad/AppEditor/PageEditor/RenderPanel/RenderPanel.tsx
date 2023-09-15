@@ -27,7 +27,7 @@ const RenderPanelRoot = styled('div')({
 
 function useRuntimeState(): RuntimeState {
   const { dom } = useAppState();
-  return React.useMemo(() => createRuntimeState({ dom, dataProviders: {} }), [dom]);
+  return React.useMemo(() => createRuntimeState({ dom }), [dom]);
 }
 
 export interface RenderPanelProps {

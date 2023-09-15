@@ -2,7 +2,6 @@ import { parentPort, workerData, MessagePort } from 'worker_threads';
 import invariant from 'invariant';
 import { createServer, Plugin } from 'vite';
 import { createRpcClient } from '@mui/toolpad-utils/workerRpc';
-import { ToolpadDataProviderIntrospection } from '@mui/toolpad-core/runtime';
 import {
   getHtmlContent,
   postProcessHtml,
@@ -20,10 +19,9 @@ export type WorkerRpc = {
   notifyReady: () => Promise<void>;
   loadDom: () => Promise<appDom.AppDom>;
   getComponents: () => Promise<ComponentEntry[]>;
-  getDataProviders: () => Promise<Record<string, ToolpadDataProviderIntrospection>>;
 };
 
-const { notifyReady, loadDom, getComponents, getDataProviders } = createRpcClient<WorkerRpc>(
+const { notifyReady, loadDom, getComponents } = createRpcClient<WorkerRpc>(
   workerData.mainThreadRpcPort,
 );
 
@@ -44,7 +42,7 @@ function devServerPlugin(root: string, config: RuntimeConfig): Plugin {
           const canvas = url.searchParams.get('toolpad-display') === 'canvas';
 
           try {
-            const [dom, dataProviders] = await Promise.all([loadDom(), getDataProviders()]);
+            const dom = await loadDom();
 
             const template = getHtmlContent({ canvas });
 
@@ -52,7 +50,7 @@ function devServerPlugin(root: string, config: RuntimeConfig): Plugin {
 
             html = postProcessHtml(html, {
               config,
-              initialState: createRuntimeState({ dom, dataProviders }),
+              initialState: createRuntimeState({ dom }),
             });
 
             res.setHeader('content-type', 'text/html; charset=utf-8').end(html);

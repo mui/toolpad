@@ -396,13 +396,7 @@ function createAppStateApi(
 const [useAppStateContext, AppStateProvider] = createProvidedContext<AppState>('AppState');
 
 export function useAppState(): AppState {
-  const appState = useAppStateContext();
-
-  if (!appState.dom) {
-    throw new Error("Trying to access the DOM before it's loaded");
-  }
-
-  return appState;
+  return useAppStateContext();
 }
 
 const DomApiContext = React.createContext<DomApi>(createDomApi(() => undefined));
@@ -534,8 +528,6 @@ export default function AppProvider({ children }: DomContextProps) {
     [dispatchWithHistory, scheduleTextInputHistoryUpdate],
   );
 
-  const fingerprint = React.useRef<number | undefined>();
-
   const handleSave = React.useCallback(() => {
     if (!state.dom || state.savingDom || state.savedDom === state.dom) {
       return;
@@ -546,8 +538,7 @@ export default function AppProvider({ children }: DomContextProps) {
     const domDiff = appDom.createDiff(state.savedDom, domToSave);
     client.mutation
       .applyDomDiff(domDiff)
-      .then(({ fingerprint: newFingerPrint }) => {
-        fingerprint.current = newFingerPrint;
+      .then(() => {
         dispatch({ type: 'DOM_SAVED', savedDom: domToSave });
       })
       .catch((err) => {

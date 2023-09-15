@@ -24,9 +24,6 @@ export function createRpcServer(project: ToolpadProject) {
       }),
     },
     mutation: {
-      saveDom: createMethod<typeof project.saveDom>(({ params }) => {
-        return project.saveDom(...params);
-      }),
       applyDomDiff: createMethod<typeof project.applyDomDiff>(({ params }) => {
         return project.applyDomDiff(...params);
       }),

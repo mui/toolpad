@@ -20,7 +20,6 @@ export default defineConfig({
   resolve: {
     alias: {
       vm: 'vm-browserify',
-      '@monaco-get-worker': path.resolve(__dirname, '../components/monaco/getWorkerVite.ts'),
     },
   },
   define: {

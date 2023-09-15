@@ -31,7 +31,7 @@ import { DateFormatEditor } from '@mui/toolpad-core/dateFormat';
 import type { EditorProps } from '../../types';
 import { useToolpadComponents } from '../AppEditor/toolpadComponents';
 import { ToolpadComponentDefinition } from '../../runtime/toolpadComponents';
-import { useDom } from '../AppState';
+import { useAppState } from '../AppState';
 import PropertyControl from '../../components/PropertyControl';
 
 // TODO: this import suggests leaky abstraction
@@ -115,7 +115,7 @@ function GridColumnEditor({
   value: editedColumn,
   onChange: handleColumnChange,
 }: GridColumnEditorProps) {
-  const { dom } = useDom();
+  const { dom } = useAppState();
   const toolpadComponents = useToolpadComponents(dom);
   const codeComponents: ToolpadComponentDefinition[] = React.useMemo(() => {
     return Object.values(toolpadComponents)

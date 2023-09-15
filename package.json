@@ -45,7 +45,7 @@
     "test:rest:start": "tsx ./scripts/restTestServer.ts"
   },
   "devDependencies": {
-    "@argos-ci/core": "^0.11.0",
+    "@argos-ci/core": "0.11.0",
     "@jest/globals": "29.6.4",
     "@mui/monorepo": "https://github.com/mui/material-ui.git",
     "@next/eslint-plugin-next": "13.4.19",
@@ -103,7 +103,7 @@
     "tsup": "7.2.0",
     "tsx": "3.12.8",
     "yargs": "17.7.2",
-    "zod": "3.22.2",
+    "zod": "3.21.4",
     "zod-to-json-schema": "3.21.4"
   },
   "engines": {

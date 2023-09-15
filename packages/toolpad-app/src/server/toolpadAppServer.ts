@@ -3,7 +3,7 @@ import * as fs from 'fs/promises';
 import { Server } from 'http';
 import * as express from 'express';
 import { postProcessHtml } from './toolpadAppBuilder';
-import { ToolpadProject, getAppOutputFolder } from './localMode';
+import { ToolpadProject } from './localMode';
 import { asyncHandler } from '../utils/express';
 import { basicAuthUnauthorized, checkBasicAuthHeader } from './basicAuth';
 import { createRpcRuntimeServer } from './rpcRuntimeServer';
@@ -24,7 +24,7 @@ export interface ToolpadAppHandlerParams {
 export async function createProdHandler(project: ToolpadProject) {
   const handler = express.Router();
 
-  handler.use(express.static(getAppOutputFolder(project.getRoot()), { index: false }));
+  handler.use(express.static(project.getAppOutputFolder(), { index: false }));
 
   // Allow static assets, block everything else
   handler.use((req, res, next) => {
@@ -47,7 +47,7 @@ export async function createProdHandler(project: ToolpadProject) {
         project.getDataProviders(),
       ]);
 
-      const htmlFilePath = path.resolve(getAppOutputFolder(project.getRoot()), './index.html');
+      const htmlFilePath = path.resolve(project.getAppOutputFolder(), './index.html');
       let html = await fs.readFile(htmlFilePath, { encoding: 'utf-8' });
 
       html = postProcessHtml(html, {

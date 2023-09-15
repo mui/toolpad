@@ -95,15 +95,15 @@ function getComponentFilePath(componentsFolder: string, componentName: string): 
   return path.join(componentsFolder, `${componentName}.tsx`);
 }
 
-export function getOutputFolder(root: string) {
+function getOutputFolder(root: string) {
   return path.join(getToolpadFolder(root), '.generated');
 }
 
-export function getAppOutputFolder(root: string) {
+function getAppOutputFolder(root: string) {
   return path.join(getOutputFolder(root), 'app');
 }
 
-export async function legacyConfigFileExists(root: string): Promise<boolean> {
+async function legacyConfigFileExists(root: string): Promise<boolean> {
   const [yamlFileExists, ymlFileExists] = await Promise.all([
     fileExists(path.join(root, './toolpad.yaml')),
     fileExists(path.join(root, './toolpad.yml')),
@@ -118,7 +118,7 @@ export interface ComponentEntry {
   path: string;
 }
 
-export async function getComponents(root: string): Promise<ComponentEntry[]> {
+async function getComponents(root: string): Promise<ComponentEntry[]> {
   const componentsFolder = getComponentsFolder(root);
   const entries = (await readMaybeDir(componentsFolder)) || [];
   const result = entries.map((entry) => {
@@ -1075,6 +1075,10 @@ class ToolpadProject {
     return getOutputFolder(this.getRoot());
   }
 
+  getAppOutputFolder() {
+    return getAppOutputFolder(this.getRoot());
+  }
+
   alertOnMissingVariablesInDom(dom: appDom.AppDom) {
     const requiredVars = appDom.getRequiredEnvVars(dom);
     const missingVars = Array.from(requiredVars).filter(
@@ -1119,6 +1123,10 @@ class ToolpadProject {
     const [dom] = await this.loadDomAndFingerprint();
     this.alertOnMissingVariablesInDom(dom);
     return dom;
+  }
+
+  async getComponents(): Promise<ComponentEntry[]> {
+    return getComponents(this.getRoot());
   }
 
   async writeDomToDisk(newDom: appDom.AppDom) {

@@ -60,7 +60,7 @@
   },
   "devDependencies": {
     "@types/invariant": "2.2.35",
-    "@types/react": "18.2.20",
+    "@types/react": "18.2.21",
     "@types/prettier": "2.7.3",
     "@types/react-is": "18.2.1"
   },

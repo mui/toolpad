@@ -1,7 +1,7 @@
 import { NodeId, ExecFetchResult } from '@mui/toolpad-core';
 import { withContext, createServerContext } from '@mui/toolpad-core/serverRuntime';
 import { createServerJsRuntime } from '@mui/toolpad-core/jsServerRuntime';
-import express from 'express';
+import express, { Router } from 'express';
 import cors from 'cors';
 import invariant from 'invariant';
 import { errorFrom, serializeError, SerializedError } from '@mui/toolpad-utils/errors';
@@ -170,7 +170,7 @@ export default class DataManager {
     return dataSource.api[method](...args);
   }
 
-  createDataHandler() {
+  createDataHandler(): Router {
     const router = express.Router();
 
     router.use(
@@ -201,7 +201,7 @@ export default class DataManager {
     return router;
   }
 
-  createDataSourcesHandler() {
+  createDataSourcesHandler(): Router {
     const router = express.Router();
 
     const handlerMap = new Map<String, Function | null | undefined>();

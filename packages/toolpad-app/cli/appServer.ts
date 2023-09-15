@@ -4,13 +4,13 @@ import { createServer, Plugin } from 'vite';
 import { createRpcClient } from '@mui/toolpad-utils/workerRpc';
 import {
   getHtmlContent,
-  postProcessHtml,
   createViteConfig,
   resolvedComponentsId,
 } from '../src/server/toolpadAppBuilder';
 import type { RuntimeConfig } from '../src/config';
 import type * as appDom from '../src/appDom';
 import type { ComponentEntry } from '../src/server/localMode';
+import { postProcessHtml } from '../src/server/toolpadAppServer';
 
 export type Command = { kind: 'reload-components' } | { kind: 'exit' };
 

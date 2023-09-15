@@ -81,7 +81,7 @@ async function createDevHandler(
     notifyReady: async () => resolveReadyPromise?.(),
     loadDom: async () => project.loadDom(),
     getComponents: async () => project.getComponents(),
-    getDataProviders: async () => project.getDataProviders()
+    getDataProviders: async () => project.getDataProviders(),
   });
 
   project.events.on('componentsListChanged', () => {

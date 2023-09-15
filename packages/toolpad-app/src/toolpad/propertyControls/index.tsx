@@ -6,6 +6,38 @@ import number from './number';
 import select from './select';
 import json from './json';
 import event from './event';
+import markdown from './Markdown';
+import GridColumns from './GridColumns';
+import ToggleButtons from './ToggleButtons';
+import SelectOptions from './SelectOptions';
+import ChartData from './ChartData';
+import RowIdFieldSelect from './RowIdFieldSelect';
+import HorizontalAlign from './HorizontalAlign';
+import VerticalAlign from './VerticalAlign';
+import NumberFormat from './NumberFormat';
+import ColorScale from './ColorScale';
+import DataProviderSelector from './DataProviderSelector';
+
+export const PROP_TYPE_CONTROLS: PropTypeControls = {
+  string,
+  boolean,
+  number,
+  select,
+  json,
+  markdown,
+  event,
+  GridColumns,
+  ToggleButtons,
+  SelectOptions,
+  ChartData,
+  RowIdFieldSelect,
+  HorizontalAlign,
+  VerticalAlign,
+  NumberFormat,
+  ColorScale,
+  DataProviderSelector,
+};
+
 import { EditorProps } from '../../types';
 
 export type PropTypeControls = {

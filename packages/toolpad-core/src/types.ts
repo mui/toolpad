@@ -87,6 +87,7 @@ export interface StringValueType extends ValueTypeBase {
    * The different possible values for the property.
    */
   enum?: string[];
+  enumLabels?: Record<string, string>;
   default?: string;
 }
 
@@ -198,6 +199,7 @@ export interface ArgControlSpec {
     | 'event'
     | 'NumberFormat'
     | 'ColorScale'
+    | 'ToggleButtons'
     | 'RowIdFieldSelect' // Row id field specialized select
     | 'DataProviderSelector'; // Row id field specialized select
   bindable?: boolean;

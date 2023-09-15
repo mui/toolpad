@@ -376,6 +376,7 @@ interface Selection {
 }
 
 interface ToolpadDataGridProps extends Omit<DataGridProProps, 'columns' | 'rows' | 'error'> {
+  rowsSource?: 'prop' | 'dataProvider';
   dataProviderId?: string;
   rows?: GridRowsProp;
   columns?: SerializableGridColumns;
@@ -660,6 +661,18 @@ export default createBuiltin(DataGridComponent, {
   loadingProp: 'loading',
   resizableHeightProp: 'height',
   argTypes: {
+    rowsSource: {
+      helperText: 'Defines how rows are provided to the grid.',
+      type: 'string',
+      enum: ['prop', 'dataProvider'],
+      enumLabels: {
+        prop: 'Direct',
+        dataProvider: 'Data provider',
+      },
+      default: 'dataProvider',
+      label: 'Rows source',
+      control: { type: 'ToggleButtons', bindable: false },
+    },
     rows: {
       helperText: 'The data to be displayed as rows. Must be an array of objects.',
       type: 'array',
@@ -676,11 +689,13 @@ export default createBuiltin(DataGridComponent, {
           required: ['id'],
         },
       },
+      visible: ({ rowsSource }: ToolpadDataGridProps) => rowsSource === 'prop',
     },
     dataProviderId: {
       helperText: 'The backend data provider that will supply the rows to this grid',
       type: 'string',
       control: { type: 'DataProviderSelector', bindable: false },
+      visible: ({ rowsSource }: ToolpadDataGridProps) => rowsSource === 'dataProvider',
     },
     columns: {
       helperText: 'The columns to be displayed.',

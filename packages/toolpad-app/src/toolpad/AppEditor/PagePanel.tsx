@@ -3,7 +3,7 @@ import { styled, SxProps, Box, Divider, Typography } from '@mui/material';
 import { Panel, PanelGroup, PanelResizeHandle } from '../../components/resizablePanels';
 import PagesExplorer from './PagesExplorer';
 import PageHierarchyExplorer from './HierarchyExplorer';
-import { useDom } from '../AppState';
+import { useAppState } from '../AppState';
 import AppOptions from '../AppOptions';
 import config from '../../config';
 
@@ -18,7 +18,7 @@ export interface ComponentPanelProps {
 }
 
 export default function PagePanel({ className, sx }: ComponentPanelProps) {
-  const { dom } = useDom();
+  const { dom } = useAppState();
 
   return (
     <PagePanelRoot className={className} sx={sx}>

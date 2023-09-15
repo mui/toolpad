@@ -170,7 +170,7 @@ export default class DataManager {
     return dataSource.api[method](...args);
   }
 
-  createDataHandler() {
+  createDataHandler(): Router {
     const router = express.Router();
 
     router.use(

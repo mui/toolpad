@@ -13,7 +13,7 @@ import * as React from 'react';
 import invariant from 'invariant';
 import CloseIcon from '@mui/icons-material/Close';
 import * as appDom from '../../../appDom';
-import { useDom } from '../../AppState';
+import { useAppState } from '../../AppState';
 import DialogForm from '../../../components/DialogForm';
 import useEvent from '../../../utils/useEvent';
 import { useNodeNameValidation } from './validation';
@@ -33,7 +33,7 @@ export default function CreateCodeComponentDialog({
   onClose,
   ...props
 }: CreateCodeComponentDialogProps) {
-  const { dom } = useDom();
+  const { dom } = useAppState();
 
   const existingNames = React.useMemo(
     () => appDom.getExistingNamesForChildren(dom, appDom.getApp(dom), 'codeComponents'),

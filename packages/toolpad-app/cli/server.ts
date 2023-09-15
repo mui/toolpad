@@ -18,12 +18,7 @@ import chalk from 'chalk';
 import { serveRpc } from '@mui/toolpad-utils/workerRpc';
 import { asyncHandler } from '../src/utils/express';
 import { createProdHandler } from '../src/server/toolpadAppServer';
-import {
-  ToolpadProject,
-  getAppOutputFolder,
-  getComponents,
-  initProject,
-} from '../src/server/localMode';
+import { ToolpadProject, initProject } from '../src/server/localMode';
 import type { Command as AppDevServerCommand, AppViteServerConfig, WorkerRpc } from './appServer';
 import { createRpcHandler } from '../src/server/rpc';
 import { RUNTIME_CONFIG_WINDOW_PROPERTY } from '../src/constants';
@@ -58,7 +53,7 @@ async function createDevHandler(
 
   const worker = new Worker(appServerPath, {
     workerData: {
-      outDir: getAppOutputFolder(project.getRoot()),
+      outDir: project.getAppOutputFolder(),
       base,
       config: runtimeConfig,
       root: project.getRoot(),
@@ -85,7 +80,7 @@ async function createDevHandler(
   serveRpc<WorkerRpc>(mainThreadRpcChannel.port2, {
     notifyReady: async () => resolveReadyPromise?.(),
     loadDom: async () => project.loadDom(),
-    getComponents: async () => getComponents(project.getRoot()),
+    getComponents: async () => project.getComponents(),
   });
 
   project.events.on('componentsListChanged', () => {

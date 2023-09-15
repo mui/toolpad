@@ -84,7 +84,7 @@ export function postProcessHtml(html: string, { config, dom }: PostProcessHtmlPa
 interface ToolpadVitePluginParams {
   root: string;
   base: string;
-  getComponents: (root: string) => Promise<ComponentEntry[]>;
+  getComponents: () => Promise<ComponentEntry[]>;
 }
 
 function toolpadVitePlugin({ root, base, getComponents }: ToolpadVitePluginParams): Plugin {
@@ -158,7 +158,7 @@ function toolpadVitePlugin({ root, base, getComponents }: ToolpadVitePluginParam
         };
       }
       if (id === resolvedComponentsId) {
-        const components = await getComponents(root);
+        const components = await getComponents();
 
         const imports = components.map(({ name }) => `import ${name} from './components/${name}';`);
 
@@ -190,7 +190,7 @@ export interface CreateViteConfigParams {
   dev: boolean;
   base: string;
   plugins?: Plugin[];
-  getComponents: (root: string) => Promise<ComponentEntry[]>;
+  getComponents: () => Promise<ComponentEntry[]>;
 }
 
 export interface CreateViteConfigResult {
@@ -309,7 +309,7 @@ export function createViteConfig({
 
 export interface ToolpadBuilderParams {
   outDir: string;
-  getComponents: (root: string) => Promise<ComponentEntry[]>;
+  getComponents: () => Promise<ComponentEntry[]>;
   root: string;
   base: string;
 }

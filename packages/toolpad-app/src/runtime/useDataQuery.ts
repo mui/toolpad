@@ -40,8 +40,6 @@ export function useDataQuery(
   const queryName = node.name;
   const pageName = page.name;
 
-  // These are only used by the editor to invalidate caches whenever the query changes during editing
-  const nodeHash: number | undefined = savedNodes ? savedNodes[node.id] : undefined;
   const isNodeAvailableOnServer: boolean = savedNodes ? !!savedNodes[node.id] : true;
 
   const {
@@ -51,7 +49,7 @@ export function useDataQuery(
     data: responseData = EMPTY_OBJECT,
     refetch,
   } = useQuery(
-    [nodeHash, pageName, queryName, params],
+    [pageName, queryName, params],
     () => api.mutation.execQuery(pageName, queryName, params),
     {
       ...options,

@@ -3,7 +3,7 @@ import { styled } from '@mui/material';
 import { NodeId } from '@mui/toolpad-core';
 import * as appDom from '../../../../appDom';
 import EditorCanvasHost from '../EditorCanvasHost';
-import { getNodeHashes, useDom, useAppStateApi, useDomLoader, useDomApi } from '../../../AppState';
+import { getNodeHashes, useAppState, useAppStateApi, useDomApi } from '../../../AppState';
 import { usePageEditorApi, usePageEditorState } from '../PageEditorProvider';
 import RenderOverlay from './RenderOverlay';
 import { NodeHashes, RuntimeState } from '../../../../types';
@@ -26,7 +26,7 @@ const RenderPanelRoot = styled('div')({
 });
 
 function useRuntimeState(): RuntimeState {
-  const { dom } = useDom();
+  const { dom } = useAppState();
   return React.useMemo(() => createRuntimeState({ dom, dataProviders: {} }), [dom]);
 }
 
@@ -35,7 +35,7 @@ export interface RenderPanelProps {
 }
 
 export default function RenderPanel({ className }: RenderPanelProps) {
-  const domLoader = useDomLoader();
+  const appState = useAppState();
   const domApi = useDomApi();
   const appStateApi = useAppStateApi();
   const pageEditorApi = usePageEditorApi();
@@ -44,8 +44,8 @@ export default function RenderPanel({ className }: RenderPanelProps) {
   const [bridge, setBridge] = React.useState<ToolpadBridge | null>(null);
 
   const savedNodes: NodeHashes = React.useMemo(
-    () => getNodeHashes(domLoader.savedDom),
-    [domLoader.savedDom],
+    () => getNodeHashes(appState.savedDom),
+    [appState.savedDom],
   );
 
   const handleInit = useEvent((initializedBridge: ToolpadBridge) => {

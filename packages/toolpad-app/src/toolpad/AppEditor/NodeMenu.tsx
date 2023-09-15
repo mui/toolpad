@@ -4,7 +4,7 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import { NodeId } from '@mui/toolpad-core';
 import * as appDom from '../../appDom';
-import { useDom } from '../AppState';
+import { useAppState } from '../AppState';
 import useLatest from '../../utils/useLatest';
 import { ConfirmDialog } from '../../components/SystemDialogs';
 import useMenu from '../../utils/useMenu';
@@ -26,7 +26,7 @@ export default function NodeMenu({
   onDeleteNode,
   onDuplicateNode,
 }: NodeMenuProps) {
-  const { dom } = useDom();
+  const { dom } = useAppState();
 
   const { menuProps, buttonProps, onMenuClose } = useMenu();
 

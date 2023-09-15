@@ -462,10 +462,10 @@ importers:
         specifier: 20.6.0
         version: 20.6.0
       '@types/semver':
-        specifier: ^7.5.0
+        specifier: 7.5.0
         version: 7.5.0
       '@types/yargs':
-        specifier: ^17.0.24
+        specifier: 17.0.24
         version: 17.0.24
       node-fetch:
         specifier: 2.7.0

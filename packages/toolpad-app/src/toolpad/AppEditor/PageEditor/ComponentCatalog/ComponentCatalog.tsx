@@ -59,7 +59,7 @@ export default function ComponentCatalog({ className }: ComponentCatalogProps) {
   const api = usePageEditorApi();
   const { dom } = useAppState();
 
-  const [openStart, setOpenStart] = React.useState(1);
+  const [openStart, setOpenStart] = React.useState(0);
   const [openCustomComponents, setOpenCustomComponents] = useLocalStorageState(
     'catalog-custom-expanded',
     true,
@@ -81,7 +81,7 @@ export default function ComponentCatalog({ className }: ComponentCatalogProps) {
     (delay?: number) => {
       const timeOpen = Date.now() - openStart;
       const defaultDelay = timeOpen > 750 ? 500 : 0;
-      closeTimeoutRef.current = setTimeout(() => setOpenStart(1), delay ?? defaultDelay);
+      closeTimeoutRef.current = setTimeout(() => setOpenStart(0), delay ?? defaultDelay);
     },
     [openStart],
   );

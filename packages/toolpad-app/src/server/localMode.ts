@@ -989,11 +989,16 @@ class ToolpadProject {
 
   private pendingVersionCheck: Promise<VersionInfo> | undefined;
 
-  constructor(root: string, options: Partial<ToolpadProjectOptions>) {
+  constructor(
+    root: string,
+    options: Partial<ToolpadProjectOptions>,
+    externalUrl: string = 'http://localhost:3000',
+  ) {
     this.root = root;
     this.options = {
       cmd: 'start',
       dev: false,
+      externalUrl,
       ...options,
     };
 
@@ -1200,8 +1205,7 @@ class ToolpadProject {
 
   getRuntimeConfig(): RuntimeConfig {
     return {
-      externalUrl:
-        process.env.TOOLPAD_EXTERNAL_URL || `http://localhost:${process.env.PORT || 3000}`,
+      externalUrl: this.options.externalUrl,
       projectDir: this.getRoot(),
       cmd: this.options.dev ? 'dev' : 'start',
     };
@@ -1215,7 +1219,11 @@ declare global {
   var __toolpadProject: ToolpadProject | undefined;
 }
 
-export async function initProject(cmd: 'dev' | 'start' | 'build', root: string) {
+export async function initProject(
+  cmd: 'dev' | 'start' | 'build',
+  root: string,
+  externalUrl?: string,
+) {
   // eslint-disable-next-line no-underscore-dangle
   invariant(!global.__toolpadProject, 'A project is already running');
 
@@ -1223,7 +1231,7 @@ export async function initProject(cmd: 'dev' | 'start' | 'build', root: string) 
 
   await initToolpadFolder(root);
 
-  const project = new ToolpadProject(root, { cmd, dev: cmd === 'dev' });
+  const project = new ToolpadProject(root, { cmd, dev: cmd === 'dev' }, externalUrl);
   // eslint-disable-next-line no-underscore-dangle
   globalThis.__toolpadProject = project;
 

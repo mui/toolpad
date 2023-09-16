@@ -256,9 +256,11 @@ function QueryEditor({
 
   const connectionParams = isBrowserSide ? null : rawConnectionParams;
   const baseUrl = isBrowserSide ? null : connectionParams?.baseUrl ?? null;
-
+  // input.attributes.query.url will be reset when it's empty
   const urlValue: BindableAttrValue<string> =
-    input.attributes.query.url || getDefaultUrl(config, connectionParams);
+    input.attributes.query.url === undefined
+      ? getDefaultUrl(config, connectionParams)
+      : input.attributes.query.url;
 
   const introspection = usePrivateQuery<FetchPrivateQuery, IntrospectionResult>(
     {
@@ -415,7 +417,7 @@ function QueryEditor({
           <Panel defaultSize={60} minSize={40}>
             <QueryInputPanel onRunPreview={handleRunPreview}>
               <Stack gap={2} sx={{ px: 3, pt: 1 }}>
-                <Typography>Query</Typography>
+                <Typography>Query1212</Typography>
                 <Box sx={{ display: 'flex', flexDirection: 'row', gap: 1 }}>
                   <TextField
                     select

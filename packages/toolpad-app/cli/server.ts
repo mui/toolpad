@@ -322,8 +322,7 @@ export async function runApp({ cmd, port, dev = false, projectDir }: RunAppOptio
   const editorDevMode = !!process.env.TOOLPAD_NEXT_DEV || dev;
 
   const externalUrl = process.env.TOOLPAD_EXTERNAL_URL || `http://localhost:${port}`;
-
-  const project = await initProject(cmd, projectDir);
+  const project = await initProject(cmd, projectDir, externalUrl);
 
   const server = await startServer({
     cmd,

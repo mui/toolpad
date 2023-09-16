@@ -417,7 +417,7 @@ function QueryEditor({
           <Panel defaultSize={60} minSize={40}>
             <QueryInputPanel onRunPreview={handleRunPreview}>
               <Stack gap={2} sx={{ px: 3, pt: 1 }}>
-                <Typography>Query1212</Typography>
+                <Typography>Query</Typography>
                 <Box sx={{ display: 'flex', flexDirection: 'row', gap: 1 }}>
                   <TextField
                     select

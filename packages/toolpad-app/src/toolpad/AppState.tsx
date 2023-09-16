@@ -64,7 +64,7 @@ export type AppStateAction =
       view: DomView;
     }
   | {
-      type: 'SET_TAB';
+      type: 'SET_PAGE_VIEW_TAB';
       tab: PageViewTab;
     }
   | {
@@ -224,7 +224,11 @@ export function appStateReducer(state: AppState, action: AppStateAction): AppSta
     case 'SELECT_NODE': {
       if (state.currentView.kind === 'page') {
         return update(state, {
-          currentView: { ...state.currentView, selectedNodeId: action.nodeId, tab: 'component' },
+          currentView: {
+            ...state.currentView,
+            selectedNodeId: action.nodeId,
+            pageViewTab: 'component',
+          },
         });
       }
       return state;
@@ -232,7 +236,7 @@ export function appStateReducer(state: AppState, action: AppStateAction): AppSta
     case 'DESELECT_NODE': {
       if (state.currentView.kind === 'page') {
         return update(state, {
-          currentView: { ...state.currentView, selectedNodeId: null, tab: 'page' },
+          currentView: { ...state.currentView, selectedNodeId: null, pageViewTab: 'page' },
         });
       }
       return state;
@@ -272,10 +276,10 @@ export function appStateReducer(state: AppState, action: AppStateAction): AppSta
                 : null,
           };
         }
-        if (action.view.selectedNodeId && typeof action.view.tab === 'undefined') {
+        if (action.view.selectedNodeId && typeof action.view.pageViewTab === 'undefined') {
           newView = {
             ...action.view,
-            tab: 'component',
+            pageViewTab: 'component',
           };
         }
       }
@@ -284,10 +288,10 @@ export function appStateReducer(state: AppState, action: AppStateAction): AppSta
         currentView: newView,
       });
     }
-    case 'SET_TAB': {
+    case 'SET_PAGE_VIEW_TAB': {
       if (state.currentView.kind === 'page') {
         return update(state, {
-          currentView: { ...state.currentView, tab: action.tab },
+          currentView: { ...state.currentView, pageViewTab: action.tab },
         });
       }
       return state;
@@ -356,9 +360,9 @@ function createAppStateApi(
         view,
       });
     },
-    setTab(tab: PageViewTab) {
+    setPageViewTab(tab: PageViewTab) {
       dispatch({
-        type: 'SET_TAB',
+        type: 'SET_PAGE_VIEW_TAB',
         tab,
       });
     },
@@ -438,7 +442,7 @@ type AppStateActionType = AppStateAction['type'];
 const UNDOABLE_ACTIONS = new Set<AppStateActionType>([
   'UPDATE',
   'SET_VIEW',
-  'SET_TAB',
+  'SET_PAGE_VIEW_TAB',
   'SELECT_NODE',
   'DESELECT_NODE',
 ]);
@@ -466,7 +470,7 @@ export default function AppProvider({ children }: DomContextProps) {
     kind: 'page',
     nodeId: firstPage?.id,
     selectedNodeId: null,
-    tab: 'page',
+    pageViewTab: 'page',
   };
 
   const [state, dispatch] = React.useReducer(appStateReducer, {

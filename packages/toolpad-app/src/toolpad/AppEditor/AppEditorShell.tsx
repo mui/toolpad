@@ -27,7 +27,7 @@ import VerticalAlign from '../propertyControls/VerticalAlign';
 import NumberFormat from '../propertyControls/NumberFormat';
 import ColorScale from '../propertyControls/ColorScale';
 
-const PAGE_PANEL_WIDTH = 250;
+export const PAGE_PANEL_WIDTH = 250;
 
 const propTypeControls: PropTypeControls = {
   string,
@@ -135,7 +135,6 @@ export default function AppEditorShell({ children, ...props }: ToolpadShellProps
             >
               <PagePanel
                 sx={{
-                  width: PAGE_PANEL_WIDTH,
                   borderRight: 1,
                   borderColor: 'divider',
                 }}

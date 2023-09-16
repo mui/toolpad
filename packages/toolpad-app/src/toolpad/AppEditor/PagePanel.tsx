@@ -6,10 +6,13 @@ import PageHierarchyExplorer from './HierarchyExplorer';
 import { useAppState } from '../AppState';
 import AppOptions from '../AppOptions';
 import config from '../../config';
+import { QueriesExplorer } from './PageEditor/QueriesExplorer';
+import { PAGE_PANEL_WIDTH } from '../../constants';
 
 const PagePanelRoot = styled('div')({
   display: 'flex',
   flexDirection: 'column',
+  width: PAGE_PANEL_WIDTH,
 });
 
 export interface ComponentPanelProps {
@@ -44,7 +47,11 @@ export default function PagePanel({ className, sx }: ComponentPanelProps) {
           <PagesExplorer />
         </Panel>
         <PanelResizeHandle />
-        <Panel minSize={25} maxSize={90}>
+        <Panel minSize={25} defaultSize={35} maxSize={90}>
+          <QueriesExplorer />
+        </Panel>
+        <PanelResizeHandle />
+        <Panel minSize={25} defaultSize={35} maxSize={90}>
           <PageHierarchyExplorer />
         </Panel>
       </PanelGroup>

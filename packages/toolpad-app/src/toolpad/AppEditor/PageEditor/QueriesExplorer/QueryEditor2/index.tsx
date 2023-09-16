@@ -4,37 +4,33 @@ import { Box, Chip, Paper, Tab } from '@mui/material';
 import { NodeId } from '@mui/toolpad-core';
 import { TabList, TabContext, TabPanel } from '@mui/lab';
 import ClearOutlinedIcon from '@mui/icons-material/ClearOutlined';
-
 import * as appDom from '../../../../../appDom';
-
-import { useDom, useAppStateApi, useDomApi } from '../../../../AppState';
+import { useDom, useAppState, useAppStateApi, useDomApi } from '../../../../AppState';
 import QueryIcon from '../../../QueryIcon';
 import QueryEditorPanel from './QueryEditor2Dialog';
 import { DomView } from '../../../../../utils/domView';
-import { QueryMeta, PanelState } from '../types';
-import { COMPONENT_CATALOG_WIDTH_COLLAPSED } from '../../ComponentCatalog/ComponentCatalog';
+import { PAGE_PANEL_WIDTH } from '../../../../../constants';
 
-type QueryEditorProps = {
-  tabs: React.MutableRefObject<Map<NodeId, QueryMeta>>;
-  currentQueryId: NodeId | '';
-  currentPageId: NodeId | undefined;
-  panelState: PanelState | null;
-  handleTabRemove: (
-    queryId: NodeId,
-    onRemove?: (viewOptions: DomView, nodeId?: NodeId) => void,
-  ) => void;
-};
+// type QueryEditorProps = {
+//   tabs: React.MutableRefObject<Map<NodeId, QueryMeta>>;
+//   currentQueryId: NodeId | '';
+//   currentPageId: NodeId | undefined;
+//   panelState: PanelState | null;
+//   handleTabRemove: (
+//     queryId: NodeId,
+//     onRemove?: (viewOptions: DomView, nodeId?: NodeId) => void,
+//   ) => void;
+// };
 
-export default function QueryEditor({
-  tabs,
-  currentQueryId,
-  currentPageId,
-  panelState,
-  handleTabRemove,
-}: QueryEditorProps) {
+export default function QueryEditor() {
   const { dom } = useDom();
   const domApi = useDomApi();
+  const { currentView } = useAppState();
   const appStateApi = useAppStateApi();
+
+  React.useEffect(() => {
+    console.log('currentView', currentView);
+  }, [currentView]);
 
   const onRemove = React.useCallback(
     (viewOptions: DomView) => {
@@ -47,51 +43,59 @@ export default function QueryEditor({
     (event: React.SyntheticEvent, newValue: NodeId) => {
       appStateApi.setView({
         kind: 'page',
-        nodeId: currentPageId,
+        nodeId: currentView.nodeId,
         view: { kind: 'query', nodeId: newValue },
       });
     },
-    [appStateApi, currentPageId],
+    [appStateApi, currentView],
   );
 
   const handleSave = React.useCallback(
     (node: appDom.QueryNode) => {
-      if (!currentPageId) {
+      if (currentView.kind !== 'page' || !currentView.nodeId) {
         return;
       }
-      const page = appDom.getNode(dom, currentPageId, 'page');
+      const page = appDom.getNode(dom, currentView.nodeId, 'page');
       if (appDom.nodeExists(dom, node.id)) {
         domApi.saveNode(node);
       } else {
         appStateApi.update((draft) => appDom.addNode(draft, node, page, 'queries'));
       }
     },
-    [dom, domApi, appStateApi, currentPageId],
+    [dom, domApi, appStateApi, currentView],
   );
 
-  return panelState?.node?.id ? (
+  const currentQueryId = React.useMemo(() => {
+    if (currentView.kind === 'page' && currentView.view?.kind === 'query') {
+      return currentView.view.nodeId;
+    }
+    return '';
+  }, [currentView]);
+
+  return currentView.kind === 'page' && currentView.view?.kind === 'query' && currentQueryId ? (
     <Box
       sx={{
         position: 'fixed',
         bottom: 0,
-        left: 250 + COMPONENT_CATALOG_WIDTH_COLLAPSED,
+        left: PAGE_PANEL_WIDTH,
         width: '100%',
+        zIndex: 1000,
       }}
     >
       <Paper square elevation={0} sx={{ minHeight: '30vh', maxHeight: '30vh' }}>
-        <TabContext value={panelState.node.id}>
+        <TabContext value={currentQueryId}>
           <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
             <TabList
               onChange={handleTabChange}
               aria-label="Query editor panel"
               sx={{ maxHeight: 36 }}
             >
-              {Array.from(tabs.current).map(([queryId, meta]) => (
+              {currentView.view?.queryPanel?.queryTabs?.map((queryMeta) => (
                 <Tab
-                  key={queryId}
+                  key={queryMeta?.saved?.id}
                   label={
                     <Chip
-                      label={meta.name}
+                      label={queryMeta.name}
                       size="small"
                       variant="outlined"
                       sx={{
@@ -118,27 +122,30 @@ export default function QueryEditor({
                         },
                       }}
                       deleteIcon={<ClearOutlinedIcon />}
-                      onDelete={() => {
-                        handleTabRemove(queryId, onRemove);
-                      }}
+                      // onDelete={() => {
+                      //   handleTabRemove(queryId, onRemove);
+                      // }}
                     />
                   }
                   icon={
-                    <QueryIcon id={meta.dataSource || 'default'} sx={{ fontSize: 24, mt: 0.2 }} />
+                    <QueryIcon
+                      id={queryMeta.dataSource || 'default'}
+                      sx={{ fontSize: 24, mt: 0.2 }}
+                    />
                   }
                   iconPosition="start"
-                  value={queryId}
+                  value={queryMeta?.saved?.id}
                 />
               ))}
             </TabList>
           </Box>
-          {Array.from(tabs.current).map(([queryId]) => (
+          {currentView.view?.queryPanel?.queryTabs?.map((queryMeta) => (
             <TabPanel
-              key={queryId}
-              value={queryId as string}
+              key={queryMeta?.saved?.id}
+              value={queryMeta?.saved?.id || ''}
               sx={{ p: 0, overflow: 'scroll', minHeight: '26vh', maxHeight: '26vh' }}
             >
-              <QueryEditorPanel nodeId={currentQueryId as NodeId} onSave={handleSave} />
+              <QueryEditorPanel nodeId={currentQueryId} onSave={handleSave} />
             </TabPanel>
           ))}
         </TabContext>

@@ -15,7 +15,7 @@ import { useDom, useDomApi, useAppState, useAppStateApi } from '../../../AppStat
 import { DomView } from '../../../../utils/domView';
 import NodeMenu from '../../NodeMenu';
 import EditableText from '../../../../components/EditableText';
-import { QueryMeta, PanelState } from './types';
+// import { QueryMeta, PanelState } from './types';
 import QueryEditor from './QueryEditor2';
 import { useNodeNameValidation } from '../../PagesExplorer/validation';
 
@@ -174,8 +174,6 @@ export function QueriesExplorer() {
   const appStateApi = useAppStateApi();
   const currentPageId = currentView.nodeId;
 
-  const tabs = React.useRef(new Map<NodeId, QueryMeta>());
-
   const currentQueryId = React.useMemo(() => {
     if (currentView.kind === 'page' && currentView.view?.kind === 'query') {
       return currentView.view.nodeId;
@@ -185,25 +183,25 @@ export function QueriesExplorer() {
 
   const [anchorEl, setAnchorEl] = React.useState<Element | null>(null);
 
-  const [panelState, setPanelState] = React.useState<PanelState | null>(null);
-  const isDraft = panelState?.isDraft || false;
+  // const [panelState, setPanelState] = React.useState<PanelState | null>(null);
+  // const isDraft = panelState?.isDraft || false;
 
-  React.useEffect(() => {
-    setPanelState((previousState) => {
-      if (!currentQueryId) {
-        return null;
-      }
+  // React.useEffect(() => {
+  //   setPanelState((previousState) => {
+  //     if (!currentQueryId) {
+  //       return null;
+  //     }
 
-      if (isDraft) {
-        return previousState;
-      }
-      const node = appDom.getNode(dom, currentQueryId, 'query');
-      tabs.current.set(node.id, { name: node.name, dataSource: node.attributes.dataSource });
-      return { node, isDraft: false };
+  //     if (isDraft) {
+  //       return previousState;
+  //     }
+  //     const node = appDom.getNode(dom, currentQueryId, 'query');
+  //     tabs.current.set(node.id, { name: node.name, dataSource: node.attributes.dataSource });
+  //     return { node, isDraft: false };
 
-      return null;
-    });
-  }, [currentQueryId, dom, isDraft]);
+  //     return null;
+  //   });
+  // }, [currentQueryId, dom, isDraft]);
 
   const queries = React.useMemo(() => {
     if (!currentPageId) {
@@ -223,7 +221,7 @@ export function QueriesExplorer() {
       appStateApi.setView({
         kind: 'page',
         nodeId: currentPageId,
-        view: { kind: 'query', nodeId },
+        view: { kind: 'query', nodeId, queryPanel },
       });
     },
     [appStateApi, currentPageId],
@@ -342,6 +340,13 @@ export function QueriesExplorer() {
         }
         defaultCollapseIcon={<ExpandMoreIcon sx={{ fontSize: '0.9rem', opacity: 0.5 }} />}
         defaultExpandIcon={<ChevronRightIcon sx={{ fontSize: '0.9rem', opacity: 0.5 }} />}
+        sx={{
+          flexGrow: 1,
+          maxWidth: 400,
+          maxHeight: '85%',
+          overflowY: 'auto',
+          scrollbarGutter: 'stable',
+        }}
       >
         <HierarchyTreeItem
           nodeId=":queries"
@@ -396,13 +401,13 @@ export function QueriesExplorer() {
           </Stack>
         </Paper>
       </Popover>
-      <QueryEditor
+      {/* <QueryEditor
         tabs={tabs}
         currentQueryId={currentQueryId}
         currentPageId={currentView.nodeId}
         panelState={panelState}
         handleTabRemove={handleDeleteNode}
-      />
+      /> */}
     </React.Fragment>
   );
 }

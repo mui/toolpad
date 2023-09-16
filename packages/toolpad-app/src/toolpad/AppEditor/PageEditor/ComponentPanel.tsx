@@ -36,13 +36,13 @@ export default function ComponentPanel({ className }: ComponentPanelProps) {
   const { currentView } = useAppState();
   const appStateApi = useAppStateApi();
 
-  const currentTab = currentView.kind === 'page' ? currentView.tab : null;
+  const currentTab = currentView.kind === 'page' ? currentView.pageViewTab : null;
 
   const selectedNodeId = currentView.kind === 'page' ? currentView.selectedNodeId : null;
   const selectedNode = selectedNodeId ? appDom.getMaybeNode(dom, selectedNodeId) : null;
 
   const handleChange = (event: React.SyntheticEvent, newValue: PageViewTab) =>
-    appStateApi.setTab(newValue);
+    appStateApi.setPageViewTab(newValue);
 
   return (
     <ComponentPanelRoot className={className}>

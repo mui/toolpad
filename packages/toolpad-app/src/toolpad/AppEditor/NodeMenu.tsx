@@ -5,7 +5,7 @@ import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import RenameIcon from '@mui/icons-material/DriveFileRenameOutlineOutlined';
 import { NodeId } from '@mui/toolpad-core';
 import * as appDom from '../../appDom';
-import { useDom } from '../AppState';
+import { useAppState } from '../AppState';
 import useLatest from '../../utils/useLatest';
 import { ConfirmDialog } from '../../components/SystemDialogs';
 import useMenu from '../../utils/useMenu';
@@ -31,7 +31,7 @@ export default function NodeMenu({
   onDuplicateNode,
   onRenameNode,
 }: NodeMenuProps) {
-  const { dom } = useDom();
+  const { dom } = useAppState();
 
   const { menuProps, buttonProps, onMenuClose } = useMenu();
 

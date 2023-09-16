@@ -10,6 +10,8 @@ Drag and drop pre-built UI components, connect your data sources, release your a
 
 <iframe id="toolpad-first-app" src="https://demo.arcade.software/MDlpNzHbuXwvPh4MK9ff?embed" frameborder="0" loading="lazy" webkitallowfullscreen mozallowfullscreen allowfullscreen title="Default page | Toolpad editor" style="width: 100%; height: min(60vw, 500px); border-radius: 0.75rem"></iframe>
 
+> You can check out the demo video [here](https://github.com/mui/mui-toolpad#product-walkthrough).
+
 ## Key features
 
 - **Open-source**: Toolpad is open-sourced, which means the code is free for you to observe and inspect, forever!

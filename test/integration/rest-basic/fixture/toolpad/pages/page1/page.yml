@@ -11,7 +11,7 @@ spec:
           name: text2
           props:
             variant: h1
-            value: RUN yarn rest:test:start
+            value: RUN yarn test:rest:start
     - component: PageRow
       name: pageRow
       children:

@@ -4,7 +4,7 @@ import * as React from 'react';
 import PageOptionsPanel from './PageOptionsPanel';
 import ComponentEditor from './ComponentEditor';
 import ThemeEditor from './ThemeEditor';
-import { useAppState, useAppStateApi, useDom } from '../../AppState';
+import { useAppState, useAppStateApi } from '../../AppState';
 import { PageViewTab } from '../../../utils/domView';
 import * as appDom from '../../../appDom';
 
@@ -32,7 +32,7 @@ export interface ComponentPanelProps {
 }
 
 export default function ComponentPanel({ className }: ComponentPanelProps) {
-  const { dom } = useDom();
+  const { dom } = useAppState();
   const { currentView } = useAppState();
   const appStateApi = useAppStateApi();
 

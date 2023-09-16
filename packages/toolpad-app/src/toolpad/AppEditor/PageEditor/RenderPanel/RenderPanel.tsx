@@ -3,7 +3,7 @@ import { styled } from '@mui/material';
 import { NodeId } from '@mui/toolpad-core';
 import * as appDom from '../../../../appDom';
 import EditorCanvasHost from '../EditorCanvasHost';
-import { getNodeHashes, useDom, useAppStateApi, useDomLoader, useDomApi } from '../../../AppState';
+import { getNodeHashes, useAppState, useAppStateApi, useDomApi } from '../../../AppState';
 import { usePageEditorApi, usePageEditorState } from '../PageEditorProvider';
 import RenderOverlay from './RenderOverlay';
 import { NodeHashes } from '../../../../types';
@@ -29,8 +29,8 @@ export interface RenderPanelProps {
 }
 
 export default function RenderPanel({ className }: RenderPanelProps) {
-  const domLoader = useDomLoader();
-  const { dom } = useDom();
+  const domLoader = useAppState();
+  const { dom } = useAppState();
   const domApi = useDomApi();
   const appStateApi = useAppStateApi();
   const pageEditorApi = usePageEditorApi();

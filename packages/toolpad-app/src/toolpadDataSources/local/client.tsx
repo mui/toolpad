@@ -17,10 +17,10 @@ import {
 } from '@mui/material';
 import { useBrowserJsRuntime } from '@mui/toolpad-core/jsBrowserRuntime';
 import { errorFrom } from '@mui/toolpad-utils/errors';
-import { LoadingButton } from '@mui/lab';
-import AddOutlinedIcon from '@mui/icons-material/AddOutlined';
-import DataObjectOutlinedIcon from '@mui/icons-material/DataObjectOutlined';
-import DoneIcon from '@mui/icons-material/Done';
+import { TreeView, treeItemClasses, TreeItem } from '@mui/x-tree-view';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import ChevronRightIcon from '@mui/icons-material/ChevronRight';
+import useBoolean from '@mui/toolpad-utils/hooks/useBoolean';
 import { useQuery } from '@tanstack/react-query';
 import Popper from '@mui/material/Popper';
 import ClickAwayListener from '@mui/material/ClickAwayListener';
@@ -465,10 +465,7 @@ function QueryEditor({
     [setSelectedHandler],
   );
 
-  const proposedFileName = React.useMemo(() => {
-    const existingNames = new Set(introspection.data?.files.map((file) => file.name) || []);
-    const baseName = 'functions';
-    let counter = 2;
+  const handlerTreeRef = React.useRef<HTMLUListElement>(null);
 
     while (existingNames.has(`${baseName}${counter}.ts`)) {
       counter += 1;

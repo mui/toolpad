@@ -1,7 +1,7 @@
 import type * as React from 'react';
 import type { Branded } from '@mui/toolpad-utils/types';
 import type { SerializedError } from '@mui/toolpad-utils/errors';
-import { JSONSchema7 } from 'json-schema';
+import type { JSONSchema7 } from 'json-schema';
 import type { TOOLPAD_COMPONENT } from './constants';
 
 export type NodeId = Branded<string, 'NodeId'>;
@@ -392,7 +392,7 @@ export type RuntimeEvent = {
 export interface ComponentConfig<P extends object = {}> {
   /**
    * A short explanatory text that'll be shown in the editor UI when this component is referenced.
-   * May contain Markdown
+   * May contain Markdown.
    */
   helperText?: string;
   /**
@@ -410,7 +410,7 @@ export interface ComponentConfig<P extends object = {}> {
   loadingPropSource?: (keyof P & string)[];
   /**
    * Designates a property as "the loading property". If Toolpad detects any of the
-   * inputs is still loading it will set this property to `true`
+   * inputs is still loading it will set this property to `true`.
    */
   loadingProp?: keyof P & string;
   /**
@@ -423,7 +423,7 @@ export interface ComponentConfig<P extends object = {}> {
    */
   resizableHeightProp?: keyof P & string;
   /**
-   * Describes the individual properties for this component
+   * Describes the individual properties for this component.
    */
   argTypes?: ArgTypeDefinitions<P>;
 }

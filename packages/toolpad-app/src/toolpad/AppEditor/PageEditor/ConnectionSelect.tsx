@@ -4,7 +4,7 @@ import { NodeId } from '@mui/toolpad-core';
 import { asArray } from '@mui/toolpad-utils/collections';
 import * as appDom from '../../../appDom';
 import { Maybe, WithControlledProp } from '../../../utils/types';
-import { useDom } from '../../AppState';
+import { useAppState } from '../../AppState';
 import dataSources from '../../../toolpadDataSources/client';
 
 export type ConnectionOption = {
@@ -23,7 +23,7 @@ export default function ConnectionSelect({
   value,
   onChange,
 }: ConnectionSelectProps) {
-  const { dom } = useDom();
+  const { dom } = useAppState();
 
   const app = appDom.getApp(dom);
   const { connections = [] } = appDom.getChildNodes(dom, app);

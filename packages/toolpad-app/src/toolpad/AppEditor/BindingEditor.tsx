@@ -50,7 +50,7 @@ import useUnsavedChangesConfirm from '../hooks/useUnsavedChangesConfirm';
 
 import TabPanel from '../../components/TabPanel';
 
-import { useDom } from '../AppState';
+import { useAppState } from '../AppState';
 import * as appDom from '../../appDom';
 import { getBindingType, getBindingValue } from '../../bindings';
 
@@ -338,7 +338,7 @@ function NavigationActionParameterEditor({
 export interface NavigationActionEditorProps extends WithControlledProp<NavigationAction | null> {}
 
 function NavigationActionEditor({ value, onChange }: NavigationActionEditorProps) {
-  const { dom } = useDom();
+  const { dom } = useAppState();
   const root = appDom.getApp(dom);
   const { pages = [] } = appDom.getChildNodes(dom, root);
 

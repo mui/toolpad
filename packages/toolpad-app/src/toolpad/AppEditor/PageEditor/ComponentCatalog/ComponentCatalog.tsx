@@ -7,10 +7,11 @@ import invariant from 'invariant';
 import ComponentCatalogItem from './ComponentCatalogItem';
 import CreateCodeComponentNodeDialog from '../../PagesExplorer/CreateCodeComponentNodeDialog';
 import * as appDom from '../../../../appDom';
-import { useDom } from '../../../AppState';
+import { useAppState } from '../../../AppState';
 import { usePageEditorApi } from '../PageEditorProvider';
 import { useToolpadComponents } from '../../toolpadComponents';
 import useLocalStorageState from '../../../../utils/useLocalStorageState';
+import HelpTooltipIcon from '../../../../components/HelpTooltipIcon';
 
 interface FutureComponentSpec {
   url: string;
@@ -45,7 +46,7 @@ export interface ComponentCatalogProps {
 
 export default function ComponentCatalog({ className }: ComponentCatalogProps) {
   const api = usePageEditorApi();
-  const { dom } = useDom();
+  const { dom } = useAppState();
 
   const [openStart, setOpenStart] = React.useState(0);
   const [openCustomComponents, setOpenCustomComponents] = useLocalStorageState(
@@ -156,7 +157,26 @@ export default function ComponentCatalog({ className }: ComponentCatalogProps) {
                 flexDirection={'row'}
                 justifyContent="space-between"
               >
-                <Typography variant="overline">Custom Components</Typography>
+                <Box display="flex" alignItems="center">
+                  <Typography mr={0.5} variant="overline">
+                    Custom Components
+                  </Typography>
+                  <HelpTooltipIcon
+                    helpText={
+                      <Typography variant="inherit">
+                        Expand Toolpad with your own React components.{' '}
+                        <Link
+                          href="https://mui.com/toolpad/concepts/custom-components"
+                          target="_blank"
+                          rel="noopener"
+                        >
+                          Learn more
+                        </Link>
+                        .
+                      </Typography>
+                    }
+                  />
+                </Box>
                 <IconButton
                   aria-label="Expand custom components"
                   sx={{

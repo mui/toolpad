@@ -44,7 +44,6 @@ interface TextProps {
 
 const MarkdownContainer = styled('div')(({ theme }) => ({
   display: 'block',
-  width: '100%',
   overflowWrap: 'anywhere',
   '&:empty::before, & > span:empty::before': {
     content: '""',
@@ -242,7 +241,6 @@ function TextContent({ value, loading, sx, variant }: TextContentProps) {
     <MuiTypography
       sx={{
         ...sx,
-        width: '100%',
         // This will give it height, even when empty.
         // REMARK: Does it make sense to put it in MUI core?
         [`&:empty::before`]: { content: '""', display: 'inline-block' },

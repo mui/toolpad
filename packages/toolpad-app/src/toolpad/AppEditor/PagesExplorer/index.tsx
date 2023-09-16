@@ -1,7 +1,6 @@
-import { TreeView } from '@mui/lab';
+import { TreeView, treeItemClasses, TreeItem, TreeItemProps } from '@mui/x-tree-view';
 import { Typography, styled, Box, IconButton } from '@mui/material';
 import * as React from 'react';
-import TreeItem, { treeItemClasses, TreeItemProps } from '@mui/lab/TreeItem';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
@@ -10,7 +9,7 @@ import { NodeId } from '@mui/toolpad-core';
 import clsx from 'clsx';
 import invariant from 'invariant';
 import * as appDom from '../../../appDom';
-import { useAppStateApi, useDom, useAppState } from '../../AppState';
+import { useAppStateApi, useAppState } from '../../AppState';
 import CreatePageNodeDialog from './CreatePageNodeDialog';
 import useLocalStorageState from '../../../utils/useLocalStorageState';
 import NodeMenu from '../NodeMenu';
@@ -39,7 +38,8 @@ const StyledTreeItem = styled(TreeItem)({
   },
 });
 
-type StyledTreeItemProps = TreeItemProps & {
+interface StyledTreeItemProps extends TreeItemProps {
+  ref?: React.RefObject<HTMLLIElement>;
   onDeleteNode?: (nodeId: NodeId) => void;
   onDuplicateNode?: (nodeId: NodeId) => void;
   onCreate?: React.MouseEventHandler;
@@ -49,7 +49,7 @@ type StyledTreeItemProps = TreeItemProps & {
   deleteLabelText?: string;
   duplicateLabelText?: string;
   toolpadNodeId?: NodeId;
-};
+}
 
 function PagesExplorerTreeItem(props: StyledTreeItemProps) {
   const {
@@ -124,7 +124,7 @@ export interface PagesExplorerProps {
 }
 
 export default function PagesExplorer({ className }: PagesExplorerProps) {
-  const { dom } = useDom();
+  const { dom } = useAppState();
   const { currentView } = useAppState();
 
   const appStateApi = useAppStateApi();

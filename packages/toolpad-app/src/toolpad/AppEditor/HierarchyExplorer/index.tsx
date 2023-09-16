@@ -1,25 +1,25 @@
 import * as React from 'react';
 import { NodeId } from '@mui/toolpad-core';
 import { Box, Typography } from '@mui/material';
-import TreeView from '@mui/lab/TreeView';
+import { TreeView, TreeItem, TreeItemProps } from '@mui/x-tree-view';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
-import TreeItem, { TreeItemProps } from '@mui/lab/TreeItem';
 import * as appDom from '../../../appDom';
-import { useDom, useDomApi, useAppState, useAppStateApi } from '../../AppState';
+import { useAppState, useDomApi, useAppStateApi } from '../../AppState';
 import EditableText from '../../../components/EditableText';
 import { ComponentIcon } from '../PageEditor/ComponentCatalog/ComponentCatalogItem';
 import { useNodeNameValidation } from '../PagesExplorer/validation';
 import { DomView } from '../../../utils/domView';
 import { removePageLayoutNode } from '../pageLayout';
 
-function CustomTreeItem(
-  props: TreeItemProps & {
-    node: appDom.ElementNode;
-  },
-) {
+export interface CustomTreeItemProps extends TreeItemProps {
+  ref?: React.RefObject<HTMLLIElement>;
+  node: appDom.ElementNode;
+}
+
+function CustomTreeItem(props: CustomTreeItemProps) {
   const domApi = useDomApi();
-  const { dom } = useDom();
+  const { dom } = useAppState();
   const appStateApi = useAppStateApi();
 
   const [domNodeEditable, setDomNodeEditable] = React.useState(false);
@@ -132,7 +132,7 @@ function RecursiveSubTree({ dom, root }: { dom: appDom.AppDom; root: appDom.Elem
 }
 
 export default function HierarchyExplorer() {
-  const { dom } = useDom();
+  const { dom } = useAppState();
   const { currentView } = useAppState();
   const appStateApi = useAppStateApi();
   const [expandedDomNodeIds, setExpandedDomNodeIds] = React.useState<string[]>([]);
@@ -197,7 +197,7 @@ export default function HierarchyExplorer() {
         selectedNodeId: null,
       },
     );
-  }, [appStateApi, dom, selectedDomNodeId, currentView]);
+  }, [selectedDomNodeId, appStateApi, currentView, dom]);
 
   const handleKeyDown = React.useCallback(
     (event: React.KeyboardEvent<HTMLUListElement>) => {

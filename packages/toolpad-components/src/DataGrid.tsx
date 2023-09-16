@@ -41,7 +41,8 @@ import { getObjectKey } from '@mui/toolpad-utils/objectKey';
 import { errorFrom } from '@mui/toolpad-utils/errors';
 import { hasImageExtension } from '@mui/toolpad-utils/path';
 import { ErrorBoundary, FallbackProps } from 'react-error-boundary';
-import { NumberFormat, createStringFormatter } from '@mui/toolpad-core/numberFormat';
+import { NumberFormat, createFormat as createNumberFormat } from '@mui/toolpad-core/numberFormat';
+import { DateFormat, createFormat as createDateFormat } from '@mui/toolpad-core/dateFormat';
 import createBuiltin from './createBuiltin';
 import { SX_PROP_HELPER_TEXT } from './constants';
 import ErrorOverlay from './components/ErrorOverlay';
@@ -303,6 +304,8 @@ export const CUSTOM_COLUMN_TYPES: Record<string, GridColTypeDef> = {
 export interface SerializableGridColumn
   extends Pick<GridColDef, 'field' | 'type' | 'align' | 'width' | 'headerName'> {
   numberFormat?: NumberFormat;
+  dateFormat?: DateFormat;
+  dateTimeFormat?: DateFormat;
   codeComponent?: string;
 }
 
@@ -325,9 +328,26 @@ export function inferColumns(rows: GridRowsProp): SerializableGridColumns {
 export function parseColumns(columns: SerializableGridColumns): GridColDef[] {
   return columns.map((column) => {
     if (column.type === 'number' && column.numberFormat) {
+      const format = createNumberFormat(column.numberFormat);
       return {
         ...column,
-        valueFormatter: createStringFormatter(column.numberFormat),
+        valueFormatter: ({ value }) => format.format(value),
+      };
+    }
+
+    if (column.type === 'date' && column.dateFormat) {
+      const format = createDateFormat(column.dateFormat);
+      return {
+        ...column,
+        valueFormatter: ({ value }) => format.format(value),
+      };
+    }
+
+    if (column.type === 'dateTime' && column.dateTimeFormat) {
+      const format = createDateFormat(column.dateTimeFormat);
+      return {
+        ...column,
+        valueFormatter: ({ value }) => format.format(value),
       };
     }
 

@@ -27,10 +27,11 @@ import {
 } from '@mui/toolpad-components';
 import { generateUniqueString } from '@mui/toolpad-utils/strings';
 import { NumberFormatEditor } from '@mui/toolpad-core/numberFormat';
+import { DateFormatEditor } from '@mui/toolpad-core/dateFormat';
 import type { EditorProps } from '../../types';
 import { useToolpadComponents } from '../AppEditor/toolpadComponents';
 import { ToolpadComponentDefinition } from '../../runtime/toolpadComponents';
-import { useDom } from '../AppState';
+import { useAppState } from '../AppState';
 import PropertyControl from '../../components/PropertyControl';
 
 // TODO: this import suggests leaky abstraction
@@ -114,7 +115,7 @@ function GridColumnEditor({
   value: editedColumn,
   onChange: handleColumnChange,
 }: GridColumnEditorProps) {
-  const { dom } = useDom();
+  const { dom } = useAppState();
   const toolpadComponents = useToolpadComponents(dom);
   const codeComponents: ToolpadComponentDefinition[] = React.useMemo(() => {
     return Object.values(toolpadComponents)
@@ -205,6 +206,27 @@ function GridColumnEditor({
             disabled={disabled}
             value={editedColumn.numberFormat}
             onChange={(numberFormat) => handleColumnChange({ ...editedColumn, numberFormat })}
+          />
+        ) : null}
+
+        {editedColumn.type === 'date' ? (
+          <DateFormatEditor
+            disabled={disabled}
+            disableTimeFormat
+            value={editedColumn.dateFormat}
+            onChange={(dateFormat) => {
+              handleColumnChange({ ...editedColumn, dateFormat });
+            }}
+          />
+        ) : null}
+
+        {editedColumn.type === 'dateTime' ? (
+          <DateFormatEditor
+            disabled={disabled}
+            value={editedColumn.dateTimeFormat}
+            onChange={(dateTimeFormat) => {
+              handleColumnChange({ ...editedColumn, dateTimeFormat });
+            }}
           />
         ) : null}
 

@@ -22,7 +22,7 @@ import * as appDom from '../../../../appDom';
 import dataSources from '../../../../toolpadDataSources/client';
 import { omit, update } from '../../../../utils/immutability';
 import { useEvaluateLiveBinding } from '../../useEvaluateLiveBinding';
-import { useDom } from '../../../AppState';
+import { useAppState } from '../../../AppState';
 import { ConnectionContextProvider } from '../../../../toolpadDataSources/context';
 import ConnectionSelect, { ConnectionOption } from '../ConnectionSelect';
 import BindableEditor from '../BindableEditor';
@@ -107,7 +107,7 @@ export default function QueryNodeEditorDialog<Q>({
   onSave,
   isDraft,
 }: QueryNodeEditorProps<Q>) {
-  const { dom } = useDom();
+  const { dom } = useAppState();
 
   // To keep it around during closing animation
   const node = useLatest(nodeProp);

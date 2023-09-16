@@ -1,6 +1,6 @@
 import { Stack, Typography, Divider, MenuItem, TextField, Tooltip, Link } from '@mui/material';
 import * as React from 'react';
-import { useDom, useDomApi } from '../../AppState';
+import { useAppState, useDomApi } from '../../AppState';
 import { usePageEditorState } from './PageEditorProvider';
 // import QueryEditor from './QueryEditor';
 // import QueryEditor from './QueryEditor2';
@@ -16,7 +16,7 @@ const PAGE_DISPLAY_OPTIONS: { value: appDom.PageDisplayMode; label: string }[] =
 
 export default function PageOptionsPanel() {
   const { nodeId: pageNodeId } = usePageEditorState();
-  const { dom } = useDom();
+  const { dom } = useAppState();
   const domApi = useDomApi();
 
   const page = appDom.getNode(dom, pageNodeId, 'page');

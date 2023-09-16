@@ -18,31 +18,31 @@ spec:
         function: invalidError
         kind: local
   content:
-    - component: PageRow
-      name: pageRow
-      children:
-        - component: Text
-          name: text
-          props:
-            value:
-              $$jsExpression: |
-                `Circlular property: ${circularData.data.a}`
-    - component: PageRow
-      name: pageRow1
-      children:
-        - component: Text
-          name: text1
-          props:
-            value:
-              $$jsExpression: >
-                `Non-circular:
-                ${nonCircularData.data.a1.b}:${nonCircularData.data.a2.b}`
-    - component: PageRow
-      name: pageRow2
-      children:
-        - component: Text
-          name: text2
-          props:
-            value:
-              $$jsExpression: |
-                `Invalid error: ${invalidError.error?.message}`
+    - component: Text
+      name: text
+      children: []
+      layout:
+        columnSize: 1
+      props:
+        value:
+          $$jsExpression: |
+            `Circlular property: ${circularData.data.a}`
+    - component: Text
+      name: text1
+      children: []
+      layout:
+        columnSize: 1
+      props:
+        value:
+          $$jsExpression: >
+            `Non-circular:
+            ${nonCircularData.data.a1.b}:${nonCircularData.data.a2.b}`
+    - component: Text
+      name: text2
+      children: []
+      layout:
+        columnSize: 1
+      props:
+        value:
+          $$jsExpression: |
+            `Invalid error: ${invalidError.error?.message}`

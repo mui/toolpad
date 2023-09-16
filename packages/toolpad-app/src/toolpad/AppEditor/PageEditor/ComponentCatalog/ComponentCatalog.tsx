@@ -1,9 +1,20 @@
 import * as React from 'react';
-import { Box, Collapse, darken, IconButton, Link, styled, Typography } from '@mui/material';
+import {
+  Box,
+  Collapse,
+  darken,
+  IconButton,
+  Link,
+  styled,
+  Typography,
+  TextField,
+} from '@mui/material';
 import ArrowLeftIcon from '@mui/icons-material/ArrowLeft';
 import ArrowRightIcon from '@mui/icons-material/ArrowRight';
 import ArrowDropDownSharpIcon from '@mui/icons-material/ArrowDropDownSharp';
 import invariant from 'invariant';
+import InputAdornment from '@mui/material/InputAdornment';
+import AccountCircle from '@mui/icons-material/Search';
 import ComponentCatalogItem from './ComponentCatalogItem';
 import CreateCodeComponentNodeDialog from '../../PagesExplorer/CreateCodeComponentNodeDialog';
 import * as appDom from '../../../../appDom';
@@ -48,7 +59,7 @@ export default function ComponentCatalog({ className }: ComponentCatalogProps) {
   const api = usePageEditorApi();
   const { dom } = useAppState();
 
-  const [openStart, setOpenStart] = React.useState(0);
+  const [openStart, setOpenStart] = React.useState(1);
   const [openCustomComponents, setOpenCustomComponents] = useLocalStorageState(
     'catalog-custom-expanded',
     true,
@@ -70,7 +81,7 @@ export default function ComponentCatalog({ className }: ComponentCatalogProps) {
     (delay?: number) => {
       const timeOpen = Date.now() - openStart;
       const defaultDelay = timeOpen > 750 ? 500 : 0;
-      closeTimeoutRef.current = setTimeout(() => setOpenStart(0), delay ?? defaultDelay);
+      closeTimeoutRef.current = setTimeout(() => setOpenStart(1), delay ?? defaultDelay);
     },
     [openStart],
   );
@@ -82,7 +93,9 @@ export default function ComponentCatalog({ className }: ComponentCatalogProps) {
     closeDrawer(0);
   };
 
-  const toolpadComponents = useToolpadComponents(dom);
+  const toolpadComponents = Object.entries(useToolpadComponents(dom));
+
+  const [toolpadComponentList, setToolpadComponentList] = React.useState(toolpadComponents);
 
   const handleMouseEnter = React.useCallback(() => openDrawer(), [openDrawer]);
   const handleMouseLeave = React.useCallback(() => closeDrawer(), [closeDrawer]);
@@ -97,6 +110,17 @@ export default function ComponentCatalog({ className }: ComponentCatalogProps) {
     () => setCreateCodeComponentDialogOpen(false),
     [],
   );
+
+  const handleSearchFilter = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const { value } = event.target;
+    if (!value) {
+      setToolpadComponentList(toolpadComponents);
+      return;
+    }
+    const regex = new RegExp(value.split('').join('.*'), 'i');
+    const newlist = toolpadComponents.filter(([componentName]) => regex.test(componentName));
+    setToolpadComponentList(newlist);
+  };
 
   return (
     <React.Fragment>
@@ -126,6 +150,27 @@ export default function ComponentCatalog({ className }: ComponentCatalogProps) {
           >
             <Box
               sx={{
+                width: '100%',
+                pl: 1,
+                pr: 1,
+              }}
+            >
+              <TextField
+                id="input-with-icon-textfield"
+                placeholder="Search components..."
+                autoFocus
+                onChange={handleSearchFilter}
+                InputProps={{
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <AccountCircle />
+                    </InputAdornment>
+                  ),
+                }}
+              />
+            </Box>
+            <Box
+              sx={{
                 width: 250,
                 height: '100%',
                 overflow: 'auto',
@@ -133,7 +178,7 @@ export default function ComponentCatalog({ className }: ComponentCatalogProps) {
               }}
             >
               <Box display="grid" gridTemplateColumns="1fr 1fr 1fr" gap={1} padding={1}>
-                {Object.entries(toolpadComponents).map(([componentId, componentType]) => {
+                {toolpadComponentList.map(([componentId, componentType]) => {
                   invariant(componentType, `No component definition found for "${componentId}"`);
                   return componentType.builtIn && !componentType.system ? (
                     <ComponentCatalogItem
@@ -194,7 +239,7 @@ export default function ComponentCatalog({ className }: ComponentCatalogProps) {
               </Box>
               <Collapse in={openCustomComponents} orientation={'vertical'}>
                 <Box display="grid" gridTemplateColumns="1fr 1fr 1fr" gap={1} padding={1} pt={0}>
-                  {Object.entries(toolpadComponents).map(([componentId, componentType]) => {
+                  {toolpadComponentList.map(([componentId, componentType]) => {
                     invariant(componentType, `No component definition found for "${componentId}"`);
                     return !componentType.builtIn ? (
                       <ComponentCatalogItem

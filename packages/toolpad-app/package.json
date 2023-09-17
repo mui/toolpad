@@ -98,7 +98,7 @@
     "markdown-to-jsx": "7.3.2",
     "mime": "3.0.0",
     "mysql2": "3.6.1",
-    "nanoid": "4.0.2",
+    "nanoid": "5.0.1",
     "node-fetch": "2.7.0",
     "node-fetch-har": "1.0.1",
     "open-editor": "4.1.1",

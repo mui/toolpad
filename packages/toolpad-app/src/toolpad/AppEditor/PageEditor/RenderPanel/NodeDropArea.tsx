@@ -12,7 +12,7 @@ import {
   Rectangle,
 } from '../../../../utils/geometry';
 
-import { useDom } from '../../../AppState';
+import { useAppState } from '../../../AppState';
 
 import {
   DROP_ZONE_CENTER,
@@ -156,7 +156,7 @@ export default function NodeDropArea({
   dropAreaRect,
   availableDropZones,
 }: NodeDropAreaProps) {
-  const { dom } = useDom();
+  const { dom } = useAppState();
   const { dragOverNodeId, dragOverSlotParentProp, dragOverZone, viewState } = usePageEditorState();
 
   const { nodes: nodesInfo } = viewState;

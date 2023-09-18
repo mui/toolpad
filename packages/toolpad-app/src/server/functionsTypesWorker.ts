@@ -3,7 +3,7 @@ import invariant from 'invariant';
 import * as ts from 'typescript';
 import { glob } from 'glob';
 import chalk from 'chalk';
-import { JSONSchema7, JSONSchema7TypeName, JSONSchema7Type } from 'json-schema';
+import type { JSONSchema7, JSONSchema7TypeName, JSONSchema7Type } from 'json-schema';
 import { asArray } from '@mui/toolpad-utils/collections';
 import { PrimitiveValueType } from '@mui/toolpad-core';
 import { compilerOptions } from './functionsShared';

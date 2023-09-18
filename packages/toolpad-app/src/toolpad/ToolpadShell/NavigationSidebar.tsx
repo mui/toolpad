@@ -73,7 +73,7 @@ export default function NavigationSidebar() {
   }, []);
 
   return (
-    <Paper elevation={1} style={{ position: 'relative' }}>
+    <Paper elevation={0} style={{ position: 'relative' }}>
       <Drawer variant="permanent" anchor="left" open={isExpanded}>
         <Toolbar variant="dense" />
         <List component="nav">

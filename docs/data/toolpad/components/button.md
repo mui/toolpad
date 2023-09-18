@@ -4,7 +4,7 @@
 
 Buttons allow users to take actions, make choices with a single tap. Detailed documentation of the component properties is available in the reference section for [button](/toolpad/reference/components/button/#properties).
 
-{{"component": "modules/components/button.js"}}
+{{"demo": "BasicButton.js", "hideToolbar": true}}
 
 ## Variations
 

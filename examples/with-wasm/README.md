@@ -1,4 +1,4 @@
-# QR Code generator
+# With WASM
 
 <p class="description">A basic Toolpad application that demonstrates integrating with WASM modules.</p>
 

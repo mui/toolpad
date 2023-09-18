@@ -7,7 +7,9 @@
     "build": "asc my-wasm-module.ts -o my-wasm-module.wasm && toolpad build",
     "start": "toolpad start"
   },
-  "dependencies": {},
+  "dependencies": {
+    "@mui/toolpad": "0.1.28"
+  },
   "devDependencies": {
     "assemblyscript": "0.27.9"
   }

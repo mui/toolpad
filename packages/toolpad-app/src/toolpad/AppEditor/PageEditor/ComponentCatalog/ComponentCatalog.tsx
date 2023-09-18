@@ -97,11 +97,9 @@ export default function ComponentCatalog({ className }: ComponentCatalogProps) {
 
   const [toolpadComponentList, setToolpadComponentList] = React.useState(toolpadComponents);
 
-  React.useEffect(() => {
-    if (toolpadComponents.length > toolpadComponentList.length) {
-      setToolpadComponentList(toolpadComponents);
-    }
-  }, [setToolpadComponentList, toolpadComponents, toolpadComponentList]);
+  if (toolpadComponents.length > toolpadComponentList.length) {
+    setToolpadComponentList(toolpadComponents);
+  }
 
   const handleMouseEnter = React.useCallback(() => openDrawer(), [openDrawer]);
   const handleMouseLeave = React.useCallback(() => closeDrawer(), [closeDrawer]);

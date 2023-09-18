@@ -2,15 +2,6 @@
 
 <p class="description">Explains our motivation for building Toolpad, where it differs from other tools and how it could be useful to you.</p>
 
-## Introduction
-
-Toolpad is primarily designed as an application framework for internal tool development. Such applications are often built by teams with access to fewer frontend development resources. These teams face challenges such as:
-
-- Having to keep up with the fast evolving landscape of libraries, frameworks and best practices.
-- Lots of glue code is required to get backend data to the browser and hooked up to data displaying components.
-- As backends evolve, the internal applications need to evolve with them with minimal amount of maintenance required.
-- Lesser focus on quality assurance usually leads to higher chances of failure.
-
 ## TL;DR
 
 - **Higher-level API** . Toolpad operates at a higher abstraction level than Material UI. It sets healthy UI constraints that prevent common pitfalls and anti-patterns
@@ -66,7 +57,3 @@ Like any Node.js app, you can self-host a Toolpad app on your own server or any 
 ### Collaboration and sharing
 
 The Toolpad application configuration is stored in yaml files that can be checked into git or any version control tool of your choice and maintained collaboratively. We didn't want to reinvent the wheel when it comes to collaboration for engineers. Having a private code repository is one of the essential practices to ensure that user data remains secure.
-
-## Conclusion
-
-Toolpad is a platform to build internal tools that are used for tasks like running marketing campaigns, data analysis, monitoring fraud, updating user data, and more. It aims to reduce the overhead associated with frontend development by providing visual editors and reducing the amount of boilerplate required to bring data on the page. With a drag-and-drop UI, you can build an internal tool for your business logic in just one sitting.

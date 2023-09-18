@@ -97,6 +97,12 @@ export default function ComponentCatalog({ className }: ComponentCatalogProps) {
 
   const [toolpadComponentList, setToolpadComponentList] = React.useState(toolpadComponents);
 
+  React.useEffect(() => {
+    if (toolpadComponents.length > toolpadComponentList.length) {
+      setToolpadComponentList(toolpadComponents);
+    }
+  }, [setToolpadComponentList, toolpadComponents, toolpadComponentList]);
+
   const handleMouseEnter = React.useCallback(() => openDrawer(), [openDrawer]);
   const handleMouseLeave = React.useCallback(() => closeDrawer(), [closeDrawer]);
 
@@ -111,16 +117,19 @@ export default function ComponentCatalog({ className }: ComponentCatalogProps) {
     [],
   );
 
-  const handleSearchFilter = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const { value } = event.target;
-    if (!value) {
-      setToolpadComponentList(toolpadComponents);
-      return;
-    }
-    const regex = new RegExp(value.split('').join('.*'), 'i');
-    const newlist = toolpadComponents.filter(([componentName]) => regex.test(componentName));
-    setToolpadComponentList(newlist);
-  };
+  const handleSearchFilter = React.useCallback(
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      const { value } = event.target;
+      if (!value) {
+        setToolpadComponentList(toolpadComponents);
+        return;
+      }
+      const regex = new RegExp(value.split('').join('.*'), 'i');
+      const newlist = toolpadComponents.filter(([componentName]) => regex.test(componentName));
+      setToolpadComponentList(newlist);
+    },
+    [setToolpadComponentList, toolpadComponents],
+  );
 
   return (
     <React.Fragment>
@@ -172,7 +181,7 @@ export default function ComponentCatalog({ className }: ComponentCatalogProps) {
             <Box
               sx={{
                 width: 250,
-                height: '100%',
+                height: 'calc(100% - 52px)',
                 overflow: 'auto',
                 scrollbarGutter: 'stable',
               }}

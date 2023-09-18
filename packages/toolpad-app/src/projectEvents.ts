@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { Emitter } from '@mui/toolpad-utils/events';
+import useEventCallback from '@mui/utils/useEventCallback';
 import { ProjectEvents } from './types';
-import useEvent from './utils/useEvent';
 
 let ws: WebSocket | null = null;
 const projectEvents = new Emitter<ProjectEvents>();
@@ -36,7 +36,7 @@ export function useOnProjectEvent<K extends keyof ProjectEvents>(
   event: K,
   handler: (payload: ProjectEvents[K]) => void,
 ) {
-  const stableHandler = useEvent(handler);
+  const stableHandler = useEventCallback(handler);
   return React.useEffect(() => {
     return projectEvents.subscribe(event, stableHandler);
   }, [event, stableHandler]);

@@ -9,10 +9,6 @@
     "packages": [
       "packages/*",
       "docs"
-    ],
-    "nohoist": [
-      "docs",
-      "docs/**"
     ]
   },
   "bin": {

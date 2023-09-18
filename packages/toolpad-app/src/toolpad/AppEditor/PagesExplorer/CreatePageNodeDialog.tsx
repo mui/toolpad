@@ -10,7 +10,7 @@ import * as React from 'react';
 import invariant from 'invariant';
 import * as appDom from '../../../appDom';
 import DialogForm from '../../../components/DialogForm';
-import useEvent from '../../../utils/useEvent';
+import useEventCallback from '@mui/utils/useEventCallback';
 import { useAppStateApi, useAppState } from '../../AppState';
 import { useNodeNameValidation } from './validation';
 
@@ -33,7 +33,9 @@ export default function CreatePageDialog({ open, onClose, ...props }: CreatePage
   const [name, setName] = React.useState(appDom.proposeName(DEFAULT_NAME, existingNames));
 
   // Reset form
-  const handleReset = useEvent(() => setName(appDom.proposeName(DEFAULT_NAME, existingNames)));
+  const handleReset = useEventCallback(() =>
+    setName(appDom.proposeName(DEFAULT_NAME, existingNames)),
+  );
 
   React.useEffect(() => {
     if (open) {

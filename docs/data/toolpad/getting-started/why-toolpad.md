@@ -1,10 +1,10 @@
 # Why Toolpad?
 
-<p class="description">Explains our motivation for building Toolpad, where it differs from other tools and how it could be useful to you.</p>
+<p class="description">Learn how Toolpad approaches building internal tools, and how it can be useful to you.</p>
 
 ## TL;DR
 
-- **Higher-level API** . Toolpad operates at a higher abstraction level than Material UI. It sets healthy UI constraints that prevent common pitfalls and anti-patterns
+- **Higher-level API**. Toolpad operates at a higher abstraction level than Material UI. It sets healthy UI constraints that prevent common pitfalls and anti-patterns
 - **Drag-and-drop builder**. Toolpad comes with a drag-and-drop builder to simplify UI building. The Drag-and-drop state is persisted in a yaml file so you can fully control the visual output with code
 - **Less boilerplate** so you can focus on the important parts of the app
 - **Run alongside existing code**. It integrates well with your existing code. You can use your database models, client libraries, secrets, and bespoke components directly
@@ -15,21 +15,33 @@
 
 After reviewing multiple approaches and tools, we noticed that there are a few recurring core problem areas that needed to be addressed:
 
-### Codebase fragmentation and duplication
+### The problems with pro-code tools
 
-Frequently, developers invest valuable time in hunting down particular versions of business logic and then maintaining them at multiple places. When working with external tools, code duplication can often arise as consequences of design decisions. Not having a unified reference point within a codebase compromises its scalability, ease of maintenance and debugging.
+#### Don't let you move fast
 
-### Loss of control with external tools
+Every business wants features to be delivered at speed but to accomodate future possibilities, developers are complelled to choose flexible solutions which results in compromise on speed. We believe that an architecturally well-designed tool empowers you to attain both speed and flexibilty simultaneously.
 
-When working with external tools, developers often forfeit their autonomy and are constrained by the choices offered by the tool. Developers typically derive a sense of ownership and responsibility when they oversee the entire process, encompassing integrations, deployment, and version control. However, when a black-box element intervenes, control often shifts away.
+#### Make you write unnecessary code
 
-### Trade-off between speed and customization
+Lots of boilerplate code is required to build an app from scratch. Similarly, lots of glue code is required to get backend data to the browser and hooked up to data displaying components.
 
-Typically, depending on factors such as project size, time constraints, available resources, and scope, developers are compelled to strike a balance between speed and customization. Every business wants features to be delivered at speed, but being able to customize later keeps the project open to come what may. While both aspects are significant, we believe that an architecturally well-designed tool empowers you to attain both objectives simultaneously.
+#### Force you to learn a front-end framework
 
-### Trust and safety
+Building internal tools require you to know a front-end framework. While it may interest some, most internal tool developers find it an extra burden to maintain and often seek help from fron-end professionls.
 
-Internal tools have access to highly sensitive data—data that every organization solemnly pledges to safeguard. Despite stringent security measures, data breaches remain a prevalent occurrence. Organizations rigorously engage in due diligence and compliance assessments before placing trust in a vendor. The security of the underlying data is critical, and the seriousness of this matter can't be overstated.
+### The problems with low-code tools
+
+#### Codebase fragmentation and duplication
+
+Frequently, developers invest valuable time in hunting down particular versions of business logic and then maintaining them in multiple places. When working with external low-code/no-code tools, code/logic duplication can often arise as a consequence of design decisions. Not having a unified reference point within a codebase compromises its scalability as well as ease of maintenance and debugging.
+
+#### Extensibility
+
+Low-code tools are hard to extend, If there's something the tool can't do out of the box, you can't bring your own code with you and integrate it seamlessly.
+
+#### Loss of control
+
+When working with external tools, developers often forfeit their autonomy and are constrained by the choices offered by the tool. A black-box element intervention takes away the control over the entire process, encompassing integrations, deployment, and version control. This lack of contril puts the underlying sensitive to risk. The security of the underlying data is critical, and the seriousness of this matter can't be overstated.
 
 ## How Toolpad fits in
 
@@ -57,3 +69,7 @@ Like any Node.js app, you can self-host a Toolpad app on your own server or any 
 ### Collaboration and sharing
 
 The Toolpad application configuration is stored in yaml files that can be checked into git or any version control tool of your choice and maintained collaboratively. We didn't want to reinvent the wheel when it comes to collaboration for engineers. Having a private code repository is one of the essential practices to ensure that user data remains secure.
+
+## How is Toolpad different from Y?
+
+🚧 Work in progress

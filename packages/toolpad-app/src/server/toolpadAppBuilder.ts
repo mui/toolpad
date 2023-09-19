@@ -2,7 +2,6 @@ import * as path from 'path';
 import { InlineConfig, Plugin, build } from 'vite';
 import react from '@vitejs/plugin-react';
 import { indent } from '@mui/toolpad-utils/strings';
-import { viteCommonjs } from '@originjs/vite-plugin-commonjs';
 import type { ComponentEntry } from './localMode';
 import { INITIAL_STATE_WINDOW_PROPERTY } from './toolpadAppServer';
 
@@ -280,13 +279,7 @@ export function createViteConfig({
       appType: 'custom',
       logLevel: 'info',
       root,
-      plugins: [
-        react(),
-        // @TODO: remove viteCommonjs plugin once https://github.com/mui/mui-x/pull/9826 is fixed
-        viteCommonjs(),
-        toolpadVitePlugin({ root, base, getComponents }),
-        ...plugins,
-      ],
+      plugins: [react(), toolpadVitePlugin({ root, base, getComponents }), ...plugins],
       base,
       define: {
         'process.env.NODE_ENV': `'${mode}'`,

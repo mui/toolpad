@@ -44,7 +44,7 @@
     "@argos-ci/core": "0.11.1",
     "@jest/globals": "29.7.0",
     "@mui/monorepo": "https://github.com/mui/material-ui.git",
-    "@mui/x-charts": "6.0.0-alpha.8",
+    "@mui/x-charts": "6.0.0-alpha.11",
     "@next/eslint-plugin-next": "13.4.19",
     "@playwright/test": "1.38.0",
     "@testing-library/jest-dom": "6.1.3",

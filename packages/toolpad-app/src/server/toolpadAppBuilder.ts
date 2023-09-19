@@ -3,7 +3,7 @@ import { InlineConfig, Plugin, build } from 'vite';
 import react from '@vitejs/plugin-react';
 import { indent } from '@mui/toolpad-utils/strings';
 import type { ComponentEntry } from './localMode';
-import { INITIAL_STATE_WINDOW_PROPERTY } from './toolpadAppServer';
+import { INITIAL_STATE_WINDOW_PROPERTY } from '../constants';
 
 const MAIN_ENTRY = '/main.tsx';
 const CANVAS_ENTRY = '/canvas.tsx';

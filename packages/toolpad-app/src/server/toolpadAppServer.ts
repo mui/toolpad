@@ -8,12 +8,10 @@ import { asyncHandler } from '../utils/express';
 import { basicAuthUnauthorized, checkBasicAuthHeader } from './basicAuth';
 import { createRpcRuntimeServer } from './rpcRuntimeServer';
 import { createRpcHandler } from './rpc';
-import { RUNTIME_CONFIG_WINDOW_PROPERTY } from '../constants';
+import { RUNTIME_CONFIG_WINDOW_PROPERTY, INITIAL_STATE_WINDOW_PROPERTY } from '../constants';
 import type { RuntimeConfig } from '../config';
 import createRuntimeState from '../runtime/createRuntimeState';
 import { RuntimeState } from '../types';
-
-export const INITIAL_STATE_WINDOW_PROPERTY = '__initialToolpadState__';
 
 export interface PostProcessHtmlParams {
   config: RuntimeConfig;

@@ -79,6 +79,8 @@ function CreateNewDataProviderDialog({
     console.log('create ', newName);
   };
 
+  const nameExists = existingNames.has(newName);
+
   return (
     <Dialog open={open} onClose={onClose}>
       <form onSubmit={handleSubmit}>
@@ -97,15 +99,13 @@ function CreateNewDataProviderDialog({
             type="text"
             onFocus={handleInputFocus}
             required
-            error={existingNames.has(newName)}
-            helperText={
-              existingNames.has(newName) ? `Provider "${newName}" already exists` : undefined
-            }
+            error={nameExists}
+            helperText={nameExists ? `Provider "${newName}" already exists` : undefined}
           />
         </DialogContent>
         <DialogActions>
           <Button onClick={onClose}>Cancel</Button>
-          <Button type="submit" disabled={!newName || existingNames.has(newName)}>
+          <Button type="submit" disabled={!newName || nameExists}>
             Add
           </Button>
         </DialogActions>

@@ -989,16 +989,12 @@ class ToolpadProject {
 
   private pendingVersionCheck: Promise<VersionInfo> | undefined;
 
-  constructor(
-    root: string,
-    options: Partial<ToolpadProjectOptions>,
-    externalUrl: string = 'http://localhost:3000',
-  ) {
+  constructor(root: string, options: Partial<ToolpadProjectOptions>) {
     this.root = root;
     this.options = {
       cmd: 'start',
       dev: false,
-      externalUrl,
+      externalUrl: 'http://localhost:3000',
       ...options,
     };
 
@@ -1231,7 +1227,7 @@ export async function initProject(
 
   await initToolpadFolder(root);
 
-  const project = new ToolpadProject(root, { cmd, dev: cmd === 'dev' }, externalUrl);
+  const project = new ToolpadProject(root, { cmd, dev: cmd === 'dev', externalUrl });
   // eslint-disable-next-line no-underscore-dangle
   globalThis.__toolpadProject = project;
 

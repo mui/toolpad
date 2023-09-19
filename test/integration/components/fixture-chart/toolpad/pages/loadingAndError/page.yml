@@ -20,7 +20,6 @@ spec:
                 color: '#1976d2'
                 xKey: ''
                 yKey: ''
-          children: []
         - component: Chart
           name: chart1
           props:
@@ -32,8 +31,7 @@ spec:
                     error.data
                 color: '#1976d2'
                 xKey: ''
-                yKey: ''
-          children: []
+                yKey: ''   
   queries:
     - name: alwaysLoading
       query:

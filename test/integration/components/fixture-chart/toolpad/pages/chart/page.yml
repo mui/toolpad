@@ -7,7 +7,6 @@ spec:
   content:
     - component: Chart
       name: chart
-      children: []
       layout:
         columnSize: 1
       props:

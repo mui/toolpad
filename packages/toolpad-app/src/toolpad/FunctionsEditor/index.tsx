@@ -31,7 +31,11 @@ import FlexFill from '../../components/FlexFill';
 import { FileIntrospectionResult } from '../../server/functionsTypesWorker';
 import ToolpadShell from '../ToolpadShell';
 import client from '../../api';
-import { serializeFunctionId } from '../../toolpadDataSources/local/shared';
+import {
+  parseFunctionId,
+  parseLegacyFunctionId,
+  serializeFunctionId,
+} from '../../toolpadDataSources/local/shared';
 import { LocalPrivateApi } from '../../toolpadDataSources/local/types';
 
 const fileTreeItemClasses = generateUtilityClasses('FileTreeItem', ['actionButton', 'handlerItem']);
@@ -57,6 +61,9 @@ const FileTreeItemRoot = styled(TreeItem)(({ theme }) => ({
     fontFamily: theme.typography.fontFamilyCode,
     fontSize: 15,
     padding: 4,
+    display: 'inline-block',
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
   },
 }));
 
@@ -72,7 +79,14 @@ function HandlerFileTreeItem({ file }: HandlerFileTreeItemProps) {
       label={
         <React.Fragment>
           <JavascriptIcon fontSize="large" />
-          {file.name}
+          <span
+            style={{
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+            }}
+          >
+            {file.name}
+          </span>
           <FlexFill />
           <OpenCodeEditorButton iconButton filePath={file.name} fileType="query" />
         </React.Fragment>
@@ -95,6 +109,22 @@ function HandlerFileTreeItem({ file }: HandlerFileTreeItemProps) {
 export default function FunctionsEditor() {
   const theme = useTheme();
 
+  const [selectedHandler, setSelectedHandler] = React.useState<string | null>(null);
+  const { file: selectedFile = undefined, handler: selectedFunction = undefined } = selectedHandler
+    ? parseLegacyFunctionId(selectedHandler)
+    : {};
+
+  const selectedNodeId: string | null = selectedFile
+    ? serializeFunctionId({
+        file: selectedFile,
+        handler: selectedFunction,
+      })
+    : null;
+
+  const [expanded, setExpanded] = React.useState<string[]>(selectedFile ? [selectedFile] : []);
+
+  const [search, setSearch] = React.useState('');
+
   const execPrivate = React.useCallback(
     <K extends keyof LocalPrivateApi>(
       method: K,
@@ -110,6 +140,16 @@ export default function FunctionsEditor() {
     queryFn: () => execPrivate('introspection', []),
     retry: false,
   });
+
+  const handleSelectFunction = React.useCallback(
+    (_event: React.SyntheticEvent, nodeId: string) => {
+      const parsed = parseFunctionId(nodeId);
+      if (parsed.handler) {
+        setSelectedHandler(nodeId);
+      }
+    },
+    [setSelectedHandler],
+  );
 
   const handlerTreeRef = React.useRef<HTMLUListElement>(null);
 
@@ -166,6 +206,10 @@ export default function FunctionsEditor() {
       setNewHandlerLoading(false);
     }
 
+    const newNodeId = serializeFunctionId({ file: fileName, handler: 'default' });
+    setSelectedHandler(newNodeId);
+    setExpanded([fileName]);
+
     handleCloseCreateNewHandler();
   }, [
     execPrivate,
@@ -176,13 +220,18 @@ export default function FunctionsEditor() {
     newHandlerLoading,
   ]);
 
+  const handleSearchChange = React.useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
+    setSearch(event.target.value);
+  }, []);
+
   return (
     <ToolpadShell>
       <PanelGroup direction="horizontal">
         <Panel defaultSize={26} minSize={24}>
-          <Box sx={{ padding: 1, height: '100%' }}>
+          <Box sx={{ padding: 1, overflow: 'scroll' }}>
             <Stack direction="row" spacing={1}>
               <TextField
+                onChange={handleSearchChange}
                 placeholder="Find function..."
                 InputProps={{
                   startAdornment: (
@@ -200,8 +249,12 @@ export default function FunctionsEditor() {
             </Stack>
             <TreeView
               ref={handlerTreeRef}
+              selected={selectedNodeId}
+              onNodeSelect={handleSelectFunction}
               defaultCollapseIcon={<ExpandMoreIcon />}
               defaultExpandIcon={<ChevronRightIcon />}
+              expanded={expanded}
+              onNodeToggle={(_event, nodeIds) => setExpanded(nodeIds)}
               sx={{ mt: 1 }}
             >
               {isCreateNewHandlerOpen ? (
@@ -213,7 +266,7 @@ export default function FunctionsEditor() {
                         ref={createNewInputRef}
                         value={newHandlerInput}
                         onChange={(event) =>
-                          setNewHandlerInput(event.target.value.replaceAll(/[^a-zA-Z0-9]/g, ''))
+                          setNewHandlerInput(event.target.value.replaceAll(/[^a-zA-Z0-9.]/g, ''))
                         }
                         autoFocus
                         disabled={newHandlerLoading}
@@ -232,6 +285,9 @@ export default function FunctionsEditor() {
                             <JavascriptIcon fontSize="large" />
                           </InputAdornment>
                         }
+                        placeholder="New file name…"
+                        fullWidth
+                        sx={{ padding: 0.5 }}
                       />
                       <Popover
                         open={open}
@@ -249,13 +305,17 @@ export default function FunctionsEditor() {
                       </Popover>
                     </React.Fragment>
                   }
-                  sx={{ backgroundColor: alpha(theme.palette.primary.main, 0.3), padding: 0.45 }}
+                  sx={{ backgroundColor: alpha(theme.palette.primary.main, 0.1) }}
                 />
               ) : null}
 
-              {introspection.data?.files?.map((file) => (
-                <HandlerFileTreeItem key={file.name} file={file} />
-              ))}
+              {introspection.data?.files
+                ?.filter((file) =>
+                  search ? file.name.toLowerCase().includes(search.toLowerCase()) : true,
+                )
+                .map((file) => (
+                  <HandlerFileTreeItem key={file.name} file={file} />
+                ))}
 
               {introspection.isLoading ? (
                 <React.Fragment>

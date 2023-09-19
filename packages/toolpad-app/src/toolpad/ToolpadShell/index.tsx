@@ -10,7 +10,6 @@ export interface ToolpadShellProps {
 }
 
 const ToolpadShellRoot = styled('div')({
-  width: '100vw',
   height: '100vh',
   display: 'flex',
   flexDirection: 'column',
@@ -27,7 +26,7 @@ export default function ToolpadShell({ children, ...props }: ToolpadShellProps) 
   return (
     <ToolpadShellRoot>
       <Header {...props} />
-      <Stack direction="row" sx={{ height: '100%' }}>
+      <Stack direction="row" sx={{ flex: 1 }}>
         <NavigationSidebar />
         <ViewPort>{children}</ViewPort>
       </Stack>

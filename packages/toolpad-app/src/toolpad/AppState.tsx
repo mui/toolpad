@@ -7,12 +7,12 @@ import { debounce, DebouncedFunc } from 'lodash-es';
 import { useLocation } from 'react-router-dom';
 import { mapValues } from '@mui/toolpad-utils/collections';
 import useDebouncedHandler from '@mui/toolpad-utils/hooks/useDebouncedHandler';
+import useEventCallback from '@mui/utils/useEventCallback';
 import * as appDom from '../appDom';
 import { omit, update } from '../utils/immutability';
 import client from '../api';
 import useShortcut from '../utils/useShortcut';
 import insecureHash from '../utils/insecureHash';
-import useEvent from '../utils/useEvent';
 import { NodeHashes } from '../types';
 import { hasFieldFocus } from '../utils/fields';
 import { DomView, getViewFromPathname, PageViewTab } from '../utils/domView';
@@ -499,7 +499,7 @@ export default function AppProvider({ children }: DomContextProps) {
     [],
   );
 
-  const dispatchWithHistory = useEvent((action: AppStateAction) => {
+  const dispatchWithHistory = useEventCallback((action: AppStateAction) => {
     if (state.hasUnsavedChanges && isCancellableAction(action)) {
       // eslint-disable-next-line no-alert
       const ok = window.confirm(

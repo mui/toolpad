@@ -237,9 +237,9 @@ export default class FunctionsManager {
       this.project.events.subscribe('envChanged', async () => {
         await this.createRuntimeWorkerWithEnv();
       });
-    }
 
-    await this.createRuntimeWorkerWithEnv();
+      await this.createRuntimeWorkerWithEnv();
+    }
   }
 
   async build() {

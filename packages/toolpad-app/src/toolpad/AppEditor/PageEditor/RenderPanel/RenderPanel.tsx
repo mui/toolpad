@@ -1,13 +1,13 @@
 import * as React from 'react';
 import { styled } from '@mui/material';
 import { NodeId } from '@mui/toolpad-core';
+import useEventCallback from '@mui/utils/useEventCallback';
 import * as appDom from '../../../../appDom';
 import EditorCanvasHost from '../EditorCanvasHost';
 import { getNodeHashes, useAppState, useAppStateApi, useDomApi } from '../../../AppState';
 import { usePageEditorApi, usePageEditorState } from '../PageEditorProvider';
 import RenderOverlay from './RenderOverlay';
 import { NodeHashes, RuntimeState } from '../../../../types';
-import useEvent from '../../../../utils/useEvent';
 import type { ToolpadBridge } from '../../../../canvas/ToolpadBridge';
 import { getBindingType } from '../../../../bindings';
 import createRuntimeState from '../../../../runtime/createRuntimeState';
@@ -48,7 +48,7 @@ export default function RenderPanel({ className }: RenderPanelProps) {
     [appState.savedDom],
   );
 
-  const handleInit = useEvent((initializedBridge: ToolpadBridge) => {
+  const handleInit = useEventCallback((initializedBridge: ToolpadBridge) => {
     initializedBridge.canvasEvents.on('propUpdated', (event) => {
       domApi.update((draft) => {
         const node = appDom.getMaybeNode(draft, event.nodeId as NodeId, 'element');

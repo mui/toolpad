@@ -258,9 +258,7 @@ function QueryEditor({
   const baseUrl = isBrowserSide ? null : connectionParams?.baseUrl ?? null;
   // input.attributes.query.url will be reset when it's empty
   const urlValue: BindableAttrValue<string> =
-    input.attributes.query.url === undefined
-      ? getDefaultUrl(config, connectionParams)
-      : input.attributes.query.url;
+    input.attributes.query.url ?? getDefaultUrl(config, connectionParams);
 
   const introspection = usePrivateQuery<FetchPrivateQuery, IntrospectionResult>(
     {

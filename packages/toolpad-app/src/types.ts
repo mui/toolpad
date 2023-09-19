@@ -207,6 +207,8 @@ export type ProjectEvents = {
   queriesInvalidated: {};
   // An environment variable has changed
   envChanged: {};
+  // Functions or datasources have been updated
+  functionsChanged: {};
 };
 
 export interface ToolpadProjectOptions {

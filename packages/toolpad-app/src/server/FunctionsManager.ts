@@ -41,6 +41,29 @@ async function createDefaultFunction(filePath: string): Promise<string> {
   return result;
 }
 
+async function createDefaultDataProvider(filePath: string): Promise<string> {
+  const result = await format(
+    `
+    /**
+     * Toolpad data provider file.
+     */
+
+    import { createDataProvider } from '@mui/toolpad/server';
+
+    export default createDataProvider({
+      paginationMode: 'index',
+      async getRecords({ paginationModel: { start, pageSize} }) {
+        return {
+          records: [],
+        };
+      }
+    })
+  `,
+    filePath,
+  );
+  return result;
+}
+
 function formatCodeFrame(location: esbuild.Location): string {
   const lineNumberCharacters = Math.ceil(Math.log10(location.line));
   return [
@@ -172,6 +195,7 @@ export default class FunctionsManager {
       this.buildErrors = args.errors;
 
       this.project.invalidateQueries();
+      this.project.events.emit('functionsChanged', {});
     };
 
     const toolpadPlugin: esbuild.Plugin = {
@@ -333,6 +357,16 @@ export default class FunctionsManager {
   async createFunctionFile(name: string): Promise<void> {
     const filePath = path.resolve(this.getResourcesFolder(), ensureSuffix(name, '.ts'));
     const content = await createDefaultFunction(filePath);
+    if (await fileExists(filePath)) {
+      throw new Error(`"${name}" already exists`);
+    }
+    await writeFileRecursive(filePath, content, { encoding: 'utf-8' });
+    this.extractedTypes = undefined;
+  }
+
+  async createDataProviderFile(name: string): Promise<void> {
+    const filePath = path.resolve(this.getResourcesFolder(), ensureSuffix(name, '.ts'));
+    const content = await createDefaultDataProvider(filePath);
     if (await fileExists(filePath)) {
       throw new Error(`"${name}" already exists`);
     }

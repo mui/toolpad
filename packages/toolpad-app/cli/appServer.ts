@@ -121,7 +121,4 @@ export async function main({ outDir, base, config, root, port }: AppViteServerCo
   await notifyReady();
 }
 
-main(workerData).catch((err) => {
-  console.error(err);
-  process.exit(1);
-});
+main(workerData);

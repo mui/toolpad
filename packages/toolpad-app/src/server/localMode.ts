@@ -1192,6 +1192,10 @@ class ToolpadProject {
     await writeFileRecursive(filePath, content, { encoding: 'utf-8' });
   }
 
+  async createDataProvider(name: string) {
+    return this.functionsManager.createDataProviderFile(name);
+  }
+
   async deletePage(name: string) {
     const pageFolder = getPageFolder(this.root, name);
     await fs.rm(pageFolder, { force: true, recursive: true });

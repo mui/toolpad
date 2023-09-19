@@ -17,12 +17,21 @@ import {
 import { errorFrom } from '@mui/toolpad-utils/errors';
 import EditIcon from '@mui/icons-material/Edit';
 import AddIcon from '@mui/icons-material/Add';
+import { useMutation } from '@tanstack/react-query';
+import { LoadingButton } from '@mui/lab';
 import { EditorProps } from '../../types';
 import client from '../../api';
 import type {
   DataProviderIntrospectionResult,
   FileIntrospectionResult,
 } from '../../server/functionsTypesWorker';
+import { projectEvents } from '../../projectEvents';
+
+projectEvents.on('functionsChanged', () => client.invalidateQueries('introspect', []));
+
+function useFunctionsIntrospectQuery() {
+  return client.useQuery('introspect', []);
+}
 
 function handleInputFocus(event: React.FocusEvent<HTMLInputElement>) {
   event.target.select();
@@ -59,6 +68,7 @@ const DataProviderSelectorRoot = styled('div')({
 interface CreateNewDataProviderDialogProps {
   open: boolean;
   onClose: () => void;
+  onCommit: (newName: string) => void;
   existingNames: Set<string>;
   initialName: string;
 }
@@ -66,20 +76,42 @@ interface CreateNewDataProviderDialogProps {
 function CreateNewDataProviderDialog({
   open,
   onClose,
+  onCommit,
   existingNames,
   initialName,
 }: CreateNewDataProviderDialogProps) {
   const [newName, setNewName] = React.useState(initialName);
   React.useEffect(() => {
-    setNewName(initialName);
-  }, [initialName]);
+    if (open) {
+      setNewName(initialName);
+    }
+  }, [open, initialName]);
+
+  const createProviderMutation = useMutation({
+    mutationKey: [newName],
+    mutationFn: () => client.mutation.createDataProvider(newName),
+    onSuccess: () => {
+      onCommit(newName);
+      onClose();
+    },
+  });
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    console.log('create ', newName);
+    createProviderMutation.mutate();
   };
 
   const nameExists = existingNames.has(newName);
+
+  const errorMessage = React.useMemo(() => {
+    if (nameExists) {
+      return `Provider "${newName}" already exists`;
+    }
+    if (createProviderMutation.error) {
+      return errorFrom(createProviderMutation.error).message;
+    }
+    return null;
+  }, [nameExists, createProviderMutation.error, newName]);
 
   return (
     <Dialog open={open} onClose={onClose}>
@@ -99,15 +131,19 @@ function CreateNewDataProviderDialog({
             type="text"
             onFocus={handleInputFocus}
             required
-            error={nameExists}
-            helperText={nameExists ? `Provider "${newName}" already exists` : undefined}
+            error={!!errorMessage}
+            helperText={errorMessage}
           />
         </DialogContent>
         <DialogActions>
           <Button onClick={onClose}>Cancel</Button>
-          <Button type="submit" disabled={!newName || nameExists}>
+          <LoadingButton
+            type="submit"
+            disabled={!newName || !!errorMessage}
+            loading={createProviderMutation.isLoading}
+          >
             Add
-          </Button>
+          </LoadingButton>
         </DialogActions>
       </form>
     </Dialog>
@@ -119,7 +155,7 @@ function getProviderNameFromFile(file: FileIntrospectionResult): string {
 }
 
 function DataProviderSelector({ value, onChange }: EditorProps<string>) {
-  const { data: introspection, isLoading, error } = client.useQuery('introspect', []);
+  const { data: introspection, isLoading, error } = useFunctionsIntrospectQuery();
 
   const options = React.useMemo<DataProviderSelectorOption[]>(() => {
     return (
@@ -169,6 +205,7 @@ function DataProviderSelector({ value, onChange }: EditorProps<string>) {
       <CreateNewDataProviderDialog
         open={dialogOpen}
         onClose={handleClose}
+        onCommit={(newName) => onChange(`${newName}.ts:default`)}
         initialName={dialogValue}
         existingNames={existingNames}
       />

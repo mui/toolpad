@@ -33,6 +33,9 @@ export function createRpcServer(project: ToolpadProject) {
       createComponent: createMethod<typeof project.createComponent>(({ params }) => {
         return project.createComponent(...params);
       }),
+      createDataProvider: createMethod<typeof project.createDataProvider>(({ params }) => {
+        return project.createDataProvider(...params);
+      }),
       deletePage: createMethod<typeof project.deletePage>(({ params }) => {
         return project.deletePage(...params);
       }),

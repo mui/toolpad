@@ -21,6 +21,10 @@ import client from '../../../api';
 import useLatest from '../../../utils/useLatest';
 import OpenCodeEditorButton from '../../../components/OpenCodeEditor';
 
+function handleInputFocus(event: React.FocusEvent<HTMLInputElement>) {
+  event.target.select();
+}
+
 const DEFAULT_NAME = 'MyComponent';
 
 export interface CreateCodeComponentDialogProps {
@@ -52,10 +56,6 @@ export default function CreateCodeComponentDialog({
       handleReset();
     }
   }, [open, handleReset]);
-
-  const handleInputFocus = React.useCallback((event: React.FocusEvent<HTMLInputElement>) => {
-    event.target.select();
-  }, []);
 
   const inputErrorMsg = useNodeNameValidation(name, existingNames, 'component');
   const isNameValid = !inputErrorMsg;

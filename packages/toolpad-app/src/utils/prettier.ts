@@ -9,8 +9,12 @@ const DEFAULT_OPTIONS = {
 /**
  * Formats a javascript source with `prettier`.
  */
-export function format(code: string): string {
-  return prettier.format(code, DEFAULT_OPTIONS);
+export async function format(code: string, filePath: string): Promise<string> {
+  const readConfig = await prettier.resolveConfig(filePath);
+  return prettier.format(code, {
+    ...readConfig,
+    ...DEFAULT_OPTIONS,
+  });
 }
 
 /**
@@ -25,17 +29,6 @@ export function formatExpression(code: string): string {
   // There's no mode to format expressions in prettier. It will insert a semicolon in front
   // in certain occasions. See https://github.com/prettier/prettier/issues/2841
   return formatted.replace(/^;/, '');
-}
-
-/**
- * Formats a javascript source with `prettier`, if it's valid.
- */
-export function tryFormat(code: string): string {
-  try {
-    return format(code);
-  } catch (err) {
-    return code;
-  }
 }
 
 /**

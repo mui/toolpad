@@ -4,7 +4,7 @@ defaults: &defaults
   working_directory: /tmp/mui-toolpad
   resource_class: medium
   docker:
-    - image: cimg/node:16.14.2
+    - image: cimg/node:18.17.1
 # CircleCI has disabled the cache across forks for security reasons.
 # Following their official statement, it was a quick solution, they
 # are working on providing this feature back with appropriate security measures.
@@ -136,7 +136,7 @@ jobs:
     <<: *defaults
     resource_class: 'large'
     docker:
-      - image: mcr.microsoft.com/playwright:v1.37.1-focal
+      - image: mcr.microsoft.com/playwright:v1.38.0-focal
         environment:
           NODE_ENV: test
           TOOLPAD_TEST_RETRIES: 1

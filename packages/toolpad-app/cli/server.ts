@@ -1,7 +1,7 @@
 import * as path from 'path';
 import { IncomingMessage, createServer } from 'http';
 import * as fs from 'fs/promises';
-import { Worker } from 'worker_threads';
+import { Worker, MessageChannel } from 'worker_threads';
 import express from 'express';
 import invariant from 'invariant';
 import getPort from 'get-port';
@@ -15,19 +15,14 @@ import { listen } from '@mui/toolpad-utils/http';
 import openBrowser from 'react-dev-utils/openBrowser';
 import { folderExists } from '@mui/toolpad-utils/fs';
 import chalk from 'chalk';
+import { serveRpc } from '@mui/toolpad-utils/workerRpc';
 import { asyncHandler } from '../src/utils/express';
 import { createProdHandler } from '../src/server/toolpadAppServer';
-import {
-  ToolpadProject,
-  getAppOutputFolder,
-  getComponents,
-  initProject,
-} from '../src/server/localMode';
+import { ToolpadProject, initProject } from '../src/server/localMode';
 import type { Command as AppDevServerCommand, AppViteServerConfig, WorkerRpc } from './appServer';
 import { createRpcHandler } from '../src/server/rpc';
 import { RUNTIME_CONFIG_WINDOW_PROPERTY } from '../src/constants';
 import type { RuntimeConfig } from '../src/config';
-import { createWorkerRpcServer } from '../src/server/workerRpc';
 import { createRpcServer } from '../src/server/rpcServer';
 import { createRpcRuntimeServer } from '../src/server/rpcRuntimeServer';
 
@@ -54,14 +49,18 @@ async function createDevHandler(
   const appServerPath = path.resolve(__dirname, './appServer.js');
   const devPort = await getPort();
 
+  const mainThreadRpcChannel = new MessageChannel();
+
   const worker = new Worker(appServerPath, {
     workerData: {
-      outDir: getAppOutputFolder(project.getRoot()),
+      outDir: project.getAppOutputFolder(),
       base,
       config: runtimeConfig,
       root: project.getRoot(),
       port: devPort,
+      mainThreadRpcPort: mainThreadRpcChannel.port1,
     } satisfies AppViteServerConfig,
+    transferList: [mainThreadRpcChannel.port1],
     env: {
       ...process.env,
       NODE_ENV: 'development',
@@ -78,10 +77,10 @@ async function createDevHandler(
     resolveReadyPromise = resolve;
   });
 
-  createWorkerRpcServer<WorkerRpc>(worker, {
+  serveRpc<WorkerRpc>(mainThreadRpcChannel.port2, {
     notifyReady: async () => resolveReadyPromise?.(),
     loadDom: async () => project.loadDom(),
-    getComponents: async () => getComponents(project.getRoot()),
+    getComponents: async () => project.getComponents(),
   });
 
   project.events.on('componentsListChanged', () => {
@@ -323,8 +322,7 @@ export async function runApp({ cmd, port, dev = false, projectDir }: RunAppOptio
   const editorDevMode = !!process.env.TOOLPAD_NEXT_DEV || dev;
 
   const externalUrl = process.env.TOOLPAD_EXTERNAL_URL || `http://localhost:${port}`;
-
-  const project = await initProject(cmd, projectDir);
+  const project = await initProject(cmd, projectDir, externalUrl);
 
   const server = await startServer({
     cmd,

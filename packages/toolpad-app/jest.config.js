@@ -1,8 +1,12 @@
-const esModules = [
+const transpiledModules = [
   'get-port',
   'lodash-es',
   'nanoid',
   'fractional-indexing',
+  'node-fetch',
+  'data-uri-to-buffer',
+  'fetch-blob',
+  'formdata-polyfill',
   'd3-scale',
   'd3-array',
   'internmap',
@@ -13,12 +17,12 @@ const esModules = [
   'd3-time-format',
   'd3-shape',
   'd3-path',
-].join('|');
+];
 
 module.exports = /** @type {import('jest').Config} */ ({
   transform: {
     '^.+\\.(t|j)sx?$': '@swc/jest',
   },
   setupFilesAfterEnv: ['<rootDir>/../../test/setupJest.ts'],
-  transformIgnorePatterns: [`node_modules/(?!(${esModules})/)`],
+  transformIgnorePatterns: [`node_modules/(?!(${transpiledModules.join('|')})/)`],
 });

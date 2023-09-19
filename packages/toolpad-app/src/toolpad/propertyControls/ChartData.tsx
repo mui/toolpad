@@ -30,7 +30,7 @@ import * as appDom from '../../appDom';
 import type { EditorProps } from '../../types';
 import PropertyControl from '../../components/PropertyControl';
 import { usePageEditorState } from '../AppEditor/PageEditor/PageEditorProvider';
-import { useDom, useDomApi } from '../AppState';
+import { useAppState, useDomApi } from '../AppState';
 import BindableEditor from '../AppEditor/PageEditor/BindableEditor';
 import { updateArray, remove } from '../../utils/immutability';
 import { createToolpadAppTheme } from '../../runtime/AppThemeProvider';
@@ -52,7 +52,7 @@ function ChartDataPropEditor({
   value = [],
   onChange,
 }: EditorProps<ChartDataSeries[]>) {
-  const { dom } = useDom();
+  const { dom } = useAppState();
   const domApi = useDomApi();
   const { pageState, bindings, globalScopeMeta } = usePageEditorState();
   const jsBrowserRuntime = useBrowserJsRuntime();

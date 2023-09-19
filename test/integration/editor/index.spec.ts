@@ -15,7 +15,7 @@ test.use({
 test('can move elements in page', async ({ page }) => {
   const editorModel = new ToolpadEditor(page);
 
-  await editorModel.goto();
+  await editorModel.goToPageById('y4d19z0');
 
   await editorModel.waitForOverlay();
 
@@ -59,7 +59,7 @@ test('can move elements in page', async ({ page }) => {
 test('can delete elements from page', async ({ page }) => {
   const editorModel = new ToolpadEditor(page);
 
-  await editorModel.goto();
+  await editorModel.goToPageById('y4d19z0');
 
   await editorModel.waitForOverlay();
 
@@ -118,6 +118,46 @@ test('can delete elements from page', async ({ page }) => {
   await removeElementByClick(lastButtonInColumnLocator);
 
   await expect(canvasButtonLocator).toHaveCount(3);
+});
+
+test('can build component layout inside layout slots', async ({ page }) => {
+  const editorModel = new ToolpadEditor(page);
+
+  await editorModel.goToPageById('UTdiEYQ');
+
+  await editorModel.waitForOverlay();
+
+  const canvasInputLocator = editorModel.appCanvas.locator('input');
+
+  const dropAreaBoundingBox = await editorModel.appCanvas
+    .getByText('Drop component here')
+    .boundingBox();
+
+  await editorModel.dragNewComponentToCanvas(
+    'Text Field',
+    dropAreaBoundingBox!.x + dropAreaBoundingBox!.width / 2,
+    dropAreaBoundingBox!.y + dropAreaBoundingBox!.height / 2,
+  );
+
+  await expect(canvasInputLocator).toBeVisible();
+
+  const firstInputBoundingBox = await canvasInputLocator.boundingBox();
+
+  await editorModel.dragNewComponentToCanvas(
+    'Text Field',
+    dropAreaBoundingBox!.x + dropAreaBoundingBox!.width / 2,
+    firstInputBoundingBox!.y + (2 / 3) * firstInputBoundingBox!.height,
+  );
+
+  await expect(canvasInputLocator).toHaveCount(2);
+
+  await editorModel.dragNewComponentToCanvas(
+    'Text Field',
+    firstInputBoundingBox!.x + firstInputBoundingBox!.width / 2,
+    firstInputBoundingBox!.y + firstInputBoundingBox!.height / 2,
+  );
+
+  await expect(canvasInputLocator).toHaveCount(3);
 });
 
 test('must correctly size new layout columns', async ({ page }) => {
@@ -223,7 +263,7 @@ test('must deselect selected element when clicking outside of it', async ({ page
 });
 test('can rename page', async ({ page, localApp }) => {
   const editorModel = new ToolpadEditor(page);
-  await editorModel.goto();
+  await editorModel.goToPageById('y4d19z0');
   await editorModel.waitForOverlay();
   await editorModel.goToPage('page4');
   await editorModel.waitForOverlay();
@@ -244,7 +284,7 @@ test('can rename page', async ({ page, localApp }) => {
 
 test('can react to pages renamed on disk', async ({ page, localApp }) => {
   const editorModel = new ToolpadEditor(page);
-  await editorModel.goto();
+  await editorModel.goToPageById('y4d19z0');
   await editorModel.waitForOverlay();
 
   const oldPageFolder = path.resolve(localApp.dir, './toolpad/pages/page4');

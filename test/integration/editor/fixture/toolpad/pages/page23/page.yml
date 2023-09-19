@@ -5,16 +5,14 @@ spec:
   title: page2
   display: shell
   content:
-    - component: PageRow
-      name: pageRow
-      children:
-        - component: TextField
-          name: textField
-    - component: PageRow
-      name: pageRow1
-      children:
-        - component: Text
-          name: text
-          props:
-            value: text-foo
-            fullWidth: true
+    - component: TextField
+      name: textField
+      layout:
+        columnSize: 1
+    - component: Text
+      name: text
+      layout:
+        columnSize: 1
+      props:
+        value: text-foo
+        fullWidth: true

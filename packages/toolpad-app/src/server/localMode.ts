@@ -95,15 +95,15 @@ function getComponentFilePath(componentsFolder: string, componentName: string): 
   return path.join(componentsFolder, `${componentName}.tsx`);
 }
 
-export function getOutputFolder(root: string) {
+function getOutputFolder(root: string) {
   return path.join(getToolpadFolder(root), '.generated');
 }
 
-export function getAppOutputFolder(root: string) {
+function getAppOutputFolder(root: string) {
   return path.join(getOutputFolder(root), 'app');
 }
 
-export async function legacyConfigFileExists(root: string): Promise<boolean> {
+async function legacyConfigFileExists(root: string): Promise<boolean> {
   const [yamlFileExists, ymlFileExists] = await Promise.all([
     fileExists(path.join(root, './toolpad.yaml')),
     fileExists(path.join(root, './toolpad.yml')),
@@ -118,7 +118,7 @@ export interface ComponentEntry {
   path: string;
 }
 
-export async function getComponents(root: string): Promise<ComponentEntry[]> {
+async function getComponents(root: string): Promise<ComponentEntry[]> {
   const componentsFolder = getComponentsFolder(root);
   const entries = (await readMaybeDir(componentsFolder)) || [];
   const result = entries.map((entry) => {
@@ -213,33 +213,37 @@ async function loadThemeFromFile(root: string): Promise<Theme | null> {
   return null;
 }
 
-function createDefaultCodeComponent(name: string): string {
+async function createDefaultCodeComponent(name: string, filePath: string): Promise<string> {
   const componentId = name.replace(/\s/g, '');
   const propTypeId = `${componentId}Props`;
-  return format(`
-    import * as React from 'react';
-    import { Typography } from '@mui/material';
-    import { createComponent } from '@mui/toolpad/browser';
-    
-    export interface ${propTypeId} {
-      msg: string;
-    }
-    
-    function ${componentId}({ msg }: ${propTypeId}) {
-      return (
-        <Typography>{msg}</Typography>
-      );
-    }
+  const result = await format(
+    `
+  import * as React from 'react';
+  import { Typography } from '@mui/material';
+  import { createComponent } from '@mui/toolpad/browser';
+  
+  export interface ${propTypeId} {
+    msg: string;
+  }
+  
+  function ${componentId}({ msg }: ${propTypeId}) {
+    return (
+      <Typography>{msg}</Typography>
+    );
+  }
 
-    export default createComponent(${componentId}, {
-      argTypes: {
-        msg: {
-          type: "string",
-          default: "Hello world!"
-        },
+  export default createComponent(${componentId}, {
+    argTypes: {
+      msg: {
+        type: "string",
+        default: "Hello world!"
       },
-    });    
-  `);
+    },
+  });    
+`,
+    filePath,
+  );
+  return result;
 }
 
 class Lock {
@@ -742,7 +746,7 @@ function optimizePageElement(element: ElementType): ElementType {
 
   return {
     ...element,
-    children: (element.children ?? []).map(optimizePageElement),
+    children: element.children && element.children.map(optimizePageElement),
   };
 }
 
@@ -990,6 +994,7 @@ class ToolpadProject {
     this.options = {
       cmd: 'start',
       dev: false,
+      externalUrl: 'http://localhost:3000',
       ...options,
     };
 
@@ -1071,6 +1076,10 @@ class ToolpadProject {
     return getOutputFolder(this.getRoot());
   }
 
+  getAppOutputFolder() {
+    return getAppOutputFolder(this.getRoot());
+  }
+
   alertOnMissingVariablesInDom(dom: appDom.AppDom) {
     const requiredVars = appDom.getRequiredEnvVars(dom);
     const missingVars = Array.from(requiredVars).filter(
@@ -1115,6 +1124,10 @@ class ToolpadProject {
     const [dom] = await this.loadDomAndFingerprint();
     this.alertOnMissingVariablesInDom(dom);
     return dom;
+  }
+
+  async getComponents(): Promise<ComponentEntry[]> {
+    return getComponents(this.getRoot());
   }
 
   async writeDomToDisk(newDom: appDom.AppDom) {
@@ -1177,7 +1190,7 @@ class ToolpadProject {
   async createComponent(name: string) {
     const componentsFolder = getComponentsFolder(this.root);
     const filePath = getComponentFilePath(componentsFolder, name);
-    const content = createDefaultCodeComponent(name);
+    const content = await createDefaultCodeComponent(name, filePath);
     await writeFileRecursive(filePath, content, { encoding: 'utf-8' });
   }
 
@@ -1188,8 +1201,7 @@ class ToolpadProject {
 
   getRuntimeConfig(): RuntimeConfig {
     return {
-      externalUrl:
-        process.env.TOOLPAD_EXTERNAL_URL || `http://localhost:${process.env.PORT || 3000}`,
+      externalUrl: this.options.externalUrl,
       projectDir: this.getRoot(),
       cmd: this.options.dev ? 'dev' : 'start',
     };
@@ -1203,7 +1215,11 @@ declare global {
   var __toolpadProject: ToolpadProject | undefined;
 }
 
-export async function initProject(cmd: 'dev' | 'start' | 'build', root: string) {
+export async function initProject(
+  cmd: 'dev' | 'start' | 'build',
+  root: string,
+  externalUrl?: string,
+) {
   // eslint-disable-next-line no-underscore-dangle
   invariant(!global.__toolpadProject, 'A project is already running');
 
@@ -1211,7 +1227,7 @@ export async function initProject(cmd: 'dev' | 'start' | 'build', root: string) 
 
   await initToolpadFolder(root);
 
-  const project = new ToolpadProject(root, { cmd, dev: cmd === 'dev' });
+  const project = new ToolpadProject(root, { cmd, dev: cmd === 'dev', externalUrl });
   // eslint-disable-next-line no-underscore-dangle
   globalThis.__toolpadProject = project;
 

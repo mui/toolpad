@@ -4,6 +4,7 @@ import { Emitter } from '@mui/toolpad-utils/events';
 import * as ReactIs from 'react-is';
 import { hasOwnProperty } from '@mui/toolpad-utils/collections';
 import { createProvidedContext } from '@mui/toolpad-utils/react';
+import { Stack } from '@mui/material';
 import { RuntimeEvents, ToolpadComponents, ToolpadComponent, ArgTypeDefinition } from './types';
 import { RUNTIME_PROP_NODE_ID, RUNTIME_PROP_SLOTS, TOOLPAD_COMPONENT } from './constants';
 import type { SlotType, ComponentConfig, RuntimeEvent, RuntimeError } from './types';
@@ -38,13 +39,25 @@ interface SlotsWrapperProps {
   children?: React.ReactNode;
   // eslint-disable-next-line react/no-unused-prop-types
   [RUNTIME_PROP_SLOTS]: string;
-  // eslint-disable-next-line react/no-unused-prop-types
   slotType: SlotType;
   // eslint-disable-next-line react/no-unused-prop-types
   parentId: string;
 }
 
-function SlotsWrapper({ children }: SlotsWrapperProps) {
+function SlotsWrapper({ children, slotType }: SlotsWrapperProps) {
+  if (slotType === 'layout') {
+    return (
+      <Stack
+        direction="column"
+        sx={{
+          gap: 1,
+        }}
+      >
+        {children}
+      </Stack>
+    );
+  }
+
   return <React.Fragment>{children}</React.Fragment>;
 }
 
@@ -166,17 +179,16 @@ export function useNode<P = {}>(): NodeRuntime<P> | null {
           value,
         });
       },
-    };
+    } satisfies NodeRuntime<P>;
   }, [canvasEvents, nodeId, nodeName]);
 }
 
 export interface PlaceholderProps {
   prop: string;
   children?: React.ReactNode;
-  hasLayout?: boolean;
 }
 
-export function Placeholder({ prop, children, hasLayout = false }: PlaceholderProps) {
+export function Placeholder({ prop, children }: PlaceholderProps) {
   const { nodeId } = React.useContext(NodeRuntimeContext);
   if (!nodeId) {
     return <React.Fragment>{children}</React.Fragment>;
@@ -189,7 +201,7 @@ export function Placeholder({ prop, children, hasLayout = false }: PlaceholderPr
       parentId={nodeId}
       {...{
         [RUNTIME_PROP_SLOTS]: prop,
-        slotType: hasLayout ? 'layout' : 'single',
+        slotType: 'single',
       }}
     />
   );
@@ -198,9 +210,10 @@ export function Placeholder({ prop, children, hasLayout = false }: PlaceholderPr
 export interface SlotsProps {
   prop: string;
   children?: React.ReactNode;
+  hasLayout?: boolean;
 }
 
-export function Slots({ prop, children }: SlotsProps) {
+export function Slots({ prop, children, hasLayout = false }: SlotsProps) {
   const { nodeId } = React.useContext(NodeRuntimeContext);
   if (!nodeId) {
     return <React.Fragment>{children}</React.Fragment>;
@@ -211,7 +224,7 @@ export function Slots({ prop, children }: SlotsProps) {
       parentId={nodeId}
       {...{
         [RUNTIME_PROP_SLOTS]: prop,
-        slotType: 'multiple',
+        slotType: hasLayout ? 'layout' : 'multiple',
       }}
     >
       {children}

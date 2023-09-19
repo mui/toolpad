@@ -1,69 +1,18 @@
 import * as React from 'react';
 
 import { Box, Chip, Paper, Tab } from '@mui/material';
-import { NodeId } from '@mui/toolpad-core';
-import { TabList, TabContext, TabPanel } from '@mui/lab';
+import { LoadingButton, TabList, TabContext, TabPanel } from '@mui/lab';
 import ClearOutlinedIcon from '@mui/icons-material/ClearOutlined';
 import * as appDom from '../../../../../appDom';
-import { useDom, useAppState, useAppStateApi, useDomApi } from '../../../../AppState';
+import { useAppState, useAppStateApi, useDomApi } from '../../../../AppState';
 import QueryIcon from '../../../QueryIcon';
 import QueryEditorPanel from './QueryEditor2Dialog';
-import { DomView } from '../../../../../utils/domView';
 import { PAGE_PANEL_WIDTH } from '../../../../../constants';
 
-// type QueryEditorProps = {
-//   tabs: React.MutableRefObject<Map<NodeId, QueryMeta>>;
-//   currentQueryId: NodeId | '';
-//   currentPageId: NodeId | undefined;
-//   panelState: PanelState | null;
-//   handleTabRemove: (
-//     queryId: NodeId,
-//     onRemove?: (viewOptions: DomView, nodeId?: NodeId) => void,
-//   ) => void;
-// };
-
 export default function QueryEditor() {
-  const { dom } = useDom();
+  const { dom, currentView } = useAppState();
   const domApi = useDomApi();
-  const { currentView } = useAppState();
   const appStateApi = useAppStateApi();
-
-  React.useEffect(() => {
-    console.log('currentView', currentView);
-  }, [currentView]);
-
-  const onRemove = React.useCallback(
-    (viewOptions: DomView) => {
-      appStateApi.setView(viewOptions);
-    },
-    [appStateApi],
-  );
-
-  const handleTabChange = React.useCallback(
-    (event: React.SyntheticEvent, newValue: NodeId) => {
-      appStateApi.setView({
-        kind: 'page',
-        nodeId: currentView.nodeId,
-        view: { kind: 'query', nodeId: newValue },
-      });
-    },
-    [appStateApi, currentView],
-  );
-
-  const handleSave = React.useCallback(
-    (node: appDom.QueryNode) => {
-      if (currentView.kind !== 'page' || !currentView.nodeId) {
-        return;
-      }
-      const page = appDom.getNode(dom, currentView.nodeId, 'page');
-      if (appDom.nodeExists(dom, node.id)) {
-        domApi.saveNode(node);
-      } else {
-        appStateApi.update((draft) => appDom.addNode(draft, node, page, 'queries'));
-      }
-    },
-    [dom, domApi, appStateApi, currentView],
-  );
 
   const currentQueryId = React.useMemo(() => {
     if (currentView.kind === 'page' && currentView.view?.kind === 'query') {
@@ -72,30 +21,88 @@ export default function QueryEditor() {
     return '';
   }, [currentView]);
 
+  const currentTabIndex = React.useMemo(() => {
+    if (currentView.kind === 'page' && currentView.view?.kind === 'query') {
+      return currentView.queryPanel?.currentTabIndex?.toString() || '';
+    }
+    return '';
+  }, [currentView]);
+
+  const handleTabChange = React.useCallback(
+    (event: React.SyntheticEvent, newValue: string) => {
+      if (currentView.kind === 'page') {
+        const tabIndex = parseInt(newValue, 10);
+        const queryId = currentView.queryPanel?.queryTabs?.[tabIndex]?.meta?.id;
+        if (queryId) {
+          appStateApi.setView({
+            kind: 'page',
+            nodeId: currentView.nodeId,
+            view: { kind: 'query', nodeId: queryId },
+            queryPanel: {
+              ...currentView.queryPanel,
+              currentTabIndex: tabIndex,
+            },
+          });
+        }
+      }
+    },
+    [appStateApi, currentView],
+  );
+
+  const handleSave = React.useCallback(() => {
+    if (
+      currentView.kind !== 'page' ||
+      !currentView.nodeId ||
+      !currentView.queryPanel?.queryTabs ||
+      currentView.queryPanel?.currentTabIndex === undefined
+    ) {
+      return;
+    }
+    const currentTab = currentView.queryPanel?.queryTabs[currentView.queryPanel?.currentTabIndex];
+    const currentQueryDraft = currentTab?.draft;
+    if (!currentTab || !currentTab.meta?.id || !currentQueryDraft) {
+      return;
+    }
+    const page = appDom.getNode(dom, currentView.nodeId, 'page');
+    if (appDom.nodeExists(dom, currentTab.meta.id)) {
+      domApi.saveNode(currentQueryDraft);
+    } else {
+      appStateApi.update((draft) => appDom.addNode(draft, currentQueryDraft, page, 'queries'));
+    }
+    appStateApi.saveQueryDraft(currentQueryDraft);
+  }, [dom, domApi, appStateApi, currentView]);
+
   return currentView.kind === 'page' && currentView.view?.kind === 'query' && currentQueryId ? (
     <Box
       sx={{
-        position: 'fixed',
-        bottom: 0,
         left: PAGE_PANEL_WIDTH,
         width: '100%',
-        zIndex: 1000,
+        height: '100%',
+        overflow: 'scroll',
       }}
     >
-      <Paper square elevation={0} sx={{ minHeight: '30vh', maxHeight: '30vh' }}>
-        <TabContext value={currentQueryId}>
-          <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
+      <Paper square elevation={0} sx={{ height: '100%' }}>
+        <TabContext value={currentTabIndex}>
+          <Box
+            sx={{
+              borderBottom: 1,
+              borderColor: 'divider',
+              display: 'flex',
+              flexDirection: 'row',
+              justifyContent: 'space-between',
+            }}
+          >
             <TabList
               onChange={handleTabChange}
               aria-label="Query editor panel"
-              sx={{ maxHeight: 36 }}
+              sx={{ maxHeight: 48 }}
             >
-              {currentView.view?.queryPanel?.queryTabs?.map((queryMeta) => (
+              {currentView.queryPanel?.queryTabs?.map((query, index) => (
                 <Tab
-                  key={queryMeta?.saved?.id}
+                  key={query?.meta?.name}
                   label={
                     <Chip
-                      label={queryMeta.name}
+                      label={query?.meta?.name}
                       size="small"
                       variant="outlined"
                       sx={{
@@ -129,25 +136,38 @@ export default function QueryEditor() {
                   }
                   icon={
                     <QueryIcon
-                      id={queryMeta.dataSource || 'default'}
+                      id={query?.meta?.dataSource || 'default'}
                       sx={{ fontSize: 24, mt: 0.2 }}
                     />
                   }
                   iconPosition="start"
-                  value={queryMeta?.saved?.id}
+                  value={index.toString()}
                 />
               ))}
             </TabList>
-          </Box>
-          {currentView.view?.queryPanel?.queryTabs?.map((queryMeta) => (
-            <TabPanel
-              key={queryMeta?.saved?.id}
-              value={queryMeta?.saved?.id || ''}
-              sx={{ p: 0, overflow: 'scroll', minHeight: '26vh', maxHeight: '26vh' }}
+            <LoadingButton
+              onClick={handleSave}
+              variant="contained"
+              color="primary"
+              sx={{ width: 'fit-content', height: 32, mr: 1, alignSelf: 'center' }}
             >
-              <QueryEditorPanel nodeId={currentQueryId} onSave={handleSave} />
-            </TabPanel>
-          ))}
+              Save
+            </LoadingButton>
+          </Box>
+          {currentView.queryPanel?.queryTabs?.map((query, index) => {
+            if (query && query.saved) {
+              return (
+                <TabPanel
+                  key={query.meta?.name}
+                  value={index.toString()}
+                  sx={{ p: 0, overflow: 'scroll', height: '100%' }}
+                >
+                  <QueryEditorPanel input={query.saved} />
+                </TabPanel>
+              );
+            }
+            return null;
+          })}
         </TabContext>
       </Paper>
     </Box>

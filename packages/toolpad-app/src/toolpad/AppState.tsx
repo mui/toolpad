@@ -64,6 +64,14 @@ export type AppStateAction =
       view: DomView;
     }
   | {
+      type: 'SET_QUERY_DRAFT';
+      draft: appDom.QueryNode;
+    }
+  | {
+      type: 'SAVE_QUERY_DRAFT';
+      draft: appDom.QueryNode;
+    }
+  | {
       type: 'SET_PAGE_VIEW_TAB';
       tab: PageViewTab;
     }
@@ -301,6 +309,62 @@ export function appStateReducer(state: AppState, action: AppStateAction): AppSta
         hasUnsavedChanges: action.hasUnsavedChanges,
       });
     }
+    case 'SET_QUERY_DRAFT': {
+      if (
+        state.currentView.kind === 'page' &&
+        state.currentView.view?.kind === 'query' &&
+        action.draft?.name
+      ) {
+        const queryTabs = state.currentView.queryPanel?.queryTabs || [];
+        const currentTabIndex = state.currentView.queryPanel?.currentTabIndex;
+        if (currentTabIndex !== undefined && queryTabs) {
+          return update(state, {
+            currentView: {
+              ...state.currentView,
+              queryPanel: {
+                ...state.currentView.queryPanel,
+                queryTabs: state.currentView?.queryPanel?.queryTabs?.map((tab, index) => {
+                  if (index === currentTabIndex) {
+                    return {
+                      ...tab,
+                      draft: action.draft,
+                    };
+                  }
+                  return tab;
+                }),
+              },
+            },
+          });
+        }
+      }
+      return state;
+    }
+    case 'SAVE_QUERY_DRAFT': {
+      if (state.currentView.kind === 'page' && state.currentView.view?.kind === 'query') {
+        const queryTabs = state.currentView.queryPanel?.queryTabs || [];
+        const currentTabIndex = state.currentView.queryPanel?.currentTabIndex;
+        if (currentTabIndex !== undefined && queryTabs) {
+          return update(state, {
+            currentView: {
+              ...state.currentView,
+              queryPanel: {
+                ...state.currentView.queryPanel,
+                queryTabs: state.currentView?.queryPanel?.queryTabs?.map((tab, index) => {
+                  if (index === currentTabIndex) {
+                    return {
+                      ...tab,
+                      saved: action.draft,
+                    };
+                  }
+                  return tab;
+                }),
+              },
+            },
+          });
+        }
+      }
+      return state;
+    }
     default:
       return state;
   }
@@ -392,6 +456,18 @@ function createAppStateApi(
       dispatch({
         type: 'SET_HAS_UNSAVED_CHANGES',
         hasUnsavedChanges,
+      });
+    },
+    setQueryDraft(draft: appDom.QueryNode) {
+      dispatch({
+        type: 'SET_QUERY_DRAFT',
+        draft,
+      });
+    },
+    saveQueryDraft(draft: appDom.QueryNode) {
+      dispatch({
+        type: 'SAVE_QUERY_DRAFT',
+        draft,
       });
     },
   };

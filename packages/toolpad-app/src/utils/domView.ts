@@ -5,24 +5,22 @@ import { QueryNode } from '../appDom';
 
 export type QueryMeta = {
   name?: string;
+  id?: NodeId;
   dataSource?: string;
 };
 
 export type QueryTab = {
-  name: string;
-  dataSource?: string;
+  meta: QueryMeta;
   saved?: QueryNode;
   draft?: QueryNode;
 };
 
 export type QueryPanel = {
   queryTabs?: QueryTab[];
-  activeQueryTab?: number;
+  currentTabIndex?: number;
 };
 
-export type PageView =
-  | { kind: 'query'; nodeId: NodeId; queryPanel?: QueryPanel }
-  | { kind: 'pageParameters' };
+export type PageView = { kind: 'query'; nodeId: NodeId } | { kind: 'pageParameters' };
 
 export type PageViewTab = 'page' | 'component' | 'theme';
 
@@ -34,6 +32,7 @@ export type DomView =
       selectedNodeId?: NodeId | null;
       hoveredNodeId?: NodeId | null;
       pageViewTab?: PageViewTab;
+      queryPanel?: QueryPanel;
     }
   | { kind: 'connection'; nodeId: NodeId }
   | { kind: 'codeComponent'; nodeId: NodeId };

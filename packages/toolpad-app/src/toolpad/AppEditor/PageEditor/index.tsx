@@ -34,11 +34,13 @@ interface PageEditorContentProps {
 
 function PageEditorContent({ node }: PageEditorContentProps) {
   usePageTitle(`${node.attributes.title} | Toolpad editor`);
+  const { currentView } = useAppState();
+  const showQuery = currentView.kind === 'page' && currentView.view?.kind === 'query';
 
   return (
     <PageEditorProvider key={node.id} nodeId={node.id}>
-      <PanelGroup direction="vertical" autoSaveId="editor/editor-query-split">
-        <Panel defaultSize={100} maxSize={100}>
+      <PanelGroup direction="vertical">
+        <Panel defaultSize={55} minSize={0} maxSize={100} order={1} id={'editor'}>
           <PanelGroup autoSaveId="editor/component-panel-split" direction="horizontal">
             <Panel defaultSize={75} minSize={50} maxSize={80}>
               <PageEditorRoot>
@@ -53,9 +55,11 @@ function PageEditorContent({ node }: PageEditorContentProps) {
           </PanelGroup>
         </Panel>
         <PanelResizeHandle />
-        <Panel defaultSize={0} minSize={0}>
-          <QueryEditor />
-        </Panel>
+        {showQuery ? (
+          <Panel defaultSize={45} minSize={20} maxSize={100} order={2} id={'query-panel'}>
+            <QueryEditor />
+          </Panel>
+        ) : null}
       </PanelGroup>
     </PageEditorProvider>
   );

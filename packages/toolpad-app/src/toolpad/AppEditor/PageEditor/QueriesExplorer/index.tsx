@@ -3,7 +3,7 @@ import clsx from 'clsx';
 import { NodeId } from '@mui/toolpad-core';
 import invariant from 'invariant';
 import { styled, Box, Button, IconButton, Typography, Popover, Stack, Paper } from '@mui/material';
-import { TreeView, TreeItem, TreeItemProps, treeItemClasses } from '@mui/lab';
+import { TreeView, TreeItem, TreeItemProps, treeItemClasses } from '@mui/x-tree-view';
 import AddIcon from '@mui/icons-material/Add';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
@@ -11,12 +11,12 @@ import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import * as appDom from '../../../../appDom';
 import dataSources from '../../../../toolpadDataSources/client';
 import QueryIcon from '../../QueryIcon';
-import { useDom, useDomApi, useAppState, useAppStateApi } from '../../../AppState';
+import { useDomApi, useAppState, useAppStateApi } from '../../../AppState';
 import { DomView } from '../../../../utils/domView';
 import NodeMenu from '../../NodeMenu';
 import EditableText from '../../../../components/EditableText';
 // import { QueryMeta, PanelState } from './types';
-import QueryEditor from './QueryEditor2';
+// import QueryEditor from './QueryEditor2';
 import { useNodeNameValidation } from '../../PagesExplorer/validation';
 
 const classes = {
@@ -79,7 +79,7 @@ function HierarchyTreeItem(props: StyledTreeItemProps) {
     onSelectNode?.(toolpadNodeId);
   }, [onSelectNode, toolpadNodeId]);
 
-  const { dom } = useDom();
+  const { dom } = useAppState();
   const domApi = useDomApi();
 
   const [queryNameEditable, setQueryNameEditable] = React.useState(false);
@@ -168,40 +168,26 @@ function HierarchyTreeItem(props: StyledTreeItemProps) {
 }
 
 export function QueriesExplorer() {
-  const { dom } = useDom();
-  const { currentView } = useAppState();
-
+  const { dom, currentView } = useAppState();
   const appStateApi = useAppStateApi();
   const currentPageId = currentView.nodeId;
 
   const currentQueryId = React.useMemo(() => {
-    if (currentView.kind === 'page' && currentView.view?.kind === 'query') {
-      return currentView.view.nodeId;
-    }
-    return '';
+    return currentView.kind === 'page' && currentView.view?.kind === 'query'
+      ? currentView.view.nodeId
+      : '';
   }, [currentView]);
 
+  const queryPanel = React.useMemo(() => {
+    if (currentView.kind === 'page' && currentView.queryPanel) {
+      return currentView.queryPanel;
+    }
+    return undefined;
+  }, [currentView]);
+
+  const currentTabIndex = queryPanel?.currentTabIndex;
+
   const [anchorEl, setAnchorEl] = React.useState<Element | null>(null);
-
-  // const [panelState, setPanelState] = React.useState<PanelState | null>(null);
-  // const isDraft = panelState?.isDraft || false;
-
-  // React.useEffect(() => {
-  //   setPanelState((previousState) => {
-  //     if (!currentQueryId) {
-  //       return null;
-  //     }
-
-  //     if (isDraft) {
-  //       return previousState;
-  //     }
-  //     const node = appDom.getNode(dom, currentQueryId, 'query');
-  //     tabs.current.set(node.id, { name: node.name, dataSource: node.attributes.dataSource });
-  //     return { node, isDraft: false };
-
-  //     return null;
-  //   });
-  // }, [currentQueryId, dom, isDraft]);
 
   const queries = React.useMemo(() => {
     if (!currentPageId) {
@@ -217,14 +203,77 @@ export function QueriesExplorer() {
   }, [currentPageId, dom]);
 
   const handleQuerySelect = React.useCallback(
-    (nodeId: NodeId) => {
-      appStateApi.setView({
-        kind: 'page',
-        nodeId: currentPageId,
-        view: { kind: 'query', nodeId, queryPanel },
-      });
+    (selectedQueryId: NodeId) => {
+      if (currentPageId) {
+        /**
+         * Selected query is already open, do nothing
+         */
+        if (selectedQueryId === currentQueryId) {
+          return;
+        }
+        /**
+         * Selected query is open but not the active tab, set it as active
+         * and update the view
+         */
+
+        const selectedQueryTabIndex = queryPanel?.queryTabs?.findIndex((tab) => {
+          return tab.meta.id === selectedQueryId;
+        });
+
+        if (selectedQueryTabIndex !== undefined && selectedQueryTabIndex > -1) {
+          appStateApi.setView({
+            kind: 'page',
+            nodeId: currentPageId,
+            view: { kind: 'query', nodeId: selectedQueryId },
+            queryPanel: {
+              ...queryPanel,
+              currentTabIndex: selectedQueryTabIndex,
+            },
+          });
+        } else {
+          /**
+           * Selected query is not open, add it as a tab
+           * and update the view
+           */
+
+          let newTabIndex;
+          let newTabs;
+          const newTab = {
+            meta: {
+              id: selectedQueryId,
+              name: queries.find((query) => query.id === selectedQueryId)?.name,
+              dataSource: queries.find((query) => query.id === selectedQueryId)?.attributes
+                ?.dataSource,
+            },
+            saved: queries.find((query) => query.id === selectedQueryId),
+          };
+          /**
+           * If no tabs are open, set the currentTabIndex to 0
+           */
+          if (!queryPanel?.queryTabs || queryPanel?.queryTabs?.length === 0) {
+            newTabIndex = 0;
+            newTabs = [newTab];
+          } else {
+            /*
+             * If tabs are open, set the currentTabIndex to the next index
+             */
+            newTabIndex = queryPanel?.queryTabs?.length;
+            newTabs = [...queryPanel.queryTabs, newTab];
+          }
+
+          appStateApi.setView({
+            kind: 'page',
+            nodeId: currentPageId,
+            view: { kind: 'query', nodeId: selectedQueryId },
+            queryPanel: {
+              queryTabs: newTabs,
+              currentTabIndex: newTabIndex,
+            },
+          });
+        }
+      }
     },
-    [appStateApi, currentPageId],
+    [appStateApi, currentQueryId, currentPageId, queryPanel, queries],
   );
 
   const handleCreateClick = (event: React.MouseEvent) => {
@@ -275,37 +324,68 @@ export function QueriesExplorer() {
   );
 
   const handleDeleteNode = React.useCallback(
-    (nodeId: NodeId, onComplete?: (viewOptions: DomView, nodeId?: NodeId) => void) => {
+    (selectedQueryId: NodeId, onComplete?: (viewOptions: DomView, nodeId?: NodeId) => void) => {
       const viewOptions: DomView = {
         kind: 'page',
         nodeId: currentPageId,
       };
-      /*
-       * if this is the only tab,
-       * or if the query being deleted is not the one open,
-       * delete the node and remove the tab, don't change the view
+      const tabs = queryPanel?.queryTabs;
+      // remove the tab in all cases
+      const newTabs = tabs?.filter((tab) => tab.meta.id !== selectedQueryId);
+
+      /**
+       * if tabs are open
        */
-      if (tabs.current.size === 1 || nodeId !== currentQueryId) {
-        if (currentQueryId && currentQueryId !== nodeId) {
-          viewOptions.view = { kind: 'query', nodeId: currentQueryId };
+      if (tabs && currentTabIndex !== undefined) {
+        /*
+         * if this is the only tab,
+         * remove the tab and set the view to the page
+         */
+        if (tabs.length === 1) {
+          viewOptions.queryPanel = {
+            queryTabs: undefined,
+            currentTabIndex: undefined,
+          };
         }
-        onComplete?.(viewOptions, nodeId);
-        tabs.current.delete(nodeId);
-      } else {
+        /*
+         * if the query being deleted is not the one open,
+         * let the current tab index remain the same
+         */
+        if (currentQueryId && selectedQueryId !== currentQueryId) {
+          viewOptions.view = { kind: 'query', nodeId: currentQueryId };
+          viewOptions.queryPanel = {
+            queryTabs: newTabs,
+            currentTabIndex,
+          };
+
+          onComplete?.(viewOptions, selectedQueryId);
+          // tabs.delete(nodeId);
+        }
         // if there are multiple tabs open, and
         // the query being deleted is the one open,
         // select the previous tab, or the next tab if there is no previous tab
-        const queryIds = Array.from(tabs.current.keys());
-        const currentTabIndex = queryIds.findIndex((id) => id === currentQueryId);
-        const replacementQueryId = queryIds[currentTabIndex === 0 ? 1 : currentTabIndex - 1];
+        const queryIds = tabs.map((tab) => tab.meta.id);
+        const replacementTabIndex = currentTabIndex > 0 ? currentTabIndex - 1 : currentTabIndex + 1;
+        const replacementQueryId = queryIds[replacementTabIndex];
         if (replacementQueryId) {
           viewOptions.view = { kind: 'query', nodeId: replacementQueryId };
-          onComplete?.(viewOptions, nodeId);
-          tabs.current.delete(nodeId);
+          viewOptions.queryPanel = {
+            queryTabs: newTabs,
+            currentTabIndex: replacementTabIndex,
+          };
+          onComplete?.(viewOptions, selectedQueryId);
+          // tabs.current.delete(nodeId);
         }
+      } else {
+        // just delete the node since no tabs are open
+        viewOptions.queryPanel = {
+          queryTabs: newTabs,
+          currentTabIndex: undefined,
+        };
+        onComplete?.(viewOptions, selectedQueryId);
       }
     },
-    [tabs, currentPageId, currentQueryId],
+    [queryPanel, currentPageId, currentQueryId, currentTabIndex],
   );
 
   const handleDuplicateNode = React.useCallback(
@@ -401,13 +481,6 @@ export function QueriesExplorer() {
           </Stack>
         </Paper>
       </Popover>
-      {/* <QueryEditor
-        tabs={tabs}
-        currentQueryId={currentQueryId}
-        currentPageId={currentView.nodeId}
-        panelState={panelState}
-        handleTabRemove={handleDeleteNode}
-      /> */}
     </React.Fragment>
   );
 }

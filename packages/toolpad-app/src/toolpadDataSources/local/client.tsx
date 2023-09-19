@@ -17,15 +17,13 @@ import {
 } from '@mui/material';
 import { useBrowserJsRuntime } from '@mui/toolpad-core/jsBrowserRuntime';
 import { errorFrom } from '@mui/toolpad-utils/errors';
-import { TreeView, treeItemClasses, TreeItem } from '@mui/x-tree-view';
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import ChevronRightIcon from '@mui/icons-material/ChevronRight';
-import useBoolean from '@mui/toolpad-utils/hooks/useBoolean';
+import { LoadingButton } from '@mui/lab';
+import AddOutlinedIcon from '@mui/icons-material/AddOutlined';
+import DataObjectOutlinedIcon from '@mui/icons-material/DataObjectOutlined';
+import DoneIcon from '@mui/icons-material/Done';
 import { useQuery } from '@tanstack/react-query';
 import Popper from '@mui/material/Popper';
 import ClickAwayListener from '@mui/material/ClickAwayListener';
-// import { ensureSuffix } from '@mui/toolpad-utils/strings';
-import { Panel, PanelGroup, PanelResizeHandle } from '../../components/resizablePanels';
 import { ClientDataSource, QueryEditorProps } from '../../types';
 import { LocalPrivateApi, LocalQuery, LocalConnectionParams } from './types';
 import {
@@ -33,6 +31,7 @@ import {
   useEvaluateLiveBindings,
 } from '../../toolpad/AppEditor/useEvaluateLiveBinding';
 import * as appDom from '../../appDom';
+import { Panel, PanelGroup, PanelResizeHandle } from '../../components/resizablePanels';
 import JsonView from '../../components/JsonView';
 import OpenCodeEditorButton from '../../components/OpenCodeEditor';
 import useQueryPreview from '../useQueryPreview';
@@ -190,35 +189,15 @@ function FunctionAutocomplete({
         nameMap.set(fn.name, file.name);
       });
     });
-    const sortedOptions = functions.sort((a, b) => {
-      // Display the selected function first.
-      if (value === a) {
-        return -1;
-      }
-      if (value === b) {
-        return 1;
-      }
-
-      // Then display the functions in the same file.
-      const fa = nameMap.get(a);
-      const fb = nameMap.get(b);
-
-      // Display the file with the selected function first.
-      const sf = nameMap.get(value);
-
-      if (sf === fa) {
-        return -1;
-      }
-      if (sf === fb) {
-        return 1;
-      }
-      return fa?.localeCompare(fb ?? '') ?? 0;
-    });
-    return [sortedOptions, nameMap];
-  }, [files, value]);
+    return [functions, nameMap];
+  }, [files]);
 
   const open = Boolean(anchorEl);
   const id = open ? 'function-selector' : undefined;
+
+  const handleCreateNew = React.useCallback(() => {
+    onCreateNew();
+  }, [onCreateNew]);
 
   return files.length > 0 ? (
     <React.Fragment>
@@ -333,7 +312,30 @@ function FunctionAutocomplete({
                   </Box>
                 </li>
               )}
-              options={options}
+              options={options.sort((a, b) => {
+                // Display the selected function first.
+                if (value === a) {
+                  return -1;
+                }
+                if (value === b) {
+                  return 1;
+                }
+
+                // Then display the functions in the same file.
+                const fa = functionNameFileNameMap.get(a);
+                const fb = functionNameFileNameMap.get(b);
+
+                // Display the file with the selected function first.
+                const sf = functionNameFileNameMap.get(value);
+
+                if (sf === fa) {
+                  return -1;
+                }
+                if (sf === fb) {
+                  return 1;
+                }
+                return fa?.localeCompare(fb ?? '') ?? 0;
+              })}
               renderInput={(params) => (
                 <StyledInput
                   ref={params.InputProps.ref}
@@ -345,7 +347,7 @@ function FunctionAutocomplete({
             <Button
               sx={{ m: 1, mb: 0.5 }}
               startIcon={<AddOutlinedIcon fontSize="inherit" />}
-              onClick={onCreateNew}
+              onClick={handleCreateNew}
             >
               New file
             </Button>
@@ -465,7 +467,10 @@ function QueryEditor({
     [setSelectedHandler],
   );
 
-  const handlerTreeRef = React.useRef<HTMLUListElement>(null);
+  const proposedFileName = React.useMemo(() => {
+    const existingNames = new Set(introspection.data?.files.map((file) => file.name) || []);
+    const baseName = 'functions';
+    let counter = 2;
 
     while (existingNames.has(`${baseName}${counter}.ts`)) {
       counter += 1;
@@ -474,7 +479,7 @@ function QueryEditor({
     return `${baseName}${counter}.ts`;
   }, [introspection.data?.files]);
 
-  const handleCreateNewFile = React.useCallback(async () => {
+  const handleCreateNewCommit = React.useCallback(async () => {
     try {
       await execApi('createNew', [proposedFileName]);
       await introspection.refetch();
@@ -492,8 +497,8 @@ function QueryEditor({
   }, [input, onSave]);
 
   return (
-    <PanelGroup direction="horizontal">
-      <Panel defaultSize={50} minSize={20}>
+    <PanelGroup direction="vertical">
+      <Panel defaultSize={60}>
         <Box display={'grid'} gridTemplateColumns={'60% auto auto'} height={'100%'} columnGap={1}>
           <Stack
             display="flex"
@@ -509,7 +514,7 @@ function QueryEditor({
               selectedFunctionFileName={selectedFile || ''}
               files={introspection.data?.files || []}
               selectedFunctionName={selectedFunction || ''}
-              onCreateNew={handleCreateNewFile}
+              onCreateNew={handleCreateNewCommit}
               onSelect={handleSelectFunction}
             />
 
@@ -581,7 +586,7 @@ function QueryEditor({
         </Box>
       </Panel>
       <PanelResizeHandle />
-      <Panel defaultSize={50} minSize={20}>
+      <Panel>
         <QueryPreview isLoading={previewIsLoading} error={preview?.error}>
           <ResolvedPreview preview={preview} />
         </QueryPreview>

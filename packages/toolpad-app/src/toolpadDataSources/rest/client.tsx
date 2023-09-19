@@ -258,7 +258,6 @@ function QueryEditor({
   connectionParams: rawConnectionParams,
   value: input,
   onChange: setInput,
-  onSave,
 }: QueryEditorProps<RestConnectionParams, FetchQuery>) {
   const isBrowserSide = input.attributes.query.browser;
 
@@ -382,11 +381,8 @@ function QueryEditor({
     globalScope: queryScope,
   });
 
-  const [activeTab, setActiveTab] = React.useState('urlQuery');
-
-  React.useEffect(() => {
-    onSave(input);
-  }, [input, onSave]);
+  const [activeConfigTab, setActiveConfigTab] = React.useState('urlQuery');
+  const [activeToolsTab, setActiveToolsTab] = React.useState('preview');
 
   const fetchPrivate = useFetchPrivate<FetchPrivateQuery, FetchResult>();
   const fetchPreview = React.useCallback(
@@ -415,193 +411,216 @@ function QueryEditor({
 
   const handleHarClear = React.useCallback(() => setPreviewHar(createHarLog()), []);
 
-  const handleActiveTabChange = React.useCallback(
-    (event: React.SyntheticEvent, newValue: string) => setActiveTab(newValue),
+  const handleActiveConfigTabChange = React.useCallback(
+    (event: React.SyntheticEvent, newValue: string) => setActiveConfigTab(newValue),
+    [],
+  );
+
+  const handleActiveToolsTabChange = React.useCallback(
+    (event: React.SyntheticEvent, newValue: string) => setActiveToolsTab(newValue),
     [],
   );
 
   return (
     <PanelGroup direction="horizontal">
+      <Panel defaultSize={50} minSize={40}>
+        <Stack
+          gap={0}
+          sx={{
+            pl: 2,
+            pr: 0,
+            pt: 1,
+            borderRight: (theme) => `1px solid ${theme.palette.divider}`,
+          }}
+        >
+          <Box sx={{ display: 'grid', gridTemplateColumns: 'auto 1fr 0.1fr', gap: 1 }}>
+            <TextField
+              select
+              inputProps={{ sx: { fontSize: 10 } }}
+              value={input.attributes.query.method || 'GET'}
+              size="small"
+              sx={{
+                '& .MuiSelect-select': {
+                  height: (theme) => theme.typography.pxToRem(20),
+                },
+              }}
+              onChange={handleMethodChange}
+            >
+              {HTTP_METHODS.map((method) => (
+                <MenuItem key={method} value={method}>
+                  {method}
+                </MenuItem>
+              ))}
+            </TextField>
+            <BindableEditor<string>
+              liveBinding={liveUrl}
+              globalScope={queryScope}
+              globalScopeMeta={QUERY_SCOPE_META}
+              sx={{ flex: 1 }}
+              jsRuntime={jsServerRuntime}
+              label="url"
+              propType={{ type: 'string' }}
+              renderControl={(props) => <UrlControl baseUrl={baseUrl} {...props} />}
+              value={urlValue}
+              onChange={handleUrlChange}
+            />
+          </Box>
+          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+            <TabContext value={activeConfigTab}>
+              <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
+                <TabList
+                  sx={{ '& button': { fontSize: 12, fontWeight: 'normal' } }}
+                  onChange={handleActiveConfigTabChange}
+                  aria-label="Fetch options active tab"
+                >
+                  <Tab label="URL query" value="urlQuery" />
+                  <Tab label="Body" value="body" />
+                  <Tab label="Headers" value="headers" />
+                  <Tab label="Response" value="response" />
+                  <Tab label="Transform" value="transform" />
+                </TabList>
+              </Box>
+              <TabPanel disableGutters value="urlQuery">
+                <ParametersEditor
+                  value={input.attributes.query.searchParams ?? []}
+                  onChange={handleSearchParamsChange}
+                  globalScope={queryScope}
+                  globalScopeMeta={QUERY_SCOPE_META}
+                  liveValue={liveSearchParams}
+                  jsRuntime={jsServerRuntime}
+                />
+              </TabPanel>
+              <TabPanel disableGutters value="body">
+                <BodyEditor
+                  value={input.attributes.query.body}
+                  onChange={handleBodyChange}
+                  globalScope={queryScope}
+                  globalScopeMeta={QUERY_SCOPE_META}
+                  method={input.attributes.query.method || 'GET'}
+                />
+              </TabPanel>
+              <TabPanel disableGutters value="headers">
+                <ParametersEditor
+                  value={input.attributes.query.headers ?? []}
+                  onChange={handleHeadersChange}
+                  globalScope={queryScope}
+                  globalScopeMeta={QUERY_SCOPE_META}
+                  liveValue={liveHeaders}
+                  jsRuntime={jsServerRuntime}
+                  envVarNames={envVarNames}
+                />
+              </TabPanel>
+              <TabPanel disableGutters value="response">
+                <TextField
+                  select
+                  label="response type"
+                  sx={{
+                    '& .MuiInputLabel-root': { fontSize: 12 },
+                    ' & .MuiInputBase-root': { fontSize: 12 },
+                    width: 200,
+                  }}
+                  value={input.attributes.query.response?.kind || 'json'}
+                  onChange={handleResponseTypeChange}
+                >
+                  <MenuItem value="raw">raw</MenuItem>
+                  <MenuItem value="json">JSON</MenuItem>
+                  <MenuItem value="csv" disabled>
+                    🚧 CSV
+                  </MenuItem>
+                  <MenuItem value="xml" disabled>
+                    🚧 XML
+                  </MenuItem>
+                </TextField>
+              </TabPanel>
+              <TabPanel disableGutters value="transform">
+                <TransformInput
+                  value={input.attributes.query.transform ?? 'return data;'}
+                  onChange={handleTransformChange}
+                  enabled={input.attributes.query.transformEnabled ?? false}
+                  onEnabledChange={handleTransformEnabledChange}
+                  globalScope={{ data: preview?.untransformedData }}
+                  loading={false}
+                />
+              </TabPanel>
+            </TabContext>
+          </Box>
+        </Stack>
+      </Panel>
+      <PanelResizeHandle />
       <Panel defaultSize={50} minSize={20}>
         <PanelGroup direction="vertical">
-          <Panel defaultSize={60} minSize={40}>
-            <Box display={'grid'} gridTemplateColumns={'70% 30%'} height={'100%'} columnGap={1}>
-              <Stack
-                gap={0}
+          <Panel defaultSize={50}>
+            <Box
+              display={'flex'}
+              flexDirection={'column'}
+              sx={{
+                p: 0.25,
+                mt: 1,
+                ml: 1,
+                borderRight: (theme) => `1px solid ${theme.palette.divider}`,
+              }}
+            >
+              <Typography
+                fontSize={12}
                 sx={{
-                  pl: 2,
-                  pr: 0,
-                  pt: 1,
-                  borderRight: (theme) => `1px solid ${theme.palette.divider}`,
+                  color: (theme) =>
+                    theme.palette.mode === 'dark' ? theme.palette.grey[500] : 'default',
                 }}
               >
-                <Box sx={{ display: 'grid', gridTemplateColumns: 'auto 1fr 0.3fr', gap: 1 }}>
-                  <TextField
-                    select
-                    inputProps={{ sx: { fontSize: 10 } }}
-                    value={input.attributes.query.method || 'GET'}
-                    size="small"
-                    sx={{
-                      '& .MuiSelect-select': {
-                        height: (theme) => theme.typography.pxToRem(20),
-                      },
-                    }}
-                    onChange={handleMethodChange}
-                  >
-                    {HTTP_METHODS.map((method) => (
-                      <MenuItem key={method} value={method}>
-                        {method}
-                      </MenuItem>
-                    ))}
-                  </TextField>
-                  <BindableEditor<string>
-                    liveBinding={liveUrl}
-                    globalScope={queryScope}
-                    globalScopeMeta={QUERY_SCOPE_META}
-                    sx={{ flex: 1 }}
-                    jsRuntime={jsServerRuntime}
-                    label="url"
-                    propType={{ type: 'string' }}
-                    renderControl={(props) => <UrlControl baseUrl={baseUrl} {...props} />}
-                    value={urlValue}
-                    onChange={handleUrlChange}
-                  />
-                  <LoadingButton
-                    loading={previewIsLoading}
-                    onClick={handleRunPreview}
-                    variant="contained"
-                    sx={{ alignSelf: 'center', justifySelf: 'center', width: '90%', mt: 1 }}
-                  >
-                    Preview
-                  </LoadingButton>
-                </Box>
-                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
-                  <TabContext value={activeTab}>
-                    <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
-                      <TabList
-                        sx={{ '& button': { fontSize: 12, fontWeight: 'normal' } }}
-                        onChange={handleActiveTabChange}
-                        aria-label="Fetch options active tab"
-                      >
-                        <Tab label="URL query" value="urlQuery" />
-                        <Tab label="Body" value="body" />
-                        <Tab label="Headers" value="headers" />
-                        <Tab label="Response" value="response" />
-                        <Tab label="Transform" value="transform" />
-                      </TabList>
-                    </Box>
-                    <TabPanel disableGutters value="urlQuery">
-                      <ParametersEditor
-                        value={input.attributes.query.searchParams ?? []}
-                        onChange={handleSearchParamsChange}
-                        globalScope={queryScope}
-                        globalScopeMeta={QUERY_SCOPE_META}
-                        liveValue={liveSearchParams}
-                        jsRuntime={jsServerRuntime}
-                      />
-                    </TabPanel>
-                    <TabPanel disableGutters value="body">
-                      <BodyEditor
-                        value={input.attributes.query.body}
-                        onChange={handleBodyChange}
-                        globalScope={queryScope}
-                        globalScopeMeta={QUERY_SCOPE_META}
-                        method={input.attributes.query.method || 'GET'}
-                      />
-                    </TabPanel>
-                    <TabPanel disableGutters value="headers">
-                      <ParametersEditor
-                        value={input.attributes.query.headers ?? []}
-                        onChange={handleHeadersChange}
-                        globalScope={queryScope}
-                        globalScopeMeta={QUERY_SCOPE_META}
-                        liveValue={liveHeaders}
-                        jsRuntime={jsServerRuntime}
-                        envVarNames={envVarNames}
-                      />
-                    </TabPanel>
-                    <TabPanel disableGutters value="response">
-                      <TextField
-                        select
-                        label="response type"
-                        sx={{
-                          '& .MuiInputLabel-root': { fontSize: 12 },
-                          ' & .MuiInputBase-root': { fontSize: 12 },
-                          width: 200,
-                        }}
-                        value={input.attributes.query.response?.kind || 'json'}
-                        onChange={handleResponseTypeChange}
-                      >
-                        <MenuItem value="raw">raw</MenuItem>
-                        <MenuItem value="json">JSON</MenuItem>
-                        <MenuItem value="csv" disabled>
-                          🚧 CSV
-                        </MenuItem>
-                        <MenuItem value="xml" disabled>
-                          🚧 XML
-                        </MenuItem>
-                      </TextField>
-                    </TabPanel>
-                    <TabPanel disableGutters value="transform">
-                      <TransformInput
-                        value={input.attributes.query.transform ?? 'return data;'}
-                        onChange={handleTransformChange}
-                        enabled={input.attributes.query.transformEnabled ?? false}
-                        onEnabledChange={handleTransformEnabledChange}
-                        globalScope={{ data: preview?.untransformedData }}
-                        loading={false}
-                      />
-                    </TabPanel>
-                  </TabContext>
-                </Box>
-              </Stack>
-
-              <Box
+                Parameters
+              </Typography>
+              <ParametersEditor
+                value={paramsEntries}
+                onChange={handleParamsChange}
+                globalScope={globalScope}
+                globalScopeMeta={globalScopeMeta}
+                liveValue={paramsEditorLiveValue}
+                jsRuntime={jsBrowserRuntime}
+              />
+              <LoadingButton
+                disabled={previewIsLoading}
+                loading={previewIsLoading}
+                variant="contained"
+                color="primary"
+                onClick={handleRunPreview}
                 sx={{
-                  p: 0.25,
-                  mt: 1,
-                  ml: 1,
-                  height: '100%',
-                  borderRight: (theme) => `1px solid ${theme.palette.divider}`,
+                  position: 'relative',
+                  bottom: 0,
+                  left: '80%',
+                  width: 'fit-content',
                 }}
               >
-                <Typography
-                  fontSize={12}
-                  sx={{
-                    color: (theme) =>
-                      theme.palette.mode === 'dark' ? theme.palette.grey[500] : 'default',
-                  }}
-                >
-                  Parameters
-                </Typography>
-                <ParametersEditor
-                  value={paramsEntries}
-                  onChange={handleParamsChange}
-                  globalScope={globalScope}
-                  globalScopeMeta={globalScopeMeta}
-                  liveValue={paramsEditorLiveValue}
-                  jsRuntime={jsBrowserRuntime}
-                />
-              </Box>
+                Preview
+              </LoadingButton>
             </Box>
-            <PanelResizeHandle />
-            <Panel defaultSize={50} minSize={20}>
-              <PanelGroup direction="vertical">
-                <Panel defaultSize={60}>
-                  <QueryPreview isLoading={previewIsLoading} error={preview?.error}>
-                    <ResolvedPreview
-                      preview={preview}
-                      onShowTransform={() => setActiveTab('transform')}
-                    />
-                  </QueryPreview>
-                  <Devtools
-                    sx={{ width: '100%', height: '100%' }}
-                    har={previewHar}
-                    onHarClear={handleHarClear}
+          </Panel>
+          <PanelResizeHandle />
+          <Panel defaultSize={50}>
+            <TabContext value={activeToolsTab}>
+              <TabList
+                sx={{ '& button': { fontSize: 12, fontWeight: 'normal' } }}
+                onChange={handleActiveToolsTabChange}
+                aria-label="Query tools active tab"
+              >
+                <Tab label="Preview" value="preview" />
+                <Tab label="Dev Tools" value="devtools" />
+              </TabList>
+              <TabPanel value="preview" disableGutters>
+                <QueryPreview isLoading={previewIsLoading} error={preview?.error}>
+                  <ResolvedPreview
+                    preview={preview}
+                    onShowTransform={() => setActiveConfigTab('transform')}
                   />
-                </Panel>
-              </PanelGroup>
-            </Panel>
+                </QueryPreview>
+              </TabPanel>
+              <TabPanel value="devtools" disableGutters>
+                <Devtools
+                  sx={{ width: '100%', height: '100%' }}
+                  har={previewHar}
+                  onHarClear={handleHarClear}
+                />
+              </TabPanel>
+            </TabContext>
           </Panel>
         </PanelGroup>
       </Panel>

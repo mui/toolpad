@@ -10,19 +10,21 @@ import { createRpcRuntimeServer } from './rpcRuntimeServer';
 import { createRpcHandler } from './rpc';
 import { RUNTIME_CONFIG_WINDOW_PROPERTY } from '../constants';
 import type { RuntimeConfig } from '../config';
-import type * as appDom from '../appDom';
 import createRuntimeState from '../runtime/createRuntimeState';
+import { RuntimeState } from '../types';
 
 export const INITIAL_STATE_WINDOW_PROPERTY = '__initialToolpadState__';
 
 export interface PostProcessHtmlParams {
   config: RuntimeConfig;
-  dom: appDom.AppDom;
+  initialState: RuntimeState;
 }
 
-export function postProcessHtml(html: string, { config, dom }: PostProcessHtmlParams): string {
+export function postProcessHtml(
+  html: string,
+  { config, initialState }: PostProcessHtmlParams,
+): string {
   const serializedConfig = serializeJavascript(config, { ignoreFunction: true });
-  const initialState = createRuntimeState({ dom });
   const serializedInitialState = serializeJavascript(initialState, { isJSON: true });
 
   const toolpadScripts = [
@@ -76,9 +78,7 @@ export async function createProdHandler(project: ToolpadProject) {
 
       html = postProcessHtml(html, {
         config: project.getRuntimeConfig(),
-        initialState: createRuntimeState({
-          dom,
-        }),
+        initialState: createRuntimeState({ dom }),
       });
 
       res.setHeader('Content-Type', 'text/html; charset=utf-8').status(200).end(html);

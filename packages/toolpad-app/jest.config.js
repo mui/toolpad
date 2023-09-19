@@ -17,6 +17,8 @@ const transpiledModules = [
   'd3-time-format',
   'd3-shape',
   'd3-path',
+  '@mui/x-charts/esm',
+  '@babel/runtime/helpers/esm',
 ];
 
 module.exports = /** @type {import('jest').Config} */ ({

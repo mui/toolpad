@@ -66,7 +66,7 @@ interface CreateNewDataProviderDialogProps {
 function CreateNewDataProviderDialog({
   open,
   onClose,
-  existingNames: existingFiles,
+  existingNames,
   initialName,
 }: CreateNewDataProviderDialogProps) {
   const [newName, setNewName] = React.useState(initialName);
@@ -97,15 +97,15 @@ function CreateNewDataProviderDialog({
             type="text"
             onFocus={handleInputFocus}
             required
-            error={existingFiles.has(newName)}
+            error={existingNames.has(newName)}
             helperText={
-              existingFiles.has(newName) ? `Provider "${newName}" already exists` : undefined
+              existingNames.has(newName) ? `Provider "${newName}" already exists` : undefined
             }
           />
         </DialogContent>
         <DialogActions>
           <Button onClick={onClose}>Cancel</Button>
-          <Button type="submit" disabled={!newName || existingFiles.has(newName)}>
+          <Button type="submit" disabled={!newName || existingNames.has(newName)}>
             Add
           </Button>
         </DialogActions>

@@ -2,12 +2,40 @@ import * as path from 'path';
 import * as fs from 'fs/promises';
 import { Server } from 'http';
 import * as express from 'express';
-import { postProcessHtml } from './toolpadAppBuilder';
+import serializeJavascript from 'serialize-javascript';
 import { ToolpadProject } from './localMode';
 import { asyncHandler } from '../utils/express';
 import { basicAuthUnauthorized, checkBasicAuthHeader } from './basicAuth';
 import { createRpcRuntimeServer } from './rpcRuntimeServer';
 import { createRpcHandler } from './rpc';
+import { RUNTIME_CONFIG_WINDOW_PROPERTY } from '../constants';
+import type { RuntimeConfig } from '../config';
+import type * as appDom from '../appDom';
+import createRuntimeState from '../runtime/createRuntimeState';
+
+export const INITIAL_STATE_WINDOW_PROPERTY = '__initialToolpadState__';
+
+export interface PostProcessHtmlParams {
+  config: RuntimeConfig;
+  dom: appDom.AppDom;
+}
+
+export function postProcessHtml(html: string, { config, dom }: PostProcessHtmlParams): string {
+  const serializedConfig = serializeJavascript(config, { ignoreFunction: true });
+  const initialState = createRuntimeState({ dom });
+  const serializedInitialState = serializeJavascript(initialState, { isJSON: true });
+
+  const toolpadScripts = [
+    `<script>window[${JSON.stringify(
+      RUNTIME_CONFIG_WINDOW_PROPERTY,
+    )}] = ${serializedConfig}</script>`,
+    `<script>window[${JSON.stringify(
+      INITIAL_STATE_WINDOW_PROPERTY,
+    )}] = ${serializedInitialState}</script>`,
+  ];
+
+  return html.replace(`<!-- __TOOLPAD_SCRIPTS__ -->`, () => toolpadScripts.join('\n'));
+}
 
 export interface CreateViteConfigParams {
   server?: Server;

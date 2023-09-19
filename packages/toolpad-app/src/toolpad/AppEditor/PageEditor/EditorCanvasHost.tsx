@@ -5,11 +5,11 @@ import createCache from '@emotion/cache';
 import { CacheProvider } from '@emotion/react';
 import * as ReactDOM from 'react-dom';
 import invariant from 'invariant';
+import useEventCallback from '@mui/utils/useEventCallback';
 import * as appDom from '../../../appDom';
 import { TOOLPAD_BRIDGE_GLOBAL } from '../../../constants';
 import { HTML_ID_EDITOR_OVERLAY } from '../../../runtime/constants';
 import { NodeHashes } from '../../../types';
-import useEvent from '../../../utils/useEvent';
 import { LogEntry } from '../../../components/Console';
 import { useAppStateApi } from '../../AppState';
 import createRuntimeState from '../../../runtime/createRuntimeState';
@@ -68,7 +68,7 @@ const CanvasFrame = styled('iframe')({
 });
 
 function useOnChange<T = unknown>(value: T, handler: (newValue: T, oldValue: T) => void) {
-  const stableHandler = useEvent(handler);
+  const stableHandler = useEventCallback(handler);
   const prevValue = React.useRef(value);
   React.useEffect(() => {
     if (prevValue.current !== value) {
@@ -109,7 +109,7 @@ export default function EditorCanvasHost({
 
   const [editorOverlayRoot, setEditorOverlayRoot] = React.useState<HTMLElement | null>(null);
 
-  const handleKeyDown = useEvent((event: KeyboardEvent) => {
+  const handleKeyDown = useEventCallback((event: KeyboardEvent) => {
     const isZ = !!event.key && event.key.toLowerCase() === 'z';
 
     const undoShortcut = isZ && (event.metaKey || event.ctrlKey);
@@ -129,7 +129,7 @@ export default function EditorCanvasHost({
   const [loading, setLoading] = React.useState(true);
   useOnChange(src, () => setLoading(true));
 
-  const initBridge = useEvent((bridgeInstance: ToolpadBridge) => {
+  const initBridge = useEventCallback((bridgeInstance: ToolpadBridge) => {
     const handleReady = (readyBridge: ToolpadBridge) => {
       setLoading(false);
       setBridge(readyBridge);
@@ -187,7 +187,7 @@ export default function EditorCanvasHost({
     [handleKeyDown, initBridge],
   );
 
-  const invalidateCanvasQueries = useEvent(() => {
+  const invalidateCanvasQueries = useEventCallback(() => {
     bridge?.canvasCommands.invalidateQueries();
   });
 

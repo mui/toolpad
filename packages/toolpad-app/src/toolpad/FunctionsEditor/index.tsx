@@ -14,14 +14,18 @@ import {
   Stack,
   useTheme,
   alpha,
+  Typography,
+  Button,
+  Link,
 } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import { errorFrom } from '@mui/toolpad-utils/errors';
 import { TreeView, treeItemClasses, TreeItem } from '@mui/x-tree-view';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
-import PlaylistAddIcon from '@mui/icons-material/PlaylistAdd';
+import NoteAddIcon from '@mui/icons-material/NoteAdd';
 import JavascriptIcon from '@mui/icons-material/Javascript';
+import ClearIcon from '@mui/icons-material/Clear';
 import useBoolean from '@mui/toolpad-utils/hooks/useBoolean';
 import { useQuery } from '@tanstack/react-query';
 import { ensureSuffix } from '@mui/toolpad-utils/strings';
@@ -64,6 +68,12 @@ const FileTreeItemRoot = styled(TreeItem)(({ theme }) => ({
     display: 'inline-block',
     overflow: 'hidden',
     textOverflow: 'ellipsis',
+  },
+
+  [`& .${treeItemClasses.group}`]: {
+    borderLeft: `1px solid ${alpha(theme.palette.text.primary, 0.2)}`,
+    position: 'relative',
+    left: '-2px',
   },
 }));
 
@@ -224,125 +234,202 @@ export default function FunctionsEditor() {
     setSearch(event.target.value);
   }, []);
 
+  const handleClearSearch = React.useCallback(() => {
+    setSearch('');
+  }, []);
+
   return (
     <ToolpadShell>
-      <PanelGroup direction="horizontal">
-        <Panel defaultSize={26} minSize={24}>
-          <Box sx={{ padding: 1, overflow: 'scroll' }}>
-            <Stack direction="row" spacing={1}>
-              <TextField
-                onChange={handleSearchChange}
-                placeholder="Find function..."
-                InputProps={{
-                  startAdornment: (
-                    <InputAdornment position="start">
-                      <SearchIcon />
-                    </InputAdornment>
-                  ),
-                }}
-                variant="outlined"
-                fullWidth
-              />
-              <IconButton size="medium" onClick={handleOpenCreateNewHandler}>
-                <PlaylistAddIcon color="primary" fontSize="inherit" />
-              </IconButton>
-            </Stack>
-            <TreeView
-              ref={handlerTreeRef}
-              selected={selectedNodeId}
-              onNodeSelect={handleSelectFunction}
-              defaultCollapseIcon={<ExpandMoreIcon />}
-              defaultExpandIcon={<ChevronRightIcon />}
-              expanded={expanded}
-              onNodeToggle={(_event, nodeIds) => setExpanded(nodeIds)}
-              sx={{ mt: 1 }}
-            >
-              {isCreateNewHandlerOpen ? (
-                <TreeItem
-                  nodeId="::create::"
-                  label={
-                    <React.Fragment>
-                      <InputBase
-                        ref={createNewInputRef}
-                        value={newHandlerInput}
-                        onChange={(event) =>
-                          setNewHandlerInput(event.target.value.replaceAll(/[^a-zA-Z0-9.]/g, ''))
-                        }
-                        autoFocus
-                        disabled={newHandlerLoading}
-                        endAdornment={newHandlerLoading ? <CircularProgress size={16} /> : null}
-                        onBlur={handleCreateNewCommit}
-                        onKeyDown={(event) => {
-                          if (event.key === 'Enter') {
-                            handleCreateNewCommit();
-                          } else if (event.key === 'Escape') {
-                            handleCloseCreateNewHandler();
-                            event.stopPropagation();
-                          }
-                        }}
-                        startAdornment={
-                          <InputAdornment position="start" sx={{ ml: '-6px', mr: '0px' }}>
-                            <JavascriptIcon fontSize="large" />
-                          </InputAdornment>
-                        }
-                        placeholder="New file name…"
-                        fullWidth
-                        sx={{ padding: 0.5 }}
-                      />
-                      <Popover
-                        open={open}
-                        anchorEl={anchorEl}
-                        onClose={() => setAnchorEl(null)}
-                        disableAutoFocus
-                        anchorOrigin={{
-                          vertical: 'bottom',
-                          horizontal: 'left',
-                        }}
-                      >
-                        <Alert severity="error" variant="outlined">
-                          {inputError}
-                        </Alert>
-                      </Popover>
-                    </React.Fragment>
-                  }
-                  sx={{ backgroundColor: alpha(theme.palette.primary.main, 0.1) }}
-                />
-              ) : null}
-
-              {introspection.data?.files
-                ?.filter((file) =>
-                  search ? file.name.toLowerCase().includes(search.toLowerCase()) : true,
-                )
-                .map((file) => (
-                  <HandlerFileTreeItem key={file.name} file={file} />
-                ))}
-
-              {introspection.isLoading ? (
-                <React.Fragment>
-                  <TreeItem disabled nodeId="::loading::" label={<Skeleton />} />
-                  <TreeItem disabled nodeId="::loading::" label={<Skeleton />} />
-                  <TreeItem disabled nodeId="::loading::" label={<Skeleton />} />
-                </React.Fragment>
-              ) : null}
-            </TreeView>
-            {introspection.error ? (
-              <Box
+      <Box sx={{ height: 'calc(100vh - 48px)' }}>
+        <PanelGroup direction="horizontal">
+          <Panel defaultSize={26} minSize={24}>
+            <Box sx={{ height: '100%', overflow: 'auto', position: 'relative' }}>
+              <Stack
+                direction="row"
+                spacing={1}
                 sx={{
-                  position: 'absolute',
-                  inset: '0 0 0 0',
-                  display: 'flex',
-                  justifyContent: 'center',
-                  alignItems: 'center',
+                  backgroundColor: theme.palette.background.paper,
+                  position: 'sticky',
+                  top: 0,
+                  left: 0,
+                  width: '100%',
+                  padding: 1,
+                  zIndex: 1,
                 }}
               >
-                {errorFrom(introspection.error).message}
-              </Box>
-            ) : null}
-          </Box>
-        </Panel>
-        <PanelResizeHandle />
-        <Panel />
-      </PanelGroup>
+                <TextField
+                  value={search}
+                  onChange={handleSearchChange}
+                  placeholder="Find function…"
+                  InputProps={{
+                    startAdornment: (
+                      <InputAdornment position="start">
+                        <SearchIcon />
+                      </InputAdornment>
+                    ),
+                    endAdornment: search ? (
+                      <InputAdornment position="end">
+                        <IconButton onClick={handleClearSearch} edge="end">
+                          <ClearIcon />
+                        </IconButton>
+                      </InputAdornment>
+                    ) : null,
+                  }}
+                  variant="outlined"
+                  fullWidth
+                />
+                <IconButton size="medium" onClick={handleOpenCreateNewHandler}>
+                  <NoteAddIcon color="primary" fontSize="inherit" />
+                </IconButton>
+              </Stack>
+              <TreeView
+                ref={handlerTreeRef}
+                selected={selectedNodeId}
+                onNodeSelect={handleSelectFunction}
+                defaultCollapseIcon={<ExpandMoreIcon />}
+                defaultExpandIcon={<ChevronRightIcon />}
+                expanded={expanded}
+                onNodeToggle={(_event, nodeIds) => setExpanded(nodeIds)}
+                sx={{
+                  mt: -1,
+                  padding: 1,
+                }}
+              >
+                {isCreateNewHandlerOpen ? (
+                  <TreeItem
+                    nodeId="::create::"
+                    label={
+                      <React.Fragment>
+                        <InputBase
+                          ref={createNewInputRef}
+                          value={newHandlerInput}
+                          onChange={(event) =>
+                            setNewHandlerInput(event.target.value.replaceAll(/[^a-zA-Z0-9.]/g, ''))
+                          }
+                          autoFocus
+                          disabled={newHandlerLoading}
+                          endAdornment={newHandlerLoading ? <CircularProgress size={16} /> : null}
+                          onBlur={handleCreateNewCommit}
+                          onKeyDown={(event) => {
+                            if (event.key === 'Enter') {
+                              handleCreateNewCommit();
+                            } else if (event.key === 'Escape') {
+                              handleCloseCreateNewHandler();
+                              event.stopPropagation();
+                            }
+                          }}
+                          startAdornment={
+                            <InputAdornment position="start" sx={{ ml: '-6px', mr: '0px' }}>
+                              <JavascriptIcon fontSize="large" />
+                            </InputAdornment>
+                          }
+                          placeholder="New file name…"
+                          fullWidth
+                          sx={{
+                            padding: 0.5,
+                            backgroundColor: 'none !important',
+                          }}
+                        />
+                        <Popover
+                          open={open}
+                          anchorEl={anchorEl}
+                          onClose={() => setAnchorEl(null)}
+                          disableAutoFocus
+                          anchorOrigin={{
+                            vertical: 'bottom',
+                            horizontal: 'left',
+                          }}
+                        >
+                          <Alert severity="error" variant="outlined">
+                            {inputError}
+                          </Alert>
+                        </Popover>
+                      </React.Fragment>
+                    }
+                    sx={{
+                      backgroundColor: alpha(theme.palette.primary.main, 0.2),
+                      '.MuiTreeItem-content': {
+                        backgroundColor: 'transparent',
+                      },
+                    }}
+                  />
+                ) : null}
+
+                {introspection.data?.files
+                  ?.filter((file) =>
+                    search ? file.name.toLowerCase().includes(search.toLowerCase()) : true,
+                  )
+                  .map((file) => (
+                    <HandlerFileTreeItem key={file.name} file={file} />
+                  ))}
+
+                {introspection.data?.files.length === 0 ? (
+                  <Stack alignItems="center" sx={{ mt: 2 }}>
+                    <Typography variant="body1">You don&apos;t have any functions yet…</Typography>
+                    <Button
+                      onClick={handleOpenCreateNewHandler}
+                      variant="outlined"
+                      startIcon={<NoteAddIcon />}
+                      size="medium"
+                      sx={{ mt: 1 }}
+                    >
+                      Create function
+                    </Button>
+                  </Stack>
+                ) : null}
+
+                {introspection.isLoading ? (
+                  <React.Fragment>
+                    <TreeItem disabled nodeId="::loading::" label={<Skeleton />} />
+                    <TreeItem disabled nodeId="::loading::" label={<Skeleton />} />
+                    <TreeItem disabled nodeId="::loading::" label={<Skeleton />} />
+                  </React.Fragment>
+                ) : null}
+              </TreeView>
+              {introspection.error ? (
+                <Box
+                  sx={{
+                    position: 'absolute',
+                    inset: '0 0 0 0',
+                    display: 'flex',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                  }}
+                >
+                  {errorFrom(introspection.error).message}
+                </Box>
+              ) : null}
+            </Box>
+          </Panel>
+          <PanelResizeHandle />
+          <Panel>
+            <Box
+              sx={{
+                height: '100%',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}
+            >
+              <Stack alignItems="center" sx={{ px: 4 }}>
+                <Typography variant="body1" textAlign="center">
+                  <strong>Custom Functions</strong> allow you to run your own Javascript code,
+                  directly from your file system.
+                </Typography>
+                <Link
+                  href="https://mui.com/toolpad/concepts/custom-functions"
+                  target="_blank"
+                  rel="noopener"
+                  textAlign="center"
+                  sx={{ mt: 1 }}
+                >
+                  Read more about Custom Functions
+                </Link>
+              </Stack>
+            </Box>
+          </Panel>
+        </PanelGroup>
+      </Box>
     </ToolpadShell>
   );
 }

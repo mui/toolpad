@@ -115,13 +115,13 @@ export default function NavigationSidebar() {
         </List>
       </Drawer>
       <ExpandButton
+        color="primary"
         onClick={toggleExpanded}
         sx={{
           zIndex: theme.zIndex.drawer + 1,
         }}
       >
         <ChevronLeftIcon
-          color="primary"
           sx={{
             transition: 'transform linear 30ms',
             transform: `rotate(${isExpanded ? 0 : 180}deg)`,

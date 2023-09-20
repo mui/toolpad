@@ -1,13 +1,16 @@
 import * as path from 'path';
 import * as fs from 'fs/promises';
+import * as url from 'url';
 import { test, expect, Locator } from '../../playwright/localTest';
 import { ToolpadEditor } from '../../models/ToolpadEditor';
 import clickCenter from '../../utils/clickCenter';
 import { folderExists } from '../../../packages/toolpad-utils/src/fs';
 
+const currentDirectory = url.fileURLToPath(new URL('.', import.meta.url));
+
 test.use({
   localAppConfig: {
-    template: path.resolve(__dirname, './fixture'),
+    template: path.resolve(currentDirectory, './fixture'),
     cmd: 'dev',
   },
 });

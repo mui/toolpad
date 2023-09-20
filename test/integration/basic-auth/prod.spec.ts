@@ -1,5 +1,8 @@
 import * as path from 'path';
+import * as url from 'url';
 import { test, expect } from '../../playwright/localTest';
+
+const currentDirectory = url.fileURLToPath(new URL('.', import.meta.url));
 
 test.use({
   ignoreConsoleErrors: [
@@ -9,7 +12,7 @@ test.use({
 
 test.use({
   localAppConfig: {
-    template: path.resolve(__dirname, './fixture'),
+    template: path.resolve(currentDirectory, './fixture'),
     cmd: 'start',
     env: {
       TOOLPAD_BASIC_AUTH_USER: 'foo',
@@ -34,11 +37,11 @@ test('Access is granted when authenticated', async ({ browserName, page, localAp
     'Fails due to https://bugzilla.mozilla.org/show_bug.cgi?id=1742396',
   );
 
-  const url = new URL(localApp.url);
-  url.username = 'foo';
-  url.password = 'bar';
+  const appUrl = new URL(localApp.url);
+  appUrl.username = 'foo';
+  appUrl.password = 'bar';
 
-  const res = await page.goto(url.href);
+  const res = await page.goto(appUrl.href);
   expect(res?.status()).toBe(200);
   await expect(page.locator('text="message: hello world"')).toBeVisible();
 });

@@ -1,19 +1,13 @@
 const fse = require('fs-extra');
-const path = require('path');
 
 const { version: transformRuntimeVersion } = fse.readJSONSync(
   require.resolve('@babel/runtime-corejs2/package.json'),
 );
 
-const errorCodesPath = path.resolve(
-  __dirname,
-  './node_modules/@mui/monorepo/docs/public/static/error-codes.json',
-);
+const errorCodesPath = require.resolve('@mui/monorepo/docs/public/static/error-codes.json');
 const missingError = process.env.MUI_EXTRACT_ERROR_CODES === 'true' ? 'write' : 'annotate';
 
-const muiErrorMacro = require.resolve(
-  './node_modules/@mui/monorepo/packages/mui-utils/macros/MuiError.macro',
-);
+const muiErrorMacro = require.resolve('@mui/monorepo/packages/mui-utils/macros/MuiError.macro');
 
 module.exports = {
   presets: [

@@ -1,5 +1,6 @@
 import * as path from 'path';
 import * as fs from 'fs/promises';
+import * as url from 'url';
 import { fileReplaceAll } from '../../../packages/toolpad-utils/src/fs';
 import { test, expect } from '../../playwright/localTest';
 import { ToolpadRuntime } from '../../models/ToolpadRuntime';
@@ -7,11 +8,13 @@ import { ToolpadEditor } from '../../models/ToolpadEditor';
 import { startTestServer } from './testServer';
 import { withTemporaryEdits } from '../../utils/fs';
 
+const currentDirectory = url.fileURLToPath(new URL('.', import.meta.url));
+
 let testServer: Awaited<ReturnType<typeof startTestServer>> | undefined;
 
 test.use({
   localAppConfig: {
-    template: path.resolve(__dirname, './fixture'),
+    template: path.resolve(currentDirectory, './fixture'),
     cmd: 'dev',
     env: {
       TEST_VAR: 'foo',

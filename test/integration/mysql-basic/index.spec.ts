@@ -1,8 +1,11 @@
 import * as path from 'path';
+import * as url from 'url';
 import { readJsonFile } from '../../../packages/toolpad-utils/src/fs';
 import { test, expect } from '../../playwright/test';
 import { ToolpadRuntime } from '../../models/ToolpadRuntime';
 import generateId from '../../utils/generateId';
+
+const currentDirectory = url.fileURLToPath(new URL('.', import.meta.url));
 
 test.skip(true, 'Legacy database tests');
 
@@ -17,12 +20,15 @@ const MYSQL_SOURCE_HOST = 'localhost';
 const MYSQL_TARGET_HOST = mysqlHost || MYSQL_SOURCE_HOST;
 
 test('mysql basics', async ({ page, api }) => {
-  const dom = await readJsonFile(path.resolve(__dirname, './mysqlDom.json'), (key, value) => {
-    if (typeof value === 'string') {
-      return value.replaceAll(MYSQL_SOURCE_HOST, MYSQL_TARGET_HOST);
-    }
-    return value;
-  });
+  const dom = await readJsonFile(
+    path.resolve(currentDirectory, './mysqlDom.json'),
+    (key, value) => {
+      if (typeof value === 'string') {
+        return value.replaceAll(MYSQL_SOURCE_HOST, MYSQL_TARGET_HOST);
+      }
+      return value;
+    },
+  );
 
   const app = await api.mutation.createApp(`App ${generateId()}`, {
     from: { kind: 'dom', dom },

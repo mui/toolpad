@@ -1,8 +1,11 @@
 import * as path from 'path';
+import * as url from 'url';
 import { ToolpadEditor } from '../../models/ToolpadEditor';
 import { ToolpadRuntime } from '../../models/ToolpadRuntime';
 import { FrameLocator, Page, test, expect } from '../../playwright/localTest';
 import clickCenter from '../../utils/clickCenter';
+
+const currentDirectory = url.fileURLToPath(new URL('.', import.meta.url));
 
 async function waitForComponents(page: Page, frame: Page | FrameLocator = page) {
   const button = frame.locator('text="foo button"');
@@ -39,7 +42,7 @@ async function waitForComponents(page: Page, frame: Page | FrameLocator = page) 
 
 test.use({
   localAppConfig: {
-    template: path.resolve(__dirname, './fixture-basic'),
+    template: path.resolve(currentDirectory, './fixture-basic'),
     cmd: 'dev',
   },
 });

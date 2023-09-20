@@ -87,7 +87,6 @@ function isNumeric(input: string) {
  *  YYYY-MM-DDThh:mm:ssTZD
  *  YYYY-MM-DDThh:mm:ss.sTZD
  * @see: https://www.w3.org/TR/NOTE-datetime
- * @type {RegExp}
  */
 const ISO_8601 =
   /^\d{4}(-\d{2}(-\d{2}([T ]\d{2}:\d{2}(:\d{2})?(\.\d+)?(([+-]\d{2}:\d{2})|Z)?)?)?)?$/i;
@@ -100,7 +99,6 @@ const ISO_8601 =
  *  YYYY-MM-DDThh:mm:ssTZD
  *  YYYY-MM-DDThh:mm:ss.sTZD
  * @see: https://www.w3.org/TR/NOTE-datetime
- * @type {RegExp}
  */
 const ISO_8601_FULL = /^\d{4}-\d{2}-\d{2}[T ]\d{2}:\d{2}:\d{2}(\.\d+)?(([+-]\d{2}:\d{2})|Z)?$/i;
 

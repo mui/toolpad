@@ -142,11 +142,6 @@ jobs:
       - run:
           name: 'Build packages'
           command: pnpm release:build
-      - save_cache:
-          name: Save Next.js cache
-          key: v0-next-{{ checksum "yarn.lock" }}
-          paths:
-            - packages/toolpad-app/.next/cache
       - run:
           name: Tests fake browser
           command: pnpm test

@@ -46,7 +46,7 @@ import {
   ResponseType as AppDomRestResponseType,
 } from '../toolpadDataSources/rest/types';
 import { LocalQuery } from '../toolpadDataSources/local/types';
-import { ProjectEvents, ToolpadProjectOptions } from '../types';
+import { ProjectEvents, ToolpadProjectOptions, CodeEditorFileType } from '../types';
 import { Awaitable } from '../utils/types';
 import EnvManager from './EnvManager';
 import FunctionsManager from './FunctionsManager';
@@ -1154,7 +1154,7 @@ class ToolpadProject {
     });
   }
 
-  async openCodeEditor(fileName: string, fileType: string) {
+  async openCodeEditor(fileName: string, fileType: CodeEditorFileType) {
     const supportedEditor = await findSupportedEditor();
     if (!supportedEditor) {
       throw new Error(`No code editor found`);
@@ -1162,7 +1162,7 @@ class ToolpadProject {
     const root = this.getRoot();
     let resolvedPath = fileName;
 
-    if (fileType === 'query') {
+    if (fileType === 'resource') {
       resolvedPath = await this.functionsManager.getFunctionFilePath(fileName);
     }
     if (fileType === 'component') {

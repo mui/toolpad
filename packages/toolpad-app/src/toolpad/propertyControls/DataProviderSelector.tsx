@@ -1,7 +1,6 @@
 import * as React from 'react';
 import {
   Autocomplete,
-  IconButton,
   TextField,
   styled,
   autocompleteClasses,
@@ -15,7 +14,6 @@ import {
   Box,
 } from '@mui/material';
 import { errorFrom } from '@mui/toolpad-utils/errors';
-import EditIcon from '@mui/icons-material/Edit';
 import AddIcon from '@mui/icons-material/Add';
 import { useMutation } from '@tanstack/react-query';
 import { LoadingButton } from '@mui/lab';
@@ -26,6 +24,7 @@ import type {
   FileIntrospectionResult,
 } from '../../server/functionsTypesWorker';
 import { projectEvents } from '../../projectEvents';
+import OpenCodeEditorButton from '../../components/OpenCodeEditor';
 
 projectEvents.on('functionsChanged', () => client.invalidateQueries('introspect', []));
 
@@ -172,11 +171,9 @@ function DataProviderSelector({ value, onChange }: EditorProps<string>) {
     );
   }, [introspection]);
 
+  const [fileName = null, providerName = null] = value ? value.split(':') : [];
+
   const autocompleteValue = React.useMemo(() => {
-    if (!value) {
-      return null;
-    }
-    const [fileName, providerName] = value.split(':');
     return (
       options.find(
         (option) =>
@@ -185,7 +182,7 @@ function DataProviderSelector({ value, onChange }: EditorProps<string>) {
           option.dataProvider.name === providerName,
       ) ?? null
     );
-  }, [value, options]);
+  }, [fileName, providerName, options]);
 
   const errorMessage = error ? errorFrom(error).message : undefined;
 
@@ -226,10 +223,13 @@ function DataProviderSelector({ value, onChange }: EditorProps<string>) {
               ...params.InputProps,
               endAdornment: (
                 <React.Fragment>
-                  {value ? (
-                    <IconButton className={classes.editButton}>
-                      <EditIcon />
-                    </IconButton>
+                  {fileName ? (
+                    <OpenCodeEditorButton
+                      className={classes.editButton}
+                      filePath={fileName}
+                      fileType="resource"
+                      iconButton
+                    />
                   ) : null}
                   {params.InputProps.endAdornment}
                 </React.Fragment>

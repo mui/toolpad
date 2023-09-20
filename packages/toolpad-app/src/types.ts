@@ -215,3 +215,5 @@ export interface ToolpadProjectOptions {
   cmd: 'dev' | 'start' | 'build';
   dev: boolean;
 }
+
+export type CodeEditorFileType = 'resource' | 'component';

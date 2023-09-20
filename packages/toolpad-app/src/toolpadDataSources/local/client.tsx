@@ -79,7 +79,7 @@ function HandlerFileTreeItem({ file }: HandlerFileTreeItemProps) {
         <React.Fragment>
           {file.name}
           <FlexFill />
-          <OpenCodeEditorButton iconButton filePath={file.name} fileType="query" />
+          <OpenCodeEditorButton iconButton filePath={file.name} fileType="resource" />
         </React.Fragment>
       }
     >

@@ -2,9 +2,10 @@
   "name": "@mui/toolpad-tests",
   "devDependencies": {
     "@mui/toolpad": "workspace:*",
+    "get-port": "7.0.0",
+    "invariant": "2.2.4",
     "react": "18.2.0",
     "react-dom": "18.2.0"
   },
-  "type": "module",
-  "dependencies": {}
+  "type": "module"
 }

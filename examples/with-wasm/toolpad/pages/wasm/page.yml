@@ -1,0 +1,36 @@
+apiVersion: v1
+kind: page
+spec:
+  id: sR_fqKE
+  title: Default page
+  content:
+    - component: TextField
+      name: number1
+      props:
+        label: number 1
+        defaultValue: '1'
+    - component: TextField
+      name: number2
+      props:
+        label: number 2
+        defaultValue: '2'
+    - component: Text
+      name: text
+      props:
+        value:
+          $$jsExpression: |
+            `WASM sum is ${sum.data}`
+  queries:
+    - name: sum
+      query:
+        function: functions.ts#add
+        kind: local
+      parameters:
+        - name: a
+          value:
+            $$jsExpression: |
+              Number(number1.value)
+        - name: b
+          value:
+            $$jsExpression: |
+              Number(number2.value)

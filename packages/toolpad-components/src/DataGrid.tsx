@@ -88,6 +88,7 @@ function isNumeric(input: string) {
 
 /**
  * RegExp to test a string for a ISO 8601 Date spec
+ * Also accepts a space instead of T to separate date and time as per rfc3339
  * Does not do any sort of date validation, only checks if the string is according to the ISO 8601 spec.
  *  YYYY
  *  YYYY-MM
@@ -96,20 +97,20 @@ function isNumeric(input: string) {
  *  YYYY-MM-DDThh:mm:ssTZD
  *  YYYY-MM-DDThh:mm:ss.sTZD
  * @see: https://www.w3.org/TR/NOTE-datetime
- * @type {RegExp}
  */
-const ISO_8601 = /^\d{4}(-\d{2}(-\d{2}(T\d{2}:\d{2}(:\d{2})?(\.\d+)?(([+-]\d{2}:\d{2})|Z)?)?)?)?$/i;
+const ISO_8601 =
+  /^\d{4}(-\d{2}(-\d{2}([T ]\d{2}:\d{2}(:\d{2})?(\.\d+)?(([+-]\d{2}:\d{2})|Z)?)?)?)?$/i;
 
 /**
  * RegExp to test a string for a full ISO 8601 Date
+ * Also accepts a space instead of T to separate date and time as per rfc3339
  * Does not do any sort of date validation, only checks if the string is according to the ISO 8601 spec.
  *  YYYY-MM-DDThh:mm:ss
  *  YYYY-MM-DDThh:mm:ssTZD
  *  YYYY-MM-DDThh:mm:ss.sTZD
  * @see: https://www.w3.org/TR/NOTE-datetime
- * @type {RegExp}
  */
-const ISO_8601_FULL = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d+)?(([+-]\d{2}:\d{2})|Z)?$/i;
+const ISO_8601_FULL = /^\d{4}-\d{2}-\d{2}[T ]\d{2}:\d{2}:\d{2}(\.\d+)?(([+-]\d{2}:\d{2})|Z)?$/i;
 
 function isValidDateTime(input: string) {
   // The Date constructor is too permissive for validating dates, so we need to use a regex

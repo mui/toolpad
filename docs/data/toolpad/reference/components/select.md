@@ -4,7 +4,7 @@
 
 <p class="description">API docs for the Toolpad Select component.</p>
 
-The MUI [Select](https://mui.com/material-ui/react-select/) component lets you select a value from a set of options.
+The Material UI [Select](https://mui.com/material-ui/react-select/) component lets you select a value from a set of options.
 
 ## Properties
 

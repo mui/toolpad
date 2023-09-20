@@ -7,7 +7,6 @@ import { Readable } from 'stream';
 import { once } from 'events';
 import invariant from 'invariant';
 import * as archiver from 'archiver';
-import getPort from 'get-port';
 import { PageScreenshotOptions, test as base } from './test';
 import { waitForMatch } from '../utils/streams';
 
@@ -51,6 +50,7 @@ export async function withApp(
   options: WithAppOptions,
   doWork: (app: RunningLocalApp) => Promise<void>,
 ) {
+  const { default: getPort } = await import('get-port');
   const { cmd = 'start', template, setup, env } = options;
 
   // Each test runs in its own temporary folder to avoid race conditions when running tests in parallel.

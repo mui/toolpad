@@ -488,12 +488,15 @@ const DataGridComponent = React.forwardRef(function DataGridComponent(
     selection,
     onSelectionChange,
     hideToolbar,
+    rowsSource,
     dataProviderId,
     ...props
   }: ToolpadDataGridProps,
   ref: React.ForwardedRef<HTMLDivElement>,
 ) {
-  const dataProviderProps = useDataProviderDataGridProps(dataProviderId);
+  const dataProviderProps = useDataProviderDataGridProps(
+    rowsSource === 'dataProvider' ? dataProviderId : null,
+  );
 
   const nodeRuntime = useNode<ToolpadDataGridProps>();
 

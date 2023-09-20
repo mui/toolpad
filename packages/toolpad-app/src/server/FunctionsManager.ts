@@ -5,6 +5,7 @@ import * as esbuild from 'esbuild';
 import { ensureSuffix, indent } from '@mui/toolpad-utils/strings';
 import * as chokidar from 'chokidar';
 import chalk from 'chalk';
+import { glob } from 'glob';
 import { writeFileRecursive, fileExists, readJsonFile } from '@mui/toolpad-utils/fs';
 import invariant from 'invariant';
 import Piscina from 'piscina';
@@ -146,6 +147,11 @@ export default class FunctionsManager {
     }
   }
 
+  private async getFunctionFiles(): Promise<string[]> {
+    const paths = await glob(this.getFunctionResourcesPattern(), { windowsPathsNoEscape: true });
+    return paths.map((fullPath) => path.relative(this.project.getRoot(), fullPath));
+  }
+
   private getBuildErrorsForFile(entryPoint: string) {
     return this.buildErrors.filter((error) => error.location?.file === entryPoint);
   }
@@ -200,9 +206,10 @@ export default class FunctionsManager {
       },
     };
 
+    const entryPoints = await this.getFunctionFiles();
     return esbuild.context({
       absWorkingDir: root,
-      entryPoints: [this.getFunctionResourcesPattern()],
+      entryPoints,
       plugins: [toolpadPlugin],
       write: true,
       bundle: true,

@@ -38,6 +38,7 @@ function SelectPropEditor({ label, propType, value, onChange, disabled }: Editor
           exclusive
           onChange={handleChange}
           aria-label="Platform"
+          disabled={disabled}
         >
           {items.map((item) => (
             <ToggleButton key={item} value={item}>

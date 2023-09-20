@@ -86,8 +86,47 @@ function isNumeric(input: string) {
   return input ? !Number.isNaN(Number(input)) : false;
 }
 
+/**
+ * RegExp to test a string for a ISO 8601 Date spec
+ * Does not do any sort of date validation, only checks if the string is according to the ISO 8601 spec.
+ *  YYYY
+ *  YYYY-MM
+ *  YYYY-MM-DD
+ *  YYYY-MM-DDThh:mmTZD
+ *  YYYY-MM-DDThh:mm:ssTZD
+ *  YYYY-MM-DDThh:mm:ss.sTZD
+ * @see: https://www.w3.org/TR/NOTE-datetime
+ * @type {RegExp}
+ */
+const ISO_8601 = /^\d{4}(-\d{2}(-\d{2}(T\d{2}:\d{2}(:\d{2})?(\.\d+)?(([+-]\d{2}:\d{2})|Z)?)?)?)?$/i;
+
+/**
+ * RegExp to test a string for a full ISO 8601 Date
+ * Does not do any sort of date validation, only checks if the string is according to the ISO 8601 spec.
+ *  YYYY-MM-DDThh:mm:ss
+ *  YYYY-MM-DDThh:mm:ssTZD
+ *  YYYY-MM-DDThh:mm:ss.sTZD
+ * @see: https://www.w3.org/TR/NOTE-datetime
+ * @type {RegExp}
+ */
+const ISO_8601_FULL = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d+)?(([+-]\d{2}:\d{2})|Z)?$/i;
+
+function isValidDateTime(input: string) {
+  // The Date constructor is too permissive for validating dates, so we need to use a regex
+  // e.g. `new Date('Foo bar 0')` results in a valid date
+  if (ISO_8601_FULL.test(input) && !Number.isNaN(Date.parse(input))) {
+    return !Number.isNaN(Date.parse(input));
+  }
+  return false;
+}
+
 function isValidDate(input: string) {
-  return !Number.isNaN(Date.parse(input));
+  // The Date constructor is too permissive for validating dates, so we need to use a regex
+  // e.g. `new Date('Foo bar 0')` results in a valid date
+  if (ISO_8601.test(input) && !Number.isNaN(Date.parse(input))) {
+    return !Number.isNaN(Date.parse(input));
+  }
+  return false;
 }
 
 const SkeletonCell = styled(Box)(({ theme }) => ({
@@ -155,6 +194,15 @@ function SkeletonLoadingOverlay() {
   );
 }
 
+// Polyfill for https://developer.mozilla.org/en-US/docs/Web/API/URL/canParse_static
+function urlCanParse(url: string, base?: string): boolean {
+  try {
+    return !!new URL(url, base);
+  } catch {
+    return false;
+  }
+}
+
 function inferColumnType(value: unknown): string {
   if (value instanceof Date) {
     return 'dateTime';
@@ -164,8 +212,8 @@ function inferColumnType(value: unknown): string {
     case 'number':
     case 'boolean':
       return valueType;
-    case 'string':
-      try {
+    case 'string': {
+      if (urlCanParse(value)) {
         const url = new URL(value);
 
         if (hasImageExtension(url.pathname)) {
@@ -173,15 +221,18 @@ function inferColumnType(value: unknown): string {
         }
 
         return 'link';
-      } catch (error) {
-        if (isNumeric(value)) {
-          return 'number';
-        }
-        if (isValidDate(value)) {
-          return 'date';
-        }
-        return valueType;
       }
+      if (isNumeric(value)) {
+        return 'number';
+      }
+      if (isValidDateTime(value)) {
+        return 'dateTime';
+      }
+      if (isValidDate(value)) {
+        return 'date';
+      }
+      return valueType;
+    }
     case 'object':
       return 'json';
     default:
@@ -388,9 +439,9 @@ interface ToolpadDataGridProps extends Omit<DataGridProProps, 'columns' | 'rows'
   hideToolbar?: boolean;
 }
 
-type DataProviderDataGridProps = (DataGridProProps | { columns?: GridColDef[] }) & {
+interface DataProviderDataGridProps extends Omit<DataGridProProps, 'columns'> {
   error?: unknown;
-};
+}
 
 function useDataProviderDataGridProps(
   dataProviderId: string | null | undefined,
@@ -544,7 +595,12 @@ const DataGridComponent = React.forwardRef(function DataGridComponent(
   );
   React.useEffect(() => handleColumnOrderChange.clear(), [handleColumnOrderChange]);
 
-  const rowsInput = rowsProp || EMPTY_ROWS;
+  let rowsInput: GridRowsProp;
+  if (rowsSource === 'dataProvider') {
+    rowsInput = dataProviderProps?.rows ?? EMPTY_ROWS;
+  } else {
+    rowsInput = rowsProp ?? EMPTY_ROWS;
+  }
 
   const hasExplicitRowId: boolean = React.useMemo(() => {
     const hasRowIdField: boolean = !!(rowIdFieldProp && rowIdFieldProp !== 'id');

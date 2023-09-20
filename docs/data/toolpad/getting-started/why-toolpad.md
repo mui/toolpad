@@ -19,7 +19,7 @@ After reviewing multiple approaches and tools, we noticed that there are a few r
 
 #### Don't let you move fast
 
-Every business wants features to be delivered at speed but to accomodate future possibilities, developers are complelled to choose flexible solutions which results in compromise on speed. We believe that an architecturally well-designed tool empowers you to attain both speed and flexibilty simultaneously.
+Every business wants features to be delivered at speed but to accomodate future use cases, developers are complelled to choose flexible solutions which results in compromise on speed. We believe that an architecturally well-designed tool empowers you to attain both speed and flexibilty simultaneously.
 
 #### Make you write unnecessary code
 
@@ -27,7 +27,7 @@ Lots of boilerplate code is required to build an app from scratch. Similarly, lo
 
 #### Force you to learn a front-end framework
 
-Building internal tools require you to know a front-end framework. While it may interest some, most internal tool developers find it an extra burden to maintain and often seek help from fron-end professionls.
+Building internal tools require you to know a front-end framework. While it may interest some, most internal tool developers find it an extra burden to maintain and often seek help from front-end professionls.
 
 ### The problems with low-code tools
 
@@ -37,11 +37,11 @@ Frequently, developers invest valuable time in hunting down particular versions 
 
 #### Extensibility
 
-Low-code tools are hard to extend, If there's something the tool can't do out of the box, you can't bring your own code with you and integrate it seamlessly.
+Low-code tools are hard to extend. If there's something the tool can't do out of the box, you can't bring your own code with you and integrate it seamlessly.
 
 #### Loss of control
 
-When working with external tools, developers often forfeit their autonomy and are constrained by the choices offered by the tool. A black-box element intervention takes away the control over the entire process, encompassing integrations, deployment, and version control. This lack of contril puts the underlying sensitive to risk. The security of the underlying data is critical, and the seriousness of this matter can't be overstated.
+When working with external tools, developers often forfeit their autonomy and are constrained by the choices offered by the tool. A black-box element intervention takes away the control over the entire process, encompassing integrations, deployment, and version control. This lack of control puts the underlying sensitive data to risk. The security of customer data is critical, and the seriousness of this matter can't be overstated.
 
 ## How Toolpad fits in
 

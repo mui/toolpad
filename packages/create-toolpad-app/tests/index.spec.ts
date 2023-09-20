@@ -6,6 +6,7 @@ import { Readable } from 'stream';
 import { execa, ExecaChildProcess } from 'execa';
 import { jest } from '@jest/globals';
 import { once } from 'events';
+import * as os from 'os';
 
 jest.setTimeout(process.env.CI ? 60000 : 600000);
 
@@ -35,10 +36,12 @@ async function waitForMatch(input: Readable, regex: RegExp): Promise<RegExpExecA
 }
 
 test('create-toolpad-app can bootstrap a Toolpad app', async () => {
-  testDir = await fs.mkdtemp(path.resolve(currentDirectory, './test-app-'));
-  cp = execa(cliPath, [path.basename(testDir)], {
+  testDir = await fs.mkdtemp(path.resolve(os.tmpdir(), './test-app-'));
+  cp = execa(cliPath, [testDir], {
     cwd: currentDirectory,
   });
+  cp.stdout?.pipe(process.stdout);
+  cp.stderr?.pipe(process.stdout);
   const result = await cp;
   expect(result.stdout).toMatch('Run the following to get started');
   const packageJsonContent = await fs.readFile(path.resolve(testDir, './package.json'), {

@@ -19,8 +19,9 @@ import { Awaitable } from '../utils/types';
 import { format } from '../utils/prettier';
 import { compilerOptions } from './functionsShared';
 
-function createDefaultFunction(): string {
-  return format(`
+async function createDefaultFunction(filePath: string): Promise<string> {
+  const result = await format(
+    `
     /**
      * Toolpad handlers file.
      */
@@ -28,7 +29,10 @@ function createDefaultFunction(): string {
     export default async function handler (message: string) {
       return \`Hello \${message}\`;
     }
-  `);
+  `,
+    filePath,
+  );
+  return result;
 }
 
 function formatCodeFrame(location: esbuild.Location): string {
@@ -231,9 +235,9 @@ export default class FunctionsManager {
       this.project.events.subscribe('envChanged', async () => {
         await this.createRuntimeWorkerWithEnv();
       });
-    }
 
-    await this.createRuntimeWorkerWithEnv();
+      await this.createRuntimeWorkerWithEnv();
+    }
   }
 
   async build() {
@@ -321,7 +325,7 @@ export default class FunctionsManager {
 
   async createFunctionFile(name: string): Promise<void> {
     const filePath = path.resolve(this.getResourcesFolder(), ensureSuffix(name, '.ts'));
-    const content = createDefaultFunction();
+    const content = await createDefaultFunction(filePath);
     if (await fileExists(filePath)) {
       throw new Error(`"${name}" already exists`);
     }

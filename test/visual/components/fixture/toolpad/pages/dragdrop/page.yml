@@ -1,0 +1,21 @@
+apiVersion: v1
+kind: page
+spec:
+  id: 8ixPqyI
+  title: dragdrop
+  display: shell
+  content:
+    - component: TextField
+      name: textField
+      props:
+        fullWidth: true
+    - component: Paper
+      name: paper
+      children:
+        - component: Button
+          name: button
+          props:
+            fullWidth: true
+            content: contained
+    - component: Paper
+      name: paper1

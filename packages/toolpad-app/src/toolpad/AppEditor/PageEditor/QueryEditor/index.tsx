@@ -25,7 +25,7 @@ import clsx from 'clsx';
 import { usePageEditorState } from '../PageEditorProvider';
 import * as appDom from '../../../../appDom';
 import dataSources from '../../../../toolpadDataSources/client';
-import { useAppStateApi, useDom, useDomApi, useAppState } from '../../../AppState';
+import { useAppStateApi, useAppState, useDomApi } from '../../../AppState';
 import NodeMenu from '../../NodeMenu';
 import QueryNodeEditorDialog from './QueryEditorDialog';
 
@@ -51,7 +51,7 @@ interface DataSourceSelectorProps<Q> {
 }
 
 function ConnectionSelectorDialog<Q>({ open, onCreated, onClose }: DataSourceSelectorProps<Q>) {
-  const { dom } = useDom();
+  const { dom } = useAppState();
 
   const handleCreateClick = React.useCallback(
     (dataSourceId: string) => () => {
@@ -117,7 +117,7 @@ type DialogState =
     };
 
 export default function QueryEditor() {
-  const { dom } = useDom();
+  const { dom } = useAppState();
   const { currentView } = useAppState();
   const state = usePageEditorState();
 

@@ -1,18 +1,102 @@
 import * as React from 'react';
-import {
-  ObjectInspector as ReactObjectInspector,
-  ObjectInspectorProps,
-  chromeDark,
-  chromeLight,
-  InspectorTheme,
-} from 'react-inspector';
+import { ObjectInspector as ReactObjectInspector, chromeDark, chromeLight } from 'react-inspector';
 import { useTheme } from '@mui/material/styles';
+import * as CSS from 'csstype';
 
-const useInspectorTheme = (): InspectorTheme => {
+export interface InspectorNodeParams {
+  depth: number;
+  name: string;
+  data: any;
+  isNonenumerable: boolean;
+  expanded: boolean;
+}
+
+export type InspectorNodeRenderer = (params: InspectorNodeParams) => React.ReactNode;
+
+export type InspectorTheme = 'chromeLight' | 'chromeDark' | InspectorThemeDefinition;
+
+export interface ObjectInspectorProps {
+  theme?: InspectorTheme | undefined;
+  name?: string | undefined;
+  /**
+   * Not required prop because we also allow undefined value.
+   */
+  data?: any;
+  /**
+   * Provide a custom nodeRenderer.
+   */
+  nodeRenderer?: InspectorNodeRenderer | undefined;
+  /**
+   * An integer specifying to which level the tree should be initially expanded.
+   */
+  expandLevel?: number | undefined;
+  /**
+   * An array containing all the paths that should be expanded when the component is initialized, or a string of just one path.
+   */
+  expandPaths?: string | ReadonlyArray<string> | undefined;
+  /**
+   * Show non-enumerable properties.
+   */
+  showNonenumerable?: boolean | undefined;
+  /**
+   * Sort object keys with optional compare function.
+   */
+  sortObjectKeys?: boolean | ((a: any, b: any) => number) | undefined;
+}
+
+export interface InspectorThemeDefinition {
+  BASE_FONT_FAMILY: CSS.Properties['fontFamily'];
+  BASE_FONT_SIZE: CSS.Properties['fontSize'];
+  BASE_LINE_HEIGHT: CSS.Properties['lineHeight'];
+
+  BASE_BACKGROUND_COLOR: CSS.Properties['backgroundColor'];
+  BASE_COLOR: CSS.Properties['color'];
+
+  OBJECT_PREVIEW_ARRAY_MAX_PROPERTIES: number;
+  OBJECT_PREVIEW_OBJECT_MAX_PROPERTIES: number;
+  OBJECT_NAME_COLOR: CSS.Properties['color'];
+  OBJECT_VALUE_NULL_COLOR: CSS.Properties['color'];
+  OBJECT_VALUE_UNDEFINED_COLOR: CSS.Properties['color'];
+  OBJECT_VALUE_REGEXP_COLOR: CSS.Properties['color'];
+  OBJECT_VALUE_STRING_COLOR: CSS.Properties['color'];
+  OBJECT_VALUE_SYMBOL_COLOR: CSS.Properties['color'];
+  OBJECT_VALUE_NUMBER_COLOR: CSS.Properties['color'];
+  OBJECT_VALUE_BOOLEAN_COLOR: CSS.Properties['color'];
+  OBJECT_VALUE_FUNCTION_PREFIX_COLOR: CSS.Properties['color'];
+
+  HTML_TAG_COLOR: CSS.Properties['color'];
+  HTML_TAGNAME_COLOR: CSS.Properties['color'];
+  HTML_TAGNAME_TEXT_TRANSFORM: CSS.Properties['textTransform'];
+  HTML_ATTRIBUTE_NAME_COLOR: CSS.Properties['color'];
+  HTML_ATTRIBUTE_VALUE_COLOR: CSS.Properties['color'];
+  HTML_COMMENT_COLOR: CSS.Properties['color'];
+  HTML_DOCTYPE_COLOR: CSS.Properties['color'];
+
+  ARROW_COLOR: CSS.Properties['color'];
+  ARROW_MARGIN_RIGHT: CSS.Properties['marginRight'];
+  ARROW_FONT_SIZE: CSS.Properties['fontSize'];
+  ARROW_ANIMATION_DURATION: string;
+
+  TREENODE_FONT_FAMILY: CSS.Properties['fontFamily'];
+  TREENODE_FONT_SIZE: CSS.Properties['fontSize'];
+  TREENODE_LINE_HEIGHT: CSS.Properties['lineHeight'];
+  TREENODE_PADDING_LEFT: CSS.Properties['paddingLeft'];
+
+  TABLE_BORDER_COLOR: CSS.Properties['borderColor'];
+  TABLE_TH_BACKGROUND_COLOR: CSS.Properties['backgroundColor'];
+  TABLE_TH_HOVER_COLOR: CSS.Properties['color'];
+  TABLE_SORT_ICON_COLOR: CSS.Properties['color'];
+  TABLE_DATA_BACKGROUND_IMAGE: CSS.Properties['backgroundImage'];
+  TABLE_DATA_BACKGROUND_SIZE: CSS.Properties['backgroundSize'];
+}
+
+function useInspectorTheme(): InspectorThemeDefinition {
   const theme = useTheme();
   return React.useMemo(() => {
     return {
-      ...(theme.palette.mode === 'dark' ? chromeDark : chromeLight),
+      ...(theme.palette.mode === 'dark'
+        ? (chromeDark as InspectorThemeDefinition)
+        : (chromeLight as InspectorThemeDefinition)),
       BASE_BACKGROUND_COLOR: 'inherit',
       TREENODE_FONT_FAMILY: 'inherit',
       TREENODE_FONT_SIZE: 'inherit',
@@ -22,11 +106,10 @@ const useInspectorTheme = (): InspectorTheme => {
       OBJECT_PREVIEW_OBJECT_MAX_PROPERTIES: 1,
     };
   }, [theme]);
-};
-
-export type { ObjectInspectorProps };
+}
 
 export default (function ObjectInspector(props: ObjectInspectorProps) {
   const inspectorTheme = useInspectorTheme();
+  // @ts-expect-error https://github.com/storybookjs/react-inspector/issues/162
   return <ReactObjectInspector theme={inspectorTheme} {...props} />;
 });

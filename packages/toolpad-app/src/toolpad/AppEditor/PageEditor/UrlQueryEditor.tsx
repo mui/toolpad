@@ -12,7 +12,7 @@ import * as React from 'react';
 import AddIcon from '@mui/icons-material/Add';
 import { NodeId } from '@mui/toolpad-core';
 import * as appDom from '../../../appDom';
-import { useDom, useDomApi, useAppState, useAppStateApi } from '../../AppState';
+import { useAppState, useDomApi, useAppStateApi } from '../../AppState';
 import MapEntriesEditor from '../../../components/MapEntriesEditor';
 import useBoolean from '../../../utils/useBoolean';
 import useUnsavedChangesConfirm from '../../hooks/useUnsavedChangesConfirm';
@@ -43,7 +43,7 @@ function UrlQueryString({ input }: UrlQueryStringProps) {
 }
 
 export default function UrlQueryEditor({ pageNodeId }: UrlQueryEditorProps) {
-  const { dom } = useDom();
+  const { dom } = useAppState();
   const { currentView } = useAppState();
 
   const domApi = useDomApi();

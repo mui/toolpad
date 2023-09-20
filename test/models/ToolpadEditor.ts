@@ -127,7 +127,7 @@ export class ToolpadEditor {
     await setTimeout(100);
   }
 
-  async dragTo(sourceLocator: Locator, moveTargetX: number, moveTargetY: number) {
+  async dragTo(sourceLocator: Locator, moveTargetX: number, moveTargetY: number, hasDrop = true) {
     const sourceBoundingBox = await sourceLocator.boundingBox();
 
     await this.page.mouse.move(
@@ -140,7 +140,9 @@ export class ToolpadEditor {
 
     await this.page.mouse.move(moveTargetX, moveTargetY, { steps: 10 });
 
-    await this.page.mouse.up();
+    if (hasDrop) {
+      await this.page.mouse.up();
+    }
   }
 
   getComponentCatalogItem(name: string): Locator {
@@ -151,6 +153,7 @@ export class ToolpadEditor {
     componentName: string,
     moveTargetX?: number,
     moveTargetY?: number,
+    hasDrop = true,
   ) {
     const style = await this.page.addStyleTag({ content: `* { transition: none !important; }` });
 
@@ -167,7 +170,7 @@ export class ToolpadEditor {
     const sourceLocator = this.getComponentCatalogItem(componentName);
     await expect(sourceLocator).toBeVisible();
 
-    await this.dragTo(sourceLocator, moveTargetX, moveTargetY);
+    await this.dragTo(sourceLocator, moveTargetX, moveTargetY, hasDrop);
 
     await style.evaluate((elm) => elm.parentNode?.removeChild(elm));
   }

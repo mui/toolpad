@@ -7,12 +7,12 @@ import { debounce, DebouncedFunc } from 'lodash-es';
 import { useLocation } from 'react-router-dom';
 import { mapValues } from '@mui/toolpad-utils/collections';
 import useDebouncedHandler from '@mui/toolpad-utils/hooks/useDebouncedHandler';
+import useEventCallback from '@mui/utils/useEventCallback';
 import * as appDom from '../appDom';
 import { omit, update } from '../utils/immutability';
 import client from '../api';
 import useShortcut from '../utils/useShortcut';
 import insecureHash from '../utils/insecureHash';
-import useEvent from '../utils/useEvent';
 import { NodeHashes } from '../types';
 import { hasFieldFocus } from '../utils/fields';
 import { DomView, getViewFromPathname, PageViewTab } from '../utils/domView';
@@ -96,15 +96,27 @@ export function domReducer(dom: appDom.AppDom, action: AppStateAction): appDom.A
   }
 }
 
-export interface DomLoader {
+export interface AppState {
   dom: appDom.AppDom;
   savedDom: appDom.AppDom;
   savingDom: boolean;
   unsavedDomChanges: number;
   saveDomError: string | null;
+  currentView: DomView;
+  undoStack: UndoRedoStackEntry[];
+  redoStack: UndoRedoStackEntry[];
+  hasUnsavedChanges: boolean;
 }
 
-export function domLoaderReducer(state: DomLoader, action: AppStateAction): DomLoader {
+export interface UndoRedoStackEntry {
+  dom: appDom.AppDom;
+  view: DomView;
+  timestamp: number;
+}
+
+const UNDO_HISTORY_LIMIT = 100;
+
+export function appStateReducer(state: AppState, action: AppStateAction): AppState {
   if (state.dom) {
     const newDom = domReducer(state.dom, action);
     const hasUnsavedDomChanges = newDom !== state.dom;
@@ -146,33 +158,6 @@ export function domLoaderReducer(state: DomLoader, action: AppStateAction): DomL
 
       return update(state, { dom: action.dom, savedDom: action.dom });
     }
-    default:
-      return state;
-  }
-}
-
-export interface AppState extends DomLoader {
-  currentView: DomView;
-  undoStack: UndoRedoStackEntry[];
-  redoStack: UndoRedoStackEntry[];
-  hasUnsavedChanges: boolean;
-}
-
-export type PublicAppState = Pick<AppState, 'dom' | 'currentView' | 'hasUnsavedChanges'>;
-
-interface UndoRedoStackEntry extends Omit<PublicAppState, 'currentView' | 'hasUnsavedChanges'> {
-  view: DomView;
-  timestamp: number;
-}
-
-const UNDO_HISTORY_LIMIT = 100;
-
-export function appStateReducer(state: AppState, action: AppStateAction): AppState {
-  const domLoaderState = domLoaderReducer(state, action);
-
-  state = { ...state, ...domLoaderState };
-
-  switch (action.type) {
     case 'UPDATE_HISTORY': {
       const updatedUndoStack = [
         ...state.undoStack,
@@ -410,34 +395,14 @@ function createAppStateApi(
 
 const [useAppStateContext, AppStateProvider] = createProvidedContext<AppState>('AppState');
 
-export function useDom(): Pick<AppState, 'dom'> {
-  const { dom } = useAppStateContext();
+export function useAppState(): AppState {
+  const appState = useAppStateContext();
 
-  if (!dom) {
+  if (!appState.dom) {
     throw new Error("Trying to access the DOM before it's loaded");
   }
 
-  return { dom };
-}
-
-export function useDomLoader(): DomLoader {
-  const { dom, savedDom, savingDom, unsavedDomChanges, saveDomError } = useAppStateContext();
-
-  if (!dom) {
-    throw new Error("Trying to access the DOM before it's loaded");
-  }
-
-  return { dom, savedDom, savingDom, unsavedDomChanges, saveDomError };
-}
-
-export function useAppState(): PublicAppState {
-  const { dom, currentView, hasUnsavedChanges } = useAppStateContext();
-
-  if (!dom) {
-    throw new Error("Trying to access the DOM before it's loaded");
-  }
-
-  return { dom, currentView, hasUnsavedChanges };
+  return appState;
 }
 
 const DomApiContext = React.createContext<DomApi>(createDomApi(() => undefined));
@@ -540,7 +505,7 @@ export default function AppProvider({ children }: DomContextProps) {
     [],
   );
 
-  const dispatchWithHistory = useEvent((action: AppStateAction) => {
+  const dispatchWithHistory = useEventCallback((action: AppStateAction) => {
     if (state.hasUnsavedChanges && isCancellableAction(action)) {
       // eslint-disable-next-line no-alert
       const ok = window.confirm(

@@ -5,7 +5,7 @@ import { Panel, PanelGroup, PanelResizeHandle } from '../../../components/resiza
 import RenderPanel from './RenderPanel';
 import ComponentPanel from './ComponentPanel';
 import { PageEditorProvider } from './PageEditorProvider';
-import { useDom } from '../../AppState';
+import { useAppState } from '../../AppState';
 import * as appDom from '../../../appDom';
 import ComponentCatalog from './ComponentCatalog';
 import NotFoundEditor from '../NotFoundEditor';
@@ -57,7 +57,7 @@ interface PageEditorProps {
 }
 
 export default function PageEditor({ nodeId }: PageEditorProps) {
-  const { dom } = useDom();
+  const { dom } = useAppState();
   const pageNode = appDom.getMaybeNode(dom, nodeId as NodeId, 'page');
 
   useUndoRedo();

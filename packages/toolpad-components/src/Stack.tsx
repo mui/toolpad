@@ -3,7 +3,7 @@ import createBuiltin from './createBuiltin';
 import { SX_PROP_HELPER_TEXT } from './constants';
 
 export default createBuiltin(Stack, {
-  helperText: 'The MUI [Stack](https://mui.com/material-ui/react-stack/) component.',
+  helperText: 'The Material UI [Stack](https://mui.com/material-ui/react-stack/) component.',
   argTypes: {
     direction: {
       helperText: 'The flex layout direction.',

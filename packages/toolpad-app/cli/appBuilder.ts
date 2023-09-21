@@ -1,6 +1,6 @@
 import invariant from 'invariant';
 import { buildApp } from '../src/server/toolpadAppBuilder';
-import { initProject, getAppOutputFolder, getComponents } from '../src/server/localMode';
+import { initProject } from '../src/server/localMode';
 
 async function main() {
   invariant(
@@ -18,8 +18,8 @@ async function main() {
   await buildApp({
     root: projectDir,
     base: '/prod',
-    getComponents,
-    outDir: getAppOutputFolder(projectDir),
+    getComponents: () => project.getComponents(),
+    outDir: project.getAppOutputFolder(),
   });
 
   await project.dispose();

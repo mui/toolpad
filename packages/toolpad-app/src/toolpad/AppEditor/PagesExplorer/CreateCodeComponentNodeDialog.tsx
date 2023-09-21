@@ -12,10 +12,10 @@ import {
 import * as React from 'react';
 import invariant from 'invariant';
 import CloseIcon from '@mui/icons-material/Close';
+import useEventCallback from '@mui/utils/useEventCallback';
 import * as appDom from '../../../appDom';
-import { useDom } from '../../AppState';
+import { useAppState } from '../../AppState';
 import DialogForm from '../../../components/DialogForm';
-import useEvent from '../../../utils/useEvent';
 import { useNodeNameValidation } from './validation';
 import client from '../../../api';
 import useLatest from '../../../utils/useLatest';
@@ -33,7 +33,7 @@ export default function CreateCodeComponentDialog({
   onClose,
   ...props
 }: CreateCodeComponentDialogProps) {
-  const { dom } = useDom();
+  const { dom } = useAppState();
 
   const existingNames = React.useMemo(
     () => appDom.getExistingNamesForChildren(dom, appDom.getApp(dom), 'codeComponents'),
@@ -43,7 +43,9 @@ export default function CreateCodeComponentDialog({
   const [name, setName] = React.useState(appDom.proposeName(DEFAULT_NAME, existingNames));
 
   // Reset form
-  const handleReset = useEvent(() => setName(appDom.proposeName(DEFAULT_NAME, existingNames)));
+  const handleReset = useEventCallback(() =>
+    setName(appDom.proposeName(DEFAULT_NAME, existingNames)),
+  );
 
   React.useEffect(() => {
     if (open) {

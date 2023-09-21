@@ -1,7 +1,7 @@
 import type * as React from 'react';
 import type { Branded } from '@mui/toolpad-utils/types';
 import type { SerializedError } from '@mui/toolpad-utils/errors';
-import { JSONSchema7 } from 'json-schema';
+import type { JSONSchema7 } from 'json-schema';
 import type { TOOLPAD_COMPONENT } from './constants';
 
 export type NodeId = Branded<string, 'NodeId'>;

@@ -4,77 +4,46 @@
 
 ## Component Library
 
-In order to access a list of built in components, hover over the **Component library** vertical bar to make it expand:
+To access the list of available Toolpad components, hover your cursor over the vertical bar labeled **Component library** to expand it.
 
-{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/concepts/building-ui/library.png", "alt": "Component library", "caption": "The Toolpad Component Library"  }}
+<video controls width="auto" height="100%" style="contain" alt="component-library">
+  <source src="/static/toolpad/docs/concepts/building-ui/component-library.mp4" type="video/mp4">
+  Your browser does not support the video tag.
+</video>
 
-Currently supported components:
+---
 
-- [Button](https://mui.com/material-ui/react-button/) - Use a button to capture user actions through a click.
-- Image - Display different types of images.
-- [DataGrid](https://mui.com/x/react-data-grid/) - Use the MUI X data grid component and easily render various types of tabular data.
-- [Text Field](https://mui.com/material-ui/react-text-field/) - Capture text from user input.
-- [Date Picker](https://mui.com/x/react-date-pickers/date-picker/) - Select a date from a date picker.
-- File Picker - Select a file from the file system.
-- [Text](https://mui.com/material-ui/react-typography/) - Present text content. Can be either plain text, markdow or links.
-- [Select](https://mui.com/material-ui/react-select/) - Capture user input from a list of options.
-- [Paper](https://mui.com/material-ui/react-paper/) - Provide a visual differantation for your components
-- [Tabs](https://mui.com/material-ui/react-tabs/) - A tabs strip that can be used to shift between different views.
-- [Container](https://mui.com/material-ui/react-container/) - A wrapper element that can be used to hide or show its children.
-- List - An array of components presented as a repeating list.
+Toolpad has many [built-in components](/toolpad/reference/components/) and we are always adding more. To make it easier for us to understand what to add next, please [upvote](https://github.com/mui/mui-toolpad/labels/waiting%20for%20%F0%9F%91%8D) the components you need, or open a [feature request](https://github.com/mui/mui-toolpad/issues/new?assignees=&labels=status%3A+needs+triage&projects=&template=2.feature.yml).
 
-We are working hard to add even more components. To make it easier for us to understand what should be added first, please help by [upvoting](https://github.com/mui/mui-toolpad/labels/waiting%20for%20%F0%9F%91%8D) components.
+## Using components
 
-## Adding components
+Each component has a set of properties that you can tweak in the **inspector panel** on the right. To view the page structure, and select or rename components, use the **page hierarchy explorer** on the bottom-left.
 
-1. With the component library open, click on a component and drag it over the canvas.
+{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/concepts/building-ui/canvas-1.png", "alt": "Toolpad panels", "caption": "Inspector panel and page hierarchy explorer" }}
 
-{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/concepts/building-ui/canvas-1.png", "alt": "Drag component", "caption": "Dragging a component to the canvas", "zoom": false  }}
+Below are the step-by-step instructions on adding, moving, deleting and resizing a component in Toolpad:
 
-2. The canvas will highlight the location where a component can be dropped. Release the mouse to place the component on the canvas.
+1. Open the component library and drag a component over the canvas.
+2. The canvas will highlight the location where the component can be dropped. Release the mouse to drop it.
+3. To select a component, click on it either in the canvas or in the page hierarchy explorer. An overlay indicates the selected component.
+4. To move a component, drag it from its drag handle in the overlay and drop it at its new location. The canvas will highlight available drop locations with a blue indicator.
+5. To delete a component, click the bin icon in the overlay. You can also press the <kbd class="key">Backspace</kbd> key while the component is selected.
+6. Components can be horizontally resized within the grid boundaries:
 
-{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/concepts/building-ui/canvas-2.png", "alt": "Drop a component", "caption": "Placing a component on the canvas", "zoom": false  }}
+{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/concepts/building-ui/canvas-8.png", "alt": "Resize component", "caption": "Resizing components along columns", "zoom": false }}
 
-## Selecting components
+Binding dynamic values to these properties is explained in the [managing state](/toolpad/concepts/managing-state/) section.
 
-Click any component in the canvas to select it. An overlay indicates the selected components.
+### Canvas grid
 
-{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/concepts/building-ui/canvas-3.png", "alt": "Drag component", "caption": "Selecting a component", "zoom": false  }}
-
-## Moving components
-
-In order to change position of a component, first you must select it. Then, click on the drag handler present in the overlay handle, drag it, and drop it at its new location. The canvas will highlight available drop locations with a blue indicator.
-
-{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/concepts/building-ui/canvas-4.gif", "alt": "Move component", "caption": "Moving a component", "aspectRatio": 2 }}
-
-## Removing components
-
-Select the component you want to remove. Click the bin icon in the overlay to remove it from the canvas. You can also press the <kbd class="key">Backspace</kbd> key to achieve the same result.
-
-## Inspector
-
-Each component has a specific set of properties that you can tweak in the inspector panel. This is available on the right side upon selecting a component.
-
-{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/concepts/building-ui/canvas-5.png", "alt": "Inspector panel", "caption": "Inspecting the data grid" }}
-
-We'll talk about binding dynamic values to these properties in the [managing state](/toolpad/concepts/managing-state/) section.
-
-## Canvas grid
-
-### Rows
+#### Rows
 
 Toolpad canvas uses a grid layout where you can use rows to position components:
 
 {{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/concepts/building-ui/canvas-6.png", "alt": "Canvas grid row", "caption": "Canvas grid rows", "zoom": false }}
 
-### Columns
+#### Columns
 
 Or place them in a dedicated column besides other components:
 
 {{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/concepts/building-ui/canvas-7.png", "alt": "Canvas grid columns", "caption": "Canvas grid columns", "zoom": false }}
-
-### Resizing components
-
-Components can be horizontally resized within the grid boundaries:
-
-{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/concepts/building-ui/canvas-8.png", "alt": "Resize component", "caption": "Resizing components along columns", "zoom": false }}

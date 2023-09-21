@@ -17,6 +17,7 @@ import {
   Typography,
   Button,
   Link,
+  Tooltip,
 } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import { errorFrom } from '@mui/toolpad-utils/errors';
@@ -41,12 +42,25 @@ import {
   serializeFunctionId,
 } from '../../toolpadDataSources/local/shared';
 import { LocalPrivateApi } from '../../toolpadDataSources/local/types';
+import usePageTitle from '../../utils/usePageTitle';
+
+const ExplorerHeader = styled(Stack)(({ theme }) => ({
+  backgroundColor: theme.palette.background.paper,
+  position: 'sticky',
+  top: 0,
+  left: 0,
+  width: '100%',
+  p: 1,
+  pl: 2,
+  zIndex: 1,
+}));
 
 const fileTreeItemClasses = generateUtilityClasses('FileTreeItem', ['actionButton', 'handlerItem']);
 
 const FileTreeItemRoot = styled(TreeItem)(({ theme }) => ({
   [`& .${treeItemClasses.label}`]: {
     display: 'flex',
+    fontSize: 15,
     flexDirection: 'row',
     alignItems: 'center',
     padding: 2,
@@ -57,23 +71,23 @@ const FileTreeItemRoot = styled(TreeItem)(({ theme }) => ({
     },
   },
 
+  [`& .${treeItemClasses.group}`]: {
+    borderLeft: `1px solid ${alpha(theme.palette.text.primary, 0.2)}`,
+    position: 'relative',
+    left: '-2px',
+  },
+
   [`& .${fileTreeItemClasses.actionButton}`]: {
     visibility: 'hidden',
   },
 
   [`& .${fileTreeItemClasses.handlerItem} .${treeItemClasses.label}`]: {
     fontFamily: theme.typography.fontFamilyCode,
-    fontSize: 15,
+    fontSize: 14,
     padding: 4,
     display: 'inline-block',
     overflow: 'hidden',
     textOverflow: 'ellipsis',
-  },
-
-  [`& .${treeItemClasses.group}`]: {
-    borderLeft: `1px solid ${alpha(theme.palette.text.primary, 0.2)}`,
-    position: 'relative',
-    left: '-2px',
   },
 }));
 
@@ -117,6 +131,8 @@ function HandlerFileTreeItem({ file }: HandlerFileTreeItemProps) {
 }
 
 export default function FunctionsEditor() {
+  usePageTitle(`Functions | Toolpad editor`);
+
   const theme = useTheme();
 
   const [selectedHandler, setSelectedHandler] = React.useState<string | null>(null);
@@ -242,25 +258,13 @@ export default function FunctionsEditor() {
     <ToolpadShell>
       <Box sx={{ height: 'calc(100vh - 48px)' }}>
         <PanelGroup direction="horizontal">
-          <Panel defaultSize={26} minSize={24}>
+          <Panel defaultSize={22} minSize={14}>
             <Box sx={{ height: '100%', overflow: 'auto', position: 'relative' }}>
-              <Stack
-                direction="row"
-                spacing={1}
-                sx={{
-                  backgroundColor: theme.palette.background.paper,
-                  position: 'sticky',
-                  top: 0,
-                  left: 0,
-                  width: '100%',
-                  padding: 1,
-                  zIndex: 1,
-                }}
-              >
+              <ExplorerHeader direction="row" alignItems="center" spacing={1}>
                 <TextField
                   value={search}
                   onChange={handleSearchChange}
-                  placeholder="Find function…"
+                  placeholder="Search"
                   InputProps={{
                     startAdornment: (
                       <InputAdornment position="start">
@@ -274,14 +278,18 @@ export default function FunctionsEditor() {
                         </IconButton>
                       </InputAdornment>
                     ) : null,
+                    sx: { fontSize: 15 },
                   }}
                   variant="outlined"
                   fullWidth
+                  size="small"
                 />
-                <IconButton size="medium" onClick={handleOpenCreateNewHandler}>
-                  <NoteAddIcon color="primary" fontSize="inherit" />
-                </IconButton>
-              </Stack>
+                <Tooltip title="Create new function">
+                  <IconButton color="primary" size="medium" onClick={handleOpenCreateNewHandler}>
+                    <NoteAddIcon />
+                  </IconButton>
+                </Tooltip>
+              </ExplorerHeader>
               <TreeView
                 ref={handlerTreeRef}
                 selected={selectedNodeId}
@@ -291,8 +299,7 @@ export default function FunctionsEditor() {
                 expanded={expanded}
                 onNodeToggle={(_event, nodeIds) => setExpanded(nodeIds)}
                 sx={{
-                  mt: -1,
-                  padding: 1,
+                  px: 1,
                 }}
               >
                 {isCreateNewHandlerOpen ? (
@@ -323,11 +330,10 @@ export default function FunctionsEditor() {
                               <JavascriptIcon fontSize="large" />
                             </InputAdornment>
                           }
-                          placeholder="New file name…"
                           fullWidth
                           sx={{
                             padding: 0.5,
-                            backgroundColor: 'none !important',
+                            fontSize: 15,
                           }}
                         />
                         <Popover
@@ -365,7 +371,9 @@ export default function FunctionsEditor() {
 
                 {introspection.data?.files.length === 0 ? (
                   <Stack alignItems="center" sx={{ mt: 2 }}>
-                    <Typography variant="body1">You don&apos;t have any functions yet…</Typography>
+                    <Typography variant="body1" fontSize={15}>
+                      You don&apos;t have any functions yet…
+                    </Typography>
                     <Button
                       onClick={handleOpenCreateNewHandler}
                       variant="outlined"
@@ -394,6 +402,7 @@ export default function FunctionsEditor() {
                     display: 'flex',
                     justifyContent: 'center',
                     alignItems: 'center',
+                    color: theme.palette.error.main,
                   }}
                 >
                   {errorFrom(introspection.error).message}
@@ -412,8 +421,8 @@ export default function FunctionsEditor() {
               }}
             >
               <Stack alignItems="center" sx={{ px: 4 }}>
-                <Typography variant="body1" textAlign="center">
-                  <strong>Custom Functions</strong> allow you to run your own Javascript code,
+                <Typography variant="body1" textAlign="center" fontSize={15}>
+                  <strong>Custom Functions</strong> allow you to run your own JavaScript code,
                   directly from your file system.
                 </Typography>
                 <Link
@@ -422,6 +431,7 @@ export default function FunctionsEditor() {
                   rel="noopener"
                   textAlign="center"
                   sx={{ mt: 1 }}
+                  fontSize={15}
                 >
                   Read more about Custom Functions
                 </Link>

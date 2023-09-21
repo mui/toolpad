@@ -1,16 +1,19 @@
 import * as React from 'react';
-import { styled } from '@mui/material/styles';
-import MuiDrawer from '@mui/material/Drawer';
-import List from '@mui/material/List';
-import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
-import IconButton from '@mui/material/IconButton';
-import ListItem from '@mui/material/ListItem';
-import ListItemButton from '@mui/material/ListItemButton';
-import ListItemIcon from '@mui/material/ListItemIcon';
-import ListItemText from '@mui/material/ListItemText';
+import { styled, useTheme } from '@mui/material/styles';
 import ArticleIcon from '@mui/icons-material/Article';
+import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import FunctionsIcon from '@mui/icons-material/Functions';
-import { Paper, Toolbar, useTheme } from '@mui/material';
+import {
+  ListItem,
+  ListItemButton,
+  Paper,
+  Toolbar,
+  Drawer as MuiDrawer,
+  List,
+  ListItemIcon,
+  ListItemText,
+  IconButton,
+} from '@mui/material';
 import { Link, matchPath, useLocation } from 'react-router-dom';
 
 const Drawer = styled(MuiDrawer, { shouldForwardProp: (prop) => prop !== 'open' })(
@@ -37,11 +40,12 @@ const Drawer = styled(MuiDrawer, { shouldForwardProp: (prop) => prop !== 'open' 
   },
 );
 
-const ExpandButton = styled(IconButton)({
+const ExpandIconButton = styled(IconButton)(({ theme }) => ({
   position: 'absolute',
   bottom: 20,
   right: 10,
-});
+  zIndex: theme.zIndex.drawer + 1,
+}));
 
 let initialIsExpanded = false;
 
@@ -84,50 +88,46 @@ export default function NavigationSidebar() {
 
             return (
               <ListItem key={name} disablePadding>
-                <Link to={path} style={{ textDecoration: 'none', width: '100%' }}>
-                  <ListItemButton
-                    selected={isSelected}
-                    sx={{
+                <ListItemButton
+                  component={Link}
+                  to={path}
+                  selected={isSelected}
+                  sx={{
+                    border: 'none',
+                    borderRadius: 0,
+                    borderLeft: `4px solid transparent`,
+                    height: 40,
+                    '&.Mui-selected': {
                       border: 'none',
                       borderRadius: 0,
-                      height: 40,
-                      '&.Mui-selected': {
-                        border: 'none',
-                        borderRadius: 0,
-                      },
+                      borderLeft: `4px solid ${theme.palette.primary.main}`,
+                    },
+                  }}
+                >
+                  <ListItemIcon sx={{ marginLeft: '-2px', marginRight: '-10px' }}>
+                    <OptionIcon color="primary" fontSize="medium" />
+                  </ListItemIcon>
+                  <ListItemText
+                    primary={name}
+                    primaryTypographyProps={{
+                      fontWeight: 'medium',
+                      variant: 'subtitle2',
                     }}
-                  >
-                    <ListItemIcon sx={{ marginRight: '-10px' }}>
-                      <OptionIcon color="primary" fontSize="medium" />
-                    </ListItemIcon>
-                    <ListItemText
-                      primary={name}
-                      primaryTypographyProps={{
-                        fontWeight: 'medium',
-                        variant: 'subtitle2',
-                      }}
-                    />
-                  </ListItemButton>
-                </Link>
+                  />
+                </ListItemButton>
               </ListItem>
             );
           })}
         </List>
       </Drawer>
-      <ExpandButton
-        color="primary"
-        onClick={toggleExpanded}
-        sx={{
-          zIndex: theme.zIndex.drawer + 1,
-        }}
-      >
+      <ExpandIconButton color="primary" onClick={toggleExpanded}>
         <ChevronLeftIcon
           sx={{
             transition: 'transform linear 30ms',
             transform: `rotate(${isExpanded ? 0 : 180}deg)`,
           }}
         />
-      </ExpandButton>
+      </ExpandIconButton>
     </Paper>
   );
 }

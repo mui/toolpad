@@ -1,6 +1,6 @@
 # Button
 
-<p class="description">Guide to configure a button component in Toolpad.</p>
+<p class="description">Learn about a button component and it's usage in Toolpad.</p>
 
 Buttons allow users to take actions, make choices with a single tap. Detailed documentation of the component properties is available in the reference section for [button](/toolpad/reference/components/button/#properties).
 
@@ -8,11 +8,11 @@ Buttons allow users to take actions, make choices with a single tap. Detailed do
 
 ## Variations
 
-The Button component has multiple variations supported in Toolpad. Let's look at each of these below:
+The Button component has multiple variations supported in Toolpad. Let's look at each of these below.
 
 ### Variant
 
-The variant property supports three different options: contained (default), outlined and text. Contained is a high-emphasis button suited for a primary action. Outlined is low-emphasis and for secondary action. Text is for less-pronounced actions to keep user focused on the main content.
+The variant property supports three different options: contained (default), outlined and text. Contained is a high-emphasis button suited for a primary action. Outlined is for low-emphasis, secondary action. Text is used for less-pronounced actions that ensure user remains focused on the main content.
 {{"demo": "ButtonVariant.js", "hideToolbar": true}}
 
 ### Color
@@ -27,16 +27,16 @@ The size property supports three options: small (default), medium and large.
 
 ### State
 
-The Button component supports different states like loading and disabled to better share the state of the component so that user can act accoridngly.
+Button supports states like loading and disabled to share the state of the component so that user can wait/act accoridngly.
 {{"demo": "ButtonState.js", "hideToolbar": true}}
 
 ## Usage
 
-Button component supports an **onClick** event handler property. It is used to instruct what action to happen in the event of a click. It supports 2 tabs:
+Button component supports an **onClick** event handler property. It is used to instruct what action to happen in the event of a click. It supports two tabs:
 
 ### JS Expression
 
-You can write any valid JS that you want to execute on the click of button. It can change component state or call backend code.
+You can write any valid JS that you want to execute on the click of button. It can change component state or call backend code. Below video shows how to take a user input and on a button click, show it in a text field component:
 
 <video controls width="100%" height="auto" style="contain" alt="button-onclick-js-expression">
   <source src="/static/toolpad/docs/components/button/button-usage.mp4" type="video/mp4">
@@ -45,7 +45,7 @@ You can write any valid JS that you want to execute on the click of button. It c
 
 ### Navigation
 
-From this tab, you can move from one page to the other in a Toolpad app.
+From this tab, you can configure to move from one page to the other in a Toolpad app.
 
 {{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/components/button/onclick-navigation.png", "alt": "Navigating to a page on button click", "caption": "Navigating to a page on button click", "indent": 1}}
 

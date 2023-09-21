@@ -2,7 +2,7 @@ import * as React from 'react';
 import { styled } from '@mui/material';
 import { useNavigate, useLocation } from 'react-router-dom';
 import PageEditor from './PageEditor';
-import DomProvider, { useAppState } from '../AppState';
+import { useAppState } from '../AppState';
 import AppEditorShell from './AppEditorShell';
 import NoPageFound from './NoPageFound';
 import { getPathnameFromView } from '../../utils/domView';
@@ -66,10 +66,8 @@ function FileEditor() {
 
 export default function Editor() {
   return (
-    <DomProvider>
-      <EditorRoot>
-        <FileEditor />
-      </EditorRoot>
-    </DomProvider>
+    <EditorRoot>
+      <FileEditor />
+    </EditorRoot>
   );
 }

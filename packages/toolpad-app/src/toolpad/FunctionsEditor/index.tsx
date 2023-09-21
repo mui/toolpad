@@ -34,7 +34,6 @@ import { Panel, PanelGroup, PanelResizeHandle } from '../../components/resizable
 import OpenCodeEditorButton from '../../components/OpenCodeEditor';
 import FlexFill from '../../components/FlexFill';
 import { FileIntrospectionResult } from '../../server/functionsTypesWorker';
-import ToolpadShell from '../ToolpadShell';
 import client from '../../api';
 import {
   parseFunctionId,
@@ -43,17 +42,6 @@ import {
 } from '../../toolpadDataSources/local/shared';
 import { LocalPrivateApi } from '../../toolpadDataSources/local/types';
 import usePageTitle from '../../utils/usePageTitle';
-
-const ExplorerHeader = styled(Stack)(({ theme }) => ({
-  backgroundColor: theme.palette.background.paper,
-  position: 'sticky',
-  top: 0,
-  left: 0,
-  width: '100%',
-  p: 1,
-  pl: 2,
-  zIndex: 1,
-}));
 
 const fileTreeItemClasses = generateUtilityClasses('FileTreeItem', ['actionButton', 'handlerItem']);
 
@@ -255,191 +243,203 @@ export default function FunctionsEditor() {
   }, []);
 
   return (
-    <ToolpadShell>
-      <Box sx={{ height: 'calc(100vh - 48px)' }}>
-        <PanelGroup direction="horizontal">
-          <Panel defaultSize={22} minSize={14}>
-            <Box sx={{ height: '100%', overflow: 'auto', position: 'relative' }}>
-              <ExplorerHeader direction="row" alignItems="center" spacing={1}>
-                <TextField
-                  value={search}
-                  onChange={handleSearchChange}
-                  placeholder="Search"
-                  InputProps={{
-                    startAdornment: (
-                      <InputAdornment position="start">
-                        <SearchIcon />
-                      </InputAdornment>
-                    ),
-                    endAdornment: search ? (
-                      <InputAdornment position="end">
-                        <IconButton onClick={handleClearSearch} edge="end">
-                          <ClearIcon />
-                        </IconButton>
-                      </InputAdornment>
-                    ) : null,
-                    sx: { fontSize: 15 },
-                  }}
-                  variant="outlined"
-                  fullWidth
-                  size="small"
-                />
-                <Tooltip title="Create new function">
-                  <IconButton color="primary" size="medium" onClick={handleOpenCreateNewHandler}>
-                    <NoteAddIcon />
-                  </IconButton>
-                </Tooltip>
-              </ExplorerHeader>
-              <TreeView
-                ref={handlerTreeRef}
-                selected={selectedNodeId}
-                onNodeSelect={handleSelectFunction}
-                defaultCollapseIcon={<ExpandMoreIcon />}
-                defaultExpandIcon={<ChevronRightIcon />}
-                expanded={expanded}
-                onNodeToggle={(_event, nodeIds) => setExpanded(nodeIds)}
-                sx={{
-                  px: 1,
-                }}
-              >
-                {isCreateNewHandlerOpen ? (
-                  <TreeItem
-                    nodeId="::create::"
-                    label={
-                      <React.Fragment>
-                        <InputBase
-                          ref={createNewInputRef}
-                          value={newHandlerInput}
-                          onChange={(event) =>
-                            setNewHandlerInput(event.target.value.replaceAll(/[^a-zA-Z0-9.]/g, ''))
-                          }
-                          autoFocus
-                          disabled={newHandlerLoading}
-                          endAdornment={newHandlerLoading ? <CircularProgress size={16} /> : null}
-                          onBlur={handleCreateNewCommit}
-                          onKeyDown={(event) => {
-                            if (event.key === 'Enter') {
-                              handleCreateNewCommit();
-                            } else if (event.key === 'Escape') {
-                              handleCloseCreateNewHandler();
-                              event.stopPropagation();
-                            }
-                          }}
-                          startAdornment={
-                            <InputAdornment position="start" sx={{ ml: '-6px', mr: '0px' }}>
-                              <JavascriptIcon fontSize="large" />
-                            </InputAdornment>
-                          }
-                          fullWidth
-                          sx={{
-                            padding: 0.5,
-                            fontSize: 15,
-                          }}
-                        />
-                        <Popover
-                          open={open}
-                          anchorEl={anchorEl}
-                          onClose={() => setAnchorEl(null)}
-                          disableAutoFocus
-                          anchorOrigin={{
-                            vertical: 'bottom',
-                            horizontal: 'left',
-                          }}
-                        >
-                          <Alert severity="error" variant="outlined">
-                            {inputError}
-                          </Alert>
-                        </Popover>
-                      </React.Fragment>
-                    }
-                    sx={{
-                      backgroundColor: alpha(theme.palette.primary.main, 0.2),
-                      '.MuiTreeItem-content': {
-                        backgroundColor: 'transparent',
-                      },
-                    }}
-                  />
-                ) : null}
-
-                {introspection.data?.files
-                  ?.filter((file) =>
-                    search ? file.name.toLowerCase().includes(search.toLowerCase()) : true,
-                  )
-                  .map((file) => (
-                    <HandlerFileTreeItem key={file.name} file={file} />
-                  ))}
-
-                {introspection.data?.files.length === 0 ? (
-                  <Stack alignItems="center" sx={{ mt: 2 }}>
-                    <Typography variant="body1" fontSize={15}>
-                      You don&apos;t have any functions yet…
-                    </Typography>
-                    <Button
-                      onClick={handleOpenCreateNewHandler}
-                      variant="outlined"
-                      startIcon={<NoteAddIcon />}
-                      size="medium"
-                      sx={{ mt: 1 }}
-                    >
-                      Create function
-                    </Button>
-                  </Stack>
-                ) : null}
-
-                {introspection.isLoading ? (
-                  <React.Fragment>
-                    <TreeItem disabled nodeId="::loading::" label={<Skeleton />} />
-                    <TreeItem disabled nodeId="::loading::" label={<Skeleton />} />
-                    <TreeItem disabled nodeId="::loading::" label={<Skeleton />} />
-                  </React.Fragment>
-                ) : null}
-              </TreeView>
-              {introspection.error ? (
-                <Box
-                  sx={{
-                    position: 'absolute',
-                    inset: '0 0 0 0',
-                    display: 'flex',
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                    color: theme.palette.error.main,
-                  }}
-                >
-                  {errorFrom(introspection.error).message}
-                </Box>
-              ) : null}
-            </Box>
-          </Panel>
-          <PanelResizeHandle />
-          <Panel>
-            <Box
+    <Box sx={{ height: 'calc(100vh - 48px)' }}>
+      <PanelGroup direction="horizontal">
+        <Panel defaultSize={22} minSize={14}>
+          <Box sx={{ height: '100%', overflow: 'auto', position: 'relative' }}>
+            <Stack
+              direction="row"
+              alignItems="center"
+              spacing={1}
               sx={{
-                height: '100%',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
+                backgroundColor: theme.palette.background.paper,
+                position: 'sticky',
+                top: 0,
+                left: 0,
+                width: '100%',
+                p: 1,
+                pl: 2,
+                zIndex: 1,
               }}
             >
-              <Stack alignItems="center" sx={{ px: 4 }}>
-                <Typography variant="body1" textAlign="center" fontSize={15}>
-                  <strong>Custom Functions</strong> allow you to run your own JavaScript code,
-                  directly from your file system.
-                </Typography>
-                <Link
-                  href="https://mui.com/toolpad/concepts/custom-functions"
-                  target="_blank"
-                  rel="noopener"
-                  textAlign="center"
-                  sx={{ mt: 1 }}
-                  fontSize={15}
-                >
-                  Read more about Custom Functions
-                </Link>
-              </Stack>
-            </Box>
-          </Panel>
-        </PanelGroup>
-      </Box>
-    </ToolpadShell>
+              <TextField
+                value={search}
+                onChange={handleSearchChange}
+                placeholder="Search"
+                InputProps={{
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <SearchIcon />
+                    </InputAdornment>
+                  ),
+                  endAdornment: search ? (
+                    <InputAdornment position="end">
+                      <IconButton onClick={handleClearSearch} edge="end">
+                        <ClearIcon />
+                      </IconButton>
+                    </InputAdornment>
+                  ) : null,
+                  sx: { fontSize: 15 },
+                }}
+                variant="outlined"
+                fullWidth
+                size="small"
+              />
+              <Tooltip title="Create new function">
+                <IconButton color="primary" size="medium" onClick={handleOpenCreateNewHandler}>
+                  <NoteAddIcon />
+                </IconButton>
+              </Tooltip>
+            </Stack>
+            <TreeView
+              ref={handlerTreeRef}
+              selected={selectedNodeId}
+              onNodeSelect={handleSelectFunction}
+              defaultCollapseIcon={<ExpandMoreIcon />}
+              defaultExpandIcon={<ChevronRightIcon />}
+              expanded={expanded}
+              onNodeToggle={(_event, nodeIds) => setExpanded(nodeIds)}
+              sx={{
+                px: 1,
+              }}
+            >
+              {isCreateNewHandlerOpen ? (
+                <TreeItem
+                  nodeId="::create::"
+                  label={
+                    <React.Fragment>
+                      <InputBase
+                        ref={createNewInputRef}
+                        value={newHandlerInput}
+                        onChange={(event) =>
+                          setNewHandlerInput(event.target.value.replaceAll(/[^a-zA-Z0-9.]/g, ''))
+                        }
+                        autoFocus
+                        disabled={newHandlerLoading}
+                        endAdornment={newHandlerLoading ? <CircularProgress size={16} /> : null}
+                        onBlur={handleCreateNewCommit}
+                        onKeyDown={(event) => {
+                          if (event.key === 'Enter') {
+                            handleCreateNewCommit();
+                          } else if (event.key === 'Escape') {
+                            handleCloseCreateNewHandler();
+                            event.stopPropagation();
+                          }
+                        }}
+                        startAdornment={
+                          <InputAdornment position="start" sx={{ ml: '-6px', mr: '0px' }}>
+                            <JavascriptIcon fontSize="large" />
+                          </InputAdornment>
+                        }
+                        fullWidth
+                        sx={{
+                          padding: 0.5,
+                          fontSize: 15,
+                        }}
+                      />
+                      <Popover
+                        open={open}
+                        anchorEl={anchorEl}
+                        onClose={() => setAnchorEl(null)}
+                        disableAutoFocus
+                        anchorOrigin={{
+                          vertical: 'bottom',
+                          horizontal: 'left',
+                        }}
+                      >
+                        <Alert severity="error" variant="outlined">
+                          {inputError}
+                        </Alert>
+                      </Popover>
+                    </React.Fragment>
+                  }
+                  sx={{
+                    backgroundColor: alpha(theme.palette.primary.main, 0.2),
+                    '.MuiTreeItem-content': {
+                      backgroundColor: 'transparent',
+                    },
+                  }}
+                />
+              ) : null}
+
+              {introspection.data?.files
+                ?.filter((file) =>
+                  search ? file.name.toLowerCase().includes(search.toLowerCase()) : true,
+                )
+                .map((file) => (
+                  <HandlerFileTreeItem key={file.name} file={file} />
+                ))}
+
+              {introspection.data?.files.length === 0 ? (
+                <Stack alignItems="center" sx={{ mt: 2 }}>
+                  <Typography variant="body1" fontSize={15}>
+                    You don&apos;t have any functions yet…
+                  </Typography>
+                  <Button
+                    onClick={handleOpenCreateNewHandler}
+                    variant="outlined"
+                    startIcon={<NoteAddIcon />}
+                    size="medium"
+                    sx={{ mt: 1 }}
+                  >
+                    Create function
+                  </Button>
+                </Stack>
+              ) : null}
+
+              {introspection.isLoading ? (
+                <React.Fragment>
+                  <TreeItem disabled nodeId="::loading::" label={<Skeleton />} />
+                  <TreeItem disabled nodeId="::loading::" label={<Skeleton />} />
+                  <TreeItem disabled nodeId="::loading::" label={<Skeleton />} />
+                </React.Fragment>
+              ) : null}
+            </TreeView>
+            {introspection.error ? (
+              <Box
+                sx={{
+                  position: 'absolute',
+                  inset: '0 0 0 0',
+                  display: 'flex',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  color: theme.palette.error.main,
+                }}
+              >
+                {errorFrom(introspection.error).message}
+              </Box>
+            ) : null}
+          </Box>
+        </Panel>
+        <PanelResizeHandle />
+        <Panel>
+          <Box
+            sx={{
+              height: '100%',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}
+          >
+            <Stack alignItems="center" sx={{ px: 4 }}>
+              <Typography variant="body1" textAlign="center" fontSize={15}>
+                <strong>Custom Functions</strong> allow you to run your own JavaScript code,
+                directly from your file system.
+              </Typography>
+              <Link
+                href="https://mui.com/toolpad/concepts/custom-functions"
+                target="_blank"
+                rel="noopener"
+                textAlign="center"
+                sx={{ mt: 1 }}
+                fontSize={15}
+              >
+                Read more about Custom Functions
+              </Link>
+            </Stack>
+          </Box>
+        </Panel>
+      </PanelGroup>
+    </Box>
   );
 }

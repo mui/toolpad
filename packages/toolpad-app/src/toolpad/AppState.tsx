@@ -393,7 +393,7 @@ function createAppStateApi(
   };
 }
 
-const [useAppStateContext, AppStateProvider] = createProvidedContext<AppState>('AppState');
+export const [useAppStateContext, AppStateProvider] = createProvidedContext<AppState>('AppState');
 
 export function useAppState(): AppState {
   const appState = useAppStateContext();

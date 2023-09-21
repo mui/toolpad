@@ -47,8 +47,6 @@ const ExpandIconButton = styled(IconButton)(({ theme }) => ({
   zIndex: theme.zIndex.drawer + 1,
 }));
 
-let initialIsExpanded = false;
-
 const navigationOptions = [
   {
     name: 'Pages',
@@ -67,13 +65,10 @@ export default function NavigationSidebar() {
 
   const location = useLocation();
 
-  const [isExpanded, setIsExpanded] = React.useState(initialIsExpanded);
+  const [isExpanded, setIsExpanded] = React.useState(false);
 
   const toggleExpanded = React.useCallback(() => {
-    setIsExpanded((previousValue) => {
-      initialIsExpanded = !previousValue;
-      return !previousValue;
-    });
+    setIsExpanded((previousValue) => !previousValue);
   }, []);
 
   return (

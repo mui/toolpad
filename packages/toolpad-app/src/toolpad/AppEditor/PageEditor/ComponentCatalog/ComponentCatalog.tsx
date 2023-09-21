@@ -114,20 +114,15 @@ export default function ComponentCatalog({ className }: ComponentCatalogProps) {
     () => setCreateCodeComponentDialogOpen(false),
     [],
   );
+  const [searchTerm, setSearchTerm] = React.useState('');
 
-  const handleSearchFilter = React.useCallback(
-    (event: React.ChangeEvent<HTMLInputElement>) => {
-      const { value } = event.target;
-      if (!value) {
-        setToolpadComponentList(toolpadComponents);
-        return;
-      }
-      const regex = new RegExp(value.split('').join('.*'), 'i');
-      const newlist = toolpadComponents.filter(([componentName]) => regex.test(componentName));
-      setToolpadComponentList(newlist);
-    },
-    [setToolpadComponentList, toolpadComponents],
-  );
+  const filteredItems = React.useMemo(() => {
+    if (!searchTerm) {
+      return toolpadComponents;
+    }
+    const regex = new RegExp(searchTerm.split('').join('.*'), 'i');
+    return toolpadComponents.filter(([componentName]) => regex.test(componentName));
+  }, [toolpadComponents, searchTerm]);
 
   return (
     <React.Fragment>
@@ -166,7 +161,8 @@ export default function ComponentCatalog({ className }: ComponentCatalogProps) {
                 id="input-with-icon-textfield"
                 placeholder="Search components..."
                 autoFocus
-                onChange={handleSearchFilter}
+                value={searchTerm}
+                onChange={(event) => setSearchTerm(event.target.value)}
                 InputProps={{
                   startAdornment: (
                     <InputAdornment position="start">
@@ -185,7 +181,7 @@ export default function ComponentCatalog({ className }: ComponentCatalogProps) {
               }}
             >
               <Box display="grid" gridTemplateColumns="1fr 1fr 1fr" gap={1} padding={1}>
-                {toolpadComponentList.map(([componentId, componentType]) => {
+                {filteredItems.map(([componentId, componentType]) => {
                   invariant(componentType, `No component definition found for "${componentId}"`);
                   return componentType.builtIn && !componentType.system ? (
                     <ComponentCatalogItem
@@ -246,7 +242,7 @@ export default function ComponentCatalog({ className }: ComponentCatalogProps) {
               </Box>
               <Collapse in={openCustomComponents} orientation={'vertical'}>
                 <Box display="grid" gridTemplateColumns="1fr 1fr 1fr" gap={1} padding={1} pt={0}>
-                  {toolpadComponentList.map(([componentId, componentType]) => {
+                  {filteredItems.map(([componentId, componentType]) => {
                     invariant(componentType, `No component definition found for "${componentId}"`);
                     return !componentType.builtIn ? (
                       <ComponentCatalogItem

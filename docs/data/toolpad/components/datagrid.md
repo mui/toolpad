@@ -1,6 +1,6 @@
-# Button
+# Data Grid
 
-<p class="description">Guide to configure a button component in Toolpad.</p>
+<p class="description">Features of a Data Grid component in Toolpad.</p>
 
 Buttons allow users to take actions, make choices with a single tap. Detailed documentation of the component properties is available in the reference section for [button](/toolpad/reference/components/button/#properties).
 

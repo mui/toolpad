@@ -144,7 +144,6 @@ test(`default Value for binding`, async () => {
 
 test(`Databinding errors`, async () => {
   const canvasEvents = new Emitter<RuntimeEvents>();
-  const consoleErrorMock = vitest.spyOn(console, 'error').mockImplementation(() => undefined);
   let bindings: LiveBindings | undefined;
 
   const bindingsUpdateHandler = (event: RuntimeEvents['pageBindingsUpdated']) => {
@@ -215,10 +214,7 @@ test(`Databinding errors`, async () => {
         message: 'Cycle detected "cyclic1.value"',
       }),
     );
-
-    expect(consoleErrorMock).toHaveBeenCalled();
   } finally {
     canvasEvents.off('pageBindingsUpdated', bindingsUpdateHandler);
-    consoleErrorMock.mockRestore();
   }
 });

@@ -120,7 +120,7 @@ jobs:
       - install_js
       - run:
           name: '`yarn prettier` changes committed?'
-          command: yarn prettier --check
+          command: yarn prettier:all --check
       - run:
           name: '`yarn jsonSchemas` changes committed?'
           command: |

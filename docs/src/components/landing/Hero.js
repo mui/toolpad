@@ -170,7 +170,7 @@ export default function Hero() {
             size="small"
             variant="outlined"
             clickable
-            onDelete={() => { }}
+            onDelete={() => {}}
             deleteIcon={<ChevronRightIcon />}
             sx={[
               (theme) => ({
@@ -258,8 +258,9 @@ export default function Hero() {
               height: '100%',
               borderRadius: '16px',
               padding: '8px',
-              background: `linear-gradient(120deg, ${(theme.vars || theme).palette.grey[50]
-                } 0%, ${alpha(theme.palette.primary[50], 0.5)} 150%)`,
+              background: `linear-gradient(120deg, ${
+                (theme.vars || theme).palette.grey[50]
+              } 0%, ${alpha(theme.palette.primary[50], 0.5)} 150%)`,
               border: '1px solid',
               borderColor: (theme.vars || theme).palette.grey[100],
               backfaceVisibility: 'hidden',
@@ -273,8 +274,9 @@ export default function Hero() {
             }),
             (theme) =>
               theme.applyDarkStyles({
-                background: `linear-gradient(120deg, ${(theme.vars || theme).palette.primaryDark[500]
-                  } 0%, ${alpha(theme.palette.primaryDark[800], 0.4)} 150%)`,
+                background: `linear-gradient(120deg, ${
+                  (theme.vars || theme).palette.primaryDark[500]
+                } 0%, ${alpha(theme.palette.primaryDark[800], 0.4)} 150%)`,
                 borderColor: `${alpha(theme.palette.primaryDark[300], 0.3)}`,
                 boxShadow: `0 4px 8px ${alpha(theme.palette.common.black, 0.8)}`,
               }),

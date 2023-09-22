@@ -121,7 +121,10 @@ export default function ComponentCatalog({ className }: ComponentCatalogProps) {
       return toolpadComponents;
     }
     const regex = new RegExp(searchTerm.split('').join('.*'), 'i');
-    return toolpadComponents.filter(([componentName]) => regex.test(componentName));
+    return toolpadComponents.filter(
+      ([componentName, component]) =>
+        regex.test(componentName) || component?.synonyms.some((name) => regex.test(name)),
+    );
   }, [toolpadComponents, searchTerm]);
 
   return (

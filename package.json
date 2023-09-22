@@ -38,7 +38,7 @@
     "test:argos": "node ./scripts/pushArgos.mjs",
     "test": "lerna run test",
     "check-types": "lerna run check-types",
-    "toolpad": "node ./packages/toolpad-app/cli.js",
+    "toolpad": "node packages/toolpad-app/cli.js",
     "jsonSchemas": "tsx ./scripts/docs/generateJsonSchemas.ts",
     "test:rest:start": "tsx ./scripts/restTestServer.ts"
   },

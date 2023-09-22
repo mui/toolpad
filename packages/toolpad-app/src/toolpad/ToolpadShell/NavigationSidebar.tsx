@@ -13,6 +13,7 @@ import {
   ListItemIcon,
   ListItemText,
   IconButton,
+  Tooltip,
 } from '@mui/material';
 import { Link, matchPath, useLocation } from 'react-router-dom';
 
@@ -82,35 +83,37 @@ export default function NavigationSidebar() {
             const isSelected = !!matchPath(`${path}/*`, location.pathname);
 
             return (
-              <ListItem key={name} disablePadding>
-                <ListItemButton
-                  component={Link}
-                  to={path}
-                  selected={isSelected}
-                  sx={{
-                    border: 'none',
-                    borderRadius: 0,
-                    borderLeft: `4px solid transparent`,
-                    height: 40,
-                    '&.Mui-selected': {
+              <Tooltip key={name} title={name} placement="right-end">
+                <ListItem disablePadding>
+                  <ListItemButton
+                    component={Link}
+                    to={path}
+                    selected={isSelected}
+                    sx={{
                       border: 'none',
                       borderRadius: 0,
-                      borderLeft: `4px solid ${theme.palette.primary.main}`,
-                    },
-                  }}
-                >
-                  <ListItemIcon sx={{ marginLeft: '-2px', marginRight: '-10px' }}>
-                    <OptionIcon color="primary" fontSize="medium" />
-                  </ListItemIcon>
-                  <ListItemText
-                    primary={name}
-                    primaryTypographyProps={{
-                      fontWeight: 'medium',
-                      variant: 'subtitle2',
+                      borderLeft: `4px solid transparent`,
+                      height: 40,
+                      '&.Mui-selected': {
+                        border: 'none',
+                        borderRadius: 0,
+                        borderLeft: `4px solid ${theme.palette.primary.main}`,
+                      },
                     }}
-                  />
-                </ListItemButton>
-              </ListItem>
+                  >
+                    <ListItemIcon sx={{ marginLeft: '-2px', marginRight: '-10px' }}>
+                      <OptionIcon color="primary" fontSize="medium" />
+                    </ListItemIcon>
+                    <ListItemText
+                      primary={name}
+                      primaryTypographyProps={{
+                        fontWeight: 'medium',
+                        variant: 'subtitle2',
+                      }}
+                    />
+                  </ListItemButton>
+                </ListItem>
+              </Tooltip>
             );
           })}
         </List>

@@ -220,7 +220,7 @@ const run = async () => {
 
   const answers = await inquirer.prompt(questions);
 
-  const absolutePath = path.join(process.cwd(), answers.path || pathArg);
+  const absolutePath = path.resolve(process.cwd(), answers.path || pathArg);
 
   await scaffoldProject(absolutePath, installFlag);
 

@@ -801,14 +801,14 @@ export default createBuiltin(DataGridComponent, {
       default: 'compact',
     },
     height: {
-      helperText: 'The height of the datagrid.',
+      helperText: 'The height of the data grid.',
       type: 'number',
       default: 350,
       minimum: 100,
     },
     loading: {
       helperText:
-        "Displays a loading animation indicating the datagrid isn't ready to present data yet.",
+        "Displays a loading animation indicating the data grid isn't ready to present data yet.",
       type: 'boolean',
     },
     hideToolbar: {

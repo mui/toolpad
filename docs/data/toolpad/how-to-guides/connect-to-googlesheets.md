@@ -57,7 +57,7 @@ export async function fetchSheet(spreadsheetId: string, range: string) {
 }
 ```
 
-Create a corresponding `fetchList` query. When you'll run the above function, you should be able to see data in your Toolpad app. You can bind it to a datagrid in your application.
+Create a corresponding `fetchList` query. When you'll run the above function, you should be able to see data in your Toolpad app. You can bind it to a data grid in your application.
 
 :::info
 The process remains the same if you want to connect to any other Google service such as Docs, Analytics, Youtube API etc.

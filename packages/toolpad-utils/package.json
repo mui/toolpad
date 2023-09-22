@@ -63,6 +63,5 @@
     "@types/prettier": "2.7.3",
     "@types/react": "18.2.21",
     "@types/react-is": "18.2.1"
-  },
-  "gitHead": "8bac56d5fbc6bddc925e2f143863e63cfb07e7c3"
+  }
 }

@@ -44,6 +44,10 @@ const pages: MuiPage[] = [
             pathname: '/toolpad/concepts/custom-functions',
             title: 'Custom functions',
           },
+          {
+            pathname: '/toolpad/concepts/data-providers',
+            title: 'Data providers',
+          },
         ],
       },
       {

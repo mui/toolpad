@@ -40,7 +40,7 @@
     "build": "tsup",
     "dev": "tsup --watch",
     "check-types": "tsup && tsc --noEmit",
-    "test": "jest"
+    "test": "vitest run"
   },
   "bugs": {
     "url": "https://github.com/mui/mui-toolpad/issues"

@@ -7,5 +7,7 @@ import * as path from 'path';
  * - We run jest from the monorepo root and it doesn't mock cwd for the projects. So
  *   we'll override it with __dirname
  *   See https://github.com/facebook/jest/issues/6155
+ *
+ * TODO: revisit whether still necessary with vitest
  */
 export default process.env.NODE_ENV === 'test' ? path.resolve(__dirname, '../..') : process.cwd();

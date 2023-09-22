@@ -13,7 +13,7 @@ The video below shows data grid features in preview mode in Toolpad:
 
 ## Variations
 
-There are two data grid properties density and hide toolbar that can change the visual appearance of a data grid.
+There are two data grid properties **density** and **hide toolbar** that can change the visual appearance of a data grid.
 
 {{"demo": "DataGrid.js", "hideToolbar": true}}
 

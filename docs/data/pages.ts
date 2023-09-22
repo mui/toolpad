@@ -66,7 +66,12 @@ const pages: MuiPage[] = [
   },
   {
     pathname: '/toolpad/components',
-    children: [{ pathname: '/toolpad/components/button' }],
+    children: [
+      { pathname: '/toolpad/components/button' },
+      {
+        pathname: '/toolpad/components/datagrid',
+      },
+    ],
   },
   {
     pathname: '/toolpad/how-to-guides',

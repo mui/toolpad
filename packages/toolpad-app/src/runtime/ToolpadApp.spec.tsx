@@ -15,7 +15,7 @@ import 'vitest-dom/extend-expect';
 import { LiveBindings, RuntimeEvents } from '@mui/toolpad-core';
 import { CanvasEventsContext } from '@mui/toolpad-core/runtime';
 import { Emitter } from '@mui/toolpad-utils/events';
-import { vitest, test, expect, afterEach } from 'vitest';
+import { test, expect, afterEach } from 'vitest';
 import ToolpadApp from './ToolpadApp';
 import * as appDom from '../appDom';
 import createRuntimeState from './createRuntimeState';

@@ -12,17 +12,12 @@ import {
 } from './Form';
 import { SX_PROP_HELPER_TEXT } from './constants';
 
-const LOCALE_LOADERS = new Map(
-  // jest is choking on this dynamic import
-  process.env.NODE_ENV === 'test'
-    ? []
-    : [
-        ['en', () => import('dayjs/locale/en')],
-        ['nl', () => import('dayjs/locale/nl')],
-        ['fr', () => import('dayjs/locale/fr')],
-        // TODO...
-      ],
-);
+const LOCALE_LOADERS = new Map([
+  ['en', () => import('dayjs/locale/en')],
+  ['nl', () => import('dayjs/locale/nl')],
+  ['fr', () => import('dayjs/locale/fr')],
+  // TODO...
+]);
 
 interface LoadableLocale {
   locale: string;

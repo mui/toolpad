@@ -1,4 +1,4 @@
-import { describe, test, expect } from '@jest/globals';
+import { describe, test, expect } from 'vitest';
 import { findImports, capitalize, uncapitalize, pascalCase, camelCase } from './strings';
 
 describe('findImports', () => {

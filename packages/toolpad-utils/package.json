@@ -40,7 +40,7 @@
     "build": "tsup",
     "dev": "tsup --watch",
     "check-types": "tsup && tsc --noEmit",
-    "test": "jest"
+    "test": "vitest run"
   },
   "bugs": {
     "url": "https://github.com/mui/mui-toolpad/issues"
@@ -61,7 +61,7 @@
   "devDependencies": {
     "@types/invariant": "2.2.35",
     "@types/prettier": "2.7.3",
-    "@types/react": "18.2.21",
+    "@types/react": "18.2.22",
     "@types/react-is": "18.2.1"
   }
 }

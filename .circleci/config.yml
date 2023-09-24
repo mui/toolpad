@@ -120,17 +120,19 @@ jobs:
       - install_js
       - run:
           name: '`yarn prettier` changes committed?'
-          command: yarn prettier:all --check
+          command: |
+            yarn prettier
+            yarn check-changes
       - run:
           name: '`yarn jsonSchemas` changes committed?'
           command: |
             yarn jsonSchemas
-            git add -A && git diff --exit-code --staged
+            yarn check-changes
       - run:
           name: '`yarn docs:build:api` changes committed?'
           command: |
             yarn docs:build:api
-            git add -A && git diff --exit-code --staged
+            yarn check-changes
 
   test_unit:
     <<: *defaults

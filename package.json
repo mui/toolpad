@@ -16,8 +16,7 @@
   },
   "scripts": {
     "markdownlint": "markdownlint-cli2 \"**/*.md\"",
-    "prettier": "pretty-quick --ignore-path .eslintignore",
-    "prettier:all": "prettier --write . --ignore-path .eslintignore",
+    "prettier": "prettier --write . --ignore-path .eslintignore",
     "deduplicate": "node scripts/deduplicate.mjs",
     "dev": "dotenv cross-env FORCE_COLOR=1 lerna -- run dev --stream --parallel --ignore docs",
     "docs:dev": "yarn workspace docs dev",
@@ -38,6 +37,7 @@
     "check-types": "lerna run check-types",
     "toolpad": "node packages/toolpad-app/cli.js",
     "jsonSchemas": "tsx ./scripts/docs/generateJsonSchemas.ts",
+    "check-changes": "git add -A && git diff --exit-code --staged",
     "test:rest:start": "tsx ./scripts/restTestServer.ts"
   },
   "devDependencies": {

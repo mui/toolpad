@@ -5,6 +5,3 @@ import * as pageProps from '../../../data/toolpad/concepts/data-providers.md?@mu
 export default function Page() {
   return <MarkdownDocs disableAd {...pageProps} />;
 }
-
-
-

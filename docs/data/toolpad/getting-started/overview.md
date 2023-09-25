@@ -26,7 +26,7 @@ Drag and drop pre-built UI components, connect your data sources, release your a
 
 - **Build faster than ever before:** from first step to a finished app in a few hours—simply drag and drop the components you need.
 - **Extensible with code:** build low-code with pro-code extensibility. You can write JavaScript anywhere in Toolpad as soon as you feel limited by the built-in features.
-- **Connect your data:** Toolpad lets you return data right from serverside functions which can be automatically connected to components on the page.
+- **Connect your data:** Toolpad lets you return data right from server-side functions which can be automatically connected to components on the page.
 - **Own your code:** All configuration is stored in local files which you can version-control, edit, git-sync and deploy in any way you want.
 
 ## Terminology

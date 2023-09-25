@@ -169,9 +169,9 @@ const rowHeaders = {
   'Support level': <ColumnHead label="Support level" />,
 };
 
-const yes = <IconImage name="yes" title="Included" />;
-const pending = <IconImage name="time" title="Work in progress" />;
-const no = <IconImage name="no" title="Not included" />;
+const yes = <IconImage name="pricing/yes" title="Included" />;
+const pending = <IconImage name="pricing/time" title="Work in progress" />;
+const no = <IconImage name="pricing/no" title="Not included" />;
 
 function Info(props) {
   const { value, metadata } = props;

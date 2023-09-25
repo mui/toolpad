@@ -29,7 +29,7 @@ const MONOREPO_PACKAGES = {
   '@mui/system': path.resolve(MONOREPO_PATH, './packages/mui-system/src'),
   '@mui/types': path.resolve(MONOREPO_PATH, './packages/mui-types'),
   '@mui/markdown': path.resolve(MONOREPO_PATH, './packages/markdown'),
-  '@mui/utils': path.resolve(MONOREPO_PATH, './packages/mui-utils'),
+  '@mui/utils': path.resolve(MONOREPO_PATH, './packages/mui-utils/src'),
 };
 
 export default withDocsInfra(

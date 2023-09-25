@@ -86,7 +86,7 @@ export default function CardGrid(props) {
                         {title}
                       </Typography>
                     </Box>
-                    {wip && <IconImage name="time" title="Work in progress" />}
+                    {wip && <IconImage name="pricing/time" title="Work in progress" />}
                   </Box>
                   <Typography variant="body2" color="text.secondary">
                     {description}

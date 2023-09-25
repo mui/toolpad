@@ -24,7 +24,7 @@
     "build": "tsup",
     "dev": "tsup --watch",
     "check-types": "tsc --noEmit",
-    "test": "cross-env NODE_OPTIONS=--experimental-vm-modules jest --detectOpenHandles --forceExit"
+    "test": "vitest run"
   },
   "engines": {
     "node": ">=18"
@@ -41,8 +41,7 @@
   "devDependencies": {
     "@types/inquirer": "9.0.3",
     "@types/invariant": "2.2.35",
-    "@types/jest": "29.5.4",
-    "@types/node": "20.6.0",
+    "@types/node": "20.6.4",
     "@types/semver": "7.5.2",
     "@types/yargs": "17.0.24"
   }

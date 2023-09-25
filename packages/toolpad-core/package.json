@@ -52,7 +52,7 @@
   },
   "devDependencies": {
     "@types/cookie": "0.5.2",
-    "@types/react": "18.2.21",
+    "@types/react": "18.2.22",
     "@types/react-is": "18.2.1",
     "concurrently": "8.2.1"
   },

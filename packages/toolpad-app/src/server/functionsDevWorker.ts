@@ -3,7 +3,7 @@ import * as path from 'path';
 import { createRequire } from 'node:module';
 import * as fs from 'fs/promises';
 import * as vm from 'vm';
-import * as url from 'url';
+import * as url from 'node:url';
 import { getCircularReplacer, replaceRecursive } from '@mui/toolpad-utils/json';
 import { ServerContext, getServerContext, withContext } from '@mui/toolpad-core/serverRuntime';
 import { isWebContainer } from '@webcontainer/env';

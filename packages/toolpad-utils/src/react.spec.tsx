@@ -1,11 +1,14 @@
 /**
- * @jest-environment jsdom
+ * @vitest-environment jsdom
  */
 
 import * as React from 'react';
-import { render, screen } from '@testing-library/react';
-import '@testing-library/jest-dom';
+import { cleanup, render, screen } from '@testing-library/react';
+import { test, expect, afterEach } from 'vitest';
 import { interleave } from './react';
+import 'vitest-dom/extend-expect';
+
+afterEach(cleanup);
 
 test('handles empty', async () => {
   render(<div data-testid="container">{interleave([], <div>quux</div>)}</div>);

@@ -4,11 +4,17 @@
 
 Toolpad functions are great to bring some backend state to the page, but they fall short when it comes to offering pagination and filtering capabilities from the server. Toolpad offers a special construct to enable this use case: Data providers. Data providers abstract server-side collections. They could be database tables, or REST APIs, or any data that represents a set of records that share a common interface. Data providers are defined as server-side objects and can be directly connected to a data grid to make it fully interactive.
 
-You can create new data provider in two ways
+Follow these steps to create a new data provider
 
-- **Through the UI:**
+1. Drag a data grid into the canvas
 
-- **In the file system:**
+1. Under its **Row Source** property, select the option "Data Provider".
+
+1. Click the data provider selector and choose "Create a new data provider".
+
+1. Name the new data provider and click **Create**
+
+1. You can click the code button to open your code editor with the data provider backend.
 
 ## pagination
 

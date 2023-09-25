@@ -115,7 +115,7 @@ function CreateNewDataProviderDialog({
   return (
     <Dialog open={open} onClose={onClose}>
       <form onSubmit={handleSubmit}>
-        <DialogTitle>Add a new data provider</DialogTitle>
+        <DialogTitle>Create a new data provider</DialogTitle>
         <DialogContent>
           <DialogContentText>
             To create a new data provider please enter the name here.
@@ -141,7 +141,7 @@ function CreateNewDataProviderDialog({
             disabled={!newName || !!errorMessage}
             loading={createProviderMutation.isLoading}
           >
-            Add
+            Create
           </LoadingButton>
         </DialogActions>
       </form>

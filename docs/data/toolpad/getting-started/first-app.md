@@ -124,7 +124,7 @@ Make sure to [install Node.js](https://nodejs.org/en) on your system.
 
 {{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/getting-started/first-app/step-11.png", "alt": "Bind image src to Java", "caption": "Binding the Image src to the query response", "indent": 1  }}
 
-6. Try selecting different rows in the datagrid to see the image update to a random image of the selected breed.
+6. Try selecting different rows in the data grid to see the image update to a random image of the selected breed.
 
 {{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/getting-started/first-app/step-12.png", "alt": "Image changes based on selection", "caption": "The image changing based on the selected row", "indent": 1  }}
 

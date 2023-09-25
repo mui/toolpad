@@ -1,5 +1,38 @@
 # Changelog
 
+## 0.1.29
+
+<!-- generated comparing v0.1.28..master -->
+
+_Sep 22, 2023_
+
+A big thanks to the 6 contributors who made this release possible. Here are some highlights ✨:
+
+Documentation improvements. Fix handling of dates in the data grid.
+
+- &#8203;<!-- 20 -->Update package.json (#2708) @JerryWu1234
+- &#8203;<!-- 19 -->Fix create-toolpad-app for absolute paths (#2682) @Janpot
+- &#8203;<!-- 18 -->Fix DataGrid date inferencing (#2706) @Janpot
+- &#8203;<!-- 17 -->fix it will be reset the value and fix 404 (#2693) @JerryWu1234
+- &#8203;<!-- 16 -->Add with-wasm example (#2700) @Janpot
+- &#8203;<!-- 15 -->hoist documentation dependencies again (#2701) @Janpot
+- &#8203;<!-- 14 -->Memory optimizations (#2689) @Janpot
+- &#8203;<!-- 13 -->Remove useEvent in favor for @mui/utils useEventCallback (#2702) @Janpot
+- &#8203;<!-- 12 -->Update theming docs (#2672) @Janpot
+- &#8203;<!-- 11 -->Bring in some fixes from #2546 (#2687) @Janpot
+- &#8203;<!-- 10 -->Remove unused eslint-plugin-prettier (#2688) @Janpot
+- &#8203;<!-- 09 -->Unify useDom, useDomLoader and useAppState (#2677) @Janpot
+- &#8203;<!-- 08 -->Avoid reloading queries twice on changes (#2675) @Janpot
+- &#8203;<!-- 07 -->Explicit dependencies (#2673) @Janpot
+- &#8203;<!-- 06 -->Update monorepo (#2681) @apedroferreira
+- &#8203;<!-- 05 -->Remove unused hook (#2671) @Janpot
+- &#8203;<!-- 04 -->[docs] Fix incorrect nomenclature (#2705) @bharatkashyap
+- &#8203;<!-- 03 -->[docs] Add file structure concepts page (#2636) @prakhargupta1
+- &#8203;<!-- 02 -->[docs] Replace some images, gifs with videos (#2662) @prakhargupta1
+- &#8203;<!-- 01 -->[website] Improve loading image @oliviertassinari
+
+All contributors of this release in alphabetical order: @apedroferreira, @bharatkashyap, @Janpot, @JerryWu1234, @oliviertassinari, @prakhargupta1
+
 ## 0.1.28
 
 <!-- generated comparing v0.1.27..master -->

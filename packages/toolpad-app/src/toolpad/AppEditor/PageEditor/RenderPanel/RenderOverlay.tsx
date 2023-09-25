@@ -5,7 +5,7 @@ import clsx from 'clsx';
 import invariant from 'invariant';
 
 import * as appDom from '../../../../appDom';
-import { useAppStateApi, useDom, useDomApi, useAppState } from '../../../AppState';
+import { useAppStateApi, useAppState, useDomApi } from '../../../AppState';
 import {
   DropZone,
   DROP_ZONE_BOTTOM,
@@ -143,7 +143,7 @@ interface RenderOverlayProps {
 }
 
 export default function RenderOverlay({ bridge }: RenderOverlayProps) {
-  const { dom } = useDom();
+  const { dom } = useAppState();
   const { currentView } = useAppState();
   const selectedNodeId = currentView.kind === 'page' ? currentView.selectedNodeId : null;
   const hoveredNodeId = currentView.kind === 'page' ? currentView.hoveredNodeId : null;

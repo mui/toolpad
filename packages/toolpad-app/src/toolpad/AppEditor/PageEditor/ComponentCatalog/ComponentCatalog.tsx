@@ -7,7 +7,7 @@ import invariant from 'invariant';
 import ComponentCatalogItem from './ComponentCatalogItem';
 import CreateCodeComponentNodeDialog from '../../PagesExplorer/CreateCodeComponentNodeDialog';
 import * as appDom from '../../../../appDom';
-import { useDom } from '../../../AppState';
+import { useAppState } from '../../../AppState';
 import { usePageEditorApi } from '../PageEditorProvider';
 import { useToolpadComponents } from '../../toolpadComponents';
 import useLocalStorageState from '../../../../utils/useLocalStorageState';
@@ -46,7 +46,7 @@ export interface ComponentCatalogProps {
 
 export default function ComponentCatalog({ className }: ComponentCatalogProps) {
   const api = usePageEditorApi();
-  const { dom } = useDom();
+  const { dom } = useAppState();
 
   const [openStart, setOpenStart] = React.useState(0);
   const [openCustomComponents, setOpenCustomComponents] = useLocalStorageState(

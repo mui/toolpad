@@ -9,7 +9,7 @@ import { NodeId } from '@mui/toolpad-core';
 import clsx from 'clsx';
 import invariant from 'invariant';
 import * as appDom from '../../../appDom';
-import { useAppStateApi, useDom, useAppState } from '../../AppState';
+import { useAppStateApi, useAppState } from '../../AppState';
 import CreatePageNodeDialog from './CreatePageNodeDialog';
 import useLocalStorageState from '../../../utils/useLocalStorageState';
 import NodeMenu from '../NodeMenu';
@@ -124,7 +124,7 @@ export interface PagesExplorerProps {
 }
 
 export default function PagesExplorer({ className }: PagesExplorerProps) {
-  const { dom } = useDom();
+  const { dom } = useAppState();
   const { currentView } = useAppState();
 
   const appStateApi = useAppStateApi();

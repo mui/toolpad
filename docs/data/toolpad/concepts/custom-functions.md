@@ -1,6 +1,6 @@
 # Custom Functions
 
-<p class="description">These offer a fast way to bring your exisitng functions to a Toolpad page.</p>
+<p class="description">These offer a fast way to bring your existing functions to a Toolpad page.</p>
 
 The most powerful way of bringing data into Toolpad is through your own code. You can define functions inside `toolpad/resources` and use them when creating a query of this type. The following video shows how you can use this feature to read data from PostgreSQL.
 

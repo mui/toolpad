@@ -1,17 +1,12 @@
 import * as path from 'path';
 import { InlineConfig, Plugin, build } from 'vite';
 import react from '@vitejs/plugin-react';
-import serializeJavascript from 'serialize-javascript';
 import { indent } from '@mui/toolpad-utils/strings';
-import { RUNTIME_CONFIG_WINDOW_PROPERTY } from '../constants';
 import type { ComponentEntry } from './localMode';
-import type { RuntimeConfig } from '../config';
-import * as appDom from '../appDom';
-import createRuntimeState from '../runtime/createRuntimeState';
+import { INITIAL_STATE_WINDOW_PROPERTY } from './toolpadAppServer';
 
 const MAIN_ENTRY = '/main.tsx';
 const CANVAS_ENTRY = '/canvas.tsx';
-const INITIAL_STATE_WINDOW_PROPERTY = '__initialToolpadState__';
 
 const componentsId = `virtual:toolpad:components.js`;
 export const resolvedComponentsId = `\0${componentsId}`;
@@ -59,32 +54,10 @@ export function getHtmlContent({ canvas }: GetHtmlContentParams) {
   `;
 }
 
-export interface PostProcessHtmlParams {
-  config: RuntimeConfig;
-  dom: appDom.AppDom;
-}
-
-export function postProcessHtml(html: string, { config, dom }: PostProcessHtmlParams): string {
-  const serializedConfig = serializeJavascript(config, { ignoreFunction: true });
-  const initialState = createRuntimeState({ dom });
-  const serializedInitialState = serializeJavascript(initialState, { isJSON: true });
-
-  const toolpadScripts = [
-    `<script>window[${JSON.stringify(
-      RUNTIME_CONFIG_WINDOW_PROPERTY,
-    )}] = ${serializedConfig}</script>`,
-    `<script>window[${JSON.stringify(
-      INITIAL_STATE_WINDOW_PROPERTY,
-    )}] = ${serializedInitialState}</script>`,
-  ];
-
-  return html.replace(`<!-- __TOOLPAD_SCRIPTS__ -->`, () => toolpadScripts.join('\n'));
-}
-
 interface ToolpadVitePluginParams {
   root: string;
   base: string;
-  getComponents: (root: string) => Promise<ComponentEntry[]>;
+  getComponents: () => Promise<ComponentEntry[]>;
 }
 
 function toolpadVitePlugin({ root, base, getComponents }: ToolpadVitePluginParams): Plugin {
@@ -158,7 +131,7 @@ function toolpadVitePlugin({ root, base, getComponents }: ToolpadVitePluginParam
         };
       }
       if (id === resolvedComponentsId) {
-        const components = await getComponents(root);
+        const components = await getComponents();
 
         const imports = components.map(({ name }) => `import ${name} from './components/${name}';`);
 
@@ -190,7 +163,7 @@ export interface CreateViteConfigParams {
   dev: boolean;
   base: string;
   plugins?: Plugin[];
-  getComponents: (root: string) => Promise<ComponentEntry[]>;
+  getComponents: () => Promise<ComponentEntry[]>;
 }
 
 export interface CreateViteConfigResult {
@@ -259,6 +232,7 @@ export function createViteConfig({
           '@mui/material/styles',
           '@mui/material/useMediaQuery',
           '@mui/utils',
+          '@mui/utils/useEventCallback',
           '@mui/x-data-grid-pro',
           '@mui/x-date-pickers/AdapterDayjs',
           '@mui/x-date-pickers/DesktopDatePicker',
@@ -309,7 +283,7 @@ export function createViteConfig({
 
 export interface ToolpadBuilderParams {
   outDir: string;
-  getComponents: (root: string) => Promise<ComponentEntry[]>;
+  getComponents: () => Promise<ComponentEntry[]>;
   root: string;
   base: string;
 }

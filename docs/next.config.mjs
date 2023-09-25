@@ -11,7 +11,7 @@ const withDocsInfra = require('@mui/monorepo/docs/nextConfigDocsInfra');
 const pkg = require('../package.json');
 const { findPages } = require('./src/modules/utils/find');
 
-const MONOREPO_PATH = path.resolve(currentDirectory, './node_modules/@mui/monorepo');
+const MONOREPO_PATH = path.resolve(currentDirectory, '../node_modules/@mui/monorepo');
 const MONOREPO_PACKAGES = {
   '@mui/base': path.resolve(MONOREPO_PATH, './packages/mui-base/src'),
   '@mui/codemod': path.resolve(MONOREPO_PATH, './packages/mui-codemod/src'),

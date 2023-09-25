@@ -223,7 +223,6 @@ export function ValueBindingEditor({ value, onChange }: ValueBindingEditorProps)
           Make the &quot;{label}&quot; property dynamic with a JavaScript expression. This property
           expects a type: <code>{propType?.type || 'any'}</code>.
         </Typography>
-
         <JsExpressionBindingEditor
           globalScope={globalScope}
           globalScopeMeta={globalScopeMeta}
@@ -234,7 +233,15 @@ export function ValueBindingEditor({ value, onChange }: ValueBindingEditorProps)
           }
           onChange={onChange}
         />
-
+        <Box
+          sx={{
+            marginTop: '20px',
+          }}
+        >
+          <Typography sx={{ mb: 2, color: 'red' }}>
+            The prettier config could not be loaded and therefore the code would not be formatted
+          </Typography>
+        </Box>
         <JsExpressionPreview jsRuntime={jsRuntime} input={value} globalScope={globalScope} />
       </Box>
     </Stack>

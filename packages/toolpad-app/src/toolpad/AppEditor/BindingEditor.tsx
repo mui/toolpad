@@ -207,7 +207,6 @@ export function ValueBindingEditor({ value, onChange, error }: ValueBindingEdito
   const handleTabChange = (event: React.SyntheticEvent, newValue: BindableType) => {
     setActiveTab(newValue);
   };
-  console.log(error, '>>>>');
   const jsExpressionBindingEditor = (
     <Stack direction="row" sx={{ height: 400, gap: 2, my: hasEnv ? 3 : 0 }}>
       <GlobalScopeExplorer sx={{ width: 250 }} value={globalScope} meta={globalScopeMeta} />

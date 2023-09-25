@@ -183,9 +183,11 @@ function getValueBindingTab(value: Maybe<BindableAttrValue<any>>) {
 }
 
 export interface ValueBindingEditorProps
-  extends WithControlledProp<JsExpressionAttrValue | EnvAttrValue | null> {}
+  extends WithControlledProp<JsExpressionAttrValue | EnvAttrValue | null> {
+  error: boolean;
+}
 
-export function ValueBindingEditor({ value, onChange }: ValueBindingEditorProps) {
+export function ValueBindingEditor({ value, onChange, error }: ValueBindingEditorProps) {
   const {
     label,
     globalScope,
@@ -205,7 +207,7 @@ export function ValueBindingEditor({ value, onChange }: ValueBindingEditorProps)
   const handleTabChange = (event: React.SyntheticEvent, newValue: BindableType) => {
     setActiveTab(newValue);
   };
-
+  console.log(error, '>>>>');
   const jsExpressionBindingEditor = (
     <Stack direction="row" sx={{ height: 400, gap: 2, my: hasEnv ? 3 : 0 }}>
       <GlobalScopeExplorer sx={{ width: 250 }} value={globalScope} meta={globalScopeMeta} />
@@ -233,15 +235,18 @@ export function ValueBindingEditor({ value, onChange }: ValueBindingEditorProps)
           }
           onChange={onChange}
         />
-        <Box
-          sx={{
-            marginTop: '20px',
-          }}
-        >
-          <Typography sx={{ mb: 2, color: 'red' }}>
-            The prettier config could not be loaded and therefore the code would not be formatted
-          </Typography>
-        </Box>
+        {error ? (
+          <Box
+            sx={{
+              marginTop: '20px',
+            }}
+          >
+            <Typography sx={{ mb: 2, color: 'red' }}>
+              Error while reading the prettier configuration: The prettier config could not be
+              loaded and therefore the code would not be formatted
+            </Typography>
+          </Box>
+        ) : null}
         <JsExpressionPreview jsRuntime={jsRuntime} input={value} globalScope={globalScope} />
       </Box>
     </Stack>
@@ -572,6 +577,7 @@ export function BindingEditorDialog<V>({
           <ActionEditor value={input} onChange={(newValue) => setInput(newValue)} />
         ) : (
           <ValueBindingEditor
+            error={!data ? false : Object?.keys(data).length === 0}
             value={
               (input as JsExpressionAttrValue)?.$$jsExpression || (input as EnvAttrValue)?.$$env
                 ? (input as JsExpressionAttrValue | EnvAttrValue)

@@ -12,11 +12,18 @@ import {
   DialogActions,
   Button,
   Box,
+  FormControl,
+  FormLabel,
+  RadioGroup,
+  FormControlLabel,
+  Radio,
 } from '@mui/material';
 import { errorFrom } from '@mui/toolpad-utils/errors';
 import AddIcon from '@mui/icons-material/Add';
 import { useMutation } from '@tanstack/react-query';
 import { LoadingButton } from '@mui/lab';
+import { generateUniqueString } from '@mui/toolpad-utils/strings';
+import { PaginationMode } from '@mui/toolpad-core';
 import { EditorProps } from '../../types';
 import client from '../../api';
 import type {
@@ -25,6 +32,7 @@ import type {
 } from '../../server/functionsTypesWorker';
 import { projectEvents } from '../../projectEvents';
 import OpenCodeEditorButton from '../../components/OpenCodeEditor';
+import type { CreateDataProviderOptions } from '../../server/FunctionsManager';
 
 projectEvents.on('functionsChanged', () => client.invalidateQueries('introspect', []));
 
@@ -86,9 +94,13 @@ function CreateNewDataProviderDialog({
     }
   }, [open, initialName]);
 
+  const [options, setOptions] = React.useState<CreateDataProviderOptions>({
+    paginationMode: 'index',
+  });
+
   const createProviderMutation = useMutation({
-    mutationKey: [newName],
-    mutationFn: () => client.mutation.createDataProvider(newName),
+    mutationKey: [newName, options],
+    mutationFn: () => client.mutation.createDataProvider(newName, options),
     onSuccess: () => {
       onCommit(newName);
       onClose();
@@ -112,6 +124,8 @@ function CreateNewDataProviderDialog({
     return null;
   }, [nameExists, createProviderMutation.error, newName]);
 
+  const paginationModeSelectId = React.useId();
+
   return (
     <Dialog open={open} onClose={onClose}>
       <form onSubmit={handleSubmit}>
@@ -133,6 +147,24 @@ function CreateNewDataProviderDialog({
             error={!!errorMessage}
             helperText={errorMessage}
           />
+
+          <FormControl>
+            <FormLabel id={paginationModeSelectId}>Pagination mode</FormLabel>
+            <RadioGroup
+              row
+              aria-labelledby={paginationModeSelectId}
+              value={options.paginationMode}
+              onChange={(event) =>
+                setOptions((existing) => ({
+                  ...existing,
+                  paginationMode: event.target.value as PaginationMode,
+                }))
+              }
+            >
+              <FormControlLabel value="index" control={<Radio />} label="Index based" />
+              <FormControlLabel value="cursor" control={<Radio />} label="Cursor based" />
+            </RadioGroup>
+          </FormControl>
         </DialogContent>
         <DialogActions>
           <Button onClick={onClose}>Cancel</Button>
@@ -197,6 +229,11 @@ function DataProviderSelector({ value, onChange }: EditorProps<string>) {
     [introspection],
   );
 
+  const handleCreateNewDataProvider = React.useCallback((suggestion: string) => {
+    setDialogValue(suggestion);
+    setDialogOpen(true);
+  }, []);
+
   return (
     <DataProviderSelectorRoot>
       <CreateNewDataProviderDialog
@@ -219,6 +256,9 @@ function DataProviderSelector({ value, onChange }: EditorProps<string>) {
         renderInput={(params) => (
           <TextField
             {...params}
+            InputLabelProps={{
+              shrink: true,
+            }}
             InputProps={{
               ...params.InputProps,
               endAdornment: (
@@ -236,6 +276,7 @@ function DataProviderSelector({ value, onChange }: EditorProps<string>) {
               ),
             }}
             label="Data Provider"
+            placeholder="Click to create or select a data provider"
             error={!!errorMessage}
             helperText={errorMessage}
           />
@@ -256,11 +297,13 @@ function DataProviderSelector({ value, onChange }: EditorProps<string>) {
         loading={isLoading}
         onChange={(event, newValue) => {
           if (typeof newValue === 'string') {
-            setDialogValue(newValue);
-            setDialogOpen(true);
+            handleCreateNewDataProvider(
+              newValue || generateUniqueString('dataProvider', existingNames),
+            );
           } else if (newValue && newValue.kind === 'create') {
-            setDialogValue(newValue.inputValue);
-            setDialogOpen(true);
+            handleCreateNewDataProvider(
+              newValue.inputValue || generateUniqueString('dataProvider', existingNames),
+            );
           } else {
             onChange(newValue ? `${newValue.file.name}:${newValue.dataProvider.name}` : undefined);
           }

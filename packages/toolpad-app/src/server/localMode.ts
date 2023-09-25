@@ -49,7 +49,7 @@ import { LocalQuery } from '../toolpadDataSources/local/types';
 import { ProjectEvents, ToolpadProjectOptions, CodeEditorFileType } from '../types';
 import { Awaitable } from '../utils/types';
 import EnvManager from './EnvManager';
-import FunctionsManager from './FunctionsManager';
+import FunctionsManager, { CreateDataProviderOptions } from './FunctionsManager';
 import { VersionInfo, checkVersion } from './versionInfo';
 import { VERSION_CHECK_INTERVAL } from '../constants';
 import DataManager from './DataManager';
@@ -1193,8 +1193,8 @@ class ToolpadProject {
     await writeFileRecursive(filePath, content, { encoding: 'utf-8' });
   }
 
-  async createDataProvider(name: string) {
-    return this.functionsManager.createDataProviderFile(name);
+  async createDataProvider(name: string, options: CreateDataProviderOptions) {
+    return this.functionsManager.createDataProviderFile(name, options);
   }
 
   async deletePage(name: string) {

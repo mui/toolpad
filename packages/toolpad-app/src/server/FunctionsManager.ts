@@ -25,6 +25,10 @@ import { Awaitable } from '../utils/types';
 import { format } from '../utils/prettier';
 import { compilerOptions } from './functionsShared';
 
+export interface CreateDataProviderOptions {
+  paginationMode: PaginationMode;
+}
+
 async function createDefaultFunction(filePath: string): Promise<string> {
   const result = await format(
     `
@@ -41,7 +45,10 @@ async function createDefaultFunction(filePath: string): Promise<string> {
   return result;
 }
 
-async function createDefaultDataProvider(filePath: string): Promise<string> {
+async function createDefaultDataProvider(
+  filePath: string,
+  options: CreateDataProviderOptions,
+): Promise<string> {
   const result = await format(
     `
     /**
@@ -51,10 +58,13 @@ async function createDefaultDataProvider(filePath: string): Promise<string> {
     import { createDataProvider } from '@mui/toolpad/server';
 
     export default createDataProvider({
-      paginationMode: 'index',
-      async getRecords({ paginationModel: { start, pageSize} }) {
+      ${options.paginationMode === 'cursor' ? 'paginationMode: "cursor",' : ''}
+      async getRecords({ paginationModel: ${
+        options.paginationMode === 'cursor' ? '{ cursor, pageSize }' : '{ start, pageSize }'
+      } }) {
         return {
           records: [],
+          ${options.paginationMode === 'cursor' ? 'cursor: null,' : ''}
         };
       }
     })
@@ -364,9 +374,9 @@ export default class FunctionsManager {
     this.extractedTypes = undefined;
   }
 
-  async createDataProviderFile(name: string): Promise<void> {
+  async createDataProviderFile(name: string, options: CreateDataProviderOptions): Promise<void> {
     const filePath = path.resolve(this.getResourcesFolder(), ensureSuffix(name, '.ts'));
-    const content = await createDefaultDataProvider(filePath);
+    const content = await createDefaultDataProvider(filePath, options);
     if (await fileExists(filePath)) {
       throw new Error(`"${name}" already exists`);
     }

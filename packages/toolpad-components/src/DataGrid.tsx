@@ -729,7 +729,7 @@ export default createBuiltin(DataGridComponent, {
         prop: 'Direct',
         dataProvider: 'Data provider',
       },
-      default: 'dataProvider',
+      default: 'prop',
       label: 'Rows source',
       control: { type: 'ToggleButtons', bindable: false },
     },

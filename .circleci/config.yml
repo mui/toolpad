@@ -113,24 +113,26 @@ jobs:
       - checkout
       - install_js
       - run:
-          name: '`pnpm prettier` changes committed?'
-          command: pnpm prettier --check
+          name: '`pnpm prettier:all` changes committed?'
+          command: |
+            pnpm prettier:all
+            pnpm check-changes
       - run:
           name: '`pnpm jsonSchemas` changes committed?'
           command: |
             pnpm jsonSchemas
-            git add -A && git diff --exit-code --staged
+            pnpm check-changes
       - run:
           name: '`pnpm docs:build:api` changes committed?'
           command: |
             pnpm docs:build:api
-            git add -A && git diff --exit-code --staged
+            pnpm check-changes
 
   test_unit:
     <<: *defaults
     resource_class: 'large'
     docker:
-      - image: mcr.microsoft.com/playwright:v1.38.0-focal
+      - image: mcr.microsoft.com/playwright:v1.38.1-focal
         environment:
           NODE_ENV: test
           TOOLPAD_TEST_RETRIES: 1

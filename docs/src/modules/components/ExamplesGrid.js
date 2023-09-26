@@ -75,6 +75,13 @@ function layouts() {
       href: 'https://github.com/mui/mui-toolpad/tree/master/examples/graphql',
       source: 'https://github.com/mui/mui-toolpad/tree/master/examples/graphql',
     },
+    {
+      title: 'With WASM',
+      description: 'A basic Toolpad application that demonstrates integrating with WASM modules.',
+      src: '/static/toolpad/marketing/with-wasm.png',
+      href: 'https://github.com/mui/mui-toolpad/tree/master/examples/with-wasm',
+      source: 'https://github.com/mui/mui-toolpad/tree/master/examples/with-wasm',
+    },
   ];
 }
 

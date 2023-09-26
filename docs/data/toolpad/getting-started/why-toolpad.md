@@ -17,15 +17,15 @@ After reviewing multiple approaches and tools, we noticed that there are a few r
 
 ### The problems with pro-code tools
 
-#### Don't let you move fast
+#### Inhibit fast development
 
-Every business wants features to be delivered at speed but to accomodate future use cases, developers are complelled to choose flexible solutions which results in compromise on speed. We believe that an architecturally well-designed tool empowers you to attain both speed and flexibilty simultaneously.
+Every organization aspires to achieve rapid delivery, but in order to accommodate potential use cases, developers are often compelled to opt for flexible pro-code solutions, which typically come at the expense of speed. They offer lower abstraction levels for more control but handling and scaling them soon becomes an unavoidable maintenance overhead.
 
-#### Make you write unnecessary code
+#### More lines of code
 
 Lots of boilerplate code is required to build an app from scratch. Similarly, lots of glue code is required to get backend data to the browser and hooked up to data displaying components.
 
-#### Force you to learn a front-end framework
+#### Compel you to learn front-end
 
 Building internal tools require you to know a front-end framework. While it may interest some, most internal tool developers find it an extra burden to maintain and often seek help from front-end professionls.
 

@@ -7,6 +7,7 @@ import { execa, ExecaChildProcess } from 'execa';
 import { test, expect, afterEach } from 'vitest';
 import { once } from 'events';
 import * as os from 'os';
+import { getAbsoluteUrl } from '../src/util';
 
 const TEST_TIMEOUT = process.env.CI ? 60000 : 600000;
 
@@ -109,4 +110,11 @@ afterEach(async () => {
     cp.kill('SIGKILL');
     await once(cp, 'exit');
   }
+});
+
+test('test absolute url', async () => {
+  const homeAbsoluteUrl = getAbsoluteUrl('~/test');
+  const cwdAbsoluteUrl = getAbsoluteUrl('./test');
+  expect(homeAbsoluteUrl).toEqual(path.resolve(os.homedir(), 'test'));
+  expect(cwdAbsoluteUrl).toEqual(path.resolve(process.cwd(), './test'));
 });

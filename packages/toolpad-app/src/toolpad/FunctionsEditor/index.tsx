@@ -20,6 +20,7 @@ import {
   Link,
   Tooltip,
   Snackbar,
+  Toolbar,
 } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import { errorFrom } from '@mui/toolpad-utils/errors';
@@ -29,6 +30,7 @@ import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import AddIcon from '@mui/icons-material/Add';
 import CloseIcon from '@mui/icons-material/Close';
 import JavascriptIcon from '@mui/icons-material/Javascript';
+import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import ClearIcon from '@mui/icons-material/Clear';
 import useBoolean from '@mui/toolpad-utils/hooks/useBoolean';
 import { useQuery } from '@tanstack/react-query';
@@ -461,31 +463,65 @@ export default function FunctionsEditor() {
           </Panel>
           <PanelResizeHandle />
           <Panel>
-            <Box
-              sx={{
-                height: '100%',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-              }}
-            >
-              <Stack alignItems="center" sx={{ px: 4 }}>
-                <Typography variant="body1" textAlign="center" fontSize={14}>
-                  <strong>Custom Functions</strong> allow you to run your own JavaScript code,
-                  directly from your file system.
-                </Typography>
-                <Link
-                  href="https://mui.com/toolpad/concepts/custom-functions"
-                  target="_blank"
-                  rel="noopener"
-                  textAlign="center"
-                  sx={{ mt: 1 }}
-                  fontSize={14}
+            {selectedHandler && selectedFile && selectedFunction ? (
+              <Toolbar sx={{ borderBottom: `1px solid ${theme.palette.divider}` }}>
+                <Stack
+                  direction="row"
+                  alignItems="center"
+                  justifyContent="space-between"
+                  sx={{ width: '100%', p: 1 }}
                 >
-                  Read more about Custom Functions
-                </Link>
-              </Stack>
-            </Box>
+                  <Stack direction="row" alignItems="center">
+                    <JavascriptIcon fontSize="large" />
+                    <Typography variant="subtitle1" fontSize={15}>
+                      {selectedFile}&nbsp;&nbsp;&gt;&nbsp;&nbsp;
+                      <span style={{ fontFamily: theme.typography.fontFamilyCode }}>
+                        <strong>{selectedFunction}</strong>
+                      </span>
+                    </Typography>
+                  </Stack>
+                  <Stack direction="row" alignItems="center" gap={1}>
+                    <OpenCodeEditorButton
+                      className={fileTreeItemClasses.actionButton}
+                      filePath={selectedFile}
+                      fileType="query"
+                      actionText="Edit"
+                      outlined
+                      iconButton
+                    />
+                    <Button variant="contained" size="medium" startIcon={<PlayArrowIcon />}>
+                      Preview
+                    </Button>
+                  </Stack>
+                </Stack>
+              </Toolbar>
+            ) : (
+              <Box
+                sx={{
+                  height: '100%',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                }}
+              >
+                <Stack alignItems="center" sx={{ px: 4 }}>
+                  <Typography variant="body1" textAlign="center" fontSize={14}>
+                    <strong>Custom Functions</strong> allow you to run your own JavaScript code,
+                    directly from your file system.
+                  </Typography>
+                  <Link
+                    href="https://mui.com/toolpad/concepts/custom-functions"
+                    target="_blank"
+                    rel="noopener"
+                    textAlign="center"
+                    sx={{ mt: 1 }}
+                    fontSize={14}
+                  >
+                    Read more about Custom Functions
+                  </Link>
+                </Stack>
+              </Box>
+            )}
           </Panel>
         </PanelGroup>
       </Box>
@@ -501,7 +537,6 @@ export default function FunctionsEditor() {
               <React.Fragment>
                 <OpenCodeEditorButton
                   className={fileTreeItemClasses.actionButton}
-                  iconButton
                   filePath={latestCreatedHandler}
                   fileType="query"
                 />

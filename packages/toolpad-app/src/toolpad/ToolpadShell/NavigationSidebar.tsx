@@ -13,7 +13,7 @@ import {
 } from '@mui/material';
 import { Link, matchPath, useLocation } from 'react-router-dom';
 
-const DRAWER_WIDTH = 72; // px
+const DRAWER_WIDTH = 74; // px
 
 const Drawer = styled(MuiDrawer)({
   width: DRAWER_WIDTH,
@@ -60,7 +60,8 @@ export default function NavigationSidebar() {
                     <OptionIcon color={isSelected ? 'primary' : 'action'} fontSize="medium" />
                   </IconButton>
                   <Typography
-                    fontSize={11}
+                    fontSize={12}
+                    fontWeight={isSelected ? 'bold' : 'regular'}
                     color={isSelected ? 'primary' : 'default'}
                     textAlign="center"
                   >

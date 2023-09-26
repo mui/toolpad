@@ -21,6 +21,8 @@ interface OpenCodeEditorButtonProps extends ButtonProps {
   fileType: string;
   onSuccess?: () => void;
   iconButton?: boolean;
+  actionText?: string;
+  outlined?: boolean;
 }
 
 interface MissingEditorDialogProps {
@@ -70,6 +72,8 @@ export default function OpenCodeEditorButton({
   fileType,
   iconButton,
   onSuccess,
+  actionText = 'Open',
+  outlined = false,
   ...rest
 }: OpenCodeEditorButtonProps) {
   const [missingEditorDialog, setMissingEditorDialog] = React.useState(false);
@@ -93,7 +97,7 @@ export default function OpenCodeEditorButton({
 
   return (
     <React.Fragment>
-      {iconButton ? (
+      {iconButton && !outlined ? (
         <Tooltip title="Open in code editor">
           <IconButton disabled={busy} size="small" onClick={handleClick} {...rest}>
             {busy ? (
@@ -104,8 +108,17 @@ export default function OpenCodeEditorButton({
           </IconButton>
         </Tooltip>
       ) : (
-        <LoadingButton disabled={busy} onClick={handleClick} loading={busy} {...rest}>
-          Open
+        <LoadingButton
+          disabled={busy}
+          onClick={handleClick}
+          loading={busy}
+          variant={outlined ? 'outlined' : 'text'}
+          startIcon={
+            iconButton && outlined ? <CodeIcon fontSize="inherit" color="primary" /> : null
+          }
+          {...rest}
+        >
+          {actionText}
         </LoadingButton>
       )}
       <MissingEditorDialog open={missingEditorDialog} onClose={setMissingEditorDialog} />

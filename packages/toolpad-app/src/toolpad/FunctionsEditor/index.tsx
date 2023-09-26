@@ -45,6 +45,7 @@ import {
 } from '../../toolpadDataSources/local/shared';
 import { LocalPrivateApi } from '../../toolpadDataSources/local/types';
 import usePageTitle from '../../utils/usePageTitle';
+import * as appDom from '../../appDom';
 
 const fileTreeItemClasses = generateUtilityClasses('FileTreeItem', ['actionButton', 'handlerItem']);
 
@@ -194,20 +195,42 @@ export default function FunctionsEditor() {
     handleCloseCreateNewHandlerDialog();
   }, [handleCloseCreateNewHandlerDialog]);
 
-  const [anchorEl, setAnchorEl] = React.useState<HTMLButtonElement | null>(null);
-  const createNewInputRef = React.useRef(null);
+  const existingFileNames = React.useMemo(
+    () =>
+      new Set(
+        introspection.data?.files.flatMap((file) => [
+          file.name,
+          `${file.name.substring(0, file.name.lastIndexOf('.'))}`,
+        ]) ?? [],
+      ),
+    [introspection],
+  );
+
+  const nextProposedName = React.useMemo(
+    () => appDom.proposeName('myfunctions', existingFileNames),
+    [existingFileNames],
+  );
+
+  const createNewInputRef = React.useRef<HTMLInputElement | null>(null);
+
+  const handleCreateNewHandler = React.useCallback(() => {
+    setNewHandlerInput(nextProposedName);
+    handleOpenCreateNewHandler();
+  }, [handleOpenCreateNewHandler, nextProposedName]);
+
+  const [anchorEl, setAnchorEl] = React.useState<HTMLInputElement | null>(null);
   const open = !!anchorEl;
 
   const inputError: string | null = React.useMemo(() => {
-    const alreadyExists = introspection.data?.files.some(
-      (file) => file.name === newHandlerInput || file.name === ensureSuffix(newHandlerInput, '.ts'),
-    );
-
+    const alreadyExists = existingFileNames.has(newHandlerInput);
     return alreadyExists ? 'File already exists' : null;
-  }, [introspection.data?.files, newHandlerInput]);
+  }, [existingFileNames, newHandlerInput]);
 
   React.useEffect(() => {
-    setAnchorEl(inputError ? createNewInputRef.current : null);
+    const createNewInput = createNewInputRef.current;
+    if (createNewInput) {
+      setAnchorEl(inputError ? createNewInput : null);
+    }
   }, [inputError]);
 
   const handleCreateNewCommit = React.useCallback(async () => {
@@ -235,6 +258,10 @@ export default function FunctionsEditor() {
     setExpanded([fileName]);
 
     handleCloseCreateNewHandler();
+
+    setTimeout(() => {
+      handlerTreeRef.current?.querySelector(`.${treeItemClasses.selected}`)?.scrollIntoView();
+    }, 0);
   }, [
     execPrivate,
     handleCloseCreateNewHandler,
@@ -260,7 +287,7 @@ export default function FunctionsEditor() {
     <React.Fragment>
       <Box sx={{ height: 'calc(100vh - 48px)' }}>
         <PanelGroup direction="horizontal">
-          <Panel defaultSize={18} minSize={14}>
+          <Panel defaultSize={16} minSize={16}>
             <Box sx={{ height: '100%', overflow: 'auto', position: 'relative' }}>
               <Stack
                 direction="row"
@@ -271,14 +298,13 @@ export default function FunctionsEditor() {
                   top: 0,
                   left: 0,
                   width: '100%',
-                  pl: 2,
+                  pl: 1,
                   zIndex: 1,
                 }}
               >
                 <TextField
                   value={search}
                   onChange={handleSearchChange}
-                  placeholder="Search…"
                   InputProps={{
                     startAdornment: (
                       <InputAdornment position="start">
@@ -299,7 +325,7 @@ export default function FunctionsEditor() {
                   size="small"
                 />
                 <Tooltip title="Create new function file">
-                  <IconButton size="medium" onClick={handleOpenCreateNewHandler}>
+                  <IconButton size="medium" onClick={handleCreateNewHandler}>
                     <AddIcon />
                   </IconButton>
                 </Tooltip>
@@ -325,13 +351,21 @@ export default function FunctionsEditor() {
                           ref={createNewInputRef}
                           value={newHandlerInput}
                           onChange={(event) =>
-                            setNewHandlerInput(event.target.value.replaceAll(/[^a-zA-Z0-9.]/g, ''))
+                            setNewHandlerInput(event.target.value.replaceAll(/[^a-zA-Z0-9]/g, ''))
                           }
-                          placeholder="myfunctions.ts"
                           autoFocus
                           disabled={newHandlerLoading}
                           endAdornment={newHandlerLoading ? <CircularProgress size={16} /> : null}
-                          onBlur={handleCreateNewCommit}
+                          onFocus={(event) => {
+                            event.target.select();
+                          }}
+                          onBlur={(event) => {
+                            if (event && event.target.value !== nextProposedName) {
+                              handleCreateNewCommit();
+                            } else {
+                              handleCloseCreateNewHandler();
+                            }
+                          }}
                           onKeyDown={(event) => {
                             if (event.key === 'Enter') {
                               handleCreateNewCommit();
@@ -390,7 +424,7 @@ export default function FunctionsEditor() {
                       You don&apos;t have any functions yet…
                     </Typography>
                     <Button
-                      onClick={handleOpenCreateNewHandler}
+                      onClick={handleCreateNewHandler}
                       variant="outlined"
                       startIcon={<AddIcon />}
                       size="medium"

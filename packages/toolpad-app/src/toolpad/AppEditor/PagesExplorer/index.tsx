@@ -209,6 +209,16 @@ export default function PagesExplorer({ className }: PagesExplorerProps) {
     setFalse: handleCloseCreateNewPageDialog,
   } = useBoolean(false);
 
+  const nextProposedName = React.useMemo(
+    () => appDom.proposeName(DEFAULT_NEW_PAGE_NAME, existingNames),
+    [existingNames],
+  );
+
+  const handleCreateNewPage = React.useCallback(() => {
+    setNewPageInput(nextProposedName);
+    handleOpenCreateNewPage();
+  }, [handleOpenCreateNewPage, nextProposedName]);
+
   const handleCloseCreateNewPage = React.useCallback(() => {
     setNewPageInput('');
     handleCloseCreateNewPageDialog();
@@ -245,6 +255,10 @@ export default function PagesExplorer({ className }: PagesExplorerProps) {
     });
 
     handleCloseCreateNewPage();
+
+    setTimeout(() => {
+      handlerTreeRef.current?.querySelector(`.${treeItemClasses.selected}`)?.scrollIntoView();
+    }, 0);
   }, [appStateApi, dom, handleCloseCreateNewPage, newPageInput, newPageInputErrorMsg]);
 
   const handleDeletePage = React.useCallback(
@@ -290,11 +304,6 @@ export default function PagesExplorer({ className }: PagesExplorerProps) {
     [appStateApi, dom],
   );
 
-  const nextProposedName = React.useMemo(
-    () => appDom.proposeName(DEFAULT_NEW_PAGE_NAME, existingNames),
-    [existingNames],
-  );
-
   return (
     <PagesExplorerRoot
       sx={{
@@ -305,6 +314,7 @@ export default function PagesExplorer({ className }: PagesExplorerProps) {
       className={className}
     >
       <TreeView
+        ref={handlerTreeRef}
         aria-label="pages explorer"
         selected={activeNode ? [activeNode] : []}
         onNodeSelect={handleSelect}
@@ -319,7 +329,7 @@ export default function PagesExplorer({ className }: PagesExplorerProps) {
           aria-level={1}
           labelText="Pages"
           createLabelText="Create page"
-          onCreate={handleOpenCreateNewPage}
+          onCreate={handleCreateNewPage}
         >
           {isCreateNewPageOpen ? (
             <TreeItem
@@ -331,7 +341,16 @@ export default function PagesExplorer({ className }: PagesExplorerProps) {
                     value={newPageInput}
                     onChange={(event) => setNewPageInput(event.target.value)}
                     autoFocus
-                    onBlur={handleCreateNewCommit}
+                    onFocus={(event) => {
+                      event.target.select();
+                    }}
+                    onBlur={(event) => {
+                      if (event && event.target.value !== nextProposedName) {
+                        handleCreateNewCommit();
+                      } else {
+                        handleCloseCreateNewPage();
+                      }
+                    }}
                     onKeyDown={(event) => {
                       if (event.key === 'Enter') {
                         handleCreateNewCommit();
@@ -341,7 +360,6 @@ export default function PagesExplorer({ className }: PagesExplorerProps) {
                       }
                     }}
                     fullWidth
-                    placeholder={nextProposedName}
                     sx={{
                       fontSize: 14,
                     }}

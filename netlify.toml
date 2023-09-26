@@ -5,7 +5,7 @@
   publish = "docs/export/"
 
   # Default build command.
-  command = "yarn docs:build && yarn docs:export"
+  command = "yarn lerna run build --scope @mui/toolpad-components  --scope @mui/toolpad-core  --scope @mui/toolpad-utils && yarn docs:build && yarn docs:export"
 
 [build.environment]
   NODE_VERSION = "18"

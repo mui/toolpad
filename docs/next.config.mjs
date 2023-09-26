@@ -53,8 +53,6 @@ export default withDocsInfra(
             ...config.resolve.alias,
             docs: path.resolve(MONOREPO_PATH, './docs'),
             [path.resolve(MONOREPO_PATH, './packages/mui-utils/macros/MuiError.macro')]: 'react',
-            react: path.resolve(currentDirectory, './node_modules/react'),
-            'react-dom': path.resolve(currentDirectory, './node_modules/react-dom'),
             ...MONOREPO_PACKAGES,
           },
         },

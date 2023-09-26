@@ -17,7 +17,7 @@
     "pretty": true,
     "rootDir": "src",
     "preserveWatchOutput": true,
-    "types": ["node", "jest"]
+    "types": ["node"]
   },
   "include": ["src/**/*.ts", "src/**/*.tsx"]
 }

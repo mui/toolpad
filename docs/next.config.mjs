@@ -54,6 +54,12 @@ export default withDocsInfra(
             docs: path.resolve(MONOREPO_PATH, './docs'),
             [path.resolve(MONOREPO_PATH, './packages/mui-utils/macros/MuiError.macro')]: 'react',
             ...MONOREPO_PACKAGES,
+            '@mui/toolpad-components': path.resolve(
+              currentDirectory,
+              '../packages/toolpad-components/src',
+            ),
+            '@mui/toolpad-core': path.resolve(currentDirectory, '../packages/toolpad-core/src'),
+            '@mui/toolpad-utils': path.resolve(currentDirectory, '../packages/toolpad-utils/src'),
           },
         },
         module: {

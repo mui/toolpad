@@ -1,5 +1,6 @@
 import * as React from 'react';
-import { Button, Stack } from '@mui/toolpad-components';
+import { Button } from '@mui/toolpad-components';
+import { Stack } from '@mui/material';
 
 const TOOLPAD_PROPS1 = {
   content: 'Loading',
@@ -15,7 +16,7 @@ const TOOLPAD_PROPS2 = {
 
 export default function BasicButton() {
   return (
-    <Stack spacing={2} direction="row">
+    <Stack spacing={2} direction="row" alignItems="center">
       <Button {...TOOLPAD_PROPS1} />
       <Button {...TOOLPAD_PROPS2} />
     </Stack>

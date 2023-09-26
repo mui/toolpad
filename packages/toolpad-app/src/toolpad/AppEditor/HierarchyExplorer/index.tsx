@@ -5,7 +5,7 @@ import { TreeView, TreeItem, TreeItemProps } from '@mui/x-tree-view';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import * as appDom from '../../../appDom';
-import { useDom, useDomApi, useAppState, useAppStateApi } from '../../AppState';
+import { useAppState, useDomApi, useAppStateApi } from '../../AppState';
 import EditableText from '../../../components/EditableText';
 import { ComponentIcon } from '../PageEditor/ComponentCatalog/ComponentCatalogItem';
 import { useNodeNameValidation } from '../PagesExplorer/validation';
@@ -19,7 +19,7 @@ export interface CustomTreeItemProps extends TreeItemProps {
 
 function CustomTreeItem(props: CustomTreeItemProps) {
   const domApi = useDomApi();
-  const { dom } = useDom();
+  const { dom } = useAppState();
   const appStateApi = useAppStateApi();
 
   const [domNodeEditable, setDomNodeEditable] = React.useState(false);
@@ -132,7 +132,7 @@ function RecursiveSubTree({ dom, root }: { dom: appDom.AppDom; root: appDom.Elem
 }
 
 export default function HierarchyExplorer() {
-  const { dom } = useDom();
+  const { dom } = useAppState();
   const { currentView } = useAppState();
   const appStateApi = useAppStateApi();
   const [expandedDomNodeIds, setExpandedDomNodeIds] = React.useState<string[]>([]);

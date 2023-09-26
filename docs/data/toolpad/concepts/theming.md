@@ -15,11 +15,7 @@
    - change your UI to light or dark mode.
    - set primary and secondary colors for your UI, from a predefined list of colors.
 
-3. The theme used in a project is configured by an auto-generated `theme.yml` file inside the `toolpad` folder.
-
-   :::info
-   For a detailed look at the supported options, please check out the [file schema](/toolpad/reference/file-schema/#file-Theme).
-   :::
+3. The theme used in a project is configured by an auto-generated `theme.yml` file inside the `toolpad` folder. The [file schema documentation](/toolpad/reference/file-schema/#file-Theme) contains detailed information on the supported options.
 
 ## Overrides
 

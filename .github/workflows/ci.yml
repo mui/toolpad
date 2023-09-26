@@ -18,7 +18,7 @@ permissions: {}
 
 jobs:
   test-dev:
-    if: ${{ github.event.ref == 'refs/heads/master'|| contains(github.event.pull_request.labels.*.name, 'Full test') }}
+    if: ${{ !github.event.pull_request || contains(github.event.pull_request.labels.*.name, 'Full test') }}
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:

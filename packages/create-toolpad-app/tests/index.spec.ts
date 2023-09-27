@@ -111,10 +111,3 @@ afterEach(async () => {
     await once(cp, 'exit');
   }
 });
-
-test('test absolute url', async () => {
-  const homeAbsoluteUrl = getAbsoluteUrl('~/test');
-  const cwdAbsoluteUrl = getAbsoluteUrl('./test');
-  expect(homeAbsoluteUrl).toEqual(path.resolve(os.homedir(), 'test'));
-  expect(cwdAbsoluteUrl).toEqual(path.resolve(process.cwd(), './test'));
-});

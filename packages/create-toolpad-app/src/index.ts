@@ -11,8 +11,8 @@ import { execaCommand } from 'execa';
 import { satisfies } from 'semver';
 import { readJsonFile } from '@mui/toolpad-utils/fs';
 import invariant from 'invariant';
+import { bashResolvePath } from '@mui/toolpad-utils/path';
 import { PackageJson } from './packageType';
-import { getAbsoluteUrl } from './util';
 
 type PackageManager = 'npm' | 'pnpm' | 'yarn';
 declare global {
@@ -221,7 +221,7 @@ const run = async () => {
 
   const answers = await inquirer.prompt(questions);
 
-  const absolutePath = getAbsoluteUrl(answers.path || pathArg);
+  const absolutePath = bashResolvePath(answers.path || pathArg);
 
   await scaffoldProject(absolutePath, installFlag);
 

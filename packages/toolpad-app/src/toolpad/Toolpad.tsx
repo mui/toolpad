@@ -15,6 +15,7 @@ import { APP_FUNCTIONS_ROUTE } from '../routes';
 import ToolpadShell from './ToolpadShell';
 import { getViewFromPathname } from '../utils/domView';
 import AppProvider, { AppState, useAppStateContext } from './AppState';
+import { GLOBAL_FUNCTIONS_FEATURE_FLAG } from '../constants';
 
 const Centered = styled('div')({
   height: '100%',
@@ -134,7 +135,9 @@ export default function Toolpad({ basename }: ToolpadProps) {
                 <AppProvider>
                   <RouteShell>
                     <Routes>
-                      <Route path={APP_FUNCTIONS_ROUTE} element={<FunctionsEditor />} />
+                      {GLOBAL_FUNCTIONS_FEATURE_FLAG ? (
+                        <Route path={APP_FUNCTIONS_ROUTE} element={<FunctionsEditor />} />
+                      ) : null}
                       <Route path="/*" element={<AppEditor />} />
                     </Routes>
                   </RouteShell>

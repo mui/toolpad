@@ -486,8 +486,7 @@ export default function FunctionsEditor() {
                       filePath={selectedFile}
                       fileType="query"
                       actionText="Edit"
-                      outlined
-                      iconButton
+                      variant="outlined"
                     />
                     <Button variant="contained" size="medium" startIcon={<PlayArrowIcon />}>
                       Preview

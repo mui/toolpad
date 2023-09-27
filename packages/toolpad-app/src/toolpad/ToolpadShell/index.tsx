@@ -2,6 +2,7 @@ import * as React from 'react';
 import { Stack, styled } from '@mui/material';
 import Header from './Header';
 import NavigationSidebar from './NavigationSidebar';
+import { GLOBAL_FUNCTIONS_FEATURE_FLAG } from '../../constants';
 
 export interface ToolpadShellProps {
   actions?: React.ReactNode;
@@ -27,7 +28,7 @@ export default function ToolpadShell({ children, ...props }: ToolpadShellProps) 
     <ToolpadShellRoot>
       <Header {...props} />
       <Stack direction="row" sx={{ flex: 1 }}>
-        <NavigationSidebar />
+        {GLOBAL_FUNCTIONS_FEATURE_FLAG ? <NavigationSidebar /> : null}
         <ViewPort>{children}</ViewPort>
       </Stack>
     </ToolpadShellRoot>

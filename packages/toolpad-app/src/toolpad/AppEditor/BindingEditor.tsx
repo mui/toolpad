@@ -184,7 +184,7 @@ function getValueBindingTab(value: Maybe<BindableAttrValue<any>>) {
 
 export interface ValueBindingEditorProps
   extends WithControlledProp<JsExpressionAttrValue | EnvAttrValue | null> {
-  error: boolean;
+  error: unknown;
 }
 
 export function ValueBindingEditor({ value, onChange, error }: ValueBindingEditorProps) {
@@ -241,8 +241,9 @@ export function ValueBindingEditor({ value, onChange, error }: ValueBindingEdito
             }}
           >
             <Typography sx={{ mb: 2, color: 'red' }}>
-              Error while reading the prettier configuration: The prettier config could not be
-              loaded and therefore the code would not be formatted
+              Error while reading the prettier configuration:
+              {(error as string) ??
+                'The prettier config could not be loaded and therefore the code would not be formatted'}
             </Typography>
           </Box>
         ) : null}
@@ -505,7 +506,7 @@ export function BindingEditorDialog<V>({
   open,
   onClose,
 }: BindingEditorDialogProps<V>) {
-  const { data } = client.useQuery('getPrettierConfig', []);
+  const { error, data } = client.useQuery('getPrettierConfig', []);
   const { propType, label } = useBindingEditorContext();
 
   const [input, setInput] = React.useState(value);
@@ -576,7 +577,7 @@ export function BindingEditorDialog<V>({
           <ActionEditor value={input} onChange={(newValue) => setInput(newValue)} />
         ) : (
           <ValueBindingEditor
-            error={!data ? false : Object?.keys(data).length === 0}
+            error={error}
             value={
               (input as JsExpressionAttrValue)?.$$jsExpression || (input as EnvAttrValue)?.$$env
                 ? (input as JsExpressionAttrValue | EnvAttrValue)

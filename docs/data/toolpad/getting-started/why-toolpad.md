@@ -23,7 +23,7 @@ Every organization aspires to achieve rapid delivery, but in order to accommodat
 
 #### More lines of code
 
-Lots of boilerplate code is required to build an app from scratch. Similarly, lots of glue code is required to get backend data to the browser and hooked up to data displaying components.
+Lots of boilerplate HTML, CSS and JavaScript is required to build a custom internal tool from scratch. Lots of glue code is also required just to get backend data to the browser and hooked up to data displaying components.
 
 #### Compel you to learn front-end
 
@@ -45,7 +45,9 @@ When working with external tools, developers often forfeit their autonomy and ar
 
 ## How Toolpad fits in
 
-Addressing all the aforementioned problems leads to a better developer experience. Toolpad solves them in the following ways:
+Addressing the aforementioned problems leads to a better developer experience. Toolpad solves them in the following ways:
+
+{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/getting-started/why-toolpad/why-toolpad.png", "alt": "How Toolpad fits in your codebase", "caption": "How Toolpad fits in your codebase", "zoom": false }}
 
 ### Front-end UI
 

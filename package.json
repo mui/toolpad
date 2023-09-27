@@ -44,7 +44,7 @@
   "devDependencies": {
     "@argos-ci/core": "0.12.0",
     "@mui/monorepo": "https://github.com/mui/material-ui.git",
-    "@mui/x-charts": "6.0.0-alpha.11",
+    "@mui/x-charts": "6.0.0-alpha.12",
     "@next/eslint-plugin-next": "13.5.2",
     "@playwright/test": "1.38.1",
     "@testing-library/react": "14.0.0",

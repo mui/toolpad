@@ -1,4 +1,4 @@
-import { homedir } from 'os';
+import os from 'os';
 import path from 'path';
 
 const IMAGE_EXTENSIONS = ['.jpg', '.jpeg', '.png', '.gif', '.svg', '.webp'];
@@ -17,6 +17,6 @@ export function hasImageExtension(pathName: string): boolean {
 // https://www.gnu.org/software/bash/manual/html_node/Tilde-Expansion.html
 export function bashResolvePath(pathName: string) {
   return pathName.startsWith('~/')
-    ? path.resolve(homedir(), pathName.slice(2))
+    ? path.resolve(os.homedir(), pathName.slice(2))
     : path.resolve(process.cwd(), pathName);
 }

@@ -7,7 +7,6 @@ import { execa, ExecaChildProcess } from 'execa';
 import { test, expect, afterEach } from 'vitest';
 import { once } from 'events';
 import * as os from 'os';
-import { getAbsoluteUrl } from '../src/util';
 
 const TEST_TIMEOUT = process.env.CI ? 60000 : 600000;
 

@@ -12,10 +12,11 @@ import {
   Typography,
   Alert,
   styled,
+  Divider,
   // Divider,
 } from '@mui/material';
 import { Controller, useForm } from 'react-hook-form';
-import { LoadingButton, TabContext, TabList } from '@mui/lab';
+import { TabContext, TabList } from '@mui/lab';
 import { useBrowserJsRuntime } from '@mui/toolpad-core/jsBrowserRuntime';
 import { useServerJsRuntime } from '@mui/toolpad-core/jsServerRuntime';
 import { Panel, PanelGroup, PanelResizeHandle } from '../../components/resizablePanels';
@@ -41,7 +42,8 @@ import MapEntriesEditor from '../../components/MapEntriesEditor';
 import { Maybe } from '../../utils/types';
 import AuthenticationEditor from './AuthenticationEditor';
 import { isSaveDisabled, validation } from '../../utils/forms';
-import * as appDom from '../../appDom';
+// import * as appDom from '../../appDom';
+import { useAppStateApi } from '../../toolpad/AppState';
 import ParametersEditor from '../../toolpad/AppEditor/PageEditor/ParametersEditor';
 import BodyEditor from './BodyEditor';
 import TabPanel from '../../components/TabPanel';
@@ -54,6 +56,7 @@ import useFetchPrivate from '../useFetchPrivate';
 import QueryPreview from '../QueryPreview';
 import { usePrivateQuery } from '../context';
 import config from '../../config';
+import QueryToolsContext from '../../toolpad/AppEditor/PageEditor/QueriesExplorer/QueryEditor2/QueryToolsContext';
 
 const HTTP_METHODS = ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'HEAD'];
 
@@ -257,8 +260,11 @@ function QueryEditor({
   globalScopeMeta,
   connectionParams: rawConnectionParams,
   value: input,
-  onChange: setInput,
+  settingsToggle,
+  settingsPanel,
+  tab,
 }: QueryEditorProps<RestConnectionParams, FetchQuery>) {
+  const appStateApi = useAppStateApi();
   const isBrowserSide = input.attributes.query.browser;
 
   const connectionParams = isBrowserSide ? null : rawConnectionParams;
@@ -266,6 +272,14 @@ function QueryEditor({
 
   const urlValue: BindableAttrValue<string> =
     input.attributes.query.url || getDefaultUrl(config, connectionParams);
+
+  const {
+    toolsTab,
+    handleToolsTabChange,
+    isPreviewLoading,
+    setIsPreviewLoading,
+    setHandleRunPreview,
+  } = React.useContext(QueryToolsContext);
 
   const introspection = usePrivateQuery<FetchPrivateQuery, IntrospectionResult>(
     {
@@ -277,67 +291,95 @@ function QueryEditor({
 
   const handleParamsChange = React.useCallback(
     (newParams: [string, BindableAttrValue<string>][]) => {
-      setInput((existing) => ({ ...existing, params: newParams }));
+      if (input?.name) {
+        appStateApi.setQueryDraftProp(input?.name, 'params', newParams, 'query');
+      }
     },
-    [setInput],
+    [appStateApi, input],
   );
 
   const handleUrlChange = React.useCallback(
     (newUrl: BindableAttrValue<string> | null) => {
-      setInput((existing) => appDom.setQueryProp(existing, 'url', newUrl || ''));
+      if (input?.name && input?.attributes?.query) {
+        appStateApi.setQueryDraftProp(input?.name, 'url', newUrl, 'query');
+      }
     },
-    [setInput],
+    [appStateApi, input],
   );
 
   const handleMethodChange = React.useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
-      setInput((existing) => appDom.setQueryProp(existing, 'method', event.target.value));
+      if (input?.name) {
+        appStateApi.setQueryDraftProp(input?.name, 'method', event.target.value, 'query');
+      }
     },
-    [setInput],
+    [appStateApi, input],
   );
 
   const handleTransformEnabledChange = React.useCallback(
     (transformEnabled: boolean) => {
-      setInput((existing) => appDom.setQueryProp(existing, 'transformEnabled', transformEnabled));
+      if (input?.name) {
+        appStateApi.setQueryDraftProp(
+          input?.name,
+          'transformEnabled',
+          transformEnabled,
+          'attributes',
+        );
+      }
     },
-    [setInput],
+    [appStateApi, input],
   );
 
   const handleTransformChange = React.useCallback(
     (transform: string) => {
-      setInput((existing) => appDom.setQueryProp(existing, 'transform', transform));
+      if (input?.name) {
+        appStateApi.setQueryDraftProp(input?.name, 'transform', transform, 'attributes');
+      }
     },
-    [setInput],
+    [appStateApi, input],
   );
 
   const handleBodyChange = React.useCallback(
     (newBody: Maybe<Body>) => {
-      setInput((existing) => appDom.setQueryProp(existing, 'body', newBody || undefined));
+      if (input?.name) {
+        appStateApi.setQueryDraftProp(input?.name, 'body', newBody || undefined, 'query');
+      }
     },
-    [setInput],
+    [appStateApi, input],
   );
 
   const handleSearchParamsChange = React.useCallback(
     (newSearchParams: BindableAttrEntries) => {
-      setInput((existing) => appDom.setQueryProp(existing, 'searchParams', newSearchParams));
+      if (input?.name) {
+        appStateApi.setQueryDraftProp(input?.name, 'searchParams', newSearchParams, 'query');
+      }
     },
-    [setInput],
+    [appStateApi, input],
   );
 
   const handleHeadersChange = React.useCallback(
     (newHeaders: BindableAttrEntries) => {
-      setInput((existing) => appDom.setQueryProp(existing, 'headers', newHeaders));
+      if (input?.name) {
+        appStateApi.setQueryDraftProp(input?.name, 'headers', newHeaders, 'query');
+      }
     },
-    [setInput],
+    [appStateApi, input],
   );
 
   const handleResponseTypeChange = React.useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
-      setInput((existing) =>
-        appDom.setQueryProp(existing, 'response', { kind: event.target.value } as ResponseType),
-      );
+      if (input?.name) {
+        appStateApi.setQueryDraftProp(
+          input?.name,
+          'response',
+          {
+            kind: event.target.value,
+          } as ResponseType,
+          'query',
+        );
+      }
     },
-    [setInput],
+    [appStateApi, input],
   );
 
   const paramsEntries = input.params || EMPTY_PARAMS;
@@ -381,8 +423,7 @@ function QueryEditor({
     globalScope: queryScope,
   });
 
-  const [activeConfigTab, setActiveConfigTab] = React.useState('urlQuery');
-  const [activeToolsTab, setActiveToolsTab] = React.useState('preview');
+  const [configTab, setConfigTab] = React.useState('urlQuery');
 
   const fetchPrivate = useFetchPrivate<FetchPrivateQuery, FetchResult>();
   const fetchPreview = React.useCallback(
@@ -392,16 +433,13 @@ function QueryEditor({
   );
 
   const [previewHar, setPreviewHar] = React.useState(() => createHarLog());
-  const {
-    preview,
-    runPreview: handleRunPreview,
-    isLoading: previewIsLoading,
-  } = useQueryPreview(
+  const { preview, runPreview } = useQueryPreview(
     fetchPreview,
     input.attributes.query,
     previewParams as Record<string, string>,
     {
       onPreview(result) {
+        setIsPreviewLoading(false);
         setPreviewHar((existing) =>
           result.har ? mergeHar(createHarLog(), existing, result.har) : existing,
         );
@@ -409,15 +447,19 @@ function QueryEditor({
     },
   );
 
+  const handleRunPreview = React.useCallback(() => {
+    setIsPreviewLoading(true);
+    runPreview();
+  }, [setIsPreviewLoading, runPreview]);
+
+  React.useEffect(() => {
+    setHandleRunPreview(() => handleRunPreview);
+  }, [handleRunPreview, setHandleRunPreview]);
+
   const handleHarClear = React.useCallback(() => setPreviewHar(createHarLog()), []);
 
-  const handleActiveConfigTabChange = React.useCallback(
-    (event: React.SyntheticEvent, newValue: string) => setActiveConfigTab(newValue),
-    [],
-  );
-
-  const handleActiveToolsTabChange = React.useCallback(
-    (event: React.SyntheticEvent, newValue: string) => setActiveToolsTab(newValue),
+  const handleConfigTabChange = React.useCallback(
+    (event: React.SyntheticEvent, newValue: string) => setConfigTab(newValue),
     [],
   );
 
@@ -433,117 +475,144 @@ function QueryEditor({
             borderRight: (theme) => `1px solid ${theme.palette.divider}`,
           }}
         >
-          <Box sx={{ display: 'grid', gridTemplateColumns: 'auto 1fr 0.1fr', gap: 1 }}>
-            <TextField
-              select
-              inputProps={{ sx: { fontSize: 10 } }}
-              value={input.attributes.query.method || 'GET'}
-              size="small"
+          <Stack direction={'row'} sx={{ display: 'flex', justifyContent: 'space-between' }}>
+            <Typography
+              fontSize={12}
               sx={{
-                '& .MuiSelect-select': {
-                  height: (theme) => theme.typography.pxToRem(20),
-                },
+                color: (theme) =>
+                  theme.palette.mode === 'dark' ? theme.palette.grey[500] : 'default',
               }}
-              onChange={handleMethodChange}
             >
-              {HTTP_METHODS.map((method) => (
-                <MenuItem key={method} value={method}>
-                  {method}
-                </MenuItem>
-              ))}
-            </TextField>
-            <BindableEditor<string>
-              liveBinding={liveUrl}
-              globalScope={queryScope}
-              globalScopeMeta={QUERY_SCOPE_META}
-              sx={{ flex: 1 }}
-              jsRuntime={jsServerRuntime}
-              label="url"
-              propType={{ type: 'string' }}
-              renderControl={(props) => <UrlControl baseUrl={baseUrl} {...props} />}
-              value={urlValue}
-              onChange={handleUrlChange}
-            />
-          </Box>
-          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
-            <TabContext value={activeConfigTab}>
-              <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
-                <TabList
-                  sx={{ '& button': { fontSize: 12, fontWeight: 'normal' } }}
-                  onChange={handleActiveConfigTabChange}
-                  aria-label="Fetch options active tab"
-                >
-                  <Tab label="URL query" value="urlQuery" />
-                  <Tab label="Body" value="body" />
-                  <Tab label="Headers" value="headers" />
-                  <Tab label="Response" value="response" />
-                  <Tab label="Transform" value="transform" />
-                </TabList>
-              </Box>
-              <TabPanel disableGutters value="urlQuery">
-                <ParametersEditor
-                  value={input.attributes.query.searchParams ?? []}
-                  onChange={handleSearchParamsChange}
-                  globalScope={queryScope}
-                  globalScopeMeta={QUERY_SCOPE_META}
-                  liveValue={liveSearchParams}
-                  jsRuntime={jsServerRuntime}
-                />
-              </TabPanel>
-              <TabPanel disableGutters value="body">
-                <BodyEditor
-                  value={input.attributes.query.body}
-                  onChange={handleBodyChange}
-                  globalScope={queryScope}
-                  globalScopeMeta={QUERY_SCOPE_META}
-                  method={input.attributes.query.method || 'GET'}
-                />
-              </TabPanel>
-              <TabPanel disableGutters value="headers">
-                <ParametersEditor
-                  value={input.attributes.query.headers ?? []}
-                  onChange={handleHeadersChange}
-                  globalScope={queryScope}
-                  globalScopeMeta={QUERY_SCOPE_META}
-                  liveValue={liveHeaders}
-                  jsRuntime={jsServerRuntime}
-                  envVarNames={envVarNames}
-                />
-              </TabPanel>
-              <TabPanel disableGutters value="response">
+              {tab === 'config' ? 'Configuration' : 'Settings'}
+            </Typography>
+            {settingsToggle}
+          </Stack>
+          <Divider />
+          {tab === 'config' ? (
+            <React.Fragment>
+              <Box
+                sx={{
+                  display: 'grid',
+                  gridTemplateColumns: 'auto 1fr 0.1fr',
+                  gap: 1,
+                  mt: 1,
+                  ml: 1,
+                }}
+              >
                 <TextField
                   select
-                  label="response type"
+                  inputProps={{ sx: { fontSize: 10 } }}
+                  value={input.attributes.query.method || 'GET'}
+                  size="small"
                   sx={{
-                    '& .MuiInputLabel-root': { fontSize: 12 },
-                    ' & .MuiInputBase-root': { fontSize: 12 },
-                    width: 200,
+                    '& .MuiSelect-select': {
+                      height: (theme) => theme.typography.pxToRem(20),
+                    },
                   }}
-                  value={input.attributes.query.response?.kind || 'json'}
-                  onChange={handleResponseTypeChange}
+                  onChange={handleMethodChange}
                 >
-                  <MenuItem value="raw">raw</MenuItem>
-                  <MenuItem value="json">JSON</MenuItem>
-                  <MenuItem value="csv" disabled>
-                    🚧 CSV
-                  </MenuItem>
-                  <MenuItem value="xml" disabled>
-                    🚧 XML
-                  </MenuItem>
+                  {HTTP_METHODS.map((method) => (
+                    <MenuItem key={method} value={method}>
+                      {method}
+                    </MenuItem>
+                  ))}
                 </TextField>
-              </TabPanel>
-              <TabPanel disableGutters value="transform">
-                <TransformInput
-                  value={input.attributes.query.transform ?? 'return data;'}
-                  onChange={handleTransformChange}
-                  enabled={input.attributes.query.transformEnabled ?? false}
-                  onEnabledChange={handleTransformEnabledChange}
-                  globalScope={{ data: preview?.untransformedData }}
-                  loading={false}
+                <BindableEditor<string>
+                  liveBinding={liveUrl}
+                  globalScope={queryScope}
+                  globalScopeMeta={QUERY_SCOPE_META}
+                  sx={{ flex: 1 }}
+                  jsRuntime={jsServerRuntime}
+                  label="url"
+                  propType={{ type: 'string' }}
+                  renderControl={(props) => <UrlControl baseUrl={baseUrl} {...props} />}
+                  value={urlValue}
+                  onChange={handleUrlChange}
                 />
-              </TabPanel>
-            </TabContext>
-          </Box>
+              </Box>
+              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1, mt: 1, ml: 1 }}>
+                <TabContext value={configTab}>
+                  <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
+                    <TabList
+                      sx={{ '& button': { fontSize: 12, fontWeight: 'normal' } }}
+                      onChange={handleConfigTabChange}
+                      aria-label="Fetch options active tab"
+                    >
+                      <Tab label="URL query" value="urlQuery" />
+                      <Tab label="Body" value="body" />
+                      <Tab label="Headers" value="headers" />
+                      <Tab label="Response" value="response" />
+                      <Tab label="Transform" value="transform" />
+                    </TabList>
+                  </Box>
+                  <TabPanel disableGutters value="urlQuery">
+                    <ParametersEditor
+                      value={input.attributes.query.searchParams ?? []}
+                      onChange={handleSearchParamsChange}
+                      globalScope={queryScope}
+                      globalScopeMeta={QUERY_SCOPE_META}
+                      liveValue={liveSearchParams}
+                      jsRuntime={jsServerRuntime}
+                    />
+                  </TabPanel>
+                  <TabPanel disableGutters value="body">
+                    <BodyEditor
+                      value={input.attributes.query.body}
+                      onChange={handleBodyChange}
+                      globalScope={queryScope}
+                      globalScopeMeta={QUERY_SCOPE_META}
+                      method={input.attributes.query.method || 'GET'}
+                    />
+                  </TabPanel>
+                  <TabPanel disableGutters value="headers">
+                    <ParametersEditor
+                      value={input.attributes.query.headers ?? []}
+                      onChange={handleHeadersChange}
+                      globalScope={queryScope}
+                      globalScopeMeta={QUERY_SCOPE_META}
+                      liveValue={liveHeaders}
+                      jsRuntime={jsServerRuntime}
+                      envVarNames={envVarNames}
+                    />
+                  </TabPanel>
+                  <TabPanel disableGutters value="response">
+                    <TextField
+                      select
+                      label="response type"
+                      sx={{
+                        '& .MuiInputLabel-root': { fontSize: 12 },
+                        ' & .MuiInputBase-root': { fontSize: 12 },
+                        width: 200,
+                      }}
+                      value={input.attributes.query.response?.kind || 'json'}
+                      onChange={handleResponseTypeChange}
+                    >
+                      <MenuItem value="raw">raw</MenuItem>
+                      <MenuItem value="json">JSON</MenuItem>
+                      <MenuItem value="csv" disabled>
+                        🚧 CSV
+                      </MenuItem>
+                      <MenuItem value="xml" disabled>
+                        🚧 XML
+                      </MenuItem>
+                    </TextField>
+                  </TabPanel>
+                  <TabPanel disableGutters value="transform">
+                    <TransformInput
+                      value={input.attributes.query.transform ?? 'return data;'}
+                      onChange={handleTransformChange}
+                      enabled={input.attributes.query.transformEnabled ?? false}
+                      onEnabledChange={handleTransformEnabledChange}
+                      globalScope={{ data: preview?.untransformedData }}
+                      loading={false}
+                    />
+                  </TabPanel>
+                </TabContext>
+              </Box>
+            </React.Fragment>
+          ) : (
+            settingsPanel
+          )}
         </Stack>
       </Panel>
       <PanelResizeHandle />
@@ -569,6 +638,7 @@ function QueryEditor({
               >
                 Parameters
               </Typography>
+              <Divider sx={{ mb: 1 }} />
               <ParametersEditor
                 value={paramsEntries}
                 onChange={handleParamsChange}
@@ -577,51 +647,49 @@ function QueryEditor({
                 liveValue={paramsEditorLiveValue}
                 jsRuntime={jsBrowserRuntime}
               />
-              <LoadingButton
-                disabled={previewIsLoading}
-                loading={previewIsLoading}
-                variant="contained"
-                color="primary"
-                onClick={handleRunPreview}
-                sx={{
-                  position: 'relative',
-                  bottom: 0,
-                  left: '80%',
-                  width: 'fit-content',
-                }}
-              >
-                Preview
-              </LoadingButton>
             </Box>
           </Panel>
           <PanelResizeHandle />
-          <Panel defaultSize={50}>
-            <TabContext value={activeToolsTab}>
-              <TabList
-                sx={{ '& button': { fontSize: 12, fontWeight: 'normal' } }}
-                onChange={handleActiveToolsTabChange}
-                aria-label="Query tools active tab"
-              >
-                <Tab label="Preview" value="preview" />
-                <Tab label="Dev Tools" value="devtools" />
-              </TabList>
-              <TabPanel value="preview" disableGutters>
-                <QueryPreview isLoading={previewIsLoading} error={preview?.error}>
-                  <ResolvedPreview
-                    preview={preview}
-                    onShowTransform={() => setActiveConfigTab('transform')}
+          {toolsTab ? (
+            <Panel defaultSize={50}>
+              <TabContext value={toolsTab}>
+                <Box
+                  sx={{
+                    borderBottom: 1,
+                    borderColor: 'divider',
+                    display: 'flex',
+                    flexDirection: 'row',
+                    justifyContent: 'space-between',
+                    height: 36,
+                  }}
+                >
+                  <TabList
+                    sx={{ '& button': { fontSize: 12, fontWeight: 'normal' } }}
+                    onChange={handleToolsTabChange}
+                    aria-label="Query tools active tab"
+                  >
+                    <Tab label="Preview" value="preview" />
+                    <Tab label="Dev Tools" value="devtools" />
+                  </TabList>
+                </Box>
+                <TabPanel value="preview" disableGutters>
+                  <QueryPreview isLoading={isPreviewLoading} error={preview?.error}>
+                    <ResolvedPreview
+                      preview={preview}
+                      onShowTransform={() => setConfigTab('transform')}
+                    />
+                  </QueryPreview>
+                </TabPanel>
+                <TabPanel value="devtools" disableGutters>
+                  <Devtools
+                    sx={{ width: '100%', height: '100%' }}
+                    har={previewHar}
+                    onHarClear={handleHarClear}
                   />
-                </QueryPreview>
-              </TabPanel>
-              <TabPanel value="devtools" disableGutters>
-                <Devtools
-                  sx={{ width: '100%', height: '100%' }}
-                  har={previewHar}
-                  onHarClear={handleHarClear}
-                />
-              </TabPanel>
-            </TabContext>
-          </Panel>
+                </TabPanel>
+              </TabContext>
+            </Panel>
+          ) : null}
         </PanelGroup>
       </Panel>
     </PanelGroup>

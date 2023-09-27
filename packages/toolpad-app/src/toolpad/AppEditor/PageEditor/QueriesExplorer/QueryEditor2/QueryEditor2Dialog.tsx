@@ -2,30 +2,26 @@ import {
   Box,
   Stack,
   TextField,
+  Tooltip,
   InputAdornment,
   Alert,
   MenuItem,
-  Fade,
   Typography,
-  Tooltip,
-  IconButton,
 } from '@mui/material';
 import * as React from 'react';
 import SettingsIcon from '@mui/icons-material/Settings';
 import DynamicFormIcon from '@mui/icons-material/DynamicForm';
-import { BindableAttrValue } from '@mui/toolpad-core';
+import { BindableAttrValue, LiveBinding } from '@mui/toolpad-core';
 import { useBrowserJsRuntime } from '@mui/toolpad-core/jsBrowserRuntime';
 import invariant from 'invariant';
-
 import { usePageEditorState } from '../../PageEditorProvider';
 import * as appDom from '../../../../../appDom';
 import dataSources from '../../../../../toolpadDataSources/client';
 import { useEvaluateLiveBinding } from '../../../useEvaluateLiveBinding';
 import { useAppState, useAppStateApi } from '../../../../AppState';
+import { QueryEditorTab } from '../../../../../types';
 import { ConnectionContextProvider } from '../../../../../toolpadDataSources/context';
-
 import BindableEditor from '../../BindableEditor';
-
 import client from '../../../../../api';
 
 function refetchIntervalInSeconds(maybeInterval?: number) {
@@ -37,95 +33,179 @@ function refetchIntervalInSeconds(maybeInterval?: number) {
 }
 
 interface QueryNodeEditorProps {
-  // onSave: (newNode: appDom.QueryNode) => void;
-  // onRemove?: (nodeId: NodeId) => void;
-  input: appDom.QueryNode;
+  draft: appDom.QueryNode;
+  saved?: appDom.QueryNode;
 }
 
-export default function QueryEditorPanel<Q>({ input }: QueryNodeEditorProps) {
-  const { dom } = useAppState();
+interface QuerySettingsPanelProps {
+  liveEnabled: LiveBinding;
+  pageState: any;
+  globalScopeMeta: any;
+  jsBrowserRuntime: any;
+}
+
+function QuerySettingsPanel({
+  liveEnabled,
+  pageState,
+  globalScopeMeta,
+  jsBrowserRuntime,
+}: QuerySettingsPanelProps) {
+  const { currentView } = useAppState();
   const appStateApi = useAppStateApi();
 
-  const [tab, setTab] = React.useState('config');
-
-  const handleTabChange = React.useCallback(() => {
-    setTab((prev) => (prev === 'config' ? 'settings' : 'config'));
-  }, []);
-
-  const [draft, setDraft] = React.useState<appDom.QueryNode<Q>>(input);
-
-  React.useEffect(() => {
-    if (draft) {
-      console.log('updating draft', draft);
-      appStateApi.setQueryDraft(draft);
+  const draftQuery = React.useMemo(() => {
+    if (
+      currentView.kind === 'page' &&
+      currentView.view?.kind === 'query' &&
+      currentView.queryPanel?.queryTabs &&
+      currentView.queryPanel?.currentTabIndex !== undefined
+    ) {
+      return currentView.queryPanel?.queryTabs[currentView.queryPanel?.currentTabIndex]?.draft;
     }
-  }, [appStateApi, draft]);
+    return null;
+  }, [currentView]);
 
-  const connectionId = appDom.deref(input?.attributes?.connectionId) ?? null;
-
-  const connection = connectionId ? appDom.getMaybeNode(dom, connectionId, 'connection') : null;
-  const dataSourceId = input?.attributes?.dataSource || null;
-  const dataSource = (dataSourceId && dataSources[dataSourceId]) || null;
-
-  const connectionParams = connection?.attributes?.params;
-
-  const { pageState, globalScopeMeta } = usePageEditorState();
-
-  const handleModeChange = React.useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
-    setDraft((prev) => {
-      if (prev && prev.attributes && prev.attributes.query) {
-        return {
-          ...prev,
-          attributes: {
-            ...prev?.attributes,
-            mode: event.target.value as any,
-          },
-        };
+  const handleModeChange = React.useCallback(
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      if (draftQuery?.name) {
+        appStateApi.setQueryDraftProp(draftQuery?.name, 'mode', event.target.value, 'attributes');
       }
-      return prev;
-    });
-  }, []);
+    },
+    [appStateApi, draftQuery],
+  );
 
-  const handleEnabledChange = React.useCallback((newValue: BindableAttrValue<boolean> | null) => {
-    setDraft((prev) => {
-      if (prev && prev.attributes && prev.attributes.query && typeof newValue === 'boolean') {
-        return {
-          ...prev,
-          attributes: {
-            ...prev?.attributes,
-            enabled: newValue,
-          },
-        };
+  const handleEnabledChange = React.useCallback(
+    (newValue: BindableAttrValue<boolean> | null) => {
+      if (draftQuery?.name && newValue !== null) {
+        appStateApi.setQueryDraftProp(draftQuery.name, 'enabled', newValue, 'attributes');
       }
-      return prev;
-    });
-  }, []);
+    },
+    [draftQuery, appStateApi],
+  );
 
   const handleRefetchIntervalChange = React.useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
       const interval = Number(event.target.value);
 
-      setDraft((prev) => {
-        if (
-          prev &&
-          prev.attributes &&
-          prev.attributes.query &&
-          !Number.isNaN(interval) &&
-          interval > 0
-        ) {
-          return {
-            ...prev,
-            attributes: {
-              ...prev?.attributes,
-              refetchInterval: interval * 1000,
-            },
-          };
-        }
-        return prev;
-      });
+      if (draftQuery?.name && !Number.isNaN(interval) && interval > 0) {
+        appStateApi.setQueryDraftProp(draftQuery?.name, interval * 1000, 'refetchInterval');
+      }
     },
-    [],
+    [draftQuery, appStateApi],
   );
+  return (
+    <Box
+      display={'flex'}
+      flexDirection={'column'}
+      sx={{
+        p: 0.25,
+        mt: 1,
+        ml: 1,
+        mr: 1,
+      }}
+    >
+      <Stack
+        display={'grid'}
+        gridTemplateRows="1fr 1fr 1fr"
+        gridTemplateColumns={'0.45fr 1fr'}
+        rowGap={0.5}
+      >
+        <Typography fontSize={12} sx={{ alignSelf: 'center' }}>
+          Set query mode:
+        </Typography>
+        <TextField
+          select
+          label="mode"
+          value={draftQuery?.attributes?.mode ?? 'query'}
+          onChange={handleModeChange}
+          sx={{
+            '& .MuiInputLabel-root': { fontSize: 12 },
+            '& .MuiInputBase-root': { fontSize: 12 },
+          }}
+        >
+          <MenuItem value="query">Fetch at any time to always be available on the page</MenuItem>
+          <MenuItem value="mutation">Only fetch on manual action</MenuItem>
+        </TextField>
+
+        <Typography fontSize={12} sx={{ alignSelf: 'center' }}>
+          Set refetch interval:
+        </Typography>
+        <TextField
+          InputProps={{
+            startAdornment: <InputAdornment position="start">s</InputAdornment>,
+          }}
+          sx={{
+            '& .MuiInputLabel-root': { fontSize: 12 },
+            '& .MuiInputBase-root': { fontSize: 12 },
+            maxWidth: 200,
+          }}
+          type="number"
+          label="Refetch interval"
+          value={refetchIntervalInSeconds(draftQuery?.attributes?.refetchInterval) ?? ''}
+          onChange={handleRefetchIntervalChange}
+          disabled={draftQuery?.attributes?.mode !== 'query'}
+        />
+        <Typography fontSize={12} sx={{ alignSelf: 'center' }}>
+          Set query enabled/disabled:
+        </Typography>
+        <BindableEditor<boolean>
+          liveBinding={liveEnabled}
+          globalScope={pageState}
+          globalScopeMeta={globalScopeMeta}
+          jsRuntime={jsBrowserRuntime}
+          label="Enabled"
+          propType={{ type: 'boolean' }}
+          value={draftQuery?.attributes?.enabled ?? true}
+          onChange={handleEnabledChange}
+          disabled={draftQuery?.attributes?.mode !== 'query'}
+          sx={{ maxWidth: 100 }}
+        />
+      </Stack>
+    </Box>
+  );
+}
+
+const settingsToggleIconStyles = {
+  p: 0,
+  mr: 1,
+  color: 'primary.main',
+  cursor: 'pointer',
+  '&:hover': {
+    color: 'primary.dark',
+  },
+};
+
+function QuerySettingsToggleButton({
+  tab,
+  handleTabChange,
+}: {
+  tab: QueryEditorTab;
+  handleTabChange: () => void;
+}) {
+  return (
+    <Tooltip title={`Show query ${tab === 'config' ? 'settings' : 'config'}`} placement="left">
+      {tab === 'config' ? (
+        <SettingsIcon sx={settingsToggleIconStyles} onClick={handleTabChange} />
+      ) : (
+        <DynamicFormIcon sx={settingsToggleIconStyles} onClick={handleTabChange} />
+      )}
+    </Tooltip>
+  );
+}
+
+export default function QueryEditorPanel({ draft, saved }: QueryNodeEditorProps) {
+  const { dom } = useAppState();
+
+  const connectionId =
+    appDom.deref(saved ? saved?.attributes?.connectionId : draft?.attributes?.connectionId) ?? null;
+
+  const connection = connectionId ? appDom.getMaybeNode(dom, connectionId, 'connection') : null;
+  const dataSourceId = saved ? saved?.attributes?.dataSource : draft?.attributes?.dataSource;
+  const dataSource = (dataSourceId && dataSources[dataSourceId]) || null;
+
+  const connectionParams = connection?.attributes?.params;
+
+  const { pageState, globalScopeMeta } = usePageEditorState();
 
   const queryEditorContext = React.useMemo(
     () => (dataSourceId ? { dataSourceId, connectionId } : null),
@@ -136,11 +216,9 @@ export default function QueryEditorPanel<Q>({ input }: QueryNodeEditorProps) {
 
   const liveEnabled = useEvaluateLiveBinding({
     jsRuntime: jsBrowserRuntime,
-    input: input?.attributes?.enabled || null,
+    input: draft?.attributes?.enabled || null,
     globalScope: pageState,
   });
-
-  const mode = input?.attributes?.mode || 'query';
 
   const execPrivate = React.useCallback(
     (method: string, args: any[]) => {
@@ -150,110 +228,39 @@ export default function QueryEditorPanel<Q>({ input }: QueryNodeEditorProps) {
     [dataSourceId],
   );
 
+  const [tab, setTab] = React.useState<QueryEditorTab>('config');
+
+  const handleTabChange = React.useCallback(() => {
+    setTab((prev) => (prev === 'config' ? 'settings' : 'config'));
+  }, []);
+
   return dataSourceId && dataSource && queryEditorContext ? (
     <ConnectionContextProvider value={queryEditorContext}>
-      <Box position={'relative'} height={'100%'}>
-        {tab === 'config' ? (
-          <Fade in={tab === 'config'} style={{ height: '100%' }}>
-            <div>
-              {draft ? (
-                <dataSource.QueryEditor
-                  connectionParams={connectionParams}
-                  value={draft}
-                  onChange={setDraft}
-                  globalScope={pageState}
-                  globalScopeMeta={globalScopeMeta}
-                  execApi={execPrivate}
-                />
-              ) : null}
-            </div>
-          </Fade>
-        ) : null}
-        {tab === 'settings' ? (
-          <Fade in={tab === 'settings'}>
-            <Stack
-              display={'grid'}
-              gridTemplateRows="1fr 1fr 1fr"
-              gridTemplateColumns={'200px 350px'}
-              rowGap={0.5}
-              marginX={2}
-              marginY={1}
-            >
-              <Typography fontSize={12} sx={{ alignSelf: 'center' }}>
-                Set query mode:
-              </Typography>
-              <TextField
-                select
-                label="mode"
-                value={mode}
-                onChange={handleModeChange}
-                sx={{
-                  '& .MuiInputLabel-root': { fontSize: 12 },
-                  '& .MuiInputBase-root': { fontSize: 12 },
+      <div>
+        {draft ? (
+          <dataSource.QueryEditor
+            connectionParams={connectionParams}
+            value={draft}
+            globalScope={pageState}
+            globalScopeMeta={globalScopeMeta}
+            execApi={execPrivate}
+            tab={tab}
+            settingsToggle={
+              <QuerySettingsToggleButton tab={tab} handleTabChange={handleTabChange} />
+            }
+            settingsPanel={
+              <QuerySettingsPanel
+                {...{
+                  liveEnabled,
+                  pageState,
+                  globalScopeMeta,
+                  jsBrowserRuntime,
                 }}
-              >
-                <MenuItem value="query">
-                  Fetch at any time to always be available on the page
-                </MenuItem>
-                <MenuItem value="mutation">Only fetch on manual action</MenuItem>
-              </TextField>
-
-              <Typography fontSize={12} sx={{ alignSelf: 'center' }}>
-                Set refetch interval:
-              </Typography>
-              <TextField
-                InputProps={{
-                  startAdornment: <InputAdornment position="start">s</InputAdornment>,
-                }}
-                sx={{
-                  '& .MuiInputLabel-root': { fontSize: 12 },
-                  '& .MuiInputBase-root': { fontSize: 12 },
-                  maxWidth: 200,
-                }}
-                type="number"
-                label="Refetch interval"
-                value={refetchIntervalInSeconds(input?.attributes?.refetchInterval) ?? ''}
-                onChange={handleRefetchIntervalChange}
-                disabled={mode !== 'query'}
               />
-              <Typography fontSize={12} sx={{ alignSelf: 'center' }}>
-                Set query enabled/disabled:
-              </Typography>
-              <BindableEditor<boolean>
-                liveBinding={liveEnabled}
-                globalScope={pageState}
-                globalScopeMeta={globalScopeMeta}
-                jsRuntime={jsBrowserRuntime}
-                label="Enabled"
-                propType={{ type: 'boolean' }}
-                value={input?.attributes?.enabled ?? true}
-                onChange={handleEnabledChange}
-                disabled={mode !== 'query'}
-                sx={{ maxWidth: 100 }}
-              />
-            </Stack>
-          </Fade>
+            }
+          />
         ) : null}
-        <Tooltip
-          title={tab === 'config' ? 'Show query settings' : 'Show query editor'}
-          placement="bottom"
-        >
-          <IconButton
-            color="primary"
-            aria-label="toggle query settings editor"
-            size="small"
-            onClick={handleTabChange}
-            sx={{
-              position: 'absolute',
-              top: 18,
-              left: '50%',
-              transform: 'translateX(-120%)',
-            }}
-          >
-            {tab === 'config' ? <SettingsIcon /> : <DynamicFormIcon />}
-          </IconButton>
-        </Tooltip>
-      </Box>
+      </div>
     </ConnectionContextProvider>
   ) : (
     <Alert severity="error">Datasource &quot;{dataSourceId}&quot; not found</Alert>

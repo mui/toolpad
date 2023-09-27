@@ -2,7 +2,18 @@ import * as React from 'react';
 import clsx from 'clsx';
 import { NodeId } from '@mui/toolpad-core';
 import invariant from 'invariant';
-import { styled, Box, Button, IconButton, Typography, Popover, Stack, Paper } from '@mui/material';
+import {
+  styled,
+  Box,
+  Button,
+  IconButton,
+  Tooltip,
+  Typography,
+  Popover,
+  Stack,
+  Paper,
+  SxProps,
+} from '@mui/material';
 import { TreeView, TreeItem, TreeItemProps, treeItemClasses } from '@mui/x-tree-view';
 import AddIcon from '@mui/icons-material/Add';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
@@ -12,11 +23,8 @@ import * as appDom from '../../../../appDom';
 import dataSources from '../../../../toolpadDataSources/client';
 import QueryIcon from '../../QueryIcon';
 import { useDomApi, useAppState, useAppStateApi } from '../../../AppState';
-import { DomView } from '../../../../utils/domView';
 import NodeMenu from '../../NodeMenu';
 import EditableText from '../../../../components/EditableText';
-// import { QueryMeta, PanelState } from './types';
-// import QueryEditor from './QueryEditor2';
 import { useNodeNameValidation } from '../../PagesExplorer/validation';
 
 const classes = {
@@ -37,16 +45,13 @@ const StyledTreeItem = styled(TreeItem)({
 });
 
 type StyledTreeItemProps = TreeItemProps & {
-  handleDeleteNode?: (
-    nodeId: NodeId,
-    onDelete?: (viewOptions: DomView, nodeId?: NodeId) => void,
-  ) => void;
-  onDelete?: (viewOptions: DomView, nodeId?: NodeId) => void;
+  onDeleteNode?: (nodeId: NodeId) => void;
   onDuplicateNode?: (nodeId: NodeId) => void;
   onSelectNode?: (nodeId: NodeId) => void;
-  onCreate?: React.MouseEventHandler;
+  onCreate?: (event: React.MouseEvent, mode?: appDom.FetchMode) => void;
   labelText: string;
   labelIconId?: string;
+  labelIconSx?: SxProps;
   createLabelText?: string;
   deleteLabelText?: string;
   renameLabelText?: string;
@@ -57,11 +62,11 @@ type StyledTreeItemProps = TreeItemProps & {
 function HierarchyTreeItem(props: StyledTreeItemProps) {
   const {
     labelText,
+    labelIconSx,
     labelIconId,
     onCreate,
     onSelectNode,
-    handleDeleteNode,
-    onDelete,
+    onDeleteNode,
     onDuplicateNode,
     createLabelText,
     deleteLabelText = 'Delete',
@@ -72,15 +77,28 @@ function HierarchyTreeItem(props: StyledTreeItemProps) {
   } = props;
 
   const handleClick = React.useCallback(() => {
+    if (props.nodeId === ':query' || props.nodeId === ':mutation') {
+      return;
+    }
     invariant(
       toolpadNodeId,
       'HierarchyTreeItem should only be used for nodes with a toolpadNodeId',
     );
     onSelectNode?.(toolpadNodeId);
-  }, [onSelectNode, toolpadNodeId]);
+  }, [onSelectNode, toolpadNodeId, props.nodeId]);
 
   const { dom } = useAppState();
   const domApi = useDomApi();
+
+  const queryCreationMode = React.useMemo(() => {
+    if (props.nodeId === ':query') {
+      return 'query';
+    }
+    if (props.nodeId === ':mutation') {
+      return 'mutation';
+    }
+    return undefined;
+  }, [props.nodeId]);
 
   const [queryNameEditable, setQueryNameEditable] = React.useState(false);
   const [queryNameInput, setQueryNameInput] = React.useState(labelText);
@@ -119,7 +137,10 @@ function HierarchyTreeItem(props: StyledTreeItemProps) {
     <StyledTreeItem
       label={
         <Box sx={{ display: 'flex', alignItems: 'center', p: 0.1, pr: 0 }} onClick={handleClick}>
-          <QueryIcon id={labelIconId || 'query'} sx={{ fontSize: 28, mt: 0.1, ml: -1 }} />
+          <QueryIcon
+            id={labelIconId || 'query'}
+            sx={{ fontSize: 28, mt: 0.1, ml: -1, ...labelIconSx }}
+          />
           <EditableText
             value={queryNameInput}
             variant="body2"
@@ -133,7 +154,13 @@ function HierarchyTreeItem(props: StyledTreeItemProps) {
             sx={{ flexGrow: 1 }}
           />
           {onCreate ? (
-            <IconButton aria-label={createLabelText} onClick={onCreate} size="small">
+            <IconButton
+              aria-label={createLabelText}
+              onClick={(event) => {
+                onCreate(event, queryCreationMode);
+              }}
+              size="small"
+            >
               <AddIcon fontSize="inherit" />
             </IconButton>
           ) : null}
@@ -155,7 +182,7 @@ function HierarchyTreeItem(props: StyledTreeItemProps) {
               deleteLabelText={deleteLabelText}
               duplicateLabelText={duplicateLabelText}
               renameLabelText={renameLabelText}
-              onDeleteNode={(nodeId) => handleDeleteNode?.(nodeId, onDelete)}
+              onDeleteNode={onDeleteNode}
               onDuplicateNode={onDuplicateNode}
               onRenameNode={() => setQueryNameEditable(true)}
             />
@@ -167,25 +194,106 @@ function HierarchyTreeItem(props: StyledTreeItemProps) {
   );
 }
 
+interface CreateQueryPopoverProps {
+  anchorEl: Element | null;
+  createPopoverOpen: boolean;
+  handleCreateNode: (dataSourceId: string) => () => void;
+  handleCreateClose: () => void;
+  createMode: appDom.FetchMode | undefined;
+}
+
+function CreateQueryPopover({
+  anchorEl,
+  createPopoverOpen,
+  handleCreateNode,
+  handleCreateClose,
+  createMode,
+}: CreateQueryPopoverProps) {
+  return (
+    <Popover
+      open={createPopoverOpen}
+      anchorEl={anchorEl}
+      onClose={handleCreateClose}
+      anchorOrigin={{
+        vertical: 'bottom',
+        horizontal: 'left',
+      }}
+    >
+      <Paper sx={{ p: 2, maxWidth: 500 }}>
+        <Typography variant="body2" sx={{ mb: 2, textAlign: 'center' }}>
+          Make backend data available as state on the page through{' '}
+          {createMode === 'mutation' ? (
+            <React.Fragment>
+              a{' '}
+              <Tooltip
+                title="Manual queries are only run when triggered by an action"
+                placement="right"
+              >
+                <Typography
+                  variant="body2"
+                  sx={{
+                    fontWeight: 'bold',
+                    color: 'primary.main',
+                    cursor: 'help',
+                    textDecoration: 'underline',
+                    textDecorationStyle: 'dotted',
+                  }}
+                  component={'span'}
+                >
+                  manual
+                </Typography>
+              </Tooltip>
+            </React.Fragment>
+          ) : (
+            <React.Fragment>
+              an{' '}
+              <Tooltip
+                title="Queries are automatically fetched at a set interval"
+                placement="right"
+              >
+                <Typography
+                  variant="body2"
+                  sx={{
+                    fontWeight: 'bold',
+                    color: 'primary.main',
+                    cursor: 'help',
+                    textDecoration: 'underline',
+                    textDecorationStyle: 'dotted',
+                  }}
+                  component={'span'}
+                >
+                  automatic
+                </Typography>
+              </Tooltip>
+            </React.Fragment>
+          )}{' '}
+          query.
+        </Typography>
+        <Stack direction="row" gap={1} display={'grid'} gridTemplateColumns={'1fr 1fr'}>
+          {Object.keys(dataSources).map((dataSourceId) => {
+            const dataSource = dataSources[dataSourceId];
+            return dataSource?.isEnabled ? (
+              <Button
+                key={dataSourceId}
+                sx={{ minHeight: 50, minWidth: 150 }}
+                variant="outlined"
+                onClick={handleCreateNode(dataSourceId)}
+              >
+                <QueryIcon id={dataSourceId} sx={{ fontSize: 28, mr: 0.5, mt: 0.1 }} />{' '}
+                {dataSource?.displayName || dataSourceId}
+              </Button>
+            ) : null;
+          })}
+        </Stack>
+      </Paper>
+    </Popover>
+  );
+}
+
 export function QueriesExplorer() {
   const { dom, currentView } = useAppState();
   const appStateApi = useAppStateApi();
   const currentPageId = currentView.nodeId;
-
-  const currentQueryId = React.useMemo(() => {
-    return currentView.kind === 'page' && currentView.view?.kind === 'query'
-      ? currentView.view.nodeId
-      : '';
-  }, [currentView]);
-
-  const queryPanel = React.useMemo(() => {
-    if (currentView.kind === 'page' && currentView.queryPanel) {
-      return currentView.queryPanel;
-    }
-    return undefined;
-  }, [currentView]);
-
-  const currentTabIndex = queryPanel?.currentTabIndex;
 
   const [anchorEl, setAnchorEl] = React.useState<Element | null>(null);
 
@@ -202,84 +310,31 @@ export function QueriesExplorer() {
     return [];
   }, [currentPageId, dom]);
 
+  const manualQueries = React.useMemo(() => {
+    return queries.filter((query) => query.attributes?.mode === 'mutation');
+  }, [queries]);
+
+  const automaticQueries = React.useMemo(() => {
+    return queries.filter((query) => query.attributes?.mode === 'query' || !query.attributes?.mode);
+  }, [queries]);
+
   const handleQuerySelect = React.useCallback(
     (selectedQueryId: NodeId) => {
-      if (currentPageId) {
-        /**
-         * Selected query is already open, do nothing
-         */
-        if (selectedQueryId === currentQueryId) {
-          return;
-        }
-        /**
-         * Selected query is open but not the active tab, set it as active
-         * and update the view
-         */
-
-        const selectedQueryTabIndex = queryPanel?.queryTabs?.findIndex((tab) => {
-          return tab.meta.id === selectedQueryId;
-        });
-
-        if (selectedQueryTabIndex !== undefined && selectedQueryTabIndex > -1) {
-          appStateApi.setView({
-            kind: 'page',
-            nodeId: currentPageId,
-            view: { kind: 'query', nodeId: selectedQueryId },
-            queryPanel: {
-              ...queryPanel,
-              currentTabIndex: selectedQueryTabIndex,
-            },
-          });
-        } else {
-          /**
-           * Selected query is not open, add it as a tab
-           * and update the view
-           */
-
-          let newTabIndex;
-          let newTabs;
-          const newTab = {
-            meta: {
-              id: selectedQueryId,
-              name: queries.find((query) => query.id === selectedQueryId)?.name,
-              dataSource: queries.find((query) => query.id === selectedQueryId)?.attributes
-                ?.dataSource,
-            },
-            saved: queries.find((query) => query.id === selectedQueryId),
-          };
-          /**
-           * If no tabs are open, set the currentTabIndex to 0
-           */
-          if (!queryPanel?.queryTabs || queryPanel?.queryTabs?.length === 0) {
-            newTabIndex = 0;
-            newTabs = [newTab];
-          } else {
-            /*
-             * If tabs are open, set the currentTabIndex to the next index
-             */
-            newTabIndex = queryPanel?.queryTabs?.length;
-            newTabs = [...queryPanel.queryTabs, newTab];
-          }
-
-          appStateApi.setView({
-            kind: 'page',
-            nodeId: currentPageId,
-            view: { kind: 'query', nodeId: selectedQueryId },
-            queryPanel: {
-              queryTabs: newTabs,
-              currentTabIndex: newTabIndex,
-            },
-          });
-        }
-      }
+      appStateApi.openQueryTab(selectedQueryId);
     },
-    [appStateApi, currentQueryId, currentPageId, queryPanel, queries],
+    [appStateApi],
   );
 
-  const handleCreateClick = (event: React.MouseEvent) => {
-    event.stopPropagation();
-    setAnchorEl(event.currentTarget);
-  };
+  const [createMode, setCreateMode] = React.useState<appDom.FetchMode | undefined>('query');
+
+  const handleCreateClick = React.useCallback(
+    (event: React.MouseEvent, mode?: appDom.FetchMode) => {
+      event.stopPropagation();
+      setCreateMode(mode);
+      setAnchorEl(event.currentTarget);
+    },
+    [],
+  );
 
   const handleCreateClose = () => {
     setAnchorEl(null);
@@ -314,78 +369,12 @@ export function QueriesExplorer() {
     [dom, currentPageId, appStateApi],
   );
 
-  const onDelete = React.useCallback(
-    (viewOptions: DomView, nodeId?: NodeId) => {
-      if (nodeId) {
-        appStateApi.update((draft) => appDom.removeNode(draft, nodeId), viewOptions);
-      }
-    },
-    [appStateApi],
-  );
-
   const handleDeleteNode = React.useCallback(
-    (selectedQueryId: NodeId, onComplete?: (viewOptions: DomView, nodeId?: NodeId) => void) => {
-      const viewOptions: DomView = {
-        kind: 'page',
-        nodeId: currentPageId,
-      };
-      const tabs = queryPanel?.queryTabs;
-      // remove the tab in all cases
-      const newTabs = tabs?.filter((tab) => tab.meta.id !== selectedQueryId);
-
-      /**
-       * if tabs are open
-       */
-      if (tabs && currentTabIndex !== undefined) {
-        /*
-         * if this is the only tab,
-         * remove the tab and set the view to the page
-         */
-        if (tabs.length === 1) {
-          viewOptions.queryPanel = {
-            queryTabs: undefined,
-            currentTabIndex: undefined,
-          };
-        }
-        /*
-         * if the query being deleted is not the one open,
-         * let the current tab index remain the same
-         */
-        if (currentQueryId && selectedQueryId !== currentQueryId) {
-          viewOptions.view = { kind: 'query', nodeId: currentQueryId };
-          viewOptions.queryPanel = {
-            queryTabs: newTabs,
-            currentTabIndex,
-          };
-
-          onComplete?.(viewOptions, selectedQueryId);
-          // tabs.delete(nodeId);
-        }
-        // if there are multiple tabs open, and
-        // the query being deleted is the one open,
-        // select the previous tab, or the next tab if there is no previous tab
-        const queryIds = tabs.map((tab) => tab.meta.id);
-        const replacementTabIndex = currentTabIndex > 0 ? currentTabIndex - 1 : currentTabIndex + 1;
-        const replacementQueryId = queryIds[replacementTabIndex];
-        if (replacementQueryId) {
-          viewOptions.view = { kind: 'query', nodeId: replacementQueryId };
-          viewOptions.queryPanel = {
-            queryTabs: newTabs,
-            currentTabIndex: replacementTabIndex,
-          };
-          onComplete?.(viewOptions, selectedQueryId);
-          // tabs.current.delete(nodeId);
-        }
-      } else {
-        // just delete the node since no tabs are open
-        viewOptions.queryPanel = {
-          queryTabs: newTabs,
-          currentTabIndex: undefined,
-        };
-        onComplete?.(viewOptions, selectedQueryId);
-      }
+    (selectedQueryId: NodeId) => {
+      const selectedQueryIndex = queries.findIndex((query) => query.id === selectedQueryId);
+      appStateApi.closeQueryTab(selectedQueryIndex, selectedQueryId, true);
     },
-    [queryPanel, currentPageId, currentQueryId, currentTabIndex],
+    [appStateApi, queries],
   );
 
   const handleDuplicateNode = React.useCallback(
@@ -412,7 +401,7 @@ export function QueriesExplorer() {
     <React.Fragment>
       <TreeView
         aria-label="queries explorer"
-        defaultExpanded={[':queries']}
+        defaultExpanded={[':queries', ':query', ':mutation']}
         selected={
           currentView.kind === 'page' && currentView.view?.kind === 'query'
             ? currentView.view.nodeId
@@ -433,54 +422,62 @@ export function QueriesExplorer() {
           aria-level={1}
           labelText="Queries"
           createLabelText="Create query"
-          onCreate={handleCreateClick}
         >
-          {queries.map((queryNode) => (
-            <HierarchyTreeItem
-              key={queryNode.id}
-              nodeId={queryNode.id}
-              toolpadNodeId={queryNode.id}
-              aria-level={2}
-              labelText={queryNode.name}
-              labelIconId={queryNode.attributes?.dataSource}
-              onDuplicateNode={handleDuplicateNode}
-              handleDeleteNode={(nodeId) => handleDeleteNode(nodeId, onDelete)}
-              onSelectNode={handleQuerySelect}
-            />
-          ))}
+          <HierarchyTreeItem
+            nodeId=":mutation"
+            aria-level={2}
+            labelText="Manual"
+            labelIconId="manual"
+            labelIconSx={{ fontSize: 16, mr: 1, ml: 0, opacity: 0.75 }}
+            createLabelText="Create manual query"
+            onCreate={handleCreateClick}
+          >
+            {manualQueries.map((queryNode) => (
+              <HierarchyTreeItem
+                key={queryNode.id}
+                nodeId={queryNode.id}
+                toolpadNodeId={queryNode.id}
+                aria-level={2}
+                labelText={queryNode.name}
+                labelIconId={queryNode.attributes?.dataSource}
+                onDuplicateNode={handleDuplicateNode}
+                onDeleteNode={handleDeleteNode}
+                onSelectNode={handleQuerySelect}
+              />
+            ))}
+          </HierarchyTreeItem>
+          <HierarchyTreeItem
+            nodeId=":query"
+            aria-level={3}
+            labelIconId="automatic"
+            labelText="Automatic"
+            labelIconSx={{ fontSize: 16, mr: 1, ml: 0, opacity: 0.75 }}
+            createLabelText="Create automatic query"
+            onCreate={handleCreateClick}
+          >
+            {automaticQueries.map((queryNode) => (
+              <HierarchyTreeItem
+                key={queryNode.id}
+                nodeId={queryNode.id}
+                toolpadNodeId={queryNode.id}
+                aria-level={2}
+                labelText={queryNode.name}
+                labelIconId={queryNode.attributes?.dataSource}
+                onDuplicateNode={handleDuplicateNode}
+                onDeleteNode={handleDeleteNode}
+                onSelectNode={handleQuerySelect}
+              />
+            ))}
+          </HierarchyTreeItem>
         </HierarchyTreeItem>
       </TreeView>
-      <Popover
-        open={createPopoverOpen}
+      <CreateQueryPopover
         anchorEl={anchorEl}
-        onClose={handleCreateClose}
-        anchorOrigin={{
-          vertical: 'bottom',
-          horizontal: 'left',
-        }}
-      >
-        <Paper sx={{ p: 2 }}>
-          <Typography variant="body2" sx={{ mb: 2, textAlign: 'center' }}>
-            Make backend data available as state on the page.
-          </Typography>
-          <Stack direction="row" gap={1} display={'grid'} gridTemplateColumns={'1fr 1fr 1fr'}>
-            {Object.keys(dataSources).map((dataSourceId) => {
-              const dataSource = dataSources[dataSourceId];
-              return dataSource?.isEnabled ? (
-                <Button
-                  key={dataSourceId}
-                  sx={{ minHeight: 50, minWidth: 150 }}
-                  variant="outlined"
-                  onClick={handleCreateNode(dataSourceId)}
-                >
-                  <QueryIcon id={dataSourceId} sx={{ fontSize: 28, mr: 0.5, mt: 0.1 }} />{' '}
-                  {dataSource?.displayName || dataSourceId}
-                </Button>
-              ) : null;
-            })}
-          </Stack>
-        </Paper>
-      </Popover>
+        createPopoverOpen={createPopoverOpen}
+        handleCreateNode={handleCreateNode}
+        handleCreateClose={handleCreateClose}
+        createMode={createMode}
+      />
     </React.Fragment>
   );
 }

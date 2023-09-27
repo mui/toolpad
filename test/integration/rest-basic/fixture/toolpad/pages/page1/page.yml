@@ -54,55 +54,36 @@ spec:
     - component: DataGrid
       name: dataGrid
   queries:
-    - name: query1
-      query:
-        kind: rest
-        url: https://635aaf68aa7c3f113daceeef.mockapi.io/customers
-        searchParams:
-          - name: query1_param2
-            value:
-              $$jsExpression: |
-                parameters.param1
-        headers: []
-        method: GET
-      parameters:
-        - name: param1
-          value:
-            $$jsExpression: |
-              "query1_value"
     - name: query2
-      mode: mutation
       query:
         kind: rest
         url: http://localhost:8080/post
+        searchParams: []
         headers: []
+        method: POST
         body:
           kind: raw
           content:
             $$jsExpression: |
               JSON.stringify(parameters)
           contentType: application/json
-        method: POST
-        searchParams: []
       parameters:
         - name: value
           value: incorrect
+      mode: mutation
     - name: queryWithTransform
       query:
         kind: rest
         url: http://localhost:8080/get
-        searchParams: []
         headers: []
         method: GET
+        searchParams: []
         transform: 'return `query3: Transformed ${data?.url}`'
         transformEnabled: true
     - name: queryWithEnv
       query:
         kind: rest
-        headers:
-          - name: Authorization
-            value:
-              $$env: TEST_VAR
-        method: GET
-        searchParams: []
         url: http://localhost:8080/get
+        searchParams: []
+        headers: [{ name: Authorization, value: { $$env: TEST_VAR } }]
+        method: GET

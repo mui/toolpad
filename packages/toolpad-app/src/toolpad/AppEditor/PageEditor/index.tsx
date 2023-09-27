@@ -35,7 +35,10 @@ interface PageEditorContentProps {
 function PageEditorContent({ node }: PageEditorContentProps) {
   usePageTitle(`${node.attributes.title} | Toolpad editor`);
   const { currentView } = useAppState();
-  const showQuery = currentView.kind === 'page' && currentView.view?.kind === 'query';
+  const showQuery =
+    currentView.kind === 'page' &&
+    currentView.view?.kind === 'query' &&
+    currentView.queryPanel?.queryTabs;
 
   return (
     <PageEditorProvider key={node.id} nodeId={node.id}>

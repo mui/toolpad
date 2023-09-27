@@ -105,7 +105,7 @@ export type { ServerContext };
  *
  * API:
  *
- * - [getContext API](https://mui.com/toolpad/reference/api/get-context)
+ * - [`getContext` API](https://mui.com/toolpad/reference/api/get-context)
  *
  */
 export function getContext(): ServerContext {
@@ -123,6 +123,18 @@ export interface ToolpadDataProvider<R, P extends PaginationMode = 'index'>
   [TOOLPAD_DATA_PROVIDER_MARKER]: true;
 }
 
+/**
+ * Create a Toolpad data provider. Data providers act as a bridge between Toolpad and your data.
+ *
+ * Demos:
+ *
+ * - [Data Providers](https://mui.com/toolpad/concepts/data-providers/)
+ *
+ * API:
+ *
+ * - [`createDataProvider` API](https://mui.com/toolpad/reference/api/create-data-provider/)
+ *
+ */
 export function createDataProvider<R, P extends PaginationMode = 'index'>(
   input: ToolpadDataProviderBase<R, P>,
 ): ToolpadDataProvider<R, P> {

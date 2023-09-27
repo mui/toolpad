@@ -8,21 +8,35 @@ Follow these steps to create a new data provider
 
 1. Drag a data grid into the canvas
 
-1. Under its **Row Source** property, select the option **Data Provider**.
+2. Under its **Row Source** property, select the option **Data Provider**.
 
-{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/concepts/data-providers/rows-source.png", "alt": "Select data provider row source", "caption": "Select data provider row source", "indent": 1, "zoom": false, "width": 297}}
+{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/concepts/data-providers/rows-source.png", "alt": "Select data provider row source", "caption": "Select data provider row source", "zoom": false, "width": 297}}
 
-1. Click the data provider selector and choose **Create new data provider**.
+3. Click the data provider selector and choose **Create new data provider**.
 
-{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/concepts/data-providers/create-data-provider.png", "alt": "Create data provider", "caption": "Create data provider", "indent": 1, "zoom": false, "width": 294}}
+{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/concepts/data-providers/create-data-provider.png", "alt": "Create data provider", "caption": "Create data provider", "zoom": false, "width": 294}}
 
-1. Name the new data provider and click **Create**
+4. Name the new data provider and click **Create**
 
-{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/concepts/data-providers/create-data-provider-dialog.png", "alt": "Create data provider dialog", "caption": "Create data provider dialog", "indent": 1, "zoom": false, "width": 490}}
+{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/concepts/data-providers/create-data-provider-dialog.png", "alt": "Create data provider dialog", "caption": "Create data provider dialog", "zoom": false, "width": 490}}
 
-1. You can click the code button to open your code editor with the data provider backend.
+5. Use the code button to open your code editor with the data provider backend.
 
-{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/concepts/data-providers/open-editor.png", "alt": "Open data provider editor", "caption": "Open data provider editor", "indent": 1, "zoom": false, "width": 272}}
+{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/concepts/data-providers/open-editor.png", "alt": "Open data provider editor", "caption": "Open data provider editor", "zoom": false, "width": 272}}
+
+6. A data provider that iterates over a static list could look as follows:
+
+   ```tsx
+   import { createDataProvider } from '@mui/toolpad-core/server';
+   import DATA from './movies.json';
+
+   export default createDataProvider({
+     async getRecords({ paginationModel: { start = 0, pageSize } }) {
+       const records = DATA.slice(start, start + pageSize);
+       return { records, totalCount: DATA.length };
+     },
+   });
+   ```
 
 ## pagination
 

@@ -5,6 +5,10 @@ import DialogContent from '@mui/material/DialogContent';
 
 const Root = styled('div')({
   position: 'relative',
+  display: 'flex',
+  flexDirection: 'column',
+  justifyContent: 'center',
+  alignItems: 'center',
 });
 
 interface DocsImageProps {
@@ -31,9 +35,9 @@ const Img = styled('img')<DocsImageProps>(({ theme, zoom, indent, width, aspectR
   position: 'relative',
   aspectRatio: aspectRatio ?? zoom === false ? 'unset' : '1.80904522613', // 1440 / 796
   marginTop: theme.spacing(3),
-  marginLeft: indent ? theme.spacing(5 * indent) : 'auto',
+  marginLeft: indent ? theme.spacing(5 * indent) : undefined,
   marginBottom: 0,
-  marginRight: indent ? 0 : 'auto',
+  marginRight: indent ? 0 : undefined,
   zIndex: 5,
   borderRadius: 4,
   maxWidth: zoom === false ? 'min(50vw, 500px)' : 'unset',
@@ -50,7 +54,7 @@ const ImageCaption = styled('p')<Pick<DocsImageProps, 'indent'>>(({ theme, inden
   fontFamily: theme.typography.fontFamily,
   textAlign: 'center',
   marginBottom: theme.spacing(3),
-  marginLeft: indent ? theme.spacing(5 * indent) : 'auto',
+  marginLeft: indent ? theme.spacing(5 * indent) : undefined,
   color:
     theme.palette.mode === 'dark' ? alpha(theme.palette.grey[500], 0.8) : theme.palette.grey[700],
   '& a': {

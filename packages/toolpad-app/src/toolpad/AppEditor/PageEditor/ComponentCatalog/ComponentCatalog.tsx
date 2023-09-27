@@ -58,8 +58,9 @@ export interface ComponentCatalogProps {
 export default function ComponentCatalog({ className }: ComponentCatalogProps) {
   const api = usePageEditorApi();
   const { dom } = useAppState();
-
+  const [searchTerm, setSearchTerm] = React.useState('');
   const [openStart, setOpenStart] = React.useState(0);
+  const [stillOpen, setStillOpen] = React.useState(true);
   const [openCustomComponents, setOpenCustomComponents] = useLocalStorageState(
     'catalog-custom-expanded',
     true,
@@ -74,6 +75,7 @@ export default function ComponentCatalog({ className }: ComponentCatalogProps) {
     if (closeTimeoutRef.current) {
       clearTimeout(closeTimeoutRef.current);
     }
+
     setOpenStart(Date.now());
   }, []);
 
@@ -81,9 +83,14 @@ export default function ComponentCatalog({ className }: ComponentCatalogProps) {
     (delay?: number) => {
       const timeOpen = Date.now() - openStart;
       const defaultDelay = timeOpen > 750 ? 500 : 0;
-      closeTimeoutRef.current = setTimeout(() => setOpenStart(0), delay ?? defaultDelay);
+      closeTimeoutRef.current = setTimeout(() => {
+        if (stillOpen) {
+          setSearchTerm('');
+          setOpenStart(0);
+        }
+      }, delay ?? defaultDelay);
     },
-    [openStart],
+    [openStart, setOpenStart, stillOpen],
   );
 
   const handleDragStart = (componentType: string) => (event: React.DragEvent<HTMLElement>) => {
@@ -95,7 +102,10 @@ export default function ComponentCatalog({ className }: ComponentCatalogProps) {
 
   const toolpadComponents = Object.entries(useToolpadComponents(dom));
 
-  const handleMouseEnter = React.useCallback(() => openDrawer(), [openDrawer]);
+  const handleMouseEnter = React.useCallback(
+    () => searchTerm.length === 0 && openDrawer(),
+    [openDrawer, searchTerm],
+  );
   const handleMouseLeave = React.useCallback(() => closeDrawer(), [closeDrawer]);
 
   const [createCodeComponentDialogOpen, setCreateCodeComponentDialogOpen] = React.useState(false);
@@ -108,7 +118,6 @@ export default function ComponentCatalog({ className }: ComponentCatalogProps) {
     () => setCreateCodeComponentDialogOpen(false),
     [],
   );
-  const [searchTerm, setSearchTerm] = React.useState('');
 
   const filteredItems = React.useMemo(() => {
     if (!searchTerm) {
@@ -160,9 +169,10 @@ export default function ComponentCatalog({ className }: ComponentCatalogProps) {
                 }}
               >
                 <TextField
-                  id="input-with-icon-textfield"
                   placeholder="Search components..."
                   autoFocus
+                  onFocus={() => setStillOpen(false)}
+                  onBlur={() => setStillOpen(true)}
                   value={searchTerm}
                   onChange={(event) => setSearchTerm(event.target.value)}
                   InputProps={{

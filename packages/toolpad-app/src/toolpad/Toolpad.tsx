@@ -106,7 +106,7 @@ function RouteShell({ children }: RouteShellProps) {
             </Button>
           </Stack>
         ),
-        shell: getAppSaveState(appState),
+        status: getAppSaveState(appState),
       };
     }
 

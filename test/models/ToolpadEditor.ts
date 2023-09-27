@@ -2,25 +2,6 @@ import { setTimeout } from 'timers/promises';
 import { expect, FrameLocator, Locator, Page } from '@playwright/test';
 import { gotoIfNotCurrent } from './shared';
 
-class CreatePageDialog {
-  readonly page: Page;
-
-  readonly dialog: Locator;
-
-  readonly nameInput: Locator;
-
-  readonly createButton: Locator;
-
-  constructor(page: Page) {
-    this.page = page;
-    this.dialog = page.locator('[role="dialog"]', {
-      hasText: 'Create a new Page',
-    });
-    this.nameInput = this.dialog.locator('label:has-text("name")');
-    this.createButton = this.dialog.locator('button:has-text("Create")');
-  }
-}
-
 class CreateComponentDialog {
   readonly page: Page;
 
@@ -45,8 +26,6 @@ export class ToolpadEditor {
   readonly page: Page;
 
   readonly createPageBtn: Locator;
-
-  readonly createPageDialog: CreatePageDialog;
 
   readonly createComponentBtn: Locator;
 
@@ -74,7 +53,6 @@ export class ToolpadEditor {
     this.page = page;
 
     this.createPageBtn = page.locator('[aria-label="Create page"]');
-    this.createPageDialog = new CreatePageDialog(page);
 
     this.componentCatalog = page.getByTestId('component-catalog');
 
@@ -99,9 +77,9 @@ export class ToolpadEditor {
 
   async createPage(name: string) {
     await this.createPageBtn.click();
-    await this.createPageDialog.nameInput.fill(name);
+    await this.explorer.locator('input').fill(name);
     const { href: currentUrl } = new URL(this.page.url());
-    await this.createPageDialog.createButton.click();
+    await this.page.keyboard.press('Enter');
     await this.page.waitForURL((url) => url.href !== currentUrl);
   }
 

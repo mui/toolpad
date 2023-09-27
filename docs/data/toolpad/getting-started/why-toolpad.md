@@ -47,7 +47,7 @@ When working with external tools, developers often forfeit their autonomy and ar
 
 Addressing the aforementioned problems leads to a better developer experience. Toolpad solves them in the following ways:
 
-{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/getting-started/why-toolpad/why-toolpad.png", "alt": "How Toolpad fits in your codebase", "caption": "How Toolpad fits in your codebase", "zoom": false }}
+{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/getting-started/why-toolpad/why-toolpad.png", "alt": "How Toolpad fits in your codebase", "caption": "How Toolpad fits in your codebase", "zoom": true }}
 
 ### Front-end UI
 

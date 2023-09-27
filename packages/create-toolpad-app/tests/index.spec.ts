@@ -4,10 +4,11 @@ import * as url from 'url';
 import readline from 'readline';
 import { Readable } from 'stream';
 import { execa, ExecaChildProcess } from 'execa';
-import { jest } from '@jest/globals';
+import { test, expect, afterEach } from 'vitest';
 import { once } from 'events';
+import * as os from 'os';
 
-jest.setTimeout(process.env.CI ? 60000 : 600000);
+const TEST_TIMEOUT = process.env.CI ? 60000 : 600000;
 
 const currentDirectory = url.fileURLToPath(new URL('.', import.meta.url));
 
@@ -34,55 +35,61 @@ async function waitForMatch(input: Readable, regex: RegExp): Promise<RegExpExecA
   });
 }
 
-test('create-toolpad-app can bootstrap a Toolpad app', async () => {
-  testDir = await fs.mkdtemp(path.resolve(currentDirectory, './test-app-'));
-  cp = execa(cliPath, [path.basename(testDir)], {
-    cwd: currentDirectory,
-  });
-  const result = await cp;
-  expect(result.stdout).toMatch('Run the following to get started');
-  const packageJsonContent = await fs.readFile(path.resolve(testDir, './package.json'), {
-    encoding: 'utf-8',
-  });
-  const packageJson = JSON.parse(packageJsonContent);
-  expect(packageJson).toEqual(
-    expect.objectContaining({
-      dependencies: expect.objectContaining({
-        '@mui/toolpad': expect.any(String),
+test(
+  'create-toolpad-app can bootstrap a Toolpad app',
+  async () => {
+    testDir = await fs.mkdtemp(path.resolve(os.tmpdir(), './test-app-'));
+    cp = execa(cliPath, [testDir], {
+      cwd: currentDirectory,
+    });
+    cp.stdout?.pipe(process.stdout);
+    cp.stderr?.pipe(process.stdout);
+    const result = await cp;
+    expect(result.stdout).toMatch('Run the following to get started');
+    const packageJsonContent = await fs.readFile(path.resolve(testDir, './package.json'), {
+      encoding: 'utf-8',
+    });
+    const packageJson = JSON.parse(packageJsonContent);
+    expect(packageJson).toEqual(
+      expect.objectContaining({
+        dependencies: expect.objectContaining({
+          '@mui/toolpad': expect.any(String),
+        }),
+        scripts: expect.objectContaining({
+          build: 'toolpad build',
+          dev: 'toolpad dev',
+          start: 'toolpad start',
+        }),
       }),
-      scripts: expect.objectContaining({
-        build: 'toolpad build',
-        dev: 'toolpad dev',
-        start: 'toolpad start',
-      }),
-    }),
-  );
+    );
 
-  // check that file exists or not in the directory
-  const gitignore = await fs.readFile(path.resolve(testDir, './.gitignore'), {
-    encoding: 'utf-8',
-  });
+    // check that file exists or not in the directory
+    const gitignore = await fs.readFile(path.resolve(testDir, './.gitignore'), {
+      encoding: 'utf-8',
+    });
 
-  expect(gitignore.length).toBeGreaterThan(0);
+    expect(gitignore.length).toBeGreaterThan(0);
 
-  toolpadProcess = execa('yarn', ['dev'], {
-    cwd: testDir,
-    env: {
-      FORCE_COLOR: '0',
-      BROWSER: 'none',
-    },
-  });
-  const { stdout: toolpadDevOutput } = toolpadProcess;
+    toolpadProcess = execa('yarn', ['dev'], {
+      cwd: testDir,
+      env: {
+        FORCE_COLOR: '0',
+        BROWSER: 'none',
+      },
+    });
+    const { stdout: toolpadDevOutput } = toolpadProcess;
 
-  expect(toolpadDevOutput).toBeTruthy();
-  const match = await waitForMatch(toolpadDevOutput!, /http:\/\/localhost:(\d+)/);
+    expect(toolpadDevOutput).toBeTruthy();
+    const match = await waitForMatch(toolpadDevOutput!, /http:\/\/localhost:(\d+)/);
 
-  expect(match).toBeTruthy();
+    expect(match).toBeTruthy();
 
-  const appUrl = match![0];
-  const res = await fetch(`${appUrl}/health-check`);
-  expect(res).toHaveProperty('status', 200);
-});
+    const appUrl = match![0];
+    const res = await fetch(`${appUrl}/health-check`);
+    expect(res).toHaveProperty('status', 200);
+  },
+  TEST_TIMEOUT,
+);
 
 afterEach(async () => {
   if (toolpadProcess && typeof toolpadProcess.exitCode !== 'number') {

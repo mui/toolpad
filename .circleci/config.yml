@@ -119,24 +119,26 @@ jobs:
       - checkout
       - install_js
       - run:
-          name: '`yarn prettier` changes committed?'
-          command: yarn prettier --check
+          name: '`yarn prettier:all` changes committed?'
+          command: |
+            yarn prettier:all
+            yarn check-changes
       - run:
           name: '`yarn jsonSchemas` changes committed?'
           command: |
             yarn jsonSchemas
-            git add -A && git diff --exit-code --staged
+            yarn check-changes
       - run:
           name: '`yarn docs:build:api` changes committed?'
           command: |
             yarn docs:build:api
-            git add -A && git diff --exit-code --staged
+            yarn check-changes
 
   test_unit:
     <<: *defaults
     resource_class: 'large'
     docker:
-      - image: mcr.microsoft.com/playwright:v1.38.0-focal
+      - image: mcr.microsoft.com/playwright:v1.38.1-focal
         environment:
           NODE_ENV: test
           TOOLPAD_TEST_RETRIES: 1

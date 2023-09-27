@@ -44,5 +44,6 @@
     "@types/node": "20.6.4",
     "@types/semver": "7.5.2",
     "@types/yargs": "17.0.24"
-  }
+  },
+  "gitHead": "4057a5514725c4eb709d3db9a0a3720f7901a4ea"
 }

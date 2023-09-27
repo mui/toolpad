@@ -1,6 +1,8 @@
 import * as React from 'react';
-import { styled } from '@mui/material';
+import { Stack, styled } from '@mui/material';
 import Header from './Header';
+import NavigationSidebar from './NavigationSidebar';
+import { GLOBAL_FUNCTIONS_FEATURE_FLAG } from '../../constants';
 
 export interface ToolpadShellProps {
   actions?: React.ReactNode;
@@ -9,7 +11,6 @@ export interface ToolpadShellProps {
 }
 
 const ToolpadShellRoot = styled('div')({
-  width: '100vw',
   height: '100vh',
   display: 'flex',
   flexDirection: 'column',
@@ -26,7 +27,10 @@ export default function ToolpadShell({ children, ...props }: ToolpadShellProps) 
   return (
     <ToolpadShellRoot>
       <Header {...props} />
-      <ViewPort>{children}</ViewPort>
+      <Stack direction="row" sx={{ flex: 1 }}>
+        {GLOBAL_FUNCTIONS_FEATURE_FLAG ? <NavigationSidebar /> : null}
+        <ViewPort>{children}</ViewPort>
+      </Stack>
     </ToolpadShellRoot>
   );
 }

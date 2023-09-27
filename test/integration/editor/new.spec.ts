@@ -50,7 +50,7 @@ test('can create and place new component', async ({ page }) => {
   await expect(editorModel.appCanvas.getByText('Hello world!')).toBeVisible();
 });
 
-test.only('can create/delete page', async ({ page, localApp }) => {
+test('can create/delete page', async ({ page, localApp }) => {
   const editorModel = new ToolpadEditor(page);
 
   await editorModel.goto();

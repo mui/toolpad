@@ -1198,6 +1198,9 @@ class ToolpadProject {
   }
 
   getRuntimeConfig(): RuntimeConfig {
+    // When these fails, you are likely trying to retrieve this information during the
+    // toolpad build. It's fundamentally wrong to use this information as it strictly holds
+    // information about the running toolpad instance.
     invariant(this.options.externalUrl, 'External URL is not set');
     invariant(this.options.wsPort, 'Websocket port is not set');
 

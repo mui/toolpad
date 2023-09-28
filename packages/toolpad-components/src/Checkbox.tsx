@@ -7,7 +7,7 @@ import {
   FormHelperText,
   FormControl,
 } from '@mui/material';
-import type { CheckboxProps as MuiCheckBocProps } from '@mui/material/Checkbox';
+import type { CheckboxProps as MuiCheckBoxProps } from '@mui/material/Checkbox';
 import type { FormControlLabelProps } from '@mui/material/FormControlLabel';
 import { SX_PROP_HELPER_TEXT } from './constants';
 import {
@@ -18,7 +18,7 @@ import {
 } from './Form';
 
 export type CheckboxProps = Omit<FormControlLabelProps, 'control' | 'onChange'> &
-  Omit<MuiCheckBocProps, 'onChange'> & {
+  Omit<MuiCheckBoxProps, 'onChange'> & {
     onChange: (newValue: boolean) => void;
     label?: string;
     defaultValue: string;

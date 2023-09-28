@@ -7,7 +7,6 @@ import * as chokidar from 'chokidar';
 import chalk from 'chalk';
 import { glob } from 'glob';
 import { writeFileRecursive, fileExists, readJsonFile } from '@mui/toolpad-utils/fs';
-import invariant from 'invariant';
 import Piscina from 'piscina';
 import {
   ExecFetchResult,
@@ -120,15 +119,6 @@ export default class FunctionsManager {
   constructor(project: IToolpadProject) {
     this.project = project;
     this.devWorker = createDevWorker(process.env);
-    if (this.shouldExtractTypes()) {
-      this.extractTypesWorker = new Piscina({
-        filename: path.join(__dirname, 'functionsTypesWorker.js'),
-      });
-    }
-  }
-
-  shouldExtractTypes(): boolean {
-    return this.project.options.cmd !== 'start';
   }
 
   private getResourcesFolder(): string {
@@ -175,8 +165,12 @@ export default class FunctionsManager {
   }
 
   private async extractTypes() {
-    invariant(this.shouldExtractTypes(), 'extractTypes() can not be used in prod mode');
-    invariant(this.extractTypesWorker, 'this.extractTypesWorker should have been initialized');
+    if (!this.extractTypesWorker) {
+      this.extractTypesWorker = new Piscina({
+        filename: path.join(__dirname, 'functionsTypesWorker.js'),
+      });
+    }
+
     const extractedTypes: Promise<IntrospectionResult> = this.extractTypesWorker
       .run({ resourcesFolder: this.getResourcesFolder() } satisfies ExtractTypesParams, {})
       .catch((error: unknown) => ({
@@ -352,7 +346,7 @@ export default class FunctionsManager {
 
   async introspect(): Promise<IntrospectionResult> {
     if (!this.extractedTypes) {
-      if (this.shouldExtractTypes()) {
+      if (this.project.options.dev) {
         this.extractedTypes = this.extractTypes();
       } else {
         this.extractedTypes = readJsonFile(

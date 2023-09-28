@@ -992,7 +992,6 @@ class ToolpadProject {
   constructor(root: string, options: Partial<ToolpadProjectOptions>) {
     this.root = root;
     this.options = {
-      cmd: 'start',
       dev: false,
       externalUrl: 'http://localhost:3000',
       ...options,
@@ -1206,7 +1205,6 @@ class ToolpadProject {
     return {
       externalUrl: this.options.externalUrl,
       projectDir: this.getRoot(),
-      cmd: this.options.dev ? 'dev' : 'start',
     };
   }
 }
@@ -1218,19 +1216,21 @@ declare global {
   var __toolpadProject: ToolpadProject | undefined;
 }
 
-export async function initProject(
-  cmd: 'dev' | 'start' | 'build',
-  root: string,
-  externalUrl?: string,
-) {
+export interface InitProjectOptions {
+  dev?: boolean;
+  dir: string;
+  externalUrl?: string;
+}
+
+export async function initProject({ dev, dir, externalUrl }: InitProjectOptions) {
   // eslint-disable-next-line no-underscore-dangle
   invariant(!global.__toolpadProject, 'A project is already running');
 
-  await migrateLegacyProject(root);
+  await migrateLegacyProject(dir);
 
-  await initToolpadFolder(root);
+  await initToolpadFolder(dir);
 
-  const project = new ToolpadProject(root, { cmd, dev: cmd === 'dev', externalUrl });
+  const project = new ToolpadProject(dir, { dev, externalUrl });
   // eslint-disable-next-line no-underscore-dangle
   globalThis.__toolpadProject = project;
 

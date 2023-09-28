@@ -72,6 +72,7 @@ export interface DatePickerProps
     Pick<FormInputComponentProps, 'name' | 'isRequired' | 'isInvalid'> {
   value?: string;
   onChange: (newValue: string | null) => void;
+  label?: string;
   format: string;
   fullWidth: boolean;
   variant: 'outlined' | 'filled' | 'standard';
@@ -91,7 +92,7 @@ function DatePicker({
 }: DatePickerProps) {
   const { onFormInputChange, formInputError, renderFormInput } = useFormInput<string | null>({
     name: rest.name,
-    label: rest.label as string,
+    label: rest.label,
     value: valueProp,
     onChange,
     defaultValue: defaultValueProp,

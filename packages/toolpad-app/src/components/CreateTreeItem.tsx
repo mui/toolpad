@@ -2,7 +2,7 @@ import { TreeItem, TreeItemProps, treeItemClasses } from '@mui/x-tree-view';
 import { InputBase, alpha, Popover, Alert, useTheme, InputBaseProps } from '@mui/material';
 import * as React from 'react';
 
-interface CreateNodeTreeItemProps extends Omit<TreeItemProps, 'nodeId' | 'label'> {
+interface CreateTreeItemProps extends Omit<TreeItemProps, 'nodeId' | 'label'> {
   treeRef: React.RefObject<HTMLUListElement | null>;
   open: boolean;
   suggestedNewItemName?: string;
@@ -25,7 +25,7 @@ export default function CreateTreeItem({
   inputProps,
   sx,
   ...rest
-}: CreateNodeTreeItemProps) {
+}: CreateTreeItemProps) {
   const theme = useTheme();
 
   const createNewInputRef = React.useRef<HTMLInputElement | null>(null);

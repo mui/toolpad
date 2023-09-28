@@ -992,7 +992,6 @@ class ToolpadProject {
   constructor(root: string, options: Partial<ToolpadProjectOptions>) {
     this.root = root;
     this.options = {
-      // cmd: 'start',
       dev: false,
       externalUrl: 'http://localhost:3000',
       ...options,

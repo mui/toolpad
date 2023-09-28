@@ -56,8 +56,10 @@ export default function CreateTreeItem({
   }, [handleClose, newItemInput, newItemValidationResult.isValid, onCreate]);
 
   React.useEffect(() => {
-    if (hasCreatedItem) {
-      treeRef?.current?.querySelector(`.${treeItemClasses.selected}`)?.scrollIntoView();
+    const tree = treeRef.current;
+
+    if (tree && hasCreatedItem) {
+      tree.querySelector(`.${treeItemClasses.selected}`)?.scrollIntoView();
       setHasCreatedItem(false);
     }
   }, [hasCreatedItem, treeRef]);
@@ -97,7 +99,11 @@ export default function CreateTreeItem({
 
   const inputErrorPopoverAnchorEl = createNewInputRef.current;
 
-  return open ? (
+  if (!open) {
+    return null;
+  }
+
+  return (
     <TreeItem
       {...rest}
       nodeId="::create::"
@@ -141,5 +147,5 @@ export default function CreateTreeItem({
         ...sx,
       }}
     />
-  ) : null;
+  );
 }

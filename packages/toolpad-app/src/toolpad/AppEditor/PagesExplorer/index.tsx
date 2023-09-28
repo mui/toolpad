@@ -182,11 +182,20 @@ export default function PagesExplorer({ className }: PagesExplorerProps) {
     }
   };
 
-  const handlerTreeRef = React.useRef<HTMLUListElement>(null);
+  const pagesTreeRef = React.useRef<HTMLUListElement | null>(null);
+
+  const [hasMounted, setHasMounted] = React.useState(false);
 
   React.useEffect(() => {
-    handlerTreeRef.current?.querySelector(`.${treeItemClasses.selected}`)?.scrollIntoView();
+    setHasMounted(true);
   }, []);
+
+  React.useEffect(() => {
+    const pagesTree = pagesTreeRef.current;
+    if (pagesTree && hasMounted) {
+      pagesTree.querySelector(`.${treeItemClasses.selected}`)?.scrollIntoView();
+    }
+  }, [hasMounted]);
 
   const {
     value: isCreateNewPageOpen,
@@ -285,7 +294,7 @@ export default function PagesExplorer({ className }: PagesExplorerProps) {
       className={className}
     >
       <TreeView
-        ref={handlerTreeRef}
+        ref={pagesTreeRef}
         aria-label="pages explorer"
         selected={activeNode ? [activeNode] : []}
         onNodeSelect={handleSelect}
@@ -303,7 +312,7 @@ export default function PagesExplorer({ className }: PagesExplorerProps) {
           onCreate={handleOpenCreateNewPage}
         >
           <CreateTreeItem
-            treeRef={handlerTreeRef}
+            treeRef={pagesTreeRef}
             open={isCreateNewPageOpen}
             suggestedNewItemName={nextProposedName}
             onCreate={handleCreateNewCommit}

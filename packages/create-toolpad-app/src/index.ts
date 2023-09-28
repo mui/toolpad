@@ -11,7 +11,7 @@ import { execaCommand } from 'execa';
 import { satisfies } from 'semver';
 import { readJsonFile } from '@mui/toolpad-utils/fs';
 import invariant from 'invariant';
-import { bashResolvePath } from '@mui/toolpad-utils/path';
+import { bashResolvePath } from '@mui/toolpad-utils/cli';
 import { PackageJson } from './packageType';
 
 type PackageManager = 'npm' | 'pnpm' | 'yarn';

@@ -11,7 +11,7 @@ async function main() {
 
   const projectDir = process.env.TOOLPAD_PROJECT_DIR;
 
-  const project = await initProject('build', projectDir);
+  const project = await initProject({ dir: projectDir });
 
   await project.build();
 

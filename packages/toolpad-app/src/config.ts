@@ -37,8 +37,8 @@ export type BuildEnvVars = Record<
 // Do not add secrets
 export interface RuntimeConfig {
   externalUrl: string;
-  projectDir?: string;
-  cmd: 'dev' | 'start' | 'build';
+  projectDir: string;
+  wsPort: number;
 }
 
 declare global {

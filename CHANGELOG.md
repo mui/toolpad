@@ -1,5 +1,31 @@
 # Changelog
 
+## 0.1.30
+
+<!-- generated comparing v0.1.29..master -->
+
+_Sep 28, 2023_
+
+A big thanks to the 3 contributors who made this release possible. Here are some highlights ✨:
+
+Some more documentation improvements, move to Vitest and minor bug fixes.
+
+- &#8203;<!-- 11 -->fix 2704 (#2725) @JerryWu1234
+- &#8203;<!-- 10 -->Fix prettier changes script (#2722) @Janpot
+- &#8203;<!-- 09 -->Remove unused address dependency (#2723) @Janpot
+- &#8203;<!-- 08 -->yarn prettier @oliviertassinari
+- &#8203;<!-- 07 -->Move to vitest (#2709) @Janpot
+- &#8203;<!-- 06 -->Run full prettier in CI (#2713) @Janpot
+- &#8203;<!-- 05 -->Improve docs language consistency (#2715) @Janpot
+- &#8203;<!-- 04 -->Fix typo in docs description (#2714) @Janpot
+- &#8203;<!-- 03 -->Update monorepo (#2712) @Janpot
+- &#8203;<!-- 02 -->[core] Sync prism-okaidia.css with docs-infra @oliviertassinari
+- &#8203;<!-- 01 -->[core] Straight quotes & website monorepo change @oliviertassinari
+
+All contributors of this release in alphabetical order: @Janpot, @JerryWu1234, @oliviertassinari
+
+✨ Done in 1.32s.
+
 ## 0.1.29
 
 <!-- generated comparing v0.1.28..master -->

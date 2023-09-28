@@ -17,7 +17,7 @@ export interface SelectOption {
 export type SelectProps = Omit<TextFieldProps, 'value' | 'onChange'> & {
   value: string;
   onChange: (newValue: string) => void;
-  label: string;
+  label?: string;
   defaultValue: string;
   options: (string | SelectOption)[];
 } & Pick<FormInputComponentProps, 'name' | 'isRequired' | 'isInvalid'>;

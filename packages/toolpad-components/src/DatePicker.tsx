@@ -72,7 +72,7 @@ export interface DatePickerProps
     Pick<FormInputComponentProps, 'name' | 'isRequired' | 'isInvalid'> {
   value?: string;
   onChange: (newValue: string | null) => void;
-  label: string;
+  label?: string;
   format: string;
   fullWidth: boolean;
   variant: 'outlined' | 'filled' | 'standard';

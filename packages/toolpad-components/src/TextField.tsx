@@ -17,7 +17,7 @@ import { SX_PROP_HELPER_TEXT } from './constants';
 export type TextFieldProps = Omit<MuiTextFieldProps, 'value' | 'onChange'> & {
   value: string;
   onChange: (newValue: string) => void;
-  label: string;
+  label?: string;
   defaultValue: string;
   alignItems?: BoxProps['alignItems'];
   justifyContent?: BoxProps['justifyContent'];

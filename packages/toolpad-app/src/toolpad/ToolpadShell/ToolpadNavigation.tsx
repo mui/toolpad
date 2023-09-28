@@ -35,7 +35,7 @@ const navigationOptions = [
   },
 ];
 
-export default function NavigationSidebar() {
+export default function ToolpadNavigation() {
   const location = useLocation();
 
   return (

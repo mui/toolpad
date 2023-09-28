@@ -19,6 +19,7 @@ import {
 
 export type FormControlLabelOptions = {
   onChange: (newValue: boolean) => void;
+  label: string;
   defaultValue: string;
   fullWidth: boolean;
 } & Omit<FormControlLabelProps, 'control' | 'onChange'> &
@@ -29,7 +30,7 @@ function Checkbox({ ...rest }: FormControlLabelOptions) {
   rest.checked = rest.checked ?? false;
   const { onFormInputChange, renderFormInput, formInputError } = useFormInput<boolean>({
     name: rest.name,
-    label: rest.label as string,
+    label: rest.label,
     onChange: rest.onChange,
     validationProps: { isRequired: rest.isRequired, isInvalid: rest.isInvalid },
   });

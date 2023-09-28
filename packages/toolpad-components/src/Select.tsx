@@ -17,6 +17,7 @@ export interface SelectOption {
 export type SelectProps = Omit<TextFieldProps, 'value' | 'onChange'> & {
   value: string;
   onChange: (newValue: string) => void;
+  label: string;
   defaultValue: string;
   options: (string | SelectOption)[];
 } & Pick<FormInputComponentProps, 'name' | 'isRequired' | 'isInvalid'>;
@@ -34,7 +35,7 @@ function Select({
 }: SelectProps) {
   const { onFormInputChange, formInputError, renderFormInput } = useFormInput<string>({
     name: rest.name,
-    label: rest.label as string,
+    label: rest.label,
     value,
     onChange,
     defaultValue,

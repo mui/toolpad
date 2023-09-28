@@ -25,8 +25,8 @@ interface AutocompleteProps
     Pick<FormInputComponentProps, 'name' | 'isRequired' | 'minLength' | 'maxLength' | 'isInvalid'> {
   value: AutocompleteValue;
   onChange: (newValue: AutocompleteValue) => void;
-  options: AutocompleteOption[];
   label: string;
+  options: AutocompleteOption[];
 }
 
 function Autocomplete({

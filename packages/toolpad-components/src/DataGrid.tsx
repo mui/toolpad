@@ -523,7 +523,12 @@ function useDataProviderDataGridProps(
     paginationModel,
     rowCount,
     onPaginationModelChange(model) {
-      setPaginationModel(model);
+      setPaginationModel((prevModel) => {
+        if (prevModel.pageSize !== model.pageSize) {
+          return { ...model, page: 0 };
+        }
+        return model;
+      });
     },
     rows: data?.records ?? [],
     error,

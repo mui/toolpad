@@ -13,6 +13,7 @@ spec:
           - field: name
             width: 135
         height: 242
+        rowsSource: dataProvider
     - component: DataGrid
       name: dataGrid1
       props:
@@ -21,4 +22,5 @@ spec:
           - field: name
             width: 133
         height: 244
+        rowsSource: dataProvider
   display: shell

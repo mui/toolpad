@@ -184,7 +184,6 @@ export interface FormInputComponentProps {
 
 interface UseFormInputInput<V> {
   name: string;
-  label?: string;
   value?: V;
   onChange: (newValue: V) => void;
   emptyValue?: V;
@@ -202,7 +201,6 @@ interface UseFormInputPayload<V> {
 
 export function useFormInput<V>({
   name,
-  label,
   value,
   onChange,
   emptyValue,
@@ -219,7 +217,7 @@ export function useFormInput<V>({
 
   const formInputName = fieldName || fallbackName;
 
-  const formInputDisplayName = label || name || 'Field';
+  const formInputDisplayName: string = name || 'Field';
 
   const formInputError = formInputName
     ? (form?.formState.errors[formInputName] as FieldError)

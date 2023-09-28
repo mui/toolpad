@@ -45,7 +45,6 @@ function Autocomplete({
 
   const { onFormInputChange, formInputError, renderFormInput } = useFormInput<string | null>({
     name: rest.name,
-    label,
     value,
     onChange,
     emptyValue: null,

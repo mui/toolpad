@@ -91,7 +91,6 @@ function DatePicker({
 }: DatePickerProps) {
   const { onFormInputChange, formInputError, renderFormInput } = useFormInput<string | null>({
     name: rest.name,
-    label: rest.label as string,
     value: valueProp,
     onChange,
     defaultValue: defaultValueProp,

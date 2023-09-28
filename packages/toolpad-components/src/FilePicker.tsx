@@ -49,7 +49,6 @@ function FilePicker({
 }: FilePickerProps) {
   const { onFormInputChange, formInputError, renderFormInput } = useFormInput<FullFile[]>({
     name: rest.name,
-    label: rest.label as string,
     value,
     onChange,
     validationProps: { isRequired, isInvalid },

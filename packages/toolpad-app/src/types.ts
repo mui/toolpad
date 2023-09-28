@@ -210,7 +210,7 @@ export type ProjectEvents = {
 };
 
 export interface ToolpadProjectOptions {
-  cmd: 'dev' | 'start' | 'build';
   dev: boolean;
-  externalUrl: string;
+  externalUrl?: string;
+  wsPort?: number;
 }

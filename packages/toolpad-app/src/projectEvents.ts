@@ -2,13 +2,14 @@ import * as React from 'react';
 import { Emitter } from '@mui/toolpad-utils/events';
 import useEventCallback from '@mui/utils/useEventCallback';
 import { ProjectEvents } from './types';
+import config from './config';
 
 let ws: WebSocket | null = null;
 const projectEvents = new Emitter<ProjectEvents>();
 
 if (typeof window !== 'undefined') {
   const wsProtocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-  ws = new WebSocket(`${wsProtocol}//${window.location.host}/toolpad-ws`);
+  ws = new WebSocket(`${wsProtocol}//${window.location.hostname}:${config.wsPort}/toolpad-ws`);
 
   ws.addEventListener('error', (err) => console.error(err));
 

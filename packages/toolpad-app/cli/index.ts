@@ -12,13 +12,14 @@ export interface RunOptions {
   dev?: boolean;
 }
 
-async function runCommand(cmd: 'dev' | 'start', { dir, ...args }: Omit<RunOptions, 'cmd'>) {
+async function runCommand(cmd: 'dev' | 'start', { dir, dev, ...args }: Omit<RunOptions, 'cmd'>) {
   const projectDir = path.resolve(process.cwd(), dir);
 
   const app = await runApp({
     ...args,
-    projectDir,
+    dir: projectDir,
     cmd,
+    toolpadDevMode: dev,
   });
 
   process.once('SIGINT', () => {

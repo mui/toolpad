@@ -34,6 +34,7 @@ function TextField({
 }: TextFieldProps) {
   const { onFormInputChange, formInputError, renderFormInput } = useFormInput<string>({
     name: rest.name,
+    label: rest.label as string,
     value,
     onChange,
     emptyValue: '',

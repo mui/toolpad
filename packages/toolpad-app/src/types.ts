@@ -211,5 +211,6 @@ export type ProjectEvents = {
 
 export interface ToolpadProjectOptions {
   dev: boolean;
-  externalUrl: string;
+  externalUrl?: string;
+  wsPort?: number;
 }

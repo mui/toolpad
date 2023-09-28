@@ -993,7 +993,6 @@ class ToolpadProject {
     this.root = root;
     this.options = {
       dev: false,
-      externalUrl: 'http://localhost:3000',
       ...options,
     };
 
@@ -1199,9 +1198,13 @@ class ToolpadProject {
   }
 
   getRuntimeConfig(): RuntimeConfig {
+    invariant(this.options.externalUrl, 'External URL is not set');
+    invariant(this.options.wsPort, 'Websocket port is not set');
+
     return {
       externalUrl: this.options.externalUrl,
       projectDir: this.getRoot(),
+      wsPort: this.options.wsPort,
     };
   }
 }
@@ -1213,13 +1216,11 @@ declare global {
   var __toolpadProject: ToolpadProject | undefined;
 }
 
-export interface InitProjectOptions {
-  dev?: boolean;
+export interface InitProjectOptions extends ToolpadProjectOptions {
   dir: string;
-  externalUrl?: string;
 }
 
-export async function initProject({ dev, dir, externalUrl }: InitProjectOptions) {
+export async function initProject({ dev, dir, externalUrl, wsPort }: InitProjectOptions) {
   // eslint-disable-next-line no-underscore-dangle
   invariant(!global.__toolpadProject, 'A project is already running');
 
@@ -1227,7 +1228,7 @@ export async function initProject({ dev, dir, externalUrl }: InitProjectOptions)
 
   await initToolpadFolder(dir);
 
-  const project = new ToolpadProject(dir, { dev, externalUrl });
+  const project = new ToolpadProject(dir, { dev, externalUrl, wsPort });
   // eslint-disable-next-line no-underscore-dangle
   globalThis.__toolpadProject = project;
 

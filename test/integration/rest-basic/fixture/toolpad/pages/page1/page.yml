@@ -4,60 +4,53 @@ spec:
   id: cn1tds0
   title: Page 1
   content:
-    - component: PageRow
-      name: pageRow5
-      children:
-        - component: Text
-          name: text2
-          props:
-            variant: h1
-            value: RUN yarn test:rest:start
-    - component: PageRow
-      name: pageRow
-      children:
-        - component: Text
-          name: typography
-          props:
-            value:
-              $$jsExpression: |
-                `query1: ${query1.data.args.query1_param1}`
-    - component: PageRow
-      name: pageRow1
-      children:
-        - component: Button
-          name: button
-          props:
-            content: fetch query2
-            onClick:
-              $$jsExpressionAction: "query2.fetch({value: 'query2_value' })"
-    - component: PageRow
-      name: pageRow2
-      children:
-        - component: Text
-          name: typography1
-          props:
-            value:
-              $$jsExpression: |
-                `query2: ${query2.data?.json.value}`
-    - component: PageRow
-      name: pageRow3
-      children:
-        - component: Text
-          name: text
-          props:
-            value:
-              $$jsExpression: |
-                queryWithTransform.data
-    - component: PageRow
-      name: pageRow4
-      children:
-        - component: Text
-          name: text1
-          props:
-            value:
-              $$jsExpression: >
-                `query4 authorization:
-                ${queryWithEnv?.data.headers.Authorization}`
+    - component: Text
+      name: text2
+      layout:
+        columnSize: 1
+      props:
+        variant: h1
+        value: RUN yarn test:rest:start
+    - component: Text
+      name: typography
+      layout:
+        columnSize: 1
+      props:
+        value:
+          $$jsExpression: |
+            `query1: ${query1.data.args.query1_param1}`
+    - component: Button
+      name: button
+      layout:
+        columnSize: 1
+      props:
+        content: fetch query2
+        onClick:
+          $$jsExpressionAction: "query2.fetch({value: 'query2_value' })"
+    - component: Text
+      name: typography1
+      layout:
+        columnSize: 1
+      props:
+        value:
+          $$jsExpression: |
+            `query2: ${query2.data?.json.value}`
+    - component: Text
+      name: text
+      layout:
+        columnSize: 1
+      props:
+        value:
+          $$jsExpression: |
+            queryWithTransform.data
+    - component: Text
+      name: text1
+      layout:
+        columnSize: 1
+      props:
+        value:
+          $$jsExpression: |
+            `query4 authorization: ${queryWithEnv?.data.headers.Authorization}`
   queries:
     - name: query1
       query:

@@ -1,16 +1,5 @@
 import { TreeView, treeItemClasses, TreeItem, TreeItemProps } from '@mui/x-tree-view';
-import {
-  Typography,
-  styled,
-  Box,
-  IconButton,
-  InputBase,
-  alpha,
-  Popover,
-  Alert,
-  useTheme,
-  Tooltip,
-} from '@mui/material';
+import { Typography, styled, Box, IconButton, Tooltip } from '@mui/material';
 import * as React from 'react';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
@@ -26,7 +15,7 @@ import NodeMenu from '../NodeMenu';
 import { DomView } from '../../../utils/domView';
 import client from '../../../api';
 import useBoolean from '../../../utils/useBoolean';
-import { useNodeNameValidation } from './validation';
+import CreateTreeItem from '../../../components/CreateTreeItem';
 
 const PagesExplorerRoot = styled('div')({
   overflow: 'auto',
@@ -144,8 +133,6 @@ export interface PagesExplorerProps {
 }
 
 export default function PagesExplorer({ className }: PagesExplorerProps) {
-  const theme = useTheme();
-
   const { dom } = useAppState();
   const { currentView } = useAppState();
 
@@ -201,12 +188,10 @@ export default function PagesExplorer({ className }: PagesExplorerProps) {
     handlerTreeRef.current?.querySelector(`.${treeItemClasses.selected}`)?.scrollIntoView();
   }, []);
 
-  const [newPageInput, setNewPageInput] = React.useState('');
-
   const {
     value: isCreateNewPageOpen,
     setTrue: handleOpenCreateNewPage,
-    setFalse: handleCloseCreateNewPageDialog,
+    setFalse: handleCloseCreateNewPage,
   } = useBoolean(false);
 
   const nextProposedName = React.useMemo(
@@ -214,52 +199,38 @@ export default function PagesExplorer({ className }: PagesExplorerProps) {
     [existingNames],
   );
 
-  const handleCreateNewPage = React.useCallback(() => {
-    setNewPageInput(nextProposedName);
-    handleOpenCreateNewPage();
-  }, [handleOpenCreateNewPage, nextProposedName]);
+  const handleCreateNewCommit = React.useCallback(
+    async (newPageName: string) => {
+      const newNode = appDom.createNode(dom, 'page', {
+        name: newPageName,
+        attributes: {
+          title: newPageName,
+          display: 'shell',
+        },
+      });
+      const appNode = appDom.getApp(dom);
 
-  const handleCloseCreateNewPage = React.useCallback(() => {
-    setNewPageInput('');
-    handleCloseCreateNewPageDialog();
-  }, [handleCloseCreateNewPageDialog]);
+      appStateApi.update((draft) => appDom.addNode(draft, newNode, appNode, 'pages'), {
+        kind: 'page',
+        nodeId: newNode.id,
+      });
 
-  const [anchorEl, setAnchorEl] = React.useState<HTMLButtonElement | null>(null);
-  const createNewInputRef = React.useRef(null);
-  const open = !!anchorEl;
-
-  const newPageInputErrorMsg = useNodeNameValidation(newPageInput, existingNames, 'page');
-
-  React.useEffect(() => {
-    setAnchorEl(newPageInputErrorMsg ? createNewInputRef.current : null);
-  }, [newPageInputErrorMsg]);
-
-  const handleCreateNewCommit = React.useCallback(async () => {
-    if (!newPageInput || newPageInputErrorMsg) {
       handleCloseCreateNewPage();
-      return;
-    }
+    },
+    [appStateApi, dom, handleCloseCreateNewPage],
+  );
 
-    const newNode = appDom.createNode(dom, 'page', {
-      name: newPageInput,
-      attributes: {
-        title: newPageInput,
-        display: 'shell',
-      },
-    });
-    const appNode = appDom.getApp(dom);
+  const validatePageName = React.useCallback(
+    (pageName: string) => {
+      const validationErrorMessage = appDom.validateNodeName(pageName, existingNames, 'page');
 
-    appStateApi.update((draft) => appDom.addNode(draft, newNode, appNode, 'pages'), {
-      kind: 'page',
-      nodeId: newNode.id,
-    });
-
-    handleCloseCreateNewPage();
-
-    setTimeout(() => {
-      handlerTreeRef.current?.querySelector(`.${treeItemClasses.selected}`)?.scrollIntoView();
-    }, 0);
-  }, [appStateApi, dom, handleCloseCreateNewPage, newPageInput, newPageInputErrorMsg]);
+      return {
+        isValid: !validationErrorMessage,
+        ...(validationErrorMessage ? { errorMessage: validationErrorMessage } : {}),
+      };
+    },
+    [existingNames],
+  );
 
   const handleDeletePage = React.useCallback(
     async (nodeId: NodeId) => {
@@ -329,65 +300,17 @@ export default function PagesExplorer({ className }: PagesExplorerProps) {
           aria-level={1}
           labelText="Pages"
           createLabelText="Create page"
-          onCreate={handleCreateNewPage}
+          onCreate={handleOpenCreateNewPage}
         >
-          {isCreateNewPageOpen ? (
-            <TreeItem
-              nodeId="::create::"
-              label={
-                <React.Fragment>
-                  <InputBase
-                    ref={createNewInputRef}
-                    value={newPageInput}
-                    onChange={(event) => setNewPageInput(event.target.value)}
-                    autoFocus
-                    onFocus={(event) => {
-                      event.target.select();
-                    }}
-                    onBlur={(event) => {
-                      if (event && event.target.value !== nextProposedName) {
-                        handleCreateNewCommit();
-                      } else {
-                        handleCloseCreateNewPage();
-                      }
-                    }}
-                    onKeyDown={(event) => {
-                      if (event.key === 'Enter') {
-                        handleCreateNewCommit();
-                      } else if (event.key === 'Escape') {
-                        handleCloseCreateNewPage();
-                        event.stopPropagation();
-                      }
-                    }}
-                    fullWidth
-                    sx={{
-                      fontSize: 14,
-                    }}
-                  />
-                  <Popover
-                    open={open}
-                    anchorEl={anchorEl}
-                    onClose={() => setAnchorEl(null)}
-                    disableAutoFocus
-                    anchorOrigin={{
-                      vertical: 'bottom',
-                      horizontal: 'left',
-                    }}
-                  >
-                    <Alert severity="error" variant="outlined">
-                      {newPageInputErrorMsg}
-                    </Alert>
-                  </Popover>
-                </React.Fragment>
-              }
-              sx={{
-                backgroundColor: alpha(theme.palette.primary.main, 0.2),
-                '.MuiTreeItem-content': {
-                  backgroundColor: 'transparent',
-                },
-              }}
-            />
-          ) : null}
+          <CreateTreeItem
+            treeRef={handlerTreeRef}
+            open={isCreateNewPageOpen}
+            suggestedNewItemName={nextProposedName}
+            onCreate={handleCreateNewCommit}
+            onClose={handleCloseCreateNewPage}
+            validateItemName={validatePageName}
+            inputProps={{ sx: { fontSize: 14 } }}
+          />
           {pages.map((page) => (
             <PagesExplorerTreeItem
               key={page.id}

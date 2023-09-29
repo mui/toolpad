@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Typography, styled, Box, IconButton, Tooltip } from '@mui/material';
+import { styled, Box, IconButton, Tooltip } from '@mui/material';
 import { TreeView, treeItemClasses } from '@mui/x-tree-view';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
@@ -16,6 +16,7 @@ import { DomView } from '../../../utils/domView';
 import client from '../../../api';
 import useBoolean from '../../../utils/useBoolean';
 import EditableTreeItem, { EditableTreeItemProps } from '../../../components/EditableTreeItem';
+import { scrollIntoViewIfNeeded } from '../../../utils/scroll';
 
 const PagesExplorerRoot = styled('div')({
   overflow: 'auto',
@@ -39,7 +40,7 @@ const StyledEditableTreeItem = styled(EditableTreeItem)({
   },
 });
 
-interface StyledTreeItemProps extends EditableTreeItemProps {
+interface StyledTreeItemProps extends Omit<EditableTreeItemProps, 'name'> {
   ref?: React.RefObject<HTMLLIElement>;
   onRenameNode?: (nodeId: NodeId, updatedName: string) => void;
   onDeleteNode?: (nodeId: NodeId) => void;
@@ -105,12 +106,11 @@ function PagesExplorerTreeItem(props: StyledTreeItemProps) {
   return (
     <StyledEditableTreeItem
       nodeId={nodeId}
-      label={
+      labelText={labelText}
+      renderLabel={(children) => (
         <Box sx={{ display: 'flex', alignItems: 'center', p: 0.1, pr: 0 }}>
           {labelIcon}
-          <Typography variant="body2" sx={{ fontWeight: 'inherit', flexGrow: 1 }} noWrap>
-            {labelText}
-          </Typography>
+          {children}
           {onCreate ? (
             <Tooltip title="Create new page">
               <IconButton aria-label={createLabelText} onClick={handleCreate} size="small">
@@ -142,7 +142,7 @@ function PagesExplorerTreeItem(props: StyledTreeItemProps) {
             />
           ) : null}
         </Box>
-      }
+      )}
       suggestedNewItemName={labelText}
       onCancel={stopEditing}
       isEditing={isEditing}
@@ -228,7 +228,11 @@ export default function PagesExplorer({ className }: PagesExplorerProps) {
   React.useEffect(() => {
     const pagesTree = pagesTreeRef.current;
     if (pagesTree && hasMounted) {
-      pagesTree.querySelector(`.${treeItemClasses.selected}`)?.scrollIntoView();
+      const selectedItem = pagesTree.querySelector(`.${treeItemClasses.selected}`);
+
+      if (selectedItem) {
+        scrollIntoViewIfNeeded(selectedItem);
+      }
     }
   }, [hasMounted, pages]);
 

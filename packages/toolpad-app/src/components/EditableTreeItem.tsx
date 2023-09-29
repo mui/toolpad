@@ -1,8 +1,18 @@
 import * as React from 'react';
 import { TreeItem, TreeItemProps } from '@mui/x-tree-view';
-import { Alert, InputBase, InputBaseProps, Popover, alpha, useTheme } from '@mui/material';
+import {
+  Alert,
+  InputBase,
+  InputBaseProps,
+  Popover,
+  Typography,
+  alpha,
+  useTheme,
+} from '@mui/material';
 
-export interface EditableTreeItemProps extends TreeItemProps {
+export interface EditableTreeItemProps extends Omit<TreeItemProps, 'label'> {
+  labelText?: string;
+  renderLabel?: (children: React.ReactNode) => React.ReactNode;
   suggestedNewItemName?: string;
   isEditing?: boolean;
   onEdit?: (newItemName: string) => void | Promise<void>;
@@ -14,7 +24,11 @@ export interface EditableTreeItemProps extends TreeItemProps {
   >;
 }
 
+const defaultRenderLabel = (children: React.ReactNode) => children;
+
 export default function EditableTreeItem({
+  labelText = '',
+  renderLabel = defaultRenderLabel,
   suggestedNewItemName = '',
   validateItemName,
   isEditing: isExternalEditing = false,
@@ -109,11 +123,17 @@ export default function EditableTreeItem({
 
   const inputErrorPopoverAnchorEl = inputRef.current;
 
+  const labelTextSx = {
+    fontSize: 14,
+    pt: '4px',
+    pb: '4px',
+  };
+
   return (
     <TreeItem
       {...rest}
       onClick={handleClick}
-      label={
+      label={renderLabel(
         isEditing ? (
           <React.Fragment>
             <InputBase
@@ -127,9 +147,9 @@ export default function EditableTreeItem({
               onKeyDown={handleKeyDown}
               fullWidth
               sx={{
-                fontSize: 14,
-                paddingBottom: '1px',
-                ...(inputProps?.sx ?? {}),
+                ...(inputProps?.sx || {}),
+                ...labelTextSx,
+                padding: 0,
               }}
             />
             {inputErrorPopoverAnchorEl ? (
@@ -151,17 +171,23 @@ export default function EditableTreeItem({
             ) : null}
           </React.Fragment>
         ) : (
-          rest.label
-        )
-      }
+          <Typography
+            variant="body2"
+            sx={{ fontWeight: 'inherit', flexGrow: 1, ...labelTextSx }}
+            noWrap
+          >
+            {labelText}
+          </Typography>
+        ),
+      )}
       sx={
         isEditing
           ? {
+              ...sx,
               backgroundColor: alpha(theme.palette.primary.main, 0.2),
               '.MuiTreeItem-content': {
                 backgroundColor: 'transparent',
               },
-              ...sx,
             }
           : sx
       }

@@ -6,11 +6,10 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import * as appDom from '../../../appDom';
 import { useAppState, useDomApi, useAppStateApi } from '../../AppState';
-import EditableText from '../../../components/EditableText';
 import { ComponentIcon } from '../PageEditor/ComponentCatalog/ComponentCatalogItem';
-import { useNodeNameValidation } from '../PagesExplorer/validation';
 import { DomView } from '../../../utils/domView';
 import { removePageLayoutNode } from '../pageLayout';
+import EditableTreeItem from '../../../components/EditableTreeItem';
 
 export interface CustomTreeItemProps extends TreeItemProps {
   ref?: React.RefObject<HTMLLIElement>;
@@ -25,28 +24,33 @@ function CustomTreeItem(props: CustomTreeItemProps) {
   const [domNodeEditable, setDomNodeEditable] = React.useState(false);
   const { label, node, ...other } = props;
 
-  const [nodeNameInput, setNodeNameInput] = React.useState(node.name);
-  const handleNodeNameChange = React.useCallback(
-    (newValue: string) => setNodeNameInput(newValue),
-    [],
-  );
   const handleStopEditing = React.useCallback(() => {
-    setNodeNameInput(node.name);
     setDomNodeEditable(false);
-  }, [node.name]);
+  }, []);
 
   const existingNames = React.useMemo(() => appDom.getExistingNamesForNode(dom, node), [dom, node]);
-  const nodeNameError = useNodeNameValidation(nodeNameInput, existingNames, node.type);
-  const isNameValid = !nodeNameError;
 
-  const handleNameSave = React.useCallback(() => {
-    if (isNameValid) {
-      setNodeNameInput(nodeNameInput);
-      domApi.setNodeName(node.id, nodeNameInput);
-    } else {
-      setNodeNameInput(node.name);
-    }
-  }, [isNameValid, domApi, node.id, node.name, nodeNameInput]);
+  const validateEditableNodeName = React.useCallback(
+    (newName: string) => {
+      if (newName !== node.name) {
+        const validationErrorMessage = appDom.validateNodeName(newName, existingNames, node.type);
+
+        return {
+          isValid: !validationErrorMessage,
+          ...(validationErrorMessage ? { errorMessage: validationErrorMessage } : {}),
+        };
+      }
+      return { isValid: true };
+    },
+    [existingNames, node.name, node.type],
+  );
+
+  const handleNameSave = React.useCallback(
+    (newName: string) => {
+      domApi.setNodeName(node.id, newName);
+    },
+    [domApi, node.id],
+  );
 
   const handleNodeHover = React.useCallback(
     (event: React.MouseEvent, nodeId: NodeId) => {
@@ -60,9 +64,10 @@ function CustomTreeItem(props: CustomTreeItemProps) {
   }, [appStateApi]);
 
   return (
-    <TreeItem
+    <EditableTreeItem
       key={node.id}
-      label={
+      labelText={node.name}
+      renderLabel={(children) => (
         <Box
           sx={{ display: 'flex', alignItems: 'center', p: 0.2, pr: 0 }}
           onMouseEnter={(event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
@@ -75,20 +80,14 @@ function CustomTreeItem(props: CustomTreeItemProps) {
             kind="builtIn"
             sx={{ marginRight: 1, fontSize: 18, opacity: 0.5 }}
           />
-          <EditableText
-            value={nodeNameInput}
-            variant="body2"
-            editable={domNodeEditable}
-            onDoubleClick={() => setDomNodeEditable(true)}
-            onChange={handleNodeNameChange}
-            onClose={handleStopEditing}
-            onSave={handleNameSave}
-            error={!isNameValid}
-            helperText={nodeNameError}
-            sx={{ flexGrow: 1 }}
-          />
+          {children}
         </Box>
-      }
+      )}
+      isEditing={domNodeEditable}
+      onEdit={handleNameSave}
+      suggestedNewItemName={node.name}
+      onCancel={handleStopEditing}
+      validateItemName={validateEditableNodeName}
       {...other}
     />
   );

@@ -96,7 +96,7 @@ const pages: MuiPage[] = [
         children: [
           {
             pathname: '/toolpad/how-to-guides/render-deploy',
-            title: 'Deploy your app to Render',
+            title: 'Deploy to Render',
           },
         ],
       },

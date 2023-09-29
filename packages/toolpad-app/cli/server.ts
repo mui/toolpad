@@ -3,7 +3,6 @@ import { IncomingMessage, createServer } from 'http';
 import * as fs from 'fs/promises';
 import { Worker, MessageChannel } from 'worker_threads';
 import express from 'express';
-import invariant from 'invariant';
 import getPort from 'get-port';
 import { createProxyMiddleware } from 'http-proxy-middleware';
 import { mapValues } from '@mui/toolpad-utils/collections';
@@ -125,31 +124,33 @@ interface AppHandler {
   dispose?: () => Promise<void>;
 }
 
-export interface ServerConfig {
-  dev?: boolean;
+export interface ToolpadHandlerConfig {
+  dev: boolean;
   dir: string;
-  port: number;
   externalUrl: string;
   toolpadDevMode?: boolean;
 }
 
-async function startServer({ dev, port, toolpadDevMode, externalUrl, dir }: ServerConfig) {
+async function createToolpadHandler({
+  dev,
+  toolpadDevMode,
+  externalUrl,
+  dir,
+}: ToolpadHandlerConfig): Promise<AppHandler> {
   const gitSha1 = process.env.GIT_SHA1 || null;
   const circleBuildNum = process.env.CIRCLE_BUILD_NUM || null;
 
-  const project = await initProject({ dev, dir, externalUrl });
+  const wsPort = await getPort();
+
+  const project = await initProject({ dev, dir, externalUrl, wsPort });
   await project.start();
 
-  const runtimeConfig: RuntimeConfig = {
-    projectDir: project.getRoot(),
-    externalUrl,
-  };
+  const runtimeConfig: RuntimeConfig = project.getRuntimeConfig();
 
-  const app = express();
-  const httpServer = createServer(app);
+  const router = express.Router();
 
   // See https://nextjs.org/docs/advanced-features/security-headers
-  app.use((req, res, expressNext) => {
+  router.use((req, res, expressNext) => {
     // Force the browser to trust the Content-Type header
     // https://stackoverflow.com/questions/18337630/what-is-x-content-type-options-nosniff
     res.setHeader('X-Content-Type-Options', 'nosniff');
@@ -158,12 +159,12 @@ async function startServer({ dev, port, toolpadDevMode, externalUrl, dir }: Serv
     expressNext();
   });
 
-  app.get('/', (req, res) => {
+  router.get('/', (req, res) => {
     const redirectUrl = dev ? '/_toolpad' : '/prod';
     res.redirect(302, redirectUrl);
   });
 
-  app.get('/health-check', (req, res) => {
+  router.get('/health-check', (req, res) => {
     const memoryUsage = process.memoryUsage();
     res.json({
       gitSha1,
@@ -174,7 +175,7 @@ async function startServer({ dev, port, toolpadDevMode, externalUrl, dir }: Serv
   });
 
   const publicPath = path.resolve(__dirname, '../../public');
-  app.use(express.static(publicPath, { index: false }));
+  router.use(express.static(publicPath, { index: false }));
 
   let appHandler: AppHandler | undefined;
 
@@ -184,16 +185,16 @@ async function startServer({ dev, port, toolpadDevMode, externalUrl, dir }: Serv
       runtimeConfig,
       base: previewBase,
     });
-    app.use(previewBase, appHandler.handler);
+    router.use(previewBase, appHandler.handler);
   } else {
     appHandler = await createProdHandler(project);
-    app.use('/prod', appHandler.handler);
+    router.use('/prod', appHandler.handler);
   }
 
   if (dev) {
     const rpcServer = createRpcServer(project);
-    app.use('/api/rpc', createRpcHandler(rpcServer));
-    app.use('/api/dataSources', project.dataManager.createDataSourcesHandler());
+    router.use('/api/rpc', createRpcHandler(rpcServer));
+    router.use('/api/dataSources', project.dataManager.createDataSourcesHandler());
 
     const transformIndexHtml = (html: string) => {
       const serializedConfig = serializeJavascript(runtimeConfig, { isJSON: true });
@@ -224,9 +225,9 @@ async function startServer({ dev, port, toolpadDevMode, externalUrl, dir }: Serv
         ],
       });
 
-      app.use(editorBasename, viteApp.middlewares);
+      router.use(editorBasename, viteApp.middlewares);
     } else {
-      app.use(
+      router.use(
         editorBasename,
         express.static(path.resolve(__dirname, '../../dist/editor'), { index: false }),
         asyncHandler(async (req, res) => {
@@ -239,38 +240,72 @@ async function startServer({ dev, port, toolpadDevMode, externalUrl, dir }: Serv
     }
   }
 
-  const runningServer = await listen(httpServer, port);
+  if (dev) {
+    const wsServer = new WebSocketServer({ port: wsPort });
 
-  const wsServer = new WebSocketServer({ noServer: true });
-
-  project.events.on('*', (event, payload) => {
-    wsServer.clients.forEach((client) => {
-      if (client.readyState === WebSocket.OPEN) {
-        client.send(JSON.stringify({ kind: 'projectEvent', event, payload }));
-      }
-    });
-  });
-
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  wsServer.on('connection', (ws: WebSocket, _request: IncomingMessage) => {
-    ws.on('error', console.error);
-  });
-
-  httpServer.on('upgrade', (request, socket, head) => {
-    invariant(request.url, 'request must have a url');
-    const { pathname } = new URL(request.url, 'http://x');
-
-    if (pathname === '/toolpad-ws') {
-      wsServer.handleUpgrade(request, socket, head, (ws) => {
-        wsServer.emit('connection', ws, request);
+    project.events.on('*', (event, payload) => {
+      wsServer.clients.forEach((client) => {
+        if (client.readyState === WebSocket.OPEN) {
+          client.send(JSON.stringify({ kind: 'projectEvent', event, payload }));
+        }
       });
-    }
+    });
+
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    wsServer.on('connection', (ws: WebSocket, _request: IncomingMessage) => {
+      ws.on('error', console.error);
+    });
+
+    // TODO(Jan): allow passing a server instance to the handler and attach websocket server to it
+    // httpServer.on('upgrade', (request, socket, head) => {
+    //   invariant(request.url, 'request must have a url');
+    //   const { pathname } = new URL(request.url, 'http://x');
+    //
+    //   if (pathname === '/toolpad-ws') {
+    //     wsServer.handleUpgrade(request, socket, head, (ws) => {
+    //       wsServer.emit('connection', ws, request);
+    //     });
+    //   }
+    // });
+  }
+
+  return {
+    handler: router,
+    dispose: async () => {
+      await Promise.allSettled([project.dispose(), appHandler?.dispose?.()]);
+    },
+  };
+}
+
+export interface ToolpadServerConfig extends Omit<ToolpadHandlerConfig, 'server'> {
+  port: number;
+}
+
+async function startToolpadServer({
+  dev,
+  port,
+  toolpadDevMode,
+  externalUrl,
+  dir,
+}: ToolpadServerConfig) {
+  const app = express();
+  const httpServer = createServer(app);
+
+  const toolpadHandler = await createToolpadHandler({
+    dev,
+    toolpadDevMode,
+    externalUrl,
+    dir,
   });
+
+  app.use(toolpadHandler.handler);
+
+  const runningServer = await listen(httpServer, port);
 
   return {
     port: runningServer.port,
     async dispose() {
-      await Promise.allSettled([project.dispose(), runningServer.close(), appHandler?.dispose?.()]);
+      await Promise.allSettled([runningServer.close(), toolpadHandler?.dispose?.()]);
     },
   };
 }
@@ -308,7 +343,7 @@ export async function runApp({ cmd, dir, port, toolpadDevMode = false }: RunAppO
 
   const externalUrl = process.env.TOOLPAD_EXTERNAL_URL || `http://localhost:${port}`;
 
-  const server = await startServer({
+  const server = await startToolpadServer({
     dev,
     dir,
     port,

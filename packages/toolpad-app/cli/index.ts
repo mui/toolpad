@@ -10,6 +10,7 @@ export interface RunOptions {
   dir: string;
   port?: number;
   dev?: boolean;
+  base: string;
 }
 
 async function runCommand(cmd: 'dev' | 'start', { dir, dev, ...args }: Omit<RunOptions, 'cmd'>) {
@@ -88,6 +89,11 @@ export default async function cli(argv: string[]) {
       demandOption: false,
       default: false,
       hidden: true,
+    },
+    base: {
+      type: 'string',
+      describe: 'Public base path of the Toolpad application',
+      default: '/prod',
     },
   } as const;
 

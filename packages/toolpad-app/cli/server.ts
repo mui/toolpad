@@ -138,6 +138,7 @@ async function createToolpadAppHandler(
 export interface ToolpadHandlerConfig {
   dev: boolean;
   dir: string;
+  base: string;
   externalUrl: string;
   toolpadDevMode?: boolean;
 }
@@ -146,10 +147,10 @@ async function createToolpadHandler({
   dev,
   toolpadDevMode,
   externalUrl,
+  base,
   dir,
 }: ToolpadHandlerConfig): Promise<AppHandler> {
   const editorBasename = '/_toolpad';
-  const appBase = '/prod';
   const gitSha1 = process.env.GIT_SHA1 || null;
   const circleBuildNum = process.env.CIRCLE_BUILD_NUM || null;
 
@@ -173,7 +174,7 @@ async function createToolpadHandler({
   });
 
   router.get('/', (req, res) => {
-    const redirectUrl = dev ? editorBasename : appBase;
+    const redirectUrl = dev ? editorBasename : base;
     res.redirect(302, redirectUrl);
   });
 
@@ -190,8 +191,8 @@ async function createToolpadHandler({
   const publicPath = path.resolve(__dirname, '../../public');
   router.use(express.static(publicPath, { index: false }));
 
-  const appHandler = await createToolpadAppHandler(project, { base: appBase });
-  router.use(appBase, appHandler.handler);
+  const appHandler = await createToolpadAppHandler(project, { base });
+  router.use(base, appHandler.handler);
 
   if (dev) {
     const rpcServer = createRpcServer(project);
@@ -282,22 +283,11 @@ export interface ToolpadServerConfig extends Omit<ToolpadHandlerConfig, 'server'
   port: number;
 }
 
-async function startToolpadServer({
-  dev,
-  port,
-  toolpadDevMode,
-  externalUrl,
-  dir,
-}: ToolpadServerConfig) {
+async function startToolpadServer({ port, ...config }: ToolpadServerConfig) {
   const app = express();
   const httpServer = createServer(app);
 
-  const toolpadHandler = await createToolpadHandler({
-    dev,
-    toolpadDevMode,
-    externalUrl,
-    dir,
-  });
+  const toolpadHandler = await createToolpadHandler(config);
 
   app.use(toolpadHandler.handler);
 
@@ -316,14 +306,11 @@ export interface RunAppOptions {
   cmd: Command;
   port?: number;
   dir: string;
+  base: string;
   toolpadDevMode?: boolean;
 }
 
-export interface RunAppResult {
-  dispose(): Promise<void>;
-}
-
-export async function runApp({ cmd, dir, port, toolpadDevMode = false }: RunAppOptions) {
+export async function runApp({ cmd, dir, base, port, toolpadDevMode = false }: RunAppOptions) {
   const dev = cmd === 'dev';
 
   if (!(await folderExists(dir))) {
@@ -346,6 +333,7 @@ export async function runApp({ cmd, dir, port, toolpadDevMode = false }: RunAppO
 
   const server = await startToolpadServer({
     dev,
+    base,
     dir,
     port,
     toolpadDevMode: !!process.env.TOOLPAD_NEXT_DEV || toolpadDevMode,

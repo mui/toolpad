@@ -172,10 +172,6 @@ export interface AppTheme {
   'palette.secondary.main'?: string;
 }
 
-export type AppVersion = 'development' | 'preview' | number;
-
-export type AppTemplateId = 'default' | 'hr' | 'images';
-
 export type NodeHashes = Record<NodeId, number | undefined>;
 
 /**

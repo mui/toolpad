@@ -29,7 +29,7 @@ export interface RenderPanelProps {
 }
 
 export default function RenderPanel({ className }: RenderPanelProps) {
-  const domLoader = useAppState();
+  const appState = useAppState();
   const { dom } = useAppState();
   const domApi = useDomApi();
   const appStateApi = useAppStateApi();
@@ -39,8 +39,8 @@ export default function RenderPanel({ className }: RenderPanelProps) {
   const [bridge, setBridge] = React.useState<ToolpadBridge | null>(null);
 
   const savedNodes: NodeHashes = React.useMemo(
-    () => getNodeHashes(domLoader.savedDom),
-    [domLoader.savedDom],
+    () => getNodeHashes(appState.savedDom),
+    [appState.savedDom],
   );
 
   const handleInit = useEventCallback((initializedBridge: ToolpadBridge) => {
@@ -94,6 +94,7 @@ export default function RenderPanel({ className }: RenderPanelProps) {
     <RenderPanelRoot className={className}>
       <EditorCanvasHost
         className={classes.view}
+        base={appState.base}
         dom={dom}
         savedNodes={savedNodes}
         pageNodeId={pageNodeId}

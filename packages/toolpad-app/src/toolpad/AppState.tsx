@@ -98,6 +98,7 @@ export function domReducer(dom: appDom.AppDom, action: AppStateAction): appDom.A
 
 export interface AppState {
   dom: appDom.AppDom;
+  base: string;
   savedDom: appDom.AppDom;
   savingDom: boolean;
   unsavedDomChanges: number;
@@ -472,6 +473,8 @@ export default function AppProvider({ children }: DomContextProps) {
   const [state, dispatch] = React.useReducer(appStateReducer, {
     // DOM state
     dom,
+    // base path of the running application
+    base: '/prod',
     // DOM loader state
     savingDom: false,
     unsavedDomChanges: 0,

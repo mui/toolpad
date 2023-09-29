@@ -34,15 +34,11 @@ function* getPreferredPorts(port: number = DEFAULT_PORT): Iterable<number> {
   }
 }
 
-interface CreateDevHandlerParams {
+interface CreateAppHandlerParams {
   base: string;
-  runtimeConfig: RuntimeConfig;
 }
 
-async function createDevHandler(
-  project: ToolpadProject,
-  { base, runtimeConfig }: CreateDevHandlerParams,
-) {
+async function createDevHandler(project: ToolpadProject, { base }: CreateAppHandlerParams) {
   const handler = express.Router();
 
   const appServerPath = path.resolve(__dirname, './appServer.js');
@@ -54,7 +50,7 @@ async function createDevHandler(
     workerData: {
       outDir: project.getAppOutputFolder(),
       base,
-      config: runtimeConfig,
+      config: project.getRuntimeConfig(),
       root: project.getRoot(),
       port: devPort,
       mainThreadRpcPort: mainThreadRpcChannel.port1,
@@ -124,6 +120,21 @@ interface AppHandler {
   dispose?: () => Promise<void>;
 }
 
+async function createToolpadAppHandler(
+  project: ToolpadProject,
+  { base }: CreateAppHandlerParams,
+): Promise<AppHandler> {
+  const router = express.Router();
+  const publicPath = path.resolve(__dirname, '../../public');
+  router.use(express.static(publicPath, { index: false }));
+
+  const appHandler = project.options.dev
+    ? await createDevHandler(project, { base })
+    : await createProdHandler(project);
+
+  return appHandler;
+}
+
 export interface ToolpadHandlerConfig {
   dev: boolean;
   dir: string;
@@ -137,6 +148,8 @@ async function createToolpadHandler({
   externalUrl,
   dir,
 }: ToolpadHandlerConfig): Promise<AppHandler> {
+  const editorBasename = '/_toolpad';
+  const base = '/prod';
   const gitSha1 = process.env.GIT_SHA1 || null;
   const circleBuildNum = process.env.CIRCLE_BUILD_NUM || null;
 
@@ -160,7 +173,7 @@ async function createToolpadHandler({
   });
 
   router.get('/', (req, res) => {
-    const redirectUrl = dev ? '/_toolpad' : '/prod';
+    const redirectUrl = dev ? editorBasename : '/prod';
     res.redirect(302, redirectUrl);
   });
 
@@ -177,19 +190,9 @@ async function createToolpadHandler({
   const publicPath = path.resolve(__dirname, '../../public');
   router.use(express.static(publicPath, { index: false }));
 
-  let appHandler: AppHandler | undefined;
-
-  if (dev) {
-    const previewBase = '/preview';
-    appHandler = await createDevHandler(project, {
-      runtimeConfig,
-      base: previewBase,
-    });
-    router.use(previewBase, appHandler.handler);
-  } else {
-    appHandler = await createProdHandler(project);
-    router.use('/prod', appHandler.handler);
-  }
+  const appBase = '/prod';
+  const appHandler = await createToolpadAppHandler(project, { base: appBase });
+  router.use(appBase, appHandler.handler);
 
   if (dev) {
     const rpcServer = createRpcServer(project);
@@ -208,7 +211,6 @@ async function createToolpadHandler({
       );
     };
 
-    const editorBasename = '/_toolpad';
     if (toolpadDevMode) {
       // eslint-disable-next-line no-console
       console.log(`${chalk.blue('info')}  - Running Toolpad editor in dev mode`);

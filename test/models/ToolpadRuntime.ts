@@ -5,6 +5,8 @@ export interface ToolpadRuntimeOptions {
   prod: boolean;
 }
 
+const PREFIX = '/prod';
+
 export class ToolpadRuntime {
   readonly page: Page;
 
@@ -18,20 +20,16 @@ export class ToolpadRuntime {
     };
   }
 
-  getPrefix() {
-    return this.options.prod ? '/prod' : '/preview';
-  }
-
   async goto() {
-    await gotoIfNotCurrent(this.page, this.getPrefix());
+    await gotoIfNotCurrent(this.page, PREFIX);
   }
 
   async gotoPage(pageName: string) {
-    await gotoIfNotCurrent(this.page, `${this.getPrefix()}/pages/${pageName}`);
+    await gotoIfNotCurrent(this.page, `${PREFIX}/pages/${pageName}`);
   }
 
   async gotoPageById(appId: string, pageId: string) {
-    await this.page.goto(`${this.getPrefix()}/pages/${pageId}`);
+    await this.page.goto(`${PREFIX}/pages/${pageId}`);
   }
 
   async waitForPageReady() {

@@ -156,7 +156,7 @@ async function createToolpadHandler({
 
   const wsPort = await getPort();
 
-  const project = await initProject({ dev, dir, externalUrl, wsPort });
+  const project = await initProject({ dev, dir, externalUrl, wsPort, base });
   await project.start();
 
   const runtimeConfig: RuntimeConfig = project.getRuntimeConfig();
@@ -340,18 +340,18 @@ export async function runApp({ cmd, dir, base, port, toolpadDevMode = false }: R
     externalUrl,
   });
 
-  const toolpadBaseUrl = `http://localhost:${server.port}/`;
+  const toolpadUrl = `http://localhost:${server.port}/`;
 
   // eslint-disable-next-line no-console
   console.log(
     `${chalk.green('ready')} - toolpad project ${chalk.cyan(dir)} ready on ${chalk.cyan(
-      toolpadBaseUrl,
+      toolpadUrl,
     )}`,
   );
 
   if (dev) {
     try {
-      openBrowser(toolpadBaseUrl);
+      openBrowser(toolpadUrl);
     } catch (err: any) {
       console.error(`${chalk.red('error')} - Failed to open browser: ${err.message}`);
     }

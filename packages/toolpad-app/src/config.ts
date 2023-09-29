@@ -39,6 +39,7 @@ export interface RuntimeConfig {
   externalUrl: string;
   projectDir: string;
   wsPort: number;
+  base: string;
 }
 
 declare global {

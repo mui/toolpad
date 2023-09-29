@@ -209,4 +209,5 @@ export interface ToolpadProjectOptions {
   dev: boolean;
   externalUrl?: string;
   wsPort?: number;
+  base?: string;
 }

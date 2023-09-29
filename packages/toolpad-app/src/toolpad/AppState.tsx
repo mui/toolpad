@@ -17,6 +17,7 @@ import { NodeHashes } from '../types';
 import { hasFieldFocus } from '../utils/fields';
 import { DomView, getViewFromPathname, PageViewTab } from '../utils/domView';
 import { projectEvents } from '../projectEvents';
+import config from '../config';
 
 projectEvents.on('externalChange', () => client.invalidateQueries('loadDom', []));
 
@@ -474,7 +475,7 @@ export default function AppProvider({ children }: DomContextProps) {
     // DOM state
     dom,
     // base path of the running application
-    base: '/prod',
+    base: config.base,
     // DOM loader state
     savingDom: false,
     unsavedDomChanges: 0,

@@ -25,7 +25,7 @@ test('must load page in initial URL without altering URL', async ({ page }) => {
 });
 
 test('must show a message when a non-existing url is accessed', async ({ page }) => {
-  await page.goto(`/preview/pages/i-dont-exist-lol`);
+  await page.goto(`/prod/pages/i-dont-exist-lol`);
 
   await expect(page.getByText('Not found')).toBeVisible();
 });

@@ -10,6 +10,7 @@ export interface RunOptions {
   dir: string;
   port?: number;
   dev?: boolean;
+  base: string;
 }
 
 async function runCommand(cmd: 'dev' | 'start', { dir, dev, ...args }: Omit<RunOptions, 'cmd'>) {
@@ -37,9 +38,10 @@ async function devCommand(args: RunOptions) {
 
 interface BuildOptions {
   dir: string;
+  base: string;
 }
 
-async function buildCommand({ dir }: BuildOptions) {
+async function buildCommand({ dir, base }: BuildOptions) {
   const projectDir = path.resolve(process.cwd(), dir);
   // eslint-disable-next-line no-console
   console.log(`${chalk.blue('info')}  - building Toolpad application...`);
@@ -51,8 +53,9 @@ async function buildCommand({ dir }: BuildOptions) {
     stdio: 'inherit',
     env: {
       NODE_ENV: 'production',
-      TOOLPAD_PROJECT_DIR: projectDir,
       FORCE_COLOR: '1',
+      TOOLPAD_PROJECT_DIR: projectDir,
+      TOOLPAD_BASE: base,
     },
   });
 
@@ -72,6 +75,11 @@ export default async function cli(argv: string[]) {
       type: 'string',
       describe: 'Directory of the Toolpad application',
       default: '.',
+    },
+    base: {
+      type: 'string',
+      describe: 'Public base path of the Toolpad application',
+      default: '/prod',
     },
   } as const;
 

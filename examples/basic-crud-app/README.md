@@ -3,7 +3,7 @@
 <p class="description">An admin application to showcase how CRUD operations work in Toolpad.</p>
 
 <a href="https://basic-crud-app-production.up.railway.app/prod/" target="_blank">
-  <img src="https://mui.com/static/toolpad/docs/examples/basic-crud-app.png" alt="Basic CRUD app" style="aspect-ratio: 1.8" width="100%">
+  <img src="https://mui.com/static/toolpad/docs/examples/basic-crud-app.png" alt="Basic CRUD app" style="aspect-ratio: 1.8" width="100%"> 
 </a>
 
 ## Check out the live app

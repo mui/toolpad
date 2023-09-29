@@ -74,11 +74,11 @@ function getAppSaveState(appState: AppState): React.ReactNode {
   );
 }
 
-export interface RouteShellProps {
+export interface AppShellProps {
   children: React.ReactNode;
 }
 
-function RouteShell({ children }: RouteShellProps) {
+function EditorShell({ children }: AppShellProps) {
   const appState = useAppStateContext();
 
   const location = useLocation();
@@ -132,14 +132,14 @@ export default function Toolpad({ basename }: ToolpadProps) {
             <React.Suspense fallback={<FullPageLoader />}>
               <BrowserRouter basename={basename}>
                 <AppProvider>
-                  <RouteShell>
+                  <EditorShell>
                     <Routes>
                       {GLOBAL_FUNCTIONS_FEATURE_FLAG ? (
                         <Route path={APP_FUNCTIONS_ROUTE} element={<div />} />
                       ) : null}
                       <Route path="/*" element={<AppEditor />} />
                     </Routes>
-                  </RouteShell>
+                  </EditorShell>
                 </AppProvider>
               </BrowserRouter>
             </React.Suspense>

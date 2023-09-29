@@ -4,7 +4,6 @@ import { useAppState, useDomApi } from '../../AppState';
 import { usePageEditorState } from './PageEditorProvider';
 import QueryEditor from './QueryEditor';
 import UrlQueryEditor from './UrlQueryEditor';
-import NodeNameEditor from '../NodeNameEditor';
 import * as appDom from '../../../appDom';
 import PageTitleEditor from '../PageTitleEditor';
 
@@ -38,7 +37,6 @@ export default function PageOptionsPanel() {
   return (
     <Stack spacing={1} alignItems="start" data-testid="page-editor">
       <Typography variant="subtitle1">Page:</Typography>
-      <NodeNameEditor node={page} />
       <PageTitleEditor node={page} />
       <Tooltip
         arrow

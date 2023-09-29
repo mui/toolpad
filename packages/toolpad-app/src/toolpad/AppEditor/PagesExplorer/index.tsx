@@ -40,7 +40,7 @@ const StyledEditableTreeItem = styled(EditableTreeItem)({
   },
 });
 
-interface StyledTreeItemProps extends Omit<EditableTreeItemProps, 'name'> {
+interface StyledTreeItemProps extends EditableTreeItemProps {
   ref?: React.RefObject<HTMLLIElement>;
   onRenameNode?: (nodeId: NodeId, updatedName: string) => void;
   onDeleteNode?: (nodeId: NodeId) => void;

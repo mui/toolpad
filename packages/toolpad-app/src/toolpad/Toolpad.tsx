@@ -74,11 +74,11 @@ function getAppSaveState(appState: AppState): React.ReactNode {
   );
 }
 
-export interface AppShellProps {
+export interface EditorShellProps {
   children: React.ReactNode;
 }
 
-function EditorShell({ children }: AppShellProps) {
+function EditorShell({ children }: EditorShellProps) {
   const appState = useAppStateContext();
 
   const location = useLocation();

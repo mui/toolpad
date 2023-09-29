@@ -4,7 +4,10 @@ import { ToolpadRuntime } from '../../models/ToolpadRuntime';
 import { expectBasicPageContent } from './shared';
 
 test.use({
-  ignoreConsoleErrors: [/The page’s settings blocked the loading of a resource at/],
+  ignoreConsoleErrors: [
+    /The page’s settings blocked the loading of a resource at http:\/\/localhost:\d+\/favicon\.ico/,
+    /Failed to load resource: the server responded with a status of 404/,
+  ],
 });
 
 test.use({

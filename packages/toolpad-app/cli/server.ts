@@ -149,7 +149,7 @@ async function createToolpadHandler({
   dir,
 }: ToolpadHandlerConfig): Promise<AppHandler> {
   const editorBasename = '/_toolpad';
-  const base = '/prod';
+  const appBase = '/prod';
   const gitSha1 = process.env.GIT_SHA1 || null;
   const circleBuildNum = process.env.CIRCLE_BUILD_NUM || null;
 
@@ -173,7 +173,7 @@ async function createToolpadHandler({
   });
 
   router.get('/', (req, res) => {
-    const redirectUrl = dev ? editorBasename : '/prod';
+    const redirectUrl = dev ? editorBasename : appBase;
     res.redirect(302, redirectUrl);
   });
 
@@ -190,7 +190,6 @@ async function createToolpadHandler({
   const publicPath = path.resolve(__dirname, '../../public');
   router.use(express.static(publicPath, { index: false }));
 
-  const appBase = '/prod';
   const appHandler = await createToolpadAppHandler(project, { base: appBase });
   router.use(appBase, appHandler.handler);
 

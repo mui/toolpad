@@ -1,4 +1,4 @@
-# Managing State
+# Managing state
 
 <p class="description">You can use bindings to make your components reactive to data on the page.</p>
 

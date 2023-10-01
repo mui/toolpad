@@ -61,8 +61,8 @@
   "devDependencies": {
     "@types/invariant": "2.2.35",
     "@types/prettier": "2.7.3",
-    "@types/react": "18.2.22",
-    "@types/react-is": "18.2.1"
+    "@types/react": "18.2.23",
+    "@types/react-is": "18.2.2"
   },
   "gitHead": "4057a5514725c4eb709d3db9a0a3720f7901a4ea"
 }

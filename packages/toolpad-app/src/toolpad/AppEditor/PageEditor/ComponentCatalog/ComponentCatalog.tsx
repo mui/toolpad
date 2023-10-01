@@ -60,7 +60,6 @@ export default function ComponentCatalog({ className }: ComponentCatalogProps) {
   const { dom } = useAppState();
   const [searchTerm, setSearchTerm] = React.useState('');
   const [openStart, setOpenStart] = React.useState(0);
-  const [stillOpen, setStillOpen] = React.useState(true);
   const [openCustomComponents, setOpenCustomComponents] = useLocalStorageState(
     'catalog-custom-expanded',
     true,
@@ -84,13 +83,11 @@ export default function ComponentCatalog({ className }: ComponentCatalogProps) {
       const timeOpen = Date.now() - openStart;
       const defaultDelay = timeOpen > 750 ? 500 : 0;
       closeTimeoutRef.current = setTimeout(() => {
-        if (stillOpen) {
-          setSearchTerm('');
-          setOpenStart(0);
-        }
+        setSearchTerm('');
+        setOpenStart(0);
       }, delay ?? defaultDelay);
     },
-    [openStart, setOpenStart, stillOpen],
+    [openStart, setOpenStart],
   );
 
   const handleDragStart = (componentType: string) => (event: React.DragEvent<HTMLElement>) => {
@@ -102,10 +99,7 @@ export default function ComponentCatalog({ className }: ComponentCatalogProps) {
 
   const toolpadComponents = Object.entries(useToolpadComponents(dom));
 
-  const handleMouseEnter = React.useCallback(
-    () => searchTerm.length === 0 && openDrawer(),
-    [openDrawer, searchTerm],
-  );
+  const handleMouseEnter = React.useCallback(() => openDrawer(), [openDrawer]);
   const handleMouseLeave = React.useCallback(() => closeDrawer(), [closeDrawer]);
 
   const [createCodeComponentDialogOpen, setCreateCodeComponentDialogOpen] = React.useState(false);
@@ -171,8 +165,6 @@ export default function ComponentCatalog({ className }: ComponentCatalogProps) {
                 <TextField
                   placeholder="Search components..."
                   autoFocus
-                  onFocus={() => setStillOpen(false)}
-                  onBlur={() => setStillOpen(true)}
                   value={searchTerm}
                   onChange={(event) => setSearchTerm(event.target.value)}
                   InputProps={{

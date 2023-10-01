@@ -37,6 +37,7 @@ import {
 import { createProvidedContext } from '@mui/toolpad-utils/react';
 import { TabContext, TabList } from '@mui/lab';
 import useDebounced from '@mui/toolpad-utils/hooks/useDebounced';
+import { errorFrom } from '@mui/toolpad-utils/errors';
 import { JsExpressionEditor } from './PageEditor/JsExpressionEditor';
 import JsonView from '../../components/JsonView';
 import useLatest from '../../utils/useLatest';
@@ -242,7 +243,7 @@ export function ValueBindingEditor({ value, onChange, error }: ValueBindingEdito
           >
             <Typography sx={{ mb: 2, color: 'red' }}>
               Error while reading the prettier configuration:
-              {(error as string) ??
+              {errorFrom(error).message ??
                 'The prettier config could not be loaded and therefore the code would not be formatted'}
             </Typography>
           </Box>

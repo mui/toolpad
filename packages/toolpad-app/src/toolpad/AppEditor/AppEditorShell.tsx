@@ -49,7 +49,7 @@ export default function AppEditorShell({ children, ...props }: ToolpadShellProps
   const currentView = getViewFromPathname(location.pathname);
   const currentPageId = currentView?.kind === 'page' ? currentView.nodeId : null;
 
-  const previewPath = currentPageId ? `/preview/pages/${currentPageId}` : '/preview';
+  const previewPath = currentPageId ? `${appState.base}/pages/${currentPageId}` : appState.base;
 
   return (
     <ToolpadShell

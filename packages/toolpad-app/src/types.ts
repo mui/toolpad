@@ -172,10 +172,6 @@ export interface AppTheme {
   'palette.secondary.main'?: string;
 }
 
-export type AppVersion = 'development' | 'preview' | number;
-
-export type AppTemplateId = 'default' | 'hr' | 'images';
-
 export type NodeHashes = Record<NodeId, number | undefined>;
 
 /**
@@ -210,7 +206,8 @@ export type ProjectEvents = {
 };
 
 export interface ToolpadProjectOptions {
-  cmd: 'dev' | 'start' | 'build';
   dev: boolean;
-  externalUrl: string;
+  externalUrl?: string;
+  wsPort?: number;
+  base?: string;
 }

@@ -3,7 +3,6 @@ import { IncomingMessage, createServer } from 'http';
 import * as fs from 'fs/promises';
 import { Worker, MessageChannel } from 'worker_threads';
 import express from 'express';
-import invariant from 'invariant';
 import getPort from 'get-port';
 import { createProxyMiddleware } from 'http-proxy-middleware';
 import { mapValues } from '@mui/toolpad-utils/collections';
@@ -35,15 +34,11 @@ function* getPreferredPorts(port: number = DEFAULT_PORT): Iterable<number> {
   }
 }
 
-interface CreateDevHandlerParams {
+interface CreateAppHandlerParams {
   base: string;
-  runtimeConfig: RuntimeConfig;
 }
 
-async function createDevHandler(
-  project: ToolpadProject,
-  { base, runtimeConfig }: CreateDevHandlerParams,
-) {
+async function createDevHandler(project: ToolpadProject, { base }: CreateAppHandlerParams) {
   const handler = express.Router();
 
   const appServerPath = path.resolve(__dirname, './appServer.js');
@@ -55,7 +50,7 @@ async function createDevHandler(
     workerData: {
       outDir: project.getAppOutputFolder(),
       base,
-      config: runtimeConfig,
+      config: project.getRuntimeConfig(),
       root: project.getRoot(),
       port: devPort,
       mainThreadRpcPort: mainThreadRpcChannel.port1,
@@ -125,39 +120,51 @@ interface AppHandler {
   dispose?: () => Promise<void>;
 }
 
-export interface ServerConfig {
-  cmd: 'dev' | 'start' | 'build';
-  gitSha1: string | null;
-  circleBuildNum: string | null;
-  projectDir: string;
-  port: number;
-  devMode: boolean;
-  externalUrl: string;
-  project: ToolpadProject;
+async function createToolpadAppHandler(
+  project: ToolpadProject,
+  { base }: CreateAppHandlerParams,
+): Promise<AppHandler> {
+  const router = express.Router();
+  const publicPath = path.resolve(__dirname, '../../public');
+  router.use(express.static(publicPath, { index: false }));
+
+  const appHandler = project.options.dev
+    ? await createDevHandler(project, { base })
+    : await createProdHandler(project);
+
+  return appHandler;
 }
 
-async function startServer({
-  cmd,
-  gitSha1,
-  circleBuildNum,
-  port,
-  devMode,
-  externalUrl,
-  project,
-}: ServerConfig) {
-  const runtimeConfig: RuntimeConfig = {
-    cmd,
-    projectDir: project.getRoot(),
-    externalUrl,
-  };
+export interface ToolpadHandlerConfig {
+  dev: boolean;
+  dir: string;
+  base: string;
+  externalUrl: string;
+  toolpadDevMode?: boolean;
+}
 
+async function createToolpadHandler({
+  dev,
+  toolpadDevMode,
+  externalUrl,
+  base,
+  dir,
+}: ToolpadHandlerConfig): Promise<AppHandler> {
+  const editorBasename = '/_toolpad';
+  const gitSha1 = process.env.GIT_SHA1 || null;
+  const circleBuildNum = process.env.CIRCLE_BUILD_NUM || null;
+
+  const wsPort = await getPort();
+
+  const project = await initProject({ dev, dir, externalUrl, wsPort, base });
   await project.start();
 
-  const app = express();
-  const httpServer = createServer(app);
+  const runtimeConfig: RuntimeConfig = project.getRuntimeConfig();
+
+  const router = express.Router();
 
   // See https://nextjs.org/docs/advanced-features/security-headers
-  app.use((req, res, expressNext) => {
+  router.use((req, res, expressNext) => {
     // Force the browser to trust the Content-Type header
     // https://stackoverflow.com/questions/18337630/what-is-x-content-type-options-nosniff
     res.setHeader('X-Content-Type-Options', 'nosniff');
@@ -166,12 +173,12 @@ async function startServer({
     expressNext();
   });
 
-  app.get('/', (req, res) => {
-    const redirectUrl = cmd === 'dev' ? '/_toolpad' : '/prod';
+  router.get('/', (req, res) => {
+    const redirectUrl = dev ? editorBasename : base;
     res.redirect(302, redirectUrl);
   });
 
-  app.get('/health-check', (req, res) => {
+  router.get('/health-check', (req, res) => {
     const memoryUsage = process.memoryUsage();
     res.json({
       gitSha1,
@@ -182,33 +189,15 @@ async function startServer({
   });
 
   const publicPath = path.resolve(__dirname, '../../public');
-  app.use(express.static(publicPath, { index: false }));
+  router.use(express.static(publicPath, { index: false }));
 
-  let appHandler: AppHandler | undefined;
+  const appHandler = await createToolpadAppHandler(project, { base });
+  router.use(base, appHandler.handler);
 
-  switch (cmd) {
-    case 'dev': {
-      const previewBase = '/preview';
-      appHandler = await createDevHandler(project, {
-        runtimeConfig,
-        base: previewBase,
-      });
-      app.use(previewBase, appHandler.handler);
-      break;
-    }
-    case 'start': {
-      appHandler = await createProdHandler(project);
-      app.use('/prod', appHandler.handler);
-      break;
-    }
-    default:
-      throw new Error(`Unknown toolpad command ${cmd}`);
-  }
-
-  if (cmd === 'dev') {
+  if (dev) {
     const rpcServer = createRpcServer(project);
-    app.use('/api/rpc', createRpcHandler(rpcServer));
-    app.use('/api/dataSources', project.dataManager.createDataSourcesHandler());
+    router.use('/api/rpc', createRpcHandler(rpcServer));
+    router.use('/api/dataSources', project.dataManager.createDataSourcesHandler());
 
     const transformIndexHtml = (html: string) => {
       const serializedConfig = serializeJavascript(runtimeConfig, { isJSON: true });
@@ -222,8 +211,7 @@ async function startServer({
       );
     };
 
-    const editorBasename = '/_toolpad';
-    if (devMode) {
+    if (toolpadDevMode) {
       // eslint-disable-next-line no-console
       console.log(`${chalk.blue('info')}  - Running Toolpad editor in dev mode`);
 
@@ -239,9 +227,9 @@ async function startServer({
         ],
       });
 
-      app.use(editorBasename, viteApp.middlewares);
+      router.use(editorBasename, viteApp.middlewares);
     } else {
-      app.use(
+      router.use(
         editorBasename,
         express.static(path.resolve(__dirname, '../../dist/editor'), { index: false }),
         asyncHandler(async (req, res) => {
@@ -254,62 +242,84 @@ async function startServer({
     }
   }
 
-  const runningServer = await listen(httpServer, port);
+  if (dev) {
+    const wsServer = new WebSocketServer({ port: wsPort });
 
-  const wsServer = new WebSocketServer({ noServer: true });
-
-  project.events.on('*', (event, payload) => {
-    wsServer.clients.forEach((client) => {
-      if (client.readyState === WebSocket.OPEN) {
-        client.send(JSON.stringify({ kind: 'projectEvent', event, payload }));
-      }
-    });
-  });
-
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  wsServer.on('connection', (ws: WebSocket, _request: IncomingMessage) => {
-    ws.on('error', console.error);
-  });
-
-  httpServer.on('upgrade', (request, socket, head) => {
-    invariant(request.url, 'request must have a url');
-    const { pathname } = new URL(request.url, 'http://x');
-
-    if (pathname === '/toolpad-ws') {
-      wsServer.handleUpgrade(request, socket, head, (ws) => {
-        wsServer.emit('connection', ws, request);
+    project.events.on('*', (event, payload) => {
+      wsServer.clients.forEach((client) => {
+        if (client.readyState === WebSocket.OPEN) {
+          client.send(JSON.stringify({ kind: 'projectEvent', event, payload }));
+        }
       });
-    }
-  });
+    });
+
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    wsServer.on('connection', (ws: WebSocket, _request: IncomingMessage) => {
+      ws.on('error', console.error);
+    });
+
+    // TODO(Jan): allow passing a server instance to the handler and attach websocket server to it
+    // httpServer.on('upgrade', (request, socket, head) => {
+    //   invariant(request.url, 'request must have a url');
+    //   const { pathname } = new URL(request.url, 'http://x');
+    //
+    //   if (pathname === '/toolpad-ws') {
+    //     wsServer.handleUpgrade(request, socket, head, (ws) => {
+    //       wsServer.emit('connection', ws, request);
+    //     });
+    //   }
+    // });
+  }
 
   return {
-    port: runningServer.port,
-    async dispose() {
-      await Promise.allSettled([runningServer.close(), appHandler?.dispose?.()]);
+    handler: router,
+    dispose: async () => {
+      await Promise.allSettled([project.dispose(), appHandler?.dispose?.()]);
     },
   };
 }
 
-export type Command = 'dev' | 'start' | 'build';
+export interface ToolpadServerConfig extends Omit<ToolpadHandlerConfig, 'server'> {
+  port: number;
+}
+
+async function startToolpadServer({ port, ...config }: ToolpadServerConfig) {
+  const app = express();
+  const httpServer = createServer(app);
+
+  const toolpadHandler = await createToolpadHandler(config);
+
+  app.use(toolpadHandler.handler);
+
+  const runningServer = await listen(httpServer, port);
+
+  return {
+    port: runningServer.port,
+    async dispose() {
+      await Promise.allSettled([runningServer.close(), toolpadHandler?.dispose?.()]);
+    },
+  };
+}
+
+export type Command = 'dev' | 'start';
 export interface RunAppOptions {
   cmd: Command;
   port?: number;
-  dev?: boolean;
-  projectDir: string;
+  dir: string;
+  base: string;
+  toolpadDevMode?: boolean;
 }
 
-export interface RunAppResult {
-  dispose(): Promise<void>;
-}
+export async function runApp({ cmd, dir, base, port, toolpadDevMode = false }: RunAppOptions) {
+  const dev = cmd === 'dev';
 
-export async function runApp({ cmd, port, dev = false, projectDir }: RunAppOptions) {
-  if (!(await folderExists(projectDir))) {
-    console.error(`${chalk.red('error')} - No project found at ${chalk.cyan(`"${projectDir}"`)}`);
+  if (!(await folderExists(dir))) {
+    console.error(`${chalk.red('error')} - No project found at ${chalk.cyan(`"${dir}"`)}`);
     process.exit(1);
   }
 
   if (!port) {
-    port = cmd === 'dev' ? await getPort({ port: getPreferredPorts(DEFAULT_PORT) }) : DEFAULT_PORT;
+    port = dev ? await getPort({ port: getPreferredPorts(DEFAULT_PORT) }) : DEFAULT_PORT;
   } else {
     // if port is specified but is not available, exit
     const availablePort = await getPort({ port });
@@ -319,34 +329,29 @@ export async function runApp({ cmd, port, dev = false, projectDir }: RunAppOptio
     }
   }
 
-  const editorDevMode = !!process.env.TOOLPAD_NEXT_DEV || dev;
-
   const externalUrl = process.env.TOOLPAD_EXTERNAL_URL || `http://localhost:${port}`;
-  const project = await initProject(cmd, projectDir, externalUrl);
 
-  const server = await startServer({
-    cmd,
-    project,
-    gitSha1: process.env.GIT_SHA1 || null,
-    circleBuildNum: process.env.CIRCLE_BUILD_NUM || null,
-    projectDir,
+  const server = await startToolpadServer({
+    dev,
+    base,
+    dir,
     port,
-    devMode: editorDevMode,
+    toolpadDevMode: !!process.env.TOOLPAD_NEXT_DEV || toolpadDevMode,
     externalUrl,
   });
 
-  const toolpadBaseUrl = `http://localhost:${server.port}/`;
+  const toolpadUrl = `http://localhost:${server.port}/`;
 
   // eslint-disable-next-line no-console
   console.log(
-    `${chalk.green('ready')} - toolpad project ${chalk.cyan(projectDir)} ready on ${chalk.cyan(
-      toolpadBaseUrl,
+    `${chalk.green('ready')} - toolpad project ${chalk.cyan(dir)} ready on ${chalk.cyan(
+      toolpadUrl,
     )}`,
   );
 
-  if (cmd === 'dev') {
+  if (dev) {
     try {
-      openBrowser(toolpadBaseUrl);
+      openBrowser(toolpadUrl);
     } catch (err: any) {
       console.error(`${chalk.red('error')} - Failed to open browser: ${err.message}`);
     }
@@ -354,7 +359,7 @@ export async function runApp({ cmd, port, dev = false, projectDir }: RunAppOptio
 
   return {
     async dispose() {
-      await Promise.allSettled([project.dispose(), server.dispose()]);
+      await Promise.allSettled([server.dispose()]);
     },
   };
 }

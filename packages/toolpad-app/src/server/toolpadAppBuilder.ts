@@ -1,9 +1,13 @@
 import * as path from 'path';
+import * as url from 'node:url';
 import { InlineConfig, Plugin, build } from 'vite';
 import react from '@vitejs/plugin-react';
 import { indent } from '@mui/toolpad-utils/strings';
 import type { ComponentEntry } from './localMode';
 import { INITIAL_STATE_WINDOW_PROPERTY } from './toolpadAppServer';
+
+import.meta.url ??= url.pathToFileURL(__filename).toString();
+const currentDirectory = url.fileURLToPath(new URL('.', import.meta.url));
 
 const MAIN_ENTRY = '/main.tsx';
 const CANVAS_ENTRY = '/canvas.tsx';
@@ -208,7 +212,7 @@ export function createViteConfig({
       },
       server: {
         fs: {
-          allow: [root, path.resolve(__dirname, '../../../../')],
+          allow: [root, path.resolve(currentDirectory, '../../../../')],
         },
       },
       optimizeDeps: {

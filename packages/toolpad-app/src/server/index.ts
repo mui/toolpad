@@ -15,6 +15,7 @@ import openBrowser from 'react-dev-utils/openBrowser';
 import { folderExists } from '@mui/toolpad-utils/fs';
 import chalk from 'chalk';
 import { serveRpc } from '@mui/toolpad-utils/workerRpc';
+import * as url from 'node:url';
 import { asyncHandler } from '../utils/express';
 import { createProdHandler } from './toolpadAppServer';
 import { ToolpadProject, initProject } from './localMode';
@@ -24,6 +25,9 @@ import { RUNTIME_CONFIG_WINDOW_PROPERTY } from '../constants';
 import type { RuntimeConfig } from '../config';
 import { createRpcServer } from './rpcServer';
 import { createRpcRuntimeServer } from './rpcRuntimeServer';
+
+import.meta.url ??= url.pathToFileURL(__filename).toString();
+const currentDirectory = url.fileURLToPath(new URL('.', import.meta.url));
 
 const DEFAULT_PORT = 3000;
 
@@ -41,7 +45,7 @@ interface CreateAppHandlerParams {
 async function createDevHandler(project: ToolpadProject, { base }: CreateAppHandlerParams) {
   const handler = express.Router();
 
-  const appServerPath = path.resolve(__dirname, './appServer.js');
+  const appServerPath = path.resolve(currentDirectory, './appServer.js');
   const devPort = await getPort();
 
   const mainThreadRpcChannel = new MessageChannel();
@@ -125,7 +129,7 @@ async function createToolpadAppHandler(
   { base }: CreateAppHandlerParams,
 ): Promise<AppHandler> {
   const router = express.Router();
-  const publicPath = path.resolve(__dirname, '../../public');
+  const publicPath = path.resolve(currentDirectory, '../../public');
   router.use(express.static(publicPath, { index: false }));
 
   const appHandler = project.options.dev
@@ -188,7 +192,7 @@ async function createToolpadHandler({
     } satisfies HealthCheck);
   });
 
-  const publicPath = path.resolve(__dirname, '../../public');
+  const publicPath = path.resolve(currentDirectory, '../../public');
   router.use(express.static(publicPath, { index: false }));
 
   const appHandler = await createToolpadAppHandler(project, { base });
@@ -216,8 +220,8 @@ async function createToolpadHandler({
       console.log(`${chalk.blue('info')}  - Running Toolpad editor in dev mode`);
 
       const viteApp = await createViteServer({
-        configFile: path.resolve(__dirname, '../../src/toolpad/vite.config.ts'),
-        root: path.resolve(__dirname, '../../src/toolpad'),
+        configFile: path.resolve(currentDirectory, '../../src/toolpad/vite.config.ts'),
+        root: path.resolve(currentDirectory, '../../src/toolpad'),
         server: { middlewareMode: true },
         plugins: [
           {
@@ -231,9 +235,9 @@ async function createToolpadHandler({
     } else {
       router.use(
         editorBasename,
-        express.static(path.resolve(__dirname, '../../dist/editor'), { index: false }),
+        express.static(path.resolve(currentDirectory, '../../dist/editor'), { index: false }),
         asyncHandler(async (req, res) => {
-          const htmlFilePath = path.resolve(__dirname, '../../dist/editor/index.html');
+          const htmlFilePath = path.resolve(currentDirectory, '../../dist/editor/index.html');
           let html = await fs.readFile(htmlFilePath, { encoding: 'utf-8' });
           html = transformIndexHtml(html);
           res.setHeader('Content-Type', 'text/html').status(200).end(html);

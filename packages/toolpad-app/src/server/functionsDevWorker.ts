@@ -11,6 +11,9 @@ import SuperJSON from 'superjson';
 import { createRpcClient, serveRpc } from '@mui/toolpad-utils/workerRpc';
 import { workerData } from 'node:worker_threads';
 
+import.meta.url ??= url.pathToFileURL(__filename).toString();
+const currentDirectory = url.fileURLToPath(new URL('.', import.meta.url));
+
 interface ModuleObject {
   exports: Record<string, unknown>;
 }
@@ -122,7 +125,7 @@ if (!isMainThread && parentPort) {
 
 export function createWorker(env: Record<string, any>) {
   const workerRpcChannel = new MessageChannel();
-  const worker = new Worker(path.join(__dirname, 'functionsDevWorker.js'), {
+  const worker = new Worker(path.join(currentDirectory, 'functionsDevWorker.js'), {
     env,
     workerData: {
       workerRpcPort: workerRpcChannel.port1,

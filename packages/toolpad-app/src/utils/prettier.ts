@@ -1,5 +1,8 @@
+import { createRequire } from 'module';
 import * as prettier from 'prettier';
-import parserBabel from 'prettier/parser-babel';
+
+const interopRequire = typeof require === 'undefined' ? createRequire(import.meta.url) : require;
+const parserBabel = interopRequire('prettier/parser-babel');
 
 const DEFAULT_OPTIONS = {
   parser: 'babel-ts',

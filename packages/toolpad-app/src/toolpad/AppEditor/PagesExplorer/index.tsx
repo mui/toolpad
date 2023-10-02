@@ -7,6 +7,7 @@ import MoreVertIcon from '@mui/icons-material/MoreVert';
 import { NodeId } from '@mui/toolpad-core';
 import clsx from 'clsx';
 import invariant from 'invariant';
+import { sortBy } from '@mui/toolpad-utils/collections';
 import * as appDom from '../../../appDom';
 import { useAppStateApi, useAppState, useDomApi } from '../../AppState';
 import useLocalStorageState from '../../../utils/useLocalStorageState';
@@ -37,6 +38,9 @@ const StyledEditableTreeItem = styled(EditableTreeItem)({
     & .${classes.treeItemMenuOpen}
   `]: {
     visibility: 'visible',
+  },
+  '.MuiTreeItem-iconContainer': {
+    display: 'none',
   },
 });
 
@@ -320,7 +324,7 @@ export default function PagesExplorer({ className }: PagesExplorerProps) {
     [appStateApi, dom],
   );
 
-  const pageItemSx = {
+  const pagesTreeItemSx = {
     '.MuiTreeItem-label': {
       pl: 1,
     },
@@ -348,6 +352,9 @@ export default function PagesExplorer({ className }: PagesExplorerProps) {
         multiSelect
         defaultCollapseIcon={<ExpandMoreIcon sx={{ fontSize: '0.9rem', opacity: 0.5 }} />}
         defaultExpandIcon={<ChevronRightIcon sx={{ fontSize: '0.9rem', opacity: 0.5 }} />}
+        sx={{
+          scrollbarGutter: 'stable',
+        }}
       >
         <ExplorerHeader
           headerText="Pages"
@@ -362,10 +369,10 @@ export default function PagesExplorer({ className }: PagesExplorerProps) {
             onEdit={handleCreateNewCommit}
             onCancel={handleCloseCreateNewPage}
             validateItemName={validatePageName}
-            sx={pageItemSx}
+            sx={pagesTreeItemSx}
           />
         ) : null}
-        {pages.map((page) => (
+        {sortBy(pages, 'name').map((page) => (
           <PagesExplorerTreeItem
             key={page.id}
             nodeId={page.id}
@@ -375,7 +382,7 @@ export default function PagesExplorer({ className }: PagesExplorerProps) {
             onDuplicateNode={handleDuplicateNode}
             onDeleteNode={handleDeletePage}
             validateItemName={validatePageName}
-            sx={pageItemSx}
+            sx={pagesTreeItemSx}
           />
         ))}
       </TreeView>

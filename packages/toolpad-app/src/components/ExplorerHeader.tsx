@@ -36,7 +36,7 @@ export default function ExplorerHeader({
         sx={{
           flexGrow: 1,
           fontWeight: theme.typography.fontWeightLight,
-          mx: 1,
+          mx: 0.5,
           my: 0.5,
         }}
       >

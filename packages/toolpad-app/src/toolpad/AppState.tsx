@@ -17,6 +17,7 @@ import { NodeHashes } from '../types';
 import { hasFieldFocus } from '../utils/fields';
 import { DomView, getViewFromPathname, PageViewTab } from '../utils/domView';
 import { projectEvents } from '../projectEvents';
+import config from '../config';
 
 projectEvents.on('externalChange', () => client.invalidateQueries('loadDom', []));
 
@@ -98,6 +99,7 @@ export function domReducer(dom: appDom.AppDom, action: AppStateAction): appDom.A
 
 export interface AppState {
   dom: appDom.AppDom;
+  base: string;
   savedDom: appDom.AppDom;
   savingDom: boolean;
   unsavedDomChanges: number;
@@ -466,6 +468,8 @@ export default function AppProvider({ children }: DomContextProps) {
   const [state, dispatch] = React.useReducer(appStateReducer, {
     // DOM state
     dom,
+    // base path of the running application
+    base: config.base,
     // DOM loader state
     savingDom: false,
     unsavedDomChanges: 0,

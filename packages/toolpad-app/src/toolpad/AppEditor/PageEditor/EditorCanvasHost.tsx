@@ -44,6 +44,7 @@ export interface EditorCanvasHostProps {
   onConsoleEntry?: (entry: LogEntry) => void;
   overlay?: React.ReactNode;
   onInit?: (bridge: ToolpadBridge) => void;
+  base: string;
 }
 
 const CanvasRoot = styled('div')({
@@ -80,6 +81,7 @@ export default function EditorCanvasHost({
   className,
   pageNodeId,
   runtimeState,
+  base,
   savedNodes,
   overlay,
   onConsoleEntry,
@@ -121,7 +123,7 @@ export default function EditorCanvasHost({
     }
   });
 
-  const src = `/preview/pages/${pageNodeId}?toolpad-display=canvas`;
+  const src = `${base}/pages/${pageNodeId}?toolpad-display=canvas`;
 
   const [loading, setLoading] = React.useState(true);
   useOnChange(src, () => setLoading(true));

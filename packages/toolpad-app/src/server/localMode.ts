@@ -39,7 +39,7 @@ import {
   themeSchema,
   API_VERSION,
 } from './schema';
-import { format } from '../utils/prettier';
+import { format, resolvePrettierConfig } from '../utils/prettier';
 import {
   Body as AppDomFetchBody,
   FetchQuery,
@@ -1200,17 +1200,25 @@ class ToolpadProject {
     await fs.rm(pageFolder, { force: true, recursive: true });
   }
 
+  async getPrettierConfig() {
+    const root = this.getRoot();
+    const config = await resolvePrettierConfig(root);
+    return config;
+  }
+
   getRuntimeConfig(): RuntimeConfig {
     // When these fail, you are likely trying to retrieve this information during the
     // toolpad build. It's fundamentally wrong to use this information as it strictly holds
     // information about the running toolpad instance.
     invariant(this.options.externalUrl, 'External URL is not set');
     invariant(this.options.wsPort, 'Websocket port is not set');
+    invariant(this.options.base, 'Base path is not set');
 
     return {
       externalUrl: this.options.externalUrl,
       projectDir: this.getRoot(),
       wsPort: this.options.wsPort,
+      base: this.options.base,
     };
   }
 }
@@ -1226,7 +1234,7 @@ export interface InitProjectOptions extends ToolpadProjectOptions {
   dir: string;
 }
 
-export async function initProject({ dev, dir, externalUrl, wsPort }: InitProjectOptions) {
+export async function initProject({ dir, ...config }: InitProjectOptions) {
   // eslint-disable-next-line no-underscore-dangle
   invariant(!global.__toolpadProject, 'A project is already running');
 
@@ -1234,7 +1242,7 @@ export async function initProject({ dev, dir, externalUrl, wsPort }: InitProject
 
   await initToolpadFolder(dir);
 
-  const project = new ToolpadProject(dir, { dev, externalUrl, wsPort });
+  const project = new ToolpadProject(dir, config);
   // eslint-disable-next-line no-underscore-dangle
   globalThis.__toolpadProject = project;
 

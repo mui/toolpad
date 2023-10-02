@@ -15,15 +15,15 @@ import openBrowser from 'react-dev-utils/openBrowser';
 import { folderExists } from '@mui/toolpad-utils/fs';
 import chalk from 'chalk';
 import { serveRpc } from '@mui/toolpad-utils/workerRpc';
-import { asyncHandler } from '../src/utils/express';
-import { createProdHandler } from '../src/server/toolpadAppServer';
-import { ToolpadProject, initProject } from '../src/server/localMode';
+import { asyncHandler } from '../utils/express';
+import { createProdHandler } from './toolpadAppServer';
+import { ToolpadProject, initProject } from './localMode';
 import type { Command as AppDevServerCommand, AppViteServerConfig, WorkerRpc } from './appServer';
-import { createRpcHandler } from '../src/server/rpc';
-import { RUNTIME_CONFIG_WINDOW_PROPERTY } from '../src/constants';
-import type { RuntimeConfig } from '../src/config';
-import { createRpcServer } from '../src/server/rpcServer';
-import { createRpcRuntimeServer } from '../src/server/rpcRuntimeServer';
+import { createRpcHandler } from './rpc';
+import { RUNTIME_CONFIG_WINDOW_PROPERTY } from '../constants';
+import type { RuntimeConfig } from '../config';
+import { createRpcServer } from './rpcServer';
+import { createRpcRuntimeServer } from './rpcRuntimeServer';
 
 const DEFAULT_PORT = 3000;
 
@@ -34,15 +34,11 @@ function* getPreferredPorts(port: number = DEFAULT_PORT): Iterable<number> {
   }
 }
 
-interface CreateDevHandlerParams {
+interface CreateAppHandlerParams {
   base: string;
-  runtimeConfig: RuntimeConfig;
 }
 
-async function createDevHandler(
-  project: ToolpadProject,
-  { base, runtimeConfig }: CreateDevHandlerParams,
-) {
+async function createDevHandler(project: ToolpadProject, { base }: CreateAppHandlerParams) {
   const handler = express.Router();
 
   const appServerPath = path.resolve(__dirname, './appServer.js');
@@ -54,7 +50,7 @@ async function createDevHandler(
     workerData: {
       outDir: project.getAppOutputFolder(),
       base,
-      config: runtimeConfig,
+      config: project.getRuntimeConfig(),
       root: project.getRoot(),
       port: devPort,
       mainThreadRpcPort: mainThreadRpcChannel.port1,
@@ -124,9 +120,25 @@ interface AppHandler {
   dispose?: () => Promise<void>;
 }
 
+async function createToolpadAppHandler(
+  project: ToolpadProject,
+  { base }: CreateAppHandlerParams,
+): Promise<AppHandler> {
+  const router = express.Router();
+  const publicPath = path.resolve(__dirname, '../../public');
+  router.use(express.static(publicPath, { index: false }));
+
+  const appHandler = project.options.dev
+    ? await createDevHandler(project, { base })
+    : await createProdHandler(project);
+
+  return appHandler;
+}
+
 export interface ToolpadHandlerConfig {
   dev: boolean;
   dir: string;
+  base: string;
   externalUrl: string;
   toolpadDevMode?: boolean;
 }
@@ -135,14 +147,16 @@ async function createToolpadHandler({
   dev,
   toolpadDevMode,
   externalUrl,
+  base,
   dir,
 }: ToolpadHandlerConfig): Promise<AppHandler> {
+  const editorBasename = '/_toolpad';
   const gitSha1 = process.env.GIT_SHA1 || null;
   const circleBuildNum = process.env.CIRCLE_BUILD_NUM || null;
 
   const wsPort = await getPort();
 
-  const project = await initProject({ dev, dir, externalUrl, wsPort });
+  const project = await initProject({ dev, dir, externalUrl, wsPort, base });
   await project.start();
 
   const runtimeConfig: RuntimeConfig = project.getRuntimeConfig();
@@ -160,7 +174,7 @@ async function createToolpadHandler({
   });
 
   router.get('/', (req, res) => {
-    const redirectUrl = dev ? '/_toolpad' : '/prod';
+    const redirectUrl = dev ? editorBasename : base;
     res.redirect(302, redirectUrl);
   });
 
@@ -177,19 +191,8 @@ async function createToolpadHandler({
   const publicPath = path.resolve(__dirname, '../../public');
   router.use(express.static(publicPath, { index: false }));
 
-  let appHandler: AppHandler | undefined;
-
-  if (dev) {
-    const previewBase = '/preview';
-    appHandler = await createDevHandler(project, {
-      runtimeConfig,
-      base: previewBase,
-    });
-    router.use(previewBase, appHandler.handler);
-  } else {
-    appHandler = await createProdHandler(project);
-    router.use('/prod', appHandler.handler);
-  }
+  const appHandler = await createToolpadAppHandler(project, { base });
+  router.use(base, appHandler.handler);
 
   if (dev) {
     const rpcServer = createRpcServer(project);
@@ -208,7 +211,6 @@ async function createToolpadHandler({
       );
     };
 
-    const editorBasename = '/_toolpad';
     if (toolpadDevMode) {
       // eslint-disable-next-line no-console
       console.log(`${chalk.blue('info')}  - Running Toolpad editor in dev mode`);
@@ -281,22 +283,11 @@ export interface ToolpadServerConfig extends Omit<ToolpadHandlerConfig, 'server'
   port: number;
 }
 
-async function startToolpadServer({
-  dev,
-  port,
-  toolpadDevMode,
-  externalUrl,
-  dir,
-}: ToolpadServerConfig) {
+async function startToolpadServer({ port, ...config }: ToolpadServerConfig) {
   const app = express();
   const httpServer = createServer(app);
 
-  const toolpadHandler = await createToolpadHandler({
-    dev,
-    toolpadDevMode,
-    externalUrl,
-    dir,
-  });
+  const toolpadHandler = await createToolpadHandler(config);
 
   app.use(toolpadHandler.handler);
 
@@ -315,14 +306,11 @@ export interface RunAppOptions {
   cmd: Command;
   port?: number;
   dir: string;
+  base: string;
   toolpadDevMode?: boolean;
 }
 
-export interface RunAppResult {
-  dispose(): Promise<void>;
-}
-
-export async function runApp({ cmd, dir, port, toolpadDevMode = false }: RunAppOptions) {
+export async function runApp({ cmd, dir, base, port, toolpadDevMode = false }: RunAppOptions) {
   const dev = cmd === 'dev';
 
   if (!(await folderExists(dir))) {
@@ -345,24 +333,25 @@ export async function runApp({ cmd, dir, port, toolpadDevMode = false }: RunAppO
 
   const server = await startToolpadServer({
     dev,
+    base,
     dir,
     port,
     toolpadDevMode: !!process.env.TOOLPAD_NEXT_DEV || toolpadDevMode,
     externalUrl,
   });
 
-  const toolpadBaseUrl = `http://localhost:${server.port}/`;
+  const toolpadUrl = `http://localhost:${server.port}/`;
 
   // eslint-disable-next-line no-console
   console.log(
     `${chalk.green('ready')} - toolpad project ${chalk.cyan(dir)} ready on ${chalk.cyan(
-      toolpadBaseUrl,
+      toolpadUrl,
     )}`,
   );
 
   if (dev) {
     try {
-      openBrowser(toolpadBaseUrl);
+      openBrowser(toolpadUrl);
     } catch (err: any) {
       console.error(`${chalk.red('error')} - Failed to open browser: ${err.message}`);
     }

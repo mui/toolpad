@@ -72,6 +72,21 @@ If you want to listen on a specific port you can change the start script to:
   "start": "toolpad start -p 1234"
 ```
 
+## Custom base path
+
+Toolpad applications can run under a custom base path. Use the `--base` CLI parameter to set a base under which the Toolpad application is hosted.
+
+```bash
+toolpad dev --base /foo
+```
+
+Now the Toolpad application is accessible under `http://localhost:3000/foo`. The `--base` parameter must be supplied to the `build` command. A build always has one specific base path:
+
+```bash
+toolpad build --base /foo
+toolpad start --base /foo
+```
+
 ## Detailed guides
 
 Detailed, step-by-step instructions are available for the following services:

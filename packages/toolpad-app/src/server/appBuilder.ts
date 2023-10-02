@@ -1,6 +1,6 @@
 import invariant from 'invariant';
-import { buildApp } from '../src/server/toolpadAppBuilder';
-import { initProject } from '../src/server/localMode';
+import { buildApp } from './toolpadAppBuilder';
+import { initProject } from './localMode';
 
 async function main() {
   invariant(
@@ -8,8 +8,10 @@ async function main() {
     'The app builder must be run with NODE_ENV=production',
   );
   invariant(!!process.env.TOOLPAD_PROJECT_DIR, 'A project root must be defined');
+  invariant(!!process.env.TOOLPAD_BASE, 'A base path must be defined');
 
   const projectDir = process.env.TOOLPAD_PROJECT_DIR;
+  const base = process.env.TOOLPAD_BASE;
 
   const project = await initProject({ dev: false, dir: projectDir });
 
@@ -17,7 +19,7 @@ async function main() {
 
   await buildApp({
     root: projectDir,
-    base: '/prod',
+    base,
     getComponents: () => project.getComponents(),
     outDir: project.getAppOutputFolder(),
   });

@@ -22,6 +22,9 @@ export function createRpcServer(project: ToolpadProject) {
       introspect: createMethod<typeof project.functionsManager.introspect>(({ params }) => {
         return project.functionsManager.introspect(...params);
       }),
+      getPrettierConfig: createMethod<typeof project.getPrettierConfig>(({ params }) => {
+        return project.getPrettierConfig(...params);
+      }),
     },
     mutation: {
       applyDomDiff: createMethod<typeof project.applyDomDiff>(({ params }) => {

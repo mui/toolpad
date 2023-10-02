@@ -87,9 +87,9 @@ function EditorShell({ children }: EditorShellProps) {
     const currentView = getViewFromPathname(location.pathname);
 
     if (currentView) {
-      const currentPageId = currentView.kind === 'page' ? currentView.nodeId : null;
+      const currentPageId = currentView?.kind === 'page' ? currentView.nodeId : null;
 
-      const previewPath = currentPageId ? `/preview/pages/${currentPageId}` : '/preview';
+      const previewPath = currentPageId ? `${appState.base}/pages/${currentPageId}` : appState.base;
 
       return {
         actions: (

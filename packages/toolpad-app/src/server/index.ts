@@ -15,15 +15,15 @@ import openBrowser from 'react-dev-utils/openBrowser';
 import { folderExists } from '@mui/toolpad-utils/fs';
 import chalk from 'chalk';
 import { serveRpc } from '@mui/toolpad-utils/workerRpc';
-import { asyncHandler } from '../src/utils/express';
-import { createProdHandler } from '../src/server/toolpadAppServer';
-import { ToolpadProject, initProject } from '../src/server/localMode';
+import { asyncHandler } from '../utils/express';
+import { createProdHandler } from './toolpadAppServer';
+import { ToolpadProject, initProject } from './localMode';
 import type { Command as AppDevServerCommand, AppViteServerConfig, WorkerRpc } from './appServer';
-import { createRpcHandler } from '../src/server/rpc';
-import { RUNTIME_CONFIG_WINDOW_PROPERTY } from '../src/constants';
-import type { RuntimeConfig } from '../src/config';
-import { createRpcServer } from '../src/server/rpcServer';
-import { createRpcRuntimeServer } from '../src/server/rpcRuntimeServer';
+import { createRpcHandler } from './rpc';
+import { RUNTIME_CONFIG_WINDOW_PROPERTY } from '../constants';
+import type { RuntimeConfig } from '../config';
+import { createRpcServer } from './rpcServer';
+import { createRpcRuntimeServer } from './rpcRuntimeServer';
 
 const DEFAULT_PORT = 3000;
 

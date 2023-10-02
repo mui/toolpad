@@ -2,15 +2,11 @@ import { parentPort, workerData, MessagePort } from 'worker_threads';
 import invariant from 'invariant';
 import { createServer, Plugin } from 'vite';
 import { createRpcClient } from '@mui/toolpad-utils/workerRpc';
-import {
-  getHtmlContent,
-  createViteConfig,
-  resolvedComponentsId,
-} from '../src/server/toolpadAppBuilder';
-import type { RuntimeConfig } from '../src/config';
-import type * as appDom from '../src/appDom';
-import type { ComponentEntry } from '../src/server/localMode';
-import { postProcessHtml } from '../src/server/toolpadAppServer';
+import { getHtmlContent, createViteConfig, resolvedComponentsId } from './toolpadAppBuilder';
+import type { RuntimeConfig } from '../config';
+import type * as appDom from '../appDom';
+import type { ComponentEntry } from './localMode';
+import { postProcessHtml } from './toolpadAppServer';
 
 export type Command = { kind: 'reload-components' } | { kind: 'exit' };
 

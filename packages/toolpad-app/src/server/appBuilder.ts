@@ -1,6 +1,6 @@
 import invariant from 'invariant';
-import { buildApp } from '../src/server/toolpadAppBuilder';
-import { initProject } from '../src/server/localMode';
+import { buildApp } from './toolpadAppBuilder';
+import { initProject } from './localMode';
 
 async function main() {
   invariant(

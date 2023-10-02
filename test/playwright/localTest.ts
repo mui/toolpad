@@ -8,7 +8,7 @@ import { once } from 'events';
 import invariant from 'invariant';
 import * as archiver from 'archiver';
 import getPort from 'get-port';
-import { PageScreenshotOptions, test as base } from './test';
+import { PageScreenshotOptions, test as baseTest } from './test';
 import { waitForMatch } from '../utils/streams';
 
 const CLI_CMD = path.resolve(__dirname, '../../packages/toolpad-app/cli.js');
@@ -42,6 +42,7 @@ interface WithAppOptions {
   setup?: (ctx: SetupContext) => Promise<void>;
   // Extra environment variables when running Toolpad
   env?: Record<string, string>;
+  base?: string;
 }
 
 /**
@@ -51,7 +52,7 @@ export async function withApp(
   options: WithAppOptions,
   doWork: (app: RunningLocalApp) => Promise<void>,
 ) {
-  const { cmd = 'start', template, setup, env } = options;
+  const { cmd = 'start', template, setup, env, base } = options;
 
   // Each test runs in its own temporary folder to avoid race conditions when running tests in parallel.
   // It also avoids mutating the source code of the fixture while running the test.
@@ -77,8 +78,16 @@ export async function withApp(
     // Run each test on its own port to avoid race conditions when running tests in parallel.
     args.push('--port', String(await getPort()));
 
+    if (base) {
+      args.push('--base', base);
+    }
+
     if (cmd === 'start') {
       const buildArgs = [CLI_CMD, 'build'];
+
+      if (base) {
+        buildArgs.push('--base', base);
+      }
 
       const child = childProcess.spawn('node', buildArgs, {
         cwd: projectDir,
@@ -143,7 +152,7 @@ export async function withApp(
   }
 }
 
-const test = base.extend<
+const test = baseTest.extend<
   {
     projectSnapshot: null;
     // Take a screenshot of the app to be used in argos-ci

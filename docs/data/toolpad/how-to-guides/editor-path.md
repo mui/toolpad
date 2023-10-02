@@ -24,7 +24,7 @@ Toolpad understands the `$EDITOR` environment variable. Make sure you can open y
 
 e.g. for webstorm, make sure to [install the CLI command](https://www.jetbrains.com/help/webstorm/working-with-the-ide-features-from-command-line.html#standalone) in the `PATH` variable, then declare the webstorm command:
 
-```
+```bash
 # ./.env
 
 EDITOR=webstorm

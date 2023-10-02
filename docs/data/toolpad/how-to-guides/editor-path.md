@@ -17,3 +17,15 @@
 4. Type `code` to find the `Install 'code' command in PATH` option, and press enter to select it:
 
 {{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/how-to-guides/editor-path/code-install.png", "alt": "VS Code add 'code' to PATH", "caption": "Install 'code' option", "aspectRatio": 2, "width": 600, "zoom": false }}
+
+## When using another editor
+
+Toolpad understands the `$EDITOR` environment variable. Make sure you can open your editor of choice from the command line. Then provide the command in the `$EDITOR` environment variable. You can use a `.env` file in the root of your project to set the variable.
+
+e.g. for webstorm, make sure to [install the CLI command](https://www.jetbrains.com/help/webstorm/working-with-the-ide-features-from-command-line.html#standalone) in the `PATH` variable, then declare the webstorm command:
+
+```yml
+# ./.env
+
+EDITOR=webstorm
+```

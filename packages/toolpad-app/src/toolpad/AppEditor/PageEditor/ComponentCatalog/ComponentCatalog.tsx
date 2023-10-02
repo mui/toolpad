@@ -59,6 +59,7 @@ export default function ComponentCatalog({ className }: ComponentCatalogProps) {
   const api = usePageEditorApi();
   const { dom } = useAppState();
   const [searchTerm, setSearchTerm] = React.useState('');
+  const [searchFocused, setSearchFocused] = React.useState(false);
   const [openStart, setOpenStart] = React.useState(0);
   const [openCustomComponents, setOpenCustomComponents] = useLocalStorageState(
     'catalog-custom-expanded',
@@ -83,7 +84,6 @@ export default function ComponentCatalog({ className }: ComponentCatalogProps) {
       const timeOpen = Date.now() - openStart;
       const defaultDelay = timeOpen > 750 ? 500 : 0;
       closeTimeoutRef.current = setTimeout(() => {
-        setSearchTerm('');
         setOpenStart(0);
       }, delay ?? defaultDelay);
     },
@@ -97,7 +97,7 @@ export default function ComponentCatalog({ className }: ComponentCatalogProps) {
     closeDrawer(0);
   };
 
-  const toolpadComponents = Object.entries(useToolpadComponents(dom));
+  const toolpadComponents = useToolpadComponents(dom);
 
   const handleMouseEnter = React.useCallback(() => openDrawer(), [openDrawer]);
   const handleMouseLeave = React.useCallback(() => closeDrawer(), [closeDrawer]);
@@ -114,15 +114,24 @@ export default function ComponentCatalog({ className }: ComponentCatalogProps) {
   );
 
   const filteredItems = React.useMemo(() => {
+    const entries = Object.entries(toolpadComponents);
     if (!searchTerm) {
-      return toolpadComponents;
+      return entries;
     }
     const regex = new RegExp(searchTerm.split('').join('.*'), 'i');
-    return toolpadComponents.filter(
+    return entries.filter(
       ([componentName, component]) =>
         regex.test(componentName) || component?.synonyms.some((name) => regex.test(name)),
     );
   }, [toolpadComponents, searchTerm]);
+
+  const drawerOpen = !!openStart || searchFocused;
+
+  React.useEffect(() => {
+    if (!drawerOpen) {
+      setSearchTerm('');
+    }
+  }, [drawerOpen]);
 
   return (
     <React.Fragment>
@@ -145,7 +154,7 @@ export default function ComponentCatalog({ className }: ComponentCatalogProps) {
           }}
         >
           <Collapse
-            in={!!openStart}
+            in={drawerOpen}
             orientation="horizontal"
             timeout={200}
             sx={{
@@ -164,7 +173,6 @@ export default function ComponentCatalog({ className }: ComponentCatalogProps) {
               >
                 <TextField
                   placeholder="Search components..."
-                  autoFocus
                   value={searchTerm}
                   onChange={(event) => setSearchTerm(event.target.value)}
                   InputProps={{
@@ -174,6 +182,8 @@ export default function ComponentCatalog({ className }: ComponentCatalogProps) {
                       </InputAdornment>
                     ),
                   }}
+                  onFocus={() => setSearchFocused(true)}
+                  onBlur={() => setSearchFocused(false)}
                 />
               </Box>
               <Box

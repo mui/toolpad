@@ -184,9 +184,8 @@ export default function EditableTreeItem({
         isEditing
           ? {
               ...sx,
-              backgroundColor: alpha(theme.palette.primary.main, 0.2),
-              '.MuiTreeItem-content': {
-                backgroundColor: 'transparent',
+              '> .MuiTreeItem-content': {
+                backgroundColor: alpha(theme.palette.primary.main, 0.2),
               },
             }
           : sx

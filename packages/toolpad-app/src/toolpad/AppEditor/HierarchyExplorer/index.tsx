@@ -10,6 +10,7 @@ import { ComponentIcon } from '../PageEditor/ComponentCatalog/ComponentCatalogIt
 import { DomView } from '../../../utils/domView';
 import { removePageLayoutNode } from '../pageLayout';
 import EditableTreeItem from '../../../components/EditableTreeItem';
+import ExplorerHeader from '../../../components/ExplorerHeader';
 
 export interface CustomTreeItemProps extends TreeItemProps {
   ref?: React.RefObject<HTMLLIElement>;
@@ -69,7 +70,7 @@ function CustomTreeItem(props: CustomTreeItemProps) {
       labelText={node.name}
       renderLabel={(children) => (
         <Box
-          sx={{ display: 'flex', alignItems: 'center', p: 0.2, pr: 0 }}
+          sx={{ display: 'flex', alignItems: 'center' }}
           onMouseEnter={(event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
             handleNodeHover?.(event, node.id);
           }}
@@ -214,19 +215,9 @@ export default function HierarchyExplorer() {
 
   return (
     <React.Fragment>
-      <Typography
-        variant="body2"
-        sx={(theme) => ({
-          flexGrow: 1,
-          fontWeight: theme.typography.fontWeightLight,
-          mx: 1,
-          my: 0.5,
-        })}
-      >
-        Page hierarchy
-      </Typography>
+      <ExplorerHeader headerText="Page hierarchy" />
       <TreeView
-        aria-label="page hierarchy explorer"
+        aria-label="Page hierarchy explorer"
         defaultCollapseIcon={<ExpandMoreIcon sx={{ fontSize: '0.9rem', opacity: 0.5 }} />}
         defaultExpandIcon={<ChevronRightIcon sx={{ fontSize: '0.9rem', opacity: 0.5 }} />}
         expanded={Array.from(expandedDomNodeIdSet)}

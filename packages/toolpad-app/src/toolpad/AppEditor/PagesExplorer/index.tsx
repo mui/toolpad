@@ -1,10 +1,9 @@
 import * as React from 'react';
-import { styled, Box, IconButton, Tooltip } from '@mui/material';
+import { styled, Box, IconButton } from '@mui/material';
 import { TreeView, treeItemClasses } from '@mui/x-tree-view';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
-import AddIcon from '@mui/icons-material/Add';
 import { NodeId } from '@mui/toolpad-core';
 import clsx from 'clsx';
 import invariant from 'invariant';
@@ -17,6 +16,7 @@ import client from '../../../api';
 import useBoolean from '../../../utils/useBoolean';
 import EditableTreeItem, { EditableTreeItemProps } from '../../../components/EditableTreeItem';
 import { scrollIntoViewIfNeeded } from '../../../utils/scroll';
+import ExplorerHeader from '../../../components/ExplorerHeader';
 
 const PagesExplorerRoot = styled('div')({
   overflow: 'auto',
@@ -60,11 +60,9 @@ function PagesExplorerTreeItem(props: StyledTreeItemProps) {
     nodeId,
     labelIcon,
     labelText,
-    onCreate,
     onRenameNode,
     onDeleteNode,
     onDuplicateNode,
-    createLabelText,
     renameLabelText = 'Rename',
     deleteLabelText = 'Delete',
     duplicateLabelText = 'Duplicate',
@@ -74,14 +72,6 @@ function PagesExplorerTreeItem(props: StyledTreeItemProps) {
   } = props;
 
   const { value: isEditing, setTrue: startEditing, setFalse: stopEditing } = useBoolean(false);
-
-  const handleCreate: React.MouseEventHandler = React.useCallback(
-    (event) => {
-      event.stopPropagation();
-      return onCreate!(event);
-    },
-    [onCreate],
-  );
 
   const handleRenameConfirm = React.useCallback(
     (updatedName: string) => {
@@ -108,16 +98,9 @@ function PagesExplorerTreeItem(props: StyledTreeItemProps) {
       nodeId={nodeId}
       labelText={labelText}
       renderLabel={(children) => (
-        <Box sx={{ display: 'flex', alignItems: 'center', p: 0.1, pr: 0 }}>
+        <Box sx={{ display: 'flex', alignItems: 'center' }}>
           {labelIcon}
           {children}
-          {onCreate ? (
-            <Tooltip title="Create new page">
-              <IconButton aria-label={createLabelText} onClick={handleCreate} size="small">
-                <AddIcon fontSize="inherit" />
-              </IconButton>
-            </Tooltip>
-          ) : null}
           {toolpadNodeId ? (
             <NodeMenu
               renderButton={({ buttonProps, menuProps }) => (
@@ -337,6 +320,15 @@ export default function PagesExplorer({ className }: PagesExplorerProps) {
     [appStateApi, dom],
   );
 
+  const pageItemSx = {
+    '.MuiTreeItem-label': {
+      pl: 1,
+    },
+    '.MuiTreeItem-iconContainer': {
+      display: 'none',
+    },
+  };
+
   return (
     <PagesExplorerRoot
       sx={{
@@ -348,7 +340,7 @@ export default function PagesExplorer({ className }: PagesExplorerProps) {
     >
       <TreeView
         ref={pagesTreeRef}
-        aria-label="pages explorer"
+        aria-label="Pages explorer"
         selected={activeNode ? [activeNode] : []}
         onNodeSelect={handleSelect}
         expanded={expanded}
@@ -357,37 +349,35 @@ export default function PagesExplorer({ className }: PagesExplorerProps) {
         defaultCollapseIcon={<ExpandMoreIcon sx={{ fontSize: '0.9rem', opacity: 0.5 }} />}
         defaultExpandIcon={<ChevronRightIcon sx={{ fontSize: '0.9rem', opacity: 0.5 }} />}
       >
-        <PagesExplorerTreeItem
-          nodeId=":pages"
-          aria-level={1}
-          labelText="Pages"
-          createLabelText="Create page"
+        <ExplorerHeader
+          headerText="Pages"
           onCreate={handleOpenCreateNewPage}
-        >
-          {isCreateNewPageOpen ? (
-            <EditableTreeItem
-              nodeId="::create::"
-              isEditing
-              suggestedNewItemName={nextProposedName}
-              onEdit={handleCreateNewCommit}
-              onCancel={handleCloseCreateNewPage}
-              validateItemName={validatePageName}
-            />
-          ) : null}
-          {pages.map((page) => (
-            <PagesExplorerTreeItem
-              key={page.id}
-              nodeId={page.id}
-              toolpadNodeId={page.id}
-              aria-level={2}
-              labelText={page.name}
-              onRenameNode={handleRenameNode}
-              onDuplicateNode={handleDuplicateNode}
-              onDeleteNode={handleDeletePage}
-              validateItemName={validatePageName}
-            />
-          ))}
-        </PagesExplorerTreeItem>
+          createLabelText="Create new page"
+        />
+        {isCreateNewPageOpen ? (
+          <EditableTreeItem
+            nodeId="::create::"
+            isEditing
+            suggestedNewItemName={nextProposedName}
+            onEdit={handleCreateNewCommit}
+            onCancel={handleCloseCreateNewPage}
+            validateItemName={validatePageName}
+            sx={pageItemSx}
+          />
+        ) : null}
+        {pages.map((page) => (
+          <PagesExplorerTreeItem
+            key={page.id}
+            nodeId={page.id}
+            toolpadNodeId={page.id}
+            labelText={page.name}
+            onRenameNode={handleRenameNode}
+            onDuplicateNode={handleDuplicateNode}
+            onDeleteNode={handleDeletePage}
+            validateItemName={validatePageName}
+            sx={pageItemSx}
+          />
+        ))}
       </TreeView>
     </PagesExplorerRoot>
   );

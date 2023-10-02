@@ -13,7 +13,7 @@ import {
 } from '@mui/material';
 import { Link, matchPath, useLocation } from 'react-router-dom';
 
-const DRAWER_WIDTH = 72; // px
+const DRAWER_WIDTH = 68; // px
 
 const Drawer = styled(MuiDrawer)({
   width: DRAWER_WIDTH,

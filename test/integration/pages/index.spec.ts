@@ -32,7 +32,7 @@ test('must show a message when a non-existing url is accessed', async ({ page })
   await expect(page.getByText('Not found')).toBeVisible();
 });
 
-test.only('can rename page', async ({ page, localApp }) => {
+test('can rename page', async ({ page, localApp }) => {
   const editorModel = new ToolpadEditor(page);
 
   await editorModel.goToPageById('g433ywb');

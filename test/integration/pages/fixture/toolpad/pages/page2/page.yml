@@ -4,10 +4,13 @@ spec:
   id: g433ywb
   title: page2
   content:
-    - component: PageRow
-      name: pageRow
-      children:
-        - component: Button
-          name: button
-          props:
-            content: page2Button
+    - component: Button
+      name: button
+      layout:
+        columnSize: 1
+      props:
+        content: page2Button
+    - component: Text
+      name: text
+      props:
+        value: foo

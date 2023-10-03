@@ -34,6 +34,7 @@ export default function ExplorerHeader({
       <Typography
         variant="body2"
         sx={{
+          fontSize: 13,
           flexGrow: 1,
           fontWeight: theme.typography.fontWeightLight,
           mx: 0.5,

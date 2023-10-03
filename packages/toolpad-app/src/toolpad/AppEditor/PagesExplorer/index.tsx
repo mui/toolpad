@@ -39,9 +39,6 @@ const StyledEditableTreeItem = styled(EditableTreeItem)({
   `]: {
     visibility: 'visible',
   },
-  '.MuiTreeItem-iconContainer': {
-    display: 'none',
-  },
 });
 
 interface StyledTreeItemProps extends EditableTreeItemProps {

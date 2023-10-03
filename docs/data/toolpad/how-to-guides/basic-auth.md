@@ -1,4 +1,4 @@
-# Enable Basic Authentication
+# Enable basic authentication
 
 <p class="description">Add basic authentication to your Toolpad application.</p>
 

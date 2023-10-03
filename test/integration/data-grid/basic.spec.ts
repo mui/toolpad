@@ -1,6 +1,6 @@
 import * as path from 'path';
 import { ToolpadEditor } from '../../models/ToolpadEditor';
-import { test, expect } from '../../playwright/localTest';
+import { test, expect, Locator } from '../../playwright/localTest';
 import clickCenter from '../../utils/clickCenter';
 
 test.use({
@@ -46,4 +46,25 @@ test('Column prop updates are not lost on drag interactions', async ({ page }) =
   await expect(
     editorModel.pageRoot.getByRole('row', { name: 'Todd Breitenberg' }).getByTestId('CheckIcon'),
   ).toBeVisible();
+});
+
+function cellLocator(gridLocator: Locator, rowIndex: number, collIndex: number) {
+  return gridLocator
+    .locator(`[aria-rowindex="${rowIndex}"]`)
+    .locator(`[aria-colindex="${collIndex}"]`);
+}
+
+test('Date columns', async ({ page }) => {
+  const editorModel = new ToolpadEditor(page);
+  editorModel.goToPageById('h0FFFmL');
+
+  await editorModel.waitForOverlay();
+
+  const canvasGridLocator = editorModel.appCanvas.getByRole('grid');
+
+  await expect(cellLocator(canvasGridLocator, 2, 1)).toHaveText('4/1/2023');
+  await expect(cellLocator(canvasGridLocator, 2, 2)).toHaveText('1/1/1970');
+  await expect(cellLocator(canvasGridLocator, 2, 3)).toHaveText('Invalid Date');
+  await expect(cellLocator(canvasGridLocator, 2, 4)).toHaveText('Invalid Date');
+  await expect(cellLocator(canvasGridLocator, 2, 5)).toHaveText('1/1/1970');
 });

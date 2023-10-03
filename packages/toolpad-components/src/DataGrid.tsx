@@ -281,13 +281,30 @@ function ImageCell({ field, id, value: src }: GridRenderCellParams<any, any, any
   );
 }
 
-function dateValueGetter({ value }: GridValueGetterParams<any, any>) {
+const INVALID_DATE = new Date(NaN);
+
+function dateValueGetter({ value }: GridValueGetterParams<any, any>): Date | undefined {
   if (value === null || value === undefined || value === '') {
     return undefined;
   }
+
+  if (typeof value === 'number') {
+    return new Date(value);
+  }
+
+  if (typeof value === 'string') {
+    if (isNumeric(value)) {
+      return new Date(Number(value));
+    }
+
+    if (isValidDate(value)) {
+      return new Date(value);
+    }
+  }
+
   // It's fine if this turns out to be an invalid date, the user wanted a date column, if the data can't be parsed as a date
   // it should just show as such
-  return new Date(value);
+  return INVALID_DATE;
 }
 
 function ComponentErrorFallback({ error }: FallbackProps) {

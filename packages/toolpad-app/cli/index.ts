@@ -13,14 +13,17 @@ export interface RunOptions {
   base: string;
 }
 
-async function runCommand(cmd: 'dev' | 'start', { dir, dev, ...args }: Omit<RunOptions, 'cmd'>) {
+async function runCommand(
+  cmd: 'dev' | 'start',
+  { dir, dev: toolpadDevMode, ...args }: Omit<RunOptions, 'cmd'>,
+) {
   const projectDir = path.resolve(process.cwd(), dir);
 
   const app = await runApp({
     ...args,
     dir: projectDir,
-    cmd,
-    toolpadDevMode: dev,
+    dev: cmd !== 'start',
+    toolpadDevMode,
   });
 
   process.once('SIGINT', () => {
@@ -49,7 +52,6 @@ async function buildCommand({ dir, base }: BuildOptions) {
   const builderPath = path.resolve(__dirname, './appBuilder.js');
 
   await execaNode(builderPath, [], {
-    cwd: projectDir,
     stdio: 'inherit',
     env: {
       NODE_ENV: 'production',

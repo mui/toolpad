@@ -21,6 +21,7 @@ import {
   updateYamlFile,
   fileExists,
 } from '@mui/toolpad-utils/fs';
+import getPort from 'get-port';
 import * as appDom from '../appDom';
 import insecureHash from '../utils/insecureHash';
 import {
@@ -1229,13 +1230,26 @@ export async function initProject({ dir, ...config }: InitProjectOptions) {
   // eslint-disable-next-line no-underscore-dangle
   invariant(!global.__toolpadProject, 'A project is already running');
 
+  const resolvedConfig: ToolpadProjectOptions = {
+    ...config,
+  };
+
+  if (resolvedConfig.dev && !resolvedConfig.wsPort) {
+    resolvedConfig.wsPort = await getPort();
+  }
+
   await migrateLegacyProject(dir);
 
   await initToolpadFolder(dir);
 
-  const project = new ToolpadProject(dir, config);
+  const project = new ToolpadProject(dir, resolvedConfig);
   // eslint-disable-next-line no-underscore-dangle
   globalThis.__toolpadProject = project;
 
   return project;
+}
+
+export function resolveProjectDir(dir: string) {
+  const projectDir = path.resolve(process.cwd(), dir);
+  return projectDir;
 }

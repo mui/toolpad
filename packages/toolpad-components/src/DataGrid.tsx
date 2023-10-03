@@ -283,7 +283,7 @@ function ImageCell({ field, id, value: src }: GridRenderCellParams<any, any, any
 
 function dateValueGetter({ value }: GridValueGetterParams<any, any>) {
   if (value === null || value === undefined || value === '') {
-    return value;
+    return undefined;
   }
   // It's fine if this turns out to be an invalid date, the user wanted a date column, if the data can't be parsed as a date
   // it should just show as such
@@ -379,9 +379,12 @@ export function inferColumns(rows: GridRowsProp): SerializableGridColumns {
 
 export function parseColumns(columns: SerializableGridColumns): GridColDef[] {
   return columns.map((column) => {
+    const customType = column.type ? CUSTOM_COLUMN_TYPES[column.type] : {};
+
     if (column.type === 'number' && column.numberFormat) {
       const format = createNumberFormat(column.numberFormat);
       return {
+        ...customType,
         ...column,
         valueFormatter: ({ value }) => format.format(value),
       };
@@ -390,20 +393,32 @@ export function parseColumns(columns: SerializableGridColumns): GridColDef[] {
     if (column.type === 'date' && column.dateFormat) {
       const format = createDateFormat(column.dateFormat);
       return {
+        ...customType,
         ...column,
-        valueFormatter: ({ value }) => format.format(value),
+        valueFormatter: ({ value }) => {
+          try {
+            return format.format(value);
+          } catch (err) {
+            return 'Invalid';
+          }
+        },
       };
     }
 
     if (column.type === 'dateTime' && column.dateTimeFormat) {
       const format = createDateFormat(column.dateTimeFormat);
       return {
+        ...customType,
         ...column,
-        valueFormatter: ({ value }) => format.format(value),
+        valueFormatter: ({ value }) => {
+          try {
+            return format.format(value);
+          } catch {
+            return 'Invalid';
+          }
+        },
       };
     }
-
-    const customType = column.type ? CUSTOM_COLUMN_TYPES[column.type] : {};
 
     const type = column.type && column.type in DEFAULT_COLUMN_TYPES ? column.type : undefined;
 

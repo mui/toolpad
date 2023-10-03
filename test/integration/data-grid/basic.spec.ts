@@ -12,7 +12,7 @@ test.use({
 
 test('Column prop updates are not lost on drag interactions', async ({ page }) => {
   const editorModel = new ToolpadEditor(page);
-  editorModel.goto();
+  editorModel.goToPageById('331kqzd');
 
   await editorModel.waitForOverlay();
 

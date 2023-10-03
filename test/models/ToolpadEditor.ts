@@ -52,7 +52,7 @@ export class ToolpadEditor {
   constructor(page: Page) {
     this.page = page;
 
-    this.createPageBtn = page.locator('[aria-label="Create page"]');
+    this.createPageBtn = page.locator('[aria-label="Create new page"]');
 
     this.componentCatalog = page.getByTestId('component-catalog');
 

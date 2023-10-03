@@ -323,10 +323,7 @@ export default function PagesExplorer({ className }: PagesExplorerProps) {
 
   const pagesTreeItemSx = {
     '.MuiTreeItem-label': {
-      pl: 1,
-    },
-    '.MuiTreeItem-iconContainer': {
-      display: 'none',
+      ml: -1.5,
     },
   };
 

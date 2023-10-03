@@ -153,16 +153,12 @@ export class ToolpadEditor {
     await style.evaluate((elm) => elm.parentNode?.removeChild(elm));
   }
 
-  getPageItem(group: string, name: string): Locator {
-    return this.explorer
-      .getByRole('treeitem')
-      .filter({ hasText: group })
-      .getByRole('treeitem')
-      .filter({ hasText: name });
+  getExplorerItem(name: string): Locator {
+    return this.explorer.getByRole('treeitem').filter({ hasText: name });
   }
 
-  async openPageExplorerMenu(group: string, name: string) {
-    const pageItem = this.getPageItem(group, name);
+  async openPageExplorerMenu(pageName: string) {
+    const pageItem = this.getExplorerItem(pageName);
     const menuButton = pageItem.getByRole('button', { name: 'Open page explorer menu' });
     await pageItem.hover();
     await menuButton.click();

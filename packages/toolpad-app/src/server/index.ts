@@ -11,6 +11,7 @@ import { createServer as createViteServer } from 'vite';
 import serializeJavascript from 'serialize-javascript';
 import { WebSocket, WebSocketServer } from 'ws';
 import { listen } from '@mui/toolpad-utils/http';
+// eslint-disable-next-line import/extensions
 import openBrowser from 'react-dev-utils/openBrowser.js';
 import { folderExists } from '@mui/toolpad-utils/fs';
 import chalk from 'chalk';

@@ -1,6 +1,6 @@
 import invariant from 'invariant';
 import { buildApp } from './toolpadAppBuilder';
-import { resolveProjectDir, initProject } from './localMode';
+import { initProject } from './localMode';
 
 async function main() {
   invariant(
@@ -10,15 +10,14 @@ async function main() {
   invariant(!!process.env.TOOLPAD_PROJECT_DIR, 'A project root must be defined');
   invariant(!!process.env.TOOLPAD_BASE, 'A base path must be defined');
 
-  const projectDir = resolveProjectDir(process.env.TOOLPAD_PROJECT_DIR);
   const base = process.env.TOOLPAD_BASE;
 
-  const project = await initProject({ dev: false, dir: projectDir });
+  const project = await initProject({ dev: false, dir: process.env.TOOLPAD_PROJECT_DIR });
 
   await project.build();
 
   await buildApp({
-    root: projectDir,
+    root: project.getRoot(),
     base,
     getComponents: () => project.getComponents(),
     outDir: project.getAppOutputFolder(),

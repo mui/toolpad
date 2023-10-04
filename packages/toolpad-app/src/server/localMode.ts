@@ -20,6 +20,7 @@ import {
   readMaybeDir,
   updateYamlFile,
   fileExists,
+  folderExists,
 } from '@mui/toolpad-utils/fs';
 import getPort from 'get-port';
 import * as appDom from '../appDom';
@@ -1203,7 +1204,6 @@ class ToolpadProject {
     // toolpad build. It's fundamentally wrong to use this information as it strictly holds
     // information about the running toolpad instance.
     invariant(this.options.externalUrl, 'External URL is not set');
-    invariant(this.options.wsPort, 'Websocket port is not set');
     invariant(this.options.base, 'Base path is not set');
 
     return {
@@ -1222,13 +1222,24 @@ declare global {
   var __toolpadProject: ToolpadProject | undefined;
 }
 
+export function resolveProjectDir(dir: string) {
+  const projectDir = path.resolve(process.cwd(), dir);
+  return projectDir;
+}
+
 export interface InitProjectOptions extends ToolpadProjectOptions {
   dir: string;
 }
 
-export async function initProject({ dir, ...config }: InitProjectOptions) {
+export async function initProject({ dir: dirInput, ...config }: InitProjectOptions) {
   // eslint-disable-next-line no-underscore-dangle
   invariant(!global.__toolpadProject, 'A project is already running');
+
+  const dir = await resolveProjectDir(dirInput);
+
+  if (!(await folderExists(dir))) {
+    throw new Error(`No Toolpad project found at ${chalk.cyan(`"${dir}"`)}`);
+  }
 
   const resolvedConfig: ToolpadProjectOptions = {
     ...config,
@@ -1247,9 +1258,4 @@ export async function initProject({ dir, ...config }: InitProjectOptions) {
   globalThis.__toolpadProject = project;
 
   return project;
-}
-
-export function resolveProjectDir(dir: string) {
-  const projectDir = path.resolve(process.cwd(), dir);
-  return projectDir;
 }

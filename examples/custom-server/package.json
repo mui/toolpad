@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "NODE_ENV=development node index.mjs",
-    "build": "toolpad build",
+    "build": "toolpad build --base /my-app",
     "start": "node index.mjs"
   },
   "dependencies": {

@@ -19,7 +19,7 @@ import * as url from 'node:url';
 import invariant from 'invariant';
 import { asyncHandler } from '../utils/express';
 import { createProdHandler } from './toolpadAppServer';
-import { resolveProjectDir, initProject, type ToolpadProject } from './localMode';
+import { initProject, resolveProjectDir, type ToolpadProject } from './localMode';
 import type { Command as AppDevServerCommand, AppViteServerConfig, WorkerRpc } from './appServer';
 import { createRpcHandler } from './rpc';
 import { RUNTIME_CONFIG_WINDOW_PROPERTY } from '../constants';
@@ -46,7 +46,7 @@ interface CreateAppHandlerParams {
 async function createDevHandler(project: ToolpadProject, { base }: CreateAppHandlerParams) {
   const handler = express.Router();
 
-  const appServerPath = path.resolve(currentDirectory, './appServer.js');
+  const appServerPath = path.resolve(currentDirectory, '../cli/appServer.js');
   const devPort = await getPort();
 
   const mainThreadRpcChannel = new MessageChannel();
@@ -365,7 +365,7 @@ export async function runApp({
   const server = await startToolpadServer({
     dev,
     base,
-    dir: projectDir,
+    dir,
     port,
     toolpadDevMode: !!process.env.TOOLPAD_NEXT_DEV || toolpadDevMode,
     externalUrl,

@@ -80,32 +80,38 @@ export default createDataProvider({
 });
 ```
 
-## filtering 🚧
+## Filtering 🚧
 
 :::warning
 This feature isn't implemented yet. It's coming.
 :::
 
-## sorting 🚧
+## Sorting 🚧
 
 :::warning
 This feature isn't implemented yet. It's coming.
 :::
 
-## row editing 🚧
+## Row editing 🚧
 
 :::warning
 This feature isn't implemented yet. It's coming.
 :::
 
-## row creation 🚧
+## Row creation 🚧
 
 :::warning
 This feature isn't implemented yet. It's coming.
 :::
 
-## deleting rows 🚧
+## Deleting rows 🚧
 
 :::warning
 This feature isn't implemented yet. It's coming.
 :::
+
+## API
+
+See the documentation below for a complete reference to all of the functions and interfaces mentioned in this page.
+
+- [`createDataProvider`](/toolpad/reference/api/create-data-provider/)

@@ -26,7 +26,7 @@ Data providers expose collections to the Toolpad frontend. They are server-side 
 
 ## Parameters
 
-- `config` An object describing the data provider capabilities
+- `config`: [`DataProviderConfig`](#dataproviderconfig) An object describing the data provider capabilities
 
 ## Returns
 

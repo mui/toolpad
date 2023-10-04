@@ -38,7 +38,7 @@ Follow these steps to create a new data provider
    });
    ```
 
-## pagination
+## Pagination
 
 The data provider supports two styles of pagination. Index based, and cursor based pagination.
 

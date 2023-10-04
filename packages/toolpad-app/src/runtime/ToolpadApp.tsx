@@ -90,6 +90,7 @@ import api, { queryClient } from './api';
 const browserJsRuntime = getBrowserRuntime();
 
 const isPreview = process.env.NODE_ENV !== 'production';
+const isCustomServer = process.env.TOOLPAD_CUSTOM_SERVER === 'true';
 const isRenderedInCanvas =
   typeof window === 'undefined'
     ? false
@@ -1487,7 +1488,7 @@ function ToolpadAppLayout({ dom }: ToolpadAppLayoutProps) {
   const pageMatch = useMatch('/pages/:slug');
   const pageId = pageMatch?.params.slug;
 
-  const showPreviewHeader = isPreview && !isRenderedInCanvas;
+  const showPreviewHeader = isPreview && !isRenderedInCanvas && !isCustomServer;
 
   const navEntries = React.useMemo(
     () =>

@@ -1,6 +1,6 @@
 {
   "name": "@mui/toolpad-core",
-  "version": "0.1.30",
+  "version": "0.1.31",
   "description": "Build MUI apps quickly",
   "author": "MUI Toolpad team",
   "homepage": "https://github.com/mui/mui-toolpad#readme",
@@ -41,7 +41,7 @@
   },
   "dependencies": {
     "@mui/material": "5.14.11",
-    "@mui/toolpad-utils": "0.1.30",
+    "@mui/toolpad-utils": "0.1.31",
     "@tanstack/react-query": "4.35.3",
     "@types/json-schema": "7.0.13",
     "cookie": "0.5.0",

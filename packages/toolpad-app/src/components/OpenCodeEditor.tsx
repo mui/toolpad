@@ -42,12 +42,14 @@ function MissingEditorDialog({ open, onClose }: MissingEditorDialogProps) {
       onClose={handleMissingEditorDialogClose}
       aria-labelledby={`${id}-title`}
       aria-describedby="alert-dialog-description"
+      onClick={(event) => event.stopPropagation()}
     >
       <DialogTitle id={`${id}-title`}>{'Editor not found'}</DialogTitle>
       <DialogContent>
         <DialogContentText id="alert-dialog-description">
-          No editor was detected on your system. If using Visual Studio Code, this may be due to a
-          missing &quot;code&quot; command in your PATH. <br />
+          No editor was detected on your system. If you use Visual Studio Code, this may be due to a
+          missing &quot;code&quot; command in your PATH. Otherwise you can set the{' '}
+          <code>$EDITOR</code> environment variable. <br />
           Check the{' '}
           <Link
             href="https://mui.com/toolpad/how-to-guides/editor-path/"

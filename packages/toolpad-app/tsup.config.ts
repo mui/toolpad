@@ -23,8 +23,8 @@ export default defineConfig((options) => [
       index: './cli/index.ts',
 
       // Worker entry points
-      appServer: './src/server/appServer.ts',
-      appBuilder: './src/server/appBuilder.ts',
+      appServerWorker: './src/server/appServerWorker.ts',
+      appBuilderWorker: './src/server/appBuilderWorker.ts',
       functionsDevWorker: './src/server/functionsDevWorker.ts',
       functionsTypesWorker: './src/server/functionsTypesWorker.ts',
     },

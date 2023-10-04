@@ -21,7 +21,11 @@ import invariant from 'invariant';
 import { asyncHandler } from '../utils/express';
 import { createProdHandler } from './toolpadAppServer';
 import { initProject, resolveProjectDir, type ToolpadProject } from './localMode';
-import type { Command as AppDevServerCommand, AppViteServerConfig, WorkerRpc } from './appServer';
+import type {
+  Command as AppDevServerCommand,
+  AppViteServerConfig,
+  WorkerRpc,
+} from './appServerWorker';
 import { createRpcHandler } from './rpc';
 import { RUNTIME_CONFIG_WINDOW_PROPERTY } from '../constants';
 import type { RuntimeConfig } from '../config';
@@ -47,7 +51,7 @@ interface CreateAppHandlerParams {
 async function createDevHandler(project: ToolpadProject, { base }: CreateAppHandlerParams) {
   const handler = express.Router();
 
-  const appServerPath = path.resolve(currentDirectory, '../cli/appServer.js');
+  const appServerPath = path.resolve(currentDirectory, '../cli/appServerWorker.js');
   const devPort = await getPort();
 
   const mainThreadRpcChannel = new MessageChannel();

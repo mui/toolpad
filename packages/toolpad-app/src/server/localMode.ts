@@ -21,8 +21,10 @@ import {
   updateYamlFile,
   fileExists,
   folderExists,
+  readJsonFile,
 } from '@mui/toolpad-utils/fs';
 import getPort from 'get-port';
+import { z } from 'zod';
 import * as appDom from '../appDom';
 import insecureHash from '../utils/insecureHash';
 import {
@@ -261,8 +263,14 @@ class Lock {
   }
 }
 
-const DEFAULT_GENERATED_GITIGNORE_FILE_CONTENT = `.generated
-`;
+const buildInfoSchema = z.object({
+  timestamp: z.number(),
+  base: z.string().optional(),
+});
+
+type BuildInfo = z.infer<typeof buildInfoSchema>;
+
+const DEFAULT_GENERATED_GITIGNORE_FILE_CONTENT = '.generated\n';
 
 async function initGitignore(root: string) {
   const projectFolder = getToolpadFolder(root);
@@ -1080,6 +1088,10 @@ class ToolpadProject {
     return getAppOutputFolder(this.getRoot());
   }
 
+  getBuildInfoFile() {
+    return path.resolve(this.getOutputFolder(), 'buildInfo.json');
+  }
+
   alertOnMissingVariablesInDom(dom: appDom.AppDom) {
     const requiredVars = appDom.getRequiredEnvVars(dom);
     const missingVars = Array.from(requiredVars).filter(
@@ -1107,7 +1119,19 @@ class ToolpadProject {
 
   async start() {
     if (this.options.dev) {
+      await this.resetBuildInfo();
       await this.initWatcher();
+    } else {
+      const buildInfo = await this.getBuildInfo();
+      if (!buildInfo) {
+        throw new Error(`No production build found. Please run "toolpad build" first.`);
+      }
+
+      if (buildInfo.base !== this.options.base) {
+        throw new Error(
+          `Production build found for base "${buildInfo.base}" but running the app with "${this.options.base}". Please run "toolpad build" with the correct --base option.`,
+        );
+      }
     }
     await Promise.all([this.envManager.start(), this.functionsManager.start()]);
   }
@@ -1212,6 +1236,30 @@ class ToolpadProject {
       wsPort: this.options.wsPort,
       base: this.options.base,
     };
+  }
+
+  async writeBuildInfo() {
+    await writeFileRecursive(
+      this.getBuildInfoFile(),
+      JSON.stringify({
+        timestamp: Date.now(),
+        base: this.options.base,
+      } satisfies BuildInfo),
+      { encoding: 'utf-8' },
+    );
+  }
+
+  async resetBuildInfo() {
+    await fs.rm(this.getBuildInfoFile(), { force: true, recursive: true });
+  }
+
+  async getBuildInfo(): Promise<BuildInfo | null> {
+    try {
+      const content = await readJsonFile(this.getBuildInfoFile());
+      return buildInfoSchema.parse(content);
+    } catch {
+      return null;
+    }
   }
 }
 

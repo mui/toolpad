@@ -33,13 +33,10 @@ function devServerPlugin(root: string, config: RuntimeConfig): Plugin {
       return () => {
         viteServer.middlewares.use('/', async (req, res, next) => {
           invariant(req.url, 'request must have a url');
-          const url = new URL(req.url, 'http://x');
-          const canvas = url.searchParams.get('toolpad-display') === 'canvas';
-
           try {
             const dom = await loadDom();
 
-            const template = getHtmlContent({ canvas });
+            const template = getHtmlContent({ canvas: true });
 
             let html = await viteServer.transformIndexHtml(req.url, template);
 

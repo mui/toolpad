@@ -999,9 +999,12 @@ class ToolpadProject {
 
   private pendingVersionCheck: Promise<VersionInfo> | undefined;
 
-  constructor(root: string, options: ToolpadProjectOptions) {
+  constructor(root: string, options: Partial<ToolpadProjectOptions>) {
     this.root = root;
-    this.options = options;
+    this.options = {
+      dev: false,
+      ...options,
+    };
 
     this.envManager = new EnvManager(this);
     this.functionsManager = new FunctionsManager(this);
@@ -1272,7 +1275,7 @@ export function resolveProjectDir(dir: string) {
   return projectDir;
 }
 
-export interface InitProjectOptions extends Partial<ToolpadProjectOptions> {
+export interface InitProjectOptions extends ToolpadProjectOptions {
   dir: string;
 }
 
@@ -1287,9 +1290,6 @@ export async function initProject({ dir: dirInput, ...config }: InitProjectOptio
   }
 
   const resolvedConfig: ToolpadProjectOptions = {
-    dev: false,
-    base: '/prod',
-    customServer: false,
     ...config,
   };
 

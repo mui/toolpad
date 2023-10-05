@@ -166,7 +166,6 @@ export interface CreateViteConfigParams {
   root: string;
   dev: boolean;
   base: string;
-  customServer?: boolean;
   plugins?: Plugin[];
   getComponents: () => Promise<ComponentEntry[]>;
 }
@@ -180,7 +179,6 @@ export function createViteConfig({
   root,
   dev,
   base,
-  customServer,
   plugins = [],
   getComponents,
 }: CreateViteConfigParams): CreateViteConfigResult {
@@ -282,7 +280,6 @@ export function createViteConfig({
       define: {
         'process.env.NODE_ENV': `'${mode}'`,
         'process.env.BASE_URL': `'${base}'`,
-        'process.env.TOOLPAD_CUSTOM_SERVER': `'${JSON.stringify(customServer)}'`,
       },
     },
   };

@@ -25,15 +25,7 @@ invariant(
   'The dev server must be started with NODE_ENV=development',
 );
 
-export interface ToolpadAppDevServerParams {
-  outDir: string;
-  config: RuntimeConfig;
-  root: string;
-  base: string;
-  customServer: boolean;
-}
-
-function devServerPlugin({ config }: ToolpadAppDevServerParams): Plugin {
+function devServerPlugin(root: string, config: RuntimeConfig): Plugin {
   return {
     name: 'toolpad-dev-server',
 
@@ -41,10 +33,13 @@ function devServerPlugin({ config }: ToolpadAppDevServerParams): Plugin {
       return () => {
         viteServer.middlewares.use('/', async (req, res, next) => {
           invariant(req.url, 'request must have a url');
+          const url = new URL(req.url, 'http://x');
+          const canvas = url.searchParams.get('toolpad-display') === 'canvas';
+
           try {
             const dom = await loadDom();
 
-            const template = getHtmlContent({ canvas: true });
+            const template = getHtmlContent({ canvas });
 
             let html = await viteServer.transformIndexHtml(req.url, template);
 
@@ -60,11 +55,20 @@ function devServerPlugin({ config }: ToolpadAppDevServerParams): Plugin {
   };
 }
 
-async function createDevServer(config: ToolpadAppDevServerParams) {
+export interface ToolpadAppDevServerParams {
+  outDir: string;
+  config: RuntimeConfig;
+  root: string;
+  base: string;
+}
+
+async function createDevServer({ outDir, config, root, base }: ToolpadAppDevServerParams) {
   const { viteConfig } = createViteConfig({
-    ...config,
+    outDir,
     dev: true,
-    plugins: [devServerPlugin(config)],
+    root,
+    base,
+    plugins: [devServerPlugin(root, config)],
     getComponents,
   });
   const devServer = await createServer(viteConfig);
@@ -72,13 +76,17 @@ async function createDevServer(config: ToolpadAppDevServerParams) {
   return { devServer };
 }
 
-export interface AppViteServerConfig extends ToolpadAppDevServerParams {
+export interface AppViteServerConfig {
+  outDir: string;
+  base: string;
+  root: string;
   port: number;
+  config: RuntimeConfig;
   mainThreadRpcPort: MessagePort;
 }
 
-export async function main({ port, ...config }: AppViteServerConfig) {
-  const { devServer } = await createDevServer(config);
+export async function main({ outDir, base, config, root, port }: AppViteServerConfig) {
+  const { devServer } = await createDevServer({ outDir, config, root, base });
 
   await devServer.listen(port);
 

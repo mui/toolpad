@@ -10,17 +10,18 @@ import getPageViewState from './getPageViewState';
 import { rectContainsPoint } from '../utils/geometry';
 import { CanvasHooks, CanvasHooksContext } from '../runtime/CanvasHooksContext';
 import { bridge, setCommandHandler } from './ToolpadBridge';
+import { BridgeContext } from './BridgeContext';
 
 const handleScreenUpdate = throttle(
   () => {
-    bridge?.canvasEvents.emit('screenUpdate', {});
+    bridge.canvasEvents.emit('screenUpdate', {});
   },
   50,
   { trailing: true },
 );
 
 export interface AppCanvasProps {
-  state: AppCanvasState;
+  initialState?: AppCanvasState | null;
   basename: string;
   extraComponents: ToolpadComponents;
 }
@@ -28,9 +29,9 @@ export interface AppCanvasProps {
 export default function AppCanvas({
   extraComponents,
   basename,
-  state: initialState,
+  initialState = null,
 }: AppCanvasProps) {
-  const [state, setState] = React.useState<AppCanvasState>(initialState);
+  const [state, setState] = React.useState<AppCanvasState | null>(initialState);
 
   const appRootRef = React.useRef<HTMLDivElement>();
   const appRootCleanupRef = React.useRef<() => void>();
@@ -82,27 +83,31 @@ export default function AppCanvas({
   });
 
   React.useEffect(() => {
-    if (!bridge) {
-      return;
-    }
+    const unsetGetPageViewState = setCommandHandler(
+      bridge.canvasCommands,
+      'getPageViewState',
+      () => {
+        invariant(appRootRef.current, 'App ref not attached');
+        return getPageViewState(appRootRef.current);
+      },
+    );
 
-    setCommandHandler(bridge.canvasCommands, 'getPageViewState', () => {
-      invariant(appRootRef.current, 'App ref not attached');
-      return getPageViewState(appRootRef.current);
-    });
-
-    setCommandHandler(bridge.canvasCommands, 'getViewCoordinates', (clientX, clientY) => {
-      if (!appRootRef.current) {
+    const unsetGetViewCoordinates = setCommandHandler(
+      bridge.canvasCommands,
+      'getViewCoordinates',
+      (clientX, clientY) => {
+        if (!appRootRef.current) {
+          return null;
+        }
+        const rect = appRootRef.current.getBoundingClientRect();
+        if (rectContainsPoint(rect, clientX, clientY)) {
+          return { x: clientX - rect.x, y: clientY - rect.y };
+        }
         return null;
-      }
-      const rect = appRootRef.current.getBoundingClientRect();
-      if (rectContainsPoint(rect, clientX, clientY)) {
-        return { x: clientX - rect.x, y: clientY - rect.y };
-      }
-      return null;
-    });
+      },
+    );
 
-    setCommandHandler(bridge.canvasCommands, 'update', (newState) => {
+    const unsetUpdate = setCommandHandler(bridge.canvasCommands, 'update', (newState) => {
       // `update` will be called from the parent window. Since the canvas runs in an iframe, it's
       // running in another javascript realm than the one this object was constructed in. This makes
       // the MUI core `deepMerge` function fail. The `deepMerge` function uses `isPlainObject` which checks
@@ -115,11 +120,22 @@ export default function AppCanvas({
       React.startTransition(() => setState(structuredClone(newState)));
     });
 
-    setCommandHandler(bridge.canvasCommands, 'invalidateQueries', () => {
-      queryClient.invalidateQueries();
-    });
+    const unsetInvalidateQueries = setCommandHandler(
+      bridge.canvasCommands,
+      'invalidateQueries',
+      () => {
+        queryClient.invalidateQueries();
+      },
+    );
 
     bridge.canvasEvents.emit('ready', {});
+
+    return () => {
+      unsetGetPageViewState();
+      unsetGetViewCoordinates();
+      unsetUpdate();
+      unsetInvalidateQueries();
+    };
   }, []);
 
   const savedNodes = state?.savedNodes;
@@ -129,16 +145,19 @@ export default function AppCanvas({
     };
   }, [savedNodes]);
 
-  return (
-    <CanvasHooksContext.Provider value={editorHooks}>
-      <CanvasEventsContext.Provider value={bridge?.canvasEvents || null}>
-        <ToolpadApp
-          rootRef={onAppRoot}
-          extraComponents={extraComponents}
-          basename={basename}
-          state={state}
-        />
-      </CanvasEventsContext.Provider>
-    </CanvasHooksContext.Provider>
-  );
+  return state ? (
+    <BridgeContext.Provider value={bridge}>
+      <CanvasHooksContext.Provider value={editorHooks}>
+        <CanvasEventsContext.Provider value={bridge.canvasEvents}>
+          <ToolpadApp
+            rootRef={onAppRoot}
+            extraComponents={extraComponents}
+            hasShell={false}
+            basename={basename}
+            state={state}
+          />
+        </CanvasEventsContext.Provider>
+      </CanvasHooksContext.Provider>
+    </BridgeContext.Provider>
+  ) : null;
 }

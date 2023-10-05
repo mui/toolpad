@@ -12,11 +12,7 @@ async function main() {
 
   const base = process.env.TOOLPAD_BASE;
 
-  const project = await initProject({
-    dev: false,
-    dir: process.env.TOOLPAD_PROJECT_DIR,
-    base,
-  });
+  const project = await initProject({ dev: false, dir: process.env.TOOLPAD_PROJECT_DIR, base });
 
   await project.build();
 

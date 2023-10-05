@@ -44,7 +44,11 @@ function* getPreferredPorts(port: number = DEFAULT_PORT): Iterable<number> {
   }
 }
 
-async function createDevHandler(project: ToolpadProject) {
+interface CreateAppHandlerParams {
+  base: string;
+}
+
+async function createDevHandler(project: ToolpadProject, { base }: CreateAppHandlerParams) {
   const handler = express.Router();
 
   const appServerPath = path.resolve(currentDirectory, '../cli/appServerWorker.js');
@@ -55,12 +59,11 @@ async function createDevHandler(project: ToolpadProject) {
   const worker = new Worker(appServerPath, {
     workerData: {
       outDir: project.getAppOutputFolder(),
-      base: project.options.base,
+      base,
       config: project.getRuntimeConfig(),
       root: project.getRoot(),
       port: devPort,
       mainThreadRpcPort: mainThreadRpcChannel.port1,
-      customServer: project.options.customServer,
     } satisfies AppViteServerConfig,
     transferList: [mainThreadRpcChannel.port1],
     env: {
@@ -127,13 +130,16 @@ interface AppHandler {
   dispose: () => Promise<void>;
 }
 
-async function createToolpadAppHandler(project: ToolpadProject): Promise<AppHandler> {
+async function createToolpadAppHandler(
+  project: ToolpadProject,
+  { base }: CreateAppHandlerParams,
+): Promise<AppHandler> {
   const router = express.Router();
   const publicPath = path.resolve(currentDirectory, '../../public');
   router.use(express.static(publicPath, { index: false }));
 
   const appHandler = project.options.dev
-    ? await createDevHandler(project)
+    ? await createDevHandler(project, { base })
     : await createProdHandler(project);
 
   if (project.options.dev) {
@@ -185,10 +191,10 @@ export async function createHandler({
   base = '/prod',
   externalUrl = 'http://localhost:3000',
 }: ToolpadHandlerConfig): Promise<AppHandler> {
-  const project = await initProject({ dev, dir, externalUrl, base, customServer: true });
+  const project = await initProject({ dev, dir, externalUrl, base });
   await project.start();
 
-  const appHandler = await createToolpadAppHandler(project);
+  const appHandler = await createToolpadAppHandler(project, { base });
 
   return {
     handler: appHandler.handler,
@@ -207,7 +213,7 @@ async function createToolpadHandler({
 }: ToolpadHandlerConfig): Promise<AppHandler> {
   const editorBasename = '/_toolpad';
 
-  const project = await initProject({ dev, dir, externalUrl });
+  const project = await initProject({ dev, dir, externalUrl, base });
   await project.start();
 
   const runtimeConfig: RuntimeConfig = project.getRuntimeConfig();
@@ -232,7 +238,7 @@ async function createToolpadHandler({
   const publicPath = path.resolve(currentDirectory, '../../public');
   router.use(express.static(publicPath, { index: false }));
 
-  const appHandler = await createToolpadAppHandler(project);
+  const appHandler = await createToolpadAppHandler(project, { base });
   router.use(base, appHandler.handler);
 
   if (dev) {

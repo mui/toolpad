@@ -61,7 +61,7 @@ export default createDataProvider({
 
 ### Cursor based
 
-This is the strategy your data is paginated by when it returns data based on a cursor and a page size. The `getRecords` method will receive `cursor` and `pageSize` values in its `paginationModel` parameter and returns a set of records representing the page. You indicate the cursor of the next page with a `cursor` property in the result. Pass `null` to signal the end of the collection. The You can enable Cursor based pagination by setting `paginationMode` to `'cursor'`.
+This is the strategy your data is paginated by when it returns data based on a cursor and a page size. The `getRecords` method will receive `cursor` and `pageSize` values in its `paginationModel` parameter and returns a set of records representing the page. You indicate the cursor of the next page with a `cursor` property in the result. Pass `null` to signal the end of the collection. You can enable Cursor based pagination by setting `paginationMode` to `'cursor'`.
 
 ```tsx
 export default createDataProvider({

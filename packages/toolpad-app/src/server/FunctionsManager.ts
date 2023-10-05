@@ -383,7 +383,7 @@ export default class FunctionsManager {
     exportName: string = 'default',
   ): Promise<ToolpadDataProviderIntrospection> {
     const fullPath = await this.getBuiltOutputFilePath(fileName);
-    return this.devWorker.intropectDataProvider(fullPath, exportName);
+    return this.devWorker.introspectDataProvider(fullPath, exportName);
   }
 
   async getDataProviderRecords<R, P extends PaginationMode>(

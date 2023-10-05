@@ -210,7 +210,7 @@ export function createWorker(env: Record<string, any>) {
       return result;
     },
 
-    async intropectDataProvider(
+    async introspectDataProvider(
       filePath: string,
       name: string,
     ): Promise<ToolpadDataProviderIntrospection> {

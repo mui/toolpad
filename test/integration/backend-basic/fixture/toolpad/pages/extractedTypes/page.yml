@@ -7,6 +7,7 @@ spec:
   content:
     - component: Text
       name: text
+      children: []
       layout:
         columnSize: 1
       props:
@@ -15,6 +16,7 @@ spec:
             `bare function with parameters: ${bareWithParams.data?.message}`
     - component: Text
       name: text1
+      children: []
       layout:
         columnSize: 1
       props:

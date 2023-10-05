@@ -20,6 +20,7 @@ spec:
   content:
     - component: Text
       name: text
+      children: []
       layout:
         columnSize: 1
       props:
@@ -28,6 +29,7 @@ spec:
             `Circlular property: ${circularData.data.a}`
     - component: Text
       name: text1
+      children: []
       layout:
         columnSize: 1
       props:
@@ -37,6 +39,7 @@ spec:
             ${nonCircularData.data.a1.b}:${nonCircularData.data.a2.b}`
     - component: Text
       name: text2
+      children: []
       layout:
         columnSize: 1
       props:

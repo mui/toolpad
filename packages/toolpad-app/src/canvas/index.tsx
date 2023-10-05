@@ -152,7 +152,6 @@ export default function AppCanvas({
           <ToolpadApp
             rootRef={onAppRoot}
             extraComponents={extraComponents}
-            hasShell={false}
             basename={basename}
             state={state}
           />

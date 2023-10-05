@@ -284,6 +284,13 @@ export const pageSchema = toolpadObjectSchema(
       .describe(
         'Display mode of the page. This can also be set at runtime with the toolpad-display query parameter',
       ),
+    layout: z
+      .union([
+        z.literal('container').describe('Use Container as root component of the page'),
+        z.literal('fluid').describe('Fluid page layout that allows you to use 100% of the page'),
+      ])
+      .optional()
+      .describe('Layout of the page.'),
   }),
 );
 

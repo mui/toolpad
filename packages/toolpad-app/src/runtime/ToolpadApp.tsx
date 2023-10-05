@@ -173,6 +173,7 @@ const AppRoot = styled('div')({
   overflow: 'auto' /* Prevents margins from collapsing into root */,
   position: 'relative' /* Makes sure that the editor overlay that renders inside sizes correctly */,
   minHeight: '100vh',
+  ...(isRenderedInCanvas ? { padding: '10px' } : {}) /* Makes fluid layout more user friendly */,
   display: 'flex',
   flexDirection: 'column',
 });
@@ -1163,7 +1164,7 @@ function RenderedNodeContent({ node, childNodeGroups, Component }: RenderedNodeC
       NodeError={NodeError}
     >
       {isLayoutNode ? (
-        <Component {...wrappedProps} />
+        <Component {...wrappedProps} attributes={node.attributes} />
       ) : (
         <Box
           sx={{
@@ -1181,10 +1182,15 @@ function RenderedNodeContent({ node, childNodeGroups, Component }: RenderedNodeC
 
 interface PageRootProps {
   children?: React.ReactNode;
+  attributes: {
+    layout: appDom.PageLayoutMode;
+  };
 }
 
-function PageRoot({ children }: PageRootProps) {
-  return (
+function PageRoot({ children, attributes }: PageRootProps) {
+  const { layout } = attributes;
+  const isContainer = layout === ('container' as appDom.PageLayoutMode);
+  return isContainer ? (
     <Container>
       <Stack
         data-testid="page-root"
@@ -1197,6 +1203,17 @@ function PageRoot({ children }: PageRootProps) {
         {children}
       </Stack>
     </Container>
+  ) : (
+    <Stack
+      data-testid="page-root"
+      direction="column"
+      sx={{
+        flex: 1,
+        gap: 1,
+      }}
+    >
+      {children}
+    </Stack>
   );
 }
 

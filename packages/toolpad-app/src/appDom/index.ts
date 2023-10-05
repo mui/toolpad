@@ -81,6 +81,7 @@ export interface ConnectionNode<P = unknown> extends AppDomNodeBase {
 }
 
 export type PageDisplayMode = 'standalone' | 'shell';
+export type PageLayoutMode = 'container' | 'fluid';
 
 export interface PageNode extends AppDomNodeBase {
   readonly type: 'page';
@@ -89,6 +90,7 @@ export interface PageNode extends AppDomNodeBase {
     readonly parameters?: [string, string][];
     readonly module?: string;
     readonly display?: PageDisplayMode;
+    readonly layout?: PageLayoutMode;
   };
 }
 
@@ -1108,6 +1110,7 @@ export function createDefaultDom(): AppDom {
     attributes: {
       title: 'Page 1',
       display: 'shell',
+      layout: 'container'
     },
   });
 

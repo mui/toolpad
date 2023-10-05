@@ -7,6 +7,7 @@ import UrlQueryEditor from './UrlQueryEditor';
 import NodeNameEditor from '../NodeNameEditor';
 import * as appDom from '../../../appDom';
 import PageTitleEditor from '../PageTitleEditor';
+import PageLayoutEditor from '../PageLayoutEditor';
 
 const PAGE_DISPLAY_OPTIONS: { value: appDom.PageDisplayMode; label: string }[] = [
   { value: 'shell', label: 'App shell' },
@@ -40,6 +41,7 @@ export default function PageOptionsPanel() {
       <Typography variant="subtitle1">Page:</Typography>
       <NodeNameEditor node={page} />
       <PageTitleEditor node={page} />
+      <PageLayoutEditor node={page} />
       <Tooltip
         arrow
         placement="left-start"

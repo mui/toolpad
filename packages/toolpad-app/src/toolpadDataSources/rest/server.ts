@@ -23,7 +23,7 @@ import {
 } from './types';
 import { Maybe } from '../../utils/types';
 import applyTransform from '../applyTransform';
-import { HTTP_NO_BODY, getAuthenticationHeaders, parseBaseUrl } from './shared';
+import { HTTP_NO_BODY, getAuthenticationHeaders, getDefaultUrl, parseBaseUrl } from './shared';
 import type { IToolpadProject } from '../server';
 
 async function loadEnvFile(project: IToolpadProject) {
@@ -148,11 +148,7 @@ async function execBase(
     parameters: params,
   };
 
-  const urlvalue = fetchQuery.url;
-
-  if (!urlvalue) {
-    throw new Error(`Missing url`);
-  }
+  const urlvalue = fetchQuery.url || getDefaultUrl(project.getRuntimeConfig(), connection);
 
   const resolvedUrl = resolveBindable(jsRuntime, urlvalue, queryScope);
   const resolvedSearchParams = resolveBindableEntries(

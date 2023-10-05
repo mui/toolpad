@@ -1,6 +1,8 @@
+import { BindableAttrValue } from '@mui/toolpad-core';
 import { ensureSuffix } from '@mui/toolpad-utils/strings';
 import { Maybe } from '../../utils/types';
-import { Authentication } from './types';
+import { Authentication, RestConnectionParams } from './types';
+import type { RuntimeConfig } from '../../config';
 
 export const HTTP_NO_BODY = new Set(['GET', 'HEAD']);
 
@@ -32,4 +34,15 @@ export function parseBaseUrl(baseUrl: string): URL {
   parsedBase.search = '';
   parsedBase.hash = '';
   return parsedBase;
+}
+
+export function getDefaultUrl(
+  config: RuntimeConfig,
+  connection?: RestConnectionParams | null,
+): BindableAttrValue<string> {
+  const baseUrl = connection?.baseUrl;
+
+  return baseUrl
+    ? ''
+    : new URL('/static/movies.json', config.externalUrl || window.location.href).href;
 }

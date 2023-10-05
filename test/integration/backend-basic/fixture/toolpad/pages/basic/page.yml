@@ -6,7 +6,6 @@ spec:
   content:
     - component: Text
       name: typography
-      children: []
       layout:
         columnSize: 1
       props:
@@ -15,7 +14,6 @@ spec:
             `hello, message: ${hello.data.message}`
     - component: Text
       name: typography1
-      children: []
       layout:
         columnSize: 1
       props:
@@ -23,26 +21,23 @@ spec:
           $$jsExpression: |
             `throws, error.message: ${throws.error}`
     - component: Text
-      name: typography2
-      children: []
-      layout:
-        columnSize: 1
-      props:
-        value:
-          $$jsExpression: |
-            `throws, data ${throws.error ? "had an error" : throws.data}`
-    - component: Text
       name: text4
-      children: []
       layout:
         columnSize: 1
       props:
         value:
           $$jsExpression: |
             `throws, data ${throwsError1.data}`
+    - component: Text
+      name: typography2
+      layout:
+        columnSize: 1
+      props:
+        value:
+          $$jsExpression: |
+            `throws, data ${throws.error ? "had an error" : throws.data}`
     - component: DataGrid
       name: dataGrid
-      children: []
       layout:
         columnSize: 1
       props:
@@ -51,7 +46,6 @@ spec:
             throws.data
     - component: Text
       name: typography3
-      children: []
       layout:
         columnSize: 1
       props:
@@ -67,17 +61,14 @@ spec:
             value:
               $$jsExpression: |
                 `echo, secret: ${echo.data.secrets.bar}`
-          children: []
         - component: Text
           name: typography5
           props:
             value:
               $$jsExpression: |
                 `echo, secret not in .env: ${echo.data.secrets.baz}`
-          children: []
     - component: Text
       name: text5
-      children: []
       layout:
         columnSize: 1
       props:
@@ -86,7 +77,6 @@ spec:
             edited.data
     - component: Button
       name: button
-      children: []
       layout:
         columnSize: 1
       props:
@@ -97,7 +87,6 @@ spec:
           $$jsExpressionAction: manualQuery.call()
     - component: Text
       name: text1
-      children: []
       layout:
         columnSize: 1
       props:
@@ -115,17 +104,14 @@ spec:
               $$jsExpressionAction: |-
                 await increment.call()
                 getGlobal.refetch()
-          children: []
         - component: Text
           name: text
           props:
             value:
               $$jsExpression: |
                 `global value: ${getGlobal.data}`
-          children: []
     - component: Text
       name: text3
-      children: []
       layout:
         columnSize: 1
       props:
@@ -134,7 +120,6 @@ spec:
             `Propagated error: ${errorInput.error}`
     - component: Text
       name: text2
-      children: []
       layout:
         columnSize: 1
       props:
@@ -144,7 +129,6 @@ spec:
             ${propagatedLoading.isLoading}`
     - component: Text
       name: text6
-      children: []
       layout:
         columnSize: 1
       props:
@@ -153,7 +137,6 @@ spec:
             `Raw text: ${getRawText.data}`
     - component: Text
       name: text7
-      children: []
       layout:
         columnSize: 1
       props:
@@ -162,7 +145,6 @@ spec:
             `my custom cookie: ${context.data.cookies.MY_TOOLPAD_COOKIE}`
     - component: Button
       name: button2
-      children: []
       props:
         content: set cookie
         onClick:

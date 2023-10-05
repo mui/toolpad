@@ -75,7 +75,7 @@ export default function CreateCodeComponentDialog({
           onSubmit={async (event) => {
             event.preventDefault();
             invariant(isFormValid, 'Invalid form should not be submitted when submit is disabled');
-            await client.mutation.createComponent(name);
+            await client.methods.createComponent(name);
             onClose();
             setSnackbarState({ name });
           }}

@@ -4,8 +4,6 @@ import { QueryClientProvider } from '@tanstack/react-query';
 import invariant from 'invariant';
 import Toolpad from './Toolpad';
 import { queryClient } from '../api';
-// TODO: move to components/HarViewer after migrating away from Next.js
-import 'perf-cascade/dist/perf-cascade.css';
 
 function Main() {
   return (

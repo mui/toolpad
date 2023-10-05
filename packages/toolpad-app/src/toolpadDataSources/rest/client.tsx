@@ -28,7 +28,7 @@ import {
   ResponseType,
   IntrospectionResult,
 } from './types';
-import { getAuthenticationHeaders, getDefaultUrl, parseBaseUrl } from './shared';
+import { getAuthenticationHeaders, parseBaseUrl } from './shared';
 import BindableEditor, {
   RenderControlParams,
 } from '../../toolpad/AppEditor/PageEditor/BindableEditor';
@@ -46,14 +46,13 @@ import BodyEditor from './BodyEditor';
 import TabPanel from '../../components/TabPanel';
 import JsonView from '../../components/JsonView';
 import useQueryPreview from '../useQueryPreview';
-import TransformInput from '../TranformInput';
+import TransformInput from '../TransformInput';
 import Devtools from '../../components/Devtools';
 import { createHarLog, mergeHar } from '../../utils/har';
 import QueryInputPanel from '../QueryInputPanel';
 import useFetchPrivate from '../useFetchPrivate';
 import QueryPreview from '../QueryPreview';
 import { usePrivateQuery } from '../context';
-import config from '../../config';
 
 const HTTP_METHODS = ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'HEAD'];
 
@@ -257,8 +256,7 @@ function QueryEditor({
   const connectionParams = isBrowserSide ? null : rawConnectionParams;
   const baseUrl = isBrowserSide ? null : connectionParams?.baseUrl ?? null;
   // input.attributes.query.url will be reset when it's empty
-  const urlValue: BindableAttrValue<string> =
-    input.attributes.query.url ?? getDefaultUrl(config, connectionParams);
+  const urlValue: BindableAttrValue<string> | undefined = input.attributes.query.url;
 
   const introspection = usePrivateQuery<FetchPrivateQuery, IntrospectionResult>(
     {
@@ -437,7 +435,7 @@ function QueryEditor({
                     label="url"
                     propType={{ type: 'string' }}
                     renderControl={(props) => <UrlControl baseUrl={baseUrl} {...props} />}
-                    value={urlValue}
+                    value={urlValue || ''}
                     onChange={handleUrlChange}
                   />
                 </Box>
@@ -564,7 +562,9 @@ function QueryEditor({
 }
 
 function getInitialQueryValue(): FetchQuery {
+  const url = new URL('/static/movies.json', window.location.href).href;
   return {
+    url,
     method: 'GET',
     headers: [],
     browser: false,

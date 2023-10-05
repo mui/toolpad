@@ -361,7 +361,6 @@ function expandChildren<N extends appDom.AppDomNode>(children: N[], dom: appDom.
         );
         return appDom.compareFractionalIndex(child1.parentIndex, child2.parentIndex);
       })
-      // eslint-disable-next-line @typescript-eslint/no-use-before-define
       .map((child) => expandFromDom(child, dom))
   );
 }

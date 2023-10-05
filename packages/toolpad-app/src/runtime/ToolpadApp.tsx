@@ -644,7 +644,6 @@ function RenderedNode({ nodeId }: RenderedNodeProps) {
   const childNodeGroups = appDom.getChildNodes(dom, node);
 
   return (
-    /* eslint-disable-next-line @typescript-eslint/no-use-before-define */
     <RenderedNodeContent node={node} childNodeGroups={childNodeGroups} Component={Component} />
   );
 }

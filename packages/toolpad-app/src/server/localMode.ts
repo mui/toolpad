@@ -352,17 +352,12 @@ function expandChildren<N extends appDom.AppDomNode>(
   dom: appDom.AppDom,
 ): (Query | ElementType)[];
 function expandChildren<N extends appDom.AppDomNode>(children: N[], dom: appDom.AppDom) {
-  return (
-    children
-      .sort((child1, child2) => {
-        invariant(
-          child1.parentIndex && child2.parentIndex,
-          'Nodes are not children of another node',
-        );
-        return appDom.compareFractionalIndex(child1.parentIndex, child2.parentIndex);
-      })
-      .map((child) => expandFromDom(child, dom))
-  );
+  return children
+    .sort((child1, child2) => {
+      invariant(child1.parentIndex && child2.parentIndex, 'Nodes are not children of another node');
+      return appDom.compareFractionalIndex(child1.parentIndex, child2.parentIndex);
+    })
+    .map((child) => expandFromDom(child, dom));
 }
 
 function undefinedWhenEmpty<O extends object | any[]>(obj?: O): O | undefined {

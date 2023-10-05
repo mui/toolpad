@@ -16,8 +16,8 @@ import { DomView } from '../../../utils/domView';
 import client from '../../../api';
 import useBoolean from '../../../utils/useBoolean';
 import EditableTreeItem, { EditableTreeItemProps } from '../../../components/EditableTreeItem';
-import { scrollIntoViewIfNeeded } from '../../../utils/scroll';
-import ExplorerHeader from '../../../components/ExplorerHeader';
+import { scrollIntoViewIfNeeded } from '../../../utils/dom';
+import ExplorerHeader from '../ExplorerHeader';
 
 const PagesExplorerRoot = styled('div')({
   overflow: 'auto',
@@ -321,11 +321,7 @@ export default function PagesExplorer({ className }: PagesExplorerProps) {
     [appStateApi, dom],
   );
 
-  const pagesTreeItemSx = {
-    '.MuiTreeItem-label': {
-      ml: -1.5,
-    },
-  };
+  const alphabeticallySortedPages = React.useMemo(() => sortBy(pages, 'name'), [pages]);
 
   return (
     <PagesExplorerRoot
@@ -363,10 +359,9 @@ export default function PagesExplorer({ className }: PagesExplorerProps) {
             onEdit={handleCreateNewCommit}
             onCancel={handleCloseCreateNewPage}
             validateItemName={validatePageName}
-            sx={pagesTreeItemSx}
           />
         ) : null}
-        {sortBy(pages, 'name').map((page) => (
+        {alphabeticallySortedPages.map((page) => (
           <PagesExplorerTreeItem
             key={page.id}
             nodeId={page.id}
@@ -376,7 +371,6 @@ export default function PagesExplorer({ className }: PagesExplorerProps) {
             onDuplicateNode={handleDuplicateNode}
             onDeleteNode={handleDeletePage}
             validateItemName={validatePageName}
-            sx={pagesTreeItemSx}
           />
         ))}
       </TreeView>

@@ -113,7 +113,7 @@ export function equalProperties<P extends object>(obj1: P, obj2: P, subset?: (ke
  * Sorts an array of objects by the value of one property.
  */
 export function sortBy<P extends object>(objs: P[], prop: keyof P, isAsc = true): P[] {
-  return objs.sort((a, b) => {
+  return objs.slice().sort((a, b) => {
     if (a[prop] < b[prop]) {
       return isAsc ? -1 : 1;
     }

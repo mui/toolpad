@@ -10,7 +10,7 @@ import { ComponentIcon } from '../PageEditor/ComponentCatalog/ComponentCatalogIt
 import { DomView } from '../../../utils/domView';
 import { removePageLayoutNode } from '../pageLayout';
 import EditableTreeItem from '../../../components/EditableTreeItem';
-import ExplorerHeader from '../../../components/ExplorerHeader';
+import ExplorerHeader from '../ExplorerHeader';
 
 export interface CustomTreeItemProps extends TreeItemProps {
   ref?: React.RefObject<HTMLLIElement>;

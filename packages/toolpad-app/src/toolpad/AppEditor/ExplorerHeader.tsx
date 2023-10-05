@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { IconButton, Tooltip, Stack, useTheme, Typography } from '@mui/material';
+import { IconButton, Tooltip, Stack, Typography, styled } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 
 interface ExplorerHeaderProps {
@@ -8,41 +8,43 @@ interface ExplorerHeaderProps {
   onCreate?: React.MouseEventHandler<HTMLButtonElement>;
 }
 
+const ExplorerHeaderContainer = styled(Stack)(({ theme }) => ({
+  backgroundColor: theme.palette.background.paper,
+  position: 'sticky',
+  top: 0,
+  left: 0,
+  width: '100%',
+  zIndex: 1,
+  height: 36,
+}));
+
+const ExplorerHeaderTitle = styled(Typography)(({ theme }) => ({
+  fontSize: 13,
+  flexGrow: 1,
+  fontWeight: theme.typography.fontWeightLight,
+}));
+
 export default function ExplorerHeader({
   headerText,
   onCreate,
   createLabelText,
 }: ExplorerHeaderProps) {
-  const theme = useTheme();
-
   return (
-    <Stack
+    <ExplorerHeaderContainer
       direction="row"
       alignItems="center"
       justifyContent="space-between"
-      sx={{
-        backgroundColor: theme.palette.background.paper,
-        position: 'sticky',
-        pl: 1,
-        top: 0,
-        left: 0,
-        width: '100%',
-        zIndex: 1,
-        height: 36,
-      }}
+      sx={{ pl: 2.5 }}
     >
-      <Typography
+      <ExplorerHeaderTitle
         variant="body2"
         sx={{
-          fontSize: 13,
-          flexGrow: 1,
-          fontWeight: theme.typography.fontWeightLight,
           mx: 0.5,
           my: 0.5,
         }}
       >
         {headerText}
-      </Typography>
+      </ExplorerHeaderTitle>
       {onCreate && createLabelText ? (
         <Tooltip title={createLabelText}>
           <IconButton aria-label={createLabelText} size="medium" onClick={onCreate}>
@@ -50,6 +52,6 @@ export default function ExplorerHeader({
           </IconButton>
         </Tooltip>
       ) : null}
-    </Stack>
+    </ExplorerHeaderContainer>
   );
 }

@@ -207,7 +207,7 @@ async function createToolpadHandler({
 }: ToolpadHandlerConfig): Promise<AppHandler> {
   const editorBasename = '/_toolpad';
 
-  const project = await initProject({ dev, dir, externalUrl });
+  const project = await initProject({ dev, dir, externalUrl, base });
   await project.start();
 
   const runtimeConfig: RuntimeConfig = project.getRuntimeConfig();
@@ -225,7 +225,7 @@ async function createToolpadHandler({
   });
 
   router.get('/', (req, res) => {
-    const redirectUrl = dev ? editorBasename : base;
+    const redirectUrl = dev ? editorBasename : project.options.base;
     res.redirect(302, redirectUrl);
   });
 
@@ -233,7 +233,7 @@ async function createToolpadHandler({
   router.use(express.static(publicPath, { index: false }));
 
   const appHandler = await createToolpadAppHandler(project);
-  router.use(base, appHandler.handler);
+  router.use(project.options.base, appHandler.handler);
 
   if (dev) {
     const rpcServer = createRpcServer(project);

@@ -28,7 +28,7 @@ test('Column prop updates are not lost on drag interactions', async ({ page }) =
 
   await editorModel.page.getByRole('button', { name: 'Avatar' }).click();
 
-  await editorModel.page.getByRole('button', { name: 'link' }).click();
+  await editorModel.page.getByRole('combobox', { name: 'link' }).click();
 
   await editorModel.page.getByRole('option', { name: 'boolean' }).click();
 

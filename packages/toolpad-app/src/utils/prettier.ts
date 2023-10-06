@@ -1,5 +1,6 @@
-import * as prettier from 'prettier';
-import parserBabel from 'prettier/parser-babel';
+import prettier from 'prettier';
+// eslint-disable-next-line import/extensions
+import parserBabel from 'prettier/parser-babel.js';
 
 const DEFAULT_OPTIONS = {
   parser: 'babel-ts',

@@ -5,6 +5,7 @@ import { expectBasicPageContent } from './shared';
 
 test.use({
   ignoreConsoleErrors: [
+    // eslint-disable-next-line material-ui/straight-quotes
     /The page’s settings blocked the loading of a resource at http:\/\/localhost:\d+\/favicon\.ico/,
     /Failed to load resource: the server responded with a status of 404/,
   ],

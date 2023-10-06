@@ -567,6 +567,10 @@ function useDataProviderDataGridProps(
   };
 }
 
+function dataGridFallbackRender({ error }: FallbackProps) {
+  return <ErrorOverlay error={error} />;
+}
+
 const DataGridComponent = React.forwardRef(function DataGridComponent(
   {
     columns: columnsProp,
@@ -727,23 +731,25 @@ const DataGridComponent = React.forwardRef(function DataGridComponent(
             visibility: error ? 'hidden' : 'visible',
           }}
         >
-          <DataGridPro
-            apiRef={apiRef}
-            slots={{
-              toolbar: hideToolbar ? null : GridToolbar,
-              loadingOverlay: SkeletonLoadingOverlay,
-            }}
-            onColumnResize={handleResize}
-            onColumnOrderChange={handleColumnOrderChange}
-            rows={rows}
-            columns={columns}
-            key={gridKey}
-            getRowId={getRowId}
-            onRowSelectionModelChange={onSelectionModelChange}
-            rowSelectionModel={selectionModel}
-            {...props}
-            {...dataProviderProps}
-          />
+          <ErrorBoundary fallbackRender={dataGridFallbackRender} resetKeys={[rows]}>
+            <DataGridPro
+              apiRef={apiRef}
+              slots={{
+                toolbar: hideToolbar ? null : GridToolbar,
+                loadingOverlay: SkeletonLoadingOverlay,
+              }}
+              onColumnResize={handleResize}
+              onColumnOrderChange={handleColumnOrderChange}
+              rows={rows}
+              columns={columns}
+              key={gridKey}
+              getRowId={getRowId}
+              onRowSelectionModelChange={onSelectionModelChange}
+              rowSelectionModel={selectionModel}
+              {...props}
+              {...dataProviderProps}
+            />
+          </ErrorBoundary>
         </div>
       </div>
     </LicenseInfoProvider>

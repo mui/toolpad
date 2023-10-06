@@ -83,5 +83,5 @@ export async function createProdHandler(project: ToolpadProject) {
     }),
   );
 
-  return { handler };
+  return { handler, dispose: async () => undefined };
 }

@@ -16,6 +16,9 @@ import * as z from 'zod';
 import { fromZodError } from 'zod-validation-error';
 import { GetRecordsParams, GetRecordsResult, PaginationMode } from '@mui/toolpad-core';
 
+import.meta.url ??= url.pathToFileURL(__filename).toString();
+const currentDirectory = url.fileURLToPath(new URL('.', import.meta.url));
+
 interface ModuleObject {
   exports: Record<string, unknown>;
 }
@@ -174,7 +177,7 @@ if (!isMainThread && parentPort) {
 
 export function createWorker(env: Record<string, any>) {
   const workerRpcChannel = new MessageChannel();
-  const worker = new Worker(path.join(__dirname, 'functionsDevWorker.js'), {
+  const worker = new Worker(path.resolve(currentDirectory, '../cli/functionsDevWorker.js'), {
     env,
     workerData: {
       workerRpcPort: workerRpcChannel.port1,

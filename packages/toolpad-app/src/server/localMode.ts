@@ -20,7 +20,11 @@ import {
   readMaybeDir,
   updateYamlFile,
   fileExists,
+  folderExists,
+  readJsonFile,
 } from '@mui/toolpad-utils/fs';
+import getPort from 'get-port';
+import { z } from 'zod';
 import * as appDom from '../appDom';
 import insecureHash from '../utils/insecureHash';
 import {
@@ -259,8 +263,14 @@ class Lock {
   }
 }
 
-const DEFAULT_GENERATED_GITIGNORE_FILE_CONTENT = `.generated
-`;
+const buildInfoSchema = z.object({
+  timestamp: z.number(),
+  base: z.string().optional(),
+});
+
+type BuildInfo = z.infer<typeof buildInfoSchema>;
+
+const DEFAULT_GENERATED_GITIGNORE_FILE_CONTENT = '.generated\n';
 
 async function initGitignore(root: string) {
   const projectFolder = getToolpadFolder(root);
@@ -986,12 +996,9 @@ class ToolpadProject {
 
   private pendingVersionCheck: Promise<VersionInfo> | undefined;
 
-  constructor(root: string, options: Partial<ToolpadProjectOptions>) {
+  constructor(root: string, options: ToolpadProjectOptions) {
     this.root = root;
-    this.options = {
-      dev: false,
-      ...options,
-    };
+    this.options = options;
 
     this.envManager = new EnvManager(this);
     this.functionsManager = new FunctionsManager(this);
@@ -1075,6 +1082,10 @@ class ToolpadProject {
     return getAppOutputFolder(this.getRoot());
   }
 
+  getBuildInfoFile() {
+    return path.resolve(this.getOutputFolder(), 'buildInfo.json');
+  }
+
   alertOnMissingVariablesInDom(dom: appDom.AppDom) {
     const requiredVars = appDom.getRequiredEnvVars(dom);
     const missingVars = Array.from(requiredVars).filter(
@@ -1102,7 +1113,19 @@ class ToolpadProject {
 
   async start() {
     if (this.options.dev) {
+      await this.resetBuildInfo();
       await this.initWatcher();
+    } else {
+      const buildInfo = await this.getBuildInfo();
+      if (!buildInfo) {
+        throw new Error(`No production build found. Please run "toolpad build" first.`);
+      }
+
+      if (buildInfo.base !== this.options.base) {
+        throw new Error(
+          `Production build found for base "${buildInfo.base}" but running the app with "${this.options.base}". Please run "toolpad build" with the correct --base option.`,
+        );
+      }
     }
     await Promise.all([this.envManager.start(), this.functionsManager.start()]);
   }
@@ -1205,7 +1228,6 @@ class ToolpadProject {
     // toolpad build. It's fundamentally wrong to use this information as it strictly holds
     // information about the running toolpad instance.
     invariant(this.options.externalUrl, 'External URL is not set');
-    invariant(this.options.wsPort, 'Websocket port is not set');
     invariant(this.options.base, 'Base path is not set');
 
     return {
@@ -1214,6 +1236,30 @@ class ToolpadProject {
       wsPort: this.options.wsPort,
       base: this.options.base,
     };
+  }
+
+  async writeBuildInfo() {
+    await writeFileRecursive(
+      this.getBuildInfoFile(),
+      JSON.stringify({
+        timestamp: Date.now(),
+        base: this.options.base,
+      } satisfies BuildInfo),
+      { encoding: 'utf-8' },
+    );
+  }
+
+  async resetBuildInfo() {
+    await fs.rm(this.getBuildInfoFile(), { force: true, recursive: true });
+  }
+
+  async getBuildInfo(): Promise<BuildInfo | null> {
+    try {
+      const content = await readJsonFile(this.getBuildInfoFile());
+      return buildInfoSchema.parse(content);
+    } catch {
+      return null;
+    }
   }
 }
 
@@ -1224,19 +1270,41 @@ declare global {
   var __toolpadProject: ToolpadProject | undefined;
 }
 
-export interface InitProjectOptions extends ToolpadProjectOptions {
+export function resolveProjectDir(dir: string) {
+  const projectDir = path.resolve(process.cwd(), dir);
+  return projectDir;
+}
+
+export interface InitProjectOptions extends Partial<ToolpadProjectOptions> {
   dir: string;
 }
 
-export async function initProject({ dir, ...config }: InitProjectOptions) {
+export async function initProject({ dir: dirInput, ...config }: InitProjectOptions) {
   // eslint-disable-next-line no-underscore-dangle
   invariant(!global.__toolpadProject, 'A project is already running');
+
+  const dir = await resolveProjectDir(dirInput);
+
+  if (!(await folderExists(dir))) {
+    throw new Error(`No Toolpad project found at ${chalk.cyan(`"${dir}"`)}`);
+  }
+
+  const resolvedConfig: ToolpadProjectOptions = {
+    dev: false,
+    base: '/prod',
+    customServer: false,
+    ...config,
+  };
+
+  if (resolvedConfig.dev && !resolvedConfig.wsPort) {
+    resolvedConfig.wsPort = await getPort();
+  }
 
   await migrateLegacyProject(dir);
 
   await initToolpadFolder(dir);
 
-  const project = new ToolpadProject(dir, config);
+  const project = new ToolpadProject(dir, resolvedConfig);
   // eslint-disable-next-line no-underscore-dangle
   globalThis.__toolpadProject = project;
 

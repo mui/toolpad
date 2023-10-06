@@ -160,7 +160,7 @@ test('function editor extracted parameters', async ({ page, localApp }) => {
   await expect(queryEditor.getByRole('button', { name: 'baz', exact: true })).toBeVisible();
   await expect(queryEditor.getByRole('spinbutton', { name: 'bar', exact: true })).toBeVisible();
 
-  const fizzCombobox = queryEditor.getByRole('button', { name: 'fizz', exact: true });
+  const fizzCombobox = queryEditor.getByRole('combobox', { name: 'fizz', exact: true });
   await expect(fizzCombobox).toBeVisible();
 
   await fizzCombobox.click();

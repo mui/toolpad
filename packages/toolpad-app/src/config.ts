@@ -38,7 +38,7 @@ export type BuildEnvVars = Record<
 export interface RuntimeConfig {
   externalUrl: string;
   projectDir: string;
-  wsPort: number;
+  wsPort?: number;
   base: string;
 }
 

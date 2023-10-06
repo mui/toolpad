@@ -3,7 +3,6 @@ import { NodeId } from '@mui/toolpad-core';
 import { createProvidedContext } from '@mui/toolpad-utils/react';
 import invariant from 'invariant';
 import { debounce, DebouncedFunc } from 'lodash-es';
-
 import { useLocation } from 'react-router-dom';
 import { mapValues } from '@mui/toolpad-utils/collections';
 import useDebouncedHandler from '@mui/toolpad-utils/hooks/useDebouncedHandler';
@@ -548,7 +547,7 @@ export default function AppProvider({ children }: DomContextProps) {
     const domToSave = state.dom;
     dispatch({ type: 'DOM_SAVING' });
     const domDiff = appDom.createDiff(state.savedDom, domToSave);
-    client.mutation
+    client.methods
       .applyDomDiff(domDiff)
       .then(({ fingerprint: newFingerPrint }) => {
         fingerprint.current = newFingerPrint;

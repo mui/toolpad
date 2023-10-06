@@ -259,7 +259,7 @@ export default function QueryNodeEditorDialog<Q>({
   const execPrivate = React.useCallback(
     (method: string, args: any[]) => {
       invariant(dataSourceId, 'dataSourceId must be set');
-      return client.mutation.dataSourceExecPrivate(dataSourceId, method, args);
+      return client.methods.dataSourceExecPrivate(dataSourceId, method, args);
     },
     [dataSourceId],
   );

@@ -10,6 +10,7 @@ import { writeFileRecursive, fileExists, readJsonFile } from '@mui/toolpad-utils
 import Piscina from 'piscina';
 import { ExecFetchResult } from '@mui/toolpad-core';
 import { errorFrom } from '@mui/toolpad-utils/errors';
+import * as url from 'node:url';
 import EnvManager from './EnvManager';
 import { ProjectEvents, ToolpadProjectOptions } from '../types';
 import { createWorker as createDevWorker } from './functionsDevWorker';
@@ -17,6 +18,9 @@ import type { ExtractTypesParams, IntrospectionResult } from './functionsTypesWo
 import { Awaitable } from '../utils/types';
 import { format } from '../utils/prettier';
 import { compilerOptions } from './functionsShared';
+
+import.meta.url ??= url.pathToFileURL(__filename).toString();
+const currentDirectory = url.fileURLToPath(new URL('.', import.meta.url));
 
 async function createDefaultFunction(filePath: string): Promise<string> {
   const result = await format(
@@ -132,7 +136,7 @@ export default class FunctionsManager {
   private async extractTypes() {
     if (!this.extractTypesWorker) {
       this.extractTypesWorker = new Piscina({
-        filename: path.join(__dirname, 'functionsTypesWorker.js'),
+        filename: path.join(currentDirectory, 'functionsTypesWorker.js'),
       });
     }
 

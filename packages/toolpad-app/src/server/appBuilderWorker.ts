@@ -10,19 +10,24 @@ async function main() {
   invariant(!!process.env.TOOLPAD_PROJECT_DIR, 'A project root must be defined');
   invariant(!!process.env.TOOLPAD_BASE, 'A base path must be defined');
 
-  const projectDir = process.env.TOOLPAD_PROJECT_DIR;
   const base = process.env.TOOLPAD_BASE;
 
-  const project = await initProject({ dev: false, dir: projectDir });
+  const project = await initProject({
+    dev: false,
+    dir: process.env.TOOLPAD_PROJECT_DIR,
+    base,
+  });
 
   await project.build();
 
   await buildApp({
-    root: projectDir,
+    root: project.getRoot(),
     base,
     getComponents: () => project.getComponents(),
     outDir: project.getAppOutputFolder(),
   });
+
+  await project.writeBuildInfo();
 
   await project.dispose();
 }

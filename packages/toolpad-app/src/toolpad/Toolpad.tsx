@@ -6,7 +6,7 @@ import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 import CloudDoneIcon from '@mui/icons-material/CloudDone';
 import SyncIcon from '@mui/icons-material/Sync';
 import SyncProblemIcon from '@mui/icons-material/SyncProblem';
-import NoSsr from '../components/NoSsr';
+import { QueryClientProvider } from '@tanstack/react-query';
 import AppEditor from './AppEditor';
 import ErrorAlert from './AppEditor/PageEditor/ErrorAlert';
 import { ThemeProvider } from '../ThemeContext';
@@ -15,6 +15,7 @@ import ToolpadShell from './ToolpadShell';
 import { getViewFromPathname } from '../utils/domView';
 import AppProvider, { AppState, useAppStateContext } from './AppState';
 import { GLOBAL_FUNCTIONS_FEATURE_FLAG } from '../constants';
+import { queryClient } from '../api';
 
 const Centered = styled('div')({
   height: '100%',
@@ -122,7 +123,7 @@ export interface ToolpadProps {
 
 export default function Toolpad({ basename }: ToolpadProps) {
   return (
-    <NoSsr>
+    <QueryClientProvider client={queryClient}>
       <ThemeProvider>
         {/* CssBaseline kickstart an elegant, consistent, and simple baseline to build upon. */}
         <CssBaseline />
@@ -146,6 +147,6 @@ export default function Toolpad({ basename }: ToolpadProps) {
           </ErrorBoundary>
         </Box>
       </ThemeProvider>
-    </NoSsr>
+    </QueryClientProvider>
   );
 }

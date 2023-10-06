@@ -5,7 +5,6 @@ import {
   TypographyVariant,
   SxProps,
   inputBaseClasses,
-  formHelperTextClasses,
   inputClasses,
 } from '@mui/material';
 
@@ -58,6 +57,8 @@ const EditableText = React.forwardRef<HTMLInputElement, EditableTextProps>(
       }
     }, [ref, editable]);
 
+    const readOnly = React.useMemo(() => disabled || !editable, [disabled, editable]);
+
     const handleBlur = React.useCallback(
       (event: React.FocusEvent<HTMLInputElement>) => {
         // This is only triggered on a click away
@@ -73,15 +74,21 @@ const EditableText = React.forwardRef<HTMLInputElement, EditableTextProps>(
 
     const handleChange = React.useCallback(
       (event: React.ChangeEvent<HTMLInputElement>) => {
+        if (readOnly) {
+          return;
+        }
         if (onChange) {
           onChange(event.target.value);
         }
       },
-      [onChange],
+      [readOnly, onChange],
     );
 
     const handleInput = React.useCallback(
       (event: React.KeyboardEvent<HTMLInputElement>) => {
+        if (readOnly) {
+          return;
+        }
         const inputElement = appTitleInput.current;
         if (inputElement) {
           if (event.key === 'Escape') {
@@ -105,13 +112,11 @@ const EditableText = React.forwardRef<HTMLInputElement, EditableTextProps>(
           }
         }
       },
-      [defaultValue, onChange, onSave, onClose],
+      [readOnly, defaultValue, onChange, onSave, onClose],
     );
 
     return (
       <TextField
-        // `disabled` prop overrides `editable` prop
-        disabled={disabled || !editable}
         error={error}
         helperText={helperText}
         ref={ref}
@@ -119,6 +124,7 @@ const EditableText = React.forwardRef<HTMLInputElement, EditableTextProps>(
         inputRef={appTitleInput}
         inputProps={{
           // tabIndex: editable ? 0 : -1,
+          readOnly,
           'aria-readonly': !editable,
           sx: (theme: Theme) => ({
             // Handle overflow
@@ -136,18 +142,28 @@ const EditableText = React.forwardRef<HTMLInputElement, EditableTextProps>(
         size={size ?? 'small'}
         sx={{
           ...sx,
+          transition: (theme: Theme) =>
+            theme.transitions.create(['border-bottom'], {
+              duration: theme.transitions.duration.short,
+            }),
           [`.${inputClasses.root}.${inputBaseClasses.root}:before, .${inputClasses.root}.${inputBaseClasses.root}:not(${inputBaseClasses.disabled}):hover:before`]:
             {
               borderBottom: editable ? `initial` : 'none',
             },
-          // TextField must not appear disabled if disabled state is controlled by `editable` prop
-          [`.${inputClasses.root}.${inputBaseClasses.root}.${inputBaseClasses.disabled}, .${inputClasses.input}.${inputBaseClasses.input}.${inputBaseClasses.disabled}, .${formHelperTextClasses.root}.${inputBaseClasses.disabled}`]:
-            disabled
-              ? null
-              : {
-                  WebkitTextFillColor: 'unset',
-                  color: 'unset',
-                },
+          // TextField must appear disabled if readOnly is true
+          [`& .${inputClasses.root}.${inputBaseClasses.root}::after`]: readOnly
+            ? {
+                transform: 'scaleX(0)',
+                borderBottom: 'none',
+                transition: (theme: Theme) =>
+                  theme.transitions.create(['transform'], {
+                    duration: theme.transitions.duration.short,
+                  }),
+              }
+            : {
+                transform: 'scaleX(1)',
+                borderBottom: '2px solid primary',
+              },
         }}
         value={value}
         variant={'standard'}

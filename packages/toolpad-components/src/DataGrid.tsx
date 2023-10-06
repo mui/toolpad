@@ -472,13 +472,13 @@ interface ToolpadDataGridProps extends Omit<DataGridProProps, 'columns' | 'rows'
   hideToolbar?: boolean;
 }
 
-interface DataProviderDataGridProps extends Omit<DataGridProProps, 'columns'> {
+interface DataProviderDataGridProps extends Partial<DataGridProProps> {
   error?: unknown;
 }
 
 function useDataProviderDataGridProps(
   dataProviderId: string | null | undefined,
-): DataProviderDataGridProps | null {
+): DataProviderDataGridProps {
   const useDataProvider = useNonNullableContext(UseDataProviderContext);
   const { dataProvider } = useDataProvider(dataProviderId || null);
 
@@ -545,7 +545,7 @@ function useDataProviderDataGridProps(
     0;
 
   if (!dataProvider) {
-    return null;
+    return {};
   }
 
   return {
@@ -587,7 +587,7 @@ const DataGridComponent = React.forwardRef(function DataGridComponent(
   }: ToolpadDataGridProps,
   ref: React.ForwardedRef<HTMLDivElement>,
 ) {
-  const dataProviderProps = useDataProviderDataGridProps(
+  const { rows: dataProviderRowsInput, ...dataProviderProps } = useDataProviderDataGridProps(
     rowsSource === 'dataProvider' ? dataProviderId : null,
   );
 
@@ -639,7 +639,7 @@ const DataGridComponent = React.forwardRef(function DataGridComponent(
 
   let rowsInput: GridRowsProp;
   if (rowsSource === 'dataProvider') {
-    rowsInput = dataProviderProps?.rows ?? EMPTY_ROWS;
+    rowsInput = dataProviderRowsInput ?? EMPTY_ROWS;
   } else {
     rowsInput = rowsProp ?? EMPTY_ROWS;
   }

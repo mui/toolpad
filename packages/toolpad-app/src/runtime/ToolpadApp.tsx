@@ -54,6 +54,7 @@ import {
   NodeErrorProps,
   NodeRuntimeWrapper,
   ResetNodeErrorsKeyProvider,
+  UseDataProviderContext,
 } from '@mui/toolpad-core/runtime';
 import ErrorIcon from '@mui/icons-material/Error';
 import { getBrowserRuntime } from '@mui/toolpad-core/jsBrowserRuntime';
@@ -85,6 +86,7 @@ import { useDataQuery, UseFetch } from './useDataQuery';
 import { NavigateToPage } from './CanvasHooksContext';
 import PreviewHeader from './PreviewHeader';
 import { AppLayout } from './AppLayout';
+import { useDataProvider } from './useDataProvider';
 import api, { queryClient } from './api';
 
 const browserJsRuntime = getBrowserRuntime();
@@ -645,7 +647,6 @@ function RenderedNode({ nodeId }: RenderedNodeProps) {
   const childNodeGroups = appDom.getChildNodes(dom, node);
 
   return (
-    /* eslint-disable-next-line @typescript-eslint/no-use-before-define */
     <RenderedNodeContent node={node} childNodeGroups={childNodeGroups} Component={Component} />
   );
 }
@@ -1541,27 +1542,29 @@ export default function ToolpadApp({ rootRef, extraComponents, basename, state }
   }, [toggleDevtools]);
 
   return (
-    <AppThemeProvider dom={dom}>
-      <CssBaseline enableColorScheme />
-      <AppRoot ref={rootRef}>
-        <ComponentsContextProvider value={components}>
-          <DomContextProvider value={dom}>
-            <ErrorBoundary FallbackComponent={AppError}>
-              <ResetNodeErrorsKeyProvider value={resetNodeErrorsKey}>
-                <React.Suspense fallback={<AppLoading />}>
-                  <QueryClientProvider client={queryClient}>
-                    <BrowserRouter basename={basename}>
-                      <ToolpadAppLayout dom={dom} />
-                    </BrowserRouter>
-                    {showDevtools ? <ReactQueryDevtoolsProduction initialIsOpen={false} /> : null}
-                  </QueryClientProvider>
-                </React.Suspense>
-              </ResetNodeErrorsKeyProvider>
-            </ErrorBoundary>
-          </DomContextProvider>
-        </ComponentsContextProvider>
-        <EditorOverlay id={HTML_ID_EDITOR_OVERLAY} />
-      </AppRoot>
-    </AppThemeProvider>
+    <UseDataProviderContext.Provider value={useDataProvider}>
+      <AppThemeProvider dom={dom}>
+        <CssBaseline enableColorScheme />
+        <AppRoot ref={rootRef}>
+          <ComponentsContextProvider value={components}>
+            <DomContextProvider value={dom}>
+              <ErrorBoundary FallbackComponent={AppError}>
+                <ResetNodeErrorsKeyProvider value={resetNodeErrorsKey}>
+                  <React.Suspense fallback={<AppLoading />}>
+                    <QueryClientProvider client={queryClient}>
+                      <BrowserRouter basename={basename}>
+                        <ToolpadAppLayout dom={dom} />
+                      </BrowserRouter>
+                      {showDevtools ? <ReactQueryDevtoolsProduction initialIsOpen={false} /> : null}
+                    </QueryClientProvider>
+                  </React.Suspense>
+                </ResetNodeErrorsKeyProvider>
+              </ErrorBoundary>
+            </DomContextProvider>
+          </ComponentsContextProvider>
+          <EditorOverlay id={HTML_ID_EDITOR_OVERLAY} />
+        </AppRoot>
+      </AppThemeProvider>
+    </UseDataProviderContext.Provider>
   );
 }

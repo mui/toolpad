@@ -6,6 +6,7 @@ import { getHtmlContent, createViteConfig, resolvedComponentsId } from './toolpa
 import type { RuntimeConfig } from '../config';
 import type * as appDom from '../appDom';
 import type { ComponentEntry } from './localMode';
+import createRuntimeState from '../runtime/createRuntimeState';
 import { postProcessHtml } from './toolpadAppServer';
 
 export type Command = { kind: 'reload-components' } | { kind: 'exit' };
@@ -48,7 +49,10 @@ function devServerPlugin({ config }: ToolpadAppDevServerParams): Plugin {
 
             let html = await viteServer.transformIndexHtml(req.url, template);
 
-            html = postProcessHtml(html, { config, dom });
+            html = postProcessHtml(html, {
+              config,
+              initialState: createRuntimeState({ dom }),
+            });
 
             res.setHeader('content-type', 'text/html; charset=utf-8').end(html);
           } catch (e) {
@@ -105,7 +109,4 @@ export async function main({ port, ...config }: AppViteServerConfig) {
   await notifyReady();
 }
 
-main(workerData).catch((err) => {
-  console.error(err);
-  process.exit(1);
-});
+main(workerData);

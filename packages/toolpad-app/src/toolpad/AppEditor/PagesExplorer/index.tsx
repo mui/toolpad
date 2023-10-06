@@ -321,7 +321,7 @@ export default function PagesExplorer({ className }: PagesExplorerProps) {
   );
 
   const alphabeticallySortedPages = React.useMemo(
-    () => pages.toSorted((page1, page2) => page1.name.localeCompare(page2.name)),
+    () => [...pages].sort((page1, page2) => page1.name.localeCompare(page2.name)),
     [pages],
   );
 

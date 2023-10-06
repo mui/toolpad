@@ -190,7 +190,7 @@ export default function PagesExplorer({ className }: PagesExplorerProps) {
         domViewAfterDelete || { kind: 'page' },
       );
     },
-    [activeNode, appStateApi, dom],
+    [projectApi, activeNode, appStateApi, dom],
   );
 
   const handleDuplicateNode = React.useCallback(

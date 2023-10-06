@@ -39,7 +39,7 @@ export default function NodeNameEditor({ node, sx }: NodeNameEditorProps) {
         await projectApi.methods.deletePage(oldname.name);
       }, 300);
     }
-  }, [isNameValid, domApi, node.id, node.name, nameInput, dom]);
+  }, [projectApi, isNameValid, domApi, node.id, node.name, nameInput, dom]);
 
   const handleKeyPress = React.useCallback(
     (event: React.KeyboardEvent<HTMLDivElement>) => {

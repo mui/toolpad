@@ -545,7 +545,7 @@ export default function AppProvider({ children }: DomContextProps) {
       .catch((err) => {
         dispatch({ type: 'DOM_SAVING_ERROR', error: err.message });
       });
-  }, [state]);
+  }, [projectApi, state]);
 
   const debouncedHandleSave = useDebouncedHandler(handleSave, 100);
 

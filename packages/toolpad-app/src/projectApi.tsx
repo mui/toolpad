@@ -12,7 +12,7 @@ export interface ApiProviderProps {
   children: React.ReactNode;
 }
 
-export function ApiProvider({ url, children }: ApiProviderProps) {
+export function ProjectApiProvider({ url, children }: ApiProviderProps) {
   const queryClient = useQueryClient();
 
   const api = React.useMemo(

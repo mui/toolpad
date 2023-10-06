@@ -262,7 +262,7 @@ export default function QueryNodeEditorDialog<Q>({
       invariant(dataSourceId, 'dataSourceId must be set');
       return projectApi.methods.dataSourceExecPrivate(dataSourceId, method, args);
     },
-    [dataSourceId],
+    [projectApi, dataSourceId],
   );
 
   return (

@@ -15,7 +15,7 @@ import ToolpadShell from './ToolpadShell';
 import { getViewFromPathname } from '../utils/domView';
 import AppProvider, { AppState, useAppStateContext } from './AppState';
 import { GLOBAL_FUNCTIONS_FEATURE_FLAG } from '../constants';
-import { ApiProvider } from '../projectApi';
+import { ProjectApiProvider } from '../projectApi';
 
 const Centered = styled('div')({
   height: '100%',
@@ -135,7 +135,7 @@ export interface ToolpadProps {
 export default function Toolpad({ basename }: ToolpadProps) {
   return (
     <QueryClientProvider client={queryClient}>
-      <ApiProvider url="/api/rpc">
+      <ProjectApiProvider url="/api/rpc">
         <ThemeProvider>
           {/* CssBaseline kickstart an elegant, consistent, and simple baseline to build upon. */}
           <CssBaseline />
@@ -159,7 +159,7 @@ export default function Toolpad({ basename }: ToolpadProps) {
             </ErrorBoundary>
           </Box>
         </ThemeProvider>
-      </ApiProvider>
+      </ProjectApiProvider>
     </QueryClientProvider>
   );
 }

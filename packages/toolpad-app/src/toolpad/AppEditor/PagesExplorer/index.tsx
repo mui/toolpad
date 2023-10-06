@@ -182,7 +182,7 @@ export default function PagesExplorer({ className }: PagesExplorerProps) {
         domViewAfterDelete = firstSiblingOfType && getNodeEditorDomView(firstSiblingOfType);
       }
 
-      await client.mutation.deletePage(deletedNode.name);
+      await client.methods.deletePage(deletedNode.name);
 
       appStateApi.update(
         (draft) => appDom.removeNode(draft, nodeId),

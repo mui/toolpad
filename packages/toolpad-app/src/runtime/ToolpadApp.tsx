@@ -90,6 +90,7 @@ import api, { queryClient } from './api';
 const browserJsRuntime = getBrowserRuntime();
 
 const isPreview = process.env.NODE_ENV !== 'production';
+const isCustomServer = process.env.TOOLPAD_CUSTOM_SERVER === 'true';
 const isRenderedInCanvas =
   typeof window === 'undefined'
     ? false
@@ -1478,17 +1479,16 @@ function AppError({ error }: FallbackProps) {
 
 export interface ToolpadAppLayoutProps {
   dom: appDom.RenderTree;
-  hasShell?: boolean;
 }
 
-function ToolpadAppLayout({ dom, hasShell = true }: ToolpadAppLayoutProps) {
+function ToolpadAppLayout({ dom }: ToolpadAppLayoutProps) {
   const root = appDom.getApp(dom);
   const { pages = [] } = appDom.getChildNodes(dom, root);
 
   const pageMatch = useMatch('/pages/:slug');
   const pageId = pageMatch?.params.slug;
 
-  const showPreviewHeader = isPreview && !isRenderedInCanvas;
+  const showPreviewHeader = isPreview && !isRenderedInCanvas && !isCustomServer;
 
   const navEntries = React.useMemo(
     () =>
@@ -1506,7 +1506,7 @@ function ToolpadAppLayout({ dom, hasShell = true }: ToolpadAppLayoutProps) {
       <AppLayout
         activePage={pageMatch?.params.slug}
         pages={navEntries}
-        hasShell={hasShell}
+        hasShell={!isRenderedInCanvas}
         clipped={showPreviewHeader}
       >
         <RenderedPages pages={pages} />
@@ -1518,18 +1518,11 @@ function ToolpadAppLayout({ dom, hasShell = true }: ToolpadAppLayoutProps) {
 export interface ToolpadAppProps {
   rootRef?: React.Ref<HTMLDivElement>;
   extraComponents: ToolpadComponents;
-  hasShell?: boolean;
   basename: string;
   state: RuntimeState;
 }
 
-export default function ToolpadApp({
-  rootRef,
-  extraComponents,
-  basename,
-  hasShell = true,
-  state,
-}: ToolpadAppProps) {
+export default function ToolpadApp({ rootRef, extraComponents, basename, state }: ToolpadAppProps) {
   const { dom } = state;
 
   const components = React.useMemo(
@@ -1558,7 +1551,7 @@ export default function ToolpadApp({
                 <React.Suspense fallback={<AppLoading />}>
                   <QueryClientProvider client={queryClient}>
                     <BrowserRouter basename={basename}>
-                      <ToolpadAppLayout dom={dom} hasShell={hasShell} />
+                      <ToolpadAppLayout dom={dom} />
                     </BrowserRouter>
                     {showDevtools ? <ReactQueryDevtoolsProduction initialIsOpen={false} /> : null}
                   </QueryClientProvider>

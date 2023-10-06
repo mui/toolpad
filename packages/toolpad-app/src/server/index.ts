@@ -11,19 +11,29 @@ import { createServer as createViteServer } from 'vite';
 import serializeJavascript from 'serialize-javascript';
 import { WebSocket, WebSocketServer } from 'ws';
 import { listen } from '@mui/toolpad-utils/http';
-import openBrowser from 'react-dev-utils/openBrowser';
+// eslint-disable-next-line import/extensions
+import openBrowser from 'react-dev-utils/openBrowser.js';
 import { folderExists } from '@mui/toolpad-utils/fs';
 import chalk from 'chalk';
 import { serveRpc } from '@mui/toolpad-utils/workerRpc';
+import * as url from 'node:url';
+import invariant from 'invariant';
 import { asyncHandler } from '../utils/express';
 import { createProdHandler } from './toolpadAppServer';
-import { ToolpadProject, initProject } from './localMode';
-import type { Command as AppDevServerCommand, AppViteServerConfig, WorkerRpc } from './appServer';
+import { initProject, resolveProjectDir, type ToolpadProject } from './localMode';
+import type {
+  Command as AppDevServerCommand,
+  AppViteServerConfig,
+  WorkerRpc,
+} from './appServerWorker';
 import { createRpcHandler } from './rpc';
 import { RUNTIME_CONFIG_WINDOW_PROPERTY } from '../constants';
 import type { RuntimeConfig } from '../config';
 import { createRpcServer } from './rpcServer';
 import { createRpcRuntimeServer } from './rpcRuntimeServer';
+
+import.meta.url ??= url.pathToFileURL(__filename).toString();
+const currentDirectory = url.fileURLToPath(new URL('.', import.meta.url));
 
 const DEFAULT_PORT = 3000;
 
@@ -34,14 +44,10 @@ function* getPreferredPorts(port: number = DEFAULT_PORT): Iterable<number> {
   }
 }
 
-interface CreateAppHandlerParams {
-  base: string;
-}
-
-async function createDevHandler(project: ToolpadProject, { base }: CreateAppHandlerParams) {
+async function createDevHandler(project: ToolpadProject) {
   const handler = express.Router();
 
-  const appServerPath = path.resolve(__dirname, './appServer.js');
+  const appServerPath = path.resolve(currentDirectory, '../cli/appServerWorker.js');
   const devPort = await getPort();
 
   const mainThreadRpcChannel = new MessageChannel();
@@ -49,11 +55,12 @@ async function createDevHandler(project: ToolpadProject, { base }: CreateAppHand
   const worker = new Worker(appServerPath, {
     workerData: {
       outDir: project.getAppOutputFolder(),
-      base,
+      base: project.options.base,
       config: project.getRuntimeConfig(),
       root: project.getRoot(),
       port: devPort,
       mainThreadRpcPort: mainThreadRpcChannel.port1,
+      customServer: project.options.customServer,
     } satisfies AppViteServerConfig,
     transferList: [mainThreadRpcChannel.port1],
     env: {
@@ -117,132 +124,22 @@ interface HealthCheck {
 
 interface AppHandler {
   handler: express.Handler;
-  dispose?: () => Promise<void>;
+  dispose: () => Promise<void>;
 }
 
-async function createToolpadAppHandler(
-  project: ToolpadProject,
-  { base }: CreateAppHandlerParams,
-): Promise<AppHandler> {
+async function createToolpadAppHandler(project: ToolpadProject): Promise<AppHandler> {
   const router = express.Router();
-  const publicPath = path.resolve(__dirname, '../../public');
+  const publicPath = path.resolve(currentDirectory, '../../public');
   router.use(express.static(publicPath, { index: false }));
 
   const appHandler = project.options.dev
-    ? await createDevHandler(project, { base })
+    ? await createDevHandler(project)
     : await createProdHandler(project);
 
-  return appHandler;
-}
+  if (project.options.dev) {
+    const wsPort = project.options.wsPort;
+    invariant(wsPort, 'wsPort must be defined in dev mode');
 
-export interface ToolpadHandlerConfig {
-  dev: boolean;
-  dir: string;
-  base: string;
-  externalUrl: string;
-  toolpadDevMode?: boolean;
-}
-
-async function createToolpadHandler({
-  dev,
-  toolpadDevMode,
-  externalUrl,
-  base,
-  dir,
-}: ToolpadHandlerConfig): Promise<AppHandler> {
-  const editorBasename = '/_toolpad';
-  const gitSha1 = process.env.GIT_SHA1 || null;
-  const circleBuildNum = process.env.CIRCLE_BUILD_NUM || null;
-
-  const wsPort = await getPort();
-
-  const project = await initProject({ dev, dir, externalUrl, wsPort, base });
-  await project.start();
-
-  const runtimeConfig: RuntimeConfig = project.getRuntimeConfig();
-
-  const router = express.Router();
-
-  // See https://nextjs.org/docs/advanced-features/security-headers
-  router.use((req, res, expressNext) => {
-    // Force the browser to trust the Content-Type header
-    // https://stackoverflow.com/questions/18337630/what-is-x-content-type-options-nosniff
-    res.setHeader('X-Content-Type-Options', 'nosniff');
-    res.setHeader('X-XSS-Protection', '1; mode=block');
-    res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
-    expressNext();
-  });
-
-  router.get('/', (req, res) => {
-    const redirectUrl = dev ? editorBasename : base;
-    res.redirect(302, redirectUrl);
-  });
-
-  router.get('/health-check', (req, res) => {
-    const memoryUsage = process.memoryUsage();
-    res.json({
-      gitSha1,
-      circleBuildNum,
-      memoryUsage,
-      memoryUsagePretty: mapValues(memoryUsage, (usage) => prettyBytes(usage)),
-    } satisfies HealthCheck);
-  });
-
-  const publicPath = path.resolve(__dirname, '../../public');
-  router.use(express.static(publicPath, { index: false }));
-
-  const appHandler = await createToolpadAppHandler(project, { base });
-  router.use(base, appHandler.handler);
-
-  if (dev) {
-    const rpcServer = createRpcServer(project);
-    router.use('/api/rpc', createRpcHandler(rpcServer));
-    router.use('/api/dataSources', project.dataManager.createDataSourcesHandler());
-
-    const transformIndexHtml = (html: string) => {
-      const serializedConfig = serializeJavascript(runtimeConfig, { isJSON: true });
-      return html.replace(
-        '<!-- __TOOLPAD_SCRIPTS__ -->',
-        `
-          <script>
-            window[${JSON.stringify(RUNTIME_CONFIG_WINDOW_PROPERTY)}] = ${serializedConfig}
-          </script>
-        `,
-      );
-    };
-
-    if (toolpadDevMode) {
-      // eslint-disable-next-line no-console
-      console.log(`${chalk.blue('info')}  - Running Toolpad editor in dev mode`);
-
-      const viteApp = await createViteServer({
-        configFile: path.resolve(__dirname, '../../src/toolpad/vite.config.ts'),
-        root: path.resolve(__dirname, '../../src/toolpad'),
-        server: { middlewareMode: true },
-        plugins: [
-          {
-            name: 'toolpad:transform-index-html',
-            transformIndexHtml,
-          },
-        ],
-      });
-
-      router.use(editorBasename, viteApp.middlewares);
-    } else {
-      router.use(
-        editorBasename,
-        express.static(path.resolve(__dirname, '../../dist/editor'), { index: false }),
-        asyncHandler(async (req, res) => {
-          const htmlFilePath = path.resolve(__dirname, '../../dist/editor/index.html');
-          let html = await fs.readFile(htmlFilePath, { encoding: 'utf-8' });
-          html = transformIndexHtml(html);
-          res.setHeader('Content-Type', 'text/html').status(200).end(html);
-        }),
-      );
-    }
-  }
-
-  if (dev) {
     const wsServer = new WebSocketServer({ port: wsPort });
 
     project.events.on('*', (event, payload) => {
@@ -271,6 +168,121 @@ async function createToolpadHandler({
     // });
   }
 
+  return appHandler;
+}
+
+export interface ToolpadHandlerConfig {
+  dev: boolean;
+  dir: string;
+  base: string;
+  externalUrl: string;
+  toolpadDevMode?: boolean;
+}
+
+export async function createHandler({
+  dev = false,
+  dir = '.',
+  base = '/prod',
+  externalUrl = 'http://localhost:3000',
+}: ToolpadHandlerConfig): Promise<AppHandler> {
+  const project = await initProject({ dev, dir, externalUrl, base, customServer: true });
+  await project.start();
+
+  const appHandler = await createToolpadAppHandler(project);
+
+  return {
+    handler: appHandler.handler,
+    dispose: async () => {
+      await Promise.allSettled([project.dispose(), appHandler.dispose()]);
+    },
+  };
+}
+
+async function createToolpadHandler({
+  dev,
+  externalUrl,
+  base,
+  dir,
+  toolpadDevMode,
+}: ToolpadHandlerConfig): Promise<AppHandler> {
+  const editorBasename = '/_toolpad';
+
+  const project = await initProject({ dev, dir, externalUrl, base });
+  await project.start();
+
+  const runtimeConfig: RuntimeConfig = project.getRuntimeConfig();
+
+  const router = express.Router();
+
+  // See https://nextjs.org/docs/advanced-features/security-headers
+  router.use((req, res, expressNext) => {
+    // Force the browser to trust the Content-Type header
+    // https://stackoverflow.com/questions/18337630/what-is-x-content-type-options-nosniff
+    res.setHeader('X-Content-Type-Options', 'nosniff');
+    res.setHeader('X-XSS-Protection', '1; mode=block');
+    res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
+    expressNext();
+  });
+
+  router.get('/', (req, res) => {
+    const redirectUrl = dev ? editorBasename : project.options.base;
+    res.redirect(302, redirectUrl);
+  });
+
+  const publicPath = path.resolve(currentDirectory, '../../public');
+  router.use(express.static(publicPath, { index: false }));
+
+  const appHandler = await createToolpadAppHandler(project);
+  router.use(project.options.base, appHandler.handler);
+
+  if (dev) {
+    const rpcServer = createRpcServer(project);
+    router.use('/api/rpc', createRpcHandler(rpcServer));
+    router.use('/api/dataSources', project.dataManager.createDataSourcesHandler());
+
+    const transformIndexHtml = (html: string) => {
+      const serializedConfig = serializeJavascript(runtimeConfig, { isJSON: true });
+      return html.replace(
+        '<!-- __TOOLPAD_SCRIPTS__ -->',
+        `
+          <script>
+            window[${JSON.stringify(RUNTIME_CONFIG_WINDOW_PROPERTY)}] = ${serializedConfig}
+          </script>
+        `,
+      );
+    };
+
+    if (toolpadDevMode) {
+      // eslint-disable-next-line no-console
+      console.log(`${chalk.blue('info')}  - Running Toolpad editor in dev mode`);
+
+      const viteApp = await createViteServer({
+        configFile: path.resolve(currentDirectory, '../../src/toolpad/vite.config.ts'),
+        root: path.resolve(currentDirectory, '../../src/toolpad'),
+        server: { middlewareMode: true },
+        plugins: [
+          {
+            name: 'toolpad:transform-index-html',
+            transformIndexHtml,
+          },
+        ],
+      });
+
+      router.use(editorBasename, viteApp.middlewares);
+    } else {
+      router.use(
+        editorBasename,
+        express.static(path.resolve(currentDirectory, '../../dist/editor'), { index: false }),
+        asyncHandler(async (req, res) => {
+          const htmlFilePath = path.resolve(currentDirectory, '../../dist/editor/index.html');
+          let html = await fs.readFile(htmlFilePath, { encoding: 'utf-8' });
+          html = transformIndexHtml(html);
+          res.setHeader('Content-Type', 'text/html').status(200).end(html);
+        }),
+      );
+    }
+  }
+
   return {
     handler: router,
     dispose: async () => {
@@ -284,8 +296,21 @@ export interface ToolpadServerConfig extends Omit<ToolpadHandlerConfig, 'server'
 }
 
 async function startToolpadServer({ port, ...config }: ToolpadServerConfig) {
+  const gitSha1 = process.env.GIT_SHA1 || null;
+  const circleBuildNum = process.env.CIRCLE_BUILD_NUM || null;
+
   const app = express();
   const httpServer = createServer(app);
+
+  app.get('/health-check', (req, res) => {
+    const memoryUsage = process.memoryUsage();
+    res.json({
+      gitSha1,
+      circleBuildNum,
+      memoryUsage,
+      memoryUsagePretty: mapValues(memoryUsage, (usage) => prettyBytes(usage)),
+    } satisfies HealthCheck);
+  });
 
   const toolpadHandler = await createToolpadHandler(config);
 
@@ -301,20 +326,25 @@ async function startToolpadServer({ port, ...config }: ToolpadServerConfig) {
   };
 }
 
-export type Command = 'dev' | 'start';
 export interface RunAppOptions {
-  cmd: Command;
+  dev?: boolean;
   port?: number;
-  dir: string;
-  base: string;
+  dir?: string;
+  base?: string;
   toolpadDevMode?: boolean;
 }
 
-export async function runApp({ cmd, dir, base, port, toolpadDevMode = false }: RunAppOptions) {
-  const dev = cmd === 'dev';
+export async function runApp({
+  dev = false,
+  dir = '.',
+  base = '/prod',
+  port = 3000,
+  toolpadDevMode = false,
+}: RunAppOptions) {
+  const projectDir = resolveProjectDir(dir);
 
-  if (!(await folderExists(dir))) {
-    console.error(`${chalk.red('error')} - No project found at ${chalk.cyan(`"${dir}"`)}`);
+  if (!(await folderExists(projectDir))) {
+    console.error(`${chalk.red('error')} - No project found at ${chalk.cyan(`"${projectDir}"`)}`);
     process.exit(1);
   }
 
@@ -344,7 +374,7 @@ export async function runApp({ cmd, dir, base, port, toolpadDevMode = false }: R
 
   // eslint-disable-next-line no-console
   console.log(
-    `${chalk.green('ready')} - toolpad project ${chalk.cyan(dir)} ready on ${chalk.cyan(
+    `${chalk.green('ready')} - toolpad project ${chalk.cyan(projectDir)} ready on ${chalk.cyan(
       toolpadUrl,
     )}`,
   );

@@ -470,6 +470,8 @@ interface ToolpadDataGridProps extends Omit<DataGridProProps, 'columns' | 'rows'
   selection?: Selection | null;
   onSelectionChange?: (newSelection?: Selection | null) => void;
   hideToolbar?: boolean;
+  rawRows?: GridRowsProp;
+  onRawRowsChange?: (rows: GridRowsProp) => void;
 }
 
 interface DataProviderDataGridProps extends Partial<DataGridProProps> {
@@ -583,6 +585,7 @@ const DataGridComponent = React.forwardRef(function DataGridComponent(
     hideToolbar,
     rowsSource,
     dataProviderId,
+    onRawRowsChange,
     ...props
   }: ToolpadDataGridProps,
   ref: React.ForwardedRef<HTMLDivElement>,
@@ -715,6 +718,10 @@ const DataGridComponent = React.forwardRef(function DataGridComponent(
   } else if (errorProp) {
     error = errorFrom(errorProp);
   }
+
+  React.useEffect(() => {
+    onRawRowsChange?.(rows);
+  }, [rows, onRawRowsChange]);
 
   return (
     <LicenseInfoProvider info={LICENSE_INFO}>
@@ -861,6 +868,12 @@ export default createBuiltin(DataGridComponent, {
     sx: {
       helperText: SX_PROP_HELPER_TEXT,
       type: 'object',
+    },
+    rawRows: {
+      helperText: 'The rows as provided to the DataGrid Component. Used internally.',
+      type: 'array',
+      visible: false,
+      onChangeProp: 'onRawRowsChange',
     },
   },
 });

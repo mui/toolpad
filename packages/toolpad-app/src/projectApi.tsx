@@ -34,7 +34,7 @@ export function ProjectApiProvider({ url, children }: ApiProviderProps) {
       unsubExternalChange();
       unsubFunctionsChanged();
     };
-  }, [api]);
+  }, [projectEvents, api]);
 
   return <ApiContext.Provider value={api}>{children}</ApiContext.Provider>;
 }

@@ -1110,7 +1110,7 @@ export function createDefaultDom(): AppDom {
     attributes: {
       title: 'Page 1',
       display: 'shell',
-      layout: 'container'
+      layout: 'container',
     },
   });
 

@@ -1,8 +1,8 @@
 import { useQueryClient } from '@tanstack/react-query';
 import * as React from 'react';
+import { useNonNullableContext } from '@mui/toolpad-utils/react';
 import { ApiClient, createRpcApi } from './rpcClient';
 import type { ServerDefinition } from './server/rpcServer';
-import { useNonNullableContext } from '../../toolpad-utils/dist/react';
 import { projectEvents } from './projectEvents';
 
 const ApiContext = React.createContext<ApiClient<ServerDefinition> | null>(null);

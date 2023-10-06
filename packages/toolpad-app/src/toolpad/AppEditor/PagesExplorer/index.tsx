@@ -293,11 +293,11 @@ export default function PagesExplorer({ className }: PagesExplorerProps) {
       const oldNameNode = dom.nodes[nodeId];
       if (oldNameNode.type === 'page' && updatedName !== oldNameNode.name) {
         setTimeout(async () => {
-          await client.methods.deletePage(oldNameNode.name);
+          await projectApi.methods.deletePage(oldNameNode.name);
         }, 300);
       }
     },
-    [dom.nodes, domApi],
+    [projectApi, dom.nodes, domApi],
   );
 
   const handleDuplicateNode = React.useCallback(

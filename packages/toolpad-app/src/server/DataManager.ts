@@ -27,7 +27,7 @@ interface IToolpadProject {
   options: ToolpadProjectOptions;
   getRoot(): string;
   loadDom(): Promise<appDom.AppDom>;
-  saveDom(dom: appDom.AppDom): Promise<{ fingerprint: number }>;
+  saveDom(dom: appDom.AppDom): Promise<void>;
   functionsManager: FunctionsManager;
   envManager: EnvManager;
   getRuntimeConfig: () => RuntimeConfig;

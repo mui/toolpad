@@ -8,21 +8,21 @@ import { asyncHandler } from '../utils/express';
 import { basicAuthUnauthorized, checkBasicAuthHeader } from './basicAuth';
 import { createRpcRuntimeServer } from './rpcRuntimeServer';
 import { createRpcHandler } from './rpc';
-import { RUNTIME_CONFIG_WINDOW_PROPERTY } from '../constants';
+import { RUNTIME_CONFIG_WINDOW_PROPERTY, INITIAL_STATE_WINDOW_PROPERTY } from '../constants';
 import type { RuntimeConfig } from '../config';
-import type * as appDom from '../appDom';
 import createRuntimeState from '../runtime/createRuntimeState';
-
-export const INITIAL_STATE_WINDOW_PROPERTY = '__initialToolpadState__';
+import { RuntimeState } from '../types';
 
 export interface PostProcessHtmlParams {
   config: RuntimeConfig;
-  dom: appDom.AppDom;
+  initialState: RuntimeState;
 }
 
-export function postProcessHtml(html: string, { config, dom }: PostProcessHtmlParams): string {
+export function postProcessHtml(
+  html: string,
+  { config, initialState }: PostProcessHtmlParams,
+): string {
   const serializedConfig = serializeJavascript(config, { ignoreFunction: true });
-  const initialState = createRuntimeState({ dom });
   const serializedInitialState = serializeJavascript(initialState, { isJSON: true });
 
   const toolpadScripts = [
@@ -74,7 +74,10 @@ export async function createProdHandler(project: ToolpadProject) {
       const htmlFilePath = path.resolve(project.getAppOutputFolder(), './index.html');
       let html = await fs.readFile(htmlFilePath, { encoding: 'utf-8' });
 
-      html = postProcessHtml(html, { config: project.getRuntimeConfig(), dom });
+      html = postProcessHtml(html, {
+        config: project.getRuntimeConfig(),
+        initialState: createRuntimeState({ dom }),
+      });
 
       res.setHeader('Content-Type', 'text/html; charset=utf-8').status(200).end(html);
     }),

@@ -1,0 +1,26 @@
+apiVersion: v1
+kind: page
+spec:
+  id: VnOzPpU
+  title: page
+  content:
+    - component: DataGrid
+      name: dataGrid
+      props:
+        dataProvider: myData.ts:default
+        dataProviderId: myIndexData.ts:default
+        columns:
+          - field: name
+            width: 135
+        height: 242
+        rowsSource: dataProvider
+    - component: DataGrid
+      name: dataGrid1
+      props:
+        dataProviderId: myCursorData.ts:default
+        columns:
+          - field: name
+            width: 133
+        height: 244
+        rowsSource: dataProvider
+  display: shell

@@ -194,15 +194,17 @@ export interface AppCanvasState extends RuntimeState {
 
 export type ProjectEvents = {
   // a change in the DOM
-  change: { fingerprint: number };
+  change: {};
   // a change in the DOM caused by an external action (e.g. user editing a file outside of toolpad)
-  externalChange: { fingerprint: number };
+  externalChange: {};
   // a component has been added or removed
   componentsListChanged: {};
   // the function runtime build has finished
   queriesInvalidated: {};
   // An environment variable has changed
   envChanged: {};
+  // Functions or datasources have been updated
+  functionsChanged: {};
 };
 
 export interface ToolpadProjectOptions {
@@ -212,3 +214,5 @@ export interface ToolpadProjectOptions {
   base: string;
   customServer: boolean;
 }
+
+export type CodeEditorFileType = 'resource' | 'component';

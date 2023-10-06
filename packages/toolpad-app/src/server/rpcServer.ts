@@ -18,6 +18,9 @@ export function createRpcServer(project: ToolpadProject) {
     getVersionInfo: createMethod<typeof project.getVersionInfo>(({ params }) => {
       return project.getVersionInfo(...params);
     }),
+    introspect: createMethod<typeof project.functionsManager.introspect>(({ params }) => {
+      return project.functionsManager.introspect(...params);
+    }),
     getPrettierConfig: createMethod<typeof project.getPrettierConfig>(({ params }) => {
       return project.getPrettierConfig(...params);
     }),
@@ -41,6 +44,9 @@ export function createRpcServer(project: ToolpadProject) {
         return project.dataManager.dataSourceExecPrivate(...params);
       },
     ),
+    createDataProvider: createMethod<typeof project.createDataProvider>(({ params }) => {
+      return project.createDataProvider(...params);
+    }),
   } satisfies MethodResolvers;
 }
 

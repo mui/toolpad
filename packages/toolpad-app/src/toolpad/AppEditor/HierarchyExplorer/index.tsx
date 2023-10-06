@@ -221,7 +221,7 @@ export default function HierarchyExplorer() {
         defaultCollapseIcon={<ExpandMoreIcon sx={{ fontSize: '0.9rem', opacity: 0.5 }} />}
         defaultExpandIcon={<ChevronRightIcon sx={{ fontSize: '0.9rem', opacity: 0.5 }} />}
         expanded={Array.from(expandedDomNodeIdSet)}
-        selected={selectedDomNodeId as string}
+        selected={selectedDomNodeId}
         onNodeSelect={handleNodeSelect}
         onNodeFocus={handleNodeFocus}
         onNodeToggle={handleNodeToggle}

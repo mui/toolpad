@@ -7,9 +7,10 @@ import EditorCanvasHost from '../EditorCanvasHost';
 import { getNodeHashes, useAppState, useAppStateApi, useDomApi } from '../../../AppState';
 import { usePageEditorApi, usePageEditorState } from '../PageEditorProvider';
 import RenderOverlay from './RenderOverlay';
-import { NodeHashes } from '../../../../types';
+import { NodeHashes, RuntimeState } from '../../../../types';
 import type { ToolpadBridge } from '../../../../canvas/ToolpadBridge';
 import { getBindingType } from '../../../../bindings';
+import createRuntimeState from '../../../../runtime/createRuntimeState';
 
 const classes = {
   view: 'Toolpad_View',
@@ -24,13 +25,17 @@ const RenderPanelRoot = styled('div')({
   },
 });
 
+function useRuntimeState(): RuntimeState {
+  const { dom } = useAppState();
+  return React.useMemo(() => createRuntimeState({ dom }), [dom]);
+}
+
 export interface RenderPanelProps {
   className?: string;
 }
 
 export default function RenderPanel({ className }: RenderPanelProps) {
   const appState = useAppState();
-  const { dom } = useAppState();
   const domApi = useDomApi();
   const appStateApi = useAppStateApi();
   const pageEditorApi = usePageEditorApi();
@@ -66,6 +71,10 @@ export default function RenderPanel({ className }: RenderPanelProps) {
       });
     });
 
+    initializedBridge.canvasEvents.on('editorNodeDataUpdated', (event) => {
+      pageEditorApi.nodeDataUpdate(event.nodeId, event.prop, event.value);
+    });
+
     initializedBridge.canvasEvents.on('pageStateUpdated', (event) => {
       pageEditorApi.pageStateUpdate(event.pageState, event.globalScopeMeta);
     });
@@ -90,12 +99,14 @@ export default function RenderPanel({ className }: RenderPanelProps) {
     setBridge(initializedBridge);
   });
 
+  const runtimeState = useRuntimeState();
+
   return (
     <RenderPanelRoot className={className}>
       <EditorCanvasHost
         className={classes.view}
+        runtimeState={runtimeState}
         base={appState.base}
-        dom={dom}
         savedNodes={savedNodes}
         pageNodeId={pageNodeId}
         overlay={<RenderOverlay bridge={bridge} />}

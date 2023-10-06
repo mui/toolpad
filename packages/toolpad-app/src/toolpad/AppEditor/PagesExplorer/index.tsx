@@ -321,7 +321,7 @@ export default function PagesExplorer({ className }: PagesExplorerProps) {
     [appStateApi, dom],
   );
 
-  const alphabeticalSortedPages = React.useMemo(
+  const alphabeticSortedPages = React.useMemo(
     () => [...pages].sort(createPropComparator('name', alphabeticComparator)),
     [pages],
   );
@@ -364,7 +364,7 @@ export default function PagesExplorer({ className }: PagesExplorerProps) {
             validateItemName={validatePageName}
           />
         ) : null}
-        {alphabeticalSortedPages.map((page) => (
+        {alphabeticSortedPages.map((page) => (
           <PagesExplorerTreeItem
             key={page.id}
             nodeId={page.id}

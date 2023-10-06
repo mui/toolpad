@@ -17,6 +17,7 @@ import {
   RadioGroup,
   FormControlLabel,
   Radio,
+  FormHelperText,
 } from '@mui/material';
 import { errorFrom } from '@mui/toolpad-utils/errors';
 import AddIcon from '@mui/icons-material/Add';
@@ -24,6 +25,7 @@ import { useMutation } from '@tanstack/react-query';
 import { LoadingButton } from '@mui/lab';
 import { generateUniqueString } from '@mui/toolpad-utils/strings';
 import { PaginationMode } from '@mui/toolpad-core';
+import { Stack } from '@mui/system';
 import { EditorProps } from '../../types';
 import client from '../../api';
 import type {
@@ -33,6 +35,8 @@ import type {
 import { projectEvents } from '../../projectEvents';
 import OpenCodeEditorButton from '../../components/OpenCodeEditor';
 import type { CreateDataProviderOptions } from '../../server/FunctionsManager';
+
+const PAGINATION_DOCUMENTATION_URL = 'https://mui.com/toolpad/concepts/data-providers/#pagination';
 
 projectEvents.on('functionsChanged', () => client.invalidateQueries('introspect', []));
 
@@ -134,37 +138,47 @@ function CreateNewDataProviderDialog({
           <DialogContentText>
             To create a new data provider please enter the name here.
           </DialogContentText>
-          <TextField
-            autoFocus
-            margin="dense"
-            fullWidth
-            value={newName}
-            onChange={(event) => setNewName(event.target.value)}
-            label="name"
-            type="text"
-            onFocus={handleInputFocus}
-            required
-            error={!!errorMessage}
-            helperText={errorMessage}
-          />
+          <Stack sx={{ gap: 2 }}>
+            <TextField
+              autoFocus
+              margin="dense"
+              fullWidth
+              value={newName}
+              onChange={(event) => setNewName(event.target.value)}
+              label="name"
+              type="text"
+              onFocus={handleInputFocus}
+              required
+              error={!!errorMessage}
+              helperText={errorMessage}
+            />
 
-          <FormControl>
-            <FormLabel id={paginationModeSelectId}>Pagination mode</FormLabel>
-            <RadioGroup
-              row
-              aria-labelledby={paginationModeSelectId}
-              value={options.paginationMode}
-              onChange={(event) =>
-                setOptions((existing) => ({
-                  ...existing,
-                  paginationMode: event.target.value as PaginationMode,
-                }))
-              }
-            >
-              <FormControlLabel value="index" control={<Radio />} label="Index based" />
-              <FormControlLabel value="cursor" control={<Radio />} label="Cursor based" />
-            </RadioGroup>
-          </FormControl>
+            <FormControl>
+              <FormLabel id={paginationModeSelectId}>Pagination mode</FormLabel>
+              <RadioGroup
+                row
+                aria-labelledby={paginationModeSelectId}
+                value={options.paginationMode}
+                onChange={(event) =>
+                  setOptions((existing) => ({
+                    ...existing,
+                    paginationMode: event.target.value as PaginationMode,
+                  }))
+                }
+              >
+                <FormControlLabel value="index" control={<Radio />} label="Index based" />
+                <FormControlLabel value="cursor" control={<Radio />} label="Cursor based" />
+              </RadioGroup>
+              <FormHelperText>
+                How is your backend data paginated? By index, or by cursor? Find more about
+                pagination modes in the{' '}
+                <a href={PAGINATION_DOCUMENTATION_URL} target="_blank" rel="noreferrer">
+                  documentation
+                </a>
+                .
+              </FormHelperText>
+            </FormControl>
+          </Stack>
         </DialogContent>
         <DialogActions>
           <Button onClick={onClose}>Cancel</Button>

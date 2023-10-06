@@ -206,7 +206,7 @@ test('data providers', async ({ page }) => {
   await expect(grid2.getByText('Cursor item 100')).toBeVisible();
   await expect(grid2.getByText('Cursor item 0')).not.toBeVisible();
 
-  await grid2.getByRole('button', { name: 'Rows per page:' }).click();
+  await grid2.getByRole('combobox', { name: 'Rows per page:' }).click();
   await editorModel.appCanvas.getByRole('option', { name: '25', exact: true }).click();
 
   await expect(grid2.getByText('Cursor item 0')).toBeVisible();

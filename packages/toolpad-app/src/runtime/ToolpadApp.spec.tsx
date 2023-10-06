@@ -16,9 +16,18 @@ import { LiveBindings, RuntimeEvents } from '@mui/toolpad-core';
 import { CanvasEventsContext } from '@mui/toolpad-core/runtime';
 import { Emitter } from '@mui/toolpad-utils/events';
 import { test, expect, afterEach } from 'vitest';
-import ToolpadApp from './ToolpadApp';
 import * as appDom from '../appDom';
 import createRuntimeState from './createRuntimeState';
+import { RUNTIME_CONFIG_WINDOW_PROPERTY } from '../constants';
+
+window[RUNTIME_CONFIG_WINDOW_PROPERTY] = {
+  wsPort: 3001,
+  base: '/test',
+  externalUrl: 'http://localhost:3000',
+  projectDir: '/tmp',
+};
+
+const { default: ToolpadApp } = await import('./ToolpadApp');
 
 afterEach(cleanup);
 

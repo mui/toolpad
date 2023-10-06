@@ -7,6 +7,7 @@ import MoreVertIcon from '@mui/icons-material/MoreVert';
 import { NodeId } from '@mui/toolpad-core';
 import clsx from 'clsx';
 import invariant from 'invariant';
+import { alphabeticComparator, createPropComparator } from '@mui/toolpad-utils/comparators';
 import * as appDom from '../../../appDom';
 import { useAppStateApi, useAppState, useDomApi } from '../../AppState';
 import useLocalStorageState from '../../../utils/useLocalStorageState';
@@ -291,7 +292,7 @@ export default function PagesExplorer({ className }: PagesExplorerProps) {
       const oldNameNode = dom.nodes[nodeId];
       if (oldNameNode.type === 'page' && updatedName !== oldNameNode.name) {
         setTimeout(async () => {
-          await client.mutation.deletePage(oldNameNode.name);
+          await client.methods.deletePage(oldNameNode.name);
         }, 300);
       }
     },
@@ -320,8 +321,8 @@ export default function PagesExplorer({ className }: PagesExplorerProps) {
     [appStateApi, dom],
   );
 
-  const alphabeticallySortedPages = React.useMemo(
-    () => [...pages].sort((page1, page2) => page1.name.localeCompare(page2.name)),
+  const alphabeticalSortedPages = React.useMemo(
+    () => [...pages].sort(createPropComparator('name', alphabeticComparator)),
     [pages],
   );
 
@@ -363,7 +364,7 @@ export default function PagesExplorer({ className }: PagesExplorerProps) {
             validateItemName={validatePageName}
           />
         ) : null}
-        {alphabeticallySortedPages.map((page) => (
+        {alphabeticalSortedPages.map((page) => (
           <PagesExplorerTreeItem
             key={page.id}
             nodeId={page.id}

@@ -1289,7 +1289,7 @@ function MutationNode({ node, page }: MutationNodeProps) {
     mutateAsync,
   } = useMutation(
     async (overrides: any = {}) => {
-      return api.mutation.execQuery(page.name, node.name, { ...params, ...overrides });
+      return api.methods.execQuery(page.name, node.name, { ...params, ...overrides });
     },
     {
       mutationKey: [node.name, params],

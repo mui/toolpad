@@ -84,7 +84,7 @@ export default function OpenCodeEditorButton({
       event.stopPropagation();
       setBusy(true);
       try {
-        await client.mutation.openCodeEditor(filePath, fileType);
+        await client.methods.openCodeEditor(filePath, fileType);
         onSuccess?.();
       } catch {
         setMissingEditorDialog(true);

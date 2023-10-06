@@ -1,6 +1,6 @@
 {
   "name": "@mui/toolpad",
-  "version": "0.1.30",
+  "version": "0.1.31",
   "license": "MIT",
   "bin": {
     "toolpad": "./cli.js"
@@ -52,15 +52,15 @@
     "@emotion/styled": "11.11.0",
     "@googleapis/drive": "8.3.1",
     "@googleapis/sheets": "5.0.4",
-    "@mui/icons-material": "5.14.11",
-    "@mui/lab": "5.0.0-alpha.146",
-    "@mui/material": "5.14.11",
-    "@mui/system": "5.14.11",
-    "@mui/toolpad-components": "0.1.30",
-    "@mui/toolpad-core": "0.1.30",
-    "@mui/toolpad-utils": "0.1.30",
-    "@mui/types": "7.2.4",
-    "@mui/utils": "5.14.11",
+    "@mui/icons-material": "5.14.12",
+    "@mui/lab": "5.0.0-alpha.147",
+    "@mui/material": "5.14.12",
+    "@mui/system": "5.14.12",
+    "@mui/toolpad-components": "0.1.31",
+    "@mui/toolpad-core": "0.1.31",
+    "@mui/toolpad-utils": "0.1.31",
+    "@mui/types": "7.2.5",
+    "@mui/utils": "5.14.12",
     "@mui/x-data-grid": "6.16.0",
     "@mui/x-data-grid-pro": "6.16.0",
     "@mui/x-date-pickers": "6.16.0",
@@ -134,7 +134,7 @@
     "yaml": "2.3.2",
     "yaml-diff-patch": "2.0.0",
     "yargs": "17.7.2",
-    "zod": "3.22.2",
+    "zod": "3.22.3",
     "zod-validation-error": "1.5.0"
   },
   "devDependencies": {
@@ -173,5 +173,5 @@
   "publishConfig": {
     "access": "public"
   },
-  "gitHead": "4057a5514725c4eb709d3db9a0a3720f7901a4ea"
+  "gitHead": "0186d8a811d0c172f193d8e961cd763d5024b71a"
 }

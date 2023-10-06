@@ -24,38 +24,37 @@ spec:
             label: Toolbar
             options:
               - label: Show
-                value: "0"
+                value: '0'
               - label: Hide
-                value: "1"
-            defaultValue: "0"
-    - component: PageRow
-      name: pageRow
-      children:
-        - component: DataGrid
-          name: dataGrid
-          props:
-            rows:
-              $$jsExpression: |
-                getUsers.data
-            height: 618
-            columns:
-              - type: string
-                field: ID
-              - type: link
-                field: Profile
-                width: 254
-              - type: link
-                field: Avatar
-                width: 147
-              - type: string
-                field: Name
-                width: 169
-              - type: string
-                field: Designation
-                width: 126
-            hideToolbar:
-              $$jsExpression: |
-                Boolean(parseInt(select.value))
+                value: '1'
+            defaultValue: '0'
+    - component: DataGrid
+      name: dataGrid
+      layout:
+        columnSize: 1
+      props:
+        rows:
+          $$jsExpression: |
+            getUsers.data
+        height: 618
+        columns:
+          - type: string
+            field: ID
+          - type: link
+            field: Profile
+            width: 254
+          - type: link
+            field: Avatar
+            width: 147
+          - type: string
+            field: Name
+            width: 169
+          - type: string
+            field: Designation
+            width: 126
+        hideToolbar:
+          $$jsExpression: |
+            Boolean(parseInt(select.value))
   queries:
     - name: getUsers
       query:

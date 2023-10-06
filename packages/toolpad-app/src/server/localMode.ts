@@ -43,7 +43,7 @@ import {
   themeSchema,
   API_VERSION,
 } from './schema';
-import { format } from '../utils/prettier';
+import { format, resolvePrettierConfig } from '../utils/prettier';
 import {
   Body as AppDomFetchBody,
   FetchQuery,
@@ -840,18 +840,15 @@ async function writeDomToDisk(root: string, dom: appDom.AppDom): Promise<void> {
   ]);
 }
 
-const DEFAULT_EDITOR = 'code';
-
-export async function findSupportedEditor(): Promise<string | null> {
-  const maybeEditor = process.env.EDITOR ?? DEFAULT_EDITOR;
-  if (!maybeEditor) {
-    return null;
+export async function findSupportedEditor(): Promise<string | undefined> {
+  if (process.env.EDITOR) {
+    return undefined;
   }
   try {
-    await execa(maybeEditor, ['-v']);
-    return maybeEditor;
+    await execa('code', ['-v']);
+    return 'code';
   } catch (err) {
-    return null;
+    return undefined;
   }
 }
 
@@ -1179,9 +1176,6 @@ class ToolpadProject {
 
   async openCodeEditor(fileName: string, fileType: string) {
     const supportedEditor = await findSupportedEditor();
-    if (!supportedEditor) {
-      throw new Error(`No code editor found`);
-    }
     const root = this.getRoot();
     let resolvedPath = fileName;
 
@@ -1193,8 +1187,8 @@ class ToolpadProject {
       resolvedPath = getComponentFilePath(componentsFolder, fileName);
     }
     const fullResolvedPath = path.resolve(root, resolvedPath);
-    openEditor([fullResolvedPath, root], {
-      editor: process.env.EDITOR ? undefined : DEFAULT_EDITOR,
+    await openEditor([fullResolvedPath, root], {
+      editor: supportedEditor,
     });
   }
 
@@ -1218,6 +1212,12 @@ class ToolpadProject {
   async deletePage(name: string) {
     const pageFolder = getPageFolder(this.root, name);
     await fs.rm(pageFolder, { force: true, recursive: true });
+  }
+
+  async getPrettierConfig() {
+    const root = this.getRoot();
+    const config = await resolvePrettierConfig(root);
+    return config;
   }
 
   getRuntimeConfig(): RuntimeConfig {

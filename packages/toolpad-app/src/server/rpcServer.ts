@@ -19,6 +19,9 @@ export function createRpcServer(project: ToolpadProject) {
       getVersionInfo: createMethod<typeof project.getVersionInfo>(({ params }) => {
         return project.getVersionInfo(...params);
       }),
+      getPrettierConfig: createMethod<typeof project.getPrettierConfig>(({ params }) => {
+        return project.getPrettierConfig(...params);
+      }),
     },
     mutation: {
       saveDom: createMethod<typeof project.saveDom>(({ params }) => {

@@ -110,10 +110,6 @@ function getNodeEditorDomView(node: appDom.AppDomNode): DomView | undefined {
   switch (node.type) {
     case 'page':
       return { kind: 'page', nodeId: node.id };
-    case 'connection':
-      return { kind: 'connection', nodeId: node.id };
-    case 'codeComponent':
-      return { kind: 'codeComponent', nodeId: node.id };
     default:
       return undefined;
   }
@@ -165,14 +161,6 @@ export default function PagesExplorer({ className }: PagesExplorerProps) {
 
     if (appDom.isPage(node)) {
       appStateApi.setView({ kind: 'page', nodeId: node.id });
-    }
-
-    if (appDom.isCodeComponent(node)) {
-      appStateApi.setView({ kind: 'codeComponent', nodeId: node.id });
-    }
-
-    if (appDom.isConnection(node)) {
-      appStateApi.setView({ kind: 'connection', nodeId: node.id });
     }
   };
 

@@ -7,7 +7,6 @@ import MoreVertIcon from '@mui/icons-material/MoreVert';
 import { NodeId } from '@mui/toolpad-core';
 import clsx from 'clsx';
 import invariant from 'invariant';
-import { sortBy } from '@mui/toolpad-utils/collections';
 import * as appDom from '../../../appDom';
 import { useAppStateApi, useAppState, useDomApi } from '../../AppState';
 import useLocalStorageState from '../../../utils/useLocalStorageState';
@@ -321,7 +320,10 @@ export default function PagesExplorer({ className }: PagesExplorerProps) {
     [appStateApi, dom],
   );
 
-  const alphabeticallySortedPages = React.useMemo(() => sortBy(pages, 'name'), [pages]);
+  const alphabeticallySortedPages = React.useMemo(
+    () => pages.toSorted((page1, page2) => page1.name.localeCompare(page2.name)),
+    [pages],
+  );
 
   return (
     <PagesExplorerRoot

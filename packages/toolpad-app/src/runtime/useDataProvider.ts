@@ -16,7 +16,7 @@ export const useDataProvider: UseDataProviderHook = (id) => {
     queryFn: async () => {
       invariant(id, 'id is required');
       const [filePath, name] = id.split(':');
-      return api.query.introspectDataProvider(filePath, name);
+      return api.methods.introspectDataProvider(filePath, name);
     },
   });
 
@@ -29,7 +29,7 @@ export const useDataProvider: UseDataProviderHook = (id) => {
       getRecords: async (...args) => {
         invariant(id, 'id is required');
         const [filePath, name] = id.split(':');
-        return api.query.getDataProviderRecords(filePath, name, ...args);
+        return api.methods.getDataProviderRecords(filePath, name, ...args);
       },
     };
   }, [id, introspection]);

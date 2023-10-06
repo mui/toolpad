@@ -104,7 +104,7 @@ function CreateNewDataProviderDialog({
 
   const createProviderMutation = useMutation({
     mutationKey: [newName, options],
-    mutationFn: () => client.mutation.createDataProvider(newName, options),
+    mutationFn: () => client.methods.createDataProvider(newName, options),
     onSuccess: () => {
       onCommit(newName);
       onClose();

@@ -173,7 +173,6 @@ const AppRoot = styled('div')({
   overflow: 'auto' /* Prevents margins from collapsing into root */,
   position: 'relative' /* Makes sure that the editor overlay that renders inside sizes correctly */,
   minHeight: '100vh',
-  ...(isRenderedInCanvas ? { padding: '10px' } : {}) /* Makes fluid layout more user friendly */,
   display: 'flex',
   flexDirection: 'column',
 });
@@ -1189,7 +1188,7 @@ interface PageRootProps {
 
 function PageRoot({ children, attributes }: PageRootProps) {
   const { layout } = attributes;
-  const isContainer = layout === ('container' as appDom.PageLayoutMode);
+  const isContainer = layout !== ('fluid' as appDom.PageLayoutMode);
   return isContainer ? (
     <Container>
       <Stack
@@ -1210,6 +1209,7 @@ function PageRoot({ children, attributes }: PageRootProps) {
       sx={{
         flex: 1,
         gap: 1,
+        ...(isRenderedInCanvas ? { px: 3 } : {}),
       }}
     >
       {children}

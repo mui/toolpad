@@ -31,7 +31,7 @@ import { ConfirmDialog } from '../../../../components/SystemDialogs';
 import useBoolean from '../../../../utils/useBoolean';
 import { useNodeNameValidation } from '../../PagesExplorer/validation';
 import useUnsavedChangesConfirm from '../../../hooks/useUnsavedChangesConfirm';
-import client from '../../../../api';
+import { useProjectApi } from '../../../../projectApi';
 
 interface QueryEditorDialogActionsProps {
   saveDisabled?: boolean;
@@ -107,6 +107,7 @@ export default function QueryNodeEditorDialog<Q>({
   onSave,
   isDraft,
 }: QueryNodeEditorProps<Q>) {
+  const projectApi = useProjectApi();
   const { dom } = useAppState();
 
   // To keep it around during closing animation
@@ -259,7 +260,7 @@ export default function QueryNodeEditorDialog<Q>({
   const execPrivate = React.useCallback(
     (method: string, args: any[]) => {
       invariant(dataSourceId, 'dataSourceId must be set');
-      return client.methods.dataSourceExecPrivate(dataSourceId, method, args);
+      return projectApi.methods.dataSourceExecPrivate(dataSourceId, method, args);
     },
     [dataSourceId],
   );

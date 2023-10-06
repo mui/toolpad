@@ -27,21 +27,19 @@ import { generateUniqueString } from '@mui/toolpad-utils/strings';
 import { PaginationMode } from '@mui/toolpad-core';
 import { Stack } from '@mui/system';
 import { EditorProps } from '../../types';
-import client from '../../api';
+import { useProjectApi } from '../../projectApi';
 import type {
   DataProviderIntrospectionResult,
   FileIntrospectionResult,
 } from '../../server/functionsTypesWorker';
-import { projectEvents } from '../../projectEvents';
 import OpenCodeEditorButton from '../OpenCodeEditor';
 import type { CreateDataProviderOptions } from '../../server/FunctionsManager';
 
 const PAGINATION_DOCUMENTATION_URL = 'https://mui.com/toolpad/concepts/data-providers/#pagination';
 
-projectEvents.on('functionsChanged', () => client.invalidateQueries('introspect', []));
-
 function useFunctionsIntrospectQuery() {
-  return client.useQuery('introspect', []);
+  const projectApi = useProjectApi();
+  return projectApi.useQuery('introspect', []);
 }
 
 function handleInputFocus(event: React.FocusEvent<HTMLInputElement>) {
@@ -91,6 +89,7 @@ function CreateNewDataProviderDialog({
   existingNames,
   initialName,
 }: CreateNewDataProviderDialogProps) {
+  const projectApi = useProjectApi();
   const [newName, setNewName] = React.useState(initialName);
   React.useEffect(() => {
     if (open) {
@@ -104,7 +103,7 @@ function CreateNewDataProviderDialog({
 
   const createProviderMutation = useMutation({
     mutationKey: [newName, options],
-    mutationFn: () => client.methods.createDataProvider(newName, options),
+    mutationFn: () => projectApi.methods.createDataProvider(newName, options),
     onSuccess: () => {
       onCommit(newName);
       onClose();

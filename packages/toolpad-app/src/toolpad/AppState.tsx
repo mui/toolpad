@@ -9,16 +9,13 @@ import useDebouncedHandler from '@mui/toolpad-utils/hooks/useDebouncedHandler';
 import useEventCallback from '@mui/utils/useEventCallback';
 import * as appDom from '../appDom';
 import { omit, update } from '../utils/immutability';
-import client from '../api';
+import { useProjectApi } from '../projectApi';
 import useShortcut from '../utils/useShortcut';
 import insecureHash from '../utils/insecureHash';
 import { NodeHashes } from '../types';
 import { hasFieldFocus } from '../utils/fields';
 import { DomView, getViewFromPathname, PageViewTab } from '../utils/domView';
-import { projectEvents } from '../projectEvents';
 import config from '../config';
-
-projectEvents.on('externalChange', () => client.invalidateQueries('loadDom', []));
 
 export function getNodeHashes(dom: appDom.AppDom): NodeHashes {
   return mapValues(dom.nodes, (node) => insecureHash(JSON.stringify(omit(node, 'id'))));
@@ -447,7 +444,8 @@ export interface DomContextProps {
 }
 
 export default function AppProvider({ children }: DomContextProps) {
-  const { data: dom } = client.useQuery('loadDom', [], { suspense: true });
+  const projectApi = useProjectApi();
+  const { data: dom } = projectApi.useQuery('loadDom', [], { suspense: true });
 
   invariant(dom, 'Suspense should load the dom');
 
@@ -539,7 +537,7 @@ export default function AppProvider({ children }: DomContextProps) {
     const domToSave = state.dom;
     dispatch({ type: 'DOM_SAVING' });
     const domDiff = appDom.createDiff(state.savedDom, domToSave);
-    client.methods
+    projectApi.methods
       .applyDomDiff(domDiff)
       .then(() => {
         dispatch({ type: 'DOM_SAVED', savedDom: domToSave });

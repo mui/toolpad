@@ -14,7 +14,7 @@ import CreatePageNodeDialog from './CreatePageNodeDialog';
 import useLocalStorageState from '../../../utils/useLocalStorageState';
 import NodeMenu from '../NodeMenu';
 import { DomView } from '../../../utils/domView';
-import client from '../../../api';
+import { useProjectApi } from '../../../projectApi';
 
 const PagesExplorerRoot = styled('div')({
   overflow: 'auto',
@@ -120,6 +120,7 @@ export interface PagesExplorerProps {
 }
 
 export default function PagesExplorer({ className }: PagesExplorerProps) {
+  const projectApi = useProjectApi();
   const { dom } = useAppState();
   const { currentView } = useAppState();
 
@@ -182,7 +183,7 @@ export default function PagesExplorer({ className }: PagesExplorerProps) {
         domViewAfterDelete = firstSiblingOfType && getNodeEditorDomView(firstSiblingOfType);
       }
 
-      await client.methods.deletePage(deletedNode.name);
+      await projectApi.methods.deletePage(deletedNode.name);
 
       appStateApi.update(
         (draft) => appDom.removeNode(draft, nodeId),

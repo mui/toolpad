@@ -3,7 +3,7 @@ import * as React from 'react';
 import * as appDom from '../../appDom';
 import { useAppState, useDomApi } from '../AppState';
 import { useNodeNameValidation } from './PagesExplorer/validation';
-import client from '../../api';
+import { useProjectApi } from '../../projectApi';
 
 interface NodeNameEditorProps {
   node: appDom.AppDomNode;
@@ -13,6 +13,7 @@ interface NodeNameEditorProps {
 export default function NodeNameEditor({ node, sx }: NodeNameEditorProps) {
   const domApi = useDomApi();
   const { dom } = useAppState();
+  const projectApi = useProjectApi();
 
   const [nameInput, setNameInput] = React.useState(node.name);
   React.useEffect(() => setNameInput(node.name), [node.name]);
@@ -35,7 +36,7 @@ export default function NodeNameEditor({ node, sx }: NodeNameEditorProps) {
     const oldname = dom.nodes[node.id];
     if (isNameValid && oldname.type === 'page' && nameInput !== oldname.name) {
       setTimeout(async () => {
-        await client.methods.deletePage(oldname.name);
+        await projectApi.methods.deletePage(oldname.name);
       }, 300);
     }
   }, [isNameValid, domApi, node.id, node.name, nameInput, dom]);

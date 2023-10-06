@@ -1881,7 +1881,7 @@
   resolved "https://registry.yarnpkg.com/@ljharb/through/-/through-2.3.9.tgz#85f221eb82f9d555e180e87d6e50fb154af85408"
   integrity sha512-yN599ZBuMPPK4tdoToLlvgJB4CLK8fGl7ntfy0Wn7U6ttNvHYurd81bfUiK/6sMkiIwm65R6ck4L6+Y3DfVbNQ==
 
-"@mui/base@5.0.0-beta.18", "@mui/base@^5.0.0-beta.14":
+"@mui/base@5.0.0-beta.18", "@mui/base@^5.0.0-beta.14", "@mui/base@^5.0.0-beta.17":
   version "5.0.0-beta.18"
   resolved "https://registry.yarnpkg.com/@mui/base/-/base-5.0.0-beta.18.tgz#f95d393cf80974e77c0823170cc15c854d5af84b"
   integrity sha512-e9ZCy/ndhyt5MTshAS3qAUy/40UiO0jX+kAo6a+XirrPJE+rrQW+mKPSI0uyp+5z4Vh+z0pvNoJ2S2gSrNz3BQ==
@@ -2003,7 +2003,7 @@
   resolved "https://registry.yarnpkg.com/@mui/types/-/types-7.2.5.tgz#cd62a1fc5eb1044137ccab2053b431dd7cfc3cb8"
   integrity sha512-S2BwfNczr7VwS6ki8GoAXJyARoeSJDLuxOEPs3vEMyTALlf9PrdHv+sluX7kk3iKrCg/ML2mIWwapZvWbkMCQA==
 
-"@mui/utils@5.14.12", "@mui/utils@^5.13.7", "@mui/utils@^5.14.12", "@mui/utils@^5.14.3", "@mui/utils@^5.14.8":
+"@mui/utils@5.14.12", "@mui/utils@^5.13.7", "@mui/utils@^5.14.11", "@mui/utils@^5.14.12", "@mui/utils@^5.14.3", "@mui/utils@^5.14.8":
   version "5.14.12"
   resolved "https://registry.yarnpkg.com/@mui/utils/-/utils-5.14.12.tgz#58b570839e22e0fba71e17d37d9c083fe233704d"
   integrity sha512-RFNXnhKQlzIkIUig6mmv0r5VbtjPdWoaBPYicq25LETdZux59HAqoRdWw15T7lp3c7gXOoE8y67+hTB8C64m2g==
@@ -2013,54 +2013,54 @@
     prop-types "^15.8.1"
     react-is "^18.2.0"
 
-"@mui/x-data-grid-pro@6.16.0":
-  version "6.16.0"
-  resolved "https://registry.yarnpkg.com/@mui/x-data-grid-pro/-/x-data-grid-pro-6.16.0.tgz#adb7c628dd8475433e6386789e1a79b97b393b03"
-  integrity sha512-PR23o1v/zZ+sRrp/OD7Ku1y4S0nR9ENQt+0VAkScG8ByiOcGgP4bVpTuJuivalMhr+DSailT6B6YJ+7Dj7sAfw==
+"@mui/x-data-grid-pro@6.16.1":
+  version "6.16.1"
+  resolved "https://registry.yarnpkg.com/@mui/x-data-grid-pro/-/x-data-grid-pro-6.16.1.tgz#f44f8a59844b83b7cb34c7dcd6cec9e2ef03cfa0"
+  integrity sha512-WcvD2DC6CkRbg7EvmjzeIE2a9f2mNXOZGE8gi05a2j16Rg+WoTTeRjClY0LqJ4H8z04Sgy8H9FMKC2aSob/yQQ==
   dependencies:
-    "@babel/runtime" "^7.22.15"
-    "@mui/utils" "^5.14.8"
-    "@mui/x-data-grid" "6.16.0"
+    "@babel/runtime" "^7.23.1"
+    "@mui/utils" "^5.14.11"
+    "@mui/x-data-grid" "6.16.1"
     "@mui/x-license-pro" "6.10.2"
     "@types/format-util" "^1.0.2"
     clsx "^2.0.0"
     prop-types "^15.8.1"
     reselect "^4.1.8"
 
-"@mui/x-data-grid@6.16.0":
-  version "6.16.0"
-  resolved "https://registry.yarnpkg.com/@mui/x-data-grid/-/x-data-grid-6.16.0.tgz#d8d57a9ad5b28fb9ba74fad8e329f1106268f987"
-  integrity sha512-u2z889gs18GtHxUtVxxpTr9Oei1ksxjWZA214RnuMGPvVGLStS36sfqICO5GVJeLkcpJAsJSNgMfzNwc9yPm7w==
+"@mui/x-data-grid@6.16.1":
+  version "6.16.1"
+  resolved "https://registry.yarnpkg.com/@mui/x-data-grid/-/x-data-grid-6.16.1.tgz#b7a33c25193d70b80ffbe4b168d8524752dfa5c5"
+  integrity sha512-jiV4kMegueNiaB3Qs0VpHG0Cp+eIZa5upMr9fcdPMPNLhOYnkNtexTyezfptJyfD8Adbjrjt4bbRktBcDCC5DA==
   dependencies:
-    "@babel/runtime" "^7.22.15"
-    "@mui/utils" "^5.14.8"
+    "@babel/runtime" "^7.23.1"
+    "@mui/utils" "^5.14.11"
     clsx "^2.0.0"
     prop-types "^15.8.1"
     reselect "^4.1.8"
 
-"@mui/x-date-pickers-pro@6.16.0":
-  version "6.16.0"
-  resolved "https://registry.yarnpkg.com/@mui/x-date-pickers-pro/-/x-date-pickers-pro-6.16.0.tgz#94c07b71f40b4170b2b4269a62db462629931b6e"
-  integrity sha512-w79lcC5my0brZ0aF9EvhxSog07E/OnaSxDFShGasbitJYtZB18qRgMl9UBT6SKNvdOsp9TMRso67DvVWzNj/9g==
+"@mui/x-date-pickers-pro@6.16.1":
+  version "6.16.1"
+  resolved "https://registry.yarnpkg.com/@mui/x-date-pickers-pro/-/x-date-pickers-pro-6.16.1.tgz#c3f00ecb87eb466f02851ecc779b153d0e4c8f9f"
+  integrity sha512-QiW7ggejZl4iqmQFUE1EFoaM1lrm7q4E0w7yB3sGPuknrM7H4T6FroJCatJuyjj3EXpfop53sxrE0ykuUoU/YQ==
   dependencies:
-    "@babel/runtime" "^7.22.15"
-    "@mui/base" "^5.0.0-beta.14"
-    "@mui/utils" "^5.14.8"
-    "@mui/x-date-pickers" "6.16.0"
+    "@babel/runtime" "^7.23.1"
+    "@mui/base" "^5.0.0-beta.17"
+    "@mui/utils" "^5.14.11"
+    "@mui/x-date-pickers" "6.16.1"
     "@mui/x-license-pro" "6.10.2"
     clsx "^2.0.0"
     prop-types "^15.8.1"
     react-transition-group "^4.4.5"
 
-"@mui/x-date-pickers@6.16.0":
-  version "6.16.0"
-  resolved "https://registry.yarnpkg.com/@mui/x-date-pickers/-/x-date-pickers-6.16.0.tgz#944440fabd9cdc5c704ccab7b8c44ebac75f15db"
-  integrity sha512-5xN/OuVtcy/bX/Yx4cJrGWLmHTMTZkufhQMtInFOM8u93TJJSPwA7X86vQdl6OztYNyYKnEpxNKxSrxcDHfKFQ==
+"@mui/x-date-pickers@6.16.1":
+  version "6.16.1"
+  resolved "https://registry.yarnpkg.com/@mui/x-date-pickers/-/x-date-pickers-6.16.1.tgz#76341384ef51db5f405f779fe5f2e9456b2cdc53"
+  integrity sha512-4B2+DU7aywYdvmr10o2qai6kbbR26zta/v1y8x3bmTilI/KcbhZ2OlsyArPKmTRNC8VYirejSnhLkPR/+JIkPg==
   dependencies:
-    "@babel/runtime" "^7.22.15"
-    "@mui/base" "^5.0.0-beta.14"
-    "@mui/utils" "^5.14.8"
-    "@types/react-transition-group" "^4.4.6"
+    "@babel/runtime" "^7.23.1"
+    "@mui/base" "^5.0.0-beta.17"
+    "@mui/utils" "^5.14.11"
+    "@types/react-transition-group" "^4.4.7"
     clsx "^2.0.0"
     prop-types "^15.8.1"
     react-transition-group "^4.4.5"
@@ -3055,10 +3055,10 @@
     "@types/history" "^4.7.11"
     "@types/react" "*"
 
-"@types/react-transition-group@^4.4.6":
-  version "4.4.6"
-  resolved "https://registry.yarnpkg.com/@types/react-transition-group/-/react-transition-group-4.4.6.tgz#18187bcda5281f8e10dfc48f0943e2fdf4f75e2e"
-  integrity sha512-VnCdSxfcm08KjsJVQcfBmhEQAPnLB8G08hAxn39azX1qYBQ/5RVQuoHuKIcfKOdncuaUvEpFKFzEvbtIMsfVew==
+"@types/react-transition-group@^4.4.6", "@types/react-transition-group@^4.4.7":
+  version "4.4.7"
+  resolved "https://registry.yarnpkg.com/@types/react-transition-group/-/react-transition-group-4.4.7.tgz#bf69f269d74aa78b99097673ca6dd6824a68ef1c"
+  integrity sha512-ICCyBl5mvyqYp8Qeq9B5G/fyBSRC0zx3XM3sCC6KkcMsNeAHqXBKkmat4GqdJET5jtYUpZXrxI5flve5qhi2Eg==
   dependencies:
     "@types/react" "*"
 

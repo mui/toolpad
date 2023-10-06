@@ -34,6 +34,11 @@
     "./cli": {
       "require": "./dist/cli/index.js"
     },
+    ".": {
+      "types": "./dist/exports/index.d.ts",
+      "import": "./dist/exports/index.mjs",
+      "require": "./dist/exports/index.js"
+    },
     "./*": {
       "types": "./dist/exports/*.d.ts",
       "import": "./dist/exports/*.mjs",

@@ -90,14 +90,17 @@ export default function ComponentCatalog({ className }: ComponentCatalogProps) {
     [openStart, setOpenStart],
   );
 
+  const toolpadComponents = useToolpadComponents(dom);
+
   const handleDragStart = (componentType: string) => (event: React.DragEvent<HTMLElement>) => {
+    const def = toolpadComponents[componentType];
+    invariant(def, `No component definition found for "${componentType}"`);
+
     event.dataTransfer.dropEffect = 'copy';
-    const newNode = appDom.createElement(dom, componentType, {});
+    const newNode = appDom.createElement(dom, def.builtIn || componentType, def.initialProps || {});
     api.newNodeDragStart(newNode);
     closeDrawer(0);
   };
-
-  const toolpadComponents = useToolpadComponents(dom);
 
   const handleMouseEnter = React.useCallback(() => openDrawer(), [openDrawer]);
   const handleMouseLeave = React.useCallback(() => closeDrawer(), [closeDrawer]);

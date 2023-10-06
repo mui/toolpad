@@ -3,7 +3,7 @@ import * as React from 'react';
 import { useNonNullableContext } from '@mui/toolpad-utils/react';
 import { ApiClient, createRpcApi } from './rpcClient';
 import type { ServerDefinition } from './server/rpcServer';
-import { projectEvents } from './projectEvents';
+import { useProjectEvents } from './projectEvents';
 
 const ApiContext = React.createContext<ApiClient<ServerDefinition> | null>(null);
 
@@ -14,6 +14,7 @@ export interface ApiProviderProps {
 
 export function ProjectApiProvider({ url, children }: ApiProviderProps) {
   const queryClient = useQueryClient();
+  const projectEvents = useProjectEvents();
 
   const api = React.useMemo(
     () => createRpcApi<ServerDefinition>(queryClient, url),

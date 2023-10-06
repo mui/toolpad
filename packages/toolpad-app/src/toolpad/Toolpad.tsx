@@ -16,6 +16,8 @@ import { getViewFromPathname } from '../utils/domView';
 import AppProvider, { AppState, useAppStateContext } from './AppState';
 import { GLOBAL_FUNCTIONS_FEATURE_FLAG } from '../constants';
 import { ProjectApiProvider } from '../projectApi';
+import { ProjectEventsProvider } from '../projectEvents';
+import config from '../config';
 
 const Centered = styled('div')({
   height: '100%',
@@ -133,33 +135,38 @@ export interface ToolpadProps {
 }
 
 export default function Toolpad({ basename }: ToolpadProps) {
+  const wsProtocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+  const wsUrl = `${wsProtocol}//${window.location.hostname}:${config.wsPort}/toolpad-ws`;
+
   return (
-    <QueryClientProvider client={queryClient}>
-      <ProjectApiProvider url="/api/rpc">
-        <ThemeProvider>
-          {/* CssBaseline kickstart an elegant, consistent, and simple baseline to build upon. */}
-          <CssBaseline />
-          {/* Container that allows children to size to it with height: 100% */}
-          <Box sx={{ height: '1px', minHeight: '100vh' }}>
-            <ErrorBoundary fallbackRender={ErrorFallback}>
-              <React.Suspense fallback={<FullPageLoader />}>
-                <BrowserRouter basename={basename}>
-                  <AppProvider>
-                    <EditorShell>
-                      <Routes>
-                        {GLOBAL_FUNCTIONS_FEATURE_FLAG ? (
-                          <Route path={APP_FUNCTIONS_ROUTE} element={<div />} />
-                        ) : null}
-                        <Route path="/*" element={<AppEditor />} />
-                      </Routes>
-                    </EditorShell>
-                  </AppProvider>
-                </BrowserRouter>
-              </React.Suspense>
-            </ErrorBoundary>
-          </Box>
-        </ThemeProvider>
-      </ProjectApiProvider>
-    </QueryClientProvider>
+    <ProjectEventsProvider wsUrl={wsUrl}>
+      <QueryClientProvider client={queryClient}>
+        <ProjectApiProvider url="/api/rpc">
+          <ThemeProvider>
+            {/* CssBaseline kickstart an elegant, consistent, and simple baseline to build upon. */}
+            <CssBaseline />
+            {/* Container that allows children to size to it with height: 100% */}
+            <Box sx={{ height: '1px', minHeight: '100vh' }}>
+              <ErrorBoundary fallbackRender={ErrorFallback}>
+                <React.Suspense fallback={<FullPageLoader />}>
+                  <BrowserRouter basename={basename}>
+                    <AppProvider>
+                      <EditorShell>
+                        <Routes>
+                          {GLOBAL_FUNCTIONS_FEATURE_FLAG ? (
+                            <Route path={APP_FUNCTIONS_ROUTE} element={<div />} />
+                          ) : null}
+                          <Route path="/*" element={<AppEditor />} />
+                        </Routes>
+                      </EditorShell>
+                    </AppProvider>
+                  </BrowserRouter>
+                </React.Suspense>
+              </ErrorBoundary>
+            </Box>
+          </ThemeProvider>
+        </ProjectApiProvider>
+      </QueryClientProvider>
+    </ProjectEventsProvider>
   );
 }

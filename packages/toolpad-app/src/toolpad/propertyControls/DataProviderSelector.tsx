@@ -33,7 +33,7 @@ import type {
   FileIntrospectionResult,
 } from '../../server/functionsTypesWorker';
 import { projectEvents } from '../../projectEvents';
-import OpenCodeEditorButton from '../../components/OpenCodeEditor';
+import OpenCodeEditorButton from '../OpenCodeEditor';
 import type { CreateDataProviderOptions } from '../../server/FunctionsManager';
 
 const PAGINATION_DOCUMENTATION_URL = 'https://mui.com/toolpad/concepts/data-providers/#pagination';

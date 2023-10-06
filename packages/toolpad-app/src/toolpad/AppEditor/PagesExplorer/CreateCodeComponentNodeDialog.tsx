@@ -19,7 +19,7 @@ import DialogForm from '../../../components/DialogForm';
 import { useNodeNameValidation } from './validation';
 import client from '../../../api';
 import useLatest from '../../../utils/useLatest';
-import OpenCodeEditorButton from '../../../components/OpenCodeEditor';
+import OpenCodeEditorButton from '../../OpenCodeEditor';
 
 function handleInputFocus(event: React.FocusEvent<HTMLInputElement>) {
   event.target.select();

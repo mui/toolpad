@@ -15,6 +15,7 @@ import ArrowDropDownSharpIcon from '@mui/icons-material/ArrowDropDownSharp';
 import invariant from 'invariant';
 import InputAdornment from '@mui/material/InputAdornment';
 import AccountCircle from '@mui/icons-material/Search';
+import { uncapitalize } from '@mui/toolpad-utils/strings';
 import ComponentCatalogItem from './ComponentCatalogItem';
 import CreateCodeComponentNodeDialog from '../../PagesExplorer/CreateCodeComponentNodeDialog';
 import * as appDom from '../../../../appDom';
@@ -97,7 +98,13 @@ export default function ComponentCatalog({ className }: ComponentCatalogProps) {
     invariant(def, `No component definition found for "${componentType}"`);
 
     event.dataTransfer.dropEffect = 'copy';
-    const newNode = appDom.createElement(dom, def.builtIn || componentType, def.initialProps || {});
+    const newNode = appDom.createElement(
+      dom,
+      def.builtIn || componentType,
+      def.initialProps || {},
+      undefined,
+      uncapitalize(def.displayName),
+    );
     api.newNodeDragStart(newNode);
     closeDrawer(0);
   };

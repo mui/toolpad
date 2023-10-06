@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { NodeId } from '@mui/toolpad-core';
+import { BindableAttrValue, NodeId } from '@mui/toolpad-core';
 import { createProvidedContext } from '@mui/toolpad-utils/react';
 import invariant from 'invariant';
 import { debounce, DebouncedFunc } from 'lodash-es';
@@ -13,7 +13,7 @@ import client from '../api';
 import useShortcut from '../utils/useShortcut';
 import insecureHash from '../utils/insecureHash';
 import useEvent from '../utils/useEvent';
-import { NodeHashes } from '../types';
+import { ClientDataSource, NodeHashes } from '../types';
 import { hasFieldFocus } from '../utils/fields';
 import { DomView, getViewFromPathname, PageViewTab } from '../utils/domView';
 import { projectEvents } from '../projectEvents';
@@ -71,19 +71,29 @@ export type AppStateAction =
       queryId: NodeId;
     }
   | {
+      type: 'CREATE_QUERY_TAB';
+      dataSource: ClientDataSource;
+      dataSourceId: string;
+      mode?: appDom.FetchMode;
+    }
+  | {
       type: 'CLOSE_QUERY_TAB';
       queryIndex: number;
       queryId: NodeId;
       deleteQuery?: boolean;
     }
   | {
+      type: 'CLOSE_QUERY_PANEL';
+    }
+  | {
       type: 'SET_QUERY_DRAFT_PROP';
       value:
         | appDom.QueryNode['attributes']['query'][QueryNodeProp]
-        | appDom.QueryNode['attributes'][QueryNodeAttribute];
+        | appDom.QueryNode['attributes'][QueryNodeAttribute]
+        | BindableAttrValue<any>;
       name: string;
-      key?: QueryNodeProp | QueryNodeAttribute;
-      namespace?: 'query' | 'attributes';
+      key?: QueryNodeProp | QueryNodeAttribute | string;
+      namespace?: 'query' | 'attributes' | 'params';
     }
   | {
       type: 'SAVE_QUERY_DRAFT';
@@ -358,28 +368,32 @@ export function appStateReducer(state: AppState, action: AppStateAction): AppSta
         const queryTabs = state.currentView.queryPanel?.queryTabs || [];
         const currentTabIndex = state.currentView.queryPanel?.currentTabIndex;
         let newAttributes: Partial<appDom.QueryNode<any>['attributes']> = {};
+        let newParams: appDom.QueryNode<any>['params'] = [];
         if (currentTabIndex !== undefined && queryTabs) {
           return update(state, {
             currentView: update(state.currentView, {
               queryPanel: update(state.currentView.queryPanel, {
                 queryTabs: state.currentView?.queryPanel?.queryTabs?.map((tab, index) => {
                   if (index === currentTabIndex && tab.draft && action.key) {
-                    if (action.namespace === 'attributes') {
+                    if (!action.namespace && tab.draft?.params) {
+                      newParams = action.value;
+                      newAttributes = tab.draft.attributes;
+                    } else if (action.namespace === 'attributes') {
                       newAttributes = {
                         [action.key]: action.value,
                       };
+                      newParams = tab.draft.params;
                     } else if (action.namespace === 'query') {
                       newAttributes = {
                         query: update(tab.draft.attributes.query, {
                           [action.key]: action.value,
                         }),
                       };
-                    } else {
-                      newAttributes = tab.draft.attributes;
+                      newParams = tab.draft.params;
                     }
-
                     return update(tab, {
                       draft: update(tab.draft, {
+                        params: newParams,
                         attributes: update(tab.draft.attributes, newAttributes),
                       }),
                     });
@@ -394,7 +408,6 @@ export function appStateReducer(state: AppState, action: AppStateAction): AppSta
       return state;
     }
     case 'OPEN_QUERY_TAB': {
-      console.log('OPEN_QUERY_TAB', action.queryId, state.currentView);
       if (state.currentView.kind !== 'page' || !state.currentView.nodeId) {
         return state;
       }
@@ -420,7 +433,7 @@ export function appStateReducer(state: AppState, action: AppStateAction): AppSta
         );
 
         if (selectedQueryTabIndex !== undefined && selectedQueryTabIndex > -1) {
-          update(state, {
+          return update(state, {
             currentView: update(state.currentView, {
               view: { kind: 'query', nodeId: action.queryId },
               queryPanel: update(state.currentView.queryPanel, {
@@ -428,68 +441,63 @@ export function appStateReducer(state: AppState, action: AppStateAction): AppSta
               }),
             }),
           });
-        } else {
-          /**
-           * Selected query is not open, add it as a tab
-           * and update the view
-           */
+        }
+        /**
+         * Selected query is not open, add it as a tab
+         * and update the view
+         */
 
-          let newTabIndex;
-          let newTabs;
-          const pageNode = appDom.getNode(state.dom, state.currentView.nodeId, 'page');
-          if (pageNode) {
-            const queries = appDom.getChildNodes(state.dom, pageNode).queries ?? [];
-            if (queries.length) {
-              const selectedQuery = queries?.find((query) => query?.id === action.queryId);
-              const newTab = {
-                meta: {
-                  id: action.queryId,
-                  name: selectedQuery?.name,
-                  dataSource: selectedQuery?.attributes?.dataSource,
-                },
-                saved: selectedQuery,
-                draft: selectedQuery,
-              };
+        let newTabIndex;
+        let newTabs;
+        const pageNode = appDom.getNode(state.dom, state.currentView.nodeId, 'page');
+        if (pageNode) {
+          const queries = appDom.getChildNodes(state.dom, pageNode).queries ?? [];
+          if (queries.length) {
+            const selectedQuery = queries?.find((query) => query?.id === action.queryId);
 
-              /**
-               * If no tabs are open, set the currentTabIndex to 0
+            const newTab = {
+              meta: {
+                id: action.queryId,
+                name: selectedQuery?.name,
+                dataSource: selectedQuery?.attributes?.dataSource,
+              },
+              saved: selectedQuery,
+              draft: selectedQuery,
+            };
+
+            /**
+             * If no tabs are open, set the currentTabIndex to 0
+             */
+            if (
+              !state.currentView?.queryPanel?.queryTabs ||
+              state?.currentView?.queryPanel?.queryTabs?.length === 0
+            ) {
+              newTabIndex = 0;
+              newTabs = [newTab];
+            } else {
+              /*
+               * If tabs are open, set the currentTabIndex to the next index
                */
-              if (
-                !state.currentView?.queryPanel?.queryTabs ||
-                state?.currentView?.queryPanel?.queryTabs?.length === 0
-              ) {
-                newTabIndex = 0;
-                newTabs = [newTab];
-              } else {
-                /*
-                 * If tabs are open, set the currentTabIndex to the next index
-                 */
-                newTabIndex = state.currentView?.queryPanel.queryTabs.length;
-                newTabs = [...state.currentView.queryPanel.queryTabs, newTab];
-              }
-
-              update(state, {
-                currentView: update(state.currentView, {
-                  view: { kind: 'query', nodeId: action.queryId },
-                  queryPanel: {
-                    currentTabIndex: newTabIndex,
-                    queryTabs: newTabs,
-                  },
-                }),
-              });
+              newTabIndex = state.currentView?.queryPanel.queryTabs.length;
+              newTabs = [...state.currentView.queryPanel.queryTabs, newTab];
             }
+            return update(state, {
+              currentView: {
+                ...state.currentView,
+                view: { kind: 'query', nodeId: action.queryId },
+                queryPanel: {
+                  currentTabIndex: newTabIndex,
+                  queryTabs: newTabs,
+                },
+              },
+            });
           }
         }
       }
       return state;
     }
     case 'CLOSE_QUERY_TAB': {
-      if (
-        state.currentView.kind !== 'page' ||
-        !state.currentView.nodeId ||
-        !state.currentView.queryPanel?.queryTabs ||
-        action.queryIndex === undefined
-      ) {
+      if (state.currentView.kind !== 'page' || !state.currentView.nodeId) {
         return state;
       }
       const tabs = state.currentView.queryPanel?.queryTabs;
@@ -534,11 +542,11 @@ export function appStateReducer(state: AppState, action: AppStateAction): AppSta
       // the query being closed is the one open,
       // select the previous tab, or the next tab if there is no previous tab
       else {
-        const queryIds = tabs.map((tab) => tab.meta.id);
+        const queryIds = tabs?.map((tab) => tab.meta.id);
         if (currentTabIndex !== undefined) {
           const replacementTabIndex =
             currentTabIndex > 0 ? currentTabIndex - 1 : currentTabIndex + 1;
-          const replacementQueryId = queryIds[replacementTabIndex];
+          const replacementQueryId = queryIds?.[replacementTabIndex];
           if (replacementQueryId) {
             newView.view = { kind: 'query', nodeId: replacementQueryId };
             newView.queryPanel = {
@@ -556,6 +564,86 @@ export function appStateReducer(state: AppState, action: AppStateAction): AppSta
         dom: newDom,
         currentView: newView,
       });
+    }
+    case 'CREATE_QUERY_TAB': {
+      if (state.currentView.kind !== 'page' || !state.currentView.nodeId) {
+        return state;
+      }
+      const pageNode = appDom.getNode(state.dom, state.currentView.nodeId, 'page');
+      const queryNode = appDom.createNode(state.dom, 'query', {
+        attributes: {
+          query: action.dataSource?.getInitialQueryValue(),
+          mode: action.mode ?? undefined,
+          connectionId: null,
+          dataSource: action?.dataSourceId,
+        },
+      });
+      const newDom = appDom.addNode(state.dom, queryNode, pageNode, 'queries');
+      const newView = { ...state.currentView };
+
+      /**
+       * To make the app state updates atomic, we must also simultaneously
+       * update the dom and the currentView
+       */
+
+      /**
+       * If tabs are open, simply add the new tab as the latest tab
+       */
+
+      if (state.currentView.queryPanel?.queryTabs) {
+        newView.view = { kind: 'query', nodeId: queryNode.id };
+        newView.queryPanel = {
+          queryTabs: [
+            ...state.currentView.queryPanel.queryTabs,
+            {
+              meta: {
+                id: queryNode.id,
+                name: queryNode.name,
+                dataSource: action.dataSourceId,
+              },
+              saved: queryNode,
+              draft: queryNode,
+            },
+          ],
+          currentTabIndex: state.currentView.queryPanel.queryTabs.length,
+        };
+      } else {
+        /**
+         * If no tabs are open, initialise the query panel
+         */
+        newView.view = { kind: 'query', nodeId: queryNode.id };
+        newView.queryPanel = {
+          queryTabs: [
+            {
+              meta: {
+                id: queryNode.id,
+                name: queryNode.name,
+                dataSource: action.dataSourceId,
+              },
+              saved: queryNode,
+              draft: queryNode,
+            },
+          ],
+          currentTabIndex: 0,
+        };
+      }
+
+      return update(state, {
+        dom: newDom,
+        currentView: newView,
+      });
+    }
+    case 'CLOSE_QUERY_PANEL': {
+      if (state.currentView.kind === 'page') {
+        return update(state, {
+          currentView: {
+            ...state.currentView,
+            view: undefined,
+            queryPanel: undefined,
+          },
+        });
+      }
+      return state;
     }
     default:
       return state;
@@ -656,6 +744,14 @@ function createAppStateApi(
         queryId,
       });
     },
+    createQueryTab(dataSource: ClientDataSource, dataSourceId: string, mode?: appDom.FetchMode) {
+      dispatch({
+        type: 'CREATE_QUERY_TAB',
+        dataSource,
+        dataSourceId,
+        mode,
+      });
+    },
     closeQueryTab(queryIndex: number, queryId: NodeId, deleteQuery?: boolean) {
       dispatch({
         type: 'CLOSE_QUERY_TAB',
@@ -664,13 +760,19 @@ function createAppStateApi(
         deleteQuery,
       });
     },
+    closeQueryPanel() {
+      dispatch({
+        type: 'CLOSE_QUERY_PANEL',
+      });
+    },
     setQueryDraftProp(
       name: string,
-      key: QueryNodeProp | QueryNodeAttribute,
+      key: QueryNodeProp | QueryNodeAttribute | string,
       value:
         | appDom.QueryNode['attributes']['query'][QueryNodeProp]
-        | appDom.QueryNode['attributes'][QueryNodeAttribute],
-      namespace?: 'query' | 'attributes',
+        | appDom.QueryNode['attributes'][QueryNodeAttribute]
+        | BindableAttrValue<any>,
+      namespace?: 'query' | 'attributes' | 'params',
     ) {
       dispatch({
         type: 'SET_QUERY_DRAFT_PROP',
@@ -737,6 +839,10 @@ const UNDOABLE_ACTIONS = new Set<AppStateActionType>([
   'SET_PAGE_VIEW_TAB',
   'SELECT_NODE',
   'DESELECT_NODE',
+  'SET_QUERY_DRAFT_PROP',
+  'OPEN_QUERY_TAB',
+  'CREATE_QUERY_TAB',
+  'CLOSE_QUERY_TAB',
 ]);
 
 function isCancellableAction(action: AppStateAction): boolean {

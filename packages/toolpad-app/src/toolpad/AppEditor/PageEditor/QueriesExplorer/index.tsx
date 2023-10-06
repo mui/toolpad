@@ -22,10 +22,8 @@ import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import * as appDom from '../../../../appDom';
 import dataSources from '../../../../toolpadDataSources/client';
 import QueryIcon from '../../QueryIcon';
-import { useDomApi, useAppState, useAppStateApi } from '../../../AppState';
+import { useAppState, useAppStateApi } from '../../../AppState';
 import NodeMenu from '../../NodeMenu';
-import EditableText from '../../../../components/EditableText';
-import { useNodeNameValidation } from '../../PagesExplorer/validation';
 
 const classes = {
   treeItemMenuButton: 'Toolpad__QueryListItem',
@@ -87,9 +85,6 @@ function HierarchyTreeItem(props: StyledTreeItemProps) {
     onSelectNode?.(toolpadNodeId);
   }, [onSelectNode, toolpadNodeId, props.nodeId]);
 
-  const { dom } = useAppState();
-  const domApi = useDomApi();
-
   const queryCreationMode = React.useMemo(() => {
     if (props.nodeId === ':query') {
       return 'query';
@@ -100,39 +95,6 @@ function HierarchyTreeItem(props: StyledTreeItemProps) {
     return undefined;
   }, [props.nodeId]);
 
-  const [queryNameEditable, setQueryNameEditable] = React.useState(false);
-  const [queryNameInput, setQueryNameInput] = React.useState(labelText);
-  const handleQueryNameChange = React.useCallback(
-    (newValue: string) => setQueryNameInput(newValue),
-    [],
-  );
-  const handleStopEditing = React.useCallback(() => {
-    setQueryNameInput(labelText);
-    setQueryNameEditable(false);
-  }, [labelText]);
-
-  const existingNames = React.useMemo(() => {
-    if (toolpadNodeId) {
-      const node = appDom.getNode(dom, toolpadNodeId);
-      if (node) {
-        return appDom.getExistingNamesForNode(dom, node);
-      }
-    }
-    return new Set([]);
-  }, [dom, toolpadNodeId]);
-
-  const nodeNameError = useNodeNameValidation(queryNameInput, existingNames, 'query');
-  const isNameValid = !nodeNameError;
-
-  const handleNameSave = React.useCallback(() => {
-    if (isNameValid && toolpadNodeId) {
-      setQueryNameInput(queryNameInput);
-      domApi.setNodeName(toolpadNodeId, queryNameInput);
-    } else {
-      setQueryNameInput(labelText);
-    }
-  }, [isNameValid, domApi, toolpadNodeId, labelText, queryNameInput]);
-
   return (
     <StyledTreeItem
       label={
@@ -141,18 +103,12 @@ function HierarchyTreeItem(props: StyledTreeItemProps) {
             id={labelIconId || 'query'}
             sx={{ fontSize: 28, mt: 0.1, ml: -1, ...labelIconSx }}
           />
-          <EditableText
-            value={queryNameInput}
+          <Typography
             variant="body2"
-            editable={queryNameEditable}
-            onDoubleClick={() => setQueryNameEditable(true)}
-            onChange={handleQueryNameChange}
-            onClose={handleStopEditing}
-            onSave={handleNameSave}
-            error={!isNameValid}
-            helperText={nodeNameError}
-            sx={{ flexGrow: 1 }}
-          />
+            sx={{ flexGrow: 1, textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap' }}
+          >
+            {labelText}
+          </Typography>
           {onCreate ? (
             <IconButton
               aria-label={createLabelText}
@@ -184,7 +140,6 @@ function HierarchyTreeItem(props: StyledTreeItemProps) {
               renameLabelText={renameLabelText}
               onDeleteNode={onDeleteNode}
               onDuplicateNode={onDuplicateNode}
-              onRenameNode={() => setQueryNameEditable(true)}
             />
           ) : null}
         </Box>
@@ -197,7 +152,7 @@ function HierarchyTreeItem(props: StyledTreeItemProps) {
 interface CreateQueryPopoverProps {
   anchorEl: Element | null;
   createPopoverOpen: boolean;
-  handleCreateNode: (dataSourceId: string) => () => void;
+  handleCreateNode: (dataSourceId: string, createMode?: appDom.FetchMode) => () => void;
   handleCreateClose: () => void;
   createMode: appDom.FetchMode | undefined;
 }
@@ -277,7 +232,7 @@ function CreateQueryPopover({
                 key={dataSourceId}
                 sx={{ minHeight: 50, minWidth: 150 }}
                 variant="outlined"
-                onClick={handleCreateNode(dataSourceId)}
+                onClick={handleCreateNode(dataSourceId, createMode)}
               >
                 <QueryIcon id={dataSourceId} sx={{ fontSize: 28, mr: 0.5, mt: 0.1 }} />{' '}
                 {dataSource?.displayName || dataSourceId}
@@ -343,30 +298,18 @@ export function QueriesExplorer() {
   const createPopoverOpen = Boolean(anchorEl);
 
   const handleCreateNode = React.useCallback(
-    (dataSourceId: string) => () => {
+    (dataSourceId: string, mode?: appDom.FetchMode) => () => {
       const dataSource = dataSources[dataSourceId];
       invariant(dataSource, `Selected non-existing dataSource "${dataSourceId}"`);
       invariant(
         currentPageId,
-        'handleDuplicateNode should only be used for queries, which should always belong to a page',
+        'handleCreateNode should only be used for queries, which should always belong to a page',
       );
-      const currentPageNode = appDom.getNode(dom, currentPageId, 'page');
 
-      const node = appDom.createNode(dom, 'query', {
-        attributes: {
-          query: dataSource.getInitialQueryValue(),
-          connectionId: null,
-          dataSource: dataSourceId,
-        },
-      });
-      appStateApi.update((draft) => appDom.addNode(draft, node, currentPageNode, 'queries'), {
-        kind: 'page',
-        nodeId: currentPageId,
-        view: { kind: 'query', nodeId: node.id },
-      });
+      appStateApi.createQueryTab(dataSource, dataSourceId, mode);
       setAnchorEl(null);
     },
-    [dom, currentPageId, appStateApi],
+    [currentPageId, appStateApi],
   );
 
   const handleDeleteNode = React.useCallback(
@@ -412,7 +355,6 @@ export function QueriesExplorer() {
         sx={{
           flexGrow: 1,
           maxWidth: 400,
-          maxHeight: '85%',
           overflowY: 'auto',
           scrollbarGutter: 'stable',
         }}

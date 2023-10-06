@@ -1,13 +1,4 @@
-import {
-  Box,
-  Stack,
-  TextField,
-  Tooltip,
-  InputAdornment,
-  Alert,
-  MenuItem,
-  Typography,
-} from '@mui/material';
+import { Box, Stack, TextField, InputAdornment, Alert, MenuItem, Typography } from '@mui/material';
 import * as React from 'react';
 import SettingsIcon from '@mui/icons-material/Settings';
 import DynamicFormIcon from '@mui/icons-material/DynamicForm';
@@ -169,6 +160,7 @@ const settingsToggleIconStyles = {
   p: 0,
   mr: 1,
   color: 'primary.main',
+  fontSize: 16,
   cursor: 'pointer',
   '&:hover': {
     color: 'primary.dark',
@@ -182,14 +174,10 @@ function QuerySettingsToggleButton({
   tab: QueryEditorTab;
   handleTabChange: () => void;
 }) {
-  return (
-    <Tooltip title={`Show query ${tab === 'config' ? 'settings' : 'config'}`} placement="left">
-      {tab === 'config' ? (
-        <SettingsIcon sx={settingsToggleIconStyles} onClick={handleTabChange} />
-      ) : (
-        <DynamicFormIcon sx={settingsToggleIconStyles} onClick={handleTabChange} />
-      )}
-    </Tooltip>
+  return tab === 'config' ? (
+    <SettingsIcon sx={settingsToggleIconStyles} onClick={handleTabChange} />
+  ) : (
+    <DynamicFormIcon sx={settingsToggleIconStyles} onClick={handleTabChange} />
   );
 }
 
@@ -236,7 +224,7 @@ export default function QueryEditorPanel({ draft, saved }: QueryNodeEditorProps)
 
   return dataSourceId && dataSource && queryEditorContext ? (
     <ConnectionContextProvider value={queryEditorContext}>
-      <div>
+      <Box sx={{ height: '100%', p: 0, overflow: 'hidden' }}>
         {draft ? (
           <dataSource.QueryEditor
             connectionParams={connectionParams}
@@ -260,7 +248,7 @@ export default function QueryEditorPanel({ draft, saved }: QueryNodeEditorProps)
             }
           />
         ) : null}
-      </div>
+      </Box>
     </ConnectionContextProvider>
   ) : (
     <Alert severity="error">Datasource &quot;{dataSourceId}&quot; not found</Alert>

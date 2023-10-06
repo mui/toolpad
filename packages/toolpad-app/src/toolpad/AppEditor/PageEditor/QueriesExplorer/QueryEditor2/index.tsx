@@ -1,37 +1,31 @@
 import * as React from 'react';
 import { NodeId } from '@mui/toolpad-core';
-import { Box, Chip, Tab } from '@mui/material';
+import { Box, Stack, Chip, Tab, IconButton } from '@mui/material';
 import { LoadingButton, TabList, TabContext, TabPanel } from '@mui/lab';
 import ClearOutlinedIcon from '@mui/icons-material/ClearOutlined';
 import CircleIcon from '@mui/icons-material/Circle';
 import PlayArrow from '@mui/icons-material/PlayArrow';
+import CancelPresentationIcon from '@mui/icons-material/CancelPresentation';
 import * as appDom from '../../../../../appDom';
 import { useAppState, useAppStateApi, useDomApi } from '../../../../AppState';
 import QueryIcon from '../../../QueryIcon';
 import QueryEditorPanel from './QueryEditor2Dialog';
+import EditableText from '../../../../../components/EditableText';
 import QueryToolsContext, { QueryToolsContextProps } from './QueryToolsContext';
 import { QueryEditorToolsTab } from '../../../../../types';
-import { PAGE_PANEL_WIDTH } from '../../../../../constants';
+import { useNodeNameValidation } from '../../../PagesExplorer/validation';
 
-function TabCloseIcon({ queryIndex, queryId }: { queryIndex?: number; queryId?: NodeId }) {
-  const { currentView } = useAppState();
+function TabCloseIcon({
+  queryIndex,
+  unsaved,
+  queryId,
+}: {
+  queryIndex?: number;
+  unsaved?: boolean;
+  queryId?: NodeId;
+}) {
   const appStateApi = useAppStateApi();
-  const unsaved = React.useMemo(() => {
-    if (
-      currentView.kind !== 'page' ||
-      !currentView.nodeId ||
-      !currentView.queryPanel?.queryTabs ||
-      queryIndex === undefined
-    ) {
-      return false;
-    }
-    const tab = currentView.queryPanel?.queryTabs[queryIndex];
-    const draft = tab?.draft;
-    if (!tab || !tab.meta?.id || !draft) {
-      return false;
-    }
-    return draft !== tab.saved;
-  }, [currentView, queryIndex]);
+
   const [notHovered, setNotHovered] = React.useState(true);
 
   const onClose = React.useCallback(
@@ -49,7 +43,9 @@ function TabCloseIcon({ queryIndex, queryId }: { queryIndex?: number; queryId?: 
     <CircleIcon
       sx={{
         color: (theme) =>
-          theme.palette.mode === 'dark' ? theme.palette.primaryDark[300] : theme.palette.grey[500],
+          theme.palette.mode === 'dark'
+            ? theme.palette.primaryDark[300]
+            : theme.palette.primary.main,
         fontSize: 12,
       }}
       onMouseEnter={() => {
@@ -79,6 +75,85 @@ function TabCloseIcon({ queryIndex, queryId }: { queryIndex?: number; queryId?: 
           borderRadius: '4px',
         },
       }}
+    />
+  );
+}
+
+function QueryTab({ query, value, unsaved }: { query: any; value: string; unsaved: boolean }) {
+  const { dom } = useAppState();
+  const domApi = useDomApi();
+
+  const [queryNameEditable, setQueryNameEditable] = React.useState(false);
+  const [queryNameInput, setQueryNameInput] = React.useState(query?.meta?.name);
+  const handleQueryNameChange = React.useCallback(
+    (newValue: string) => setQueryNameInput(newValue),
+    [],
+  );
+  const handleStopEditing = React.useCallback(() => {
+    setQueryNameInput(query?.meta?.name);
+    setQueryNameEditable(false);
+  }, [query?.meta?.name]);
+
+  const existingNames = React.useMemo(() => {
+    if (query?.meta?.id) {
+      const node = appDom.getNode(dom, query?.meta?.id, 'query');
+      if (node) {
+        return appDom.getExistingNamesForNode(dom, node);
+      }
+    }
+    return new Set([]);
+  }, [dom, query]);
+
+  const nodeNameError = useNodeNameValidation(queryNameInput, existingNames, 'query');
+  const isNameValid = !nodeNameError;
+
+  const handleNameSave = React.useCallback(() => {
+    if (isNameValid && query?.meta?.id) {
+      setQueryNameInput(queryNameInput);
+      domApi.setNodeName(query, queryNameInput);
+    } else {
+      setQueryNameInput(query?.meta?.name);
+    }
+  }, [isNameValid, domApi, query, queryNameInput]);
+  return (
+    <Tab
+      key={query?.meta?.name}
+      label={
+        <Chip
+          label={
+            <EditableText
+              value={queryNameInput}
+              variant="body2"
+              editable={queryNameEditable}
+              onDoubleClick={() => setQueryNameEditable(true)}
+              onChange={handleQueryNameChange}
+              onClose={handleStopEditing}
+              onSave={handleNameSave}
+              error={!isNameValid}
+              helperText={nodeNameError}
+            />
+          }
+          size="small"
+          variant="outlined"
+          sx={{
+            color: 'inherit',
+            border: 0,
+            ml: -1,
+            '&:hover': { color: 'inherit' },
+          }}
+          deleteIcon={
+            <TabCloseIcon
+              queryIndex={parseInt(value, 10)}
+              unsaved={unsaved}
+              queryId={query?.meta?.id}
+            />
+          }
+          onDelete={() => {}}
+        />
+      }
+      value={value}
+      icon={<QueryIcon id={query?.meta?.dataSource || 'default'} sx={{ fontSize: 24, mt: 0.2 }} />}
+      iconPosition="start"
     />
   );
 }
@@ -153,6 +228,26 @@ export default function QueryEditor() {
     [appStateApi, currentView],
   );
 
+  const hasUnsavedChanges = React.useCallback(
+    (queryIndex: number) => {
+      if (
+        currentView.kind !== 'page' ||
+        !currentView.nodeId ||
+        !currentView.queryPanel?.queryTabs ||
+        queryIndex === undefined
+      ) {
+        return false;
+      }
+      const tab = currentView.queryPanel?.queryTabs[queryIndex];
+      const draft = tab?.draft;
+      if (!tab || !tab.meta?.id || !draft) {
+        return false;
+      }
+      return draft !== tab.saved;
+    },
+    [currentView],
+  );
+
   const handleSave = React.useCallback(() => {
     if (
       currentView.kind !== 'page' ||
@@ -176,106 +271,108 @@ export default function QueryEditor() {
     }
   }, [dom, domApi, appStateApi, currentView]);
 
+  const onClosePanel = React.useCallback(() => {
+    appStateApi.closeQueryPanel();
+  }, [appStateApi]);
+
   return currentView.kind === 'page' &&
     currentView.view?.kind === 'query' &&
     currentQueryId &&
     currentView?.queryPanel?.queryTabs ? (
-    <Box
-      sx={{
-        left: PAGE_PANEL_WIDTH,
-        width: '100%',
-        height: '100%',
-        overflow: 'scroll',
-      }}
+    <Stack
+      direction="column"
+      sx={{ height: '100%', overflow: 'hidden', borderBottom: 5, borderColor: 'divider' }}
     >
       <TabContext value={currentTabIndex}>
         <QueryToolsContext.Provider value={queryToolsContext}>
-          <Box
-            sx={{
-              borderBottom: 1,
-              borderColor: 'divider',
-              display: 'flex',
-              flexDirection: 'row',
-              justifyContent: 'space-between',
-            }}
-          >
-            <TabList
-              onChange={handleTabChange}
-              aria-label="Query editor panel"
-              sx={{ maxHeight: 36 }}
+          <Stack direction="column">
+            <Stack
+              direction={'row'}
+              justifyContent={'space-between'}
+              sx={{ maxHeight: 40, borderBottom: 1, borderColor: 'divider' }}
             >
-              {currentView.queryPanel?.queryTabs?.map((query, index) => (
-                <Tab
-                  key={query?.meta?.name}
-                  label={
-                    <Chip
-                      label={query?.meta?.name}
-                      size="small"
-                      variant="outlined"
-                      sx={{
-                        color: 'inherit',
-                        border: 0,
-                        ml: -1,
-                        '&:hover': { color: 'inherit' },
-                      }}
-                      deleteIcon={<TabCloseIcon queryIndex={index} queryId={query?.meta?.id} />}
-                      onDelete={() => {}}
-                    />
-                  }
-                  icon={
-                    <QueryIcon
-                      id={query?.meta?.dataSource || 'default'}
-                      sx={{ fontSize: 24, mt: 0.2 }}
-                    />
-                  }
-                  iconPosition="start"
-                  value={index.toString()}
+              <TabList onChange={handleTabChange} aria-label="Query editor panel">
+                {currentView.queryPanel?.queryTabs?.map((query, index) => (
+                  <QueryTab
+                    key={query?.meta?.name}
+                    query={query}
+                    value={index.toString()}
+                    unsaved={hasUnsavedChanges(index)}
+                  />
+                ))}
+              </TabList>
+              <IconButton size="small" disableRipple onClick={onClosePanel}>
+                <CancelPresentationIcon
+                  sx={{
+                    mr: 1,
+                    alignSelf: 'center',
+                    color: (theme) => theme.palette.grey[500],
+                    transition: (theme) =>
+                      theme.transitions.create('color', {
+                        duration: theme.transitions.duration.shortest,
+                      }),
+                    '&:hover, &:focus': {
+                      color: (theme) =>
+                        theme.palette.mode === 'dark'
+                          ? theme.palette.primaryDark[300]
+                          : theme.palette.primary.main,
+                    },
+                    fontSize: 16,
+                  }}
                 />
-              ))}
-            </TabList>
-          </Box>
-          <Box
-            sx={{
-              display: 'flex',
-              justifyContent: 'end',
-              borderBottom: 1,
-              borderColor: 'divider',
-              height: 40,
-            }}
-          >
-            <LoadingButton
-              disabled={isPreviewLoading || toolsTab !== 'preview'}
-              loading={isPreviewLoading}
-              variant="outlined"
-              color="primary"
-              onClick={handleRunPreview}
-              endIcon={<PlayArrow />}
+              </IconButton>
+            </Stack>
+            <Box
               sx={{
-                width: 'fit-content',
-                height: 32,
-                mr: 1,
-                my: 'auto',
-                alignSelf: 'center',
+                display: 'flex',
+                justifyContent: 'center',
+                gap: 1,
+                minHeight: 60,
+                borderBottom: 1,
+                borderColor: 'divider',
               }}
             >
-              Preview
-            </LoadingButton>
-            <LoadingButton
-              onClick={handleSave}
-              variant="contained"
-              color="primary"
-              sx={{ width: 'fit-content', height: 32, my: 'auto', mr: 2 }}
-            >
-              Save
-            </LoadingButton>
-          </Box>
+              <LoadingButton
+                disabled={isPreviewLoading}
+                loading={isPreviewLoading}
+                variant="outlined"
+                color="primary"
+                onClick={handleRunPreview}
+                endIcon={<PlayArrow />}
+                sx={{
+                  width: 'fit-content',
+                  height: 32,
+                  mr: 1,
+                  my: 'auto',
+                  alignSelf: 'center',
+                }}
+              >
+                Preview
+              </LoadingButton>
+              <LoadingButton
+                disabled={!hasUnsavedChanges(parseInt(currentTabIndex, 10))}
+                onClick={handleSave}
+                variant="contained"
+                color="primary"
+                sx={{ width: 'fit-content', height: 32, my: 'auto', mr: 2 }}
+              >
+                Save
+              </LoadingButton>
+            </Box>
+          </Stack>
+
           {currentView.queryPanel?.queryTabs?.map((query, index) => {
             if (query && query.draft) {
               return (
                 <TabPanel
                   key={query.meta?.name}
                   value={index.toString()}
-                  sx={{ p: 0, overflow: 'scroll', height: '100%' }}
+                  sx={{
+                    p: 1,
+                    pb: 0,
+                    height: '100%',
+                    overflow: 'hidden',
+                  }}
                 >
                   <QueryEditorPanel draft={query.draft} saved={query.saved} />
                 </TabPanel>
@@ -285,6 +382,6 @@ export default function QueryEditor() {
           })}
         </QueryToolsContext.Provider>
       </TabContext>
-    </Box>
+    </Stack>
   ) : null;
 }

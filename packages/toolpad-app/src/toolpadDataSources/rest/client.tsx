@@ -292,7 +292,7 @@ function QueryEditor({
   const handleParamsChange = React.useCallback(
     (newParams: [string, BindableAttrValue<string>][]) => {
       if (input?.name) {
-        appStateApi.setQueryDraftProp(input?.name, 'params', newParams, 'query');
+        appStateApi.setQueryDraftProp(input?.name, 'params', newParams);
       }
     },
     [appStateApi, input],
@@ -465,16 +465,8 @@ function QueryEditor({
 
   return (
     <PanelGroup direction="horizontal">
-      <Panel defaultSize={50} minSize={40}>
-        <Stack
-          gap={0}
-          sx={{
-            pl: 2,
-            pr: 0,
-            pt: 1,
-            borderRight: (theme) => `1px solid ${theme.palette.divider}`,
-          }}
-        >
+      <Panel defaultSize={50} minSize={40} style={{ overflow: 'auto', scrollbarGutter: 'stable' }}>
+        <Stack direction="column" gap={0}>
           <Stack direction={'row'} sx={{ display: 'flex', justifyContent: 'space-between' }}>
             <Typography
               fontSize={12}
@@ -618,15 +610,13 @@ function QueryEditor({
       <PanelResizeHandle />
       <Panel defaultSize={50} minSize={20}>
         <PanelGroup direction="vertical">
-          <Panel defaultSize={50}>
+          <Panel defaultSize={40} style={{ overflow: 'auto', scrollbarGutter: 'stable' }}>
             <Box
               display={'flex'}
               flexDirection={'column'}
               sx={{
-                p: 0.25,
-                mt: 1,
-                ml: 1,
-                borderRight: (theme) => `1px solid ${theme.palette.divider}`,
+                px: 1,
+                pt: 0.25,
               }}
             >
               <Typography
@@ -651,16 +641,14 @@ function QueryEditor({
           </Panel>
           <PanelResizeHandle />
           {toolsTab ? (
-            <Panel defaultSize={50}>
+            <Panel defaultSize={60} style={{ overflow: 'auto', scrollbarGutter: 'stable' }}>
               <TabContext value={toolsTab}>
                 <Box
                   sx={{
                     borderBottom: 1,
                     borderColor: 'divider',
                     display: 'flex',
-                    flexDirection: 'row',
-                    justifyContent: 'space-between',
-                    height: 36,
+                    height: 32,
                   }}
                 >
                   <TabList
@@ -682,7 +670,7 @@ function QueryEditor({
                 </TabPanel>
                 <TabPanel value="devtools" disableGutters>
                   <Devtools
-                    sx={{ width: '100%', height: '100%' }}
+                    sx={{ overflow: 'auto' }}
                     har={previewHar}
                     onHarClear={handleHarClear}
                   />

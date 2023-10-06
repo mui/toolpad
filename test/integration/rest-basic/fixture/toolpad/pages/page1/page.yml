@@ -20,7 +20,7 @@ spec:
           $$jsExpression: |
             `query1: ${query1.data.args.query1_param1}`
     - component: Button
-      name: button
+      name: button2Renamed
       layout:
         columnSize: 1
       props:
@@ -52,7 +52,7 @@ spec:
           $$jsExpression: |
             `query4 authorization: ${queryWithEnv?.data.headers.Authorization}`
     - component: DataGrid
-      name: dataGrid
+      name: dataGridRenamed
   queries:
     - name: query2
       query:
@@ -83,7 +83,15 @@ spec:
     - name: queryWithEnv
       query:
         kind: rest
-        url: http://localhost:8080/get
+        url: http://localhost:8081/get
         searchParams: []
         headers: [{ name: Authorization, value: { $$env: TEST_VAR } }]
         method: GET
+    - name: customers
+      mode: query
+      query:
+        kind: rest
+        headers: []
+        method: GET
+        url: https://635aaf68aa7c3f113daceeef.mockapi.io/customers
+        searchParams: []

@@ -71,6 +71,10 @@ export default function RenderPanel({ className }: RenderPanelProps) {
       });
     });
 
+    initializedBridge.canvasEvents.on('editorNodeDataUpdated', (event) => {
+      pageEditorApi.nodeDataUpdate(event.nodeId, event.prop, event.value);
+    });
+
     initializedBridge.canvasEvents.on('pageStateUpdated', (event) => {
       pageEditorApi.pageStateUpdate(event.pageState, event.globalScopeMeta);
     });

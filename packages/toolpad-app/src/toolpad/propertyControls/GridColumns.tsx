@@ -267,7 +267,7 @@ function GridColumnsPropEditor({
   onChange,
   disabled,
 }: EditorProps<SerializableGridColumns>) {
-  const { bindings } = usePageEditorState();
+  const { nodeData } = usePageEditorState();
   const [editedIndex, setEditedIndex] = React.useState<number | null>(null);
 
   const editedColumn = typeof editedIndex === 'number' ? value[editedIndex] : null;
@@ -281,12 +281,11 @@ function GridColumnsPropEditor({
     setMenuAnchorEl(null);
   };
 
-  const rowsValue = nodeId && bindings[`${nodeId}.props.rawRows`];
-  const definedRows: unknown = rowsValue?.value;
+  const rawRows: unknown = nodeId && nodeData[nodeId]?.rawRows;
 
   const inferredColumns = React.useMemo(
-    () => inferColumns(Array.isArray(definedRows) ? definedRows : []),
-    [definedRows],
+    () => inferColumns(Array.isArray(rawRows) ? rawRows : []),
+    [rawRows],
   );
 
   const columnSuggestions = React.useMemo(() => {

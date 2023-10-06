@@ -375,6 +375,11 @@ export type RuntimeEvents = {
     prop: string;
     value: React.SetStateAction<unknown>;
   };
+  editorNodeDataUpdated: {
+    nodeId: NodeId;
+    prop: string;
+    value: any;
+  };
   pageStateUpdated: {
     pageState: Record<string, unknown>;
     globalScopeMeta: ScopeMeta;

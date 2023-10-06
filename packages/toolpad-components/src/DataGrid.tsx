@@ -720,8 +720,8 @@ const DataGridComponent = React.forwardRef(function DataGridComponent(
   }
 
   React.useEffect(() => {
-    onRawRowsChange?.(rows);
-  }, [rows, onRawRowsChange]);
+    nodeRuntime?.updateEditorNodeData('rawRows', rows);
+  }, [nodeRuntime, rows]);
 
   return (
     <LicenseInfoProvider info={LICENSE_INFO}>
@@ -868,12 +868,6 @@ export default createBuiltin(DataGridComponent, {
     sx: {
       helperText: SX_PROP_HELPER_TEXT,
       type: 'object',
-    },
-    rawRows: {
-      helperText: 'The rows as provided to the DataGrid Component. Used internally.',
-      type: 'array',
-      visible: false,
-      onChangeProp: 'onRawRowsChange',
     },
   },
 });

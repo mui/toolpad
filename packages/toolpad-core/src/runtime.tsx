@@ -14,6 +14,7 @@ import type {
   RuntimeError,
   PaginationMode,
   ToolpadDataProviderBase,
+  NodeId,
 } from './types';
 import { createComponent } from './browser';
 
@@ -32,7 +33,7 @@ declare global {
 }
 
 export const NodeRuntimeContext = React.createContext<{
-  nodeId: string | null;
+  nodeId: NodeId | null;
   nodeName: string | null;
 }>({
   nodeId: null,
@@ -111,7 +112,7 @@ function NodeFiberHost({ children }: NodeFiberHostProps) {
 
 export interface NodeRuntimeWrapperProps {
   children: React.ReactElement;
-  nodeId: string;
+  nodeId: NodeId;
   nodeName: string;
   componentConfig: ComponentConfig<any>;
   NodeError: React.ComponentType<NodeErrorProps>;
@@ -166,6 +167,7 @@ export interface NodeRuntime<P> {
     key: K,
     value: React.SetStateAction<P[K]>,
   ) => void;
+  updateEditorNodeData: (key: string, value: any) => void;
 }
 
 export function useNode<P = {}>(): NodeRuntime<P> | null {
@@ -181,6 +183,13 @@ export function useNode<P = {}>(): NodeRuntime<P> | null {
       nodeName,
       updateAppDomConstProp: (prop, value) => {
         canvasEvents.emit('propUpdated', {
+          nodeId,
+          prop,
+          value,
+        });
+      },
+      updateEditorNodeData: (prop: string, value: any) => {
+        canvasEvents.emit('editorNodeDataUpdated', {
           nodeId,
           prop,
           value,

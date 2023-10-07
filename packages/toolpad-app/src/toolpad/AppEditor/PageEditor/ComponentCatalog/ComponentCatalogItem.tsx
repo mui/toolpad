@@ -32,8 +32,10 @@ import TableRowsIcon from '@mui/icons-material/TableRows';
 import ViewColumnIcon from '@mui/icons-material/ViewColumn';
 import TagIcon from '@mui/icons-material/Tag';
 import { ButtonBase, SxProps } from '@mui/material';
+import PasswordIcon from '@mui/icons-material/Password';
 
 const iconMap = new Map<string, React.ComponentType<SvgIconProps>>([
+  ['Password', PasswordIcon],
   ['Autocomplete', ManageSearchIcon],
   ['Text', NotesIcon],
   ['Button', SmartButtonIcon],

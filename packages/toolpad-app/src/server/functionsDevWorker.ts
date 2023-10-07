@@ -1,51 +1,23 @@
-import { once } from 'node:events';
-import { Worker, MessageChannel, MessagePort, isMainThread, parentPort } from 'worker_threads';
+import { Worker, MessageChannel, isMainThread, parentPort } from 'worker_threads';
 import * as path from 'path';
 import { createRequire } from 'node:module';
 import * as fs from 'fs/promises';
 import * as vm from 'vm';
-import * as url from 'url';
-import fetch, { Headers, Request, Response } from 'node-fetch';
-import { errorFrom, serializeError } from '@mui/toolpad-utils/errors';
-import { ServerContext, getContext, withContext } from '@mui/toolpad-core/server';
+import * as url from 'node:url';
+import { getCircularReplacer, replaceRecursive } from '@mui/toolpad-utils/json';
+import { ServerContext, getServerContext, withContext } from '@mui/toolpad-core/serverRuntime';
+import { isWebContainer } from '@webcontainer/env';
+import SuperJSON from 'superjson';
+import { createRpcClient, serveRpc } from '@mui/toolpad-utils/workerRpc';
+import { workerData } from 'node:worker_threads';
+import { ToolpadDataProviderIntrospection } from '@mui/toolpad-core/runtime';
+import { TOOLPAD_DATA_PROVIDER_MARKER, ToolpadDataProvider } from '@mui/toolpad-core/server';
+import * as z from 'zod';
+import { fromZodError } from 'zod-validation-error';
+import { GetRecordsParams, GetRecordsResult, PaginationMode } from '@mui/toolpad-core';
 
-function getCircularReplacer() {
-  const ancestors: object[] = [];
-  return function replacer(this: object, key: string, value: unknown) {
-    if (typeof value !== 'object' || value === null) {
-      return value;
-    }
-    // `this` is the object that value is contained in,
-    // i.e., its direct parent.
-    while (ancestors.length > 0 && ancestors.at(-1) !== this) {
-      ancestors.pop();
-    }
-    if (ancestors.includes(value)) {
-      return '[Circular]';
-    }
-    ancestors.push(value);
-    return value;
-  };
-}
-
-type IntrospectedFiles = Map<string, { file: string }>;
-
-interface IntrospectMessage {
-  kind: 'introspect';
-  files: IntrospectedFiles;
-}
-
-interface ExecuteMessage {
-  kind: 'execute';
-  filePath: string;
-  name: string;
-  parameters: unknown[];
-  ctx: ServerContext;
-}
-
-type WorkerMessage = IntrospectMessage | ExecuteMessage;
-
-type TransferredMessage = WorkerMessage & { port: MessagePort };
+import.meta.url ??= url.pathToFileURL(__filename).toString();
+const currentDirectory = url.fileURLToPath(new URL('.', import.meta.url));
 
 interface ModuleObject {
   exports: Record<string, unknown>;
@@ -67,7 +39,7 @@ function loadModule(fullPath: string, content: string) {
   return moduleObject;
 }
 
-async function resolveFunctions(filePath: string): Promise<Record<string, Function>> {
+async function resolveExports(filePath: string): Promise<Map<string, unknown>> {
   const fullPath = path.resolve(filePath);
   const content = await fs.readFile(fullPath, 'utf-8');
 
@@ -83,76 +55,137 @@ async function resolveFunctions(filePath: string): Promise<Record<string, Functi
     moduleCache.set(fullPath, cachedModule);
   }
 
-  return Object.fromEntries(
-    Object.entries(cachedModule.exports).flatMap(([key, value]) =>
-      typeof value === 'function' ? [[key, value]] : [],
-    ),
-  );
+  return new Map(Object.entries(cachedModule.exports));
 }
 
-async function execute(msg: ExecuteMessage) {
-  const fns = await resolveFunctions(msg.filePath);
+interface ExecuteParams {
+  filePath: string;
+  name: string;
+  parameters: unknown[];
+  cookies?: Record<string, string>;
+}
 
-  const fn = fns[msg.name];
+interface ExecuteResult {
+  result: string;
+  newCookies: [string, string][];
+}
+
+async function execute(msg: ExecuteParams): Promise<ExecuteResult> {
+  const exports = await resolveExports(msg.filePath);
+
+  const fn = exports.get(msg.name);
   if (typeof fn !== 'function') {
     throw new Error(`Function "${msg.name}" not found`);
   }
 
-  const result = await withContext(msg.ctx, async () => {
-    return fn(...msg.parameters);
-  });
+  let functionFinished = false;
 
-  return result;
-}
+  try {
+    const newCookies = new Map<string, string>();
 
-async function handleMessage(msg: WorkerMessage) {
-  switch (msg.kind) {
-    case 'execute':
-      return execute(msg);
-    default:
-      throw new Error(`Unknown kind "${(msg as any).kind}"`);
+    const ctx: ServerContext = {
+      cookies: msg.cookies || {},
+      setCookie(name: string, value: string) {
+        if (functionFinished) {
+          throw new Error(`setCookie can't be called after the function has finished executing.`);
+        }
+        newCookies.set(name, value);
+      },
+    };
+
+    const shouldBypassContext = isWebContainer();
+
+    if (shouldBypassContext) {
+      console.warn(
+        'Bypassing server context in web containers, see https://github.com/stackblitz/core/issues/2711',
+      );
+    }
+
+    const rawResult = shouldBypassContext
+      ? await fn(...msg.parameters)
+      : await withContext(ctx, async () => fn(...msg.parameters));
+
+    const withoutCircularRefs = replaceRecursive(rawResult, getCircularReplacer());
+    const serializedResult = SuperJSON.stringify(withoutCircularRefs);
+
+    return { result: serializedResult, newCookies: Array.from(newCookies.entries()) };
+  } finally {
+    functionFinished = true;
   }
 }
+
+const dataProviderSchema: z.ZodType<ToolpadDataProvider<any, any>> = z.object({
+  paginationMode: z.enum(['index', 'cursor']).optional().default('index'),
+  getRecords: z.function(z.tuple([z.any()]), z.any()),
+  [TOOLPAD_DATA_PROVIDER_MARKER]: z.literal(true),
+});
+
+async function loadDataProvider(
+  filePath: string,
+  name: string,
+): Promise<ToolpadDataProvider<any, any>> {
+  const exports = await resolveExports(filePath);
+  const dataProviderExport = exports.get(name);
+
+  if (!dataProviderExport || typeof dataProviderExport !== 'object') {
+    throw new Error(`DataProvider "${name}" not found`);
+  }
+
+  const parsed = dataProviderSchema.safeParse(dataProviderExport);
+
+  if (parsed.success) {
+    return parsed.data;
+  }
+
+  throw fromZodError(parsed.error);
+}
+
+async function introspectDataProvider(
+  filePath: string,
+  name: string,
+): Promise<ToolpadDataProviderIntrospection> {
+  const dataProvider = await loadDataProvider(filePath, name);
+
+  return {
+    paginationMode: dataProvider.paginationMode,
+  };
+}
+
+async function getDataProviderRecords<R, P extends PaginationMode>(
+  filePath: string,
+  name: string,
+  params: GetRecordsParams<R, P>,
+): Promise<GetRecordsResult<R, P>> {
+  const dataProvider = await loadDataProvider(filePath, name);
+
+  return dataProvider.getRecords(params);
+}
+
+type WorkerRpcServer = {
+  execute: typeof execute;
+  introspectDataProvider: typeof introspectDataProvider;
+  getDataProviderRecords: typeof getDataProviderRecords;
+};
 
 if (!isMainThread && parentPort) {
-  // Polyfill fetch() in the Node.js environment
-  if (!global.fetch) {
-    // @ts-expect-error
-    global.fetch = fetch;
-    // @ts-expect-error
-    global.Headers = Headers;
-    // @ts-expect-error
-    global.Request = Request;
-    // @ts-expect-error
-    global.Response = Response;
-  }
-
-  parentPort.on('message', (msg: TransferredMessage) => {
-    (async () => {
-      try {
-        const result = await handleMessage(msg);
-        msg.port.postMessage({ result: JSON.stringify(result, getCircularReplacer()) });
-      } catch (rawError) {
-        msg.port.postMessage({ error: serializeError(errorFrom(rawError)) });
-      }
-    })();
+  serveRpc<WorkerRpcServer>(workerData.workerRpcPort, {
+    execute,
+    introspectDataProvider,
+    getDataProviderRecords,
   });
 }
 
 export function createWorker(env: Record<string, any>) {
-  const worker = new Worker(path.join(__dirname, 'functionsDevWorker.js'), { env });
+  const workerRpcChannel = new MessageChannel();
+  const worker = new Worker(path.resolve(currentDirectory, '../cli/functionsDevWorker.js'), {
+    env,
+    workerData: {
+      workerRpcPort: workerRpcChannel.port1,
+    },
+    transferList: [workerRpcChannel.port1],
+  });
 
-  const runOnWorker = async (msg: WorkerMessage) => {
-    const { port1, port2 } = new MessageChannel();
-    worker.postMessage({ port: port1, ...msg } satisfies TransferredMessage, [port1]);
-    const [{ error, result }] = await once(port2, 'message');
-
-    if (error) {
-      throw errorFrom(error);
-    }
-
-    return result ? JSON.parse(result) : undefined;
-  };
+  const client = createRpcClient<WorkerRpcServer>(workerRpcChannel.port2);
 
   return {
     async terminate() {
@@ -160,14 +193,39 @@ export function createWorker(env: Record<string, any>) {
     },
 
     async execute(filePath: string, name: string, parameters: unknown[]): Promise<any> {
-      const ctx = getContext();
-      return runOnWorker({
-        kind: 'execute',
+      const ctx = getServerContext();
+
+      const { result: serializedResult, newCookies } = await client.execute({
         filePath,
         name,
         parameters,
-        ctx,
+        cookies: ctx?.cookies,
       });
+
+      if (ctx) {
+        for (const [cookieName, cookieValue] of newCookies) {
+          ctx.setCookie(cookieName, cookieValue);
+        }
+      }
+
+      const result = SuperJSON.parse(serializedResult);
+
+      return result;
+    },
+
+    async introspectDataProvider(
+      filePath: string,
+      name: string,
+    ): Promise<ToolpadDataProviderIntrospection> {
+      return client.introspectDataProvider(filePath, name);
+    },
+
+    async getDataProviderRecords<R, P extends PaginationMode>(
+      filePath: string,
+      name: string,
+      params: GetRecordsParams<R, P>,
+    ): Promise<GetRecordsResult<R, P>> {
+      return client.getDataProviderRecords(filePath, name, params);
     },
   };
 }

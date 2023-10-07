@@ -1,19 +1,19 @@
 import * as path from 'path';
+import * as url from 'node:url';
 import { InlineConfig, Plugin, build } from 'vite';
 import react from '@vitejs/plugin-react';
-import serializeJavascript from 'serialize-javascript';
 import { indent } from '@mui/toolpad-utils/strings';
-import { RUNTIME_CONFIG_WINDOW_PROPERTY } from '../constants';
 import type { ComponentEntry } from './localMode';
-import type { RuntimeConfig } from '../config';
 import * as appDom from '../appDom';
-import createRuntimeState from '../runtime/createRuntimeState';
 import virtualFsPlugin, { replaceFiles } from './viteVirtualFsPlugin';
 import { generateAppCode } from './codegen';
+import { INITIAL_STATE_WINDOW_PROPERTY } from '../constants';
+
+import.meta.url ??= url.pathToFileURL(__filename).toString();
+const currentDirectory = url.fileURLToPath(new URL('.', import.meta.url));
 
 const MAIN_ENTRY = '/main.tsx';
 const CANVAS_ENTRY = '/canvas.tsx';
-const INITIAL_STATE_WINDOW_PROPERTY = '__initialToolpadState__';
 
 const componentsId = `virtual:toolpad:components.js`;
 export const resolvedComponentsId = `\0${componentsId}`;
@@ -61,32 +61,10 @@ export function getHtmlContent({ canvas }: GetHtmlContentParams) {
   `;
 }
 
-export interface PostProcessHtmlParams {
-  config: RuntimeConfig;
-  dom: appDom.AppDom;
-}
-
-export function postProcessHtml(html: string, { config, dom }: PostProcessHtmlParams): string {
-  const serializedConfig = serializeJavascript(config, { ignoreFunction: true });
-  const initialState = createRuntimeState({ dom });
-  const serializedInitialState = serializeJavascript(initialState, { isJSON: true });
-
-  const toolpadScripts = [
-    `<script>window[${JSON.stringify(
-      RUNTIME_CONFIG_WINDOW_PROPERTY,
-    )}] = ${serializedConfig}</script>`,
-    `<script>window[${JSON.stringify(
-      INITIAL_STATE_WINDOW_PROPERTY,
-    )}] = ${serializedInitialState}</script>`,
-  ];
-
-  return html.replace(`<!-- __TOOLPAD_SCRIPTS__ -->`, () => toolpadScripts.join('\n'));
-}
-
 interface ToolpadVitePluginParams {
   root: string;
   base: string;
-  getComponents: (root: string) => Promise<ComponentEntry[]>;
+  getComponents: () => Promise<ComponentEntry[]>;
 }
 
 function toolpadVitePlugin({ root, base, getComponents }: ToolpadVitePluginParams): Plugin {
@@ -160,7 +138,7 @@ function toolpadVitePlugin({ root, base, getComponents }: ToolpadVitePluginParam
         };
       }
       if (id === resolvedComponentsId) {
-        const components = await getComponents(root);
+        const components = await getComponents();
 
         const imports = components.map(({ name }) => `import ${name} from './components/${name}';`);
 
@@ -191,9 +169,10 @@ export interface CreateViteConfigParams {
   root: string;
   dev: boolean;
   base: string;
+  customServer?: boolean;
   plugins?: Plugin[];
   dom: appDom.AppDom;
-  getComponents: (root: string) => Promise<ComponentEntry[]>;
+  getComponents: () => Promise<ComponentEntry[]>;
 }
 
 export interface CreateViteConfigResult {
@@ -206,6 +185,7 @@ export function createViteConfig({
   root,
   dev,
   base,
+  customServer,
   plugins = [],
   dom,
   getComponents,
@@ -236,7 +216,7 @@ export function createViteConfig({
         alias: [
           {
             // FIXME(https://github.com/mui/material-ui/issues/35233)
-            find: /^@mui\/icons-material\/([^/]*)/,
+            find: /^@mui\/icons-material\/(?!esm\/)([^/]*)/,
             replacement: '@mui/icons-material/esm/$1',
           },
           ...(process.env.EXPERIMENTAL_CODE_GENERATION
@@ -251,7 +231,7 @@ export function createViteConfig({
       },
       server: {
         fs: {
-          allow: [root, path.resolve(__dirname, '../../../../')],
+          allow: [root, path.resolve(currentDirectory, '../../../../')],
         },
       },
       optimizeDeps: {
@@ -275,6 +255,7 @@ export function createViteConfig({
           '@mui/material/styles',
           '@mui/material/useMediaQuery',
           '@mui/utils',
+          '@mui/utils/useEventCallback',
           '@mui/x-data-grid-pro',
           '@mui/x-date-pickers/AdapterDayjs',
           '@mui/x-date-pickers/DesktopDatePicker',
@@ -323,6 +304,7 @@ export function createViteConfig({
       define: {
         'process.env.NODE_ENV': `'${mode}'`,
         'process.env.BASE_URL': `'${base}'`,
+        'process.env.TOOLPAD_CUSTOM_SERVER': `'${JSON.stringify(customServer)}'`,
       },
     },
 
@@ -335,7 +317,7 @@ export function createViteConfig({
 
 export interface ToolpadBuilderParams {
   outDir: string;
-  getComponents: (root: string) => Promise<ComponentEntry[]>;
+  getComponents: () => Promise<ComponentEntry[]>;
   root: string;
   base: string;
   dom: appDom.AppDom;

@@ -1,7 +1,7 @@
 import { SxProps, TextField } from '@mui/material';
 import * as React from 'react';
 import * as appDom from '../../appDom';
-import { useDom, useDomApi } from '../AppState';
+import { useAppState, useDomApi } from '../AppState';
 import { useNodeNameValidation } from './PagesExplorer/validation';
 import client from '../../api';
 
@@ -12,7 +12,7 @@ interface NodeNameEditorProps {
 
 export default function NodeNameEditor({ node, sx }: NodeNameEditorProps) {
   const domApi = useDomApi();
-  const { dom } = useDom();
+  const { dom } = useAppState();
 
   const [nameInput, setNameInput] = React.useState(node.name);
   React.useEffect(() => setNameInput(node.name), [node.name]);
@@ -35,7 +35,7 @@ export default function NodeNameEditor({ node, sx }: NodeNameEditorProps) {
     const oldname = dom.nodes[node.id];
     if (isNameValid && oldname.type === 'page' && nameInput !== oldname.name) {
       setTimeout(async () => {
-        await client.mutation.deletePage(oldname.name);
+        await client.methods.deletePage(oldname.name);
       }, 300);
     }
   }, [isNameValid, domApi, node.id, node.name, nameInput, dom]);

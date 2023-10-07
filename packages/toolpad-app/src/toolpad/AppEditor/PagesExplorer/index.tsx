@@ -1,21 +1,23 @@
-import { TreeView } from '@mui/lab';
-import { Typography, styled, Box, IconButton } from '@mui/material';
 import * as React from 'react';
-import TreeItem, { treeItemClasses, TreeItemProps } from '@mui/lab/TreeItem';
+import { styled, Box, IconButton } from '@mui/material';
+import { TreeView, treeItemClasses } from '@mui/x-tree-view';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
-import AddIcon from '@mui/icons-material/Add';
 import { NodeId } from '@mui/toolpad-core';
 import clsx from 'clsx';
 import invariant from 'invariant';
+import { alphabeticComparator, createPropComparator } from '@mui/toolpad-utils/comparators';
 import * as appDom from '../../../appDom';
-import { useAppStateApi, useDom, useAppState } from '../../AppState';
-import CreatePageNodeDialog from './CreatePageNodeDialog';
+import { useAppStateApi, useAppState, useDomApi } from '../../AppState';
 import useLocalStorageState from '../../../utils/useLocalStorageState';
 import NodeMenu from '../NodeMenu';
 import { DomView } from '../../../utils/domView';
 import client from '../../../api';
+import useBoolean from '../../../utils/useBoolean';
+import EditableTreeItem, { EditableTreeItemProps } from '../../../components/EditableTreeItem';
+import { scrollIntoViewIfNeeded } from '../../../utils/dom';
+import ExplorerHeader from '../ExplorerHeader';
 
 const PagesExplorerRoot = styled('div')({
   overflow: 'auto',
@@ -27,7 +29,7 @@ const classes = {
   treeItemMenuOpen: 'Toolpad__PagesExplorerTreeItemMenuOpen',
 };
 
-const StyledTreeItem = styled(TreeItem)({
+const StyledEditableTreeItem = styled(EditableTreeItem)({
   [`& .${classes.treeItemMenuButton}`]: {
     visibility: 'hidden',
   },
@@ -39,45 +41,67 @@ const StyledTreeItem = styled(TreeItem)({
   },
 });
 
-type StyledTreeItemProps = TreeItemProps & {
+interface StyledTreeItemProps extends EditableTreeItemProps {
+  ref?: React.RefObject<HTMLLIElement>;
+  onRenameNode?: (nodeId: NodeId, updatedName: string) => void;
   onDeleteNode?: (nodeId: NodeId) => void;
   onDuplicateNode?: (nodeId: NodeId) => void;
   onCreate?: React.MouseEventHandler;
   labelIcon?: React.ReactNode;
   labelText: string;
   createLabelText?: string;
+  renameLabelText?: string;
   deleteLabelText?: string;
   duplicateLabelText?: string;
   toolpadNodeId?: NodeId;
-};
+}
 
 function PagesExplorerTreeItem(props: StyledTreeItemProps) {
   const {
+    nodeId,
     labelIcon,
     labelText,
-    onCreate,
+    onRenameNode,
     onDeleteNode,
     onDuplicateNode,
-    createLabelText,
+    renameLabelText = 'Rename',
     deleteLabelText = 'Delete',
     duplicateLabelText = 'Duplicate',
     toolpadNodeId,
+    validateItemName,
     ...other
   } = props;
 
+  const { value: isEditing, setTrue: startEditing, setFalse: stopEditing } = useBoolean(false);
+
+  const handleRenameConfirm = React.useCallback(
+    (updatedName: string) => {
+      if (onRenameNode) {
+        onRenameNode(nodeId as NodeId, updatedName);
+        stopEditing();
+      }
+    },
+    [nodeId, onRenameNode, stopEditing],
+  );
+
+  const validateEditablePageName = React.useCallback(
+    (newName: string) => {
+      if (newName !== labelText && validateItemName) {
+        return validateItemName(newName);
+      }
+      return { isValid: true };
+    },
+    [labelText, validateItemName],
+  );
+
   return (
-    <StyledTreeItem
-      label={
-        <Box sx={{ display: 'flex', alignItems: 'center', p: 0.1, pr: 0 }}>
+    <StyledEditableTreeItem
+      nodeId={nodeId}
+      labelText={labelText}
+      renderLabel={(children) => (
+        <Box sx={{ display: 'flex', alignItems: 'center' }}>
           {labelIcon}
-          <Typography variant="body2" sx={{ fontWeight: 'inherit', flexGrow: 1 }} noWrap>
-            {labelText}
-          </Typography>
-          {onCreate ? (
-            <IconButton aria-label={createLabelText} onClick={onCreate} size="small">
-              <AddIcon fontSize="inherit" />
-            </IconButton>
-          ) : null}
+          {children}
           {toolpadNodeId ? (
             <NodeMenu
               renderButton={({ buttonProps, menuProps }) => (
@@ -93,14 +117,21 @@ function PagesExplorerTreeItem(props: StyledTreeItemProps) {
                 </IconButton>
               )}
               nodeId={toolpadNodeId}
+              renameLabelText={renameLabelText}
               deleteLabelText={deleteLabelText}
               duplicateLabelText={duplicateLabelText}
+              onRenameNode={startEditing}
               onDeleteNode={onDeleteNode}
               onDuplicateNode={onDuplicateNode}
             />
           ) : null}
         </Box>
-      }
+      )}
+      suggestedNewItemName={labelText}
+      onCancel={stopEditing}
+      isEditing={isEditing}
+      {...(onRenameNode ? { onEdit: handleRenameConfirm } : {})}
+      validateItemName={validateEditablePageName}
       {...other}
     />
   );
@@ -110,31 +141,33 @@ function getNodeEditorDomView(node: appDom.AppDomNode): DomView | undefined {
   switch (node.type) {
     case 'page':
       return { kind: 'page', nodeId: node.id };
-    case 'connection':
-      return { kind: 'connection', nodeId: node.id };
-    case 'codeComponent':
-      return { kind: 'codeComponent', nodeId: node.id };
     default:
       return undefined;
   }
 }
+
+const DEFAULT_NEW_PAGE_NAME = 'page';
 
 export interface PagesExplorerProps {
   className?: string;
 }
 
 export default function PagesExplorer({ className }: PagesExplorerProps) {
-  const { dom } = useDom();
-  const { currentView } = useAppState();
-
+  const { dom, currentView } = useAppState();
+  const domApi = useDomApi();
   const appStateApi = useAppStateApi();
 
   const app = appDom.getApp(dom);
   const { pages = [] } = appDom.getChildNodes(dom, app);
 
+  const existingNames = React.useMemo(
+    () => appDom.getExistingNamesForChildren(dom, appDom.getApp(dom), 'pages'),
+    [dom],
+  );
+
   const [expanded, setExpanded] = useLocalStorageState<string[]>(
     `editor/${app.id}/pages-explorer-expansion`,
-    [':connections', ':pages', ':codeComponents'],
+    [':pages'],
   );
 
   const activeNode = currentView.nodeId || null;
@@ -166,22 +199,70 @@ export default function PagesExplorer({ className }: PagesExplorerProps) {
     if (appDom.isPage(node)) {
       appStateApi.setView({ kind: 'page', nodeId: node.id });
     }
-
-    if (appDom.isCodeComponent(node)) {
-      appStateApi.setView({ kind: 'codeComponent', nodeId: node.id });
-    }
-
-    if (appDom.isConnection(node)) {
-      appStateApi.setView({ kind: 'connection', nodeId: node.id });
-    }
   };
 
-  const [createPageDialogOpen, setCreatePageDialogOpen] = React.useState(0);
-  const handleCreatePageDialogOpen = React.useCallback((event: React.MouseEvent) => {
-    event.stopPropagation();
-    setCreatePageDialogOpen(Math.random());
+  const pagesTreeRef = React.useRef<HTMLUListElement | null>(null);
+
+  const [hasMounted, setHasMounted] = React.useState(false);
+
+  React.useEffect(() => {
+    setHasMounted(true);
   }, []);
-  const handleCreatepageDialogClose = React.useCallback(() => setCreatePageDialogOpen(0), []);
+
+  React.useEffect(() => {
+    const pagesTree = pagesTreeRef.current;
+    if (pagesTree && hasMounted) {
+      const selectedItem = pagesTree.querySelector(`.${treeItemClasses.selected}`);
+
+      if (selectedItem) {
+        scrollIntoViewIfNeeded(selectedItem);
+      }
+    }
+  }, [hasMounted, pages]);
+
+  const {
+    value: isCreateNewPageOpen,
+    setTrue: handleOpenCreateNewPage,
+    setFalse: handleCloseCreateNewPage,
+  } = useBoolean(false);
+
+  const nextProposedName = React.useMemo(
+    () => appDom.proposeName(DEFAULT_NEW_PAGE_NAME, existingNames),
+    [existingNames],
+  );
+
+  const handleCreateNewCommit = React.useCallback(
+    async (newPageName: string) => {
+      const newNode = appDom.createNode(dom, 'page', {
+        name: newPageName,
+        attributes: {
+          title: newPageName,
+          display: 'shell',
+        },
+      });
+      const appNode = appDom.getApp(dom);
+
+      appStateApi.update((draft) => appDom.addNode(draft, newNode, appNode, 'pages'), {
+        kind: 'page',
+        nodeId: newNode.id,
+      });
+
+      handleCloseCreateNewPage();
+    },
+    [appStateApi, dom, handleCloseCreateNewPage],
+  );
+
+  const validatePageName = React.useCallback(
+    (pageName: string) => {
+      const validationErrorMessage = appDom.validateNodeName(pageName, existingNames, 'page');
+
+      return {
+        isValid: !validationErrorMessage,
+        ...(validationErrorMessage ? { errorMessage: validationErrorMessage } : {}),
+      };
+    },
+    [existingNames],
+  );
 
   const handleDeletePage = React.useCallback(
     async (nodeId: NodeId) => {
@@ -194,7 +275,7 @@ export default function PagesExplorer({ className }: PagesExplorerProps) {
         domViewAfterDelete = firstSiblingOfType && getNodeEditorDomView(firstSiblingOfType);
       }
 
-      await client.mutation.deletePage(deletedNode.name);
+      await client.methods.deletePage(deletedNode.name);
 
       appStateApi.update(
         (draft) => appDom.removeNode(draft, nodeId),
@@ -202,6 +283,20 @@ export default function PagesExplorer({ className }: PagesExplorerProps) {
       );
     },
     [activeNode, appStateApi, dom],
+  );
+
+  const handleRenameNode = React.useCallback(
+    (nodeId: NodeId, updatedName: string) => {
+      domApi.setNodeName(nodeId, updatedName);
+
+      const oldNameNode = dom.nodes[nodeId];
+      if (oldNameNode.type === 'page' && updatedName !== oldNameNode.name) {
+        setTimeout(async () => {
+          await client.methods.deletePage(oldNameNode.name);
+        }, 300);
+      }
+    },
+    [dom.nodes, domApi],
   );
 
   const handleDuplicateNode = React.useCallback(
@@ -226,6 +321,11 @@ export default function PagesExplorer({ className }: PagesExplorerProps) {
     [appStateApi, dom],
   );
 
+  const alphabeticSortedPages = React.useMemo(
+    () => [...pages].sort(createPropComparator('name', alphabeticComparator)),
+    [pages],
+  );
+
   return (
     <PagesExplorerRoot
       sx={{
@@ -236,7 +336,8 @@ export default function PagesExplorer({ className }: PagesExplorerProps) {
       className={className}
     >
       <TreeView
-        aria-label="pages explorer"
+        ref={pagesTreeRef}
+        aria-label="Pages explorer"
         selected={activeNode ? [activeNode] : []}
         onNodeSelect={handleSelect}
         expanded={expanded}
@@ -244,33 +345,38 @@ export default function PagesExplorer({ className }: PagesExplorerProps) {
         multiSelect
         defaultCollapseIcon={<ExpandMoreIcon sx={{ fontSize: '0.9rem', opacity: 0.5 }} />}
         defaultExpandIcon={<ChevronRightIcon sx={{ fontSize: '0.9rem', opacity: 0.5 }} />}
+        sx={{
+          scrollbarGutter: 'stable',
+        }}
       >
-        <PagesExplorerTreeItem
-          nodeId=":pages"
-          aria-level={1}
-          labelText="Pages"
-          createLabelText="Create page"
-          onCreate={handleCreatePageDialogOpen}
-        >
-          {pages.map((page) => (
-            <PagesExplorerTreeItem
-              key={page.id}
-              nodeId={page.id}
-              toolpadNodeId={page.id}
-              aria-level={2}
-              labelText={page.name}
-              onDuplicateNode={handleDuplicateNode}
-              onDeleteNode={handleDeletePage}
-            />
-          ))}
-        </PagesExplorerTreeItem>
+        <ExplorerHeader
+          headerText="Pages"
+          onCreate={handleOpenCreateNewPage}
+          createLabelText="Create new page"
+        />
+        {isCreateNewPageOpen ? (
+          <EditableTreeItem
+            nodeId="::create::"
+            isEditing
+            suggestedNewItemName={nextProposedName}
+            onEdit={handleCreateNewCommit}
+            onCancel={handleCloseCreateNewPage}
+            validateItemName={validatePageName}
+          />
+        ) : null}
+        {alphabeticSortedPages.map((page) => (
+          <PagesExplorerTreeItem
+            key={page.id}
+            nodeId={page.id}
+            toolpadNodeId={page.id}
+            labelText={page.name}
+            onRenameNode={handleRenameNode}
+            onDuplicateNode={handleDuplicateNode}
+            onDeleteNode={handleDeletePage}
+            validateItemName={validatePageName}
+          />
+        ))}
       </TreeView>
-
-      <CreatePageNodeDialog
-        key={createPageDialogOpen || undefined}
-        open={!!createPageDialogOpen}
-        onClose={handleCreatepageDialogClose}
-      />
     </PagesExplorerRoot>
   );
 }

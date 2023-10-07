@@ -8,11 +8,11 @@
     "start": "toolpad start"
   },
   "dependencies": {
-    "@mui/toolpad": "^0.1.24",
+    "@mui/toolpad": "^0.1.31",
     "child_process": "^1.0.2",
     "fs": "^0.0.1-security",
     "path": "^0.12.7",
-    "stripe": "^12.14.0",
-    "url": "^0.11.1"
+    "stripe": "^13.8.0",
+    "url": "^0.11.3"
   }
 }

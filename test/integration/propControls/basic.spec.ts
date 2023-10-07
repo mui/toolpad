@@ -76,4 +76,8 @@ test('can toggle boolean prop that is true by default', async ({ page }) => {
   await expect(fullWidthControlInput).toBeChecked();
   await fullWidthControlInput.click();
   await expect(fullWidthControlInput).not.toBeChecked();
+  const labelControlInput = editorModel.componentEditor.getByLabel('label', { exact: true });
+  await labelControlInput.click();
+  await labelControlInput.fill('');
+  await expect(labelControlInput).toHaveValue('');
 });

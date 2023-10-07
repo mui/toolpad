@@ -1,52 +1,57 @@
 import * as React from 'react';
 import { NodeId } from '@mui/toolpad-core';
 import { Box, Typography } from '@mui/material';
-import TreeView from '@mui/lab/TreeView';
+import { TreeView, TreeItem, TreeItemProps } from '@mui/x-tree-view';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
-import TreeItem, { TreeItemProps } from '@mui/lab/TreeItem';
 import * as appDom from '../../../appDom';
-import { useDom, useDomApi, useAppState, useAppStateApi } from '../../AppState';
-import EditableText from '../../../components/EditableText';
+import { useAppState, useDomApi, useAppStateApi } from '../../AppState';
 import { ComponentIcon } from '../PageEditor/ComponentCatalog/ComponentCatalogItem';
-import { useNodeNameValidation } from '../PagesExplorer/validation';
 import { DomView } from '../../../utils/domView';
 import { removePageLayoutNode } from '../pageLayout';
+import EditableTreeItem from '../../../components/EditableTreeItem';
+import ExplorerHeader from '../ExplorerHeader';
 
-function CustomTreeItem(
-  props: TreeItemProps & {
-    node: appDom.ElementNode;
-  },
-) {
+export interface CustomTreeItemProps extends TreeItemProps {
+  ref?: React.RefObject<HTMLLIElement>;
+  node: appDom.ElementNode;
+}
+
+function CustomTreeItem(props: CustomTreeItemProps) {
   const domApi = useDomApi();
-  const { dom } = useDom();
+  const { dom } = useAppState();
   const appStateApi = useAppStateApi();
 
   const [domNodeEditable, setDomNodeEditable] = React.useState(false);
   const { label, node, ...other } = props;
 
-  const [nodeNameInput, setNodeNameInput] = React.useState(node.name);
-  const handleNodeNameChange = React.useCallback(
-    (newValue: string) => setNodeNameInput(newValue),
-    [],
-  );
   const handleStopEditing = React.useCallback(() => {
-    setNodeNameInput(node.name);
     setDomNodeEditable(false);
-  }, [node.name]);
+  }, []);
 
   const existingNames = React.useMemo(() => appDom.getExistingNamesForNode(dom, node), [dom, node]);
-  const nodeNameError = useNodeNameValidation(nodeNameInput, existingNames, node.type);
-  const isNameValid = !nodeNameError;
 
-  const handleNameSave = React.useCallback(() => {
-    if (isNameValid) {
-      setNodeNameInput(nodeNameInput);
-      domApi.setNodeName(node.id, nodeNameInput);
-    } else {
-      setNodeNameInput(node.name);
-    }
-  }, [isNameValid, domApi, node.id, node.name, nodeNameInput]);
+  const validateEditableNodeName = React.useCallback(
+    (newName: string) => {
+      if (newName !== node.name) {
+        const validationErrorMessage = appDom.validateNodeName(newName, existingNames, node.type);
+
+        return {
+          isValid: !validationErrorMessage,
+          ...(validationErrorMessage ? { errorMessage: validationErrorMessage } : {}),
+        };
+      }
+      return { isValid: true };
+    },
+    [existingNames, node.name, node.type],
+  );
+
+  const handleNameSave = React.useCallback(
+    (newName: string) => {
+      domApi.setNodeName(node.id, newName);
+    },
+    [domApi, node.id],
+  );
 
   const handleNodeHover = React.useCallback(
     (event: React.MouseEvent, nodeId: NodeId) => {
@@ -60,11 +65,12 @@ function CustomTreeItem(
   }, [appStateApi]);
 
   return (
-    <TreeItem
+    <EditableTreeItem
       key={node.id}
-      label={
+      labelText={node.name}
+      renderLabel={(children) => (
         <Box
-          sx={{ display: 'flex', alignItems: 'center', p: 0.2, pr: 0 }}
+          sx={{ display: 'flex', alignItems: 'center' }}
           onMouseEnter={(event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
             handleNodeHover?.(event, node.id);
           }}
@@ -75,20 +81,14 @@ function CustomTreeItem(
             kind="builtIn"
             sx={{ marginRight: 1, fontSize: 18, opacity: 0.5 }}
           />
-          <EditableText
-            value={nodeNameInput}
-            variant="body2"
-            editable={domNodeEditable}
-            onDoubleClick={() => setDomNodeEditable(true)}
-            onChange={handleNodeNameChange}
-            onClose={handleStopEditing}
-            onSave={handleNameSave}
-            error={!isNameValid}
-            helperText={nodeNameError}
-            sx={{ flexGrow: 1 }}
-          />
+          {children}
         </Box>
-      }
+      )}
+      isEditing={domNodeEditable}
+      onEdit={handleNameSave}
+      suggestedNewItemName={node.name}
+      onCancel={handleStopEditing}
+      validateItemName={validateEditableNodeName}
       {...other}
     />
   );
@@ -132,7 +132,7 @@ function RecursiveSubTree({ dom, root }: { dom: appDom.AppDom; root: appDom.Elem
 }
 
 export default function HierarchyExplorer() {
-  const { dom } = useDom();
+  const { dom } = useAppState();
   const { currentView } = useAppState();
   const appStateApi = useAppStateApi();
   const [expandedDomNodeIds, setExpandedDomNodeIds] = React.useState<string[]>([]);
@@ -197,7 +197,7 @@ export default function HierarchyExplorer() {
         selectedNodeId: null,
       },
     );
-  }, [appStateApi, dom, selectedDomNodeId, currentView]);
+  }, [selectedDomNodeId, appStateApi, currentView, dom]);
 
   const handleKeyDown = React.useCallback(
     (event: React.KeyboardEvent<HTMLUListElement>) => {
@@ -215,23 +215,13 @@ export default function HierarchyExplorer() {
 
   return (
     <React.Fragment>
-      <Typography
-        variant="body2"
-        sx={(theme) => ({
-          flexGrow: 1,
-          fontWeight: theme.typography.fontWeightLight,
-          mx: 1,
-          my: 0.5,
-        })}
-      >
-        Page hierarchy
-      </Typography>
+      <ExplorerHeader headerText="Page hierarchy" />
       <TreeView
-        aria-label="page hierarchy explorer"
+        aria-label="Page hierarchy explorer"
         defaultCollapseIcon={<ExpandMoreIcon sx={{ fontSize: '0.9rem', opacity: 0.5 }} />}
         defaultExpandIcon={<ChevronRightIcon sx={{ fontSize: '0.9rem', opacity: 0.5 }} />}
         expanded={Array.from(expandedDomNodeIdSet)}
-        selected={selectedDomNodeId as string}
+        selected={selectedDomNodeId}
         onNodeSelect={handleNodeSelect}
         onNodeFocus={handleNodeFocus}
         onNodeToggle={handleNodeToggle}

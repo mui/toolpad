@@ -20,7 +20,11 @@ import {
   readMaybeDir,
   updateYamlFile,
   fileExists,
+  folderExists,
+  readJsonFile,
 } from '@mui/toolpad-utils/fs';
+import getPort from 'get-port';
+import { z } from 'zod';
 import * as appDom from '../appDom';
 import insecureHash from '../utils/insecureHash';
 import {
@@ -39,17 +43,17 @@ import {
   themeSchema,
   API_VERSION,
 } from './schema';
-import { format } from '../utils/prettier';
+import { format, resolvePrettierConfig } from '../utils/prettier';
 import {
   Body as AppDomFetchBody,
   FetchQuery,
   ResponseType as AppDomRestResponseType,
 } from '../toolpadDataSources/rest/types';
 import { LocalQuery } from '../toolpadDataSources/local/types';
-import { ProjectEvents, ToolpadProjectOptions } from '../types';
+import { ProjectEvents, ToolpadProjectOptions, CodeEditorFileType } from '../types';
 import { Awaitable } from '../utils/types';
 import EnvManager from './EnvManager';
-import FunctionsManager from './FunctionsManager';
+import FunctionsManager, { CreateDataProviderOptions } from './FunctionsManager';
 import { VersionInfo, checkVersion } from './versionInfo';
 import { VERSION_CHECK_INTERVAL } from '../constants';
 import DataManager from './DataManager';
@@ -95,15 +99,15 @@ function getComponentFilePath(componentsFolder: string, componentName: string): 
   return path.join(componentsFolder, `${componentName}.tsx`);
 }
 
-export function getOutputFolder(root: string) {
+function getOutputFolder(root: string) {
   return path.join(getToolpadFolder(root), '.generated');
 }
 
-export function getAppOutputFolder(root: string) {
+function getAppOutputFolder(root: string) {
   return path.join(getOutputFolder(root), 'app');
 }
 
-export async function legacyConfigFileExists(root: string): Promise<boolean> {
+async function legacyConfigFileExists(root: string): Promise<boolean> {
   const [yamlFileExists, ymlFileExists] = await Promise.all([
     fileExists(path.join(root, './toolpad.yaml')),
     fileExists(path.join(root, './toolpad.yml')),
@@ -118,7 +122,7 @@ export interface ComponentEntry {
   path: string;
 }
 
-export async function getComponents(root: string): Promise<ComponentEntry[]> {
+async function getComponents(root: string): Promise<ComponentEntry[]> {
   const componentsFolder = getComponentsFolder(root);
   const entries = (await readMaybeDir(componentsFolder)) || [];
   const result = entries.map((entry) => {
@@ -213,33 +217,37 @@ async function loadThemeFromFile(root: string): Promise<Theme | null> {
   return null;
 }
 
-function createDefaultCodeComponent(name: string): string {
+async function createDefaultCodeComponent(name: string, filePath: string): Promise<string> {
   const componentId = name.replace(/\s/g, '');
   const propTypeId = `${componentId}Props`;
-  return format(`
-    import * as React from 'react';
-    import { Typography } from '@mui/material';
-    import { createComponent } from '@mui/toolpad/browser';
-    
-    export interface ${propTypeId} {
-      msg: string;
-    }
-    
-    function ${componentId}({ msg }: ${propTypeId}) {
-      return (
-        <Typography>{msg}</Typography>
-      );
-    }
+  const result = await format(
+    `
+  import * as React from 'react';
+  import { Typography } from '@mui/material';
+  import { createComponent } from '@mui/toolpad/browser';
+  
+  export interface ${propTypeId} {
+    msg: string;
+  }
+  
+  function ${componentId}({ msg }: ${propTypeId}) {
+    return (
+      <Typography>{msg}</Typography>
+    );
+  }
 
-    export default createComponent(${componentId}, {
-      argTypes: {
-        msg: {
-          type: "string",
-          default: "Hello world!"
-        },
+  export default createComponent(${componentId}, {
+    argTypes: {
+      msg: {
+        type: "string",
+        default: "Hello world!"
       },
-    });    
-  `);
+    },
+  });    
+`,
+    filePath,
+  );
+  return result;
 }
 
 class Lock {
@@ -255,8 +263,14 @@ class Lock {
   }
 }
 
-const DEFAULT_GENERATED_GITIGNORE_FILE_CONTENT = `.generated
-`;
+const buildInfoSchema = z.object({
+  timestamp: z.number(),
+  base: z.string().optional(),
+});
+
+type BuildInfo = z.infer<typeof buildInfoSchema>;
+
+const DEFAULT_GENERATED_GITIGNORE_FILE_CONTENT = '.generated\n';
 
 async function initGitignore(root: string) {
   const projectFolder = getToolpadFolder(root);
@@ -348,18 +362,12 @@ function expandChildren<N extends appDom.AppDomNode>(
   dom: appDom.AppDom,
 ): (Query | ElementType)[];
 function expandChildren<N extends appDom.AppDomNode>(children: N[], dom: appDom.AppDom) {
-  return (
-    children
-      .sort((child1, child2) => {
-        invariant(
-          child1.parentIndex && child2.parentIndex,
-          'Nodes are not children of another node',
-        );
-        return appDom.compareFractionalIndex(child1.parentIndex, child2.parentIndex);
-      })
-      // eslint-disable-next-line @typescript-eslint/no-use-before-define
-      .map((child) => expandFromDom(child, dom))
-  );
+  return children
+    .sort((child1, child2) => {
+      invariant(child1.parentIndex && child2.parentIndex, 'Nodes are not children of another node');
+      return appDom.compareFractionalIndex(child1.parentIndex, child2.parentIndex);
+    })
+    .map((child) => expandFromDom(child, dom));
 }
 
 function undefinedWhenEmpty<O extends object | any[]>(obj?: O): O | undefined {
@@ -742,7 +750,7 @@ function optimizePageElement(element: ElementType): ElementType {
 
   return {
     ...element,
-    children: (element.children ?? []).map(optimizePageElement),
+    children: element.children && element.children.map(optimizePageElement),
   };
 }
 
@@ -826,18 +834,15 @@ async function writeDomToDisk(root: string, dom: appDom.AppDom): Promise<void> {
   ]);
 }
 
-const DEFAULT_EDITOR = 'code';
-
-export async function findSupportedEditor(): Promise<string | null> {
-  const maybeEditor = process.env.EDITOR ?? DEFAULT_EDITOR;
-  if (!maybeEditor) {
-    return null;
+export async function findSupportedEditor(): Promise<string | undefined> {
+  if (process.env.EDITOR) {
+    return undefined;
   }
   try {
-    await execa(maybeEditor, ['-v']);
-    return maybeEditor;
+    await execa('code', ['-v']);
+    return 'code';
   } catch (err) {
-    return null;
+    return undefined;
   }
 }
 
@@ -985,13 +990,9 @@ class ToolpadProject {
 
   private pendingVersionCheck: Promise<VersionInfo> | undefined;
 
-  constructor(root: string, options: Partial<ToolpadProjectOptions>) {
+  constructor(root: string, options: ToolpadProjectOptions) {
     this.root = root;
-    this.options = {
-      cmd: 'start',
-      dev: false,
-      ...options,
-    };
+    this.options = options;
 
     this.envManager = new EnvManager(this);
     this.functionsManager = new FunctionsManager(this);
@@ -1024,8 +1025,8 @@ class ToolpadProject {
             loadDomFromDisk(this.root),
             calculateDomFingerprint(this.root),
           ]);
-          this.events.emit('change', { fingerprint });
-          this.events.emit('externalChange', { fingerprint });
+          this.events.emit('change', {});
+          this.events.emit('externalChange', {});
 
           const newCodeComponentsFingerprint = getCodeComponentsFingerprint(dom);
           if (this.codeComponentsFingerprint !== newCodeComponentsFingerprint) {
@@ -1071,6 +1072,14 @@ class ToolpadProject {
     return getOutputFolder(this.getRoot());
   }
 
+  getAppOutputFolder() {
+    return getAppOutputFolder(this.getRoot());
+  }
+
+  getBuildInfoFile() {
+    return path.resolve(this.getOutputFolder(), 'buildInfo.json');
+  }
+
   alertOnMissingVariablesInDom(dom: appDom.AppDom) {
     const requiredVars = appDom.getRequiredEnvVars(dom);
     const missingVars = Array.from(requiredVars).filter(
@@ -1098,7 +1107,19 @@ class ToolpadProject {
 
   async start() {
     if (this.options.dev) {
+      await this.resetBuildInfo();
       await this.initWatcher();
+    } else {
+      const buildInfo = await this.getBuildInfo();
+      if (!buildInfo) {
+        throw new Error(`No production build found. Please run "toolpad build" first.`);
+      }
+
+      if (buildInfo.base !== this.options.base) {
+        throw new Error(
+          `Production build found for base "${buildInfo.base}" but running the app with "${this.options.base}". Please run "toolpad build" with the correct --base option.`,
+        );
+      }
     }
     await Promise.all([this.envManager.start(), this.functionsManager.start()]);
   }
@@ -1117,6 +1138,10 @@ class ToolpadProject {
     return dom;
   }
 
+  async getComponents(): Promise<ComponentEntry[]> {
+    return getComponents(this.getRoot());
+  }
+
   async writeDomToDisk(newDom: appDom.AppDom) {
     if (!this.options.dev) {
       throw new Error(`Writing to disk is only possible in toolpad dev mode.`);
@@ -1126,32 +1151,28 @@ class ToolpadProject {
     const newFingerprint = await calculateDomFingerprint(this.root);
     this.domAndFingerprint = [newDom, newFingerprint];
     this.events.emit('change', { fingerprint: newFingerprint });
-    return { fingerprint: newFingerprint };
   }
 
   async saveDom(newDom: appDom.AppDom) {
-    return this.domAndFingerprintLock.use(async () => {
+    await this.domAndFingerprintLock.use(async () => {
       return this.writeDomToDisk(newDom);
     });
   }
 
   async applyDomDiff(domDiff: appDom.DomDiff) {
-    return this.domAndFingerprintLock.use(async () => {
+    await this.domAndFingerprintLock.use(async () => {
       const dom = await this.loadDom();
       const newDom = appDom.applyDiff(dom, domDiff);
       return this.writeDomToDisk(newDom);
     });
   }
 
-  async openCodeEditor(fileName: string, fileType: string) {
+  async openCodeEditor(fileName: string, fileType: CodeEditorFileType) {
     const supportedEditor = await findSupportedEditor();
-    if (!supportedEditor) {
-      throw new Error(`No code editor found`);
-    }
     const root = this.getRoot();
     let resolvedPath = fileName;
 
-    if (fileType === 'query') {
+    if (fileType === 'resource') {
       resolvedPath = await this.functionsManager.getFunctionFilePath(fileName);
     }
     if (fileType === 'component') {
@@ -1159,8 +1180,8 @@ class ToolpadProject {
       resolvedPath = getComponentFilePath(componentsFolder, fileName);
     }
     const fullResolvedPath = path.resolve(root, resolvedPath);
-    openEditor([fullResolvedPath, root], {
-      editor: process.env.EDITOR ? undefined : DEFAULT_EDITOR,
+    await openEditor([fullResolvedPath, root], {
+      editor: supportedEditor,
     });
   }
 
@@ -1177,8 +1198,12 @@ class ToolpadProject {
   async createComponent(name: string) {
     const componentsFolder = getComponentsFolder(this.root);
     const filePath = getComponentFilePath(componentsFolder, name);
-    const content = createDefaultCodeComponent(name);
+    const content = await createDefaultCodeComponent(name, filePath);
     await writeFileRecursive(filePath, content, { encoding: 'utf-8' });
+  }
+
+  async createDataProvider(name: string, options: CreateDataProviderOptions) {
+    return this.functionsManager.createDataProviderFile(name, options);
   }
 
   async deletePage(name: string) {
@@ -1186,13 +1211,49 @@ class ToolpadProject {
     await fs.rm(pageFolder, { force: true, recursive: true });
   }
 
+  async getPrettierConfig() {
+    const root = this.getRoot();
+    const config = await resolvePrettierConfig(root);
+    return config;
+  }
+
   getRuntimeConfig(): RuntimeConfig {
+    // When these fail, you are likely trying to retrieve this information during the
+    // toolpad build. It's fundamentally wrong to use this information as it strictly holds
+    // information about the running toolpad instance.
+    invariant(this.options.externalUrl, 'External URL is not set');
+    invariant(this.options.base, 'Base path is not set');
+
     return {
-      externalUrl:
-        process.env.TOOLPAD_EXTERNAL_URL || `http://localhost:${process.env.PORT || 3000}`,
+      externalUrl: this.options.externalUrl,
       projectDir: this.getRoot(),
-      cmd: this.options.dev ? 'dev' : 'start',
+      wsPort: this.options.wsPort,
+      base: this.options.base,
     };
+  }
+
+  async writeBuildInfo() {
+    await writeFileRecursive(
+      this.getBuildInfoFile(),
+      JSON.stringify({
+        timestamp: Date.now(),
+        base: this.options.base,
+      } satisfies BuildInfo),
+      { encoding: 'utf-8' },
+    );
+  }
+
+  async resetBuildInfo() {
+    await fs.rm(this.getBuildInfoFile(), { force: true, recursive: true });
+  }
+
+  async getBuildInfo(): Promise<BuildInfo | null> {
+    try {
+      const content = await readJsonFile(this.getBuildInfoFile());
+      return buildInfoSchema.parse(content);
+    } catch {
+      return null;
+    }
   }
 }
 
@@ -1203,15 +1264,41 @@ declare global {
   var __toolpadProject: ToolpadProject | undefined;
 }
 
-export async function initProject(cmd: 'dev' | 'start' | 'build', root: string) {
+export function resolveProjectDir(dir: string) {
+  const projectDir = path.resolve(process.cwd(), dir);
+  return projectDir;
+}
+
+export interface InitProjectOptions extends Partial<ToolpadProjectOptions> {
+  dir: string;
+}
+
+export async function initProject({ dir: dirInput, ...config }: InitProjectOptions) {
   // eslint-disable-next-line no-underscore-dangle
   invariant(!global.__toolpadProject, 'A project is already running');
 
-  await migrateLegacyProject(root);
+  const dir = await resolveProjectDir(dirInput);
 
-  await initToolpadFolder(root);
+  if (!(await folderExists(dir))) {
+    throw new Error(`No Toolpad project found at ${chalk.cyan(`"${dir}"`)}`);
+  }
 
-  const project = new ToolpadProject(root, { cmd, dev: cmd === 'dev' });
+  const resolvedConfig: ToolpadProjectOptions = {
+    dev: false,
+    base: '/prod',
+    customServer: false,
+    ...config,
+  };
+
+  if (resolvedConfig.dev && !resolvedConfig.wsPort) {
+    resolvedConfig.wsPort = await getPort();
+  }
+
+  await migrateLegacyProject(dir);
+
+  await initToolpadFolder(dir);
+
+  const project = new ToolpadProject(dir, resolvedConfig);
   // eslint-disable-next-line no-underscore-dangle
   globalThis.__toolpadProject = project;
 

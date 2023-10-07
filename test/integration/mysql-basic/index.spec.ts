@@ -24,7 +24,7 @@ test('mysql basics', async ({ page, api }) => {
     return value;
   });
 
-  const app = await api.mutation.createApp(`App ${generateId()}`, {
+  const app = await api.methods.createApp(`App ${generateId()}`, {
     from: { kind: 'dom', dom },
   });
 

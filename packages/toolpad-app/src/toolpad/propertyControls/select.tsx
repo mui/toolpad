@@ -12,6 +12,9 @@ function SelectPropEditor({ label, propType, value, onChange, disabled }: Editor
     [onChange],
   );
 
+  const enumLabels: Record<string, string> =
+    propType.type === 'string' ? propType.enumLabels ?? {} : {};
+
   return (
     <PropertyControl propType={propType}>
       <TextField
@@ -25,7 +28,7 @@ function SelectPropEditor({ label, propType, value, onChange, disabled }: Editor
         {typeof propType.default === 'undefined' ? <MenuItem value="">-</MenuItem> : null}
         {items.map((item) => (
           <MenuItem key={item} value={item}>
-            {item}
+            {enumLabels[item] || item}
           </MenuItem>
         ))}
       </TextField>

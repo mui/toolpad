@@ -9,9 +9,10 @@ const pages: MuiPage[] = [
       { pathname: '/toolpad/getting-started/installation' },
       { pathname: '/toolpad/getting-started/first-app', title: 'Build your first app' },
       {
-        pathname: '/toolpad/examples',
+        pathname: '/toolpad/examples-group',
+        title: 'Examples',
         children: [
-          { pathname: '/toolpad/examples/overview', title: 'Overview' },
+          { pathname: '/toolpad/examples', title: 'Overview' },
           { pathname: '/toolpad/examples/npm-stats', title: 'npm stats' },
           { pathname: '/toolpad/examples/basic-crud-app', title: 'Basic CRUD application' },
           { pathname: '/toolpad/examples/qr-generator', title: 'QR Code generator' },
@@ -43,11 +44,19 @@ const pages: MuiPage[] = [
             pathname: '/toolpad/concepts/custom-functions',
             title: 'Custom functions',
           },
+          {
+            pathname: '/toolpad/concepts/data-providers',
+            title: 'Data providers',
+          },
         ],
       },
       {
         pathname: '/toolpad/concepts/managing-state',
         title: 'Managing state',
+      },
+      {
+        pathname: '/toolpad/concepts/file-structure',
+        title: 'File structure',
       },
       {
         pathname: '/toolpad/concepts/deployment',
@@ -87,7 +96,7 @@ const pages: MuiPage[] = [
         children: [
           {
             pathname: '/toolpad/how-to-guides/render-deploy',
-            title: 'Deploy your app to Render',
+            title: 'Deploy to Render',
           },
         ],
       },
@@ -96,8 +105,8 @@ const pages: MuiPage[] = [
         subheader: 'Create custom components',
         children: [
           {
-            pathname: '/toolpad/how-to-guides/number-display',
-            title: 'Number component',
+            pathname: '/toolpad/how-to-guides/map-display',
+            title: 'Map component',
           },
           {
             pathname: '/toolpad/how-to-guides/cube-component',
@@ -159,12 +168,20 @@ const pages: MuiPage[] = [
             subheader: 'Functions',
             children: [
               {
+                title: 'createComponent',
+                pathname: '/toolpad/reference/api/create-component',
+              },
+              {
+                title: 'createDataProvider',
+                pathname: '/toolpad/reference/api/create-data-provider',
+              },
+              {
                 title: 'createFunction',
                 pathname: '/toolpad/reference/api/create-function',
               },
               {
-                title: 'createComponent',
-                pathname: '/toolpad/reference/api/create-component',
+                title: 'getContext',
+                pathname: '/toolpad/reference/api/get-context',
               },
             ],
           },

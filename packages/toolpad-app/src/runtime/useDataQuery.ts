@@ -5,39 +5,7 @@ import * as React from 'react';
 import { useQuery, UseQueryOptions } from '@tanstack/react-query';
 import { CanvasHooksContext } from './CanvasHooksContext';
 import * as appDom from '../appDom';
-
-interface ExecDataSourceQueryParams {
-  signal?: AbortSignal;
-  pageName: string;
-  queryName: string;
-  params: any;
-}
-
-export async function execDataSourceQuery({
-  signal,
-  pageName,
-  queryName,
-  params,
-}: ExecDataSourceQueryParams) {
-  const dataUrl = new URL(`${process.env.BASE_URL}/api/data/`, window.location.href);
-  const url = new URL(
-    `./${encodeURIComponent(pageName)}/${encodeURIComponent(queryName)}`,
-    dataUrl,
-  );
-
-  const res = await fetch(String(url), {
-    method: 'POST',
-    body: JSON.stringify(params),
-    headers: [['content-type', 'application/json']],
-    signal,
-  });
-
-  if (!res.ok) {
-    throw new Error(`HTTP ${res.status} while fetching "${url}"`);
-  }
-
-  return res.json();
-}
+import api from './api';
 
 export type UseDataQueryConfig = Pick<
   UseQueryOptions<any, unknown, unknown, any[]>,
@@ -72,8 +40,6 @@ export function useDataQuery(
   const queryName = node.name;
   const pageName = page.name;
 
-  // These are only used by the editor to invalidate caches whenever the query changes during editing
-  const nodeHash: number | undefined = savedNodes ? savedNodes[node.id] : undefined;
   const isNodeAvailableOnServer: boolean = savedNodes ? !!savedNodes[node.id] : true;
 
   const {
@@ -83,8 +49,8 @@ export function useDataQuery(
     data: responseData = EMPTY_OBJECT,
     refetch,
   } = useQuery(
-    [nodeHash, pageName, queryName, params],
-    ({ signal }) => execDataSourceQuery({ signal, pageName, queryName, params }),
+    [pageName, queryName, params],
+    () => api.methods.execQuery(pageName, queryName, params),
     {
       ...options,
       enabled: isNodeAvailableOnServer && enabled,

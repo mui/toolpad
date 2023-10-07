@@ -1,6 +1,6 @@
 # Queries
 
-<p class="description">Be it a database table or an external API, Toolpad offers mechanisms to bring serverside data to the page.</p>
+<p class="description">Be it a database table or an external API, Toolpad offers mechanisms to bring server-side data to the page.</p>
 
 You can create two kinds of **queries** in Toolpad to bring data to your page.
 

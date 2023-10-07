@@ -24,14 +24,19 @@ export interface NavigationEntry {
 
 const DRAWER_WIDTH = 250; // px
 
-interface AppNavigationProps {
+interface AppPagesNavigationProps {
   activePage?: string;
   pages: NavigationEntry[];
   clipped?: boolean;
   search?: string;
 }
 
-function AppNavigation({ activePage, pages, clipped = false, search }: AppNavigationProps) {
+function AppPagesNavigation({
+  activePage,
+  pages,
+  clipped = false,
+  search,
+}: AppPagesNavigationProps) {
   const navListSubheaderId = React.useId();
 
   return (
@@ -46,29 +51,27 @@ function AppNavigation({ activePage, pages, clipped = false, search }: AppNaviga
       }}
     >
       {clipped ? <Toolbar variant="dense" /> : null}
-      <Box>
-        <List
-          component="nav"
-          subheader={
-            <ListSubheader id={navListSubheaderId} sx={{ px: 4 }}>
-              Pages
-            </ListSubheader>
-          }
-          aria-labelledby={navListSubheaderId}
-        >
-          {pages.map((page) => (
-            <ListItem key={page.slug} disablePadding>
-              <ListItemButton
-                component={Link}
-                to={`pages/${page.slug}${search}`}
-                selected={activePage === page.slug}
-              >
-                <ListItemText primary={page.displayName} sx={{ ml: 2 }} />
-              </ListItemButton>
-            </ListItem>
-          ))}
-        </List>
-      </Box>
+      <List
+        component="nav"
+        subheader={
+          <ListSubheader id={navListSubheaderId} sx={{ px: 4 }}>
+            Pages
+          </ListSubheader>
+        }
+        aria-labelledby={navListSubheaderId}
+      >
+        {pages.map((page) => (
+          <ListItem key={page.slug} disablePadding>
+            <ListItemButton
+              component={Link}
+              to={`pages/${page.slug}${search}`}
+              selected={activePage === page.slug}
+            >
+              <ListItemText primary={page.displayName} sx={{ ml: 2 }} />
+            </ListItemButton>
+          </ListItem>
+        ))}
+      </List>
     </Drawer>
   );
 }
@@ -109,7 +112,7 @@ export function AppLayout({
   return (
     <Box sx={{ flex: 1, display: 'flex' }}>
       {hasShell ? (
-        <AppNavigation
+        <AppPagesNavigation
           activePage={activePage}
           pages={pages}
           clipped={clipped}

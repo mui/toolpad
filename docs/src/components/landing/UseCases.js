@@ -13,7 +13,6 @@ import AutoAwesomeRoundedIcon from '@mui/icons-material/AutoAwesomeRounded';
 import SectionHeadline from 'docs/src/components/typography/SectionHeadline';
 import GradientText from 'docs/src/components/typography/GradientText';
 import Grid from '@mui/material/Unstable_Grid2';
-import ROUTES from '../../route';
 
 const ImageContainer = styled(Link)(({ theme }) => [
   {
@@ -30,7 +29,7 @@ const ImageContainer = styled(Link)(({ theme }) => [
     )} 150%)`,
     border: '1px solid',
     borderColor: (theme.vars || theme).palette.grey[100],
-    boxShadow: `0 4px 8px ${alpha(theme.palette.grey[100], 0.5)}`,
+    boxShadow: `0 2px 4px ${alpha(theme.palette.grey[100], 0.8)}`,
     overflow: 'hidden',
   },
   theme.applyDarkStyles({
@@ -38,7 +37,7 @@ const ImageContainer = styled(Link)(({ theme }) => [
       (theme.vars || theme).palette.primaryDark[500]
     } 0%, ${alpha(theme.palette.primaryDark[800], 0.4)} 150%)`,
     borderColor: `${alpha(theme.palette.primaryDark[300], 0.3)}`,
-    boxShadow: `0 4px 8px ${alpha(theme.palette.primaryDark[600], 0.5)}`,
+    boxShadow: `0 2px 4px ${alpha(theme.palette.common.black, 0.8)}`,
   }),
 ]);
 
@@ -195,7 +194,7 @@ export default function CardGrid() {
               <Typography variant="body" color="text.secondary" textAlign="center">
                 Learn how to build these and many other apps using Toolpad!
               </Typography>
-              <Link href={ROUTES.toolpadMoreExamples} variant="body" sx={{ mt: 1 }}>
+              <Link href="/toolpad/examples/" variant="body" sx={{ mt: 1 }}>
                 View more examples
                 <KeyboardArrowRightRounded fontSize="small" />
               </Link>

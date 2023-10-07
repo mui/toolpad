@@ -1,5 +1,199 @@
 # Changelog
 
+## 0.1.31
+
+<!-- generated comparing v0.1.30..master -->
+
+_Oct 4, 2023_
+
+A big thanks to the 5 contributors who made this release possible. Here are some highlights ✨:
+
+Add component search box, fix editor failing to open, allow custom base path for Toolpad applications, improve automatic formatting of binding expressions.
+
+- &#8203;<!-- 15 -->Fix Data grid invalid date handling (#2748) @Janpot
+- &#8203;<!-- 14 -->Fix editor failing to open (#2745) @Janpot
+- &#8203;<!-- 13 -->add a search box on the top (#2692) @JerryWu1234
+- &#8203;<!-- 12 -->Add global sidebar (#2730) @apedroferreira
+- &#8203;<!-- 11 -->format IDE code (#2674) @JerryWu1234
+- &#8203;<!-- 10 -->Move server files to the src folder (#2746) @Janpot
+- &#8203;<!-- 09 -->Update PULL_REQUEST_TEMPLATE.md @mbrookes
+- &#8203;<!-- 08 -->Support --base option to set a custom base path (#2740) @Janpot
+- &#8203;<!-- 07 -->Remove Chart as future component (#2738) @Janpot
+- &#8203;<!-- 06 -->Isolate the Toolpad router from Toolpad server (#2735) @Janpot
+- &#8203;<!-- 05 -->Correct types of component labels (#2736) @Janpot
+- &#8203;<!-- 04 -->Run required PR label action on synchronize event (#2734) @Janpot
+- &#8203;<!-- 03 -->Refactor cli interface (#2729) @Janpot
+- &#8203;<!-- 02 -->[docs] Fix docs title regression (#2739) @oliviertassinari
+- &#8203;<!-- 01 -->[docs] Header captialization with sidenav consistency @oliviertassinari
+
+All contributors of this release in alphabetical order: @apedroferreira, @Janpot, @JerryWu1234, @mbrookes, @oliviertassinari
+
+## 0.1.30
+
+<!-- generated comparing v0.1.29..master -->
+
+_Sep 28, 2023_
+
+A big thanks to the 3 contributors who made this release possible. Here are some highlights ✨:
+
+Some more documentation improvements, move to Vitest and minor bug fixes.
+
+- &#8203;<!-- 11 -->fix 2704 (#2725) @JerryWu1234
+- &#8203;<!-- 10 -->Fix prettier changes script (#2722) @Janpot
+- &#8203;<!-- 09 -->Remove unused address dependency (#2723) @Janpot
+- &#8203;<!-- 08 -->yarn prettier @oliviertassinari
+- &#8203;<!-- 07 -->Move to vitest (#2709) @Janpot
+- &#8203;<!-- 06 -->Run full prettier in CI (#2713) @Janpot
+- &#8203;<!-- 05 -->Improve docs language consistency (#2715) @Janpot
+- &#8203;<!-- 04 -->Fix typo in docs description (#2714) @Janpot
+- &#8203;<!-- 03 -->Update monorepo (#2712) @Janpot
+- &#8203;<!-- 02 -->[core] Sync prism-okaidia.css with docs-infra @oliviertassinari
+- &#8203;<!-- 01 -->[core] Straight quotes & website monorepo change @oliviertassinari
+
+All contributors of this release in alphabetical order: @Janpot, @JerryWu1234, @oliviertassinari
+
+✨ Done in 1.32s.
+
+## 0.1.29
+
+<!-- generated comparing v0.1.28..master -->
+
+_Sep 22, 2023_
+
+A big thanks to the 6 contributors who made this release possible. Here are some highlights ✨:
+
+Documentation improvements. Fix handling of dates in the data grid.
+
+- &#8203;<!-- 20 -->Update package.json (#2708) @JerryWu1234
+- &#8203;<!-- 19 -->Fix create-toolpad-app for absolute paths (#2682) @Janpot
+- &#8203;<!-- 18 -->Fix DataGrid date inferencing (#2706) @Janpot
+- &#8203;<!-- 17 -->fix it will be reset the value and fix 404 (#2693) @JerryWu1234
+- &#8203;<!-- 16 -->Add with-wasm example (#2700) @Janpot
+- &#8203;<!-- 15 -->hoist documentation dependencies again (#2701) @Janpot
+- &#8203;<!-- 14 -->Memory optimizations (#2689) @Janpot
+- &#8203;<!-- 13 -->Remove useEvent in favor for @mui/utils useEventCallback (#2702) @Janpot
+- &#8203;<!-- 12 -->Update theming docs (#2672) @Janpot
+- &#8203;<!-- 11 -->Bring in some fixes from #2546 (#2687) @Janpot
+- &#8203;<!-- 10 -->Remove unused eslint-plugin-prettier (#2688) @Janpot
+- &#8203;<!-- 09 -->Unify useDom, useDomLoader and useAppState (#2677) @Janpot
+- &#8203;<!-- 08 -->Avoid reloading queries twice on changes (#2675) @Janpot
+- &#8203;<!-- 07 -->Explicit dependencies (#2673) @Janpot
+- &#8203;<!-- 06 -->Update monorepo (#2681) @apedroferreira
+- &#8203;<!-- 05 -->Remove unused hook (#2671) @Janpot
+- &#8203;<!-- 04 -->[docs] Fix incorrect nomenclature (#2705) @bharatkashyap
+- &#8203;<!-- 03 -->[docs] Add file structure concepts page (#2636) @prakhargupta1
+- &#8203;<!-- 02 -->[docs] Replace some images, gifs with videos (#2662) @prakhargupta1
+- &#8203;<!-- 01 -->[website] Improve loading image @oliviertassinari
+
+All contributors of this release in alphabetical order: @apedroferreira, @bharatkashyap, @Janpot, @JerryWu1234, @oliviertassinari, @prakhargupta1
+
+## 0.1.28
+
+<!-- generated comparing v0.1.27..master -->
+
+_Sep 13, 2023_
+
+A big thanks to the 5 contributors who made this release possible. Here are some highlights ✨:
+
+Support date and time formats in DataGrid, upgrade to Node 18, fix container components, respect user's prettier config when formatting files.
+
+- &#8203;<!-- 21 -->Simplify component loading (#2667) @Janpot
+- &#8203;<!-- 20 -->Fix gap and direction in layout slots (#2653) @apedroferreira
+- &#8203;<!-- 19 -->Support date/dateTime formatting (#2589) @Janpot
+- &#8203;<!-- 18 -->Remove monaco-editor special case in renovatebot (#2663) @Janpot
+- &#8203;<!-- 17 -->format component and function (#2665) @JerryWu1234
+- &#8203;<!-- 16 -->Upgrade react-inspector (#2647) @Janpot
+- &#8203;<!-- 15 -->Remove fetch polyfills for node 18 (#2651) @Janpot
+- &#8203;<!-- 14 -->respect the user's prettier config when writing yml files (#2638) @JerryWu1234
+- &#8203;<!-- 13 -->Allow execa update (#2654) @Janpot
+- &#8203;<!-- 12 -->Fix container components (#2635) @apedroferreira
+- &#8203;<!-- 11 -->Upgrade to Node 18 (#2505) @apedroferreira
+- &#8203;<!-- 10 -->[docs] Simpler package readme @oliviertassinari
+- &#8203;<!-- 09 -->[docs] Fix /toolpad/reference/api/get-context/ 404 (#2656) @oliviertassinari
+- &#8203;<!-- 08 -->[docs] Fix description @oliviertassinari
+- &#8203;<!-- 07 -->[docs] Fix 404 link @oliviertassinari
+- &#8203;<!-- 06 -->[docs] Sync prism with docs-infra (#2652) @oliviertassinari
+- &#8203;<!-- 05 -->[examples] Migrate to railsway (#2646) @oliviertassinari
+- &#8203;<!-- 04 -->[refactor] Refactor worker rpc (#2645) @Janpot
+- &#8203;<!-- 03 -->[website] Tweak a few elements on the landing page (#2666) @danilo-leal
+- &#8203;<!-- 02 -->[website] Remove dead code @oliviertassinari
+- &#8203;<!-- 01 -->[website] Fix redirection @oliviertassinari
+
+All contributors of this release in alphabetical order: @apedroferreira, @danilo-leal, @Janpot, @JerryWu1234, @oliviertassinari
+
+## 0.1.27
+
+<!-- generated comparing v0.1.26..master -->
+
+_Sep 6, 2023_
+
+A big thanks to the 8 contributors who made this release possible. Here are some highlights ✨:
+
+Add support for setting cookies inside custom functions, add a Checkbox component and link docs to more places inside the app!
+
+- &#8203;<!-- 25 -->Fix stackblitz issues with setCookie (#2641) @Janpot
+- &#8203;<!-- 24 -->Support setCookie API (#2630) @Janpot
+- &#8203;<!-- 23 -->Replace @mui/lab with @mui/x-tree-view (#2639) @Janpot
+- &#8203;<!-- 22 -->Fix TreeView types after core update (#2634) @Janpot
+- &#8203;<!-- 21 -->[Toolpad Editor] Add tooltip to custom component subtitle (#2612) @rohanprasadofficial
+- &#8203;<!-- 20 -->[Toolpad Editor] Fix Markdown text alignment issue (#2591) @rohanprasadofficial
+- &#8203;<!-- 19 -->[Toolpad Editor] Fix : text component alignment rendering (#2587) @rohanprasadofficial
+- &#8203;<!-- 18 -->fix add a new property placeholder (#2622) @JerryWu1234
+- &#8203;<!-- 17 -->Improve visual test for resizing columns (#2610) @apedroferreira
+- &#8203;<!-- 16 -->Disallow binding to event handlers and list templates (#2600) @Janpot
+- &#8203;<!-- 15 -->Exclude esm folder from icons alias (#2606) @Janpot
+- &#8203;<!-- 14 -->add checkbox (#2494) @JerryWu1234
+- &#8203;<!-- 13 -->Fix typo in the code snippet of createComponent API (#2605) @Janpot
+- &#8203;<!-- 12 -->Lock file maintenance (#2604) @renovate[bot]
+- &#8203;<!-- 11 -->Lock file maintenance (#2603) @renovate[bot]
+- &#8203;<!-- 10 -->[core] Finish migration to GA4 @oliviertassinari
+- &#8203;<!-- 09 -->[docs] Add live apps link to the homepage examples (#2633) @prakhargupta1
+- &#8203;<!-- 08 -->[docs] Rename Examples group (#2628) @bharatkashyap
+- &#8203;<!-- 07 -->[docs] Open docs link in a new page @oliviertassinari
+- &#8203;<!-- 06 -->[docs] Fix references @oliviertassinari
+- &#8203;<!-- 05 -->[docs] Fix shell layout @oliviertassinari
+- &#8203;<!-- 04 -->[docs] Clean-up examples (#2611) @oliviertassinari
+- &#8203;<!-- 03 -->[docs] Official URL (#2609) @oliviertassinari
+- &#8203;<!-- 02 -->[refactor] Move Toolpad runtime to the RPC mechanism (#2582) @Janpot
+- &#8203;<!-- 01 -->[website] Fix `NpmCopyButton` placement (#2640) @bharatkashyap
+
+All contributors of this release in alphabetical order: @apedroferreira, @bharatkashyap, @Janpot, @JerryWu1234, @oliviertassinari, @prakhargupta1, @renovate[bot], @rohanprasadofficial
+
+## 0.1.26
+
+<!-- generated comparing v0.1.25..master -->
+
+_Aug 31, 2023_
+
+A big thanks to the 8 contributors who made this release possible. Here are some highlights ✨:
+
+Improve date columns on the grid, Support `Intl` in bindings.
+
+- &#8203;<!-- 22 -->Add visual regression tests for text component (#2593) @Janpot
+- &#8203;<!-- 21 -->Auto-create a theme when the user starts editing (#2594) @Janpot
+- &#8203;<!-- 20 -->Show page parameters in url form and add link to docs (#2577) @Kirera-Wainaina
+- &#8203;<!-- 19 -->[Toolpad Editor] Add tooltip to display more dropdown (#2590) @rohanprasadofficial
+- &#8203;<!-- 18 -->Stabilize query editor screenshots (#2584) @Janpot
+- &#8203;<!-- 17 -->[Toolpad Editor] Add themes docs link to theme panel (#2583) @rohanprasadofficial
+- &#8203;<!-- 16 -->Bypass server context for stackblitz (#2579) @Janpot
+- &#8203;<!-- 15 -->Improve columns editor UX (#2570) @Janpot
+- &#8203;<!-- 14 -->Allow using Intl in bindings (#2586) @Janpot
+- &#8203;<!-- 13 -->Stabilize visual regression test (#2574) @Janpot
+- &#8203;<!-- 12 -->fix 2467_AutoComplete (#2540) @JerryWu1234
+- &#8203;<!-- 11 -->Allow theme files to not specify a palette (#2556) @Janpot
+- &#8203;<!-- 10 -->Auto parse date strings on data grids (#2371) @bharatkashyap
+- &#8203;<!-- 09 -->Fix query editor panels orientation (#2557) @Janpot
+- &#8203;<!-- 08 -->Remove lodash from @mui/components (#2545) @Janpot
+- &#8203;<!-- 07 -->Update monorepo (#2544) @apedroferreira
+- &#8203;<!-- 06 -->Refactor Toolpad App Navigation (#2535) @Janpot
+- &#8203;<!-- 05 -->[core] Remove dead code (#2580) @oliviertassinari
+- &#8203;<!-- 04 -->[core] Remove S3 orb from circleci config (#2547) @Janpot
+- &#8203;<!-- 03 -->[docs] add graphQL to overview page and add 2 readme docs (#2576) @prakhargupta1
+- &#8203;<!-- 02 -->[Docs] Add initial steps of creating a custom component (#2534) @prakhargupta1
+- &#8203;<!-- 01 -->[website] Add GA4 events (#2532) @bharatkashyap
+
+All contributors of this release in alphabetical order: @apedroferreira, @bharatkashyap, @Janpot, @JerryWu1234, @Kirera-Wainaina, @oliviertassinari, @prakhargupta1, @rohanprasadofficial
+
 ## 0.1.25
 
 <!-- generated comparing v0.1.24..master -->
@@ -369,7 +563,7 @@ Add new reference documentation, add new QR-code example.
 - &#8203;<!-- 10 -->Add 404 page to application runtime (#2077) @Janpot
 - &#8203;<!-- 09 -->Avoid component catalog opening while hovering the snackbar (#2079) @Janpot
 - &#8203;<!-- 08 -->Fix broken documentation links (#2076) @Janpot
-- &#8203;<!-- 07 -->Add new example for QR code generator (#2067) @Janpot
+- &#8203;<!-- 07 -->Add new example for QR Code generator (#2067) @Janpot
 - &#8203;<!-- 06 -->Avoid restarting vite devserver when env file changes (#2069) @Janpot
 - &#8203;<!-- 05 -->Reference documentation (#2001) @Janpot
 - &#8203;<!-- 04 -->Fix websocket connection in codesandbox (#2068) @Janpot

@@ -3,7 +3,7 @@ import { NumberFormat, NumberFormatEditor } from '@mui/toolpad-core/numberFormat
 import type { EditorProps } from '../../types';
 import PropertyControl from '../../components/PropertyControl';
 
-function GridColumnsPropEditor({
+function NumberFormatPropEditor({
   propType,
   label,
   value,
@@ -12,9 +12,11 @@ function GridColumnsPropEditor({
 }: EditorProps<NumberFormat>) {
   return (
     <PropertyControl propType={propType}>
-      <NumberFormatEditor label={label} disabled={disabled} value={value} onChange={onChange} />
+      <span>
+        <NumberFormatEditor label={label} disabled={disabled} value={value} onChange={onChange} />
+      </span>
     </PropertyControl>
   );
 }
 
-export default GridColumnsPropEditor;
+export default NumberFormatPropEditor;

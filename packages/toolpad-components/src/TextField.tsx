@@ -17,6 +17,7 @@ import { SX_PROP_HELPER_TEXT } from './constants';
 export type TextFieldProps = Omit<MuiTextFieldProps, 'value' | 'onChange'> & {
   value: string;
   onChange: (newValue: string) => void;
+  label?: string;
   defaultValue: string;
   alignItems?: BoxProps['alignItems'];
   justifyContent?: BoxProps['justifyContent'];
@@ -34,7 +35,7 @@ function TextField({
 }: TextFieldProps) {
   const { onFormInputChange, formInputError, renderFormInput } = useFormInput<string>({
     name: rest.name,
-    label: rest.label as string,
+    label: rest.label,
     value,
     onChange,
     emptyValue: '',
@@ -67,7 +68,7 @@ const FormWrappedTextField = withComponentForm(TextField);
 
 export default createBuiltin(FormWrappedTextField, {
   helperText:
-    'The MUI [TextField](https://mui.com/material-ui/react-text-field/) component lets you input a text value.',
+    'The Material UI [TextField](https://mui.com/material-ui/react-text-field/) component lets you input a text value.',
   layoutDirection: 'both',
   argTypes: {
     value: {
@@ -102,6 +103,10 @@ export default createBuiltin(FormWrappedTextField, {
     fullWidth: {
       helperText: 'Whether the input should occupy all available horizontal space.',
       type: 'boolean',
+    },
+    placeholder: {
+      helperText: 'The short hint displayed in the `input` before the user enters a value.',
+      type: 'string',
     },
     disabled: {
       helperText: 'Whether the input is disabled.',

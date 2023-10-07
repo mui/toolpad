@@ -6,7 +6,7 @@ export default function useFetchPrivate<PQ, R>(): (privateQuery: PQ) => Promise<
   const { dataSourceId, connectionId } = useConnectionContext();
   return React.useCallback(
     (privateQuery: PQ) =>
-      client.query.dataSourceFetchPrivate(dataSourceId, connectionId, privateQuery),
+      client.methods.dataSourceFetchPrivate(dataSourceId, connectionId, privateQuery),
     [connectionId, dataSourceId],
   );
 }

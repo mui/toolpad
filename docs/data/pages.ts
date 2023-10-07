@@ -44,6 +44,10 @@ const pages: MuiPage[] = [
             pathname: '/toolpad/concepts/custom-functions',
             title: 'Custom functions',
           },
+          {
+            pathname: '/toolpad/concepts/data-providers',
+            title: 'Data providers',
+          },
         ],
       },
       {
@@ -167,12 +171,16 @@ const pages: MuiPage[] = [
             subheader: 'Functions',
             children: [
               {
-                title: 'createFunction',
-                pathname: '/toolpad/reference/api/create-function',
-              },
-              {
                 title: 'createComponent',
                 pathname: '/toolpad/reference/api/create-component',
+              },
+              {
+                title: 'createDataProvider',
+                pathname: '/toolpad/reference/api/create-data-provider',
+              },
+              {
+                title: 'createFunction',
+                pathname: '/toolpad/reference/api/create-function',
               },
               {
                 title: 'getContext',

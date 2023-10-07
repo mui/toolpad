@@ -8,8 +8,15 @@ import chalk from 'chalk';
 import { glob } from 'glob';
 import { writeFileRecursive, fileExists, readJsonFile } from '@mui/toolpad-utils/fs';
 import Piscina from 'piscina';
-import { ExecFetchResult } from '@mui/toolpad-core';
+import {
+  ExecFetchResult,
+  GetRecordsParams,
+  GetRecordsResult,
+  PaginationMode,
+} from '@mui/toolpad-core';
 import { errorFrom } from '@mui/toolpad-utils/errors';
+import { ToolpadDataProviderIntrospection } from '@mui/toolpad-core/runtime';
+import * as url from 'node:url';
 import EnvManager from './EnvManager';
 import { ProjectEvents, ToolpadProjectOptions } from '../types';
 import { createWorker as createDevWorker } from './functionsDevWorker';
@@ -17,6 +24,13 @@ import type { ExtractTypesParams, IntrospectionResult } from './functionsTypesWo
 import { Awaitable } from '../utils/types';
 import { format } from '../utils/prettier';
 import { compilerOptions } from './functionsShared';
+
+export interface CreateDataProviderOptions {
+  paginationMode: PaginationMode;
+}
+
+import.meta.url ??= url.pathToFileURL(__filename).toString();
+const currentDirectory = url.fileURLToPath(new URL('.', import.meta.url));
 
 async function createDefaultFunction(filePath: string): Promise<string> {
   const result = await format(
@@ -28,6 +42,36 @@ async function createDefaultFunction(filePath: string): Promise<string> {
     export default async function handler (message: string) {
       return \`Hello \${message}\`;
     }
+  `,
+    filePath,
+  );
+  return result;
+}
+
+async function createDefaultDataProvider(
+  filePath: string,
+  options: CreateDataProviderOptions,
+): Promise<string> {
+  const result = await format(
+    `
+    /**
+     * Toolpad data provider file.
+     * See: https://mui.com/toolpad/concepts/data-providers/
+     */
+
+    import { createDataProvider } from '@mui/toolpad/server';
+
+    export default createDataProvider({
+      ${options.paginationMode === 'cursor' ? 'paginationMode: "cursor",' : ''}
+      async getRecords({ paginationModel: ${
+        options.paginationMode === 'cursor' ? '{ cursor, pageSize }' : '{ start, pageSize }'
+      } }) {
+        return {
+          records: [],
+          ${options.paginationMode === 'cursor' ? 'cursor: null,' : ''}
+        };
+      }
+    })
   `,
     filePath,
   );
@@ -117,10 +161,6 @@ export default class FunctionsManager {
     return this.buildErrors.filter((error) => error.location?.file === entryPoint);
   }
 
-  private getOutputFile(fileName: string): string | undefined {
-    return path.resolve(this.getFunctionsOutputFolder(), `${path.basename(fileName, '.ts')}.js`);
-  }
-
   private getFunctionsOutputFolder(): string {
     return path.resolve(this.project.getOutputFolder(), 'functions');
   }
@@ -132,7 +172,7 @@ export default class FunctionsManager {
   private async extractTypes() {
     if (!this.extractTypesWorker) {
       this.extractTypesWorker = new Piscina({
-        filename: path.join(__dirname, 'functionsTypesWorker.js'),
+        filename: path.join(currentDirectory, 'functionsTypesWorker.js'),
       });
     }
 
@@ -164,6 +204,7 @@ export default class FunctionsManager {
       this.buildErrors = args.errors;
 
       this.project.invalidateQueries();
+      this.project.events.emit('functionsChanged', {});
     };
 
     const toolpadPlugin: esbuild.Plugin = {
@@ -261,11 +302,7 @@ export default class FunctionsManager {
     ]);
   }
 
-  async exec(
-    fileName: string,
-    name: string,
-    parameters: Record<string, unknown>,
-  ): Promise<ExecFetchResult<unknown>> {
+  async getBuiltOutputFilePath(fileName: string): Promise<string> {
     const resourcesFolder = this.getResourcesFolder();
     const fullPath = path.resolve(resourcesFolder, fileName);
     const entryPoint = path.relative(this.project.getRoot(), fullPath);
@@ -276,11 +313,20 @@ export default class FunctionsManager {
       throw formatError(buildErrors[0]);
     }
 
-    const outputFilePath = this.getOutputFile(fileName);
-    if (!outputFilePath) {
-      throw new Error(`No build found for "${fileName}"`);
-    }
+    const outputFilePath = path.resolve(
+      this.getFunctionsOutputFolder(),
+      `${path.basename(fileName, '.ts')}.js`,
+    );
 
+    return outputFilePath;
+  }
+
+  async exec(
+    fileName: string,
+    name: string,
+    parameters: Record<string, unknown>,
+  ): Promise<ExecFetchResult<unknown>> {
+    const outputFilePath = await this.getBuiltOutputFilePath(fileName);
     const extractedTypes = await this.introspect();
 
     if (extractedTypes.error) {
@@ -325,5 +371,32 @@ export default class FunctionsManager {
     }
     await writeFileRecursive(filePath, content, { encoding: 'utf-8' });
     this.extractedTypes = undefined;
+  }
+
+  async createDataProviderFile(name: string, options: CreateDataProviderOptions): Promise<void> {
+    const filePath = path.resolve(this.getResourcesFolder(), ensureSuffix(name, '.ts'));
+    const content = await createDefaultDataProvider(filePath, options);
+    if (await fileExists(filePath)) {
+      throw new Error(`"${name}" already exists`);
+    }
+    await writeFileRecursive(filePath, content, { encoding: 'utf-8' });
+    this.extractedTypes = undefined;
+  }
+
+  async introspectDataProvider(
+    fileName: string,
+    exportName: string = 'default',
+  ): Promise<ToolpadDataProviderIntrospection> {
+    const fullPath = await this.getBuiltOutputFilePath(fileName);
+    return this.devWorker.introspectDataProvider(fullPath, exportName);
+  }
+
+  async getDataProviderRecords<R, P extends PaginationMode>(
+    fileName: string,
+    exportName: string,
+    params: GetRecordsParams<R, P>,
+  ): Promise<GetRecordsResult<R, P>> {
+    const fullPath = await this.getBuiltOutputFilePath(fileName);
+    return this.devWorker.getDataProviderRecords(fullPath, exportName, params);
   }
 }

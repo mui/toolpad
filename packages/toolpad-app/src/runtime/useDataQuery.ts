@@ -50,7 +50,7 @@ export function useDataQuery(
     refetch,
   } = useQuery(
     [pageName, queryName, params],
-    () => api.mutation.execQuery(pageName, queryName, params),
+    () => api.methods.execQuery(pageName, queryName, params),
     {
       ...options,
       enabled: isNodeAvailableOnServer && enabled,

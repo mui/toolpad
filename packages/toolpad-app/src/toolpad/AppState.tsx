@@ -3,7 +3,6 @@ import { NodeId } from '@mui/toolpad-core';
 import { createProvidedContext } from '@mui/toolpad-utils/react';
 import invariant from 'invariant';
 import { debounce, DebouncedFunc } from 'lodash-es';
-
 import { useLocation } from 'react-router-dom';
 import { mapValues } from '@mui/toolpad-utils/collections';
 import useDebouncedHandler from '@mui/toolpad-utils/hooks/useDebouncedHandler';
@@ -398,13 +397,7 @@ function createAppStateApi(
 export const [useAppStateContext, AppStateProvider] = createProvidedContext<AppState>('AppState');
 
 export function useAppState(): AppState {
-  const appState = useAppStateContext();
-
-  if (!appState.dom) {
-    throw new Error("Trying to access the DOM before it's loaded");
-  }
-
-  return appState;
+  return useAppStateContext();
 }
 
 const DomApiContext = React.createContext<DomApi>(createDomApi(() => undefined));
@@ -538,8 +531,6 @@ export default function AppProvider({ children }: DomContextProps) {
     [dispatchWithHistory, scheduleTextInputHistoryUpdate],
   );
 
-  const fingerprint = React.useRef<number | undefined>();
-
   const handleSave = React.useCallback(() => {
     if (!state.dom || state.savingDom || state.savedDom === state.dom) {
       return;
@@ -548,10 +539,9 @@ export default function AppProvider({ children }: DomContextProps) {
     const domToSave = state.dom;
     dispatch({ type: 'DOM_SAVING' });
     const domDiff = appDom.createDiff(state.savedDom, domToSave);
-    client.mutation
+    client.methods
       .applyDomDiff(domDiff)
-      .then(({ fingerprint: newFingerPrint }) => {
-        fingerprint.current = newFingerPrint;
+      .then(() => {
         dispatch({ type: 'DOM_SAVED', savedDom: domToSave });
       })
       .catch((err) => {

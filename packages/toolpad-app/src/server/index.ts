@@ -52,6 +52,8 @@ async function createDevHandler(project: ToolpadProject) {
 
   const mainThreadRpcChannel = new MessageChannel();
 
+  const initialDom = await project.loadDom();
+
   const worker = new Worker(appServerPath, {
     workerData: {
       outDir: project.getAppOutputFolder(),
@@ -61,6 +63,7 @@ async function createDevHandler(project: ToolpadProject) {
       port: devPort,
       mainThreadRpcPort: mainThreadRpcChannel.port1,
       customServer: project.options.customServer,
+      dom: initialDom,
     } satisfies AppViteServerConfig,
     transferList: [mainThreadRpcChannel.port1],
     env: {

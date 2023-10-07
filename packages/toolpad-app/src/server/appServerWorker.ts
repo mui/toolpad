@@ -95,7 +95,7 @@ export interface AppViteServerConfig extends ToolpadAppDevServerParams {
   port: number;
   mainThreadRpcPort: MessagePort;
   config: RuntimeConfig;
-  initialDom: appDom.AppDom;
+  dom: appDom.AppDom;
 }
 
 export async function main({ port, ...config }: AppViteServerConfig) {

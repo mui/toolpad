@@ -20,11 +20,14 @@ async function main() {
 
   await project.build();
 
+  const dom = await project.loadDom();
+
   await buildApp({
     root: project.getRoot(),
     base,
     getComponents: () => project.getComponents(),
     outDir: project.getAppOutputFolder(),
+    dom,
   });
 
   await project.writeBuildInfo();

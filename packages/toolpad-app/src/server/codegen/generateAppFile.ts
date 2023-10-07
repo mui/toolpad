@@ -24,7 +24,8 @@ export default function generateAppFile(ctx: ModuleContext, dom: appDom.AppDom):
     import * as ReactDOM from 'react-dom/client';
     import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
     import { ThemeProvider, CssBaseline, Container, Typography } from '@mui/material';
-    import { AppLayout } from '@mui/toolpad/runtime';
+    import { AppLayout, UseDataProviderContext } from '@mui/toolpad/runtime';
+    import { QueryClientProvider, QueryClient } from '@tanstack/react-query';
     import theme from ${JSON.stringify(themeImportSpecifier)};
     ${pages
       .map((page) => {
@@ -57,36 +58,50 @@ export default function generateAppFile(ctx: ModuleContext, dom: appDom.AppDom):
 
     const navigationEntries = ${serializeJavascript(navigationEntries, { isJSON: true })}
 
+    function useDataProvider() {
+      return { dataProvider: null }
+    }
+
+    const queryClient =  new QueryClient()
+
     function App() {
       return (
-        <ThemeProvider theme={theme}>
-          <CssBaseline enableColorScheme />
-          <BrowserRouter basename={base}>
-            <AppLayout pages={navigationEntries}>
-              <Routes>
-                ${pages.map((page) => {
-                  const pageUrlPath = `/pages/${page.id}`;
-                  const pageElement = `<${getPageComponentName(page)} />`;
-                  return `<Route path=${JSON.stringify(pageUrlPath)} element={${pageElement}} />`;
-                })}
-                ${pages.map((page) => {
-                  const pageUrlPath = `/pages/${page.name}`;
-                  const pageRedirectUrlPath = `/pages/${page.id}`;
-                  const pageElement = `<Navigate to=${JSON.stringify(pageRedirectUrlPath)} />`;
-                  return `<Route path=${JSON.stringify(pageUrlPath)} element={${pageElement}} />`;
-                })}
-                ${
-                  defaultPageUrl
-                    ? `<Route path="/" element={<Navigate to=${JSON.stringify(
-                        defaultPageUrl,
-                      )} />} />`
-                    : ''
-                }
-                <Route path="*" element={<PageNotFound />} />
-              </Routes>
-            </AppLayout>
-          </BrowserRouter>
-        </ThemeProvider>
+        <UseDataProviderContext.Provider value={useDataProvider}>
+          <QueryClientProvider client={queryClient}>
+            <ThemeProvider theme={theme}>
+              <CssBaseline enableColorScheme />
+              <BrowserRouter basename={base}>
+                <AppLayout pages={navigationEntries}>
+                  <Routes>
+                    ${pages.map((page) => {
+                      const pageUrlPath = `/pages/${page.id}`;
+                      const pageElement = `<${getPageComponentName(page)} />`;
+                      return `<Route path=${JSON.stringify(
+                        pageUrlPath,
+                      )} element={${pageElement}} />`;
+                    })}
+                    ${pages.map((page) => {
+                      const pageUrlPath = `/pages/${page.name}`;
+                      const pageRedirectUrlPath = `/pages/${page.id}`;
+                      const pageElement = `<Navigate to=${JSON.stringify(pageRedirectUrlPath)} />`;
+                      return `<Route path=${JSON.stringify(
+                        pageUrlPath,
+                      )} element={${pageElement}} />`;
+                    })}
+                    ${
+                      defaultPageUrl
+                        ? `<Route path="/" element={<Navigate to=${JSON.stringify(
+                            defaultPageUrl,
+                          )} />} />`
+                        : ''
+                    }
+                    <Route path="*" element={<PageNotFound />} />
+                  </Routes>
+                </AppLayout>
+              </BrowserRouter>
+            </ThemeProvider>
+          </QueryClientProvider>
+        </UseDataProviderContext.Provider>
       );
     }
 

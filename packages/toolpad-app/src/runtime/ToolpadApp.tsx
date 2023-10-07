@@ -266,7 +266,7 @@ const [useDomContext, DomContextProvider] = createProvidedContext<appDom.AppDom>
 const [useEvaluateScopeExpression, EvaluateScopeExpressionProvider] =
   createProvidedContext<(expr: string) => any>('EvaluateScopeExpression');
 
-export { DomContextProvider, ComponentsContextProvider };
+export { DomContextProvider, ComponentsContextProvider, UseDataProviderContext };
 
 interface SetBindingContextValue {
   setBinding: (id: string, result: BindingEvaluationResult, scopeId?: string) => void;

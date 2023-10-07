@@ -531,6 +531,7 @@ function QueryEditor({
                 globalScopeMeta={globalScopeMeta}
                 liveValue={paramsEditorLiveValue}
                 jsRuntime={jsBrowserRuntime}
+                envVarNames={envVarNames}
               />
             </Box>
           </Panel>

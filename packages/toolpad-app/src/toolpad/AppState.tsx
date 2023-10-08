@@ -15,7 +15,6 @@ import insecureHash from '../utils/insecureHash';
 import { NodeHashes } from '../types';
 import { hasFieldFocus } from '../utils/fields';
 import { DomView, getViewFromPathname, PageViewTab } from '../utils/domView';
-import config from '../config';
 
 export function getNodeHashes(dom: appDom.AppDom): NodeHashes {
   return mapValues(dom.nodes, (node) => insecureHash(JSON.stringify(omit(node, 'id'))));
@@ -95,7 +94,7 @@ export function domReducer(dom: appDom.AppDom, action: AppStateAction): appDom.A
 
 export interface AppState {
   dom: appDom.AppDom;
-  base: string;
+  appUrl: string;
   savedDom: appDom.AppDom;
   savingDom: boolean;
   unsavedDomChanges: number;
@@ -440,10 +439,11 @@ function isCancellableAction(action: AppStateAction): boolean {
 }
 
 export interface DomContextProps {
+  appUrl: string;
   children?: React.ReactNode;
 }
 
-export default function AppProvider({ children }: DomContextProps) {
+export default function AppProvider({ appUrl, children }: DomContextProps) {
   const projectApi = useProjectApi();
   const { data: dom } = projectApi.useQuery('loadDom', [], { suspense: true });
 
@@ -466,7 +466,7 @@ export default function AppProvider({ children }: DomContextProps) {
     // DOM state
     dom,
     // base path of the running application
-    base: config.base,
+    appUrl,
     // DOM loader state
     savingDom: false,
     unsavedDomChanges: 0,

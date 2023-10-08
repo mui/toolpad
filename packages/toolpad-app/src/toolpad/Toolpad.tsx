@@ -92,7 +92,9 @@ function EditorShell({ children }: EditorShellProps) {
     if (currentView) {
       const currentPageId = currentView?.kind === 'page' ? currentView.nodeId : null;
 
-      const previewPath = currentPageId ? `${appState.base}/pages/${currentPageId}` : appState.base;
+      const previewPath = currentPageId
+        ? `${appState.appUrl}/pages/${currentPageId}`
+        : appState.appUrl;
 
       return {
         actions: (
@@ -135,13 +137,15 @@ export interface ToolpadProps {
 }
 
 export default function Toolpad({ basename }: ToolpadProps) {
+  const appUrl = config.base;
   const wsProtocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
   const wsUrl = `${wsProtocol}//${window.location.hostname}:${config.wsPort}/toolpad-ws`;
+  const projectApiUrl = '/api/rpc';
 
   return (
-    <ProjectEventsProvider wsUrl={wsUrl}>
-      <QueryClientProvider client={queryClient}>
-        <ProjectApiProvider url="/api/rpc">
+    <QueryClientProvider client={queryClient}>
+      <ProjectEventsProvider wsUrl={wsUrl}>
+        <ProjectApiProvider url={projectApiUrl}>
           <ThemeProvider>
             {/* CssBaseline kickstart an elegant, consistent, and simple baseline to build upon. */}
             <CssBaseline />
@@ -150,7 +154,7 @@ export default function Toolpad({ basename }: ToolpadProps) {
               <ErrorBoundary fallbackRender={ErrorFallback}>
                 <React.Suspense fallback={<FullPageLoader />}>
                   <BrowserRouter basename={basename}>
-                    <AppProvider>
+                    <AppProvider appUrl={appUrl}>
                       <EditorShell>
                         <Routes>
                           {GLOBAL_FUNCTIONS_FEATURE_FLAG ? (
@@ -166,7 +170,7 @@ export default function Toolpad({ basename }: ToolpadProps) {
             </Box>
           </ThemeProvider>
         </ProjectApiProvider>
-      </QueryClientProvider>
-    </ProjectEventsProvider>
+      </ProjectEventsProvider>
+    </QueryClientProvider>
   );
 }

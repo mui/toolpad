@@ -1,0 +1,34 @@
+apiVersion: v1
+kind: page
+spec:
+  id: -vzMDF1
+  title: Default page
+  content:
+    - component: Text
+      name: text
+      layout:
+        columnSize: 1
+        horizontalAlign: start
+      props:
+        variant: h2
+        value: Users
+        mode: text
+    - component: DataGrid
+      name: usersDataGrid
+      layout:
+        columnSize: 1
+      props:
+        rows: null
+        columns:
+          - field: id
+            type: number
+            width: 77
+          - field: name
+            type: string
+            width: 120
+          - field: email
+            type: string
+            width: 335
+        height: 474
+        rowsSource: dataProvider
+        dataProviderId: usersByCursor.ts:default

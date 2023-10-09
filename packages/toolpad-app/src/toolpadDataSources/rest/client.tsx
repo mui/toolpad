@@ -15,7 +15,6 @@ import {
 } from '@mui/material';
 import { Controller, useForm } from 'react-hook-form';
 import { TabContext, TabList } from '@mui/lab';
-import { useBrowserJsRuntime } from '@mui/toolpad-core/jsBrowserRuntime';
 import { useServerJsRuntime } from '@mui/toolpad-core/jsServerRuntime';
 import { Panel, PanelGroup, PanelResizeHandle } from '../../components/resizablePanels';
 import { ClientDataSource, ConnectionEditorProps, QueryEditorProps } from '../../types';
@@ -335,11 +334,10 @@ function QueryEditor({
 
   const paramsEntries = input.params || EMPTY_PARAMS;
 
-  const jsBrowserRuntime = useBrowserJsRuntime();
   const jsServerRuntime = useServerJsRuntime();
 
   const paramsEditorLiveValue = useEvaluateLiveBindingEntries({
-    jsRuntime: jsBrowserRuntime,
+    jsRuntime: jsServerRuntime,
     input: paramsEntries,
     globalScope,
   });
@@ -530,7 +528,7 @@ function QueryEditor({
                 globalScope={globalScope}
                 globalScopeMeta={globalScopeMeta}
                 liveValue={paramsEditorLiveValue}
-                jsRuntime={jsBrowserRuntime}
+                jsRuntime={jsServerRuntime}
                 envVarNames={envVarNames}
               />
             </Box>

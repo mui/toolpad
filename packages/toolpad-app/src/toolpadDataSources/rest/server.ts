@@ -145,7 +145,13 @@ async function execBase(
   const queryScope = {
     // @TODO: remove deprecated query after v1
     query: params,
-    parameters: params,
+    parameters: Object.fromEntries(
+      resolveBindableEntries(
+        jsRuntime,
+        Object.entries(params).map((item) => [item[0], item[1]]) || [],
+        {},
+      ),
+    ),
   };
 
   const urlvalue = fetchQuery.url || getDefaultUrl(project.getRuntimeConfig(), connection);

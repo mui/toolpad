@@ -14,7 +14,11 @@ export function evaluateBindable<V>(
     }
 
     if (hasOwnProperty(bindable, '$$env')) {
-      return { value: ctx.getEnv()[bindable.$$env as string] };
+      const env = ctx.getEnv();
+      if (Object.keys(env).length > 0) {
+        return { value: ctx.getEnv()[bindable.$$env as string] };
+      }
+      return { value: bindable };
     }
   }
 

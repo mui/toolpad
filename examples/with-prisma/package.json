@@ -10,13 +10,13 @@
   },
   "dependencies": {
     "@mui/toolpad": "0.1.31",
-    "@prisma/client": "5.3.1",
+    "@prisma/client": "5.4.1",
     "qrcode": "^1.5.3"
   },
   "devDependencies": {
-    "@types/node": "^20.8.0",
+    "@types/node": "^20.8.3",
     "@types/qrcode": "^1.5.2",
-    "prisma": "^5.3.1",
+    "prisma": "^5.4.1",
     "ts-node": "^10.9.1",
     "typescript": "^5.2.2"
   }

@@ -42,7 +42,7 @@
   "dependencies": {
     "@mui/material": "5.14.12",
     "@mui/toolpad-utils": "0.1.31",
-    "@tanstack/react-query": "4.35.3",
+    "@tanstack/react-query": "4.36.1",
     "@types/json-schema": "7.0.13",
     "cookie": "0.5.0",
     "invariant": "2.2.4",
@@ -52,7 +52,7 @@
   },
   "devDependencies": {
     "@types/cookie": "0.5.2",
-    "@types/react": "18.2.23",
+    "@types/react": "18.2.25",
     "@types/react-is": "18.2.2",
     "concurrently": "8.2.1"
   },

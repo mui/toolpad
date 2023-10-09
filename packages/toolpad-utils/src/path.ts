@@ -6,7 +6,7 @@ export function getExtension(filePath: string): string {
   return dotIndex < 0 ? '' : fileName.substring(dotIndex);
 }
 
-export function hasImageExtension(path: string): boolean {
-  const extension = getExtension(path);
+export function hasImageExtension(pathName: string): boolean {
+  const extension = getExtension(pathName);
   return IMAGE_EXTENSIONS.includes(extension);
 }

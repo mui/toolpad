@@ -267,7 +267,7 @@ function GridColumnsPropEditor({
   onChange,
   disabled,
 }: EditorProps<SerializableGridColumns>) {
-  const { bindings } = usePageEditorState();
+  const { nodeData } = usePageEditorState();
   const [editedIndex, setEditedIndex] = React.useState<number | null>(null);
 
   const editedColumn = typeof editedIndex === 'number' ? value[editedIndex] : null;
@@ -281,19 +281,17 @@ function GridColumnsPropEditor({
     setMenuAnchorEl(null);
   };
 
-  const rowsValue = nodeId && bindings[`${nodeId}.props.rows`];
-  const definedRows: unknown = rowsValue?.value;
+  const rawRows: unknown = nodeId && nodeData[nodeId]?.rawRows;
 
   const inferredColumns = React.useMemo(
-    () => inferColumns(Array.isArray(definedRows) ? definedRows : []),
-    [definedRows],
+    () => inferColumns(Array.isArray(rawRows) ? rawRows : []),
+    [rawRows],
   );
 
   const columnSuggestions = React.useMemo(() => {
     const existingFields = new Set(value.map(({ field }) => field));
     return inferredColumns.filter((column) => !existingFields.has(column.field));
   }, [inferredColumns, value]);
-  const hasColumnSuggestions = columnSuggestions.length > 0;
 
   const handleCreateColumn = React.useCallback(
     (suggestion: SerializableGridColumn) => () => {
@@ -330,10 +328,10 @@ function GridColumnsPropEditor({
   );
 
   const handleRecreateColumns = React.useCallback(() => {
-    if (hasColumnSuggestions) {
+    if (inferredColumns.length > 0) {
       onChange(inferredColumns);
     }
-  }, [hasColumnSuggestions, inferredColumns, onChange]);
+  }, [inferredColumns, onChange]);
 
   const [anchorEl, setAnchorEl] = React.useState<HTMLButtonElement | null>(null);
 
@@ -394,7 +392,7 @@ function GridColumnsPropEditor({
                   <IconButton
                     aria-label="Recreate columns"
                     onClick={handleRecreateColumns}
-                    disabled={!hasColumnSuggestions}
+                    disabled={inferredColumns.length <= 0}
                   >
                     <RefreshIcon />
                   </IconButton>

@@ -1,4 +1,4 @@
-# HTTP Requests
+# HTTP requests
 
 <p class="description">These offer a fast way to load external data from REST APIs, via a configurable interface.</p>
 

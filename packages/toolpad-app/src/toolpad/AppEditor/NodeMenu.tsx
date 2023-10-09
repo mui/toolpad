@@ -2,7 +2,7 @@ import { MenuItem, Menu, ListItemIcon, ListItemText, ButtonProps, MenuProps } fr
 import * as React from 'react';
 import DeleteIcon from '@mui/icons-material/Delete';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
-import RenameIcon from '@mui/icons-material/DriveFileRenameOutlineOutlined';
+import ModeEditIcon from '@mui/icons-material/ModeEdit';
 import { NodeId } from '@mui/toolpad-core';
 import * as appDom from '../../appDom';
 import { useAppState } from '../AppState';
@@ -13,9 +13,10 @@ import useMenu from '../../utils/useMenu';
 export interface NodeMenuProps {
   nodeId: NodeId;
   renderButton: (params: { buttonProps: ButtonProps; menuProps: MenuProps }) => React.ReactNode;
+  renameLabelText?: string;
   deleteLabelText?: string;
   duplicateLabelText?: string;
-  renameLabelText?: string;
+  onRenameNode?: (nodeId: NodeId) => void;
   onDeleteNode?: (nodeId: NodeId) => void;
   onDuplicateNode?: (nodeId: NodeId) => void;
   onRenameNode?: () => void;
@@ -24,9 +25,10 @@ export interface NodeMenuProps {
 export default function NodeMenu({
   nodeId,
   renderButton,
+  renameLabelText,
   deleteLabelText,
   duplicateLabelText,
-  renameLabelText,
+  onRenameNode,
   onDeleteNode,
   onDuplicateNode,
   onRenameNode,
@@ -59,6 +61,14 @@ export default function NodeMenu({
     [deletedNode, deletedNodeId, onDeleteNode],
   );
 
+  const handleRenameClick = React.useCallback(
+    (event: React.MouseEvent) => {
+      onMenuClose(event);
+      onRenameNode?.(nodeId);
+    },
+    [nodeId, onRenameNode, onMenuClose],
+  );
+
   const handleDuplicateClick = React.useCallback(
     (event: React.MouseEvent) => {
       onMenuClose(event);
@@ -88,6 +98,12 @@ export default function NodeMenu({
           menuProps.onClick?.(event);
         }}
       >
+        <MenuItem onClick={handleRenameClick}>
+          <ListItemIcon>
+            <ModeEditIcon />
+          </ListItemIcon>
+          <ListItemText>{renameLabelText}</ListItemText>
+        </MenuItem>
         <MenuItem onClick={handleDuplicateClick}>
           <ListItemIcon>
             <ContentCopyIcon />

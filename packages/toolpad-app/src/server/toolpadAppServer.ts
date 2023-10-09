@@ -2,12 +2,40 @@ import * as path from 'path';
 import * as fs from 'fs/promises';
 import { Server } from 'http';
 import * as express from 'express';
-import { postProcessHtml } from './toolpadAppBuilder';
+import serializeJavascript from 'serialize-javascript';
 import { ToolpadProject } from './localMode';
 import { asyncHandler } from '../utils/express';
 import { basicAuthUnauthorized, checkBasicAuthHeader } from './basicAuth';
 import { createRpcRuntimeServer } from './rpcRuntimeServer';
 import { createRpcHandler } from './rpc';
+import { RUNTIME_CONFIG_WINDOW_PROPERTY, INITIAL_STATE_WINDOW_PROPERTY } from '../constants';
+import type { RuntimeConfig } from '../config';
+import createRuntimeState from '../runtime/createRuntimeState';
+import { RuntimeState } from '../types';
+
+export interface PostProcessHtmlParams {
+  config: RuntimeConfig;
+  initialState: RuntimeState;
+}
+
+export function postProcessHtml(
+  html: string,
+  { config, initialState }: PostProcessHtmlParams,
+): string {
+  const serializedConfig = serializeJavascript(config, { ignoreFunction: true });
+  const serializedInitialState = serializeJavascript(initialState, { isJSON: true });
+
+  const toolpadScripts = [
+    `<script>window[${JSON.stringify(
+      RUNTIME_CONFIG_WINDOW_PROPERTY,
+    )}] = ${serializedConfig}</script>`,
+    `<script>window[${JSON.stringify(
+      INITIAL_STATE_WINDOW_PROPERTY,
+    )}] = ${serializedInitialState}</script>`,
+  ];
+
+  return html.replace(`<!-- __TOOLPAD_SCRIPTS__ -->`, () => toolpadScripts.join('\n'));
+}
 
 export interface CreateViteConfigParams {
   server?: Server;
@@ -46,11 +74,14 @@ export async function createProdHandler(project: ToolpadProject) {
       const htmlFilePath = path.resolve(project.getAppOutputFolder(), './index.html');
       let html = await fs.readFile(htmlFilePath, { encoding: 'utf-8' });
 
-      html = postProcessHtml(html, { config: project.getRuntimeConfig(), dom });
+      html = postProcessHtml(html, {
+        config: project.getRuntimeConfig(),
+        initialState: createRuntimeState({ dom }),
+      });
 
       res.setHeader('Content-Type', 'text/html; charset=utf-8').status(200).end(html);
     }),
   );
 
-  return { handler };
+  return { handler, dispose: async () => undefined };
 }

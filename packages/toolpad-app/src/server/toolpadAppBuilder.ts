@@ -1,17 +1,16 @@
 import * as path from 'path';
+import * as url from 'node:url';
 import { InlineConfig, Plugin, build } from 'vite';
 import react from '@vitejs/plugin-react';
-import serializeJavascript from 'serialize-javascript';
 import { indent } from '@mui/toolpad-utils/strings';
-import { RUNTIME_CONFIG_WINDOW_PROPERTY } from '../constants';
 import type { ComponentEntry } from './localMode';
-import type { RuntimeConfig } from '../config';
-import * as appDom from '../appDom';
-import createRuntimeState from '../runtime/createRuntimeState';
+import { INITIAL_STATE_WINDOW_PROPERTY } from '../constants';
+
+import.meta.url ??= url.pathToFileURL(__filename).toString();
+const currentDirectory = url.fileURLToPath(new URL('.', import.meta.url));
 
 const MAIN_ENTRY = '/main.tsx';
 const CANVAS_ENTRY = '/canvas.tsx';
-const INITIAL_STATE_WINDOW_PROPERTY = '__initialToolpadState__';
 
 const componentsId = `virtual:toolpad:components.js`;
 export const resolvedComponentsId = `\0${componentsId}`;
@@ -57,28 +56,6 @@ export function getHtmlContent({ canvas }: GetHtmlContentParams) {
       </body>
     </html>
   `;
-}
-
-export interface PostProcessHtmlParams {
-  config: RuntimeConfig;
-  dom: appDom.AppDom;
-}
-
-export function postProcessHtml(html: string, { config, dom }: PostProcessHtmlParams): string {
-  const serializedConfig = serializeJavascript(config, { ignoreFunction: true });
-  const initialState = createRuntimeState({ dom });
-  const serializedInitialState = serializeJavascript(initialState, { isJSON: true });
-
-  const toolpadScripts = [
-    `<script>window[${JSON.stringify(
-      RUNTIME_CONFIG_WINDOW_PROPERTY,
-    )}] = ${serializedConfig}</script>`,
-    `<script>window[${JSON.stringify(
-      INITIAL_STATE_WINDOW_PROPERTY,
-    )}] = ${serializedInitialState}</script>`,
-  ];
-
-  return html.replace(`<!-- __TOOLPAD_SCRIPTS__ -->`, () => toolpadScripts.join('\n'));
 }
 
 interface ToolpadVitePluginParams {
@@ -189,6 +166,7 @@ export interface CreateViteConfigParams {
   root: string;
   dev: boolean;
   base: string;
+  customServer?: boolean;
   plugins?: Plugin[];
   getComponents: () => Promise<ComponentEntry[]>;
 }
@@ -202,6 +180,7 @@ export function createViteConfig({
   root,
   dev,
   base,
+  customServer,
   plugins = [],
   getComponents,
 }: CreateViteConfigParams): CreateViteConfigResult {
@@ -235,7 +214,7 @@ export function createViteConfig({
       },
       server: {
         fs: {
-          allow: [root, path.resolve(__dirname, '../../../../')],
+          allow: [root, path.resolve(currentDirectory, '../../../../')],
         },
       },
       optimizeDeps: {
@@ -259,6 +238,7 @@ export function createViteConfig({
           '@mui/material/styles',
           '@mui/material/useMediaQuery',
           '@mui/utils',
+          '@mui/utils/useEventCallback',
           '@mui/x-data-grid-pro',
           '@mui/x-date-pickers/AdapterDayjs',
           '@mui/x-date-pickers/DesktopDatePicker',
@@ -302,6 +282,7 @@ export function createViteConfig({
       define: {
         'process.env.NODE_ENV': `'${mode}'`,
         'process.env.BASE_URL': `'${base}'`,
+        'process.env.TOOLPAD_CUSTOM_SERVER': `'${JSON.stringify(customServer)}'`,
       },
     },
   };

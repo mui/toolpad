@@ -27,7 +27,7 @@ interface IToolpadProject {
   options: ToolpadProjectOptions;
   getRoot(): string;
   loadDom(): Promise<appDom.AppDom>;
-  saveDom(dom: appDom.AppDom): Promise<{ fingerprint: number }>;
+  saveDom(dom: appDom.AppDom): Promise<void>;
   functionsManager: FunctionsManager;
   envManager: EnvManager;
   getRuntimeConfig: () => RuntimeConfig;
@@ -39,16 +39,22 @@ interface IToolpadProject {
 export default class DataManager {
   private project: IToolpadProject;
 
-  private dataSources: Map<string, ServerDataSource<any, any, any> | undefined>;
+  private dataSources: Map<string, ServerDataSource<any, any, any> | undefined> | undefined;
 
   constructor(project: IToolpadProject) {
     this.project = project;
-    this.dataSources = new Map(
-      Object.entries(serverDataSources).map(([key, value]) => [
-        key,
-        typeof value === 'function' ? value(project) : value,
-      ]),
-    );
+  }
+
+  getDataSources(): Map<string, ServerDataSource<any, any, any> | undefined> {
+    if (!this.dataSources) {
+      this.dataSources = new Map(
+        Object.entries(serverDataSources).map(([key, value]) => [
+          key,
+          typeof value === 'function' ? value(this.project) : value,
+        ]),
+      );
+    }
+    return this.dataSources;
   }
 
   async getConnectionParams<P = unknown>(connectionId: string | null): Promise<P | null> {
@@ -80,8 +86,9 @@ export default class DataManager {
     dataNode: appDom.QueryNode<Q>,
     params: Q,
   ): Promise<ExecFetchResult<any>> {
+    const dataSources = this.getDataSources();
     const dataSource: ServerDataSource<P, Q, any> | undefined = dataNode.attributes.dataSource
-      ? this.dataSources.get(dataNode.attributes.dataSource)
+      ? dataSources.get(dataNode.attributes.dataSource)
       : undefined;
     if (!dataSource) {
       throw new Error(
@@ -137,7 +144,8 @@ export default class DataManager {
     connectionId: NodeId | null,
     query: Q,
   ): Promise<any> {
-    const dataSource: ServerDataSource<P, Q, any> | undefined = this.dataSources.get(dataSourceId);
+    const dataSources = this.getDataSources();
+    const dataSource: ServerDataSource<P, Q, any> | undefined = dataSources.get(dataSourceId);
 
     if (!dataSource) {
       throw new Error(`Unknown dataSource "${dataSourceId}"`);
@@ -155,7 +163,8 @@ export default class DataManager {
     method: keyof PQS,
     args: any[],
   ): Promise<any> {
-    const dataSource = this.dataSources.get(dataSourceId) as
+    const dataSources = this.getDataSources();
+    const dataSource = dataSources.get(dataSourceId) as
       | ServerDataSource<P, Q, any, PQS>
       | undefined;
 
@@ -202,11 +211,12 @@ export default class DataManager {
   }
 
   createDataSourcesHandler(): Router {
+    const dataSources = this.getDataSources();
     const router = express.Router();
 
     const handlerMap = new Map<String, Function | null | undefined>();
     Object.keys(serverDataSources).forEach((dataSourceId) => {
-      const handler = this.dataSources.get(dataSourceId)?.createHandler?.();
+      const handler = dataSources.get(dataSourceId)?.createHandler?.();
       if (handler) {
         invariant(
           typeof handler === 'function',

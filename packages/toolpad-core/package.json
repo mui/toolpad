@@ -1,6 +1,6 @@
 {
   "name": "@mui/toolpad-core",
-  "version": "0.1.28",
+  "version": "0.1.31",
   "description": "Build MUI apps quickly",
   "author": "MUI Toolpad team",
   "homepage": "https://github.com/mui/mui-toolpad#readme",
@@ -40,10 +40,10 @@
     "url": "https://github.com/mui/mui-toolpad/issues"
   },
   "dependencies": {
-    "@mui/material": "5.14.9",
-    "@mui/toolpad-utils": "0.1.28",
-    "@tanstack/react-query": "4.35.0",
-    "@types/json-schema": "7.0.12",
+    "@mui/material": "5.14.12",
+    "@mui/toolpad-utils": "0.1.31",
+    "@tanstack/react-query": "4.36.1",
+    "@types/json-schema": "7.0.13",
     "cookie": "0.5.0",
     "invariant": "2.2.4",
     "quickjs-emscripten": "0.23.0",
@@ -52,13 +52,13 @@
   },
   "devDependencies": {
     "@types/cookie": "0.5.2",
-    "@types/react": "18.2.21",
-    "@types/react-is": "18.2.1",
+    "@types/react": "18.2.25",
+    "@types/react-is": "18.2.2",
     "concurrently": "8.2.1"
   },
   "peerDependencies": {
-    "vm-browserify": "^1.1.2",
-    "react": "^18.0.0"
+    "react": "^18.0.0",
+    "vm-browserify": "^1.1.2"
   },
   "peerDependenciesMeta": {
     "vm-browserify": {
@@ -68,5 +68,5 @@
   "publishConfig": {
     "access": "public"
   },
-  "gitHead": "60bec54459ba0f3334c62f12e6e6c2c10a08fd21"
+  "gitHead": "0186d8a811d0c172f193d8e961cd763d5024b71a"
 }

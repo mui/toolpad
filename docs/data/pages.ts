@@ -51,6 +51,9 @@ const pages: MuiPage[] = [
         title: 'Managing state',
       },
       {
+        pathname: '/toolpad/concepts/event-handling',
+      },
+      {
         pathname: '/toolpad/concepts/file-structure',
         title: 'File structure',
       },
@@ -64,7 +67,7 @@ const pages: MuiPage[] = [
         pathname: '/toolpad/concepts/theming',
       },
       {
-        pathname: '/toolpad/concepts/display-mode',
+        pathname: '/toolpad/concepts/page-properties',
       },
     ],
   },

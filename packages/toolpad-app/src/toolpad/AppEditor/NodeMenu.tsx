@@ -19,7 +19,6 @@ export interface NodeMenuProps {
   onRenameNode?: (nodeId: NodeId) => void;
   onDeleteNode?: (nodeId: NodeId) => void;
   onDuplicateNode?: (nodeId: NodeId) => void;
-  onRenameNode?: () => void;
 }
 
 export default function NodeMenu({
@@ -31,7 +30,6 @@ export default function NodeMenu({
   onRenameNode,
   onDeleteNode,
   onDuplicateNode,
-  onRenameNode,
 }: NodeMenuProps) {
   const { dom } = useAppState();
 
@@ -77,14 +75,6 @@ export default function NodeMenu({
     [onDuplicateNode, nodeId, onMenuClose],
   );
 
-  const handleRenameClick = React.useCallback(
-    (event: React.MouseEvent) => {
-      onMenuClose(event);
-      onRenameNode?.();
-    },
-    [onRenameNode, onMenuClose],
-  );
-
   return (
     <React.Fragment>
       {renderButton({
@@ -110,14 +100,6 @@ export default function NodeMenu({
           </ListItemIcon>
           <ListItemText>{duplicateLabelText}</ListItemText>
         </MenuItem>
-        {onRenameNode ? (
-          <MenuItem onClick={handleRenameClick}>
-            <ListItemIcon>
-              <RenameIcon />
-            </ListItemIcon>
-            <ListItemText>{renameLabelText}</ListItemText>
-          </MenuItem>
-        ) : null}
         <MenuItem onClick={handleDeleteNodeDialogOpen}>
           <ListItemIcon>
             <DeleteIcon />

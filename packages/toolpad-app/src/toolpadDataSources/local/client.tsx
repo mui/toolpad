@@ -162,32 +162,32 @@ interface FunctionAutocompleteProps {
   onSelect: (functionName: string) => void;
 }
 
-function HandlerFileTreeItem({ file }: HandlerFileTreeItemProps) {
-  return (
-    <FileTreeItemRoot
-      key={file.name}
-      nodeId={serializeFunctionId({ file: file.name })}
-      label={
-        <React.Fragment>
-          {file.name}
-          <FlexFill />
-          <OpenCodeEditorButton iconButton filePath={file.name} fileType="resource" />
-        </React.Fragment>
-      }
-    >
-      {file.handlers.map((handler) => {
-        return (
-          <TreeItem
-            className={fileTreeItemClasses.handlerItem}
-            key={handler.name}
-            nodeId={serializeFunctionId({ file: file.name, handler: handler.name })}
-            label={handler.name}
-          />
-        );
-      })}
-    </FileTreeItemRoot>
-  );
-}
+// function HandlerFileTreeItem({ file }: HandlerFileTreeItemProps) {
+//   return (
+//     <FileTreeItemRoot
+//       key={file.name}
+//       nodeId={serializeFunctionId({ file: file.name })}
+//       label={
+//         <React.Fragment>
+//           {file.name}
+//           <FlexFill />
+//           <OpenCodeEditorButton iconButton filePath={file.name} fileType="resource" />
+//         </React.Fragment>
+//       }
+//     >
+//       {file.handlers.map((handler) => {
+//         return (
+//           <TreeItem
+//             className={fileTreeItemClasses.handlerItem}
+//             key={handler.name}
+//             nodeId={serializeFunctionId({ file: file.name, handler: handler.name })}
+//             label={handler.name}
+//           />
+//         );
+//       })}
+//     </FileTreeItemRoot>
+//   );
+// }
 
 function FunctionAutocomplete({
   files,
@@ -284,7 +284,7 @@ function FunctionAutocomplete({
                     {params.group}
                     <OpenCodeEditorButton
                       filePath={params.group}
-                      fileType="query"
+                      fileType="resource"
                       iconButton
                       disableRipple
                       sx={{

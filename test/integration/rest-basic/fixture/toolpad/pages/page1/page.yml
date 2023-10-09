@@ -5,14 +5,14 @@ spec:
   title: Page 1
   content:
     - component: Text
-      name: text2
+      name: text2Renamed
       layout:
         columnSize: 1
       props:
         variant: h1
         value: RUN yarn test:rest:start
     - component: Text
-      name: typography
+      name: typographyRenamed
       layout:
         columnSize: 1
       props:
@@ -20,7 +20,7 @@ spec:
           $$jsExpression: |
             `query1: ${query1.data.args.query1_param1}`
     - component: Button
-      name: button2Renamed
+      name: button2RenamedIsCool
       layout:
         columnSize: 1
       props:
@@ -28,7 +28,7 @@ spec:
         onClick:
           $$jsExpressionAction: "query2.fetch({value: 'query2_value' })"
     - component: Text
-      name: typography1
+      name: typography1Renamed
       layout:
         columnSize: 1
       props:
@@ -69,7 +69,7 @@ spec:
           contentType: application/json
       parameters:
         - name: value
-          value: incorrect
+          value: ramesh
       mode: mutation
     - name: queryWithTransform
       query:

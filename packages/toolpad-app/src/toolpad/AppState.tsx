@@ -12,7 +12,7 @@ import { omit, update } from '../utils/immutability';
 import client from '../api';
 import useShortcut from '../utils/useShortcut';
 import insecureHash from '../utils/insecureHash';
-import { NodeHashes } from '../types';
+import { NodeHashes, ClientDataSource } from '../types';
 import { hasFieldFocus } from '../utils/fields';
 import { DomView, getViewFromPathname, PageViewTab } from '../utils/domView';
 import { projectEvents } from '../projectEvents';

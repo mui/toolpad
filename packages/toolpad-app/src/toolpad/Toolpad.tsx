@@ -138,9 +138,11 @@ export interface ToolpadProps {
 
 export default function Toolpad({ basename }: ToolpadProps) {
   const appUrl = config.base;
+
   const wsProtocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
   const wsUrl = `${wsProtocol}//${window.location.hostname}:${config.wsPort}/toolpad-ws`;
-  const projectApiUrl = '/api/rpc';
+
+  const projectApiUrl = `${appUrl}/__toolpad_dev__/rpc`;
 
   return (
     <QueryClientProvider client={queryClient}>

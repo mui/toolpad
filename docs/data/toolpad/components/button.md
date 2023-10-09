@@ -2,11 +2,13 @@
 
 <p class="description">Learn about a button component and it's usage in Toolpad.</p>
 
+## Demo
+
 Buttons allow users to take actions, make choices with a single tap. Detailed documentation of the component properties is available in the reference section for [button](/toolpad/reference/components/button/#properties).
 
 {{"demo": "ButtonBasic.js", "hideToolbar": true}}
 
-## Variations
+## Appearance
 
 The Button component has multiple variations supported in Toolpad. Let's look at each of these below.
 

@@ -13,7 +13,7 @@
 
 ## The problems
 
-After reviewing multiple approaches and tools, we noticed that there are a few recurring core problem areas that needed to be addressed:
+On reviewing multiple products and approaches, a few recurring core problem areas were noticed. Let's examine them in detail:
 
 ### The problems with pro-code tools
 
@@ -70,7 +70,7 @@ Like any Node.js app, you can self-host a Toolpad app on your own server or any 
 
 ### Collaboration and sharing
 
-The Toolpad application configuration is stored in yaml files that can be checked into git or any version control tool of your choice and maintained collaboratively. We didn't want to reinvent the wheel when it comes to collaboration for engineers. Having a private code repository is one of the essential practices to ensure that user data remains secure.
+The Toolpad application configuration is stored in yaml files that can be checked into git or any version control tool of your choice and maintained collaboratively. Having a private code repository is one of the essential practices to ensure that user data remains secure. There is no need to reinvent the wheel when it comes to collaboration for engineers.
 
 ## How is Toolpad different from Y?
 

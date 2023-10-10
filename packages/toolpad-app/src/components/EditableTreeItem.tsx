@@ -110,13 +110,11 @@ export default function EditableTreeItem({
 
   const handleKeyDown = React.useCallback(
     (event: React.KeyboardEvent<HTMLInputElement>) => {
+      event.stopPropagation();
       if (event.key === 'Enter') {
         handleConfirm();
-      } else if (event.key === 'Backspace') {
-        event.stopPropagation();
       } else if (event.key === 'Escape') {
         handleCancel();
-        event.stopPropagation();
       }
     },
     [handleCancel, handleConfirm],

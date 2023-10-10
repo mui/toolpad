@@ -16,7 +16,7 @@ export interface NodeMenuProps {
   renameLabelText?: string;
   deleteLabelText?: string;
   duplicateLabelText?: string;
-  onRenameNode?: () => void;
+  onRenameNode?: (nodeId: NodeId) => void;
   onDeleteNode?: (nodeId: NodeId) => void;
   onDuplicateNode?: (nodeId: NodeId) => void;
 }
@@ -60,10 +60,10 @@ export default function NodeMenu({
 
   const handleRenameClick = React.useCallback(
     (event: React.MouseEvent) => {
-      onRenameNode?.();
+      onRenameNode?.(nodeId);
       onMenuClose(event);
     },
-    [onRenameNode, onMenuClose],
+    [nodeId, onRenameNode, onMenuClose],
   );
 
   const handleDuplicateClick = React.useCallback(
@@ -95,18 +95,22 @@ export default function NodeMenu({
             <ListItemText>{renameLabelText}</ListItemText>
           </MenuItem>
         ) : null}
-        <MenuItem onClick={handleDuplicateClick}>
-          <ListItemIcon>
-            <ContentCopyIcon />
-          </ListItemIcon>
-          <ListItemText>{duplicateLabelText}</ListItemText>
-        </MenuItem>
-        <MenuItem onClick={handleDeleteNodeDialogOpen}>
-          <ListItemIcon>
-            <DeleteIcon />
-          </ListItemIcon>
-          <ListItemText>{deleteLabelText}</ListItemText>
-        </MenuItem>
+        {onDuplicateNode ? (
+          <MenuItem onClick={handleDuplicateClick}>
+            <ListItemIcon>
+              <ContentCopyIcon />
+            </ListItemIcon>
+            <ListItemText>{duplicateLabelText}</ListItemText>
+          </MenuItem>
+        ) : null}
+        {onDeleteNode ? (
+          <MenuItem onClick={handleDeleteNodeDialogOpen}>
+            <ListItemIcon>
+              <DeleteIcon />
+            </ListItemIcon>
+            <ListItemText>{deleteLabelText}</ListItemText>
+          </MenuItem>
+        ) : null}
       </Menu>
       <ConfirmDialog
         open={!!deletedNode}

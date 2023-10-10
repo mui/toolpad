@@ -11,35 +11,25 @@
 - **Single source of truth**. Because Toolpad runs alongside your existing code, it lets you maintain a single source of truth for all business logic
 - **Integrates well with your development lifecycle**. Your project lives on your own file system. You can use your own IDE, version control system, deployment target, CLI tools
 
-## The problems
+On reviewing multiple products and approaches, a few recurring areas of concern were noticed. Let's examine them in detail:
 
-On reviewing multiple products and approaches, a few recurring core problem areas were noticed. Let's examine them in detail:
+## Building internal apps using pro-code tools
 
-### The problems with pro-code tools
+Every organization aspires to achieve rapid delivery, but to accommodate potential use cases, developers are often compelled to opt for flexible pro-code solutions, which typically come at the expense of speed. These tools offer lower abstraction levels for more control, but handling and scaling them soon becomes an unavoidable maintenance overhead. Lots of boilerplate HTML, CSS, and JavaScript glue code is needed just to get backend data to the browser. Building internal tools requires knowledge of front-end framework. While it may interest some, most internal tool developers find it an extra burden to maintain.
 
-#### Inhibit fast development
+## Building internal tools using low-code tools
 
-Every organization aspires to achieve rapid delivery, but in order to accommodate potential use cases, developers are often compelled to opt for flexible pro-code solutions, which typically come at the expense of speed. They offer lower abstraction levels for more control but handling and scaling them soon becomes an unavoidable maintenance overhead.
+There exist many low-code code tools specifically to build internal tools. These help develop apps fast but come with a few trade-offs, as mentioned below:
 
-#### More lines of code
-
-Lots of boilerplate HTML, CSS and JavaScript is required to build a custom internal tool from scratch. Lots of glue code is also required just to get backend data to the browser and hooked up to data displaying components.
-
-#### Compel you to learn front-end
-
-Building internal tools require you to know a front-end framework. While it may interest some, most internal tool developers find it an extra burden to maintain and often seek help from front-end professionls.
-
-### The problems with low-code tools
-
-#### Codebase fragmentation and duplication
+### Codebase fragmentation and duplication
 
 Frequently, developers invest valuable time in hunting down particular versions of business logic and then maintaining them in multiple places. When working with external low-code/no-code tools, code/logic duplication can often arise as a consequence of design decisions. Not having a unified reference point within a codebase compromises its scalability as well as ease of maintenance and debugging.
 
-#### Extensibility
+### Extensibility
 
 Low-code tools are hard to extend. If there's something the tool can't do out of the box, you can't bring your own code with you and integrate it seamlessly.
 
-#### Loss of control
+### Loss of control
 
 When working with external tools, developers often forfeit their autonomy and are constrained by the choices offered by the tool. A black-box element intervention takes away the control over the entire process, encompassing integrations, deployment, and version control. This lack of control puts the underlying sensitive data to risk. The security of customer data is critical, and the seriousness of this matter can't be overstated.
 
@@ -47,7 +37,7 @@ When working with external tools, developers often forfeit their autonomy and ar
 
 Addressing the aforementioned problems leads to a better developer experience. Toolpad solves them in the following ways:
 
-{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/getting-started/why-toolpad/why-toolpad.png", "alt": "How Toolpad fits in your codebase", "caption": "How Toolpad fits in your codebase", "zoom": true }}
+{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/getting-started/why-toolpad/why-toolpad.png", "alt": "How Toolpad fits in your codebase", "caption": "How Toolpad fits in your workflow", "zoom": true }}
 
 ### Front-end UI
 
@@ -60,11 +50,11 @@ For other use cases, Toolpad supports adding any number of custom React componen
 Toolpad supports connecting to data in two ways:
 
 1. Link REST APIs to Toolpad through HTTP queries—this is the most common way of getting data to Toolpad.
-2. Write custom functions in your own IDE to connect to any data source. You can reuse your existing scripts, business logic, database models, client libraries, and secrets. These allow you to have a single, shared codebase for internal or external applications—meaning **no duplication or fragmentation**.
+2. Write custom functions in your own IDE to connect to any data source. You can reuse your existing scripts, business logic, database models, client libraries, and secrets. These allow you to have a single, shared codebase for internal or external applications—meaning no duplication or fragmentation.
 
 ### Development lifecycle
 
-Toolpad gives you **full control** over your app's development lifecycle. Toolpad is "local-first": your project lives on your own file system, so you can use your own IDE, version control system, deployment target, and CLI tools.
+Toolpad gives you full control over your app's development lifecycle. Toolpad is "local-first": your project lives on your own file system, so you can use your own IDE, version control system, deployment target, and CLI tools.
 
 Like any Node.js app, you can self-host a Toolpad app on your own server or any hosting provider of your choice (such as AWS, Render, Railway, or Heroku). Toolpad does not lock you in to its own cloud hosting.
 

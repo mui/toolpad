@@ -1,5 +1,59 @@
 # Changelog
 
+## 0.1.31
+
+<!-- generated comparing v0.1.30..master -->
+
+_Oct 4, 2023_
+
+A big thanks to the 5 contributors who made this release possible. Here are some highlights ✨:
+
+Add component search box, fix editor failing to open, allow custom base path for Toolpad applications, improve automatic formatting of binding expressions.
+
+- &#8203;<!-- 15 -->Fix Data grid invalid date handling (#2748) @Janpot
+- &#8203;<!-- 14 -->Fix editor failing to open (#2745) @Janpot
+- &#8203;<!-- 13 -->add a search box on the top (#2692) @JerryWu1234
+- &#8203;<!-- 12 -->Add global sidebar (#2730) @apedroferreira
+- &#8203;<!-- 11 -->format IDE code (#2674) @JerryWu1234
+- &#8203;<!-- 10 -->Move server files to the src folder (#2746) @Janpot
+- &#8203;<!-- 09 -->Update PULL_REQUEST_TEMPLATE.md @mbrookes
+- &#8203;<!-- 08 -->Support --base option to set a custom base path (#2740) @Janpot
+- &#8203;<!-- 07 -->Remove Chart as future component (#2738) @Janpot
+- &#8203;<!-- 06 -->Isolate the Toolpad router from Toolpad server (#2735) @Janpot
+- &#8203;<!-- 05 -->Correct types of component labels (#2736) @Janpot
+- &#8203;<!-- 04 -->Run required PR label action on synchronize event (#2734) @Janpot
+- &#8203;<!-- 03 -->Refactor cli interface (#2729) @Janpot
+- &#8203;<!-- 02 -->[docs] Fix docs title regression (#2739) @oliviertassinari
+- &#8203;<!-- 01 -->[docs] Header captialization with sidenav consistency @oliviertassinari
+
+All contributors of this release in alphabetical order: @apedroferreira, @Janpot, @JerryWu1234, @mbrookes, @oliviertassinari
+
+## 0.1.30
+
+<!-- generated comparing v0.1.29..master -->
+
+_Sep 28, 2023_
+
+A big thanks to the 3 contributors who made this release possible. Here are some highlights ✨:
+
+Some more documentation improvements, move to Vitest and minor bug fixes.
+
+- &#8203;<!-- 11 -->fix 2704 (#2725) @JerryWu1234
+- &#8203;<!-- 10 -->Fix prettier changes script (#2722) @Janpot
+- &#8203;<!-- 09 -->Remove unused address dependency (#2723) @Janpot
+- &#8203;<!-- 08 -->yarn prettier @oliviertassinari
+- &#8203;<!-- 07 -->Move to vitest (#2709) @Janpot
+- &#8203;<!-- 06 -->Run full prettier in CI (#2713) @Janpot
+- &#8203;<!-- 05 -->Improve docs language consistency (#2715) @Janpot
+- &#8203;<!-- 04 -->Fix typo in docs description (#2714) @Janpot
+- &#8203;<!-- 03 -->Update monorepo (#2712) @Janpot
+- &#8203;<!-- 02 -->[core] Sync prism-okaidia.css with docs-infra @oliviertassinari
+- &#8203;<!-- 01 -->[core] Straight quotes & website monorepo change @oliviertassinari
+
+All contributors of this release in alphabetical order: @Janpot, @JerryWu1234, @oliviertassinari
+
+✨ Done in 1.32s.
+
 ## 0.1.29
 
 <!-- generated comparing v0.1.28..master -->

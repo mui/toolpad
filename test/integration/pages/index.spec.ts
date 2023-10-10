@@ -1,7 +1,9 @@
 import * as path from 'path';
 import * as url from 'url';
+import * as fs from 'fs/promises';
 import { ToolpadEditor } from '../../models/ToolpadEditor';
 import { test, expect } from '../../playwright/localTest';
+import { folderExists } from '../../../packages/toolpad-utils/src/fs';
 
 const currentDirectory = url.fileURLToPath(new URL('.', import.meta.url));
 
@@ -28,7 +30,32 @@ test('must load page in initial URL without altering URL', async ({ page }) => {
 });
 
 test('must show a message when a non-existing url is accessed', async ({ page }) => {
-  await page.goto(`/preview/pages/i-dont-exist-lol`);
+  await page.goto(`/prod/pages/i-dont-exist-lol`);
 
   await expect(page.getByText('Not found')).toBeVisible();
+});
+
+test('can rename page', async ({ page, localApp }) => {
+  const editorModel = new ToolpadEditor(page);
+
+  await editorModel.goToPageById('g433ywb');
+  await editorModel.waitForOverlay();
+
+  const text = editorModel.appCanvas.getByText('foo');
+
+  await expect(text).toBeVisible();
+
+  const oldPageFolder = path.resolve(localApp.dir, './toolpad/pages/page2');
+  await expect.poll(async () => folderExists(oldPageFolder)).toBe(true);
+
+  await editorModel.explorer.getByText('page2').dblclick();
+  await page.keyboard.type('renamedpage');
+  await page.keyboard.press('Enter');
+
+  const newPageFolder = path.resolve(localApp.dir, './toolpad/pages/renamedpage');
+  await expect.poll(async () => folderExists(oldPageFolder)).toBe(false);
+  await expect.poll(async () => folderExists(newPageFolder)).toBe(true);
+
+  await expect(text).toBeVisible();
+  await fs.rename(newPageFolder, oldPageFolder);
 });

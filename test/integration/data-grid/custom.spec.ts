@@ -40,7 +40,7 @@ test('Code component column selector', async ({ page }) => {
   await clickCenter(page, editorModel.appCanvas.locator('.MuiDataGrid-root'));
   await editorModel.componentEditor.getByRole('button', { name: 'columns' }).click();
   await page.getByRole('button', { name: 'customField' }).click();
-  await page.getByRole('button', { name: 'Custom component​' }).click();
+  await page.getByRole('combobox', { name: 'Custom component​' }).click();
   await page.getByRole('option', { name: 'Other' }).click();
   await expect(marker).toBeVisible();
 });

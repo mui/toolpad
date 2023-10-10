@@ -15,10 +15,11 @@ import {
 import CodeIcon from '@mui/icons-material/Code';
 import { LoadingButton } from '@mui/lab';
 import client from '../api';
+import { CodeEditorFileType } from '../types';
 
 interface OpenCodeEditorButtonProps extends ButtonProps {
   filePath: string;
-  fileType: string;
+  fileType: CodeEditorFileType;
   onSuccess?: () => void;
   iconButton?: boolean;
 }
@@ -41,12 +42,14 @@ function MissingEditorDialog({ open, onClose }: MissingEditorDialogProps) {
       onClose={handleMissingEditorDialogClose}
       aria-labelledby={`${id}-title`}
       aria-describedby="alert-dialog-description"
+      onClick={(event) => event.stopPropagation()}
     >
       <DialogTitle id={`${id}-title`}>{'Editor not found'}</DialogTitle>
       <DialogContent>
         <DialogContentText id="alert-dialog-description">
-          No editor was detected on your system. If using Visual Studio Code, this may be due to a
-          missing &quot;code&quot; command in your PATH. <br />
+          No editor was detected on your system. If you use Visual Studio Code, this may be due to a
+          missing &quot;code&quot; command in your PATH. Otherwise you can set the{' '}
+          <code>$EDITOR</code> environment variable. <br />
           Check the{' '}
           <Link
             href="https://mui.com/toolpad/how-to-guides/editor-path/"
@@ -70,6 +73,7 @@ export default function OpenCodeEditorButton({
   fileType,
   iconButton,
   onSuccess,
+  disabled,
   ...rest
 }: OpenCodeEditorButtonProps) {
   const [missingEditorDialog, setMissingEditorDialog] = React.useState(false);
@@ -80,7 +84,7 @@ export default function OpenCodeEditorButton({
       event.stopPropagation();
       setBusy(true);
       try {
-        await client.mutation.openCodeEditor(filePath, fileType);
+        await client.methods.openCodeEditor(filePath, fileType);
         onSuccess?.();
       } catch {
         setMissingEditorDialog(true);
@@ -95,7 +99,7 @@ export default function OpenCodeEditorButton({
     <React.Fragment>
       {iconButton ? (
         <Tooltip title="Open in code editor">
-          <IconButton disabled={busy} size="small" onClick={handleClick} {...rest}>
+          <IconButton disabled={disabled || busy} size="small" onClick={handleClick} {...rest}>
             {busy ? (
               <CircularProgress color="inherit" size={16} />
             ) : (
@@ -104,7 +108,7 @@ export default function OpenCodeEditorButton({
           </IconButton>
         </Tooltip>
       ) : (
-        <LoadingButton disabled={busy} onClick={handleClick} loading={busy} {...rest}>
+        <LoadingButton disabled={disabled || busy} onClick={handleClick} loading={busy} {...rest}>
           Open
         </LoadingButton>
       )}

@@ -65,7 +65,7 @@ test('select component behavior', async ({ page }) => {
   const runtimeModel = new ToolpadRuntime(page);
   await runtimeModel.gotoPage('select');
 
-  const optionsSelect = page.getByRole('button', { name: /select with options/ });
+  const optionsSelect = page.getByRole('combobox', { name: /select with options/ });
   await optionsSelect.scrollIntoViewIfNeeded();
   await clickCenter(page, optionsSelect);
   await expect(page.getByRole('option', { name: 'one' })).toBeVisible();

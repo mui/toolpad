@@ -6,13 +6,11 @@ import { CacheProvider } from '@emotion/react';
 import * as ReactDOM from 'react-dom';
 import invariant from 'invariant';
 import useEventCallback from '@mui/utils/useEventCallback';
-import * as appDom from '../../../appDom';
 import { TOOLPAD_BRIDGE_GLOBAL } from '../../../constants';
 import { HTML_ID_EDITOR_OVERLAY } from '../../../runtime/constants';
-import { NodeHashes } from '../../../types';
+import { NodeHashes, RuntimeState } from '../../../types';
 import { LogEntry } from '../../../components/Console';
 import { useAppStateApi } from '../../AppState';
-import createRuntimeState from '../../../runtime/createRuntimeState';
 import type { ToolpadBridge } from '../../../canvas/ToolpadBridge';
 import CenteredSpinner from '../../../components/CenteredSpinner';
 import { useOnProjectEvent } from '../../../projectEvents';
@@ -41,11 +39,12 @@ function Overlay(props: OverlayProps) {
 export interface EditorCanvasHostProps {
   className?: string;
   pageNodeId: NodeId;
-  dom: appDom.AppDom;
+  runtimeState: RuntimeState;
   savedNodes: NodeHashes;
   onConsoleEntry?: (entry: LogEntry) => void;
   overlay?: React.ReactNode;
   onInit?: (bridge: ToolpadBridge) => void;
+  base: string;
 }
 
 const CanvasRoot = styled('div')({
@@ -81,7 +80,8 @@ function useOnChange<T = unknown>(value: T, handler: (newValue: T, oldValue: T) 
 export default function EditorCanvasHost({
   className,
   pageNodeId,
-  dom,
+  runtimeState,
+  base,
   savedNodes,
   overlay,
   onConsoleEntry,
@@ -93,10 +93,9 @@ export default function EditorCanvasHost({
 
   const updateOnBridge = React.useCallback(() => {
     if (bridge) {
-      const data = createRuntimeState({ dom });
-      bridge.canvasCommands.update({ ...data, savedNodes });
+      bridge.canvasCommands.update({ ...runtimeState, savedNodes });
     }
-  }, [bridge, dom, savedNodes]);
+  }, [bridge, runtimeState, savedNodes]);
 
   React.useEffect(() => {
     updateOnBridge();
@@ -124,7 +123,7 @@ export default function EditorCanvasHost({
     }
   });
 
-  const src = `/preview/pages/${pageNodeId}?toolpad-display=canvas`;
+  const src = `${base}/pages/${pageNodeId}?toolpad-display=canvas`;
 
   const [loading, setLoading] = React.useState(true);
   useOnChange(src, () => setLoading(true));

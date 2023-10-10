@@ -35,7 +35,7 @@ export default function NodeNameEditor({ node, sx }: NodeNameEditorProps) {
     const oldname = dom.nodes[node.id];
     if (isNameValid && oldname.type === 'page' && nameInput !== oldname.name) {
       setTimeout(async () => {
-        await client.mutation.deletePage(oldname.name);
+        await client.methods.deletePage(oldname.name);
       }, 300);
     }
   }, [isNameValid, domApi, node.id, node.name, nameInput, dom]);

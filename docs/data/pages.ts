@@ -47,8 +47,8 @@ const pages: MuiPage[] = [
         ],
       },
       {
-        pathname: '/toolpad/concepts/managing-state',
-        title: 'Managing state',
+        pathname: '/toolpad/concepts/data-binding',
+        title: 'Data binding',
       },
       {
         pathname: '/toolpad/concepts/event-handling',

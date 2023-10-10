@@ -81,11 +81,9 @@ export default function EditableTreeItem({
       handleCancel();
       return;
     }
-
     if (onEdit) {
       onEdit(itemNameInput);
     }
-
     setItemNameInput('');
     setIsInternalEditing(false);
   }, [handleCancel, itemNameInput, newItemValidationResult.isValid, onEdit]);
@@ -96,6 +94,7 @@ export default function EditableTreeItem({
 
   const handleFocus = React.useCallback((event: React.FocusEvent<HTMLInputElement>) => {
     event.target.select();
+    event.stopPropagation();
   }, []);
 
   const handleBlur = React.useCallback(
@@ -113,6 +112,8 @@ export default function EditableTreeItem({
     (event: React.KeyboardEvent<HTMLInputElement>) => {
       if (event.key === 'Enter') {
         handleConfirm();
+      } else if (event.key === 'Backspace') {
+        event.stopPropagation();
       } else if (event.key === 'Escape') {
         handleCancel();
         event.stopPropagation();

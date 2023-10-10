@@ -16,7 +16,7 @@ export interface NodeMenuProps {
   renameLabelText?: string;
   deleteLabelText?: string;
   duplicateLabelText?: string;
-  onRenameNode?: (nodeId: NodeId) => void;
+  onRenameNode?: () => void;
   onDeleteNode?: (nodeId: NodeId) => void;
   onDuplicateNode?: (nodeId: NodeId) => void;
 }
@@ -50,7 +50,6 @@ export default function NodeMenu({
   const handleDeleteNodeDialogClose = React.useCallback(
     (confirmed: boolean, event: React.MouseEvent) => {
       event.stopPropagation();
-
       setDeletedNodeId(null);
       if (confirmed && deletedNode) {
         onDeleteNode?.(deletedNodeId);
@@ -61,10 +60,10 @@ export default function NodeMenu({
 
   const handleRenameClick = React.useCallback(
     (event: React.MouseEvent) => {
+      onRenameNode?.();
       onMenuClose(event);
-      onRenameNode?.(nodeId);
     },
-    [nodeId, onRenameNode, onMenuClose],
+    [onRenameNode, onMenuClose],
   );
 
   const handleDuplicateClick = React.useCallback(
@@ -88,12 +87,14 @@ export default function NodeMenu({
           menuProps.onClick?.(event);
         }}
       >
-        <MenuItem onClick={handleRenameClick}>
-          <ListItemIcon>
-            <ModeEditIcon />
-          </ListItemIcon>
-          <ListItemText>{renameLabelText}</ListItemText>
-        </MenuItem>
+        {onRenameNode ? (
+          <MenuItem onClick={handleRenameClick}>
+            <ListItemIcon>
+              <ModeEditIcon />
+            </ListItemIcon>
+            <ListItemText>{renameLabelText}</ListItemText>
+          </MenuItem>
+        ) : null}
         <MenuItem onClick={handleDuplicateClick}>
           <ListItemIcon>
             <ContentCopyIcon />

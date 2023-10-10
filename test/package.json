@@ -1,5 +1,6 @@
 {
   "name": "@mui/toolpad-tests",
+  "private": true,
   "devDependencies": {
     "@mui/toolpad": "workspace:*",
     "get-port": "7.0.0",

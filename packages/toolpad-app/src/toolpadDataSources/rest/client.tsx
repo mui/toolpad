@@ -266,8 +266,11 @@ function QueryEditor({
     },
     { retry: false },
   );
-  const envVarNames = React.useMemo(() => introspection?.data?.envVarNames || [], [introspection]);
 
+  const envObj = React.useMemo(() => introspection?.data?.envVarNames || [], [introspection]);
+
+  const envVarNames = React.useMemo(() => Object.keys(envObj) || [], [envObj]);
+  debugger;
   const handleParamsChange = React.useCallback(
     (newParams: [string, BindableAttrValue<string>][]) => {
       setInput((existing) => ({ ...existing, params: newParams }));
@@ -335,11 +338,10 @@ function QueryEditor({
 
   const paramsEntries = input.params || EMPTY_PARAMS;
 
-  const jsBrowserRuntime = useBrowserJsRuntime();
-  const jsServerRuntime = useServerJsRuntime();
+  const jsServerRuntime = useServerJsRuntime(envObj);
 
   const paramsEditorLiveValue = useEvaluateLiveBindingEntries({
-    jsRuntime: jsBrowserRuntime,
+    jsRuntime: jsServerRuntime,
     input: paramsEntries,
     globalScope,
   });
@@ -530,7 +532,8 @@ function QueryEditor({
                 globalScope={globalScope}
                 globalScopeMeta={globalScopeMeta}
                 liveValue={paramsEditorLiveValue}
-                jsRuntime={jsBrowserRuntime}
+                jsRuntime={jsServerRuntime}
+                envVarNames={envVarNames}
               />
             </Box>
           </Panel>

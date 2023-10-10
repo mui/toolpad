@@ -293,8 +293,14 @@ export default createBuiltin(Text, {
         'Defines how the content is rendered. Either as plain text, markdown, or as a link.',
       type: 'string',
       enum: ['text', 'markdown', 'link'],
+      enumLabels: {
+        text: 'Text',
+        markdown: 'Markdown',
+        link: 'Link',
+      },
       default: 'text',
       label: 'Mode',
+      control: { type: 'ToggleButtons' },
     },
     value: {
       helperText: 'The text content.',

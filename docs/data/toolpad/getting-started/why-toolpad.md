@@ -25,23 +25,23 @@ Lots of boilerplate HTML, CSS, and JavaScript glue code is needed just to get ba
 
 ### Lower-level abstraction
 
-Building internal tools requires knowledge of front-end framework. While it may interest some, most internal tool developers find the lower-level APIs, HTML and CSS an extra burden to maintain.
+Creating internal tools demands knowledge of a front-end framework. While this aspect might be intriguing to some, most developers of internal tools often consider managing the lower-level APIs, HTML, and CSS as an additional burden.
 
 ## Trade-offs with low-code tools
 
-There exist many low-code code tools specifically for internal tools. They are proven to be productive but come with some trade-offs, as mentioned below:
+There exist many low-code code tools specifically for internal use cases. They offer speed, but come with some trade-offs:
 
-### Codebase fragmentation and duplication
 
-Frequently, developers invest valuable time in hunting down particular versions of business logic and then maintaining them in multiple places. When working with external low-code/no-code tools, code/logic duplication can often arise as a consequence of design decisions. Not having a unified reference point within a codebase compromises its scalability as well as ease of maintenance and debugging.
 
 ### Extensibility
 
-Low-code tools are hard to extend. If there's something the tool can't do out of the box, you can't bring your own code with you and integrate it seamlessly.
+Low-code tools can be hard to extend. When the tool can't handle a particular task by default, integrating your own code seamlessly is often a challenge. This lack of flexibility often results in having to write custom code inside these apps and storing your business logic within their configuration files.
+### Duplication and fragmentation
 
+When working with external low-code or no-code tools, the duplication of code and logic can frequently occur because of a lack of extensibility. Developers invest valuable time in hunting down specific versions of business logic and maintaining them in multiple places. This lack of a unified reference point within the codebase can compromise its scalability, making maintenance and debugging more challenging.
 ### Loss of control
 
-When working with external tools, developers often forfeit their autonomy and are constrained by the choices offered by the tool. A black-box element intervention takes away the control over the entire process, encompassing integrations, deployment, and version control. This lack of control puts the underlying sensitive data to risk. The security of customer data is critical, and the seriousness of this matter can't be overstated.
+When developers use external tools, they frequently sacrifice their autonomy and become restricted by the options provided by the tool. The introduction of a black-box element removes control over the entire process, including integrations, deployment, and version control. This can lead to a significant problem when it comes to the long-term maintainability of internal tools, as it becomes challenging to adapt, extend, or customize them to meet evolving needs.
 
 ## How Toolpad fits in
 
@@ -57,24 +57,27 @@ Toolpad supports adding any number of custom React components for other use case
 
 ### Single source of truth
 
-Toolpad supports connecting to data in two ways:
+Toolpad offers two ways to connect to your data, ensuring that you can keep your data in one centralised location and avoid duplicating it for each internal tool you create:
 
-1. Link REST APIs to Toolpad through HTTP queries—this is the most common way of getting data to Toolpad.
-2. Write custom functions in your own IDE to connect to any data source. You can reuse your existing scripts, business logic, database models, client libraries, and secrets. These allow you to have a single, shared codebase for internal or external applications—meaning no duplication or fragmentation.
+1. Link REST APIs to Toolpad through HTTP queries: This common method allows you to access your data directly by building REST queries in a visual interface.
+2. Write custom functions in your own IDE to connect to any data source: You can use your existing scripts, business logic, database models, client libraries, and secrets. This approach helps you maintain a single, shared data source for all your internal tools, preventing data duplication and ensuring consistency across applications.
 
 ### Integrates with your development lifecycle
 
-Toolpad gives you complete control over your app's development lifecycle. Toolpad is "local-first"; your project lives on your own file system, so you can use your own IDE, version control system, deployment target, and CLI tools.
+
+Toolpad empowers you with total control over the entire development lifecycle of your application. It operates on a "local-first" principle, where your project resides on your local file system. This enables you to utilize your preferred Integrated Development Environment (IDE), version control system, deployment target, and Command Line Interface (CLI) tools.
+
+Similar to any Node.js application, you have the flexibility to self-host a Toolpad app on your own server or select a hosting provider that suits your needs, whether it's AWS, Render, Railway, or Heroku. Toolpad does not confine you to its cloud hosting, ensuring you have the freedom to choose the hosting solution that best aligns with your preferences and requirements.
 
 Like any Node.js app, you can self-host a Toolpad app on your own server or any hosting provider of your choice (such as AWS, Render, Railway, or Heroku). Toolpad does not lock you into its cloud hosting.
 
 ### Seamless collaboration
 
-The Toolpad application configuration is stored in yaml files that can be checked into git or any version control tool of your choice and maintained collaboratively. Having a private code repository is one of the essential practices to ensure that user data remains secure. There is no need to reinvent the wheel regarding collaboration for engineers.
+The Toolpad application configuration is saved in YAML files, which can be conveniently added to Git or any preferred version control tool for collaborative maintenance. Maintaining a private code repository is a fundamental practice for enhancing the security of user data. This eliminates the need to create new collaboration mechanisms for engineers, as the existing tools can be effectively leveraged.
 
 ### Trust and Safety
 
-Internal tools have access to highly sensitive data that every organization solemnly pledges to safeguard. Despite the stringent security measures in place, data breaches remain a prevalent occurrence. Organizations rigorously engage in due diligence and compliance assessments before trusting a vendor. Toolpad supports just that by letting you keep the control.
+While organizations make every effort to protect highly sensitive data and conduct thorough vendor due diligence and compliance assessments, data breaches continue to be a significant concern. Toolpad ensures that you can maintain control over your data, helping to address this issue.
 
 ## How is Toolpad different from Y?
 

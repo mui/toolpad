@@ -15,7 +15,6 @@ import {
 } from '@mui/material';
 import { Controller, useForm } from 'react-hook-form';
 import { TabContext, TabList } from '@mui/lab';
-import { useBrowserJsRuntime } from '@mui/toolpad-core/jsBrowserRuntime';
 import { useServerJsRuntime } from '@mui/toolpad-core/jsServerRuntime';
 import { Panel, PanelGroup, PanelResizeHandle } from '../../components/resizablePanels';
 import { ClientDataSource, ConnectionEditorProps, QueryEditorProps } from '../../types';
@@ -267,10 +266,10 @@ function QueryEditor({
     { retry: false },
   );
 
-  const envObj = React.useMemo(() => introspection?.data?.envVarNames || [], [introspection]);
+  const envObj = React.useMemo(() => introspection?.data?.envVarNames, [introspection]);
 
-  const envVarNames = React.useMemo(() => Object.keys(envObj) || [], [envObj]);
-  debugger;
+  const envVarNames = React.useMemo(() => Object.keys(envObj || {}) || [], [envObj]);
+
   const handleParamsChange = React.useCallback(
     (newParams: [string, BindableAttrValue<string>][]) => {
       setInput((existing) => ({ ...existing, params: newParams }));
@@ -465,6 +464,7 @@ function QueryEditor({
                         globalScopeMeta={QUERY_SCOPE_META}
                         liveValue={liveSearchParams}
                         jsRuntime={jsServerRuntime}
+                        envVarNames={envVarNames}
                       />
                     </TabPanel>
                     <TabPanel disableGutters value="body">

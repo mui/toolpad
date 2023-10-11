@@ -29,8 +29,8 @@ import type {
 import { createRpcHandler } from './rpc';
 import { RUNTIME_CONFIG_WINDOW_PROPERTY } from '../constants';
 import type { RuntimeConfig } from '../config';
-import { createRpcServer } from './rpcServer';
-import { createRpcRuntimeServer } from './rpcRuntimeServer';
+import { createRpcServer as createProjectRpcServer } from './projectRpcServer';
+import { createRpcServer as createRuntimeRpcServer } from './runtimeRpcServer';
 
 import.meta.url ??= url.pathToFileURL(__filename).toString();
 const currentDirectory = url.fileURLToPath(new URL('.', import.meta.url));
@@ -89,8 +89,12 @@ async function createDevHandler(project: ToolpadProject) {
     worker.postMessage({ kind: 'reload-components' } satisfies AppDevServerCommand);
   });
 
+  const rpcServer = createProjectRpcServer(project);
+  handler.use('/__toolpad_dev__/rpc', createRpcHandler(rpcServer));
+
   handler.use('/api/data', project.dataManager.createDataHandler());
-  const runtimeRpcServer = createRpcRuntimeServer(project);
+  const runtimeRpcServer = createRuntimeRpcServer(project);
+
   handler.use('/api/runtime-rpc', createRpcHandler(runtimeRpcServer));
   handler.use(
     (req, res, next) => {
@@ -106,6 +110,36 @@ async function createDevHandler(project: ToolpadProject) {
       },
     }),
   );
+
+  const wsPort = project.options.wsPort;
+  invariant(wsPort, 'wsPort must be defined in dev mode');
+
+  const wsServer = new WebSocketServer({ port: wsPort });
+
+  project.events.on('*', (event, payload) => {
+    wsServer.clients.forEach((client) => {
+      if (client.readyState === WebSocket.OPEN) {
+        client.send(JSON.stringify({ kind: 'projectEvent', event, payload }));
+      }
+    });
+  });
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  wsServer.on('connection', (ws: WebSocket, _request: IncomingMessage) => {
+    ws.on('error', console.error);
+  });
+
+  // TODO(Jan): allow passing a server instance to the handler and attach websocket server to it
+  // httpServer.on('upgrade', (request, socket, head) => {
+  //   invariant(request.url, 'request must have a url');
+  //   const { pathname } = new URL(request.url, 'http://x');
+  //
+  //   if (pathname === '/toolpad-ws') {
+  //     wsServer.handleUpgrade(request, socket, head, (ws) => {
+  //       wsServer.emit('connection', ws, request);
+  //     });
+  //   }
+  // });
 
   return {
     handler,
@@ -128,46 +162,9 @@ interface AppHandler {
 }
 
 async function createToolpadAppHandler(project: ToolpadProject): Promise<AppHandler> {
-  const router = express.Router();
-  const publicPath = path.resolve(currentDirectory, '../../public');
-  router.use(express.static(publicPath, { index: false }));
-
   const appHandler = project.options.dev
     ? await createDevHandler(project)
     : await createProdHandler(project);
-
-  if (project.options.dev) {
-    const wsPort = project.options.wsPort;
-    invariant(wsPort, 'wsPort must be defined in dev mode');
-
-    const wsServer = new WebSocketServer({ port: wsPort });
-
-    project.events.on('*', (event, payload) => {
-      wsServer.clients.forEach((client) => {
-        if (client.readyState === WebSocket.OPEN) {
-          client.send(JSON.stringify({ kind: 'projectEvent', event, payload }));
-        }
-      });
-    });
-
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    wsServer.on('connection', (ws: WebSocket, _request: IncomingMessage) => {
-      ws.on('error', console.error);
-    });
-
-    // TODO(Jan): allow passing a server instance to the handler and attach websocket server to it
-    // httpServer.on('upgrade', (request, socket, head) => {
-    //   invariant(request.url, 'request must have a url');
-    //   const { pathname } = new URL(request.url, 'http://x');
-    //
-    //   if (pathname === '/toolpad-ws') {
-    //     wsServer.handleUpgrade(request, socket, head, (ws) => {
-    //       wsServer.emit('connection', ws, request);
-    //     });
-    //   }
-    // });
-  }
-
   return appHandler;
 }
 
@@ -236,8 +233,6 @@ async function createToolpadHandler({
   router.use(project.options.base, appHandler.handler);
 
   if (dev) {
-    const rpcServer = createRpcServer(project);
-    router.use('/api/rpc', createRpcHandler(rpcServer));
     router.use('/api/dataSources', project.dataManager.createDataSourcesHandler());
 
     const transformIndexHtml = (html: string) => {

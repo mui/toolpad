@@ -1,8 +1,8 @@
 import { createMethod, MethodResolvers } from './rpc';
 import type { ToolpadProject } from './localMode';
 
-// Methods exposed to the Toolpad editor
-export function createRpcRuntimeServer(project: ToolpadProject) {
+// Methods exposed to the Toolpad runtime
+export function createRpcServer(project: ToolpadProject) {
   return {
     introspectDataProvider: createMethod<typeof project.functionsManager.introspectDataProvider>(
       ({ params }) => {
@@ -20,4 +20,4 @@ export function createRpcRuntimeServer(project: ToolpadProject) {
   } satisfies MethodResolvers;
 }
 
-export type ServerDefinition = ReturnType<typeof createRpcRuntimeServer>;
+export type ServerDefinition = ReturnType<typeof createRpcServer>;

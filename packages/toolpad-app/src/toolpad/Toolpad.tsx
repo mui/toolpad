@@ -6,7 +6,7 @@ import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 import CloudDoneIcon from '@mui/icons-material/CloudDone';
 import SyncIcon from '@mui/icons-material/Sync';
 import SyncProblemIcon from '@mui/icons-material/SyncProblem';
-import { QueryClientProvider } from '@tanstack/react-query';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import AppEditor from './AppEditor';
 import ErrorAlert from './AppEditor/PageEditor/ErrorAlert';
 import { ThemeProvider } from '../ThemeContext';
@@ -15,7 +15,9 @@ import ToolpadShell from './ToolpadShell';
 import { getViewFromPathname } from '../utils/domView';
 import AppProvider, { AppState, useAppStateContext } from './AppState';
 import { GLOBAL_FUNCTIONS_FEATURE_FLAG } from '../constants';
-import { queryClient } from '../api';
+import { ProjectApiProvider } from '../projectApi';
+import { ProjectEventsProvider } from '../projectEvents';
+import config from '../config';
 
 const Centered = styled('div')({
   height: '100%',
@@ -90,7 +92,9 @@ function EditorShell({ children }: EditorShellProps) {
     if (currentView) {
       const currentPageId = currentView?.kind === 'page' ? currentView.nodeId : null;
 
-      const previewPath = currentPageId ? `${appState.base}/pages/${currentPageId}` : appState.base;
+      const previewPath = currentPageId
+        ? `${appState.appUrl}/pages/${currentPageId}`
+        : appState.appUrl;
 
       return {
         actions: (
@@ -117,36 +121,58 @@ function EditorShell({ children }: EditorShellProps) {
   return <ToolpadShell {...shellProps}>{children}</ToolpadShell>;
 }
 
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      networkMode: 'always',
+    },
+    mutations: {
+      networkMode: 'always',
+    },
+  },
+});
+
 export interface ToolpadProps {
   basename: string;
 }
 
 export default function Toolpad({ basename }: ToolpadProps) {
+  const appUrl = config.base;
+
+  const wsProtocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+  const wsUrl = `${wsProtocol}//${window.location.hostname}:${config.wsPort}/toolpad-ws`;
+
+  const projectApiUrl = `${appUrl}/__toolpad_dev__/rpc`;
+
   return (
     <QueryClientProvider client={queryClient}>
-      <ThemeProvider>
-        {/* CssBaseline kickstart an elegant, consistent, and simple baseline to build upon. */}
-        <CssBaseline />
-        {/* Container that allows children to size to it with height: 100% */}
-        <Box sx={{ height: '1px', minHeight: '100vh' }}>
-          <ErrorBoundary fallbackRender={ErrorFallback}>
-            <React.Suspense fallback={<FullPageLoader />}>
-              <BrowserRouter basename={basename}>
-                <AppProvider>
-                  <EditorShell>
-                    <Routes>
-                      {GLOBAL_FUNCTIONS_FEATURE_FLAG ? (
-                        <Route path={APP_FUNCTIONS_ROUTE} element={<div />} />
-                      ) : null}
-                      <Route path="/*" element={<AppEditor />} />
-                    </Routes>
-                  </EditorShell>
-                </AppProvider>
-              </BrowserRouter>
-            </React.Suspense>
-          </ErrorBoundary>
-        </Box>
-      </ThemeProvider>
+      <ProjectEventsProvider wsUrl={wsUrl}>
+        <ProjectApiProvider url={projectApiUrl}>
+          <ThemeProvider>
+            {/* CssBaseline kickstart an elegant, consistent, and simple baseline to build upon. */}
+            <CssBaseline />
+            {/* Container that allows children to size to it with height: 100% */}
+            <Box sx={{ height: '1px', minHeight: '100vh' }}>
+              <ErrorBoundary fallbackRender={ErrorFallback}>
+                <React.Suspense fallback={<FullPageLoader />}>
+                  <BrowserRouter basename={basename}>
+                    <AppProvider appUrl={appUrl}>
+                      <EditorShell>
+                        <Routes>
+                          {GLOBAL_FUNCTIONS_FEATURE_FLAG ? (
+                            <Route path={APP_FUNCTIONS_ROUTE} element={<div />} />
+                          ) : null}
+                          <Route path="/*" element={<AppEditor />} />
+                        </Routes>
+                      </EditorShell>
+                    </AppProvider>
+                  </BrowserRouter>
+                </React.Suspense>
+              </ErrorBoundary>
+            </Box>
+          </ThemeProvider>
+        </ProjectApiProvider>
+      </ProjectEventsProvider>
     </QueryClientProvider>
   );
 }

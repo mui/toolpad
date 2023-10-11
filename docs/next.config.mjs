@@ -52,7 +52,7 @@ export default withDocsInfra(
           alias: {
             ...config.resolve.alias,
             docs: path.resolve(MONOREPO_PATH, './docs'),
-            [path.resolve(MONOREPO_PATH, './packages/mui-utils/macros/MuiError.macro')]: 'react',
+            'babel-plugin-macros': require.resolve('babel-plugin-macros'),
             ...MONOREPO_PACKAGES,
           },
         },

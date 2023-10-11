@@ -31,7 +31,6 @@ export default createBuiltin(Container, {
     sx: {
       helperText: SX_PROP_HELPER_TEXT,
       type: 'object',
-      default: { padding: 1, border: 'solid 1px' },
     },
   },
 });

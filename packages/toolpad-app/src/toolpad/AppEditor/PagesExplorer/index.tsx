@@ -13,7 +13,7 @@ import { useAppStateApi, useAppState, useDomApi } from '../../AppState';
 import useLocalStorageState from '../../../utils/useLocalStorageState';
 import NodeMenu from '../NodeMenu';
 import { DomView } from '../../../utils/domView';
-import client from '../../../api';
+import { useProjectApi } from '../../../projectApi';
 import useBoolean from '../../../utils/useBoolean';
 import EditableTreeItem, { EditableTreeItemProps } from '../../../components/EditableTreeItem';
 import { scrollIntoViewIfNeeded } from '../../../utils/dom';
@@ -153,6 +153,7 @@ export interface PagesExplorerProps {
 }
 
 export default function PagesExplorer({ className }: PagesExplorerProps) {
+  const projectApi = useProjectApi();
   const { dom, currentView } = useAppState();
   const domApi = useDomApi();
   const appStateApi = useAppStateApi();
@@ -275,14 +276,14 @@ export default function PagesExplorer({ className }: PagesExplorerProps) {
         domViewAfterDelete = firstSiblingOfType && getNodeEditorDomView(firstSiblingOfType);
       }
 
-      await client.methods.deletePage(deletedNode.name);
+      await projectApi.methods.deletePage(deletedNode.name);
 
       appStateApi.update(
         (draft) => appDom.removeNode(draft, nodeId),
         domViewAfterDelete || { kind: 'page' },
       );
     },
-    [activeNode, appStateApi, dom],
+    [projectApi, activeNode, appStateApi, dom],
   );
 
   const handleRenameNode = React.useCallback(
@@ -292,11 +293,11 @@ export default function PagesExplorer({ className }: PagesExplorerProps) {
       const oldNameNode = dom.nodes[nodeId];
       if (oldNameNode.type === 'page' && updatedName !== oldNameNode.name) {
         setTimeout(async () => {
-          await client.methods.deletePage(oldNameNode.name);
+          await projectApi.methods.deletePage(oldNameNode.name);
         }, 300);
       }
     },
-    [dom.nodes, domApi],
+    [projectApi, dom.nodes, domApi],
   );
 
   const handleDuplicateNode = React.useCallback(

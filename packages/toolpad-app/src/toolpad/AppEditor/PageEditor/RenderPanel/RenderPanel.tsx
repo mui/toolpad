@@ -106,7 +106,7 @@ export default function RenderPanel({ className }: RenderPanelProps) {
       <EditorCanvasHost
         className={classes.view}
         runtimeState={runtimeState}
-        base={appState.base}
+        base={appState.appUrl}
         savedNodes={savedNodes}
         pageNodeId={pageNodeId}
         overlay={<RenderOverlay bridge={bridge} />}

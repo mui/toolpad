@@ -123,7 +123,7 @@ export default function EditorCanvasHost({
     }
   });
 
-  const src = `${base}/pages/${pageNodeId}?toolpad-display=canvas`;
+  const src = `${base}/pages/${pageNodeId}`;
 
   const [loading, setLoading] = React.useState(true);
   useOnChange(src, () => setLoading(true));

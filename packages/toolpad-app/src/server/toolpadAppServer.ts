@@ -6,7 +6,7 @@ import serializeJavascript from 'serialize-javascript';
 import { ToolpadProject } from './localMode';
 import { asyncHandler } from '../utils/express';
 import { basicAuthUnauthorized, checkBasicAuthHeader } from './basicAuth';
-import { createRpcRuntimeServer } from './rpcRuntimeServer';
+import { createRpcServer } from './runtimeRpcServer';
 import { createRpcHandler } from './rpc';
 import { RUNTIME_CONFIG_WINDOW_PROPERTY, INITIAL_STATE_WINDOW_PROPERTY } from '../constants';
 import type { RuntimeConfig } from '../config';
@@ -64,7 +64,7 @@ export async function createProdHandler(project: ToolpadProject) {
 
   handler.use('/api/data', project.dataManager.createDataHandler());
 
-  const runtimeRpcServer = createRpcRuntimeServer(project);
+  const runtimeRpcServer = createRpcServer(project);
   handler.use('/api/runtime-rpc', createRpcHandler(runtimeRpcServer));
 
   handler.use(

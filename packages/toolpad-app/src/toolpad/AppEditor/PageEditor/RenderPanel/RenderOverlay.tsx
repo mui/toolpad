@@ -1158,7 +1158,6 @@ export default function RenderOverlay({ bridge }: RenderOverlayProps) {
   }, [handleNodeDragEnd]);
 
   const resizePreviewElementRef = React.useRef<HTMLDivElement | null>(null);
-  const resizePreviewElement = resizePreviewElementRef.current;
 
   const overlayGridRef = React.useRef<OverlayGridHandle>({
     gridElement: null,
@@ -1173,6 +1172,7 @@ export default function RenderOverlay({ bridge }: RenderOverlayProps) {
         return;
       }
 
+      const resizePreviewElement = resizePreviewElementRef.current;
       const draggedNodeInfo = nodesInfo[draggedNode.id];
       const draggedNodeRect = draggedNodeInfo?.rect;
 
@@ -1253,7 +1253,7 @@ export default function RenderOverlay({ bridge }: RenderOverlayProps) {
         }
       }
     },
-    [bridge, dom, draggedEdge, draggedNode, nodesInfo, resizePreviewElement],
+    [bridge, dom, draggedEdge, draggedNode, nodesInfo],
   );
 
   const handleEdgeDragEnd = React.useCallback(
@@ -1267,6 +1267,7 @@ export default function RenderOverlay({ bridge }: RenderOverlayProps) {
       const draggedNodeInfo = nodesInfo[draggedNode.id];
       const draggedNodeRect = draggedNodeInfo?.rect;
 
+      const resizePreviewElement = resizePreviewElementRef.current;
       const resizePreviewRect = resizePreviewElement?.getBoundingClientRect();
 
       if (draggedNodeRect && resizePreviewRect) {
@@ -1364,7 +1365,7 @@ export default function RenderOverlay({ bridge }: RenderOverlayProps) {
 
       api.dragEnd();
     },
-    [api, domApi, draggedEdge, draggedNode, nodesInfo, resizePreviewElement],
+    [api, domApi, draggedEdge, draggedNode, nodesInfo],
   );
 
   return (

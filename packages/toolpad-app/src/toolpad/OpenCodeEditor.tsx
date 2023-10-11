@@ -14,7 +14,7 @@ import {
 } from '@mui/material';
 import CodeIcon from '@mui/icons-material/Code';
 import { LoadingButton } from '@mui/lab';
-import client from '../api';
+import { useProjectApi } from '../projectApi';
 import { CodeEditorFileType } from '../types';
 
 interface OpenCodeEditorButtonProps extends ButtonProps {
@@ -78,13 +78,14 @@ export default function OpenCodeEditorButton({
 }: OpenCodeEditorButtonProps) {
   const [missingEditorDialog, setMissingEditorDialog] = React.useState(false);
   const [busy, setBusy] = React.useState(false);
+  const projectApi = useProjectApi();
 
   const handleClick = React.useCallback(
     async (event: React.SyntheticEvent) => {
       event.stopPropagation();
       setBusy(true);
       try {
-        await client.methods.openCodeEditor(filePath, fileType);
+        await projectApi.methods.openCodeEditor(filePath, fileType);
         onSuccess?.();
       } catch {
         setMissingEditorDialog(true);
@@ -92,7 +93,7 @@ export default function OpenCodeEditorButton({
         setBusy(false);
       }
     },
-    [filePath, fileType, onSuccess],
+    [projectApi, filePath, fileType, onSuccess],
   );
 
   return (

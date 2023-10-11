@@ -9,16 +9,12 @@ import useDebouncedHandler from '@mui/toolpad-utils/hooks/useDebouncedHandler';
 import useEventCallback from '@mui/utils/useEventCallback';
 import * as appDom from '../appDom';
 import { omit, update } from '../utils/immutability';
-import client from '../api';
+import { useProjectApi } from '../projectApi';
 import useShortcut from '../utils/useShortcut';
 import insecureHash from '../utils/insecureHash';
 import { NodeHashes, ClientDataSource } from '../types';
 import { hasFieldFocus } from '../utils/fields';
 import { DomView, getViewFromPathname, PageViewTab } from '../utils/domView';
-import { projectEvents } from '../projectEvents';
-import config from '../config';
-
-projectEvents.on('externalChange', () => client.invalidateQueries('loadDom', []));
 
 export function getNodeHashes(dom: appDom.AppDom): NodeHashes {
   return mapValues(dom.nodes, (node) => insecureHash(JSON.stringify(omit(node, 'id'))));
@@ -134,7 +130,7 @@ export function domReducer(dom: appDom.AppDom, action: AppStateAction): appDom.A
 
 export interface AppState {
   dom: appDom.AppDom;
-  base: string;
+  appUrl: string;
   savedDom: appDom.AppDom;
   savingDom: boolean;
   unsavedDomChanges: number;
@@ -845,11 +841,13 @@ function isCancellableAction(action: AppStateAction): boolean {
 }
 
 export interface DomContextProps {
+  appUrl: string;
   children?: React.ReactNode;
 }
 
-export default function AppProvider({ children }: DomContextProps) {
-  const { data: dom } = client.useQuery('loadDom', [], { suspense: true });
+export default function AppProvider({ appUrl, children }: DomContextProps) {
+  const projectApi = useProjectApi();
+  const { data: dom } = projectApi.useQuery('loadDom', [], { suspense: true });
 
   invariant(dom, 'Suspense should load the dom');
 
@@ -870,7 +868,7 @@ export default function AppProvider({ children }: DomContextProps) {
     // DOM state
     dom,
     // base path of the running application
-    base: config.base,
+    appUrl,
     // DOM loader state
     savingDom: false,
     unsavedDomChanges: 0,
@@ -941,7 +939,7 @@ export default function AppProvider({ children }: DomContextProps) {
     const domToSave = state.dom;
     dispatch({ type: 'DOM_SAVING' });
     const domDiff = appDom.createDiff(state.savedDom, domToSave);
-    client.methods
+    projectApi.methods
       .applyDomDiff(domDiff)
       .then(() => {
         dispatch({ type: 'DOM_SAVED', savedDom: domToSave });
@@ -949,7 +947,7 @@ export default function AppProvider({ children }: DomContextProps) {
       .catch((err) => {
         dispatch({ type: 'DOM_SAVING_ERROR', error: err.message });
       });
-  }, [state]);
+  }, [projectApi, state]);
 
   const debouncedHandleSave = useDebouncedHandler(handleSave, 100);
 

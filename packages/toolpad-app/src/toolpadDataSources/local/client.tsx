@@ -33,7 +33,7 @@ import {
 import * as appDom from '../../appDom';
 import { Panel, PanelGroup, PanelResizeHandle } from '../../components/resizablePanels';
 import JsonView from '../../components/JsonView';
-import OpenCodeEditorButton from '../../components/OpenCodeEditor';
+import OpenCodeEditorButton from '../../toolpad/OpenCodeEditor';
 import useQueryPreview from '../useQueryPreview';
 import QueryPreview from '../QueryPreview';
 import BindableEditor from '../../toolpad/AppEditor/PageEditor/BindableEditor';

@@ -8,16 +8,17 @@ import {
   Drawer as MuiDrawer,
   List,
   Stack,
-  Typography,
   IconButton,
+  Tooltip,
 } from '@mui/material';
 import { Link, matchPath, useLocation } from 'react-router-dom';
 
-const DRAWER_WIDTH = 68; // px
+const DRAWER_WIDTH = 44; // px
 
 const Drawer = styled(MuiDrawer)({
   width: DRAWER_WIDTH,
   '& .MuiDrawer-paper': {
+    overflow: 'hidden',
     width: DRAWER_WIDTH,
   },
 });
@@ -48,7 +49,7 @@ export default function ToolpadNavigation() {
           const isSelected = !!matchPath(`${path}/*`, location.pathname);
 
           return (
-            <ListItem key={name} sx={{ pt: 1, pb: 1, pl: 0, pr: 0 }}>
+            <ListItem key={name} sx={{ pt: 0.5, pb: 0.5, pl: 0, pr: 0 }}>
               <Link to={path} style={{ textDecoration: 'none', color: 'inherit' }}>
                 <Stack
                   flex={1}
@@ -56,17 +57,11 @@ export default function ToolpadNavigation() {
                   alignItems="center"
                   sx={{ width: DRAWER_WIDTH - 1 }}
                 >
-                  <IconButton color="primary" sx={{ p: 1.5, mb: 0.5 }}>
-                    <OptionIcon color={isSelected ? 'primary' : 'action'} fontSize="medium" />
-                  </IconButton>
-                  <Typography
-                    fontSize={11}
-                    fontWeight={isSelected ? 'bold' : 'regular'}
-                    color={isSelected ? 'primary' : 'default'}
-                    textAlign="center"
-                  >
-                    {name}
-                  </Typography>
+                  <Tooltip title={name} placement="right">
+                    <IconButton>
+                      <OptionIcon color={isSelected ? 'primary' : 'action'} fontSize="medium" />
+                    </IconButton>
+                  </Tooltip>
                 </Stack>
               </Link>
             </ListItem>

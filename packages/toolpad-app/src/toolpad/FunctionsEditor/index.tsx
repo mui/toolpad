@@ -1,14 +1,8 @@
 import * as React from 'react';
 import {
-  Alert,
   Box,
-  CircularProgress,
-  InputBase,
-  Popover,
   Portal,
   Skeleton,
-  TextField,
-  InputAdornment,
   IconButton,
   generateUtilityClasses,
   styled,
@@ -18,11 +12,9 @@ import {
   Typography,
   Button,
   Link,
-  Tooltip,
   Snackbar,
   Toolbar,
 } from '@mui/material';
-import SearchIcon from '@mui/icons-material/Search';
 import { errorFrom } from '@mui/toolpad-utils/errors';
 import { TreeView, treeItemClasses, TreeItem } from '@mui/x-tree-view';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
@@ -31,15 +23,14 @@ import AddIcon from '@mui/icons-material/Add';
 import CloseIcon from '@mui/icons-material/Close';
 import JavascriptIcon from '@mui/icons-material/Javascript';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
-import ClearIcon from '@mui/icons-material/Clear';
 import useBoolean from '@mui/toolpad-utils/hooks/useBoolean';
 import { useQuery } from '@tanstack/react-query';
 import { ensureSuffix } from '@mui/toolpad-utils/strings';
+import { NodeId } from '@mui/toolpad-core';
 import { Panel, PanelGroup, PanelResizeHandle } from '../../components/resizablePanels';
-import OpenCodeEditorButton from '../../components/OpenCodeEditor';
+import OpenCodeEditorButton from '../OpenCodeEditor';
 import FlexFill from '../../components/FlexFill';
 import { FileIntrospectionResult } from '../../server/functionsTypesWorker';
-import client from '../../api';
 import {
   parseFunctionId,
   parseLegacyFunctionId,
@@ -48,13 +39,16 @@ import {
 import { LocalPrivateApi } from '../../toolpadDataSources/local/types';
 import usePageTitle from '../../utils/usePageTitle';
 import * as appDom from '../../appDom';
+import { useProjectApi } from '../../projectApi';
+import ExplorerHeader from '../AppEditor/ExplorerHeader';
+import EditableTreeItem, { EditableTreeItemProps } from '../../components/EditableTreeItem';
+import { scrollIntoViewIfNeeded } from '../../utils/dom';
 
 const fileTreeItemClasses = generateUtilityClasses('FileTreeItem', ['actionButton', 'handlerItem']);
 
-const FileTreeItemRoot = styled(TreeItem)(({ theme }) => ({
+const FileTreeItemRoot = styled(EditableTreeItem)(({ theme }) => ({
   [`& .${treeItemClasses.label}`]: {
     display: 'flex',
-    fontSize: 15,
     flexDirection: 'row',
     alignItems: 'center',
 
@@ -83,36 +77,64 @@ const FileTreeItemRoot = styled(TreeItem)(({ theme }) => ({
   },
 }));
 
-interface HandlerFileTreeItemProps {
+interface HandlerFileTreeItemProps extends EditableTreeItemProps {
   file: FileIntrospectionResult;
+  onRename: (nodeId: NodeId, updatedName: string) => void | Promise<void>;
 }
 
-function HandlerFileTreeItem({ file }: HandlerFileTreeItemProps) {
+function HandlerFileTreeItem({
+  file,
+  nodeId,
+  validateItemName,
+  onRename,
+  ...other
+}: HandlerFileTreeItemProps) {
+  const { value: isEditing, setFalse: stopEditing } = useBoolean(false);
+
+  const labelText = file.name;
+
+  // const handleRename = React.useCallback(
+  //   async (newName: string) => {
+  //     await onRename(nodeId as NodeId, newName);
+  //     stopEditing();
+  //   },
+  //   [nodeId, onRename, stopEditing],
+  // );
+
+  const validateEditableFileName = React.useCallback(
+    (newName: string) => {
+      if (newName !== labelText && validateItemName) {
+        return validateItemName(newName);
+      }
+      return { isValid: true };
+    },
+    [labelText, validateItemName],
+  );
+
   return (
     <FileTreeItemRoot
       key={file.name}
-      nodeId={serializeFunctionId({ file: file.name })}
-      label={
+      nodeId={nodeId}
+      labelText={labelText}
+      renderLabel={(children) => (
         <React.Fragment>
           <JavascriptIcon fontSize="large" />
-          <span
-            style={{
-              overflow: 'hidden',
-              textOverflow: 'ellipsis',
-              fontSize: 14,
-            }}
-          >
-            {file.name}
-          </span>
+          {children}
           <FlexFill />
           <OpenCodeEditorButton
             className={fileTreeItemClasses.actionButton}
             iconButton
             filePath={file.name}
-            fileType="query"
+            fileType="resource"
           />
         </React.Fragment>
-      }
+      )}
+      isEditing={isEditing}
+      // onEdit={handleRename}
+      suggestedNewItemName={labelText}
+      onCancel={stopEditing}
+      validateItemName={validateEditableFileName}
+      {...other}
     >
       {file.handlers.map((handler) => {
         return (
@@ -133,6 +155,8 @@ export default function FunctionsEditor() {
 
   const theme = useTheme();
 
+  const projectApi = useProjectApi();
+
   const [selectedHandler, setSelectedHandler] = React.useState<string | null>(null);
   const { file: selectedFile = undefined, handler: selectedFunction = undefined } = selectedHandler
     ? parseLegacyFunctionId(selectedHandler)
@@ -147,8 +171,6 @@ export default function FunctionsEditor() {
 
   const [expanded, setExpanded] = React.useState<string[]>(selectedFile ? [selectedFile] : []);
 
-  const [search, setSearch] = React.useState('');
-
   const [latestCreatedHandler, setLatestCreatedHandler] = React.useState<string | null>(null);
 
   const execPrivate = React.useCallback(
@@ -156,9 +178,9 @@ export default function FunctionsEditor() {
       method: K,
       args: Parameters<LocalPrivateApi[K]>,
     ): Promise<Awaited<ReturnType<LocalPrivateApi[K]>>> => {
-      return client.mutation.dataSourceExecPrivate('local', method, args);
+      return projectApi.methods.dataSourceExecPrivate('local', method, args);
     },
-    [],
+    [projectApi.methods],
   );
 
   const introspection = useQuery({
@@ -183,19 +205,30 @@ export default function FunctionsEditor() {
     handlerTreeRef.current?.querySelector(`.${treeItemClasses.selected}`)?.scrollIntoView();
   }, []);
 
-  const [newHandlerInput, setNewHandlerInput] = React.useState('');
   const [newHandlerLoading, setNewHandlerLoading] = React.useState(false);
+
+  const [hasMounted, setHasMounted] = React.useState(false);
+
+  React.useEffect(() => {
+    setHasMounted(true);
+  }, []);
+
+  React.useEffect(() => {
+    const handlerTree = handlerTreeRef.current;
+    if (handlerTree && hasMounted) {
+      const selectedItem = handlerTree.querySelector(`.${treeItemClasses.selected}`);
+
+      if (selectedItem) {
+        scrollIntoViewIfNeeded(selectedItem);
+      }
+    }
+  }, [hasMounted, introspection.data]);
 
   const {
     value: isCreateNewHandlerOpen,
     setTrue: handleOpenCreateNewHandler,
-    setFalse: handleCloseCreateNewHandlerDialog,
+    setFalse: handleCloseCreateNewHandler,
   } = useBoolean(false);
-
-  const handleCloseCreateNewHandler = React.useCallback(() => {
-    setNewHandlerInput('');
-    handleCloseCreateNewHandlerDialog();
-  }, [handleCloseCreateNewHandlerDialog]);
 
   const existingFileNames = React.useMemo(
     () =>
@@ -208,130 +241,96 @@ export default function FunctionsEditor() {
     [introspection],
   );
 
+  const validateFileName = React.useCallback(
+    (fileName: string) => {
+      const alreadyExists = existingFileNames.has(fileName);
+
+      return {
+        isValid: !alreadyExists,
+        ...(alreadyExists ? { errorMessage: 'File already exists' } : {}),
+      };
+    },
+    [existingFileNames],
+  );
+
   const nextProposedName = React.useMemo(
     () => appDom.proposeName('myfunctions', existingFileNames),
     [existingFileNames],
   );
 
-  const createNewInputRef = React.useRef<HTMLInputElement | null>(null);
+  const handleCreateNewCommit = React.useCallback(
+    async (newFileName: string) => {
+      const fileName = ensureSuffix(newFileName, '.ts');
 
-  const handleCreateNewHandler = React.useCallback(() => {
-    setNewHandlerInput(nextProposedName);
-    handleOpenCreateNewHandler();
-  }, [handleOpenCreateNewHandler, nextProposedName]);
+      setNewHandlerLoading(true);
+      try {
+        await execPrivate('createNew', [fileName]);
+        await introspection.refetch();
+      } catch (error) {
+        // eslint-disable-next-line no-alert
+        window.alert(errorFrom(error).message);
+      } finally {
+        setNewHandlerLoading(false);
+        setLatestCreatedHandler(fileName);
+      }
 
-  const [anchorEl, setAnchorEl] = React.useState<HTMLInputElement | null>(null);
-  const open = !!anchorEl;
+      const newNodeId = serializeFunctionId({ file: fileName, handler: 'default' });
+      setSelectedHandler(newNodeId);
+      setExpanded([fileName]);
 
-  const inputError: string | null = React.useMemo(() => {
-    const alreadyExists = existingFileNames.has(newHandlerInput);
-    return alreadyExists ? 'File already exists' : null;
-  }, [existingFileNames, newHandlerInput]);
-
-  React.useEffect(() => {
-    const createNewInput = createNewInputRef.current;
-    if (createNewInput) {
-      setAnchorEl(inputError ? createNewInput : null);
-    }
-  }, [inputError]);
-
-  const handleCreateNewCommit = React.useCallback(async () => {
-    if (!newHandlerInput || inputError || newHandlerLoading) {
       handleCloseCreateNewHandler();
-      return;
-    }
-
-    const fileName = ensureSuffix(newHandlerInput, '.ts');
-
-    setNewHandlerLoading(true);
-    try {
-      await execPrivate('createNew', [fileName]);
-      await introspection.refetch();
-    } catch (error) {
-      // eslint-disable-next-line no-alert
-      window.alert(errorFrom(error).message);
-    } finally {
-      setNewHandlerLoading(false);
-      setLatestCreatedHandler(fileName);
-    }
-
-    const newNodeId = serializeFunctionId({ file: fileName, handler: 'default' });
-    setSelectedHandler(newNodeId);
-    setExpanded([fileName]);
-
-    handleCloseCreateNewHandler();
-
-    setTimeout(() => {
-      handlerTreeRef.current?.querySelector(`.${treeItemClasses.selected}`)?.scrollIntoView();
-    }, 0);
-  }, [
-    execPrivate,
-    handleCloseCreateNewHandler,
-    inputError,
-    introspection,
-    newHandlerInput,
-    newHandlerLoading,
-  ]);
-
-  const handleSearchChange = React.useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
-    setSearch(event.target.value);
-  }, []);
-
-  const handleClearSearch = React.useCallback(() => {
-    setSearch('');
-  }, []);
+    },
+    [execPrivate, handleCloseCreateNewHandler, introspection],
+  );
 
   const handleSnackbarClose = React.useCallback(() => {
     setLatestCreatedHandler(null);
   }, []);
+
+  const [searchTerm, setSearchTerm] = React.useState('');
+
+  const handleSearch = React.useCallback((newSearchTerm: string) => {
+    setSearchTerm(newSearchTerm);
+  }, []);
+
+  const handleFileRename = React.useCallback(async () => {
+    try {
+      // @TODO: Rename file
+      await introspection.refetch();
+    } catch (error) {
+      // eslint-disable-next-line no-alert
+      window.alert(errorFrom(error).message);
+    }
+  }, [introspection]);
+
+  const functionFiles = React.useMemo(() => {
+    const regex = new RegExp(searchTerm.split('').join('.*'), 'i');
+    return (
+      introspection.data?.files?.filter((file) => (searchTerm ? regex.test(file.name) : true)) || []
+    );
+  }, [introspection.data?.files, searchTerm]);
 
   return (
     <React.Fragment>
       <Box sx={{ height: 'calc(100vh - 48px)' }}>
         <PanelGroup direction="horizontal">
           <Panel defaultSize={16} minSize={16}>
-            <Box sx={{ height: '100%', overflow: 'auto', position: 'relative' }}>
-              <Stack
-                direction="row"
-                alignItems="center"
-                sx={{
-                  backgroundColor: theme.palette.background.paper,
-                  position: 'sticky',
-                  top: 0,
-                  left: 0,
-                  width: '100%',
-                  pl: 1,
-                  zIndex: 1,
-                }}
-              >
-                <TextField
-                  value={search}
-                  onChange={handleSearchChange}
-                  InputProps={{
-                    startAdornment: (
-                      <InputAdornment position="start">
-                        <SearchIcon />
-                      </InputAdornment>
-                    ),
-                    endAdornment: search ? (
-                      <InputAdornment position="end">
-                        <IconButton onClick={handleClearSearch} edge="end">
-                          <ClearIcon />
-                        </IconButton>
-                      </InputAdornment>
-                    ) : null,
-                    sx: { fontSize: 14 },
-                  }}
-                  variant="outlined"
-                  fullWidth
-                  size="small"
-                />
-                <Tooltip title="Create new function file">
-                  <IconButton size="medium" onClick={handleCreateNewHandler}>
-                    <AddIcon />
-                  </IconButton>
-                </Tooltip>
-              </Stack>
+            <Box
+              sx={{
+                height: '100%',
+                overflow: 'auto',
+                position: 'relative',
+                scrollbarGutter: 'stable',
+              }}
+            >
+              <ExplorerHeader
+                headerText="Functions"
+                createLabelText="Create new function file"
+                searchLabelText="Find function file"
+                onCreate={handleOpenCreateNewHandler}
+                onSearch={handleSearch}
+                hasPersistentSearch
+              />
               <TreeView
                 ref={handlerTreeRef}
                 selected={selectedNodeId}
@@ -345,80 +344,31 @@ export default function FunctionsEditor() {
                 }}
               >
                 {isCreateNewHandlerOpen ? (
-                  <TreeItem
+                  <EditableTreeItem
                     nodeId="::create::"
-                    label={
-                      <React.Fragment>
-                        <InputBase
-                          ref={createNewInputRef}
-                          value={newHandlerInput}
-                          onChange={(event) =>
-                            setNewHandlerInput(event.target.value.replaceAll(/[^a-zA-Z0-9]/g, ''))
-                          }
-                          autoFocus
-                          disabled={newHandlerLoading}
-                          endAdornment={newHandlerLoading ? <CircularProgress size={16} /> : null}
-                          onFocus={(event) => {
-                            event.target.select();
-                          }}
-                          onBlur={(event) => {
-                            if (event && event.target.value !== nextProposedName) {
-                              handleCreateNewCommit();
-                            } else {
-                              handleCloseCreateNewHandler();
-                            }
-                          }}
-                          onKeyDown={(event) => {
-                            if (event.key === 'Enter') {
-                              handleCreateNewCommit();
-                            } else if (event.key === 'Escape') {
-                              handleCloseCreateNewHandler();
-                              event.stopPropagation();
-                            }
-                          }}
-                          startAdornment={
-                            <InputAdornment position="start" sx={{ ml: '-6px', mr: '0px' }}>
-                              <JavascriptIcon fontSize="large" />
-                            </InputAdornment>
-                          }
-                          fullWidth
-                          sx={{
-                            padding: 0.5,
-                            fontSize: 14,
-                          }}
-                        />
-                        <Popover
-                          open={open}
-                          anchorEl={anchorEl}
-                          onClose={() => setAnchorEl(null)}
-                          disableAutoFocus
-                          anchorOrigin={{
-                            vertical: 'bottom',
-                            horizontal: 'left',
-                          }}
-                        >
-                          <Alert severity="error" variant="outlined">
-                            {inputError}
-                          </Alert>
-                        </Popover>
-                      </React.Fragment>
-                    }
-                    sx={{
-                      backgroundColor: alpha(theme.palette.primary.main, 0.2),
-                      '.MuiTreeItem-content': {
-                        backgroundColor: 'transparent',
-                      },
-                    }}
+                    isEditing
+                    suggestedNewItemName={nextProposedName}
+                    onEdit={handleCreateNewCommit}
+                    onCancel={handleCloseCreateNewHandler}
+                    validateItemName={validateFileName}
+                    isLoading={newHandlerLoading}
+                    renderLabel={(children) => (
+                      <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                        <JavascriptIcon fontSize="large" />
+                        {children}
+                      </Box>
+                    )}
                   />
                 ) : null}
-
-                {introspection.data?.files
-                  ?.filter((file) =>
-                    search ? file.name.toLowerCase().includes(search.toLowerCase()) : true,
-                  )
-                  .map((file) => (
-                    <HandlerFileTreeItem key={file.name} file={file} />
-                  ))}
+                {functionFiles.map((file) => (
+                  <HandlerFileTreeItem
+                    key={file.name}
+                    nodeId={serializeFunctionId({ file: file.name })}
+                    file={file}
+                    validateItemName={validateFileName}
+                    onRename={handleFileRename}
+                  />
+                ))}
 
                 {introspection.data?.files.length === 0 ? (
                   <Stack alignItems="center" sx={{ mt: 2 }}>
@@ -426,7 +376,7 @@ export default function FunctionsEditor() {
                       You don&apos;t have any functions yet…
                     </Typography>
                     <Button
-                      onClick={handleCreateNewHandler}
+                      onClick={handleOpenCreateNewHandler}
                       variant="outlined"
                       startIcon={<AddIcon />}
                       size="medium"
@@ -484,7 +434,7 @@ export default function FunctionsEditor() {
                     <OpenCodeEditorButton
                       className={fileTreeItemClasses.actionButton}
                       filePath={selectedFile}
-                      fileType="query"
+                      fileType="resource"
                       actionText="Edit"
                       variant="outlined"
                     />
@@ -537,7 +487,7 @@ export default function FunctionsEditor() {
                 <OpenCodeEditorButton
                   className={fileTreeItemClasses.actionButton}
                   filePath={latestCreatedHandler}
-                  fileType="query"
+                  fileType="resource"
                 />
                 <IconButton
                   size="small"

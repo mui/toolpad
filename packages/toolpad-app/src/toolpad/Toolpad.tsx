@@ -18,6 +18,7 @@ import { GLOBAL_FUNCTIONS_FEATURE_FLAG } from '../constants';
 import { ProjectApiProvider } from '../projectApi';
 import { ProjectEventsProvider } from '../projectEvents';
 import config from '../config';
+import FunctionsEditor from './FunctionsEditor';
 
 const Centered = styled('div')({
   height: '100%',
@@ -160,7 +161,7 @@ export default function Toolpad({ basename }: ToolpadProps) {
                       <EditorShell>
                         <Routes>
                           {GLOBAL_FUNCTIONS_FEATURE_FLAG ? (
-                            <Route path={APP_FUNCTIONS_ROUTE} element={<div />} />
+                            <Route path={APP_FUNCTIONS_ROUTE} element={<FunctionsEditor />} />
                           ) : null}
                           <Route path="/*" element={<AppEditor />} />
                         </Routes>

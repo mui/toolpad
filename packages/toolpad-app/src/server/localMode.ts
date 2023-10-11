@@ -1216,7 +1216,7 @@ class ToolpadProject {
     return config;
   }
 
-  getRuntimeConfig(): RuntimeConfig {
+  async getRuntimeConfig(): Promise<RuntimeConfig> {
     // When these fail, you are likely trying to retrieve this information during the
     // toolpad build. It's fundamentally wrong to use this information as it strictly holds
     // information about the running toolpad instance.

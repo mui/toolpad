@@ -79,9 +79,9 @@ export function ProjectProvider({ url, children }: ProjectProps) {
     suspense: true,
   });
 
-  const queryClient = useQueryClient();
+  invariant(manifest, "manifest should be defined, we're using suspense");
 
-  invariant(manifest, "Manifest should be defined, we're using suspense");
+  const queryClient = useQueryClient();
 
   const project = React.useMemo(
     () => createProject(url, manifest, queryClient),

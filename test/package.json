@@ -10,6 +10,6 @@
   },
   "type": "module",
   "dependencies": {
-    "@mui/material": "5.14.12"
+    "@mui/material": "5.14.13"
   }
 }

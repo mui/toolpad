@@ -43,13 +43,7 @@ export function setCommandHandler<T extends Record<string, Function>, K extends 
   name: K,
   handler: T[K],
 ) {
-  if (typeof commands[COMMAND_HANDLERS][name] !== 'undefined') {
-    throw new Error(`"${name}" is already handled`);
-  }
   commands[COMMAND_HANDLERS][name] = handler;
-  return () => {
-    delete commands[COMMAND_HANDLERS][name];
-  };
 }
 
 // Interface to communicate between editor and canvas
@@ -69,34 +63,45 @@ export interface ToolpadBridge {
     invalidateQueries(): void;
   }>;
 }
-
-if (
+const isRenderedInCanvas =
   typeof window !== 'undefined' &&
-  process.env.NODE_ENV !== 'test' &&
-  !(window.frameElement as HTMLIFrameElement | null)?.dataset.toolpadCanvas
-) {
-  throw new Error(
-    'An attempt was made at setting up the canvas bridge outside of the canvas. Was this file imported unintentionally?',
-  );
-}
+  (window.frameElement as HTMLIFrameElement | null)?.dataset.toolpadCanvas;
 
 let canvasIsReady = false;
-export const bridge: ToolpadBridge = {
-  editorEvents: new Emitter(),
-  editorCommands: createCommands(),
-  canvasEvents: new Emitter(),
-  canvasCommands: createCommands({
-    isReady: () => canvasIsReady,
-  }),
-} as ToolpadBridge;
 
-bridge.canvasEvents.on('ready', () => {
+const bridge: ToolpadBridge | null = isRenderedInCanvas
+  ? ({
+      editorEvents: new Emitter(),
+      editorCommands: createCommands(),
+      canvasEvents: new Emitter(),
+      canvasCommands: createCommands({
+        isReady: () => canvasIsReady,
+        getPageViewState: () => {
+          throw new Error('Not implemented');
+        },
+        getViewCoordinates: () => {
+          throw new Error('Not implemented');
+        },
+        invalidateQueries: () => {
+          throw new Error('Not implemented');
+        },
+        update: () => {
+          throw new Error('Not implemented');
+        },
+      }),
+    } satisfies ToolpadBridge)
+  : null;
+
+bridge?.canvasEvents.on('ready', () => {
   canvasIsReady = true;
 });
 
-if (typeof window !== 'undefined') {
+if (bridge) {
   if (typeof window[TOOLPAD_BRIDGE_GLOBAL] === 'function') {
     window[TOOLPAD_BRIDGE_GLOBAL](bridge);
   }
+
   window[TOOLPAD_BRIDGE_GLOBAL] = bridge;
 }
+
+export { bridge };

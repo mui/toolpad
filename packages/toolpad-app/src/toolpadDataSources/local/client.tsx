@@ -30,7 +30,7 @@ import {
 } from '../../toolpad/AppEditor/useEvaluateLiveBinding';
 import * as appDom from '../../appDom';
 import JsonView from '../../components/JsonView';
-import OpenCodeEditorButton from '../../components/OpenCodeEditor';
+import OpenCodeEditorButton from '../../toolpad/OpenCodeEditor';
 import useQueryPreview from '../useQueryPreview';
 import QueryInputPanel from '../QueryInputPanel';
 import QueryPreview from '../QueryPreview';

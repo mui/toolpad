@@ -17,9 +17,9 @@ import * as appDom from '../../../appDom';
 import { useAppState } from '../../AppState';
 import DialogForm from '../../../components/DialogForm';
 import { useNodeNameValidation } from './validation';
-import client from '../../../api';
+import { useProjectApi } from '../../../projectApi';
 import useLatest from '../../../utils/useLatest';
-import OpenCodeEditorButton from '../../../components/OpenCodeEditor';
+import OpenCodeEditorButton from '../../OpenCodeEditor';
 
 function handleInputFocus(event: React.FocusEvent<HTMLInputElement>) {
   event.target.select();
@@ -38,6 +38,7 @@ export default function CreateCodeComponentDialog({
   ...props
 }: CreateCodeComponentDialogProps) {
   const { dom } = useAppState();
+  const projectApi = useProjectApi();
 
   const existingNames = React.useMemo(
     () => appDom.getExistingNamesForChildren(dom, appDom.getApp(dom), 'codeComponents'),
@@ -75,7 +76,7 @@ export default function CreateCodeComponentDialog({
           onSubmit={async (event) => {
             event.preventDefault();
             invariant(isFormValid, 'Invalid form should not be submitted when submit is disabled');
-            await client.methods.createComponent(name);
+            await projectApi.methods.createComponent(name);
             onClose();
             setSnackbarState({ name });
           }}

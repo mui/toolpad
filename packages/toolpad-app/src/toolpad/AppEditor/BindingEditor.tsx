@@ -55,7 +55,7 @@ import { useAppState } from '../AppState';
 import * as appDom from '../../appDom';
 import { getBindingType, getBindingValue } from '../../bindings';
 
-import client from '../../api';
+import { useProjectApi } from '../../projectApi';
 
 // eslint-disable-next-line import/no-cycle
 import BindableEditor from './PageEditor/BindableEditor';
@@ -507,7 +507,8 @@ export function BindingEditorDialog<V>({
   open,
   onClose,
 }: BindingEditorDialogProps<V>) {
-  const { error, data } = client.useQuery('getPrettierConfig', []);
+  const projectApi = useProjectApi();
+  const { error, data } = projectApi.useQuery('getPrettierConfig', []);
   const { propType, label } = useBindingEditorContext();
 
   const [input, setInput] = React.useState(value);

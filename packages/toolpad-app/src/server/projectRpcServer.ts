@@ -1,7 +1,7 @@
 import { createMethod, MethodResolvers } from './rpc';
 import type { ToolpadProject } from './localMode';
 
-// Methods exposed to the Toolpad editor
+// Methods exposing the actions on the Toolpad project
 export function createRpcServer(project: ToolpadProject) {
   return {
     dataSourceFetchPrivate: createMethod<typeof project.dataManager.dataSourceFetchPrivate>(

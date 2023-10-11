@@ -7,6 +7,7 @@ export interface ToolpadComponentDefinition {
   system?: boolean;
   codeComponentId?: NodeId;
   synonyms: string[];
+  initialProps?: Record<string, unknown>;
 }
 
 export type ToolpadComponentDefinitions = Record<string, ToolpadComponentDefinition | undefined>;
@@ -57,6 +58,28 @@ export const INTERNAL_COMPONENTS = new Map<string, ToolpadComponentDefinition>([
   ['DatePicker', { displayName: 'Date Picker', builtIn: 'DatePicker', synonyms: ['time'] }],
   ['FilePicker', { displayName: 'File Picker', builtIn: 'FilePicker', synonyms: [] }],
   ['Text', { displayName: 'Text', builtIn: 'Text', synonyms: ['markdown', 'link', 'output'] }],
+  [
+    'Markdown',
+    {
+      displayName: 'Markdown',
+      builtIn: 'Text',
+      initialProps: {
+        mode: 'markdown',
+      },
+      synonyms: [],
+    },
+  ],
+  [
+    'Link',
+    {
+      displayName: 'Link',
+      builtIn: 'Text',
+      initialProps: {
+        mode: 'link',
+      },
+      synonyms: [],
+    },
+  ],
   ['Select', { displayName: 'Select', builtIn: 'Select', synonyms: ['combobox', 'dropdown'] }],
   ['List', { displayName: 'List', builtIn: 'List', synonyms: ['repeat'] }],
   ['Paper', { displayName: 'Paper', builtIn: 'Paper', synonyms: ['surface'] }],

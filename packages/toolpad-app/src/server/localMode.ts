@@ -1221,11 +1221,9 @@ class ToolpadProject {
     // toolpad build. It's fundamentally wrong to use this information as it strictly holds
     // information about the running toolpad instance.
     invariant(this.options.externalUrl, 'External URL is not set');
-    invariant(this.options.base, 'Base path is not set');
 
     return {
       externalUrl: this.options.externalUrl,
-      base: this.options.base,
     };
   }
 

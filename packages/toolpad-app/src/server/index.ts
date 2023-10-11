@@ -26,7 +26,7 @@ import type {
   WorkerRpc,
 } from './appServerWorker';
 import { createRpcHandler } from './rpc';
-import { RUNTIME_CONFIG_WINDOW_PROPERTY } from '../constants';
+import { APP_URL_WINDOW_PROPERTY, RUNTIME_CONFIG_WINDOW_PROPERTY } from '../constants';
 import type { RuntimeConfig } from '../config';
 import { createRpcServer as createProjectRpcServer } from './projectRpcServer';
 import { createRpcServer as createRuntimeRpcServer } from './runtimeRpcServer';
@@ -247,7 +247,10 @@ async function createToolpadHandler({
       const serializedConfig = serializeJavascript(runtimeConfig, { isJSON: true });
       return html.replace(
         '<!-- __TOOLPAD_SCRIPTS__ -->',
-        `
+
+        `<script>window[${JSON.stringify(APP_URL_WINDOW_PROPERTY)}] = ${JSON.stringify(
+          project.options.base,
+        )}</script>
           <script>
             window[${JSON.stringify(RUNTIME_CONFIG_WINDOW_PROPERTY)}] = ${serializedConfig}
           </script>

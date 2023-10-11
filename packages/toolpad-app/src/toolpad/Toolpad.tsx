@@ -15,7 +15,6 @@ import ToolpadShell from './ToolpadShell';
 import { getViewFromPathname } from '../utils/domView';
 import AppProvider, { AppState, useAppStateContext } from './AppState';
 import { GLOBAL_FUNCTIONS_FEATURE_FLAG } from '../constants';
-import config from '../config';
 import { ProjectProvider } from '../project';
 
 const Centered = styled('div')({
@@ -133,11 +132,10 @@ const queryClient = new QueryClient({
 
 export interface ToolpadProps {
   basename: string;
+  appUrl: string;
 }
 
-export default function Toolpad({ basename }: ToolpadProps) {
-  const appUrl = config.base;
-
+export default function Toolpad({ appUrl, basename }: ToolpadProps) {
   return (
     <ThemeProvider>
       {/* CssBaseline kickstart an elegant, consistent, and simple baseline to build upon. */}

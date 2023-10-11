@@ -7,13 +7,15 @@ import { Readable } from 'stream';
 import { once } from 'events';
 import invariant from 'invariant';
 import * as archiver from 'archiver';
-import getPort from 'get-port';
+import * as url from 'url';
 import { PageScreenshotOptions, test as baseTest } from './test';
 import { waitForMatch } from '../utils/streams';
 
-const CLI_CMD = path.resolve(__dirname, '../../packages/toolpad-app/cli.js');
+const currentDirectory = url.fileURLToPath(new URL('.', import.meta.url));
 
-const PROJECT_ROOT = path.resolve(__dirname, '../../');
+const CLI_CMD = path.resolve(currentDirectory, '../../packages/toolpad-app/cli.js');
+
+const PROJECT_ROOT = path.resolve(currentDirectory, '../../');
 
 // https://github.com/mui/material-ui/blob/bc35128302b5bd61fa35f89d371aeed91e6a5748/scripts/pushArgos.mjs#L7
 const ARGOS_OUTPUT_FOLDER = 'test/regressions/screenshots/chrome';
@@ -52,11 +54,12 @@ export async function withApp(
   options: WithAppOptions,
   doWork: (app: RunningLocalApp) => Promise<void>,
 ) {
+  const { default: getPort } = await import('get-port');
   const { cmd = 'start', template, setup, env, base } = options;
 
   // Each test runs in its own temporary folder to avoid race conditions when running tests in parallel.
   // It also avoids mutating the source code of the fixture while running the test.
-  const tmpTestDir = await fs.mkdtemp(path.resolve(__dirname, './tmp-'));
+  const tmpTestDir = await fs.mkdtemp(path.resolve(currentDirectory, './tmp-'));
 
   try {
     const projectDir = path.resolve(tmpTestDir, './fixture');

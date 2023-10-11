@@ -5,7 +5,7 @@
 ## TL;DR
 
 - **Higher-level API**. Toolpad operates at a higher abstraction level than Material UI. It sets healthy UI constraints that prevent common pitfalls and anti-patterns.
-- **Drag-and-drop builder**. Toolpad comes with a drag-and-drop builder to simplify UI building. The Drag-and-drop state is persisted in a yaml file so you can fully control the visual output with code.
+- **Drag-and-drop builder**. Toolpad comes with a drag-and-drop builder to simplify UI building. The builder saves the UI as a YAML file, so you can even modify and version the visual output on your file system.
 - **Less boilerplate** so you can focus on the essential parts of the app.
 - **Run alongside existing code**. It integrates well with your existing code. You can use your database models, client libraries, secrets, and bespoke components directly.
 - **Single source of truth**. Because Toolpad runs alongside your existing code, it lets you maintain a single source of truth for all business logic.
@@ -17,11 +17,11 @@ On reviewing multiple products and approaches, a few recurring areas of concern 
 
 ### Compromised delivery speed
 
-Every organization aspires to achieve rapid delivery, but to accommodate potential use cases, developers are often compelled to opt for flexible pro-code solutions, which typically come at the expense of speed. These tools offer lower abstraction levels for more control, but handling and scaling them soon becomes an unavoidable maintenance overhead.
+Every organization aims to achieve fast delivery, but in order to accommodate various use cases, developers are often pushed to choose flexible pro-code solutions. However, this flexibility often comes at the cost of speed. Pro-code provides lower-level abstractions for greater control, but as use cases scale, they quickly involve a growing maintenance burden that can't be avoided.
 
-### More lines of code
+### A lot of boilerplate
 
-Lots of boilerplate HTML, CSS, and JavaScript glue code is needed just to get backend data to the browser and hooked up to data displaying components.
+To connect backend data to the browser and set up data-display components, a substantial amount of boilerplate HTML, CSS, and JavaScript glue code is often required.
 
 ### Lower-level abstraction
 

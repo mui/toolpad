@@ -192,7 +192,7 @@ export default function EditorCanvasHost({
   });
 
   React.useEffect(() => {
-    return project.events.subscribe('externalChange', invalidateCanvasQueries);
+    return project.events.subscribe('queriesInvalidated', invalidateCanvasQueries);
   }, [project.events, invalidateCanvasQueries]);
 
   return (

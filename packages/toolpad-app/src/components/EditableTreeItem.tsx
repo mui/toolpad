@@ -98,16 +98,9 @@ export default function EditableTreeItem({
     event.target.select();
   }, []);
 
-  const handleBlur = React.useCallback(
-    (event: React.FocusEvent<HTMLInputElement>) => {
-      if (!suggestedNewItemName || (event && event.target.value !== suggestedNewItemName)) {
-        handleConfirm();
-      } else {
-        handleCancel();
-      }
-    },
-    [handleCancel, handleConfirm, suggestedNewItemName],
-  );
+  const handleBlur = React.useCallback(() => {
+    handleConfirm();
+  }, [handleConfirm]);
 
   const handleKeyDown = React.useCallback(
     (event: React.KeyboardEvent<HTMLInputElement>) => {

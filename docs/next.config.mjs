@@ -52,7 +52,6 @@ export default withDocsInfra(
           alias: {
             ...config.resolve.alias,
             docs: path.resolve(MONOREPO_PATH, './docs'),
-            'babel-plugin-macros': require.resolve('babel-plugin-macros'),
             ...MONOREPO_PACKAGES,
           },
         },

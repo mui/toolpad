@@ -69,13 +69,17 @@ export async function createProdHandler(project: ToolpadProject) {
 
   handler.use(
     asyncHandler(async (req, res) => {
-      const dom = await project.loadDom();
-
       const htmlFilePath = path.resolve(project.getAppOutputFolder(), './index.html');
+
+      const [runtimeConfig, dom] = await Promise.all([
+        project.getRuntimeConfig(),
+        project.loadDom(),
+      ]);
+
       let html = await fs.readFile(htmlFilePath, { encoding: 'utf-8' });
 
       html = postProcessHtml(html, {
-        config: project.getRuntimeConfig(),
+        config: runtimeConfig,
         initialState: createRuntimeState({ dom }),
       });
 

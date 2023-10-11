@@ -8,7 +8,6 @@ import { createProxyMiddleware } from 'http-proxy-middleware';
 import { mapValues } from '@mui/toolpad-utils/collections';
 import prettyBytes from 'pretty-bytes';
 import { createServer as createViteServer } from 'vite';
-import serializeJavascript from 'serialize-javascript';
 import { WebSocket, WebSocketServer } from 'ws';
 import { listen } from '@mui/toolpad-utils/http';
 // eslint-disable-next-line import/extensions
@@ -26,8 +25,7 @@ import type {
   WorkerRpc,
 } from './appServerWorker';
 import { createRpcHandler } from './rpc';
-import { APP_URL_WINDOW_PROPERTY, RUNTIME_CONFIG_WINDOW_PROPERTY } from '../constants';
-import type { RuntimeConfig } from '../config';
+import { APP_URL_WINDOW_PROPERTY } from '../constants';
 import { createRpcServer as createProjectRpcServer } from './projectRpcServer';
 import { createRpcServer as createRuntimeRpcServer } from './runtimeRpcServer';
 
@@ -48,7 +46,11 @@ async function createDevHandler(project: ToolpadProject) {
 
   const appServerPath = path.resolve(currentDirectory, '../cli/appServerWorker.js');
 
-  const [wsPort, devPort] = await Promise.all([getPort(), getPort()]);
+  const [wsPort, devPort, runtimeConfig] = await Promise.all([
+    getPort(),
+    getPort(),
+    project.getRuntimeConfig(),
+  ]);
 
   const mainThreadRpcChannel = new MessageChannel();
 
@@ -56,7 +58,7 @@ async function createDevHandler(project: ToolpadProject) {
     workerData: {
       outDir: project.getAppOutputFolder(),
       base: project.options.base,
-      config: project.getRuntimeConfig(),
+      config: runtimeConfig,
       root: project.getRoot(),
       port: devPort,
       mainThreadRpcPort: mainThreadRpcChannel.port1,
@@ -215,8 +217,6 @@ async function createToolpadHandler({
   const project = await initProject({ dev, dir, externalUrl, base });
   await project.start();
 
-  const runtimeConfig: RuntimeConfig = project.getRuntimeConfig();
-
   const router = express.Router();
 
   // See https://nextjs.org/docs/advanced-features/security-headers
@@ -244,16 +244,12 @@ async function createToolpadHandler({
     router.use('/api/dataSources', project.dataManager.createDataSourcesHandler());
 
     const transformIndexHtml = (html: string) => {
-      const serializedConfig = serializeJavascript(runtimeConfig, { isJSON: true });
       return html.replace(
         '<!-- __TOOLPAD_SCRIPTS__ -->',
 
         `<script>window[${JSON.stringify(APP_URL_WINDOW_PROPERTY)}] = ${JSON.stringify(
           project.options.base,
         )}</script>
-          <script>
-            window[${JSON.stringify(RUNTIME_CONFIG_WINDOW_PROPERTY)}] = ${serializedConfig}
-          </script>
         `,
       );
     };

@@ -11,7 +11,7 @@ import type { RuntimeConfig } from '../config';
 export interface IToolpadProject {
   functionsManager: FunctionsManager;
   envManager: EnvManager;
-  getRuntimeConfig: () => RuntimeConfig;
+  getRuntimeConfig: () => Promise<RuntimeConfig>;
 }
 
 type ServerDataSources = {

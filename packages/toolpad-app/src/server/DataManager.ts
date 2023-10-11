@@ -30,7 +30,7 @@ interface IToolpadProject {
   saveDom(dom: appDom.AppDom): Promise<void>;
   functionsManager: FunctionsManager;
   envManager: EnvManager;
-  getRuntimeConfig: () => RuntimeConfig;
+  getRuntimeConfig: () => Promise<RuntimeConfig>;
 }
 
 /**

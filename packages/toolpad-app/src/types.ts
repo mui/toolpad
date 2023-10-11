@@ -13,6 +13,7 @@ import { PaletteMode } from '@mui/material';
 import type * as appDom from './appDom';
 import type { Awaitable, Maybe, WithControlledProp } from './utils/types';
 import type { Rectangle } from './utils/geometry';
+import { RuntimeConfig } from './config';
 
 declare global {
   interface Error {
@@ -94,6 +95,7 @@ export interface QueryEditorProps<C, Q, A extends Methods = {}>
   globalScopeMeta: ScopeMeta;
   onChange: React.Dispatch<React.SetStateAction<appDom.QueryNode<Q>>>;
   onCommit?: () => void;
+  runtimeConfig: RuntimeConfig;
 }
 
 export type QueryEditor<C, Q, A extends Methods> = React.FC<QueryEditorProps<C, Q, A>>;

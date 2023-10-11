@@ -9,9 +9,8 @@ import { basicAuthUnauthorized, checkBasicAuthHeader } from './basicAuth';
 import { createRpcServer } from './runtimeRpcServer';
 import { createRpcHandler } from './rpc';
 import { RUNTIME_CONFIG_WINDOW_PROPERTY, INITIAL_STATE_WINDOW_PROPERTY } from '../constants';
-import type { RuntimeConfig } from '../config';
 import createRuntimeState from '../runtime/createRuntimeState';
-import { RuntimeState } from '../types';
+import type { RuntimeConfig, RuntimeState } from '../types';
 
 export interface PostProcessHtmlParams {
   config: RuntimeConfig;

@@ -49,14 +49,18 @@ import {
   ResponseType as AppDomRestResponseType,
 } from '../toolpadDataSources/rest/types';
 import { LocalQuery } from '../toolpadDataSources/local/types';
-import { ProjectEvents, ToolpadProjectOptions, CodeEditorFileType } from '../types';
+import type {
+  RuntimeConfig,
+  ProjectEvents,
+  ToolpadProjectOptions,
+  CodeEditorFileType,
+} from '../types';
 import { Awaitable } from '../utils/types';
 import EnvManager from './EnvManager';
 import FunctionsManager, { CreateDataProviderOptions } from './FunctionsManager';
 import { VersionInfo, checkVersion } from './versionInfo';
 import { VERSION_CHECK_INTERVAL } from '../constants';
 import DataManager from './DataManager';
-import type { RuntimeConfig } from '../config';
 import { PAGE_COLUMN_COMPONENT_ID, PAGE_ROW_COMPONENT_ID } from '../runtime/toolpadComponents';
 
 invariant(

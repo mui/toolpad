@@ -205,6 +205,60 @@ export async function createHandler({
   };
 }
 
+interface EditorHandlerParams {
+  toolpadDevMode?: boolean;
+}
+
+async function createEditorHandler(
+  appUrl: string,
+  { toolpadDevMode = false }: EditorHandlerParams,
+) {
+  const router = express.Router();
+
+  const transformIndexHtml = (html: string) => {
+    return html.replace(
+      '<!-- __TOOLPAD_SCRIPTS__ -->',
+
+      `<script>window[${JSON.stringify(APP_URL_WINDOW_PROPERTY)}] = ${JSON.stringify(
+        appUrl,
+      )}</script>
+      `,
+    );
+  };
+
+  if (toolpadDevMode) {
+    // eslint-disable-next-line no-console
+    console.log(`${chalk.blue('info')}  - Running Toolpad editor in dev mode`);
+
+    const viteApp = await createViteServer({
+      configFile: path.resolve(currentDirectory, '../../src/toolpad/vite.config.ts'),
+      root: path.resolve(currentDirectory, '../../src/toolpad'),
+      server: { middlewareMode: true },
+      plugins: [
+        {
+          name: 'toolpad:transform-index-html',
+          transformIndexHtml,
+        },
+      ],
+    });
+
+    router.use('/', viteApp.middlewares);
+  } else {
+    router.use(
+      '/',
+      express.static(path.resolve(currentDirectory, '../../dist/editor'), { index: false }),
+      asyncHandler(async (req, res) => {
+        const htmlFilePath = path.resolve(currentDirectory, '../../dist/editor/index.html');
+        let html = await fs.readFile(htmlFilePath, { encoding: 'utf-8' });
+        html = transformIndexHtml(html);
+        res.setHeader('Content-Type', 'text/html').status(200).end(html);
+      }),
+    );
+  }
+
+  return router;
+}
+
 async function createToolpadHandler({
   dev,
   externalUrl,
@@ -241,48 +295,8 @@ async function createToolpadHandler({
   router.use(project.options.base, appHandler.handler);
 
   if (dev) {
-    router.use('/api/dataSources', project.dataManager.createDataSourcesHandler());
-
-    const transformIndexHtml = (html: string) => {
-      return html.replace(
-        '<!-- __TOOLPAD_SCRIPTS__ -->',
-
-        `<script>window[${JSON.stringify(APP_URL_WINDOW_PROPERTY)}] = ${JSON.stringify(
-          project.options.base,
-        )}</script>
-        `,
-      );
-    };
-
-    if (toolpadDevMode) {
-      // eslint-disable-next-line no-console
-      console.log(`${chalk.blue('info')}  - Running Toolpad editor in dev mode`);
-
-      const viteApp = await createViteServer({
-        configFile: path.resolve(currentDirectory, '../../src/toolpad/vite.config.ts'),
-        root: path.resolve(currentDirectory, '../../src/toolpad'),
-        server: { middlewareMode: true },
-        plugins: [
-          {
-            name: 'toolpad:transform-index-html',
-            transformIndexHtml,
-          },
-        ],
-      });
-
-      router.use(editorBasename, viteApp.middlewares);
-    } else {
-      router.use(
-        editorBasename,
-        express.static(path.resolve(currentDirectory, '../../dist/editor'), { index: false }),
-        asyncHandler(async (req, res) => {
-          const htmlFilePath = path.resolve(currentDirectory, '../../dist/editor/index.html');
-          let html = await fs.readFile(htmlFilePath, { encoding: 'utf-8' });
-          html = transformIndexHtml(html);
-          res.setHeader('Content-Type', 'text/html').status(200).end(html);
-        }),
-      );
-    }
+    const editorHandler = await createEditorHandler(project.options.base, { toolpadDevMode });
+    router.use(editorBasename, editorHandler);
   }
 
   return {

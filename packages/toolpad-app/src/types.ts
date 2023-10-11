@@ -13,7 +13,12 @@ import { PaletteMode } from '@mui/material';
 import type * as appDom from './appDom';
 import type { Awaitable, Maybe, WithControlledProp } from './utils/types';
 import type { Rectangle } from './utils/geometry';
-import { RuntimeConfig } from './config';
+
+// These are set at runtime and passed to the browser.
+// Do not add secrets
+export interface RuntimeConfig {
+  externalUrl: string;
+}
 
 declare global {
   interface Error {

@@ -1,5 +1,5 @@
 import { Emitter } from '@mui/toolpad-utils/events';
-import { QueryClient, useQuery } from '@tanstack/react-query';
+import { QueryClient, useQuery, useQueryClient } from '@tanstack/react-query';
 import * as React from 'react';
 import { useNonNullableContext } from '@mui/toolpad-utils/react';
 import invariant from 'invariant';
@@ -15,7 +15,7 @@ async function fetchAppDevManifest(url: string) {
   return response.text();
 }
 
-function createProject(url: string, serializedManifest: string) {
+function createProject(url: string, serializedManifest: string, queryClient: QueryClient) {
   const manifest = JSON.parse(serializedManifest);
   const events = new Emitter<ProjectEvents>();
 
@@ -38,17 +38,6 @@ function createProject(url: string, serializedManifest: string) {
       default:
         throw new Error(`Unknown message kind: ${message.kind}`);
     }
-  });
-
-  const queryClient = new QueryClient({
-    defaultOptions: {
-      queries: {
-        networkMode: 'always',
-      },
-      mutations: {
-        networkMode: 'always',
-      },
-    },
   });
 
   const api = createRpcApi<ServerDefinition>(queryClient, `${url}/__toolpad_dev__/rpc`);
@@ -90,9 +79,14 @@ export function ProjectProvider({ url, children }: ProjectProps) {
     suspense: true,
   });
 
+  const queryClient = useQueryClient();
+
   invariant(manifest, "Manifest should be defined, we're using suspense");
 
-  const project = React.useMemo(() => createProject(url, manifest), [url, manifest]);
+  const project = React.useMemo(
+    () => createProject(url, manifest, queryClient),
+    [url, manifest, queryClient],
+  );
 
   React.useEffect(() => {
     return () => {

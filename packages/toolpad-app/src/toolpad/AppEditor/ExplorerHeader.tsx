@@ -11,7 +11,6 @@ interface ExplorerHeaderProps {
 const ExplorerHeaderContainer = styled(Stack)(({ theme }) => ({
   backgroundColor: theme.palette.background.paper,
   width: '100%',
-  zIndex: 1,
   height: 36,
 }));
 

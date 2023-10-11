@@ -17,7 +17,6 @@ import { folderExists } from '@mui/toolpad-utils/fs';
 import chalk from 'chalk';
 import { serveRpc } from '@mui/toolpad-utils/workerRpc';
 import * as url from 'node:url';
-import invariant from 'invariant';
 import { asyncHandler } from '../utils/express';
 import { createProdHandler } from './toolpadAppServer';
 import { initProject, resolveProjectDir, type ToolpadProject } from './localMode';
@@ -48,7 +47,8 @@ async function createDevHandler(project: ToolpadProject) {
   const handler = express.Router();
 
   const appServerPath = path.resolve(currentDirectory, '../cli/appServerWorker.js');
-  const devPort = await getPort();
+
+  const [wsPort, devPort] = await Promise.all([getPort(), getPort()]);
 
   const mainThreadRpcChannel = new MessageChannel();
 
@@ -92,6 +92,16 @@ async function createDevHandler(project: ToolpadProject) {
   const rpcServer = createProjectRpcServer(project);
   handler.use('/__toolpad_dev__/rpc', createRpcHandler(rpcServer));
 
+  handler.use(
+    '/__toolpad_dev__/manifest.json',
+    asyncHandler(async (req, res) => {
+      const wsProtocol = req.protocol === 'http' ? 'ws' : 'wss';
+      res.json({
+        wsUrl: `${wsProtocol}://${req.hostname}:${wsPort}`,
+      });
+    }),
+  );
+
   handler.use('/api/data', project.dataManager.createDataHandler());
   const runtimeRpcServer = createRuntimeRpcServer(project);
 
@@ -110,9 +120,6 @@ async function createDevHandler(project: ToolpadProject) {
       },
     }),
   );
-
-  const wsPort = project.options.wsPort;
-  invariant(wsPort, 'wsPort must be defined in dev mode');
 
   const wsServer = new WebSocketServer({ port: wsPort });
 

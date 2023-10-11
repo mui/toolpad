@@ -23,7 +23,6 @@ import {
   folderExists,
   readJsonFile,
 } from '@mui/toolpad-utils/fs';
-import getPort from 'get-port';
 import { z } from 'zod';
 import * as appDom from '../appDom';
 import insecureHash from '../utils/insecureHash';
@@ -1227,7 +1226,6 @@ class ToolpadProject {
     return {
       externalUrl: this.options.externalUrl,
       projectDir: this.getRoot(),
-      wsPort: this.options.wsPort,
       base: this.options.base,
     };
   }
@@ -1289,10 +1287,6 @@ export async function initProject({ dir: dirInput, ...config }: InitProjectOptio
     customServer: false,
     ...config,
   };
-
-  if (resolvedConfig.dev && !resolvedConfig.wsPort) {
-    resolvedConfig.wsPort = await getPort();
-  }
 
   await migrateLegacyProject(dir);
 

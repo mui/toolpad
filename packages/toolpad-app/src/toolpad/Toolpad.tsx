@@ -139,22 +139,19 @@ export interface ToolpadProps {
 export default function Toolpad({ basename }: ToolpadProps) {
   const appUrl = config.base;
 
-  const wsProtocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-  const wsUrl = `${wsProtocol}//${window.location.hostname}:${config.wsPort}/toolpad-ws`;
-
   const projectApiUrl = `${appUrl}/__toolpad_dev__/rpc`;
 
   return (
-    <QueryClientProvider client={queryClient}>
-      <ProjectEventsProvider wsUrl={wsUrl}>
-        <ProjectApiProvider url={projectApiUrl}>
-          <ThemeProvider>
-            {/* CssBaseline kickstart an elegant, consistent, and simple baseline to build upon. */}
-            <CssBaseline />
-            {/* Container that allows children to size to it with height: 100% */}
-            <Box sx={{ height: '1px', minHeight: '100vh' }}>
-              <ErrorBoundary fallbackRender={ErrorFallback}>
-                <React.Suspense fallback={<FullPageLoader />}>
+    <ThemeProvider>
+      {/* CssBaseline kickstart an elegant, consistent, and simple baseline to build upon. */}
+      <CssBaseline />
+      {/* Container that allows children to size to it with height: 100% */}
+      <Box sx={{ height: '1px', minHeight: '100vh' }}>
+        <ErrorBoundary fallbackRender={ErrorFallback}>
+          <React.Suspense fallback={<FullPageLoader />}>
+            <QueryClientProvider client={queryClient}>
+              <ProjectEventsProvider url={appUrl}>
+                <ProjectApiProvider url={projectApiUrl}>
                   <BrowserRouter basename={basename}>
                     <AppProvider appUrl={appUrl}>
                       <EditorShell>
@@ -167,12 +164,12 @@ export default function Toolpad({ basename }: ToolpadProps) {
                       </EditorShell>
                     </AppProvider>
                   </BrowserRouter>
-                </React.Suspense>
-              </ErrorBoundary>
-            </Box>
-          </ThemeProvider>
-        </ProjectApiProvider>
-      </ProjectEventsProvider>
-    </QueryClientProvider>
+                </ProjectApiProvider>
+              </ProjectEventsProvider>
+            </QueryClientProvider>
+          </React.Suspense>
+        </ErrorBoundary>
+      </Box>
+    </ThemeProvider>
   );
 }

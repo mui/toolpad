@@ -210,7 +210,6 @@ export type ProjectEvents = {
 export interface ToolpadProjectOptions {
   dev: boolean;
   externalUrl?: string;
-  wsPort?: number;
   base: string;
   customServer: boolean;
 }

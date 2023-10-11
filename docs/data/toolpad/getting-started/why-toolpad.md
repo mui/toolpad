@@ -78,6 +78,6 @@ The Toolpad application configuration is saved in YAML files, which can be conve
 
 While organizations make every effort to protect highly sensitive data and conduct thorough vendor due diligence and compliance assessments, data breaches continue to be a significant concern. Toolpad ensures that you can maintain control over your data, helping to address this issue.
 
-## How is Toolpad different from Y?
+## How is Toolpad different from other tools?
 
 🚧 Work in progress

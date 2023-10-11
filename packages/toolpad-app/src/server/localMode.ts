@@ -1225,7 +1225,6 @@ class ToolpadProject {
 
     return {
       externalUrl: this.options.externalUrl,
-      projectDir: this.getRoot(),
       base: this.options.base,
     };
   }

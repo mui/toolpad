@@ -97,6 +97,7 @@ async function createDevHandler(project: ToolpadProject) {
     asyncHandler(async (req, res) => {
       const wsProtocol = req.protocol === 'http' ? 'ws' : 'wss';
       res.json({
+        rootDir: project.getRoot(),
         wsUrl: `${wsProtocol}://${req.hostname}:${wsPort}`,
       });
     }),

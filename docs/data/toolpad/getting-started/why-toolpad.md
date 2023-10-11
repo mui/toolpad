@@ -11,7 +11,7 @@
 - **Single source of truth**. Because Toolpad runs alongside your existing code, it lets you maintain a single source of truth for all business logic.
 - **Integrates well with your development lifecycle**. Your project lives on your file system. You can use your own IDE, version control system, deployment target, CLI tools.
 
-On reviewing multiple products and approaches, a few recurring areas of concern were noticed. Let's examine them in detail:
+After reviewing multiple products and approaches, a few recurring areas of concern were noticed. Let's take a closer look at them:
 
 ## Trade-offs with pro-code tools
 
@@ -31,14 +31,14 @@ Creating internal tools demands knowledge of a front-end framework. While this a
 
 There exist many low-code code tools specifically for internal use cases. They offer speed, but come with some trade-offs:
 
-
-
 ### Extensibility
 
 Low-code tools can be hard to extend. When the tool can't handle a particular task by default, integrating your own code seamlessly is often a challenge. This lack of flexibility often results in having to write custom code inside these apps and storing your business logic within their configuration files.
+
 ### Duplication and fragmentation
 
 When working with external low-code or no-code tools, the duplication of code and logic can frequently occur because of a lack of extensibility. Developers invest valuable time in hunting down specific versions of business logic and maintaining them in multiple places. This lack of a unified reference point within the codebase can compromise its scalability, making maintenance and debugging more challenging.
+
 ### Loss of control
 
 When developers use external tools, they frequently sacrifice their autonomy and become restricted by the options provided by the tool. The introduction of a black-box element removes control over the entire process, including integrations, deployment, and version control. This can lead to a significant problem when it comes to the long-term maintainability of internal tools, as it becomes challenging to adapt, extend, or customize them to meet evolving needs.
@@ -63,7 +63,6 @@ Toolpad offers two ways to connect to your data, ensuring that you can keep your
 2. Write custom functions in your own IDE to connect to any data source: You can use your existing scripts, business logic, database models, client libraries, and secrets. This approach helps you maintain a single, shared data source for all your internal tools, preventing data duplication and ensuring consistency across applications.
 
 ### Integrates with your development lifecycle
-
 
 Toolpad empowers you with total control over the entire development lifecycle of your application. It operates on a "local-first" principle, where your project resides on your local file system. This enables you to utilize your preferred Integrated Development Environment (IDE), version control system, deployment target, and Command Line Interface (CLI) tools.
 

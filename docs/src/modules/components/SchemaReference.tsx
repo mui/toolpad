@@ -234,9 +234,7 @@ function JsonSchemaItemDisplay({ schema, idPrefix }: JsonSchemaItemDisplayProps)
 
   return (
     <React.Fragment>
-      {/* eslint-disable-next-line @typescript-eslint/no-use-before-define */}
       <JsonDescriptionDisplay schema={schema} />
-      {/* eslint-disable-next-line @typescript-eslint/no-use-before-define */}
       <JsonSchemaValueDisplay schema={schema} idPrefix={idPrefix} />
     </React.Fragment>
   );
@@ -288,7 +286,6 @@ function JsonSchemaPropertiesDisplay({ schema, idPrefix, open }: JsonSchemaPrope
       {interleave(
         properties.map(([propName, propSchema]) => {
           return (
-            // eslint-disable-next-line @typescript-eslint/no-use-before-define
             <JsonSchemaNameValueDisplay
               key={propName}
               name={propName}
@@ -318,7 +315,6 @@ function DefinitionTooltip({ name }: DefinitionTooltipProps) {
   return (
     <TooltipContext.Provider value={EMPTY_OBJECT}>
       <Wrapper>
-        {/* eslint-disable-next-line @typescript-eslint/no-use-before-define */}
         <JsonSchemaNameValueDisplay name={name} schema={definition} idPrefix={`definition`} />
       </Wrapper>
     </TooltipContext.Provider>

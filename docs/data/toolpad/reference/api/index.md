@@ -5,5 +5,6 @@
 ## Functions
 
 - [createComponent](/toolpad/reference/api/create-component/)
+- [createDataProvider](/toolpad/reference/api/create-data-provider/)
 - [createFunction](/toolpad/reference/api/create-function/)
 - [getContext](/toolpad/reference/api/get-context/)

@@ -33,7 +33,7 @@
 
 1. Open a PR to the `master` branch with the proposed changes. Add the "release" label.
 
-1. Merge the changes. Check out the master branch and pull the last commit.
+1. Merge the PR changes, then check out the `master` branch and pull the last commit.
 
 1. Publish the package to `npm`
 

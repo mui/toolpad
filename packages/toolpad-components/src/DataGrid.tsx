@@ -43,6 +43,7 @@ import {
   Typography,
   Tooltip,
   Popover,
+  Container,
 } from '@mui/material';
 import { getObjectKey } from '@mui/toolpad-utils/objectKey';
 import { errorFrom } from '@mui/toolpad-utils/errors';
@@ -586,6 +587,7 @@ const DataGridComponent = React.forwardRef(function DataGridComponent(
     rowsSource,
     dataProviderId,
     onRawRowsChange,
+    sx,
     ...props
   }: ToolpadDataGridProps,
   ref: React.ForwardedRef<HTMLDivElement>,
@@ -725,40 +727,36 @@ const DataGridComponent = React.forwardRef(function DataGridComponent(
 
   return (
     <LicenseInfoProvider info={LICENSE_INFO}>
-      <div
+      <Container
         ref={ref}
-        style={{ height: heightProp, minHeight: '100%', width: '100%', position: 'relative' }}
+        disableGutters
+        sx={{ ...sx, minHeight: heightProp, position: 'relative' }}
       >
-        <ErrorOverlay error={error} />
-
-        <div
-          style={{
-            position: 'absolute',
-            inset: '0 0 0 0',
-            visibility: error ? 'hidden' : 'visible',
-          }}
-        >
-          <ErrorBoundary fallbackRender={dataGridFallbackRender} resetKeys={[rows]}>
-            <DataGridPro
-              apiRef={apiRef}
-              slots={{
-                toolbar: hideToolbar ? null : GridToolbar,
-                loadingOverlay: SkeletonLoadingOverlay,
-              }}
-              onColumnResize={handleResize}
-              onColumnOrderChange={handleColumnOrderChange}
-              rows={rows}
-              columns={columns}
-              key={gridKey}
-              getRowId={getRowId}
-              onRowSelectionModelChange={onSelectionModelChange}
-              rowSelectionModel={selectionModel}
-              {...props}
-              {...dataProviderProps}
-            />
-          </ErrorBoundary>
-        </div>
-      </div>
+        <ErrorBoundary fallbackRender={dataGridFallbackRender} resetKeys={[rows]}>
+          <DataGridPro
+            apiRef={apiRef}
+            slots={{
+              toolbar: hideToolbar ? null : GridToolbar,
+              loadingOverlay: SkeletonLoadingOverlay,
+            }}
+            onColumnResize={handleResize}
+            onColumnOrderChange={handleColumnOrderChange}
+            rows={rows}
+            columns={columns}
+            key={gridKey}
+            getRowId={getRowId}
+            onRowSelectionModelChange={onSelectionModelChange}
+            rowSelectionModel={selectionModel}
+            {...props}
+            {...dataProviderProps}
+            sx={{
+              height: heightProp,
+              minHeight: '100%',
+              visibility: error ? 'hidden' : 'visible',
+            }}
+          />
+        </ErrorBoundary>
+      </Container>
     </LicenseInfoProvider>
   );
 });

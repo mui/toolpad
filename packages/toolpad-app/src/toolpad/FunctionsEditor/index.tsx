@@ -315,12 +315,11 @@ export default function FunctionsEditor() {
       <Box sx={{ height: 'calc(100vh - 48px)' }}>
         <PanelGroup direction="horizontal">
           <Panel defaultSize={16} minSize={16}>
-            <Box
+            <Stack
+              direction="column"
               sx={{
                 height: '100%',
-                overflow: 'auto',
                 position: 'relative',
-                scrollbarGutter: 'stable',
               }}
             >
               <ExplorerHeader
@@ -340,6 +339,8 @@ export default function FunctionsEditor() {
                 onNodeToggle={(_event, nodeIds) => setExpanded(nodeIds)}
                 sx={{
                   px: 1,
+                  overflow: 'auto',
+                  scrollbarGutter: 'stable',
                 }}
               >
                 {isCreateNewHandlerOpen ? (
@@ -408,7 +409,7 @@ export default function FunctionsEditor() {
                   {errorFrom(introspection.error).message}
                 </Box>
               ) : null}
-            </Box>
+            </Stack>
           </Panel>
           <PanelResizeHandle />
           <Panel>

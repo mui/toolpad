@@ -1,5 +1,35 @@
 # Changelog
 
+## 0.1.32
+
+<!-- generated comparing v0.1.31..master -->
+
+_Oct 12, 2023_
+
+A big thanks to the 4 contributors who made this release possible. Here are some highlights ✨:
+
+Added new data providers feature. Improved UX around the pages explorer. Added new Markdown and Link components.
+
+- &#8203;<!-- 17 -->Fix createDataProvider imports in the integration tests (#2780) @Janpot
+- &#8203;<!-- 16 -->Remove container sx default (#2779) @Janpot
+- &#8203;<!-- 15 -->Use a context to distribute project API (#2766) @Janpot
+- &#8203;<!-- 14 -->Demonstrate how data providers can be used with prisma (#2774) @Janpot
+- &#8203;<!-- 13 -->Unify preview and canvas entrypoints (#2760) @Janpot
+- &#8203;<!-- 12 -->Use toggle buttons for text mode property (#2764) @Janpot
+- &#8203;<!-- 11 -->Add Markdown and Link components (#2763) @Janpot
+- &#8203;<!-- 10 -->fix lock file @Janpot
+- &#8203;<!-- 09 -->Block next.js from updating (#2768) @Janpot
+- &#8203;<!-- 08 -->New page creation UX (#2728) @apedroferreira
+- &#8203;<!-- 07 -->Introduce Data providers (#2644) @Janpot
+- &#8203;<!-- 06 -->Update monorepo (#2758) @apedroferreira
+- &#8203;<!-- 05 -->Simplify the editor RPC implementation (#2756) @Janpot
+- &#8203;<!-- 04 -->Allow integrating toolpad applications in a custom server (#2747) @Janpot
+- &#8203;<!-- 03 -->Move the perf cascade css file to the HarViewer component (#2755) @Janpot
+- &#8203;<!-- 02 -->[core] Smoothen edges on the new Editable Tree component (#2778) @bharatkashyap
+- &#8203;<!-- 01 -->[core] Revert Next to v13.4.19 @oliviertassinari
+
+All contributors of this release in alphabetical order: @apedroferreira, @bharatkashyap, @Janpot, @oliviertassinari
+
 ## 0.1.31
 
 <!-- generated comparing v0.1.30..master -->

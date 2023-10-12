@@ -1,6 +1,6 @@
 {
   "name": "@mui/toolpad",
-  "version": "0.1.31",
+  "version": "0.1.32",
   "license": "MIT",
   "bin": {
     "toolpad": "./cli.js"
@@ -172,6 +172,5 @@
   "typings": "./index.d.ts",
   "publishConfig": {
     "access": "public"
-  },
-  "gitHead": "0186d8a811d0c172f193d8e961cd763d5024b71a"
+  }
 }

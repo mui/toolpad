@@ -1,6 +1,6 @@
 {
   "name": "docs",
-  "version": "0.1.31",
+  "version": "0.1.32",
   "private": true,
   "author": "MUI Toolpad",
   "license": "MIT",
@@ -30,7 +30,7 @@
     "@mui/material": "5.14.13",
     "@mui/monorepo": "https://github.com/mui/material-ui.git",
     "@mui/styles": "5.14.13",
-    "@mui/toolpad": "0.1.31",
+    "@mui/toolpad": "0.1.32",
     "@mui/utils": "5.14.13",
     "@trendmicro/react-interpolate": "0.5.5",
     "@types/lodash": "4.14.199",

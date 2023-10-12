@@ -1413,6 +1413,9 @@ export default function RenderOverlay({ bridge }: RenderOverlayProps) {
         const isVerticallyResizable =
           isSelected && Boolean(nodeInfo?.componentConfig?.resizableHeightProp);
 
+        const isResizingVertically =
+          draggedEdge === RECTANGLE_EDGE_TOP || draggedEdge === RECTANGLE_EDGE_BOTTOM;
+
         const isResizing = Boolean(draggedEdge);
         const isResizingNode = isResizing && node.id === draggedNodeId;
 
@@ -1440,7 +1443,7 @@ export default function RenderOverlay({ bridge }: RenderOverlayProps) {
                 onEdgeDragStart={
                   isHorizontallyResizable || isVerticallyResizable
                     ? handleEdgeDragStart(
-                        parent && isPageColumnChild && !isVerticallyResizable ? parent : node,
+                        parent && isPageColumnChild && !isResizingVertically ? parent : node,
                       )
                     : undefined
                 }

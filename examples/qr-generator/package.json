@@ -8,7 +8,7 @@
     "start": "toolpad start"
   },
   "dependencies": {
-    "@mui/toolpad": "0.1.31",
+    "@mui/toolpad": "0.1.32",
     "qrcode": "^1.5.3"
   },
   "devDependencies": {

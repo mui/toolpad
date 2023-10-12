@@ -26,7 +26,7 @@ import {
   DOCUMENTATION_URL,
   VERSION_CHECK_INTERVAL,
 } from '../../../../constants';
-import client from '../../../../api';
+import { useProjectApi } from '../../../../projectApi';
 import useBoolean from '../../../../utils/useBoolean';
 import type { PackageManager } from '../../../../server/versionInfo';
 
@@ -96,11 +96,12 @@ function getUpgradeMessage(packageManager: PackageManager | null): string {
 
 function UserFeedback() {
   const { buttonProps, menuProps } = useMenu();
+  const projectApi = useProjectApi();
 
   invariant(process.env.TOOLPAD_VERSION, 'Missing env var TOOLPAD_VERSION');
   invariant(process.env.TOOLPAD_BUILD, 'Missing env var TOOLPAD_BUILD');
 
-  const { data: versionInfo } = client.useQuery('getVersionInfo', [], {
+  const { data: versionInfo } = projectApi.useQuery('getVersionInfo', [], {
     staleTime: VERSION_CHECK_INTERVAL,
   });
 

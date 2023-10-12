@@ -70,18 +70,18 @@ export interface UseMutationFn<M extends Methods> {
   ): UseMutationResult<Awaited<ReturnType<M[K]>>, unknown, Parameters<M[K]>>;
 }
 
-export interface ApiClient<D extends Methods> {
-  methods: D;
-  useQuery: UseQueryFn<D>;
-  useMutation: UseMutationFn<D>;
-  refetchQueries: <K extends keyof D>(key: K, params?: Parameters<D[K]>) => Promise<void>;
-  invalidateQueries: <K extends keyof D>(key: K, params?: Parameters<D[K]>) => Promise<void>;
+export interface ApiClient<D extends MethodResolvers, M extends Methods = MethodsOf<D>> {
+  methods: M;
+  useQuery: UseQueryFn<M>;
+  useMutation: UseMutationFn<M>;
+  refetchQueries: <K extends keyof M>(key: K, params: Parameters<M[K]>) => Promise<void>;
+  invalidateQueries: <K extends keyof M>(key: K, params: Parameters<M[K]>) => Promise<void>;
 }
 
 export function createRpcApi<D extends MethodResolvers>(
   queryClient: QueryClient,
   endpoint: string | URL,
-): ApiClient<MethodsOf<D>> {
+): ApiClient<D> {
   const methods = createRpcClient<D>(endpoint);
 
   return {
@@ -99,10 +99,10 @@ export function createRpcApi<D extends MethodResolvers>(
     },
     useMutation: (key, options) => useMutation((params) => methods[key](...params), options),
     refetchQueries(key, params?) {
-      return queryClient.refetchQueries(params ? [key, params] : [key]);
+      return queryClient.refetchQueries([key, params]);
     },
-    invalidateQueries(key, params?) {
-      return queryClient.invalidateQueries(params ? [key, params] : [key]);
+    invalidateQueries(key, params) {
+      return queryClient.invalidateQueries([key, params]);
     },
   };
 }

@@ -13,7 +13,7 @@ import { LogEntry } from '../../../components/Console';
 import { useAppStateApi } from '../../AppState';
 import type { ToolpadBridge } from '../../../canvas/ToolpadBridge';
 import CenteredSpinner from '../../../components/CenteredSpinner';
-import { useOnProjectEvent } from '../../../projectEvents';
+import { useProject } from '../../../project';
 
 interface OverlayProps {
   children?: React.ReactNode;
@@ -87,6 +87,7 @@ export default function EditorCanvasHost({
   onConsoleEntry,
   onInit,
 }: EditorCanvasHostProps) {
+  const project = useProject();
   const appStateApi = useAppStateApi();
 
   const [bridge, setBridge] = React.useState<ToolpadBridge | null>(null);
@@ -123,7 +124,7 @@ export default function EditorCanvasHost({
     }
   });
 
-  const src = `${base}/pages/${pageNodeId}?toolpad-display=canvas`;
+  const src = `${base}/pages/${pageNodeId}`;
 
   const [loading, setLoading] = React.useState(true);
   useOnChange(src, () => setLoading(true));
@@ -190,7 +191,9 @@ export default function EditorCanvasHost({
     bridge?.canvasCommands.invalidateQueries();
   });
 
-  useOnProjectEvent('queriesInvalidated', invalidateCanvasQueries);
+  React.useEffect(() => {
+    return project.events.subscribe('queriesInvalidated', invalidateCanvasQueries);
+  }, [project.events, invalidateCanvasQueries]);
 
   return (
     <CanvasRoot className={className}>

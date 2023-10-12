@@ -1,12 +1,15 @@
 import * as path from 'path';
 import * as fs from 'fs/promises';
+import * as url from 'url';
 import { ToolpadRuntime } from '../../models/ToolpadRuntime';
 import { expect, test } from '../../playwright/localTest';
 import { ToolpadEditor } from '../../models/ToolpadEditor';
 
+const currentDirectory = url.fileURLToPath(new URL('.', import.meta.url));
+
 test.use({
   localAppConfig: {
-    template: path.resolve(__dirname, './fixture'),
+    template: path.resolve(currentDirectory, './fixture'),
     cmd: 'dev',
   },
 });

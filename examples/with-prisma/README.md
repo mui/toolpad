@@ -28,8 +28,8 @@ npm run dev
 
 This app demonstrates the following capabilities of Toolpad:
 
-1. Reusing your models in Toolpad UI
+1. Reusing your models in Toolpad UI.
 2. Using a Data Grid, Button and a text input component.
-3. Using CRUD operations from [Prisma Client API](https://www.prisma.io/docs/concepts/components/prisma-client/crud)
+3. Using CRUD operations from [Prisma Client API](https://www.prisma.io/docs/concepts/components/prisma-client/crud).
 
 [Check out the source code](https://github.com/mui/mui-toolpad/tree/master/examples/with-prisma)

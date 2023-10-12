@@ -6,12 +6,11 @@ import serializeJavascript from 'serialize-javascript';
 import { ToolpadProject } from './localMode';
 import { asyncHandler } from '../utils/express';
 import { basicAuthUnauthorized, checkBasicAuthHeader } from './basicAuth';
-import { createRpcRuntimeServer } from './rpcRuntimeServer';
+import { createRpcServer } from './runtimeRpcServer';
 import { createRpcHandler } from './rpc';
 import { RUNTIME_CONFIG_WINDOW_PROPERTY, INITIAL_STATE_WINDOW_PROPERTY } from '../constants';
-import type { RuntimeConfig } from '../config';
 import createRuntimeState from '../runtime/createRuntimeState';
-import { RuntimeState } from '../types';
+import type { RuntimeConfig, RuntimeState } from '../types';
 
 export interface PostProcessHtmlParams {
   config: RuntimeConfig;
@@ -64,18 +63,22 @@ export async function createProdHandler(project: ToolpadProject) {
 
   handler.use('/api/data', project.dataManager.createDataHandler());
 
-  const runtimeRpcServer = createRpcRuntimeServer(project);
+  const runtimeRpcServer = createRpcServer(project);
   handler.use('/api/runtime-rpc', createRpcHandler(runtimeRpcServer));
 
   handler.use(
     asyncHandler(async (req, res) => {
-      const dom = await project.loadDom();
-
       const htmlFilePath = path.resolve(project.getAppOutputFolder(), './index.html');
+
+      const [runtimeConfig, dom] = await Promise.all([
+        project.getRuntimeConfig(),
+        project.loadDom(),
+      ]);
+
       let html = await fs.readFile(htmlFilePath, { encoding: 'utf-8' });
 
       html = postProcessHtml(html, {
-        config: project.getRuntimeConfig(),
+        config: runtimeConfig,
         initialState: createRuntimeState({ dom }),
       });
 

@@ -1,6 +1,6 @@
 import { QueryClient } from '@tanstack/react-query';
 import { createRpcApi } from '../rpcClient';
-import type { ServerDefinition } from '../server/rpcRuntimeServer';
+import type { ServerDefinition } from '../server/runtimeRpcServer';
 
 export const queryClient = new QueryClient({
   defaultOptions: {

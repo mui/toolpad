@@ -3,7 +3,7 @@ import invariant from 'invariant';
 import { createServer, Plugin } from 'vite';
 import { createRpcClient } from '@mui/toolpad-utils/workerRpc';
 import { getHtmlContent, createViteConfig, resolvedComponentsId } from './toolpadAppBuilder';
-import type { RuntimeConfig } from '../config';
+import type { RuntimeConfig } from '../types';
 import type * as appDom from '../appDom';
 import type { ComponentEntry } from './localMode';
 import createRuntimeState from '../runtime/createRuntimeState';
@@ -42,13 +42,10 @@ function devServerPlugin({ config }: ToolpadAppDevServerParams): Plugin {
       return () => {
         viteServer.middlewares.use('/', async (req, res, next) => {
           invariant(req.url, 'request must have a url');
-          const url = new URL(req.url, 'http://x');
-          const canvas = url.searchParams.get('toolpad-display') === 'canvas';
-
           try {
             const dom = await loadDom();
 
-            const template = getHtmlContent({ canvas });
+            const template = getHtmlContent({ canvas: true });
 
             let html = await viteServer.transformIndexHtml(req.url, template);
 

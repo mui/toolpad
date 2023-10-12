@@ -40,6 +40,7 @@ export default function PageOptionsPanel() {
       <Typography variant="subtitle1">Page:</Typography>
       <NodeNameEditor node={page} />
       <PageTitleEditor node={page} />
+      <Typography variant="body2">Display mode:</Typography>
       <Tooltip
         arrow
         placement="left-start"

@@ -1,4 +1,4 @@
-import { Stack, Typography, Divider, MenuItem, TextField, Tooltip, Link } from '@mui/material';
+import { Stack, Typography, Divider, Tooltip, Link, ToggleButtonGroup, ToggleButton } from '@mui/material';
 import * as React from 'react';
 import { useAppState, useDomApi } from '../../AppState';
 import { usePageEditorState } from './PageEditorProvider';
@@ -57,22 +57,19 @@ export default function PageOptionsPanel() {
           </Typography>
         }
       >
-        <TextField
-          select
-          defaultValue="shell"
-          value={page.attributes.display}
+        <ToggleButtonGroup
+          exclusive
+          value={page.attributes.display ?? "shell"}
           onChange={handleDisplayModeChange}
-          label="Display mode"
+          aria-label="Display mode"
           fullWidth
         >
           {PAGE_DISPLAY_OPTIONS.map((option) => {
             return (
-              <MenuItem key={option.value} value={option.value}>
-                {option.label}
-              </MenuItem>
+              <ToggleButton key={option.value} value={option.value}>{option.label}</ToggleButton>
             );
           })}
-        </TextField>
+        </ToggleButtonGroup>
       </Tooltip>
       <Divider variant="middle" sx={{ alignSelf: 'stretch' }} />
       <Typography variant="overline">Page State:</Typography>

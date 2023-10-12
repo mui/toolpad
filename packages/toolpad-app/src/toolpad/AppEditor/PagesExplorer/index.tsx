@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { styled, Box, IconButton } from '@mui/material';
+import { styled, Box, IconButton, Stack } from '@mui/material';
 import { TreeView, treeItemClasses } from '@mui/x-tree-view';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
@@ -19,8 +19,8 @@ import EditableTreeItem, { EditableTreeItemProps } from '../../../components/Edi
 import { scrollIntoViewIfNeeded } from '../../../utils/dom';
 import ExplorerHeader from '../ExplorerHeader';
 
-const PagesExplorerRoot = styled('div')({
-  overflow: 'auto',
+const PagesExplorerRoot = styled(Stack)({
+  height: '100%',
   width: '100%',
 });
 
@@ -328,14 +328,12 @@ export default function PagesExplorer({ className }: PagesExplorerProps) {
   );
 
   return (
-    <PagesExplorerRoot
-      sx={{
-        height: '100%',
-        overflow: 'auto',
-      }}
-      data-testid="pages-explorer"
-      className={className}
-    >
+    <PagesExplorerRoot data-testid="pages-explorer" direction="column" className={className}>
+      <ExplorerHeader
+        headerText="Pages"
+        onCreate={handleOpenCreateNewPage}
+        createLabelText="Create new page"
+      />
       <TreeView
         ref={pagesTreeRef}
         aria-label="Pages explorer"
@@ -347,14 +345,10 @@ export default function PagesExplorer({ className }: PagesExplorerProps) {
         defaultCollapseIcon={<ExpandMoreIcon sx={{ fontSize: '0.9rem', opacity: 0.5 }} />}
         defaultExpandIcon={<ChevronRightIcon sx={{ fontSize: '0.9rem', opacity: 0.5 }} />}
         sx={{
+          overflow: 'auto',
           scrollbarGutter: 'stable',
         }}
       >
-        <ExplorerHeader
-          headerText="Pages"
-          onCreate={handleOpenCreateNewPage}
-          createLabelText="Create new page"
-        />
         {isCreateNewPageOpen ? (
           <EditableTreeItem
             nodeId="::create::"

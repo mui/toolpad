@@ -33,6 +33,8 @@
 
 1. Open a PR to the `master` branch with the proposed changes. Add the "release" label.
 
+1. Merge the changes. Check out the master branch and pull the last commit.
+
 1. Publish the package to `npm`
 
    1. If you are not logged in to `npm` in your CLI, first log in with:
@@ -53,7 +55,17 @@
       yarn release:publish-canary
       ```
 
-1. Merge the changes.
+1. Smoke test the release:
+
+   1. Run
+
+   ```bash
+   yarn create toolpad-app test-app
+   cd test-app
+   yarn dev
+   ```
+
+   And verify the editor works
 
 1. Publish the documentation. The documentation must be updated on the `docs-latest` branch.
 
@@ -71,15 +83,3 @@
    1. Use `<version number>` as the **Release title**
    1. Mark as prerelease if necessary.
    1. **Publish release**
-
-1. Smoke test the release:
-
-   1. Run
-
-   ```bash
-   yarn create toolpad-app test-app
-   cd test-app
-   yarn dev
-   ```
-
-   And verify the editor works

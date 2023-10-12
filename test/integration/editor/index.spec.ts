@@ -1,6 +1,7 @@
 import * as path from 'path';
 import * as fs from 'fs/promises';
 import * as url from 'url';
+import invariant from 'invariant';
 import { test, expect, Locator } from '../../playwright/localTest';
 import { ToolpadEditor } from '../../models/ToolpadEditor';
 import clickCenter from '../../utils/clickCenter';
@@ -265,6 +266,11 @@ test('must deselect selected element when clicking outside of it', async ({ page
 });
 
 test('can react to pages renamed on disk', async ({ page, localApp }) => {
+  invariant(
+    localApp,
+    'test must be configured with `localAppConfig`. Add `test.use({ localAppConfig: ... })`',
+  );
+
   const editorModel = new ToolpadEditor(page);
   await editorModel.goToPageById('y4d19z0');
   await editorModel.waitForOverlay();

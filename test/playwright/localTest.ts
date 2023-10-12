@@ -4,12 +4,14 @@ import childProcess from 'child_process';
 import { createWriteStream } from 'fs';
 import { pipeline } from 'stream/promises';
 import { Readable } from 'stream';
+import { listen } from '@mui/toolpad-utils/http';
 import { once } from 'events';
 import invariant from 'invariant';
 import * as archiver from 'archiver';
 import * as url from 'url';
 import getPort from 'get-port';
 import { unstable_createHandler } from '@mui/toolpad';
+import express from 'express';
 import { PageScreenshotOptions, test as baseTest } from './test';
 import { waitForMatch } from '../utils/streams';
 
@@ -38,7 +40,7 @@ interface SetupContext {
 interface WithAppOptions {
   build?: boolean;
   // Command to start toolpad with
-  cmd?: 'start' | 'dev' | 'custom-server';
+  cmd?: 'start' | 'dev';
   // Template to be used as the starting point of the project folder toolpad is running in
   // This will copied to the temporary folder
   template?: string;
@@ -50,125 +52,153 @@ interface WithAppOptions {
   base?: string;
 }
 
-/**
- * Spins up a Toolpad app in a local temporary folder. The folder is deleted after `doWork` is done
- */
-export async function withApp(
-  options: WithAppOptions,
-  doWork: (app: RunningLocalApp) => Promise<void>,
-) {
-  const { cmd = 'start', build = cmd === 'start', template, setup, env, base } = options;
+const asyncDisposeSymbol: typeof Symbol.asyncDispose =
+  Symbol.asyncDispose ?? Symbol('asyncDispose');
 
+async function getTestProjectDir() {
+  const tmpTestDir = await fs.mkdtemp(path.resolve(currentDirectory, './tmp-'));
   // Each test runs in its own temporary folder to avoid race conditions when running tests in parallel.
   // It also avoids mutating the source code of the fixture while running the test.
-  const tmpTestDir = await fs.mkdtemp(path.resolve(currentDirectory, './tmp-'));
+  const projectDir = path.resolve(tmpTestDir, './fixture');
+  await fs.mkdir(projectDir, { recursive: true });
+  return {
+    path: projectDir,
+    [asyncDisposeSymbol]: async () => {
+      await fs.rm(tmpTestDir, { recursive: true, maxRetries: 3, retryDelay: 1000 });
+    },
+  };
+}
 
-  try {
-    const projectDir = path.resolve(tmpTestDir, './fixture');
-    await fs.mkdir(projectDir, { recursive: true });
+async function runCustomServer(projectDir: string) {
+  const base = '/foo';
+  const app = express();
 
-    if (template) {
-      await fs.cp(template, projectDir, { recursive: true });
+  const toolpadHandler = await unstable_createHandler({
+    dev: true,
+    externalUrl: 'http://localhost:3000',
+    dir: projectDir,
+    base,
+  });
+
+  app.use(base, toolpadHandler.handler);
+
+  const port = await getPort();
+  const server = await listen(app, port);
+
+  return {
+    url: `http://localhost:${server.port}${base}`,
+    dir: projectDir,
+    stdout: process.stdout,
+    [asyncDisposeSymbol]: async () => {
+      await server.close();
+    },
+  };
+}
+
+async function runApp(projectDir: string, options: WithAppOptions) {
+  const { cmd = 'start', build = cmd === 'start', template, setup, env, base } = options;
+  if (template) {
+    await fs.cp(template, projectDir, { recursive: true });
+  }
+
+  if (setup) {
+    await setup({ dir: projectDir });
+  }
+
+  if (build) {
+    const buildArgs = [CLI_CMD, 'build'];
+
+    if (base) {
+      buildArgs.push('--base', base);
     }
 
-    if (setup) {
-      await setup({ dir: projectDir });
+    const child = childProcess.spawn('node', buildArgs, {
+      cwd: projectDir,
+      stdio: 'pipe',
+      shell: !process.env.CI,
+      env: {
+        ...process.env,
+        ...env,
+      },
+    });
+
+    if (VERBOSE) {
+      child.stdout?.pipe(process.stdout);
+      child.stderr?.pipe(process.stderr);
     }
 
-    if (build) {
-      const buildArgs = [CLI_CMD, 'build'];
+    await once(child, 'exit');
 
-      if (base) {
-        buildArgs.push('--base', base);
-      }
+    if (child.exitCode !== 0) {
+      throw new Error('Build failed');
+    }
+  }
 
-      const child = childProcess.spawn('node', buildArgs, {
-        cwd: projectDir,
-        stdio: 'pipe',
-        shell: !process.env.CI,
-        env: {
-          ...process.env,
-          ...env,
-        },
-      });
+  const args: string[] = [CLI_CMD, cmd];
+  if (options.toolpadDev) {
+    args.push('--dev');
+  }
+
+  // Run each test on its own port to avoid race conditions when running tests in parallel.
+  args.push('--port', String(await getPort()));
+
+  if (base) {
+    args.push('--base', base);
+  }
+
+  const child = childProcess.spawn('node', args, {
+    cwd: projectDir,
+    stdio: 'pipe',
+    shell: !process.env.CI,
+    env: {
+      ...process.env,
+      ...env,
+    },
+  });
+
+  const port = await Promise.race([
+    once(child, 'exit').then(([code]) => {
+      throw new Error(`App process exited unexpectedly${code ? ` with code ${code}` : ''}`);
+    }),
+    (async () => {
+      invariant(child.stdout, "Childprocess must be started with stdio: 'pipe'");
 
       if (VERBOSE) {
         child.stdout?.pipe(process.stdout);
         child.stderr?.pipe(process.stderr);
       }
 
-      await once(child, 'exit');
+      const match = await waitForMatch(child.stdout, /localhost:(\d+)/);
 
-      if (child.exitCode !== 0) {
-        throw new Error('Build failed');
-      }
-    }
-
-    if (cmd === 'custom-server') {
-      const app = express();
-
-      const toolpadHandler = await unstable_createHandler({
-        dir: projectDir,
-        base: '/foo',
-      });
-
-      app.use('/foo', unstable_create);
-    } else {
-      const args: string[] = [CLI_CMD, cmd];
-      if (options.toolpadDev) {
-        args.push('--dev');
+      if (!match) {
+        throw new Error('Failed to start');
       }
 
-      // Run each test on its own port to avoid race conditions when running tests in parallel.
-      args.push('--port', String(await getPort()));
+      const detectedPort = Number(match[1]);
 
-      if (base) {
-        args.push('--base', base);
-      }
+      return detectedPort;
+    })(),
+  ]);
 
-      const child = childProcess.spawn('node', args, {
-        cwd: projectDir,
-        stdio: 'pipe',
-        shell: !process.env.CI,
-        env: {
-          ...process.env,
-          ...env,
-        },
-      });
+  return {
+    url: `http://localhost:${port}`,
+    dir: projectDir,
+    stdout: child.stdout,
 
-      try {
-        await Promise.race([
-          once(child, 'exit').then(([code]) => {
-            throw new Error(`App process exited unexpectedly${code ? ` with code ${code}` : ''}`);
-          }),
-          (async () => {
-            invariant(child.stdout, "Childprocess must be started with stdio: 'pipe'");
+    [asyncDisposeSymbol]: () => {
+      child.kill();
+    },
+  };
+}
 
-            if (VERBOSE) {
-              child.stdout?.pipe(process.stdout);
-              child.stderr?.pipe(process.stderr);
-            }
-
-            const match = await waitForMatch(child.stdout, /localhost:(\d+)/);
-
-            if (!match) {
-              throw new Error('Failed to start');
-            }
-
-            const port = Number(match[1]);
-            await doWork({
-              url: `http://localhost:${port}`,
-              dir: projectDir,
-              stdout: child.stdout,
-            });
-          })(),
-        ]);
-      } finally {
-        child.kill();
-      }
-    }
+async function using<T extends { [asyncDisposeSymbol]: () => void | Promise<void> }>(
+  resource: T,
+  callback: (resource: T) => Promise<void>,
+) {
+  try {
+    await callback(resource);
   } finally {
-    await fs.rm(tmpTestDir, { recursive: true, maxRetries: 3, retryDelay: 1000 });
+    await resource[asyncDisposeSymbol]();
   }
 }
 
@@ -183,26 +213,50 @@ const test = baseTest.extend<
   },
   {
     browserCloser: null;
-    localApp: RunningLocalApp;
+    localApp?: RunningLocalApp;
+    projectDir: { path: string };
     toolpadDev: boolean;
+    customServer: RunningLocalApp;
     localAppConfig?: WithAppOptions;
   }
 >({
   toolpadDev: [!!process.env.TOOLPAD_NEXT_DEV, { option: true, scope: 'worker' }],
   localAppConfig: [undefined, { option: true, scope: 'worker' }],
-  localApp: [
-    async ({ localAppConfig, toolpadDev }, use) => {
-      if (!localAppConfig) {
-        throw new Error('localAppConfig missing');
-      }
-      await withApp({ toolpadDev, ...localAppConfig }, async (app) => {
+  projectDir: [
+    // eslint-disable-next-line no-empty-pattern
+    async ({}, use) => {
+      await using(await getTestProjectDir(), async (projectDir) => {
+        await use(projectDir);
+      });
+    },
+    { scope: 'worker', timeout: 60000 },
+  ],
+  customServer: [
+    // eslint-disable-next-line no-empty-pattern
+    async ({ projectDir }, use) => {
+      await using(await runCustomServer(projectDir.path), async (app) => {
         await use(app);
       });
     },
     { scope: 'worker', timeout: 60000 },
   ],
+  localApp: [
+    async ({ projectDir, localAppConfig, toolpadDev }, use) => {
+      if (localAppConfig) {
+        await using(
+          await runApp(projectDir.path, { toolpadDev, ...localAppConfig }),
+          async (app) => {
+            await use(app);
+          },
+        );
+      } else {
+        await use(undefined);
+      }
+    },
+    { scope: 'worker', timeout: 60000 },
+  ],
   baseURL: async ({ localApp }, use) => {
-    await use(localApp.url);
+    await use(localApp?.url);
   },
   browserCloser: [
     async ({ browser }, use) => {
@@ -216,14 +270,14 @@ const test = baseTest.extend<
     },
   ],
   projectSnapshot: [
-    async ({ localApp }, use, testInfo) => {
+    async ({ projectDir }, use, testInfo) => {
       await use(null);
 
       if (testInfo.status !== 'passed' && testInfo.status !== 'skipped') {
         await fs.mkdir(testInfo.outputDir, { recursive: true });
         const output = createWriteStream(path.resolve(testInfo.outputDir, './projectSnapshot.zip'));
         const archive = archiver.create('zip');
-        archive.directory(localApp.dir, '/project');
+        archive.directory(projectDir.path, '/project');
         archive.finalize();
 
         await pipeline(archive, output);

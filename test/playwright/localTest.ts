@@ -8,6 +8,7 @@ import { once } from 'events';
 import invariant from 'invariant';
 import * as archiver from 'archiver';
 import getPort from 'get-port';
+import { unstable_createHandler } from '@mui/toolpad';
 import { PageScreenshotOptions, test as baseTest } from './test';
 import { waitForMatch } from '../utils/streams';
 
@@ -32,8 +33,9 @@ interface SetupContext {
 }
 
 interface WithAppOptions {
+  build?: boolean;
   // Command to start toolpad with
-  cmd?: 'start' | 'dev';
+  cmd?: 'start' | 'dev' | 'custom-server';
   // Template to be used as the starting point of the project folder toolpad is running in
   // This will copied to the temporary folder
   template?: string;
@@ -52,7 +54,7 @@ export async function withApp(
   options: WithAppOptions,
   doWork: (app: RunningLocalApp) => Promise<void>,
 ) {
-  const { cmd = 'start', template, setup, env, base } = options;
+  const { cmd = 'start', build = cmd === 'start', template, setup, env, base } = options;
 
   // Each test runs in its own temporary folder to avoid race conditions when running tests in parallel.
   // It also avoids mutating the source code of the fixture while running the test.
@@ -70,19 +72,7 @@ export async function withApp(
       await setup({ dir: projectDir });
     }
 
-    const args: string[] = [CLI_CMD, cmd];
-    if (options.toolpadDev) {
-      args.push('--dev');
-    }
-
-    // Run each test on its own port to avoid race conditions when running tests in parallel.
-    args.push('--port', String(await getPort()));
-
-    if (base) {
-      args.push('--base', base);
-    }
-
-    if (cmd === 'start') {
+    if (build) {
       const buildArgs = [CLI_CMD, 'build'];
 
       if (base) {
@@ -111,41 +101,68 @@ export async function withApp(
       }
     }
 
-    const child = childProcess.spawn('node', args, {
-      cwd: projectDir,
-      stdio: 'pipe',
-      shell: !process.env.CI,
-      env: {
-        ...process.env,
-        ...env,
-      },
-    });
+    if (cmd === 'custom-server') {
+      const app = express();
 
-    try {
-      await Promise.race([
-        once(child, 'exit').then(([code]) => {
-          throw new Error(`App process exited unexpectedly${code ? ` with code ${code}` : ''}`);
-        }),
-        (async () => {
-          invariant(child.stdout, "Childprocess must be started with stdio: 'pipe'");
+      const toolpadHandler = await unstable_createHandler({
+        dir: projectDir,
+        base: '/foo',
+      });
 
-          if (VERBOSE) {
-            child.stdout?.pipe(process.stdout);
-            child.stderr?.pipe(process.stderr);
-          }
+      app.use('/foo', unstable_create);
+    } else {
+      const args: string[] = [CLI_CMD, cmd];
+      if (options.toolpadDev) {
+        args.push('--dev');
+      }
 
-          const match = await waitForMatch(child.stdout, /localhost:(\d+)/);
+      // Run each test on its own port to avoid race conditions when running tests in parallel.
+      args.push('--port', String(await getPort()));
 
-          if (!match) {
-            throw new Error('Failed to start');
-          }
+      if (base) {
+        args.push('--base', base);
+      }
 
-          const port = Number(match[1]);
-          await doWork({ url: `http://localhost:${port}`, dir: projectDir, stdout: child.stdout });
-        })(),
-      ]);
-    } finally {
-      child.kill();
+      const child = childProcess.spawn('node', args, {
+        cwd: projectDir,
+        stdio: 'pipe',
+        shell: !process.env.CI,
+        env: {
+          ...process.env,
+          ...env,
+        },
+      });
+
+      try {
+        await Promise.race([
+          once(child, 'exit').then(([code]) => {
+            throw new Error(`App process exited unexpectedly${code ? ` with code ${code}` : ''}`);
+          }),
+          (async () => {
+            invariant(child.stdout, "Childprocess must be started with stdio: 'pipe'");
+
+            if (VERBOSE) {
+              child.stdout?.pipe(process.stdout);
+              child.stderr?.pipe(process.stderr);
+            }
+
+            const match = await waitForMatch(child.stdout, /localhost:(\d+)/);
+
+            if (!match) {
+              throw new Error('Failed to start');
+            }
+
+            const port = Number(match[1]);
+            await doWork({
+              url: `http://localhost:${port}`,
+              dir: projectDir,
+              stdout: child.stdout,
+            });
+          })(),
+        ]);
+      } finally {
+        child.kill();
+      }
     }
   } finally {
     await fs.rm(tmpTestDir, { recursive: true, maxRetries: 3, retryDelay: 1000 });

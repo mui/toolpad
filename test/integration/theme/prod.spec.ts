@@ -1,10 +1,13 @@
 import * as path from 'path';
+import * as url from 'url';
 import { test, expect } from '../../playwright/localTest';
+
+const currentDirectory = url.fileURLToPath(new URL('.', import.meta.url));
 
 test.use({
   colorScheme: 'dark',
   localAppConfig: {
-    template: path.resolve(__dirname, './fixture'),
+    template: path.resolve(currentDirectory, './fixture'),
     cmd: 'start',
   },
 });

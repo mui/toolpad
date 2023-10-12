@@ -23,12 +23,8 @@ interface ExplorerHeaderProps {
 
 const ExplorerHeaderContainer = styled(Stack)(({ theme }) => ({
   backgroundColor: theme.palette.background.paper,
-  position: 'sticky',
-  top: 0,
-  left: 0,
   width: '100%',
-  zIndex: 1,
-  height: 40,
+  height: 36,
 }));
 
 const ExplorerHeaderTitle = styled(Typography)(({ theme }) => ({

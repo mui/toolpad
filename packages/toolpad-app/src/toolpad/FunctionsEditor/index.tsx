@@ -307,7 +307,7 @@ export default function FunctionsEditor() {
     const regex = new RegExp(searchTerm.split('').join('.*'), 'i');
     return (
       introspection.data?.files?.filter((file) => (searchTerm ? regex.test(file.name) : true)) || []
-    );
+    ).filter((file) => file.handlers.length > 0);
   }, [introspection.data?.files, searchTerm]);
 
   return (
@@ -326,7 +326,6 @@ export default function FunctionsEditor() {
               <ExplorerHeader
                 headerText="Functions"
                 createLabelText="Create new function file"
-                searchLabelText="Find function file"
                 onCreate={handleOpenCreateNewHandler}
                 onSearch={handleSearch}
                 hasPersistentSearch
@@ -423,10 +422,10 @@ export default function FunctionsEditor() {
                 >
                   <Stack direction="row" alignItems="center">
                     <JavascriptIcon fontSize="large" />
-                    <Typography variant="subtitle1" fontSize={15}>
-                      {selectedFile}&nbsp;&nbsp;&gt;&nbsp;&nbsp;
+                    <Typography variant="subtitle1" fontSize={14}>
+                      {selectedFile}&nbsp;&nbsp;&rsaquo;&nbsp;&nbsp;
                       <span style={{ fontFamily: theme.typography.fontFamilyCode }}>
-                        <strong>{selectedFunction}</strong>
+                        {selectedFunction}
                       </span>
                     </Typography>
                   </Stack>

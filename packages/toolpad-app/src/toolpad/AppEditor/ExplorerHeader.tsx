@@ -10,7 +10,7 @@ import {
 } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import SearchIcon from '@mui/icons-material/Search';
-import ClearIcon from '@mui/icons-material/Clear';
+// import ClearIcon from '@mui/icons-material/Clear';
 
 interface ExplorerHeaderProps {
   headerText: string;
@@ -60,9 +60,9 @@ export default function ExplorerHeader({
     setSearchTerm(event.target.value);
   }, []);
 
-  const handleClearSearch = React.useCallback(() => {
-    setSearchTerm('');
-  }, []);
+  // const handleClearSearch = React.useCallback(() => {
+  //   setSearchTerm('');
+  // }, []);
 
   React.useEffect(() => {
     if (onSearch) {
@@ -83,19 +83,24 @@ export default function ExplorerHeader({
           value={searchTerm}
           onChange={handleSearchChange}
           InputProps={{
-            endAdornment: searchTerm ? (
-              <InputAdornment position="end">
-                <IconButton onClick={handleClearSearch} edge="end">
-                  <ClearIcon fontSize="small" />
-                </IconButton>
+            startAdornment: hasPersistentSearch ? (
+              <InputAdornment position="start">
+                <SearchIcon fontSize="small" sx={{ mt: '-4px' }} />
               </InputAdornment>
             ) : null,
+            // endAdornment: searchTerm ? (
+            //   <InputAdornment position="end">
+            //     <IconButton onClick={handleClearSearch} edge="end">
+            //       <ClearIcon fontSize="small" />
+            //     </IconButton>
+            //   </InputAdornment>
+            // ) : null,
             sx: {
               fontSize: 14,
               borderRadius: 0,
             },
           }}
-          variant="filled"
+          variant="standard"
           fullWidth
           size="small"
           placeholder={`${searchLabelText}…`}

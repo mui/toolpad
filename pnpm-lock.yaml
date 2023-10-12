@@ -50,7 +50,7 @@ importers:
         version: 0.12.0
       '@mui/monorepo':
         specifier: github:mui/material-ui
-        version: github.com/mui/material-ui/2c1c4816669a5c6bb27d3170198fd9525a37cbf2
+        version: github.com/mui/material-ui/eee35def70308593b0f672236d631053776e5240
       '@next/eslint-plugin-next':
         specifier: 13.5.4
         version: 13.5.4
@@ -209,7 +209,7 @@ importers:
         version: 5.14.13(@emotion/react@11.11.1)(@emotion/styled@11.11.0)(react-dom@18.2.0)(react@18.2.0)
       '@mui/monorepo':
         specifier: https://github.com/mui/material-ui.git
-        version: github.com/mui/material-ui/2c1c4816669a5c6bb27d3170198fd9525a37cbf2
+        version: github.com/mui/material-ui/eee35def70308593b0f672236d631053776e5240
       '@mui/styles':
         specifier: 5.14.13
         version: 5.14.13(react@18.2.0)
@@ -240,6 +240,9 @@ importers:
       autoprefixer:
         specifier: 10.4.16
         version: 10.4.16(postcss@8.4.31)
+      babel-plugin-macros:
+        specifier: 3.1.0
+        version: 3.1.0
       babel-plugin-module-resolver:
         specifier: 5.0.0
         version: 5.0.0
@@ -391,9 +394,6 @@ importers:
       '@types/react-is':
         specifier: 18.2.2
         version: 18.2.2
-      babel-plugin-macros:
-        specifier: ^3.1.0
-        version: 3.1.0
       cpy-cli:
         specifier: 5.0.0
         version: 5.0.0
@@ -4755,6 +4755,7 @@ packages:
 
   /@types/parse-json@4.0.0:
     resolution: {integrity: sha512-//oorEZjL6sbPcKUaCdIGlIUeH26mgzimjBB77G6XRgnDl/L5wOnpyBGRe/Mmf5CVW3PwEBE1NjiMZ/ssFh4wA==}
+    dev: false
 
   /@types/pg@8.10.3:
     resolution: {integrity: sha512-BACzsw64lCZesclRpZGu55tnqgFAYcrCBP92xLh1KLypZLCOsvJTSTgaoFVTy3lCys/aZTQzfeDxtjwrvdzL2g==}
@@ -5877,6 +5878,7 @@ packages:
       '@babel/runtime': 7.23.1
       cosmiconfig: 7.1.0
       resolve: 1.22.4
+    dev: false
 
   /babel-plugin-module-resolver@5.0.0:
     resolution: {integrity: sha512-g0u+/ChLSJ5+PzYwLwP8Rp8Rcfowz58TJNCe+L/ui4rpzE/mg//JVX0EWBUYoxaextqnwuGHzfGp2hh0PPV25Q==}
@@ -6791,6 +6793,7 @@ packages:
       parse-json: 5.2.0
       path-type: 4.0.0
       yaml: 1.10.2
+    dev: false
 
   /cosmiconfig@8.3.6(typescript@5.2.2):
     resolution: {integrity: sha512-kcZ6+W5QzcJ3P1Mt+83OUv/oHFqZHIx8DuxG6eZ5RGMERoLqp4BuGjhHLYGK+Kf5XVkQvqBSmAy/nGWN3qDgEA==}
@@ -15168,6 +15171,7 @@ packages:
   /yaml@1.10.2:
     resolution: {integrity: sha512-r3vXyErRCYJ7wg28yvBY5VSoAF8ZvlcW9/BwUzEtUsjvX/DKs24dIkuwjtuprwJJHsbyUbLApepYTR1BN4uHrg==}
     engines: {node: '>= 6'}
+    dev: false
 
   /yaml@2.3.2:
     resolution: {integrity: sha512-N/lyzTPaJasoDmfV7YTrYCI0G/3ivm/9wdG0aHuheKowWQwGTsK0Eoiw6utmzAnI6pkJa0DUVygvp3spqqEKXg==}
@@ -15274,7 +15278,7 @@ packages:
     resolution: {integrity: sha512-iC+8Io04lddc+mVqQ9AZ7OQ2MrUKGN+oIQyq1vemgt46jwCwLfhq7/pwnBnNXXXZb8VTVLKwp9EDkx+ryxIWmg==}
     dev: false
 
-  github.com/mui/material-ui/2c1c4816669a5c6bb27d3170198fd9525a37cbf2:
-    resolution: {tarball: https://codeload.github.com/mui/material-ui/tar.gz/2c1c4816669a5c6bb27d3170198fd9525a37cbf2}
+  github.com/mui/material-ui/eee35def70308593b0f672236d631053776e5240:
+    resolution: {tarball: https://codeload.github.com/mui/material-ui/tar.gz/eee35def70308593b0f672236d631053776e5240}
     name: '@mui/monorepo'
     version: 5.14.13

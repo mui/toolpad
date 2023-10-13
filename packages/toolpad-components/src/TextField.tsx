@@ -21,6 +21,7 @@ export type TextFieldProps = Omit<MuiTextFieldProps, 'value' | 'onChange'> & {
   defaultValue: string;
   alignItems?: BoxProps['alignItems'];
   justifyContent?: BoxProps['justifyContent'];
+  password?: boolean;
 } & Pick<FormInputComponentProps, 'name' | 'isRequired' | 'minLength' | 'maxLength' | 'isInvalid'>;
 
 function TextField({
@@ -31,6 +32,7 @@ function TextField({
   minLength,
   maxLength,
   isInvalid,
+  password,
   ...rest
 }: TextFieldProps) {
   const { onFormInputChange, formInputError, renderFormInput } = useFormInput<string>({
@@ -60,6 +62,7 @@ function TextField({
         error: Boolean(formInputError),
         helperText: formInputError.message || '',
       })}
+      type={password ? 'password' : 'text'}
     />,
   );
 }
@@ -102,6 +105,10 @@ export default createBuiltin(FormWrappedTextField, {
     },
     fullWidth: {
       helperText: 'Whether the input should occupy all available horizontal space.',
+      type: 'boolean',
+    },
+    password: {
+      helperText: 'Whether the input is of password type',
       type: 'boolean',
     },
     placeholder: {

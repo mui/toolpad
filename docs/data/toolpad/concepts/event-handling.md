@@ -1,20 +1,47 @@
 # Event Handling
 
-<p class="description">Actions create events and these events can be handled in multiple ways in Toolpad</p>
+<p class="description">User actions create events which are handled in two ways in Toolpad</p>
 
 ## JS expression actions
 
-Some components have event handler props, such as the `Button` component and its `onClick` prop which triggers when the button is clicked.
+Some components have event handler props, such as the `Button` component and its `onClick` prop which triggers when the button is clicked. You can run arbitrary JavaScript when the event fires, including manipulating the state of other components on the page.
 
-{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/concepts/managing-state/event-handling.png", "alt": "Event handling ", "caption": "Binding to event handler props"}}
+Some event handling example scenarios:
 
-You can run arbitrary JavaScript when the event fires, including manipulating the state of other components on the page.
+### Change component state
+
+<video controls width="100%" height="auto" style="contain" alt="change-component-state">
+  <source src="/static/toolpad/docs/concepts/data-binding/change-component-state.mp4" type="video/mp4">
+  Your browser does not support the video tag.
+</video>
+
+### Call queries
+
+You can call single or multiple queries sequentially to fetch data on the page or run an operation in the backend.
+
+#### Single query
+
+{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/concepts/managing-state/binding-editor.png", "alt": "Binding editor", "caption": "Fetch data from a query" }}
+
+#### Multiple queries
+
+<video controls width="100%" height="auto" style="contain" alt="call-multiple-queries">
+  <source src="/static/toolpad/docs/concepts/data-binding/multiple-queries.mp4" type="video/mp4">
+  Your browser does not support the video tag.
+</video>
+
+### Using console options
+
+Custom functions allow you to write custom code in your editor. You can write a console.log statement that interacts with the data on the page and prints logs.
+
+<video controls width="100%" height="auto" style="contain" alt="console-log">
+  <source src="/static/toolpad/docs/concepts/data-binding/console-log.mp4" type="video/mp4">
+  Your browser does not support the video tag.
+</video>
 
 :::info
 See the [deleting data grid row](/toolpad/how-to-guides/delete-datagrid-row/) guide for a detailed usage example.
 :::
-
-{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/concepts/managing-state/on-click.gif", "alt": "onClick JavaScript ", "caption": "Running JavaScript on click", "indent": 1}}
 
 ## Navigation actions
 

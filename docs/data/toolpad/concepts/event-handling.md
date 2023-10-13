@@ -21,7 +21,7 @@ You can call single or multiple queries sequentially to fetch data on the page o
 
 #### Single query
 
-{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/concepts/managing-state/binding-editor.png", "alt": "Binding editor", "caption": "Fetch data from a query" }}
+{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/concepts/page-properties/binding-editor.png", "alt": "Binding editor", "caption": "Fetch data from a query" }}
 
 #### Multiple queries
 
@@ -47,10 +47,10 @@ Custom functions allow you to write custom code in your editor. You can write a 
 
 It is also possible to navigate to a different page of the app when an event occurs.
 
-The binding editor for navigation actions allows you to select which page to go to, as well as set values for any [page parameters](/toolpad/concepts/managing-state/#page-parameters) that the target page supports.
+The binding editor for navigation actions allows you to select which page to go to, as well as set values for any [page parameters](/toolpad/concepts/page-properties/#page-parameters) that the target page supports.
 
 You may also bind the page parameter values to the page state of the source page.
 
-{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/concepts/managing-state/navigation-action.png", "alt": "onClick navigation ", "caption": "Navigation on click (1/2)", "indent": 1}}
+{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/concepts/page-properties/navigation-action.png", "alt": "onClick navigation ", "caption": "Navigation on click (1/2)", "indent": 1}}
 
-{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/concepts/managing-state/navigate.gif", "alt": "onClick navigation ", "caption": "Navigation on click (2/2)", "indent": 1, "aspectRatio": 2.5 }}
+{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/concepts/page-properties/navigate.gif", "alt": "onClick navigation ", "caption": "Navigation on click (2/2)", "indent": 1, "aspectRatio": 2.5 }}

@@ -256,7 +256,6 @@ const test = baseTest.extend<
   customServerConfig: [undefined, { option: true, scope: 'worker' }],
   projectConfig: [undefined, { option: true, scope: 'worker' }],
   projectDir: [
-    // eslint-disable-next-line no-empty-pattern
     async ({ projectConfig }, use) => {
       await using(await getTestProjectDir(projectConfig), async (projectDir) => {
         await use(projectDir);
@@ -265,7 +264,6 @@ const test = baseTest.extend<
     { scope: 'worker', timeout: 60000 },
   ],
   customServer: [
-    // eslint-disable-next-line no-empty-pattern
     async ({ projectDir, customServerConfig }, use) => {
       if (customServerConfig) {
         await using(await runCustomServer(projectDir.path, customServerConfig), async (app) => {

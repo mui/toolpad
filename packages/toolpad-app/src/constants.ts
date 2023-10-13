@@ -1,6 +1,7 @@
 export const HTML_ID_EDITOR_OVERLAY = 'editor-overlay';
 export const WINDOW_PROP_TOOLPAD_APP_RENDER_PARAMS = '__TOOLPAD_APP_RENDER_PARAMS__';
 export const RUNTIME_CONFIG_WINDOW_PROPERTY = '__TOOLPAD_RUNTIME_CONFIG__';
+export const APP_URL_WINDOW_PROPERTY = '__TOOLPAD_APP_URL__';
 export const INITIAL_STATE_WINDOW_PROPERTY = '__initialToolpadState__';
 
 export const TOOLPAD_TARGET_CE = 'CE';

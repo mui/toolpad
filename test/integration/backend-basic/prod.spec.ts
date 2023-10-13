@@ -18,8 +18,10 @@ test.use({
 });
 
 test.use({
-  localAppConfig: {
+  projectConfig: {
     template: path.resolve(currentDirectory, './fixture'),
+  },
+  localAppConfig: {
     cmd: 'start',
     env: {
       SECRET_BAZ: 'Some baz secret',

@@ -1,4 +1,5 @@
 import path from 'path';
+import invariant from 'invariant';
 import { fileExists, folderExists } from '../../../packages/toolpad-utils/src/fs';
 import { test, expect } from '../../playwright/localTest';
 import { ToolpadEditor } from '../../models/ToolpadEditor';
@@ -51,6 +52,11 @@ test('can create and place new component', async ({ page }) => {
 });
 
 test('can create/delete page', async ({ page, localApp }) => {
+  invariant(
+    localApp,
+    'test must be configured with `localAppConfig`. Add `test.use({ localAppConfig: ... })`',
+  );
+
   const editorModel = new ToolpadEditor(page);
 
   await editorModel.goto();

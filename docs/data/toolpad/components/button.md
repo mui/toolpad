@@ -1,6 +1,6 @@
 # Button
 
-<p class="description">Learn about a button component and it's usage in Toolpad.</p>
+<p class="description">Learn about the button component and it's usage in Toolpad.</p>
 
 ## Demo
 

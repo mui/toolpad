@@ -16,6 +16,7 @@ import { folderExists } from '@mui/toolpad-utils/fs';
 import chalk from 'chalk';
 import { serveRpc } from '@mui/toolpad-utils/workerRpc';
 import * as url from 'node:url';
+import cors from 'cors';
 import { asyncHandler } from '../utils/express';
 import { createProdHandler } from './toolpadAppServer';
 import { initProject, resolveProjectDir, type ToolpadProject } from './localMode';
@@ -43,6 +44,8 @@ function* getPreferredPorts(port: number = DEFAULT_PORT): Iterable<number> {
 
 async function createDevHandler(project: ToolpadProject) {
   const handler = express.Router();
+
+  handler.use(cors());
 
   const appServerPath = path.resolve(currentDirectory, '../cli/appServerWorker.js');
 
@@ -93,6 +96,11 @@ async function createDevHandler(project: ToolpadProject) {
 
   const rpcServer = createProjectRpcServer(project);
   handler.use('/__toolpad_dev__/rpc', createRpcHandler(rpcServer));
+
+  handler.use(
+    '/__toolpad_dev__/reactDevtools',
+    express.static(path.resolve(currentDirectory, '../../dist/editor/reactDevtools')),
+  );
 
   handler.use(
     '/__toolpad_dev__/manifest.json',
@@ -340,6 +348,42 @@ async function startToolpadServer({ port, ...config }: ToolpadServerConfig) {
       await Promise.allSettled([runningServer.close(), toolpadHandler?.dispose?.()]);
     },
   };
+}
+
+export interface RunEditorOptions {
+  toolpadDevMode?: boolean;
+}
+
+export async function runEditor(appUrl: string, options: RunEditorOptions = {}) {
+  // eslint-disable-next-line no-console
+  console.log(`${chalk.blue('info')}  - starting Toolpad editor...`);
+
+  const app = express();
+
+  const editorBasename = '/_toolpad';
+  const { pathname, origin } = new URL(appUrl);
+
+  const editorHandler = await createEditorHandler(pathname, options);
+
+  app.use(
+    pathname,
+    createProxyMiddleware({
+      logLevel: 'silent',
+      ws: true,
+      target: origin,
+    }),
+  );
+
+  app.use(editorBasename, editorHandler);
+
+  const server = await listen(app);
+
+  // eslint-disable-next-line no-console
+  console.log(
+    `${chalk.green('ready')} - Toolpad editor ready on ${chalk.cyan(
+      `http://localhost:${server.port}${editorBasename}`,
+    )}`,
+  );
 }
 
 export interface RunAppOptions {

@@ -28,7 +28,7 @@
     "@emotion/styled": "11.11.0",
     "@mui/icons-material": "5.14.13",
     "@mui/material": "5.14.13",
-    "@mui/monorepo": "https://github.com/mui/material-ui.git",
+    "@mui/monorepo": "https://github.com/Janpot/material-ui.git#bring-back-prettier",
     "@mui/styles": "5.14.13",
     "@mui/toolpad": "0.1.32",
     "@mui/utils": "5.14.13",

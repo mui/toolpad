@@ -13,7 +13,6 @@ import {
   Alert,
   styled,
   Divider,
-  // Divider,
 } from '@mui/material';
 import { Controller, useForm } from 'react-hook-form';
 import { TabContext, TabList } from '@mui/lab';
@@ -42,7 +41,6 @@ import MapEntriesEditor from '../../components/MapEntriesEditor';
 import { Maybe } from '../../utils/types';
 import AuthenticationEditor from './AuthenticationEditor';
 import { isSaveDisabled, validation } from '../../utils/forms';
-// import * as appDom from '../../appDom';
 import { useAppStateApi } from '../../toolpad/AppState';
 import ParametersEditor from '../../toolpad/AppEditor/PageEditor/ParametersEditor';
 import BodyEditor from './BodyEditor';
@@ -56,7 +54,7 @@ import useFetchPrivate from '../useFetchPrivate';
 import QueryPreview from '../QueryPreview';
 import { usePrivateQuery } from '../context';
 import config from '../../config';
-import QueryToolsContext from '../../toolpad/AppEditor/PageEditor/QueriesExplorer/QueryEditor2/QueryToolsContext';
+import QueryToolsContext from '../../toolpad/AppEditor/PageEditor/QueryEditor/QueryToolsContext';
 
 const HTTP_METHODS = ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'HEAD'];
 
@@ -261,8 +259,8 @@ function QueryEditor({
   connectionParams: rawConnectionParams,
   value: input,
   settingsToggle,
-  settingsPanel,
-  tab,
+  settingsTab,
+  tabType,
 }: QueryEditorProps<RestConnectionParams, FetchQuery>) {
   const appStateApi = useAppStateApi();
   const isBrowserSide = input.attributes.query.browser;
@@ -274,8 +272,8 @@ function QueryEditor({
     input.attributes.query.url ?? getDefaultUrl(config, connectionParams);
 
   const {
-    toolsTab,
-    handleToolsTabChange,
+    toolsTabType,
+    handleToolsTabTypeChange,
     isPreviewLoading,
     setIsPreviewLoading,
     setHandleRunPreview,
@@ -289,97 +287,98 @@ function QueryEditor({
   );
   const envVarNames = React.useMemo(() => introspection?.data?.envVarNames || [], [introspection]);
 
+  const updateAttribute = React.useCallback(
+    (attribute: string, value: any) => {
+      appStateApi.updateQueryDraft((draft) => ({
+        ...draft,
+        attributes: {
+          ...draft.attributes,
+          [attribute]: value,
+        },
+      }));
+    },
+    [appStateApi],
+  );
+
+  const updateProp = React.useCallback(
+    (prop: string, value: any) => {
+      appStateApi.updateQueryDraft((draft) => ({
+        ...draft,
+        attributes: {
+          ...draft.attributes,
+          query: {
+            ...draft.attributes.query,
+            [prop]: value,
+          },
+        },
+      }));
+    },
+    [appStateApi],
+  );
+
   const handleParamsChange = React.useCallback(
     (newParams: [string, BindableAttrValue<string>][]) => {
-      if (input?.name) {
-        appStateApi.setQueryDraftProp(input?.name, 'params', newParams);
-      }
+      updateProp('params', newParams);
     },
-    [appStateApi, input],
+    [updateProp],
   );
 
   const handleUrlChange = React.useCallback(
     (newUrl: BindableAttrValue<string> | null) => {
-      if (input?.name && input?.attributes?.query) {
-        appStateApi.setQueryDraftProp(input?.name, 'url', newUrl, 'query');
-      }
+      updateProp('url', newUrl);
     },
-    [appStateApi, input],
+    [updateProp],
   );
 
   const handleMethodChange = React.useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
-      if (input?.name) {
-        appStateApi.setQueryDraftProp(input?.name, 'method', event.target.value, 'query');
-      }
+      updateProp('method', event.target.value);
     },
-    [appStateApi, input],
+    [updateProp],
   );
 
   const handleTransformEnabledChange = React.useCallback(
     (transformEnabled: boolean) => {
-      if (input?.name) {
-        appStateApi.setQueryDraftProp(
-          input?.name,
-          'transformEnabled',
-          transformEnabled,
-          'attributes',
-        );
-      }
+      updateAttribute('transformEnabled', transformEnabled);
     },
-    [appStateApi, input],
+    [updateAttribute],
   );
 
   const handleTransformChange = React.useCallback(
     (transform: string) => {
-      if (input?.name) {
-        appStateApi.setQueryDraftProp(input?.name, 'transform', transform, 'attributes');
-      }
+      updateAttribute('transform', transform);
     },
-    [appStateApi, input],
+    [updateAttribute],
   );
 
   const handleBodyChange = React.useCallback(
     (newBody: Maybe<Body>) => {
-      if (input?.name) {
-        appStateApi.setQueryDraftProp(input?.name, 'body', newBody || undefined, 'query');
-      }
+      updateProp('body', newBody || undefined);
     },
-    [appStateApi, input],
+    [updateProp],
   );
 
   const handleSearchParamsChange = React.useCallback(
     (newSearchParams: BindableAttrEntries) => {
-      if (input?.name) {
-        appStateApi.setQueryDraftProp(input?.name, 'searchParams', newSearchParams, 'query');
-      }
+      updateProp('searchParams', newSearchParams);
     },
-    [appStateApi, input],
+    [updateProp],
   );
 
   const handleHeadersChange = React.useCallback(
     (newHeaders: BindableAttrEntries) => {
-      if (input?.name) {
-        appStateApi.setQueryDraftProp(input?.name, 'headers', newHeaders, 'query');
-      }
+      updateProp('headers', newHeaders);
     },
-    [appStateApi, input],
+    [updateProp],
   );
 
   const handleResponseTypeChange = React.useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
-      if (input?.name) {
-        appStateApi.setQueryDraftProp(
-          input?.name,
-          'response',
-          {
-            kind: event.target.value,
-          } as ResponseType,
-          'query',
-        );
-      }
+      updateProp('response', {
+        kind: event.target.value,
+      } as ResponseType);
     },
-    [appStateApi, input],
+    [updateProp],
   );
 
   const paramsEntries = input.params || EMPTY_PARAMS;
@@ -475,12 +474,12 @@ function QueryEditor({
                   theme.palette.mode === 'dark' ? theme.palette.grey[500] : 'default',
               }}
             >
-              {tab === 'config' ? 'Configuration' : 'Settings'}
+              {tabType === 'config' ? 'Configuration' : 'Settings'}
             </Typography>
             {settingsToggle}
           </Stack>
           <Divider />
-          {tab === 'config' ? (
+          {tabType === 'config' ? (
             <React.Fragment>
               <Box
                 sx={{
@@ -603,7 +602,7 @@ function QueryEditor({
               </Box>
             </React.Fragment>
           ) : (
-            settingsPanel
+            settingsTab
           )}
         </Stack>
       </Panel>
@@ -640,9 +639,9 @@ function QueryEditor({
             </Box>
           </Panel>
           <PanelResizeHandle />
-          {toolsTab ? (
+          {toolsTabType ? (
             <Panel defaultSize={60} style={{ overflow: 'auto', scrollbarGutter: 'stable' }}>
-              <TabContext value={toolsTab}>
+              <TabContext value={toolsTabType}>
                 <Box
                   sx={{
                     borderBottom: 1,
@@ -653,7 +652,7 @@ function QueryEditor({
                 >
                   <TabList
                     sx={{ '& button': { fontSize: 12, fontWeight: 'normal' } }}
-                    onChange={handleToolsTabChange}
+                    onChange={handleToolsTabTypeChange}
                     aria-label="Query tools active tab"
                   >
                     <Tab label="Preview" value="preview" />

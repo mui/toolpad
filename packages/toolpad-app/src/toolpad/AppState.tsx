@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { BindableAttrValue, NodeId } from '@mui/toolpad-core';
+import { NodeId } from '@mui/toolpad-core';
 import { createProvidedContext } from '@mui/toolpad-utils/react';
 import invariant from 'invariant';
 import { debounce, DebouncedFunc } from 'lodash-es';
@@ -25,9 +25,6 @@ export type DomAction = {
   updater?: (dom: appDom.AppDom) => appDom.AppDom;
   view?: DomView;
 };
-
-type QueryNodeAttribute = keyof appDom.QueryNode['attributes'];
-type QueryNodeProp = keyof appDom.QueryNode['attributes']['query'];
 
 export type DomLoaderAction =
   | DomAction
@@ -82,14 +79,8 @@ export type AppStateAction =
       type: 'CLOSE_QUERY_PANEL';
     }
   | {
-      type: 'SET_QUERY_DRAFT_PROP';
-      value:
-        | appDom.QueryNode['attributes']['query'][QueryNodeProp]
-        | appDom.QueryNode['attributes'][QueryNodeAttribute]
-        | BindableAttrValue<any>;
-      name: string;
-      key?: QueryNodeProp | QueryNodeAttribute | string;
-      namespace?: 'query' | 'attributes' | 'params';
+      type: 'UPDATE_QUERY_DRAFT';
+      updater: (draft: appDom.QueryNode) => appDom.QueryNode;
     }
   | {
       type: 'SAVE_QUERY_DRAFT';
@@ -360,49 +351,101 @@ export function appStateReducer(state: AppState, action: AppStateAction): AppSta
       }
       return state;
     }
-    case 'SET_QUERY_DRAFT_PROP': {
+    case 'UPDATE_QUERY_DRAFT': {
       if (state.currentView.kind === 'page' && state.currentView.view?.kind === 'query') {
         const queryTabs = state.currentView.queryPanel?.queryTabs || [];
         const currentTabIndex = state.currentView.queryPanel?.currentTabIndex;
-        let newAttributes: Partial<appDom.QueryNode<any>['attributes']> = {};
-        let newParams: appDom.QueryNode<any>['params'] = [];
         if (currentTabIndex !== undefined && queryTabs) {
           return update(state, {
-            currentView: update(state.currentView, {
-              queryPanel: update(state.currentView.queryPanel, {
+            currentView: {
+              ...state.currentView,
+              queryPanel: {
+                ...state.currentView.queryPanel,
                 queryTabs: state.currentView?.queryPanel?.queryTabs?.map((tab, index) => {
-                  if (index === currentTabIndex && tab.draft && action.key) {
-                    if (!action.namespace && tab.draft?.params) {
-                      newParams = action.value;
-                      newAttributes = tab.draft.attributes;
-                    } else if (action.namespace === 'attributes') {
-                      newAttributes = {
-                        [action.key]: action.value,
+                  if (index === currentTabIndex) {
+                    if (action.updater && tab.draft) {
+                      return {
+                        ...tab,
+                        draft: action.updater(tab.draft),
                       };
-                      newParams = tab.draft.params;
-                    } else if (action.namespace === 'query') {
-                      newAttributes = {
-                        query: update(tab.draft.attributes.query, {
-                          [action.key]: action.value,
-                        }),
-                      };
-                      newParams = tab.draft.params;
                     }
-                    return update(tab, {
-                      draft: update(tab.draft, {
-                        params: newParams,
-                        attributes: update(tab.draft.attributes, newAttributes),
-                      }),
-                    });
                   }
                   return tab;
                 }),
-              }),
-            }),
+              },
+            },
           });
         }
       }
       return state;
+    }
+    case 'CREATE_QUERY_TAB': {
+      if (state.currentView.kind !== 'page' || !state.currentView.nodeId) {
+        return state;
+      }
+      const pageNode = appDom.getNode(state.dom, state.currentView.nodeId, 'page');
+      const queryNode = appDom.createNode(state.dom, 'query', {
+        attributes: {
+          query: action.dataSource?.getInitialQueryValue(),
+          mode: action.mode ?? undefined,
+          connectionId: null,
+          dataSource: action?.dataSourceId,
+        },
+      });
+      const newDom = appDom.addNode(state.dom, queryNode, pageNode, 'queries');
+      const newView = { ...state.currentView };
+
+      /**
+       * To make the app state updates atomic, we must also simultaneously
+       * update the dom and the currentView
+       */
+
+      /**
+       * If tabs are open, simply add the new tab as the latest tab
+       */
+
+      if (state.currentView.queryPanel?.queryTabs) {
+        newView.view = { kind: 'query', nodeId: queryNode.id };
+        newView.queryPanel = {
+          queryTabs: [
+            ...state.currentView.queryPanel.queryTabs,
+            {
+              meta: {
+                id: queryNode.id,
+                name: queryNode.name,
+                dataSource: action.dataSourceId,
+              },
+              saved: queryNode,
+              draft: queryNode,
+            },
+          ],
+          currentTabIndex: state.currentView.queryPanel.queryTabs.length,
+        };
+      } else {
+        /**
+         * If no tabs are open, initialise the query panel
+         */
+        newView.view = { kind: 'query', nodeId: queryNode.id };
+        newView.queryPanel = {
+          queryTabs: [
+            {
+              meta: {
+                id: queryNode.id,
+                name: queryNode.name,
+                dataSource: action.dataSourceId,
+              },
+              saved: queryNode,
+              draft: queryNode,
+            },
+          ],
+          currentTabIndex: 0,
+        };
+      }
+
+      return update(state, {
+        dom: newDom,
+        currentView: newView,
+      });
     }
     case 'OPEN_QUERY_TAB': {
       if (state.currentView.kind !== 'page' || !state.currentView.nodeId) {
@@ -519,7 +562,6 @@ export function appStateReducer(state: AppState, action: AppStateAction): AppSta
        * if the query being closed is not the one open,
        * decrement the current tab index if it is greater than the index of the tab being closed
        */
-      // const currentQueryId = currentView.view?.kind === 'query' ? currentView.view.nodeId : undefined;
       const currentTabIndex = state.currentView.queryPanel?.currentTabIndex;
 
       if (
@@ -553,76 +595,9 @@ export function appStateReducer(state: AppState, action: AppStateAction): AppSta
           }
         }
       }
+      // If a delete action is also involved, remove the query from the dom
       if (action.deleteQuery) {
         newDom = appDom.removeNode(state.dom, action.queryId);
-      }
-
-      return update(state, {
-        dom: newDom,
-        currentView: newView,
-      });
-    }
-    case 'CREATE_QUERY_TAB': {
-      if (state.currentView.kind !== 'page' || !state.currentView.nodeId) {
-        return state;
-      }
-      const pageNode = appDom.getNode(state.dom, state.currentView.nodeId, 'page');
-      const queryNode = appDom.createNode(state.dom, 'query', {
-        attributes: {
-          query: action.dataSource?.getInitialQueryValue(),
-          mode: action.mode ?? undefined,
-          connectionId: null,
-          dataSource: action?.dataSourceId,
-        },
-      });
-      const newDom = appDom.addNode(state.dom, queryNode, pageNode, 'queries');
-      const newView = { ...state.currentView };
-
-      /**
-       * To make the app state updates atomic, we must also simultaneously
-       * update the dom and the currentView
-       */
-
-      /**
-       * If tabs are open, simply add the new tab as the latest tab
-       */
-
-      if (state.currentView.queryPanel?.queryTabs) {
-        newView.view = { kind: 'query', nodeId: queryNode.id };
-        newView.queryPanel = {
-          queryTabs: [
-            ...state.currentView.queryPanel.queryTabs,
-            {
-              meta: {
-                id: queryNode.id,
-                name: queryNode.name,
-                dataSource: action.dataSourceId,
-              },
-              saved: queryNode,
-              draft: queryNode,
-            },
-          ],
-          currentTabIndex: state.currentView.queryPanel.queryTabs.length,
-        };
-      } else {
-        /**
-         * If no tabs are open, initialise the query panel
-         */
-        newView.view = { kind: 'query', nodeId: queryNode.id };
-        newView.queryPanel = {
-          queryTabs: [
-            {
-              meta: {
-                id: queryNode.id,
-                name: queryNode.name,
-                dataSource: action.dataSourceId,
-              },
-              saved: queryNode,
-              draft: queryNode,
-            },
-          ],
-          currentTabIndex: 0,
-        };
       }
 
       return update(state, {
@@ -762,21 +737,10 @@ function createAppStateApi(
         type: 'CLOSE_QUERY_PANEL',
       });
     },
-    setQueryDraftProp(
-      name: string,
-      key: QueryNodeProp | QueryNodeAttribute | string,
-      value:
-        | appDom.QueryNode['attributes']['query'][QueryNodeProp]
-        | appDom.QueryNode['attributes'][QueryNodeAttribute]
-        | BindableAttrValue<any>,
-      namespace?: 'query' | 'attributes' | 'params',
-    ) {
+    updateQueryDraft(updater: (draft: appDom.QueryNode) => appDom.QueryNode) {
       dispatch({
-        type: 'SET_QUERY_DRAFT_PROP',
-        name,
-        key,
-        value,
-        namespace,
+        type: 'UPDATE_QUERY_DRAFT',
+        updater,
       });
     },
     saveQueryDraft(draft: appDom.QueryNode) {
@@ -830,14 +794,18 @@ const UNDOABLE_ACTIONS = new Set<AppStateActionType>([
   'SET_PAGE_VIEW_TAB',
   'SELECT_NODE',
   'DESELECT_NODE',
-  'SET_QUERY_DRAFT_PROP',
+  'UPDATE_QUERY_DRAFT',
   'OPEN_QUERY_TAB',
   'CREATE_QUERY_TAB',
   'CLOSE_QUERY_TAB',
 ]);
 
 function isCancellableAction(action: AppStateAction): boolean {
-  return Boolean(action.type === 'SET_VIEW' || (action.type === 'UPDATE' && action.view));
+  return Boolean(
+    action.type === 'SET_VIEW' ||
+      (action.type === 'UPDATE' && action.view) ||
+      (action.type === 'UPDATE_QUERY_DRAFT' && action.updater),
+  );
 }
 
 export interface DomContextProps {

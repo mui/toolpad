@@ -1,317 +1,333 @@
-import {
-  Stack,
-  Button,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  List,
-  ListItem,
-  DialogActions,
-  ListItemText,
-  IconButton,
-  styled,
-  ListItemButton,
-  ButtonBase,
-  Popover,
-  Paper,
-  Typography,
-} from '@mui/material';
 import * as React from 'react';
-import AddIcon from '@mui/icons-material/Add';
 import { NodeId } from '@mui/toolpad-core';
-import invariant from 'invariant';
-import MoreVertIcon from '@mui/icons-material/MoreVert';
-import clsx from 'clsx';
-import { usePageEditorState } from '../PageEditorProvider';
+import { Box, Stack, Chip, Tab, IconButton } from '@mui/material';
+import { LoadingButton, TabList, TabContext, TabPanel } from '@mui/lab';
+import ClearOutlinedIcon from '@mui/icons-material/ClearOutlined';
+import CircleIcon from '@mui/icons-material/Circle';
+import PlayArrow from '@mui/icons-material/PlayArrow';
+import CancelPresentationIcon from '@mui/icons-material/CancelPresentation';
 import * as appDom from '../../../../appDom';
-import dataSources from '../../../../toolpadDataSources/client';
-import { useAppStateApi, useAppState, useDomApi } from '../../../AppState';
-import NodeMenu from '../../NodeMenu';
-import QueryNodeEditorDialog from './QueryEditorDialog';
+import { useAppState, useAppStateApi, useDomApi } from '../../../AppState';
+import QueryIcon from '../../QueryIcon';
+import QueryEditorPanel from './QueryEditorPanel';
+import QueryToolsContext, { QueryToolsContextProps } from './QueryToolsContext';
+import { QueryEditorToolsTabType } from '../../../../types';
 
-const DataSourceButton = styled(ButtonBase)(({ theme }) => ({
-  position: 'relative',
-  width: 150,
-  height: 70,
-  border: 1,
-  borderColor: 'divider',
-  borderStyle: 'solid',
-  color: 'text.secondary',
-  padding: theme.spacing(1),
-  borderRadius: 8,
-  '&:hover': {
-    backgroundColor: theme.palette.action.hover,
-  },
-}));
+function TabCloseIcon({
+  queryIndex,
+  unsaved,
+  queryId,
+}: {
+  queryIndex?: number;
+  unsaved?: boolean;
+  queryId?: NodeId;
+}) {
+  const appStateApi = useAppStateApi();
 
-interface DataSourceSelectorProps<Q> {
-  open: boolean;
-  onClose: () => void;
-  onCreated: (newNode: appDom.QueryNode<Q>) => void;
-}
+  const [notHovered, setNotHovered] = React.useState(true);
 
-function ConnectionSelectorDialog<Q>({ open, onCreated, onClose }: DataSourceSelectorProps<Q>) {
-  const { dom } = useAppState();
-
-  const handleCreateClick = React.useCallback(
-    (dataSourceId: string) => () => {
-      const dataSource = dataSources[dataSourceId];
-      invariant(dataSource, `Selected non-existing dataSource "${dataSourceId}"`);
-
-      const queryNode = appDom.createNode(dom, 'query', {
-        attributes: {
-          query: dataSource.getInitialQueryValue(),
-          connectionId: null,
-          dataSource: dataSourceId,
-        },
-      });
-
-      onCreated(queryNode);
+  const onClose = React.useCallback(
+    (event: React.MouseEvent<SVGElement>) => {
+      // Prevent the tab from being selected.
+      event.stopPropagation();
+      if (queryIndex === undefined || queryId === undefined) {
+        return;
+      }
+      appStateApi.closeQueryTab(queryIndex, queryId);
     },
-    [dom, onCreated],
+    [appStateApi, queryIndex, queryId],
   );
-
-  return (
-    <Dialog open={open} onClose={onClose} scroll="body">
-      <DialogTitle>Create Query</DialogTitle>
-      <DialogContent>
-        <Stack direction="row" gap={1}>
-          <DataSourceButton onClick={handleCreateClick('local')}>Local function</DataSourceButton>
-          <DataSourceButton onClick={handleCreateClick('rest')}>Fetch</DataSourceButton>
-        </Stack>
-      </DialogContent>
-      <DialogActions>
-        <Button color="inherit" variant="text" onClick={onClose}>
-          Cancel
-        </Button>
-      </DialogActions>
-    </Dialog>
+  return unsaved && notHovered ? (
+    <CircleIcon
+      sx={{
+        color: (theme) =>
+          theme.palette.mode === 'dark'
+            ? theme.palette.primaryDark[300]
+            : theme.palette.primary.main,
+        fontSize: 12,
+      }}
+      onMouseEnter={() => {
+        setNotHovered(false);
+      }}
+    />
+  ) : (
+    <ClearOutlinedIcon
+      onMouseLeave={() => {
+        setNotHovered(true);
+      }}
+      onClick={onClose}
+      sx={{
+        color: (theme) =>
+          theme.palette.mode === 'dark' ? theme.palette.primaryDark[400] : theme.palette.grey[500],
+        fontSize: 12,
+        padding: '1px',
+        '&:hover': {
+          color: (theme) =>
+            theme.palette.mode === 'dark'
+              ? theme.palette.primaryDark[300]
+              : theme.palette.grey[700],
+          backgroundColor: (theme) =>
+            theme.palette.mode === 'dark'
+              ? theme.palette.primaryDark[700]
+              : theme.palette.grey[300],
+          borderRadius: '4px',
+        },
+      }}
+    />
   );
 }
-
-const classes = {
-  listItemMenuButton: 'Toolpad__QueryListItem',
-  listItemMenuOpen: 'Toolpad__QueryListItemMenuOpen',
-};
-
-const QueryListItem = styled(ListItem)({
-  [`& .${classes.listItemMenuButton}`]: {
-    visibility: 'hidden',
-  },
-  [`
-    &:hover .${classes.listItemMenuButton}, 
-    & .${classes.listItemMenuOpen}
-  `]: {
-    visibility: 'visible',
-  },
-});
-
-type DialogState =
-  | {
-      node?: undefined;
-      isDraft?: undefined;
-    }
-  | {
-      node: appDom.QueryNode;
-      isDraft: boolean;
-    };
 
 export default function QueryEditor() {
-  const { dom } = useAppState();
-  const { currentView } = useAppState();
-  const state = usePageEditorState();
-
-  const appStateApi = useAppStateApi();
+  const { dom, currentView } = useAppState();
   const domApi = useDomApi();
+  const appStateApi = useAppStateApi();
 
-  const [dialogState, setDialogState] = React.useState<DialogState | null>(null);
-  const isDraft = dialogState?.isDraft || false;
-
-  const page = appDom.getNode(dom, state.nodeId, 'page');
-  const { queries = [] } = appDom.getChildNodes(dom, page) ?? [];
-
-  const handleEditStateDialogClose = React.useCallback(() => {
-    if (isDraft) {
-      setDialogState(null);
-    } else {
-      appStateApi.setView({ kind: 'page', nodeId: page.id });
+  const currentQueryId = React.useMemo(() => {
+    if (currentView.kind === 'page' && currentView.view?.kind === 'query') {
+      return currentView.view.nodeId;
     }
-  }, [appStateApi, isDraft, page.id]);
+    return '';
+  }, [currentView]);
 
-  const handleCreated = React.useCallback((node: appDom.QueryNode) => {
-    setDialogState({ node, isDraft: true });
-  }, []);
+  const currentTabIndex = React.useMemo(() => {
+    if (currentView.kind === 'page' && currentView.view?.kind === 'query') {
+      return currentView.queryPanel?.currentTabIndex?.toString() || '';
+    }
+    return '';
+  }, [currentView]);
 
-  const handleSave = React.useCallback(
-    (node: appDom.QueryNode) => {
-      if (appDom.nodeExists(dom, node.id)) {
-        domApi.saveNode(node);
-      } else {
-        appStateApi.update((draft) => appDom.addNode(draft, node, page, 'queries'));
+  const [toolsTabType, setToolsTabType] = React.useState<QueryEditorToolsTabType>('preview');
+
+  const handleToolsTabTypeChange = React.useCallback(
+    (event: React.SyntheticEvent, newValue: QueryEditorToolsTabType) => setToolsTabType(newValue),
+    [],
+  );
+
+  const [isPreviewLoading, setIsPreviewLoading] = React.useState(false);
+
+  const [handleRunPreview, setHandleRunPreview] = React.useState(() => () => {});
+
+  const queryToolsContext = React.useMemo<QueryToolsContextProps>(
+    () => ({
+      toolsTabType,
+      handleToolsTabTypeChange,
+      isPreviewLoading,
+      setIsPreviewLoading,
+      handleRunPreview,
+      setHandleRunPreview,
+    }),
+    [
+      toolsTabType,
+      handleToolsTabTypeChange,
+      isPreviewLoading,
+      setIsPreviewLoading,
+      handleRunPreview,
+      setHandleRunPreview,
+    ],
+  );
+
+  const handleTabChange = React.useCallback(
+    (event: React.SyntheticEvent, newValue: string) => {
+      if (currentView.kind === 'page') {
+        const tabIndex = parseInt(newValue, 10);
+        const queryId = currentView.queryPanel?.queryTabs?.[tabIndex]?.meta?.id;
+        if (queryId) {
+          appStateApi.setView({
+            kind: 'page',
+            nodeId: currentView.nodeId,
+            view: { kind: 'query', nodeId: queryId },
+            queryPanel: {
+              ...currentView.queryPanel,
+              currentTabIndex: tabIndex,
+            },
+          });
+        }
       }
     },
-    [dom, domApi, appStateApi, page],
+    [appStateApi, currentView],
   );
 
-  const handleDeleteNode = React.useCallback(
-    (nodeId: NodeId) => {
-      appStateApi.update((draft) => appDom.removeNode(draft, nodeId), {
-        kind: 'page',
-        nodeId: page.id,
-      });
-    },
-    [appStateApi, page.id],
-  );
-
-  const handleRemove = React.useCallback(
-    (node: appDom.QueryNode) => handleDeleteNode(node.id),
-    [handleDeleteNode],
-  );
-
-  const handleDuplicateNode = React.useCallback(
-    (nodeId: NodeId) => {
-      const node = appDom.getNode(dom, nodeId, 'query');
-      invariant(
-        page,
-        'handleDuplicateNode should only be used for queries, which should always belong to a page',
-      );
-      const existingNames = appDom.getExistingNamesForChildren(dom, page);
-      const newName = appDom.proposeName(node.name, existingNames);
-      const copy = appDom.createNode(dom, 'query', { ...node, name: newName });
-
-      setDialogState({ node: copy, isDraft: true });
-    },
-    [dom, page],
-  );
-
-  React.useEffect(() => {
-    setDialogState((previousState) => {
-      if (currentView.kind === 'page' && currentView.view?.kind === 'query') {
-        const node = appDom.getNode(dom, currentView.view?.nodeId, 'query');
-        return { node, isDraft: false };
+  const hasUnsavedChanges = React.useCallback(
+    (queryIndex: number) => {
+      if (
+        currentView.kind !== 'page' ||
+        !currentView.nodeId ||
+        !currentView.queryPanel?.queryTabs ||
+        queryIndex === undefined
+      ) {
+        return false;
       }
-
-      if (isDraft) {
-        return previousState;
+      const tab = currentView.queryPanel?.queryTabs[queryIndex];
+      const draft = tab?.draft;
+      if (!tab || !tab.meta?.id || !draft) {
+        return false;
       }
-
-      return null;
-    });
-  }, [currentView, dom, isDraft]);
-
-  const [anchorEl, setAnchorEl] = React.useState<Element | null>(null);
-
-  const handleCreate = (event: React.MouseEvent) => {
-    setAnchorEl(event.currentTarget);
-  };
-
-  const handleClose = () => {
-    setAnchorEl(null);
-  };
-
-  const open = Boolean(anchorEl);
-
-  const handleCreateClick = React.useCallback(
-    (dataSourceId: string) => () => {
-      const dataSource = dataSources[dataSourceId];
-      invariant(dataSource, `Selected non-existing dataSource "${dataSourceId}"`);
-
-      const node = appDom.createNode(dom, 'query', {
-        attributes: {
-          query: dataSource.getInitialQueryValue(),
-          connectionId: null,
-          dataSource: dataSourceId,
-        },
-      });
-
-      setAnchorEl(null);
-      setDialogState({ node, isDraft: true });
+      return draft !== tab.saved;
     },
-    [dom],
+    [currentView],
   );
 
-  return (
-    <Stack spacing={1} alignItems="start" sx={{ width: '100%' }}>
-      <Button color="inherit" startIcon={<AddIcon />} onClick={handleCreate}>
-        Add query
-      </Button>
-      <Popover
-        open={open}
-        anchorEl={anchorEl}
-        onClose={handleClose}
-        anchorOrigin={{
-          vertical: 'bottom',
-          horizontal: 'left',
-        }}
-      >
-        <Paper sx={{ p: 2 }}>
-          <Typography sx={{ mb: 2 }}>Make backend data available as state on the page.</Typography>
-          <Stack direction="row" gap={1}>
-            <DataSourceButton onClick={handleCreateClick('local')}>
-              Custom function
-            </DataSourceButton>
-            <DataSourceButton onClick={handleCreateClick('rest')}>HTTP request</DataSourceButton>
-          </Stack>
-        </Paper>
-      </Popover>
-      <List sx={{ width: '100%' }}>
-        {queries.map((queryNode) => {
-          return (
-            <QueryListItem
-              key={queryNode.id}
-              disablePadding
-              onClick={() => {
-                appStateApi.setView({
-                  kind: 'page',
-                  nodeId: page.id,
-                  view: { kind: 'query', nodeId: queryNode.id },
-                });
-              }}
-              secondaryAction={
-                <NodeMenu
-                  renderButton={({ buttonProps, menuProps }) => (
-                    <IconButton
-                      className={clsx(classes.listItemMenuButton, {
-                        [classes.listItemMenuOpen]: menuProps.open,
-                      })}
-                      edge="end"
-                      aria-label="Open query menu"
-                      {...buttonProps}
-                    >
-                      <MoreVertIcon />
-                    </IconButton>
-                  )}
-                  nodeId={queryNode.id}
-                  deleteLabelText="Delete"
-                  duplicateLabelText="Duplicate"
-                  onDeleteNode={handleDeleteNode}
-                  onDuplicateNode={handleDuplicateNode}
-                />
-              }
+  const handleSave = React.useCallback(() => {
+    if (
+      currentView.kind !== 'page' ||
+      !currentView.nodeId ||
+      !currentView.queryPanel?.queryTabs ||
+      currentView.queryPanel?.currentTabIndex === undefined
+    ) {
+      return;
+    }
+    const currentTab = currentView.queryPanel?.queryTabs[currentView.queryPanel?.currentTabIndex];
+    const currentQueryDraft = currentTab?.draft;
+    if (!currentTab || !currentTab.meta?.id || !currentQueryDraft) {
+      return;
+    }
+    appStateApi.saveQueryDraft(currentQueryDraft);
+    const page = appDom.getNode(dom, currentView.nodeId, 'page');
+    if (appDom.nodeExists(dom, currentTab.meta.id)) {
+      domApi.saveNode(currentQueryDraft);
+    } else {
+      appStateApi.update((draft) => appDom.addNode(draft, currentQueryDraft, page, 'queries'));
+    }
+  }, [dom, domApi, appStateApi, currentView]);
+
+  const onClosePanel = React.useCallback(() => {
+    appStateApi.closeQueryPanel();
+  }, [appStateApi]);
+
+  return currentView.kind === 'page' &&
+    currentView.view?.kind === 'query' &&
+    currentQueryId &&
+    currentView?.queryPanel?.queryTabs ? (
+    <Stack
+      direction="column"
+      sx={{ height: '100%', overflow: 'hidden', borderBottom: 5, borderColor: 'divider' }}
+    >
+      <TabContext value={currentTabIndex}>
+        <QueryToolsContext.Provider value={queryToolsContext}>
+          <Stack direction="column">
+            <Stack
+              direction={'row'}
+              justifyContent={'space-between'}
+              sx={{ maxHeight: 40, borderBottom: 1, borderColor: 'divider' }}
             >
-              <ListItemButton>
-                <ListItemText primaryTypographyProps={{ noWrap: true }} primary={queryNode.name} />
-              </ListItemButton>
-            </QueryListItem>
-          );
-        })}
-      </List>
-      {dialogState?.node ? (
-        <QueryNodeEditorDialog
-          open={!!dialogState}
-          node={dialogState.node}
-          isDraft={isDraft}
-          onSave={handleSave}
-          onRemove={handleRemove}
-          onClose={handleEditStateDialogClose}
-        />
-      ) : (
-        <ConnectionSelectorDialog
-          open={!!dialogState}
-          onCreated={handleCreated}
-          onClose={handleEditStateDialogClose}
-        />
-      )}
+              <TabList onChange={handleTabChange} aria-label="Query editor panel">
+                {currentView.queryPanel?.queryTabs?.map((query, index) => (
+                  <Tab
+                    key={query?.meta?.name}
+                    label={
+                      <Chip
+                        label={query?.meta?.name}
+                        size="small"
+                        variant="outlined"
+                        sx={{
+                          color: 'inherit',
+                          border: 0,
+                          ml: -1,
+                          '&:hover': { color: 'inherit' },
+                        }}
+                        deleteIcon={
+                          <TabCloseIcon
+                            queryIndex={index}
+                            unsaved={hasUnsavedChanges(index)}
+                            queryId={query?.meta?.id}
+                          />
+                        }
+                        // Need to pass onDelete to allow the delete icon to be rendered
+                        onDelete={() => {}}
+                      />
+                    }
+                    value={index.toString()}
+                    icon={
+                      <QueryIcon
+                        id={query?.meta?.dataSource || 'default'}
+                        sx={{ fontSize: 24, mt: 0.2 }}
+                      />
+                    }
+                    iconPosition="start"
+                  />
+                ))}
+              </TabList>
+              <IconButton size="small" disableRipple onClick={onClosePanel}>
+                <CancelPresentationIcon
+                  sx={{
+                    mr: 1,
+                    alignSelf: 'center',
+                    color: (theme) => theme.palette.grey[500],
+                    transition: (theme) =>
+                      theme.transitions.create('color', {
+                        duration: theme.transitions.duration.shortest,
+                      }),
+                    '&:hover, &:focus': {
+                      color: (theme) =>
+                        theme.palette.mode === 'dark'
+                          ? theme.palette.primaryDark[300]
+                          : theme.palette.primary.main,
+                    },
+                    fontSize: 16,
+                  }}
+                />
+              </IconButton>
+            </Stack>
+            <Box
+              sx={{
+                display: 'flex',
+                justifyContent: 'center',
+                gap: 1,
+                minHeight: 60,
+                borderBottom: 1,
+                borderColor: 'divider',
+              }}
+            >
+              <LoadingButton
+                disabled={isPreviewLoading}
+                loading={isPreviewLoading}
+                variant="outlined"
+                color="primary"
+                onClick={handleRunPreview}
+                endIcon={<PlayArrow />}
+                sx={{
+                  width: 'fit-content',
+                  height: 32,
+                  mr: 1,
+                  my: 'auto',
+                  alignSelf: 'center',
+                }}
+              >
+                Preview
+              </LoadingButton>
+              <LoadingButton
+                disabled={!hasUnsavedChanges(parseInt(currentTabIndex, 10))}
+                onClick={handleSave}
+                variant="contained"
+                color="primary"
+                sx={{ width: 'fit-content', height: 32, my: 'auto', mr: 2 }}
+              >
+                Save
+              </LoadingButton>
+            </Box>
+          </Stack>
+
+          {currentView.queryPanel?.queryTabs?.map((query, index) => {
+            if (query && query.draft) {
+              return (
+                <TabPanel
+                  key={query.meta?.name}
+                  value={index.toString()}
+                  sx={{
+                    p: 1,
+                    pb: 0,
+                    height: '100%',
+                    overflow: 'hidden',
+                  }}
+                >
+                  <QueryEditorPanel draft={query.draft} saved={query.saved} />
+                </TabPanel>
+              );
+            }
+            return null;
+          })}
+        </QueryToolsContext.Provider>
+      </TabContext>
     </Stack>
-  );
+  ) : null;
 }

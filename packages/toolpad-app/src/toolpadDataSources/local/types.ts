@@ -4,7 +4,6 @@ import type { IntrospectionResult } from '../../server/functionsTypesWorker';
 export type FileTypes = 'query' | 'component' | 'page' | 'theme';
 
 export interface LocalConnectionParams {}
-
 export interface LocalQuery {
   /**
    * name of the handler to execute.

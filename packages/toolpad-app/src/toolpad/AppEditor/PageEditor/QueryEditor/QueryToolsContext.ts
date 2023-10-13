@@ -1,9 +1,12 @@
 import * as React from 'react';
-import { QueryEditorToolsTab } from '../../../../../types';
+import { QueryEditorToolsTabType } from '../../../../types';
 
 export type QueryToolsContextProps = {
-  toolsTab: QueryEditorToolsTab;
-  handleToolsTabChange: (event: React.SyntheticEvent, newValue: QueryEditorToolsTab) => void;
+  toolsTabType: QueryEditorToolsTabType;
+  handleToolsTabTypeChange: (
+    event: React.SyntheticEvent,
+    newValue: QueryEditorToolsTabType,
+  ) => void;
   isPreviewLoading: boolean;
   setIsPreviewLoading: React.Dispatch<React.SetStateAction<boolean>>;
   handleRunPreview: () => void;
@@ -11,8 +14,8 @@ export type QueryToolsContextProps = {
 };
 
 const QueryToolsContext = React.createContext<QueryToolsContextProps>({
-  toolsTab: 'preview',
-  handleToolsTabChange: () => {},
+  toolsTabType: 'preview',
+  handleToolsTabTypeChange: () => {},
   isPreviewLoading: false,
   setIsPreviewLoading: () => {},
   handleRunPreview: () => {},

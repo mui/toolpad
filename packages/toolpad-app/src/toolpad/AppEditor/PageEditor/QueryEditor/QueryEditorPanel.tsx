@@ -5,15 +5,21 @@ import DynamicFormIcon from '@mui/icons-material/DynamicForm';
 import { BindableAttrValue, LiveBinding } from '@mui/toolpad-core';
 import { useBrowserJsRuntime } from '@mui/toolpad-core/jsBrowserRuntime';
 import invariant from 'invariant';
-import { usePageEditorState } from '../../PageEditorProvider';
-import * as appDom from '../../../../../appDom';
-import dataSources from '../../../../../toolpadDataSources/client';
-import { useEvaluateLiveBinding } from '../../../useEvaluateLiveBinding';
-import { useAppState, useAppStateApi } from '../../../../AppState';
-import { QueryEditorTab } from '../../../../../types';
-import { ConnectionContextProvider } from '../../../../../toolpadDataSources/context';
-import BindableEditor from '../../BindableEditor';
-import client from '../../../../../api';
+
+import { usePageEditorState } from '../PageEditorProvider';
+import * as appDom from '../../../../appDom';
+import dataSources from '../../../../toolpadDataSources/client';
+import { useEvaluateLiveBinding } from '../../useEvaluateLiveBinding';
+import { useAppState, useAppStateApi } from '../../../AppState';
+import { QueryEditorTabType } from '../../../../types';
+import { ConnectionContextProvider } from '../../../../toolpadDataSources/context';
+import BindableEditor from '../BindableEditor';
+import { useProjectApi } from '../../../../projectApi';
+
+interface QueryEditorProps {
+  draft: appDom.QueryNode;
+  saved?: appDom.QueryNode;
+}
 
 function refetchIntervalInSeconds(maybeInterval?: number) {
   if (typeof maybeInterval !== 'number') {
@@ -23,24 +29,46 @@ function refetchIntervalInSeconds(maybeInterval?: number) {
   return seconds > 0 ? seconds : undefined;
 }
 
-interface QueryNodeEditorProps {
-  draft: appDom.QueryNode;
-  saved?: appDom.QueryNode;
+const settingsToggleIconStyles = {
+  p: 0,
+  mr: 1,
+  color: 'primary.main',
+  fontSize: 16,
+  cursor: 'pointer',
+  '&:hover': {
+    color: 'primary.dark',
+  },
+};
+
+interface QuerySettingsToggleButtonProps {
+  tabType: QueryEditorTabType;
+  handleTabTypeChange: () => void;
 }
 
-interface QuerySettingsPanelProps {
+function QuerySettingsToggleButton({
+  tabType,
+  handleTabTypeChange,
+}: QuerySettingsToggleButtonProps) {
+  return tabType === 'config' ? (
+    <SettingsIcon sx={settingsToggleIconStyles} onClick={handleTabTypeChange} />
+  ) : (
+    <DynamicFormIcon sx={settingsToggleIconStyles} onClick={handleTabTypeChange} />
+  );
+}
+
+interface QuerySettingsTabProps {
   liveEnabled: LiveBinding;
   pageState: any;
   globalScopeMeta: any;
   jsBrowserRuntime: any;
 }
 
-function QuerySettingsPanel({
+function QuerySettingsTab({
   liveEnabled,
   pageState,
   globalScopeMeta,
   jsBrowserRuntime,
-}: QuerySettingsPanelProps) {
+}: QuerySettingsTabProps) {
   const { currentView } = useAppState();
   const appStateApi = useAppStateApi();
 
@@ -56,33 +84,44 @@ function QuerySettingsPanel({
     return null;
   }, [currentView]);
 
+  const updateAttribute = React.useCallback(
+    (attrName: string, attrValue: any) => {
+      appStateApi.updateQueryDraft((draft) => ({
+        ...draft,
+        attributes: {
+          ...draft.attributes,
+          [attrName]: attrValue,
+        },
+      }));
+    },
+    [appStateApi],
+  );
+
   const handleModeChange = React.useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
-      if (draftQuery?.name) {
-        appStateApi.setQueryDraftProp(draftQuery?.name, 'mode', event.target.value, 'attributes');
-      }
+      updateAttribute('mode', event.target.value);
     },
-    [appStateApi, draftQuery],
+    [updateAttribute],
   );
 
   const handleEnabledChange = React.useCallback(
     (newValue: BindableAttrValue<boolean> | null) => {
-      if (draftQuery?.name && newValue !== null) {
-        appStateApi.setQueryDraftProp(draftQuery.name, 'enabled', newValue, 'attributes');
+      if (newValue !== null) {
+        updateAttribute('enabled', newValue);
       }
     },
-    [draftQuery, appStateApi],
+    [updateAttribute],
   );
 
   const handleRefetchIntervalChange = React.useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
       const interval = Number(event.target.value);
 
-      if (draftQuery?.name && !Number.isNaN(interval) && interval > 0) {
-        appStateApi.setQueryDraftProp(draftQuery?.name, interval * 1000, 'refetchInterval');
+      if (!Number.isNaN(interval) && interval > 0) {
+        updateAttribute('refetchInterval', interval * 1000);
       }
     },
-    [draftQuery, appStateApi],
+    [updateAttribute],
   );
   return (
     <Box
@@ -156,33 +195,9 @@ function QuerySettingsPanel({
   );
 }
 
-const settingsToggleIconStyles = {
-  p: 0,
-  mr: 1,
-  color: 'primary.main',
-  fontSize: 16,
-  cursor: 'pointer',
-  '&:hover': {
-    color: 'primary.dark',
-  },
-};
-
-function QuerySettingsToggleButton({
-  tab,
-  handleTabChange,
-}: {
-  tab: QueryEditorTab;
-  handleTabChange: () => void;
-}) {
-  return tab === 'config' ? (
-    <SettingsIcon sx={settingsToggleIconStyles} onClick={handleTabChange} />
-  ) : (
-    <DynamicFormIcon sx={settingsToggleIconStyles} onClick={handleTabChange} />
-  );
-}
-
-export default function QueryEditorPanel({ draft, saved }: QueryNodeEditorProps) {
+export default function QueryEditorPanel({ draft, saved }: QueryEditorProps) {
   const { dom } = useAppState();
+  const projectApi = useProjectApi();
 
   const connectionId =
     appDom.deref(saved ? saved?.attributes?.connectionId : draft?.attributes?.connectionId) ?? null;
@@ -211,15 +226,15 @@ export default function QueryEditorPanel({ draft, saved }: QueryNodeEditorProps)
   const execPrivate = React.useCallback(
     (method: string, args: any[]) => {
       invariant(dataSourceId, 'dataSourceId must be set');
-      return client.mutation.dataSourceExecPrivate(dataSourceId, method, args);
+      return projectApi.methods.dataSourceExecPrivate(dataSourceId, method, args);
     },
-    [dataSourceId],
+    [projectApi, dataSourceId],
   );
 
-  const [tab, setTab] = React.useState<QueryEditorTab>('config');
+  const [tabType, setTabType] = React.useState<QueryEditorTabType>('config');
 
-  const handleTabChange = React.useCallback(() => {
-    setTab((prev) => (prev === 'config' ? 'settings' : 'config'));
+  const handleTabTypeChange = React.useCallback(() => {
+    setTabType((prev) => (prev === 'config' ? 'settings' : 'config'));
   }, []);
 
   return dataSourceId && dataSource && queryEditorContext ? (
@@ -232,12 +247,15 @@ export default function QueryEditorPanel({ draft, saved }: QueryNodeEditorProps)
             globalScope={pageState}
             globalScopeMeta={globalScopeMeta}
             execApi={execPrivate}
-            tab={tab}
+            tabType={tabType}
             settingsToggle={
-              <QuerySettingsToggleButton tab={tab} handleTabChange={handleTabChange} />
+              <QuerySettingsToggleButton
+                tabType={tabType}
+                handleTabTypeChange={handleTabTypeChange}
+              />
             }
-            settingsPanel={
-              <QuerySettingsPanel
+            settingsTab={
+              <QuerySettingsTab
                 {...{
                   liveEnabled,
                   pageState,

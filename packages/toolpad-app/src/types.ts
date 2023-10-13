@@ -83,9 +83,9 @@ export type ConnectionParamsEditor<P = {}> = React.FC<ConnectionEditorProps<P>>;
 
 export type Methods = Record<string, (...args: any[]) => Awaitable<any>>;
 
-export type QueryEditorTab = 'config' | 'settings';
+export type QueryEditorTabType = 'config' | 'settings';
 
-export type QueryEditorToolsTab = 'preview' | 'devTools';
+export type QueryEditorToolsTabType = 'preview' | 'devTools';
 
 export interface QueryEditorProps<C, Q, A extends Methods = {}> {
   connectionParams: Maybe<C>;
@@ -98,9 +98,9 @@ export interface QueryEditorProps<C, Q, A extends Methods = {}> {
   value: appDom.QueryNode<Q>;
   onChange?: <T extends keyof appDom.QueryNode<Q>>(name: string, prop: T, value: Q) => void;
   onSave?: (newNode: appDom.QueryNode<Q>) => void;
-  tab?: QueryEditorTab;
+  tabType?: QueryEditorTabType;
   settingsToggle?: React.ReactNode;
-  settingsPanel?: React.ReactNode;
+  settingsTab?: React.ReactNode;
 }
 
 export type QueryEditor<C, Q, A extends Methods> = React.FC<QueryEditorProps<C, Q, A>>;

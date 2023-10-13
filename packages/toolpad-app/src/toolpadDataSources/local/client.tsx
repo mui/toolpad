@@ -8,29 +8,32 @@ import {
   Box,
   Button,
   Chip,
+  Divider,
   InputBase,
   ListSubheader,
   Stack,
+  Tab,
   Typography,
   styled,
   alpha,
 } from '@mui/material';
+import { TabContext, TabList } from '@mui/lab';
 import { useBrowserJsRuntime } from '@mui/toolpad-core/jsBrowserRuntime';
 import { errorFrom } from '@mui/toolpad-utils/errors';
-import { LoadingButton } from '@mui/lab';
 import AddOutlinedIcon from '@mui/icons-material/AddOutlined';
 import DataObjectOutlinedIcon from '@mui/icons-material/DataObjectOutlined';
 import DoneIcon from '@mui/icons-material/Done';
 import { useQuery } from '@tanstack/react-query';
 import Popper from '@mui/material/Popper';
 import ClickAwayListener from '@mui/material/ClickAwayListener';
+import TabPanel from '../../components/TabPanel';
 import { ClientDataSource, QueryEditorProps } from '../../types';
 import { LocalPrivateApi, LocalQuery, LocalConnectionParams } from './types';
 import {
   useEvaluateLiveBindingEntries,
   useEvaluateLiveBindings,
 } from '../../toolpad/AppEditor/useEvaluateLiveBinding';
-import * as appDom from '../../appDom';
+import { useAppStateApi } from '../../toolpad/AppState';
 import { Panel, PanelGroup, PanelResizeHandle } from '../../components/resizablePanels';
 import JsonView from '../../components/JsonView';
 import OpenCodeEditorButton from '../../toolpad/OpenCodeEditor';
@@ -40,6 +43,7 @@ import BindableEditor from '../../toolpad/AppEditor/PageEditor/BindableEditor';
 import { getDefaultControl, usePropControlsContext } from '../../toolpad/propertyControls';
 import { parseFunctionId, parseLegacyFunctionId, serializeFunctionId } from './shared';
 import { FileIntrospectionResult } from '../../server/functionsTypesWorker';
+import QueryToolsContext from '../../toolpad/AppEditor/PageEditor/QueryEditor/QueryToolsContext';
 
 const EMPTY_PARAMS: BindableAttrEntries = [];
 
@@ -410,15 +414,33 @@ function QueryEditor({
   globalScope,
   globalScopeMeta,
   value: input,
-  onChange: setInput,
+  settingsToggle,
+  settingsTab,
+  tabType,
   execApi,
-  onSave,
 }: QueryEditorProps<LocalConnectionParams, LocalQuery, LocalPrivateApi>) {
+  const appStateApi = useAppStateApi();
   const introspection = useQuery({
     queryKey: ['introspection'],
     queryFn: () => execApi('introspection', []),
     retry: false,
   });
+
+  const updateProp = React.useCallback(
+    (prop: string, value: any) => {
+      appStateApi.updateQueryDraft((draft) => ({
+        ...draft,
+        attributes: {
+          ...draft.attributes,
+          query: {
+            ...draft.attributes.query,
+            [prop]: value,
+          },
+        },
+      }));
+    },
+    [appStateApi],
+  );
 
   const propTypeControls = usePropControlsContext();
 
@@ -460,14 +482,37 @@ function QueryEditor({
   );
 
   const {
-    preview,
-    runPreview: handleRunPreview,
-    isLoading: previewIsLoading,
-  } = useQueryPreview(
+    toolsTabType,
+    handleToolsTabTypeChange,
+    isPreviewLoading,
+    setIsPreviewLoading,
+    setHandleRunPreview,
+  } = React.useContext(QueryToolsContext);
+
+  const { preview, runPreview } = useQueryPreview(
     fetchServerPreview,
     input.attributes.query,
     previewParams as Record<string, string>,
+    {
+      onPreview() {
+        setIsPreviewLoading(false);
+      },
+    },
   );
+
+  const [mounted, setMounted] = React.useState(false);
+
+  const handleRunPreview = React.useCallback(() => {
+    setIsPreviewLoading(true);
+    runPreview();
+  }, [setIsPreviewLoading, runPreview]);
+
+  React.useEffect(() => {
+    if (!mounted) {
+      setHandleRunPreview(() => handleRunPreview);
+      setMounted(true);
+    }
+  }, [setHandleRunPreview, handleRunPreview, mounted]);
 
   const liveBindings = useEvaluateLiveBindings({
     jsRuntime: jsBrowserRuntime,
@@ -475,23 +520,14 @@ function QueryEditor({
     globalScope,
   });
 
-  const setSelectedHandler = React.useCallback(
-    (id: string) => {
-      setInput((draft) => {
-        return appDom.setQueryProp(draft, 'function', id);
-      });
-    },
-    [setInput],
-  );
-
   const handleSelectFunction = React.useCallback(
     (nodeId: string) => {
       const parsed = parseFunctionId(nodeId);
       if (parsed.handler) {
-        setSelectedHandler(nodeId);
+        updateProp('function', nodeId);
       }
     },
-    [setSelectedHandler],
+    [updateProp],
   );
 
   const proposedFileName = React.useMemo(() => {
@@ -514,63 +550,15 @@ function QueryEditor({
       // eslint-disable-next-line no-alert
       window.alert(errorFrom(error).message);
     }
-
     const newNodeId = serializeFunctionId({ file: proposedFileName, handler: 'default' });
-    setSelectedHandler(newNodeId);
-  }, [execApi, introspection, proposedFileName, setSelectedHandler]);
-
-  React.useEffect(() => {
-    onSave(input);
-  }, [input, onSave]);
+    updateProp('function', newNodeId);
+  }, [execApi, introspection, proposedFileName, updateProp]);
 
   return (
-    <PanelGroup direction="vertical">
-      <Panel defaultSize={60}>
-        <Box display={'grid'} gridTemplateColumns={'60% auto auto'} height={'100%'} columnGap={1}>
-          <Stack
-            display="flex"
-            flexDirection={'row'}
-            sx={{
-              borderRight: (theme) => `1px solid ${theme.palette.divider}`,
-              alignItems: 'flex-start',
-              mt: 2,
-              mx: 2,
-            }}
-          >
-            <FunctionAutocomplete
-              selectedFunctionFileName={selectedFile || ''}
-              files={introspection.data?.files || []}
-              selectedFunctionName={selectedFunction || ''}
-              onCreateNew={handleCreateNewCommit}
-              onSelect={handleSelectFunction}
-            />
-
-            <LoadingButton
-              loading={previewIsLoading}
-              onClick={handleRunPreview}
-              variant="contained"
-              disabled={!selectedFunction}
-              sx={{ width: '80%', mx: 2.5, mt: 1 }}
-            >
-              Preview
-            </LoadingButton>
-          </Stack>
-
-          {introspection.error ? (
-            <Box
-              sx={{
-                position: 'absolute',
-                inset: '0 0 0 0',
-                display: 'flex',
-                justifyContent: 'center',
-                alignItems: 'center',
-              }}
-            >
-              {errorFrom(introspection.error).message}
-            </Box>
-          ) : null}
-
-          <Stack sx={{ gap: 1, mt: 2 }}>
+    <PanelGroup direction="horizontal">
+      <Panel defaultSize={50} minSize={40} style={{ overflow: 'auto', scrollbarGutter: 'stable' }}>
+        <Stack direction="column" gap={0}>
+          <Stack direction={'row'} sx={{ display: 'flex', justifyContent: 'space-between' }}>
             <Typography
               fontSize={12}
               sx={{
@@ -578,45 +566,128 @@ function QueryEditor({
                   theme.palette.mode === 'dark' ? theme.palette.grey[500] : 'default',
               }}
             >
-              Parameters:
+              {tabType === 'config' ? 'Configuration' : 'Settings'}
             </Typography>
-            {Object.entries(parameterDefs).map(([name, definiton]) => {
-              const Control = getDefaultControl(propTypeControls, definiton, liveBindings);
-              return Control ? (
-                <BindableEditor
-                  key={name}
-                  liveBinding={liveBindings[name]}
-                  globalScope={globalScope}
-                  globalScopeMeta={globalScopeMeta}
-                  label={name}
-                  propType={definiton}
-                  jsRuntime={jsBrowserRuntime}
-                  renderControl={(renderControlParams) => (
-                    <Control {...renderControlParams} propType={definiton} />
-                  )}
-                  value={paramsObject[name]}
-                  onChange={(newValue) => {
-                    const paramKeys = Object.keys(parameterDefs);
-                    const newParams: BindableAttrEntries = paramKeys.flatMap((key) => {
-                      const paramValue = key === name ? newValue : paramsObject[key];
-                      return paramValue ? [[key, paramValue]] : [];
-                    });
-                    setInput((existing) => ({
-                      ...existing,
-                      params: newParams,
-                    }));
-                  }}
-                />
-              ) : null;
-            })}
+            {settingsToggle}
           </Stack>
-        </Box>
+          <Divider />
+          {tabType === 'config' ? (
+            <Stack
+              display="flex"
+              flexDirection={'row'}
+              sx={{
+                borderRight: (theme) => `1px solid ${theme.palette.divider}`,
+                alignItems: 'flex-start',
+                mt: 2,
+                mx: 2,
+              }}
+            >
+              <FunctionAutocomplete
+                selectedFunctionFileName={selectedFile || ''}
+                files={introspection.data?.files || []}
+                selectedFunctionName={selectedFunction || ''}
+                onCreateNew={handleCreateNewCommit}
+                onSelect={handleSelectFunction}
+              />
+              {introspection.error ? (
+                <Box
+                  sx={{
+                    position: 'absolute',
+                    inset: '0 0 0 0',
+                    display: 'flex',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                  }}
+                >
+                  {errorFrom(introspection.error).message}
+                </Box>
+              ) : null}
+            </Stack>
+          ) : (
+            settingsTab
+          )}
+        </Stack>
       </Panel>
       <PanelResizeHandle />
-      <Panel>
-        <QueryPreview isLoading={previewIsLoading} error={preview?.error}>
-          <ResolvedPreview preview={preview} />
-        </QueryPreview>
+      <Panel defaultSize={50} minSize={20}>
+        <PanelGroup direction="vertical">
+          <Panel defaultSize={40} style={{ overflow: 'auto', scrollbarGutter: 'stable' }}>
+            <Box
+              display={'flex'}
+              flexDirection={'column'}
+              sx={{
+                px: 1,
+                pt: 0.25,
+              }}
+            >
+              <Typography
+                fontSize={12}
+                sx={{
+                  color: (theme) =>
+                    theme.palette.mode === 'dark' ? theme.palette.grey[500] : 'default',
+                }}
+              >
+                Parameters
+              </Typography>
+              <Divider sx={{ mb: 1 }} />
+
+              {Object.entries(parameterDefs).map(([name, definiton]) => {
+                const Control = getDefaultControl(propTypeControls, definiton, liveBindings);
+                return Control ? (
+                  <BindableEditor
+                    key={name}
+                    liveBinding={liveBindings[name]}
+                    globalScope={globalScope}
+                    globalScopeMeta={globalScopeMeta}
+                    label={name}
+                    propType={definiton}
+                    jsRuntime={jsBrowserRuntime}
+                    renderControl={(renderControlParams) => (
+                      <Control {...renderControlParams} propType={definiton} />
+                    )}
+                    value={paramsObject[name]}
+                    onChange={(newValue) => {
+                      const paramKeys = Object.keys(parameterDefs);
+                      const newParams: BindableAttrEntries = paramKeys.flatMap((key) => {
+                        const paramValue = key === name ? newValue : paramsObject[key];
+                        return paramValue ? [[key, paramValue]] : [];
+                      });
+                      updateProp('params', newParams);
+                    }}
+                  />
+                ) : null;
+              })}
+            </Box>
+          </Panel>
+          <PanelResizeHandle />
+          {toolsTabType ? (
+            <Panel defaultSize={60} style={{ overflow: 'auto', scrollbarGutter: 'stable' }}>
+              <TabContext value={toolsTabType}>
+                <Box
+                  sx={{
+                    borderBottom: 1,
+                    borderColor: 'divider',
+                    display: 'flex',
+                    height: 32,
+                  }}
+                >
+                  <TabList
+                    sx={{ '& button': { fontSize: 12, fontWeight: 'normal' } }}
+                    onChange={handleToolsTabTypeChange}
+                    aria-label="Query tools active tab"
+                  >
+                    <Tab label="Preview" value="preview" />
+                  </TabList>
+                </Box>
+                <TabPanel value="preview" disableGutters>
+                  <QueryPreview isLoading={isPreviewLoading} error={preview?.error}>
+                    <ResolvedPreview preview={preview} />
+                  </QueryPreview>
+                </TabPanel>
+              </TabContext>
+            </Panel>
+          ) : null}
+        </PanelGroup>
       </Panel>
     </PanelGroup>
   );

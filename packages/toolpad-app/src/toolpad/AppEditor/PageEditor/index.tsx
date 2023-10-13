@@ -11,7 +11,7 @@ import ComponentCatalog from './ComponentCatalog';
 import NotFoundEditor from '../NotFoundEditor';
 import usePageTitle from '../../../utils/usePageTitle';
 import useUndoRedo from '../../hooks/useUndoRedo';
-import QueryEditor from './QueriesExplorer/QueryEditor2';
+import QueryEditor from './QueryEditor';
 
 const classes = {
   renderPanel: 'Toolpad_RenderPanel',

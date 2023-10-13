@@ -6,12 +6,12 @@
 
 Some components have event handler props, such as the `Button` component and its `onClick` prop which triggers when the button is clicked. You can run arbitrary JavaScript when the event fires, including manipulating the state of other components on the page.
 
-Some event handling example scenarios:
+Some event handling scenarios:
 
 ### Change component state
 
 <video controls width="100%" height="auto" style="contain" alt="change-component-state">
-  <source src="/static/toolpad/docs/concepts/data-binding/change-component-state.mp4" type="video/mp4">
+  <source src="/static/toolpad/docs/concepts/event-handling/change-component-state.mp4" type="video/mp4">
   Your browser does not support the video tag.
 </video>
 
@@ -26,22 +26,22 @@ You can call single or multiple queries sequentially to fetch data on the page o
 #### Multiple queries
 
 <video controls width="100%" height="auto" style="contain" alt="call-multiple-queries">
-  <source src="/static/toolpad/docs/concepts/data-binding/multiple-queries.mp4" type="video/mp4">
-  Your browser does not support the video tag.
-</video>
-
-### Using console options
-
-Custom functions allow you to write custom code in your editor. You can write a console.log statement that interacts with the data on the page and prints logs.
-
-<video controls width="100%" height="auto" style="contain" alt="console-log">
-  <source src="/static/toolpad/docs/concepts/data-binding/console-log.mp4" type="video/mp4">
+  <source src="/static/toolpad/docs/concepts/event-handling/multiple-queries.mp4" type="video/mp4">
   Your browser does not support the video tag.
 </video>
 
 :::info
 See the [deleting data grid row](/toolpad/how-to-guides/delete-datagrid-row/) guide for a detailed usage example.
 :::
+
+### Using console options
+
+Custom functions allow you to write custom code in your editor. You can write a `console.log` statement that interacts with the data on the page and prints logs.
+
+<video controls width="100%" height="auto" style="contain" alt="console-log">
+  <source src="/static/toolpad/docs/concepts/event-handling/console-log.mp4" type="video/mp4">
+  Your browser does not support the video tag.
+</video>
 
 ## Navigation actions
 

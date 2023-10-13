@@ -8,7 +8,7 @@ Each property of component that may be bound to data present on the page is surr
 
 You can write JavaScript expressions in the editor which opens up.
 
-The editor will expect a return type, `string` for example.
+Based on the property, the editor expects a return type, `string` for example which is shown at the top.
 
 The **scope** includes the current values of all components and queries that you have added on the page. You can use anything from within this scope to write your JavaScript expressions.
 
@@ -20,11 +20,11 @@ The evaluated value of the binding will be visible to you in the editor.
 
 You can change the format of a value like:
 
-{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/concepts/data-binding/data-transform.png", "alt": "Data transformation", "caption": "Data transformation", "zoom": false, "width": 300 }}
+{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/concepts/data-binding/data-transform.png", "alt": "Data transformation", "caption": "Data transformation", "zoom": true}}
 
 ### Template strings
 
-You can write template strings inside backticks (`) to write embedded expressions and multiline text. These are highly useful and can be used to read values from other components.
+You can write strings inside backticks (`) to write embedded expressions and multiline text. These can be used to read values from other components.
 
 <video controls width="100%" height="auto" style="contain" alt="button-onclick-js-expression">
   <source src="/static/toolpad/docs/components/button/button-usage.mp4" type="video/mp4">

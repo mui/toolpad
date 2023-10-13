@@ -3,7 +3,7 @@ import invariant from 'invariant';
 import { createServer, Plugin } from 'vite';
 import { createRpcClient } from '@mui/toolpad-utils/workerRpc';
 import { getHtmlContent, createViteConfig, resolvedComponentsId } from './toolpadAppBuilder';
-import type { RuntimeConfig } from '../config';
+import type { RuntimeConfig } from '../types';
 import type * as appDom from '../appDom';
 import type { ComponentEntry } from './localMode';
 import createRuntimeState from '../runtime/createRuntimeState';

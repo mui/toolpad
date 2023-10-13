@@ -11,14 +11,14 @@ test.use({
     template: path.resolve(currentDirectory, '../backend-basic/fixture'),
   },
   customServerConfig: {
-    dev: true,
+    dev: false,
     env: {
       SECRET_BAZ: 'Some baz secret',
     },
   },
 });
 
-test('custom server', async ({ context, customServer, page }) => {
+test('custom server production mode', async ({ context, customServer, page }) => {
   invariant(
     customServer,
     'test must be configured with `customServerConfig`. Add `test.use({ customServerConfig: ... })`',

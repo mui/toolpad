@@ -45,7 +45,6 @@ interface ProjectConfig {
 }
 
 interface LocalAppConfig {
-  build?: boolean;
   // Command to start toolpad with
   cmd?: 'start' | 'dev';
   // Run toolpad editor app in local dev mode
@@ -58,6 +57,7 @@ interface LocalAppConfig {
 interface LocalServerConfig {
   dev?: boolean;
   env?: Record<string, string>;
+  base?: string;
 }
 
 const asyncDisposeSymbol: typeof Symbol.asyncDispose =
@@ -86,10 +86,51 @@ async function getTestProjectDir({ template, setup }: ProjectConfig = {}) {
   };
 }
 
-async function runCustomServer(projectDir: string, { dev = false, env = {} }: LocalServerConfig) {
+interface BuildAppOptions {
+  base?: string;
+  env?: Record<string, string>;
+}
+
+async function buildApp(projectDir: string, { base, env = {} }: BuildAppOptions = {}) {
+  const buildArgs = [CLI_CMD, 'build'];
+
+  if (base) {
+    buildArgs.push('--base', base);
+  }
+
+  const child = childProcess.spawn('node', buildArgs, {
+    cwd: projectDir,
+    stdio: 'pipe',
+    shell: !process.env.CI,
+    env: {
+      ...process.env,
+      ...env,
+    },
+  });
+
+  if (VERBOSE) {
+    child.stdout?.pipe(process.stdout);
+    child.stderr?.pipe(process.stderr);
+  }
+
+  await once(child, 'exit');
+
+  if (child.exitCode !== 0) {
+    throw new Error('Build failed');
+  }
+}
+
+async function runCustomServer(
+  projectDir: string,
+  { dev = false, base = '/foo', env = {} }: LocalServerConfig,
+) {
   const origEnv = { ...process.env };
   Object.assign(process.env, env);
-  const base = '/foo';
+
+  if (!dev) {
+    await buildApp(projectDir, { base, env });
+  }
+
   const app = express();
 
   const toolpadHandler = await unstable_createHandler({
@@ -116,35 +157,10 @@ async function runCustomServer(projectDir: string, { dev = false, env = {} }: Lo
 }
 
 async function runApp(projectDir: string, options: LocalAppConfig) {
-  const { cmd = 'start', build = cmd === 'start', env, base } = options;
+  const { cmd = 'start', env, base } = options;
 
-  if (build) {
-    const buildArgs = [CLI_CMD, 'build'];
-
-    if (base) {
-      buildArgs.push('--base', base);
-    }
-
-    const child = childProcess.spawn('node', buildArgs, {
-      cwd: projectDir,
-      stdio: 'pipe',
-      shell: !process.env.CI,
-      env: {
-        ...process.env,
-        ...env,
-      },
-    });
-
-    if (VERBOSE) {
-      child.stdout?.pipe(process.stdout);
-      child.stderr?.pipe(process.stderr);
-    }
-
-    await once(child, 'exit');
-
-    if (child.exitCode !== 0) {
-      throw new Error('Build failed');
-    }
+  if (cmd === 'start') {
+    await buildApp(projectDir, { base, env });
   }
 
   const args: string[] = [CLI_CMD, cmd];

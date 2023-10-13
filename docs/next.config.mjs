@@ -52,7 +52,6 @@ export default withDocsInfra(
           alias: {
             ...config.resolve.alias,
             docs: path.resolve(MONOREPO_PATH, './docs'),
-            [path.resolve(MONOREPO_PATH, './packages/mui-utils/macros/MuiError.macro')]: 'react',
             ...MONOREPO_PACKAGES,
             '@mui/toolpad-components': path.resolve(
               currentDirectory,

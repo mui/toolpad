@@ -42,6 +42,10 @@ module.exports = {
             message:
               'Avoid kitchensink libraries like lodash-es. We prefer a slightly more verbose, but more universally understood javascript style',
           },
+          {
+            name: 'react-query',
+            message: 'deprecated package, use @tanstack/react-query instead.',
+          },
         ],
         patterns: [
           {

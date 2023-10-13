@@ -1,6 +1,8 @@
 export const HTML_ID_EDITOR_OVERLAY = 'editor-overlay';
 export const WINDOW_PROP_TOOLPAD_APP_RENDER_PARAMS = '__TOOLPAD_APP_RENDER_PARAMS__';
 export const RUNTIME_CONFIG_WINDOW_PROPERTY = '__TOOLPAD_RUNTIME_CONFIG__';
+export const APP_URL_WINDOW_PROPERTY = '__TOOLPAD_APP_URL__';
+export const INITIAL_STATE_WINDOW_PROPERTY = '__initialToolpadState__';
 
 export const TOOLPAD_TARGET_CE = 'CE';
 export const TOOLPAD_TARGET_CLOUD = 'CLOUD';
@@ -16,3 +18,6 @@ export const SCHEDULE_DEMO_URL = 'https://calendly.com/prakhar-mui/toolpad';
 export const TOOLPAD_BRIDGE_GLOBAL = '__TOOLPAD_BRIDGE__';
 
 export const VERSION_CHECK_INTERVAL = 1000 * 60 * 10;
+
+// @TODO: Remove once global functions UI is ready
+export const GLOBAL_FUNCTIONS_FEATURE_FLAG = false;

@@ -17,6 +17,7 @@ import { SX_PROP_HELPER_TEXT } from './constants';
 export type TextFieldProps = Omit<MuiTextFieldProps, 'value' | 'onChange'> & {
   value: string;
   onChange: (newValue: string) => void;
+  label?: string;
   defaultValue: string;
   alignItems?: BoxProps['alignItems'];
   justifyContent?: BoxProps['justifyContent'];
@@ -34,7 +35,7 @@ function TextField({
 }: TextFieldProps) {
   const { onFormInputChange, formInputError, renderFormInput } = useFormInput<string>({
     name: rest.name,
-    label: rest.label as string,
+    label: rest.label,
     value,
     onChange,
     emptyValue: '',

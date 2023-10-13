@@ -3,6 +3,7 @@ import { gotoIfNotCurrent } from './shared';
 
 export interface ToolpadRuntimeOptions {
   prod: boolean;
+  base: string;
 }
 
 export class ToolpadRuntime {
@@ -14,24 +15,21 @@ export class ToolpadRuntime {
     this.page = page;
     this.options = {
       prod: false,
+      base: '/prod',
       ...options,
     };
   }
 
-  getPrefix() {
-    return this.options.prod ? '/prod' : '/preview';
-  }
-
   async goto() {
-    await gotoIfNotCurrent(this.page, this.getPrefix());
+    await gotoIfNotCurrent(this.page, this.options.base);
   }
 
   async gotoPage(pageName: string) {
-    await gotoIfNotCurrent(this.page, `${this.getPrefix()}/pages/${pageName}`);
+    await gotoIfNotCurrent(this.page, `${this.options.base}/pages/${pageName}`);
   }
 
   async gotoPageById(appId: string, pageId: string) {
-    await this.page.goto(`${this.getPrefix()}/pages/${pageId}`);
+    await this.page.goto(`${this.options.base}/pages/${pageId}`);
   }
 
   async waitForPageReady() {

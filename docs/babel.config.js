@@ -4,6 +4,11 @@ const { version: transformRuntimeVersion } = fse.readJSONSync(
   require.resolve('@babel/runtime-corejs2/package.json'),
 );
 
+const errorCodesPath = require.resolve('@mui/monorepo/docs/public/static/error-codes.json');
+const missingError = process.env.MUI_EXTRACT_ERROR_CODES === 'true' ? 'write' : 'annotate';
+
+const muiErrorMacro = require.resolve('@mui/monorepo/packages/mui-utils/macros/MuiError.macro');
+
 module.exports = {
   presets: [
     // backport of https://github.com/zeit/next.js/pull/9511
@@ -11,9 +16,14 @@ module.exports = {
   ],
   plugins: [
     [
-      'babel-plugin-transform-rename-import',
+      'babel-plugin-macros',
       {
-        replacements: [{ original: '@mui/utils/macros/MuiError.macro', replacement: 'react' }],
+        muiError: {
+          errorCodesPath,
+          missingError,
+        },
+        // TODO: Figure out dependency resolution for macros so this hack isn't needed.
+        resolvePath: () => muiErrorMacro,
       },
     ],
     'babel-plugin-optimize-clsx',

@@ -7,7 +7,15 @@ import { createProvidedContext } from '@mui/toolpad-utils/react';
 import { Stack } from '@mui/material';
 import { RuntimeEvents, ToolpadComponents, ToolpadComponent, ArgTypeDefinition } from './types';
 import { RUNTIME_PROP_NODE_ID, RUNTIME_PROP_SLOTS, TOOLPAD_COMPONENT } from './constants';
-import type { SlotType, ComponentConfig, RuntimeEvent, RuntimeError } from './types';
+import type {
+  SlotType,
+  ComponentConfig,
+  RuntimeEvent,
+  RuntimeError,
+  PaginationMode,
+  ToolpadDataProviderBase,
+  NodeId,
+} from './types';
 import { createComponent } from './browser';
 
 const ResetNodeErrorsKeyContext = React.createContext(0);
@@ -25,7 +33,7 @@ declare global {
 }
 
 export const NodeRuntimeContext = React.createContext<{
-  nodeId: string | null;
+  nodeId: NodeId | null;
   nodeName: string | null;
 }>({
   nodeId: null,
@@ -104,7 +112,7 @@ function NodeFiberHost({ children }: NodeFiberHostProps) {
 
 export interface NodeRuntimeWrapperProps {
   children: React.ReactElement;
-  nodeId: string;
+  nodeId: NodeId;
   nodeName: string;
   componentConfig: ComponentConfig<any>;
   NodeError: React.ComponentType<NodeErrorProps>;
@@ -159,6 +167,7 @@ export interface NodeRuntime<P> {
     key: K,
     value: React.SetStateAction<P[K]>,
   ) => void;
+  updateEditorNodeData: (key: string, value: any) => void;
 }
 
 export function useNode<P = {}>(): NodeRuntime<P> | null {
@@ -179,7 +188,15 @@ export function useNode<P = {}>(): NodeRuntime<P> | null {
           value,
         });
       },
+      updateEditorNodeData: (prop: string, value: any) => {
+        canvasEvents.emit('editorNodeDataUpdated', {
+          nodeId,
+          prop,
+          value,
+        });
+      },
     };
+
     return nodeRuntime;
   }, [canvasEvents, nodeId, nodeName]);
 }
@@ -275,3 +292,19 @@ export function useComponent(id: string) {
     );
   }, [components, id]);
 }
+
+export interface ToolpadDataProviderIntrospection {
+  paginationMode: PaginationMode;
+}
+
+export interface UseDataProviderHookResult<R, P extends PaginationMode> {
+  isLoading: boolean;
+  error?: unknown;
+  dataProvider: ToolpadDataProviderBase<R, P> | null;
+}
+
+export interface UseDataProviderHook {
+  <R, P extends PaginationMode>(id: string | null): UseDataProviderHookResult<R, P>;
+}
+
+export const UseDataProviderContext = React.createContext<UseDataProviderHook | null>(null);

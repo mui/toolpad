@@ -1,13 +1,15 @@
 import * as path from 'path';
 import * as fs from 'fs/promises';
+import * as url from 'url';
 import { test, expect, Locator } from '../../playwright/localTest';
 import { ToolpadEditor } from '../../models/ToolpadEditor';
 import clickCenter from '../../utils/clickCenter';
-import { folderExists } from '../../../packages/toolpad-utils/src/fs';
+
+const currentDirectory = url.fileURLToPath(new URL('.', import.meta.url));
 
 test.use({
   localAppConfig: {
-    template: path.resolve(__dirname, './fixture'),
+    template: path.resolve(currentDirectory, './fixture'),
     cmd: 'dev',
   },
 });
@@ -260,26 +262,6 @@ test('must deselect selected element when clicking outside of it', async ({ page
   const textFieldBoundingBox = await textField.boundingBox();
   await page.mouse.click(textFieldBoundingBox!.x + 150, textFieldBoundingBox!.y + 150);
   await expect(textFieldNodeHudTag).toBeHidden();
-});
-test('can rename page', async ({ page, localApp }) => {
-  const editorModel = new ToolpadEditor(page);
-  await editorModel.goToPageById('y4d19z0');
-  await editorModel.waitForOverlay();
-  await editorModel.goToPage('page4');
-  await editorModel.waitForOverlay();
-  const text = editorModel.appCanvas.getByText('text-foo');
-  const oldPageFolder = path.resolve(localApp.dir, './toolpad/pages/page4');
-  await expect.poll(async () => folderExists(oldPageFolder)).toBe(true);
-  const valueInput = await page.getByLabel('Node name');
-  await valueInput.click();
-  await page.keyboard.type('test1');
-  await valueInput.blur();
-  const text2 = editorModel.appCanvas.getByText('text-foo');
-  const newPageFolder = path.resolve(localApp.dir, './toolpad/pages/page4test1');
-  await expect.poll(async () => folderExists(oldPageFolder)).toBe(false);
-  await expect.poll(async () => folderExists(newPageFolder)).toBe(true);
-  await expect(text).toEqual(text2);
-  await fs.rename(newPageFolder, oldPageFolder);
 });
 
 test('can react to pages renamed on disk', async ({ page, localApp }) => {

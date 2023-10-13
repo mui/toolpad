@@ -1,6 +1,9 @@
 import * as path from 'path';
+import * as url from 'url';
 import { ToolpadRuntime } from '../../models/ToolpadRuntime';
 import { test, expect } from '../../playwright/localTest';
+
+const currentDirectory = url.fileURLToPath(new URL('.', import.meta.url));
 
 test.use({
   ignoreConsoleErrors: [
@@ -11,7 +14,7 @@ test.use({
 
 test.use({
   localAppConfig: {
-    template: path.resolve(__dirname, './fixture-chart'),
+    template: path.resolve(currentDirectory, './fixture-chart'),
     cmd: 'dev',
   },
 });

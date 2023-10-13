@@ -37,30 +37,47 @@ interface SetupContext {
   dir: string;
 }
 
-interface WithAppOptions {
-  build?: boolean;
-  // Command to start toolpad with
-  cmd?: 'start' | 'dev';
+interface ProjectConfig {
   // Template to be used as the starting point of the project folder toolpad is running in
   // This will copied to the temporary folder
   template?: string;
+  setup?: (ctx: SetupContext) => Promise<void>;
+}
+
+interface LocalAppConfig {
+  build?: boolean;
+  // Command to start toolpad with
+  cmd?: 'start' | 'dev';
   // Run toolpad editor app in local dev mode
   toolpadDev?: boolean;
-  setup?: (ctx: SetupContext) => Promise<void>;
   // Extra environment variables when running Toolpad
   env?: Record<string, string>;
   base?: string;
 }
 
+interface LocalServerConfig {
+  dev?: boolean;
+  env?: Record<string, string>;
+}
+
 const asyncDisposeSymbol: typeof Symbol.asyncDispose =
   Symbol.asyncDispose ?? Symbol('asyncDispose');
 
-async function getTestProjectDir() {
+async function getTestProjectDir({ template, setup }: ProjectConfig = {}) {
   const tmpTestDir = await fs.mkdtemp(path.resolve(currentDirectory, './tmp-'));
   // Each test runs in its own temporary folder to avoid race conditions when running tests in parallel.
   // It also avoids mutating the source code of the fixture while running the test.
   const projectDir = path.resolve(tmpTestDir, './fixture');
   await fs.mkdir(projectDir, { recursive: true });
+
+  if (template) {
+    await fs.cp(template, projectDir, { recursive: true });
+  }
+
+  if (setup) {
+    await setup({ dir: projectDir });
+  }
+
   return {
     path: projectDir,
     [asyncDisposeSymbol]: async () => {
@@ -69,12 +86,14 @@ async function getTestProjectDir() {
   };
 }
 
-async function runCustomServer(projectDir: string) {
+async function runCustomServer(projectDir: string, { dev = false, env = {} }: LocalServerConfig) {
+  const origEnv = { ...process.env };
+  Object.assign(process.env, env);
   const base = '/foo';
   const app = express();
 
   const toolpadHandler = await unstable_createHandler({
-    dev: true,
+    dev,
     externalUrl: 'http://localhost:3000',
     dir: projectDir,
     base,
@@ -90,20 +109,14 @@ async function runCustomServer(projectDir: string) {
     dir: projectDir,
     stdout: process.stdout,
     [asyncDisposeSymbol]: async () => {
+      process.env = origEnv;
       await server.close();
     },
   };
 }
 
-async function runApp(projectDir: string, options: WithAppOptions) {
-  const { cmd = 'start', build = cmd === 'start', template, setup, env, base } = options;
-  if (template) {
-    await fs.cp(template, projectDir, { recursive: true });
-  }
-
-  if (setup) {
-    await setup({ dir: projectDir });
-  }
+async function runApp(projectDir: string, options: LocalAppConfig) {
+  const { cmd = 'start', build = cmd === 'start', env, base } = options;
 
   if (build) {
     const buildArgs = [CLI_CMD, 'build'];
@@ -216,16 +229,20 @@ const test = baseTest.extend<
     localApp?: RunningLocalApp;
     projectDir: { path: string };
     toolpadDev: boolean;
-    customServer: RunningLocalApp;
-    localAppConfig?: WithAppOptions;
+    customServer?: RunningLocalApp;
+    localAppConfig?: LocalAppConfig;
+    customServerConfig?: LocalServerConfig;
+    projectConfig?: ProjectConfig;
   }
 >({
   toolpadDev: [!!process.env.TOOLPAD_NEXT_DEV, { option: true, scope: 'worker' }],
   localAppConfig: [undefined, { option: true, scope: 'worker' }],
+  customServerConfig: [undefined, { option: true, scope: 'worker' }],
+  projectConfig: [undefined, { option: true, scope: 'worker' }],
   projectDir: [
     // eslint-disable-next-line no-empty-pattern
-    async ({}, use) => {
-      await using(await getTestProjectDir(), async (projectDir) => {
+    async ({ projectConfig }, use) => {
+      await using(await getTestProjectDir(projectConfig), async (projectDir) => {
         await use(projectDir);
       });
     },
@@ -233,10 +250,14 @@ const test = baseTest.extend<
   ],
   customServer: [
     // eslint-disable-next-line no-empty-pattern
-    async ({ projectDir }, use) => {
-      await using(await runCustomServer(projectDir.path), async (app) => {
-        await use(app);
-      });
+    async ({ projectDir, customServerConfig }, use) => {
+      if (customServerConfig) {
+        await using(await runCustomServer(projectDir.path, customServerConfig), async (app) => {
+          await use(app);
+        });
+      } else {
+        await use(undefined);
+      }
     },
     { scope: 'worker', timeout: 60000 },
   ],

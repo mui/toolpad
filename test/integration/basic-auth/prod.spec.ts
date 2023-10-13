@@ -1,5 +1,6 @@
 import * as path from 'path';
 import * as url from 'url';
+import invariant from 'invariant';
 import { test, expect } from '../../playwright/localTest';
 
 const currentDirectory = url.fileURLToPath(new URL('.', import.meta.url));
@@ -11,8 +12,10 @@ test.use({
 });
 
 test.use({
-  localAppConfig: {
+  projectConfig: {
     template: path.resolve(currentDirectory, './fixture'),
+  },
+  localAppConfig: {
     cmd: 'start',
     env: {
       TOOLPAD_BASIC_AUTH_USER: 'foo',
@@ -32,6 +35,11 @@ test('Access is blocked to API route', async ({ request }) => {
 });
 
 test('Access is granted when authenticated', async ({ browserName, page, localApp }) => {
+  invariant(
+    localApp,
+    'test must be configured with `localAppConfig`. Add `test.use({ localAppConfig: ... })`',
+  );
+
   test.skip(
     browserName === 'firefox',
     'Fails due to https://bugzilla.mozilla.org/show_bug.cgi?id=1742396',

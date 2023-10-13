@@ -9,8 +9,10 @@ import { ToolpadEditor } from '../../models/ToolpadEditor';
 const currentDirectory = url.fileURLToPath(new URL('.', import.meta.url));
 
 test.use({
-  localAppConfig: {
+  projectConfig: {
     template: path.resolve(currentDirectory, './fixture'),
+  },
+  localAppConfig: {
     cmd: 'dev',
   },
 });

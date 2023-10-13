@@ -14,17 +14,19 @@ const currentDirectory = url.fileURLToPath(new URL('.', import.meta.url));
 let testServer: Awaited<ReturnType<typeof startTestServer>> | undefined;
 
 test.use({
-  localAppConfig: {
+  projectConfig: {
     template: path.resolve(currentDirectory, './fixture'),
-    cmd: 'dev',
-    env: {
-      TEST_VAR: 'foo',
-    },
     async setup(ctx) {
       testServer = await startTestServer();
       const targetUrl = `http://localhost:${testServer.port}/`;
       const pageFilePath = path.resolve(ctx.dir, './toolpad/pages/page1/page.yml');
       await fileReplaceAll(pageFilePath, `http://localhost:8080/`, targetUrl);
+    },
+  },
+  localAppConfig: {
+    cmd: 'dev',
+    env: {
+      TEST_VAR: 'foo',
     },
   },
 });

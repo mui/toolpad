@@ -1,13 +1,34 @@
 import * as path from 'path';
 import * as url from 'url';
-import { ToolpadEditor } from '../../models/ToolpadEditor';
-import { test, expect, Locator } from '../../playwright/localTest';
-import clickCenter from '../../utils/clickCenter';
+import invariant from 'invariant';
+import { test } from '../../playwright/localTest';
+import { expectBasicPageContent } from '../backend-basic/shared';
 
 const currentDirectory = url.fileURLToPath(new URL('.', import.meta.url));
 
-test.use({});
+test.use({
+  projectConfig: {
+    template: path.resolve(currentDirectory, '../backend-basic/fixture'),
+  },
+  customServerConfig: {
+    dev: true,
+    env: {
+      SECRET_BAZ: 'Some baz secret',
+    },
+  },
+});
 
-test('hello', ({ customServer }) => {
-  console.log(customServer.url);
+test('custom server', async ({ context, customServer, page }) => {
+  invariant(
+    customServer,
+    'test must be configured with `customServerConfig`. Add `test.use({ customServerConfig: ... })`',
+  );
+
+  await context.addCookies([
+    { name: 'MY_TOOLPAD_COOKIE', value: 'foo-bar-baz', domain: 'localhost', path: '/' },
+  ]);
+
+  await page.goto(customServer.url);
+
+  await expectBasicPageContent(page);
 });

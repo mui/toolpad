@@ -172,7 +172,7 @@ export default class FunctionsManager {
   private async extractTypes() {
     if (!this.extractTypesWorker) {
       this.extractTypesWorker = new Piscina({
-        filename: path.join(currentDirectory, 'functionsTypesWorker.js'),
+        filename: path.resolve(currentDirectory, '../cli/functionsTypesWorker.js'),
       });
     }
 

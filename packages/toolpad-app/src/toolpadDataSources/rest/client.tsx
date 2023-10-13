@@ -53,7 +53,6 @@ import { createHarLog, mergeHar } from '../../utils/har';
 import useFetchPrivate from '../useFetchPrivate';
 import QueryPreview from '../QueryPreview';
 import { usePrivateQuery } from '../context';
-import config from '../../config';
 import QueryToolsContext from '../../toolpad/AppEditor/PageEditor/QueryEditor/QueryToolsContext';
 
 const HTTP_METHODS = ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'HEAD'];
@@ -261,6 +260,7 @@ function QueryEditor({
   settingsToggle,
   settingsTab,
   tabType,
+  runtimeConfig,
 }: QueryEditorProps<RestConnectionParams, FetchQuery>) {
   const appStateApi = useAppStateApi();
   const isBrowserSide = input.attributes.query.browser;
@@ -269,7 +269,7 @@ function QueryEditor({
   const baseUrl = isBrowserSide ? null : connectionParams?.baseUrl ?? null;
   // input.attributes.query.url will be reset when it's empty
   const urlValue: BindableAttrValue<string> =
-    input.attributes.query.url ?? getDefaultUrl(config, connectionParams);
+    input.attributes.query.url ?? getDefaultUrl(runtimeConfig, connectionParams);
 
   const {
     toolsTabType,

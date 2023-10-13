@@ -23,7 +23,6 @@ import {
   folderExists,
   readJsonFile,
 } from '@mui/toolpad-utils/fs';
-import getPort from 'get-port';
 import { z } from 'zod';
 import * as appDom from '../appDom';
 import insecureHash from '../utils/insecureHash';
@@ -50,14 +49,18 @@ import {
   ResponseType as AppDomRestResponseType,
 } from '../toolpadDataSources/rest/types';
 import { LocalQuery } from '../toolpadDataSources/local/types';
-import { ProjectEvents, ToolpadProjectOptions, CodeEditorFileType } from '../types';
+import type {
+  RuntimeConfig,
+  ProjectEvents,
+  ToolpadProjectOptions,
+  CodeEditorFileType,
+} from '../types';
 import { Awaitable } from '../utils/types';
 import EnvManager from './EnvManager';
 import FunctionsManager, { CreateDataProviderOptions } from './FunctionsManager';
 import { VersionInfo, checkVersion } from './versionInfo';
 import { VERSION_CHECK_INTERVAL } from '../constants';
 import DataManager from './DataManager';
-import type { RuntimeConfig } from '../config';
 import { PAGE_COLUMN_COMPONENT_ID, PAGE_ROW_COMPONENT_ID } from '../runtime/toolpadComponents';
 
 invariant(
@@ -1217,18 +1220,14 @@ class ToolpadProject {
     return config;
   }
 
-  getRuntimeConfig(): RuntimeConfig {
+  async getRuntimeConfig(): Promise<RuntimeConfig> {
     // When these fail, you are likely trying to retrieve this information during the
     // toolpad build. It's fundamentally wrong to use this information as it strictly holds
     // information about the running toolpad instance.
     invariant(this.options.externalUrl, 'External URL is not set');
-    invariant(this.options.base, 'Base path is not set');
 
     return {
       externalUrl: this.options.externalUrl,
-      projectDir: this.getRoot(),
-      wsPort: this.options.wsPort,
-      base: this.options.base,
     };
   }
 
@@ -1289,10 +1288,6 @@ export async function initProject({ dir: dirInput, ...config }: InitProjectOptio
     customServer: false,
     ...config,
   };
-
-  if (resolvedConfig.dev && !resolvedConfig.wsPort) {
-    resolvedConfig.wsPort = await getPort();
-  }
 
   await migrateLegacyProject(dir);
 

@@ -54,7 +54,10 @@ export const INTERNAL_COMPONENTS = new Map<string, ToolpadComponentDefinition>([
       synonyms: ['graph', 'bar chart', 'pie chart', 'line chart', 'plot'],
     },
   ],
-  ['TextField', { displayName: 'Text Field', builtIn: 'TextField', synonyms: ['input', 'field'] }],
+  [
+    'TextField',
+    { displayName: 'Text Field', builtIn: 'TextField', synonyms: ['input', 'field', 'password'] },
+  ],
   ['DatePicker', { displayName: 'Date Picker', builtIn: 'DatePicker', synonyms: ['time'] }],
   ['FilePicker', { displayName: 'File Picker', builtIn: 'FilePicker', synonyms: [] }],
   ['Text', { displayName: 'Text', builtIn: 'Text', synonyms: ['markdown', 'link', 'output'] }],

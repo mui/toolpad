@@ -108,7 +108,7 @@ export default createBuiltin(FormWrappedTextField, {
       type: 'boolean',
     },
     password: {
-      helperText: 'Whether the input is of password type',
+      helperText: "Masks the input to hide what's being typed.",
       type: 'boolean',
     },
     placeholder: {

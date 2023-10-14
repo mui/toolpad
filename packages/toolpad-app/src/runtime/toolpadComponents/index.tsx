@@ -91,6 +91,15 @@ export const INTERNAL_COMPONENTS = new Map<string, ToolpadComponentDefinition>([
   ['Metric', { displayName: 'Metric', builtIn: 'Metric', synonyms: ['value', 'number', 'output'] }],
   ['Checkbox', { displayName: 'Checkbox', builtIn: 'Checkbox', synonyms: ['switch'] }],
   [FORM_COMPONENT_ID, { displayName: 'Form', builtIn: 'Form', synonyms: [] }],
+  [
+    'Password',
+    {
+      displayName: 'Password',
+      builtIn: 'TextField',
+      synonyms: [],
+      initialProps: { password: true },
+    },
+  ],
 ]);
 
 function createCodeComponent(domNode: appDom.CodeComponentNode): ToolpadComponentDefinition {

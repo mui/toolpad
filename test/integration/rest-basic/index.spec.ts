@@ -1,6 +1,7 @@
 import * as path from 'path';
 import * as fs from 'fs/promises';
 import * as url from 'url';
+import invariant from 'invariant';
 import { fileReplaceAll } from '../../../packages/toolpad-utils/src/fs';
 import { test, expect } from '../../playwright/localTest';
 import { ToolpadRuntime } from '../../models/ToolpadRuntime';
@@ -13,17 +14,19 @@ const currentDirectory = url.fileURLToPath(new URL('.', import.meta.url));
 let testServer: Awaited<ReturnType<typeof startTestServer>> | undefined;
 
 test.use({
-  localAppConfig: {
+  projectConfig: {
     template: path.resolve(currentDirectory, './fixture'),
-    cmd: 'dev',
-    env: {
-      TEST_VAR: 'foo',
-    },
     async setup(ctx) {
       testServer = await startTestServer();
       const targetUrl = `http://localhost:${testServer.port}/`;
       const pageFilePath = path.resolve(ctx.dir, './toolpad/pages/page1/page.yml');
       await fileReplaceAll(pageFilePath, `http://localhost:8080/`, targetUrl);
+    },
+  },
+  localAppConfig: {
+    cmd: 'dev',
+    env: {
+      TEST_VAR: 'foo',
     },
   },
 });
@@ -33,6 +36,11 @@ test.afterAll(async () => {
 });
 
 test('rest runtime basics', async ({ page, localApp }) => {
+  invariant(
+    localApp,
+    'test must be configured with `localAppConfig`. Add `test.use({ localAppConfig: ... })`',
+  );
+
   const runtimeModel = new ToolpadRuntime(page);
   await runtimeModel.gotoPage('page1');
   await expect(page.locator('text="query1: query1_value"')).toBeVisible();
@@ -54,6 +62,11 @@ test('rest runtime basics', async ({ page, localApp }) => {
 });
 
 test('rest editor basics', async ({ page, context, localApp, argosScreenshot }) => {
+  invariant(
+    localApp,
+    'test must be configured with `localAppConfig`. Add `test.use({ localAppConfig: ... })`',
+  );
+
   const editorModel = new ToolpadEditor(page);
   await editorModel.goto();
   await editorModel.waitForOverlay();

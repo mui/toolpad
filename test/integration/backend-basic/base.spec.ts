@@ -1,7 +1,11 @@
 import * as path from 'path';
+import * as url from 'url';
+import invariant from 'invariant';
 import { expect, test } from '../../playwright/localTest';
 import { ToolpadRuntime } from '../../models/ToolpadRuntime';
 import { expectBasicPageContent } from './shared';
+
+const currentDirectory = url.fileURLToPath(new URL('.', import.meta.url));
 
 test.use({
   ignoreConsoleErrors: [
@@ -12,8 +16,10 @@ test.use({
 });
 
 test.use({
+  projectConfig: {
+    template: path.resolve(currentDirectory, './fixture'),
+  },
   localAppConfig: {
-    template: path.resolve(__dirname, './fixture'),
     cmd: 'dev',
     env: {
       SECRET_BAZ: 'Some baz secret',
@@ -23,6 +29,11 @@ test.use({
 });
 
 test('base path basics', async ({ page, context, localApp }) => {
+  invariant(
+    localApp,
+    'test must be configured with `localAppConfig`. Add `test.use({ localAppConfig: ... })`',
+  );
+
   await context.addCookies([
     { name: 'MY_TOOLPAD_COOKIE', value: 'foo-bar-baz', domain: 'localhost', path: '/' },
   ]);

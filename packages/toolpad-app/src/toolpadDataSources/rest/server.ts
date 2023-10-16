@@ -148,7 +148,8 @@ async function execBase(
     parameters: params,
   };
 
-  const urlvalue = fetchQuery.url || getDefaultUrl(project.getRuntimeConfig(), connection);
+  const runtimeConfig = await project.getRuntimeConfig();
+  const urlvalue = fetchQuery.url || getDefaultUrl(runtimeConfig, connection);
 
   const resolvedUrl = resolveBindable(jsRuntime, urlvalue, queryScope);
   const resolvedSearchParams = resolveBindableEntries(

@@ -14,6 +14,12 @@ import type * as appDom from './appDom';
 import type { Awaitable, Maybe, WithControlledProp } from './utils/types';
 import type { Rectangle } from './utils/geometry';
 
+// These are set at runtime and passed to the browser.
+// Do not add secrets
+export interface RuntimeConfig {
+  externalUrl: string;
+}
+
 declare global {
   interface Error {
     code?: unknown;
@@ -94,6 +100,7 @@ export interface QueryEditorProps<C, Q, A extends Methods = {}>
   globalScopeMeta: ScopeMeta;
   onChange: React.Dispatch<React.SetStateAction<appDom.QueryNode<Q>>>;
   onCommit?: () => void;
+  runtimeConfig: RuntimeConfig;
 }
 
 export type QueryEditor<C, Q, A extends Methods> = React.FC<QueryEditorProps<C, Q, A>>;
@@ -210,7 +217,6 @@ export type ProjectEvents = {
 export interface ToolpadProjectOptions {
   dev: boolean;
   externalUrl?: string;
-  wsPort?: number;
   base: string;
   customServer: boolean;
 }

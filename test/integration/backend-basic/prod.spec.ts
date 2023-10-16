@@ -1,7 +1,10 @@
 import * as path from 'path';
+import * as url from 'url';
 import { test } from '../../playwright/localTest';
 import { ToolpadRuntime } from '../../models/ToolpadRuntime';
 import { expectBasicPageContent } from './shared';
+
+const currentDirectory = url.fileURLToPath(new URL('.', import.meta.url));
 
 test.use({
   ignoreConsoleErrors: [
@@ -15,8 +18,10 @@ test.use({
 });
 
 test.use({
+  projectConfig: {
+    template: path.resolve(currentDirectory, './fixture'),
+  },
   localAppConfig: {
-    template: path.resolve(__dirname, './fixture'),
     cmd: 'start',
     env: {
       SECRET_BAZ: 'Some baz secret',

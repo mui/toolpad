@@ -47,6 +47,9 @@ export function createRpcServer(project: ToolpadProject) {
     createDataProvider: createMethod<typeof project.createDataProvider>(({ params }) => {
       return project.createDataProvider(...params);
     }),
+    getRuntimeConfig: createMethod<typeof project.getRuntimeConfig>(({ params }) => {
+      return project.getRuntimeConfig(...params);
+    }),
   } satisfies MethodResolvers;
 }
 

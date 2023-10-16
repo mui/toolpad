@@ -9,6 +9,6 @@
   },
   "dependencies": {
     "@mui/toolpad": "0.1.32",
-    "recharts": "2.8.0"
+    "recharts": "2.9.0"
   }
 }

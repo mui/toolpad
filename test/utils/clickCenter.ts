@@ -1,8 +1,10 @@
 import { Page, Locator, expect } from '@playwright/test';
 
 export default async function clickCenter(page: Page, targetLocator: Locator) {
+  await expect(targetLocator).toBeAttached();
+
   const targetBoundingBox = await targetLocator.boundingBox();
-  await expect(targetBoundingBox).toBeDefined();
+  expect(targetBoundingBox).toBeTruthy();
 
   await page.mouse.click(
     targetBoundingBox!.x + targetBoundingBox!.width / 2,

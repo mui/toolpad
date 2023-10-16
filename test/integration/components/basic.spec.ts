@@ -41,8 +41,10 @@ async function waitForComponents(page: Page, frame: Page | FrameLocator = page) 
 }
 
 test.use({
-  localAppConfig: {
+  projectConfig: {
     template: path.resolve(currentDirectory, './fixture-basic'),
+  },
+  localAppConfig: {
     cmd: 'dev',
   },
 });

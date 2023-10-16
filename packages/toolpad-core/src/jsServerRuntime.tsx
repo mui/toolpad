@@ -27,9 +27,10 @@ export function createServerJsRuntime(env?: Record<string, string | undefined>):
   };
 }
 
-export function useServerJsRuntime(processEnv: Record<string, string | undefined> = {}): JsRuntime {
+export function useServerJsRuntime(): JsRuntime {
   return React.useMemo(() => {
     // process.env is not available in the browser
+    const processEnv = {};
     return createServerJsRuntime(processEnv);
-  }, [processEnv]);
+  }, []);
 }

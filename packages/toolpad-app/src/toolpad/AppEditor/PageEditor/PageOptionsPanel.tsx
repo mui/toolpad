@@ -1,4 +1,12 @@
-import { Stack, Typography, Divider, Tooltip, Link, ToggleButtonGroup, ToggleButton } from '@mui/material';
+import {
+  Stack,
+  Typography,
+  Divider,
+  Tooltip,
+  Link,
+  ToggleButtonGroup,
+  ToggleButton,
+} from '@mui/material';
 import * as React from 'react';
 import { useAppState, useDomApi } from '../../AppState';
 import { usePageEditorState } from './PageEditorProvider';
@@ -21,14 +29,14 @@ export default function PageOptionsPanel() {
   const page = appDom.getNode(dom, pageNodeId, 'page');
 
   const handleDisplayModeChange = React.useCallback(
-    (event: React.ChangeEvent<HTMLInputElement>) => {
+    (event: React.MouseEvent<HTMLElement>, newValue: string) => {
       domApi.update((draft) =>
         appDom.setNodeNamespacedProp(
           draft,
           page,
           'attributes',
           'display',
-          event.target.value as appDom.PageDisplayMode,
+          newValue as appDom.PageDisplayMode,
         ),
       );
     },
@@ -60,14 +68,16 @@ export default function PageOptionsPanel() {
       >
         <ToggleButtonGroup
           exclusive
-          value={page.attributes.display ?? "shell"}
+          value={page.attributes.display ?? 'shell'}
           onChange={handleDisplayModeChange}
           aria-label="Display mode"
           fullWidth
         >
           {PAGE_DISPLAY_OPTIONS.map((option) => {
             return (
-              <ToggleButton key={option.value} value={option.value}>{option.label}</ToggleButton>
+              <ToggleButton key={option.value} value={option.value}>
+                {option.label}
+              </ToggleButton>
             );
           })}
         </ToggleButtonGroup>

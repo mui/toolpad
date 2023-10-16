@@ -141,7 +141,8 @@ export default function Toolpad({ appUrl, basename }: ToolpadProps) {
       {/* CssBaseline kickstart an elegant, consistent, and simple baseline to build upon. */}
       <CssBaseline />
       {/* Container that allows children to size to it with height: 100% */}
-      <Box sx={{ height: '1px', minHeight: '100vh' }}>
+      {/* @TODO: pls delet sir pls */}
+      <Box id="yamaha" sx={{ height: '1px', minHeight: '100vh' }}>
         <ErrorBoundary fallbackRender={ErrorFallback}>
           <React.Suspense fallback={<FullPageLoader />}>
             <QueryClientProvider client={queryClient}>

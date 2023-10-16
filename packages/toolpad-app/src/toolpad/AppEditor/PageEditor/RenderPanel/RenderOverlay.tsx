@@ -1368,6 +1368,17 @@ export default function RenderOverlay({ bridge }: RenderOverlayProps) {
     [api, domApi, draggedEdge, draggedNode, nodesInfo],
   );
 
+  // @TODO: Keep trying
+  // React.useEffect(() => {
+  //   if (draggedEdge) {
+  //     document.getElementById('yamaha').addEventListener('mouseup', handleEdgeDragEnd, true);
+
+  //     return () => {
+  //       document.getElementById('yamaha').removeEventListener('mouseup', handleEdgeDragEnd, true);
+  //     };
+  //   }
+  // }, [draggedEdge, handleEdgeDragEnd]);
+
   return (
     <OverlayRoot
       data-testid="page-overlay"
@@ -1385,7 +1396,6 @@ export default function RenderOverlay({ bridge }: RenderOverlayProps) {
       {...(draggedEdge
         ? {
             onMouseMove: handleEdgeDragOver,
-            onMouseUp: handleEdgeDragEnd,
           }
         : {
             onDragOver: handleNodeDragOver,

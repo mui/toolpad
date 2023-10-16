@@ -36,6 +36,8 @@ export { default as Checkbox } from './Checkbox';
 
 export { default as Form } from './Form';
 
+export { default as Spacer } from './Spacer';
+
 export { default as Metric } from './Metric';
 export type { ColorScale, ColorScaleStop } from './Metric';
 

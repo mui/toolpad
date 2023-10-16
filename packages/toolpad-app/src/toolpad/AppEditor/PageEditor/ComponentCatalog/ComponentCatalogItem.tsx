@@ -33,6 +33,7 @@ import TagIcon from '@mui/icons-material/Tag';
 import PasswordIcon from '@mui/icons-material/Password';
 import LinkIcon from '@mui/icons-material/Link';
 import TextFormatIcon from '@mui/icons-material/TextFormat';
+import SpaceBarIcon from '@mui/icons-material/SpaceBar';
 
 const iconMap = new Map<string, React.ComponentType<SvgIconProps>>([
   ['Password', PasswordIcon],
@@ -68,6 +69,7 @@ const iconMap = new Map<string, React.ComponentType<SvgIconProps>>([
   ['PageRow', TableRowsIcon],
   ['PageColumn', ViewColumnIcon],
   ['Metric', TagIcon],
+  ['Spacer', SpaceBarIcon],
 ]);
 
 type ComponentItemKind = 'future' | 'builtIn' | 'create' | 'custom';

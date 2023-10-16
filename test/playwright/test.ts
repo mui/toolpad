@@ -1,6 +1,4 @@
 import { ConsoleMessage, test as base } from '@playwright/test';
-import { createRpcClient, RpcClient } from '../../packages/toolpad-app/src/rpcClient';
-import type { ServerDefinition } from '../../packages/toolpad-app/src/server/rpc';
 
 export * from '@playwright/test';
 
@@ -26,7 +24,7 @@ const IGNORED_ERRORS = [
 
 export type Options = { ignoreConsoleErrors: RegExp[] };
 
-export const test = base.extend<Options & { api: RpcClient<ServerDefinition> }>({
+export const test = base.extend<Options>({
   ignoreConsoleErrors: [[], { option: true }],
 
   page: async ({ page, ignoreConsoleErrors }, use) => {
@@ -67,11 +65,5 @@ export const test = base.extend<Options & { api: RpcClient<ServerDefinition> }>(
         throw new Error(`Console error message detected\n${JSON.stringify(entry, null, 2)}`);
       }
     }
-  },
-
-  api: async ({ baseURL }, use) => {
-    const endpoint = new URL('/api/rpc', baseURL).href;
-    const api = createRpcClient<ServerDefinition>(endpoint);
-    await use(api);
   },
 });

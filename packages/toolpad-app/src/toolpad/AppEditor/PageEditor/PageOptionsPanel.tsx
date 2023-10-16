@@ -29,7 +29,7 @@ export default function PageOptionsPanel() {
   const page = appDom.getNode(dom, pageNodeId, 'page');
 
   const handleDisplayModeChange = React.useCallback(
-    (event: React.MouseEvent<HTMLElement>, newValue: string) => {
+    (event: React.MouseEvent<HTMLElement>, newValue: appDom.PageDisplayMode) => {
       domApi.update((draft) =>
         appDom.setNodeNamespacedProp(
           draft,

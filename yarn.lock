@@ -11574,7 +11574,14 @@ sucrase@^3.20.3, sucrase@^3.21.0:
     pirates "^4.0.1"
     ts-interface-checker "^0.1.9"
 
-superjson@1.13.3, superjson@^1.10.0:
+superjson@2.0.0:
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/superjson/-/superjson-2.0.0.tgz#7abcbe6c1badc2e689ea62c375ca257666a68282"
+  integrity sha512-W3n+NJ7TFjaLle8ihIIvsr/bbuKpnxeatsyjmhy7iSkom+/cshaHziCQAWXrHGWJVQSQFDOuES6C3nSEvcbrQg==
+  dependencies:
+    copy-anything "^3.0.2"
+
+superjson@^1.10.0:
   version "1.13.3"
   resolved "https://registry.yarnpkg.com/superjson/-/superjson-1.13.3.tgz#3bd64046f6c0a47062850bb3180ef352a471f930"
   integrity sha512-mJiVjfd2vokfDxsQPOwJ/PtanO87LhpYY88ubI5dUB1Ab58Txbyje3+jpm+/83R/fevaq/107NNhtYBLuoTrFg==

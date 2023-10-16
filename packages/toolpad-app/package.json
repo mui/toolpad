@@ -1,6 +1,6 @@
 {
   "name": "@mui/toolpad",
-  "version": "0.1.31",
+  "version": "0.1.32",
   "license": "MIT",
   "bin": {
     "toolpad": "./cli.js"
@@ -56,15 +56,15 @@
     "@mui/lab": "5.0.0-alpha.148",
     "@mui/material": "5.14.13",
     "@mui/system": "5.14.13",
-    "@mui/toolpad-components": "0.1.31",
-    "@mui/toolpad-core": "0.1.31",
-    "@mui/toolpad-utils": "0.1.31",
+    "@mui/toolpad-components": "0.1.32",
+    "@mui/toolpad-core": "0.1.32",
+    "@mui/toolpad-utils": "0.1.32",
     "@mui/types": "7.2.6",
     "@mui/utils": "5.14.13",
-    "@mui/x-data-grid": "6.16.1",
-    "@mui/x-data-grid-pro": "6.16.1",
-    "@mui/x-date-pickers": "6.16.1",
-    "@mui/x-date-pickers-pro": "6.16.1",
+    "@mui/x-data-grid": "6.16.2",
+    "@mui/x-data-grid-pro": "6.16.2",
+    "@mui/x-date-pickers": "6.16.2",
+    "@mui/x-date-pickers-pro": "6.16.2",
     "@mui/x-tree-view": "6.0.0-beta.0",
     "@tanstack/react-query": "4.36.1",
     "@tanstack/react-query-devtools": "4.36.1",
@@ -172,6 +172,5 @@
   "typings": "./index.d.ts",
   "publishConfig": {
     "access": "public"
-  },
-  "gitHead": "0186d8a811d0c172f193d8e961cd763d5024b71a"
+  }
 }

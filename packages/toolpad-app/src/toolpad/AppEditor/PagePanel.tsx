@@ -5,7 +5,7 @@ import PagesExplorer from './PagesExplorer';
 import PageHierarchyExplorer from './HierarchyExplorer';
 import { useAppState } from '../AppState';
 import AppOptions from '../AppOptions';
-import config from '../../config';
+import { useProject } from '../../project';
 
 const PagePanelRoot = styled('div')({
   display: 'flex',
@@ -18,6 +18,7 @@ export interface ComponentPanelProps {
 }
 
 export default function PagePanel({ className, sx }: ComponentPanelProps) {
+  const project = useProject();
   const { dom } = useAppState();
 
   return (
@@ -33,7 +34,7 @@ export default function PagePanel({ className, sx }: ComponentPanelProps) {
           alignItems: 'center',
         }}
       >
-        <Typography noWrap>{config.projectDir?.split(/[/\\]/).pop()}</Typography>
+        <Typography noWrap>{project.rootDir.split(/[/\\]/).pop()}</Typography>
 
         <AppOptions dom={dom} />
       </Box>

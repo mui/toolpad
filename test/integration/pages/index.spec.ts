@@ -1,12 +1,18 @@
 import * as path from 'path';
+import * as url from 'url';
 import * as fs from 'fs/promises';
+import invariant from 'invariant';
 import { ToolpadEditor } from '../../models/ToolpadEditor';
 import { test, expect } from '../../playwright/localTest';
 import { folderExists } from '../../../packages/toolpad-utils/src/fs';
 
+const currentDirectory = url.fileURLToPath(new URL('.', import.meta.url));
+
 test.use({
+  projectConfig: {
+    template: path.resolve(currentDirectory, './fixture'),
+  },
   localAppConfig: {
-    template: path.resolve(__dirname, './fixture'),
     cmd: 'dev',
   },
 });
@@ -33,6 +39,11 @@ test('must show a message when a non-existing url is accessed', async ({ page })
 });
 
 test('can rename page', async ({ page, localApp }) => {
+  invariant(
+    localApp,
+    'test must be configured with `localAppConfig`. Add `test.use({ localAppConfig: ... })`',
+  );
+
   const editorModel = new ToolpadEditor(page);
 
   await editorModel.goToPageById('g433ywb');

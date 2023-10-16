@@ -50,7 +50,6 @@ export default function NodeMenu({
   const handleDeleteNodeDialogClose = React.useCallback(
     (confirmed: boolean, event: React.MouseEvent) => {
       event.stopPropagation();
-
       setDeletedNodeId(null);
       if (confirmed && deletedNode) {
         onDeleteNode?.(deletedNodeId);
@@ -61,8 +60,8 @@ export default function NodeMenu({
 
   const handleRenameClick = React.useCallback(
     (event: React.MouseEvent) => {
-      onMenuClose(event);
       onRenameNode?.(nodeId);
+      onMenuClose(event);
     },
     [nodeId, onRenameNode, onMenuClose],
   );
@@ -88,24 +87,30 @@ export default function NodeMenu({
           menuProps.onClick?.(event);
         }}
       >
-        <MenuItem onClick={handleRenameClick}>
-          <ListItemIcon>
-            <ModeEditIcon />
-          </ListItemIcon>
-          <ListItemText>{renameLabelText}</ListItemText>
-        </MenuItem>
-        <MenuItem onClick={handleDuplicateClick}>
-          <ListItemIcon>
-            <ContentCopyIcon />
-          </ListItemIcon>
-          <ListItemText>{duplicateLabelText}</ListItemText>
-        </MenuItem>
-        <MenuItem onClick={handleDeleteNodeDialogOpen}>
-          <ListItemIcon>
-            <DeleteIcon />
-          </ListItemIcon>
-          <ListItemText>{deleteLabelText}</ListItemText>
-        </MenuItem>
+        {onRenameNode ? (
+          <MenuItem onClick={handleRenameClick}>
+            <ListItemIcon>
+              <ModeEditIcon />
+            </ListItemIcon>
+            <ListItemText>{renameLabelText}</ListItemText>
+          </MenuItem>
+        ) : null}
+        {onDuplicateNode ? (
+          <MenuItem onClick={handleDuplicateClick}>
+            <ListItemIcon>
+              <ContentCopyIcon />
+            </ListItemIcon>
+            <ListItemText>{duplicateLabelText}</ListItemText>
+          </MenuItem>
+        ) : null}
+        {onDeleteNode ? (
+          <MenuItem onClick={handleDeleteNodeDialogOpen}>
+            <ListItemIcon>
+              <DeleteIcon />
+            </ListItemIcon>
+            <ListItemText>{deleteLabelText}</ListItemText>
+          </MenuItem>
+        ) : null}
       </Menu>
       <ConfirmDialog
         open={!!deletedNode}

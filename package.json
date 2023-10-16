@@ -45,7 +45,7 @@
     "@argos-ci/core": "0.12.0",
     "@mui/monorepo": "https://github.com/mui/material-ui.git",
     "@next/eslint-plugin-next": "13.5.5",
-    "@playwright/test": "1.38.1",
+    "@playwright/test": "1.39.0",
     "@testing-library/react": "14.0.0",
     "@types/archiver": "5.3.3",
     "@types/gtag.js": "0.0.16",

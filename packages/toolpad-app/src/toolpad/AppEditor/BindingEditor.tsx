@@ -71,7 +71,7 @@ interface BindingEditorContext {
   disabled?: boolean;
   propType?: PropValueType;
   liveBinding?: LiveBinding;
-  envVarNames?: string[];
+  env?: Record<string, string>;
 }
 
 const [useBindingEditorContext, BindingEditorContextProvider] =
@@ -138,8 +138,8 @@ function JsExpressionPreview({ jsRuntime, input, globalScope }: JsExpressionPrev
 export interface EnvBindingEditorProps extends WithControlledProp<EnvAttrValue | null> {}
 
 export function EnvBindingEditor({ value, onChange }: EnvBindingEditorProps) {
-  const { envVarNames = [] } = useBindingEditorContext();
-
+  const context = useBindingEditorContext();
+  const env = Object.values(context.env ?? {});
   const handleInputChange = React.useCallback(
     (event: React.SyntheticEvent, newValue: string | null) => {
       onChange({
@@ -154,7 +154,7 @@ export function EnvBindingEditor({ value, onChange }: EnvBindingEditorProps) {
       <Typography>Assign to an environment variable</Typography>
       <Autocomplete
         freeSolo
-        options={envVarNames}
+        options={env}
         value={value?.$$env || ''}
         onInputChange={handleInputChange}
         renderInput={(params) => (
@@ -164,7 +164,7 @@ export function EnvBindingEditor({ value, onChange }: EnvBindingEditorProps) {
             sx={{ my: 3 }}
             label="Environment variable name"
             helperText={
-              value?.$$env && !envVarNames.includes(value.$$env)
+              value?.$$env && !env.includes(value.$$env)
                 ? 'Warning: This variable is not in your env file!'
                 : ''
             }
@@ -195,10 +195,10 @@ export function ValueBindingEditor({ value, onChange, error }: ValueBindingEdito
     globalScopeMeta = {},
     jsRuntime,
     propType,
-    envVarNames,
+    env,
   } = useBindingEditorContext();
 
-  const hasEnv = Boolean(envVarNames);
+  const hasEnv = Boolean(env);
 
   const [activeTab, setActiveTab] = React.useState<BindableType>(getValueBindingTab(value));
   React.useEffect(() => {
@@ -616,7 +616,7 @@ export interface BindingEditorProps<V> extends WithControlledProp<BindableAttrVa
   hidden?: boolean;
   propType?: PropValueType;
   liveBinding?: LiveBinding;
-  envVarNames?: string[];
+  env?: Record<string, string>;
 }
 
 export function BindingEditor<V>({
@@ -630,7 +630,7 @@ export function BindingEditor<V>({
   value,
   onChange,
   liveBinding,
-  envVarNames,
+  env,
 }: BindingEditorProps<V>) {
   const [open, setOpen] = React.useState(false);
   const handleOpen = React.useCallback(() => setOpen(true), []);
@@ -687,9 +687,9 @@ export function BindingEditor<V>({
       disabled,
       propType,
       liveBinding,
-      envVarNames,
+      env,
     }),
-    [disabled, envVarNames, globalScope, jsRuntime, label, liveBinding, propType, resolvedMeta],
+    [disabled, env, globalScope, jsRuntime, label, liveBinding, propType, resolvedMeta],
   );
 
   return (

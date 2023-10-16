@@ -125,5 +125,5 @@ export interface FetchResult extends ExecFetchResult<any> {
 }
 
 export type IntrospectionResult = {
-  envVarNames: Record<string, string | undefined>;
+  env: Record<string, string>;
 };

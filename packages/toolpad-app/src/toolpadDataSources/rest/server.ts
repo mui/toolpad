@@ -232,7 +232,7 @@ export default function createDatasource(
       switch (query.kind) {
         case 'introspection': {
           const env = await loadEnvFile(project);
-          return { envVarNames: env };
+          return { env };
         }
         case 'debugExec':
           return execBase(project, connection, query.query, query.params);

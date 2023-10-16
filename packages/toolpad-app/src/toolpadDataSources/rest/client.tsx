@@ -266,10 +266,7 @@ function QueryEditor({
     { retry: false },
   );
 
-  const envObj = React.useMemo(() => introspection?.data?.envVarNames, [introspection]);
-
-  const envVarNames = React.useMemo(() => Object.keys(envObj || {}) || [], [envObj]);
-
+  const env = React.useMemo(() => introspection?.data?.env, [introspection]);
   const handleParamsChange = React.useCallback(
     (newParams: [string, BindableAttrValue<string>][]) => {
       setInput((existing) => ({ ...existing, params: newParams }));
@@ -337,7 +334,7 @@ function QueryEditor({
 
   const paramsEntries = input.params || EMPTY_PARAMS;
 
-  const jsServerRuntime = React.useMemo(() => createServerJsRuntime(envObj!), [envObj]);
+  const jsServerRuntime = React.useMemo(() => createServerJsRuntime(env!), [env]);
 
   const paramsEditorLiveValue = useEvaluateLiveBindingEntries({
     jsRuntime: jsServerRuntime,
@@ -464,7 +461,6 @@ function QueryEditor({
                         globalScopeMeta={QUERY_SCOPE_META}
                         liveValue={liveSearchParams}
                         jsRuntime={jsServerRuntime}
-                        envVarNames={envVarNames}
                       />
                     </TabPanel>
                     <TabPanel disableGutters value="body">
@@ -484,7 +480,7 @@ function QueryEditor({
                         globalScopeMeta={QUERY_SCOPE_META}
                         liveValue={liveHeaders}
                         jsRuntime={jsServerRuntime}
-                        envVarNames={envVarNames}
+                        env={env}
                       />
                     </TabPanel>
                     <TabPanel disableGutters value="response">
@@ -533,7 +529,7 @@ function QueryEditor({
                 globalScopeMeta={globalScopeMeta}
                 liveValue={paramsEditorLiveValue}
                 jsRuntime={jsServerRuntime}
-                envVarNames={envVarNames}
+                env={env}
               />
             </Box>
           </Panel>

@@ -91,13 +91,23 @@ export const INTERNAL_COMPONENTS = new Map<string, ToolpadComponentDefinition>([
     {
       displayName: 'Checkbox',
       initialProps: {
-        mode: 'link',
+        mode: 'checkbox',
       },
       builtIn: 'Checkbox',
       synonyms: ['switch'],
     },
   ],
-  ['Switch', { displayName: 'Switch', builtIn: 'Checkbox', synonyms: ['switch'] }],
+  [
+    'Switch',
+    {
+      displayName: 'Switch',
+      initialProps: {
+        mode: 'switch',
+      },
+      builtIn: 'Checkbox',
+      synonyms: ['switch'],
+    },
+  ],
   [FORM_COMPONENT_ID, { displayName: 'Form', builtIn: 'Form', synonyms: [] }],
 ]);
 

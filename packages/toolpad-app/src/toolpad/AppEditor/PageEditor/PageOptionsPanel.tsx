@@ -36,7 +36,7 @@ export default function PageOptionsPanel() {
           page,
           'attributes',
           'display',
-          newValue as appDom.PageDisplayMode,
+          newValue,
         ),
       );
     },

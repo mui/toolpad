@@ -5,7 +5,7 @@ import PagesExplorer from './PagesExplorer';
 import PageHierarchyExplorer from './HierarchyExplorer';
 import { useAppState } from '../AppState';
 import AppOptions from '../AppOptions';
-import { QueriesExplorer } from './PageEditor/QueriesExplorer';
+import { DataExplorer } from './PageEditor/DataExplorer';
 import { PAGE_PANEL_WIDTH } from '../../constants';
 import { useProject } from '../../project';
 
@@ -49,7 +49,7 @@ export default function PagePanel({ className, sx }: ComponentPanelProps) {
         </Panel>
         <PanelResizeHandle />
         <Panel minSize={25} defaultSize={35} maxSize={90}>
-          <QueriesExplorer />
+          <DataExplorer />
         </Panel>
         <PanelResizeHandle />
         <Panel minSize={25} defaultSize={35} maxSize={90}>

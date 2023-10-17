@@ -7,14 +7,14 @@ import {
   Box,
   Button,
   IconButton,
-  Tooltip,
   Typography,
+  Divider,
   Popover,
   Stack,
   Paper,
   SxProps,
 } from '@mui/material';
-import { TreeView, TreeItem, TreeItemProps, treeItemClasses } from '@mui/x-tree-view';
+import { TreeView, treeItemClasses } from '@mui/x-tree-view';
 import AddIcon from '@mui/icons-material/Add';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
@@ -23,14 +23,17 @@ import * as appDom from '../../../../appDom';
 import dataSources from '../../../../toolpadDataSources/client';
 import QueryIcon from '../../QueryIcon';
 import { useAppState, useAppStateApi } from '../../../AppState';
+import useBoolean from '../../../../utils/useBoolean';
+import EditableTreeItem, { EditableTreeItemProps } from '../../../../components/EditableTreeItem';
 import NodeMenu from '../../NodeMenu';
+import ExplorerHeader from '../../ExplorerHeader';
 
 const classes = {
   treeItemMenuButton: 'Toolpad__QueryListItem',
   treeItemMenuOpen: 'Toolpad__QueryListItemMenuOpen',
 };
 
-const StyledTreeItem = styled(TreeItem)({
+const StyledTreeItem = styled(EditableTreeItem)({
   [`& .${classes.treeItemMenuButton}`]: {
     visibility: 'hidden',
   },
@@ -42,12 +45,13 @@ const StyledTreeItem = styled(TreeItem)({
   },
 });
 
-type StyledTreeItemProps = TreeItemProps & {
+interface StyledTreeItemProps extends EditableTreeItemProps {
   onDeleteNode?: (nodeId: NodeId) => void;
   onDuplicateNode?: (nodeId: NodeId) => void;
+  onRenameNode?: (nodeId: NodeId, updatedName: string) => void;
   onSelectNode?: (nodeId: NodeId) => void;
   onCreate?: (event: React.MouseEvent, mode?: appDom.FetchMode) => void;
-  labelText: string;
+  labelTextSx?: SxProps;
   labelIconId?: string;
   labelIconSx?: SxProps;
   createLabelText?: string;
@@ -55,35 +59,55 @@ type StyledTreeItemProps = TreeItemProps & {
   renameLabelText?: string;
   duplicateLabelText?: string;
   toolpadNodeId?: NodeId;
-};
+}
 
-function HierarchyTreeItem(props: StyledTreeItemProps) {
+function DataTreeItem(props: StyledTreeItemProps) {
   const {
+    nodeId,
     labelText,
+    labelTextSx,
     labelIconSx,
     labelIconId,
     onCreate,
     onSelectNode,
     onDeleteNode,
     onDuplicateNode,
+    onRenameNode,
     createLabelText,
     deleteLabelText = 'Delete',
     duplicateLabelText = 'Duplicate',
     renameLabelText = 'Rename',
     toolpadNodeId,
+    validateItemName,
     ...other
   } = props;
 
+  const { value: isEditing, setTrue: startEditing, setFalse: stopEditing } = useBoolean(false);
+
+  const handleRenameConfirm = React.useCallback(
+    (updatedName: string) => {
+      if (onRenameNode) {
+        onRenameNode(nodeId as NodeId, updatedName);
+        stopEditing();
+      }
+    },
+    [nodeId, onRenameNode, stopEditing],
+  );
+
+  const validateEditableQueryName = React.useCallback(
+    (newName: string) => {
+      if (newName !== labelText && validateItemName) {
+        return validateItemName(newName);
+      }
+      return { isValid: true };
+    },
+    [labelText, validateItemName],
+  );
+
   const handleClick = React.useCallback(() => {
-    if (props.nodeId === ':query' || props.nodeId === ':mutation') {
-      return;
-    }
-    invariant(
-      toolpadNodeId,
-      'HierarchyTreeItem should only be used for nodes with a toolpadNodeId',
-    );
+    invariant(toolpadNodeId, 'DataTreeItem should only be used for nodes with a toolpadNodeId');
     onSelectNode?.(toolpadNodeId);
-  }, [onSelectNode, toolpadNodeId, props.nodeId]);
+  }, [onSelectNode, toolpadNodeId]);
 
   const queryCreationMode = React.useMemo(() => {
     if (props.nodeId === ':query') {
@@ -97,18 +121,12 @@ function HierarchyTreeItem(props: StyledTreeItemProps) {
 
   return (
     <StyledTreeItem
-      label={
-        <Box sx={{ display: 'flex', alignItems: 'center', p: 0.1, pr: 0 }} onClick={handleClick}>
-          <QueryIcon
-            id={labelIconId || 'query'}
-            sx={{ fontSize: 28, mt: 0.1, ml: -1, ...labelIconSx }}
-          />
-          <Typography
-            variant="body2"
-            sx={{ flexGrow: 1, textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap' }}
-          >
-            {labelText}
-          </Typography>
+      nodeId={nodeId}
+      labelText={labelText}
+      renderLabel={(children) => (
+        <Box sx={{ display: 'flex', alignItems: 'center' }} onClick={handleClick}>
+          <QueryIcon id={labelIconId || 'query'} sx={{ fontSize: 24, mr: 1, ...labelIconSx }} />
+          {children}
           {onCreate ? (
             <IconButton
               aria-label={createLabelText}
@@ -138,18 +156,24 @@ function HierarchyTreeItem(props: StyledTreeItemProps) {
               deleteLabelText={deleteLabelText}
               duplicateLabelText={duplicateLabelText}
               renameLabelText={renameLabelText}
+              onRenameNode={startEditing}
               onDeleteNode={onDeleteNode}
               onDuplicateNode={onDuplicateNode}
             />
           ) : null}
         </Box>
-      }
+      )}
+      suggestedNewItemName={labelText}
+      onCancel={stopEditing}
+      isEditing={isEditing}
+      {...(onRenameNode ? { onEdit: handleRenameConfirm } : {})}
+      validateItemName={validateEditableQueryName}
       {...other}
     />
   );
 }
 
-interface CreateQueryPopoverProps {
+interface CreatePopoverProps {
   anchorEl: Element | null;
   createPopoverOpen: boolean;
   handleCreateNode: (dataSourceId: string, createMode?: appDom.FetchMode) => () => void;
@@ -157,13 +181,13 @@ interface CreateQueryPopoverProps {
   createMode: appDom.FetchMode | undefined;
 }
 
-function CreateQueryPopover({
+function CreatePopover({
   anchorEl,
   createPopoverOpen,
   handleCreateNode,
   handleCreateClose,
   createMode,
-}: CreateQueryPopoverProps) {
+}: CreatePopoverProps) {
   return (
     <Popover
       open={createPopoverOpen}
@@ -176,53 +200,9 @@ function CreateQueryPopover({
     >
       <Paper sx={{ p: 2, maxWidth: 500 }}>
         <Typography variant="body2" sx={{ mb: 2, textAlign: 'center' }}>
-          Make backend data available as state on the page through{' '}
-          {createMode === 'mutation' ? (
-            <React.Fragment>
-              a{' '}
-              <Tooltip
-                title="Manual queries are only run when triggered by an action"
-                placement="right"
-              >
-                <Typography
-                  variant="body2"
-                  sx={{
-                    fontWeight: 'bold',
-                    color: 'primary.main',
-                    cursor: 'help',
-                    textDecoration: 'underline',
-                    textDecorationStyle: 'dotted',
-                  }}
-                  component={'span'}
-                >
-                  manual
-                </Typography>
-              </Tooltip>
-            </React.Fragment>
-          ) : (
-            <React.Fragment>
-              an{' '}
-              <Tooltip
-                title="Queries are automatically fetched at a set interval"
-                placement="right"
-              >
-                <Typography
-                  variant="body2"
-                  sx={{
-                    fontWeight: 'bold',
-                    color: 'primary.main',
-                    cursor: 'help',
-                    textDecoration: 'underline',
-                    textDecorationStyle: 'dotted',
-                  }}
-                  component={'span'}
-                >
-                  automatic
-                </Typography>
-              </Tooltip>
-            </React.Fragment>
-          )}{' '}
-          query.
+          {createMode === 'query'
+            ? 'Make backend data available as state on the page'
+            : 'Run an action on the page'}
         </Typography>
         <Stack direction="row" gap={1} display={'grid'} gridTemplateColumns={'1fr 1fr'}>
           {Object.keys(dataSources).map((dataSourceId) => {
@@ -245,14 +225,14 @@ function CreateQueryPopover({
   );
 }
 
-export function QueriesExplorer() {
+export function DataExplorer() {
   const { dom, currentView } = useAppState();
   const appStateApi = useAppStateApi();
   const currentPageId = currentView.nodeId;
 
   const [anchorEl, setAnchorEl] = React.useState<Element | null>(null);
 
-  const queries = React.useMemo(() => {
+  const queryNodes = React.useMemo(() => {
     if (!currentPageId) {
       return [];
     }
@@ -265,13 +245,15 @@ export function QueriesExplorer() {
     return [];
   }, [currentPageId, dom]);
 
-  const manualQueries = React.useMemo(() => {
-    return queries.filter((query) => query.attributes?.mode === 'mutation');
-  }, [queries]);
+  const queries = React.useMemo(() => {
+    return queryNodes.filter(
+      (query) => query.attributes?.mode === 'query' || !query.attributes?.mode,
+    );
+  }, [queryNodes]);
 
-  const automaticQueries = React.useMemo(() => {
-    return queries.filter((query) => query.attributes?.mode === 'query' || !query.attributes?.mode);
-  }, [queries]);
+  const actions = React.useMemo(() => {
+    return queryNodes.filter((query) => query.attributes?.mode === 'mutation');
+  }, [queryNodes]);
 
   const handleQuerySelect = React.useCallback(
     (selectedQueryId: NodeId) => {
@@ -282,14 +264,17 @@ export function QueriesExplorer() {
 
   const [createMode, setCreateMode] = React.useState<appDom.FetchMode | undefined>('query');
 
-  const handleCreateClick = React.useCallback(
-    (event: React.MouseEvent, mode?: appDom.FetchMode) => {
-      event.stopPropagation();
-      setCreateMode(mode);
-      setAnchorEl(event.currentTarget);
-    },
-    [],
-  );
+  const handleCreateQueryClick = React.useCallback((event: React.MouseEvent) => {
+    event.stopPropagation();
+    setCreateMode('query');
+    setAnchorEl(event.currentTarget);
+  }, []);
+
+  const handleCreateActionClick = React.useCallback((event: React.MouseEvent) => {
+    event.stopPropagation();
+    setCreateMode('mutation');
+    setAnchorEl(event.currentTarget);
+  }, []);
 
   const handleCreateClose = () => {
     setAnchorEl(null);
@@ -314,11 +299,19 @@ export function QueriesExplorer() {
 
   const handleDeleteNode = React.useCallback(
     (selectedQueryId: NodeId) => {
-      const selectedQueryIndex = queries.findIndex((query) => query.id === selectedQueryId);
+      const selectedQueryIndex = queryNodes.findIndex((query) => query.id === selectedQueryId);
       appStateApi.closeQueryTab(selectedQueryIndex, selectedQueryId, true);
     },
-    [appStateApi, queries],
+    [appStateApi, queryNodes],
   );
+
+  const existingNames = React.useMemo(() => {
+    if (!currentPageId) {
+      return undefined;
+    }
+    const currentPageNode = appDom.getNode(dom, currentPageId, 'page');
+    return appDom.getExistingNamesForChildren(dom, currentPageNode);
+  }, [currentPageId, dom]);
 
   const handleDuplicateNode = React.useCallback(
     (nodeId: NodeId) => {
@@ -328,7 +321,7 @@ export function QueriesExplorer() {
         'handleDuplicateNode should only be used for queries, which should always belong to a page',
       );
       const currentPageNode = appDom.getNode(dom, currentPageId, 'page');
-      const existingNames = appDom.getExistingNamesForChildren(dom, currentPageNode);
+
       const newName = appDom.proposeName(node.name, existingNames);
       const copy = appDom.createNode(dom, 'query', { ...node, name: newName });
       appStateApi.update((draft) => appDom.addNode(draft, copy, currentPageNode, 'queries'), {
@@ -337,14 +330,61 @@ export function QueriesExplorer() {
         view: { kind: 'query', nodeId: copy.id },
       });
     },
-    [dom, currentPageId, appStateApi],
+    [dom, currentPageId, existingNames, appStateApi],
+  );
+
+  const validateName = React.useCallback(
+    (queryName: string) => {
+      if (!existingNames) {
+        return {
+          isValid: true,
+        };
+      }
+
+      const validationErrorMessage = appDom.validateNodeName(queryName, existingNames, 'query');
+      return {
+        isValid: !validationErrorMessage,
+        ...(validationErrorMessage ? { errorMessage: validationErrorMessage } : {}),
+      };
+    },
+    [existingNames],
+  );
+
+  const handleRenameNode = React.useCallback(
+    (nodeId: NodeId, updatedName: string) => {
+      const node = appDom.getNode(dom, nodeId, 'query');
+      appStateApi.update((draft) => appDom.setNodeName(draft, node, updatedName), {
+        ...currentView,
+        queryPanel: {
+          ...currentView.queryPanel,
+          queryTabs: currentView.queryPanel?.queryTabs?.map((tab) => {
+            if (tab?.meta?.id === nodeId) {
+              return {
+                ...tab,
+                meta: {
+                  ...tab.meta,
+                  name: updatedName,
+                },
+              };
+            }
+            return tab;
+          }),
+        },
+      });
+    },
+    [dom, appStateApi, currentView],
   );
 
   return (
-    <React.Fragment>
+    <Box sx={{ maxHeight: '100%', overflowY: 'auto', scrollbarGutter: 'stable' }}>
+      <ExplorerHeader
+        headerText="Queries"
+        onCreate={handleCreateQueryClick}
+        createLabelText="Create new query"
+      />
       <TreeView
         aria-label="queries explorer"
-        defaultExpanded={[':queries', ':query', ':mutation']}
+        defaultExpanded={[':queries']}
         selected={
           currentView.kind === 'page' && currentView.view?.kind === 'query'
             ? currentView.view.nodeId
@@ -355,71 +395,70 @@ export function QueriesExplorer() {
         sx={{
           flexGrow: 1,
           maxWidth: 400,
-          overflowY: 'auto',
-          scrollbarGutter: 'stable',
         }}
       >
-        <HierarchyTreeItem
-          nodeId=":queries"
-          aria-level={1}
-          labelText="Queries"
-          createLabelText="Create query"
-        >
-          <HierarchyTreeItem
-            nodeId=":mutation"
-            aria-level={2}
-            labelText="Manual"
-            labelIconId="manual"
-            labelIconSx={{ fontSize: 16, mr: 1, ml: 0, opacity: 0.75 }}
-            createLabelText="Create manual query"
-            onCreate={handleCreateClick}
-          >
-            {manualQueries.map((queryNode) => (
-              <HierarchyTreeItem
-                key={queryNode.id}
-                nodeId={queryNode.id}
-                toolpadNodeId={queryNode.id}
-                aria-level={2}
-                labelText={queryNode.name}
-                labelIconId={queryNode.attributes?.dataSource}
-                onDuplicateNode={handleDuplicateNode}
-                onDeleteNode={handleDeleteNode}
-                onSelectNode={handleQuerySelect}
-              />
-            ))}
-          </HierarchyTreeItem>
-          <HierarchyTreeItem
-            nodeId=":query"
-            aria-level={3}
-            labelIconId="automatic"
-            labelText="Automatic"
-            labelIconSx={{ fontSize: 16, mr: 1, ml: 0, opacity: 0.75 }}
-            createLabelText="Create automatic query"
-            onCreate={handleCreateClick}
-          >
-            {automaticQueries.map((queryNode) => (
-              <HierarchyTreeItem
-                key={queryNode.id}
-                nodeId={queryNode.id}
-                toolpadNodeId={queryNode.id}
-                aria-level={2}
-                labelText={queryNode.name}
-                labelIconId={queryNode.attributes?.dataSource}
-                onDuplicateNode={handleDuplicateNode}
-                onDeleteNode={handleDeleteNode}
-                onSelectNode={handleQuerySelect}
-              />
-            ))}
-          </HierarchyTreeItem>
-        </HierarchyTreeItem>
+        {queries.map((query) => (
+          <DataTreeItem
+            key={query.id}
+            nodeId={query.id}
+            toolpadNodeId={query.id}
+            aria-level={1}
+            labelText={query.name}
+            labelTextSx={{ fontSize: 13 }}
+            labelIconId={query.attributes?.dataSource}
+            onDuplicateNode={handleDuplicateNode}
+            onDeleteNode={handleDeleteNode}
+            onSelectNode={handleQuerySelect}
+            onRenameNode={handleRenameNode}
+            validateItemName={validateName}
+          />
+        ))}
       </TreeView>
-      <CreateQueryPopover
+      <Divider />
+      <ExplorerHeader
+        headerText="Actions"
+        onCreate={handleCreateActionClick}
+        createLabelText="Create new action"
+      />
+      <TreeView
+        aria-label="actions explorer"
+        defaultExpanded={[':actions']}
+        selected={
+          currentView.kind === 'page' && currentView.view?.kind === 'query'
+            ? currentView.view.nodeId
+            : ''
+        }
+        defaultCollapseIcon={<ExpandMoreIcon sx={{ fontSize: '0.9rem', opacity: 0.5 }} />}
+        defaultExpandIcon={<ChevronRightIcon sx={{ fontSize: '0.9rem', opacity: 0.5 }} />}
+        sx={{
+          flexGrow: 1,
+          maxWidth: 400,
+        }}
+      >
+        {actions.map((action) => (
+          <DataTreeItem
+            key={action.id}
+            nodeId={action.id}
+            toolpadNodeId={action.id}
+            aria-level={1}
+            labelText={action.name}
+            labelTextSx={{ fontSize: 13 }}
+            labelIconId={action.attributes?.dataSource}
+            onDuplicateNode={handleDuplicateNode}
+            onDeleteNode={handleDeleteNode}
+            onSelectNode={handleQuerySelect}
+            onRenameNode={handleRenameNode}
+            validateItemName={validateName}
+          />
+        ))}
+      </TreeView>
+      <CreatePopover
         anchorEl={anchorEl}
         createPopoverOpen={createPopoverOpen}
         handleCreateNode={handleCreateNode}
         handleCreateClose={handleCreateClose}
         createMode={createMode}
       />
-    </React.Fragment>
+    </Box>
   );
 }

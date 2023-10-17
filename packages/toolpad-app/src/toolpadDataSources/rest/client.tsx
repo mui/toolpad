@@ -318,9 +318,12 @@ function QueryEditor({
 
   const handleParamsChange = React.useCallback(
     (newParams: [string, BindableAttrValue<string>][]) => {
-      updateProp('params', newParams);
+      appStateApi.updateQueryDraft((draft) => ({
+        ...draft,
+        params: newParams,
+      }));
     },
-    [updateProp],
+    [appStateApi],
   );
 
   const handleUrlChange = React.useCallback(

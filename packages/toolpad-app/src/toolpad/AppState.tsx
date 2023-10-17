@@ -384,7 +384,8 @@ export function appStateReducer(state: AppState, action: AppStateAction): AppSta
         return state;
       }
       const pageNode = appDom.getNode(state.dom, state.currentView.nodeId, 'page');
-      const queryNode = appDom.createNode(state.dom, 'query', {
+      const draftNode = appDom.createNode(state.dom, 'query', {
+        name: action.mode === 'mutation' ? 'action' : 'query',
         attributes: {
           query: action.dataSource?.getInitialQueryValue(),
           mode: action.mode ?? undefined,
@@ -392,8 +393,10 @@ export function appStateReducer(state: AppState, action: AppStateAction): AppSta
           dataSource: action?.dataSourceId,
         },
       });
-      const newDom = appDom.addNode(state.dom, queryNode, pageNode, 'queries');
+
+      const newDom = appDom.addNode(state.dom, draftNode, pageNode, 'queries');
       const newView = { ...state.currentView };
+      const createdNode = newDom.nodes[draftNode.id] as appDom.QueryNode;
 
       /**
        * To make the app state updates atomic, we must also simultaneously
@@ -405,18 +408,18 @@ export function appStateReducer(state: AppState, action: AppStateAction): AppSta
        */
 
       if (state.currentView.queryPanel?.queryTabs) {
-        newView.view = { kind: 'query', nodeId: queryNode.id };
+        newView.view = { kind: 'query', nodeId: createdNode.id };
         newView.queryPanel = {
           queryTabs: [
             ...state.currentView.queryPanel.queryTabs,
             {
               meta: {
-                id: queryNode.id,
-                name: queryNode.name,
+                id: createdNode.id,
+                name: createdNode.name,
                 dataSource: action.dataSourceId,
               },
-              saved: queryNode,
-              draft: queryNode,
+              saved: createdNode,
+              draft: createdNode,
             },
           ],
           currentTabIndex: state.currentView.queryPanel.queryTabs.length,
@@ -425,17 +428,17 @@ export function appStateReducer(state: AppState, action: AppStateAction): AppSta
         /**
          * If no tabs are open, initialise the query panel
          */
-        newView.view = { kind: 'query', nodeId: queryNode.id };
+        newView.view = { kind: 'query', nodeId: createdNode.id };
         newView.queryPanel = {
           queryTabs: [
             {
               meta: {
-                id: queryNode.id,
-                name: queryNode.name,
+                id: createdNode.id,
+                name: createdNode.name,
                 dataSource: action.dataSourceId,
               },
-              saved: queryNode,
-              draft: queryNode,
+              saved: createdNode,
+              draft: createdNode,
             },
           ],
           currentTabIndex: 0,
@@ -583,9 +586,10 @@ export function appStateReducer(state: AppState, action: AppStateAction): AppSta
       else {
         const queryIds = tabs?.map((tab) => tab.meta.id);
         if (currentTabIndex !== undefined) {
+          const replacementQueryId =
+            queryIds?.[action.queryIndex === 0 ? currentTabIndex + 1 : currentTabIndex - 1];
           const replacementTabIndex =
-            currentTabIndex > 0 ? currentTabIndex - 1 : currentTabIndex + 1;
-          const replacementQueryId = queryIds?.[replacementTabIndex];
+            action.queryIndex === 0 ? currentTabIndex : currentTabIndex - 1;
           if (replacementQueryId) {
             newView.view = { kind: 'query', nodeId: replacementQueryId };
             newView.queryPanel = {

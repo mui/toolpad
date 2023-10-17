@@ -10,8 +10,14 @@ import * as appDom from '../../../../appDom';
 import { useAppState, useAppStateApi, useDomApi } from '../../../AppState';
 import QueryIcon from '../../QueryIcon';
 import QueryEditorPanel from './QueryEditorPanel';
+import useShortcut from '../../../../utils/useShortcut';
+import { isMac } from '../../../../utils/platform';
 import QueryToolsContext, { QueryToolsContextProps } from './QueryToolsContext';
 import { QueryEditorToolsTabType } from '../../../../types';
+
+function SaveShortcutIndicator() {
+  return <span style={{ opacity: 0.55, marginLeft: 6 }}>{isMac() ? '⌘' : <kbd>Ctrl</kbd>}S</span>;
+}
 
 function TabCloseIcon({
   queryIndex,
@@ -194,6 +200,13 @@ export default function QueryEditor() {
     appStateApi.closeQueryPanel();
   }, [appStateApi]);
 
+  const saveDisabled = React.useMemo(
+    () => !hasUnsavedChanges(parseInt(currentTabIndex, 10)),
+    [hasUnsavedChanges, currentTabIndex],
+  );
+
+  useShortcut({ key: 's', metaKey: true, disabled: saveDisabled }, handleSave);
+
   return currentView.kind === 'page' &&
     currentView.view?.kind === 'query' &&
     currentQueryId &&
@@ -296,13 +309,13 @@ export default function QueryEditor() {
                 Preview
               </LoadingButton>
               <LoadingButton
-                disabled={!hasUnsavedChanges(parseInt(currentTabIndex, 10))}
+                disabled={saveDisabled}
                 onClick={handleSave}
                 variant="contained"
                 color="primary"
                 sx={{ width: 'fit-content', height: 32, my: 'auto', mr: 2 }}
               >
-                Save
+                Save <SaveShortcutIndicator />
               </LoadingButton>
             </Box>
           </Stack>

@@ -139,7 +139,7 @@ export interface EnvBindingEditorProps extends WithControlledProp<EnvAttrValue |
 
 export function EnvBindingEditor({ value, onChange }: EnvBindingEditorProps) {
   const context = useBindingEditorContext();
-  const env = Object.values(context.env ?? {});
+  const envVarNames = Object.keys(context.env ?? {});
   const handleInputChange = React.useCallback(
     (event: React.SyntheticEvent, newValue: string | null) => {
       onChange({
@@ -154,7 +154,7 @@ export function EnvBindingEditor({ value, onChange }: EnvBindingEditorProps) {
       <Typography>Assign to an environment variable</Typography>
       <Autocomplete
         freeSolo
-        options={env}
+        options={envVarNames}
         value={value?.$$env || ''}
         onInputChange={handleInputChange}
         renderInput={(params) => (
@@ -164,7 +164,7 @@ export function EnvBindingEditor({ value, onChange }: EnvBindingEditorProps) {
             sx={{ my: 3 }}
             label="Environment variable name"
             helperText={
-              value?.$$env && !env.includes(value.$$env)
+              value?.$$env && !envVarNames.includes(value.$$env)
                 ? 'Warning: This variable is not in your env file!'
                 : ''
             }

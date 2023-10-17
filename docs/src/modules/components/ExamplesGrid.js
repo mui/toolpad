@@ -55,15 +55,16 @@ function layouts() {
       source: 'https://github.com/mui/mui-toolpad/tree/master/examples/dog-app',
     },
     {
-      title: 'Data grid columns',
-      description: 'A basic Toolpad app that shows how to add a code component inside a data grid.',
+      title: 'Customized data grid',
+      description: 'A Toolpad app that shows how to customize a data grid using code component.',
       src: '/static/toolpad/marketing/datagrid-columns.png',
       href: 'https://github.com/mui/mui-toolpad/tree/master/examples/datagrid-columns',
       source: 'https://github.com/mui/mui-toolpad/tree/master/examples/datagrid-columns',
     },
     {
-      title: 'Custom data grid',
-      description: 'A basic Toolpad app that shows how to add a code component inside a data grid.',
+      title: 'Custom data grid columns',
+      description:
+        'A basic Toolpad app that shows how to customize a data grid column using code component.',
       src: '/static/toolpad/marketing/custom-datagrid-column.png',
       href: 'https://github.com/mui/mui-toolpad/tree/master/examples/custom-datagrid-column',
       source: 'https://github.com/mui/mui-toolpad/tree/master/examples/custom-datagrid-column',

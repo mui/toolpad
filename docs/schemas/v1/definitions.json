@@ -344,6 +344,21 @@
                 }
               ],
               "description": "Display mode of the page. This can also be set at runtime with the toolpad-display query parameter"
+            },
+            "layout": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "const": "container",
+                  "description": "Use Container as root component of the page"
+                },
+                {
+                  "type": "string",
+                  "const": "fluid",
+                  "description": "Fluid page layout that allows you to use 100% of the page"
+                }
+              ],
+              "description": "Layout of the page."
             }
           },
           "required": [

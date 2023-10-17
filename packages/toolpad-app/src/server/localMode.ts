@@ -502,6 +502,7 @@ function expandFromDom<N extends appDom.AppDomNode>(
         content: undefinedWhenEmpty(expandChildren(children.children || [], dom)),
         queries: undefinedWhenEmpty(expandChildren(children.queries || [], dom)),
         display: node.attributes.display,
+        layout: node.attributes.layout,
       },
     } satisfies Page;
   }
@@ -676,6 +677,7 @@ function createPageDomFromPageFile(pageName: string, pageFile: Page): appDom.App
       title: pageFileSpec.title || '',
       parameters: pageFileSpec.parameters?.map(({ name, value }) => [name, value]) || [],
       display: pageFileSpec.display || undefined,
+      layout: pageFileSpec.layout || undefined,
     },
   });
 

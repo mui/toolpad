@@ -1165,7 +1165,7 @@ function RenderedNodeContent({ node, childNodeGroups, Component }: RenderedNodeC
       NodeError={NodeError}
     >
       {isLayoutNode ? (
-        <Component {...wrappedProps} />
+        <Component {...wrappedProps} attributes={node.attributes} />
       ) : (
         <Box
           sx={{
@@ -1183,10 +1183,15 @@ function RenderedNodeContent({ node, childNodeGroups, Component }: RenderedNodeC
 
 interface PageRootProps {
   children?: React.ReactNode;
+  attributes: {
+    layout: appDom.PageLayoutMode;
+  };
 }
 
-function PageRoot({ children }: PageRootProps) {
-  return (
+function PageRoot({ children, attributes }: PageRootProps) {
+  const { layout } = attributes;
+  const isContainer = layout !== ('fluid' as appDom.PageLayoutMode);
+  return isContainer ? (
     <Container>
       <Stack
         data-testid="page-root"
@@ -1199,6 +1204,18 @@ function PageRoot({ children }: PageRootProps) {
         {children}
       </Stack>
     </Container>
+  ) : (
+    <Stack
+      data-testid="page-root"
+      direction="column"
+      sx={{
+        flex: 1,
+        gap: 1,
+        ...(isRenderedInCanvas ? { px: 3 } : {}),
+      }}
+    >
+      {children}
+    </Stack>
   );
 }
 

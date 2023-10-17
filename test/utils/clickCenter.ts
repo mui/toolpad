@@ -1,7 +1,7 @@
 import { Page, Locator, expect } from '@playwright/test';
 
 export default async function clickCenter(page: Page, targetLocator: Locator) {
-  await expect(targetLocator).toBeAttached();
+  await expect(targetLocator).toBeVisible();
 
   const targetBoundingBox = await targetLocator.boundingBox();
   expect(targetBoundingBox).toBeTruthy();

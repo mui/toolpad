@@ -1,9 +1,13 @@
 import * as path from 'path';
+import * as url from 'node:url';
 import { InlineConfig, Plugin, build } from 'vite';
 import react from '@vitejs/plugin-react';
 import { indent } from '@mui/toolpad-utils/strings';
 import type { ComponentEntry } from './localMode';
-import { INITIAL_STATE_WINDOW_PROPERTY } from './toolpadAppServer';
+import { INITIAL_STATE_WINDOW_PROPERTY } from '../constants';
+
+import.meta.url ??= url.pathToFileURL(__filename).toString();
+const currentDirectory = url.fileURLToPath(new URL('.', import.meta.url));
 
 const MAIN_ENTRY = '/main.tsx';
 const CANVAS_ENTRY = '/canvas.tsx';
@@ -162,6 +166,7 @@ export interface CreateViteConfigParams {
   root: string;
   dev: boolean;
   base: string;
+  customServer?: boolean;
   plugins?: Plugin[];
   getComponents: () => Promise<ComponentEntry[]>;
 }
@@ -175,6 +180,7 @@ export function createViteConfig({
   root,
   dev,
   base,
+  customServer,
   plugins = [],
   getComponents,
 }: CreateViteConfigParams): CreateViteConfigResult {
@@ -208,7 +214,7 @@ export function createViteConfig({
       },
       server: {
         fs: {
-          allow: [root, path.resolve(__dirname, '../../../../')],
+          allow: [root, path.resolve(currentDirectory, '../../../../')],
         },
       },
       optimizeDeps: {
@@ -276,6 +282,7 @@ export function createViteConfig({
       define: {
         'process.env.NODE_ENV': `'${mode}'`,
         'process.env.BASE_URL': `'${base}'`,
+        'process.env.TOOLPAD_CUSTOM_SERVER': `'${JSON.stringify(customServer)}'`,
       },
     },
   };

@@ -2,7 +2,7 @@ import { BindableAttrValue } from '@mui/toolpad-core';
 import { ensureSuffix } from '@mui/toolpad-utils/strings';
 import { Maybe } from '../../utils/types';
 import { Authentication, RestConnectionParams } from './types';
-import type { RuntimeConfig } from '../../config';
+import type { RuntimeConfig } from '../../types';
 
 export const HTTP_NO_BODY = new Set(['GET', 'HEAD']);
 

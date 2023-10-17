@@ -1,0 +1,23 @@
+{
+  "name": "with-prisma-data-provider",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "toolpad dev",
+    "build": "toolpad build",
+    "start": "toolpad start",
+    "prisma": "prisma"
+  },
+  "dependencies": {
+    "@mui/toolpad": "0.1.32",
+    "@prisma/client": "5.4.2",
+    "qrcode": "^1.5.3"
+  },
+  "devDependencies": {
+    "@types/node": "^20.8.6",
+    "@types/qrcode": "^1.5.2",
+    "prisma": "^5.4.2",
+    "ts-node": "^10.9.1",
+    "typescript": "^5.2.2"
+  }
+}

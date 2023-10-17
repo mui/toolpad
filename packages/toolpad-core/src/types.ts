@@ -87,6 +87,7 @@ export interface StringValueType extends ValueTypeBase {
    * The different possible values for the property.
    */
   enum?: string[];
+  enumLabels?: Record<string, string>;
   default?: string;
 }
 
@@ -198,7 +199,9 @@ export interface ArgControlSpec {
     | 'event'
     | 'NumberFormat'
     | 'ColorScale'
-    | 'RowIdFieldSelect'; // Row id field specialized select
+    | 'ToggleButtons'
+    | 'RowIdFieldSelect' // Row id field specialized select
+    | 'DataProviderSelector'; // Row id field specialized select
   bindable?: boolean;
   hideLabel?: boolean;
 }
@@ -372,6 +375,11 @@ export type RuntimeEvents = {
     prop: string;
     value: React.SetStateAction<unknown>;
   };
+  editorNodeDataUpdated: {
+    nodeId: NodeId;
+    prop: string;
+    value: any;
+  };
   pageStateUpdated: {
     pageState: Record<string, unknown>;
     globalScopeMeta: ScopeMeta;
@@ -479,4 +487,39 @@ export interface RuntimeScope {
 export interface ApplicationVm {
   scopes: { [id in string]?: RuntimeScope };
   bindingScopes: { [id in string]?: string };
+}
+
+export interface IndexPaginationModel {
+  start: number;
+  pageSize: number;
+}
+
+export interface CursorPaginationModel {
+  cursor: string | null;
+  pageSize: number;
+}
+
+export type PaginationMode = 'index' | 'cursor';
+
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+export interface GetRecordsParams<R, P extends PaginationMode> {
+  paginationModel: P extends 'cursor' ? CursorPaginationModel : IndexPaginationModel;
+  // filterModel: FilterModel;
+  // sortModel: SortModel;
+}
+
+export interface GetRecordsResult<R, P extends PaginationMode> {
+  records: R[];
+  hasNextPage?: boolean;
+  totalCount?: number;
+  cursor?: P extends 'cursor' ? string | null : undefined;
+}
+
+export interface ToolpadDataProviderBase<R, P extends PaginationMode = 'index'> {
+  paginationMode?: P;
+  getRecords: (params: GetRecordsParams<R, P>) => Promise<GetRecordsResult<R, P>>;
+  // getTotalCount?: () => Promise<number>;
+  // updateRecord?: (id: string, record: R) => Promise<void>;
+  // deleteRecord?: (id: string) => Promise<void>;
+  // createRecord?: (record: R) => Promise<void>;
 }

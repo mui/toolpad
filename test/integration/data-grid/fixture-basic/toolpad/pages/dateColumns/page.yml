@@ -1,0 +1,30 @@
+apiVersion: v1
+kind: page
+spec:
+  id: h0FFFmL
+  title: columns
+  content:
+    - component: DataGrid
+      name: dataGrid
+      props:
+        columns:
+          - field: date1
+            type: date
+            width: 149
+          - field: date2
+            type: date
+            width: 143
+          - field: date3
+            type: date
+          - field: date4
+            type: date
+            width: 129
+          - field: date5
+            type: date
+        rows:
+          - date1: 2023-04-01
+            date2: 1234567
+            date3: not a date
+            date4: foo 1900
+            date5: '1234567'
+  display: shell

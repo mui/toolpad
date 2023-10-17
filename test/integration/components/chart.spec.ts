@@ -13,8 +13,10 @@ test.use({
 });
 
 test.use({
-  localAppConfig: {
+  projectConfig: {
     template: path.resolve(currentDirectory, './fixture-chart'),
+  },
+  localAppConfig: {
     cmd: 'dev',
   },
 });

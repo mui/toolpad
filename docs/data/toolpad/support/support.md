@@ -47,4 +47,4 @@ Please keep in mind that we don't actively monitor direct messages on the compan
 
 ### Direct email
 
-If email is your thing, the team can be directly reached out at *toolpad@mui.com*.
+If email is your thing, the team can be directly reached out at _toolpad@mui.com_.

@@ -21,8 +21,10 @@ export default defineConfig((options) => [
   {
     entry: {
       index: './cli/index.ts',
-      appServer: './cli/appServer.ts',
-      appBuilder: './cli/appBuilder.ts',
+
+      // Worker entry points
+      appServerWorker: './src/server/appServerWorker.ts',
+      appBuilderWorker: './src/server/appBuilderWorker.ts',
       functionsDevWorker: './src/server/functionsDevWorker.ts',
       functionsTypesWorker: './src/server/functionsTypesWorker.ts',
     },
@@ -39,6 +41,7 @@ export default defineConfig((options) => [
       'pretty-bytes',
       'latest-version',
       'nanoid',
+      'superjson',
     ],
     sourcemap: true,
     esbuildPlugins: [cleanFolderOnFailure(path.resolve(__dirname, './dist/cli'))],

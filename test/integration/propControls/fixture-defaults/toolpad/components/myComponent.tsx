@@ -1,6 +1,6 @@
-import * as React from "react";
-import { Typography } from "@mui/material";
-import { createComponent } from "@mui/toolpad-core";
+import * as React from 'react';
+import { Typography } from '@mui/material';
+import { createComponent } from '@mui/toolpad/browser';
 
 export interface myComponentProps {
   msg: string;
@@ -13,8 +13,8 @@ function myComponent({ msg }: myComponentProps) {
 export default createComponent(myComponent, {
   argTypes: {
     msg: {
-      typeDef: { type: "string" },
-      defaultValue: "Hello world!",
+      typeDef: { type: 'string' },
+      defaultValue: 'Hello world!',
     },
   },
 });

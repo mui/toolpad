@@ -7,7 +7,7 @@ import {
   FormHelperText,
   FormControl,
 } from '@mui/material';
-import type { CheckboxProps } from '@mui/material/Checkbox';
+import type { CheckboxProps as MuiCheckBoxProps } from '@mui/material/Checkbox';
 import type { FormControlLabelProps } from '@mui/material/FormControlLabel';
 import { SX_PROP_HELPER_TEXT } from './constants';
 import {
@@ -17,19 +17,19 @@ import {
   FORM_INPUT_ARG_TYPES,
 } from './Form';
 
-export type FormControlLabelOptions = {
-  onChange: (newValue: boolean) => void;
-  defaultValue: string;
-  fullWidth: boolean;
-} & Omit<FormControlLabelProps, 'control' | 'onChange'> &
-  Omit<CheckboxProps, 'onChange'> &
-  Pick<FormInputComponentProps, 'name' | 'isRequired' | 'isInvalid'>;
+export type CheckboxProps = Omit<FormControlLabelProps, 'control' | 'onChange'> &
+  Omit<MuiCheckBoxProps, 'onChange'> & {
+    onChange: (newValue: boolean) => void;
+    label?: string;
+    defaultValue: string;
+    fullWidth: boolean;
+  } & Pick<FormInputComponentProps, 'name' | 'isRequired' | 'isInvalid'>;
 
-function Checkbox({ ...rest }: FormControlLabelOptions) {
+function Checkbox({ ...rest }: CheckboxProps) {
   rest.checked = rest.checked ?? false;
   const { onFormInputChange, renderFormInput, formInputError } = useFormInput<boolean>({
     name: rest.name,
-    label: rest.label as string,
+    label: rest.label,
     onChange: rest.onChange,
     validationProps: { isRequired: rest.isRequired, isInvalid: rest.isInvalid },
   });

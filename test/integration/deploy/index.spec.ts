@@ -1,5 +1,8 @@
 import * as path from 'path';
+import * as url from 'url';
 import { test, expect } from '../../playwright/localTest';
+
+const currentDirectory = url.fileURLToPath(new URL('.', import.meta.url));
 
 test.use({
   ignoreConsoleErrors: [
@@ -8,8 +11,10 @@ test.use({
 });
 
 test.use({
+  projectConfig: {
+    template: path.resolve(currentDirectory, './fixture'),
+  },
   localAppConfig: {
-    template: path.resolve(__dirname, './fixture'),
     cmd: 'start',
   },
 });

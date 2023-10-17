@@ -53,7 +53,6 @@ import QueryInputPanel from '../QueryInputPanel';
 import useFetchPrivate from '../useFetchPrivate';
 import QueryPreview from '../QueryPreview';
 import { usePrivateQuery } from '../context';
-import config from '../../config';
 
 const HTTP_METHODS = ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'HEAD'];
 
@@ -251,6 +250,7 @@ function QueryEditor({
   connectionParams: rawConnectionParams,
   value: input,
   onChange: setInput,
+  runtimeConfig,
 }: QueryEditorProps<RestConnectionParams, FetchQuery>) {
   const isBrowserSide = input.attributes.query.browser;
 
@@ -258,7 +258,7 @@ function QueryEditor({
   const baseUrl = isBrowserSide ? null : connectionParams?.baseUrl ?? null;
   // input.attributes.query.url will be reset when it's empty
   const urlValue: BindableAttrValue<string> =
-    input.attributes.query.url ?? getDefaultUrl(config, connectionParams);
+    input.attributes.query.url ?? getDefaultUrl(runtimeConfig, connectionParams);
 
   const introspection = usePrivateQuery<FetchPrivateQuery, IntrospectionResult>(
     {

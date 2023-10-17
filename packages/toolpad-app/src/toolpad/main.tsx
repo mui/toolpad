@@ -1,18 +1,20 @@
 import * as React from 'react';
 import * as ReactDOM from 'react-dom/client';
-import { QueryClientProvider } from '@tanstack/react-query';
 import invariant from 'invariant';
 import Toolpad from './Toolpad';
-import { queryClient } from '../api';
-// TODO: move to components/HarViewer after migrating away from Next.js
-import 'perf-cascade/dist/perf-cascade.css';
+import { APP_URL_WINDOW_PROPERTY } from '../constants';
+
+declare global {
+  interface Window {
+    [APP_URL_WINDOW_PROPERTY]?: string;
+  }
+}
+
+const appUrl = window[APP_URL_WINDOW_PROPERTY];
 
 function Main() {
-  return (
-    <QueryClientProvider client={queryClient}>
-      <Toolpad basename="/_toolpad" />
-    </QueryClientProvider>
-  );
+  invariant(appUrl, 'Missing app url');
+  return <Toolpad appUrl={appUrl} basename="/_toolpad" />;
 }
 
 const container = document.getElementById('root');

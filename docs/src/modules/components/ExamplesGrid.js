@@ -82,13 +82,13 @@ function layouts() {
       href: 'https://github.com/mui/mui-toolpad/tree/master/examples/with-wasm',
       source: 'https://github.com/mui/mui-toolpad/tree/master/examples/with-wasm',
     },
-    {
+    /* To be added later when this app is ready.  
       title: 'Stripe invoice downloader',
       description: 'A Stripe app to fetch and download invoices.',
       // src: '/static/toolpad/marketing/with-wasm.png',
       href: 'https://github.com/mui/mui-toolpad/tree/master/examples/stripe-script',
       source: 'https://github.com/mui/mui-toolpad/tree/master/examples/stripe-script',
-    },
+    },*/
   ];
 }
 

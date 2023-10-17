@@ -99,4 +99,9 @@ export default class EnvManager {
   async getDeclaredValues(): Promise<Record<string, string>> {
     return this.values;
   }
+
+  // eslint-disable-next-line class-methods-use-this
+  getEnv() {
+    return process.env;
+  }
 }

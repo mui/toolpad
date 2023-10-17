@@ -6,8 +6,10 @@ const currentDirectory = url.fileURLToPath(new URL('.', import.meta.url));
 
 test.use({
   colorScheme: 'dark',
-  localAppConfig: {
+  projectConfig: {
     template: path.resolve(currentDirectory, './fixture'),
+  },
+  localAppConfig: {
     cmd: 'start',
   },
 });

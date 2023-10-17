@@ -1251,10 +1251,10 @@
   resolved "https://registry.yarnpkg.com/@mui/types/-/types-7.2.6.tgz#d72b9e9eb0032e107e76033932d65c3f731d2608"
   integrity sha512-7sjLQrUmBwufm/M7jw/quNiPK/oor2+pGUQP2CULRcFCArYTq78oJ3D5esTaL0UMkXKJvDqXn6Ike69yAOBQng==
 
-"@mui/utils@5.14.13", "@mui/utils@^5.13.7", "@mui/utils@^5.14.11", "@mui/utils@^5.14.13", "@mui/utils@^5.14.3", "@mui/utils@^5.14.8":
-  version "5.14.13"
-  resolved "https://registry.yarnpkg.com/@mui/utils/-/utils-5.14.13.tgz#42c352b342da90b44a29a83d3dbda6ee1e56a0f8"
-  integrity sha512-2AFpyXWw7uDCIqRu7eU2i/EplZtks5LAMzQvIhC79sPV9IhOZU2qwOWVnPtdctRXiQJOAaXulg+A37pfhEueQw==
+"@mui/utils@5.14.14", "@mui/utils@^5.13.7", "@mui/utils@^5.14.11", "@mui/utils@^5.14.13", "@mui/utils@^5.14.3", "@mui/utils@^5.14.8":
+  version "5.14.14"
+  resolved "https://registry.yarnpkg.com/@mui/utils/-/utils-5.14.14.tgz#7b2a0bcfb44c3376fc81f85500f9bd01706682ac"
+  integrity sha512-3AKp8uksje5sRfVrtgG9Q/2TBsHWVBUtA0NaXliZqGcXo8J+A+Agp0qUW2rJ+ivgPWTCCubz9FZVT2IQZ3bGsw==
   dependencies:
     "@babel/runtime" "^7.23.1"
     "@types/prop-types" "^15.7.7"

@@ -56,15 +56,8 @@ function layouts() {
     },
     {
       title: 'Customized data grid',
-      description: 'A Toolpad app that shows how to customize a data grid using code component.',
-      src: '/static/toolpad/marketing/datagrid-columns.png',
-      href: 'https://github.com/mui/mui-toolpad/tree/master/examples/datagrid-columns',
-      source: 'https://github.com/mui/mui-toolpad/tree/master/examples/datagrid-columns',
-    },
-    {
-      title: 'Custom data grid columns',
       description:
-        'A basic Toolpad app that shows how to customize a data grid column using code component.',
+        'A basic Toolpad app that shows how to customize a data grid column using a custom code component.',
       src: '/static/toolpad/marketing/custom-datagrid-column.png',
       href: 'https://github.com/mui/mui-toolpad/tree/master/examples/custom-datagrid-column',
       source: 'https://github.com/mui/mui-toolpad/tree/master/examples/custom-datagrid-column',
@@ -82,6 +75,14 @@ function layouts() {
       src: '/static/toolpad/marketing/with-wasm.png',
       href: 'https://github.com/mui/mui-toolpad/tree/master/examples/with-wasm',
       source: 'https://github.com/mui/mui-toolpad/tree/master/examples/with-wasm',
+    },
+    {
+      title: 'Data provider with prisma',
+      description:
+        'A basic Toolpad application that demonstrates how to use data providers with Prisma.',
+      src: '/static/toolpad/marketing/with-prisma-data-provider.png',
+      href: 'https://github.com/mui/mui-toolpad/tree/master/examples/with-prisma-data-provider',
+      source: 'https://github.com/mui/mui-toolpad/tree/master/examples/with-prisma-data-provider',
     },
     /* To be added later when this app is ready.  
       title: 'Stripe invoice downloader',

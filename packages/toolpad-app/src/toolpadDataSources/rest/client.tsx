@@ -34,6 +34,7 @@ import BindableEditor, {
 import {
   useEvaluateLiveBinding,
   useEvaluateLiveBindingEntries,
+  evaluateBindableAttrLArray,
 } from '../../toolpad/AppEditor/useEvaluateLiveBinding';
 import MapEntriesEditor from '../../components/MapEntriesEditor';
 import { Maybe } from '../../utils/types';
@@ -267,11 +268,13 @@ function QueryEditor({
   );
 
   const env = React.useMemo(() => introspection?.data?.env, [introspection]);
+  const jsServerRuntime = React.useMemo(() => createServerJsRuntime(env!), [env]);
   const handleParamsChange = React.useCallback(
     (newParams: [string, BindableAttrValue<string>][]) => {
-      setInput((existing) => ({ ...existing, params: newParams }));
+      const newValue = evaluateBindableAttrLArray(jsServerRuntime, newParams, env!);
+      setInput((existing) => ({ ...existing, params: newValue }));
     },
-    [setInput],
+    [setInput, env, jsServerRuntime],
   );
 
   const handleUrlChange = React.useCallback(
@@ -333,8 +336,6 @@ function QueryEditor({
   );
 
   const paramsEntries = input.params || EMPTY_PARAMS;
-
-  const jsServerRuntime = React.useMemo(() => createServerJsRuntime(env!), [env]);
 
   const paramsEditorLiveValue = useEvaluateLiveBindingEntries({
     jsRuntime: jsServerRuntime,

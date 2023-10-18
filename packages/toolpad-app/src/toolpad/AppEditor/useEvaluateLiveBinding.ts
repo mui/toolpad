@@ -76,3 +76,14 @@ export function useEvaluateLiveBindingEntries({
     return evaluateBindableAttrEntries(jsRuntime, input, globalScope);
   }, [jsRuntime, input, globalScope]);
 }
+
+export function evaluateBindableAttrLArray(
+  jsRuntime: JsRuntime,
+  input: BindableAttrEntries,
+  globalScope: Record<string, unknown>,
+): [string, string | unknown][] {
+  return input.map(([key, bindable]) => {
+    const { value } = evaluateBindable(jsRuntime, bindable || null, globalScope);
+    return [key, value];
+  });
+}

@@ -132,6 +132,11 @@ export default function QueryEditor() {
     ],
   );
 
+  const refreshQueryToolsContext = React.useCallback(() => {
+    setToolsTabType('preview');
+    setIsPreviewLoading(false);
+  }, []);
+
   const handleTabChange = React.useCallback(
     (event: React.SyntheticEvent, newValue: string) => {
       if (currentView.kind === 'page') {
@@ -148,9 +153,10 @@ export default function QueryEditor() {
             },
           });
         }
+        refreshQueryToolsContext();
       }
     },
-    [appStateApi, currentView],
+    [appStateApi, currentView, refreshQueryToolsContext],
   );
 
   const hasUnsavedChanges = React.useCallback(

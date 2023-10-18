@@ -5,7 +5,7 @@ import PagesExplorer from './PagesExplorer';
 import PageHierarchyExplorer from './HierarchyExplorer';
 import { useAppState } from '../AppState';
 import AppOptions from '../AppOptions';
-import { DataExplorer } from './PageEditor/DataExplorer';
+import { DataExplorer } from './PageEditor/QueriesExplorer';
 import { PAGE_PANEL_WIDTH } from '../../constants';
 import { useProject } from '../../project';
 

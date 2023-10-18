@@ -159,72 +159,54 @@ const StyledListSubheader = styled(ListSubheader)(({ theme }) => ({
 }));
 
 interface FunctionAutocompleteProps {
-  selectedFunctionFileName?: string;
   files: FileIntrospectionResult[];
-  selectedFunctionName: string;
+  selectedFunctionId?: string;
   onCreateNew: () => void;
   onSelect: (functionName: string) => void;
 }
 
-// function HandlerFileTreeItem({ file }: HandlerFileTreeItemProps) {
-//   return (
-//     <FileTreeItemRoot
-//       key={file.name}
-//       nodeId={serializeFunctionId({ file: file.name })}
-//       label={
-//         <React.Fragment>
-//           {file.name}
-//           <FlexFill />
-//           <OpenCodeEditorButton iconButton filePath={file.name} fileType="resource" />
-//         </React.Fragment>
-//       }
-//     >
-//       {file.handlers.map((handler) => {
-//         return (
-//           <TreeItem
-//             className={fileTreeItemClasses.handlerItem}
-//             key={handler.name}
-//             nodeId={serializeFunctionId({ file: file.name, handler: handler.name })}
-//             label={handler.name}
-//           />
-//         );
-//       })}
-//     </FileTreeItemRoot>
-//   );
-// }
-
 function FunctionAutocomplete({
   files,
-  selectedFunctionName,
+  selectedFunctionId,
   onCreateNew,
   onSelect,
 }: FunctionAutocompleteProps) {
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
-  const [value, setValue] = React.useState<string>(selectedFunctionName);
+  const [inputValue, setInputValue] = React.useState<string>('');
 
-  const handleClick = React.useCallback(
-    (event: React.MouseEvent<HTMLElement>) => {
-      setValue(selectedFunctionName);
-      setAnchorEl(event.currentTarget);
-    },
-    [selectedFunctionName],
-  );
+  const { selectedFileName, selectedFunctionName } = React.useMemo(() => {
+    const parsed = parseFunctionId(selectedFunctionId ?? '');
+    return {
+      selectedFileName: parsed.file,
+      selectedFunctionName: parsed.handler,
+    };
+  }, [selectedFunctionId]);
+
+  const selectedFunctionLabel = React.useMemo(() => {
+    if (selectedFileName) {
+      return `${selectedFileName} > ${selectedFunctionName}`;
+    }
+    return 'Select function';
+  }, [selectedFileName, selectedFunctionName]);
+
+  const options = React.useMemo(() => {
+    const functions: string[] = [];
+
+    files.forEach((file) => {
+      file.handlers.forEach((fn) => {
+        functions.push(serializeFunctionId({ file: file.name, handler: fn.name }));
+      });
+    });
+    return functions;
+  }, [files]);
+
+  const handleClick = React.useCallback((event: React.MouseEvent<HTMLElement>) => {
+    setAnchorEl(event.currentTarget);
+  }, []);
 
   const handleClose = React.useCallback(() => {
     setAnchorEl(null);
   }, []);
-
-  const [options, functionNameFileNameMap] = React.useMemo(() => {
-    const functions: string[] = [];
-    const nameMap = new Map<string, string>();
-    files.forEach((file) => {
-      file.handlers.forEach((fn) => {
-        functions.push(fn.name);
-        nameMap.set(fn.name, file.name);
-      });
-    });
-    return [functions, nameMap];
-  }, [files]);
 
   const open = Boolean(anchorEl);
   const id = open ? 'function-selector' : undefined;
@@ -233,6 +215,10 @@ function FunctionAutocomplete({
     onCreateNew();
   }, [onCreateNew]);
 
+  const handleInput = React.useCallback((event: React.FormEvent<HTMLInputElement>) => {
+    setInputValue((event.target as HTMLInputElement).value);
+  }, []);
+
   return (
     <React.Fragment>
       <FunctionButton
@@ -240,7 +226,7 @@ function FunctionAutocomplete({
         clickable
         icon={<DataObjectOutlinedIcon fontSize="inherit" color="inherit" />}
         onClick={handleClick}
-        label={value || 'Select function'}
+        label={selectedFunctionLabel}
       />
       <StyledPopper id={id} open={open} anchorEl={anchorEl} placement="bottom-start">
         <ClickAwayListener onClickAway={handleClose}>
@@ -261,7 +247,9 @@ function FunctionAutocomplete({
                   handleClose();
                 }
               }}
-              value={value}
+              value={selectedFunctionId}
+              inputValue={inputValue}
+              onInput={handleInput}
               onChange={(event, newValue, reason) => {
                 if (
                   event.type === 'keydown' &&
@@ -270,13 +258,9 @@ function FunctionAutocomplete({
                 ) {
                   return;
                 }
-                setValue(newValue ?? '');
 
                 if (newValue) {
-                  const selectedFile = functionNameFileNameMap.get(newValue);
-                  if (selectedFile) {
-                    onSelect(serializeFunctionId({ file: selectedFile, handler: newValue }));
-                  }
+                  onSelect(newValue);
                 }
 
                 handleClose();
@@ -284,7 +268,7 @@ function FunctionAutocomplete({
               PopperComponent={PopperComponent}
               renderTags={() => null}
               noOptionsText="No functions"
-              groupBy={(option) => functionNameFileNameMap.get(option) ?? ''}
+              groupBy={(option) => parseFunctionId(option).file ?? ''}
               renderGroup={(params) => [
                 <StyledListSubheader key={params.key}>
                   <Stack direction="row" justifyContent={'space-between'}>
@@ -342,25 +326,25 @@ function FunctionAutocomplete({
                       fontFamily: (theme) => theme.typography.fontFamilyCode,
                     }}
                   >
-                    {option}
+                    {parseFunctionId(option).handler ?? ''}
                   </Box>
                 </li>
               )}
               options={options.sort((a, b) => {
                 // Display the selected function first.
-                if (value === a) {
+                if (selectedFunctionId === a) {
                   return -1;
                 }
-                if (value === b) {
+                if (selectedFunctionId === b) {
                   return 1;
                 }
 
                 // Then display the functions in the same file.
-                const fa = functionNameFileNameMap.get(a);
-                const fb = functionNameFileNameMap.get(b);
+                const fa = parseFunctionId(a).file;
+                const fb = parseFunctionId(b).file;
 
                 // Display the file with the selected function first.
-                const sf = functionNameFileNameMap.get(value);
+                const sf = parseFunctionId(selectedFunctionId ?? '').file;
 
                 if (sf === fa) {
                   return -1;
@@ -503,19 +487,14 @@ function QueryEditor({
     },
   );
 
-  const [mounted, setMounted] = React.useState(false);
-
   const handleRunPreview = React.useCallback(() => {
     setIsPreviewLoading(true);
     runPreview();
   }, [setIsPreviewLoading, runPreview]);
 
   React.useEffect(() => {
-    if (!mounted) {
-      setHandleRunPreview(() => handleRunPreview);
-      setMounted(true);
-    }
-  }, [setHandleRunPreview, handleRunPreview, mounted]);
+    setHandleRunPreview(() => handleRunPreview);
+  }, [setHandleRunPreview, handleRunPreview]);
 
   const liveBindings = useEvaluateLiveBindings({
     jsRuntime: jsBrowserRuntime,
@@ -524,11 +503,8 @@ function QueryEditor({
   });
 
   const handleSelectFunction = React.useCallback(
-    (nodeId: string) => {
-      const parsed = parseFunctionId(nodeId);
-      if (parsed.handler) {
-        updateProp('function', nodeId);
-      }
+    (functionId: string) => {
+      updateProp('function', functionId);
     },
     [updateProp],
   );
@@ -583,11 +559,9 @@ function QueryEditor({
                 mx: 2,
               }}
             >
-              <p>{`File: ${selectedFile}, Function: ${selectedFunction}`}</p>
               <FunctionAutocomplete
-                selectedFunctionFileName={selectedFile || ''}
                 files={introspection.data?.files || []}
-                selectedFunctionName={selectedFunction || ''}
+                selectedFunctionId={input.attributes.query.function || ''}
                 onCreateNew={handleCreateNewCommit}
                 onSelect={handleSelectFunction}
               />
@@ -654,7 +628,10 @@ function QueryEditor({
                         const paramValue = key === name ? newValue : paramsObject[key];
                         return paramValue ? [[key, paramValue]] : [];
                       });
-                      updateProp('params', newParams);
+                      appStateApi.updateQueryDraft((draft) => ({
+                        ...draft,
+                        params: newParams,
+                      }));
                     }}
                   />
                 ) : null;

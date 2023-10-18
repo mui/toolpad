@@ -299,10 +299,14 @@ export function DataExplorer() {
 
   const handleDeleteNode = React.useCallback(
     (selectedQueryId: NodeId) => {
-      const selectedQueryIndex = queryNodes.findIndex((query) => query.id === selectedQueryId);
-      appStateApi.closeQueryTab(selectedQueryIndex, selectedQueryId, true);
+      const selectedQueryTabIndex = currentView.queryPanel?.queryTabs?.findIndex(
+        (tab) => tab.meta?.id === selectedQueryId,
+      );
+      if (selectedQueryTabIndex !== undefined) {
+        appStateApi.closeQueryTab(selectedQueryTabIndex, selectedQueryId, true);
+      }
     },
-    [appStateApi, queryNodes],
+    [appStateApi, currentView],
   );
 
   const existingNames = React.useMemo(() => {

@@ -526,8 +526,7 @@ function QueryEditor({
       await execApi('createNew', [proposedFileName]);
       await introspection.refetch();
     } catch (error) {
-      // eslint-disable-next-line no-alert
-      window.alert(errorFrom(error).message);
+      console.error(errorFrom(error).message);
     }
   }, [execApi, introspection, proposedFileName]);
 

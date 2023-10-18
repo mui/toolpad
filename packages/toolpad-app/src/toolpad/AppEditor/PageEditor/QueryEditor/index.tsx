@@ -14,6 +14,7 @@ import useShortcut from '../../../../utils/useShortcut';
 import { isMac } from '../../../../utils/platform';
 import QueryToolsContext, { QueryToolsContextProps } from './QueryToolsContext';
 import { QueryEditorToolsTabType } from '../../../../types';
+import useUnsavedChangesConfirm from '../../../hooks/useUnsavedChangesConfirm';
 
 function SaveShortcutIndicator() {
   return <span style={{ opacity: 0.55, marginLeft: 6 }}>{isMac() ? '⌘' : <kbd>Ctrl</kbd>}S</span>;
@@ -32,17 +33,17 @@ function TabCloseIcon({
 
   const [notHovered, setNotHovered] = React.useState(true);
 
-  const onClose = React.useCallback(
-    (event: React.MouseEvent<SVGElement>) => {
-      // Prevent the tab from being selected.
-      event.stopPropagation();
-      if (queryIndex === undefined || queryId === undefined) {
-        return;
-      }
-      appStateApi.closeQueryTab(queryIndex, queryId);
-    },
-    [appStateApi, queryIndex, queryId],
-  );
+  const onClose = React.useCallback(() => {
+    if (queryIndex === undefined || queryId === undefined) {
+      return;
+    }
+    appStateApi.closeQueryTab(queryIndex, queryId);
+  }, [appStateApi, queryIndex, queryId]);
+
+  const { handleCloseWithUnsavedChanges: handleCloseTab } = useUnsavedChangesConfirm({
+    hasUnsavedChanges: unsaved ?? false,
+    onClose,
+  });
   return unsaved && notHovered ? (
     <CircleIcon
       sx={{
@@ -61,7 +62,11 @@ function TabCloseIcon({
       onMouseLeave={() => {
         setNotHovered(true);
       }}
-      onClick={onClose}
+      onClick={(event) => {
+        // Prevent the tab from being selected.
+        event.stopPropagation();
+        handleCloseTab();
+      }}
       sx={{
         color: (theme) =>
           theme.palette.mode === 'dark' ? theme.palette.primaryDark[400] : theme.palette.grey[500],
@@ -211,6 +216,18 @@ export default function QueryEditor() {
     [hasUnsavedChanges, currentTabIndex],
   );
 
+  const hasUnsavedChangesInPanel = React.useMemo(() => {
+    if (currentView.kind !== 'page' || !currentView.queryPanel?.queryTabs) {
+      return false;
+    }
+    return currentView.queryPanel?.queryTabs.some((tab) => tab.draft !== tab.saved);
+  }, [currentView]);
+
+  const { handleCloseWithUnsavedChanges: handleClosePanel } = useUnsavedChangesConfirm({
+    hasUnsavedChanges: hasUnsavedChangesInPanel,
+    onClose: onClosePanel,
+  });
+
   useShortcut({ key: 's', metaKey: true, disabled: saveDisabled }, handleSave);
 
   return currentView.kind === 'page' &&
@@ -266,7 +283,7 @@ export default function QueryEditor() {
                   />
                 ))}
               </TabList>
-              <IconButton size="small" disableRipple onClick={onClosePanel}>
+              <IconButton size="small" disableRipple onClick={handleClosePanel}>
                 <CancelPresentationIcon
                   sx={{
                     mr: 1,

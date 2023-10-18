@@ -100,9 +100,14 @@ function ChartDataPropEditor({
 
   const handleDuplicateDataSeries = React.useCallback(
     (index: number) => () => {
+      const newDataSeriesCount = value.length + 1;
+
       onChange([
         ...value.slice(0, index + 1),
-        { ...value[index], color: defaultPalette[(index + 1) % defaultPalette.length] },
+        {
+          ...value[index],
+          color: defaultPalette[(newDataSeriesCount - 1) % defaultPalette.length],
+        },
         ...value.slice(index + 1),
       ]);
     },

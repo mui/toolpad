@@ -202,10 +202,13 @@ function FunctionAutocomplete({
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const [value, setValue] = React.useState<string>(selectedFunctionName);
 
-  const handleClick = (event: React.MouseEvent<HTMLElement>) => {
-    setValue(selectedFunctionName);
-    setAnchorEl(event.currentTarget);
-  };
+  const handleClick = React.useCallback(
+    (event: React.MouseEvent<HTMLElement>) => {
+      setValue(selectedFunctionName);
+      setAnchorEl(event.currentTarget);
+    },
+    [selectedFunctionName],
+  );
 
   const handleClose = React.useCallback(() => {
     setAnchorEl(null);
@@ -230,7 +233,7 @@ function FunctionAutocomplete({
     onCreateNew();
   }, [onCreateNew]);
 
-  return files.length > 0 ? (
+  return (
     <React.Fragment>
       <FunctionButton
         aria-describedby={id}
@@ -386,7 +389,7 @@ function FunctionAutocomplete({
         </ClickAwayListener>
       </StyledPopper>
     </React.Fragment>
-  ) : null;
+  );
 }
 
 interface ResolvedPreviewProps {
@@ -550,9 +553,7 @@ function QueryEditor({
       // eslint-disable-next-line no-alert
       window.alert(errorFrom(error).message);
     }
-    const newNodeId = serializeFunctionId({ file: proposedFileName, handler: 'default' });
-    updateProp('function', newNodeId);
-  }, [execApi, introspection, proposedFileName, updateProp]);
+  }, [execApi, introspection, proposedFileName]);
 
   return (
     <PanelGroup direction="horizontal">
@@ -582,6 +583,7 @@ function QueryEditor({
                 mx: 2,
               }}
             >
+              <p>{`File: ${selectedFile}, Function: ${selectedFunction}`}</p>
               <FunctionAutocomplete
                 selectedFunctionFileName={selectedFile || ''}
                 files={introspection.data?.files || []}

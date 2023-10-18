@@ -30,7 +30,6 @@ spec:
             `throws, data ${throws.error ? "had an error" : throws.data}`
     - component: Text
       name: text4
-      
       layout:
         columnSize: 1
       props:
@@ -62,14 +61,12 @@ spec:
             value:
               $$jsExpression: |
                 `echo, secret: ${echo.data.secrets.bar}`
-          
         - component: Text
           name: typography5
           props:
             value:
               $$jsExpression: |
                 `echo, secret not in .env: ${echo.data.secrets.baz}`
-          
     - component: Text
       name: text5
       layout:
@@ -79,7 +76,7 @@ spec:
           $$jsExpression: |
             edited.data
     - component: Button
-      name: button 
+      name: button
       layout:
         columnSize: 1
       props:
@@ -89,7 +86,7 @@ spec:
         onClick:
           $$jsExpressionAction: manualQuery.call()
     - component: Text
-      name: text1   
+      name: text1
       layout:
         columnSize: 1
       props:
@@ -107,14 +104,12 @@ spec:
               $$jsExpressionAction: |-
                 await increment.call()
                 getGlobal.refetch()
-          
         - component: Text
           name: text
           props:
             value:
               $$jsExpression: |
                 `global value: ${getGlobal.data}`
-          
     - component: Text
       name: text3
       layout:

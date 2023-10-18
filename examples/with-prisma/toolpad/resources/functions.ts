@@ -1,6 +1,9 @@
+/* eslint-disable no-underscore-dangle */
 import { PrismaClient, Prisma } from '@prisma/client';
 
-const prisma = new PrismaClient();
+// Reuse existing PrismaClient instance during development
+(globalThis as any).__prisma ??= new PrismaClient();
+const prisma = (globalThis as any).__prisma;
 
 export async function getUsers() {
   return prisma.user.findMany();

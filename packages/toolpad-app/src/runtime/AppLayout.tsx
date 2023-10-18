@@ -24,14 +24,19 @@ export interface NavigationEntry {
 
 const DRAWER_WIDTH = 250; // px
 
-interface AppNavigationProps {
+interface AppPagesNavigationProps {
   activePage?: string;
   pages: NavigationEntry[];
   clipped?: boolean;
   search?: string;
 }
 
-function AppNavigation({ activePage, pages, clipped = false, search }: AppNavigationProps) {
+function AppPagesNavigation({
+  activePage,
+  pages,
+  clipped = false,
+  search,
+}: AppPagesNavigationProps) {
   const navListSubheaderId = React.useId();
 
   return (
@@ -107,7 +112,7 @@ export function AppLayout({
   return (
     <Box sx={{ flex: 1, display: 'flex' }}>
       {hasShell ? (
-        <AppNavigation
+        <AppPagesNavigation
           activePage={activePage}
           pages={pages}
           clipped={clipped}

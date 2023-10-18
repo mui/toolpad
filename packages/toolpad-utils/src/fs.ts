@@ -3,7 +3,7 @@ import * as path from 'path';
 import { Dirent } from 'fs';
 import * as yaml from 'yaml';
 import { yamlOverwrite } from 'yaml-diff-patch';
-import * as prettier from 'prettier';
+import prettier from 'prettier';
 import { errorFrom } from './errors';
 
 /**

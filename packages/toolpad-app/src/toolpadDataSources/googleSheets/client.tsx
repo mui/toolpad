@@ -81,7 +81,7 @@ function QueryEditor({
 
   const handleSpreadsheetChange = React.useCallback(
     (event: React.SyntheticEvent<Element, Event>, newValue: GoogleDriveFile | null) => {
-      setInput((existing) => {
+      setInput?.((existing) => {
         existing = appDom.setQueryProp(existing, 'sheetName', null);
         existing = appDom.setQueryProp(existing, 'spreadsheetId', newValue?.id ?? null);
         return existing;
@@ -92,7 +92,7 @@ function QueryEditor({
 
   const handleSheetChange = React.useCallback(
     (event: React.SyntheticEvent<Element, Event>, newValue: GoogleSheet | null) => {
-      setInput((existing) =>
+      setInput?.((existing) =>
         appDom.setQueryProp(existing, 'sheetName', newValue?.properties?.title ?? null),
       );
     },
@@ -101,14 +101,14 @@ function QueryEditor({
 
   const handleRangeChange = React.useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
-      setInput((existing) => appDom.setQueryProp(existing, 'ranges', event.target.value));
+      setInput?.((existing) => appDom.setQueryProp(existing, 'ranges', event.target.value));
     },
     [setInput],
   );
 
   const handleTransformChange = React.useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
-      setInput((existing) => appDom.setQueryProp(existing, 'headerRow', event.target.checked));
+      setInput?.((existing) => appDom.setQueryProp(existing, 'headerRow', event.target.checked));
     },
     [setInput],
   );

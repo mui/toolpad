@@ -200,7 +200,7 @@ export function QueryEditor({
 
   const handleParamsChange = React.useCallback(
     (newParams: [string, BindableAttrValue<string>][]) => {
-      setInput((existing) => ({ ...existing, params: newParams }));
+      setInput?.((existing) => ({ ...existing, params: newParams }));
     },
     [setInput],
   );
@@ -242,7 +242,7 @@ export function QueryEditor({
                 <MonacoEditor
                   value={input.attributes.query.sql}
                   onChange={(newValue) =>
-                    setInput((existing) => appDom.setQueryProp(existing, 'sql', newValue))
+                    setInput?.((existing) => appDom.setQueryProp(existing, 'sql', newValue))
                   }
                   language="sql"
                 />

@@ -71,7 +71,7 @@ function Chart({ data = [], loading, error, height, sx }: ChartProps) {
           }
           return dataSeries.data.map((dataSeriesPoint) => dataSeriesPoint[dataSeries.xKey!]);
         })
-        .filter((value, index, array) => array.indexOf(value) === index)
+        .filter((value, index, array) => value !== undefined && array.indexOf(value) === index)
         .sort((a: number | string, b: number | string) => {
           if (typeof a === 'number' && typeof b === 'number') {
             return (a as number) - (b as number);

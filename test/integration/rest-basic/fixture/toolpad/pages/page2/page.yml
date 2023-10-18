@@ -1,6 +1,0 @@
-apiVersion: v1
-kind: page
-spec:
-  id: qab-IOQ
-  title: page2
-  display: shell

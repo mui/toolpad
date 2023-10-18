@@ -337,14 +337,40 @@ function ChartDataPropEditor({
                 options={dataSeriesKeySuggestions[dataSeriesEditIndex]}
                 value={editDataSeries?.xKey || ''}
                 onInputChange={handleDataSeriesAutocompletePropChange(dataSeriesEditIndex, 'xKey')}
-                renderInput={(params) => <TextField {...params} label="xKey" />}
+                renderInput={(params) => {
+                  const keyExists =
+                    !!editDataSeries?.xKey &&
+                    dataSeriesKeySuggestions[dataSeriesEditIndex].includes(editDataSeries.xKey);
+
+                  return (
+                    <TextField
+                      {...params}
+                      label="xKey"
+                      error={!keyExists}
+                      helperText={keyExists ? '' : 'Property not present in data'}
+                    />
+                  );
+                }}
               />
               <Autocomplete
                 freeSolo
                 options={dataSeriesKeySuggestions[dataSeriesEditIndex]}
                 value={editDataSeries?.yKey || ''}
                 onInputChange={handleDataSeriesAutocompletePropChange(dataSeriesEditIndex, 'yKey')}
-                renderInput={(params) => <TextField {...params} label="yKey" />}
+                renderInput={(params) => {
+                  const keyExists =
+                    !!editDataSeries?.yKey &&
+                    dataSeriesKeySuggestions[dataSeriesEditIndex].includes(editDataSeries.yKey);
+
+                  return (
+                    <TextField
+                      {...params}
+                      label="yKey"
+                      error={!keyExists}
+                      helperText={keyExists ? '' : 'Property not present in data'}
+                    />
+                  );
+                }}
               />
               <ColorPicker
                 label="color"

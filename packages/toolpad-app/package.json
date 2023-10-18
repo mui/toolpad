@@ -61,7 +61,7 @@
     "@mui/toolpad-utils": "0.1.32",
     "@mui/types": "7.2.6",
     "@mui/utils": "5.14.14",
-    "@mui/x-charts": "6.0.0-alpha.12",
+    "@mui/x-charts": "https://pkg.csb.dev/mui/mui-x/commit/349587dd/@mui/x-charts",
     "@mui/x-data-grid": "6.16.2",
     "@mui/x-data-grid-pro": "6.16.2",
     "@mui/x-date-pickers": "6.16.2",

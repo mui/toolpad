@@ -41,7 +41,7 @@ import useQueryPreview from '../useQueryPreview';
 import QueryPreview from '../QueryPreview';
 import BindableEditor from '../../toolpad/AppEditor/PageEditor/BindableEditor';
 import { getDefaultControl, usePropControlsContext } from '../../toolpad/propertyControls';
-import { parseFunctionId, parseLegacyFunctionId, serializeFunctionId } from './shared';
+import { parseLegacyFunctionId, serializeFunctionId, transformLegacyFunctionId } from './shared';
 import { FileIntrospectionResult } from '../../server/functionsTypesWorker';
 import QueryToolsContext from '../../toolpad/AppEditor/PageEditor/QueryEditor/QueryToolsContext';
 
@@ -175,7 +175,7 @@ function FunctionAutocomplete({
   const [inputValue, setInputValue] = React.useState<string>('');
 
   const { selectedFileName, selectedFunctionName } = React.useMemo(() => {
-    const parsed = parseFunctionId(selectedFunctionId ?? '');
+    const parsed = parseLegacyFunctionId(selectedFunctionId ?? '');
     return {
       selectedFileName: parsed.file,
       selectedFunctionName: parsed.handler,
@@ -268,7 +268,7 @@ function FunctionAutocomplete({
               PopperComponent={PopperComponent}
               renderTags={() => null}
               noOptionsText="No functions"
-              groupBy={(option) => parseFunctionId(option).file ?? ''}
+              groupBy={(option) => parseLegacyFunctionId(option).file ?? ''}
               renderGroup={(params) => [
                 <StyledListSubheader key={params.key}>
                   <Stack direction="row" justifyContent={'space-between'}>
@@ -326,7 +326,7 @@ function FunctionAutocomplete({
                       fontFamily: (theme) => theme.typography.fontFamilyCode,
                     }}
                   >
-                    {parseFunctionId(option).handler ?? ''}
+                    {parseLegacyFunctionId(option).handler ?? ''}
                   </Box>
                 </li>
               )}
@@ -340,13 +340,17 @@ function FunctionAutocomplete({
                 }
 
                 // Then display the functions in the same file.
-                const fa = parseFunctionId(a).file;
-                const fb = parseFunctionId(b).file;
+                const fa = parseLegacyFunctionId(a).file;
+                const fb = parseLegacyFunctionId(b).file;
 
                 // Display the file with the selected function first.
-                const sf = parseFunctionId(selectedFunctionId ?? '').file;
+                const sf = parseLegacyFunctionId(selectedFunctionId ?? '').file;
 
                 if (sf === fa) {
+                  if (fa === fb) {
+                    // Alphabetically sort functions with the same file
+                    return a.localeCompare(b);
+                  }
                   return -1;
                 }
                 if (sf === fb) {
@@ -560,7 +564,9 @@ function QueryEditor({
             >
               <FunctionAutocomplete
                 files={introspection.data?.files || []}
-                selectedFunctionId={input.attributes.query.function || ''}
+                selectedFunctionId={transformLegacyFunctionId(
+                  input.attributes.query.function || '',
+                )}
                 onCreateNew={handleCreateNewCommit}
                 onSelect={handleSelectFunction}
               />

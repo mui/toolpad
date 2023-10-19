@@ -199,7 +199,10 @@ export default function QueryEditorPanel({ draft, saved }: QueryEditorProps) {
   const { dom } = useAppState();
   const projectApi = useProjectApi();
 
-  const { data: runtimeConfig } = projectApi.useQuery('getRuntimeConfig', []);
+  const { data: runtimeConfig, status: runtimeConfigFetchStatus } = projectApi.useQuery(
+    'getRuntimeConfig',
+    [],
+  );
 
   const connectionId =
     appDom.deref(saved ? saved?.attributes?.connectionId : draft?.attributes?.connectionId) ?? null;
@@ -239,10 +242,10 @@ export default function QueryEditorPanel({ draft, saved }: QueryEditorProps) {
     setTabType((prev) => (prev === 'config' ? 'settings' : 'config'));
   }, []);
 
-  return dataSourceId && dataSource && queryEditorContext && runtimeConfig ? (
+  return dataSourceId && dataSource && queryEditorContext ? (
     <ConnectionContextProvider value={queryEditorContext}>
       <Box sx={{ height: '100%', p: 0, overflow: 'hidden' }}>
-        {draft ? (
+        {draft && runtimeConfigFetchStatus === 'success' ? (
           <dataSource.QueryEditor
             connectionParams={connectionParams}
             value={draft}

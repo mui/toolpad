@@ -261,7 +261,7 @@ function ChartDataPropEditor({
                     <ListItemText
                       primary={label}
                       primaryTypographyProps={{
-                        style: { overflow: 'hidden', textOverflow: 'ellipsis' },
+                        style: { overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: 166 },
                       }}
                     />
                   </ListItemButton>

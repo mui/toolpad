@@ -8,7 +8,7 @@
     "start": "node index.mjs"
   },
   "dependencies": {
-    "@mui/toolpad": "0.1.32",
+    "@mui/toolpad": "0.1.33",
     "express": "4.18.2"
   },
   "devDependencies": {}

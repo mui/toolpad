@@ -27,6 +27,9 @@ test('Column prop updates are not lost on drag interactions', async ({ page }) =
 
   const firstGridLocator = canvasGridLocator.first();
 
+  // Wait for data to load so that datagrid bounding box is stable
+  await expect(editorModel.pageRoot.getByText('Todd Breitenberg')).toBeVisible();
+
   await clickCenter(page, firstGridLocator);
 
   await editorModel.componentEditor.locator('button:has-text("columns")').click();

@@ -11,6 +11,7 @@ import {
   RECTANGLE_EDGE_BOTTOM,
   RECTANGLE_EDGE_LEFT,
   RECTANGLE_EDGE_RIGHT,
+  RECTANGLE_EDGE_TOP,
 } from '../../../../utils/geometry';
 import { usePageEditorState } from '../PageEditorProvider';
 
@@ -131,6 +132,15 @@ const DraggableEdge = styled('div', {
     dynamicStyles = {
       cursor: 'ns-resize',
       bottom: -10,
+      height: 22,
+      left: 0,
+      width: '100%',
+    };
+  }
+  if (edge === RECTANGLE_EDGE_TOP) {
+    dynamicStyles = {
+      cursor: 'ns-resize',
+      top: -10,
       height: 22,
       left: 0,
       width: '100%',

@@ -81,6 +81,15 @@ export default function AppCanvas({
     }
   });
 
+  const handleWindowResize = React.useCallback(() => {
+    handleScreenUpdate();
+  }, []);
+
+  React.useEffect(() => {
+    window.addEventListener('resize', handleWindowResize, false);
+    return () => window.removeEventListener('resize', handleWindowResize, false);
+  }, [handleWindowResize]);
+
   React.useEffect(() => {
     if (!bridge) {
       return;

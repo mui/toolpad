@@ -88,6 +88,10 @@ export function deleteOrphanedLayoutNodes(
             );
           }
 
+          if (isPageColumn(lastContainerChild) && appDom.isPage(parentParent)) {
+            updatedDom = appDom.spreadNode(updatedDom, lastContainerChild);
+          }
+
           orphanedLayoutNodeIds = [...orphanedLayoutNodeIds, parent.id];
         }
 

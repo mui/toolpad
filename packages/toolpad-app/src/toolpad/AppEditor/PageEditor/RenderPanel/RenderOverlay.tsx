@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { NodeId } from '@mui/toolpad-core';
+import { NodeId, NumberValueType } from '@mui/toolpad-core';
 import { styled } from '@mui/material';
 import clsx from 'clsx';
 import invariant from 'invariant';
@@ -23,6 +23,7 @@ import {
   PAGE_COLUMN_COMPONENT_ID,
   isFormComponent,
   FORM_COMPONENT_ID,
+  SPACER_COMPONENT_ID,
 } from '../../../../runtime/toolpadComponents';
 import {
   getRectanglePointActiveEdge,
@@ -51,8 +52,6 @@ import {
 } from '../../pageLayout';
 
 const VERTICAL_RESIZE_SNAP_UNITS = 2; // px
-
-const MIN_RESIZABLE_ELEMENT_HEIGHT = 100; // px
 
 const overlayClasses = {
   hud: 'Toolpad_Hud',
@@ -306,7 +305,7 @@ export default function RenderOverlay({ bridge }: RenderOverlayProps) {
 
       const isFirstChild =
         parent && appDom.isElement(parent) && nodeParentProp
-          ? appDom.getNodeFirstChild(dom, parent, node.parentProp)?.id === node.id
+          ? appDom.getNodeFirstChild(dom, parent, nodeParentProp)?.id === node.id
           : false;
       const isLastChild =
         parent && appDom.isElement(parent) && nodeParentProp
@@ -332,11 +331,18 @@ export default function RenderOverlay({ bridge }: RenderOverlayProps) {
       (event: React.MouseEvent<HTMLElement>) => {
         event.stopPropagation();
 
-        api.edgeDragStart({ nodeId: node.id, edge });
+        const parent = appDom.getParent(dom, node);
 
-        selectNode(node.id);
+        const isPageColumnChild = parent ? appDom.isElement(parent) && isPageColumn(parent) : false;
+        const isResizingVertically = edge === RECTANGLE_EDGE_TOP || edge === RECTANGLE_EDGE_BOTTOM;
+
+        const nodeToResize = parent && isPageColumnChild && !isResizingVertically ? parent : node;
+
+        api.edgeDragStart({ nodeId: nodeToResize.id, edge });
+
+        selectNode(nodeToResize.id);
       },
-    [api, selectNode],
+    [api, dom, selectNode],
   );
 
   const handleKeyDown = React.useCallback(
@@ -1183,6 +1189,10 @@ export default function RenderOverlay({ bridge }: RenderOverlayProps) {
 
       const cursorPos = bridge?.canvasCommands.getViewCoordinates(event.clientX, event.clientY);
 
+      const previousSibling = appDom.getSiblingBeforeNode(dom, draggedNode, 'children');
+      const previousSiblingInfo = previousSibling && nodesInfo[previousSibling.id];
+      const previousSiblingRect = previousSiblingInfo?.rect;
+
       if (draggedNodeRect && parentRect && resizePreviewElement && cursorPos) {
         if (draggedEdge === RECTANGLE_EDGE_LEFT || draggedEdge === RECTANGLE_EDGE_RIGHT) {
           let snappedToGridCursorRelativePosX = cursorPos.x - draggedNodeRect.x;
@@ -1199,10 +1209,6 @@ export default function RenderOverlay({ bridge }: RenderOverlayProps) {
               snappedToGridCursorRelativePosX = gridColumnEdge - draggedNodeRect.x;
             }
           }
-
-          const previousSibling = appDom.getSiblingBeforeNode(dom, draggedNode, 'children');
-          const previousSiblingInfo = previousSibling && nodesInfo[previousSibling.id];
-          const previousSiblingRect = previousSiblingInfo?.rect;
 
           if (
             draggedEdge === RECTANGLE_EDGE_LEFT &&
@@ -1238,9 +1244,28 @@ export default function RenderOverlay({ bridge }: RenderOverlayProps) {
           }
         }
 
+        const defaultMinimumResizableHeight = 100;
+
+        const resizableHeightProp = draggedNodeInfo?.componentConfig?.resizableHeightProp;
+        const minimumVerticalResizeHeight = resizableHeightProp
+          ? (draggedNodeInfo.componentConfig?.argTypes![resizableHeightProp] as NumberValueType)
+              .minimum ?? 100
+          : null;
+
+        const previousSiblingResizableHeightProp =
+          previousSiblingInfo?.componentConfig?.resizableHeightProp;
+        const previousSiblingMinimumVerticalResizeHeight = previousSiblingResizableHeightProp
+          ? (
+              previousSiblingInfo.componentConfig?.argTypes![
+                previousSiblingResizableHeightProp
+              ] as NumberValueType
+            ).minimum ?? defaultMinimumResizableHeight
+          : previousSiblingRect?.height ?? null;
+
         if (
           draggedEdge === RECTANGLE_EDGE_BOTTOM &&
-          cursorPos.y > draggedNodeRect.y + MIN_RESIZABLE_ELEMENT_HEIGHT
+          minimumVerticalResizeHeight &&
+          cursorPos.y > draggedNodeRect.y + minimumVerticalResizeHeight
         ) {
           const snappedToGridCursorRelativePosY =
             Math.ceil((cursorPos.y - draggedNodeRect.y) / VERTICAL_RESIZE_SNAP_UNITS) *
@@ -1249,6 +1274,29 @@ export default function RenderOverlay({ bridge }: RenderOverlayProps) {
           const updatedTransformScale = snappedToGridCursorRelativePosY / draggedNodeRect.height;
 
           resizePreviewElement.style.transformOrigin = '50% 0';
+          resizePreviewElement.style.transform = `scaleY(${updatedTransformScale})`;
+        }
+
+        if (
+          draggedEdge === RECTANGLE_EDGE_TOP &&
+          minimumVerticalResizeHeight &&
+          cursorPos.y < draggedNodeRect.y + draggedNodeRect.height - minimumVerticalResizeHeight &&
+          (!previousSiblingRect ||
+            !previousSiblingMinimumVerticalResizeHeight ||
+            cursorPos.y >
+              draggedNodeRect.y -
+                previousSiblingRect.height +
+                previousSiblingMinimumVerticalResizeHeight)
+        ) {
+          const snappedToGridCursorRelativePosY =
+            Math.ceil(
+              (draggedNodeRect.y + draggedNodeRect.height - cursorPos.y) /
+                VERTICAL_RESIZE_SNAP_UNITS,
+            ) * VERTICAL_RESIZE_SNAP_UNITS;
+
+          const updatedTransformScale = snappedToGridCursorRelativePosY / draggedNodeRect.height;
+
+          resizePreviewElement.style.transformOrigin = '50% 100%';
           resizePreviewElement.style.transform = `scaleY(${updatedTransformScale})`;
         }
       }
@@ -1272,41 +1320,43 @@ export default function RenderOverlay({ bridge }: RenderOverlayProps) {
 
       if (draggedNodeRect && resizePreviewRect) {
         domApi.update((draft) => {
+          const parent = appDom.getParent(draft, draggedNode);
+
+          let previousSibling = appDom.getSiblingBeforeNode(draft, draggedNode, 'children');
+
+          let previousSiblingInfo = null;
+          let previousSiblingRect = null;
+          if (previousSibling) {
+            previousSiblingInfo = nodesInfo[previousSibling.id];
+            previousSiblingRect = previousSiblingInfo?.rect;
+          }
+
           if (draggedEdge === RECTANGLE_EDGE_LEFT || draggedEdge === RECTANGLE_EDGE_RIGHT) {
             if (draggedEdge === RECTANGLE_EDGE_LEFT) {
-              const previousSibling = appDom.getSiblingBeforeNode(draft, draggedNode, 'children');
+              if (previousSibling && previousSiblingRect) {
+                const totalResizedColumnsSize =
+                  (draggedNode.layout?.columnSize || 1) + (previousSibling.layout?.columnSize || 1);
+                const totalResizedColumnsWidth = draggedNodeRect.width + previousSiblingRect.width;
 
-              if (previousSibling) {
-                const previousSiblingInfo = nodesInfo[previousSibling.id];
-                const previousSiblingRect = previousSiblingInfo?.rect;
+                const updatedDraggedNodeColumnSize =
+                  (resizePreviewRect.width / totalResizedColumnsWidth) * totalResizedColumnsSize;
+                const updatedPreviousSiblingColumnSize =
+                  totalResizedColumnsSize - updatedDraggedNodeColumnSize;
 
-                if (previousSiblingRect) {
-                  const totalResizedColumnsSize =
-                    (draggedNode.layout?.columnSize || 1) +
-                    (previousSibling.layout?.columnSize || 1);
-                  const totalResizedColumnsWidth =
-                    draggedNodeRect.width + previousSiblingRect.width;
-
-                  const updatedDraggedNodeColumnSize =
-                    (resizePreviewRect.width / totalResizedColumnsWidth) * totalResizedColumnsSize;
-                  const updatedPreviousSiblingColumnSize =
-                    totalResizedColumnsSize - updatedDraggedNodeColumnSize;
-
-                  draft = appDom.setNodeNamespacedProp(
-                    draft,
-                    draggedNode,
-                    'layout',
-                    'columnSize',
-                    updatedDraggedNodeColumnSize,
-                  );
-                  draft = appDom.setNodeNamespacedProp(
-                    draft,
-                    previousSibling,
-                    'layout',
-                    'columnSize',
-                    updatedPreviousSiblingColumnSize,
-                  );
-                }
+                draft = appDom.setNodeNamespacedProp(
+                  draft,
+                  draggedNode,
+                  'layout',
+                  'columnSize',
+                  updatedDraggedNodeColumnSize,
+                );
+                draft = appDom.setNodeNamespacedProp(
+                  draft,
+                  previousSibling,
+                  'layout',
+                  'columnSize',
+                  updatedPreviousSiblingColumnSize,
+                );
               }
             }
             if (draggedEdge === RECTANGLE_EDGE_RIGHT) {
@@ -1345,7 +1395,7 @@ export default function RenderOverlay({ bridge }: RenderOverlayProps) {
             }
           }
 
-          if (draggedEdge === RECTANGLE_EDGE_BOTTOM) {
+          if (draggedEdge === RECTANGLE_EDGE_BOTTOM || draggedEdge === RECTANGLE_EDGE_TOP) {
             const resizableHeightProp = draggedNodeInfo?.componentConfig?.resizableHeightProp;
 
             if (resizableHeightProp) {
@@ -1356,6 +1406,47 @@ export default function RenderOverlay({ bridge }: RenderOverlayProps) {
                 resizableHeightProp,
                 resizePreviewRect.height,
               );
+
+              if (draggedEdge === RECTANGLE_EDGE_TOP) {
+                let previousSiblingResizableHeightProp =
+                  previousSiblingInfo?.componentConfig?.resizableHeightProp;
+
+                const draggedNodeParentProp = draggedNode.parentProp;
+
+                const hasNewSpacer =
+                  !previousSiblingResizableHeightProp && parent && draggedNodeParentProp;
+
+                if (hasNewSpacer) {
+                  const spacer = appDom.createElement(draft, SPACER_COMPONENT_ID);
+
+                  draft = appDom.addNode(
+                    draft,
+                    spacer,
+                    parent,
+                    draggedNodeParentProp,
+                    appDom.getNewParentIndexBeforeNode(draft, draggedNode, draggedNodeParentProp),
+                  );
+
+                  previousSibling = spacer;
+                  previousSiblingInfo = nodesInfo[previousSibling.id];
+                  previousSiblingRect = previousSiblingInfo?.rect;
+                  previousSiblingResizableHeightProp =
+                    previousSiblingInfo?.componentConfig?.resizableHeightProp;
+                }
+
+                if (previousSibling && previousSiblingRect && previousSiblingResizableHeightProp) {
+                  draft = appDom.setNodeNamespacedProp(
+                    draft,
+                    previousSibling,
+                    'props',
+                    previousSiblingResizableHeightProp,
+                    hasNewSpacer
+                      ? draggedNodeRect.height - resizePreviewRect.height
+                      : previousSiblingRect.height +
+                          (draggedNodeRect.height - resizePreviewRect.height),
+                  );
+                }
+              }
             }
           }
 
@@ -1367,17 +1458,6 @@ export default function RenderOverlay({ bridge }: RenderOverlayProps) {
     },
     [api, domApi, draggedEdge, draggedNode, nodesInfo],
   );
-
-  // @TODO: Keep trying
-  // React.useEffect(() => {
-  //   if (draggedEdge) {
-  //     document.getElementById('yamaha').addEventListener('mouseup', handleEdgeDragEnd, true);
-
-  //     return () => {
-  //       document.getElementById('yamaha').removeEventListener('mouseup', handleEdgeDragEnd, true);
-  //     };
-  //   }
-  // }, [draggedEdge, handleEdgeDragEnd]);
 
   return (
     <OverlayRoot
@@ -1396,6 +1476,7 @@ export default function RenderOverlay({ bridge }: RenderOverlayProps) {
       {...(draggedEdge
         ? {
             onMouseMove: handleEdgeDragOver,
+            onMouseUp: handleEdgeDragEnd,
           }
         : {
             onDragOver: handleNodeDragOver,
@@ -1417,15 +1498,18 @@ export default function RenderOverlay({ bridge }: RenderOverlayProps) {
         const isPageRowChild = parent ? appDom.isElement(parent) && isPageRow(parent) : false;
         const isPageColumnChild = parent ? appDom.isElement(parent) && isPageColumn(parent) : false;
 
+        const nodeParentProp = node.parentProp;
+        const isFirstChild =
+          parent && appDom.isElement(parent) && nodeParentProp
+            ? appDom.getNodeFirstChild(dom, parent, nodeParentProp)?.id === node.id
+            : false;
+
         const isSelected = selectedNode && !newNode ? selectedNode.id === node.id : false;
         const isHovered = hoveredNodeId === node.id;
 
         const isHorizontallyResizable = isSelected && (isPageRowChild || isPageColumnChild);
         const isVerticallyResizable =
           isSelected && Boolean(nodeInfo?.componentConfig?.resizableHeightProp);
-
-        const isResizingVertically =
-          draggedEdge === RECTANGLE_EDGE_TOP || draggedEdge === RECTANGLE_EDGE_BOTTOM;
 
         const isResizing = Boolean(draggedEdge);
         const isResizingNode = isResizing && node.id === draggedNodeId;
@@ -1449,13 +1533,18 @@ export default function RenderOverlay({ bridge }: RenderOverlayProps) {
                 onDuplicate={handleNodeDuplicate(node as appDom.ElementNode)}
                 draggableEdges={[
                   ...getNodeDraggableHorizontalEdges(parent && isPageColumnChild ? parent : node),
-                  ...(isVerticallyResizable ? [RECTANGLE_EDGE_BOTTOM as RectangleEdge] : []),
+                  ...(isVerticallyResizable
+                    ? [
+                        RECTANGLE_EDGE_BOTTOM as RectangleEdge,
+                        ...(isPageColumnChild && !isFirstChild
+                          ? [RECTANGLE_EDGE_TOP as RectangleEdge]
+                          : []),
+                      ]
+                    : []),
                 ]}
                 onEdgeDragStart={
                   isHorizontallyResizable || isVerticallyResizable
-                    ? handleEdgeDragStart(
-                        parent && isPageColumnChild && !isResizingVertically ? parent : node,
-                      )
+                    ? handleEdgeDragStart(node)
                     : undefined
                 }
                 onDelete={handleNodeDelete(node.id)}

@@ -732,7 +732,14 @@ function mergePageIntoDom(dom: appDom.AppDom, pageName: string, pageFile: Page):
   return dom;
 }
 
-function optimizePageElement(element: ElementType): ElementType {
+function optimizePageElement(
+  element: ElementType,
+  isPageChild = false,
+): ElementType | ElementType[] {
+  if (isPageChild && element.component === PAGE_COLUMN_COMPONENT_ID) {
+    return (element.children || []).flatMap((child) => optimizePageElement(child, true));
+  }
+
   const isLayoutElement = (possibleLayoutElement: ElementType): boolean =>
     possibleLayoutElement.component === PAGE_ROW_COMPONENT_ID ||
     possibleLayoutElement.component === PAGE_COLUMN_COMPONENT_ID;
@@ -753,7 +760,7 @@ function optimizePageElement(element: ElementType): ElementType {
 
   return {
     ...element,
-    children: element.children && element.children.map(optimizePageElement),
+    children: element.children && element.children.flatMap((child) => optimizePageElement(child)),
   };
 }
 
@@ -762,7 +769,7 @@ function optimizePage(page: Page): Page {
     ...page,
     spec: {
       ...page.spec,
-      content: page.spec.content?.map(optimizePageElement),
+      content: page.spec.content?.flatMap((element) => optimizePageElement(element, true)),
     },
   };
 }

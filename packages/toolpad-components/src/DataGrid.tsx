@@ -43,7 +43,6 @@ import {
   Typography,
   Tooltip,
   Popover,
-  Container,
 } from '@mui/material';
 import { getObjectKey } from '@mui/toolpad-utils/objectKey';
 import { errorFrom } from '@mui/toolpad-utils/errors';
@@ -727,11 +726,7 @@ const DataGridComponent = React.forwardRef(function DataGridComponent(
 
   return (
     <LicenseInfoProvider info={LICENSE_INFO}>
-      <Container
-        ref={ref}
-        disableGutters
-        sx={{ ...sx, minHeight: heightProp, position: 'relative' }}
-      >
+      <Box ref={ref} sx={{ ...sx, width: '100%', minHeight: heightProp, position: 'relative' }}>
         <ErrorBoundary fallbackRender={dataGridFallbackRender} resetKeys={[rows]}>
           <DataGridPro
             apiRef={apiRef}
@@ -756,7 +751,7 @@ const DataGridComponent = React.forwardRef(function DataGridComponent(
             }}
           />
         </ErrorBoundary>
-      </Container>
+      </Box>
     </LicenseInfoProvider>
   );
 });

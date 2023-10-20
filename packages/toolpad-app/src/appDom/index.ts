@@ -816,6 +816,22 @@ export function moveNode<Parent extends AppDomNode, Child extends AppDomNode>(
   return setNodeParent(dom, node, parent.id, parentProp, parentIndex);
 }
 
+export function spreadNode<Child extends AppDomNode>(dom: AppDom, node: Child) {
+  const parent = getParent(dom, node);
+  const parentProp = node.parentProp;
+
+  let draft = dom;
+  if (parent && parentProp && isElement(node)) {
+    for (const child of getDescendants(draft, node)) {
+      const parentIndex = getNewParentIndexBeforeNode(draft, node, parentProp);
+      draft = setNodeParent(draft, child, parent.id, parentProp, parentIndex);
+    }
+    draft = removeNode(draft, node.id);
+  }
+
+  return draft;
+}
+
 export function nodeExists(dom: AppDom, nodeId: NodeId): boolean {
   return !!getMaybeNode(dom, nodeId);
 }

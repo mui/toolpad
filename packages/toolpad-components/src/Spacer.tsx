@@ -19,7 +19,7 @@ export default createBuiltin(Spacer, {
       helperText: 'The height of the spacer.',
       type: 'number',
       default: 160,
-      minimum: 20,
+      minimum: 4,
     },
     sx: {
       helperText: SX_PROP_HELPER_TEXT,

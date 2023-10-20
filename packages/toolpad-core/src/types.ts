@@ -397,7 +397,7 @@ export type RuntimeEvent = {
   [K in keyof RuntimeEvents]: { type: K } & RuntimeEvents[K];
 }[keyof RuntimeEvents];
 
-export interface ComponentConfig<P extends object = {}> {
+export interface ComponentConfig<P extends object = Record<string, unknown>> {
   /**
    * A short explanatory text that'll be shown in the editor UI when this component is referenced.
    * May contain Markdown.

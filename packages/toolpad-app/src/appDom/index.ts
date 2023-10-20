@@ -1051,8 +1051,18 @@ export function duplicateNode(
     throw new Error(`Node "${node.id}" can't be duplicated, it must have a parent`);
   }
 
-  const fragment = cloneFragment(dom, node.id);
-  return addFragment(dom, fragment, parent.id, parentProp);
+  if (isElement(node)) {
+    const fragment = cloneFragment(dom, node.id);
+    return addFragment(
+      dom,
+      fragment,
+      parent.id,
+      parentProp,
+      getNewParentIndexAfterNode(dom, node, parentProp),
+    );
+  }
+
+  return dom;
 }
 
 const RENDERTREE_NODES = ['app', 'page', 'element', 'query', 'mutation', 'theme'] as const;
